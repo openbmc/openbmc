@@ -1,0 +1,8 @@
+[Unit]
+Description=Phosphor OpenBMC event management daemon
+
+[Service]
+ExecStart=/usr/sbin/obmc-phosphor-eventd
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,6 @@
+Common targets are:
+     obmc-phosphor-image
+
+You can also run generated qemu images with a command like:
+     idir=tmp/deploy/images/qemuphosphor
+     runqemu qemuarm $idir/zImage-qemuphosphor.bin $idir/obmc-phosphor-image-qemuphosphor.ext4

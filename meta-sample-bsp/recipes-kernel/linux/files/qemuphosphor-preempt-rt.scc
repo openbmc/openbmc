@@ -1,0 +1,7 @@
+define KMACHINE qemuphosphor
+define KTYPE preempt-rt
+define KARCH arm
+
+include ktypes/preempt-rt/preempt-rt.scc
+
+include qemuphosphor.scc
