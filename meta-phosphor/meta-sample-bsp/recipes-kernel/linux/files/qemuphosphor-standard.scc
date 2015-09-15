@@ -1,0 +1,7 @@
+define KMACHINE qemuphosphor
+define KTYPE standard
+define KARCH arm
+
+include bsp/arm-versatile-926ejs/arm-versatile-926ejs-standard
+
+include qemuphosphor.scc
