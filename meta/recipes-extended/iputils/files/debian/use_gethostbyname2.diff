@@ -1,0 +1,31 @@
+Upstream-Status: Pending [from other distro Debian]
+
+Index: iputils-s20121221/tracepath.c
+===================================================================
+--- iputils-s20121221.orig/tracepath.c
++++ iputils-s20121221/tracepath.c
+@@ -370,9 +370,9 @@ main(int argc, char **argv)
+ 	}
+ #endif
+ 
+-	he = gethostbyname(p);
++	he = gethostbyname2(argv[0], AF_INET);
+ 	if (he == NULL) {
+-		herror("gethostbyname");
++		herror("gethostbyname2");
+ 		exit(1);
+ 	}
+ 
+Index: iputils-s20121221/ping.c
+===================================================================
+--- iputils-s20121221.orig/ping.c
++++ iputils-s20121221/ping.c
+@@ -279,7 +279,7 @@ main(int argc, char **argv)
+ #else
+ 			idn = target;
+ #endif
+-			hp = gethostbyname(idn);
++			hp = gethostbyname2(idn, AF_INET);
+ 			if (!hp) {
+ 				fprintf(stderr, "ping: unknown host %s\n", target);
+ 				exit(2);

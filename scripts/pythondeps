@@ -1,0 +1,250 @@
+#!/usr/bin/env python
+#
+# Determine dependencies of python scripts or available python modules in a search path.
+#
+# Given the -d argument and a filename/filenames, returns the modules imported by those files.
+# Given the -d argument and a directory/directories, recurses to find all
+# python packages and modules, returns the modules imported by these.
+# Given the -p argument and a path or paths, scans that path for available python modules/packages.
+
+import argparse
+import ast
+import imp
+import logging
+import os.path
+import sys
+
+
+logger = logging.getLogger('pythondeps')
+
+suffixes = []
+for triple in imp.get_suffixes():
+    suffixes.append(triple[0])
+
+
+class PythonDepError(Exception):
+    pass
+
+
+class DependError(PythonDepError):
+    def __init__(self, path, error):
+        self.path = path
+        self.error = error
+        PythonDepError.__init__(self, error)
+
+    def __str__(self):
+        return "Failure determining dependencies of {}: {}".format(self.path, self.error)
+
+
+class ImportVisitor(ast.NodeVisitor):
+    def __init__(self):
+        self.imports = set()
+        self.importsfrom = []
+
+    def visit_Import(self, node):
+        for alias in node.names:
+            self.imports.add(alias.name)
+
+    def visit_ImportFrom(self, node):
+        self.importsfrom.append((node.module, [a.name for a in node.names], node.level))
+
+
+def walk_up(path):
+    while path:
+        yield path
+        path, _, _ = path.rpartition(os.sep)
+
+
+def get_provides(path):
+    path = os.path.realpath(path)
+
+    def get_fn_name(fn):
+        for suffix in suffixes:
+            if fn.endswith(suffix):
+                return fn[:-len(suffix)]
+
+    isdir = os.path.isdir(path)
+    if isdir:
+        pkg_path = path
+        walk_path = path
+    else:
+        pkg_path = get_fn_name(path)
+        if pkg_path is None:
+            return
+        walk_path = os.path.dirname(path)
+
+    for curpath in walk_up(walk_path):
+        if not os.path.exists(os.path.join(curpath, '__init__.py')):
+            libdir = curpath
+            break
+    else:
+        libdir = ''
+
+    package_relpath = pkg_path[len(libdir)+1:]
+    package = '.'.join(package_relpath.split(os.sep))
+    if not isdir:
+        yield package, path
+    else:
+        if os.path.exists(os.path.join(path, '__init__.py')):
+            yield package, path
+
+        for dirpath, dirnames, filenames in os.walk(path):
+            relpath = dirpath[len(path)+1:]
+            if relpath:
+                if '__init__.py' not in filenames:
+                    dirnames[:] = []
+                    continue
+                else:
+                    context = '.'.join(relpath.split(os.sep))
+                    if package:
+                        context = package + '.' + context
+                    yield context, dirpath
+            else:
+                context = package
+
+            for fn in filenames:
+                adjusted_fn = get_fn_name(fn)
+                if not adjusted_fn or adjusted_fn == '__init__':
+                    continue
+
+                fullfn = os.path.join(dirpath, fn)
+                if context:
+                    yield context + '.' + adjusted_fn, fullfn
+                else:
+                    yield adjusted_fn, fullfn
+
+
+def get_code_depends(code_string, path=None, provide=None, ispkg=False):
+    try:
+        code = ast.parse(code_string, path)
+    except TypeError as exc:
+        raise DependError(path, exc)
+    except SyntaxError as exc:
+        raise DependError(path, exc)
+
+    visitor = ImportVisitor()
+    visitor.visit(code)
+    for builtin_module in sys.builtin_module_names:
+        if builtin_module in visitor.imports:
+            visitor.imports.remove(builtin_module)
+
+    if provide:
+        provide_elements = provide.split('.')
+        if ispkg:
+            provide_elements.append("__self__")
+        context = '.'.join(provide_elements[:-1])
+        package_path = os.path.dirname(path)
+    else:
+        context = None
+        package_path = None
+
+    levelzero_importsfrom = (module for module, names, level in visitor.importsfrom
+                             if level == 0)
+    for module in visitor.imports | set(levelzero_importsfrom):
+        if context and path:
+            module_basepath = os.path.join(package_path, module.replace('.', '/'))
+            if os.path.exists(module_basepath):
+                # Implicit relative import
+                yield context + '.' + module, path
+                continue
+
+            for suffix in suffixes:
+                if os.path.exists(module_basepath + suffix):
+                    # Implicit relative import
+                    yield context + '.' + module, path
+                    break
+            else:
+                yield module, path
+        else:
+            yield module, path
+
+    for module, names, level in visitor.importsfrom:
+        if level == 0:
+            continue
+        elif not provide:
+            raise DependError("Error: ImportFrom non-zero level outside of a package: {0}".format((module, names, level)), path)
+        elif level > len(provide_elements):
+            raise DependError("Error: ImportFrom level exceeds package depth: {0}".format((module, names, level)), path)
+        else:
+            context = '.'.join(provide_elements[:-level])
+            if module:
+                if context:
+                    yield context + '.' + module, path
+                else:
+                    yield module, path
+
+
+def get_file_depends(path):
+    try:
+        code_string = open(path, 'r').read()
+    except (OSError, IOError) as exc:
+        raise DependError(path, exc)
+
+    return get_code_depends(code_string, path)
+
+
+def get_depends_recursive(directory):
+    directory = os.path.realpath(directory)
+
+    provides = dict((v, k) for k, v in get_provides(directory))
+    for filename, provide in provides.iteritems():
+        if os.path.isdir(filename):
+            filename = os.path.join(filename, '__init__.py')
+            ispkg = True
+        elif not filename.endswith('.py'):
+            continue
+        else:
+            ispkg = False
+
+        with open(filename, 'r') as f:
+            source = f.read()
+
+        depends = get_code_depends(source, filename, provide, ispkg)
+        for depend, by in depends:
+            yield depend, by
+
+
+def get_depends(path):
+    if os.path.isdir(path):
+        return get_depends_recursive(path)
+    else:
+        return get_file_depends(path)
+
+
+def main():
+    logging.basicConfig()
+
+    parser = argparse.ArgumentParser(description='Determine dependencies and provided packages for python scripts/modules')
+    parser.add_argument('path', nargs='+', help='full path to content to be processed')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-p', '--provides', action='store_true',
+                       help='given a path, display the provided python modules')
+    group.add_argument('-d', '--depends', action='store_true',
+                       help='given a filename, display the imported python modules')
+
+    args = parser.parse_args()
+    if args.provides:
+        modules = set()
+        for path in args.path:
+            for provide, fn in get_provides(path):
+                modules.add(provide)
+
+        for module in sorted(modules):
+            print(module)
+    elif args.depends:
+        for path in args.path:
+            try:
+                modules = get_depends(path)
+            except PythonDepError as exc:
+                logger.error(str(exc))
+                sys.exit(1)
+
+            for module, imp_by in modules:
+                print("{}\t{}".format(module, imp_by))
+    else:
+        parser.print_help()
+        sys.exit(2)
+
+
+if __name__ == '__main__':
+    main()

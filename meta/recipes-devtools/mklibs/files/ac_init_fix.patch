@@ -1,0 +1,19 @@
+Get the version of mklibs by simpler means. The MKLIBS_VERSION string in the 
+configure.ac file is replaced with real version string by the 
+do_configure_prepend() function from the recipe .bb file.
+
+Upstream-Status: Inappropriate [configuration]
+
+Nitin A Kamble <nitin.a.kamble@intel.com>
+Date: 2011/01/24
+
+Index: mklibs/configure.ac
+===================================================================
+--- mklibs.orig/configure.ac	2010-02-21 17:34:56.000000000 -0800
++++ mklibs/configure.ac	2011-01-24 18:52:19.943242079 -0800
+@@ -1,4 +1,4 @@
+-AC_INIT([mklibs],m4_esyscmd(dpkg-parsechangelog | perl -ne 'print $1 if m/^Version: (.*)$/;'))
++AC_INIT([mklibs], MKLIBS_VERSION)
+ AM_INIT_AUTOMAKE([foreign no-define])
+ AC_CONFIG_HEADERS([config.h])
+ AM_MAINTAINER_MODE

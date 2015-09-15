@@ -1,0 +1,20 @@
+Upstream-Status: Submitted [bug-parted@gnu.org]
+
+| for po in `ls -1 ./*.pt_BR.po 2>/dev/null`; do \
+| 		make $(basename ${po%.pt_BR.po}); \
+| 	done
+| Makefile:904: *** Recursive variable `mandir' references itself (eventually).  Stop.
+
+Signed-off-by: Andreas Oberritter <obi@opendreambox.org>
+
+--- parted-3.1/doc/po4a.mk.orig	2012-03-15 14:09:11.555831872 +0100
++++ parted-3.1/doc/po4a.mk	2012-03-15 14:10:44.243830985 +0100
+@@ -23,7 +23,7 @@
+ # threshold is 80%), it won't be distributed, and the build won't fail.
+ #
+ 
+-mandir = $(mandir)/$(lang)
++mandir := $(mandir)/$(lang)
+ 
+ # Inform automake that we want to install some man pages in section 1, 5
+ # and 8.

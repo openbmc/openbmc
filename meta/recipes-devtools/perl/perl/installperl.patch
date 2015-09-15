@@ -1,0 +1,17 @@
+Upstream-Status:Inappropriate [embedded specific]
+
+Index: perl-5.12.3/installperl
+===================================================================
+--- perl-5.12.3.orig/installperl
++++ perl-5.12.3/installperl
+@@ -3,8 +3,8 @@
+ BEGIN {
+     require 5.004;
+     chdir '..' if !-d 'lib' and -d '../lib';
+-    @INC = 'lib';
+-    $ENV{PERL5LIB} = 'lib';
++#    @INC = 'lib';
++#    $ENV{PERL5LIB} = 'lib';
+ 
+     # This needs to be at BEGIN time, before any use of Config
+     require './install_lib.pl';

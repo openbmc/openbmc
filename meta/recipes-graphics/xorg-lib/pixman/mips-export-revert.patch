@@ -1,0 +1,22 @@
+Revert a commit in pixman 0.32.6 which breaks compliation on MIPS machines with
+errors such as:
+
+pixman-0.32.6/pixman/pixman-mips-dspr2-asm.S:4267:
+Error: invalid operands `mflo $14,$ac3'
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+--- b/pixman/pixman-mips-dspr2-asm.h
++++ a/pixman/pixman-mips-dspr2-asm.h
+@@ -72,10 +72,7 @@
+ #define LEAF_MIPS32R2(symbol)                           \
+                 .globl  symbol;                         \
+                 .align  2;                              \
+-#ifdef __ELF__
+-                .hidden symbol;                         \
+                 .type   symbol, @function;              \
+-#endif
+                 .ent    symbol, 0;                      \
+ symbol:         .frame  sp, 0, ra;                      \
+                 .set    push;                           \

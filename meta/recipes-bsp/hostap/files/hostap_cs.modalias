@@ -1,0 +1,28 @@
+# product info: "Pretec", "CompactWLAN Card 802.11b", "2.5"
+alias pcmcia:m0156c0002f06fn00pfn00pa1CADD3E5pbE697636Cpc7A5BFCF1pd00000000 hostap_cs
+
+# manufacturer ID which exist in orinoco_cs AND in hostap_cs
+alias pcmcia:m000Bc7100f06fn00pfn00pa*pb*pc*pd* hostap_cs
+alias pcmcia:m000Bc7300f06fn00pfn00pa*pb*pc*pd* hostap_cs
+alias pcmcia:m0126c8000f06fn00pfn00pa*pb*pc*pd* hostap_cs
+alias pcmcia:m0138c0002f06fn00pfn00pa*pb*pc*pd* hostap_cs
+alias pcmcia:m0250c0002f06fn00pfn00pa*pb*pc*pd* hostap_cs
+alias pcmcia:m0274c1612f06fn00pfn00pa*pb*pc*pd* hostap_cs
+alias pcmcia:m0274c1613f06fn00pfn00pa*pb*pc*pd* hostap_cs
+alias pcmcia:m028Ac0002f06fn00pfn00pa*pb*pc*pd* hostap_cs
+alias pcmcia:m02AAc0002f06fn00pfn00pa*pb*pc*pd* hostap_cs
+alias pcmcia:m50C2c7300f06fn00pfn00pa*pb*pc*pd* hostap_cs
+alias pcmcia:mD601c0002f06fn00pfn00pa*pb*pc*pd* hostap_cs
+alias pcmcia:mD601c0005f06fn00pfn00pa*pb*pc*pd* hostap_cs
+
+# product info: "Linksys", "Wireless CompactFlash Card", "", ""
+alias pcmcia:m028Ac0673f06fn00pfn00pa0733CC81pb0C52F395pc00000000pd00000000 hostap_cs
+
+# product info:"PLANEX COMMUNICATION INC","PLANEX GW-CF11X Wireless CF Card", "", ""
+alias pcmcia:mD601c0010f06fn00pfn00pa4703CF68pbFAD7318Dpc00000000pd00000000 hostap_cs
+
+# 0x0156, 0x0002 and "Version 01.02" only appear for Prism based cards.
+alias pcmcia:m0156c0002f06fn00pfn00pa*pb*pc4B74BAA0pd00000000 hostap_cs
+
+# "BUFFALO", "WLI-CF-S11G", "", ""
+alias pcmcia:m026Fc030Bf06fn00pfn00pa2DECECE3pb82067C18pc00000000pd00000000 hostap_cs

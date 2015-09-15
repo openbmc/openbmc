@@ -1,0 +1,59 @@
+RPM5 has removed support for RPMVSF_NOSIGNATURES
+
+Patch smart to no longer use this flag
+
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+diff --git a/smart/backends/rpm/base.py b/smart/backends/rpm/base.py
+--- a/smart/backends/rpm/base.py
++++ b/smart/backends/rpm/base.py
+@@ -63,11 +63,11 @@ def getTS(new=False):
+         if sysconf.get("rpm-dbpath"):
+             rpm.addMacro('_dbpath', "/" + sysconf.get("rpm-dbpath"))
+         getTS.ts = rpm.ts(getTS.root)
+-        if not sysconf.get("rpm-check-signatures", False):
+-            if hasattr(rpm, '_RPMVSF_NOSIGNATURES'):
+-                getTS.ts.setVSFlags(rpm._RPMVSF_NOSIGNATURES)
+-            else:
+-                raise Error, _("rpm requires checking signatures")
++        #if not sysconf.get("rpm-check-signatures", False):
++        #    if hasattr(rpm, '_RPMVSF_NOSIGNATURES'):
++        #        getTS.ts.setVSFlags(rpm._RPMVSF_NOSIGNATURES)
++        #    else:
++        #        raise Error, _("rpm requires checking signatures")
+         rpm_dbpath = sysconf.get("rpm-dbpath", "var/lib/rpm")
+         dbdir = rpm_join_dbpath(getTS.root, rpm_dbpath)
+         if not os.path.isdir(dbdir):
+@@ -89,11 +89,11 @@ def getTS(new=False):
+         if sysconf.get("rpm-dbpath"):
+             rpm.addMacro('_dbpath', "/" + sysconf.get("rpm-dbpath"))
+         ts = rpm.ts(getTS.root)
+-        if not sysconf.get("rpm-check-signatures", False):
+-            if hasattr(rpm, '_RPMVSF_NOSIGNATURES'):
+-                ts.setVSFlags(rpm._RPMVSF_NOSIGNATURES)
+-            else:
+-                raise Error, _("rpm requires checking signatures")
++        #if not sysconf.get("rpm-check-signatures", False):
++        #    if hasattr(rpm, '_RPMVSF_NOSIGNATURES'):
++        #        ts.setVSFlags(rpm._RPMVSF_NOSIGNATURES)
++        #    else:
++        #        raise Error, _("rpm requires checking signatures")
+         return ts
+     else:
+         return getTS.ts
+diff --git a/smart/plugins/yumchannelsync.py b/smart/plugins/yumchannelsync.py
+--- a/smart/plugins/yumchannelsync.py
++++ b/smart/plugins/yumchannelsync.py
+@@ -56,8 +56,8 @@ def _getreleasever():
+ 
+     rpmroot = sysconf.get("rpm-root", "/")
+     ts = rpmUtils.transaction.initReadOnlyTransaction(root=rpmroot)
+-    if hasattr(rpm, '_RPMVSF_NOSIGNATURES') and hasattr(rpm, '_RPMVSF_NODIGESTS'):
+-        ts.pushVSFlags(~(rpm._RPMVSF_NOSIGNATURES|rpm._RPMVSF_NODIGESTS))
++    #if hasattr(rpm, '_RPMVSF_NOSIGNATURES') and hasattr(rpm, '_RPMVSF_NODIGESTS'):
++    #    ts.pushVSFlags(~(rpm._RPMVSF_NOSIGNATURES|rpm._RPMVSF_NODIGESTS))
+     releasever = None
+     # HACK: we're hard-coding the most used distros, will add more if needed
+     idx = ts.dbMatch('provides', 'fedora-release')

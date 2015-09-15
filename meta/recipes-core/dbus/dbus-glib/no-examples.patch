@@ -1,0 +1,15 @@
+Disable compiling examples
+
+Upstream-Status: Inappropriate [disable feature]
+
+Signed-off-by: Kevin Tian <kevin.tian@intel.com>
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+--- dbus-glib-0.70/dbus/Makefile.am.orig	2006-07-23 16:04:43.000000000 +0200
++++ dbus-glib-0.70/dbus/Makefile.am	2006-07-23 16:04:52.000000000 +0200
+@@ -1,4 +1,4 @@
+-SUBDIRS = . examples
++SUBDIRS = .
+ 
+ INCLUDES=-I$(top_srcdir) $(DBUS_CFLAGS) $(DBUS_GLIB_CFLAGS) $(DBUS_GLIB_TOOL_CFLAGS) -DDBUS_COMPILATION=1 -DDBUS_LOCALEDIR=\"$(prefix)/@DATADIRNAME@/locale\" 
+ 

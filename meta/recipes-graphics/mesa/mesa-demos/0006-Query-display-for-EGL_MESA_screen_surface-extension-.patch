@@ -1,0 +1,41 @@
+From 6a19dba1d275579c73e7763b0554410ff4e1e650 Mon Sep 17 00:00:00 2001
+From: Frank Binns <frank.binns@imgtec.com>
+Date: Fri, 29 Jun 2012 12:00:26 +0100
+Subject: [PATCH 6/9] Query display for EGL_MESA_screen_surface extension
+ before using it
+
+This code makes heavy use of the EGL_MESA_screen_surface extension so
+check the display to determine if it's supported by the underlying EGL
+implementation. If it doesn't then bail.
+
+Signed-off-by: Frank Binns <frank.binns@imgtec.com>
+
+Applied and fixed up in Yocto by...
+
+Integrated-by: Tom Zanussi <tom.zanussi@linux.intel.com>
+
+Upstream-Status: Pending
+---
+ src/egl/opengl/demo1.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/egl/opengl/demo1.c b/src/egl/opengl/demo1.c
+index 3a3564c..06e2138 100644
+--- a/src/egl/opengl/demo1.c
++++ b/src/egl/opengl/demo1.c
+@@ -110,6 +110,12 @@ main(int argc, char *argv[])
+    printf("EGL version = %d.%d\n", maj, min);
+    printf("EGL_VENDOR = %s\n", eglQueryString(d, EGL_VENDOR));
+ 
++   if (!strstr(eglQueryString(d, EGL_EXTENSIONS),
++               "EGL_MESA_screen_surface")) {
++      printf("EGL_MESA_screen_surface is not supported\n");
++      exit(1);
++   }
++
+    eglGetConfigs(d, NULL, 0, &numConfigs);
+    configs = malloc(sizeof(*configs) *numConfigs);
+    eglGetConfigs(d, configs, numConfigs, &numConfigs);
+-- 
+2.0.0
+

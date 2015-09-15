@@ -1,0 +1,24 @@
+Upstream-Status: Inappropriate [open-embedded]
+
+Index: openssl-1.0.0/Makefile.shared
+===================================================================
+--- openssl-1.0.0.orig/Makefile.shared
++++ openssl-1.0.0/Makefile.shared
+@@ -92,7 +92,7 @@
+ LINK_APP=	\
+   ( $(SET_X);   \
+     LIBDEPS="$${LIBDEPS:-$(LIBDEPS)}"; \
+-    LDCMD="$${LDCMD:-$(CC)}"; LDFLAGS="$${LDFLAGS:-$(CFLAGS)}"; \
++    LDCMD="$${LDCMD:-$(CC)}"; LDFLAGS="$(OE_LDFLAGS) $${LDFLAGS:-$(CFLAGS)}"; \
+     LIBPATH=`for x in $$LIBDEPS; do echo $$x; done | sed -e 's/^ *-L//;t' -e d | uniq`; \
+     LIBPATH=`echo $$LIBPATH | sed -e 's/ /:/g'`; \
+     LD_LIBRARY_PATH=$$LIBPATH:$$LD_LIBRARY_PATH \
+@@ -102,7 +102,7 @@
+   ( $(SET_X);   \
+     LIBDEPS="$${LIBDEPS:-$(LIBDEPS)}"; \
+     SHAREDCMD="$${SHAREDCMD:-$(CC)}"; \
+-    SHAREDFLAGS="$${SHAREDFLAGS:-$(CFLAGS) $(SHARED_LDFLAGS)}"; \
++    SHAREDFLAGS="$(OE_LDFLAGS) $${SHAREDFLAGS:-$(CFLAGS) $(SHARED_LDFLAGS)}"; \
+     LIBPATH=`for x in $$LIBDEPS; do echo $$x; done | sed -e 's/^ *-L//;t' -e d | uniq`; \
+     LIBPATH=`echo $$LIBPATH | sed -e 's/ /:/g'`; \
+     LD_LIBRARY_PATH=$$LIBPATH:$$LD_LIBRARY_PATH \

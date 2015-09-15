@@ -1,0 +1,27 @@
+This patch skips over the 'import check' setup.py does when building
+extensions.  This generally won't work when cross-compiling.
+
+Upstream-Status: Inappropriate [embedded-specific]
+
+Signed-off-by: Tom Zanussi <tom.zanussi@intel.com>
+
+Index: Python-2.7.2/setup.py
+===================================================================
+--- Python-2.7.2.orig/setup.py	2011-11-04 16:46:34.553796410 -0500
++++ Python-2.7.2/setup.py	2011-11-04 16:59:49.692802313 -0500
+@@ -287,6 +287,15 @@
+                           (ext.name, sys.exc_info()[1]))
+             self.failed.append(ext.name)
+             return
++
++        # If we're cross-compiling, we want to skip the import check
++        # i.e. we shouldn't be dynamically loading target shared libs
++        if os.environ.get('CROSS_COMPILE') is not None:
++            self.announce(
++                'WARNING: skipping import check for cross-compiled "%s"' %
++                ext.name)
++            return
++
+         # Workaround for Mac OS X: The Carbon-based modules cannot be
+         # reliably imported into a command-line Python
+         if 'Carbon' in ext.extra_link_args:

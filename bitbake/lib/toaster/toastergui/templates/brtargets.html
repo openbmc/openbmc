@@ -1,0 +1,20 @@
+<span data-toggle="tooltip"
+    {% if buildrequest.brtarget_set.all.count > 1 %}
+        title="Targets:
+        {% for target in buildrequest.brtarget_set.all %}
+            {% if target.task %}
+                {{target.target}}:{{target.task}}
+            {% else %}
+                {{target.target}}
+            {% endif %}
+        {%endfor%}"
+    {%endif%}>
+    {% if buildrequest.brtarget_set.all.0.task %}
+        {{buildrequest.brtarget_set.all.0.target}}:{{buildrequest.brtarget_set.all.0.task}}
+    {% else %}
+         {{buildrequest.brtarget_set.all.0.target}}
+    {% endif %}
+    {% if buildrequest.brtarget_set.all.count > 1 %}
+        (+ {{buildrequest.brtarget_set.all.count|add:"-1"}})
+    {% endif %}
+</span>

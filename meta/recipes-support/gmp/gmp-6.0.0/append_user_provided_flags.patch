@@ -1,0 +1,52 @@
+Upstream-Status: Inappropriate
+
+Append the user provided flags to the auto-detected ones.
+
+Signed-off-by: Laurentiu Palcu <laurentiu.palcu@intel.com>
+
+Index: gmp-5.1.1/configure.ac
+===================================================================
+--- gmp-5.1.1.orig/configure.ac	2014-02-11 15:05:44.925202403 +0200
++++ gmp-5.1.1/configure.ac	2014-02-11 15:19:03.918511398 +0200
+@@ -1745,8 +1745,12 @@
+ EOF
+ 
+ 
+-test_CFLAGS=${CFLAGS+set}
+-test_CPPFLAGS=${CPPFLAGS+set}
++test_CFLAGS=
++test_CPPFLAGS=
++
++user_CFLAGS=$CFLAGS
++user_CPPFLAGS=$CPPFLAGS
++user_CXXFLAGS=$CXXFLAGS
+ 
+ for abi in $abilist; do
+   abi_last="$abi"
+@@ -2175,7 +2179,7 @@
+ want_cxx=no
+ AC_PROG_CXX
+ if test $enable_cxx != no; then
+-  test_CXXFLAGS=${CXXFLAGS+set}
++  test_CXXFLAGS=
+ 
+   echo "CXXFLAGS chosen by autoconf: $CXXFLAGS" >&AS_MESSAGE_LOG_FD()
+   cxxflags_ac_prog_cxx=$CXXFLAGS
+@@ -2202,7 +2206,7 @@
+   # Automake includes $CPPFLAGS in a C++ compile, so we do the same here.
+   #
+   for cxxflags_choice in $cxxflags_list; do
+-    eval CXXFLAGS=\"\$cxxflags_$cxxflags_choice\"
++    eval CXXFLAGS=\"\$cxxflags_$cxxflags_choice $user_CXXFLAGS\"
+     GMP_PROG_CXX_WORKS($CXX $CPPFLAGS $CXXFLAGS,
+       [want_cxx=yes
+       break])
+@@ -2292,6 +2296,8 @@
+ #  done
+ fi
+ 
++CFLAGS="$CFLAGS $user_CFLAGS"
++CPPFLAGS="$CPPFLAGS $user_CPPFLAGS"
+ 
+ cat >&AS_MESSAGE_LOG_FD() <<EOF
+ Decided:

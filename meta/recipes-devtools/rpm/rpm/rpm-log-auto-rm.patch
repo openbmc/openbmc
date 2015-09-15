@@ -1,0 +1,15 @@
+
+Upstream-Status: Inappropriate [configuration]
+
+Index: rpm-5.4.14/rpmdb/DB_CONFIG.in
+===================================================================
+--- rpm-5.4.14.orig/rpmdb/DB_CONFIG.in
++++ rpm-5.4.14/rpmdb/DB_CONFIG.in
+@@ -4,6 +4,7 @@ set_data_dir .
+ set_create_dir .
+ set_lg_dir ./log
+ set_tmp_dir ./tmp
++set_flags db_log_autoremove on
+ 
+ # -- thread_count must be >= 8
+ set_thread_count 64

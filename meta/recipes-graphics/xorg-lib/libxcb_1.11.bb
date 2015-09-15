@@ -1,0 +1,10 @@
+include libxcb.inc
+
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://COPYING;md5=d763b081cb10c223435b01e00dc0aba7"
+
+
+DEPENDS += "libxdmcp"
+
+SRC_URI[md5sum] = "5a873ebd383d1a60612dd6ec6b42c781"
+SRC_URI[sha256sum] = "03635d70045b9ede90778e67516135828a57de87ac508f987024f43c03620ff7"

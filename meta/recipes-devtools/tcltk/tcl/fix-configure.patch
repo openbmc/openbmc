@@ -1,0 +1,46 @@
+Upstream-Status: Pending
+
+Index: unix/tcl.m4
+===================================================================
+--- tcl8.4.11/unix.orig/tcl.m4
++++ tcl8.4.11/unix/tcl.m4
+@@ -845,7 +845,7 @@ AC_DEFUN(SC_CONFIG_CFLAGS, [
+ 	    # results, and the version is kept in special file).
+ 	
+ 	    if test -r /etc/.relid -a "X`uname -n`" = "X`uname -s`" ; then
+-		system=MP-RAS-`awk '{print $3}' /etc/.relid'`
++		system=MP-RAS-`awk '{print $3}' /etc/.relid`
+ 	    fi
+ 	    if test "`uname -s`" = "AIX" ; then
+ 		system=AIX-`uname -v`.`uname -r`
+@@ -2250,7 +2250,7 @@ AC_DEFUN(SC_BLOCKING_STYLE, [
+ 	    # results, and the version is kept in special file).
+ 	
+ 	    if test -r /etc/.relid -a "X`uname -n`" = "X`uname -s`" ; then
+-		system=MP-RAS-`awk '{print $3}' /etc/.relid'`
++		system=MP-RAS-`awk '{print $3}' /etc/.relid`
+ 	    fi
+ 	    if test "`uname -s`" = "AIX" ; then
+ 		system=AIX-`uname -v`.`uname -r`
+Index: unix/configure
+===================================================================
+--- tcl8.4.11/unix.orig/configure
++++ tcl8.4.11/unix/configure
+@@ -2130,7 +2130,7 @@ echo "configure:2121: checking system ve
+ 	    # results, and the version is kept in special file).
+ 	
+ 	    if test -r /etc/.relid -a "X`uname -n`" = "X`uname -s`" ; then
+-		system=MP-RAS-`awk '{print }' /etc/.relid'`
++		system=MP-RAS-`awk '{print }' /etc/.relid`
+ 	    fi
+ 	    if test "`uname -s`" = "AIX" ; then
+ 		system=AIX-`uname -v`.`uname -r`
+@@ -7608,7 +7608,7 @@ echo "configure:7600: checking FIONBIO v
+ 	    # results, and the version is kept in special file).
+ 	
+ 	    if test -r /etc/.relid -a "X`uname -n`" = "X`uname -s`" ; then
+-		system=MP-RAS-`awk '{print }' /etc/.relid'`
++		system=MP-RAS-`awk '{print }' /etc/.relid`
+ 	    fi
+ 	    if test "`uname -s`" = "AIX" ; then
+ 		system=AIX-`uname -v`.`uname -r`

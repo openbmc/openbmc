@@ -1,0 +1,33 @@
+Signed-off-by: Florin Sarbu <florin.sarbu@windriver.com>
+
+Upstream-Status: Inappropriate [OE specific]
+
+Index: intltool-0.40.6/intltool.m4
+===================================================================
+--- intltool-0.40.6.orig/intltool.m4	2009-02-14 14:12:28.000000000 -0800
++++ intltool-0.40.6/intltool.m4	2011-11-23 15:39:34.689561872 -0800
+@@ -122,14 +122,16 @@
+    IT_PERL_VERSION="`$INTLTOOL_PERL -e \"printf '%vd', $^V\"`"
+    AC_MSG_RESULT([$IT_PERL_VERSION])
+ fi
+-if test "x$2" != "xno-xml"; then
+-   AC_MSG_CHECKING([for XML::Parser])
+-   if `$INTLTOOL_PERL -e "require XML::Parser" 2>/dev/null`; then
+-       AC_MSG_RESULT([ok])
+-   else
+-       AC_MSG_ERROR([XML::Parser perl module is required for intltool])
+-   fi
+-fi
++
++# Disable this check since we know XML::Parser is installed
++#if test "x$2" != "xno-xml"; then
++#   AC_MSG_CHECKING([for XML::Parser])
++#   if `$INTLTOOL_PERL -e "require XML::Parser" 2>/dev/null`; then
++#       AC_MSG_RESULT([ok])
++#   else
++#       AC_MSG_ERROR([XML::Parser perl module is required for intltool])
++#   fi
++#fi
+ 
+ # Substitute ALL_LINGUAS so we can use it in po/Makefile
+ AC_SUBST(ALL_LINGUAS)

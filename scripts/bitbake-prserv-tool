@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+
+help ()
+{
+    base=`basename $0`
+    echo -e "Usage: $base command"
+    echo "Avaliable commands:"
+    echo -e "\texport <file.conf>: export and lock down the AUTOPR values from the PR service into a file for release."
+    echo -e "\timport <file.conf>: import the AUTOPR values from the exported file into the PR service."
+}
+
+clean_cache()
+{
+    s=`bitbake -e | grep ^CACHE= | cut -f2 -d\"`
+    if [ "x${s}" != "x" ]; then
+        rm -rf ${s}
+    fi
+}
+
+do_export ()
+{
+    file=$1
+    [ "x${file}" == "x" ] && help && exit 1
+    rm -f ${file}
+
+    clean_cache
+    bitbake -R conf/prexport.conf -p
+    s=`bitbake -R conf/prexport.conf -e | grep ^PRSERV_DUMPFILE= | cut -f2 -d\"`
+    if [ "x${s}" != "x" ];
+    then
+       [ -e $s ] && mv -f $s $file && echo "Exporting to file $file succeeded!"
+       return 0
+    fi
+    echo "Exporting to file $file failed!"
+    return 1
+}
+
+do_import ()
+{
+    file=$1
+    [ "x${file}" == "x" ] && help && exit 1
+
+    clean_cache
+    bitbake -R conf/primport.conf -R $file -p
+    ret=$?
+    [ $ret -eq 0 ] && echo "Importing from file $file succeeded!" || echo "Importing from file $file failed!"
+    return $ret
+}
+
+do_migrate_localcount ()
+{
+    df=`bitbake -R conf/migrate_localcount.conf -e | \
+                grep ^LOCALCOUNT_DUMPFILE= | cut -f2 -d\"`
+    if [ "x${df}" == "x" ];
+    then
+        echo "LOCALCOUNT_DUMPFILE is not defined!"
+        return 1
+    fi
+
+    rm -rf $df
+    clean_cache
+    echo "Exporting LOCALCOUNT to AUTOINCs..."
+    bitbake -R conf/migrate_localcount.conf -p
+    [ ! $? -eq 0 ] && echo "Exporting to file $df failed!" && exit 1
+
+    if [ -e $df ];
+    then
+        echo "Exporting to file $df succeeded!"
+    else
+        echo "Exporting to file $df failed!"
+        exit 1
+    fi
+    
+    echo "Importing generated AUTOINC entries..."
+    [ -e $df ] && do_import $df
+
+    if [ ! $? -eq 0 ]
+    then
+        echo "Migration from LOCALCOUNT to AUTOINCs failed!"
+        return 1
+    fi
+
+    echo "Migration from LOCALCOUNT to AUTOINCs succeeded!"
+    return 0
+}
+
+[ $# -eq 0 ] && help  && exit 1
+
+case $1 in
+export)
+    do_export $2
+    ;;
+import)
+    do_import $2
+    ;;
+migrate_localcount)
+    do_migrate_localcount
+    ;;
+*)
+    help
+    exit 1
+    ;;
+esac

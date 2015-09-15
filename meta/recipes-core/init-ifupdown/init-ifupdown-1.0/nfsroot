@@ -1,0 +1,39 @@
+#! /bin/sh
+
+# In case the interface is used as nfsroot, avoid ifup, otherwise
+# nfsroot may lose response
+
+nfsroot=0
+
+if test "x$IFACE" = xlo ; then
+	exit 0
+fi
+
+exec 9<&0 < /proc/mounts
+while read dev mtpt fstype rest; do
+    if test $mtpt = "/" ; then
+        case $fstype in
+            nfs | nfs4)
+                nfsroot=1
+                nfs_addr=`echo $rest | sed -e 's/^.*addr=\([0-9.]*\).*$/\1/'`
+                break
+                ;;
+            *)
+                ;;
+        esac
+    fi
+done
+exec 0<&9 9<&-
+
+test $nfsroot -eq 0 && exit 0
+
+if [ -x /bin/ip -o -x /sbin/ip ] ; then
+    nfs_iface=`ip route get $nfs_addr | grep dev | sed -e 's/^.*dev \([-a-z0-9.]*\).*$/\1/'`
+fi
+
+if test "x$IFACE" = "x$nfs_iface" ; then
+    echo "ifup skipped for nfsroot interface $nfs_iface"
+    exit 1
+fi
+
+exit 0

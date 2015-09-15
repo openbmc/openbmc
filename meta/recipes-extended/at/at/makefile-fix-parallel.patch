@@ -1,0 +1,35 @@
+From 150b63a936af71b992a3a7b0fc2d2497e51fc800 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Wed, 28 Jan 2015 23:52:00 -0800
+Subject: [PATCH] Makefile: fix for parallel build
+
+Fixed:
+y.tab.c:1001:0: error: unterminated #if
+
+Let "$(YACC) -d parsetime.y" only run once will fix the problem.
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ Makefile |    4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 2a9b918..aa7c04a 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -75,7 +75,9 @@ at: $(ATOBJECTS)
+ atd: $(RUNOBJECTS)
+ 	$(CC) $(LDFLAGS) -o atd $(RUNOBJECTS) $(LIBS) $(PAMLIB)
+ 
+-y.tab.c y.tab.h: parsetime.y
++y.tab.h: y.tab.c
++
++y.tab.c: parsetime.y
+ 	$(YACC) -d parsetime.y
+ 
+ lex.yy.c: parsetime.l
+-- 
+1.7.9.5
+

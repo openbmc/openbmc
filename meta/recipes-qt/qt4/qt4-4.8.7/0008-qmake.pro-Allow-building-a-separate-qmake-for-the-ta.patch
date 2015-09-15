@@ -1,0 +1,29 @@
+From 64ce5d0e7c19436b928a2a0d9d192f56be3c9bb2 Mon Sep 17 00:00:00 2001
+From: Paul Eggleton <paul.eggleton@linux.intel.com>
+Date: Wed, 26 Sep 2012 20:32:41 +0200
+Subject: [PATCH 08/21] qmake.pro: Allow building a separate qmake for the
+ target
+
+Upstream-Status: Inappropriate [config]
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ qmake/qmake.pro | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/qmake/qmake.pro b/qmake/qmake.pro
+index 38e0fce..53b1ffb 100644
+--- a/qmake/qmake.pro
++++ b/qmake/qmake.pro
+@@ -7,6 +7,7 @@ CONFIG += console bootstrap
+ CONFIG -= qt shared app_bundle uic
+ DEFINES += QT_BUILD_QMAKE QT_BOOTSTRAPPED
+ DESTDIR = ../bin/
++TARGET = qmake2
+ 
+ OBJECTS_DIR = .
+ MOC_DIR = .
+-- 
+1.8.0
+

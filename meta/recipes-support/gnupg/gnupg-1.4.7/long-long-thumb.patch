@@ -1,0 +1,19 @@
+Orignal Patch came from OpenWrt via OE-Classic
+https://dev.openwrt.org/browser/packages/utils/gnupg/patches/001-mips_gcc4.4
+which is no longer a valid revision!
+
+Upstream-Status: Inappropriate [configuration]
+
+
+--- gnupg/mpi/longlong.h~      2006-02-14 10:09:55.000000000 +0000
++++ gnupg/mpi/longlong.h       2008-10-27 13:11:09.000000000 +0000
+@@ -181,7 +181,7 @@
+ /***************************************
+  **************  ARM  ******************
+  ***************************************/
+-#if defined (__arm__) && W_TYPE_SIZE == 32
++#if defined (__arm__) && W_TYPE_SIZE == 32 && !defined(__thumb__)
+ #define add_ssaaaa(sh, sl, ah, al, bh, bl) \
+   __asm__ ("adds %1, %4, %5\n"                                          \
+          "adc  %0, %2, %3"                                            \
+

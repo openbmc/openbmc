@@ -1,0 +1,12 @@
+[Unit]
+Description=RPC Bind Service
+Requires=rpcbind.socket
+
+[Service]
+Type=forking
+EnvironmentFile=-@SYSCONFDIR@/rpcbind.conf
+ExecStart=@SBINDIR@/rpcbind -w $RPCBIND_OPTS
+SuccessExitStatus=2
+
+[Install]
+Also=rpcbind.socket

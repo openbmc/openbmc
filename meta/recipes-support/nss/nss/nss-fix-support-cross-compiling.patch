@@ -1,0 +1,71 @@
+nss: fix support cross compiling
+
+Let some make variables be assigned from outside makefile.
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+Upstream-Status: Inappropriate [configuration]
+---
+ nss/coreconf/Linux.mk   | 12 +++++++++++-
+ nss/coreconf/arch.mk    |  2 +-
+ nss/lib/freebl/Makefile |  6 ++++++
+ 3 files changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/nss/coreconf/Linux.mk b/nss/coreconf/Linux.mk
+--- a/nss/coreconf/Linux.mk
++++ b/nss/coreconf/Linux.mk
+@@ -16,11 +16,21 @@ ifeq ($(USE_PTHREADS),1)
+ 	IMPL_STRATEGY = _PTH
+ endif
+ 
++ifndef CC
+ CC			= gcc
++endif
++
++ifdef CXX
++CCC			= $(CXX)
++else
+ CCC			= g++
++endif
++
++ifndef RANLIB
+ RANLIB			= ranlib
++endif
+ 
+-DEFAULT_COMPILER = gcc
++DEFAULT_COMPILER = $(CC)
+ 
+ ifeq ($(OS_TARGET),Android)
+ ifndef ANDROID_NDK
+diff --git a/nss/coreconf/arch.mk b/nss/coreconf/arch.mk
+index 6557348..b722412 100644
+--- a/nss/coreconf/arch.mk
++++ b/nss/coreconf/arch.mk
+@@ -37,7 +37,7 @@ OS_TEST := $(shell uname -m)
+ ifeq ($(OS_TEST),i86pc)
+     OS_RELEASE := $(shell uname -r)_$(OS_TEST)
+ else
+-    OS_RELEASE := $(shell uname -r)
++    OS_RELEASE ?= $(shell uname -r)
+ endif
+ 
+ #
+diff --git a/nss/lib/freebl/Makefile b/nss/lib/freebl/Makefile
+index 0d293f1..678f506 100644
+--- a/nss/lib/freebl/Makefile
++++ b/nss/lib/freebl/Makefile
+@@ -36,6 +36,12 @@ ifdef USE_64
+ 	DEFINES += -DNSS_USE_64
+ endif
+ 
++ifeq ($(OS_TEST),mips)
++ifndef USE_64
++	DEFINES += -DNS_PTR_LE_32
++endif
++endif
++
+ ifdef USE_ABI32_FPU
+ 	DEFINES += -DNSS_USE_ABI32_FPU
+ endif
+-- 
+1.8.1.2
+

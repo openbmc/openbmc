@@ -1,0 +1,35 @@
+syslinux-native: fix parallel building issue
+
+There might be an error when parallel build:
+
+[snip]
+cp: cannot create directory `tmp/sysroots/x86_64-linux/usr/share/
+syslinux/com32/include/gplinclude': No such file or directory
+make[4]: *** [install] Error 1
+make[3]: *** [gpllib] Error 2
+[snip]
+
+This is a potential issue. In ${S}/com32/gpllib/Makefile file,
+install target wants to copy $(SRC)/../gplinclude to
+$(INSTALLROOT)$(COM32DIR)/include/ directory, but in ${S}/com32/lib/Makefile
+file, the install target will remove $(INSTALLROOT)$(COM32DIR)/include
+directory. We need to do com32/lib first.
+
+The patch make com32/gpllib depends on com32/lib to fix this issue.
+
+Upstream-Status: Pending
+
+Signed-off-by: Chong Lu <Chong.Lu@windriver.com>
+---
+ com32/Makefile |    1 +
+ 1 file changed, 1 insertion(+)
+
+Index: syslinux-6.03/com32/Makefile
+===================================================================
+--- syslinux-6.03.orig/com32/Makefile
++++ syslinux-6.03/com32/Makefile
+@@ -21,3 +21,4 @@ rosh: lib libutil
+ samples: libutil elflink/ldlinux
+ sysdump: lib libutil libupload gpllib
+ lua/src: cmenu modules
++gpllib: lib

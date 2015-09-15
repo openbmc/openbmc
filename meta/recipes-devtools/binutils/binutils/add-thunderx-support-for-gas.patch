@@ -1,0 +1,33 @@
+Add thunderx support to gas
+
+Upstream-Status: Submitted [https://sourceware.org/ml/binutils/2014-10/msg00170.html]
+
+Signed-off-by: Jagadeesh Krishnanjanappa <jkrishnanjanappa@mvista.com>
+
+Author: Andrew Pinski <apinski@cavium.com>
+Date: Mon, 20 Oct 2014 11:42:58 -0700
+
+    This patch adds -mcpu=thunderx support to gas.
+
+diff -Naurp git_org/gas/config/tc-aarch64.c git/gas/config/tc-aarch64.c
+--- git_org/gas/config/tc-aarch64.c	2015-09-07 02:13:51.988973523 -0700
++++ git/gas/config/tc-aarch64.c	2015-09-07 02:15:21.705981540 -0700
+@@ -7206,6 +7206,7 @@ static const struct aarch64_cpu_option_t
+ 				 AARCH64_FEATURE_CRC), "Cortex-A57"},
+   {"cortex-a72", AARCH64_FEATURE (AARCH64_ARCH_V8,
+ 				  AARCH64_FEATURE_CRC), "Cortex-A72"},
++  {"thunderx",		AARCH64_ARCH_V8, "Cavium ThunderX"},				  
+   {"exynos-m1", AARCH64_FEATURE (AARCH64_ARCH_V8,
+ 				 AARCH64_FEATURE_CRC | AARCH64_FEATURE_CRYPTO),
+ 				 "Samsung Exynos M1"},
+diff -Naurp git_org/gas/doc/c-aarch64.texi git/gas/doc/c-aarch64.texi
+--- git_org/gas/doc/c-aarch64.texi	2015-09-07 02:13:51.969973522 -0700
++++ git/gas/doc/c-aarch64.texi	2015-09-07 02:16:03.364985262 -0700
+@@ -58,6 +58,7 @@ on the target processor.  The following
+ @code{cortex-a53},
+ @code{cortex-a57},
+ @code{cortex-a72},
++@code{thunderx},
+ @code{exynos-m1},
+ @code{xgene1},
+ and

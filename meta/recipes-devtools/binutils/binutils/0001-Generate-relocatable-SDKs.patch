@@ -1,0 +1,62 @@
+From f71ecf251f84b4bbc9b7a832d5cd4a8bae95d83b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 2 Mar 2015 01:58:54 +0000
+Subject: [PATCH 01/13] Generate relocatable SDKs
+
+This patch will modify the ELF linker scripts so that the crosssdk
+linker will generate binaries with a 4096 bytes PT_INTERP section. When the binaries
+will be relocated, at SDK install time, the interpreter path can be easily
+changed by the relocating script.
+
+Upstream-Status: Inappropriate [SDK specific]
+
+Signed-off-by: Laurentiu Palcu <laurentiu.palcu@intel.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ ld/genscripts.sh      | 3 +++
+ ld/scripttempl/elf.sc | 4 ++--
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/ld/genscripts.sh b/ld/genscripts.sh
+index 499607a..075dd04 100755
+--- a/ld/genscripts.sh
++++ b/ld/genscripts.sh
+@@ -277,6 +277,7 @@ DATA_ALIGNMENT_u="${DATA_ALIGNMENT_u-${DATA_ALIGNMENT_r}}"
+ LD_FLAG=r
+ DATA_ALIGNMENT=${DATA_ALIGNMENT_r}
+ DEFAULT_DATA_ALIGNMENT="ALIGN(${SEGMENT_SIZE})"
++PARTIAL_LINKING=" "
+ ( echo "/* Script for ld -r: link without relocation */"
+   . ${CUSTOMIZER_SCRIPT}
+   . ${srcdir}/scripttempl/${SCRIPT_NAME}.sc
+@@ -285,10 +286,12 @@ DEFAULT_DATA_ALIGNMENT="ALIGN(${SEGMENT_SIZE})"
+ LD_FLAG=u
+ DATA_ALIGNMENT=${DATA_ALIGNMENT_u}
+ CONSTRUCTING=" "
++PARTIAL_LINKING=" "
+ ( echo "/* Script for ld -Ur: link w/out relocation, do create constructors */"
+   . ${CUSTOMIZER_SCRIPT}
+   . ${srcdir}/scripttempl/${SCRIPT_NAME}.sc
+ ) | sed -e '/^ *$/d;s/[ 	]*$//' > ldscripts/${EMULATION_NAME}.xu
++unset PARTIAL_LINKING
+ 
+ LD_FLAG=
+ DATA_ALIGNMENT=${DATA_ALIGNMENT_}
+diff --git a/ld/scripttempl/elf.sc b/ld/scripttempl/elf.sc
+index 4368fd9..9f01e8c 100644
+--- a/ld/scripttempl/elf.sc
++++ b/ld/scripttempl/elf.sc
+@@ -131,8 +131,8 @@ if test -n "${COMMONPAGESIZE}"; then
+   DATA_SEGMENT_END=". = DATA_SEGMENT_END (.);"
+   DATA_SEGMENT_RELRO_END=". = DATA_SEGMENT_RELRO_END (${SEPARATE_GOTPLT-0}, .);"
+ fi
+-if test -z "${INITIAL_READONLY_SECTIONS}${CREATE_SHLIB}"; then
+-  INITIAL_READONLY_SECTIONS=".interp       ${RELOCATING-0} : { *(.interp) }"
++if test -z "${INITIAL_READONLY_SECTIONS}${CREATE_SHLIB}${PARTIAL_LINKING}"; then
++  INITIAL_READONLY_SECTIONS=".interp       ${RELOCATING-0} : { *(.interp); . = 0x1000; }"
+ fi
+ if test -z "$PLT"; then
+   IPLT=".iplt         ${RELOCATING-0} : { *(.iplt) }"
+-- 
+2.1.4
+

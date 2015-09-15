@@ -1,0 +1,86 @@
+Adjustements for ptest:
+
+- Add 'install-ptest' rule.
+- Print a standard result line for each test.
+- Replace the use of "tree" with "find".
+
+Signed-off-by: Björn Stenberg <bjst@enea.com>
+Signed-off-by: Alexandra Safta <alst@enea.com>
+Upstream-Status: Pending
+
+Add missing files for rule-syntax-check
+- Add rule-syntax-check.py
+- Add the deployed udev rules to the testdata
+
+Signed-off-by: Max Krummenacher <max.oss.09@gmail.com>
+Upstream-Status: Pending
+--- a/Makefile.am	2012-03-18 16:28:14.000000000 +0100
++++ b/Makefile.am	2013-02-18 10:03:36.531101244 +0100
+@@ -708,3 +708,18 @@
+ 	for i in src/docs/html/*.{html,css,png}; do echo $$i; kup put $$i $$i.sign /pub/linux/utils/kernel/hotplug/libudev/; done
+ 	for i in src/gudev/docs/html/*.{html,css,png}; do rm -f $$i.sign; gpg --armor --detach-sign --output=$$i.sign $$i; done
+ 	for i in src/gudev/docs/html/*.{html,css,png}; do echo $$i; kup put $$i $$i.sign /pub/linux/utils/kernel/hotplug/gudev/; done
++
++RULES = rules/* src/accelerometer/61-accelerometer.rules \
++	 src/cdrom_id/60-cdrom_id.rules \
++	 src/keymap/95-keyboard-force-release.rules src/keymap/95-keymap.rules \
++	 src/mtd_probe/75-probe_mtd.rules src/v4l_id/60-persistent-v4l.rules
++
++install-ptest:
++	install test-udev $(DESTDIR)
++	cp Makefile $(DESTDIR)
++	sed -i -e 's|^Makefile:|_Makefile:|' $(DESTDIR)/Makefile
++	install -d $(DESTDIR)/test $(DESTDIR)/rules
++	(cd $(top_srcdir) && install $(TESTS) $(DESTDIR)/test)
++	(cd $(top_srcdir) && install test/rule-syntax-check.py $(DESTDIR)/test)
++	(cd $(top_srcdir) && install $(RULES) $(DESTDIR)/rules)
++	cp $(top_srcdir)/test/sys.tar.xz $(DESTDIR)/test/
+--- a/test/udev-test.pl	2012-03-18 16:43:36.000000000 +0100
++++ b/test/udev-test.pl	2013-02-18 10:31:29.706357321 +0100
+@@ -1459,11 +1459,13 @@
+                 print "add:         error";
+                 if ($rules->{exp_add_error}) {
+                         print " as expected\n";
++                        print "XFAIL: TEST $number: $rules->{desc}: add\n";
+                 } else {
+                         print "\n";
+-                        system("tree $udev_root");
++                        system("find $udev_root");
+                         print "\n";
+                         $error++;
++                        print "FAIL: TEST $number: $rules->{desc}: add\n";
+                         sleep(1);
+                 }
+         }
+@@ -1479,15 +1481,18 @@
+                 print "remove:      error";
+                 if ($rules->{exp_rem_error}) {
+                         print " as expected\n";
++                        print "XFAIL: TEST $number: $rules->{desc}: remove\n";
+                 } else {
+                         print "\n";
+-                        system("tree $udev_root");
++                        system("find $udev_root");
+                         print "\n";
+                         $error++;
++                        print "FAIL: TEST $number: $rules->{desc}: remove\n";
+                         sleep(1);
+                 }
+         } else {
+                 print "remove:      ok\n";
++                print "PASS: TEST $number: $rules->{desc}: remove\n";
+         }
+ 
+         print "\n";
+--- a/configure.ac      2013-11-28 09:14:02.814248826 +0100
++++ b/configure.ac      2013-11-28 09:14:34.260874296 +0100
+@@ -6,7 +6,7 @@
+        [http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html])
+ AC_CONFIG_SRCDIR([src/udevd.c])
+ AC_CONFIG_AUX_DIR([build-aux])
+-AM_INIT_AUTOMAKE([check-news foreign 1.11 -Wall -Wno-portability silent-rules tar-pax no-dist-gzip dist-xz subdir-objects])
++AM_INIT_AUTOMAKE([check-news foreign 1.11 -Wall -Wno-portability silent-rules tar-pax no-dist-gzip dist-xz subdir-objects serial-tests])
+ AC_USE_SYSTEM_EXTENSIONS
+ AC_SYS_LARGEFILE
+ AC_CONFIG_MACRO_DIR([m4])
+

@@ -1,0 +1,27 @@
+
+This has been discussed in a couple of different bug reported
+upstream:
+
+http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=486250
+http://bugs.sourcemage.org/show_bug.cgi?id=14446
+
+Fix:
+http://lists.gnupg.org/pipermail/gnupg-devel/2008-April/024344.html
+
+Upstream-Status: Backport [Debian]
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+Index: gnupg-1.4.7/keyserver/gpgkeys_curl.c
+===================================================================
+--- gnupg-1.4.7.orig/keyserver/gpgkeys_curl.c
++++ gnupg-1.4.7/keyserver/gpgkeys_curl.c
+@@ -286,7 +286,7 @@ main(int argc,char *argv[])
+       curl_easy_setopt(curl,CURLOPT_VERBOSE,1);
+     }
+ 
+-  curl_easy_setopt(curl,CURLOPT_SSL_VERIFYPEER,opt->flags.check_cert);
++  curl_easy_setopt(curl,CURLOPT_SSL_VERIFYPEER,(long)opt->flags.check_cert);
+   curl_easy_setopt(curl,CURLOPT_CAINFO,opt->ca_cert_file);
+ 
+   if(proxy)

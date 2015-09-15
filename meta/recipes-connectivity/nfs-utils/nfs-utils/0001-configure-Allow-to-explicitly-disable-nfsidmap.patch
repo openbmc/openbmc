@@ -1,0 +1,43 @@
+From 9b84cff305866abd150cf1a4c6e7e5ebf8a7eb3a Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Fri, 15 Nov 2013 23:21:35 +0100
+Subject: [PATCH] configure: Allow to explicitly disable nfsidmap
+
+* keyutils availability is autodetected and builds aren't reproducible
+
+Upstream-Status: Pending
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ configure.ac | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index bf433d6..28a8f62 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -69,6 +69,12 @@ AC_ARG_ENABLE(nfsv4,
+ 	AC_SUBST(enable_nfsv4)
+ 	AM_CONDITIONAL(CONFIG_NFSV4, [test "$enable_nfsv4" = "yes"])
+ 
++AC_ARG_ENABLE(nfsidmap,
++        [AC_HELP_STRING([--enable-nfsidmap],
++                        [enable support for NFSv4 idmapper @<:@default=yes@:>@])],
++        enable_nfsidmap=$enableval,
++        enable_nfsidmap=yes)
++
+ AC_ARG_ENABLE(nfsv41,
+ 	[AC_HELP_STRING([--enable-nfsv41],
+                         [enable support for NFSv41 @<:@default=yes@:>@])],
+@@ -296,7 +302,7 @@ fi
+ 
+ dnl enable nfsidmap when its support by libnfsidmap
+ AM_CONDITIONAL(CONFIG_NFSDCLTRACK, [test "$enable_nfsdcltrack" = "yes" ])
+-AM_CONDITIONAL(CONFIG_NFSIDMAP, [test "$ac_cv_header_keyutils_h$ac_cv_lib_nfsidmap_nfs4_owner_to_uid" = "yesyes"])
++AM_CONDITIONAL(CONFIG_NFSIDMAP, [test "$enable_nfsidmap$ac_cv_header_keyutils_h$ac_cv_lib_nfsidmap_nfs4_owner_to_uid" = "yesyesyes"])
+ 
+ 
+ if test "$knfsd_cv_glibc2" = no; then
+-- 
+1.8.4.3
+

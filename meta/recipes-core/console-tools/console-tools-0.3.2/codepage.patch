@@ -1,0 +1,17 @@
+Upstream-Status: Pending
+
+#
+# Patch managed by http://www.mn-logistik.de/unsupported/pxa250/patcher
+#
+
+--- console-tools-0.3.2/contrib/codepage.c~codepage
++++ console-tools-0.3.2/contrib/codepage.c
+@@ -229,7 +229,7 @@
+ 	  return 0;
+ 
+         fprintf(stderr, "\
+-Warning: CP format is a hack!\n
++Warning: CP format is a hack!\n\
+          The files produced may or may not be usable!\n");
+ 
+ 	sprintf(outfile, "%d.cp", CPEntryHeader.codepage);

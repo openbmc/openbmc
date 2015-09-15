@@ -1,0 +1,79 @@
+--- a/doc/stress.texi
++++ b/doc/stress.texi
+@@ -62,47 +62,47 @@
+ 
+ @table @samp
+ @item -?
+-@itemx --help
++@item --help
+ Show help information.
+ 
+-@itemx --version
++@item --version
+ Show version information.
+ 
+ @item -v
+-@itemx --verbose
++@item --verbose
+ Turn up verbosity.
+ 
+ @item -q
+-@itemx --quiet
++@item --quiet
+ Turn down verbosity.
+ 
+ @item -n
+-@itemx --dry-run
++@item --dry-run
+ Show what would have been done.
+ 
+ @item -t @var{secs}
+-@itemx --timeout @var{secs}
++@item --timeout @var{secs}
+ Time out after @var{secs} seconds.
+ 
+-@itemx --backoff @var{usecs}
++@item --backoff @var{usecs}
+ Wait for factor of @var{usecs} microseconds before starting work.
+ 
+ @item -c @var{forks}
+-@itemx --cpu @var{forks}
++@item --cpu @var{forks}
+ Spawn @var{forks} processes each spinning on @samp{sqrt()}.
+ 
+ @item -i @var{forks}
+-@itemx --io @var{forks}
++@item --io @var{forks}
+ Spawn @var{forks} processes each spinning on @samp{sync()}.
+ 
+ @item -m @var{forks}
+-@itemx --vm @var{forks}
++@item --vm @var{forks}
+ Spawn @var{forks} processes each spinning on @samp{malloc()}.
+ 
+-@itemx --vm-bytes @var{bytes}
++@item --vm-bytes @var{bytes}
+ Allocate @var{bytes} number of bytes.  The default is 1.
+ 
+-@itemx --vm-hang
++@item --vm-hang
+ Instruct each vm hog process to go to sleep after allocating memory.  This
+ contrasts with their normal behavior, which is to free the memory and
+ reallocate @emph{ad infinitum}.  This is useful for simulating low memory
+@@ -114,13 +114,13 @@
+ @end example
+ 
+ @item -d @var{forks}
+-@itemx --hdd @var{forks}
++@item --hdd @var{forks}
+ Spawn @var{forks} processes each spinning on @samp{write()}.
+ 
+-@itemx --hdd-bytes @var{bytes}
++@item --hdd-bytes @var{bytes}
+ Write @var{bytes} number of bytes.  The default is 1GB.
+ 
+-@itemx --hdd-noclean
++@item --hdd-noclean
+ Do not unlink file(s) to which random ASCII data is written.
+ 
+ @end table

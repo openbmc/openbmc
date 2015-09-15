@@ -1,0 +1,50 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+Enalbing sysroot support exposed a bug where the final library
+had an RPATH encoded into it which still pointed to the sysroot.
+This works around the issue until it gets sorted out upstream.
+
+Fix suggested by Richard Purdie <richard.purdie@intel.com>
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+Signed-off-by: Randy Witt <randy.e.witt@linux.intel.com>
+Updated by: Robert Yang <liezhi.yang@windriver.com>
+
+diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
+--- a/build-aux/ltmain.in
++++ b/build-aux/ltmain.in
+@@ -7569,9 +7569,11 @@ EOF
+ 	  test relink = "$opt_mode" || rpath=$compile_rpath$rpath
+ 	  for libdir in $rpath; do
+ 	    if test -n "$hardcode_libdir_flag_spec"; then
++		  func_replace_sysroot "$libdir"
++		  libdir=$func_replace_sysroot_result
++		  func_stripname '=' '' "$libdir"
++		  libdir=$func_stripname_result
+ 	      if test -n "$hardcode_libdir_separator"; then
+-		func_replace_sysroot "$libdir"
+-		libdir=$func_replace_sysroot_result
+ 		if test -z "$hardcode_libdirs"; then
+ 		  hardcode_libdirs=$libdir
+ 		else
+@@ -8301,6 +8303,10 @@ EOF
+       hardcode_libdirs=
+       for libdir in $compile_rpath $finalize_rpath; do
+ 	if test -n "$hardcode_libdir_flag_spec"; then
++	  func_replace_sysroot "$libdir"
++	  libdir=$func_replace_sysroot_result
++	  func_stripname '=' '' "$libdir"
++	  libdir=$func_stripname_result
+ 	  if test -n "$hardcode_libdir_separator"; then
+ 	    if test -z "$hardcode_libdirs"; then
+ 	      hardcode_libdirs=$libdir
+@@ -8352,6 +8358,10 @@ EOF
+       hardcode_libdirs=
+       for libdir in $finalize_rpath; do
+ 	if test -n "$hardcode_libdir_flag_spec"; then
++	  func_replace_sysroot "$libdir"
++	  libdir=$func_replace_sysroot_result
++	  func_stripname '=' '' "$libdir"
++	  libdir=$func_stripname_result
+ 	  if test -n "$hardcode_libdir_separator"; then
+ 	    if test -z "$hardcode_libdirs"; then
+ 	      hardcode_libdirs=$libdir

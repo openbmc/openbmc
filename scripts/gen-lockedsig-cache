@@ -1,0 +1,46 @@
+#!/usr/bin/env python
+#
+# gen-lockedsig-cache <locked-sigs.inc> <input-cachedir> <output-cachedir>
+#
+
+import os
+import sys
+import glob
+import shutil
+import errno
+
+def mkdir(d):
+    try:
+        os.makedirs(d)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise e
+
+if len(sys.argv) < 3:
+    print("Incorrect number of arguments specified")
+    sys.exit(1)
+
+sigs = []
+with open(sys.argv[1]) as f:
+    for l in f.readlines():
+        if ":" in l:
+            sigs.append(l.split(":")[2].split()[0])
+
+files = set()
+for s in sigs:
+    p = sys.argv[2] + "/" + s[:2] + "/*" + s + "*"
+    files |= set(glob.glob(p))
+    p = sys.argv[2] + "/*/" + s[:2] + "/*" + s + "*"
+    files |= set(glob.glob(p))
+
+for f in files:
+    dst = f.replace(sys.argv[2], sys.argv[3])
+    destdir = os.path.dirname(dst)
+    mkdir(destdir)
+
+    if os.path.exists(dst):
+        os.remove(dst)
+    if (os.stat(f).st_dev == os.stat(destdir).st_dev):
+        os.link(f, dst)
+    else:
+        shutil.copyfile(f, dst)

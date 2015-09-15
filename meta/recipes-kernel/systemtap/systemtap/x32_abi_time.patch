@@ -1,0 +1,34 @@
+Fix time_t print because in x32 ABI is long long int instead of long int.
+
+Upstream-Status: Pending
+
+Signed-off-by: Aníbal Limón <anibal.limon@linux.intel.com>
+
+diff --git a/cache.cxx b/cache.cxx
+index 3546b30..19c77ca 100644
+--- a/cache.cxx
++++ b/cache.cxx
+@@ -294,7 +294,11 @@ clean_cache(systemtap_session& s)
+         {
+           //interval not passed, don't continue
+           if (s.verbose > 1)
++#if defined(__x86_64__) && defined (__ILP32__)
++            clog << _F("Cache cleaning skipped, interval not reached %lld s / %lu s.",
++#else
+             clog << _F("Cache cleaning skipped, interval not reached %lu s / %lu s.",
++#endif
+                        (current_time.tv_sec-sb.st_mtime), cache_clean_interval)  << endl;
+           return;
+         }
+@@ -302,7 +306,11 @@ clean_cache(systemtap_session& s)
+         {
+           //interval reached, continue
+           if (s.verbose > 1)
++#if defined(__x86_64__) && defined (__ILP32__)
++            clog << _F("Cleaning cache, interval reached %lld s > %lu s.",
++#else
+             clog << _F("Cleaning cache, interval reached %lu s > %lu s.",
++#endif
+                        (current_time.tv_sec-sb.st_mtime), cache_clean_interval)  << endl;
+         }
+ 

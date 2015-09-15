@@ -1,0 +1,21 @@
+Upstream-Status: Inappropriate [configuration]
+
+---
+ libopkg/opkg_download_wget.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libopkg/opkg_download_wget.c b/libopkg/opkg_download_wget.c
+index 9001493..18ef91e 100644
+--- a/libopkg/opkg_download_wget.c
++++ b/libopkg/opkg_download_wget.c
+@@ -50,6 +50,7 @@ int opkg_download_backend(const char *src, const char *dest,
+ 
+     argv[i++] = "wget";
+     argv[i++] = "-q";
++    argv[i++] = "--no-cache";
+     if (opkg_config->http_proxy || opkg_config->ftp_proxy) {
+         argv[i++] = "-Y";
+         argv[i++] = "on";
+-- 
+1.9.1
+

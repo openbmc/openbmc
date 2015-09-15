@@ -1,0 +1,43 @@
+From a85c78ea1393985fdb6e6678dea19135c553d341 Mon Sep 17 00:00:00 2001
+From: Mark H Weaver <mhw@netris.org>
+Date: Fri, 19 Sep 2014 21:18:09 -0400
+Subject: [PATCH] VM: ASM_MUL for ARM: Add earlyclobber constraint to the SMULL
+ outputs.
+
+Reported by Rob Browning <rlb@defaultvalue.org>.
+
+* libguile/vm-i-scheme.c (ASM_MUL)[ARM]: Add earlyclobber (&) constraint
+  to the SMULL output registers.
+
+Author: Mark H Weaver <mhw@netris.org>
+
+Upstream-Status: Backport
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ libguile/vm-i-scheme.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/libguile/vm-i-scheme.c b/libguile/vm-i-scheme.c
+index 587aa95..162efab 100644
+--- a/libguile/vm-i-scheme.c
++++ b/libguile/vm-i-scheme.c
+@@ -1,5 +1,4 @@
+-/* Copyright (C) 2001, 2009, 2010, 2011, 2012, 2013,
+- *   2014 Free Software Foundation, Inc.
++/* Copyright (C) 2001, 2009-2014 Free Software Foundation, Inc.
+  * 
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public License
+@@ -363,7 +362,7 @@ VM_DEFINE_FUNCTION (149, ge, "ge?", 2)
+       {									\
+ 	scm_t_signed_bits rlo, rhi;					\
+ 	asm ("smull %0, %1, %2, %3\n"					\
+-	     : "=r" (rlo), "=r" (rhi)					\
++	     : "=&r" (rlo), "=&r" (rhi)					\
+ 	     : "r" (SCM_UNPACK (x) - scm_tc2_int),			\
+ 	       "r" (SCM_I_INUM (y)));					\
+ 	if (SCM_LIKELY (SCM_SRS (rlo, 31) == rhi))			\
+-- 
+2.3.5
+

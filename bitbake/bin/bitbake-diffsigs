@@ -1,0 +1,138 @@
+#!/usr/bin/env python
+
+# bitbake-diffsigs
+# BitBake task signature data comparison utility
+#
+# Copyright (C) 2012-2013 Intel Corporation
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+import os
+import sys
+import warnings
+import fnmatch
+import optparse
+import logging
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(sys.argv[0])), 'lib'))
+
+import bb.tinfoil
+import bb.siggen
+
+def logger_create(name, output=sys.stderr):
+    logger = logging.getLogger(name)
+    console = logging.StreamHandler(output)
+    format = bb.msg.BBLogFormatter("%(levelname)s: %(message)s")
+    if output.isatty():
+        format.enable_color()
+    console.setFormatter(format)
+    logger.addHandler(console)
+    logger.setLevel(logging.INFO)
+    return logger
+
+logger = logger_create('bitbake-diffsigs')
+
+def find_compare_task(bbhandler, pn, taskname):
+    """ Find the most recent signature files for the specified PN/task and compare them """
+
+    def get_hashval(siginfo):
+        if siginfo.endswith('.siginfo'):
+            return siginfo.rpartition(':')[2].partition('_')[0]
+        else:
+            return siginfo.rpartition('.')[2]
+
+    if not hasattr(bb.siggen, 'find_siginfo'):
+        logger.error('Metadata does not support finding signature data files')
+        sys.exit(1)
+
+    if not taskname.startswith('do_'):
+        taskname = 'do_%s' % taskname
+
+    filedates = bb.siggen.find_siginfo(pn, taskname, None, bbhandler.config_data)
+    latestfiles = sorted(filedates.keys(), key=lambda f: filedates[f])[-3:]
+    if not latestfiles:
+        logger.error('No sigdata files found matching %s %s' % (pn, taskname))
+        sys.exit(1)
+    elif len(latestfiles) < 2:
+        logger.error('Only one matching sigdata file found for the specified task (%s %s)' % (pn, taskname))
+        sys.exit(1)
+    else:
+        # It's possible that latestfiles contain 3 elements and the first two have the same hash value.
+        # In this case, we delete the second element.
+        # The above case is actually the most common one. Because we may have sigdata file and siginfo
+        # file having the same hash value. Comparing such two files makes no sense.
+        if len(latestfiles) == 3:
+            hash0 = get_hashval(latestfiles[0])
+            hash1 = get_hashval(latestfiles[1])
+            if hash0 == hash1:
+                latestfiles.pop(1)
+
+        # Define recursion callback
+        def recursecb(key, hash1, hash2):
+            hashes = [hash1, hash2]
+            hashfiles = bb.siggen.find_siginfo(key, None, hashes, bbhandler.config_data)
+
+            recout = []
+            if len(hashfiles) == 2:
+                out2 = bb.siggen.compare_sigfiles(hashfiles[hash1], hashfiles[hash2], recursecb)
+                recout.extend(list('  ' + l for l in out2))
+            else:
+                recout.append("Unable to find matching sigdata for %s with hashes %s or %s" % (key, hash1, hash2))
+
+            return recout
+
+        # Recurse into signature comparison
+        output = bb.siggen.compare_sigfiles(latestfiles[0], latestfiles[1], recursecb)
+        if output:
+            print '\n'.join(output)
+    sys.exit(0)
+
+
+
+parser = optparse.OptionParser(
+    description = "Compares siginfo/sigdata files written out by BitBake",
+    usage = """
+  %prog -t recipename taskname
+  %prog sigdatafile1 sigdatafile2
+  %prog sigdatafile1""")
+
+parser.add_option("-t", "--task",
+        help = "find the signature data files for last two runs of the specified task and compare them",
+        action="store", dest="taskargs", nargs=2, metavar='recipename taskname')
+
+options, args = parser.parse_args(sys.argv)
+
+if options.taskargs:
+    tinfoil = bb.tinfoil.Tinfoil()
+    tinfoil.prepare(config_only = True)
+    find_compare_task(tinfoil, options.taskargs[0], options.taskargs[1])
+else:
+    if len(args) == 1:
+        parser.print_help()
+    else:
+        import cPickle
+        try:
+            if len(args) == 2:
+                output = bb.siggen.dump_sigfile(sys.argv[1])
+            else:
+                output = bb.siggen.compare_sigfiles(sys.argv[1], sys.argv[2])
+        except IOError as e:
+            logger.error(str(e))
+            sys.exit(1)
+        except cPickle.UnpicklingError, EOFError:
+            logger.error('Invalid signature data - ensure you are specifying sigdata/siginfo files')
+            sys.exit(1)
+
+        if output:
+            print '\n'.join(output)

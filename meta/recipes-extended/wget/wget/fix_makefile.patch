@@ -1,0 +1,18 @@
+
+Upstream-Status: Pending
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+Index: wget-1.12/configure.ac
+===================================================================
+--- wget-1.12.orig/configure.ac	2009-09-22 09:39:49.000000000 -0700
++++ wget-1.12/configure.ac	2011-10-19 20:32:53.714812160 -0700
+@@ -177,7 +177,7 @@
+ dnl Gettext
+ dnl
+ AM_GNU_GETTEXT([external],[need-ngettext])
+-AM_GNU_GETTEXT_VERSION([0.17])
++AM_GNU_GETTEXT_VERSION([0.18])
+ 
+ AC_PROG_RANLIB
+ 

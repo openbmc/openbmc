@@ -1,0 +1,79 @@
+Fix ping mode failure
+
+Upstream-Status: Pending  
+
+When watchdog works on ping mode, the system will be rebooted since
+watchdog can not receive the expected ECOREPLY on a setting interval.
+
+Ping mode uses a raw socket to send a ECO packet, then uses select()
+to wait and recvfrom() to receive the ECOREPLY packet, if select()
+shows the data is ready, and the data is not the expected ECOREPLY,
+and waiting time is not overdue, it will continue use select() and
+recvfrom().
+
+Problem is that the raw socket can receive any icmp packets, if we do
+not set filters, and there are many icmp packets on socket, this
+program will not find its interested ECOREPLY packet in a special
+interval, which makes the ping mode fail.
+
+
+Other program is that watchdog sometime can not reach the call of
+recvfrom to try to receive packets since tv_sec of struct timeval
+of select parameter is 0.
+
+The timeout of select() is the result of ping interval minusing the
+time of calling gettimeofday spending, when ping interval is 1 second,
+and the call of gettimeofday() spends several useconds, the tv_sec of
+struct timeval of select parameter must be 0, at that condition, we
+should it is valid of tv_sec of struct timeval of select parameter be 0 
+
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+---
+ src/net.c      |    2 +-
+ src/watchdog.c |    5 ++++-
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+
+Index: watchdog-5.14/src/watchdog.c
+===================================================================
+--- watchdog-5.14.orig/src/watchdog.c
++++ watchdog-5.14/src/watchdog.c
+@@ -24,6 +24,7 @@
+ #include <sys/types.h>
+ #include <sys/ioctl.h>
+ #include <linux/oom.h>
++#include <linux/icmp.h>
+ #include <linux/watchdog.h>
+ #include <string.h>
+ 
+Index: watchdog-5.14/src/net.c
+===================================================================
+--- watchdog-5.14.orig/src/net.c
++++ watchdog-5.14/src/net.c
+@@ -11,7 +11,8 @@
+ #include <errno.h>
+ #include <sys/time.h>
+ #include <netinet/ip.h>
+-#include <netinet/ip_icmp.h>
++#include <linux/icmp.h>
++//#include <netinet/ip_icmp.h>
+ #include <fcntl.h>
+ #include <string.h>
+ #include <unistd.h>		/* for gethostname() etc */
+@@ -179,6 +180,9 @@ int open_netcheck(struct list *tlist)
+ {
+ 	struct list *act;
+ 	int hold = 0;
++	struct icmp_filter filt;
++	filt.data = ~(1<<ICMP_ECHOREPLY);
++
+ 
+ 	if (tlist != NULL) {
+ 		for (act = tlist; act != NULL; act = act->next) {
+@@ -202,6 +206,7 @@ int open_netcheck(struct list *tlist)
+ 			    fatal_error(EX_SYSERR, "error opening socket (%s)", strerror(errno));
+ 			}
+ 
++			setsockopt(net->sock_fp, SOL_RAW, ICMP_FILTER, (char*)&filt, sizeof(filt));
+ 			/* this is necessary for broadcast pings to work */
+ 			(void)setsockopt(net->sock_fp, SOL_SOCKET, SO_BROADCAST, (char *)&hold, sizeof(hold));
+ 

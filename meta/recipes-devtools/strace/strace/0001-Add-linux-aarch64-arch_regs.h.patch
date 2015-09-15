@@ -1,0 +1,25 @@
+From f85854131c8265f2eb59c714dcea5c4b3dc09bed Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen.kooi@linaro.org>
+Date: Wed, 15 Apr 2015 14:29:37 +0200
+Subject: [PATCH] Add linux/aarch64/arch_regs.h
+
+It is missing from the tarball, but it is present in git for v4.10
+
+Signed-off-by: Koen Kooi <koen.kooi@linaro.org>
+Upstream-Status: Pending
+---
+ linux/aarch64/arch_regs.h | 2 ++
+ 1 file changed, 2 insertions(+)
+ create mode 100644 linux/aarch64/arch_regs.h
+
+diff --git a/linux/aarch64/arch_regs.h b/linux/aarch64/arch_regs.h
+new file mode 100644
+index 0000000..9a5e33e
+--- /dev/null
++++ b/linux/aarch64/arch_regs.h
+@@ -0,0 +1,2 @@
++extern uint64_t *const aarch64_sp_ptr;
++extern uint32_t *const arm_sp_ptr;
+-- 
+1.9.3
+

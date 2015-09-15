@@ -1,0 +1,12 @@
+   This file describes the limits of the Exception under which you are allowed
+   to distribute Non-GPL Code in linked combination with Red Hat elfutils.
+   For the full text of the license, please see one of the header files
+   included with the source distribution or the file COPYING found in the
+   top level directory of the source.
+
+   The Approved Interfaces are the functions declared in the files:
+
+   libelf.h
+   libdw.h
+   libdwfl.h
+

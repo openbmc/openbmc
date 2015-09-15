@@ -1,0 +1,102 @@
+From f172101130604e4a9efa5746f4d8d30de99a0fdc Mon Sep 17 00:00:00 2001
+From: Yuanjie Huang <yuanjie.huang@windriver.com>
+Date: Fri, 17 Apr 2015 14:48:20 +0800
+Subject: [PATCH] avoid failure on symbol provided by application
+
+Upstream-Status: Pending
+
+Undefined symbols in a library can be provided by the application
+that links to the library, such as `logsink' in libmultipath.so.0.
+This fix checks the type of object in which the symbol is needed
+and the existence of the symbol in application, when a symbol
+cannot be provided by libraries. It prevents false alarm on absence
+of symbols.
+
+Signed-off-by: Yuanjie Huang <yuanjie.huang@windriver.com>
+---
+ src/mklibs | 28 ++++++++++++++++++++++++----
+ 1 file changed, 24 insertions(+), 4 deletions(-)
+
+diff --git a/src/mklibs b/src/mklibs
+index c5614ea..b0d9034 100755
+--- a/src/mklibs
++++ b/src/mklibs
+@@ -133,9 +133,9 @@ class Symbol(object):
+         return '@'.join(ret)
+ 
+ class UndefinedSymbol(Symbol):
+-    def __init__(self, name, weak, version, library):
++    def __init__(self, name, weak, version, library, object):
+         super(UndefinedSymbol, self).__init__(name, version, library)
+-        self.weak, self.library = weak, library
++        self.weak, self.library, self.object = weak, library, object
+ 
+ # Return undefined symbols in an object as a set of tuples (name, weakness)
+ def undefined_symbols(obj):
+@@ -144,6 +144,11 @@ def undefined_symbols(obj):
+ 
+     output = command("mklibs-readelf", "--print-symbols-undefined", obj)
+ 
++    if len(obj) > len(dest_path) and obj[:len(dest_path)] == dest_path:
++        object = obj[len(dest_path) + 1:-len('-so-stripped')]
++    else:
++        object = obj
++
+     result = []
+     for line in output:
+         name, weak_string, version_string, library_string = line.split()[:4]
+@@ -160,7 +165,7 @@ def undefined_symbols(obj):
+         if library_string.lower() != 'none':
+             library = library_string
+ 
+-        result.append(UndefinedSymbol(name, weak, version, library))
++        result.append(UndefinedSymbol(name, weak, version, library, object))
+ 
+     return result
+ 
+@@ -495,12 +500,13 @@ while 1:
+                      and re.search("^ps_", str(symbol)))
+                 and not (re.search("ld-linux.so.3$", str(symbol)))
+                 and not (re.search("^__gnu_local_gp", str(symbol)))):
+-                debug(DEBUG_SPAM, "needed_symbols adding %s, weak: %s" % (symbol, symbol.weak))
++                debug(DEBUG_SPAM, "needed_symbols adding %s, weak: %s, for %s" % (symbol, symbol.weak, obj))
+                 needed_symbols[str(symbol)] = symbol
+         libraries.update(library_depends(obj))
+ 
+     # calculate what symbols are present in small_libs and available_libs
+     present_symbols = {}
++    present_symbol_progs = {}
+     checked_libs = small_libs
+     checked_libs.extend(available_libs)
+     checked_libs.append(ldlib)
+@@ -510,6 +516,12 @@ while 1:
+             names = symbol.base_names()
+             for name in names:
+                 present_symbols[name] = symbol
++            if not so_pattern.match(lib):
++                debug(DEBUG_SPAM, "present_symbol_progs adding %s, from executable %s" % (' '.join(names), lib))
++                for name in names:
++                    progs = present_symbol_progs.get(name, set())
++                    progs.add(lib)
++                    present_symbol_progs[name] = progs
+ 
+     # are we finished?
+     num_unresolved = 0
+@@ -565,6 +577,14 @@ while 1:
+     for name in needed_symbols:
+         if not name in symbol_provider:
+             if not needed_symbols[name].weak:
++                # WORKAROUND: Undefined symbols in a library can be provided by the application
++                # that links to the library. So if the object which requires the symbol is a library
++                # and some application can provide the symbol, the undefined symbol is skipped.
++                symbol = needed_symbols[name]
++                if so_pattern.match(symbol.object) and present_symbol_progs.get(name, None):
++                    debug(DEBUG_SPAM, "symbol %s in library %s is provided by executable %s" \
++                          % (name, symbol.object, ' '.join(present_symbol_progs[name])))
++                    continue
+                 raise Exception("No library provides non-weak %s" % name)
+         else:
+             lib = symbol_provider[name]
+-- 
+1.8.5.2.233.g932f7e4
+

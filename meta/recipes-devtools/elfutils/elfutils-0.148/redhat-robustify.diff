@@ -1,0 +1,1709 @@
+Upstream-Status: Backport
+
+Index: elfutils-0.148/libelf/ChangeLog
+===================================================================
+--- elfutils-0.148.orig/libelf/ChangeLog	2010-07-03 13:07:10.000000000 +0000
++++ elfutils-0.148/libelf/ChangeLog	2010-07-03 13:07:11.000000000 +0000
+@@ -649,10 +649,53 @@
+ 	If section content hasn't been read yet, do it before looking for the
+ 	block size.  If no section data present, infer size of section header.
+ 
++2005-05-14  Jakub Jelinek  <jakub@redhat.com>
++
++	* libelfP.h (INVALID_NDX): Define.
++	* gelf_getdyn.c (gelf_getdyn): Use it.  Remove ndx < 0 test if any.
++	* gelf_getlib.c (gelf_getlib): Likewise.
++	* gelf_getmove.c (gelf_getmove): Likewise.
++	* gelf_getrel.c (gelf_getrel): Likewise.
++	* gelf_getrela.c (gelf_getrela): Likewise.
++	* gelf_getsym.c (gelf_getsym): Likewise.
++	* gelf_getsyminfo.c (gelf_getsyminfo): Likewise.
++	* gelf_getsymshndx.c (gelf_getsymshndx): Likewise.
++	* gelf_getversym.c (gelf_getversym): Likewise.
++	* gelf_update_dyn.c (gelf_update_dyn): Likewise.
++	* gelf_update_lib.c (gelf_update_lib): Likewise.
++	* gelf_update_move.c (gelf_update_move): Likewise.
++	* gelf_update_rel.c (gelf_update_rel): Likewise.
++	* gelf_update_rela.c (gelf_update_rela): Likewise.
++	* gelf_update_sym.c (gelf_update_sym): Likewise.
++	* gelf_update_syminfo.c (gelf_update_syminfo): Likewise.
++	* gelf_update_symshndx.c (gelf_update_symshndx): Likewise.
++	* gelf_update_versym.c (gelf_update_versym): Likewise.
++	* elf_newscn.c (elf_newscn): Check for overflow.
++	* elf32_updatefile.c (__elfw2(LIBELFBITS,updatemmap)): Likewise.
++	(__elfw2(LIBELFBITS,updatefile)): Likewise.
++	* elf_begin.c (file_read_elf): Likewise.
++	* elf32_newphdr.c (elfw2(LIBELFBITS,newphdr)): Likewise.
++	* elf_getarsym.c (elf_getarsym): Likewise.
++	* elf32_getshdr.c (elfw2(LIBELFBITS,getshdr)): Likewise.
+ 2005-05-11  Ulrich Drepper  <drepper@redhat.com>
+ 
+ 	* elf.h: Update again.
+ 
++2005-05-17  Jakub Jelinek  <jakub@redhat.com>
++
++	* elf32_getphdr.c (elfw2(LIBELFBITS,getphdr)): Check if program header
++	table fits into object's bounds.
++	* elf_getshstrndx.c (elf_getshstrndx): Add elf->start_offset to
++	elf->map_address.  Check if first section header fits into object's
++	bounds.
++	* elf32_getshdr.c (elfw2(LIBELFBITS,getshdr)):
++	Check if section header table fits into object's bounds.
++	* elf_begin.c (get_shnum): Ensure section headers fits into
++	object's bounds.
++	(file_read_elf): Make sure scncnt is small enough to allocate both
++	ElfXX_Shdr and Elf_Scn array.  Make sure section and program header
++	tables fit into object's bounds.  Avoid memory leak on failure.
++
+ 2005-05-09  Ulrich Drepper  <drepper@redhat.com>
+ 
+ 	* elf.h: Update from glibc.
+Index: elfutils-0.148/libelf/elf32_getphdr.c
+===================================================================
+--- elfutils-0.148.orig/libelf/elf32_getphdr.c	2010-04-21 14:26:40.000000000 +0000
++++ elfutils-0.148/libelf/elf32_getphdr.c	2010-07-03 13:07:11.000000000 +0000
+@@ -114,6 +114,16 @@
+ 
+       if (elf->map_address != NULL)
+ 	{
++	  /* First see whether the information in the ELF header is
++	     valid and it does not ask for too much.  */
++	  if (unlikely (ehdr->e_phoff >= elf->maximum_size)
++	      || unlikely (elf->maximum_size - ehdr->e_phoff < size))
++	    {
++	      /* Something is wrong.  */
++	      __libelf_seterrno (ELF_E_INVALID_PHDR);
++	      goto out;
++	    }
++
+ 	  /* All the data is already mapped.  Use it.  */
+ 	  void *file_phdr = ((char *) elf->map_address
+ 			     + elf->start_offset + ehdr->e_phoff);
+Index: elfutils-0.148/libelf/elf32_getshdr.c
+===================================================================
+--- elfutils-0.148.orig/libelf/elf32_getshdr.c	2009-06-13 22:41:42.000000000 +0000
++++ elfutils-0.148/libelf/elf32_getshdr.c	2010-07-03 13:07:11.000000000 +0000
+@@ -1,5 +1,5 @@
+ /* Return section header.
+-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2005, 2007, 2009 Red Hat, Inc.
++   Copyright (C) 1998-2009 Red Hat, Inc.
+    This file is part of Red Hat elfutils.
+    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
+ 
+@@ -81,7 +81,8 @@
+     goto out;
+ 
+   size_t shnum;
+-  if (__elf_getshdrnum_rdlock (elf, &shnum) != 0)
++  if (__elf_getshdrnum_rdlock (elf, &shnum) != 0
++      || shnum > SIZE_MAX / sizeof (ElfW2(LIBELFBITS,Shdr)))
+     goto out;
+   size_t size = shnum * sizeof (ElfW2(LIBELFBITS,Shdr));
+ 
+@@ -98,6 +99,16 @@
+ 
+   if (elf->map_address != NULL)
+     {
++      /* First see whether the information in the ELF header is
++	 valid and it does not ask for too much.  */
++      if (unlikely (ehdr->e_shoff >= elf->maximum_size)
++	  || unlikely (elf->maximum_size - ehdr->e_shoff < size))
++	{
++	  /* Something is wrong.  */
++	  __libelf_seterrno (ELF_E_INVALID_SECTION_HEADER);
++	  goto free_and_out;
++	}
++
+       ElfW2(LIBELFBITS,Shdr) *notcvt;
+ 
+       /* All the data is already mapped.  If we could use it
+Index: elfutils-0.148/libelf/elf32_newphdr.c
+===================================================================
+--- elfutils-0.148.orig/libelf/elf32_newphdr.c	2010-01-12 16:57:54.000000000 +0000
++++ elfutils-0.148/libelf/elf32_newphdr.c	2010-07-03 13:07:11.000000000 +0000
+@@ -135,6 +135,12 @@
+ 	   || count == PN_XNUM
+ 	   || elf->state.ELFW(elf,LIBELFBITS).phdr == NULL)
+     {
++      if (unlikely (count > SIZE_MAX / sizeof (ElfW2(LIBELFBITS,Phdr))))
++	{
++	  result = NULL;
++	  goto out;
++	}
++
+       /* Allocate a new program header with the appropriate number of
+ 	 elements.  */
+       result = (ElfW2(LIBELFBITS,Phdr) *)
+Index: elfutils-0.148/libelf/elf32_updatefile.c
+===================================================================
+--- elfutils-0.148.orig/libelf/elf32_updatefile.c	2010-01-12 16:57:54.000000000 +0000
++++ elfutils-0.148/libelf/elf32_updatefile.c	2010-07-03 13:07:11.000000000 +0000
+@@ -223,6 +223,9 @@
+   /* Write all the sections.  Well, only those which are modified.  */
+   if (shnum > 0)
+     {
++      if (unlikely (shnum > SIZE_MAX / sizeof (Elf_Scn *)))
++ 	return 1;
++
+       Elf_ScnList *list = &elf->state.ELFW(elf,LIBELFBITS).scns;
+       Elf_Scn **scns = (Elf_Scn **) alloca (shnum * sizeof (Elf_Scn *));
+       char *const shdr_start = ((char *) elf->map_address + elf->start_offset
+@@ -645,6 +648,10 @@
+   /* Write all the sections.  Well, only those which are modified.  */
+   if (shnum > 0)
+     {
++      if (unlikely (shnum > SIZE_MAX / (sizeof (Elf_Scn *)
++					+ sizeof (ElfW2(LIBELFBITS,Shdr)))))
++	return 1;
++
+       off_t shdr_offset = elf->start_offset + ehdr->e_shoff;
+ #if EV_NUM != 2
+       xfct_t shdr_fctp = __elf_xfctstom[__libelf_version - 1][EV_CURRENT - 1][ELFW(ELFCLASS, LIBELFBITS) - 1][ELF_T_SHDR];
+Index: elfutils-0.148/libelf/elf_begin.c
+===================================================================
+--- elfutils-0.148.orig/libelf/elf_begin.c	2010-04-21 14:26:40.000000000 +0000
++++ elfutils-0.148/libelf/elf_begin.c	2010-07-03 13:07:11.000000000 +0000
+@@ -165,7 +165,8 @@
+ 
+       if (unlikely (result == 0) && ehdr.e32->e_shoff != 0)
+ 	{
+-	  if (ehdr.e32->e_shoff + sizeof (Elf32_Shdr) > maxsize)
++	  if (unlikely (ehdr.e32->e_shoff >= maxsize)
++	      || unlikely (maxsize - ehdr.e32->e_shoff < sizeof (Elf32_Shdr)))
+ 	    /* Cannot read the first section header.  */
+ 	    return 0;
+ 
+@@ -213,7 +214,8 @@
+ 
+       if (unlikely (result == 0) && ehdr.e64->e_shoff != 0)
+ 	{
+-	  if (ehdr.e64->e_shoff + sizeof (Elf64_Shdr) > maxsize)
++	  if (unlikely (ehdr.e64->e_shoff >= maxsize)
++	      || unlikely (ehdr.e64->e_shoff + sizeof (Elf64_Shdr) > maxsize))
+ 	    /* Cannot read the first section header.  */
+ 	    return 0;
+ 
+@@ -285,6 +287,15 @@
+     /* Could not determine the number of sections.  */
+     return NULL;
+ 
++  /* Check for too many sections.  */
++  if (e_ident[EI_CLASS] == ELFCLASS32)
++    {
++      if (scncnt > SIZE_MAX / (sizeof (Elf_Scn) + sizeof (Elf32_Shdr)))
++	return NULL;
++    }
++  else if (scncnt > SIZE_MAX / (sizeof (Elf_Scn) + sizeof (Elf64_Shdr)))
++    return NULL;
++
+   /* We can now allocate the memory.  Even if there are no section headers,
+      we allocate space for a zeroth section in case we need it later.  */
+   const size_t scnmax = (scncnt ?: (cmd == ELF_C_RDWR || cmd == ELF_C_RDWR_MMAP)
+@@ -324,6 +335,16 @@
+ 	{
+ 	  /* We can use the mmapped memory.  */
+ 	  elf->state.elf32.ehdr = ehdr;
++
++	  if (unlikely (ehdr->e_shoff >= maxsize)
++	      || unlikely (maxsize - ehdr->e_shoff
++			   < scncnt * sizeof (Elf32_Shdr)))
++	    {
++	    free_and_out:
++	      free (elf);
++	      __libelf_seterrno (ELF_E_INVALID_FILE);
++	      return NULL;
++	    }
+ 	  elf->state.elf32.shdr
+ 	    = (Elf32_Shdr *) ((char *) ehdr + ehdr->e_shoff);
+ 
+@@ -410,6 +431,11 @@
+ 	{
+ 	  /* We can use the mmapped memory.  */
+ 	  elf->state.elf64.ehdr = ehdr;
++
++	  if (unlikely (ehdr->e_shoff >= maxsize)
++	      || unlikely (ehdr->e_shoff
++			   + scncnt * sizeof (Elf32_Shdr) > maxsize))
++	    goto free_and_out;
+ 	  elf->state.elf64.shdr
+ 	    = (Elf64_Shdr *) ((char *) ehdr + ehdr->e_shoff);
+ 
+Index: elfutils-0.148/libelf/elf_getarsym.c
+===================================================================
+--- elfutils-0.148.orig/libelf/elf_getarsym.c	2009-01-08 20:56:37.000000000 +0000
++++ elfutils-0.148/libelf/elf_getarsym.c	2010-07-03 13:07:11.000000000 +0000
+@@ -179,6 +179,9 @@
+       size_t index_size = atol (tmpbuf);
+ 
+       if (SARMAG + sizeof (struct ar_hdr) + index_size > elf->maximum_size
++#if SIZE_MAX <= 4294967295U
++	  || n >= SIZE_MAX / sizeof (Elf_Arsym)
++#endif
+ 	  || n * sizeof (uint32_t) > index_size)
+ 	{
+ 	  /* This index table cannot be right since it does not fit into
+Index: elfutils-0.148/libelf/elf_getshdrstrndx.c
+===================================================================
+--- elfutils-0.148.orig/libelf/elf_getshdrstrndx.c	2009-06-13 22:31:35.000000000 +0000
++++ elfutils-0.148/libelf/elf_getshdrstrndx.c	2010-07-03 13:07:11.000000000 +0000
+@@ -125,10 +125,25 @@
+ 	      if (elf->map_address != NULL
+ 		  && elf->state.elf32.ehdr->e_ident[EI_DATA] == MY_ELFDATA
+ 		  && (ALLOW_UNALIGNED
+-		      || (((size_t) ((char *) elf->map_address + offset))
++		      || (((size_t) ((char *) elf->map_address
++			   + elf->start_offset + offset))
+ 			  & (__alignof__ (Elf32_Shdr) - 1)) == 0))
+-		/* We can directly access the memory.  */
+-		num = ((Elf32_Shdr *) (elf->map_address + offset))->sh_link;
++		{
++		  /* First see whether the information in the ELF header is
++		     valid and it does not ask for too much.  */
++		  if (unlikely (elf->maximum_size - offset
++				< sizeof (Elf32_Shdr)))
++		    {
++		      /* Something is wrong.  */
++		      __libelf_seterrno (ELF_E_INVALID_SECTION_HEADER);
++		      result = -1;
++		      goto out;
++		    }
++
++		  /* We can directly access the memory.  */
++		  num = ((Elf32_Shdr *) (elf->map_address + elf->start_offset
++					 + offset))->sh_link;
++		}
+ 	      else
+ 		{
+ 		  /* We avoid reading in all the section headers.  Just read
+@@ -163,10 +178,25 @@
+ 	      if (elf->map_address != NULL
+ 		  && elf->state.elf64.ehdr->e_ident[EI_DATA] == MY_ELFDATA
+ 		  && (ALLOW_UNALIGNED
+-		      || (((size_t) ((char *) elf->map_address + offset))
++		      || (((size_t) ((char *) elf->map_address
++			   + elf->start_offset + offset))
+ 			  & (__alignof__ (Elf64_Shdr) - 1)) == 0))
+-		/* We can directly access the memory.  */
+-		num = ((Elf64_Shdr *) (elf->map_address + offset))->sh_link;
++		{
++		  /* First see whether the information in the ELF header is
++		     valid and it does not ask for too much.  */
++		  if (unlikely (elf->maximum_size - offset
++				< sizeof (Elf64_Shdr)))
++		    {
++		      /* Something is wrong.  */
++		      __libelf_seterrno (ELF_E_INVALID_SECTION_HEADER);
++		      result = -1;
++		      goto out;
++		    }
++
++		  /* We can directly access the memory.  */
++		  num = ((Elf64_Shdr *) (elf->map_address + elf->start_offset
++					 + offset))->sh_link;
++		}
+ 	      else
+ 		{
+ 		  /* We avoid reading in all the section headers.  Just read
+Index: elfutils-0.148/libelf/elf_newscn.c
+===================================================================
+--- elfutils-0.148.orig/libelf/elf_newscn.c	2009-01-08 20:56:37.000000000 +0000
++++ elfutils-0.148/libelf/elf_newscn.c	2010-07-03 13:07:11.000000000 +0000
+@@ -104,10 +104,18 @@
+   else
+     {
+       /* We must allocate a new element.  */
+-      Elf_ScnList *newp;
++      Elf_ScnList *newp = NULL;
+ 
+       assert (elf->state.elf.scnincr > 0);
+ 
++      if (
++#if SIZE_MAX <= 4294967295U
++	  likely (elf->state.elf.scnincr
++		  < SIZE_MAX / 2 / sizeof (Elf_Scn) - sizeof (Elf_ScnList))
++#else
++	  1
++#endif
++	  )
+       newp = (Elf_ScnList *) calloc (sizeof (Elf_ScnList)
+ 				     + ((elf->state.elf.scnincr *= 2)
+ 					* sizeof (Elf_Scn)), 1);
+Index: elfutils-0.148/libelf/gelf_getdyn.c
+===================================================================
+--- elfutils-0.148.orig/libelf/gelf_getdyn.c	2009-01-08 20:56:37.000000000 +0000
++++ elfutils-0.148/libelf/gelf_getdyn.c	2010-07-03 13:07:11.000000000 +0000
+@@ -1,5 +1,5 @@
+ /* Get information from dynamic table at the given index.
+-   Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
++   Copyright (C) 2000-2009 Red Hat, Inc.
+    This file is part of Red Hat elfutils.
+    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
+ 
+@@ -93,7 +93,7 @@
+ 	 table entries has to be adopted.  The user better has provided
+ 	 a buffer where we can store the information.  While copying the
+ 	 data we are converting the format.  */
+-      if (unlikely ((ndx + 1) * sizeof (Elf32_Dyn) > data_scn->d.d_size))
++      if (INVALID_NDX (ndx, Elf32_Dyn, &data_scn->d))
+ 	{
+ 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
+ 	  goto out;
+@@ -114,7 +114,7 @@
+ 
+       /* The data is already in the correct form.  Just make sure the
+ 	 index is OK.  */
+-      if (unlikely ((ndx + 1) * sizeof (GElf_Dyn) > data_scn->d.d_size))
++      if (INVALID_NDX (ndx, GElf_Dyn, &data_scn->d))
+ 	{
+ 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
+ 	  goto out;
+Index: elfutils-0.148/libelf/gelf_getlib.c
+===================================================================
+--- elfutils-0.148.orig/libelf/gelf_getlib.c	2009-01-08 20:56:37.000000000 +0000
++++ elfutils-0.148/libelf/gelf_getlib.c	2010-07-03 13:07:11.000000000 +0000
+@@ -1,5 +1,5 @@
+ /* Get library from table at the given index.
+-   Copyright (C) 2004 Red Hat, Inc.
++   Copyright (C) 2004-2009 Red Hat, Inc.
+    This file is part of Red Hat elfutils.
+    Written by Ulrich Drepper <drepper@redhat.com>, 2004.
+ 
+@@ -86,7 +86,7 @@
+   /* The data is already in the correct form.  Just make sure the
+      index is OK.  */
+   GElf_Lib *result = NULL;
+-  if (unlikely ((ndx + 1) * sizeof (GElf_Lib) > data->d_size))
++  if (INVALID_NDX (ndx, GElf_Lib, data))
+     __libelf_seterrno (ELF_E_INVALID_INDEX);
+   else
+     {
+Index: elfutils-0.148/libelf/gelf_getmove.c
+===================================================================
+--- elfutils-0.148.orig/libelf/gelf_getmove.c	2009-01-08 20:56:37.000000000 +0000
++++ elfutils-0.148/libelf/gelf_getmove.c	2010-07-03 13:07:11.000000000 +0000
+@@ -1,5 +1,5 @@
+ /* Get move structure at the given index.
+-   Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
++   Copyright (C) 2000-2009 Red Hat, Inc.
+    This file is part of Red Hat elfutils.
+    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
+ 
+@@ -83,7 +83,7 @@
+ 
+   /* The data is already in the correct form.  Just make sure the
+      index is OK.  */
+-  if (unlikely ((ndx + 1) * sizeof (GElf_Move) > data->d_size))
++  if (INVALID_NDX (ndx, GElf_Move, data))
+     {
+       __libelf_seterrno (ELF_E_INVALID_INDEX);
+       goto out;
+Index: elfutils-0.148/libelf/gelf_getrela.c
+===================================================================
+--- elfutils-0.148.orig/libelf/gelf_getrela.c	2009-01-08 20:56:37.000000000 +0000
++++ elfutils-0.148/libelf/gelf_getrela.c	2010-07-03 13:07:11.000000000 +0000
+@@ -1,5 +1,5 @@
+ /* Get RELA relocation information at given index.
+-   Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
++   Copyright (C) 2000-2009 Red Hat, Inc.
+    This file is part of Red Hat elfutils.
+    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
+ 
+@@ -71,12 +71,6 @@
+   if (data_scn == NULL)
+     return NULL;
+ 
+-  if (unlikely (ndx < 0))
+-    {
+-      __libelf_seterrno (ELF_E_INVALID_INDEX);
+-      return NULL;
+-    }
+-
+   if (unlikely (data_scn->d.d_type != ELF_T_RELA))
+     {
+       __libelf_seterrno (ELF_E_INVALID_HANDLE);
+@@ -93,7 +87,7 @@
+   if (scn->elf->class == ELFCLASS32)
+     {
+       /* We have to convert the data.  */
+-      if (unlikely ((ndx + 1) * sizeof (Elf32_Rela) > data_scn->d.d_size))
++      if (INVALID_NDX (ndx, Elf32_Rela, &data_scn->d))
+ 	{
+ 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
+ 	  result = NULL;
+@@ -114,7 +108,7 @@
+     {
+       /* Simply copy the data after we made sure we are actually getting
+ 	 correct data.  */
+-      if (unlikely ((ndx + 1) * sizeof (Elf64_Rela) > data_scn->d.d_size))
++      if (INVALID_NDX (ndx, Elf64_Rela, &data_scn->d))
+ 	{
+ 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
+ 	  result = NULL;
+Index: elfutils-0.148/libelf/gelf_getrel.c
+===================================================================
+--- elfutils-0.148.orig/libelf/gelf_getrel.c	2009-01-08 20:56:37.000000000 +0000
++++ elfutils-0.148/libelf/gelf_getrel.c	2010-07-03 13:07:11.000000000 +0000
+@@ -1,5 +1,5 @@
+ /* Get REL relocation information at given index.
+-   Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
++   Copyright (C) 2000-2009 Red Hat, Inc.
+    This file is part of Red Hat elfutils.
+    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
+ 
+@@ -71,12 +71,6 @@
+   if (data_scn == NULL)
+     return NULL;
+ 
+-  if (unlikely (ndx < 0))
+-    {
+-      __libelf_seterrno (ELF_E_INVALID_INDEX);
+-      return NULL;
+-    }
+-
+   if (unlikely (data_scn->d.d_type != ELF_T_REL))
+     {
+       __libelf_seterrno (ELF_E_INVALID_HANDLE);
+@@ -93,7 +87,7 @@
+   if (scn->elf->class == ELFCLASS32)
+     {
+       /* We have to convert the data.  */
+-      if (unlikely ((ndx + 1) * sizeof (Elf32_Rel) > data_scn->d.d_size))
++      if (INVALID_NDX (ndx, Elf32_Rel, &data_scn->d))
+ 	{
+ 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
+ 	  result = NULL;
+@@ -113,7 +107,7 @@
+     {
+       /* Simply copy the data after we made sure we are actually getting
+ 	 correct data.  */
+-      if (unlikely ((ndx + 1) * sizeof (Elf64_Rel) > data_scn->d.d_size))
++      if (INVALID_NDX (ndx, Elf64_Rel, &data_scn->d))
+ 	{
+ 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
+ 	  result = NULL;
+Index: elfutils-0.148/libelf/gelf_getsym.c
+===================================================================
+--- elfutils-0.148.orig/libelf/gelf_getsym.c	2009-01-08 20:56:37.000000000 +0000
++++ elfutils-0.148/libelf/gelf_getsym.c	2010-07-03 13:07:11.000000000 +0000
+@@ -1,5 +1,5 @@
+ /* Get symbol information from symbol table at the given index.
+-   Copyright (C) 1999, 2000, 2001, 2002 Red Hat, Inc.
++   Copyright (C) 1999-2009 Red Hat, Inc.
+    This file is part of Red Hat elfutils.
+    Written by Ulrich Drepper <drepper@redhat.com>, 1999.
+ 
+@@ -90,7 +90,7 @@
+ 	 table entries has to be adopted.  The user better has provided
+ 	 a buffer where we can store the information.  While copying the
+ 	 data we are converting the format.  */
+-      if (unlikely ((ndx + 1) * sizeof (Elf32_Sym) > data->d_size))
++      if (INVALID_NDX (ndx, Elf32_Sym, data))
+ 	{
+ 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
+ 	  goto out;
+@@ -119,7 +119,7 @@
+ 
+       /* The data is already in the correct form.  Just make sure the
+ 	 index is OK.  */
+-      if (unlikely ((ndx + 1) * sizeof (GElf_Sym) > data->d_size))
++      if (INVALID_NDX (ndx, GElf_Sym, data))
+ 	{
+ 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
+ 	  goto out;
+Index: elfutils-0.148/libelf/gelf_getsyminfo.c
+===================================================================
+--- elfutils-0.148.orig/libelf/gelf_getsyminfo.c	2009-01-08 20:56:37.000000000 +0000
++++ elfutils-0.148/libelf/gelf_getsyminfo.c	2010-07-03 13:07:11.000000000 +0000
+@@ -1,5 +1,5 @@
+ /* Get additional symbol information from symbol table at the given index.
+-   Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
++   Copyright (C) 2000-2009 Red Hat, Inc.
+    This file is part of Red Hat elfutils.
+    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
+ 
+@@ -84,7 +84,7 @@
+ 
+   /* The data is already in the correct form.  Just make sure the
+      index is OK.  */
+-  if (unlikely ((ndx + 1) * sizeof (GElf_Syminfo) > data->d_size))
++  if (INVALID_NDX (ndx, GElf_Syminfo, data))
+     {
+       __libelf_seterrno (ELF_E_INVALID_INDEX);
+       goto out;
+Index: elfutils-0.148/libelf/gelf_getsymshndx.c
+===================================================================
+--- elfutils-0.148.orig/libelf/gelf_getsymshndx.c	2009-01-08 20:56:37.000000000 +0000
++++ elfutils-0.148/libelf/gelf_getsymshndx.c	2010-07-03 13:07:11.000000000 +0000
+@@ -1,6 +1,6 @@
+ /* Get symbol information and separate section index from symbol table
+    at the given index.
+-   Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
++   Copyright (C) 2000-2009 Red Hat, Inc.
+    This file is part of Red Hat elfutils.
+    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
+ 
+@@ -90,7 +90,7 @@
+      section index table.  */
+   if (likely (shndxdata_scn != NULL))
+     {
+-      if (unlikely ((ndx + 1) * sizeof (Elf32_Word) > shndxdata_scn->d.d_size))
++      if (INVALID_NDX (ndx, Elf32_Word, &shndxdata_scn->d))
+ 	{
+ 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
+ 	  goto out;
+@@ -110,7 +110,7 @@
+ 	 table entries has to be adopted.  The user better has provided
+ 	 a buffer where we can store the information.  While copying the
+ 	 data we are converting the format.  */
+-      if (unlikely ((ndx + 1) * sizeof (Elf32_Sym) > symdata->d_size))
++      if (INVALID_NDX (ndx, Elf32_Sym, symdata))
+ 	{
+ 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
+ 	  goto out;
+@@ -139,7 +139,7 @@
+ 
+       /* The data is already in the correct form.  Just make sure the
+ 	 index is OK.  */
+-      if (unlikely ((ndx + 1) * sizeof (GElf_Sym) > symdata->d_size))
++      if (INVALID_NDX (ndx, GElf_Sym, symdata))
+ 	{
+ 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
+ 	  goto out;
+Index: elfutils-0.148/libelf/gelf_getversym.c
+===================================================================
+--- elfutils-0.148.orig/libelf/gelf_getversym.c	2009-01-08 20:56:37.000000000 +0000
++++ elfutils-0.148/libelf/gelf_getversym.c	2010-07-03 13:07:11.000000000 +0000
+@@ -1,5 +1,5 @@
+ /* Get symbol version information at the given index.
+-   Copyright (C) 1999, 2000, 2001, 2002 Red Hat, Inc.
++   Copyright (C) 1999-2009 Red Hat, Inc.
+    This file is part of Red Hat elfutils.
+    Written by Ulrich Drepper <drepper@redhat.com>, 1999.
+ 
+@@ -92,7 +92,7 @@
+ 
+   /* The data is already in the correct form.  Just make sure the
+      index is OK.  */
+-  if (unlikely ((ndx + 1) * sizeof (GElf_Versym) > data->d_size))
++  if (INVALID_NDX (ndx, GElf_Versym, data))
+     {
+       __libelf_seterrno (ELF_E_INVALID_INDEX);
+       result = NULL;
+Index: elfutils-0.148/libelf/gelf_update_dyn.c
+===================================================================
+--- elfutils-0.148.orig/libelf/gelf_update_dyn.c	2009-01-08 20:56:37.000000000 +0000
++++ elfutils-0.148/libelf/gelf_update_dyn.c	2010-07-03 13:07:11.000000000 +0000
+@@ -1,5 +1,5 @@
+ /* Update information in dynamic table at the given index.
+-   Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
++   Copyright (C) 2000-2009 Red Hat, Inc.
+    This file is part of Red Hat elfutils.
+    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
+ 
+@@ -71,12 +71,6 @@
+   if (data == NULL)
+     return 0;
+ 
+-  if (unlikely (ndx < 0))
+-    {
+-      __libelf_seterrno (ELF_E_INVALID_INDEX);
+-      return 0;
+-    }
+-
+   if (unlikely (data_scn->d.d_type != ELF_T_DYN))
+     {
+       /* The type of the data better should match.  */
+@@ -102,7 +96,7 @@
+ 	}
+ 
+       /* Check whether we have to resize the data buffer.  */
+-      if (unlikely ((ndx + 1) * sizeof (Elf32_Dyn) > data_scn->d.d_size))
++      if (INVALID_NDX (ndx, Elf32_Dyn, &data_scn->d))
+ 	{
+ 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
+ 	  goto out;
+@@ -116,7 +110,7 @@
+   else
+     {
+       /* Check whether we have to resize the data buffer.  */
+-      if (unlikely ((ndx + 1) * sizeof (Elf64_Dyn) > data_scn->d.d_size))
++      if (INVALID_NDX (ndx, Elf64_Dyn, &data_scn->d))
+ 	{
+ 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
+ 	  goto out;
+Index: elfutils-0.148/libelf/gelf_update_lib.c
+===================================================================
+--- elfutils-0.148.orig/libelf/gelf_update_lib.c	2009-01-08 20:56:37.000000000 +0000
++++ elfutils-0.148/libelf/gelf_update_lib.c	2010-07-03 13:07:11.000000000 +0000
+@@ -1,5 +1,5 @@
+ /* Update library in table at the given index.
+-   Copyright (C) 2004 Red Hat, Inc.
++   Copyright (C) 2004-2009 Red Hat, Inc.
+    This file is part of Red Hat elfutils.
+    Written by Ulrich Drepper <drepper@redhat.com>, 2004.
+ 
+@@ -68,12 +68,6 @@
+   if (data == NULL)
+     return 0;
+ 
+-  if (unlikely (ndx < 0))
+-    {
+-      __libelf_seterrno (ELF_E_INVALID_INDEX);
+-      return 0;
+-    }
+-
+   Elf_Data_Scn *data_scn = (Elf_Data_Scn *) data;
+   if (unlikely (data_scn->d.d_type != ELF_T_LIB))
+     {
+@@ -87,7 +81,7 @@
+ 
+   /* Check whether we have to resize the data buffer.  */
+   int result = 0;
+-  if (unlikely ((ndx + 1) * sizeof (Elf64_Lib) > data_scn->d.d_size))
++  if (INVALID_NDX (ndx, Elf64_Lib, &data_scn->d))
+     __libelf_seterrno (ELF_E_INVALID_INDEX);
+   else
+     {
+Index: elfutils-0.148/libelf/gelf_update_move.c
+===================================================================
+--- elfutils-0.148.orig/libelf/gelf_update_move.c	2009-01-08 20:56:37.000000000 +0000
++++ elfutils-0.148/libelf/gelf_update_move.c	2010-07-03 13:07:11.000000000 +0000
+@@ -1,5 +1,5 @@
+ /* Update move structure at the given index.
+-   Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
++   Copyright (C) 2000-2009 Red Hat, Inc.
+    This file is part of Red Hat elfutils.
+    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
+ 
+@@ -75,8 +75,7 @@
+   assert (sizeof (GElf_Move) == sizeof (Elf64_Move));
+ 
+   /* Check whether we have to resize the data buffer.  */
+-  if (unlikely (ndx < 0)
+-      || unlikely ((ndx + 1) * sizeof (GElf_Move) > data_scn->d.d_size))
++  if (INVALID_NDX (ndx, GElf_Move, &data_scn->d))
+     {
+       __libelf_seterrno (ELF_E_INVALID_INDEX);
+       return 0;
+Index: elfutils-0.148/libelf/gelf_update_rela.c
+===================================================================
+--- elfutils-0.148.orig/libelf/gelf_update_rela.c	2009-01-08 20:56:37.000000000 +0000
++++ elfutils-0.148/libelf/gelf_update_rela.c	2010-07-03 13:07:11.000000000 +0000
+@@ -1,5 +1,5 @@
+ /* Update RELA relocation information at given index.
+-   Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
++   Copyright (C) 2000-2009 Red Hat, Inc.
+    This file is part of Red Hat elfutils.
+    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
+ 
+@@ -68,12 +68,6 @@
+   if (dst == NULL)
+     return 0;
+ 
+-  if (unlikely (ndx < 0))
+-    {
+-      __libelf_seterrno (ELF_E_INVALID_INDEX);
+-      return 0;
+-    }
+-
+   if (unlikely (data_scn->d.d_type != ELF_T_RELA))
+     {
+       /* The type of the data better should match.  */
+@@ -101,7 +95,7 @@
+ 	}
+ 
+       /* Check whether we have to resize the data buffer.  */
+-      if (unlikely ((ndx + 1) * sizeof (Elf32_Rela) > data_scn->d.d_size))
++      if (INVALID_NDX (ndx, Elf32_Rela, &data_scn->d))
+ 	{
+ 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
+ 	  goto out;
+@@ -117,7 +111,7 @@
+   else
+     {
+       /* Check whether we have to resize the data buffer.  */
+-      if (unlikely ((ndx + 1) * sizeof (Elf64_Rela) > data_scn->d.d_size))
++      if (INVALID_NDX (ndx, Elf64_Rela, &data_scn->d))
+ 	{
+ 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
+ 	  goto out;
+Index: elfutils-0.148/libelf/gelf_update_rel.c
+===================================================================
+--- elfutils-0.148.orig/libelf/gelf_update_rel.c	2009-01-08 20:56:37.000000000 +0000
++++ elfutils-0.148/libelf/gelf_update_rel.c	2010-07-03 13:07:11.000000000 +0000
+@@ -1,5 +1,5 @@
+ /* Update REL relocation information at given index.
+-   Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
++   Copyright (C) 2000-2009 Red Hat, Inc.
+    This file is part of Red Hat elfutils.
+    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
+ 
+@@ -68,12 +68,6 @@
+   if (dst == NULL)
+     return 0;
+ 
+-  if (unlikely (ndx < 0))
+-    {
+-      __libelf_seterrno (ELF_E_INVALID_INDEX);
+-      return 0;
+-    }
+-
+   if (unlikely (data_scn->d.d_type != ELF_T_REL))
+     {
+       /* The type of the data better should match.  */
+@@ -99,7 +93,7 @@
+ 	}
+ 
+       /* Check whether we have to resize the data buffer.  */
+-      if (unlikely ((ndx + 1) * sizeof (Elf32_Rel) > data_scn->d.d_size))
++      if (INVALID_NDX (ndx, Elf32_Rel, &data_scn->d))
+ 	{
+ 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
+ 	  goto out;
+@@ -114,7 +108,7 @@
+   else
+     {
+       /* Check whether we have to resize the data buffer.  */
+-      if (unlikely ((ndx + 1) * sizeof (Elf64_Rel) > data_scn->d.d_size))
++      if (INVALID_NDX (ndx, Elf64_Rel, &data_scn->d))
+ 	{
+ 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
+ 	  goto out;
+Index: elfutils-0.148/libelf/gelf_update_sym.c
+===================================================================
+--- elfutils-0.148.orig/libelf/gelf_update_sym.c	2009-01-08 20:56:37.000000000 +0000
++++ elfutils-0.148/libelf/gelf_update_sym.c	2010-07-03 13:07:11.000000000 +0000
+@@ -1,5 +1,5 @@
+ /* Update symbol information in symbol table at the given index.
+-   Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
++   Copyright (C) 2000-2009 Red Hat, Inc.
+    This file is part of Red Hat elfutils.
+    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
+ 
+@@ -72,12 +72,6 @@
+   if (data == NULL)
+     return 0;
+ 
+-  if (unlikely (ndx < 0))
+-    {
+-      __libelf_seterrno (ELF_E_INVALID_INDEX);
+-      return 0;
+-    }
+-
+   if (unlikely (data_scn->d.d_type != ELF_T_SYM))
+     {
+       /* The type of the data better should match.  */
+@@ -102,7 +96,7 @@
+ 	}
+ 
+       /* Check whether we have to resize the data buffer.  */
+-      if (unlikely ((ndx + 1) * sizeof (Elf32_Sym) > data_scn->d.d_size))
++      if (INVALID_NDX (ndx, Elf32_Sym, &data_scn->d))
+ 	{
+ 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
+ 	  goto out;
+@@ -125,7 +119,7 @@
+   else
+     {
+       /* Check whether we have to resize the data buffer.  */
+-      if (unlikely ((ndx + 1) * sizeof (Elf64_Sym) > data_scn->d.d_size))
++      if (INVALID_NDX (ndx, Elf64_Sym, &data_scn->d))
+ 	{
+ 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
+ 	  goto out;
+Index: elfutils-0.148/libelf/gelf_update_syminfo.c
+===================================================================
+--- elfutils-0.148.orig/libelf/gelf_update_syminfo.c	2009-01-08 20:56:37.000000000 +0000
++++ elfutils-0.148/libelf/gelf_update_syminfo.c	2010-07-03 13:07:11.000000000 +0000
+@@ -1,5 +1,5 @@
+ /* Update additional symbol information in symbol table at the given index.
+-   Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
++   Copyright (C) 2000-2009 Red Hat, Inc.
+    This file is part of Red Hat elfutils.
+    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
+ 
+@@ -72,12 +72,6 @@
+   if (data == NULL)
+     return 0;
+ 
+-  if (unlikely (ndx < 0))
+-    {
+-      __libelf_seterrno (ELF_E_INVALID_INDEX);
+-      return 0;
+-    }
+-
+   if (unlikely (data_scn->d.d_type != ELF_T_SYMINFO))
+     {
+       /* The type of the data better should match.  */
+@@ -93,7 +87,7 @@
+   rwlock_wrlock (scn->elf->lock);
+ 
+   /* Check whether we have to resize the data buffer.  */
+-  if (unlikely ((ndx + 1) * sizeof (GElf_Syminfo) > data_scn->d.d_size))
++  if (INVALID_NDX (ndx, GElf_Syminfo, &data_scn->d))
+     {
+       __libelf_seterrno (ELF_E_INVALID_INDEX);
+       goto out;
+Index: elfutils-0.148/libelf/gelf_update_symshndx.c
+===================================================================
+--- elfutils-0.148.orig/libelf/gelf_update_symshndx.c	2009-01-08 20:56:37.000000000 +0000
++++ elfutils-0.148/libelf/gelf_update_symshndx.c	2010-07-03 13:07:11.000000000 +0000
+@@ -1,6 +1,6 @@
+ /* Update symbol information and section index in symbol table at the
+    given index.
+-   Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
++   Copyright (C) 2000-2009 Red Hat, Inc.
+    This file is part of Red Hat elfutils.
+    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
+ 
+@@ -77,12 +77,6 @@
+   if (symdata == NULL)
+     return 0;
+ 
+-  if (unlikely (ndx < 0))
+-    {
+-      __libelf_seterrno (ELF_E_INVALID_INDEX);
+-      return 0;
+-    }
+-
+   if (unlikely (symdata_scn->d.d_type != ELF_T_SYM))
+     {
+       /* The type of the data better should match.  */
+@@ -128,7 +122,7 @@
+ 	}
+ 
+       /* Check whether we have to resize the data buffer.  */
+-      if (unlikely ((ndx + 1) * sizeof (Elf32_Sym) > symdata_scn->d.d_size))
++      if (INVALID_NDX (ndx, Elf32_Sym, &symdata_scn->d))
+ 	{
+ 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
+ 	  goto out;
+@@ -151,7 +145,7 @@
+   else
+     {
+       /* Check whether we have to resize the data buffer.  */
+-      if (unlikely ((ndx + 1) * sizeof (Elf64_Sym) > symdata_scn->d.d_size))
++      if (INVALID_NDX (ndx, Elf64_Sym, &symdata_scn->d))
+ 	{
+ 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
+ 	  goto out;
+Index: elfutils-0.148/libelf/gelf_update_versym.c
+===================================================================
+--- elfutils-0.148.orig/libelf/gelf_update_versym.c	2009-01-08 20:56:37.000000000 +0000
++++ elfutils-0.148/libelf/gelf_update_versym.c	2010-07-03 13:07:11.000000000 +0000
+@@ -1,5 +1,5 @@
+ /* Update symbol version information.
+-   Copyright (C) 2001, 2002 Red Hat, Inc.
++   Copyright (C) 2001-2009 Red Hat, Inc.
+    This file is part of Red Hat elfutils.
+    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
+ 
+@@ -75,8 +75,7 @@
+   assert (sizeof (GElf_Versym) == sizeof (Elf64_Versym));
+ 
+   /* Check whether we have to resize the data buffer.  */
+-  if (unlikely (ndx < 0)
+-      || unlikely ((ndx + 1) * sizeof (GElf_Versym) > data_scn->d.d_size))
++  if (INVALID_NDX (ndx, GElf_Versym, &data_scn->d))
+     {
+       __libelf_seterrno (ELF_E_INVALID_INDEX);
+       return 0;
+Index: elfutils-0.148/libelf/libelfP.h
+===================================================================
+--- elfutils-0.148.orig/libelf/libelfP.h	2010-01-12 16:57:54.000000000 +0000
++++ elfutils-0.148/libelf/libelfP.h	2010-07-03 13:07:11.000000000 +0000
+@@ -608,4 +608,8 @@
+ /* Align offset to 4 bytes as needed for note name and descriptor data.  */
+ #define NOTE_ALIGN(n)	(((n) + 3) & -4U)
+ 
++/* Convenience macro.  */
++#define INVALID_NDX(ndx, type, data) \
++  unlikely ((data)->d_size / sizeof (type) <= (unsigned int) (ndx))
++
+ #endif  /* libelfP.h */
+Index: elfutils-0.148/src/ChangeLog
+===================================================================
+--- elfutils-0.148.orig/src/ChangeLog	2010-07-03 13:07:10.000000000 +0000
++++ elfutils-0.148/src/ChangeLog	2010-07-03 13:07:11.000000000 +0000
+@@ -1640,6 +1640,16 @@
+ 	object symbols or symbols with unknown type.
+ 	(check_rel): Likewise.
+ 
++2005-06-09  Roland McGrath  <roland@redhat.com>
++
++	* readelf.c (handle_dynamic, handle_symtab): Check for bogus sh_link.
++	(handle_verneed, handle_verdef, handle_versym, handle_hash): Likewise.
++	(handle_scngrp): Check for bogus sh_info.
++
++	* strip.c (handle_elf): Check for bogus values in sh_link, sh_info,
++	st_shndx, e_shstrndx, and SHT_GROUP or SHT_SYMTAB_SHNDX data.
++	Don't use assert on input values, instead bail with "illformed" error.
++
+ 2005-06-08  Roland McGrath  <roland@redhat.com>
+ 
+ 	* readelf.c (print_ops): Add consts.
+@@ -1690,6 +1700,19 @@
+ 
+ 	* readelf.c (dwarf_tag_string): Add new tags.
+ 
++2005-05-17  Jakub Jelinek  <jakub@redhat.com>
++
++	* elflint.c (check_hash): Don't check entries beyond end of section.
++	(check_note): Don't crash if gelf_rawchunk fails.
++	(section_name): Return <invalid> if gelf_getshdr returns NULL.
++
++2005-05-14  Jakub Jelinek  <jakub@redhat.com>
++
++	* elflint.c (section_name): Return "<invalid>" instead of
++	crashing on invalid section name.
++	(check_symtab, is_rel_dyn, check_rela, check_rel, check_dynamic,
++	check_symtab_shndx, check_hash, check_versym): Robustify.
++
+ 2005-05-08  Roland McGrath  <roland@redhat.com>
+ 
+ 	* strip.c (handle_elf): Don't translate hash and versym data formats,
+Index: elfutils-0.148/src/elflint.c
+===================================================================
+--- elfutils-0.148.orig/src/elflint.c	2010-04-13 20:08:02.000000000 +0000
++++ elfutils-0.148/src/elflint.c	2010-07-03 13:07:11.000000000 +0000
+@@ -131,6 +131,10 @@
+ /* Array to count references in section groups.  */
+ static int *scnref;
+ 
++/* Numbers of sections and program headers.  */
++static unsigned int shnum;
++static unsigned int phnum;
++
+ 
+ int
+ main (int argc, char *argv[])
+@@ -319,10 +323,19 @@
+ {
+   GElf_Shdr shdr_mem;
+   GElf_Shdr *shdr;
++  const char *ret;
++
++  if ((unsigned int) idx > shnum)
++    return "<invalid>";
+ 
+   shdr = gelf_getshdr (elf_getscn (ebl->elf, idx), &shdr_mem);
++  if (shdr == NULL)
++    return "<invalid>";
+ 
+-  return elf_strptr (ebl->elf, shstrndx, shdr->sh_name);
++  ret = elf_strptr (ebl->elf, shstrndx, shdr->sh_name);
++  if (ret == NULL)
++    return "<invalid>";
++  return ret;
+ }
+ 
+ 
+@@ -344,11 +357,6 @@
+   (sizeof (valid_e_machine) / sizeof (valid_e_machine[0]))
+ 
+ 
+-/* Numbers of sections and program headers.  */
+-static unsigned int shnum;
+-static unsigned int phnum;
+-
+-
+ static void
+ check_elf_header (Ebl *ebl, GElf_Ehdr *ehdr, size_t size)
+ {
+@@ -632,7 +640,8 @@
+ 	  }
+       }
+ 
+-  if (shdr->sh_entsize != gelf_fsize (ebl->elf, ELF_T_SYM, 1, EV_CURRENT))
++  size_t sh_entsize = gelf_fsize (ebl->elf, ELF_T_SYM, 1, EV_CURRENT);
++  if (shdr->sh_entsize != sh_entsize)
+     ERROR (gettext ("\
+ section [%2u] '%s': entry size is does not match ElfXX_Sym\n"),
+ 	   idx, section_name (ebl, idx));
+@@ -670,7 +679,7 @@
+ 	       xndxscnidx, section_name (ebl, xndxscnidx));
+     }
+ 
+-  for (size_t cnt = 1; cnt < shdr->sh_size / shdr->sh_entsize; ++cnt)
++  for (size_t cnt = 1; cnt < shdr->sh_size / sh_entsize; ++cnt)
+     {
+       sym = gelf_getsymshndx (data, xndxdata, cnt, &sym_mem, &xndx);
+       if (sym == NULL)
+@@ -690,7 +699,8 @@
+       else
+ 	{
+ 	  name = elf_strptr (ebl->elf, shdr->sh_link, sym->st_name);
+-	  assert (name != NULL);
++	  assert (name != NULL
++		  || strshdr->sh_type != SHT_STRTAB);
+ 	}
+ 
+       if (sym->st_shndx == SHN_XINDEX)
+@@ -1038,9 +1048,11 @@
+     {
+       GElf_Shdr rcshdr_mem;
+       const GElf_Shdr *rcshdr = gelf_getshdr (scn, &rcshdr_mem);
+-      assert (rcshdr != NULL);
+ 
+-      if (rcshdr->sh_type == SHT_DYNAMIC)
++      if (rcshdr == NULL)
++	break;
++
++      if (rcshdr->sh_type == SHT_DYNAMIC && rcshdr->sh_entsize)
+ 	{
+ 	  /* Found the dynamic section.  Look through it.  */
+ 	  Elf_Data *d = elf_getdata (scn, NULL);
+@@ -1050,7 +1062,9 @@
+ 	    {
+ 	      GElf_Dyn dyn_mem;
+ 	      GElf_Dyn *dyn = gelf_getdyn (d, cnt, &dyn_mem);
+-	      assert (dyn != NULL);
++
++	      if (dyn == NULL)
++		break;
+ 
+ 	      if (dyn->d_tag == DT_RELCOUNT)
+ 		{
+@@ -1064,7 +1078,9 @@
+ 		      /* Does the number specified number of relative
+ 			 relocations exceed the total number of
+ 			 relocations?  */
+-		      if (dyn->d_un.d_val > shdr->sh_size / shdr->sh_entsize)
++		      if (shdr->sh_entsize != 0
++			  && dyn->d_un.d_val > (shdr->sh_size
++						/ shdr->sh_entsize))
+ 			ERROR (gettext ("\
+ section [%2d] '%s': DT_RELCOUNT value %d too high for this section\n"),
+ 			       idx, section_name (ebl, idx),
+@@ -1224,7 +1240,8 @@
+ 	}
+     }
+ 
+-  if (shdr->sh_entsize != gelf_fsize (ebl->elf, reltype, 1, EV_CURRENT))
++  size_t sh_entsize = gelf_fsize (ebl->elf, reltype, 1, EV_CURRENT);
++  if (shdr->sh_entsize != sh_entsize)
+     ERROR (gettext (reltype == ELF_T_RELA ? "\
+ section [%2d] '%s': section entry size does not match ElfXX_Rela\n" : "\
+ section [%2d] '%s': section entry size does not match ElfXX_Rel\n"),
+@@ -1447,7 +1464,8 @@
+   Elf_Data *symdata = elf_getdata (symscn, NULL);
+   enum load_state state = state_undecided;
+ 
+-  for (size_t cnt = 0; cnt < shdr->sh_size / shdr->sh_entsize; ++cnt)
++  size_t sh_entsize = gelf_fsize (ebl->elf, ELF_T_RELA, 1, EV_CURRENT);
++  for (size_t cnt = 0; cnt < shdr->sh_size / sh_entsize; ++cnt)
+     {
+       GElf_Rela rela_mem;
+       GElf_Rela *rela = gelf_getrela (data, cnt, &rela_mem);
+@@ -1497,7 +1515,8 @@
+   Elf_Data *symdata = elf_getdata (symscn, NULL);
+   enum load_state state = state_undecided;
+ 
+-  for (size_t cnt = 0; cnt < shdr->sh_size / shdr->sh_entsize; ++cnt)
++  size_t sh_entsize = gelf_fsize (ebl->elf, ELF_T_REL, 1, EV_CURRENT);
++  for (size_t cnt = 0; cnt < shdr->sh_size / sh_entsize; ++cnt)
+     {
+       GElf_Rel rel_mem;
+       GElf_Rel *rel = gelf_getrel (data, cnt, &rel_mem);
+@@ -1600,7 +1619,8 @@
+ 	   shdr->sh_link, section_name (ebl, shdr->sh_link),
+ 	   idx, section_name (ebl, idx));
+ 
+-  if (shdr->sh_entsize != gelf_fsize (ebl->elf, ELF_T_DYN, 1, EV_CURRENT))
++  size_t sh_entsize = gelf_fsize (ebl->elf, ELF_T_DYN, 1, EV_CURRENT);
++  if (shdr->sh_entsize != sh_entsize)
+     ERROR (gettext ("\
+ section [%2d] '%s': section entry size does not match ElfXX_Dyn\n"),
+ 	   idx, section_name (ebl, idx));
+@@ -1610,7 +1630,7 @@
+ 	   idx, section_name (ebl, idx));
+ 
+   bool non_null_warned = false;
+-  for (cnt = 0; cnt < shdr->sh_size / shdr->sh_entsize; ++cnt)
++  for (cnt = 0; cnt < shdr->sh_size / sh_entsize; ++cnt)
+     {
+       GElf_Dyn dyn_mem;
+       GElf_Dyn *dyn = gelf_getdyn (data, cnt, &dyn_mem);
+@@ -1891,6 +1911,8 @@
+ 	   idx, section_name (ebl, idx));
+ 
+   if (symshdr != NULL
++      && shdr->sh_entsize
++      && symshdr->sh_entsize
+       && (shdr->sh_size / shdr->sh_entsize
+ 	  < symshdr->sh_size / symshdr->sh_entsize))
+     ERROR (gettext ("\
+@@ -1917,6 +1939,12 @@
+     }
+ 
+   Elf_Data *data = elf_getdata (elf_getscn (ebl->elf, idx), NULL);
++  if (data == NULL)
++    {
++      ERROR (gettext ("section [%2d] '%s': cannot get section data\n"),
++ 	     idx, section_name (ebl, idx));
++      return;
++    }
+ 
+   if (*((Elf32_Word *) data->d_buf) != 0)
+     ERROR (gettext ("symbol 0 should have zero extended section index\n"));
+@@ -1959,7 +1987,7 @@
+ 
+   size_t maxidx = nchain;
+ 
+-  if (symshdr != NULL)
++  if (symshdr != NULL && symshdr->sh_entsize != 0)
+     {
+       size_t symsize = symshdr->sh_size / symshdr->sh_entsize;
+ 
+@@ -1970,18 +1998,28 @@
+       maxidx = symsize;
+     }
+ 
++  Elf32_Word *buf = (Elf32_Word *) data->d_buf;
++  Elf32_Word *end = (Elf32_Word *) ((char *) data->d_buf + shdr->sh_size);
+   size_t cnt;
+   for (cnt = 2; cnt < 2 + nbucket; ++cnt)
+-    if (((Elf32_Word *) data->d_buf)[cnt] >= maxidx)
++    {
++      if (buf + cnt >= end)
++	break;
++      else if (buf[cnt] >= maxidx)
+       ERROR (gettext ("\
+ section [%2d] '%s': hash bucket reference %zu out of bounds\n"),
+ 	     idx, section_name (ebl, idx), cnt - 2);
++    }
+ 
+   for (; cnt < 2 + nbucket + nchain; ++cnt)
+-    if (((Elf32_Word *) data->d_buf)[cnt] >= maxidx)
++    {
++      if (buf + cnt >= end)
++	break;
++      else if (buf[cnt] >= maxidx)
+       ERROR (gettext ("\
+ section [%2d] '%s': hash chain reference %zu out of bounds\n"),
+ 	     idx, section_name (ebl, idx), cnt - 2 - nbucket);
++    }
+ }
+ 
+ 
+@@ -2011,18 +2049,28 @@
+       maxidx = symsize;
+     }
+ 
++  Elf64_Xword *buf = (Elf64_Xword *) data->d_buf;
++  Elf64_Xword *end = (Elf64_Xword *) ((char *) data->d_buf + shdr->sh_size);
+   size_t cnt;
+   for (cnt = 2; cnt < 2 + nbucket; ++cnt)
+-    if (((Elf64_Xword *) data->d_buf)[cnt] >= maxidx)
++    {
++      if (buf + cnt >= end)
++	break;
++      else if (buf[cnt] >= maxidx)
+       ERROR (gettext ("\
+ section [%2d] '%s': hash bucket reference %zu out of bounds\n"),
+ 	     idx, section_name (ebl, idx), cnt - 2);
++    }
+ 
+   for (; cnt < 2 + nbucket + nchain; ++cnt)
+-    if (((Elf64_Xword *) data->d_buf)[cnt] >= maxidx)
++    {
++      if (buf + cnt >= end)
++	break;
++      else if (buf[cnt] >= maxidx)
+       ERROR (gettext ("\
+ section [%2d] '%s': hash chain reference %" PRIu64 " out of bounds\n"),
+-	     idx, section_name (ebl, idx), (uint64_t) (cnt - 2 - nbucket));
++	       idx, section_name (ebl, idx), (uint64_t) cnt - 2 - nbucket);
++    }
+ }
+ 
+ 
+@@ -2047,7 +2095,7 @@
+   if (shdr->sh_size < (4 + bitmask_words + nbuckets) * sizeof (Elf32_Word))
+     {
+       ERROR (gettext ("\
+-section [%2d] '%s': hash table section is too small (is %ld, expected at least%ld)\n"),
++section [%2d] '%s': hash table section is too small (is %ld, expected at least %ld)\n"),
+ 	     idx, section_name (ebl, idx), (long int) shdr->sh_size,
+ 	     (long int) ((4 + bitmask_words + nbuckets) * sizeof (Elf32_Word)));
+       return;
+@@ -2719,8 +2767,9 @@
+ 
+   /* The number of elements in the version symbol table must be the
+      same as the number of symbols.  */
+-  if (shdr->sh_size / shdr->sh_entsize
+-      != symshdr->sh_size / symshdr->sh_entsize)
++  if (shdr->sh_entsize && symshdr->sh_entsize
++      && (shdr->sh_size / shdr->sh_entsize
++	  != symshdr->sh_size / symshdr->sh_entsize))
+     ERROR (gettext ("\
+ section [%2d] '%s' has different number of entries than symbol table [%2d] '%s'\n"),
+ 	   idx, section_name (ebl, idx),
+Index: elfutils-0.148/src/readelf.c
+===================================================================
+--- elfutils-0.148.orig/src/readelf.c	2010-07-03 13:07:10.000000000 +0000
++++ elfutils-0.148/src/readelf.c	2010-07-03 13:07:11.000000000 +0000
+@@ -1172,6 +1172,8 @@
+   Elf32_Word *grpref = (Elf32_Word *) data->d_buf;
+ 
+   GElf_Sym sym_mem;
++  GElf_Sym *sym = gelf_getsym (symdata, shdr->sh_info, &sym_mem);
++
+   printf ((grpref[0] & GRP_COMDAT)
+ 	  ? ngettext ("\
+ \nCOMDAT section group [%2zu] '%s' with signature '%s' contains %zu entry:\n",
+@@ -1184,8 +1186,8 @@
+ 		      data->d_size / sizeof (Elf32_Word) - 1),
+ 	  elf_ndxscn (scn),
+ 	  elf_strptr (ebl->elf, shstrndx, shdr->sh_name),
+-	  elf_strptr (ebl->elf, symshdr->sh_link,
+-		      gelf_getsym (symdata, shdr->sh_info, &sym_mem)->st_name)
++	  (sym == NULL ? NULL
++	   : elf_strptr (ebl->elf, symshdr->sh_link, sym->st_name))
+ 	  ?: gettext ("<INVALID SYMBOL>"),
+ 	  data->d_size / sizeof (Elf32_Word) - 1);
+ 
+@@ -1336,7 +1338,8 @@
+ handle_dynamic (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
+ {
+   int class = gelf_getclass (ebl->elf);
+-  GElf_Shdr glink;
++  GElf_Shdr glink_mem;
++  GElf_Shdr *glink;
+   Elf_Data *data;
+   size_t cnt;
+   size_t shstrndx;
+@@ -1351,6 +1354,11 @@
+     error (EXIT_FAILURE, 0,
+ 	   gettext ("cannot get section header string table index"));
+ 
++  glink = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link), &glink_mem);
++  if (glink == NULL)
++    error (EXIT_FAILURE, 0, gettext ("invalid sh_link value in section %Zu"),
++	   elf_ndxscn (scn));
++
+   printf (ngettext ("\
+ \nDynamic segment contains %lu entry:\n Addr: %#0*" PRIx64 "  Offset: %#08" PRIx64 "  Link to section: [%2u] '%s'\n",
+ 		    "\
+@@ -1360,9 +1368,7 @@
+ 	  class == ELFCLASS32 ? 10 : 18, shdr->sh_addr,
+ 	  shdr->sh_offset,
+ 	  (int) shdr->sh_link,
+-	  elf_strptr (ebl->elf, shstrndx,
+-		      gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
+-				    &glink)->sh_name));
++	  elf_strptr (ebl->elf, shstrndx, glink->sh_name));
+   fputs_unlocked (gettext ("  Type              Value\n"), stdout);
+ 
+   for (cnt = 0; cnt < shdr->sh_size / shdr->sh_entsize; ++cnt)
+@@ -1945,6 +1951,13 @@
+     error (EXIT_FAILURE, 0,
+ 	   gettext ("cannot get section header string table index"));
+ 
++  GElf_Shdr glink_mem;
++  GElf_Shdr *glink = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
++				   &glink_mem);
++  if (glink == NULL)
++    error (EXIT_FAILURE, 0, gettext ("invalid sh_link value in section %Zu"),
++	   elf_ndxscn (scn));
++
+   /* Now we can compute the number of entries in the section.  */
+   unsigned int nsyms = data->d_size / (class == ELFCLASS32
+ 				       ? sizeof (Elf32_Sym)
+@@ -1955,15 +1968,12 @@
+ 		    nsyms),
+ 	  (unsigned int) elf_ndxscn (scn),
+ 	  elf_strptr (ebl->elf, shstrndx, shdr->sh_name), nsyms);
+-  GElf_Shdr glink;
+   printf (ngettext (" %lu local symbol  String table: [%2u] '%s'\n",
+ 		    " %lu local symbols  String table: [%2u] '%s'\n",
+ 		    shdr->sh_info),
+ 	  (unsigned long int) shdr->sh_info,
+ 	  (unsigned int) shdr->sh_link,
+-	  elf_strptr (ebl->elf, shstrndx,
+-		      gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
+-				    &glink)->sh_name));
++	  elf_strptr (ebl->elf, shstrndx, glink->sh_name));
+ 
+   fputs_unlocked (class == ELFCLASS32
+ 		  ? gettext ("\
+@@ -2199,7 +2209,13 @@
+     error (EXIT_FAILURE, 0,
+ 	   gettext ("cannot get section header string table index"));
+ 
+-  GElf_Shdr glink;
++  GElf_Shdr glink_mem;
++  GElf_Shdr *glink = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
++				   &glink_mem);
++  if (glink == NULL)
++    error (EXIT_FAILURE, 0, gettext ("invalid sh_link value in section %Zu"),
++	   elf_ndxscn (scn));
++
+   printf (ngettext ("\
+ \nVersion needs section [%2u] '%s' contains %d entry:\n Addr: %#0*" PRIx64 "  Offset: %#08" PRIx64 "  Link to section: [%2u] '%s'\n",
+ 		    "\
+@@ -2210,9 +2226,7 @@
+ 	  class == ELFCLASS32 ? 10 : 18, shdr->sh_addr,
+ 	  shdr->sh_offset,
+ 	  (unsigned int) shdr->sh_link,
+-	  elf_strptr (ebl->elf, shstrndx,
+-		      gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
+-				    &glink)->sh_name));
++	  elf_strptr (ebl->elf, shstrndx, glink->sh_name));
+ 
+   unsigned int offset = 0;
+   for (int cnt = shdr->sh_info; --cnt >= 0; )
+@@ -2265,8 +2279,14 @@
+     error (EXIT_FAILURE, 0,
+ 	   gettext ("cannot get section header string table index"));
+ 
++  GElf_Shdr glink_mem;
++  GElf_Shdr *glink = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
++				   &glink_mem);
++  if (glink == NULL)
++    error (EXIT_FAILURE, 0, gettext ("invalid sh_link value in section %Zu"),
++	   elf_ndxscn (scn));
++
+   int class = gelf_getclass (ebl->elf);
+-  GElf_Shdr glink;
+   printf (ngettext ("\
+ \nVersion definition section [%2u] '%s' contains %d entry:\n Addr: %#0*" PRIx64 "  Offset: %#08" PRIx64 "  Link to section: [%2u] '%s'\n",
+ 		    "\
+@@ -2278,9 +2298,7 @@
+ 	  class == ELFCLASS32 ? 10 : 18, shdr->sh_addr,
+ 	  shdr->sh_offset,
+ 	  (unsigned int) shdr->sh_link,
+-	  elf_strptr (ebl->elf, shstrndx,
+-		      gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
+-				    &glink)->sh_name));
++	  elf_strptr (ebl->elf, shstrndx, glink->sh_name));
+ 
+   unsigned int offset = 0;
+   for (int cnt = shdr->sh_info; --cnt >= 0; )
+@@ -2542,8 +2560,14 @@
+       filename = NULL;
+     }
+ 
++  GElf_Shdr glink_mem;
++  GElf_Shdr *glink = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
++				   &glink_mem);
++  if (glink == NULL)
++    error (EXIT_FAILURE, 0, gettext ("invalid sh_link value in section %Zu"),
++	   elf_ndxscn (scn));
++
+   /* Print the header.  */
+-  GElf_Shdr glink;
+   printf (ngettext ("\
+ \nVersion symbols section [%2u] '%s' contains %d entry:\n Addr: %#0*" PRIx64 "  Offset: %#08" PRIx64 "  Link to section: [%2u] '%s'",
+ 		    "\
+@@ -2555,9 +2579,7 @@
+ 	  class == ELFCLASS32 ? 10 : 18, shdr->sh_addr,
+ 	  shdr->sh_offset,
+ 	  (unsigned int) shdr->sh_link,
+-	  elf_strptr (ebl->elf, shstrndx,
+-		      gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
+-				    &glink)->sh_name));
++	  elf_strptr (ebl->elf, shstrndx, glink->sh_name));
+ 
+   /* Now we can finally look at the actual contents of this section.  */
+   for (unsigned int cnt = 0; cnt < shdr->sh_size / shdr->sh_entsize; ++cnt)
+@@ -2609,7 +2631,17 @@
+   for (Elf32_Word cnt = 0; cnt < nbucket; ++cnt)
+     ++counts[lengths[cnt]];
+ 
+-  GElf_Shdr glink;
++  GElf_Shdr glink_mem;
++  GElf_Shdr *glink = gelf_getshdr (elf_getscn (ebl->elf,
++					       shdr->sh_link),
++				   &glink_mem);
++  if (glink == NULL)
++    {
++      error (0, 0, gettext ("invalid sh_link value in section %Zu"),
++	     elf_ndxscn (scn));
++      return;
++    }
++
+   printf (ngettext ("\
+ \nHistogram for bucket list length in section [%2u] '%s' (total of %d bucket):\n Addr: %#0*" PRIx64 "  Offset: %#08" PRIx64 "  Link to section: [%2u] '%s'\n",
+ 		    "\
+@@ -2622,9 +2654,7 @@
+ 	  shdr->sh_addr,
+ 	  shdr->sh_offset,
+ 	  (unsigned int) shdr->sh_link,
+-	  elf_strptr (ebl->elf, shstrndx,
+-		      gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
+-				    &glink)->sh_name));
++	  elf_strptr (ebl->elf, shstrndx, glink->sh_name));
+ 
+   if (extrastr != NULL)
+     fputs (extrastr, stdout);
+@@ -4312,6 +4342,16 @@
+       return;
+     }
+ 
++  GElf_Shdr glink_mem;
++  GElf_Shdr *glink;
++  glink = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link), &glink_mem);
++  if (glink == NULL)
++    {
++      error (0, 0, gettext ("invalid sh_link value in section %Zu"),
++	     elf_ndxscn (scn));
++      return;
++    }
++
+   printf (ngettext ("\
+ \nDWARF section [%2zu] '%s' at offset %#" PRIx64 " contains %zu entry:\n",
+ 		    "\
+Index: elfutils-0.148/src/strip.c
+===================================================================
+--- elfutils-0.148.orig/src/strip.c	2010-07-03 13:07:10.000000000 +0000
++++ elfutils-0.148/src/strip.c	2010-07-03 13:07:11.000000000 +0000
+@@ -561,6 +561,11 @@
+       goto fail_close;
+     }
+ 
++  if (shstrndx >= shnum)
++    goto illformed;
++
++#define elf_assert(test) do { if (!(test)) goto illformed; } while (0)
++
+   /* Storage for section information.  We leave room for two more
+      entries since we unconditionally create a section header string
+      table.  Maybe some weird tool created an ELF file without one.
+@@ -582,7 +587,7 @@
+     {
+       /* This should always be true (i.e., there should not be any
+ 	 holes in the numbering).  */
+-      assert (elf_ndxscn (scn) == cnt);
++      elf_assert (elf_ndxscn (scn) == cnt);
+ 
+       shdr_info[cnt].scn = scn;
+ 
+@@ -595,6 +600,7 @@
+ 					shdr_info[cnt].shdr.sh_name);
+       if (shdr_info[cnt].name == NULL)
+ 	{
++	illformed:
+ 	  error (0, 0, gettext ("illformed file '%s'"), fname);
+ 	  goto fail_close;
+ 	}
+@@ -604,6 +610,8 @@
+ 
+       /* Remember the shdr.sh_link value.  */
+       shdr_info[cnt].old_sh_link = shdr_info[cnt].shdr.sh_link;
++      if (shdr_info[cnt].old_sh_link >= shnum)
++	goto illformed;
+ 
+       /* Sections in files other than relocatable object files which
+ 	 are not loaded can be freely moved by us.  In relocatable
+@@ -616,7 +624,7 @@
+ 	 appropriate reference.  */
+       if (unlikely (shdr_info[cnt].shdr.sh_type == SHT_SYMTAB_SHNDX))
+ 	{
+-	  assert (shdr_info[shdr_info[cnt].shdr.sh_link].symtab_idx == 0);
++	  elf_assert (shdr_info[shdr_info[cnt].shdr.sh_link].symtab_idx == 0);
+ 	  shdr_info[shdr_info[cnt].shdr.sh_link].symtab_idx = cnt;
+ 	}
+       else if (unlikely (shdr_info[cnt].shdr.sh_type == SHT_GROUP))
+@@ -633,7 +641,12 @@
+ 	  for (inner = 1;
+ 	       inner < shdr_info[cnt].data->d_size / sizeof (Elf32_Word);
+ 	       ++inner)
++	    {
++	      if (grpref[inner] < shnum)
+ 	    shdr_info[grpref[inner]].group_idx = cnt;
++	      else
++		goto illformed;
++	    }
+ 
+ 	  if (inner == 1 || (inner == 2 && (grpref[0] & GRP_COMDAT) == 0))
+ 	    /* If the section group contains only one element and this
+@@ -644,7 +657,7 @@
+ 	}
+       else if (unlikely (shdr_info[cnt].shdr.sh_type == SHT_GNU_versym))
+ 	{
+-	  assert (shdr_info[shdr_info[cnt].shdr.sh_link].version_idx == 0);
++	  elf_assert (shdr_info[shdr_info[cnt].shdr.sh_link].version_idx == 0);
+ 	  shdr_info[shdr_info[cnt].shdr.sh_link].version_idx = cnt;
+ 	}
+ 
+@@ -652,7 +665,7 @@
+ 	 discarded right away.  */
+       if ((shdr_info[cnt].shdr.sh_flags & SHF_GROUP) != 0)
+ 	{
+-	  assert (shdr_info[cnt].group_idx != 0);
++	  elf_assert (shdr_info[cnt].group_idx != 0);
+ 
+ 	  if (shdr_info[shdr_info[cnt].group_idx].idx == 0)
+ 	    {
+@@ -727,11 +740,15 @@
+ 	    {
+ 	      /* If a relocation section is marked as being removed make
+ 		 sure the section it is relocating is removed, too.  */
+-	      if ((shdr_info[cnt].shdr.sh_type == SHT_REL
++	      if (shdr_info[cnt].shdr.sh_type == SHT_REL
+ 		   || shdr_info[cnt].shdr.sh_type == SHT_RELA)
+-		  && shdr_info[shdr_info[cnt].shdr.sh_info].idx != 0)
++		{
++		  if (shdr_info[cnt].shdr.sh_info >= shnum)
++		    goto illformed;
++		  else if (shdr_info[shdr_info[cnt].shdr.sh_info].idx != 0)
+ 		shdr_info[cnt].idx = 1;
+ 	    }
++	    }
+ 
+ 	  if (shdr_info[cnt].idx == 1)
+ 	    {
+@@ -758,7 +775,7 @@
+ 		  if (shdr_info[cnt].symtab_idx != 0
+ 		      && shdr_info[shdr_info[cnt].symtab_idx].data == NULL)
+ 		    {
+-		      assert (shdr_info[cnt].shdr.sh_type == SHT_SYMTAB);
++		      elf_assert (shdr_info[cnt].shdr.sh_type == SHT_SYMTAB);
+ 
+ 		      shdr_info[shdr_info[cnt].symtab_idx].data
+ 			= elf_getdata (shdr_info[shdr_info[cnt].symtab_idx].scn,
+@@ -798,6 +815,9 @@
+ 		      else if (scnidx == SHN_XINDEX)
+ 			scnidx = xndx;
+ 
++		      if (scnidx >= shnum)
++			goto illformed;
++
+ 		      if (shdr_info[scnidx].idx == 0)
+ 			/* This symbol table has a real symbol in
+ 			   a discarded section.  So preserve the
+@@ -828,12 +848,16 @@
+ 		}
+ 
+ 	      /* Handle references through sh_info.  */
+-	      if (SH_INFO_LINK_P (&shdr_info[cnt].shdr)
+-		  && shdr_info[shdr_info[cnt].shdr.sh_info].idx == 0)
++	      if (SH_INFO_LINK_P (&shdr_info[cnt].shdr))
++		{
++		  if (shdr_info[cnt].shdr.sh_info >= shnum)
++		    goto illformed;
++		  else if ( shdr_info[shdr_info[cnt].shdr.sh_info].idx == 0)
+ 		{
+ 		  shdr_info[shdr_info[cnt].shdr.sh_info].idx = 1;
+ 		  changes |= shdr_info[cnt].shdr.sh_info < cnt;
+ 		}
++		}
+ 
+ 	      /* Mark the section as investigated.  */
+ 	      shdr_info[cnt].idx = 2;
+@@ -972,7 +996,7 @@
+ 	  error (EXIT_FAILURE, 0, gettext ("while generating output file: %s"),
+ 		 elf_errmsg (-1));
+ 
+-	assert (elf_ndxscn (shdr_info[cnt].newscn) == shdr_info[cnt].idx);
++	elf_assert (elf_ndxscn (shdr_info[cnt].newscn) == shdr_info[cnt].idx);
+ 
+ 	/* Add this name to the section header string table.  */
+ 	shdr_info[cnt].se = ebl_strtabadd (shst, shdr_info[cnt].name, 0);
+@@ -1009,7 +1033,7 @@
+ 	error (EXIT_FAILURE, 0,
+ 	       gettext ("while create section header section: %s"),
+ 	       elf_errmsg (-1));
+-      assert (elf_ndxscn (shdr_info[cnt].newscn) == shdr_info[cnt].idx);
++      elf_assert (elf_ndxscn (shdr_info[cnt].newscn) == shdr_info[cnt].idx);
+ 
+       shdr_info[cnt].data = elf_newdata (shdr_info[cnt].newscn);
+       if (shdr_info[cnt].data == NULL)
+@@ -1065,7 +1089,7 @@
+     error (EXIT_FAILURE, 0,
+ 	   gettext ("while create section header section: %s"),
+ 	   elf_errmsg (-1));
+-  assert (elf_ndxscn (shdr_info[cnt].newscn) == idx);
++  elf_assert (elf_ndxscn (shdr_info[cnt].newscn) == idx);
+ 
+   /* Finalize the string table and fill in the correct indices in the
+      section headers.  */
+@@ -1155,20 +1179,20 @@
+ 		    shndxdata = elf_getdata (shdr_info[shdr_info[cnt].symtab_idx].scn,
+ 					     NULL);
+ 
+-		    assert ((versiondata->d_size / sizeof (Elf32_Word))
++		    elf_assert ((versiondata->d_size / sizeof (Elf32_Word))
+ 			    >= shdr_info[cnt].data->d_size / elsize);
+ 		  }
+ 
+ 		if (shdr_info[cnt].version_idx != 0)
+ 		  {
+-		    assert (shdr_info[cnt].shdr.sh_type == SHT_DYNSYM);
++		    elf_assert (shdr_info[cnt].shdr.sh_type == SHT_DYNSYM);
+ 		    /* This section has associated version
+ 		       information.  We have to modify that
+ 		       information, too.  */
+ 		    versiondata = elf_getdata (shdr_info[shdr_info[cnt].version_idx].scn,
+ 					       NULL);
+ 
+-		    assert ((versiondata->d_size / sizeof (GElf_Versym))
++		    elf_assert ((versiondata->d_size / sizeof (GElf_Versym))
+ 			    >= shdr_info[cnt].data->d_size / elsize);
+ 		  }
+ 
+@@ -1223,7 +1247,7 @@
+ 		      sec = shdr_info[sym->st_shndx].idx;
+ 		    else
+ 		      {
+-			assert (shndxdata != NULL);
++			elf_assert (shndxdata != NULL);
+ 
+ 			sec = shdr_info[xshndx].idx;
+ 		      }
+@@ -1244,7 +1268,7 @@
+ 			    nxshndx = sec;
+ 			  }
+ 
+-			assert (sec < SHN_LORESERVE || shndxdata != NULL);
++			elf_assert (sec < SHN_LORESERVE || shndxdata != NULL);
+ 
+ 			if ((inner != destidx || nshndx != sym->st_shndx
+ 			     || (shndxdata != NULL && nxshndx != xshndx))
+@@ -1268,7 +1292,7 @@
+ 			     || shdr_info[cnt].debug_data == NULL)
+ 		      /* This is a section symbol for a section which has
+ 			 been removed.  */
+-		      assert (GELF_ST_TYPE (sym->st_info) == STT_SECTION);
++		      elf_assert (GELF_ST_TYPE (sym->st_info) == STT_SECTION);
+ 		  }
+ 
+ 		if (destidx != inner)
+@@ -1455,11 +1479,11 @@
+ 		  {
+ 		    GElf_Sym sym_mem;
+ 		    GElf_Sym *sym = gelf_getsym (symd, inner, &sym_mem);
+-		    assert (sym != NULL);
++		    elf_assert (sym != NULL);
+ 
+ 		    const char *name = elf_strptr (elf, strshndx,
+ 						   sym->st_name);
+-		    assert (name != NULL);
++		    elf_assert (name != NULL);
+ 		    size_t hidx = elf_hash (name) % nbucket;
+ 
+ 		    if (bucket[hidx] == 0)
+@@ -1478,7 +1502,7 @@
+ 	    else
+ 	      {
+ 		/* Alpha and S390 64-bit use 64-bit SHT_HASH entries.  */
+-		assert (shdr_info[cnt].shdr.sh_entsize
++		elf_assert (shdr_info[cnt].shdr.sh_entsize
+ 			== sizeof (Elf64_Xword));
+ 
+ 		Elf64_Xword *bucket = (Elf64_Xword *) hashd->d_buf;
+@@ -1509,11 +1533,11 @@
+ 		  {
+ 		    GElf_Sym sym_mem;
+ 		    GElf_Sym *sym = gelf_getsym (symd, inner, &sym_mem);
+-		    assert (sym != NULL);
++		    elf_assert (sym != NULL);
+ 
+ 		    const char *name = elf_strptr (elf, strshndx,
+ 						   sym->st_name);
+-		    assert (name != NULL);
++		    elf_assert (name != NULL);
+ 		    size_t hidx = elf_hash (name) % nbucket;
+ 
+ 		    if (bucket[hidx] == 0)

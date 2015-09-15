@@ -1,0 +1,15 @@
+bash
+bzip2
+ccache
+coreutils
+cpp
+file
+findutils
+gawk
+grep
+hostname
+make
+sed
+tar
+util-linux
+zlib1g

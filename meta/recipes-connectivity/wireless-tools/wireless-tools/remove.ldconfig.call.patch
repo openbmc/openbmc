@@ -1,0 +1,19 @@
+When /etc/ld.so.cache is writeable by user running bitbake then it creates invalid cache 
+(in my case libstdc++.so cannot be found after building zlib(-native) and I have to call 
+touch */libstdc++.so && /sbin/ldconfig to fix it.
+
+So remove ldconfig call from make install-libs
+
+Upstream-Status: Inappropriate [disable feature]
+
+diff -uNr wireless_tools.29.orig/Makefile wireless_tools.29/Makefile
+--- wireless_tools.29.orig/Makefile	2007-09-18 01:56:46.000000000 +0200
++++ wireless_tools.29/Makefile	2012-02-15 20:46:41.780763514 +0100
+@@ -163,7 +163,6 @@
+ 	install -m 755 $(DYNAMIC) $(INSTALL_LIB)
+ 	ln -sfn $(DYNAMIC) $(INSTALL_LIB)/$(DYNAMIC_LINK)
+ 	@echo "*** Don't forget to add $(INSTALL_LIB) to /etc/ld.so.conf, and run ldconfig as root. ***"
+-	@$(LDCONFIG) || echo "*** Could not run ldconfig ! ***"
+ 
+ # Install the static library
+ install-static:: $(STATIC)

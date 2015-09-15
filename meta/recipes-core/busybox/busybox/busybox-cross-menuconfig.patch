@@ -1,0 +1,71 @@
+From: Jason Wessel <jason.wessel@windriver.com>
+Date: Sun, 3 Mar 2013 12:31:40 -0600
+Subject: [PATCH] menuconfig,check-lxdiaglog.sh: Allow specification of ncurses location
+
+Upstream-Status: Submitted
+
+[ based on: https://lkml.org/lkml/2013/3/3/103 ]
+
+This patch syncs up with the way the menuconfig ncurses / curses
+is detected and the HOST_EXTRACFLAGS works in the Linux kernel
+and it allows the menuconfig to work with a sysroot version
+of the curses libraries.
+
+---
+
+In some cross build environments such as the Yocto Project build
+environment it provides an ncurses library that is compiled
+differently than the host's version.  This causes display corruption
+problems when the host's curses includes are used instead of the
+includes from the provided compiler are overridden.  There is a second
+case where there is no curses libraries at all on the host system and
+menuconfig will just fail entirely.
+
+The solution is simply to allow an override variable in
+check-lxdialog.sh for environments such as the Yocto Project.  Adding
+a CROSS_CURSES_LIB and CROSS_CURSES_INC solves the issue and allowing
+compiling and linking against the right headers and libraries.
+
+Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
+cc: Michal Marek <mmarek@suse.cz>
+cc: linux-kbuild@vger.kernel.org
+---
+ scripts/kconfig/lxdialog/Makefile          |    2 +-
+ scripts/kconfig/lxdialog/check-lxdialog.sh |    8 ++++++++
+ 2 files changed, 9 insertions(+), 1 deletion(-)
+
+--- a/scripts/kconfig/lxdialog/check-lxdialog.sh
++++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
+@@ -4,6 +4,10 @@
+ # What library to link
+ ldflags()
+ {
++	if [ x"$CROSS_CURSES_LIB" != x ]; then
++		echo "$CROSS_CURSES_LIB"
++		exit
++	fi
+ 	for ext in so a dylib ; do
+ 		for lib in ncursesw ncurses curses ; do
+ 			$cc -print-file-name=lib${lib}.${ext} | grep -q /
+@@ -19,6 +23,10 @@ ldflags()
+ # Where is ncurses.h?
+ ccflags()
+ {
++	if [ x"$CROSS_CURSES_INC" != x ]; then
++		echo "$CROSS_CURSES_INC"
++		exit
++	fi
+ 	if [ -f /usr/include/ncursesw/ncurses.h ]; then
+ 		echo '-I/usr/include/ncursesw -DCURSES_LOC="<ncurses.h>"'
+ 	elif [ -f /usr/include/ncursesw/curses.h ]; then
+--- a/scripts/kconfig/lxdialog/Makefile
++++ b/scripts/kconfig/lxdialog/Makefile
+@@ -5,7 +5,7 @@ check-lxdialog  := $(srctree)/$(src)/che
+ 
+ # Use reursively expanded variables so we do not call gcc unless
+ # we really need to do so. (Do not call gcc as part of make mrproper)
+-HOST_EXTRACFLAGS = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ccflags)
++HOST_EXTRACFLAGS += $(shell $(CONFIG_SHELL) $(check-lxdialog) -ccflags)
+ HOST_LOADLIBES   = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ldflags $(HOSTCC))
+ 
+ HOST_EXTRACFLAGS += -DLOCALE

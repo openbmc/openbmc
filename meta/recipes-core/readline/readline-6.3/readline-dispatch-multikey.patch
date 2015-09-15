@@ -1,0 +1,32 @@
+From 8ef852a5be72c75e17f2510bea52455f809b56ce Mon Sep 17 00:00:00 2001
+From: Chet Ramey <chet.ramey@case.edu>
+Date: Fri, 28 Mar 2014 14:07:42 -0400
+Subject: [PATCH 04/10] Readline-6.3 patch 2
+
+Fixes multi-key issue identified in this thread:
+http://lists.gnu.org/archive/html/bug-readline/2014-03/msg00010.html
+
+Upstream-Status: Backport
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+---
+ readline.c | 3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
+
+diff --git a/readline.c b/readline.c
+index eb4eae3..abb29a0 100644
+--- a/readline.c
++++ b/readline.c
+@@ -744,7 +744,8 @@ _rl_dispatch_callback (cxt)
+     r = _rl_subseq_result (r, cxt->oldmap, cxt->okey, (cxt->flags & KSEQ_SUBSEQ));
+ 
+   RL_CHECK_SIGNALS ();
+-  if (r == 0)			/* success! */
++  /* We only treat values < 0 specially to simulate recursion. */
++  if (r >= 0 || (r == -1 && (cxt->flags & KSEQ_SUBSEQ) == 0))	/* success! or failure! */
+     {
+       _rl_keyseq_chain_dispose ();
+       RL_UNSETSTATE (RL_STATE_MULTIKEY);
+-- 
+1.8.3.1
+

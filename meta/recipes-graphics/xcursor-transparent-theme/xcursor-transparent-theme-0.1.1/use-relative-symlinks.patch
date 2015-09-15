@@ -1,0 +1,25 @@
+Use relative symlink for link rather than absolute path which 
+doesn't work well in DESTDIR setting.
+
+Also fix out of tree builds to use correct srcdir.
+
+Upstream-Status: Pending
+
+RP 2013/3/8
+
+Index: xcursor-transparent-theme-0.1.1/cursors/Makefile.am
+===================================================================
+--- xcursor-transparent-theme-0.1.1.orig/cursors/Makefile.am	2013-03-07 22:25:03.933435307 +0000
++++ xcursor-transparent-theme-0.1.1/cursors/Makefile.am	2013-03-07 22:25:27.293434755 +0000
+@@ -88,9 +88,9 @@
+ 
+ install-data-local:
+ 	$(mkinstalldirs) $(DESTDIR)$(CURSOR_DIR); 
+-	$(INSTALL_DATA) $(CURSOR_REAL) $(DESTDIR)$(CURSOR_DIR)/ 
++	$(INSTALL_DATA) $(srcdir)/$(CURSOR_REAL) $(DESTDIR)$(CURSOR_DIR)/
+ 	for CURSOR in $(CURSOR_NAMES); do \
+ 		echo '-- Installing cursor '$$CURSOR; \
+-		ln -s $(DESTDIR)$(CURSOR_DIR)/transp $(DESTDIR)$(CURSOR_DIR)/$$CURSOR; \
++		ln -s transp $(DESTDIR)$(CURSOR_DIR)/$$CURSOR; \
+ 	done
+ 

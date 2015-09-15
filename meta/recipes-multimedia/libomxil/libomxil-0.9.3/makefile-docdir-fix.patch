@@ -1,0 +1,19 @@
+This patch is to remove DESTDIR in docdir.
+Otherwise, when users install by running `make install DESTDIR=/alternate/directory' specified in the file INSTALL, the doc will go into /alternate/directory/alternate/directory, which is not expected.
+
+Upstream-Status: Pending
+
+Signed-off-by: Shane Wang <shane.wang@intel.com>
+
+diff -r 30b597e4e70d Makefile.am
+--- a/Makefile.am	Wed Dec 28 15:38:35 2011 +0800
++++ b/Makefile.am	Wed Dec 28 15:39:25 2011 +0800
+@@ -7,7 +7,7 @@
+ pkgconfigdir = $(libdir)/pkgconfig
+ pkgconfig_DATA = libomxil-bellagio.pc
+ 
+-docdir = $(DESTDIR)$(prefix)/share/doc/@PACKAGE@
++docdir = $(prefix)/share/doc/@PACKAGE@
+ doc_DATA = README \
+ 	   ChangeLog \
+ 	   TODO

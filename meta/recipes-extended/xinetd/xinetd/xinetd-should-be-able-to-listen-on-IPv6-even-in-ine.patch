@@ -1,0 +1,112 @@
+Upstream-Status: Pending [from other distro Debian]
+
+From f44b218ccc779ab3f4aed072390ccf129d94b58d Mon Sep 17 00:00:00 2001
+From: David Madore <david@pleiades.stars>
+Date: Mon, 24 Mar 2008 12:45:36 +0100
+Subject: [PATCH] xinetd should be able to listen on IPv6 even in -inetd_compat mode
+
+xinetd does not bind to IPv6 addresses (and does not seem to have an
+option to do so) when used in -inetd_compat mode.  As current inetd's
+are IPv6-aware, this is a problem: this means xinetd cannot be used as
+a drop-in inetd replacement.
+
+The attached patch is a suggestion: it adds a -inetd_ipv6 global
+option that, if used, causes inetd-compatibility lines to have an
+implicit "IPv6" option.  Perhaps this is not the best solution, but
+there should definitely be a way to get inetd.conf to be read in
+IPv6-aware mode.
+---
+ xinetd/confparse.c |    1 +
+ xinetd/inet.c      |   17 +++++++++++++++++
+ xinetd/options.c   |    3 +++
+ xinetd/xinetd.man  |    6 ++++++
+ 4 files changed, 27 insertions(+), 0 deletions(-)
+
+diff --git a/xinetd/confparse.c b/xinetd/confparse.c
+index db9f431..d7b0bcc 100644
+--- a/xinetd/confparse.c
++++ b/xinetd/confparse.c
+@@ -40,6 +40,7 @@
+ #include "inet.h"
+ #include "main.h"
+ 
++extern int inetd_ipv6;
+ extern int inetd_compat;
+ 
+ /*
+diff --git a/xinetd/inet.c b/xinetd/inet.c
+index 8caab45..2e617ae 100644
+--- a/xinetd/inet.c
++++ b/xinetd/inet.c
+@@ -25,6 +25,8 @@
+ 
+ static psi_h iter ;
+ 
++extern int inetd_ipv6;
++
+ static int get_next_inet_entry( int fd, pset_h sconfs, 
+                           struct service_config *defaults);
+ 
+@@ -360,6 +362,21 @@ static int get_next_inet_entry( int fd, pset_h sconfs,
+          }
+          SC_SERVER_ARGV(scp)[u] = p;
+       }
++
++      /* Set the IPv6 flag if we were passed the -inetd_ipv6 option */
++      if ( inetd_ipv6 )
++      {
++         nvp = nv_find_value( service_flags, "IPv6" );
++         if ( nvp == NULL )
++         {
++            parsemsg( LOG_WARNING, func, "inetd.conf - Bad foo %s", name ) ;
++            pset_destroy(args);
++            sc_free(scp);
++            return -1;
++         }
++         M_SET(SC_XFLAGS(scp), nvp->value);
++      }
++
+       /* Set the reuse flag, as this is the default for inetd */
+       nvp = nv_find_value( service_flags, "REUSE" );
+       if ( nvp == NULL )
+diff --git a/xinetd/options.c b/xinetd/options.c
+index b058b6a..dc2f3a0 100644
+--- a/xinetd/options.c
++++ b/xinetd/options.c
+@@ -30,6 +30,7 @@ int logprocs_option ;
+ unsigned logprocs_option_arg ;
+ int stayalive_option=0;
+ char *program_name ;
++int inetd_ipv6 = 0 ;
+ int inetd_compat = 0 ;
+ int dont_fork = 0;
+ 
+@@ -128,6 +129,8 @@ int opt_recognize( int argc, char *argv[] )
+             fprintf(stderr, "\n");
+             exit(0);
+          }
++         else if ( strcmp ( &argv[ arg ][ 1 ], "inetd_ipv6" ) == 0 )
++            inetd_ipv6 = 1;
+          else if ( strcmp ( &argv[ arg ][ 1 ], "inetd_compat" ) == 0 )
+             inetd_compat = 1;
+       }
+diff --git a/xinetd/xinetd.man b/xinetd/xinetd.man
+index c76c3c6..c9dd803 100644
+--- a/xinetd/xinetd.man
++++ b/xinetd/xinetd.man
+@@ -106,6 +106,12 @@ This option causes xinetd to read /etc/inetd.conf in addition to the
+ standard xinetd config files.  /etc/inetd.conf is read after the
+ standard xinetd config files.
+ .TP
++.BI \-inetd_ipv6
++This option causes xinetd to bind to IPv6 (AF_INET6) addresses for
++inetd compatibility lines (see previous option).  This only affects
++how /etc/inetd.conf is interpreted and thus only has any effect if
++the \-inetd_compat option is also used.
++.TP
+ .BI \-cc " interval"
+ This option instructs
+ .B xinetd
+-- 
+1.5.5.rc0.127.gb4337
+

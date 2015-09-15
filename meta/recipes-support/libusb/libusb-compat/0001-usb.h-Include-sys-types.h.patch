@@ -1,0 +1,30 @@
+From 340f911f9e3f4ff6b01682c5341c959060782af2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 2 Apr 2015 19:18:45 -0700
+Subject: [PATCH] usb.h: Include sys/types.h
+
+We need the definitions for things like u_intX_t
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libusb/usb.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/libusb/usb.h b/libusb/usb.h
+index 84e730f..caffae2 100644
+--- a/libusb/usb.h
++++ b/libusb/usb.h
+@@ -31,6 +31,8 @@
+ 
+ #include <dirent.h>
+ 
++#include <sys/types.h>
++
+ /*
+  * USB spec information
+  *
+-- 
+2.1.4
+

@@ -1,0 +1,21 @@
+When building with a separate build directory, make install fails,
+unable to find the gnome_data files. This patch corrects the
+patch and ensures the build works in this case.
+
+RP 2013/3/8
+
+Upstream-Status: Pending
+
+Index: distcc-3.1/Makefile.in
+===================================================================
+--- distcc-3.1.orig/Makefile.in	2008-12-02 21:50:31.000000000 +0000
++++ distcc-3.1/Makefile.in	2013-03-08 10:49:24.224400937 +0000
+@@ -1088,7 +1088,7 @@
+ install-gnome-data: $(gnome_data)
+ 	$(mkinstalldirs) "$(DESTDIR)$(pkgdatadir)"
+ 	for p in $(gnome_data); do				\
+-	$(INSTALL_DATA) "$$p" "$(DESTDIR)$(pkgdatadir)" || exit 1; \
++	$(INSTALL_DATA) "$(srcdir)/$$p" "$(DESTDIR)$(pkgdatadir)" || exit 1; \
+ 	done
+ 
+ install-conf: $(conf_files) $(default_files)

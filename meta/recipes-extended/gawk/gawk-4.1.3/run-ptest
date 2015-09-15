@@ -1,0 +1,10 @@
+#!/bin/sh
+
+cd test
+for i in `grep -vE "@|^$|#|Gt-dummy" Maketests |awk -F: '{print $1}'`; \
+  do LC_ALL=${GAWKLOCALE:-C} LANG=${GAWKLOCALE:-C} srcdir=`pwd` AWK=gawk CMP=cmp \
+  make -f Maketests $i >$i.tmp 2>&1; \
+  grep -q "Error" $i.tmp; \
+  if [ $? -eq 0 ]; then echo "FAIL: $i"; \
+  else echo "PASS: $i"; rm -f $i.tmp; fi; \
+done

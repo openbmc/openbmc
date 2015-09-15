@@ -1,0 +1,15 @@
+Upstream-Status: Submitted [https://bugs.freedesktop.org/show_bug.cgi?id=59097]
+
+Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
+diff -Nurd startup-notification-0.12/configure.in startup-notification-0.12/configure.in
+--- startup-notification-0.12/configure.in	2011-05-16 17:29:20.000000000 +0300
++++ startup-notification-0.12/configure.in	2013-01-07 06:00:48.921905409 +0200
+@@ -3,7 +3,7 @@
+ AC_CONFIG_SRCDIR(libsn/sn-launchee.c)
+
+ AM_INIT_AUTOMAKE
+-AM_CONFIG_HEADER(config.h)
++AC_CONFIG_HEADERS(config.h)
+
+ # Honor aclocal flags
+ AC_SUBST(ACLOCAL_AMFLAGS, "\${ACLOCAL_FLAGS}")

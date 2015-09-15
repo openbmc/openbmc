@@ -1,0 +1,24 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+The native version of ldconfig was using native definition of LD_SO (i.e. 
+ld-linux-x86-64.so.2 ) which is not correct for doing the cross ldconfig.
+This was causing libc.so on the target marked as ELF lib rather than 
+FLAG_ELF_LIBC6 in the ld.so.cache.
+
+Nitin A Kamble <nitin.a.kamble@intel.com> 2011/04/4
+
+Index: ldconfig-native-2.12.1/readlib.c
+===================================================================
+--- ldconfig-native-2.12.1.orig/readlib.c
++++ ldconfig-native-2.12.1/readlib.c
+@@ -51,6 +51,10 @@ struct known_names
+   int flag;
+ };
+ 
++/* don't use host's definition of LD_SO */
++#undef LD_SO 
++#define LD_SO "ld.so.1"
++
+ static struct known_names interpreters[] =
+ {
+   { "/lib/" LD_SO, FLAG_ELF_LIBC6 },

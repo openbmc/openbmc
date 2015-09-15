@@ -1,0 +1,86 @@
+From 18d360d74271a066a849bc1fba4f10dbb23ed251 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 8 Sep 2015 08:17:42 +0000
+Subject: [PATCH] Fix typo in comparision
+
+error: comparison of array 'devnm' equal to a null pointer is always false
+
+User bitwise '&' operator as it is a mask
+
+Fixes
+error: use of logical '&&' with constant operand
+
+Remove extraneous parens
+
+error: equality comparison with extraneous parentheses
+
+Remove dead code
+
+restripe.c:465:21: error: explicitly assigning value of variable of type 'int' to itself
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ mdmon.h       | 2 +-
+ mdopen.c      | 2 +-
+ restripe.c    | 3 ---
+ super-intel.c | 2 +-
+ 4 files changed, 3 insertions(+), 6 deletions(-)
+
+diff --git a/mdmon.h b/mdmon.h
+index aa750c6..0b08c3d 100644
+--- a/mdmon.h
++++ b/mdmon.h
+@@ -101,7 +101,7 @@ static inline int is_resync_complete(struct mdinfo *array)
+ 		break;
+ 	case 10:
+ 		l = array->array.layout;
+-		ncopies = (l & 0xff) * ((l >> 8) && 0xff);
++		ncopies = (l & 0xff) * ((l >> 8) & 0xff);
+ 		sync_size = array->component_size * array->array.raid_disks;
+ 		sync_size /= ncopies;
+ 		break;
+diff --git a/mdopen.c b/mdopen.c
+index 28410f4..c5ee2a6 100644
+--- a/mdopen.c
++++ b/mdopen.c
+@@ -318,7 +318,7 @@ int create_mddev(char *dev, char *name, int autof, int trustworthy,
+ 	else if (num < 0) {
+ 		/* need to choose a free number. */
+ 		char *_devnm = find_free_devnm(use_mdp);
+-		if (devnm == NULL) {
++		if (_devnm == NULL) {
+ 			pr_err("No avail md devices - aborting\n");
+ 			return -1;
+ 		}
+diff --git a/restripe.c b/restripe.c
+index 4d92190..cfe9666 100644
+--- a/restripe.c
++++ b/restripe.c
+@@ -461,9 +461,6 @@ int raid6_check_disks(int data_disks, int start, int chunk_size,
+ 			curr_broken_disk = diskD;
+ 		}
+ 
+-		if((Px == 0) && (Qx == 0))
+-			curr_broken_disk = curr_broken_disk;
+-
+ 		if(curr_broken_disk >= data_disks + 2)
+ 			broken_status = 2;
+ 
+diff --git a/super-intel.c b/super-intel.c
+index 3f812d6..1838012 100644
+--- a/super-intel.c
++++ b/super-intel.c
+@@ -10027,7 +10027,7 @@ enum imsm_reshape_type imsm_analyze_change(struct supertype *st,
+ 				geo->size = max_size;
+ 		}
+ 
+-		if ((direction == ROLLBACK_METADATA_CHANGES)) {
++		if (direction == ROLLBACK_METADATA_CHANGES) {
+ 			/* accept size for rollback only
+ 			*/
+ 		} else {
+-- 
+2.5.1
+

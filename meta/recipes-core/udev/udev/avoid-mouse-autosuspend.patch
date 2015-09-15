@@ -1,0 +1,25 @@
+Source: http://cgit.freedesktop.org/systemd/systemd/commit/rules/42-usb-hid-pm.rules?id=e0386cf2809219bbdd30895f46f1f567b56902b6
+
+Some USB ports on external hubs may be reported as "fixed". We only want
+to auto-enable this on ports that are internal to the machine, so check
+the parent state as well.
+
+Upstream-Status: backport
+
+Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
+2013/09/13
+
+Index: udev-182/rules/42-usb-hid-pm.rules
+===================================================================
+--- udev-182.orig/rules/42-usb-hid-pm.rules
++++ udev-182/rules/42-usb-hid-pm.rules
+@@ -46,4 +46,9 @@ ACTION=="add", SUBSYSTEM=="usb", ATTRS{i
+ ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="14dd", ATTR{idProduct}="0002", TEST=="power/control", ATTR{power/control}="auto"
+
+ # USB HID devices that are internal to the machine should also be safe to autosuspend
++# And skip it for devices which are external but say "fixed"
++ACTION=="add", SUBSYSTEM=="usb", SUBSYSTEMS=="usb", ATTRS{removable}=="removable", GOTO="usb_hid_pm_end"
++ACTION=="add", SUBSYSTEM=="usb", SUBSYSTEMS=="usb", ATTRS{removable}=="unknown", GOTO="usb_hid_pm_end"
+ ACTION=="add", SUBSYSTEM=="usb", ATTR{bInterfaceClass}=="03", ATTRS{removable}=="fixed", TEST=="../power/control", ATTR{../power/control}="auto"
++LABEL="usb_hid_pm_end"
++

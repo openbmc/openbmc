@@ -1,0 +1,19 @@
+Upstream-Status: Pending
+
+This fixes compilation with x32 toolchain.
+
+Received this patch from H.J. Lu <hjl.tools@gmail.com>
+Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com> 2011/12/1
+
+
+--- libXt-1.1.1/include/X11/Xtos.h.x32	2011-02-08 07:56:40.000000000 -0800
++++ libXt-1.1.1/include/X11/Xtos.h	2011-11-30 17:19:27.473349770 -0800
+@@ -62,7 +62,7 @@ SOFTWARE.
+     defined(__sparc64__) || \
+     defined(__s390x__) || \
+     (defined(__hppa__) && defined(__LP64__)) || \
+-    defined(__amd64__) || defined(amd64) || \
++    ((defined(__amd64__) || defined(amd64)) && defined(__LP64__)) || \
+     defined(__powerpc64__) || \
+     (defined(sgi) && (_MIPS_SZLONG == 64))
+ #define LONG64

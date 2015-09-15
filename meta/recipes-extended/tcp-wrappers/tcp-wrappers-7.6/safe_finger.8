@@ -1,0 +1,34 @@
+.TH SAFE_FINGER 8 "21th June 1997" Linux "Linux Programmer's Manual"
+.SH NAME
+safe_finger \- finger client wrapper that protects against nasty stuff
+from finger servers
+.SH SYNOPSIS
+.B safe_finger [finger_options]
+.SH DESCRIPTION
+The
+.B safe_finger
+command protects against nasty stuff from finger servers. Use this
+program for automatic reverse finger probes from the
+.B tcp_wrapper
+.B (tcpd)
+, not the raw finger command. The
+.B safe_finger
+command makes sure that the finger client is not run with root
+privileges. It also runs the finger client with a defined PATH
+environment.
+.B safe_finger
+will also protect you from problems caused by the output of some
+finger servers. The problem: some programs may react to stuff in
+the first column. Other programs may get upset by thrash anywhere
+on a line. File systems may fill up as the finger server keeps
+sending data. Text editors may bomb out on extremely long lines.
+The finger server may take forever because it is somehow wedged.
+.B safe_finger
+takes care of all this badness.
+.SH SEE ALSO
+.BR hosts_access (5),
+.BR hosts_options (5),
+.BR tcpd (8)
+.SH AUTHOR
+Wietse Venema, Eindhoven University of Technology, The Netherlands.
+

@@ -1,0 +1,220 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
+[<!ENTITY % poky SYSTEM "../poky.ent"> %poky; ] >
+
+<appendix id='kernel-dev-maint-appx'>
+<title>Kernel Maintenance</title>
+
+    <section id='tree-construction'>
+        <title>Tree Construction</title>
+        <para>
+            This section describes construction of the Yocto Project kernel source repositories
+            as accomplished by the Yocto Project team to create kernel repositories.
+            These kernel repositories are found under the heading "Yocto Linux Kernel" at
+            <ulink url='&YOCTO_GIT_URL;/cgit.cgi'>&YOCTO_GIT_URL;/cgit.cgi</ulink>
+            and can be shipped as part of a Yocto Project release.
+            The team creates these repositories by
+            compiling and executing the set of feature descriptions for every BSP
+            and feature in the product.
+            Those feature descriptions list all necessary patches,
+            configuration, branching, tagging and feature divisions found in a kernel.
+            Thus, the Yocto Project kernel repository (or tree) is built.
+        </para>
+        <para>
+            The existence of this tree allows you to access and clone a particular
+            Yocto Project kernel repository and use it to build images based on their configurations
+            and features.
+        </para>
+        <para>
+            You can find the files used to describe all the valid features and BSPs
+            in the Yocto Project kernel in any clone of the Yocto Project kernel source repository
+            Git tree.
+            For example, the following command clones the Yocto Project baseline kernel that
+            branched off of <filename>linux.org</filename> version 3.19:
+            <literallayout class='monospaced'>
+     $ git clone git://git.yoctoproject.org/linux-yocto-3.19
+            </literallayout>
+            For another example of how to set up a local Git repository of the Yocto Project
+            kernel files, see the
+            "<ulink url='&YOCTO_DOCS_DEV_URL;#local-kernel-files'>Yocto Project Kernel</ulink>" bulleted
+            item in the Yocto Project Development Manual.
+        </para>
+        <para>
+            Once you have cloned the kernel Git repository on your local machine, you can
+            switch to the <filename>meta</filename> branch within the repository.
+            Here is an example that assumes the local Git repository for the kernel is in
+            a top-level directory named <filename>linux-yocto-3.19</filename>:
+            <literallayout class='monospaced'>
+     $ cd linux-yocto-3.19
+     $ git checkout -b meta origin/meta
+            </literallayout>
+            Once you have checked out and switched to the <filename>meta</filename> branch,
+            you can see a snapshot of all the kernel configuration and feature descriptions that are
+            used to build that particular kernel repository.
+            These descriptions are in the form of <filename>.scc</filename> files.
+        </para>
+        <para>
+            You should realize, however, that browsing your local kernel repository
+            for feature descriptions and patches is not an effective way to determine what is in a
+            particular kernel branch.
+            Instead, you should use Git directly to discover the changes in a branch.
+            Using Git is an efficient and flexible way to inspect changes to the kernel.
+            <note>
+                Ground up reconstruction of the complete kernel tree is an action only taken by the
+                Yocto Project team during an active development cycle.
+                When you create a clone of the kernel Git repository, you are simply making it
+                efficiently available for building and development.
+            </note>
+        </para>
+        <para>
+            The following steps describe what happens when the Yocto Project Team constructs
+            the Yocto Project kernel source Git repository (or tree) found at
+            <ulink url='&YOCTO_GIT_URL;/cgit.cgi'></ulink> given the
+            introduction of a new top-level kernel feature or BSP.
+            These are the actions that effectively create the tree
+            that includes the new feature, patch or BSP:
+            <orderedlist>
+                <listitem><para>A top-level kernel feature is passed to the kernel build subsystem.
+                    Normally, this feature is a BSP for a particular kernel type.</para></listitem>
+                <listitem><para>The file that describes the top-level feature is located by searching
+                    these system directories:
+                    <itemizedlist>
+                        <listitem><para>The in-tree kernel-cache directories, which are located
+                            in <filename>meta/cfg/kernel-cache</filename></para></listitem>
+                        <listitem><para>Areas pointed to by <filename>SRC_URI</filename> statements
+                            found in recipes</para></listitem>
+                    </itemizedlist>
+                    For a typical build, the target of the search is a
+                    feature description in an <filename>.scc</filename> file
+                    whose name follows this format:
+                    <literallayout class='monospaced'>
+     <replaceable>bsp_name</replaceable>-<replaceable>kernel_type</replaceable>.scc
+                    </literallayout>
+                </para></listitem>
+                <listitem><para>Once located, the feature description is either compiled into a simple script
+                    of actions, or into an existing equivalent script that is already part of the
+                    shipped kernel.</para></listitem>
+                <listitem><para>Extra features are appended to the top-level feature description.
+                    These features can come from the
+                    <ulink url='&YOCTO_DOCS_REF_URL;#var-KERNEL_FEATURES'><filename>KERNEL_FEATURES</filename></ulink>
+                    variable in recipes.</para></listitem>
+                <listitem><para>Each extra feature is located, compiled and appended to the script
+                    as described in step three.</para></listitem>
+                <listitem><para>The script is executed to produce a series of <filename>meta-*</filename>
+                    directories.
+                    These directories are descriptions of all the branches, tags, patches and configurations that
+                    need to be applied to the base Git repository to completely create the
+                    source (build) branch for the new BSP or feature.</para></listitem>
+                <listitem><para>The base repository is cloned, and the actions
+                    listed in the <filename>meta-*</filename> directories are applied to the
+                    tree.</para></listitem>
+                <listitem><para>The Git repository is left with the desired branch checked out and any
+                    required branching, patching and tagging has been performed.</para></listitem>
+            </orderedlist>
+        </para>
+        <para>
+            The kernel tree is now ready for developer consumption to be locally cloned,
+            configured, and built into a Yocto Project kernel specific to some target hardware.
+            <note><para>The generated <filename>meta-*</filename> directories add to the kernel
+                as shipped with the Yocto Project release.
+                Any add-ons and configuration data are applied to the end of an existing branch.
+                The full repository generation that is found in the
+                official Yocto Project kernel repositories at
+                <ulink url='&YOCTO_GIT_URL;/cgit.cgi'>http://git.yoctoproject.org/cgit.cgi</ulink>
+                is the combination of all supported boards and configurations.</para>
+                <para>The technique the Yocto Project team uses is flexible and allows for seamless
+                blending of an immutable history with additional patches specific to a
+                deployment.
+                Any additions to the kernel become an integrated part of the branches.</para>
+            </note>
+        </para>
+    </section>
+
+    <section id='build-strategy'>
+        <title>Build Strategy</title>
+
+<!--
+        <para>
+            <emphasis>AR - Darren Hart:</emphasis>  Some parts of this section
+            need to be in the
+            "<link linkend='using-an-iterative-development-process'>Using an Iterative Development Process</link>"
+            section.
+            Darren needs to figure out which parts and identify them.
+        </para>
+-->
+
+        <para>
+            Once a local Git repository of the Yocto Project kernel exists on a development system,
+            you can consider the compilation phase of kernel development - building a kernel image.
+            Some prerequisites exist that are validated by the build process before compilation
+            starts:
+        </para>
+
+        <itemizedlist>
+            <listitem><para>The
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink> points
+                to the kernel Git repository.</para></listitem>
+            <listitem><para>A BSP build branch exists.
+                This branch has the following form:
+                <literallayout class='monospaced'>
+     <replaceable>kernel_type</replaceable>/<replaceable>bsp_name</replaceable>
+                </literallayout></para></listitem>
+        </itemizedlist>
+
+        <para>
+            The OpenEmbedded build system makes sure these conditions exist before attempting compilation.
+            Other means, however, do exist, such as as bootstrapping a BSP.
+        </para>
+
+        <para>
+            Before building a kernel, the build process verifies the tree
+            and configures the kernel by processing all of the
+            configuration "fragments" specified by feature descriptions in the <filename>.scc</filename>
+            files.
+            As the features are compiled, associated kernel configuration fragments are noted
+            and recorded in the <filename>meta-*</filename> series of directories in their compilation order.
+            The fragments are migrated, pre-processed and passed to the Linux Kernel
+            Configuration subsystem (<filename>lkc</filename>) as raw input in the form
+            of a <filename>.config</filename> file.
+            The <filename>lkc</filename> uses its own internal dependency constraints to do the final
+            processing of that information and generates the final <filename>.config</filename> file
+            that is used during compilation.
+        </para>
+
+        <para>
+            Using the board's architecture and other relevant values from the board's template,
+            kernel compilation is started and a kernel image is produced.
+        </para>
+
+        <para>
+            The other thing that you notice once you configure a kernel is that
+            the build process generates a build tree that is separate from your kernel's local Git
+            source repository tree.
+            This build tree has a name that uses the following form, where
+            <filename>${MACHINE}</filename> is the metadata name of the machine (BSP) and "kernel_type" is one
+            of the Yocto Project supported kernel types (e.g. "standard"):
+        <literallayout class='monospaced'>
+     linux-${MACHINE}-<replaceable>kernel_type</replaceable>-build
+        </literallayout>
+        </para>
+
+        <para>
+            The existing support in the <filename>kernel.org</filename> tree achieves this
+            default functionality.
+        </para>
+
+        <para>
+            This behavior means that all the generated files for a particular machine or BSP are now in
+            the build tree directory.
+            The files include the final <filename>.config</filename> file, all the <filename>.o</filename>
+            files, the <filename>.a</filename> files, and so forth.
+            Since each machine or BSP has its own separate
+            <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>
+            in its own separate branch
+            of the Git repository, you can easily switch between different builds.
+        </para>
+    </section>
+</appendix>
+<!--
+vim: expandtab tw=80 ts=4
+-->

@@ -1,0 +1,36 @@
+Upstream-Status: Inappropriate [configuration]
+
+libnl has progressed to 0.3.2 and there does not appear to be any
+"make -j" issues with this build after my limited testing on that
+newer version so we can assume this issue is fixed upstream
+
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+
+Index: libnl-3.2.25/lib/Makefile.am
+===================================================================
+--- libnl-3.2.25.orig/lib/Makefile.am
++++ libnl-3.2.25/lib/Makefile.am
+@@ -46,9 +46,12 @@ CLEANFILES = \
+ 
+ # Hack to avoid using ylwrap. It does not function correctly in combination
+ # with --header-file=
++route/pktloc.lo: route/pktloc_syntax.h route/pktloc_grammar.h
++route/pktloc_grammar.h: route/pktloc_grammar.c
+ route/pktloc_grammar.c: route/pktloc_grammar.l
+ 	$(AM_V_GEN) $(MKDIR_P) route; $(FLEX) --header-file=route/pktloc_grammar.h $(LFLAGS) -o $@ $^
+ 
++route/pktloc_syntax.h: route/pktloc_syntax.c
+ route/pktloc_syntax.c: route/pktloc_syntax.y
+ 	$(AM_V_GEN) $(MKDIR_P) route; $(YACC) -d $(YFLAGS) -o $@ $^
+ 
+@@ -102,7 +105,9 @@ BUILT_SOURCES = \
+ 	route/cls/ematch_grammar.c \
+ 	route/cls/ematch_syntax.c \
+ 	route/pktloc_grammar.c \
+-	route/pktloc_syntax.c
++   route/pktloc_syntax.c \
++   route/pktloc_syntax.h \
++   route/pktloc_grammar.h
+ 
+ EXTRA_DIST = \
+ 	route/pktloc_grammar.l \

@@ -1,0 +1,1716 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
+[<!ENTITY % poky SYSTEM "../poky.ent"> %poky; ] >
+
+<chapter id='dev-manual-newbie'>
+
+<title>The Yocto Project Open Source Development Environment</title>
+
+<para>
+    This chapter helps you understand the Yocto Project as an open source development project.
+    In general, working in an open source environment is very different from working in a
+    closed, proprietary environment.
+    Additionally, the Yocto Project uses specific tools and constructs as part of its development
+    environment.
+    This chapter specifically addresses open source philosophy, using the
+    Yocto Project in a team environment, source repositories, Yocto Project
+    terms, licensing, the open source distributed version control system Git,
+    workflows, bug tracking, and how to submit changes.
+</para>
+
+<section id='open-source-philosophy'>
+    <title>Open Source Philosophy</title>
+
+    <para>
+        Open source philosophy is characterized by software development directed by peer production
+        and collaboration through an active community of developers.
+        Contrast this to the more standard centralized development models used by commercial software
+        companies where a finite set of developers produces a product for sale using a defined set
+        of procedures that ultimately result in an end product whose architecture and source material
+        are closed to the public.
+    </para>
+
+    <para>
+        Open source projects conceptually have differing concurrent agendas, approaches, and production.
+        These facets of the development process can come from anyone in the public (community) that has a
+        stake in the software project.
+        The open source environment contains new copyright, licensing, domain, and consumer issues
+        that differ from the more traditional development environment.
+        In an open source environment, the end product, source material, and documentation are
+        all available to the public at no cost.
+    </para>
+
+    <para>
+        A benchmark example of an open source project is the Linux kernel, which was initially conceived
+        and created by Finnish computer science student Linus Torvalds in 1991.
+        Conversely, a good example of a non-open source project is the
+        <trademark class='registered'>Windows</trademark> family of operating
+        systems developed by <trademark class='registered'>Microsoft</trademark> Corporation.
+    </para>
+
+    <para>
+        Wikipedia has a good historical description of the Open Source Philosophy
+        <ulink url='http://en.wikipedia.org/wiki/Open_source'>here</ulink>.
+        You can also find helpful information on how to participate in the Linux Community
+        <ulink url='http://ldn.linuxfoundation.org/book/how-participate-linux-community'>here</ulink>.
+    </para>
+</section>
+
+<section id="usingpoky-changes-collaborate">
+    <title>Using the Yocto Project in a Team Environment</title>
+
+    <para>
+        It might not be immediately clear how you can use the Yocto
+        Project in a team environment, or scale it for a large team of
+        developers.
+        One of the strengths of the Yocto Project is that it is extremely
+        flexible.
+        Thus, you can adapt it to many different use cases and scenarios.
+        However, these characteristics can cause a struggle if you are trying
+        to create a working setup that scales across a large team.
+    </para>
+
+    <para>
+        To help with these types of situations, this section presents
+        some of the project's most successful experiences,
+        practices, solutions, and available technologies that work well.
+        Keep in mind, the information here is a starting point.
+        You can build off it and customize it to fit any
+        particular working environment and set of practices.
+    </para>
+
+    <section id='best-practices-system-configurations'>
+        <title>System Configurations</title>
+
+        <para>
+            Systems across a large team should meet the needs of
+            two types of developers: those working on the contents of the
+            operating system image itself and those developing applications.
+            Regardless of the type of developer, their workstations must
+            be both reasonably powerful and run Linux.
+        </para>
+
+        <section id='best-practices-application-development'>
+            <title>Application Development</title>
+
+            <para>
+                For developers who mainly do application level work
+                on top of an existing software stack,
+                here are some practices that work best:
+                <itemizedlist>
+                    <listitem><para>Use a pre-built toolchain that
+                        contains the software stack itself.
+                        Then, develop the application code on top of the
+                        stack.
+                        This method works well for small numbers of relatively
+                        isolated applications.</para></listitem>
+                    <listitem><para>When possible, use the Yocto Project
+                        plug-in for the <trademark class='trade'>Eclipse</trademark> IDE
+                        and other pieces of Application Development
+                        Technology (ADT).
+                        For more information, see the
+                        "<link linkend='application-development-workflow'>Application
+                        Development Workflow</link>" section as well as the
+                        <ulink url='&YOCTO_DOCS_ADT_URL;'>Yocto Project Application Developer's Guide</ulink>.
+                        </para></listitem>
+                    <listitem><para>Keep your cross-development toolchains
+                        updated.
+                        You can do this through provisioning either as new
+                        toolchain downloads or as updates through a package
+                        update mechanism using <filename>opkg</filename>
+                        to provide updates to an existing toolchain.
+                        The exact mechanics of how and when to do this are a
+                        question for local policy.</para></listitem>
+                    <listitem><para>Use multiple toolchains installed locally
+                        into different locations to allow development across
+                        versions.</para></listitem>
+                </itemizedlist>
+            </para>
+        </section>
+
+        <section id='best-practices-core-system-development'>
+            <title>Core System Development</title>
+
+            <para>
+                For core system development, it is often best to have the
+                build system itself available on the developer workstations
+                so developers can run their own builds and directly
+                rebuild the software stack.
+                You should keep the core system unchanged as much as
+                possible and do your work in layers on top of the core system.
+                Doing so gives you a greater level of portability when
+                upgrading to new versions of the core system or Board
+                Support Packages (BSPs).
+                You can share layers amongst the developers of a particular
+                project and contain the policy configuration that defines
+                the project.
+            </para>
+
+            <para>
+                Aside from the previous best practices, there exists a number
+                of tips and tricks that can help speed up core development
+                projects:
+                <itemizedlist>
+                    <listitem><para>Use a
+                        <ulink url='&YOCTO_DOCS_REF_URL;#shared-state-cache'>Shared State Cache</ulink>
+                        (sstate) among groups of developers who are on a
+                        fast network.
+                        The best way to share sstate is through a
+                        Network File System (NFS) share.
+                        The first user to build a given component for the
+                        first time contributes that object to the sstate,
+                        while subsequent builds from other developers then
+                        reuse the object rather than rebuild it themselves.
+                        </para>
+                        <para>Although it is possible to use other protocols for the
+                        sstate such as HTTP and FTP, you should avoid these.
+                        Using HTTP limits the sstate to read-only and
+                        FTP provides poor performance.
+                        </para></listitem>
+                    <listitem><para>Have autobuilders contribute to the sstate
+                        pool similarly to how the developer workstations
+                        contribute.
+                        For information, see the
+                        "<link linkend='best-practices-autobuilders'>Autobuilders</link>"
+                        section.</para></listitem>
+                    <listitem><para>Build stand-alone tarballs that contain
+                        "missing" system requirements if for some reason
+                        developer workstations do not meet minimum system
+                        requirements such as latest Python versions,
+                        <filename>chrpath</filename>, or other tools.
+                        You can install and relocate the tarball exactly as you
+                        would the usual cross-development toolchain so that
+                        all developers can meet minimum version requirements
+                        on most distributions.</para></listitem>
+                    <listitem><para>Use a small number of shared,
+                        high performance systems for testing purposes
+                        (e.g. dual, six-core Xeons with 24 Gbytes of RAM
+                        and plenty of disk space).
+                        Developers can use these systems for wider, more
+                        extensive testing while they continue to develop
+                        locally using their primary development system.
+                        </para></listitem>
+                    <listitem><para>Enable the PR Service when package feeds
+                        need to be incremental with continually increasing
+                        <ulink url='&YOCTO_DOCS_REF_URL;#var-PR'>PR</ulink>
+                        values.
+                        Typically, this situation occurs when you use or
+                        publish package feeds and use a shared state.
+                        You should enable the PR Service for all users who
+                        use the shared state pool.
+                        For more information on the PR Service, see the
+                        "<link linkend='working-with-a-pr-service'>Working With a PR Service</link>".
+                        </para></listitem>
+                </itemizedlist>
+            </para>
+        </section>
+    </section>
+
+    <section id='best-practices-source-control-management'>
+        <title>Source Control Management (SCM)</title>
+
+        <para>
+            Keeping your
+            <ulink url='&YOCTO_DOCS_DEV_URL;#metadata'>Metadata</ulink>
+            and any software you are developing under the
+            control of an SCM system that is compatible
+            with the OpenEmbedded build system is advisable.
+            Of the SCMs BitBake supports, the
+            Yocto Project team strongly recommends using
+            <link linkend='git'>Git</link>.
+            Git is a distributed system that is easy to backup,
+            allows you to work remotely, and then connects back to the
+            infrastructure.
+            <note>
+                For information about BitBake, see the
+                <ulink url='&YOCTO_DOCS_BB_URL;'>BitBake User Manual</ulink>.
+            </note>
+        </para>
+
+        <para>
+            It is relatively easy to set up Git services and create
+            infrastructure like
+            <ulink url='&YOCTO_GIT_URL;'>http://git.yoctoproject.org</ulink>,
+            which is based on server software called
+            <filename>gitolite</filename> with <filename>cgit</filename>
+            being used to generate the web interface that lets you view the
+            repositories.
+            The <filename>gitolite</filename> software identifies users
+            using SSH keys and allows branch-based
+            access controls to repositories that you can control as little
+            or as much as necessary.
+        </para>
+
+        <note>
+            The setup of these services is beyond the scope of this manual.
+            However, sites such as these exist that describe how to perform
+            setup:
+            <itemizedlist>
+                <listitem><para><ulink url='http://git-scm.com/book/ch4-8.html'>Git documentation</ulink>:
+                    Describes how to install <filename>gitolite</filename>
+                    on the server.</para></listitem>
+                <listitem><para><ulink url='http://sitaramc.github.com/gitolite/master-toc.html'>The <filename>gitolite</filename> master index</ulink>:
+                    All topics for <filename>gitolite</filename>.
+                    </para></listitem>
+                <listitem><para><ulink url='https://git.wiki.kernel.org/index.php/Interfaces,_frontends,_and_tools'>Interfaces, frontends, and tools</ulink>:
+                    Documentation on how to create interfaces and frontends
+                    for Git.</para></listitem>
+            </itemizedlist>
+        </note>
+    </section>
+
+    <section id='best-practices-autobuilders'>
+        <title>Autobuilders</title>
+
+        <para>
+            Autobuilders are often the core of a development project.
+            It is here that changes from individual developers are brought
+            together and centrally tested and subsequent decisions about
+            releases can be made.
+            Autobuilders also allow for "continuous integration" style
+            testing of software components and regression identification
+            and tracking.
+        </para>
+
+        <para>
+            See "<ulink url='http://autobuilder.yoctoproject.org'>Yocto Project Autobuilder</ulink>"
+            for more information and links to buildbot.
+            The Yocto Project team has found this implementation
+            works well in this role.
+            A public example of this is the Yocto Project
+            Autobuilders, which we use to test the overall health of the
+            project.
+        </para>
+
+        <para>
+            The features of this system are:
+            <itemizedlist>
+                <listitem><para>Highlights when commits break the build.
+                    </para></listitem>
+                <listitem><para>Populates an sstate cache from which
+                    developers can pull rather than requiring local
+                    builds.</para></listitem>
+                <listitem><para>Allows commit hook triggers,
+                    which trigger builds when commits are made.
+                    </para></listitem>
+                <listitem><para>Allows triggering of automated image booting
+                    and testing under the QuickEMUlator (QEMU).
+                    </para></listitem>
+                <listitem><para>Supports incremental build testing and
+                    from-scratch builds.</para></listitem>
+                <listitem><para>Shares output that allows developer
+                    testing and historical regression investigation.
+                    </para></listitem>
+                <listitem><para>Creates output that can be used for releases.
+                    </para></listitem>
+                <listitem><para>Allows scheduling of builds so that resources
+                    can be used efficiently.</para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='best-practices-policies-and-change-flow'>
+        <title>Policies and Change Flow</title>
+
+        <para>
+            The Yocto Project itself uses a hierarchical structure and a
+            pull model.
+            Scripts exist to create and send pull requests
+            (i.e. <filename>create-pull-request</filename> and
+            <filename>send-pull-request</filename>).
+            This model is in line with other open source projects where
+            maintainers are responsible for specific areas of the project
+            and a single maintainer handles the final "top-of-tree" merges.
+        </para>
+
+        <note>
+            You can also use a more collective push model.
+            The <filename>gitolite</filename> software supports both the
+            push and pull models quite easily.
+        </note>
+
+        <para>
+            As with any development environment, it is important
+            to document the policy used as well as any main project
+            guidelines so they are understood by everyone.
+            It is also a good idea to have well structured
+            commit messages, which are usually a part of a project's
+            guidelines.
+            Good commit messages are essential when looking back in time and
+            trying to understand why changes were made.
+        </para>
+
+        <para>
+            If you discover that changes are needed to the core layer of the
+            project, it is worth sharing those with the community as soon
+            as possible.
+            Chances are if you have discovered the need for changes, someone
+            else in the community needs them also.
+        </para>
+    </section>
+
+    <section id='best-practices-summary'>
+        <title>Summary</title>
+
+        <para>
+            This section summarizes the key recommendations described in the
+            previous sections:
+            <itemizedlist>
+                <listitem><para>Use <link linkend='git'>Git</link>
+                    as the source control system.</para></listitem>
+                <listitem><para>Maintain your Metadata in layers that make sense
+                    for your situation.
+                    See the "<link linkend='understanding-and-creating-layers'>Understanding
+                    and Creating Layers</link>" section for more information on
+                    layers.</para></listitem>
+                <listitem><para>
+                    Separate the project's Metadata and code by using
+                    separate Git repositories.
+                    See the
+                    "<link linkend='yocto-project-repositories'>Yocto Project Source Repositories</link>"
+                    section for information on these repositories.
+                    See the
+                    "<link linkend='getting-setup'>Getting Set Up</link>"
+                    section for information on how to set up local Git
+                    repositories for related upstream Yocto Project
+                    Git repositories.
+                    </para></listitem>
+                <listitem><para>Set up the directory for the shared state cache
+                    (<ulink url='&YOCTO_DOCS_REF_URL;#var-SSTATE_DIR'><filename>SSTATE_DIR</filename></ulink>)
+                    where it makes sense.
+                    For example, set up the sstate cache on a system used
+                    by developers in the same organization and share the
+                    same source directories on their machines.
+                    </para></listitem>
+                <listitem><para>Set up an Autobuilder and have it populate the
+                    sstate cache and source directories.</para></listitem>
+                <listitem><para>The Yocto Project community encourages you
+                    to send patches to the project to fix bugs or add features.
+                    If you do submit patches, follow the project commit
+                    guidelines for writing good commit messages.
+                    See the "<link linkend='how-to-submit-a-change'>How to Submit a Change</link>"
+                    section.</para></listitem>
+                <listitem><para>Send changes to the core sooner than later
+                    as others are likely to run into the same issues.
+                    For some guidance on mailing lists to use, see the list in the
+                    "<link linkend='how-to-submit-a-change'>How to Submit a Change</link>"
+                    section.
+                    For a description of the available mailing lists, see the
+                    "<ulink url='&YOCTO_DOCS_REF_URL;#resources-mailinglist'>Mailing Lists</ulink>"
+                    section in the Yocto Project Reference Manual.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+</section>
+
+<section id='yocto-project-repositories'>
+    <title>Yocto Project Source Repositories</title>
+
+    <para>
+        The Yocto Project team maintains complete source repositories for all
+        Yocto Project files at
+        <ulink url='&YOCTO_GIT_URL;/cgit/cgit.cgi'></ulink>.
+        This web-based source code browser is organized into categories by
+        function such as IDE Plugins, Matchbox, Poky, Yocto Linux Kernel, and
+        so forth.
+        From the interface, you can click on any particular item in the "Name"
+        column and see the URL at the bottom of the page that you need to clone
+        a Git repository for that particular item.
+        Having a local Git repository of the
+        <link linkend='source-directory'>Source Directory</link>, which is
+        usually named "poky", allows
+        you to make changes, contribute to the history, and ultimately enhance
+        the Yocto Project's tools, Board Support Packages, and so forth.
+    </para>
+
+    <para>
+        For any supported release of Yocto Project, you can also go to the
+        <ulink url='&YOCTO_HOME_URL;'>Yocto Project Website</ulink> and
+        select the "Downloads" tab and get a released tarball of the
+        <filename>poky</filename> repository or any supported BSP tarballs.
+        Unpacking these tarballs gives you a snapshot of the released
+        files.
+        <note><title>Notes</title>
+            <itemizedlist>
+                <listitem><para>
+                    The recommended method for setting up the Yocto Project
+                    <link linkend='source-directory'>Source Directory</link>
+                    and the files for supported BSPs
+                    (e.g., <filename>meta-intel</filename>) is to use
+                    <link linkend='git'>Git</link> to create a local copy of
+                    the upstream repositories.
+                    </para></listitem>
+                <listitem><para>
+                    Be sure to always work in matching branches for both
+                    the selected BSP repository and the
+                    <link linkend='source-directory'>Source Directory</link>
+                    (i.e. <filename>poky</filename>) repository.
+                    For example, if you have checked out the "master" branch
+                    of <filename>poky</filename> and you are going to use
+                    <filename>meta-intel</filename>, be sure to checkout the
+                    "master" branch of <filename>meta-intel</filename>.
+                    </para></listitem>
+            </itemizedlist>
+        </note>
+    </para>
+
+    <para>
+        In summary, here is where you can get the project files needed for development:
+        <itemizedlist>
+            <listitem><para id='source-repositories'><emphasis><ulink url='&YOCTO_GIT_URL;/cgit/cgit.cgi'>Source Repositories:</ulink></emphasis>
+                This area contains IDE Plugins, Matchbox, Poky, Poky Support, Tools, Yocto Linux Kernel, and Yocto
+                Metadata Layers.
+                You can create local copies of Git repositories for each of these areas.</para>
+                <para>
+                <imagedata fileref="figures/source-repos.png" align="center" width="6in" depth="4in" />
+                </para></listitem>
+            <listitem><para><anchor id='index-downloads' /><emphasis><ulink url='&YOCTO_DL_URL;/releases/'>Index of /releases:</ulink></emphasis>
+                This is an index of releases such as
+                the <trademark class='trade'>Eclipse</trademark>
+                Yocto Plug-in, miscellaneous support, Poky, Pseudo, installers for cross-development toolchains,
+                and all released versions of Yocto Project in the form of images or tarballs.
+                Downloading and extracting these files does not produce a local copy of the
+                Git repository but rather a snapshot of a particular release or image.</para>
+                <para>
+                <imagedata fileref="figures/index-downloads.png" align="center" width="6in" depth="3.5in" />
+                </para></listitem>
+            <listitem><para><emphasis>"Downloads" page for the
+                <ulink url='&YOCTO_HOME_URL;'>Yocto Project Website</ulink>:</emphasis>
+                Access this page by going to the website and then selecting
+                the "Downloads" tab.
+                This page allows you to download any Yocto Project
+                release or Board Support Package (BSP) in tarball form.
+                The tarballs are similar to those found in the
+                <ulink url='&YOCTO_DL_URL;/releases/'>Index of /releases:</ulink> area.</para>
+                <para>
+                <imagedata fileref="figures/yp-download.png" align="center" width="6in" depth="4in" />
+            </para></listitem>
+        </itemizedlist>
+    </para>
+</section>
+
+<section id='yocto-project-terms'>
+    <title>Yocto Project Terms</title>
+
+    <para>
+        Following is a list of terms and definitions users new to the Yocto Project development
+        environment might find helpful.
+        While some of these terms are universal, the list includes them just in case:
+        <itemizedlist>
+            <listitem><para><emphasis>Append Files:</emphasis> Files that append build information to
+                a recipe file.
+                Append files are known as BitBake append files and <filename>.bbappend</filename> files.
+                The OpenEmbedded build system expects every append file to have a corresponding
+                recipe (<filename>.bb</filename>) file.
+                Furthermore, the append file and corresponding recipe file
+                must use the same root filename.
+                The filenames can differ only in the file type suffix used (e.g.
+                <filename>formfactor_0.0.bb</filename> and <filename>formfactor_0.0.bbappend</filename>).
+                </para>
+                <para>Information in append files extends or overrides the
+                information in the similarly-named recipe file.
+                For an example of an append file in use, see the
+                "<link linkend='using-bbappend-files'>Using .bbappend Files</link>" section.
+                <note>
+                    Append files can also use wildcard patterns in their version numbers
+                    so they can be applied to more than one version of the underlying recipe file.
+                </note>
+                </para></listitem>
+            <listitem><para id='bitbake-term'><emphasis>BitBake:</emphasis>
+                The task executor and scheduler used by the OpenEmbedded build
+                system to build images.
+                For more information on BitBake, see the
+                <ulink url='&YOCTO_DOCS_BB_URL;'>BitBake User Manual</ulink>.
+                </para></listitem>
+            <listitem>
+                <para id='build-directory'><emphasis>Build Directory:</emphasis>
+                This term refers to the area used by the OpenEmbedded build
+                system for builds.
+                The area is created when you <filename>source</filename> the
+                setup environment script that is found in the Source Directory
+                (i.e. <ulink url='&YOCTO_DOCS_REF_URL;#structure-core-script'><filename>&OE_INIT_FILE;</filename></ulink>
+                or
+                <ulink url='&YOCTO_DOCS_REF_URL;#structure-memres-core-script'><filename>oe-init-build-env-memres</filename></ulink>).
+                The <ulink url='&YOCTO_DOCS_REF_URL;#var-TOPDIR'><filename>TOPDIR</filename></ulink>
+                variable points to the Build Directory.</para>
+
+                <para>
+                    You have a lot of flexibility when creating the Build
+                    Directory.
+                    Following are some examples that show how to create the
+                    directory.
+                    The examples assume your
+                    <link linkend='source-directory'>Source Directory</link> is
+                    named <filename>poky</filename>:
+                   <itemizedlist>
+                        <listitem><para>Create the Build Directory inside your
+                            Source Directory and let the name of the Build
+                            Directory default to <filename>build</filename>:
+                            <literallayout class='monospaced'>
+     $ cd $HOME/poky
+     $ source &OE_INIT_FILE;
+                            </literallayout></para></listitem>
+                        <listitem><para>Create the Build Directory inside your
+                            home directory and specifically name it
+                            <filename>test-builds</filename>:
+                            <literallayout class='monospaced'>
+     $ cd $HOME
+     $ source poky/&OE_INIT_FILE; test-builds
+                            </literallayout></para></listitem>
+                        <listitem><para>
+                            Provide a directory path and
+                            specifically name the Build Directory.
+                            Any intermediate folders in the pathname must
+                            exist.
+                            This next example creates a Build Directory named
+                            <filename>YP-&POKYVERSION;</filename>
+                            in your home directory within the existing
+                            directory <filename>mybuilds</filename>:
+                            <literallayout class='monospaced'>
+     $cd $HOME
+     $ source $HOME/poky/&OE_INIT_FILE; $HOME/mybuilds/YP-&POKYVERSION;
+                            </literallayout></para></listitem>
+                    </itemizedlist>
+                    <note>
+                        By default, the Build Directory contains
+                        <ulink url='&YOCTO_DOCS_REF_URL;#var-TMPDIR'><filename>TMPDIR</filename></ulink>,
+                        which is a temporary directory the build system uses for
+                        its work.
+                        <filename>TMPDIR</filename> cannot be under NFS.
+                        Thus, by default, the Build Directory cannot be under NFS.
+                        However, if you need the Build Directory to be under NFS,
+                        you can set this up by setting <filename>TMPDIR</filename>
+                        in your <filename>local.conf</filename> file
+                        to use a local drive.
+                        Doing so effectively separates <filename>TMPDIR</filename>
+                        from <filename>TOPDIR</filename>, which is the Build
+                        Directory.
+                    </note>
+                    </para></listitem>
+            <listitem><para><emphasis>Classes:</emphasis> Files that provide for logic encapsulation
+                and inheritance so that commonly used patterns can be defined once and then easily used
+                in multiple recipes.
+                For reference information on the Yocto Project classes, see the
+                "<ulink url='&YOCTO_DOCS_REF_URL;#ref-classes'>Classes</ulink>" chapter of the
+                Yocto Project Reference Manual.
+                Class files end with the <filename>.bbclass</filename> filename extension.
+                </para></listitem>
+            <listitem><para><emphasis>Configuration File:</emphasis>
+                Configuration information in various <filename>.conf</filename>
+                files provides global definitions of variables.
+                The <filename>conf/local.conf</filename> configuration file in
+                the
+                <link linkend='build-directory'>Build Directory</link>
+                contains user-defined variables that affect every build.
+                The <filename>meta-yocto/conf/distro/poky.conf</filename>
+                configuration file defines Yocto "distro" configuration
+                variables used only when building with this policy.
+                Machine configuration files, which
+                are located throughout the
+                <link linkend='source-directory'>Source Directory</link>, define
+                variables for specific hardware and are only used when building
+                for that target (e.g. the
+                <filename>machine/beaglebone.conf</filename> configuration
+                file defines variables for the Texas Instruments ARM Cortex-A8
+                development board).
+                Configuration files end with a <filename>.conf</filename>
+                filename extension.
+                </para></listitem>
+            <listitem><para id='cross-development-toolchain'>
+                <emphasis>Cross-Development Toolchain:</emphasis>
+                    In general, a cross-development toolchain is a collection of
+                    software development tools and utilities that run on one
+                    architecture and allow you to develop software for a
+                    different, or targeted, architecture.
+                    These toolchains contain cross-compilers, linkers, and
+                    debuggers that are specific to the target architecture.
+                </para>
+
+                <para>The Yocto Project supports two different cross-development
+                    toolchains:
+                    <itemizedlist>
+                        <listitem><para>A toolchain only used by and within
+                            BitBake when building an image for a target
+                            architecture.</para></listitem>
+                        <listitem><para>A relocatable toolchain used outside of
+                            BitBake by developers when developing applications
+                            that will run on a targeted device.
+                            Sometimes this relocatable cross-development
+                            toolchain is referred to as the meta-toolchain.
+                            </para></listitem>
+                    </itemizedlist>
+                </para>
+
+                <para>
+                    Creation of these toolchains is simple and automated.
+                    For information on toolchain concepts as they apply to the
+                    Yocto Project, see the
+                    "<ulink url='&YOCTO_DOCS_REF_URL;#cross-development-toolchain-generation'>Cross-Development Toolchain Generation</ulink>"
+                    section in the Yocto Project Reference Manual.
+                    You can also find more information on using the
+                    relocatable toolchain in the
+                    <ulink url='&YOCTO_DOCS_ADT_URL;'>Yocto Project
+                    Application Developer's Guide</ulink>.
+                </para></listitem>
+            <listitem><para><emphasis>Image:</emphasis>
+                An image is an artifact of the BitBake build process given
+                a collection of recipes and related Metadata.
+                Images are the binary output that run on specific hardware or
+                QEMU and are used for specific use-cases.
+                For a list of the supported image types that the Yocto Project provides, see the
+                "<ulink url='&YOCTO_DOCS_REF_URL;#ref-images'>Images</ulink>"
+                chapter in the Yocto Project Reference Manual.</para></listitem>
+            <listitem><para id='layer'><emphasis>Layer:</emphasis> A collection of recipes representing the core,
+                a BSP, or an application stack.
+                For a discussion specifically on BSP Layers, see the
+                "<ulink url='&YOCTO_DOCS_BSP_URL;#bsp-layers'>BSP Layers</ulink>"
+                section in the Yocto Project Board Support Packages (BSP)
+                Developer's Guide.</para></listitem>
+            <listitem><para id='meta-toolchain'><emphasis>Meta-Toolchain:</emphasis>
+                A term sometimes used for
+                <link linkend='cross-development-toolchain'>Cross-Development Toolchain</link>.
+                </para></listitem>
+            <listitem><para id='metadata'><emphasis>Metadata:</emphasis>
+                The files that BitBake parses when building an image.
+                In general, Metadata includes recipes, classes, and
+                configuration files.
+                In the context of the kernel ("kernel Metadata"),
+                it refers to Metadata in the <filename>meta</filename>
+                branches of the kernel source Git repositories.
+                </para></listitem>
+            <listitem><para id='oe-core'><emphasis>OE-Core:</emphasis> A core set of Metadata originating
+                with OpenEmbedded (OE) that is shared between OE and the Yocto Project.
+                This Metadata is found in the <filename>meta</filename> directory of the
+                <link linkend='source-directory'>Source Directory</link>.</para></listitem>
+            <listitem><para id='build-system-term'><emphasis>OpenEmbedded Build System:</emphasis>
+                The build system specific to the Yocto Project.
+                The OpenEmbedded build system is based on another project known
+                as "Poky", which uses
+                <link linkend='bitbake-term'>BitBake</link> as the task
+                executor.
+                Throughout the Yocto Project documentation set, the
+                OpenEmbedded build system is sometimes referred to simply
+                as "the build system".
+                If other build systems, such as a host or target build system
+                are referenced, the documentation clearly states the
+                difference.
+                <note>
+                    For some historical information about Poky, see the
+                    <link linkend='poky'>Poky</link> term.
+                </note>
+                </para></listitem>
+            <listitem><para><emphasis>Package:</emphasis>
+                In the context of the Yocto Project, this term refers to a
+                recipe's packaged output produced by BitBake (i.e. a
+                "baked recipe").
+                A package is generally the compiled binaries produced from the
+                recipe's sources.
+                You "bake" something by running it through BitBake.</para>
+                <para>It is worth noting that the term "package" can, in general, have subtle
+                meanings.  For example, the packages referred to in the
+                "<ulink url='&YOCTO_DOCS_QS_URL;#packages'>The Build Host Packages</ulink>" section are
+                compiled binaries that, when installed, add functionality to your Linux
+                distribution.</para>
+                <para>Another point worth noting is that historically within the Yocto Project,
+                recipes were referred to as packages - thus, the existence of several BitBake
+                variables that are seemingly mis-named,
+                (e.g. <ulink url='&YOCTO_DOCS_REF_URL;#var-PR'><filename>PR</filename></ulink>,
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-PV'><filename>PV</filename></ulink>, and
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-PE'><filename>PE</filename></ulink>).
+                </para></listitem>
+            <listitem><para><emphasis>Package Groups:</emphasis>
+                Arbitrary groups of software Recipes.
+                You use package groups to hold recipes that, when built,
+                usually accomplish a single task.
+                For example, a package group could contain the recipes for a
+                company’s proprietary or value-add software.
+                Or, the package group could contain the recipes that enable
+                graphics.
+                A package group is really just another recipe.
+                Because package group files are recipes, they end with the
+                <filename>.bb</filename> filename extension.</para></listitem>
+            <listitem><para id='poky'><emphasis>Poky:</emphasis>
+                The term "poky" can mean several things.
+                In its most general sense, it is an open-source
+                project that was initially developed by OpenedHand.
+                With OpenedHand, poky was developed off of the existing
+                OpenEmbedded build system becoming a commercially
+                supportable build system for embedded Linux.
+                After Intel Corporation acquired OpenedHand, the
+                project poky became the basis for the Yocto Project's
+                build system.</para>
+                <para>Within the Yocto Project source repositories,
+                <filename>poky</filename> exists as a separate Git
+                repository you can clone to yield a local copy on your
+                host system.
+                Thus, "poky" can refer to the local copy of the Source
+                Directory used for development within the Yocto
+                Project.</para>
+                <para>Finally, "poky" can refer to the default
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-DISTRO'><filename>DISTRO</filename></ulink>
+                (i.e. distribution) created when you use the Yocto
+                Project in conjunction with the
+                <filename>poky</filename> repository to build an image.
+                </para></listitem>
+            <listitem><para><emphasis>Recipe:</emphasis>
+                A set of instructions for building packages.
+                A recipe describes where you get source code, which patches
+                to apply, how to configure the source, how to compile it and so on.
+                Recipes also describe dependencies for libraries or for other
+                recipes.
+                Recipes represent the logical unit of execution, the software
+                to build, the images to build, and use the
+                <filename>.bb</filename> file extension.
+                </para></listitem>
+            <listitem>
+                <para id='source-directory'><emphasis>Source Directory:</emphasis>
+                This term refers to the directory structure created as a result
+                of creating a local copy of the <filename>poky</filename> Git
+                repository <filename>git://git.yoctoproject.org/poky</filename>
+                or expanding a released <filename>poky</filename> tarball.
+                <note>
+                    Creating a local copy of the <filename>poky</filename>
+                    Git repository is the recommended method for setting up
+                    your Source Directory.
+                </note>
+                Sometimes you might hear the term "poky directory" used to refer
+                to this directory structure.
+                <note>
+                    The OpenEmbedded build system does not support file or
+                    directory names that contain spaces.
+                    Be sure that the Source Directory you use does not contain
+                    these types of names.
+                </note></para>
+
+                <para>The Source Directory contains BitBake, Documentation,
+                Metadata and other files that all support the Yocto Project.
+                Consequently, you must have the Source Directory in place on
+                your development system in order to do any development using
+                the Yocto Project.</para>
+
+                <para>When you create a local copy of the Git repository, you
+                can name the repository anything you like.
+                Throughout much of the documentation, "poky"
+                is used as the name of the top-level folder of the local copy of
+                the poky Git repository.
+                So, for example, cloning the <filename>poky</filename> Git
+                repository results in a local Git repository whose top-level
+                folder is also named "poky".</para>
+
+                <para>While it is not recommended that you use tarball expansion
+                to set up the Source Directory, if you do, the top-level
+                directory name of the Source Directory is derived from the
+                Yocto Project release tarball.
+                For example, downloading and unpacking
+                <filename>&YOCTO_POKY_TARBALL;</filename> results in a
+                Source Directory whose root folder is named
+                <filename>&YOCTO_POKY;</filename>.</para>
+
+                <para>It is important to understand the differences between the
+                Source Directory created by unpacking a released tarball as
+                compared to cloning
+                <filename>git://git.yoctoproject.org/poky</filename>.
+                When you unpack a tarball, you have an exact copy of the files
+                based on the time of release - a fixed release point.
+                Any changes you make to your local files in the Source Directory
+                are on top of the release and will remain local only.
+                On the other hand, when you clone the <filename>poky</filename>
+                Git repository, you have an active development repository with
+                access to the upstream repository's branches and tags.
+                In this case, any local changes you make to the local
+                Source Directory can be later applied to active development
+                branches of the upstream <filename>poky</filename> Git
+                repository.</para>
+
+                <para>For more information on concepts related to Git
+                repositories, branches, and tags, see the
+                "<link linkend='repositories-tags-and-branches'>Repositories, Tags, and Branches</link>"
+                section.</para></listitem>
+            <listitem><para><emphasis>Task:</emphasis>
+                A unit of execution for BitBake (e.g.
+                <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-compile'><filename>do_compile</filename></ulink>,
+                <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-fetch'><filename>do_fetch</filename></ulink>,
+                <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-patch'><filename>do_patch</filename></ulink>,
+                and so forth).
+                </para></listitem>
+            <listitem><para><emphasis>Upstream:</emphasis> A reference to source code or repositories
+                that are not local to the development system but located in a master area that is controlled
+                by the maintainer of the source code.
+                For example, in order for a developer to work on a particular piece of code, they need to
+                first get a copy of it from an "upstream" source.</para></listitem>
+        </itemizedlist>
+    </para>
+</section>
+
+<section id='licensing'>
+    <title>Licensing</title>
+
+    <para>
+        Because open source projects are open to the public, they have different licensing structures in place.
+        License evolution for both Open Source and Free Software has an interesting history.
+        If you are interested in this history, you can find basic information here:
+    <itemizedlist>
+        <listitem><para><ulink url='http://en.wikipedia.org/wiki/Open-source_license'>Open source license history</ulink>
+            </para></listitem>
+        <listitem><para><ulink url='http://en.wikipedia.org/wiki/Free_software_license'>Free software license
+            history</ulink></para></listitem>
+    </itemizedlist>
+    </para>
+
+    <para>
+        In general, the Yocto Project is broadly licensed under the Massachusetts Institute of Technology
+        (MIT) License.
+        MIT licensing permits the reuse of software within proprietary software as long as the
+        license is distributed with that software.
+        MIT is also compatible with the GNU General Public License (GPL).
+        Patches to the Yocto Project follow the upstream licensing scheme.
+        You can find information on the MIT license
+        <ulink url='http://www.opensource.org/licenses/mit-license.php'>here</ulink>.
+        You can find information on the GNU GPL <ulink url='http://www.opensource.org/licenses/LGPL-3.0'>
+        here</ulink>.
+    </para>
+
+    <para>
+        When you build an image using the Yocto Project, the build process uses a
+        known list of licenses to ensure compliance.
+        You can find this list in the
+        <link linkend='source-directory'>Source Directory</link> at
+        <filename>meta/files/common-licenses</filename>.
+        Once the build completes, the list of all licenses found and used during that build are
+        kept in the
+        <link linkend='build-directory'>Build Directory</link> at
+        <filename>tmp/deploy/licenses</filename>.
+    </para>
+
+    <para>
+        If a module requires a license that is not in the base list, the build process
+        generates a warning during the build.
+        These tools make it easier for a developer to be certain of the licenses with which
+        their shipped products must comply.
+        However, even with these tools it is still up to the developer to resolve potential licensing issues.
+    </para>
+
+    <para>
+        The base list of licenses used by the build process is a combination of the Software Package
+        Data Exchange (SPDX) list and the Open Source Initiative (OSI) projects.
+        <ulink url='http://spdx.org'>SPDX Group</ulink> is a working group of the Linux Foundation
+        that maintains a specification
+        for a standard format for communicating the components, licenses, and copyrights
+        associated with a software package.
+        <ulink url='http://opensource.org'>OSI</ulink> is a corporation dedicated to the Open Source
+        Definition and the effort for reviewing and approving licenses that
+        conform to the Open Source Definition (OSD).
+    </para>
+
+    <para>
+        You can find a list of the combined SPDX and OSI licenses that the
+        Yocto Project uses in the
+        <filename>meta/files/common-licenses</filename> directory in your
+        <link linkend='source-directory'>Source Directory</link>.
+    </para>
+
+    <para>
+        For information that can help you maintain compliance with various
+        open source licensing during the lifecycle of a product created using
+        the Yocto Project, see the
+        "<link linkend='maintaining-open-source-license-compliance-during-your-products-lifecycle'>Maintaining Open Source License Compliance During Your Product's Lifecycle</link>"
+        section.
+    </para>
+</section>
+
+<section id='git'>
+    <title>Git</title>
+
+    <para>
+        The Yocto Project makes extensive use of Git,
+        which is a free, open source distributed version control system.
+        Git supports distributed development, non-linear development, and can handle large projects.
+        It is best that you have some fundamental understanding of how Git tracks projects and
+        how to work with Git if you are going to use the Yocto Project for development.
+        This section provides a quick overview of how Git works and provides you with a summary
+        of some essential Git commands.
+    </para>
+
+    <para>
+        For more information on Git, see
+        <ulink url='http://git-scm.com/documentation'></ulink>.
+        If you need to download Git, go to <ulink url='http://git-scm.com/download'></ulink>.
+    </para>
+
+    <section id='repositories-tags-and-branches'>
+        <title>Repositories, Tags, and Branches</title>
+
+        <para>
+            As mentioned earlier in the section
+            "<link linkend='yocto-project-repositories'>Yocto Project Source Repositories</link>",
+            the Yocto Project maintains source repositories at
+            <ulink url='&YOCTO_GIT_URL;/cgit.cgi'></ulink>.
+            If you look at this web-interface of the repositories, each item is a separate
+            Git repository.
+        </para>
+
+        <para>
+            Git repositories use branching techniques that track content change (not files)
+            within a project (e.g. a new feature or updated documentation).
+            Creating a tree-like structure based on project divergence allows for excellent historical
+            information over the life of a project.
+            This methodology also allows for an environment from which you can do lots of
+            local experimentation on projects as you develop changes or new features.
+        </para>
+
+        <para>
+            A Git repository represents all development efforts for a given project.
+            For example, the Git repository <filename>poky</filename> contains all changes
+            and developments for Poky over the course of its entire life.
+            That means that all changes that make up all releases are captured.
+            The repository maintains a complete history of changes.
+        </para>
+
+        <para>
+            You can create a local copy of any repository by "cloning" it with the Git
+            <filename>clone</filename> command.
+            When you clone a Git repository, you end up with an identical copy of the
+            repository on your development system.
+            Once you have a local copy of a repository, you can take steps to develop locally.
+            For examples on how to clone Git repositories, see the
+            "<link linkend='getting-setup'>Getting Set Up</link>" section.
+        </para>
+
+        <para>
+            It is important to understand that Git tracks content change and
+            not files.
+            Git uses "branches" to organize different development efforts.
+            For example, the <filename>poky</filename> repository has
+            several branches that include the current
+            <filename>&DISTRO_NAME;</filename> branch, the
+            <filename>master</filename> branch, and many branches for past
+            Yocto Project releases.
+            You can see all the branches by going to
+            <ulink url='&YOCTO_GIT_URL;/cgit.cgi/poky/'></ulink> and
+            clicking on the
+            <filename><ulink url='&YOCTO_GIT_URL;/cgit.cgi/poky/refs/heads'>[...]</ulink></filename>
+            link beneath the "Branch" heading.
+        </para>
+
+        <para>
+            Each of these branches represents a specific area of development.
+            The <filename>master</filename> branch represents the current or most recent
+            development.
+            All other branches represent offshoots of the <filename>master</filename>
+            branch.
+        </para>
+
+        <para>
+            When you create a local copy of a Git repository, the copy has the same set
+            of branches as the original.
+            This means you can use Git to create a local working area (also called a branch)
+            that tracks a specific development branch from the source Git repository.
+            in other words, you can define your local Git environment to work on any development
+            branch in the repository.
+            To help illustrate, here is a set of commands that creates a local copy of the
+            <filename>poky</filename> Git repository and then creates and checks out a local
+            Git branch that tracks the Yocto Project &DISTRO; Release (&DISTRO_NAME;) development:
+            <literallayout class='monospaced'>
+     $ cd ~
+     $ git clone git://git.yoctoproject.org/poky
+     $ cd poky
+     $ git checkout -b &DISTRO_NAME; origin/&DISTRO_NAME;
+            </literallayout>
+            In this example, the name of the top-level directory of your local
+            <link linkend='source-directory'>Source Directory</link>
+            is "poky" and the name of that local working area (local branch)
+            you just created and checked out is "&DISTRO_NAME;".
+            The files in your local repository now reflect the same files that
+            are in the "&DISTRO_NAME;" development branch of the
+            Yocto Project's "poky" upstream repository.
+            It is important to understand that when you create and checkout a
+            local working branch based on a branch name,
+            your local environment matches the "tip" of that development branch
+            at the time you created your local branch, which could be
+            different from the files at the time of a similarly named release.
+            In other words, creating and checking out a local branch based on
+            the "&DISTRO_NAME;" branch name is not the same as
+            cloning and checking out the "master" branch.
+            Keep reading to see how you create a local snapshot of a Yocto
+            Project Release.
+        </para>
+
+        <para>
+            Git uses "tags" to mark specific changes in a repository.
+            Typically, a tag is used to mark a special point such as the final
+            change before a project is released.
+            You can see the tags used with the <filename>poky</filename> Git
+            repository by going to
+            <ulink url='&YOCTO_GIT_URL;/cgit.cgi/poky/'></ulink> and
+            clicking on the
+            <filename><ulink url='&YOCTO_GIT_URL;/cgit.cgi/poky/refs/tags'>[...]</ulink></filename>
+            link beneath the "Tag" heading.
+        </para>
+
+        <para>
+            Some key tags are <filename>dylan-9.0.4</filename>,
+            <filename>dora-10.0.4</filename>, <filename>daisy-11.0.2</filename>,
+            <filename>dizzy-12.0.0</filename>, and
+            <filename>&DISTRO_NAME;-&POKYVERSION;</filename>.
+            These tags represent Yocto Project releases.
+        </para>
+
+        <para>
+            When you create a local copy of the Git repository, you also have access to all the
+            tags.
+            Similar to branches, you can create and checkout a local working Git branch based
+            on a tag name.
+            When you do this, you get a snapshot of the Git repository that reflects
+            the state of the files when the change was made associated with that tag.
+            The most common use is to checkout a working branch that matches a specific
+            Yocto Project release.
+            Here is an example:
+            <literallayout class='monospaced'>
+     $ cd ~
+     $ git clone git://git.yoctoproject.org/poky
+     $ cd poky
+     $ git checkout -b my-&DISTRO_NAME;-&POKYVERSION; &DISTRO_NAME;-&POKYVERSION;
+            </literallayout>
+            In this example, the name of the top-level directory of your local Yocto Project
+            Files Git repository is <filename>poky</filename>.
+            And, the name of the local branch you have created and checked out is
+            <filename>my-&DISTRO_NAME;-&POKYVERSION;</filename>.
+            The files in your repository now exactly match the Yocto Project &DISTRO;
+            Release tag (<filename>&DISTRO_NAME;-&POKYVERSION;</filename>).
+            It is important to understand that when you create and checkout a local
+            working branch based on a tag, your environment matches a specific point
+            in time and not the entire development branch.
+        </para>
+    </section>
+
+    <section id='basic-commands'>
+        <title>Basic Commands</title>
+
+        <para>
+            Git has an extensive set of commands that lets you manage changes and perform
+            collaboration over the life of a project.
+            Conveniently though, you can manage with a small set of basic operations and workflows
+            once you understand the basic philosophy behind Git.
+            You do not have to be an expert in Git to be functional.
+            A good place to look for instruction on a minimal set of Git commands is
+            <ulink url='http://git-scm.com/documentation'>here</ulink>.
+            If you need to download Git, you can do so
+            <ulink url='http://git-scm.com/download'>here</ulink>, although
+            any reasonably current Linux distribution should already have an
+            installable package for Git.
+        </para>
+
+        <para>
+            If you do not know much about Git, you should educate
+            yourself by visiting the links previously mentioned.
+        </para>
+
+        <para>
+            The following list briefly describes some basic Git operations as a way to get started.
+            As with any set of commands, this list (in most cases) simply shows the base command and
+            omits the many arguments they support.
+            See the Git documentation for complete descriptions and strategies on how to use these commands:
+            <itemizedlist>
+                <listitem><para><emphasis><filename>git init</filename>:</emphasis> Initializes an empty Git repository.
+                    You cannot use Git commands unless you have a <filename>.git</filename> repository.</para></listitem>
+                <listitem><para><emphasis><filename>git clone</filename>:</emphasis>
+                    Creates a local clone of a Git repository.
+                    During collaboration, this command allows you to create a
+                    local Git repository that is on equal footing with a fellow
+                    developer’s Git repository.
+                    </para></listitem>
+                <listitem><para><emphasis><filename>git add</filename>:</emphasis> Stages updated file contents
+                    to the index that
+                    Git uses to track changes.
+                    You must stage all files that have changed before you can commit them.</para></listitem>
+                <listitem><para><emphasis><filename>git commit</filename>:</emphasis> Creates a "commit" that documents
+                    the changes you made.
+                    Commits are used for historical purposes, for determining if a maintainer of a project
+                    will allow the change, and for ultimately pushing the change from your local Git repository
+                    into the project’s upstream (or master) repository.</para></listitem>
+                <listitem><para><emphasis><filename>git status</filename>:</emphasis> Reports any modified files that
+                    possibly need to be staged and committed.</para></listitem>
+                <listitem><para><emphasis><filename>git checkout &lt;branch-name&gt;</filename>:</emphasis> Changes
+                    your working branch.
+                    This command is analogous to "cd".</para></listitem>
+                <listitem><para><emphasis><filename>git checkout –b &lt;working-branch&gt;</filename>:</emphasis> Creates
+                    a working branch on your local machine where you can isolate work.
+                    It is a good idea to use local branches when adding specific features or changes.
+                    This way if you do not like what you have done you can easily get rid of the work.</para></listitem>
+                <listitem><para><emphasis><filename>git branch</filename>:</emphasis> Reports
+                    existing local branches and
+                    tells you the branch in which you are currently working.</para></listitem>
+                <listitem><para><emphasis><filename>git branch -D &lt;branch-name&gt;</filename>:</emphasis>
+                    Deletes an existing local branch.
+                    You need to be in a local branch other than the one you are deleting
+                    in order to delete <filename>&lt;branch-name&gt;</filename>.</para></listitem>
+                <listitem><para><emphasis><filename>git pull</filename>:</emphasis> Retrieves information
+                    from an upstream Git
+                    repository and places it in your local Git repository.
+                    You use this command to make sure you are synchronized with the repository
+                    from which you are basing changes (.e.g. the master branch).</para></listitem>
+                <listitem><para><emphasis><filename>git push</filename>:</emphasis>
+                    Sends all your committed local changes to an upstream Git
+                    repository (e.g. a contribution repository).
+                    The maintainer of the project draws from these repositories
+                    when adding changes to the project’s master repository or
+                    other development branch.
+                    </para></listitem>
+                <listitem><para><emphasis><filename>git merge</filename>:</emphasis> Combines or adds changes from one
+                    local branch of your repository with another branch.
+                    When you create a local Git repository, the default branch is named "master".
+                    A typical workflow is to create a temporary branch for isolated work, make and commit your
+                    changes, switch to your local master branch, merge the changes from the temporary branch into the
+                    local master branch, and then delete the temporary branch.</para></listitem>
+                <listitem><para><emphasis><filename>git cherry-pick</filename>:</emphasis> Choose and apply specific
+                    commits from one branch into another branch.
+                    There are times when you might not be able to merge all the changes in one branch with
+                    another but need to pick out certain ones.</para></listitem>
+                <listitem><para><emphasis><filename>gitk</filename>:</emphasis> Provides a GUI view of the branches
+                    and changes in your local Git repository.
+                    This command is a good way to graphically see where things have diverged in your
+                    local repository.</para></listitem>
+                <listitem><para><emphasis><filename>git log</filename>:</emphasis> Reports a history of your changes to the
+                    repository.</para></listitem>
+                <listitem><para><emphasis><filename>git diff</filename>:</emphasis> Displays line-by-line differences
+                    between your local working files and the same files in the upstream Git repository that your
+                    branch currently tracks.</para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+</section>
+
+<section id='workflows'>
+    <title>Workflows</title>
+
+    <para>
+        This section provides some overview on workflows using Git.
+        In particular, the information covers basic practices that describe roles and actions in a
+        collaborative development environment.
+        Again, if you are familiar with this type of development environment, you might want to just
+        skip this section.
+    </para>
+
+    <para>
+        The Yocto Project files are maintained using Git in a "master" branch whose Git history
+        tracks every change and whose structure provides branches for all diverging functionality.
+        Although there is no need to use Git, many open source projects do so.
+        For the Yocto Project, a key individual called the "maintainer" is responsible for the "master"
+        branch of a given Git repository.
+        The "master" branch is the “upstream” repository where the final builds of the project occur.
+        The maintainer is responsible for accepting changes from other developers and for
+        organizing the underlying branch structure to reflect release strategies and so forth.
+        <note>For information on finding out who is responsible for (maintains)
+            a particular area of code, see the
+            "<link linkend='how-to-submit-a-change'>How to Submit a Change</link>"
+            section.
+        </note>
+    </para>
+
+    <para>
+        The project also has an upstream contribution Git repository named
+        <filename>poky-contrib</filename>.
+        You can see all the branches in this repository using the web interface
+        of the
+        <ulink url='&YOCTO_GIT_URL;'>Source Repositories</ulink> organized
+        within the "Poky Support" area.
+        These branches temporarily hold changes to the project that have been
+        submitted or committed by the Yocto Project development team and by
+        community members who contribute to the project.
+        The maintainer determines if the changes are qualified to be moved
+        from the "contrib" branches into the "master" branch of the Git
+        repository.
+    </para>
+
+    <para>
+        Developers (including contributing community members) create and maintain cloned repositories
+        of the upstream "master" branch.
+        These repositories are local to their development platforms and are used to develop changes.
+        When a developer is satisfied with a particular feature or change, they "push" the changes
+        to the appropriate "contrib" repository.
+    </para>
+
+    <para>
+        Developers are responsible for keeping their local repository up-to-date with "master".
+        They are also responsible for straightening out any conflicts that might arise within files
+        that are being worked on simultaneously by more than one person.
+        All this work is done locally on the developer’s machines before anything is pushed to a
+        "contrib" area and examined at the maintainer’s level.
+    </para>
+
+    <para>
+        A somewhat formal method exists by which developers commit changes and push them into the
+        "contrib" area and subsequently request that the maintainer include them into "master"
+        This process is called “submitting a patch” or "submitting a change."
+        For information on submitting patches and changes, see the
+        "<link linkend='how-to-submit-a-change'>How to Submit a Change</link>" section.
+    </para>
+
+    <para>
+        To summarize the environment:  a single point of entry exists for
+        changes into the project’s "master" branch of the Git repository,
+        which is controlled by the project’s maintainer.
+        And, a set of developers exist who independently develop, test, and
+        submit changes to "contrib" areas for the maintainer to examine.
+        The maintainer then chooses which changes are going to become a
+        permanent part of the project.
+    </para>
+
+    <para>
+        <imagedata fileref="figures/git-workflow.png" width="6in" depth="3in" align="left" scalefit="1" />
+    </para>
+
+    <para>
+        While each development environment is unique, there are some best practices or methods
+        that help development run smoothly.
+        The following list describes some of these practices.
+        For more information about Git workflows, see the workflow topics in the
+        <ulink url='http://book.git-scm.com'>Git Community Book</ulink>.
+        <itemizedlist>
+            <listitem><para><emphasis>Make Small Changes:</emphasis> It is best to keep the changes you commit
+                small as compared to bundling many disparate changes into a single commit.
+                This practice not only keeps things manageable but also allows the maintainer
+                to more easily include or refuse changes.</para>
+                <para>It is also good practice to leave the repository in a state that allows you to
+                still successfully build your project.  In other words, do not commit half of a feature,
+                then add the other half as a separate, later commit.
+                Each commit should take you from one buildable project state to another
+                buildable state.</para></listitem>
+            <listitem><para><emphasis>Use Branches Liberally:</emphasis> It is very easy to create, use, and
+                delete local branches in your working Git repository.
+                You can name these branches anything you like.
+                It is helpful to give them names associated with the particular feature or change
+                on which you are working.
+                Once you are done with a feature or change and have merged it
+                into your local master branch, simply discard the temporary
+                branch.</para></listitem>
+            <listitem><para><emphasis>Merge Changes:</emphasis> The <filename>git merge</filename>
+                command allows you to take the
+                changes from one branch and fold them into another branch.
+                This process is especially helpful when more than a single developer might be working
+                on different parts of the same feature.
+                Merging changes also automatically identifies any collisions or "conflicts"
+                that might happen as a result of the same lines of code being altered by two different
+                developers.</para></listitem>
+            <listitem><para><emphasis>Manage Branches:</emphasis> Because branches are easy to use, you should
+                use a system where branches indicate varying levels of code readiness.
+                For example, you can have a "work" branch to develop in, a "test" branch where the code or
+                change is tested, a "stage" branch where changes are ready to be committed, and so forth.
+                As your project develops, you can merge code across the branches to reflect ever-increasing
+                stable states of the development.</para></listitem>
+            <listitem><para><emphasis>Use Push and Pull:</emphasis> The push-pull workflow is based on the
+                concept of developers "pushing" local commits to a remote repository, which is
+                usually a contribution repository.
+                This workflow is also based on developers "pulling" known states of the project down into their
+                local development repositories.
+                The workflow easily allows you to pull changes submitted by other developers from the
+                upstream repository into your work area ensuring that you have the most recent software
+                on which to develop.
+                The Yocto Project has two scripts named <filename>create-pull-request</filename> and
+                <filename>send-pull-request</filename> that ship with the release to facilitate this
+                workflow.
+                You can find these scripts in the <filename>scripts</filename>
+                folder of the
+                <link linkend='source-directory'>Source Directory</link>.
+                For information on how to use these scripts, see the
+                "<link linkend='pushing-a-change-upstream'>Using Scripts to Push a Change Upstream and Request a Pull</link>" section.
+                </para></listitem>
+            <listitem><para><emphasis>Patch Workflow:</emphasis> This workflow allows you to notify the
+                maintainer through an email that you have a change (or patch) you would like considered
+                for the "master" branch of the Git repository.
+                To send this type of change, you format the patch and then send the email using the Git commands
+                <filename>git format-patch</filename> and <filename>git send-email</filename>.
+                For information on how to use these scripts, see the
+                "<link linkend='how-to-submit-a-change'>How to Submit a Change</link>"
+                section.
+                </para></listitem>
+        </itemizedlist>
+    </para>
+</section>
+
+<section id='tracking-bugs'>
+    <title>Tracking Bugs</title>
+
+    <para>
+        The Yocto Project uses its own implementation of
+        <ulink url='http://www.bugzilla.org/about/'>Bugzilla</ulink> to track bugs.
+        Implementations of Bugzilla work well for group development because they track bugs and code
+        changes, can be used to communicate changes and problems with developers, can be used to
+        submit and review patches, and can be used to manage quality assurance.
+        The home page for the Yocto Project implementation of Bugzilla is
+        <ulink url='&YOCTO_BUGZILLA_URL;'>&YOCTO_BUGZILLA_URL;</ulink>.
+    </para>
+
+    <para>
+        Sometimes it is helpful to submit, investigate, or track a bug against the Yocto Project itself
+        such as when discovering an issue with some component of the build system that acts contrary
+        to the documentation or your expectations.
+        Following is the general procedure for submitting a new bug using the Yocto Project
+        Bugzilla.
+        You can find more information on defect management, bug tracking, and feature request
+        processes all accomplished through the Yocto Project Bugzilla on the
+        <ulink url='&YOCTO_WIKI_URL;/wiki/Bugzilla_Configuration_and_Bug_Tracking'>wiki page</ulink>.
+        <orderedlist>
+            <listitem><para>Always use the Yocto Project implementation of Bugzilla to submit
+                a bug.</para></listitem>
+            <listitem><para>When submitting a new bug, be sure to choose the appropriate
+                Classification, Product, and Component for which the issue was found.
+                Defects for the Yocto Project fall into one of seven classifications:
+                Yocto Project Components, Infrastructure, Build System &amp; Metadata,
+                Documentation, QA/Testing, Runtime and Hardware.
+                Each of these Classifications break down into multiple Products and, in some
+                cases, multiple Components.</para></listitem>
+            <listitem><para>Use the bug form to choose the correct Hardware and Architecture
+                for which the bug applies.</para></listitem>
+            <listitem><para>Indicate the Yocto Project version you were using when the issue
+                occurred.</para></listitem>
+            <listitem><para>Be sure to indicate the Severity of the bug.
+                Severity communicates how the bug impacted your work.</para></listitem>
+            <listitem><para>Select the appropriate "Documentation change" item
+                for the bug.
+                Fixing a bug may or may not affect the Yocto Project
+                documentation.</para></listitem>
+            <listitem><para>Provide a brief summary of the issue.
+                Try to limit your summary to just a line or two and be sure to capture the
+                essence of the issue.</para></listitem>
+            <listitem><para>Provide a detailed description of the issue.
+                You should provide as much detail as you can about the context, behavior, output,
+                and so forth that surrounds the issue.
+                You can even attach supporting files for output from logs by
+                using the "Add an attachment" button.</para></listitem>
+            <listitem><para>Be sure to copy the appropriate people in the
+                "CC List" for the bug.
+                See the "<link linkend='how-to-submit-a-change'>How to Submit a Change</link>"
+                section for information about finding out who is responsible
+                for code.</para></listitem>
+            <listitem><para>Submit the bug by clicking the "Submit Bug" button.</para></listitem>
+        </orderedlist>
+    </para>
+</section>
+
+<section id='how-to-submit-a-change'>
+    <title>How to Submit a Change</title>
+
+    <para>
+        Contributions to the Yocto Project and OpenEmbedded are very welcome.
+        Because the system is extremely configurable and flexible, we recognize that developers
+        will want to extend, configure or optimize it for their specific uses.
+        You should send patches to the appropriate mailing list so that they
+        can be reviewed and merged by the appropriate maintainer.
+    </para>
+
+    <para>
+        Before submitting any change, be sure to find out who you should be
+        notifying.
+        Several methods exist through which you find out who you should be copying
+        or notifying:
+        <itemizedlist>
+            <listitem><para><emphasis>Maintenance File:</emphasis>
+                Examine the <filename>maintainers.inc</filename> file, which is
+                located in the
+                <link linkend='source-directory'>Source Directory</link>
+                at <filename>meta-yocto/conf/distro/include</filename>, to
+                see who is responsible for code.
+                </para></listitem>
+            <listitem><para><emphasis>Board Support Package (BSP) README Files:</emphasis>
+                For BSP maintainers of supported BSPs, you can examine
+                individual BSP <filename>README</filename> files.
+                In addition, some layers (such as the <filename>meta-intel</filename> layer),
+                include a <filename>MAINTAINERS</filename> file which contains
+                a list of all supported BSP maintainers for that layer.
+                </para></listitem>
+            <listitem><para><emphasis>Search by File:</emphasis>
+                Using <link linkend='git'>Git</link>, you can enter the
+                following command to bring up a short list of all commits
+                against a specific file:
+                <literallayout class='monospaced'>
+     git shortlog -- <replaceable>filename</replaceable>
+                </literallayout>
+                Just provide the name of the file for which you are interested.
+                The information returned is not ordered by history but does
+                include a list of all committers grouped by name.
+                From the list, you can see who is responsible for the bulk of
+                the changes against the file.
+                </para></listitem>
+        </itemizedlist>
+    </para>
+
+    <para>
+        For a list of the Yocto Project and related mailing lists, see the
+        "<ulink url='&YOCTO_DOCS_REF_URL;#resources-mailinglist'>Mailing lists</ulink>" section in
+        the Yocto Project Reference Manual.
+    </para>
+
+    <para>
+        Here is some guidance on which mailing list to use for what type of change:
+        <itemizedlist>
+            <listitem><para>For changes to the core
+                <link linkend='metadata'>Metadata</link>, send your patch to the
+                <ulink url='&OE_LISTS_URL;/listinfo/openembedded-core'>openembedded-core</ulink> mailing list.
+                For example, a change to anything under the <filename>meta</filename> or
+                <filename>scripts</filename> directories
+                should be sent to this mailing list.</para></listitem>
+            <listitem><para>For changes to BitBake (anything under the <filename>bitbake</filename>
+                directory), send your patch to the
+                <ulink url='&OE_LISTS_URL;/listinfo/bitbake-devel'>bitbake-devel</ulink> mailing list.</para></listitem>
+            <listitem><para>For changes to <filename>meta-yocto</filename>, send your patch to the
+                <ulink url='&YOCTO_LISTS_URL;/listinfo/poky'>poky</ulink> mailing list.</para></listitem>
+            <listitem><para>For changes to other layers hosted on
+                <filename>yoctoproject.org</filename> (unless the
+                layer's documentation specifies otherwise), tools, and Yocto Project
+                documentation, use the
+                <ulink url='&YOCTO_LISTS_URL;/listinfo/yocto'>yocto</ulink> mailing list.</para></listitem>
+            <listitem><para>For additional recipes that do not fit into the core Metadata,
+                you should determine which layer the recipe should go into and submit the
+                change in the manner recommended by the documentation (e.g. README) supplied
+                with the layer. If in doubt, please ask on the
+                <ulink url='&YOCTO_LISTS_URL;/listinfo/yocto'>yocto</ulink> or
+                <ulink url='&OE_LISTS_URL;/listinfo/openembedded-devel'>openembedded-devel</ulink>
+                mailing lists.</para></listitem>
+        </itemizedlist>
+    </para>
+
+    <para>
+        When you send a patch, be sure to include a "Signed-off-by:"
+        line in the same style as required by the Linux kernel.
+        Adding this line signifies that you, the submitter, have agreed to the Developer's Certificate of Origin 1.1
+        as follows:
+        <literallayout class='monospaced'>
+     Developer's Certificate of Origin 1.1
+
+     By making a contribution to this project, I certify that:
+
+     (a) The contribution was created in whole or in part by me and I
+         have the right to submit it under the open source license
+         indicated in the file; or
+
+     (b) The contribution is based upon previous work that, to the best
+         of my knowledge, is covered under an appropriate open source
+         license and I have the right under that license to submit that
+         work with modifications, whether created in whole or in part
+         by me, under the same open source license (unless I am
+         permitted to submit under a different license), as indicated
+         in the file; or
+
+     (c) The contribution was provided directly to me by some other
+         person who certified (a), (b) or (c) and I have not modified
+         it.
+
+     (d) I understand and agree that this project and the contribution
+         are public and that a record of the contribution (including all
+         personal information I submit with it, including my sign-off) is
+         maintained indefinitely and may be redistributed consistent with
+         this project or the open source license(s) involved.
+        </literallayout>
+    </para>
+
+    <para>
+        In a collaborative environment, it is necessary to have some sort of standard
+        or method through which you submit changes.
+        Otherwise, things could get quite chaotic.
+        One general practice to follow is to make small, controlled changes.
+        Keeping changes small and isolated aids review, makes merging/rebasing easier
+        and keeps the change history clean when anyone needs to refer to it in future.
+    </para>
+
+    <para>
+        When you make a commit, you must follow certain standards established by the
+        OpenEmbedded and Yocto Project development teams.
+        For each commit, you must provide a single-line summary of the change and you
+        should almost always provide a more detailed description of what you did (i.e.
+        the body of the commit message).
+        The only exceptions for not providing a detailed description would be if your
+        change is a simple, self-explanatory change that needs no further description
+        beyond the summary.
+        Here are the guidelines for composing a commit message:
+        <itemizedlist>
+            <listitem><para>Provide a single-line, short summary of the change.
+                This summary is typically viewable in the "shortlist" of changes.
+                Thus, providing something short and descriptive that gives the reader
+                a summary of the change is useful when viewing a list of many commits.
+                This short description should be prefixed by the recipe name (if changing a recipe), or
+                else the short form path to the file being changed.
+                </para></listitem>
+            <listitem><para>For the body of the commit message, provide detailed information
+                that describes what you changed, why you made the change, and the approach
+                you used. It may also be helpful if you mention how you tested the change.
+                Provide as much detail as you can in the body of the commit message.
+                </para></listitem>
+            <listitem><para>
+                If the change addresses a specific bug or issue that is
+                associated with a bug-tracking ID, include a reference to that
+                ID in your detailed description.
+                For example, the Yocto Project uses a specific convention for
+                bug references - any commit that addresses a specific bug should
+                use the following form for the detailed description:
+                <literallayout class='monospaced'>
+     Fixes [YOCTO #<replaceable>bug-id</replaceable>]
+
+     <replaceable>detailed description of change</replaceable>
+                </literallayout></para></listitem>
+                Where <replaceable>bug-id</replaceable> is replaced with the
+                specific bug ID from the Yocto Project Bugzilla instance.
+        </itemizedlist>
+    </para>
+
+    <para>
+        You can find more guidance on creating well-formed commit messages at this OpenEmbedded
+        wiki page:
+        <ulink url='&OE_HOME_URL;/wiki/Commit_Patch_Message_Guidelines'></ulink>.
+    </para>
+
+    <para>
+        The next two sections describe general instructions for both pushing
+        changes upstream and for submitting changes as patches.
+    </para>
+
+    <section id='pushing-a-change-upstream'>
+        <title>Using Scripts to Push a Change Upstream and Request a Pull</title>
+
+        <para>
+            The basic flow for pushing a change to an upstream "contrib" Git repository is as follows:
+            <itemizedlist>
+                <listitem><para>Make your changes in your local Git repository.</para></listitem>
+                <listitem><para>Stage your changes by using the <filename>git add</filename>
+                    command on each file you changed.</para></listitem>
+                <listitem><para>
+                    Commit the change by using the
+                    <filename>git commit</filename> command.
+                    Be sure to provide a commit message that follows the
+                    project’s commit message standards as described earlier.
+                    </para></listitem>
+                <listitem><para>
+                    Push the change to the upstream "contrib" repository by
+                    using the <filename>git push</filename> command.
+                    </para></listitem>
+                <listitem><para>Notify the maintainer that you have pushed a change by making a pull
+                    request.
+                    The Yocto Project provides two scripts that conveniently let you generate and send
+                    pull requests to the Yocto Project.
+                    These scripts are <filename>create-pull-request</filename> and
+                    <filename>send-pull-request</filename>.
+                    You can find these scripts in the <filename>scripts</filename> directory
+                    within the <link linkend='source-directory'>Source Directory</link>.</para>
+                    <para>Using these scripts correctly formats the requests without introducing any
+                    whitespace or HTML formatting.
+                    The maintainer that receives your patches needs to be able to save and apply them
+                    directly from your emails.
+                    Using these scripts is the preferred method for sending patches.</para>
+                    <para>For help on using these scripts, simply provide the
+                    <filename>-h</filename> argument as follows:
+                    <literallayout class='monospaced'>
+     $ poky/scripts/create-pull-request -h
+     $ poky/scripts/send-pull-request -h
+                    </literallayout></para></listitem>
+            </itemizedlist>
+        </para>
+
+        <para>
+            You can find general Git information on how to push a change upstream in the
+            <ulink url='http://git-scm.com/book/en/v2/Distributed-Git-Distributed-Workflows'>Git Community Book</ulink>.
+        </para>
+    </section>
+
+    <section id='submitting-a-patch'>
+        <title>Using Email to Submit a Patch</title>
+
+        <para>
+            You can submit patches without using the <filename>create-pull-request</filename> and
+            <filename>send-pull-request</filename> scripts described in the previous section.
+            However, keep in mind, the preferred method is to use the scripts.
+        </para>
+
+        <para>
+            Depending on the components changed, you need to submit the email to a specific
+            mailing list.
+            For some guidance on which mailing list to use, see the list in the
+            "<link linkend='how-to-submit-a-change'>How to Submit a Change</link>"
+            section.
+            For a description of the available mailing lists, see the
+            "<ulink url='&YOCTO_DOCS_REF_URL;#resources-mailinglist'>Mailing Lists</ulink>"
+            section in the Yocto Project Reference Manual.
+        </para>
+
+        <para>
+            Here is the general procedure on how to submit a patch through email without using the
+            scripts:
+            <itemizedlist>
+                <listitem><para>Make your changes in your local Git repository.</para></listitem>
+                <listitem><para>Stage your changes by using the <filename>git add</filename>
+                    command on each file you changed.</para></listitem>
+                <listitem><para>Commit the change by using the
+                    <filename>git commit --signoff</filename> command.
+                    Using the <filename>--signoff</filename> option identifies you as the person
+                    making the change and also satisfies the Developer's Certificate of
+                    Origin (DCO) shown earlier.</para>
+                    <para>When you form a commit, you must follow certain standards established by the
+                    Yocto Project development team.
+                    See the earlier section
+                    "<link linkend='how-to-submit-a-change'>How to Submit a Change</link>"
+                    for Yocto Project commit message standards.</para></listitem>
+                <listitem><para>Format the commit into an email message.
+                    To format commits, use the <filename>git format-patch</filename> command.
+                    When you provide the command, you must include a revision list or a number of patches
+                    as part of the command.
+                    For example, either of these two commands takes your most
+                    recent single commit and formats it as an email message in
+                    the current directory:
+                    <literallayout class='monospaced'>
+     $ git format-patch -1
+                    </literallayout>
+                    or
+                    <literallayout class='monospaced'>
+     $ git format-patch HEAD~
+                    </literallayout></para>
+                    <para>After the command is run, the current directory contains a
+                    numbered <filename>.patch</filename> file for the commit.</para>
+                    <para>If you provide several commits as part of the command,
+                    the <filename>git format-patch</filename> command produces a
+                    series of numbered files in the current directory – one for each commit.
+                    If you have more than one patch, you should also use the
+                    <filename>--cover</filename> option with the command, which generates a
+                    cover letter as the first "patch" in the series.
+                    You can then edit the cover letter to provide a description for
+                    the series of patches.
+                    For information on the <filename>git format-patch</filename> command,
+                    see <filename>GIT_FORMAT_PATCH(1)</filename> displayed using the
+                    <filename>man git-format-patch</filename> command.</para>
+                    <note>If you are or will be a frequent contributor to the Yocto Project
+                    or to OpenEmbedded, you might consider requesting a contrib area and the
+                    necessary associated rights.</note></listitem>
+                <listitem><para>Import the files into your mail client by using the
+                    <filename>git send-email</filename> command.
+                    <note>In order to use <filename>git send-email</filename>, you must have the
+                    the proper Git packages installed.
+                    For Ubuntu, Debian, and Fedora the package is <filename>git-email</filename>.</note></para>
+                    <para>The <filename>git send-email</filename> command sends email by using a local
+                    or remote Mail Transport Agent (MTA) such as
+                    <filename>msmtp</filename>, <filename>sendmail</filename>, or through a direct
+                    <filename>smtp</filename> configuration in your Git <filename>config</filename>
+                    file.
+                    If you are submitting patches through email only, it is very important
+                    that you submit them without any whitespace or HTML formatting that
+                    either you or your mailer introduces.
+                    The maintainer that receives your patches needs to be able to save and
+                    apply them directly from your emails.
+                    A good way to verify that what you are sending will be applicable by the
+                    maintainer is to do a dry run and send them to yourself and then
+                    save and apply them as the maintainer would.</para>
+                    <para>The <filename>git send-email</filename> command is the preferred method
+                    for sending your patches since there is no risk of compromising whitespace
+                    in the body of the message, which can occur when you use your own mail client.
+                    The command also has several options that let you
+                    specify recipients and perform further editing of the email message.
+                    For information on how to use the <filename>git send-email</filename> command,
+                    see <filename>GIT-SEND-EMAIL(1)</filename> displayed using
+                    the <filename>man git-send-email</filename> command.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+</section>
+</chapter>
+<!--
+vim: expandtab tw=80 ts=4
+-->

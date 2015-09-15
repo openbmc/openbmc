@@ -1,0 +1,3 @@
+# Assume a USB mouse and touchscreen are connected
+HAVE_TOUCHSCREEN=0
+HAVE_KEYBOARD=1

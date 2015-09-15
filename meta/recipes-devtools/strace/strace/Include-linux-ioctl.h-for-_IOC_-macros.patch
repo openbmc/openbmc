@@ -1,0 +1,69 @@
+Upstream-Status: Backport
+
+  http://sourceforge.net/p/strace/code/ci/3460dc486d333231998de0f19918204aacee9ae3
+
+Expected to be released officially as part of strace 4.11
+
+Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+
+From 3460dc486d333231998de0f19918204aacee9ae3 Mon Sep 17 00:00:00 2001
+From: Felix Janda <felix.janda@posteo.de>
+Date: Sat, 28 Mar 2015 18:40:13 +0100
+Subject: [PATCH] Include <linux/ioctl.h> for _IOC_* macros
+
+Fix a compilation failure with musl libc.
+
+* evdev.c: Include <linux/ioctl.h>.
+* ioctl.c: Include <linux/ioctl.h> instead of <asm/ioctl.h>.
+* ioctlsort.c: Likewise.
+
+Reported-by: Dima Krasner <dima@dimakrasner.com>
+Acked-by: Mike Frysinger <vapier@gentoo.org>
+---
+ evdev.c     | 2 ++
+ ioctl.c     | 2 +-
+ ioctlsort.c | 2 +-
+ 3 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/evdev.c b/evdev.c
+index 9a7430d..e06f9c1 100644
+--- a/evdev.c
++++ b/evdev.c
+@@ -28,6 +28,8 @@
+ 
+ #include "defs.h"
+ 
++#include <linux/ioctl.h>
++
+ #ifdef HAVE_LINUX_INPUT_H
+ #include <linux/input.h>
+ #include "xlat/evdev_abs.h"
+diff --git a/ioctl.c b/ioctl.c
+index 46f8334..c67d048 100644
+--- a/ioctl.c
++++ b/ioctl.c
+@@ -29,7 +29,7 @@
+  */
+ 
+ #include "defs.h"
+-#include <asm/ioctl.h>
++#include <linux/ioctl.h>
+ #include "xlat/ioctl_dirs.h"
+ 
+ #ifdef HAVE_LINUX_INPUT_H
+diff --git a/ioctlsort.c b/ioctlsort.c
+index 333556c..9c31691 100644
+--- a/ioctlsort.c
++++ b/ioctlsort.c
+@@ -33,7 +33,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+-#include <asm/ioctl.h>
++#include <linux/ioctl.h>
+ 
+ struct ioctlent {
+ 	const char *info;
+-- 
+1.9.1
+

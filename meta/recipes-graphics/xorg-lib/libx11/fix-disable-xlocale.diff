@@ -1,0 +1,17 @@
+Upstream-Status: Pending
+
+Signed-off-by: Xiaofeng Yan <xiaofeng.yan@windriver.com>
+--- libX11-X11R7.0-1.0.0/src/Font.c.orig	2006-03-12 18:35:42.000000000 +0100
++++ libX11-X11R7.0-1.0.0/src/Font.c	2006-03-12 18:40:27.000000000 +0100
+@@ -701,7 +701,11 @@
+     }
+     if (l - 2 - (p - charset) < 0)
+ 	return 0;
++#ifdef XLOCALE
+     if (_XlcNCompareISOLatin1(name + l - 2 - (p - charset), charset, p - charset))
++#else
++    if (strncasecmp(name + l - 2 - (p - charset), charset, p - charset))
++#endif
+ 	return 0;
+     if (strlen(p + 1) + l - 1 >= sizeof(buf) - 1)
+ 	return 0;

@@ -1,0 +1,58 @@
+
+MirOS License
+
+/*-
+* Copyright &#169; year, year, year, &#8230;
+* First M. Last <user@host.domain>
+*
+* Provided that these terms and disclaimer and all copyright notices
+* are retained or reproduced in an accompanying document, permission
+* is granted to deal in this work without restriction, including un&#8208;
+* limited rights to use, publicly perform, distribute, sell, modify,
+* merge, give away, or sublicence.
+*
+* This work is provided "AS IS" and WITHOUT WARRANTY of any kind, to
+* the utmost extent permitted by applicable law, neither express nor
+* implied; without malicious intent or gross negligence. In no event
+* may a licensor, author or contributor be held liable for indirect,
+* direct, other damage, loss, or other issues arising in any way out
+* of dealing in the work, even if advised of the possibility of such
+* damage or existence of a defect, except proven that it results out
+* of said person`s immediate fault when using the work as intended.
+*/
+
+I_N_S_T_R_U_C_T_I_O_N_S_:_
+To apply the template(&#185;) specify the years of copyright (separated by
+comma, not as a range), the legal names of the copyright holders, and
+the real names of the authors if different. Avoid adding text.
+
+R_A_T_I_O_N_A_L_E_:_
+This licence is apt for any kind of work (such as source code, fonts,
+documentation, graphics, sound etc.) and the preferred terms for work
+added to MirBSD. It has been drafted as universally usable equivalent
+of the "historic permission notice"&#8317;&#178;&#8318; adapted to Europen law because
+in some (droit d`auteur) countries authors cannot disclaim all liabi&#8208;
+lities. Compliance to DFSG&#8317;&#179;&#8318; 1.1 is ensured, and GPLv2 compatibility
+is asserted unless advertising clauses are used. The MirOS Licence is
+certified to conform to OKD&#8317;&#8308;&#8318; 1.0 and OSD&#8317;&#8309;&#8318; 1.9, and qualifies as a
+Free Software&#8317;&#8310;&#8318; and also Free Documentation&#8317;&#8311;&#8318; licence and is inclu&#8208;
+ded in some relevant lists&#8317;&#8312;&#8318;&#8317;&#8313;&#8318;&#8317;&#185;&#8304;&#8318;.
+
+We believe you are not liable for work inserted which is intellectual
+property of third parties, if you were not aware of the fact, act ap&#8208;
+propriately as soon as you become aware of that problem, seek an ami&#8208;
+cable solution for all parties, and never knowingly distribute a work
+without being authorised to do so by its licensors.
+
+R_E_F_E_R_E_N_C_E_S_:_
+&#9312; also at http://mirbsd.de/MirOS-Licence
+&#9313; http://www.opensource.org/licenses/historical.php
+&#9314; http://www.debian.org/social_contract#guidelines
+&#9315; http://www.opendefinition.org/1.0
+&#9316; http://www.opensource.org/docs/osd
+&#9317; http://www.gnu.org/philosophy/free-sw.html
+&#9318; http://www.gnu.org/philosophy/free-doc.html
+&#9319; http://www.ifross.de/ifross_html/lizenzcenter.html
+&#9320; http://www.opendefinition.org/licenses
+&#9321; http://opensource.org/licenses/miros.html
+

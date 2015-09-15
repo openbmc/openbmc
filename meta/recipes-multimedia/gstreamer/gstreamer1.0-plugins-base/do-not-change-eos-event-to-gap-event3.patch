@@ -1,0 +1,31 @@
+commit 3f7052aac5e0118a9a9e09fff2f65091be448972
+Author: Song Bing <b06498@freescale.com>
+Date:   Thu Oct 23 13:35:13 2014 +0800
+
+[streamsynchronizer] One stream can finish playback.
+  
+As changed GAP event EOS event, so EOS will send more times, which will
+cause send function return error.
+Streamsynchronizer will don’t send second track EOS event if send the
+first track EOS return fail. Fixed by ignore the return error.
+
+Upstream-Status: Submitted [https://bugzilla.gnome.org/show_bug.cgi?id=736655]
+
+Signed-off-by: Song Bing b06498@freescale.com
+
+diff --git a/gst/playback/gststreamsynchronizer.c b/gst/playback/gststreamsynchronizer.c
+index ff42d72..d1732c3 100644
+--- a/gst/playback/gststreamsynchronizer.c
++++ b/gst/playback/gststreamsynchronizer.c
+@@ -482,7 +482,10 @@ gst_stream_synchronizer_sink_event (GstPad * pad, GstObject * parent,
+         while (epad) {
+           pad = epad->data;
+           GST_DEBUG_OBJECT (pad, "Pushing EOS");
+-          ret = ret && gst_pad_push_event (pad, gst_event_new_eos ());
++          /* FIXME: remove error check as GAP changed to EOS will send EOS
++           * more times, which will cause return error and then don't send
++           * EOS event to following tracks. */
++          gst_pad_push_event (pad, gst_event_new_eos ());
+           gst_object_unref (pad);
+           epad = g_slist_next (epad);
+         }

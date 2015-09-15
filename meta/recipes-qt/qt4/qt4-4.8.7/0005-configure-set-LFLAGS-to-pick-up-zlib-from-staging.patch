@@ -1,0 +1,28 @@
+From ac93237bc90ea7773c0ef5275962baba01d4a9c7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jeremy=20Lain=C3=A9?= <jeremy.laine@m4x.org>
+Date: Wed, 26 Sep 2012 20:27:44 +0200
+Subject: [PATCH 05/21] configure: set LFLAGS to pick up zlib from staging
+
+Upstream-Status: Pending
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure b/configure
+index cc04b27..5a7c4ee 100755
+--- a/configure
++++ b/configure
+@@ -690,7 +690,7 @@ fi
+ # initalize variables
+ #-------------------------------------------------------------------------------
+ 
+-SYSTEM_VARIABLES="RANLIB STRIP OBJDUMP LD CC CXX CFLAGS CXXFLAGS LDFLAGS"
++SYSTEM_VARIABLES="RANLIB STRIP OBJDUMP LD CC CXX CFLAGS CXXFLAGS LDFLAGS LFLAGS"
+ for varname in $SYSTEM_VARIABLES; do
+     qmakevarname="${varname}"
+     # use LDFLAGS for autoconf compat, but qmake uses QMAKE_LFLAGS
+-- 
+1.8.0
+

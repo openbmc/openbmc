@@ -1,0 +1,4 @@
+#!/bin/sh
+
+exec run-parts -a "$1" /etc/udhcpc.d
+

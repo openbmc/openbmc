@@ -1,0 +1,44 @@
+#!/bin/sh
+DAEMON=/usr/sbin/httpd
+NAME=httpd
+DESC="Busybox HTTP Daemon"
+HTTPROOT="/srv/www"
+ARGS="-h $HTTPROOT"
+
+test -f $DAEMON || exit 0
+
+set -e
+
+case "$1" in
+    start)
+        echo -n "starting $DESC: $NAME... "
+	if [ ! -d $HTTPROOT ]; then
+		echo "$HTTPROOT is missing."
+		exit 1
+	fi
+	start-stop-daemon -S -b -n $NAME -a $DAEMON -- $ARGS
+	echo "done."
+	;;
+    stop)
+        echo -n "stopping $DESC: $NAME... "
+	start-stop-daemon -K -n $NAME
+	echo "done."
+	;;
+    restart)
+        echo "restarting $DESC: $NAME... "
+ 	$0 stop
+	$0 start
+	echo "done."
+	;;
+    reload)
+    	echo -n "reloading $DESC: $NAME... "
+    	killall -HUP $(basename ${DAEMON})
+	echo "done."
+	;;
+    *)
+	echo "Usage: $0 {start|stop|restart|reload}"
+	exit 1
+	;;
+esac
+
+exit 0

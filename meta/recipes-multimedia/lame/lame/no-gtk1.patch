@@ -1,0 +1,20 @@
+Upstream-Status: Inappropriate [configuration]
+
+# Acquired from OpenEmbedded
+
+--- lame-3.96.1/configure.in~no-gtk1.patch	2004-07-25 15:52:12.000000000 +0100
++++ lame-3.96.1/configure.in	2004-09-10 15:54:39.000000000 +0100
+@@ -363,7 +363,12 @@
+ 
+ dnl configure use of features
+ 
+-AM_PATH_GTK(1.2.0, HAVE_GTK="yes", HAVE_GTK="no")
++#AM_PATH_GTK(1.2.0, HAVE_GTK="yes", HAVE_GTK="no")
++HAVE_GTK="no"
++GTK_CFLAGS=""
++GTK_LIBS=""
++AC_SUBST(GTK_CFLAGS)
++AC_SUBST(GTK_LIBS)
+
+ dnl ElectricFence malloc debugging
+ AC_MSG_CHECKING(use of ElectricFence malloc debugging)

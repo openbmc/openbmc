@@ -1,0 +1,196 @@
+#!/usr/bin/env python
+
+# Sends an error report (if the report-error class was enabled) to a
+# remote server.
+#
+# Copyright (C) 2013 Intel Corporation
+# Author: Andreea Proca <andreea.b.proca@intel.com>
+# Author: Michael Wood <michael.g.wood@intel.com>
+
+import urllib2
+import sys
+import json
+import os
+import subprocess
+import argparse
+import logging
+
+version = "0.3"
+
+log = logging.getLogger("send-error-report")
+logging.basicConfig(format='%(levelname)s: %(message)s')
+
+def getPayloadLimit(url):
+    req = urllib2.Request(url, None)
+    try:
+        response = urllib2.urlopen(req)
+    except urllib2.URLError as e:
+        # Use this opportunity to bail out if we can't even contact the server
+        log.error("Could not contact server: " + url)
+        log.error(e.reason)
+        sys.exit(1)
+    try:
+        ret = json.loads(response.read())
+        max_log_size = ret.get('max_log_size', 0)
+        return int(max_log_size)
+    except:
+        pass
+
+    return 0
+
+def ask_for_contactdetails():
+    print("Please enter your name and your email (optionally), they'll be saved in the file you send.")
+    username = raw_input("Name (required): ")
+    email = raw_input("E-mail (not required): ")
+    return username, email
+
+def edit_content(json_file_path):
+    edit = raw_input("Review information before sending? (y/n): ")
+    if 'y' in edit or 'Y' in edit:
+        editor = os.environ.get('EDITOR', None)
+        if editor:
+            subprocess.check_call([editor, json_file_path])
+        else:
+            log.error("Please set your EDITOR value")
+            sys.exit(1)
+        return True
+    return False
+
+def prepare_data(args):
+    # attempt to get the max_log_size from the server's settings
+    max_log_size = getPayloadLimit("http://"+args.server+"/ClientPost/JSON")
+
+    if not os.path.isfile(args.error_file):
+        log.error("No data file found.")
+        sys.exit(1)
+
+    home = os.path.expanduser("~")
+    userfile = os.path.join(home, ".oe-send-error")
+
+    try:
+        with open(userfile, 'r') as userfile_fp:
+            if len(args.name) == 0:
+                args.name = userfile_fp.readline()
+            else:
+                #use empty readline to increment the fp
+                userfile_fp.readline()
+
+            if len(args.email) == 0:
+                args.email = userfile_fp.readline()
+    except:
+        pass
+
+    if args.assume_yes == True and len(args.name) == 0:
+        log.error("Name needs to be provided either via "+userfile+" or as an argument (-n).")
+        sys.exit(1)
+
+    while len(args.name) <= 0 and len(args.name) < 50:
+        print("\nName needs to be given and must not more than 50 characters.")
+        args.name, args.email = ask_for_contactdetails()
+
+    with open(userfile, 'w') as userfile_fp:
+        userfile_fp.write(args.name.strip() + "\n")
+        userfile_fp.write(args.email.strip() + "\n")
+
+    with open(args.error_file, 'r') as json_fp:
+        data = json_fp.read()
+
+        jsondata = json.loads(data)
+        jsondata['username'] = args.name.strip()
+        jsondata['email'] = args.email.strip()
+        jsondata['link_back'] = args.link_back.strip()
+        # If we got a max_log_size then use this to truncate to get the last
+        # max_log_size bytes from the end
+        if max_log_size != 0:
+            for fail in jsondata['failures']:
+                if len(fail['log']) > max_log_size:
+                    print "Truncating log to allow for upload"
+                    fail['log'] = fail['log'][-max_log_size:]
+
+        data = json.dumps(jsondata, indent=4, sort_keys=True)
+
+    # Write back the result which will contain all fields filled in and
+    # any post processing done on the log data
+    with open(args.error_file, "w") as json_fp:
+        if data:
+            json_fp.write(data)
+
+
+    if args.assume_yes == False and edit_content(args.error_file):
+        #We'll need to re-read the content if we edited it
+        with open(args.error_file, 'r') as json_fp:
+            data = json_fp.read()
+
+    return data
+
+
+def send_data(data, args):
+    headers={'Content-type': 'application/json', 'User-Agent': "send-error-report/"+version}
+
+    if args.json:
+        url = "http://"+args.server+"/ClientPost/JSON/"
+    else:
+        url = "http://"+args.server+"/ClientPost/"
+
+    req = urllib2.Request(url, data=data, headers=headers)
+    try:
+        response = urllib2.urlopen(req)
+    except urllib2.HTTPError, e:
+        logging.error(e.reason)
+        sys.exit(1)
+
+    print response.read()
+
+
+if __name__ == '__main__':
+    arg_parse = argparse.ArgumentParser(description="This scripts will send an error report to your specified error-report-web server.")
+
+    arg_parse.add_argument("error_file",
+                           help="Generated error report file location",
+                           type=str)
+
+    arg_parse.add_argument("-y",
+                           "--assume-yes",
+                           help="Assume yes to all queries and do not prompt",
+                           action="store_true")
+
+    arg_parse.add_argument("-s",
+                           "--server",
+                           help="Server to send error report to",
+                           type=str,
+                           default="errors.yoctoproject.org")
+
+    arg_parse.add_argument("-e",
+                           "--email",
+                           help="Email address to be used for contact",
+                           type=str,
+                           default="")
+
+    arg_parse.add_argument("-n",
+                           "--name",
+                           help="Submitter name used to identify your error report",
+                           type=str,
+                           default="")
+
+    arg_parse.add_argument("-l",
+                           "--link-back",
+                           help="A url to link back to this build from the error report server",
+                           type=str,
+                           default="")
+
+    arg_parse.add_argument("-j",
+                           "--json",
+                           help="Return the result in json format, silences all other output",
+                           action="store_true")
+
+
+
+    args = arg_parse.parse_args()
+
+    if (args.json == False):
+        print "Preparing to send errors to: "+args.server
+
+    data = prepare_data(args)
+    send_data(data, args)
+
+    sys.exit(0)

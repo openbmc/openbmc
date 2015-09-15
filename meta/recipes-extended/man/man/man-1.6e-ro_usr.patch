@@ -1,0 +1,33 @@
+Upstream-Status: Pending
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+Index: man-1.6f/src/makewhatis.sh
+===================================================================
+--- man-1.6f.orig/src/makewhatis.sh	2010-12-29 13:42:34.000000000 -0800
++++ man-1.6f/src/makewhatis.sh	2010-12-29 13:42:35.667428347 -0800
+@@ -124,7 +124,7 @@
+ 	continue;;
+     -s) setsections=1
+ 	continue;;
+-    -u) findarg="-ctime 0"
++    -u) findarg="-newer /var/cache/man/whatis"
+ 	update=1
+ 	continue;;
+     -v) verbose=1
+@@ -165,14 +165,7 @@
+ # first truncate all the whatis files that will be created new,
+ # then only update - we might visit the same directory twice
+ if [ x$update = x ]; then
+-   for pages in man cat
+-   do
+-      eval path="\$$pages"path
+-      for mandir in $path
+-      do
+-	 cp /dev/null $mandir/whatis
+-      done
+-   done
++   cp /dev/null /var/cache/man/whatis
+ fi
+ 
+ for pages in man cat

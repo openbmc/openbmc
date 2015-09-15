@@ -1,0 +1,52 @@
+From e129dc0d6cde69dd15d1836c4111e0526fc29161 Mon Sep 17 00:00:00 2001
+From: Paul Eggleton <paul.eggleton@linux.intel.com>
+Date: Wed, 26 Sep 2012 20:33:49 +0200
+Subject: [PATCH 09/21] qmake: fix source file references in qmake.pri
+
+Fix duplicate entries in SOURCES and HEADERS, and fix the source file
+list for the split of qlocale.cpp.
+
+Upstream-Status: Pending
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ qmake/qmake.pri | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/qmake/qmake.pri b/qmake/qmake.pri
+index 31f67f4..9081669 100644
+--- a/qmake/qmake.pri
++++ b/qmake/qmake.pri
+@@ -22,8 +22,7 @@ SOURCES += project.cpp property.cpp main.cpp generators/makefile.cpp \
+            generators/symbian/initprojectdeploy_symbian.cpp \
+            generators/integrity/gbuild.cpp \
+            windows/registry.cpp \
+-           symbian/epocroot.cpp \
+-           generators/integrity/gbuild.cpp
++           symbian/epocroot.cpp
+ 
+ HEADERS += project.h property.h generators/makefile.h \
+            generators/unix/unixmake.h meta.h option.h cachekeys.h \
+@@ -40,8 +39,7 @@ HEADERS += project.h property.h generators/makefile.h \
+            generators/symbian/initprojectdeploy_symbian.h \
+            generators/integrity/gbuild.h \
+            windows/registry_p.h \
+-           symbian/epocroot_p.h \
+-           generators/integrity/gbuild.h
++           symbian/epocroot_p.h
+ 
+ contains(QT_EDITION, OpenSource) {
+    DEFINES += QMAKE_OPENSOURCE_EDITION
+@@ -72,6 +70,8 @@ bootstrap { #Qt code
+         qlist.cpp \
+         qlinkedlist.cpp \
+         qlocale.cpp \
++        qlocale_tools.cpp \
++        qlocale_unix.cpp \
+         qmalloc.cpp \
+         qmap.cpp \
+         qmetatype.cpp \
+-- 
+1.8.0
+

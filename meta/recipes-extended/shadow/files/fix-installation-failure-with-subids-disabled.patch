@@ -1,0 +1,28 @@
+Upstream-Status: Pending
+
+Subject: fix installation failure with subids disabled
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/Makefile.am |    5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 25e288d..076f8ef 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -52,7 +52,10 @@ usbin_PROGRAMS = \
+ noinst_PROGRAMS = id sulogin
+ 
+ suidbins       = su
+-suidubins      = chage chfn chsh expiry gpasswd newgrp passwd newuidmap newgidmap
++suidubins      = chage chfn chsh expiry gpasswd newgrp passwd
++if ENABLE_SUBIDS
++suidubins += newgidmap newuidmap
++endif
+ if ACCT_TOOLS_SETUID
+ 	suidubins += chage chgpasswd chpasswd groupadd groupdel groupmod newusers useradd userdel usermod
+ endif
+-- 
+1.7.9.5
+

@@ -1,0 +1,29 @@
+#!/bin/sh
+
+test1="test-alloc-extra test-array-nr test-array-r test-basic-nr test-basic-r test-extended test-quotes \
+test-bison-nr test-bison-yylloc test-bison-yylval test-c++-basic test-c-cpp-nr test-prefix-nr test-ccl \
+test-c-cpp-r test-c++-multiple-scanners test-mem-r test-mem-nr test-debug-nr test-linedir-r test-noansi-r \
+test-yyextra test-header-r test-noansi-nr test-debug-r TEMPLATE test-top test-header-nr test-prefix-r"
+test2="test-multiple-scanners-nr test-posixly-correct test-posix test-string-r test-string-nr"
+test3="test-pthread test-include-by-push test-include-by-buffer test-include-by-reentrant"
+test4="test-lineno-nr test-lineno-r test-lineno-trailing"
+test5="test-c++-yywrap test-rescan-r test-rescan-nr"
+test6="test-reject-nr test-reject-r"
+test7="test-reject-ser test-reject-ver"
+test8="test-multiple-scanners-r"
+
+output() {
+  if [ $? -eq 0 ]; \
+    then echo "PASS: $i"; \
+    else echo "FAIL: $i"; \
+  fi;
+}
+
+for i in $test1; do $i/$i < $i/test.input >/dev/null; output; done
+for i in $test2; do $i/$i >/dev/null; output; done
+for i in $test3; do cd $i; ./$i test-1.input >/dev/null; output; cd ..; done
+for i in $test4; do test `$i/$i < $i/test.input` -eq `$i/$i 1 < $i/test.input` >/dev/null; output; done
+for i in $test5; do $i/$i $i/test.input >/dev/null; output; done
+for i in $test6; do test-reject/$i < test-reject/test.input >/dev/null; output; done
+for i in $test7; do test-reject/$i test-reject/$i.tables < test-reject/test.input >/dev/null; output; done
+cd $test8; ./$test8 >/dev/null; i=$test8 output

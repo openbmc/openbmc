@@ -1,0 +1,29 @@
+We have problem using hardcoded directories like /usr/local here
+which will be checked for cross builds. This is a special case which
+is valid for AIX only. We do not have AIX as one of our supported
+build host or target. Therefore we get rid of the hardcoded paths
+and make life easier for cross compilation process.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Inappropriate [Upstream does care for AIX while we may not]
+Index: autoconf-2.68/lib/autoconf/functions.m4
+===================================================================
+--- autoconf-2.68.orig/lib/autoconf/functions.m4	2010-09-22 14:52:19.000000000 -0700
++++ autoconf-2.68/lib/autoconf/functions.m4	2011-08-03 11:57:05.822199513 -0700
+@@ -749,15 +749,6 @@ if test $ac_have_func = no; then
+     [LIBS="-lutil $LIBS" ac_have_func=yes ac_cv_func_getloadavg_setgid=yes])
+ fi
+ 
+-if test $ac_have_func = no; then
+-  # There is a commonly available library for RS/6000 AIX.
+-  # Since it is not a standard part of AIX, it might be installed locally.
+-  ac_getloadavg_LIBS=$LIBS
+-  LIBS="-L/usr/local/lib $LIBS"
+-  AC_CHECK_LIB(getloadavg, getloadavg,
+-	       [LIBS="-lgetloadavg $LIBS"], [LIBS=$ac_getloadavg_LIBS])
+-fi
+-
+ # Make sure it is really in the library, if we think we found it,
+ # otherwise set up the replacement function.
+ AC_CHECK_FUNCS(getloadavg, [],

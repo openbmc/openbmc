@@ -1,0 +1,76 @@
+From 697a834c35d19447b7dcdb9e1d9434bc6ce17c21 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?An=C3=ADbal=20Lim=C3=B3n?= <anibal.limon@linux.intel.com>
+Date: Wed, 12 Aug 2015 15:11:30 -0500
+Subject: [PATCH] cpus.c: Add error messages when qemi_cpu_kick_thread fails.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Add custom_debug.h with function for print backtrace information.
+When pthread_kill fails in qemu_cpu_kick_thread display backtrace and
+current cpu information.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Aníbal Limón <anibal.limon@linux.intel.com>
+---
+ cpus.c         |  5 +++++
+ custom_debug.h | 24 ++++++++++++++++++++++++
+ 2 files changed, 29 insertions(+)
+ create mode 100644 custom_debug.h
+
+diff --git a/cpus.c b/cpus.c
+index a822ce3..7e4786e 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1080,6 +1080,8 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+     return NULL;
+ }
+ 
++#include "custom_debug.h"
++
+ static void qemu_cpu_kick_thread(CPUState *cpu)
+ {
+ #ifndef _WIN32
+@@ -1088,6 +1090,9 @@ static void qemu_cpu_kick_thread(CPUState *cpu)
+     err = pthread_kill(cpu->thread->thread, SIG_IPI);
+     if (err) {
+         fprintf(stderr, "qemu:%s: %s", __func__, strerror(err));
++        fprintf(stderr, "CPU #%d:\n", cpu->cpu_index);
++        cpu_dump_state(cpu, stderr, fprintf, 0);
++        backtrace_print();
+         exit(1);
+     }
+ #else /* _WIN32 */
+diff --git a/custom_debug.h b/custom_debug.h
+new file mode 100644
+index 0000000..f029e45
+--- /dev/null
++++ b/custom_debug.h
+@@ -0,0 +1,24 @@
++#include <execinfo.h>
++#include <stdio.h>
++#define BACKTRACE_MAX 128
++static void backtrace_print(void)
++{
++	int nfuncs = 0;
++	void *buf[BACKTRACE_MAX];
++	char **symbols;
++	int i;
++
++	nfuncs = backtrace(buf, BACKTRACE_MAX);
++
++	symbols = backtrace_symbols(buf, nfuncs);
++	if (symbols == NULL) {
++		fprintf(stderr, "backtrace_print failed to get symbols");
++		return;
++	}
++
++	fprintf(stderr, "Backtrace ...\n");
++	for (i = 0; i < nfuncs; i++)
++		fprintf(stderr, "%s\n", symbols[i]);
++
++	free(symbols);
++}
+-- 
+1.9.1
+

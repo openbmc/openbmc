@@ -1,0 +1,104 @@
+Lua 'print' statement is not working properly inside of RPM 5
+
+The print statement should capture the output and send it to the script
+processing engine, and not display it directly to the screen.
+
+This patch is from: http://rpm5.org/cvs/patchset?cn=17671
+
+Upstream-Status: backport (patchset 17671 from rpm5.org)
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.14/CHANGES
+===================================================================
+--- rpm-5.4.14.orig/CHANGES
++++ rpm-5.4.14/CHANGES
+@@ -1,3 +1,4 @@
++    - jbj: lua: fix: resurrect output capture with lua-5.2.
+     - jbj: verify: fix: broken logic for %ghost avoidance (Mark Hatle).
+ 
+ 5.4.13 -> 5.4.14:
+Index: rpm-5.4.14/rpmio/rpmlua.c
+===================================================================
+--- rpm-5.4.14.orig/rpmio/rpmlua.c
++++ rpm-5.4.14/rpmio/rpmlua.c
+@@ -175,7 +175,7 @@ rpmlua rpmluaNew(void)
+     };
+     /*@=readonlytrans =nullassign @*/
+     /*@observer@*/ /*@unchecked@*/
+-    const luaL_Reg *lib = lualibs;
++    const luaL_Reg *lib;
+     char *path_buf;
+     char *path_next;
+     char *path;
+@@ -190,31 +190,34 @@ rpmlua rpmluaNew(void)
+ 
+     luaL_openlibs(L);
+ 
+-    for (; lib->name; lib++) {
++    for (lib = lualibs; lib->name; lib++) {
+ 	luaL_requiref(L, lib->name, lib->func, 1);
++	lua_pop(L, 1);
+     }
+ 
+     {	const char * _lua_path = rpmGetPath(rpmluaPath, NULL);
+  	if (_lua_path != NULL) {
++#if defined(LUA_GLOBALSINDEX)
+ 	    lua_pushliteral(L, "LUA_PATH");
+ 	    lua_pushstring(L, _lua_path);
++	    lua_rawset(L, LUA_GLOBALSINDEX);
++#else
++	    lua_pushstring(L, _lua_path);
++	    lua_setglobal(L, "LUA_PATH");
++#endif
+ 	    _lua_path = _free(_lua_path);
+ 	}
+     }
+ 
+ #if defined(LUA_GLOBALSINDEX)
+-    lua_rawset(L, LUA_GLOBALSINDEX);
+-#else
+-    lua_pushglobaltable(L);
+-#endif
+     lua_pushliteral(L, "print");
+     lua_pushcfunction(L, rpm_print);
+-
+-#if defined(LUA_GLOBALSINDEX)
+     lua_rawset(L, LUA_GLOBALSINDEX);
+ #else
+-    lua_pushglobaltable(L);
++    lua_pushcfunction(L, rpm_print);
++    lua_setglobal(L, "print");
+ #endif
++
+     rpmluaSetData(lua, "lua", lua);
+ 
+     /* load all standard RPM Lua script files */
+@@ -351,6 +354,9 @@ void rpmluaSetVar(rpmlua _lua, rpmluav v
+ #if defined(LUA_GLOBALSINDEX)
+ 	if (lua->pushsize == 0)
+ 	    lua_pushvalue(L, LUA_GLOBALSINDEX);
++#else
++	if (lua->pushsize == 0)
++	    lua_pushglobaltable(L);
+ #endif
+ 	if (pushvar(L, var->keyType, &var->key) != -1) {
+ 	    if (pushvar(L, var->valueType, &var->value) != -1)
+@@ -1039,14 +1045,15 @@ static int rpm_print (lua_State *L)
+     lua_getglobal(L, "tostring");
+     for (i = 1; i <= n; i++) {
+ 	const char *s;
++	size_t l;
+ 	lua_pushvalue(L, -1);  /* function to be called */
+ 	lua_pushvalue(L, i);   /* value to print */
+ 	lua_call(L, 1, 1);
+-	s = lua_tostring(L, -1);  /* get result */
++	s = lua_tolstring(L, -1, &l);  /* get result */
+ 	if (s == NULL)
+ 	    return luaL_error(L, "`tostring' must return a string to `print'");
+ 	if (lua->storeprint) {
+-	    size_t sl = lua_rawlen(L, -1);
++	    size_t sl = l;
+ 	    if ((size_t)(lua->printbufused+sl+1) > lua->printbufsize) {
+ 		lua->printbufsize += sl+512;
+ 		lua->printbuf = (char *) xrealloc(lua->printbuf, lua->printbufsize);

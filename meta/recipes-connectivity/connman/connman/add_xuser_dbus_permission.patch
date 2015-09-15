@@ -1,0 +1,21 @@
+Because Poky doesn't support at_console we need to special-case the session
+user.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/src/connman-dbus.conf b/src/connman-dbus.conf
+index 98a773e..466809c 100644
+--- a/src/connman-dbus.conf
++++ b/src/connman-dbus.conf
+@@ -8,6 +8,9 @@
+         <allow send_interface="net.connman.Counter"/>
+         <allow send_interface="net.connman.Notification"/>
+     </policy>
++    <policy user="xuser">
++        <allow send_destination="net.connman"/>
++    </policy>
+     <policy at_console="true">
+         <allow send_destination="net.connman"/>
+     </policy>

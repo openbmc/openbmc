@@ -1,0 +1,36 @@
+From 41534253b6b61ed4769eb6a3966698a50ee73b71 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 12 Jun 2015 17:08:46 +0300
+Subject: [PATCH] Remove the warning about deprecated paths in schemas
+
+Some schemas in gsettings-desktop-schemas (such as proxy and locale)
+are still using deprecated paths, as of 3.16.1. This causes warning
+messages, and meta/lib/oe/rootfs.py complaints about them.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+---
+ gio/glib-compile-schemas.c | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/gio/glib-compile-schemas.c b/gio/glib-compile-schemas.c
+index e42949b..ec79d7c 100644
+--- a/gio/glib-compile-schemas.c
++++ b/gio/glib-compile-schemas.c
+@@ -1202,12 +1202,6 @@ parse_state_start_schema (ParseState  *state,
+       return;
+     }
+ 
+-  if (path && (g_str_has_prefix (path, "/apps/") ||
+-               g_str_has_prefix (path, "/desktop/") ||
+-               g_str_has_prefix (path, "/system/")))
+-    g_printerr ("warning: Schema '%s' has path '%s'.  Paths starting with "
+-                "'/apps/', '/desktop/' or '/system/' are deprecated.\n", id, path);
+-
+   state->schema_state = schema_state_new (path, gettext_domain,
+                                           extends, extends_name, list_of);
+ 
+-- 
+2.1.4
+

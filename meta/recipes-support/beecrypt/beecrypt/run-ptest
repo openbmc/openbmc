@@ -1,0 +1,5 @@
+#!/bin/sh
+
+cd tests
+for i in `ls`; do ./$i; if [ $? -eq 0 ]; then echo "PASS: $i"; \
+    else echo "FAIL: $i"; fi; done

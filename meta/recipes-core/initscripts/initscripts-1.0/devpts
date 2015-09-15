@@ -1,0 +1,5 @@
+# GID of the `tty' group
+TTYGRP=5
+ 
+# Set to 600 to have `mesg n' be the default
+TTYMODE=620

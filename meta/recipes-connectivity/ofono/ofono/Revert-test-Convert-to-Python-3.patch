@@ -1,0 +1,1270 @@
+Upstream-Status: Inappropriate [configuration]
+
+From 572fc23f6efd65a2ef9e6c957b2506108738672b Mon Sep 17 00:00:00 2001
+From: Cristian Iorga <cristian.iorga@intel.com>
+Date: Mon, 25 Aug 2014 16:59:39 +0300
+Subject: [PATCH] Revert "test: Convert to Python 3"
+
+This reverts commit c027ab9fbc1a8e8c9e76bcd123df1ad7696307c2.
+---
+ test/activate-context          |  2 +-
+ test/answer-calls              |  2 +-
+ test/backtrace                 |  2 +-
+ test/cancel-ussd               |  2 +-
+ test/cdma-connman-disable      |  2 +-
+ test/cdma-connman-enable       |  2 +-
+ test/cdma-dial-number          |  2 +-
+ test/cdma-hangup               |  2 +-
+ test/cdma-list-call            |  2 +-
+ test/cdma-set-credentials      |  2 +-
+ test/change-pin                |  2 +-
+ test/create-internet-context   |  2 +-
+ test/create-mms-context        |  2 +-
+ test/create-multiparty         |  2 +-
+ test/deactivate-all            |  2 +-
+ test/deactivate-context        |  2 +-
+ test/dial-number               |  2 +-
+ test/disable-call-forwarding   |  2 +-
+ test/disable-gprs              |  2 +-
+ test/disable-modem             |  2 +-
+ test/display-icon              |  2 +-
+ test/enable-cbs                |  2 +-
+ test/enable-gprs               |  2 +-
+ test/enable-modem              |  2 +-
+ test/enter-pin                 |  2 +-
+ test/get-icon                  |  2 +-
+ test/get-operators             |  2 +-
+ test/get-tech-preference       |  2 +-
+ test/hangup-active             |  2 +-
+ test/hangup-all                |  2 +-
+ test/hangup-call               |  2 +-
+ test/hangup-multiparty         |  2 +-
+ test/hold-and-answer           |  2 +-
+ test/initiate-ussd             |  4 ++--
+ test/list-calls                |  2 +-
+ test/list-contexts             |  2 +-
+ test/list-messages             |  2 +-
+ test/list-modems               |  2 +-
+ test/list-operators            |  2 +-
+ test/lock-pin                  |  2 +-
+ test/lockdown-modem            |  2 +-
+ test/monitor-ofono             |  4 ++--
+ test/offline-modem             |  2 +-
+ test/online-modem              |  2 +-
+ test/private-chat              |  2 +-
+ test/process-context-settings  |  2 +-
+ test/receive-sms               |  2 +-
+ test/reject-calls              |  2 +-
+ test/release-and-answer        |  2 +-
+ test/release-and-swap          |  2 +-
+ test/remove-contexts           |  2 +-
+ test/reset-pin                 |  2 +-
+ test/scan-for-operators        |  2 +-
+ test/send-sms                  |  2 +-
+ test/send-ussd                 |  4 ++--
+ test/send-vcal                 |  2 +-
+ test/send-vcard                |  2 +-
+ test/set-call-forwarding       |  2 +-
+ test/set-cbs-topics            |  2 +-
+ test/set-context-property      |  2 +-
+ test/set-fast-dormancy         |  2 +-
+ test/set-gsm-band              |  2 +-
+ test/set-mic-volume            |  2 +-
+ test/set-mms-details           |  2 +-
+ test/set-msisdn                |  2 +-
+ test/set-roaming-allowed       |  2 +-
+ test/set-speaker-volume        |  2 +-
+ test/set-tech-preference       |  2 +-
+ test/set-tty                   |  2 +-
+ test/set-umts-band             |  2 +-
+ test/set-use-sms-reports       |  2 +-
+ test/swap-calls                |  2 +-
+ test/test-advice-of-charge     |  2 +-
+ test/test-call-barring         |  2 +-
+ test/test-call-forwarding      |  2 +-
+ test/test-call-settings        |  2 +-
+ test/test-cbs                  |  4 ++--
+ test/test-gnss                 |  4 ++--
+ test/test-message-waiting      |  2 +-
+ test/test-modem                |  2 +-
+ test/test-network-registration |  2 +-
+ test/test-phonebook            |  2 +-
+ test/test-push-notification    |  2 +-
+ test/test-smart-messaging      |  2 +-
+ test/test-sms                  | 18 +++++++++---------
+ test/test-ss                   |  2 +-
+ test/test-ss-control-cb        |  2 +-
+ test/test-ss-control-cf        |  2 +-
+ test/test-ss-control-cs        |  2 +-
+ test/test-stk-menu             | 34 +++++++++++++++++-----------------
+ test/unlock-pin                |  2 +-
+ 94 files changed, 124 insertions(+), 124 deletions(-)
+
+diff --git a/test/activate-context b/test/activate-context
+index e4fc702..4241396 100755
+--- a/test/activate-context
++++ b/test/activate-context
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/answer-calls b/test/answer-calls
+index daa794b..45ff08f 100755
+--- a/test/answer-calls
++++ b/test/answer-calls
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ 
+diff --git a/test/backtrace b/test/backtrace
+index 03c7632..c624709 100755
+--- a/test/backtrace
++++ b/test/backtrace
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import os
+ import re
+diff --git a/test/cancel-ussd b/test/cancel-ussd
+index e7559ba..1797f26 100755
+--- a/test/cancel-ussd
++++ b/test/cancel-ussd
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/cdma-connman-disable b/test/cdma-connman-disable
+index 3adc14d..0ddc0cd 100755
+--- a/test/cdma-connman-disable
++++ b/test/cdma-connman-disable
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ import sys
+diff --git a/test/cdma-connman-enable b/test/cdma-connman-enable
+index ac16a2d..a3cca01 100755
+--- a/test/cdma-connman-enable
++++ b/test/cdma-connman-enable
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ import sys
+diff --git a/test/cdma-dial-number b/test/cdma-dial-number
+index 683431e..9cdfb24 100755
+--- a/test/cdma-dial-number
++++ b/test/cdma-dial-number
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/cdma-hangup b/test/cdma-hangup
+index 41ffa60..493ece4 100755
+--- a/test/cdma-hangup
++++ b/test/cdma-hangup
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/cdma-list-call b/test/cdma-list-call
+index b132353..5d36a69 100755
+--- a/test/cdma-list-call
++++ b/test/cdma-list-call
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ 
+diff --git a/test/cdma-set-credentials b/test/cdma-set-credentials
+index a60c86e..a286b0e 100755
+--- a/test/cdma-set-credentials
++++ b/test/cdma-set-credentials
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ import sys
+diff --git a/test/change-pin b/test/change-pin
+index 301c6ce..000ce53 100755
+--- a/test/change-pin
++++ b/test/change-pin
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ import sys
+diff --git a/test/create-internet-context b/test/create-internet-context
+index 1089053..efd0998 100755
+--- a/test/create-internet-context
++++ b/test/create-internet-context
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/create-mms-context b/test/create-mms-context
+index 598336f..e5be08d 100755
+--- a/test/create-mms-context
++++ b/test/create-mms-context
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/create-multiparty b/test/create-multiparty
+index 1b76010..97047c3 100755
+--- a/test/create-multiparty
++++ b/test/create-multiparty
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/deactivate-all b/test/deactivate-all
+index 5aa8587..427009e 100755
+--- a/test/deactivate-all
++++ b/test/deactivate-all
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/deactivate-context b/test/deactivate-context
+index 5c86a71..df47d2e 100755
+--- a/test/deactivate-context
++++ b/test/deactivate-context
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/dial-number b/test/dial-number
+index fe5adad..ee674d9 100755
+--- a/test/dial-number
++++ b/test/dial-number
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/disable-call-forwarding b/test/disable-call-forwarding
+index 811e4fa..3609816 100755
+--- a/test/disable-call-forwarding
++++ b/test/disable-call-forwarding
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ from gi.repository import GLib
+diff --git a/test/disable-gprs b/test/disable-gprs
+index 61ce216..c6c40a5 100755
+--- a/test/disable-gprs
++++ b/test/disable-gprs
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ import sys
+diff --git a/test/disable-modem b/test/disable-modem
+index 6fba857..ca8c8d8 100755
+--- a/test/disable-modem
++++ b/test/disable-modem
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ import sys
+diff --git a/test/display-icon b/test/display-icon
+index ac40818..753d14d 100755
+--- a/test/display-icon
++++ b/test/display-icon
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/enable-cbs b/test/enable-cbs
+index 4a8bf66..c08bf2b 100755
+--- a/test/enable-cbs
++++ b/test/enable-cbs
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ import sys
+diff --git a/test/enable-gprs b/test/enable-gprs
+index 68d5ef0..8664891 100755
+--- a/test/enable-gprs
++++ b/test/enable-gprs
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ import sys
+diff --git a/test/enable-modem b/test/enable-modem
+index fc5958a..dfaaaa8 100755
+--- a/test/enable-modem
++++ b/test/enable-modem
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ import sys
+diff --git a/test/enter-pin b/test/enter-pin
+index 9556363..c6ee669 100755
+--- a/test/enter-pin
++++ b/test/enter-pin
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ import sys
+diff --git a/test/get-icon b/test/get-icon
+index 5569a33..fdaaee7 100755
+--- a/test/get-icon
++++ b/test/get-icon
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ import sys
+diff --git a/test/get-operators b/test/get-operators
+index 0f35c80..62354c5 100755
+--- a/test/get-operators
++++ b/test/get-operators
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ import sys
+diff --git a/test/get-tech-preference b/test/get-tech-preference
+index 7ba6365..77d20d0 100755
+--- a/test/get-tech-preference
++++ b/test/get-tech-preference
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus, sys
+ 
+diff --git a/test/hangup-active b/test/hangup-active
+index 82e0eb0..5af62ab 100755
+--- a/test/hangup-active
++++ b/test/hangup-active
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/hangup-all b/test/hangup-all
+index 3a0138d..32933db 100755
+--- a/test/hangup-all
++++ b/test/hangup-all
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/hangup-call b/test/hangup-call
+index 5a2de20..447020c 100755
+--- a/test/hangup-call
++++ b/test/hangup-call
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/hangup-multiparty b/test/hangup-multiparty
+index 24751c3..48fe342 100755
+--- a/test/hangup-multiparty
++++ b/test/hangup-multiparty
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/hold-and-answer b/test/hold-and-answer
+index da3be57..2c47e27 100755
+--- a/test/hold-and-answer
++++ b/test/hold-and-answer
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/initiate-ussd b/test/initiate-ussd
+index faf50d0..d7022f1 100755
+--- a/test/initiate-ussd
++++ b/test/initiate-ussd
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+@@ -45,7 +45,7 @@ if state == "idle":
+ print("State: %s" % (state))
+ 
+ while state == "user-response":
+-	response = input("Enter response: ")
++	response = raw_input("Enter response: ")
+ 
+ 	result = ussd.Respond(response, timeout=100)
+ 
+diff --git a/test/list-calls b/test/list-calls
+index f3ee991..08668c6 100755
+--- a/test/list-calls
++++ b/test/list-calls
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ 
+diff --git a/test/list-contexts b/test/list-contexts
+index 78278ca..f0d4094 100755
+--- a/test/list-contexts
++++ b/test/list-contexts
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ 
+diff --git a/test/list-messages b/test/list-messages
+index 9f5bce3..cfccbea 100755
+--- a/test/list-messages
++++ b/test/list-messages
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ 
+diff --git a/test/list-modems b/test/list-modems
+index b9f510a..ed66124 100755
+--- a/test/list-modems
++++ b/test/list-modems
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ 
+diff --git a/test/list-operators b/test/list-operators
+index 064c4e3..349bf41 100755
+--- a/test/list-operators
++++ b/test/list-operators
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ import sys
+diff --git a/test/lock-pin b/test/lock-pin
+index 96ea9c2..5579735 100755
+--- a/test/lock-pin
++++ b/test/lock-pin
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ import sys
+diff --git a/test/lockdown-modem b/test/lockdown-modem
+index 4e04205..781abb6 100755
+--- a/test/lockdown-modem
++++ b/test/lockdown-modem
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ import sys
+diff --git a/test/monitor-ofono b/test/monitor-ofono
+index 8830757..bd31617 100755
+--- a/test/monitor-ofono
++++ b/test/monitor-ofono
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ from gi.repository import GLib
+ 
+@@ -6,7 +6,7 @@ import dbus
+ import dbus.mainloop.glib
+ 
+ _dbus2py = {
+-	dbus.String : str,
++	dbus.String : unicode,
+ 	dbus.UInt32 : int,
+ 	dbus.Int32 : int,
+ 	dbus.Int16 : int,
+diff --git a/test/offline-modem b/test/offline-modem
+index e8c043a..ea1f522 100755
+--- a/test/offline-modem
++++ b/test/offline-modem
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus, sys
+ 
+diff --git a/test/online-modem b/test/online-modem
+index 029c4a5..310ed7d 100755
+--- a/test/online-modem
++++ b/test/online-modem
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus, sys
+ 
+diff --git a/test/private-chat b/test/private-chat
+index e7e5406..ef2ef6c 100755
+--- a/test/private-chat
++++ b/test/private-chat
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/process-context-settings b/test/process-context-settings
+index 8a3ecfa..0f058b2 100755
+--- a/test/process-context-settings
++++ b/test/process-context-settings
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import os
+ import dbus
+diff --git a/test/receive-sms b/test/receive-sms
+index a0c6915..c23eb14 100755
+--- a/test/receive-sms
++++ b/test/receive-sms
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ from gi.repository import GLib
+ 
+diff --git a/test/reject-calls b/test/reject-calls
+index 71b243e..9edf1ff 100755
+--- a/test/reject-calls
++++ b/test/reject-calls
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ 
+diff --git a/test/release-and-answer b/test/release-and-answer
+index dec8e17..25fd818 100755
+--- a/test/release-and-answer
++++ b/test/release-and-answer
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/release-and-swap b/test/release-and-swap
+index cb8c84e..7b3569f 100755
+--- a/test/release-and-swap
++++ b/test/release-and-swap
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/remove-contexts b/test/remove-contexts
+index b54184e..c5082cb 100755
+--- a/test/remove-contexts
++++ b/test/remove-contexts
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ 
+diff --git a/test/reset-pin b/test/reset-pin
+index 3fbd126..b429254 100755
+--- a/test/reset-pin
++++ b/test/reset-pin
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ import sys
+diff --git a/test/scan-for-operators b/test/scan-for-operators
+index b4fc05e..749c710 100755
+--- a/test/scan-for-operators
++++ b/test/scan-for-operators
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ import sys
+diff --git a/test/send-sms b/test/send-sms
+index 98808aa..e06444d 100755
+--- a/test/send-sms
++++ b/test/send-sms
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/send-ussd b/test/send-ussd
+index a20e098..e585883 100755
+--- a/test/send-ussd
++++ b/test/send-ussd
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+@@ -46,7 +46,7 @@ if state == "idle":
+ print("State: %s" % (state))
+ 
+ while state == "user-response":
+-	response = input("Enter response: ")
++	response = raw_input("Enter response: ")
+ 
+ 	print(ussd.Respond(response, timeout=100))
+ 
+diff --git a/test/send-vcal b/test/send-vcal
+index 566daef..7f8272b 100755
+--- a/test/send-vcal
++++ b/test/send-vcal
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/send-vcard b/test/send-vcard
+index 4dedf51..250b36f 100755
+--- a/test/send-vcard
++++ b/test/send-vcard
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/set-call-forwarding b/test/set-call-forwarding
+index 49d1ce0..9fd358b 100755
+--- a/test/set-call-forwarding
++++ b/test/set-call-forwarding
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ from gi.repository import GLib
+diff --git a/test/set-cbs-topics b/test/set-cbs-topics
+index db95e16..78d6d44 100755
+--- a/test/set-cbs-topics
++++ b/test/set-cbs-topics
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ import sys
+diff --git a/test/set-context-property b/test/set-context-property
+index 5ff7a67..64a6fb8 100755
+--- a/test/set-context-property
++++ b/test/set-context-property
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/set-fast-dormancy b/test/set-fast-dormancy
+index ef77bcd..7bf7715 100755
+--- a/test/set-fast-dormancy
++++ b/test/set-fast-dormancy
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ import sys
+diff --git a/test/set-gsm-band b/test/set-gsm-band
+index b37bcb5..3c17c10 100755
+--- a/test/set-gsm-band
++++ b/test/set-gsm-band
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ import sys
+diff --git a/test/set-mic-volume b/test/set-mic-volume
+index cd6c73f..e0bff49 100755
+--- a/test/set-mic-volume
++++ b/test/set-mic-volume
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/set-mms-details b/test/set-mms-details
+index 6ee59fa..d2d0838 100755
+--- a/test/set-mms-details
++++ b/test/set-mms-details
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/set-msisdn b/test/set-msisdn
+index b5fe819..01f284d 100755
+--- a/test/set-msisdn
++++ b/test/set-msisdn
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ import sys
+diff --git a/test/set-roaming-allowed b/test/set-roaming-allowed
+index 698c8b6..9e3e058 100755
+--- a/test/set-roaming-allowed
++++ b/test/set-roaming-allowed
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/set-speaker-volume b/test/set-speaker-volume
+index 6d4e301..7962f39 100755
+--- a/test/set-speaker-volume
++++ b/test/set-speaker-volume
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/set-tech-preference b/test/set-tech-preference
+index b549abc..2666cbd 100755
+--- a/test/set-tech-preference
++++ b/test/set-tech-preference
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ import sys
+diff --git a/test/set-tty b/test/set-tty
+index eed1fba..53d6b99 100755
+--- a/test/set-tty
++++ b/test/set-tty
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ import sys
+diff --git a/test/set-umts-band b/test/set-umts-band
+index 0bae5c4..c1e6448 100755
+--- a/test/set-umts-band
++++ b/test/set-umts-band
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ import sys
+diff --git a/test/set-use-sms-reports b/test/set-use-sms-reports
+index 288d4e1..a4efe4f 100755
+--- a/test/set-use-sms-reports
++++ b/test/set-use-sms-reports
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ import sys
+diff --git a/test/swap-calls b/test/swap-calls
+index 018a8d3..eeb257b 100755
+--- a/test/swap-calls
++++ b/test/swap-calls
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/test-advice-of-charge b/test/test-advice-of-charge
+index 6e87e61..0f1f57f 100755
+--- a/test/test-advice-of-charge
++++ b/test/test-advice-of-charge
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ from gi.repository import GLib
+ import sys
+diff --git a/test/test-call-barring b/test/test-call-barring
+index eedb69f..be4ab57 100755
+--- a/test/test-call-barring
++++ b/test/test-call-barring
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ from gi.repository import GLib
+ import sys
+diff --git a/test/test-call-forwarding b/test/test-call-forwarding
+index 5db84d7..01a7294 100755
+--- a/test/test-call-forwarding
++++ b/test/test-call-forwarding
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ from gi.repository import GLib
+ 
+diff --git a/test/test-call-settings b/test/test-call-settings
+index 435594c..5d7ee49 100755
+--- a/test/test-call-settings
++++ b/test/test-call-settings
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ from gi.repository import GLib
+ 
+diff --git a/test/test-cbs b/test/test-cbs
+index a5cec06..13cdd80 100755
+--- a/test/test-cbs
++++ b/test/test-cbs
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ import dbus.mainloop.glib
+@@ -78,7 +78,7 @@ def set_topics(cbs):
+ 	invalidData = False;
+ 	index = 0
+ 
+-	topics = input('Enter the topic ID(s) you want to register to: ')
++	topics = raw_input('Enter the topic ID(s) you want to register to: ')
+ 
+ 	while index < len(topics):
+ 		if topics[index] == ',' or topics[index] == '-':
+diff --git a/test/test-gnss b/test/test-gnss
+index 6ae64db..aa0b160 100755
+--- a/test/test-gnss
++++ b/test/test-gnss
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ from gi.repository import GLib
+ import sys
+@@ -40,7 +40,7 @@ def print_menu():
+ def stdin_handler(channel, condition, gnss, path):
+ 	in_key = os.read(channel.unix_get_fd(), 160).rstrip().decode('UTF-8')
+ 	if in_key == '0':
+-		xml = input('type the element and press enter: ')
++		xml = raw_input('type the element and press enter: ')
+ 		try:
+ 			gnss.SendPositioningElement(dbus.String(xml))
+ 			print("ok")
+diff --git a/test/test-message-waiting b/test/test-message-waiting
+index 432862e..b93fbf3 100755
+--- a/test/test-message-waiting
++++ b/test/test-message-waiting
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ from gi.repository import GLib
+ import sys
+diff --git a/test/test-modem b/test/test-modem
+index aa38b1f..29dbf14 100755
+--- a/test/test-modem
++++ b/test/test-modem
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ from gi.repository import GLib
+ 
+diff --git a/test/test-network-registration b/test/test-network-registration
+index 68b4347..c5ad586 100755
+--- a/test/test-network-registration
++++ b/test/test-network-registration
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ from gi.repository import GLib
+ import sys
+diff --git a/test/test-phonebook b/test/test-phonebook
+index 42646d3..116fd4f 100755
+--- a/test/test-phonebook
++++ b/test/test-phonebook
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus, sys
+ 
+diff --git a/test/test-push-notification b/test/test-push-notification
+index d972ad3..ecc6afb 100755
+--- a/test/test-push-notification
++++ b/test/test-push-notification
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ from gi.repository import GLib
+ 
+diff --git a/test/test-smart-messaging b/test/test-smart-messaging
+index f22efd2..188ac1e 100755
+--- a/test/test-smart-messaging
++++ b/test/test-smart-messaging
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ from gi.repository import GLib
+ 
+diff --git a/test/test-sms b/test/test-sms
+index 30ac651..49935e1 100755
+--- a/test/test-sms
++++ b/test/test-sms
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ # -*- coding: utf-8 -*-
+ 
+ from gi.repository import GLib
+@@ -132,7 +132,7 @@ def stdin_handler(channel, condition, sms, value, number):
+ 		lock = "on"
+ 		if in_key == '0':
+ 			print_send_sms_menu()
+-			sms_type = input('Select SMS type: ')
++			sms_type = raw_input('Select SMS type: ')
+ 
+ 			if sms_type == '1':
+ 				message_send(sms, number, value)
+@@ -150,49 +150,49 @@ def stdin_handler(channel, condition, sms, value, number):
+ 
+ 		elif in_key == '1':
+ 			message_delivery_report(sms, 1)
+-			send_msg = input('Send test message[y/n]?: ')
++			send_msg = raw_input('Send test message[y/n]?: ')
+ 			if send_msg == 'y':
+ 				message_send(sms, number, ("(1)" + value +
+ 						": UseDeliveryReports[TRUE]"))
+ 
+ 		elif in_key == '2':
+ 			message_delivery_report(sms, 0)
+-			send_msg = input('Send test message[y/n]?: ')
++			send_msg = raw_input('Send test message[y/n]?: ')
+ 			if send_msg == 'y':
+ 				message_send(sms, number, ("(2) " + value +
+ 						": UseDeliveryReports[FALSE]"))
+ 
+ 		elif in_key == '3':
+ 			message_service_center_address(sms, SCA)
+-			send_msg = input('Send test message[y/n]?: ')
++			send_msg = raw_input('Send test message[y/n]?: ')
+ 			if send_msg == 'y':
+ 				message_send(sms, number, ("(3) " + value +
+ 						": ServiceCenterAddress"))
+ 
+ 		elif in_key == '4':
+ 			message_bearer(sms, "ps-only")
+-			send_msg = input('Send test message[y/n]?: ')
++			send_msg = raw_input('Send test message[y/n]?: ')
+ 			if send_msg == 'y':
+ 				message_send(sms, number, ("(4) " + value +
+ 						": Bearer[ps-only]"))
+ 
+ 		elif in_key == '5':
+ 			message_bearer(sms, "cs-only")
+-			send_msg = input('Send test message[y/n]?: ')
++			send_msg = raw_input('Send test message[y/n]?: ')
+ 			if send_msg == 'y':
+ 				message_send(sms, number, ("(5) " + value +
+ 						": Bearer[cs-only]"))
+ 
+ 		elif in_key == '6':
+ 			message_bearer(sms, "ps-preferred")
+-			send_msg = input('Send test message[y/n]?: ')
++			send_msg = raw_input('Send test message[y/n]?: ')
+ 			if send_msg == 'y':
+ 				message_send(sms, number, ("(6) " + value +
+ 						": Bearer[ps-preferred]"))
+ 
+ 		elif in_key == '7':
+ 			message_bearer(sms, "cs-preferred")
+-			send_msg = input('Send test message[y/n]?: ')
++			send_msg = raw_input('Send test message[y/n]?: ')
+ 			if send_msg == 'y':
+ 				message_send(sms,number, ("(7) " + value +
+ 						": Bearer[cs-preferred]"))
+diff --git a/test/test-ss b/test/test-ss
+index 4cd8732..2c80806 100755
+--- a/test/test-ss
++++ b/test/test-ss
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import sys
+ import dbus
+diff --git a/test/test-ss-control-cb b/test/test-ss-control-cb
+index ddae6d3..86bac9b 100755
+--- a/test/test-ss-control-cb
++++ b/test/test-ss-control-cb
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ from gi.repository import GLib
+ 
+diff --git a/test/test-ss-control-cf b/test/test-ss-control-cf
+index 095eb5d..d30bf4f 100755
+--- a/test/test-ss-control-cf
++++ b/test/test-ss-control-cf
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ from gi.repository import GLib
+ 
+diff --git a/test/test-ss-control-cs b/test/test-ss-control-cs
+index 8180474..e0ed1d1 100755
+--- a/test/test-ss-control-cs
++++ b/test/test-ss-control-cs
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ from gi.repository import GLib
+ 
+diff --git a/test/test-stk-menu b/test/test-stk-menu
+index 0cf8fa2..ac0a5bd 100755
+--- a/test/test-stk-menu
++++ b/test/test-stk-menu
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ from gi.repository import GLib
+ 
+@@ -58,7 +58,7 @@ class StkAgent(dbus.service.Object):
+ 			index += 1
+ 
+ 		print("\nDefault: %d" % (default))
+-		select = input("Enter Selection (t, b):")
++		select = raw_input("Enter Selection (t, b):")
+ 
+ 		if select == 'b':
+ 			raise GoBack("User wishes to go back")
+@@ -75,7 +75,7 @@ class StkAgent(dbus.service.Object):
+ 		print("DisplayText (%s)" % (title))
+ 		print("Icon: (%d)" % (int(icon)))
+ 		print("Urgent: (%d)" % (urgent))
+-		key = input("Press return to clear ('t' terminates, "
++		key = raw_input("Press return to clear ('t' terminates, "
+ 						"'b' goes back, 'n' busy, "
+ 						"'w' return and wait):")
+ 
+@@ -108,7 +108,7 @@ class StkAgent(dbus.service.Object):
+ 		print("Hide typing: (%s)" % (hide_typing))
+ 		print("Enter characters, min: %d, max: %d:" % (min_chars,
+ 								max_chars))
+-		userin = input("")
++		userin = raw_input("")
+ 
+ 		return userin
+ 
+@@ -122,7 +122,7 @@ class StkAgent(dbus.service.Object):
+ 		print("Hide typing: (%s)" % (hide_typing))
+ 		print("Enter digits, min: %d, max: %d:" % (min_chars,
+ 								max_chars))
+-		userin = input("'t' terminates, 'b' goes back:")
++		userin = raw_input("'t' terminates, 'b' goes back:")
+ 
+ 		if userin == 'b':
+ 			raise GoBack("User wishes to go back")
+@@ -136,7 +136,7 @@ class StkAgent(dbus.service.Object):
+ 	def RequestKey(self, title, icon):
+ 		print("Title: (%s)" % (title))
+ 		print("Icon: (%d)" % (int(icon)))
+-		key = input("Enter Key (t, b):")
++		key = raw_input("Enter Key (t, b):")
+ 
+ 		if key == 'b':
+ 			raise GoBack("User wishes to go back")
+@@ -150,7 +150,7 @@ class StkAgent(dbus.service.Object):
+ 	def RequestDigit(self, title, icon):
+ 		print("Title: (%s)" % (title))
+ 		print("Icon: (%d)" % (int(icon)))
+-		key = input("Enter Digit (t, b):")
++		key = raw_input("Enter Digit (t, b):")
+ 
+ 		if key == 'b':
+ 			raise GoBack("User wishes to go back")
+@@ -164,7 +164,7 @@ class StkAgent(dbus.service.Object):
+ 	def RequestQuickDigit(self, title, icon):
+ 		print("Title: (%s)" % (title))
+ 		print("Icon: (%d)" % (int(icon)))
+-		key = input("Quick digit (0-9, *, #, t, b):")
++		key = raw_input("Quick digit (0-9, *, #, t, b):")
+ 
+ 		if key == 'b':
+ 			raise GoBack("User wishes to go back")
+@@ -178,7 +178,7 @@ class StkAgent(dbus.service.Object):
+ 	def RequestConfirmation(self, title, icon):
+ 		print("Title: (%s)" % (title))
+ 		print("Icon: (%d)" % (int(icon)))
+-		key = input("Enter Confirmation (t, b, y, n):")
++		key = raw_input("Enter Confirmation (t, b, y, n):")
+ 
+ 		if key == 'b':
+ 			raise GoBack("User wishes to go back")
+@@ -194,7 +194,7 @@ class StkAgent(dbus.service.Object):
+ 	def ConfirmCallSetup(self, info, icon):
+ 		print("Information: (%s)" % (info))
+ 		print("Icon: (%d)" % (int(icon)))
+-		key = input("Enter Confirmation (t, y, n):")
++		key = raw_input("Enter Confirmation (t, y, n):")
+ 
+ 		if key == 't':
+ 			raise EndSession("User wishes to terminate session")
+@@ -209,7 +209,7 @@ class StkAgent(dbus.service.Object):
+ 		print("Information: (%s)" % (info))
+ 		print("Icon: (%d)" % (int(icon)))
+ 		print("URL (%s)" % (url))
+-		key = input("Enter Confirmation (y, n):")
++		key = raw_input("Enter Confirmation (y, n):")
+ 
+ 		if key == 'y':
+ 			return True
+@@ -232,7 +232,7 @@ class StkAgent(dbus.service.Object):
+ 		signal.alarm(5)
+ 
+ 		try:
+-			key = input("Press return to end before end of"
++			key = raw_input("Press return to end before end of"
+ 							 " single tone (t):")
+ 			signal.alarm(0)
+ 
+@@ -250,7 +250,7 @@ class StkAgent(dbus.service.Object):
+ 		print("LoopTone: %s" % (tone))
+ 		print("Text: %s" % (text))
+ 		print("Icon: %d" % (int(icon)))
+-		key = input("Press return to end before timeout "
++		key = raw_input("Press return to end before timeout "
+ 				"('t' terminates, 'w' return and wait):")
+ 
+ 		if key == 'w':
+@@ -279,7 +279,7 @@ class StkAgent(dbus.service.Object):
+ 	def DisplayAction(self, text, icon):
+ 		print("Text: (%s)" % (text))
+ 		print("Icon: (%d)" % (int(icon)))
+-		key = input("Press 't' to terminate the session ")
++		key = raw_input("Press 't' to terminate the session ")
+ 
+ 		if key == 't':
+ 			raise EndSession("User wishes to terminate session")
+@@ -289,7 +289,7 @@ class StkAgent(dbus.service.Object):
+ 	def ConfirmOpenChannel(self, info, icon):
+ 		print("Open channel confirmation: (%s)" % (info))
+ 		print("Icon: (%d)" % (int(icon)))
+-		key = input("Enter Confirmation (t, y, n):")
++		key = raw_input("Enter Confirmation (t, y, n):")
+ 
+ 		if key == 't':
+ 			raise EndSession("User wishes to terminate session")
+@@ -299,7 +299,7 @@ class StkAgent(dbus.service.Object):
+ 			return False
+ 
+ _dbus2py = {
+-	dbus.String : str,
++	dbus.String : unicode,
+ 	dbus.UInt32 : int,
+ 	dbus.Int32 : int,
+ 	dbus.Int16 : int,
+@@ -396,7 +396,7 @@ if __name__ == '__main__':
+ 		except:
+ 			pass
+ 
+-		select = int(input("Enter Selection: "))
++		select = int(raw_input("Enter Selection: "))
+ 		stk.SelectItem(select, path)
+ 	elif mode == 'agent':
+ 		path = "/test/agent"
+diff --git a/test/unlock-pin b/test/unlock-pin
+index 61f4765..10b6626 100755
+--- a/test/unlock-pin
++++ b/test/unlock-pin
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ 
+ import dbus
+ import sys
+-- 
+1.9.1
+

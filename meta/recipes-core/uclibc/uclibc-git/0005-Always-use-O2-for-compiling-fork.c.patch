@@ -1,0 +1,33 @@
+From 883debc22e30a947fe5858cc07ee5aebd3d07a2e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 16 Aug 2015 20:59:56 -0700
+Subject: [PATCH 5/7] Always use -O2 for compiling fork.c
+
+When compiling in thumb mode for arm with -Os gcc gives up since it can
+not find registers to spill. So we use -O2 option for compiling fork.c
+It may be addressable in gcc.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ libpthread/nptl/sysdeps/unix/sysv/linux/arm/Makefile.arch | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/libpthread/nptl/sysdeps/unix/sysv/linux/arm/Makefile.arch b/libpthread/nptl/sysdeps/unix/sysv/linux/arm/Makefile.arch
+index 0ea0b29..0767e9c 100644
+--- a/libpthread/nptl/sysdeps/unix/sysv/linux/arm/Makefile.arch
++++ b/libpthread/nptl/sysdeps/unix/sysv/linux/arm/Makefile.arch
+@@ -21,3 +21,9 @@ ASFLAGS-pt-vfork.S = -marm
+ CFLAGS-OMIT-pt-vfork.S = -mthumb
+ ASFLAGS-vfork.S = -marm
+ CFLAGS-OMIT-vfork.S = -mthumb
++
++# For arm fork.c does not compile with -Os when compiling
++# in thumb1 mode
++ifeq ($(COMPILE_IN_THUMB_MODE),y)
++CFLAGS-fork.c = -O2
++endif
+-- 
+2.1.4
+

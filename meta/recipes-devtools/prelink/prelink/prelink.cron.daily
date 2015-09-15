@@ -1,0 +1,40 @@
+#!/bin/sh
+
+. /etc/default/prelink
+
+renice +19 -p $$ >/dev/null 2>&1
+
+if [ "$PRELINKING" != yes ]; then
+  if [ -f /etc/prelink.cache ]; then
+    echo /usr/sbin/prelink -uav > /var/log/prelink.log
+    /usr/sbin/prelink -uav >> /var/log/prelink.log 2>&1
+    rm -f /etc/prelink.cache
+    # Restart init if needed
+    [ -n "$(find `ldd /sbin/init | awk '{ print $3 }'` /sbin/init -ctime -1 2>/dev/null )" ] && /sbin/telinit u
+  fi
+  exit 0
+fi
+
+if [ ! -f /etc/prelink.cache -o -f /var/lib/misc/prelink.force ] \
+   || grep -q '^prelink-ELF0.[0-2]' /etc/prelink.cache; then
+  # If cache does not exist or is from older prelink versions or
+  # if we were asked to explicitely, force full prelinking
+  rm -f /etc/prelink.cache /var/lib/misc/prelink.force
+  PRELINK_OPTS="$PRELINK_OPTS -f"
+  date > /var/lib/misc/prelink.full
+elif [ -n "$PRELINK_FULL_TIME_INTERVAL" \
+       -a "`find /var/lib/misc/prelink.full -mtime -${PRELINK_FULL_TIME_INTERVAL} 2>/dev/null`" \
+	  = /var/lib/misc/prelink.full ]; then
+  # If prelink without -q has been run in the last
+  # PRELINK_FULL_TIME_INTERVAL days, just use quick mode
+  PRELINK_OPTS="$PRELINK_OPTS -q"
+else
+  date > /var/lib/misc/prelink.full
+fi
+
+echo /usr/sbin/prelink -av $PRELINK_OPTS > /var/log/prelink.log
+/usr/sbin/prelink -av $PRELINK_OPTS >> /var/log/prelink.log 2>&1
+# Restart init if needed
+[ -n "$(find `ldd /sbin/init | awk '{ print $3 }'` /sbin/init -ctime -1 2>/dev/null )" ] && /sbin/telinit u
+
+exit 0

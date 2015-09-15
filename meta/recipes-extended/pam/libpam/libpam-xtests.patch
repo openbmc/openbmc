@@ -1,0 +1,35 @@
+This patch is used to create a new sub package libpam-xtests to do more checks.
+
+Upstream-Status: Pending
+
+Signed-off-by: Kang Kai <kai.kang@windriver.com>
+--- Linux-PAM-1.1.4/xtests/Makefile.am.orig	2011-07-19 17:00:09.619980001 +0800
++++ Linux-PAM-1.1.4/xtests/Makefile.am	2011-07-19 16:54:00.229979998 +0800
+@@ -7,7 +7,7 @@
+ AM_LDFLAGS = -L$(top_builddir)/libpam -lpam \
+ 	-L$(top_builddir)/libpam_misc -lpam_misc
+ 
+-CLEANFILES = *~ $(XTESTS)
++CLEANFILES = *~
+ 
+ EXTRA_DIST = run-xtests.sh tst-pam_dispatch1.pamd tst-pam_dispatch2.pamd \
+ 	tst-pam_dispatch3.pamd tst-pam_dispatch4.pamd \
+@@ -51,3 +51,18 @@
+ 
+ xtests: $(XTESTS) run-xtests.sh
+ 	"$(srcdir)"/run-xtests.sh "$(srcdir)" ${XTESTS} ${NOSRCTESTS}
++
++all: $(XTESTS)
++
++install: install_xtests
++
++install_xtests:
++	$(INSTALL) -d $(DESTDIR)$(pkgdatadir)/xtests
++	for file in $(EXTRA_DIST) ; do \
++		$(INSTALL) $$file $(DESTDIR)$(pkgdatadir)/xtests ; \
++	done
++	for file in $(XTESTS); do \
++		$(INSTALL) .libs/$$file $(DESTDIR)$(pkgdatadir)/xtests ; \
++	done
++
++.PHONY: all install_xtests

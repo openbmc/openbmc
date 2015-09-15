@@ -1,0 +1,36 @@
+Upstream-Status: Pending
+
+Coming from this bug: http://sourceware.org/bugzilla/show_bug.cgi?id=11149
+
+Nitin A Kamble <nitin.a.kamble@intel.com>2011/03/29
+
+--- ldconfig-native-2.12.1.orig/ldconfig.c	
++++ ldconfig-native-2.12.1/ldconfig.c	
+@@ -1359,14 +1359,9 @@ main (int argc, char **argv)
+ 
+   const char *aux_cache_file = _PATH_LDCONFIG_AUX_CACHE;
+   if (opt_chroot)
+-    {
+-      aux_cache_file = chroot_canon (opt_chroot, aux_cache_file);
+-      if (aux_cache_file == NULL)
+-	error (EXIT_FAILURE, errno, _("Can't open cache file %s\n"),
+-	       _PATH_LDCONFIG_AUX_CACHE);
+-    }
++    aux_cache_file = chroot_canon (opt_chroot, aux_cache_file);
+ 
+-  if (! opt_ignore_aux_cache)
++  if (! opt_ignore_aux_cache && aux_cache_file)
+     load_aux_cache (aux_cache_file);
+   else
+     init_aux_cache ();
+@@ -1376,7 +1371,8 @@ main (int argc, char **argv)
+   if (opt_build_cache)
+     {
+       save_cache (cache_file);
+-      save_aux_cache (aux_cache_file);
++      if (aux_cache_file)
++        save_aux_cache (aux_cache_file);
+     }
+ 
+   return 0;
+

@@ -1,0 +1,33 @@
+Upstream-Status: Backport
+
+Backport from:
+
+http://git.savannah.gnu.org/cgit/screen.git/commit/?id=39c5f1c
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+From 39c5f1c76f1fcef4b5958bf828a63f53426b6984 Mon Sep 17 00:00:00 2001
+From: Mike Gerwitz <mike@mikegerwitz.com>
+Date: Tue, 24 Dec 2013 22:16:31 -0500
+Subject: [PATCH] comm.h now depends on term.h
+
+---
+ src/Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/Makefile.in b/src/Makefile.in
+index e791e79..d4f7c0b 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -113,7 +113,7 @@ term.h: term.c term.sh
+ 
+ kmapdef.c: term.h
+ 
+-comm.h: comm.c comm.sh config.h
++comm.h: comm.c comm.sh config.h term.h
+ 	AWK=$(AWK) CC="$(CC) $(CFLAGS)" srcdir=${srcdir} sh $(srcdir)/comm.sh
+ 
+ docs:
+-- 
+2.4.1
+

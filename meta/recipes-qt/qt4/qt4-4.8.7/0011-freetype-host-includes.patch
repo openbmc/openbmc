@@ -1,0 +1,29 @@
+From 3fcffa79e6a5f0448cbfe2bb33fe1218f5dae61d Mon Sep 17 00:00:00 2001
+From: Michael Krelin <hacker@klever.net>
+Date: Mon, 4 Jun 2007 14:48:50 +0200
+Subject: [PATCH 11/21] freetype host includes
+
+Host include path should not be used in cross compiling case.
+
+Ported from OE by: Yu Ke <ke.yu@intel.com>
+Upstream-Status: Pending
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ config.tests/unix/freetype/freetype.pri | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/config.tests/unix/freetype/freetype.pri b/config.tests/unix/freetype/freetype.pri
+index 7ef1cf9..b362fcd 100644
+--- a/config.tests/unix/freetype/freetype.pri
++++ b/config.tests/unix/freetype/freetype.pri
+@@ -1,5 +1,5 @@
+ !cross_compile {
+-    TRY_INCLUDEPATHS = /include /usr/include $$QMAKE_INCDIR $$QMAKE_INCDIR_X11 $$INCLUDEPATH
++    TRY_INCLUDEPATHS = $$QMAKE_INCDIR $$QMAKE_INCDIR_X11 $$INCLUDEPATH
+     # LSB doesn't allow using headers from /include or /usr/include
+     linux-lsb-g++:TRY_INCLUDEPATHS = $$QMAKE_INCDIR $$QMAKE_INCDIR_X11 $$INCLUDEPATH
+     for(p, TRY_INCLUDEPATHS) {
+-- 
+1.8.0
+

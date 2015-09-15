@@ -1,0 +1,17 @@
+[Unit]
+Description=dpkg first boot configure
+DefaultDependencies=no
+After=systemd-remount-fs.service systemd-tmpfiles-setup.service tmp.mount
+Before=sysinit.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=-@SYSCONFDIR@/default/postinst
+ExecStart=-@BASE_BINDIR@/sh -c " if [ $POSTINST_LOGGING = '1' ]; then @BINDIR@/dpkg --configure -a > $LOGFILE 2>&1; else @BINDIR@/dpkg --configure -a; fi"
+ExecStartPost=@BASE_BINDIR@/systemctl disable dpkg-configure.service
+StandardOutput=syslog
+RemainAfterExit=No
+
+[Install]
+WantedBy=basic.target
+WantedBy=sysinit.target

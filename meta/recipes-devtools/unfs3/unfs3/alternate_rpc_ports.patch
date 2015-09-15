@@ -1,0 +1,158 @@
+Add ability to specify rcp port numbers
+
+In order to run more than one unfs server on a host system, you must
+be able to specify alternate rpc port numbers.
+
+Jason Wessel <jason.wessel@windriver.com>
+
+Upstream-Status: Submitted http://sourceforge.net/p/unfs3/bugs/5/
+
+---
+ daemon.c |   44 +++++++++++++++++++++++++++++++-------------
+ mount.c  |    4 ++--
+ 2 files changed, 33 insertions(+), 15 deletions(-)
+
+--- a/daemon.c
++++ b/daemon.c
+@@ -78,6 +78,8 @@ int opt_testconfig = FALSE;
+ struct in_addr opt_bind_addr;
+ int opt_readable_executables = FALSE;
+ char *opt_pid_file = NULL;
++int nfs_prog = NFS3_PROGRAM;
++int mount_prog = MOUNTPROG;
+ 
+ /* Register with portmapper? */
+ int opt_portmapper = TRUE;
+@@ -206,7 +208,7 @@ static void parse_options(int argc, char
+ {
+ 
+     int opt = 0;
+-    char *optstring = "bcC:de:hl:m:n:prstTuwi:";
++    char *optstring = "bcC:de:hl:m:n:prstTuwi:x:y:";
+ 
+     while (opt != -1) {
+ 	opt = getopt(argc, argv, optstring);
+@@ -261,8 +263,24 @@ static void parse_options(int argc, char
+ 		printf
+ 		    ("\t-r          report unreadable executables as readable\n");
+ 		printf("\t-T          test exports file and exit\n");
++		printf("\t-x <port>   alternate NFS RPC port\n");
++		printf("\t-y <port>   alternate MOUNTD RPC port\n");
+ 		exit(0);
+ 		break;
++	    case 'x':
++		nfs_prog = strtol(optarg, NULL, 10);
++		if (nfs_prog == 0) {
++		    fprintf(stderr, "Invalid NFS RPC port\n");
++		    exit(1);
++		}
++		break;
++	    case 'y':
++		mount_prog = strtol(optarg, NULL, 10);
++		if (mount_prog == 0) {
++		    fprintf(stderr, "Invalid MOUNTD RPC port\n");
++		    exit(1);
++		}
++		break;
+ 	    case 'l':
+ 		opt_bind_addr.s_addr = inet_addr(optarg);
+ 		if (opt_bind_addr.s_addr == (unsigned) -1) {
+@@ -347,12 +365,12 @@ void daemon_exit(int error)
+ #endif				       /* WIN32 */
+ 
+     if (opt_portmapper) {
+-	svc_unregister(MOUNTPROG, MOUNTVERS1);
+-	svc_unregister(MOUNTPROG, MOUNTVERS3);
++	svc_unregister(mount_prog, MOUNTVERS1);
++	svc_unregister(mount_prog, MOUNTVERS3);
+     }
+ 
+     if (opt_portmapper) {
+-	svc_unregister(NFS3_PROGRAM, NFS_V3);
++	svc_unregister(nfs_prog, NFS_V3);
+     }
+ 
+     if (error == SIGSEGV)
+@@ -657,13 +675,13 @@ static void mountprog_3(struct svc_req *
+ static void register_nfs_service(SVCXPRT * udptransp, SVCXPRT * tcptransp)
+ {
+     if (opt_portmapper) {
+-	pmap_unset(NFS3_PROGRAM, NFS_V3);
++	pmap_unset(nfs_prog, NFS_V3);
+     }
+ 
+     if (udptransp != NULL) {
+ 	/* Register NFS service for UDP */
+ 	if (!svc_register
+-	    (udptransp, NFS3_PROGRAM, NFS_V3, nfs3_program_3,
++	    (udptransp, nfs_prog, NFS_V3, nfs3_program_3,
+ 	     opt_portmapper ? IPPROTO_UDP : 0)) {
+ 	    fprintf(stderr, "%s\n",
+ 		    "unable to register (NFS3_PROGRAM, NFS_V3, udp).");
+@@ -674,7 +692,7 @@ static void register_nfs_service(SVCXPRT
+     if (tcptransp != NULL) {
+ 	/* Register NFS service for TCP */
+ 	if (!svc_register
+-	    (tcptransp, NFS3_PROGRAM, NFS_V3, nfs3_program_3,
++	    (tcptransp, nfs_prog, NFS_V3, nfs3_program_3,
+ 	     opt_portmapper ? IPPROTO_TCP : 0)) {
+ 	    fprintf(stderr, "%s\n",
+ 		    "unable to register (NFS3_PROGRAM, NFS_V3, tcp).");
+@@ -686,14 +704,14 @@ static void register_nfs_service(SVCXPRT
+ static void register_mount_service(SVCXPRT * udptransp, SVCXPRT * tcptransp)
+ {
+     if (opt_portmapper) {
+-	pmap_unset(MOUNTPROG, MOUNTVERS1);
+-	pmap_unset(MOUNTPROG, MOUNTVERS3);
++	pmap_unset(mount_prog, MOUNTVERS1);
++	pmap_unset(mount_prog, MOUNTVERS3);
+     }
+ 
+     if (udptransp != NULL) {
+ 	/* Register MOUNT service (v1) for UDP */
+ 	if (!svc_register
+-	    (udptransp, MOUNTPROG, MOUNTVERS1, mountprog_3,
++	    (udptransp, mount_prog, MOUNTVERS1, mountprog_3,
+ 	     opt_portmapper ? IPPROTO_UDP : 0)) {
+ 	    fprintf(stderr, "%s\n",
+ 		    "unable to register (MOUNTPROG, MOUNTVERS1, udp).");
+@@ -702,7 +720,7 @@ static void register_mount_service(SVCXP
+ 
+ 	/* Register MOUNT service (v3) for UDP */
+ 	if (!svc_register
+-	    (udptransp, MOUNTPROG, MOUNTVERS3, mountprog_3,
++	    (udptransp, mount_prog, MOUNTVERS3, mountprog_3,
+ 	     opt_portmapper ? IPPROTO_UDP : 0)) {
+ 	    fprintf(stderr, "%s\n",
+ 		    "unable to register (MOUNTPROG, MOUNTVERS3, udp).");
+@@ -713,7 +731,7 @@ static void register_mount_service(SVCXP
+     if (tcptransp != NULL) {
+ 	/* Register MOUNT service (v1) for TCP */
+ 	if (!svc_register
+-	    (tcptransp, MOUNTPROG, MOUNTVERS1, mountprog_3,
++	    (tcptransp, mount_prog, MOUNTVERS1, mountprog_3,
+ 	     opt_portmapper ? IPPROTO_TCP : 0)) {
+ 	    fprintf(stderr, "%s\n",
+ 		    "unable to register (MOUNTPROG, MOUNTVERS1, tcp).");
+@@ -722,7 +740,7 @@ static void register_mount_service(SVCXP
+ 
+ 	/* Register MOUNT service (v3) for TCP */
+ 	if (!svc_register
+-	    (tcptransp, MOUNTPROG, MOUNTVERS3, mountprog_3,
++	    (tcptransp, mount_prog, MOUNTVERS3, mountprog_3,
+ 	     opt_portmapper ? IPPROTO_TCP : 0)) {
+ 	    fprintf(stderr, "%s\n",
+ 		    "unable to register (MOUNTPROG, MOUNTVERS3, tcp).");
+--- a/mount.c
++++ b/mount.c
+@@ -155,8 +155,8 @@ mountres3 *mountproc_mnt_3_svc(dirpath *
+     /* error out if not version 3 */
+     if (rqstp->rq_vers != 3) {
+ 	logmsg(LOG_INFO,
+-	       "%s attempted mount with unsupported protocol version",
+-	       inet_ntoa(get_remote(rqstp)));
++	       "%s attempted mount with unsupported protocol version: %i",
++	       inet_ntoa(get_remote(rqstp)), rqstp->rq_vers);
+ 	result.fhs_status = MNT3ERR_INVAL;
+ 	return &result;
+     }

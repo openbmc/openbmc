@@ -1,0 +1,40 @@
+From 015715694eadd714b903f30ade876e0738d44974 Mon Sep 17 00:00:00 2001
+From: Randy Witt <randy.e.witt@linux.intel.com>
+Date: Mon, 5 Jan 2015 15:09:20 -0800
+Subject: [PATCH] Ignore DWARF sections.
+
+Assume for now that we don't care about the DWARF sections due to path
+differences. However, in the case the tool is ran on a "debug" package
+it will most likely falsely say the packages have no differences.
+
+Upstream-Status: Inappropriate [other]
+
+The package difference tool is correctly labelling the packages as different
+when the DWARF sections don't match due to paths. The paths in the debug info
+should actually be made to be the same using compile flags or some other
+mechanism.
+
+However, to make the tool more useful to Yocto until the work can be done
+to ensure identical paths in debug sections, this patch is being applied.
+
+Signed-off-by: Randy Witt <randy.e.witt@linux.intel.com>
+---
+ pkg-diff.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pkg-diff.sh b/pkg-diff.sh
+index 56035c1..0f1fa76 100755
+--- a/pkg-diff.sh
++++ b/pkg-diff.sh
+@@ -658,7 +658,7 @@ check_single_file()
+        echo "" >$file1
+        echo "" >$file2
+        # Don't compare .build-id and .gnu_debuglink sections
+-       sections="$(objdump -s new/$file | grep "Contents of section .*:" | sed -r "s,.* (.*):,\1,g" | grep -v -e "\.build-id" -e "\.gnu_debuglink" | tr "\n" " ")"
++       sections="$(objdump -s new/$file | grep "Contents of section .*:" | sed -r "s,.* (.*):,\1,g" | grep -v -e "\.build-id" -e "\.gnu_debuglink" -e "\.debug_abbrev" -e "\.debug_aranges" -e "\.debug_frame" -e "\.debug_info" -e "\.debug_line" -e "\.debug_loc" -e "\.debug_macinfo" -e "\.debug_pubnames" -e "\.debug_pubtypes" -e "\.debug_ranges"  -e "\.debug_str" | tr "\n" " ")"
+        for section in $sections; do
+           objdump -s -j $section old/$file | sed "s,^old/,," > $file1
+           objdump -s -j $section new/$file | sed "s,^new/,," > $file2
+-- 
+1.9.3
+

@@ -1,0 +1,29 @@
+trace-cmd: Add blktrace_api compatibility for TC_BARRIER
+
+Newer kernels replace TC_BARRIER with TC_FLUSH. Ensure trace-cmd
+can build regardless of the linux-kernel-headers version.
+
+Upstream-Status: Inappropriate [Stop gap]
+
+Signed-off-by: Darren Hart <dvhart@linux.intel.com>
+
+diff --git a/plugin_blk.c b/plugin_blk.c
+index 9327b17..c8e5e1c 100644
+--- a/plugin_blk.c
++++ b/plugin_blk.c
+@@ -44,6 +44,15 @@ struct blk_data {
+ 	unsigned short		pdu_len;
+ };
+ 
++/*
++ * Newer kernels don't define BLK_TC_BARRIER and have replaced it with
++ * BLK_TC_FLUSH. In this case, define it here and report FLUSHES as BARRIERS as
++ * a workaround, as described in:
++ * http://git.kernel.org/?p=linux/kernel/git/torvalds/linux.git;a=commit;h=c09c47caedc9854d59378d6e34c989e51cfdd2b4
++ */
++#ifndef BLK_TC_BARRIER
++#define BLK_TC_BARRIER 1<<2
++#endif
+ static void fill_rwbs(char *rwbs, int action, unsigned int bytes)
+ {
+ 	int i = 0;

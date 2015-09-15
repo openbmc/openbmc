@@ -1,0 +1,160 @@
+From 15c6ef6a827d3681ad06e862d27ab3dfb84cb687 Mon Sep 17 00:00:00 2001
+From: Roy Li <rongqing.li@windriver.com>
+Date: Wed, 27 May 2015 14:30:28 +0800
+Subject: [PATCH] fix the gcc version check
+
+Upstream-Status: pending
+
+"GCC diagnostic push" is gcc 4.6 feature, gcc 4.4.7 on centos did not know it
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ apt-pkg/cacheset.h           |  4 ++--
+ apt-pkg/deb/debsrcrecords.cc | 12 ++++++------
+ apt-pkg/srcrecords.cc        |  4 ++--
+ apt-pkg/srcrecords.h         |  4 ++--
+ apt-pkg/vendorlist.cc        |  4 ++--
+ 5 files changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/apt-pkg/cacheset.h b/apt-pkg/cacheset.h
+index b7229bc..8cc2917 100644
+--- a/apt-pkg/cacheset.h
++++ b/apt-pkg/cacheset.h
+@@ -119,12 +119,12 @@ public:
+ 		inline std::string FullName(bool const Pretty) const { return getPkg().FullName(Pretty); }
+ 		inline std::string FullName() const { return getPkg().FullName(); }
+ 		APT_DEPRECATED inline const char *Section() const {
+-#if __GNUC__ >= 4
++#if __GNUC__ >= 4 + (6 >= __GNUC_MINOR__)
+ 	#pragma GCC diagnostic push
+ 	#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+ #endif
+ 	   return getPkg().Section();
+-#if __GNUC__ >= 4
++#if __GNUC__ >= 4 + (6 >= __GNUC_MINOR__)
+ 	#pragma GCC diagnostic pop
+ #endif
+ 		}
+diff --git a/apt-pkg/deb/debsrcrecords.cc b/apt-pkg/deb/debsrcrecords.cc
+index 49a348d..4bc9dcf 100644
+--- a/apt-pkg/deb/debsrcrecords.cc
++++ b/apt-pkg/deb/debsrcrecords.cc
+@@ -126,13 +126,13 @@ bool debSrcRecordParser::Files(std::vector<pkgSrcRecords::File> &F)
+    for (std::vector<pkgSrcRecords::File2>::const_iterator f2 = F2.begin(); f2 != F2.end(); ++f2)
+    {
+       pkgSrcRecords::File2 f;
+-#if __GNUC__ >= 4
++#if __GNUC__ >= 4 + (6 >= __GNUC_MINOR__)
+ 	#pragma GCC diagnostic push
+ 	#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+ #endif
+       f.MD5Hash = f2->MD5Hash;
+       f.Size = f2->Size;
+-#if __GNUC__ >= 4
++#if __GNUC__ >= 4 + (6 >= __GNUC_MINOR__)
+ 	#pragma GCC diagnostic pop
+ #endif
+       f.Path = f2->Path;
+@@ -190,14 +190,14 @@ bool debSrcRecordParser::Files2(std::vector<pkgSrcRecords::File2> &List)
+ 	 // we have it already, store the new hash and be done
+ 	 if (file != List.end())
+ 	 {
+-#if __GNUC__ >= 4
++#if __GNUC__ >= 4 + (6 >= __GNUC_MINOR__)
+ 	// set for compatibility only, so warn users not us
+ 	#pragma GCC diagnostic push
+ 	#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+ #endif
+ 	    if (checksumField == "Files")
+ 	       file->MD5Hash = hash;
+-#if __GNUC__ >= 4
++#if __GNUC__ >= 4 + (6 >= __GNUC_MINOR__)
+ 	#pragma GCC diagnostic pop
+ #endif
+ 	    // an error here indicates that we have two different hashes for the same file
+@@ -212,7 +212,7 @@ bool debSrcRecordParser::Files2(std::vector<pkgSrcRecords::File2> &List)
+ 	 F.FileSize = strtoull(size.c_str(), NULL, 10);
+ 	 F.Hashes.push_back(hashString);
+ 
+-#if __GNUC__ >= 4
++#if __GNUC__ >= 4 + (6 >= __GNUC_MINOR__)
+ 	// set for compatibility only, so warn users not us
+ 	#pragma GCC diagnostic push
+ 	#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+@@ -220,7 +220,7 @@ bool debSrcRecordParser::Files2(std::vector<pkgSrcRecords::File2> &List)
+ 	 F.Size = F.FileSize;
+ 	 if (checksumField == "Files")
+ 	    F.MD5Hash = hash;
+-#if __GNUC__ >= 4
++#if __GNUC__ >= 4 + (6 >= __GNUC_MINOR__)
+ 	#pragma GCC diagnostic pop
+ #endif
+ 
+diff --git a/apt-pkg/srcrecords.cc b/apt-pkg/srcrecords.cc
+index 3175ee7..340e796 100644
+--- a/apt-pkg/srcrecords.cc
++++ b/apt-pkg/srcrecords.cc
+@@ -160,7 +160,7 @@ bool pkgSrcRecords::Parser::Files2(std::vector<pkgSrcRecords::File2> &F2)/*{{{*/
+    for (std::vector<pkgSrcRecords::File>::const_iterator f = F.begin(); f != F.end(); ++f)
+    {
+       pkgSrcRecords::File2 f2;
+-#if __GNUC__ >= 4
++#if __GNUC__ >= 4 + (6 >= __GNUC_MINOR__)
+ 	#pragma GCC diagnostic push
+ 	#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+ #endif
+@@ -168,7 +168,7 @@ bool pkgSrcRecords::Parser::Files2(std::vector<pkgSrcRecords::File2> &F2)/*{{{*/
+       f2.Size = f->Size;
+       f2.Hashes.push_back(HashString("MD5Sum", f->MD5Hash));
+       f2.FileSize = f->Size;
+-#if __GNUC__ >= 4
++#if __GNUC__ >= 4 + (6 >= __GNUC_MINOR__)
+ 	#pragma GCC diagnostic pop
+ #endif
+       f2.Path = f->Path;
+diff --git a/apt-pkg/srcrecords.h b/apt-pkg/srcrecords.h
+index dde22bd..91f8061 100644
+--- a/apt-pkg/srcrecords.h
++++ b/apt-pkg/srcrecords.h
+@@ -30,7 +30,7 @@ class pkgSrcRecords
+ {
+    public:
+ 
+-#if __GNUC__ >= 4
++#if __GNUC__ >= 4 + (6 >= __GNUC_MINOR__)
+ 	// ensure that con- & de-structor don't trigger this warning
+ 	#pragma GCC diagnostic push
+ 	#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+@@ -48,7 +48,7 @@ class pkgSrcRecords
+       unsigned long long FileSize;
+       HashStringList Hashes;
+    };
+-#if __GNUC__ >= 4
++#if __GNUC__ >= 4 + (6 >= __GNUC_MINOR__)
+ 	#pragma GCC diagnostic pop
+ #endif
+ 
+diff --git a/apt-pkg/vendorlist.cc b/apt-pkg/vendorlist.cc
+index fb33ff1..ba1d3c3 100644
+--- a/apt-pkg/vendorlist.cc
++++ b/apt-pkg/vendorlist.cc
+@@ -11,7 +11,7 @@
+ 
+ #include <apti18n.h>
+ 
+-#if __GNUC__ >= 4
++#if __GNUC__ >= 4 + (6 >= __GNUC_MINOR__)
+ 	#pragma GCC diagnostic push
+ 	#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+ #endif
+@@ -163,6 +163,6 @@ const Vendor* pkgVendorList::FindVendor(const std::vector<string> GPGVOutput)	/*
+ }
+ 									/*}}}*/
+ 
+-#if __GNUC__ >= 4
++#if __GNUC__ >= 4 + (6 >= __GNUC_MINOR__)
+ 	#pragma GCC diagnostic pop
+ #endif
+-- 
+1.9.1
+

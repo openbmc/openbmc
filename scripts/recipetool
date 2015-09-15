@@ -1,0 +1,114 @@
+#!/usr/bin/env python
+
+# Recipe creation tool
+#
+# Copyright (C) 2014 Intel Corporation
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+import sys
+import os
+import argparse
+import glob
+import logging
+
+scripts_path = os.path.dirname(os.path.realpath(__file__))
+lib_path = scripts_path + '/lib'
+sys.path = sys.path + [lib_path]
+import scriptutils
+logger = scriptutils.logger_create('recipetool')
+
+plugins = []
+
+def tinfoil_init(parserecipes):
+    import bb.tinfoil
+    import logging
+    tinfoil = bb.tinfoil.Tinfoil()
+    tinfoil.prepare(not parserecipes)
+    tinfoil.logger.setLevel(logger.getEffectiveLevel())
+    return tinfoil
+
+def main():
+
+    if not os.environ.get('BUILDDIR', ''):
+        logger.error("This script can only be run after initialising the build environment (e.g. by using oe-init-build-env)")
+        sys.exit(1)
+
+    parser = argparse.ArgumentParser(description="OpenEmbedded recipe tool",
+                                     add_help=False,
+                                     epilog="Use %(prog)s <subcommand> --help to get help on a specific command")
+    parser.add_argument('-d', '--debug', help='Enable debug output', action='store_true')
+    parser.add_argument('-q', '--quiet', help='Print only errors', action='store_true')
+    parser.add_argument('--color', choices=['auto', 'always', 'never'], default='auto', help='Colorize output (where %(metavar)s is %(choices)s)', metavar='COLOR')
+
+    global_args, unparsed_args = parser.parse_known_args()
+
+    # Help is added here rather than via add_help=True, as we don't want it to
+    # be handled by parse_known_args()
+    parser.add_argument('-h', '--help', action='help', default=argparse.SUPPRESS,
+                        help='show this help message and exit')
+    subparsers = parser.add_subparsers(title='subcommands', metavar='<subcommand>')
+
+    if global_args.debug:
+        logger.setLevel(logging.DEBUG)
+    elif global_args.quiet:
+        logger.setLevel(logging.ERROR)
+
+    import scriptpath
+    bitbakepath = scriptpath.add_bitbake_lib_path()
+    if not bitbakepath:
+        logger.error("Unable to find bitbake by searching parent directory of this script or PATH")
+        sys.exit(1)
+    logger.debug('Found bitbake path: %s' % bitbakepath)
+
+    scriptutils.logger_setup_color(logger, global_args.color)
+
+    tinfoil = tinfoil_init(False)
+    for path in ([scripts_path] +
+                 tinfoil.config_data.getVar('BBPATH', True).split(':')):
+        pluginpath = os.path.join(path, 'lib', 'recipetool')
+        scriptutils.load_plugins(logger, plugins, pluginpath)
+
+    registered = False
+    for plugin in plugins:
+        if hasattr(plugin, 'register_command'):
+            registered = True
+            plugin.register_command(subparsers)
+        if hasattr(plugin, 'tinfoil_init'):
+            plugin.tinfoil_init(tinfoil)
+
+    if not registered:
+        logger.error("No commands registered - missing plugins?")
+        sys.exit(1)
+
+    args = parser.parse_args(unparsed_args, namespace=global_args)
+
+    try:
+        if getattr(args, 'parserecipes', False):
+            tinfoil.parseRecipes()
+        ret = args.func(args)
+    except bb.BBHandledException:
+        ret = 1
+
+    return ret
+
+
+if __name__ == "__main__":
+    try:
+        ret = main()
+    except Exception:
+        ret = 1
+        import traceback
+        traceback.print_exc(5)
+    sys.exit(ret)

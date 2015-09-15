@@ -1,0 +1,15 @@
+[Unit]
+Description=DHCPv4 Server Daemon
+Documentation=man:dhcpd(8) man:dhcpd.conf(5)
+After=network.target
+After=time-sync.target
+
+[Service]
+PIDFile=@localstatedir@/run/dhcpd.pid
+EnvironmentFile=@SYSCONFDIR@/default/dhcp-server
+EnvironmentFile=-@SYSCONFDIR@/sysconfig/dhcp-server
+ExecStartPre=@base_bindir@/touch @localstatedir@/lib/dhcp/dhcpd.leases
+ExecStart=@SBINDIR@/dhcpd -f -cf @SYSCONFDIR@/dhcp/dhcpd.conf -pf @localstatedir@/run/dhcpd.pid $DHCPDARGS -q $INTERFACES
+
+[Install]
+WantedBy=multi-user.target

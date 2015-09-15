@@ -1,0 +1,98 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+Renames "libtool" -> "${TARGET_PREFIX}libtool" which makes sure
+it can't be confused with the host libtool.
+
+Originally by: RP
+
+Updated: Date: 2010/06/28
+Nitin A Kamble <nitin.a.kamble@intel.com>
+
+It also adjusts libtool so that the header at the script is used for 
+script execution and not thevalue of $SHELL. This is because many 
+Makefiles change $SHELL so dash can get used to execute what is 
+otherwise configured as a bash shell script. Since we don't need to 
+execute scipts this way on any system I'm aware of us building upon, 
+the simplest fix is just to remove $SHELL.
+
+Updated: Date: 2011/11/09
+RP
+
+Updated by: Robert Yang <liezhi.yang@windriver.com>
+
+diff --git a/Makefile.am b/Makefile.am
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -31,7 +31,7 @@ SUBDIRS			= .
+ DIST_SUBDIRS		= $(SUBDIRS)
+ EXTRA_DIST		=
+ 
+-BUILT_SOURCES		= libtool libtoolize
++BUILT_SOURCES		= $(host_alias)-libtool libtoolize
+ 
+ CLEANFILES		=
+ MOSTLYCLEANFILES	=
+@@ -67,7 +67,7 @@ build_scripts	= $(srcdir)/$(aux_dir)/announce-gen \
+ 
+ EXTRA_DIST     += bootstrap bootstrap.conf $(build_scripts) cfg.mk maint.mk \
+ 		  GNUmakefile
+-CLEANFILES     += libtool libtoolize
++CLEANFILES     += $(host_alias)-libtool libtoolize
+ 
+ ## If a file is named several times below, and especially if it
+ ## is a distributed file created during Libtool bootstrap, we
+@@ -276,7 +276,7 @@ configure_edit = $(bootstrap_edit) \
+ 	-e 's|@srcdir\@|$(srcdir)|g'
+ 
+ # The libtool distributor and the standalone libtool script.
+-bin_SCRIPTS = libtool
++bin_SCRIPTS = $(host_alias)-libtool
+ 
+ libtoolize: $(libtoolize_in) $(config_status)
+ 	$(AM_V_at)rm -f '$@'
+@@ -287,7 +287,7 @@ libtoolize: $(libtoolize_in) $(config_status)
+ # We used to do this with a 'stamp-vcl' file, but non-gmake builds
+ # would rerun configure on every invocation, so now we manually
+ # check the version numbers from the build rule when necessary.
+-libtool: $(ltmain_sh) $(config_status) $(dotversion)
++$(host_alias)-libtool: $(ltmain_sh) $(config_status) $(dotversion)
+ 	@$(rebuild); \
+ 	if test -f '$@'; then \
+ 	  eval `'$(SED)' -n '/^package_revision=/p' '$@'`; \
+@@ -731,12 +731,12 @@ TESTS_ENVIRONMENT = MAKE="$(MAKE)" CC="$(CC)" CFLAGS="$(CFLAGS)" \
+ 
+ BUILDCHECK_ENVIRONMENT = _lt_pkgdatadir="$(abs_top_srcdir)" \
+ 	LIBTOOLIZE="$(abs_top_builddir)/libtoolize" \
+-	LIBTOOL="$(abs_top_builddir)/libtool" \
++	LIBTOOL="$(abs_top_builddir)/$(host_alias)-libtool" \
+ 	tst_aclocaldir="$(abs_top_srcdir)/m4"
+ 
+ INSTALLCHECK_ENVIRONMENT = \
+ 	LIBTOOLIZE="$(bindir)/`echo libtoolize |$(SED) '$(program_transform_name)'`" \
+-	LIBTOOL="$(bindir)/`echo libtool |$(SED) '$(program_transform_name)'`" \
++	LIBTOOL="$(bindir)/`echo $(host_alias)-libtool |$(SED) '$(program_transform_name)'`" \
+ 	LTDLINCL="-I$(includedir)" \
+ 	LIBLTDL="$(libdir)/libltdl.la" \
+ 	tst_aclocaldir="$(aclocaldir)"
+diff --git a/m4/libtool.m4 b/m4/libtool.m4
+--- a/m4/libtool.m4
++++ b/m4/libtool.m4
+@@ -86,7 +86,8 @@ _LT_SET_OPTIONS([$0], [$1])
+ LIBTOOL_DEPS=$ltmain
+ 
+ # Always use our own libtool.
+-LIBTOOL='$(SHELL) $(top_builddir)/libtool'
++LIBTOOL='$(top_builddir)'
++LIBTOOL="$LIBTOOL/${host_alias}-libtool"
+ AC_SUBST(LIBTOOL)dnl
+ 
+ _LT_SETUP
+@@ -199,7 +200,7 @@ aix3*)
+ esac
+ 
+ # Global variables:
+-ofile=libtool
++ofile=${host_alias}-libtool
+ can_build_shared=yes
+ 
+ # All known linkers require a '.a' archive for static linking (except MSVC,

@@ -1,0 +1,39 @@
+From fbfbeb7a690d703a3cdc56f923e89eb7b7997d31 Mon Sep 17 00:00:00 2001
+From: Niko Tyni <ntyni@debian.org>
+Date: Fri, 9 Jan 2009 18:54:47 +0200
+Subject: Make perlivp skip include directories in /usr/local
+
+Bug-Debian: http://bugs.debian.org/510895
+
+On Sat, Jan 10, 2009 at 12:37:18AM +1100, Brendan O'Dea wrote:
+> On Wed, Jan 7, 2009 at 12:21 AM, Niko Tyni <ntyni@debian.org> wrote:
+
+> > We could create the directories in a postinst script, but I'm not sure
+> > I see the point. They will be created automatically when installing
+> > CPAN modules.
+>
+> The directories are intentionally not created, as this way they are
+> excluded from the search path at start-up, saving a bunch of wasted
+> stats at use/require time in the common case that the user has not
+> installed any local packages.  As Niko points out, they will be
+> created as required.
+
+Signed-off-by: Niko Tyni <ntyni@debian.org>
+
+Patch-Name: debian/perlivp.diff
+---
+ utils/perlivp.PL | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/utils/perlivp.PL b/utils/perlivp.PL
+index c2f0a11..cc49f96 100644
+--- a/utils/perlivp.PL
++++ b/utils/perlivp.PL
+@@ -153,6 +153,7 @@ my $INC_total = 0;
+ my $INC_there = 0;
+ foreach (@INC) {
+     next if $_ eq '.'; # skip -d test here
++    next if m|/usr/local|; # not shipped on Debian
+     if (-d $_) {
+         print "## Perl \@INC directory '$_' exists.\n" if $opt{'v'};
+         $INC_there++;

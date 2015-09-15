@@ -1,0 +1,19 @@
+Upstream-Status: Inappropriate [configuration]
+
+---
+ configure.ac |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: tiff-3.9.5/configure.ac
+===================================================================
+--- tiff-3.9.5.orig/configure.ac
++++ tiff-3.9.5/configure.ac
+@@ -27,7 +27,7 @@ dnl Process this file with autoconf to p
+ AC_PREREQ(2.64)
+ AC_INIT([LibTIFF Software],[3.9.5],[tiff@lists.maptools.org],[tiff])
+ AC_CONFIG_AUX_DIR(config)
+-AC_CONFIG_MACRO_DIR(m4)
++dnl AC_CONFIG_MACRO_DIR(m4)
+ AC_LANG(C)
+ 
+ dnl Compute the canonical host (run-time) system type variable

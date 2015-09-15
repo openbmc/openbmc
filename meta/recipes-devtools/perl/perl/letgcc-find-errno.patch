@@ -1,0 +1,46 @@
+Upstream-Status:Inappropriate [embedded specific]
+
+This removes all the logic that perl uses to locate an appropriate
+errno.h for the target. Instead we simple create a file that does
+
+  #include "errno.h"
+
+and use that as the file to parse. This is needed when using an
+external toolchain since perl will search in ${STAGING_INCDIR} for
+errno.h (when using gcc) and that isn't where it's located - its
+wherever the external toolchain keeps it's headers.
+
+Index: perl-5.12.3/ext/Errno/Errno_pm.PL
+===================================================================
+--- perl-5.12.3.orig/ext/Errno/Errno_pm.PL
++++ perl-5.12.3/ext/Errno/Errno_pm.PL
+@@ -17,8 +17,18 @@ unlink "Errno.tmp" if -f "Errno.tmp";
+ open OUT, ">Errno.tmp" or die "Cannot open Errno.tmp: $!";
+ select OUT;
+ my $file;
+-my @files = get_files();
+-if ($Config{gccversion} ne '' && $^O eq 'MSWin32') {
++#my @files = get_files();
++my @files = ("errno.h");
++
++if (1) {
++    open INCS, '>includes.c' or
++	die "Cannot open includes.c";
++    print INCS qq[#include "errno.h"\n];
++    close INCS;
++    process_file('includes.c');
++    unlink 'includes.c';
++}
++elsif ($Config{gccversion} ne '' && $^O eq 'MSWin32') {
+     # MinGW complains "warning: #pragma system_header ignored outside include
+     # file" if the header files are processed individually, so include them
+     # all in .c file and process that instead.
+@@ -53,7 +63,7 @@ sub process_file {
+         chomp($file = `cygpath -w "$file"`);
+     }
+ 
+-    return unless defined $file and -f $file;
++#    return unless defined $file and -f $file;
+ #    warn "Processing $file\n";
+ 
+     local *FH;

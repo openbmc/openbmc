@@ -1,0 +1,27 @@
+If for example you build on a machine with /bin/grep, then restore that sstate
+onto a machine with /usr/bin/grep, things will fail. Simply don't bother
+hardcoding paths.
+
+RP 2015/2/3
+
+Index: libtool-2.4.5/libtoolize.in
+===================================================================
+--- libtool-2.4.5.orig/libtoolize.in
++++ libtool-2.4.5/libtoolize.in
+@@ -40,11 +40,11 @@
+ 
+ : ${AUTOCONF="autoconf"}
+ : ${AUTOMAKE="automake"}
+-: ${EGREP="@EGREP@"}
+-: ${FGREP="@FGREP@"}
+-: ${GREP="@GREP@"}
+-: ${LN_S="@LN_S@"}
+-: ${SED="@SED@"}
++: ${EGREP="egrep"}
++: ${FGREP="fgrep"}
++: ${GREP="grep"}
++: ${LN_S="ln -s"}
++: ${SED="sed"}
+ 
+ 
+ ## -------------------------- ##

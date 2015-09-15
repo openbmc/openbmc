@@ -1,0 +1,15 @@
+Upstream-Status: Submitted [https://trac.xiph.org/ticket/1922]
+
+Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
+Index: configure.in
+===================================================================
+--- configure.in	(revision 18764)
++++ configure.in	(working copy)
+@@ -9,7 +9,7 @@
+ AC_CANONICAL_HOST
+ AC_CANONICAL_TARGET
+
+-AM_CONFIG_HEADER([config.h])
++AC_CONFIG_HEADERS([config.h])
+
+ AM_INIT_AUTOMAKE(libvorbisidec,1.2.1)

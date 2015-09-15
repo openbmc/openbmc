@@ -1,0 +1,17 @@
+Upstream-Status: Inappropriate [configuration]
+
+Index: git/Makefile
+===================================================================
+--- git.orig/Makefile	2011-11-02 14:52:17.243104779 -0700
++++ git/Makefile	2011-11-02 15:06:01.555104982 -0700
+@@ -161,8 +161,8 @@
+ 	$(INSTALL) -d $(DESTDIR)$(BINDIR)
+ 	$(INSTALL) $(BIN) $(SCRIPTS) $(DESTDIR)$(BINDIR)
+ 	$(INSTALL) -d $(DESTDIR)$(LIBDIR)
+-	$(INSTALL) $(LIBFDT_lib) $(DESTDIR)$(LIBDIR)
+-	ln -sf $(notdir $(LIBFDT_lib)) $(DESTDIR)$(LIBDIR)/$(LIBFDT_soname)
++	$(INSTALL) $(LIBFDT_lib) $(DESTDIR)$(LIBDIR)/$(LIBFDT_soname)
++	ln -sf $(LIBFDT_soname) $(DESTDIR)$(LIBDIR)/$(notdir $(LIBFDT_lib))
+ 	ln -sf $(LIBFDT_soname) $(DESTDIR)$(LIBDIR)/libfdt.$(SHAREDLIB_EXT)
+ 	$(INSTALL) -m 644 $(LIBFDT_archive) $(DESTDIR)$(LIBDIR)
+ 	$(INSTALL) -d $(DESTDIR)$(INCLUDEDIR)

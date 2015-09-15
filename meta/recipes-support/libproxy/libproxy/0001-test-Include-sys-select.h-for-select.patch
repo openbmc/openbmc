@@ -1,0 +1,37 @@
+From f5f2c2289eb35eb804c1c35e46ca41b58e4cae01 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 6 Apr 2015 14:13:49 -0700
+Subject: [PATCH] test: Include <sys/select.h> for select()
+
+As per posix we need to include this file otherwise we end up with errors like
+
+/home/kraj/work/bleeding/openembedded-core/build/tmp-musl/work/mips32r2-oe-linux-musl/libproxy/0.4.11-r0/libproxy-0.4.11/libproxy/test/get-pac-test.cpp: In member function 'bool TestServer::loop()':
+/home/kraj/work/bleeding/openembedded-core/build/tmp-musl/work/mips32r2-oe-linux-musl/libproxy/0.4.11-r0/libproxy-0.4.11/libproxy/test/get-pac-test.cpp:80:4: error: 'fd_set' was not declared in this scope
+    fd_set fds;
+    ^
+/home/kraj/work/bleeding/openembedded-core/build/tmp-musl/work/mips32r2-oe-linux-musl/libproxy/0.4.11-r0/libproxy-0.4.11/libproxy/test/get-pac-test.cpp:89:14: error: 'fds' was not declared in this scope
+    FD_ZERO (&fds);
+<JIRA TICKET #1>, <JIRA TICKET #2>, <JIRA TICKET #n> : <one line summary of change>
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libproxy/test/get-pac-test.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libproxy/test/get-pac-test.cpp b/libproxy/test/get-pac-test.cpp
+index a61fc4b..bda4646 100644
+--- a/libproxy/test/get-pac-test.cpp
++++ b/libproxy/test/get-pac-test.cpp
+@@ -3,6 +3,7 @@
+ #include <sstream>
+ #include <string>
+ 
++#include <sys/select.h>
+ #include <sys/socket.h>
+ #include <netinet/in.h>
+ #include <arpa/inet.h>
+-- 
+2.1.4
+

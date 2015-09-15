@@ -1,0 +1,34 @@
+Remove Makefile dependencies for test targets
+
+These are probably here because the executables aren't always built for
+other platforms (e.g. Windows); however we can safely assume they'll
+always be there. None of the other test targets have such dependencies
+and if we don't remove them, make tries to rebuild the executables and
+fails during run-ptest.
+
+Upstream-Status: Inappropriate [config]
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+
+Index: openssl-1.0.2/test/Makefile
+===================================================================
+--- openssl-1.0.2.orig/test/Makefile
++++ openssl-1.0.2/test/Makefile
+@@ -330,7 +330,7 @@ test_cms: ../apps/openssl$(EXE_EXT) cms-
+ 	@echo "CMS consistency test"
+ 	$(PERL) cms-test.pl
+ 
+-test_srp: $(SRPTEST)$(EXE_EXT)
++test_srp:
+ 	@echo "Test SRP"
+ 	../util/shlib_wrap.sh ./srptest
+ 
+@@ -342,7 +342,7 @@ test_v3name: $(V3NAMETEST)$(EXE_EXT)
+ 	@echo "Test X509v3_check_*"
+ 	../util/shlib_wrap.sh ./$(V3NAMETEST)
+ 
+-test_heartbeat: $(HEARTBEATTEST)$(EXE_EXT)
++test_heartbeat:
+ 	../util/shlib_wrap.sh ./$(HEARTBEATTEST)
+ 
+ test_constant_time: $(CONSTTIMETEST)$(EXE_EXT)

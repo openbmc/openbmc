@@ -1,0 +1,29 @@
+From aa66afecd8ba9cc4139f25ab15ec315173413a7d Mon Sep 17 00:00:00 2001
+From: Paul Barker <paul@paulbarker.me.uk>
+Date: Wed, 20 Aug 2014 10:31:37 +0000
+Subject: [PATCH] Include <limits.h> for PATH_MAX
+
+When building against musl libc, PATH_MAX is defined in <limits.h>.
+
+Signed-off-by: Paul Barker <paul@paulbarker.me.uk>
+
+Upstream-Status: Accepted (Should be in next release after 22.21)
+---
+ src/pstree.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/pstree.c b/src/pstree.c
+index 071e6c4..0d28260 100644
+--- a/src/pstree.c
++++ b/src/pstree.c
+@@ -41,6 +41,7 @@
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <sys/ioctl.h>
++#include <limits.h>
+ 
+ #include "i18n.h"
+ #include "comm.h"
+-- 
+2.0.4
+

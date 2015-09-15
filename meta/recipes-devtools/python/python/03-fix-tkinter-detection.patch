@@ -1,0 +1,46 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+We need to supply STAGING_INCDIR here, otherwise the Tk headers
+will not be found.
+
+Signed-off-by: Michael 'Mickey' Lauer <mickey@vanille.de>
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+
+Rebased for python-2.7.9
+
+diff --git a/setup.py b/setup.py
+index 8fe1fb8..67eda74 100644
+--- a/setup.py
++++ b/setup.py
+@@ -1892,7 +1892,7 @@ class PyBuildExt(build_ext):
+                 dotversion = dotversion[:-1] + '.' + dotversion[-1]
+             tcl_include_sub = []
+             tk_include_sub = []
+-            for dir in inc_dirs:
++            for dir in [os.getenv("STAGING_INCDIR")]:
+                 tcl_include_sub += [dir + os.sep + "tcl" + dotversion]
+                 tk_include_sub += [dir + os.sep + "tk" + dotversion]
+             tk_include_sub += tcl_include_sub
+@@ -1911,22 +1911,6 @@ class PyBuildExt(build_ext):
+             if dir not in include_dirs:
+                 include_dirs.append(dir)
+ 
+-        # Check for various platform-specific directories
+-        if host_platform == 'sunos5':
+-            include_dirs.append('/usr/openwin/include')
+-            added_lib_dirs.append('/usr/openwin/lib')
+-        elif os.path.exists('/usr/X11R6/include'):
+-            include_dirs.append('/usr/X11R6/include')
+-            added_lib_dirs.append('/usr/X11R6/lib64')
+-            added_lib_dirs.append('/usr/X11R6/lib')
+-        elif os.path.exists('/usr/X11R5/include'):
+-            include_dirs.append('/usr/X11R5/include')
+-            added_lib_dirs.append('/usr/X11R5/lib')
+-        else:
+-            # Assume default location for X11
+-            include_dirs.append('/usr/X11/include')
+-            added_lib_dirs.append('/usr/X11/lib')
+-
+         # If Cygwin, then verify that X is installed before proceeding
+         if host_platform == 'cygwin':
+             x11_inc = find_file('X11/Xlib.h', [], include_dirs)

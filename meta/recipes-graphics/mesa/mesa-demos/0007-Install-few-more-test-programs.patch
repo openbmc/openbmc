@@ -1,0 +1,74 @@
+From d930b2da57f7c9efb80c8cef8f8adad15bbbc0d3 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Thu, 10 Jul 2014 14:30:52 +0200
+Subject: [PATCH 7/9] Install few more test programs
+
+Upstream-Status: Pending
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ src/egl/opengl/Makefile.am    |  2 +-
+ src/egl/opengles1/Makefile.am | 10 ++++------
+ src/egl/openvg/Makefile.am    |  2 +-
+ 3 files changed, 6 insertions(+), 8 deletions(-)
+
+diff --git a/src/egl/opengl/Makefile.am b/src/egl/opengl/Makefile.am
+index 0c7228f..87b2f1a 100644
+--- a/src/egl/opengl/Makefile.am
++++ b/src/egl/opengl/Makefile.am
+@@ -50,7 +50,7 @@ endif
+ endif
+ 
+ if HAVE_EGL
+-noinst_PROGRAMS = \
++bin_PROGRAMS = \
+ 	demo1 \
+ 	demo2 \
+ 	demo3 \
+diff --git a/src/egl/opengles1/Makefile.am b/src/egl/opengles1/Makefile.am
+index 3455e75..516e516 100644
+--- a/src/egl/opengles1/Makefile.am
++++ b/src/egl/opengles1/Makefile.am
+@@ -36,11 +36,11 @@ AM_LDFLAGS = \
+ 	$(EGL_LIBS) \
+ 	-lm
+ 
+-noinst_PROGRAMS =
++bin_PROGRAMS =
+ 
+ if HAVE_EGL
+ if HAVE_GLESV1
+-noinst_PROGRAMS += \
++bin_PROGRAMS += \
+ 	drawtex_screen \
+ 	gears_screen \
+ 	torus_screen \
+@@ -57,10 +57,8 @@ torus_screen_LDADD = ../eglut/libeglut_screen.la
+ tri_screen_LDADD = ../eglut/libeglut_screen.la
+ 
+ if HAVE_X11
+-noinst_PROGRAMS += \
+-	clear
+-
+-bin_PROGRAMS = \
++bin_PROGRAMS += \
++	clear \
+ 	bindtex \
+ 	drawtex_x11 \
+ 	eglfbdev \
+diff --git a/src/egl/openvg/Makefile.am b/src/egl/openvg/Makefile.am
+index 7318a43..b545225 100644
+--- a/src/egl/openvg/Makefile.am
++++ b/src/egl/openvg/Makefile.am
+@@ -49,7 +49,7 @@ endif
+ 
+ if HAVE_EGL
+ if HAVE_VG
+-noinst_PROGRAMS = \
++bin_PROGRAMS = \
+ 	lion_screen \
+ 	sp_screen \
+ 	$(EGL_X11_DEMOS)
+-- 
+2.0.0
+

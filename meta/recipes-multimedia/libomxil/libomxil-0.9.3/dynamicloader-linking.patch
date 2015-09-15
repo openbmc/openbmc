@@ -1,0 +1,20 @@
+This patch fixes link issue when libomxdynamicloader.so is loaded :
+Missing symbol RM_Deinit.
+
+This patch comes from "http://pkgs.fedoraproject.org/cgit/libomxil-bellagio.git/commit/?h=f17&id=4996a95828943d345e51ded6876c3103653eecf8"
+
+Upstream-Status: Pending
+
+Signed-off-by: Sébastien Mennetrier <s.mennetrier@innotis.org>
+
+--- a/src/dynamic_loader/Makefile.am	2014-02-25 15:29:10.128549636 +0100
++++ b/src/dynamic_loader/Makefile.am	2014-02-25 15:30:15.756548808 +0100
+@@ -3,7 +3,7 @@
+ omxdynamicloader_LTLIBRARIES = libomxdynamicloader.la
+ libomxdynamicloader_la_SOURCES = ste_dynamic_component_loader.c ste_dynamic_component_loader.h
+ 
+-libomxdynamicloader_la_LDFLAGS =
++libomxdynamicloader_la_LDFLAGS = -lomxil-bellagio -L$(top_builddir)/src/.libs
+ libomxdynamicloader_la_CFLAGS = -I$(top_srcdir)/include \
+ 			-I$(top_srcdir)/src \
+ 			-I$(top_srcdir)/src/base \

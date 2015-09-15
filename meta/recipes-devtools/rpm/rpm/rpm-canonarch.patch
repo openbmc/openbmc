@@ -1,0 +1,136 @@
+lib/rpmrc.c: Update --target processing to support full GNU canonical arch
+
+Prior to this patch, when using --target, RPM supported the format:
+  <arch>
+  <arch>-<os>
+  <arch>-<os>-gnu
+  <arch>-<arbitrary items>-<os>
+  <arch>-<arbitrary items>-<os>-gnu
+
+This patch changes the list of supported items to:
+  <arch>
+  <arch>-<os>
+  <arch>-<os>-gnu
+  <arch>-<vendor>-<os>
+  <arch>-<vendor>-<os>-<extension>
+
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.14/lib/rpmrc.c
+===================================================================
+--- rpm-5.4.14.orig/lib/rpmrc.c
++++ rpm-5.4.14/lib/rpmrc.c
+@@ -925,8 +925,8 @@ static void getMachineInfo(int type, /*@
+ 
+ static void rpmRebuildTargetVars(const char ** target, const char ** canontarget)
+ {
+-
+-    char *ca = NULL, *co = NULL, *ct = NULL;
++    /* ca = arch, cv = vendor, co = os, ce = extension, ct = canon target */
++    char *ca = NULL, *cv = NULL, *co = NULL, *ce = NULL, *ct = NULL;
+     int x;
+ 
+     /* Rebuild the compat table to recalculate the current target arch.  */
+@@ -936,23 +936,60 @@ static void rpmRebuildTargetVars(const c
+     rpmSetTables(RPM_MACHTABLE_BUILDARCH, RPM_MACHTABLE_BUILDOS);
+ 
+     if (target && *target) {
++	/* GNU canonical format is:
++	 *  <arch>-<vendor>-<os>[-extension]
++	 *
++	 * We support the both the GNU canonical format
++	 * as well as the traditional RPM formats: 
++	 *  <arch>
++	 *  <arch>-<os>[-gnu]
++	 */
+ 	char *c;
+ 	/* Set arch and os from specified build target */
+ 	ca = xstrdup(*target);
+-	if ((c = strchr(ca, '-')) != NULL) {
++	if ((c = strchr(ca, '-')) == NULL) {
++	    /* Format is <arch> */
++	    ;
++	} else {
+ 	    *c++ = '\0';
+-	    
+-	    if ((co = strrchr(c, '-')) == NULL) {
+-		co = c;
++	    cv = c;
++
++	    if ((c = strchr(c, '-')) == NULL) {
++		/* Format is <arch>-<os> */
++		co = cv;
++		cv = NULL;
+ 	    } else {
+-		if (!xstrcasecmp(co, "-gnu"))
+-		    *co = '\0';
+-		if ((co = strrchr(c, '-')) == NULL)
+-		    co = c;
+-		else
+-		    co++;
++		*c++ = '\0';
++		co = c;
++
++		if ((c = strchr(c, '-')) == NULL) {
++		    /* Might be:
++		     *  <arch>-<vendor>-<os>
++		     *  <arch>-<os>-gnu
++		     */
++		    if (!xstrcasecmp(co, "gnu")) {
++			/* Format was <arch>-<os>-gnu */
++			ce = co;
++			co = cv;
++			cv = NULL;
++		    }
++		} else {
++		    /* Format was <arch>-<vendor>-<os>-<extension> */
++		    *c++ = '\0';
++		    ce = c;
++		}
+ 	    }
++	    if (cv != NULL) cv = xstrdup(cv);
+ 	    if (co != NULL) co = xstrdup(co);
++	    if (ce != NULL) {
++		/* We need to prefix it with a "-" */
++		char * lce = NULL;
++
++		lce = xmalloc(strlen(ce) + sizeof("-"));
++		sprintf(lce, "-%s", ce);
++
++		ce = lce;
++	    }
+ 	}
+     } else {
+ 	const char *a = NULL;
+@@ -995,8 +1032,16 @@ static void rpmRebuildTargetVars(const c
+     addMacro(NULL, "_target", NULL, ct, RMIL_RPMRC);
+     delMacro(NULL, "_target_cpu");
+     addMacro(NULL, "_target_cpu", NULL, ca, RMIL_RPMRC);
++    if (cv) {
++	delMacro(NULL, "_target_vendor");
++	addMacro(NULL, "_target_vendor", NULL, cv, RMIL_RPMRC);
++    }
+     delMacro(NULL, "_target_os");
+     addMacro(NULL, "_target_os", NULL, co, RMIL_RPMRC);
++    if (ce) {
++	delMacro(NULL, "_gnu");
++	addMacro(NULL, "_gnu", NULL, ce, RMIL_RPMRC);
++    }
+ 
+     if (canontarget)
+ 	*canontarget = ct;
+@@ -1004,8 +1049,12 @@ static void rpmRebuildTargetVars(const c
+ 	ct = _free(ct);
+     ca = _free(ca);
+     /*@-usereleased@*/
++    cv = _free(cv);
++    /*@-usereleased@*/
+     co = _free(co);
+     /*@=usereleased@*/
++    ce = _free(ce);
++    /*@-usereleased@*/
+ }
+ 
+ void rpmFreeRpmrc(void)

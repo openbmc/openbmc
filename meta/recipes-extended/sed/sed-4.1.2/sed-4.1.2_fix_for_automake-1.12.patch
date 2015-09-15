@@ -1,0 +1,37 @@
+Upstream-Status: Pending
+
+automake-1.12.x has deprecated use of @mkdir_p@, fix the issue by using @MKDIR_P@ instead.
+
+Avoid this build issue:
+| make[1]: mkdir_p@: Command not found
+| make[1]: *** [install-data-yes] Error 127
+
+Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+2012/07/13
+
+Index: sed-4.1.2/intl/Makefile.in
+===================================================================
+--- sed-4.1.2.orig/intl/Makefile.in
++++ sed-4.1.2/intl/Makefile.in
+@@ -40,7 +40,7 @@ subdir = intl
+ INSTALL = @INSTALL@
+ INSTALL_DATA = @INSTALL_DATA@
+ mkinstalldirs = $(mkdir_p)
+-mkdir_p = @mkdir_p@
++mkdir_p = @MKDIR_P@
+ 
+ l = @INTL_LIBTOOL_SUFFIX_PREFIX@
+ 
+Index: sed-4.1.2/po/Makefile.in.in
+===================================================================
+--- sed-4.1.2.orig/po/Makefile.in.in
++++ sed-4.1.2/po/Makefile.in.in
+@@ -29,7 +29,7 @@ gettextsrcdir = $(datadir)/gettext/po
+ INSTALL = /srv/home/nitin/builds2/build0/tmp/sysroots/x86_64-linux/usr/bin/install -c
+ INSTALL_DATA = ${INSTALL} -m 644
+ mkinstalldirs = $(mkdir_p)
+-mkdir_p = @mkdir_p@
++mkdir_p = @MKDIR_P@
+ 
+ CC = i586-poky-linux-gcc  -m32   -march=i586 --sysroot=/srv/home/nitin/builds2/build0/tmp/sysroots/qemux86
+ GMSGFMT = /srv/home/nitin/builds2/build0/tmp/sysroots/x86_64-linux/usr/bin/msgfmt

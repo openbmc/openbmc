@@ -1,0 +1,19 @@
+Upstream-Status: Pending
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+--- man-1.5i2/src/makewhatis.sh.initial	Tue Jul  3 15:38:39 2001
++++ man-1.5i2/src/makewhatis.sh	Tue Jul  3 15:39:39 2001
+@@ -81,8 +81,10 @@
+ 	continue;;
+     -s) setsections=1
+ 	continue;;
+-    -u) findarg="-newer /var/cache/man/whatis"
+-	update=1
++    -u) if [ -e /var/cache/man/whatis ]; then
++	  findarg="-newer /var/cache/man/whatis"
++	  update=1
++	fi
+ 	continue;;
+     -v) verbose=1
+ 	continue;;

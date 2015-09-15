@@ -1,0 +1,32 @@
+From 275fe0269ecc00af4788afaf9dc151a50b25645b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 28 Aug 2014 19:26:14 -0700
+Subject: [PATCH] Fix build with glibc 2.20
+
+* grub-core/kern/emu/hostfs.c: squahes below warning
+  warning: #warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Submitted
+
+---
+ grub-core/kern/emu/hostfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/kern/emu/hostfs.c b/grub-core/kern/emu/hostfs.c
+index 7e725f6..8dd8e65 100644
+--- a/grub-core/kern/emu/hostfs.c
++++ b/grub-core/kern/emu/hostfs.c
+@@ -19,7 +19,7 @@
+ 
+ #include <config-util.h>
+ 
+-#define _BSD_SOURCE
++#define _DEFAULT_SOURCE
+ #include <grub/fs.h>
+ #include <grub/file.h>
+ #include <grub/disk.h>
+-- 
+2.1.0
+

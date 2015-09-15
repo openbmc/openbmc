@@ -1,0 +1,163 @@
+#!/bin/bash
+#
+# Copyright (c) 2005-2009 Wind River Systems, Inc.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+usage() {
+	echo "Usage: $0 {start|stop|restart} <nfs-export-dir>"
+}
+
+if [ $# != 2 ]; then
+	usage
+	exit 1
+fi
+
+if [[ "$1" != "start" && "$1" != "stop" && "$1" != "restart" ]]; then
+	echo "Unknown command '$1'"
+	usage
+	exit 1
+fi
+
+if [ ! -d "$2" ]; then
+	echo "Error: '$2' does not exist"
+	usage
+	exit 1
+fi
+# Ensure the nfs-export-dir is an absolute path
+NFS_EXPORT_DIR=$(cd "$2" && pwd)
+
+SYSROOT_SETUP_SCRIPT=`which oe-find-native-sysroot 2> /dev/null`
+if [ -z "$SYSROOT_SETUP_SCRIPT" ]; then
+	echo "Error: Unable to find the oe-find-native-sysroot script"
+	echo "Did you forget to source your build environment setup script?"
+	exit 1
+fi
+. $SYSROOT_SETUP_SCRIPT
+
+if [ ! -e "$OECORE_NATIVE_SYSROOT/usr/sbin/unfsd" ]; then
+	echo "Error: Unable to find unfsd binary in $OECORE_NATIVE_SYSROOT/usr/sbin/"
+
+	if [ "x$OECORE_DISTRO_VERSION" = "x" ]; then
+		echo "Have you run 'bitbake meta-ide-support'?"
+	else
+		echo "This shouldn't happen - something is missing from your toolchain installation"
+	fi
+	exit 1
+fi
+
+if [ ! -d ~/.runqemu-sdk ]; then
+	mkdir -p ~/.runqemu-sdk
+fi
+
+NFS_INSTANCE=${NFS_INSTANCE:=0}
+EXPORTS=~/.runqemu-sdk/exports$NFS_INSTANCE
+RMTAB=~/.runqemu-sdk/rmtab$NFS_INSTANCE
+NFSPID=~/.runqemu-sdk/nfs$NFS_INSTANCE.pid
+MOUNTPID=~/.runqemu-sdk/mount$NFS_INSTANCE.pid
+
+PSEUDO_OPTS="-P $OECORE_NATIVE_SYSROOT/usr"
+PSEUDO_LOCALSTATEDIR="$NFS_EXPORT_DIR/../$(basename $NFS_EXPORT_DIR).pseudo_state"
+export PSEUDO_LOCALSTATEDIR
+
+if [ ! -d "$PSEUDO_LOCALSTATEDIR" ]; then
+	echo "Error: $PSEUDO_LOCALSTATEDIR does not exist."
+	echo "Did you create the export directory using runqemu-extract-sdk?"
+	exit 1	
+fi
+
+# rpc.mountd RPC port
+NFS_MOUNTPROG=$[ 21111 + $NFS_INSTANCE ]
+# rpc.nfsd RPC port
+NFS_NFSPROG=$[ 11111 + $NFS_INSTANCE ]
+# NFS port number
+NFS_PORT=$[ 3049 + 2 * $NFS_INSTANCE ]
+# mountd port number
+MOUNT_PORT=$[ 3048 + 2 * $NFS_INSTANCE ]
+
+## For debugging you would additionally add
+## --debug all
+UNFSD_OPTS="-p -N -i $NFSPID -e $EXPORTS -x $NFS_NFSPROG -n $NFS_PORT -y $NFS_MOUNTPROG -m $MOUNT_PORT"
+
+# Setup the exports file
+if [ "$1" = "start" ]; then
+	echo "Creating exports file..."
+	echo "$NFS_EXPORT_DIR (rw,async,no_root_squash,no_all_squash,insecure)" > $EXPORTS
+fi
+
+# See how we were called.
+case "$1" in
+  start)
+	PORTMAP_RUNNING=`ps -ef | grep portmap | grep -v grep`
+	RPCBIND_RUNNING=`ps -ef | grep rpcbind | grep -v grep`
+	if [[ "x$PORTMAP_RUNNING" = "x" && "x$RPCBIND_RUNNING" = "x" ]]; then
+		echo "======================================================="
+		echo "Error: neither rpcbind nor portmap appear to be running"
+		echo "Please install and start one of these services first"
+		echo "======================================================="
+		echo "Tip: for recent Ubuntu hosts, run:"
+		echo "  sudo apt-get install rpcbind"
+		echo "Then add OPTIONS=\"-i -w\"  to /etc/default/rpcbind and run"
+		echo "  sudo service portmap restart"
+
+		exit 1
+	fi
+
+	echo "Starting User Mode nfsd"
+	echo "  $PSEUDO $PSEUDO_OPTS $OECORE_NATIVE_SYSROOT/usr/sbin/unfsd $UNFSD_OPTS"
+	$PSEUDO $PSEUDO_OPTS $OECORE_NATIVE_SYSROOT/usr/sbin/unfsd $UNFSD_OPTS
+	if [ ! $? = 0 ]; then
+		echo "Error starting nfsd"
+		exit 1
+	fi
+	# Check to make sure everything started ok.
+	if [ ! -f $NFSPID ]; then
+		echo "rpc.nfsd did not start correctly"
+		exit 1
+	fi
+	ps -fp `cat $NFSPID` > /dev/null 2> /dev/null
+	if [ ! $? = 0 ]; then
+		echo "rpc.nfsd did not start correctly"
+		exit 1
+	fi
+	echo " "
+	echo "On your target please remember to add the following options for NFS"
+	echo "nfsroot=IP_ADDRESS:$NFS_EXPORT_DIR,nfsvers=3,port=$NFSD_PORT,mountprog=$MOUNTD_RPCPORT,nfsprog=$NFSD_RPCPORT,udp,mountport=$MOUNTD_PORT"
+	;;
+  stop)
+	if [ -f "$NFSPID" ]; then
+		echo "Stopping rpc.nfsd"
+		kill `cat $NFSPID`
+		rm -f $NFSPID
+	else
+		echo "No PID file, not stopping rpc.nfsd"
+	fi
+	if [ -f "$EXPORTS" ]; then
+		echo "Removing exports file"
+		rm -f $EXPORTS
+	fi
+	;;
+  restart)
+	$0 stop $NFS_EXPORT_DIR
+	$0 start $NFS_EXPORT_DIR 
+	if [ ! $? = 0 ]; then
+		exit 1
+	fi
+	;;
+  *)
+	echo "$0 {start|stop|restart} <nfs-export-dir>"
+	;;
+esac
+
+exit 0

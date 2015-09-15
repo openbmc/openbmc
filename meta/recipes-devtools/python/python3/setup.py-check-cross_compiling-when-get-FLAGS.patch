@@ -1,0 +1,50 @@
+From 8dad810f3a3d073f09ad72e1a3ee0a895eab2ca1 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Sun, 18 Jan 2015 19:05:36 -0800
+Subject: [PATCH] setup.py:check cross_compiling when get FLAGS
+
+Fixed when compile target pythnon3:
+gcc -isystem/path/to/sysroots/x86_64-linux/usr/include \
+    -L=/path/to/sysroots/x86_64-linux/usr/lib
+
+This is incorrect, the native sysroot should not be used by target
+python3.
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ setup.py |   10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index e8339cd..83fd31f 100644
+--- a/setup.py
++++ b/setup.py
+@@ -238,7 +238,10 @@ class PyBuildExt(build_ext):
+         # unfortunately, distutils doesn't let us provide separate C and C++
+         # compilers
+         if compiler is not None:
+-            (ccshared,cflags) = sysconfig.get_config_vars('CCSHARED','CFLAGS')
++            if cross_compiling:
++                (ccshared,cflags) = (os.environ.get('CCSHARED') or '', os.environ.get('CFLAGS') or '')
++            else:
++                (ccshared,cflags) = sysconfig.get_config_vars('CCSHARED','CFLAGS')
+             args['compiler_so'] = compiler + ' ' + ccshared + ' ' + cflags
+         self.compiler.set_executables(**args)
+ 
+@@ -457,7 +460,10 @@ class PyBuildExt(build_ext):
+                 ('LDFLAGS', '-R', self.compiler.runtime_library_dirs),
+                 ('LDFLAGS', '-L', self.compiler.library_dirs),
+                 ('CPPFLAGS', '-I', self.compiler.include_dirs)):
+-            env_val = sysconfig.get_config_var(env_var)
++            if cross_compiling:
++                env_val = os.environ.get(env_var)
++            else:
++                env_val = sysconfig.get_config_var(env_var)
+             if env_val:
+                 # To prevent optparse from raising an exception about any
+                 # options in env_val that it doesn't know about we strip out
+-- 
+1.7.9.5
+

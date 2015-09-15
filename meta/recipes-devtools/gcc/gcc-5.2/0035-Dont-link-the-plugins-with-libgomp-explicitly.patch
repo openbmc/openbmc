@@ -1,0 +1,83 @@
+From 3a09545f3d18ce492ef55639215a072282de03d0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 8 Mar 2015 03:41:39 +0000
+Subject: [PATCH 35/35] Dont link the plugins with libgomp explicitly
+
+They are dlopened by libgomp anyway. This fixes
+the libtool relink issue which causes issues during
+cross compilation
+
+libtool: install: /usr/bin/install -c .libs/libgomp.lai
+/home/ubuntu/work/bleeding/build-qemux86-64mc/tmp/work/core2-64-rdk-linux/gcc-runtime/5.0-r0/image/usr/lib/../lib/libgomp.la
+libtool: install: error: cannot install `libgomp-plugin-host_nonshm.la'
+to a directory not ending in /usr/lib
+Makefile:517: recipe for target 'install-toolexeclibLTLIBRARIES' failed
+make[2]: *** [install-toolexeclibLTLIBRARIES] Error 1
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libgomp/Makefile.in        | 7 +++----
+ libgomp/plugin/Makefrag.am | 3 +--
+ 2 files changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/libgomp/Makefile.in b/libgomp/Makefile.in
+index b61b108..71b2627 100644
+--- a/libgomp/Makefile.in
++++ b/libgomp/Makefile.in
+@@ -123,7 +123,7 @@ am__installdirs = "$(DESTDIR)$(toolexeclibdir)" "$(DESTDIR)$(infodir)" \
+ 	"$(DESTDIR)$(fincludedir)" "$(DESTDIR)$(libsubincludedir)" \
+ 	"$(DESTDIR)$(toolexeclibdir)"
+ LTLIBRARIES = $(toolexeclib_LTLIBRARIES)
+-libgomp_plugin_host_nonshm_la_DEPENDENCIES = libgomp.la
++libgomp_plugin_host_nonshm_la_LIBADD =
+ am_libgomp_plugin_host_nonshm_la_OBJECTS =  \
+ 	libgomp_plugin_host_nonshm_la-plugin-host.lo
+ libgomp_plugin_host_nonshm_la_OBJECTS =  \
+@@ -133,7 +133,7 @@ libgomp_plugin_host_nonshm_la_LINK = $(LIBTOOL) --tag=CC \
+ 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+ 	$(libgomp_plugin_host_nonshm_la_LDFLAGS) $(LDFLAGS) -o $@
+ am__DEPENDENCIES_1 =
+-@PLUGIN_NVPTX_TRUE@libgomp_plugin_nvptx_la_DEPENDENCIES = libgomp.la \
++@PLUGIN_NVPTX_TRUE@libgomp_plugin_nvptx_la_DEPENDENCIES =  \
+ @PLUGIN_NVPTX_TRUE@	$(am__DEPENDENCIES_1)
+ @PLUGIN_NVPTX_TRUE@am_libgomp_plugin_nvptx_la_OBJECTS =  \
+ @PLUGIN_NVPTX_TRUE@	libgomp_plugin_nvptx_la-plugin-nvptx.lo
+@@ -407,7 +407,7 @@ libgomp_la_SOURCES = alloc.c barrier.c critical.c env.c error.c iter.c \
+ @PLUGIN_NVPTX_TRUE@libgomp_plugin_nvptx_la_LDFLAGS =  \
+ @PLUGIN_NVPTX_TRUE@	$(libgomp_plugin_nvptx_version_info) \
+ @PLUGIN_NVPTX_TRUE@	$(lt_host_flags) $(PLUGIN_NVPTX_LDFLAGS)
+-@PLUGIN_NVPTX_TRUE@libgomp_plugin_nvptx_la_LIBADD = libgomp.la $(PLUGIN_NVPTX_LIBS)
++@PLUGIN_NVPTX_TRUE@libgomp_plugin_nvptx_la_LIBADD = $(PLUGIN_NVPTX_LIBS)
+ @PLUGIN_NVPTX_TRUE@libgomp_plugin_nvptx_la_LIBTOOLFLAGS = --tag=disable-static
+ libgomp_plugin_host_nonshm_version_info = -version-info $(libtool_VERSION)
+ libgomp_plugin_host_nonshm_la_SOURCES = plugin/plugin-host.c
+@@ -415,7 +415,6 @@ libgomp_plugin_host_nonshm_la_CPPFLAGS = $(AM_CPPFLAGS) -DHOST_NONSHM_PLUGIN
+ libgomp_plugin_host_nonshm_la_LDFLAGS = \
+ 	$(libgomp_plugin_host_nonshm_version_info) $(lt_host_flags)
+ 
+-libgomp_plugin_host_nonshm_la_LIBADD = libgomp.la
+ libgomp_plugin_host_nonshm_la_LIBTOOLFLAGS = --tag=disable-static
+ nodist_noinst_HEADERS = libgomp_f.h
+ nodist_libsubinclude_HEADERS = omp.h openacc.h
+diff --git a/libgomp/plugin/Makefrag.am b/libgomp/plugin/Makefrag.am
+index 167485f..d2c5428 100644
+--- a/libgomp/plugin/Makefrag.am
++++ b/libgomp/plugin/Makefrag.am
+@@ -35,7 +35,7 @@ libgomp_plugin_nvptx_la_CPPFLAGS = $(AM_CPPFLAGS) $(PLUGIN_NVPTX_CPPFLAGS)
+ libgomp_plugin_nvptx_la_LDFLAGS = $(libgomp_plugin_nvptx_version_info) \
+ 	$(lt_host_flags)
+ libgomp_plugin_nvptx_la_LDFLAGS += $(PLUGIN_NVPTX_LDFLAGS)
+-libgomp_plugin_nvptx_la_LIBADD = libgomp.la $(PLUGIN_NVPTX_LIBS)
++libgomp_plugin_nvptx_la_LIBADD = $(PLUGIN_NVPTX_LIBS)
+ libgomp_plugin_nvptx_la_LIBTOOLFLAGS = --tag=disable-static
+ endif
+ 
+@@ -45,5 +45,4 @@ libgomp_plugin_host_nonshm_la_SOURCES = plugin/plugin-host.c
+ libgomp_plugin_host_nonshm_la_CPPFLAGS = $(AM_CPPFLAGS) -DHOST_NONSHM_PLUGIN
+ libgomp_plugin_host_nonshm_la_LDFLAGS = \
+ 	$(libgomp_plugin_host_nonshm_version_info) $(lt_host_flags)
+-libgomp_plugin_host_nonshm_la_LIBADD = libgomp.la
+ libgomp_plugin_host_nonshm_la_LIBTOOLFLAGS = --tag=disable-static
+-- 
+2.1.4
+

@@ -1,0 +1,505 @@
+#!/usr/bin/env python
+
+# OpenEmbedded pkgdata utility
+#
+# Written by: Paul Eggleton <paul.eggleton@linux.intel.com>
+#
+# Copyright 2012-2015 Intel Corporation
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#
+
+import sys
+import os
+import os.path
+import fnmatch
+import re
+import argparse
+import logging
+from collections import defaultdict, OrderedDict
+
+scripts_path = os.path.dirname(os.path.realpath(__file__))
+lib_path = scripts_path + '/lib'
+sys.path = sys.path + [lib_path]
+import scriptutils
+logger = scriptutils.logger_create('pkgdatautil')
+
+def tinfoil_init():
+    import bb.tinfoil
+    import logging
+    tinfoil = bb.tinfoil.Tinfoil()
+    tinfoil.prepare(True)
+
+    tinfoil.logger.setLevel(logging.WARNING)
+    return tinfoil
+
+
+def glob(args):
+    # Handle both multiple arguments and multiple values within an arg (old syntax)
+    globs = []
+    for globitem in args.glob:
+        globs.extend(globitem.split())
+
+    if not os.path.exists(args.pkglistfile):
+        logger.error('Unable to find package list file %s' % args.pkglistfile)
+        sys.exit(1)
+
+    skipval = "-locale-|^locale-base-|-dev$|-doc$|-dbg$|-staticdev$|^kernel-module-"
+    if args.exclude:
+        skipval += "|" + args.exclude
+    skipregex = re.compile(skipval)
+
+    mappedpkgs = set()
+    with open(args.pkglistfile, 'r') as f:
+        for line in f:
+            fields = line.rstrip().split()
+            if not fields:
+                continue
+            pkg = fields[0]
+            # We don't care about other args (used to need the package architecture but the
+            # new pkgdata structure avoids the need for that)
+
+            # Skip packages for which there is no point applying globs
+            if skipregex.search(pkg):
+                logger.debug("%s -> !!" % pkg)
+                continue
+
+            # Skip packages that already match the globs, so if e.g. a dev package
+            # is already installed and thus in the list, we don't process it any further
+            # Most of these will be caught by skipregex already, but just in case...
+            already = False
+            for g in globs:
+                if fnmatch.fnmatchcase(pkg, g):
+                    already = True
+                    break
+            if already:
+                logger.debug("%s -> !" % pkg)
+                continue
+
+            # Define some functions
+            def revpkgdata(pkgn):
+                return os.path.join(args.pkgdata_dir, "runtime-reverse", pkgn)
+            def fwdpkgdata(pkgn):
+                return os.path.join(args.pkgdata_dir, "runtime", pkgn)
+            def readpn(pkgdata_file):
+                pn = ""
+                with open(pkgdata_file, 'r') as f:
+                    for line in f:
+                        if line.startswith("PN:"):
+                            pn = line.split(': ')[1].rstrip()
+                return pn
+            def readrenamed(pkgdata_file):
+                renamed = ""
+                pn = os.path.basename(pkgdata_file)
+                with open(pkgdata_file, 'r') as f:
+                    for line in f:
+                        if line.startswith("PKG_%s:" % pn):
+                            renamed = line.split(': ')[1].rstrip()
+                return renamed
+
+            # Main processing loop
+            for g in globs:
+                mappedpkg = ""
+                # First just try substitution (i.e. packagename -> packagename-dev)
+                newpkg = g.replace("*", pkg)
+                revlink = revpkgdata(newpkg)
+                if os.path.exists(revlink):
+                    mappedpkg = os.path.basename(os.readlink(revlink))
+                    fwdfile = fwdpkgdata(mappedpkg)
+                    if os.path.exists(fwdfile):
+                        mappedpkg = readrenamed(fwdfile)
+                    if not os.path.exists(fwdfile + ".packaged"):
+                        mappedpkg = ""
+                else:
+                    revlink = revpkgdata(pkg)
+                    if os.path.exists(revlink):
+                        # Check if we can map after undoing the package renaming (by resolving the symlink)
+                        origpkg = os.path.basename(os.readlink(revlink))
+                        newpkg = g.replace("*", origpkg)
+                        fwdfile = fwdpkgdata(newpkg)
+                        if os.path.exists(fwdfile):
+                            mappedpkg = readrenamed(fwdfile)
+                        else:
+                            # That didn't work, so now get the PN, substitute that, then map in the other direction
+                            pn = readpn(revlink)
+                            newpkg = g.replace("*", pn)
+                            fwdfile = fwdpkgdata(newpkg)
+                            if os.path.exists(fwdfile):
+                                mappedpkg = readrenamed(fwdfile)
+                        if not os.path.exists(fwdfile + ".packaged"):
+                            mappedpkg = ""
+                    else:
+                        # Package doesn't even exist...
+                        logger.debug("%s is not a valid package!" % (pkg))
+                        break
+
+                if mappedpkg:
+                    logger.debug("%s (%s) -> %s" % (pkg, g, mappedpkg))
+                    mappedpkgs.add(mappedpkg)
+                else:
+                    logger.debug("%s (%s) -> ?" % (pkg, g))
+
+    logger.debug("------")
+
+    print("\n".join(mappedpkgs))
+
+def read_value(args):
+    # Handle both multiple arguments and multiple values within an arg (old syntax)
+    packages = []
+    for pkgitem in args.pkg:
+        packages.extend(pkgitem.split())
+
+    def readvar(pkgdata_file, valuename):
+        val = ""
+        with open(pkgdata_file, 'r') as f:
+            for line in f:
+                if line.startswith(valuename + ":"):
+                    val = line.split(': ', 1)[1].rstrip()
+        return val
+
+    logger.debug("read-value('%s', '%s' '%s'" % (args.pkgdata_dir, args.valuename, packages))
+    for package in packages:
+        pkg_split = package.split('_')
+        pkg_name = pkg_split[0]
+        logger.debug("package: '%s'" % pkg_name)
+        revlink = os.path.join(args.pkgdata_dir, "runtime-reverse", pkg_name)
+        logger.debug(revlink)
+        if os.path.exists(revlink):
+            mappedpkg = os.path.basename(os.readlink(revlink))
+            qvar = args.valuename
+            if qvar == "PKGSIZE":
+                # append packagename
+                qvar = "%s_%s" % (args.valuename, mappedpkg)
+                # PKGSIZE is now in bytes, but we we want it in KB
+                pkgsize = (int(readvar(revlink, qvar)) + 1024 // 2) // 1024
+                print("%d" % pkgsize)
+            else:
+                print(readvar(revlink, qvar))
+
+def lookup_pkglist(pkgs, pkgdata_dir, reverse):
+    if reverse:
+        mappings = OrderedDict()
+        for pkg in pkgs:
+            revlink = os.path.join(pkgdata_dir, "runtime-reverse", pkg)
+            logger.debug(revlink)
+            if os.path.exists(revlink):
+                mappings[pkg] = os.path.basename(os.readlink(revlink))
+    else:
+        mappings = defaultdict(list)
+        for pkg in pkgs:
+            pkgfile = os.path.join(pkgdata_dir, 'runtime', pkg)
+            if os.path.exists(pkgfile):
+                with open(pkgfile, 'r') as f:
+                    for line in f:
+                        fields = line.rstrip().split(': ')
+                        if fields[0] == 'PKG_%s' % pkg:
+                            mappings[pkg].append(fields[1])
+                            break
+    return mappings
+
+def lookup_pkg(args):
+    # Handle both multiple arguments and multiple values within an arg (old syntax)
+    pkgs = []
+    for pkgitem in args.pkg:
+        pkgs.extend(pkgitem.split())
+
+    mappings = lookup_pkglist(pkgs, args.pkgdata_dir, args.reverse)
+
+    if len(mappings) < len(pkgs):
+        missing = list(set(pkgs) - set(mappings.keys()))
+        logger.error("The following packages could not be found: %s" % ', '.join(missing))
+        sys.exit(1)
+
+    if args.reverse:
+        items = mappings.values()
+    else:
+        items = []
+        for pkg in pkgs:
+            items.extend(mappings.get(pkg, []))
+
+    print('\n'.join(items))
+
+def lookup_recipe(args):
+    # Handle both multiple arguments and multiple values within an arg (old syntax)
+    pkgs = []
+    for pkgitem in args.pkg:
+        pkgs.extend(pkgitem.split())
+
+    mappings = defaultdict(list)
+    for pkg in pkgs:
+        pkgfile = os.path.join(args.pkgdata_dir, 'runtime-reverse', pkg)
+        if os.path.exists(pkgfile):
+            with open(pkgfile, 'r') as f:
+                for line in f:
+                    fields = line.rstrip().split(': ')
+                    if fields[0] == 'PN':
+                        mappings[pkg].append(fields[1])
+                        break
+    if len(mappings) < len(pkgs):
+        missing = list(set(pkgs) - set(mappings.keys()))
+        logger.error("The following packages could not be found: %s" % ', '.join(missing))
+        sys.exit(1)
+
+    items = []
+    for pkg in pkgs:
+        items.extend(mappings.get(pkg, []))
+    print('\n'.join(items))
+
+def get_recipe_pkgs(pkgdata_dir, recipe, unpackaged):
+    recipedatafile = os.path.join(pkgdata_dir, recipe)
+    if not os.path.exists(recipedatafile):
+        logger.error("Unable to find packaged recipe with name %s" % recipe)
+        sys.exit(1)
+    packages = []
+    with open(recipedatafile, 'r') as f:
+        for line in f:
+            fields = line.rstrip().split(': ')
+            if fields[0] == 'PACKAGES':
+                packages = fields[1].split()
+                break
+
+    if not unpackaged:
+        pkglist = []
+        for pkg in packages:
+            if os.path.exists(os.path.join(pkgdata_dir, 'runtime', '%s.packaged' % pkg)):
+                pkglist.append(pkg)
+        return pkglist
+    else:
+        return packages
+
+def list_pkgs(args):
+    found = False
+
+    def matchpkg(pkg):
+        if args.pkgspec:
+            matched = False
+            for pkgspec in args.pkgspec:
+                if fnmatch.fnmatchcase(pkg, pkgspec):
+                    matched = True
+                    break
+            if not matched:
+                return False
+        if not args.unpackaged:
+            if args.runtime:
+                revlink = os.path.join(args.pkgdata_dir, "runtime-reverse", pkg)
+                if os.path.exists(revlink):
+                    # We're unlikely to get here if the package was not packaged, but just in case
+                    # we add the symlinks for unpackaged files in the future
+                    mappedpkg = os.path.basename(os.readlink(revlink))
+                    if not os.path.exists(os.path.join(args.pkgdata_dir, 'runtime', '%s.packaged' % mappedpkg)):
+                        return False
+                else:
+                    return False
+            else:
+                if not os.path.exists(os.path.join(args.pkgdata_dir, 'runtime', '%s.packaged' % pkg)):
+                    return False
+        return True
+
+    if args.recipe:
+        packages = get_recipe_pkgs(args.pkgdata_dir, args.recipe, args.unpackaged)
+
+        if args.runtime:
+            pkglist = []
+            runtime_pkgs = lookup_pkglist(packages, args.pkgdata_dir, False)
+            for rtpkgs in runtime_pkgs.values():
+                pkglist.extend(rtpkgs)
+        else:
+            pkglist = packages
+
+        for pkg in pkglist:
+            if matchpkg(pkg):
+                found = True
+                print("%s" % pkg)
+    else:
+        if args.runtime:
+            searchdir = 'runtime-reverse'
+        else:
+            searchdir = 'runtime'
+
+        for root, dirs, files in os.walk(os.path.join(args.pkgdata_dir, searchdir)):
+            for fn in files:
+                if fn.endswith('.packaged'):
+                    continue
+                if matchpkg(fn):
+                    found = True
+                    print("%s" % fn)
+    if not found:
+        if args.pkgspec:
+            logger.error("Unable to find any package matching %s" % args.pkgspec)
+        else:
+            logger.error("No packages found")
+        sys.exit(1)
+
+def list_pkg_files(args):
+    import json
+
+    if args.recipe:
+        if args.pkg:
+            logger.error("list-pkg-files: If -p/--recipe is specified then a package name cannot be specified")
+            sys.exit(1)
+        recipepkglist = get_recipe_pkgs(args.pkgdata_dir, args.recipe, args.unpackaged)
+        if args.runtime:
+            pkglist = []
+            runtime_pkgs = lookup_pkglist(recipepkglist, args.pkgdata_dir, False)
+            for rtpkgs in runtime_pkgs.values():
+                pkglist.extend(rtpkgs)
+        else:
+            pkglist = recipepkglist
+    else:
+        if not args.pkg:
+            logger.error("list-pkg-files: If -p/--recipe is not specified then at least one package name must be specified")
+            sys.exit(1)
+        pkglist = args.pkg
+
+    for pkg in pkglist:
+        print("%s:" % pkg)
+        if args.runtime:
+            pkgdatafile = os.path.join(args.pkgdata_dir, "runtime-reverse", pkg)
+            if not os.path.exists(pkgdatafile):
+                if args.recipe:
+                    # This package was empty and thus never packaged, ignore
+                    continue
+                logger.error("Unable to find any built runtime package named %s" % pkg)
+                sys.exit(1)
+        else:
+            pkgdatafile = os.path.join(args.pkgdata_dir, "runtime", pkg)
+            if not os.path.exists(pkgdatafile):
+                logger.error("Unable to find any built recipe-space package named %s" % pkg)
+                sys.exit(1)
+
+        with open(pkgdatafile, 'r') as f:
+            found = False
+            for line in f:
+                if line.startswith('FILES_INFO:'):
+                    found = True
+                    val = line.split(':', 1)[1].strip()
+                    dictval = json.loads(val)
+                    for fullpth in sorted(dictval):
+                        print("\t%s" % fullpth)
+                    break
+            if not found:
+                logger.error("Unable to find FILES_INFO entry in %s" % pkgdatafile)
+                sys.exit(1)
+
+def find_path(args):
+    import json
+
+    found = False
+    for root, dirs, files in os.walk(os.path.join(args.pkgdata_dir, 'runtime')):
+        for fn in files:
+            with open(os.path.join(root,fn)) as f:
+                for line in f:
+                    if line.startswith('FILES_INFO:'):
+                        val = line.split(':', 1)[1].strip()
+                        dictval = json.loads(val)
+                        for fullpth in dictval.keys():
+                            if fnmatch.fnmatchcase(fullpth, args.targetpath):
+                                found = True
+                                print("%s: %s" % (fn, fullpth))
+                        break
+    if not found:
+        logger.error("Unable to find any package producing path %s" % args.targetpath)
+        sys.exit(1)
+
+
+def main():
+    parser = argparse.ArgumentParser(description="OpenEmbedded pkgdata tool - queries the pkgdata files written out during do_package",
+                                     epilog="Use %(prog)s <subcommand> --help to get help on a specific command")
+    parser.add_argument('-d', '--debug', help='Enable debug output', action='store_true')
+    parser.add_argument('-p', '--pkgdata-dir', help='Path to pkgdata directory (determined automatically if not specified)')
+    subparsers = parser.add_subparsers(title='subcommands', metavar='<subcommand>')
+
+    parser_lookup_pkg = subparsers.add_parser('lookup-pkg',
+                                          help='Translate between recipe-space package names and runtime package names',
+                                          description='Looks up the specified recipe-space package name(s) to see what the final runtime package name is (e.g. glibc becomes libc6), or with -r/--reverse looks up the other way.')
+    parser_lookup_pkg.add_argument('pkg', nargs='+', help='Package name to look up')
+    parser_lookup_pkg.add_argument('-r', '--reverse', help='Switch to looking up recipe-space package names from runtime package names', action='store_true')
+    parser_lookup_pkg.set_defaults(func=lookup_pkg)
+
+    parser_list_pkgs = subparsers.add_parser('list-pkgs',
+                                          help='List packages',
+                                          description='Lists packages that have been built')
+    parser_list_pkgs.add_argument('pkgspec', nargs='*', help='Package name to search for (wildcards * ? allowed, use quotes to avoid shell expansion)')
+    parser_list_pkgs.add_argument('-r', '--runtime', help='Show runtime package names instead of recipe-space package names', action='store_true')
+    parser_list_pkgs.add_argument('-p', '--recipe', help='Limit to packages produced by the specified recipe')
+    parser_list_pkgs.add_argument('-u', '--unpackaged', help='Include unpackaged (i.e. empty) packages', action='store_true')
+    parser_list_pkgs.set_defaults(func=list_pkgs)
+
+    parser_list_pkg_files = subparsers.add_parser('list-pkg-files',
+                                          help='List files within a package',
+                                          description='Lists files included in one or more packages')
+    parser_list_pkg_files.add_argument('pkg', nargs='*', help='Package name to report on (if -p/--recipe is not specified)')
+    parser_list_pkg_files.add_argument('-r', '--runtime', help='Specified package(s) are runtime package names instead of recipe-space package names', action='store_true')
+    parser_list_pkg_files.add_argument('-p', '--recipe', help='Report on all packages produced by the specified recipe')
+    parser_list_pkg_files.add_argument('-u', '--unpackaged', help='Include unpackaged (i.e. empty) packages (only useful with -p/--recipe)', action='store_true')
+    parser_list_pkg_files.set_defaults(func=list_pkg_files)
+
+    parser_lookup_recipe = subparsers.add_parser('lookup-recipe',
+                                          help='Find recipe producing one or more packages',
+                                          description='Looks up the specified runtime package(s) to see which recipe they were produced by')
+    parser_lookup_recipe.add_argument('pkg', nargs='+', help='Runtime package name to look up')
+    parser_lookup_recipe.set_defaults(func=lookup_recipe)
+
+    parser_find_path = subparsers.add_parser('find-path',
+                                          help='Find package providing a target path',
+                                          description='Finds the recipe-space package providing the specified target path')
+    parser_find_path.add_argument('targetpath', help='Path to find (wildcards * ? allowed, use quotes to avoid shell expansion)')
+    parser_find_path.set_defaults(func=find_path)
+
+    parser_read_value = subparsers.add_parser('read-value',
+                                          help='Read any pkgdata value for one or more packages',
+                                          description='Reads the named value from the pkgdata files for the specified packages')
+    parser_read_value.add_argument('valuename', help='Name of the value to look up')
+    parser_read_value.add_argument('pkg', nargs='+', help='Runtime package name to look up')
+    parser_read_value.set_defaults(func=read_value)
+
+    parser_glob = subparsers.add_parser('glob',
+                                          help='Expand package name glob expression',
+                                          description='Expands one or more glob expressions over the packages listed in pkglistfile')
+    parser_glob.add_argument('pkglistfile', help='File listing packages (one package name per line)')
+    parser_glob.add_argument('glob', nargs="+", help='Glob expression for package names, e.g. *-dev')
+    parser_glob.add_argument('-x', '--exclude', help='Exclude packages matching specified regex from the glob operation')
+    parser_glob.set_defaults(func=glob)
+
+
+    args = parser.parse_args()
+
+    if args.debug:
+        logger.setLevel(logging.DEBUG)
+
+    if not args.pkgdata_dir:
+        import scriptpath
+        bitbakepath = scriptpath.add_bitbake_lib_path()
+        if not bitbakepath:
+            logger.error("Unable to find bitbake by searching parent directory of this script or PATH")
+            sys.exit(1)
+        logger.debug('Found bitbake path: %s' % bitbakepath)
+        tinfoil = tinfoil_init()
+        args.pkgdata_dir = tinfoil.config_data.getVar('PKGDATA_DIR', True)
+        logger.debug('Value of PKGDATA_DIR is "%s"' % args.pkgdata_dir)
+        if not args.pkgdata_dir:
+            logger.error('Unable to determine pkgdata directory from PKGDATA_DIR')
+            sys.exit(1)
+
+    if not os.path.exists(args.pkgdata_dir):
+        logger.error('Unable to find pkgdata directory %s' % pkgdata_dir)
+        sys.exit(1)
+
+    ret = args.func(args)
+
+    return ret
+
+
+if __name__ == "__main__":
+    main()

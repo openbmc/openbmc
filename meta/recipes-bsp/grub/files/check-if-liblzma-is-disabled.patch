@@ -1,0 +1,33 @@
+Disable liblzma if --enable-liblzma=no
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Constantin Musca <constantinx.musca@intel.com>
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -1029,10 +1029,20 @@ fi
+ 
+ AC_SUBST([LIBGEOM])
+ 
+-AC_CHECK_LIB([lzma], [lzma_code],
+-             [LIBLZMA="-llzma"
+-              AC_DEFINE([HAVE_LIBLZMA], [1],
+-                        [Define to 1 if you have the LZMA library.])],)
++AC_ARG_ENABLE([liblzma],
++              [AS_HELP_STRING([--enable-liblzma],
++                              [enable liblzma integration (default=guessed)])])
++if test x"$enable_liblzma" = xno ; then
++  liblzma_excuse="explicitly disabled"
++fi
++
++if test x"$liblzma_excuse" = x ; then
++  AC_CHECK_LIB([lzma], [lzma_code],
++               [LIBLZMA="-llzma"
++                AC_DEFINE([HAVE_LIBLZMA], [1],
++                          [Define to 1 if you have the LZMA library.])],)
++fi
++
+ AC_SUBST([LIBLZMA])
+ 
+ AC_ARG_ENABLE([libzfs],

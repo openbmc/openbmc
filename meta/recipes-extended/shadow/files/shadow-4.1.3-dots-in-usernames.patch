@@ -1,0 +1,27 @@
+# commit message copied from openembedded:
+#    commit 246c80637b135f3a113d319b163422f98174ee6c
+#    Author: Khem Raj <raj.khem@gmail.com>
+#    Date:   Wed Jun 9 13:37:03 2010 -0700
+#
+#    shadow-4.1.4.2: Add patches to support dots in login id.
+#    
+#    Signed-off-by: Khem Raj <raj.khem@gmail.com>
+#
+# comment added by Kevin Tian <kevin.tian@intel.com>, 2010-08-11
+
+Upstream-Status: Pending
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+Index: shadow-4.1.4.2/libmisc/chkname.c
+===================================================================
+--- shadow-4.1.4.2.orig/libmisc/chkname.c	2009-04-28 12:14:04.000000000 -0700
++++ shadow-4.1.4.2/libmisc/chkname.c	2010-06-03 17:43:20.638973857 -0700
+@@ -61,6 +61,7 @@ static bool is_valid_name (const char *n
+ 		      ( ('0' <= *name) && ('9' >= *name) ) ||
+ 		      ('_' == *name) ||
+ 		      ('-' == *name) ||
++		      ('.' == *name) ||
+ 		      ( ('$' == *name) && ('\0' == *(name + 1)) )
+ 		     )) {
+ 			return false;

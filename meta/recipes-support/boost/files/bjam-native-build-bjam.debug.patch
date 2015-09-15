@@ -1,0 +1,50 @@
+From 619ada314ab26c0c9cbfe5702cd9c0caa8f6415a Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Mon, 3 Aug 2015 17:12:33 +0800
+Subject: [PATCH] bjam-native: build bjam.debug
+
+bjam is stripped by default, this causes QA warning while stripping it
+from do_populate_sysroot():
+
+  WARNING: File '.../tmp/sysroots/x86_64-linux/usr/bin/bjam' \
+    from bjam-native was already stripped, \
+    this will prevent future debugging!
+
+The JAM scripts allow to build unstripped version with '--debug'. Just
+build and install the bjam.debug to stop bjam from being stripped in
+compile step.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ bootstrap.sh                    | 1 +
+ tools/build/src/engine/build.sh | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/bootstrap.sh b/bootstrap.sh
+index 98cf88b..54690aa 100755
+--- a/bootstrap.sh
++++ b/bootstrap.sh
+@@ -228,6 +228,7 @@ if test "x$BJAM" = x; then
+   echo "tools/build/src/engine/$arch/b2"
+   cp "$BJAM" .
+   cp "$my_dir/tools/build/src/engine/$arch/bjam" .
++  cp "$my_dir/tools/build/src/engine/${arch}.debug/bjam" bjam.debug
+ 
+ fi
+ 
+diff --git a/tools/build/src/engine/build.sh b/tools/build/src/engine/build.sh
+index 6dbc706..c69fdc7 100755
+--- a/tools/build/src/engine/build.sh
++++ b/tools/build/src/engine/build.sh
+@@ -312,5 +312,5 @@ if test -x "./bootstrap/jam0" ; then
+     if test "${BJAM_UPDATE}" != "update" ; then
+         echo_run ./bootstrap/jam0 -f build.jam --toolset=$BOOST_JAM_TOOLSET "--toolset-root=$BOOST_JAM_TOOLSET_ROOT" "$@" clean
+     fi
+-    echo_run ./bootstrap/jam0 -f build.jam --toolset=$BOOST_JAM_TOOLSET "--toolset-root=$BOOST_JAM_TOOLSET_ROOT" "$@"
++    echo_run ./bootstrap/jam0 -f build.jam --toolset=$BOOST_JAM_TOOLSET "--toolset-root=$BOOST_JAM_TOOLSET_ROOT" "$@" --debug
+ fi
+-- 
+1.9.1
+

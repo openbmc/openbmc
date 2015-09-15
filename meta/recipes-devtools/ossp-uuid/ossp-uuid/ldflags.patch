@@ -1,0 +1,26 @@
+Obey LDFLAGS
+
+Signed-off-by: Christopher Larson <chris_larson@mentor.com>
+Upstream-Status: Pending
+
+--- uuid-1.6.2.orig/Makefile.in
++++ uuid-1.6.2/Makefile.in
+@@ -113,15 +113,15 @@ all: $(TARGETS)
+	@$(LIBTOOL) --mode=compile $(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $<
+
+ $(LIB_NAME): $(LIB_OBJS)
+-	@$(LIBTOOL) --mode=link $(CC) -o $(LIB_NAME) $(LIB_OBJS) -rpath $(libdir) \
++	@$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -o $(LIB_NAME) $(LIB_OBJS) -rpath $(libdir) \
+	    -version-info `$(SHTOOL) version -l c -d libtool $(S)/uuid_vers.h`
+
+ $(DCE_NAME): $(DCE_OBJS)
+-	@$(LIBTOOL) --mode=link $(CC) -o $(DCE_NAME) $(DCE_OBJS) -rpath $(libdir) \
++	@$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -o $(DCE_NAME) $(DCE_OBJS) -rpath $(libdir) \
+	    -version-info `$(SHTOOL) version -l c -d libtool $(S)/uuid_vers.h`
+
+ $(CXX_NAME): $(CXX_OBJS)
+-	@$(LIBTOOL) --mode=link $(CXX) -o $(CXX_NAME) $(CXX_OBJS) -rpath $(libdir) \
++	@$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $(CXX_NAME) $(CXX_OBJS) -rpath $(libdir) \
+	    -version-info `$(SHTOOL) version -l c -d libtool $(S)/uuid_vers.h`
+
+ $(PRG_NAME): $(PRG_OBJS) $(LIB_NAME)

@@ -1,0 +1,22 @@
+Ensure that builds in separate builddirs (${B} != ${S}) correctly install the 
+lenses files.
+
+Upstream-Status: Pending
+
+RP 2013/4/17
+
+Index: augeas-1.0.0/Makefile.am
+===================================================================
+--- augeas-1.0.0.orig/Makefile.am	2012-11-02 15:20:11.000000000 +0000
++++ augeas-1.0.0/Makefile.am	2013-04-17 10:36:24.033400125 +0000
+@@ -5,8 +5,8 @@
+ lensdir=$(datadir)/augeas/lenses/dist
+ lenstestdir=$(datadir)/augeas/lenses/dist/tests
+ 
+-dist_lens_DATA=$(wildcard lenses/*.aug)
+-dist_lenstest_DATA=$(wildcard lenses/tests/*.aug)
++dist_lens_DATA=$(wildcard $(top_srcdir)/lenses/*.aug)
++dist_lenstest_DATA=$(wildcard $(top_srcdir)lenses/tests/*.aug)
+ 
+ EXTRA_DIST=augeas.spec build/aux/move-if-change Makefile.am HACKING
+ 

@@ -1,0 +1,142 @@
+{% extends "basebuilddetailpage.html" %}
+{% load projecttags %}
+
+{% block extraheadcontent %}
+    <!-- functions to format package 'installed_package' alias -->
+    <script>
+    function fmtAliasHelp(package_name, alias, hover) {
+        var r = null;
+        if (alias != null && alias != '') {
+            r = '<span class="muted"> as ' + alias + '&nbsp';
+            r += '<i class="icon-question-sign get-help';
+            if (hover) {
+                r+= ' hover-help';
+            }
+            else {
+                r+= ' heading-help';
+            }
+            r += '"';
+            title = package_name + ' was renamed at packaging time and was installed on your system as ' + alias;
+            r += ' title="' + title + '">';
+            r += '</i>';
+            r += '</span>';
+            document.write(r);
+        }
+    }
+    </script>
+{% endblock extraheadcontent %}
+{% block localbreadcrumb %}
+    {% if target %}
+        <li><a href="{% url "target" build.id target.id %}">{{target.target}}</a></li>
+        <li>{{package.fullpackagespec}} {% if package.alias %} as {{package.alias}}{% endif %}</li>
+    {% else %}
+        <li><a href="{% url "packages" build.id %}"> Packages </a></li>
+        <li>{{package.fullpackagespec}}</li>
+    {% endif %}
+{% endblock localbreadcrumb %}
+
+{% block pagedetailinfomain %}
+    <div class="row span11">
+        <div class="page-header">
+            {% block title %}
+            <h1>{{package.fullpackagespec}}</h1>
+            {% endblock title %}
+        </div> <!-- page-header -->
+    </div> <!-- row span11 page-header -->
+
+    {% block twocolumns %}
+    <div class="row span7 tabbable">
+        {% block tabcontent %}
+        {% endblock tabcontent %}
+    </div> <!-- row span7 -->
+
+    <div class="row span4 well">
+        <h2>Package information</h2>
+
+        <!-- info presented as definition list -->
+        <dl class="item-info">
+            <dt>
+                Size
+                <i class="icon-question-sign get-help" title="The size of the package"></i>
+            </dt>
+            <dd>
+                {% comment %}
+                    if recipe is absent, filesize is not 0
+                {% endcomment %}
+                {% if package.recipe_id > 0 %}
+                    {{package.size|filtered_filesizeformat}}
+                    {% if target.file_size %}
+                        ({{package.size|multiply:100|divide:target.file_size}}% of included package size)
+                    {% endif %}
+
+                {% endif %}
+            </dd>
+
+            <dt>
+                License
+                <i class="icon-question-sign get-help" title="The license under which this package is distributed"></i>
+            </dt>
+            <dd>{{package.license}}</dd>
+
+            {% comment %}
+            # Removed per review on 1/18/2014 until license data population
+            # problemse are resolved.
+            <dt>
+                License files
+                <i class="icon-question-sign get-help" title="Path to the license files that apply to the package"></i>
+            </dt>
+            <dd></dd>
+            {% endcomment %}
+
+            <dt>
+                Recipe
+                <i class="icon-question-sign get-help" title="The name of the recipe building this package"></i>
+            </dt>
+            <dd>
+                {% if package.recipe_id > 0 %}
+                    <a href="{% url "recipe" build.id package.recipe_id %}"> {{package.recipe.name}} </a>
+                {% else %}
+                    {{package.recipe.name}}
+                {% endif %}
+            </dd>
+
+            <dt>
+                Recipe version
+                <i class="icon-question-sign get-help" title="The version of the recipe building this package"></i>
+            </dt>
+            <dd>{{package.recipe.version}}</dd>
+
+            <dt>
+                Layer
+                <i class="icon-question-sign get-help" title="The name of the layer providing the recipe that builds this package"></i>
+            </dt>
+            <dd>
+                {{package.recipe.layer_version.layer.name}}
+                {% if package.recipe.layer_version.layer.name|format_none_and_zero != "" %}
+                    {% comment %}
+                    # Removed per team meeting of 1/29/2014 until
+                    # decision on index search algorithm
+                    <a href="http://layers.openembedded.org"  target="_blank">
+                    <i class="icon-share get-info"></i>
+                    </a>
+                    {% endcomment %}
+                {% endif %}
+            </dd>
+            {% if package.recipe.layer_version.branch %}
+            <dt>
+                Layer branch
+                <i class="icon-question-sign get-help" title="The Git branch of the layer providing the recipe that builds this package"></i>
+            </dt>
+            <dd>{{package.recipe.layer_version.branch}}</dd>
+            {% endif %}
+            <dt>
+                Layer commit
+                <i class="icon-question-sign get-help" title="The Git commit of the layer providing the recipe that builds this package"></i>
+            </dt>
+
+            <dd class="iscommit">{{package.recipe.layer_version.commit}}</dd>
+
+        </dl>
+    </div> <!-- row4 well -->
+    {% endblock twocolumns %}
+{% endblock pagedetailinfomain %}

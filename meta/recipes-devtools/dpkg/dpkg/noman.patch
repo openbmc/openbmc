@@ -1,0 +1,14 @@
+Upstream-Status: Inappropriate [disable feature]
+
+diff -ruN dpkg-1.15.8.5-orig/Makefile.am dpkg-1.15.8.5/Makefile.am
+--- dpkg-1.15.8.5-orig/Makefile.am	2010-10-08 12:27:15.042083703 +0800
++++ dpkg-1.15.8.5/Makefile.am	2010-10-08 12:27:27.755148228 +0800
+@@ -12,8 +12,7 @@
+ 	utils \
+ 	$(MAYBE_DSELECT) \
+ 	scripts \
+-	po \
+-	man
++	po
+ 
+ ACLOCAL_AMFLAGS = -I m4

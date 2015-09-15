@@ -1,0 +1,203 @@
+This patch enable owl menu, which is hidden in the title bar to save space on
+small screen. It has not been used for a long time, rebase needed.
+
+Upstream-Status: Inappropriate [enable feature]
+
+Index: src/gtk.c
+===================================================================
+--- src/gtk.c	(revision 22)
++++ src/gtk.c	(working copy)
+@@ -28,6 +28,8 @@
+ #include <gdk/gdkx.h>
+ #include <gdk-pixbuf/gdk-pixbuf.h>
+ 
++#include <libowl/owlwindowmenu.h>
++
+ #include <librsvg/rsvg.h>
+ 
+ #include <X11/Xlib.h>
+@@ -1237,6 +1239,7 @@
+     }
+ }
+ 
++#if 0
+ static void
+ add_widget (GtkUIManager *merge,
+ 	    GtkWidget *widget,
+@@ -1247,10 +1250,11 @@
+     gtk_box_pack_start (box, widget, FALSE, FALSE, 0);
+ 
+     toplevel = gtk_widget_get_toplevel (GTK_WIDGET (box));
+-    gtk_widget_show_all (toplevel);
+ }
++#endif
+ 
+ static GtkActionEntry toplevel_actions[] = {
++    { "Top", NULL, "" },
+     { "Game", NULL, N_("Game") },
+     { "Settings", NULL, N_("Settings") },
+     { "Help", NULL, N_("Help") },
+@@ -1303,11 +1307,13 @@
+ 			frontend *fe)
+ {
+     GString *xml;
++    GError *error = NULL;
+     gboolean presets = FALSE;
+     GSList *radio_group = NULL;
+     int i;
+ 
+-    xml = g_string_new ("<ui><menubar><placeholder name=\"TypePlaceholder\">"
++    xml = g_string_new ("<ui><menubar><menu name=\"TopMenu\" action=\"Top\">"
++			"<placeholder name=\"TypePlaceholder\">"
+ 			"<menu name=\"SettingsMenu\" action=\"Settings\">");
+ 
+     for (i = 0; i < midend_num_presets(fe->me); i++) {
+@@ -1359,8 +1365,14 @@
+ 			 "<menuitem name=\"CustomMenu\" action=\"Custom\"/>");
+     }
+     
+-    g_string_append (xml, "</menu></placeholder></menubar></ui>");
+-    gtk_ui_manager_add_ui_from_string (merge, xml->str, -1, NULL);
++    g_string_append (xml, "</menu></placeholder></menu></menubar></ui>");
++
++    gtk_ui_manager_add_ui_from_string (merge, xml->str, -1, &error);
++    if (error != NULL) {
++	g_warning ("Error adding custom: %s", error->message);
++	g_error_free (error);
++    }
++
+     g_string_free (xml, TRUE);
+ }
+ 
+@@ -1434,6 +1446,7 @@
+ new_window(char *arg, char **error)
+ {
+     frontend *fe;
++    GError *err = NULL;
+     GtkBox *vbox;
+     GtkUIManager *merge;
+     GtkActionGroup *actions;
+@@ -1496,8 +1509,6 @@
+     gtk_window_add_accel_group(GTK_WINDOW(fe->window), fe->accelgroup);
+ 
+     merge = gtk_ui_manager_new ();
+-    g_signal_connect (G_OBJECT (merge), "add_widget",
+-		      G_CALLBACK (add_widget), vbox);
+ 
+     actions = gtk_action_group_new ("PuzzleActions");
+     gtk_action_group_add_actions (actions, toplevel_actions,
+@@ -1509,22 +1520,39 @@
+ 
+     gtk_ui_manager_insert_action_group (merge, actions, 0);
+     
+-    gtk_ui_manager_add_ui_from_file (merge, DATADIR "/oh-puzzles/ui/menu.xml", NULL);
++    gtk_ui_manager_add_ui_from_file (merge, DATADIR "/oh-puzzles/ui/menu.xml", 
++				     &err);
++    if (err != NULL) {
++	g_warning ("Error making UI: %s", err->message);
++	g_error_free (err);
++	err = NULL;
++    }
+ 
+     if (thegame.can_solve) {
+-	    char *str = "<ui><menubar><menu name=\"GameMenu\" action=\"Game\">"
++	char *str = "<ui><menubar><menu name=\"TopMenu\" action=\"Top\">"
++	    "<menu name=\"GameMenu\" action=\"Game\">"
+ 	    "<placeholder name=\"SolvePlaceholder\">"
+ 	    "<separator name=\"SolveSep\"/>"
+ 	    "<menuitem name=\"SolveMenu\" action=\"Solve\"/>"
+-	    "</placeholder></menu></menubar></ui>";
++	    "</placeholder></menu></menu></menubar></ui>";
+ 
+-	gtk_ui_manager_add_ui_from_string (merge, str, -1, NULL);
++	gtk_ui_manager_add_ui_from_string (merge, str, -1, &err);
++	if (err != NULL) {
++	    g_warning ("Error adding solve. %s", err->message);
++	    g_error_free (err);
++	}
+     }
+ 
+     if ((n = midend_num_presets(fe->me)) > 0 || thegame.can_configure) {
+ 	generate_settings_menu (merge, actions, fe);
+     }
+ 
++    /* Do this so that the menu is packed now instead of in the idle loop */
++    gtk_ui_manager_ensure_update (merge);
++
++    owl_set_window_menu_item (GTK_WINDOW (fe->window),
++			      GTK_MENU_ITEM (gtk_ui_manager_get_widget (merge, "/menubar/TopMenu")));
++    
+     setup_colours (fe);
+     setup_pixbufs (fe);
+ 
+@@ -1572,7 +1600,7 @@
+                           GDK_BUTTON_RELEASE_MASK |
+ 			  GDK_BUTTON_MOTION_MASK);
+ 
+-    /* The window is shown once the menubar has been added */
++    gtk_widget_show_all (fe->window);
+     return fe;
+ }
+ 
+Index: src/menu.xml
+===================================================================
+--- src/menu.xml	(revision 22)
++++ src/menu.xml	(working copy)
+@@ -1,26 +1,25 @@
+ <ui>
+ <menubar>
+-<menu name="GameMenu" action="Game">
+-	<menuitem name="NewMenu" action="New"/>
+-	<menuitem name="RestartMenu" action="Restart"/>
+-<!--	<menuitem name="SpecificMenu" action="Specific"/> -->
+-	<menuitem name="RandomMenu" action="Random"/>
+-	<separator name="GameSep1"/>
+-	<menuitem name="LoadMenu" action="Load"/>
+-	<menuitem name="SaveMenu" action="Save"/>
+-	<separator name="GameSep2"/>
+-	<menuitem name="UndoMenu" action="Undo"/>
+-	<menuitem name="RedoMenu" action="Redo"/>
+-	<placeholder name="CopyPlaceholder"/>
+-	<placeholder name="SolvePlaceholder"/>
+-	<separator name="GameSep3"/>
+-	<menuitem name="QuitMenu" action="Quit"/>
+-</menu>
++<menu name="TopMenu" action="Top">
++	<menu name="GameMenu" action="Game">
++		<menuitem name="NewMenu" action="New"/>
++		<menuitem name="RestartMenu" action="Restart"/>
++	<!--	<menuitem name="SpecificMenu" action="Specific"/> -->
++		<menuitem name="RandomMenu" action="Random"/>
++		<separator name="GameSep1"/>
++		<menuitem name="LoadMenu" action="Load"/>
++		<menuitem name="SaveMenu" action="Save"/>
++		<separator name="GameSep2"/>
++		<menuitem name="UndoMenu" action="Undo"/>
++		<menuitem name="RedoMenu" action="Redo"/>
++		<placeholder name="CopyPlaceholder"/>
++		<placeholder name="SolvePlaceholder"/>
++	</menu>
+ 
+-<placeholder name="TypePlaceholder"/>
+-
+-<menu name="HelpMenu" action="Help">
++	<placeholder name="TypePlaceholder"/>
+ 	<menuitem name="AboutMenu" action="About"/>
++	<menuitem name="QuitMenu" action="Quit"/>
++
+ </menu>
+ </menubar>
+ </ui>
+Index: src/Makefile.am
+===================================================================
+--- src/Makefile.am	(revision 22)
++++ src/Makefile.am	(working copy)
+@@ -10,7 +10,7 @@
+ 	lightup loopy map mines net netslide pattern pegs rect samegame \
+ 	sixteen slant solo tents twiddle untangle
+ 
+-libpuzzles_la_LIBADD = $(PUZZLES_LIBS)
++libpuzzles_la_LIBADD = $(PUZZLES_LIBS) -lowl
+ libpuzzles_la_SOURCES = combi.c \
+ 			configuration.c \
+ 			drawing.c \

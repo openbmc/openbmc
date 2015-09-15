@@ -1,0 +1,33 @@
+The Makefile used by shared-mime-info is one big race with the SUBDIRS 
+option and the dependency specifically calling make all combining to
+create multiple make instances all of which may try and build targets
+like update-mime-database.
+
+This patch removes those options meaning make can correctly identify
+dependencies and stop itself racing itself.
+
+RP 10/10/2011
+
+Upstream-Status: Pending
+Signed-off-by: Constantin Musca <constantinx.musca@intel.com>
+
+Index: shared-mime-info-1.0/Makefile.am
+===================================================================
+--- shared-mime-info-1.0.orig/Makefile.am
++++ shared-mime-info-1.0/Makefile.am
+@@ -1,5 +1,3 @@
+-SUBDIRS=. po
+-
+ AM_CPPFLAGS = $(ALL_CFLAGS)
+ 
+ packagesdir = $(datadir)/mime/packages
+@@ -72,8 +70,7 @@ uninstall-hook:
+ 
+ all: $(defaultmakedeps)
+ 
+-create-pot:
+-	$(AM_V_GEN) $(MAKE) -C po shared-mime-info.pot
++create-pot: po
+ 
+ check: create-pot freedesktop.org.xml update-mime-database check-translations
+ 	if test -e $(top_builddir)/freedesktop.org.xml; then \

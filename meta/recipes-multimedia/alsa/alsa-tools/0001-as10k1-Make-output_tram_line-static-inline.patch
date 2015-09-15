@@ -1,0 +1,31 @@
+From 1e5926df74a35fe2cd90bc59f5264a8715c94048 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 7 Sep 2015 08:16:59 +0000
+Subject: [PATCH] as10k1: Make output_tram_line() static inline
+
+The function is not used in any other file, its better to make it static
+inline so compiler has a better chance of optimizing here
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ as10k1/as10k1.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/as10k1/as10k1.c b/as10k1/as10k1.c
+index 96af0c3..d0766fd 100644
+--- a/as10k1/as10k1.c
++++ b/as10k1/as10k1.c
+@@ -366,7 +366,7 @@ void as_exit(const char *message)
+ 	exit(1);
+ }
+ 
+-inline void output_tram_line( struct list_head *line_head, int type){
++static inline void output_tram_line( struct list_head *line_head, int type){
+         
+         struct tram *tram_sym;
+         struct list_head *entry;
+-- 
+2.5.1
+

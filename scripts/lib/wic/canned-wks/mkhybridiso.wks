@@ -1,0 +1,7 @@
+# short-description: Create a hybrid ISO image
+# long-description: Creates an EFI and legacy bootable hybrid ISO image
+# which can be used on optical media as well as USB media.
+
+part /boot --source isoimage-isohybrid --sourceparams="loader=grub-efi,image_name=HYBRID_ISO_IMG" --ondisk cd --label HYBRIDISO --fstype=ext4
+
+bootloader  --timeout=15  --append=""

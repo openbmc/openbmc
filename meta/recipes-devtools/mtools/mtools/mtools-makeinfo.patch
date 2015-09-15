@@ -1,0 +1,65 @@
+Upstream-Status: Inappropriate [licensing]
+
+--- mtools-3.9.9/configure.in.orig	2006-04-14 16:05:54.337655192 -0600
++++ mtools-3.9.9/configure.in	2006-04-14 16:12:29.736545424 -0600
+@@ -21,6 +21,33 @@
+ AC_C_CONST
+ AC_C_INLINE
+ 
++AC_CHECK_PROG(MAKEINFO, makeinfo, makeinfo, )
++if test "x$MAKEINFO" = "x"; then
++	MAKEINFO="@echo makeinfo missing; true"
++fi
++AC_CHECK_PROG(TEXI2DVI, texi2dvi, texi2dvi, )
++if test "x$TEXI2DVI" = "x"; then
++	TEXI2DVI="@echo texi2dvi missing; true"
++fi
++AC_CHECK_PROG(TEXI2PDF, texi2pdf, texi2pdf, )
++if test "x$TEXI2PDF" = "x"; then
++	TEXI2PDF="@echo texi2pdf missing; true"
++fi
++AC_CHECK_PROG(TEXI2HTML, texi2html, texi2html, )
++if test "x$TEXI2HTML" = "x"; then
++	TEXI2HTML="@echo texi2html missing; true"
++fi    
++AC_CHECK_PROG(DVI2PS, dvi2ps, dvi2ps, )
++if test "x$DVI2PS" = "x"; then
++	DVI2PS="@echo dvi2ps missing; true"
++fi
++
++AC_SUBST(MAKEINFO)
++AC_SUBST(TEXI2DVI)
++AC_SUBST(TEXI2PDF)
++AC_SUBST(TEXI2HTML)
++AC_SUBST(DVI2PS)
++
+ 
+ dnl Check for configuration options
+ dnl Enable OS/2 extended density format disks
+--- mtools-3.9.9/Makefile.in.sav	2006-04-14 15:56:19.000000000 -0600
++++ mtools-3.9.9/Makefile.in	2006-04-14 16:15:29.315245312 -0600
+@@ -11,10 +11,11 @@
+ USERLDFLAGS =
+ USERLDLIBS =
+ 
+-MAKEINFO = makeinfo
+-TEXI2DVI = texi2dvi
+-TEXI2PDF = texi2pdf
+-TEXI2HTML = texi2html
++MAKEINFO = @MAKEINFO@
++TEXI2DVI = @TEXI2DVI@
++TEXI2PDF = @TEXI2PDF@
++TEXI2HTML = @TEXI2HTML@
++DVI2PS = @DVI2PS@
+ 
+ 
+ # do not edit below this line
+@@ -181,7 +182,7 @@
+ 
+ ps: mtools.ps
+ %.ps: %.dvi
+-	dvips -f < $< > $@
++	$(DVI2PS) -f < $< > $@
+ 
+ pdf: mtools.pdf
+ %.pdf: %.texi

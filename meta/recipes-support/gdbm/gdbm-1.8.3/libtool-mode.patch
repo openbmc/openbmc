@@ -1,0 +1,22 @@
+Upstream-Status: Pending
+
+--- gdbm-1.8.3/Makefile.in.orig	2006-02-16 15:17:25.000000000 +0000
++++ gdbm-1.8.3/Makefile.in	2006-02-16 15:18:08.000000000 +0000
+@@ -131,7 +131,7 @@
+ 	$(srcdir)/mkinstalldirs $(DESTDIR)$(libdir) \
+ 		$(DESTDIR)$(includedir) $(DESTDIR)$(man3dir) \
+ 		$(DESTDIR)$(infodir)
+-	$(LIBTOOL) $(INSTALL) -c libgdbm.la $(DESTDIR)$(libdir)/libgdbm.la
++	$(LIBTOOL) --mode=install $(INSTALL) -c libgdbm.la $(DESTDIR)$(libdir)/libgdbm.la
+ 	$(INSTALL_DATA) gdbm.h \
+ 		$(DESTDIR)$(includedir)/gdbm.h
+ 	$(INSTALL_DATA) $(srcdir)/gdbm.3 \
+@@ -142,7 +142,7 @@
+ install-compat:
+ 	$(srcdir)/mkinstalldirs $(DESTDIR)$(libdir) \
+ 		$(DESTDIR)$(includedir)
+-	$(LIBTOOL) $(INSTALL) -c libgdbm_compat.la \
++	$(LIBTOOL) --mode=install $(INSTALL) -c libgdbm_compat.la \
+ 		$(DESTDIR)$(libdir)/libgdbm_compat.la
+ 	$(INSTALL_DATA) $(srcdir)/dbm.h \
+ 		$(DESTDIR)$(includedir)/dbm.h

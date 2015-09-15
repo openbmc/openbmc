@@ -1,0 +1,10 @@
+#!/bin/sh
+
+output() {
+  if [ $? -eq 0 ]
+    then echo "PASS: $i"
+    else echo "FAIL: $i"
+  fi
+}
+
+for i in `ls test/test-*`; do ./$i ./test/data DBUS_TEST_HOMEDIR=./test >/dev/null; output; done

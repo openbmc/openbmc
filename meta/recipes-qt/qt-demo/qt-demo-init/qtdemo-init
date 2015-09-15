@@ -1,0 +1,55 @@
+#!/bin/sh
+
+set -e
+
+if [ -x /usr/bin/qtdemo ]; then
+	QTDEMO="qtdemo"
+else
+	QTDEMO="qtdemoE -qws"
+fi
+
+case "$1" in
+  start)
+	echo "Starting qtdemo"
+	if [ -f /etc/profile.d/tslib.sh ]; then
+		. /etc/profile.d/tslib.sh
+	fi
+	if [ -e "$TSLIB_TSDEVICE" ]; then
+		if [ ! -f /etc/pointercal ]; then
+			/usr/bin/ts_calibrate
+		fi
+		if [ "$QTDEMO" = "qtdemo" ]; then
+			Xorg &
+			export DISPLAY=:0
+			$QTDEMO &
+		else
+			QWS_MOUSE_PROTO=tslib:$TSLIB_TSDEVICE $QTDEMO &
+		fi
+	else
+		if [ "$QTDEMO" = "qtdemo" ]; then
+			Xorg &
+			export DISPLAY=:0
+		fi
+		$QTDEMO &
+	fi
+	;;
+  stop)
+	echo "Stopping qtdemo"
+	if [ "$QTDEMO" = "qtdemo" ]; then
+		killall Xorg
+		killall qtdemo
+	else
+		killall qtdemoE
+	fi
+	;;
+  restart)
+	$0 stop
+	$0 start
+	;;
+  *)
+	echo "usage: $0 { start | stop | restart }" >&2
+	exit 1
+	;;
+esac
+
+exit 0

@@ -1,0 +1,23 @@
+util-linux: take ${sbindir} from the environment if it is set there
+fix the test, the [ ] syntax was getting eaten by autoconf
+
+Signed-off-by: Phil Blundell <pb@pbcl.net>
+Signed-off-by: Saul Wold <sgw@linux.intel.com
+Upstream-Status: Inappropriate [configuration]
+
+Index: util-linux-2.22.1/configure.ac
+===================================================================
+--- util-linux-2.22.1.orig/configure.ac
++++ util-linux-2.22.1/configure.ac
+@@ -73,7 +73,10 @@ AC_SUBST([localstatedir])
+ usrbin_execdir='${exec_prefix}/bin'
+ AC_SUBST([usrbin_execdir])
+ 
+-usrsbin_execdir='${exec_prefix}/sbin'
++if test -z "$usrsbin_execdir" ;
++then
++   usrsbin_execdir='${exec_prefix}/sbin'
++fi
+ AC_SUBST([usrsbin_execdir])
+ 
+ case $libdir in

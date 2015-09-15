@@ -1,0 +1,42 @@
+The RPATH handling in serf is all wrong for us and we don't need it 
+anyway so hack around it by removing this for now.
+
+Upstream-Status: Inappropriate
+
+RP 2014/7/17
+
+Index: serf-1.3.6/SConstruct
+===================================================================
+--- serf-1.3.6.orig/SConstruct	2014-07-17 19:57:57.724389150 +0000
++++ serf-1.3.6/SConstruct	2014-07-17 20:04:21.784399616 +0000
+@@ -218,8 +218,7 @@
+ else:
+   LIBNAMESTATIC = 'serf-${MAJOR}'
+ 
+-env.Append(RPATH=libdir,
+-           PDB='${TARGET.filebase}.pdb')
++env.Append(PDB='${TARGET.filebase}.pdb')
+ 
+ #for i in env:
+ #    print(str(env[i]))
+@@ -371,12 +370,6 @@
+ if sys.platform == 'win32':
+   env.Append(CPPDEFINES=['SERF_HAVE_SSPI'])
+ 
+-# On some systems, the -R values that APR describes never make it into actual
+-# RPATH flags. We'll manually map all directories in LIBPATH into new
+-# flags to set RPATH values.
+-for d in env['LIBPATH']:
+-  env.Append(RPATH=':'+d)
+-
+ # Set up the construction of serf-*.pc
+ pkgconfig = env.Textfile('serf-%d.pc' % (MAJOR,),
+                          env.File('build/serf.pc.in'),
+@@ -446,7 +439,6 @@
+                           ENV={'PATH' : os.environ['PATH']}))
+ 
+ # Find the (dynamic) library in this directory
+-tenv.Replace(RPATH=thisdir)
+ tenv.Prepend(LIBS=[LIBNAMESTATIC, ],
+              LIBPATH=[thisdir, ])
+ 

@@ -1,0 +1,29 @@
+Upstream-Status: Pending
+
+--- console-tools-0.3.2/configure.in~configure
++++ console-tools-0.3.2/configure.in
+@@ -2,13 +2,14 @@
+ dnl Process this file with autoconf to produce a configure script.
+ 
+ # Initialize
+-AC_INIT(kbdtools/loadkeys.y)
++AC_INIT
++AC_CONFIG_SRCDIR([kbdtools/loadkeys.y])
+ 
+ define(ct_unicodedata_default,/usr/share/unidata/UnicodeData-2.txt)
+ ct_localdatadir_default=/usr/local/share     # iff --enable-localdatadir without specific dir
+ 
+ #AC_CONFIG_AUX_DIR(autoconf)
+-AC_CANONICAL_SYSTEM
++AC_CANONICAL_TARGET([])
+ AM_INIT_AUTOMAKE(console-tools, 0.3.2)
+ 
+ # Defaults
+@@ -25,7 +26,6 @@
+ # i18n stuff
+ ALL_LINGUAS="cs de ru ga fr"
+ AM_GNU_GETTEXT
+-AC_OUTPUT_COMMANDS([sed -e "/POTFILES =/r po/POTFILES" po/Makefile.in > po/Makefile])
+ 
+ AC_DEFINE_UNQUOTED(LOCALEDIR, "/usr/share/locale")
+ 

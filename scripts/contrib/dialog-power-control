@@ -1,0 +1,53 @@
+#!/bin/sh
+#
+# Simple script to show a manual power prompt for when you want to use
+# automated hardware testing with testimage.bbclass but you don't have a
+# web-enabled power strip or similar to do the power on/off/cycle.
+#
+# You can enable it by enabling testimage (see the Yocto Project
+# Development manual "Performing Automated Runtime Testing" section)
+# and setting the following in your local.conf:
+#
+# TEST_POWERCONTROL_CMD = "${COREBASE}/scripts/contrib/dialog-power-control"
+#
+
+PROMPT=""
+while true; do
+    case $1 in
+        on)
+            PROMPT="Please turn device power on";;
+        off)
+            PROMPT="Please turn device power off";;
+        cycle)
+            PROMPT="Please click Done, then turn the device power off then on";;
+        "")
+            break;;
+    esac
+    shift
+done
+
+if [ "$PROMPT" = "" ] ; then
+    echo "ERROR: no power action specified on command line"
+    exit 2
+fi
+
+if [ "`which kdialog 2>/dev/null`" != "" ] ; then
+    DIALOGUTIL="kdialog"
+elif [ "`which zenity 2>/dev/null`" != "" ] ; then
+    DIALOGUTIL="zenity"
+else
+    echo "ERROR: couldn't find program to display a message, install kdialog or zenity"
+    exit 3
+fi
+
+if [ "$DIALOGUTIL" = "kdialog" ] ; then
+    kdialog --yesno "$PROMPT" --title "TestImage Power Control" --yes-label "Done" --no-label "Cancel test"
+elif [ "$DIALOGUTIL" = "zenity" ] ; then
+    zenity --question --text="$PROMPT" --title="TestImage Power Control" --ok-label="Done" --cancel-label="Cancel test"
+fi
+
+if [ "$?" != "0" ] ; then
+    echo "User cancelled test at power prompt"
+    exit 1
+fi
+

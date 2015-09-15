@@ -1,0 +1,591 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
+[<!ENTITY % poky SYSTEM "../poky.ent"> %poky; ] >
+
+<chapter id='ref-manual-intro'>
+<title>Introduction</title>
+
+<section id='intro-welcome'>
+    <title>Introduction</title>
+
+    <para>
+        This manual provides reference information for the current release of the Yocto Project.
+        The Yocto Project is an open-source collaboration project focused on embedded Linux
+        developers.
+        Amongst other things, the Yocto Project uses the OpenEmbedded build system, which
+        is based on the Poky project, to construct complete Linux images.
+        You can find complete introductory and getting started information on the Yocto Project
+        by reading the
+        <ulink url='&YOCTO_DOCS_QS_URL;'>Yocto Project Quick Start</ulink>.
+        For task-based information using the Yocto Project, see the
+        <ulink url='&YOCTO_DOCS_DEV_URL;'>Yocto Project Development Manual</ulink>
+        and the <ulink url='&YOCTO_DOCS_KERNEL_DEV_URL;'>Yocto Project Linux Kernel Development Manual</ulink>.
+        For Board Support Package (BSP) structure information, see the
+        <ulink url='&YOCTO_DOCS_BSP_URL;'>Yocto Project Board Support Package (BSP) Developer's Guide</ulink>.
+        You can find information on tracing and profiling in the
+        <ulink url='&YOCTO_DOCS_PROF_URL;'>Yocto Project Profiling and Tracing Manual</ulink>.
+        For information on BitBake, which is the task execution tool the
+        OpenEmbedded build system is based on, see the
+        <ulink url='&YOCTO_DOCS_BB_URL;#bitbake-user-manual'>BitBake User Manual</ulink>.
+        Finally, you can also find lots of Yocto Project information on the
+        <ulink url="&YOCTO_HOME_URL;">Yocto Project website</ulink>.
+    </para>
+</section>
+
+<section id='intro-manualoverview'>
+    <title>Documentation Overview</title>
+    <para>
+        This reference manual consists of the following:
+        <itemizedlist>
+            <listitem><para><emphasis>
+                <link linkend='usingpoky'>Using the Yocto Project</link>:</emphasis>
+                Provides an overview of the components that make up the Yocto Project
+                followed by information about debugging images created in the Yocto Project.
+                </para></listitem>
+            <listitem><para><emphasis>
+                <link linkend='closer-look'>A Closer Look at the Yocto Project Development Environment</link>:</emphasis>
+                Provides a more detailed look at the Yocto Project development
+                environment within the context of development.
+                </para></listitem>
+            <listitem><para><emphasis>
+                <link linkend='technical-details'>Technical Details</link>:</emphasis>
+                Describes fundamental Yocto Project components as well as an explanation
+                behind how the Yocto Project uses shared state (sstate) cache to speed build time.
+                </para></listitem>
+            <listitem><para><emphasis>
+                <link linkend='migration'>Migrating to a Newer Yocto Project Release</link>:</emphasis>
+                Describes release-specific information that helps you move from
+                one Yocto Project Release to another.
+                </para></listitem>
+            <listitem><para><emphasis>
+                <link linkend='ref-structure'>Directory Structure</link>:</emphasis>
+                Describes the
+                <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink> created
+                either by unpacking a released Yocto Project tarball on your host development system,
+                or by cloning the upstream
+                <ulink url='&YOCTO_DOCS_DEV_URL;#poky'>Poky</ulink> Git repository.
+                </para></listitem>
+            <listitem><para><emphasis>
+                <link linkend='ref-classes'>Classes</link>:</emphasis>
+                Describes the classes used in the Yocto Project.</para></listitem>
+            <listitem><para><emphasis>
+                <link linkend='ref-tasks'>Tasks</link>:</emphasis>
+                Describes the tasks defined by the OpenEmbedded build system.
+                </para></listitem>
+            <listitem><para><emphasis>
+                <link linkend='ref-qa-checks'>QA Error and Warning Messages</link>:</emphasis>
+                Lists and describes QA warning and error messages.
+                </para></listitem>
+            <listitem><para><emphasis>
+                <link linkend='ref-images'>Images</link>:</emphasis>
+                Describes the standard images that the Yocto Project supports.
+                </para></listitem>
+            <listitem><para><emphasis>
+                <link linkend='ref-features'>Features</link>:</emphasis>
+                Describes mechanisms for creating distribution, machine, and image
+                features during the build process using the OpenEmbedded build system.</para></listitem>
+            <listitem><para><emphasis>
+                <link linkend='ref-variables-glos'>Variables Glossary</link>:</emphasis>
+                Presents most variables used by the OpenEmbedded build system, which
+                uses BitBake.
+                Entries describe the function of the variable and how to apply them.
+                </para></listitem>
+            <listitem><para><emphasis>
+                <link linkend='ref-varlocality'>Variable Context</link>:</emphasis>
+                Provides variable locality or context.</para></listitem>
+            <listitem><para><emphasis>
+                <link linkend='faq'>FAQ</link>:</emphasis>
+                Provides answers for commonly asked questions in the Yocto Project
+                development environment.</para></listitem>
+            <listitem><para><emphasis>
+                <link linkend='resources'>Contributing to the Yocto Project</link>:</emphasis>
+                Provides guidance on how you can contribute back to the Yocto
+                Project.</para></listitem>
+        </itemizedlist>
+    </para>
+</section>
+
+
+<section id='intro-requirements'>
+<title>System Requirements</title>
+    <para>
+        For general Yocto Project system requirements, see the
+        "<ulink url='&YOCTO_DOCS_QS_URL;#yp-resources'>Setting Up to Use the Yocto Project</ulink>" section
+        in the Yocto Project Quick Start.
+        The remainder of this section provides details on system requirements
+        not covered in the Yocto Project Quick Start.
+    </para>
+
+    <section id='detailed-supported-distros'>
+        <title>Supported Linux Distributions</title>
+
+        <para>
+            Currently, the Yocto Project is supported on the following
+            distributions:
+            <note>
+                <para>
+                    Yocto Project releases are tested against the stable Linux
+                    distributions in the following list.
+                    The Yocto Project should work on other distributions but
+                    validation is not performed against them.
+                </para>
+
+                <para>
+                    In particular, the Yocto Project does not support
+                    and currently has no plans to support
+                    rolling-releases or development distributions due to their
+                    constantly changing nature.
+                    We welcome patches and bug reports, but keep in mind that
+                    our priority is on the supported platforms listed below.
+                </para>
+
+                <para>
+                    If you encounter problems, please go to
+                    <ulink url='&YOCTO_BUGZILLA_URL;'>Yocto Project Bugzilla</ulink>
+                    and submit a bug.
+                    We are interested in hearing about your experience.
+                </para>
+            </note>
+            <itemizedlist>
+<!--
+                <listitem><para>Ubuntu 10.04</para></listitem>
+                <listitem><para>Ubuntu 11.10</para></listitem>
+                <listitem><para>Ubuntu 12.04 (LTS)</para></listitem>
+                <listitem><para>Ubuntu 13.10</para></listitem> -->
+                <listitem><para>Ubuntu 14.04 (LTS)</para></listitem>
+                <listitem><para>Ubuntu 14.10</para></listitem>
+<!--                <listitem><para>Fedora 16 (Verne)</para></listitem>
+                <listitem><para>Fedora 17 (Spherical)</para></listitem>
+                <listitem><para>Fedora release 19 (Schrödinger's Cat)</para></listitem>
+                <listitem><para>Fedora release 20 (Heisenbug)</para></listitem> -->
+                <listitem><para>Fedora release 21</para></listitem>
+<!--                <listitem><para>CentOS release 5.6 (Final)</para></listitem>
+                <listitem><para>CentOS release 5.7 (Final)</para></listitem>
+                <listitem><para>CentOS release 5.8 (Final)</para></listitem>
+                <listitem><para>CentOS release 6.3 (Final)</para></listitem> -->
+                <listitem><para>CentOS release 6.x</para></listitem>
+                <listitem><para>CentOS release 7.x</para></listitem>
+<!--                <listitem><para>Debian GNU/Linux 6.0 (Squeeze)</para></listitem> -->
+                <listitem><para>Debian GNU/Linux 7.x (Wheezy)</para></listitem>
+                <listitem><para>Debian GNU/Linux 8.x (Jessie)</para></listitem>
+<!--                <listitem><para>Debian GNU/Linux 7.1 (Wheezy)</para></listitem>
+                <listitem><para>Debian GNU/Linux 7.2 (Wheezy)</para></listitem>
+                <listitem><para>Debian GNU/Linux 7.3 (Wheezy)</para></listitem>
+                <listitem><para>Debian GNU/Linux 7.4 (Wheezy)</para></listitem>
+                <listitem><para>Debian GNU/Linux 7.5 (Wheezy)</para></listitem>
+                <listitem><para>Debian GNU/Linux 7.6 (Wheezy)</para></listitem> -->
+<!--                <listitem><para>openSUSE 11.4</para></listitem>
+                <listitem><para>openSUSE 12.1</para></listitem>
+                <listitem><para>openSUSE 12.2</para></listitem>
+                <listitem><para>openSUSE 12.3</para></listitem>
+                <listitem><para>openSUSE 13.1</para></listitem> -->
+                <listitem><para>openSUSE 13.2</para></listitem>
+            </itemizedlist>
+        </para>
+
+        <note>
+            While the Yocto Project Team attempts to ensure all Yocto Project
+            releases are one hundred percent compatible with each officially
+            supported Linux distribution, instances might exist where you
+            encounter a problem while using the Yocto Project on a specific
+            distribution.
+            For example, the CentOS 6.4 distribution does not include the
+            Gtk+ 2.20.0 and PyGtk 2.21.0 (or higher) packages, which are
+            required to run
+            <ulink url='&YOCTO_HOME_URL;/tools-resources/projects/hob'>Hob</ulink>.
+        </note>
+    </section>
+
+    <section id='required-packages-for-the-host-development-system'>
+    <title>Required Packages for the Host Development System</title>
+
+        <para>
+            The list of packages you need on the host development system can
+            be large when covering all build scenarios using the Yocto Project.
+            This section provides required packages according to
+            Linux distribution and function.
+        </para>
+
+        <section id='ubuntu-packages'>
+            <title>Ubuntu and Debian</title>
+
+            <para>
+                The following list shows the required packages by function
+                given a supported Ubuntu or Debian Linux distribution:
+                <note>
+                    If your build system has the
+                    <filename>oss4-dev</filename> package installed, you
+                    might experience QEMU build failures due to the package
+                    installing its own custom
+                    <filename>/usr/include/linux/soundcard.h</filename> on
+                    the Debian system.
+                    If you run into this situation, either of the following
+                    solutions exist:
+                    <literallayout class='monospaced'>
+     $ sudo apt-get build-dep qemu
+     $ sudo apt-get remove oss4-dev
+                    </literallayout>
+                 </note>
+                <itemizedlist>
+                    <listitem><para><emphasis>Essentials:</emphasis>
+                        Packages needed to build an image on a headless
+                        system:
+                        <literallayout class='monospaced'>
+     $ sudo apt-get install &UBUNTU_HOST_PACKAGES_ESSENTIAL;
+                        </literallayout></para></listitem>
+                    <listitem><para><emphasis>Graphical and Eclipse Plug-In Extras:</emphasis>
+                        Packages recommended if the host system has graphics
+                        support or if you are going to use the Eclipse
+                        IDE:
+                        <literallayout class='monospaced'>
+     $ sudo apt-get install libsdl1.2-dev xterm
+                        </literallayout></para></listitem>
+                    <listitem><para><emphasis>Documentation:</emphasis>
+                        Packages needed if you are going to build out the
+                        Yocto Project documentation manuals:
+                        <literallayout class='monospaced'>
+     $ sudo apt-get install make xsltproc docbook-utils fop dblatex xmlto
+                        </literallayout></para></listitem>
+                    <listitem><para><emphasis>ADT Installer Extras:</emphasis>
+                        Packages needed if you are going to be using the
+                        <ulink url='&YOCTO_DOCS_ADT_URL;#using-the-adt-installer'>Application Development Toolkit (ADT) Installer</ulink>:
+                        <literallayout class='monospaced'>
+     $ sudo apt-get install autoconf automake libtool libglib2.0-dev
+                        </literallayout></para></listitem>
+                </itemizedlist>
+            </para>
+        </section>
+
+        <section id='fedora-packages'>
+            <title>Fedora Packages</title>
+
+            <para>
+                The following list shows the required packages by function
+                given a supported Fedora Linux distribution:
+                <itemizedlist>
+                    <listitem><para><emphasis>Essentials:</emphasis>
+                        Packages needed to build an image for a headless
+                        system:
+                        <literallayout class='monospaced'>
+     $ sudo yum install &FEDORA_HOST_PACKAGES_ESSENTIAL;
+                        </literallayout></para></listitem>
+                    <listitem><para><emphasis>Graphical and Eclipse Plug-In Extras:</emphasis>
+                        Packages recommended if the host system has graphics
+                        support or if you are going to use the Eclipse
+                        IDE:
+                        <literallayout class='monospaced'>
+     $ sudo yum install SDL-devel xterm perl-Thread-Queue
+                        </literallayout></para></listitem>
+                    <listitem><para><emphasis>Documentation:</emphasis>
+                        Packages needed if you are going to build out the
+                        Yocto Project documentation manuals:
+                        <literallayout class='monospaced'>
+     $ sudo yum install make docbook-style-dsssl docbook-style-xsl \
+     docbook-dtds docbook-utils fop libxslt dblatex xmlto xsltproc
+                        </literallayout></para></listitem>
+                    <listitem><para><emphasis>ADT Installer Extras:</emphasis>
+                        Packages needed if you are going to be using the
+                        <ulink url='&YOCTO_DOCS_ADT_URL;#using-the-adt-installer'>Application Development Toolkit (ADT) Installer</ulink>:
+                        <literallayout class='monospaced'>
+     $ sudo yum install autoconf automake libtool glib2-devel
+                        </literallayout></para></listitem>
+                </itemizedlist>
+            </para>
+        </section>
+
+        <section id='opensuse-packages'>
+            <title>openSUSE Packages</title>
+
+            <para>
+                The following list shows the required packages by function
+                given a supported openSUSE Linux distribution:
+                <itemizedlist>
+                    <listitem><para><emphasis>Essentials:</emphasis>
+                        Packages needed to build an image for a headless
+                        system:
+                        <literallayout class='monospaced'>
+     $ sudo zypper install &OPENSUSE_HOST_PACKAGES_ESSENTIAL;
+                        </literallayout></para></listitem>
+                    <listitem><para><emphasis>Graphical and Eclipse Plug-In Extras:</emphasis>
+                        Packages recommended if the host system has graphics
+                        support or if you are going to use the Eclipse
+                        IDE:
+                        <literallayout class='monospaced'>
+     $ sudo zypper install libSDL-devel xterm
+                        </literallayout></para></listitem>
+                    <listitem><para><emphasis>Documentation:</emphasis>
+                        Packages needed if you are going to build out the
+                        Yocto Project documentation manuals:
+                        <literallayout class='monospaced'>
+     $ sudo zypper install make fop xsltproc dblatex xmlto
+                        </literallayout></para></listitem>
+                    <listitem><para><emphasis>ADT Installer Extras:</emphasis>
+                        Packages needed if you are going to be using the
+                        <ulink url='&YOCTO_DOCS_ADT_URL;#using-the-adt-installer'>Application Development Toolkit (ADT) Installer</ulink>:
+                        <literallayout class='monospaced'>
+     $ sudo zypper install autoconf automake libtool glib2-devel
+                        </literallayout></para></listitem>
+                </itemizedlist>
+            </para>
+        </section>
+
+        <section id='centos-packages'>
+            <title>CentOS Packages</title>
+
+            <para>
+                The following list shows the required packages by function
+                given a supported CentOS Linux distribution:
+                <note>
+                    For CentOS 6.x, some of the versions of the components
+                    provided by the distribution are too old (e.g. Git, Python,
+                    and tar).
+                    It is recommended that you install the buildtools in order
+                    to provide versions that will work with the OpenEmbedded
+                    build system.
+                    For information on how to install the buildtools tarball,
+                    see the
+                    "<link linkend='required-git-tar-and-python-versions'>Required Git, Tar, and Python Versions</link>"
+                    section.
+                </note>
+                <itemizedlist>
+                    <listitem><para><emphasis>Essentials:</emphasis>
+                        Packages needed to build an image for a headless
+                        system:
+                        <literallayout class='monospaced'>
+     $ sudo yum install &CENTOS_HOST_PACKAGES_ESSENTIAL;
+                        </literallayout></para></listitem>
+                    <listitem><para><emphasis>Graphical and Eclipse Plug-In Extras:</emphasis>
+                        Packages recommended if the host system has graphics
+                        support or if you are going to use the Eclipse
+                        IDE:
+                        <literallayout class='monospaced'>
+     $ sudo yum install SDL-devel xterm
+                        </literallayout></para></listitem>
+                    <listitem><para><emphasis>Documentation:</emphasis>
+                        Packages needed if you are going to build out the
+                        Yocto Project documentation manuals:
+                        <literallayout class='monospaced'>
+     $ sudo yum install make docbook-style-dsssl docbook-style-xsl \
+     docbook-dtds docbook-utils fop libxslt dblatex xmlto xsltproc
+                        </literallayout></para></listitem>
+                    <listitem><para><emphasis>ADT Installer Extras:</emphasis>
+                        Packages needed if you are going to be using the
+                        <ulink url='&YOCTO_DOCS_ADT_URL;#using-the-adt-installer'>Application Development Toolkit (ADT) Installer</ulink>:
+                        <literallayout class='monospaced'>
+     $ sudo yum install autoconf automake libtool glib2-devel
+                        </literallayout></para></listitem>
+                </itemizedlist>
+            </para>
+        </section>
+    </section>
+
+    <section id='required-git-tar-and-python-versions'>
+        <title>Required Git, tar, and Python Versions</title>
+
+        <para>
+            In order to use the build system, your host development system
+            must meet the following version requirements for Git, tar, and
+            Python:
+            <itemizedlist>
+                <listitem><para>Git 1.7.8 or greater</para></listitem>
+                <listitem><para>tar 1.24 or greater</para></listitem>
+                <listitem><para>Python 2.7.3 or greater not including
+                    Python 3.x, which is not supported.</para></listitem>
+            </itemizedlist>
+        </para>
+
+        <para>
+            If your host development system does not meet all these requirements,
+            you can resolve this by installing a <filename>buildtools</filename>
+            tarball that contains these tools.
+            You can get the tarball one of two ways: download a pre-built
+            tarball or use BitBake to build the tarball.
+        </para>
+
+        <section id='downloading-a-pre-built-buildtools-tarball'>
+            <title>Downloading a Pre-Built <filename>buildtools</filename> Tarball</title>
+
+            <para>
+                Downloading and running a pre-built buildtools installer is
+                the easiest of the two methods by which you can get these tools:
+                <orderedlist>
+                    <listitem><para>
+                        Locate and download the <filename>*.sh</filename> at
+                        <ulink url='&YOCTO_DL_URL;/releases/yocto/yocto-&DISTRO;/buildtools/'></ulink>.
+                        </para></listitem>
+                    <listitem><para>
+                        Execute the installation script.
+                        Here is an example:
+                        <literallayout class='monospaced'>
+     $ sh poky-glibc-x86_64-buildtools-tarball-x86_64-buildtools-nativesdk-standalone-&DISTRO;.sh
+                        </literallayout>
+                        During execution, a prompt appears that allows you to
+                        choose the installation directory.
+                        For example, you could choose the following:
+                        <literallayout class='monospaced'>
+     /home/<replaceable>your-username</replaceable>/buildtools
+                        </literallayout>
+                        </para></listitem>
+                    <listitem><para>
+                        Source the tools environment setup script by using a
+                        command like the following:
+                        <literallayout class='monospaced'>
+     $ source /home/<replaceable>your_username</replaceable>/buildtools/environment-setup-i586-poky-linux
+                        </literallayout>
+                        Of course, you need to supply your installation directory and be
+                        sure to use the right file (i.e. i585 or x86-64).
+                        </para>
+                        <para>
+                        After you have sourced the setup script,
+                        the tools are added to <filename>PATH</filename>
+                        and any other environment variables required to run the
+                        tools are initialized.
+                        The results are working versions versions of Git, tar,
+                        Python and <filename>chrpath</filename>.
+                        </para></listitem>
+                </orderedlist>
+            </para>
+        </section>
+
+        <section id='building-your-own-buildtools-tarball'>
+            <title>Building Your Own <filename>buildtools</filename> Tarball</title>
+
+            <para>
+                Building and running your own buildtools installer applies
+                only when you have a build host that can already run BitBake.
+                In this case, you use that machine to build the
+                <filename>.sh</filename> file and then
+                take steps to transfer and run it on a
+                machine that does not meet the minimal Git, tar, and Python
+                requirements.
+            </para>
+
+            <para>
+                Here are the steps to take to build and run your own
+                buildtools installer:
+                <orderedlist>
+                    <listitem><para>
+                        On the machine that is able to run BitBake,
+                        be sure you have set up your build environment with
+                        the setup script
+                        (<link linkend='structure-core-script'><filename>&OE_INIT_FILE;</filename></link>
+                        or
+                        <link linkend='structure-memres-core-script'><filename>oe-init-build-env-memres</filename></link>).
+                        </para></listitem>
+                    <listitem><para>
+                        Run the BitBake command to build the tarball:
+                        <literallayout class='monospaced'>
+     $ bitbake buildtools-tarball
+                        </literallayout>
+                        <note>
+                        The
+                        <link linkend='var-SDKMACHINE'><filename>SDKMACHINE</filename></link>
+                        variable in your <filename>local.conf</filename> file
+                        determines whether you build tools for a 32-bit
+                        or 64-bit system.
+                       </note>
+                       Once the build completes, you can find the
+                       <filename>.sh</filename> file that installs
+                       the tools in the <filename>tmp/deploy/sdk</filename>
+                       subdirectory of the
+                       <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>.
+                       The installer file has the string "buildtools"
+                       in the name.
+                       </para></listitem>
+                   <listitem><para>
+                       Transfer the <filename>.sh</filename> file from the
+                       build host to the machine that does not meet the
+                       Git, tar, or Python requirements.
+                       </para></listitem>
+                   <listitem><para>
+                       On the machine that does not meet the requirements,
+                       run the <filename>.sh</filename> file
+                       to install the tools.
+                       Here is an example:
+                       <literallayout class='monospaced'>
+     $ sh poky-glibc-x86_64-buildtools-tarball-x86_64-buildtools-nativesdk-standalone-&DISTRO;.sh
+                       </literallayout>
+                       During execution, a prompt appears that allows you to
+                       choose the installation directory.
+                       For example, you could choose the following:
+                       <literallayout class='monospaced'>
+     /home/<replaceable>your_username</replaceable>/buildtools
+                       </literallayout>
+                       </para></listitem>
+                    <listitem><para>
+                        Source the tools environment setup script by using a
+                        command like the following:
+                        <literallayout class='monospaced'>
+     $ source /home/<replaceable>your_username</replaceable>/buildtools/environment-setup-i586-poky-linux
+                        </literallayout>
+                        Of course, you need to supply your installation directory and be
+                        sure to use the right file (i.e. i585 or x86-64).
+                        </para>
+                        <para>
+                        After you have sourced the setup script,
+                        the tools are added to <filename>PATH</filename>
+                        and any other environment variables required to run the
+                        tools are initialized.
+                        The results are working versions versions of Git, tar,
+                        Python and <filename>chrpath</filename>.
+                        </para></listitem>
+                </orderedlist>
+            </para>
+        </section>
+    </section>
+</section>
+
+<section id='intro-getit'>
+    <title>Obtaining the Yocto Project</title>
+    <para>
+        The Yocto Project development team makes the Yocto Project available through a number
+        of methods:
+        <itemizedlist>
+            <listitem><para><emphasis>Source Repositories:</emphasis>
+                Working from a copy of the upstream
+                <filename>poky</filename> repository is the
+                preferred method for obtaining and using a Yocto Project
+                release.
+                You can view the Yocto Project Source Repositories at
+                <ulink url='&YOCTO_GIT_URL;/cgit.cgi'></ulink>.
+                In particular, you can find the
+                <filename>poky</filename> repository at
+                <ulink url='http://git.yoctoproject.org/cgit/cgit.cgi/poky/'></ulink>.
+                </para></listitem>
+            <listitem><para><emphasis>Releases:</emphasis> Stable, tested
+                releases are available as tarballs through
+                <ulink url='&YOCTO_DL_URL;/releases/yocto/'/>.</para></listitem>
+            <listitem><para><emphasis>Nightly Builds:</emphasis> These
+                tarball releases are available at
+                <ulink url='&YOCTO_AB_NIGHTLY_URL;'/>.
+                These builds include Yocto Project releases, meta-toolchain
+                tarball installation scripts, and experimental builds.
+                </para></listitem>
+            <listitem><para><emphasis>Yocto Project Website:</emphasis> You can
+                find tarball releases of the Yocto Project and supported BSPs
+                at the
+                <ulink url='&YOCTO_HOME_URL;'>Yocto Project website</ulink>.
+                Along with these downloads, you can find lots of other
+                information at this site.
+                </para></listitem>
+        </itemizedlist>
+    </para>
+</section>
+
+<section id='intro-getit-dev'>
+    <title>Development Checkouts</title>
+    <para>
+        Development using the Yocto Project requires a local
+        <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+        You can set up the Source Directory by cloning a copy of the upstream
+        <ulink url='&YOCTO_DOCS_DEV_URL;#poky'>poky</ulink> Git repository.
+        For information on how to do this, see the
+        "<ulink url='&YOCTO_DOCS_DEV_URL;#getting-setup'>Getting Set Up</ulink>"
+        section in the Yocto Project Development Manual.
+    </para>
+</section>
+
+</chapter>
+<!--
+vim: expandtab tw=80 ts=4
+-->

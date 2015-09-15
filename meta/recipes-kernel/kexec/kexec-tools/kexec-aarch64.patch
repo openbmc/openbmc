@@ -1,0 +1,801 @@
+From: Geoff Levand <geoff@infradead.org>
+Date: Mon, 15 Jul 2013 23:32:36 +0000 (-0700)
+Subject: Add arm64 support
+X-Git-Url: https://git.linaro.org/gitweb?p=people%2Fgeoff%2Fkexec-tools.git;a=commitdiff_plain;h=fbf5ac6c2c70ec0f6da2b9ff563e573999752c01
+
+Add arm64 support
+
+Signed-off-by: Geoff Levand <geoff@infradead.org>
+
+Get patch from:
+https://fedorapeople.org/~hrw/aarch64/for-fedora/kexec-aarch64.patch
+
+Upstream-Status: Pending
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+
+---
+ configure.ac                            |    3 
+ kexec/Makefile                          |    1 
+ kexec/arch/arm64/Makefile               |   13 +
+ kexec/arch/arm64/crashdump-arm64.c      |  305 ++++++++++++++++++++++++++++++++
+ kexec/arch/arm64/include/arch/options.h |   26 ++
+ kexec/arch/arm64/kexec-arm64.c          |  177 ++++++++++++++++++
+ kexec/arch/arm64/kexec-arm64.h          |   20 ++
+ kexec/arch/arm64/kexec-elf-arm64.c      |  114 +++++++++++
+ kexec/kexec-syscall.h                   |    9 
+ kexec/kexec.c                           |    2 
+ purgatory/arch/arm64/Makefile           |    7 
+ 11 files changed, 675 insertions(+), 2 deletions(-)
+
+Index: kexec-tools-2.0.10/configure.ac
+===================================================================
+--- kexec-tools-2.0.10.orig/configure.ac
++++ kexec-tools-2.0.10/configure.ac
+@@ -36,6 +36,9 @@ case $target_cpu in
+ 		ARCH="ppc64"
+ 		SUBARCH="LE"
+ 		;;
++	aarch64* )
++		ARCH="arm64"
++		;;
+ 	arm* )
+ 		ARCH="arm"
+ 		;;
+Index: kexec-tools-2.0.10/kexec/Makefile
+===================================================================
+--- kexec-tools-2.0.10.orig/kexec/Makefile
++++ kexec-tools-2.0.10/kexec/Makefile
+@@ -71,6 +71,7 @@ KEXEC_SRCS			+= $($(ARCH)_FS2DT)
+ 
+ include $(srcdir)/kexec/arch/alpha/Makefile
+ include $(srcdir)/kexec/arch/arm/Makefile
++include $(srcdir)/kexec/arch/arm64/Makefile
+ include $(srcdir)/kexec/arch/i386/Makefile
+ include $(srcdir)/kexec/arch/ia64/Makefile
+ include $(srcdir)/kexec/arch/m68k/Makefile
+Index: kexec-tools-2.0.10/kexec/arch/arm64/Makefile
+===================================================================
+--- /dev/null
++++ kexec-tools-2.0.10/kexec/arch/arm64/Makefile
+@@ -0,0 +1,13 @@
++
++arm64_KEXEC_SRCS += \
++	kexec/arch/arm64/kexec-arm64.c \
++	kexec/arch/arm64/kexec-elf-arm64.c \
++	kexec/arch/arm64/crashdump-arm64.c
++
++arm64_ARCH_REUSE_INITRD =
++arm64_ADD_SEGMENT =
++arm64_VIRT_TO_PHYS =
++
++dist += $(arm64_KEXEC_SRCS) \
++	kexec/arch/arm64/Makefile \
++	kexec/arch/arm64/kexec-arm64.h
+Index: kexec-tools-2.0.10/kexec/arch/arm64/crashdump-arm64.c
+===================================================================
+--- /dev/null
++++ kexec-tools-2.0.10/kexec/arch/arm64/crashdump-arm64.c
+@@ -0,0 +1,305 @@
++/*
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation (version 2 of the License).
++ */
++
++#include "../../kexec.h"
++#include "../../kexec-elf.h"
++#include "../../crashdump.h"
++
++int is_crashkernel_mem_reserved(void)
++{
++	return 0;
++}
++
++#if 0
++/*
++ * Used to save various memory ranges/regions needed for the captured
++ * kernel to boot. (lime memmap= option in other archs)
++ */
++static struct memory_range crash_memory_ranges[CRASH_MAX_MEMORY_RANGES];
++struct memory_ranges usablemem_rgns = {
++    .size = 0,
++    .ranges = crash_memory_ranges,
++};
++
++/* memory range reserved for crashkernel */
++static struct memory_range crash_reserved_mem;
++
++static struct crash_elf_info elf_info = {
++	.class		= ELFCLASS32,
++	.data		= ELFDATA2LSB,
++	.machine	= EM_ARM,
++	.page_offset	= PAGE_OFFSET,
++};
++
++unsigned long phys_offset;
++
++/**
++ * crash_range_callback() - callback called for each iomem region
++ * @data: not used
++ * @nr: not used
++ * @str: name of the memory region
++ * @base: start address of the memory region
++ * @length: size of the memory region
++ *
++ * This function is called once for each memory region found in /proc/iomem. It
++ * locates system RAM and crashkernel reserved memory and places these to
++ * variables: @crash_memory_ranges and @crash_reserved_mem. Number of memory
++ * regions is placed in @crash_memory_nr_ranges.
++ */
++static int crash_range_callback(void *UNUSED(data), int UNUSED(nr),
++				char *str, unsigned long base,
++				unsigned long length)
++{
++	struct memory_range *range;
++
++	if (usablemem_rgns.size >= CRASH_MAX_MEMORY_RANGES)
++		return 1;
++
++	range = usablemem_rgns.ranges + usablemem_rgns.size;
++
++	if (strncmp(str, "System RAM\n", 11) == 0) {
++		range->start = base;
++		range->end = base + length - 1;
++		range->type = RANGE_RAM;
++		usablemem_rgns.size++;
++	} else if (strncmp(str, "Crash kernel\n", 13) == 0) {
++		crash_reserved_mem.start = base;
++		crash_reserved_mem.end = base + length - 1;
++		crash_reserved_mem.type = RANGE_RAM;
++	}
++
++	return 0;
++}
++
++/**
++ * crash_exclude_range() - excludes memory region reserved for crashkernel
++ *
++ * Function locates where crashkernel reserved memory is and removes that region
++ * from the available memory regions.
++ */
++static void crash_exclude_range(void)
++{
++	const struct memory_range *range = &crash_reserved_mem;
++	int i;
++
++	for (i = 0; i < usablemem_rgns.size; i++) {
++		struct memory_range *r = usablemem_rgns.ranges + i;
++
++		/*
++		 * We assume that crash area is fully contained in
++		 * some larger memory area.
++		 */
++		if (r->start <= range->start && r->end >= range->end) {
++			struct memory_range *new;
++			/*
++			 * Let's split this area into 2 smaller ones and
++			 * remove excluded range from between. First create
++			 * new entry for the remaining area.
++			 */
++			new = usablemem_rgns.ranges + usablemem_rgns.size;
++			new->start = range->end + 1;
++			new->end = r->end;
++			usablemem_rgns.size++;
++			/*
++			 * Next update this area to end before excluded range.
++			 */
++			r->end = range->start - 1;
++			break;
++		}
++	}
++}
++
++static int range_cmp(const void *a1, const void *a2)
++{
++	const struct memory_range *r1 = a1;
++	const struct memory_range *r2 = a2;
++
++	if (r1->start > r2->start)
++		return 1;
++	if (r1->start < r2->start)
++		return -1;
++
++	return 0;
++}
++
++/**
++ * crash_get_memory_ranges() - read system physical memory
++ *
++ * Function reads through system physical memory and stores found memory regions
++ * in @crash_memory_ranges. Number of memory regions found is placed in
++ * @crash_memory_nr_ranges. Regions are sorted in ascending order.
++ *
++ * Returns %0 in case of success and %-1 otherwise (errno is set).
++ */
++static int crash_get_memory_ranges(void)
++{
++	/*
++	 * First read all memory regions that can be considered as
++	 * system memory including the crash area.
++	 */
++	kexec_iomem_for_each_line(NULL, crash_range_callback, NULL);
++
++	if (usablemem_rgns.size < 1) {
++		errno = EINVAL;
++		return -1;
++	}
++
++	/*
++	 * Exclude memory reserved for crashkernel (this may result a split memory
++	 * region).
++	 */
++	crash_exclude_range();
++
++	/*
++	 * Make sure that the memory regions are sorted.
++	 */
++	qsort(usablemem_rgns.ranges, usablemem_rgns.size,
++	      sizeof(*usablemem_rgns.ranges), range_cmp);
++
++	return 0;
++}
++
++/**
++ * cmdline_add_elfcorehdr() - adds elfcorehdr= to @cmdline
++ * @cmdline: buffer where parameter is placed
++ * @elfcorehdr: physical address of elfcorehdr
++ *
++ * Function appends 'elfcorehdr=start' at the end of the command line given in
++ * @cmdline. Note that @cmdline must be at least %COMMAND_LINE_SIZE bytes long
++ * (inclunding %NUL).
++ */
++static void cmdline_add_elfcorehdr(char *cmdline, unsigned long elfcorehdr)
++{
++	char buf[COMMAND_LINE_SIZE];
++	int buflen;
++
++	buflen = snprintf(buf, sizeof(buf), "%s elfcorehdr=%#lx",
++			  cmdline, elfcorehdr);
++	if (buflen < 0)
++		die("Failed to construct elfcorehdr= command line parameter\n");
++	if (buflen >= sizeof(buf))
++		die("Command line overflow\n");
++
++	(void) strncpy(cmdline, buf, COMMAND_LINE_SIZE);
++	cmdline[COMMAND_LINE_SIZE - 1] = '\0';
++}
++
++/**
++ * cmdline_add_mem() - adds mem= parameter to kernel command line
++ * @cmdline: buffer where parameter is placed
++ * @size: size of the kernel reserved memory (in bytes)
++ *
++ * This function appends 'mem=size' at the end of the command line given in
++ * @cmdline. Note that @cmdline must be at least %COMMAND_LINE_SIZE bytes long
++ * (including %NUL).
++ */
++static void cmdline_add_mem(char *cmdline, unsigned long size)
++{
++	char buf[COMMAND_LINE_SIZE];
++	int buflen;
++
++	buflen = snprintf(buf, sizeof(buf), "%s mem=%ldK", cmdline, size >> 10);
++	if (buflen < 0)
++		die("Failed to construct mem= command line parameter\n");
++	if (buflen >= sizeof(buf))
++		die("Command line overflow\n");
++
++	(void) strncpy(cmdline, buf, COMMAND_LINE_SIZE);
++	cmdline[COMMAND_LINE_SIZE - 1] = '\0';
++}
++
++static unsigned long long range_size(const struct memory_range *r)
++{
++	return r->end - r->start + 1;
++}
++
++static void dump_memory_ranges(void)
++{
++	int i;
++
++	if (!kexec_debug)
++		return;
++
++	dbgprintf("crashkernel: [%#llx - %#llx] (%ldM)\n",
++		  crash_reserved_mem.start, crash_reserved_mem.end,
++		  (unsigned long)range_size(&crash_reserved_mem) >> 20);
++
++	for (i = 0; i < usablemem_rgns.size; i++) {
++		struct memory_range *r = usablemem_rgns.ranges + i;
++		dbgprintf("memory range: [%#llx - %#llx] (%ldM)\n",
++			  r->start, r->end, (unsigned long)range_size(r) >> 20);
++	}
++}
++
++/**
++ * load_crashdump_segments() - loads additional segments needed for kdump
++ * @info: kexec info structure
++ * @mod_cmdline: kernel command line
++ *
++ * This function loads additional segments which are needed for the dump capture
++ * kernel. It also updates kernel command line passed in @mod_cmdline to have
++ * right parameters for the dump capture kernel.
++ *
++ * Return %0 in case of success and %-1 in case of error.
++ */
++int load_crashdump_segments(struct kexec_info *info, char *mod_cmdline)
++{
++	unsigned long elfcorehdr;
++	unsigned long bufsz;
++	void *buf;
++	int err;
++
++	/*
++	 * First fetch all the memory (RAM) ranges that we are going to pass to
++	 * the crashdump kernel during panic.
++	 */
++	err = crash_get_memory_ranges();
++	if (err)
++		return err;
++
++	/*
++	 * Now that we have memory regions sorted, we can use first memory
++	 * region as PHYS_OFFSET.
++	 */
++	phys_offset = usablemem_rgns.ranges->start;
++	dbgprintf("phys_offset: %#lx\n", phys_offset);
++
++	err = crash_create_elf32_headers(info, &elf_info,
++					 usablemem_rgns.ranges,
++					 usablemem_rgns.size, &buf, &bufsz,
++					 ELF_CORE_HEADER_ALIGN);
++	if (err)
++		return err;
++
++	/*
++	 * We allocate ELF core header from the end of the memory area reserved
++	 * for the crashkernel. We align the header to SECTION_SIZE (which is
++	 * 1MB) so that available memory passed in kernel command line will be
++	 * aligned to 1MB. This is because kernel create_mapping() wants memory
++	 * regions to be aligned to SECTION_SIZE.
++	 */
++	elfcorehdr = add_buffer_phys_virt(info, buf, bufsz, bufsz, 1 << 20,
++					  crash_reserved_mem.start,
++					  crash_reserved_mem.end, -1, 0);
++
++	dbgprintf("elfcorehdr: %#lx\n", elfcorehdr);
++	cmdline_add_elfcorehdr(mod_cmdline, elfcorehdr);
++
++	/*
++	 * Add 'mem=size' parameter to dump capture kernel command line. This
++	 * prevents the dump capture kernel from using any other memory regions
++	 * which belong to the primary kernel.
++	 */
++	cmdline_add_mem(mod_cmdline, elfcorehdr - crash_reserved_mem.start);
++
++	dump_memory_ranges();
++	dbgprintf("kernel command line: \"%s\"\n", mod_cmdline);
++
++	return 0;
++}
++
++#endif
++
+Index: kexec-tools-2.0.10/kexec/arch/arm64/include/arch/options.h
+===================================================================
+--- /dev/null
++++ kexec-tools-2.0.10/kexec/arch/arm64/include/arch/options.h
+@@ -0,0 +1,26 @@
++#ifndef KEXEC_ARCH_ARM64_OPTIONS_H
++#define KEXEC_ARCH_ARM64_OPTIONS_H
++
++//#define OPT_ARCH_MAX	((OPT_MAX)+0)
++
++#define OPT_APPEND	((OPT_MAX)+0)
++#define OPT_RAMDISK	((OPT_MAX)+1)
++#define OPT_DTB		((OPT_MAX)+2)
++
++#define OPT_ARCH_MAX	((OPT_MAX)+3)
++
++
++#define KEXEC_ARCH_OPTIONS \
++	KEXEC_OPTIONS \
++	{ "append",       1, NULL, OPT_APPEND }, \
++	{ "command-line", 1, NULL, OPT_APPEND }, \
++	{ "dtb",          1, NULL, OPT_DTB }, \
++	{ "initrd",       1, NULL, OPT_RAMDISK }, \
++	{ "ramdisk",      1, NULL, OPT_RAMDISK }, \
++
++#define KEXEC_ARCH_OPT_STR KEXEC_OPT_STR /* Only accept long arch options. */
++
++#define KEXEC_ALL_OPTIONS KEXEC_ARCH_OPTIONS
++#define KEXEC_ALL_OPT_STR KEXEC_ARCH_OPT_STR
++
++#endif /* KEXEC_ARCH_ARM64_OPTIONS_H */
+Index: kexec-tools-2.0.10/kexec/arch/arm64/kexec-arm64.c
+===================================================================
+--- /dev/null
++++ kexec-tools-2.0.10/kexec/arch/arm64/kexec-arm64.c
+@@ -0,0 +1,177 @@
++/*
++ * ARM64 kexec support.
++ */
++
++#define _GNU_SOURCE
++
++#include <errno.h>
++#include <stddef.h>
++
++//#include <linux/kexec.h>
++
++#include "../../kexec.h"
++#include "../../kexec-syscall.h"
++#include "kexec-arm64.h"
++
++
++void arch_usage(void)
++{
++	fprintf(stderr, "%s:%d: ->\n", __func__, __LINE__);
++
++	printf(
++"     --append=STRING       Set the kernel command line to STRING.\n"
++"     --command-line=STRING Set the kernel command line to STRING.\n"
++"     --dtb=FILE            Use FILE as the device tree blob.\n"
++"     --initrd=FILE         Use FILE as the kernel initial ramdisk.\n"
++"     --ramdisk=FILE        Use FILE as the kernel initial ramdisk.\n");
++
++	fprintf(stderr, "%s:%d: <-\n", __func__, __LINE__);
++}
++
++int arch_process_options(int UNUSED(argc), char **UNUSED(argv))
++{
++	fprintf(stderr, "%s:%d: do\n", __func__, __LINE__);
++	return 0;
++}
++
++const struct arch_map_entry arches[] = {
++	{ "aarch64", KEXEC_ARCH_ARM64 },
++	{ NULL, 0 },
++};
++
++void arch_update_purgatory(struct kexec_info *UNUSED(info))
++{
++	fprintf(stderr, "%s:%d: do\n", __func__, __LINE__);
++}
++
++unsigned long virt_to_phys(unsigned long addr)
++{
++	fprintf(stderr, "%s:%d: %016lx -> %016lx\n", __func__, __LINE__, addr,
++		addr + 0x080000000UL);
++	return addr + 0x080000000UL;
++}
++
++void add_segment(struct kexec_info *info, const void *buf, size_t bufsz,
++	unsigned long base, size_t memsz)
++{
++	fprintf(stderr, "%s:%d: ->\n", __func__, __LINE__);
++	add_segment_phys_virt(info, buf, bufsz, base, memsz, 1);
++	fprintf(stderr, "%s:%d: <-\n", __func__, __LINE__);
++}
++
++static int get_memory_ranges_1(struct memory_range **range, int *ranges,
++			unsigned long kexec_flags)
++{
++	static struct memory_range memory_range[KEXEC_SEGMENT_MAX];
++	const char *iomem;
++	int range_count = 0;
++	char line[MAX_LINE];
++	FILE *fp;
++
++	iomem = proc_iomem();
++	fp = fopen(iomem, "r");
++
++	if (!fp) {
++		fprintf(stderr, "Cannot open %s: %s\n",
++			iomem, strerror(errno));
++		return -1;
++	}
++
++	dbgprintf("memory ranges:\n");
++
++	while(fgets(line, sizeof(line), fp) != 0) {
++		struct memory_range r;
++		char *str;
++		int consumed;
++
++		if (range_count >= KEXEC_SEGMENT_MAX)
++			break;
++
++		if (sscanf(line, "%Lx-%Lx : %n", &r.start, &r.end, &consumed)
++			!= 2)
++			continue;
++
++		str = line + consumed;
++		r.end++;
++
++		if (memcmp(str, "System RAM\n", 11)) {
++			dbgprintf(" Skip: %016Lx - %016Lx : %s", r.start, r.end,
++				str);
++			continue;
++		}
++
++		r.type = RANGE_RAM;
++		memory_range[range_count] = r;
++		range_count++;
++
++		dbgprintf(" Add:  %016Lx - %016Lx : %s", r.start, r.end, str);
++	}
++
++	fclose(fp);
++	*range = memory_range;
++	*ranges = range_count;
++
++	return 0;
++}
++
++static int get_memory_ranges_2(struct memory_range **range, int *ranges,
++		      unsigned long UNUSED(kexec_flags))
++{
++	static struct memory_range memory_range[2];
++
++	memory_range[0].start = 0x080000000;
++	memory_range[0].end   = 0x100000000;
++	memory_range[0].type = RANGE_RAM;
++
++	memory_range[1].start = 0x900000000;
++	memory_range[1].end   = 0x880000000;
++	memory_range[1].type = RANGE_RAM;
++
++	*range = memory_range;
++	*ranges = sizeof(memory_range) / sizeof(memory_range[0]);
++
++	return 0;
++}
++
++int get_memory_ranges(struct memory_range **range, int *ranges,
++			unsigned long kexec_flags)
++{
++	/* FIXME: Should get this info from device tree. */
++	
++	return get_memory_ranges_1(range, ranges, kexec_flags);
++}
++
++struct file_type file_type[] = {
++	{ "elf-arm64", elf_arm64_probe, elf_arm64_load, elf_arm64_usage },
++};
++
++int file_types = sizeof(file_type) / sizeof(file_type[0]);
++
++int arch_compat_trampoline(struct kexec_info *info)
++{
++	fprintf(stderr, "%s:%d: do\n", __func__, __LINE__);
++	return 0;
++}
++
++void arch_reuse_initrd(void)
++{
++}
++
++int machine_verify_elf_rel(struct mem_ehdr *ehdr)
++{
++	(void)ehdr;
++
++	fprintf(stderr, "%s:%d: do\n", __func__, __LINE__);
++	return 0;
++}
++
++void machine_apply_elf_rel(struct mem_ehdr *ehdr, unsigned long r_type,
++	void *location, unsigned long address, unsigned long value)
++{
++	(void)ehdr;
++	(void)r_type;
++	(void)location;
++	(void)address;
++	(void)value;
++	fprintf(stderr, "%s:%d: do\n", __func__, __LINE__);
++}
+Index: kexec-tools-2.0.10/kexec/arch/arm64/kexec-arm64.h
+===================================================================
+--- /dev/null
++++ kexec-tools-2.0.10/kexec/arch/arm64/kexec-arm64.h
+@@ -0,0 +1,20 @@
++/*
++ * ARM64 kexec support.
++ */
++
++#if !defined(KEXEC_ARM64_H)
++#define KEXEC_ARM64_H
++
++/* #include <linux/kexec.h> FIXME: this is broken */
++#include <sys/types.h>
++
++#include "../../kexec.h"
++
++#define KEXEC_SEGMENT_MAX 16 /* FIXME: this should come from <linux/kexec.h> */
++
++int elf_arm64_probe(const char *buf, off_t len);
++int elf_arm64_load(int argc, char **argv, const char *buf, off_t len,
++	struct kexec_info *info);
++void elf_arm64_usage(void);
++
++#endif
+\ No newline at end of file
+Index: kexec-tools-2.0.10/kexec/arch/arm64/kexec-elf-arm64.c
+===================================================================
+--- /dev/null
++++ kexec-tools-2.0.10/kexec/arch/arm64/kexec-elf-arm64.c
+@@ -0,0 +1,114 @@
++/*
++ * ARM64 kexec support.
++ */
++
++#define _GNU_SOURCE
++
++#include <elf.h>
++#include <getopt.h>
++
++#include "../../kexec-syscall.h"
++
++#include "kexec-arm64.h"
++#include "arch/options.h"
++
++#if !defined(EM_AARCH64)
++# define EM_AARCH64 183
++#endif
++
++int elf_arm64_probe(const char *buf, off_t len)
++{
++	int result;
++	struct mem_ehdr ehdr;
++
++	fprintf(stderr, "%s:%d: ->\n", __func__, __LINE__);
++	
++	result = build_elf_exec_info(buf, len, &ehdr, 0);
++
++	if (result < 0) {
++		dbgprintf("Not an ELF executable\n");
++		goto out;
++	}
++
++	if (ehdr.e_machine != EM_AARCH64) {
++		dbgprintf("Not an AARCH64 executable\n");
++		result = -1;
++		goto out;
++	}
++
++	result = 0;
++
++out:
++	free_elf_info(&ehdr);
++	fprintf(stderr, "%s:%d: <-\n", __func__, __LINE__);
++	return result;
++}
++
++int elf_arm64_load(int argc, char **argv, const char *buf, off_t len,
++			struct kexec_info *info)
++{
++	static const struct option options[] = {
++		KEXEC_ARCH_OPTIONS
++		{ 0 }
++	};
++	static const char short_options[] = KEXEC_OPT_STR "";
++	const char *command_line = NULL;
++	unsigned int command_line_len = 0;
++	const char *ramdisk = NULL;
++	const char *dtb = NULL;
++	int opt;
++	struct mem_ehdr ehdr;
++	int result;
++
++	fprintf(stderr, "%s:%d: ->\n", __func__, __LINE__);
++
++	while ((opt = getopt_long(argc, argv, short_options, options, 0))
++		!= -1) {
++		switch (opt) {
++		default:
++			if (opt < OPT_MAX) /* Ignore core options */
++				break;
++		case OPT_APPEND:
++			command_line = optarg;
++			command_line_len = strlen(command_line) + 1;
++			break;
++		case OPT_RAMDISK:
++			ramdisk = optarg;
++			break;
++		case OPT_DTB:
++			dtb = optarg;
++			break;
++		}
++	}
++
++	fprintf(stderr, "%s:%d: command_line: %s\n", __func__, __LINE__, command_line);
++	fprintf(stderr, "%s:%d: ramdisk: %s\n", __func__, __LINE__, ramdisk);
++	fprintf(stderr, "%s:%d: dtb: %s\n", __func__, __LINE__, dtb);
++
++	if (info->kexec_flags & KEXEC_ON_CRASH) {
++		fprintf(stderr, "kexec: kdump not yet supported on arm64\n");
++		return -1;
++	}
++
++	result = build_elf_exec_info(buf, len, &ehdr, 0);
++
++	if (result < 0) {
++		free_elf_info(&ehdr);
++		fprintf(stderr, "%s:%d: free_elf_info failed\n", __func__,
++			__LINE__);
++		return result;
++	}
++
++	elf_exec_build_load(info, &ehdr, buf, len, 0);
++
++	info->entry = (void*)0x80080000UL;  // FIXME
++
++	fprintf(stderr, "%s:%d: <-\n", __func__, __LINE__);
++	return 0;
++}
++
++void elf_arm64_usage(void)
++{
++	fprintf(stderr, "%s:%d: ->\n", __func__, __LINE__);
++	fprintf(stderr, "%s:%d: <-\n", __func__, __LINE__);
++}
+Index: kexec-tools-2.0.10/kexec/kexec-syscall.h
+===================================================================
+--- kexec-tools-2.0.10.orig/kexec/kexec-syscall.h
++++ kexec-tools-2.0.10/kexec/kexec-syscall.h
+@@ -39,8 +39,8 @@
+ #ifdef __s390__
+ #define __NR_kexec_load		277
+ #endif
+-#ifdef __arm__
+-#define __NR_kexec_load		__NR_SYSCALL_BASE + 347  
++#if defined(__arm__) || defined(__arm64__)
++#define __NR_kexec_load		__NR_SYSCALL_BASE + 347
+ #endif
+ #if defined(__mips__)
+ #define __NR_kexec_load                4311
+@@ -108,6 +108,8 @@ static inline long kexec_file_load(int k
+ #define KEXEC_ARCH_PPC64   (21 << 16)
+ #define KEXEC_ARCH_IA_64   (50 << 16)
+ #define KEXEC_ARCH_ARM     (40 << 16)
++#define KEXEC_ARCH_ARM64   (183 << 16)
++/* #define KEXEC_ARCH_AARCH64 (183 << 16) */
+ #define KEXEC_ARCH_S390    (22 << 16)
+ #define KEXEC_ARCH_SH      (42 << 16)
+ #define KEXEC_ARCH_MIPS_LE (10 << 16)
+@@ -153,5 +155,8 @@ static inline long kexec_file_load(int k
+ #ifdef __m68k__
+ #define KEXEC_ARCH_NATIVE	KEXEC_ARCH_68K
+ #endif
++#if defined(__arm64__)
++#define KEXEC_ARCH_NATIVE	KEXEC_ARCH_ARM64
++#endif
+ 
+ #endif /* KEXEC_SYSCALL_H */
+Index: kexec-tools-2.0.10/kexec/kexec.c
+===================================================================
+--- kexec-tools-2.0.10.orig/kexec/kexec.c
++++ kexec-tools-2.0.10/kexec/kexec.c
+@@ -664,6 +664,8 @@ static int my_load(const char *type, int
+ 	memset(&info, 0, sizeof(info));
+ 	info.kexec_flags = kexec_flags;
+ 
++	fprintf(stderr, "%s:%d: do\n", __func__, __LINE__);
++
+ 	result = 0;
+ 	if (argc - fileind <= 0) {
+ 		fprintf(stderr, "No kernel specified\n");
+Index: kexec-tools-2.0.10/purgatory/arch/arm64/Makefile
+===================================================================
+--- /dev/null
++++ kexec-tools-2.0.10/purgatory/arch/arm64/Makefile
+@@ -0,0 +1,7 @@
++#
++# Purgatory arm64
++#
++
++arm64_PURGATORY_SRCS =
++
++dist += purgatory/arch/arm64/Makefile $(arm64_PURGATORY_SRCS)

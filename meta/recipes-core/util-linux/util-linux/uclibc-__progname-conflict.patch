@@ -1,0 +1,32 @@
+configure should include errno.h instead of argp.h when
+checking for presence of program_invocation_short_name
+uclibc defines this to be const char* unlike util-linux-ng
+which defines this to be char* so this error goes unnoticed
+on glibc/eglibc systems.
+
+here is the error it fixes
+
+in file included from mountP.h:14:0,                                                                               
+                 from cache.c:29:                                                                                  
+/home/kraj/work/slugos/build/tmp-slugos-uclibc/sysroots/nslu2le/usr/include/errno.h:55:46: error: conflicting types for '__progname'                                                                                                  
+../../../include/c.h:118:14: note: previous declaration of '__progname' was here                                   
+make[3]: *** [cache.lo] Error 1          
+
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Jonathan Liu <net147@gmail.com>
+
+Upstream-Status: Pending
+Index: util-linux-2.22.1/configure.ac
+===================================================================
+--- util-linux-2.22.1.orig/configure.ac
++++ util-linux-2.22.1/configure.ac
+@@ -372,7 +372,7 @@ esac
+ 
+ AC_MSG_CHECKING([whether program_invocation_short_name is defined])
+ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+-	#include <argp.h>
++	#include <errno.h>
+ ]], [[
+ 	program_invocation_short_name = "test";
+ ]])], [

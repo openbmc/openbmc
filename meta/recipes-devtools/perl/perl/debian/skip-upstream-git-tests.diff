@@ -1,0 +1,28 @@
+From ae9b645d6da2990fd055368eca2c67c449474e38 Mon Sep 17 00:00:00 2001
+From: Niko Tyni <ntyni@debian.org>
+Date: Fri, 22 Apr 2011 11:15:32 +0300
+Subject: Skip tests specific to the upstream Git repository
+
+These tests fail if run from a different git repository than
+upstream. This complicates things needlessly for downstream packagers.
+
+Skip the tests altogether even if the .git directory exists.
+
+Patch-Name: debian/skip-upstream-git-tests.diff
+---
+ t/test.pl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/t/test.pl b/t/test.pl
+index cda3840..af579a2 100644
+--- a/t/test.pl
++++ b/t/test.pl
+@@ -174,7 +174,7 @@ sub skip_all_without_unicode_tables { # (but only under miniperl)
+ 
+ sub find_git_or_skip {
+     my ($source_dir, $reason);
+-    if (-d '.git') {
++    if (-d '.git' && ! -d 'debian') {
+ 	$source_dir = '.';
+     } elsif (-l 'MANIFEST' && -l 'AUTHORS') {
+ 	my $where = readlink 'MANIFEST';

@@ -1,0 +1,29 @@
+Avoid parallel-tests as it remove
+buildtest-TESTS and runtest-TESTS targets required by ptest.
+In automake 1.13.4 parallel-tests is assumed by defauls.
+In order to have buildtest-TESTS and runtest-TESTS targets
+serial-tests is now required
+
+Signed-off-by: Tudor Florea <tudor.florea@enea.com>
+Upstream-Status: Inappropriate (disable feature incompatible with ptest) 
+
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index eb0f9d1..a539968 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -14,7 +14,7 @@ AC_USE_SYSTEM_EXTENSIONS
+ AC_SYS_LARGEFILE
+ AC_PREFIX_DEFAULT([/usr])
+ AM_MAINTAINER_MODE([enable])
+-AM_INIT_AUTOMAKE([check-news foreign 1.11 silent-rules tar-pax no-dist-gzip dist-xz subdir-objects color-tests parallel-tests])
++AM_INIT_AUTOMAKE([check-news foreign 1.11 silent-rules tar-pax no-dist-gzip dist-xz subdir-objects color-tests serial-tests])
+ AM_SILENT_RULES([yes])
+ LT_INIT([disable-static pic-only])
+ 
+-- 
+1.9.1
+

@@ -1,0 +1,31 @@
+Fix build with musl by ensuring CTRL is defined.
+
+musl does not define CTRL in <termios.h>, we could include <sys/ttydefaults.h>
+explicitly but it's easier just to ensure CTRL is defined.
+
+This patch is taken from Sabotage Linux, the license statement for patches and
+build scripts in Sabotage Linux says:
+
+    To the extent possible under law, Christian Neukirchen has waived
+    all copyright and related or neighboring rights to this work.
+
+    http://creativecommons.org/publicdomain/zero/1.0/
+
+Therefore this should be good to include in OpenEmbedded.
+
+Signed-off-by: Paul Barker <paul@paulbarker.me.uk>
+
+Upstream-Status: Accepted (should be included in v4.8.14)
+
+diff -u mc-4.8.1.7.org/lib/tty/tty-ncurses.c mc-4.8.1.7/lib/tty/tty-ncurses.c
+--- mc-4.8.1.7.org/lib/tty/tty-ncurses.c
++++ mc-4.8.1.7/lib/tty/tty-ncurses.c
+@@ -65,7 +65,7 @@
+ 
+ /*** file scope macro definitions ****************************************************************/
+ 
+-#if defined(_AIX) && !defined(CTRL)
++#if !defined(CTRL)
+ #define CTRL(x) ((x) & 0x1f)
+ #endif
+ 

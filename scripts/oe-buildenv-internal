@@ -1,0 +1,109 @@
+#!/bin/sh
+
+# OE-Core Build Environment Setup Script
+#
+# Copyright (C) 2006-2011 Linux Foundation
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+# It is assumed OEROOT is already defined when this is called
+if [ -z "$OEROOT" ]; then
+    echo >&2 "Error: OEROOT is not defined!"
+    return 1
+fi
+
+if [ -z "$OE_SKIP_SDK_CHECK" -a ! -z "$OECORE_SDK_VERSION" ]; then
+    echo >&2 "Error: The OE SDK/ADT was detected as already being present in this shell environment. Please use a clean shell when sourcing this environment script."
+    return 1
+fi
+
+# Make sure we're not using python v3.x. This check can't go into
+# sanity.bbclass because bitbake's source code doesn't even pass
+# parsing stage when used with python v3, so we catch it here so we
+# can offer a meaningful error message.
+py_v3_check=`/usr/bin/env python --version 2>&1 | grep "Python 3"`
+if [ "$py_v3_check" != "" ]; then
+	echo >&2 "Bitbake is not compatible with python v3"
+	echo >&2 "Please set up python v2 as your default python interpreter"
+	return 1
+fi
+
+# Similarly, we now have code that doesn't parse correctly with older
+# versions of Python, and rather than fixing that and being eternally
+# vigilant for any other new feature use, just check the version here.
+py_v26_check=`python -c 'import sys; print sys.version_info >= (2,7,3)'`
+if [ "$py_v26_check" != "True" ]; then
+	echo >&2 "BitBake requires Python 2.7.3 or later"
+	return 1
+fi
+
+if [ "x$BDIR" = "x" ]; then
+    if [ "x$1" = "x" ]; then
+        BDIR="build"
+    else
+        BDIR="$1"
+        if [ "$BDIR" = "/" ]; then
+            echo >&2 "Error: / is not supported as a build directory."
+            return 1
+        fi
+
+        # Remove any possible trailing slashes. This is used to work around
+        # buggy readlink in Ubuntu 10.04 that doesn't ignore trailing slashes
+        # and hence "readlink -f new_dir_to_be_created/" returns empty.
+        BDIR=`echo $BDIR | sed -re 's|/+$||'`
+
+        BDIR=`readlink -f "$BDIR"`
+        if [ -z "$BDIR" ]; then
+            PARENTDIR=`dirname "$1"`
+            echo >&2 "Error: the directory $PARENTDIR does not exist?"
+            return 1
+        fi
+    fi
+    if [ "x$2" != "x" ]; then
+        BITBAKEDIR="$2"
+    fi
+fi
+if expr "$BDIR" : '/.*' > /dev/null ; then
+    BUILDDIR="$BDIR"
+else
+    BUILDDIR="`pwd`/$BDIR"
+fi
+unset BDIR
+
+if [ "x$BITBAKEDIR" = "x" ]; then
+    BITBAKEDIR="$OEROOT/bitbake$BBEXTRA/"
+fi
+
+BITBAKEDIR=`readlink -f "$BITBAKEDIR"`
+BUILDDIR=`readlink -f "$BUILDDIR"`
+
+if ! (test -d "$BITBAKEDIR"); then
+    echo >&2 "Error: The bitbake directory ($BITBAKEDIR) does not exist!  Please ensure a copy of bitbake exists at this location"
+    return 1
+fi
+
+# Make sure our paths are at the beginning of $PATH
+NEWPATHS="${OEROOT}/scripts:$BITBAKEDIR/bin:"
+PATH=$NEWPATHS$(echo $PATH | sed -e "s|:$NEWPATHS|:|g" -e "s|^$NEWPATHS||")
+unset BITBAKEDIR NEWPATHS
+
+# Used by the runqemu script
+export BUILDDIR
+export PATH
+export BB_ENV_EXTRAWHITE="MACHINE DISTRO TCMODE TCLIBC HTTP_PROXY http_proxy \
+HTTPS_PROXY https_proxy FTP_PROXY ftp_proxy FTPS_PROXY ftps_proxy ALL_PROXY \
+all_proxy NO_PROXY no_proxy SSH_AGENT_PID SSH_AUTH_SOCK BB_SRCREV_POLICY \
+SDKMACHINE BB_NUMBER_THREADS BB_NO_NETWORK PARALLEL_MAKE GIT_PROXY_COMMAND \
+SOCKS5_PASSWD SOCKS5_USER SCREENDIR STAMPS_DIR"

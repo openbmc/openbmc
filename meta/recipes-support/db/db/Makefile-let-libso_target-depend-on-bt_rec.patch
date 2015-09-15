@@ -1,0 +1,30 @@
+From c640ff9340f358a00835816d0fea03d27a7be978 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Tue, 31 Mar 2015 00:56:44 -0700
+Subject: [PATCH] Makefile: let libso_target depend on bt_rec
+
+Fixed parallel issue:
+libtool: link: `bt_rec.lo' is not a valid libtool object
+Makefile:867: recipe for target 'libdb-6.0.la' failed
+make: *** [libdb-6.0.la] Error 1
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ Makefile.in |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index e451f70..0a42375 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -863,7 +863,7 @@ $(libdb_version): $(C_OBJS)
+ 	$(LN) -s $(libdb_version) $(libdb)
+ 
+ # Shared C library.
+-$(libso_target): $(C_OBJS)
++$(libso_target): $(C_OBJS) bt_rec@o@
+ 	$(SOLINK) $(SOFLAGS) $(LDFLAGS) -o $@ $(C_OBJS) \
+ 		$(LIBCSO_LIBS)
+ 	$(RM) $(libdb)

@@ -1,0 +1,228 @@
+From 29d12344fb682a053de53eb08b95704cf3b67af2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 29 Mar 2013 09:24:50 +0400
+Subject: [PATCH 29/35] Define GLIBC_DYNAMIC_LINKER and UCLIBC_DYNAMIC_LINKER
+ relative to SYSTEMLIBS_DIR
+
+This patch defines GLIBC_DYNAMIC_LINKER and UCLIBC_DYNAMIC_LINKER
+relative to SYSTEMLIBS_DIR which can be set in generated headers
+This breaks the assumption of hardcoded multilib in gcc
+Change is only for the supported architectures in OE including
+SH, sparc, alpha for possible future support (if any)
+
+Removes the do_headerfix task in metadata
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Inappropriate [OE configuration]
+---
+ gcc/config/alpha/linux-elf.h |    4 ++--
+ gcc/config/arm/linux-eabi.h  |    4 ++--
+ gcc/config/arm/linux-elf.h   |    2 +-
+ gcc/config/i386/linux.h      |    2 +-
+ gcc/config/i386/linux64.h    |    6 +++---
+ gcc/config/mips/linux.h      |    2 +-
+ gcc/config/mips/linux64.h    |    8 ++++----
+ gcc/config/rs6000/linux64.h  |    8 ++++----
+ gcc/config/sh/linux.h        |    2 +-
+ gcc/config/sparc/linux.h     |    2 +-
+ gcc/config/sparc/linux64.h   |    4 ++--
+ 11 files changed, 22 insertions(+), 22 deletions(-)
+
+Index: gcc-4.9.0/gcc/config/alpha/linux-elf.h
+===================================================================
+--- gcc-4.9.0.orig/gcc/config/alpha/linux-elf.h	2014-05-07 16:43:50.609106535 +0000
++++ gcc-4.9.0/gcc/config/alpha/linux-elf.h	2014-05-07 16:43:50.605106535 +0000
+@@ -23,8 +23,8 @@
+ #define EXTRA_SPECS \
+ { "elf_dynamic_linker", ELF_DYNAMIC_LINKER },
+ 
+-#define GLIBC_DYNAMIC_LINKER	"/lib/ld-linux.so.2"
+-#define UCLIBC_DYNAMIC_LINKER "/lib/ld-uClibc.so.0"
++#define GLIBC_DYNAMIC_LINKER	SYSTEMLIBS_DIR "ld-linux.so.2"
++#define UCLIBC_DYNAMIC_LINKER  SYSTEMLIBS_DIR "ld-uClibc.so.0"
+ #if DEFAULT_LIBC == LIBC_UCLIBC
+ #define CHOOSE_DYNAMIC_LINKER(G, U) "%{mglibc:" G ";:" U "}"
+ #elif DEFAULT_LIBC == LIBC_GLIBC
+Index: gcc-4.9.0/gcc/config/arm/linux-eabi.h
+===================================================================
+--- gcc-4.9.0.orig/gcc/config/arm/linux-eabi.h	2014-05-07 16:43:50.609106535 +0000
++++ gcc-4.9.0/gcc/config/arm/linux-eabi.h	2014-05-07 16:43:50.605106535 +0000
+@@ -68,8 +68,8 @@
+    GLIBC_DYNAMIC_LINKER_DEFAULT and TARGET_DEFAULT_FLOAT_ABI.  */
+ 
+ #undef  GLIBC_DYNAMIC_LINKER
+-#define GLIBC_DYNAMIC_LINKER_SOFT_FLOAT "/lib/ld-linux.so.3"
+-#define GLIBC_DYNAMIC_LINKER_HARD_FLOAT "/lib/ld-linux-armhf.so.3"
++#define GLIBC_DYNAMIC_LINKER_SOFT_FLOAT SYSTEMLIBS_DIR "ld-linux.so.3"
++#define GLIBC_DYNAMIC_LINKER_HARD_FLOAT SYSTEMLIBS_DIR "ld-linux-armhf.so.3"
+ #define GLIBC_DYNAMIC_LINKER_DEFAULT GLIBC_DYNAMIC_LINKER_SOFT_FLOAT
+ 
+ #define GLIBC_DYNAMIC_LINKER \
+Index: gcc-4.9.0/gcc/config/arm/linux-elf.h
+===================================================================
+--- gcc-4.9.0.orig/gcc/config/arm/linux-elf.h	2014-05-07 16:43:50.609106535 +0000
++++ gcc-4.9.0/gcc/config/arm/linux-elf.h	2014-05-07 16:43:50.605106535 +0000
+@@ -57,7 +57,7 @@
+ 
+ #define LIBGCC_SPEC "%{mfloat-abi=soft*:-lfloat} -lgcc"
+ 
+-#define GLIBC_DYNAMIC_LINKER "/lib/ld-linux.so.2"
++#define GLIBC_DYNAMIC_LINKER SYSTEMLIBS_DIR "ld-linux.so.2"
+ 
+ #define LINUX_TARGET_LINK_SPEC  "%{h*} \
+    %{static:-Bstatic} \
+Index: gcc-4.9.0/gcc/config/i386/linux.h
+===================================================================
+--- gcc-4.9.0.orig/gcc/config/i386/linux.h	2014-05-07 16:43:50.609106535 +0000
++++ gcc-4.9.0/gcc/config/i386/linux.h	2014-05-07 16:43:50.605106535 +0000
+@@ -20,4 +20,4 @@
+ <http://www.gnu.org/licenses/>.  */
+ 
+ #define GNU_USER_LINK_EMULATION "elf_i386"
+-#define GLIBC_DYNAMIC_LINKER "/lib/ld-linux.so.2"
++#define GLIBC_DYNAMIC_LINKER SYSTEMLIBS_DIR "ld-linux.so.2"
+Index: gcc-4.9.0/gcc/config/i386/linux64.h
+===================================================================
+--- gcc-4.9.0.orig/gcc/config/i386/linux64.h	2014-05-07 16:43:50.609106535 +0000
++++ gcc-4.9.0/gcc/config/i386/linux64.h	2014-05-07 16:43:50.605106535 +0000
+@@ -27,6 +27,6 @@
+ #define GNU_USER_LINK_EMULATION64 "elf_x86_64"
+ #define GNU_USER_LINK_EMULATIONX32 "elf32_x86_64"
+ 
+-#define GLIBC_DYNAMIC_LINKER32 "/lib/ld-linux.so.2"
+-#define GLIBC_DYNAMIC_LINKER64 "/lib64/ld-linux-x86-64.so.2"
+-#define GLIBC_DYNAMIC_LINKERX32 "/libx32/ld-linux-x32.so.2"
++#define GLIBC_DYNAMIC_LINKER32 SYSTEMLIBS_DIR "ld-linux.so.2"
++#define GLIBC_DYNAMIC_LINKER64 SYSTEMLIBS_DIR "ld-linux-x86-64.so.2"
++#define GLIBC_DYNAMIC_LINKERX32 SYSTEMLIBS_DIR "ld-linux-x32.so.2"
+Index: gcc-4.9.0/gcc/config/mips/linux.h
+===================================================================
+--- gcc-4.9.0.orig/gcc/config/mips/linux.h	2014-05-07 16:43:50.609106535 +0000
++++ gcc-4.9.0/gcc/config/mips/linux.h	2014-05-07 16:43:50.605106535 +0000
+@@ -18,8 +18,8 @@
+ <http://www.gnu.org/licenses/>.  */
+ 
+ #define GLIBC_DYNAMIC_LINKER \
+-  "%{mnan=2008:/lib/ld-linux-mipsn8.so.1;:/lib/ld.so.1}"
++  "%{mnan=2008:" SYSTEMLIBS_DIR "ld-linux-mipsn8.so.1;:" SYSTEMLIBS_DIR "ld.so.1}"
+ 
+ #undef UCLIBC_DYNAMIC_LINKER
+ #define UCLIBC_DYNAMIC_LINKER \
+-  "%{mnan=2008:/lib/ld-uClibc-mipsn8.so.0;:/lib/ld-uClibc.so.0}"
++  "%{mnan=2008:" SYSTEMLIBS_DIR "ld-uClibc-mipsn8.so.0;:" SYSTEMLIBS_DIR "ld-uClibc.so.0}"
+Index: gcc-4.9.0/gcc/config/mips/linux64.h
+===================================================================
+--- gcc-4.9.0.orig/gcc/config/mips/linux64.h	2014-05-07 16:43:50.609106535 +0000
++++ gcc-4.9.0/gcc/config/mips/linux64.h	2014-05-07 16:43:50.605106535 +0000
+@@ -23,20 +23,20 @@
+ #define GNU_USER_LINK_EMULATIONN32 "elf32%{EB:b}%{EL:l}tsmipn32"
+ 
+ #define GLIBC_DYNAMIC_LINKER32 \
+-  "%{mnan=2008:/lib/ld-linux-mipsn8.so.1;:/lib/ld.so.1}"
++  "%{mnan=2008:" SYSTEMLIBS_DIR "ld-linux-mipsn8.so.1;:" SYSTEMLIBS_DIR "ld.so.1}"
+ #define GLIBC_DYNAMIC_LINKER64 \
+-  "%{mnan=2008:/lib64/ld-linux-mipsn8.so.1;:/lib64/ld.so.1}"
++  "%{mnan=2008:" SYSTEMLIBS_DIR "ld-linux-mipsn8.so.1;:" SYSTEMLIBS_DIR "ld.so.1}"
+ #define GLIBC_DYNAMIC_LINKERN32 \
+-  "%{mnan=2008:/lib32/ld-linux-mipsn8.so.1;:/lib32/ld.so.1}"
++  "%{mnan=2008:" SYSTEMLIBS_DIR "ld-linux-mipsn8.so.1;:" SYSTEMLIBS_DIR "ld.so.1}"
+ 
+ #undef UCLIBC_DYNAMIC_LINKER32
+ #define UCLIBC_DYNAMIC_LINKER32 \
+-  "%{mnan=2008:/lib/ld-uClibc-mipsn8.so.0;:/lib/ld-uClibc.so.0}"
++  "%{mnan=2008:" SYSTEMLIBS_DIR "ld-uClibc-mipsn8.so.0;:" SYSTEMLIBS_DIR "ld-uClibc.so.0}"
+ #undef UCLIBC_DYNAMIC_LINKER64
+ #define UCLIBC_DYNAMIC_LINKER64 \
+-  "%{mnan=2008:/lib/ld64-uClibc-mipsn8.so.0;:/lib/ld64-uClibc.so.0}"
++  "%{mnan=2008:" SYSTEMLIBS_DIR "ld64-uClibc-mipsn8.so.0;:" SYSTEMLIBS_DIR "ld64-uClibc.so.0}"
+ #define UCLIBC_DYNAMIC_LINKERN32 \
+-  "%{mnan=2008:/lib32/ld-uClibc-mipsn8.so.0;:/lib32/ld-uClibc.so.0}"
++  "%{mnan=2008:" SYSTEMLIBS_DIR "ld-uClibc-mipsn8.so.0;:" SYSTEMLIBS_DIR "ld-uClibc.so.0}"
+ 
+ #define BIONIC_DYNAMIC_LINKERN32 "/system/bin/linker32"
+ #define GNU_USER_DYNAMIC_LINKERN32 \
+Index: gcc-4.9.0/gcc/config/rs6000/linux64.h
+===================================================================
+--- gcc-4.9.0.orig/gcc/config/rs6000/linux64.h	2014-05-07 16:43:50.609106535 +0000
++++ gcc-4.9.0/gcc/config/rs6000/linux64.h	2014-05-07 16:43:50.605106535 +0000
+@@ -367,14 +367,14 @@
+ #undef	LINK_OS_DEFAULT_SPEC
+ #define LINK_OS_DEFAULT_SPEC "%(link_os_linux)"
+ 
+-#define GLIBC_DYNAMIC_LINKER32 "/lib/ld.so.1"
++#define GLIBC_DYNAMIC_LINKER32 SYSTEMLIBS_DIR "ld.so.1"
+ #ifdef LINUX64_DEFAULT_ABI_ELFv2
+-#define GLIBC_DYNAMIC_LINKER64 "%{mabi=elfv1:/lib64/ld64.so.1;:/lib64/ld64.so.2}"
++#define GLIBC_DYNAMIC_LINKER64 "%{mabi=elfv1:" SYSTEMLIBS_DIR "ld64.so.1;:" SYSTEMLIBS_DIR "ld64.so.2}"
+ #else
+-#define GLIBC_DYNAMIC_LINKER64 "%{mabi=elfv2:/lib64/ld64.so.2;:/lib64/ld64.so.1}"
++#define GLIBC_DYNAMIC_LINKER64 "%{mabi=elfv2:" SYSTEMLIBS_DIR "ld64.so.2;:" SYSTEMLIBS_DIR "ld64.so.1}"
+ #endif
+-#define UCLIBC_DYNAMIC_LINKER32 "/lib/ld-uClibc.so.0"
+-#define UCLIBC_DYNAMIC_LINKER64 "/lib/ld64-uClibc.so.0"
++#define UCLIBC_DYNAMIC_LINKER32 SYSTEMLIBS_DIR "ld-uClibc.so.0"
++#define UCLIBC_DYNAMIC_LINKER64 SYSTEMLIBS_DIR "ld64-uClibc.so.0"
+ #if DEFAULT_LIBC == LIBC_UCLIBC
+ #define CHOOSE_DYNAMIC_LINKER(G, U) "%{mglibc:" G ";:" U "}"
+ #elif DEFAULT_LIBC == LIBC_GLIBC
+Index: gcc-4.9.0/gcc/config/sh/linux.h
+===================================================================
+--- gcc-4.9.0.orig/gcc/config/sh/linux.h	2014-05-07 16:43:50.609106535 +0000
++++ gcc-4.9.0/gcc/config/sh/linux.h	2014-05-07 16:43:50.605106535 +0000
+@@ -43,7 +43,7 @@
+ 
+ #define TARGET_ASM_FILE_END file_end_indicate_exec_stack
+ 
+-#define GLIBC_DYNAMIC_LINKER "/lib/ld-linux.so.2"
++#define GLIBC_DYNAMIC_LINKER SYSTEMLIBS_DIR "ld-linux.so.2"
+ 
+ #undef SUBTARGET_LINK_EMUL_SUFFIX
+ #define SUBTARGET_LINK_EMUL_SUFFIX "_linux"
+Index: gcc-4.9.0/gcc/config/sparc/linux.h
+===================================================================
+--- gcc-4.9.0.orig/gcc/config/sparc/linux.h	2014-05-07 16:43:50.609106535 +0000
++++ gcc-4.9.0/gcc/config/sparc/linux.h	2014-05-07 16:43:50.605106535 +0000
+@@ -83,7 +83,7 @@
+    When the -shared link option is used a final link is not being
+    done.  */
+ 
+-#define GLIBC_DYNAMIC_LINKER "/lib/ld-linux.so.2"
++#define GLIBC_DYNAMIC_LINKER SYSTEMLIBS_DIR "ld-linux.so.2"
+ 
+ #undef  LINK_SPEC
+ #define LINK_SPEC "-m elf32_sparc %{shared:-shared} \
+Index: gcc-4.9.0/gcc/config/sparc/linux64.h
+===================================================================
+--- gcc-4.9.0.orig/gcc/config/sparc/linux64.h	2014-05-07 16:43:50.609106535 +0000
++++ gcc-4.9.0/gcc/config/sparc/linux64.h	2014-05-07 16:43:50.605106535 +0000
+@@ -92,8 +92,8 @@
+    When the -shared link option is used a final link is not being
+    done.  */
+ 
+-#define GLIBC_DYNAMIC_LINKER32 "/lib/ld-linux.so.2"
+-#define GLIBC_DYNAMIC_LINKER64 "/lib64/ld-linux.so.2"
++#define GLIBC_DYNAMIC_LINKER32 SYSTEMLIBS_DIR "ld-linux.so.2"
++#define GLIBC_DYNAMIC_LINKER64 SYSTEMLIBS_DIR "ld-linux.so.2"
+ 
+ #ifdef SPARC_BI_ARCH
+ 
+Index: gcc-4.9.0/gcc/config/linux.h
+===================================================================
+--- gcc-4.9.0.orig/gcc/config/linux.h	2014-05-07 16:43:50.609106535 +0000
++++ gcc-4.9.0/gcc/config/linux.h	2014-05-07 16:43:50.605106535 +0000
+@@ -73,10 +73,10 @@
+    GLIBC_DYNAMIC_LINKER must be defined for each target using them, or
+    GLIBC_DYNAMIC_LINKER32 and GLIBC_DYNAMIC_LINKER64 for targets
+    supporting both 32-bit and 64-bit compilation.  */
+-#define UCLIBC_DYNAMIC_LINKER "/lib/ld-uClibc.so.0"
+-#define UCLIBC_DYNAMIC_LINKER32 "/lib/ld-uClibc.so.0"
+-#define UCLIBC_DYNAMIC_LINKER64 "/lib/ld64-uClibc.so.0"
+-#define UCLIBC_DYNAMIC_LINKERX32 "/lib/ldx32-uClibc.so.0"
++#define UCLIBC_DYNAMIC_LINKER SYSTEMLIBS_DIR "ld-uClibc.so.0"
++#define UCLIBC_DYNAMIC_LINKER32 SYSTEMLIBS_DIR "ld-uClibc.so.0"
++#define UCLIBC_DYNAMIC_LINKER64 SYSTEMLIBS_DIR "ld64-uClibc.so.0"
++#define UCLIBC_DYNAMIC_LINKERX32 SYSTEMLIBS_DIR "ldx32-uClibc.so.0"
+ #define BIONIC_DYNAMIC_LINKER "/system/bin/linker"
+ #define BIONIC_DYNAMIC_LINKER32 "/system/bin/linker"
+ #define BIONIC_DYNAMIC_LINKER64 "/system/bin/linker64"

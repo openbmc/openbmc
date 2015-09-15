@@ -1,0 +1,25 @@
+When try to print time_t values as a long int it causes an error because time_t
+data type in x32 ABI is long long int.
+
+Upstream-Status: Pending
+
+Signed-off-by: Aníbal Limón <anibal.limon@linux.intel.com>
+
+Index: mdadm-3.3.4/monitor.c
+===================================================================
+--- mdadm-3.3.4.orig/monitor.c
++++ mdadm-3.3.4/monitor.c
+@@ -257,9 +257,12 @@ static int read_and_act(struct active_ar
+ 			mdi->curr_state = read_dev_state(mdi->state_fd);
+ 		}
+ 	}
+-
+ 	gettimeofday(&tv, NULL);
++#if defined(__x86_64__) && defined(__ILP32__)
++	dprintf("(%d): %lld.%06lld state:%s prev:%s action:%s prev: %s start:%llu\n",
++#else
+ 	dprintf("(%d): %ld.%06ld state:%s prev:%s action:%s prev: %s start:%llu\n",
++#endif
+ 		a->info.container_member,
+ 		tv.tv_sec, tv.tv_usec,
+ 		array_states[a->curr_state],

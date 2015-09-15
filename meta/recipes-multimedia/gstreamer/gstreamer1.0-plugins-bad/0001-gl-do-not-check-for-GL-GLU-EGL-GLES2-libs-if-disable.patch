@@ -1,0 +1,41 @@
+From deba0da45ec821209a7ed148a4521d562e6512cd Mon Sep 17 00:00:00 2001
+From: Carlos Rafael Giani <dv@pseudoterminal.org>
+Date: Wed, 27 Aug 2014 14:47:25 +0200
+Subject: [PATCH] gl: do not check for GL/GLU/EGL/GLES2 libs if disabled in
+ configuration
+
+Upstream-Status: Submitted [https://bugzilla.gnome.org/show_bug.cgi?id=735522]
+
+Signed-off-by: Carlos Rafael Giani <dv@pseudoterminal.org>
+---
+ configure.ac | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 1a46afb..e85d4ba 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -661,10 +661,16 @@ case $host in
+     fi
+   ;;
+   *)
+-    AG_GST_CHECK_LIBHEADER(GL, GL, glTexImage2D,, GL/gl.h)
+-    AG_GST_CHECK_LIBHEADER(GLU, GLU, gluSphere,, GL/glu.h)
+-    AG_GST_CHECK_LIBHEADER(GLES2, GLESv2, glTexImage2D,, GLES2/gl2.h)
+-    AG_GST_CHECK_LIBHEADER(EGL, EGL, eglGetError,, EGL/egl.h)
++    if test "x$NEED_GL" != "xno"; then
++      AG_GST_CHECK_LIBHEADER(GL, GL, glTexImage2D,, GL/gl.h)
++      AG_GST_CHECK_LIBHEADER(GLU, GLU, gluSphere,, GL/glu.h)
++    fi
++    if test "x$NEED_GLES2" != "xno"; then
++      AG_GST_CHECK_LIBHEADER(GLES2, GLESv2, glTexImage2D,, GLES2/gl2.h)
++    fi
++    if test "x$NEED_EGL" != "xno"; then
++      AG_GST_CHECK_LIBHEADER(EGL, EGL, eglGetError,, EGL/egl.h)
++    fi
+ 
+     old_LIBS=$LIBS
+     old_CFLAGS=$CFLAGS
+-- 
+1.8.3.2
+

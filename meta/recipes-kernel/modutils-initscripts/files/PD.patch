@@ -1,0 +1,8 @@
+Upstream-Status: Inappropriate [licensing]
+
+Index: modutils-initscripts-1.0/LICENSE
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ modutils-initscripts-1.0/LICENSE	2010-12-06 14:26:03.570339002 -0800
+@@ -0,0 +1 @@
++Public Domain

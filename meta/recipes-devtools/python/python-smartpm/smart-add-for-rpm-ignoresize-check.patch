@@ -1,0 +1,37 @@
+python-smartpm: Add checking for "rpm-ignoresize" option
+
+The do_rootfs takes a very long time when build host has mounted many NFS
+devices. syscall lstat() was being called on every filesystem mounted on the
+build host during building.
+The reason for the lstat() is that rpm is verifying that enough free disk space
+is available to do the install. However, since the install is into the target
+rootfs it should not matter how much free space there is in the host mounts.
+Add checking for "rpm-ignoresize", by it, smart can make whether RPM skip
+checking for diskspace when install a rpm package.
+
+Upstream-Status: Pending
+
+Signed-off-by: wenlin.kang <wenlin.kang@windriver.com>
+Signed-off-by: Chong Lu <Chong.Lu@windriver.com>
+---
+ smart/backends/rpm/pm.py | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/smart/backends/rpm/pm.py b/smart/backends/rpm/pm.py
+index 5da9ee6..f0488ec 100644
+--- a/smart/backends/rpm/pm.py
++++ b/smart/backends/rpm/pm.py
+@@ -241,6 +241,10 @@ class RPMPackageManager(PackageManager):
+         except AttributeError:
+             probfilter |= rpm.RPMPROB_FILTER_IGNOREARCH
+ 
++        if sysconf.get("rpm-ignoresize", False):
++            probfilter |= rpm.RPMPROB_FILTER_DISKNODES
++            probfilter |= rpm.RPMPROB_FILTER_DISKSPACE
++
+         if force or reinstall:
+             probfilter |= rpm.RPMPROB_FILTER_REPLACEPKG
+             probfilter |= rpm.RPMPROB_FILTER_REPLACEOLDFILES
+-- 
+1.9.1
+

@@ -1,0 +1,91 @@
+# -*-Shell-script-*-
+#
+# functions     This file contains functions to be used by most or all
+#               shell scripts in the /etc/init.d directory.
+#
+
+NORMAL="\\033[0;39m"         # Standard console grey
+SUCCESS="\\033[1;32m"        # Success is green
+WARNING="\\033[1;33m"        # Warnings are yellow
+FAILURE="\\033[1;31m"        # Failures are red
+INFO="\\033[1;36m"           # Information is light cyan
+BRACKET="\\033[1;34m"        # Brackets are blue
+
+# NOTE: The pidofproc () doesn't support the process which is a script unless
+#       the pidof supports "-x" option. If you want to use it for such a
+#       process:
+#       1) If there is no "pidof -x", replace the "pidof $1" with another
+#          command like(for core-image-minimal):
+#            ps | awk '/'"$1"'/ {print $1}'
+#       Or
+#       2) If there is "pidof -x", replace "pidof" with "pidof -x".
+#
+# pidofproc - print the pid of a process
+# $1: the name of the process
+pidofproc () {
+
+	# pidof output null when no program is running, so no "2>/dev/null".
+	pid=`pidof $1`
+	status=$?
+	case $status in
+	0)
+		echo $pid
+		return 0
+		;;
+	127)
+		echo "ERROR: command pidof not found" >&2
+		exit 127
+		;;
+	*)
+		return $status
+		;;
+	esac
+}
+
+machine_id() { # return the machine ID
+	awk 'BEGIN { FS=": " } /Hardware/ \
+		{ gsub(" ", "_", $2); print tolower($2) } ' </proc/cpuinfo
+}
+
+killproc() { # kill the named process(es)
+	pid=`pidofproc $1` && kill $pid
+}
+
+status() {
+    local pid
+    if [ "$#" = 0 ]; then
+        echo "Usage: status {program}"
+        return 1
+    fi
+    pid=`pidofproc $1`
+    if [ -n "$pid" ]; then
+        echo "$1 (pid $pid) is running..."
+        return 0
+    else
+        echo "$1 is stopped"
+    fi
+    return 3
+}
+
+success() {
+    echo -n -e "${BRACKET}[${SUCCESS}  OK  ${BRACKET}]${NORMAL}"
+    return 0
+}
+
+failure() {
+    local rc=$*
+    echo -n -e "${BRACKET}[${FAILURE} FAIL ${BRACKET}]${NORMAL}"
+    return $rc
+}
+
+warning() {
+    local rc=$*
+    echo -n -e "${BRACKET}[${WARNING} WARN ${BRACKET}]${NORMAL}"
+    return $rc
+}
+
+passed() {
+    local rc=$*
+    echo -n -e "${BRACKET}[${SUCCESS} PASS ${BRACKET}]${NORMAL}"
+    return $rc
+}

@@ -1,0 +1,153 @@
+Upstream-Status: Backport
+
+Path: news.porcupine.org!news.porcupine.org!not-for-mail
+From: Wietse Venema <wietse@((no)(spam)(please))wzv.win.tue.nl>
+Newsgroups: comp.mail.sendmail,comp.security.unix
+Subject: TCP Wrapper Blacklist Extension
+Followup-To: poster
+Date: 8 Sep 1997 18:53:13 -0400
+Organization: Wietse's hangout while on sabattical in the USA
+Lines: 147
+Sender: wietse@spike.porcupine.org
+Message-ID: <5v1vkp$h4f$1@spike.porcupine.org>
+NNTP-Posting-Host: spike.porcupine.org
+Xref: news.porcupine.org comp.mail.sendmail:3541 comp.security.unix:7158
+
+The patch below adds a new host pattern to the TCP Wrapper access
+control language. Instead of a host name or address pattern, you
+can specify an external /file/name with host name or address
+patterns.   The feature can be used recursively.
+
+The /file/name extension makes it easy to blacklist bad sites, for
+example, to block unwanted electronic mail when libwrap is linked
+into sendmail.  Adding hosts to a simple text file is much easier
+than having to edit a more complex hosts.allow/deny file.
+
+I developed this a year or so ago as a substitute for NIS netgroups.
+At that time, I did not consider it of sufficient interest for
+inclusion in the TCP Wrapper distribution. How times have changed.
+
+The patch is relative to TCP Wrappers version 7.6. The main archive
+site is ftp://ftp.win.tue.nl/pub/security/tcp_wrappers_7.6.tar.gz
+
+Thanks to the Debian LINUX folks for expressing their interest in
+this patch.
+
+	Wietse
+
+
+[diff updated by Md]
+
+diff -ruN tcp_wrappers_7.6.orig/hosts_access.5 tcp_wrappers_7.6/hosts_access.5
+--- tcp_wrappers_7.6.orig/hosts_access.5	2004-04-10 19:28:09.000000000 +0200
++++ tcp_wrappers_7.6/hosts_access.5	2004-04-10 19:28:01.000000000 +0200
+@@ -97,6 +97,13 @@
+ `[3ffe:505:2:1::]/64\' matches every address in the range
+ `3ffe:505:2:1::\' through `3ffe:505:2:1:ffff:ffff:ffff:ffff\'.
+ .IP \(bu
++A string that begins with a `/\' character is treated as a file
++name. A host name or address is matched if it matches any host name
++or address pattern listed in the named file. The file format is
++zero or more lines with zero or more host name or address patterns
++separated by whitespace.  A file name pattern can be used anywhere
++a host name or address pattern can be used.
++.IP \(bu
+ Wildcards `*\' and `?\' can be used to match hostnames or IP addresses.  This
+ method of matching cannot be used in conjunction with `net/mask\' matching,
+ hostname matching beginning with `.\' or IP address matching ending with `.\'.
+diff -ruN tcp_wrappers_7.6.orig/hosts_access.c tcp_wrappers_7.6/hosts_access.c
+--- tcp_wrappers_7.6.orig/hosts_access.c	2004-04-10 19:28:09.000000000 +0200
++++ tcp_wrappers_7.6/hosts_access.c	2004-04-10 19:27:05.000000000 +0200
+@@ -253,6 +253,26 @@
+     }
+ }
+ 
++/* hostfile_match - look up host patterns from file */
++
++static int hostfile_match(path, host)
++char   *path;
++struct hosts_info *host;
++{
++    char    tok[BUFSIZ];
++    int     match = NO;
++    FILE   *fp;
++
++    if ((fp = fopen(path, "r")) != 0) {
++	while (fscanf(fp, "%s", tok) == 1 && !(match = host_match(tok, host)))
++	     /* void */ ;
++	fclose(fp);
++    } else if (errno != ENOENT) {
++	tcpd_warn("open %s: %m", path);
++    }
++    return (match);
++}
++
+ /* host_match - match host name and/or address against pattern */
+ 
+ static int host_match(tok, host)
+@@ -280,6 +300,8 @@
+ 	tcpd_warn("netgroup support is disabled");	/* not tcpd_jump() */
+ 	return (NO);
+ #endif
++    } else if (tok[0] == '/') {			/* /file hack */
++	return (hostfile_match(tok, host));
+     } else if (STR_EQ(tok, "KNOWN")) {		/* check address and name */
+ 	char   *name = eval_hostname(host);
+ 	return (STR_NE(eval_hostaddr(host), unknown) && HOSTNAME_KNOWN(name));
+diff -ruN tcp_wrappers_7.6.orig/tcpdchk.c tcp_wrappers_7.6/tcpdchk.c
+--- tcp_wrappers_7.6.orig/tcpdchk.c	2004-04-10 19:28:09.000000000 +0200
++++ tcp_wrappers_7.6/tcpdchk.c	2004-04-10 19:27:05.000000000 +0200
+@@ -353,6 +353,8 @@
+ {
+     if (pat[0] == '@') {
+ 	tcpd_warn("%s: daemon name begins with \"@\"", pat);
++    } else if (pat[0] == '/') {
++	tcpd_warn("%s: daemon name begins with \"/\"", pat);
+     } else if (pat[0] == '.') {
+ 	tcpd_warn("%s: daemon name begins with dot", pat);
+     } else if (pat[strlen(pat) - 1] == '.') {
+@@ -385,6 +387,8 @@
+ {
+     if (pat[0] == '@') {			/* @netgroup */
+ 	tcpd_warn("%s: user name begins with \"@\"", pat);
++    } else if (pat[0] == '/') {
++	tcpd_warn("%s: user name begins with \"/\"", pat);
+     } else if (pat[0] == '.') {
+ 	tcpd_warn("%s: user name begins with dot", pat);
+     } else if (pat[strlen(pat) - 1] == '.') {
+@@ -430,8 +434,13 @@
+ static int check_host(pat)
+ char   *pat;
+ {
++    char    buf[BUFSIZ];
+     char   *mask;
+     int     addr_count = 1;
++    FILE   *fp;
++    struct tcpd_context saved_context;
++    char   *cp;
++    char   *wsp = " \t\r\n";
+ 
+     if (pat[0] == '@') {			/* @netgroup */
+ #ifdef NO_NETGRENT
+@@ -450,6 +459,21 @@
+ 	tcpd_warn("netgroup support disabled");
+ #endif
+ #endif
++    } else if (pat[0] == '/') {			/* /path/name */
++	if ((fp = fopen(pat, "r")) != 0) {
++	    saved_context = tcpd_context;
++	    tcpd_context.file = pat;
++	    tcpd_context.line = 0;
++	    while (fgets(buf, sizeof(buf), fp)) {
++		tcpd_context.line++;
++		for (cp = strtok(buf, wsp); cp; cp = strtok((char *) 0, wsp))
++		    check_host(cp);
++	    }
++	    tcpd_context = saved_context;
++	    fclose(fp);
++	} else if (errno != ENOENT) {
++	    tcpd_warn("open %s: %m", pat);
++	}
+     } else if (mask = split_at(pat, '/')) {	/* network/netmask */
+ #ifdef INET6
+ 	int mask_len;

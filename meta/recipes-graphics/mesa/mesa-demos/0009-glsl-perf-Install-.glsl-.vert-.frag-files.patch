@@ -1,0 +1,73 @@
+From c8c3de5417d6b6c7d7579c528c0cab718f4bfdb6 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Thu, 10 Jul 2014 14:48:12 +0200
+Subject: [PATCH 9/9] glsl, perf: Install .glsl, .vert, .frag files
+
+Upstream-Status: Pending
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ src/fpglsl/Makefile.am | 3 ++-
+ src/glsl/Makefile.am   | 3 ++-
+ src/perf/Makefile.am   | 3 ++-
+ src/vpglsl/Makefile.am | 3 ++-
+ 4 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/src/fpglsl/Makefile.am b/src/fpglsl/Makefile.am
+index fd43c91..2bf51de 100644
+--- a/src/fpglsl/Makefile.am
++++ b/src/fpglsl/Makefile.am
+@@ -38,7 +38,8 @@ noinst_PROGRAMS = \
+ 	fp-tri
+ endif
+ 
+-EXTRA_DIST = \
++demosdatadir=$(datadir)/$(PACKAGE)/
++dist_demosdata_DATA= \
+ 	depth-read.glsl \
+ 	dowhile2.glsl \
+ 	dowhile.glsl \
+diff --git a/src/glsl/Makefile.am b/src/glsl/Makefile.am
+index 079a29d..f66ec29 100644
+--- a/src/glsl/Makefile.am
++++ b/src/glsl/Makefile.am
+@@ -118,7 +118,8 @@ vert_or_frag_only_LDADD = ../util/libutil.la
+ vert_tex_LDADD = ../util/libutil.la
+ vsraytrace_LDADD = ../util/libutil.la
+ 
+-EXTRA_DIST = \
++demosdatadir=$(datadir)/$(PACKAGE)/
++dist_demosdata_DATA= \
+ 	CH06-brick.frag \
+ 	CH06-brick.vert \
+ 	CH11-bumpmap.frag \
+diff --git a/src/perf/Makefile.am b/src/perf/Makefile.am
+index c5cca8d..140256d 100644
+--- a/src/perf/Makefile.am
++++ b/src/perf/Makefile.am
+@@ -58,7 +58,8 @@ endif
+ 
+ glslstateschange_LDADD = libperf.la ../util/libutil.la
+ 
+-EXTRA_DIST = \
++demosdatadir=$(datadir)/$(PACKAGE)/
++dist_demosdata_DATA= \
+ 	glslstateschange1.frag \
+ 	glslstateschange1.vert \
+ 	glslstateschange2.frag \
+diff --git a/src/vpglsl/Makefile.am b/src/vpglsl/Makefile.am
+index 48b08f4..5526867 100644
+--- a/src/vpglsl/Makefile.am
++++ b/src/vpglsl/Makefile.am
+@@ -38,7 +38,8 @@ noinst_PROGRAMS = \
+ 	vp-tris
+ endif
+ 
+-EXTRA_DIST = \
++demosdatadir=$(datadir)/$(PACKAGE)/
++dist_demosdata_DATA= \
+ 	for.glsl \
+ 	func.glsl \
+ 	func2.glsl \
+-- 
+2.0.0
+

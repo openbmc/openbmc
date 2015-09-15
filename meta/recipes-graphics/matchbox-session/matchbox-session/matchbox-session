@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+# Very simple session manager for matchbox tools
+#
+
+# Uncomment below to enable parsing of debian menu entrys
+# export MB_USE_DEB_MENUS=1 
+
+if [ -e $HOME/.matchbox/session ]
+then
+exec $HOME/.matchbox/session
+fi
+
+if [ -e /etc/matchbox/session ]
+then
+exec /etc/matchbox/session
+fi
+
+# Default files to run if $HOME/.matchbox/session or /etc/matchbox/session
+# dont exist. 
+
+matchbox-desktop &
+matchbox-panel &
+exec matchbox-window-manager $@

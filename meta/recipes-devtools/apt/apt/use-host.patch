@@ -1,0 +1,15 @@
+Upstream-Status: Pending
+
+Index: apt-0.9.7.7/configure.ac
+===================================================================
+--- apt-0.9.7.7.orig/configure.ac
++++ apt-0.9.7.7/configure.ac
+@@ -112,7 +112,7 @@ dnl This is often the dpkg architecture
+ dnl First check against the full canonical canoncial-system-type in $target
+ dnl and if that fails, just look for the cpu
+ AC_MSG_CHECKING(debian architecture)
+-archset="`dpkg-architecture -qDEB_HOST_ARCH`"
++archset="`echo $host_alias|cut -d'-' -f1`"
+ if test "x$archset" = "x"; then
+    AC_MSG_ERROR([failed: use --host= or output from dpkg-architecture])
+ fi

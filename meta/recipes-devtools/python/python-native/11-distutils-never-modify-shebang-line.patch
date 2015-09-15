@@ -1,0 +1,20 @@
+Upstream-Status: Pending
+
+# Don't modify the she-bang line for a cross-build.
+# Otherwise it points to our hostpython (which we do not want)
+#
+# Signed-Off: Michael 'Mickey' Lauer <mickey@vanille-media.de>
+
+Index: Python-2.6.1/Lib/distutils/command/build_scripts.py
+===================================================================
+--- Python-2.6.1.orig/Lib/distutils/command/build_scripts.py
++++ Python-2.6.1/Lib/distutils/command/build_scripts.py
+@@ -87,7 +87,7 @@ class build_scripts (Command):
+                     continue
+ 
+                 match = first_line_re.match(first_line)
+-                if match:
++                if False: #match:
+                     adjust = 1
+                     post_interp = match.group(1) or ''
+ 

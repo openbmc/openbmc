@@ -1,0 +1,267 @@
+#! /usr/bin/env perl
+# -*- perl -*-
+
+eval 'case $# in 0) exec /usr/bin/perl -S "$0";; *) exec /usr/bin/perl -S "$0" "$@";; esac'
+    if 0;
+
+# gnu-configize - install the GNU config.guess / config.sub in a directory tree
+# Based on autoreconf:
+#   Copyright (C) 1994, 1999, 2000, 2001, 2002, 2003
+#   Free Software Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+# 02111-1307, USA.
+
+BEGIN
+{
+  my $datadir = $ENV{'autom4te_perllibdir'} || '@autom4te_perllibdir@';
+#  '/home/kergoth/code/build-arm/tmp/staging/share/autoconf';
+  unshift @INC, $datadir;
+
+  # Override SHELL.  On DJGPP SHELL may not be set to a shell
+  # that can handle redirection and quote arguments correctly,
+  # e.g.: COMMAND.COM.  For DJGPP always use the shell that configure
+  # has detected.
+  $ENV{'SHELL'} = '/bin/sh' if ($^O eq 'dos');
+}
+
+use Autom4te::ChannelDefs;
+use Autom4te::Channels;
+use Autom4te::Configure_ac;
+use Autom4te::FileUtils;
+use Autom4te::General;
+use Autom4te::XFile;
+# Do not use Cwd::chdir, since it might hang.
+use Cwd 'cwd';
+use strict;
+
+## ----------- ##
+## Variables.  ##
+## ----------- ##
+
+# $HELP
+# -----
+$help = "Usage: $0 [OPTION] ... [CONFIGURE-AC or DIRECTORY] ...
+
+Install the GNU config.sub and config.guess scripts in the
+DIRECTORIES or the directory trees driven by CONFIGURE-AC
+(defaulting to `.').
+
+Operation modes:
+  -h, --help               print this help, then exit
+  -V, --version            print version number, then exit
+  -v, --verbose            verbosely report processing
+  -f, --force              consider all files obsolete
+  -s, --symlink            install symbolic links instead of copies
+  -W, --warnings=CATEGORY  report the warnings falling in CATEGORY [syntax]
+
+" . Autom4te::ChannelDefs::usage . "
+
+The environment variable \`WARNINGS\' is honored.  Some subtools might
+support other warning types, using \`all' is encouraged.
+";
+
+# $VERSION
+# --------
+$version = "gnu-configize 1.0
+
+Copyright (C) 2004 Chris Larson
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+";
+
+my $configdir  = '@gnu-configdir@';
+#'/home/kergoth/code/build-arm/tmp/staging/i686-linux/share/gnu-config';
+my $autoconf   = $ENV{'AUTOCONF'}     || 'autoconf';
+
+# use symlinks instead.
+my $symlink = 0;
+
+my $configure_ac;
+
+my $rm = "rm -f";
+my $ln_s = "ln -sf";
+my $cp = "cp -f";
+my $mkdir = "mkdir";
+my $chmod = "chmod";
+
+## ---------- ##
+## Routines.  ##
+## ---------- ##
+
+
+# parse_args ()
+# -------------
+# Process any command line arguments.
+sub parse_args ()
+{
+  my $srcdir;
+
+  getopt ('s|symlink'            => \$symlink);
+
+  # Even if the user specified a configure.ac, trim to get the
+  # directory, and look for configure.ac again.  Because (i) the code
+  # is simpler, and (ii) we are still able to diagnose simultaneous
+  # presence of configure.ac and configure.in.
+  @ARGV = map { /configure\.(ac|in)$/ ? dirname ($_) : $_ } @ARGV;
+  push @ARGV, '.' unless @ARGV;
+}
+
+
+# &gnu_configize_current_directory
+# -----------------------------
+sub gnu_configize_current_directory ()
+{
+  my $configure_ac = require_configure_ac;
+
+  # ---------------------- #
+  # Is it using Autoconf?  #
+  # ---------------------- #
+
+  my $uses_autoconf;
+  my $uses_gettext;
+  my $configure_ac_file = new Autom4te::XFile $configure_ac;
+  while ($_ = $configure_ac_file->getline)
+     {
+       s/#.*//;
+       s/dnl.*//;
+       $uses_autoconf = 1 if /AC_INIT/;
+     }
+
+  if (!$uses_autoconf)
+    {
+      verb "$configure_ac: not using Autoconf";
+      return;
+    }
+
+  my $aux_dir;
+  my @subdir;
+  my $cmd;
+  my $dest;
+
+  verb "$configure_ac: tracing";
+  my $traces = new Autom4te::XFile
+    ("$autoconf"
+     . join (' --trace=', '',
+	     # If you change this list, update the
+	     # `Autoreconf-preselections' section of autom4te.in.
+	     'AC_CONFIG_AUX_DIR:AC_CONFIG_AUX_DIR:\$1',
+	     'AC_CONFIG_SUBDIRS:AC_CONFIG_SUBDIRS:\$1',
+	     'AC_INIT',
+	    )
+     . ' |');
+  while ($_ = $traces->getline)
+    {
+      $aux_dir = $1                 if /AC_CONFIG_AUX_DIR:(.*)/;
+      $uses_autoconf = 1            if /AC_INIT/;
+      push @subdir, split (' ', $1) if /AC_CONFIG_SUBDIRS:(.*)/;
+    }
+
+  # The subdirs are *optional*, they may not exist.
+  foreach (@subdir)
+    {
+      if (-d)
+	{
+	  verb "$configure_ac: subdirectory $_ to gnu-configize";
+	  gnu_configize ($_);
+	}
+      else
+	{
+	  verb "$configure_ac: subdirectory $_ not present";
+	}
+    }
+
+  $dest = ".";
+
+  if (defined $aux_dir)
+    {
+      $dest = $aux_dir;
+      if (! -d $aux_dir)
+        {
+          verb "$configure_ac: creating directory $aux_dir";
+          mkdir $aux_dir
+            or error "cannot create $aux_dir: $!";
+        }
+    }
+
+  if (!$symlink)
+    {
+      $cmd = $cp;
+    }
+  else
+    {
+      $cmd = $ln_s;
+    }
+
+  xsystem ("$cmd $configdir/config.guess $dest/");
+  xsystem ("$chmod u+x $dest/config.guess");
+  xsystem ("$cmd $configdir/config.sub $dest/");
+  xsystem ("$chmod u+x $dest/config.sub");
+}
+
+
+# &gnu_configize ($DIRECTORY)
+# ------------------------
+# Reconf the $DIRECTORY.
+sub gnu_configize ($)
+{
+  my ($directory) = @_;
+  my $cwd = cwd;
+
+  # The format for this message is not free: taken from Emacs, itself
+  # using GNU Make's format.
+  verb "Entering directory `$directory'";
+  chdir $directory
+    or error "cannot chdir to $directory: $!";
+
+  gnu_configize_current_directory;
+
+  # The format is not free: taken from Emacs, itself using GNU Make's
+  # format.
+  verb "Leaving directory `$directory'";
+  chdir $cwd
+    or error "cannot chdir to $cwd: $!";
+}
+
+
+## ------ ##
+## Main.  ##
+## ------ ##
+
+parse_args;
+
+# Autoreconf all the given configure.ac.  A while loop, not a for,
+# since the list can change at runtime because of AC_CONFIG_SUBDIRS.
+for my $directory (@ARGV)
+  {
+    gnu_configize ($directory);
+  }
+
+### Setup "GNU" style for perl-mode and cperl-mode.
+## Local Variables:
+## perl-indent-level: 2
+## perl-continued-statement-offset: 2
+## perl-continued-brace-offset: 0
+## perl-brace-offset: 0
+## perl-brace-imaginary-offset: 0
+## perl-label-offset: -2
+## cperl-indent-level: 2
+## cperl-brace-offset: 0
+## cperl-continued-brace-offset: 0
+## cperl-label-offset: -2
+## cperl-extra-newline-before-brace: t
+## cperl-merge-trailing-else: nil
+## cperl-continued-statement-offset: 2
+## End:

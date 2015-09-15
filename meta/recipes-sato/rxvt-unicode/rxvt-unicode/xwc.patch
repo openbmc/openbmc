@@ -1,0 +1,26 @@
+Upstream-Status: Pending
+
+diff -ruN rxvt-unicode-9.10-orig//src/screen.C rxvt-unicode-9.10/src/screen.C
+--- rxvt-unicode-9.10-orig//src/screen.C	2011-04-19 13:34:01.327664984 +0800
++++ rxvt-unicode-9.10/src/screen.C	2011-04-19 13:34:47.037665001 +0800
+@@ -3152,7 +3152,7 @@
+       return false;
+     }
+ 
+-#if 0
++#if HAVE_XWC
+   XTextProperty ct;
+ 
+   if (XwcTextListToTextProperty (dpy, &selection.text, 1, XStringStyle, &ct) >= 0)
+@@ -3734,9 +3734,11 @@
+         }
+       else
+ #endif
++#ifdef HAVE_XWC
+       if (XwcTextListToTextProperty (dpy, &cl, 1, (XICCEncodingStyle) style, &ct) >= 0)
+         freect = 1;
+       else
++#endif
+         {
+           /* if we failed to convert then send it raw */
+           ct.value = (unsigned char *)cl;

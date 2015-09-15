@@ -1,0 +1,25 @@
+Upstream-Status: Inappropriate [bugfix: http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2010-0624]
+
+This patch avoids heap overflow reported by :
+http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2010-0624
+
+This is a clean patch for the GPLv2 tar recipe.
+
+the GPLv2 tar recipe patch is also applicable to this GPLv2 cpio 
+recipe, as they share code.
+
+Nitin A Kamble <nitin.a.kamble@intel.com> 2011/04/25
+
+Index: tar-1.17/lib/rtapelib.c
+===================================================================
+--- tar-1.17.orig/lib/rtapelib.c
++++ tar-1.17/lib/rtapelib.c
+@@ -570,7 +570,7 @@ rmt_read__ (int handle, char *buffer, si
+ 
+   sprintf (command_buffer, "R%lu\n", (unsigned long) length);
+   if (do_command (handle, command_buffer) == -1
+-      || (status = get_status (handle)) == SAFE_READ_ERROR)
++      || ((status = get_status (handle)) == SAFE_READ_ERROR) || (status > length))
+     return SAFE_READ_ERROR;
+ 
+   for (counter = 0; counter < status; counter += rlen, buffer += rlen)

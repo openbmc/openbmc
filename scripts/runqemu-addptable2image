@@ -1,0 +1,51 @@
+#!/bin/sh
+
+# Add a partion table to an ext2 image file
+#
+# Copyright (C) 2006-2007 OpenedHand Ltd.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+IMAGE=$1
+IMAGEOUT=$2
+
+echo $IMAGE
+echo $IMAGEOUT
+
+size=`ls -l $IMAGE | awk '{ print $5}'`
+size2=`expr $size / 512 / 16 / 63`
+
+echo $size
+echo $size2
+
+# MBR Size = 512 * 63 bytes
+dd if=/dev/zero of=$IMAGEOUT count=63
+
+echo "x" > /tmp/fdisk.cmds
+echo "c" >> /tmp/fdisk.cmds
+echo "1024" >> /tmp/fdisk.cmds
+echo "h" >> /tmp/fdisk.cmds
+echo "16" >> /tmp/fdisk.cmds
+echo "r" >> /tmp/fdisk.cmds
+echo "n" >> /tmp/fdisk.cmds
+echo "p" >> /tmp/fdisk.cmds
+echo "1" >> /tmp/fdisk.cmds
+echo "1" >> /tmp/fdisk.cmds
+echo "$size2" >> /tmp/fdisk.cmds
+echo "w" >> /tmp/fdisk.cmds
+
+/sbin/fdisk $IMAGEOUT < /tmp/fdisk.cmds
+cat $IMAGE >> $IMAGEOUT

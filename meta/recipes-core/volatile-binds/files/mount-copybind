@@ -1,0 +1,34 @@
+#!/bin/sh
+#
+# Perform a bind mount, copying existing files as we do so to ensure the
+# overlaid path has the necessary content.
+
+if [ $# -lt 2 ]; then
+    echo >&2 "Usage: $0 spec mountpoint [OPTIONS]"
+    exit 1
+fi
+
+spec=$1
+mountpoint=$2
+
+if [ $# -gt 2 ]; then
+    options=$3
+else
+    options=
+fi
+
+[ -n "$options" ] && options=",$options"
+
+mkdir -p "${spec%/*}"
+if [ -d "$mountpoint" ]; then
+    if [ ! -d "$spec" ]; then
+        mkdir "$spec"
+        cp -pPR "$mountpoint"/. "$spec/"
+    fi
+elif [ -f "$mountpoint" ]; then
+    if [ ! -f "$spec" ]; then
+        cp -pP "$mountpoint" "$spec"
+    fi
+fi
+
+mount -o "bind$options" "$spec" "$mountpoint"

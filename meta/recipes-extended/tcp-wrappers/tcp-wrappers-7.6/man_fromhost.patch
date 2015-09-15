@@ -1,0 +1,23 @@
+Upstream-Status: Backport
+
+diff -ruN tcp_wrappers_7.6.orig/hosts_access.3 tcp_wrappers_7.6/hosts_access.3
+--- tcp_wrappers_7.6.orig/hosts_access.3	2004-04-25 00:10:48.000000000 +0200
++++ tcp_wrappers_7.6/hosts_access.3	2004-04-25 00:09:36.000000000 +0200
+@@ -14,6 +14,9 @@
+ struct request_info *request_set(request, key, value, ..., 0)
+ struct request_info *request;
+ 
++void fromhost(request)
++struct request_info *request;
++
+ int hosts_access(request)
+ struct request_info *request;
+ 
+@@ -60,6 +63,7 @@
+ is available, host names and client user names are looked up on demand,
+ using the request structure as a cache.  hosts_access() returns zero if
+ access should be denied.
++fromhost() must be called before hosts_access().
+ .PP
+ hosts_ctl() is a wrapper around the request_init() and hosts_access()
+ routines with a perhaps more convenient interface (though it does not

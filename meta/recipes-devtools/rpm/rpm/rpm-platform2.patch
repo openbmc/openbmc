@@ -1,0 +1,105 @@
+Fix up platform and related sysinfo file loading (part 2).
+
+Upstream-Status: Pending
+
+We need to ensure that we set the _gnu flag somehow.  We do this by reading
+from the platform file, and setting a new _platform_gnu and related vars.
+
+The default values of _host_cpu, _host_vendor and _host_os are changed to
+reference either the automatically determined _target_... or _platform_...
+values.  The macros file uses the configure time defaults in _platform_...
+versions have not been defined.  This preserves existing behavior, but
+ensures reasonable defaults are always available.
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.14/lib/rpmrc.c
+===================================================================
+--- rpm-5.4.14.orig/lib/rpmrc.c
++++ rpm-5.4.14/lib/rpmrc.c
+@@ -328,10 +328,15 @@ static void setDefaults(void)
+ 	/*@modifies rpmGlobalMacroContext, internalState @*/
+ {
+ 
+-#if defined(RPM_VENDOR_WINDRIVER)
++#if defined(RPM_VENDOR_WINDRIVER) || defined(RPM_VENDOR_OE)
+     addMacro(NULL, "_usrlibrpm", NULL, __usrlibrpm, RMIL_DEFAULT);
+     addMacro(NULL, "_etcrpm", NULL, __etcrpm, RMIL_DEFAULT);
+     addMacro(NULL, "_vendor", NULL, "%{?_host_vendor}%{!?_host_vendor:wrs}", RMIL_DEFAULT);
++
++    addMacro(NULL, "_host_cpu", NULL, "%{?_platform_cpu}%{!?_platform_cpu:%{?_target_cpu}}", RMIL_DEFAULT);
++    addMacro(NULL, "_host_vendor", NULL, "%{?_platform_vendor}%{!?_platform_cpu:%{?_target_vendor}}", RMIL_DEFAULT);
++    addMacro(NULL, "_host_os", NULL, "%{?_platform_os}%{!?_platform_os:%{?_target_os}}", RMIL_DEFAULT);
++    addMacro(NULL, "_host_gnu", NULL, "%{?_platform_gnu}%{!?_platform_gnu:%{?_gnu}}", RMIL_DEFAULT);
+ #endif
+ 
+     addMacro(NULL, "_usr", NULL, USRPREFIX, RMIL_DEFAULT);
+@@ -487,9 +492,22 @@ static rpmRC rpmPlatform(const char * pl
+ 	}
+ 
+ 	if (!parseCVOG(p, &cvog) && cvog != NULL) {
++#if defined(RPM_VENDOR_OE)
++	    char * _gnu = NULL;
++
++	    addMacro(NULL, "_platform_cpu", NULL, cvog->cpu, -1);
++	    addMacro(NULL, "_platform_vendor", NULL, cvog->vendor, -1);
++	    addMacro(NULL, "_platform_os", NULL, cvog->os, -1);
++
++	    if (cvog->gnu && cvog->gnu[0] != '\0')
++		_gnu = rpmExpand("-", cvog->gnu, NULL);
++
++	    addMacro(NULL, "_platform_gnu", NULL, (_gnu ? _gnu : ""), -1);
++#else
+ 	    addMacro(NULL, "_host_cpu", NULL, cvog->cpu, -1);
+ 	    addMacro(NULL, "_host_vendor", NULL, cvog->vendor, -1);
+ 	    addMacro(NULL, "_host_os", NULL, cvog->os, -1);
++#endif
+ 	}
+ 
+ #if defined(RPM_VENDOR_OPENPKG) /* explicit-platform */
+Index: rpm-5.4.14/macros/macros.in
+===================================================================
+--- rpm-5.4.14.orig/macros/macros.in
++++ rpm-5.4.14/macros/macros.in
+@@ -900,9 +900,9 @@ $_arbitrary_tags_tests	Foo:Bar
+ %_os			@RPMCANONOS@
+ %_gnu			@RPMCANONGNU@
+ 
+-%_host_platform		%{_host_cpu}-%{_host_vendor}-%{_host_os}%{?_gnu}
+-%_build_platform	%{_build_cpu}-%{_build_vendor}-%{_build_os}%{?_gnu}
+-%_target_platform	%{_target_cpu}-%{_target_vendor}-%{_target_os}%{?_gnu}
++%_host_platform		%{_host_cpu}-%{_host_vendor}-%{_host_os}%{?_host_gnu}%{!?_host_gnu:%{?_gnu}}
++%_build_platform	%{_build_cpu}-%{_build_vendor}-%{_build_os}%{?_host_gnu}%{!?_host_gnu:%{?_gnu}}
++%_target_platform	%{_target_cpu}-%{_target_vendor}-%{_target_os}%{?_host_gnu}%{!?_host_gnu:%{?_gnu}}
+ 
+ #==============================================================================
+ # ---- configure macros.
+@@ -945,9 +945,10 @@ $_arbitrary_tags_tests	Foo:Bar
+ %_build_os		%{_host_os}
+ %_host			@host@
+ %_host_alias		@host_alias@%{nil}
+-%_host_cpu		@host_cpu@
+-%_host_vendor		@host_vendor@
+-%_host_os		@host_os@
++%_host_cpu		%{?_platform_cpu}%{!?_platform_cpu:%{_arch}}
++%_host_vendor		%{?_platform_vendor}%{!?_platform_vendor:%{_vendor}}
++%_host_os		%{?_platform_os}%{!?_platform_os:%{_os}}
++%_host_gnu		%{?_platform_gnu}%{!?_platform_gnu:%{_gnu}}
+ %_target		%{_host}
+ %_target_alias		%{_host_alias}
+ %_target_cpu		%{_host_cpu}
+Index: rpm-5.4.14/python/rpmmodule.c
+===================================================================
+--- rpm-5.4.14.orig/python/rpmmodule.c
++++ rpm-5.4.14/python/rpmmodule.c
+@@ -65,8 +65,8 @@ static PyObject * archScore(PyObject * s
+     if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &arch))
+ 	return NULL;
+ 
+-#if defined(RPM_VENDOR_WINDRIVER)
+-    platform = rpmExpand(arch, "-%{_host_vendor}", "-%{_host_os}%{?_gnu}", NULL);
++#if defined(RPM_VENDOR_WINDRIVER) || defined(RPM_VENDOR_OE)
++    platform = rpmExpand(arch, "-%{_host_vendor}", "-%{_host_os}%{?_host_gnu}%{!?_host_gnu:%{?_gnu}}", NULL);
+ #else
+     platform = rpmExpand(arch, "-", "%{_vendor}", "-", "%{_os}", NULL);
+ #endif

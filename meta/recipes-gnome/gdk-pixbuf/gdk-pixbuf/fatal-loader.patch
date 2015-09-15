@@ -1,0 +1,79 @@
+If an environment variable is specified set the return value from main() to
+non-zero if the loader had errors (missing libraries, generally).
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/gdk-pixbuf/queryloaders.c b/gdk-pixbuf/queryloaders.c
+index a9ca015..395674a 100644
+--- a/gdk-pixbuf/queryloaders.c
++++ b/gdk-pixbuf/queryloaders.c
+@@ -146,7 +146,7 @@ write_loader_info (GString *contents, const char *path, GdkPixbufFormat *info)
+         g_string_append_c (contents, '\n');
+ }
+ 
+-static void
++static gboolean
+ query_module (GString *contents, const char *dir, const char *file)
+ {
+         char *path;
+@@ -155,6 +155,7 @@ query_module (GString *contents, const char *dir, const char *file)
+         void                    (*fill_vtable)   (GdkPixbufModule *module);
+         gpointer fill_info_ptr;
+         gpointer fill_vtable_ptr;
++        gboolean ret = TRUE;
+ 
+         if (g_path_is_absolute (file))
+                 path = g_strdup (file);
+@@ -204,10 +205,13 @@ query_module (GString *contents, const char *dir, const char *file)
+                                    g_module_error());
+                 else
+                         g_fprintf (stderr, "Cannot load loader %s\n", path);
++                ret = FALSE;
+         }
+         if (module)
+                 g_module_close (module);
+         g_free (path);
++
++        return ret;
+ }
+ 
+ #ifdef G_OS_WIN32
+@@ -257,6 +261,7 @@ int main (int argc, char **argv)
+         GString *contents;
+         gchar *cache_file = NULL;
+         gint first_file = 1;
++        gboolean success = TRUE;
+ 
+ #ifdef G_OS_WIN32
+         gchar *libdir;
+@@ -360,7 +365,8 @@ int main (int argc, char **argv)
+                                 gint len = strlen (dent);
+                                 if (len > SOEXT_LEN &&
+                                     strcmp (dent + len - SOEXT_LEN, SOEXT) == 0) {
+-                                        query_module (contents, path, dent);
++                                        if (!query_module (contents, path, dent))
++                                                success = FALSE;
+                                 }
+                         }
+                         g_dir_close (dir);
+@@ -378,7 +384,8 @@ int main (int argc, char **argv)
+                         infilename = g_locale_to_utf8 (infilename,
+                                                        -1, NULL, NULL, NULL);
+ #endif
+-                        query_module (contents, cwd, infilename);
++                        if (!query_module (contents, cwd, infilename))
++                                success = FALSE;
+                 }
+                 g_free (cwd);
+         }
+@@ -394,5 +401,8 @@ int main (int argc, char **argv)
+         else
+                 g_print ("%s\n", contents->str);
+ 
+-        return 0;
++        if (g_getenv ("GDK_PIXBUF_FATAL_LOADER"))
++                return success ? 0 : 1;
++        else
++                return 0;
+ }

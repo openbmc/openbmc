@@ -1,0 +1,28 @@
+Fix NULL pointer crash.
+
+Before use usbbuslist, we should check if it is valid.
+
+Upstream-Status: Pending
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+---
+ lsusb-t.c |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
+
+diff --git a/lsusb-t.c b/lsusb-t.c
+index f604155..583a46a 100644
+--- a/lsusb-t.c
++++ b/lsusb-t.c
+@@ -643,6 +643,10 @@ static void sort_busses(void)
+ 	/* need to reverse sort bus numbers */
+ 	struct usbbusnode *t, *p, **pp;
+ 	int swapped;
++
++	if (!usbbuslist)
++		return;
++
+ 	do {
+ 		p = usbbuslist;
+ 		pp = &usbbuslist;
+-- 
+1.7.4.1
+

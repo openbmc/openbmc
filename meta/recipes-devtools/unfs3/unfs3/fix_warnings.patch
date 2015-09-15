@@ -1,0 +1,53 @@
+exports.*: fix warnings.
+
+Fix these warnings:
+lex.yy.c:1207: warning: 'yyunput' defined but not used
+lex.yy.c:1248: warning: 'input' defined but not used
+exports.y: In function 'set_hostname':
+exports.y:334: warning: large integer implicitly truncated to unsigned type
+exports.y: In function 'set_ipaddr':
+exports.y:350: warning: large integer implicitly truncated to unsigned type
+
+Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
+
+Upstream-Status: Submitted http://sourceforge.net/p/unfs3/bugs/5/
+
+---
+ Config/exports.l |    3 +++
+ Config/exports.y |    6 ++++--
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+--- a/Config/exports.l
++++ b/Config/exports.l
+@@ -48,6 +48,9 @@ NETCOMP [0-9]{1,2}
+ NET {IP}"/"{NETCOMP}
+ OLDNET {IP}"/"{IP}
+ 
++%option nounput
++%option noinput
++
+ %%
+ 
+ ^{WHITE}*\n		{ /* eat empty line */ }
+--- a/Config/exports.y
++++ b/Config/exports.y
+@@ -331,7 +331,8 @@ static void set_hostname(const char *nam
+ 	if (ent) {
+ 		memcpy(&cur_host.addr, ent->h_addr_list[0],
+ 		       sizeof(struct in_addr));
+-		cur_host.mask.s_addr = ~0UL;
++		cur_host.mask.s_addr = 0;
++		cur_host.mask.s_addr = ~cur_host.mask.s_addr;
+ 	} else {
+ 		logmsg(LOG_CRIT, "could not resolve hostname '%s'", name);
+ 		e_error = TRUE;
+@@ -347,7 +348,8 @@ static void set_ipaddr(const char *addr)
+ 	
+ 	if (!inet_aton(addr, &cur_host.addr))
+ 		e_error = TRUE;
+-	cur_host.mask.s_addr = ~0UL;
++	cur_host.mask.s_addr = 0;
++	cur_host.mask.s_addr = ~cur_host.mask.s_addr;
+ }
+ 
+ /*

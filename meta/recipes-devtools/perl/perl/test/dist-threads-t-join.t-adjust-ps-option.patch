@@ -1,0 +1,38 @@
+dist/threads/t/join.t: adjust ps option
+
+The ps's option '-f' is not supported by busybox in oe.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ dist/threads/t/join.t | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/dist/threads/t/join.t b/dist/threads/t/join.t
+--- a/dist/threads/t/join.t
++++ b/dist/threads/t/join.t
+@@ -118,7 +118,7 @@ if ($^O eq 'linux') {
+                  })->join;
+     #print "# mainthread: \$0 = $0\n";
+     #print "# pid = $$\n";
+-    if (open PS, "ps -f |") { # Note: must work in (all) systems.
++    if (open PS, "ps |") { # Note: must work in (all) systems.
+         my ($sawpid, $sawexe);
+         while (<PS>) {
+             chomp;
+@@ -135,10 +135,10 @@ if ($^O eq 'linux') {
+         if ($sawpid) {
+             ok($sawpid && $sawexe, 'altering $0 is effective');
+         } else {
+-            skip("\$0 check: did not see pid $$ in 'ps -f |'");
++            skip("\$0 check: did not see pid $$ in 'ps |'");
+         }
+     } else {
+-        skip("\$0 check: opening 'ps -f |' failed: $!");
++        skip("\$0 check: opening 'ps |' failed: $!");
+     }
+ } else {
+     skip("\$0 check: only on Linux");
+-- 
+1.8.1.2
+

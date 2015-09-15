@@ -1,0 +1,162 @@
+{% extends "basebuildpage.html" %}
+{% block localbreadcrumb %}
+<li>{{target.target}}</li>
+{% endblock localbreadcrumb%}
+
+{% load projecttags %}
+
+{% block nav-target %}
+  {% for t in build.get_sorted_target_list %}
+    {% ifequal target.pk t.pk %}
+      <li class="active"><a href="{% url 'target' build.pk t.pk %}">{{t.target}}</a><li>
+    {% else %}
+      <li><a href="{% url 'target' build.pk t.pk %}">{{t.target}}</a><li>
+    {% endifequal %}
+  {% endfor %}
+{% endblock %}
+
+{% block buildinfomain %}
+
+<div class="row-fluid span10">
+    <div class="page-header">
+        <h1>
+            {% if request.GET.search and objects.paginator.count > 0 %}
+                {{objects.paginator.count}} package{{objects.paginator.count|pluralize}} found
+            {% elif request.GET.search and objects.paginator.count == 0 %}
+                No packages found
+            {% else %}
+                {{target.target}}
+            {% endif %}
+        </h1>
+    </div>
+</div>
+
+<div class="row-fluid pull-right span10" id="navTab">
+    <ul class="nav nav-pills">
+        <li class="active">
+            <a href="#target">
+            <i class="icon-question-sign get-help" title="Of all the packages built, the subset installed in the root file system of this image"></i>
+                Packages included ({{target.package_count}} - {{packages_sum|filtered_filesizeformat}})
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'dirinfo' build.id target.id %}">
+                <i class="icon-question-sign get-help" title="The directories and files in the root file system of this image"></i>
+                Directory structure
+            </a>
+        </li>
+    </ul>
+
+    <div id="image-packages" class="tab-pane">
+
+    {% if objects.paginator.count == 0 %}
+    <div class="row-fluid">
+        <div class="alert">
+            <form class="no-results input-append" id="searchform">
+                <input id="search" name="search" class="input-xxlarge" type="text" value="{% if request.GET.search %}{{request.GET.search}}{% endif %}"/>{% if request.GET.search %}<a href="javascript:$('#search').val('');searchform.submit()" class="add-on btn" tabindex="-1"><i class="icon-remove"></i></a>{% endif %}
+                <button class="btn" type="submit" value="Search">Search</button>
+                <button class="btn btn-link" onclick="javascript:$('#search').val('');searchform.submit()">Show all packages</button>
+            </form>
+        </div>
+    </div>
+
+
+    {% else %}
+    {% include "basetable_top.html" %}
+    {% for package in objects %}
+    <tr>
+      {# order of the table data must match the columns defined in template's context tablecols  #}
+        <td class="package_name">
+            <a href="{% url 'package_included_detail' build.id target.id package.id %}">
+            {{package.name}}
+            </a>
+            {% if package.installed_name and package.name != package.installed_name %}
+            <span class="muted"> as {{package.installed_name}}</span>
+            <i class="icon-question-sign get-help hover-help" title='{{package.name|add:" was renamed at packaging time and was installed in your image as "|add:package.installed_name}}'></i>
+            {% endif %}
+        </td>
+        <td class="package_version">
+            <a href="{% url 'package_included_detail' build.id target.id package.id %}">
+            {{package.version|filtered_packageversion:package.revision}}
+            </a>
+        </td>
+        <td class="license">
+            {{package.license}}
+        </td>
+        <td class="size sizecol">
+            {{package.size|filtered_installedsize:package.installed_size|filtered_filesizeformat}}
+        </td>
+
+        <td class="size_over_total sizecol">
+            {{package|filter_sizeovertotal:packages_sum}}
+        </td>
+       <td class="depends">
+            {% with deps=package.runtime_dependencies %}
+            {% with deps_count=deps|length %}
+            {% if deps_count > 0 %}
+            <a class="btn"
+                title="<a href='{% url "package_included_dependencies" build.id target.id package.id %}'>{{package.name}}</a> dependencies"
+                data-content="<ul class='unstyled'>
+                  {% for i in deps|dictsort:'depends_on.name' %}
+                    <li><a href='{% url "package_included_detail" build.pk target.id i.depends_on.pk %}'>{{i.depends_on.name}}</a></li>
+                  {% endfor %}
+                </ul>">
+                {{deps_count}}
+            </a>
+            {% endif %}
+            {% endwith %}
+            {% endwith %}
+        </td>
+        <td class="brought_in_by">
+            {% with rdeps=package.reverse_runtime_dependencies %}
+            {% with rdeps_count=rdeps|length %}
+            {% if rdeps_count > 0 %}
+            <a class="btn"
+                title="<a href='{% url "package_included_reverse_dependencies" build.id target.id package.id %}'>{{package.name}}</a> reverse dependencies"
+                data-content="<ul class='unstyled'>
+                  {% for i in rdeps|dictsort:'package.name' %}
+                    <li><a href='{% url "package_included_detail" build.id target.id i.package.id %}'>{{i.package.name}}</a></li>
+                  {% endfor %}
+                </ul>">
+                {{rdeps_count}}
+            </a>
+            {% endif %}
+            {% endwith %}
+            {% endwith %}
+        </td>
+        <td class="recipe_name">
+            {% if package.recipe.version %}
+            <a href="{% url 'recipe' build.id package.recipe_id %}">
+            {{ package.recipe.name }}
+            </a>
+            {% endif %}
+        </td>
+        <td class="recipe_version">
+            {% if package.recipe.version %}
+            <a href="{% url 'recipe' build.id package.recipe_id %}">
+            {{ package.recipe.version }}
+            </a>
+            {% endif %}
+        </td>
+        <td class="layer_name">
+            {{ package.recipe.layer_version.layer.name }}
+        </td>
+        <td class="layer_branch">
+            {{ package.recipe.layer_version.branch}}
+        </td>
+        <td class="layer_commit">
+            <a class="btn"
+                data-content="<ul class='unstyled'>
+                  <li>{{package.recipe.layer_version.commit}}</li>
+                </ul>">
+                {{package.recipe.layer_version.commit|truncatechars:13}}
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+
+    {% include "basetable_bottom.html" %}
+    {% endif %}
+    </div> <!-- tabpane -->
+</div> <!--span 10-->
+{% endblock buildinfomain %}

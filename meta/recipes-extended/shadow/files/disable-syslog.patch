@@ -1,0 +1,34 @@
+Disable use of syslog to prevent sysroot user and group additions from
+writing entries to the host's syslog. This patch should only be used
+with the shadow-native recipe.
+
+Upstream-Status: Inappropriate [disable feature]
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+diff -urN shadow-4.1.4.3.orig//src/groupadd.c shadow-4.1.4.3/src/groupadd.c
+--- shadow-4.1.4.3.orig//src/groupadd.c	2011-02-13 09:58:16.000000000 -0800
++++ shadow-4.1.4.3/src/groupadd.c	2012-04-05 10:05:59.440001758 -0700
+@@ -34,6 +34,9 @@
+ 
+ #ident "$Id: groupadd.c 3015 2009-06-05 22:16:56Z nekral-guest $"
+ 
++/* Disable use of syslog since we're running this command against a sysroot */
++#undef USE_SYSLOG
++
+ #include <ctype.h>
+ #include <fcntl.h>
+ #include <getopt.h>
+diff -urN shadow-4.1.4.3.orig//src/useradd.c shadow-4.1.4.3/src/useradd.c
+--- shadow-4.1.4.3.orig//src/useradd.c	2011-02-13 09:58:16.000000000 -0800
++++ shadow-4.1.4.3/src/useradd.c	2012-04-05 10:06:25.076001315 -0700
+@@ -34,6 +34,9 @@
+ 
+ #ident "$Id: useradd.c 3015 2009-06-05 22:16:56Z nekral-guest $"
+ 
++/* Disable use of syslog since we're running this command against a sysroot */
++#undef USE_SYSLOG
++
+ #include <assert.h>
+ #include <ctype.h>
+ #include <errno.h>

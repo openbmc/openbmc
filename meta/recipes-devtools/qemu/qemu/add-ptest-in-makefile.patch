@@ -1,0 +1,29 @@
+Upstream-Status: Pending
+
+Add subpackage -ptest which runs all unit test cases for qemu.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ tests/Makefile |   10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/tests/Makefile b/tests/Makefile
+index 88f7105..3f40b4b 100644
+--- a/tests/Makefile
++++ b/tests/Makefile
+@@ -405,3 +405,12 @@ all: $(QEMU_IOTESTS_HELPERS-y)
+ 
+ -include $(wildcard tests/*.d)
+ -include $(wildcard tests/libqos/*.d)
++
++buildtest-TESTS: $(check-unit-y)
++
++runtest-TESTS:
++	for f in $(check-unit-y); do \
++		nf=$$(echo $$f | sed 's/tests\//\.\//g'); \
++		$$nf; \
++	done
++
+--
+1.7.9.5
+

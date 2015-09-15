@@ -1,0 +1,255 @@
+Upstream-Status: Backport
+
+diff -ruN tcp_wrappers_7.6.orig/Makefile tcp_wrappers_7.6/Makefile
+--- tcp_wrappers_7.6.orig/Makefile	2004-05-02 15:37:59.000000000 +0200
++++ tcp_wrappers_7.6/Makefile	2004-05-02 15:31:09.000000000 +0200
+@@ -150,15 +150,15 @@
+ 
+ linux:
+ 	@make REAL_DAEMON_DIR=$(REAL_DAEMON_DIR) STYLE=$(STYLE) \
+-	LIBS=-lnsl RANLIB=ranlib ARFLAGS=rv AUX_OBJ= \
++	LIBS=-lnsl RANLIB=ranlib ARFLAGS=rv AUX_OBJ=weak_symbols.o \
+ 	NETGROUP="-DNETGROUP" TLI= VSYSLOG= BUGS= \
+-	EXTRA_CFLAGS="-DSYS_ERRLIST_DEFINED -DHAVE_STRERROR -DINET6=1 -Dss_family=__ss_family -Dss_len=__ss_len" all
++	EXTRA_CFLAGS="-DSYS_ERRLIST_DEFINED -DHAVE_STRERROR -DHAVE_WEAKSYMS -D_REENTRANT -DINET6=1 -Dss_family=__ss_family -Dss_len=__ss_len" all
+ 
+ gnu:
+ 	@make REAL_DAEMON_DIR=$(REAL_DAEMON_DIR) STYLE=$(STYLE) \
+-	LIBS=-lnsl RANLIB=ranlib ARFLAGS=rv AUX_OBJ= \
++	LIBS=-lnsl RANLIB=ranlib ARFLAGS=rv AUX_OBJ=weak_symbols.o \
+ 	NETGROUP=-DNETGROUP TLI= VSYSLOG= BUGS= \
+-	EXTRA_CFLAGS="-DSYS_ERRLIST_DEFINED -DHAVE_STRERROR" all
++	EXTRA_CFLAGS="-DSYS_ERRLIST_DEFINED -DHAVE_STRERROR -DHAVE_WEAKSYMS -D_REENTRANT" all
+ 
+ # This is good for many SYSV+BSD hybrids with NIS, probably also for HP-UX 7.x.
+ hpux hpux8 hpux9 hpux10:
+@@ -713,7 +713,22 @@
+ 
+ LIB	= libwrap.a
+ 
+-all other: config-check tcpd tcpdmatch try-from safe_finger tcpdchk
++shared/%.o: %.c
++	$(CC) $(CFLAGS) $(SHCFLAGS) -c $< -o $@
++
++SOMAJOR = 0
++SOMINOR = 7.6
++
++SHLIB		= shared/libwrap.so.$(SOMAJOR).$(SOMINOR)
++SHLIBSOMAJ	= shared/libwrap.so.$(SOMAJOR)
++SHLIBSO		= shared/libwrap.so
++SHLIBFLAGS	= -Lshared -lwrap
++
++SHLINKFLAGS = -shared -Xlinker -soname -Xlinker libwrap.so.$(SOMAJOR) -lc $(LIBS)
++SHCFLAGS = -fPIC -shared -D_REENTRANT
++SHLIB_OBJ= $(addprefix shared/, $(LIB_OBJ));
++
++all other: config-check tcpd tcpdmatch try-from safe_finger tcpdchk $(LIB)
+ 
+ # Invalidate all object files when the compiler options (CFLAGS) have changed.
+ 
+@@ -731,27 +746,33 @@
+ 	$(AR) $(ARFLAGS) $(LIB) $(LIB_OBJ)
+ 	-$(RANLIB) $(LIB)
+ 
+-tcpd:	tcpd.o $(LIB)
+-	$(CC) $(CFLAGS) -o $@ tcpd.o $(LIB) $(LIBS)
++$(SHLIB): $(SHLIB_OBJ)
++	rm -f $(SHLIB)
++	$(CC) -o $(SHLIB) $(SHLINKFLAGS) $(SHLIB_OBJ)
++	ln -sf $(notdir $(SHLIB)) $(SHLIBSOMAJ)
++	ln -sf $(notdir $(SHLIBSOMAJ)) $(SHLIBSO)
++
++tcpd:	tcpd.o $(SHLIB)
++	$(CC) $(CFLAGS) -o $@ tcpd.o $(SHLIBFLAGS)
+ 
+ miscd:	miscd.o $(LIB)
+ 	$(CC) $(CFLAGS) -o $@ miscd.o $(LIB) $(LIBS)
+ 
+-safe_finger: safe_finger.o $(LIB)
+-	$(CC) $(CFLAGS) -o $@ safe_finger.o $(LIB) $(LIBS)
++safe_finger: safe_finger.o $(SHLIB)
++	$(CC) $(CFLAGS) -o $@ safe_finger.o $(SHLIBFLAGS)
+ 
+ TCPDMATCH_OBJ = tcpdmatch.o fakelog.o inetcf.o scaffold.o
+ 
+-tcpdmatch: $(TCPDMATCH_OBJ) $(LIB)
+-	$(CC) $(CFLAGS) -o $@ $(TCPDMATCH_OBJ) $(LIB) $(LIBS)
++tcpdmatch: $(TCPDMATCH_OBJ) $(SHLIB)
++	$(CC) $(CFLAGS) -o $@ $(TCPDMATCH_OBJ) $(SHLIBFLAGS)
+ 
+-try-from: try-from.o fakelog.o $(LIB)
+-	$(CC) $(CFLAGS) -o $@ try-from.o fakelog.o $(LIB) $(LIBS)
++try-from: try-from.o fakelog.o $(SHLIB)
++	$(CC) $(CFLAGS) -o $@ try-from.o fakelog.o $(SHLIBFLAGS)
+ 
+ TCPDCHK_OBJ = tcpdchk.o fakelog.o inetcf.o scaffold.o
+ 
+-tcpdchk: $(TCPDCHK_OBJ) $(LIB)
+-	$(CC) $(CFLAGS) -o $@ $(TCPDCHK_OBJ) $(LIB) $(LIBS)
++tcpdchk: $(TCPDCHK_OBJ) $(SHLIB)
++	$(CC) $(CFLAGS) -o $@ $(TCPDCHK_OBJ) $(SHLIBFLAGS)
+ 
+ shar:	$(KIT)
+ 	@shar $(KIT)
+@@ -767,7 +788,9 @@
+ 
+ clean:
+ 	rm -f tcpd miscd safe_finger tcpdmatch tcpdchk try-from *.[oa] core \
++	libwrap*.so* \
+ 	cflags
++	rm -rf shared/
+ 
+ tidy:	clean
+ 	chmod -R a+r .
+@@ -913,5 +936,6 @@
+ update.o: mystdarg.h
+ update.o: tcpd.h
+ vfprintf.o: cflags
++weak_symbols.o: tcpd.h
+ workarounds.o: cflags
+ workarounds.o: tcpd.h
+diff -ruN tcp_wrappers_7.6.orig/tcpd.h tcp_wrappers_7.6/tcpd.h
+--- tcp_wrappers_7.6.orig/tcpd.h	2004-05-02 15:37:59.000000000 +0200
++++ tcp_wrappers_7.6/tcpd.h	2004-05-02 15:37:49.000000000 +0200
+@@ -4,6 +4,15 @@
+   * Author: Wietse Venema, Eindhoven University of Technology, The Netherlands.
+   */
+ 
++#ifndef _TCPWRAPPERS_TCPD_H
++#define _TCPWRAPPERS_TCPD_H
++
++/* Need definitions of struct sockaddr_in and FILE. */
++#include <netinet/in.h>
++#include <stdio.h>
++
++__BEGIN_DECLS
++
+ /* Structure to describe one communications endpoint. */
+ 
+ #define STRING_LENGTH	128		/* hosts, users, processes */
+@@ -29,10 +38,10 @@
+     char    pid[10];			/* access via eval_pid(request) */
+     struct host_info client[1];		/* client endpoint info */
+     struct host_info server[1];		/* server endpoint info */
+-    void  (*sink) ();			/* datagram sink function or 0 */
+-    void  (*hostname) ();		/* address to printable hostname */
+-    void  (*hostaddr) ();		/* address to printable address */
+-    void  (*cleanup) ();		/* cleanup function or 0 */
++    void  (*sink) (int);		/* datagram sink function or 0 */
++    void  (*hostname) (struct host_info *); /* address to printable hostname */
++    void  (*hostaddr) (struct host_info *); /* address to printable address */
++    void  (*cleanup) (struct request_info *); /* cleanup function or 0 */
+     struct netconfig *config;		/* netdir handle */
+ };
+ 
+@@ -70,20 +79,27 @@
+ #define fromhost sock_host		/* no TLI support needed */
+ #endif
+ 
+-extern int hosts_access();		/* access control */
+-extern void shell_cmd();		/* execute shell command */
+-extern char *percent_x();		/* do %<char> expansion */
+-extern void rfc931();			/* client name from RFC 931 daemon */
+-extern void clean_exit();		/* clean up and exit */
+-extern void refuse();			/* clean up and exit */
+-extern char *xgets();			/* fgets() on steroids */
+-extern char *split_at();		/* strchr() and split */
+-extern unsigned long dot_quad_addr();	/* restricted inet_addr() */
++extern int hosts_access(struct request_info *request);	/* access control */
++extern void shell_cmd(char *);		/* execute shell command */
++extern char *percent_x(char *, int, char *, struct request_info *);
++					/* do %<char> expansion */
++extern void rfc931(struct sockaddr *, struct sockaddr *, char *);
++					/* client name from RFC 931 daemon */
++extern void clean_exit(struct request_info *);	/* clean up and exit */
++extern void refuse(struct request_info *);	/* clean up and exit */
++extern char *xgets(char *, int, FILE *);	/* fgets() on steroids */
++extern char *split_at(char *, int);		/* strchr() and split */
++extern unsigned long dot_quad_addr(char *);	/* restricted inet_addr() */
+ 
+ /* Global variables. */
+ 
++#ifdef HAVE_WEAKSYMS
++extern int allow_severity __attribute__ ((weak)); /* for connection logging */
++extern int deny_severity __attribute__ ((weak)); /* for connection logging */
++#else
+ extern int allow_severity;		/* for connection logging */
+ extern int deny_severity;		/* for connection logging */
++#endif
+ extern char *hosts_allow_table;		/* for verification mode redirection */
+ extern char *hosts_deny_table;		/* for verification mode redirection */
+ extern int hosts_access_verbose;	/* for verbose matching mode */
+@@ -98,6 +114,8 @@
+ #ifdef __STDC__
+ extern struct request_info *request_init(struct request_info *,...);
+ extern struct request_info *request_set(struct request_info *,...);
++extern int hosts_ctl(char *daemon, char *client_name, char *client_addr,
++		char *client_user);
+ #else
+ extern struct request_info *request_init();	/* initialize request */
+ extern struct request_info *request_set();	/* update request structure */
+@@ -121,20 +139,23 @@
+   * host_info structures serve as caches for the lookup results.
+   */
+ 
+-extern char *eval_user();		/* client user */
+-extern char *eval_hostname();		/* printable hostname */
+-extern char *eval_hostaddr();		/* printable host address */
+-extern char *eval_hostinfo();		/* host name or address */
+-extern char *eval_client();		/* whatever is available */
+-extern char *eval_server();		/* whatever is available */
++extern char *eval_user(struct request_info *);	/* client user */
++extern char *eval_hostname(struct host_info *);	/* printable hostname */
++extern char *eval_hostaddr(struct host_info *);	/* printable host address */
++extern char *eval_hostinfo(struct host_info *);	/* host name or address */
++extern char *eval_client(struct request_info *);/* whatever is available */
++extern char *eval_server(struct request_info *);/* whatever is available */
+ #define eval_daemon(r)	((r)->daemon)	/* daemon process name */
+ #define eval_pid(r)	((r)->pid)	/* process id */
+ 
+ /* Socket-specific methods, including DNS hostname lookups. */
+ 
+-extern void sock_host();		/* look up endpoint addresses */
+-extern void sock_hostname();		/* translate address to hostname */
+-extern void sock_hostaddr();		/* address to printable address */
++/* look up endpoint addresses */
++extern void sock_host(struct request_info *);
++/* translate address to hostname */
++extern void sock_hostname(struct host_info *);
++/* address to printable address */
++extern void sock_hostaddr(struct host_info *);
+ #define sock_methods(r) \
+ 	{ (r)->hostname = sock_hostname; (r)->hostaddr = sock_hostaddr; }
+ 
+@@ -182,7 +203,7 @@
+   * behavior.
+   */
+ 
+-extern void process_options();		/* execute options */
++extern void process_options(char *, struct request_info *);/* execute options */
+ extern int dry_run;			/* verification flag */
+ 
+ /* Bug workarounds. */
+@@ -221,3 +242,7 @@
+ #define strtok	my_strtok
+ extern char *my_strtok();
+ #endif
++
++__END_DECLS
++
++#endif
+diff -ruN tcp_wrappers_7.6.orig/weak_symbols.c tcp_wrappers_7.6/weak_symbols.c
+--- tcp_wrappers_7.6.orig/weak_symbols.c	1970-01-01 01:00:00.000000000 +0100
++++ tcp_wrappers_7.6/weak_symbols.c	2004-05-02 15:31:09.000000000 +0200
+@@ -0,0 +1,11 @@
++ /*
++  * @(#) weak_symbols.h 1.5 99/12/29 23:50
++  * 
++  * Author: Anthony Towns <ajt@debian.org>
++  */
++
++#ifdef HAVE_WEAKSYMS
++#include <syslog.h>
++int deny_severity = LOG_WARNING;
++int allow_severity = SEVERITY; 
++#endif

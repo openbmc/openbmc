@@ -1,0 +1,35 @@
+From 774f55f9dd22c01e4041a183d8dff14811f29114 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Fri, 4 Apr 2014 17:33:04 +0800
+Subject: [PATCH] sys-utils/Makemodule.am: fix parallel build issue
+
+The rule SETARCH_MAN_LINKS is used for the files under the sys-utils
+dir, for example:
+
+echo ".so man8/setarch.8" > sys-utils/linux32.8
+
+but it depends on nothing so that the sys-utils dir may not exist, we
+can create the sys-utils dir to fix problem.
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ sys-utils/Makemodule.am | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/sys-utils/Makemodule.am b/sys-utils/Makemodule.am
+index 6265282..62ead37 100644
+--- a/sys-utils/Makemodule.am
++++ b/sys-utils/Makemodule.am
+@@ -124,6 +124,7 @@ man_MANS += $(SETARCH_MAN_LINKS)
+ CLEANFILES += $(SETARCH_MAN_LINKS)
+ 
+ $(SETARCH_MAN_LINKS):
++	$(MKDIR_P) sys-utils
+ 	$(AM_V_GEN)echo ".so man8/setarch.8" > $@
+ 
+ install-exec-hook-setarch:
+-- 
+1.8.2.1
+

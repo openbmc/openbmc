@@ -1,0 +1,242 @@
+
+CONTRAT DE LICENCE DE LOGICIEL LIBRE CeCILL
+
+Avertissement
+
+Ce contrat est une licence de logiciel libre issue d&#8217;une concertation entre ses auteurs afin que le respect de deux grands principes pr&#233;side &#224; sa r&#233;daction:
+
+d&#8217;une part, sa conformit&#233; au droit fran&#231;ais, tant au regard du droit de la responsabilit&#233; civile que du droit de la propri&#233;t&#233; intellectuelle et de la protection qu&#8217;il offre aux auteurs et titulaires des droits patrimoniaux sur un logiciel.
+d&#8217;autre part, le respect des principes de diffusion des logiciels libres: acc&#232;s au code source, droits &#233;tendus conf&#233;r&#233;s aux utilisateurs.
+Les auteurs de la licence CeCILL1 sont:
+
+Commissariat &#224; l&#8217;Energie Atomique &#8211; CEA, &#233;tablissement public de caract&#232;re scientifique technique et industriel, dont le si&#232;ge est situ&#233; 31-33 rue de la F&#233;d&#233;ration, 75752 PARIS cedex 15.
+
+Centre National de la Recherche Scientifique &#8211; CNRS, &#233;tablissement public &#224; caract&#232;re scientifique et technologique, dont le si&#232;ge est situ&#233; 3 rue Michel-Ange 75794 Paris cedex 16.
+
+Institut National de Recherche en Informatique et en Automatique &#8211; INRIA, &#233;tablissement public &#224; caract&#232;re scientifique et technologique, dont le si&#232;ge est situ&#233; Domaine de Voluceau, Rocquencourt, BP 105, 78153 Le Chesnay cedex.
+
+PREAMBULE
+
+Ce contrat est une licence de logiciel libre dont l`objectif est de conf&#233;rer aux utilisateurs la libert&#233; de modification et de redistribution du logiciel r&#233;gi par cette licence dans le cadre d`un mod&#232;le de diffusion &#171;open source&#187;.
+
+L`exercice de ces libert&#233;s est assorti de certains devoirs &#224; la charge des utilisateurs afin de pr&#233;server ce statut au cours des redistributions ult&#233;rieures.
+
+L&#8217;accessibilit&#233; au code source et les droits de copie, de modification et de redistribution qui en d&#233;coulent ont pour contrepartie de n&#8217;offrir aux utilisateurs qu&#8217;une garantie limit&#233;e et de ne faire peser sur l&#8217;auteur du logiciel, le titulaire des droits patrimoniaux et les conc&#233;dants successifs qu&#8217;une responsabilit&#233; restreinte.
+
+A cet &#233;gard l&#8217;attention de l&#8217;utilisateur est attir&#233;e sur les risques associ&#233;s au chargement, &#224; l&#8217;utilisation, &#224; la modification et/ou au d&#233;veloppement et &#224; la reproduction du logiciel par l&#8217;utilisateur &#233;tant donn&#233; sa sp&#233;cificit&#233; de logiciel libre, qui peut le rendre complexe &#224; manipuler et qui le r&#233;serve donc &#224; des d&#233;veloppeurs et des professionnels avertis poss&#233;dant des connaissances informatiques approfondies. Les utilisateurs sont donc invit&#233;s &#224; charger et tester l&#8217;ad&#233;quation du Logiciel &#224; leurs besoins dans des conditions permettant d`assurer la s&#233;curit&#233; de leurs syst&#232;mes et ou de leurs donn&#233;es et, plus g&#233;n&#233;ralement, &#224; l`utiliser et l`exploiter dans les m&#234;me conditions de s&#233;curit&#233;. Ce contrat peut &#234;tre reproduit et diffus&#233; librement, sous r&#233;serve de le conserver en l&#8217;&#233;tat, sans ajout ni suppression de clauses.
+
+Ce contrat est susceptible de s&#8217;appliquer &#224; tout logiciel dont le titulaire des droits patrimoniaux d&#233;cide de soumettre l&#8217;exploitation aux dispositions qu&#8217;il contient.
+
+Article 1er - DEFINITIONS
+
+Dans ce contrat, les termes suivants, lorsqu&#8217;ils seront &#233;crits avec une lettre capitale, auront la signification suivante:
+
+Contrat: d&#233;signe le pr&#233;sent contrat de licence, ses &#233;ventuelles versions post&#233;rieures et annexes.
+
+Logiciel: d&#233;signe le logiciel sous sa forme de Code Objet et/ou de Code Source et le cas &#233;ch&#233;ant sa documentation, dans leur &#233;tat au moment de l&#8217;acceptation du Contrat par le Licenci&#233;.
+
+Logiciel Initial: d&#233;signe le Logiciel sous sa forme de Code Source et de Code Objet et le cas &#233;ch&#233;ant sa documentation, dans leur &#233;tat au moment de leur premi&#232;re diffusion sous les termes du Contrat.
+
+Logiciel Modifi&#233;: d&#233;signe le Logiciel modifi&#233; par au moins une Contribution.
+
+Code Source: d&#233;signe l&#8217;ensemble des instructions et des lignes de programme du Logiciel et auquel l&#8217;acc&#232;s est n&#233;cessaire en vue de modifier le Logiciel.
+
+Code Objet: d&#233;signe les fichiers binaires issus de la compilation du Code Source.
+
+Titulaire : d&#233;signe le d&#233;tenteur des droits patrimoniaux d&#8217;auteur sur le Logiciel Initial.
+
+Licenci&#233;(s): d&#233;signe le ou les utilisateur(s) du Logiciel ayant accept&#233; le Contrat.
+
+Contributeur: d&#233;signe le Licenci&#233; auteur d&#8217;au moins une Contribution.
+
+Conc&#233;dant: d&#233;signe le Titulaire ou toute personne physique ou morale distribuant le Logiciel sous le Contrat.
+
+Contributions: d&#233;signe l&#8217;ensemble des modifications, corrections, traductions, adaptations et/ou nouvelles fonctionnalit&#233;s int&#233;gr&#233;es dans le Logiciel par tout Contributeur, ainsi que les Modules Statiques.
+
+Module: d&#233;signe un ensemble de fichiers sources y compris leur documentation qui, une fois compil&#233; sous forme ex&#233;cutable, permet de r&#233;aliser des fonctionnalit&#233;s ou services suppl&#233;mentaires &#224; ceux fournis par le Logiciel.
+
+Module Dynamique: d&#233;signe tout Module, cr&#233;&#233; par le Contributeur, ind&#233;pendant du Logiciel, tel que ce Module et le Logiciel sont sous forme de deux ex&#233;cutables ind&#233;pendants qui s&#8217;ex&#233;cutent dans un espace d&#8217;adressage ind&#233;pendant, l&#8217;un appelant l&#8217;autre au moment de leur ex&#233;cution.
+
+Module Statique: d&#233;signe tout Module cr&#233;&#233; par le Contributeur et li&#233; au Logiciel par un lien statique rendant leur code objet d&#233;pendant l`un de l`autre. Ce Module et le Logiciel auquel il est li&#233;, sont regroup&#233;s en un seul ex&#233;cutable.
+
+Parties: d&#233;signe collectivement le Licenci&#233; et le Conc&#233;dant.
+
+Ces termes s&#8217;entendent au singulier comme au pluriel.
+
+Article 2 - OBJET
+
+Le Contrat a pour objet la concession par le Conc&#233;dant au Licenci&#233; d&#8217;une Licence non exclusive, transf&#233;rable et mondiale du Logiciel telle que d&#233;finie ci-apr&#232;s &#224; l`article 5 pour toute la dur&#233;e de protection des droits portant sur ce Logiciel.
+
+Article 3 - ACCEPTATION
+
+3.1. L&#8217;acceptation par le Licenci&#233; des termes du Contrat est r&#233;put&#233;e acquise du fait du premier des faits suivants:
+
+(i) le chargement du Logiciel par tout moyen notamment par t&#233;l&#233;chargement &#224; partir d&#8217;un serveur distant ou par chargement &#224; partir d&#8217;un support physique;
+(ii) le premier exercice par le Licenci&#233; de l&#8217;un quelconque des droits conc&#233;d&#233;s par le Contrat.
+3.2. Un exemplaire du Contrat, contenant notamment un avertissement relatif aux sp&#233;cificit&#233;s du Logiciel, &#224; la restriction de garantie et &#224; la limitation &#224; un usage par des utilisateurs exp&#233;riment&#233;s a &#233;t&#233; mis &#224; disposition du Licenci&#233; pr&#233;alablement &#224; son acceptation telle que d&#233;finie &#224; l`article 3.1 ci dessus et le Licenci&#233; reconna&#238;t en avoir pris connaissances.
+
+Article 4 - ENTREE EN VIGUEUR ET DUREE
+
+4.1.ENTREE EN VIGUEUR
+
+Le Contrat entre en vigueur &#224; la date de son acceptation par le Licenci&#233; telle que d&#233;finie en 3.1.
+
+4.2. DUREE
+
+Le Contrat produira ses effets pendant toute la dur&#233;e l&#233;gale de protection des droits patrimoniaux portant sur le Logiciel.
+
+Article 5 - ETENDUE DES DROITS CONCEDES
+
+Le Conc&#233;dant conc&#232;de au Licenci&#233;, qui accepte, les droits suivants sur le Logiciel pour toutes destinations et pour la dur&#233;e du Contrat dans les conditions ci-apr&#232;s d&#233;taill&#233;es.
+
+Par ailleurs, le Conc&#233;dant conc&#232;de au Licenci&#233; &#224; titre gracieux les droits d&#8217;exploitation du ou des brevets qu&#8217;il d&#233;tient sur tout ou partie des inventions impl&#233;ment&#233;es dans le Logiciel.
+
+5.1. DROITS D&#8217;UTILISATION
+
+Le Licenci&#233; est autoris&#233; &#224; utiliser le Logiciel, sans restriction quant aux domaines d&#8217;application, &#233;tant ci-apr&#232;s pr&#233;cis&#233; que cela comporte:
+
+la reproduction permanente ou provisoire du Logiciel en tout ou partie par tout moyen et sous toute forme.
+
+le chargement, l&#8217;affichage, l&#8217;ex&#233;cution, ou le stockage du Logiciel sur tout support.
+
+la possibilit&#233; d&#8217;en observer, d&#8217;en &#233;tudier, ou d&#8217;en tester le fonctionnement afin de d&#233;terminer les id&#233;es et principes qui sont &#224; la base de n&#8217;importe quel &#233;l&#233;ment de ce Logiciel; et ceci, lorsque le Licenci&#233; effectue toute op&#233;ration de chargement, d&#8217;affichage, d&#8217;ex&#233;cution, de transmission ou de stockage du Logiciel qu&#8217;il est en droit d&#8217;effectuer en vertu du Contrat.
+
+5.2. DROIT D&#8217;APPORTER DES CONTRIBUTIONS
+
+Le droit d&#8217;apporter des Contributions comporte le droit de traduire, d&#8217;adapter, d&#8217;arranger ou d&#8217;apporter toute autre modification du Logiciel et le droit de reproduire le Logiciel en r&#233;sultant.
+
+Le Licenci&#233; est autoris&#233; &#224; apporter toute Contribution au Logiciel sous r&#233;serve de mentionner, de fa&#231;on explicite, son nom en tant qu&#8217;auteur de cette Contribution et la date de cr&#233;ation de celle-ci.
+
+5.3. DROITS DE DISTRIBUTION ET DE DIFFUSION
+
+Le droit de distribution et de diffusion comporte notamment le droit de transmettre et de communiquer le Logiciel au public sur tout support et par tout moyen ainsi que le droit de mettre sur le march&#233; &#224; titre on&#233;reux ou gratuit, un ou des exemplaires du Logiciel par tout proc&#233;d&#233;.
+
+Le Licenci&#233; est autoris&#233; &#224; redistribuer des copies du Logiciel, modifi&#233; ou non, &#224; des tiers dans les conditions ci-apr&#232;s d&#233;taill&#233;es.
+
+5.3.1. REDISTRIBUTION DU LOGICIEL SANS MODIFICATION
+
+Le Licenci&#233; est autoris&#233; &#224; redistribuer des copies conformes du Logiciel, sous forme de Code Source ou de Code Objet, &#224; condition que cette redistribution respecte les dispositions du Contrat dans leur totalit&#233; et soit accompagn&#233;e:
+
+d&#8217;un exemplaire du Contrat,
+
+d&#8217;un avertissement relatif &#224; la restriction de garantie et de responsabilit&#233; du Conc&#233;dant telle que pr&#233;vue aux articles 8 et 9,
+
+et que, dans le cas o&#249; seul le Code Objet du Logiciel est redistribu&#233;, le Licenci&#233; permette aux futurs Licenci&#233;s d&#8217;acc&#233;der facilement au Code Source complet du Logiciel en indiquant les modalit&#233;s d&#8217;acc&#232;s, &#233;tant entendu que le co&#251;t additionnel d&#8217;acquisition du Code Source ne devra pas exc&#233;der le simple co&#251;t de transfert des donn&#233;es.
+
+5.3.2. REDISTRIBUTION DU LOGICIEL MODIFIE
+
+Lorsque le Licenci&#233; apporte une Contribution au Logiciel, les conditions de redistribution du Logiciel Modifi&#233; sont alors soumises &#224; l&#8217;int&#233;gralit&#233; des dispositions du Contrat.
+
+Le Licenci&#233; est autoris&#233; &#224; redistribuer le Logiciel Modifi&#233;, sous forme de Code Source ou de Code Objet, &#224; condition que cette redistribution respecte les dispositions du Contrat dans leur totalit&#233; et soit accompagn&#233;e:
+
+d&#8217;un exemplaire du Contrat,
+
+d&#8217;un avertissement relatif &#224; la restriction de garantie et de responsabilit&#233; du conc&#233;dant telle que pr&#233;vue aux articles 8 et 9,
+
+et que, dans le cas o&#249; seul le Code Objet du Logiciel Modifi&#233; est redistribu&#233;, le Licenci&#233; permette aux futurs Licenci&#233;s d&#8217;acc&#233;der facilement au Code Source complet du Logiciel Modifi&#233; en indiquant les modalit&#233;s d&#8217;acc&#232;s, &#233;tant entendu que le co&#251;t additionnel d&#8217;acquisition du Code Source ne devra pas exc&#233;der le simple co&#251;t de transfert des donn&#233;es.
+
+5.3.3. REDISTRIBUTION DES MODULES DYNAMIQUES
+
+Lorsque le Licenci&#233; a d&#233;velopp&#233; un Module Dynamique les conditions du Contrat ne s&#8217;appliquent pas &#224; ce Module Dynamique, qui peut &#234;tre distribu&#233; sous un contrat de licence diff&#233;rent.
+
+5.3.4. COMPATIBILITE AVEC LA LICENCE GPL
+
+Dans le cas o&#249; le Logiciel, Modifi&#233; ou non, est int&#233;gr&#233; &#224; un code soumis aux dispositions de la licence GPL, le Licenci&#233; est autoris&#233; &#224; redistribuer l&#8217;ensemble sous la licence GPL.
+
+Dans le cas o&#249; le Logiciel Modifi&#233; int&#232;gre un code soumis aux dispositions de la licence GPL, le Licenci&#233; est autoris&#233; &#224; redistribuer le Logiciel Modifi&#233; sous la licence GPL.
+
+Article 6 - PROPRIETE INTELLECTUELLE
+
+6.1. SUR LE LOGICIEL INITIAL
+
+Le Titulaire est d&#233;tenteur des droits patrimoniaux sur le Logiciel Initial. Toute utilisation du Logiciel Initial est soumise au respect des conditions dans lesquelles le Titulaire a choisi de diffuser son &#339;uvre et nul autre n&#8217;a la facult&#233; de modifier les conditions de diffusion de ce Logiciel Initial.
+
+Le Titulaire s`engage &#224; maintenir la diffusion du Logiciel initial sous les conditions du Contrat et ce, pour la dur&#233;e vis&#233;e &#224; l`article 4.2.
+
+6.2. SUR LES CONTRIBUTIONS
+
+Les droits de propri&#233;t&#233; intellectuelle sur les Contributions sont attach&#233;s au titulaire de droits patrimoniaux d&#233;sign&#233; par la l&#233;gislation applicable.
+
+6.3. SUR LES MODULES DYNAMIQUES
+
+Le Licenci&#233; ayant d&#233;velopp&#233; un Module Dynamique est titulaire des droits de propri&#233;t&#233; intellectuelle sur ce Module Dynamique et reste libre du choix du contrat r&#233;gissant sa diffusion.
+
+6.4. DISPOSITIONS COMMUNES
+
+6.4.1. Le Licenci&#233; s&#8217;engage express&#233;ment:
+
+&#224; ne pas supprimer ou modifier de quelque mani&#232;re que ce soit les mentions de propri&#233;t&#233; intellectuelle appos&#233;es sur le Logiciel;
+
+&#224; reproduire &#224; l&#8217;identique lesdites mentions de propri&#233;t&#233; intellectuelle sur les copies du Logiciel.
+
+6.4.2. Le Licenci&#233; s&#8217;engage &#224; ne pas porter atteinte, directement ou indirectement, aux droits de propri&#233;t&#233; intellectuelle du Titulaire et/ou des Contributeurs et &#224; prendre, le cas &#233;ch&#233;ant, &#224; l&#8217;&#233;gard de son personnel toutes les mesures n&#233;cessaires pour assurer le respect des dits droits de propri&#233;t&#233; intellectuelle du Titulaire et/ou des Contributeurs.
+
+Article 7 - SERVICES ASSOCIES
+
+7.1. Le Contrat n&#8217;oblige en aucun cas le Conc&#233;dant &#224; la r&#233;alisation de prestations d&#8217;assistance technique ou de maintenance du Logiciel.
+
+Cependant le Conc&#233;dant reste libre de proposer ce type de services. Les termes et conditions d&#8217;une telle assistance technique et/ou d&#8217;une telle maintenance seront alors d&#233;termin&#233;s dans un acte s&#233;par&#233;. Ces actes de maintenance et/ou assistance technique n&#8217;engageront que la seule responsabilit&#233; du Conc&#233;dant qui les propose.
+
+7.2. De m&#234;me, tout Conc&#233;dant est libre de proposer, sous sa seule responsabilit&#233;, &#224; ses licenci&#233;s une garantie, qui n&#8217;engagera que lui, lors de la redistribution du Logiciel et/ou du Logiciel Modifi&#233; et ce, dans les conditions qu&#8217;il souhaite. Cette garantie et les modalit&#233;s financi&#232;res de son application feront l&#8217;objet d&#8217;un acte s&#233;par&#233; entre le Conc&#233;dant et le Licenci&#233;.
+
+Article 8 - RESPONSABILITE
+
+8.1. Sous r&#233;serve des dispositions de l&#8217;article 8.2, si le Conc&#233;dant n&#8217;ex&#233;cute pas tout ou partie des obligations mises &#224; sa charge par le Contrat, le Licenci&#233; a la facult&#233;, sous r&#233;serve de prouver la faute du Conc&#233;dant concern&#233;, de solliciter la r&#233;paration du pr&#233;judice direct qu&#8217;il subit et dont il apportera la preuve.
+
+8.2. La responsabilit&#233; du Conc&#233;dant est limit&#233;e aux engagements pris en application du Contrat et ne saurait &#234;tre engag&#233;e en raison notamment:(i) des dommages dus &#224; l&#8217;inex&#233;cution, totale ou partielle, de ses obligations par le Licenci&#233;, (ii) des dommages directs ou indirects d&#233;coulant de l&#8217;utilisation ou des performances du Logiciel subis par le Licenci&#233; lorsqu&#8217;il s&#8217;agit d&#8217;un professionnel utilisant le Logiciel &#224; des fins professionnelles et (iii) des dommages indirects d&#233;coulant de l&#8217;utilisation ou des performances du Logiciel. Les Parties conviennent express&#233;ment que tout pr&#233;judice financier ou commercial (par exemple perte de donn&#233;es, perte de b&#233;n&#233;fices, perte d&#8217;exploitation, perte de client&#232;le ou de commandes, manque &#224; gagner, trouble commercial quelconque) ou toute action dirig&#233;e contre le Licenci&#233; par un tiers, constitue un dommage indirect et n&#8217;ouvre pas droit &#224; r&#233;paration par le Conc&#233;dant.
+
+Article 9 - GARANTIE
+
+9.1. Le Licenci&#233; reconna&#238;t que l&#8217;&#233;tat actuel des connaissances scientifiques et techniques au moment de la mise en circulation du Logiciel ne permet pas d&#8217;en tester et d&#8217;en v&#233;rifier toutes les utilisations ni de d&#233;tecter l&#8217;existence d&#8217;&#233;ventuels d&#233;fauts. L&#8217;attention du Licenci&#233; a &#233;t&#233; attir&#233;e sur ce point sur les risques associ&#233;s au chargement, &#224; l&#8217;utilisation, la modification et/ou au d&#233;veloppement et &#224; la reproduction du Logiciel qui sont r&#233;serv&#233;s &#224; des utilisateurs avertis.
+
+Il rel&#232;ve de la responsabilit&#233; du Licenci&#233; de contr&#244;ler, par tous moyens, l&#8217;ad&#233;quation du produit &#224; ses besoins, son bon fonctionnement et de s`assurer qu&#8217;il ne causera pas de dommages aux personnes et aux biens.
+
+9.2. Le Conc&#233;dant d&#233;clare de bonne foi &#234;tre en droit de conc&#233;der l`ensemble des droits attach&#233;s au Logiciel (comprenant notamment les droits vis&#233;s &#224; l`article 5).
+
+9.3. Le Licenci&#233; reconna&#238;t que le Logiciel est fourni &#171;en l`&#233;tat&#187; par le Conc&#233;dant sans autre garantie, expresse ou tacite, que celle pr&#233;vue &#224; l&#8217;article 9.2 et notamment sans aucune garantie sur sa valeur commerciale, son caract&#232;re s&#233;curis&#233;, innovant ou pertinent.
+
+En particulier, le Conc&#233;dant ne garantit pas que le Logiciel est exempt d`erreur, qu&#8217;il fonctionnera sans interruption, qu&#8217;il sera compatible avec l&#8217;&#233;quipement du Licenci&#233; et sa configuration logicielle ni qu&#8217;il remplira les besoins du Licenci&#233;.
+
+9.4. Le Conc&#233;dant ne garantit pas, de mani&#232;re expresse ou tacite, que le Logiciel ne porte pas atteinte &#224; un quelconque droit de propri&#233;t&#233; intellectuelle d&#8217;un tiers portant sur un brevet, un logiciel ou sur tout autre droit de propri&#233;t&#233;. Ainsi, le Conc&#233;dant exclut toute garantie au profit du Licenci&#233; contre les actions en contrefa&#231;on qui pourraient &#234;tre diligent&#233;es au titre de l&#8217;utilisation, de la modification, et de la redistribution du Logiciel. N&#233;anmoins, si de telles actions sont exerc&#233;es contre le Licenci&#233;, le Conc&#233;dant lui apportera son aide technique et juridique pour sa d&#233;fense. Cette aide technique et juridique est d&#233;termin&#233;e au cas par cas entre le Conc&#233;dant concern&#233; et le Licenci&#233; dans le cadre d&#8217;un protocole d&#8217;accord. Le Conc&#233;dant d&#233;gage toute responsabilit&#233; quant &#224; l&#8217;utilisation de la d&#233;nomination du Logiciel par le Licenci&#233;. Aucune garantie n&#8217;est apport&#233;e quant &#224; l&#8217;existence de droits ant&#233;rieurs sur le nom du Logiciel et sur l&#8217;existence d&#8217;une marque.
+
+Article 10 - RESILIATION
+
+10.1. En cas de manquement par le Licenci&#233; aux obligations mises &#224; sa charge par le Contrat, le Conc&#233;dant pourra r&#233;silier de plein droit le Contrat trente (30) jours apr&#232;s notification adress&#233;e au Licenci&#233; et rest&#233;e sans effet.
+
+10.2. Le Licenci&#233; dont le Contrat est r&#233;sili&#233; n&#8217;est plus autoris&#233; &#224; utiliser, modifier ou distribuer le Logiciel. Cependant, toutes les licences qu&#8217;il aura conc&#233;d&#233;es ant&#233;rieurement &#224; la r&#233;siliation du Contrat resteront valides sous r&#233;serve qu&#8217;elles aient &#233;t&#233; effectu&#233;es en conformit&#233; avec le Contrat.
+
+Article 11 - DISPOSITIONS DIVERSES
+
+11.1. CAUSE EXTERIEURE
+
+Aucune des Parties ne sera responsable d&#8217;un retard ou d&#8217;une d&#233;faillance d&#8217;ex&#233;cution du Contrat qui serait d&#251; &#224; un cas de force majeure, un cas fortuit ou une cause ext&#233;rieure, telle que, notamment, le mauvais fonctionnement ou les interruptions du r&#233;seau &#233;lectrique ou de t&#233;l&#233;communication, la paralysie du r&#233;seau li&#233;e &#224; une attaque informatique, l&#8217;intervention des autorit&#233;s gouvernementales, les catastrophes naturelles, les d&#233;g&#226;ts des eaux, les tremblements de terre, le feu, les explosions, les gr&#232;ves et les conflits sociaux, l&#8217;&#233;tat de guerre&#8230;
+
+11.2. Le fait, par l&#8217;une ou l&#8217;autre des Parties, d&#8217;omettre en une ou plusieurs occasions de se pr&#233;valoir d&#8217;une ou plusieurs dispositions du Contrat, ne pourra en aucun cas impliquer renonciation par la Partie int&#233;ress&#233;e &#224; s&#8217;en pr&#233;valoir ult&#233;rieurement.
+
+11.3. Le Contrat annule et remplace toute convention ant&#233;rieure, &#233;crite ou orale, entre les Parties sur le m&#234;me objet et constitue l&#8217;accord entier entre les Parties sur cet objet. Aucune addition ou modification aux termes du Contrat n&#8217;aura d&#8217;effet &#224; l&#8217;&#233;gard des Parties &#224; moins d&#8217;&#234;tre faite par &#233;crit et sign&#233;e par leurs repr&#233;sentants d&#251;ment habilit&#233;s.
+
+11.4. Dans l&#8217;hypoth&#232;se o&#249; une ou plusieurs des dispositions du Contrat s&#8217;av&#232;rerait contraire &#224; une loi ou &#224; un texte applicable, existants ou futurs, cette loi ou ce texte pr&#233;vaudrait, et les Parties feraient les amendements n&#233;cessaires pour se conformer &#224; cette loi ou &#224; ce texte. Toutes les autres dispositions resteront en vigueur. De m&#234;me, la nullit&#233;, pour quelque raison que ce soit, d&#8217;une des dispositions du Contrat ne saurait entra&#238;ner la nullit&#233; de l&#8217;ensemble du Contrat.
+
+11.5. LANGUE
+
+Le Contrat est r&#233;dig&#233; en langue fran&#231;aise et en langue anglaise. En cas de divergence d&#8217;interpr&#233;tation, seule la version fran&#231;aise fait foi.
+
+Article 12 - NOUVELLES VERSIONS DU CONTRAT
+
+12.1. Toute personne est autoris&#233;e &#224; copier et distribuer des copies de ce Contrat.
+
+12.2. Afin d&#8217;en pr&#233;server la coh&#233;rence, le texte du Contrat est prot&#233;g&#233; et ne peut &#234;tre modifi&#233; que par les auteurs de la licence, lesquels se r&#233;servent le droit de publier p&#233;riodiquement des mises &#224; jour ou de nouvelles versions du Contrat, qui poss&#232;deront chacune un num&#233;ro distinct. Ces versions ult&#233;rieures seront susceptibles de prendre en compte de nouvelles probl&#233;matiques rencontr&#233;es par les logiciels libres.
+
+12.3. Tout Logiciel diffus&#233; sous une version donn&#233;e du Contrat ne pourra faire l`objet d`une diffusion ult&#233;rieure que sous la m&#234;me version du Contrat ou une version post&#233;rieure, sous r&#233;serve des dispositions de l`article 5.3.4.
+
+Article 13 - LOI APPLICABLE ET COMPETENCE TERRITORIALE
+
+13.1. Le Contrat est r&#233;gi par la loi fran&#231;aise. Les Parties conviennent de tenter de r&#233;gler &#224; l&#8217;amiable les diff&#233;rends ou litiges qui viendraient &#224; se produire par suite ou &#224; l&#8217;occasion du Contrat.
+
+13.2. A d&#233;faut d&#8217;accord amiable dans un d&#233;lai de deux (2) mois &#224; compter de leur survenance et sauf situation relevant d&#8217;une proc&#233;dure d&#8217;urgence, les diff&#233;rends ou litiges seront port&#233;s par la Partie la plus diligente devant les Tribunaux comp&#233;tents de Paris.
+
+1 Ce: CEA, C: CNRS, I: INRIA, LL: Logiciel Libre
+
+
+Version 1 du 21/06/2004
+

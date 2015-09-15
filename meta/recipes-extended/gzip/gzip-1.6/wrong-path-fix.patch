@@ -1,0 +1,31 @@
+fix MakeMaker issues with using wrong SHELL/GREP
+
+A set of substitution is being processed to all target scripts with sed by
+replacing some key words with the detected values at configure time, this
+is exactly not compliant with cross compling, and will cause missing path
+errors at run time like:
+"/usr/bin/zgrep: line 230: /usr/bin/grep: No such file or directory"
+
+Fixed by removing unneeded substitution and using real runtime paths
+instead.
+
+Signed-off-by: Ming Liu <ming.liu@windriver.com>
+
+Upstream-Status: Pending
+
+Index: gzip-1.3.12/Makefile.am
+===================================================================
+diff -urpN a/Makefile.am b/Makefile.am
+--- a/Makefile.am	2013-11-30 10:06:09.402234871 +0800
++++ b/Makefile.am	2013-11-30 10:13:42.952236025 +0800
+@@ -81,9 +81,8 @@ gzip.doc.gz: gzip.doc $(bin_PROGRAMS)
+ SUFFIXES = .in
+ .in:
+ 	$(AM_V_GEN)sed \
+-		-e 's|/bin/sh|$(SHELL)|g' \
+ 		-e 's|[@]bindir@|'\''$(bindir)'\''|g' \
+-		-e 's|[@]GREP@|$(GREP)|g' \
++		-e 's|[@]GREP@|$(base_bindir)/grep|g' \
+ 		-e 's|[@]VERSION@|$(VERSION)|g' \
+ 		$(srcdir)/$@.in >$@-t \
+ 	  && chmod a+x $@-t \

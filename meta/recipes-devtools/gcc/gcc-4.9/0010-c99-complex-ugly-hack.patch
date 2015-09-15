@@ -1,0 +1,29 @@
+From 73f69d806e2c9561a54995223431a1076cfd6164 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 29 Mar 2013 08:49:57 +0400
+Subject: [PATCH 10/35] c99-complex-ugly-hack
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Inappropriate [embedded specific]
+---
+ libstdc++-v3/configure |    3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/libstdc++-v3/configure b/libstdc++-v3/configure
+index c57a751..a1333e2 100755
+--- a/libstdc++-v3/configure
++++ b/libstdc++-v3/configure
+@@ -18734,6 +18734,9 @@ $as_echo_n "checking for ISO C99 support to TR1 in <complex.h>... " >&6; }
+     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+ #include <complex.h>
++#ifdef __UCLIBC__
++#error ugly hack to make sure configure test fails here for cross until uClibc supports the complex funcs
++#endif
+ int
+ main ()
+ {
+-- 
+1.7.10.4
+

@@ -1,0 +1,20 @@
+Do not use absolute path for awk while getting the path of awk
+when running makewhatis.
+This can avoid errors if path of awk changes.
+
+Upstream-Status: Submitted [man-1.6g]
+
+Signed-off-by: Jian Liu <jian.liu@windriver.com>
+
+diff -Nur man-1.6g.orig/src/makewhatis.sh man-1.6g/src/makewhatis.sh
+--- man-1.6g.orig/src/makewhatis.sh	2015-02-25 16:13:12.657611419 +0800
++++ man-1.6g/src/makewhatis.sh	2015-02-25 16:14:49.334694815 +0800
+@@ -67,7 +67,7 @@
+ # but that leads to problems and bugs.
+
+ # AWK=/usr/bin/gawk
+-AWK=@awk@
++AWK=`which awk`
+
+ # Find a place for our temporary files. If security is not a concern, use
+ #	TMPFILE=/tmp/whatis$$; TMPFILEDIR=none

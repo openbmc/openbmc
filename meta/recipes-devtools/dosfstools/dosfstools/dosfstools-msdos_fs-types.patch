@@ -1,0 +1,37 @@
+Ensure the __s8 type is properly defined.
+
+Upstream-Status: Inappropriate [licensing]
+We're tracking an old release of dosfstools due to licensing issues.
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+--- dosfstools-2.10/dosfsck/dosfsck.h.org	2006-02-21 08:36:14.000000000 -0700
++++ dosfstools-2.10/dosfsck/dosfsck.h	2006-02-21 08:40:12.000000000 -0700
+@@ -22,6 +22,14 @@
+        #undef __KERNEL__
+ #endif
+ 
++#ifndef __s8
++#include <asm/types.h>
++#endif
++
++#ifndef __ASM_STUB_BYTEORDER_H__
++#include <asm/byteorder.h>
++#endif
++
+ #include <linux/msdos_fs.h>
+ 
+ /* 2.1 kernels use le16_to_cpu() type functions for CF_LE_W & Co., but don't
+--- dosfstools-2.10/dosfsck/file.c.org	2006-02-21 08:37:36.000000000 -0700
++++ dosfstools-2.10/dosfsck/file.c	2006-02-21 08:37:47.000000000 -0700
+@@ -23,6 +23,10 @@
+        #undef __KERNEL__
+ #endif
+ 
++#ifndef __s8
++#include <asm/types.h>
++#endif
++
+ #include <linux/msdos_fs.h>
+ 
+ #include "common.h"

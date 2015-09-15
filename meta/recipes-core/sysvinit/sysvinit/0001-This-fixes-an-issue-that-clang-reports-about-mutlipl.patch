@@ -1,0 +1,52 @@
+From 36ac97bfe51797458442a6035219a504a42e703a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 21 Aug 2015 10:56:40 -0700
+Subject: [PATCH] This fixes an issue that clang reports about mutliple output
+ files
+
+Issue is that we are passing .h file to link step as seen below.
+
+| arm-oe-linux-gnueabi-clang  -march=armv7-a -mthumb  -mfloat-abi=hard
+-mfpu=neon-vfpv4 -mtune=cortex-a7 -D__extern_always_inline=inline
+-no-integrated-as
+--sysroot=/mnt/home/kraj/work/angstrom/sources/openembedded-core/build/tmp-glibc/sysroots/raspberrypi2
+-Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed  halt.o ifdown.o hddown.o
+utmp.o reboot.h   -o halt
+| clang-3.7: error: cannot specify -o when generating multiple output
+files
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/Makefile | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index e77ed5f..a6f9f40 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -103,9 +103,9 @@ all:		$(BIN) $(SBIN) $(USRBIN)
+ init:		LDLIBS += $(INITLIBS) $(STATIC)
+ init:		init.o init_utmp.o
+ 
+-halt:		halt.o ifdown.o hddown.o utmp.o reboot.h
++halt:		halt.o ifdown.o hddown.o utmp.o
+ 
+-last:		last.o oldutmp.h
++last:		last.o
+ 
+ mesg:		mesg.o
+ 
+@@ -120,7 +120,7 @@ sulogin:	sulogin.o
+ 
+ wall:		dowall.o wall.o
+ 
+-shutdown:	dowall.o shutdown.o utmp.o reboot.h
++shutdown:	dowall.o shutdown.o utmp.o
+ 
+ bootlogd:	LDLIBS += -lutil
+ bootlogd:	bootlogd.o
+-- 
+2.1.4
+

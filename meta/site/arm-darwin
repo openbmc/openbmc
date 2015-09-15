@@ -1,0 +1,11 @@
+ac_cv_lib_m_sin=${ac_cv_lib_m_sin=yes}
+ac_cv_func_posix_spawn=${ac_cv_func_posix_spawn=no}
+glib_cv_stack_grows=${glib_cv_stack_grows=no}
+glib_cv_uscore=${glib_cv_uscore=no}
+ac_cv_func_posix_getpwnam_r=${ac_cv_func_posix_getpwnam_r=no}
+ac_cv_func_posix_getpwuid_r=${ac_cv_func_posix_getpwuid_r=no}
+ac_cv_func_posix_getgrgid_r=${ac_cv_func_posix_getgrgid_r=no}
+ac_cv_have_abstract_sockets=${ac_cv_have_abstract_sockets=no}
+bash_cv_have_mbstate_t=${bash_cv_have_mbstate_t=yes}
+ac_cv_func_strerror_r=${ac_cv_func_strerror_r=no}
+ac_cv_va_copy=${ac_cv_va_copy=yes}

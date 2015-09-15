@@ -1,0 +1,147 @@
+#!/usr/bin/env python
+# ex:ts=4:sw=4:sts=4:et
+# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
+#
+# Copyright (c) 2012, Intel Corporation.
+# All rights reserved.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#
+# DESCRIPTION
+# 'yocto-layer' is the Yocto Tool that helps users create a new Yocto
+# layer.  Invoking it without any arguments will display help screens
+# for the 'yocto-layer' command and list the available 'yocto-layer'
+# subcommands.  Invoking a subcommand without any arguments will
+# likewise display help screens for the specified subcommand.  Please
+# use that interface for detailed help.
+#
+# AUTHORS
+# Tom Zanussi <tom.zanussi (at] intel.com>
+#
+
+__version__ = "0.1.0"
+
+import os
+import sys
+import optparse
+import logging
+
+scripts_path = os.path.abspath(os.path.dirname(os.path.abspath(sys.argv[0])))
+lib_path = scripts_path + '/lib'
+sys.path = sys.path + [lib_path]
+
+from bsp.help import *
+from bsp.engine import *
+
+
+def yocto_layer_create_subcommand(args, usage_str):
+    """
+    Command-line handling for layer creation.  The real work is done by
+    bsp.engine.yocto_layer_create()
+    """
+    parser = optparse.OptionParser(usage = usage_str)
+
+    parser.add_option("-o", "--outdir", dest = "outdir", action = "store",
+                      help = "name of layer dir to create")
+    parser.add_option("-i", "--infile", dest = "properties_file", action = "store",
+                      help = "name of file containing the values for layer input properties as a JSON file")
+    parser.add_option("-c", "--codedump", dest = "codedump", action = "store_true",
+                      default = False, help = "dump the generated code to layergen.out")
+    (options, args) = parser.parse_args(args)
+
+    if len(args) < 1 or len(args) > 2:
+        logging.error("Wrong number of arguments, exiting\n")
+        parser.print_help()
+        sys.exit(1)
+
+    layer_name = args[0]
+    properties = ""
+
+    if len(args) == 2:
+        layer_priority = args[1]
+        properties = '{"layer_priority":"' + layer_priority + '"}'
+
+    if options.outdir:
+        layer_output_dir = options.outdir
+    else:
+        layer_output_dir = "meta-" + layer_name
+
+    yocto_layer_create(layer_name, scripts_path, layer_output_dir, options.codedump, options.properties_file, properties)
+
+
+def yocto_layer_list_subcommand(args, usage_str):
+    """
+    Command-line handling for listing available layer properties and
+    values.  The real work is done by bsp.engine.yocto_layer_list()
+    """
+    parser = optparse.OptionParser(usage = usage_str)
+
+    parser.add_option("-o", "--outfile", action = "store", dest = "properties_file",
+                      help = "dump the possible values for layer properties to a JSON file")
+
+    (options, args) = parser.parse_args(args)
+
+    if not yocto_layer_list(args, scripts_path, options.properties_file):
+        logging.error("Bad list arguments, exiting\n")
+        parser.print_help()
+        sys.exit(1)
+
+
+subcommands = {
+    "create": [yocto_layer_create_subcommand,
+               yocto_layer_create_usage,
+               yocto_layer_create_help],
+    "list":   [yocto_layer_list_subcommand,
+               yocto_layer_list_usage,
+               yocto_layer_list_help],
+}
+
+
+def start_logging(loglevel):
+    logging.basicConfig(filname = 'yocto-layer.log', filemode = 'w', level=loglevel)
+
+
+def main():
+    parser = optparse.OptionParser(version = "yocto-layer version %s" % __version__,
+                                   usage = yocto_layer_usage)
+
+    parser.disable_interspersed_args()
+    parser.add_option("-D", "--debug", dest = "debug", action = "store_true",
+                      default = False, help = "output debug information")
+
+    (options, args) = parser.parse_args()
+
+    loglevel = logging.INFO
+    if options.debug:
+        loglevel = logging.DEBUG
+    start_logging(loglevel)
+
+    if len(args):
+        if args[0] == "help":
+            if len(args) == 1:
+                parser.print_help()
+                sys.exit(1)
+
+    invoke_subcommand(args, parser, yocto_layer_help_usage, subcommands)
+
+
+if __name__ == "__main__":
+    try:
+        ret = main()
+    except Exception:
+        ret = 1
+        import traceback
+        traceback.print_exc(5)
+    sys.exit(ret)
+

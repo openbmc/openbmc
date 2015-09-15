@@ -1,0 +1,82 @@
+Upstream-Status: Inappropriate [disable feature]
+
+---
+ xev.c |   16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+Index: xev-1.2.0/xev.c
+===================================================================
+--- xev-1.2.0.orig/xev.c
++++ xev-1.2.0/xev.c
+@@ -116,7 +116,7 @@ do_KeyPress (XEvent *eventp)
+     nbytes = XLookupString (e, str, 256, &ks, NULL);
+ 
+     /* not supposed to call XmbLookupString on a key release event */
+-    if (e->type == KeyPress && xic) {
++    /*if (e->type == KeyPress && xic) {
+         do {
+             nmbbytes = XmbLookupString (xic, e, buf, bsize - 1, &ks, &status);
+             buf[nmbbytes] = '\0';
+@@ -126,7 +126,7 @@ do_KeyPress (XEvent *eventp)
+                 buf = realloc (buf, bsize);
+             }
+         } while (status == XBufferOverflow);
+-    }
++    }*/
+ 
+     if (ks == NoSymbol)
+ 	ksname = "NoSymbol";
+@@ -156,7 +156,7 @@ do_KeyPress (XEvent *eventp)
+     }
+ 
+     /* not supposed to call XmbLookupString on a key release event */
+-    if (e->type == KeyPress && xic) {
++    /*if (e->type == KeyPress && xic) {
+         printf ("    XmbLookupString gives %d bytes: ", nmbbytes);
+         if (nmbbytes > 0) {
+            dump (buf, nmbbytes);
+@@ -164,7 +164,7 @@ do_KeyPress (XEvent *eventp)
+         } else {
+     	   printf ("\n");
+         }
+-    }
++    } */
+ 
+     printf ("    XFilterEvent returns: %s\n",
+ 	    XFilterEvent (eventp, e->window) ? "True" : "False");
+@@ -1015,7 +1015,7 @@ main (int argc, char **argv)
+         fprintf (stderr, "%s:  XSetLocaleModifiers failed\n", ProgramName);
+     }
+ 
+-    xim = XOpenIM (dpy, NULL, NULL, NULL);
++    /*xim = XOpenIM (dpy, NULL, NULL, NULL);
+     if (xim == NULL) {
+         fprintf (stderr, "%s:  XOpenIM failed\n", ProgramName);
+     }
+@@ -1042,7 +1042,7 @@ main (int argc, char **argv)
+             }
+             XFree (xim_styles);
+         }
+-    }
++	}*/
+ 
+     screen = DefaultScreen (dpy);
+ 
+@@ -1109,7 +1109,7 @@ main (int argc, char **argv)
+ 	printf ("Outer window is 0x%lx, inner window is 0x%lx\n", w, subw);
+     }
+ 
+-    if (xim && xim_style) {
++    /*if (xim && xim_style) {
+         xic = XCreateIC (xim,
+                          XNInputStyle, xim_style,
+                          XNClientWindow, w,
+@@ -1119,7 +1119,7 @@ main (int argc, char **argv)
+         if (xic == NULL) {
+             fprintf (stderr, "XCreateIC failed\n");
+         }
+-    }
++    }*/
+ 
+     have_rr = XRRQueryExtension (dpy, &rr_event_base, &rr_error_base);
+     if (have_rr) {

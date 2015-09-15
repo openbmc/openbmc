@@ -1,0 +1,67 @@
+From a97777889328157bb7d06ec618bad16712a9c345 Mon Sep 17 00:00:00 2001
+From: Denys Vlasenko <vda.linux@googlemail.com>
+Date: Tue, 3 Feb 2015 12:11:30 +0100
+Subject: [PATCH] ifconfig: fix double free fatal error in INET_sprint
+
+Derived from:
+http://git.busybox.net/busybox/commit/?id=a97777889328157bb7d06ec618bad16712a9c345.
+
+While INET_sprint or INET6_sprint is called circularly by keeping
+ifconfiging, sap->sa_family would be cleaned by other parallel processes
+such as dhclient sometimes, and then there would be a double free error
+like the following:
+
+  *** glibc detected *** ifconfig: double free or corruption (fasttop): 0x000a6008 ***
+  ======= Backtrace: =========
+  /lib/libc.so.6(+0x6bc84)[0x40133c84]
+  /lib/libc.so.6(cfree+0x94)[0x40138684]
+  ifconfig[0x1c460]
+  ifconfig[0x1c6a0]
+  ifconfig[0x1ccf4]
+  ifconfig[0x187c8]
+  ifconfig[0xd544]
+  ifconfig[0xd5dc]
+  ifconfig[0xdca8]
+  /lib/libc.so.6(__libc_start_main+0x110)[0x400df258]
+  ======= Memory map: ========
+  00008000-0009c000 r-xp 00000000 1f:05 444328     /bin/busybox
+  000a3000-000a4000 rw-p 00093000 1f:05 444328     /bin/busybox
+
+This patch moved free() two lines down to address this problem.
+
+Upstream-Status: Backport
+
+Signed-off-by: Denys Vlasenko <vda.linux@googlemail.com>
+---
+ networking/interface.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/networking/interface.c b/networking/interface.c
+index bf7d2b1..b0572d0 100644
+--- a/networking/interface.c
++++ b/networking/interface.c
+@@ -91,9 +91,9 @@ static const char* FAST_FUNC INET_sprint(struct sockaddr *sap, int numeric)
+ {
+ 	static char *buff; /* defaults to NULL */
+ 
+-	free(buff);
+ 	if (sap->sa_family == 0xFFFF || sap->sa_family == 0)
+ 		return "[NONE SET]";
++	free(buff);
+ 	buff = INET_rresolve((struct sockaddr_in *) sap, numeric, 0xffffff00);
+ 	return buff;
+ }
+@@ -173,9 +173,9 @@ static const char* FAST_FUNC INET6_sprint(struct sockaddr *sap, int numeric)
+ {
+ 	static char *buff;
+ 
+-	free(buff);
+ 	if (sap->sa_family == 0xFFFF || sap->sa_family == 0)
+ 		return "[NONE SET]";
++	free(buff);
+ 	buff = INET6_rresolve((struct sockaddr_in6 *) sap, numeric);
+ 	return buff;
+ }
+-- 
+1.8.3.4
+

@@ -1,0 +1,41 @@
+childinfo_t is a union that contains both signed (error) and unsigned
+(threadid) members. Thus a large threadid could appear as a negative error
+value, which will cause unexpected failures.
+
+childinfo_t should be changed to a struct, but it could potentially affect the
+performance. So we keep it as a union but only check error against -1. There is
+still a chance of false alarm but it's small.
+
+Upstream-Status: Pending
+
+Signed-off-by: Song.Li <Song.Li@windriver.com>
+Signed-off-by: Jesse Zhang <sen.zhang@windriver.com>
+---
+ src/hackbench/hackbench.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/hackbench/hackbench.c b/src/hackbench/hackbench.c
+index 8baeb23..dc0de8f 100644
+--- a/src/hackbench/hackbench.c
++++ b/src/hackbench/hackbench.c
+@@ -317,7 +317,7 @@ static unsigned int group(childinfo_t *child,
+ 		ctx->wakefd = wakefd;
+ 
+ 		child[tab_offset+i] = create_worker(ctx, (void *)(void *)receiver);
+-		if( child[tab_offset+i].error < 0 ) {
++		if( child[tab_offset+i].error == -1 ) {
+ 			return (i > 0 ? i-1 : 0);
+ 		}
+ 		snd_ctx->out_fds[i] = fds[1];
+@@ -332,7 +332,7 @@ static unsigned int group(childinfo_t *child,
+ 		snd_ctx->num_fds = num_fds;
+ 
+ 		child[tab_offset+num_fds+i] = create_worker(snd_ctx, (void *)(void *)sender);
+-		if( child[tab_offset+num_fds+i].error < 0 ) {
++		if( child[tab_offset+num_fds+i].error == -1 ) {
+ 			return (num_fds+i)-1;
+ 		}
+ 	}
+-- 
+1.7.9.5
+

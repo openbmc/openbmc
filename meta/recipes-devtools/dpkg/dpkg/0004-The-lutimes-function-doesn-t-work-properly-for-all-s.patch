@@ -1,0 +1,31 @@
+From adb6bfd0feeceaf030df0debe3343d7f73e708a0 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 26 Aug 2015 16:27:45 +0300
+Subject: [PATCH 4/5] The lutimes function doesn't work properly for all
+ systems.
+
+Signed-off-by: Constantin Musca <constantinx.musca@intel.com>
+
+Upstream-Status: Inappropriate [embedded specific]
+---
+ src/archives.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/archives.c b/src/archives.c
+index bff5f14..b711013 100644
+--- a/src/archives.c
++++ b/src/archives.c
+@@ -449,8 +449,9 @@ tarobject_set_mtime(struct tar_entry *te, const char *path)
+ 
+   if (te->type == TAR_FILETYPE_SYMLINK) {
+ #ifdef HAVE_LUTIMES
+-    if (lutimes(path, tv) && errno != ENOSYS)
++/*    if (lutimes(path, tv) && errno != ENOSYS)
+       ohshite(_("error setting timestamps of '%.255s'"), path);
++*/
+ #endif
+   } else {
+     if (utimes(path, tv))
+-- 
+2.1.4
+

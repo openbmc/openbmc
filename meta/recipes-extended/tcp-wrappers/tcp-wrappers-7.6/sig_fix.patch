@@ -1,0 +1,36 @@
+Upstream-Status: Backport
+
+* Mon Feb 10 2003 Harald Hoyer <harald@redhat.de> 7.6-29
+- added security patch tcp_wrappers-7.6-sig.patch
+
+--- tcp_wrappers_7.6/hosts_access.c.sig	2003-02-10 16:18:31.000000000 +0100
++++ tcp_wrappers_7.6/hosts_access.c	2003-02-10 16:50:38.000000000 +0100
+@@ -66,6 +66,7 @@
+ 
+ #define	YES		1
+ #define	NO		0
++#define ERR             -1
+ 
+  /*
+   * These variables are globally visible so that they can be redirected in
+@@ -129,9 +129,9 @@
+ 	return (verdict == AC_PERMIT);
+     if (table_match(hosts_allow_table, request))
+ 	return (YES);
+-    if (table_match(hosts_deny_table, request))
+-	return (NO);
+-    return (YES);
++    if (table_match(hosts_deny_table, request) == NO)
++	return (YES);
++    return (NO);
+ }
+ 
+ /* table_match - match table entries with (daemon, client) pair */
+@@ -175,6 +175,7 @@
+ 	(void) fclose(fp);
+     } else if (errno != ENOENT) {
+ 	tcpd_warn("cannot open %s: %m", table);
++	match = ERR;
+     }
+     if (match) {
+ 	if (hosts_access_verbose > 1)

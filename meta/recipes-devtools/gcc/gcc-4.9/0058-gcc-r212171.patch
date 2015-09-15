@@ -1,0 +1,113 @@
+From ca03cf1b133d66eb978c68f6dbc345e9aabcba88 Mon Sep 17 00:00:00 2001
+From: uros <uros@138bc75d-0d04-0410-961f-82ee72b054a4>
+Date: Mon, 30 Jun 2014 19:30:52 +0000
+Subject: [PATCH] r212171
+
+* except.c (emit_note_eh_region_end): New helper
+ function. 	(convert_to_eh_region_ranges): Use
+ emit_note_eh_region_end to 	emit EH_REGION_END note. 
+ * jump.c (cleanup_barriers): Do not split a call and its 
+ corresponding CALL_ARG_LOCATION note.
+
+git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/trunk@212171 138bc75d-0d04-0410-961f-82ee72b054a4
+
+Upstream-Status: Backport [https://gcc.gnu.org/viewcvs/gcc?view=revision&revision=212171]
+Signed-off-by: Baoshan Pang <baoshan.pang@windriver.com>
+---
+ gcc/except.c |   23 ++++++++++++++++++-----
+ gcc/jump.c   |   19 +++++++++++++++----
+ 2 files changed, 33 insertions(+), 9 deletions(-)
+
+diff --git a/gcc/except.c b/gcc/except.c
+index dc5c1d2..7ac114f 100644
+--- a/gcc/except.c
++++ b/gcc/except.c
+@@ -2466,6 +2466,20 @@ add_call_site (rtx landing_pad, int action, int section)
+   return call_site_base + crtl->eh.call_site_record_v[section]->length () - 1;
+ }
+ 
++static rtx
++emit_note_eh_region_end (rtx insn)
++{
++  rtx next = NEXT_INSN (insn);
++
++  /* Make sure we do not split a call and its corresponding
++     CALL_ARG_LOCATION note.  */
++  if (next && NOTE_P (next)
++      && NOTE_KIND (next) == NOTE_INSN_CALL_ARG_LOCATION)
++    insn = next;
++
++  return emit_note_after (NOTE_INSN_EH_REGION_END, insn);
++}
++
+ /* Turn REG_EH_REGION notes back into NOTE_INSN_EH_REGION notes.
+    The new note numbers will not refer to region numbers, but
+    instead to call site entries.  */
+@@ -2544,8 +2558,8 @@ convert_to_eh_region_ranges (void)
+ 		note = emit_note_before (NOTE_INSN_EH_REGION_BEG,
+ 					 first_no_action_insn_before_switch);
+ 		NOTE_EH_HANDLER (note) = call_site;
+-		note = emit_note_after (NOTE_INSN_EH_REGION_END,
+-					last_no_action_insn_before_switch);
++		note
++		  = emit_note_eh_region_end (last_no_action_insn_before_switch);
+ 		NOTE_EH_HANDLER (note) = call_site;
+ 		gcc_assert (last_action != -3
+ 			    || (last_action_insn
+@@ -2569,8 +2583,7 @@ convert_to_eh_region_ranges (void)
+ 		    first_no_action_insn = NULL_RTX;
+ 		  }
+ 
+-		note = emit_note_after (NOTE_INSN_EH_REGION_END,
+-					last_action_insn);
++		note = emit_note_eh_region_end (last_action_insn);
+ 		NOTE_EH_HANDLER (note) = call_site;
+ 	      }
+ 
+@@ -2617,7 +2630,7 @@ convert_to_eh_region_ranges (void)
+ 
+   if (last_action >= -1 && ! first_no_action_insn)
+     {
+-      note = emit_note_after (NOTE_INSN_EH_REGION_END, last_action_insn);
++      note = emit_note_eh_region_end (last_action_insn);
+       NOTE_EH_HANDLER (note) = call_site;
+     }
+ 
+diff --git a/gcc/jump.c b/gcc/jump.c
+index 9418f65..a5e5f52 100644
+--- a/gcc/jump.c
++++ b/gcc/jump.c
+@@ -121,15 +121,26 @@ rebuild_jump_labels_chain (rtx chain)
+ static unsigned int
+ cleanup_barriers (void)
+ {
+-  rtx insn, next, prev;
+-  for (insn = get_insns (); insn; insn = next)
++  rtx insn;
++  for (insn = get_insns (); insn; insn = NEXT_INSN (insn))
+     {
+-      next = NEXT_INSN (insn);
+       if (BARRIER_P (insn))
+ 	{
+-	  prev = prev_nonnote_insn (insn);
++	  rtx prev = prev_nonnote_insn (insn);
+ 	  if (!prev)
+ 	    continue;
++
++	  if (CALL_P (prev))
++	    {
++	      /* Make sure we do not split a call and its corresponding
++		 CALL_ARG_LOCATION note.  */
++	      rtx next = NEXT_INSN (prev);
++
++	      if (NOTE_P (next)
++		  && NOTE_KIND (next) == NOTE_INSN_CALL_ARG_LOCATION)
++		prev = next;
++	    }
++
+ 	  if (BARRIER_P (prev))
+ 	    delete_insn (insn);
+ 	  else if (prev != PREV_INSN (insn))
+-- 
+1.7.9.5
+

@@ -1,0 +1,711 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
+[<!ENTITY % poky SYSTEM "../poky.ent"> %poky; ] >
+
+<chapter id='ref-tasks'>
+<title>Tasks</title>
+
+<para>
+    Tasks are units of execution for BitBake.
+    Recipes (<filename>.bb</filename> files) use tasks to complete
+    configuring, compiling, and packaging software.
+    This chapter provides a reference of the tasks defined in the
+    OpenEmbedded build system.
+</para>
+
+<section id='normal-recipe-build-tasks'>
+    <title>Normal Recipe Build Tasks</title>
+
+    <para>
+        The following sections describe normal tasks associated with building
+        a recipe.
+    </para>
+
+    <section id='ref-tasks-build'>
+        <title><filename>do_build</filename></title>
+
+        <para>
+            The default task for all recipes.
+            This task depends on all other normal tasks
+            required to build a recipe.
+        </para>
+    </section>
+
+    <section id='ref-tasks-compile'>
+        <title><filename>do_compile</filename></title>
+
+        <para>
+            Compiles the source in the compilation directory, which is pointed
+            to by the
+            <link linkend='var-B'><filename>B</filename></link> variable.
+        </para>
+    </section>
+
+    <section id='ref-tasks-compile_ptest_base'>
+        <title><filename>do_compile_ptest_base</filename></title>
+
+        <para>
+            Compiles the runtime test suite included in the software being
+            built.
+        </para>
+    </section>
+
+    <section id='ref-tasks-configure'>
+        <title><filename>do_configure</filename></title>
+
+        <para>
+            Configures the source by enabling and disabling any build-time and
+            configuration options for the software being built.
+        </para>
+    </section>
+
+    <section id='ref-tasks-configure_ptest_base'>
+        <title><filename>do_configure_ptest_base</filename></title>
+
+        <para>
+            Configures the runtime test suite included in the software being
+            built.
+        </para>
+    </section>
+
+    <section id='ref-tasks-deploy'>
+        <title><filename>do_deploy</filename></title>
+
+        <para>
+            Writes output files that are to be deployed to the deploy
+            directory, which is defined by the
+            <link linkend='var-DEPLOYDIR'><filename>DEPLOYDIR</filename></link>
+            variable.
+        </para>
+
+        <para>
+            The <filename>do_deploy</filename> task is a
+            shared state (sstate) task, which means that the task can
+            be accelerated through sstate use.
+            Realize also that if the task is re-executed, any previous output
+            is removed (i.e. "cleaned").
+        </para>
+    </section>
+
+    <section id='ref-tasks-fetch'>
+        <title><filename>do_fetch</filename></title>
+
+        <para>
+            Fetches the source code.
+            This task uses the
+            <link linkend='var-SRC_URI'><filename>SRC_URI</filename></link>
+            variable and the argument's prefix to determine the correct
+            fetcher module.
+        </para>
+    </section>
+
+    <section id='ref-tasks-install'>
+        <title><filename>do_install</filename></title>
+
+        <para>
+            Copies files from the compilation directory, which is defined by
+            the
+            <link linkend='var-B'><filename>B</filename></link> variable,
+            to a holding area defined by the
+            <link linkend='var-D'><filename>D</filename></link> variable.
+        </para>
+    </section>
+
+    <section id='ref-tasks-install_ptest_base'>
+        <title><filename>do_install_ptest_base</filename></title>
+
+        <para>
+            Copies the runtime test suite files from the compilation directory
+            to a holding area.
+        </para>
+    </section>
+
+    <section id='ref-tasks-package'>
+        <title><filename>do_package</filename></title>
+
+        <para>
+            Analyzes the content of the holding area and splits it into subsets
+            based on available packages and files.
+        </para>
+    </section>
+
+    <section id='ref-tasks-package_qa'>
+        <title><filename>do_package_qa</filename></title>
+
+        <para>
+            Runs QA checks on packaged files.
+            For more information on these checks, see the
+            <link linkend='ref-classes-insane'><filename>insane</filename></link>
+            class.
+        </para>
+    </section>
+
+    <section id='ref-tasks-package_write_deb'>
+        <title><filename>do_package_write_deb</filename></title>
+
+        <para>
+            Creates Debian packages (i.e. <filename>*.deb</filename> files) and
+            places them in the
+            <filename>${</filename><link linkend='var-DEPLOY_DIR_DEB'><filename>DEPLOY_DIR_DEB</filename></link><filename>}</filename>
+            directory in the package feeds area.
+            For more information, see the
+            "<link linkend='package-feeds-dev-environment'>Package Feeds</link>"
+            section.
+        </para>
+    </section>
+
+    <section id='ref-tasks-package_write_ipk'>
+        <title><filename>do_package_write_ipk</filename></title>
+
+        <para>
+            Creates IPK packages (i.e. <filename>*.ipk</filename> files) and
+            places them in the
+            <filename>${</filename><link linkend='var-DEPLOY_DIR_IPK'><filename>DEPLOY_DIR_IPK</filename></link><filename>}</filename>
+            directory in the package feeds area.
+            For more information, see the
+            "<link linkend='package-feeds-dev-environment'>Package Feeds</link>"
+            section.
+        </para>
+    </section>
+
+    <section id='ref-tasks-package_write_rpm'>
+        <title><filename>do_package_write_rpm</filename></title>
+
+        <para>
+            Creates RPM packages (i.e. <filename>*.rpm</filename> files) and
+            places them in the
+            <filename>${</filename><link linkend='var-DEPLOY_DIR_RPM'><filename>DEPLOY_DIR_RPM</filename></link><filename>}</filename>
+            directory in the package feeds area.
+            For more information, see the
+            "<link linkend='package-feeds-dev-environment'>Package Feeds</link>"
+            section.
+        </para>
+    </section>
+
+    <section id='ref-tasks-package_write_tar'>
+        <title><filename>do_package_write_tar</filename></title>
+
+        <para>
+            Creates tarballs and places them in the
+            <filename>${</filename><link linkend='var-DEPLOY_DIR_TAR'><filename>DEPLOY_DIR_TAR</filename></link><filename>}</filename>
+            directory in the package feeds area.
+            For more information, see the
+            "<link linkend='package-feeds-dev-environment'>Package Feeds</link>"
+            section.
+        </para>
+    </section>
+
+    <section id='ref-tasks-packagedata'>
+        <title><filename>do_packagedata</filename></title>
+
+        <para>
+            Creates package metadata used by the build system to generate the
+            final packages.
+        </para>
+    </section>
+
+    <section id='ref-tasks-patch'>
+        <title><filename>do_patch</filename></title>
+
+        <para>
+            Locates patch files and applies them to the source code.
+            See the
+            "<link linkend='patching-dev-environment'>Patching</link>"
+            section for more information.
+        </para>
+    </section>
+
+    <section id='ref-tasks-populate_lic'>
+        <title><filename>do_populate_lic</filename></title>
+
+        <para>
+            Writes license information for the recipe that is collected later
+            when the image is constructed.
+        </para>
+    </section>
+
+    <section id='ref-tasks-populate_sdk'>
+        <title><filename>do_populate_sdk</filename></title>
+
+        <para>
+            Creates the file and directory structure for an installable SDK.
+            See the
+            "<link linkend='sdk-generation-dev-environment'>SDK Generation</link>"
+            section for more information.
+        </para>
+    </section>
+
+    <section id='ref-tasks-populate_sysroot'>
+        <title><filename>do_populate_sysroot</filename></title>
+
+        <para>
+            Copies a subset of files installed by the
+            <link linkend='ref-tasks-install'><filename>do_install</filename></link>
+            task into the sysroot in order to make them available to other
+            recipes.
+        </para>
+
+        <para>
+            The <filename>do_populate_sysroot</filename> task is a
+            shared state (sstate) task, which means that the task can
+            be accelerated through sstate use.
+            Realize also that if the task is re-executed, any previous output
+            is removed (i.e. "cleaned").
+        </para>
+    </section>
+
+    <section id='ref-tasks-rm_work'>
+        <title><filename>do_rm_work</filename></title>
+
+        <para>
+            Removes work files after the OpenEmbedded build system has
+            finished with them.
+            You can learn more by looking at the
+            "<link linkend='ref-classes-rm-work'><filename>rm_work.bbclass</filename></link>"
+            section.
+        </para>
+    </section>
+
+    <section id='ref-tasks-rm_work_all'>
+        <title><filename>do_rm_work_all</filename></title>
+
+        <para>
+            Top-level task for removing work files after the build system has
+            finished with them.
+        </para>
+    </section>
+
+    <section id='ref-tasks-unpack'>
+        <title><filename>do_unpack</filename></title>
+
+        <para>
+            Unpacks the source code into a working directory pointed to
+            by
+            <filename>${</filename><link linkend='var-WORKDIR'><filename>WORKDIR</filename></link><filename>}</filename>.
+            The
+            <link linkend='var-S'><filename>S</filename></link> variable also
+            plays a role in where unpacked source files ultimately reside.
+            For more information on how source files are unpacked, see the
+            "<link linkend='source-fetching-dev-environment'>Source Fetching</link>"
+            section and the <filename>WORKDIR</filename> and
+            <filename>S</filename> variable descriptions.
+        </para>
+    </section>
+</section>
+
+<section id='manually-called-tasks'>
+    <title>Manually Called Tasks</title>
+
+    <para>
+        These tasks are typically manually triggered (e.g. by using the
+        <filename>bitbake -c</filename> command-line option):
+    </para>
+
+    <section id='ref-tasks-checkuri'>
+        <title><filename>do_checkuri</filename></title>
+
+        <para>
+            Validates the
+            <link linkend='var-SRC_URI'><filename>SRC_URI</filename></link>
+            value.
+        </para>
+    </section>
+
+    <section id='ref-tasks-checkuriall'>
+        <title><filename>do_checkuriall</filename></title>
+
+        <para>
+            Validates the
+            <link linkend='var-SRC_URI'><filename>SRC_URI</filename></link>
+            value for all recipes required to build a target.
+        </para>
+    </section>
+
+    <section id='ref-tasks-clean'>
+        <title><filename>do_clean</filename></title>
+
+        <para>
+            Removes all output files for a target from the
+            <link linkend='ref-tasks-unpack'><filename>do_unpack</filename></link>
+            task forward (i.e.
+            <link linkend='ref-tasks-patch'><filename>do_unpack</filename></link>,
+            <link linkend='ref-tasks-configure'><filename>do_configure</filename></link>,
+            <link linkend='ref-tasks-compile'><filename>do_compile</filename></link>,
+            <link linkend='ref-tasks-install'><filename>do_install</filename></link>,
+            and
+            <link linkend='ref-tasks-package'><filename>do_package</filename></link>).
+        </para>
+
+        <para>
+            You can run this task using BitBake as follows:
+            <literallayout class='monospaced'>
+     $ bitbake -c clean <replaceable>recipe</replaceable>
+            </literallayout>
+        </para>
+
+        <para>
+            Running this task does not remove the
+            <link linkend='shared-state-cache'>sstate</link>) cache
+            files.
+            Consequently, if no changes have been made and the recipe is
+            rebuilt after cleaning, output files are simply restored from the
+            sstate cache.
+            If you want to remove the sstate cache files for the recipe,
+            you need to use the
+            <link linkend='ref-tasks-cleansstate'><filename>do_cleansstate</filename></link>
+            task instead (i.e. <filename>bitbake -c cleansstate</filename> <replaceable>recipe</replaceable>).
+        </para>
+    </section>
+
+    <section id='ref-tasks-cleanall'>
+        <title><filename>do_cleanall</filename></title>
+
+        <para>
+            Removes all output files, shared state
+            (<link linkend='shared-state-cache'>sstate</link>) cache, and
+            downloaded source files for a target (i.e. the contents of
+            <link linkend='var-DL_DIR'><filename>DL_DIR</filename></link>).
+            Essentially, the <filename>do_cleanall</filename> task is
+            identical to the
+            <link linkend='ref-tasks-cleansstate'><filename>do_cleansstate</filename></link>
+            task with the added removal of downloaded source files.
+        </para>
+
+        <para>
+            You can run this task using BitBake as follows:
+            <literallayout class='monospaced'>
+     $ bitbake -c cleanall <replaceable>recipe</replaceable>
+            </literallayout>
+        </para>
+
+        <para>
+            Typically, you would not normally use the
+            <filename>cleanall</filename> task.
+            Do so only if you want to start fresh with the
+            <link linkend='ref-tasks-fetch'><filename>do_fetch</filename></link>
+            task.
+        </para>
+    </section>
+
+    <section id='ref-tasks-cleansstate'>
+        <title><filename>do_cleansstate</filename></title>
+
+        <para>
+            Removes all output files and shared state
+            (<link linkend='shared-state-cache'>sstate</link>)
+            cache for a target.
+            Essentially, the <filename>do_cleansstate</filename> task is
+            identical to the
+            <link linkend='ref-tasks-clean'><filename>do_clean</filename></link>
+            task with the added removal of shared state
+            (<link linkend='shared-state-cache'>sstate</link>) cache.
+        </para>
+
+        <para>
+            You can run this task using BitBake as follows:
+            <literallayout class='monospaced'>
+     $ bitbake -c cleansstate <replaceable>recipe</replaceable>
+            </literallayout>
+        </para>
+
+        <para>
+            When you run the <filename>do_cleansstate</filename> task,
+            the OpenEmbedded build system no longer uses any
+            sstate.
+            Consequently, building the recipe from scratch is guaranteed.
+            <note>
+                The <filename>do_cleansstate</filename> task cannot remove
+                sstate from a remote sstate mirror.
+                If you need to build a target from scratch using remote
+                mirrors, use the "-f" option as follows:
+                <literallayout class='monospaced'>
+     $ bitbake -f -c do_cleansstate <replaceable>target</replaceable>
+                </literallayout>
+            </note>
+        </para>
+     </section>
+
+    <section id='ref-tasks-devshell'>
+        <title><filename>do_devshell</filename></title>
+
+        <para>
+            Starts a shell whose environment is set up for
+            development, debugging, or both.
+            See the
+            "<ulink url='&YOCTO_DOCS_DEV_URL;#platdev-appdev-devshell'>Using a Development Shell</ulink>"
+            section in the Yocto Project Development Manual for more
+            information about using <filename>devshell</filename>.
+        </para>
+    </section>
+
+    <section id='ref-tasks-fetchall'>
+        <title><filename>do_fetchall</filename></title>
+
+        <para>
+            Fetches all remote sources required to build a target.
+        </para>
+    </section>
+
+    <section id='ref-tasks-listtasks'>
+        <title><filename>do_listtasks</filename></title>
+
+        <para>
+            Lists all defined tasks for a target.
+        </para>
+    </section>
+
+    <section id='ref-tasks-package_index'>
+        <title><filename>do_package_index</filename></title>
+
+        <para>
+            Creates or updates the index in the
+            <link linkend='package-feeds-dev-environment'>Package Feeds</link>
+            area.
+            <note>
+                This task is not triggered with the
+                <filename>bitbake -c</filename> command-line option as
+                are the other tasks in this section.
+                Because this task is specifically for the
+                <filename>package-index</filename> recipe,
+                you run it using
+                <filename>bitbake package-index</filename>.
+            </note>
+        </para>
+    </section>
+</section>
+
+<section id='image-related-tasks'>
+    <title>Image-Related Tasks</title>
+
+    <para>
+        The following tasks are applicable to image recipes.
+    </para>
+
+    <section id='ref-tasks-bootimg'>
+        <title><filename>do_bootimg</filename></title>
+
+        <para>
+            Creates a bootable live image.
+            See the
+            <link linkend='var-IMAGE_FSTYPES'><filename>IMAGE_FSTYPES</filename></link>
+            variable for additional information on live image types.
+        </para>
+    </section>
+
+    <section id='ref-tasks-bundle_initramfs'>
+        <title><filename>do_bundle_initramfs</filename></title>
+
+        <para>
+            Combines an initial RAM disk (initramfs) image and kernel
+            together to form a single image.
+            The
+            <link linkend='var-CONFIG_INITRAMFS_SOURCE'><filename>CONFIG_INITRAMFS_SOURCE</filename></link>
+            variable has some more information about these types of images.
+        </para>
+    </section>
+
+    <section id='ref-tasks-rootfs'>
+        <title><filename>do_rootfs</filename></title>
+
+        <para>
+            Creates the root filesystem (file and directory structure) for an
+            image.
+            See the
+            "<link linkend='image-generation-dev-environment'>Image Generation</link>"
+            section for more information on how the root filesystem is created.
+        </para>
+    </section>
+
+    <section id='ref-tasks-testimage'>
+        <title><filename>do_testimage</filename></title>
+
+        <para>
+            Boots an image and performs runtime tests within the image.
+            For information on automatically testing images, see the
+            "<ulink url='&YOCTO_DOCS_DEV_URL;#performing-automated-runtime-testing'>Performing Automated Runtime Testing</ulink>"
+            section in the Yocto Project Development Manual.
+        </para>
+    </section>
+
+    <section id='ref-tasks-testimage_auto'>
+        <title><filename>do_testimage_auto</filename></title>
+
+        <para>
+            Boots an image and performs runtime tests within the image
+            immediately after it has been built.
+            This task is enabled when you set
+            <link linkend='var-TEST_IMAGE'><filename>TEST_IMAGE</filename></link>
+            equal to "1".
+        </para>
+
+        <para>
+            For information on automatically testing images, see the
+            "<ulink url='&YOCTO_DOCS_DEV_URL;#performing-automated-runtime-testing'>Performing Automated Runtime Testing</ulink>"
+            section in the Yocto Project Development Manual.
+        </para>
+    </section>
+
+    <section id='ref-tasks-vmdkimg'>
+        <title><filename>do_vmdkimg</filename></title>
+
+        <para>
+            Creates a <filename>.vmdk</filename> image for use with
+            <ulink url='http://www.vmware.com/'>VMware</ulink>
+            and compatible virtual machine hosts.
+        </para>
+    </section>
+</section>
+
+<section id='kernel-related-tasks'>
+    <title>Kernel-Related Tasks</title>
+
+    <para>
+        The following tasks are applicable to kernel recipes.
+        Some of these tasks (e.g. the
+        <link linkend='ref-tasks-menuconfig'><filename>do_menuconfig</filename></link>
+        task) are also applicable to recipes that use
+        Linux kernel style configuration such as the BusyBox recipe.
+    </para>
+
+    <section id='ref-tasks-compile_kernelmodules'>
+        <title><filename>do_compile_kernelmodules</filename></title>
+
+        <para>
+            Compiles loadable modules for the Linux kernel.
+        </para>
+    </section>
+
+    <section id='ref-tasks-diffconfig'>
+        <title><filename>do_diffconfig</filename></title>
+
+        <para>
+            Compares the old and new config files after running the
+            <link linkend='ref-tasks-menuconfig'><filename>do_menuconfig</filename></link>
+            task for the kernel.
+        </para>
+    </section>
+
+    <section id='ref-tasks-kernel_checkout'>
+        <title><filename>do_kernel_checkout</filename></title>
+
+        <para>
+            Checks out source/meta branches for a linux-yocto style kernel.
+        </para>
+    </section>
+
+    <section id='ref-tasks-kernel_configcheck'>
+        <title><filename>do_kernel_configcheck</filename></title>
+
+        <para>
+            Validates the kernel configuration for a linux-yocto style kernel.
+        </para>
+    </section>
+
+    <section id='ref-tasks-kernel_configme'>
+        <title><filename>do_kernel_configme</filename></title>
+
+        <para>
+            Assembles the kernel configuration for a linux-yocto style kernel.
+        </para>
+    </section>
+
+    <section id='ref-tasks-kernel_link_vmlinux'>
+        <title><filename>do_kernel_link_vmlinux</filename></title>
+
+        <para>
+            Creates a symbolic link in
+            <filename>arch/$arch/boot</filename> for vmlinux kernel
+            images.
+        </para>
+    </section>
+
+    <section id='ref-tasks-menuconfig'>
+        <title><filename>do_menuconfig</filename></title>
+
+        <para>
+            Runs <filename>make menuconfig</filename> for the kernel.
+            For information on <filename>menuconfig</filename>, see the
+            "<ulink url='&YOCTO_DOCS_DEV_URL;#using-menuconfig'>Using&nbsp;&nbsp;<filename>menuconfig</filename></ulink>"
+            section in the Yocto Project Development Manual.
+        </para>
+    </section>
+
+    <section id='ref-tasks-savedefconfig'>
+        <title><filename>do_savedefconfig</filename></title>
+
+        <para>
+            Creates a minimal Linux kernel configuration file.
+        </para>
+    </section>
+
+    <section id='ref-tasks-sizecheck'>
+        <title><filename>do_sizecheck</filename></title>
+
+        <para>
+            Checks the size of the kernel image against
+            <link linkend='var-KERNEL_IMAGE_MAXSIZE'><filename>KERNEL_IMAGE_MAXSIZE</filename></link>
+            when set.
+        </para>
+    </section>
+
+    <section id='ref-tasks-strip'>
+        <title><filename>do_strip</filename></title>
+
+        <para>
+            Strips unneeded sections out of the Linux kernel image.
+        </para>
+    </section>
+
+    <section id='ref-tasks-uboot_mkimage'>
+        <title><filename>do_uboot_mkimage</filename></title>
+
+        <para>
+            Creates a uImage file from the kernel for the U-Boot bootloader.
+        </para>
+    </section>
+
+    <section id='ref-tasks-validate_branches'>
+        <title><filename>do_validate_branches</filename></title>
+
+        <para>
+            Ensures that the source, metadata (or both) branches are on the
+            locations specified by their
+            <link linkend='var-SRCREV'><filename>SRCREV</filename></link>
+            values for a linux-yocto style kernel.
+        </para>
+    </section>
+</section>
+
+<section id='miscellaneous-tasks'>
+    <title>Miscellaneous Tasks</title>
+
+    <para>
+        The following sections describe miscellaneous tasks.
+    </para>
+
+    <section id='ref-tasks-generate_qt_config_file'>
+        <title><filename>do_generate_qt_config_file</filename></title>
+
+        <para>
+            Writes a <filename>qt.conf</filename> configuration
+            file used for building a Qt-based application.
+        </para>
+    </section>
+
+    <section id='ref-tasks-spdx'>
+        <title><filename>do_spdx</filename></title>
+
+        <para>
+            A build stage that takes the source code and scans it on a remote
+            FOSSOLOGY server in order to produce an SPDX document.
+            This task applies only to the
+            <link linkend='ref-classes-spdx'><filename>spdx</filename></link>
+            class.
+        </para>
+    </section>
+</section>
+
+</chapter>
+<!--
+vim: expandtab tw=80 ts=4
+-->

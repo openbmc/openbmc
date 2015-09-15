@@ -1,0 +1,86 @@
+Upstream-Status: Pending [from other distro Debian]
+
+From d588b6530e1382a624898b3f4307f636c72c80a9 Mon Sep 17 00:00:00 2001
+From: Pierre Habouzit <madcoder@debian.org>
+Date: Wed, 28 Nov 2007 10:13:08 +0100
+Subject: [PATCH] Disable services from inetd.conf if a service with the same id exists.
+
+  This way, if a service is enabled in /etc/xinetd* _and_ in
+/etc/inetd.conf, the one (even if disabled) from /etc/xinetd* takes
+precedence.
+
+Signed-off-by: Pierre Habouzit <madcoder@debian.org>
+---
+ xinetd/inet.c |   22 +++++++++++++++++++---
+ 1 files changed, 19 insertions(+), 3 deletions(-)
+
+diff --git a/xinetd/inet.c b/xinetd/inet.c
+index 1cb2ba2..8caab45 100644
+--- a/xinetd/inet.c
++++ b/xinetd/inet.c
+@@ -23,6 +23,8 @@
+ #include "parsesup.h"
+ #include "nvlists.h"
+ 
++static psi_h iter ;
++
+ static int get_next_inet_entry( int fd, pset_h sconfs, 
+                           struct service_config *defaults);
+ 
+@@ -32,12 +34,15 @@ void parse_inet_conf_file( int fd, struct configuration *confp )
+    struct service_config *default_config = CNF_DEFAULTS( confp );
+    
+    line_count = 0;
++   iter = psi_create (sconfs);
+ 
+    for( ;; )
+    {   
+       if (get_next_inet_entry(fd, sconfs, default_config) == -2)
+          break;
+    }
++
++   psi_destroy(iter);
+ }
+ 
+ static int get_next_inet_entry( int fd, pset_h sconfs, 
+@@ -46,7 +51,7 @@ static int get_next_inet_entry( int fd, pset_h sconfs,
+    char *p;
+    str_h strp;
+    char *line = next_line(fd);
+-   struct service_config *scp;
++   struct service_config *scp, *tmp;
+    unsigned u, i;
+    const char *func = "get_next_inet_entry";
+    char *name = NULL, *rpcvers = NULL, *rpcproto = NULL;
+@@ -405,7 +410,16 @@ static int get_next_inet_entry( int fd, pset_h sconfs,
+    SC_SPECIFY( scp, A_SOCKET_TYPE );
+    SC_SPECIFY( scp, A_WAIT );
+ 
+-   if( ! pset_add(sconfs, scp) )
++   for ( tmp = SCP( psi_start( iter ) ) ; tmp ; tmp = SCP( psi_next(iter)) ){
++      if (EQ(SC_ID(scp), SC_ID(tmp))) {
++         parsemsg(LOG_DEBUG, func, "removing duplicate service %s", SC_NAME(scp));
++         sc_free(scp);
++         scp = NULL;
++         break;
++      }
++   }
++
++   if( scp && ! pset_add(sconfs, scp) )
+    {
+       out_of_memory( func );
+       pset_destroy(args);
+@@ -414,7 +428,9 @@ static int get_next_inet_entry( int fd, pset_h sconfs,
+    }
+ 
+    pset_destroy(args);
+-   parsemsg( LOG_DEBUG, func, "added service %s", SC_NAME(scp));
++   if (scp) {
++      parsemsg( LOG_DEBUG, func, "added service %s", SC_NAME(scp));
++   }
+    return 0;
+ }
+ 
+-- 
+1.5.3.6.2040.g15e6
+

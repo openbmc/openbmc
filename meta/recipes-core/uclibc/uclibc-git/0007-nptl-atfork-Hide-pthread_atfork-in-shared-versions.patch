@@ -1,0 +1,35 @@
+From 90516af9f776f9c2835b47fc52775dcb307a85ac Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 23 Jun 2012 15:59:01 -0700
+Subject: [PATCH 7/7] nptl/atfork: Hide pthread_atfork in shared versions
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+---
+ libpthread/nptl/Makefile.in | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/libpthread/nptl/Makefile.in b/libpthread/nptl/Makefile.in
+index 55eeba2..8cb8fa9 100644
+--- a/libpthread/nptl/Makefile.in
++++ b/libpthread/nptl/Makefile.in
+@@ -16,6 +16,7 @@ libc-shared-routines-y = forward.c libc-cancellation.c
+ libc-static-routines-y = alloca_cutoff.c libc-cancellation.c
+ libpthread-shared-only-routines-y = version.c
+ libpthread-static-only-routines-y = pthread_atfork.c
++
+ libpthread-routines- += $(notdir $(wildcard $(libpthread_DIR)/gen_*.c)) # dummy generated files
+ libpthread-routines- += allocatestack.c # dummy included by pthread_create.c
+ libpthread-routines- += pthread_mutex_getprioceiling.c pthread_mutex_setprioceiling.c # XXX: delete those or use them!
+@@ -201,7 +202,7 @@ CFLAGS-msgsnd.c = -fexceptions -fasynchronous-unwind-tables
+ CFLAGS-tcdrain.c = -fexceptions -fasynchronous-unwind-tables
+ 
+ CFLAGS-pt-system.c = -fexceptions -I$(top_srcdir)libc/stdlib
+-
++CFLAGS-pthread_atfork.c = -DNOT_IN_libc
+ #
+ # The rest of this file is uClibc specific.
+ #
+-- 
+2.1.4
+

@@ -1,0 +1,41 @@
+Upstream-Status: Backport
+
+diff -ruN tcp_wrappers_7.6.orig/tcpdchk.c tcp_wrappers_7.6/tcpdchk.c
+--- tcp_wrappers_7.6.orig/tcpdchk.c	2003-08-21 02:50:37.000000000 +0200
++++ tcp_wrappers_7.6/tcpdchk.c	2003-08-21 02:50:33.000000000 +0200
+@@ -53,6 +53,24 @@
+ #include "inetcf.h"
+ #include "scaffold.h"
+ 
++/* list of programs which are known to be linked with libwrap in debian */
++static const char *const libwrap_programs[] = {
++    "portmap", "mountd", "statd", "ugidd",
++    "redir", "rlinetd",
++    "sshd",
++    "atftpd",
++    "diald",
++    "esound",
++    "gdm", "gnome-session",
++    "icecast", "icecast_admin", "icecast_client", "icecast_source",
++    "mysqld",
++    "ntop",
++    "pptpd",
++    "rquotad",
++    "sendmail", "smail",
++    NULL
++};
++
+  /*
+   * Stolen from hosts_access.c...
+   */
+@@ -147,8 +165,8 @@
+     /*
+      * These are not run from inetd but may have built-in access control.
+      */
+-    inet_set("portmap", WR_NOT);
+-    inet_set("rpcbind", WR_NOT);
++    for (c = 0; libwrap_programs[c]; c++)
++	inet_set(libwrap_programs[c], WR_YES);
+ 
+     /*
+      * Check accessibility of access control files.

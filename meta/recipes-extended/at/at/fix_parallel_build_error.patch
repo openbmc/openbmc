@@ -1,0 +1,28 @@
+make -j was failing sometimesa like this
+| ccache i586-poky-linux-gcc -march=i586 --sysroot=/home/nitin/build/build0/tmp/sysroots/i586-poky-linux -I. -fexpensive-optimizations -fomit-frame-pointer -frename-registers -O2 -ggdb -feliminate-unused-debug-types -o atd atd.o daemon.o  -lfl  -lpam -Wl,-O1 -Wl,--as-needed
+| parsetime.l:5:19: fatal error: y.tab.h: No such file or directory
+| compilation terminated.
+| make: *** [lex.yy.o] Error 1
+| make: *** Waiting for unfinished jobs....
+
+Fixed the issue by adding a dependency in the makefile.
+Nitin <nitin.a.kamble@intel.com>
+2010/09/02
+
+Upstream-Status: Pending
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+Index: at-3.1.12/Makefile.in
+===================================================================
+--- at-3.1.12.orig/Makefile.in
++++ at-3.1.12/Makefile.in
+@@ -83,6 +83,8 @@ y.tab.c y.tab.h: parsetime.y
+ lex.yy.c: parsetime.l
+ 	$(LEX) -i parsetime.l
+ 
++parsetime.l: y.tab.h
++
+ atrun: atrun.in
+ 	configure
+ 

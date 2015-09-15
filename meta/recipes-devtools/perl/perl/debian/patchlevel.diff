@@ -1,0 +1,30 @@
+From b517c5e15d0871e36d0f1187661fe1dd28ddf820 Mon Sep 17 00:00:00 2001
+From: Niko Tyni <ntyni@debian.org>
+Date: Sun, 15 May 2011 19:35:58 +0300
+Subject: List packaged patches in patchlevel.h
+
+Origin: vendor
+Bug-Debian: http://bugs.debian.org/567489
+
+The list of packaged patches is in patchlevel-debian.h, which is generated
+from the debian/patches/ directory when building the package.
+
+Patch-Name: debian/patchlevel.diff
+---
+ patchlevel.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/patchlevel.h b/patchlevel.h
+index a0ad78b..01367b7 100644
+--- a/patchlevel.h
++++ b/patchlevel.h
+@@ -137,6 +137,9 @@ static const char * const local_patches[] = {
+ 	,"uncommitted-changes"
+ #endif
+ 	PERL_GIT_UNPUSHED_COMMITS    	/* do not remove this line */
++#ifdef DEBIAN
++#include "patchlevel-debian.h"
++#endif
+ 	,NULL
+ };
+ 

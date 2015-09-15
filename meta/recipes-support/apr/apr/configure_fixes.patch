@@ -1,0 +1,68 @@
+Upstream-Status: Inappropriate [configuration]
+
+Index: apr-1.3.3/configure.in
+===================================================================
+--- apr-1.3.3.orig/configure.in
++++ apr-1.3.3/configure.in
+@@ -794,39 +794,6 @@ AC_CHECK_FUNCS([mmap munmap shm_open shm
+                 create_area])
+ 
+ APR_CHECK_DEFINE(MAP_ANON, sys/mman.h)
+-AC_CHECK_FILE(/dev/zero)
+-
+-# Not all systems can mmap /dev/zero (such as HP-UX).  Check for that.
+-if test "$ac_cv_func_mmap" = "yes" &&
+-   test "$ac_cv_file__dev_zero" = "yes"; then
+-    AC_MSG_CHECKING(for mmap that can map /dev/zero)
+-    AC_TRY_RUN([
+-#include <sys/types.h>
+-#include <sys/stat.h>
+-#include <fcntl.h>
+-#ifdef HAVE_SYS_MMAN_H
+-#include <sys/mman.h>
+-#endif
+-    int main()
+-    {
+-        int fd;
+-        void *m;
+-        fd = open("/dev/zero", O_RDWR);
+-        if (fd < 0) {
+-            return 1;
+-        }
+-        m = mmap(0, sizeof(void*), PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+-        if (m == (void *)-1) {  /* aka MAP_FAILED */
+-            return 2;
+-        }
+-        if (munmap(m, sizeof(void*)) < 0) {
+-            return 3;
+-        }
+-        return 0;
+-    }], [], [ac_cv_file__dev_zero=no], [ac_cv_file__dev_zero=no])
+-
+-    AC_MSG_RESULT($ac_cv_file__dev_zero)
+-fi
+ 
+ # Now we determine which one is our anonymous shmem preference.
+ haveshmgetanon="0"
+@@ -1518,13 +1485,14 @@ else
+     bigendian=0
+ fi
+ 
+-APR_CHECK_SIZEOF_EXTENDED([#include <sys/types.h>
+-#include <sys/uio.h>],struct iovec,0)
+-if test "$ac_cv_sizeof_struct_iovec" = "0"; then
+-    have_iovec=0
+-else
+-    have_iovec=1
+-fi
++#APR_CHECK_SIZEOF_EXTENDED([#include <sys/types.h>
++##include <sys/uio.h>],struct iovec,0)
++#if test "$ac_cv_sizeof_struct_iovec" = "0"; then
++#    have_iovec=0
++#else
++#    have_iovec=1
++#fi
++have_iovec=1
+ 
+ AC_SUBST(voidp_size)
+ AC_SUBST(short_value)

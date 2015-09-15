@@ -1,0 +1,2 @@
+#!/bin/sh
+make -k runteststatic runtestshared | sed -r -e 's/^(\s+\*+ (.+?) test OK \*+)/\1\nPASS: \2/' -e 's/^(\s+\*+ (.+?) test FAILED \*+)/\1\nFAIL: \2/'

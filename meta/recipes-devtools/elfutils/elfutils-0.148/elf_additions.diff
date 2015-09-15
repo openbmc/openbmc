@@ -1,0 +1,71 @@
+Upstream-Status: Backport
+
+Index: elfutils-0.146/libelf/elf.h
+===================================================================
+--- elfutils-0.146.orig/libelf/elf.h	2010-04-24 10:13:50.000000000 +0000
++++ elfutils-0.146/libelf/elf.h	2010-04-24 10:22:43.000000000 +0000
+@@ -143,6 +143,7 @@
+ #define ELFOSABI_HPUX		1	/* HP-UX */
+ #define ELFOSABI_NETBSD		2	/* NetBSD.  */
+ #define ELFOSABI_LINUX		3	/* Linux.  */
++#define ELFOSABI_HURD		4	/* GNU/Hurd */
+ #define ELFOSABI_SOLARIS	6	/* Sun Solaris.  */
+ #define ELFOSABI_AIX		7	/* IBM AIX.  */
+ #define ELFOSABI_IRIX		8	/* SGI Irix.  */
+@@ -150,8 +151,13 @@
+ #define ELFOSABI_TRU64		10	/* Compaq TRU64 UNIX.  */
+ #define ELFOSABI_MODESTO	11	/* Novell Modesto.  */
+ #define ELFOSABI_OPENBSD	12	/* OpenBSD.  */
++#define ELFOSABI_OPENVMS	13	/* OpenVMS */
++#define ELFOSABI_NSK		14	/* Hewlett-Packard Non-Stop Kernel */
++#define ELFOSABI_AROS		15	/* Amiga Research OS */
++/* 64-255 Architecture-specific value range */
+ #define ELFOSABI_ARM_AEABI	64	/* ARM EABI */
+ #define ELFOSABI_ARM		97	/* ARM */
++/* This is deprecated? It's not in the latest version anymore. */
+ #define ELFOSABI_STANDALONE	255	/* Standalone (embedded) application */
+ 
+ #define EI_ABIVERSION	8		/* ABI version */
+@@ -206,7 +212,7 @@
+ #define EM_H8_300H	47		/* Hitachi H8/300H */
+ #define EM_H8S		48		/* Hitachi H8S */
+ #define EM_H8_500	49		/* Hitachi H8/500 */
+-#define EM_IA_64	50		/* Intel Merced */
++#define EM_IA_64	50		/* Intel IA64 */
+ #define EM_MIPS_X	51		/* Stanford MIPS-X */
+ #define EM_COLDFIRE	52		/* Motorola Coldfire */
+ #define EM_68HC12	53		/* Motorola M68HC12 */
+@@ -220,7 +226,8 @@
+ #define EM_TINYJ	61		/* Advanced Logic Corp. Tinyj emb.fam*/
+ #define EM_X86_64	62		/* AMD x86-64 architecture */
+ #define EM_PDSP		63		/* Sony DSP Processor */
+-
++#define	EM_PDP10	64		/* Digital Equipment Corp. PDP-10 */
++#define EM_PDP11	65		/* Digital Equipment Corp. PDP-11 */
+ #define EM_FX66		66		/* Siemens FX66 microcontroller */
+ #define EM_ST9PLUS	67		/* STMicroelectronics ST9+ 8/16 mc */
+ #define EM_ST7		68		/* STmicroelectronics ST7 8 bit mc */
+@@ -250,7 +257,22 @@
+ #define EM_OPENRISC	92		/* OpenRISC 32-bit embedded processor */
+ #define EM_ARC_A5	93		/* ARC Cores Tangent-A5 */
+ #define EM_XTENSA	94		/* Tensilica Xtensa Architecture */
+-#define EM_NUM		95
++#define	EM_VIDEOCORE	95		/* Alphamosaic VideoCore processor */
++#define	EM_TMM_GPP	96		/* Thompson Multimedia General Purpose Processor */
++#define	EM_NS32K	97		/* National Semiconductor 32000 series */
++#define	EM_TPC		98		/* Tenor Network TPC processor */
++#define	EM_SNP1K	99		/* Trebia SNP 1000 processor */
++#define	EM_ST200	100		/* STMicroelectronics (www.st.com) ST200 microcontroller */
++#define EM_IP2K         101		/* Ubicom IP2XXX microcontroller family */
++#define	EM_MAX		102		/* MAX Processor */
++#define EM_CR           103		/* National Semiconductor CompactRISC */
++#define	EM_F2MC16	104		/* Fujitsu F2MC16 */
++#define EM_MSP430       105		/* TI msp430 micro controller */
++#define EM_BLACKFIN     106		/* Analog Devices Blackfin (DSP) processor */
++#define EM_SE_C33	107		/* S1C33 Family of Seiko Epson processors */
++#define	EM_SEP		108		/* Sharp embedded microprocessor */
++#define EM_ARCA		109		/* Arca RISC Microprocessor */
++#define EM_NUM		110
+ 
+ /* If it is necessary to assign new unofficial EM_* values, please
+    pick large random numbers (0x8523, 0xa7f2, etc.) to minimize the

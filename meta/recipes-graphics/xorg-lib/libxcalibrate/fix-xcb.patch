@@ -1,0 +1,29 @@
+Upstream-Status: Pending
+
+There is no extra reply data and if we say not to disgard it, xcb
+throws fatal asserts.
+
+RP - 26/11/09
+
+Index: git/xcalibrate.c
+===================================================================
+--- git.orig/xcalibrate.c	2009-11-26 08:11:48.000000000 +0000
++++ git/xcalibrate.c	2009-11-26 08:09:55.000000000 +0000
+@@ -216,7 +216,7 @@
+   req->reqType = info->codes->major_opcode;
+   req->xCalibrateReqType = X_XCalibrateRawMode;
+   req->on = enable;
+-  if (!_XReply (dpy, (xReply *) &rep, 0, xFalse)) 
++  if (!_XReply (dpy, (xReply *) &rep, 0, xTrue)) 
+     {
+       UnlockDisplay (dpy);
+       SyncHandle ();
+@@ -240,7 +240,7 @@
+   req->xCalibrateReqType = X_XCalibrateScreenToCoord;
+   req->x = *x;
+   req->y = *y;
+-  if (!_XReply (dpy, (xReply *) &rep, 0, xFalse)) 
++  if (!_XReply (dpy, (xReply *) &rep, 0, xTrue)) 
+     {
+       UnlockDisplay (dpy);
+       SyncHandle ();

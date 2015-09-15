@@ -1,0 +1,71 @@
+make the tool to be cross compilable.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+
+Index: mkelfImage/configure.ac
+===================================================================
+--- mkelfImage.orig/configure.ac	2012-07-14 14:04:48.964898667 -0700
++++ mkelfImage/configure.ac	2012-07-14 14:10:47.800916083 -0700
+@@ -70,6 +70,9 @@
+ 		AC_MSG_ERROR([cc not found])
+ 	fi
+ 	eval "${with_default}_CC='$CC'"
++	if test "x$HOST_CC" = 'x'; then
++		AC_CHECK_PROG([HOST_CC], [$CC], [$CC], [gcc], [$PATH])
++	fi
+ 	AC_PROG_CPP
+ 	if test "$CPP" = no; then
+ 		AC_MSG_ERROR([cpp not found])
+@@ -172,7 +175,6 @@
+ 
+ dnl ---Output variables...
+ 
+-HOST_CC=$CC
+ HOST_CFLAGS="$HOST_CFLAGS -O2 -Wall \$(HOST_CPPFLAGS)"
+ 
+ dnl TODO: figure out how to set these appropriately for compilers other than gcc
+Index: mkelfImage/linux-i386/Makefile
+===================================================================
+--- mkelfImage.orig/linux-i386/Makefile	2012-07-14 14:04:48.964898667 -0700
++++ mkelfImage/linux-i386/Makefile	2012-07-14 14:04:49.032898671 -0700
+@@ -4,7 +4,7 @@
+ 
+ $(LI386_OBJ)/mkelf-linux-i386.o: $(LI386_DIR)/mkelf-linux-i386.c $(LI386_DIR)/convert.bin.c $(LI386_DEP)
+ 	$(MKDIR) -p $(@D)
+-	$(HOST_CC) $(HOST_CFLAGS) -c -g $< -o $@
++	$(CC) $(HOST_CFLAGS) -c -g $< -o $@
+ 
+ 
+ ifdef I386_CC
+Index: mkelfImage/linux-ia64/Makefile
+===================================================================
+--- mkelfImage.orig/linux-ia64/Makefile	2012-07-14 14:04:48.964898667 -0700
++++ mkelfImage/linux-ia64/Makefile	2012-07-14 14:04:49.032898671 -0700
+@@ -4,7 +4,7 @@
+ 
+ $(LIA64_OBJ)/mkelf-linux-ia64.o: $(LIA64_DIR)/mkelf-linux-ia64.c $(LIA64_DIR)/convert.bin.c $(LIA64_DEP)
+ 	$(MKDIR) -p $(@D)
+-	$(HOST_CC) $(HOST_CFLAGS) -c -g $< -o $@
++	$(CC) $(HOST_CFLAGS) -c -g $< -o $@
+ 
+ ifdef IA64_CC
+ 
+Index: mkelfImage/main/Makefile
+===================================================================
+--- mkelfImage.orig/main/Makefile	2012-07-14 14:04:48.964898667 -0700
++++ mkelfImage/main/Makefile	2012-07-14 14:04:49.032898671 -0700
+@@ -4,11 +4,11 @@
+ 
+ $(OBJDIR)/sbin/mkelfImage: $(MKELF_OBJS) $(DEPS)
+ 	$(MKDIR) -p $(@D)
+-	$(HOST_CC) $(HOST_CFLAGS) $(MKELF_OBJS) -o $@ $(LIBS)
++	$(CC) $(HOST_CFLAGS) $(MKELF_OBJS) -o $@ $(LIBS)
+ 
+ $(OBJDIR)/main/mkelfImage.o: main/mkelfImage.c include/mkelfImage.h $(DEPS)
+ 	$(MKDIR) -p $(@D)
+-	$(HOST_CC) $(HOST_CFLAGS) -c $< -o $@
++	$(CC) $(HOST_CFLAGS) -c $< -o $@
+ 
+ $(OBJDIR)/man/man8/mkelfImage.8: main/mkelfImage.man
+ 	$(MKDIR) -p $(@D)

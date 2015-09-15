@@ -1,0 +1,94 @@
+    </tbody>
+    </table>
+
+<!-- Show pagination controls -->
+<div class="pagination pagination-centered">
+   <div class="pull-left">
+   Showing {{objects.start_index}} to {{objects.end_index}} out of {{objects.paginator.count}} entries.
+   </div>
+
+   <ul class="pagination" style="display: block-inline">
+{%if objects.has_previous %}
+  <li><a href="javascript:reload_params({'page':{{objects.previous_page_number}}})">&laquo;</a></li>
+{%else%}
+  <li class="disabled"><a href="#">&laquo;</a></li>
+{%endif%}
+{% for i in objects.page_range %}
+  <li{%if i == objects.number %} class="active" {%endif%}><a href="javascript:reload_params({'page':{{i}}})">{{i}}</a></li>
+{% endfor %}
+{%if objects.has_next%}
+  <li><a href="javascript:reload_params({'page':{{objects.next_page_number}}})">&raquo;</a></li>
+{%else%}
+  <li class="disabled"><a href="#">&raquo;</a></li>
+{%endif%}
+  </ul>
+  <div class="pull-right">
+    <span class="help-inline" style="padding-top:5px;">Show rows:</span>
+    <select style="margin-top:5px;margin-bottom:0px;" class="pagesize">
+      {% with "10 25 50 100 150" as list%}
+        {% for i in list.split %}
+            <option value="{{i}}">{{i}}</option>
+        {% endfor %}
+      {% endwith %}
+    </select>
+   </div>
+</div>
+
+<!-- Update page display settings -->
+
+<script>
+ $(document).ready(function() {
+
+    // we load cookies for the column display
+    save = $.cookie('_displaycols_{{objectname}}');
+    if (save != undefined) {
+        setting = save.split(';');
+        for ( i = 0; i < setting.length; i++) {
+            if (setting[i].length > 0) {
+                splitlist = setting[i].split(':');
+                id = splitlist[0], v = splitlist[1];
+                if (v == 'true') {
+                    $('.chbxtoggle#'+id).prop('checked', true);
+                }
+                else {
+                    $('.chbxtoggle#'+id).prop('checked', false);
+                }
+            }
+        }
+    }
+
+    // load data for number of entries to be displayed on page
+    if ({{request.GET.count}} != "") {
+      pagesize = {{request.GET.count}};
+    }
+
+    $('.pagesize option').prop('selected', false)
+                         .filter('[value="' + pagesize + '"]')
+                         .attr('selected', true);
+
+    $('.chbxtoggle').each(function () {
+        showhideTableColumn($(this).attr('id'), $(this).is(':checked'))
+    });
+
+    //turn edit columns dropdown into a multi-select menu
+     $('.dropdown-menu input, .dropdown-menu label').click(function(e) {
+        e.stopPropagation();
+    });
+
+    //show tooltip with applied filter
+    $('#filtered').tooltip({container:'table', placement:'bottom', delay:{hide:1500}, html:true});
+
+    //progress bar tooltip
+    $('.progress, .lead span').tooltip({container:'table', placement:'top'});
+
+    $(".pagesize").change(function () {
+        reload_params({"count":$(this).val()});
+    });
+});
+</script>
+
+<!-- modal filter boxes -->
+   {% for tc in tablecols %}{% if tc.filter %}{% with objectname=objectname f=tc.filter %}
+        {% include "filtersnippet.html" %}
+   {% endwith %}{% endif %} {% endfor %}
+<!-- end modals -->

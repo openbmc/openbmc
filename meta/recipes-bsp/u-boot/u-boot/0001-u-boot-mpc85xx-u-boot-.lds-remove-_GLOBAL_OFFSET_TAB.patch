@@ -1,0 +1,184 @@
+From 92598e1515b2ec3851af1f064075d0457f01272d Mon Sep 17 00:00:00 2001
+From: Zhenhua Luo <zhenhua.luo@freescale.com>
+Date: Mon, 9 Feb 2015 18:33:56 +0800
+Subject: [PATCH] powerpc/cpu/*/u-boot*.lds: remove _GLOBAL_OFFSET_TABLE_
+ definition
+Organization: O.S. Systems Software LTDA.
+
+In binutils-2.25, the _GLOBAL_OFFSET_TABLE_ symbols defined by PROVIDE in
+u-boot.lds overrides the linker built-in symbols
+(https://sourceware.org/git/gitweb.cgi?p=binutils-gdb.git;a=commitdiff;h=b893397a4b1316610f49819344817715e4305de9),
+so the linker is treating _GLOBAL_OFFSET_TABLE_ as a definition into the .reloc section.
+
+To align with the change of binutils-2.25, the _GLOBAL_OFFSET_TABLE_ symbol
+should not be defined in sections, and the symbols in linker generated .got
+section should be used(https://sourceware.org/ml/binutils/2008-09/msg00122.html).
+
+Fixed the following build errors with binutils-2.25:
+| powerpc-poky-linux-gnuspe-ld.bfd: _GLOBAL_OFFSET_TABLE_ not defined in linker created .got
+
+Signed-off-by: Zhenhua Luo <zhenhua.luo@freescale.com>
+
+Upstream-Status: Pending
+---
+ arch/powerpc/cpu/mpc512x/u-boot.lds          | 1 -
+ arch/powerpc/cpu/mpc5xx/u-boot.lds           | 1 -
+ arch/powerpc/cpu/mpc5xxx/u-boot.lds          | 1 -
+ arch/powerpc/cpu/mpc8260/u-boot.lds          | 1 -
+ arch/powerpc/cpu/mpc83xx/u-boot-spl.lds      | 1 -
+ arch/powerpc/cpu/mpc83xx/u-boot.lds          | 1 -
+ arch/powerpc/cpu/mpc85xx/u-boot-nand.lds     | 1 -
+ arch/powerpc/cpu/mpc85xx/u-boot-nand_spl.lds | 1 -
+ arch/powerpc/cpu/mpc85xx/u-boot-spl.lds      | 1 -
+ arch/powerpc/cpu/mpc85xx/u-boot.lds          | 1 -
+ arch/powerpc/cpu/mpc86xx/u-boot.lds          | 1 -
+ arch/powerpc/cpu/ppc4xx/u-boot.lds           | 1 -
+ 12 files changed, 12 deletions(-)
+
+diff --git a/arch/powerpc/cpu/mpc512x/u-boot.lds b/arch/powerpc/cpu/mpc512x/u-boot.lds
+index 9658b21..b32f74e 100644
+--- a/arch/powerpc/cpu/mpc512x/u-boot.lds
++++ b/arch/powerpc/cpu/mpc512x/u-boot.lds
+@@ -24,7 +24,6 @@ SECTIONS
+     _GOT2_TABLE_ = .;
+     KEEP(*(.got2))
+     KEEP(*(.got))
+-    PROVIDE(_GLOBAL_OFFSET_TABLE_ = . + 4);
+     _FIXUP_TABLE_ = .;
+     KEEP(*(.fixup))
+     *(.fixup)
+diff --git a/arch/powerpc/cpu/mpc5xx/u-boot.lds b/arch/powerpc/cpu/mpc5xx/u-boot.lds
+index 7198465..6a53571 100644
+--- a/arch/powerpc/cpu/mpc5xx/u-boot.lds
++++ b/arch/powerpc/cpu/mpc5xx/u-boot.lds
+@@ -33,7 +33,6 @@ SECTIONS
+     _GOT2_TABLE_ = .;
+     KEEP(*(.got2))
+     KEEP(*(.got))
+-    PROVIDE(_GLOBAL_OFFSET_TABLE_ = . + 4);
+     _FIXUP_TABLE_ = .;
+     KEEP(*(.fixup))
+   }
+diff --git a/arch/powerpc/cpu/mpc5xxx/u-boot.lds b/arch/powerpc/cpu/mpc5xxx/u-boot.lds
+index cd9e23f..aa80d3d 100644
+--- a/arch/powerpc/cpu/mpc5xxx/u-boot.lds
++++ b/arch/powerpc/cpu/mpc5xxx/u-boot.lds
+@@ -28,7 +28,6 @@ SECTIONS
+     _GOT2_TABLE_ = .;
+     KEEP(*(.got2))
+     KEEP(*(.got))
+-    PROVIDE(_GLOBAL_OFFSET_TABLE_ = . + 4);
+     _FIXUP_TABLE_ = .;
+     KEEP(*(.fixup))
+   }
+diff --git a/arch/powerpc/cpu/mpc8260/u-boot.lds b/arch/powerpc/cpu/mpc8260/u-boot.lds
+index 50cbf85..469fc29 100644
+--- a/arch/powerpc/cpu/mpc8260/u-boot.lds
++++ b/arch/powerpc/cpu/mpc8260/u-boot.lds
+@@ -27,7 +27,6 @@ SECTIONS
+     _GOT2_TABLE_ = .;
+     KEEP(*(.got2))
+     KEEP(*(.got))
+-    PROVIDE(_GLOBAL_OFFSET_TABLE_ = . + 4);
+     _FIXUP_TABLE_ = .;
+     KEEP(*(.fixup))
+   }
+diff --git a/arch/powerpc/cpu/mpc83xx/u-boot-spl.lds b/arch/powerpc/cpu/mpc83xx/u-boot-spl.lds
+index 774772b..4101eaf 100644
+--- a/arch/powerpc/cpu/mpc83xx/u-boot-spl.lds
++++ b/arch/powerpc/cpu/mpc83xx/u-boot-spl.lds
+@@ -24,7 +24,6 @@ SECTIONS
+ 		_GOT2_TABLE_ = .;
+ 		KEEP(*(.got2))
+ 		KEEP(*(.got))
+-		PROVIDE(_GLOBAL_OFFSET_TABLE_ = . + 4);
+ 	}
+ 	__got2_entries = ((_GLOBAL_OFFSET_TABLE_ - _GOT2_TABLE_) >> 2) - 1;
+ 
+diff --git a/arch/powerpc/cpu/mpc83xx/u-boot.lds b/arch/powerpc/cpu/mpc83xx/u-boot.lds
+index 3c177fa..dbd8bbe 100644
+--- a/arch/powerpc/cpu/mpc83xx/u-boot.lds
++++ b/arch/powerpc/cpu/mpc83xx/u-boot.lds
+@@ -26,7 +26,6 @@ SECTIONS
+     _GOT2_TABLE_ = .;
+     KEEP(*(.got2))
+     KEEP(*(.got))
+-    PROVIDE(_GLOBAL_OFFSET_TABLE_ = . + 4);
+     _FIXUP_TABLE_ = .;
+     KEEP(*(.fixup))
+   }
+diff --git a/arch/powerpc/cpu/mpc85xx/u-boot-nand.lds b/arch/powerpc/cpu/mpc85xx/u-boot-nand.lds
+index f933b21..0399f93 100644
+--- a/arch/powerpc/cpu/mpc85xx/u-boot-nand.lds
++++ b/arch/powerpc/cpu/mpc85xx/u-boot-nand.lds
+@@ -44,7 +44,6 @@ SECTIONS
+     _GOT2_TABLE_ = .;
+     KEEP(*(.got2))
+     KEEP(*(.got))
+-    PROVIDE(_GLOBAL_OFFSET_TABLE_ = . + 4);
+     _FIXUP_TABLE_ = .;
+     KEEP(*(.fixup))
+   }
+diff --git a/arch/powerpc/cpu/mpc85xx/u-boot-nand_spl.lds b/arch/powerpc/cpu/mpc85xx/u-boot-nand_spl.lds
+index b83c553..f044564 100644
+--- a/arch/powerpc/cpu/mpc85xx/u-boot-nand_spl.lds
++++ b/arch/powerpc/cpu/mpc85xx/u-boot-nand_spl.lds
+@@ -22,7 +22,6 @@ SECTIONS
+ 		_GOT2_TABLE_ = .;
+ 		KEEP(*(.got2))
+ 		KEEP(*(.got))
+-		PROVIDE(_GLOBAL_OFFSET_TABLE_ = . + 4);
+ 		_FIXUP_TABLE_ = .;
+ 		KEEP(*(.fixup))
+ 	}
+diff --git a/arch/powerpc/cpu/mpc85xx/u-boot-spl.lds b/arch/powerpc/cpu/mpc85xx/u-boot-spl.lds
+index 5ae7b3e..889a4c2 100644
+--- a/arch/powerpc/cpu/mpc85xx/u-boot-spl.lds
++++ b/arch/powerpc/cpu/mpc85xx/u-boot-spl.lds
+@@ -29,7 +29,6 @@ SECTIONS
+ 		_GOT2_TABLE_ = .;
+ 		KEEP(*(.got2))
+ 		KEEP(*(.got))
+-		PROVIDE(_GLOBAL_OFFSET_TABLE_ = . + 4);
+ 		_FIXUP_TABLE_ = .;
+ 		KEEP(*(.fixup))
+ 	}
+diff --git a/arch/powerpc/cpu/mpc85xx/u-boot.lds b/arch/powerpc/cpu/mpc85xx/u-boot.lds
+index 2cf0b25..f15eaf3 100644
+--- a/arch/powerpc/cpu/mpc85xx/u-boot.lds
++++ b/arch/powerpc/cpu/mpc85xx/u-boot.lds
+@@ -50,7 +50,6 @@ SECTIONS
+     _GOT2_TABLE_ = .;
+     KEEP(*(.got2))
+     KEEP(*(.got))
+-    PROVIDE(_GLOBAL_OFFSET_TABLE_ = . + 4);
+     _FIXUP_TABLE_ = .;
+     KEEP(*(.fixup))
+   }
+diff --git a/arch/powerpc/cpu/mpc86xx/u-boot.lds b/arch/powerpc/cpu/mpc86xx/u-boot.lds
+index 58467c2..6c48f40 100644
+--- a/arch/powerpc/cpu/mpc86xx/u-boot.lds
++++ b/arch/powerpc/cpu/mpc86xx/u-boot.lds
+@@ -32,7 +32,6 @@ SECTIONS
+     _GOT2_TABLE_ = .;
+     KEEP(*(.got2))
+     KEEP(*(.got))
+-    PROVIDE(_GLOBAL_OFFSET_TABLE_ = . + 4);
+     _FIXUP_TABLE_ = .;
+     KEEP(*(.fixup))
+   }
+diff --git a/arch/powerpc/cpu/ppc4xx/u-boot.lds b/arch/powerpc/cpu/ppc4xx/u-boot.lds
+index 1980508..55dd4e1 100644
+--- a/arch/powerpc/cpu/ppc4xx/u-boot.lds
++++ b/arch/powerpc/cpu/ppc4xx/u-boot.lds
+@@ -46,7 +46,6 @@ SECTIONS
+     _GOT2_TABLE_ = .;
+     KEEP(*(.got2))
+     KEEP(*(.got))
+-    PROVIDE(_GLOBAL_OFFSET_TABLE_ = . + 4);
+     _FIXUP_TABLE_ = .;
+     KEEP(*(.fixup))
+   }
+-- 
+2.4.6
+

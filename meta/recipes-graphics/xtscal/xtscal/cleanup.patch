@@ -1,0 +1,621 @@
+---
+ Makefile.am  |    9 --
+ configure.ac |    3 
+ gpe-dist.am  |   12 ---
+ h3600_ts.h   |  216 -----------------------------------------------------------
+ main.c       |  210 ++-------------------------------------------------------
+ xtscal.in    |   19 -----
+ 6 files changed, 14 insertions(+), 455 deletions(-)
+
+Upstream-Status: Pending
+
+Index: xtscal-0.6.3/xtscal.in
+===================================================================
+--- xtscal-0.6.3.orig/xtscal.in	2004-09-10 20:10:36.000000000 +0100
++++ /dev/null	1970-01-01 00:00:00.000000000 +0000
+@@ -1,19 +0,0 @@
+-#!/bin/sh
+-
+-module_id() {
+-    # Get model name
+-    echo `grep "^Hardware" /proc/cpuinfo | sed -e "s/.*: *//" | tr a-z A-Z`
+-}
+-
+-case `module_id` in
+-	"HP IPAQ H3100" | "HP IPAQ H3800" )
+-		ARGS="-rotate 90" ;;
+-	"HP IPAQ H3600" | "HP IPAQ H3700" | "HP IPAQ H3900" | *COLLIE | *POODLE)
+-		ARGS="-rotate 270" ;;
+-	# H2200: works without rotation
+-esac
+-
+-# the things we do for autoconf
+-prefix=@prefix@
+-exec_prefix=@exec_prefix@
+-exec @libexecdir@/xtscal.bin $ARGS $*
+Index: xtscal-0.6.3/main.c
+===================================================================
+--- xtscal-0.6.3.orig/main.c	2007-07-01 01:12:52.000000000 +0100
++++ xtscal-0.6.3/main.c	2007-07-01 01:12:55.000000000 +0100
+@@ -22,12 +22,10 @@
+ #include <X11/Xlib.h>
+ 
+ #include <X11/extensions/Xrender.h>
+-#include <X11/extensions/Xrandr.h>
+ #include <X11/Xft/Xft.h>
+ #include <X11/extensions/xcalibrate.h>
+ #include <X11/keysym.h>
+ 
+-#include "h3600_ts.h"
+ #include "calibrate.h"
+ 
+ Display *dpy;
+@@ -45,15 +43,11 @@ XftColor xftcol;
+ XftDraw *xftdraw;
+ XftFont *xftfont;
+ int screen_x, screen_y;
+-int ts_fd;
+ int samples;
+ Pixmap bg_pixmap;
+ int flag_debug;
+-int rotation = 0;
+ int error_base, event_base;
+ 
+-int using_xcalibrate;
+-
+ int moving;
+ 
+ #define CROSSHAIR_SIZE	25
+@@ -63,7 +57,6 @@ int moving;
+ #define ENOUGH 5
+ #define MAX_SAMPLES 40
+ 
+-#define RAW_DEVICE "/dev/h3600_tsraw"
+ #define FONTNAME "sans-10"
+ 
+ struct point 
+@@ -287,12 +280,8 @@ sort_by_y (const void* a, const void *b)
+ void
+ set_calibration (calibration *cal)
+ {
+-  TS_CAL tc;
+-  int xtrans, ytrans, xscale, yscale, xyscale, yxscale;
+   calibration ocal = *cal;
+ 
+-  if (using_xcalibrate)
+-    {
+       FILE *fp;
+       if (flag_debug)
+ 	printf ("constants are: %d %d %d %d %d %d %d\n", cal->a[1], cal->a[2], cal->a[0], cal->a[4], cal->a[5], cal->a[3], cal->a[6]);
+@@ -304,29 +293,6 @@ set_calibration (calibration *cal)
+ 	}
+       fprintf (fp, "%d %d %d %d %d %d %d\n", cal->a[1], cal->a[2], cal->a[0], cal->a[4], cal->a[5], cal->a[3], cal->a[6]);
+       fclose (fp); 
+-      return;
+-    }
+-
+-  xtrans = cal->a[0] / cal->a[6];
+-  ytrans = cal->a[3] / cal->a[6];
+-  xscale = cal->a[1] * 256 / cal->a[6];
+-  yscale = cal->a[5] * 256 / cal->a[6];
+-  xyscale = cal->a[2] * 256 / cal->a[6];
+-  yxscale = cal->a[4] * 256 / cal->a[6];
+-  
+-  tc.xtrans = xtrans;
+-  tc.ytrans = ytrans;
+-  tc.xscale = xscale;
+-  tc.yscale = yscale;
+-  tc.xyswap = 0;
+-
+-  printf ("%d %d %d %d %d\n", tc.xscale, tc.xtrans, tc.yscale, tc.ytrans, tc.xyswap);
+-
+-  if (ioctl (ts_fd, TS_SET_CAL, (void *)&tc) != 0)
+-    {
+-      perror ("TS_SET_CAL");
+-      exit (1);
+-    }
+ }
+ 
+ void
+@@ -398,80 +364,13 @@ handle_ts_event (int x, int y, int press
+ }
+ 
+ void
+-read_ts (void)
+-{
+-  TS_EVENT ts_ev;
+-  int r;
+-
+-  r = read (ts_fd, &ts_ev, sizeof (ts_ev));
+-  if (r == sizeof (ts_ev))
+-    handle_ts_event (ts_ev.x, ts_ev.y, ts_ev.pressure);
+-}
+-
+-void
+-do_cal (char **args)
+-{
+-  TS_CAL tc;
+-
+-  tc.xscale = atoi (args[0]);
+-  tc.xtrans = atoi (args[1]);
+-  tc.yscale = atoi (args[2]);
+-  tc.ytrans = atoi (args[3]);
+-  tc.xyswap = atoi (args[4]);
+-
+-  if (flag_debug)
+-    fprintf (stderr, "setting: %d %d %d %d %d\n", 
+-	     tc.xtrans, tc.ytrans, tc.xscale, tc.yscale, tc.xyswap);
+-    
+-  if (ioctl (ts_fd, TS_SET_CAL, (void *)&tc) != 0)
+-    {
+-      perror ("TS_SET_CAL");
+-      exit (1);
+-    }
+-  
+-  exit (0);
+-}
+-
+-void
+-show_cal (void)
+-{
+-  TS_CAL tc;
+-
+-  if (ioctl (ts_fd, TS_GET_CAL, (void *)&tc) != 0)
+-    {
+-      perror ("TS_GET_CAL");
+-      exit (1);
+-    }
+-
+-  printf ("%d %d %d %d %d\n", tc.xscale, tc.xtrans, tc.yscale, tc.ytrans, tc.xyswap);
+-}
+-
+-void
+ usage (const char *name)
+ {
+-  fprintf (stderr, "usage: %s -view\n", name);
+-  fprintf (stderr, "       %s [-rotate <0 | 90 | 180 | 270>]\n", name);
+-  fprintf (stderr, "       %s -cal <xs> <xt> <ys> <yt> <xyswap>\n", name);
+-
++  fprintf (stderr, "usage: %s [-debug]\n", name);
+   exit (1);
+ }
+ 
+ int
+-xrr_supported (void)
+-{
+-  int xrr_event_base, xrr_error_base;
+-  int xrr_major, xrr_minor;
+-
+-  if (XRRQueryExtension (dpy, &xrr_event_base, &xrr_error_base) == False
+-      || XRRQueryVersion (dpy, &xrr_major, &xrr_minor) == 0
+-      || xrr_major != 1
+-      || xrr_minor < 1)
+-    return 0;
+-
+-  return 1;
+-}
+-
+-int
+ main (int argc, char *argv[])
+ {
+   XSetWindowAttributes attributes;
+@@ -480,31 +379,11 @@ main (int argc, char *argv[])
+   int max_fd;
+   GC bg_gc;
+   int i;
+-  int have_xrandr;
+ 
+   for (i = 1; i < argc; i++)
+     {
+-      if (!strcmp (argv[i], "-view"))
+-	{
+-	  show_cal ();
+-	  exit (0);
+-	}
+-      else if (!strcmp (argv[i], "-debug"))
++      if (!strcmp (argv[i], "-debug"))
+ 	flag_debug = 1;
+-      else if (!strcmp (argv[i], "-cal"))
+-	{
+-	  if (argc > (i + 5))
+-	    do_cal (argv + i + 1);
+-	  else
+-	    usage (argv[0]);
+-	}
+-      else if (!strcmp (argv[i], "-rotate"))
+-	{
+-	  if (argc > (i + 1))
+-	    rotation = atoi (argv[++i]);
+-	  else
+-	    usage (argv[0]);
+-	}
+       else
+ 	usage (argv[0]);
+     }
+@@ -531,48 +410,11 @@ main (int argc, char *argv[])
+ 	  fprintf (stderr, "failed to set raw mode: error %d\n", r);
+ 	  exit (1);
+ 	}
+-
+-      using_xcalibrate = 1;
+-    }
+-
+-  have_xrandr = xrr_supported ();
+-  if (have_xrandr)
+-    {
+-      XRRScreenConfiguration *rr_screen;
+-      Rotation current_rotation;
+-
+-      if (flag_debug)
+-	fprintf (stderr, "XRANDR is supported\n");
+-
+-      rr_screen = XRRGetScreenInfo (dpy, RootWindow (dpy, screen));
+-
+-      XRRRotations (dpy, screen, &current_rotation);
+-
+-      XRRFreeScreenConfigInfo (rr_screen);
+-
+-      if (flag_debug)
+-	fprintf (stderr, "Current RANDR rotation is %d\n", current_rotation);
+-
+-      switch (current_rotation)
+-	{
+-	case RR_Rotate_270:
+-	  rotation += 90;
+-	case RR_Rotate_180:
+-	  rotation += 90;
+-	case RR_Rotate_90:
+-	  rotation += 90;
+-	  rotation %= 360;
+-	case RR_Rotate_0:
+-	  break;
+-	default:
+-	  fprintf (stderr, "Unknown RANDR rotation: %d\n", current_rotation);
+-	  break;
+-	}
+     }
+   else
+     {
+-      if (flag_debug)
+-	fprintf (stderr, "XRANDR not supported\n");
++      perror ("XCALIBRATE extension missing");
++      exit (1);
+     }
+ 
+   attributes.override_redirect = flag_debug ? False : True;
+@@ -666,45 +508,17 @@ main (int argc, char *argv[])
+ 
+   for (i = 0; i < NR_POINTS; i++)
+     {
+-      switch (rotation)
+-	{
+-	case 0:
+-	  cal.xfb[i] = cal.xscr[i];
+-	  cal.yfb[i] = cal.yscr[i];
+-	  break;
+-	case 90:
+-	  cal.xfb[i] = cal.yscr[i];
+-	  cal.yfb[i] = screen_x - cal.xscr[i];
+-	  break;
+-	case 180:
+-	  cal.xfb[i] = screen_x - cal.xscr[i];
+-	  cal.yfb[i] = screen_y - cal.yscr[i];
+-	  break;
+-	case 270:
+-	  cal.xfb[i] = screen_y - cal.yscr[i];
+-	  cal.yfb[i] = cal.xscr[i];
+-	  break;
+-	}
++      cal.xfb[i] = cal.xscr[i];
++      cal.yfb[i] = cal.yscr[i];
++      XCalibrateScreenToCoord (dpy, &cal.xfb[i], &cal.yfb[i]);
+ 
+       if (flag_debug)
+-	printf ("rotation %d: (%d,%d) -> (%d,%d)\n", rotation, 
++	printf ("rotation conversion: (%d,%d) -> (%d,%d)\n",
+ 		cal.xscr[i], cal.yscr[i], cal.xfb[i], cal.yfb[i]);
+     }
+ 
+   next_event ();
+ 
+-  if (!using_xcalibrate)
+-    {
+-      ts_fd = open (RAW_DEVICE, O_RDONLY);
+-      if (ts_fd < 0)
+-	{
+-	  perror (RAW_DEVICE);
+-	  exit (1);
+-	}
+-    }
+-
+-  max_fd = (xfd > ts_fd) ? xfd : ts_fd;
+-
+   for (;;)
+     {
+       fd_set fds;
+@@ -713,12 +527,8 @@ main (int argc, char *argv[])
+ 
+       FD_ZERO (&fds);
+       FD_SET (xfd, &fds);
+-      if (ts_fd != -1)
+-	FD_SET (ts_fd, &fds);
+ 
+-      select (max_fd + 1, &fds, NULL, NULL, NULL);
+-      
+-      if (ts_fd != -1 && FD_ISSET (ts_fd, &fds))
+-	read_ts ();
++      select (xfd + 1, &fds, NULL, NULL, NULL);
+     }
+ }
++
+Index: xtscal-0.6.3/configure.ac
+===================================================================
+--- xtscal-0.6.3.orig/configure.ac	2004-09-10 20:11:12.000000000 +0100
++++ xtscal-0.6.3/configure.ac	2007-07-01 01:12:55.000000000 +0100
+@@ -9,8 +9,7 @@ AM_INIT_AUTOMAKE([foreign dist-bzip2])
+ # Checks for programs.
+ AC_PROG_CC
+ 
+-PKG_CHECK_MODULES(XTSCAL, x11 xft xext xrandr xcalibrate)
++PKG_CHECK_MODULES(XTSCAL, x11 xft xext xcalibrate)
+ 
+ AC_CONFIG_FILES([Makefile])
+-AC_CONFIG_FILES([xtscal])
+ AC_OUTPUT
+Index: xtscal-0.6.3/gpe-dist.am
+===================================================================
+--- xtscal-0.6.3.orig/gpe-dist.am	2004-06-02 23:07:13.000000000 +0100
++++ /dev/null	1970-01-01 00:00:00.000000000 +0000
+@@ -1,12 +0,0 @@
+-CVSTAG := $(shell echo $(PACKAGE)-$(VERSION) | tr [a-z.] [A-Z_])
+-
+-dist-upload: dist
+-	scp $(PACKAGE)-$(VERSION).tar.bz2 $(USER)@handhelds.org:/home/ftp/pub/projects/gpe/source/
+-
+-tag:
+-	cvs tag $(CVSTAG)
+-
+-retag:
+-	cvs tag -F $(CVSTAG)
+-
+-source: tag dist-upload
+Index: xtscal-0.6.3/h3600_ts.h
+===================================================================
+--- xtscal-0.6.3.orig/h3600_ts.h	2003-07-05 17:27:10.000000000 +0100
++++ /dev/null	1970-01-01 00:00:00.000000000 +0000
+@@ -1,216 +0,0 @@
+-/*
+-*
+-* Driver for the H3600 Touch Screen and other Atmel controlled devices.
+-*
+-* Copyright 2000 Compaq Computer Corporation.
+-*
+-* Use consistent with the GNU GPL is permitted,
+-* provided that this copyright notice is
+-* preserved in its entirety in all copies and derived works.
+-*
+-* COMPAQ COMPUTER CORPORATION MAKES NO WARRANTIES, EXPRESSED OR IMPLIED,
+-* AS TO THE USEFULNESS OR CORRECTNESS OF THIS CODE OR ITS
+-* FITNESS FOR ANY PARTICULAR PURPOSE.
+-*
+-* Author: Charles Flynn.
+-*
+-*/
+-
+-
+-#ifndef __H3600_TS_H__
+-#define __H3600_TS_H__
+-
+-#include <linux/ioctl.h>
+-
+-enum h3600_ts_minor_devices {
+-	TS_MINOR    = 0,
+-	TSRAW_MINOR = 1,
+-	KEY_MINOR   = 2
+-};
+-
+-typedef struct h3600_ts_calibration {
+-        int xscale;
+-        int xtrans;
+-        int yscale;
+-        int ytrans;
+-        int xyswap;
+-} TS_CAL;
+-
+-typedef struct h3600_ts_event {
+-        unsigned short pressure;
+-        unsigned short x;
+-        unsigned short y;
+-        unsigned short pad;
+-} TS_EVENT;
+-
+-/* Deprecated - do not use */
+-typedef struct h3600_ts_return {
+-        unsigned short pressure;
+-        unsigned short x;
+-        unsigned short y;
+-        unsigned short pad;
+-} TS_RET;
+-
+-enum power_button_mode {
+-   PBM_SUSPEND           = 0,
+-   PBM_GENERATE_KEYPRESS = 1
+-};
+-
+-
+-/* ++++++++++++++ +++++++++++++++++++++++++++++++++++++ */
+-
+-typedef struct therm_dev {
+-	short data;
+-} THERM_DEV;
+-
+-#define H3600_BATT_CHEM_ALKALINE        0x01
+-#define H3600_BATT_CHEM_NICD            0x02
+-#define H3600_BATT_CHEM_NIMH            0x03
+-#define H3600_BATT_CHEM_LION            0x04
+-#define H3600_BATT_CHEM_LIPOLY          0x05
+-#define H3600_BATT_CHEM_NOT_INSTALLED   0x06
+-#define H3600_BATT_CHEM_UNKNOWN         0xff
+-
+-/* These should match the apm_bios.h definitions */
+-#define H3600_AC_STATUS_AC_OFFLINE	0x00
+-#define H3600_AC_STATUS_AC_ONLINE	0x01
+-#define H3600_AC_STATUS_AC_BACKUP	0x02   /* What does this mean? */
+-#define H3600_AC_STATUS_AC_UNKNOWN	0xff
+-
+-/* These bitfields are rarely "or'd" together */
+-#define H3600_BATT_STATUS_HIGH		0x01
+-#define H3600_BATT_STATUS_LOW		0x02
+-#define H3600_BATT_STATUS_CRITICAL	0x04
+-#define H3600_BATT_STATUS_CHARGING	0x08
+-#define H3600_BATT_STATUS_CHARGE_MAIN   0x10
+-#define H3600_BATT_STATUS_DEAD          0x20   /* Battery will not charge */
+-#define H3600_BATT_NOT_INSTALLED        0x20   /* For expansion pack batteries */
+-#define H3600_BATT_STATUS_FULL          0x40   /* Battery fully charged (and connected to AC) */
+-#define H3600_BATT_STATUS_NOBATT	0x80
+-#define H3600_BATT_STATUS_UNKNOWN	0xff
+-
+-struct battery_data {
+-	unsigned char  chemistry;
+-	unsigned char  status;
+-	unsigned short voltage;    /* Voltage for battery #0; unknown for battery #1 */
+-	unsigned short percentage; /* Percentage of full charge */
+-	unsigned short life;       /* Life remaining in minutes */
+-};
+-
+-struct h3600_battery {
+-        unsigned char       ac_status;
+-	unsigned char       battery_count;  /* How many batteries we have */
+-	struct battery_data battery[2];
+-};
+-
+-/* -------- EEPROM and SPI Interfaces ---------------*/
+-
+-#define EEPROM_RD_BUFSIZ 6	/* EEPROM reads are 16 bits */
+-#define EEPROM_WR_BUFSIZ 5	/* Allow room for 8bit 'addr' field in buffer*/ 
+-#define SPI_RD_BUFSIZ	 16	/* SPI reads are 8 bits */
+-#define SPI_WR_BUFSIZ	 7
+-
+-/* The EEPROM is where internal programs are stored on the Amtel.
+-   You probably don't want to read or write these values */
+-
+-typedef struct h3600_eeprom_read_request {
+-	unsigned char addr;    /* 8bit Address Offset 0-255 */
+-	unsigned char len;     /* Number of 16bit words to read 0-128  */
+-	unsigned short buff[EEPROM_RD_BUFSIZ];
+-} EEPROM_READ;
+-
+-typedef struct h3600_eeprom_write_request {
+-	unsigned char len;	/* used only to compute the number of bytes to send */
+-	unsigned char addr;    /* 0-128  */
+-	unsigned short buff[EEPROM_WR_BUFSIZ];
+-} EEPROM_WRITE;
+-
+-/* The SPI bus connects to EEPROMs located on sleeves plugged into
+-   the iPAQ.  You may want to read these values  */
+-
+-typedef struct h3600_spi_read_request {
+-	unsigned short addr;    /* 16bit Address Offset 0-128 */
+-	unsigned char len;      /* Number of bytes to read */
+-	unsigned char buff[SPI_RD_BUFSIZ];
+-} SPI_READ;
+-
+-#define SPI_READ_STATUS_BYTE  0xffff   /* Use this address to read the status byte */
+-
+-typedef struct h3600_spi_write_request {
+-	unsigned short len;	/* used only to compute the number of bytes to send */
+-	unsigned short addr;	/* this 16bit address accesses a single byte */
+-	unsigned char  buff[SPI_WR_BUFSIZ];
+-} SPI_WRITE;
+-
+-
+-/* -------- end of EEPROM and SPI Interfaces ---------------*/
+-
+-/* User space structures for IOCTL calls */
+-
+-typedef struct h3600_ts_version {
+-	unsigned char host_version[8];	/* ascii "x.yy" */
+-	unsigned char pack_version[8];	/* ascii "x.yy" */
+-	unsigned char boot_type;		/* TODO ?? */
+-} VER_RET;
+-
+-typedef struct h3600_ts_led {
+-        unsigned char OffOnBlink;       /* 0=off 1=on 2=Blink */
+-        unsigned char TotalTime;        /* Units of 5 seconds */
+-        unsigned char OnTime;           /* units of 100m/s */
+-        unsigned char OffTime;          /* units of 100m/s */
+-} LED_IN;
+-
+-enum flite_mode {
+-        FLITE_MODE1 = 1,
+-	FLITE_AUTO_MODE   = 1,     /* for reference only */
+-	FLITE_MANUAL_MODE = 2,     /* Use this normally? */
+-	FLITE_GET_LIGHT_SENSOR = 3 /* Returns light reading in "brightness" field */
+-};
+-enum flite_pwr {
+-        FLITE_PWR_OFF = 0,
+-        FLITE_PWR_ON  = 1
+-};
+-
+-typedef struct h3600_ts_flite {
+-        unsigned char mode;
+-        unsigned char pwr;
+-        unsigned char brightness;
+-} FLITE_IN;
+-
+-/*************************** Updated "universal" structures *******************/
+-
+-/* Sets backlight for both H3100 and H3600 models - technically "frontlight" for H3600 */
+-struct h3600_ts_backlight {
+-	enum flite_pwr power;          /* 0 = off, 1 = on */
+-	unsigned char  brightness;     /* 0 - 255         */
+-};
+-
+-struct h3600_ts_contrast {            /* Only useful on H3100 model */
+-	unsigned char contrast;       /* 0 - 255 */
+-};
+-
+-/* IOCTL cmds  user or kernel space */
+-
+-/* Use 'f' as magic number */
+-#define IOC_H3600_TS_MAGIC  'f'
+-
+-/* TODO: Some of these IOWR values are just plain wrong */
+-#define GET_VERSION		_IOR(IOC_H3600_TS_MAGIC,  1, struct h3600_ts_version )
+-#define READ_EEPROM		_IOWR(IOC_H3600_TS_MAGIC, 2, struct h3600_eeprom_read_request)
+-#define WRITE_EEPROM		_IOWR(IOC_H3600_TS_MAGIC, 3, struct h3600_eeprom_write_request)
+-#define GET_THERMAL		_IOR(IOC_H3600_TS_MAGIC,  4, struct therm_dev)
+-#define LED_ON			_IOW(IOC_H3600_TS_MAGIC,  5, struct h3600_ts_led)
+-#define GET_BATTERY_STATUS	_IOR(IOC_H3600_TS_MAGIC,  6, struct h3600_battery)
+-#define FLITE_ON		_IOW(IOC_H3600_TS_MAGIC,  7, struct h3600_ts_flite)
+-#define READ_SPI		_IOWR(IOC_H3600_TS_MAGIC, 8, struct h3600_spi_read_request)
+-#define WRITE_SPI		_IOWR(IOC_H3600_TS_MAGIC, 9, struct h3600_spi_write_request)
+-#define TS_GET_CAL		_IOR(IOC_H3600_TS_MAGIC, 10, struct h3600_ts_calibration)
+-#define TS_SET_CAL		_IOW(IOC_H3600_TS_MAGIC, 11, struct h3600_ts_calibration)
+-
+-/* New IOCTL interfaces - defined to be more user friendly */
+-#define TS_GET_BACKLIGHT        _IOR(IOC_H3600_TS_MAGIC, 20, struct h3600_ts_backlight)
+-#define TS_SET_BACKLIGHT        _IOW(IOC_H3600_TS_MAGIC, 20, struct h3600_ts_backlight)
+-#define TS_GET_CONTRAST         _IOR(IOC_H3600_TS_MAGIC, 21, struct h3600_ts_contrast)
+-#define TS_SET_CONTRAST         _IOW(IOC_H3600_TS_MAGIC, 21, struct h3600_ts_contrast)
+-
+-#endif
+Index: xtscal-0.6.3/Makefile.am
+===================================================================
+--- xtscal-0.6.3.orig/Makefile.am	2004-06-02 23:07:13.000000000 +0100
++++ xtscal-0.6.3/Makefile.am	2007-07-02 12:51:02.000000000 +0100
+@@ -1,11 +1,8 @@
+-libexec_PROGRAMS = xtscal.bin
+-bin_SCRIPTS = xtscal
++bin_PROGRAMS = xtscal
+ 
+-xtscal_bin_SOURCES = main.c calibrate.c calibrate.h h3600_ts.h
++xtscal_SOURCES = main.c calibrate.c calibrate.h
+ 
+-xtscal_bin_LDADD = @XTSCAL_LIBS@
++xtscal_LDADD = @XTSCAL_LIBS@
+ 
+ INCLUDES = @XTSCAL_CFLAGS@ -DNR_POINTS=5
+ 
+-include gpe-dist.am
+-

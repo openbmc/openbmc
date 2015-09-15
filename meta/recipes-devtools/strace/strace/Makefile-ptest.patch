@@ -1,0 +1,53 @@
+strace: Add ptest
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Gabriel Barbu <gabriel.barbu@enea.com>
+Signed-off-by: Chong Lu <Chong.Lu@windriver.com>
+---
+ configure.ac      |  2 +-
+ tests/Makefile.am | 18 ++++++++++++++++++
+ 2 files changed, 19 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index e73958c..5f0dfee 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -6,7 +6,7 @@ AC_INIT([strace],
+ AC_CONFIG_SRCDIR([strace.c])
+ AC_CONFIG_AUX_DIR([.])
+ AC_CONFIG_HEADERS([config.h])
+-AM_INIT_AUTOMAKE([foreign dist-xz no-dist-gzip silent-rules parallel-tests])
++AM_INIT_AUTOMAKE([foreign dist-xz no-dist-gzip silent-rules serial-tests])
+ AM_MAINTAINER_MODE
+ AC_CANONICAL_HOST
+ 
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index ff5e136..984bdb6 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -101,3 +101,21 @@ EXTRA_DIST = init.sh run.sh \
+ 	     $(TESTS)
+ 
+ CLEANFILES = $(TESTS:=.tmp)
++
++buildtest-TESTS: $(check_PROGRAMS) $(TESTS)
++
++install-ptest:
++	install $(BUILDDIR)/strace $(DESTDIR)
++	install "$(srcdir)/.."/strace-log-merge $(DESTDIR)
++	install -d $(DESTDIR)/$(TESTDIR)
++	cp $(BUILDDIR)/$(TESTDIR)/Makefile $(DESTDIR)/$(TESTDIR)
++	sed -i -e 's/^Makefile:/_Makefile:/' $(DESTDIR)/$(TESTDIR)/Makefile
++	sed -i -e 's/bash/sh/' $(DESTDIR)/$(TESTDIR)/Makefile
++	for file in $(check_PROGRAMS); do \
++		install $(BUILDDIR)/$(TESTDIR)/$$file $(DESTDIR)/$(TESTDIR); \
++	done
++	for file in $(EXTRA_DIST); do \
++		install $(srcdir)/$$file $(DESTDIR)/$(TESTDIR); \
++		sed -i -e 's/$${srcdir=.}/./g' $(DESTDIR)/$(TESTDIR)/$$file; \
++	done
++	for i in net net-fd scm_rights-fd sigaction; do sed -i -e 's/$$srcdir/./g' $(DESTDIR)/$(TESTDIR)/$$i.test; done
+-- 
+1.9.1
+

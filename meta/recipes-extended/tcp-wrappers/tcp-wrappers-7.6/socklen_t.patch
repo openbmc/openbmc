@@ -1,0 +1,59 @@
+commit 88b6984ef0bf3b703c1c851092662b95e91db1ff
+Author: farrah rashid <farrah.rashid@windriver.com>
+Date:   Tue Feb 12 09:53:50 2013 -0500
+
+    tcp-wrappers Support for building with glibc
+    
+    Added support for socklen_t type to len argument passed to socket related
+    calls. This fixes a bug that causes tcp wrappers to fail when using sshd.
+    
+    Upstream-Status: Pending
+    
+    Signed-off-by: farrah rashid <farrah.rashid@windriver.com>
+
+diff --git a/fix_options.c b/fix_options.c
+index 7473adf..fe2b442 100644
+--- a/fix_options.c
++++ b/fix_options.c
+@@ -38,7 +38,12 @@ struct request_info *request;
+ #ifdef IP_OPTIONS
+     unsigned char optbuf[BUFFER_SIZE / 3], *cp;
+     char    lbuf[BUFFER_SIZE], *lp;
+-    int     optsize = sizeof(optbuf), ipproto;
++#ifdef __GLIBC__
++    socklen_t  optsize = sizeof(optbuf);
++#else
++    int     optsize = sizeof(optbuf);
++#endif
++    int ipproto;
+     struct protoent *ip;
+     int     fd = request->fd;
+     unsigned int opt;
+diff --git a/socket.c b/socket.c
+index 4b2c575..a0d2987 100644
+--- a/socket.c
++++ b/socket.c
+@@ -95,7 +95,11 @@ struct request_info *request;
+     static struct sockaddr_in client;
+     static struct sockaddr_in server;
+ #endif
++#ifdef __GLIBC__
++    socklen_t  len;
++#else
+     int     len;
++#endif
+     char    buf[BUFSIZ];
+     int     fd = request->fd;
+ 
+@@ -426,7 +430,11 @@ int     fd;
+ #else
+     struct sockaddr_in sin;
+ #endif
++#ifdef __GLIBC__
++    socklen_t  size = sizeof(sin);
++#else
+     int     size = sizeof(sin);
++#endif
+ 
+     /*
+      * Eat up the not-yet received datagram. Some systems insist on a

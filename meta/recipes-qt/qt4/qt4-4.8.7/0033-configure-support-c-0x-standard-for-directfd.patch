@@ -1,0 +1,40 @@
+configure: support c++0x standard for directfd
+
+While directfd upgrade to 1.7.6, it always includes directfb++ utils
+when C++ is used and set c++0x as c++ standard.
+(In git://git.directfb.org/git/directfb/core/DirectFB.git
+commit b444bcae3197be9faf883460dcc239ef757d5922, and commit
+522beeb76f2a8d2dee30d928d2a5955bd06cf25c)
+
+The directfd in qt4 is c++, and there was a build failure:
+...
+| qdirectfbwindowsurface.cpp:336:69: error: in C++98 'rect' must be
+initialized by constructor, not by '{...}'
+|      const DFBRectangle rect = { r.x(), r.y(), r.width(), r.height() };
+...
+
+The g++ used c++98 as default c++ standard, we should
+explicitly set c++0x for directfd in qt4.
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configure b/configure
+index 5724bd6..ecc2f8b 100755
+--- a/configure
++++ b/configure
+@@ -6656,6 +6656,7 @@ if [ "$PLATFORM_QWS" = "yes" ]; then
+        if [ "${screen}" = "directfb" ] && [ "${CFG_CONFIGURE_EXIT_ON_ERROR}" = "yes" ]; then
+            if test -n "$PKG_CONFIG" && "$PKG_CONFIG" --exists directfb 2>/dev/null; then
+                QT_CFLAGS_DIRECTFB=`$PKG_CONFIG --cflags directfb 2>/dev/null`
++               QT_CFLAGS_DIRECTFB="$QT_CFLAGS_DIRECTFB -std=c++0x"
+                QT_LIBS_DIRECTFB=`$PKG_CONFIG --libs directfb 2>/dev/null`
+            elif directfb-config --version >/dev/null 2>&1; then
+                QT_CFLAGS_DIRECTFB=`directfb-config --cflags 2>/dev/null`
+-- 
+1.9.1
+

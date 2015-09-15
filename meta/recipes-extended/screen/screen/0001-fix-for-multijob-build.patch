@@ -1,0 +1,58 @@
+Upstream-Status: Backport
+
+Backport patch to fix parallel build failure and update context to make patch
+coulde be applied.
+
+http://git.savannah.gnu.org/cgit/screen.git/commit?id=c0de6dd
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+From c0de6dd7970b2c7b426a5c39dcbc31c2bef87232 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Amadeusz=20S=C5=82awi=C5=84ski?= <amade@asmblr.net>
+Date: Thu, 2 Jan 2014 18:18:06 +0100
+Subject: [PATCH] fix for multijob build
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+make sure that comm.sh script generates comm.h header before doing
+anything else
+
+Signed-off-by: Amadeusz Sławiński <amade@asmblr.net>
+---
+ Makefile.in | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index ce86cbc..dea16d8 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -298,7 +298,7 @@ search.o: layout.h viewport.h canvas.h search.c config.h screen.h os.h osdef.h a
+  comm.h layer.h term.h image.h display.h window.h mark.h extern.h
+ tty.o: layout.h viewport.h canvas.h tty.c config.h screen.h os.h osdef.h ansi.h acls.h comm.h \
+  layer.h term.h image.h display.h window.h extern.h
+-term.o: layout.h viewport.h canvas.h term.c term.h
++term.o: layout.h viewport.h canvas.h term.c term.h comm.h
+ window.o: layout.h viewport.h canvas.h window.c config.h screen.h os.h osdef.h ansi.h acls.h \
+  comm.h layer.h term.h image.h display.h window.h extern.h logfile.h
+ utmp.o: layout.h viewport.h canvas.h utmp.c config.h screen.h os.h osdef.h ansi.h acls.h \
+@@ -324,7 +324,7 @@ canvas.o: layout.h viewport.h canvas.h canvas.c config.h screen.h os.h osdef.h a
+  comm.h layer.h term.h image.h display.h window.h extern.h \
+  braille.h
+ comm.o: layout.h viewport.h canvas.h comm.c config.h acls.h comm.h
+-kmapdef.o: layout.h viewport.h canvas.h kmapdef.c config.h
++kmapdef.o: layout.h viewport.h canvas.h kmapdef.c config.h comm.h
+ acls.o: layout.h viewport.h canvas.h acls.c config.h screen.h os.h osdef.h ansi.h acls.h comm.h \
+  layer.h term.h image.h display.h window.h extern.h
+ braille.o: layout.h viewport.h canvas.h braille.c config.h screen.h os.h osdef.h ansi.h acls.h \
+@@ -350,7 +350,7 @@ layout.o: layout.h viewport.h canvas.h layout.c config.h screen.h os.h osdef.h a
+ viewport.o: layout.h viewport.h canvas.h viewport.c config.h screen.h os.h osdef.h ansi.h acls.h \
+  comm.h layer.h term.h image.h display.h window.h extern.h \
+  braille.h
+-list_generic.o: list_generic.h list_generic.c layer.h screen.h osdef.h
+-list_display.o: list_generic.h list_display.c layer.h screen.h osdef.h
+-list_window.o: list_generic.h list_window.c window.h layer.h screen.h osdef.h
++list_generic.o: list_generic.h list_generic.c layer.h screen.h osdef.h comm.h
++list_display.o: list_generic.h list_display.c layer.h screen.h osdef.h comm.h
++list_window.o: list_generic.h list_window.c window.h layer.h screen.h osdef.h comm.h
+ 

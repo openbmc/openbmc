@@ -1,0 +1,64 @@
+#!/bin/sh
+#
+# /etc/init.d/xinetd  --  script to start and stop xinetd.
+
+# Source function library.
+. /etc/init.d/functions
+
+if test -f /etc/default/xinetd; then
+	. /etc/default/xinetd
+fi
+
+
+test -x /usr/sbin/xinetd || exit 0
+
+checkportmap () {
+  if grep "^[^ *#]" /etc/xinetd.conf | grep -q 'rpc/'; then
+    if ! rpcinfo -u localhost portmapper >/dev/null 2>&1; then
+      echo
+      echo "WARNING: portmapper inactive - RPC services unavailable!"
+      echo "    Commenting out or removing the RPC services from"
+      echo "    the /etc/xinetd.conf file will remove this message."
+      echo
+    fi
+  fi
+} 
+
+case "$1" in
+    start)
+        checkportmap
+	echo -n "Starting internet superserver: xinetd"
+	start-stop-daemon --start --quiet --background --exec /usr/sbin/xinetd -- -pidfile /var/run/xinetd.pid $XINETD_OPTS
+	echo "."
+	;;
+    stop)
+	echo -n "Stopping internet superserver: xinetd"
+	start-stop-daemon --stop --signal 3 --quiet --exec /usr/sbin/xinetd
+	echo "."
+	;;
+    status)
+	status /usr/sbin/xinetd;
+	exit $?
+	;;
+    reload)
+	echo -n "Reloading internet superserver configuration: xinetd"
+	start-stop-daemon --stop --signal 1 --quiet --exec /usr/sbin/xinetd
+	echo "."
+	;;
+    force-reload)
+	echo "$0 force-reload: Force Reload is deprecated"
+	echo -n "Forcefully reloading internet superserver configuration: xinetd"
+	start-stop-daemon --stop --signal 1 --quiet --exec /usr/sbin/xinetd
+	echo "."
+	;;
+    restart)
+	$0 stop
+	$0 start
+	;;
+    *)
+	echo "Usage: /etc/init.d/xinetd {start|stop|status|reload|force-reload|restart}"
+	exit 1
+	;;
+esac
+
+exit 0

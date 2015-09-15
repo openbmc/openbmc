@@ -1,0 +1,30 @@
+Patch setup.py so that the detect_modules() function looks for required
+libraries and headers in STAGING_LIBDIR / STAGING_INCDIR.
+
+Without this patch, several extension modules are not built, even though
+their dependencies are present in the compiler's search paths.
+The result is the following warning, and ultimately incomplete packages:
+
+| The necessary bits to build these optional modules were not found:
+| _bz2                  _curses_panel         _dbm
+| _gdbm                 _lzma                 _sqlite3
+| nis                   readline              zlib
+| To find the necessary bits, look in setup.py in detect_modules() for the module's name.
+
+Upstream-Status:  Inappropriate [Cross compile specific]
+
+Signed-off-by: Dominic Sacré <dominic.sacre@gmx.de>
+
+Index: Python-3.4.3/setup.py
+===================================================================
+--- Python-3.4.3.orig/setup.py
++++ Python-3.4.3/setup.py
+@@ -521,6 +521,8 @@ class PyBuildExt(build_ext):
+         else:
+             lib_dirs = self.compiler.library_dirs[:]
+             inc_dirs = self.compiler.include_dirs[:]
++            lib_dirs.append(os.environ.get('STAGING_LIBDIR'))
++            inc_dirs.append(os.environ.get('STAGING_INCDIR'))
+         exts = []
+         missing = []
+ 

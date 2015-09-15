@@ -1,0 +1,45 @@
+#!/bin/sh
+
+. /etc/init.d/functions
+
+nice=
+force=
+pidfile=
+user=
+check=
+RETVAL=
+while [ "$1" != "${1##[-+]}" ]; do
+	case $1 in
+	     -f)
+	     	force="--force"
+		shift
+		;;
+	     -n)
+	     	nice=$2
+		shift 2
+		;;
+	     -p)
+		pidfile="--pidfile $2"
+		shift 2
+		;;
+	     -u)
+	        user="--user $2"
+		shift 2
+		;;
+	     -c)
+	        check="--check $2"
+		shift 2
+		;;
+	      *)     
+ 		echo "Unknown Option $1"
+ 		echo "Options are:"
+ 		echo "-f" 
+		echo "-p {pidfile}"
+		echo "-n [+/-nicelevel]"
+		echo "-u {user}"
+		echo "-c {base}"
+	        exit 1;;	
+	esac
+done
+LSB=LSB-1.1 daemon ${force:-} ${nice:-} ${pidfile:-} ${user:-} ${check:-} $*
+exit $?

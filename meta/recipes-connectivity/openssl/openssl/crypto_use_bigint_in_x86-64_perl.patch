@@ -1,0 +1,35 @@
+Upsteram Status: Backport
+
+When building on x32 systems where the default type is 32bit, make sure
+we can transparently represent 64bit integers.  Otherwise we end up with
+build errors like:
+/usr/bin/perl asm/ghash-x86_64.pl elf > ghash-x86_64.s
+Integer overflow in hexadecimal number at asm/../../perlasm/x86_64-xlate.pl line 201, <> line 890.
+...
+ghash-x86_64.s: Assembler messages:
+ghash-x86_64.s:890: Error: junk '.15473355479995e+19' after expression
+
+We don't enable this globally as there are some cases where we'd get
+32bit values interpreted as unsigned when we need them as signed.
+
+Reported-by: Bertrand Jacquin <bertrand@jacquin.bzh>
+URL: https://bugs.gentoo.org/542618
+
+Signed-off-By: Armin Kuster <akuster@mvista.com>
+
+Index: openssl-1.0.2a/crypto/perlasm/x86_64-xlate.pl
+===================================================================
+--- openssl-1.0.2a.orig/crypto/perlasm/x86_64-xlate.pl
++++ openssl-1.0.2a/crypto/perlasm/x86_64-xlate.pl
+@@ -194,7 +194,10 @@ my %globals;
+     }
+     sub out {
+     	my $self = shift;
+-
++	# When building on x32 ABIs, the expanded hex value might be too
++	# big to fit into 32bits. Enable transparent 64bit support here
++	# so we can safely print it out.
++	use bigint;
+ 	if ($gas) {
+ 	    # Solaris /usr/ccs/bin/as can't handle multiplications
+ 	    # in $self->{value}

@@ -1,0 +1,8 @@
+<a href="{% url 'project' extra.pid %}?setMachine={{data.name}}" class="btn btn-block layer-exists-{{data.layer_version.id}}" style="margin-top: 5px; display:none">
+  Select machine</a>
+<button class="btn btn-block layerbtn layer-add-{{data.layer_version.id}}" data-layer='{ "id": {{data.layer_version.id}}, "name":  "{{data.layer_version.layer.name}}", "layerdetailurl": "{%url 'layerdetails' extra.pid data.layer_version.id %}"}' data-directive="add">
+  <i class="icon-plus"></i>
+  Add layer
+  <i title="" class="icon-question-sign get-help" data-original-title="To enable this machine, you must first add the {{data.layer_version.layer.name}} layer to your project"></i>
+</button>
+

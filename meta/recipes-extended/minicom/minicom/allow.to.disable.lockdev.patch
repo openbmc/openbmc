@@ -1,0 +1,21 @@
+Upstream-Status: Pending
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
+--- a/configure.in	2013-02-06 18:18:13.000000000 +0100
++++ b/configure.in	2013-07-21 15:31:27.614828894 +0200
+@@ -40,7 +40,13 @@
+ fi
+ 
+ PKG_PROG_PKG_CONFIG
+-if test -n "$PKG_CONFIG"; then
++
++AC_ARG_ENABLE([lockdev],
++        AS_HELP_STRING([--enable-lockdev],
++                       [Enable lockdev support (def: enabled)]),
++        [], [enable_lockdev="yes"])
++
++if test -n "$PKG_CONFIG" && test "x$enable_lockdev" = xyes; then
+ 	PKG_CHECK_MODULES([LOCKDEV], [lockdev], AC_DEFINE([HAVE_LOCKDEV],[1],[Define if you have lockdev]),[:])
+ fi
+ 

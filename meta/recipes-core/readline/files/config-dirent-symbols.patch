@@ -1,0 +1,34 @@
+Fix the names of the STRUCT_DIRENT_D symbols to match the names used by both
+configure and the source code.
+
+Upstream-Status: Submitted (http://lists.gnu.org/archive/html/bug-readline/2014-05/msg00008.html)
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From e48656811550774892fd4e0f4b3c7d418422da52 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Tue, 27 May 2014 22:32:31 +0100
+Subject: [PATCH] config.h.in: fix names of STRUCT_DIRENT_D symbols
+
+---
+ config.h.in |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/config.h.in b/config.h.in
+index a67e43e..a42acc5 100644
+--- a/config.h.in
++++ b/config.h.in
+@@ -244,9 +244,9 @@
+ 
+ #undef HAVE_GETPW_DECLS
+ 
+-#undef STRUCT_DIRENT_HAS_D_INO
++#undef HAVE_STRUCT_DIRENT_D_INO
+ 
+-#undef STRUCT_DIRENT_HAS_D_FILENO
++#undef HAVE_STRUCT_DIRENT_D_FILENO
+ 
+ #undef HAVE_BSD_SIGNALS
+ 
+-- 
+1.7.10.4
+

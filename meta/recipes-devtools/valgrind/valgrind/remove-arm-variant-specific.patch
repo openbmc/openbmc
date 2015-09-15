@@ -1,0 +1,66 @@
+Remove arm tests that don't compile
+
+Upstream-Status: Pending
+
+Corrects the original commit for the patch that removed ARM ptest CFLAGS
+settings. Since the flags could be set by a user, the flags should
+be kept in place during compilation.  By keeping the original up-stream
+CFLAGS for the tests, then additional tests successfully compile
+for all tested ARM tunings.
+
+However, there were still two tests listed below that did not compile
+for any beaglebone tuning that is valid for valgrind. With the updated
+patch, the set of excluded ARM ptests and their respective build
+failures are:
+  intdiv - fails for all beaglebone tunings with 2 errors:
+  {standard input}:(40 or 41): Error: selected processor does not
+       support Thumb mode `udiv r3,r9,r10'
+  {standard input}:(72 or 73): Error: selected processor does not
+       support Thumb mode `sdiv r3,r9,r10'
+
+  vcvt_fixed_float_VFP - fails for all beaglebone tunings in one of
+  two ways:
+    with neon tuning (-mfpu=neon) fails with Internal Compiler Error
+    without neon tuning fails with 3 errors:
+    {standard input}:33: Error: selected FPU does not support
+      instruction -- `vcvt.f32.s32 s15,s15,#1'
+    {standard input}:58: Error: selected FPU does not support
+      instruction -- `vcvt.f32.s32 s15,s15,#32'
+    {standard input}:136: Error: selected FPU does not support
+      instruction -- `vcvt.f32.u32 s15,s15,#1'
+
+After applying this commit, the valgrind ARM ptests compile without
+errors for tunings:
+  armv7[t][hf][b][-neon] cortexa8[t][hf][-neon]
+where the tuning [option] was successfully compiled, both with
+and without the 'option', and in combination with all other options.
+
+Signed-off-by: Dave Lerner <dave.lerner@windriver.com>
+
+Index: valgrind-3.10.1/none/tests/arm/Makefile.am
+===================================================================
+--- valgrind-3.10.1.orig/none/tests/arm/Makefile.am	2015-05-19 15:11:59.224842927 -0500
++++ valgrind-3.10.1/none/tests/arm/Makefile.am	2015-05-19 15:14:20.808847028 -0500
+@@ -17,9 +17,13 @@
+ 	vfp.stdout.exp vfp.stderr.exp vfp.vgtest \
+ 	vfpv4_fma.stdout.exp vfpv4_fma.stderr.exp vfpv4_fma.vgtest
+ 
++# Remove the following tests which cause compiler errors for all tunings
++#  available for beagle bone (see remove-arm-variant-specific.patch):
++#	intdiv
++#	vcvt_fixed_float_VFP
++
+ check_PROGRAMS = \
+ 	allexec \
+-	intdiv \
+ 	ldrt \
+ 	ldrt_arm \
+ 	neon128 \
+@@ -27,7 +31,6 @@
+ 	v6intARM \
+ 	v6intThumb \
+ 	v6media \
+-	vcvt_fixed_float_VFP \
+ 	vfp \
+ 	vfpv4_fma
+ 

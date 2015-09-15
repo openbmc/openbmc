@@ -1,0 +1,66 @@
+#!/bin/bash
+#
+# QEMU network configuration script to bring down tap devices. This
+# utility needs to be run as root, and will use the tunctl binary
+# from the native sysroot. 
+#
+# If you find yourself calling this script a lot, you can add the
+# the following to your /etc/sudoers file to be able to run this
+# command without entering your password each time:
+#
+# <my-username> ALL=NOPASSWD: /path/to/runqemu-ifup
+# <my-username> ALL=NOPASSWD: /path/to/runqemu-ifdown
+#
+# Copyright (c) 2006-2011 Linux Foundation
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+usage() {
+	echo "sudo $(basename $0) <tap-dev> <native-sysroot-basedir>"
+}
+
+if [ $EUID -ne 0 ]; then
+	echo "Error: This script (runqemu-ifdown) must be run with root privileges"
+	exit 1
+fi
+
+if [ $# -ne 2 ]; then
+	usage
+	exit 1
+fi
+
+TAP=$1
+NATIVE_SYSROOT_DIR=$2
+
+TUNCTL=$NATIVE_SYSROOT_DIR/usr/bin/tunctl
+if [ ! -e "$TUNCTL" ]; then
+	echo "Error: Unable to find tunctl binary in '$NATIVE_SYSROOT_DIR/usr/bin', please bitbake qemu-helper-native"
+	exit 1
+fi
+
+$TUNCTL -d $TAP
+
+# cleanup the remaining iptables rules
+IPTABLES=`which iptables 2> /dev/null`
+if [ "x$IPTABLES" = "x" ]; then
+	IPTABLES=/sbin/iptables
+fi
+if [ ! -x "$IPTABLES" ]; then
+	echo "$IPTABLES cannot be executed"
+	exit 1
+fi
+n=$[ (`echo $TAP | sed 's/tap//'` * 2) + 1 ]
+dest=$[ (`echo $TAP | sed 's/tap//'` * 2) + 2 ]
+$IPTABLES -D POSTROUTING -t nat -j MASQUERADE -s 192.168.7.$n/32
+$IPTABLES -D POSTROUTING -t nat -j MASQUERADE -s 192.168.7.$dest/32

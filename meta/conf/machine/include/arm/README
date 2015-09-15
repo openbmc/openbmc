@@ -1,0 +1,40 @@
+2012/03/30 - Mark Hatle <mark.hatle@windriver.com>
+ - Initial Revision
+
+The ARM architecture definitions are split among a number of files.
+The primary definitions for the variables are handled by the core
+arch-arm.inc file.
+
+TUNE_ARCH is set to either "arm" or "armeb" depending on the value
+of the existence of the "bigendian" feature in a given tune.
+
+A small set of ARM specific variables have been defined to allow 
+TUNE_PKGARCH to be automatically defined.  Optimized tunings must NOT 
+change the definiton of TUNE_PKGARCH.  TUNE_PKGACH_tune-<tune> will be 
+ignored.  The format of the package arch is enforced by the TUNE_PKGARCH
+default.  The format must be of the form:
+<armversion>[t][e][hf][b][-vfp][-neon]
+
+TUNE_PKGARCH is defined as:
+${ARMPKGARCH}${ARMPKGSFX_THUMB}${ARMPKGSFX_DSP}${ARMPKGSFX_EABI}${ARMPKGSFX_ENDIAN}${ARMPKGSFX_FPU}
+
+ARMPKGARCH - This is the core package arch component specified by each 
+tuning.  This is the primary identifier of a tuning.  Usual values are:
+arm, armv4, armv5, armv6, armv7a, etc.
+
+ARMPKGSFX_THUMB - This is the thumb specific suffix.  Curently it is 
+defined in feature-arm-thumb.inc.
+
+ARMPKGSFX_DSP - This is the DSP specific suffix.  Currently this is set 
+to 'e' when on armv5 and the dsp feature is enabled.
+
+ARMPKGSFX_EABI - This is the eabi specific suffix.  There are currently 
+two defined ABIs specificed, standard EABI and Hard Float (VFP) EABI.  
+When the callconvention-hard is enabled, "hf" is specified, otherwise it 
+is blank.
+
+ARMPKGSFX_ENDIAN - This is the endian specific suffix.  It is defined in 
+the core arch-arm.inc file.
+
+ARMPKGSFX_FPU - This is the FPU specific suffix.  The suffix indicates 
+specific FPU optimizations.  'vfp' and 'neon' are both defined.

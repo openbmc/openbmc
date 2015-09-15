@@ -1,0 +1,75 @@
+Upstream-Status: Pending
+
+Updated to apply to pango-1.32.5
+
+Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
+diff -Nurd pango-1.32.5/configure.ac pango-1.32.5/configure.ac
+--- pango-1.32.5/configure.ac	2012-12-07 04:43:25.000000000 +0200
++++ pango-1.32.5/configure.ac	2013-01-09 08:27:40.328516792 +0200
+@@ -213,6 +213,11 @@
+
+ AC_SUBST(PANGO_DEBUG_FLAGS)
+
++AC_ARG_WITH(mlprefix,
++            AC_HELP_STRING([--with-mlprefix=<ARG>], [multilib prefix]),
++            mlprefix_str=$withval, mlprefix_str="")
++AC_DEFINE_UNQUOTED([MLPREFIX], ["$mlprefix_str"], [multilib prefix.])
++
+ AC_ARG_ENABLE(rebuilds,
+               [AC_HELP_STRING([--disable-rebuilds],
+                               [disable all source autogeneration rules])],,
+diff -Nurd pango-1.32.5/pango/modules.c pango-1.32.5/pango/modules.c
+--- pango-1.32.5/pango/modules.c	2012-12-17 20:27:56.000000000 +0200
++++ pango-1.32.5/pango/modules.c	2013-01-09 08:31:16.336512052 +0200
+@@ -555,11 +555,11 @@
+       files = g_new (char *, 3);
+
+       files[0] = g_build_filename (pango_get_sysconf_subdirectory (),
+-                                   "pango.modules",
++                                   MLPREFIX "pango.modules",
+                                    NULL);
+       files[1] = g_build_filename (pango_get_lib_subdirectory (),
+                                    MODULE_VERSION,
+-                                   "modules.cache",
++                                   MLPREFIX "modules.cache",
+                                    NULL);
+       files[2] = NULL;
+     }
+@@ -674,7 +674,8 @@
+       if (!no_module_warning)
+	{
+	  gchar *filename = g_build_filename (pango_get_sysconf_subdirectory (),
+-					      "pango.modules",
++/* For multilib case, keep multiple config file for different libs */
++					      MLPREFIX "pango.modules",
+					      NULL);
+	  g_critical ("No modules found:\n"
+		      "No builtin or dynamically loaded modules were found.\n"
+diff -Nurd pango-1.32.5/pango/modules.c.rej pango-1.32.5/pango/modules.c.rej
+--- pango-1.32.5/pango/modules.c.rej	1970-01-01 02:00:00.000000000 +0200
++++ pango-1.32.5/pango/modules.c.rej	2013-01-09 08:27:40.328516792 +0200
+@@ -0,0 +1,12 @@
++--- pango/modules.c	2010-09-22 03:37:01.000000000 +0800
+++++ pango/modules.c	2012-05-08 21:21:02.000000000 +0800
++@@ -529,7 +529,8 @@
++
++   if (!file_str)
++     file_str = g_build_filename (pango_get_sysconf_subdirectory (),
++-				 "pango.modules",
+++/* For multilib case, keep multiple config file for different libs */
+++				 MLPREFIX "pango.modules",
++ 				 NULL);
++
++   files = pango_split_file_list (file_str);
+diff -Nurd pango-1.32.5/pango/querymodules.c pango-1.32.5/pango/querymodules.c
+--- pango-1.32.5/pango/querymodules.c	2012-08-28 15:27:18.000000000 +0300
++++ pango-1.32.5/pango/querymodules.c	2013-01-09 08:31:47.828511359 +0200
+@@ -304,7 +304,7 @@
+
+       cache_file = g_build_filename (pango_get_lib_subdirectory (),
+                                      MODULE_VERSION,
+-                                     "modules.cache",
++                                     MLPREFIX "modules.cache",
+                                      NULL);
+       err = NULL;
+       if (!g_file_set_contents (cache_file, contents->str, -1, &err))

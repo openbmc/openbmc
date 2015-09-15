@@ -1,0 +1,48 @@
+Original patch submitted by jbowler@nslu2-linux.org on 2005-11-17:
+
+db: fix thumb uclibc operation in 4.3.29
+  - uclibc thumb builds were using libpthread to implement mutexes, the
+  - uclibc version seems to be a stub (at least on thumb).  This commit
+  - fixes the ARM/gcc-assembly mutex implementation so that it has thumb
+  - support and the resultant db4 works (tested on LE Thumb uclibc)
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Author: jbowler@nslu2-linux.org
+
+--- db-5.1.19/src/dbinc/mutex_int.h.orig	2011-01-05 19:21:42.181805366 -0600
++++ db-5.1.19/src/dbinc/mutex_int.h	2011-01-05 19:24:53.141853117 -0600
+@@ -474,6 +474,25 @@
+ 
+ #ifdef LOAD_ACTUAL_MUTEX_CODE
+ /* gcc/arm: 0 is clear, 1 is set. */
++#if defined __thumb__
++#define	MUTEX_SET(tsl) ({						\
++	int __r, __p;							\
++	__asm__ volatile(						\
++		".align 2\n\t"                                          \
++		"bx     pc\n\t"                                         \
++		"nop\n\t"                                               \
++		".arm\n\t"                                              \
++		"swpb   %0, %2, [%3]\n\t"                               \
++		"eor    %0, %0, #1\n\t"                                 \
++		"orr    %1, pc, #1\n\t"                                 \
++		"bx     %1\n\t"                                         \
++		".force_thumb"                                          \
++	    : "=&r" (__r), "=r" (__p)                                   \
++	    : "r" (1), "r" (tsl)                                        \
++	    );                                                          \
++	__r & 1;							\
++})
++#else
+ #define	MUTEX_SET(tsl) ({						\
+ 	int __r;							\
+ 	__asm__ volatile(						\
+@@ -484,6 +503,7 @@
+ 	    );								\
+ 	__r & 1;							\
+ })
++#endif
+ 
+ #define	MUTEX_UNSET(tsl)	(*(volatile tsl_t *)(tsl) = 0)
+ #define	MUTEX_INIT(tsl)         (MUTEX_UNSET(tsl), 0)

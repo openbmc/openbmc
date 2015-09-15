@@ -1,0 +1,25 @@
+Upstream-Status: Pending
+
+This patch fixes this compiler error with gcc 4.6.0
+
+Nitin A Kamble <nitin.a.kamble@intel.com> 2011/05/08
+
+| fts.c: In function 'pax_fts_set':
+| fts.c:469:7: error: parameter 'sp' set but not used [-Werror=unused-but-set-parameter]
+| cc1: all warnings being treated as errors
+| 
+| make[2]: *** [fts.o] Error 1
+
+Index: pax-3.4/lib/fts.c
+===================================================================
+--- pax-3.4.orig/lib/fts.c
++++ pax-3.4/lib/fts.c
+@@ -466,7 +466,7 @@ name:		t = sp->fts_path + NAPPEND(p->fts
+ /* ARGSUSED */
+ int
+ fts_set(sp, p, instr)
+-	FTS *sp;
++	FTS __attribute__((__unused__)) *sp;
+ 	FTSENT *p;
+ 	int instr;
+ {

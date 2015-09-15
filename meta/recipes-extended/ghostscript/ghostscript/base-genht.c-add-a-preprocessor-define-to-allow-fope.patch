@@ -1,0 +1,36 @@
+base/genht.c: add a preprocessor define to allow fopen calling
+
+The commit in upstream:
+http://git.ghostscript.com/?p=ghostpdl.git;a=commitdiff;h=773c69e46e70bdd5482676437dafd2ca83397643
+
+Replace all fopen calls with gp_fopen and add a preprocessor define so
+that any unintential calls directly to fopen will cause an error.
+
+Only exceptions are those in the platform specific code, and mkromfs.c.
+This patch add a preprocessor define to allow fopen calling in base/genht.c.
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ base/genht.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/base/genht.c b/base/genht.c
+index 4b04085..cc82fff 100644
+--- a/base/genht.c
++++ b/base/genht.c
+@@ -16,6 +16,10 @@
+ 
+ /* Generate C code for compiling halftones into ROM. */
+ #include "malloc_.h"
++
++/* prevent gp.h from defining fopen */
++#define fopen fopen
++
+ #include "stdio_.h"
+ #include "string_.h"
+ #include "gscdefs.h"
+-- 
+1.8.1.2
+

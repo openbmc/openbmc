@@ -1,0 +1,47 @@
+Upstream-Status: Backport
+
+diff -uN tcp_wrappers_7.6/hosts_access.c tcp_wrappers_7.6.new/hosts_access.c
+--- tcp_wrappers_7.6/hosts_access.c	Mon May 20 14:00:56 2002
++++ tcp_wrappers_7.6.new/hosts_access.c	Mon May 20 14:25:05 2002
+@@ -448,6 +448,15 @@
+     int len, mask_len, i = 0;
+     char ch;
+ 
++    /*
++     * Behavior of getaddrinfo() against IPv4-mapped IPv6 address is
++     * different between KAME and Solaris8.  While KAME returns
++     * AF_INET6, Solaris8 returns AF_INET.  So, we avoid this here.
++     */
++    if (STRN_EQ(string, "::ffff:", 7)
++	&& dot_quad_addr(string + 7) != INADDR_NONE)
++	return (masked_match4(net_tok, mask_tok, string + 7));
++
+     memset(&hints, 0, sizeof(hints));
+     hints.ai_family = AF_INET6;
+     hints.ai_socktype = SOCK_STREAM;
+@@ -457,13 +466,6 @@
+     memcpy(&addr, res->ai_addr, sizeof(addr));
+     freeaddrinfo(res);
+ 
+-    if (IN6_IS_ADDR_V4MAPPED(&addr.sin6_addr)) {
+-	if ((*(u_int32_t *)&net.sin6_addr.s6_addr[12] = dot_quad_addr(net_tok)) == INADDR_NONE
+-	 || (mask = dot_quad_addr(mask_tok)) == INADDR_NONE)
+-	    return (NO);
+-	return ((*(u_int32_t *)&addr.sin6_addr.s6_addr[12] & mask) == *(u_int32_t *)&net.sin6_addr.s6_addr[12]);
+-    }
+-
+     /* match IPv6 address against netnumber/prefixlen */
+     len = strlen(net_tok);
+     if (*net_tok != '[' || net_tok[len - 1] != ']')
+diff -uN tcp_wrappers_7.6/socket.c tcp_wrappers_7.6.new/socket.c
+--- tcp_wrappers_7.6/socket.c	Mon May 20 13:48:35 2002
++++ tcp_wrappers_7.6.new/socket.c	Mon May 20 14:22:27 2002
+@@ -228,7 +228,7 @@
+ 	hints.ai_family = sin->sa_family;
+ 	hints.ai_socktype = SOCK_STREAM;
+ 	hints.ai_flags = AI_PASSIVE | AI_CANONNAME | AI_NUMERICHOST;
+-	if ((err = getaddrinfo(host->name, NULL, &hints, &res0) == 0)) {
++	if ((err = getaddrinfo(host->name, NULL, &hints, &res0)) == 0) {
+ 	    freeaddrinfo(res0);
+ 	    res0 = NULL;
+ 	    tcpd_warn("host name/name mismatch: "

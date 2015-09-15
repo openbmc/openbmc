@@ -1,0 +1,27 @@
+From cb3e98e17a666896150b109694e9eb9278620845 Mon Sep 17 00:00:00 2001
+From: Niko Tyni <ntyni@debian.org>
+Date: Sat, 17 May 2014 14:57:01 +0300
+Subject: Skip a regeneration check in unrelated git repositories
+
+If the test is run in a git repository without lib/.gitignore,
+for instance because the repository only imported the Perl tarball,
+the regeneration check is broken because lib/.gitignore is missing.
+
+Patch-Name: debian/regen-skip.diff
+---
+ regen/lib_cleanup.pl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/regen/lib_cleanup.pl b/regen/lib_cleanup.pl
+index c9d6e43..fece1ed 100644
+--- a/regen/lib_cleanup.pl
++++ b/regen/lib_cleanup.pl
+@@ -159,7 +159,7 @@ foreach ('win32/Makefile', 'win32/makefile.mk') {
+ }
+ 
+ # This must come last as it can exit early:
+-if ($TAP && !-d '.git' && !-f 'lib/.gitignore') {
++if ($TAP && !-d '.git' || !-f 'lib/.gitignore') {
+     print "ok # skip not being run from a git checkout, hence no lib/.gitignore\n";
+     exit 0;
+ }

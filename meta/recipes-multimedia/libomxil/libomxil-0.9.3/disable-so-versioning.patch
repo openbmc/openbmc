@@ -1,0 +1,36 @@
+Disable so versioning since they are really not a versioned shared lib.
+
+Upstream-Status: Submitted @ https://sourceforge.net/p/omxil/bugs/59/
+
+Signed-off-by: Drew Moseley <drew_moseley@mentor.com>
+
+diff -rub libomxil-bellagio-0.9.3-orig/src/components/audio_effects/Makefile.am libomxil-bellagio-0.9.3/src/components/audio_effects/Makefile.am
+--- libomxil-bellagio-0.9.3-orig/src/components/audio_effects/Makefile.am	2014-07-20 15:22:00.858425234 -0400
++++ libomxil-bellagio-0.9.3/src/components/audio_effects/Makefile.am	2014-07-20 15:25:42.687525225 -0400
+@@ -10,4 +10,5 @@
+ libomxaudio_effects_la_CFLAGS = -I$(top_srcdir)/include \
+ 				-I$(top_srcdir)/src \
+ 				-I$(top_srcdir)/src/base
++libomxaudio_effects_la_LDFLAGS = -avoid-version
+ 
+diff -rub libomxil-bellagio-0.9.3-orig/src/components/clocksrc/Makefile.am libomxil-bellagio-0.9.3/src/components/clocksrc/Makefile.am
+--- libomxil-bellagio-0.9.3-orig/src/components/clocksrc/Makefile.am	2014-07-20 15:22:00.858425234 -0400
++++ libomxil-bellagio-0.9.3/src/components/clocksrc/Makefile.am	2014-07-20 15:24:49.151259753 -0400
+@@ -10,4 +10,4 @@
+                              -I$(top_srcdir)/include \
+                              -I$(top_srcdir)/src \
+                              -I$(top_srcdir)/src/base
+-
++libomxclocksrc_la_LDFLAGS = -avoid-version
+diff -rub libomxil-bellagio-0.9.3-orig/src/components/videoscheduler/Makefile.am libomxil-bellagio-0.9.3/src/components/videoscheduler/Makefile.am
+--- libomxil-bellagio-0.9.3-orig/src/components/videoscheduler/Makefile.am	2014-07-20 15:22:00.862425254 -0400
++++ libomxil-bellagio-0.9.3/src/components/videoscheduler/Makefile.am	2014-07-20 15:22:36.462601786 -0400
+@@ -6,7 +6,7 @@
+ 								library_entry_point.c
+ 
+ libomxvideosched_la_LIBADD = $(top_builddir)/src/libomxil-bellagio.la
+-libomxvideosched_la_LDFLAGS = 
++libomxvideosched_la_LDFLAGS = -avoid-version
+ libomxvideosched_la_CFLAGS = -I$(top_srcdir)/include \
+ 			-I$(top_srcdir)/src \
+ 			-I$(top_srcdir)/src/base

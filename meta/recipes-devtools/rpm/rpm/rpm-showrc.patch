@@ -1,0 +1,26 @@
+Workaround for a memory leak in --showrc.
+
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.14/lib/rpmrc.c
+===================================================================
+--- rpm-5.4.14.orig/lib/rpmrc.c
++++ rpm-5.4.14/lib/rpmrc.c
+@@ -1228,11 +1228,15 @@ int rpmShowRC(FILE * fp)
+ 		if (DNEVR != NULL)
+ 		    fprintf(fp, "    %s\n", DNEVR+2);
+ 	    }
++#if 0
+ 	    (void)rpmdsFree(ds);
+ 	    ds = NULL;
++#endif
+ 	    fprintf(fp, "\n");
+ 	}
++#if 0
+ 	PRCO = rpmdsFreePRCO(PRCO);
++#endif
+     }
+ 
+     if (rpmIsVerbose()) {

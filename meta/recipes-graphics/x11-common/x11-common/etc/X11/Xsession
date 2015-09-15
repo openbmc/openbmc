@@ -1,0 +1,38 @@
+#!/bin/sh
+
+if [ -x /usr/bin/dbus-launch ]; then
+    # As this is the X session script, always start a new DBus session.
+    eval `dbus-launch --sh-syntax --exit-with-session </dev/null`
+    echo "D-BUS per-session daemon address is: $DBUS_SESSION_BUS_ADDRESS"
+fi
+
+. /etc/profile
+
+if [ -f $HOME/.profile ]; then
+    . $HOME/.profile
+fi
+
+SYSSESSIONDIR=/etc/X11/Xsession.d
+
+export CLUTTER_DISABLE_MIPMAPPED_TEXT=1
+
+for SESSIONFILE in $SYSSESSIONDIR/*; do
+    set +e
+    case "$SESSIONFILE" in
+        *.sh)
+            . "$SESSIONFILE"
+            ;;
+        *.shbg)
+            "$SESSIONFILE" &
+            ;;
+        *~)
+            # Ignore backup files
+            ;;
+        *)
+            "$SESSIONFILE"
+            ;;
+    esac
+    set -e
+done
+
+exit 0

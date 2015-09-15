@@ -1,0 +1,38 @@
+{% load projecttags %}
+<!-- component to display a generic table -->
+    {% if disable_sort %}
+    <table class="table table-bordered table-hover" id="detail_table">
+    <thead>
+        <tr>
+            {% for tc in tablecols %}
+            <th class="{%if tc.dclass%}{{tc.dclass}}{%endif%} {%if tc.clclass%}{{tc.clclass}}{%endif%}">
+                {%if tc.qhelp%}<i class="icon-question-sign get-help" title="{{tc.qhelp}}"></i>{%endif%}
+                {{tc.name}}
+            </th>
+            {% endfor %}
+        </tr>
+    </thead>
+    {% else %}
+    <table class="table table-bordered table-hover tablesorter" id="otable">
+    <thead>
+        <!-- Table header row; generated from "tablecols" entry in the context dict -->
+        <tr>
+            {% for tc in tablecols %}
+            <th class="{%if tc.dclass%}{{tc.dclass}}{%endif%} {%if tc.clclass%}{{tc.clclass}}{%endif%}">
+                {%if tc.qhelp%}<i class="icon-question-sign get-help" title="{{tc.qhelp}}"></i>{%endif%}
+                {%if tc.orderfield%}
+                    <a {%if tc.ordericon%} class="sorted" {%endif%}
+                        href="javascript:reload_params({'page': 1, 'orderby' : '{{tc.orderfield}}' })" >
+                        {{tc.name}}
+                    </a>
+                {%else%}
+                    <span class="muted">
+                        {{tc.name}}
+                    </span>
+                {%endif%}
+                {%if tc.ordericon%} <i class="icon-caret-{{tc.ordericon}}"></i>{%endif%}
+            </th>
+            {% endfor %}
+        </tr>
+    </thead>
+    {% endif %}

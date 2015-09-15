@@ -1,0 +1,39 @@
+
+Upstream-Status: Inappropriate [embedded]
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+---
+ groff-1.18.1.4/Makefile.in |    7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -460,27 +460,22 @@ OTHERDIRS=\
+   src/roff/grog \
+   src/roff/nroff \
+   contrib/mm \
+   contrib/pic2graph \
+   contrib/eqn2graph \
+-  contrib/groffer \
+-  contrib/mom \
+-  doc
++  contrib/groffer
+ ALLDIRS=$(INCDIRS) $(LIBDIRS) $(PROGDIRS) \
+   $(DEVDIRS) $(OTHERDEVDIRS) $(TTYDEVDIRS) $(OTHERDIRS)
+ EXTRADIRS=\
+   font/devps/generate \
+   font/devdvi/generate \
+   font/devlj4/generate \
+-  src/xditview \
+   doc
+ NOMAKEDIRS=\
+   arch/djgpp \
+   contrib/mm/examples \
+   contrib/mm/mm \
+-  contrib/mom/examples \
+-  contrib/mom/momdoc \
+   src/libs/snprintf
+ DISTDIRS=\
+   $(INCDIRS) $(LIBDIRS) $(PROGDIRS) $(DEVDIRS) $(OTHERDEVDIRS) \
+   $(ALLTTYDEVDIRS) $(OTHERDIRS) $(EXTRADIRS) $(NOMAKEDIRS)
+ TARGETS=all install install_bin install_data clean distclean mostlyclean \

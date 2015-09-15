@@ -1,0 +1,30 @@
+Fix avahi-daemon when running on kernel < 3.9 (patch taken from Ubuntu).
+
+Upstream-Status: Pending (unmaintained upstream)
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+Description: SO_REUSEPORT may not exist in running kernel
+ When userspace defines SO_REUSEPORT we will attempt to enable socket
+ port number reuse.  However if the running kernel does not support
+ this call it will fail preventing daemon startup.  If this call is
+ present but fails ENOPROTOOPT then we know that actually the kernel
+ does not support it and we should continue as if we did not have the
+ call at all.  (LP: #1228204)
+ .
+ This patch could be removed from the debian package after jessie release.
+Author: Andy Whitcroft <apw@canonical.com>
+
+Index: avahi-0.6.31/avahi-core/socket.c
+===================================================================
+--- avahi-0.6.31.orig/avahi-core/socket.c	2013-09-20 16:36:50.000000000 +0100
++++ avahi-0.6.31/avahi-core/socket.c	2013-09-20 16:38:23.781863644 +0100
+@@ -177,7 +177,8 @@
+     yes = 1;
+     if (setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &yes, sizeof(yes)) < 0) {
+         avahi_log_warn("SO_REUSEPORT failed: %s", strerror(errno));
+-        return -1;
++        if (errno != ENOPROTOOPT)
++            return -1;
+     }
+ #endif
+ 

@@ -1,0 +1,107 @@
+{% extends "basebuildpage.html" %}
+
+{% load projecttags %}
+
+{% block localbreadcrumb %}
+<li>Packages</li>
+{% endblock %}
+
+{% block nav-packages %}
+  <li class="active"><a href="{% url 'packages' build.pk %}">Packages</a></li>
+{% endblock %}
+
+{% block buildinfomain %}
+<div class="span10">
+
+{% if not request.GET.filter and not request.GET.search and not objects.paginator.count %}
+
+<!-- Empty - no data in database -->
+<div class="page-header">
+    <h1>
+        Packages
+    </h1>
+</div>
+<div class="alert alert-info lead">
+    <strong>No packages were built.</strong> How did this happen? Well, BitBake reuses as much stuff as possible.
+    If all of the packages needed were already built and available in your build infrastructure, BitBake
+    will not rebuild any of them. This might be slightly confusing, but it does make everything faster.
+</div>
+
+{% else %}
+
+<div class="page-header">
+  <h1>
+  {% if request.GET.search and objects.paginator.count > 0  %}
+      {{objects.paginator.count}} package{{objects.paginator.count|pluralize}} found
+  {%elif request.GET.search and objects.paginator.count == 0%}
+      No packages found
+  {%else%}
+      Packages
+  {%endif%}
+  </h1>
+</div>
+
+  {% if objects.paginator.count == 0 %}
+  <div class="row-fluid">
+      <div class="alert">
+        <form class="no-results input-append" id="searchform">
+            <input id="search" name="search" class="input-xxlarge" type="text" value="{{request.GET.search}}"/>{% if request.GET.search %}<a href="javascript:$('#search').val('');searchform.submit()" class="add-on btn" tabindex="-1"><i class="icon-remove"></i></a>{% endif %}
+            <button class="btn" type="submit" value="Search">Search</button>
+            <button class="btn btn-link" onclick="javascript:$('#search').val('');searchform.submit()">Show all packages</button>
+        </form>
+      </div>
+  </div>
+
+  {% else %}
+  {% include "basetable_top.html" %}
+
+    {% for package in objects %}
+
+    <tr class="data">
+
+        <!-- Package -->
+        <td class="package_name"><a href="{% url "package_built_detail" build.pk package.pk %}">{{package.name}}</a></td>
+        <!-- Package Version -->
+        <td class="package_version">{%if package.version%}<a href="{% url "package_built_detail" build.pk package.pk %}">{{package.version}}-{{package.revision}}</a>{%endif%}</td>
+        <!-- Package Size -->
+        <td class="size sizecol">{{package.size|filtered_filesizeformat}}</td>
+        <!-- License -->
+        <td class="license">{{package.license}}</td>
+
+        {%if package.recipe%}
+            <!-- Recipe -->
+            <td class="recipe__name"><a href="{% url "recipe" build.pk package.recipe.pk %}">{{package.recipe.name}}</a></td>
+            <!-- Recipe Version -->
+            <td class="recipe__version"><a href="{% url "recipe" build.pk package.recipe.pk %}">{{package.recipe.version}}</a></td>
+
+            <!-- Layer -->
+            <td class="recipe__layer_version__layer__name">{{package.recipe.layer_version.layer.name}}</td>
+            <!-- Layer branch -->
+            <td class="recipe__layer_version__branch">{{package.recipe.layer_version.branch}}</td>
+            <!-- Layer commit -->
+            <td class="recipe__layer_version__layer__commit">
+                <a class="btn"
+                    data-content="<ul class='unstyled'>
+                      <li>{{package.recipe.layer_version.commit}}</li>
+                    </ul>">
+                    {{package.recipe.layer_version.commit|truncatechars:13}}
+                </a>
+            </td>
+            <!-- Layer directory -->
+        {%else%}
+            <td class="recipe__name"></td>
+            <td class="recipe__version"></td>
+            <td class="recipe__layer_version__layer__name"></td>
+            <td class="recipe__layer_version__branch"></td>
+            <td class="recipe__layer_version__layer__commit"></td>
+            <td class="recipe__layer_version__local_path"></td>
+        {%endif%}
+
+    </tr>
+    {% endfor %}
+
+  {% include "basetable_bottom.html" %}
+  {% endif %} {# objects.paginator.count #}
+{% endif %} {# Empty #}
+</div>
+{% endblock %}

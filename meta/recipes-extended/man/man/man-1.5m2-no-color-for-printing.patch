@@ -1,0 +1,15 @@
+Upstream-Status: Pending
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+--- man-1.5m2/configure.color	2006-09-16 18:27:37.000000000 +0200
++++ man-1.5m2/configure	2006-09-16 18:28:44.000000000 +0200
+@@ -539,6 +539,8 @@
+     troff="$troff -c"
+     nroff="$nroff -c"
+     jnroff="$jnroff -c"
++else
++    troff="$troff -c"
+ fi
+ 
+ if [ x$default = x ]; then

@@ -1,0 +1,29 @@
+Disable building documentation which requires the latex utility.
+This patch should be dropped once we include a native version of
+latex.
+
+Upstream-Status: Inappropriate [Other]
+Temporary workaround which disables documentation.
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+diff -urN linuxdoc-tools-0.9.66.orig/doc/Makedoc.sh linuxdoc-tools-0.9.66/doc/Makedoc.sh
+--- linuxdoc-tools-0.9.66.orig/doc/Makedoc.sh	2009-11-09 11:58:25.000000000 -0800
++++ linuxdoc-tools-0.9.66/doc/Makedoc.sh	2011-02-25 15:23:58.610016114 -0800
+@@ -46,11 +46,11 @@
+ 	$TMPDIR/sgml2txt -b 1 ./guide
+ fi
+ 
+-if [ -n "`which latex`" ]; then
+-	ln -s $TMPDIR/linuxdoc $TMPDIR/sgml2latex
+-	echo "- Building latex docs" >&2
+-	$TMPDIR/sgml2latex --pass="\usepackage{times}" -o dvi ./guide
+-fi
++#if [ -n "`which latex`" ]; then
++#	ln -s $TMPDIR/linuxdoc $TMPDIR/sgml2latex
++#	echo "- Building latex docs" >&2
++#	$TMPDIR/sgml2latex --pass="\usepackage{times}" -o dvi ./guide
++#fi
+ 
+ if [ -n "`which dvips`" ]; then
+ 	echo "   + dvips" >&2

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+export BB_ENV_EXTRAWHITE="DISABLE_SANITY_CHECKS $BB_ENV_EXTRAWHITE"
+DISABLE_SANITY_CHECKS=1 bitbake -u hob $@
+
+ret=$?
+exit $ret

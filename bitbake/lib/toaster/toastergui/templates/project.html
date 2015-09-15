@@ -1,0 +1,130 @@
+{% extends "baseprojectpage.html" %}
+
+{% load projecttags %}
+{% load humanize %}
+{% load static %}
+
+{% block projectinfomain %}
+
+<script src="{% static 'js/layerDepsModal.js' %}"></script>
+<script src="{% static 'js/projectpage.js' %}"></script>
+<script>
+  $(document).ready(function (){
+    var ctx = {
+      testReleaseChangeUrl: "{% url 'xhr_testreleasechange' project.id %}",
+    };
+
+    try {
+      projectPageInit(ctx);
+    } catch (e) {
+      document.write("Sorry, An error has occurred loading this page");
+      console.warn(e);
+    }
+  });
+</script>
+
+<div id="change-release-modal" class="modal hide fade in" tabindex="-1" role="dialog" aria-labelledby="change-release-modal" aria-hidden="false">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+    <h3>Changing Yocto Project release to <span class="proposed-release-change-name"></span></h3>
+  </div>
+  <div class="modal-body">
+    <p>The following added layers do not exist for <span class="proposed-release-change-name"></span>: </p>
+    <ul id="layers-to-remove-list">
+    </ul>
+    <p>If you change the Yocto Project release to <span class="proposed-release-change-name"></span>, the above layers will be deleted from your added layers.</p>
+  </div>
+  <div class="modal-footer">
+    <button id="change-release-and-rm-layers" data-dismiss="modal" type="submit" class="btn btn-primary">Change release and delete layers</button>
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+  </div>
+</div>
+
+
+<div class="row-fluid" id="project-page" style="display:none">
+  <div class="span6">
+    <div class="well well-transparent" id="machine-section">
+      <h3>Machine</h3>
+
+      <p class="lead"><span id="project-machine-name"></span> <i title="" data-original-title="" id="change-machine-toggle" class="icon-pencil"></i></p>
+
+      <form id="select-machine-form" style="display:none;">
+        <div class="alert alert-info">
+          <strong>Machine changes have a big impact on build outcome.</strong> You cannot really compare the builds for the new machine with the previous ones.
+        </div>
+
+        <div class="input-append">
+          <input id="machine-change-input" autocomplete="off" value="" data-provide="typeahead" data-minlength="1" data-autocomplete="off" type="text">
+            <button id="machine-change-btn" class="btn" type="button">Save</button> <a href="#" id="cancel-machine-change" class="btn btn-link">Cancel</a>
+        </div>
+
+        <p><a href="{% url 'projectmachines' project.id %}" class="link">View compatible machines</a></p>
+      </form>
+    </div>
+
+    <div class="well well-transparent">
+      <h3>Most built recipes</h3>
+
+      <div class="alert alert-info" style="display:none" id="no-most-built">
+        <span class="lead">You haven't built any recipes yet</span>
+        <p style="margin-top: 10px;"><a href="{% url 'projecttargets' project.id %}">Choose a recipe to build</a></p>
+      </div>
+
+      <ul class="unstyled configuration-list" id="freq-build-list">
+      </ul>
+      <button class="btn btn-primary" id="freq-build-btn" disabled="disabled">Build selected recipes</button>
+    </div>
+
+    <div class="well well-transparent">
+      <h3>Project release</h3>
+
+      <p class="lead"><span id="project-release-title"></span> <i title="" data-original-title="" id="release-change-toggle" class="icon-pencil"></i></p>
+
+      <form class="form-inline" id="change-release-form" style="display:none;">
+        <select></select>
+        <button class="btn" style="margin-left:5px;" id="change-release-btn">Change</button> <a href="#" id="cancel-release-change" class="btn btn-link">Cancel</a>
+      </form>
+    </div>
+  </div>
+
+  <div class="span6">
+    <div class="well well-transparent" id="layer-container">
+      <h3>Layers <span class="muted counter">(<span id="project-layers-count"></span>)</span>
+        <i data-original-title="OpenEmbedded organises metadata into modules called 'layers'. Layers allow you to isolate different types of customizations from each other. <a href='http://www.yoctoproject.org/docs/current/dev-manual/dev-manual.html#understanding-and-creating-layers' target='_blank'>More on layers</a>" class="icon-question-sign get-help heading-help" title=""></i>
+      </h3>
+
+      <div class="alert lead" id="no-layers-in-project" style="display:none">
+        You need to add some layers. For that you can:
+        <ul>
+          <li><a href="{% url 'projectlayers' project.id %}">View all layers compatible with this project</a></li>
+          <li><a href="{% url 'importlayer' project.id %}">Import a layer</a></li>
+          <li><a href="http://www.yoctoproject.org/docs/current/dev-manual/dev-manual.html#understanding-and-creating-layers" target="_blank">Read about layers in the documentation</a></li>
+        </ul>
+        <p>Or type a layer name below.</p>
+      </div>
+
+      <form style="margin-top:20px">
+        <!--div class="control-group error"-->
+
+        <div class="input-append">
+          <input id="layer-add-input" autocomplete="off" placeholder="Type a layer name" data-minlength="1" data-autocomplete="off" data-provide="typeahead" data-source="" type="text">
+            <button id="add-layer-btn" class="btn" disabled>Add</button>
+        </div>
+
+        <div id="import-alert" class="alert alert-info" style="display:none;">
+          Toaster does not know about this layer. Please <a href="#">import it</a>
+        </div>
+
+        <p>
+          <a href="{% url 'projectlayers' project.id %}" id="view-compatible-layers">View compatible layers</a>
+          <i data-original-title="View all the layers you can build with the release selected for this project, which is Yocto Project master" class="icon-question-sign get-help" title=""></i>
+          | <a href="{% url 'importlayer' project.id %}">Import layer</a>
+        </p>
+      </form>
+
+      <ul class="unstyled configuration-list" id="layers-in-project-list">
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

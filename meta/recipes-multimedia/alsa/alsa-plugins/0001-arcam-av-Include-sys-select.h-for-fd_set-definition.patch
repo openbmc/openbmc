@@ -1,0 +1,31 @@
+From d28c655be3ac4fcb8024555983884f832ee18787 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 29 May 2015 15:17:30 -0700
+Subject: [PATCH] arcam-av: Include sys/select.h for fd_set definition
+
+fixes build errors on non-glibc based systems
+
+arcam-av/arcam_av.c:389:2: error: unknown type name 'fd_set'
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted
+
+ arcam-av/arcam_av.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arcam-av/arcam_av.c b/arcam-av/arcam_av.c
+index 0491fc6..fff96f9 100644
+--- a/arcam-av/arcam_av.c
++++ b/arcam-av/arcam_av.c
+@@ -31,6 +31,7 @@
+ #include <unistd.h>
+ 
+ #include <sys/ipc.h>
++#include <sys/select.h>
+ #include <sys/shm.h>
+ #include <sys/stat.h>
+ #include <sys/stat.h>
+-- 
+2.1.4
+

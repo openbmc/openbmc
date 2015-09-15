@@ -1,0 +1,9 @@
+[Unit]
+Description=Job spooling tools
+After=syslog.target
+
+[Service]
+ExecStart=@SBINDIR@/atd -f
+
+[Install]
+WantedBy=multi-user.target

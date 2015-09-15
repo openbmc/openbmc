@@ -1,0 +1,96 @@
+rpm: check if the argument(rootpath) exists or be writable
+
+When user execute the command "rpm -qai --root=$dir",if $dir doesn't
+exist or is unwritable as result of making a typo in rootpath,then
+it will create dirent $dir and subdirectory.
+So we should add the check function to fix it before creating relational
+subdirectory,and warn the incorrect rootpath to user. It just checks the
+rootpath reasonableness when the user input the argument(--root=/-r=).
+
+Upstream-Status: Pending
+
+Signed-off-by: Zhixiong Chi <zchi@windriver.com>
+---
+ rpmqv.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
+
+diff --git a/rpmqv.c b/rpmqv.c
+index 40c42bd..88d85ab 100644
+--- a/rpmqv.c
++++ b/rpmqv.c
+@@ -206,6 +206,8 @@ static struct poptOption optionsTable[] = {
+    POPT_TABLEEND
+ };
+ 
++static int _rpmqv_rootpath_state = 0;
++
+ #ifdef __MINT__
+ /* MiNT cannot dynamically increase the stack.  */
+ long _stksize = 64 * 1024L;
+@@ -427,6 +429,41 @@ static void integrity_check(const char *progname, enum modes progmode_num)
+ }
+ #endif
+ 
++/*check if the rootdir is writable or exists */
++int access_file(const char *rootdir)
++{
++    int ret,rootdir_len;
++
++    if(rootdir == NULL) {
++        return;
++    }
++
++    rootdir_len = strlen(rootdir);
++    /*make sure that dirent argument trailing is "/" */
++    if(!(rootdir_len && rootdir[rootdir_len - 1] == '/')){
++        char *t = (char *)malloc(rootdir_len + 2);
++        *t = '\0';
++        (void)stpcpy(stpcpy(t,rootdir),"/");
++        ret = access(t,F_OK|W_OK);
++        free(t);
++    }else{
++        ret = access(rootdir,F_OK|W_OK);
++    }
++    return ret;
++}
++
++/*check if input the argument "--root/-r"  */
++void check_argument_root(int argc,char * const argv[])
++{
++    int i;
++    for (i = 0; i < argc; i++) {
++        if(strncmp(argv[i],"--root=",7) == 0 || strncmp(argv[i],"-r=",3) == 0) {
++            _rpmqv_rootpath_state = 1;
++            break;
++        }
++    }
++}
++
+ /*@-bounds@*/ /* LCL: segfault */
+ /*@-mods@*/ /* FIX: shrug */
+ #if !defined(__GLIBC__) && !defined(__LCLINT__)
+@@ -476,6 +513,8 @@ int main(int argc, const char ** argv)
+     int xx;
+ #endif
+ 	
++    check_argument_root(argc,(char *const *)argv);
++
+ #if !defined(__GLIBC__) && !defined(__LCLINT__)
+     environ = envp;
+ #else
+@@ -715,6 +754,12 @@ int main(int argc, const char ** argv)
+ 		argerror(_("arguments to --root (-r) must begin with a /"));
+ 	    break;
+ 	}
++        if (_rpmqv_rootpath_state) {
++            if (access_file(rpmioRootDir)) {
++                fprintf(stderr, _("Invalid directory:%s, ensure it exists or be writable\n"),rpmioRootDir);
++                exit(EXIT_FAILURE);
++            }
++        }
+     }
+ 
+ #if defined(RPM_VENDOR_OPENPKG) /* integrity-checking */
+-- 
+1.9.1
+

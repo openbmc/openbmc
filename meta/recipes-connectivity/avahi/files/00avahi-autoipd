@@ -1,0 +1,10 @@
+#!/bin/sh
+
+[ -z "$1" ] && echo "Error: should be called from udhcpc" && exit 1
+
+case "$1" in
+
+	deconfig|renew|bound)
+		/usr/sbin/avahi-autoipd -k $interface 2> /dev/null
+		;;
+esac

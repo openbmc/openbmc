@@ -1,0 +1,158 @@
+From 6af790818d074c103c4797f1ce764896f183e028 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 22 Aug 2015 21:35:03 -0700
+Subject: [PATCH] uatomic: Specify complete types for atomic function calls
+
+This was unearthed by clang compiler where it complained about parameter
+mismatch, gcc doesnt notice this
+
+urcu/uatomic/generic.h:190:10: error: address argument to atomic builtin
+must be a pointer to integer or pointer ('void *' invalid)
+                return __sync_add_and_fetch_4(addr, val);
+
+Fixed all instances thusly
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted
+
+ urcu/uatomic/generic.h | 40 ++++++++++++++++++++--------------------
+ 1 file changed, 20 insertions(+), 20 deletions(-)
+
+diff --git a/urcu/uatomic/generic.h b/urcu/uatomic/generic.h
+index 37f59cc..0046ffd 100644
+--- a/urcu/uatomic/generic.h
++++ b/urcu/uatomic/generic.h
+@@ -65,17 +65,17 @@ unsigned long _uatomic_cmpxchg(void *addr, unsigned long old,
+ 	switch (len) {
+ #ifdef UATOMIC_HAS_ATOMIC_BYTE
+ 	case 1:
+-		return __sync_val_compare_and_swap_1(addr, old, _new);
++		return __sync_val_compare_and_swap_1((unsigned char *)addr, old, _new);
+ #endif
+ #ifdef UATOMIC_HAS_ATOMIC_SHORT
+ 	case 2:
+-		return __sync_val_compare_and_swap_2(addr, old, _new);
++		return __sync_val_compare_and_swap_2((unsigned short int *)addr, old, _new);
+ #endif
+ 	case 4:
+-		return __sync_val_compare_and_swap_4(addr, old, _new);
++		return __sync_val_compare_and_swap_4((unsigned int *)addr, old, _new);
+ #if (CAA_BITS_PER_LONG == 64)
+ 	case 8:
+-		return __sync_val_compare_and_swap_8(addr, old, _new);
++		return __sync_val_compare_and_swap_8((unsigned long *)addr, old, _new);
+ #endif
+ 	}
+ 	_uatomic_link_error();
+@@ -100,20 +100,20 @@ void _uatomic_and(void *addr, unsigned long val,
+ 	switch (len) {
+ #ifdef UATOMIC_HAS_ATOMIC_BYTE
+ 	case 1:
+-		__sync_and_and_fetch_1(addr, val);
++		__sync_and_and_fetch_1((unsigned char *)addr, val);
+ 		return;
+ #endif
+ #ifdef UATOMIC_HAS_ATOMIC_SHORT
+ 	case 2:
+-		__sync_and_and_fetch_2(addr, val);
++		__sync_and_and_fetch_2((unsigned short int *)addr, val);
+ 		return;
+ #endif
+ 	case 4:
+-		__sync_and_and_fetch_4(addr, val);
++		__sync_and_and_fetch_4((unsigned int *)addr, val);
+ 		return;
+ #if (CAA_BITS_PER_LONG == 64)
+ 	case 8:
+-		__sync_and_and_fetch_8(addr, val);
++		__sync_and_and_fetch_8((unsigned long *)addr, val);
+ 		return;
+ #endif
+ 	}
+@@ -139,20 +139,20 @@ void _uatomic_or(void *addr, unsigned long val,
+ 	switch (len) {
+ #ifdef UATOMIC_HAS_ATOMIC_BYTE
+ 	case 1:
+-		__sync_or_and_fetch_1(addr, val);
++		__sync_or_and_fetch_1((unsigned char *)addr, val);
+ 		return;
+ #endif
+ #ifdef UATOMIC_HAS_ATOMIC_SHORT
+ 	case 2:
+-		__sync_or_and_fetch_2(addr, val);
++		__sync_or_and_fetch_2((unsigned short int *)addr, val);
+ 		return;
+ #endif
+ 	case 4:
+-		__sync_or_and_fetch_4(addr, val);
++		__sync_or_and_fetch_4((unsigned int *)addr, val);
+ 		return;
+ #if (CAA_BITS_PER_LONG == 64)
+ 	case 8:
+-		__sync_or_and_fetch_8(addr, val);
++		__sync_or_and_fetch_8((unsigned long *)addr, val);
+ 		return;
+ #endif
+ 	}
+@@ -180,17 +180,17 @@ unsigned long _uatomic_add_return(void *addr, unsigned long val,
+ 	switch (len) {
+ #ifdef UATOMIC_HAS_ATOMIC_BYTE
+ 	case 1:
+-		return __sync_add_and_fetch_1(addr, val);
++		return __sync_add_and_fetch_1((unsigned char *)addr, val);
+ #endif
+ #ifdef UATOMIC_HAS_ATOMIC_SHORT
+ 	case 2:
+-		return __sync_add_and_fetch_2(addr, val);
++		return __sync_add_and_fetch_2((unsigned short int *)addr, val);
+ #endif
+ 	case 4:
+-		return __sync_add_and_fetch_4(addr, val);
++		return __sync_add_and_fetch_4((unsigned int *)addr, val);
+ #if (CAA_BITS_PER_LONG == 64)
+ 	case 8:
+-		return __sync_add_and_fetch_8(addr, val);
++		return __sync_add_and_fetch_8((unsigned long *)addr, val);
+ #endif
+ 	}
+ 	_uatomic_link_error();
+@@ -218,7 +218,7 @@ unsigned long _uatomic_exchange(void *addr, unsigned long val, int len)
+ 
+ 		do {
+ 			old = uatomic_read((unsigned char *)addr);
+-		} while (!__sync_bool_compare_and_swap_1(addr, old, val));
++		} while (!__sync_bool_compare_and_swap_1((unsigned char *)addr, old, val));
+ 
+ 		return old;
+ 	}
+@@ -230,7 +230,7 @@ unsigned long _uatomic_exchange(void *addr, unsigned long val, int len)
+ 
+ 		do {
+ 			old = uatomic_read((unsigned short *)addr);
+-		} while (!__sync_bool_compare_and_swap_2(addr, old, val));
++		} while (!__sync_bool_compare_and_swap_2((unsigned short int *)addr, old, val));
+ 
+ 		return old;
+ 	}
+@@ -241,7 +241,7 @@ unsigned long _uatomic_exchange(void *addr, unsigned long val, int len)
+ 
+ 		do {
+ 			old = uatomic_read((unsigned int *)addr);
+-		} while (!__sync_bool_compare_and_swap_4(addr, old, val));
++		} while (!__sync_bool_compare_and_swap_4((unsigned int *)addr, old, val));
+ 
+ 		return old;
+ 	}
+@@ -252,7 +252,7 @@ unsigned long _uatomic_exchange(void *addr, unsigned long val, int len)
+ 
+ 		do {
+ 			old = uatomic_read((unsigned long *)addr);
+-		} while (!__sync_bool_compare_and_swap_8(addr, old, val));
++		} while (!__sync_bool_compare_and_swap_8((unsigned long *)addr, old, val));
+ 
+ 		return old;
+ 	}
+-- 
+2.1.4
+

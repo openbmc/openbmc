@@ -1,0 +1,19 @@
+When executing a script don't echo every command, as we do this for entire
+filesystems at rootfs time.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/debugfs/debugfs.c b/debugfs/debugfs.c
+index 5590295..ac57292 100644
+--- a/debugfs/debugfs.c
++++ b/debugfs/debugfs.c
+@@ -2378,7 +2378,7 @@ static int source_file(const char *cmd_file, int ss_idx)
+ 		cp = strchr(buf, '\r');
+ 		if (cp)
+ 			*cp = 0;
+-		printf("debugfs: %s\n", buf);
++		/*printf("debugfs: %s\n", buf);*/
+ 		retval = ss_execute_line(ss_idx, buf);
+ 		if (retval) {
+ 			ss_perror(ss_idx, retval, buf);

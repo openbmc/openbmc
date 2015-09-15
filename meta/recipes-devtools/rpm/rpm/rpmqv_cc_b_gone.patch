@@ -1,0 +1,32 @@
+rpm: compile rpmqv.c instead of rpmqv.cc
+
+Some versions of gcc, 4.4.5 for example, will put a reference to __gxx_personality_v0
+into rpm.o and rpmbuild.o.  This means we must link with g++, and the Makefile we
+generate does not.
+
+So, go back to using rpmqv.c (which is currently identical to rpmqv.cc).
+
+Upstream-Status: Inappropriate [other]
+
+   When linking with g++ is really necessary, the upstream package will do that.
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -127,13 +127,13 @@ rpm_SOURCES =		build.c
+ rpm_LDFLAGS =		@LDFLAGS_STATIC@ $(LDFLAGS)
+ rpm_LDADD =		rpm.o $(myLDADD)
+ rpm.o:	$(top_srcdir)/rpmqv.c
+-	$(COMPILE) -DIAM_RPMBT -DIAM_RPMDB -DIAM_RPMEIU -DIAM_RPMK -DIAM_RPMQV -o $@ -c $(top_srcdir)/rpmqv.cc
++	$(COMPILE) -DIAM_RPMBT -DIAM_RPMDB -DIAM_RPMEIU -DIAM_RPMK -DIAM_RPMQV -o $@ -c $(top_srcdir)/rpmqv.c
+ 
+ rpmbuild_SOURCES =	build.c
+ rpmbuild_LDFLAGS =	@LDFLAGS_STATIC@ $(LDFLAGS)
+ rpmbuild_LDADD =	rpmbuild.o $(myLDADD)
+ rpmbuild.o: $(top_srcdir)/rpmqv.c
+-	$(COMPILE) -DIAM_RPMBT -o $@ -c $(top_srcdir)/rpmqv.cc
++	$(COMPILE) -DIAM_RPMBT -o $@ -c $(top_srcdir)/rpmqv.c
+ 
+ .PHONY:	splint
+ splint:

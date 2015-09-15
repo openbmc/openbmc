@@ -1,0 +1,37 @@
+From 14b865b3438d0df29b4969148678d8fa8943e1ef Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 16 Aug 2015 20:49:33 -0700
+Subject: [PATCH 1/7] Disable lrount_tes() function
+
+Its not used anyway, avoids some strict compiler warnings
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ test/math/libm-test.inc | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/test/math/libm-test.inc b/test/math/libm-test.inc
+index f50b48b..6d70a95 100644
+--- a/test/math/libm-test.inc
++++ b/test/math/libm-test.inc
+@@ -3470,7 +3470,6 @@ logb_test (void)
+ }
+ 
+ 
+-#if 0
+ static void
+ lround_test (void)
+ {
+@@ -3605,7 +3604,6 @@ llround_test (void)
+ 
+   END (llround);
+ }
+-#endif
+ 
+ static void
+ modf_test (void)
+-- 
+2.1.4
+

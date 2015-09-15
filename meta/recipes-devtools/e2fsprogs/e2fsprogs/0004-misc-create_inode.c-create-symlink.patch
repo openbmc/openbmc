@@ -1,0 +1,63 @@
+From 09d3049776882167f7249ee26265b4163d7222c1 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Mon, 23 Dec 2013 03:19:55 -0500
+Subject: [PATCH 04/11] misc/create_inode.c: create symlink
+
+The do_symlink_internal() is used for creating symlinks, most of the
+code are from debugfs/debugfs.c, the debugfs/debugfs.c will be modified
+to use this function.
+
+Upstream-Status: Backport
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+Reviewed-by: Darren Hart <dvhart@linux.intel.com>
+---
+ misc/create_inode.c |   32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+
+diff --git a/misc/create_inode.c b/misc/create_inode.c
+index 4da8aff..f845103 100644
+--- a/misc/create_inode.c
++++ b/misc/create_inode.c
+@@ -88,6 +88,38 @@ errcode_t do_mknod_internal(ext2_ino_t cwd, const char *name, struct stat *st)
+ /* Make a symlink name -> target */
+ errcode_t do_symlink_internal(ext2_ino_t cwd, const char *name, char *target)
+ {
++	char			*cp;
++	ext2_ino_t		parent_ino;
++	errcode_t		retval;
++	struct ext2_inode	inode;
++	struct stat		st;
++
++	cp = strrchr(name, '/');
++	if (cp) {
++		*cp = 0;
++		if ((retval =  ext2fs_namei(current_fs, root, cwd, name, &parent_ino))){
++			com_err(name, retval, 0);
++			return retval;
++		}
++		name = cp+1;
++	} else
++		parent_ino = cwd;
++
++try_again:
++	retval = ext2fs_symlink(current_fs, parent_ino, 0, name, target);
++	if (retval == EXT2_ET_DIR_NO_SPACE) {
++		retval = ext2fs_expand_dir(current_fs, parent_ino);
++		if (retval) {
++			com_err("do_symlink_internal", retval, "while expanding directory");
++			return retval;
++		}
++		goto try_again;
++	}
++	if (retval) {
++		com_err("ext2fs_symlink", retval, 0);
++		return retval;
++	}
++
+ }
+ 
+ /* Make a directory in the fs */
+-- 
+1.7.10.4
+

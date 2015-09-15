@@ -1,0 +1,13 @@
+The recipes-rt recipes provide package and image recipes for using and testing
+the PREEMPT_RT kernel. The core-image-rt*.bb images are minimal images with
+a couple extra packages, including rt-tests. In order to build the image with
+the linux-yocto-rt kernel, be sure to include the following line in your
+local.conf, bblayers.conf, or your $MACHINE.conf.
+
+PREFERRED_PROVIDER_virtual/kernel = "linux-yocto-rt"
+
+If you are creating a new BSP which should use linux-yocto-rt by default,
+use the line above in the $MACHINE.conf in your BSP layer, and specify the
+following in a linux-yocto-rt bbappend recipe:
+
+COMPATIBLE_MACHINE_$MACHINE = $MACHINE

@@ -1,0 +1,5 @@
+#!/bin/sh
+#
+#This script is used to run python test suites
+
+make -f LIBDIR/python/ptest/Makefile -k runtest-TESTS srcdir=LIBDIR/python2.7 TESTPROG=LIBDIR/python2.7/test/regrtest.py | sed -e '/\.\.\. ok/ s/^/PASS: /g' -e '/\.\.\. [ERROR|FAIL]/ s/^/FAIL: /g' -e '/\.\.\. skipped/ s/^/SKIP: /g' -e 's/ \.\.\. ok//g' -e 's/ \.\.\. ERROR//g' -e 's/ \.\.\. FAIL//g' -e 's/ \.\.\. skipped//g'

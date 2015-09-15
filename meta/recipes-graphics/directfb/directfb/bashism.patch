@@ -1,0 +1,18 @@
+${x//y/} is a bash syntax. Replace with something dash compatible
+
+RP 2015/5/3
+Upstream-Status: Pending
+
+Index: DirectFB-1.7.7/configure.in
+===================================================================
+--- DirectFB-1.7.7.orig/configure.in
++++ DirectFB-1.7.7/configure.in
+@@ -2696,7 +2696,7 @@ AM_CONDITIONAL(BUILD_TOOLS, test "$with_
+ AM_CONDITIONAL(CROSS_COMPILING, test "$cross_compiling" = "yes")
+ 
+ CFLAGS="$CFLAGS $DFB_INTERNAL_CFLAGS"
+-CXXFLAGS="$CXXFLAGS ${CFLAGS//-Werror-implicit-function-declaration/}"
++CXXFLAGS="$CXXFLAGS $(printf '%s\n' "$CFLAGS" | sed 's/-Werror-implicit-function-declaration//g')"
+ DFB_LDFLAGS="$LDFLAGS $ZLIB_LIBS"
+ 
+ CFLAGS="$CFLAGS $CFLAGS_STD"

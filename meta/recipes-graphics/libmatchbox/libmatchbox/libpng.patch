@@ -1,0 +1,69 @@
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From 19c3d242034748b3c60765683e1ff4e2df970205 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Tue, 10 Dec 2013 11:37:32 +0000
+Subject: [PATCH] configure: improve libpng detection
+
+Instead of looking for "libpng12" explicitly though pkg-config and then falling
+back to library hunting, just use pkg-config to find "libpng" which is provided
+by both libpng12 and libpng16.
+
+This also makes the libpng detection deterministic.
+
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+---
+ configure.ac | 29 +++++------------------------
+ 1 file changed, 5 insertions(+), 24 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 8a28076..65d7c79 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -34,7 +34,7 @@ AC_ARG_ENABLE(jpeg,
+   enable_jpeg=$enableval, enable_jpeg=no)
+ 
+ AC_ARG_ENABLE(png,
+-  [  --disable-png           disable png support [default=no]],
++  [  --disable-png           disable PNG support [default=enabled]],
+      enable_png=$enableval, enable_png=yes )
+ 
+ AC_ARG_ENABLE(doxygen-docs,     
+@@ -156,29 +156,10 @@ fi
+ dnl ------ Check for PNG ---------------------------------------------------
+ 
+ if test x$enable_png != xno; then
+-  AC_MSG_CHECKING(for libpng12)
+-  if test x$PKG_CONFIG != xno && $PKG_CONFIG --exists libpng12; then 
+-        AC_MSG_RESULT(yes)
+-        PNG_LIBS=`$PKG_CONFIG --libs libpng12`
+-	PNG_CFLAGS=`$PKG_CONFIG --cflags libpng12`
+-        AC_DEFINE(USE_PNG, [1], [Use Png])
+-	SUPPORTS_PNG=1
+-	PNG_REQUIRED="libpng12"
+-  else
+-	AC_MSG_RESULT(no)
+-        # AC_CHECK_HEADERS(png.h, [ have_png_h="yes" ], [ have_png_h="no" ] )
+-        AC_CHECK_LIB([png], [png_create_read_struct], [have_png="yes"], [have_png="no"])
+-
+-        if test x$have_png=xyes && test x$have_png_h=xyes; then 
+-            AC_DEFINE(USE_PNG, [1], [Use Png])
+-	    SUPPORTS_PNG=1
+-            PNG_LIBS="-lpng -lz"
+-            MB_EXTRA_LIBS="$MB_EXTRA_LIBS $PNG_LIBS"
+-        else
+-	    AC_MSG_WARN([*** Cannot find PNG, disabling support])
+-            enable_png=no
+-	fi
+-  fi
++  PKG_CHECK_MODULES(PNG, libpng)
++  AC_DEFINE(USE_PNG, [1], [Use PNG])
++  SUPPORTS_PNG=1
++  PNG_REQUIRED="libpng"
+ fi
+ 
+ 
+-- 
+1.8.5
+

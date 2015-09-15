@@ -1,0 +1,11 @@
+Handbook Todo List:
+
+  * Document adding a new IMAGE_FEATURE to the customising images section 
+  * Add instructions about using zaurus/openmoko emulation
+  * Add component overview/block diagrams
+  * Software Deevelopment intro should mention its software development for 
+    intended target and could be a different arch etc and thus special case. 
+  * Expand insane.bbclass documentation to cover tests
+  * Document remaining classes (see list in ref-classes)
+  * Document formfactor
+

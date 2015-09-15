@@ -1,0 +1,60 @@
+From 24229971492515b64c81e8c6392e5dfbdc22b44c Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 26 Aug 2015 16:25:45 +0300
+Subject: [PATCH 3/5] Our pre/postinsts expect $D to be set when running in a
+ sysroot and don't expect a chroot. This matches up our system expectations
+ with what dpkg does.
+
+Upstream-Status: Inappropriate [OE Specific]
+
+RP 2011/12/07
+---
+ src/script.c | 31 ++-----------------------------
+ 1 file changed, 2 insertions(+), 29 deletions(-)
+
+diff --git a/src/script.c b/src/script.c
+index a958145..24c49f9 100644
+--- a/src/script.c
++++ b/src/script.c
+@@ -100,36 +100,9 @@ maintscript_pre_exec(struct command *cmd)
+ 	size_t instdirl = strlen(instdir);
+ 
+ 	if (*instdir) {
+-		if (strncmp(admindir, instdir, instdirl) != 0)
+-			ohshit(_("admindir must be inside instdir for dpkg to work properly"));
+-		if (setenv("DPKG_ADMINDIR", admindir + instdirl, 1) < 0)
+-			ohshite(_("unable to setenv for subprocesses"));
+-
+-		if (chroot(instdir))
+-			ohshite(_("failed to chroot to '%.250s'"), instdir);
+-	}
+-	/* Switch to a known good directory to give the maintainer script
+-	 * a saner environment, also needed after the chroot(). */
+-	if (chdir("/"))
+-		ohshite(_("failed to chdir to '%.255s'"), "/");
+-	if (debug_has_flag(dbg_scripts)) {
+-		struct varbuf args = VARBUF_INIT;
+-		const char **argv = cmd->argv;
+-
+-		while (*++argv) {
+-			varbuf_add_char(&args, ' ');
+-			varbuf_add_str(&args, *argv);
+-		}
+-		varbuf_end_str(&args);
+-		debug(dbg_scripts, "fork/exec %s (%s )", cmd->filename,
+-		      args.buf);
+-		varbuf_destroy(&args);
++		setenv("D", instdir, 1);
+ 	}
+-	if (!instdirl)
+-		return cmd->filename;
+-
+-	assert(strlen(cmd->filename) >= instdirl);
+-	return cmd->filename + instdirl;
++	return cmd->filename;
+ }
+ 
+ /**
+-- 
+2.1.4
+

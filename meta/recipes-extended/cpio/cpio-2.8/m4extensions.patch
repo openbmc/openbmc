@@ -1,0 +1,31 @@
+Upstream-Status: Inappropriate [licensing]
+
+# Define AC_USE_SYSTEM_EXTENSIONS only if it was previously undefined.
+# This is needed to configure correctly with newer versions of autoconf.
+
+diff -urN cpio-2.8.orig/m4/extensions.m4 cpio-2.8/m4/extensions.m4
+--- cpio-2.8.orig/m4/extensions.m4	2006-10-12 04:34:45.000000000 -0700
++++ cpio-2.8/m4/extensions.m4	2010-07-23 14:37:36.000000000 -0700
+@@ -1,4 +1,4 @@
+-# serial 4  -*- Autoconf -*-
++# serial 5  -*- Autoconf -*-
+ # Enable extensions on systems that normally disable them.
+ 
+ # Copyright (C) 2003, 2006 Free Software Foundation, Inc.
+@@ -16,6 +16,7 @@
+ # ------------------------
+ # Enable extensions on systems that normally disable them,
+ # typically due to standards-conformance issues.
++m4_ifdef([AC_USE_SYSTEM_EXTENSIONS], [], [
+ AC_DEFUN([AC_USE_SYSTEM_EXTENSIONS],
+ [
+   AC_BEFORE([$0], [AC_COMPILE_IFELSE])
+@@ -48,7 +49,7 @@
+     AC_DEFINE([__EXTENSIONS__])
+   AC_DEFINE([_POSIX_PTHREAD_SEMANTICS])
+   AC_DEFINE([_TANDEM_SOURCE])
+-])
++])])
+ 
+ # gl_USE_SYSTEM_EXTENSIONS
+ # ------------------------

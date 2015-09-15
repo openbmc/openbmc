@@ -1,0 +1,98 @@
+During the recalculation of the buildid, it's necessary to change the word
+back to the original endian.  However, if we do this in-place, we've also
+affected the headers that we're also working on.  The side effect of this is
+we can no longer rely on 'sh_type' as it may have been changed.
+
+This patch ensures that any time we translate the loaded data to the machine
+format, we only do it in a backup copy and never the original copy.
+
+Note: in all other places a backup copy was used, just not buildid processing.
+
+Also the process (...) function was modified to verify the data is not
+NULL as well.  This is an extra check and is not strictly necessary.
+
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.14/tools/debugedit.c
+===================================================================
+--- rpm-5.4.14.orig/tools/debugedit.c
++++ rpm-5.4.14/tools/debugedit.c
+@@ -1445,21 +1445,24 @@ handle_build_id (DSO *dso, Elf_Data *bui
+     auto inline void process (const void *data, size_t size)
+     {
+       memchunk chunk = { .data = (void *) data, .size = size };
+-      hashFunctionContextUpdateMC (&ctx, &chunk);
++      if (data != NULL && size != 0)
++        hashFunctionContextUpdateMC (&ctx, &chunk);
+     }
+     union
+     {
+       GElf_Ehdr ehdr;
+       GElf_Phdr phdr;
+       GElf_Shdr shdr;
+-    } u;
+-    Elf_Data x = { .d_version = EV_CURRENT, .d_buf = &u };
++    } u1, u2;
++    Elf_Data src  = { .d_version = EV_CURRENT, .d_buf = &u1 };
++    Elf_Data dest = { .d_version = EV_CURRENT, .d_buf = &u2 };
+ 
+-    x.d_type = ELF_T_EHDR;
+-    x.d_size = sizeof u.ehdr;
+-    u.ehdr = dso->ehdr;
+-    u.ehdr.e_phoff = u.ehdr.e_shoff = 0;
+-    if (elf64_xlatetom (&x, &x, dso->ehdr.e_ident[EI_DATA]) == NULL)
++    src.d_type = ELF_T_EHDR;
++    src.d_size = sizeof u1.ehdr;
++    dest.d_size = sizeof u2.ehdr;
++    u1.ehdr = dso->ehdr;
++    u1.ehdr.e_phoff = u1.ehdr.e_shoff = 0;
++    if (elf64_xlatetom (&dest, &src, dso->ehdr.e_ident[EI_DATA]) == NULL)
+       {
+       bad:
+ 	fprintf (stderr, "Failed to compute header checksum: %s\n",
+@@ -1467,29 +1470,31 @@ handle_build_id (DSO *dso, Elf_Data *bui
+ 	exit (1);
+       }
+ 
+-    x.d_type = ELF_T_PHDR;
+-    x.d_size = sizeof u.phdr;
++    src.d_type = ELF_T_PHDR;
++    src.d_size = sizeof u1.phdr;
++    dest.d_size = sizeof u2.phdr;
+     for (i = 0; i < dso->ehdr.e_phnum; ++i)
+       {
+-	if (gelf_getphdr (dso->elf, i, &u.phdr) == NULL)
++	if (gelf_getphdr (dso->elf, i, &u1.phdr) == NULL)
+ 	  goto bad;
+-	if (elf64_xlatetom (&x, &x, dso->ehdr.e_ident[EI_DATA]) == NULL)
++	if (elf64_xlatetom (&dest, &src, dso->ehdr.e_ident[EI_DATA]) == NULL)
+ 	  goto bad;
+-	process (x.d_buf, x.d_size);
++	process (dest.d_buf, dest.d_size);
+       }
+ 
+-    x.d_type = ELF_T_SHDR;
+-    x.d_size = sizeof u.shdr;
++    src.d_type = ELF_T_SHDR;
++    src.d_size = sizeof u1.shdr;
++    dest.d_size = sizeof u2.shdr;
+     for (i = 0; i < dso->ehdr.e_shnum; ++i)
+       if (dso->scn[i] != NULL)
+ 	{
+-	  u.shdr = dso->shdr[i];
+-	  u.shdr.sh_offset = 0;
+-	  if (elf64_xlatetom (&x, &x, dso->ehdr.e_ident[EI_DATA]) == NULL)
++	  u1.shdr = dso->shdr[i];
++	  u1.shdr.sh_offset = 0;
++	  if (elf64_xlatetom (&dest, &src, dso->ehdr.e_ident[EI_DATA]) == NULL)
+ 	    goto bad;
+-	  process (x.d_buf, x.d_size);
++	  process (dest.d_buf, dest.d_size);
+ 
+-	  if (u.shdr.sh_type != SHT_NOBITS)
++	  if (u1.shdr.sh_type != SHT_NOBITS)
+ 	    {
+ 	      Elf_Data *d = elf_rawdata (dso->scn[i], NULL);
+ 	      if (d == NULL)

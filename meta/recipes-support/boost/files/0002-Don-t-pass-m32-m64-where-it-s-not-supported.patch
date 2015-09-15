@@ -1,0 +1,40 @@
+From f825634a56b119dfa9d712119a66279cc7635978 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?J=C3=B6rg=20Krause?= <joerg.krause@embedded.rocks>
+Date: Sat, 2 May 2015 14:24:02 +0200
+Subject: [PATCH 2/2] Don't pass -m32/-m64 where it's not supported.
+
+Only PowerPC, SPARC, and x86 do support the -m32 and -m64 compiler options [1].
+
+Rather then excluding all architectures not supporting these options as it is
+done in commit c0634341d9ee2c02d3a55c91dafb988afc066c49 [2], include all
+architectures that do support them.
+
+This will fix building Boost for the SuperH architecture with Buildroot [3].
+
+[1] https://gcc.gnu.org/onlinedocs/gcc/Option-Summary.html
+[2] https://github.com/boostorg/build/commit/c0634341d9ee2c02d3a55c91dafb988afc066c49
+[3] http://autobuild.buildroot.net/results/ccd/ccd5c83963032ba49b1627b1dff39e34a9486943/build-end.log
+
+Upstream-Status: Backport
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+
+---
+ tools/build/src/tools/gcc.jam |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/build/src/tools/gcc.jam b/tools/build/src/tools/gcc.jam
+index eff95ae..2f6af93 100644
+--- a/tools/build/src/tools/gcc.jam
++++ b/tools/build/src/tools/gcc.jam
+@@ -451,7 +451,7 @@ rule setup-address-model ( targets * : sources * : properties * )
+         else
+         {
+             local arch = [ feature.get-values architecture : $(properties) ] ;
+-            if $(arch) != arm && $(arch) != mips1
++            if $(arch) = power || $(arch) = sparc || $(arch) = x86
+             {
+                 if $(model) = 32
+                 {
+-- 
+1.7.9.5
+

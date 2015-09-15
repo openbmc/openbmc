@@ -1,0 +1,75 @@
+From ba0f6058d1f25b2b60fc31ab2656bf12a71ffdab Mon Sep 17 00:00:00 2001
+From: Lu Chong <Chong.Lu@windriver.com>
+Date: Tue, 5 Nov 2013 17:32:56 +0800
+Subject: [PATCH] ppp: Fix compilation errors in Makefile
+
+This patch fixes below issues:
+
+1. Make can't exit while compilation error occurs in subdir for plugins building.
+
+2. If build ppp with newer kernel (3.10.10), it will pick 'if_pppox.h' from sysroot-dir and
+   'if_pppol2tp.h' from its own source dir, this cause below build errors:
+
+        bitbake_build/tmp/sysroots/intel-x86-64/usr/include/linux/if_pppox.h:84:26:
+        error: field 'pppol2tp' has incomplete type
+          struct pppol2tpin6_addr pppol2tp;
+                                  ^
+        bitbake_build/tmp/sysroots/intel-x86-64/usr/include/linux/if_pppox.h:99:28:
+        error: field 'pppol2tp' has incomplete type
+          struct pppol2tpv3in6_addr pppol2tp;
+                                    ^
+
+The 'sysroot-dir/if_pppox.h' enabled ipv6 support but the 'source-dir/if_pppol2tp.h' lost
+related structure definitions, we should use both header files from sysroots to fix this
+build failure.
+
+Upstream-Status: Pending
+
+Signed-off-by: Lu Chong <Chong.Lu@windriver.com>
+---
+ pppd/plugins/Makefile.linux          |    2 +-
+ pppd/plugins/pppol2tp/Makefile.linux |    2 +-
+ pppd/plugins/rp-pppoe/Makefile.linux |    2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/pppd/plugins/Makefile.linux b/pppd/plugins/Makefile.linux
+index 0a7ec7b..2a2c15a 100644
+--- a/pppd/plugins/Makefile.linux
++++ b/pppd/plugins/Makefile.linux
+@@ -20,7 +20,7 @@ include .depend
+ endif
+ 
+ all:	$(PLUGINS)
+-	for d in $(SUBDIRS); do $(MAKE) $(MFLAGS) -C $$d all; done
++	for d in $(SUBDIRS); do $(MAKE) $(MFLAGS) -C $$d all || exit 1; done
+ 
+ %.so: %.c
+ 	$(CC) -o $@ $(LDFLAGS) $(CFLAGS) $^
+diff --git a/pppd/plugins/pppol2tp/Makefile.linux b/pppd/plugins/pppol2tp/Makefile.linux
+index 19eff67..feb2f52 100644
+--- a/pppd/plugins/pppol2tp/Makefile.linux
++++ b/pppd/plugins/pppol2tp/Makefile.linux
+@@ -1,6 +1,6 @@
+ #CC	= gcc
+ COPTS	= -O2 -g
+-CFLAGS	= $(COPTS) -I. -I../.. -I../../../include -fPIC
++CFLAGS	= $(COPTS) -I. -I../.. -fPIC
+ LDFLAGS	= -shared
+ INSTALL	= install
+ 
+diff --git a/pppd/plugins/rp-pppoe/Makefile.linux b/pppd/plugins/rp-pppoe/Makefile.linux
+index f078991..15b9118 100644
+--- a/pppd/plugins/rp-pppoe/Makefile.linux
++++ b/pppd/plugins/rp-pppoe/Makefile.linux
+@@ -26,7 +26,7 @@ INSTALL	= install
+ RP_VERSION=3.8p
+ 
+ COPTS=-O2 -g
+-CFLAGS=$(COPTS) -I../../../include '-DRP_VERSION="$(RP_VERSION)"'
++CFLAGS=$(COPTS) '-DRP_VERSION="$(RP_VERSION)"'
+ all: rp-pppoe.so pppoe-discovery
+ 
+ pppoe-discovery: pppoe-discovery.o debug.o
+-- 
+1.7.9.5
+

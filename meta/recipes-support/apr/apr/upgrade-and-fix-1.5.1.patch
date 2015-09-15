@@ -1,0 +1,45 @@
+Makefile.in: fix cross compiling failed
+
+The tools/gen_test_char was invoked at build time,
+and it didn't work for the cross compiling, so we
+compile it with $BUILD_CC.
+
+Remove the 'tools' dir creation, it always existed.
+And it caused gen_test_char unexpected rebuilt at
+do_install time.
+
+Upstream-Status: inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ Makefile.in | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index a2a5194..5fe028f 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -46,7 +46,6 @@ LT_VERSION = @LT_VERSION@
+ 
+ CLEAN_TARGETS = apr-config.out apr.exp exports.c export_vars.c .make.dirs \
+ 	build/apr_rules.out tools/gen_test_char@EXEEXT@ \
+-	tools/gen_test_char.o tools/gen_test_char.lo \
+ 	include/private/apr_escape_test_char.h
+ DISTCLEAN_TARGETS = config.cache config.log config.status \
+ 	include/apr.h include/arch/unix/apr_private.h \
+@@ -129,13 +128,8 @@ check: $(TARGET_LIB)
+ etags:
+ 	etags `find . -name '*.[ch]'`
+ 
+-OBJECTS_gen_test_char = tools/gen_test_char.lo $(LOCAL_LIBS)
+-tools/gen_test_char.lo: tools/gen_test_char.c
+-	$(APR_MKDIR) tools
+-	$(LT_COMPILE)
+-
+-tools/gen_test_char@EXEEXT@: $(OBJECTS_gen_test_char)
+-	$(LINK_PROG) $(OBJECTS_gen_test_char) $(ALL_LIBS)
++tools/gen_test_char@EXEEXT@: tools/gen_test_char.c
++	$(BUILD_CC) $(CFLAGS_FOR_BUILD) $< -o $@
+ 
+ include/private/apr_escape_test_char.h: tools/gen_test_char@EXEEXT@
+ 	$(APR_MKDIR) include/private

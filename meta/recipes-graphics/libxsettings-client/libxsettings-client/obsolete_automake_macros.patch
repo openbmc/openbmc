@@ -1,0 +1,14 @@
+Upstream-Status: Pending
+
+Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
+diff -Nurd Xsettings-client-0.10/configure.ac Xsettings-client-0.10/configure.ac
+--- Xsettings-client-0.10/configure.ac	2003-03-28 12:39:51.000000000 +0200
++++ Xsettings-client-0.10/configure.ac	2013-01-11 07:37:21.491597743 +0200
+@@ -1,7 +1,7 @@
+ # Process this file with autoconf to produce a configure script.
+ AC_INIT(xsettings-client.c)
+ AM_INIT_AUTOMAKE(Xsettings-client, 0.10)
+-AM_CONFIG_HEADER(config.h)
++AC_CONFIG_HEADERS(config.h)
+
+ CFLAGS="-Os -Wall"

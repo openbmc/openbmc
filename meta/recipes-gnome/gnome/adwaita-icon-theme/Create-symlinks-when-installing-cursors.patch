@@ -1,0 +1,178 @@
+Create symlinks when installing cursors
+
+This cuts down the installed size by ~11MB.
+
+Upstream-Status: Backport
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+
+
+From 1e8c0dd0a2de5e1d5ff60ff11f131e88510c7f50 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=D0=A0=D1=83=D1=81=D0=BB=D0=B0=D0=BD=20=D0=98=D0=B6=D0=B1?=
+ =?UTF-8?q?=D1=83=D0=BB=D0=B0=D1=82=D0=BE=D0=B2?= <lrn1986@gmail.com>
+Date: Sat, 16 May 2015 07:49:19 +0000
+Subject: [PATCH] Create symlinks when installing cursors
+
+Also support creating symlinks for W32 cursors (including L and XL variants).
+
+https://bugzilla.gnome.org/show_bug.cgi?id=749223
+---
+ Makefile.am  | 93 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ configure.ac | 24 ++++++++++++++++
+ 2 files changed, 117 insertions(+)
+
+diff --git a/Makefile.am b/Makefile.am
+index fed3972..4d00268 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -6,6 +6,17 @@ ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
+ 
+ cursordir = $(datadir)/icons/Adwaita/cursors
+ cursor_DATA = $(wildcard $(srcdir)/Adwaita/cursors/*)
++if ENABLE_L_XL_VARIANTS
++cursorldir = $(datadir)/icons/Adwaita-Large/cursors
++cursorl_DATA = $(wildcard $(srcdir)/Adwaita-Large/cursors/*)
++cursorxldir = $(datadir)/icons/Adwaita-ExtraLarge/cursors
++cursorxl_DATA = $(wildcard $(srcdir)/Adwaita-ExtraLarge/cursors/*)
++else
++cursorldir =
++cursorl_DATA =
++cursorxldir =
++cursorxl_DATA =
++endif
+ 
+ theme_in_files = index.theme.in.in
+ theme_DATA = $(theme_in_files:.theme.in.in=.theme)
+@@ -99,6 +110,88 @@ install-data-local:
+ 	fi
+ 
+ install-data-hook:
++	cd $(DESTDIR)$(cursordir) && \
++	if test "x$(enable_w32_cursors)" = "xyes"; \
++	then \
++		cur=.cur && \
++		ani=.ani; \
++	else \
++		cur= && \
++		ani= ; \
++	fi; \
++	if test "x$(enable_l_xl_variants)" = "xyes"; \
++	then \
++		themedirs="$(cursordir) $(cursorldir) $(cursorxldir)"; \
++	else \
++		themedirs="$(cursordir)"; \
++	fi; \
++	for d in $$themedirs; \
++	do \
++		cd $(DESTDIR)$$d && \
++		echo Creating symlinks in $(DESTDIR)$$d && \
++		$(LN_S) -f  dotbox$$cur			draped_box$$cur && \
++		$(LN_S) -f  dotbox$$cur			icon$$cur && \
++		$(LN_S) -f  dotbox$$cur			target$$cur && \
++		$(LN_S) -f  dotbox$$cur			dot_box_mask$$cur && \
++		$(LN_S) -f  X_cursor$$cur		pirate$$cur && \
++		$(LN_S) -f  left_ptr_watch$$ani		08e8e1c95fe2fc01f976f1e063a24ccd$$ani && \
++		$(LN_S) -f  left_ptr_watch$$ani		3ecb610c1bf2410f44200f48c40d3599$$ani && \
++		$(LN_S) -f  left_ptr$$cur		arrow$$cur && \
++		$(LN_S) -f  left_ptr$$cur		top_left_arrow$$cur && \
++		$(LN_S) -f  right_ptr$$cur		draft_large$$cur && \
++		$(LN_S) -f  right_ptr$$cur		draft_small$$cur && \
++		$(LN_S) -f  move$$cur			4498f0e0c1937ffe01fd06f973665830$$cur && \
++		$(LN_S) -f  move$$cur			9081237383d90e509aa00f00170e968f$$cur && \
++		$(LN_S) -f  copy$$cur			1081e37283d90000800003c07f3ef6bf$$cur && \
++		$(LN_S) -f  copy$$cur			6407b0e94181790501fd1e167b474872$$cur && \
++		$(LN_S) -f  cross$$cur			cross_reverse$$cur && \
++		$(LN_S) -f  cross$$cur			diamond_cross$$cur && \
++		$(LN_S) -f  hand1$$cur			grab$$cur && \
++		$(LN_S) -f  hand2$$cur			9d800788f1b08800ae810202380a0822$$cur && \
++		$(LN_S) -f  hand2$$cur			e29285e634086352946a0e7090d73106$$cur && \
++		$(LN_S) -f  hand2$$cur			hand$$cur && \
++		$(LN_S) -f  grabbing$$cur		fleur$$cur && \
++		$(LN_S) -f  question_arrow$$cur		d9ce0ab605698f320427677b458ad60b$$cur && \
++		$(LN_S) -f  question_arrow$$cur		5c6cd98b3f3ebcb1f9c7f1c204630408$$cur && \
++		$(LN_S) -f  question_arrow$$cur		help$$cur && \
++		$(LN_S) -f  question_arrow$$cur		left_ptr_help$$cur && \
++		$(LN_S) -f  link$$cur			3085a0e285430894940527032f8b26df$$cur && \
++		$(LN_S) -f  link$$cur			640fb0e74195791501fd1ed57b41487f$$cur && \
++		$(LN_S) -f  crossed_circle$$cur		03b6e0fcb3499374a867c041f52298f0$$cur && \
++		$(LN_S) -f  fd_double_arrow$$cur	fcf1c3c7cd4491d801f1e1c78f100000$$cur && \
++		$(LN_S) -f  bd_double_arrow$$cur	c7088f0f3e6c8088236ef8e1e3e70000$$cur && \
++		$(LN_S) -f  sb_h_double_arrow$$cur 	h_double_arrow$$cur && \
++		$(LN_S) -f  sb_h_double_arrow$$cur	14fef782d02440884392942c11205230$$cur && \
++		$(LN_S) -f  h_double_arrow$$cur		028006030e0e7ebffc7f7070c0600140$$cur && \
++		$(LN_S) -f  sb_v_double_arrow$$cur 	double_arrow$$cur && \
++		$(LN_S) -f  sb_v_double_arrow$$cur 	v_double_arrow$$cur && \
++		$(LN_S) -f  sb_v_double_arrow$$cur	2870a09082c103050810ffdffffe0204$$cur && \
++		$(LN_S) -f  v_double_arrow$$cur		00008160000006810000408080010102$$cur && \
++		$(LN_S) -f  left_ptr$$cur		default$$cur && \
++		$(LN_S) -f  hand$$cur			pointer$$cur && \
++		$(LN_S) -f  left_ptr_watch$$ani		progress$$ani && \
++		$(LN_S) -f  watch$$ani			wait$$ani && \
++		$(LN_S) -f  cross$$cur			crosshair$$cur && \
++		$(LN_S) -f  xterm$$cur			text$$cur && \
++		$(LN_S) -f  dnd-link$$cur		alias$$cur && \
++		$(LN_S) -f  dnd-copy$$cur		copy$$cur && \
++		$(LN_S) -f  dnd-none$$cur		no-drop$$cur && \
++		$(LN_S) -f  crossed_circle$$cur		not-allowed$$cur && \
++		$(LN_S) -f  sb_h_double_arrow$$cur	col-resize$$cur && \
++		$(LN_S) -f  sb_v_double_arrow$$cur	row-resize$$cur && \
++		$(LN_S) -f  top_side$$cur		n-resize$$cur && \
++		$(LN_S) -f  right_side$$cur		e-resize$$cur && \
++		$(LN_S) -f  bottom_side$$cur		s-resize$$cur && \
++		$(LN_S) -f  left_side$$cur		w-resize$$cur && \
++		$(LN_S) -f  top_right_corner$$cur	ne-resize$$cur && \
++		$(LN_S) -f  top_left_corner$$cur	nw-resize$$cur && \
++		$(LN_S) -f  bottom_right_corner$$cur	se-resize$$cur && \
++		$(LN_S) -f  bottom_left_corner$$cur	sw-resize$$cur && \
++		$(LN_S) -f  sb_h_double_arrow$$cur	ew-resize$$cur && \
++		$(LN_S) -f  sb_v_double_arrow$$cur	ns-resize$$cur && \
++		$(LN_S) -f  fd_double_arrow$$cur	nesw-resize$$cur && \
++		$(LN_S) -f  bd_double_arrow$$cur	nwse-resize$$cur; \
++	done
+ 	if test -z "$(DESTDIR)" && test -n "$(GTK_UPDATE_ICON_CACHE)" ; then \
+ 		$(GTK_UPDATE_ICON_CACHE) -q $(DESTDIR)$(themedir); \
+ 	fi
+diff --git a/configure.ac b/configure.ac
+index 9e4d8a0..312b24c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -31,6 +31,7 @@ AC_SUBST([render_sizes], ["8x8 16x16 22x22 24x24 32x32 48x48 256x256"])
+ AC_SUBST([symbolic_render_sizes], [""])
+ AC_SUBST([install_sizes], ["8x8 16x16 22x22 24x24 32x32 48x48 64x64 96x96 256x256"])
+ 
++AC_PROG_LN_S
+ AC_PATH_PROG(GTK_UPDATE_ICON_CACHE, gtk-update-icon-cache)
+ 
+ # need git, icontool, and inkscape for rendering
+@@ -56,6 +57,29 @@ if test "x$GTK_ENCODE_SYMBOLIC_SVG" = "xfalse"; then
+ fi
+ AC_SUBST(symbolic_encode_sizes)
+ 
++AC_ARG_ENABLE([w32-cursors],
++  [AS_HELP_STRING([--enable-w32-cursors],
++    [Make and install Windows cursors (.cur and .ani) instead of X cursors])],
++  [case "${enableval}" in
++    yes) enable_w32_cursors=yes ;;
++    no)  enable_w32_cursors=no ;;
++    *) AC_MSG_ERROR([bad value ${enableval} for --enable-w32-cursors]) ;;
++   esac],
++  [enable_w32_cursors=no])
++AC_SUBST(enable_w32_cursors)
++
++AC_ARG_ENABLE([l-xl-variants],
++  [AS_HELP_STRING([--enable-l-xl-variants],
++    [Also make and install Large and Extra Large Windows cursor versions])],
++  [case "${enableval}" in
++    yes) enable_l_xl_variants=yes ;;
++    no)  enable_l_xl_variants=no ;;
++    *) AC_MSG_ERROR([bad value ${enableval} for --enable-l-xl-variants]) ;;
++   esac],
++  [enable_l_xl_variants=no])
++AC_SUBST(enable_l_xl_variants)
++AM_CONDITIONAL([ENABLE_L_XL_VARIANTS], [test x$enable_l_xl_variants = xyes])
++
+ AC_CONFIG_FILES([
+ Makefile
+ adwaita-icon-theme.pc
+-- 
+2.1.4
+

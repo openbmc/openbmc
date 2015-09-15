@@ -1,0 +1,13 @@
+[Unit]
+Description=System Logging Service
+Wants=busybox-klogd.service
+
+[Service]
+EnvironmentFile=-/etc/default/busybox-syslog
+ExecStart=@base_sbindir@/syslogd -n $OPTIONS
+Sockets=syslog.socket
+
+[Install]
+WantedBy=multi-user.target
+Also=busybox-klogd.service
+Alias=syslog.service

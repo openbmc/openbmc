@@ -1,0 +1,79 @@
+Upstream-Status: Pending [from other distro Debian]
+
+From a3410b0bc81ab03a889d9ffc14e351badf8372f1 Mon Sep 17 00:00:00 2001
+From: Pierre Habouzit <madcoder@debian.org>
+Date: Mon, 26 Nov 2007 16:02:04 +0100
+Subject: [PATCH] Various fixes from the previous maintainer.
+
+---
+ xinetd/child.c   |   20 +++++++++++++++++---
+ xinetd/service.c |    8 ++++----
+ 2 files changed, 21 insertions(+), 7 deletions(-)
+
+diff --git a/xinetd/child.c b/xinetd/child.c
+index 89ee54c..48e9615 100644
+--- a/xinetd/child.c
++++ b/xinetd/child.c
+@@ -284,6 +284,7 @@ void child_process( struct server *serp )
+    connection_s            *cp  = SERVER_CONNECTION( serp ) ;
+    struct service_config   *scp = SVC_CONF( sp ) ;
+    const char              *func = "child_process" ;
++   int                     fd, null_fd;
+ 
+    signal_default_state();
+ 
+@@ -296,9 +297,22 @@ void child_process( struct server *serp )
+    signals_pending[0] = -1;
+    signals_pending[1] = -1;
+ 
+-   Sclose(0);
+-   Sclose(1);
+-   Sclose(2);
++   if ( ( null_fd = open( "/dev/null", O_RDONLY ) ) == -1 )
++   {
++      msg( LOG_ERR, func, "open('/dev/null') failed: %m") ;
++      _exit( 1 ) ;
++   }
++
++   for ( fd = 0 ; fd <= MAX_PASS_FD ; fd++ )
++   {
++      if ( fd != null_fd && dup2( null_fd, fd ) == -1 )
++      {
++         msg( LOG_ERR, func, "dup2(%d, %d) failed: %m") ;
++         _exit( 1 ) ;
++      }
++   }
++   if ( null_fd > MAX_PASS_FD )
++      (void) Sclose( null_fd ) ;
+ 
+ 
+ #ifdef DEBUG_SERVER
+diff --git a/xinetd/service.c b/xinetd/service.c
+index 3d68d78..0132d6c 100644
+--- a/xinetd/service.c
++++ b/xinetd/service.c
+@@ -745,8 +745,8 @@ static status_e failed_service(struct service *sp,
+                return FAILED;
+ 
+             if ( last == NULL ) {
+-               last = SAIN( calloc( 1, sizeof(union xsockaddr) ) );
+-	       SVC_LAST_DGRAM_ADDR(sp) = (union xsockaddr *)last;
++	    SVC_LAST_DGRAM_ADDR(sp) =  SAIN( calloc( 1, sizeof(union xsockaddr) ) );
++	    last = SAIN( SVC_LAST_DGRAM_ADDR(sp) );
+             }
+ 
+             (void) time( &current_time ) ;
+@@ -772,8 +772,8 @@ static status_e failed_service(struct service *sp,
+                return FAILED;
+ 
+ 	    if( last == NULL ) {
+-               last = SAIN6(calloc( 1, sizeof(union xsockaddr) ) );
+-	       SVC_LAST_DGRAM_ADDR( sp ) = (union xsockaddr *)last;
++	    SVC_LAST_DGRAM_ADDR(sp) = SAIN6(calloc( 1, sizeof(union xsockaddr) ) );
++            last = SAIN6(SVC_LAST_DGRAM_ADDR(sp));
+             }
+ 
+             (void) time( &current_time ) ;
+-- 
+1.5.3.6.2040.g15e6
+

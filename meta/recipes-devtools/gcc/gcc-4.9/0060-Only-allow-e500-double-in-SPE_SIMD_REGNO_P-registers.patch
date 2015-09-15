@@ -1,0 +1,55 @@
+From 5c0092070253113cf0d9c45eacc884b3ecc34d81 Mon Sep 17 00:00:00 2001
+From: jsm28 <jsm28@138bc75d-0d04-0410-961f-82ee72b054a4>
+Date: Sat, 25 Oct 2014 00:23:17 +0000
+Subject: [PATCH] Only allow e500 double in SPE_SIMD_REGNO_P registers.
+
+rs6000_hard_regno_nregs_internal allows SPE vectors in single
+registers satisfying SPE_SIMD_REGNO_P (i.e. register numbers 0 to
+31).  However, the corresponding test for e500 double treats all
+registers as being able to store a 64-bit value, rather than just
+those GPRs.
+
+Logically this inconsistency is wrong; in addition, it causes problems
+unwinding from signal handlers.  linux-unwind.h uses
+ARG_POINTER_REGNUM as a place to store the return address from a
+signal handler, but this logic in rs6000_hard_regno_nregs_internal
+results in that being considered an 8-byte register, resulting in
+assertion failures.
+(<https://gcc.gnu.org/ml/gcc-patches/2014-09/msg02625.html> first
+needs to be applied for unwinding to work in general on e500.)  This
+patch makes rs6000_hard_regno_nregs_internal handle the e500 double
+case consistently with SPE vectors.
+
+Tested with no regressions with cross to powerpc-linux-gnuspe (given
+the aforementioned patch applied).  Failures of signal handling
+unwinding tests such as gcc.dg/cleanup-{8,9,10,11}.c are fixed by this
+patch.
+
+	* config/rs6000/rs6000.c (rs6000_hard_regno_nregs_internal): Do
+	not allow e500 double in registers not satisyfing
+	SPE_SIMD_REGNO_P.
+
+
+git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/trunk@216688 138bc75d-0d04-0410-961f-82ee72b054a4
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Backport [gcc 5.0]
+
+---
+ gcc/ChangeLog              | 6 ++++++
+ gcc/config/rs6000/rs6000.c | 2 +-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+Index: gcc-4.9.2/gcc/config/rs6000/rs6000.c
+===================================================================
+--- gcc-4.9.2.orig/gcc/config/rs6000/rs6000.c
++++ gcc-4.9.2/gcc/config/rs6000/rs6000.c
+@@ -1703,7 +1703,7 @@ rs6000_hard_regno_nregs_internal (int re
+      SCmode so as to pass the value correctly in a pair of
+      registers.  */
+   else if (TARGET_E500_DOUBLE && FLOAT_MODE_P (mode) && mode != SCmode
+-	   && !DECIMAL_FLOAT_MODE_P (mode))
++	   && !DECIMAL_FLOAT_MODE_P (mode) && SPE_SIMD_REGNO_P (regno))
+     reg_size = UNITS_PER_FP_WORD;
+ 
+   else

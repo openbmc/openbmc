@@ -1,0 +1,31 @@
+Upstream-Status: Inappropriate [disable feature]
+
+After the commit "tcmode-default: switch to gcc 4.6.0 for x86, x86-64 & arm",
+we got bug 1099 (http://bugzilla.yoctoproject.org/show_bug.cgi?id=1099):
+
+Running "install --stage2=/ssd/boot/grub/stage2 /boot/grub/stage1(hd0)
+     /boot/grub/stage2 p /boot/grub/menu list" failed
+Error 6: Mismatched or corrupt version of stage1/stage2
+
+This turned out to be a gcc's bug. See
+https://bugs.gentoo.org/show_bug.cgi?id=360513
+http://gcc.gnu.org/bugzilla/show_bug.cgi?id=39333
+
+Upstream gcc seems uninterested in the bug, so at present we can disable the
+option as a workaround. Thanks Ryan Hill for the investigation and the
+workaround patch.
+
+Dexuan Cui <dexuan.cui@intel.com>
+Wed Jun 29 20:21:39 CST 2011
+
+--- grub-0.97/stage2/Makefile.am.orig
++++ grub-0.97/stage2/Makefile.am
+@@ -79,7 +79,7 @@
+ HERCULES_FLAGS =
+ endif
+ 
+-STAGE2_COMPILE = $(STAGE2_CFLAGS) -fno-builtin -nostdinc \
++STAGE2_COMPILE = $(STAGE2_CFLAGS) -fno-reorder-functions -fno-builtin -nostdinc \
+ 	$(NETBOOT_FLAGS) $(SERIAL_FLAGS) $(HERCULES_FLAGS)
+ 
+ STAGE1_5_LINK = -nostdlib -Wl,-N -Wl,-Ttext -Wl,2000

@@ -1,0 +1,26 @@
+Do not include /usr/include host paths
+
+These were added upstream apparently for freebsd support, but trigger
+compiler warnings during the build and could be dangerous, so remove
+them.
+
+Upstream-Status: Inappropriate [cross]
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+
+Update patch for version 0.7.4.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+--- qmmp-0.7.4/CMakeLists.txt	2014-01-10 09:59:44.971837746 +0800
++++ qmmp-0.7.4/CMakeLists.txt.new	2014-01-10 10:24:51.855837566 +0800
+@@ -1,9 +1,5 @@
+ cmake_minimum_required(VERSION 2.6.0)
+ 
+-#freebsd support
+-include_directories(SYSTEM /usr/local/include)
+-SET(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} /usr/local/include)
+-
+ #extract version from qmmp.h
+ FILE(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/src/qmmp/qmmp.h"
+      QMMP_VERSION_DATA REGEX "^#define[ \t]+QMMP_VERSION_[A-Z]+[ \t]+[0-9]+.*$")

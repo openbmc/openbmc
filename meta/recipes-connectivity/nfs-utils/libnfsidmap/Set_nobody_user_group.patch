@@ -1,0 +1,18 @@
+Set nobody user and group
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+--- a/idmapd.conf
++++ b/idmapd.conf
+@@ -17,8 +17,8 @@
+ 
+ [Mapping]
+ 
+-#Nobody-User = nobody
+-#Nobody-Group = nobody
++Nobody-User = nobody
++Nobody-Group = nogroup
+ 
+ [Translation]
+ 

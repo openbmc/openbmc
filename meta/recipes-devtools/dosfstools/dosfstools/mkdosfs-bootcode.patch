@@ -1,0 +1,241 @@
+Add option to read in bootcode from a file.
+
+Upstream-Status: Inappropriate [licensing]
+We're tracking an old release of dosfstools due to licensing issues.
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+Index: dosfstools-2.11/mkdosfs/ChangeLog
+===================================================================
+--- dosfstools-2.11.orig/mkdosfs/ChangeLog	1997-06-18 10:09:38.000000000 +0000
++++ dosfstools-2.11/mkdosfs/ChangeLog	2011-12-06 12:14:23.634011558 +0000
+@@ -1,3 +1,14 @@
++19th June 2003			Sam Bingner (sam@bingner.com)
++
++	Added option to read in bootcode from a file so that if you have
++	for example Windows 2000 boot code, you can have it write that
++	as the bootcode.  This is a dump of the behinning of a partition
++	generally 512 bytes, but can be up to reserved sectors*512 bytes.
++        Also writes 0x80 as the	BIOS drive number if we are formatting a
++	hard drive, and sets the number of hidden sectors to be the
++	number of sectors in one track. These were required so that DOS
++	could boot using the bootcode.
++
+ 28th January 1995		H. Peter Anvin (hpa@yggdrasil.com)
+ 
+ 	Better algorithm to select cluster sizes on large filesystems.
+Index: dosfstools-2.11/mkdosfs/mkdosfs.8
+===================================================================
+--- dosfstools-2.11.orig/mkdosfs/mkdosfs.8	2004-02-25 19:36:07.000000000 +0000
++++ dosfstools-2.11/mkdosfs/mkdosfs.8	2011-12-06 12:19:54.777888434 +0000
+@@ -44,6 +44,10 @@
+ .I message-file
+ ]
+ [
++.B \-B
++.I bootcode-file
++]
++[
+ .B \-n
+ .I volume-name
+ ]
+@@ -165,6 +169,18 @@
+ carriage return-line feed combinations, and tabs have been expanded.
+ If the filename is a hyphen (-), the text is taken from standard input. 
+ .TP
++.BI \-B " bootcode-file"
++Uses boot machine code from file "file".  On any thing other than FAT32,
++this only writes the first 3 bytes, and 480 bytes from offset 3Eh.  On
++FAT32, this writes the first 3 bytes, 420 bytes from offset 5Ah to both
++primary and backup boot sectors.  Also writes all other reserved sectors
++excluding the sectors following boot sectors (usually sector 2 and 7).
++Does not require that the input file be as large as reserved_sectors*512.
++To make a FAT32 partition bootable, you will need at least the first
++13 sectors (6656 bytes).  You can also specify a partition as the argument
++to clone the boot code from that partition.
++i.e mkdosfs -B /dev/sda1 /dev/sda1
++.TP
+ .BI \-n " volume-name"
+ Sets the volume name (label) of the filesystem.  The volume name can
+ be up to 11 characters long.  The default is no label.
+@@ -198,8 +214,9 @@
+ simply will not support it ;)
+ .SH AUTHOR
+ Dave Hudson - <dave@humbug.demon.co.uk>; modified by Peter Anvin
+-<hpa@yggdrasil.com>. Fixes and additions by Roman Hodek
+-<roman@hodek.net> for Debian/GNU Linux.
++<hpa@yggdrasil.com> and Sam Bingner <sam@bingner.com>. Fixes and
++additions by Roman Hodek <Roman.Hodek@informatik.uni-erlangen.de>
++for Debian/GNU Linux.
+ .SH ACKNOWLEDGEMENTS
+ .B mkdosfs
+ is based on code from
+Index: dosfstools-2.11/mkdosfs/mkdosfs.c
+===================================================================
+--- dosfstools-2.11.orig/mkdosfs/mkdosfs.c	2005-03-12 16:12:16.000000000 +0000
++++ dosfstools-2.11/mkdosfs/mkdosfs.c	2011-12-06 12:27:55.121886076 +0000
+@@ -24,6 +24,12 @@
+    - New options -A, -S, -C
+    - Support for filesystems > 2GB
+    - FAT32 support
++
++   Fixes/additions June 2003 by Sam Bingner
++   <sam@bingner.com>:
++   - Add -B option to read in bootcode from a file
++   - Write BIOS drive number so that FS can properly boot
++   - Set number of hidden sectors before boot code to be one track
+    
+    Copying:     Copyright 1993, 1994 David Hudson (dave@humbug.demon.co.uk)
+ 
+@@ -153,6 +159,8 @@
+ #define FAT_BAD      0x0ffffff7
+ 
+ #define MSDOS_EXT_SIGN 0x29	/* extended boot sector signature */
++#define HD_DRIVE_NUMBER 0x80	/* Boot off first hard drive */
++#define FD_DRIVE_NUMBER 0x00	/* Boot off first floppy drive */
+ #define MSDOS_FAT12_SIGN "FAT12   "	/* FAT12 filesystem signature */
+ #define MSDOS_FAT16_SIGN "FAT16   "	/* FAT16 filesystem signature */
+ #define MSDOS_FAT32_SIGN "FAT32   "	/* FAT32 filesystem signature */
+@@ -175,6 +183,8 @@
+ #define BOOTCODE_SIZE		448
+ #define BOOTCODE_FAT32_SIZE	420
+ 
++#define MAX_RESERVED		0xFFFF
++
+ /* __attribute__ ((packed)) is used on all structures to make gcc ignore any
+  * alignments */
+ 
+@@ -202,7 +212,7 @@
+   __u16         fat_length;	/* sectors/FAT */
+   __u16         secs_track;	/* sectors per track */
+   __u16         heads;		/* number of heads */
+-  __u32         hidden;		/* hidden sectors (unused) */
++  __u32         hidden;		/* hidden sectors (one track) */
+   __u32         total_sect;	/* number of sectors (if sectors == 0) */
+   union {
+     struct {
+@@ -285,6 +295,8 @@
+ 
+ /* Global variables - the root of all evil :-) - see these and weep! */
+ 
++static char *template_boot_code;	/* Variable to store a full template boot sector in */
++static int use_template = 0;
+ static char *program_name = "mkdosfs";	/* Name of the program */
+ static char *device_name = NULL;	/* Name of the device on which to create the filesystem */
+ static int atari_format = 0;	/* Use Atari variation of MS-DOS FS format */
+@@ -837,6 +849,12 @@
+     vi->volume_id[2] = (unsigned char) ((volume_id & 0x00ff0000) >> 16);
+     vi->volume_id[3] = (unsigned char) (volume_id >> 24);
+   }
++  if (bs.media == 0xf8) {
++      vi->drive_number = HD_DRIVE_NUMBER;  /* Set bios drive number to 80h */
++  }
++  else {
++      vi->drive_number = FD_DRIVE_NUMBER;  /* Set bios drive number to 00h */
++  }
+ 
+   if (!atari_format) {
+     memcpy(vi->volume_label, volume_name, 11);
+@@ -1362,6 +1380,32 @@
+    * dir area on FAT12/16, and the first cluster on FAT32. */
+   writebuf( (char *) root_dir, size_root_dir, "root directory" );
+ 
++  if (use_template == 1) {
++    /* dupe template into reserved sectors */
++    seekto( 0, "Start of partition" );
++    if (size_fat == 32) {
++      writebuf( template_boot_code, 3, "backup jmpBoot" );
++      seekto( 0x5a, "sector 1 boot area" );
++      writebuf( template_boot_code+0x5a, 420, "sector 1 boot area" );
++      seekto( 512*2, "third sector" );
++      if (backup_boot != 0) {
++        writebuf( template_boot_code+512*2, backup_boot*sector_size - 512*2, "data to backup boot" );
++        seekto( backup_boot*sector_size, "backup boot sector" );
++        writebuf( template_boot_code, 3, "backup jmpBoot" );
++        seekto( backup_boot*sector_size+0x5a, "backup boot sector boot area" );
++        writebuf( template_boot_code+0x5a, 420, "backup boot sector boot area" );
++        seekto( (backup_boot+2)*sector_size, "sector following backup code" );
++        writebuf( template_boot_code+(backup_boot+2)*sector_size, (reserved_sectors-backup_boot-2)*512, "remaining data" );
++      } else {
++        writebuf( template_boot_code+512*2, (reserved_sectors-2)*512, "remaining data" );
++      }
++    } else {
++      writebuf( template_boot_code, 3, "jmpBoot" );
++      seekto( 0x3e, "sector 1 boot area" );
++      writebuf( template_boot_code+0x3e, 448, "boot code" );
++    }
++  }
++
+   if (blank_sector) free( blank_sector );
+   if (info_sector) free( info_sector );
+   free (root_dir);   /* Free up the root directory space from setup_tables */
+@@ -1376,7 +1420,7 @@
+ {
+   fatal_error("\
+ Usage: mkdosfs [-A] [-c] [-C] [-v] [-I] [-l bad-block-file] [-b backup-boot-sector]\n\
+-       [-m boot-msg-file] [-n volume-name] [-i volume-id]\n\
++       [-m boot-msg-file] [-n volume-name] [-i volume-id] [-B bootcode]\n\
+        [-s sectors-per-cluster] [-S logical-sector-size] [-f number-of-FATs]\n\
+        [-h hidden-sectors] [-F fat-size] [-r root-dir-entries] [-R reserved-sectors]\n\
+        /dev/name [blocks]\n");
+@@ -1439,7 +1483,7 @@
+   printf ("%s " VERSION " (" VERSION_DATE ")\n",
+ 	   program_name);
+ 
+-  while ((c = getopt (argc, argv, "AbcCf:F:Ii:l:m:n:r:R:s:S:h:v")) != EOF)
++  while ((c = getopt (argc, argv, "AbcCf:F:Ii:l:m:n:r:R:s:S:v:B:")) != EOF)
+     /* Scan the command line for options */
+     switch (c)
+       {
+@@ -1509,6 +1553,51 @@
+ 	listfile = optarg;
+ 	break;
+ 
++      case 'B':         /* B : read in bootcode */
++        if ( strcmp(optarg, "-") )
++	  {
++	    msgfile = fopen(optarg, "r");
++	    if ( !msgfile )
++	      perror(optarg);
++	  }
++	else
++	  msgfile = stdin;
++
++	if ( msgfile )
++	  {
++            if (!(template_boot_code = malloc( MAX_RESERVED )))
++                die( "Out of memory" );
++	    /* The template boot sector including reserved must not be > 65535 */
++            use_template = 1;
++	    i = 0;
++	    do
++	      {
++		ch = getc(msgfile);
++		switch (ch)
++		  {
++		  case EOF:
++		    break;
++
++		  default:
++		    template_boot_code[i++] = ch; /* Store character */
++		    break;
++		  }
++	      }
++	    while ( ch != EOF && i < MAX_RESERVED );
++	    ch = getc(msgfile); /* find out if we're at EOF */
++
++	    /* Fill up with zeros */
++	    while( i < MAX_RESERVED )
++		template_boot_code[i++] = '\0';
++	    
++	    if ( ch != EOF )
++	      printf ("Warning: template too long; truncated after %d bytes\n", i);
++	    
++	    if ( msgfile != stdin )
++	      fclose(msgfile);
++	  }
++	break;
++
+       case 'm':		/* m : Set boot message */
+ 	if ( strcmp(optarg, "-") )
+ 	  {

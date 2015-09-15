@@ -1,0 +1,33 @@
+Use pkg-config for pcre dependency instead of -config script.
+
+Upstream-Status: Pending
+
+RP 2014/5/22
+
+
+Index: lighttpd-1.4.35/configure.ac
+===================================================================
+--- lighttpd-1.4.35.orig/configure.ac	2014-03-06 14:08:00.000000000 +0000
++++ lighttpd-1.4.35/configure.ac	2014-05-13 16:58:30.758471169 +0000
+@@ -309,16 +309,14 @@
+ AC_MSG_RESULT([$WITH_PCRE])
+ 
+ if test "$WITH_PCRE" != "no"; then
+-  AC_PATH_PROG(PCRECONFIG, pcre-config)
+-
+-  if test x"$PCRECONFIG" != x; then
+-    PCRE_LIB=`$PCRECONFIG --libs`
+-    CPPFLAGS="$CPPFLAGS `$PCRECONFIG --cflags`"
++  PKG_CHECK_MODULES(PCREPKG, [libpcre], [
++    PCRE_LIB=${PCREPKG_LIBS}
++    CPPFLAGS="$CPPFLAGS ${PCREPKG_CFLAGS}"
+     AC_DEFINE([HAVE_LIBPCRE], [1], [libpcre])
+     AC_DEFINE([HAVE_PCRE_H], [1], [pcre.h])
+-  else
++  ], [
+      AC_MSG_ERROR([pcre-config not found, install the pcre-devel package or build with --without-pcre])
+-  fi
++  ])
+ fi
+ 
+ AC_SUBST(PCRE_LIB)

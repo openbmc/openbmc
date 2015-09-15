@@ -1,0 +1,56 @@
+From dfbcfb0d71765b337e63562299a943043928d2d2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 2 Mar 2015 01:07:33 +0000
+Subject: [PATCH 02/13] configure: widen the regexp for SH architectures
+
+gprof needs to know about uclibc
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure       | 4 ++--
+ gprof/configure | 5 +++++
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/configure b/configure
+index 87677bc..e9f2f13 100755
+--- a/configure
++++ b/configure
+@@ -3341,7 +3341,7 @@ case "${target}" in
+     ;;
+   s390-*-* | s390x-*-*)
+     ;;
+-  sh-*-* | sh[34]*-*-*)
++  sh*-*-* | sh[34]*-*-*)
+     ;;
+   sh64-*-* | sh5*-*-*)
+     ;;
+@@ -3812,7 +3812,7 @@ case "${target}" in
+   or1k*-*-*)
+     noconfigdirs="$noconfigdirs gdb"
+     ;;
+-  sh-*-* | sh64-*-*)
++  sh*-*-* | sh64-*-*)
+     case "${target}" in
+       sh*-*-elf)
+          ;;
+diff --git a/gprof/configure b/gprof/configure
+index b09c8fb..79961c5 100755
+--- a/gprof/configure
++++ b/gprof/configure
+@@ -5869,6 +5869,11 @@ linux* | k*bsd*-gnu | kopensolaris*-gnu)
+   lt_cv_deplibs_check_method=pass_all
+   ;;
+ 
++linux-uclibc*)
++  lt_cv_deplibs_check_method=pass_all
++  lt_cv_file_magic_test_file=`echo /lib/libuClibc-*.so`
++  ;;
++
+ netbsd*)
+   if echo __ELF__ | $CC -E - | $GREP __ELF__ > /dev/null; then
+     lt_cv_deplibs_check_method='match_pattern /lib[^/]+(\.so\.[0-9]+\.[0-9]+|_pic\.a)$'
+-- 
+2.1.4
+

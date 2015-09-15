@@ -1,0 +1,14 @@
+#
+# Automatically generated make config: don't edit
+# Version: 0.9.32-git
+# Mon Jul 19 01:34:29 2010
+#
+#
+# Using ELF file format
+#
+FORCE_OPTIONS_FOR_ARCH=y
+ARCH_HAS_MMU=y
+ARCH_USE_MMU=y
+KERNEL_HEADERS="/usr/include"
+HAVE_DOT_CONFIG=y
+

@@ -1,0 +1,32 @@
+Upstream-Status: Pending
+
+Fixes this install issue
+#| /bin/sh: line 0: cd: /srv/home/nitin/builds/build-gcc47/tmp/work/i586-poky-linux/avahi-0.6.31-r3.0/image//usr/bin: No such file or directory
+
+Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+2012/05/03
+
+Index: avahi-0.6.31/avahi-utils/Makefile.am
+===================================================================
+--- avahi-0.6.31.orig/avahi-utils/Makefile.am
++++ avahi-0.6.31/avahi-utils/Makefile.am
+@@ -54,6 +54,7 @@ avahi_set_host_name_CFLAGS = $(AM_CFLAGS
+ avahi_set_host_name_LDADD = $(AM_LDADD) ../avahi-client/libavahi-client.la ../avahi-common/libavahi-common.la
+ 
+ install-exec-local:
++	$(MKDIR_P) $(DESTDIR)/$(bindir) && \
+ 	cd $(DESTDIR)/$(bindir) && \
+ 		rm -f avahi-resolve-host-name avahi-resolve-address avahi-browse-domains avahi-publish-address avahi-publish-service && \
+ 		$(LN_S) avahi-resolve avahi-resolve-host-name && \
+Index: avahi-0.6.31/avahi-utils/Makefile.in
+===================================================================
+--- avahi-0.6.31.orig/avahi-utils/Makefile.in
++++ avahi-0.6.31/avahi-utils/Makefile.in
+@@ -906,6 +906,7 @@ uninstall-am: uninstall-binPROGRAMS
+ 
+ 
+ @HAVE_DBUS_TRUE@install-exec-local:
++@HAVE_DBUS_TRUE@	$(MKDIR_P) $(DESTDIR)/$(bindir) && \
+ @HAVE_DBUS_TRUE@	cd $(DESTDIR)/$(bindir) && \
+ @HAVE_DBUS_TRUE@		rm -f avahi-resolve-host-name avahi-resolve-address avahi-browse-domains avahi-publish-address avahi-publish-service && \
+ @HAVE_DBUS_TRUE@		$(LN_S) avahi-resolve avahi-resolve-host-name && \

@@ -1,0 +1,38 @@
+From 0bc0db83812b5900dc4e6ffa96bdeab46b6adcae Mon Sep 17 00:00:00 2001
+From: Paul Eggleton <paul.eggleton@linux.intel.com>
+Date: Wed, 26 Sep 2012 20:29:09 +0200
+Subject: [PATCH 06/21] configure: Use OE_QMAKE_* values to specify Qt utility
+ paths
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ configure | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/configure b/configure
+index 5a7c4ee..db4d044 100755
+--- a/configure
++++ b/configure
+@@ -8683,11 +8683,11 @@ QMAKE_ABSOLUTE_SOURCE_ROOT = \$\$QT_SOURCE_TREE
+ QMAKE_MOC_SRC    = \$\$QT_BUILD_TREE/src/moc
+ 
+ #local paths that cannot be queried from the QT_INSTALL_* properties while building QTDIR
+-QMAKE_MOC        = \$\$QT_BUILD_TREE/bin/moc
+-QMAKE_UIC        = \$\$QT_BUILD_TREE/bin/uic
+-QMAKE_UIC3       = \$\$QT_BUILD_TREE/bin/uic3
+-QMAKE_RCC        = \$\$QT_BUILD_TREE/bin/rcc
+-QMAKE_QDBUSXML2CPP = \$\$QT_BUILD_TREE/bin/qdbusxml2cpp
++QMAKE_MOC        = \${OE_QMAKE_MOC}
++QMAKE_UIC        = \${OE_QMAKE_UIC}
++QMAKE_UIC3       = \${OE_QMAKE_UIC3}
++QMAKE_RCC        = \${OE_QMAKE_RCC}
++QMAKE_QDBUSXML2CPP = \${OE_QMAKE_QDBUSXML2CPP}
+ QMAKE_INCDIR_QT  = \$\$QT_BUILD_TREE/include
+ QMAKE_LIBDIR_QT  = \$\$QT_BUILD_TREE/lib
+ 
+-- 
+1.8.0
+

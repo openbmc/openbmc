@@ -1,0 +1,53 @@
+From 06f9a88b5dd5597f9198ea0cb34f5e96f180e6e3 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Sat, 27 Apr 2013 16:02:30 +0800
+Subject: [PATCH] craklib:fix testnum and teststr failed
+
+Error log:
+...
+$ ./testnum
+(null).pwd.gz: No such file or directory
+PWOpen: No such file or directory
+
+$ ./util/teststr
+(null).pwd.gz: No such file or directory
+PWOpen: No such file or directory
+...
+Set DEFAULT_CRACKLIB_DICT as the path of  PWOpen
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+Upstream-Status: Pending
+---
+ util/testnum.c |    2 +-
+ util/teststr.c |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/util/testnum.c b/util/testnum.c
+index ae2246d..ca210ff 100644
+--- a/util/testnum.c
++++ b/util/testnum.c
+@@ -20,7 +20,7 @@ main ()
+     PWDICT *pwp;
+     char buffer[STRINGSIZE];
+ 
+-    if (!(pwp = PWOpen (NULL, "r")))
++    if (!(pwp = PWOpen (DEFAULT_CRACKLIB_DICT, "r")))
+     {
+ 	perror ("PWOpen");
+ 	return (-1);
+diff --git a/util/teststr.c b/util/teststr.c
+index 2a31fa4..9fb9cda 100644
+--- a/util/teststr.c
++++ b/util/teststr.c
+@@ -15,7 +15,7 @@ main ()
+     PWDICT *pwp;
+     char buffer[STRINGSIZE];
+ 
+-    if (!(pwp = PWOpen (NULL, "r")))
++    if (!(pwp = PWOpen (DEFAULT_CRACKLIB_DICT, "r")))
+     {
+ 	perror ("PWOpen");
+ 	return (-1);
+-- 
+1.7.10.4
+

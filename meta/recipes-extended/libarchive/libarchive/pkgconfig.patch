@@ -1,0 +1,25 @@
+Use pkg-config for the libxml2 dependency, not the -config script.
+
+Upstream-Status: Pending
+
+RP 2014/5/22
+
+Index: libarchive-3.1.2/configure.ac
+===================================================================
+--- libarchive-3.1.2.orig/configure.ac	2013-02-09 17:23:03.000000000 +0000
++++ libarchive-3.1.2/configure.ac	2014-05-13 15:26:45.446499108 +0000
+@@ -329,10 +329,10 @@
+   AS_HELP_STRING([--without-expat], [Don't build support for xar through expat]))
+ 
+ if test "x$with_xml2" != "xno"; then
+-  AC_PATH_PROG([XML2_CONFIG], [xml2-config],, [${PATH}])
+-  if test "x$XML2_CONFIG" != "x"; then
+-    CPPFLAGS="${CPPFLAGS} `${XML2_CONFIG} --cflags`"
+-    LIBS="${LIBS} `${XML2_CONFIG} --libs`"
++  PKG_CHECK_MODULES(PKG_XML2, [libxml-2.0],,)
++  if test "x$PKG_XML2_CFLAGS" != "x"; then
++    CPPFLAGS="${CPPFLAGS} ${PKG_XML2_CFLAGS}"
++    LIBS="${LIBS} ${PKG_XML2_LIBS}"
+     AC_CHECK_LIB(xml2,xmlInitParser,[true],AC_MSG_FAILURE(Missing xml2 library))
+   else
+     AC_CHECK_LIB(xml2,xmlInitParser)

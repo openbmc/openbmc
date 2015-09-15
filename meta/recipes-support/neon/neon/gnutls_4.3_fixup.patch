@@ -1,0 +1,68 @@
+replace deprecated GnuTLS functions with newer ones if available 
+
+Upstream-Status: Pending
+
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: neon-0.30.1/macros/neon.m4
+===================================================================
+--- neon-0.30.1.orig/macros/neon.m4
++++ neon-0.30.1/macros/neon.m4
+@@ -987,6 +987,10 @@ gnutls)
+                   gnutls_certificate_get_x509_cas \
+                   gnutls_x509_crt_sign2])
+ 
++   # gnutls 4.3 check
++   AC_CHECK_LIB(gnutls, gnutls_global_init)
++   AC_CHECK_FUNCS(gnutls_certificate_set_retrieve_function,,)
++
+    # fail if gnutls_x509_crt_sign2 is not found (it was introduced in 1.2.0, which is required)
+    if test x${ac_cv_func_gnutls_x509_crt_sign2} != xyes; then
+        AC_MSG_ERROR([GnuTLS version predates gnutls_x509_crt_sign2, newer version required (at least 1.2.0)])
+Index: neon-0.30.1/src/ne_gnutls.c
+===================================================================
+--- neon-0.30.1.orig/src/ne_gnutls.c
++++ neon-0.30.1/src/ne_gnutls.c
+@@ -553,7 +553,13 @@ dup_error:
+ static int provide_client_cert(gnutls_session_t session,
+                                const gnutls_datum_t *req_ca_rdn, int nreqs,
+                                const gnutls_pk_algorithm_t *sign_algos,
+-                               int sign_algos_length, gnutls_retr_st *st)
++                               int sign_algos_length,
++#if HAVE_GNUTLS_CERTIFICATE_SET_RETRIEVE_FUNCTION
++    gnutls_retr2_st* st
++#else
++    gnutls_retr_st *st
++#endif
++    )
+ {
+     ne_session *sess = gnutls_session_get_ptr(session);
+     
+@@ -617,8 +623,11 @@ static int provide_client_cert(gnutls_se
+ #endif
+             ) {
+             NE_DEBUG(NE_DBG_SSL, "Supplying client certificate.\n");
+-
++#if HAVE_GNUTLS_CERTIFICATE_SET_RETRIEVE_FUNCTION
++            st->cert_type = type;
++#else
+             st->type = type;
++#endif
+             st->ncerts = 1;
+             st->cert.x509 = &sess->client_cert->cert.subject;
+             st->key.x509 = sess->client_cert->pkey;
+@@ -649,8 +658,14 @@ ne_ssl_context *ne_ssl_context_create(in
+     ne_ssl_context *ctx = ne_calloc(sizeof *ctx);
+     gnutls_certificate_allocate_credentials(&ctx->cred);
+     if (flags == NE_SSL_CTX_CLIENT) {
++
++#if HAVE_GNUTLS_CERTIFICATE_SET_RETRIEVE_FUNCTION
++        gnutls_certificate_set_retrieve_function(ctx->cred,
++                                                       provide_client_cert);
++#else
+         gnutls_certificate_client_set_retrieve_function(ctx->cred,
+                                                         provide_client_cert);
++#endif
+     }
+     gnutls_certificate_set_verify_flags(ctx->cred, 
+                                         GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);

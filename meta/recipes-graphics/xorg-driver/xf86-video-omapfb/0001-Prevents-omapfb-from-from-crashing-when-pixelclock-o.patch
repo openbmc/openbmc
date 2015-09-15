@@ -1,0 +1,35 @@
+From 28c006c94e57ea71df11ec4fff79d7ffcfc4860f Mon Sep 17 00:00:00 2001
+From: Far McKon <FarMcKon@buglabs.net>
+Date: Tue, 3 May 2011 20:59:04 +0300
+Subject: [PATCH] Prevents omapfb from from crashing when pixelclock of 0 is
+ sent to it.
+
+Due to a Linux design bug it is easy to get a pixelclock set to zero
+when changing displays at runtime.
+---
+ src/omapfb-output.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/src/omapfb-output.c b/src/omapfb-output.c
+index f8b4db3..4d59265 100644
+--- a/src/omapfb-output.c
++++ b/src/omapfb-output.c
+@@ -125,8 +125,13 @@ OMAPFBOutputGetModes(xf86OutputPtr output)
+ 	/* Only populate the native (current) mode */
+ 	mode = calloc(1, sizeof(DisplayModeRec));
+ 	mode->type      |= M_T_PREFERRED;
+-	mode->Clock = PICOS2KHZ(ofb->state_info.pixclock);
+-	mode->SynthClock = PICOS2KHZ(ofb->state_info.pixclock);
++	if (ofb->state_info.pixclock == 0) {
++		mode->Clock = 0;
++		mode->SynthClock = 0;
++	} else {
++		mode->Clock = PICOS2KHZ(ofb->state_info.pixclock);
++		mode->SynthClock = PICOS2KHZ(ofb->state_info.pixclock);
++	}
+ 	mode->HDisplay   = ofb->state_info.xres;
+ 	mode->HSyncStart = mode->HDisplay
+ 	                  + ofb->state_info.right_margin;
+-- 
+2.1.4
+

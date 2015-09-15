@@ -1,0 +1,70 @@
+From: Simon McVittie <smcv@debian.org>
+Date: Sun, 23 Nov 2014 22:50:33 +0000
+Subject: Use memcpy() instead of reinventing it
+
+gcc inlines memcpy() with results as fast as handwritten code (at
+least in my brief testing with lzop), and knows the alignment
+constraints for our architectures.
+
+Change suggested by Julian Taylor.
+
+Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=757037
+
+Upstream-Status: Pending
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+---
+ minilzo/minilzo.c | 14 ++++++++++++++
+ src/lzo_func.h    | 14 ++++++++++++++
+ 2 files changed, 28 insertions(+)
+
+
+diff --git a/minilzo/minilzo.c b/minilzo/minilzo.c
+index ab2be5f..6913c2f 100644
+--- a/minilzo/minilzo.c
++++ b/minilzo/minilzo.c
+@@ -3523,6 +3523,20 @@ LZO_COMPILE_TIME_ASSERT_HEADER(sizeof(*(lzo_memops_TU8p)0)==8)
+     if ((void)0, n__n > 0) do { *d__n++ = *s__n++; } while (--n__n > 0); \
+     LZO_BLOCK_END
+ 
++/* Debian-specific change: we know that our compiler inlines memcpy() with
++ * constant n to be as fast as handwritten code, and knows which architectures
++ * need things correctly aligned. */
++#undef LZO_MEMOPS_COPY1
++#undef LZO_MEMOPS_COPY2
++#undef LZO_MEMOPS_COPY4
++#undef LZO_MEMOPS_COPY8
++#undef LZO_MEMOPS_COPYN
++#define LZO_MEMOPS_COPY1(dd,ss) memcpy(dd, ss, 1)
++#define LZO_MEMOPS_COPY2(dd,ss) memcpy(dd, ss, 2)
++#define LZO_MEMOPS_COPY4(dd,ss) memcpy(dd, ss, 4)
++#define LZO_MEMOPS_COPY8(dd,ss) memcpy(dd, ss, 8)
++#define LZO_MEMOPS_COPYN(dd,ss,nn) memcpy(dd, ss, nn)
++
+ __lzo_static_forceinline lzo_uint16_t lzo_memops_get_le16(const lzo_voidp ss)
+ {
+     lzo_uint16_t v;
+diff --git a/src/lzo_func.h b/src/lzo_func.h
+index dfaa676..1cc1b53 100644
+--- a/src/lzo_func.h
++++ b/src/lzo_func.h
+@@ -333,6 +333,20 @@ LZO_COMPILE_TIME_ASSERT_HEADER(sizeof(*(lzo_memops_TU8p)0)==8)
+     if ((void)0, n__n > 0) do { *d__n++ = *s__n++; } while (--n__n > 0); \
+     LZO_BLOCK_END
+ 
++/* Debian-specific change: we know that our compiler inlines memcpy() with
++ * constant n to be as fast as handwritten code, and knows which architectures
++ * need things correctly aligned. */
++#undef LZO_MEMOPS_COPY1
++#undef LZO_MEMOPS_COPY2
++#undef LZO_MEMOPS_COPY4
++#undef LZO_MEMOPS_COPY8
++#undef LZO_MEMOPS_COPYN
++#define LZO_MEMOPS_COPY1(dd,ss) memcpy(dd, ss, 1)
++#define LZO_MEMOPS_COPY2(dd,ss) memcpy(dd, ss, 2)
++#define LZO_MEMOPS_COPY4(dd,ss) memcpy(dd, ss, 4)
++#define LZO_MEMOPS_COPY8(dd,ss) memcpy(dd, ss, 8)
++#define LZO_MEMOPS_COPYN(dd,ss,nn) memcpy(dd, ss, nn)
++
+ __lzo_static_forceinline lzo_uint16_t lzo_memops_get_le16(const lzo_voidp ss)
+ {
+     lzo_uint16_t v;

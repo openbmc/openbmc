@@ -1,0 +1,64 @@
+From 756f20e70a97ee2dea9b32c0955eabfc27f29be1 Mon Sep 17 00:00:00 2001
+From: Andrei Dinu <andrei.adrianx.dinu@intel.com>
+Date: Wed, 29 May 2013 16:50:17 +0300
+Subject: [PATCH] The build of sgml2rtf is problematic due to the way it wants
+ to link to a shared library version of flex. Flex only
+ ships with a static lib. Rather than diverging from
+ upstream flex, simply skip building this un-needed utility.
+
+Upstream-Status: Inappropriate [Other]
+Workaround which disables a feature.
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+Signed-off-by: Andrei Dinu <andrei.adrianx.dinu@intel.com>
+---
+ Makefile.in |   12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 359f14e..fc04020 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -40,7 +40,7 @@ perl5lib_ddir      = $(DESTDIR)$(perl5libdir)
+ pkgdata_ddir       = $(DESTDIR)$(pkgdatadir)
+ tex_ddir           = $(DESTDIR)$(texdir)
+ 
+-progs    := sgml2html sgml2info sgml2latex sgml2lyx sgml2rtf sgml2txt sgmlcheck
++progs    := sgml2html sgml2info sgml2latex sgml2lyx sgml2txt sgmlcheck
+ 
+ PROFILE  =
+ INCLUDE  =
+@@ -71,9 +71,9 @@ endif
+ 	( cd sgmlpre ; \
+ 	  $(MAKE)  CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" LEX=flex sgmlpre || exit -1 )
+ 
+-	@echo "Compiling RTF conversion tools (in rtf-fix/)..."
+-	( cd rtf-fix ; \
+-	  $(MAKE) CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" || exit -1 )
++#	@echo "Compiling RTF conversion tools (in rtf-fix/)..."
++#	( cd rtf-fix ; \
++#	  $(MAKE) CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" || exit -1 )
+ 
+ 	@echo "making man pages in genman ..."
+ 	if [ ! -d genman ]; then mkdir genman ; fi
+@@ -117,7 +117,7 @@ endif
+ 
+ #    -- Install auxiliary programs
+ 	mkdir -p $(auxbin_ddir)
+-	for ii in sgmlpre/sgmlpre rtf-fix/rtf2rtf; do \
++	for ii in sgmlpre/sgmlpre; do \
+ 	  bn=`basename $$ii`; \
+ 	  $(INSTALL_PROGRAM) $$ii $(auxbin_ddir)/$$bn; \
+ 	done
+@@ -206,7 +206,7 @@ bin/linuxdoc:: Makefile bin/linuxdoc.in
+ 
+ clean::
+ 	-rm -f *~ bin/*~ bin/linuxdoc
+-	for d in $(DDIRS) $(MDIRS) rtf-fix; do $(MAKE) -C $$d clean; done
++	for d in $(DDIRS) $(MDIRS); do $(MAKE) -C $$d clean; done
+ 	(cd sgmlpre ; rm -f sgmlpre.o sgmlpre)
+ 	-rm -rf genman/
+ 
+-- 
+1.7.9.5
+

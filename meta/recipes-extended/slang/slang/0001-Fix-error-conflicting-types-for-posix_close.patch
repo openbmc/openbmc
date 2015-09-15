@@ -1,0 +1,39 @@
+From 96eb7e29822151823a66a1eb59f1fa4aead5ae08 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 31 Aug 2015 06:33:21 +0000
+Subject: [PATCH] Fix  error: conflicting types for 'posix_close'
+
+Exposed while compiling on musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ src/slposio.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/slposio.c b/src/slposio.c
+index 9ce9697..9ff9bfe 100644
+--- a/src/slposio.c
++++ b/src/slposio.c
+@@ -363,7 +363,7 @@ static int posix_close_fd (int *fd)
+    return 0;
+ }
+ 
+-static int posix_close (SLFile_FD_Type *f)
++static int posix_closex (SLFile_FD_Type *f)
+ {
+    int status = do_close (f);
+ 
+@@ -1001,7 +1001,7 @@ static SLang_Intrin_Fun_Type Fd_Name_Table [] =
+    MAKE_INTRINSIC_2("write", posix_write, V, F, B),
+    MAKE_INTRINSIC_1("dup_fd", posix_dup, V, F),
+    MAKE_INTRINSIC_2("dup2_fd", posix_dup2, I, F, I),
+-   MAKE_INTRINSIC_1("close", posix_close, I, F),
++   MAKE_INTRINSIC_1("close", posix_closex, I, F),
+    MAKE_INTRINSIC_1("_close", posix_close_fd, I, I),
+ #if defined(TTYNAME_R)
+    MAKE_INTRINSIC_0("ttyname", posix_ttyname, V),
+-- 
+2.5.1
+

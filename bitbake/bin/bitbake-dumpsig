@@ -1,0 +1,65 @@
+#!/usr/bin/env python
+
+# bitbake-dumpsig
+# BitBake task signature dump utility
+#
+# Copyright (C) 2013 Intel Corporation
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+import os
+import sys
+import warnings
+import optparse
+import logging
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(sys.argv[0])), 'lib'))
+
+import bb.siggen
+
+def logger_create(name, output=sys.stderr):
+    logger = logging.getLogger(name)
+    console = logging.StreamHandler(output)
+    format = bb.msg.BBLogFormatter("%(levelname)s: %(message)s")
+    if output.isatty():
+        format.enable_color()
+    console.setFormatter(format)
+    logger.addHandler(console)
+    logger.setLevel(logging.INFO)
+    return logger
+
+logger = logger_create('bitbake-dumpsig')
+
+parser = optparse.OptionParser(
+    description = "Dumps siginfo/sigdata files written out by BitBake",
+    usage = """
+  %prog sigdatafile""")
+
+options, args = parser.parse_args(sys.argv)
+
+if len(args) == 1:
+    parser.print_help()
+else:
+    import cPickle
+    try:
+        output = bb.siggen.dump_sigfile(args[1])
+    except IOError as e:
+        logger.error(str(e))
+        sys.exit(1)
+    except cPickle.UnpicklingError, EOFError:
+        logger.error('Invalid signature data - ensure you are specifying a sigdata/siginfo file')
+        sys.exit(1)
+
+    if output:
+        print '\n'.join(output)

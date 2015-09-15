@@ -1,0 +1,31 @@
+Upstream-Status: Inappropriate [Specific case QEMU/AB]
+
+From 7b8c4e0a67a79a75e1bd77df3a452a5497322108 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?An=C3=ADbal=20Lim=C3=B3n?= <anibal.limon@linux.intel.com>
+Date: Thu, 27 Aug 2015 17:58:26 -0500
+Subject: [PATCH] core/device.c: Change the default device timeout to 240 sec.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Aníbal Limón <anibal.limon@linux.intel.com>
+---
+ src/core/device.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/core/device.c b/src/core/device.c
+index e7efcf0..4ed8f08 100644
+--- a/src/core/device.c
++++ b/src/core/device.c
+@@ -110,7 +110,7 @@ static void device_init(Unit *u) {
+          * indefinitely for plugged in devices, something which cannot
+          * happen for the other units since their operations time out
+          * anyway. */
+-        u->job_timeout = u->manager->default_timeout_start_usec;
++        u->job_timeout = (240 * USEC_PER_SEC);
+ 
+         u->ignore_on_isolate = true;
+         u->ignore_on_snapshot = true;
+-- 
+1.9.1
+

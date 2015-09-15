@@ -1,0 +1,65 @@
+#!/bin/sh
+#
+### BEGIN INIT INFO
+# Provides: xserver
+# Required-Start: $local_fs $remote_fs dbus
+# Required-Stop: $local_fs $remote_fs
+# Default-Start:     5
+# Default-Stop:      0 1 2 3 6
+### END INIT INFO
+
+killproc() {            # kill the named process(es)
+        pid=`/bin/pidof $1`
+        [ "$pid" != "" ] && kill $pid
+}
+
+read CMDLINE < /proc/cmdline
+for x in $CMDLINE; do
+        case $x in
+        x11=false)
+		echo "X Server disabled" 
+		exit 0;
+                ;;
+        esac
+done
+
+case "$1" in
+  start)
+       . /etc/profile
+       username=root
+       echo "Starting Xserver"
+       if [ -f /etc/X11/Xusername ]; then
+           username=`cat /etc/X11/Xusername`
+           # setting for rootless X
+           chmod o+w /var/log
+           chmod g+r /dev/tty[0-3]
+           # hidraw device is probably needed
+           if [ -e /dev/hidraw0 ]; then
+               chmod o+rw /dev/hidraw*
+           fi
+       fi
+       # Using su rather than sudo as latest 1.8.1 cause failure [YOCTO #1211]
+       su -l -c '/etc/X11/Xserver&' $username 
+       # Wait for the desktop to say its finished loading
+       # before loading the rest of the system
+       # dbus-wait org.matchbox_project.desktop Loaded
+  ;;
+
+  stop)
+        echo "Stopping XServer"
+        killproc xinit
+        sleep 1
+        chvt 1 &
+  ;;
+
+  restart)
+	$0 stop
+        $0 start
+  ;;
+
+  *)
+        echo "usage: $0 { start | stop | restart }"
+  ;;
+esac
+
+exit 0

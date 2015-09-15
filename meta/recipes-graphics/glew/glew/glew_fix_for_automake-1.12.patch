@@ -1,0 +1,25 @@
+Upstream-Status: Pending
+
+This patch fixes following issue with automake 1.12
+
+| automake: warnings are treated as errors
+| /srv/home/nitin/builds/build-gcc47/tmp/sysroots/x86_64-linux/usr/share/automake-1.12/am/ltlibrary.am: warning: 'libGLEW.la': linking libtool libraries using a non-POSIX
+| /srv/home/nitin/builds/build-gcc47/tmp/sysroots/x86_64-linux/usr/share/automake-1.12/am/ltlibrary.am: archiver requires 'AM_PROG_AR' in 'configure.ac'
+
+Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+2012/05/03
+
+Index: glew-1.7.0/configure.ac
+===================================================================
+--- glew-1.7.0.orig/configure.ac
++++ glew-1.7.0/configure.ac
+@@ -14,6 +14,9 @@ LT_INIT
+ AC_PROG_CC
+ AC_PROG_INSTALL
+ AC_PROG_LN_S
++# automake 1.12 seems to require this, but automake 1.11 doesn't recognize it
++m4_pattern_allow([AM_PROG_AR])
++AM_PROG_AR
+ 
+ # Checks for libraries.
+ 

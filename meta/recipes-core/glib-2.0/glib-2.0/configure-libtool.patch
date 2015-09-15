@@ -1,0 +1,60 @@
+From 1c5718648d49e795efee91c220a2bf9386c184f2 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Sat, 28 Apr 2012 18:24:50 +0200
+Subject: [PATCH] configure: use $host_alias-libtool instead of libtool
+ directly
+
+Poky renames libtool to $host_alias-libtool.
+./$host_alias-libtool isn't created until after configure runs with
+libtool >= 2.2.2
+so we can't call # it at this point. We can safely assume a version is
+available
+from PATH though
+
+Rebased to glib-2.27.3 by Dongxiao Xu <dongxiao.xu@intel.com>
+Rebased to glib-2.32.1 by Martin Jansa <Martin.Jansa@gmail.com>
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ configure.ac |    8 ++++----
+ 1 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index a6478c6..9a93d60 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1470,7 +1470,7 @@ if test x"$glib_native_win32" = xyes; then
+   G_MODULE_LDFLAGS=
+ else
+   export SED
+-  G_MODULE_LDFLAGS=`(./libtool --config; echo eval echo \\$export_dynamic_flag_spec) | sh`
++  G_MODULE_LDFLAGS=`(./$host_alias-libtool --config; echo eval echo \\$export_dynamic_flag_spec) | sh`
+ fi
+ dnl G_MODULE_IMPL= don't reset, so cmd-line can override
+ G_MODULE_NEED_USCORE=0
+@@ -1535,9 +1535,9 @@ if test "$G_MODULE_IMPL" = "G_MODULE_IMPL_DL"; then
+ 	LDFLAGS="$LDFLAGS $G_MODULE_LDFLAGS"
+ dnl *** check for OSF1/5.0 RTLD_GLOBAL brokenness
+ 	echo "void glib_plugin_test(void) { }" > plugin.c
+-	${SHELL} ./libtool --mode=compile --tag=CC ${CC} ${CFLAGS} \
++	${SHELL} ./$host_alias-libtool --mode=compile --tag=CC ${CC} ${CFLAGS} \
+ 		${CPPFLAGS} -c -o plugin.lo plugin.c >/dev/null 2>&1
+-	${SHELL} ./libtool --mode=link --tag=CC ${CC} ${CFLAGS} \
++	${SHELL} ./$host_alias-libtool --mode=link --tag=CC ${CC} ${CFLAGS} \
+ 		${LDFLAGS} -module -o plugin.la -export-dynamic \
+ 		-shrext ".o" -avoid-version plugin.lo \
+ 		-rpath /dont/care >/dev/null 2>&1
+@@ -1614,7 +1614,7 @@ fi
+ 
+ AC_MSG_CHECKING(for the suffix of module shared libraries)
+ export SED
+-shrext_cmds=`./libtool --config | grep '^shrext_cmds='`
++shrext_cmds=`./$host_alias-libtool --config | grep '^shrext_cmds='`
+ eval $shrext_cmds
+ module=yes eval std_shrext=$shrext_cmds
+ # chop the initial dot
+-- 
+1.7.8.6
+

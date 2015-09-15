@@ -1,0 +1,54 @@
+From daf89d272e51b2153015ce7f54ab0b86182e64c1 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Wed, 28 Jan 2015 18:50:23 -0800
+Subject: [PATCH] Makefile: fix for parallel build
+
+Fixed:
+make: *** No rule to make target `cflags', needed by `tcpd.o'.  Stop.
+
+Let "cflags" depend on config-check which generates cflgas will fix the
+problem.
+
+Also fixed:
+Fatal error: can't create shared/hosts_access.o: No such file or directory
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ Makefile |    5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index fe5e732..f468751 100644
+--- a/Makefile
++++ b/Makefile
+@@ -714,6 +714,7 @@ KIT	= README miscd.c tcpd.c fromhost.c hosts_access.c shell_cmd.c \
+ LIB	= libwrap.a
+ 
+ shared/%.o: %.c
++	[ -d shared ] || mkdir -p shared
+ 	$(CC) $(CFLAGS) $(SHCFLAGS) -c $< -o $@
+ 
+ SOMAJOR = 0
+@@ -730,6 +731,8 @@ SHLIB_OBJ= $(addprefix shared/, $(LIB_OBJ));
+ 
+ all other: config-check tcpd tcpdmatch try-from safe_finger tcpdchk $(LIB)
+ 
++cflags: config-check
++
+ # Invalidate all object files when the compiler options (CFLAGS) have changed.
+ 
+ config-check:
+@@ -739,7 +742,7 @@ config-check:
+ 	then rm cflags.new ; \
+ 	else mv cflags.new cflags ; \
+ 	fi >/dev/null 2>/dev/null
+-	@if [ ! -d shared ]; then mkdir shared; fi
++	@[ -d shared ] || mkdir -p shared
+ 
+ $(LIB):	$(LIB_OBJ)
+ 	rm -f $(LIB)
+-- 
+1.7.9.5
+

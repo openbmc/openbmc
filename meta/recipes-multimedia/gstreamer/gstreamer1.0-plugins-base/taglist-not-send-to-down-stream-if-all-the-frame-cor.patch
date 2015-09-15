@@ -1,0 +1,57 @@
+From 68fa1b1425ad2c5f7c5013d0943153a8a6d0934e Mon Sep 17 00:00:00 2001
+From: Jian Li <lj.qfy.sh@gmail.com>
+Date: Wed, 24 Sep 2014 17:21:02 +0800
+Subject: [PATCH] taglist not send to down stream if all the frame corrupted
+
+https://bugzilla.gnome.org/show_bug.cgi?id=737246
+
+Upstream-Status: Pending
+
+Signed-off-by: Jian Li <lj.qfy.sh@gmail.com>
+---
+ gst-libs/gst/audio/gstaudiodecoder.c |    9 +++++++++
+ gst-libs/gst/video/gstvideodecoder.c |    8 ++++++++
+ 2 files changed, 17 insertions(+)
+
+diff --git a/gst-libs/gst/audio/gstaudiodecoder.c b/gst-libs/gst/audio/gstaudiodecoder.c
+index 3504678..3d69efe 100644
+--- a/gst-libs/gst/audio/gstaudiodecoder.c
++++ b/gst-libs/gst/audio/gstaudiodecoder.c
+@@ -2083,6 +2083,15 @@ gst_audio_decoder_sink_eventfunc (GstAudioDecoder * dec, GstEvent * event)
+       gst_audio_decoder_drain (dec);
+       GST_AUDIO_DECODER_STREAM_UNLOCK (dec);
+ 
++      /* send taglist if no valid frame is decoded util EOS */
++      if (dec->priv->taglist && dec->priv->taglist_changed) {
++        GST_DEBUG_OBJECT (dec, "codec tag %" GST_PTR_FORMAT, dec->priv->taglist);
++        if (!gst_tag_list_is_empty (dec->priv->taglist))
++          gst_audio_decoder_push_event (dec,
++              gst_event_new_tag (gst_tag_list_ref (dec->priv->taglist)));
++        dec->priv->taglist_changed = FALSE;
++      }
++
+       /* Forward EOS because no buffer or serialized event will come after
+        * EOS and nothing could trigger another _finish_frame() call. */
+       ret = gst_audio_decoder_push_event (dec, event);
+diff --git a/gst-libs/gst/video/gstvideodecoder.c b/gst-libs/gst/video/gstvideodecoder.c
+index dd8abe3..d9bfe4d 100644
+--- a/gst-libs/gst/video/gstvideodecoder.c
++++ b/gst-libs/gst/video/gstvideodecoder.c
+@@ -1024,6 +1024,14 @@ gst_video_decoder_sink_event_default (GstVideoDecoder * decoder,
+        * parent class' ::sink_event() until a later time.
+        */
+       forward_immediate = TRUE;
++
++      /* send taglist if no valid frame is decoded util EOS */
++      if (decoder->priv->tags && decoder->priv->tags_changed) {
++        gst_video_decoder_push_event (decoder,
++            gst_event_new_tag (gst_tag_list_ref (decoder->priv->tags)));
++        decoder->priv->tags_changed = FALSE;
++      }
++
+       break;
+     }
+     case GST_EVENT_GAP:
+-- 
+1.7.9.5
+

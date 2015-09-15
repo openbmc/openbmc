@@ -1,0 +1,19 @@
+Upstream-Status: Inappropriate [configuration]
+
+Change cache size to reduce the usage of disk space from 62MB to 26MB. 
+
+Signed-off-by: Mei Lei <lei.mei@intel.com>
+
+Index: rpm-5.4.14/rpmdb/DB_CONFIG.in
+===================================================================
+--- rpm-5.4.14.orig/rpmdb/DB_CONFIG.in
++++ rpm-5.4.14/rpmdb/DB_CONFIG.in
+@@ -29,7 +29,7 @@ set_thread_count 64
+ 
+ # ================ Memory Pool
+ #XXX initializing dbenv with set_cachesize has unimplemented prerequsites
+-#set_cachesize 0 1048576 0 
++set_cachesize 0 1048576 0 
+ set_mp_mmapsize 268435456
+ 
+ # ================ Locking

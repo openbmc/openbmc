@@ -1,0 +1,43 @@
+We need to sanity check that the nlink size and our linksLeft counter
+do match. If an rpm is badly constructed with identical inode values
+for multiple hardlinked files, such an rpm will otherwise access memory
+out of array bounds and cause memory corruption and crashes.
+
+The fix is to add in the sanity check and exit if bad circumstances
+are found. We need to fix the caller to check the return code too.
+
+RP 2014/6/10
+
+Upstream-Status: Pending
+
+Index: rpm-5.4.14/lib/fsm.c
+===================================================================
+--- rpm-5.4.14.orig/lib/fsm.c
++++ rpm-5.4.14/lib/fsm.c
+@@ -495,6 +495,11 @@ static int saveHardLink(/*@special@*/ /*
+     }
+ 
+     if (fsm->goal == IOSM_PKGBUILD) --fsm->li->linksLeft;
++    if (fsm->li->linksLeft > st->st_nlink) {
++	rpmlog(RPMLOG_ERR, _("Corrupted hardlinks found (count %d does not match %d), exiting.\n"), fsm->li->linksLeft, st->st_nlink);
++	return -1;
++    }
++
+     fsm->li->filex[fsm->li->linksLeft] = fsm->ix;
+     /*@-observertrans -dependenttrans@*/
+     fsm->li->nsuffix[fsm->li->linksLeft] = fsm->nsuffix;
+@@ -1878,8 +1883,13 @@ if (!(fsmGetFi(fsm)->mapflags & IOSM_PAY
+ 	fsm->postpone = iosmFileActionSkipped(fsm->action);
+ 	if (fsm->goal == IOSM_PKGINSTALL || fsm->goal == IOSM_PKGBUILD) {
+ 	    /*@-evalorder@*/ /* FIX: saveHardLink can modify fsm */
+-	    if (S_ISREG(st->st_mode) && st->st_nlink > 1)
++	    if (S_ISREG(st->st_mode) && st->st_nlink > 1) {
+ 		fsm->postpone = saveHardLink(fsm);
++		if (fsm->postpone < 0) {
++		    rc = RPMRC_FAIL;
++		    break;
++		}
++	    }
+ 	    /*@=evalorder@*/
+ 	}
+ if (fsmGetFi(fsm)->mapflags & IOSM_PAYLOAD_LIST) fsm->postpone = 1;

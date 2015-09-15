@@ -1,0 +1,42 @@
+From 161496fbe1465817a77a50a1172734dae81a13ef Mon Sep 17 00:00:00 2001
+From: Mikael Beckius <mikael.beckius@windriver.com>
+Date: Tue, 12 May 2015 11:11:48 +0200
+Subject: [PATCH] lttng-tools: Fix live timer calculation error
+
+There is an calculation error for live timer. Variable switch_timer_interval is
+based on microsecond, and it is not right to assign switch_timer_interval mod
+1000000 to var tv_nsec which is based on nanosecond.
+
+Upstream-Status: Pending
+
+Signed-off-by: Mikael Beckius <mikael.beckius@windriver.com>
+Signed-off-by: Jianchuan Wang <jianchuan.wang@windriver.com>
+---
+ src/common/consumer-timer.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/common/consumer-timer.c b/src/common/consumer-timer.c
+index 1408052..c6202ba 100644
+--- a/src/common/consumer-timer.c
++++ b/src/common/consumer-timer.c
+@@ -368,7 +368,7 @@ void consumer_timer_switch_start(struct lttng_consumer_channel *channel,
+ 	channel->switch_timer_enabled = 1;
+ 
+ 	its.it_value.tv_sec = switch_timer_interval / 1000000;
+-	its.it_value.tv_nsec = switch_timer_interval % 1000000;
++	its.it_value.tv_nsec = (switch_timer_interval % 1000000) * 1000;
+ 	its.it_interval.tv_sec = its.it_value.tv_sec;
+ 	its.it_interval.tv_nsec = its.it_value.tv_nsec;
+ 
+@@ -425,7 +425,7 @@ void consumer_timer_live_start(struct lttng_consumer_channel *channel,
+ 	channel->live_timer_enabled = 1;
+ 
+ 	its.it_value.tv_sec = live_timer_interval / 1000000;
+-	its.it_value.tv_nsec = live_timer_interval % 1000000;
++	its.it_value.tv_nsec = (live_timer_interval % 1000000) * 1000;
+ 	its.it_interval.tv_sec = its.it_value.tv_sec;
+ 	its.it_interval.tv_nsec = its.it_value.tv_nsec;
+ 
+-- 
+1.9.1
+

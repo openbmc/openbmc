@@ -1,0 +1,51 @@
+Upstream-Status: Inappropriate [configuration]
+
+Index: apr-util-1.3.4/apu-config.in
+===================================================================
+--- apr-util-1.3.4.orig/apu-config.in	2009-01-12 17:08:06.000000000 +0000
++++ apr-util-1.3.4/apu-config.in	2009-01-12 17:09:00.000000000 +0000
+@@ -134,14 +134,7 @@
+     exit 0
+     ;;
+     --includes)
+-    if test "$location" = "installed"; then
+         flags="$flags -I$includedir $INCLUDES"
+-    elif test "$location" = "source"; then
+-        flags="$flags -I$APU_SOURCE_DIR/include $INCLUDES"
+-    else
+-        # this is for VPATH builds
+-        flags="$flags -I$APU_BUILD_DIR/include -I$APU_SOURCE_DIR/include $INCLUDES"
+-    fi
+     ;;
+     --ldflags)
+     flags="$flags $LDFLAGS"
+@@ -155,28 +148,10 @@
+     exit 0
+     ;;
+     --link-ld)
+-    if test "$location" = "installed"; then
+-        ### avoid using -L if libdir is a "standard" location like /usr/lib
+         flags="$flags -L$libdir -l$APRUTIL_LIBNAME"
+-    else
+-        flags="$flags -L$APU_BUILD_DIR -l$APRUTIL_LIBNAME"
+-    fi
+     ;;
+     --link-libtool)
+-    # If the LA_FILE exists where we think it should be, use it.  If we're
+-    # installed and the LA_FILE does not exist, assume to use -L/-l
+-    # (the LA_FILE may not have been installed).  If we're building ourselves,
+-    # we'll assume that at some point the .la file be created.
+-    if test -f "$LA_FILE"; then
+-        flags="$flags $LA_FILE"
+-    elif test "$location" = "installed"; then
+-        ### avoid using -L if libdir is a "standard" location like /usr/lib
+-        # Since the user is specifying they are linking with libtool, we
+-        # *know* that -R will be recognized by libtool.
+-        flags="$flags -L$libdir -R$libdir -l$APRUTIL_LIBNAME"
+-    else
+-        flags="$flags $LA_FILE"
+-    fi
++        flags="$flags -l$APRUTIL_LIBNAME"
+     ;;
+     --apu-la-file)
+     if test -f "$LA_FILE"; then

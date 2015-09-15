@@ -1,0 +1,296 @@
+Rebased for python-2.7.9
+Signed-Off-By: Alejandro Hernandez <alejandro.hernandez@linux.intel.com>
+
+Index: Python-2.7.9/configure.ac
+===================================================================
+--- Python-2.7.9.orig/configure.ac
++++ Python-2.7.9/configure.ac
+@@ -736,6 +736,10 @@ SunOS*)
+     ;;
+ esac
+ 
++AC_SUBST(LIB)
++AC_MSG_CHECKING(LIB)
++LIB=`basename ${libdir}`
++AC_MSG_RESULT($LIB)
+ 
+ AC_SUBST(LIBRARY)
+ AC_MSG_CHECKING(LIBRARY)
+Index: Python-2.7.9/Include/pythonrun.h
+===================================================================
+--- Python-2.7.9.orig/Include/pythonrun.h
++++ Python-2.7.9/Include/pythonrun.h
+@@ -108,6 +108,7 @@ PyAPI_FUNC(char *) Py_GetPath(void);
+ /* In their own files */
+ PyAPI_FUNC(const char *) Py_GetVersion(void);
+ PyAPI_FUNC(const char *) Py_GetPlatform(void);
++PyAPI_FUNC(const char *) Py_GetLib(void);
+ PyAPI_FUNC(const char *) Py_GetCopyright(void);
+ PyAPI_FUNC(const char *) Py_GetCompiler(void);
+ PyAPI_FUNC(const char *) Py_GetBuildInfo(void);
+Index: Python-2.7.9/Lib/distutils/command/install.py
+===================================================================
+--- Python-2.7.9.orig/Lib/distutils/command/install.py
++++ Python-2.7.9/Lib/distutils/command/install.py
+@@ -22,6 +22,8 @@ from site import USER_BASE
+ from site import USER_SITE
+ 
+ 
++libname = sys.lib
++
+ if sys.version < "2.2":
+     WINDOWS_SCHEME = {
+         'purelib': '$base',
+@@ -42,7 +44,7 @@ else:
+ INSTALL_SCHEMES = {
+     'unix_prefix': {
+         'purelib': '$base/lib/python$py_version_short/site-packages',
+-        'platlib': '$platbase/lib/python$py_version_short/site-packages',
++        'platlib': '$platbase/'+libname+'/python$py_version_short/site-packages',
+         'headers': '$base/include/python$py_version_short/$dist_name',
+         'scripts': '$base/bin',
+         'data'   : '$base',
+Index: Python-2.7.9/Lib/distutils/sysconfig.py
+===================================================================
+--- Python-2.7.9.orig/Lib/distutils/sysconfig.py
++++ Python-2.7.9/Lib/distutils/sysconfig.py
+@@ -119,8 +119,11 @@ def get_python_lib(plat_specific=0, stan
+         prefix = plat_specific and EXEC_PREFIX or PREFIX
+ 
+     if os.name == "posix":
+-        libpython = os.path.join(prefix,
+-                                 "lib", "python" + get_python_version())
++        if plat_specific or standard_lib:
++            lib = sys.lib
++        else:
++            lib = "lib"
++        libpython = os.path.join(prefix, lib, "python" + get_python_version())
+         if standard_lib:
+             return libpython
+         else:
+Index: Python-2.7.9/Lib/pydoc.py
+===================================================================
+--- Python-2.7.9.orig/Lib/pydoc.py
++++ Python-2.7.9/Lib/pydoc.py
+@@ -383,7 +383,7 @@ class Doc:
+ 
+         docloc = os.environ.get("PYTHONDOCS",
+                                 "http://docs.python.org/library")
+-        basedir = os.path.join(sys.exec_prefix, "lib",
++        basedir = os.path.join(sys.exec_prefix, sys.lib,
+                                "python"+sys.version[0:3])
+         if (isinstance(object, type(os)) and
+             (object.__name__ in ('errno', 'exceptions', 'gc', 'imp',
+Index: Python-2.7.9/Lib/site.py
+===================================================================
+--- Python-2.7.9.orig/Lib/site.py
++++ Python-2.7.9/Lib/site.py
+@@ -288,13 +288,18 @@ def getsitepackages():
+         if sys.platform in ('os2emx', 'riscos'):
+             sitepackages.append(os.path.join(prefix, "Lib", "site-packages"))
+         elif os.sep == '/':
+-            sitepackages.append(os.path.join(prefix, "lib",
++            sitepackages.append(os.path.join(prefix, sys.lib,
+                                         "python" + sys.version[:3],
+                                         "site-packages"))
+-            sitepackages.append(os.path.join(prefix, "lib", "site-python"))
++            sitepackages.append(os.path.join(prefix, sys.lib, "site-python"))
++            if sys.lib != "lib":
++                sitepackages.append(os.path.join(prefix, "lib",
++                                            "python" + sys.version[:3],
++                                            "site-packages"))
++                sitepackages.append(os.path.join(prefix, "lib", "site-python"))
+         else:
+             sitepackages.append(prefix)
+-            sitepackages.append(os.path.join(prefix, "lib", "site-packages"))
++            sitepackages.append(os.path.join(prefix, sys.lib, "site-packages"))
+         if sys.platform == "darwin":
+             # for framework builds *only* we add the standard Apple
+             # locations.
+Index: Python-2.7.9/Lib/sysconfig.py
+===================================================================
+--- Python-2.7.9.orig/Lib/sysconfig.py
++++ Python-2.7.9/Lib/sysconfig.py
+@@ -7,10 +7,10 @@ from os.path import pardir, realpath
+ 
+ _INSTALL_SCHEMES = {
+     'posix_prefix': {
+-        'stdlib': '{base}/lib/python{py_version_short}',
+-        'platstdlib': '{platbase}/lib/python{py_version_short}',
++        'stdlib': '{base}/'+sys.lib+'/python{py_version_short}',
++        'platstdlib': '{platbase}/'+sys.lib+'/python{py_version_short}',
+         'purelib': '{base}/lib/python{py_version_short}/site-packages',
+-        'platlib': '{platbase}/lib/python{py_version_short}/site-packages',
++        'platlib': '{platbase}/'+sys.lib+'/python{py_version_short}/site-packages',
+         'include': '{base}/include/python{py_version_short}',
+         'platinclude': '{platbase}/include/python{py_version_short}',
+         'scripts': '{base}/bin',
+@@ -65,10 +65,10 @@ _INSTALL_SCHEMES = {
+         'data'   : '{userbase}',
+         },
+     'posix_user': {
+-        'stdlib': '{userbase}/lib/python{py_version_short}',
+-        'platstdlib': '{userbase}/lib/python{py_version_short}',
++        'stdlib': '{userbase}/'+sys.lib+'/python{py_version_short}',
++        'platstdlib': '{userbase}/'+sys.lib+'/python{py_version_short}',
+         'purelib': '{userbase}/lib/python{py_version_short}/site-packages',
+-        'platlib': '{userbase}/lib/python{py_version_short}/site-packages',
++        'platlib': '{userbase}/'+sys.lib+'/python{py_version_short}/site-packages',
+         'include': '{userbase}/include/python{py_version_short}',
+         'scripts': '{userbase}/bin',
+         'data'   : '{userbase}',
+Index: Python-2.7.9/Lib/test/test_dl.py
+===================================================================
+--- Python-2.7.9.orig/Lib/test/test_dl.py
++++ Python-2.7.9/Lib/test/test_dl.py
+@@ -4,10 +4,11 @@
+ import unittest
+ from test.test_support import verbose, import_module
+ dl = import_module('dl', deprecated=True)
++import sys
+ 
+ sharedlibs = [
+-    ('/usr/lib/libc.so', 'getpid'),
+-    ('/lib/libc.so.6', 'getpid'),
++    ('/usr/'+sys.lib+'/libc.so', 'getpid'),
++    ('/'+sys.lib+'/libc.so.6', 'getpid'),
+     ('/usr/bin/cygwin1.dll', 'getpid'),
+     ('/usr/lib/libc.dylib', 'getpid'),
+     ]
+Index: Python-2.7.9/Lib/test/test_site.py
+===================================================================
+--- Python-2.7.9.orig/Lib/test/test_site.py
++++ Python-2.7.9/Lib/test/test_site.py
+@@ -241,12 +241,16 @@ class HelperFunctionsTests(unittest.Test
+             self.assertEqual(dirs[2], wanted)
+         elif os.sep == '/':
+             # OS X non-framwework builds, Linux, FreeBSD, etc
+-            self.assertEqual(len(dirs), 2)
+             wanted = os.path.join('xoxo', 'lib', 'python' + sys.version[:3],
+                                   'site-packages')
+-            self.assertEqual(dirs[0], wanted)
++            self.assertTrue(wanted in dirs)
+             wanted = os.path.join('xoxo', 'lib', 'site-python')
+-            self.assertEqual(dirs[1], wanted)
++            self.assertTrue(wanted in dirs)
++            wanted = os.path.join('xoxo', sys.lib, 'python' + sys.version[:3],
++                                  'site-packages')
++            self.assertTrue(wanted in dirs)
++            wanted = os.path.join('xoxo', sys.lib, 'site-python')
++            self.assertTrue(wanted in dirs)
+         else:
+             # other platforms
+             self.assertEqual(len(dirs), 2)
+Index: Python-2.7.9/Lib/trace.py
+===================================================================
+--- Python-2.7.9.orig/Lib/trace.py
++++ Python-2.7.9/Lib/trace.py
+@@ -754,10 +754,10 @@ def main(argv=None):
+                 # should I also call expanduser? (after all, could use $HOME)
+ 
+                 s = s.replace("$prefix",
+-                              os.path.join(sys.prefix, "lib",
++                              os.path.join(sys.prefix, sys.lib,
+                                            "python" + sys.version[:3]))
+                 s = s.replace("$exec_prefix",
+-                              os.path.join(sys.exec_prefix, "lib",
++                              os.path.join(sys.exec_prefix, sys.lib,
+                                            "python" + sys.version[:3]))
+                 s = os.path.normpath(s)
+                 ignore_dirs.append(s)
+Index: Python-2.7.9/Makefile.pre.in
+===================================================================
+--- Python-2.7.9.orig/Makefile.pre.in
++++ Python-2.7.9/Makefile.pre.in
+@@ -87,6 +87,7 @@ PY_CFLAGS=	$(CFLAGS) $(CPPFLAGS) $(CFLAG
+ 
+ # Machine-dependent subdirectories
+ MACHDEP=	@MACHDEP@
++LIB=		@LIB@
+ 
+ # Multiarch directory (may be empty)
+ MULTIARCH=	@MULTIARCH@
+@@ -106,7 +107,7 @@ LIBDIR=		@libdir@
+ MANDIR=		@mandir@
+ INCLUDEDIR=	@includedir@
+ CONFINCLUDEDIR=	$(exec_prefix)/include
+-SCRIPTDIR=	$(prefix)/lib
++SCRIPTDIR=	$(prefix)/@LIB@
+ 
+ # Detailed destination directories
+ BINLIBDEST=	$(LIBDIR)/python$(VERSION)
+@@ -598,6 +599,7 @@ Modules/getpath.o: $(srcdir)/Modules/get
+ 		-DEXEC_PREFIX='"$(exec_prefix)"' \
+ 		-DVERSION='"$(VERSION)"' \
+ 		-DVPATH='"$(VPATH)"' \
++		-DLIB='"$(LIB)"' \
+ 		-o $@ $(srcdir)/Modules/getpath.c
+ 
+ Modules/python.o: $(srcdir)/Modules/python.c
+@@ -640,7 +642,7 @@ $(AST_C): $(AST_ASDL) $(ASDLGEN_FILES)
+ Python/compile.o Python/symtable.o Python/ast.o: $(GRAMMAR_H) $(AST_H)
+ 
+ Python/getplatform.o: $(srcdir)/Python/getplatform.c
+-		$(CC) -c $(PY_CFLAGS) -DPLATFORM='"$(MACHDEP)"' -o $@ $(srcdir)/Python/getplatform.c
++		$(CC) -c $(PY_CFLAGS) -DPLATFORM='"$(MACHDEP)"' -DLIB='"$(LIB)"' -o $@ $(srcdir)/Python/getplatform.c
+ 
+ Python/importdl.o: $(srcdir)/Python/importdl.c
+ 		$(CC) -c $(PY_CFLAGS) -I$(DLINCLDIR) -o $@ $(srcdir)/Python/importdl.c
+Index: Python-2.7.9/Modules/getpath.c
+===================================================================
+--- Python-2.7.9.orig/Modules/getpath.c
++++ Python-2.7.9/Modules/getpath.c
+@@ -116,9 +116,11 @@
+ #define EXEC_PREFIX PREFIX
+ #endif
+ 
++#define LIB_PYTHON LIB "/python" VERSION
++
+ #ifndef PYTHONPATH
+-#define PYTHONPATH PREFIX "/lib/python" VERSION ":" \
+-              EXEC_PREFIX "/lib/python" VERSION "/lib-dynload"
++#define PYTHONPATH PREFIX "/" LIB_PYTHON ":" \
++              EXEC_PREFIX "/" LIB_PYTHON "/lib-dynload"
+ #endif
+ 
+ #ifndef LANDMARK
+@@ -129,7 +131,7 @@ static char prefix[MAXPATHLEN+1];
+ static char exec_prefix[MAXPATHLEN+1];
+ static char progpath[MAXPATHLEN+1];
+ static char *module_search_path = NULL;
+-static char lib_python[] = "lib/python" VERSION;
++static char lib_python[] = LIB_PYTHON;
+ 
+ static void
+ reduce(char *dir)
+Index: Python-2.7.9/Python/getplatform.c
+===================================================================
+--- Python-2.7.9.orig/Python/getplatform.c
++++ Python-2.7.9/Python/getplatform.c
+@@ -10,3 +10,13 @@ Py_GetPlatform(void)
+ {
+ 	return PLATFORM;
+ }
++
++#ifndef LIB
++#define LIB "lib"
++#endif
++
++const char *
++Py_GetLib(void)
++{
++	return LIB;
++}
+Index: Python-2.7.9/Python/sysmodule.c
+===================================================================
+--- Python-2.7.9.orig/Python/sysmodule.c
++++ Python-2.7.9/Python/sysmodule.c
+@@ -1437,6 +1437,8 @@ _PySys_Init(void)
+                         PyString_FromString(Py_GetCopyright()));
+     SET_SYS_FROM_STRING("platform",
+                         PyString_FromString(Py_GetPlatform()));
++    SET_SYS_FROM_STRING("lib",
++                        PyString_FromString(Py_GetLib()));
+     SET_SYS_FROM_STRING("executable",
+                         PyString_FromString(Py_GetProgramFullPath()));
+     SET_SYS_FROM_STRING("prefix",

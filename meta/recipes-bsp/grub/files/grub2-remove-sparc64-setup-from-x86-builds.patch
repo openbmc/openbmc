@@ -1,0 +1,104 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+remove the grub-sparc64-setup files from the x86 builds.
+
+Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+
+--- a/Makefile.util.am	2014-08-15 11:41:02.441011278 -0700
++++ b/Makefile.util.am	2014-08-15 11:44:26.245021142 -0700
+@@ -4692,9 +4692,9 @@
+ endif
+ 
+ if COND_emu
+-sbin_PROGRAMS += grub-sparc64-setup
++sbin_PROGRAMS +=
+ if COND_MAN_PAGES
+-man_MANS += grub-sparc64-setup.8
++man_MANS +=
+ 
+ grub-sparc64-setup.8: grub-sparc64-setup
+ 	chmod a+x grub-sparc64-setup
+@@ -4715,9 +4715,9 @@
+ endif
+ 
+ if COND_i386_pc
+-sbin_PROGRAMS += grub-sparc64-setup
++sbin_PROGRAMS +=
+ if COND_MAN_PAGES
+-man_MANS += grub-sparc64-setup.8
++man_MANS +=
+ 
+ grub-sparc64-setup.8: grub-sparc64-setup
+ 	chmod a+x grub-sparc64-setup
+@@ -4738,9 +4738,9 @@
+ endif
+ 
+ if COND_i386_efi
+-sbin_PROGRAMS += grub-sparc64-setup
++sbin_PROGRAMS +=
+ if COND_MAN_PAGES
+-man_MANS += grub-sparc64-setup.8
++man_MANS +=
+ 
+ grub-sparc64-setup.8: grub-sparc64-setup
+ 	chmod a+x grub-sparc64-setup
+@@ -4761,9 +4761,9 @@
+ endif
+ 
+ if COND_i386_qemu
+-sbin_PROGRAMS += grub-sparc64-setup
++sbin_PROGRAMS +=
+ if COND_MAN_PAGES
+-man_MANS += grub-sparc64-setup.8
++man_MANS +=
+ 
+ grub-sparc64-setup.8: grub-sparc64-setup
+ 	chmod a+x grub-sparc64-setup
+@@ -4784,9 +4784,9 @@
+ endif
+ 
+ if COND_i386_coreboot
+-sbin_PROGRAMS += grub-sparc64-setup
++sbin_PROGRAMS +=
+ if COND_MAN_PAGES
+-man_MANS += grub-sparc64-setup.8
++man_MANS +=
+ 
+ grub-sparc64-setup.8: grub-sparc64-setup
+ 	chmod a+x grub-sparc64-setup
+@@ -4807,9 +4807,9 @@
+ endif
+ 
+ if COND_i386_multiboot
+-sbin_PROGRAMS += grub-sparc64-setup
++sbin_PROGRAMS +=
+ if COND_MAN_PAGES
+-man_MANS += grub-sparc64-setup.8
++man_MANS +=
+ 
+ grub-sparc64-setup.8: grub-sparc64-setup
+ 	chmod a+x grub-sparc64-setup
+@@ -4830,9 +4830,9 @@
+ endif
+ 
+ if COND_i386_ieee1275
+-sbin_PROGRAMS += grub-sparc64-setup
++sbin_PROGRAMS +=
+ if COND_MAN_PAGES
+-man_MANS += grub-sparc64-setup.8
++man_MANS +=
+ 
+ grub-sparc64-setup.8: grub-sparc64-setup
+ 	chmod a+x grub-sparc64-setup
+@@ -4853,9 +4853,9 @@
+ endif
+ 
+ if COND_x86_64_efi
+-sbin_PROGRAMS += grub-sparc64-setup
++sbin_PROGRAMS +=
+ if COND_MAN_PAGES
+-man_MANS += grub-sparc64-setup.8
++man_MANS +=
+ 
+ grub-sparc64-setup.8: grub-sparc64-setup
+ 	chmod a+x grub-sparc64-setup

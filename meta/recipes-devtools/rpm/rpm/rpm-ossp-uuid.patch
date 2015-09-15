@@ -1,0 +1,23 @@
+Fix integration of ossp-uuid
+
+We need to avoid including the util-linux uuid library, instead
+we need ossp-uuid.  There is a related hack in do_configure to
+make sure that we use the right .pc file as well.
+
+Upstream-Status: Inappropriate [disable feature]
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.14/configure.ac
+===================================================================
+--- rpm-5.4.14.orig/configure.ac
++++ rpm-5.4.14/configure.ac
+@@ -1951,7 +1951,7 @@ grep -v 'define HAVE_UNISTD_H' confdefs.
+ esac
+ RPM_CHECK_LIB(
+     [OSSP uuid], [uuid],
+-    [ossp-uuid uuid], [uuid_import], [uuid.h],
++    [ossp-uuid], [uuid_import], [uuid.h],
+     [no,external:none], [],
+     [ dnl # enable OSSP uuid native API support for embedded Lua
+       if test ".$WITH_LUA" = .yes; then

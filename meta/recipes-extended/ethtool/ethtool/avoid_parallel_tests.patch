@@ -1,0 +1,19 @@
+ptest needs buildtest-TESTS and runtest-TESTS targets.
+serial-tests is required to generate those targets.
+
+Signed-off-by: Tudor Florea <tudor.florea@enea.com>
+Upstream-Status: Inappropriate
+(default automake behavior incompatible with ptest)
+
+diff -ruN a/configure.ac b/configure.ac
+--- a/configure.ac	2014-05-28 18:19:13.513980977 +0200
++++ b/configure.ac	2014-05-28 18:19:21.129660215 +0200
+@@ -2,7 +2,7 @@
+ AC_INIT(ethtool, 3.14, netdev@vger.kernel.org)
+ AC_PREREQ(2.52)
+ AC_CONFIG_SRCDIR([ethtool.c])
+-AM_INIT_AUTOMAKE([gnu])
++AM_INIT_AUTOMAKE([gnu serial-tests])
+ AC_CONFIG_HEADERS([ethtool-config.h])
+ 
+ AM_MAINTAINER_MODE

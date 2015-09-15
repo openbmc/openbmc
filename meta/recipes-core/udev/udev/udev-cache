@@ -1,0 +1,75 @@
+#!/bin/sh -e
+
+### BEGIN INIT INFO
+# Provides:          udev-cache
+# Required-Start:    mountall
+# Required-Stop:
+# Default-Start:     S
+# Default-Stop:
+# Short-Description: cache /dev to speedup the udev next boot
+### END INIT INFO
+
+export TZ=/etc/localtime
+
+[ -r /proc/mounts ] || exit 1
+[ -x @UDEVD@ ] || exit 1
+[ -d /sys/class ] || exit 1
+
+[ -f /etc/default/rcS ] && . /etc/default/rcS
+DEVCACHE_TMP="/dev/shm/udev-cache-tmp.tar"
+SYSCONF_CACHED="/etc/udev/cache.data"
+SYSCONF_TMP="/dev/shm/udev.cache"
+DEVCACHE_REGEN="/dev/shm/udev-regen" # create to request cache regen
+
+# A list of files which are used as a criteria to judge whether the udev cache could be reused.
+CMP_FILE_LIST="/proc/version /proc/cmdline /proc/devices"
+[ -f /proc/atags ] && CMP_FILE_LIST="$CMP_FILE_LIST /proc/atags"
+
+# List of files whose metadata (size/mtime/name) will be included in cached
+# system state.
+META_FILE_LIST="lib/udev/rules.d/* etc/udev/rules.d/*"
+
+# Command to compute system configuration.
+sysconf_cmd () {
+	cat -- $CMP_FILE_LIST
+	stat -c '%s %Y %n' -- $META_FILE_LIST | awk -F/ '{print $1 " " $NF;}'
+}
+
+[ -f /etc/default/udev-cache ] && . /etc/default/udev-cache
+
+if [ "$ROOTFS_READ_ONLY" = "yes" ]; then
+    [ "$VERBOSE" != "no" ] && echo "udev-cache: read-only rootfs, skip generating udev-cache"
+    exit 0
+fi
+
+[ "$DEVCACHE" != "" ] || exit 0
+[ "${VERBOSE}" == "no" ] || echo -n "udev-cache: checking for ${DEVCACHE_REGEN}... "
+if ! [ -e "$DEVCACHE_REGEN" ]; then
+	[ "${VERBOSE}" == "no" ] || echo "not found."
+	exit 0
+fi
+[ "${VERBOSE}" == "no" ] || echo "found."
+echo "Populating dev cache"
+
+err_cleanup () {
+        echo "udev-cache: update failed!"
+        udevadm control --start-exec-queue
+	rm -f -- "$SYSCONF_TMP" "$DEVCACHE_TMP" "$DEVCACHE" "$SYSCONF_CACHED"
+}
+
+(
+	set -e
+	trap 'err_cleanup' EXIT
+	udevadm control --stop-exec-queue
+	sysconf_cmd > "$SYSCONF_TMP"
+	find /dev -xdev \( -type b -o -type c -o -type l \) | cut -c 2- \
+		| xargs tar cf "${DEVCACHE_TMP}"
+	gzip < "${DEVCACHE_TMP}" > "$DEVCACHE"
+	rm -f "${DEVCACHE_TMP}"
+	mv "$SYSCONF_TMP" "$SYSCONF_CACHED"
+	udevadm control --start-exec-queue
+	rm -f "$DEVCACHE_REGEN"
+	trap - EXIT
+) &
+
+exit 0

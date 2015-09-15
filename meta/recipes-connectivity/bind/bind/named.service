@@ -1,0 +1,22 @@
+[Unit]
+Description=Berkeley Internet Name Domain (DNS)
+Wants=nss-lookup.target
+Before=nss-lookup.target
+After=network.target
+
+[Service]
+Type=forking
+EnvironmentFile=-/etc/default/bind9
+PIDFile=/run/named/named.pid
+
+ExecStartPre=@SBINDIR@/generate-rndc-key.sh
+ExecStart=@SBINDIR@/named $OPTIONS
+
+ExecReload=@BASE_BINDIR@/sh -c '@SBINDIR@/rndc reload > /dev/null 2>&1 || @BASE_BINDIR@/kill -HUP $MAINPID'
+
+ExecStop=@BASE_BINDIR@/sh -c '@SBINDIR@/rndc stop > /dev/null 2>&1 || @BASE_BINDIR@/kill -TERM $MAINPID'
+
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,32 @@
+Upstream-Status: Submitted
+
+add gtk-types.defs into gdk.c dependence
+
+gdk.c depends on gtk-types.defs but
+gdk/Makefile.am miss this. This will cause
+build error sometimes when built
+with multi-jobbing, so add gtk-types.defs into
+gdk.c dependence.
+
+Signed-off-by: Song.Li <Song.Li@windriver.com>
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ gtk/Makefile.am |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/gtk/Makefile.am b/gtk/Makefile.am
+index 7bb5d0c..4a88351 100644
+--- a/gtk/Makefile.am
++++ b/gtk/Makefile.am
+@@ -214,7 +214,7 @@ gtkunixprint.defs: $(GTKUNIXPRINT_DEFS) Makefile
+ gtkunixprint-types.defs: $(GTKUNIXPRINT_TYPES_DEFS) Makefile
+ 	$(CREATEDEFS) $@ $(GTKUNIXPRINT_TYPES_DEFS)
+ 
+-gdk.c: gdk-types.defs gdk.defs $(GDK_OVERRIDES)
++gdk.c: gdk-types.defs gtk-types.defs gdk.defs $(GDK_OVERRIDES)
+ gtk.c: gdk-types.defs gtk-types.defs gtk.defs gdk-types.defs $(GTK_OVERRIDES)
+ _gtk_la_CFLAGS = $(PYCAIRO_CFLAGS) $(GTK_CFLAGS)
+ _gtk_la_LDFLAGS = $(common_ldflags) -export-symbols-regex init_gtk
+-- 
+1.7.4
+

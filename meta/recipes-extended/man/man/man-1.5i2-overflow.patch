@@ -1,0 +1,16 @@
+Upstream-Status: Pending
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+--- man-1.5i2/src/man.c.overflow	Mon Jun 25 00:01:45 2001
++++ man-1.5i2/src/man.c	Mon Jun 25 00:01:45 2001
+@@ -381,6 +381,9 @@
+ 	  strcat(name, "/");
+ 	  strcat(name, beg);
+      }
++     /* If this is too long, bad things have already happened. *
++      * we should quit IMMEDIATELY.                            */
++     if(strlen(name)>sizeof(ultname)) _exit(1);
+ 
+      goto again;
+ }

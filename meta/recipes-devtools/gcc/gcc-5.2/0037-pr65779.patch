@@ -1,0 +1,173 @@
+List-Id: <gcc-patches.gcc.gnu.org>
+List-Archive: <http://gcc.gnu.org/ml/gcc-patches/>
+List-Post: <mailto:gcc-patches at gcc dot gnu dot org>
+List-Help: <mailto:gcc-patches-help at gcc dot gnu dot org>
+Date: Mon, 20 Apr 2015 12:40:49 +0930
+From: Alan Modra <amodra at gmail dot com>
+To: gcc-patches at gcc dot gnu dot org
+Subject: [Patch] pr65779 - [5/6 Regression] undefined local symbol on powerpc
+
+This patch removes bogus debug info left around by shrink-wrapping,
+which on some powerpc targets with just the right register allocation
+led to assembly errors.
+
+Bootstrapped and regression tested powerpc64-linux and x86_64-linux.
+
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65779
+
+gcc/
+	PR debug/65779
+	* shrink-wrap.c (insn_uses_reg): New function.
+	(move_insn_for_shrink_wrap): Remove debug insns using regs set
+	by the moved insn.
+gcc/testsuite/
+	* gcc.dg/pr65779.c: New.
+	
+Upstream-Status: Pending (from mailing list, not merged yet)
+
+Index: a/gcc/shrink-wrap.c
+===================================================================
+--- a/gcc/shrink-wrap.c.orig
++++ b/gcc/shrink-wrap.c
+@@ -182,6 +182,21 @@ live_edge_for_reg (basic_block bb, int r
+   return live_edge;
+ }
+ 
++static bool
++insn_uses_reg (rtx_insn *insn, unsigned int regno, unsigned int end_regno)
++{
++  df_ref use;
++
++  FOR_EACH_INSN_USE (use, insn)
++    {
++      rtx reg = DF_REF_REG (use);
++
++      if (REG_P (reg) && REGNO (reg) >= regno && REGNO (reg) < end_regno)
++	return true;
++    }
++  return false;
++}
++
+ /* Try to move INSN from BB to a successor.  Return true on success.
+    USES and DEFS are the set of registers that are used and defined
+    after INSN in BB.  SPLIT_P indicates whether a live edge from BB
+@@ -340,10 +355,15 @@ move_insn_for_shrink_wrap (basic_block b
+       *split_p = true;
+     }
+ 
++  vec<basic_block> live_bbs;
++  if (MAY_HAVE_DEBUG_INSNS)
++    live_bbs.create (5);
+   /* At this point we are committed to moving INSN, but let's try to
+      move it as far as we can.  */
+   do
+     {
++      if (MAY_HAVE_DEBUG_INSNS)
++	live_bbs.safe_push (bb);
+       live_out = df_get_live_out (bb);
+       live_in = df_get_live_in (next_block);
+       bb = next_block;
+@@ -426,6 +446,34 @@ move_insn_for_shrink_wrap (basic_block b
+ 	SET_REGNO_REG_SET (bb_uses, i);
+     }
+ 
++  /* Remove debug insns using regs set by the insn we are moving.  */
++  if (MAY_HAVE_DEBUG_INSNS)
++    {
++      while (!live_bbs.is_empty ())
++	{
++	  rtx_insn *dinsn;
++	  basic_block tmp_bb = live_bbs.pop ();
++
++	  FOR_BB_INSNS_REVERSE (tmp_bb, dinsn)
++	    {
++	      if (dinsn == insn)
++		break;
++	      if (DEBUG_INSN_P (dinsn)
++		  && insn_uses_reg (dinsn, dregno, end_dregno))
++		{
++		  if (*split_p)
++		    /* If split, then we will be moving insn into a
++		       newly created block immediately after the entry
++		       block.  Move the debug info there too.  */
++		    emit_debug_insn_after (PATTERN (dinsn), bb_note (bb));
++		  delete_insn (dinsn);
++		  break;
++		}
++	    }
++	}
++      live_bbs.release ();
++    }
++
+   emit_insn_after (PATTERN (insn), bb_note (bb));
+   delete_insn (insn);
+   return true;
+Index: b/gcc/testsuite/gcc.dg/pr65779.c
+===================================================================
+--- /dev/null
++++ b/gcc/testsuite/gcc.dg/pr65779.c
+@@ -0,0 +1,64 @@
++/* { dg-do run } */
++/* { dg-options "-O2 -g" } */
++/* { dg-additional-options "-mrelocatable" { target powerpc-*-rtems* } } */
++
++unsigned long __attribute__ ((noinline))
++adler32 (unsigned long adler, unsigned char *buf, unsigned int len)
++{
++  unsigned long s1 = adler & 0xffff;
++  unsigned long s2 = (adler >> 16) & 0xffff;
++  int k;
++
++  if (buf == 0)
++    return 1L;
++
++  while (len > 0)
++    {
++      k = len < 5552 ? len : 5552;
++      len -= k;
++      while (k >= 16)
++	{
++	  s1 += *buf++; s2 += s1;
++	  s1 += *buf++; s2 += s1;
++	  s1 += *buf++; s2 += s1;
++	  s1 += *buf++; s2 += s1;
++	  s1 += *buf++; s2 += s1;
++	  s1 += *buf++; s2 += s1;
++	  s1 += *buf++; s2 += s1;
++	  s1 += *buf++; s2 += s1;
++	  s1 += *buf++; s2 += s1;
++	  s1 += *buf++; s2 += s1;
++	  s1 += *buf++; s2 += s1;
++	  s1 += *buf++; s2 += s1;
++	  s1 += *buf++; s2 += s1;
++	  s1 += *buf++; s2 += s1;
++	  s1 += *buf++; s2 += s1;
++	  s1 += *buf++; s2 += s1;
++	  k -= 16;
++	}
++      if (k != 0)
++	do
++	  {
++	    s1 += *buf++; s2 += s1;
++	  } while (--k);
++      s1 &= 0xffffffffUL;
++      s2 &= 0xffffffffUL;
++      s1 %= 65521L;
++      s2 %= 65521L;
++    }
++  return (s2 << 16) | s1;
++}
++
++unsigned char buf[] = { 0, 1, 2, 3, 4, 5, 6, 7,
++			8, 9, 10, 11, 12, 13, 14, 15,
++			0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87,
++			0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f,
++			0x55, 0xaa };
++int
++main ()
++{
++  unsigned long x = adler32 (0, buf, sizeof buf);
++  if (x != 0x640409efUL)
++    __builtin_abort ();
++  return 0;
++}

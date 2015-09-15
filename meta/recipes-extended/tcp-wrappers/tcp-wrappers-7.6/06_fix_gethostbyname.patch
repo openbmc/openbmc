@@ -1,0 +1,32 @@
+Upstream-Status: Backport
+
+* Mon Feb  5 2001 Preston Brown <pbrown@redhat.com>
+- fix gethostbyname to work better with dot "." notation (#16949)
+
+--- tcp_wrappers_7.6/socket.c.fixgethostbyname	Fri Mar 21 13:27:25 1997
++++ tcp_wrappers_7.6/socket.c	Mon Feb  5 14:09:40 2001
+@@ -52,7 +52,8 @@
+ char   *name;
+ {
+     char    dot_name[MAXHOSTNAMELEN + 1];
+-
++    struct hostent *hp;
++    
+     /*
+      * Don't append dots to unqualified names. Such names are likely to come
+      * from local hosts files or from NIS.
+@@ -61,8 +62,12 @@
+     if (strchr(name, '.') == 0 || strlen(name) >= MAXHOSTNAMELEN - 1) {
+ 	return (gethostbyname(name));
+     } else {
+-	sprintf(dot_name, "%s.", name);
+-	return (gethostbyname(dot_name));
++        sprintf(dot_name, "%s.", name);
++        hp = gethostbyname(dot_name);
++	if (hp)
++	    return hp;
++	else
++	    return (gethostbyname(name));
+     }
+ }
+ 

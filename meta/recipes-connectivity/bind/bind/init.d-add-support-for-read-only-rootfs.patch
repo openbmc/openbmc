@@ -1,0 +1,65 @@
+Subject: init.d: add support for read-only rootfs
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ init.d |   40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
+
+diff --git a/init.d b/init.d
+index 0111ed4..24677c8 100644
+--- a/init.d
++++ b/init.d
+@@ -6,8 +6,48 @@ PATH=/sbin:/bin:/usr/sbin:/usr/bin
+ # Don't modify this line, change or create /etc/default/bind9.
+ OPTIONS=""
+ 
++test -f /etc/default/rcS && . /etc/default/rcS
+ test -f /etc/default/bind9 && . /etc/default/bind9
+ 
++# This function is here because it's possible that /var and / are on different partitions.
++is_on_read_only_partition () {
++    DIRECTORY=$1
++    dir=`readlink -f $DIRECTORY`
++    while true; do
++	if [ ! -d "$dir" ]; then
++	    echo "ERROR: $dir is not a directory"
++	    exit 1
++	else
++	    for flag in `awk -v dir=$dir '{ if ($2 == dir) { print "FOUND"; split($4,FLAGS,",") } }; \
++		END { for (f in FLAGS) print FLAGS[f] }' < /proc/mounts`; do
++		[ "$flag" = "FOUND" ] && partition="read-write"
++		[ "$flag" = "ro" ] && { partition="read-only"; break; }
++	    done
++	    if [ "$dir" = "/" -o -n "$partition" ]; then
++		break
++	    else
++		dir=`dirname $dir`
++	    fi
++	fi
++    done
++    [ "$partition" = "read-only" ] && echo "yes" || echo "no"
++}
++
++bind_mount () {
++    olddir=$1
++    newdir=$2
++    mkdir -p $olddir
++    cp -a $newdir/* $olddir
++    mount --bind $olddir $newdir
++}
++
++# Deal with read-only rootfs
++if [ "$ROOTFS_READ_ONLY" = "yes" ]; then
++    [ "$VERBOSE" != "no" ] && echo "WARN: start bind service in read-only rootfs"
++    [ `is_on_read_only_partition /etc/bind` = "yes" ] && bind_mount /var/volatile/bind/etc /etc/bind
++    [ `is_on_read_only_partition /var/named` = "yes" ] && bind_mount /var/volatile/bind/named /var/named
++fi
++
+ test -x /usr/sbin/rndc || exit 0
+ 
+ case "$1" in
+-- 
+1.7.9.5
+

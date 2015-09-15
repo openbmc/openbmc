@@ -1,0 +1,94 @@
+
+{% load static %}
+{% load projecttags %}
+
+<script src="{% static 'js/table.js' %}"></script>
+<script src="{% static 'js/layerBtn.js' %}"></script>
+<script>
+  $(document).ready(function() {
+    (function(){
+
+    var ctx = {
+      tableName : "{{table_name}}",
+      url : "{{ xhr_table_url }}?format=json",
+      title : "{{title}}",
+      projectLayers : {{projectlayers|json}},
+    };
+
+    try {
+      tableInit(ctx);
+    } catch (e) {
+      document.write("Problem loading table widget: " + e);
+    }
+    })();
+  });
+</script>
+
+{% include 'toastertable-filter.html' %}
+
+<div class="row-fluid" id="no-results-{{table_name}}" style="display:none">
+  <div class="alert">
+    <form class="no-results input-append">
+      <input class="input-xlarge" id="new-search-input-{{table_name}}" name="search" type="text" placeholder="Search {{title|lower}}" value="{% if request.GET.search %}{{request.GET.search}}{% endif %}"/>
+      <a href="#" class="add-on btn remove-search-btn-{{table_name}}" tabindex="-1">
+        <i class="icon-remove"></i>
+      </a>
+      <button class="btn search-submit-{{table_name}}" >Search</button>
+      <button class="btn btn-link remove-search-btn-{{table_name}}">Show {{title|lower}}
+      </button>
+    </form>
+  </div>
+</div>
+<div id="table-container-{{table_name}}" style="visibility: hidden">
+  <!-- control header -->
+  <div class="row-fluid" id="table-chrome-{{table_name}}">
+      <div class="navbar-search input-append pull-left">
+
+        <input class="input-xlarge" id="search-input-{{table_name}}" name="search" type="text" placeholder="Search {{title|lower}}" value="{% if request.GET.search %}{{request.GET.search}}{% endif %}"/>
+        <a href="#" style="display:none" class="add-on btn remove-search-btn-{{table_name}}" tabindex="-1">
+          <i class="icon-remove"></i>
+        </a>
+        <button class="btn" id="search-submit-{{table_name}}" >Search</button>
+      </div>
+
+      <div class="pull-right">
+
+        <div style="display:inline">
+          <span class="divider-vertical"></span>
+          <span class="help-inline" style="padding-top:5px;">Show rows:</span>
+          <select style="margin-top:5px;margin-bottom:0px;" class="pagesize-{{table_name}}">
+            {% with "10 25 50 100 150" as list%}
+            {% for i in list.split %}
+            <option value="{{i}}">{{i}}</option>
+            {% endfor %}
+            {% endwith %}
+          </select>
+        </div>
+      </div>
+  </div>
+
+  <!-- The actual table -->
+  <table class="table table-bordered table-hover tablesorter" id="{{table_name}}">
+    <thead>
+      <tr><th></th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <!-- Pagination controls -->
+  <div class="pagination pagination-centered" id="pagination-{{table_name}}">
+    <ul class="pagination" style="display: block-inline">
+    </ul>
+
+    <div class="pull-right">
+      <span class="help-inline" style="padding-top:5px;">Show rows:</span>
+      <select style="margin-top:5px;margin-bottom:0px;" class="pagesize-{{table_name}}">
+        {% with "10 25 50 100 150" as list%}
+        {% for i in list.split %}
+        <option value="{{i}}">{{i}}</option>
+        {% endfor %}
+        {% endwith %}
+      </select>
+    </div>
+  </div>
+</div>

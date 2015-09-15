@@ -1,0 +1,25 @@
+Add FAIL/PASS output to test output.
+
+Signed-off-by: Björn Stenberg <bjst@enea.com>
+Upstream-Status: Pending
+---
+diff -uNr a/tests/run-all b/tests/run-all
+--- a/tests/run-all	1999-10-08 17:07:46.000000000 +0200
++++ b/tests/run-all	2012-10-27 21:04:18.663331887 +0200
+@@ -22,7 +22,15 @@
+ 	case $x in
+ 	$0|run-minimal|run-gprof)	;;
+ 	*.orig|*~) ;;
+-	*)	echo $x ; sh $x ;;
++    *)  echo $x
++         output=`sh $x`
++         if [ -n "$output" ]; then
++             echo "$output"
++             echo "FAIL: $x"
++         else
++             echo "PASS: $x"
++         fi
++         ;;
+ 	esac
+ done
+ 

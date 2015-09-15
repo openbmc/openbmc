@@ -1,0 +1,35 @@
+dbus: remove build host test in configure script
+
+The dbus build tests the build host to detect what initscript
+environment it expects.  Remove the test and set it to "redhat"
+unconditionally as the oe-core initscript has a redhat-style pid file
+path.
+
+Signed-off-by: Andy Ross <andy.ross@windriver.com>
+Upstream-Status: Inappropriate [embedded]
+
+diff -u a/configure.ac b/configure.ac
+--- a/configure.ac	2012-08-28 11:23:43.040609874 -0700
++++ b/configure.ac	2012-08-28 11:54:25.602913945 -0700
+@@ -1348,19 +1348,8 @@
+ AS_AC_EXPAND(EXPANDED_LIBEXECDIR, "$libexecdir")
+ AS_AC_EXPAND(EXPANDED_DATADIR, "$datadir")
+ 
+-#### Check our operating system
+-operating_system=unknown
+-if test -f /etc/redhat-release || test -f $EXPANDED_SYSCONFDIR/redhat-release ; then
+-   operating_system=redhat
+-fi
+-
+-if test -f /etc/slackware-version || test -f $EXPANDED_SYSCONFDIR/slackware-version ; then
+-   operating_system=slackware
+-fi
+-
+-if test -f /usr/bin/cygwin1.dll || test -f $EXPANDED_BINDIR/cygwin1.dll ; then
+-   operating_system=cygwin
+-fi
++#### Build host test removed from upstream code, openembedded initscript is redhat-like:
++operating_system=redhat
+ 
+ #### Sort out init scripts
+ 

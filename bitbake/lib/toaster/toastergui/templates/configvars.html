@@ -1,0 +1,132 @@
+{% extends "basebuildpage.html" %}
+{% load projecttags %}
+
+{% block localbreadcrumb %}
+<li>Configuration</li>
+{% endblock %}
+
+{% block nav-configuration %}
+  <li class="active"><a href="{% url 'configuration' build.pk %}">Configuration</a></li>
+{% endblock %}
+
+{% block buildinfomain %}
+<!-- page title -->
+<div class="row-fluid span10">
+ <div class="page-header">
+ <h1>
+  {% if request.GET.filter and objects.paginator.count > 0 or request.GET.search and objects.paginator.count > 0 %}
+      {{objects.paginator.count}} variable{{objects.paginator.count|pluralize}} found
+  {%elif request.GET.filter and objects.paginator.count == 0 or request.GET.search and objects.paginator.count == 0 %}
+      No variables found
+  {%else%}
+      Configuration
+  {%endif%}
+ </h1>
+ </div>
+</div>
+
+<!-- configuration table -->
+<div class="row-fluid pull-right span10" id="navTab">
+  <ul class="nav nav-pills">
+    <li class=""><a href="{% url 'configuration' build.id %}">Summary</a></li>
+    <li class="active"><a href="#" >BitBake variables</a></li>
+  </ul>
+
+  <!-- variables -->
+  <div id="variables" class="tab-pane">
+
+  {% if objects.paginator.count == 0 %}
+  <div class="row-fluid">
+      <div class="alert">
+        <form class="no-results input-append" id="searchform">
+            <input id="search" name="search" class="input-xxlarge" type="text" value="{% if request.GET.search %}{{request.GET.search}}{% endif %}"/>{% if request.GET.search %}<a href="javascript:$('#search').val('');searchform.submit()" class="add-on btn" tabindex="-1"><i class="icon-remove"></i></a>{% endif %}
+            <button class="btn" type="submit" value="Search">Search</button>
+            <button class="btn btn-link" onclick="javascript:$('#search').val('');searchform.submit()">Show all variables</button>
+        </form>
+      </div>
+  </div>
+
+  {% else %}
+  {% include "basetable_top.html" %}
+
+  {% for variable in objects %}
+    <tr class="data">
+        <td class="variable_name"><a data-toggle="modal" href="#variable-{{variable.pk}}">{{variable.variable_name}}</a></td>
+        <td class="variable_value"><a data-toggle="modal" href="#variable-{{variable.pk}}">{{variable.variable_value|truncatechars:153}}</a></td>
+        <td class="file"><a data-toggle="modal" href="#variable-{{variable.pk}}">
+            {% if variable.vhistory.all %}
+                {% for path in variable.vhistory.all|filter_setin_files:file_filter %}
+                    {{path}}<br/>
+                {% endfor %}
+            {% endif %}
+        </a></td>
+        <td class="description">
+            {% if variable.description %}
+                {{variable.description}}
+                <a href="http://www.yoctoproject.org/docs/current/ref-manual/ref-manual.html#var-{{variable.variable_name|variable_parent_name}}" target="_blank">
+                <i class="icon-share get-info"></i></a>
+            {% endif %}
+        </td>
+    </tr>
+{% endfor %}
+
+{% include "basetable_bottom.html" %}
+{% endif %}
+</div> <!-- endvariables -->
+
+<!-- file list popups -->
+{% for variable in objects %}
+    {% if variable.vhistory.count %}
+    <div id="variable-{{variable.pk}}" class="modal hide fade" tabindex="-1" role="dialog">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+            <h3>History of {{variable.variable_name}}</h3>
+        </div>
+        <div class="modal-body">
+            {% if variable.variable_value %}
+              {% if variable.variable_value|length < 570 %}
+                <h4>{{variable.variable_name}} value is:</h4>
+                <p>
+                    {{variable.variable_value}}
+                </p>
+              {% else %}
+                <h4>{{variable.variable_name}} value is:</h4>
+                <p>
+                    <span>{{variable.variable_value|string_slice:':570'}}
+                        <span class="full"> {{variable.variable_value|string_slice:'570:'}}
+                        </span>
+                        <a class="btn btn-mini full-show">...</a>
+                    </span>
+                </p>
+                <a class="btn btn-mini full-hide">Collapse variable value <i class="icon-caret-up"></i>
+                </a>
+              {% endif %}
+            {% else %}
+                <div class="alert alert-info">The value of <strong>{{variable.variable_name}}</strong> is an empty string</div>
+            {% endif %}
+            <h4>The value was set in the following configuration files:</h4>
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>Configuration file</th>
+                        <th>Operation</th>
+                        <th>Line number</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vh in variable.vhistory.all %}
+                    <tr>
+                        <td>{{forloop.counter}}</td><td>{{vh.file_name}}</td><td>{{vh.operation}}</td><td>{{vh.line_number}}</td>
+                    </tr>
+                    {%endfor%}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+{% endfor %}
+
+</div> <!-- buildinfomain -->
+
+{% endblock %}

@@ -1,0 +1,13 @@
+Upstream-Status:  Pending
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -281,7 +281,7 @@ dnl ************************************
+ 
+ CURL_CHECK_COMPILER
+ CURL_SET_COMPILER_BASIC_OPTS
+-CURL_SET_COMPILER_DEBUG_OPTS
++dnl CURL_SET_COMPILER_DEBUG_OPTS
+ CURL_SET_COMPILER_OPTIMIZE_OPTS
+ CURL_SET_COMPILER_WARNING_OPTS
+ 

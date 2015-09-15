@@ -1,0 +1,32 @@
+From 85b0589b4843c03e8e6fd9416d71ea449a73c5c0 Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen@dominion.thruhere.net>
+Date: Thu, 3 Nov 2011 10:46:16 +0100
+Subject: [PATCH] make configure cross compile safe
+
+According to Kevin Tian:
+Upstream-Status: Pending
+
+Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
+Signed-off-by: Shane Wang <shane.wang@intel.com>
+
+Index: iproute2-3.7.0/configure
+===================================================================
+--- iproute2-3.7.0.orig/configure
++++ iproute2-3.7.0/configure
+@@ -2,6 +2,7 @@
+ # This is not an autconf generated configure
+ #
+ INCLUDE=${1:-"$PWD/include"}
++SYSROOT=$1
+ 
+ # Make a temp directory in build tree.
+ TMPDIR=$(mktemp -d config.XXXXXX)
+@@ -158,7 +159,7 @@ check_ipt_lib_dir()
+ 		return
+ 	fi
+ 
+-	for dir in /lib /usr/lib /usr/local/lib
++	for dir in $SYSROOT/lib $SYSROOT/usr/lib $SYSROOT/usr/local/lib
+ 	do
+ 		for file in $dir/{xtables,iptables}/lib*t_*so ; do
+ 			if [ -f $file ]; then

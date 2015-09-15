@@ -1,0 +1,29 @@
+The musl implementation of getaddrinfo and getservbyname does not
+aliases. As a workaround we use "sunprc" instead of "portmapper"
+
+ported from alpine linux
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: rpcbind-0.2.2/src/rpcbind.c
+===================================================================
+--- rpcbind-0.2.2.orig/src/rpcbind.c
++++ rpcbind-0.2.2/src/rpcbind.c
+@@ -491,7 +491,7 @@ init_transport(struct netconfig *nconf)
+ 			if ((aicode = getaddrinfo(hosts[nhostsbak],
+ 			    servname, &hints, &res)) != 0) {
+ 			  if ((aicode = getaddrinfo(hosts[nhostsbak],
+-						    "portmapper", &hints, &res)) != 0) {
++						    "sunrpc", &hints, &res)) != 0) {
+ 				syslog(LOG_ERR,
+ 				    "cannot get local address for %s: %s",
+ 				    nconf->nc_netid, gai_strerror(aicode));
+@@ -564,7 +564,7 @@ init_transport(struct netconfig *nconf)
+ 		if ((strcmp(nconf->nc_netid, "local") != 0) &&
+ 		    (strcmp(nconf->nc_netid, "unix") != 0)) {
+ 			if ((aicode = getaddrinfo(NULL, servname, &hints, &res))!= 0) {
+-			  if ((aicode = getaddrinfo(NULL, "portmapper", &hints, &res))!= 0) {
++			  if ((aicode = getaddrinfo(NULL, "sunrpc", &hints, &res))!= 0) {
+ 			  printf("cannot get local address for %s: %s",  nconf->nc_netid, gai_strerror(aicode));
+ 			  syslog(LOG_ERR,
+ 				    "cannot get local address for %s: %s",

@@ -1,0 +1,28 @@
+Upstream-Status: Pending
+
+mmc.h: don't include <asm-generic/int-ll64.h>
+
+Including this file causes a compile failure for qemumips64.
+This file is not needed to be explicitly included, because it will be
+included by the <linux/mmc/ioctl.h> file if _MIPS_SZLONG is not 64.
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ mmc.h |    1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/mmc.h b/mmc.h
+index 9871d62..3df2cdf 100644
+--- a/mmc.h
++++ b/mmc.h
+@@ -14,7 +14,6 @@
+  * Boston, MA 021110-1307, USA.
+  */
+ 
+-#include <asm-generic/int-ll64.h>
+ #include <linux/mmc/ioctl.h>
+ #include <stdio.h>
+ 
+-- 
+1.7.9.5
+

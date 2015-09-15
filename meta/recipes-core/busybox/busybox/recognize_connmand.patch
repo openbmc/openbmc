@@ -1,0 +1,21 @@
+This adds connmand to the list of know dhcp clients
+
+Upstream-Status: Inappropriate [OE-Core]
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+Index: busybox-1.22.1/networking/ifupdown.c
+===================================================================
+--- busybox-1.22.1.orig/networking/ifupdown.c
++++ busybox-1.22.1/networking/ifupdown.c
+@@ -521,6 +521,10 @@ struct dhcp_client_t {
+ };
+ 
+ static const struct dhcp_client_t ext_dhcp_clients[] = {
++	{ "connmand",
++		"true",
++		"true",
++	},
+ 	{ "dhcpcd",
+ 		"dhcpcd[[ -h %hostname%]][[ -i %vendor%]][[ -I %client%]][[ -l %leasetime%]] %iface%",
+ 		"dhcpcd -k %iface%",

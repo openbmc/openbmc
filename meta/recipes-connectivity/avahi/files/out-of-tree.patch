@@ -1,0 +1,32 @@
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From a62dc95d75691ea4aefa86d8bbe54c62afd78ff6 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Tue, 17 Sep 2013 12:27:36 +0100
+Subject: [PATCH] build-sys: fix out-of-tree builds without xmltoman
+
+If manpages are enabled but xmltoman isn't present, out-of-tree builds fail
+because it checks inside the build directory for the pre-generated manpages.
+
+Fix this by using $srcdir when looking for files inside the source directory.
+---
+ configure.ac |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 9debce2..047c7ae 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1021,7 +1021,7 @@ if test x$manpages = xyes ; then
+     fi
+ 
+     if test x$have_xmltoman = xno -o x$xmltoman = xno; then
+-        if ! test -e man/avahi-daemon.8 ; then
++        if ! test -e $srcdir/man/avahi-daemon.8 ; then
+             AC_MSG_ERROR([*** xmltoman was not found or was disabled, it is required to build the manpages as they have not been pre-built, install xmltoman, pass --disable-manpages or dont pass --disable-xmltoman])
+             exit 1
+         fi
+-- 
+1.7.10.4
+

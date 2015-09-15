@@ -1,0 +1,192 @@
+#! /usr/bin/env bash
+# icecc -- A simple distributed compiler system
+#
+# Copyright (C) 2004 by the Icecream Authors
+# GPL
+
+target_files=
+
+is_contained ()
+{
+  case " $target_files " in
+    *" $1 "* ) return 0 ;;
+    *"=$1 "* ) return 0;;
+    * ) return 1 ;;
+  esac
+}
+
+add_file ()
+{
+  local name="$1"
+  local path="$1";
+  if test -n "$2"; then
+    name="$2"
+  fi
+  test -z "$name" && return
+  # ls -H isn't really the same as readlink, but
+  # readlink is not portable enough.
+  path=`ls -H $path`
+  toadd="$name=$path"
+  is_contained "$toadd" && return
+  if test -z "$silent"; then
+  echo "adding file $toadd"
+  fi
+  target_files="$target_files $toadd"
+  if test -x "$path"; then
+    # Only call ldd when it makes sense
+    if file -L "$path" | grep 'ELF' > /dev/null 2>&1; then
+	if ! file -L "$path" | grep 'static' > /dev/null 2>&1; then
+	   # ldd now outputs ld as /lib/ld-linux.so.xx on current nptl based glibc
+		# this regexp parse the outputs like:
+		# ldd /usr/bin/gcc
+		#         linux-gate.so.1 =>  (0xffffe000)
+		#         libc.so.6 => /lib/tls/libc.so.6 (0xb7e81000)
+		#         /lib/ld-linux.so.2 (0xb7fe8000)
+		# covering both situations ( with => and without )
+          for lib in `ldd "$path" | sed -n 's,^[^/]*\(/[^ ]*\).*,\1,p'`; do
+	    test -f "$lib" || continue
+	    # Check wether the same library also exists in the parent directory,
+	    # and prefer that on the assumption that it is a more generic one.
+	    local baselib=`echo "$lib" | sed 's,\(/[^/]*\)/.*\(/[^/]*\)$,\1\2,'`
+	    test -f "$baselib" && lib=$baselib
+	  add_file "$lib"
+        done
+      fi
+    fi
+  fi
+}
+
+# backward compat
+if test "$1" = "--respect-path"; then
+  shift
+fi
+
+#add a --silent switch to avoid "broken pipe" errors when calling this scipt from within OE
+if test "$1" = "--silent"; then
+ silent=1
+ shift
+fi
+
+
+added_gcc=$1
+shift
+added_gxx=$1
+shift
+added_as=$1
+shift
+archive_name=$1
+
+if test -z "$added_gcc" || test -z "$added_gxx" ; then
+	echo "usage: $0 <gcc_path> <g++_path>"
+	exit 1
+fi
+
+if ! test -x "$added_gcc" ; then
+  echo "'$added_gcc' is no executable."
+  exit 1
+fi
+
+if ! test -x "$added_gxx" ; then
+  echo "'$added_gcc' is no executable."
+  exit 1
+fi
+
+
+
+add_file $added_gcc /usr/bin/gcc
+add_file $added_gxx /usr/bin/g++
+
+if test -z "$added_as" ; then
+ add_file /usr/bin/as /usr/bin/as
+else
+ if ! test -x "$added_as" ; then
+  echo "'$added_as' is no executable."
+  exit 1
+ fi
+
+ add_file $added_as  /usr/bin/as
+fi
+
+add_file `$added_gcc -print-prog-name=cc1` /usr/bin/cc1
+add_file `$added_gxx -print-prog-name=cc1plus` /usr/bin/cc1plus
+specfile=`$added_gcc -print-file-name=specs`
+if test -n "$specfile" && test -e "$specfile"; then
+  add_file "$specfile"
+fi
+
+ltofile=`$added_gcc -print-prog-name=lto1`
+pluginfile="${ltofile%lto1}liblto_plugin.so"
+if test -r "$pluginfile"
+then
+  add_file $pluginfile  ${pluginfile#*usr}
+  add_file $pluginfile  /usr${pluginfile#*usr}
+fi
+
+tempdir=`mktemp -d /tmp/iceccenvXXXXXX`
+new_target_files=
+for i in $target_files; do
+ case $i in
+   *=/*)
+    target=`echo $i | cut -d= -f1`
+    path=`echo $i | cut -d= -f2`
+    ;;
+   *)
+    path=$i
+    target=$i
+    ;;
+  esac
+  mkdir -p $tempdir/`dirname $target`
+  cp -p $path $tempdir/$target
+  if test -f $tempdir/$target -a -x $tempdir/$target; then
+    strip -s $tempdir/$target 2>/dev/null
+  fi
+  target=`echo $target | cut -b2-`
+  new_target_files="$new_target_files $target"
+done
+
+#sort the files
+target_files=`for i in $new_target_files; do echo $i; done | sort`
+
+#test if an archive name was supplied
+#if not use the md5 of all files as the archive name
+if test -z "$archive_name"; then
+  md5sum=NONE
+  for file in /usr/bin/md5sum /bin/md5 /usr/bin/md5; do
+    if test -x $file; then
+      md5sum=$file
+      break
+    fi
+  done
+
+  #calculate md5 and use it as the archive name
+  archive_name=`for i in $target_files; do test -f $tempdir/$i && $md5sum $tempdir/$i; done | sed -e 's/ .*$//' | $md5sum | sed -e 's/ .*$//'`.tar.gz || {
+    if test -z "$silent"; then
+     echo "Couldn't compute MD5 sum."
+    fi
+    exit 2
+  }
+  mydir=`pwd`
+else
+  mydir="`dirname "$archive_name"`"
+
+  #check if we have a full path or only a filename
+  if test "$mydir" = "." ; then
+    mydir=`pwd`
+  else
+    mydir=""
+  fi
+fi
+
+if test -z "$silent"; then
+echo "creating $archive_name"
+fi
+
+cd $tempdir
+tar -czhf "$mydir/$archive_name" $target_files || {
+ if test -z "$silent"; then
+  echo "Couldn't create archive"
+ fi
+  exit 3
+}
+cd ..
+rm -rf $tempdir

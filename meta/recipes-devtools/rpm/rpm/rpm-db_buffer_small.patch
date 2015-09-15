@@ -1,0 +1,77 @@
+In certain cases with BerkleyDB 5.3.x we are getting the error:
+
+db3.c:1443: dbcursor->pget(-30999): BDB0063 DB_BUFFER_SMALL: User memory too small for return value
+
+See https://bugs.launchpad.net/rpm/+bug/934420 for more information.
+
+It appears to be some type of a bug in the BerkleyDB 5.3.x.  In an attempt
+to workaround the problem, when we encounter this situation we attempt
+to adjust the size of the mmap buffer until the call works, or we
+end up trying 10 times.  The new size is either the updated vp->size
+from the failed pget call, or the previous size + 1024.
+
+If DBI debugging is enabled, additional diagnostics are printed, otherwise
+a basic retry and success message is added to show that the failure was
+resolved.
+
+Upstream-Status: Inappropriate (workaround)
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.14/rpmdb/rpmdb.c
+===================================================================
+--- rpm-5.4.14.orig/rpmdb/rpmdb.c
++++ rpm-5.4.14/rpmdb/rpmdb.c
+@@ -2212,8 +2212,12 @@ static int rpmmiGet(dbiIndex dbi, DBC *
+ 	vp->flags |= DB_DBT_USERMEM;
+ 	rc = dbiGet(dbi, dbcursor, kp, vp, flags);
+ 	if (rc == DB_BUFFER_SMALL) {
++	    int retry = 0;
++	    size_t origlen = vp->size;
+ 	    size_t uhlen = vp->size;
+-	    void * uh = mmap(NULL, uhlen, _prot, _flags, _fdno, _off);
++	    void * uh;
++retry_get:
++	    uh = mmap(NULL, uhlen, _prot, _flags, _fdno, _off);
+ 	    if (uh == NULL || uh == (void *)-1)
+ 		fprintf(stderr,
+ 		    "==> mmap(%p[%u], 0x%x, 0x%x, %d, 0x%x) error(%d): %s\n",
+@@ -2235,6 +2239,25 @@ static int rpmmiGet(dbiIndex dbi, DBC *
+ 		if (munmap(uh, uhlen) != 0)
+ 		    fprintf(stderr, "==> munmap(%p[%u]) error(%d): %s\n",
+                 	uh, (unsigned)uhlen, errno, strerror(errno));
++	        /* We want to be sure to limit the number of retry attempts to avoid a loop! */
++	        if (rc == DB_BUFFER_SMALL && retry < 10) {
++		   /* If we got a largr vp-size back, use that, otherwise increment the size by 1k */
++	           uhlen = vp->size > uhlen ? vp->size : uhlen + 1024;
++		   retry++;
++	           if ((dbi)->dbi_debug)
++	               fprintf(stderr, "==> DB_BUFFER_SMALL orig requested (%d), configured (%d), forcing larger buffer (%d), new size (%d)\n",
++	                    origlen, vp->ulen, uhlen, vp->size);
++	           else
++	               fprintf(stderr, "==> retry (%d) db3cpget (%d)\n", retry, uhlen);
++	           goto retry_get;
++	        }
++	    }
++	    if (retry) {
++	        if ((dbi)->dbi_debug)
++	           fprintf(stderr, "==> success orig requested (%d), configured buffer (%d), buffer (%d), size after dbiGet (%d)\n",
++			origlen, vp->ulen, uhlen, vp->size);
++	        else
++	           fprintf(stderr, "==> success\n");
+ 	    }
+ 	}
+     } else
+Index: rpm-5.4.14/rpmdb/db3.c
+===================================================================
+--- rpm-5.4.14.orig/rpmdb/db3.c
++++ rpm-5.4.14/rpmdb/db3.c
+@@ -1509,7 +1509,7 @@ assert(db != NULL);
+ #endif
+     }
+ 
+-DBIDEBUG(dbi, (stderr, "<-- %s(%p,%p,%p,%p,%p,0x%x) rc %d %s%s\n", __FUNCTION__, dbi, dbcursor, key, pkey, data, flags, rc, _DBCFLAGS(flags), _KEYDATA(key, pkey, data, NULL)));
++DBIDEBUG(dbi, (stderr, "<-- %s(%p,%p,%p,%p,%p,0x%x) rc %d %s%s\n", __FUNCTION__, dbi, dbcursor, key, pkey, data, flags, rc, _DBCFLAGS(flags), _KEYDATA(key, pkey, rc == DB_BUFFER_SMALL ? NULL : data, NULL)));
+     return rc;
+ }
+ /*@=mustmod@*/

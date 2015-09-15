@@ -1,0 +1,56 @@
+From def4aa3817f98aae625e601b791ef068276f05d5 Mon Sep 17 00:00:00 2001
+From: Dominic Hargreaves <dom@earth.li>
+Date: Mon, 17 May 2010 13:23:07 +0300
+Subject: Point users to Debian packages of deprecated core modules
+
+Bug-Debian: http://bugs.debian.org/747628
+
+Several modules are being deprecated with perl 5.20.
+To get a clean transition, perl/perl-modules is going to recommend the
+separate Debian packages of these for one release cycle so that they will be
+pulled in by default on upgrades. This is taking place for perl 5.20/jessie.
+
+However, on systems configured to ignore recommendations the deprecation
+warnings will still be useful, so modify them slightly to point to the
+separate packages instead.
+
+Patch-Name: debian/deprecate-with-apt.diff
+---
+ lib/deprecate.pm | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/lib/deprecate.pm b/lib/deprecate.pm
+index 47bc112..b0c61df 100644
+--- a/lib/deprecate.pm
++++ b/lib/deprecate.pm
+@@ -7,6 +7,13 @@ our $VERSION = 0.03;
+ our %Config;
+ unless (%Config) { require Config; *Config = \%Config::Config; }
+ 
++# Debian-specific change: recommend the separate Debian packages of
++# deprecated modules where available
++
++our %DEBIAN_PACKAGES = (
++    # None for the perl 5.22 cycle
++);
++
+ # This isn't a public API. It's internal to code maintained by the perl-porters
+ # If you would like it to be a public API, please send a patch with
+ # documentation and tests. Until then, it may change without warning.
+@@ -58,9 +65,15 @@ EOM
+ 	if (defined $callers_bitmask
+ 	    && (vec($callers_bitmask, $warnings::Offsets{deprecated}, 1)
+ 		|| vec($callers_bitmask, $warnings::Offsets{all}, 1))) {
+-	    warn <<"EOM";
++		if (my $deb = $DEBIAN_PACKAGES{$package}) {
++		    warn <<"EOM";
++$package will be removed from the Perl core distribution in the next major release. Please install the separate $deb package. It is being used at $call_file, line $call_line.
++EOM
++		} else {
++		    warn <<"EOM";
+ $package will be removed from the Perl core distribution in the next major release. Please install it from CPAN. It is being used at $call_file, line $call_line.
+ EOM
++		}
+ 	}
+     }
+ }

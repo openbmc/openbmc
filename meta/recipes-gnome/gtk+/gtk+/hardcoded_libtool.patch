@@ -1,0 +1,35 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+Updated to apply to gtk+-2.24.15
+
+Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
+diff -Nurd gtk+-2.24.15/configure.ac gtk+-2.24.15/configure.ac
+--- gtk+-2.24.15/configure.ac	2013-01-12 20:52:54.000000000 +0200
++++ gtk+-2.24.15/configure.ac	2013-02-12 21:33:30.689925967 +0200
+@@ -415,7 +415,7 @@
+ case $enable_explicit_deps in
+   auto)
+     export SED
+-    deplibs_check_method=`(./libtool --config; echo 'eval echo \"$deplibs_check_method\"') | sh`
++    deplibs_check_method=`(./$host_alias-libtool --config; echo 'eval echo \"$deplibs_check_method\"') | sh`
+     if test "x$deplibs_check_method" '!=' xpass_all || test "x$enable_static" = xyes ; then
+       enable_explicit_deps=yes
+     else
+@@ -774,7 +774,7 @@
+     dnl Now we check to see if our libtool supports shared lib deps
+     dnl (in a rather ugly way even)
+     if $dynworks; then
+-        module_libtool_config="${CONFIG_SHELL-/bin/sh} ./libtool --config"
++        module_libtool_config="${CONFIG_SHELL-/bin/sh} $host_alias-libtool --config"
+         module_deplibs_check=`$module_libtool_config | \
+             grep '^[[a-z_]]*check[[a-z_]]*_method=[['\''"]]' | \
+             sed 's/.*[['\''"]]\(.*\)[['\''"]]$/\1/'`
+@@ -1574,7 +1574,7 @@
+ # We are using gmodule-no-export now, but I'm leaving the stripping
+ # code in place for now, since pango and atk still require gmodule.
+ export SED
+-export_dynamic=`(./libtool --config; echo eval echo \\$export_dynamic_flag_spec) | sh`
++export_dynamic=`($host_alias-libtool --config; echo eval echo \\$export_dynamic_flag_spec) | sh`
+ if test -n "$export_dynamic"; then
+   GDK_DEP_LIBS=`echo $GDK_DEP_LIBS | sed -e "s/$export_dynamic//"`
+   GTK_DEP_LIBS=`echo $GTK_DEP_LIBS | sed -e "s/$export_dynamic//"`

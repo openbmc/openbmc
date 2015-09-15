@@ -1,0 +1,129 @@
+From 3781d40940d46d7e6a502092d24aac7997f6da5b Mon Sep 17 00:00:00 2001
+From: Mingke Wang <mingke.wang@freescale.com>
+Date: Thu, 5 Mar 2015 12:06:23 +0800
+Subject: [PATCH 1/4] basetextoverlay: make memory copy when video buffer's
+ memory is ready only
+
+1. since gst_buffer_make_writable just lookup the refcount to determine if
+   a buffer is writable, and it will use _gst_buffer_copy() which don't
+   perform a deep memory copy even if the flag of a memory is set to
+   GST_MEMORY_FLAG_READONLY. So, we detect the memory flag and use
+   gst_buffer_copy_region with GST_BUFFER_COPY_DEEP parameter to perform
+   deep memory copy. if the allocator of a memory don't support mem_copy
+   interface, the it will return NULL, if this case, we can use
+   gst_buffer_make_writable() to get a shared memory buffer or the orignal
+   buffer if the buffer's refcount is 1.
+2.  new feature is no added if caps has no feature during caps negotiation
+
+Upstream-Status: Submitted [https://bugzilla.gnome.org/show_bug.cgi?id=747495]
+
+Signed-off-by: Mingke Wang <mingke.wang@freescale.com>
+
+diff --git a/ext/pango/gstbasetextoverlay.c b/ext/pango/gstbasetextoverlay.c
+index c919861..3c0a1d7 100755
+--- a/ext/pango/gstbasetextoverlay.c
++++ b/ext/pango/gstbasetextoverlay.c
+@@ -747,6 +747,7 @@ gst_base_text_overlay_negotiate (GstBaseTextOverlay * overlay, GstCaps * caps)
+     if (f == NULL) {
+       f = gst_caps_features_new
+           (GST_CAPS_FEATURE_META_GST_VIDEO_OVERLAY_COMPOSITION, NULL);
++      gst_caps_set_features(overlay_caps, 0, f);
+     } else {
+       gst_caps_features_add (f,
+           GST_CAPS_FEATURE_META_GST_VIDEO_OVERLAY_COMPOSITION);
+@@ -1890,16 +1891,71 @@ gst_base_text_overlay_push_frame (GstBaseTextOverlay * overlay,
+   if (gst_pad_check_reconfigure (overlay->srcpad))
+     gst_base_text_overlay_negotiate (overlay, NULL);
+ 
+-  video_frame = gst_buffer_make_writable (video_frame);
+-
+   if (overlay->attach_compo_to_buffer) {
+     GST_DEBUG_OBJECT (overlay, "Attaching text overlay image to video buffer");
++    video_frame = gst_buffer_make_writable (video_frame);
+     gst_buffer_add_video_overlay_composition_meta (video_frame,
+         overlay->composition);
+     /* FIXME: emulate shaded background box if want_shading=true */
+     goto done;
+   }
+ 
++  gint m = gst_buffer_n_memory(video_frame);
++  gboolean mem_rdonly = FALSE;
++  GstMemory *mem;
++  GstBuffer *orig = video_frame;
++
++  while (--m>=0) {
++    mem = gst_buffer_get_memory(video_frame, m);
++    if (GST_MEMORY_IS_READONLY(mem)) {
++      mem_rdonly = TRUE;
++      gst_memory_unref (mem);
++      break;
++    }
++    gst_memory_unref (mem);
++  }
++
++  if (mem_rdonly) {
++    // since gst_buffer_make_writable just lookup the refcount to determine if
++    // a buffer is writable, and it will use _gst_buffer_copy() which don't
++    // perform a deep memory copy even if the flag of a memory is set to
++    // GST_MEMORY_FLAG_READONLY. So, we detect the memory flag and use
++    // gst_buffer_copy_region with GST_BUFFER_COPY_DEEP parameter to perform
++    // deep memory copy. if the allocator of a memory don't support mem_copy
++    // interface, the it will return NULL, if this case, we can use
++    // gst_buffer_make_writable() to get a shared memory buffer or the orignal
++    // buffer if the buffer's refcount is 1.
++    GstBuffer *new_buf = gst_buffer_copy_region (video_frame,
++        GST_BUFFER_COPY_ALL | GST_BUFFER_COPY_DEEP, 0, -1);
++
++    GST_DEBUG_OBJECT (overlay, "copy %s video frame buffer %p -> %p",
++        g_type_name (GST_MINI_OBJECT_TYPE (video_frame)), video_frame, new_buf);
++
++    if (!new_buf) {
++      //maybe the allocator don't support mem_copy interface, the we just use
++      //gst_buffer_make_writable() to get a writable buffer.
++      video_frame = gst_buffer_make_writable (video_frame);
++    } else {
++      gst_mini_object_unref (video_frame);
++      GST_BUFFER_FLAG_UNSET (new_buf, GST_BUFFER_FLAG_TAG_MEMORY);
++      video_frame = new_buf;
++    }
++
++    if (!video_frame) {
++      GST_WARNING_OBJECT (overlay, "make writable buffer failed");
++      return GST_FLOW_OK;
++    }
++
++    m = gst_buffer_n_memory(video_frame);
++    while (--m>=0) {
++      mem = gst_buffer_get_memory(video_frame, m);
++      GST_MEMORY_FLAG_UNSET (mem, GST_MEMORY_FLAG_READONLY);
++      gst_memory_unref (mem);
++    }
++  } else {
++    video_frame = gst_buffer_make_writable (video_frame);
++  }
++
+   if (!gst_video_frame_map (&frame, &overlay->info, video_frame,
+           GST_MAP_READWRITE))
+     goto invalid_frame;
+@@ -1918,6 +1974,18 @@ gst_base_text_overlay_push_frame (GstBaseTextOverlay * overlay,
+ 
+   gst_video_frame_unmap (&frame);
+ 
++  if (mem_rdonly && orig == video_frame) {
++    //if we used the original buffer and it's mem is set to read only,
++    //recover the memory ready only flag since we unset it before
++    // gst_video_frame_map ()
++    m = gst_buffer_n_memory(video_frame);
++    while (--m>=0) {
++      mem = gst_buffer_get_memory(video_frame, m);
++      GST_MEMORY_FLAGS(mem) |= (GST_MEMORY_FLAG_READONLY);
++      gst_memory_unref (mem);
++    }
++  }
++
+ done:
+ 
+   return gst_pad_push (overlay->srcpad, video_frame);
+-- 
+1.7.9.5
+

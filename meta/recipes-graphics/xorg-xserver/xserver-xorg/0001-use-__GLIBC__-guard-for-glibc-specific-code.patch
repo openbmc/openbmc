@@ -1,0 +1,31 @@
+From f242740f6488a25e6ca84968b0e2319a9a3975b4 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 6 Apr 2015 20:52:50 -0700
+Subject: [PATCH] use __GLIBC__ guard for glibc specific code
+
+Using __linux__ is a tad bit wrong assumption since
+linux != glibc
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ hw/xfree86/os-support/xf86_OSlib.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/xfree86/os-support/xf86_OSlib.h b/hw/xfree86/os-support/xf86_OSlib.h
+index eb0a338..c366ffc 100644
+--- a/hw/xfree86/os-support/xf86_OSlib.h
++++ b/hw/xfree86/os-support/xf86_OSlib.h
+@@ -178,7 +178,7 @@
+ #include <sys/types.h>
+ #include <assert.h>
+ 
+-#ifdef __linux__
++#ifdef __GLIBC__
+ #include <termio.h>
+ #else                           /* __GLIBC__ */
+ #include <termios.h>
+-- 
+2.1.4
+

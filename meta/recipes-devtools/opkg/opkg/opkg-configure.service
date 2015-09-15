@@ -1,0 +1,17 @@
+[Unit]
+Description=Opkg first boot configure
+DefaultDependencies=no
+After=systemd-remount-fs.service systemd-tmpfiles-setup.service tmp.mount
+Before=sysinit.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=-@SYSCONFDIR@/default/postinst
+ExecStart=-@BASE_BINDIR@/sh -c " if [ $POSTINST_LOGGING = '1' ]; then @BINDIR@/opkg configure > $LOGFILE 2>&1; else @BINDIR@/opkg configure; fi"
+ExecStartPost=@BASE_BINDIR@/systemctl disable opkg-configure.service
+StandardOutput=syslog
+RemainAfterExit=No
+
+[Install]
+WantedBy=basic.target
+WantedBy=sysinit.target

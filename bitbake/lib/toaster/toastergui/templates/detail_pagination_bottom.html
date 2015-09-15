@@ -1,0 +1,55 @@
+{% comment %}
+    Show pagination controls as per search/pagination table detail spec.
+    Input: objects, setup for pagination using the standard method in views.
+           object_count, count for complete list of objects, (all pages, no pattern)
+{% endcomment %}
+
+{# only paginate if 10 or more rows unfiltered, all pages #}
+{% if object_count >= 10 %}
+<div class="pagination">
+  <ul>
+{%if objects.has_previous %}
+    <li><a href="javascript:reload_params({'page':{{objects.previous_page_number}}})">&laquo;</a></li>
+{%else%}
+    <li class="disabled"><a href="#">&laquo;</a></li>
+{%endif%}
+{% for i in objects.page_range %}
+    <li{%if i == objects.number %} class="active" {%endif%}><a href="javascript:reload_params({'page':{{i}}})">{{i}}</a></li>
+{% endfor %}
+{%if objects.has_next%}
+    <li><a href="javascript:reload_params({'page':{{objects.next_page_number}}})">&raquo;</a></li>
+{%else%}
+    <li class="disabled"><a href="#">&raquo;</a></li>
+{%endif%}
+  </ul>
+
+  <div class="pull-right">
+    <span class="help-inline" style="padding-bottom:10px;">Show rows:</span>
+    <select class="pagesize">
+      {% with "10 25 50 100 150" as list%}
+        {% for i in list.split %}
+          <option value="{{i}}">{{i}}</option>
+        {% endfor %}
+      {% endwith %}
+    </select>
+  </div>
+</div>
+
+<!-- Update page display settings -->
+<script>
+ $(document).ready(function() {
+    // load data for number of entries to be displayed on page
+    if ({{request.GET.count}} != "") {
+      pagesize = {{request.GET.count}};
+    }
+    $('.pagesize option').prop('selected', false)
+                         .filter('[value="' + pagesize + '"]')
+                         .attr('selected', true);
+
+    $(".pagesize").change(function () {
+        reload_params({"count":$(this).val()});
+    });
+});
+</script>
+{% endif %}
+

@@ -1,0 +1,31 @@
+From b842e1de7798a1f7df770bb3f185ad3356e490e6 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Mon, 22 Jun 2015 20:06:56 -0700
+Subject: [PATCH] ext/ODBM_File/t/odbm.t: fix the  path of dbmt_common.pl
+
+It should be lib/dbmt_common.pl when run by run-ptest.
+
+Fixed:
+Can't locate ../../t/lib/dbmt_common.pl in @INC
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ ext/ODBM_File/t/odbm.t |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ext/ODBM_File/t/odbm.t b/ext/ODBM_File/t/odbm.t
+index 079b9f1..250b991 100644
+--- a/ext/ODBM_File/t/odbm.t
++++ b/ext/ODBM_File/t/odbm.t
+@@ -2,7 +2,7 @@
+ 
+ our $DBM_Class = 'ODBM_File';
+ 
+-require '../../t/lib/dbmt_common.pl';
++require 'lib/dbmt_common.pl';
+ 
+ if ($^O eq 'hpux') {
+     print <<EOM;
+-- 
+1.7.9.5
+

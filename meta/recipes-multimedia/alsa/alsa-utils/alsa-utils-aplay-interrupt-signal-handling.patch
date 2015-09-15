@@ -1,0 +1,48 @@
+Upstream-Status: Pending
+
+aplay/arecord (alsa-utils v1.0.28) cannot interrupt streaming
+via CTRL-C. Fixed the issue by reverting buggy patches and
+properly handling 'in_aborting' flag in appropriate functions.
+
+Signed-off-by: Anant Agrawal <Anant_Agrawal@mentor.com>
+Signed-off-by: Mikhail Durnev <mikhail_durnev@mentor.com>
+
+--- a/aplay/aplay.c	2014-05-19 16:25:14.000000000 +0530
++++ b/aplay/aplay.c	2014-05-20 15:17:14.364823007 +0530
+@@ -392,14 +392,22 @@
+ 		putchar('\n');
+ 	if (!quiet_mode)
+ 		fprintf(stderr, _("Aborted by signal %s...\n"), strsignal(sig));
+-	if (handle)
++	if (stream == SND_PCM_STREAM_CAPTURE) {
++		if (fmt_rec_table[file_type].end) {
++			fmt_rec_table[file_type].end(fd);
++			fd = -1;
++		}
++		stream = -1;
++	}
++	if (fd > 1) {
++		close(fd);
++		fd = -1;
++	}
++	if (handle && sig != SIGABRT) {
+ 		snd_pcm_abort(handle);
+-	if (sig == SIGABRT) {
+-		/* do not call snd_pcm_close() and abort immediately */
+ 		handle = NULL;
+-		prg_exit(EXIT_FAILURE);
+ 	}
+-	signal(sig, signal_handler);
++	prg_exit(EXIT_FAILURE);
+ }
+ 
+ /* call on SIGUSR1 signal. */
+@@ -2096,7 +2104,7 @@
+ 	ssize_t result = count, r;
+ 	size_t size;
+ 
+-	while (count > 0) {
++	while (count > 0 && !in_aborting) {
+ 		size = count;
+ 		if (size > chunk_bytes - buffer_pos)
+ 			size = chunk_bytes - buffer_pos;

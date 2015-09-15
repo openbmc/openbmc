@@ -1,0 +1,37 @@
+the original guess algorithm is broken for many archs
+for example, the following two would break:
+	arm-linux-gnueabi  --> sys=gnueabi
+	x86_64-unknown-pc-linux-gnu  --> sys = pc-linux-gnu
+
+use a simpler scheme here and hope it works for all the cases
+
+Upstream-Status: Pending
+
+7/30/2010 - created by Qing He <qing.he@intel.com>
+
+diff --git a/lib/configure b/lib/configure
+index 4318b05..84f6acb 100755
+--- a/lib/configure
++++ b/lib/configure
+@@ -53,20 +53,7 @@ cpu=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\1/'`
+ sys=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
+ echo " $host $rel $cpu $sys"
+ 
+-if [ "$host" = "linux--gnueabi" ]
+-then
+-	sys=linux
+-fi
+-
+-if [ "$host" = "linux--uclibc" ]
+-then
+-	sys=linux
+-fi
+-
+-if [ "$host" = "linux--uclibceabi" ]
+-then
+-	sys=linux
+-fi
++{ echo "$host" | grep linux; } && sys=linux
+ 
+ c=config.h
+ m=config.mk

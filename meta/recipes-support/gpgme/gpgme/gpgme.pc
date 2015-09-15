@@ -1,0 +1,10 @@
+prefix=/usr
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: gpgme
+Description: GNU Privacy Guard Made Easy
+Version: 1.4.3
+Requires:
+Libs: -L${libdir} -lgpgme -lassuan -lgpg-error
+Cflags: -I${includedir}

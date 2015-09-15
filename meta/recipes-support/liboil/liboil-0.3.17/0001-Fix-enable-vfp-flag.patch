@@ -1,0 +1,41 @@
+Upstream-Status: Inappropriate [configuration]
+
+From 1921498bcc06408e8b051a3a9e9ce4182998f748 Mon Sep 17 00:00:00 2001
+From: David Schleef <ds@schleef.org>
+Date: Fri, 8 Apr 2011 10:05:49 -0700
+Subject: [PATCH 10/10] Fix --enable-vfp flag
+
+Patch from Christophe Lyon, fixes #36084.
+---
+ configure.ac           |    4 ++--
+ liboil/arm/Makefile.am |    1 +
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 98c81fb..407d88c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -188,8 +188,8 @@ fi
+ AC_ARG_ENABLE(vfp,
+   AC_HELP_STRING([--enable-vfp],[compile with Vector Floating-point unit support]),
+   enable_vfp=$enableval,enable_vfp=yes)
+-if test "x$enable-vfp" = xyes -a x$HAVE_GCC_ASM = xyes -a x$HAVE_ARM = xyes; then
+-  AS_COMPILER_FLAG(["-Wa,-mfpu=vfp"],
++if test "x$enable_vfp" = xyes -a x$HAVE_GCC_ASM = xyes -a x$HAVE_ARM = xyes; then
++  AS_COMPILER_FLAG(["-mfpu=vfp"],
+     [VFP_CFLAGS="$VFP_CFLAGS -mfpu=vfp"],
+     true)
+   #AS_COMPILER_FLAG(["-Wa,-mfloat-abi=softfp"],
+diff --git a/liboil/arm/Makefile.am b/liboil/arm/Makefile.am
+index ead08ed..cd8d9fa 100644
+--- a/liboil/arm/Makefile.am
++++ b/liboil/arm/Makefile.am
+@@ -6,4 +6,5 @@ libarm_la_SOURCES = \
+ 	math_vfp_asm.S
+ 
+ libarm_la_CFLAGS = $(LIBOIL_CFLAGS) $(VFP_CFLAGS)
++libarm_la_CCASFLAGS = $(LIBOIL_CFLAGS) $(VFP_CFLAGS)
+ 
+-- 
+1.7.6
+

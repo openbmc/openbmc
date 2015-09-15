@@ -1,0 +1,71 @@
+tests/bench-slope.c: workaround ICE failure on mips with '-O -g'
+
+Hit a ICE and could reduce it to the following minimal example:
+
+1. Only the size of array assigned with 2 caused the issue:
+$ cat > mipgcc-test.c << END
+
+int main (int argc, char **argv)
+{
+        char *pStrArry[ARRAY_SIZE_MAX] = {"hello"};
+        int i = 0;
+
+        while(pStrArry[i] && i<ARRAY_SIZE_MAX)
+        {
+                printf("%s\n", pStrArry[i]);
+                i++;
+        }
+
+        return 0;
+}
+
+END
+
+2. Only -O1 and -g on mips caused the issue:
+$ mips-poky-linux-gcc -O1 -g -o mipgcc-test mipgcc-test.c
+mipgcc-test.c: In function 'main':
+mipgcc-test.c:18:1: internal compiler error: in dwarf2out_var_location, at dwarf2out.c:20810
+ }
+ ^
+Please submit a full bug report,
+with preprocessed source if appropriate.
+See <http://gcc.gnu.org/bugs.html> for instructions
+
+3. The quick workround is trying to enlarge the size of array with larger
+than 2.
+
+4. File a bug to GNU, but it could not be reproduced on there environment.
+http://gcc.gnu.org/bugzilla/show_bug.cgi?id=60643
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ tests/bench-slope.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/bench-slope.c b/tests/bench-slope.c
+index bd05064..28c2438 100644
+--- a/tests/bench-slope.c
++++ b/tests/bench-slope.c
+@@ -1197,7 +1197,7 @@ static struct bench_ops hash_ops = {
+ };
+ 
+ 
+-static struct bench_hash_mode hash_modes[] = {
++static struct bench_hash_mode hash_modes[3] = {
+   {"", &hash_ops},
+   {0},
+ };
+@@ -1349,7 +1349,7 @@ static struct bench_ops mac_ops = {
+ };
+ 
+ 
+-static struct bench_mac_mode mac_modes[] = {
++static struct bench_mac_mode mac_modes[3] = {
+   {"", &mac_ops},
+   {0},
+ };
+-- 
+1.8.1.2
+

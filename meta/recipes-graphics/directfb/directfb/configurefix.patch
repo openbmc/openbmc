@@ -1,0 +1,60 @@
+Libtool needs these set correctly else we end up with pointless rpaths
+such as the QA warnings:
+
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/bin/dfblayer contains probably-redundant RPATH /usr/libWARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/bin/dfbmaster contains probably-redundant RPATH /usr/libWARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/bin/mkdgifft contains probably-redundant RPATH /usr/libWARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/bin/dfbdump contains probably-redundant RPATH /usr/libWARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/bin/dfbinput contains probably-redundant RPATH /usr/libWARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/bin/dfbfx contains probably-redundant RPATH /usr/libWARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/bin/dfbscreen contains probably-redundant RPATH /usr/libWARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/bin/mkdgiff contains probably-redundant RPATH /usr/libWARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/bin/dfbinspector contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/bin/mkdfiff contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/bin/dfbinfo contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/bin/dfbpenmount contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/bin/dfbg contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/libfusion-1.4.so.6 contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/libdirectfb-1.4.so.6.0.9 contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/libdirectfb-1.4.so.6 contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/libfusion-1.4.so.6.0.9 contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/directfb-1.4-6/systems/libdirectfb_fbdev.so contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/directfb-1.4-6/systems/libdirectfb_devmem.so contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/directfb-1.4-6/systems/libdirectfb_dummy.so contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/directfb-1.4-6/interfaces/IDirectFBVideoProvider/libidirectfbvideoprovider_v4l.so contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/directfb-1.4-6/interfaces/IDirectFBVideoProvider/libidirectfbvideoprovider_gif.so contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/directfb-1.4-6/interfaces/ICoreResourceManager/libicoreresourcemanager_test.so contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/directfb-1.4-6/interfaces/IDirectFBImageProvider/libidirectfbimageprovider_jpeg.so contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/directfb-1.4-6/interfaces/IDirectFBImageProvider/libidirectfbimageprovider_png.so contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/directfb-1.4-6/interfaces/IDirectFBImageProvider/libidirectfbimageprovider_dfiff.so contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/directfb-1.4-6/interfaces/IDirectFBImageProvider/libidirectfbimageprovider_gif.so contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/directfb-1.4-6/interfaces/IDirectFBFont/libidirectfbfont_ft2.so contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/directfb-1.4-6/interfaces/IDirectFBFont/libidirectfbfont_dgiff.so contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/directfb-1.4-6/wm/libdirectfbwm_default.so contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/directfb-1.4-6/inputdrivers/libdirectfb_zytronic.so contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/directfb-1.4-6/inputdrivers/libdirectfb_penmount.so contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/directfb-1.4-6/inputdrivers/libdirectfb_linux_input.so contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/directfb-1.4-6/inputdrivers/libdirectfb_serialmouse.so contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/directfb-1.4-6/inputdrivers/libdirectfb_mutouch.so contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/directfb-1.4-6/inputdrivers/libdirectfb_tslib.so contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/directfb-1.4-6/inputdrivers/libdirectfb_joystick.so contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/directfb-1.4-6/inputdrivers/libdirectfb_sonypi.so contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/directfb-1.4-6/inputdrivers/libdirectfb_lirc.so contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/directfb-1.4-6/inputdrivers/libdirectfb_wm97xx_ts.so contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/directfb-1.4-6/inputdrivers/libdirectfb_ps2mouse.so contains probably-redundant RPATH /usr/lib
+WARNING: QA Issue: directfb: /work/i586-poky-linux/directfb-1.4.15-r1/packages-split/directfb/usr/lib/directfb-1.4-6/inputdrivers/libdirectfb_keyboard.so contains probably-redundant RPATH /usr/lib
+
+Upstream-Status: Pending
+
+RP 2012/03/16
+
+Index: DirectFB-1.4.15/configure.in
+===================================================================
+--- DirectFB-1.4.15.orig/configure.in	2012-03-16 13:32:23.692402879 +0000
++++ DirectFB-1.4.15/configure.in	2012-03-16 13:33:22.312400960 +0000
+@@ -97,13 +97,6 @@
+ AC_CHECK_SIZEOF(long long)
+ AC_CHECK_FUNCS(fork)
+ 
+-
+-## Work around libstuhl during cross build...
+-if test "$host" != "$build"; then
+-  sys_lib_dlsearch_path_spec=""
+-  sys_lib_search_path_spec=""
+-fi
+-
+ AC_PATH_PROGS(PERL, perl5 perl)
+ 
+ AC_PATH_PROG(MAN2HTML, man2html, no)

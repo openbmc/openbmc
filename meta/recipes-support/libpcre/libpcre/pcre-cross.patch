@@ -1,0 +1,48 @@
+Upstream-Status: Pending
+
+--- pcre-8.32.orig/Makefile.am
++++ pcre-8.32/Makefile.am
+@@ -197,8 +197,18 @@ bin_SCRIPTS = pcre-config
+ 
++CC_FOR_BUILD = @CC_FOR_BUILD@
++CFLAGS_FOR_BUILD = @CFLAGS_FOR_BUILD@
++CCLD_FOR_BUILD = @CCLD_FOR_BUILD@
++LDFLAGS_FOR_BUILD = @LDFLAGS_FOR_BUILD@
++
+ if WITH_REBUILD_CHARTABLES
+ 
+ noinst_PROGRAMS += dftables
+ dftables_SOURCES = dftables.c
++dftables_LINK = $(CCLD_FOR_BUILD) -o $@
++dftables_LDFLAGS = $(LDFLAGS_FOR_BUILD)
++
++dftables.o: $(srcdir)/dftables.c
++	$(CC_FOR_BUILD) -c $(CFLAGS_FOR_BUILD) -o $@ $(srcdir)/dftables.c
+ 
+ pcre_chartables.c: dftables$(EXEEXT)
+ 	./dftables$(EXEEXT) $@
+--- pcre-8.32.orig/configure.ac
++++ pcre-8.32/configure.ac
+@@ -72,6 +72,22 @@ then
+   fi
+ fi
+ 
++if test x"$cross_compiling" = xyes; then
++    CC_FOR_BUILD="${CC_FOR_BUILD-gcc}"
++    CCLD_FOR_BUILD="${CCLD_FOR_BUILD-gcc}"
++    CFLAGS_FOR_BUILD="${CFLAGS_FOR_BUILD}"
++    LDFLAGS_FOR_BUILD="${LDFLAGS_FOR_BUILD}"
++else
++    CC_FOR_BUILD="${CC_FOR_BUILD-\$(CC)}"
++    CCLD_FOR_BUILD="${CCLD_FOR_BUILD-\$(CCLD)}"
++    CFLAGS_FOR_BUILD="${CFLAGS_FOR_BUILD-\$(CFLAGS)}"
++    LDFLAGS_FOR_BUILD="${LDFLAGS_FOR_BUILD-\$(LDFLAGS)}"
++fi
++AC_ARG_VAR(CC_FOR_BUILD, [build system C compiler])
++AC_ARG_VAR(CCLD_FOR_BUILD, [build system C linker frontend])
++AC_ARG_VAR(CFLAGS_FOR_BUILD, [build system C compiler arguments])
++AC_ARG_VAR(LDFLAGS_FOR_BUILD, [build system C linker frontend arguments])
++
+ # AC_PROG_CXX will return "g++" even if no c++ compiler is installed.
+ # Check for that case, and just disable c++ code if g++ doesn't run.
+ AC_LANG_PUSH(C++)

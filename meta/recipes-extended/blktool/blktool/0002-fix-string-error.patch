@@ -1,0 +1,31 @@
+From ddb1071da2c78d8155aab62e9f0d46f69500200f Mon Sep 17 00:00:00 2001
+From: Azat Khuzhin <a3at.mail@gmail.com>
+Date: Wed, 8 Jul 2015 01:42:24 +0300
+Subject: [PATCH 2/3] fix string error
+
+This patch is taken from
+ftp://ftp.debian.org/debian/pool/main/b/blktool/blktool_4-7.debian.tar.xz
+
+Upstream-Status: Inappropriate [upstream is dead]
+Signed-off-by: Alexander Kanavin <alexander.kanavin@linux.intel.com>
+
+---
+ util.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/util.c b/util.c
+index 1f3a9ca..2ccf56a 100644
+--- a/util.c
++++ b/util.c
+@@ -28,7 +28,7 @@ void pdie(const char *msg, int perr)
+ 	if (perr)
+ 		perror(msg);
+ 	else
+-		fprintf(stderr, msg);
++		fprintf(stderr, "%s", msg);
+ 	if (blkdev >= 0)
+ 		close(blkdev);
+ 	exit(1);
+-- 
+2.1.4
+

@@ -1,0 +1,194 @@
+[GENERAL]
+VERBOSE_LEVEL:   1
+ARCHITECTURE:    targetarch
+USE_INTERNET:    1
+STD_VERSION:     LSB 4.1
+STD_PROFILE:     no
+[cmdchk]
+RUN: 1
+VERSION: local|*
+
+[libchk]
+RUN: 1
+VERSION: local|*
+
+[alsa-t2c]
+RUN: 1
+VERSION: local|*
+
+[alsa-t2c|local|*]
+AUTOREPLY_TESTSUITE_DIR: /opt/lsb/test/alsa-t2c
+AUTOREPLY_RESULTS_DIR: /opt/lsb/test/alsa-t2c/results
+
+[core]
+RUN: 1
+VERSION: local|*
+
+[core|local|*]
+AUTOREPLY_PROVIDES_BASH: n
+AUTOREPLY_TESTRUN_PATH: /home/tet/test_sets
+AUTOREPLY_PERSON: Automated
+AUTOREPLY_KERNEL_NAME: vmlinuz
+AUTOREPLY_INSTALL_LSBPAM_CONF: y
+AUTOREPLY_PROVIDES_C_SHELL: n
+AUTOREPLY_ORGANISATION: N/A
+AUTOREPLY_SET_PASS_MIN_DAYS: y
+AUTOREPLY_PROVIDES_SYSV_INIT: 
+AUTOREPLY_ISNTALL_DEVS: y
+AUTOREPLY_SUPPORTS_FILE_CMD: y
+AUTOREPLY_TEST_SYSTEM: Distribution Checker
+AUTOREPLY_TESTSUITE_DIR: /opt/lsb/test/core/tet/test_sets
+AUTOREPLY_SUPPORTS_NLS: n
+AUTOREPLY_SUPPORTS_PROCESS_ACCOUNTING: n
+AUTOREPLY_PATH_TO_RC.D: 
+AUTOREPLY_ALLOWS_MAKEDEV: n
+AUTOREPLY_RESULTS_DIR: /opt/lsb/test/core/tet/test_sets/results
+
+[core-t2c]
+RUN: 1
+VERSION: local|*
+
+[core-t2c|local|*]
+AUTOREPLY_TESTSUITE_DIR: /opt/lsb/test/core-t2c
+AUTOREPLY_RESULTS_DIR: /opt/lsb/test/core-t2c/results
+
+[cpp-t2c]
+RUN: 1
+VERSION: local|*
+
+[cpp-t2c|local|*]
+AUTOREPLY_TESTSUITE_DIR: /opt/lsb/test/cpp-t2c
+AUTOREPLY_RESULTS_DIR: /opt/lsb/test/cpp-t2c/results
+
+[desktop]
+RUN: 1
+VERSION: local|*
+
+[desktop|local|*]
+AUTOREPLY_DESKTOP_ENVIRONMENT: [default]
+AUTOREPLY_PERSON: Automated
+AUTOREPLY_X_CLIENT_HOSTNAME: 
+AUTOREPLY_TEST_SYSTEM: Distribution Checker
+AUTOREPLY_TESTSUITE_DIR: /opt/lsb/test/desktop
+AUTOREPLY_X11_FONT_PATH: [default]
+AUTOREPLY_SHOW_SUMMARY_REPORT: 
+AUTOREPLY_ORGANISATION: N/A
+AUTOREPLY_XVFB_DISPLAY: [default]
+
+[desktop-t2c]
+RUN: 1
+VERSION: local|*
+
+[desktop-t2c|local|*]
+AUTOREPLY_TESTSUITE_DIR: /opt/lsb/test/desktop-t2c
+AUTOREPLY_RESULTS_DIR: /opt/lsb/test/desktop-t2c/results
+
+[libstdcpp]
+RUN: 1
+VERSION: local|*
+
+[libstdcpp|local|*]
+AUTOREPLY_TEST_SYSTEM: Distribution Checker
+AUTOREPLY_PERSON: Automated
+AUTOREPLY_TESTSUITE_DIR: /opt/lsb/test/libstdcpp_4.1.0
+AUTOREPLY_ORGANISATION: N/A
+AUTOREPLY_GNU_TRIPLET: 
+
+[olver]
+RUN: 1
+VERSION: local|*
+
+[olver|local|*]
+AUTOREPLY_TESTSUITE_DIR: /opt/lsb/test/olver-core
+AUTOREPLY_RESULTS_DIR: /var/opt/lsb/test/olver-core
+
+[perl]
+RUN: 1
+VERSION: local|*
+
+[perl|local|*]
+AUTOREPLY_TESTSUITE_DIR: /opt/lsb/test/perl
+AUTOREPLY_RESULTS_DIR: /opt/lsb/test/perl/results
+
+[printing]
+RUN: 1
+VERSION: local|*
+
+[printing|local|*]
+AUTOREPLY_TESTSUITE_DIR: /opt/lsb/test/printing
+AUTOREPLY_RESULTS_DIR: /opt/lsb/test/printing/results
+
+[python]
+RUN: 1
+VERSION: local|*
+
+[python|local|*]
+AUTOREPLY_TESTSUITE_DIR: /opt/lsb/test/python
+AUTOREPLY_RESULTS_DIR: /opt/lsb/test/python/results
+
+[qt3-azov]
+RUN: 1
+VERSION: local|*
+
+[qt3-azov|local|*]
+AUTOREPLY_TESTSUITE_DIR: /opt/lsb/test/qt3-azov
+AUTOREPLY_X11_FONT_PATH: [default]
+AUTOREPLY_RESULTS_DIR: /opt/lsb/test/qt3-azov/results
+
+[qt4-azov]
+RUN: 1
+VERSION: local|*
+
+[qt4-azov|local|*]
+AUTOREPLY_TESTSUITE_DIR: /opt/lsb/test/qt4-azov
+AUTOREPLY_X11_FONT_PATH: [default]
+AUTOREPLY_RESULTS_DIR: /opt/lsb/test/qt4-azov/results
+
+[xml2-azov]
+RUN: 1
+VERSION: local|*
+
+[xts5]
+RUN: 1
+VERSION: local|*
+
+[xts5|local|*]
+AUTOREPLY_XT_FONTPATH_GOOD: [default]
+AUTOREPLY_TESTSUITE_DIR: /opt/lsb/test/xts5
+AUTOREPLY_XVFB_DISPLAY: [default]
+AUTOREPLY_RESULTS_DIR: /opt/lsb/test/xts5/xts5/results
+AUTOREPLY_XT_FONTPATH: [default]
+AUTOREPLY_X_CLIENT_HOSTNAME: 
+
+[apache]
+RUN: 1
+VERSION: local|*
+
+[expect]
+RUN: 1
+VERSION: local|*
+
+[groff]
+RUN: 1
+VERSION: local|*
+
+[raptor]
+RUN: 1
+VERSION: local|*
+
+[rsync]
+RUN: 1
+VERSION: local|*
+
+[samba]
+RUN: 1
+VERSION: local|*
+
+[tcl]
+RUN: 1
+VERSION: local|*
+
+[xpdf]
+RUN: 1
+VERSION: local|*
+

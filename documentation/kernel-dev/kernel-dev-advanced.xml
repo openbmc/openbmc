@@ -1,0 +1,1088 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
+[<!ENTITY % poky SYSTEM "../poky.ent"> %poky; ] >
+
+<chapter id='kernel-dev-advanced'>
+<title>Working with Advanced Metadata</title>
+
+<section id='kernel-dev-advanced-overview'>
+    <title>Overview</title>
+
+    <para>
+        In addition to supporting configuration fragments and patches, the
+        Yocto Project kernel tools also support rich
+        <ulink url='&YOCTO_DOCS_DEV_URL;#metadata'>Metadata</ulink> that you can
+        use to define complex policies and Board Support Package (BSP) support.
+        The purpose of the Metadata and the tools that manage it, known as
+        the kern-tools (<filename>kern-tools-native_git.bb</filename>), is
+        to help you manage the complexity of the configuration and sources
+        used to support multiple BSPs and Linux kernel types.
+    </para>
+</section>
+
+<section id='using-kernel-metadata-in-a-recipe'>
+    <title>Using Kernel Metadata in a Recipe</title>
+
+    <para>
+        The kernel sources in the Yocto Project contain kernel Metadata, which
+        is located in the <filename>meta</filename> branches of the kernel
+        source Git repositories.
+        This Metadata defines Board Support Packages (BSPs) that
+        correspond to definitions in linux-yocto recipes for the same BSPs.
+        A BSP consists of an aggregation of kernel policy and hardware-specific
+        feature enablements.
+        The BSP can be influenced from within the linux-yocto recipe.
+        <note>
+            Linux kernel source that contains kernel Metadata is said to be
+            "linux-yocto style" kernel source.
+            A Linux kernel recipe that inherits from the
+            <filename>linux-yocto.inc</filename> include file is said to be a
+            "linux-yocto style" recipe.
+        </note>
+    </para>
+
+    <para>
+        Every linux-yocto style recipe must define the
+        <ulink url='&YOCTO_DOCS_REF_URL;#var-KMACHINE'><filename>KMACHINE</filename></ulink>
+        variable.
+        This variable is typically set to the same value as the
+        <ulink url='&YOCTO_DOCS_REF_URL;#var-MACHINE'><filename>MACHINE</filename></ulink>
+        variable, which is used by
+        <ulink url='&YOCTO_DOCS_DEV_URL;#bitbake-term'>BitBake</ulink>.
+        However, in some cases, the variable might instead refer to the
+        underlying platform of the <filename>MACHINE</filename>.
+    </para>
+
+    <para>
+        Multiple BSPs can reuse the same <filename>KMACHINE</filename>
+        name if they are built using the same BSP description.
+        The "ep108-zynqmp" and "qemuzynqmp" BSP combination
+        in the <filename>meta-xilinx</filename>
+        layer is a good example of two BSPs using the same
+        <filename>KMACHINE</filename> value (i.e. "zynqmp").
+        See the <link linkend='bsp-descriptions'>BSP Descriptions</link> section
+        for more information.
+    </para>
+
+    <para>
+        Every linux-yocto style recipe must also indicate the Linux kernel
+        source repository branch used to build the Linux kernel.
+        The <ulink url='&YOCTO_DOCS_REF_URL;#var-KBRANCH'><filename>KBRANCH</filename></ulink>
+        variable must be set to indicate the branch.
+        <note>
+            You can use the <filename>KBRANCH</filename> value to define an
+            alternate branch typically with a machine override as shown here
+            from the <filename>meta-emenlow</filename> layer:
+            <literallayout class='monospaced'>
+     KBRANCH_emenlow-noemgd = "standard/base"
+            </literallayout>
+        </note>
+    </para>
+
+    <para>
+        The linux-yocto style recipes can optionally define the following
+        variables:
+        <literallayout class='monospaced'>
+     <ulink url='&YOCTO_DOCS_REF_URL;#var-KERNEL_FEATURES'>KERNEL_FEATURES</ulink>
+     <ulink url='&YOCTO_DOCS_REF_URL;#var-LINUX_KERNEL_TYPE'>LINUX_KERNEL_TYPE</ulink>
+        </literallayout>
+    </para>
+
+    <para>
+        <filename>LINUX_KERNEL_TYPE</filename> defines the kernel type to be
+        used in assembling the configuration.
+        If you do not specify a <filename>LINUX_KERNEL_TYPE</filename>,
+        it defaults to "standard".
+        Together with
+        <ulink url='&YOCTO_DOCS_REF_URL;#var-KMACHINE'><filename>KMACHINE</filename></ulink>,
+        <filename>LINUX_KERNEL_TYPE</filename> defines the search
+        arguments used by the kernel tools to find the
+        appropriate description within the kernel Metadata with which to
+        build out the sources and configuration.
+        The linux-yocto recipes define "standard", "tiny", and "preempt-rt"
+        kernel types.
+        See the "<link linkend='kernel-types'>Kernel Types</link>" section
+        for more information on kernel types.
+    </para>
+
+    <para>
+        During the build, the kern-tools search for the BSP description
+        file that most closely matches the <filename>KMACHINE</filename>
+        and <filename>LINUX_KERNEL_TYPE</filename> variables passed in from the
+        recipe.
+        The tools use the first BSP description it finds that match
+        both variables.
+        If the tools cannot find a match, they issue a warning such as
+        the following:
+        <literallayout class='monospaced'>
+     WARNING: Can't find any BSP hardware or required configuration fragments.
+     WARNING: Looked at meta/cfg/broken/emenlow-broken/hdw_frags.txt and
+              meta/cfg/broken/emenlow-broken/required_frags.txt in directory:
+              meta/cfg/broken/emenlow-broken
+        </literallayout>
+        In this example, <filename>KMACHINE</filename> was set to "emenlow-broken"
+        and <filename>LINUX_KERNEL_TYPE</filename> was set to "broken".
+    </para>
+
+    <para>
+        The tools first search for the <filename>KMACHINE</filename> and
+        then for the <filename>LINUX_KERNEL_TYPE</filename>.
+        If the tools cannot find a partial match, they will use the
+        sources from the <filename>KBRANCH</filename> and any configuration
+        specified in the
+        <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>.
+    </para>
+
+    <para>
+        You can use the <filename>KERNEL_FEATURES</filename> variable
+        to include features (configuration fragments, patches, or both) that
+        are not already included by the <filename>KMACHINE</filename> and
+        <filename>LINUX_KERNEL_TYPE</filename> variable combination.
+        For example, to include a feature specified as
+        "features/netfilter/netfilter.scc",
+        specify:
+        <literallayout class='monospaced'>
+     KERNEL_FEATURES += "features/netfilter/netfilter.scc"
+        </literallayout>
+        To include a feature called "cfg/sound.scc" just for the
+        <filename>qemux86</filename> machine, specify:
+        <literallayout class='monospaced'>
+     KERNEL_FEATURES_append_qemux86 = " cfg/sound.scc"
+        </literallayout>
+        The value of the entries in <filename>KERNEL_FEATURES</filename>
+        are dependent on their location within the kernel Metadata itself.
+        The examples here are taken from the <filename>meta</filename>
+        branch of the <filename>linux-yocto-3.19</filename> repository.
+        Within that branch, "features" and "cfg" are subdirectories of the
+        <filename>meta/cfg/kernel-cache</filename> directory.
+        For more information, see the
+        "<link linkend='kernel-metadata-syntax'>Kernel Metadata Syntax</link>" section.
+        <note>
+            The processing of the these variables has evolved some between the
+	        0.9 and 1.3 releases of the Yocto Project and associated
+	        kern-tools sources.
+            The descriptions in this section are accurate for 1.3 and later
+	        releases of the Yocto Project.
+        </note>
+    </para>
+</section>
+
+<section id='kernel-metadata-location'>
+    <title>Kernel Metadata Location</title>
+
+    <para>
+        Kernel Metadata can be defined in either the kernel recipe
+        (recipe-space) or in the kernel tree (in-tree).
+        Where you choose to define the Metadata depends on what you want
+        to do and how you intend to work.
+        Regardless of where you define the kernel Metadata, the syntax used
+        applies equally.
+    </para>
+
+    <para>
+        If you are unfamiliar with the Linux kernel and only wish
+        to apply a configuration and possibly a couple of patches provided to
+        you by others, the recipe-space method is recommended.
+        This method is also a good approach if you are working with Linux kernel
+        sources you do not control or if you just do not want to maintain a
+        Linux kernel Git repository on your own.
+        For partial information on how you can define kernel Metadata in
+        the recipe-space, see the
+        "<link linkend='modifying-an-existing-recipe'>Modifying an Existing Recipe</link>"
+        section.
+    </para>
+
+    <para>
+        Conversely, if you are actively developing a kernel and are already
+        maintaining a Linux kernel Git repository of your own, you might find
+        it more convenient to work with the kernel Metadata in the same
+        repository as the Linux kernel sources.
+        This method can make iterative development of the Linux kernel
+        more efficient outside of the BitBake environment.
+    </para>
+
+    <section id='recipe-space-metadata'>
+        <title>Recipe-Space Metadata</title>
+
+        <para>
+            When stored in recipe-space, the kernel Metadata files reside in a
+            directory hierarchy below
+            <ulink url='&YOCTO_DOCS_REF_URL;#var-FILESEXTRAPATHS'><filename>FILESEXTRAPATHS</filename></ulink>.
+            For a linux-yocto recipe or for a Linux kernel recipe derived
+            by copying and modifying
+            <filename>oe-core/meta-skeleton/recipes-kernel/linux/linux-yocto-custom.bb</filename>
+            to a recipe in your layer, <filename>FILESEXTRAPATHS</filename>
+            is typically set to
+            <filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-THISDIR'><filename>THISDIR</filename></ulink><filename>}/${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-PN'><filename>PN</filename></ulink><filename>}</filename>.
+            See the "<link linkend='modifying-an-existing-recipe'>Modifying an Existing Recipe</link>"
+            section for more information.
+        </para>
+
+        <para>
+            Here is an example that shows a trivial tree of kernel Metadata
+            stored in recipe-space within a BSP layer:
+            <literallayout class='monospaced'>
+     meta-<replaceable>my_bsp_layer</replaceable>/
+     `-- recipes-kernel
+         `-- linux
+             `-- linux-yocto
+                 |-- bsp-standard.scc
+                 |-- bsp.cfg
+                 `-- standard.cfg
+            </literallayout>
+        </para>
+
+        <para>
+            When the Metadata is stored in recipe-space, you must take
+            steps to ensure BitBake has the necessary information to decide
+            what files to fetch and when they need to be fetched again.
+            It is only necessary to specify the <filename>.scc</filename>
+            files on the
+            <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>.
+            BitBake parses them and fetches any files referenced in the
+            <filename>.scc</filename> files by the <filename>include</filename>,
+            <filename>patch</filename>, or <filename>kconf</filename> commands.
+            Because of this, it is necessary to bump the recipe
+            <ulink url='&YOCTO_DOCS_REF_URL;#var-PR'><filename>PR</filename></ulink>
+            value when changing the content of files not explicitly listed
+            in the <filename>SRC_URI</filename>.
+        </para>
+    </section>
+
+    <section id='in-tree-metadata'>
+        <title>In-Tree Metadata</title>
+
+        <para>
+            When stored in-tree, the kernel Metadata files reside in the
+            <filename>meta</filename> directory of the Linux kernel sources.
+            The <filename>meta</filename> directory can be present in the
+            same repository branch as the sources,
+            such as "master", or <filename>meta</filename> can be its own
+            orphan branch.
+            <note>
+                An orphan branch in Git is a branch with unique history and
+                content to the other branches in the repository.
+                Orphan branches are useful to track Metadata changes
+                independently from the sources of the Linux kernel, while
+                still keeping them together in the same repository.
+            </note>
+            For the purposes of this document, we will discuss all
+            in-tree Metadata as residing below the
+            <filename>meta/cfg/kernel-cache</filename> directory.
+        </para>
+
+        <para>
+            Following is an example that shows how a trivial tree of Metadata
+            is stored in a custom Linux kernel Git repository:
+            <literallayout class='monospaced'>
+     meta/
+     `-- cfg
+         `-- kernel-cache
+             |-- bsp-standard.scc
+             |-- bsp.cfg
+             `-- standard.cfg
+            </literallayout>
+        </para>
+
+        <para>
+            To use a branch different from where the sources reside,
+            specify the branch in the <filename>KMETA</filename> variable
+            in your Linux kernel recipe.
+            Here is an example:
+            <literallayout class='monospaced'>
+     KMETA = "meta"
+            </literallayout>
+            To use the same branch as the sources, set
+            <filename>KMETA</filename> to an empty string:
+            <literallayout class='monospaced'>
+     KMETA = ""
+            </literallayout>
+            If you are working with your own sources and want to create an
+            orphan <filename>meta</filename> branch, use these commands
+            from within your Linux kernel Git repository:
+            <literallayout class='monospaced'>
+     $ git checkout --orphan meta
+     $ git rm -rf .
+     $ git commit --allow-empty -m "Create orphan meta branch"
+            </literallayout>
+        </para>
+
+        <para>
+            If you modify the Metadata in the linux-yocto
+            <filename>meta</filename> branch, you must not forget to update
+            the
+            <ulink url='&YOCTO_DOCS_REF_URL;#var-SRCREV'><filename>SRCREV</filename></ulink>
+            statements in the kernel's recipe.
+            In particular, you need to update the
+            <filename>SRCREV_meta</filename> variable to match the commit in
+            the <filename>KMETA</filename> branch you wish to use.
+            Changing the data in these branches and not updating the
+            <filename>SRCREV</filename> statements to match will cause the
+            build to fetch an older commit.
+        </para>
+    </section>
+</section>
+
+<section id='kernel-metadata-syntax'>
+    <title>Kernel Metadata Syntax</title>
+
+    <para>
+        The kernel Metadata consists of three primary types of files:
+        <filename>scc</filename>
+        <footnote>
+            <para>
+                <filename>scc</filename> stands for Series Configuration
+                Control, but the naming has less significance in the
+                current implementation of the tooling than it had in the
+                past.
+                Consider <filename>scc</filename> files to be description files.
+            </para>
+        </footnote>
+        description files, configuration fragments, and patches.
+        The <filename>scc</filename> files define variables and include or
+        otherwise reference any of the three file types.
+        The description files are used to aggregate all types of kernel
+        Metadata into
+        what ultimately describes the sources and the configuration required
+        to build a Linux kernel tailored to a specific machine.
+    </para>
+
+    <para>
+        The <filename>scc</filename> description files are used to define two
+        fundamental types of kernel Metadata:
+        <itemizedlist>
+            <listitem><para>Features</para></listitem>
+            <listitem><para>Board Support Packages (BSPs)</para></listitem>
+        </itemizedlist>
+    </para>
+
+    <para>
+        Features aggregate sources in the form of patches and configuration
+        fragments into a modular reusable unit.
+        You can use features to implement conceptually separate kernel
+        Metadata descriptions such as pure configuration fragments,
+        simple patches, complex features, and kernel types.
+        <link linkend='kernel-types'>Kernel types</link> define general
+        kernel features and policy to be reused in the BSPs.
+    </para>
+
+    <para>
+        BSPs define hardware-specific features and aggregate them with kernel
+        types to form the final description of what will be assembled and built.
+    </para>
+
+    <para>
+        While the kernel Metadata syntax does not enforce any logical
+        separation of configuration fragments, patches, features or kernel
+        types, best practices dictate a logical separation of these types
+        of Metadata.
+        The following Metadata file hierarchy is recommended:
+        <literallayout class='monospaced'>
+     <replaceable>base</replaceable>/
+        bsp/
+        cfg/
+        features/
+        ktypes/
+        patches/
+        </literallayout>
+    </para>
+
+    <para>
+        The <filename>bsp</filename> directory contains the
+        <link linkend='bsp-descriptions'>BSP descriptions</link>.
+        The remaining directories all contain "features".
+        Separating <filename>bsp</filename> from the rest of the structure
+        aids conceptualizing intended usage.
+    </para>
+
+    <para>
+        Use these guidelines to help place your <filename>scc</filename>
+        description files within the structure:
+        <itemizedlist>
+            <listitem><para>If your file contains
+                only configuration fragments, place the file in the
+                <filename>cfg</filename> directory.</para></listitem>
+            <listitem><para>If your file contains
+                only source-code fixes, place the file in the
+                <filename>patches</filename> directory.</para></listitem>
+            <listitem><para>If your file encapsulates
+                a major feature, often combining sources and configurations,
+                place the file in <filename>features</filename> directory.
+                </para></listitem>
+            <listitem><para>If your file aggregates
+                non-hardware configuration and patches in order to define a
+                base kernel policy or major kernel type to be reused across
+                multiple BSPs, place the file in <filename>ktypes</filename>
+                directory.
+                </para></listitem>
+        </itemizedlist>
+    </para>
+
+    <para>
+        These distinctions can easily become blurred - especially as
+        out-of-tree features slowly merge upstream over time.
+        Also, remember that how the description files are placed is
+        a purely logical organization and has no impact on the functionality
+        of the kernel Metadata.
+        There is no impact because all of <filename>cfg</filename>,
+        <filename>features</filename>, <filename>patches</filename>, and
+        <filename>ktypes</filename>, contain "features" as far as the kernel
+        tools are concerned.
+    </para>
+
+    <para>
+        Paths used in kernel Metadata files are relative to
+        <filename>&lt;base&gt;</filename>, which is either
+        <ulink url='&YOCTO_DOCS_REF_URL;#var-FILESEXTRAPATHS'><filename>FILESEXTRAPATHS</filename></ulink>
+        if you are creating Metadata in
+        <link linkend='recipe-space-metadata'>recipe-space</link>,
+        or <filename>meta/cfg/kernel-cache/</filename> if you are creating
+        Metadata <link linkend='in-tree-metadata'>in-tree</link>.
+    </para>
+
+    <section id='configuration'>
+        <title>Configuration</title>
+
+        <para>
+            The simplest unit of kernel Metadata is the configuration-only
+            feature.
+            This feature consists of one or more Linux kernel configuration
+            parameters in a configuration fragment file
+            (<filename>.cfg</filename>) and a <filename>.scc</filename> file
+            that describes the fragment.
+        </para>
+
+        <para>
+            The Symmetric Multi-Processing (SMP) fragment included in the
+            <filename>linux-yocto-3.19</filename> Git repository
+            consists of the following two files:
+            <literallayout class='monospaced'>
+     cfg/smp.scc:
+        define KFEATURE_DESCRIPTION "Enable SMP"
+        define KFEATURE_COMPATIBILITY all
+
+        kconf hardware smp.cfg
+
+     cfg/smp.cfg:
+        CONFIG_SMP=y
+        CONFIG_SCHED_SMT=y
+        # Increase default NR_CPUS from 8 to 64 so that platform with
+        # more than 8 processors can be all activated at boot time
+        CONFIG_NR_CPUS=64
+            </literallayout>
+            You can find information on configuration fragment files in the
+            "<ulink url='&YOCTO_DOCS_DEV_URL;#creating-config-fragments'>Creating Configuration Fragments</ulink>"
+            section of the Yocto Project Development Manual and in
+            the "<link linkend='generating-configuration-files'>Generating Configuration Files</link>"
+            section earlier in this manual.
+        </para>
+
+        <para>
+            <ulink url='&YOCTO_DOCS_REF_URL;#var-KFEATURE_DESCRIPTION'><filename>KFEATURE_DESCRIPTION</filename></ulink>
+            provides a short description of the fragment.
+            Higher level kernel tools use this description.
+        </para>
+
+        <para>
+            The <filename>kconf</filename> command is used to include the
+            actual configuration fragment in an <filename>.scc</filename>
+            file, and the "hardware" keyword identifies the fragment as
+            being hardware enabling, as opposed to general policy,
+            which would use the "non-hardware" keyword.
+            The distinction is made for the benefit of the configuration
+            validation tools, which warn you if a hardware fragment
+            overrides a policy set by a non-hardware fragment.
+            <note>
+                The description file can include multiple
+                <filename>kconf</filename> statements, one per fragment.
+            </note>
+        </para>
+
+        <para>
+            As described in the
+            "<link linkend='generating-configuration-files'>Generating Configuration Files</link>"
+            section, you can use the following BitBake command to audit your
+            configuration:
+            <literallayout class='monospaced'>
+     $ bitbake linux-yocto -c kernel_configcheck -f
+            </literallayout>
+        </para>
+    </section>
+
+    <section id='patches'>
+        <title>Patches</title>
+
+        <para>
+            Patch descriptions are very similar to configuration fragment
+            descriptions, which are described in the previous section.
+            However, instead of a <filename>.cfg</filename> file, these
+            descriptions work with source patches.
+        </para>
+
+        <para>
+            A typical patch includes a description file and the patch itself:
+            <literallayout class='monospaced'>
+     patches/mypatch.scc:
+        patch mypatch.patch
+
+     patches/mypatch.patch:
+        <replaceable>typical-patch</replaceable>
+            </literallayout>
+            You can create the typical <filename>.patch</filename>
+            file using <filename>diff -Nurp</filename> or
+            <filename>git format-patch</filename>.
+        </para>
+
+        <para>
+            The description file can include multiple patch statements,
+            one per patch.
+        </para>
+    </section>
+
+    <section id='features'>
+        <title>Features</title>
+
+        <para>
+            Features are complex kernel Metadata types that consist
+            of configuration fragments (<filename>kconf</filename>), patches
+            (<filename>patch</filename>), and possibly other feature
+            description files (<filename>include</filename>).
+        </para>
+
+        <para>
+            Here is an example that shows a feature description file:
+            <literallayout class='monospaced'>
+     features/myfeature.scc
+        define KFEATURE_DESCRIPTION "Enable myfeature"
+
+        patch 0001-myfeature-core.patch
+        patch 0002-myfeature-interface.patch
+
+        include cfg/myfeature_dependency.scc
+        kconf non-hardware myfeature.cfg
+            </literallayout>
+            This example shows how the <filename>patch</filename> and
+            <filename>kconf</filename> commands are used as well as
+            how an additional feature description file is included.
+        </para>
+
+        <para>
+            Typically, features are less granular than configuration
+            fragments and are more likely than configuration fragments
+            and patches to be the types of things you want to specify
+            in the <filename>KERNEL_FEATURES</filename> variable of the
+            Linux kernel recipe.
+            See the "<link linkend='using-kernel-metadata-in-a-recipe'>Using Kernel Metadata in a Recipe</link>"
+            section earlier in the manual.
+        </para>
+    </section>
+
+    <section id='kernel-types'>
+        <title>Kernel Types</title>
+
+        <para>
+            A kernel type defines a high-level kernel policy by
+            aggregating non-hardware configuration fragments with
+            patches you want to use when building a Linux kernels of a
+            specific type.
+            Syntactically, kernel types are no different than features
+            as described in the "<link linkend='features'>Features</link>"
+            section.
+            The <filename>LINUX_KERNEL_TYPE</filename> variable in the kernel
+            recipe selects the kernel type.
+            See the "<link linkend='using-kernel-metadata-in-a-recipe'>Using Kernel Metadata in a Recipe</link>"
+            section for more information.
+        </para>
+
+        <para>
+            As an example, the <filename>linux-yocto-3.19</filename>
+            tree defines three kernel types: "standard",
+            "tiny", and "preempt-rt":
+            <itemizedlist>
+                <listitem><para>"standard":
+                    Includes the generic Linux kernel policy of the Yocto
+                    Project linux-yocto kernel recipes.
+                    This policy includes, among other things, which file
+                    systems, networking options, core kernel features, and
+                    debugging and tracing options are supported.
+                    </para></listitem>
+                <listitem><para>"preempt-rt":
+                    Applies the <filename>PREEMPT_RT</filename>
+                    patches and the configuration options required to
+                    build a real-time Linux kernel.
+                    This kernel type inherits from the "standard" kernel type.
+                    </para></listitem>
+                <listitem><para>"tiny":
+                    Defines a bare minimum configuration meant to serve as a
+                    base for very small Linux kernels.
+                    The "tiny" kernel type is independent from the "standard"
+                    configuration.
+                    Although the "tiny" kernel type does not currently include
+                    any source changes, it might in the future.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+
+        <para>
+            The "standard" kernel type is defined by
+            <filename>standard.scc</filename>:
+            <literallayout class='monospaced'>
+     # Include this kernel type fragment to get the standard features and
+     # configuration values.
+
+     # Include all standard features
+     include standard-nocfg.scc
+
+     kconf non-hardware standard.cfg
+
+     # individual cfg block section
+     include cfg/fs/devtmpfs.scc
+     include cfg/fs/debugfs.scc
+     include cfg/fs/btrfs.scc
+     include cfg/fs/ext2.scc
+     include cfg/fs/ext3.scc
+     include cfg/fs/ext4.scc
+
+     include cfg/net/ipv6.scc
+     include cfg/net/ip_nf.scc
+     include cfg/net/ip6_nf.scc
+     include cfg/net/bridge.scc
+            </literallayout>
+        </para>
+
+        <para>
+            As with any <filename>.scc</filename> file, a
+            kernel type definition can aggregate other
+            <filename>.scc</filename> files with
+            <filename>include</filename> commands.
+            These definitions can also directly pull in
+            configuration fragments and patches with the
+            <filename>kconf</filename> and <filename>patch</filename>
+            commands, respectively.
+        </para>
+
+        <note>
+            It is not strictly necessary to create a kernel type
+            <filename>.scc</filename> file.
+            The Board Support Package (BSP) file can implicitly define
+            the kernel type using a <filename>define
+            <ulink url='&YOCTO_DOCS_REF_URL;#var-KTYPE'>KTYPE</ulink> myktype</filename>
+            line.
+            See the "<link linkend='bsp-descriptions'>BSP Descriptions</link>"
+            section for more information.
+        </note>
+    </section>
+
+    <section id='bsp-descriptions'>
+        <title>BSP Descriptions</title>
+
+        <para>
+            BSP descriptions combine kernel types with hardware-specific
+            features.
+            The hardware-specific portion is typically defined
+            independently, and then aggregated with each supported kernel
+            type.
+            Consider this simple BSP description that supports the
+            <replaceable>mybsp</replaceable> machine:
+            <literallayout class='monospaced'>
+     <replaceable>mybsp</replaceable>.scc:
+        define KMACHINE <replaceable>mybsp</replaceable>
+        define KTYPE standard
+        define KARCH i386
+
+        kconf <replaceable>mybsp</replaceable>.cfg
+            </literallayout>
+            Every BSP description should define the
+            <ulink url='&YOCTO_DOCS_REF_URL;#var-KMACHINE'><filename>KMACHINE</filename></ulink>,
+            <ulink url='&YOCTO_DOCS_REF_URL;#var-KTYPE'><filename>KTYPE</filename></ulink>,
+            and <ulink url='&YOCTO_DOCS_REF_URL;#var-KARCH'><filename>KARCH</filename></ulink>
+            variables.
+            These variables allow the OpenEmbedded build system to identify
+            the description as meeting the criteria set by the recipe being
+            built.
+            This simple example supports the "mybsp" machine for the "standard"
+            kernel and the "i386" architecture.
+        </para>
+
+        <para>
+            Be aware that a hard link between the
+            <filename>KTYPE</filename> variable and a kernel type
+            description file does not exist.
+            Thus, if you do not have kernel types defined in your kernel
+            Metadata, you only need to ensure that the kernel recipe's
+            <ulink url='&YOCTO_DOCS_REF_URL;#var-LINUX_KERNEL_TYPE'><filename>LINUX_KERNEL_TYPE</filename></ulink>
+            variable and the <filename>KTYPE</filename> variable in the
+            BSP description file match.
+            <note>
+                Future versions of the tooling make the specification of
+                <filename>KTYPE</filename> in the BSP optional.
+            </note>
+        </para>
+
+        <para>
+            If you did want to separate your kernel policy from your
+            hardware configuration, you could do so by specifying a kernel
+            type, such as "standard" and including that description file
+            in the BSP description file.
+            See the "<link linkend='kernel-types'>Kernel Types</link>" section
+            for more information.
+        </para>
+
+        <para>
+            You might also have multiple hardware configurations that you
+            aggregate into a single hardware description file that you
+            could include in the BSP description file, rather than referencing
+            a single <filename>.cfg</filename> file.
+            Consider the following:
+            <literallayout class='monospaced'>
+     <replaceable>mybsp</replaceable>.scc:
+        define KMACHINE mybsp
+        define KTYPE standard
+        define KARCH i386
+
+        include standard.scc
+        include <replaceable>mybsp</replaceable>-hw.scc
+            </literallayout>
+        </para>
+
+        <para>
+            In the above example, <filename>standard.scc</filename>
+            aggregates all the configuration fragments, patches, and
+            features that make up your standard kernel policy whereas
+            <replaceable>mybsp</replaceable><filename>-hw.scc</filename>
+            aggregates all those necessary
+            to support the hardware available on the
+            <replaceable>mybsp</replaceable> machine.
+            For information on how to break a complete
+            <filename>.config</filename> file into the various
+            configuration fragments, see the
+            "<link linkend='generating-configuration-files'>Generating Configuration Files</link>"
+            section.
+        </para>
+
+        <para>
+            Many real-world examples are more complex.
+            Like any other <filename>.scc</filename> file, BSP
+            descriptions can aggregate features.
+            Consider the Minnow BSP definition from the
+            <filename>linux-yocto-3.19</filename>
+            Git repository:
+            <literallayout class='monospaced'>
+     minnow.scc:
+        include cfg/x86.scc
+        include features/eg20t/eg20t.scc
+        include cfg/dmaengine.scc
+        include features/power/intel.scc
+        include cfg/efi.scc
+        include features/usb/ehci-hcd.scc
+        include features/usb/ohci-hcd.scc
+        include features/usb/usb-gadgets.scc
+        include features/usb/touchscreen-composite.scc
+        include cfg/timer/hpet.scc
+        include cfg/timer/rtc.scc
+        include features/leds/leds.scc
+        include features/spi/spidev.scc
+        include features/i2c/i2cdev.scc
+
+        # Earlyprintk and port debug requires 8250
+        kconf hardware cfg/8250.cfg
+
+        kconf hardware minnow.cfg
+        kconf hardware minnow-dev.cfg
+            </literallayout>
+        </para>
+
+        <para>
+            The <filename>minnow.scc</filename> description file includes
+            a hardware configuration fragment
+            (<filename>minnow.cfg</filename>) specific to the Minnow
+            BSP as well as several more general configuration
+            fragments and features enabling hardware found on the
+            machine.
+            This description file is then included in each of the three
+            "minnow" description files for the supported kernel types
+            (i.e. "standard", "preempt-rt", and "tiny").
+            Consider the "minnow" description for the "standard" kernel
+            type:
+            <literallayout class='monospaced'>
+     minnow-standard.scc:
+        define KMACHINE minnow
+        define KTYPE standard
+        define KARCH i386
+
+        include ktypes/standard
+
+        include minnow.scc
+
+        # Extra minnow configs above the minimal defined in minnow.scc
+        include cfg/efi-ext.scc
+        include features/media/media-all.scc
+        include features/sound/snd_hda_intel.scc
+
+        # The following should really be in standard.scc
+        # USB live-image support
+        include cfg/usb-mass-storage.scc
+        include cfg/boot-live.scc
+
+        # Basic profiling
+        include features/latencytop/latencytop.scc
+        include features/profiling/profiling.scc
+
+        # Requested drivers that don't have an existing scc
+        kconf hardware minnow-drivers-extra.cfg
+            </literallayout>
+            The <filename>include</filename> command midway through the file
+            includes the <filename>minnow.scc</filename> description that
+            defines all hardware enablements for the BSP that is common to all
+            kernel types.
+            Using this command significantly reduces duplication.
+        </para>
+
+        <para>
+            Now consider the "minnow" description for the "tiny" kernel type:
+            <literallayout class='monospaced'>
+     minnow-tiny.scc:
+        define KMACHINE minnow
+        define KTYPE tiny
+        define KARCH i386
+
+        include ktypes/tiny
+
+        include minnow.scc
+            </literallayout>
+            As you might expect, the "tiny" description includes quite a
+            bit less.
+            In fact, it includes only the minimal policy defined by the
+            "tiny" kernel type and the hardware-specific configuration required
+            for booting the machine along with the most basic functionality of
+            the system as defined in the base "minnow" description file.
+        </para>
+
+        <para>
+            Notice again the three critical variables:
+            <filename>KMACHINE</filename>, <filename>KTYPE</filename>,
+            and <filename>KARCH</filename>.
+            Of these variables, only the <filename>KTYPE</filename> has changed.
+            It is now set to "tiny".
+        </para>
+    </section>
+</section>
+
+<section id='organizing-your-source'>
+    <title>Organizing Your Source</title>
+
+    <para>
+        Many recipes based on the <filename>linux-yocto-custom.bb</filename>
+        recipe use Linux kernel sources that have only a single
+        branch - "master".
+        This type of repository structure is fine for linear development
+        supporting a single machine and architecture.
+        However, if you work with multiple boards and architectures,
+        a kernel source repository with multiple branches is more
+        efficient.
+        For example, suppose you need a series of patches for one board to boot.
+        Sometimes, these patches are works-in-progress or fundamentally wrong,
+        yet they are still necessary for specific boards.
+        In these situations, you most likely do not want to include these
+        patches in every kernel you build (i.e. have the patches as part of
+        the lone "master" branch).
+        It is situations like these that give rise to multiple branches used
+        within a Linux kernel sources Git repository.
+    </para>
+
+    <para>
+        Repository organization strategies exist that maximize source reuse,
+        remove redundancy, and logically order your changes.
+        This section presents strategies for the following cases:
+        <itemizedlist>
+            <listitem><para>Encapsulating patches in a feature description
+                and only including the patches in the BSP descriptions of
+                the applicable boards.</para></listitem>
+            <listitem><para>Creating a machine branch in your
+                kernel source repository and applying the patches on that
+                branch only.</para></listitem>
+            <listitem><para>Creating a feature branch in your
+                kernel source repository and merging that branch into your
+                BSP when needed.</para></listitem>
+        </itemizedlist>
+    </para>
+
+    <para>
+        The approach you take is entirely up to you
+        and depends on what works best for your development model.
+    </para>
+
+    <section id='encapsulating-patches'>
+        <title>Encapsulating Patches</title>
+
+        <para>
+            if you are reusing patches from an external tree and are not
+            working on the patches, you might find the encapsulated feature
+            to be appropriate.
+            Given this scenario, you do not need to create any branches in the
+            source repository.
+            Rather, you just take the static patches you need and encapsulate
+            them within a feature description.
+            Once you have the feature description, you simply include that into
+            the BSP description as described in the
+            "<link linkend='bsp-descriptions'>BSP Descriptions</link>"
+            section.
+        </para>
+
+        <para>
+            You can find information on how to create patches and BSP
+            descriptions in the "<link linkend='patches'>Patches</link>" and
+            "<link linkend='bsp-descriptions'>BSP Descriptions</link>"
+            sections.
+        </para>
+    </section>
+
+    <section id='machine-branches'>
+        <title>Machine Branches</title>
+
+        <para>
+            When you have multiple machines and architectures to support,
+            or you are actively working on board support, it is more
+            efficient to create branches in the repository based on
+            individual machines.
+            Having machine branches allows common source to remain in the
+            "master" branch with any features specific to a machine stored
+            in the appropriate machine branch.
+            This organization method frees you from continually reintegrating
+            your patches into a feature.
+        </para>
+
+        <para>
+            Once you have a new branch, you can set up your kernel Metadata
+            to use the branch a couple different ways.
+            In the recipe, you can specify the new branch as the
+            <filename>KBRANCH</filename> to use for the board as
+            follows:
+            <literallayout class='monospaced'>
+     KBRANCH = "mynewbranch"
+            </literallayout>
+            Another method is to use the <filename>branch</filename> command
+            in the BSP description:
+            <literallayout class='monospaced'>
+     mybsp.scc:
+        define KMACHINE mybsp
+        define KTYPE standard
+        define KARCH i386
+        include standard.scc
+
+        branch mynewbranch
+
+        include mybsp-hw.scc
+            </literallayout>
+        </para>
+
+        <para>
+            If you find
+            yourself with numerous branches, you might consider using a
+            hierarchical branching system similar to what the linux-yocto Linux
+            kernel repositories use:
+            <literallayout class='monospaced'>
+     <replaceable>common</replaceable>/<replaceable>kernel_type</replaceable>/<replaceable>machine</replaceable>
+            </literallayout>
+        </para>
+
+        <para>
+            If you had two kernel types, "standard" and "small" for
+            instance, three machines, and <replaceable>common</replaceable>
+            as <filename>mydir</filename>, the branches in your
+            Git repository might look like this:
+            <literallayout class='monospaced'>
+     mydir/base
+     mydir/standard/base
+     mydir/standard/machine_a
+     mydir/standard/machine_b
+     mydir/standard/machine_c
+     mydir/small/base
+     mydir/small/machine_a
+            </literallayout>
+        </para>
+
+        <para>
+            This organization can help clarify the branch relationships.
+            In this case, <filename>mydir/standard/machine_a</filename>
+            includes everything in <filename>mydir/base</filename> and
+            <filename>mydir/standard/base</filename>.
+            The "standard" and "small" branches add sources specific to those
+            kernel types that for whatever reason are not appropriate for the
+            other branches.
+            <note>The "base" branches are an artifact of the way Git manages
+                its data internally on the filesystem: Git will not allow you
+                to use <filename>mydir/standard</filename> and
+                <filename>mydir/standard/machine_a</filename> because it
+                would have to create a file and a directory named "standard".
+            </note>
+        </para>
+    </section>
+
+    <section id='feature-branches'>
+        <title>Feature Branches</title>
+
+        <para>
+            When you are actively developing new features, it can be more
+            efficient to work with that feature as a branch, rather than
+            as a set of patches that have to be regularly updated.
+            The Yocto Project Linux kernel tools provide for this with
+            the <filename>git merge</filename> command.
+        </para>
+
+        <para>
+            To merge a feature branch into a BSP, insert the
+            <filename>git merge</filename> command after any
+            <filename>branch</filename> commands:
+            <literallayout class='monospaced'>
+     mybsp.scc:
+        define KMACHINE mybsp
+        define KTYPE standard
+        define KARCH i386
+        include standard.scc
+
+        branch mynewbranch
+        git merge myfeature
+
+        include mybsp-hw.scc
+            </literallayout>
+        </para>
+    </section>
+</section>
+
+<section id='scc-reference'>
+    <title>SCC Description File Reference</title>
+
+    <para>
+        This section provides a brief reference for the commands you can use
+        within an SCC description file (<filename>.scc</filename>):
+        <itemizedlist>
+            <listitem><para><filename>branch [ref]</filename>:
+                Creates a new branch relative to the current branch
+                (typically <filename>${KTYPE}</filename>) using
+                the currently checked-out branch, or "ref" if specified.
+                </para></listitem>
+            <listitem><para><filename>define</filename>:
+                Defines variables, such as <filename>KMACHINE</filename>,
+                <filename>KTYPE</filename>, <filename>KARCH</filename>,
+                and <filename>KFEATURE_DESCRIPTION</filename>.</para></listitem>
+            <listitem><para><filename>include SCC_FILE</filename>:
+                Includes an SCC file in the current file.
+                The file is parsed as if you had inserted it inline.
+                </para></listitem>
+            <listitem><para><filename>kconf [hardware|non-hardware] CFG_FILE</filename>:
+                Queues a configuration fragment for merging into the final
+                Linux <filename>.config</filename> file.</para></listitem>
+            <listitem><para><filename>git merge GIT_BRANCH</filename>:
+                Merges the feature branch into the current branch.
+                </para></listitem>
+            <listitem><para><filename>patch PATCH_FILE</filename>:
+                Applies the patch to the current Git branch.</para></listitem>
+        </itemizedlist>
+    </para>
+</section>
+
+</chapter>
+<!--
+vim: expandtab tw=80 ts=4
+-->

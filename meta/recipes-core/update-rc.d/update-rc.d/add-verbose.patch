@@ -1,0 +1,49 @@
+Upstream-Status: Pending
+
+--- update-rc.d/update-rc.d.org	2005-01-03 00:30:47.000000000 +0200
++++ update-rc.d/update-rc.d	2007-12-01 19:41:08.000000000 +0200
+@@ -19,6 +19,7 @@
+ notreally=0
+ force=0
+ dostart=0
++verbose=0
+ 
+ usage()
+ {
+@@ -28,6 +29,7 @@
+        update-rc.d [-n] [-r <root>] [-s] <basename> start|stop NN runlvl [runlvl] [...] .
+ 		-n: not really
+ 		-f: force
++		-v: verbose
+ 		-r: alternate root path (default is /)
+ 		-s: invoke start methods if appropriate to current runlevel
+ EOF
+@@ -69,7 +71,7 @@
+ 	lev=`echo $2 | cut -d/ -f1`
+ 	nn=`echo $2 | cut -d/ -f2`
+ 	fn="${etcd}${lev}.d/${startstop}${nn}${bn}"
+-	echo "  $fn -> ../init.d/$bn"
++	[ $verbose -eq 1 ] && echo "  $fn -> ../init.d/$bn"
+ 	if [ $notreally -eq 0 ]; then
+ 		mkdir -p `dirname $fn`
+  		ln -s ../init.d/$bn $fn
+@@ -89,7 +91,7 @@
+ 		exit 0
+ 	fi
+ 
+-	echo " Adding system startup for $initd/$bn ..."
++	echo " Adding system startup for $initd/$bn."
+ 
+ 	for i in $startlinks; do
+ 		dolink S $i
+@@ -105,6 +107,10 @@
+ 			shift
+ 			continue
+ 			;;
++		-v)	verbose=1
++			shift
++			continue
++			;;
+ 		-f)	force=1
+ 			shift
+ 			continue

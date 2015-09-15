@@ -1,0 +1,25 @@
+Upstream-Status: Pending
+
+Subject: gen.c: extend DIRNAMESIZE from 256 to 512
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ lib/dns/gen.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/dns/gen.c b/lib/dns/gen.c
+index 7a7dafb..51a0435 100644
+--- a/lib/dns/gen.c
++++ b/lib/dns/gen.c
+@@ -148,7 +148,7 @@ static const char copyright[] =
+ #define TYPECLASSBUF (TYPECLASSLEN + 1)
+ #define TYPECLASSFMT "%" STR(TYPECLASSLEN) "[-0-9a-z]_%d"
+ #define ATTRIBUTESIZE 256
+-#define DIRNAMESIZE 256
++#define DIRNAMESIZE 512
+ 
+ static struct cc {
+ 	struct cc *next;
+-- 
+1.9.1
+

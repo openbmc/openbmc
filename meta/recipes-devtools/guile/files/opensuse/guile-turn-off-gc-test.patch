@@ -1,0 +1,49 @@
+Upstream-Status: Inappropriate [opensuse patch]
+
+Signed-Off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
+
+See http://debbugs.gnu.org/cgi/bugreport.cgi?bug=10096
+why this test is turned off.
+Index: guile-2.0.3/test-suite/tests/gc.test
+===================================================================
+--- guile-2.0.3.orig/test-suite/tests/gc.test	2011-10-15 09:34:40.000000000 -0700
++++ guile-2.0.3/test-suite/tests/gc.test	2012-01-13 21:52:10.282540355 -0800
+@@ -65,23 +65,23 @@
+       foo)))
+ 
+ 
+-(with-test-prefix "gc"
+-  (pass-if "Unused modules are removed"
+-    (let* ((guard (make-guardian))
+-           (total 1000))
+-
+-      (for-each (lambda (x) (guard (make-module))) (iota total))
++;;(with-test-prefix "gc"
++;;  (pass-if "Unused modules are removed"
++;;    (let* ((guard (make-guardian))
++;;           (total 1000))
++;;
++;;      (for-each (lambda (x) (guard (make-module))) (iota total))
+ 
+       ;; Avoid false references to the modules on the stack.
+-      (stack-cleanup 20)
++;;      (stack-cleanup 20)
+ 
+-      (gc)
+-      (gc) ;; twice: have to kill the weak vectors.
+-      (gc) ;; thrice: because the test doesn't succeed with only
++;;      (gc)
++;;      (gc) ;; twice: have to kill the weak vectors.
++;;      (gc) ;; thrice: because the test doesn't succeed with only
+            ;; one gc round. not sure why.
+ 
+-      (= (let lp ((i 0))
+-           (if (guard)
+-               (lp (1+ i))
+-               i))
+-         total))))
++;;      (= (let lp ((i 0))
++;;           (if (guard)
++;;               (lp (1+ i))
++;;               i))
++;;         total))))

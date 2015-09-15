@@ -1,0 +1,309 @@
+Upstream-Status: Backport
+
+Index: elfutils-0.146/backends/m68k_init.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ elfutils-0.146/backends/m68k_init.c	2010-04-24 10:11:38.000000000 +0000
+@@ -0,0 +1,49 @@
++/* Initialization of m68k specific backend library.
++   Copyright (C) 2007 Kurt Roeckx <kurt@roeckx.be>
++
++   This software is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by the
++   Free Software Foundation; version 2 of the License.
++
++   This softare is distributed in the hope that it will be useful, but
++   WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   General Public License for more details.
++
++   You should have received a copy of the GNU General Public License along
++   with this software; if not, write to the Free Software Foundation,
++   Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301 USA.
++
++*/
++
++#ifdef HAVE_CONFIG_H
++# include <config.h>
++#endif
++
++#define BACKEND		m68k_
++#define RELOC_PREFIX	R_68K_
++#include "libebl_CPU.h"
++
++/* This defines the common reloc hooks based on m68k_reloc.def.  */
++#include "common-reloc.c"
++
++
++const char *
++m68k_init (elf, machine, eh, ehlen)
++     Elf *elf __attribute__ ((unused));
++     GElf_Half machine __attribute__ ((unused));
++     Ebl *eh;
++     size_t ehlen;
++{
++  /* Check whether the Elf_BH object has a sufficent size.  */
++  if (ehlen < sizeof (Ebl))
++    return NULL;
++
++  /* We handle it.  */
++  eh->name = "m68k";
++  m68k_init_reloc (eh);
++  HOOK (eh, reloc_simple_type);
++  HOOK (eh, register_info);
++
++  return MODVERSION;
++}
+Index: elfutils-0.146/backends/m68k_regs.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ elfutils-0.146/backends/m68k_regs.c	2010-04-24 10:11:38.000000000 +0000
+@@ -0,0 +1,106 @@
++/* Register names and numbers for m68k DWARF.
++   Copyright (C) 2007 Kurt Roeckx <kurt@roeckx.be>
++
++   This software is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by the
++   Free Software Foundation; version 2 of the License.
++
++   This software is distributed in the hope that it will be useful, but
++   WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   General Public License for more details.
++
++   You should have received a copy of the GNU General Public License along
++   with this software; if not, write to the Free Software Foundation,
++   Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301 USA.
++
++   */
++
++#ifdef HAVE_CONFIG_H
++# include <config.h>
++#endif
++
++#include <string.h>
++#include <dwarf.h>
++
++#define BACKEND m68k_
++#include "libebl_CPU.h"
++
++ssize_t
++m68k_register_info (Ebl *ebl __attribute__ ((unused)),
++		   int regno, char *name, size_t namelen,
++		   const char **prefix, const char **setname,
++		   int *bits, int *type)
++{
++	if (name == NULL)
++		return 25;
++
++	if (regno < 0 || regno > 24 || namelen < 5)
++		return -1;
++
++	*prefix = "%";
++	*bits = 32;
++	*type = (regno < 8 ? DW_ATE_signed
++		: regno < 16 ? DW_ATE_address : DW_ATE_float);
++
++	if (regno < 8)
++	{
++		*setname = "integer";
++	}
++	else if (regno < 16)
++	{
++		*setname = "address";
++	}
++	else if (regno < 24)
++	{
++		*setname = "FPU";
++	}
++	else
++	{
++		*setname = "address";
++		*type = DW_ATE_address;
++	}
++
++	switch (regno)
++	{
++	case 0 ... 7:
++		name[0] = 'd';
++		name[1] = regno + '0';
++		namelen = 2;
++		break;
++
++	case 8 ... 13:
++		name[0] = 'a';
++		name[1] = regno - 8 + '0';
++		namelen = 2;
++		break;
++
++	case 14:
++		name[0] = 'f';
++		name[1] = 'p';
++   		namelen = 2;
++		break;
++
++	case 15:
++		name[0] = 's';
++		name[1] = 'p';
++   		namelen = 2;
++		break;
++
++	case 16 ... 23:
++		name[0] = 'f';
++		name[1] = 'p';
++		name[2] = regno - 16 + '0';
++   		namelen = 3;
++		break;
++
++	case 24:
++		name[0] = 'p';
++		name[1] = 'c';
++		namelen = 2;
++	}
++
++	name[namelen++] = '\0';
++	return namelen;
++}
++
+Index: elfutils-0.146/backends/m68k_reloc.def
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ elfutils-0.146/backends/m68k_reloc.def	2010-04-24 10:11:38.000000000 +0000
+@@ -0,0 +1,45 @@
++/* List the relocation types for m68k.  -*- C -*-
++   Copyright (C) 2007 Kurt Roeckx <kurt@roeckx.be>
++
++   This software is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by the
++   Free Software Foundation; version 2 of the License.
++
++   This software is distributed in the hope that it will be useful, but
++   WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   General Public License for more details.
++
++   You should have received a copy of the GNU General Public License along
++   with this software; if not, write to the Free Software Foundation,
++   Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301 USA.
++*/
++
++/* 	    NAME,		REL|EXEC|DYN	*/
++
++RELOC_TYPE (NONE,		0)
++RELOC_TYPE (32,			REL|EXEC|DYN)
++RELOC_TYPE (16,			REL)
++RELOC_TYPE (8,			REL)
++RELOC_TYPE (PC32,		REL|EXEC|DYN)
++RELOC_TYPE (PC16,		REL)
++RELOC_TYPE (PC8,		REL)
++RELOC_TYPE (GOT32,		REL)
++RELOC_TYPE (GOT16,		REL)
++RELOC_TYPE (GOT8,		REL)
++RELOC_TYPE (GOT32O,		REL)
++RELOC_TYPE (GOT16O,		REL)
++RELOC_TYPE (GOT8O,		REL)
++RELOC_TYPE (PLT32,		REL)
++RELOC_TYPE (PLT16,		REL)
++RELOC_TYPE (PLT8,		REL)
++RELOC_TYPE (PLT32O,		REL)
++RELOC_TYPE (PLT16O,		REL)
++RELOC_TYPE (PLT8O,		REL)
++RELOC_TYPE (COPY,		EXEC)
++RELOC_TYPE (GLOB_DAT,		EXEC|DYN)
++RELOC_TYPE (JMP_SLOT,		EXEC|DYN)
++RELOC_TYPE (RELATIVE,		EXEC|DYN)
++RELOC_TYPE (GNU_VTINHERIT,	REL)
++RELOC_TYPE (GNU_VTENTRY,	REL)
++
+Index: elfutils-0.146/libelf/elf.h
+===================================================================
+--- elfutils-0.146.orig/libelf/elf.h	2010-04-24 10:11:13.000000000 +0000
++++ elfutils-0.146/libelf/elf.h	2010-04-24 10:13:50.000000000 +0000
+@@ -1125,6 +1125,9 @@
+ #define R_68K_GLOB_DAT	20		/* Create GOT entry */
+ #define R_68K_JMP_SLOT	21		/* Create PLT entry */
+ #define R_68K_RELATIVE	22		/* Adjust by program base */
++/* The next 2 are GNU extensions to enable C++ vtable garbage collection.  */
++#define R_68K_GNU_VTINHERIT 23
++#define R_68K_GNU_VTENTRY   24
+ #define R_68K_TLS_GD32      25          /* 32 bit GOT offset for GD */
+ #define R_68K_TLS_GD16      26          /* 16 bit GOT offset for GD */
+ #define R_68K_TLS_GD8       27          /* 8 bit GOT offset for GD */
+Index: elfutils-0.146/backends/Makefile.am
+===================================================================
+--- elfutils-0.146.orig/backends/Makefile.am	2010-04-24 10:11:23.000000000 +0000
++++ elfutils-0.146/backends/Makefile.am	2010-04-24 10:11:38.000000000 +0000
+@@ -29,11 +29,12 @@
+ 	   -I$(top_srcdir)/libelf -I$(top_srcdir)/libdw
+ 
+ 
+-modules = i386 sh x86_64 ia64 alpha arm sparc ppc ppc64 s390 parisc mips
++modules = i386 sh x86_64 ia64 alpha arm sparc ppc ppc64 s390 parisc mips m68k
+ libebl_pic = libebl_i386_pic.a libebl_sh_pic.a libebl_x86_64_pic.a \
+ 	     libebl_ia64_pic.a libebl_alpha_pic.a libebl_arm_pic.a \
+ 	     libebl_sparc_pic.a libebl_ppc_pic.a libebl_ppc64_pic.a \
+-	     libebl_s390_pic.a libebl_parisc_pic.a libebl_mips_pic.a
++	     libebl_s390_pic.a libebl_parisc_pic.a libebl_mips_pic.a \
++	     libebl_m68k_pic.a
+ noinst_LIBRARIES = $(libebl_pic)
+ noinst_DATA = $(libebl_pic:_pic.a=.so)
+ 
+@@ -103,6 +104,10 @@
+ libebl_mips_pic_a_SOURCES = $(mips_SRCS)
+ am_libebl_mips_pic_a_OBJECTS = $(mips_SRCS:.c=.os)
+ 
++m68k_SRCS = m68k_init.c m68k_symbol.c m68k_regs.c
++libebl_m68k_pic_a_SOURCES = $(m68k_SRCS)
++am_libebl_m68k_pic_a_OBJECTS = $(m68k_SRCS:.c=.os)
++
+ libebl_%.so libebl_%.map: libebl_%_pic.a $(libelf) $(libdw)
+ 	@rm -f $(@:.so=.map)
+ 	echo 'ELFUTILS_$(PACKAGE_VERSION) { global: $*_init; local: *; };' \
+Index: elfutils-0.146/backends/m68k_symbol.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ elfutils-0.146/backends/m68k_symbol.c	2010-04-24 10:11:38.000000000 +0000
+@@ -0,0 +1,43 @@
++/* m68k specific symbolic name handling.
++   Copyright (C) 2007 Kurt Roeckx <kurt@roeckx.be>
++
++   This software is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by the
++   Free Software Foundation; version 2 of the License.
++
++   This software distributed in the hope that it will be useful, but
++   WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   General Public License for more details.
++
++   You should have received a copy of the GNU General Public License along
++   with this software; if not, write to the Free Software Foundation,
++   Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301 USA.
++*/
++
++#ifdef HAVE_CONFIG_H
++# include <config.h>
++#endif
++
++#include <elf.h>
++#include <stddef.h>
++
++#define BACKEND		m68k_
++#include "libebl_CPU.h"
++
++/* Check for the simple reloc types.  */
++Elf_Type
++m68k_reloc_simple_type (Ebl *ebl __attribute__ ((unused)), int type)
++{
++  switch (type)
++    {
++    case R_68K_32:
++      return ELF_T_SWORD;
++    case R_68K_16:
++      return ELF_T_HALF;
++    case R_68K_8:
++      return ELF_T_BYTE;
++    default:
++      return ELF_T_NUM;
++    }
++}

@@ -1,0 +1,25 @@
+Upstream-Status: Pending
+
+--- at-3.1.12/configure.ac	2011-06-23 14:51:03.653572945 +0800
++++ at-3.1.12/configure.ac.new	2011-06-27 16:12:14.903572945 +0800
+@@ -81,10 +81,18 @@
+ AC_FUNC_VPRINTF
+ AC_FUNC_GETLOADAVG
+ AC_CHECK_FUNCS(getcwd mktime strftime setreuid setresuid sigaction waitpid)
++
++AC_ARG_WITH([pam],
++  [AS_HELP_STRING([--without-pam], [without PAM support])])
++
++if test "x$with_pam" != xno; then
+ AC_CHECK_HEADERS(security/pam_appl.h, [
+   PAMLIB="-lpam"
+-  AC_DEFINE(HAVE_PAM, 1, [Define to 1 for PAM support])
+-])
++  AC_DEFINE(HAVE_PAM, 1, [Define to 1 for PAM support])],
++   [if test "x$with_pam" = xyes; then
++   AC_MSG_ERROR([PAM selected but security/pam_misc.h not found])
++   fi])
++fi
+
+ dnl Checking for programs
+

@@ -1,0 +1,17 @@
+Fix typo in Makefile
+
+Upstream-Status: Pending
+
+Index: xcursor-transparent-theme-0.1.1/cursors/Makefile.am
+===================================================================
+--- xcursor-transparent-theme-0.1.1.orig/cursors/Makefile.am	2013-03-07 22:25:04.001435305 +0000
++++ xcursor-transparent-theme-0.1.1/cursors/Makefile.am	2013-03-07 22:25:04.061435302 +0000
+@@ -79,7 +79,7 @@
+ 	ul_angle \
+ 	ur_angle \
+ 	v_double_arrow \
+-	watcha \
++	watch \
+ 	xterm  
+ 
+ CURSOR_DIR = $(datadir)/icons/xcursor-transparent/cursors

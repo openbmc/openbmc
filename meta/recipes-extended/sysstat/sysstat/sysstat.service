@@ -1,0 +1,12 @@
+[Unit]
+Description=Resets System Activity Logs
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+User=root
+ExecStart=@LIBDIR@/sa/sa1 --boot
+
+[Install]
+WantedBy=multi-user.target
+

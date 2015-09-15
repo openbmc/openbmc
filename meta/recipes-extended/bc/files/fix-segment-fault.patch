@@ -1,0 +1,28 @@
+Upstream-Status: Pending
+
+when run command such as 'echo "a = 13" | bc -l', it segmentation faults.
+This patch is from http://www.mail-archive.com/blfs-support@linuxfromscratch.org/msg04602.html.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+--- bc-1.06/lib/number.c.orig	2003-09-26 21:14:02.000000000 +0000
++++ bc-1.06/lib/number.c	2003-09-26 21:14:26.000000000 +0000
+@@ -34,6 +34,7 @@
+ #include <number.h>
+ #include <assert.h>
+ #include <stdlib.h>
++#include <string.h>
+ #include <ctype.h>/* Prototypes needed for external utility routines. */
+ 
+ #define bc_rt_warn rt_warn
+--- bc-1.06/bc/load.c.orig	2003-09-26 21:14:14.000000000 +0000
++++ bc-1.06/bc/load.c	2003-09-26 21:14:26.000000000 +0000
+@@ -156,7 +156,7 @@
+   long  label_no;
+   long  vaf_name;	/* variable, array or function number. */
+   long  func;
+-  program_counter save_adr;
++  static program_counter save_adr;
+ 
+   /* Initialize. */
+   str = code;

@@ -1,0 +1,23 @@
+From 27a4952c2e531947dc9f2f02e2063d117e2e699a Mon Sep 17 00:00:00 2001
+From: Niko Tyni <ntyni@debian.org>
+Date: Sat, 18 Apr 2015 17:39:32 +0300
+Subject: Update porting/customized.dat for pod2man modifications
+
+Patch-Name: debian/pod2man-customized.diff
+---
+ t/porting/customized.dat | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/t/porting/customized.dat b/t/porting/customized.dat
+index 0eed9f7..7df398d 100644
+--- a/t/porting/customized.dat
++++ b/t/porting/customized.dat
+@@ -42,7 +42,7 @@ Win32API::File cpan/Win32API-File/Makefile.PL 605d0aee31aebe84a99408f9ab5f644db5
+ Win32API::File cpan/Win32API-File/t/file.t 124e64aa77e755235eb297644a87fac5388d3d78
+ Win32API::File cpan/Win32API-File/t/tie.t 712ea7edd0cc805ce1c0b8172c01b03dd19b583d
+ Win32API::File cpan/Win32API-File/typemap 24bff088babeadac0873e8df390d1666d9d9db4a
+-podlators cpan/podlators/scripts/pod2man.PL f81acf53f3ff46cdcc5ebdd661c5d13eb35d20d6
++podlators cpan/podlators/scripts/pod2man.PL 761f35d3fcf91c1bc2f9e024a9fa5c62fd3fc338
+ podlators cpan/podlators/scripts/pod2text.PL b4693fcfe4a0a1b38a215cfb8985a65d5d025d69
+ version cpan/version/lib/version.pm d0923b895d57f1d669ae36fcf85c87b16db341d1
+ version vutil.c 668f17ca43e2527645674d29ba772b86330d5663

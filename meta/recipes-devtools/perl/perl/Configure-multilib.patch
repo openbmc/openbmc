@@ -1,0 +1,17 @@
+Upstream-Status:Pending
+
+Index: perl-5.12.3/Configure
+===================================================================
+--- perl-5.12.3.orig/Configure
++++ perl-5.12.3/Configure
+@@ -1316,8 +1316,9 @@ loclibpth="/usr/local/lib /opt/local/lib
+ loclibpth="$loclibpth /opt/gnu/lib /usr/GNU/lib /opt/GNU/lib"
+ 
+ : general looking path for locating libraries
+-glibpth="/lib /usr/lib $xlibpth"
++glibpth="/lib /usr/lib /lib64 /usr/lib64 $xlibpth"
+ glibpth="$glibpth /usr/ccs/lib /usr/ucblib /usr/local/lib"
++test -f /usr/lib/*-linux-gnu/libc.so && glibpth="/usr/lib/*-linux-gnu $glibpth"
+ test -f /usr/shlib/libc.so && glibpth="/usr/shlib $glibpth"
+ test -f /shlib/libc.so     && glibpth="/shlib $glibpth"
+ test -d /usr/lib64         && glibpth="$glibpth /lib64 /usr/lib64 /usr/local/lib64"

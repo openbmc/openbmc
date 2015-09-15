@@ -1,0 +1,22 @@
+Upstream-Status: Pending
+
+# copy commit message from OE as the patch comment:
+#    commit 5a0e1d473ca7aca5ffefffe9a2ec44ae7a1f35bc
+#    Author: Frans Meulenbroeks <fransmeulenbroeks@gmail.com>
+#    Date:   Wed Feb 11 22:40:21 2009 +0100
+#
+#    busybox: fix tar problem with filenames that are exactly 100 bytes
+#
+# above comment added by Kevin Tian <kevin.tian@intel.com>, 2010-07-06
+
+--- busybox-1.13.2/archival/libarchive/get_header_tar.c.orig	2008-11-09 18:28:02.000000000 +0100
++++ busybox-1.13.2/archival/libarchive/get_header_tar.c	2009-02-11 22:34:52.000000000 +0100
+@@ -252,6 +252,8 @@
+ 			file_header->name = concat_path_file(tar.prefix, tar.name);
+ 		} else
+ 			file_header->name = xstrdup(tar.name);
++		if (strlen(file_header->name) > 100) 
++			file_header->name[100] = 0;
+ 	}
+ 
+ 	/* Set bits 12-15 of the files mode */

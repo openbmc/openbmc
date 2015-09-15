@@ -1,0 +1,84 @@
+Taken from portage
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+From e1443c945a4cf67096d8c27721aadd7368382b3f Mon Sep 17 00:00:00 2001
+From: Gilles Dartiguelongue <eva@gentoo.org>
+Date: Tue, 6 Apr 2010 15:22:25 +0200
+Subject: [PATCH 2/2] gentoo: use ISO types for fixed type size
+
+---
+ Makefile.am  |   11 ++---------
+ art_config.h |    5 +++++
+ configure.in |   10 ----------
+ 3 files changed, 7 insertions(+), 19 deletions(-)
+ create mode 100644 art_config.h
+
+diff --git a/Makefile.am b/Makefile.am
+index 95952da..6aa2fe3 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -2,13 +2,6 @@ check_PROGRAMS = testart testuta
+ 
+ bin_SCRIPTS = \
+ 	libart2-config
+-	
+-noinst_SCRIPTS = gen_art_config.sh
+-
+-BUILT_SOURCES = art_config.h
+-
+-art_config.h:
+-	./gen_art_config.sh > art_config.h
+ 
+ EXTRA_DIST = 			\
+ 	libart.def		\
+@@ -173,5 +166,5 @@ install-data-local: install-ms-lib install-libtool-import-lib
+ 
+ uninstall-local: uninstall-ms-lib uninstall-libtool-import-lib
+ 
+-CLEANFILES = $(BUILT_SOURCES) $(bin_SCRIPTS)
+-DISTCLEANFILES = $(BUILT_SOURCES) $(bin_SCRIPTS)
++CLEANFILES = $(bin_SCRIPTS)
++DISTCLEANFILES = $(bin_SCRIPTS)
+diff --git a/art_config.h b/art_config.h
+new file mode 100644
+index 0000000..5985f1f
+--- a/art_config.h
++++ b/art_config.h
+@@ -0,0 +1,5 @@
++#include <stdint.h>
++
++typedef uint8_t art_u8;
++typedef uint16_t art_u16;
++typedef uint32_t art_u32;
+diff --git a/configure.in b/configure.in
+index e4804f7..ddcac4f 100644
+--- a/configure.in
++++ b/configure.in
+@@ -92,15 +92,6 @@ AC_FUNC_ALLOCA
+ 
+ AC_C_BIGENDIAN
+ 
+-AC_CHECK_SIZEOF(char)
+-AC_SUBST(ART_SIZEOF_CHAR, $ac_cv_sizeof_char)
+-AC_CHECK_SIZEOF(short)
+-AC_SUBST(ART_SIZEOF_SHORT, $ac_cv_sizeof_short)
+-AC_CHECK_SIZEOF(int)
+-AC_SUBST(ART_SIZEOF_INT, $ac_cv_sizeof_int)
+-AC_CHECK_SIZEOF(long)
+-AC_SUBST(ART_SIZEOF_LONG, $ac_cv_sizeof_long)
+-
+ AC_CONFIG_FILES([
+ libart-features.h
+ Makefile
+@@ -109,6 +100,5 @@ libart-2.0-uninstalled.pc
+ libart-zip])
+ 
+ AC_CONFIG_FILES([libart-config],[chmod +x libart-config])
+-AC_CONFIG_FILES([gen_art_config.sh],[chmod +x gen_art_config.sh])
+ 
+ AC_OUTPUT
+-- 
+1.7.0.4
+

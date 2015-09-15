@@ -1,0 +1,24 @@
+Enable platform tag matching workaround in OE.
+
+When installing some LSB packages the 'platform' field in the package
+appears to be invalid.  Instead of relying solely on the platform comparison
+we also want to generate a perceived platform based on the valid rpm contents
+of arch and os.
+
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.14/lib/depends.c
+===================================================================
+--- rpm-5.4.14.orig/lib/depends.c
++++ rpm-5.4.14/lib/depends.c
+@@ -595,7 +595,7 @@ int rpmtsAddInstallElement(rpmts ts, Hea
+ 	    platform = rpmExpand(arch, "-unknown-", os, NULL);
+ 
+ 	rc = rpmPlatformScore(platform, platpat, nplatpat);
+-#if defined(RPM_VENDOR_MANDRIVA)
++#if defined(RPM_VENDOR_MANDRIVA) || defined(RPM_VENDOR_OE)
+ 	/*
+ 	 * If no match on platform tag, we'll try again with arch tag
+ 	 * in case platform tag is inconsistent with it, which is the case

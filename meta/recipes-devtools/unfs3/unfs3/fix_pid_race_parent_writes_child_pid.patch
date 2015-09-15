@@ -1,0 +1,61 @@
+daemon.c: Fix race window for writing of the pid file
+
+The parent process should write the pid file such that the pid file
+will can be checked immediately following exit of the fork from the
+parent.
+
+This allows external monitoring applications to watch the daemon
+without having to add sleep calls to wait for the pid file be written
+on a busy system.
+
+Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
+
+Upstream-Status: Submitted http://sourceforge.net/p/unfs3/bugs/5/
+
+---
+ daemon.c |   12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+--- a/daemon.c
++++ b/daemon.c
+@@ -153,7 +153,7 @@ int get_socket_type(struct svc_req *rqst
+ /*
+  * write current pid to a file
+  */
+-static void create_pid_file(void)
++static void create_pid_file(int pid)
+ {
+     char buf[16];
+     int fd, res, len;
+@@ -175,7 +175,7 @@ static void create_pid_file(void)
+     }
+ #endif
+ 
+-    sprintf(buf, "%i\n", backend_getpid());
++    sprintf(buf, "%i\n", pid);
+     len = strlen(buf);
+ 
+     res = backend_pwrite(fd, buf, len, 0);
+@@ -970,6 +970,10 @@ int main(int argc, char **argv)
+ 	    fprintf(stderr, "could not fork into background\n");
+ 	    daemon_exit(0);
+ 	}
++	if (pid)
++	    create_pid_file(pid);
++    } else {
++	create_pid_file(backend_getpid());
+     }
+ #endif				       /* WIN32 */
+ 
+@@ -1006,8 +1010,10 @@ int main(int argc, char **argv)
+ 	/* no umask to not screw up create modes */
+ 	umask(0);
+ 
++#ifdef WIN32
+ 	/* create pid file if wanted */
+-	create_pid_file();
++	create_pid_file(backend_getpid());
++#endif
+ 
+ 	/* initialize internal stuff */
+ 	fh_cache_init();

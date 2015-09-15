@@ -1,0 +1,57 @@
+From 9e27fc2e1b3dc8c36ef6a502edffc3a3d84d9dd9 Mon Sep 17 00:00:00 2001
+From: Christopher Larson <chris_larson@mentor.com>
+Date: Wed, 26 Aug 2015 17:23:48 -0700
+Subject: [PATCH] Support separation of SRCDIR and OBJDIR
+
+Typical use of VPATH to locate the sources.
+
+Upstream-Status: Pending
+
+Signed-off-by: Christopher Larson <chris_larson@mentor.com>
+
+---
+ Makefile   | 7 +++++--
+ version.sh | 2 +-
+ 2 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 548591a..da8d33a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,5 +1,8 @@
+ MAKEFLAGS += --no-print-directory
+ 
++SRCDIR ?= $(dir $(lastword $(MAKEFILE_LIST)))
++OBJDIR ?= $(PWD)
++VPATH = $(SRCDIR)
+ PREFIX ?= /usr
+ SBINDIR ?= $(PREFIX)/sbin
+ MANDIR ?= $(PREFIX)/share/man
+@@ -95,11 +98,11 @@ VERSION_OBJS := $(filter-out version.o, $(OBJS))
+ version.c: version.sh $(patsubst %.o,%.c,$(VERSION_OBJS)) nl80211.h iw.h Makefile \
+ 		$(wildcard .git/index .git/refs/tags)
+ 	@$(NQ) ' GEN ' $@
+-	$(Q)./version.sh $@
++	$(Q)cd $(SRCDIR) && ./version.sh $(OBJDIR)/$@
+ 
+ %.o: %.c iw.h nl80211.h
+ 	@$(NQ) ' CC  ' $@
+-	$(Q)$(CC) $(CFLAGS) -c -o $@ $<
++	$(Q)$(CC) -I$(SRCDIR) $(CFLAGS) -c -o $@ $<
+ 
+ ifeq ($(IW_ANDROID_BUILD),)
+ iw:	$(OBJS)
+diff --git a/version.sh b/version.sh
+index 5354383..fa954cf 100755
+--- a/version.sh
++++ b/version.sh
+@@ -5,5 +5,5 @@ OUT="$1"
+ 
+ v="$VERSION"
+ 
+-echo '#include "iw.h"' > "$OUT"
++echo '#include <iw.h>' > "$OUT"
+ echo "const char iw_version[] = \"$v\";" >> "$OUT"
+-- 
+2.2.1
+

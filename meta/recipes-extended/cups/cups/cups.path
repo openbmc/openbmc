@@ -1,0 +1,8 @@
+[Unit]
+Description=CUPS Printer Service Spool
+
+[Path]
+PathExistsGlob=/var/spool/cups/d*
+
+[Install]
+WantedBy=multi-user.target

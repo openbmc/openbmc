@@ -1,0 +1,49 @@
+From 64851c6622aff64787a9fcea26cccde183b7c743 Mon Sep 17 00:00:00 2001
+From: "Roy.Li" <rongqing.li@windriver.com>
+Date: Tue, 11 Nov 2014 16:28:22 +0800
+Subject: [PATCH] using poptParseArgvString to parse the
+ _gpg_check_password_cmd
+
+Upstream-Status: Pending
+
+Both __gpg_check_password_cmd and __gpg_sign_cmd include "%{_gpg_name}", but
+strace shows that gpg_name has a quote when run _gpg_check_password,
+but not when run __gpg_sign_cmd; for example, if gpg_name is "tester"
+
+    execve("/usr/bin/gpg", ["gpg", "--batch", "--no-verbose",
+    "--passphrase-fd", "3", "-u", "\"tester\"", "-so", "-"], [/* 20 vars */]) = 0
+
+    execve("/usr/bin/gpg", ["gpg", "--batch", "--no-verbose", "--no-armor",
+    "--passphrase-fd", "3", "--no-secmem-warning", "-u", "tester", "-sbo"..,) = 0
+
+it can be fixed by removing the quote around %{gpg_name} when define
+__gpg_check_password_cmd in macros/macros, like below, but if gpg_name includes
+space, it will not work.
+
+     %__gpg_check_password_cmd       %{__gpg} \
+        gpg --batch --no-verbose --passphrase-fd 3 -u %{_gpg_name} -so -
+
+The poptParseArgvString function is used to parse _gpg_sign_cmd, so using
+poptParseArgvString to parse __gpg_check_password_cmd to fix this issue.
+
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+---
+ rpmdb/signature.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/rpmdb/signature.c b/rpmdb/signature.c
+index c35e0ab..016e8d1 100644
+--- a/rpmdb/signature.c
++++ b/rpmdb/signature.c
+@@ -529,7 +529,7 @@ int rpmCheckPassPhrase(const char * passPhrase)
+   		(void) setenv("GNUPGHOME", gpg_path, 1);
+ 
+ 	    cmd = rpmExpand("%{?__gpg_check_password_cmd}", NULL);
+-	    rc = argvSplit(&av, cmd, NULL);
++	    rc = poptParseArgvString(cmd, NULL, (const char ***)&av);
+ 	    if (!rc)
+ 		rc = execve(av[0], (char *const *)av+1, environ);
+ 
+-- 
+1.9.1
+

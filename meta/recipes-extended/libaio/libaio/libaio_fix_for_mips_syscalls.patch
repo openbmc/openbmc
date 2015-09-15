@@ -1,0 +1,62 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Phil Staub <Phil.Staub@windriver.com>
+
+Index: libaio-0.3.109/src/syscall-mips.h
+===================================================================
+--- libaio-0.3.109.orig/src/syscall-mips.h
++++ libaio-0.3.109/src/syscall-mips.h
+@@ -76,7 +76,7 @@ type fname(atype a) \
+ 	\
+ 	if (__a3 == 0) \
+ 		return (type) __v0; \
+-	return (type) -1; \
++	return (type) (-(__v0)); \
+ }
+ 
+ #define io_syscall2(type,fname,sname,atype,a,btype,b) \
+@@ -100,7 +100,7 @@ type fname(atype a, btype b) \
+ 	\
+ 	if (__a3 == 0) \
+ 		return (type) __v0; \
+-	return (type) -1; \
++	return (type) (-(__v0)); \
+ }
+ 
+ #define io_syscall3(type,fname,sname,atype,a,btype,b,ctype,c) \
+@@ -125,7 +125,7 @@ type fname(atype a, btype b, ctype c) \
+ 	\
+ 	if (__a3 == 0) \
+ 		return (type) __v0; \
+-	return (type) -1; \
++	return (type) (-(__v0)); \
+ }
+ 
+ #define io_syscall4(type,fname,sname,atype,a,btype,b,ctype,c,dtype,d) \
+@@ -150,7 +150,7 @@ type fname(atype a, btype b, ctype c, dt
+ 	\
+ 	if (__a3 == 0) \
+ 		return (type) __v0; \
+-	return (type) -1; \
++	return (type) (-(__v0)); \
+ }
+ 
+ #if (_MIPS_SIM == _MIPS_SIM_ABI32)
+@@ -186,7 +186,7 @@ type fname(atype a, btype b, ctype c, dt
+ 	\
+ 	if (__a3 == 0) \
+ 		return (type) __v0; \
+-	return (type) -1; \
++	return (type) (-(__v0)); \
+ }
+ 
+ #endif /* (_MIPS_SIM == _MIPS_SIM_ABI32) */
+@@ -216,7 +216,7 @@ type fname (atype a,btype b,ctype c,dtyp
+ 	\
+ 	if (__a3 == 0) \
+ 		return (type) __v0; \
+-	return (type) -1; \
++	return (type) (-(__v0)); \
+ }
+ 
+ #endif /* (_MIPS_SIM == _MIPS_SIM_NABI32) || (_MIPS_SIM == _MIPS_SIM_ABI64) */

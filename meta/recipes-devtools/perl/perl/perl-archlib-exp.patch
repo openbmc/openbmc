@@ -1,0 +1,40 @@
+perl: add archlib_exp variable used to generate ARCHLIB_EXP in config.h
+    
+perl.c uses an ARCHLIB_EXP define to generate compile-time code that
+adds the archlibexp path to @INC during run-time initialization of a
+new perl interpreter.
+    
+Because we've changed this value in a temporary way to make it
+possible to use ExtUtils::Embed in the target build (the temporary
+value in config.sh gets re-stripped out during packaging), the
+ARCHLIB_EXP value that gets generated still uses the temporary version
+instead of the original expected version (i.e. becauses it's in the
+generated config.h, it doesn't get stripped out during packaging like
+the others in config.sh).
+
+This creates an unmodified version called archlib_exp that gets used
+by a modified config_h.SH to get the correct value into config.h
+    
+This patch uses an unmodified version of archlibexp called
+archlib_exp, introduced to config.sh, which is used to generate the
+correct value of ARCHLIB_EXP into config.h
+  
+See YOCTO #3099 for more info.
+
+Upstream-Status:Inappropriate [embedded specific]
+
+Signed-off-by: Tom Zanussi <tom.zanussi@intel.com>
+
+Index: perl-5.14.2/config_h.SH
+===================================================================
+--- perl-5.14.2.orig/config_h.SH
++++ perl-5.14.2/config_h.SH
+@@ -996,7 +996,7 @@ sed <<!GROK!THIS! >$CONFIG_H -e 's!^#und
+  *	in programs that are not prepared to deal with ~ expansion at run-time.
+  */
+ #$d_archlib ARCHLIB "$archlib"		/**/
+-#$d_archlib ARCHLIB_EXP "$archlibexp"		/**/
++#$d_archlib ARCHLIB_EXP "$archlib_exp"		/**/
+ 
+ /* ARCHNAME:
+  *	This symbol holds a string representing the architecture name.

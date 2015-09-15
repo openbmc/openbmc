@@ -1,0 +1,24 @@
+2012/03/30 - Mark Hatle <mark.hatle@windriver.com>
+ - Initial version
+
+Most of the items for the X86 architectures are defined in the single
+arch-x86 file.
+
+Three ABIs are define, m32, mx32 and m64.
+
+The following is the list of X86 specific variables:
+
+X86ARCH32 - This is the 32-bit architecture GNU canonical arch, TUNE_ARCH.
+
+X86ARCH64 - This is the 64-bit architecture GNU canonical arch, TUNE_ARCH.
+
+The TUNE_PKGARCH is defined as follows:
+
+TUNE_PKGARCH = ${TUNE_PKGARCH_tune-${DEFAULTTUNE}}
+
+The package architecture for 32-bit targets is historical and generally
+set to to match the core compatible processor type, i.e. i386.
+
+For 64-bit architectures, the architecture is expected to end in '_64'.
+
+If the x32 ABI is used, then the _64 is further extended with a '_x32'.

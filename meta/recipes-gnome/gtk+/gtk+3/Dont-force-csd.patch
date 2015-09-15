@@ -1,0 +1,118 @@
+window: Check if we can use CSD before enabling them
+
+Upstream-Status: Backport
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+
+
+From c5e5ee67490e7e7af56052d8f8beb75db002c2f1 Mon Sep 17 00:00:00 2001
+From: Emmanuele Bassi <ebassi@gnome.org>
+Date: Wed, 3 Jun 2015 14:07:29 +0100
+Subject: window: Check if we can use CSD before enabling them
+
+The change in 03213b9509fc1df16c66194ea168aed6c15110e9 changed the rules
+as to when CSD can be enabled, but it also unconditionally enables CSD
+with the implicit assumption that client-side shadows were the real
+issue, and that we could work around that by drawing our own borders.
+This also means that setting a titlebar for a GtkWindow will enable CSD
+unconditionally.
+
+In reality, some window managers (like Matchbox) *only* support
+server-side decorations, and will ignore all hints to the contrary, to
+the point of drawing decorations at random locations on top of the
+window.
+
+Since CSD are enabled unconditionally, the GTK_CSD environment variable
+is also not a suitable escape hatch.
+
+In the grand tradition of asking ourselves if we should do something
+just because we can, we should split the environment checks from the
+checks on what the user requested; by doing that, we can also check
+when enabling client-side decorations, and ideally bail out if needed.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=750343
+
+diff --git a/gtk/gtkwindow.c b/gtk/gtkwindow.c
+index 423c6bd..9fe882f 100644
+--- a/gtk/gtkwindow.c
++++ b/gtk/gtkwindow.c
+@@ -4056,6 +4056,32 @@ gtk_window_supports_client_shadow (GtkWindow *window)
+   return TRUE;
+ }
+ 
++static gboolean
++gtk_window_can_use_csd (GtkWindow *window)
++{
++  const gchar *csd_env;
++
++#ifdef GDK_WINDOWING_BROADWAY
++  if (GDK_IS_BROADWAY_DISPLAY (gtk_widget_get_display (GTK_WIDGET (window))))
++    return TRUE;
++#endif
++
++#ifdef GDK_WINDOWING_WAYLAND
++  if (GDK_IS_WAYLAND_DISPLAY (gtk_widget_get_display (GTK_WIDGET (window))))
++    return TRUE;
++#endif
++
++#ifdef GDK_WINDOWING_MIR
++  if (GDK_IS_MIR_DISPLAY (gtk_widget_get_display (GTK_WIDGET (window))))
++    return TRUE;
++#endif
++
++  csd_env = g_getenv ("GTK_CSD");
++
++  /* If GTK_CSD is unset we default to CSD support */
++  return csd_env == NULL || (strcmp (csd_env, "1") == 0);
++}
++
+ static void
+ gtk_window_enable_csd (GtkWindow *window)
+ {
+@@ -4063,6 +4089,10 @@ gtk_window_enable_csd (GtkWindow *window)
+   GtkWidget *widget = GTK_WIDGET (window);
+   GdkVisual *visual;
+ 
++  /* If the environment does not support CSD, then there's no point in enabling them */
++  if (!gtk_window_can_use_csd (window))
++    return;
++
+   /* We need a visual with alpha for client shadows */
+   if (priv->use_client_shadow)
+     {
+@@ -5839,7 +5869,6 @@ static gboolean
+ gtk_window_should_use_csd (GtkWindow *window)
+ {
+   GtkWindowPrivate *priv = window->priv;
+-  const gchar *csd_env;
+ 
+   if (priv->csd_requested)
+     return TRUE;
+@@ -5850,24 +5879,7 @@ gtk_window_should_use_csd (GtkWindow *window)
+   if (priv->type == GTK_WINDOW_POPUP)
+     return FALSE;
+ 
+-#ifdef GDK_WINDOWING_BROADWAY
+-  if (GDK_IS_BROADWAY_DISPLAY (gtk_widget_get_display (GTK_WIDGET (window))))
+-    return TRUE;
+-#endif
+-
+-#ifdef GDK_WINDOWING_WAYLAND
+-  if (GDK_IS_WAYLAND_DISPLAY (gtk_widget_get_display (GTK_WIDGET (window))))
+-    return TRUE;
+-#endif
+-
+-#ifdef GDK_WINDOWING_MIR
+-  if (GDK_IS_MIR_DISPLAY (gtk_widget_get_display (GTK_WIDGET (window))))
+-    return TRUE;
+-#endif
+-
+-  csd_env = g_getenv ("GTK_CSD");
+-
+-  return (g_strcmp0 (csd_env, "1") == 0);
++  return gtk_window_can_use_csd (window);
+ }
+ 
+ static void
+-- 
+cgit v0.10.2
+

@@ -1,0 +1,108 @@
+fix the pcre existence checking
+
+when check if there is pcre, the configure file always check
+the host dir. now we make it work by adding correct prefix for
+cross-compile environment.
+
+When enable pcre-module, we see a QA warning because rpaths
+hardcoded into the build, rpaths are not needed, so lets turn
+this off.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+---
+ configure |   60 ++++++------------------------------------------------------
+ 1 files changed, 6 insertions(+), 54 deletions(-)
+
+diff --git a/configure b/configure
+index f1586c3..d22814f 100755
+--- a/configure
++++ b/configure
+@@ -6991,6 +6991,7 @@ $as_echo_n "checking for the pcre library and header files ... " >&6; }
+ 	 /usr/include/pcre,/usr/lib \
+ 	 /usr/pcre/include,/usr/pcre/lib \
+ 	 /usr/include,/usr/lib \
++	 /usr/include,/usr/lib64 \
+ 	 /opt/include/pcre,/opt/lib \
+ 	 /opt/pcre/include,/opt/pcre/lib \
+ 	 /opt/include,/opt/lib"
+@@ -7021,14 +7022,14 @@ $as_echo_n "checking for the pcre library and header files ... " >&6; }
+         xincdir=`echo $include_and_lib | tr ',' ' ' | awk '{print $1}'`
+ 	xlibdir=`echo $include_and_lib | tr ',' ' ' | awk '{print $2}'`
+ 	found=0
+-	if test -r $xincdir/$xincfile
++	if test -r $PKG_CONFIG_SYSROOT_DIR/$xincdir/$xincfile
+ 	then
+ 	  for E in $exts
+ 	  do
+-	    if test -r "$xlibdir/$xlibfile.$E"
++	    if test -r "$PKG_CONFIG_SYSROOT_DIR/$xlibdir/$xlibfile.$E"
+ 	    then
+-	      jd_pcre_include_dir="$xincdir"
+-	      jd_pcre_library_dir="$xlibdir"
++	      jd_pcre_include_dir="$PKG_CONFIG_SYSROOT_DIR/$xincdir"
++	      jd_pcre_library_dir="$PKG_CONFIG_SYSROOT_DIR/$xlibdir"
+ 	      jd_with_pcre_library="yes"
+ 	      found=1
+ 	      break
+@@ -7054,56 +7055,7 @@ $as_echo "yes: $jd_pcre_library_dir and $jd_pcre_include_dir" >&6; }
+     then
+       PCRE_LIB=""
+     else
+-
+-if test "X$jd_pcre_library_dir" != "X"
+-then
+-  if test "X$RPATH" = "X"
+-  then
+-
+-case "$host_os" in
+-  *linux*|*solaris* )
+-    if test "X$GCC" = Xyes
+-    then
+-      if test "X$ac_R_nospace" = "Xno"
+-      then
+-        RPATH="-Wl,-R,"
+-      else
+-        RPATH="-Wl,-R"
+-      fi
+-    else
+-      if test "X$ac_R_nospace" = "Xno"
+-      then
+-        RPATH="-R "
+-      else
+-	RPATH="-R"
+-      fi
+-    fi
+-  ;;
+-  *osf*|*openbsd*)
+-    if test "X$GCC" = Xyes
+-    then
+-      RPATH="-Wl,-rpath,"
+-    else
+-      RPATH="-rpath "
+-    fi
+-  ;;
+-  *netbsd*)
+-    if test "X$GCC" = Xyes
+-    then
+-      RPATH="-Wl,-R"
+-    fi
+-  ;;
+-esac
+-
+-    if test "X$RPATH" != "X"
+-    then
+-      RPATH="$RPATH$jd_pcre_library_dir"
+-    fi
+-  else
+-    RPATH="$RPATH:$jd_pcre_library_dir"
+-  fi
+-fi
+-
++      RPATH=""
+     fi
+ 
+     PCRE_INC=-I$jd_pcre_include_dir
+-- 
+1.7.4.1
+

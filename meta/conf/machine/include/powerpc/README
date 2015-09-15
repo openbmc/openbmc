@@ -1,0 +1,17 @@
+2012/03/30 - Mark Hatle <mark.hatle@windriver.com>
+  - Initial revision
+
+There are 4 primary PowerPC ABIs.
+# *) Hard/Soft Floating Point
+# *) 32-bit/64-bit
+
+TUNE_ARCH is defined as either "powerpc" or "powerpc64" based on the m32 
+or m64 feature.
+
+May of the PowerPC package archictures are based on legacy Linux names.
+However, a general naming scheme should be similar to: ppc[64][<family>][-nf].
+(Note: the default package architectures are "powerpc" and "powerpc64".)
+
+TUNE_PKGARCH is defined as TUNE_PKGARCH_tune-${DEFAULTTUNE}.  All 
+PowerPC tunings are required to define TUNE_PKGARCH_tune-<tune>.
+

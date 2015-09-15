@@ -1,0 +1,62 @@
+Upstream-Status: Pending
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+diff -Naur man-1.6e.orig/src/makewhatis.sh man-1.6e/src/makewhatis.sh
+--- man-1.6e.orig/src/makewhatis.sh	2006-07-19 01:58:08.000000000 -0300
++++ man-1.6e/src/makewhatis.sh	2007-05-18 10:18:31.000000000 -0300
+@@ -45,7 +45,7 @@
+ # and should be first.
+ # It is a bug to add /var/cache/man to DEFCATPATH.
+ dm=
+-for d in /usr/man /usr/share/man /usr/X11R6/man /usr/local/man
++for d in /usr/share/man /usr/man /usr/X11R6/man /usr/local/man
+ do
+     if [ -d $d ]; then
+ 	if [ x$dm = x ]; then dm=$d; else dm=$dm:$d; fi
+@@ -53,7 +53,7 @@
+ done
+ DEFMANPATH=$dm
+ dc=
+-for d in /usr/man/preformat /usr/man /usr/share/man/preformat /usr/share/man
++for d in /var/cache/man /usr/share/man/preformat /usr/man/preformat /usr/share/man /usr/man
+ do
+     if [ -d $d ]; then
+ 	if [ x$dc = x ]; then dc=$d; else dc=$dc:$d; fi
+@@ -76,12 +76,12 @@
+ # We try here to be careful (and avoid preconstructed symlinks)
+ # in case makewhatis is run as root, by creating a subdirectory of /tmp.
+ 
+-TMPFILEDIR=/tmp/whatis.tmp.dir.$$
+-rm -rf $TMPFILEDIR
+-if ! mkdir -m 0700 $TMPFILEDIR; then
+-    echo Could not create $TMPFILEDIR
+-    exit 1;
++TMPFILEDIR=`mktemp -d /tmp/makewhatisXXXXXX`
++if [ $? -ne 0 ]; then
++   echo "$0: Can't create temp file, exiting..."
++   exit 1
+ fi
++chmod 0700 $TMPFILEDIR
+ TMPFILE=$TMPFILEDIR/w
+ 
+ # make sure TMPFILEDIR is deleted if program is killed or terminates
+diff -Naur man-1.6e.orig/src/man.c man-1.6e/src/man.c
+--- man-1.6e.orig/src/man.c	2006-05-01 17:34:22.000000000 -0300
++++ man-1.6e/src/man.c	2007-05-18 10:11:33.000000000 -0300
+@@ -1234,7 +1234,6 @@
+ #endif
+ 
+ 
+-#if 0
+      {
+ 	/* There are no known cases of buffer overflow caused by
+ 	   excessively long environment variables. In case you find one,
+@@ -1257,7 +1256,6 @@
+ 	   MAN_ICONV_PATH, MAN_ICONV_OPT, MAN_ICONV_INPUT_CHARSET,
+ 	   MAN_ICONV_OUTPUT_CHARSET, NLSPATH, PATH */
+      }
+-#endif
+ 
+ 
+ #ifndef __FreeBSD__ 

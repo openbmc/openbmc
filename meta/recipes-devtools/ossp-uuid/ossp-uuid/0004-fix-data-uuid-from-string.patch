@@ -1,0 +1,43 @@
+Description: Support dash-less args to from_string.
+Author: Tim Retout <diocles@debian.org>
+Bug-Debian: http://bugs.debian.org/635607
+
+The module Data::GUID depends on Data::UUID supporting this behaviour.
+
+----
+Upstream-Status: Inappropriate [not author]
+
+This patch is from debian ossp-uuid 1.6.2 integration.
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+--- a/perl/uuid_compat.pm
++++ b/perl/uuid_compat.pm
+@@ -93,7 +93,9 @@
+     $uuid->import('str',
+           $str =~ /^0x/
+         ? join '-', unpack('x2 a8 a4 a4 a4 a12', $str)
+-        : $str
++        : $str =~ /-/
++        ? $str
++        : join '-', unpack('A8 A4 A4 A4 A12', $str)
+     );
+     return $uuid->export('bin');
+ }
+--- a/perl/uuid_compat.ts
++++ b/perl/uuid_compat.ts
+@@ -28,7 +28,7 @@
+ ##  uuid_compat.ts: Data::UUID Backward Compatibility Perl API (Perl test suite part)
+ ##
+ 
+-use Test::More tests => 14;
++use Test::More tests => 16;
+ 
+ BEGIN {
+     use_ok('Data::UUID');
+@@ -53,3 +53,5 @@
+ ok($uuid8 = $ug->from_string("6ba7b811-9dad-11d1-80b4-00c04fd430c8"));
+ ok($ug->compare($uuid7, $uuid8) == 0);
+ 
++ok($uuid9 = $ug->from_string("6ba7b8119dad11d180b400c04fd430c8"));
++ok($ug->compare($uuid7, $uuid9) == 0);

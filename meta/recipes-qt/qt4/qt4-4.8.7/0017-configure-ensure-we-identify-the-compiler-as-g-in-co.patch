@@ -1,0 +1,46 @@
+From d2bb701b551402f0befddd0e906423596bdc0df7 Mon Sep 17 00:00:00 2001
+From: Paul Eggleton <paul.eggleton@linux.intel.com>
+Date: Wed, 26 Sep 2012 20:48:37 +0200
+Subject: [PATCH 17/21] configure: ensure we identify the compiler as g++ in
+ configure
+
+Our PLATFORM in OE is ${TARGET_OS}-oe-g++, and previously the configure
+script was interpreting from this that the compiler was "oe-g++" and
+thus
+g++ specific checks were not being run since this string did not match;
+among other things this resulted in a compiler version check in the
+QtWebKit build code not working, and hence the following error at build
+time:
+
+./wtf/NullPtr.h:48:1: error: identifier 'nullptr' will become a keyword
+in C++0x [-Werror=c++0x-compat]
+
+The easiest thing since our PLATFORM is entirely artificial is to just
+force COMPILER to "g++" in the configure script if it is detected as
+"oe-g++".
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ configure | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/configure b/configure
+index 891d6e7..7031898 100755
+--- a/configure
++++ b/configure
+@@ -7592,6 +7592,9 @@ elif [ "$XPLATFORM" != "$PLATFORM" ]; then
+ else
+     COMPILER=`echo $PLATFORM | cut -f 2- -d-`
+ fi
++case $COMPILER in
++    *oe-g++) COMPILER="g++" ;;
++esac
+ if [ "$CFG_EXCEPTIONS" = "unspecified" -a "$PLATFORM_QWS" = "yes" ]; then
+     CFG_EXCEPTIONS=no
+ fi
+-- 
+1.8.0
+

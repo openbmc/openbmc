@@ -1,0 +1,35 @@
+From 5907a23ad2f49702960a33f9e2039552673eabc7 Mon Sep 17 00:00:00 2001
+From: Andrei Dinu <andrei.adrianx.dinu@intel.com>
+Date: Mon, 17 Dec 2012 14:01:18 +0200
+Subject: [PATCH] Removed icon from connman-gnome "about" applet
+
+The connman-gnome "about" applet showed a picture that
+can not be displayed. There is no designated picture
+in connman-gnome to be used in the about section, so
+it was removed.
+
+[OE-Core #2509]
+
+Upstream-Status: Pending
+
+Signed-off-by: Andrei Dinu <andrei.adrianx.dinu@intel.com>
+---
+ applet/main.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/applet/main.c b/applet/main.c
+index f12d371..c7b3c7f 100644
+--- a/applet/main.c
++++ b/applet/main.c
+@@ -212,7 +212,7 @@ static void about_callback(GtkWidget *item, gpointer user_data)
+ 			"comments", _("A connection manager for the GNOME desktop"),
+ 			"authors", authors,
+ 			"translator-credits", _("translator-credits"),
+-			"logo-icon-name", "network-wireless", NULL);
++			NULL);
+ }
+ 
+ static void settings_callback(GtkWidget *item, gpointer user_data)
+-- 
+1.7.9.5
+

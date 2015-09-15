@@ -1,0 +1,37 @@
+From 8403634a71f067eec514b6d2193cf41e281dff8e Mon Sep 17 00:00:00 2001
+From: Paul Eggleton <paul.eggleton@linux.intel.com>
+Date: Wed, 26 Sep 2012 20:47:08 +0200
+Subject: [PATCH 16/21] configure: eval QMAKE_CXX
+
+Allow expansion of $(...) references in QMAKE_CXX (currently its value
+is $(OE_QMAKE_CXX)) in order to allow compiler version check to succeed
+which allows WebKit to be enabled.
+
+Upstream-Status: Pending
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
+Conflicts:
+	configure
+---
+ configure | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/configure b/configure
+index d02824b..891d6e7 100755
+--- a/configure
++++ b/configure
+@@ -3409,7 +3409,8 @@ else
+     CFG_FRAMEWORK=no
+ fi
+ 
+-QMAKE_CONF_COMPILER=`getXQMakeConf QMAKE_CXX`
++QMAKE_CONF_COMPILER=`getXQMakeConf QMAKE_CXX | sed -n 's/$[(]\([0-9a-zA-Z_]*\)[)]/$\1/pg'`
++QMAKE_CONF_COMPILER=`eval "echo $QMAKE_CONF_COMPILER"`
+ TEST_COMPILER="$CXX"
+ 
+ [ -z "$TEST_COMPILER" ] && TEST_COMPILER=$QMAKE_CONF_COMPILER
+-- 
+1.8.0
+

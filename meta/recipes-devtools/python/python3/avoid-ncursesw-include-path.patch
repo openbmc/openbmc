@@ -1,0 +1,21 @@
+Upstream-Status: Pending
+
+We should make sure that sysroot is used by gcc instead of assuming
+hardcoded locations for include paths
+
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: Python-3.4.2/configure.ac
+===================================================================
+--- Python-3.4.2.orig/configure.ac
++++ Python-3.4.2/configure.ac
+@@ -4434,7 +4434,7 @@ fi
+ 
+ # first curses header check
+ ac_save_cppflags="$CPPFLAGS"
+-CPPFLAGS="$CPPFLAGS -I/usr/include/ncursesw"
++CPPFLAGS="$CPPFLAGS -I=/usr/include/ncursesw"
+ 
+ AC_CHECK_HEADERS(curses.h ncurses.h)
+ 

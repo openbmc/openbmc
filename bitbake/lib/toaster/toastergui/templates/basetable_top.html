@@ -1,0 +1,239 @@
+{% load projecttags %}
+<!-- component to display a generic table -->
+    <script>
+
+    //
+    // most of the following javascript is for managing the 'Edit Columns'
+    // pop-up dialog and actions. the idea is that there are 2 types
+    // of actions: immediate - performed while the dialog is still
+    // visible - hide/show columns, and delayed - performed when the
+    // dialog becomes invisible - any resorting if necessary.
+    //
+    // When the dialog is open, an interval timer is set up to
+    // determine if the dialog is still visible. when the dialog
+    // closes - goes invisible, the delayed actions are performed.
+    //
+    // the interval timer and interrupt handler is a way of simulating
+    // an onclose event. there is probably a simpler way to do this
+    // however the pop-up window id was elusive.
+    //
+
+    var editColTimer;
+    var editColAction;
+
+    //
+    // this is the target function of the interval timeout.
+    // check to see if the dialog is visible. if the dialog
+    // has gone invisible since the last check, take any delayed
+    // actions indicated in the action list and clear the timer.
+    //
+
+    function checkVisible( ) {
+        editcol = document.getElementById( 'editcol' );
+        if ( editcol.offsetWidth <= 0 ) {
+            clearInterval( editColTimer );
+            editColTimer = false;
+            hideshowColumns( );
+            editColAction = [ ];
+        }
+    }
+
+    function filterTableRows(test) {
+        if (test.length > 0) {
+            var r = test.split(/[ ,]+/).map(function (e) { return new RegExp(e, 'i') });
+            $('tr.data').map( function (i, el) {
+                (! r.map(function (j) { return j.test($(el).html())}).reduce(function (c, p) { return c && p;} )) ? $(el).hide() : $(el).show();
+            });
+        } else
+        {
+            $('tr.data').show();
+        }
+    }
+
+    //
+    // determine the value of the indicated url arg.
+    // this is needed to determine whether a resort
+    // is necessary. it looks like a lot of gorp stuff
+    // but its actually pretty simple.
+    //
+
+    function getURLParameter( name ) {
+        return decodeURIComponent((new RegExp('[?|&]' + name + '=' +
+          '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g,
+          '%20'))||null
+    }
+
+    //
+    // when the dialog box goes invisible
+    // this function is called to interpret
+    // the action list and take any delayed actions necessary.
+    // the editColAction list is a hash table with
+    // the column name as the hash key, the hash value
+    // is a 2 element list. the first element is a flag
+    // indicating whether the column is on or off. the
+    // 2nd element is the sort order indicator for the column.
+    //
+
+    function hideshowColumns( ) {
+        for( var k in editColAction ) {
+            showhideDelayedTableAction( k, editColAction[ k ][ 0 ], editColAction[ k ][ 1 ]);
+        }
+    }
+
+    //
+    // this function actually performs the delayed table actions
+    // namely any resorting if necessary
+    //
+
+    function showhideDelayedTableAction( clname, sh, orderkey ) {
+        if ( !sh ) {
+            p = getURLParameter( "orderby" ).split( ":" )[ 0 ];
+            if ( p == orderkey ) {
+                reload_params({ 'orderby' : '{{default_orderby}}'});
+            }
+        }
+    }
+
+    //
+    // this function actually performs the immediate table actions
+    // namely any colums that need to be hidden/shown
+    //
+
+    function showhideImmediateTableAction( clname, sh, orderkey ) {
+        if ( sh ) {
+            $( '.' + clname ).show( 100 );
+        }
+        else {
+            $( '.' + clname ).hide( 100 );
+        }
+
+	// save cookie for all checkboxes
+	save = '';
+	$( '.chbxtoggle' ).each(function( ) {
+            if ( $( this ).attr( 'id' ) != undefined ) {
+                save += ';' + $( this ).attr( 'id' ) +':'+ $( this ).is( ':checked' )
+            }
+        });
+	$.cookie( '_displaycols_{{objectname}}', save );
+	save = '';
+    }
+
+    //
+    // this is the onclick handler for all of the check box
+    // items in edit columns dialog
+    //
+
+    function showhideTableColumn( clname, sh, orderkey ) {
+        editcol = document.getElementById( 'editcol' );
+        if ( editcol.offsetWidth <= 0 ) {
+
+            //
+            // this path is taken when the page is first
+            // getting initialized - no dialog visible,
+            // perform both the immediate and delayed actions
+            //
+
+            showhideImmediateTableAction( clname, sh, orderkey );
+            showhideDelayedTableAction( clname, sh, orderkey );
+            return;
+        }
+        if ( !editColTimer ) {
+
+            //
+            // we don't have a timer active so set one up
+            // and clear the action list
+            //
+
+            editColTimer = setInterval( checkVisible, 250 );
+            editColAction = [ ];
+        }
+
+        //
+        // save the action to be taken when the dialog closes
+        //
+
+        editColAction[ clname ] = [ sh, orderkey ];
+        showhideImmediateTableAction( clname, sh, orderkey );
+    }
+
+    </script>
+
+<!-- control header -->
+<div class="navbar">
+    <div class="navbar-inner">
+        <form class="navbar-search input-append pull-left" id="searchform">
+            <input class="input-xxlarge" id="search" name="search" type="text" placeholder="Search {%if object_search_display %}{{object_search_display}}{%else%}{{objectname}}{%endif%}" value="{%if request.GET.search %}{{request.GET.search}}{% endif %}"/>{% if request.GET.search %}<a href="javascript:$('#search').val('');searchform.submit()" class="add-on btn" tabindex="-1"><i class="icon-remove"></i></a>{%endif%}
+            <input type="hidden" name="orderby" value="{{request.GET.orderby}}">
+            <input type="hidden" name="page" value="1">
+            <button class="btn" id="search-button" type="submit" value="Search">Search</button>
+        </form>
+        <div class="pull-right">
+{% if tablecols %}
+            <div class="btn-group">
+                <button id="edit-columns-button" class="btn dropdown-toggle" data-toggle="dropdown">Edit columns
+                    <span class="caret"></span>
+                </button>
+<!--
+	{{tablecols|sortcols}}
+-->
+                <ul id='editcol' class="dropdown-menu">
+                  {% for i in tablecols|sortcols %}
+                    <li>
+                        <label {% if not i.clclass %} class="checkbox muted" {%else%} class="checkbox" {%endif%}>
+                            <input type="checkbox" class="chbxtoggle"
+                                   {% if i.clclass %}
+                                       id="{{i.clclass}}"
+                                       value="ct{{i.name}}"
+                                       {% if not i.hidden %}
+                                           checked="checked"
+                                       {%endif%}
+                                       onclick="showhideTableColumn(
+                                           $(this).attr('id'),
+                                           $(this).is(':checked'),
+                                           {% if i.ordericon %}
+                                              '{{i.orderkey}}'
+                                           {% else %}
+                                              undefined
+                                           {% endif %}
+                                       )"
+                                   {%else%}
+                                       checked disabled
+                                   {% endif %}/>   {{i.name}}
+                        </label>
+                    </li>
+                  {% endfor %}
+                </ul>
+            </div>
+{% endif %}
+            <div style="display:inline">
+                <span class="divider-vertical"></span>
+                <span class="help-inline" style="padding-top:5px;">Show rows:</span>
+                <select style="margin-top:5px;margin-bottom:0px;" class="pagesize">
+                  {% with "10 25 50 100 150" as list%}
+                    {% for i in list.split %}
+                        <option value="{{i}}">{{i}}</option>
+                    {% endfor %}
+                  {% endwith %}
+                </select>
+           </div>
+        </div>
+    </div> <!-- navbar-inner -->
+</div>
+
+<!-- the actual rows of the table -->
+    <table class="table table-bordered table-hover tablesorter" id="otable">
+    <thead>
+        <!-- Table header row; generated from "tablecols" entry in the context dict -->
+        <tr>
+            {% for tc in tablecols %}<th class="{%if tc.dclass%}{{tc.dclass}}{%endif%} {% if tc.clclass %}{{tc.clclass}}{% endif %}">
+                {%if tc.qhelp%}<i class="icon-question-sign get-help" title="{{tc.qhelp}}"></i>{%endif%}
+                {%if tc.orderfield%}<a {%if tc.ordericon%} class="sorted" {%endif%}href="javascript:reload_params({'page': 1, 'orderby' : '{{tc.orderfield}}' })">{{tc.name}}</a>{%else%}<span class="muted">{{tc.name}}</span>{%endif%}
+                {%if tc.ordericon%} <i class="icon-caret-{{tc.ordericon}}"></i>{%endif%}
+                {%if tc.filter%}<div class="btn-group pull-right">
+                    <a href="#filter_{{tc.filter.class}}" role="button" class="btn btn-mini {%if request.GET.filter%}{{tc.filter.options|filtered_icon:request.GET.filter}} {%endif%}" {%if request.GET.filter and tc.filter.options|filtered_tooltip:request.GET.filter %} title="<p>{{tc.filter.options|filtered_tooltip:request.GET.filter}}</p><p><a class='btn btn-small btn-primary' href=javascript:reload_params({'filter':''})>Show all {% if filter_search_display %}{{filter_search_display}}{% else %}{{objectname}}{% endif %}</a></p>" {%endif%} data-toggle="modal"> <i class="icon-filter filtered"></i> </a>
+                </div>{%endif%}
+            </th>{% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+

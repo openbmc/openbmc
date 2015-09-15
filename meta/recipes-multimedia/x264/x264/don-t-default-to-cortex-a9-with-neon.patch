@@ -1,0 +1,29 @@
+-march flag is not in CFLAGS so this will always default to -mcpu=cortex-a8
+-mfpu=neon.
+
+Upstream-Status: Pending
+Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
+
+diff --git a/configure b/configure
+index 2916036..f4ece40 100755
+--- a/configure
++++ b/configure
+@@ -773,9 +773,6 @@ if [ $asm = auto -a \( $ARCH = X86 -o $ARCH = X86_64 \) ] ; then
+ fi
+ 
+ if [ $asm = auto -a $ARCH = ARM ] ; then
+-    # set flags so neon is built by default
+-    echo $CFLAGS | grep -Eq '(-mcpu|-march|-mfpu)' || CFLAGS="$CFLAGS -mcpu=cortex-a8 -mfpu=neon"
+-
+     if  cc_check '' '' '__asm__("rev ip, ip");' ; then      define HAVE_ARMV6
+         cc_check '' '' '__asm__("movt r0, #0");'         && define HAVE_ARMV6T2
+         cc_check '' '' '__asm__("vadd.i16 q0, q0, q0");' && define HAVE_NEON
+@@ -788,8 +785,6 @@ if [ $asm = auto -a $ARCH = ARM ] ; then
+ fi
+ 
+ if [ $asm = auto -a $ARCH = AARCH64 ] ; then
+-    # set flags so neon is built by default
+-    echo $CFLAGS | grep -Eq '(-mcpu|-march|-mfpu|-arch)' || CFLAGS="$CFLAGS -arch arm64 -mfpu=neon"
+ 
+     if  cc_check '' '' '__asm__("cmeq v0.8h, v0.8h, #0");' ; then define HAVE_NEON
+         ASFLAGS="$ASFLAGS -c"

@@ -1,0 +1,55 @@
+Upstream-Status: Inappropriate [licensing]
+
+# Fix to use mempcpy instead of __mempcpy. This is needed for uclibc which
+# doesn't define __mempcpy, only mempcpy. Since both uclibc and glibc have
+# mempcpy, we'll just use that instead.
+# Patch source: OpenEmbedded
+
+Index: grep-2.5.1/intl/localealias.c
+===================================================================
+--- grep-2.5.1.orig/intl/localealias.c	2002-03-14 00:39:06.000000000 +1100
++++ grep-2.5.1/intl/localealias.c	2007-05-17 13:53:58.000000000 +1000
+@@ -65,7 +65,7 @@
+ # define strcasecmp __strcasecmp
+ 
+ # ifndef mempcpy
+-#  define mempcpy __mempcpy
++#  error "mempcpy not detected"
+ # endif
+ # define HAVE_MEMPCPY	1
+ # define HAVE___FSETLOCKING	1
+Index: grep-2.5.1/lib/getopt.c
+===================================================================
+--- grep-2.5.1.orig/lib/getopt.c	2001-03-04 16:33:12.000000000 +1100
++++ grep-2.5.1/lib/getopt.c	2007-05-17 13:51:44.000000000 +1000
+@@ -326,7 +326,7 @@
+ 	nonoption_flags_len = nonoption_flags_max_len = 0;
+       else
+ 	{
+-	  memset (__mempcpy (new_str, __getopt_nonoption_flags,
++	  memset (mempcpy (new_str, __getopt_nonoption_flags,
+ 			     nonoption_flags_max_len),
+ 		  '\0', top + 1 - nonoption_flags_max_len);
+ 	  nonoption_flags_max_len = top + 1;
+@@ -437,7 +437,7 @@
+ 	      if (__getopt_nonoption_flags == NULL)
+ 		nonoption_flags_max_len = -1;
+ 	      else
+-		memset (__mempcpy (__getopt_nonoption_flags, orig_str, len),
++		memset (mempcpy (__getopt_nonoption_flags, orig_str, len),
+ 			'\0', nonoption_flags_max_len - len);
+ 	    }
+ 	}
+Index: grep-2.5.1/lib/regex.c
+===================================================================
+--- grep-2.5.1.orig/lib/regex.c	2001-04-03 04:04:45.000000000 +1000
++++ grep-2.5.1/lib/regex.c	2007-05-17 13:51:48.000000000 +1000
+@@ -7842,7 +7842,7 @@
+       if (msg_size > errbuf_size)
+         {
+ #if defined HAVE_MEMPCPY || defined _LIBC
+-	  *((char *) __mempcpy (errbuf, msg, errbuf_size - 1)) = '\0';
++	  *((char *) mempcpy (errbuf, msg, errbuf_size - 1)) = '\0';
+ #else
+           memcpy (errbuf, msg, errbuf_size - 1);
+           errbuf[errbuf_size - 1] = 0;

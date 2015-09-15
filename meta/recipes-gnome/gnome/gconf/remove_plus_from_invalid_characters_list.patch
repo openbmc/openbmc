@@ -1,0 +1,19 @@
+Upstream-Status: Pending
+
+Remove '+' from invalid characters list
+
+Signed-off-by: Laurentiu Palcu <laurentiu.palcu@intel.com>
+
+Index: GConf-3.2.5/gconf/gconf-backend.c
+===================================================================
+--- GConf-3.2.5.orig/gconf/gconf-backend.c
++++ GConf-3.2.5/gconf/gconf-backend.c
+@@ -37,7 +37,7 @@ static const char invalid_chars[] =
+   /* Space is common in user names (and thus home directories) on Windows */
+   " "
+ #endif
+-  "\t\r\n\"$&<>,+=#!()'|{}[]?~`;%\\";
++  "\t\r\n\"$&<>,=#!()'|{}[]?~`;%\\";
+ 
+ static gboolean
+ gconf_address_valid (const char  *address,

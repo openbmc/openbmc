@@ -1,0 +1,34 @@
+From 01421f8a80d5c623959695ba2b8167f30112d333 Mon Sep 17 00:00:00 2001
+From: Brendan O'Dea <bod@debian.org>
+Date: Fri, 16 Dec 2005 01:32:14 +1100
+Subject: Remove overly restrictive DB_File version check.
+
+Bug-Debian: http://bugs.debian.org/340047
+
+Package dependencies ensure the correct library is linked at run-time.
+
+Patch-Name: debian/db_file_ver.diff
+---
+ cpan/DB_File/version.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/cpan/DB_File/version.c b/cpan/DB_File/version.c
+index e01f6f6..544e6ee 100644
+--- a/cpan/DB_File/version.c
++++ b/cpan/DB_File/version.c
+@@ -48,6 +48,7 @@ __getBerkeleyDBInfo()
+ 
+     (void)db_version(&Major, &Minor, &Patch) ;
+ 
++#ifndef DEBIAN
+     /* Check that the versions of db.h and libdb.a are the same */
+     if (Major != DB_VERSION_MAJOR || Minor != DB_VERSION_MINOR )
+ 		/* || Patch != DB_VERSION_PATCH) */
+@@ -55,6 +56,7 @@ __getBerkeleyDBInfo()
+ 	croak("\nDB_File was build with libdb version %d.%d.%d,\nbut you are attempting to run it with libdb version %d.%d.%d\n",
+ 		DB_VERSION_MAJOR, DB_VERSION_MINOR, DB_VERSION_PATCH, 
+ 		Major, Minor, Patch) ;
++#endif /* DEBIAN */
+     
+     /* check that libdb is recent enough  -- we need 2.3.4 or greater */
+     if (Major == 2 && (Minor < 3 || (Minor ==  3 && Patch < 4)))

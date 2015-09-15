@@ -1,0 +1,33 @@
+From 90c252cecc38aed5d5faedb30485dd6eee2e54eb Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Wed, 11 Feb 2015 15:14:40 +0800
+Subject: [PATCH] perl / PathTools: don't filter out blib from @INC
+
+If $TOPDIR includes the string "blib", filter it out from @INC may empty
+the @INC and cause build errors like:
+
+  Can't locate ExtUtils/MakeMaker.pm in @INC \
+  (you may need to install the ExtUtils::MakeMaker module) \
+  (@INC contains: .) at Makefile.PL
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ dist/PathTools/Makefile.PL | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/dist/PathTools/Makefile.PL b/dist/PathTools/Makefile.PL
+index 1b21de4..f562cb2 100644
+--- a/dist/PathTools/Makefile.PL
++++ b/dist/PathTools/Makefile.PL
+@@ -1,6 +1,3 @@
+-
+-BEGIN { @INC = grep {!/blib/} @INC }
+-
+ require 5.005;
+ use ExtUtils::MakeMaker;
+ WriteMakefile
+-- 
+1.9.1
+

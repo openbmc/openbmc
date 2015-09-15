@@ -1,0 +1,21 @@
+Use of $(top_srcdir) in TESTS is an error which causes
+automake-1.13 to abort. Just remove tests.
+
+Upstream-Status: Inappropriate [disable feature]
+
+Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
+diff -Nurd popt-1.16/Makefile.am popt-1.16/Makefile.am
+--- popt-1.16/Makefile.am	2010-05-04 23:55:54.000000000 +0300
++++ popt-1.16/Makefile.am	2013-01-02 13:34:29.540361391 +0200
+@@ -34,11 +34,6 @@
+
+ noinst_SCRIPTS = testit.sh
+
+-TESTS_ENVIRONMENT = \
+-test1="$(top_builddir)/test1"
+-
+-TESTS = $(top_srcdir)/testit.sh
+-
+ include_HEADERS = popt.h
+
+ usrlibdir = $(libdir)

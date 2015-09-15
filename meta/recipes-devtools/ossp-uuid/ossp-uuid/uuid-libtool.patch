@@ -1,0 +1,27 @@
+Remove hardcoded libtool name, fall back to generated name
+
+Upstream-Status: Inappropriate [no upstream]
+The project appears to no longer be accepting changes.
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+diff -ur uuid-1.6.2.orig/Makefile.in uuid-1.6.2/Makefile.in
+--- uuid-1.6.2.orig/Makefile.in	2012-05-14 14:37:19.579672930 -0500
++++ uuid-1.6.2/Makefile.in	2012-05-14 14:37:49.112733787 -0500
+@@ -32,6 +32,7 @@
+ VPATH       = @srcdir@
+ srcdir      = @srcdir@
+ top_srcdir  = @top_srcdir@
++top_builddir = @top_builddir@
+ S           = $(srcdir)
+ C           = .
+ 
+@@ -55,7 +56,7 @@
+ CP          = cp
+ RMDIR       = rmdir
+ SHTOOL      = $(S)/shtool
+-LIBTOOL     = $(C)/libtool
++LIBTOOL     = @LIBTOOL@
+ TRUE        = true
+ POD2MAN     = pod2man
+ PERL        = @PERL@

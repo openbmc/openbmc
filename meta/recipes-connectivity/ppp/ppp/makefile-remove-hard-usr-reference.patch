@@ -1,0 +1,37 @@
+The patch comes from OpenEmbedded.
+Rebased for ppp-2.4.5. Dongxiao Xu <dongxiao.xu@intel.com>
+
+Updated from OE-Classic to include the pcap hunk.
+Signed-off-by: Andreas Oberritter <obi@opendreambox.org>
+
+Upstream-Status: Inappropriate [configuration]
+
+diff -urN ppp-2.4.5-orig/pppd/Makefile.linux ppp-2.4.5/pppd/Makefile.linux
+--- ppp-2.4.5-orig/pppd/Makefile.linux	2010-06-30 15:51:12.043682063 +0800
++++ ppp-2.4.5/pppd/Makefile.linux	2010-06-30 17:08:21.806363042 +0800
+@@ -117,10 +117,10 @@
+ #LIBS     += -lshadow $(LIBS)
+ endif
+ 
+-ifneq ($(wildcard /usr/include/crypt.h),)
++#ifneq ($(wildcard /usr/include/crypt.h),)
+ CFLAGS  += -DHAVE_CRYPT_H=1
+ LIBS	+= -lcrypt
+-endif
++#endif
+ 
+ ifdef NEEDDES
+ ifndef USE_CRYPT
+@@ -169,10 +169,10 @@
+ endif
+ 
+ ifdef FILTER
+-ifneq ($(wildcard /usr/include/pcap-bpf.h),)
++#ifneq ($(wildcard /usr/include/pcap-bpf.h),)
+ LIBS    += -lpcap
+ CFLAGS  += -DPPP_FILTER
+-endif
++#endif
+ endif
+ 
+ ifdef HAVE_INET6

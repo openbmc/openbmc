@@ -1,0 +1,15 @@
+Upstream-Status: Backport [debian]
+
+Index: openssl-1.0.0c/Makefile.org
+===================================================================
+--- openssl-1.0.0c.orig/Makefile.org	2010-12-12 16:11:27.000000000 +0100
++++ openssl-1.0.0c/Makefile.org	2010-12-12 16:11:37.000000000 +0100
+@@ -131,7 +131,7 @@
+ 
+ MAKEFILE= Makefile
+ 
+-MANDIR=$(OPENSSLDIR)/man
++MANDIR=/usr/share/man
+ MAN1=1
+ MAN3=3
+ MANSUFFIX=

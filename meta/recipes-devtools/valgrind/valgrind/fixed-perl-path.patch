@@ -1,0 +1,53 @@
+this is a temporary patch to workaround cross compilation.
+otherwise @PERL@ will be replaced to perl-native binary,
+this creates unusable scripts and fails FILERDEPENDS mechanism
+(esp. rpm)
+
+a better fix would need:
+ 1. configure.ac should differentiate PERL and HOSTPERL
+ 2. optionally remove ${STAGING_DIR} in #! line before do_install
+
+8/31/2010 - created by Qing He <qing.he@intel.com>
+
+Upstream-Status: Inappropriate [configuration]
+
+diff --git a/cachegrind/cg_annotate.in b/cachegrind/cg_annotate.in
+index 9dc9565..cc4ef05 100644
+--- a/cachegrind/cg_annotate.in
++++ b/cachegrind/cg_annotate.in
+@@ -1,4 +1,4 @@
+-#! @PERL@
++#! /usr/bin/perl
+ 
+ ##--------------------------------------------------------------------##
+ ##--- Cachegrind's annotator.                       cg_annotate.in ---##
+diff --git a/cachegrind/cg_diff.in b/cachegrind/cg_diff.in
+index 951066e..84c2dde 100644
+--- a/cachegrind/cg_diff.in
++++ b/cachegrind/cg_diff.in
+@@ -1,4 +1,4 @@
+-#! @PERL@
++#! /usr/bin/perl
+ 
+ ##--------------------------------------------------------------------##
+ ##--- Cachegrind's differencer.                         cg_diff.in ---##
+diff --git a/massif/ms_print.in b/massif/ms_print.in
+index e6ffdbf..fb45906 100755
+--- a/massif/ms_print.in
++++ b/massif/ms_print.in
+@@ -1,4 +1,4 @@
+-#! @PERL@
++#! /usr/bin/perl
+ 
+ ##--------------------------------------------------------------------##
+ ##--- Massif's results printer                         ms_print.in ---##
+diff --git a/perf/vg_perf.in b/perf/vg_perf.in
+index 2188a31..83ad024 100644
+--- a/perf/vg_perf.in
++++ b/perf/vg_perf.in
+@@ -1,4 +1,4 @@
+-#! @PERL@
++#! /usr/bin/perl
+ ##--------------------------------------------------------------------##
+ ##--- Valgrind performance testing script                  vg_perf ---##
+ ##--------------------------------------------------------------------##

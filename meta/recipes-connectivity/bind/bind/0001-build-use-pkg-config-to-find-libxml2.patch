@@ -1,0 +1,42 @@
+xml2-config is disabled, so change the configure script to use pkgconfig to find
+libxml2.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+---
+ configure.in | 18 +++---------------
+ 1 file changed, 3 insertions(+), 15 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index d566e1c..c9ef3a6 100644
+--- a/configure.in
++++ b/configure.in
+@@ -2102,21 +2102,9 @@ case "$use_libxml2" in
+ 		DST_LIBXML2_INC=""
+ 		;;
+ 	auto|yes)
+-		case X`(xml2-config --version) 2>/dev/null` in
+-		X2.[[6789]].*)
+-			libxml2_libs=`xml2-config --libs`
+-			libxml2_cflags=`xml2-config --cflags`
+-			;;
+-		*)
+-			libxml2_libs=
+-			libxml2_cflags=
+-			;;
+-		esac
+-		;;
+-	*)
+-		if test -f "$use_libxml2/bin/xml2-config" ; then
+-			libxml2_libs=`$use_libxml2/bin/xml2-config --libs`
+-			libxml2_cflags=`$use_libxml2/bin/xml2-config --cflags`
++		if pkg-config --exists libxml-2.0 ; then
++			libxml2_libs=`pkg-config libxml-2.0 --libs`
++			libxml2_cflags=`pkg-config libxml-2.0 --cflags`
+ 		fi
+ 		;;
+ esac
+-- 
+2.1.4
+

@@ -1,0 +1,45 @@
+#!/bin/sh
+# Copyright (C) 2011, 2012 O.S. Systems Software LTDA.
+# Licensed on MIT
+
+udev_shutdown_hook_handler() {
+	status=$1
+	module=$2
+	if [ "$status" = "pre" ] && [ "$module" = "finish" ]; then
+		killall `basename $_UDEV_DAEMON` 2>/dev/null
+	fi
+}
+
+udev_daemon() {
+	OPTIONS="/sbin/udev/udevd /sbin/udevd /lib/udev/udevd /lib/systemd/systemd-udevd"
+
+	for o in $OPTIONS; do
+		if [ -x "$o" ]; then
+			echo $o
+			return 0
+		fi
+	done
+
+	return 1
+}
+
+_UDEV_DAEMON=`udev_daemon`
+
+udev_enabled() {
+	if [ -z "$_UDEV_DAEMON" ]; then
+		msg "WARNING: Cannot find the udev daemon; daemon will not be started in initramfs."
+		return 1
+	fi
+
+	return 0
+}
+
+udev_run() {
+	add_module_pre_hook "udev_shutdown_hook_handler"
+
+	mkdir -p /run
+
+	$_UDEV_DAEMON --daemon
+	udevadm trigger --action=add
+	udevadm settle
+}

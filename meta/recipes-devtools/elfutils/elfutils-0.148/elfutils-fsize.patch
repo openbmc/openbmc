@@ -1,0 +1,39 @@
+Upstream-Status: Backport
+
+The ELF_T_LIB and ELF_T_GNUHASH sizes were missing from fsize table.
+
+This could cause a failure in the elf*_xlatetof function.
+
+diff -ur elfutils-0.148.orig/libelf/exttypes.h elfutils-0.148/libelf/exttypes.h
+--- elfutils-0.148.orig/libelf/exttypes.h	2009-01-08 12:56:37.000000000 -0800
++++ elfutils-0.148/libelf/exttypes.h	2010-08-18 14:00:33.000000000 -0700
+@@ -94,6 +94,7 @@
+ Vernaux32 (Ext_);
+ Syminfo32 (Ext_);
+ Move32 (Ext_);
++Lib32 (Ext_);
+ auxv_t32 (Ext_);
+ 
+ Ehdr64 (Ext_);
+@@ -110,6 +111,7 @@
+ Vernaux64 (Ext_);
+ Syminfo64 (Ext_);
+ Move64 (Ext_);
++Lib64 (Ext_);
+ auxv_t64 (Ext_);
+ 
+ #undef START
+diff -ur elfutils-0.148.orig/libelf/gelf_fsize.c elfutils-0.148/libelf/gelf_fsize.c
+--- elfutils-0.148.orig/libelf/gelf_fsize.c	2009-01-08 12:56:37.000000000 -0800
++++ elfutils-0.148/libelf/gelf_fsize.c	2010-08-18 14:11:57.000000000 -0700
+@@ -87,7 +87,9 @@
+       [ELF_T_NHDR]	= sizeof (ElfW2(LIBELFBITS, Ext_Nhdr)),		      \
+       [ELF_T_SYMINFO]	= sizeof (ElfW2(LIBELFBITS, Ext_Syminfo)),	      \
+       [ELF_T_MOVE]	= sizeof (ElfW2(LIBELFBITS, Ext_Move)),		      \
+-      [ELF_T_AUXV]	= sizeof (ElfW2(LIBELFBITS, Ext_auxv_t))
++      [ELF_T_LIB]	= sizeof (ElfW2(LIBELFBITS, Ext_Lib)),		      \
++      [ELF_T_AUXV]	= sizeof (ElfW2(LIBELFBITS, Ext_auxv_t)),	      \
++      [ELF_T_GNUHASH]	= ELFW2(LIBELFBITS, FSZ_WORD)
+       TYPE_SIZES (32)
+     },
+     [ELFCLASS64 - 1] = {

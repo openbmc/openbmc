@@ -1,0 +1,19 @@
+
+exec_prefix is /usr default in OE-Core
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+Index: procps-ng-3.3.10/configure.ac
+===================================================================
+--- procps-ng-3.3.10.orig/configure.ac
++++ procps-ng-3.3.10/configure.ac
+@@ -70,7 +70,7 @@ AC_FUNC_MMAP
+ AC_FUNC_REALLOC
+ AC_FUNC_STRTOD
+ 
+-usrbin_execdir='${exec_prefix}/usr/bin'
++usrbin_execdir='${exec_prefix}/bin'
+ AC_SUBST([usrbin_execdir])
+ 
+ AM_GNU_GETTEXT_VERSION([0.14.1])

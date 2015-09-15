@@ -1,0 +1,57 @@
+{% load projecttags %}
+<!-- '{{f.class}}' filter -->
+{% with f.class as  key %}
+<form id="filter_{{f.class}}" class="modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <input type="hidden" name="search" value="{%if request.GET.search %}{{request.GET.search}}{%endif%}"/>
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+            {% if search_term %}
+                 <h3>Filter {{total_count}} {%if filter_search_display%}{{filter_search_display|title}}{%else%}{{objectname|title}}{%endif%} matching '{{search_term}}' by '{{tc.name}}'</h3>
+            {% else %}
+                <h3>Filter {%if filter_search_display%}{{filter_search_display|title}}{%else%}{{objectname|title}}{%endif%} by '{{tc.name}}'</h3>
+            {% endif %}
+        </div>
+        <div class="modal-body">
+            <p>{{f.label}}</p>
+            <label class="radio">
+                <input type="radio" name="filter" {%if request.GET.filter%}{{f.options|check_filter_status:request.GET.filter}} {%else%} checked {%endif%} value="" data-key="{{key}}">  All {%if filter_search_display%}{{filter_search_display|title}}{%else%}{{objectname|title}}{%endif%}
+            </label>
+            {% for option in f.options %}
+                {% if option.1 == 'daterange' %}
+                  <div class="form-inline">
+                      <label class="radio">
+                          <input type="radio" name="filter" id="filter_value_{{key}}" {%if key == daterange_selected %}checked{%endif%} value="{{option.1}}" data-key="{{key}}"> {{option.0}}
+                {% else %}
+                  {% if 1 %}
+                      <label class="radio">
+                          <input type="radio" name="filter" {%if request.GET.filter == option.1 %}checked{%endif%}  value="{{option.1}}" data-key="{{key}}"> {{option.0}}
+                  {% comment "do not disable radio selections by count for now" %}{% else %}
+                      <label class="radio muted">
+                          <input type="radio" name="filter" disabled {%if request.GET.filter == option.1 %}checked{%endif%}  value="{{option.1}}" data-key="{{key}}"> {{option.0}}
+                  {% endcomment %}{% endif %}
+                {% endif %}
+                {% if option.3 %}<i class="icon-question-sign get-help" data-placement="right" title="{{option.3}}"></i>{% endif %}
+                  </label>
+                {% if option.1 == 'daterange' %}
+                  <input type="text" id="date_from_{{key}}" name="date_from_{{key}}" disabled class="input-small" /><label class="help-inline">to</label>
+                  <input type="text" id="date_to_{{key}}" name="date_to_{{key}}" disabled class="input-small"  />
+                  <label class="help-inline get-help" >(dd/mm/yyyy)</label>
+                  </div>
+                {% endif %}
+            {% endfor %}
+        <!-- daterange persistence -->
+        {% if last_date_from and last_date_to %}
+        <input type="hidden" id="last_date_from_{{key}}" name="last_date_from" value="{{last_date_from}}"/>
+        <input type="hidden" id="last_date_to_{{key}}" name="last_date_to"   value="{{last_date_to}}"/>
+        {% endif %}
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary" data-key="{{key}}">Apply</button>
+            {% if request.GET.filter %}
+                {% if request.GET.filter|string_remove_regex:':.*' != f.options.0.1|string_remove_regex:':.*' %}
+                <span class="help-inline pull-left">You can only apply one filter to the table. This filter will override the current filter.</span>
+                {% endif %}
+            {% endif %}
+        </div>
+</form>
+{% endwith %}

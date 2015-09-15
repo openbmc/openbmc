@@ -1,0 +1,172 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
+[<!ENTITY % poky SYSTEM "../poky.ent"> %poky; ] >
+
+<chapter id='toaster-manual-intro'>
+<title>Introduction</title>
+
+    <para>
+        Toaster is a web interface to the Yocto Project's
+        <ulink url='&YOCTO_DOCS_DEV_URL;#build-system-term'>OpenEmbedded build system</ulink>.
+        The interface enables you to configure and run your builds.
+        Information about builds is collected and stored in a database.
+        You can use Toaster to configure and start builds on multiple
+        remote build servers.
+    </para>
+
+    <note>
+        <para>
+            This release of Toaster does allow you to configure and initiate
+            builds.
+            However, you cannot use Toaster to customize image recipes, which
+            still must either be done by hand or through
+            <ulink url='&YOCTO_HOME_URL;/tools-resources/projects/hob'>Hob</ulink>.
+            As Toaster matures, it eventually will equal and surpass Hob
+            functionality, at which time Hob will be deprecated.
+        </para>
+
+        <para>
+            For more information on Hob,
+            see the
+            "<ulink url='&YOCTO_DOCS_DEV_URL;#image-development-using-hob'>Image Development Using Hob</ulink>"
+           section in the Yocto Project Development Manual.
+        </para>
+    </note>
+
+    <section id='intro-modes'>
+        <title>Toaster Operational Modes</title>
+
+        <para>
+            You can use Toaster in Analysis Mode or Build Mode:
+            <itemizedlist>
+                <listitem><para><emphasis>Analysis Mode:</emphasis>
+                    In Analysis Mode, you can record builds and statistics.
+                    In this Mode, you directly access the
+                    <filename>bitbake</filename> command, which you then use to
+                    build images.</para>
+                    <para>Analysis Mode requires you to have first started
+                    Toaster and then to initiate your build using the
+                    <filename>bitbake</filename> command from the shell.
+                    Toaster must be started before the build or it will not
+                    collect build data.</para>
+                    <para>Toaster has the following capabilities in
+                    Analysis Mode:
+                    <itemizedlist>
+                        <listitem><para>
+                            See what was built (recipes and packages) and what
+                            packages were installed into your final image.
+                            </para></listitem>
+                        <listitem><para>
+                            Browse the directory structure of your image.
+                            </para></listitem>
+                        <listitem><para>
+                            See the value of all variables in your build
+                            configuration, and which files set each value.
+                            </para></listitem>
+                        <listitem><para>
+                            Examine error, warning and trace messages to aid
+                            in debugging.
+                            </para></listitem>
+                        <listitem><para>
+                            See information about the BitBake tasks executed
+                            and reused during your build, including those that
+                            used shared state.
+                            </para></listitem>
+                        <listitem><para>
+                            See dependency relationships between recipes,
+                            packages and tasks
+                            </para></listitem>
+                        <listitem><para>
+                            See performance information such as build time,
+                            task time, CPU usage, and disk I/O.
+                            </para></listitem>
+                    </itemizedlist>
+                    </para></listitem>
+                <listitem><para><emphasis>Build Mode:</emphasis>
+                    In Build Mode, Toaster handles the build configuration,
+                    scheduling and execution.
+                    In this mode, all your interaction with the build system
+                    happens through the web interface.
+                    You do not have direct access to the
+                    <filename>bitbake</filename> command.</para>
+                    <para>Using this mode, you configure and start your builds
+                    within Toaster's GUI.
+                    Each project can be configured for a specific version
+                    of the build system.
+                    As shipped, Toaster supports Yocto Project Releases 1.7 and
+                    beyond.</para>
+                    <para>Toaster has all the same capabilities in Build Mode
+                    as it does in Analysis Mode plus the following:
+                    <itemizedlist>
+                        <listitem><para>
+                            Browse layers listed in the various
+                            <link linkend='layer-source'>layer sources</link>
+                            that are available in your project (e.g. the
+                            OpenEmbedded Metadata Index at
+                            <ulink url='http://layers.openembedded.org/layerindex/'></ulink>).
+                            </para></listitem>
+                        <listitem><para>
+                            Import your own layers for building.
+                            </para></listitem>
+                        <listitem><para>
+                            Add and remove layers from your configuration.
+                            </para></listitem>
+                        <listitem><para>
+                            Set configuration variables.
+                            </para></listitem>
+                        <listitem><para>
+                            Select a target or multiple targets to build.
+                            </para></listitem>
+                        <listitem><para>
+                            Start your builds.
+                            </para></listitem>
+                    </itemizedlist>
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='toaster-installation-options'>
+        <title>Installation Options</title>
+
+        <para>
+            You can set Toaster up to run as a local instance or as a shared
+            hosted service.
+            Regardless of how you set up Toaster, both Analysis and Build
+            Modes are available.
+        </para>
+
+        <para>
+            When Toaster is set up as a local instance, all the components
+            reside on a single build host.
+            Fundamentally, a local instance of Toaster is suited for a single
+            user developing on a single build host.
+        </para>
+
+        <para>
+            <imagedata fileref="figures/simple-configuration.png" align="center" width="6in" depth="1.5in" />
+        </para>
+
+        <para>
+            Toaster as a hosted service is suited for multiple users
+            developing across several build hosts.
+            When Toaster is set up as a hosted service, its components can
+            be spread across several machines:
+        </para>
+
+        <para>
+            <imagedata fileref="figures/hosted-service.png" align="center" width="6in" depth="3.5in" />
+        </para>
+    </section>
+
+<!--THIS EXTRA INFORMATION PROBABLY WILL GO AWAY
+        For additional information on installing and running Toaster, see the
+        "<ulink url='https://wiki.yoctoproject.org/wiki/Toaster#Installation_and_Running'>Installation and Running</ulink>"
+        section of the "Toaster" wiki page.
+        For complete information on the API and its search operation
+        URI, parameters, and responses, see the
+        <ulink url='https://wiki.yoctoproject.org/wiki/REST_API_Contracts'>REST API Contracts</ulink>
+        Wiki page.
+    </para>
+-->
+</chapter>

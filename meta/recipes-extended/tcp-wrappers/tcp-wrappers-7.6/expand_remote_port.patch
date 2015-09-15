@@ -1,0 +1,73 @@
+Upstream-Status: Backport
+
+diff -ruN tcp_wrappers_7.6.orig/eval.c tcp_wrappers_7.6/eval.c
+--- tcp_wrappers_7.6.orig/eval.c	1995-01-30 19:51:46.000000000 +0100
++++ tcp_wrappers_7.6/eval.c	2004-11-04 13:59:01.000000000 +0100
+@@ -98,6 +98,28 @@
+     }
+ }
+ 
++/* eval_port - return string with the port */
++char   *eval_port(saddr)
++#ifdef INET6
++struct sockaddr *saddr;
++#else
++struct sockaddr_in *saddr;
++#endif
++{
++    static char port[16];
++    if (saddr != 0) {
++        sprintf(port, "%u",
++#ifdef INET6
++            ntohs(((struct sockaddr_in *)saddr)->sin_port));
++#else
++            ntohs(saddr->sin_port));
++#endif
++    } else {
++	strcpy(port, "0");
++    }
++    return (port);
++}
++
+ /* eval_client - return string with as much about the client as we know */
+ 
+ char   *eval_client(request)
+diff -ruN tcp_wrappers_7.6.orig/hosts_access.5 tcp_wrappers_7.6/hosts_access.5
+--- tcp_wrappers_7.6.orig/hosts_access.5	2004-11-04 13:17:45.000000000 +0100
++++ tcp_wrappers_7.6/hosts_access.5	2004-11-04 13:55:32.000000000 +0100
+@@ -175,6 +175,8 @@
+ unavailable.
+ .IP "%n (%N)"
+ The client (server) host name (or "unknown" or "paranoid").
++.IP "%r (%R)"
++The clients (servers) port number (or "0").
+ .IP %p
+ The daemon process id.
+ .IP %s
+diff -ruN tcp_wrappers_7.6.orig/percent_x.c tcp_wrappers_7.6/percent_x.c
+--- tcp_wrappers_7.6.orig/percent_x.c	1994-12-28 17:42:38.000000000 +0100
++++ tcp_wrappers_7.6/percent_x.c	2004-11-04 13:19:29.000000000 +0100
+@@ -63,6 +63,8 @@
+ 		ch == 'n' ? eval_hostname(request->client) :
+ 		ch == 'N' ? eval_hostname(request->server) :
+ 		ch == 'p' ? eval_pid(request) :
++		ch == 'r' ? eval_port(request->client->sin) :
++		ch == 'R' ? eval_port(request->server->sin) :
+ 		ch == 's' ? eval_server(request) :
+ 		ch == 'u' ? eval_user(request) :
+ 		ch == '%' ? "%" : (tcpd_warn("unrecognized %%%c", ch), "");
+diff -ruN tcp_wrappers_7.6.orig/tcpd.h tcp_wrappers_7.6/tcpd.h
+--- tcp_wrappers_7.6.orig/tcpd.h	2004-11-04 13:17:45.000000000 +0100
++++ tcp_wrappers_7.6/tcpd.h	2004-11-04 13:19:13.000000000 +0100
+@@ -145,6 +145,11 @@
+ extern char *eval_hostinfo(struct host_info *);	/* host name or address */
+ extern char *eval_client(struct request_info *);/* whatever is available */
+ extern char *eval_server(struct request_info *);/* whatever is available */
++#ifdef INET6
++extern char *eval_port(struct sockaddr *);
++#else
++extern char *eval_port(struct sockaddr_in *);
++#endif
+ #define eval_daemon(r)	((r)->daemon)	/* daemon process name */
+ #define eval_pid(r)	((r)->pid)	/* process id */
+ 

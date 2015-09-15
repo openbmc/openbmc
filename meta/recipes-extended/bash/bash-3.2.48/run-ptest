@@ -1,0 +1,2 @@
+#!/bin/sh
+make -k THIS_SH=/bin/bash BUILD_DIR=. runtest

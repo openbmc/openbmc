@@ -1,0 +1,165 @@
+From: Mark Wielaard <mjw@redhat.com>
+Date: Sun, 15 Jun 2014 11:30:35 +0200
+Subject: libebl: Add sym_func_value hook.
+
+The ARM EABI says that the zero bit of function symbol st_value indicates
+whether the symbol points to a THUMB or ARM function. Add a new ebl hook
+to adjust the st_value in such a case so that we get the actual value that
+the symbol points to. It isn't easily possible to reuse the existing
+resolve_sym_value for this purpose, so we end up with another hook that
+can be used from dwfl_module_getsym and elflint.
+
+Rebase arm_func_value.patch from 0.159 to 0.160
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ backends/arm_init.c          |    1 +
+ backends/arm_symbol.c        |    8 ++++++++
+ libdwfl/dwfl_module_getsym.c |    2 +-
+ libebl/Makefile.am           |    3 ++-
+ libebl/ebl-hooks.h           |    3 +++
+ libebl/eblsymfuncval.c       |   43 ++++++++++++++++++++++++++++++++++++++++++
+ libebl/libebl.h              |   11 +++++++++++
+ 7 files changed, 69 insertions(+), 2 deletions(-)
+
+diff --git a/backends/arm_init.c b/backends/arm_init.c
+index 7171186..9f03630 100644
+--- a/backends/arm_init.c
++++ b/backends/arm_init.c
+@@ -78,6 +78,7 @@ arm_init (elf, machine, eh, ehlen)
+     eh->return_value_location = arm_return_value_location_hard;
+   HOOK (eh, abi_cfi);
+   HOOK (eh, check_reloc_target_type);
++  HOOK (eh, sym_func_value);
+   HOOK (eh, symbol_type_name);
+ 
+   /* We only unwind the core integer registers.  */
+diff --git a/backends/arm_symbol.c b/backends/arm_symbol.c
+index da4a50a..ccea03b 100644
+--- a/backends/arm_symbol.c
++++ b/backends/arm_symbol.c
+@@ -130,6 +130,14 @@ arm_check_reloc_target_type (Ebl *ebl __attribute__ ((unused)), Elf64_Word sh_ty
+   return sh_type == SHT_ARM_EXIDX;
+ }
+ 
++/* ARM EABI says that the low bit indicates whether the function
++   symbol value is a THUMB function or not.  Mask it off.  */
++GElf_Addr
++arm_sym_func_value (Ebl *ebl __attribute__ ((unused)), GElf_Addr val)
++{
++  return val & ~(GElf_Addr)1;
++}
++
+ const char *
+ arm_symbol_type_name (int type,
+ 		      char *buf __attribute__ ((unused)),
+diff --git a/libdwfl/dwfl_module_getsym.c b/libdwfl/dwfl_module_getsym.c
+index 42d2b67..fb192d7 100644
+--- a/libdwfl/dwfl_module_getsym.c
++++ b/libdwfl/dwfl_module_getsym.c
+@@ -119,7 +119,7 @@ __libdwfl_getsym (Dwfl_Module *mod, int ndx, GElf_Sym *sym, GElf_Addr *addr,
+      descriptors).  */
+ 
+   char *ident;
+-  GElf_Addr st_value = sym->st_value & ebl_func_addr_mask (mod->ebl);
++  GElf_Addr st_value = ebl_sym_func_value (mod->ebl, sym->st_value);
+   *resolved = false;
+   if (! adjust_st_value && mod->e_type != ET_REL && alloc
+       && (GELF_ST_TYPE (sym->st_info) == STT_FUNC
+diff --git a/libebl/Makefile.am b/libebl/Makefile.am
+index ec4477b..889c21b 100644
+--- a/libebl/Makefile.am
++++ b/libebl/Makefile.am
+@@ -55,7 +55,8 @@ gen_SOURCES = eblopenbackend.c eblclosebackend.c eblstrtab.c \
+ 	      eblsysvhashentrysize.c eblauxvinfo.c eblcheckobjattr.c \
+ 	      ebl_check_special_section.c ebl_syscall_abi.c eblabicfi.c \
+ 	      eblstother.c eblinitreg.c ebldwarftoregno.c eblnormalizepc.c \
+-	      eblunwind.c eblresolvesym.c eblcheckreloctargettype.c
++	      eblunwind.c eblresolvesym.c eblcheckreloctargettype.c \
++	      eblsymfuncval.c
+ 
+ libebl_a_SOURCES = $(gen_SOURCES)
+ 
+diff --git a/libebl/ebl-hooks.h b/libebl/ebl-hooks.h
+index 2e31446..9df945d 100644
+--- a/libebl/ebl-hooks.h
++++ b/libebl/ebl-hooks.h
+@@ -191,5 +191,8 @@ bool EBLHOOK(unwind) (Ebl *ebl, Dwarf_Addr pc, ebl_tid_registers_t *setfunc,
+    (e.g. function descriptor resolving)  */
+ bool EBLHOOK(resolve_sym_value) (Ebl *ebl, GElf_Addr *addr);
+ 
++/* Returns the real value of a symbol function address or offset.  */
++GElf_Addr EBLHOOK(sym_func_value) (Ebl *ebl, GElf_Addr val);
++
+ /* Destructor for ELF backend handle.  */
+ void EBLHOOK(destr) (struct ebl *);
+diff --git a/libebl/eblsymfuncval.c b/libebl/eblsymfuncval.c
+new file mode 100644
+index 0000000..c0b322f
+--- /dev/null
++++ b/libebl/eblsymfuncval.c
+@@ -0,0 +1,43 @@
++/* Turn a symbol function value into a real function address or offset.
++   Copyright (C) 2014 Red Hat, Inc.
++   This file is part of elfutils.
++
++   This file is free software; you can redistribute it and/or modify
++   it under the terms of either
++
++     * the GNU Lesser General Public License as published by the Free
++       Software Foundation; either version 3 of the License, or (at
++       your option) any later version
++
++   or
++
++     * the GNU General Public License as published by the Free
++       Software Foundation; either version 2 of the License, or (at
++       your option) any later version
++
++   or both in parallel, as here.
++
++   elfutils is distributed in the hope that it will be useful, but
++   WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   General Public License for more details.
++
++   You should have received copies of the GNU General Public License and
++   the GNU Lesser General Public License along with this program.  If
++   not, see <http://www.gnu.org/licenses/>.  */
++
++#ifdef HAVE_CONFIG_H
++# include <config.h>
++#endif
++
++#include <libeblP.h>
++#include <assert.h>
++
++GElf_Addr
++ebl_sym_func_value (Ebl *ebl, GElf_Addr val)
++{
++  if (ebl == NULL || ebl->sym_func_value == NULL)
++    return val;
++
++  return ebl->sym_func_value (ebl, val);
++}
+diff --git a/libebl/libebl.h b/libebl/libebl.h
+index 7dbf460..96c076b 100644
+--- a/libebl/libebl.h
++++ b/libebl/libebl.h
+@@ -472,6 +472,17 @@ extern bool ebl_unwind (Ebl *ebl, Dwarf_Addr pc, ebl_tid_registers_t *setfunc,
+ extern bool ebl_resolve_sym_value (Ebl *ebl, GElf_Addr *addr)
+    __nonnull_attribute__ (2);
+ 
++/* Returns the real value of a symbol function address or offset
++   (e.g. when the st_value contains some flag bits that need to be
++   masked off).  This is different from ebl_resolve_sym_value which
++   only works for actual symbol addresses (in non-ET_REL files) that
++   might resolve to an address in a different section.
++   ebl_sym_func_value is called to turn the given value into the a
++   real address or offset (the original value might not be a real
++   address).  This works for both ET_REL when the value is a section
++   offset or ET_EXEC or ET_DYN symbol values, which are addresses.  */
++extern GElf_Addr ebl_sym_func_value (Ebl *ebl, GElf_Addr val);
++
+ #ifdef __cplusplus
+ }
+ #endif

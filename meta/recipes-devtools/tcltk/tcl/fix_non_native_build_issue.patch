@@ -1,0 +1,64 @@
+Upstream-Status: Pending
+
+Index: unix/Makefile.in
+===================================================================
+--- unix.orig/Makefile.in	2013-11-10 23:37:34.243424934 -0800
++++ unix/Makefile.in	2013-11-10 23:37:34.243424934 -0800
+@@ -709,23 +709,23 @@
+ test: test-tcl test-packages
+ 
+ test-tcl: ${TCLTEST_EXE}
+-	$(SHELL_ENV) ./${TCLTEST_EXE} $(TOP_DIR)/tests/all.tcl $(TESTFLAGS)
++	$(SHELL_ENV) ${TCLTEST_EXE} $(TOP_DIR)/tests/all.tcl $(TESTFLAGS)
+ 
+ gdb-test: ${TCLTEST_EXE}
+ 	@echo "set env @LD_LIBRARY_PATH_VAR@=`pwd`:$${@LD_LIBRARY_PATH_VAR@}" > gdb.run
+ 	@echo "set env TCL_LIBRARY=${TCL_BUILDTIME_LIBRARY}" >> gdb.run
+ 	@echo "set args $(TOP_DIR)/tests/all.tcl $(TESTFLAGS) -singleproc 1" >> gdb.run
+-	$(GDB) ./${TCLTEST_EXE} --command=gdb.run
++	$(GDB) ${TCLTEST_EXE} --command=gdb.run
+ 	rm gdb.run
+ 
+ # Useful target to launch a built tcltest with the proper path,...
+ runtest: ${TCLTEST_EXE}
+-	$(SHELL_ENV) ./${TCLTEST_EXE}
++	$(SHELL_ENV) ${TCLTEST_EXE}
+ 
+ # Useful target for running the test suite with an unwritable current
+ # directory...
+ ro-test: ${TCLTEST_EXE}
+-	echo 'exec chmod -w .;package require tcltest;tcltest::temporaryDirectory /tmp;source ../tests/all.tcl;exec chmod +w .' | $(SHELL_ENV) ./${TCLTEST_EXE}
++	echo 'exec chmod -w .;package require tcltest;tcltest::temporaryDirectory /tmp;source ../tests/all.tcl;exec chmod +w .' | $(SHELL_ENV) ${TCLTEST_EXE}
+ 
+ # The following target generates the shared libraries in dltest/ that are used
+ # for testing; they are included as part of the "tcltest" target (via the
+@@ -743,23 +743,23 @@
+ # This target can be used to run tclsh from the build directory
+ # via `make shell SCRIPT=/tmp/foo.tcl`
+ shell: ${TCL_EXE}
+-	$(SHELL_ENV) ./${TCL_EXE} $(SCRIPT)
++	$(SHELL_ENV) ${TCL_EXE} $(SCRIPT)
+ 
+ # This target can be used to run tclsh inside either gdb or insight
+ gdb: ${TCL_EXE}
+-	$(SHELL_ENV) $(GDB) ./${TCL_EXE}
++	$(SHELL_ENV) $(GDB) ${TCL_EXE}
+ 
+ valgrind: ${TCL_EXE} ${TCLTEST_EXE}
+-	$(SHELL_ENV) $(VALGRIND) $(VALGRINDARGS) ./${TCLTEST_EXE} $(TOP_DIR)/tests/all.tcl -singleproc 1 -constraints valgrind $(TESTFLAGS)
++	$(SHELL_ENV) $(VALGRIND) $(VALGRINDARGS) ${TCLTEST_EXE} $(TOP_DIR)/tests/all.tcl -singleproc 1 -constraints valgrind $(TESTFLAGS)
+ 
+ valgrindshell: ${TCL_EXE}
+-	$(SHELL_ENV) $(VALGRIND) $(VALGRINDARGS) ./${TCL_EXE} $(SCRIPT)
++	$(SHELL_ENV) $(VALGRIND) $(VALGRINDARGS) ${TCL_EXE} $(SCRIPT)
+ 
+ trace-shell: ${TCL_EXE}
+-	$(SHELL_ENV) ${TRACE} $(TRACE_OPTS) ./${TCL_EXE} $(SCRIPT)
++	$(SHELL_ENV) ${TRACE} $(TRACE_OPTS) ${TCL_EXE} $(SCRIPT)
+ 
+ trace-test: ${TCLTEST_EXE}
+-	$(SHELL_ENV) ${TRACE} $(TRACE_OPTS) ./${TCLTEST_EXE} $(TOP_DIR)/tests/all.tcl -singleproc 1 $(TESTFLAGS)
++	$(SHELL_ENV) ${TRACE} $(TRACE_OPTS) ${TCLTEST_EXE} $(TOP_DIR)/tests/all.tcl -singleproc 1 $(TESTFLAGS)
+ 
+ #--------------------------------------------------------------------------
+ # Installation rules

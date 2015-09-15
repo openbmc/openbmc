@@ -1,0 +1,13 @@
+Upstream-Status: Inappropriate [configuration]
+
+Index: pygtk-2.24.0/pygtk-2.0.pc.in
+===================================================================
+--- pygtk-2.24.0.orig/pygtk-2.0.pc.in
++++ pygtk-2.24.0/pygtk-2.0.pc.in
+@@ -1,5 +1,6 @@
+ prefix=@prefix@
+ exec_prefix=@exec_prefix@
++libdir=@libdir@
+ includedir=@includedir@
+ datarootdir=@datarootdir@
+ datadir=@datadir@

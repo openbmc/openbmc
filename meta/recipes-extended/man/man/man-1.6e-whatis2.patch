@@ -1,0 +1,59 @@
+Upstream-Status: Pending
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+Index: man-1.6f/src/makewhatis.sh
+===================================================================
+--- man-1.6f.orig/src/makewhatis.sh	2010-12-29 13:51:45.000000000 -0800
++++ man-1.6f/src/makewhatis.sh	2010-12-29 13:59:35.399799412 -0800
+@@ -164,10 +164,15 @@
+ fi
+ catpath=`echo ${catpath} | tr : ' '`
+ 
++#WHATIS_DIR=$DESTDIR/var/cache/man/`echo $here|sed -e 's!.*/man/!!g'`
++WHATIS_DIR=$DESTDIR/var/cache/man/$LANG
++[[ -d $WHATIS_DIR ]] || mkdir -p $WHATIS_DIR/
++
+ # first truncate all the whatis files that will be created new,
+ # then only update - we might visit the same directory twice
+ if [ x$update = x ]; then
+-   cp /dev/null /var/cache/man/whatis
++   mkdir -p $WHATIS_DIR/
++   /bin/echo -n > $WHATIS_DIR/whatis
+ fi
+ 
+ for pages in man cat
+@@ -180,13 +185,7 @@
+ 	echo "about to enter $mandir" > /dev/stderr
+      fi
+ 
+-     # kludge for Slackware's /usr/man/preformat
+-     if [ $mandir = /usr/man/preformat ]
+-     then
+-	mandir1=/usr/man
+-     else
+-	mandir1=$mandir
+-     fi
++     mandir1=$WHATIS_DIR
+ 
+      # if $mandir is on a readonly partition, and the whatis file
+      # is not a symlink, then let's skip trying to update it
+@@ -207,11 +206,6 @@
+ 	fi
+      fi
+ 
+-     if [ -s ${mandir}/whatis -a $pages = man -a x$update = x ]; then
+-	if [ x$verbose != x ]; then
+-	   echo skipping $mandir - we did it already > /dev/stderr
+-	fi
+-     else      
+        here=`pwd`
+        cd $mandir
+        for i in $sections
+@@ -447,7 +447,6 @@
+
+        chmod 644 ${mandir1}/whatis
+        rm $TMPFILE
+-     fi
+    done
+ done

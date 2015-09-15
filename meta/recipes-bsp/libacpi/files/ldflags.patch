@@ -1,0 +1,41 @@
+libacpi: Remove QA warning: No GNU_HASH in the elf binary
+
+Upstream-Status: Inappropriate [other]
+  Useful within bitbake environment only.
+
+Signed-off-by: Muhammad Shakeel <muhammad_shakeel@mentor.com>
+
+---
+ Makefile  |    3 ++-
+ config.mk |    1 +
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+--- libacpi-0.2.orig/Makefile
++++ libacpi-0.2/Makefile
+@@ -19,6 +19,7 @@ options:
+ 	@echo "CFLAGS   = ${CFLAGS}"
+ 	@echo "CC       = ${CC}"
+ 	@echo "SOFLAGS  = ${SOFLAGS}"
++	@echo "LDFLAGS  = ${LDFLAGS}"
+ 	@echo "LD       = ${LD}"
+ 
+ .c.o:
+@@ -34,7 +35,7 @@ libacpi.a: ${OBJ}
+ 
+ libacpi.so: ${OBJ}
+ 	@echo LD $@
+-	@${CC} ${SOFLAGS} -o $@.${SOVERSION} ${OBJ}
++	@${CC} ${SOFLAGS} ${LDFLAGS} -o $@.${SOVERSION} ${OBJ}
+ 
+ test-libacpi: ${OBJ_test}
+ 	@echo LD $@
+--- libacpi-0.2.orig/config.mk
++++ libacpi-0.2/config.mk
+@@ -10,6 +10,7 @@ MANPREFIX = ${PREFIX}/share/man
+ SOFLAGS = -shared -Wl,-soname,${SONAME}
+ CFLAGS += -fPIC -g --pedantic -Wall -Wextra
+ ARFLAGS = cr
++LDFLAGS =
+ 
+ # Compiler and linker
+ CC = cc

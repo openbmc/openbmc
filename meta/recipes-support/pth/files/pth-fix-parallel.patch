@@ -1,0 +1,48 @@
+From df06b8170745eac347acb95f9f374f257621254f Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Thu, 29 Jan 2015 18:11:00 -0800
+Subject: [PATCH] Makefile.in: fix for parallel build
+
+Fixed:
+* do_compile
+ pth_uctx.c:31:19: fatal error: pth_p.h: No such file or directory
+ #include "pth_p.h"
+                   ^
+compilation terminated.
+make: *** [pth_uctx.lo] Error 1
+
+* do_install:
+  cp: cannot create regular file `image/usr/lib/pkgconfig/#INST@15507#': No such file or directory
+
+Upstream-Status: Pending
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ Makefile.in |    5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index de0390d..381a0ee 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -219,7 +219,8 @@ test_pthread: test_pthread.o test_common.o libpthread.la
+ 
+ #   install the package
+ install: all-for-install
+-	@$(MAKE) $(MKFLAGS) install-dirs install-pth @INSTALL_PTHREAD@ install-pkgconfigDATA
++	@$(MAKE) $(MKFLAGS) install-dirs
++	@$(MAKE) $(MKFLAGS) install-pth @INSTALL_PTHREAD@ install-pkgconfigDATA
+ 	@touch .done-install >/dev/null 2>&1 || $(TRUE)
+ 	@$(MAKE) $(MKFLAGS) what-next
+ install-dirs:
+@@ -432,7 +433,7 @@ TAGS:
+ ##  (AUTOMATICALLY UPDATED - DO NOT EDIT)
+ ##
+ 
+-$(LOBJS): Makefile
++$(LOBJS): Makefile pth_p.h
+ 
+ # DO NOT REMOVE
+ pth_attr.lo: pth_attr.c pth_p.h pth_vers.c pth.h pth_acdef.h pth_acmac.h
+-- 
+1.7.9.5
+

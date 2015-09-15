@@ -1,0 +1,50 @@
+Upstream-Status: Pending
+
+update-ca-certificates: find SYSROOT relative to its own location
+
+This makes the script relocatable.
+
+Index: git/sbin/update-ca-certificates
+===================================================================
+--- git.orig/sbin/update-ca-certificates
++++ git/sbin/update-ca-certificates
+@@ -66,6 +66,39 @@ do
+   shift
+ done
+ 
++if [ -z "$SYSROOT" ]; then
++  local_which () {
++    if [ $# -lt 1 ]; then
++      return 1
++    fi
++
++    (
++      IFS=:
++      for entry in $PATH; do
++        if [ -x "$entry/$1" ]; then
++          echo "$entry/$1"
++          exit 0
++        fi
++      done
++      exit 1
++    )
++  }
++
++  case "$0" in
++    */*)
++      sbindir=$(cd ${0%/*} && pwd)
++      ;;
++    *)
++      sbindir=$(cd $(dirname $(local_which $0)) && pwd)
++      ;;
++  esac
++  prefix=${sbindir%/*}
++  SYSROOT=${prefix%/*}
++  if [ ! -d "$SYSROOT/usr/share/ca-certificates" ]; then
++    SYSROOT=
++  fi
++fi
++
+ if [ ! -s "$CERTSCONF" ]
+ then
+   fresh=1

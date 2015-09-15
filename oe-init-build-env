@@ -1,0 +1,62 @@
+#!/bin/sh
+
+# OE Build Environment Setup Script
+#
+# Copyright (C) 2006-2011 Linux Foundation
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+#
+# Normally this is called as '. ./oe-init-build-env builddir'
+#
+# This works in most shells (not dash), but not all of them pass arg1 when
+# being sourced.   To workaround the shell limitation use "set arg1" prior 
+# to sourcing this script.
+#
+if [ -n "$BASH_SOURCE" ]; then
+   OEROOT="`dirname $BASH_SOURCE`"
+elif [ -n "$ZSH_NAME" ]; then
+   OEROOT="`dirname $0`"
+else
+   OEROOT="`pwd`"
+fi
+if [ -n "$BBSERVER" ]; then
+   unset BBSERVER
+fi
+THIS_SCRIPT=$OEROOT/oe-init-build-env
+
+if [ -z "$ZSH_NAME" ] && [ "$0" = "$THIS_SCRIPT" ]; then
+   echo "Error: This script needs to be sourced. Please run as '. $THIS_SCRIPT'"
+   exit 1
+fi
+
+OEROOT=`readlink -f "$OEROOT"`
+export OEROOT
+. $OEROOT/scripts/oe-buildenv-internal && \
+     $OEROOT/scripts/oe-setup-builddir && \
+     [ -n "$BUILDDIR" ] && cd "$BUILDDIR"
+unset OEROOT
+unset BBPATH
+unset THIS_SCRIPT
+
+# Shutdown any bitbake server if the BBSERVER variable is not set
+if [ -z "$BBSERVER" ] && [ -f bitbake.lock ] ; then
+    grep ":" bitbake.lock > /dev/null && BBSERVER=`cat bitbake.lock` bitbake --status-only
+    if [ $? = 0 ] ; then
+	echo "Shutting down bitbake memory resident server with bitbake -m"
+	BBSERVER=`cat bitbake.lock` bitbake -m
+    fi
+fi
+

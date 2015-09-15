@@ -1,0 +1,849 @@
+{% extends "baseprojectpage.html" %}
+{% load projecttags %}
+{% load humanize %}
+
+
+{% block projectinfomain %}
+
+<h2>Bitbake variables</h2>
+
+    <div style="padding-left:19px;">
+
+        <dl class="dl-vertical">
+            {% if distro_defined %}
+            <dt>
+                <span class="js-config-var-name js-config-var-managed-name">DISTRO</span>
+                <i class="icon-question-sign get-help" title="The short name of the distribution. If the variable is blank, meta/conf/distro/defaultsetup.conf will be used. <br /><a href='http://www.yoctoproject.org/docs/1.6.1/ref-manual/ref-manual.html#var-DISTRO' target='_blank'>Read more in the manual</a>"></i>
+            </dt>
+            <dd class="lead">
+                <span id="distro">{{distro}}</span>
+                <i class="icon-pencil" id="change-distro-icon"></i>
+                <form id="change-distro-form" style="display:none;">
+                    <div class="input-append">
+                        <span  id="edit-distro-name-div" class="control-group">
+                            <input type="text" id="new-distro" value="{{distro}}">
+                            <button id="apply-change-distro" class="btn" type="button">Save</button>
+                            <button id="cancel-change-distro" type="button" class="btn btn-link">Cancel</button>
+                        </span>
+                        <span class="help-block error" id="distro-error-message"></span>
+                    </div>
+                </form>
+            </dd>
+            {% endif %}
+
+            {% if fstypes_defined %}
+            <dt>
+                <span class="js-config-var-name js-config-var-managed-name">IMAGE_FSTYPES</span>
+                <i class="icon-question-sign get-help" title="Formats of root file system images that you want to have created <br /><a href='http://www.yoctoproject.org/docs/1.6.1/ref-manual/ref-manual.html#var-IMAGE_FSTYPES' target='_blank'>Read more in the manual</a>"></i>
+            </dt>
+            <dd class="lead">
+                <span id="image_fstypes">{{fstypes}}</span>
+                <i class="icon-pencil" id="change-image_fstypes-icon"></i>
+                <form id="change-image_fstypes-form" style="display:none;">
+                    <input id="filter-image_fstypes" type="text" placeholder="Search image types" class="span4">
+                    <div id="all-image_fstypes" class="scrolling">
+                    </div>
+                    <button id="apply-change-image_fstypes" type="button" class="btn">Save</button>
+                    <button id="cancel-change-image_fstypes" type="button" class="btn btn-link">Cancel</button>
+                </form>
+            </dd>
+            {% endif %}
+
+            {% if image_install_append_defined %}
+            <dt>
+                <span class="js-config-var-name js-config-var-managed-name">IMAGE_INSTALL_append</span>
+                <i class="icon-question-sign get-help" title="Specifies additional packages to install into an image. If your build creates more than one image, the packages will be installed in <strong>all of them</strong> <br /><a href='http://www.yoctoproject.org/docs/1.6.1/ref-manual/ref-manual.html#var-IMAGE_INSTALL' target='_blank'>Read more in the manual</a>"></i>
+            </dt>
+            <dd class="lead">
+                <span id="image_install"{% if image_install_append %}{%else%} class="muted"{%endif%}>{% if image_install_append %}{{image_install_append}}{%else%}Not set{%endif%}</span>
+                <i class="icon-pencil" id="change-image_install-icon"></i>
+                <i class="icon-trash" id="delete-image_install-icon" {% if image_install_append %}{%else%}style="display:none;"{%endif%}></i>
+                <form id="change-image_install-form" style="display:none;">
+                    <div class="row-fluid">
+                        <span class="help-block span4">To set IMAGE_INSTALL_append to more than one package, type the package names separated by a space.</span>
+                    </div>
+                    <div class="input-append">
+                        <input type="text" class="input-xlarge" id="new-image_install" placeholder="Type one or more package names">
+                        <button id="apply-change-image_install" class="btn" type="button">Save</button>
+                        <button id="cancel-change-image_install" type="button" class="btn btn-link">Cancel</button>
+                    </div>
+                </form>
+            </dd>
+            {% endif %}
+
+            {% if package_classes_defined %}
+            <dt>
+                <span class="js-config-var-name js-config-var-managed-name">PACKAGE_CLASSES</span>
+                <i class="icon-question-sign get-help" title="Specifies the package manager to use when packaging data <br /><a href='http://www.yoctoproject.org/docs/1.6.1/ref-manual/ref-manual.html#var-PACKAGE_CLASSES' target='_blank'>Read more in the manual</a>"></i>
+            </dt>
+            <dd class="lead">
+                <span id="package_classes">{{package_classes}}</span>
+                <i id="change-package_classes-icon" class="icon-pencil"></i>
+                <form id="change-package_classes-form" style="display:none;">
+                    <label>
+                        Root file system package format
+                        <i class="icon-question-sign get-help" title="The package format used to generate the root file system. Options are <code>dev</code>, <code>ipk</code> and <code>rpm</code>"></i>
+                    </label>
+                    <select id="package_classes-select">
+                        <option>package_deb</option>
+                        <option>package_ipk</option>
+                        <option>package_rpm</option>
+                    </select>
+                    <label>
+                        Additional package formats
+                        <i class="icon-question-sign get-help" title="Extra package formats to build"></i>
+                    </label>
+                    <label class="checkbox" id="package_class_1">
+                        <input type="checkbox" id="package_class_1_input"> package_deb
+                    </label>
+                    <label class="checkbox" id="package_class_2">
+                        <input type="checkbox" id="package_class_2_input"> package_ipk
+                    </label>
+                    <div style="padding-top:10px;">
+                        <button id="apply-change-package_classes" type="button" class="btn">Save</button>
+                        <button id="cancel-change-package_classes" type="button" class="btn btn-link">Cancel</button>
+                    </div>
+                </form>
+            </dd>
+            {% endif %}
+
+            {% if sdk_machine_defined %}
+            <dt>
+                <span class="js-config-var-name js-config-var-managed-name">SDKMACHINE</span>
+                <i class="icon-question-sign get-help" title="Specifies the architecture (i.e. i686 or x86_64) for which to build SDK and ADT items <br /><a href='http://www.yoctoproject.org/docs/1.6.1/ref-manual/ref-manual.html#var-SDKMACHINE' target='_blank'>Read more in the manual</a>"></i>
+            </dt>
+            <dd class="lead">
+                <span id="sdkmachine">{{sdk_machine}}</span>
+                <i id="change-sdkmachine-icon" class="icon-pencil"></i>
+                <form id="change-sdkmachine-form" style="display:none;">
+                    <label class="radio">
+                        <input type="radio" name="sdkmachine" value="i686">
+                        i686
+                    </label>
+                    <label class="radio">
+                        <input type="radio" name="sdkmachine" value="x86_64">
+                        x86_64
+                    </label>
+                    <div style="padding-top:10px;">
+                        <button id="apply-change-sdkmachine" type="button" class="btn">Save</button>
+                        <button id="cancel-change-sdkmachine" type="button" class="btn btn-link">Cancel</button>
+                    </div>
+                </form>
+            </dd>
+            {% endif %}
+
+        </dl>
+
+        <!-- <ul class="unstyled configuration-list" id="configvar-list"> -->
+        <dl id="configvar-list">
+            <!-- the added configuration variables are inserted here -->
+        </dl>
+
+        <!-- pass the fstypes list, black list, and externally managed variables here -->
+        {% for fstype in vars_fstypes %}
+            <input type="hidden" class="js-checkbox-fstypes-list" value="{{fstype}}">
+        {% endfor %}
+        {% for b in vars_blacklist %}
+            <input type="hidden" class="js-config-blacklist-name" value="{{b}}">
+        {% endfor %}
+        {% for b in vars_managed %}
+            <input type="hidden" class="js-config-managed-name" value="{{b}}">
+        {% endfor %}
+
+        <div class="row-fluid">
+          <form id="variable-form">
+            <fieldset style="padding-left:0px;">
+                <legend>Add variable</legend>
+                <div class="span3" style="margin-left:0px;">
+                    <span  id="add-configvar-name-div" class="control-group">
+                      <label>
+                        Variable
+                        <i title="" class="icon-question-sign get-help"
+                           data-original-title="Variable names are case sensitive,
+                           cannot have spaces, and can only include letters, numbers, underscores
+                           and dashes"></i>
+                      </label>
+                      <input type="text" placeholder="Type variable name" id="variable">
+                      <span class="help-block error" id="new-variable-error-message"></span>
+                    </span>
+                    <label>Value</label>
+                    <input id="value" type="text" placeholder="Type variable value"><p>
+                    <div>
+                        <button id="add-configvar-button" class="btn save" type="button" disabled>Add variable</button>
+                    </div>
+                </div>
+                <div class="span5 help-block">
+                    <h5>Some variables are reserved from Toaster</h5>
+                    <p>Toaster cannot set any variables that impact 1) the configuration of the build servers,
+                    or 2) where artifacts produced by the build are stored. Such variables include: </p>
+                    <p>
+                    <code><a href="http://www.yoctoproject.org/docs/1.6.1/ref-manual/ref-manual.html#var-BB_DISKMON_DIRS" target="_blank">BB_DISKMON_DIRS</a></code>
+                    <code><a href="http://www.yoctoproject.org/docs/1.6.1/ref-manual/ref-manual.html#var-BB_NUMBER_THREADS" target="_blank">BB_NUMBER_THREADS</a></code>
+                    <code>CVS_PROXY_HOST</code>
+                    <code>CVS_PROXY_PORT</code>
+                    <code><a href="http://www.yoctoproject.org/docs/1.6.1/ref-manual/ref-manual.html#var-DL_DIR" target="_blank">DL_DIR</a></code>
+                    <code><a href="http://www.yoctoproject.org/docs/1.6.1/ref-manual/ref-manual.html#var-PARALLEL_MAKE" target="_blank">PARALLEL_MAKE</a></code>
+                    <code><a href="http://www.yoctoproject.org/docs/1.6.1/ref-manual/ref-manual.html#var-SSTATE_DIR" target="_blank">SSTATE_DIR</a></code>
+                    <code><a href="http://www.yoctoproject.org/docs/1.6.1/ref-manual/ref-manual.html#var-SSTATE_MIRRORS" target="_blank">SSTATE_MIRRORS</a></code>
+                    <code><a href="http://www.yoctoproject.org/docs/1.6.1/ref-manual/ref-manual.html#var-TMPDIR" target="_blank">TMPDIR</a></code></p>
+                    <p>Plus the following standard shell environment variables:</p>
+                    <p><code>http_proxy</code> <code>ftp_proxy</code> <code>https_proxy</code> <code>all_proxy</code></p>
+                </div>
+            </fieldset>
+          </form>
+        </div>
+
+    </div>
+
+    <script>
+
+        // global variables
+        var do_reload=false;
+
+        // validate new variable name
+        function validate_new_variable() {
+            var variable = $("input#variable").val();
+            var value    = $("input#value").val();
+
+            // presumed innocence
+            $('#new-variable-error-message').text("");
+            var error_msg = "";
+
+            var existing_configvars = document.getElementsByClassName('js-config-var-name');
+            for (var i = 0, length = existing_configvars.length; i < length; i++) {
+                if (existing_configvars[i].innerHTML.toUpperCase() == variable.toUpperCase()) {
+                    error_msg = "This variable is already set in this page, edit its value instead";
+                }
+            }
+
+            var blacklist_configvars = document.getElementsByClassName('js-config-blacklist-name');
+            for (var i = 0, length = blacklist_configvars.length; i < length; i++) {
+                if (blacklist_configvars[i].value.toUpperCase() == variable.toUpperCase()) {
+                    error_msg = "You cannot edit this variable in Toaster because it is set by the build servers";
+                }
+            }
+
+            var managed_configvars = document.getElementsByClassName('js-config-managed-name');
+            for (var i = 0, length = managed_configvars.length; i < length; i++) {
+                if (managed_configvars[i].value.toUpperCase() == variable.toUpperCase()) {
+                    error_msg = "You cannot set this variable here. Please set it in the <a href=\"{% url 'project' project.id %}\">project main page</a>";
+                }
+            }
+
+            var bad_chars  = /[^a-zA-Z0-9\-_]/.test(variable);
+            var has_spaces = (0 <= variable.indexOf(" "));
+            var only_spaces = (0 < variable.length) && (0 == variable.trim().length);
+
+            if (only_spaces) {
+                error_msg = "A valid variable name cannot include spaces";
+            } else if (bad_chars && has_spaces) {
+                error_msg = "A valid variable name can only include letters, numbers, underscores, dashes, and cannot include spaces";
+            } else if (bad_chars) {
+                error_msg = "A valid variable name can only include letters, numbers, underscores, and dashes";
+            }
+
+            if ("" != error_msg) {
+                $('#new-variable-error-message').html(error_msg);
+                $(".save").attr("disabled","disabled");
+
+                // add one (and only one) error class append
+                var d = document.getElementById("add-configvar-name-div");
+                d.className = d.className.replace(" error","");
+                d.className = d.className + " error";
+
+                return false;
+            } else if (0 == variable.length) {
+                $(".save").attr("disabled","disabled");
+                return false;
+            }
+
+            var d = document.getElementById("add-configvar-name-div");
+            d.className = d.className.replace(" error","");
+
+            // now set the "Save" enablement if 'value' also passes
+            if (value.trim().length > 0) {
+                $(".save").removeAttr("disabled");
+            } else {
+                $(".save").attr("disabled","disabled");
+            }
+
+            return true;
+        }
+
+        // validate distro name
+        function validate_distro_name() {
+             var value    = $("input#new-distro").val();
+
+            // presumed innocence
+            $('#distro-error-message').text("");
+            var error_msg = "";
+
+            var has_spaces = (0 <= value.indexOf(" "));
+
+            if (has_spaces) {
+                error_msg = "A valid distro name cannot include spaces";
+            } else if (0 == value.length) {
+                error_msg = " ";
+            }
+
+            if ("" != error_msg) {
+                $('#distro-error-message').text(error_msg);
+                $("#apply-change-distro").attr("disabled","disabled");
+
+                // add one (and only one) error class append
+                var d = document.getElementById("edit-distro-name-div");
+                d.className = d.className.replace(" error","");
+                d.className = d.className + " error";
+
+                return false;
+            }
+
+            var d = document.getElementById("edit-distro-name-div");
+            d.className = d.className.replace(" error","");
+            $("#apply-change-distro").removeAttr("disabled");
+            return true;
+        }
+
+        // Test to insure at least one FS Type is checked
+        function enableFsTypesSave() {
+            var any_checked = 0;
+            $(".fs-checkbox-fstypes:checked").each(function(){
+                any_checked = 1;
+            });
+            if ( 0 == any_checked ) {
+                $("#apply-change-image_fstypes").attr("disabled","disabled");
+            }
+            else {
+                $("#apply-change-image_fstypes").removeAttr("disabled");
+            }
+        }
+
+        // Preset or reset the Package Class checkbox labels
+        function updatePackageClassCheckboxes() {
+            $('#package_class_1, #package_class_2').hide();
+            if ($('select').val() == 'package_deb') {
+                $('#package_class_1').html('<input type="checkbox" id="package_class_1_input"> package_ipk');
+                $('#package_class_2').html('<input type="checkbox" id="package_class_2_input"> package_rpm');
+            }
+            if ($('select').val() == 'package_ipk') {
+                $('#package_class_1').html('<input type="checkbox" id="package_class_1_input"> package_deb');
+                $('#package_class_2').html('<input type="checkbox" id="package_class_2_input"> package_rpm');
+            }
+            if ($('select').val() == 'package_rpm') {
+                $('#package_class_1').html('<input type="checkbox" id="package_class_1_input"> package_deb');
+                $('#package_class_2').html('<input type="checkbox" id="package_class_2_input"> package_ipk');
+            }
+            $('#package_class_1, #package_class_2').fadeIn(1500);
+        }
+
+        // Re-assert handlers when the page is served and/or refreshed via Ajax
+        function setEventHandlersForDynamicElements() {
+
+            // change variable value
+            $('.js-icon-pencil-config_var').click(function (evt) {
+                var pk = evt.target.attributes["x-data"].value;
+                var current_val = $("span#config_var_value_"+pk).text();
+                $('.js-icon-pencil-config_var, .js-icon-trash-config_var, #config_var_value_'+pk).hide();
+                $("#change-config_var-form_"+pk).slideDown();
+                $("input#new-config_var_"+pk).val(current_val);
+            });
+
+            $('.js-cancel-change-config_var').click(function (evt) {
+                var pk = evt.target.attributes["x-data"].value;
+                $("#change-config_var-form_"+pk).slideUp(function() {
+                    $('.js-icon-pencil-config_var, .js-icon-trash-config_var, #config_var_value_'+pk).show();
+                });
+            });
+
+            $(".js-new-config_var").on('input', function(){
+                if ($(this).val().length == 0) {
+                    $(".js-apply-change-config_var").attr("disabled","disabled");
+                }
+                else {
+                    $(".js-apply-change-config_var").removeAttr("disabled");
+                }
+            });
+
+            $('.js-apply-change-config_var').click(function (evt) {
+                var xdata    = evt.target.attributes["x-data"].value.split(":");
+                var pk       = xdata[0];
+                var variable = xdata[1];
+                var val      = $('#new-config_var_'+pk).val();
+                postEditAjaxRequest({"configvarChange" : variable+':'+val});
+                $('#config_var_value_'+pk).parent().removeClass('muted');
+                $("#change-config_var-form_"+pk).slideUp(function() {
+                    $('.js-icon-pencil-config_var, .js-icon-trash-config_var, #config_var_value_'+pk).show();
+                });
+            });
+
+            // delete variable
+            $(".js-icon-trash-config_var").click(function (evt) {
+                var xdata    = evt.target.attributes["x-data"].value.split(":");
+                var pk       = xdata[0];
+
+                // hide the dangling trash tooltip
+                $('#config_var_trash_'+pk).hide();
+
+                // fade out the variable+value div, then refresh the variable list
+                $('#config_var_entry_'+pk).parent().parent().fadeOut(1000, function(){
+                     postEditAjaxRequest({"configvarDel": evt.target.attributes["x-data"].value});
+                });
+
+            });
+
+        }
+
+        function onEditPageUpdate(data) {
+            // update targets
+            var i; var orightml = "";
+
+            var configvars_sorted = data.configvars.sort(function(a, b){return a[0] > b[0]});
+
+            var managed_configvars = document.getElementsByClassName('js-config-var-managed-name');
+
+            for (i = 0; i < configvars_sorted.length; i++) {
+                // skip if the variable name has a special context (not user defined)
+                var var_context=undefined;
+                for (var j = 0, length = managed_configvars.length; j < length; j++) {
+                    if ((managed_configvars[j].innerHTML == configvars_sorted[i][0]) ||
+                        (managed_configvars[j].value     == configvars_sorted[i][0]) ) {
+                        var_context='m';
+                    }
+                }
+                if (var_context == undefined) {
+                    orightml += '<div> <dt><span id="config_var_entry_'+configvars_sorted[i][2]+'" class="js-config-var-name"></span><i class="icon-trash js-icon-trash-config_var" id="config_var_trash_'+configvars_sorted[i][2]+'" x-data="'+configvars_sorted[i][2]+'"></i> </dt>'
+                    orightml += '<dd class="lead">'
+                    orightml += '    <span id="config_var_value_'+configvars_sorted[i][2]+'"></span>'
+                    orightml += '    <i class="icon-pencil js-icon-pencil-config_var" x-data="'+configvars_sorted[i][2]+'"></i>'
+                    orightml += '    <form id="change-config_var-form_'+configvars_sorted[i][2]+'" style="display:none;">'
+                    orightml += '        <div class="input-append">'
+                    orightml += '            <input type="text" class="input-xlarge js-new-config_var" id="new-config_var_'+configvars_sorted[i][2]+'" value="">'
+                    orightml += '            <button class="btn js-apply-change-config_var" type="button" x-data="'+configvars_sorted[i][2]+':'+configvars_sorted[i][0]+'" disabled>Save</button>'
+                    orightml += '            <button type="button" class="btn btn-link js-cancel-change-config_var" x-data="'+configvars_sorted[i][2]+'">Cancel</button>'
+                    orightml += '        </div>'
+                    orightml += '    </form>'
+                    orightml += '</dd> </div>'
+                }
+            }
+
+            // update configvars list HTML framework
+            $("dl#configvar-list").html(orightml);
+
+            // insert the name/value pairs safely as non-HTML
+            for (i = 0; i < configvars_sorted.length; i++) {
+                $('#config_var_entry_'+configvars_sorted[i][2]).text(configvars_sorted[i][0]);
+                $('#config_var_value_'+configvars_sorted[i][2]).text(configvars_sorted[i][1]);
+            }
+
+            // Add the tooltips
+            $(".js-icon-trash-config_var").each( function(){ setDeleteTooltip($(this)); });
+            $(".js-icon-pencil-config_var").each(function(){ setChangeTooltip($(this)); });
+
+            // re-assert these event handlers
+            setEventHandlersForDynamicElements();
+        }
+
+        function onEditAjaxSuccess(data, textstatus) {
+            // console.log("XHR returned:", data, "(" + textstatus + ")");
+            if (data.error != "ok") {
+                alert("error on request:\n" + data.error);
+                return;
+            }
+
+            // delayed page reload?
+            if (do_reload) {
+                do_reload=false;
+                location.reload(true);
+            } else {
+                onEditPageUpdate(data);
+            }
+        }
+
+        function onEditAjaxError(jqXHR, textstatus, error) {
+            alert("XHR errored:\n" + error + "\n(" + textstatus + ")");
+            // re-assert the event handlers
+        }
+
+        /* ensure cookie exists {% csrf_token %} */
+        function postEditAjaxRequest(reqdata) {
+            var ajax = $.ajax({
+                    type:"POST",
+                    data: $.param(reqdata),
+                    url:"{% url 'xhr_configvaredit' project.id%}",
+                    headers: { 'X-CSRFToken': $.cookie("csrftoken")},
+                    success: onEditAjaxSuccess,
+                    error: onEditAjaxError,
+            })
+        }
+
+        function setDeleteTooltip(object) {
+            object.tooltip({ container: 'body', html: true, delay: {show: 400}, title: "Delete" });
+        }
+        function setChangeTooltip(object) {
+            object.tooltip({ container: 'body', html: true, delay: {show: 400}, title: "Change" });
+        }
+
+        $(document).ready(function() {
+
+            //
+            // Register handlers for static elements
+            //
+
+            {% if distro_defined %}
+            // change distro variable
+            $('#change-distro-icon').click(function() {
+                $('#change-distro-icon, #distro').hide();
+                $("#change-distro-form").slideDown();
+                $("#new-distro").val( $('#distro').text() );
+            });
+
+            $('#cancel-change-distro').click(function(){
+                $("#change-distro-form").slideUp(function() {
+                    $('#distro, #change-distro-icon').show();
+
+                    // reset any dangling error state
+                    $('#distro-error-message').text("");
+                    var d = document.getElementById("edit-distro-name-div");
+                    d.className = d.className.replace(" error","");
+                });
+            });
+
+            // validate new distro name
+            $("input#new-distro").on('input', function (evt) {
+                validate_distro_name();
+            });
+
+            $('#apply-change-distro').click(function(){
+                //$('#repo').parent().removeClass('highlight-go');
+                var name = $('#new-distro').val();
+                postEditAjaxRequest({"configvarChange" : 'DISTRO:'+name});
+                $('#distro').text(name);
+                $("#change-distro-form").slideUp(function () {
+                    $('#distro, #change-distro-icon').show();
+                });
+            });
+            {% endif %}
+
+
+            {% if fstypes_defined %}
+            // change IMAGE_FSTYPES variable
+
+            $('#change-image_fstypes-icon').click(function() {
+                $('#change-image_fstypes-icon, #image_fstypes').hide();
+                $("#change-image_fstypes-form").slideDown();
+                // avoid false substring matches by including space separators
+                var html         = "";
+                var fstypes      = " " + document.getElementById("image_fstypes").innerHTML + " ";
+                var fstypes_list = document.getElementsByClassName('js-checkbox-fstypes-list');
+                // Add the checked boxes first
+                if ("  " != fstypes) {
+                    for (var i = 0, length = fstypes_list.length; i < length; i++) {
+                        if (0 <= fstypes.indexOf(" "+fstypes_list[i].value+" ")) {
+                             html += '<label class="checkbox"><input type="checkbox" class="fs-checkbox-fstypes" value="'+fstypes_list[i].value+'" checked="checked">'+fstypes_list[i].value+'</label>\n';
+                        }
+                    }
+                }
+                // Add the un-checked boxes second
+                for (var i = 0, length = fstypes_list.length; i < length; i++) {
+                    if (0  > fstypes.indexOf(" "+fstypes_list[i].value+" ")) {
+                            html += '<label class="checkbox"><input type="checkbox" class="fs-checkbox-fstypes" value="'+fstypes_list[i].value+'">'+fstypes_list[i].value+'</label>\n';
+                    }
+                }
+                document.getElementById("all-image_fstypes").innerHTML = html;
+
+                // Watch elements to disable Save when none are checked
+                $(".fs-checkbox-fstypes").each(function(){
+                    $(this).click(function() {
+                        enableFsTypesSave();
+                    });
+                });
+
+                // clear the previous filter values
+                $("input#filter-image_fstypes").val("");
+            });
+
+            $('#cancel-change-image_fstypes').click(function(){
+                $("#change-image_fstypes-form").slideUp(function() {
+                    $('#image_fstypes, #change-image_fstypes-icon').show();
+                });
+            });
+
+            $('#filter-image_fstypes').on('input', function(){
+                   var valThis = $(this).val().toLowerCase();
+                $('#all-image_fstypes label').each(function(){
+                    var text = $(this).text().toLowerCase();
+                    var match = text.indexOf(valThis);
+                    if (match >= 0) {
+                        $(this).show();
+                    }
+                    else {
+                        $(this).hide();
+                    }
+                });
+            });
+
+            $('#apply-change-image_fstypes').click(function(){
+                // extract the selected fstypes and sort them
+                var fstypes_array = [];
+                var checkboxes = document.getElementsByClassName('fs-checkbox-fstypes');
+                $(".fs-checkbox-fstypes:checked").each(function(){
+                       fstypes_array.push($(this).val());
+                });
+                fstypes_array.sort();
+
+                // now make a string of them
+                var fstypes = '';
+                for (var i = 0, length = fstypes_array.length; i < length; i++) {
+                    fstypes += fstypes_array[i] + ' ';
+                }
+                fstypes = fstypes.trim();
+
+                postEditAjaxRequest({"configvarChange" : 'IMAGE_FSTYPES:'+fstypes});
+                $('#image_fstypes').text(fstypes);
+                $('#image_fstypes').parent().removeClass('muted');
+
+                $("#change-image_fstypes-form").slideUp(function() {
+                    $('#image_fstypes, #change-image_fstypes-icon').show();
+                });
+            });
+            {% endif %}
+
+
+            {% if image_install_append_defined %}
+
+            // init IMAGE_INSTALL_append trash icon
+            setDeleteTooltip($('#delete-image_install-icon'));
+
+            // change IMAGE_INSTALL_append variable
+            $('#change-image_install-icon').click(function() {
+                // preset the edit value
+                var current_val = $("span#image_install").text().trim();
+                if (current_val == "Not set") {
+                    current_val="";
+                    $("#apply-change-image_install").attr("disabled","disabled");
+                } else {
+                    // insure these non-empty values have single space prefix
+                    current_val=" " + current_val;
+                }
+                $("input#new-image_install").val(current_val);
+
+                $('#change-image_install-icon, #delete-image_install-icon, #image_install').hide();
+                $("#change-image_install-form").slideDown();
+            });
+
+            $('#cancel-change-image_install').click(function(){
+                $("#change-image_install-form").slideUp(function() {
+                    $('#image_install, #change-image_install-icon').show();
+                    if ($("span#image_install").text() != "Not set") {
+                        $('#delete-image_install-icon').show();
+                        setDeleteTooltip($('#delete-image_install-icon'));
+                    }
+                });
+            });
+
+            $("#new-image_install").on('input', function(){
+                if ($(this).val().trim().length == 0) {
+                    $("#apply-change-image_install").attr("disabled","disabled");
+                }
+                else {
+                    $("#apply-change-image_install").removeAttr("disabled");
+                }
+            });
+
+            $('#apply-change-image_install').click(function(){
+                // insure these non-empty values have single space prefix
+                var value = " " + $('#new-image_install').val().trim();
+                postEditAjaxRequest({"configvarChange" : 'IMAGE_INSTALL_append:'+value});
+                $('#image_install').text(value);
+                $('#image_install').removeClass('muted');
+                $("#change-image_install-form").slideUp(function () {
+                    $('#image_install, #change-image_install-icon').show();
+                    if (value.length > -1) {
+                        $('#delete-image_install-icon').show();
+                        setDeleteTooltip($('#delete-image_install-icon'));
+                    }
+               });
+            });
+
+            // delete IMAGE_INSTALL_append variable value
+            $('#delete-image_install-icon').click(function(){
+                $(this).tooltip('hide');
+                postEditAjaxRequest({"configvarChange" : 'IMAGE_INSTALL_append:'+''});
+                $('#image_install').parent().fadeOut(1000, function(){
+                    $('#image_install').addClass('muted');
+                    $('#image_install').text('Not set');
+                    $('#delete-image_install-icon').hide();
+                    $('#image_install').parent().fadeIn(1000);
+                });
+            });
+            {% endif %}
+
+
+            {% if package_classes_defined %}
+            // change PACKAGE_CLASSES variable
+            $('#change-package_classes-icon').click(function() {
+                $('#change-package_classes-icon, #package_classes').hide();
+                $("#change-package_classes-form").slideDown();
+
+                // initialize the pulldown and checkboxes
+                var value = $("#package_classes").text();
+                if ( value.indexOf("package_deb") == 0 ) {
+                    $("#package_classes-select").prop('selectedIndex', 0);
+                    updatePackageClassCheckboxes();
+                    if ( value.indexOf("_ipk") > 0 ) {
+                        $("#package_class_1_input").attr("checked",true);
+                    }
+                    if ( value.indexOf("_rpm") > 0 ) {
+                        $("#package_class_2_input").attr("checked",true);
+                    }
+                }
+
+                if ( value.indexOf("package_ipk") == 0 ) {
+                    $("#package_classes-select").prop('selectedIndex', 1);
+                    updatePackageClassCheckboxes();
+                    if ( value.indexOf("_deb") > 0 ) {
+                        $("#package_class_1_input").attr("checked",true);
+                    }
+                    if ( value.indexOf("_rpm") > 0 ) {
+                        $("#package_class_2_input").attr("checked",true);
+                    }
+                }
+
+                if ( value.indexOf("package_rpm") == 0 ) {
+                    $("#package_classes-select").prop('selectedIndex', 2);
+                    updatePackageClassCheckboxes();
+                    if ( value.indexOf("_deb") > 0 ) {
+                        $("#package_class_1_input").attr("checked",true);
+                    }
+                    if ( value.indexOf("_ipk") > 0 ) {
+                        $("#package_class_2_input").attr("checked",true);
+                    }
+                }
+            });
+
+            $('#cancel-change-package_classes').click(function(){
+                $("#change-package_classes-form").slideUp(function() {
+                    $('#package_classes, #change-package_classes-icon').show();
+                });
+            });
+
+            $('select').change(function() {
+                updatePackageClassCheckboxes();
+            });
+
+            $('#apply-change-package_classes').click(function(){
+                var e   = document.getElementById("package_classes-select");
+                var val = e.options[e.selectedIndex].text;
+
+                pc1_checked = document.getElementById("package_class_1_input").checked;
+                pc2_checked = document.getElementById("package_class_2_input").checked;
+                if (val == "package_deb") {
+                    if (pc1_checked) val = val + " package_ipk";
+                    if (pc2_checked) val = val + " package_rpm";
+                }
+                if (val == "package_ipk") {
+                    if (pc1_checked) val = val + " package_deb";
+                    if (pc2_checked) val = val + " package_rpm";
+                }
+                if (val == "package_rpm") {
+                    if (pc1_checked) val = val + " package_deb";
+                    if (pc2_checked) val = val + " package_ipk";
+                }
+
+                $('#package_classes').text(val);
+                //$('#package_classes').parent().removeClass('muted');
+                postEditAjaxRequest({"configvarChange" : 'PACKAGE_CLASSES:'+val});
+                $("#change-package_classes-form").slideUp(function() {
+                    $('#package_classes, #change-package_classes-icon').show();
+                });
+            });
+            {% endif %}
+
+
+            {% if sdk_machine_defined %}
+            // change SDKMACHINE variable
+            $('#change-sdkmachine-icon').click(function() {
+                var current_value = document.getElementById("sdkmachine").innerHTML;
+                var radios = document.getElementsByName('sdkmachine');
+                for (var i = 0, length = radios.length; i < length; i++) {
+                    radios[i].checked = false;
+                    if (radios[i].value == current_value) {
+                        radios[i].checked = true;
+                    }
+                }
+                $('#change-sdkmachine-icon, #sdkmachine').hide();
+                $("#change-sdkmachine-form").slideDown();
+            });
+
+            $('#cancel-change-sdkmachine').click(function(){
+                $("#change-sdkmachine-form").slideUp(function() {
+                    $('#sdkmachine, #change-sdkmachine-icon').show();
+                });
+            });
+
+            $('#apply-change-sdkmachine').click(function(){
+                var value="";
+                var radios = document.getElementsByName('sdkmachine');
+                for (var i = 0, length = radios.length; i < length; i++) {
+                    if (radios[i].checked) {
+                        // do whatever you want with the checked radio
+                        value=radios[i].value;
+                        break;
+                    }
+                }
+                postEditAjaxRequest({"configvarChange" : 'SDKMACHINE:'+value});
+                $('#sdkmachine').text(value);
+                $("#change-sdkmachine-form").slideUp(function() {
+                    $('#sdkmachine, #change-sdkmachine-icon').show();
+                });
+
+            });
+            {% endif %}
+
+
+            // add new variable
+            $("button#add-configvar-button").click( function (evt) {
+                var variable = $("input#variable").val();
+                var value    = $("input#value").val();
+
+                postEditAjaxRequest({"configvarAdd" : variable+':'+value});
+
+                // clear the previous values
+                $("input#variable").val("");
+                $("input#value").val("");
+                // Disable add button
+                $(".save").attr("disabled","disabled");
+
+                // Reload page if admin-removed core managed value is manually added back in
+                if (0 <= " DISTRO IMAGE_FSTYPES IMAGE_INSTALL_append PACKAGE_CLASSES SDKMACHINE ".indexOf( " "+variable+" " )) {
+                    // delayed reload to avoid race condition with postEditAjaxRequest
+                    do_reload=true;
+                }
+            });
+
+            // validate new variable name and value
+            $("#variable, #value").on('input', function() {
+                validate_new_variable();
+            });
+
+            //
+            // draw and register the dynamic configuration variables and handlers
+            //
+
+            var data = {
+                configvars : []
+            };
+            {% for c in configvars %}
+                data.configvars.push([ "{{c.name}}","{{c.value}}","{{c.pk}}" ]);
+                {% if '' != vars_context|get_dict_value:c.name %}
+                    data.vars_context[ "{{c.name}}" ] = "{{vars_context|get_dict_value:c.name }}";
+                {% endif %}
+            {% endfor %}
+
+            // draw these elements and assert their event handlers
+            onEditPageUpdate(data);
+        });
+
+    </script>
+
+{% endblock %}

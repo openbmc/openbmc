@@ -1,0 +1,96 @@
+From 0bf4b0ac18d1ea41b32ad781d214b295ca1998f3 Mon Sep 17 00:00:00 2001
+From: Aneesh Bansal <aneesh.bansal@freescale.com>
+Date: Mon, 21 Nov 2011 17:31:39 +0530
+Subject: [PATCH] Added support for PPC instructions mfatbu, mfatbl.
+
+Upstream-Status: Pending
+
+Signed-off-by: Aneesh Bansal <aneesh.bansal@freescale.com>
+---
+Currently Valgrind 3.7.0 does not have support for PPC instructions mfatbu and mfatbl. When we run a USDPAA application with VALGRIND, the following error is given by valgrind :
+dis_proc_ctl(ppc)(mfspr,SPR)(0x20F)
+disInstr(ppc): unhandled instruction: 0x7C0F82A6
+
+
+ VEX/priv/guest_ppc_defs.h    |    2 ++
+ VEX/priv/guest_ppc_helpers.c |   18 ++++++++++++++++++
+ VEX/priv/guest_ppc_toIR.c    |   22 ++++++++++++++++++++++
+ 3 files changed, 42 insertions(+), 0 deletions(-)
+
+diff --git a/VEX/priv/guest_ppc_defs.h b/VEX/priv/guest_ppc_defs.h
+index dd3c62e..11a34aa 100644
+--- a/VEX/priv/guest_ppc_defs.h
++++ b/VEX/priv/guest_ppc_defs.h
+@@ -146,6 +146,8 @@ extern UInt ppc32g_dirtyhelper_MFSPR_268_269 ( UInt );
+ 
+ extern UInt ppc32g_dirtyhelper_MFSPR_287 ( void );
+ 
++extern UInt ppc32g_dirtyhelper_MFSPR_526_527 ( UInt );
++
+ extern void ppc32g_dirtyhelper_LVS ( VexGuestPPC32State* gst,
+                                      UInt vD_idx, UInt sh,
+                                      UInt shift_right );
+diff --git a/VEX/priv/guest_ppc_helpers.c b/VEX/priv/guest_ppc_helpers.c
+index 11aa428..b49ea3f 100644
+--- a/VEX/priv/guest_ppc_helpers.c
++++ b/VEX/priv/guest_ppc_helpers.c
+@@ -119,6 +119,24 @@ UInt ppc32g_dirtyhelper_MFSPR_287 ( void )
+ #  endif
+ }
+ 
++/* CALLED FROM GENERATED CODE */
++/* DIRTY HELPER (non-referentially transparent) */
++UInt ppc32g_dirtyhelper_MFSPR_526_527 ( UInt r527 )
++{
++#  if defined(__powerpc__) || defined(_AIX)
++   UInt spr;
++   if (r527) {
++      __asm__ __volatile__("mfspr %0,527" : "=b"(spr));
++   } else {
++      __asm__ __volatile__("mfspr %0,526" : "=b"(spr));
++   }
++   return spr;
++#  else
++   return 0;
++#  endif
++}
++
++
+ 
+ /* CALLED FROM GENERATED CODE */
+ /* DIRTY HELPER (reads guest state, writes guest mem) */
+diff --git a/VEX/priv/guest_ppc_toIR.c b/VEX/priv/guest_ppc_toIR.c
+index f8d220d..37c8974 100644
+--- a/VEX/priv/guest_ppc_toIR.c
++++ b/VEX/priv/guest_ppc_toIR.c
+@@ -5657,6 +5657,28 @@ static Bool dis_proc_ctl ( VexAbiInfo* vbi, UInt theInstr )
+          break;
+       }
+ 
++
++      case 526 /* 0x20E */:
++      case 527 /* 0x20F */: {
++         UInt     arg  = SPR==526 ? 0 : 1;
++         IRTemp   val  = newTemp(Ity_I32);
++         IRExpr** args = mkIRExprVec_1( mkU32(arg) );
++         IRDirty* d    = unsafeIRDirty_1_N(
++                            val,
++                            0/*regparms*/,
++                            "ppc32g_dirtyhelper_MFSPR_526_527",
++                            fnptr_to_fnentry
++                               (vbi, &ppc32g_dirtyhelper_MFSPR_526_527),
++                            args
++                         );
++         /* execute the dirty call, dumping the result in val. */
++         stmt( IRStmt_Dirty(d) );
++         putIReg( rD_addr,
++                  mkWidenFrom32(ty, mkexpr(val), False/*unsigned*/) );
++         DIP("mfspr r%u,%u", rD_addr, (UInt)SPR);
++         break;
++      }
++
+       default:
+          vex_printf("dis_proc_ctl(ppc)(mfspr,SPR)(0x%x)\n", SPR);
+          return False;
+-- 
+1.7.0.4

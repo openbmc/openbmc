@@ -1,0 +1,41 @@
+Upstream-Status: Backport
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+
+
+
+From f8cce5f6cb2958a4074f87cd345bfe46e0dda6e1 Mon Sep 17 00:00:00 2001
+From: "Jasper St. Pierre" <jstpierre@mecheye.net>
+Date: Mon, 20 Apr 2015 12:08:29 -0700
+Subject: cogl-framebuffer-gl: Work again on GLESv2
+
+
+diff --git a/cogl/driver/gl/cogl-framebuffer-gl.c b/cogl/driver/gl/cogl-framebuffer-gl.c
+index 793b10b..609cfb3 100644
+--- a/cogl/driver/gl/cogl-framebuffer-gl.c
++++ b/cogl/driver/gl/cogl-framebuffer-gl.c
+@@ -107,6 +107,12 @@
+ #ifndef GL_PACK_INVERT_MESA
+ #define GL_PACK_INVERT_MESA 0x8758
+ #endif
++#ifndef GL_BACK_LEFT
++#define GL_BACK_LEFT				0x0402
++#endif
++#ifndef GL_BACK_RIGHT
++#define GL_BACK_RIGHT				0x0403
++#endif
+ 
+ #ifndef GL_COLOR
+ #define GL_COLOR 0x1800
+@@ -245,6 +251,9 @@ _cogl_framebuffer_gl_flush_stereo_mode_state (CoglFramebuffer *framebuffer)
+   if (framebuffer->type == COGL_FRAMEBUFFER_TYPE_OFFSCREEN)
+     return;
+ 
++  if (!ctx->glDrawBuffer)
++    return;
++
+   /* The one-shot default draw buffer setting in _cogl_framebuffer_gl_bind
+    * must have already happened. If not it would override what we set here. */
+   g_assert (ctx->was_bound_to_onscreen);
+-- 
+cgit v0.10.2
+

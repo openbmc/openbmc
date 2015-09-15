@@ -1,0 +1,23 @@
+systemtap: Cross compilation fix
+
+This is a cross compilation fix. It allows systemtap to find
+the kernel map file in the right place, i.e. in the kernel build tree.
+Without this fix it takes a map file from the build host, if available.
+
+Upstream-Status: Pending
+
+Signed-off-by: Mikhail Durnev <mikhail_durnev@mentor.com>
+
+Index: git/session.cxx
+===================================================================
+--- git.orig/session.cxx
++++ git/session.cxx
+@@ -1634,7 +1634,7 @@ systemtap_session::parse_kernel_function
+ 	clog << _F("Kernel symbol table %s unavailable, (%s)",
+ 		   system_map_path.c_str(), strerror(errno)) << endl;
+ 
+-      system_map_path = "/boot/System.map-" + kernel_release;
++      system_map_path = kernel_build_tree + "/System.map-" + kernel_release;
+       system_map.clear();
+       system_map.open(system_map_path.c_str(), ifstream::in);
+       if (! system_map.is_open())

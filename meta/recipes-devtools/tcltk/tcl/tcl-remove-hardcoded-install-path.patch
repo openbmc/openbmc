@@ -1,0 +1,47 @@
+From 6efc98774681795712073c2b91e5e9d1763239b8 Mon Sep 17 00:00:00 2001
+From: "Song.Li" <Song.Li@windriver.com>
+Date: Wed, 1 Aug 2012 19:05:51 +0800
+Subject: [PATCH] tcl:install tcl to lib64 instead of lib on 64bit target
+
+Remove hardcoded library install path. Change $(prefix)/lib/ to ${libdir}.
+
+[YOCTO #2876]
+
+This is not a bug, but libraries should be installed into directory .../lib/.
+On 64bit target that should be lib64/.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Song.Li <Song.Li@windriver.com>
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+---
+ configure |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: unix/configure
+===================================================================
+--- unix.orig/configure	2013-11-10 23:38:33.643426430 -0800
++++ unix/configure	2013-11-10 23:39:51.347428387 -0800
+@@ -19134,7 +19134,7 @@
+ 
+ eval "TCL_LIB_FILE=${TCL_LIB_FILE}"
+ 
+-TCL_LIBRARY='$(prefix)/lib/tcl$(VERSION)'
++TCL_LIBRARY='$(libdir)/tcl$(VERSION)'
+ PRIVATE_INCLUDE_DIR='$(includedir)'
+ HTML_DIR='$(DISTDIR)/html'
+ 
+Index: unix/configure.in
+===================================================================
+--- unix.orig/configure.in	2013-11-10 23:20:50.000000000 -0800
++++ unix/configure.in	2013-11-10 23:39:41.199428131 -0800
+@@ -790,7 +790,7 @@
+ 
+ eval "TCL_LIB_FILE=${TCL_LIB_FILE}"
+ 
+-TCL_LIBRARY='$(prefix)/lib/tcl$(VERSION)'
++TCL_LIBRARY='$(libdir)/tcl$(VERSION)'
+ PRIVATE_INCLUDE_DIR='$(includedir)'
+ HTML_DIR='$(DISTDIR)/html'
+ 

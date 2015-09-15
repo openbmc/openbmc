@@ -1,0 +1,80 @@
+Upstream-Status: Pending
+
+From cb9b1c041b634a4c128896e3d3eed4082608c797 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 3 May 2014 19:25:17 -0700
+Subject: [PATCH] Revert "2013-05-21  Christian Bruel 
+ <christian.bruel@st.com>"
+
+This reverts commit 3983036a8b6b2710c57777194f21507819a73553.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Conflicts:
+	gcc/ChangeLog
+---
+ gcc/ChangeLog   | 219 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ gcc/dwarf2out.c |  33 +++++----
+ 2 files changed, 234 insertions(+), 18 deletions(-)
+
+diff --git a/gcc/dwarf2out.c b/gcc/dwarf2out.c
+index 1272326..6ac2b28 100644
+--- a/gcc/dwarf2out.c
++++ b/gcc/dwarf2out.c
+@@ -10870,27 +10870,25 @@ static dw_loc_descr_ref
+ multiple_reg_loc_descriptor (rtx rtl, rtx regs,
+ 			     enum var_init_status initialized)
+ {
+-  int size, i;
++  int nregs, size, i;
++  unsigned reg;
+   dw_loc_descr_ref loc_result = NULL;
+ 
+-  /* Simple, contiguous registers.  */
+-  if (regs == NULL_RTX)
+-    {
+-      unsigned reg = REGNO (rtl);
+-      int nregs;
+-
++  reg = REGNO (rtl);
+ #ifdef LEAF_REG_REMAP
+-      if (crtl->uses_only_leaf_regs)
+-	{
+-	  int leaf_reg = LEAF_REG_REMAP (reg);
+-	  if (leaf_reg != -1)
+-	    reg = (unsigned) leaf_reg;
+-	}
++  if (crtl->uses_only_leaf_regs)
++    {
++      int leaf_reg = LEAF_REG_REMAP (reg);
++      if (leaf_reg != -1)
++	reg = (unsigned) leaf_reg;
++    }
+ #endif
++  gcc_assert ((unsigned) DBX_REGISTER_NUMBER (reg) == dbx_reg_number (rtl));
++  nregs = hard_regno_nregs[REGNO (rtl)][GET_MODE (rtl)];
+ 
+-      gcc_assert ((unsigned) DBX_REGISTER_NUMBER (reg) == dbx_reg_number (rtl));
+-      nregs = hard_regno_nregs[REGNO (rtl)][GET_MODE (rtl)];
+-
++  /* Simple, contiguous registers.  */
++  if (regs == NULL_RTX)
++    {
+       size = GET_MODE_SIZE (GET_MODE (rtl)) / nregs;
+ 
+       loc_result = NULL;
+@@ -10918,9 +10916,10 @@ multiple_reg_loc_descriptor (rtx rtl, rtx regs,
+     {
+       dw_loc_descr_ref t;
+ 
+-      t = one_reg_loc_descriptor (dbx_reg_number (XVECEXP (regs, 0, i)),
++      t = one_reg_loc_descriptor (REGNO (XVECEXP (regs, 0, i)),
+ 				  VAR_INIT_STATUS_INITIALIZED);
+       add_loc_descr (&loc_result, t);
++      size = GET_MODE_SIZE (GET_MODE (XVECEXP (regs, 0, 0)));
+       add_loc_descr_op_piece (&loc_result, size);
+     }
+ 
+-- 
+1.9.2
+

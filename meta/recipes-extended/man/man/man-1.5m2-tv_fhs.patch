@@ -1,0 +1,31 @@
+Upstream-Status: Pending
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+--- man/Makefile.in	2008-12-21 19:19:33.000000000 +0100
++++ man/Makefile.in.oden	2008-12-21 19:19:39.000000000 +0100
+@@ -34,6 +34,15 @@
+ 	for i in $(MAN8); \
+ 		do if test -f $$i.8; then $(INSTALL) $$i.8 $(mandir)/man8/$$i.@man8ext@; fi; done
+ 
++install-l10n: $(ALL)
++	mkdir -p $(mandir)/$(SLANG)/man1 $(mandir)/$(SLANG)/man5 $(mandir)/$(SLANG)/man8
++	for i in $(MAN1); \
++		do $(INSTALL) $$i.1 $(mandir)/$(SLANG)/man1/$$i.@man1ext@; done
++	for i in $(MAN5); \
++		do $(INSTALL) $$i.5 $(mandir)/$(SLANG)/man5/$$i.@man5ext@; done
++	for i in $(MAN8); \
++		do if test -f $$i.8; then $(INSTALL) $$i.8 $(mandir)/$(SLANG)/man8/$$i.@man8ext@; fi; done
++
+ clean:
+ 	rm -f core *.in *.@man1ext@ *.@man5ext@ *.@man8ext@ *~
+ 
+@@ -49,7 +58,7 @@
+ 	@for i in @languages@; do if test -d $$i; then echo; \
+ 		echo "==== Installing the `cat $$i.txt` man pages. ===="; \
+ 		cd $$i; SLANG=/$$i; if test $$SLANG = /en; then SLANG= ; fi; \
+-		export SLANG; make -f ../Makefile install; cd ..; \
++		export SLANG; make -f ../Makefile install-l10n; cd ..; \
+ 		else echo "==== No $$i man pages found. ===="; fi; done
+ 
+ cleansubdirs:

@@ -1,0 +1,33 @@
+
+    <ul class="nav nav-pills">
+    {% if active_tab == "detail" %}
+        <li class="active">
+    {% else %}
+        <li class="">
+    {% endif %}
+            <a href="{% url 'package_included_detail' build.id target.id package.id %}">
+                <i class="icon-question-sign get-help" title="The files this package adds to the image root file system"></i>
+                Files in root file system ({{packageFileCount}})
+            </a>
+        </li>
+    {% if active_tab == "dependencies" %}
+        <li class="active">
+    {% else %}
+        <li class="">
+    {% endif %}
+            <a href="{% url 'package_included_dependencies' build.id target.id package.id %}">
+                <i class="icon-question-sign get-help" title="Package runtime dependencies"></i>
+                Runtime dependencies ({{dependency_count}})
+            </a>
+        </li>
+    {% if active_tab == "reverse" %}
+        <li class="active">
+    {% else %}
+        <li class="">
+    {% endif %}
+            <a href="{% url 'package_included_reverse_dependencies' build.id target.id package.id %}">
+                <i class="icon-question-sign get-help" title="The package runtime reverse dependencies (i.e. the packages in this image that depend on this package). Reverse dependencies reflect only the 'depends' dependency type"></i>
+                Reverse runtime dependencies ({{reverse_count}})
+            </a>
+        </li>
+    </ul>

@@ -1,0 +1,19 @@
+Add a description to the AC_DEFINE for LOCALEDIR so that it appears in config.h
+and silences a fatal warning.
+
+Upstream-Status:Pending
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/configure.in b/configure.in
+index c10460c..aa20263 100644
+--- a/configure.in
++++ b/configure.in
+@@ -258,7 +258,7 @@ AC_SUBST(LIBS)
+ 
+ AM_GNU_GETTEXT
+ 
+-AC_DEFINE_UNQUOTED(LOCALEDIR,"$prefix/$DATADIRNAME")
++AC_DEFINE_UNQUOTED(LOCALEDIR,"$prefix/$DATADIRNAME",[locale directory])
+ 
+ AC_OUTPUT([Makefile intl/Makefile lib/Makefile testsuite/Makefile  m4/Makefile \
+ man/Makefile po/Makefile.in src/Makefile debian/rules Specfile systype \

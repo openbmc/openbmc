@@ -1,0 +1,34 @@
+From 765e0a38cb8c40f8865af5cb356ffe6039ffb08f Mon Sep 17 00:00:00 2001
+From: Thomas Klausner <wiz@NetBSD.org>
+Date: Sun, 22 Mar 2015 21:38:23 +0100
+Subject: [PATCH 2/4] Fix quoting issue.
+
+m4 has '[]' as quoting characters, so if we want '[]' to
+end up in the configure script, we need to quote them again.
+
+Reported by Greg Troxel <gdt@ir.bbn.com>.
+
+Signed-off-by: Thomas Klausner <wiz@NetBSD.org>
+Reviewed-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+---
+Upstream-Status: Backport
+
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index e67e9e1..888330b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -76,7 +76,7 @@ case $host_os in
+ 		;;
+ 	*netbsd*)
+ 		case $host in
+-		*i[3-9]86*)
++		*i[[3-9]]86*)
+ 			PCIACCESS_LIBS="$PCIACCESS_LIBS -li386"
+ 			;;
+ 		*x86_64*|*amd64*)
+-- 
+2.1.4
+

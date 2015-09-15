@@ -1,0 +1,23 @@
+cmake: don't run cross-binaries on host machine
+
+When doing the cross build we obviously cannot run those binaries on
+host since they can be binary incompatible.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+
+Index: cmake-2.8.10.1/CMakeLists.txt
+===================================================================
+--- cmake-2.8.10.1.orig/CMakeLists.txt
++++ cmake-2.8.10.1/CMakeLists.txt
+@@ -588,7 +588,8 @@ mark_as_advanced(CMAKE_STRICT)
+ 
+ # build the remaining subdirectories
+ add_subdirectory(Source)
+-add_subdirectory(Utilities)
++# Come on! Running the cross-binaries on host is not a good idea.
++#add_subdirectory(Utilities)
+ add_subdirectory(Tests)
+ 
+ if(BUILD_TESTING)

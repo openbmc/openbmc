@@ -1,0 +1,43 @@
+From 2bff7ee06a4f96e7d326991d61fb86f8aa651d48 Mon Sep 17 00:00:00 2001
+From: Roy Li <rongqing.li@windriver.com>
+Date: Wed, 27 May 2015 09:48:45 +0800
+Subject: [PATCH] remove Wsuggest-attribute from CXXFLAGS
+
+Upstream-Status: Inappropriate
+
+Wsuggest-attribute is GCC 4.6 feature, centos6 is using GCC
+4.4.7 which unknown this flag, so remove it from CXXFLAGS
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ buildlib/environment.mak.in | 1 -
+ test/libapt/makefile        | 1 -
+ 2 files changed, 2 deletions(-)
+
+diff --git a/buildlib/environment.mak.in b/buildlib/environment.mak.in
+index b0a8d9d..91ed011 100644
+--- a/buildlib/environment.mak.in
++++ b/buildlib/environment.mak.in
+@@ -11,7 +11,6 @@ CPPFLAGS+= @CPPFLAGS@ @DEFS@ -D_REENTRANT -D_FORTIFY_SOURCE=2
+ CXX = @CXX@
+ CXXFLAGS+= @CXXFLAGS@ -Wall -Wextra
+ CXXFLAGS+= -Wcast-align -Wlogical-op -Wredundant-decls -Wmissing-declarations -Wunsafe-loop-optimizations
+-CXXFLAGS+= -Wsuggest-attribute=pure -Wsuggest-attribute=const -Wsuggest-attribute=noreturn
+ # a bit too pedantic to be run by default
+ #CXXFLAGS+= -Wpedantic -Wno-long-long -Wno-vla -Wno-variadic-macros
+ NUM_PROCS = @NUM_PROCS@
+diff --git a/test/libapt/makefile b/test/libapt/makefile
+index 7f23ace..e805f13 100644
+--- a/test/libapt/makefile
++++ b/test/libapt/makefile
+@@ -39,7 +39,6 @@ CXXFLAGS += -pthread
+ # disable some flags for gtest again
+ CXXFLAGS+= -Wno-missing-declarations
+ CXXFLAGS+= -Wno-missing-field-initializers
+-CXXFLAGS+= -Wno-suggest-attribute=pure -Wno-suggest-attribute=const -Wno-suggest-attribute=noreturn
+ 
+ # All Google Test headers.  Usually you shouldn't change this definition.
+ GTEST_HEADERS = /usr/include/gtest/*.h \
+-- 
+1.9.1
+

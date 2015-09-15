@@ -1,0 +1,34 @@
+Upstream-Status: Backport [debian]
+
+Index: openssl-1.0.0c/Makefile.org
+===================================================================
+--- openssl-1.0.0c.orig/Makefile.org	2010-12-12 16:11:37.000000000 +0100
++++ openssl-1.0.0c/Makefile.org	2010-12-12 16:13:28.000000000 +0100
+@@ -160,7 +160,8 @@
+ MANDIR=/usr/share/man
+ MAN1=1
+ MAN3=3
+-MANSUFFIX=
++MANSUFFIX=ssl
++MANSECTION=SSL
+ HTMLSUFFIX=html
+ HTMLDIR=$(OPENSSLDIR)/html
+ SHELL=/bin/sh
+@@ -651,7 +652,7 @@
+ 		echo "installing man$$sec/$$fn.$${sec}$(MANSUFFIX)"; \
+ 		(cd `$(PERL) util/dirname.pl $$i`; \
+ 		sh -c "$$pod2man \
+-			--section=$$sec --center=OpenSSL \
++			--section=$${sec}$(MANSECTION) --center=OpenSSL \
+ 			--release=$(VERSION) `basename $$i`") \
+ 			>  $(INSTALL_PREFIX)$(MANDIR)/man$$sec/$$fn.$${sec}$(MANSUFFIX); \
+ 		$(PERL) util/extract-names.pl < $$i | \
+@@ -668,7 +669,7 @@
+ 		echo "installing man$$sec/$$fn.$${sec}$(MANSUFFIX)"; \
+ 		(cd `$(PERL) util/dirname.pl $$i`; \
+ 		sh -c "$$pod2man \
+-			--section=$$sec --center=OpenSSL \
++			--section=$${sec}$(MANSECTION) --center=OpenSSL \
+ 			--release=$(VERSION) `basename $$i`") \
+ 			>  $(INSTALL_PREFIX)$(MANDIR)/man$$sec/$$fn.$${sec}$(MANSUFFIX); \
+ 		$(PERL) util/extract-names.pl < $$i | \

@@ -1,0 +1,30 @@
+From 07b5ed42d7041ccc084889eaa96817aa097bf461 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Tue, 3 Feb 2015 03:10:25 +0000
+Subject: [PATCH] Makefile: fix gzip command
+
+The "-c" doesn't work in command "gzip file -c", need use "gzip -c file"
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 219a591..c7d147a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -144,7 +144,7 @@ install_hwlatdetect: hwlatdetect
+ 		install -D -m 755 src/hwlatdetect/hwlatdetect.py $(DESTDIR)$(PYLIB)/hwlatdetect.py ; \
+ 		rm -f "$(DESTDIR)$(bindir)/hwlatdetect" ; \
+ 		ln -s $(PYLIB)/hwlatdetect.py "$(DESTDIR)$(bindir)/hwlatdetect" ; \
+-		gzip src/hwlatdetect/hwlatdetect.8 -c >"$(DESTDIR)$(mandir)/man8/hwlatdetect.8.gz" ; \
++		gzip -c src/hwlatdetect/hwlatdetect.8 >"$(DESTDIR)$(mandir)/man8/hwlatdetect.8.gz" ; \
+ 	fi
+ 
+ .PHONY: release
+-- 
+2.0.1
+

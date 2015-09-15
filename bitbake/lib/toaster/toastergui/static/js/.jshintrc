@@ -1,0 +1,11 @@
+{
+  "curly" : false,
+  "predef" : [ "$","libtoaster", "prettyPrint" ],
+  "eqnull": true,
+  "plusplus" : false,
+  "browser" : true,
+  "jquery" : true,
+  "devel" : true,
+  "unused" : true,
+  "maxerr" : 60
+}

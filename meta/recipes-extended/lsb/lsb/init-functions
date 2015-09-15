@@ -1,0 +1,44 @@
+#!/bin/sh
+
+# LSB initscript functions, as defined in the LSB Spec 1.1.0
+#
+# Lawrence Lim <llim@core.com> - Tue, 26 June 2007
+# Updated to the latest LSB 3.1 spec
+# http://refspecs.freestandards.org/LSB_3.1.0/LSB-Core-generic/LSB-Core-generic_lines.txt
+
+start_daemon () {
+	/etc/core-lsb/lsb_start_daemon "$@"
+}
+
+killproc () {
+	/etc/core-lsb/lsb_killproc "$@"
+}
+
+pidofproc () {
+	/etc/core-lsb/lsb_pidofproc "$@"
+}
+
+log_success_msg () {
+	/etc/core-lsb/lsb_log_message success "$@"
+}
+
+log_failure_msg () {
+	/etc/core-lsb/lsb_log_message failure "$@"
+}
+
+log_warning_msg () {
+	/etc/core-lsb/lsb_log_message warning "$@"
+}
+
+# int log_begin_message (char *message)
+log_begin_msg () {
+	if [ -z "$1" ]; then
+		return 1
+	fi
+	echo " * $@"
+}
+
+
+log_end_msg () {
+	/etc/core-lsb/lsb_log_message end "$@"
+}

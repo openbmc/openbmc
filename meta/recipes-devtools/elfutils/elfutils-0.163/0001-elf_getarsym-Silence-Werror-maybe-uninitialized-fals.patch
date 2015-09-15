@@ -1,0 +1,35 @@
+From 668accf322fd7185e273bfd50b84320e71d9de5a Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Fri, 10 Apr 2015 00:29:18 +0200
+Subject: [PATCH] elf_getarsym: Silence -Werror=maybe-uninitialized false
+ positive
+
+Upstream-Status: Pending
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ libelf/elf_getarsym.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/libelf/elf_getarsym.c b/libelf/elf_getarsym.c
+index d0bb28a..08954d2 100644
+--- a/libelf/elf_getarsym.c
++++ b/libelf/elf_getarsym.c
+@@ -165,8 +165,13 @@ elf_getarsym (elf, ptr)
+       int w = index64_p ? 8 : 4;
+ 
+       /* We have an archive.  The first word in there is the number of
+-	 entries in the table.  */
+-      uint64_t n;
++	 entries in the table.
++	 Set to SIZE_MAX just to silence -Werror=maybe-uninitialized
++	 elf_getarsym.c:290:9: error: 'n' may be used uninitialized in this function
++	 The read_number_entries function doesn't initialize n only when returning
++	 -1 which in turn ensures to jump over usage of this uninitialized variable.
++	 */
++      uint64_t n = SIZE_MAX;
+       size_t off = elf->start_offset + SARMAG + sizeof (struct ar_hdr);
+       if (read_number_entries (&n, elf, &off, index64_p) < 0)
+ 	{
+-- 
+2.3.5
+

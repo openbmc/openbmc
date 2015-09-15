@@ -1,0 +1,19 @@
+Avoid using libdir from .la which usually points to a host path
+
+Upstream-Status: Inappropriate [embedded specific]
+Signed-off-by: Jonathan Liu <net147@gmail.com>
+
+diff --git a/ltmain.sh b/ltmain.sh
+index a03433f..1902a90 100644
+--- a/ltmain.sh
++++ b/ltmain.sh
+@@ -5628,6 +5628,9 @@ func_mode_link ()
+ 	    absdir="$abs_ladir"
+ 	    libdir="$abs_ladir"
+ 	  else
++	    # Instead of using libdir from .la which usually points to a host path,
++	    # use the path the .la is contained in.
++	    libdir="$abs_ladir"
+ 	    dir="$libdir"
+ 	    absdir="$libdir"
+ 	  fi

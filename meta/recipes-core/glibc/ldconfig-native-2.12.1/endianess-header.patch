@@ -1,0 +1,113 @@
+Upstream-Status: Inappropriate [fix poky patch]
+
+This patch fixes build issues with a previous endian-ness_handling.patch on
+distros that don't have macros referenced
+
+7/20/2011
+Matthew McClintock <msm@freescale.com>
+
+diff -purN ldconfig-native-2.12.1.orig/endian_extra.h ldconfig-native-2.12.1/endian_extra.h
+--- ldconfig-native-2.12.1.orig/endian_extra.h	1969-12-31 18:00:00.000000000 -0600
++++ ldconfig-native-2.12.1/endian_extra.h	2011-07-19 18:09:14.323048417 -0500
+@@ -0,0 +1,64 @@
++/* Copyright (C) 1992, 1996, 1997, 2000, 2008 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, write to the Free
++   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
++   02111-1307 USA.  */
++
++#include <endian.h>
++
++#ifndef	_ENDIAN_EXTRA_H
++#define	_ENDIAN_EXTRA_H	1
++
++/* Don't redefine these macros if they already exist */
++#ifndef htobe16
++#ifdef __USE_BSD
++/* Conversion interfaces.  */
++# include <byteswap.h>
++
++# if __BYTE_ORDER == __LITTLE_ENDIAN
++#  define htobe16(x) __bswap_16 (x)
++#  define htole16(x) (x)
++#  define be16toh(x) __bswap_16 (x)
++#  define le16toh(x) (x)
++
++#  define htobe32(x) __bswap_32 (x)
++#  define htole32(x) (x)
++#  define be32toh(x) __bswap_32 (x)
++#  define le32toh(x) (x)
++
++#  define htobe64(x) __bswap_64 (x)
++#  define htole64(x) (x)
++#  define be64toh(x) __bswap_64 (x)
++#  define le64toh(x) (x)
++# else
++#  define htobe16(x) (x)
++#  define htole16(x) __bswap_16 (x)
++#  define be16toh(x) (x)
++#  define le16toh(x) __bswap_16 (x)
++
++#  define htobe32(x) (x)
++#  define htole32(x) __bswap_32 (x)
++#  define be32toh(x) (x)
++#  define le32toh(x) __bswap_32 (x)
++
++#  define htobe64(x) (x)
++#  define htole64(x) __bswap_64 (x)
++#  define be64toh(x) (x)
++#  define le64toh(x) __bswap_64 (x)
++# endif
++#endif
++#endif
++
++#endif	/* endian_extra.h */
+diff -purN ldconfig-native-2.12.1.orig/cache.c ldconfig-native-2.12.1/cache.c
+--- ldconfig-native-2.12.1.orig/cache.c	2011-07-19 18:21:28.347041301 -0500
++++ ldconfig-native-2.12.1/cache.c	2011-07-19 18:22:54.118048064 -0500
+@@ -39,6 +39,8 @@
+ # define N_(msgid)  msgid
+ #define _(msg) msg
+ 
++#include "endian_extra.h"
++
+ extern int be;
+ 
+ static uint16_t write16(uint16_t x, int be)
+diff -purN ldconfig-native-2.12.1.orig/readelflib.c ldconfig-native-2.12.1/readelflib.c
+--- ldconfig-native-2.12.1.orig/readelflib.c	2011-07-19 18:21:28.346041593 -0500
++++ ldconfig-native-2.12.1/readelflib.c	2011-07-19 18:23:05.324059875 -0500
+@@ -25,6 +25,9 @@
+ 
+ /* check_ptr checks that a pointer is in the mmaped file and doesn't
+    point outside it.  */
++
++#include "endian_extra.h"
++
+ #undef check_ptr
+ #define check_ptr(ptr)						\
+ do								\
+diff -purN ldconfig-native-2.12.1.orig/readlib.c ldconfig-native-2.12.1/readlib.c
+--- ldconfig-native-2.12.1.orig/readlib.c	2011-07-19 18:21:28.346041593 -0500
++++ ldconfig-native-2.12.1/readlib.c	2011-07-19 18:23:23.877046210 -0500
+@@ -40,6 +40,8 @@
+ 
+ #include "ldconfig.h"
+ 
++#include "endian_extra.h"
++
+ #define _(msg) msg
+ 
+ #define Elf32_CLASS ELFCLASS32

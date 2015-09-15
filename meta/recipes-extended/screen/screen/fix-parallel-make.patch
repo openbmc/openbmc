@@ -1,0 +1,19 @@
+This fixes the parallel make install failure
+
+Upstream-Status: Pending
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+Index: screen-4.0.3/Makefile.in
+===================================================================
+--- screen-4.0.3.orig/Makefile.in
++++ screen-4.0.3/Makefile.in
+@@ -70,7 +70,7 @@ screen: $(OFILES)
+ .c.o:
+ 	$(CC) -c -I. -I$(srcdir) $(M_CFLAGS) $(DEFS) $(OPTIONS) $(CFLAGS) $<
+ 
+-install_bin: .version screen
++install_bin: .version screen installdirs
+ 	-if [ -f $(DESTDIR)$(bindir)/$(SCREEN) ] && [ ! -f $(DESTDIR)$(bindir)/$(SCREEN).old ]; \
+ 		then mv $(DESTDIR)$(bindir)/$(SCREEN) $(DESTDIR)$(bindir)/$(SCREEN).old; fi
+ 	$(INSTALL_PROGRAM) screen $(DESTDIR)$(bindir)/$(SCREEN)

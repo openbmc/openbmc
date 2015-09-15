@@ -1,0 +1,45 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
+[<!ENTITY % poky SYSTEM "../poky.ent"> %poky; ] >
+
+<chapter id='profile-manual-arch'>
+
+<title>Overall Architecture of the Linux Tracing and Profiling Tools</title>
+
+<section id='architecture-of-the-tracing-and-profiling-tools'>
+    <title>Architecture of the Tracing and Profiling Tools</title>
+
+    <para>
+        It may seem surprising to see a section covering an 'overall architecture'
+        for what seems to be a random collection of tracing tools that together
+        make up the Linux tracing and profiling space.
+        The fact is, however, that in recent years this seemingly disparate
+        set of tools has started to converge on a 'core' set of underlying
+        mechanisms:
+    </para>
+
+    <para>
+        <itemizedlist>
+            <listitem>static tracepoints</listitem>
+            <listitem>dynamic tracepoints
+                 <itemizedlist>
+                     <listitem>kprobes</listitem>
+                     <listitem>uprobes</listitem>
+                 </itemizedlist>
+            </listitem>
+            <listitem>the perf_events subsystem</listitem>
+            <listitem>debugfs</listitem>
+        </itemizedlist>
+    </para>
+
+    <informalexample>
+        <emphasis>Tying it Together:</emphasis> Rather than enumerating here how each tool makes use of
+        these common mechanisms, textboxes like this will make note of the
+        specific usages in each tool as they come up in the course
+        of the text.
+    </informalexample>
+</section>
+</chapter>
+<!--
+vim: expandtab tw=80 ts=4
+-->

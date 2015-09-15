@@ -1,0 +1,58 @@
+[PATCH] disable test
+
+Upstream-Status: Inappropriate [configuration]
+
+test needs gtest package, so not build the test dir
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ Makefile     | 7 +++----
+ configure.ac | 6 ------
+ 2 files changed, 3 insertions(+), 10 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 5f5fb27..5070e96 100644
+--- a/Makefile
++++ b/Makefile
+@@ -9,8 +9,8 @@ endif
+ .PHONY: default
+ default: startup all
+ 
+-.PHONY: headers library clean veryclean all binary program doc test update-po
+-all headers library clean veryclean binary program doc manpages docbook test update-po startup dirs:
++.PHONY: headers library clean veryclean all binary program doc update-po
++all headers library clean veryclean binary program doc manpages docbook update-po startup dirs:
+ 	$(MAKE) -C vendor $@
+ 	$(MAKE) -C apt-pkg $@
+ 	$(MAKE) -C apt-inst $@
+@@ -21,9 +21,8 @@ all headers library clean veryclean binary program doc manpages docbook test upd
+ 	$(MAKE) -C dselect $@
+ #	$(MAKE) -C doc $@
+ 	$(MAKE) -C po $@
+-	$(MAKE) -C test $@
+ 
+-all headers library clean veryclean binary program doc manpages docbook test update-po: startup dirs
++all headers library clean veryclean binary program doc manpages docbook update-po: startup dirs
+ 
+ dirs: startup
+ 
+diff --git a/configure.ac b/configure.ac
+index 5663aaf..b0f9564 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -89,12 +89,6 @@ AC_CHECK_LIB(curl, curl_easy_init,
+      AC_MSG_ERROR([failed: I need CURL due https support]),
+ )
+ 
+-AC_LANG_PUSH([C++])
+-AC_CHECK_HEADER(gtest/gtest.h,,
+-     AC_MSG_ERROR([failed: I need gtest to build tests]),
+-)
+-AC_LANG_POP([C++])
+-
+ 
+ AC_SUBST(BDBLIB)
+ 
+-- 
+1.9.1
+

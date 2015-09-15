@@ -1,0 +1,141 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
+[<!ENTITY % poky SYSTEM "../poky.ent"> %poky; ] >
+
+<chapter id='toaster-manual-start'>
+
+<title>Preparing to Use Toaster</title>
+
+    <para>
+        This chapter describes how you need to prepare your system in order to
+        use Toaster.
+    </para>
+
+    <section id='toaster-setting-up-the-basic-system-requirements'>
+        <title>Setting Up the Basic System Requirements</title>
+
+        <para>
+            You first need to be sure your build system is set up to run
+            the Yocto Project.
+            See the
+            "<ulink url='&YOCTO_DOCS_QS_URL;#yp-resources'>Setting Up to Use the Yocto Project</ulink>"
+            section in the Yocto Project Quick Start for information on how
+            to set up your system for the Yocto Project.
+        </para>
+    </section>
+
+    <section id='toaster-establishing-toaster-system-dependencies'>
+        <title>Establishing Toaster System Dependencies</title>
+
+        <para>
+            Toaster requires extra Python dependencies in order to run.
+            A Toaster requirements file named
+            <filename>toaster-requirements.txt</filename> defines the
+            Python dependencies.
+            The requirements file is located in the
+            <filename>bitbake</filename> directory, which is located in the
+            root directory of the
+            <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+            (e.g. <filename>poky/bitbake/toaster-requirements.txt</filename>).
+            The dependencies appear in a <filename>pip</filename>,
+            install-compatible format.
+        </para>
+
+        <section id='toaster-optional-virtual-environment'>
+            <title>Optionally Setting Up a Python Virtual Environment</title>
+
+            <para>
+                It is highly recommended that you use a Python virtual
+                environment that allows you to maintain a dedicated Python
+                executable and its own set of installed modules.
+                Doing so separates the executable from the Python and modules
+                provided by the operating system and therefore avoids any
+                version conflicts.
+            </para>
+
+            <para>
+                Follow these steps to set up your virtual environment.
+                These steps assume a Ubuntu distribution:
+                <orderedlist>
+                    <listitem><para><emphasis>Install <filename>virtualenv</filename>:</emphasis>
+                        Install the supported
+                        <filename>python-virtualenv</filename> package from your
+                        distribution rather than using <filename>pip</filename>.
+                        <literallayout class='monospaced'>
+     $ sudo apt-get install python-virtualenv
+                        </literallayout>
+                        </para></listitem>
+                    <listitem><para><emphasis>Create and Activate a Virtual Environment:</emphasis>
+                        <literallayout class='monospaced'>
+     $ virtualenv venv
+     $ source venv/bin/activate
+                        </literallayout>
+                        </para></listitem>
+                </orderedlist>
+                <note>
+                    If you do choose to set up a virtual environment in
+                    which to run Toaster, you must initialize that
+                    virtual environment each time you want to start
+                    Toaster.
+                    Use the following to initialize the environment just
+                    before you start Toaster:
+                    <literallayout class='monospaced'>
+     $ source venv/bin/activate
+                    </literallayout>
+                </note>
+            </para>
+        </section>
+
+        <section id='toaster-load-packages'>
+            <title>Install Toaster Packages</title>
+
+            <para>
+                You need to install the packages that Toaster requires.
+                Use this command:
+                <literallayout class='monospaced'>
+     $ pip install -r bitbake/toaster-requirements.txt
+                </literallayout>
+            </para>
+        </section>
+
+<!-- Commenting this section out for now in case it needs to be used again.
+
+        <section id='toaster-install-daemon'>
+            <title>Install <filename>daemon</filename></title>
+
+            <para>
+                Toaster depends on
+                <ulink url='http://www.libslack.org/daemon/'><filename>daemon</filename></ulink>.
+                Depending on your distribution, how you install
+                <filename>daemon</filename> differs:
+                <itemizedlist>
+                    <listitem><para><emphasis>Debian-Based Systems:</emphasis>
+                        If you are running a Debian-based distribution,
+                        install <filename>daemon</filename> using the
+                        following command:
+                        <literallayout class='monospaced'>
+     $ sudo apt-get install daemon​
+                        </literallayout>
+                        </para></listitem>
+                    <listitem><para><emphasis>Non-Debian-Based Systems:</emphasis>
+                        If you are not running a Debian-based distribution
+                        (Redhat-based distribution such as Fedora),
+                        you need to download ​the file relevant to the
+                        architecture and then install
+                        <filename>daemon</filename> manually.
+                        Following are the commands for 64-bit distributions:
+                        <literallayout class='monospaced'>
+     $ wget http://libslack.org/daemon/download/daemon-0.6.4-1.x86_64.rpm
+     $ sudo rpm -i daemon-0.6.4-1.x86_64.rpm
+                        </literallayout>
+                        Here are the commands for a 32-bit distribution:
+                        <literallayout class='monospaced'>
+     $ wget http://libslack.org/daemon/download/daemon-0.6.4-1.i686.rpm
+     $ sudo rpm -i ​daemon-0.6.4-1.i686.rpm​
+                        </literallayout>
+                        </para></listitem>
+                </itemizedlist>
+            </para>
+        </section> -->
+    </section>
+</chapter>

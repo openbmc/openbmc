@@ -1,0 +1,33 @@
+Upstream-Status: Pending
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ login-utils/login.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/login-utils/login.c b/login-utils/login.c
+index ebb76f5..38c881b 100644
+--- a/login-utils/login.c
++++ b/login-utils/login.c
+@@ -1110,6 +1110,7 @@ int main(int argc, char **argv)
+ 	char *buff;
+ 	int childArgc = 0;
+ 	int retcode;
++	struct sigaction act;
+ 
+ 	char *pwdbuf = NULL;
+ 	struct passwd *pwd = NULL, _pwd;
+@@ -1123,7 +1124,9 @@ int main(int argc, char **argv)
+ 	timeout = (unsigned int)getlogindefs_num("LOGIN_TIMEOUT", LOGIN_TIMEOUT);
+ 
+ 	signal(SIGALRM, timedout);
+-	siginterrupt(SIGALRM, 1);	/* we have to interrupt syscalls like ioctl() */
++	(void) sigaction(SIGALRM, NULL, &act);
++	act.sa_flags &= ~SA_RESTART;
++	sigaction(SIGALRM, &act, NULL);
+ 	alarm(timeout);
+ 	signal(SIGQUIT, SIG_IGN);
+ 	signal(SIGINT, SIG_IGN);
+-- 
+1.9.1
+

@@ -1,0 +1,29 @@
+Upstream-Status: Backport
+
+Index: apt-0.7.3/configure.ac
+===================================================================
+--- apt-0.7.3.orig/configure.ac	2007-07-01 10:38:45.000000000 +0000
++++ apt-0.7.3/configure.ac	2007-08-21 13:39:26.000000000 +0000
+@@ -67,8 +67,20 @@
+       [AC_DEFINE(HAVE_BDB)
+        BDBLIB="-ldb"
+        AC_MSG_RESULT(yes)],
+-      [BDBLIB=""
+-       AC_MSG_RESULT(no)]
++
++       LIBS="$LIBS -lpthread"
++       [AC_MSG_CHECKING(if we can link against BerkeleyDB with pthread)
++        AC_LINK_IFELSE(
++        [AC_LANG_PROGRAM(
++         [#include <db.h>],
++         [int r, s, t; db_version(&r, &s, &t);]
++        )],
++        [AC_DEFINE(HAVE_BDB)
++         BDBLIB="-ldb -lpthread"
++         AC_MSG_RESULT(yes)],
++        [BDBLIB=""
++         AC_MSG_RESULT(no)]
++      )]       
+     )]
+ )
+ 

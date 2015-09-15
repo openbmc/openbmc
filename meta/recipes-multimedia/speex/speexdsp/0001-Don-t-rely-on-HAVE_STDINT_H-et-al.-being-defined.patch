@@ -1,0 +1,63 @@
+From c73370ceafd138becee8ca3c688ba75756830bfe Mon Sep 17 00:00:00 2001
+From: Tanu Kaskinen <tanu.kaskinen@linux.intel.com>
+Date: Sun, 5 Jul 2015 17:48:16 +0300
+Subject: [PATCH] Don't rely on HAVE_STDINT_H et al. being defined
+
+Not everyone who includes speexdsp_config_types.h will have a test
+which defines those, and if we've chosen to use the stdint types at
+configure time then we know exactly which header(s) are available, so
+just choose the best one then and generate the header to use it.
+
+This patch, including the above text, is copied from a commit in the
+speex repository[1]. The original commit for speex was made by Ron
+<ron@debian.org>.
+
+[1] https://git.xiph.org/?p=speex.git;a=commitdiff;h=774c87d6cb7dd8dabdd17677fc6da753ecf4aa87
+
+Upstream-Status: Backport
+
+Signed-off-by: Tanu Kaskinen <tanu.kaskinen@linux.intel.com>
+---
+ configure.ac                             | 6 ++++++
+ include/speex/speexdsp_config_types.h.in | 8 +-------
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 2cd2d1e..1de0c23 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -334,6 +334,12 @@ AC_SUBST([USIZE16])
+ AC_SUBST([SIZE32])
+ AC_SUBST([USIZE32])
+ 
++AS_IF([test "$ac_cv_header_stdint_h" = "yes"],    [INCLUDE_STDINT="#include <stdint.h>"],
++      [test "$ac_cv_header_inttypes_h" = "yes"],  [INCLUDE_STDINT="#include <inttypes.h>"],
++      [test "$ac_cv_header_sys_types_h" = "yes"], [INCLUDE_STDINT="#include <sys/types.h>"])
++
++AC_SUBST([INCLUDE_STDINT])
++
+ AC_CONFIG_FILES([
+            Makefile libspeexdsp/Makefile doc/Makefile SpeexDSP.spec
+            include/Makefile include/speex/Makefile speexdsp.pc
+diff --git a/include/speex/speexdsp_config_types.h.in b/include/speex/speexdsp_config_types.h.in
+index 02b82fd..5ea7b55 100644
+--- a/include/speex/speexdsp_config_types.h.in
++++ b/include/speex/speexdsp_config_types.h.in
+@@ -1,13 +1,7 @@
+ #ifndef __SPEEX_TYPES_H__
+ #define __SPEEX_TYPES_H__
+ 
+-#if defined HAVE_STDINT_H
+-#  include <stdint.h>
+-#elif defined HAVE_INTTYPES_H
+-#  include <inttypes.h>
+-#elif defined HAVE_SYS_TYPES_H
+-#  include <sys/types.h>
+-#endif
++@INCLUDE_STDINT@
+ 
+ typedef @SIZE16@ spx_int16_t;
+ typedef @USIZE16@ spx_uint16_t;
+-- 
+1.9.3
+

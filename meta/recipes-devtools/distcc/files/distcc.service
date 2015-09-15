@@ -1,0 +1,11 @@
+[Unit]
+Description=Distccd A Distributed Compilation Server
+After=network.target
+
+[Service]
+User=distcc
+EnvironmentFile=-/etc/default/distcc
+ExecStart=@BINDIR@/distccd --verbose --no-detach --daemon $OPTIONS
+
+[Install]
+WantedBy=multi-user.target

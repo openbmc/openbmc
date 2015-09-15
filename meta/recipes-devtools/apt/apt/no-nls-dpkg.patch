@@ -1,0 +1,26 @@
+Upstream-Status: Pending
+
+--- a/apt-pkg/deb/dpkgpm.cc
++++ b/apt-pkg/deb/dpkgpm.cc
+@@ -42,6 +42,12 @@
+ #include <apti18n.h>
+ 									/*}}}*/
+ 
++#ifdef USE_NLS
++#define _dpkg(x) dgettext("dpkg", x)
++#else
++#define _dpkg(x) x
++#endif
++
+ using namespace std;
+ 
+ namespace
+@@ -1279,7 +1285,7 @@ void pkgDPkgPM::WriteApportReport(const
+    }
+ 
+    // check if its not a follow up error 
+-   const char *needle = dgettext("dpkg", "dependency problems - leaving unconfigured");
++   const char *needle = _dpkg("dependency problems - leaving unconfigured");
+    if(strstr(errormsg, needle) != NULL) {
+       std::clog << _("No apport report written because the error message indicates its a followup error from a previous failure.") << std::endl;
+       return;

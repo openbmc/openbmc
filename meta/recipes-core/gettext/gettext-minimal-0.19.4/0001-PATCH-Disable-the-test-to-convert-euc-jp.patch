@@ -1,0 +1,38 @@
+[PATCH] Disable the test to convert euc-jp
+
+Remove the test "Test against HP-UX 11.11 bug:
+No converter from EUC-JP to UTF-8 is provided"
+since we don't support HP-UX and if the euc-jp is not
+installed on the host, the dependence will be built without
+iconv support and will cause guile-native building fail.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ iconv.m4 | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/iconv.m4 b/iconv.m4
+index 4e37363..35f54bd 100644
+--- a/iconv.m4
++++ b/iconv.m4
+@@ -165,6 +165,7 @@ AC_DEFUN([AM_ICONV_LINK],
+       }
+   }
+ #endif
++#if 0
+   /* Test against HP-UX 11.11 bug: No converter from EUC-JP to UTF-8 is
+      provided.  */
+   if (/* Try standardized names.  */
+@@ -176,6 +177,7 @@ AC_DEFUN([AM_ICONV_LINK],
+       /* Try HP-UX names.  */
+       && iconv_open ("utf8", "eucJP") == (iconv_t)(-1))
+     result |= 16;
++#endif
+   return result;
+ ]])],
+           [am_cv_func_iconv_works=yes], ,
+-- 
+2.0.1
+

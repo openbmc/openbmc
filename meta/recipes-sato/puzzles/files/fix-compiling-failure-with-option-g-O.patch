@@ -1,0 +1,52 @@
+gtk.c: fix compiling failure with option -g -O
+
+There were compiling failure with option -g -O
+...
+././gtk.c: In function 'configure_area':
+././gtk.c:397:2: error: 'cr' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+  cairo_set_source_rgb(cr,
+  ^
+././gtk.c:384:14: note: 'cr' was declared here
+     cairo_t *cr;
+              ^
+././gtk.c: In function 'main':
+././gtk.c:2911:6: error: 'error' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+      fprintf(stderr, "%s: %s\n", pname, error);
+      ^
+cc1: all warnings being treated as errors
+...
+
+Initialized pointer 'cr' and 'error' with NULL
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ gtk.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gtk.c b/gtk.c
+index a2eba2c..c54bf63 100644
+--- a/gtk.c
++++ b/gtk.c
+@@ -381,7 +381,7 @@ static void clear_backing_store(frontend *fe)
+ 
+ static void setup_backing_store(frontend *fe)
+ {
+-    cairo_t *cr;
++    cairo_t *cr = NULL;
+     int i;
+ 
+     fe->pixmap = gdk_pixmap_new(fe->area->window, fe->pw, fe->ph, -1);
+@@ -2481,7 +2481,7 @@ char *fgetline(FILE *fp)
+ int main(int argc, char **argv)
+ {
+     char *pname = argv[0];
+-    char *error;
++    char *error = NULL;
+     int ngenerate = 0, print = FALSE, px = 1, py = 1;
+     int time_generation = FALSE, test_solve = FALSE, list_presets = FALSE;
+     int soln = FALSE, colour = FALSE;
+-- 
+1.9.1
+

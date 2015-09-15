@@ -1,0 +1,42 @@
+From 6d02a6c1aeb1d050ffe7c6624bab9acfa76fc05f Mon Sep 17 00:00:00 2001
+From: Mikael Beckius <mikael.beckius@windriver.com>
+Date: Tue, 12 May 2015 11:04:34 +0200
+Subject: [PATCH] lttng-ust:Fix live timer calculation error
+
+There is an calculation error for live timer. Variable chan->switch_timer_interval is
+based on microsecond, and it is not right to assign chan->switch_timer_interval mod
+1000000 to var tv_nsec which is based on nanosecond.
+
+Upstream-Status: Pending
+
+Signed-off-by: Mikael Beckius <mikael.beckius@windriver.com>
+Signed-off-by: Jianchuan Wang <jianchuan.wang@windriver.com>
+---
+ libringbuffer/ring_buffer_frontend.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libringbuffer/ring_buffer_frontend.c b/libringbuffer/ring_buffer_frontend.c
+index eb4e486..e0377a3 100644
+--- a/libringbuffer/ring_buffer_frontend.c
++++ b/libringbuffer/ring_buffer_frontend.c
+@@ -528,7 +528,7 @@ void lib_ring_buffer_channel_switch_timer_start(struct channel *chan)
+ 	}
+ 
+ 	its.it_value.tv_sec = chan->switch_timer_interval / 1000000;
+-	its.it_value.tv_nsec = chan->switch_timer_interval % 1000000;
++	its.it_value.tv_nsec = (chan->switch_timer_interval % 1000000) * 1000;
+ 	its.it_interval.tv_sec = its.it_value.tv_sec;
+ 	its.it_interval.tv_nsec = its.it_value.tv_nsec;
+ 
+@@ -582,7 +582,7 @@ void lib_ring_buffer_channel_read_timer_start(struct channel *chan)
+ 	}
+ 
+ 	its.it_value.tv_sec = chan->read_timer_interval / 1000000;
+-	its.it_value.tv_nsec = chan->read_timer_interval % 1000000;
++	its.it_value.tv_nsec = (chan->read_timer_interval % 1000000) * 1000;
+ 	its.it_interval.tv_sec = its.it_value.tv_sec;
+ 	its.it_interval.tv_nsec = its.it_value.tv_nsec;
+ 
+-- 
+1.9.1
+

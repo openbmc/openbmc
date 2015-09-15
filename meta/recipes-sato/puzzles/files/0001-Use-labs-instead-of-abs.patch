@@ -1,0 +1,46 @@
+From 9808dc09e08937c9bffd858d3ded428225a4312a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 7 Sep 2015 09:02:38 +0000
+Subject: [PATCH] Use labs instead of abs
+
+cluevals is array of longs so we have to use labs() instead of abs()
+since abs() returns int
+
+Fixes
+
+keen.c:1458:17: error: absolute value function 'abs' given an argument
+of type 'long' but has parameter of type 'int' which may cause
+truncation of value
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ keen.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/keen.c b/keen.c
+index a6a7238..1631992 100644
+--- a/keen.c
++++ b/keen.c
+@@ -1043,7 +1043,7 @@ done
+ 		    cluevals[j] *= grid[i];
+ 		    break;
+ 		  case C_SUB:
+-		    cluevals[j] = abs(cluevals[j] - grid[i]);
++		    cluevals[j] = labs(cluevals[j] - grid[i]);
+ 		    break;
+ 		  case C_DIV:
+ 		    {
+@@ -1455,7 +1455,7 @@ static int check_errors(const game_state *state, long *errors)
+ 		cluevals[j] *= state->grid[i];
+ 		break;
+ 	      case C_SUB:
+-		cluevals[j] = abs(cluevals[j] - state->grid[i]);
++		cluevals[j] = labs(cluevals[j] - state->grid[i]);
+ 		break;
+ 	      case C_DIV:
+ 		{
+-- 
+2.5.1
+

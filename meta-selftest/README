@@ -1,0 +1,3 @@
+This layer is intended as test layer, used by scripts/oe-selftest
+and it's probably a mistake to include it in your builds (unless you
+want to run the script).

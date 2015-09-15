@@ -1,0 +1,63 @@
+From 1c38d570b33f2b036d4fa47e929bb2b3264e38bd Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Tue, 11 Aug 2015 16:25:38 +0300
+Subject: [PATCH] configure: add option to enable/disable use of GTK+
+
+Distro packagers like predictability and automatically detected optional
+dependencies are not predicable.  Add a --with-gtk3 option (default to "auto")
+for forcibly controlling whether GTK+ will be used or not.
+
+Upstream-Status: Submitted [https://bugzilla.gnome.org/show_bug.cgi?id=712693]
+
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+Forward-ported to 2.40.10
+
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ configure.ac | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index bf77f3a..ca77de8 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -128,17 +128,22 @@ AC_CHECK_FUNCS(strtok_r)
+ # GTK
+ # ===========================================================================
+ 
+-PKG_CHECK_MODULES([GTK3],[gtk+-3.0 >= $GTK3_REQUIRED],[have_gtk_3=yes],[have_gtk_3=no])
+-
+ GTK3_BINARY_VERSION=
+ 
+-if test "$have_gtk_3" = "yes"; then
+-    GTK3_BINARY_VERSION="`$PKG_CONFIG --variable=gtk_binary_version gtk+-3.0`"
++AC_MSG_CHECKING([whether to use GTK+ 3])
++AC_ARG_WITH([gtk3],
++  [AS_HELP_STRING([--without-gtk3],[Don't build GTK+3 tools (default=auto)])],
++  [],[PKG_CHECK_EXISTS([gtk+-3.0 >= $GTK3_REQUIRED],[with_gtk3=yes],[with_gtk3=no])])
++AC_MSG_RESULT([$with_gtk3])
++
++if test "$with_gtk3" = "yes"; then
++  PKG_CHECK_MODULES(GTK3, [gtk+-3.0 >= $GTK3_REQUIRED])
++  GTK3_BINARY_VERSION="`$PKG_CONFIG --variable=gtk_binary_version gtk+-3.0`"
+ fi
+ 
+ AC_SUBST([GTK3_BINARY_VERSION])
+ 
+-AM_CONDITIONAL([HAVE_GTK_3],[test "$have_gtk_3" = "yes"])
++AM_CONDITIONAL([HAVE_GTK_3],[test "$with_gtk3" = "yes"])
+ 
+ dnl ===========================================================================
+ dnl GDK-Pixbuf SVG loader
+@@ -289,6 +294,6 @@ librsvg-$VERSION
+ 	Build introspectable bindings:  ${found_introspection}
+ 	Build Vala bindings:            ${enable_vala}
+ 	Build GdkPixbuf loader:         ${enable_pixbuf_loader}
+-        GTK+ $GTK3_REQUIRED or later:           ${have_gtk_3}
++        GTK+ $GTK3_REQUIRED or later:           ${with_gtk_3}
+ 	Build miscellaenous tools:      ${build_misc_tools}
+ "
+-- 
+2.1.4
+

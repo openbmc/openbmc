@@ -1,0 +1,20 @@
+Replace getrpcbynumber_r with getrpcbynumber
+musl and uclibc dont implement it
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Index: quota-tools/svc_socket.c
+===================================================================
+--- quota-tools.orig/svc_socket.c
++++ quota-tools/svc_socket.c
+@@ -55,7 +55,8 @@ static int svc_socket (u_long number, in
+ 	addr.sin_family = AF_INET;
+ 
+ 	if (!port) {
+-		ret = getrpcbynumber_r(number, &rpcbuf, rpcdata, sizeof(rpcdata), &rpcp);
++		rpcp = getrpcbynumber(number);
++		ret = 0;
+ 		if (ret == 0 && rpcp != NULL) {
+ 			/* First try name */
+ 			ret = getservbyname_r(rpcp->r_name, proto, &servbuf, servdata,

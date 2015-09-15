@@ -1,0 +1,26 @@
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Xiaofeng Yan <xiaofeng.yan@windriver.com>
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+Index: initscripts-9.43/rc.d/init.d/functions
+===================================================================
+--- initscripts-9.43.orig/rc.d/init.d/functions
++++ initscripts-9.43/rc.d/init.d/functions
+@@ -13,6 +13,7 @@ umask 022
+ PATH="/sbin:/usr/sbin:/bin:/usr/bin"
+ export PATH
+ 
++
+ if [ $PPID -ne 1 -a -z "$SYSTEMCTL_SKIP_REDIRECT" ] && \
+ 		( /bin/mountpoint -q /cgroup/systemd || /bin/mountpoint -q /sys/fs/cgroup/systemd ) ; then
+         case "$0" in
+@@ -54,7 +55,7 @@ systemctl_redirect () {
+ [ -z "${COLUMNS:-}" ] && COLUMNS=80
+ 
+ if [ -z "${CONSOLETYPE:-}" ]; then
+-  if [ -c "/dev/stderr" -a -r "/dev/stderr" ]; then
++  if [ -c "/dev/stderr" -a -r "/dev/stderr" -a -e /sbin/consoletype ]; then
+     CONSOLETYPE="$(/sbin/consoletype < /dev/stderr 2>/dev/null)"
+   else
+     CONSOLETYPE="serial"

@@ -1,0 +1,45 @@
+From 0f7f9e3bb1d0e1b93f3ad8a1d5d7bdd3fbf27494 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Thu, 27 Mar 2014 07:20:33 +0000
+Subject: [PATCH] Makefile.am: use objcopy from the env
+
+It uses the "objcopy" directly, which is not suitable for cross compile.
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ Makefile.am | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+Index: git/Makefile.am
+===================================================================
+--- git.orig/Makefile.am
++++ git/Makefile.am
+@@ -19,6 +19,8 @@
+ ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
+ AM_MAKEFLAGS = --no-print-directory
+ 
++OBJCOPY ?= objcopy
++
+ gummibootlibdir = $(prefix)/lib/gummiboot
+ 
+ AM_CPPFLAGS = -include config.h
+@@ -148,7 +150,7 @@ $(gummiboot_solib): $(gummiboot_objects)
+ .DELETE_ON_ERROR: $(gummboot_solib)
+ 
+ $(gummiboot): $(gummiboot_solib)
+-	$(AM_V_GEN) objcopy -j .text -j .sdata -j .data -j .dynamic \
++	$(AM_V_GEN) $(OBJCOPY) -j .text -j .sdata -j .data -j .dynamic \
+ 	  -j .dynsym -j .rel -j .rela -j .reloc \
+ 	  --target=efi-app-$(ARCH) $< $@
+ 
+@@ -183,7 +185,7 @@ $(stub_solib): $(stub_objects)
+ .DELETE_ON_ERROR: $(gummboot_solib)
+ 
+ $(stub): $(stub_solib)
+-	$(AM_V_GEN) objcopy -j .text -j .sdata -j .data -j .dynamic \
++	$(AM_V_GEN) $(OBJCOPY) -j .text -j .sdata -j .data -j .dynamic \
+ 	  -j .dynsym -j .rel -j .rela -j .reloc \
+ 	  --target=efi-app-$(ARCH) $< $@
+ 

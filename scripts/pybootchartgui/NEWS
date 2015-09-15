@@ -1,0 +1,204 @@
+bootchart2 0.14.5:
+	+ pybootchartgui (Riccardo)
+		+ Fix tests with python3
+		+ Fix parsing of files with non-ascii bytes
+		+ Robustness fixes to taskstats and meminfo parsing
+		+ More python3 fixes
+
+bootchart2 0.14.4:
+	+ bootchartd
+		+ Add relevant EXIT_PROC for GNOME3, XFCE4, openbox
+		  (Justin Lecher, Ben Eills)
+	+ pybootchartgui (Riccardo)
+		+ Fix some issues in --crop-after and --annotate
+		+ Fix pybootchartgui process_tree tests
+		+ More python3 fixes
+
+bootchart2 0.14.2:
+	+ pybootchartgui
+		+ Fix some crashes in parsing.py (Jakub Czaplicki, Riccardo)
+		+ speedup a bit meminfo parsing (Riccardo)
+		+ Fix indentation for python3.2 (Riccardo)
+
+bootchart2 0.14.1:
+	+ bootchartd
+		+ Expect dmesg only if started as init (Henry Yei)
+		+ look for bootchart_init in the environment (Henry Gebhardt)
+	+ pybootchartgui
+		+ Fixup some tests (Riccardo)
+		+ Support hp smart arrays block devices (Anders Norgaard,
+		  Brian Murray)
+		+ Fixes for -t, -o and -f options (Mladen Kuntner, Harald, Riccardo)
+
+bootchart2 0.14.0:
+	+ bootchartd
+		+ Add ability to define custom commands
+		  (Lucian Muresan, Peter Hjalmarsson)
+	+ collector
+		+ fix tmpfs mount leakage (Peter Hjalmarsson)
+	+ pybootchartgui
+		+ render cumulative I/O time chart (Sankar P)
+		+ python3 compatibility fixes (Riccardo)
+	+ Misc (Michael)
+		+ remove confusing, obsolete setup.py
+		+ install docs to /usr/share/
+		+ lot of fixes for easier packaging (Peter Hjalmarsson)
+		+ add bootchart2, bootchartd and pybootchartgui manpages
+		  (Francesca Ciceri, David Paleino)
+
+bootchart2 0.12.6:
+	+ bootchartd
+		+ better check for initrd (Riccardo Magliocchetti)
+		+ code cleanup (Riccardo)
+		+ make the list of processes we are waiting for editable
+		  in config file by EXIT_PROC (Riccardo)
+		+ fix parsing of cmdline for alternative init system (Riccardo)
+		+ fixed calling init in initramfs (Harald)
+		+ exit 0 for start, if the collector is already running (Harald)
+	+ collector
+		+ try harder with taskstats (Michael)
+		+ plug some small leaks (Riccardo)
+		+ fix missing PROC_EVENTS detection (Harald)
+	+ pybootchartgui (Michael)
+		+ add kernel bootchart tab to interactive gui
+		+ report bootchart version in cli interface
+		+ improve rendering performance
+		+ GUI improvements
+		+ lot of cleanups
+	+ Makefile
+		+ do not python compile if NO_PYTHON_COMPILE is set (Harald)
+	+ systemd service files
+		+ added them and install (Harald, Wulf C. Krueger)
+
+bootchart2 0.12.5:
+	+ administrative snafu version; pull before pushing...
+
+bootchart2 0.12.4:
+	+ bootchartd
+		+ reduce overhead caused by pidof (Riccardo Magliocchetti)
+	+ collector
+		+ attempt to retry ptrace to avoid bogus ENOSYS (Michael)
+		+ add meminfo polling (Dave Martin)
+	+ pybootchartgui
+		+ handle dmesg timestamps with big delta (Riccardo)
+		+ avoid divide by zero when rendering I/O utilization (Riccardo)
+		+ add process grouping in the cumulative chart (Riccardo)
+		+ fix cpu time calculation in cumulative chart (Riccardo)
+		+ get i/o statistics for flash based devices (Riccardo)
+		+ prettier coloring for the cumulative graphs (Michael)
+		+ fix interactive CPU rendering (Michael)
+		+ render memory usage graph (Dave Martin)
+
+bootchart2 0.12.3
+	+ collector
+		+ pclose after popen (Riccardo Magliocchetti (xrmx))
+		+ fix buffer overflow (xrmx)
+		+ count 'processor:' in /proc/cpuinfo for ARM (Michael)
+		+ get model name from that line too for ARM (xrmx)
+		+ store /proc/cpuinfo in the boot-chart archive (xrmx)
+		+ try harder to detect missing TASKSTATS (Michael)
+		+ sanity-check invalid domain names (Michael)
+		+ detect missing PROC_EVENTS more reliably (Michael)
+		+ README fixes (xrmx, Michael)
+	+ pybootchartgui
+		+ make num_cpu parsing robust (Michael)
+
+bootchart2 0.12.2
+ 	+ fix pthread compile / linking bug
+
+bootchart2 0.12.1
+	+ pybootchartgui
+		+ pylint cleanup
+		+ handle empty traces more elegantly
+		+ add '-t' / '--boot-time' argument (Matthew Bauer)
+	+ collector
+		+ now GPLv2
+		+ add rdinit support for very early initrd tracing
+		+ cleanup / re-factor code into separate modules
+		+ re-factor arg parsing, and parse remote process args
+		+ handle missing bootchartd.conf cleanly
+		+ move much of bootchartd from shell -> C
+			+ drop dmesg and uname usage
+			+ avoid rpm/dpkg with native version reporting
+
+bootchart2 0.12.0 (Michael Meeks)
+	+ collector
+		+ use netlink PROC_EVENTS to generate parentage data
+			+ finally kills any need for 'acct' et. al.
+			+ also removes need to poll /proc => faster
+		+ cleanup code to K&R, 8 stop tabs.
+	+ pybootchartgui
+		+ consume thread parentage data
+
+bootchart2 0.11.4 (Michael Meeks)
+	+ collector
+		+ if run inside an initrd detect when /dev is writable
+		  and remount ourselves into that.
+		+ overflow buffers more elegantly in extremis
+		+ dump full process path and command-line args
+		+ calm down debugging output
+	+ pybootchartgui
+		+ can render logs in a directory again
+		+ has a 'show more' option to show command-lines
+
+bootchart2 0.11.3 (Michael Meeks)
+	+ add $$ display to the bootchart header
+	+ process command-line bits
+		+ fix collection code, and rename stream to match
+		+ enable parsing, add check button to UI, and --show-all
+		  command-line option
+	+ fix parsing of directories full of files.
+
+bootchart2 0.11.2 (Michael Meeks)
+	+ fix initrd sanity check to use the right proc path
+	+ don't return a bogus error value when dumping state
+	+ add -c to aid manual console debugging
+
+bootchart2 0.11.1 (Michael Meeks)
+	+ even simpler initrd setup
+		+ create a single directory: /lib/bootchart/tmpfs
+
+bootchart2 0.11 (Michael Meeks)
+	+ bootchartd
+		+ far, far simpler, less shell, more robustness etc.
+	+ bootchart-collector
+		+ remove the -p argument - we always mount proc
+		+ requires /lib/bootchart (make install-chroot) to
+		  be present (also in the initrd) [ with a kmsg
+		  node included ]
+		+ add a --probe-running mode
+	+ ptrace re-write
+		+ gives -much- better early-boot-time resolution
+		+ unconditional chroot /lib/bootchart/chroot
+			+ we mount proc there ourselves
+		+ log extraction requires no common file-system view
+
+
+bootchart2 0.10.1 (Kel Modderman)
+	+ collector arg -m should mount /proc
+	+ remove bogus vcsid code
+	+ split collector install in Makefile
+	+ remove bogus debug code
+	+ accept process names containing spaces
+
+bootchart2 0.10.0
+	+ rendering (Anders Norgaard)
+		+ fix for unknown exceptions
+	+ interactive UI (Michael)
+		+ much faster rendering by manual clipping
+		+ horizontal scaling
+		+ remove annoying page-up/down bindings
+	+ initrd portability & fixes (Federic Crozat)
+		+ port to Mandriva
+		+ improved process waiting
+		+ inittab commenting fix
+		+ improved initrd detection / jail tagging
+		+ fix for un-detectable accton behaviour change
+		+ implement a built-in usleep to help initrd deps (Michael)
+
+bootchart2 0.0.9
+	+ fix initrd bug
+
+bootchart2 0.0.8
+	+ add a filename string to the window title in interactive mode
+	+ add a NEWS file

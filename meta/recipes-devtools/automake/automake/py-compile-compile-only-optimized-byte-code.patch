@@ -1,0 +1,42 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+* OE-Core's python creates the same binary output
+  for both pyc and pyo, so disable the creation of
+  pyc files by automake.
+
+Signed-off-by: Andreas Oberritter <obi@opendreambox.org>
+
+Updated for automake-1.12.6
+
+Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
+
+diff -Nurd automake-1.12.6/lib/py-compile automake-1.12.6/lib/py-compile
+--- automake-1.12.6/lib/py-compile	2012-12-13 21:57:31.000000000 +0200
++++ automake-1.12.6/lib/py-compile	2012-12-27 19:34:01.426015140 +0200
+@@ -115,26 +115,6 @@
+     filetrans="filepath = os.path.normpath('$destdir' + os.sep + path)"
+ fi
+ 
+-$PYTHON -c "
+-import sys, os, py_compile, imp
+-
+-files = '''$files'''
+-
+-sys.stdout.write('Byte-compiling python modules...\n')
+-for file in files.split():
+-    $pathtrans
+-    $filetrans
+-    if not os.path.exists(filepath) or not (len(filepath) >= 3
+-                                            and filepath[-3:] == '.py'):
+-	    continue
+-    sys.stdout.write(file)
+-    sys.stdout.flush()
+-    if hasattr(imp, 'get_tag'):
+-        py_compile.compile(filepath, imp.cache_from_source(filepath), path)
+-    else:
+-        py_compile.compile(filepath, filepath + 'c', path)
+-sys.stdout.write('\n')" || exit $?
+-
+ # this will fail for python < 1.5, but that doesn't matter ...
+ $PYTHON -O -c "
+ import sys, os, py_compile, imp

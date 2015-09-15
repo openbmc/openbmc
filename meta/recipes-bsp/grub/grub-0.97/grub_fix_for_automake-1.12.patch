@@ -1,0 +1,74 @@
+Upstream-Status: Inappropriate
+
+Subject: [PATCH] grub: fix for automake-1.12
+
+automake 1.12 has depricated automatic de-ANSI-fication support
+
+this patch avoids these kinds of errors:
+
+| stage1/Makefile.am:2: error: 'pkglibdir' is not a legitimate directory for 'DATA'
+| stage2/Makefile.am:35: error: 'pkglibdir' is not a legitimate directory for 'DATA'
+| stage2/Makefile.am:46: error: 'pkglibdir' is not a legitimate directory for 'DATA'
+| autoreconf: automake failed with exit status: 1
+| ERROR: autoreconf execution failed.
+
+The upstream status is marked as 'Inappropriate' because this problem is not uncommon,
+it has been there for a long time and no change in upstream.
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+
+Index: grub-0.97/stage1/Makefile.am
+===================================================================
+--- a/stage1/Makefile.am
++++ b/stage1/Makefile.am
+@@ -1,7 +1,7 @@
+-pkglibdir = $(libdir)/$(PACKAGE)/$(host_cpu)-$(host_vendor)
+-nodist_pkglib_DATA = stage1
++pkgdatadir = $(libdir)/$(PACKAGE)/$(host_cpu)-$(host_vendor)
++nodist_pkgdata_DATA = stage1
+ 
+-CLEANFILES = $(nodist_pkglib_DATA)
++CLEANFILES = $(nodist_pkgdata_DATA)
+ 
+ # We can't use builtins or standard includes.
+ AM_CCASFLAGS = $(STAGE1_CFLAGS) -fno-builtin -nostdinc
+Index: grub-0.97/stage2/Makefile.am
+===================================================================
+--- a/stage2/Makefile.am
++++ b/stage2/Makefile.am
+@@ -27,12 +27,12 @@ libgrub_a_CFLAGS = $(GRUB_CFLAGS) -I$(top_srcdir)/lib \
+ 	-DUSE_MD5_PASSWORDS=1 -DSUPPORT_SERIAL=1 -DSUPPORT_HERCULES=1
+ 
+ # Stage 2 and Stage 1.5's.
+-pkglibdir = $(libdir)/$(PACKAGE)/$(host_cpu)-$(host_vendor)
++pkgdatadir = $(libdir)/$(PACKAGE)/$(host_cpu)-$(host_vendor)
+ 
+ EXTRA_PROGRAMS = nbloader.exec pxeloader.exec diskless.exec
+ 
+ if DISKLESS_SUPPORT
+-pkglib_DATA = stage2 stage2_eltorito e2fs_stage1_5 fat_stage1_5 \
++pkgdata_DATA = stage2 stage2_eltorito e2fs_stage1_5 fat_stage1_5 \
+ 	ffs_stage1_5 iso9660_stage1_5 jfs_stage1_5 minix_stage1_5 \
+ 	reiserfs_stage1_5 ufs2_stage1_5 vstafs_stage1_5 xfs_stage1_5 \
+ 	nbgrub pxegrub
+@@ -43,7 +43,7 @@ noinst_PROGRAMS = pre_stage2.exec start.exec start_eltorito.exec \
+ 	reiserfs_stage1_5.exec ufs2_stage1_5.exec vstafs_stage1_5.exec \
+ 	xfs_stage1_5.exec nbloader.exec pxeloader.exec diskless.exec
+ else
+-pkglib_DATA = stage2 stage2_eltorito e2fs_stage1_5 fat_stage1_5 \
++pkgdata_DATA = stage2 stage2_eltorito e2fs_stage1_5 fat_stage1_5 \
+ 	ffs_stage1_5 iso9660_stage1_5 jfs_stage1_5 minix_stage1_5 \
+ 	reiserfs_stage1_5 ufs2_stage1_5 vstafs_stage1_5 xfs_stage1_5
+ noinst_DATA = pre_stage2 start start_eltorito
+@@ -105,7 +105,7 @@ else
+ BUILT_SOURCES = stage2_size.h
+ endif
+ 
+-CLEANFILES = $(pkglib_DATA) $(noinst_DATA) $(BUILT_SOURCES)
++CLEANFILES = $(pkgdata_DATA) $(noinst_DATA) $(BUILT_SOURCES)
+ 
+ stage2_size.h: pre_stage2
+ 	-rm -f stage2_size.h
+-- 
+1.7.9.5
+

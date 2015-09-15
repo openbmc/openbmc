@@ -1,0 +1,51 @@
+
+This patch hardcodes in version 0.17 for the GETTEXT_MACRO_VERSION,
+the version check is only part of 0.17 and will not affect any 0.16.1
+operations
+
+Upstream-Status: Inappropriate [licensing]
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+Index: gettext-0.16.1/gettext-runtime/m4/po.m4
+===================================================================
+--- gettext-0.16.1.orig/gettext-runtime/m4/po.m4	2011-03-17 02:24:28.953520231 -0700
++++ gettext-0.16.1/gettext-runtime/m4/po.m4	2011-03-17 02:28:25.455396862 -0700
+@@ -27,6 +27,9 @@
+   AC_REQUIRE([AM_PROG_MKDIR_P])dnl defined by automake
+   AC_REQUIRE([AM_NLS])dnl
+ 
++  dnl Hardcode the MACRO_VERSION to 0.17 for gnutls
++  AC_SUBST([GETTEXT_MACRO_VERSION], [0.17])
++
+   dnl Perform the following tests also if --disable-nls has been given,
+   dnl because they are needed for "make dist" to work.
+ 
+Index: gettext-0.16.1/gettext-runtime/po/Makefile.in.in
+===================================================================
+--- gettext-0.16.1.orig/gettext-runtime/po/Makefile.in.in	2011-03-17 02:24:28.953520231 -0700
++++ gettext-0.16.1/gettext-runtime/po/Makefile.in.in	2011-03-17 02:28:07.574395144 -0700
+@@ -10,6 +10,9 @@
+ #
+ # Origin: gettext-0.16
+ 
++# Hardcode this value for gnutls building against gplv2 code
++GETTEXT_MACRO_VERSION = 0.17
++
+ PACKAGE = @PACKAGE@
+ VERSION = @VERSION@
+ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
+Index: gettext-0.16.1/gettext-tools/po/Makefile.in.in
+===================================================================
+--- gettext-0.16.1.orig/gettext-tools/po/Makefile.in.in	2011-03-17 02:24:28.953520231 -0700
++++ gettext-0.16.1/gettext-tools/po/Makefile.in.in	2011-03-17 02:28:07.574395144 -0700
+@@ -10,6 +10,9 @@
+ #
+ # Origin: gettext-0.16
+ 
++# Hardcode this value for gnutls building against gplv2 code
++GETTEXT_MACRO_VERSION = 0.17
++
+ PACKAGE = @PACKAGE@
+ VERSION = @VERSION@
+ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@

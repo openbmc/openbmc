@@ -1,0 +1,41 @@
+
+Toaster Testing Framework
+Yocto Project
+
+
+Rationale
+------------
+As Toaster contributions grow with the number of people that contribute code, verifying each patch prior to submitting upstream becomes a hard-to-scale problem for humans. We devised this system in order to run patch-level validation, trying to eliminate common problems from submitted patches, in an automated fashion.
+
+The Toaster Testing Framework is a set of Python scripts that provides an extensible way to write smoke and regression tests that will be run on each patch set sent for review on the toaster mailing list.
+
+
+Usage
+------------
+There are three main executable scripts in this directory.
+    *    runner.py  is designed to be run from the command line. It requires, as mandatory parameter, a branch name on poky-contrib, branch which contains the patches to be tested. The program will auto-discover the available tests residing in this directory by looking for unittest classes, and will run the tests on the branch dumping the output to the standard output. Optionally, it can take parameters inhibiting the branch checkout, or specifying a single test to be run, for debugging purposes.
+    *    launcher.py  is a designed to be run from a crontab or similar scheduling mechanism. It looks up a backlog file containing branches-to-test (named tasks in the source code), select the first one in FIFO manner, and launch runner.py on it. It will await for completion, and email the standard output and standard error dumps from the runner.py execution
+    *    recv.py  is an email receiver, designed to be called as a pipe from a .forward file. It is used to monitor a mailing list, for example, and add tasks to the backlog based on review requests coming on the mailing list.
+
+
+Installation
+------------
+As prerequisite, we expect a functioning email system on a machine with Python2.
+
+The broad steps to installation
+* set up the .forward on the receiving email account to pipe to the recv.py file
+* edit config.py and settings.json to alter for local installation settings
+* on email receive, verify backlog.txt to see that the tasks are received and marked for processing
+* execute launcher.py in command line to verify that a test occurs with no problems, and that the outgoing email is delivered
+* add launcher.py
+
+
+
+Contribute
+------------
+What we need are tests. Add your own tests to either tests.py file, or to a new file.
+Use "config.logger" to write logs that will make it to email.
+
+Commonly used code should be going to shellutils, and configuration to config.py.
+
+Contribute code by emailing patches to the list: toaster@yoctoproject.org (membership required)

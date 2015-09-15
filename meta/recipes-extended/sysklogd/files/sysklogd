@@ -1,0 +1,151 @@
+#! /bin/sh
+# /etc/init.d/sysklogd: start the system log daemon.
+
+### BEGIN INIT INFO
+# Provides:             sysklogd
+# Required-Start:       $remote_fs $time
+# Required-Stop:        $remote_fs $time
+# Should-Start:         $network
+# Should-Stop:          $network
+# Default-Start:        2 3 4 5
+# Default-Stop:         0 1 6
+# Short-Description:    System logger
+### END INIT INFO
+
+# Source function library.
+. /etc/init.d/functions
+
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+
+pidfile_syslogd=/var/run/syslogd.pid
+pidfile_klogd=/var/run/klogd.pid
+binpath_syslogd=/sbin/syslogd
+binpath_klogd=/sbin/klogd
+
+test -x $binpath || exit 0
+
+test ! -r /etc/default/syslogd || . /etc/default/syslogd
+
+create_xconsole()
+{
+    # Only proceed if /dev/xconsole is used at all
+    if ! grep -q '^[^#].*/dev/xconsole' /etc/syslog.conf
+    then
+	return
+    fi
+
+    if [ ! -e /dev/xconsole ]; then
+	mknod -m 640 /dev/xconsole p
+    else
+	chmod 0640 /dev/xconsole
+    fi
+    chown root:adm /dev/xconsole
+    test ! -x /sbin/restorecon || /sbin/restorecon /dev/xconsole
+}
+
+log_begin_msg () {
+    echo -n $1
+}
+
+log_end_msg () {
+    echo $1
+}
+
+log_success_msg () {
+    echo $1
+}
+
+running()
+{
+    # No pidfile, probably no daemon present
+    #
+    if [ ! -f $pidfile ]
+    then
+	return 1
+    fi
+
+    pid=`cat $pidfile_syslogd`
+
+    # No pid, probably no daemon present
+    #
+    if [ -z "$pid" ]
+    then
+	return 1
+    fi
+
+    if [ ! -d /proc/$pid ]
+    then
+	return 1
+    fi
+
+    cmd=`cat /proc/$pid/cmdline | tr "\000" "\n"|head -n 1`
+
+    # No syslogd?
+    #
+    if [ "$cmd" != "$binpath" ]
+    then
+	return 1
+    fi
+
+    return 0
+}
+
+case "$1" in
+  start)
+    log_begin_msg "Starting system log daemon..."
+    create_xconsole
+    start-stop-daemon --start --quiet --pidfile $pidfile_syslogd --name syslogd --startas $binpath_syslogd -- $SYSLOGD
+    log_end_msg $?
+    log_begin_msg "Starting kernel log daemon..."
+    start-stop-daemon --start --quiet --pidfile $pidfile_klogd --name klogd --startas $binpath_klogd -- $KLOGD
+    log_end_msg $?
+    ;;
+  stop)
+    log_begin_msg "Stopping system log daemon..."
+    start-stop-daemon --stop --quiet --pidfile $pidfile_syslogd --name syslogd
+    log_end_msg $?
+    log_begin_msg "Stopping kernel log daemon..."
+    start-stop-daemon --stop --quiet --retry 3 --exec $binpath_klogd --pidfile $pidfile_klogd
+    log_end_msg $?
+    ;;
+  reload|force-reload)
+    log_begin_msg "Reloading system log daemon..."
+    start-stop-daemon --stop --quiet --signal 1 --pidfile $pidfile_syslogd --name syslogd
+    log_end_msg $?
+    log_begin_msg "Reloading kernel log daemon..."
+    start-stop-daemon --stop --quiet --retry 3 --exec $binpath_klogd --pidfile $pidfile_klogd
+    start-stop-daemon --start --quiet --pidfile $pidfile_klogd --name klogd --startas $binpath_klogd -- $KLOGD
+    log_end_msg $?
+    ;;
+  restart)
+    log_begin_msg "Restarting system log daemon..."
+    start-stop-daemon --stop --retry 5 --quiet --pidfile $pidfile_syslogd --name syslogd
+    start-stop-daemon --start --quiet --pidfile $pidfile_syslogd --name syslogd --startas $binpath_syslogd -- $SYSLOGD
+    log_end_msg $?
+    log_begin_msg "Reloading kernel log daemon..."
+    start-stop-daemon --stop --quiet --retry 3 --exec $binpath_klogd --pidfile $pidfile_klogd
+    start-stop-daemon --start --quiet --pidfile $pidfile_klogd --name klogd --startas $binpath_klogd -- $KLOGD
+    log_end_msg $?
+    ;;
+  reload-or-restart)
+    if running
+    then
+	$0 reload
+    else
+	$0 start
+    fi
+    ;;
+  status)
+    status syslogd
+    RETVAL=$?
+    status klogd
+    rval=$?
+    [ $RETVAL -eq 0 ] && exit $rval
+    exit $RETVAL
+    ;;
+  *)
+    log_success_msg "Usage: /etc/init.d/sysklogd {start|stop|reload|restart|force-reload|reload-or-restart|status}"
+    exit 1
+esac
+
+exit 0

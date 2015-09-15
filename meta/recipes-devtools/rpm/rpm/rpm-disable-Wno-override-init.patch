@@ -1,0 +1,32 @@
+From 70d881873b443c9bad502db9665595455d4f0ac9 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Tue, 8 Jul 2014 07:41:10 +0800
+Subject: [PATCH] configure.ac: disable -Wno-override-init
+
+Fixed rpm-native.do_configure error on CentOS 5.x:
+
+cc1: error: unrecognized command line option "-Wno-override-init"
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index adeffe0..6746b4c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -163,7 +163,7 @@ AC_ARG_ENABLE(build-warnings,
+ # XXX gcc-4.2 on Mac OS X hasn't
+ #            CFLAGS="$CFLAGS -Wno-unused-but-set-variable"
+ # XXX rpmio/set.c needs this
+-            CFLAGS="$CFLAGS -Wno-override-init"
++#            CFLAGS="$CFLAGS -Wno-override-init"
+         elif test ".`$CC -V 2>&1 | grep 'Sun C'`" != .; then
+             dnl # Sun Studio (usually "cc")
+             CFLAGS="$CFLAGS -v"
+--
+1.8.2.1
+

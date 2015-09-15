@@ -1,0 +1,37 @@
+Upstream-Status: Pending
+
+# copy commit message from OE as the patch comment:
+#    commit 98c24291aa165f53423c27ae033831ce0b3bb676
+#    Author: Roman I Khimov <khimov@altell.ru>
+#    Date:   Thu Mar 26 23:03:58 2009 +0000
+#
+#    busybox: update appletlib dependency patch
+#    
+#    Previous version still failed from time to time on clean-start builds
+#    with 4 bitbake threads and '-j16'. Building busybox as sole target worked
+#    well.
+#    
+#    The reason is that previous version introduced a race between applets make
+#    processes spawned from top-level Makefile and from libbb Makefile.
+#    
+#    Fix it with high-level dependency that doesn't create races.
+#    
+#    Signed-off-by: Koen Kooi <koen@openembedded.org>
+#
+# above comment added by Kevin Tian <kevin.tian@intel.com>, 2010-07-06
+
+Index: busybox-1.13.2/Makefile
+===================================================================
+--- busybox-1.13.2.orig/Makefile	2009-03-19 15:44:37.419270265 +0300
++++ busybox-1.13.2/Makefile	2009-03-19 15:45:57.737521296 +0300
+@@ -471,6 +471,10 @@
+ 		util-linux/ \
+ 		util-linux/volume_id/ \
+ 
++# Lib interdeps
++# libbb uses headers generated in applets
++libbb: applets
++
+ endif # KBUILD_EXTMOD
+ 
+ ifeq ($(dot-config),1)

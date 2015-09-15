@@ -1,0 +1,67 @@
+From ae3370788ed3447bba16969d9eb1bf1b9631e1b7 Mon Sep 17 00:00:00 2001
+From: Valentin Popa <valentin.popa@intel.com>
+Date: Fri, 25 Apr 2014 13:58:55 +0300
+Subject: [PATCH] Correct rpl_gettimeofday signature
+
+Currently we fail on uclibc like below
+
+| In file included from /home/kraj/work/angstrom/sources/openembedded-core/build/tmp-uclibc/sysroots/qemuarm/usr/include/sys/procfs.h:32:0,
+|                  from /home/kraj/work/angstrom/sources/openembedded-core/build/tmp-uclibc/sysroots/qemuarm/usr/include/sys/ucontext.h:26,
+|                  from /home/kraj/work/angstrom/sources/openembedded-core/build/tmp-uclibc/sysroots/qemuarm/usr/include/signal.h:392,
+|                  from ../../gl/signal.h:52,
+|                  from ../../gl/sys/select.h:58,
+|                  from /home/kraj/work/angstrom/sources/openembedded-core/build/tmp-uclibc/sysroots/qemuarm/usr/include/sys/types.h:220,
+|                  from ../../gl/sys/types.h:28,
+|                  from ../../lib/includes/gnutls/gnutls.h:46,
+|                  from ex-cxx.cpp:3:
+| ../../gl/sys/time.h:396:66: error: conflicting declaration 'void* restrict'
+| ../../gl/sys/time.h:396:50: error: 'restrict' has a previous declaration as 'timeval* restrict'
+| make[4]: *** [ex-cxx.o] Error 1
+| make[4]: *** Waiting for unfinished jobs....
+
+GCC detects that we call 'restrict' as param name in function
+signatures and complains since both params are called 'restrict'
+therefore we use __restrict to denote the C99 keywork
+
+This only happens of uclibc since this code is not excercised with
+eglibc otherwise we will have same issue there too
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Pending
+---
+ gl/sys_time.in.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/gl/sys_time.in.h b/gl/sys_time.in.h
+index 84a17c9..6ceadc3 100644
+--- a/gl/sys_time.in.h
++++ b/gl/sys_time.in.h
+@@ -93,20 +93,20 @@ struct timeval
+ #   define gettimeofday rpl_gettimeofday
+ #  endif
+ _GL_FUNCDECL_RPL (gettimeofday, int,
+-                  (struct timeval *restrict, void *restrict)
++                  (struct timeval *__restrict, void *__restrict)
+                   _GL_ARG_NONNULL ((1)));
+ _GL_CXXALIAS_RPL (gettimeofday, int,
+-                  (struct timeval *restrict, void *restrict));
++                  (struct timeval *__restrict, void *__restrict));
+ # else
+ #  if !@HAVE_GETTIMEOFDAY@
+ _GL_FUNCDECL_SYS (gettimeofday, int,
+-                  (struct timeval *restrict, void *restrict)
++                  (struct timeval *__restrict, void *__restrict)
+                   _GL_ARG_NONNULL ((1)));
+ #  endif
+ /* Need to cast, because on glibc systems, by default, the second argument is
+                                                   struct timezone *.  */
+ _GL_CXXALIAS_SYS_CAST (gettimeofday, int,
+-                       (struct timeval *restrict, void *restrict));
++                       (struct timeval *__restrict, void *__restrict));
+ # endif
+ _GL_CXXALIASWARN (gettimeofday);
+ #elif defined GNULIB_POSIXCHECK
+-- 
+1.9.1
+

@@ -1,0 +1,18 @@
+Upstream-Status:Inappropriate [embedded specific]
+
+We need ld in the fake config library, but it's not included by default. So
+expand the number of items included. While this works it indicates that the
+rest of the config items are not being picked up and/or are being picked up
+from the host. More investigation needed.
+
+--- perl-5.8.8/configpm	2007/04/20 09:48:05	1.1
++++ perl-5.8.8/configpm	2007/04/20 09:57:12
+@@ -2,7 +2,7 @@
+ use strict;
+ use vars qw(%Config $Config_SH_expanded);
+ 
+-my $how_many_common = 22;
++my $how_many_common = 50;
+ 
+ # commonly used names to precache (and hence lookup fastest)
+ my %Common;

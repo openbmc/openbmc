@@ -1,0 +1,47 @@
+If a the number of hard links decreases or increases while creating
+the tar files used for an ipk package, tar fails with error code 1:
+
+| DEBUG: Executing python function do_package_ipk
+| tar: ./usr/src/debug/gperf/3.0.4-r0/gperf-3.0.4/src/main.cc: file changed as we read it
+NOTE: recipe gperf-3.0.4-r0: task do_package_write_ipk: Failed
+ERROR: Task 6539 (recipes-extended/gperf/gperf_3.0.4.bb, do_package_write_ipk) failed with exit code '1'
+
+
+We detect if the error code produced by tar is 1 and in this case ignore it.
+
+This a similar behavior to the one on dpkg:
+http://git.yoctoproject.org/cgit/cgit.cgi/poky/commit/?id=40731942515ec8d80c727ad561174986d4f05818
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Alejandro Hernandez <alejandro.hernandez@linux.intel.com>
+
+
+Index: git/opkg-build
+===================================================================
+--- git.orig/opkg-build
++++ git/opkg-build
+@@ -250,8 +250,21 @@ tmp_dir=$dest_dir/IPKG_BUILD.$$
+ mkdir $tmp_dir
+ 
+ echo $CONTROL > $tmp_dir/tarX
+-( cd $pkg_dir && tar $ogargs -X $tmp_dir/tarX -cz $tarformat -f $tmp_dir/data.tar.gz . )
+-( cd $pkg_dir/$CONTROL && tar $ogargs -cz $tarformat -f $tmp_dir/control.tar.gz . )
++
++
++# Ignore error code 1, caused by modifying the number of hard links while creating the tar file
++rc=0
++( cd $pkg_dir && tar $ogargs -X $tmp_dir/tarX -cz $tarformat -f $tmp_dir/data.tar.gz . ) || rc=$?
++if [ $rc -ne 1 ] && [ $rc -ne 0 ]; then
++        exit $rc 
++fi
++
++rc=0
++( cd $pkg_dir/$CONTROL && tar $ogargs -cz $tarformat -f $tmp_dir/control.tar.gz . ) || rc=$?
++if [ $rc -ne 1 ] && [ $rc -ne 0 ]; then
++        exit $rc
++fi
++
+ rm $tmp_dir/tarX
+ 
+ echo "2.0" > $tmp_dir/debian-binary

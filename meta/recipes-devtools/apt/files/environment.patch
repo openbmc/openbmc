@@ -1,0 +1,15 @@
+Upstream-Status: Backport
+
+Index: apt-0.6.46.2/buildlib/environment.mak.in
+===================================================================
+--- apt-0.6.46.2.orig/buildlib/environment.mak.in	2007-03-29 11:38:58.000000000 +0100
++++ apt-0.6.46.2/buildlib/environment.mak.in	2007-03-29 11:39:12.000000000 +0100
+@@ -62,7 +62,7 @@
+ 
+ # Shared library things
+ HOST_OS = @host_os@
+-ifneq ($(words $(filter linux-gnu gnu% %gnu,$(HOST_OS))),0)
++ifneq ($(words $(filter linux-gnu linux-gnueabi gnu% %gnu,$(HOST_OS))),0)
+    SONAME_MAGIC=-Wl,-soname -Wl,
+    LFLAGS_SO=
+ else

@@ -1,0 +1,53 @@
+Upstream-Status: Inappropriate [this is 2.18(GPLv2) specific]
+
+# glibc also implements the function group_member. To avoid name conflict,
+# here let us append a "_" to which's version.
+#
+# Signed-off-by Dexuan Cui <dexuan.cui@intel.com>, 2010-08-20
+# (this patch is licensed under GPLv2)
+
+--- which-2.18/bash.c
++++ which-2.18/bash.c
+@@ -45,7 +45,12 @@
+  * - changed all occurences of 'gid_t' into 'GID_T'.
+  * - exported functions needed in which.c
+  */
+-static int group_member (GID_T gid);
++
++/*
++ * glibc also implements the function group_member. To avoid name conflict,
++ * here let us append a "_" to which's version.
++ */
++static int _group_member (GID_T gid);
+ static char* extract_colon_unit (char const* string, int *p_index);
+ 
+ /*===========================================================================
+@@ -200,8 +205,8 @@
+ 
+ /* From bash-2.05b / general.c / line 805 */
+ /* Return non-zero if GID is one that we have in our groups list. */
+-int
+-group_member (GID_T gid)
++static int
++_group_member (GID_T gid)
+ {
+ #if defined (HAVE_GETGROUPS)
+   register int i;
+@@ -290,7 +295,7 @@
+     return (X_BIT (u_mode_bits (finfo.st_mode))) ? (FS_EXISTS | FS_EXECABLE) : FS_EXISTS;
+ 
+   /* Otherwise, if we are in the owning group, the group permissions apply. */
+-  if (group_member (finfo.st_gid))
++  if (_group_member (finfo.st_gid))
+     return (X_BIT (g_mode_bits (finfo.st_mode))) ? (FS_EXISTS | FS_EXECABLE) : FS_EXISTS;
+ 
+   /* Otherwise, if we are in the other group, the other permissions apply. */
+@@ -331,7 +336,7 @@
+ /* Given a string containing units of information separated by colons,
+    return the next one pointed to by (P_INDEX), or NULL if there are no more.
+    Advance (P_INDEX) to the character after the colon. */
+-char*
++static char*
+ extract_colon_unit (char const* string, int* p_index)
+ {
+   int i, start, len;

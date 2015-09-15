@@ -1,0 +1,84 @@
+From 60f3833ab2b5899771b4eab654e88f9888b99501 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Wed, 31 Dec 2014 16:01:55 +0800
+Subject: [PATCH 1/9] linux/syslinux: support ext2/3/4 device
+
+* Support ext2/3/4 deivce.
+* The open_ext2_fs() checks whether it is an ext2/3/4 device,
+  do the ext2/3/4 installation (install_to_ext2()) if yes, otherwise go
+  on to the fat/ntfs.
+* The ext2/3/4 support doesn't require root privileges since it doesn't need
+  mount (but write permission is required).
+
+Upstream-Status: Submitted
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+Tested-by: Du Dolpher <dolpher.du@intel.com>
+---
+ linux/syslinux.c | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
+
+diff --git a/linux/syslinux.c b/linux/syslinux.c
+index 912de71..36fc202 100755
+--- a/linux/syslinux.c
++++ b/linux/syslinux.c
+@@ -256,6 +256,23 @@ int do_open_file(char *name)
+     return fd;
+ }
+ 
++/*
++ * Check whether the device contains an ext2, ext3 or ext4 fs and open it if
++ * true.
++ * return value:
++ * 0: Everything is OK
++ * 1: Not an ext2, ext3 or ext4
++ * -1: unexpected error
++ */
++static int open_ext2_fs(const char *device, const char *subdir)
++{
++}
++
++/* The install func for ext2, ext3 and ext4 */
++static int install_to_ext2(const char *device, int dev_fd, const char *subdir)
++{
++}
++
+ int main(int argc, char *argv[])
+ {
+     static unsigned char sectbuf[SECTOR_SIZE];
+@@ -313,6 +330,24 @@ int main(int argc, char *argv[])
+ 	die("can't combine an offset with a block device");
+     }
+ 
++    /*
++     * Check if it is an ext2, ext3 or ext4
++     */
++    rv = open_ext2_fs(opt.device, subdir);
++    if (rv == 0) {
++        if (install_to_ext2(opt.device, dev_fd, subdir)) {
++            fprintf(stderr, "%s: installation failed\n", opt.device);
++            exit(1);
++        }
++        return 0;
++    /* Unexpected errors */
++    } else if (rv == -1) {
++        exit(1);
++    }
++
++    /* Reset rv */
++    rv = 0;
++
+     xpread(dev_fd, sectbuf, SECTOR_SIZE, opt.offset);
+     fsync(dev_fd);
+ 
+@@ -322,6 +357,7 @@ int main(int argc, char *argv[])
+      */
+     if ((errmsg = syslinux_check_bootsect(sectbuf, &fs_type))) {
+ 	fprintf(stderr, "%s: %s\n", opt.device, errmsg);
++	fprintf(stderr, "%s: supported fs: fat/ntfs/ext2/ex3/ext4\n", program);
+ 	exit(1);
+     }
+ 
+-- 
+1.9.1
+

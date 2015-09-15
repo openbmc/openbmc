@@ -1,0 +1,40 @@
+A patch to fix a problem when compiling with uuid.
+
+When attempting to build with uuid and all tests compiling will error because
+uuid.h doesn't exist in the rpm tarball. Fix this by changing the include to
+use the one in ossp which solves the issue. 
+
+The recipe already depends on ossp so ossp/uuid.h will be there when rpm-native
+is built.
+
+Upstream-Status: Pending
+
+Signed-off-by: Morgan Little <morgan.little@windriver.com>
+
+
+Index: rpm-5.4.14/lua/local/luuid.c
+===================================================================
+--- rpm-5.4.14.orig/lua/local/luuid.c
++++ rpm-5.4.14/lua/local/luuid.c
+@@ -21,7 +21,7 @@
+ 
+ #ifdef LUA_USE_UUID
+ 
+-#include "uuid.h"
++#include <ossp/uuid.h>
+ 
+ /*  Lua method: <uuid> = uuid.generate(<version>[, <uuid-namespace>, <data>])  */
+ static int luuid_generate(lua_State *L)
+Index: rpm-5.4.14/rpmio/rpmuuid.c
+===================================================================
+--- rpm-5.4.14.orig/rpmio/rpmuuid.c
++++ rpm-5.4.14/rpmio/rpmuuid.c
+@@ -16,7 +16,7 @@
+ #include "rpmlog.h"
+ #include "rpmuuid.h"
+ #ifdef WITH_UUID
+-#include "uuid.h"
++#include <ossp/uuid.h>
+ #endif
+ #include "debug.h"
+ 

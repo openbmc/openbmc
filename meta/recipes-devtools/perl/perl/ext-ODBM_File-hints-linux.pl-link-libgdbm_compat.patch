@@ -1,0 +1,35 @@
+From ba4ed0b5b7baad5353c1e65b655f41d45e01c990 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Mon, 22 Jun 2015 20:00:11 -0700
+Subject: [PATCH] ext/ODBM_File/hints/linux.pl: link libgdbm_compat
+
+Fixed for test case ../ext/ODBM_File/t/odbm.t:
+ok 1 - use ODBM_File;
+ok 2 - use Fcntl;
+./perl: symbol lookup error: /usr/lib/perl/5.22.0/auto/ODBM_File/ODBM_File.so: undefined symbol: dbminit
+
+The checking "if -e $_.'/libgdbm_compat.so'" doesn't work when cross
+build, so always link libgdbm_compat, since perl depends on gdbm and we
+always have libgdbm_compat.
+
+Upstream-Status:Inappropriate [embedded specific]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ ext/ODBM_File/hints/linux.pl |    6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/ext/ODBM_File/hints/linux.pl b/ext/ODBM_File/hints/linux.pl
+index 204bba0..9271b45 100644
+--- a/ext/ODBM_File/hints/linux.pl
++++ b/ext/ODBM_File/hints/linux.pl
+@@ -1,8 +1,2 @@
+ # uses GDBM dbm compatibility feature - at least on SuSE 8.0
+-$self->{LIBS} = ['-lgdbm'];
+-
+-# Debian/Ubuntu have libgdbm_compat.so but not this file,
+-# so linking may fail
+-foreach (split / /, $Config{libpth}) {
+-    $self->{LIBS}->[0] .= ' -lgdbm_compat' if -e $_.'/libgdbm_compat.so';
+-}
++$self->{LIBS} = ['-lgdbm -lgdbm_compat'];

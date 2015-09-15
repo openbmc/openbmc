@@ -1,0 +1,50 @@
+#!/bin/sh
+
+if [ -e /etc/formfactor/machconfig ]; then
+    . /etc/formfactor/machconfig
+fi
+
+if [ -z "$HAVE_TOUCHSCREEN" ]; then
+    HAVE_TOUCHSCREEN=0
+fi
+
+if [ -z "$HAVE_KEYBOARD" ]; then
+    HAVE_KEYBOARD=0
+fi
+
+if [ -z "$HAVE_KEYBOARD_PORTRAIT" ]; then
+    HAVE_KEYBOARD_PORTRAIT=0
+fi
+
+if [ -z "$HAVE_KEYBOARD_LANDSCAPE" ]; then
+    HAVE_KEYBOARD_LANDSCAPE=0
+fi
+
+if [ -z "$DISPLAY_CAN_ROTATE" ]; then
+    DISPLAY_CAN_ROTATE=0
+fi
+
+if [ -z "$DISPLAY_ORIENTATION" ]; then
+    DISPLAY_ORIENTATION=0
+fi
+
+if [ -e "/dev/fb" ]; then
+    if [ -z "$DISPLAY_WIDTH_PIXELS" ]; then
+        DISPLAY_WIDTH_PIXELS=`/usr/sbin/fbset | grep geometry | awk '{ print $2 }'`
+    fi
+
+    if [ -z "$DISPLAY_HEIGHT_PIXELS" ]; then
+        DISPLAY_HEIGHT_PIXELS=`/usr/sbin/fbset | grep geometry | awk '{ print $3 }'`
+    fi
+
+    if [ -z "$DISPLAY_BPP" ]; then
+        DISPLAY_BPP=`/usr/sbin/fbset | grep geometry | awk '{ print $6 }'`
+    fi
+fi
+
+# 
+# No way to guess these or have any defaults
+#
+#DISPLAY_WIDTH_MM
+#DISPLAY_HEIGHT_MM
+#DISPLAY_SUBPIXEL_ORDER=

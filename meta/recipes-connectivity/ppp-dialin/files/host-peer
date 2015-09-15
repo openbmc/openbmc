@@ -1,0 +1,11 @@
+-detach
+defaultroute
+nocrtscts
+lock
+noauth
+lcp-echo-interval 5
+lcp-echo-failure 3
+usepeerdns
+115200
+local
+asyncmap 0

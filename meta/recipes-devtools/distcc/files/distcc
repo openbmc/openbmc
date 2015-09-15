@@ -1,0 +1,119 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          distcc
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      1
+# Short-Description: simple distributed compiler client and server
+### END INIT INFO
+#
+# distccd Debian init.d script contributed by Jason Thomas.  (Debian #161136)
+#
+# skeleton	example file to build /etc/init.d/ scripts.
+#		This file should be used to construct scripts for /etc/init.d.
+#
+#		Written by Miquel van Smoorenburg <miquels@cistron.nl>.
+#		Modified for Debian GNU/Linux
+#		by Ian Murdock <imurdock@gnu.ai.mit.edu>.
+#
+# Version:	@(#)skeleton  1.9.1  08-Apr-2002  miquels@cistron.nl
+#
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/usr/bin/distccd
+NAME=distcc
+DESC="Distributed Compiler Daemon"
+DAEMON_ARGS="--pid-file=/var/run/$NAME.pid --daemon"
+# please change those variables by overriding them in /etc/defaults/distcc
+ALLOWEDNETS="127.0.0.1"
+
+# Reads config file (will override defaults above)
+[ -r /etc/default/distcc ] && . /etc/default/distcc
+
+test -x $DAEMON || exit 0
+
+set -e
+
+# Source function library.
+. /etc/init.d/functions
+
+# construct access list
+ALLOW=""
+for net in $ALLOWEDNETS
+do
+	ALLOW="$ALLOW --allow $net"
+done
+
+should_start() {
+	if [ "$STARTDISTCC" != "true" ] && [ "$STARTDISTCC" != "YES" ]; then
+		echo "STARTDISTCC is set to false in /etc/default/distcc"
+		echo "$DAEMON not starting"
+		exit 0
+	fi
+	# we need permission to write to the pid file
+	touch /var/run/$NAME.pid
+	chown distcc /var/run/$NAME.pid
+}
+
+case "$1" in
+  start)
+	should_start
+	echo -n "Starting $DESC: $NAME"
+	start-stop-daemon --start --quiet --pidfile /var/run/$NAME.pid \
+	--exec $DAEMON -- $DAEMON_ARGS $ALLOW ||
+	{
+	    code=$?
+	    echo "$0: start failed with error code $code" >&2
+	    exit $code
+	}
+	echo "."
+	;;
+  stop)
+	echo -n "Stopping $DESC: $NAME"
+	start-stop-daemon --stop --quiet --pidfile /var/run/$NAME.pid \
+		--exec $DAEMON ||
+	{
+	    code=$?
+	    echo "$0: stop failed with error code $code" >&2
+	    exit $code
+	}
+	rm -f /var/run/$NAME.pid >/dev/null 2>&1
+	echo "."
+	;;
+  restart|force-reload)
+	#
+	#	If the "reload" option is implemented, move the "force-reload"
+	#	option to the "reload" entry above. If not, "force-reload" is
+	#	just the same as "restart".
+	#
+	echo -n "Restarting $DESC: $NAME"
+	start-stop-daemon --stop --quiet --pidfile /var/run/$NAME.pid \
+		--exec $DAEMON
+	sleep 1
+	should_start
+	start-stop-daemon --start --quiet --pidfile /var/run/$NAME.pid \
+		--exec $DAEMON -- $DAEMON_ARGS $ALLOW ||
+	{
+	    code=$?
+	    rm -f /var/run/$NAME.pid >/dev/null 2>&1
+	    echo "$0: restart failed with error code $code" >&2
+	    exit $code
+	}
+	echo "."
+	;;
+
+   status)
+	status $DAEMON
+	exit $?
+	;;
+  *)
+	N=/etc/init.d/$NAME
+	echo "Usage: $N {start|stop|restart|force-reload|status}" >&2
+	exit 1
+	;;
+esac
+
+exit 0
+
+

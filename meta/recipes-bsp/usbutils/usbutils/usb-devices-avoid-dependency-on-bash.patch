@@ -1,0 +1,30 @@
+From 333d5fbbc03481f1aa222bd68c2609db168ae3e0 Mon Sep 17 00:00:00 2001
+From: Paul Eggleton <paul.eggleton@linux.intel.com>
+Date: Thu, 26 Jul 2012 10:37:32 +0100
+Subject: [PATCH] usb-devices: avoid dependency on bash
+
+By virtue of having #!/bin/bash this script declared that it requires
+bash, however manual examination, checkbashisms and tests with dash
+and busybox show that it doesn't contain any bashisms, so change the
+header to avoid the dependency.
+
+Upstream-Status: Pending
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+---
+ usb-devices |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/usb-devices b/usb-devices
+index b2052e2..14a5358 100755
+--- a/usb-devices
++++ b/usb-devices
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ # Copyright: 2009 Greg Kroah-Hartman <greg@kroah.com>
+ #            2009 Randy Dunlap <rdunlap@xenotime.net>
+-- 
+1.7.9.5
+

@@ -1,0 +1,27 @@
+oe doesn't support "@include", use the concrete directive instead.
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+Index: at-3.1.15/pam.conf
+===================================================================
+--- at-3.1.15.orig/pam.conf
++++ at-3.1.15/pam.conf
+@@ -1,10 +1,11 @@
+ #
+ # The PAM configuration file for the at daemon
+ #
++ 
++auth    required    pam_env.so
++auth    include     common-auth
++account include     common-account
++session include     common-session-noninteractive
++session required    pam_limits.so
++session required    pam_loginuid.so
+ 
+-auth	required	pam_env.so
+-@include common-auth
+-@include common-account
+-session    required   pam_loginuid.so
+-@include common-session-noninteractive
+-session    required   pam_limits.so

@@ -1,0 +1,8 @@
+#!/bin/sh
+#
+#This script is used to run qemu test suites
+ptestdir=$(pwd)
+cd tests
+
+export SRC_PATH=$ptestdir
+make -k runtest-TESTS | sed '/: OK/ s/^/PASS: /g'

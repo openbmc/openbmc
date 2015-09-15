@@ -1,0 +1,16 @@
+Upstream-Status: Pending
+
+version-remake.texi is not there but it is required by remake.texi,
+just add it for getting the 'make remake.info' works.
+
+==============================================================
+diff --git a/doc/version-remake.texi b/doc/version-remake.texi
+new file mode 100644
+index 0000000..2a3b72b
+--- /dev/null
++++ b/doc/version-remake.texi
+@@ -0,0 +1,4 @@
++@set UPDATED 10 June 2012
++@set UPDATED-MONTH June 2012
++@set EDITION 3.82+dbg-0.9git
++@set VERSION 3.82+dbg-0.9git

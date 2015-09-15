@@ -1,0 +1,81 @@
+Remove dependency on dpkg
+
+Upstream-Status: Submitted
+
+Asking the host OS whether it supports multiarch is not useful
+in a cross-compilation environment, or if the user has specified
+a libdir explicitly. So this patch, based on the work of Mentor
+Graphics, removes mklibs's dependency on dpkg package.
+
+Signed-off-by: Yuanjie Huang <Yuanjie.Huang@windriver.com>
+ src/mklibs | 30 +++++++++++++++++++-----------
+ 1 file changed, 19 insertions(+), 11 deletions(-)
+
+diff --git a/src/mklibs b/src/mklibs
+index d9b784b..c5614ea 100755
+--- a/src/mklibs
++++ b/src/mklibs
+@@ -261,6 +261,11 @@ def extract_soname(so_file):
+     return ""
+ 
+ def multiarch(paths):
++    # Asking the host OS whether it supports multiarch is not useful
++    # in a cross-compilation environment, or if the user has specified
++    # a libdir explicitly.
++    if sysroot != "" or libdir != "":
++        return paths
+     devnull = open('/dev/null', 'w')
+     dpkg_architecture = subprocess.Popen(
+         ['dpkg-architecture', '-qDEB_HOST_MULTIARCH'],
+@@ -340,7 +345,7 @@ lib_path = []
+ dest_path = "DEST"
+ ldlib = "LDLIB"
+ include_default_lib_path = "yes"
+-default_lib_path = multiarch(["/lib/", "/usr/lib/", "/usr/X11R6/lib/"])
++default_lib_path = ["/lib/", "/usr/lib/", "/usr/X11R6/lib/"]
+ libc_extras_dir = "/usr/lib/libc_pic"
+ libc_extras_dir_default = True
+ libdir = "lib"
+@@ -386,7 +391,7 @@ for opt, arg in optlist:
+     elif opt == "--libdir":
+         libdir = arg
+     elif opt in ("--help", "-h"):
+-	usage(0)
++        usage(0)
+         sys.exit(0)
+     elif opt in ("--version", "-V"):
+         version(vers)
+@@ -395,6 +400,7 @@ for opt, arg in optlist:
+         print "WARNING: unknown option: " + opt + "\targ: " + arg
+ 
+ if include_default_lib_path == "yes":
++    default_lib_path = multiarch(default_lib_path)
+     lib_path.extend([a.replace("/lib/", "/" + libdir + "/") for a in default_lib_path])
+ 
+ if libc_extras_dir_default:
+@@ -661,16 +669,16 @@ ld_path_name = os.path.dirname(ldlib)
+ ld_full_path = "../" + ldlib
+ ld_file = find_lib(ld_file_name)
+ 
+-if ld_path_name != "/lib":
+-    if os.access(dest_path + "/" + ld_file_name, os.F_OK):
+-        os.remove(dest_path + "/" + ld_file_name)
++#if ld_path_name != "/lib":
++#    if os.access(dest_path + "/" + ld_file_name, os.F_OK):
++#        os.remove(dest_path + "/" + ld_file_name)
+ 
+-if not os.path.exists(dest_path + "/../" + ld_path_name):
+-    os.mkdir(dest_path + "/../" + ld_path_name)
++#if not os.path.exists(dest_path + "/../" + ld_path_name):
++#    os.mkdir(dest_path + "/../" + ld_path_name)
+ 
+-if not os.access(dest_path + "/" + ld_full_path, os.F_OK):
+-    debug(DEBUG_NORMAL, "I: stripping and copying dynamic linker to " + ld_full_path)
++if not os.access(dest_path + "/" + ld_file_name, os.F_OK):
++    debug(DEBUG_NORMAL, "I: stripping and copying dynamic linker to " + ld_file_name)
+     command(target + "objcopy", "--strip-unneeded -R .note -R .comment",
+-            ld_file, dest_path + "/" + ld_full_path)
++            ld_file, dest_path + "/" + ld_file_name)
+ 
+-os.chmod(dest_path + "/" + ld_full_path, 0755)
++os.chmod(dest_path + "/" + ld_file_name, 0755)

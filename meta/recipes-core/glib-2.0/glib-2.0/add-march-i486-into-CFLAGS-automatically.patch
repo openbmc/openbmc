@@ -1,0 +1,39 @@
+From 55253b55b9c65f3e0efbbe03cbab2a4c4014a16b Mon Sep 17 00:00:00 2001
+From: Song.Li <Song.Li@windriver.com>
+Date: Thu, 5 Jul 2012 15:09:41 +0800
+Subject: [PATCH] add -march=i486 into CFLAGS automatically
+
+Upstream-Status: Inappropriate [configuration]
+
+glib configure will check if current gcc need -march=i486,
+when gcc need -march=i486 but CFLAGS don't have,
+glib configure will abort and advise the user to add -march=i486 or later.
+This will break the build process,it's not good for automatic build system.
+so change this to adding -march=i485 automatically when it is needed.
+---
+ configure.ac |    6 ++++--
+ 1 files changed, 4 insertions(+), 2 deletions(-)
+
+Index: glib-2.36.0/configure.ac
+===================================================================
+--- glib-2.36.0.orig/configure.ac
++++ glib-2.36.0/configure.ac
+@@ -2378,7 +2378,7 @@ dnl
+ dnl Note that the atomic ops are only available with GCC on x86 when
+ dnl using -march=i486 or higher.  If we detect that the atomic ops are
+ dnl not available but would be available given the right flags, we want
+-dnl to abort and advise the user to fix their CFLAGS.  It's better to do
++dnl to add -march=i486 automatically to fix their CFLAGS.  It's better to do
+ dnl that then to silently fall back on emulated atomic ops just because
+ dnl the user had the wrong build environment.
+
+@@ -2401,7 +2401,8 @@ AC_CACHE_CHECK([for lock-free atomic int
+         AC_TRY_COMPILE([],
+                        [volatile int atomic = 2;\
+                         __sync_bool_compare_and_swap (&atomic, 2, 3);],
+-                       [AC_MSG_ERROR([GLib must be build with -march=i486 or later.])],
++                       [AC_MSG_WARN([GLib must be build with -march=i486 or later.])
++                       SAVE_CFLAGS="${SAVE_CFLAGS} -march=i486"],
+                        [])
+         CFLAGS="${SAVE_CFLAGS}"
+       fi

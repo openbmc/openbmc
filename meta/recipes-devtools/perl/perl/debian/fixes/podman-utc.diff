@@ -1,0 +1,33 @@
+From c796775cdbd2cce06acbb7ac355187d4063017a2 Mon Sep 17 00:00:00 2001
+From: Chris Lamb <lamby@debian.org>
+Date: Wed, 15 Apr 2015 20:42:53 -0700
+Subject: Make the embedded date from Pod::Man reproducible
+
+While working on the "reproducible builds" effort, we have noticed
+that Pod::Man generates output that varies depending on the current
+timezone.
+
+The attached patch fixes this by using GMT (~UTC) dates instead.
+
+(backported to Perl 5.20.2 by Niko Tyni <ntyni@debian.org>)
+
+Origin: upstream, http://git.eyrie.org/?p=perl/podlators.git;a=commitdiff;h=913fbb2bd2ce071e20128629302ae2852554cad4
+Bug-Debian: https://bugs.debian.org/780259
+Patch-Name: fixes/podman-utc.diff
+---
+ cpan/podlators/lib/Pod/Man.pm | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cpan/podlators/lib/Pod/Man.pm b/cpan/podlators/lib/Pod/Man.pm
+index 0536662..c3ba201 100644
+--- a/cpan/podlators/lib/Pod/Man.pm
++++ b/cpan/podlators/lib/Pod/Man.pm
+@@ -910,7 +910,7 @@ sub devise_date {
+ 
+     # Can't use POSIX::strftime(), which uses Fcntl, because MakeMaker uses
+     # this and it has to work in the core which can't load dynamic libraries.
+-    my ($year, $month, $day) = (localtime($time))[5,4,3];
++    my ($year, $month, $day) = (gmtime($time))[5,4,3];
+     return sprintf("%04d-%02d-%02d", $year + 1900, $month + 1, $day);
+ }
+ 

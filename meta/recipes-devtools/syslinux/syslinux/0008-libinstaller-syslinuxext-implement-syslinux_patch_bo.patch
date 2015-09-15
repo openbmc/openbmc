@@ -1,0 +1,427 @@
+From 78d76b87a4b855e6b661ae457283a63f385c04c9 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Fri, 2 Jan 2015 12:26:46 +0800
+Subject: [PATCH 8/9] libinstaller/syslinuxext: implement
+ syslinux_patch_bootsect()
+
+Move the related from extlinux/main.c to libinstaller/syslinuxext.c, the
+syslinux_patch_bootsect() are used by both extlinux/main.c and
+linux/syslinux.c.
+
+Upstream-Status: Submitted
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+Tested-by: Du Dolpher <dolpher.du@intel.com>
+---
+ extlinux/Makefile          |   3 +-
+ extlinux/main.c            | 167 +-------------------------------------------
+ libinstaller/syslinuxext.c | 170 +++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 175 insertions(+), 165 deletions(-)
+
+diff --git a/extlinux/Makefile b/extlinux/Makefile
+index 02d1db5..90dd92f 100644
+--- a/extlinux/Makefile
++++ b/extlinux/Makefile
+@@ -31,7 +31,8 @@ SRCS     = main.c \
+ 	   ../libinstaller/advio.c \
+ 	   ../libinstaller/bootsect_bin.c \
+ 	   ../libinstaller/ldlinuxc32_bin.c \
+-	   ../libinstaller/ldlinux_bin.c
++	   ../libinstaller/ldlinux_bin.c \
++	   ../libinstaller/syslinuxext.c
+ OBJS	 = $(patsubst %.c,%.o,$(notdir $(SRCS)))
+ 
+ .SUFFIXES: .c .o .i .s .S
+diff --git a/extlinux/main.c b/extlinux/main.c
+index 09740bd..6fe026e 100644
+--- a/extlinux/main.c
++++ b/extlinux/main.c
+@@ -60,6 +60,7 @@
+ #include "setadv.h"
+ #include "syslxopt.h" /* unified options */
+ #include "mountinfo.h"
++#include "syslinuxext.h"
+ 
+ #ifdef DEBUG
+ # define dprintf printf
+@@ -67,10 +68,6 @@
+ # define dprintf(...) ((void)0)
+ #endif
+ 
+-#ifndef EXT2_SUPER_OFFSET
+-#define EXT2_SUPER_OFFSET 1024
+-#endif
+-
+ /* Since we have unused 2048 bytes in the primary AG of an XFS partition,
+  * we will use the first 0~512 bytes starting from 2048 for the Syslinux
+  * boot sector.
+@@ -92,136 +89,6 @@ static char subvol[BTRFS_SUBVOL_MAX];
+ 			  - 2*ADV_SIZE)
+ 
+ /*
+- * Get the size of a block device
+- */
+-static uint64_t get_size(int devfd)
+-{
+-    uint64_t bytes;
+-    uint32_t sects;
+-    struct stat st;
+-
+-#ifdef BLKGETSIZE64
+-    if (!ioctl(devfd, BLKGETSIZE64, &bytes))
+-	return bytes;
+-#endif
+-    if (!ioctl(devfd, BLKGETSIZE, &sects))
+-	return (uint64_t) sects << 9;
+-    else if (!fstat(devfd, &st) && st.st_size)
+-	return st.st_size;
+-    else
+-	return 0;
+-}
+-
+-/*
+- * Get device geometry and partition offset
+- */
+-struct geometry_table {
+-    uint64_t bytes;
+-    struct hd_geometry g;
+-};
+-
+-static int sysfs_get_offset(int devfd, unsigned long *start)
+-{
+-    struct stat st;
+-    char sysfs_name[128];
+-    FILE *f;
+-    int rv;
+-
+-    if (fstat(devfd, &st))
+-	return -1;
+-
+-    if ((size_t)snprintf(sysfs_name, sizeof sysfs_name,
+-			 "/sys/dev/block/%u:%u/start",
+-			 major(st.st_rdev), minor(st.st_rdev))
+-	>= sizeof sysfs_name)
+-	return -1;
+-
+-    f = fopen(sysfs_name, "r");
+-    if (!f)
+-	return -1;
+-
+-    rv = fscanf(f, "%lu", start);
+-    fclose(f);
+-
+-    return (rv == 1) ? 0 : -1;
+-}
+-
+-/* Standard floppy disk geometries, plus LS-120.  Zipdisk geometry
+-   (x/64/32) is the final fallback.  I don't know what LS-240 has
+-   as its geometry, since I don't have one and don't know anyone that does,
+-   and Google wasn't helpful... */
+-static const struct geometry_table standard_geometries[] = {
+-    {360 * 1024, {2, 9, 40, 0}},
+-    {720 * 1024, {2, 9, 80, 0}},
+-    {1200 * 1024, {2, 15, 80, 0}},
+-    {1440 * 1024, {2, 18, 80, 0}},
+-    {1680 * 1024, {2, 21, 80, 0}},
+-    {1722 * 1024, {2, 21, 80, 0}},
+-    {2880 * 1024, {2, 36, 80, 0}},
+-    {3840 * 1024, {2, 48, 80, 0}},
+-    {123264 * 1024, {8, 32, 963, 0}},	/* LS120 */
+-    {0, {0, 0, 0, 0}}
+-};
+-
+-int get_geometry(int devfd, uint64_t totalbytes, struct hd_geometry *geo)
+-{
+-    struct floppy_struct fd_str;
+-    struct loop_info li;
+-    struct loop_info64 li64;
+-    const struct geometry_table *gp;
+-    int rv = 0;
+-
+-    memset(geo, 0, sizeof *geo);
+-
+-    if (!ioctl(devfd, HDIO_GETGEO, geo)) {
+-	goto ok;
+-    } else if (!ioctl(devfd, FDGETPRM, &fd_str)) {
+-	geo->heads = fd_str.head;
+-	geo->sectors = fd_str.sect;
+-	geo->cylinders = fd_str.track;
+-	geo->start = 0;
+-	goto ok;
+-    }
+-
+-    /* Didn't work.  Let's see if this is one of the standard geometries */
+-    for (gp = standard_geometries; gp->bytes; gp++) {
+-	if (gp->bytes == totalbytes) {
+-	    memcpy(geo, &gp->g, sizeof *geo);
+-	    goto ok;
+-	}
+-    }
+-
+-    /* Didn't work either... assign a geometry of 64 heads, 32 sectors; this is
+-       what zipdisks use, so this would help if someone has a USB key that
+-       they're booting in USB-ZIP mode. */
+-
+-    geo->heads = opt.heads ? : 64;
+-    geo->sectors = opt.sectors ? : 32;
+-    geo->cylinders = totalbytes / (geo->heads * geo->sectors << SECTOR_SHIFT);
+-    geo->start = 0;
+-
+-    if (!opt.sectors && !opt.heads) {
+-	fprintf(stderr,
+-		"Warning: unable to obtain device geometry (defaulting to %d heads, %d sectors)\n"
+-		"         (on hard disks, this is usually harmless.)\n",
+-		geo->heads, geo->sectors);
+-	rv = 1;			/* Suboptimal result */
+-    }
+-
+-ok:
+-    /* If this is a loopback device, try to set the start */
+-    if (!ioctl(devfd, LOOP_GET_STATUS64, &li64))
+-	geo->start = li64.lo_offset >> SECTOR_SHIFT;
+-    else if (!ioctl(devfd, LOOP_GET_STATUS, &li))
+-	geo->start = (unsigned int)li.lo_offset >> SECTOR_SHIFT;
+-    else if (!sysfs_get_offset(devfd, &geo->start)) {
+-	/* OK */
+-    }
+-
+-    return rv;
+-}
+-
+-/*
+  * Query the device geometry and put it into the boot sector.
+  * Map the file and put the map in the boot sector and file.
+  * Stick the "current directory" inode number into the file.
+@@ -231,11 +98,8 @@ ok:
+ static int patch_file_and_bootblock(int fd, const char *dir, int devfd)
+ {
+     struct stat dirst, xdst;
+-    struct hd_geometry geo;
+     sector_t *sectp;
+-    uint64_t totalbytes, totalsectors;
+     int nsect;
+-    struct fat_boot_sector *sbs;
+     char *dirpath, *subpath, *xdirpath;
+     int rv;
+ 
+@@ -279,33 +143,8 @@ static int patch_file_and_bootblock(int fd, const char *dir, int devfd)
+     /* Now subpath should contain the path relative to the fs base */
+     dprintf("subpath = %s\n", subpath);
+ 
+-    totalbytes = get_size(devfd);
+-    get_geometry(devfd, totalbytes, &geo);
+-
+-    if (opt.heads)
+-	geo.heads = opt.heads;
+-    if (opt.sectors)
+-	geo.sectors = opt.sectors;
+-
+-    /* Patch this into a fake FAT superblock.  This isn't because
+-       FAT is a good format in any way, it's because it lets the
+-       early bootstrap share code with the FAT version. */
+-    dprintf("heads = %u, sect = %u\n", geo.heads, geo.sectors);
+-
+-    sbs = (struct fat_boot_sector *)syslinux_bootsect;
+-
+-    totalsectors = totalbytes >> SECTOR_SHIFT;
+-    if (totalsectors >= 65536) {
+-	set_16(&sbs->bsSectors, 0);
+-    } else {
+-	set_16(&sbs->bsSectors, totalsectors);
+-    }
+-    set_32(&sbs->bsHugeSectors, totalsectors);
+-
+-    set_16(&sbs->bsBytesPerSec, SECTOR_SIZE);
+-    set_16(&sbs->bsSecPerTrack, geo.sectors);
+-    set_16(&sbs->bsHeads, geo.heads);
+-    set_32(&sbs->bsHiddenSecs, geo.start);
++    /* Patch syslinux_bootsect */
++    syslinux_patch_bootsect(devfd);
+ 
+     /* Construct the boot file map */
+ 
+diff --git a/libinstaller/syslinuxext.c b/libinstaller/syslinuxext.c
+index bb54cef..5a4423b 100644
+--- a/libinstaller/syslinuxext.c
++++ b/libinstaller/syslinuxext.c
+@@ -1,7 +1,177 @@
+ #define _GNU_SOURCE
+ 
++#include <sys/stat.h>
++#include <sys/types.h>
++#include <getopt.h>
++#include <ext2fs/ext2fs.h>
++
++#include "linuxioctl.h"
++#include "syslinux.h"
++#include "syslxint.h"
++#include "syslxopt.h"
++
++/*
++ * Get the size of a block device
++ */
++static uint64_t get_size(int dev_fd)
++{
++    uint64_t bytes;
++    uint32_t sects;
++    struct stat st;
++
++#ifdef BLKGETSIZE64
++    if (!ioctl(dev_fd, BLKGETSIZE64, &bytes))
++	return bytes;
++#endif
++    if (!ioctl(dev_fd, BLKGETSIZE, &sects))
++	return (uint64_t) sects << 9;
++    else if (!fstat(dev_fd, &st) && st.st_size)
++	return st.st_size;
++    else
++	return 0;
++}
++
++/*
++ * Get device geometry and partition offset
++ */
++static struct geometry_table {
++    uint64_t bytes;
++    struct hd_geometry g;
++};
++
++static int sysfs_get_offset(int dev_fd, unsigned long *start)
++{
++    struct stat st;
++    char sysfs_name[128];
++    FILE *f;
++    int rv;
++
++    if (fstat(dev_fd, &st))
++	return -1;
++
++    if ((size_t)snprintf(sysfs_name, sizeof sysfs_name,
++			 "/sys/dev/block/%u:%u/start",
++			 major(st.st_rdev), minor(st.st_rdev))
++	>= sizeof sysfs_name)
++	return -1;
++
++    f = fopen(sysfs_name, "r");
++    if (!f)
++	return -1;
++
++    rv = fscanf(f, "%lu", start);
++    fclose(f);
++
++    return (rv == 1) ? 0 : -1;
++}
++
++/* Standard floppy disk geometries, plus LS-120.  Zipdisk geometry
++   (x/64/32) is the final fallback.  I don't know what LS-240 has
++   as its geometry, since I don't have one and don't know anyone that does,
++   and Google wasn't helpful... */
++static const struct geometry_table standard_geometries[] = {
++    {360 * 1024, {2, 9, 40, 0}},
++    {720 * 1024, {2, 9, 80, 0}},
++    {1200 * 1024, {2, 15, 80, 0}},
++    {1440 * 1024, {2, 18, 80, 0}},
++    {1680 * 1024, {2, 21, 80, 0}},
++    {1722 * 1024, {2, 21, 80, 0}},
++    {2880 * 1024, {2, 36, 80, 0}},
++    {3840 * 1024, {2, 48, 80, 0}},
++    {123264 * 1024, {8, 32, 963, 0}},	/* LS120 */
++    {0, {0, 0, 0, 0}}
++};
++
++static int get_geometry(int dev_fd, uint64_t totalbytes, struct hd_geometry *geo)
++{
++    struct floppy_struct fd_str;
++    struct loop_info li;
++    struct loop_info64 li64;
++    const struct geometry_table *gp;
++    int rv = 0;
++
++    memset(geo, 0, sizeof *geo);
++
++    if (!ioctl(dev_fd, HDIO_GETGEO, geo)) {
++	goto ok;
++    } else if (!ioctl(dev_fd, FDGETPRM, &fd_str)) {
++	geo->heads = fd_str.head;
++	geo->sectors = fd_str.sect;
++	geo->cylinders = fd_str.track;
++	geo->start = 0;
++	goto ok;
++    }
++
++    /* Didn't work.  Let's see if this is one of the standard geometries */
++    for (gp = standard_geometries; gp->bytes; gp++) {
++	if (gp->bytes == totalbytes) {
++	    memcpy(geo, &gp->g, sizeof *geo);
++	    goto ok;
++	}
++    }
++
++    /* Didn't work either... assign a geometry of 64 heads, 32 sectors; this is
++       what zipdisks use, so this would help if someone has a USB key that
++       they're booting in USB-ZIP mode. */
++
++    geo->heads = opt.heads ? : 64;
++    geo->sectors = opt.sectors ? : 32;
++    geo->cylinders = totalbytes / (geo->heads * geo->sectors << SECTOR_SHIFT);
++    geo->start = 0;
++
++    if (!opt.sectors && !opt.heads) {
++	fprintf(stderr,
++		"Warning: unable to obtain device geometry (defaulting to %d heads, %d sectors)\n"
++		"         (on hard disks, this is usually harmless.)\n",
++		geo->heads, geo->sectors);
++	rv = 1;			/* Suboptimal result */
++    }
++
++ok:
++    /* If this is a loopback device, try to set the start */
++    if (!ioctl(dev_fd, LOOP_GET_STATUS64, &li64))
++	geo->start = li64.lo_offset >> SECTOR_SHIFT;
++    else if (!ioctl(dev_fd, LOOP_GET_STATUS, &li))
++	geo->start = (unsigned int)li.lo_offset >> SECTOR_SHIFT;
++    else if (!sysfs_get_offset(dev_fd, &geo->start)) {
++	/* OK */
++    }
++
++    return rv;
++}
++
++
+ /* Patch syslinux_bootsect */
+ void syslinux_patch_bootsect(int dev_fd)
+ {
++    uint64_t totalbytes, totalsectors;
++    struct hd_geometry geo;
++    struct fat_boot_sector *sbs;
++
++    totalbytes = get_size(dev_fd);
++    get_geometry(dev_fd, totalbytes, &geo);
++
++    if (opt.heads)
++	geo.heads = opt.heads;
++    if (opt.sectors)
++	geo.sectors = opt.sectors;
++
++    /* Patch this into a fake FAT superblock.  This isn't because
++       FAT is a good format in any way, it's because it lets the
++       early bootstrap share code with the FAT version. */
++    sbs = (struct fat_boot_sector *)syslinux_bootsect;
++
++    totalsectors = totalbytes >> SECTOR_SHIFT;
++    if (totalsectors >= 65536) {
++	set_16(&sbs->bsSectors, 0);
++    } else {
++	set_16(&sbs->bsSectors, totalsectors);
++    }
++    set_32(&sbs->bsHugeSectors, totalsectors);
++
++    set_16(&sbs->bsBytesPerSec, SECTOR_SIZE);
++    set_16(&sbs->bsSecPerTrack, geo.sectors);
++    set_16(&sbs->bsHeads, geo.heads);
++    set_32(&sbs->bsHiddenSecs, geo.start);
+ }
+ 
+-- 
+1.9.1
+

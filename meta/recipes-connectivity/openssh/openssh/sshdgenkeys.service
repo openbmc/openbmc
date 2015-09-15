@@ -1,0 +1,11 @@
+[Unit]
+Description=OpenSSH Key Generation
+ConditionPathExists=|!/etc/ssh/ssh_host_rsa_key
+ConditionPathExists=|!/etc/ssh/ssh_host_dsa_key
+ConditionPathExists=|!/etc/ssh/ssh_host_ecdsa_key
+ConditionPathExists=|!/etc/ssh/ssh_host_ed25519_key
+
+[Service]
+ExecStart=@BINDIR@/ssh-keygen -A
+Type=oneshot
+RemainAfterExit=yes

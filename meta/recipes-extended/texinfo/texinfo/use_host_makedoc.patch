@@ -1,0 +1,17 @@
+Upstream-Status: Inappropriate [cross build specific]
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+Index: texinfo-5.1/info/Makefile.am
+===================================================================
+--- texinfo-5.1.orig/info/Makefile.am
++++ texinfo-5.1/info/Makefile.am
+@@ -76,7 +76,7 @@ cmd_sources = $(srcdir)/session.c $(srcd
+ # more than once.
+ funs.h: makedoc$(EXEEXT) $(cmd_sources)
+ 	rm -f $(generated_sources)
+-	$(top_builddir)/$(native_tools)/info/makedoc $(cmd_sources)
++	makedoc $(cmd_sources)
+ 
+ # The following hack is necessary to hint make before the automatic
+ # dependencies are built.

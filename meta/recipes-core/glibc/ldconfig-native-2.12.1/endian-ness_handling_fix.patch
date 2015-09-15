@@ -1,0 +1,47 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+Fix problem during parsing of ELF headers for 64bit on big-endian.
+Some header fields were read with wrong size.
+
+2014/10/24
+Par Olsson <Par.Olsson@windriver.com>
+Shan Hai <shan.hai@windriver.com>
+
+diff --git a/readelflib.c b/readelflib.c
+index 3f5b25b..0bf0de3 100644
+--- a/readelflib.c
++++ b/readelflib.c
+@@ -261,8 +261,8 @@ process_elf_file64 (const char *file_name, const char *lib, int *flag,
+   int i;
+   unsigned int j;
+   Elf64_Addr loadaddr;
+-  unsigned int dynamic_addr;
+-  size_t dynamic_size;
++  Elf64_Addr dynamic_addr;
++  Elf64_Xword dynamic_size;
+   char *program_interpreter;
+ 
+   Elf64_Ehdr *elf_header;
+@@ -311,7 +311,7 @@ process_elf_file64 (const char *file_name, const char *lib, int *flag,
+ 	    error (0, 0, _("more than one dynamic segment\n"));
+ 
+ 	  dynamic_addr = read64(segment->p_offset, be);
+-	  dynamic_size = read32(segment->p_filesz, be);
++	  dynamic_size = read64(segment->p_filesz, be);
+ 	  break;
+ 
+ 	case PT_INTERP:
+@@ -329,11 +329,11 @@ process_elf_file64 (const char *file_name, const char *lib, int *flag,
+ 	  break;
+ 
+ 	case PT_NOTE:
+-	  if (!*osversion && read32(segment->p_filesz, be) >= 32 && read32(segment->p_align, be) >= 4)
++	  if (!*osversion && read64(segment->p_filesz, be) >= 32 && read64(segment->p_align, be) >= 4)
+ 	    {
+ 	      Elf64_Word *abi_note = (Elf64_Word *) (file_contents
+ 						     + read64(segment->p_offset, be));
+-	      Elf64_Addr size = read32(segment->p_filesz, be);
++	      Elf64_Xword size = read64(segment->p_filesz, be);
+ 
+ 	      while (read32(abi_note [0], be) != 4 || read32(abi_note [1], be) != 16
+ 		     || read32(abi_note [2], be) != 1

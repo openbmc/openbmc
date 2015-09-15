@@ -1,0 +1,121 @@
+{% load static %}
+{% load projecttags %}
+{% load humanize %}
+
+
+{%if mru.count > 0%}
+
+  <div class="page-header">
+      <h1>
+          Latest builds
+       </h1>
+  </div>
+  <div id="latest-builds">
+  {% for build in mru %}
+    <div class="alert {%if build.outcome == build.SUCCEEDED%}alert-success{%elif build.outcome == build.FAILED%}alert-error{%else%}alert-info{%endif%} project-name ">
+       <span class="label {%if build.outcome == build.SUCCEEDED%}label-success{%elif build.outcome == build.FAILED%}label-important{%else%}label-info{%endif%}">
+         <a href={% url 'project' build.project.pk %}>
+           {{build.project.name}}
+         </a>
+       </span>
+
+        <div class="row-fluid">
+            <div class="span3 lead">
+    {%if build.outcome == build.SUCCEEDED or build.outcome == build.FAILED %}
+                <a href="{%url 'builddashboard' build.pk%}" class="{%if build.outcome == build.SUCCEEDED %}success{%else%}error{%endif%}">
+    {% endif %}
+            {% if build.target_set.all.count > 0 %}
+                <span data-toggle="tooltip"
+                  {%if build.target_set.all.count > 1%}
+                    title="Targets: {%for target in build.target_set.all%}{{target.target}} {%endfor%}"
+                  {%endif%}
+                >
+
+                  {{build.target_set.all.0.target}} {%if build.target_set.all.count > 1%}(+ {{build.target_set.all.count|add:"-1"}}){%endif%}
+                </span>
+             {% endif %}
+    {%if build.outcome == build.SUCCEEDED or build.outcome == build.FAILED %}
+                </a>
+    {% endif %}
+            </div>
+            <div class="span2 lead">
+                {% if build.completed_on|format_build_date  %}
+                    {{ build.completed_on|date:'d/m/y H:i' }}
+                {% else %}
+                    {{ build.completed_on|date:'H:i' }}
+                {% endif %}
+            </div>
+    {%if build.outcome == build.SUCCEEDED or build.outcome == build.FAILED %}
+            <div class="span2 lead">
+      {% if  build.errors.count %}
+                <i class="icon-minus-sign red"></i> <a href="{%url 'builddashboard' build.pk%}#errors" class="error">{{build.errors.count}} error{{build.errors.count|pluralize}}</a>
+      {% endif %}
+            </div>
+            <div class="span2 lead">
+      {% if  build.warnings.count %}
+                <i class="icon-warning-sign yellow"></i> <a href="{%url 'builddashboard' build.pk%}#warnings" class="warning">{{build.warnings.count}} warning{{build.warnings.count|pluralize}}</a>
+      {% endif %}
+            </div>
+            <div class="lead ">
+              <span class="lead">
+                Build time: <a href="{% url 'buildtime' build.pk %}">{{ build.timespent_seconds|sectohms }}</a>
+              </span>
+              <button class="btn
+                  {% if build.outcome == build.SUCCEEDED %}
+                      btn-success
+                  {% elif build.outcome == build.FAILED %}
+                      btn-danger
+                  {% else %}
+                      btn-info
+                  {%endif%}
+                  pull-right"
+                  onclick='scheduleBuild({% url 'projectbuilds' build.project.id as bpi %}{{bpi|json}},
+                    {{build.project.name|json}},
+                    {% url 'project' build.project.id as bpurl %}{{bpurl|json}},
+                    {{build.target_set.all|get_tasks|json}})'>
+
+                    Run again
+              </button>
+            </div>
+    {%endif%}
+    {%if build.outcome == build.IN_PROGRESS %}
+            <div class="span4">
+                <div class="progress" style="margin-top:5px;" data-toggle="tooltip" title="{{build.completeper}}% of tasks complete">
+                    <div style="width: {{build.completeper}}%;" class="bar"></div>
+                </div>
+            </div>
+            <div class="lead pull-right">{{build.completeper}}% of tasks complete</div>
+    {%endif%}
+        </div>
+    </div>
+
+  {% endfor %}
+  </div>
+
+<script>
+
+function scheduleBuild(url, projectName, projectUrl, buildlist) {
+  console.log("scheduleBuild");
+  libtoaster.startABuild(url, null, buildlist.join(" "), function(){
+    console.log("reloading page");
+    window.location.reload();
+  }, null);
+}
+
+$(document).ready(function(){
+
+  $(".cancel-build-btn").click(function (){
+    var url = $(this).data('request-url');
+    var buildIds = $(this).data('build-id');
+    var btn = $(this);
+
+    libtoaster.cancelABuild(url, buildIds, function(){
+      btn.parents(".alert").fadeOut();
+    }, null);
+  });
+});
+
+</script>
+
+{%endif%}
+

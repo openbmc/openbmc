@@ -1,0 +1,91 @@
+#!/bin/bash
+#
+# Create a "bank" of tap network devices that can be used by the
+# runqemu script. This script needs to be run as root, and will
+# use the tunctl binary from the build system sysroot. Note: many Linux 
+# distros these days still use an older version of tunctl which does not
+# support the group permissions option, hence the need to use the build
+# system provided version.
+#
+# Copyright (C) 2010 Intel Corp.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+usage() {
+	echo "Usage: sudo $0 <uid> <gid> <num> <native-sysroot-basedir>"
+        echo "Where <uid> is the numeric user id the tap devices will be owned by"
+	echo "Where <gid> is the numeric group id the tap devices will be owned by"
+	echo "<num> is the number of tap devices to create (0 to remove all)"
+	echo "<native-sysroot-basedir> is the path to the build system's native sysroot"
+	exit 1
+}
+
+if [ $EUID -ne 0 ]; then
+	echo "Error: This script must be run with root privileges"
+	exit
+fi
+
+if [ $# -ne 4 ]; then
+	echo "Error: Incorrect number of arguments"
+	usage
+fi
+
+TUID=$1
+GID=$2
+COUNT=$3
+SYSROOT=$4
+
+TUNCTL=$SYSROOT/usr/bin/tunctl
+if [[ ! -x "$TUNCTL" || -d "$TUNCTL" ]]; then
+	echo "Error: $TUNCTL is not an executable"
+	usage
+fi
+
+SCRIPT_DIR=`dirname $0`
+RUNQEMU_IFUP="$SCRIPT_DIR/runqemu-ifup"
+if [ ! -x "$RUNQEMU_IFUP" ]; then
+	echo "Error: Unable to find the runqemu-ifup script in $SCRIPT_DIR"
+	exit 1
+fi
+
+IFCONFIG=`which ip 2> /dev/null`
+if [ -z "$IFCONFIG" ]; then
+	# Is it ever anywhere else?
+	IFCONFIG=/sbin/ip
+fi
+if [ ! -x "$IFCONFIG" ]; then
+       echo "$IFCONFIG cannot be executed"
+       exit 1
+fi
+
+# Ensure we start with a clean slate
+for tap in `$IFCONFIG link | grep tap | awk '{ print \$2 }' | sed s/://`; do
+	echo "Note: Destroying pre-existing tap interface $tap..."
+	$TUNCTL -d $tap
+done
+
+echo "Creating $COUNT tap devices for UID: $TUID GID: $GID..."
+for ((index=0; index < $COUNT; index++)); do
+	echo "Creating tap$index"
+	ifup=`$RUNQEMU_IFUP $TUID $GID $SYSROOT 2>&1`
+	if [ $? -ne 0 ]; then
+		echo "Error running tunctl: $ifup"
+		exit 1
+	fi
+done
+
+# The runqemu script will check for this file, and if it exists,
+# will use the existing bank of tap devices without creating
+# additional ones via sudo.
+touch /etc/runqemu-nosudo

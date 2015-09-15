@@ -1,0 +1,39 @@
+
+# Pulled from OpenEmbedded
+# 
+# Commented by: Saul Wold <saul.wold@intel.com>
+
+Upstream-Status: Inappropriate [licensing]
+
+Index: gettext-0.16.1/gettext-tools/configure.ac
+===================================================================
+--- gettext-0.16.1.orig/gettext-tools/configure.ac	2006-11-27 09:02:01.000000000 -0800
++++ gettext-0.16.1/gettext-tools/configure.ac	2011-03-16 16:55:36.111396557 -0700
+@@ -36,27 +36,15 @@
+ gt_JAVA_CHOICE
+ 
+ gt_GCJ
+-if test -n "$HAVE_GCJ" && test "$JAVA_CHOICE" = yes; then
+-  BUILDJAVAEXE=yes
+-else
+   BUILDJAVAEXE=no
+-fi
+ AC_SUBST(BUILDJAVAEXE)
+ 
+ gt_JAVAEXEC
+ gt_JAVACOMP([1.3])
+ AC_CHECK_PROG(JAR, jar, jar)
+-if test -n "$HAVE_JAVACOMP" && test -n "$JAR" && test "$JAVA_CHOICE" != no; then
+-  BUILDJAVA=yes
+-else
+   BUILDJAVA=no
+-fi
+ AC_SUBST(BUILDJAVA)
+-if test -n "$HAVE_JAVAEXEC" && test $BUILDJAVA = yes; then
+-  TESTJAVA=yes
+-else
+   TESTJAVA=no
+-fi
+ AC_SUBST(TESTJAVA)
+ 
+ gt_CSHARPCOMP

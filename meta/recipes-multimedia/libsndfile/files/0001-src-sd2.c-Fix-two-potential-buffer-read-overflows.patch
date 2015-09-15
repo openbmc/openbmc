@@ -1,0 +1,49 @@
+From dbe14f00030af5d3577f4cabbf9861db59e9c378 Mon Sep 17 00:00:00 2001
+From: Erik de Castro Lopo <erikd@mega-nerd.com>
+Date: Thu, 25 Dec 2014 19:23:12 +1100
+Subject: [PATCH] src/sd2.c : Fix two potential buffer read overflows.
+
+(Upstream commit dbe14f00030af5d3577f4cabbf9861db59e9c378)
+
+Closes: https://github.com/erikd/libsndfile/issues/93
+
+Upstream-Status: Backport
+
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+---
+ src/sd2.c |   12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/src/sd2.c b/src/sd2.c
+index 0b4e5af..a70a1f1 100644
+--- a/src/sd2.c
++++ b/src/sd2.c
+@@ -517,6 +517,11 @@ sd2_parse_rsrc_fork (SF_PRIVATE *psf)
+ 
+ 	rsrc.type_offset = rsrc.map_offset + 30 ;
+ 
++	if (rsrc.map_offset + 28 > rsrc.rsrc_len)
++	{	psf_log_printf (psf, "Bad map offset.\n") ;
++		goto parse_rsrc_fork_cleanup ;
++		} ;
++
+ 	rsrc.type_count = read_rsrc_short (&rsrc, rsrc.map_offset + 28) + 1 ;
+ 	if (rsrc.type_count < 1)
+ 	{	psf_log_printf (psf, "Bad type count.\n") ;
+@@ -533,7 +538,12 @@ sd2_parse_rsrc_fork (SF_PRIVATE *psf)
+ 
+ 	rsrc.str_index = -1 ;
+ 	for (k = 0 ; k < rsrc.type_count ; k ++)
+-	{	marker = read_rsrc_marker (&rsrc, rsrc.type_offset + k * 8) ;
++	{	if (rsrc.type_offset + k * 8 > rsrc.rsrc_len)
++		{	psf_log_printf (psf, "Bad rsrc marker.\n") ;
++			goto parse_rsrc_fork_cleanup ;
++			} ;
++
++		marker = read_rsrc_marker (&rsrc, rsrc.type_offset + k * 8) ;
+ 
+ 		if (marker == STR_MARKER)
+ 		{	rsrc.str_index = k ;
+-- 
+1.7.9.5
+

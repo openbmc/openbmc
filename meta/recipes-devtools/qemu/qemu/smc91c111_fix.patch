@@ -1,0 +1,74 @@
+The smc91c111.c driver appears to have several issues. The can_receive()
+function can return that the driver is ready when rx_fifo has not been 
+freed yet. There is also no sanity check of rx_fifo() in _receive() which
+can lead to corruption of the rx_fifo array.
+
+release_packet() can also call qemu_flush_queued_packets() before rx_fifo 
+has been cleaned up, resulting in cases where packets are submitted
+for which there is not yet any space.
+
+This patch therefore:
+
+* fixes the logic in can_receive()
+* adds logic to receive() as a sanity check
+* moves the flush() calls to the correct places where data is ready
+  to be received
+
+Upstream-Status: Pending [discussion in progress on mailing list]
+RP 2015/9/7
+
+Index: qemu-2.4.0/hw/net/smc91c111.c
+===================================================================
+--- qemu-2.4.0.orig/hw/net/smc91c111.c
++++ qemu-2.4.0/hw/net/smc91c111.c
+@@ -185,7 +185,6 @@ static void smc91c111_release_packet(smc
+     s->allocated &= ~(1 << packet);
+     if (s->tx_alloc == 0x80)
+         smc91c111_tx_alloc(s);
+-    qemu_flush_queued_packets(qemu_get_queue(s->nic));
+ }
+ 
+ /* Flush the TX FIFO.  */
+@@ -237,9 +236,11 @@ static void smc91c111_do_tx(smc91c111_st
+             }
+         }
+ #endif
+-        if (s->ctr & CTR_AUTO_RELEASE)
++        if (s->ctr & CTR_AUTO_RELEASE) {
+             /* Race?  */
+             smc91c111_release_packet(s, packetnum);
++            qemu_flush_queued_packets(qemu_get_queue(s->nic));
++        }
+         else if (s->tx_fifo_done_len < NUM_PACKETS)
+             s->tx_fifo_done[s->tx_fifo_done_len++] = packetnum;
+         qemu_send_packet(qemu_get_queue(s->nic), p, len);
+@@ -379,9 +380,11 @@ static void smc91c111_writeb(void *opaqu
+                     smc91c111_release_packet(s, s->rx_fifo[0]);
+                 }
+                 smc91c111_pop_rx_fifo(s);
++                qemu_flush_queued_packets(qemu_get_queue(s->nic));
+                 break;
+             case 5: /* Release.  */
+                 smc91c111_release_packet(s, s->packet_num);
++                qemu_flush_queued_packets(qemu_get_queue(s->nic));
+                 break;
+             case 6: /* Add to TX FIFO.  */
+                 smc91c111_queue_tx(s, s->packet_num);
+@@ -642,7 +642,7 @@ static int smc91c111_can_receive(NetClie
+ 
+     if ((s->rcr & RCR_RXEN) == 0 || (s->rcr & RCR_SOFT_RST))
+         return 1;
+-    if (s->allocated == (1 << NUM_PACKETS) - 1)
++    if ((s->allocated == (1 << NUM_PACKETS) - 1) || (s->rx_fifo_len == NUM_PACKETS))
+         return 0;
+     return 1;
+ }
+@@ -671,6 +671,8 @@ static ssize_t smc91c111_receive(NetClie
+     /* TODO: Flag overrun and receive errors.  */
+     if (packetsize > 2048)
+         return -1;
++    if  (s->rx_fifo_len == NUM_PACKETS)
++        return -1;    
+     packetnum = smc91c111_allocate_packet(s);
+     if (packetnum == 0x80)
+         return -1;

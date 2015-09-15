@@ -1,0 +1,33 @@
+Upstream-Status: Backport
+
+Original commit: http://git.savannah.gnu.org/cgit/grub.git/commit/grub-core/net/bootp.c?id=f06c2172c0b32052f22e37523445cf8e7affaea3
+
+From 149d2a14f4723778ced23f439487201ccbf1a2c9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 23 Apr 2015 07:03:34 +0000
+Subject: [PATCH] parse_dhcp_vendor: Add missing const qualifiers.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ grub-core/net/bootp.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/net/bootp.c b/grub-core/net/bootp.c
+index bc07d53..44131ed 100644
+--- a/grub-core/net/bootp.c
++++ b/grub-core/net/bootp.c
+@@ -52,9 +52,9 @@ set_env_limn_ro (const char *intername, const char *suffix,
+ }
+ 
+ static void
+-parse_dhcp_vendor (const char *name, void *vend, int limit, int *mask)
++parse_dhcp_vendor (const char *name, const void *vend, int limit, int *mask)
+ {
+-  grub_uint8_t *ptr, *ptr0;
++  const grub_uint8_t *ptr, *ptr0;
+ 
+   ptr = ptr0 = vend;
+ 
+-- 
+2.1.4
+

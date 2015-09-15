@@ -1,0 +1,7 @@
+#!/bin/sh
+
+gpasswd -a daemon bin
+make -C test -k tests root-tests |sed \
+ -e 's|^\[.*\] \(.*\) -- ok$|PASS: \1|' \
+ -e 's|^\[.*\] \(.*\) -- failed|FAIL: \1|'
+gpasswd -d daemon bin

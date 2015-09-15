@@ -1,0 +1,26 @@
+Upstream-Status: Pending
+
+This patch fixes following issue with automake 1.12
+
+| automake: warnings are treated as errors
+| /srv/home/nitin/builds/build-gcc47/tmp/sysroots/x86_64-linux/usr/share/automake-1.12/am/ltlibrary.am: warning: 'libidn.la': linking libtool libraries using a non-POSIX
+| /srv/home/nitin/builds/build-gcc47/tmp/sysroots/x86_64-linux/usr/share/automake-1.12/am/ltlibrary.am: archiver requires 'AM_PROG_AR' in 'configure.ac'
+
+Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+2012/05/03
+
+Index: libidn-1.24/configure.ac
+===================================================================
+--- libidn-1.24.orig/configure.ac
++++ libidn-1.24/configure.ac
+@@ -34,6 +34,10 @@ AC_SUBST(LT_CURRENT, 17)
+ AC_SUBST(LT_REVISION, 7)
+ AC_SUBST(LT_AGE, 6)
+ 
++# automake 1.12 seems to require this, but automake 1.11 doesn't recognize it
++m4_pattern_allow([AM_PROG_AR])
++AM_PROG_AR
++
+ AC_PROG_CC
+ gl_EARLY
+ lgl_EARLY

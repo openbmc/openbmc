@@ -1,0 +1,112 @@
+Upstream-Status: Pending
+
+11/30/2010
+--with-libbind=PATH is available but not used by Makefile,
+this patch is to allow building with external bind
+
+Signed-off-by: Qing He <qing.he@intel.com>
+
+Index: dhcp-4.3.0/Makefile.am
+===================================================================
+--- dhcp-4.3.0.orig/Makefile.am
++++ dhcp-4.3.0/Makefile.am
+@@ -25,7 +25,7 @@ EXTRA_DIST = RELNOTES LICENSE \
+ 	     bind/Makefile bind/bind.tar.gz bind/version.tmp \
+ 	     common/tests/Atffile server/tests/Atffile
+ 
+-SUBDIRS = bind includes tests common dst omapip client dhcpctl relay server
++SUBDIRS = includes tests common dst omapip client dhcpctl relay server
+ 
+ nobase_include_HEADERS = dhcpctl/dhcpctl.h
+ 
+Index: dhcp-4.3.0/client/Makefile.am
+===================================================================
+--- dhcp-4.3.0.orig/client/Makefile.am
++++ dhcp-4.3.0/client/Makefile.am
+@@ -4,8 +4,8 @@ dhclient_SOURCES = clparse.c dhclient.c
+ 		   scripts/bsdos scripts/freebsd scripts/linux scripts/macos \
+ 		   scripts/netbsd scripts/nextstep scripts/openbsd \
+ 		   scripts/solaris scripts/openwrt
+-dhclient_LDADD = ../common/libdhcp.a ../omapip/libomapi.a ../bind/lib/libirs.a \
+-		 ../bind/lib/libdns.a ../bind/lib/libisccfg.a ../bind/lib/libisc.a
++dhclient_LDADD = ../common/libdhcp.a ../omapip/libomapi.a $(libbind)/libirs.a \
++		 $(libbind)/libdns.a $(libbind)/libisccfg.a $(libbind)/libisc.a
+ man_MANS = dhclient.8 dhclient-script.8 dhclient.conf.5 dhclient.leases.5
+ EXTRA_DIST = $(man_MANS)
+ 
+Index: dhcp-4.3.0/configure.ac
+===================================================================
+--- dhcp-4.3.0.orig/configure.ac
++++ dhcp-4.3.0/configure.ac
+@@ -566,6 +566,7 @@ no)
+ 	libbind="$use_libbind"
+ 	;;
+ esac
++AC_SUBST([libbind])
+ 
+ # OpenLDAP support.
+ AC_ARG_WITH(ldap,
+Index: dhcp-4.3.0/dhcpctl/Makefile.am
+===================================================================
+--- dhcp-4.3.0.orig/dhcpctl/Makefile.am
++++ dhcp-4.3.0/dhcpctl/Makefile.am
+@@ -6,12 +6,12 @@ EXTRA_DIST = $(man_MANS)
+ 
+ omshell_SOURCES = omshell.c
+ omshell_LDADD = libdhcpctl.a ../common/libdhcp.a ../omapip/libomapi.a \
+-	        ../bind/lib/libirs.a ../bind/lib/libdns.a \
+-	        ../bind/lib/libisccfg.a ../bind/lib/libisc.a
++	        $(libbind)/libirs.a $(libbind)/libdns.a \
++	        $(libbind)/libisccfg.a $(libbind)/libisc.a
+ 
+ libdhcpctl_a_SOURCES = dhcpctl.c callback.c remote.c
+ 
+ cltest_SOURCES = cltest.c
+ cltest_LDADD = libdhcpctl.a ../common/libdhcp.a ../omapip/libomapi.a \
+-	       ../bind/lib/libirs.a ../bind/lib/libdns.a \
+-               ../bind/lib/libisccfg.a ../bind/lib/libisc.a
++	       $(libbind)/libirs.a $(libbind)/libdns.a \
++               $(libbind)/libisccfg.a $(libbind)/libisc.a
+Index: dhcp-4.3.0/omapip/Makefile.am
+===================================================================
+--- dhcp-4.3.0.orig/omapip/Makefile.am
++++ dhcp-4.3.0/omapip/Makefile.am
+@@ -10,6 +10,6 @@ man_MANS = omapi.3
+ EXTRA_DIST = $(man_MANS)
+ 
+ svtest_SOURCES = test.c
+-svtest_LDADD = libomapi.a ../bind/lib/libirs.a ../bind/lib/libdns.a \
+-		../bind/lib/libisccfg.a ../bind/lib/libisc.a
++svtest_LDADD = libomapi.a $(libbind)/libirs.a $(libbind)/libdns.a \
++		$(libbind)/libisccfg.a $(libbind)/libisc.a
+ 
+Index: dhcp-4.3.0/relay/Makefile.am
+===================================================================
+--- dhcp-4.3.0.orig/relay/Makefile.am
++++ dhcp-4.3.0/relay/Makefile.am
+@@ -3,8 +3,8 @@ AM_CPPFLAGS = -DLOCALSTATEDIR='"@localst
+ sbin_PROGRAMS = dhcrelay
+ dhcrelay_SOURCES = dhcrelay.c
+ dhcrelay_LDADD = ../common/libdhcp.a ../omapip/libomapi.a \
+-		 ../bind/lib/libirs.a ../bind/lib/libdns.a \
+-		 ../bind/lib/libisccfg.a ../bind/lib/libisc.a
++		 $(libbind)/libirs.a $(libbind)/libdns.a \
++		 $(libbind)/libisccfg.a $(libbind)/libisc.a
+ man_MANS = dhcrelay.8
+ EXTRA_DIST = $(man_MANS)
+ 
+Index: dhcp-4.3.0/server/Makefile.am
+===================================================================
+--- dhcp-4.3.0.orig/server/Makefile.am
++++ dhcp-4.3.0/server/Makefile.am
+@@ -14,8 +14,8 @@ dhcpd_SOURCES = dhcpd.c dhcp.c bootp.c c
+ 
+ dhcpd_CFLAGS = $(LDAP_CFLAGS)
+ dhcpd_LDADD = ../common/libdhcp.a ../omapip/libomapi.a \
+-	      ../dhcpctl/libdhcpctl.a ../bind/lib/libirs.a \
+-	      ../bind/lib/libdns.a ../bind/lib/libisccfg.a ../bind/lib/libisc.a
++	      ../dhcpctl/libdhcpctl.a $(libbind)/libirs.a \
++	      $(libbind)/libdns.a $(libbind)/libisccfg.a $(libbind)/libisc.a
+ 
+ man_MANS = dhcpd.8 dhcpd.conf.5 dhcpd.leases.5
+ EXTRA_DIST = $(man_MANS)

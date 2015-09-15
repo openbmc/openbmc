@@ -1,0 +1,163 @@
+Upstream-Status: Inappropriate [configuration]
+
+Date: Jan 31, 2011
+
+There are two fixes:
+  1. -native needs to customize prefix
+  2. needs to change python reference in binaries
+
+Signed-off-by: Qing He <qing.he@intel.com>
+
+diff --git a/Makefile b/Makefile
+index b2d1a32..3c3639f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -3,22 +3,22 @@ VERSION = 0.4.11
+ SHELL = /bin/sh
+ top_srcdir = .
+ srcdir = .
+-prefix = /usr
+-exec_prefix = ${prefix}
+-
+-bindir = ${exec_prefix}/bin
+-sbindir = ${exec_prefix}/sbin
+-libexecdir = ${exec_prefix}/libexec
+-datadir = ${prefix}/share
+-sysconfdir = ${prefix}/etc
+-sharedstatedir = ${prefix}/com
+-localstatedir = ${prefix}/var
+-libdir = ${exec_prefix}/lib
+-infodir = ${prefix}/info
++prefix ?= /usr
++exec_prefix ?= ${prefix}
++
++bindir ?= ${exec_prefix}/bin
++sbindir ?= ${exec_prefix}/sbin
++libexecdir ?= ${exec_prefix}/libexec
++datadir ?= ${prefix}/share
++sysconfdir ?= ${prefix}/etc
++sharedstatedir ?= ${prefix}/com
++localstatedir ?= ${prefix}/var
++libdir ?= ${exec_prefix}/lib
++infodir ?= ${prefix}/info
+ docdir = 
+-includedir = ${prefix}/include
++includedir ?= ${prefix}/include
+ oldincludedir = /usr/include
+-mandir = ${prefix}/share/man
++mandir ?= ${prefix}/share/man
+ 
+ pkgdatadir = $(datadir)/$(PACKAGE)
+ pkglibdir = $(libdir)/$(PACKAGE)
+diff --git a/bin/Makefile b/bin/Makefile
+index 52c1f50..e30610e 100644
+--- a/bin/Makefile
++++ b/bin/Makefile
+@@ -1,22 +1,22 @@
+ SHELL = /bin/sh
+ top_srcdir = ..
+ srcdir = ../bin
+-prefix = /usr
+-exec_prefix = ${prefix}
+-
+-bindir = ${exec_prefix}/bin
+-sbindir = ${exec_prefix}/sbin
+-libexecdir = ${exec_prefix}/libexec
+-datadir = ${prefix}/share
+-sysconfdir = ${prefix}/etc
+-sharedstatedir = ${prefix}/com
+-localstatedir = ${prefix}/var
+-libdir = ${exec_prefix}/lib
+-infodir = ${prefix}/info
++prefix ?= /usr
++exec_prefix ?= ${prefix}
++
++bindir ?= ${exec_prefix}/bin
++sbindir ?= ${exec_prefix}/sbin
++libexecdir ?= ${exec_prefix}/libexec
++datadir ?= ${prefix}/share
++sysconfdir ?= ${prefix}/etc
++sharedstatedir ?= ${prefix}/com
++localstatedir ?= ${prefix}/var
++libdir ?= ${exec_prefix}/lib
++infodir ?= ${prefix}/info
+ docdir = 
+-includedir = ${prefix}/include
++includedir ?= ${prefix}/include
+ oldincludedir = /usr/include
+-mandir = ${prefix}/man
++mandir ?= ${prefix}/man
+ 
+ pkgdatadir = $(datadir)/$(PACKAGE)
+ pkglibdir = $(libdir)/$(PACKAGE)
+@@ -40,8 +40,11 @@ all: $(srcdir)/$(PACKAGE)
+ 
+ 
+ install: all installdirs
+-	$(INSTALL_BIN) $(srcdir)/$(PACKAGE) $(DESTDIR)$(bindir)/$(PACKAGE)
+-	$(INSTALL_BIN) $(srcdir)/modifyrepo $(DESTDIR)$(bindir)/modifyrepo
++	sed -e "s|@DATADIR@|$(datadir)|" $(srcdir)/$(PACKAGE) > $(srcdir)/$(PACKAGE).tmp
++	sed -e "s|@DATADIR@|$(datadir)|" $(srcdir)/modifyrepo > $(srcdir)/modifyrepo.tmp
++	$(INSTALL_BIN) $(srcdir)/$(PACKAGE).tmp $(DESTDIR)$(bindir)/$(PACKAGE)
++	$(INSTALL_BIN) $(srcdir)/modifyrepo.tmp $(DESTDIR)$(bindir)/modifyrepo
++	rm -f $(srcdir)/$(PACKAGE).tmp $(srcdir)/modifyrepo.tmp
+ 
+ 
+ uninstall:
+diff --git a/bin/createrepo b/bin/createrepo
+index b0de515..eaacb39 100755
+--- a/bin/createrepo
++++ b/bin/createrepo
+@@ -1,2 +1,2 @@
+ #!/bin/sh
+-exec /usr/share/createrepo/genpkgmetadata.py "$@"
++exec @DATADIR@/createrepo/genpkgmetadata.py "$@"
+diff --git a/bin/modifyrepo b/bin/modifyrepo
+index c9732d8..6f7c1d4 100755
+--- a/bin/modifyrepo
++++ b/bin/modifyrepo
+@@ -1,2 +1,2 @@
+ #!/bin/sh
+-exec /usr/share/createrepo/modifyrepo.py "$@"
++exec @DATADIR@/createrepo/modifyrepo.py "$@"
+diff --git a/docs/Makefile b/docs/Makefile
+index 0a41179..e128c85 100644
+--- a/docs/Makefile
++++ b/docs/Makefile
+@@ -1,22 +1,22 @@
+ SHELL = /bin/sh
+ top_srcdir = ..
+ srcdir = ../docs
+-prefix = /usr
+-exec_prefix = ${prefix}
+-
+-bindir = ${exec_prefix}/bin
+-sbindir = ${exec_prefix}/sbin
+-libexecdir = ${exec_prefix}/libexec
+-datadir = ${prefix}/share
+-sysconfdir = ${prefix}/etc
+-sharedstatedir = ${prefix}/com
+-localstatedir = ${prefix}/var
+-libdir = ${exec_prefix}/lib
+-infodir = ${prefix}/info
++prefix ?= /usr
++exec_prefix ?= ${prefix}
++
++bindir ?= ${exec_prefix}/bin
++sbindir ?= ${exec_prefix}/sbin
++libexecdir ?= ${exec_prefix}/libexec
++datadir ?= ${prefix}/share
++sysconfdir ?= ${prefix}/etc
++sharedstatedir ?= ${prefix}/com
++localstatedir ?= ${prefix}/var
++libdir ?= ${exec_prefix}/lib
++infodir ?= ${prefix}/info
+ docdir = 
+-includedir = ${prefix}/include
++includedir ?= ${prefix}/include
+ oldincludedir = /usr/include
+-mandir = ${datadir}/man
++mandir ?= ${datadir}/man
+ 
+ pkgdatadir = $(datadir)/$(PACKAGE)
+ pkglibdir = $(libdir)/$(PACKAGE)

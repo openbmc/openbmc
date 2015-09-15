@@ -1,0 +1,15 @@
+Upstream-Status: Pending
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+--- src/man.c	2008-12-21 19:17:31.000000000 +0100
++++ src/man.c.oden	2008-12-21 19:17:38.000000000 +0100
+@@ -391,7 +391,7 @@ again:
+ 	  beg++;
+ 
+      end = beg;
+-     while (*end != ' ' && *end != '\t' && *end != '\n' && *end != '\0')
++     while (*end != ' ' && *end != '\t' && *end != '\n' && *end != '\0' && (end-buf)<BUFSIZE)
+ 	  end++;		/* note that buf is NUL-terminated */
+      *end = '\0';
+ 

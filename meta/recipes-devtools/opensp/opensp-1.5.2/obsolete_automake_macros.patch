@@ -1,0 +1,15 @@
+Upstream-Status: Submitted [https://sourceforge.net/tracker/?func=detail&aid=3599291&group_id=2115&atid=102115]
+
+Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
+diff -Nurd OpenSP-1.5.2/configure.in OpenSP-1.5.2/configure.in
+--- OpenSP-1.5.2/configure.in	2005-12-23 16:15:21.000000000 +0200
++++ OpenSP-1.5.2/configure.in	2013-01-03 09:04:51.922645689 +0200
+@@ -16,7 +16,7 @@
+ AM_INIT_AUTOMAKE(OpenSP, 1.5.2, no-define)
+ AM_MAINTAINER_MODE
+ AC_PREREQ(2.53)
+-AM_CONFIG_HEADER(config.h)
++AC_CONFIG_HEADERS(config.h)
+ AM_SANITY_CHECK
+
+ dnl Autoheader definitions

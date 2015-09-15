@@ -1,0 +1,15 @@
+Upstream-Status: Inappropriate [configuration]
+
+Index: pygtk-2.17.0/Makefile.am
+===================================================================
+--- pygtk-2.17.0.orig/Makefile.am
++++ pygtk-2.17.0/Makefile.am
+@@ -4,7 +4,7 @@ if BUILD_GTK
+   GTK_SUBDIR = gtk
+ endif
+ 
+-SUBDIRS = . $(GTK_SUBDIR) examples tests docs
++SUBDIRS = . $(GTK_SUBDIR) examples tests
+ 
+ PLATFORM_VERSION = 2.0
+ 

@@ -1,0 +1,54 @@
+Upstream-Status: Inappropriate [Embedded specific]
+
+This patch fixes issuing with different libdir like lib64.
+This patch makes the native python binary modules findable
+in the install process of the host python.
+
+Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+Date: 2012/03/14
+
+Updated for python 2.7.3
+Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+Date: 2012/05/01
+
+Index: Python-3.3.0rc2/Lib/sysconfig.py
+===================================================================
+--- Python-3.3.0rc2.orig/Lib/sysconfig.py	2012-09-20 22:50:11.000000000 -0700
++++ Python-3.3.0rc2/Lib/sysconfig.py	2012-09-20 22:53:01.561123396 -0700
+@@ -21,9 +21,9 @@
+ 
+ _INSTALL_SCHEMES = {
+     'posix_prefix': {
+-        'stdlib': '{installed_base}/'+sys.lib+'/python{py_version_short}',
++        'stdlib': '{base}/'+sys.lib+'/python{py_version_short}',
+         'platstdlib': '{platbase}/'+sys.lib+'/python{py_version_short}',
+-        'purelib': '{base}/lib/python{py_version_short}/site-packages',
++        'purelib': '{base}/'+sys.lib+'/python{py_version_short}/site-packages',
+         'platlib': '{platbase}/'+sys.lib+'/python{py_version_short}/site-packages',
+         'include':
+             '{installed_base}/include/python{py_version_short}{abiflags}',
+@@ -83,7 +83,7 @@
+     'posix_user': {
+         'stdlib': '{userbase}/'+sys.lib+'/python{py_version_short}',
+         'platstdlib': '{userbase}/'+sys.lib+'/python{py_version_short}',
+-        'purelib': '{userbase}/lib/python{py_version_short}/site-packages',
++        'purelib': '{userbase}/'+sys.lib+'/python{py_version_short}/site-packages',
+         'platlib': '{userbase}/'+sys.lib+'/python{py_version_short}/site-packages',
+         'include': '{userbase}/include/python{py_version_short}',
+         'scripts': '{userbase}/bin',
+Index: Python-3.3.0rc2/Makefile.pre.in
+===================================================================
+--- Python-3.3.0rc2.orig/Makefile.pre.in	2012-09-20 22:50:11.000000000 -0700
++++ Python-3.3.0rc2/Makefile.pre.in	2012-09-20 22:50:54.245123997 -0700
+@@ -1080,9 +1080,9 @@
+ 		$(INSTALL_DATA) $(srcdir)/Modules/xxmodule.c \
+ 			$(DESTDIR)$(LIBDEST)/distutils/tests ; \
+ 	fi
+-	-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
++	-PYTHONPATH=$(DESTDIR)$(LIBDEST):${CROSSPYTHONPATH} $(RUNSHARED) \
+ 		$(PYTHON_FOR_BUILD) -m lib2to3.pgen2.driver $(DESTDIR)$(LIBDEST)/lib2to3/Grammar.txt
+-	-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
++	-PYTHONPATH=$(DESTDIR)$(LIBDEST):${CROSSPYTHONPATH} $(RUNSHARED) \
+ 		$(PYTHON_FOR_BUILD) -m lib2to3.pgen2.driver $(DESTDIR)$(LIBDEST)/lib2to3/PatternGrammar.txt
+ 
+ # Create the PLATDIR source directory, if one wasn't distributed..

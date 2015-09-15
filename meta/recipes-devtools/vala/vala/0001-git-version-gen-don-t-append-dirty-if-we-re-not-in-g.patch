@@ -1,0 +1,55 @@
+From 2460d7b79f7e90dcfeebde5e9c53d9b6798a1f3c Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Tue, 21 Feb 2012 17:12:50 +0100
+Subject: [PATCH] git-version-gen: don't append -dirty if we're not in git
+ repo
+
+* for example if we have some dirty directory and we unpack clean vala tarball in it, then it will append -dirty
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
+Upstream-Status: Inappropriate [OE-Specific]
+---
+ build-aux/git-version-gen |   25 ++++++++++++++-----------
+ 1 files changed, 14 insertions(+), 11 deletions(-)
+
+diff --git a/build-aux/git-version-gen b/build-aux/git-version-gen
+index 0fa6faa..1d1f9d2 100755
+--- a/build-aux/git-version-gen
++++ b/build-aux/git-version-gen
+@@ -126,18 +126,21 @@ fi
+ 
+ v=`echo "$v" |sed 's/^v//'`
+ 
+-# Don't declare a version "dirty" merely because a time stamp has changed.
+-git status > /dev/null 2>&1
++if test -d .git
++then
++	# Don't declare a version "dirty" merely because a time stamp has changed.
++	git status > /dev/null 2>&1
+ 
+-dirty=`sh -c 'git diff-index --name-only HEAD' 2>/dev/null` || dirty=
+-case "$dirty" in
+-    '') ;;
+-    *) # Append the suffix only if there isn't one already.
+-	case $v in
+-	  *-dirty) ;;
+-	  *) v="$v-dirty" ;;
+-	esac ;;
+-esac
++	dirty=`sh -c 'git diff-index --name-only HEAD' 2>/dev/null` || dirty=
++	case "$dirty" in
++	    '') ;;
++	    *) # Append the suffix only if there isn't one already.
++		case $v in
++		  *-dirty) ;;
++		  *) v="$v-dirty" ;;
++		esac ;;
++	esac
++fi
+ 
+ # Omit the trailing newline, so that m4_esyscmd can use the result directly.
+ echo "$v" | tr -d '\012'
+-- 
+1.7.8.4
+

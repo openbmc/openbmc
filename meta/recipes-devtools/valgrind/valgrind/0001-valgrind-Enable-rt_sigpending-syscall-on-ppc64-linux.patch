@@ -1,0 +1,35 @@
+From 1a8006f56342dae9f7100a3c33d80873676e0404 Mon Sep 17 00:00:00 2001
+From: Li Zhou <li.zhou@windriver.com>
+Date: Mon, 24 Aug 2015 03:55:18 -0400
+Subject: [PATCH] valgrind: Enable rt_sigpending syscall on ppc64 linux
+
+New Revision: 15133
+Enable rt_sigpending syscall on ppc64 linux.
+Patch from Thomas Huth <thuth@redhat.com>
+
+Get the patch from valgrind upstream:
+http://valgrind.10908.n7.nabble.com/Valgrind-r15133-in-trunk-NEWS-coregrind-m-syswrap-syswrap-ppc64-linux-c-td54589.html
+
+Upstream-Status: backport
+
+Signed-off-by: Li Zhou <li.zhou@windriver.com>
+---
+ coregrind/m_syswrap/syswrap-ppc64-linux.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/coregrind/m_syswrap/syswrap-ppc64-linux.c b/coregrind/m_syswrap/syswrap-ppc64-linux.c
+index 5946ee1..8aaa1d7 100644
+--- a/coregrind/m_syswrap/syswrap-ppc64-linux.c
++++ b/coregrind/m_syswrap/syswrap-ppc64-linux.c
+@@ -887,7 +887,7 @@ static SyscallTableEntry syscall_table[] = {
+    LINXY(__NR_rt_sigaction,      sys_rt_sigaction),       // 173
+    LINXY(__NR_rt_sigprocmask,    sys_rt_sigprocmask),     // 174
+ 
+-// _____(__NR_rt_sigpending,     sys_rt_sigpending),      // 175
++   LINXY(__NR_rt_sigpending,     sys_rt_sigpending),      // 175
+    LINXY(__NR_rt_sigtimedwait,   sys_rt_sigtimedwait),    // 176
+    LINXY(__NR_rt_sigqueueinfo,   sys_rt_sigqueueinfo),    // 177
+    LINX_(__NR_rt_sigsuspend,     sys_rt_sigsuspend),      // 178
+-- 
+1.9.1
+

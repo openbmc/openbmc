@@ -1,0 +1,42 @@
+Upstream-Status: Pending
+
+Add missing length fields to the replies. Without these, sanity checking in recent X
+breaks things.
+
+RP 11/2/10
+
+
+Index: git/xcalibrateproto.h
+===================================================================
+--- git.orig/xcalibrateproto.h	2010-02-11 11:47:45.711985932 +0000
++++ git/xcalibrateproto.h	2010-02-11 11:40:21.000000000 +0000
+@@ -67,13 +67,13 @@
+     BYTE    type;   /* X_Reply */
+     BYTE    pad1;
+     CARD16  sequenceNumber B16;
++    CARD32  length;
+     CARD32  status;
+     CARD32  pad2 B32;
+     CARD32  pad3 B32;
+     CARD32  pad4 B32;
+     CARD32  pad5 B32;
+     CARD32  pad6 B32;
+-    CARD32  pad7 B32;
+ } xXCalibrateRawModeReply;
+ 
+ #define sz_xXCalibrateRawModeReply	32
+@@ -92,13 +92,13 @@
+     BYTE    type;   /* X_Reply */
+     BYTE    pad1;
+     CARD16  sequenceNumber B16;
++    CARD32  length;
+     CARD32  x;
+     CARD32  y;
+     CARD32  pad2 B32;
+     CARD32  pad3 B32;
+     CARD32  pad4 B32;
+     CARD32  pad5 B32;
+-    CARD32  pad6 B32;
+ } xXCalibrateScreenToCoordReply;
+ 
+ #define sz_xXCalibrateScreenToCoordReply	32

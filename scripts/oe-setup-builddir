@@ -1,0 +1,140 @@
+#!/bin/sh
+
+# OE Build Environment Setup Script
+#
+# Copyright (C) 2006-2011 Linux Foundation
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+if [ -z "$BUILDDIR" ]; then
+    echo >&2 "Error: The build directory (BUILDDIR) must be set!"
+    exit 1
+fi
+
+mkdir -p "$BUILDDIR/conf"
+
+if [ ! -d "$BUILDDIR" ]; then
+    echo >&2 "Error: The builddir ($BUILDDIR) does not exist!"
+    exit 1
+fi
+
+if [ ! -w "$BUILDDIR" ]; then
+    echo >&2 "Error: Cannot write to $BUILDDIR, perhaps try sourcing with a writable path? i.e. . oe-init-build-env ~/my-build"
+    exit 1
+fi
+
+# Attempting removal of sticky,setuid bits from BUILDDIR, BUILDDIR/conf
+chmod -st "$BUILDDIR" 2>/dev/null || echo "WARNING: unable to chmod $BUILDDIR"
+chmod -st "$BUILDDIR/conf" 2>/dev/null || echo "WARNING: unable to chmod $BUILDDIR/conf"
+
+cd "$BUILDDIR"
+
+if [ -f "$BUILDDIR/conf/templateconf.cfg" ]; then
+    TEMPLATECONF=$(cat "$BUILDDIR/conf/templateconf.cfg")
+fi
+
+. $OEROOT/.templateconf
+
+if [ ! -f "$BUILDDIR/conf/templateconf.cfg" ]; then
+    echo "$TEMPLATECONF" >"$BUILDDIR/conf/templateconf.cfg"
+fi
+
+# 
+# $TEMPLATECONF can point to a directory for the template local.conf & bblayers.conf
+#
+if [ -n "$TEMPLATECONF" ]; then
+    if [ ! -d "$TEMPLATECONF" ]; then
+        # Allow TEMPLATECONF=meta-xyz/conf as a shortcut
+        if [ -d "$OEROOT/$TEMPLATECONF" ]; then
+            TEMPLATECONF="$OEROOT/$TEMPLATECONF"
+        fi
+        if [ ! -d "$TEMPLATECONF" ]; then
+            echo >&2 "Error: '$TEMPLATECONF' must be a directory containing local.conf & bblayers.conf"
+            exit 1
+        fi
+    fi
+    OECORELAYERCONF="$TEMPLATECONF/bblayers.conf.sample"
+    OECORELOCALCONF="$TEMPLATECONF/local.conf.sample"
+    OECORENOTESCONF="$TEMPLATECONF/conf-notes.txt"
+fi
+
+unset SHOWYPDOC
+if [ -z "$OECORELOCALCONF" ]; then
+    OECORELOCALCONF="$OEROOT/meta/conf/local.conf.sample"
+fi
+if [ ! -r "$BUILDDIR/conf/local.conf" ]; then
+cat <<EOM
+You had no conf/local.conf file. This configuration file has therefore been
+created for you with some default values. You may wish to edit it to use a 
+different MACHINE (target hardware) or enable parallel build options to take 
+advantage of multiple cores for example. See the file for more information as 
+common configuration options are commented.
+
+EOM
+    cp -f $OECORELOCALCONF "$BUILDDIR/conf/local.conf"
+    SHOWYPDOC=yes
+fi
+
+if [ -z "$OECORELAYERCONF" ]; then
+    OECORELAYERCONF="$OEROOT/meta/conf/bblayers.conf.sample"
+fi
+if [ ! -r "$BUILDDIR/conf/bblayers.conf" ]; then
+    cat <<EOM
+You had no conf/bblayers.conf file. The configuration file has been created for
+you with some default values. To add additional metadata layers into your
+configuration please add entries to this file.
+
+EOM
+
+    # Put the abosolute path to the layers in bblayers.conf so we can run
+    # bitbake without the init script after the first run
+    # ##COREBASE## is deprecated as it's meaning was inconsistent, but continue
+    # to replace it for compatibility.
+    sed -e "s|##OEROOT##|$OEROOT|g" \
+        -e "s|##COREBASE##|$OEROOT|g" \
+        $OECORELAYERCONF > "$BUILDDIR/conf/bblayers.conf"
+    SHOWYPDOC=yes
+fi
+
+# Prevent disturbing a new GIT clone in same console
+unset OECORELOCALCONF
+unset OECORELAYERCONF
+
+# Ending the first-time run message. Show the YP Documentation banner.
+if [ ! -z "$SHOWYPDOC" ]; then
+    cat <<EOM
+The Yocto Project has extensive documentation about OE including a reference
+manual which can be found at:
+    http://yoctoproject.org/documentation
+
+For more information about OpenEmbedded see their website:
+    http://www.openembedded.org/
+
+EOM
+#    unset SHOWYPDOC
+fi
+
+cat <<EOM
+
+### Shell environment set up for builds. ###
+
+You can now run 'bitbake <target>'
+
+EOM
+if [ -z "$OECORENOTESCONF" ]; then
+    OECORENOTESCONF="$OEROOT/meta/conf/conf-notes.txt"
+fi
+[ ! -r "$OECORENOTESCONF" ] || cat $OECORENOTESCONF
+unset OECORENOTESCONF

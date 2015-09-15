@@ -1,0 +1,16 @@
+#!/bin/sh
+
+CONFIGF=/var/lib/connman/wired.config
+
+# Extract wired network config from /proc/cmdline
+NET_CONF=`cat /proc/cmdline |sed -ne 's/^.*ip=\([^ ]*\):\([^ ]*\):\([^ ]*\):\([^ ]*\).*$/\1\/\4\/\3/p'`
+
+# Check if eth0 is already set via kernel cmdline
+if [ "x$NET_CONF" = "x" ]; then
+	# Wired interface is not configured via kernel cmdline
+	# Remove connman config file template
+	rm -f ${CONFIGF}
+else
+	# Setup a connman config accordingly
+	sed -i -e "s|^IPv4 =.*|IPv4 = ${NET_CONF}|" ${CONFIGF}
+fi

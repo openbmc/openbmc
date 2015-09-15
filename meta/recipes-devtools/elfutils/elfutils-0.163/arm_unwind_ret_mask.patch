@@ -1,0 +1,83 @@
+From: Mark Wielaard <mjw@redhat.com>
+Date: Sun, 15 Jun 2014 12:30:02 +0200
+Subject: libebl: Add ebl_unwind_ret_mask.
+
+Another ARM oddity. A return value address in an unwind will contain an
+extra bit to indicate whether to return to a regular ARM or THUMB function.
+Add a new ebl function to return a mask to use to get the actual return
+address during an unwind ebl_unwind_ret_mask.
+
+Rebase arm_unwind_ret_mask.patch from 0.159 to 0.160
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ backends/arm_init.c | 3 +++
+ libebl/eblinitreg.c | 8 ++++++++
+ libebl/libebl.h     | 4 ++++
+ libebl/libeblP.h    | 6 ++++++
+ 4 files changed, 21 insertions(+)
+
+diff --git a/backends/arm_init.c b/backends/arm_init.c
+index 2266829..f8df042 100644
+--- a/backends/arm_init.c
++++ b/backends/arm_init.c
+@@ -87,5 +87,8 @@ arm_init (elf, machine, eh, ehlen)
+   /* Bit zero encodes whether an function address is THUMB or ARM. */
+   eh->func_addr_mask = ~(GElf_Addr)1;
+ 
++  /* Bit zero encodes whether to return to a THUMB or ARM function. */
++  eh->unwind_ret_mask = ~(GElf_Addr)1;
++
+   return MODVERSION;
+ }
+diff --git a/libebl/eblinitreg.c b/libebl/eblinitreg.c
+index 5729b3c..ca681c0 100644
+--- a/libebl/eblinitreg.c
++++ b/libebl/eblinitreg.c
+@@ -56,3 +56,11 @@ ebl_func_addr_mask (Ebl *ebl)
+   return ((ebl == NULL || ebl->func_addr_mask == 0)
+ 	  ? ~(GElf_Addr)0 : ebl->func_addr_mask);
+ }
++
++GElf_Addr
++ebl_unwind_ret_mask (Ebl *ebl)
++{
++  return ((ebl == NULL || ebl->unwind_ret_mask == 0)
++	  ? ~(GElf_Addr)0 : ebl->unwind_ret_mask);
++}
++
+diff --git a/libebl/libebl.h b/libebl/libebl.h
+index 40cf635..be70027 100644
+--- a/libebl/libebl.h
++++ b/libebl/libebl.h
+@@ -420,6 +420,10 @@ extern size_t ebl_frame_nregs (Ebl *ebl)
+    tables) is needed.  */
+ extern GElf_Addr ebl_func_addr_mask (Ebl *ebl);
+ 
++/* Mask to use for unwind return address in case the architecture adds
++   some extra non-address bits to it.  */
++extern GElf_Addr ebl_unwind_ret_mask (Ebl *ebl);
++
+ /* Convert *REGNO as is in DWARF to a lower range suitable for
+    Dwarf_Frame->REGS indexing.  */
+ extern bool ebl_dwarf_to_regno (Ebl *ebl, unsigned *regno)
+diff --git a/libebl/libeblP.h b/libebl/libeblP.h
+index dbd67f3..e18ace6 100644
+--- a/libebl/libeblP.h
++++ b/libebl/libeblP.h
+@@ -70,6 +70,12 @@ struct ebl
+      otherwise it should be the actual mask to use.  */
+   GElf_Addr func_addr_mask;
+ 
++  /* Mask to use to get the return address from an unwind in case the
++     architecture adds some extra non-address bits to it.  When not
++     initialized (0) then ebl_unwind_ret_mask will return ~0, otherwise
++     it should be the actual mask to use.  */
++  GElf_Addr unwind_ret_mask;
++
+   /* Function descriptor load address and table as used by
+      ebl_resolve_sym_value if available for this arch.  */
+   GElf_Addr fd_addr;
+-- 
+1.9.1
+

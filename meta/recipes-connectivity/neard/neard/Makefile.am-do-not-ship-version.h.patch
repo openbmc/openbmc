@@ -1,0 +1,36 @@
+From bfd32d68cfc9f1e31dab88e07446d1c02bc80b5e Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Thu, 12 Feb 2015 00:39:29 -0800
+Subject: [PATCH] Makefile.am: do not ship version.h
+
+The HEADERS' name has been changed to pkginclude_HEADERS, so use
+nodist_pkginclude_HEADERS, otherwise version.h would be shipped.
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ Makefile.am |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 3334790..69cd58f 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -10,11 +10,11 @@ pkginclude_HEADERS = include/types.h include/log.h include/plugin.h \
+ 			include/tlv.h include/setting.h include/device.h \
+ 			include/nfc_copy.h include/snep.h
+ 
+-nodist_include_HEADERS = include/version.h
++nodist_pkginclude_HEADERS = include/version.h
+ 
+ noinst_HEADERS = include/dbus.h
+ 
+-local_headers = $(foreach file,$(pkginclude_HEADERS) $(nodist_include_HEADERS) \
++local_headers = $(foreach file,$(pkginclude_HEADERS) $(nodist_pkginclude_HEADERS) \
+ 			$(noinst_HEADERS), include/near/$(notdir $(file)))
+ 
+ gdbus_sources = gdbus/gdbus.h gdbus/mainloop.c gdbus/watch.c \
+-- 
+1.7.9.5
+

@@ -1,0 +1,24 @@
+# an very old patch cherry-picked in every glib-2.0 patch directory. The earliest container
+# for it is 2.6.5 in OE. The earliest commit for it is c8e5702127e507e82e6f68a4b8c546803accea9d
+# in OE side which ports from previous bitkeeper SCM. In OE side it's only used til 2.12.4.
+#
+# keep it since it's always cleaner to not hardcode destination path. Use @datadir@ is more
+# portable here. mark for upstream
+#
+# by Kevin Tian <kevin.tian@intel.com>, 06/25/2010
+# Rebased by Dongxiao Xu <dongxiao.xu@intel.com>, 11/16/2010
+
+Upstream-Status: Inappropriate [configuration]
+
+diff -ruN glib-2.27.3-orig/glib-gettextize.in glib-2.27.3/glib-gettextize.in
+--- glib-2.27.3-orig/glib-gettextize.in	2009-04-01 07:04:20.000000000 +0800
++++ glib-2.27.3/glib-gettextize.in	2010-11-16 12:55:06.874605916 +0800
+@@ -52,7 +52,7 @@
+ datadir=@datadir@
+ datarootdir=@datarootdir@
+ 
+-gettext_dir=$prefix/share/glib-2.0/gettext
++gettext_dir=@datadir@/glib-2.0/gettext
+ 
+ while test $# -gt 0; do
+   case "$1" in

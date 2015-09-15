@@ -1,0 +1,77 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:             sysklogd
+# Required-Start:       $remote_fs $time
+# Required-Stop:        $remote_fs $time
+# Default-Start:        2 3 4 5
+# Default-Stop:         0 1 6
+# Short-Description:    System logger
+### END INIT INFO
+
+set -e
+
+if [ -f /etc/syslog-startup.conf ]; then
+	. /etc/syslog-startup.conf
+	LOG_LOCAL=0
+	LOG_REMOTE=0
+	for D in $DESTINATION; do
+		if [ "$D" = "buffer" ]; then
+			SYSLOG_ARGS="$SYSLOG_ARGS -C$BUFFERSIZE"
+			LOG_LOCAL=1
+		elif [ "$D" = "file" ]; then
+			if [ -n "$LOGFILE" ]; then
+				SYSLOG_ARGS="$SYSLOG_ARGS -O $LOGFILE"
+			fi
+			if [ -n "$ROTATESIZE" ]; then
+				SYSLOG_ARGS="$SYSLOG_ARGS -s $ROTATESIZE"
+			fi
+			if [ -n "$ROTATEGENS" ]; then
+				SYSLOG_ARGS="$SYSLOG_ARGS -b $ROTATEGENS"
+			fi
+			LOG_LOCAL=1
+		elif [ "$D" = "remote" ]; then
+			SYSLOG_ARGS="$SYSLOG_ARGS -R $REMOTE"
+			LOG_REMOTE=1
+		fi
+	done
+	if [ "$LOG_LOCAL" = "1" -a "$LOG_REMOTE" = "1" ]; then
+		SYSLOG_ARGS="$SYSLOG_ARGS -L"
+	fi
+	if [ "$REDUCE" = "yes" ]; then
+		SYSLOG_ARGS="$SYSLOG_ARGS -S"
+	fi
+	if [ "$DROPDUPLICATES" = "yes" ]; then
+	    SYSLOG_ARGS="$SYSLOG_ARGS -D"
+	fi
+	if [ -n "$LOGLEVEL" ]; then
+	    SYSLOG_ARGS="$SYSLOG_ARGS -l $LOGLEVEL"
+	fi
+else
+	# default: log to 16K shm circular buffer
+	SYSLOG_ARGS="-C"
+fi
+
+case "$1" in
+  start)
+	echo -n "Starting syslogd/klogd: "
+	start-stop-daemon -S -b -n syslogd -a /sbin/syslogd -- -n $SYSLOG_ARGS
+	start-stop-daemon -S -b -n klogd -a /sbin/klogd -- -n
+	echo "done"
+	;;
+  stop)
+	echo -n "Stopping syslogd/klogd: "
+	start-stop-daemon -K -n syslogd
+	start-stop-daemon -K -n klogd
+	echo "done"
+	;;
+  restart)
+  	$0 stop
+	$0 start
+	;;
+  *)
+	echo "Usage: syslog { start | stop | restart }" >&2
+	exit 1
+	;;
+esac
+
+exit 0

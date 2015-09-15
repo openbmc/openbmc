@@ -1,0 +1,36 @@
+Add install-ptest rules.
+
+Signed-off-by: Josep Puigdemont <josep.puigdemont@enea.com>
+Signed-off-by: Maxin B. John <maxin.john@enea.com>
+Upstream-Status: Pending
+
+diff -ur a/Makefile.am b/Makefile.am
+--- a/Makefile.am	2011-08-16 10:13:10.000000000 +0200
++++ b/Makefile.am	2013-04-12 18:02:16.473715873 +0200
+@@ -31,3 +31,8 @@
+ 	d=`date '+%d/%m/%Y'`; \
+ 	sed 's|/\*@DIST_DATE@\*/|"'"$$d"'"|' $(srcdir)/src/version.c > \
+ 		$(distdir)/src/version.c
++
++install-ptest:
++	@for subdir in $(SUBDIRS); do \
++		$(MAKE) -C $$subdir DESTDIR=$(DESTDIR)/$$subdir $@; \
++	done
+diff -ur a/tests/Makefile.am b/tests/Makefile.am
+--- a/tests/Makefile.am	2011-11-11 19:39:42.000000000 +0100
++++ b/tests/Makefile.am	2013-04-12 18:30:57.066301037 +0200
+@@ -132,4 +132,14 @@
+ dtdel_LDADD = ../src/libgdbm.la ../compat/libgdbm_compat.la
+ d_creat_ce_LDADD = ../src/libgdbm.la ../compat/libgdbm_compat.la
+ 
++buildtests: $(check_PROGRAMS) $(TESTSUITE)
+ 
++install-ptest: $(check_PROGRAMS) $(TESTSUITE)
++	@$(INSTALL) -d $(DESTDIR)
++	@for file in $^; do \
++		if [ -x .libs/$$file ]; then \
++			$(INSTALL_PROGRAM) .libs/$$file $(DESTDIR)/$$file; \
++		else \
++			$(INSTALL_PROGRAM) $$file $(DESTDIR) ; \
++		fi \
++	done

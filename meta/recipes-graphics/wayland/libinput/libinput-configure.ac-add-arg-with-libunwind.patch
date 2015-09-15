@@ -1,0 +1,50 @@
+From cc6fce587f2628c8b342764e06fb0fc27c1e8274 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Mon, 3 Aug 2015 20:33:44 -0700
+Subject: [PATCH] configure.ac: add arg --with-libunwind
+
+Add arg --with-libunwind for configure so it's optional to check
+libunwind, which is helpfull to make deterministic builds.
+
+Upstream-Status: Submitted [wayland-devel]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ configure.ac | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 314b0d4..242d251 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -60,13 +60,22 @@ PKG_PROG_PKG_CONFIG()
+ PKG_CHECK_MODULES(MTDEV, [mtdev >= 1.1.0])
+ PKG_CHECK_MODULES(LIBUDEV, [libudev])
+ PKG_CHECK_MODULES(LIBEVDEV, [libevdev >= 0.4])
+-PKG_CHECK_MODULES(LIBUNWIND,
++
++AC_ARG_WITH(libunwind,
++            AS_HELP_STRING([--without-libunwind],[Do not use libunwind]))
++
++AS_IF([test "x$with_libunwind" != "xno"],
++	[PKG_CHECK_MODULES(LIBUNWIND,
+ 		  [libunwind],
+ 		  [HAVE_LIBUNWIND=yes],
+-		  [HAVE_LIBUNWIND=no])
+-if test "x$HAVE_LIBUNWIND" = "xyes"; then
+-	AC_DEFINE(HAVE_LIBUNWIND, 1, [Have libunwind support])
+-fi
++		  [HAVE_LIBUNWIND=no])],
++	[HAVE_LIBUNWIND=no])
++
++AS_IF([test "x$HAVE_LIBUNWIND" = "xyes"],
++	[AC_DEFINE(HAVE_LIBUNWIND, 1, [Have libunwind support])],
++	[AS_IF([test "x$with_libunwind" = "xyes"],
++		[AC_MSG_ERROR([libunwind requested but not found])])])
++
+ AM_CONDITIONAL(HAVE_LIBUNWIND, [test "x$HAVE_LIBUNWIND" = xyes])
+ AC_PATH_PROG(ADDR2LINE, [addr2line])
+ if test "x$ADDR2LINE" != "x"; then
+-- 
+2.3.5
+

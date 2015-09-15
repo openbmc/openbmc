@@ -1,0 +1,31 @@
+From fc653ca3b36435aea281ae409fb90f85e1bc0d81 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 7 Sep 2015 08:44:13 +0000
+Subject: [freedreno][PATCH] drmmode_output_dpms: Replace logical && with bitwise &
+ operation
+
+This is a mask calculation so bitbwise & should have been used
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted
+
+ src/drmmode_display.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/drmmode_display.c b/src/drmmode_display.c
+index c3cf4f8..eb54b59 100644
+--- a/src/drmmode_display.c
++++ b/src/drmmode_display.c
+@@ -777,7 +777,7 @@ drmmode_output_dpms(xf86OutputPtr output, int mode)
+ 
+ 	for (i = 0; i < koutput->count_props; i++) {
+ 		props = drmModeGetProperty(drmmode->fd, koutput->props[i]);
+-		if (props && (props->flags && DRM_MODE_PROP_ENUM)) {
++		if (props && (props->flags & DRM_MODE_PROP_ENUM)) {
+ 			if (!strcmp(props->name, "DPMS")) {
+ 				mode_id = koutput->props[i];
+ 				drmModeFreeProperty(props);
+-- 
+2.5.1
+

@@ -1,0 +1,20 @@
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+Signed-off-by: Ronan Le Martret <ronan.lemartret@open.eurogiciel.org> 
+
+diff --git a/python/rpmmodule.c b/python/rpmmodule.c
+index a4fe217..728c66c 100644
+--- a/python/rpmmodule.c
++++ b/python/rpmmodule.c
+@@ -396,6 +396,10 @@ static int initModule(PyObject *m)
+     REGISTER_ENUM(RPMSENSE_STRONG);
+     REGISTER_ENUM(RPMSENSE_CONFIG);
+ 
++#if defined(RPM_VENDOR_OE)
++    REGISTER_ENUM(RPMSENSE_MISSINGOK);
++#endif
++
+     REGISTER_ENUM(RPMTRANS_FLAG_TEST);
+     REGISTER_ENUM(RPMTRANS_FLAG_BUILD_PROBS);
+     REGISTER_ENUM(RPMTRANS_FLAG_NOSCRIPTS);

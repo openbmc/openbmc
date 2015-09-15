@@ -1,0 +1,25 @@
+commit d71d74daac8ed54156ed103958ab455c63c72b0e
+Author: Song Bing <b06498@freescale.com>
+Date:   Mon Nov 10 11:25:47 2014 +0800
+
+[asteriskh263] decrease the rank as we havn't this kind of decoder.
+
+Decrease the rank as we havn't this kind of decoder.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=739935
+
+Upstream-Status: Pending
+
+Signed-off-by: Song Bing <b06498@freescale.com>
+
+diff --git a/gst/rtp/gstasteriskh263.c b/gst/rtp/gstasteriskh263.c
+index a01fbc8..8fa3194 100644
+--- a/gst/rtp/gstasteriskh263.c
++++ b/gst/rtp/gstasteriskh263.c
+@@ -226,5 +226,5 @@ gboolean
+ gst_asteriskh263_plugin_init (GstPlugin * plugin)
+ {
+   return gst_element_register (plugin, "asteriskh263",
+-      GST_RANK_SECONDARY, GST_TYPE_ASTERISK_H263);
++      GST_RANK_SECONDARY - 1, GST_TYPE_ASTERISK_H263);
+ }

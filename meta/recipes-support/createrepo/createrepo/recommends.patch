@@ -1,0 +1,71 @@
+createrepo: implement recommends support
+
+Record against the corresponding requires entry in the output metadata
+if a dependency relationship is marked with the RPMSENSE_MISSINGOK flag
+(indicating it is a recommendation, rather than a hard dependency).
+
+Upstream-Status: Pending
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+
+diff --git a/dumpMetadata.py b/dumpMetadata.py
+index 70bb2d8..e40e8ac 100644
+--- a/dumpMetadata.py
++++ b/dumpMetadata.py
+@@ -319,6 +319,23 @@ class RpmMetaData:
+                     reqs.append(0)
+         return reqs
+ 
++    def _checkMissingOk(self, flags):
++        reqs=[]
++        if flags is None:
++            return reqs
++
++        if type(flags) is not types.ListType:
++            flags = [flags]
++        for flag in flags:
++            newflag = flag
++            if flag is not None:
++                newflag = flag & rpm.RPMSENSE_MISSINGOK
++                if newflag:
++                    reqs.append(1)
++                else:
++                    reqs.append(0)
++        return reqs
++
+ 
+     def _correctVersion(self, vers):
+         returnvers = []
+@@ -537,9 +554,10 @@ class RpmMetaData:
+         tmpflags = self.hdr[rpm.RPMTAG_REQUIREFLAGS]
+         flags = self._correctFlags(tmpflags)
+         prereq = self._checkPreReq(tmpflags)
++        missingok = self._checkMissingOk(tmpflags)
+         ver = self._correctVersion(self.hdr[rpm.RPMTAG_REQUIREVERSION])
+         if names is not None:
+-            lst = zip(names, flags, ver, prereq)
++            lst = zip(names, flags, ver, prereq, missingok)
+         return self._uniq(lst)
+         
+     def obsoletesList(self):
+@@ -692,7 +710,7 @@ def generateXML(doc, node, formatns, rpmObj, sumtype):
+     depsList = rpmObj.depsList()
+     if len(depsList) > 0:
+         rpconode = format.newChild(formatns, 'requires', None)    
+-        for (name, flags, (e,v,r), prereq) in depsList:
++        for (name, flags, (e,v,r), prereq, missingok) in depsList:
+             entry = rpconode.newChild(formatns, 'entry', None)
+             entry.newProp('name', name)
+             if flags != 0:
+@@ -711,6 +729,8 @@ def generateXML(doc, node, formatns, rpmObj, sumtype):
+                     entry.newProp('rel', str(r))
+             if prereq == 1:
+                 entry.newProp('pre', str(prereq))
++            if missingok:
++                entry.newProp('missingok', '1')
+         
+     for file in rpmObj.usefulFiles():
+         files = format.newChild(None, 'file', None)
+-- 
+1.7.9.5
+

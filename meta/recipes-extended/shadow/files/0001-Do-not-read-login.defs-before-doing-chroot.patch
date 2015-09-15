@@ -1,0 +1,46 @@
+From 170c25c8e0b5c3dc2615d1db94c8d24a13ff99bf Mon Sep 17 00:00:00 2001
+From: Peter Kjellerstedt <pkj@axis.com>
+Date: Thu, 11 Sep 2014 15:11:23 +0200
+Subject: [PATCH] Do not read login.defs before doing chroot()
+
+If "useradd --root <root> ..." was used, the login.defs file would still
+be read from /etc/login.defs instead of <root>/etc/login.defs. This was
+due to getdef_ulong() being called before process_root_flag().
+
+Upstream-Status: Submitted [http://lists.alioth.debian.org/pipermail/pkg-shadow-devel/2014-September/010446.html]
+
+Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+---
+ src/useradd.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/src/useradd.c b/src/useradd.c
+index a8a1f76..e1ebf50 100644
+--- a/src/useradd.c
++++ b/src/useradd.c
+@@ -1993,9 +1993,11 @@ int main (int argc, char **argv)
+ #endif				/* USE_PAM */
+ #endif				/* ACCT_TOOLS_SETUID */
+ 
++#ifdef ENABLE_SUBIDS
+ 	/* Needed for userns check */
+-	uid_t uid_min = (uid_t) getdef_ulong ("UID_MIN", 1000UL);
+-	uid_t uid_max = (uid_t) getdef_ulong ("UID_MAX", 60000UL);
++	uid_t uid_min;
++	uid_t uid_max;
++#endif
+ 
+ 	/*
+ 	 * Get my name so that I can use it to report errors.
+@@ -2026,6 +2028,8 @@ int main (int argc, char **argv)
+ 	is_shadow_grp = sgr_file_present ();
+ #endif
+ #ifdef ENABLE_SUBIDS
++	uid_min = (uid_t) getdef_ulong ("UID_MIN", 1000UL);
++	uid_max = (uid_t) getdef_ulong ("UID_MAX", 60000UL);
+ 	is_sub_uid = sub_uid_file_present () && !rflg &&
+ 	    (!user_id || (user_id <= uid_max && user_id >= uid_min));
+ 	is_sub_gid = sub_gid_file_present () && !rflg &&
+-- 
+1.9.0
+

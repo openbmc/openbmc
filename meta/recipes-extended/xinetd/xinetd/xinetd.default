@@ -1,0 +1,12 @@
+# Default settings for xinetd. This file is sourced by /bin/sh from
+# /etc/init.d/xinetd
+
+# enable xinetd Inetd compat mode
+INETD_COMPAT=Yes
+
+# Options to pass to xinetd
+#
+# -stayalive comes by default : it can be removed if xinetd is expected
+# not to start when no service is configured
+#
+XINETD_OPTS="-stayalive"

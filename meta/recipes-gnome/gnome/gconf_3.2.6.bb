@@ -1,0 +1,60 @@
+SUMMARY = "GNOME configuration system"
+SECTION = "x11/gnome"
+LICENSE = "LGPLv2+"
+LIC_FILES_CHKSUM = "file://COPYING;md5=55ca817ccb7d5b5b66355690e9abc605"
+
+DEPENDS = "glib-2.0 dbus dbus-glib libxml2 intltool-native gobject-introspection-stub"
+DEPENDS_class-native = "glib-2.0-native dbus-native dbus-glib-native libxml2-native intltool-native gnome-common-native gobject-introspection-stub-native"
+
+
+inherit gnomebase gtk-doc gettext
+
+SRC_URI = "${GNOME_MIRROR}/GConf/${@gnome_verdir("${PV}")}/GConf-${PV}.tar.xz;name=archive \
+           file://remove_plus_from_invalid_characters_list.patch \
+           file://unable-connect-dbus.patch \
+"
+
+SRC_URI[archive.md5sum] = "2b16996d0e4b112856ee5c59130e822c"
+SRC_URI[archive.sha256sum] = "1912b91803ab09a5eed34d364bf09fe3a2a9c96751fde03a4e0cfa51a04d784c"
+
+S = "${WORKDIR}/GConf-${PV}"
+
+EXTRA_OECONF = "--enable-shared --disable-static --enable-debug=yes \
+                --disable-introspection --disable-orbit --with-openldap=no --disable-gtk"
+
+# Disable PolicyKit by default
+PACKAGECONFIG ??= ""
+# We really don't want PolicyKit for native or uclibc
+PACKAGECONFIG_class-native = ""
+PACKAGECONFIG_libc-uclibc = ""
+
+PACKAGECONFIG[policykit] = "--enable-defaults-service,--disable-defaults-service,polkit"
+
+do_install_append() {
+	# this directory need to be created to avoid an Error 256 at gdm launch
+	install -d ${D}${sysconfdir}/gconf/gconf.xml.system
+
+	# this stuff is unusable
+	rm -f ${D}${libdir}/GConf/*/*.*a
+	rm -f ${D}${libdir}/gio/*/*.*a
+}
+
+do_install_append_class-native() {
+	create_wrapper ${D}/${bindir}/gconftool-2 \
+		GCONF_BACKEND_DIR=${STAGING_LIBDIR_NATIVE}/GConf/2
+}
+
+# disable dbus-x11 when x11 isn't in DISTRO_FEATURES
+RDEPENDS_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'dbus-x11', '', d)}"
+RDEPENDS_${PN}_class-native = ""
+
+FILES_${PN} += "${libdir}/GConf/* \
+                ${libdir}/gio/*/*.so \
+                ${datadir}/polkit* \
+                ${datadir}/dbus-1/services/*.service \
+                ${datadir}/dbus-1/system-services/*.service \
+               "
+FILES_${PN}-dbg += "${libdir}/*/*/.debug"
+FILES_${PN}-dev += "${datadir}/sgml/gconf/gconf-1.0.dtd"
+
+BBCLASSEXTEND = "native"

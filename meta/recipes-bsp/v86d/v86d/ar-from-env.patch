@@ -1,0 +1,33 @@
+Fix cross link using host-cross ar
+
+If building on 32bit host and creating 64bit libraries, the target
+package builds should not invoke the 32bit hosts's ar.  Specifically
+you will get an error message like:
+
+x86_64-linux-gcc  -m64 --sysroot=/opt/qemux86-64/tmp/sysroots/qemux86-64 -Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed -Llibs/x86emu v86_x86emu.o v86_mem.o v86_common.o  v86.o -lx86emu -o v86d
+libs/x86emu/libx86emu.a: could not read symbols: Archive has no index; run ranlib to add one
+collect2: error: ld returned 1 exit status
+
+Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
+
+Upstream-Status: Pending
+
+---
+ libs/x86emu/Makefile |    6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+--- a/libs/x86emu/Makefile
++++ b/libs/x86emu/Makefile
+@@ -1,7 +1,11 @@
+ OBJS = decode.o fpu.o ops.o ops2.o prim_ops.o sys.o
+ 
++ifeq ($(AR),)
++	AR = ar
++endif
++
+ libx86emu.a: $(OBJS)
+-	ar rv $@ $+
++	$(AR) rv $@ $+
+ 
+ %.o: %.c
+ 	$(CC) -c $(CFLAGS) -o $@ $<

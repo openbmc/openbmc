@@ -1,0 +1,39 @@
+From 5eb10d90af9178edb65e6091ae939d1b5b19bb78 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Tue, 23 Sep 2014 04:47:10 -0400
+Subject: [PATCH] systemtap: allow to disable libvirt
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ configure.ac |   13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index a631ae7..cb4885b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -525,10 +525,15 @@ dnl Check for the libvirt and libxml2 devel packages
+ 
+ dnl We require libvirt >= 1.0.2 because stapvirt relies on the
+ dnl virDomainOpenChannel function, which was implemented in 1.0.2.
+-PKG_CHECK_MODULES([libvirt], [libvirt >= 1.0.2], [
+-   have_libvirt=yes
+-   AC_DEFINE([HAVE_LIBVIRT],[1],[Define to 1 if libvirt development libraries are installed])
+-   ], [have_libvirt=no])
++AC_ARG_ENABLE([libvirt],
++  AS_HELP_STRING([--disable-libvirt], [Do not use libvirt even if present]))
++
++if test "$enable_libvirt" != no; then
++  PKG_CHECK_MODULES([libvirt], [libvirt >= 1.0.2], [
++     have_libvirt=yes
++     AC_DEFINE([HAVE_LIBVIRT],[1],[Define to 1 if libvirt development libraries are installed])
++     ], [have_libvirt=no])
++fi
+ AM_CONDITIONAL([HAVE_LIBVIRT], [test "${have_libvirt}" = "yes"])
+ PKG_CHECK_MODULES([libxml2], [libxml-2.0], [
+    have_libxml2=yes
+-- 
+1.7.9.5
+

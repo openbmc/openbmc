@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -e
+# update native pixbuf loaders
+gdk-pixbuf-query-loaders --update-cache
+
+for icondir in $D/usr/share/icons/*/ ; do
+    if [ -d $icondir ] ; then
+        gtk-update-icon-cache -fqt  $icondir
+    fi
+done
+

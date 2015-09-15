@@ -1,0 +1,35 @@
+From 827eee225897c35ec97194a5971bf4bfcf250748 Mon Sep 17 00:00:00 2001
+From: Brendan O'Dea <bod@debian.org>
+Date: Fri, 16 Dec 2005 01:32:14 +1100
+Subject: Remove Errno version check due to upgrade problems with long-running
+ processes.
+
+Bug-Debian: http://bugs.debian.org/343351
+
+Remove version check which can cause problems for long running
+processes embedding perl when upgrading to a newer version,
+compatible, but built on a different machine.
+
+Patch-Name: debian/errno_ver.diff
+---
+ ext/Errno/Errno_pm.PL | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/ext/Errno/Errno_pm.PL b/ext/Errno/Errno_pm.PL
+index c6bfa06..519e5c7 100644
+--- a/ext/Errno/Errno_pm.PL
++++ b/ext/Errno/Errno_pm.PL
+@@ -278,13 +278,8 @@ sub write_errno_pm {
+ 
+ package Errno;
+ require Exporter;
+-use Config;
+ use strict;
+ 
+-"\$Config{'archname'}-\$Config{'osvers'}" eq
+-"$archname-$Config{'osvers'}" or
+-	die "Errno architecture ($archname-$Config{'osvers'}) does not match executable architecture (\$Config{'archname'}-\$Config{'osvers'})";
+-
+ our \$VERSION = "$VERSION";
+ \$VERSION = eval \$VERSION;
+ our \@ISA = 'Exporter';

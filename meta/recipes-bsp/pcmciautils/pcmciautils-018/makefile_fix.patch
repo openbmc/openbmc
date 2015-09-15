@@ -1,0 +1,101 @@
+Upstream-Status: Inappropriate [configuration]
+
+Hardcoded paths are bad...
+This lets us use the install from OE's native sysroot
+rebase the patch to 018, removing hardcoded path for true
+as well. Removing of -D in install invocation is a little
+questionable, is it some GNU extention?
+
+-Khem Raj <raj.khem@gmail.com>
+
+Index: pcmciautils-018/Makefile
+===================================================================
+--- pcmciautils-018.orig/Makefile
++++ pcmciautils-018/Makefile
+@@ -76,7 +76,7 @@ sbindir =	${exec_prefix}/sbin
+ mandir =	${prefix}/usr/share/man
+ udevdir =	${prefix}/lib/udev
+ 
+-INSTALL = /usr/bin/install -c
++INSTALL = install -c
+ INSTALL_PROGRAM = ${INSTALL}
+ INSTALL_DATA  = ${INSTALL} -m 644
+ INSTALL_SCRIPT = ${INSTALL_PROGRAM}
+@@ -180,7 +180,7 @@ endif
+ # if DEBUG is enabled, then we do not strip or optimize
+ ifeq ($(strip $(DEBUG)),true)
+ 	CFLAGS  += -O1 -g -DDEBUG -D_GNU_SOURCE
+-	STRIPCMD = /bin/true -Since_we_are_debugging
++	STRIPCMD = true -Since_we_are_debugging
+ else
+ 	CFLAGS  += $(OPTIMIZATION) -fomit-frame-pointer -D_GNU_SOURCE
+ 	STRIPCMD = $(STRIP) -s --remove-section=.note --remove-section=.comment
+@@ -273,30 +273,32 @@ clean:
+ 
+ install-hotplug:
+ 	$(INSTALL) -d $(DESTDIR)$(hotplugdir)
+-	$(INSTALL_PROGRAM) -D hotplug/pcmcia.agent $(DESTDIR)$(hotplugdir)/pcmcia.agent
+-	$(INSTALL_PROGRAM) -D hotplug/pcmcia.rc $(DESTDIR)$(hotplugdir)/pcmcia.rc
++	$(INSTALL_PROGRAM) hotplug/pcmcia.agent $(DESTDIR)$(hotplugdir)/pcmcia.agent
++	$(INSTALL_PROGRAM) hotplug/pcmcia.rc $(DESTDIR)$(hotplugdir)/pcmcia.rc
+ 
+ uninstall-hotplug:
+ 	- rm -f $(DESTDIR)$(hotplugdir)/pcmcia.agent $(DESTDIR)$(hotplugdir)/pcmcia.rc
+ 
+ install-socket-hotplug:
+-	$(INSTALL_PROGRAM) -D hotplug/pcmcia_socket.agent $(DESTDIR)$(hotplugdir)/pcmcia_socket.agent
+-	$(INSTALL_PROGRAM) -D hotplug/pcmcia_socket.rc $(DESTDIR)$(hotplugdir)/pcmcia_socket.rc
++	$(INSTALL_PROGRAM) hotplug/pcmcia_socket.agent $(DESTDIR)$(hotplugdir)/pcmcia_socket.agent
++	$(INSTALL_PROGRAM) hotplug/pcmcia_socket.rc $(DESTDIR)$(hotplugdir)/pcmcia_socket.rc
+ 
+ uninstall-socket-hotplug:
+ 	- rm -f $(DESTDIR)$(hotplugdir)/pcmcia_socket.agent $(DESTDIR)$(hotplugdir)/pcmcia_socket.rc
+ 
+ install-socket-tools:
+-	$(INSTALL_PROGRAM) -D $(PCMCIA_SOCKET_STARTUP) $(DESTDIR)$(udevhelperdir)/$(PCMCIA_SOCKET_STARTUP)
++	$(INSTALL) -d $(DESTDIR)$(udevhelperdir)
++	$(INSTALL_PROGRAM) $(PCMCIA_SOCKET_STARTUP) $(DESTDIR)$(udevhelperdir)/$(PCMCIA_SOCKET_STARTUP)
+ 
+ uninstall-socket-tools:
+ 	- rm -f $(DESTDIR)$(udevhelperdir)/$(PCMCIA_SOCKET_STARTUP)
+ 
+ install-tools:
+ 	$(INSTALL) -d $(DESTDIR)$(sbindir)
+-	$(INSTALL_PROGRAM) -D $(PCCARDCTL) $(DESTDIR)$(sbindir)/$(PCCARDCTL)
++	$(INSTALL) -d $(DESTDIR)$(udevhelperdir)
++	$(INSTALL_PROGRAM) $(PCCARDCTL) $(DESTDIR)$(sbindir)/$(PCCARDCTL)
+ 	$(SYMLINK) $(PCCARDCTL) $(DESTDIR)$(sbindir)/$(LSPCMCIA)
+-	$(INSTALL_PROGRAM) -D $(PCMCIA_CHECK_BROKEN_CIS) $(DESTDIR)$(udevhelperdir)/$(PCMCIA_CHECK_BROKEN_CIS)
++	$(INSTALL_PROGRAM) $(PCMCIA_CHECK_BROKEN_CIS) $(DESTDIR)$(udevhelperdir)/$(PCMCIA_CHECK_BROKEN_CIS)
+ 
+ uninstall-tools:
+ 	- rm -f $(DESTDIR)$(sbindir)/$(PCCARDCTL)
+@@ -305,22 +307,24 @@ uninstall-tools:
+ 
+ install-config:
+ 	$(INSTALL) -d $(DESTDIR)$(pcmciaconfdir)
+-	$(INSTALL_DATA)  -D config/config.opts $(DESTDIR)$(pcmciaconfdir)/config.opts
++	$(INSTALL_DATA)  config/config.opts $(DESTDIR)$(pcmciaconfdir)/config.opts
+ 	if [ -f config/config.opts.$(ARCH) ]; then \
+-		$(INSTALL_DATA) -D config/config.opts.$(ARCH) $(DESTDIR)$(pcmciaconfdir)/config.opts; \
++		$(INSTALL_DATA) config/config.opts.$(ARCH) $(DESTDIR)$(pcmciaconfdir)/config.opts; \
+ 	fi
+ 
+ uninstall-config:
+ #	- rm -f $(DESTDIR)$(pcmciaconfdir)/config.opts
+ 
+ install-udev:
+-	$(INSTALL_DATA) -D $(UDEV_RULES_FILE) $(DESTDIR)$(udevrulesdir)/60-pcmcia.rules
++	$(INSTALL) -d $(DESTDIR)$(udevrulesdir)
++	$(INSTALL_DATA) $(UDEV_RULES_FILE) $(DESTDIR)$(udevrulesdir)/60-pcmcia.rules
+ 
+ uninstall-udev:
+ 	- rm -f $(DESTDIR)$(udevrulesdir)/60-pcmcia.rules
+ 
+ install-man:
+-	$(INSTALL_DATA) -D man/man8/pccardctl.8 $(DESTDIR)$(mandir)/man8/pccardctl.8
++	$(INSTALL) -d $(DESTDIR)$(mandir)/man8
++	$(INSTALL_DATA) man/man8/pccardctl.8 $(DESTDIR)$(mandir)/man8/pccardctl.8
+ 	$(SYMLINK) pccardctl.8 $(DESTDIR)$(mandir)/man8/lspcmcia.8
+ 
+ uninstall-man:

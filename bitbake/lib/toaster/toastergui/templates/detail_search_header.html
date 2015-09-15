@@ -1,0 +1,68 @@
+{% comment %}
+  Show a detail table Search field and Rows per page.
+  Input:
+    objects, our boilerplated paginated with search fields set.
+    object_count, count of full, unfiltered, objects list
+    search_what, fills in "Search ___"
+  Only show the search form if we have more than 10 results,
+  or if return from a previous search.
+{% endcomment %}
+
+
+<script>
+$(document).ready(function() {
+  /* Clear the current search selection and reload the results */
+  $(".search-clear").click(function(){
+    $("#search").val("");
+    $(this).parents("form").submit();
+  });
+});
+</script>
+<div class="row-fluid">
+{% if objects.paginator.count > 10 or request.GET.search %}
+  {% if objects.paginator.count == 0 %}
+  <div class="alert">
+    <h3>No {{search_what}} found</h3>
+    <form id="searchform" class="input-append">
+  {% else %}
+    <form id="searchform" class="navbar-search input-append pull-left">
+  {% endif %}
+
+      <input id="search" class="input-xlarge" type="text" placeholder="Search {{search_what}}" name="search" value="{% if request.GET.search %}{{request.GET.search}}{% endif %}">
+      <input type="hidden" value="name:+" name="orderby">
+      <input type="hidden" value="l" name="page">
+  {% if request.GET.search %}
+      <a class="add-on btn search-clear">
+        <i class="icon-remove"></i>
+      </a>
+  {% endif %}
+      <button type="submit" class="btn">Search</button>
+  {% if objects.paginator.count == 0 %}
+      <button type="submit" class="btn btn-link search-clear">
+        Show all {{search_what}}
+      </button>
+  {% endif %}
+    </form>
+{% endif %}
+
+{% if objects.paginator.count == 0 %}
+  </div> {# end alert #}
+{% else %}
+  {% if object_count > 10 %}
+  <div class="pull-right">
+    <span class="help-inline" style="padding-top:5px;">Show rows:</span>
+    <select style="margin-top:5px;margin-bottom:0px;" class="pagesize">
+    {% with "10 25 50 100 150" as list%}
+      {% for i in list.split %}
+        {% if request.session.limit == i %}
+      <option value="{{i}}" selected>{{i}}</option>
+        {% else %}
+      <option value="{{i}}">{{i}}</option>
+        {% endif %}
+      {% endfor %}
+    {% endwith %}
+    </select>
+  </div>
+  {% endif %}
+{% endif %}
+</div> {# row-fluid #}

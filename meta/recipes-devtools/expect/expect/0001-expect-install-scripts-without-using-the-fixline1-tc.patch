@@ -1,0 +1,34 @@
+Upstream-Status: Inappropriate [wrlinux specific]
+
+Subject: expect: install scripts without using the fixline1 tcl script
+
+On older machines like SLED11.2, we are encountering do_install failures
+complaining that 'GLIBC_2.14' is not found in /lib64/libc.so.6 but is required
+by libtcl8.6.so.0.
+
+This is because that we're executing the fixline1 tcl script which requires
+libtcl8.6.so.0 in sysroot. However, all commands in SCRIPTS already have got
+the correct first line, that is '#!/bin/sh'. We don't need to modify anything.
+That's why we could just copy them.
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ Makefile.in |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index c05c880..f1394ff 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -380,7 +380,7 @@ dist: dist-clean doc
+ 	cp $(DIST_ROOT)/$(PKG_DIR).tar.gz $(top_builddir)
+ 
+ $(SCRIPTS):
+-	$(TCLSH) $(srcdir)/fixline1 $(SHORT_BINDIR) < $(srcdir)/example/$@ > $@
++	cp $(srcdir)/example/$@ $@
+ 
+ ## We cannot use TCL_LIBS below (after TCL_LIB_SPEC) because its
+ ## expansion references the contents of LIBS, which contains linker
+-- 
+1.7.10.4
+

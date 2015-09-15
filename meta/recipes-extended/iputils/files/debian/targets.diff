@@ -1,0 +1,15 @@
+Upstream-Status: Inappropriate [disable feature]
+
+Index: iputils-s20121221/Makefile
+===================================================================
+--- iputils-s20121221.orig/Makefile
++++ iputils-s20121221/Makefile
+@@ -106,7 +106,7 @@ endif
+ endif
+ 
+ # -------------------------------------
+-IPV4_TARGETS=tracepath ping clockdiff rdisc arping tftpd rarpd
++IPV4_TARGETS=tracepath ping clockdiff arping
+ IPV6_TARGETS=tracepath6 traceroute6 ping6
+ TARGETS=$(IPV4_TARGETS) $(IPV6_TARGETS)
+ 

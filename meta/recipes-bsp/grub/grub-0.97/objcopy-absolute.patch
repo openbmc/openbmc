@@ -1,0 +1,40 @@
+
+This patch is from ubuntu:
+  * objcopy-absolute.diff (update): Remove .note, .comment, and
+    .note.gnu.build-id sections from images (LP: #444703).
+
+Upstream-Status: Inappropriate [no longer maintained]
+
+Index: b/acinclude.m4
+===================================================================
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -61,7 +61,7 @@
+   else
+     AC_MSG_ERROR([${CC-cc} cannot link at address $link_addr])
+   fi
+-  if AC_TRY_COMMAND([${OBJCOPY-objcopy} -O binary conftest.exec conftest]); then :
++  if AC_TRY_COMMAND([${OBJCOPY-objcopy} --only-section=.text -O binary conftest.exec conftest]); then :
+   else
+     AC_MSG_ERROR([${OBJCOPY-objcopy} cannot create binary files])
+   fi
+Index: b/stage1/Makefile.am
+===================================================================
+--- a/stage1/Makefile.am
++++ b/stage1/Makefile.am
+@@ -12,4 +12,4 @@
+
+ SUFFIXES = .exec
+ .exec:
+-	$(OBJCOPY) -O binary $< $@
++	$(OBJCOPY) -O binary -R .note -R .comment -R .note.gnu.build-id $< $@
+Index: b/stage2/Makefile.am
+===================================================================
+--- a/stage2/Makefile.am
++++ b/stage2/Makefile.am
+@@ -293,4 +293,4 @@
+ # General rule for making a raw binary.
+ SUFFIXES = .exec
+ .exec:
+-	$(OBJCOPY) -O binary $< $@
++	$(OBJCOPY) -O binary -R .note -R .comment -R .note.gnu.build-id $< $@

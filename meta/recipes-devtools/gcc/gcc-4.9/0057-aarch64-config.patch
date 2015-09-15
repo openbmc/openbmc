@@ -1,0 +1,32 @@
+Disable the MULTILIB_OSDIRNAMES and other multilib options.
+
+Hard coding the MULTILIB_OSDIRNAMES with ../lib64 is causing problems on
+systems where the libdir is NOT set to /lib64.  This is allowed by the ABI, as
+long as the dynamic loader is present in /lib.
+
+We simply want to use the default rules in gcc to find and configure the 
+normal libdir.
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: gcc-4.9.1/gcc/config/aarch64/t-aarch64-linux
+===================================================================
+--- gcc-4.9.1.orig/gcc/config/aarch64/t-aarch64-linux
++++ gcc-4.9.1/gcc/config/aarch64/t-aarch64-linux
+@@ -21,11 +21,11 @@
+ LIB1ASMSRC   = aarch64/lib1funcs.asm
+ LIB1ASMFUNCS = _aarch64_sync_cache_range
+ 
+-AARCH_BE = $(if $(findstring TARGET_BIG_ENDIAN_DEFAULT=1, $(tm_defines)),_be)
+-MULTILIB_OSDIRNAMES = .=../lib64$(call if_multiarch,:aarch64$(AARCH_BE)-linux-gnu)
+-MULTIARCH_DIRNAME = $(call if_multiarch,aarch64$(AARCH_BE)-linux-gnu)
++#AARCH_BE = $(if $(findstring TARGET_BIG_ENDIAN_DEFAULT=1, $(tm_defines)),_be)
++#MULTILIB_OSDIRNAMES = .=../lib64$(call if_multiarch,:aarch64$(AARCH_BE)-linux-gnu)
++#MULTIARCH_DIRNAME = $(call if_multiarch,aarch64$(AARCH_BE)-linux-gnu)
+ 
+ # Disable the multilib for linux-gnu targets for the time being; focus
+ # on the baremetal targets.
+-MULTILIB_OPTIONS    =
+-MULTILIB_DIRNAMES   =
++#MULTILIB_OPTIONS    =
++#MULTILIB_DIRNAMES   =

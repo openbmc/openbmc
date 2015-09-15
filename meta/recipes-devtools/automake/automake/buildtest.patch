@@ -1,0 +1,33 @@
+Split "check-TESTS" into a buildtest and runtest target, so that they can
+be run separately.
+
+Signed-off-by: Björn Stenberg <bjst@enea.com>
+Upstream-Status: Pending
+
+--- a/lib/am/check.am	2012-11-14 13:46:16.335475995 +0100
++++ b/lib/am/check.am	2012-08-13 18:40:12.000000000 +0200
+@@ -44,7 +44,7 @@
+ am__tty_colors = $(am__tty_colors_dummy)
+ endif !%?COLOR%
+
+-.PHONY: check-TESTS
++.PHONY: check-TESTS buildtest-TESTS runtest-TESTS
+
+ if %?PARALLEL_TESTS%
+
+@@ -465,7 +465,14 @@
+
+ else !%?PARALLEL_TESTS%
+
+-check-TESTS: $(TESTS)
++AM_RECURSIVE_TARGETS += buildtest runtest
++
++buildtest-TESTS: $(TESTS)
++
++check-TESTS: buildtest-TESTS
++	$(MAKE) $(AM_MAKEFLAGS) runtest-TESTS
++
++runtest-TESTS:
+	@failed=0; all=0; xfail=0; xpass=0; skip=0; \
+	srcdir=$(srcdir); export srcdir; \
+ ## Make sure Solaris VPATH-expands all members of this list, even

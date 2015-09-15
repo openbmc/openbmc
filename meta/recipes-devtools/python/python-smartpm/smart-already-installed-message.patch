@@ -1,0 +1,54 @@
+From a74a9a9eb9d75964a0e978950e8b191d7a18d763 Mon Sep 17 00:00:00 2001
+From: Paul Eggleton <paul.eggleton@linux.intel.com>
+Date: Fri, 5 Jun 2015 17:07:16 +0100
+Subject: [PATCH] smart: change "is already installed" message from warning to
+ info
+
+This doesn't need to be a warning.
+
+Upstream-Status: Pending
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+---
+ smart/commands/install.py            | 4 ++--
+ smart/interfaces/text/interactive.py | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/smart/commands/install.py b/smart/commands/install.py
+index 6ef9682..80d456b 100644
+--- a/smart/commands/install.py
++++ b/smart/commands/install.py
+@@ -152,7 +152,7 @@ def main(ctrl, opts):
+             for obj in results:
+                 for pkg in obj.packages:
+                     if pkg.installed:
+-                        iface.warning(_("%s (for %s) is already installed")
++                        iface.info(_("%s (for %s) is already installed")
+                                       % (pkg, arg))
+                         installed = True
+                         break
+@@ -184,7 +184,7 @@ def main(ctrl, opts):
+         for name in names:
+             pkg = names[name][0]
+             if pkg.installed:
+-                iface.warning(_("%s is already installed") % pkg)
++                iface.info(_("%s is already installed") % pkg)
+             else:
+                 trans.enqueue(pkg, INSTALL)
+ 
+diff --git a/smart/interfaces/text/interactive.py b/smart/interfaces/text/interactive.py
+index 9865584..190867b 100644
+--- a/smart/interfaces/text/interactive.py
++++ b/smart/interfaces/text/interactive.py
+@@ -278,7 +278,7 @@ class Interpreter(Cmd):
+             for name in names:
+                 pkg = names[name][0]
+                 if pkg.installed:
+-                    iface.warning(_("%s is already installed") % pkg)
++                    iface.info(_("%s is already installed") % pkg)
+                 else:
+                     found = True
+                     transaction.enqueue(pkg, INSTALL)
+-- 
+2.1.0
+

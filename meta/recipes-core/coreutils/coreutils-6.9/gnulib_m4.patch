@@ -1,0 +1,21 @@
+Upstream-Status: Inappropriate [legacy version]
+
+# remove the line to cause recursive inclusion error from autoreconf, sicne
+# newer autoconf has included this definition. Simply rename it here.
+#
+# Signed-off-by Kevin Tian <kevin.tian@intel.com>, 2010-08-18
+# (this patch is licensed under GPLv2)
+
+diff --git a/extensions.m4 b/extensions.m4
+index 143a9e5..f6558f1 100644
+--- a/m4/extensions.m4
++++ b/m4/extensions.m4
+@@ -16,7 +16,7 @@
+ # ------------------------
+ # Enable extensions on systems that normally disable them,
+ # typically due to standards-conformance issues.
+-AC_DEFUN([AC_USE_SYSTEM_EXTENSIONS],
++AC_DEFUN([AC_USE_SYSTEM_EXTENSIONS_DUMMY],
+ [
+   AC_BEFORE([$0], [AC_COMPILE_IFELSE])
+   AC_BEFORE([$0], [AC_RUN_IFELSE])

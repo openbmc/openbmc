@@ -1,0 +1,17 @@
+Upstream-Status: Inappropriate (embedded specific)
+
+Signed-off-by: Laurentiu Palcu <laurentiu.palcu@intel.com>
+
+Index: flex-2.5.37/doc/Makefile.am
+===================================================================
+--- flex-2.5.37.orig/doc/Makefile.am	2012-07-21 04:18:27.000000000 +0300
++++ flex-2.5.37/doc/Makefile.am	2013-07-30 17:57:09.834834531 +0300
+@@ -2,7 +2,7 @@
+ 
+ info_TEXINFOS =	flex.texi
+ dist_man_MANS = flex.1
+-dist_doc_DATA= flex.pdf
++EXTRA_DIST= flex.pdf
+ 
+ CLEANFILES = \
+ 	flex.hks \

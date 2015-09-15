@@ -1,0 +1,48 @@
+kexec-tools: Refine kdump device_tree sort
+
+The commit b02d735bf was to rearrange the device-tree entries, and
+assumed that these entries are sorted in the ascending order. but
+acctually when I was validating kexec and kdump, the order of
+serial node still is changed. So the patch is to sort these entries
+by the directory name in ascending order.
+
+Upstream-Status: Pending
+
+Signed-off-by: Yang Wei <Wei.Yang@windriver.com>
+Signed-off-by: Chong Lu <Chong.Lu@windriver.com>
+---
+ kexec/arch/ppc/fs2dt.c |   13 ++++++++++---
+ kexec/fs2dt.c          |   13 ++++++++++---
+ 2 files changed, 20 insertions(+), 6 deletions(-)
+
+Index: kexec-tools-2.0.10/kexec/arch/ppc/fs2dt.c
+===================================================================
+--- kexec-tools-2.0.10.orig/kexec/arch/ppc/fs2dt.c
++++ kexec-tools-2.0.10/kexec/arch/ppc/fs2dt.c
+@@ -296,6 +296,9 @@ static int comparefunc(const void *dentr
+ {
+ 	char *str1 = (*(struct dirent **)dentry1)->d_name;
+ 	char *str2 = (*(struct dirent **)dentry2)->d_name;
++	char* ptr1 = strchr(str1, '@');
++	char* ptr2 = strchr(str2, '@');
++	int len1, len2;
+ 
+ 	/*
+ 	 * strcmp scans from left to right and fails to idetify for some
+@@ -303,9 +306,13 @@ static int comparefunc(const void *dentr
+ 	 * Therefore, we get the wrong sorted order like memory@10000000 and
+ 	 * memory@f000000.
+ 	 */
+-	if (strchr(str1, '@') && strchr(str2, '@') &&
+-		(strlen(str1) > strlen(str2)))
+-		return 1;
++	if (ptr1 && ptr2) {
++		len1 = ptr1 - str1;
++		len2 = ptr2 - str2;
++		if (!strncmp(str1, str2, len1 >len2 ? len1: len2) &&
++					(strlen(str1) > strlen(str2)))
++				return 1;
++	}
+ 
+ 	return strcmp(str1, str2);
+ }

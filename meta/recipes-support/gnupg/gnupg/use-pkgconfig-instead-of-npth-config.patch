@@ -1,0 +1,72 @@
+Upstream-Status: Inappropriate [openembedded specific]
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+
+Index: gnupg-2.1.0/m4/npth.m4
+===================================================================
+--- gnupg-2.1.0.orig/m4/npth.m4
++++ gnupg-2.1.0/m4/npth.m4
+@@ -17,10 +17,10 @@ AC_DEFUN([_AM_PATH_NPTH_CONFIG],
+   if test "x$npth_config_prefix" != x ; then
+       NPTH_CONFIG="$npth_config_prefix/bin/npth-config"
+   fi
+-  AC_PATH_PROG(NPTH_CONFIG, npth-config, no)
++  AC_PATH_PROG(PKGCONFIG, pkg-config, no)
+ 
+-  if test "$NPTH_CONFIG" != "no" ; then
+-    npth_version=`$NPTH_CONFIG --version`
++  if test "$PKGCONFIG" != "no" ; then
++    npth_version=`$PKGCONFIG --modversion npth`
+   fi
+   npth_version_major=`echo $npth_version | \
+                sed 's/\([[0-9]]*\)\.\([[0-9]]*\).*/\1/'`
+@@ -45,7 +45,7 @@ AC_DEFUN([AM_PATH_NPTH],
+ 
+   AC_MSG_CHECKING(for NPTH - version >= $min_npth_version)
+   ok=no
+-  if test "$NPTH_CONFIG" != "no" ; then
++  if test "$PKGCONFIG" != "no" ; then
+     req_major=`echo $min_npth_version | \
+                sed 's/\([[0-9]]*\)\.\([[0-9]]*\)/\1/'`
+     req_minor=`echo $min_npth_version | \
+@@ -66,28 +66,9 @@ AC_DEFUN([AM_PATH_NPTH],
+   fi
+   if test $ok = yes; then
+     AC_MSG_RESULT([yes ($npth_version)])
+-  else
+-    AC_MSG_RESULT(no)
+-  fi
+-  if test $ok = yes; then
+-     # If we have a recent NPTH, we should also check that the
+-     # API is compatible.
+-     if test "$req_npth_api" -gt 0 ; then
+-        tmp=`$NPTH_CONFIG --api-version 2>/dev/null || echo 0`
+-        if test "$tmp" -gt 0 ; then
+-           AC_MSG_CHECKING([NPTH API version])
+-           if test "$req_npth_api" -eq "$tmp" ; then
+-             AC_MSG_RESULT([okay])
+-           else
+-             ok=no
+-             AC_MSG_RESULT([does not match. want=$req_npth_api got=$tmp])
+-           fi
+-        fi
+-     fi
+-  fi
+-  if test $ok = yes; then
+-    NPTH_CFLAGS=`$NPTH_CONFIG --cflags`
+-    NPTH_LIBS=`$NPTH_CONFIG --libs`
++    NPTH_CFLAGS=`$PKGCONFIG --cflags npth`
++    NPTH_LIBS=`$PKGCONFIG --libs npth`
++    AC_MSG_WARN([[GOT HERE - $NPTH_LIBS ]])
+     ifelse([$2], , :, [$2])
+     npth_config_host=`$NPTH_CONFIG --host 2>/dev/null || echo none`
+     if test x"$npth_config_host" != xnone ; then
+@@ -103,6 +84,7 @@ AC_DEFUN([AM_PATH_NPTH],
+       fi
+     fi
+   else
++    AC_MSG_RESULT(no)
+     NPTH_CFLAGS=""
+     NPTH_LIBS=""
+     ifelse([$3], , :, [$3])

@@ -1,0 +1,145 @@
+Upstream-Status: Pending
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+diff -Naur man-1.6e.orig/src/apropos.sh man-1.6e/src/apropos.sh
+--- man-1.6e.orig/src/apropos.sh	2007-05-18 13:49:31.000000000 -0300
++++ man-1.6e/src/apropos.sh	2007-05-18 14:24:33.000000000 -0300
+@@ -60,16 +60,56 @@
+     esac
+ done
+ 
++# list of languages to look for
++LANG_LIST=`echo $LANGUAGE:$LC_ALL:$LC_MESSAGES:$LANG | tr ':' ' '`
++DIR_LIST=""
++for d in /var/cache/man $manpath /usr/lib
++do
++    for l in $LANG_LIST
++    do
++        if [ -d $d/$l ]
++        then
++            # check that the path is not already in the list
++            if ! echo "$DIR_LIST" | grep " $d/$l\b" > /dev/null
++            then
++                DIR_LIST="$DIR_LIST $d/$l"
++            fi
++        fi
++    done
++    DIR_LIST="$DIR_LIST $d"
++    # check that the path is not already in the list
++    if ! echo "$DIR_LIST" | grep " $d\b" > /dev/null
++    then
++        DIR_LIST="$DIR_LIST $d/$l"
++    fi
++done
++
+ while [ "$1" != "" ]
+ do
+     found=0
+-    for d in /var/cache/man $manpath /usr/lib
++    # in order not to display lines in more than one language for
++    # a same man page; we check that a given man page name
++    # hasn't already been displayed
++    BAZ=""
++    for d in $DIR_LIST
+     do
+         if [ -f $d/whatis ]
+         then
+-            if grep -"$grepopt1" "$grepopt2""$1" $d/whatis
++            if FOO=`grep -"$grepopt1" "$grepopt2""$1" $d/whatis`
+             then
+-                found=1
++                # the LC_ALL=C is needed in case the text is
++                # in a different encoding than the locale
++                BAR=`echo -e "$FOO" | LC_ALL=C sed 's/ - .*$//' | tr ' []' '_' | sort -u`
++                for i in $BAR
++                do
++                    if ! echo "$BAZ" | grep "$i" > /dev/null
++                    then
++                        BAZ="$BAZ $i"
++                        i="^`echo $i | sed 's:_\+:\\\(\[_ \]\\\|\\\[\\\|\\\]\\\)\\\+:g'`"
++                        echo -e "$FOO" | grep "$i"
++                        found=1
++                    fi
++                done
+ # Some people are satisfied with a single occurrence
+ # But it is better to give all
+ #               break
+diff -Naur man-1.6e.orig/src/makewhatis.sh man-1.6e/src/makewhatis.sh
+--- man-1.6e.orig/src/makewhatis.sh	2007-05-18 13:49:31.000000000 -0300
++++ man-1.6e/src/makewhatis.sh	2007-05-18 13:50:07.000000000 -0300
+@@ -41,12 +41,32 @@
+ 
+ program=`basename $0`
+ 
++# this allows to define language specific values fro NAME, DESCRIPTION
++# if not defined, using those default values
++if [ -z "$MAN_NAME" ]
++then
++	MAN_NAME="ИМЕ|NOM|JMÉNO|NAVN|ΟΝΟΜΑ|NOMBRE|NIME|IZENA|NIMI|IME|\
++NÉV|NOME|名前|이름|NAAM|NAZWA|NUME|ИМЯ|MENO|НАЗВА|名称|名稱"
++fi
++if [ -z "$MAN_DESCRIPTION" ]
++then
++	MAN_DESCRIPTION="ОПИСАНИЕ|DESCRIPCIÓ|POPIS|BESKRIVELSE|BESCHREIBUNG|\
++ΠΕΡΙΓΡΑΦΗ|DESCRIPCIÓN|KIRJELDUS|AZALPENA|KUVAUS|OPIS|LEÍRÁS|DESCRIZIONE|\
++説明|설명|BESCHRIJVING|DESCRIÇÃO|DESCRIERE|ОПИС|描述"
++fi
++# make them into awk regexp
++MAN_NAME="^(${MAN_NAME})";
++MAN_DESCRIPTION="^(${MAN_DESCRIPTION})";
++
+ # In case both /usr/man and /usr/share/man exist, the former is local
+ # and should be first.
+ # It is a bug to add /var/cache/man to DEFCATPATH.
+ dm=
+ for d in /usr/share/man /usr/man /usr/X11R6/man /usr/local/man
+ do
++    if [ -n "$LANG" -a -d "$d/$LANG" ]; then
++	if [ x$dm = x ]; then dm="$d/$LANG"; else dm=$dm:"$d/$LANG"; fi
++    fi
+     if [ -d $d ]; then
+ 	if [ x$dm = x ]; then dm=$d; else dm=$dm:$d; fi
+     fi
+@@ -55,6 +75,9 @@
+ dc=
+ for d in /var/cache/man /usr/share/man/preformat /usr/man/preformat /usr/share/man /usr/man
+ do
++    if [ -n "$LANG" -a -d "$d/$LANG" ]; then
++	if [ x$dc = x ]; then dm="$d/$LANG"; else dm=$dc:"$d/$LANG"; fi
++    fi
+     if [ -d $d ]; then
+ 	if [ x$dc = x ]; then dc=$d; else dc=$dc:$d; fi
+     fi
+@@ -194,7 +217,7 @@
+ 	    section=$i
+ 	    curdir=$mandir/${pages}$i
+ 	    export section verbose curdir
+-	    find $mandir/${pages}$i/. -name '*' $findarg0 $findarg -print | $AWK '
++	    find $mandir/${pages}$i/. -name '*' $findarg0 $findarg -print | LC_ALL=C $AWK -v MAN_NAME="$MAN_NAME" -v MAN_DESCRIPTION="$MAN_DESCRIPTION" '
+ 
+ 	    function readline() {
+ 	      if (use_zcat || use_bzcat) {
+@@ -261,13 +284,7 @@
+ 		gsub(/.\b/, "");
+ 		if (($1 ~ /^\.[Ss][Hh]/ &&
+ 		  ($2 ~ /[Nn][Aa][Mm][Ee]/ ||
+-		   $2 ~ /^JM�NO/ || $2 ~ /^NAVN/ || $2 ~ /^NUME/ ||
+-		   $2 ~ /^BEZEICHNUNG/ || $2 ~ /^NOMBRE/ ||
+-		   $2 ~ /^NIMI/ || $2 ~ /^NOM/ || $2 ~ /^IME/ ||
+-		   $2 ~ /^N[�E]V/ || $2 ~ /^NAMA/ || $2 ~ /^̾��/ ||
+-		   $2 ~ /^̾��/ || $2 ~ /^�̸�/ || $2 ~ /^NAZWA/ ||
+-		   $2 ~ /^��������/ || $2 ~ /^����/ || $2 ~ /^�W��/ ||
+-		   $2 ~ /^NOME/ || $2 ~ /^NAAM/ || $2 ~ /^���/)) ||
++		   $2 ~ MAN_NAME )) ||
+ 		  (pages == "cat" && $1 ~ /^NAME/)) {
+ 		    if (!insh) {
+ 		      insh = 1;
+@@ -278,6 +295,7 @@
+ 		  if ($1 ~ /^\.[Ss][HhYS]/ ||
+ 		    (pages == "cat" &&
+ 		    ($1 ~ /^S[yYeE]/ || $1 ~ /^DESCRIPTION/ ||
++		     $1 ~ MAN_DESCRIPTION ||
+ 		     $1 ~ /^COMMAND/ || $1 ~ /^OVERVIEW/ ||
+ 		     $1 ~ /^STRUCTURES/ || $1 ~ /^INTRODUCTION/ ||
+ 		     $0 ~ /^[^ ]/))) {

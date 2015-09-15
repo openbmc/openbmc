@@ -1,0 +1,45 @@
+Upstream-Status: Submitted
+
+From f354b9333408d411854af058cc44cceda60b4473 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?An=C3=ADbal=20Lim=C3=B3n?= <anibal.limon@linux.intel.com>
+Date: Thu, 3 Sep 2015 14:07:34 -0500
+Subject: [PATCH] cpus.c: qemu_mutex_lock_iothread fix race condition at cpu
+ thread init
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When QEMU starts the RCU thread executes qemu_mutex_lock_thread
+causing error "qemu:qemu_cpu_kick_thread: No such process" and exits.
+
+This isn't occur frequently but in glibc the thread id can exist and
+this not guarantee that the thread is on active/running state. If is
+inserted a sleep(1) after newthread assignment [1] the issue appears.
+
+So not make assumption that thread exist if first_cpu->thread is set
+then change the validation of cpu to created that is set into cpu
+threads (kvm, tcg, dummy).
+
+[1] https://sourceware.org/git/?p=glibc.git;a=blob;f=nptl/pthread_create.c;h=d10f4ea8004e1d8f3a268b95cc0f8d93b8d89867;hb=HEAD#l621
+
+Signed-off-by: Aníbal Limón <anibal.limon@linux.intel.com>
+---
+ cpus.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cpus.c b/cpus.c
+index 7e4786e..05e5400 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1171,7 +1171,7 @@ void qemu_mutex_lock_iothread(void)
+      * TCG code execution.
+      */
+     if (!tcg_enabled() || qemu_in_vcpu_thread() ||
+-        !first_cpu || !first_cpu->thread) {
++        !first_cpu || !first_cpu->created) {
+         qemu_mutex_lock(&qemu_global_mutex);
+         atomic_dec(&iothread_requesting_mutex);
+     } else {
+-- 
+1.9.1
+

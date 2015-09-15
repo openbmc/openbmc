@@ -1,0 +1,91 @@
+The system-auth in the configure files is from Fedora which put all the 4 pam type rules
+in one file.
+In yocto it obey the way with Debian/Ubuntu, and the names are common-auth, common-account,
+common-password and common-session.
+So update them with oe way.
+
+Upstream-Status: Pending
+
+Signed-off-by: Kang Kai <kai.kang@windriver.com>
+
+diff -Nur shadow-4.1.4.3/etc/pam.d.orig/chage shadow-4.1.4.3/etc/pam.d/chage
+--- shadow-4.1.4.3/etc/pam.d.orig/chage	2011-07-20 19:02:27.384844958 +0800
++++ shadow-4.1.4.3/etc/pam.d/chage	2011-07-20 19:03:08.964844958 +0800
+@@ -1,4 +1,4 @@
+ #%PAM-1.0
+ auth		sufficient	pam_rootok.so
+ account		required	pam_permit.so
+-password	include		system-auth
++password	include		common-password
+diff -Nur shadow-4.1.4.3/etc/pam.d.orig/chgpasswd shadow-4.1.4.3/etc/pam.d/chgpasswd
+--- shadow-4.1.4.3/etc/pam.d.orig/chgpasswd	2011-07-20 19:02:27.384844958 +0800
++++ shadow-4.1.4.3/etc/pam.d/chgpasswd	2011-07-20 19:03:26.544844958 +0800
+@@ -1,4 +1,4 @@
+ #%PAM-1.0
+ auth		sufficient	pam_rootok.so
+ account		required	pam_permit.so
+-password	include		system-auth
++password	include		common-password
+diff -Nur shadow-4.1.4.3/etc/pam.d.orig/groupadd shadow-4.1.4.3/etc/pam.d/groupadd
+--- shadow-4.1.4.3/etc/pam.d.orig/groupadd	2011-07-20 19:02:27.384844958 +0800
++++ shadow-4.1.4.3/etc/pam.d/groupadd	2011-07-20 19:04:08.124844958 +0800
+@@ -1,4 +1,4 @@
+ #%PAM-1.0
+ auth		sufficient	pam_rootok.so
+ account		required	pam_permit.so
+-password	include		system-auth
++password	include		common-password
+diff -Nur shadow-4.1.4.3/etc/pam.d.orig/groupdel shadow-4.1.4.3/etc/pam.d/groupdel
+--- shadow-4.1.4.3/etc/pam.d.orig/groupdel	2011-07-20 19:02:27.384844958 +0800
++++ shadow-4.1.4.3/etc/pam.d/groupdel	2011-07-20 19:04:26.114844958 +0800
+@@ -1,4 +1,4 @@
+ #%PAM-1.0
+ auth		sufficient	pam_rootok.so
+ account		required	pam_permit.so
+-password	include		system-auth
++password	include		common-password
+diff -Nur shadow-4.1.4.3/etc/pam.d.orig/groupmems shadow-4.1.4.3/etc/pam.d/groupmems
+--- shadow-4.1.4.3/etc/pam.d.orig/groupmems	2011-07-20 19:02:27.384844958 +0800
++++ shadow-4.1.4.3/etc/pam.d/groupmems	2011-07-20 19:04:35.074844958 +0800
+@@ -1,4 +1,4 @@
+ #%PAM-1.0
+ auth		sufficient	pam_rootok.so
+ account		required	pam_permit.so
+-password	include		system-auth
++password	include		common-password
+diff -Nur shadow-4.1.4.3/etc/pam.d.orig/groupmod shadow-4.1.4.3/etc/pam.d/groupmod
+--- shadow-4.1.4.3/etc/pam.d.orig/groupmod	2011-07-20 19:02:27.384844958 +0800
++++ shadow-4.1.4.3/etc/pam.d/groupmod	2011-07-20 19:04:44.864844958 +0800
+@@ -1,4 +1,4 @@
+ #%PAM-1.0
+ auth		sufficient	pam_rootok.so
+ account		required	pam_permit.so
+-password	include		system-auth
++password	include		common-password
+diff -Nur shadow-4.1.4.3/etc/pam.d.orig/useradd shadow-4.1.4.3/etc/pam.d/useradd
+--- shadow-4.1.4.3/etc/pam.d.orig/useradd	2011-07-20 19:02:27.384844958 +0800
++++ shadow-4.1.4.3/etc/pam.d/useradd	2011-07-20 19:07:26.244844958 +0800
+@@ -1,4 +1,4 @@
+ #%PAM-1.0
+ auth		sufficient	pam_rootok.so
+ account		required	pam_permit.so
+-password	include		system-auth
++password	include		common-password
+diff -Nur shadow-4.1.4.3/etc/pam.d.orig/userdel shadow-4.1.4.3/etc/pam.d/userdel
+--- shadow-4.1.4.3/etc/pam.d.orig/userdel	2011-07-20 19:02:27.384844958 +0800
++++ shadow-4.1.4.3/etc/pam.d/userdel	2011-07-20 19:07:35.734844958 +0800
+@@ -1,4 +1,4 @@
+ #%PAM-1.0
+ auth		sufficient	pam_rootok.so
+ account		required	pam_permit.so
+-password	include		system-auth
++password	include		common-password
+diff -Nur shadow-4.1.4.3/etc/pam.d.orig/usermod shadow-4.1.4.3/etc/pam.d/usermod
+--- shadow-4.1.4.3/etc/pam.d.orig/usermod	2011-07-20 19:02:27.384844958 +0800
++++ shadow-4.1.4.3/etc/pam.d/usermod	2011-07-20 19:07:42.024844958 +0800
+@@ -1,4 +1,4 @@
+ #%PAM-1.0
+ auth		sufficient	pam_rootok.so
+ account		required	pam_permit.so
+-password	include		system-auth
++password	include		common-password

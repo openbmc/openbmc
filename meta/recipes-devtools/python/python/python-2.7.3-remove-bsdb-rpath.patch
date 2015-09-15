@@ -1,0 +1,28 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+Remove the RPATH to avoid QA issue warning.
+
+RP: Added secondary unnecessary rpath to the list 2012/8/7
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+
+
+Index: Python-2.7.3/setup.py
+===================================================================
+--- Python-2.7.3.orig/setup.py	2012-08-07 10:41:58.560132529 +0000
++++ Python-2.7.3/setup.py	2012-08-07 11:09:47.852094515 +0000
+@@ -1042,7 +1042,6 @@
+             exts.append(Extension('_bsddb', ['_bsddb.c'],
+                                   depends = ['bsddb.h'],
+                                   library_dirs=dblib_dir,
+-                                  runtime_library_dirs=dblib_dir,
+                                   include_dirs=db_incs,
+                                   libraries=dblibs))
+         else:
+@@ -1252,7 +1251,6 @@
+                         print "building dbm using bdb"
+                         dbmext = Extension('dbm', ['dbmmodule.c'],
+                                            library_dirs=dblib_dir,
+-                                           runtime_library_dirs=dblib_dir,
+                                            include_dirs=db_incs,
+                                            define_macros=[
+                                                ('HAVE_BERKDB_H', None),

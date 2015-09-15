@@ -1,0 +1,33 @@
+From cfa46b67f59115f6d8ef9414af60380749ff3eb3 Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen@dominion.thruhere.net>
+Date: Wed, 26 Jan 2011 13:21:12 +0100
+Subject: [PATCH 4/6] blacklist tv out
+
+The tv-out gets added last and the driver tries to reconfigure dvi to TV resolutions, which fails. so blacklist it
+
+Upstream-Status: Pending
+
+Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ src/omapfb-output-dss.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/omapfb-output-dss.c b/src/omapfb-output-dss.c
+index 6cc52de..83cb711 100644
+--- a/src/omapfb-output-dss.c
++++ b/src/omapfb-output-dss.c
+@@ -205,6 +205,10 @@ OMAPFBDSSOutputDetect (xf86OutputPtr output)
+ 	if(ofb->timings[idx][0] == '\0')
+ 		return XF86OutputStatusDisconnected;
+ 
++	// Hack to disable the tv out
++	if (strncmp(output->name, "tv", 2) == 0)
++		return XF86OutputStatusDisconnected;
++
+ 	return XF86OutputStatusConnected;
+ }
+ 
+-- 
+1.8.0
+

@@ -1,0 +1,50 @@
+language: python
+python:
+  - "2.7"
+  - "3.4"
+services:
+  - mysql
+  - postgresql
+env:
+  - DJANGO=1.4 DB=sqlite
+  - DJANGO=1.4 DB=mysql
+  - DJANGO=1.4 DB=postgres
+  - DJANGO=1.5 DB=sqlite
+  - DJANGO=1.5 DB=mysql
+  - DJANGO=1.5 DB=postgres
+  - DJANGO=1.6 DB=sqlite
+  - DJANGO=1.6 DB=mysql
+  - DJANGO=1.6 DB=postgres
+  - DJANGO=1.7 DB=sqlite
+  - DJANGO=1.7 DB=mysql
+  - DJANGO=1.7 DB=postgres
+
+matrix:
+  exclude:
+    - python: "3.4"
+      env: DJANGO=1.4 DB=sqlite
+    - python: "3.4"
+      env: DJANGO=1.4 DB=mysql
+    - python: "3.4"
+      env: DJANGO=1.4 DB=postgres
+    - python: "3.4"
+      env: DJANGO=1.5 DB=sqlite
+    - python: "3.4"
+      env: DJANGO=1.5 DB=mysql
+    - python: "3.4"
+      env: DJANGO=1.5 DB=postgres
+    - python: "3.4"
+      env: DJANGO=1.6 DB=mysql
+    - python: "3.4"
+      env: DJANGO=1.7 DB=mysql
+
+before_script:
+  - mysql -e 'create database aggregation;'
+  - psql -c 'create database aggregation;' -U postgres
+install:
+  - pip install six
+  - if [ "$DB" == "mysql" ]; then pip install mysql-python; fi
+  - if [ "$DB" == "postgres" ]; then pip install psycopg2; fi
+  - pip install -q Django==$DJANGO --use-mirrors
+script:
+  - ./runtests.py --settings=tests.test_$DB

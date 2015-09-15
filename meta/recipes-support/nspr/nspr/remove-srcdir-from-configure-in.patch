@@ -1,0 +1,19 @@
+the $srcdir is not defined at the time of gnu-configurize.
+
+Upstream-Status: Inappropriate [OE-Core specific]
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+Index: nspr/configure.in
+===================================================================
+--- nspr.orig/configure.in
++++ nspr/configure.in
+@@ -8,7 +8,7 @@ AC_PREREQ(2.61)
+ AC_INIT
+ AC_CONFIG_SRCDIR([pr/include/nspr.h])
+ 
+-AC_CONFIG_AUX_DIR(${srcdir}/build/autoconf)
++AC_CONFIG_AUX_DIR(build/autoconf)
+ AC_CANONICAL_TARGET
+ 
+ dnl ========================================================

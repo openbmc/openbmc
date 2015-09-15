@@ -1,0 +1,13 @@
+Upstream-Status: Inappropriate [configuration]
+
+Index: Xsettings-client-0.10/Makefile.am
+===================================================================
+--- Xsettings-client-0.10.orig/Makefile.am	2008-02-07 14:49:54.000000000 +0000
++++ Xsettings-client-0.10/Makefile.am	2008-02-07 14:50:00.000000000 +0000
+@@ -9,4 +9,4 @@
+ 
+ libXsettings_client_la_SOURCES= $(source_c) $(source_h)
+ 
+-libXsettings_client_la_LIBADD      = @X_LIBS@
+\ No newline at end of file
++libXsettings_client_la_LIBADD      = @X_LIBS@ -lX11

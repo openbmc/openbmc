@@ -1,0 +1,14 @@
+Upstream-Status: Pending
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+--- gencat/genlib.c	2006-08-02 20:11:44.000000000 +0200
++++ gencat/genlib.c.oden	2008-12-21 19:18:50.000000000 +0100
+@@ -47,6 +47,7 @@ up-to-date.  Many thanks.
+ 01/14/91   4 nazgul	Off by one on number specified entries
+ */
+ 
++#undef _GNU_SOURCE
+ #include <stdio.h>
+ #include <stdlib.h>
+ #ifdef SYSV

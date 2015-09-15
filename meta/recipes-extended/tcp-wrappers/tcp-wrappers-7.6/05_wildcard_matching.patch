@@ -1,0 +1,105 @@
+Upstream-Status: Backport
+
+See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=17847
+
+diff -ruN tcp_wrappers_7.6.orig/hosts_access.5 tcp_wrappers_7.6/hosts_access.5
+--- tcp_wrappers_7.6.orig/hosts_access.5	2004-04-10 18:54:33.000000000 +0200
++++ tcp_wrappers_7.6/hosts_access.5	2004-04-10 18:54:27.000000000 +0200
+@@ -89,6 +89,10 @@
+ bitwise AND of the address and the `mask\'. For example, the net/mask
+ pattern `131.155.72.0/255.255.254.0\' matches every address in the
+ range `131.155.72.0\' through `131.155.73.255\'.
++.IP \(bu
++Wildcards `*\' and `?\' can be used to match hostnames or IP addresses.  This
++method of matching cannot be used in conjunction with `net/mask\' matching,
++hostname matching beginning with `.\' or IP address matching ending with `.\'.
+ .SH WILDCARDS
+ The access control language supports explicit wildcards:
+ .IP ALL
+diff -ruN tcp_wrappers_7.6.orig/hosts_access.c tcp_wrappers_7.6/hosts_access.c
+--- tcp_wrappers_7.6.orig/hosts_access.c	1997-02-12 02:13:23.000000000 +0100
++++ tcp_wrappers_7.6/hosts_access.c	2004-04-10 18:52:21.000000000 +0200
+@@ -289,6 +289,11 @@
+ {
+     int     n;
+ 
++#ifndef DISABLE_WILDCARD_MATCHING
++    if (strchr(tok, '*') || strchr(tok,'?')) {  /* contains '*' or '?' */
++        return (match_pattern_ylo(string,tok)); 	       
++    } else 
++#endif    
+     if (tok[0] == '.') {			/* suffix */
+ 	n = strlen(string) - strlen(tok);
+ 	return (n > 0 && STR_EQ(tok, string + n));
+@@ -329,3 +334,71 @@
+     }
+     return ((addr & mask) == net);
+ }
++
++#ifndef DISABLE_WILDCARD_MATCHING
++/* Note: this feature has been adapted in a pretty straightforward way
++   from Tatu Ylonen's last SSH version under free license by 
++   Pekka Savola <pekkas@netcore.fi>.
++
++   Copyright (c) 1995 Tatu Ylonen <ylo@cs.hut.fi>, Espoo, Finland
++*/
++
++/* Returns true if the given string matches the pattern (which may contain
++   ? and * as wildcards), and zero if it does not match. */
++	  
++int match_pattern_ylo(const char *s, const char *pattern)
++{
++  while (1)
++    {
++      /* If at end of pattern, accept if also at end of string. */
++      if (!*pattern)
++        return !*s;
++
++      /* Process '*'. */
++      if (*pattern == '*')
++        {
++	  /* Skip the asterisk. */
++	  pattern++;
++
++	  /* If at end of pattern, accept immediately. */
++          if (!*pattern)
++            return 1;
++
++	  /* If next character in pattern is known, optimize. */
++          if (*pattern != '?' && *pattern != '*')
++            {
++	      /* Look instances of the next character in pattern, and try
++		 to match starting from those. */
++              for (; *s; s++)
++                if (*s == *pattern &&
++                    match_pattern_ylo(s + 1, pattern + 1))
++                  return 1;
++	      /* Failed. */
++              return 0;
++            }
++
++	  /* Move ahead one character at a time and try to match at each
++	     position. */
++          for (; *s; s++)
++            if (match_pattern_ylo(s, pattern))
++              return 1;
++	  /* Failed. */
++          return 0;
++        }
++
++      /* There must be at least one more character in the string.  If we are
++	 at the end, fail. */
++      if (!*s)
++        return 0;
++
++      /* Check if the next character of the string is acceptable. */
++      if (*pattern != '?' && *pattern != *s)
++	return 0;
++      
++      /* Move to the next character, both in string and in pattern. */
++      s++;
++      pattern++;
++    }
++  /*NOTREACHED*/
++}
++#endif /* DISABLE_WILDCARD_MATCHING */

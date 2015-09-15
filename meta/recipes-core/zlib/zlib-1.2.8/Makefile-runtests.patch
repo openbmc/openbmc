@@ -1,0 +1,38 @@
+Add 'ptest' target to Makefile, to run tests without checking dependencies.
+
+Signed-off-by: Anders Roxell <anders.roxell@enea.com>
+Upstream-Status: Pending
+---
+diff -uNr a/Makefile.in b/Makefile.in
+--- a/Makefile.in	2013-06-10 13:48:14.321959162 +0200
++++ b/Makefile.in	2013-06-10 13:49:36.686476448 +0200
+@@ -83,6 +83,9 @@
+ test: all teststatic testshared
+ 
+ teststatic: static
++	@make runteststatic
++
++runteststatic:
+ 	@TMPST=tmpst_$$; \
+ 	if echo hello world | ./minigzip | ./minigzip -d && ./example $$TMPST ; then \
+ 	  echo '		*** zlib test OK ***'; \
+@@ -92,6 +95,9 @@
+ 	rm -f $$TMPST
+ 
+ testshared: shared
++	@make runtestshared
++
++runtestshared:
+ 	@LD_LIBRARY_PATH=`pwd`:$(LD_LIBRARY_PATH) ; export LD_LIBRARY_PATH; \
+ 	LD_LIBRARYN32_PATH=`pwd`:$(LD_LIBRARYN32_PATH) ; export LD_LIBRARYN32_PATH; \
+ 	DYLD_LIBRARY_PATH=`pwd`:$(DYLD_LIBRARY_PATH) ; export DYLD_LIBRARY_PATH; \
+@@ -105,6 +111,9 @@
+ 	rm -f $$TMPSH
+ 
+ test64: all64
++	@make runtestall64
++
++runtestall64:
+ 	@TMP64=tmp64_$$; \
+ 	if echo hello world | ./minigzip64 | ./minigzip64 -d && ./example64 $$TMP64; then \
+ 	  echo '		*** zlib 64-bit test OK ***'; \

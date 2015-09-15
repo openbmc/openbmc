@@ -1,0 +1,27 @@
+Fix out of tree build support:
+
+| installing /etc/watchdog.conf
+|  /bin/mkdir -p '/media/build1/poky/build/tmp/work/i586-poky-linux/watchdog/5.13-r0/image/usr/share/man/man5'
+|  /bin/mkdir -p '/media/build1/poky/build/tmp/work/i586-poky-linux/watchdog/5.13-r0/image/usr/share/man/man8'
+|  /usr/bin/install -c -m 644 /media/build1/poky/build/tmp/work/i586-poky-linux/watchdog/5.13-r0/watchdog-5.13/watchdog.conf.5 '/media/build1/poky/build/tmp/work/i586-poky-linux/watchdog/5.13-r0/image/usr/share/man/man5'
+|  /usr/bin/install -c -m 644 /media/build1/poky/build/tmp/work/i586-poky-linux/watchdog/5.13-r0/watchdog-5.13/watchdog.8 /media/build1/poky/build/tmp/work/i586-poky-linux/watchdog/5.13-r0/watchdog-5.13/wd_keepalive.8 /media/build1/poky/build/tmp/work/i586-poky-linux/watchdog/5.13-r0/watchdog-5.13/wd_identify.8 '/media/build1/poky/build/tmp/work/i586-poky-linux/watchdog/5.13-r0/image/usr/share/man/man8'
+| /usr/bin/install: cannot stat `watchdog.conf': No such file or directory
+| make[2]: *** [install-etc-local] Error 1
+
+Upstream-Status: Pending
+
+RP 2013/03/21
+
+Index: watchdog-5.13/Makefile.am
+===================================================================
+--- watchdog-5.13.orig/Makefile.am	2013-02-01 11:15:44.000000000 +0000
++++ watchdog-5.13/Makefile.am	2013-03-21 11:59:35.637139031 +0000
+@@ -16,7 +16,7 @@
+ 	else \
+ 	        echo "installing $(CONFIG_FILENAME)"; \
+ 		$(mkinstalldirs) `dirname $(DESTDIR)$(CONFIG_FILENAME)`; \
+-	        $(INSTALL_DATA) watchdog.conf $(DESTDIR)$(CONFIG_FILENAME); \
++	        $(INSTALL_DATA) $(srcdir)/watchdog.conf $(DESTDIR)$(CONFIG_FILENAME); \
+ 	fi
+ 
+ install-data-local: install-etc-local

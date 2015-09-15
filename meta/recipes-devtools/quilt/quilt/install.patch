@@ -1,0 +1,13 @@
+Upstream-Status: Pending
+
+--- quilt-0.47/Makefile.in	2008-12-31 19:09:13.000000000 +0000
++++ quilt-0.47/Makefile.in.orig	2008-08-21 13:21:32.000000000 +0100
+@@ -13,7 +13,7 @@
+ mandir :=	@mandir@
+ localedir :=	$(datadir)/locale
+ emacsdir :=	$(datadir)/emacs/site-lisp
+-etcdir :=	$(subst /usr/etc,/etc,$(prefix)/etc)
++etcdir :=	@sysconfdir@
+ 
+ INSTALL :=	@INSTALL@
+ POD2MAN :=	@POD2MAN@

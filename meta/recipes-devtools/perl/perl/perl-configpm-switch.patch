@@ -1,0 +1,47 @@
+Upstream-Status:Inappropriate [native]
+
+This patch is used for perl-native only. It enables the switching of
+configuration files between Config_heavy.pl and
+Config_heavy-target.pl by setting the environment variables
+PERLCONFIGTARGET - the later containing settings for the target while
+the former contains those for the host. This will allow cpan.bbclass
+to use the settings appropriate for the native and/or target builds
+as required. This also disables the use of the cache since the cached
+values would be valid for the host only.
+
+Index: perl-5.14.2/configpm
+===================================================================
+--- perl-5.14.2.orig/configpm
++++ perl-5.14.2/configpm
+@@ -658,7 +658,7 @@ sub FETCH {
+     my($self, $key) = @_;
+ 
+     # check for cached value (which may be undef so we use exists not defined)
+-    return exists $self->{$key} ? $self->{$key} : $self->fetch_string($key);
++    return $self->fetch_string($key);
+ }
+ 
+ ENDOFEND
+@@ -816,7 +816,21 @@ $config_txt .= sprintf <<'ENDOFTIE', $fa
+ sub DESTROY { }
+ 
+ sub AUTOLOAD {
+-    require 'Config_heavy.pl';
++    my $cfgfile = 'Config_heavy.pl';
++    if (defined $ENV{PERLCONFIGTARGET} and $ENV{PERLCONFIGTARGET} eq "yes")
++    {
++        $cfgfile = 'Config_heavy-target.pl';
++    }
++    if (defined $ENV{PERL_ARCHLIB})
++    {
++        push @INC, $ENV{PERL_ARCHLIB};
++        require $cfgfile;
++        pop @INC;
++    }
++    else
++    {
++        require $cfgfile;
++    }
+     goto \&launcher unless $Config::AUTOLOAD =~ /launcher$/;
+     die "&Config::AUTOLOAD failed on $Config::AUTOLOAD";
+ }

@@ -1,0 +1,38 @@
+This patch avoids underlinking issues since we pass -lz via LDFLAGS but it appears
+before pigz.o which needs symbols from libz however due to order linker happily discards libz
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: pigz-2.3.3/Makefile
+===================================================================
+--- pigz-2.3.3.orig/Makefile	2015-01-19 20:12:31.000000000 -0800
++++ pigz-2.3.3/Makefile	2015-01-28 09:11:50.266669184 -0800
+@@ -5,7 +5,7 @@
+ # use gcc and gmake on Solaris
+ 
+ pigz: pigz.o yarn.o try.o ${ZOPFLI}deflate.o ${ZOPFLI}blocksplitter.o ${ZOPFLI}tree.o ${ZOPFLI}lz77.o ${ZOPFLI}cache.o ${ZOPFLI}hash.o ${ZOPFLI}util.o ${ZOPFLI}squeeze.o ${ZOPFLI}katajainen.o
+-	$(CC) $(LDFLAGS) -o pigz $^ -lpthread -lm
++	$(CC) -o pigz $^ $(LDFLAGS) -lz -lpthread -lm
+ 	ln -f pigz unpigz
+ 
+ pigz.o: pigz.c yarn.h try.h ${ZOPFLI}deflate.h ${ZOPFLI}util.h
+@@ -35,7 +35,7 @@
+ dev: pigz pigzt pigzn
+ 
+ pigzt: pigzt.o yarnt.o try.o ${ZOPFLI}deflate.o ${ZOPFLI}blocksplitter.o ${ZOPFLI}tree.o ${ZOPFLI}lz77.o ${ZOPFLI}cache.o ${ZOPFLI}hash.o ${ZOPFLI}util.o ${ZOPFLI}squeeze.o ${ZOPFLI}katajainen.o
+-	$(CC) $(LDFLAGS) -o pigzt $^ -lpthread -lm
++	$(CC) -o pigzt $^ $(LDFLAGS) -lz -lpthread -lm
+ 
+ pigzt.o: pigz.c yarn.h try.h
+ 	$(CC) $(CFLAGS) -DDEBUG -g -c -o pigzt.o pigz.c
+@@ -44,7 +44,7 @@
+ 	$(CC) $(CFLAGS) -DDEBUG -g -c -o yarnt.o yarn.c
+ 
+ pigzn: pigzn.o tryn.o ${ZOPFLI}deflate.o ${ZOPFLI}blocksplitter.o ${ZOPFLI}tree.o ${ZOPFLI}lz77.o ${ZOPFLI}cache.o ${ZOPFLI}hash.o ${ZOPFLI}util.o ${ZOPFLI}squeeze.o ${ZOPFLI}katajainen.o
+-	$(CC) $(LDFLAGS) -o pigzn $^ -lm
++	$(CC) -o pigzn $^ $(LDFLAGS) -lz -lm
+ 
+ pigzn.o: pigz.c try.h
+ 	$(CC) $(CFLAGS) -DDEBUG -DNOTHREAD -g -c -o pigzn.o pigz.c

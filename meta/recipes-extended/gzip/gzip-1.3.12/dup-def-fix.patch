@@ -1,0 +1,48 @@
+gzip uses gnulib, whose header conflict with glibc. This patch rename some function to avoid conflict.
+
+Signed-off-by: Zhai Edwin <edwin.zhai@intel.com>
+
+Upstream-Status: Inappropriate [licensing]
+
+Index: gzip-1.3.12/gzip.c
+===================================================================
+--- gzip-1.3.12.orig/gzip.c	2010-08-13 10:29:38.000000000 +0800
++++ gzip-1.3.12/gzip.c	2010-08-13 10:29:44.000000000 +0800
+@@ -1637,7 +1637,7 @@
+ 	}
+       }
+ 
+-    if (futimens (ofd, ofname, timespec) != 0)
++    if (futimens_gnulib (ofd, ofname, timespec) != 0)
+       {
+ 	int e = errno;
+ 	WARN ((stderr, "%s: ", program_name));
+Index: gzip-1.3.12/lib/utimens.c
+===================================================================
+--- gzip-1.3.12.orig/lib/utimens.c	2010-08-13 10:33:47.000000000 +0800
++++ gzip-1.3.12/lib/utimens.c	2010-08-13 10:34:02.000000000 +0800
+@@ -75,7 +75,7 @@
+    Return 0 on success, -1 (setting errno) on failure.  */
+ 
+ int
+-futimens (int fd ATTRIBUTE_UNUSED,
++futimens_gnulib (int fd ATTRIBUTE_UNUSED,
+ 	  char const *file, struct timespec const timespec[2])
+ {
+   /* Some Linux-based NFS clients are buggy, and mishandle time stamps
+@@ -185,5 +185,5 @@
+ int
+ utimens (char const *file, struct timespec const timespec[2])
+ {
+-  return futimens (-1, file, timespec);
++  return futimens_gnulib (-1, file, timespec);
+ }
+Index: gzip-1.3.12/lib/utimens.h
+===================================================================
+--- gzip-1.3.12.orig/lib/utimens.h	2010-08-13 10:14:57.000000000 +0800
++++ gzip-1.3.12/lib/utimens.h	2010-08-13 10:21:45.000000000 +0800
+@@ -1,3 +1,3 @@
+ #include <time.h>
+-int futimens (int, char const *, struct timespec const [2]);
++int futimens_gnulib (int, char const *, struct timespec const [2]);
+ int utimens (char const *, struct timespec const [2]);

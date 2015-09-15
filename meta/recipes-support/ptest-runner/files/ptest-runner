@@ -1,0 +1,27 @@
+#!/bin/sh
+ANYFAILED=no
+echo "START: $0"
+
+for libdir in /usr/lib*
+do
+
+    [ ! -d "$libdir" ] && continue
+
+    for x in `ls -d $libdir/*/ptest 2>/dev/null`
+    do
+        [ ! -f $x/run-ptest ] && continue
+        [ -h `dirname $x` ] && continue
+
+        date "+%Y-%m-%dT%H:%M"
+        echo "BEGIN: $x"
+        cd "$x"
+        ./run-ptest || ANYFAILED=yes
+        echo "END: $x"
+        date "+%Y-%m-%dT%H:%M"
+    done
+done
+echo "STOP: $0"
+if [ "$ANYFAILED" = "yes"  ]; then
+    exit 1
+fi
+exit 0

@@ -1,0 +1,24 @@
+Disable documentation for now as it uses tools currently not supported
+by OE-Core. It uses sgmltools and po4a.
+
+Upstream-Status: Inappropriate [OE-Core specific]
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+Index: base-passwd-3.5.28/Makefile.in
+===================================================================
+--- base-passwd-3.5.28.orig/Makefile.in
++++ base-passwd-3.5.28/Makefile.in
+@@ -25,13 +25,10 @@ gen_configure	= config.cache config.stat
+ 		  confdefhs.h config.h Makefile
+ 
+ all: update-passwd
+-	$(MAKE) -C doc all
+-	$(MAKE) -C man all
+ 
+ install: all
+ 	mkdir -p $(DESTDIR)$(sbindir)
+ 	$(INSTALL) update-passwd $(DESTDIR)$(sbindir)/
+-	$(MAKE) -C man install
+ 
+ update-passwd.o: version.h
+ 

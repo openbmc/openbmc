@@ -1,0 +1,33 @@
+Do not hardcode /usr into include paths when cross compiling
+
+-Khem
+
+Upstream-Status: Pending
+ 
+---
+ setup.py |   15 ++-------------
+ 1 file changed, 2 insertions(+), 13 deletions(-)
+
+Index: Python-3.3.2/setup.py
+===================================================================
+--- Python-3.3.2.orig/setup.py
++++ Python-3.3.2/setup.py
+@@ -444,7 +444,8 @@ class PyBuildExt(build_ext):
+         # only change this for cross builds for 3.3, issues on Mageia
+         if cross_compiling:
+             self.add_gcc_paths()
+-        self.add_multiarch_paths()
++        if not cross_compiling:
++            self.add_multiarch_paths()
+ 
+         # Add paths specified in the environment variables LDFLAGS and
+         # CPPFLAGS for header and library files.
+@@ -480,7 +481,7 @@ class PyBuildExt(build_ext):
+                     for directory in reversed(options.dirs):
+                         add_dir_to_list(dir_list, directory)
+ 
+-        if os.path.normpath(sys.base_prefix) != '/usr' \
++        if not cross_compiling and os.path.normpath(sys.base_prefix) != '/usr' \
+                 and not sysconfig.get_config_var('PYTHONFRAMEWORK'):
+             # OSX note: Don't add LIBDIR and INCLUDEDIR to building a framework
+             # (PYTHONFRAMEWORK is set) to avoid # linking problems when

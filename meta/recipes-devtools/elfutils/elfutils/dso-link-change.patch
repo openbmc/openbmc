@@ -1,0 +1,32 @@
+Upstream-Status: Pending
+
+# This patch makes the link to the dependencies of libdw explicit, as recent
+# ld no longer implicitly links them. See
+# http://lists.fedoraproject.org/pipermail/devel/2010-March/133601.html as
+# a similar example of the error message you can encounter without this patch,
+# and https://fedoraproject.org/wiki/UnderstandingDSOLinkChange and
+# https://fedoraproject.org/wiki/Features/ChangeInImplicitDSOLinking for more
+# details.
+
+--- elfutils-0.148.orig/src/Makefile.am
++++ elfutils-0.148/src/Makefile.am
+@@ -86,7 +86,7 @@ libdw = ../libdw/libdw.a $(zip_LIBS) $(l
+ libelf = ../libelf/libelf.a
+ else
+ libasm = ../libasm/libasm.so
+-libdw = ../libdw/libdw.so
++libdw = ../libdw/libdw.so $(zip_LIBS) $(libelf) $(libebl) -ldl
+ libelf = ../libelf/libelf.so
+ endif
+ libebl = ../libebl/libebl.a
+--- elfutils-0.148.orig/tests/Makefile.am
++++ elfutils-0.148/tests/Makefile.am
+@@ -172,7 +172,7 @@ libdw = ../libdw/libdw.a $(zip_LIBS) $(l
+ libelf = ../libelf/libelf.a
+ libasm = ../libasm/libasm.a
+ else
+-libdw = ../libdw/libdw.so
++libdw = ../libdw/libdw.so $(zip_LIBS) $(libelf) $(libebl) -ldl
+ libelf = ../libelf/libelf.so
+ libasm = ../libasm/libasm.so
+ endif

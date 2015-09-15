@@ -1,0 +1,30 @@
+From f629e041e9f678fcd86ad764a15117dff63c271c Mon Sep 17 00:00:00 2001
+From: Carlos Rafael Giani <dv@pseudoterminal.org>
+Date: Sat, 27 Apr 2013 02:50:25 +0200
+Subject: [PATCH] omx: fixed type error in printf call
+
+%zu expects size_t
+
+Upstream-Status: Submitted [https://bugzilla.gnome.org/show_bug.cgi?id=699008]
+
+Signed-off-by: Carlos Rafael Giani <dv@pseudoterminal.org>
+---
+ omx/gstomx.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/omx/gstomx.c b/omx/gstomx.c
+index a2945ed..1eca7cc 100644
+--- a/omx/gstomx.c
++++ b/omx/gstomx.c
+@@ -1630,7 +1630,7 @@ gst_omx_port_allocate_buffers_unlocked (GstOMXPort * port,
+ 
+   GST_INFO_OBJECT (comp->parent,
+       "Allocating %d buffers of size %zu for %s port %u", n,
+-      port->port_def.nBufferSize, comp->name, (guint) port->index);
++      (size_t) (port->port_def.nBufferSize), comp->name, (guint) port->index);
+ 
+   if (!port->buffers)
+     port->buffers = g_ptr_array_sized_new (n);
+-- 
+1.7.9.5
+

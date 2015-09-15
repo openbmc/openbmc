@@ -1,0 +1,292 @@
+This patch comes from OpenEmbedded.
+The original patch is from Debian / SuSE to implement replacedefaultroute
+Rebased it to fit ppp-2.4.5. Dongxiao Xu <dongxiao.xu@intel.com>
+
+Upstream-Status: Inappropriate [debian/suse patches]
+
+diff -urN ppp-2.4.5-orig/pppd/ipcp.c ppp-2.4.5/pppd/ipcp.c
+--- ppp-2.4.5-orig/pppd/ipcp.c	2010-06-30 15:51:12.050166398 +0800
++++ ppp-2.4.5/pppd/ipcp.c	2010-06-30 16:40:00.478716855 +0800
+@@ -198,6 +198,16 @@
+       "disable defaultroute option", OPT_ALIAS | OPT_A2CLR,
+       &ipcp_wantoptions[0].default_route },
+ 
++#ifdef __linux__
++    { "replacedefaultroute", o_bool,
++                               &ipcp_wantoptions[0].replace_default_route,
++      "Replace default route", 1
++    },
++    { "noreplacedefaultroute", o_bool,
++                               &ipcp_allowoptions[0].replace_default_route,
++      "Never replace default route", OPT_A2COPY,
++                               &ipcp_wantoptions[0].replace_default_route },
++#endif
+     { "proxyarp", o_bool, &ipcp_wantoptions[0].proxy_arp,
+       "Add proxy ARP entry", OPT_ENABLE|1, &ipcp_allowoptions[0].proxy_arp },
+     { "noproxyarp", o_bool, &ipcp_allowoptions[0].proxy_arp,
+@@ -271,7 +281,7 @@
+     ip_active_pkt
+ };
+ 
+-static void ipcp_clear_addrs __P((int, u_int32_t, u_int32_t));
++static void ipcp_clear_addrs __P((int, u_int32_t, u_int32_t, bool));
+ static void ipcp_script __P((char *, int));	/* Run an up/down script */
+ static void ipcp_script_done __P((void *));
+ 
+@@ -1742,7 +1752,12 @@
+     if (!sifnpmode(u, PPP_IP, NPMODE_QUEUE))
+ 	return 0;
+     if (wo->default_route)
++#ifndef __linux__
+ 	if (sifdefaultroute(u, wo->ouraddr, wo->hisaddr))
++#else
++	if (sifdefaultroute(u, wo->ouraddr, wo->hisaddr,
++                                            wo->replace_default_route))
++#endif
+ 	    default_route_set[u] = 1;
+     if (wo->proxy_arp)
+ 	if (sifproxyarp(u, wo->hisaddr))
+@@ -1830,7 +1845,8 @@
+      */
+     if (demand) {
+ 	if (go->ouraddr != wo->ouraddr || ho->hisaddr != wo->hisaddr) {
+-	    ipcp_clear_addrs(f->unit, wo->ouraddr, wo->hisaddr);
++	    ipcp_clear_addrs(f->unit, wo->ouraddr, wo->hisaddr, 
++				      wo->replace_default_route);
+ 	    if (go->ouraddr != wo->ouraddr) {
+ 		warn("Local IP address changed to %I", go->ouraddr);
+ 		script_setenv("OLDIPLOCAL", ip_ntoa(wo->ouraddr), 0);
+@@ -1855,7 +1871,12 @@
+ 
+ 	    /* assign a default route through the interface if required */
+ 	    if (ipcp_wantoptions[f->unit].default_route) 
++#ifndef __linux__
+ 		if (sifdefaultroute(f->unit, go->ouraddr, ho->hisaddr))
++#else
++		if (sifdefaultroute(f->unit, go->ouraddr, ho->hisaddr,
++					     wo->replace_default_route))
++#endif
+ 		    default_route_set[f->unit] = 1;
+ 
+ 	    /* Make a proxy ARP entry if requested. */
+@@ -1905,7 +1926,12 @@
+ 
+ 	/* assign a default route through the interface if required */
+ 	if (ipcp_wantoptions[f->unit].default_route) 
++#ifndef __linux__
+ 	    if (sifdefaultroute(f->unit, go->ouraddr, ho->hisaddr))
++#else
++	    if (sifdefaultroute(f->unit, go->ouraddr, ho->hisaddr,
++					 wo->replace_default_route))
++#endif
+ 		default_route_set[f->unit] = 1;
+ 
+ 	/* Make a proxy ARP entry if requested. */
+@@ -1983,7 +2009,7 @@
+ 	sifnpmode(f->unit, PPP_IP, NPMODE_DROP);
+ 	sifdown(f->unit);
+ 	ipcp_clear_addrs(f->unit, ipcp_gotoptions[f->unit].ouraddr,
+-			 ipcp_hisoptions[f->unit].hisaddr);
++			 ipcp_hisoptions[f->unit].hisaddr, 0);
+     }
+ 
+     /* Execute the ip-down script */
+@@ -1999,12 +2025,21 @@
+  * proxy arp entries, etc.
+  */
+ static void
+-ipcp_clear_addrs(unit, ouraddr, hisaddr)
++ipcp_clear_addrs(unit, ouraddr, hisaddr, replacedefaultroute)
+     int unit;
+     u_int32_t ouraddr;  /* local address */
+     u_int32_t hisaddr;  /* remote address */
++    bool replacedefaultroute;
+ {
+-    if (proxy_arp_set[unit]) {
++    /* If replacedefaultroute, sifdefaultroute will be called soon
++     * with replacedefaultroute set and that will overwrite the current
++     * default route. This is the case only when doing demand, otherwise
++     * during demand, this cifdefaultroute would restore the old default
++     * route which is not what we want in this case. In the non-demand
++     * case, we'll delete the default route and restore the old if there
++     * is one saved by an sifdefaultroute with replacedefaultroute.
++     */
++    if (!replacedefaultroute && default_route_set[unit]) {
+ 	cifproxyarp(unit, hisaddr);
+ 	proxy_arp_set[unit] = 0;
+     }
+diff -urN ppp-2.4.5-orig/pppd/ipcp.h ppp-2.4.5/pppd/ipcp.h
+--- ppp-2.4.5-orig/pppd/ipcp.h	2010-06-30 15:51:12.043682063 +0800
++++ ppp-2.4.5/pppd/ipcp.h	2010-06-30 16:40:49.586203129 +0800
+@@ -70,6 +70,7 @@
+     bool old_addrs;		/* Use old (IP-Addresses) option? */
+     bool req_addr;		/* Ask peer to send IP address? */
+     bool default_route;		/* Assign default route through interface? */
++    bool replace_default_route; /* Replace default route through interface? */
+     bool proxy_arp;		/* Make proxy ARP entry for peer? */
+     bool neg_vj;		/* Van Jacobson Compression? */
+     bool old_vj;		/* use old (short) form of VJ option? */
+diff -urN ppp-2.4.5-orig/pppd/pppd.8 ppp-2.4.5/pppd/pppd.8
+--- ppp-2.4.5-orig/pppd/pppd.8	2010-06-30 15:51:12.043682063 +0800
++++ ppp-2.4.5/pppd/pppd.8	2010-06-30 16:42:47.102413859 +0800
+@@ -121,6 +121,13 @@
+ This entry is removed when the PPP connection is broken.  This option
+ is privileged if the \fInodefaultroute\fR option has been specified.
+ .TP
++.B replacedefaultroute
++This option is a flag to the defaultroute option. If defaultroute is
++set and this flag is also set, pppd replaces an existing default route
++with the new default route.
++
++
++.TP
+ .B disconnect \fIscript
+ Execute the command specified by \fIscript\fR, by passing it to a
+ shell, after
+@@ -717,7 +724,12 @@
+ .TP
+ .B nodefaultroute
+ Disable the \fIdefaultroute\fR option.  The system administrator who
+-wishes to prevent users from creating default routes with pppd
++wishes to prevent users from adding a default route with pppd
++can do so by placing this option in the /etc/ppp/options file.
++.TP
++.B noreplacedefaultroute
++Disable the \fIreplacedefaultroute\fR option. The system administrator who
++wishes to prevent users from replacing a default route with pppd
+ can do so by placing this option in the /etc/ppp/options file.
+ .TP
+ .B nodeflate
+diff -urN ppp-2.4.5-orig/pppd/pppd.h ppp-2.4.5/pppd/pppd.h
+--- ppp-2.4.5-orig/pppd/pppd.h	2010-06-30 15:51:12.050166398 +0800
++++ ppp-2.4.5/pppd/pppd.h	2010-06-30 16:43:36.514148327 +0800
+@@ -643,7 +643,11 @@
+ int  cif6addr __P((int, eui64_t, eui64_t));
+ 				/* Remove an IPv6 address from i/f */
+ #endif
++#ifndef __linux__
+ int  sifdefaultroute __P((int, u_int32_t, u_int32_t));
++#else
++int  sifdefaultroute __P((int, u_int32_t, u_int32_t, bool replace_default_rt));
++#endif
+ 				/* Create default route through i/f */
+ int  cifdefaultroute __P((int, u_int32_t, u_int32_t));
+ 				/* Delete default route through i/f */
+diff -urN ppp-2.4.5-orig/pppd/sys-linux.c ppp-2.4.5/pppd/sys-linux.c
+--- ppp-2.4.5-orig/pppd/sys-linux.c	2010-06-30 15:51:12.050166398 +0800
++++ ppp-2.4.5/pppd/sys-linux.c	2010-06-30 16:54:00.362716231 +0800
+@@ -206,6 +206,8 @@
+ 
+ static int	if_is_up;	/* Interface has been marked up */
+ static int	have_default_route;	/* Gateway for default route added */
++static struct rtentry old_def_rt;       /* Old default route */
++static int       default_rt_repl_rest;  /* replace and restore old default rt */
+ static u_int32_t proxy_arp_addr;	/* Addr for proxy arp entry added */
+ static char proxy_arp_dev[16];		/* Device for proxy arp entry */
+ static u_int32_t our_old_addr;		/* for detecting address changes */
+@@ -1537,6 +1539,9 @@
+ 	p = NULL;
+     }
+ 
++    SET_SA_FAMILY (rt->rt_dst,     AF_INET);
++    SET_SA_FAMILY (rt->rt_gateway, AF_INET);
++
+     SIN_ADDR(rt->rt_dst) = strtoul(cols[route_dest_col], NULL, 16);
+     SIN_ADDR(rt->rt_gateway) = strtoul(cols[route_gw_col], NULL, 16);
+     SIN_ADDR(rt->rt_genmask) = strtoul(cols[route_mask_col], NULL, 16);
+@@ -1606,20 +1611,51 @@
+ /********************************************************************
+  *
+  * sifdefaultroute - assign a default route through the address given.
+- */
+-
+-int sifdefaultroute (int unit, u_int32_t ouraddr, u_int32_t gateway)
+-{
+-    struct rtentry rt;
+-
+-    if (defaultroute_exists(&rt) && strcmp(rt.rt_dev, ifname) != 0) {
+-	if (rt.rt_flags & RTF_GATEWAY)
+-	    error("not replacing existing default route via %I",
+-		  SIN_ADDR(rt.rt_gateway));
+-	else
+-	    error("not replacing existing default route through %s",
+-		  rt.rt_dev);
+-	return 0;
++ *
++ * If the global default_rt_repl_rest flag is set, then this function
++ * already replaced the original system defaultroute with some other
++ * route and it should just replace the current defaultroute with
++ * another one, without saving the current route. Use: demand mode,
++ * when pppd sets first a defaultroute it it's temporary ppp0 addresses
++ * and then changes the temporary addresses to the addresses for the real
++ * ppp connection when it has come up.
++ */
++
++int sifdefaultroute (int unit, u_int32_t ouraddr, u_int32_t gateway, bool replace)
++{
++    struct rtentry rt, tmp_rt;
++    struct rtentry *del_rt = NULL;
++
++    if (default_rt_repl_rest) {
++	/* We have already reclaced the original defaultroute, if we
++         * are called again, we will delete the current default route
++         * and set the new default route in this function.  
++         * - this is normally only the case the doing demand: */
++	if (defaultroute_exists( &tmp_rt ))
++		del_rt = &tmp_rt;
++    } else if ( defaultroute_exists( &old_def_rt                ) &&
++	                     strcmp(  old_def_rt.rt_dev, ifname ) != 0) {
++	/* We did not yet replace an existing default route, let's
++	 * check if we should save and replace a default route:
++         */
++	u_int32_t old_gateway = SIN_ADDR(old_def_rt.rt_gateway);
++	if (old_gateway != gateway) {
++	    if (!replace) {
++	        error("not replacing default route to %s [%I]",
++			old_def_rt.rt_dev, old_gateway);
++		return 0;
++	    } else {
++		// we need to copy rt_dev because we need it permanent too:
++		char * tmp_dev = malloc(strlen(old_def_rt.rt_dev)+1);
++		strcpy(tmp_dev, old_def_rt.rt_dev);
++		old_def_rt.rt_dev = tmp_dev;
++
++		notice("replacing old default route to %s [%I]",
++			old_def_rt.rt_dev, old_gateway);
++	        default_rt_repl_rest = 1;
++		del_rt = &old_def_rt;
++	    }
++	}
+     }
+ 
+     memset (&rt, 0, sizeof (rt));
+@@ -1638,6 +1674,12 @@
+ 	    error("default route ioctl(SIOCADDRT): %m");
+ 	return 0;
+     }
++    if (default_rt_repl_rest && del_rt)
++        if (ioctl(sock_fd, SIOCDELRT, del_rt) < 0) {
++	    if ( ! ok_error ( errno ))
++	        error("del old default route ioctl(SIOCDELRT): %m(%d)", errno);
++	    return 0;
++        }
+ 
+     have_default_route = 1;
+     return 1;
+@@ -1673,6 +1715,16 @@
+ 	    return 0;
+ 	}
+     }
++    if (default_rt_repl_rest) {
++	notice("restoring old default route to %s [%I]",
++			old_def_rt.rt_dev, SIN_ADDR(old_def_rt.rt_gateway));
++        if (ioctl(sock_fd, SIOCADDRT, &old_def_rt) < 0) {
++	    if ( ! ok_error ( errno ))
++	        error("restore default route ioctl(SIOCADDRT): %m(%d)", errno);
++	    return 0;
++        }
++        default_rt_repl_rest = 0;
++    }
+ 
+     return 1;
+ }

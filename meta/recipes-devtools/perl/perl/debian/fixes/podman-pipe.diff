@@ -1,0 +1,109 @@
+From 7671d101baa75d7a79bfbd8c75c1595fbb3f53ba Mon Sep 17 00:00:00 2001
+From: Russ Allbery <rra@cpan.org>
+Date: Sat, 7 Feb 2015 19:03:34 -0800
+Subject: Better errors for man pages from standard input
+
+[Pod::Man] Attempt to detect if the input came from a pipe and
+therefore has a completely unhelpful (and nonreproducible) source file
+name, and diagnose this as an error.  Document that the name option
+(--name to pod2man) is required when processing POD source from
+standard input.  (Debian Bug#777405)
+
+(backported to Perl 5.20.2 by Niko Tyni <ntyni@debian.org>)
+
+Origin: upstream, http://git.eyrie.org/?p=perl/podlators.git;a=commitdiff;h=d98872e46c93861b7aba14949e1258712087dc55
+Bug-Debian: https://bugs.debian.org/777405
+Patch-Name: fixes/podman-pipe.diff
+---
+ cpan/podlators/lib/Pod/Man.pm     | 15 +++++++++++++++
+ cpan/podlators/scripts/pod2man.PL |  4 ++++
+ cpan/podlators/t/devise-title.t   | 32 ++++++++++++++++++++++++++++++++
+ 3 files changed, 51 insertions(+)
+ create mode 100755 cpan/podlators/t/devise-title.t
+
+diff --git a/cpan/podlators/lib/Pod/Man.pm b/cpan/podlators/lib/Pod/Man.pm
+index 8997a15..969eaff 100644
+--- a/cpan/podlators/lib/Pod/Man.pm
++++ b/cpan/podlators/lib/Pod/Man.pm
+@@ -828,6 +828,17 @@ sub devise_title {
+     $section = 3 if (!$$self{section} && $name =~ /\.pm\z/i);
+     $name =~ s/\.p(od|[lm])\z//i;
+ 
++    # If Pod::Parser gave us an IO::File reference as the source file name,
++    # convert that to the empty string as well.  Then, if we don't have a
++    # valid name, emit a warning and convert it to STDIN.
++    if ($name =~ /^IO::File(?:=\w+)\(0x[\da-f]+\)$/i) {
++        $name = '';
++    }
++    if ($name eq '') {
++        $self->whine (1, 'No name given for document');
++        $name = 'STDIN';
++    }
++
+     # If the section isn't 3, then the name defaults to just the basename of
+     # the file.  Otherwise, assume we're dealing with a module.  We want to
+     # figure out the full module name from the path to the file, but we don't
+@@ -1705,6 +1716,10 @@ module path.  If it is, a path like C<.../lib/Pod/Man.pm> is converted into
+ a name like C<Pod::Man>.  This option, if given, overrides any automatic
+ determination of the name.
+ 
++If generating a manual page from standard input, this option is required,
++since there's otherwise no way for Pod::Man to know what to use for the
++manual page name.
++
+ =item nourls
+ 
+ Normally, LZ<><> formatting codes with a URL but anchor text are formatted
+diff --git a/cpan/podlators/scripts/pod2man.PL b/cpan/podlators/scripts/pod2man.PL
+index 38695f8..43e35df 100644
+--- a/cpan/podlators/scripts/pod2man.PL
++++ b/cpan/podlators/scripts/pod2man.PL
+@@ -236,6 +236,10 @@ Note that this option is probably not useful when converting multiple POD
+ files at once.  The convention for Unix man pages for commands is for the
+ man page title to be in all-uppercase even if the command isn't.
+ 
++When converting POD source from standard input, this option is required,
++since there's otherwise no way to know what to use as the name of the
++manual page.
++
+ =item B<--nourls>
+ 
+ Normally, LZ<><> formatting codes with a URL but anchor text are formatted
+diff --git a/cpan/podlators/t/devise-title.t b/cpan/podlators/t/devise-title.t
+new file mode 100755
+index 0000000..8639441
+--- /dev/null
++++ b/cpan/podlators/t/devise-title.t
+@@ -0,0 +1,32 @@
++#!/usr/bin/perl
++#
++# Tests for the automatic determination of the manual page title if not
++# specified via options to pod2man or the Pod::Man constructor.
++
++use 5.006;
++use strict;
++use warnings;
++
++use File::Spec;
++use IO::File;
++use Test::More tests => 3;
++
++BEGIN {
++    use_ok('Pod::Man');
++}
++
++# Create a parser and set it up with an input source.  There isn't a way to do
++# this in Pod::Simple without actually parsing the document, so send the
++# output to a string that we'll ignore.
++my $path = File::Spec->catdir('t', 'data', 'basic.pod');
++my $handle = IO::File->new($path, 'r');
++my $parser = Pod::Man->new(errors => 'pod');
++my $output;
++$parser->output_string(\$output);
++$parser->parse_file($handle);
++
++# Check the results of devise_title for this.  We should get back STDIN, and
++# we should have reported an error.
++my ($name, $section) = $parser->devise_title;
++is($name, 'STDIN', 'devise_title uses STDIN for file handle input');
++ok($parser->errors_seen, '...and errors were seen');

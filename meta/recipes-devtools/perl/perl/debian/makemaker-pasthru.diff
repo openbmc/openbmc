@@ -1,0 +1,30 @@
+From 593dd52f535b1f439dfd0afe52211ae8960e980a Mon Sep 17 00:00:00 2001
+From: Niko Tyni <ntyni@debian.org>
+Date: Sun, 24 Aug 2014 12:56:11 -0700
+Subject: Pass LD settings through to subdirectories
+
+[rt.cpan.org #28632] fixed most issues with passing LD down to
+subdirectory Makefile.PL files. However, there are some distributions
+(including Wx, Par::Packer, and Verilog-Perl) that explicitly set
+LD. Those still can't be overridden from the command line. Adding LD to
+the PASTHRU list fixes this.
+
+Bug-Debian: https://bugs.debian.org/758471
+Patch-Name: debian/makemaker-pasthru.diff
+---
+ cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_Unix.pm | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_Unix.pm b/cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_Unix.pm
+index 4a8e14c..548d98e 100644
+--- a/cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_Unix.pm
++++ b/cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_Unix.pm
+@@ -2793,7 +2793,7 @@ sub pasthru {
+     my($sep) = $Is{VMS} ? ',' : '';
+     $sep .= "\\\n\t";
+ 
+-    foreach my $key (qw(LIB LIBPERL_A LINKTYPE OPTIMIZE
++    foreach my $key (qw(LIB LIBPERL_A LINKTYPE OPTIMIZE LD
+                      PREFIX INSTALL_BASE)
+                  )
+     {

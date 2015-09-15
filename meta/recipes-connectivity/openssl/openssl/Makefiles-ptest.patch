@@ -1,0 +1,77 @@
+Add 'buildtest' and 'runtest' targets to Makefile, to build and run tests
+cross-compiled.
+
+Signed-off-by: Anders Roxell <anders.roxell@enea.com>
+Signed-off-by: Maxin B. John <maxin.john@enea.com>
+Upstream-Status: Pending
+---
+Index: openssl-1.0.2/Makefile.org
+===================================================================
+--- openssl-1.0.2.orig/Makefile.org
++++ openssl-1.0.2/Makefile.org
+@@ -451,8 +451,16 @@ rehash.time: certs apps
+ test:   tests
+ 
+ tests: rehash
++	$(MAKE) buildtest
++	$(MAKE) runtest
++
++buildtest:
++	@(cd test && \
++	$(CLEARENV) && $(MAKE) -e $(BUILDENV) TOP=.. TESTS='$(TESTS)' OPENSSL_DEBUG_MEMORY=on OPENSSL_CONF=../apps/openssl.cnf exe apps);
++
++runtest:
+ 	@(cd test && echo "testing..." && \
+-	$(CLEARENV) && $(MAKE) -e $(BUILDENV) TOP=.. TESTS='$(TESTS)' OPENSSL_DEBUG_MEMORY=on OPENSSL_CONF=../apps/openssl.cnf tests );
++	$(CLEARENV) && $(MAKE) -e $(BUILDENV) TOP=.. TESTS='$(TESTS)' OPENSSL_DEBUG_MEMORY=on OPENSSL_CONF=../apps/openssl.cnf alltests );
+ 	OPENSSL_CONF=apps/openssl.cnf util/opensslwrap.sh version -a
+ 
+ report:
+Index: openssl-1.0.2/test/Makefile
+===================================================================
+--- openssl-1.0.2.orig/test/Makefile
++++ openssl-1.0.2/test/Makefile
+@@ -137,7 +137,7 @@ tests:	exe apps $(TESTS)
+ apps:
+ 	@(cd ..; $(MAKE) DIRS=apps all)
+ 
+-alltests: \
++all-tests= \
+ 	test_des test_idea test_sha test_md4 test_md5 test_hmac \
+ 	test_md2 test_mdc2 test_wp \
+ 	test_rmd test_rc2 test_rc4 test_rc5 test_bf test_cast test_aes \
+@@ -148,6 +148,11 @@ alltests: \
+ 	test_jpake test_srp test_cms test_ocsp test_v3name test_heartbeat \
+ 	test_constant_time
+ 
++alltests:
++	@(for i in $(all-tests); do \
++	( $(MAKE) $$i && echo "PASS: $$i" ) || echo "FAIL: $$i"; \
++	done)
++
+ test_evp: $(EVPTEST)$(EXE_EXT) evptests.txt
+ 	../util/shlib_wrap.sh ./$(EVPTEST) evptests.txt
+ 
+@@ -213,7 +218,7 @@ test_x509: ../apps/openssl$(EXE_EXT) tx5
+ 	echo test second x509v3 certificate
+ 	sh ./tx509 v3-cert2.pem 2>/dev/null
+ 
+-test_rsa: $(RSATEST)$(EXE_EXT) ../apps/openssl$(EXE_EXT) trsa testrsa.pem
++test_rsa: ../apps/openssl$(EXE_EXT) trsa testrsa.pem
+ 	@sh ./trsa 2>/dev/null
+ 	../util/shlib_wrap.sh ./$(RSATEST)
+ 
+@@ -313,11 +318,11 @@ test_tsa: ../apps/openssl$(EXE_EXT) test
+ 	  sh ./testtsa; \
+ 	fi
+ 
+-test_ige: $(IGETEST)$(EXE_EXT)
++test_ige:
+ 	@echo "Test IGE mode"
+ 	../util/shlib_wrap.sh ./$(IGETEST)
+ 
+-test_jpake: $(JPAKETEST)$(EXE_EXT)
++test_jpake:
+ 	@echo "Test JPAKE"
+ 	../util/shlib_wrap.sh ./$(JPAKETEST)
+ 

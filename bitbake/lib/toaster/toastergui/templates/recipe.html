@@ -1,0 +1,242 @@
+{% extends "basebuilddetailpage.html" %}
+
+{% load projecttags %}
+
+{% block localbreadcrumb %}
+<li><a href="{% url 'recipes' build.pk %}">Recipes</a></li>
+<li>{{object.name}}_{{object.version}} </li>
+{% endblock %}
+
+{% block pagedetailinfomain %}
+
+<!-- Begin container -->
+
+<div class="row span11">
+    <div class="page-header">
+        <h1>{{object.name}}_{{object.version}}</h1>
+    </div>
+</div>
+
+<div class="row span7 tabbable">
+    <ul class="nav nav-pills">
+        <li class="{{tab_states.1}}">
+            <a href="#information" data-toggle="tab">
+                <i class="icon-question-sign get-help" title="Build-related information about the recipe"></i>
+                Recipe details
+            </a>
+        </li>
+        <li>
+             <a href="{% url "recipe_packages" build.pk object.id %}">
+                <i class="icon-question-sign get-help" title="The packaged output resulting from building the recipe"></i>
+                Packages ({{package_count}})
+            </a>
+        </li>
+        <li class="{{tab_states.3}}">
+            <a href="#dependencies" data-toggle="tab">
+                <i class="icon-question-sign get-help" title="The recipe build-time dependencies (i.e. other recipes)"></i>
+                Build dependencies ({{object.r_dependencies_recipe.all.count}})
+            </a>
+        </li>
+        <li class="{{tab_states.4}}">
+            <a href="#brought-in-by" data-toggle="tab">
+                <i class="icon-question-sign get-help" title="The recipe build-time reverse dependencies (i.e. the recipes that depend on this recipe)"></i>
+                Reverse build dependencies ({{object.r_dependencies_depends.all.count}})
+            </a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane {{tab_states.1}}" id="information">
+            <dl class="dl-horizontal">
+                <dt>
+                    <i class="icon-question-sign get-help" title="The name of the layer providing the recipe"></i>
+                    Layer
+                </dt>
+                <dd>{{layer.name}}</dd>
+
+                <dt>
+                    <i class="icon-question-sign get-help" title="Path to the recipe .bb file"></i>
+                    Recipe file
+                </dt>
+                <dd><code>{{object.file_path}} {% if object.pathflags %}<i>({{object.pathflags}})</i>{% endif %}</code></dd>
+                {% if layer_version.branch %}
+                <dt>
+                    <i class="icon-question-sign get-help" title="The Git branch of the layer providing the recipe"></i>
+                    Layer branch
+                </dt>
+                <dd>{{layer_version.branch}}</dd>
+                {% endif %}
+                <dt>
+                    <i class="icon-question-sign get-help" title="The Git commit of the layer providing the recipe"></i>
+                    Layer commit
+                </dt>
+                <dd class="iscommit">{{layer_version.commit}}</dd>
+            </dl>
+
+            <h2 class="details">Tasks</h2>
+            {% if not tasks %}
+            <div class="alert alert-info">
+                <strong>{{object.name}}_{{object.version}}</strong> does not have any tasks in this build.
+            </div>
+            {% else %}
+            <table class="table table-bordered table-hover">
+                <thead>
+		  <tr>
+                    <th>
+                        <i class="icon-question-sign get-help" title="The running sequence of each task in the build"></i>
+                        Order
+                    </th>
+                    <th>
+                        <i class="icon-question-sign get-help" title="The name of the task"></i>
+                        Task
+                    </th>
+                    <th>
+                        <i class="icon-question-sign get-help" title="This value tells you if a task had to run (executed) in order to generate the task output, or if the output was provided by another task and therefore the task didn't need to run (not executed)"></i>
+                        Executed
+                    </th>
+                    <th>
+                        <i class="icon-question-sign get-help" title="This column tells you if 'executed' tasks succeeded or failed. The column also tells you why 'not executed' tasks did not need to run"></i>
+                        Outcome
+                    </th>
+                    <th>
+                        <i class="icon-question-sign get-help" title="This column tells you if a task tried to restore output from the <code>sstate-cache</code> directory or mirrors, and reports the result: Succeeded, Failed or File not in cache"></i>
+                        Cache attempt
+                    </th>
+		  </tr>
+                </thead>
+                <tbody>
+
+                    {% for task in tasks %}
+
+                    <tr {{ task|task_color }} >
+
+                    <td><a {{ task|task_color }} href="{% url "task" build.pk task.pk %}">{{task.order}}</a></td>
+                    <td>
+                        <a {{ task|task_color }} href="{% url "task" build.pk task.pk %}">{{task.task_name}}</a>
+                        {% if task.get_description %}<i class="icon-question-sign get-help hover-help" title="" data-original-title="{{task.get_description}}"></i> {% endif %}
+                    </td>
+
+                    <td><a {{ task|task_color }} href="{% url "task" build.pk task.pk %}">{{task.get_executed_display}}</a></td>
+
+                    <td>
+                        <a {{ task|task_color }} href="{% url "task" build.pk task.pk %}">{{task.get_outcome_display}} </a>
+                        {% if task.outcome = task.OUTCOME_FAILED %}
+                            <a href="{% url 'build_artifact' build.pk "tasklogfile" task.pk %}">
+                                <i class="icon-download-alt" title="Download task log file"></i>
+                            </a>
+                        {% endif %}
+                        <i class="icon-question-sign get-help hover-help" title="{{task.get_outcome_help}}"></i>
+                    </td>
+                    <td>
+                        {% ifnotequal task.sstate_result task.SSTATE_NA %}
+                        <a {{ task|task_color }} href="{% url "task" build.pk task.pk %}">{{task.get_sstate_result_display}}</a>
+                        {% endifnotequal %}
+                    </td>
+
+                    </tr>
+
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+        <div class="tab-pane {{tab_states.3}}" id="dependencies">
+
+            {% if not object.r_dependencies_recipe.all %}
+            <div class="alert alert-info">
+                <strong>{{object.name}}_{{object.version}}</strong> has no build dependencies.
+            </div>
+            {% else %}
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            Recipe
+                        </th>
+                        <th>
+                            Version
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {% for rr in object.r_dependencies_recipe.all|dictsort:"depends_on.name" %}
+                    <tr>
+                        <td><a href="{% url "recipe" build.pk rr.depends_on.pk %}">{{rr.depends_on.name}}</a></td>
+                        <td><a href="{% url "recipe" build.pk rr.depends_on.pk %}">{{rr.depends_on.version}}</a></td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+            {% endif %}
+
+        </div>
+        <div class="tab-pane {{tab_states.4}}" id="brought-in-by">
+
+            {% if not object.r_dependencies_depends.all %}
+            <div class="alert alert-info">
+                <strong>{{object.name}}_{{object.version}}</strong> has no reverse build dependencies.
+            </div>
+            {% else %}
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            Recipe
+                        </th>
+                        <th>
+                            Version
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {% for rr in object.r_dependencies_depends.all|dictsort:"recipe.name" %}
+                    <tr>
+                        <td><a href="{% url "recipe" build.pk rr.recipe.pk %}">{{rr.recipe.name}}</a></td>
+                        <td><a href="{% url "recipe" build.pk rr.recipe.pk %}">{{rr.recipe.version}}</a></td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+<div class="row span4 well">
+    <h2>About {{object.name}}</h2>
+    <dl class="item-info">
+        {% if object.summary %}
+            <dt>Summary</dt>
+            <dd>{{object.summary}}</dd>
+        {% endif %}
+        {% if object.description %}
+            <dt>Description</dt>
+            <dd>{{object.description}}</dd>
+        {% endif %}
+        {% if object.homepage %}
+            <dt>Homepage</dt>
+            <dd><a href="{{object.homepage}}">{{object.homepage}}</a></dd>
+        {% endif %}
+        {% if object.bugtracker %}
+            <dt>Bugtracker</dt>
+            <dd><a href="{{object.bugtracker}}">{{object.bugtracker}}</a></dd>
+        {% endif %}
+        {% if object.section %}
+            <dt>
+            Section
+            <i class="icon-question-sign get-help" title="The section in which recipes should be categorized"></i>
+            </dt>
+            <dd>{{object.section}}</dd>
+        {% endif %}
+        {% if object.license %}
+            <dt>License</dt>
+            <dd>{{object.license}}</dd>
+        {% endif %}
+    </dl>
+</div>
+
+{% endblock %}

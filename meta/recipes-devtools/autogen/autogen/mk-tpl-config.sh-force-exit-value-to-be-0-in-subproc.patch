@@ -1,0 +1,30 @@
+Upstream-Status: Pending
+
+mk-tpl-config.sh: force exit value to be 0 in subprocess
+
+The return value of statement list=`<subcommands>` is the exit value of the
+subcommands. So if the subcommands fails, the compilation fails. This is obviously
+not intended. In the normal case, we expect the grep command to fail as there should
+be no 'noreturn' word in the libguile files.
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ autoopts/mk-tpl-config.sh |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/autoopts/mk-tpl-config.sh b/autoopts/mk-tpl-config.sh
+index 926f5ab..6b4a0fb 100755
+--- a/autoopts/mk-tpl-config.sh
++++ b/autoopts/mk-tpl-config.sh
+@@ -202,7 +202,7 @@ fix_guile() {
+ 
+     list=`set +e ; exec 2>/dev/null
+         find ${libguiledir}/libguile* -type f | \
+-            xargs grep -l -E '\<noreturn\>'`
++            xargs grep -l -E '\<noreturn\>' ; exit 0`
+ 
+     test -z "$list" && exit 0
+ 
+-- 
+1.7.9.5
+

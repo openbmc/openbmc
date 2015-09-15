@@ -1,0 +1,5 @@
+#!/bin/sh
+
+PSEUDO_UNLOAD=1 qemuwrapper -L $D -E LD_LIBRARY_PATH=$D/${libdir}:$D/${base_libdir}\
+					$D${bindir}/fc-cache --sysroot=$D
+chown -R root:root $D${fontconfigcachedir}

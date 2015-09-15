@@ -1,0 +1,37 @@
+ghostscript-native:fix disable-system-libtiff
+
+Modify configure to add the check to make sure
+ghostscrip could work while system-libtiff is
+disabled.
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+Upstream-Status: Pending
+---
+ configure.ac | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+--- a/configure.ac
++++ b/configure.ac
+@@ -1055,6 +1055,7 @@ Disabling tiff output devices.])
+ esac
+ 
+ if test $SHARE_LIBTIFF -eq 0; then
++    if test -e $LIBTIFFDIR/configure; then
+       echo
+       echo "Running libtiff configure script..."
+       olddir=`pwd`
+@@ -1069,6 +1070,10 @@ if test $SHARE_LIBTIFF -eq 0; then
+       cd "$olddir"
+       echo
+       echo "Continuing with Ghostscript configuration..."
++    else
++      AC_MSG_NOTICE([Could not find local copy of libtiff.
++Disabling tiff output devices.])
++    fi
+ fi
+ 
+ AC_SUBST(SHARE_LIBTIFF)
+-- 
+1.8.1.2
+

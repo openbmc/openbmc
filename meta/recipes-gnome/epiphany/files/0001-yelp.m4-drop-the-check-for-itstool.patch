@@ -1,0 +1,33 @@
+From 30f03a256efe375a4d5c3a24bf4168ebf380e3ab Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 30 Jul 2015 15:13:23 +0300
+Subject: [PATCH] yelp.m4: drop the check for itstool
+
+It isn't used for anything during build, so there's no need to provide
+it as a recipe.
+
+Upstream-Status: Inappropriate [tarball-specific issue]
+---
+ m4/yelp.m4 | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/m4/yelp.m4 b/m4/yelp.m4
+index 5db847f..1b6ede4 100644
+--- a/m4/yelp.m4
++++ b/m4/yelp.m4
+@@ -27,12 +27,6 @@ AC_ARG_WITH([help-dir],
+ HELP_DIR="$with_help_dir"
+ AC_SUBST(HELP_DIR)
+ 
+-AC_ARG_VAR([ITSTOOL], [Path to the `itstool` command])
+-AC_CHECK_PROG([ITSTOOL], [itstool], [itstool])
+-if test x"$ITSTOOL" = x; then
+-  AC_MSG_ERROR([itstool not found])
+-fi
+-
+ AC_ARG_VAR([XMLLINT], [Path to the `xmllint` command])
+ AC_CHECK_PROG([XMLLINT], [xmllint], [xmllint])
+ if test x"$XMLLINT" = x; then
+-- 
+2.1.4
+

@@ -1,0 +1,71 @@
+As the rest of Sato is GTK+ 2, patch gtk-play to use GTK+ 2.  When the rest of
+Sato has been ported to GTK+ 3 this patch can be dropped.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+
+diff --git a/configure.ac b/configure.ac
+index b8af13b..90ab74c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -60,7 +60,7 @@ AC_SUBST(GLIB_PREFIX)
+ GST_PREFIX="`$PKG_CONFIG --variable=prefix gstreamer-1.0`"
+ AC_SUBST(GST_PREFIX)
+ 
+-PKG_CHECK_MODULES(GTK, [gtk+-3.0], [have_gtk="yes"], [have_gtk="no"])
++PKG_CHECK_MODULES(GTK, [gtk+-2.0], [have_gtk="yes"], [have_gtk="no"])
+ AM_CONDITIONAL(HAVE_GTK, test "x$have_gtk" != "xno")
+ 
+ GOBJECT_INTROSPECTION_CHECK([1.31.1])
+diff --git a/gtk/gtk-play.c b/gtk/gtk-play.c
+index f015077..954d6fb 100644
+--- a/gtk/gtk-play.c
++++ b/gtk/gtk-play.c
+@@ -34,6 +34,46 @@ typedef struct
+   gulong seekbar_value_changed_signal_id;
+ } GtkPlay;
+ 
++/* Compat stubs */
++GtkWidget *
++gtk_box_new (GtkOrientation orientation,
++             gint spacing)
++{
++  switch (orientation) {
++  case GTK_ORIENTATION_HORIZONTAL:
++    return gtk_hbox_new (FALSE, spacing);
++  case GTK_ORIENTATION_VERTICAL:
++    return gtk_vbox_new (FALSE, spacing);
++  }
++}
++
++GtkWidget*
++gtk_button_new_from_icon_name (const gchar *icon_name,
++                               GtkIconSize  size)
++{
++  GtkWidget *button;
++  GtkWidget *image;
++
++  image = gtk_image_new_from_icon_name (icon_name, size);
++  button =  g_object_new (GTK_TYPE_BUTTON,
++                         "image", image,
++                         NULL);
++  return button;
++}
++
++GtkWidget *
++gtk_scale_new_with_range (GtkOrientation orientation,
++                          gdouble min,
++                          gdouble max,
++                          gdouble step)
++{
++  switch (orientation) {
++  case GTK_ORIENTATION_HORIZONTAL:
++    return gtk_hscale_new_with_range (min, max, step);
++  case GTK_ORIENTATION_VERTICAL:
++    return gtk_vscale_new_with_range (min, max, step);
++  }
++}
+ 
+ static void
+ set_title (GtkPlay * play, const gchar * title)

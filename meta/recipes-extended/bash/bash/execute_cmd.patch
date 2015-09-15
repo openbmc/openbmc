@@ -1,0 +1,17 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+--- execute_cmd.c.orig	Fri Jun  3 13:34:42 2011
++++ execute_cmd.c	Fri Jun  3 13:36:41 2011
+@@ -2202,7 +2202,11 @@
+   /* If the `lastpipe' option is set with shopt, and job control is not
+      enabled, execute the last element of non-async pipelines in the
+      current shell environment. */
+-  if (lastpipe_opt && job_control == 0 && asynchronous == 0 && pipe_out == NO_PIPE && prev > 0)
++  if (lastpipe_opt && 
++#if defined(JOB_CONTROL)
++		job_control == 0 && 
++#endif
++		asynchronous == 0 && pipe_out == NO_PIPE && prev > 0)
+     {
+       lstdin = move_to_high_fd (0, 0, 255);
+       if (lstdin > 0)

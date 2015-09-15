@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=Terminal
+Comment=A unicode capable rxvt clone
+Exec=rxvt
+Icon=terminal
+Terminal=false
+Type=Application
+Categories=Utility;TerminalEmulator;

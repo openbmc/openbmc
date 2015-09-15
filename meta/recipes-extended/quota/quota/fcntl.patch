@@ -1,0 +1,113 @@
+Include fcntl.h to pacify compiler errors on musl
+like
+
+error: unknown type name 'loff_t'
+Cover rpc headers under proper conditional
+Dont use __P its undefined
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+ndex: quota-tools/quota.h
+===================================================================
+Index: quota-tools/quota.h
+===================================================================
+--- quota-tools.orig/quota.h
++++ quota-tools/quota.h
+@@ -165,6 +165,6 @@ enum {
+ 	#endif
+ #endif
+ 
+-long quotactl __P((int, const char *, qid_t, caddr_t));
++long quotactl (int, const char *, qid_t, caddr_t);
+ 
+ #endif /* _QUOTA_ */
+Index: quota-tools/quotacheck.c
+===================================================================
+--- quota-tools.orig/quotacheck.c
++++ quota-tools/quotacheck.c
+@@ -19,6 +19,7 @@
+ #include <unistd.h>
+ #include <stdlib.h>
+ #include <errno.h>
++#include <fcntl.h>
+ 
+ #include <sys/stat.h>
+ #include <sys/types.h>
+Index: quota-tools/quotaio.c
+===================================================================
+--- quota-tools.orig/quotaio.c
++++ quota-tools/quotaio.c
+@@ -12,6 +12,7 @@
+ #include <string.h>
+ #include <unistd.h>
+ #include <stdlib.h>
++#include <fcntl.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <sys/file.h>
+Index: quota-tools/dqblk_v2.h
+===================================================================
+--- quota-tools.orig/dqblk_v2.h
++++ quota-tools/dqblk_v2.h
+@@ -7,6 +7,7 @@
+ #ifndef GUARD_DQBLK_V2_H
+ #define GUARD_DQBLK_V2_H
+ 
++#include <fcntl.h>
+ #include <sys/types.h>
+ #include "quota_tree.h"
+ 
+Index: quota-tools/quotaops.c
+===================================================================
+--- quota-tools.orig/quotaops.c
++++ quota-tools/quotaops.c
+@@ -34,7 +34,9 @@
+ 
+ #include "config.h"
+ 
++#if defined(RPC)
+ #include <rpc/rpc.h>
++#endif
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <sys/file.h>
+Index: quota-tools/rquota_client.c
+===================================================================
+--- quota-tools.orig/rquota_client.c
++++ quota-tools/rquota_client.c
+@@ -19,7 +19,9 @@
+ 
+ #include "config.h"
+ 
++#if defined(RPC)
+ #include <rpc/rpc.h>
++#endif
+ #include <sys/types.h>
+ #include <sys/param.h>
+ #include <sys/stat.h>
+@@ -35,7 +37,9 @@
+ #include <stdint.h>
+ 
+ #include "mntopt.h"
++#if defined(RPC)
+ #include "rquota.h"
++#endif
+ #include "common.h"
+ #include "quotaio.h"
+ #include "quotasys.h"
+Index: quota-tools/setquota.c
+===================================================================
+--- quota-tools.orig/setquota.c
++++ quota-tools/setquota.c
+@@ -7,7 +7,9 @@
+ 
+ #include "config.h"
+ 
++#if defined(RPC)
+ #include <rpc/rpc.h>
++#endif
+ #include <sys/types.h>
+ #include <errno.h>
+ #include <stdio.h>

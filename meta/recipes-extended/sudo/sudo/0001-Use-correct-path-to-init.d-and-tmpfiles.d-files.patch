@@ -1,0 +1,31 @@
+The makefile uses top_srcdir to find files that were created by configure, when
+it should use top_builddir.
+
+Upstream-Status: Submitted (http://bugzilla.sudo.ws/show_bug.cgi?id=708)
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+---
+ src/Makefile.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/Makefile.in b/src/Makefile.in
+index f009e10..7acfb2d 100644
+--- a/src/Makefile.in
++++ b/src/Makefile.in
+@@ -165,11 +165,11 @@ install-dirs:
+ 
+ install-rc: install-dirs
+ 	if [ -n "$(INIT_SCRIPT)" ]; then \
+-	    $(INSTALL) $(INSTALL_OWNER) -m 0755 $(top_srcdir)/init.d/$(INIT_SCRIPT) $(DESTDIR)$(INIT_DIR)/sudo; \
++	    $(INSTALL) $(INSTALL_OWNER) -m 0755 $(top_builddir)/init.d/$(INIT_SCRIPT) $(DESTDIR)$(INIT_DIR)/sudo; \
+ 	    rm -f $(DESTDIR)$(RC_LINK); \
+ 	    ln -s $(INIT_DIR)/sudo $(DESTDIR)$(RC_LINK); \
+ 	elif test -n "$(tmpfiles_d)"; then \
+-	    $(INSTALL) $(INSTALL_OWNER) -m 0644 $(top_srcdir)/init.d/sudo.conf $(DESTDIR)$(tmpfiles_d)/sudo.conf; \
++	    $(INSTALL) $(INSTALL_OWNER) -m 0644 $(top_builddir)/init.d/sudo.conf $(DESTDIR)$(tmpfiles_d)/sudo.conf; \
+ 	fi
+ 
+ install-binaries: install-dirs $(PROGS)
+-- 
+2.1.4
+

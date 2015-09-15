@@ -1,0 +1,2 @@
+d root root 0755 /var/run/sshd none
+f root root 0644 /var/log/lastlog none

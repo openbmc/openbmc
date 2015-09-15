@@ -1,0 +1,97 @@
+#!/bin/bash
+#
+# This utility setup the necessary metadata for an rpm repo
+#
+# Copyright (c) 2011 Intel Corp.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+
+# Don't use TMPDIR from the external environment, it may be a distro
+# variable pointing to /tmp (e.g. within X on OpenSUSE)
+# Instead, use OE_TMPDIR for passing this in externally.
+TMPDIR="$OE_TMPDIR"
+
+function usage() {
+	echo "Usage: $0 <rpm-dir>"
+	echo "  <rpm-dir>: default is $TMPDIR/deploy/rpm"
+}
+
+if [ $# -gt 1 ]; then
+	usage
+	exit 1
+fi
+
+setup_tmpdir() {
+    if [ -z "$TMPDIR" ]; then
+        # Try to get TMPDIR from bitbake
+        type -P bitbake &>/dev/null || {
+            echo "In order for this script to dynamically infer paths";
+            echo "to kernels or filesystem images, you either need";
+            echo "bitbake in your PATH or to source oe-init-build-env";
+            echo "before running this script" >&2;
+            exit 1; }
+
+        # We have bitbake in PATH, get TMPDIR from bitbake
+        TMPDIR=`bitbake -e | grep ^TMPDIR=\" | cut -d '=' -f2 | cut -d '"' -f2`
+        if [ -z "$TMPDIR" ]; then
+            echo "Error: this script needs to be run from your build directory,"
+            echo "or you need to explicitly set TMPDIR in your environment"
+            exit 1
+        fi
+    fi
+}
+
+setup_sysroot() {
+	# Toolchain installs set up $OECORE_NATIVE_SYSROOT in their
+	# environment script. If that variable isn't set, we're
+	# either in an in-tree poky scenario or the environment
+	# script wasn't source'd.
+	if [ -z "$OECORE_NATIVE_SYSROOT" ]; then
+		setup_tmpdir
+		BUILD_ARCH=`uname -m`
+		BUILD_OS=`uname | tr '[A-Z]' '[a-z]'`
+		BUILD_SYS="$BUILD_ARCH-$BUILD_OS"
+
+		OECORE_NATIVE_SYSROOT=$TMPDIR/sysroots/$BUILD_SYS
+	fi 
+}
+
+setup_tmpdir
+setup_sysroot
+
+
+if [ -n "$1" ]; then
+	RPM_DIR="$1"
+else
+	RPM_DIR="$TMPDIR/deploy/rpm"
+fi
+
+if [ ! -d "$RPM_DIR" ]; then
+   	echo "Error: rpm dir $RPM_DIR doesn't exist"
+	exit 1
+fi
+
+CREATEREPO=$OECORE_NATIVE_SYSROOT/usr/bin/createrepo
+if [ ! -e "$CREATEREPO" ]; then
+   	echo "Error: can't find createrepo binary"
+	echo "please run bitbake createrepo-native first"
+	exit 1
+fi
+
+export PATH=${PATH}:${OECORE_NATIVE_SYSROOT}/usr/bin
+
+$CREATEREPO "$RPM_DIR"
+
+exit 0

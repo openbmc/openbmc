@@ -1,0 +1,37 @@
+Upstream-Status: Inappropriate [licensing]
+
+# Fix errors when built with gcc 4.3
+# Patch taken from Debian bug #452096
+
+diff -urN tar-1.17.orig/lib/argp-fmtstream.h tar-1.17/lib/argp-fmtstream.h
+--- tar-1.17.orig/lib/argp-fmtstream.h	2006-01-11 12:24:05.000000000 -0800
++++ tar-1.17/lib/argp-fmtstream.h	2010-07-22 22:36:12.000000000 -0700
+@@ -198,7 +198,11 @@
+ #endif
+ 
+ #ifndef ARGP_FS_EI
+-#define ARGP_FS_EI extern inline
++ #if defined __GNUC_STDC_INLINE__
++   #define ARGP_FS_EI extern inline __attribute__((__gnu_inline__))
++ #else
++   #define ARGP_FS_EI extern inline
++ #endif
+ #endif
+ 
+ ARGP_FS_EI size_t
+diff -urN tar-1.17.orig/lib/argp.h tar-1.17/lib/argp.h
+--- tar-1.17.orig/lib/argp.h	2007-03-30 00:09:11.000000000 -0700
++++ tar-1.17/lib/argp.h	2010-07-22 22:38:44.000000000 -0700
+@@ -580,7 +580,11 @@
+ # endif
+ 
+ # ifndef ARGP_EI
+-#  define ARGP_EI extern __inline__
++#  if defined __GNUC_STDC_INLINE__
++#    define ARGP_EI extern __inline__ __attribute__((__gnu_inline__))
++#  else
++#    define ARGP_EI extern __inline__
++#  endif
+ # endif
+ 
+ ARGP_EI void

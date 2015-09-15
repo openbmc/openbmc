@@ -1,0 +1,41 @@
+Upstream-Status: Pending
+
+automake 1.12 has depricated automatic de-ANSI-fication support
+
+this patch avoids these kinds of errors:
+
+| configure.ac:127: error: automatic de-ANSI-fication support has been removed
+| /srv/home/nitin/builds/build-gcc47/tmp/sysroots/x86_64-linux/usr/share/aclocal-1.12/protos.m4:12: AM_C_PROTOTYPES is expanded from...
+| configure.ac:127: the top level
+| autom4te: m4 failed with exit status: 1
+...
+| Makefile.am:27: error: automatic de-ANSI-fication support has been removed
+
+Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+2012/05/04
+
+Index: gawk-3.1.5/configure.ac
+===================================================================
+--- gawk-3.1.5.orig/configure.ac
++++ gawk-3.1.5/configure.ac
+@@ -124,7 +124,6 @@ fi
+ 
+ dnl check for C compiler for automake
+ AM_PROG_CC_STDC
+-AM_C_PROTOTYPES
+ 
+ dnl Cygwin doesn't like to get libs with full paths
+ dnl since that overrides linking against DLLs.
+Index: gawk-3.1.5/Makefile.am
+===================================================================
+--- gawk-3.1.5.orig/Makefile.am
++++ gawk-3.1.5/Makefile.am
+@@ -24,7 +24,7 @@
+ ## process this file with automake to produce Makefile.in
+ 
+ # Automatic de-ANSI-fication if needed, make .bz2 files also.
+-AUTOMAKE_OPTIONS = ansi2knr dist-bzip2
++AUTOMAKE_OPTIONS = dist-bzip2
+ 
+ # This undocumented variable insures that aclocal runs
+ # correctly after changing configure.ac

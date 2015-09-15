@@ -1,0 +1,29 @@
+From af699c6e8cf9fb28d6f8b789bf33d53b47edaec7 Mon Sep 17 00:00:00 2001
+From: Michael Krelin <hacker@klever.net>
+Date: Wed, 26 Sep 2012 20:24:20 +0200
+Subject: [PATCH 04/21] configure: qmake is already built in qt4-tools-native,
+ so disable it
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure b/configure
+index e3d464b..cc04b27 100755
+--- a/configure
++++ b/configure
+@@ -4899,7 +4899,7 @@ setBootstrapVariable()
+ }
+ 
+ # build qmake
+-if true; then ###[ '!' -f "$outpath/bin/qmake" ];
++if false; then ###[ '!' -f "$outpath/bin/qmake" ];
+     echo "Creating qmake. Please wait..."
+ 
+     OLD_QCONFIG_H=
+-- 
+1.8.0
+

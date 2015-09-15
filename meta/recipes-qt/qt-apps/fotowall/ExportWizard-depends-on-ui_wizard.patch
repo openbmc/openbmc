@@ -1,0 +1,18 @@
+App/ExportWizard.cpp depends on wizard.h which depends on ui_wizard. The last one
+should be already generated before compiling ExportWizard.cpp.
+
+Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
+Upstream-Status: Pending
+
+Index: Fotowall-0.9/App/ExportWizard.cpp
+===================================================================
+--- Fotowall-0.9.orig/App/ExportWizard.cpp	2009-11-30 13:21:31.000000000 +0200
++++ Fotowall-0.9/App/ExportWizard.cpp	2012-05-10 17:12:06.765230830 +0300
+@@ -23,6 +23,7 @@
+ #include "imageloaderqt.h"
+ #include "posterazorcore.h"
+ #include "wizard.h"
++#include "ui_wizard.h"
+ 
+ #include <QDesktopServices>
+ #include <QDesktopWidget>

@@ -1,0 +1,9 @@
+[Unit]
+Description=PPP link to %I
+Before=network.target
+
+[Service]
+ExecStart=@SBINDIR@/pppd call %I nodetach nolog
+
+[Install]
+WantedBy=multi-user.target

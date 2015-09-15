@@ -1,0 +1,26 @@
+From fb8bdbb4bf56382de099e62c2564286b9dfda46d Mon Sep 17 00:00:00 2001
+From: Brendan O'Dea <bod@debian.org>
+Date: Tue, 8 Mar 2005 19:30:38 +1100
+Subject: Note that libperl-dev package is required for embedded linking
+
+Bug-Debian: http://bugs.debian.org/186778
+
+Patch-Name: debian/libperl_embed_doc.diff
+---
+ lib/ExtUtils/Embed.pm | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/lib/ExtUtils/Embed.pm b/lib/ExtUtils/Embed.pm
+index 3f983c1..0ec8a67 100644
+--- a/lib/ExtUtils/Embed.pm
++++ b/lib/ExtUtils/Embed.pm
+@@ -296,6 +296,9 @@ and extensions in your C/C++ applications.
+ Typically, an application F<Makefile> will invoke C<ExtUtils::Embed>
+ functions while building your application.  
+ 
++Note that on Debian systems the B<libperl-dev> package is required for
++compiling applications which embed an interpreter.
++
+ =head1 @EXPORT
+ 
+ C<ExtUtils::Embed> exports the following functions:

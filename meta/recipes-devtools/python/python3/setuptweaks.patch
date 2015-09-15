@@ -1,0 +1,57 @@
+This patch removes various ways native system options can pass into the python 
+compilation and somehow break C modules.
+
+Upstream-Status: Inappropriate [OE Specific]
+
+RP 2012/04/23
+
+Index: Python-2.7.2/setup.py
+===================================================================
+--- Python-2.7.2.orig/setup.py	2012-04-23 20:03:47.295582553 +0000
++++ Python-2.7.2/setup.py	2012-04-23 20:03:15.000000000 +0000
+@@ -231,7 +231,13 @@
+         # compilers
+         if compiler is not None:
+             (ccshared,cflags) = sysconfig.get_config_vars('CCSHARED','CFLAGS')
+-            args['compiler_so'] = compiler + ' ' + ccshared + ' ' + cflags
++            # Need to filter out -isysroot from the flags. Ideally should 
++            # figure out target flags here.
++            flags = []
++            for f in cflags.split():
++                if not f.startswith("-isystem"):
++                    flags.append(f)
++            args['compiler_so'] = compiler + ' ' + ccshared + ' ' + ' '.join(flags)
+         self.compiler.set_executables(**args)
+ 
+         build_ext.build_extensions(self)
+@@ -393,7 +399,6 @@
+         # into configure and stored in the Makefile (issue found on OS X 10.3).
+         for env_var, arg_name, dir_list in (
+                 ('LDFLAGS', '-R', self.compiler.runtime_library_dirs),
+-                ('LDFLAGS', '-L', self.compiler.library_dirs),
+                 ('CPPFLAGS', '-I', self.compiler.include_dirs)):
+             env_val = sysconfig.get_config_var(env_var)
+             if env_val:
+@@ -419,16 +424,16 @@
+                     for directory in reversed(options.dirs):
+                         add_dir_to_list(dir_list, directory)
+ 
+-        if os.path.normpath(sys.prefix) != '/usr' \
+-                and not sysconfig.get_config_var('PYTHONFRAMEWORK'):
++#        if os.path.normpath(sys.prefix) != '/usr' \
++#                and not sysconfig.get_config_var('PYTHONFRAMEWORK'):
+             # OSX note: Don't add LIBDIR and INCLUDEDIR to building a framework
+             # (PYTHONFRAMEWORK is set) to avoid # linking problems when
+             # building a framework with different architectures than
+             # the one that is currently installed (issue #7473)
+-            add_dir_to_list(self.compiler.library_dirs,
+-                            sysconfig.get_config_var("LIBDIR"))
+-            add_dir_to_list(self.compiler.include_dirs,
+-                            sysconfig.get_config_var("INCLUDEDIR"))
++#            add_dir_to_list(self.compiler.library_dirs,
++#                            sysconfig.get_config_var("LIBDIR"))
++#            add_dir_to_list(self.compiler.include_dirs,
++#                            sysconfig.get_config_var("INCLUDEDIR"))
+ 
+         try:
+             have_unicode = unicode

@@ -1,0 +1,16 @@
+
+Upstream-Status: Pending
+
+Index: git/Makefile.in
+===================================================================
+--- git.orig/Makefile.in
++++ git/Makefile.in
+@@ -5,7 +5,7 @@ CC = @CC@
+ CPP = @CPP@
+ CFLAGS = @CFLAGS@
+ LDFLAGS = @LDFLAGS@
+-CPPFLAGS = -D_GNU_SOURCE -I/usr/include/slang @CPPFLAGS@ 
++CPPFLAGS = -D_GNU_SOURCE @CPPFLAGS@ 
+ GNU_LD = @GNU_LD@
+ 
+ VERSION = @VERSION@

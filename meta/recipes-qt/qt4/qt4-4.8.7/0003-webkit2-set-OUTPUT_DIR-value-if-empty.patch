@@ -1,0 +1,34 @@
+From b6805e883c078f7647d9234aca4e3513ebd1c9bf Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Tue, 1 May 2012 07:48:15 +0200
+Subject: [PATCH 03/21] webkit2: set OUTPUT_DIR value if empty
+
+Without this do_configure was trying to create /include/WebCore/libdummy.prl in root of build host filesystem
+now it's in proper place ${WORKDIR}/qt-everywhere-opensource-src-4.8.1/src/3rdparty/webkit/include/WebCore/libdummy.prl
+
+First reported here:
+http://www.mail-archive.com/openembedded-devel@lists.openembedded.org/msg24436.html
+
+Upstream-Status: Pending
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ src/3rdparty/webkit/Source/WebKit2/DerivedSources.pro | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/3rdparty/webkit/Source/WebKit2/DerivedSources.pro b/src/3rdparty/webkit/Source/WebKit2/DerivedSources.pro
+index 006a88c..5e17193 100644
+--- a/src/3rdparty/webkit/Source/WebKit2/DerivedSources.pro
++++ b/src/3rdparty/webkit/Source/WebKit2/DerivedSources.pro
+@@ -3,6 +3,8 @@ TARGET = dummy
+ 
+ CONFIG -= debug_and_release
+ 
++isEmpty(OUTPUT_DIR): OUTPUT_DIR = ../..
++
+ CONFIG(standalone_package) {
+     isEmpty(WEBKIT2_GENERATED_SOURCES_DIR):WEBKIT2_GENERATED_SOURCES_DIR = $$PWD/generated
+     isEmpty(WC_GENERATED_SOURCES_DIR):WC_GENERATED_SOURCES_DIR = $$PWD/../WebCore/generated
+-- 
+1.8.0
+

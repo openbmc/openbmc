@@ -1,0 +1,33 @@
+Add by RP to address "unable to infer tagged configuration" error:
+   commit 35de05e61b88c0808a5e885bb0efdf420555d5ad
+   Author: Richard Purdie <rpurdie@rpsys.net>
+   Date:   Sun Jun 1 16:13:38 2008 +0000
+
+   apmd: Use libtool --tag options to avoid problems with libtool 2.2.4 (from poky)
+
+However I didn't see same issue with current libtool-2.2.10. Also per my understanding,
+the default tag, if not specified, falls back to CC. So disable it from patching, but
+keep it here. If we encounter similar issue in the future, we could then push upstream
+
+Comment added by Kevin Tian <kevin.tian@intel.com>, 2010-07-16
+
+Upstream-Status: Pending
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+Index: apmd-3.2.2.orig/Makefile
+===================================================================
+--- apmd-3.2.2.orig.orig/Makefile	2004-01-04 08:13:18.000000000 +0000
++++ apmd-3.2.2.orig/Makefile	2008-04-21 17:10:03.000000000 +0100
+@@ -58,9 +57,8 @@
+ #CFLAGS=-O3 -m486 -fomit-frame-pointer
+ #LDFLAGS=-s
+ 
+-LIBTOOL=libtool --quiet
+-LT_COMPILE = $(LIBTOOL) --mode=compile $(CC)
+-LT_LINK = $(LIBTOOL) --mode=link $(CC)
++LT_COMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC)
++LT_LINK = $(LIBTOOL)  --tag=CC --mode=link $(CC)
+ LT_INSTALL = $(LIBTOOL) --mode=install install
+ LT_CLEAN = $(LIBTOOL) --mode=clean rm
+ 

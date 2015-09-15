@@ -1,0 +1,58 @@
+From b01bb2694f66cd981e6d61523433dc3eb5ed32f2 Mon Sep 17 00:00:00 2001
+From: Li xin <lixin.fnst@cn.fujitsu.com>
+Date: Sat, 18 Jul 2015 23:03:30 +0900
+Subject: [PATCH] configure.ac - Avoid an incorrect check for python.
+ Makefile.am - avoid hard coded host include paths.
+
+Upstream-Status: pending
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
+---
+ bindings/python/Makefile.am |  3 ++-
+ configure.ac                | 15 ++-------------
+ 2 files changed, 4 insertions(+), 14 deletions(-)
+
+diff --git a/bindings/python/Makefile.am b/bindings/python/Makefile.am
+index 82b9bb8..f9fe7a8 100644
+--- a/bindings/python/Makefile.am
++++ b/bindings/python/Makefile.am
+@@ -23,7 +23,8 @@ SUBDIRS = test
+ CONFIG_CLEAN_FILES = *.loT *.rej *.orig
+ AM_CFLAGS = -fPIC -DPIC
+ PYLIBVER ?= python$(PYTHON_VERSION)
+-AM_CPPFLAGS = -I. -I$(top_builddir) -I@PYINCLUDEDIR@
++PYINC ?= /usr/include/$(PYLIBVER)
++AM_CPPFLAGS = -I. -I$(top_builddir) -I$(PYINC)
+ LIBS = $(top_builddir)/src/libcap-ng.la
+ SWIG_FLAGS = -python
+ SWIG_INCLUDES = ${AM_CPPFLAGS}
+diff --git a/configure.ac b/configure.ac
+index 1d777d5..9d90f64 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -123,19 +123,8 @@ if test x$use_python = xno ; then
+ else
+ AC_MSG_RESULT(testing)
+ AM_PATH_PYTHON
+-PYINCLUDEDIR=`python${am_cv_python_version} -c "from distutils import sysconfig; print(sysconfig.get_config_var('INCLUDEPY'))"`
+-if test -f ${PYINCLUDEDIR}/Python.h ; then
+-	python_found="yes"
+-	AC_SUBST(PYINCLUDEDIR)
+-	AC_MSG_NOTICE(Python bindings will be built)
+-else
+-	python_found="no"
+-	if test x$use_python = xyes ; then
+-		AC_MSG_ERROR([Python explicitly required and python headers found])
+-	else
+-		AC_MSG_WARN("Python headers not found - python bindings will not be made")
+-	fi
+-fi
++python_found="yes"
++AC_MSG_NOTICE(Python bindings will be built)
+ fi
+ AM_CONDITIONAL(HAVE_PYTHON, test ${python_found} = "yes")
+ 
+-- 
+1.8.4.2
+

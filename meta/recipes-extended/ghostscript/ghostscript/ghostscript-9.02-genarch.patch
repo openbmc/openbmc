@@ -1,0 +1,28 @@
+Import patch from windriver linux for cross compilation, and split patches
+into oe way under different directories such as i586, powerpc etc according 
+to Richard's opinion.
+
+Upstream-Status: Pending
+
+Signed-off-by: Kang Kai <kai.kang@windriver.com>
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+
+# Author: Chi Xu <chi.xu@windriver.com>
+# Date: Feb 26 2010
+# Summary: Generate arch.h for ppc32
+#
+
+diff -Nru ghostscript-8.64.orig/base/lib.mak ghostscript-8.64/base/lib.mak
+--- ghostscript-8.64.orig/base/lib.mak	2010-02-10 10:30:02.000000000 +0800
++++ ghostscript-8.64/base/lib.mak	2010-02-10 10:56:21.000000000 +0800
+@@ -67,8 +67,8 @@
+ stdpre_h=$(GLSRC)stdpre.h $(stdpn_h)
+ stdint__h=$(GLSRC)stdint_.h $(std_h)
+ 
+-$(GLGEN)arch.h : $(GENARCH_XE)
+-	$(EXP)$(GENARCH_XE) $(GLGEN)arch.h $(TARGET_ARCH_FILE)
++##$(GLGEN)arch.h : $(GENARCH_XE)
++##	$(EXP)$(GENARCH_XE) $(GLGEN)arch.h $(TARGET_ARCH_FILE)
+ 
+ # Platform interfaces
+ 

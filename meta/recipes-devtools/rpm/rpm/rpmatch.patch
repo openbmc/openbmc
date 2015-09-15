@@ -1,0 +1,42 @@
+Add configure check for rpmatch() and 
+creates a compatable macro if it is not provided by the C library.
+
+This is needed for uclibc since it does not have the above function
+implemented.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: rpm-5.4.14/configure.ac
+===================================================================
+--- rpm-5.4.14.orig/configure.ac
++++ rpm-5.4.14/configure.ac
+@@ -943,7 +943,7 @@ AC_CHECK_FUNCS([dnl
+     ftok getaddrinfo getattrlist getcwd getdelim getline getmode getnameinfo dnl
+     getpassphrase getxattr getwd iconv inet_aton lchflags lchmod lchown dnl
+     lgetxattr lsetxattr lutimes madvise mempcpy mkdtemp mkstemp mtrace dnl
+-    posix_fadvise posix_fallocate putenv realpath regcomp secure_getenv __secure_getenv dnl
++    posix_fadvise posix_fallocate putenv realpath regcomp rpmatch secure_getenv __secure_getenv dnl
+     setattrlist setenv setlocale setmode setxattr dnl
+     sigaddset sigdelset sigemptyset sighold sigrelse sigpause dnl
+     sigprocmask sigsuspend sigaction dnl
+Index: rpm-5.4.14/system.h
+===================================================================
+--- rpm-5.4.14.orig/system.h
++++ rpm-5.4.14/system.h
+@@ -353,6 +353,14 @@ extern int _tolower(int) __THROW	/*@*/;
+ #include <libgen.h>
+ #endif
+ 
++#ifndef HAVE_RPMATCH
++#define rpmatch(line) \
++	( (line == NULL)? -1 : \
++	  (*line == 'y' || *line == 'Y')? 1 : \
++	  (*line == 'n' || *line == 'N')? 0 : \
++	  -1 )
++#endif
++
+ /* -- Retrofit glibc __progname */
+ #if defined __GLIBC__ && __GLIBC__ >= 2
+ #if __GLIBC_MINOR__ >= 1

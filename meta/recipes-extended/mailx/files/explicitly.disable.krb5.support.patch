@@ -1,0 +1,46 @@
+krb5 support is autodetected from sysroot making builds undeterministic
+feel free to improve this to support explicitly enabling/disabling it
+
+Upstream-Status: Pending
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
+--- a/makeconfig	2013-07-21 15:06:11.177792334 +0200
++++ b/makeconfig	2013-07-21 15:07:20.028793994 +0200
+@@ -424,36 +424,6 @@
+ }
+ !
+ 
+-<$tmp2.c link_check gssapi 'for GSSAPI in libgss' \
+-		'#define USE_GSSAPI' '-lgss' ||
+-	<$tmp2.c link_check gssapi 'for GSSAPI in libgssapi_krb5' \
+-			'#define USE_GSSAPI' '-lgssapi_krb5' ||
+-		link_check gssapi 'for GSSAPI in libgssapi_krb5, old-style' \
+-				'#define USE_GSSAPI
+-#define GSSAPI_OLD_STYLE' '-lgssapi_krb5' <<\! || \
+-			link_check gssapi 'for GSSAPI in libgssapi' \
+-				'#define USE_GSSAPI
+-#define	GSSAPI_REG_INCLUDE' '-lgssapi' <<\%
+-#include <gssapi/gssapi.h>
+-#include <gssapi/gssapi_generic.h>
+-
+-int main(void)
+-{
+-	gss_import_name(0, 0, gss_nt_service_name, 0);
+-	gss_init_sec_context(0,0,0,0,0,0,0,0,0,0,0,0,0);
+-	return 0;
+-}
+-!
+-#include <gssapi.h>
+-
+-int main(void)
+-{
+-	gss_import_name(0, 0, GSS_C_NT_HOSTBASED_SERVICE, 0);
+-	gss_init_sec_context(0,0,0,0,0,0,0,0,0,0,0,0,0);
+-	return 0;
+-}
+-%
+-
+ cat >$tmp2.c <<\!
+ #include "config.h"
+ #ifdef HAVE_NL_LANGINFO

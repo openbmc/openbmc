@@ -1,0 +1,8 @@
+CheckPolicy() {
+	if pidof gnome-power-manager kpowersave > /dev/null ||
+	   (pidof dcopserver > /dev/null && test -x /usr/bin/dcop && /usr/bin/dcop kded kded loadedModules | grep -q klaptopdaemon) ; then
+		echo 0;
+	else
+		echo 1;
+	fi
+}

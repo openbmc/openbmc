@@ -1,0 +1,127 @@
+From cdb980b37f40dc2c41891434c7736e49da53756e Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Wed, 31 Dec 2014 16:47:52 +0800
+Subject: [PATCH 5/9] linux/syslinux: implement handle_adv_on_ext()
+
+It reads adv if found on the device, or resets syslinux_adv, or update
+the adv if update adv only.
+
+Upstream-Status: Submitted
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+Tested-by: Du Dolpher <dolpher.du@intel.com>
+---
+ linux/syslinux.c | 97 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 97 insertions(+)
+
+diff --git a/linux/syslinux.c b/linux/syslinux.c
+index 247c86a..de5d272 100755
+--- a/linux/syslinux.c
++++ b/linux/syslinux.c
+@@ -421,6 +421,103 @@ int install_bootblock(int fd, const char *device)
+ 
+ static int handle_adv_on_ext(void)
+ {
++    int                 i, retval, found_file;
++    int                 need_close = 2; /* 2 means no need extra close */
++    char                *filenames[2] = {"ldlinux.sys", "extlinux.sys"};
++    char                *filename;
++    ext2_ino_t          newino;
++    ext2_file_t         e2_file;
++    struct ext2_inode   inode;
++
++    for (i = 0; i < 2; i++) {
++        filename = filenames[i];
++        found_file = 0;
++        retval = ext2fs_namei(e2fs, root, cwd, filename, &newino);
++        if (retval == 0) {
++            found_file = 1;
++        } else
++            continue;
++
++        need_close = i;
++
++        retval = ext2fs_file_open(e2fs, newino, EXT2_FLAG_RW, &e2_file);
++        if (retval) {
++            fprintf(stderr, "%s: failed to open %s\n",
++                program, filename);
++            goto fail;
++        }
++
++        retval = ext2fs_read_inode(e2fs, newino, &inode);
++        if (retval) {
++            fprintf(stderr, "%s: error while reading inode: %u, file: %s\n",
++                program, newino, filename);
++            goto fail;
++        }
++
++        /* Check the size to see if too small to read */
++        if (inode.i_size < 2 * ADV_SIZE) {
++            if (opt.update_only == -1) {
++                fprintf(stderr, "%s: failed to write auxilliary data\n\
++                        the size of %s is too small (need --update)?\n",
++                        program, filename);
++                retval = -1;
++                goto fail;
++            }
++            syslinux_reset_adv(syslinux_adv);
++            found_file = 0;
++            break;
++        }
++
++        /* Read the adv */
++        retval = ext_file_read(e2_file, syslinux_adv, 2 * ADV_SIZE,
++                        inode.i_size - 2 * ADV_SIZE, "ADV");
++        if (retval == -1)
++                goto fail;
++        if (retval == 2 * ADV_SIZE) {
++            retval = syslinux_validate_adv(syslinux_adv);
++            /* Read the adv successfully */
++            if (retval == 0)
++                break;
++        }
++
++        /* Close the file if reaches here, otherwise we leave the file
++         * open in case we need write it */
++        need_close = 2;
++        retval = ext2fs_file_close(e2_file);
++        if (retval) {
++            fprintf(stderr, "%s: error while closing %s\n",
++                program, filename);
++            return retval;
++        }
++    }
++
++    if (!found_file) {
++        if (opt.update_only == -1) {
++            fprintf(stderr, "%s: no ldlinux.sys or extlinux.sys found on the device\n",
++                program);
++            return -1;
++        }
++        syslinux_reset_adv(syslinux_adv);
++    }
++
++    /* The modify_adv will reset the adv if opt.reset_adv */
++    if (modify_adv() < 0) {
++        fprintf(stderr, "%s: error while modifying adv\n", program);
++        retval = -1;
++        goto fail;
++    }
++
++    /* Write adv if update_only == -1 and found file */
++    if (opt.update_only == -1 && found_file) {
++        if (ext_file_write(e2_file, syslinux_adv, 2 * ADV_SIZE ,
++                        inode.i_size - 2 * ADV_SIZE) == -1)
++                goto fail;
++    }
++
++fail:
++    if (need_close != 2)
++        (void) ext2fs_file_close(e2_file);
++    return retval;
+ }
+ 
+ /* Write files, adv, boot sector */
+-- 
+1.9.1
+

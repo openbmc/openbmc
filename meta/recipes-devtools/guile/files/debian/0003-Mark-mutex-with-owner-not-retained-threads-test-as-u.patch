@@ -1,0 +1,33 @@
+Upstream-Status: Inappropriate [debian patch]
+
+Signed-Off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
+
+From 848543091d55dddb54a85612155964506d712852 Mon Sep 17 00:00:00 2001
+From: Rob Browning <rlb@defaultvalue.org>
+Date: Sun, 18 Mar 2012 13:28:24 -0500
+Subject: Mark "mutex with owner not retained" threads test as unresolved.
+
+As per discussion with upstream, mark this test as unresolved since it
+may produce false negatives, depending on the behavior/timing of the
+garbage collector.
+---
+ test-suite/tests/threads.test |    6 ++++--
+ 1 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/test-suite/tests/threads.test b/test-suite/tests/threads.test
+index 85a7c38..50899cb 100644
+--- a/test-suite/tests/threads.test
++++ b/test-suite/tests/threads.test
+@@ -414,8 +414,10 @@
+ 
+             (gc) (gc)
+             (let ((m (g)))
+-              (and (mutex? m)
+-                   (eq? (mutex-owner m) (current-thread)))))))
++              (or
++               (and (mutex? m)
++                    (eq? (mutex-owner m) (current-thread)))
++               (throw 'unresolved))))))
+ 
+       ;;
+       ;; mutex lock levels

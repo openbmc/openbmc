@@ -1,0 +1,28 @@
+Subject: [PATCH] automake foreign strictness
+
+Use foreign strictness to avoid automake errors.
+
+Upstream-Status: Inappropriate [upstream no longer active]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ configure.ac |    5 +++--
+ 1 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index b30b6f5..bd3222c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1,6 +1,7 @@
+ dnl Process this file with autoconf to produce a configure script.
+-AC_INIT(which.c)
+-AM_INIT_AUTOMAKE(which, 2.18)
++AC_INIT([which],[2.18])
++AC_CONFIG_SRCDIR(which.c)
++AM_INIT_AUTOMAKE([foreign])
+ AM_CONFIG_HEADER(config.h)
+ AM_MAINTAINER_MODE
+ 
+-- 
+1.7.1
+

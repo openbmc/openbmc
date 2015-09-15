@@ -1,0 +1,30 @@
+#!/bin/sh
+# Copyright (C) 2011 O.S. Systems Software LTDA.
+# Licensed on MIT
+
+mdev_enabled() {
+	if [ ! -e /sbin/mdev ]; then
+		debug "/sbin/mdev doesn't exist"
+		return 1
+	fi
+
+	return 0
+}
+
+mdev_run() {
+	# setup the environment
+	mount -t tmpfs tmpfs /dev
+
+	mkdir -m 1777 /dev/shm
+
+	mkdir -m 0755 /dev/pts
+	mount -t devpts devpts /dev/pts
+
+	echo /sbin/mdev > /proc/sys/kernel/hotplug
+	mdev -s
+
+	# load modules for devices
+	find /sys -name modalias | while read m; do
+		load_kernel_module $(cat $m)
+	done
+}

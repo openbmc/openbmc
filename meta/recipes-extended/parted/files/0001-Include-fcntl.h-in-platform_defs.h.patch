@@ -1,0 +1,29 @@
+From d78dd087c4ec4715aab5fe115668e726046ecd76 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 13 Apr 2015 18:16:05 -0700
+Subject: [PATCH] Include fcntl.h in /platform_defs.h
+
+exposed when compiling using musl
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libparted/fs/xfs/platform_defs.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libparted/fs/xfs/platform_defs.h b/libparted/fs/xfs/platform_defs.h
+index 2b55752..32bd3d3 100644
+--- a/libparted/fs/xfs/platform_defs.h
++++ b/libparted/fs/xfs/platform_defs.h
+@@ -42,6 +42,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
++#include <fcntl.h>
+ #include <sys/param.h>
+ #include <sys/types.h>
+ 
+-- 
+2.1.4
+

@@ -1,0 +1,50 @@
+LSB_RELEASE="released-4.1.0"
+LSB_ARCH="lsbarch"
+
+BASE_PACKAGES_LIST="lsb-setup-4.1.0-1.noarch.rpm"
+
+RUNTIME_BASE_PACKAGES_LIST="lsb-dist-checker-5.0.0.1-1.targetarch.rpm \
+	lsb-tet3-lite-3.7-27.lsb5.targetarch.rpm \
+	lsb-tet3-lite-devel-3.7-27.lsb5.targetarch.rpm \
+	lsb-xvfb-1.2.0-22.targetarch.rpm \
+	"
+
+RUNTIME_PACKAGES_LIST="lsb-cmdchk-4.1.4-5.targetarch.rpm \
+	lsb-libchk-4.1.4-5.targetarch.rpm \
+	lsb-qm-2.2-12.lsb4.targetarch.rpm \
+	lsb-task-dist-testkit-4.1.9-1.noarch.rpm \
+	lsb-test-core-4.1.15-1.targetarch.rpm \
+	lsb-test-cpp-t2c-4.1.0-1.targetarch.rpm \
+	lsb-test-desktop-4.1.9-1.targetarch.rpm \
+	lsb-test-desktop-t2c-4.1.3-3.targetarch.rpm \
+	lsb-test-libstdcpp-4.1.0-18.lsb4.targetarch.rpm \
+	lsb-test-olver-core-4.1.4-1.targetarch.rpm \
+	lsb-test-perl-4.1.8-1.noarch.rpm \
+	lsb-test-printing-4.1.2-1.targetarch.rpm \
+	lsb-test-python-4.1.5-1.targetarch.rpm \
+	lsb-test-qt3-azov-4.1.1-3.targetarch.rpm \
+	lsb-test-qt4-azov-4.1.3-1.targetarch.rpm \
+	lsb-test-xts5-5.1.5-45.lsb4.targetarch.rpm \
+	lsb-test-alsa-t2c-4.1.0-1.targetarch.rpm \
+	lsb-test-core-t2c-4.1.2-3.targetarch.rpm \
+	lsb-test-xml2-azov-4.1.0-1.targetarch.rpm \
+	"
+
+APP_PACKAGES_LIST="lsb-python-2.4.6-7.lsb4.targetarch.rpm \
+	lsb-apache-2.2.14-8.lsb4.targetarch.rpm \
+	lsb-tcl-8.5.7-8.lsb4.targetarch.rpm \
+	lsb-expect-5.43.0-13.lsb4.targetarch.rpm \
+	lsb-groff-1.20.1-7.lsb4.targetarch.rpm \
+	lsb-raptor-1.4.19-5.lsb4.targetarch.rpm \
+	lsb-xpdf-1.01-14.lsb4.targetarch.rpm \
+	lsb-samba-3.4.3-9.lsb4.targetarch.rpm \
+	lsb-rsync-3.0.6-6.lsb4.targetarch.rpm \
+	"
+
+APP_TESTFILES_LIST="expect-tests.tar \
+	tcl-tests.tar \
+	raptor-tests.tar \
+	test1.pdf \
+	test2.pdf \
+	"
+

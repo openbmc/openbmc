@@ -1,0 +1,23 @@
+Subject: [PATCH 1/6] urandom-xauth-changes-to-options.h
+
+Upstream-Status: Inappropriate [configuration]
+---
+ options.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/options.h b/options.h
+index 7d06322..71a21c2 100644
+--- a/options.h
++++ b/options.h
+@@ -247,7 +247,7 @@ much traffic. */
+ /* The command to invoke for xauth when using X11 forwarding.
+  * "-q" for quiet */
+ #ifndef XAUTH_COMMAND
+-#define XAUTH_COMMAND "/usr/bin/xauth -q"
++#define XAUTH_COMMAND "xauth -q"
+ #endif
+ 
+ /* if you want to enable running an sftp server (such as the one included with
+-- 
+1.7.11.7
+

@@ -1,0 +1,25 @@
+Upstream-Status: Inappropriate 
+
+automake 1.12.x has deprecated AM_PROG_MKDIR_P , and throws a warning for that,
+and the warnings are treated as errors because of the -Werror parameter.
+
+These AM_PROG_MKDIR_P are coming from gettext, and the latest gettext code has not 
+eliminated these deprecated macros yet. So disable the treatment of warnings
+as errors until gettext is updated to remove the deprecated macros.
+
+Signed-Off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
+2012/07/10
+
+Index: libidn-1.24/configure.ac
+===================================================================
+--- libidn-1.24.orig/configure.ac
++++ libidn-1.24/configure.ac
+@@ -23,7 +23,7 @@ AC_COPYRIGHT([Copyright (c) 2002-2011 Si
+ AC_CONFIG_AUX_DIR([build-aux])
+ AC_CONFIG_MACRO_DIR([m4])
+ AC_CONFIG_HEADERS(config.h)
+-AM_INIT_AUTOMAKE([1.10 -Wall -Werror -Wno-override])
++AM_INIT_AUTOMAKE([1.10 -Wall -Wno-override])
+ AM_SILENT_RULES([yes])
+ 
+ # Library code modified:                              REVISION++

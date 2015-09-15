@@ -1,0 +1,35 @@
+STRINGS name conflicts with variable for strings tools (e.g. i586-oe-linux-strings)
+
+Upstream-Status: Pending
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
+--- tcp_wrappers_7.6/Makefile.orig	2013-04-18 23:41:58.277981740 +0200
++++ tcp_wrappers_7.6/Makefile	2013-04-18 23:42:42.513978966 +0200
+@@ -309,7 +309,7 @@
+ pyramid:
+ 	@make REAL_DAEMON_DIR=$(REAL_DAEMON_DIR) STYLE=$(STYLE) \
+ 	LIBS= RANLIB=ranlib ARFLAGS=rv AUX_OBJ="environ.o vfprintf.o" \
+-	STRINGS="-Dstrchr=index -Dstrrchr=rindex -Dmemcmp=bcmp -Dno_memcpy" \
++	STRINGS_FLAGS="-Dstrchr=index -Dstrrchr=rindex -Dmemcmp=bcmp -Dno_memcpy" \
+ 	NETGROUP="-DNETGROUP -DUSE_GETDOMAIN" TLI= all
+ 
+ # Untested.
+@@ -419,7 +419,7 @@
+ # Uncomment the following if your C library does not provide the
+ # strchr/strrchr/memcmp routines, but comes with index/rindex/bcmp.
+ #
+-#STRINGS= -Dstrchr=index -Dstrrchr=rindex -Dmemcmp=bcmp -Dno_memcpy
++#STRINGS_FLAGS= -Dstrchr=index -Dstrrchr=rindex -Dmemcmp=bcmp -Dno_memcpy
+ 
+ #################################################################
+ # System dependencies: selection of non-default object libraries.
+@@ -690,7 +690,7 @@
+ 	$(BUGS) $(SYSTYPE) $(AUTH) $(UMASK) \
+ 	-DREAL_DAEMON_DIR=\"$(REAL_DAEMON_DIR)\" $(STYLE) $(KILL_OPT) \
+ 	-DSEVERITY=$(SEVERITY) -DRFC931_TIMEOUT=$(RFC931_TIMEOUT) \
+-	$(UCHAR) $(TABLES) $(STRINGS) $(TLI) $(EXTRA_CFLAGS) $(DOT) \
++	$(UCHAR) $(TABLES) $(STRINGS_FLAGS) $(TLI) $(EXTRA_CFLAGS) $(DOT) \
+ 	$(VSYSLOG) $(HOSTNAME)
+ 
+ LIB_OBJ= hosts_access.o options.o shell_cmd.o rfc931.o eval.o \

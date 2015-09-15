@@ -1,0 +1,42 @@
+nfs-utils: Do not pass CFLAGS to gcc while building
+
+Do not pass CFLAGS/LDFLAGS to gcc while building, The needed flags has
+been passed by xxx_CFLAGS=$(CFLAGS_FOR_BUILD).
+
+Upstream-Status: Pending
+
+Signed-off-by: Chong Lu <Chong.Lu@windriver.com>
+---
+ tools/locktest/Makefile.am |    2 ++
+ tools/rpcgen/Makefile.am   |    2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/tools/locktest/Makefile.am b/tools/locktest/Makefile.am
+index 3156815..1729fd1 100644
+--- a/tools/locktest/Makefile.am
++++ b/tools/locktest/Makefile.am
+@@ -1,6 +1,8 @@
+ ## Process this file with automake to produce Makefile.in
+ 
+ CC=$(CC_FOR_BUILD)
++CFLAGS=
++LDFLAGS=
+ LIBTOOL = @LIBTOOL@ --tag=CC
+ 
+ noinst_PROGRAMS = testlk
+diff --git a/tools/rpcgen/Makefile.am b/tools/rpcgen/Makefile.am
+index 8a9ec89..8bacdaa 100644
+--- a/tools/rpcgen/Makefile.am
++++ b/tools/rpcgen/Makefile.am
+@@ -1,6 +1,8 @@
+ ## Process this file with automake to produce Makefile.in
+ 
+ CC=$(CC_FOR_BUILD)
++CFLAGS=
++LDFLAGS=
+ LIBTOOL = @LIBTOOL@ --tag=CC
+ 
+ noinst_PROGRAMS = rpcgen
+-- 
+1.7.9.5
+

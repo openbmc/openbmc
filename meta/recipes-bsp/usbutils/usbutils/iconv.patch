@@ -1,0 +1,40 @@
+This patch adds support for detecting iconv support using autotools
+uclibc does not have iconv implementation inside libc like glibc, therefore
+the existing checks were not sufficient, it worked for glibc but not for
+uclibc. The new patch portably detects the iconv support and adds the
+libiconv to linker cmdline
+
+This patch should be submitted upstream too
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: usbutils-007/configure.ac
+===================================================================
+--- usbutils-007.orig/configure.ac
++++ usbutils-007/configure.ac
+@@ -10,7 +10,9 @@ AC_USE_SYSTEM_EXTENSIONS
+ AC_SYS_LARGEFILE
+ 
+ AC_CHECK_HEADERS([byteswap.h])
+-AC_CHECK_FUNCS([nl_langinfo iconv])
++
++AM_GNU_GETTEXT
++AM_ICONV
+ 
+ AC_ARG_ENABLE(zlib,
+ 	AS_HELP_STRING(--disable-zlib,disable support for zlib))
+Index: usbutils-007/Makefile.am
+===================================================================
+--- usbutils-007.orig/Makefile.am
++++ usbutils-007/Makefile.am
+@@ -27,7 +27,7 @@ lsusb_CPPFLAGS = \
+ 	-DDATADIR=\"$(datadir)\"
+ 
+ lsusb_LDADD = \
+-	$(LIBUSB_LIBS)
++	$(LIBUSB_LIBS) $(LIBICONV)
+ 
+ if HAVE_ZLIB
+ lsusb_CPPFLAGS += -DHAVE_LIBZ

@@ -1,0 +1,360 @@
+#!/usr/bin/env python
+
+# Copyright (c) 2014 Intel Corporation
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+# DESCRIPTION
+# This script is used to test public autobuilder images on remote hardware.
+# The script is called from a machine that is able download the images from the remote images repository and to connect to the test hardware.
+#
+# test-remote-image --image-type core-image-sato --repo-link http://192.168.10.2/images --required-packages rpm psplash
+#
+# Translation: Build the 'rpm' and 'pslash' packages and test a remote core-image-sato image using the http://192.168.10.2/images repository.
+#
+# You can also use the '-h' option to see some help information.
+
+import os
+import sys
+import argparse
+import logging
+import shutil
+from abc import ABCMeta, abstractmethod
+
+# Add path to scripts/lib in sys.path;
+scripts_path = os.path.abspath(os.path.dirname(os.path.abspath(sys.argv[0])))
+lib_path = scripts_path + '/lib'
+sys.path = sys.path + [lib_path]
+
+import scriptpath
+
+# Add meta/lib to sys.path
+scriptpath.add_oe_lib_path()
+
+import oeqa.utils.ftools as ftools
+from oeqa.utils.commands import runCmd, bitbake, get_bb_var
+
+# Add all lib paths relative to BBPATH to sys.path; this is used to find and import the target controllers.
+for path in get_bb_var('BBPATH').split(":"):
+    sys.path.insert(0, os.path.abspath(os.path.join(path, 'lib')))
+
+# In order to import modules that contain target controllers, we need the bitbake libraries in sys.path .
+bitbakepath = scriptpath.add_bitbake_lib_path()
+if not bitbakepath:
+    sys.stderr.write("Unable to find bitbake by searching parent directory of this script or PATH\n")
+    sys.exit(1)
+
+# create a logger
+def logger_create():
+    log = logging.getLogger('hwauto')
+    log.setLevel(logging.DEBUG)
+
+    fh = logging.FileHandler(filename='hwauto.log', mode='w')
+    fh.setLevel(logging.DEBUG)
+
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.INFO)
+
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    ch.setFormatter(formatter)
+
+    log.addHandler(fh)
+    log.addHandler(ch)
+
+    return log
+
+# instantiate the logger
+log = logger_create()
+
+
+# Define and return the arguments parser for the script
+def get_args_parser():
+    description = "This script is used to run automated runtime tests using remotely published image files. You should prepare the build environment just like building local images and running the tests."
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument('--image-types', required=True, action="store", nargs='*', dest="image_types", default=None, help='The image types to test(ex: core-image-minimal).')
+    parser.add_argument('--repo-link', required=True, action="store", type=str, dest="repo_link", default=None, help='The link to the remote images repository.')
+    parser.add_argument('--required-packages', required=False, action="store", nargs='*', dest="required_packages", default=None, help='Required packages for the tests. They will be built before the testing begins.')
+    parser.add_argument('--targetprofile', required=False, action="store", nargs=1, dest="targetprofile", default='AutoTargetProfile', help='The target profile to be used.')
+    parser.add_argument('--repoprofile', required=False, action="store", nargs=1, dest="repoprofile", default='PublicAB', help='The repo profile to be used.')
+    parser.add_argument('--skip-download', required=False, action="store_true", dest="skip_download", default=False, help='Skip downloading the images completely. This needs the correct files to be present in the directory specified by the target profile.')
+    return parser
+
+class BaseTargetProfile(object):
+    """
+    This class defines the meta profile for a specific target (MACHINE type + image type).
+    """
+
+    __metaclass__ = ABCMeta
+
+    def __init__(self, image_type):
+        self.image_type = image_type
+
+        self.kernel_file = None
+        self.rootfs_file = None
+        self.manifest_file = None
+        self.extra_download_files = []          # Extra files (full name) to be downloaded. They should be situated in repo_link
+
+    # This method is used as the standard interface with the target profile classes.
+    # It returns a dictionary containing a list of files and their meaning/description.
+    def get_files_dict(self):
+        files_dict = {}
+
+        if self.kernel_file:
+            files_dict['kernel_file'] = self.kernel_file
+        else:
+            log.error('The target profile did not set a kernel file.')
+            sys.exit(1)
+
+        if self.rootfs_file:
+            files_dict['rootfs_file'] = self.rootfs_file
+        else:
+            log.error('The target profile did not set a rootfs file.')
+            sys.exit(1)
+
+        if self.manifest_file:
+            files_dict['manifest_file'] = self.manifest_file
+        else:
+            log.error('The target profile did not set a manifest file.')
+            sys.exit(1)
+
+        for idx, f in enumerate(self.extra_download_files):
+            files_dict['extra_download_file' + str(idx)] = f
+
+        return files_dict
+
+class AutoTargetProfile(BaseTargetProfile):
+
+    def __init__(self, image_type):
+        super(AutoTargetProfile, self).__init__(image_type)
+        self.image_name = get_bb_var('IMAGE_LINK_NAME', target=image_type)
+        self.kernel_type = get_bb_var('KERNEL_IMAGETYPE', target=image_type)
+        self.controller = self.get_controller()
+
+        self.set_kernel_file()
+        self.set_rootfs_file()
+        self.set_manifest_file()
+        self.set_extra_download_files()
+
+    # Get the controller object that will be used by bitbake.
+    def get_controller(self):
+        from oeqa.controllers.testtargetloader import TestTargetLoader
+
+        target_controller = get_bb_var('TEST_TARGET')
+        bbpath = get_bb_var('BBPATH').split(':')
+
+        if target_controller == "qemu":
+            from oeqa.targetcontrol import QemuTarget
+            controller = QemuTarget
+        else:
+            testtargetloader = TestTargetLoader()
+            controller = testtargetloader.get_controller_module(target_controller, bbpath)
+        return controller
+
+    def set_kernel_file(self):
+        postconfig = "QA_GET_MACHINE = \"${MACHINE}\""
+        machine = get_bb_var('QA_GET_MACHINE', postconfig=postconfig)
+        self.kernel_file = self.kernel_type + '-' + machine + '.bin'
+
+    def set_rootfs_file(self):
+        image_fstypes = get_bb_var('IMAGE_FSTYPES').split(' ')
+        # Get a matching value between target's IMAGE_FSTYPES and the image fstypes suppoerted by the target controller.
+        fstype = self.controller.match_image_fstype(d=None, image_fstypes=image_fstypes)
+        if fstype:
+            self.rootfs_file = self.image_name + '.' + fstype
+        else:
+            log.error("Could not get a compatible image fstype. Check that IMAGE_FSTYPES and the target controller's supported_image_fstypes fileds have common values.")
+            sys.exit(1)
+
+    def set_manifest_file(self):
+        self.manifest_file = self.image_name + ".manifest"
+
+    def set_extra_download_files(self):
+        self.extra_download_files = self.get_controller_extra_files()
+        if not self.extra_download_files:
+            self.extra_download_files = []
+
+    def get_controller_extra_files(self):
+        controller = self.get_controller()
+        return controller.get_extra_files()
+
+
+class BaseRepoProfile(object):
+    """
+    This class defines the meta profile for an images repository.
+    """
+
+    __metaclass__ = ABCMeta
+
+    def __init__(self, repolink, localdir):
+        self.localdir = localdir
+        self.repolink = repolink
+
+    # The following abstract methods are the interfaces to the repository profile classes derived from this abstract class.
+
+    # This method should check the file named 'file_name' if it is different than the upstream one.
+    # Should return False if the image is the same as the upstream and True if it differs.
+    @abstractmethod
+    def check_old_file(self, file_name):
+        pass
+
+    # This method should fetch file_name and create a symlink to localname if set.
+    @abstractmethod
+    def fetch(self, file_name, localname=None):
+        pass
+
+class PublicAB(BaseRepoProfile):
+
+    def __init__(self, repolink, localdir=None):
+        super(PublicAB, self).__init__(repolink, localdir)
+        if localdir is None:
+            self.localdir = os.path.join(os.environ['BUILDDIR'], 'PublicABMirror')
+
+    # Not yet implemented. Always returning True.
+    def check_old_file(self, file_name):
+        return True
+
+    def get_repo_path(self):
+        path = '/machines/'
+
+        postconfig = "QA_GET_MACHINE = \"${MACHINE}\""
+        machine = get_bb_var('QA_GET_MACHINE', postconfig=postconfig)
+        if 'qemu' in machine:
+            path += 'qemu/'
+
+        postconfig = "QA_GET_DISTRO = \"${DISTRO}\""
+        distro = get_bb_var('QA_GET_DISTRO', postconfig=postconfig)
+        path += distro.replace('poky', machine) + '/'
+        return path
+
+
+    def fetch(self, file_name, localname=None):
+        repo_path = self.get_repo_path()
+        link = self.repolink + repo_path + file_name
+
+        self.wget(link, self.localdir, localname)
+
+    def wget(self, link, localdir, localname=None, extraargs=None):
+        wget_cmd = '/usr/bin/env wget -t 2 -T 30 -nv --passive-ftp --no-check-certificate '
+
+        if localname:
+            wget_cmd += ' -O ' + localname + ' '
+
+        if extraargs:
+            wget_cmd += ' ' + extraargs + ' '
+
+        wget_cmd += " -P %s '%s'" % (localdir, link)
+        runCmd(wget_cmd)
+
+class HwAuto():
+
+    def __init__(self, image_types, repolink, required_packages, targetprofile, repoprofile, skip_download):
+        log.info('Initializing..')
+        self.image_types = image_types
+        self.repolink = repolink
+        self.required_packages = required_packages
+        self.targetprofile = targetprofile
+        self.repoprofile = repoprofile
+        self.skip_download = skip_download
+        self.repo = self.get_repo_profile(self.repolink)
+
+    # Get the repository profile; for now we only look inside this module.
+    def get_repo_profile(self, *args, **kwargs):
+        repo = getattr(sys.modules[__name__], self.repoprofile)(*args, **kwargs)
+        log.info("Using repo profile: %s" % repo.__class__.__name__)
+        return repo
+
+    # Get the target profile; for now we only look inside this module.
+    def get_target_profile(self, *args, **kwargs):
+        target = getattr(sys.modules[__name__], self.targetprofile)(*args, **kwargs)
+        log.info("Using target profile: %s" % target.__class__.__name__)
+        return target
+
+    # Run the testimage task on a build while redirecting DEPLOY_DIR_IMAGE to repo.localdir, where the images are downloaded.
+    def runTestimageBuild(self, image_type):
+        log.info("Running the runtime tests for %s.." % image_type)
+        postconfig = "DEPLOY_DIR_IMAGE = \"%s\"" % self.repo.localdir
+        result = bitbake("%s -c testimage" % image_type, ignore_status=True, postconfig=postconfig)
+        testimage_results = ftools.read_file(os.path.join(get_bb_var("T", image_type), "log.do_testimage"))
+        log.info('Runtime tests results for %s:' % image_type)
+        print testimage_results
+        return result
+
+    # Start the procedure!
+    def run(self):
+        if self.required_packages:
+            # Build the required packages for the tests
+            log.info("Building the required packages: %s ." % ', '.join(map(str, self.required_packages)))
+            result = bitbake(self.required_packages, ignore_status=True)
+            if result.status != 0:
+                log.error("Could not build required packages: %s. Output: %s" % (self.required_packages, result.output))
+                sys.exit(1)
+
+            # Build the package repository meta data.
+            log.info("Building the package index.")
+            result = bitbake("package-index", ignore_status=True)
+            if result.status != 0:
+                log.error("Could not build 'package-index'. Output: %s" % result.output)
+                sys.exit(1)
+
+        # Create the directory structure for the images to be downloaded
+        log.info("Creating directory structure %s" % self.repo.localdir)
+        if not os.path.exists(self.repo.localdir):
+            os.makedirs(self.repo.localdir)
+
+        # For each image type, download the needed files and run the tests.
+        noissuesfound = True
+        for image_type in self.image_types:
+            if self.skip_download:
+                log.info("Skipping downloading the images..")
+            else:
+                target = self.get_target_profile(image_type)
+                files_dict = target.get_files_dict()
+                log.info("Downloading files for %s" % image_type)
+                for f in files_dict:
+                    if self.repo.check_old_file(files_dict[f]):
+                        filepath = os.path.join(self.repo.localdir, files_dict[f])
+                        if os.path.exists(filepath):
+                            os.remove(filepath)
+                        self.repo.fetch(files_dict[f])
+
+            result = self.runTestimageBuild(image_type)
+            if result.status != 0:
+                noissuesfound = False
+
+        if noissuesfound:
+            log.info('Finished. No issues found.')
+        else:
+            log.error('Finished. Some runtime tests have failed. Returning non-0 status code.')
+            sys.exit(1)
+
+
+
+def main():
+
+    parser = get_args_parser()
+    args = parser.parse_args()
+
+    hwauto = HwAuto(image_types=args.image_types, repolink=args.repo_link, required_packages=args.required_packages, targetprofile=args.targetprofile, repoprofile=args.repoprofile, skip_download=args.skip_download)
+
+    hwauto.run()
+
+if __name__ == "__main__":
+    try:
+        ret = main()
+    except Exception:
+        ret = 1
+        import traceback
+        traceback.print_exc(5)
+    sys.exit(ret)

@@ -1,0 +1,21 @@
+This support script ends up hardcoding unnecessary rpaths into the libraries. We
+will search $libdir automatically so this is just wastes space. There may be some
+cases this is necessary but our use cases aren't one of them.
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+Index: readline-5.2/support/shobj-conf
+===================================================================
+--- readline-5.2.orig/support/shobj-conf
++++ readline-5.2/support/shobj-conf
+@@ -110,7 +110,7 @@ linux*-*|gnu*-*|k*bsd*-gnu-*)
+ 	SHOBJ_LD='${CC}'
+ 	SHOBJ_LDFLAGS='-shared -Wl,-soname,$@'
+ 
+-	SHLIB_XLDFLAGS='-Wl,-rpath,$(libdir) -Wl,-soname,`basename $@ $(SHLIB_MINOR)`'
++	SHLIB_XLDFLAGS='-Wl,-soname,`basename $@ $(SHLIB_MINOR)`'
+ 	SHLIB_LIBVERSION='$(SHLIB_LIBSUFF).$(SHLIB_MAJOR)$(SHLIB_MINOR)'
+ 	;;
+ 

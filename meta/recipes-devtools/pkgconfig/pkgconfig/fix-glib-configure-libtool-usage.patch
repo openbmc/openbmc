@@ -1,0 +1,45 @@
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+
+Index: pkg-config-0.28/glib/configure.ac
+===================================================================
+--- pkg-config-0.28.orig/glib/configure.ac
++++ pkg-config-0.28/glib/configure.ac
+@@ -1438,7 +1438,7 @@ if test x"$glib_native_win32" = xyes; th
+   G_MODULE_LDFLAGS=
+ else
+   export SED
+-  G_MODULE_LDFLAGS=`(./libtool --config; echo eval echo \\$export_dynamic_flag_spec) | sh`
++  G_MODULE_LDFLAGS=`(./${host_alias}-libtool --config; echo eval echo \\$export_dynamic_flag_spec) | sh`
+ fi
+ dnl G_MODULE_IMPL= don't reset, so cmd-line can override
+ G_MODULE_NEED_USCORE=0
+@@ -1503,13 +1503,13 @@ if test "$G_MODULE_IMPL" = "G_MODULE_IMP
+ 	LDFLAGS="$LDFLAGS $G_MODULE_LDFLAGS"
+ dnl *** check for OSF1/5.0 RTLD_GLOBAL brokenness
+ 	echo "void glib_plugin_test(void) { }" > plugin.c
+-	${SHELL} ./libtool --mode=compile --tag=CC ${CC} ${CFLAGS} \
++	${SHELL} ./${host_alias}-libtool --mode=compile --tag=CC ${CC} ${CFLAGS} \
+ 		${CPPFLAGS} -c -o plugin.lo plugin.c >/dev/null 2>&1
+-	${SHELL} ./libtool --mode=link --tag=CC ${CC} ${CFLAGS} \
++	${SHELL} ./${host_alias}-libtool --mode=link --tag=CC ${CC} ${CFLAGS} \
+ 		${LDFLAGS} -module -o plugin.la -export-dynamic \
+ 		-shrext ".o" -avoid-version plugin.lo \
+ 		-rpath /dont/care >/dev/null 2>&1
+-	eval `./libtool --config | grep ^objdir`
++	eval `./${host_alias}-libtool --config | grep ^objdir`
+ 	AC_CACHE_CHECK([for RTLD_GLOBAL brokenness],
+ 		glib_cv_rtldglobal_broken,[
+ 		AC_TRY_RUN([
+@@ -1582,7 +1582,7 @@ fi
+ 
+ AC_MSG_CHECKING(for the suffix of module shared libraries)
+ export SED
+-shrext_cmds=`./libtool --config | grep '^shrext_cmds='`
++shrext_cmds=`./${host_alias}-libtool --config | grep '^shrext_cmds='`
+ eval $shrext_cmds
+ module=yes eval std_shrext=$shrext_cmds
+ # chop the initial dot

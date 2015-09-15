@@ -1,0 +1,43 @@
+readline: Security Advisory - readline - CVE-2014-2524
+
+Upstream-Status: Backport
+
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+
+			   READLINE PATCH REPORT
+			   =====================
+
+Readline-Release: 6.3
+Patch-ID: readline63-003
+
+Bug-Reported-by:
+Bug-Reference-ID:
+Bug-Reference-URL:
+
+Bug-Description:
+
+There are debugging functions in the readline release that are theoretically
+exploitable as security problems.  They are not public functions, but have
+global linkage.
+
+Patch (apply with `patch -p0'):
+
+*** ../readline-6.3/util.c	2013-09-02 13:36:12.000000000 -0400
+--- util.c	2014-03-20 10:25:53.000000000 -0400
+***************
+*** 477,480 ****
+--- 479,483 ----
+  }
+  
++ #if defined (DEBUG)
+  #if defined (USE_VARARGS)
+  static FILE *_rl_tracefp;
+***************
+*** 539,542 ****
+--- 542,546 ----
+  }
+  #endif
++ #endif /* DEBUG */
+  
+  
+

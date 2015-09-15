@@ -1,0 +1,17 @@
+Always use locale.h as HAVE_LOCALE_H is no longer handled by ./configure
+Upstream-Status: Inappropriate [ old version that will not be maintained ]
+Signed-off-by: Alex DAMIAN <alexandru.damian@intel.com>
+
+diff --recursive --unified grep-2.5.1a-orig/lib/hard-locale.c grep-2.5.1a/lib/hard-locale.c
+--- grep-2.5.1a-orig/lib/hard-locale.c	2001-03-04 07:33:12.000000000 +0200
++++ grep-2.5.1a/lib/hard-locale.c	2013-03-11 17:05:52.086444891 +0200
+@@ -38,9 +38,7 @@
+ # endif
+ #endif
+ 
+-#if HAVE_LOCALE_H
+ # include <locale.h>
+-#endif
+ 
+ #if HAVE_STRING_H
+ # include <string.h>

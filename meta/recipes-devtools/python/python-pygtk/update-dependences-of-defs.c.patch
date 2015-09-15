@@ -1,0 +1,38 @@
+From dc024e9079bbffbb44436ba3e70a758ebad5520f Mon Sep 17 00:00:00 2001
+From: "Song.Li" <Song.Li@windriver.com>
+Date: Sat, 5 Jan 2013 14:55:59 +0800
+Subject: [PATCH] update dependences of defs.c in Makefile.am
+
+In gtk/Makefile.am, defs.c should dependes on gdk-types.defs and
+gtk-types.defs, otherwise it fails occasionally when parallel compile.
+The error message:
+"IOError: [Errno 2] No such file or directory: 'gtk-types.defs'"
+
+Add them to dependences of defs.c to fix this issue.
+
+Upstream-Status: Submitted
+https://bugzilla.gnome.org/show_bug.cgi?id=702706
+
+Signed-off-by: Song.Li <Song.Li@windriver.com>
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+---
+ gtk/Makefile.am |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gtk/Makefile.am b/gtk/Makefile.am
+index 7bb5d0c..91826cb 100644
+--- a/gtk/Makefile.am
++++ b/gtk/Makefile.am
+@@ -289,7 +289,7 @@ if HAVE_GIO_TYPES_DEFS
+ extra_codegen_args += --register $(PYGOBJECT_DEFSDIR)/gio-types.defs
+ endif
+ 
+-.defs.c: 
++.defs.c: gdk-types.defs gtk-types.defs
+ 	($(PYTHON) $(CODEGENDIR)/codegen.py \
+ 	   $(PYGTK_CODEGEN_DEFINES) \
+ 	    -I $(srcdir) \
+-- 
+1.7.9.5
+

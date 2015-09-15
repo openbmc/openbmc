@@ -1,0 +1,34 @@
+From 386e2c2fa2ab2e02ef71c268a57205139be329ab Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 31 Aug 2015 07:07:49 +0000
+Subject: [PATCH] Include sys/types.h for id_t definition
+
+/sudo_util.h:219:14: error: unknown type name 'id_t'
+ __dso_public id_t sudo_strtoid_v1(const char *str, const char *sep,
+ char **endp, const char **errstr);
+               ^
+	       make[1]: *** [preserve_fds.o] Error 1
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ include/sudo_util.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/include/sudo_util.h b/include/sudo_util.h
+index 89c9f89..ac0855a 100644
+--- a/include/sudo_util.h
++++ b/include/sudo_util.h
+@@ -17,6 +17,8 @@
+ #ifndef SUDO_UTIL_H
+ #define SUDO_UTIL_H
+ 
++#include <sys/types.h>
++
+ #ifdef HAVE_STDBOOL_H
+ # include <stdbool.h>
+ #else
+-- 
+2.5.1
+

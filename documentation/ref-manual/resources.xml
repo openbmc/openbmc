@@ -1,0 +1,123 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
+[<!ENTITY % poky SYSTEM "../poky.ent"> %poky; ] >
+
+<chapter id='resources'>
+<title>Contributing to the Yocto Project</title>
+
+<section id='resources-intro'>
+    <title>Introduction</title>
+    <para>
+        The Yocto Project team is happy for people to experiment with the Yocto Project.
+        A number of places exist to find help if you run into difficulties or find bugs.
+        To find out how to download source code,
+        see the "<ulink url='&YOCTO_DOCS_DEV_URL;#local-yp-release'>Yocto Project Release</ulink>"
+        section in the Yocto Project Development Manual.
+    </para>
+</section>
+
+<section id='resources-bugtracker'>
+    <title>Tracking Bugs</title>
+
+    <para>
+        If you find problems with the Yocto Project, you should report them using the
+        Bugzilla application at <ulink url='&YOCTO_BUGZILLA_URL;'></ulink>.
+    </para>
+</section>
+
+<section id='resources-mailinglist'>
+    <title>Mailing lists</title>
+
+    <para>
+        A number of mailing lists maintained by the Yocto Project exist
+        as well as related OpenEmbedded mailing lists for discussion,
+        patch submission and announcements.
+        To subscribe to one of the following mailing lists, click on the
+        appropriate URL in the following list and follow the instructions:
+        <itemizedlist>
+            <listitem><para><ulink url='&YOCTO_LISTS_URL;/listinfo/yocto'></ulink> -
+                General Yocto Project discussion mailing list. </para></listitem>
+            <listitem><para><ulink url='&OE_LISTS_URL;/listinfo/openembedded-core'></ulink> -
+                Discussion mailing list about OpenEmbedded-Core (the core metadata).</para></listitem>
+            <listitem><para><ulink url='&OE_LISTS_URL;/listinfo/openembedded-devel'></ulink> -
+                Discussion mailing list about OpenEmbedded.</para></listitem>
+            <listitem><para><ulink url='&OE_LISTS_URL;/listinfo/bitbake-devel'></ulink> -
+                Discussion mailing list about the
+                <ulink url='&YOCTO_DOCS_DEV_URL;#bitbake-term'>BitBake</ulink>
+                build tool.</para></listitem>
+            <listitem><para><ulink url='&YOCTO_LISTS_URL;/listinfo/poky'></ulink> -
+                Discussion mailing list about
+                <ulink url='&YOCTO_DOCS_DEV_URL;#poky'>Poky</ulink>.
+                </para></listitem>
+            <listitem><para><ulink url='&YOCTO_LISTS_URL;/listinfo/yocto-announce'></ulink> -
+                Mailing list to receive official Yocto Project release and milestone
+                announcements.</para></listitem>
+        </itemizedlist>
+    </para>
+    For more Yocto Project-related mailing lists, see the Yocto Project community mailing lists page
+    <ulink url='&YOCTO_HOME_URL;/tools-resources/community/mailing-lists'>here</ulink>.
+</section>
+
+<section id='resources-irc'>
+    <title>Internet Relay Chat (IRC)</title>
+
+    <para>
+        Two IRC channels on freenode are available for the Yocto Project and Poky discussions:
+        <itemizedlist>
+            <listitem><para><filename>#yocto</filename></para></listitem>
+            <listitem><para><filename>#poky</filename></para></listitem>
+        </itemizedlist>
+    </para>
+</section>
+
+<section id='resources-links'>
+    <title>Links</title>
+
+    <para>
+        Here is a list of resources you will find helpful:
+        <itemizedlist>
+            <listitem><para><emphasis>
+                <ulink url='&YOCTO_HOME_URL;'>The Yocto Project website</ulink>:
+                </emphasis> The home site for the Yocto
+                Project.</para></listitem>
+<!--
+            <listitem><para><emphasis>
+                <ulink url='http://www.intel.com/'>Intel Corporation</ulink>:</emphasis>
+                The company that acquired OpenedHand in 2008 and began
+                development on the Yocto Project.</para></listitem>
+-->
+            <listitem><para><emphasis>
+                <ulink url='&OE_HOME_URL;'>OpenEmbedded</ulink>:</emphasis>
+                The upstream, generic, embedded distribution used as the basis
+                for the build system in the Yocto Project.
+                Poky derives from and contributes back to the OpenEmbedded
+                project.</para></listitem>
+            <listitem><para><emphasis>
+                <ulink url='http://www.openembedded.org/wiki/BitBake'>
+                BitBake</ulink>:</emphasis> The tool used to process metadata.</para></listitem>
+        </itemizedlist>
+        For more links, see the
+        "<ulink url='&YOCTO_DOCS_DEV_URL;#other-information'>Other Information</ulink>"
+        section in the Yocto Project Development Manual.
+    </para>
+</section>
+
+<section id='resources-contributions'>
+    <title>Contributions</title>
+
+    <para>
+        The Yocto Project gladly accepts contributions.
+        You can submit changes to the project either by creating and sending
+        pull requests,
+        or by submitting patches through email.
+        For information on how to do both as well as information on how
+        to identify the maintainer for each area of code, see the
+        "<ulink url='&YOCTO_DOCS_DEV_URL;#how-to-submit-a-change'>How to Submit a Change</ulink>"
+        section in the Yocto Project Development Manual.
+    </para>
+</section>
+
+</chapter>
+<!--
+vim: expandtab tw=80 ts=4
+-->

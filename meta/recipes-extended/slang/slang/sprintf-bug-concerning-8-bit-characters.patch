@@ -1,0 +1,42 @@
+Upstream-Status: Backport
+
+From 3a05d1a920140e9f2c72791c12f664213feb46df Mon Sep 17 00:00:00 2001
+From: Manfred Hanke <Manfred.Hanke@tngtech.com>
+Date: Thu, 20 Jun 2013 10:24:12 +0200
+Subject: [PATCH] sprintf bug (concerning %c for 8-bit character in non-UTF8
+ mode) fixed
+
+char *str points to SLuchar_Type utf8_buf[], which had too small scope
+
+src/test/strops.sl failed in the following environment:
+ - compiler:  gcc (Debian 4.7.2-5) 4.7.2
+ - CFLAGS:    -g -O2
+ - libc:      GNU C Library (Debian EGLIBC 2.13-38) stable release version 2.13
+ - kernel:    3.2.0-4-686-pae #1 SMP Debian 3.2.39-2 i686 GNU/Linux
+---
+ src/slstrops.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/slstrops.c b/src/slstrops.c
+index ce6acb0..cbbbb01 100644
+--- a/src/slstrops.c
++++ b/src/slstrops.c
+@@ -1884,6 +1884,7 @@ static char *SLdo_sprintf (char *fmt) /*{{{*/
+ #endif
+    unsigned char uch;
+    int use_long = 0, use_alt_format = 0;
++   SLuchar_Type utf8_buf[SLUTF8_MAX_MBLEN+1];
+ 
+    while (1)
+      {
+@@ -2071,7 +2072,6 @@ static char *SLdo_sprintf (char *fmt) /*{{{*/
+ #endif
+ 	       {
+ 		  SLwchar_Type wc;
+-		  SLuchar_Type utf8_buf[SLUTF8_MAX_MBLEN+1];
+ 
+ 		  if (-1 == SLang_pop_wchar (&wc))
+ 		    return out;
+-- 
+1.7.9.5
+

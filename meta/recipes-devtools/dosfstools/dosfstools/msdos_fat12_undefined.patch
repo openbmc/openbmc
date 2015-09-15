@@ -1,0 +1,19 @@
+Fix a compilation error due to undefined MSDOS_FAT12.
+
+Upstream-Status: Inappropriate [licensing]
+We're tracking an old release of dosfstools due to licensing issues.
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+--- dosfstools-2.10/dosfsck/boot.c.orig	2004-10-15 08:51:42.394725176 -0600
++++ dosfstools-2.10/dosfsck/boot.c	2004-10-15 08:49:16.776862456 -0600
+@@ -14,6 +14,9 @@
+ #include "io.h"
+ #include "boot.h"
+ 
++#ifndef MSDOS_FAT12
++#define MSDOS_FAT12 4084
++#endif
+ 
+ #define ROUND_TO_MULTIPLE(n,m) ((n) && (m) ? (n)+(m)-1-((n)-1)%(m) : 0)
+     /* don't divide by zero */

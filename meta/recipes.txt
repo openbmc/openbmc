@@ -1,0 +1,15 @@
+recipes-bsp          - Anything with links to specific hardware or hardware configuration information
+recipes-connectivity - Libraries and applications related to communication with other devices 
+recipes-core         - What's needed to build a basic working Linux image including commonly used dependencies
+recipes-devtools     - Tools primarily used by the build system (but can also be used on targets)
+recipes-extended     - Applications which whilst not essential add features compared to the alternatives in
+                       core. May be needed for full tool functionality or LSB compliance.
+recipes-gnome        - All things related to the GTK+ application framework
+recipes-graphics     - X and other graphically related system libraries  
+recipes-kernel       - The kernel and generic applications/libraries with strong kernel dependencies
+recipes-lsb4         - Recipes added for the sole purpose of supporting the Linux Standard Base (LSB) 4.x
+recipes-multimedia   - Codecs and support utilties for audio, images and video
+recipes-rt           - Provides package and image recipes for using and testing the PREEMPT_RT kernel
+recipes-qt           - All things related to the Qt application framework
+recipes-sato         - The Sato demo/reference UI/UX, its associated apps and configuration 
+recipes-support      - Recipes used by other recipes but that are not directly included in images

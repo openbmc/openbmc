@@ -1,0 +1,18 @@
+Upstream-Status: Inappropriate [other]
+
+This is a hack to fix building the locale bits on an older
+CentOs 5.X machine
+
+Index: git/locale/programs/config.h
+===================================================================
+--- git/locale/programs/config.h
++++ git.orig/locale/programs/config.h
+@@ -19,6 +19,8 @@
+ #ifndef _LD_CONFIG_H
+ #define _LD_CONFIG_H	1
+ 
++#define DUMMY_LOCALE_T
++
+ /* Use the internal textdomain used for libc messages.  */
+ #define PACKAGE _libc_intl_domainname
+ #ifndef VERSION

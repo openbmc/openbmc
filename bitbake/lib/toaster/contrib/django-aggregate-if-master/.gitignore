@@ -1,0 +1,10 @@
+*.pyc
+*.swp
+*.swo
+*.kpf
+*.egg-info/
+.idea
+.tox
+tmp/
+dist/
+.DS_Store

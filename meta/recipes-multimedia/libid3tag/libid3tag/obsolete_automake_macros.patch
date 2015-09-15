@@ -1,0 +1,15 @@
+Upstream-Status: Submitted [https://sourceforge.net/tracker/?func=detail&aid=3599280&group_id=12349&atid=112349]
+
+Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
+diff -Nurd libid3tag-0.15.1b/configure.ac libid3tag-0.15.1b/configure.ac
+--- libid3tag-0.15.1b/configure.ac	2004-01-24 01:22:46.000000000 +0200
++++ libid3tag-0.15.1b/configure.ac	2013-01-03 06:41:02.734835014 +0200
+@@ -28,7 +28,7 @@
+
+-AM_INIT_AUTOMAKE
++AM_INIT_AUTOMAKE([foreign])
+
+-AM_CONFIG_HEADER([config.h])
++AC_CONFIG_HEADERS([config.h])
+
+ dnl System type.

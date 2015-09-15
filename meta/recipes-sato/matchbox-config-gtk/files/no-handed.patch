@@ -1,0 +1,35 @@
+Upstream-Status: Inappropriate [configuration]
+
+Index: appearance/mb-appearance.c
+===================================================================
+--- appearance/mb-appearance.c	(revision 1614)
++++ appearance/mb-appearance.c	(working copy)
+@@ -300,11 +300,13 @@
+     gtk_font_button_set_font_name (GTK_FONT_BUTTON (font_button),
+                                    gconf_value_get_string (value));
+   } else if (strcmp (key, HANDED_KEY) == 0) {
++#if 0
+     GEnumValue *e;
+     e = g_enum_get_value_by_name (g_type_class_ref (GTK_TYPE_CORNER_TYPE),
+                                   gconf_value_get_string (value));
+     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (handed_check),
+                                   e->value == GTK_CORNER_TOP_RIGHT);
++#endif
+   }
+ }
+ 
+@@ -395,12 +397,13 @@
+   gtk_container_add (GTK_CONTAINER (align), font_button);
+ 
+   /* Left/Right Handed */
+-  
++#if 0
+   frame = new_frame (_("Orientation"), &align);
+   gtk_box_pack_start (GTK_BOX (box), frame, TRUE, TRUE, 0);
+   handed_check = gtk_check_button_new_with_mnemonic (_("_Left-handed"));
+   g_signal_connect (handed_check, "toggled", G_CALLBACK (on_handed_set), NULL);
+   gtk_container_add (GTK_CONTAINER (align), handed_check);
++#endif
+ 
+   gconf_client_add_dir (gconf, INTERFACE_DIR, GCONF_CLIENT_PRELOAD_ONELEVEL, NULL);
+   g_signal_connect (gconf, "value-changed", G_CALLBACK (on_gconf_value_changed), NULL);

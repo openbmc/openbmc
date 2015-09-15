@@ -1,0 +1,91 @@
+on uclibc systems libintl and libuargp are separate from libc.
+so they need to be specified on commandline when we use proxy-libintl
+then libintl is a static archive so it should be listed last since
+elfutils does not respect disable-nls we need to link in libintl
+
+We add a new option --enable-uclibc which will be used to control
+the uclibc specific configurations during build.
+
+Signed-off-by: Khem Raj <raj.khem>
+
+Upstream-Status: Inappropriate [uclibc specific]
+
+Index: elfutils-0.148/configure.ac
+===================================================================
+--- elfutils-0.148.orig/configure.ac
++++ elfutils-0.148/configure.ac
+@@ -55,9 +55,16 @@ AS_IF([test "$use_locks" = yes], [AC_DEF
+ 
+ AH_TEMPLATE([USE_LOCKS], [Defined if libraries should be thread-safe.])
+ 
++AC_ARG_ENABLE([uclibc],
++AS_HELP_STRING([--enable-uclibc], [Use uclibc for system libraries]),
++use_uclibc=yes, use_uclibc=no)
++AM_CONDITIONAL(USE_UCLIBC, test "$use_uclibc" = yes)
++AS_IF([test "$use_uclibc" = yes], [AC_DEFINE(USE_UCLIBC)])
++
++AH_TEMPLATE([USE_UCLIBC], [Defined if uclibc libraries are used.])
++
+ dnl Add all the languages for which translations are available.
+ ALL_LINGUAS=
+-
+ AC_PROG_CC
+ AC_PROG_RANLIB
+ AC_PROG_YACC
+Index: elfutils-0.148/libelf/Makefile.am
+===================================================================
+--- elfutils-0.148.orig/libelf/Makefile.am
++++ elfutils-0.148/libelf/Makefile.am
+@@ -93,7 +93,12 @@ if !MUDFLAP
+ libelf_pic_a_SOURCES =
+ am_libelf_pic_a_OBJECTS = $(libelf_a_SOURCES:.c=.os)
+ 
++
+ libelf_so_LDLIBS =
++if USE_UCLIBC
++libelf_so_LDLIBS += -lintl -luargp
++endif
++
+ if USE_LOCKS
+ libelf_so_LDLIBS += -lpthread
+ endif
+Index: elfutils-0.148/libdw/Makefile.am
+===================================================================
+--- elfutils-0.148.orig/libdw/Makefile.am
++++ elfutils-0.148/libdw/Makefile.am
+@@ -98,6 +98,11 @@ if !MUDFLAP
+ libdw_pic_a_SOURCES =
+ am_libdw_pic_a_OBJECTS = $(libdw_a_SOURCES:.c=.os)
+ 
++libdw_so_LDLIBS =
++if USE_UCLIBC
++libdw_so_LDLIBS += -lintl -luargp
++endif
++
+ libdw_so_SOURCES =
+ libdw.so: $(srcdir)/libdw.map libdw_pic.a \
+ 	  ../libdwfl/libdwfl_pic.a ../libebl/libebl.a \
+@@ -108,7 +113,7 @@ libdw.so: $(srcdir)/libdw.map libdw_pic.
+ 		-Wl,--enable-new-dtags,-rpath,$(pkglibdir) \
+ 		-Wl,--version-script,$<,--no-undefined \
+ 		-Wl,--whole-archive $(filter-out $<,$^) -Wl,--no-whole-archive\
+-		-ldl $(zip_LIBS)
++		-ldl $(zip_LIBS) $(libdw_so_LDLIBS)
+ 	if readelf -d $@ | fgrep -q TEXTREL; then exit 1; fi
+ 	ln -fs $@ $@.$(VERSION)
+ 
+Index: elfutils-0.148/libcpu/Makefile.am
+===================================================================
+--- elfutils-0.148.orig/libcpu/Makefile.am
++++ elfutils-0.148/libcpu/Makefile.am
+@@ -63,6 +63,10 @@ i386_parse_CFLAGS = -DNMNES="`wc -l < i3
+ i386_lex.o: i386_parse.h
+ i386_gendis_LDADD = $(libeu) -lm $(libmudflap)
+ 
++if USE_UCLIBC
++i386_gendis_LDADD += -luargp -lintl
++endif
++
+ i386_parse.h: i386_parse.c ;
+ 
+ noinst_HEADERS = memory-access.h i386_parse.h i386_data.h

@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+
+XSERVER=/usr/bin/Xorg
+
+. /etc/profile
+
+ARGS=" -br -pn"
+
+DISPLAY=':0'
+
+exec xinit /etc/X11/Xsession -- $XSERVER $DISPLAY $ARGS $*

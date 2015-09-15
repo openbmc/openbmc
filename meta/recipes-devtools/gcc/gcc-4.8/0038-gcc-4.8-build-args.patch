@@ -1,0 +1,64 @@
+When cross compiling a target gcc, target flags may be used on the host
+
+Configure identifies a number of warning flags (WARN_CFLAGS and
+WARN_CXXFLAGS) from the $CC value.  The cross compiler may be different
+from the host compiler and may not support the same set of flags.  This
+leads to problems such as:
+
+cc1plus: error: unrecognized command line option "-Wno-narrowing"
+cc1plus: error: unrecognized command line option "-Wno-overlength-strings"
+
+Work around this problem by removing the warning flags from the
+BUILD_CXXFLAGS value, in a way similar to the BUILD_CFLAGS.
+
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: gcc-4.8.4/gcc/configure
+===================================================================
+--- gcc-4.8.4.orig/gcc/configure
++++ gcc-4.8.4/gcc/configure
+@@ -17864,7 +17864,7 @@ else
+   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
+   lt_status=$lt_dlunknown
+   cat > conftest.$ac_ext <<_LT_EOF
+-#line 17853 "configure"
++#line 17867 "configure"
+ #include "confdefs.h"
+ 
+ #if HAVE_DLFCN_H
+@@ -17970,7 +17970,7 @@ else
+   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
+   lt_status=$lt_dlunknown
+   cat > conftest.$ac_ext <<_LT_EOF
+-#line 17959 "configure"
++#line 17973 "configure"
+ #include "confdefs.h"
+ 
+ #if HAVE_DLFCN_H
+@@ -26918,18 +26918,15 @@ $as_echo "#define TARGET_LIBC_PROVIDES_S
+ fi
+ 
+ # Test for <sys/sdt.h> on the target.
+-
+-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking sys/sdt.h in the target C library" >&5
+-$as_echo_n "checking sys/sdt.h in the target C library... " >&6; }
+-have_sys_sdt_h=no
++#GCC_TARGET_TEMPLATE([HAVE_SYS_SDT_H])
++#AC_MSG_CHECKING(sys/sdt.h in the target C library)
++#have_sys_sdt_h=no
+ #if test -f $target_header_dir/sys/sdt.h; then
+ #  have_sys_sdt_h=yes
+-#
+-#$as_echo "#define HAVE_SYS_SDT_H 1" >>confdefs.h
+-#
++#  AC_DEFINE(HAVE_SYS_SDT_H, 1,
++#            [Define if your target C library provides sys/sdt.h])
+ #fi
+-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $have_sys_sdt_h" >&5
+-$as_echo "$have_sys_sdt_h" >&6; }
++#AC_MSG_RESULT($have_sys_sdt_h)
+ 
+ # Check if TFmode long double should be used by default or not.
+ # Some glibc targets used DFmode long double, but with glibc 2.4

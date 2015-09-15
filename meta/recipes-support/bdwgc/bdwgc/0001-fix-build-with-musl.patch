@@ -1,0 +1,35 @@
+From 829a89e7f5785239a9384e3afd46c900f9d76ada Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 31 Aug 2015 19:55:32 +0000
+Subject: [PATCH] fix build with musl
+
+signal.h already includes bits/sigcontext.h
+Documentation seems to indicate that if you need the definitions in
+sigcontext.h, you are supposed to include signal.h and not sigcontext.h.
+
+a good fix should be to remove glibc
+specific understanding, in those ifdef's
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ os_dep.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/os_dep.c b/os_dep.c
+index 08c501d..5cb7873 100644
+--- a/os_dep.c
++++ b/os_dep.c
+@@ -41,7 +41,7 @@
+ #   else /* __GLIBC__ < 2 */
+       /* libc5 doesn't have <sigcontext.h>: go directly with the kernel   */
+       /* one.  Check LINUX_VERSION_CODE to see which we should reference. */
+-#     include <asm/sigcontext.h>
++#     include <signal.h>
+ #   endif /* __GLIBC__ < 2 */
+ # endif
+ #endif /* LINUX && !POWERPC */
+-- 
+2.5.1
+

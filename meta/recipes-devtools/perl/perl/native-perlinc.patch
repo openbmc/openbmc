@@ -1,0 +1,26 @@
+Upstream-Status:Inappropriate [embedded specific]
+
+Index: perl-5.8.8/lib/ExtUtils/MM_Unix.pm
+===================================================================
+--- perl-5.12.3.orig/cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_Unix.pm	2008-10-31 22:01:35.000000000 +0000
++++ perl-5.12.3/cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_Unix.pm	2008-10-31 22:01:35.000000000 +0000
+@@ -1597,6 +1597,19 @@
+ 	$self->{PERL_LIB}     ||= $Config{privlibexp};
+ 	$self->{PERL_ARCHLIB} ||= $Config{archlibexp};
+ 	$self->{PERL_INC}     = $self->catdir("$self->{PERL_ARCHLIB}","CORE"); # wild guess for now
++	# Check for environment override so we'll find the headers in the correct place
++        if (defined $ENV{PERL_LIB})
++        {
++            $self->{PERL_LIB} = $ENV{PERL_LIB};
++        }
++        if (defined $ENV{PERL_ARCHLIB})
++        {
++            $self->{PERL_ARCHLIB} = $ENV{PERL_ARCHLIB};
++        }
++        if (defined $ENV{PERL_INC})
++        {
++            $self->{PERL_INC} = $ENV{PERL_INC};
++        }
+ 	my $perl_h;
+ 
+ 	if (not -f ($perl_h = $self->catfile($self->{PERL_INC},"perl.h"))

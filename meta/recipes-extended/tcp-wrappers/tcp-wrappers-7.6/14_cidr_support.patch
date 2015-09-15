@@ -1,0 +1,68 @@
+Upstream-Status: Backport
+
+diff -ruN tcp_wrappers_7.6.orig/hosts_access.5 tcp_wrappers_7.6/hosts_access.5
+--- tcp_wrappers_7.6.orig/hosts_access.5	2003-08-21 03:15:36.000000000 +0200
++++ tcp_wrappers_7.6/hosts_access.5	2003-08-21 03:15:31.000000000 +0200
+@@ -90,6 +90,10 @@
+ pattern `131.155.72.0/255.255.254.0\' matches every address in the
+ range `131.155.72.0\' through `131.155.73.255\'.
+ .IP \(bu
++An expression of the form `n.n.n.n/mm' is interpreted as a
++`net/masklength' pair, where `mm' is the number of consecutive `1'
++bits in the netmask applied to the `n.n.n.n' address.
++.IP \(bu
+ An expression of the form `[n:n:n:n:n:n:n:n]/m\' is interpreted as a
+ `[net]/prefixlen\' pair. An IPv6 host address is matched if
+ `prefixlen\' bits of `net\' is equal to the `prefixlen\' bits of the
+diff -ruN tcp_wrappers_7.6.orig/hosts_access.c tcp_wrappers_7.6/hosts_access.c
+--- tcp_wrappers_7.6.orig/hosts_access.c	2003-08-21 03:15:36.000000000 +0200
++++ tcp_wrappers_7.6/hosts_access.c	2003-08-21 03:09:30.000000000 +0200
+@@ -417,7 +417,8 @@
+     if ((addr = dot_quad_addr(string)) == INADDR_NONE)
+ 	return (NO);
+     if ((net = dot_quad_addr(net_tok)) == INADDR_NONE
+-	|| (mask = dot_quad_addr(mask_tok)) == INADDR_NONE) {
++	|| ((mask = dot_quad_addr(mask_tok)) == INADDR_NONE
++	    && (mask = cidr_mask_addr(mask_tok)) == 0)) {
+ #ifndef INET6
+ 	tcpd_warn("bad net/mask expression: %s/%s", net_tok, mask_tok);
+ #endif
+diff -ruN tcp_wrappers_7.6.orig/misc.c tcp_wrappers_7.6/misc.c
+--- tcp_wrappers_7.6.orig/misc.c	2003-08-21 03:15:36.000000000 +0200
++++ tcp_wrappers_7.6/misc.c	2003-08-21 03:09:30.000000000 +0200
+@@ -107,3 +107,17 @@
+     }
+     return (runs == 4 ? inet_addr(str) : INADDR_NONE);
+ }
++
++/* cidr_mask_addr - convert cidr netmask length to internal form */
++
++unsigned long cidr_mask_addr(str)
++char   *str;
++{
++    int     maskbits;
++
++    maskbits = atoi(str);
++    if (maskbits < 1 || maskbits > 32)
++	return (0);
++    return htonl(0xFFFFFFFF << (32 - maskbits));
++}
++
+diff -ruN tcp_wrappers_7.6.orig/tcpdchk.c tcp_wrappers_7.6/tcpdchk.c
+--- tcp_wrappers_7.6.orig/tcpdchk.c	2003-08-21 03:15:36.000000000 +0200
++++ tcp_wrappers_7.6/tcpdchk.c	2003-08-21 03:09:30.000000000 +0200
+@@ -497,12 +497,12 @@
+ 	int mask_len;
+ 
+ 	if ((dot_quad_addr(pat) == INADDR_NONE
+-	    || dot_quad_addr(mask) == INADDR_NONE)
++	    || dot_quad_addr(mask) == INADDR_NONE && cidr_mask_addr(mask) == 0)
+ 	    && (!is_inet6_addr(pat)
+ 		|| ((mask_len = atoi(mask)) < 0 || mask_len > 128)))
+ #else
+ 	if (dot_quad_addr(pat) == INADDR_NONE
+-	    || dot_quad_addr(mask) == INADDR_NONE)
++	    || dot_quad_addr(mask) == INADDR_NONE && cidr_mask_addr(mask) == 0)
+ #endif
+ 	    tcpd_warn("%s/%s: bad net/mask pattern", pat, mask);
+     } else if (STR_EQ(pat, "FAIL")) {		/* obsolete */

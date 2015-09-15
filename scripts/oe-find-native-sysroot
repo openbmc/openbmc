@@ -1,0 +1,81 @@
+#!/bin/bash
+#
+# Find a native sysroot to use - either from an in-tree OE build or
+# from a toolchain installation. It then ensures the variable
+# $OECORE_NATIVE_SYSROOT is set to the sysroot's base directory, and sets 
+# $PSEUDO to the path of the pseudo binary.
+#
+# This script is intended to be run within other scripts by source'ing
+# it, e.g:
+#
+# SYSROOT_SETUP_SCRIPT=`which oe-find-native-sysroot`
+# . $SYSROOT_SETUP_SCRIPT
+#
+# This script will terminate execution of your calling program unless
+# you set a variable $SKIP_STRICT_SYSROOT_CHECK to a non-empty string
+# beforehand.
+#
+# Copyright (c) 2010 Linux Foundation
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+if [ "x$OECORE_NATIVE_SYSROOT" = "x" ]; then
+    BITBAKE=`which bitbake 2> /dev/null`
+    if [ "x$BITBAKE" != "x" ]; then
+        if [ "$UID" = "0" ]; then
+            # Root cannot run bitbake unless sanity checking is disabled
+            if [ ! -d "./conf" ]; then
+                echo "Error: root cannot run bitbake by default, and I cannot find a ./conf directory to be able to disable sanity checking"
+                exit 1
+            fi
+            touch conf/sanity.conf
+            OECORE_NATIVE_SYSROOT=`bitbake -e | grep ^STAGING_DIR_NATIVE | cut -d '"' -f2`
+            rm -f conf/sanity.conf
+        else
+            OECORE_NATIVE_SYSROOT=`bitbake -e | grep ^STAGING_DIR_NATIVE | cut -d '"' -f2`
+        fi
+    else
+        echo "Error: Unable to locate bitbake command."
+        echo "Did you forget to source the build environment setup script?"
+
+        if [ -z "$SKIP_STRICT_SYSROOT_CHECK" ]; then
+            exit 1
+        fi
+    fi
+fi
+
+if [ "x$OECORE_NATIVE_SYSROOT" = "x" ]; then
+    # This indicates that there was an error running bitbake -e that
+    # the user needs to be informed of
+    echo "There was an error running bitbake to determine STAGING_DIR_NATIVE"
+    echo "Here is the output from bitbake -e"
+    bitbake -e
+    exit 1
+fi
+
+# Set up pseudo command
+if [ ! -e "$OECORE_NATIVE_SYSROOT/usr/bin/pseudo" ]; then
+    echo "Error: Unable to find pseudo binary in $OECORE_NATIVE_SYSROOT/usr/bin/"
+
+    if [ "x$OECORE_DISTRO_VERSION" = "x" ]; then
+        echo "Have you run 'bitbake meta-ide-support'?"
+    else
+        echo "This shouldn't happen - something is wrong with your toolchain installation"
+    fi
+
+    if [ -z "$SKIP_STRICT_SYSROOT_CHECK" ]; then
+        exit 1
+    fi
+fi
+PSEUDO="$OECORE_NATIVE_SYSROOT/usr/bin/pseudo"

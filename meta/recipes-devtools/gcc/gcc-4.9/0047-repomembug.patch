@@ -1,0 +1,53 @@
+When compiling a project using -frepo, .rpo files are written alongside
+the .o file, the symbols either have O or C against them. During final linking,
+the objects can be recompiled with some of the entries tweaked/chosen by the 
+tlink.c code (visible with TLINK_VERBOSE=3), it does this by changing O -> C
+in the .rpo files.
+
+My tests showed that init_repo (cp/repo.c) was correctly calling 
+IDENTIFIER_REPO_CHOSEN against the right identifers and setting the
+chosen bit.
+
+By the time finish_repo() or emit_repo_p() were called, the pointer returned
+by get_identifier() for the symbol marked during init_repo had changed and
+the chosen bit was no longer set. This lead to linking bugs like:
+
+collect: relinking
+collect2: error: '_ZNK6sudoku5ClearINS_8SequenceEEclERS1_' was assigned to 'board.rpo', but was not defined during recompilation, or vice versa
+
+The problem is that the garbage collection is getting called before
+finish_repo() is called and ggc_protect_identifiers is set to false 
+so the identifiers are not preserved. They are recreated but the 
+chosen bits get wiped out which is why the pointer changes and the 
+chosen bit is not set.
+
+The fix is to change ggc_protect_identifiers *after* the finish_repo 
+calls are made.
+
+Reproduction is tricky since you need to trigger the garbage collector at
+just the right moment.
+
+RP 2013/10/9
+
+[YOCTO #5133]
+
+Upstream-Status: Pending
+
+Index: gcc-4.8.1/gcc/toplev.c
+===================================================================
+--- gcc-4.8.1.orig/gcc/toplev.c	2013-03-28 08:29:51.000000000 +0000
++++ gcc-4.8.1/gcc/toplev.c	2013-10-09 20:27:17.089228023 +0000
+@@ -551,11 +551,11 @@
+   if (flag_syntax_only || flag_wpa)
+     return;
+ 
+-  ggc_protect_identifiers = false;
+-
+   /* This must also call finalize_compilation_unit.  */
+   lang_hooks.decls.final_write_globals ();
+ 
++  ggc_protect_identifiers = false;
++
+   if (seen_error ())
+     return;
+ 

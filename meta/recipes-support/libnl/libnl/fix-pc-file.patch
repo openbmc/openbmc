@@ -1,0 +1,17 @@
+Upstream-Status: Pending
+
+Some packages are asking only for libnl-2.0, but expects to get also
+libnl-genl, libnl-nf libnl-route, easiest way to fix them is here.
+
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+Index: libnl-3.2.14/libnl-3.0.pc.in
+===================================================================
+--- libnl-3.2.14.orig/libnl-3.0.pc.in
++++ libnl-3.2.14/libnl-3.0.pc.in
+@@ -6,5 +6,5 @@ includedir=@includedir@
+ Name: libnl
+ Description: Convenience library for netlink sockets
+ Version: @PACKAGE_VERSION@
+-Libs: -L${libdir} -lnl-@MAJ_VERSION@
++Libs: -L${libdir} -lnl-@MAJ_VERSION@ -lnl-genl-@MAJ_VERSION@ -lnl-nf-@MAJ_VERSION@ -lnl-route-@MAJ_VERSION@
+ Cflags: -I${includedir}/libnl@MAJ_VERSION@

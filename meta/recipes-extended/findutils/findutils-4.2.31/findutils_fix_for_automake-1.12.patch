@@ -1,0 +1,23 @@
+Upstream-Status: Pending
+
+automake 1.12 has depricated automatic de-ANSI-fication support
+
+this patch avoids these kinds of errors:
+
+| configure.in:75: error: automatic de-ANSI-fication support has been removed
+
+Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+2012/05/04
+
+Index: findutils-4.2.31/configure.in
+===================================================================
+--- findutils-4.2.31.orig/configure.in
++++ findutils-4.2.31/configure.in
+@@ -72,7 +72,6 @@ dnl gl_EARLY calls AC_GNU_SOURCE anyway.
+ 
+ 
+ AC_ISC_POSIX
+-AM_C_PROTOTYPES
+ 
+ AC_PROG_INSTALL
+ AC_PROG_RANLIB

@@ -1,0 +1,34 @@
+From ff8f68cc48fd3c30d55e1d570d51f2e0952c968e Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Sat, 25 Jan 2014 23:49:44 -0500
+Subject: [PATCH] autogen.sh: exclude .pc from po/POTFILES.in
+
+Exclude the .pc from po/POTFILES.in since quilt uses "patch --backup",
+which will create the backup file under .pc, this may cause unexpected
+errors, for example, on CentOS 5.x, if the backup file is null
+(newfile), it's mode will be 000, then we will get errors when xgettext
+try to read it.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ autogen.sh |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/autogen.sh b/autogen.sh
+index 7424428..843619e 100755
+--- a/autogen.sh
++++ b/autogen.sh
+@@ -5,7 +5,7 @@ set -e
+ export LC_COLLATE=C
+ unset LC_ALL
+ 
+-find . -iname '*.[ch]' ! -ipath './grub-core/lib/libgcrypt-grub/*' ! -ipath './build-aux/*' ! -ipath './grub-core/lib/libgcrypt/src/misc.c' ! -ipath './grub-core/lib/libgcrypt/src/global.c' ! -ipath './grub-core/lib/libgcrypt/src/secmem.c'  ! -ipath './util/grub-gen-widthspec.c' ! -ipath './util/grub-gen-asciih.c' |sort > po/POTFILES.in
++find . -iname '*.[ch]' ! -ipath './grub-core/lib/libgcrypt-grub/*' ! -ipath './build-aux/*' ! -ipath './grub-core/lib/libgcrypt/src/misc.c' ! -ipath './grub-core/lib/libgcrypt/src/global.c' ! -ipath './grub-core/lib/libgcrypt/src/secmem.c'  ! -ipath './util/grub-gen-widthspec.c' ! -ipath './util/grub-gen-asciih.c' ! -path './.pc/*' | sort > po/POTFILES.in
+ find util -iname '*.in' ! -name Makefile.in  |sort > po/POTFILES-shell.in
+ 
+ echo "Importing unicode..."
+-- 
+1.7.10.4
+

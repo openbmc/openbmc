@@ -1,0 +1,38 @@
+uclibc does not provide des functionality unlike eglibc so lets disable ssl support
+
+Upstream-Status: Inappropriate [uclibc specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: libtirpc-0.2.3/src/rpc_soc.c
+===================================================================
+--- libtirpc-0.2.3.orig/src/rpc_soc.c	2013-03-10 16:00:51.355282153 -0700
++++ libtirpc-0.2.3/src/rpc_soc.c	2013-03-10 16:00:51.703282148 -0700
+@@ -520,6 +520,7 @@
+ 	    (resultproc_t) rpc_wrap_bcast, "udp");
+ }
+ 
++#if 0
+ /*
+  * Create the client des authentication object. Obsoleted by
+  * authdes_seccreate().
+@@ -551,6 +552,7 @@
+ 	dummy = authdes_seccreate(servername, window, NULL, ckey);
+ 	return (dummy);
+ }
++#endif
+ 
+ /*
+  * Create a client handle for a unix connection. Obsoleted by clnt_vc_create()
+Index: libtirpc-0.2.3/src/Makefile.am
+===================================================================
+--- libtirpc-0.2.3.orig/src/Makefile.am	2013-03-10 16:00:51.355282153 -0700
++++ libtirpc-0.2.3/src/Makefile.am	2013-03-10 16:00:51.703282148 -0700
+@@ -50,7 +50,7 @@
+         rpc_callmsg.c rpc_generic.c rpc_soc.c rpcb_clnt.c rpcb_prot.c \
+         rpcb_st_xdr.c svc.c svc_auth.c svc_dg.c svc_auth_unix.c svc_auth_none.c \
+         svc_generic.c svc_raw.c svc_run.c svc_simple.c svc_vc.c getpeereid.c \
+-        auth_time.c auth_des.c authdes_prot.c
++        auth_time.c
+ 
+ ## XDR
+ libtirpc_la_SOURCES += xdr.c xdr_rec.c xdr_array.c xdr_float.c xdr_mem.c xdr_reference.c xdr_stdio.c

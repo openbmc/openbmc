@@ -1,0 +1,23 @@
+Upstream-Status: Inappropriate [disable feature]
+
+Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
+diff -Nurdd libidn-1.26/doc/Makefile.am libidn-1.26/doc/Makefile.am
+--- libidn-1.26/doc/Makefile.am	2012-09-18 11:25:45.000000000 +0300
++++ libidn-1.26/doc/Makefile.am	2013-02-08 07:41:24.591431462 +0200
+@@ -49,15 +49,9 @@
+
+ # Man pages.
+
+-dist_man_MANS = idn.1 $(gdoc_MANS)
++dist_man_MANS = $(gdoc_MANS)
+ MAINTAINERCLEANFILES = $(dist_man_MANS)
+
+-idn.1: $(top_srcdir)/src/idn.c $(top_srcdir)/src/idn.ggo \
+-		$(top_srcdir)/configure.ac
+-	$(HELP2MAN) \
+-		--name="Internationalized Domain Names command line tool" \
+-		--output=$@ $(top_builddir)/src/idn$(EXEEXT)
+-
+ # GDOC
+
+ GDOC_BIN = $(srcdir)/gdoc

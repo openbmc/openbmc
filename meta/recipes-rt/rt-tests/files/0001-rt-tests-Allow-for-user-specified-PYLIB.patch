@@ -1,0 +1,35 @@
+From 66765522b634952346f1a3ab7d00c7222a1f9361 Mon Sep 17 00:00:00 2001
+Message-Id: <66765522b634952346f1a3ab7d00c7222a1f9361.1347419597.git.dvhart@linux.intel.com>
+From: Darren Hart <dvhart@linux.intel.com>
+Date: Tue, 11 Sep 2012 15:19:30 -0700
+Subject: [PATCH 1/2] rt-tests: Allow for user-specified PYLIB
+
+Upstream-Status: Submitted
+
+Allow users (build systems) to specify PYLIB. This allows for a
+cross-build-system to specify the target PYLIB rather than the host
+PYLIB.
+
+Signed-off-by: Darren Hart <dvhart@linux.intel.com>
+CC: Clark Williams <williams@redhat.com>
+CC: John Kacur <jkacur@redhat.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 3a82407..61e2f9f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -23,7 +23,7 @@ endif
+ CFLAGS ?= -D_GNU_SOURCE -Wall -Wno-nonnull -Isrc/include
+ LDFLAGS ?=
+ 
+-PYLIB  := $(shell python -c 'import distutils.sysconfig;  print distutils.sysconfig.get_python_lib()')
++PYLIB  ?= $(shell python -c 'import distutils.sysconfig;  print distutils.sysconfig.get_python_lib()')
+ 
+ ifndef DEBUG
+ 	CFLAGS	+= -O2
+-- 
+1.7.11.4
+

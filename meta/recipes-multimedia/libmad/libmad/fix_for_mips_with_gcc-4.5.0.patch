@@ -1,0 +1,33 @@
+gcc 4.4 did this: The MIPS port no longer recognizes the h  asm constraint. It was necessary to remove this constraint in order to avoid generating unpredictable code sequences. 
+
+so the libmad build with gcc-4.5.0 was failing.
+
+Found a solution here:
+
+http://us.generation-nt.com/answer/bug-568418-libmad0-dev-mpg321-compilation-errors-mips-mipsel-architectures-help-169033451.html
+
+Upstream-Status: Pending
+
+2010/07/29
+Nitin A Kamble <nitin.a.kamble@intel.com>
+
+Index: libmad-0.15.1b/fixed.h
+===================================================================
+--- libmad-0.15.1b.orig/fixed.h
++++ libmad-0.15.1b/fixed.h
+@@ -297,6 +297,15 @@ mad_fixed_t mad_f_mul_inline(mad_fixed_t
+ 
+ /* --- MIPS ---------------------------------------------------------------- */
+ 
++# elif defined(FPM_MIPS) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4))
++    typedef unsigned int u64_di_t __attribute__ ((mode (DI)));
++#   define MAD_F_MLX(hi, lo, x, y) \
++    do { \
++        u64_di_t __ll = (u64_di_t) (x) * (y); \
++        hi = __ll >> 32; \
++        lo = __ll; \
++     } while (0)
++
+ # elif defined(FPM_MIPS)
+ 
+ /*

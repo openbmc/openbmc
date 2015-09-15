@@ -1,0 +1,8 @@
+# yocto-bsp-filename {{=machine}}.scc
+kconf hardware {{=machine}}.cfg
+
+include cfg/usb-mass-storage.scc
+include cfg/fs/vfat.scc
+
+kconf hardware {{=machine}}-user-config.cfg
+include {{=machine}}-user-patches.scc

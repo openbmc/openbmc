@@ -1,0 +1,25 @@
+Author: Andrei Gherzan <andrei@gherzan.ro>
+Date:   Thu Feb 2 23:59:11 2012 +0200
+
+From 4.2.0 final release, -lcrypto check was removed and we compile static libraries
+from bind that are linked to libcrypto. This is why i added a patch in order to add
+-lcrypto to LIBS.
+
+Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
+Upstream-Status: Pending
+
+Index: dhcp-4.2.3-P2-r0/dhcp-4.2.3-P2/configure.ac
+===================================================================
+--- dhcp-4.2.3-P2.orig/configure.ac	2012-02-02 18:04:20.843023196 +0200
++++ dhcp-4.2.3-P2/configure.ac	2012-02-02 17:58:16.000000000 +0200
+@@ -456,6 +456,10 @@
+ # Look for optional headers.
+ AC_CHECK_HEADERS(sys/socket.h net/if_dl.h net/if6.h regex.h)
+ 
++# find an MD5 library
++AC_SEARCH_LIBS(MD5_Init, [crypto])
++AC_SEARCH_LIBS(MD5Init, [crypto])
++
+ # Solaris needs some libraries for functions
+ AC_SEARCH_LIBS(socket, [socket])
+ AC_SEARCH_LIBS(inet_ntoa, [nsl])

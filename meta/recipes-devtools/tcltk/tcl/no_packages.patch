@@ -1,0 +1,53 @@
+tcl 8.6.0 builds by default a number of packages that are not needed in Yocto.
+This patch changes the makefile so that these packages are not built by default.
+
+Upstream-Status:Inappropriate [embedded specific]
+
+Signed-off-by: Bogdan Marinescu <bogdan.a.marinescu@intel.com>
+
+Index: unix/Makefile.in
+===================================================================
+--- unix.orig/Makefile.in	2013-11-10 23:38:12.235425891 -0800
++++ unix/Makefile.in	2013-11-10 23:38:12.231425891 -0800
+@@ -611,7 +611,7 @@
+ # Start of rules
+ #--------------------------------------------------------------------------
+ 
+-all: binaries libraries doc packages
++all: binaries libraries doc
+ 
+ binaries: ${LIB_FILE} $(STUB_LIB_FILE) ${TCL_EXE}
+ 
+@@ -653,12 +653,12 @@
+ #tclConfig.h: $(UNIX_DIR)/tclConfig.h.in
+ #	$(SHELL) config.status
+ 
+-clean: clean-packages
++clean:
+ 	rm -f *.a *.o libtcl* core errs *~ \#* TAGS *.E a.out \
+ 		errors ${TCL_EXE} ${TCLTEST_EXE} lib.exp Tcl @DTRACE_HDR@
+ 	cd dltest ; $(MAKE) clean
+ 
+-distclean: distclean-packages clean
++distclean: clean
+ 	rm -rf Makefile config.status config.cache config.log tclConfig.sh \
+ 		tclConfig.h *.plist Tcl.framework tcl.pc
+ 	cd dltest ; $(MAKE) distclean
+@@ -706,7 +706,7 @@
+ # tcltest, ie:
+ #	% make test TESTFLAGS="-verbose bps -file fileName.test"
+ 
+-test: test-tcl test-packages
++test: test-tcl
+ 
+ test-tcl: ${TCLTEST_EXE}
+ 	$(SHELL_ENV) ${TCLTEST_EXE} $(TOP_DIR)/tests/all.tcl $(TESTFLAGS)
+@@ -771,7 +771,7 @@
+ INSTALL_DEV_TARGETS = install-headers
+ INSTALL_EXTRA_TARGETS = @EXTRA_INSTALL@
+ INSTALL_TARGETS = $(INSTALL_BASE_TARGETS) $(INSTALL_DOC_TARGETS) $(INSTALL_DEV_TARGETS) \
+-		  $(INSTALL_PACKAGE_TARGETS) $(INSTALL_EXTRA_TARGETS)
++		  $(INSTALL_EXTRA_TARGETS)
+ 
+ install: $(INSTALL_TARGETS)
+ 

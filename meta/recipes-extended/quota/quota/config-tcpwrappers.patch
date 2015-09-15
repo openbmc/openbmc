@@ -1,0 +1,75 @@
+Upstream-Status: Pending
+
+--- quota-tools.orig/configure.in
++++ quota-tools/configure.in
+@@ -151,33 +151,46 @@ AC_SUBST(QUOTA_NETLINK_PROG)
+ AC_SUBST(NETLINKLIBS)
+
+ AC_SEARCH_LIBS(gethostbyname, nsl)
+-AC_MSG_CHECKING(for host_access in -lwrap)
+-AC_CACHE_VAL(ac_cv_lib_wrap_main,
+-	saved_LIBS="$LIBS"
+-	LIBS="$LIBS -lwrap"
+-	[AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+-	#include <stdio.h>
+-	#include <sys/types.h>
+-	#include <sys/socket.h>
+-	#include <netinet/in.h>
+-	#include <tcpd.h>
+-	struct request_info request;
+-	int deny_severity, allow_severity;]],[[hosts_access(&request);]])],
+-	dnl We always restore LIBS as we add -lwrap in the next check
+-	[ac_cv_lib_wrap_main=yes; LIBS="$saved_LIBS"; AC_MSG_RESULT(yes)],
+-	[ac_cv_lib_wrap_main=no; LIBS="$saved_LIBS"; AC_MSG_RESULT(no)])
+-	])
+
+-if test ${ac_cv_lib_wrap_main} = yes; then
+-	AC_CHECK_HEADER(tcpd.h,, [
+-		echo 'ERROR: could not find tcpd.h - missing TCP wrappers package'
+-		exit 1
+-	])
+-	LIBS="$LIBS -lwrap"
+-	AC_DEFINE([HOSTS_ACCESS], 1, [Use hosts.allow and hosts.deny for access checking of rpc.rquotad])
+-	COMPILE_OPTS="$COMPILE_OPTS HOSTS_ACCESS"
++AC_ARG_WITH(tcpwrappers,
++	[  --with-tcpwrappers=[yes/no/try]   Use hosts.allow and hosts.deny for access checking of rpc.rquota [default=yes, if available.]],
++	,
++	with_tcpwrappers="try")
++
++if test "x$with_tcpwrappers" != xno; then
++	AC_MSG_CHECKING(for host_access in -lwrap)
++	AC_CACHE_VAL(ac_cv_lib_wrap_main,
++		saved_LIBS="$LIBS"
++		LIBS="$LIBS -lwrap"
++		[AC_LINK_IFELSE([AC_LANG_PROGRAM([[
++		#include <stdio.h>
++		#include <sys/types.h>
++		#include <sys/socket.h>
++		#include <netinet/in.h>
++		#include <tcpd.h>
++		struct request_info request;
++		int deny_severity, allow_severity;]],[[hosts_access(&request);]])],
++		dnl We always restore LIBS as we add -lwrap in the next try
++		[ac_cv_lib_wrap_main=yes; LIBS="$saved_LIBS"; AC_MSG_RESULT(yes)],
++		[ac_cv_lib_wrap_main=no; LIBS="$saved_LIBS"; AC_MSG_RESULT(no)])
++		])
++
++	if test "x$ac_cv_lib_wrap_main" = xyes; then
++		AC_CHECK_HEADER(tcpd.h,, [
++			if test "x$with_tcpwrappers" != xtry; then
++				AC_MSG_ERROR([could not find tcpd.h - missing TCP wrappers package])
++			fi
++		])
++
++		LIBS="$LIBS -lwrap"
++		AC_DEFINE([HOSTS_ACCESS], 1, [Use hosts.allow and hosts.deny for access checking of rpc.rquotad])
++		COMPILE_OPTS="$COMPILE_OPTS HOSTS_ACCESS"
++	elif test "x$with_tcpwrappers" != xtry; then
++		AC_MSG_ERROR([could not find libwrap - missing TCP wrappers package])
++	fi
+ fi
+
++
+ dnl Checks for typedefs, structures, and compiler characteristics.
+ AC_C_CONST
+ AC_C_INLINE

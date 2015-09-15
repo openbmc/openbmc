@@ -1,0 +1,19 @@
+We don't want anything stripped
+
+Upstream-Status: Inappropriate [no upstream]
+The project appears to no longer be accepting changes.
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+diff -ur uuid-1.6.2.orig/Makefile.in uuid-1.6.2/Makefile.in
+--- uuid-1.6.2.orig/Makefile.in	2012-05-14 14:42:42.225789456 -0500
++++ uuid-1.6.2/Makefile.in	2012-05-14 15:03:03.119733400 -0500
+@@ -254,7 +254,7 @@
+ 	-@if [ ".$(WITH_CXX)" = .yes ]; then \
+ 	    $(LIBTOOL) --mode=install $(SHTOOL) install -c -m 644 $(CXX_NAME) $(DESTDIR)$(libdir)/; \
+ 	fi
+-	@$(LIBTOOL) --mode=install $(SHTOOL) install -c -s -m 755 uuid $(DESTDIR)$(bindir)/
++	@$(LIBTOOL) --mode=install $(SHTOOL) install -c -m 755 uuid $(DESTDIR)$(bindir)/
+ 	$(SHTOOL) install -c -m 644 $(S)/uuid.1 $(DESTDIR)$(mandir)/man1/
+ 	-@if [ ".$(WITH_PERL)" = .yes ]; then \
+ 	    (cd $(S)/perl && $(MAKE) $(MFLAGS) install DESTDIR=$(DESTDIR)); \

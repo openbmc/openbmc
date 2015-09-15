@@ -1,0 +1,68 @@
+These tests don't work in cross compiling, just disable them for now, we don't
+build subversion on OS-X at this time.
+
+RP 1014/7/16
+
+Upstream-Status: Pending [needs a rewrite to support a cache value]
+
+Index: subversion-1.8.9/build/ac-macros/macosx.m4
+===================================================================
+--- subversion-1.8.9.orig/build/ac-macros/macosx.m4	2012-11-26 03:04:27.000000000 +0000
++++ subversion-1.8.9/build/ac-macros/macosx.m4	2014-07-16 12:28:58.357300403 +0000
+@@ -24,21 +24,7 @@
+ AC_DEFUN(SVN_LIB_MACHO_ITERATE,
+ [
+   AC_MSG_CHECKING([for Mach-O dynamic module iteration functions])
+-  AC_RUN_IFELSE([AC_LANG_PROGRAM([[
+-    #include <mach-o/dyld.h>
+-    #include <mach-o/loader.h>
+-  ]],[[
+-    const struct mach_header *header = _dyld_get_image_header(0);
+-    const char *name = _dyld_get_image_name(0);
+-    if (name && header) return 0;
+-    return 1;
+-  ]])],[
+-    AC_DEFINE([SVN_HAVE_MACHO_ITERATE], [1],
+-              [Is Mach-O low-level _dyld API available?])
+-    AC_MSG_RESULT([yes])
+-  ],[
+     AC_MSG_RESULT([no])
+-  ])
+ ])
+ 
+ dnl SVN_LIB_MACOS_PLIST
+@@ -46,34 +32,7 @@
+ AC_DEFUN(SVN_LIB_MACOS_PLIST,
+ [
+   AC_MSG_CHECKING([for Mac OS property list utilities])
+-
+-  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+-    #include <AvailabilityMacros.h>
+-    #if !defined(MAC_OS_X_VERSION_MAX_ALLOWED) \
+-     || !defined(MAC_OS_X_VERSION_10_0) \
+-     || (MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_0)
+-    #error ProperyList API unavailable.
+-    #endif
+-  ]],[[]])],[
+-    dnl ### Hack.  We should only need to pass the -framework options when
+-    dnl linking libsvn_subr, since it is the only library that uses Keychain.
+-    dnl
+-    dnl Unfortunately, libtool 1.5.x doesn't track transitive dependencies for
+-    dnl OS X frameworks like it does for normal libraries, so we need to
+-    dnl explicitly pass the option to all the users of libsvn_subr to allow
+-    dnl static builds to link successfully.
+-    dnl
+-    dnl This does mean that all executables we link will be linked directly
+-    dnl to these frameworks - even when building shared libraries - but that
+-    dnl shouldn't cause any problems.
+-
+-    LIBS="$LIBS -framework CoreFoundation"
+-    AC_DEFINE([SVN_HAVE_MACOS_PLIST], [1],
+-              [Is Mac OS property list API available?])
+-    AC_MSG_RESULT([yes])
+-  ],[
+     AC_MSG_RESULT([no])
+-  ])
+ ])
+ 
+ dnl SVN_LIB_MACOS_KEYCHAIN

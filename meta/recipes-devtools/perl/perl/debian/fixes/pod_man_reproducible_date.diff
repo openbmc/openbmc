@@ -1,0 +1,170 @@
+From 9057adc106d6bbef53c9e706523cd94f1a7a08d4 Mon Sep 17 00:00:00 2001
+From: Russ Allbery <rra@debian.org>
+Date: Sat, 30 Aug 2014 15:10:41 -0700
+Subject: Support POD_MAN_DATE in Pod::Man for the left-hand footer
+
+Honor the environment variable POD_MAN_DATE and use its contents, if
+set, as the value of the left-hand footer if the date option is not
+set, overriding the timestamp of the input file.  This is primarily
+useful to ensure reproducible builds of the same output file given the
+same souce and Pod::Man version, even when file timestamps may not be
+consistent.  Thanks, Niko Tyni.
+
+Bug-Debian: http://bugs.debian.org/759405
+Origin: upstream
+Patch-Name: fixes/pod_man_reproducible_date.diff
+---
+ cpan/podlators/lib/Pod/Man.pm  | 69 +++++++++++++++++++++++++++++++-----------
+ cpan/podlators/t/devise-date.t | 29 +++++++++++++-----
+ 2 files changed, 72 insertions(+), 26 deletions(-)
+
+diff --git a/cpan/podlators/lib/Pod/Man.pm b/cpan/podlators/lib/Pod/Man.pm
+index 72ca9ff..0536662 100644
+--- a/cpan/podlators/lib/Pod/Man.pm
++++ b/cpan/podlators/lib/Pod/Man.pm
+@@ -876,25 +876,42 @@ sub devise_title {
+ }
+ 
+ # Determine the modification date and return that, properly formatted in ISO
+-# format.  If we can't get the modification date of the input, instead use the
+-# current time.  Pod::Simple returns a completely unuseful stringified file
+-# handle as the source_filename for input from a file handle, so we have to
+-# deal with that as well.
++# format.
++#
++# If POD_MAN_DATE is set, that overrides anything else.  This can be used for
++# reproducible generation of the same file even if the input file timestamps
++# are unpredictable or the POD coms from standard input.
++#
++# Otherwise, use the modification date of the input if we can stat it.  Be
++# aware that Pod::Simple returns the stringification of the file handle as
++# source_filename for input from a file handle, so we'll stat some random ref
++# string in that case.  If that fails, instead use the current time.
++#
++# $self - Pod::Man object, used to get the source file
++#
++# Returns: YYYY-MM-DD date suitable for the left-hand footer
+ sub devise_date {
+     my ($self) = @_;
++
++    # If POD_MAN_DATE is set, always use it.
++    if ($ENV{POD_MAN_DATE}) {
++        return $ENV{POD_MAN_DATE};
++    }
++
++    # Otherwise, get the input filename and try to stat it.  If that fails,
++    # use the current time.
+     my $input = $self->source_filename;
+     my $time;
+     if ($input) {
+-        $time = (stat $input)[9] || time;
++        $time = (stat($input))[9] || time();
+     } else {
+-        $time = time;
++        $time = time();
+     }
+ 
+-    # Can't use POSIX::strftime(), which uses Fcntl, because MakeMaker
+-    # uses this and it has to work in the core which can't load dynamic
+-    # libraries.
+-    my ($year, $month, $day) = (localtime $time)[5,4,3];
+-    return sprintf ("%04d-%02d-%02d", $year + 1900, $month + 1, $day);
++    # Can't use POSIX::strftime(), which uses Fcntl, because MakeMaker uses
++    # this and it has to work in the core which can't load dynamic libraries.
++    my ($year, $month, $day) = (localtime($time))[5,4,3];
++    return sprintf("%04d-%02d-%02d", $year + 1900, $month + 1, $day);
+ }
+ 
+ # Print out the preamble and the title.  The meaning of the arguments to .TH
+@@ -1632,6 +1649,15 @@ argument.
+ Sets the centered page header to use instead of "User Contributed Perl
+ Documentation".
+ 
++=item date
++
++Sets the left-hand footer.  If this option is not set, the contents of the
++environment variable POD_MAN_DATE, if set, will be used.  Failing that,
++the modification date of the input file will be used, or the current time
++if stat() can't find that file (which will be the case if the input is
++from C<STDIN>).  If obtained from the file modification date or the
++current time, he date will be formatted as C<YYYY-MM-DD>.
++
+ =item errors
+ 
+ How to report errors.  C<die> says to throw an exception on any POD
+@@ -1642,13 +1668,6 @@ POD errors entirely, as much as possible.
+ 
+ The default is C<pod>.
+ 
+-=item date
+-
+-Sets the left-hand footer.  By default, the modification date of the input
+-file will be used, or the current date if stat() can't find that file (the
+-case if the input is from C<STDIN>), and the date will be formatted as
+-C<YYYY-MM-DD>.
+-
+ =item fixed
+ 
+ The fixed-width font to use for verbatim text and code.  Defaults to
+@@ -1810,6 +1829,20 @@ option was set to C<die>.
+ 
+ =back
+ 
++=head1 ENVIRONMENT
++
++=over 4
++
++=item POD_MAN_DATE
++
++If set, this will be used as the value of the left-hand footer unless the
++C<date> option is explicitly set, overriding the timestamp of the input
++file or the current time.  This is primarily useful to ensure reproducible
++builds of the same output file given the same souce and Pod::Man version,
++even when file timestamps may not be consistent.
++
++=back
++
+ =head1 BUGS
+ 
+ Encoding handling assumes that PerlIO is available and does not work
+diff --git a/cpan/podlators/t/devise-date.t b/cpan/podlators/t/devise-date.t
+index 3cce9f5..c610dd9 100644
+--- a/cpan/podlators/t/devise-date.t
++++ b/cpan/podlators/t/devise-date.t
+@@ -1,15 +1,28 @@
+-#!/usr/bin/perl -w
+-
+-# In order for MakeMaker to build in the core, nothing can use
+-# Fcntl which includes POSIX.  devise_date()'s use of strftime()
+-# was replaced.  This tests that it's identical.
++#!/usr/bin/perl
++#
++# In order for MakeMaker to build in the core, nothing can use Fcntl which
++# includes POSIX.  devise_date()'s use of strftime() was replaced.  This tests
++# that it's identical.  It also tests special handling of the POD_MAN_DATE
++# environment variable.
+ 
++use 5.006;
+ use strict;
+-
+-use Test::More tests => 1;
++use warnings;
+ 
+ use Pod::Man;
+ use POSIX qw(strftime);
+ 
++use Test::More tests => 2;
++
++# Check that the results of device_date matches strftime.  There is no input
++# file name, so this will use the current time.
+ my $parser = Pod::Man->new;
+-is $parser->devise_date, strftime("%Y-%m-%d", localtime);
++is(
++    $parser->devise_date,
++    strftime('%Y-%m-%d', localtime()),
++    'devise_date matches strftime'
++);
++
++# Set the override environment variable and ensure that it's honored.
++local $ENV{POD_MAN_DATE} = '2014-01-01';
++is($parser->devise_date, '2014-01-01', 'devise_date honors POD_MAN_DATE');

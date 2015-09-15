@@ -1,0 +1,180 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
+[<!ENTITY % poky SYSTEM "../poky.ent"> %poky; ] >
+
+<chapter id='adt-intro'>
+    <title>The Application Development Toolkit (ADT)</title>
+
+    <para>
+        Part of the Yocto Project development solution is an Application Development
+        Toolkit (ADT).
+        The ADT provides you with a custom-built, cross-development
+        platform suited for developing a user-targeted product application.
+    </para>
+
+    <para>
+        Fundamentally, the ADT consists of the following:
+        <itemizedlist>
+            <listitem><para>An architecture-specific cross-toolchain and matching
+                sysroot both built by the
+                <ulink url='&YOCTO_DOCS_DEV_URL;#build-system-term'>OpenEmbedded build system</ulink>.
+                The toolchain and sysroot are based on a
+                <ulink url='&YOCTO_DOCS_DEV_URL;#metadata'>Metadata</ulink>
+                configuration and extensions,
+                which allows you to cross-develop on the host machine for the target hardware.
+                </para></listitem>
+            <listitem><para>The Eclipse IDE Yocto Plug-in.</para></listitem>
+            <listitem><para>The Quick EMUlator (QEMU), which lets you simulate target hardware.
+                </para></listitem>
+            <listitem><para>Various user-space tools that greatly enhance your application
+                development experience.</para></listitem>
+        </itemizedlist>
+    </para>
+
+    <section id='the-cross-development-toolchain'>
+        <title>The Cross-Development Toolchain</title>
+
+        <para>
+            The
+            <ulink url='&YOCTO_DOCS_DEV_URL;#cross-development-toolchain'>Cross-Development Toolchain</ulink>
+            consists of a cross-compiler, cross-linker, and cross-debugger
+            that are used to develop user-space applications for targeted
+            hardware.
+            This toolchain is created either by running the ADT Installer
+            script, a toolchain installer script, or through a
+            <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>
+            that is based on your Metadata configuration or extension for
+            your targeted device.
+            The cross-toolchain works with a matching target sysroot.
+        </para>
+    </section>
+
+    <section id='sysroot'>
+        <title>Sysroot</title>
+
+        <para>
+            The matching target sysroot contains needed headers and libraries for generating
+            binaries that run on the target architecture.
+            The sysroot is based on the target root filesystem image that is built by
+            the OpenEmbedded build system and uses the same Metadata configuration
+            used to build the cross-toolchain.
+        </para>
+    </section>
+
+    <section id='eclipse-overview'>
+        <title>Eclipse Yocto Plug-in</title>
+
+        <para>
+            The Eclipse IDE is a popular development environment and it fully supports
+            development using the Yocto Project.
+            When you install and configure the Eclipse Yocto Project Plug-in into
+            the Eclipse IDE, you maximize your Yocto Project experience.
+            Installing and configuring the Plug-in results in an environment that
+            has extensions specifically designed to let you more easily develop software.
+            These extensions allow for cross-compilation, deployment, and execution of
+            your output into a QEMU emulation session.
+            You can also perform cross-debugging and profiling.
+            The environment also supports a suite of tools that allows you to perform
+            remote profiling, tracing, collection of power data, collection of
+            latency data, and collection of performance data.
+        </para>
+
+        <para>
+            For information about the application development workflow that uses the Eclipse
+            IDE and for a detailed example of how to install and configure the Eclipse
+            Yocto Project Plug-in, see the
+            "<ulink url='&YOCTO_DOCS_DEV_URL;#adt-eclipse'>Working Within Eclipse</ulink>" section
+            of the Yocto Project Development Manual.
+        </para>
+    </section>
+
+    <section id='the-qemu-emulator'>
+        <title>The QEMU Emulator</title>
+
+        <para>
+            The QEMU emulator allows you to simulate your hardware while running your
+            application or image.
+            QEMU is made available a number of ways:
+            <itemizedlist>
+                <listitem><para>
+                    If you use the ADT Installer script to install ADT, you can
+                    specify whether or not to install QEMU.
+                    </para></listitem>
+                <listitem><para>
+                    If you have cloned the <filename>poky</filename> Git
+                    repository to create a
+                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+                    and you have sourced the environment setup script, QEMU is
+                    installed and automatically available.
+                    </para></listitem>
+                <listitem><para>
+                    If you have downloaded a Yocto Project release and unpacked
+                    it to create a
+                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+                    and you have sourced the environment setup script, QEMU is
+                    installed and automatically available.
+                    </para></listitem>
+                <listitem><para>
+                    If you have installed the cross-toolchain tarball and you
+                    have sourced the toolchain's setup environment script, QEMU
+                    is also installed and automatically available.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='user-space-tools'>
+        <title>User-Space Tools</title>
+
+        <para>
+            User-space tools are included as part of the Yocto Project.
+            You will find these tools helpful during development.
+            The tools include LatencyTOP, PowerTOP, OProfile, Perf, SystemTap, and Lttng-ust.
+            These tools are common development tools for the Linux platform.
+            <itemizedlist>
+                <listitem><para><emphasis>LatencyTOP:</emphasis> LatencyTOP focuses on latency
+                    that causes skips in audio,
+                    stutters in your desktop experience, or situations that overload your server
+                    even when you have plenty of CPU power left.
+                    </para></listitem>
+                <listitem><para><emphasis>PowerTOP:</emphasis> Helps you determine what
+                    software is using the most power.
+                    You can find out more about PowerTOP at
+                    <ulink url='https://01.org/powertop/'></ulink>.</para></listitem>
+                <listitem><para><emphasis>OProfile:</emphasis> A system-wide profiler for Linux
+                    systems that is capable of profiling all running code at low overhead.
+                    You can find out more about OProfile at
+                    <ulink url='http://oprofile.sourceforge.net/about/'></ulink>.
+                    For examples on how to setup and use this tool, see the
+                    "<ulink url='&YOCTO_DOCS_PROF_URL;#profile-manual-oprofile'>OProfile</ulink>"
+                    section in the Yocto Project Profiling and Tracing Manual.
+                    </para></listitem>
+                <listitem><para><emphasis>Perf:</emphasis> Performance counters for Linux used
+                    to keep track of certain types of hardware and software events.
+                    For more information on these types of counters see
+                    <ulink url='https://perf.wiki.kernel.org/'></ulink>.
+                    For examples on how to setup and use this tool, see the
+                    "<ulink url='&YOCTO_DOCS_PROF_URL;#profile-manual-perf'>perf</ulink>"
+                    section in the Yocto Project Profiling and Tracing Manual.
+                    </para></listitem>
+                <listitem><para><emphasis>SystemTap:</emphasis> A free software infrastructure
+                    that simplifies information gathering about a running Linux system.
+                    This information helps you diagnose performance or functional problems.
+                    SystemTap is not available as a user-space tool through the Eclipse IDE Yocto Plug-in.
+                    See <ulink url='http://sourceware.org/systemtap'></ulink> for more information
+                    on SystemTap.
+                    For examples on how to setup and use this tool, see the
+                    "<ulink url='&YOCTO_DOCS_PROF_URL;#profile-manual-systemtap'>SystemTap</ulink>"
+                    section in the Yocto Project Profiling and Tracing Manual.</para></listitem>
+                <listitem><para><emphasis>Lttng-ust:</emphasis> A User-space Tracer designed to
+                    provide detailed information on user-space activity.
+                    See <ulink url='http://lttng.org/ust'></ulink> for more information on Lttng-ust.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+</chapter>
+<!--
+vim: expandtab tw=80 ts=4
+-->

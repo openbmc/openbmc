@@ -1,0 +1,26 @@
+Upstream-Status: Pending
+
+Index: rpm-5.4.14/rpmdb/rpmdb.h
+===================================================================
+--- rpm-5.4.14.orig/rpmdb/rpmdb.h
++++ rpm-5.4.14/rpmdb/rpmdb.h
+@@ -9,6 +9,7 @@
+ 
+ #include <assert.h>
+ #include <mire.h>
++#include <errno.h>
+ 
+ #include <rpmtypes.h>
+ #include <rpmtag.h>	/* XXX Header typedef */
+Index: rpm-5.4.14/rpmdb/rpmtag.h
+===================================================================
+--- rpm-5.4.14.orig/rpmdb/rpmtag.h
++++ rpm-5.4.14/rpmdb/rpmtag.h
+@@ -7,6 +7,7 @@
+ 
+ #include <rpmiotypes.h>
+ #include <rpmsw.h>
++#include <stdint.h>
+ 
+ #ifdef __cplusplus
+ extern "C" {

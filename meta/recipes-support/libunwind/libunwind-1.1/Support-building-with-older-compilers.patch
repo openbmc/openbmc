@@ -1,0 +1,72 @@
+From 10b064ffe902d5af31bb49bd8e4f03c545f8d462 Mon Sep 17 00:00:00 2001
+From: Ladislav Michl <ladis@linux-mips.org>
+Date: Tue, 13 Nov 2012 11:19:47 +0100
+Subject: [PATCH] Support building with older compilers.
+
+Add a check for __builtin_unreachable.
+
+Upstream-Status: Pending
+---
+ configure.ac          |   11 +++++++++++
+ include/libunwind_i.h |    6 ++++++
+ src/arm/Gresume.c     |    2 +-
+ src/sh/Gresume.c      |    2 +-
+ 4 files changed, 19 insertions(+), 2 deletions(-)
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -285,6 +285,17 @@ if test x$have__builtin___clear_cache =
+ fi
+ AC_MSG_RESULT([$have__builtin___clear_cache])
+ 
++AC_MSG_CHECKING([for __builtin_unreachable])
++AC_LINK_IFELSE(
++  [AC_LANG_PROGRAM([[]], [[__builtin_unreachable()]])],
++  [have__builtin_unreachable=yes],
++  [have__builtin_unreachable=no])
++if test x$have__builtin_unreachable = xyes; then
++  AC_DEFINE([HAVE__BUILTIN_UNREACHABLE], [1],
++            [Defined if __builtin_unreachable() is available])
++fi
++AC_MSG_RESULT([$have__builtin_unreachable])
++
+ AC_MSG_CHECKING([for __sync atomics])
+ AC_LINK_IFELSE(
+   [AC_LANG_PROGRAM([[]], [[
+--- a/include/libunwind_i.h
++++ b/include/libunwind_i.h
+@@ -72,6 +72,12 @@ WITH THE SOFTWARE OR THE USE OR OTHER DE
+ # endif
+ #endif
+ 
++#if defined(HAVE__BUILTIN_UNREACHABLE)
++# define unreachable() __builtin_unreachable()
++#else
++# define unreachable() do { } while (1)
++#endif
++
+ #ifdef DEBUG
+ # define UNW_DEBUG	1
+ #else
+--- a/src/arm/Gresume.c
++++ b/src/arm/Gresume.c
+@@ -96,7 +96,7 @@ arm_local_resume (unw_addr_space_t as, u
+ 	: : "r" (c->sigcontext_sp), "r" (c->sigcontext_pc)
+       );
+    }
+-  __builtin_unreachable();
++  unreachable();
+ #else
+   printf ("%s: implement me\n", __FUNCTION__);
+ #endif
+--- a/src/sh/Gresume.c
++++ b/src/sh/Gresume.c
+@@ -109,7 +109,7 @@ sh_local_resume (unw_addr_space_t as, un
+ 	  "r" (c->sigcontext_pc)
+       );
+    }
+-  __builtin_unreachable();
++  unreachable();
+ #endif
+   return -UNW_EINVAL;
+ }

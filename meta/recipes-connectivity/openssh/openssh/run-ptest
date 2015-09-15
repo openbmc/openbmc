@@ -1,0 +1,7 @@
+#!/bin/sh
+
+export TEST_SHELL=sh
+
+cd regress
+make -k .OBJDIR=`pwd` .CURDIR=`pwd` SUDO="sudo" tests \
+        | sed -e 's/^skipped/SKIP: /g' -e 's/^ok /PASS: /g' -e 's/^failed/FAIL: /g'

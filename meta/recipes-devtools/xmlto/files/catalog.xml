@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE catalog PUBLIC "-//OASIS//DTD Entity Resolution XML Catalog V1.0//EN" "http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd">
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+<delegateSystem systemIdStartString="http://docbook.org/xml/" catalog="./docbook-xml.xml"/>
+<delegatePublic publicIdStartString="-//OASIS//ELEMENTS DocBook" catalog="./docbook-xml.xml"/>
+<delegatePublic publicIdStartString="-//OASIS//DTD DocBook XML" catalog="./docbook-xml.xml"/>
+<delegatePublic publicIdStartString="-//OASIS//DTD XML Exchange Table Model 19990315" catalog="./docbook-xml.xml"/>
+<delegatePublic publicIdStartString="-//Norman Walsh//DTD CALS Table Model XML" catalog="./docbook-xml.xml"/>
+<delegatePublic publicIdStartString="-//Norman Walsh//ELEMENTS DocBk XML" catalog="./docbook-xml.xml"/>
+<delegatePublic publicIdStartString="-//Norman Walsh//DTD DocBook XML" catalog="./docbook-xml.xml"/>
+<delegatePublic publicIdStartString="-//OASIS//ENTITIES DocBook" catalog="./docbook-xml.xml"/>
+<delegatePublic publicIdStartString="-//Norman Walsh//ENTITIES DocBk XML" catalog="./docbook-xml.xml"/>
+<delegatePublic publicIdStartString="-//Norman Walsh//DTD DocBk XML" catalog="./docbook-xml.xml"/>
+<delegatePublic publicIdStartString="-//Normal Walsh//Exchange Table Model 19960430" catalog="./docbook-xml.xml"/>
+<delegateSystem systemIdStartString="http://www.oasis-open.org/docbook/xml/" catalog="./docbook-xml.xml"/>
+<delegatePublic publicIdStartString="-//OASIS//DTD DocBook CALS Table Model" catalog="./docbook-xml.xml"/>
+<delegateURI uriStartString="http://docbook.sourceforge.net/release/xsl/" catalog="./docbook-xsl.xml"/>
+<delegateSystem systemIdStartString="http://docbook.sourceforge.net/release/xsl/" catalog="./docbook-xsl.xml"/>
+</catalog>

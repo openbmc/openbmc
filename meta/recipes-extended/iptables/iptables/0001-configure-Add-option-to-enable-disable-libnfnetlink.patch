@@ -1,0 +1,47 @@
+From 5c47cf5061b852c02178f01e23690bfe38a99d93 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 17 Mar 2013 11:21:35 -0700
+Subject: [PATCH] configure: Add option to enable/disable libnfnetlink
+
+This changes the configure behaviour from autodetecting
+for libnfnetlink to having an option to disable it explicitly
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Pending
+---
+ configure.ac |   11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index ba616ab..ce2d315 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -53,6 +53,9 @@ AC_ARG_ENABLE([libipq],
+ AC_ARG_WITH([pkgconfigdir], AS_HELP_STRING([--with-pkgconfigdir=PATH],
+ 	[Path to the pkgconfig directory [[LIBDIR/pkgconfig]]]),
+ 	[pkgconfigdir="$withval"], [pkgconfigdir='${libdir}/pkgconfig'])
++AC_ARG_ENABLE([libnfnetlink],
++	AS_HELP_STRING([--disable-libnfnetlink], [Do not use netfilter netlink library]),
++	[enable_libnfnetlink="$enableval"], [enable_libnfnetlink="yes"])
+ 
+ libiptc_LDFLAGS2="";
+ AX_CHECK_LINKER_FLAGS([-Wl,--no-as-needed],
+@@ -89,9 +92,11 @@ AM_CONDITIONAL([ENABLE_LARGEFILE], [test "$enable_largefile" = "yes"])
+ AM_CONDITIONAL([ENABLE_DEVEL], [test "$enable_devel" = "yes"])
+ AM_CONDITIONAL([ENABLE_LIBIPQ], [test "$enable_libipq" = "yes"])
+ 
+-PKG_CHECK_MODULES([libnfnetlink], [libnfnetlink >= 1.0],
+-	[nfnetlink=1], [nfnetlink=0])
+-AM_CONDITIONAL([HAVE_LIBNFNETLINK], [test "$nfnetlink" = 1])
++AS_IF([test "x$enable_libnfnetlink" = "xyes"], [
++  PKG_CHECK_MODULES([libnfnetlink], [libnfnetlink >= 1.0])
++  ])
++
++AM_CONDITIONAL([HAVE_LIBNFNETLINK], [test "x$enable_libnfnetlink" = "xyes"])
+ 
+ regular_CFLAGS="-Wall -Waggregate-return -Wmissing-declarations \
+ 	-Wmissing-prototypes -Wredundant-decls -Wshadow -Wstrict-prototypes \
+-- 
+1.7.9.5
+

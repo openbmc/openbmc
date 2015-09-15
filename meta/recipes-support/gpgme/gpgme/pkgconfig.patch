@@ -1,0 +1,279 @@
+Update gpgme to use pkgconfig instead of -config files since its
+simpler and less error prone when cross compiling.
+
+Upstream-Status: Denied [Upstream not interested in pkg-config support]
+RP 2015/4/17
+
+diff --git a/configure.ac b/configure.ac
+index 298a22b..c778b61 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -622,6 +622,7 @@ AC_CONFIG_FILES(Makefile src/Makefile
+                 src/versioninfo.rc
+                 src/gpgme.h)
+ AC_CONFIG_FILES(src/gpgme-config, chmod +x src/gpgme-config)
++AC_CONFIG_FILES(src/gpgme.pc src/gpgme-pthread.pc)
+ AC_CONFIG_FILES([lang/Makefile lang/cl/Makefile lang/cl/gpgme.asd])
+ AC_OUTPUT
+ 
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 58922f9..40d0dca 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -20,11 +20,13 @@
+ 
+ # Note: moc_kdpipeiodevice should actually be a dependecy below.
+ EXTRA_DIST = gpgme-config.in gpgme.m4 libgpgme.vers ChangeLog-2011 \
+-	     gpgme.h.in versioninfo.rc.in gpgme.def moc_kdpipeiodevice.cpp
++	     gpgme.h.in versioninfo.rc.in gpgme.def moc_kdpipeiodevice.cpp gpgme.pc.in gpgme-pthread.pc.in
+ 
+ bin_SCRIPTS = gpgme-config
+ m4datadir = $(datadir)/aclocal
+ m4data_DATA = gpgme.m4
++pkgconfigdir = $(libdir)/pkgconfig
++pkgconfig_DATA = gpgme.pc gpgme-pthread.pc
+ nodist_include_HEADERS = gpgme.h
+ 
+ bin_PROGRAMS = gpgme-tool
+diff --git a/src/gpgme-pthread.pc.in b/src/gpgme-pthread.pc.in
+new file mode 100644
+index 0000000..980a48e
+--- /dev/null
++++ b/src/gpgme-pthread.pc.in
+@@ -0,0 +1,15 @@
++prefix=@prefix@
++exec_prefix=@exec_prefix@
++libdir=@libdir@
++includedir=@includedir@
++
++# API info
++api_version=@GPGME_CONFIG_API_VERSION@
++host=@GPGME_CONFIG_HOST@
++
++Name: gpgme
++Description: GnuPG Made Easy (GPGME) is a C language library that allows to addsupport for cryptography to a program (threaded version)
++Version: @VERSION@
++Libs: -L${libdir} -lgpgme-pthread -lpthread
++Cflags: -I${includedir}
++Requires: libassuan gpg-error
+diff --git a/src/gpgme.m4 b/src/gpgme.m4
+index 6c2be44..d8a75cb 100644
+--- a/src/gpgme.m4
++++ b/src/gpgme.m4
+@@ -79,7 +79,7 @@ dnl config script does not match the host specification the script
+ dnl is added to the gpg_config_script_warn variable.
+ dnl
+ AC_DEFUN([AM_PATH_GPGME],
+-[ AC_REQUIRE([_AM_PATH_GPGME_CONFIG])dnl
++[
+   tmp=ifelse([$1], ,1:0.4.2,$1)
+   if echo "$tmp" | grep ':' >/dev/null 2>/dev/null ; then
+      req_gpgme_api=`echo "$tmp"     | sed 's/\(.*\):\(.*\)/\1/'`
+@@ -89,36 +89,12 @@ AC_DEFUN([AM_PATH_GPGME],
+      min_gpgme_version="$tmp"
+   fi
+ 
+-  AC_MSG_CHECKING(for GPGME - version >= $min_gpgme_version)
+-  ok=no
+-  if test "$GPGME_CONFIG" != "no" ; then
+-    req_major=`echo $min_gpgme_version | \
+-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\1/'`
+-    req_minor=`echo $min_gpgme_version | \
+-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\2/'`
+-    req_micro=`echo $min_gpgme_version | \
+-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\3/'`
+-    if test "$gpgme_version_major" -gt "$req_major"; then
+-        ok=yes
+-    else
+-        if test "$gpgme_version_major" -eq "$req_major"; then
+-            if test "$gpgme_version_minor" -gt "$req_minor"; then
+-               ok=yes
+-            else
+-               if test "$gpgme_version_minor" -eq "$req_minor"; then
+-                   if test "$gpgme_version_micro" -ge "$req_micro"; then
+-                     ok=yes
+-                   fi
+-               fi
+-            fi
+-        fi
+-    fi
+-  fi
++  PKG_CHECK_MODULES(GPGME, [gpgme >= $min_gpgme_version], [ok=yes], [ok=no])
+   if test $ok = yes; then
+      # If we have a recent GPGME, we should also check that the
+      # API is compatible.
+      if test "$req_gpgme_api" -gt 0 ; then
+-        tmp=`$GPGME_CONFIG --api-version 2>/dev/null || echo 0`
++        tmp=`$PKG_CONFIG --variable=api_version gpgme 2>/dev/null || echo 0`
+         if test "$tmp" -gt 0 ; then
+            if test "$req_gpgme_api" -ne "$tmp" ; then
+              ok=no
+@@ -127,19 +103,11 @@ AC_DEFUN([AM_PATH_GPGME],
+      fi
+   fi
+   if test $ok = yes; then
+-    GPGME_CFLAGS=`$GPGME_CONFIG --cflags`
+-    GPGME_LIBS=`$GPGME_CONFIG --libs`
+-    AC_MSG_RESULT(yes)
+     ifelse([$2], , :, [$2])
+     _AM_PATH_GPGME_CONFIG_HOST_CHECK
+   else
+-    GPGME_CFLAGS=""
+-    GPGME_LIBS=""
+-    AC_MSG_RESULT(no)
+     ifelse([$3], , :, [$3])
+   fi
+-  AC_SUBST(GPGME_CFLAGS)
+-  AC_SUBST(GPGME_LIBS)
+ ])
+ 
+ dnl AM_PATH_GPGME_PTHREAD([MINIMUM-VERSION,
+@@ -148,7 +116,7 @@ dnl Test for libgpgme and define GPGME_PTHREAD_CFLAGS
+ dnl  and GPGME_PTHREAD_LIBS.
+ dnl
+ AC_DEFUN([AM_PATH_GPGME_PTHREAD],
+-[ AC_REQUIRE([_AM_PATH_GPGME_CONFIG])dnl
++[
+   tmp=ifelse([$1], ,1:0.4.2,$1)
+   if echo "$tmp" | grep ':' >/dev/null 2>/dev/null ; then
+      req_gpgme_api=`echo "$tmp"     | sed 's/\(.*\):\(.*\)/\1/'`
+@@ -158,38 +126,12 @@ AC_DEFUN([AM_PATH_GPGME_PTHREAD],
+      min_gpgme_version="$tmp"
+   fi
+ 
+-  AC_MSG_CHECKING(for GPGME pthread - version >= $min_gpgme_version)
+-  ok=no
+-  if test "$GPGME_CONFIG" != "no" ; then
+-    if `$GPGME_CONFIG --thread=pthread 2> /dev/null` ; then
+-      req_major=`echo $min_gpgme_version | \
+-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\1/'`
+-      req_minor=`echo $min_gpgme_version | \
+-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\2/'`
+-      req_micro=`echo $min_gpgme_version | \
+-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\3/'`
+-      if test "$gpgme_version_major" -gt "$req_major"; then
+-        ok=yes
+-      else
+-        if test "$gpgme_version_major" -eq "$req_major"; then
+-          if test "$gpgme_version_minor" -gt "$req_minor"; then
+-            ok=yes
+-          else
+-            if test "$gpgme_version_minor" -eq "$req_minor"; then
+-              if test "$gpgme_version_micro" -ge "$req_micro"; then
+-                ok=yes
+-              fi
+-            fi
+-          fi
+-        fi
+-      fi
+-    fi
+-  fi
++  PKG_CHECK_MODULES(GPGME_PTHREAD, [gpgme-pthread >= $min_gpgme_version], [ok=yes], [ok=no])
+   if test $ok = yes; then
+      # If we have a recent GPGME, we should also check that the
+      # API is compatible.
+      if test "$req_gpgme_api" -gt 0 ; then
+-        tmp=`$GPGME_CONFIG --api-version 2>/dev/null || echo 0`
++        tmp=`$PKG_CONFIG --variable=api_version gpgme-pthread 2>/dev/null || echo 0`
+         if test "$tmp" -gt 0 ; then
+            if test "$req_gpgme_api" -ne "$tmp" ; then
+              ok=no
+@@ -198,19 +140,11 @@ AC_DEFUN([AM_PATH_GPGME_PTHREAD],
+      fi
+   fi
+   if test $ok = yes; then
+-    GPGME_PTHREAD_CFLAGS=`$GPGME_CONFIG --thread=pthread --cflags`
+-    GPGME_PTHREAD_LIBS=`$GPGME_CONFIG --thread=pthread --libs`
+-    AC_MSG_RESULT(yes)
+     ifelse([$2], , :, [$2])
+     _AM_PATH_GPGME_CONFIG_HOST_CHECK
+   else
+-    GPGME_PTHREAD_CFLAGS=""
+-    GPGME_PTHREAD_LIBS=""
+-    AC_MSG_RESULT(no)
+     ifelse([$3], , :, [$3])
+   fi
+-  AC_SUBST(GPGME_PTHREAD_CFLAGS)
+-  AC_SUBST(GPGME_PTHREAD_LIBS)
+ ])
+ 
+ 
+@@ -229,36 +163,12 @@ AC_DEFUN([AM_PATH_GPGME_GLIB],
+      min_gpgme_version="$tmp"
+   fi
+ 
+-  AC_MSG_CHECKING(for GPGME - version >= $min_gpgme_version)
+-  ok=no
+-  if test "$GPGME_CONFIG" != "no" ; then
+-    req_major=`echo $min_gpgme_version | \
+-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\1/'`
+-    req_minor=`echo $min_gpgme_version | \
+-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\2/'`
+-    req_micro=`echo $min_gpgme_version | \
+-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\3/'`
+-    if test "$gpgme_version_major" -gt "$req_major"; then
+-        ok=yes
+-    else
+-        if test "$gpgme_version_major" -eq "$req_major"; then
+-            if test "$gpgme_version_minor" -gt "$req_minor"; then
+-               ok=yes
+-            else
+-               if test "$gpgme_version_minor" -eq "$req_minor"; then
+-                   if test "$gpgme_version_micro" -ge "$req_micro"; then
+-                     ok=yes
+-                   fi
+-               fi
+-            fi
+-        fi
+-    fi
+-  fi
++  PKG_CHECK_MODULES(GPGME_GLIB, [gpgme >= $min_gpgme_version glib-2.0], [ok=yes], [ok=no])  
+   if test $ok = yes; then
+      # If we have a recent GPGME, we should also check that the
+      # API is compatible.
+      if test "$req_gpgme_api" -gt 0 ; then
+-        tmp=`$GPGME_CONFIG --api-version 2>/dev/null || echo 0`
++        tmp=`$PKG_CONFIG --variable=api_version gpgme 2>/dev/null || echo 0`
+         if test "$tmp" -gt 0 ; then
+            if test "$req_gpgme_api" -ne "$tmp" ; then
+              ok=no
+@@ -267,17 +177,9 @@ AC_DEFUN([AM_PATH_GPGME_GLIB],
+      fi
+   fi
+   if test $ok = yes; then
+-    GPGME_GLIB_CFLAGS=`$GPGME_CONFIG --glib --cflags`
+-    GPGME_GLIB_LIBS=`$GPGME_CONFIG --glib --libs`
+-    AC_MSG_RESULT(yes)
+     ifelse([$2], , :, [$2])
+     _AM_PATH_GPGME_CONFIG_HOST_CHECK
+   else
+-    GPGME_GLIB_CFLAGS=""
+-    GPGME_GLIB_LIBS=""
+-    AC_MSG_RESULT(no)
+     ifelse([$3], , :, [$3])
+   fi
+-  AC_SUBST(GPGME_GLIB_CFLAGS)
+-  AC_SUBST(GPGME_GLIB_LIBS)
+ ])
+diff --git a/src/gpgme.pc.in b/src/gpgme.pc.in
+new file mode 100644
+index 0000000..b69539f
+--- /dev/null
++++ b/src/gpgme.pc.in
+@@ -0,0 +1,15 @@
++prefix=@prefix@
++exec_prefix=@exec_prefix@
++libdir=@libdir@
++includedir=@includedir@
++
++# API info
++api_version=@GPGME_CONFIG_API_VERSION@
++host=@GPGME_CONFIG_HOST@
++
++Name: gpgme
++Description: GnuPG Made Easy (GPGME) is a C language library that allows to addsupport for cryptography to a program.
++Version: @VERSION@
++Libs: -L${libdir} -lgpgme
++Cflags: -I${includedir}
++Requires: libassuan gpg-error
+\ No newline at end of file

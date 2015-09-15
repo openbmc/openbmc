@@ -1,0 +1,18 @@
+Disable documentation
+
+Upstream-Status: Inappropriate [configuration]
+Signed-off-by: Constantin Musca <constantinx.musca@intel.com>
+
+Index: apt-0.9.7.7/Makefile
+===================================================================
+--- apt-0.9.7.7.orig/Makefile
++++ apt-0.9.7.7/Makefile
+@@ -17,7 +17,7 @@ all headers library clean veryclean bina
+ 	$(MAKE) -C cmdline $@
+ 	$(MAKE) -C ftparchive $@
+ 	$(MAKE) -C dselect $@
+-	$(MAKE) -C doc $@
++#	$(MAKE) -C doc $@
+ 	$(MAKE) -C po $@
+ 	$(MAKE) -C test $@
+ 

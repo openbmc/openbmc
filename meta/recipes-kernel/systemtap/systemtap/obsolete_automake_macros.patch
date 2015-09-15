@@ -1,0 +1,15 @@
+Upstream-Status: Pending
+
+Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
+Index: git/configure.ac
+===================================================================
+--- git.orig/configure.ac
++++ git/configure.ac
+@@ -19,7 +19,6 @@ AC_PROG_LN_S
+ AC_PROG_CC
+ AC_PROG_CXX
+ AC_PROG_CPP
+-AM_PROG_CC_STDC
+ AM_PROG_CC_C_O
+ AC_PROG_RANLIB
+ AC_OBJEXT

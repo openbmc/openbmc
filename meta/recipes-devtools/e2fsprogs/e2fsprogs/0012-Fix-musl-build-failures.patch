@@ -1,0 +1,54 @@
+From c6ff7feb9038d6e8aaffe2e69b205ad5fa33df2f Mon Sep 17 00:00:00 2001
+From: Paul Barker <paul@paulbarker.me.uk>
+Date: Mon, 18 Aug 2014 21:02:56 +0200
+Subject: [PATCH] Fix musl build failures
+
+In lib/ext2fs/unix_io.c, __u64 should be used instead of __uint64_t. This type
+is guaranteed by the e2fsprogs build system.
+(795c02def3681a99cc792a5ebc162d06f8a1eeb7)
+
+In misc/create_inode.c, <limits.h> is needed for the definition of PATH_MAX.
+(bbccc6f3c6a106721fb6f1ef4df6bc32c7986235)
+
+Both of these fixes have been made upstream with the git commit IDs given but
+those are larger commits containing other changes not needed here.
+
+Signed-off-by: Paul Barker <paul@paulbarker.me.uk>
+
+Upstream-Status: Backport
+---
+ lib/ext2fs/unix_io.c | 6 +++---
+ misc/create_inode.c  | 1 +
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/lib/ext2fs/unix_io.c b/lib/ext2fs/unix_io.c
+index 19be630..0cc0f52 100644
+--- a/lib/ext2fs/unix_io.c
++++ b/lib/ext2fs/unix_io.c
+@@ -931,10 +931,10 @@ static errcode_t unix_discard(io_channel channel, unsigned long long block,
+ 
+ 	if (channel->flags & CHANNEL_FLAGS_BLOCK_DEVICE) {
+ #ifdef BLKDISCARD
+-		__uint64_t range[2];
++		__u64 range[2];
+ 
+-		range[0] = (__uint64_t)(block) * channel->block_size;
+-		range[1] = (__uint64_t)(count) * channel->block_size;
++		range[0] = (__u64)(block) * channel->block_size;
++		range[1] = (__u64)(count) * channel->block_size;
+ 
+ 		ret = ioctl(data->dev, BLKDISCARD, &range);
+ #else
+diff --git a/misc/create_inode.c b/misc/create_inode.c
+index 6d8de04..fcec5aa 100644
+--- a/misc/create_inode.c
++++ b/misc/create_inode.c
+@@ -1,4 +1,5 @@
+ #include "create_inode.h"
++#include <limits.h>
+ 
+ #if __STDC_VERSION__ < 199901L
+ # if __GNUC__ >= 2
+-- 
+1.9.1
+

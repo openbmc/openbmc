@@ -1,0 +1,55 @@
+Upstream-Status: Pending
+
+Subject: e2fsprogs: fix cross compilation problem
+
+The checking of types in parse-types.sh doesn't make much sense in a
+cross-compilation environment, because the generated binary is executed
+on build machine.
+
+So even if asm_types.h has got correct statements for types, it's possible
+that the generated binary will report an error. Because these types are for
+the target machine.
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ config/parse-types.sh |    6 ++++--
+ configure.in          |    6 +++++-
+ 2 files changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/config/parse-types.sh b/config/parse-types.sh
+index 5076f6c..24d2a99 100755
+--- a/config/parse-types.sh
++++ b/config/parse-types.sh
+@@ -118,8 +118,10 @@ if ./asm_types
+ then
+     true
+ else
+-    echo "Problem detected with asm_types.h"
+-    echo "" > asm_types.h
++    if [ "${CROSS_COMPILE}" != "1" ]; then
++	echo "Problem detected with asm_types.h"
++	echo "" > asm_types.h
++    fi
+ fi
+ rm asm_types.c asm_types
+ 
+diff --git a/configure.in b/configure.in
+index 68adf0d..ed1697b 100644
+--- a/configure.in
++++ b/configure.in
+@@ -953,7 +953,11 @@ AC_SUBST(SIZEOF_LONG)
+ AC_SUBST(SIZEOF_LONG_LONG)
+ AC_SUBST(SIZEOF_OFF_T)
+ AC_C_BIGENDIAN
+-BUILD_CC="$BUILD_CC" CPP="$CPP" /bin/sh $ac_aux_dir/parse-types.sh
++if test $cross_compiling = no; then
++  BUILD_CC="$BUILD_CC" CPP="$CPP" /bin/sh $ac_aux_dir/parse-types.sh
++else
++  CROSS_COMPILE="1" BUILD_CC="$BUILD_CC" CPP="$CPP" /bin/sh $ac_aux_dir/parse-types.sh
++fi
+ ASM_TYPES_HEADER=./asm_types.h
+ AC_SUBST_FILE(ASM_TYPES_HEADER)
+ dnl
+-- 
+1.7.9.5
+

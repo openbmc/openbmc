@@ -1,0 +1,5 @@
+#!/bin/sh
+
+tar -C test/ -xJf test/sys.tar.xz
+make -k check-TESTS
+make test-sys-distclean

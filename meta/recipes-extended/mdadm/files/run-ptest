@@ -1,0 +1,10 @@
+#!/bin/sh
+
+./test &>./test.log
+if [ $? -eq 0 ]
+then
+	echo "PASS: mdadm"
+	rm test.log
+else
+	echo "FAIL: mdadm"
+fi

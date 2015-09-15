@@ -1,0 +1,471 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+enable standalone building of ldconfig
+
+---
+ cache.c        |   11 +-
+ chroot_canon.c |    7 +
+ dl-cache.c     |  235 ---------------------------------------------------------
+ dl-cache.h     |    3 
+ ldconfig.c     |   27 ++++--
+ readlib.c      |    7 +
+ xstrdup.c      |   11 --
+ 7 files changed, 45 insertions(+), 256 deletions(-)
+
+Index: ldconfig-native-2.12.1/cache.c
+===================================================================
+--- ldconfig-native-2.12.1.orig/cache.c
++++ ldconfig-native-2.12.1/cache.c
+@@ -16,6 +16,9 @@
+    along with this program; if not, write to the Free Software Foundation,
+    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+ 
++#define _LARGEFILE64_SOURCE
++#define _GNU_SOURCE
++
+ #include <errno.h>
+ #include <error.h>
+ #include <dirent.h>
+@@ -31,8 +34,10 @@
+ #include <sys/stat.h>
+ #include <sys/types.h>
+ 
+-#include <ldconfig.h>
+-#include <dl-cache.h>
++#include "ldconfig.h"
++#include "dl-cache.h"
++# define N_(msgid)  msgid
++#define _(msg) msg
+ 
+ struct cache_entry
+ {
+Index: ldconfig-native-2.12.1/chroot_canon.c
+===================================================================
+--- ldconfig-native-2.12.1.orig/chroot_canon.c
++++ ldconfig-native-2.12.1/chroot_canon.c
+@@ -17,6 +17,9 @@
+    along with this program; if not, write to the Free Software Foundation,
+    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+ 
++#define _LARGEFILE64_SOURCE
++#define _GNU_SOURCE
++
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
+@@ -27,7 +30,9 @@
+ #include <stddef.h>
+ #include <stdint.h>
+ 
+-#include <ldconfig.h>
++#include "ldconfig.h"
++
++#define __set_errno(Val) errno = (Val)
+ 
+ #ifndef PATH_MAX
+ #define PATH_MAX 1024
+Index: ldconfig-native-2.12.1/dl-cache.c
+===================================================================
+--- ldconfig-native-2.12.1.orig/dl-cache.c
++++ ldconfig-native-2.12.1/dl-cache.c
+@@ -20,12 +20,12 @@
+ 
+ #include <assert.h>
+ #include <unistd.h>
+-#include <ldsodefs.h>
++//#include "ldsodefs.h"
+ #include <sys/mman.h>
+ #include <dl-cache.h>
+ #include <dl-procinfo.h>
+ 
+-#include <stdio-common/_itoa.h>
++//#include "_itoa.h"
+ 
+ #ifndef _DL_PLATFORMS_COUNT
+ # define _DL_PLATFORMS_COUNT 0
+@@ -39,103 +39,7 @@ static size_t cachesize;
+ /* 1 if cache_data + PTR points into the cache.  */
+ #define _dl_cache_verify_ptr(ptr) (ptr < cache_data_size)
+ 
+-#define SEARCH_CACHE(cache) \
+-/* We use binary search since the table is sorted in the cache file.	      \
+-   The first matching entry in the table is returned.			      \
+-   It is important to use the same algorithm as used while generating	      \
+-   the cache file.  */							      \
+-do									      \
+-  {									      \
+-    left = 0;								      \
+-    right = cache->nlibs - 1;						      \
+-									      \
+-    while (left <= right)						      \
+-      {									      \
+-	__typeof__ (cache->libs[0].key) key;				      \
+-									      \
+-	middle = (left + right) / 2;					      \
+-									      \
+-	key = cache->libs[middle].key;					      \
+-									      \
+-	/* Make sure string table indices are not bogus before using	      \
+-	   them.  */							      \
+-	if (! _dl_cache_verify_ptr (key))				      \
+-	  {								      \
+-	    cmpres = 1;							      \
+-	    break;							      \
+-	  }								      \
+-									      \
+-	/* Actually compare the entry with the key.  */			      \
+-	cmpres = _dl_cache_libcmp (name, cache_data + key);		      \
+-	if (__builtin_expect (cmpres == 0, 0))				      \
+-	  {								      \
+-	    /* Found it.  LEFT now marks the last entry for which we	      \
+-	       know the name is correct.  */				      \
+-	    left = middle;						      \
+-									      \
+-	    /* There might be entries with this name before the one we	      \
+-	       found.  So we have to find the beginning.  */		      \
+-	    while (middle > 0)						      \
+-	      {								      \
+-		__typeof__ (cache->libs[0].key) key;			      \
+-									      \
+-		key = cache->libs[middle - 1].key;			      \
+-		/* Make sure string table indices are not bogus before	      \
+-		   using them.  */					      \
+-		if (! _dl_cache_verify_ptr (key)			      \
+-		    /* Actually compare the entry.  */			      \
+-		    || _dl_cache_libcmp (name, cache_data + key) != 0)	      \
+-		  break;						      \
+-		--middle;						      \
+-	      }								      \
+-									      \
+-	    do								      \
+-	      {								      \
+-		int flags;						      \
+-		__typeof__ (cache->libs[0]) *lib = &cache->libs[middle];      \
+-									      \
+-		/* Only perform the name test if necessary.  */		      \
+-		if (middle > left					      \
+-		    /* We haven't seen this string so far.  Test whether the  \
+-		       index is ok and whether the name matches.  Otherwise   \
+-		       we are done.  */					      \
+-		    && (! _dl_cache_verify_ptr (lib->key)		      \
+-			|| (_dl_cache_libcmp (name, cache_data + lib->key)    \
+-			    != 0)))					      \
+-		  break;						      \
+-									      \
+-		flags = lib->flags;					      \
+-		if (_dl_cache_check_flags (flags)			      \
+-		    && _dl_cache_verify_ptr (lib->value))		      \
+-		  {							      \
+-		    if (best == NULL || flags == GLRO(dl_correct_cache_id))   \
+-		      {							      \
+-			HWCAP_CHECK;					      \
+-			best = cache_data + lib->value;			      \
+-									      \
+-			if (flags == GLRO(dl_correct_cache_id))		      \
+-			  /* We've found an exact match for the shared	      \
+-			     object and no general `ELF' release.  Stop	      \
+-			     searching.  */				      \
+-			  break;					      \
+-		      }							      \
+-		  }							      \
+-	      }								      \
+-	    while (++middle <= right);					      \
+-	    break;							      \
+-	}								      \
+-									      \
+-	if (cmpres < 0)							      \
+-	  left = middle + 1;						      \
+-	else								      \
+-	  right = middle - 1;						      \
+-      }									      \
+-  }									      \
+-while (0)
+-
+-
+ int
+-internal_function
+ _dl_cache_libcmp (const char *p1, const char *p2)
+ {
+   while (*p1 != '\0')
+@@ -172,139 +76,3 @@ _dl_cache_libcmp (const char *p1, const 
+     }
+   return *p1 - *p2;
+ }
+-
+-
+-/* Look up NAME in ld.so.cache and return the file name stored there,
+-   or null if none is found.  */
+-
+-const char *
+-internal_function
+-_dl_load_cache_lookup (const char *name)
+-{
+-  int left, right, middle;
+-  int cmpres;
+-  const char *cache_data;
+-  uint32_t cache_data_size;
+-  const char *best;
+-
+-  /* Print a message if the loading of libs is traced.  */
+-  if (__builtin_expect (GLRO_dl_debug_mask & DL_DEBUG_LIBS, 0))
+-    _dl_debug_printf (" search cache=%s\n", LD_SO_CACHE);
+-
+-  if (cache == NULL)
+-    {
+-      /* Read the contents of the file.  */
+-      void *file = _dl_sysdep_read_whole_file (LD_SO_CACHE, &cachesize,
+-					       PROT_READ);
+-
+-      /* We can handle three different cache file formats here:
+-	 - the old libc5/glibc2.0/2.1 format
+-	 - the old format with the new format in it
+-	 - only the new format
+-	 The following checks if the cache contains any of these formats.  */
+-      if (file != MAP_FAILED && cachesize > sizeof *cache
+-	  && memcmp (file, CACHEMAGIC, sizeof CACHEMAGIC - 1) == 0)
+-	{
+-	  size_t offset;
+-	  /* Looks ok.  */
+-	  cache = file;
+-
+-	  /* Check for new version.  */
+-	  offset = ALIGN_CACHE (sizeof (struct cache_file)
+-				+ cache->nlibs * sizeof (struct file_entry));
+-
+-	  cache_new = (struct cache_file_new *) ((void *) cache + offset);
+-	  if (cachesize < (offset + sizeof (struct cache_file_new))
+-	      || memcmp (cache_new->magic, CACHEMAGIC_VERSION_NEW,
+-			 sizeof CACHEMAGIC_VERSION_NEW - 1) != 0)
+-	    cache_new = (void *) -1;
+-	}
+-      else if (file != MAP_FAILED && cachesize > sizeof *cache_new
+-	       && memcmp (file, CACHEMAGIC_VERSION_NEW,
+-			  sizeof CACHEMAGIC_VERSION_NEW - 1) == 0)
+-	{
+-	  cache_new = file;
+-	  cache = file;
+-	}
+-      else
+-	{
+-	  if (file != MAP_FAILED)
+-	    __munmap (file, cachesize);
+-	  cache = (void *) -1;
+-	}
+-
+-      assert (cache != NULL);
+-    }
+-
+-  if (cache == (void *) -1)
+-    /* Previously looked for the cache file and didn't find it.  */
+-    return NULL;
+-
+-  best = NULL;
+-
+-  if (cache_new != (void *) -1)
+-    {
+-      uint64_t platform;
+-
+-      /* This is where the strings start.  */
+-      cache_data = (const char *) cache_new;
+-
+-      /* Now we can compute how large the string table is.  */
+-      cache_data_size = (const char *) cache + cachesize - cache_data;
+-
+-      platform = _dl_string_platform (GLRO(dl_platform));
+-      if (platform != (uint64_t) -1)
+-	platform = 1ULL << platform;
+-
+-#define _DL_HWCAP_TLS_MASK (1LL << 63)
+-      uint64_t hwcap_exclude = ~((GLRO(dl_hwcap) & GLRO(dl_hwcap_mask))
+-				 | _DL_HWCAP_PLATFORM | _DL_HWCAP_TLS_MASK);
+-
+-      /* Only accept hwcap if it's for the right platform.  */
+-#define HWCAP_CHECK \
+-      if (lib->hwcap & hwcap_exclude)					      \
+-	continue;							      \
+-      if (GLRO(dl_osversion) && lib->osversion > GLRO(dl_osversion))	      \
+-	continue;							      \
+-      if (_DL_PLATFORMS_COUNT						      \
+-	  && (lib->hwcap & _DL_HWCAP_PLATFORM) != 0			      \
+-	  && (lib->hwcap & _DL_HWCAP_PLATFORM) != platform)		      \
+-	continue
+-      SEARCH_CACHE (cache_new);
+-    }
+-  else
+-    {
+-      /* This is where the strings start.  */
+-      cache_data = (const char *) &cache->libs[cache->nlibs];
+-
+-      /* Now we can compute how large the string table is.  */
+-      cache_data_size = (const char *) cache + cachesize - cache_data;
+-
+-#undef HWCAP_CHECK
+-#define HWCAP_CHECK do {} while (0)
+-      SEARCH_CACHE (cache);
+-    }
+-
+-  /* Print our result if wanted.  */
+-  if (__builtin_expect (GLRO_dl_debug_mask & DL_DEBUG_LIBS, 0)
+-      && best != NULL)
+-    _dl_debug_printf ("  trying file=%s\n", best);
+-
+-  return best;
+-}
+-
+-#ifndef MAP_COPY
+-/* If the system does not support MAP_COPY we cannot leave the file open
+-   all the time since this would create problems when the file is replaced.
+-   Therefore we provide this function to close the file and open it again
+-   once needed.  */
+-void
+-_dl_unload_cache (void)
+-{
+-  if (cache != NULL && cache != (struct cache_file *) -1)
+-    {
+-      __munmap (cache, cachesize);
+-      cache = NULL;
+-    }
+-}
+-#endif
+Index: ldconfig-native-2.12.1/dl-cache.h
+===================================================================
+--- ldconfig-native-2.12.1.orig/dl-cache.h
++++ ldconfig-native-2.12.1/dl-cache.h
+@@ -101,5 +101,4 @@ struct cache_file_new
+ (((addr) + __alignof__ (struct cache_file_new) -1)	\
+  & (~(__alignof__ (struct cache_file_new) - 1)))
+ 
+-extern int _dl_cache_libcmp (const char *p1, const char *p2)
+-     internal_function;
++extern int _dl_cache_libcmp (const char *p1, const char *p2);
+Index: ldconfig-native-2.12.1/ldconfig.c
+===================================================================
+--- ldconfig-native-2.12.1.orig/ldconfig.c
++++ ldconfig-native-2.12.1/ldconfig.c
+@@ -16,6 +16,9 @@
+    along with this program; if not, write to the Free Software Foundation,
+    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+ 
++#define _LARGEFILE64_SOURCE
++#define _GNU_SOURCE
++
+ #define PROCINFO_CLASS static
+ #include <alloca.h>
+ #include <argp.h>
+@@ -39,10 +42,20 @@
+ #include <glob.h>
+ #include <libgen.h>
+ 
+-#include <ldconfig.h>
+-#include <dl-cache.h>
++#include "ldconfig.h"
++#include "dl-cache.h"
++
++#include "dl-procinfo.h"
++
++#include "argp.h"
++
++
++#define SYSCONFDIR "/etc"
++#define LIBDIR "/usr/lib"
++#define SLIBDIR "/lib"
++# define N_(msgid)  msgid
++#define _(msg) msg
+ 
+-#include <dl-procinfo.h>
+ 
+ #ifdef _DL_FIRST_PLATFORM
+ # define _DL_FIRST_EXTRA (_DL_FIRST_PLATFORM + _DL_PLATFORMS_COUNT)
+@@ -55,7 +68,7 @@
+ #endif
+ 
+ /* Get libc version number.  */
+-#include <version.h>
++#include "version.h"
+ 
+ #define PACKAGE _libc_intl_domainname
+ 
+@@ -152,8 +165,8 @@ static const struct argp_option options[
+   { NULL, 0, NULL, 0, NULL, 0 }
+ };
+ 
+-#define PROCINFO_CLASS static
+-#include <dl-procinfo.c>
++//#define PROCINFO_CLASS static
++//#include <dl-procinfo.c>
+ 
+ /* Short description of program.  */
+ static const char doc[] = N_("Configure Dynamic Linker Run Time Bindings.");
+@@ -291,6 +304,7 @@ parse_opt (int key, char *arg, struct ar
+   return 0;
+ }
+ 
++#define REPORT_BUGS_TO "mailing list : poky@yoctoproject.org"
+ /* Print bug-reporting information in the help message.  */
+ static char *
+ more_help (int key, const char *text, void *input)
+@@ -315,7 +329,7 @@ For bug reporting instructions, please s
+ static void
+ print_version (FILE *stream, struct argp_state *state)
+ {
+-  fprintf (stream, "ldconfig %s%s\n", PKGVERSION, VERSION);
++  fprintf (stream, "ldconfig (Hacked Poky Version)\n");
+   fprintf (stream, gettext ("\
+ Copyright (C) %s Free Software Foundation, Inc.\n\
+ This is free software; see the source for copying conditions.  There is NO\n\
+@@ -1233,6 +1247,7 @@ set_hwcap (void)
+     hwcap_mask = strtoul (mask, NULL, 0);
+ }
+ 
++const char _libc_intl_domainname[] = "libc";
+ 
+ int
+ main (int argc, char **argv)
+Index: ldconfig-native-2.12.1/readlib.c
+===================================================================
+--- ldconfig-native-2.12.1.orig/readlib.c
++++ ldconfig-native-2.12.1/readlib.c
+@@ -22,6 +22,9 @@
+    development version.  Besides the simplification, it has also been
+    modified to read some other file formats.  */
+ 
++#define _LARGEFILE64_SOURCE
++#define _GNU_SOURCE
++
+ #include <a.out.h>
+ #include <elf.h>
+ #include <error.h>
+@@ -35,7 +38,9 @@
+ #include <sys/stat.h>
+ #include <gnu/lib-names.h>
+ 
+-#include <ldconfig.h>
++#include "ldconfig.h"
++
++#define _(msg) msg
+ 
+ #define Elf32_CLASS ELFCLASS32
+ #define Elf64_CLASS ELFCLASS64
+Index: ldconfig-native-2.12.1/xstrdup.c
+===================================================================
+--- ldconfig-native-2.12.1.orig/xstrdup.c
++++ ldconfig-native-2.12.1/xstrdup.c
+@@ -16,15 +16,10 @@
+    along with this program; if not, write to the Free Software Foundation,
+    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+ 
+-#ifdef HAVE_CONFIG_H
+-# include <config.h>
+-#endif
++#define _GNU_SOURCE
++
++#include <string.h>
+ 
+-#if defined STDC_HEADERS || defined HAVE_STRING_H || _LIBC
+-# include <string.h>
+-#else
+-# include <strings.h>
+-#endif
+ void *xmalloc (size_t n) __THROW;
+ char *xstrdup (char *string) __THROW;
+ 

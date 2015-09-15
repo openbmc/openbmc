@@ -1,0 +1,420 @@
+#!/bin/bash
+# Yocto ADT Installer
+#
+# Copyright 2010-2011 by Intel Corp.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy 
+# of this software and associated documentation files (the "Software"), to deal 
+# in the Software without restriction, including without limitation the rights 
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+# copies of the Software, and to permit persons to whom the Software is 
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in 
+# all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+# THE SOFTWARE.
+
+
+usage ()
+{
+
+  INST_ARCH=`uname -m`
+  INST_OS=`uname -o| tr '[A-Z]' '[a-z]'`
+  INST_KR=`uname -r| tr '[A-Z]' '[a-z]'`
+
+  echo_info "#########################################################################"
+  echo_info "# Welcome to Yocto Application Developement Tools (ADT) Installer"
+  echo_info "# "
+  echo_info "# Host Machine:\t\t\t\t"$INST_ARCH
+  echo_info "# OS info:\t\t\t\t$INST_KR"  
+  echo_info "# Yocto ADT version to be installed:\t$YOCTOADT_VERSION"
+  echo_info "# supported target architectures:\t$YOCTOADT_SUPPORTED_TARGETS"
+  echo_info "# supported target root_fs images:\t$YOCTOADT_SUPPORTED_ROOTFS"
+  echo_info "#########################################################################\n"
+
+  echo_info "Systemwide installation. Installation will occur under $INSTALL_FOLDER\n"
+  echo_info "############################################################################"
+  echo_info "# Your system installation configurations from adt_installer.conf"
+  echo_info "############################################################################"
+
+  echo_info "# Cross toolchains:\t\t$YOCTOADT_TARGETS"
+  echo_info "# Install Qemu:\t\t\t$YOCTOADT_QEMU"
+  echo_info "# Install NFS utilities:\t$YOCTOADT_NFS_UTIL"
+  #echo_info "# Install bitbake + UI:\t\t$YOCTOADT_BITBAKE"
+  #echo_info "# Install metadata:\t$YOCTOADT_METADATA"
+  #echo_info "############################################################################\n"
+
+    echo_info "\n##############################################################################"
+    echo_info "# Your rootfs image(s) and target sysroot selections from adt_installer.conf"
+    echo_info "##############################################################################"
+prompt=1
+for arch_type in $YOCTOADT_TARGETS; do
+  download_images $arch_type $prompt
+done
+    echo_info "############################################################################\n"
+  select_install_type
+}
+
+validate_config()
+{
+
+  for selected_arch_type in $YOCTOADT_TARGETS; do
+    found=0
+    select_machine_var="\$YOCTOADT_TARGET_MACHINE_$selected_arch_type"
+    select_machine=`eval echo $select_machine_var`
+    show_error_banner=0
+
+    for supported_arch_type in $YOCTOADT_SUPPORTED_TARGETS; do
+      if [ "$selected_arch_type" == "$supported_arch_type" ]; then
+        found=1
+        break
+      fi
+    done
+    if [ $found == 0 ]; then
+       echo_info "[ADT_INST] Error: YOCTADT_TARGETS in adt_installer.conf contains invalid entries: $YOCTOADT_TARGETS. Valid values are: $YOCTOADT_SUPPORTED_TARGETS"
+       show_error_banner=1
+    elif [ -z "$select_machine" ]; then
+       echo_info "[ADT_INST] Error: No MACHINE was defined for $selected_arch_type architecture! This is needed to install the toolchain and the correct environment settings."
+       echo_info "[ADT_INST] To do that, in adt-installer.conf, set the following variable: YOCTOADT_TARGET_MACHINE_$selected_arch_type"
+       show_error_banner=1
+    fi
+
+    if [ $show_error_banner == 1 ]; then
+       echo -e "\n#############################################################################"
+       echo -e "# Meet error(s) when installing Yocto ADT! Please check log file for details. "
+       echo -e "#############################################################################\n"
+       exit -1
+    fi
+  done
+
+  for arch_type in $YOCTOADT_SUPPORTED_TARGETS; do
+    #select_target_var="\$YOCTOADT_TARGET_$arch_type"
+    #select_target=`eval echo $select_target_var`
+
+    #if [ "$select_target" != "Y" ] || [ "$selected_target" != "y" ]; then
+    #  continue;
+    #fi
+
+    target_sysroot_image_var="\$YOCTOADT_TARGET_SYSROOT_IMAGE_$arch_type"
+    target_sysroot_image=`eval echo $target_sysroot_image_var`
+
+
+    select_rootfs_var="\$YOCTOADT_ROOTFS_$arch_type"
+    select_rootfs=`eval echo $select_rootfs_var`
+
+    if [ "$select_rootfs" == "" ] && [ "$target_sysroot_image" == "" ]; then
+       continue;
+    fi
+
+    for image_type in $select_rootfs; do
+#validate rootfs type defined in YOCTOADT_ROOTFS_{ARCH} is valid and in YOCTOADT_SUPPORTED_ROOTFS
+      found=0
+      for supported_rootfs_type in $YOCTOADT_SUPPORTED_ROOTFS; do
+        if [ "$image_type" == "$supported_rootfs_type" ]; then
+          found=1
+          break
+        fi
+      done
+      if [ $found == 0 ]; then
+#the rootfs type listed for downloading is not valid
+        echo_info "[ADT_INST] Error: Selected YOCTOADT_ROOTFS_$arch_type value: $image_type, is not valid! Valid values are: $YOCTOADT_SUPPORTED_ROOTFS "
+       echo -e "\n#############################################################################"
+       echo -e "# Meet error(s) when installing Yocto ADT! Please check log file for details. "
+       echo -e "#############################################################################\n"
+        exit -1
+      fi
+    done
+
+    found=0
+    for image_type in $select_rootfs; do
+#validate that rootfs to be extracted must be in the item: YOCTOADT_ROOTFS_${ARCH}
+      if [ "$target_sysroot_image" == "$image_type" ]; then
+        found=1
+        break
+      fi
+    done
+# the rootfs image to be extracted is not selected
+    if [ $found == 0 ]; then
+      echo_info "[ADT_INST] Error: YOCTOADT_TARGET_SYSROOT_IMAGE_$arch_type selection: $target_sysroot_image is not included in YOCTOADT_ROOTFS_$arch_type selections: $select_rootfs"
+      echo -e "\n#############################################################################"
+      echo -e "# Meet error(s) when installing Yocto ADT! Please check log file for details. "
+      echo -e "#############################################################################\n"
+      exit -1
+    fi
+  done
+}
+
+
+#detect opkg installed or not, for installing sdk, we will use
+#this installed local opkg
+install_opkg()
+{
+if [ ! -x "$LOCAL_OPKG_LOC/bin/opkg" ]; then
+  echo_info "OPKG is not setup, setting up opkg in local, which is required for installing yocto ADT...\n"
+
+  if [ -d $LOCAL_OPKG_LOC ]; then
+    echo_info "Deleting old OPKG folder, which doesn't contain executables... "
+    rm -rf $LOCAL_OPKG_LOC
+  fi
+
+  parent_folder=`pwd`
+  cd $LOCAL_OPKG_FOLDER
+  check_result
+
+  opkg_source_dir=`ls -d opkg-*`
+
+  if [ $opkg_source_dir == "" ]; then
+    echo_info "[ADT_INST] Error: OPKG source directory is not found!"
+    echo -e "\n#############################################################################"
+    echo -e "# Meet error(s) when installing Yocto ADT! Please check log file for details. "
+    echo -e "#############################################################################\n"
+    exit -1
+  fi
+
+  cd $opkg_source_dir
+  check_result
+
+  echo_info "Configure opkg ...\n"
+  autoreconf -i
+  ./configure --prefix=$parent_folder/$LOCAL_OPKG_LOC --enable-shared=no --disable-curl --disable-ssl-curl --disable-gpg >> $parent_folder/$YOCTOADT_INSTALL_LOG_FILE
+  check_result
+
+  echo_info "Make opkg ...\n"
+  make &>> $parent_folder/$YOCTOADT_INSTALL_LOG_FILE
+  check_result
+
+  echo_info "Make Install opkg ...\n"
+  make install &>> $parent_folder/$YOCTOADT_INSTALL_LOG_FILE
+  #if meet error when installing opkg, cancel the installation
+  check_result
+
+  cd $parent_folder
+  echo_info "Successfully installed OPKG.\n"
+fi
+}
+
+confirm_download()
+{
+#avoid repeated reminding
+if [ "$override_oldfile" == 1 ]; then
+  return $pre_result
+else
+  override_oldfile=1
+fi
+
+while true; do
+  #echo_info "[ADT_INST] Files [$1] already exists. If you continue downloading, old files will be overrided."
+  #echo_info "[ADT_INST] Further prompts will not be given if there're more existing files to be downloaded."
+  #echo_info "[ADT_INST] Do you want to continue downloading? Please enter Y/N:"
+  echo_info "\nFile [$1] already exists, which means you've downloaded the qemu kernel and rootfs file(s) before.  If you choose continue downloading, old files will be overridden."
+  echo_info "[ADT_INST] Do you want to continue downloading? Please enter Y/N:"
+  read YOCTOADT_INSTALL
+  YOCTOADT_INSTALL=`tr '[a-z]' '[A-Z]'<<<"$YOCTOADT_INSTALL"`
+  if [ "$YOCTOADT_INSTALL" == "Y" ]; then
+    pre_result=0
+    return 0
+  elif [ "$YOCTOADT_INSTALL" == "N" ]; then
+    pre_result=1
+    return 1
+  fi
+done
+}
+
+download_file()
+{
+local filename=`echo ${1##*/}`
+if [ -f "$LOCAL_DOWNLOAD/$filename" ]; then
+  confirm_download $filename
+  result="$?"
+  if [ ! "$result" == "0" ]; then
+    return
+  else
+    echo "Removing old file [$1]"
+    rm -rf "$LOCAL_DOWNLOAD/$filename" 
+  fi
+fi
+echo_info "Downloading file: $filename..."
+wget "$YOCTOADT_REPO/rootfs/$1" -P $LOCAL_DOWNLOAD --progress=bar:force 2>&1 | tee -a "$YOCTOADT_INSTALL_LOG_FILE" 
+}
+
+
+
+#Need three input params:
+# $1 arch_type(arm powerpc x86 mips)
+# $2 machine(qemuarm beagleboard)
+# $3 rootfs_image_type (a list of sdk sato minimal lsb)
+get_image()
+{
+  local machine=$2
+ 
+  if [ "$1" == "x86" ] || [ "$1" == "x86_64" ]; then
+    kernel="bzImage-$machine.bin"
+  elif [ "$1" == "ppc" ] || [ "$1" == "mips" ]; then
+    kernel="vmlinux-$machine.bin"
+  else
+    kernel="zImage-$machine.bin"
+  fi
+
+  #echo_info "[ADT_INST] Downloading qemu kernel binary: $qemu_kernel"
+  download_file $machine/$kernel
+  check_result
+  
+  for image_type in $select_rootfs; do
+    #echo_info "[ADT_INST] Downloading rootfs file: core-image-$image_type-$machine.tar.bz2"
+    filename="core-image-$image_type-$machine.tar.bz2"
+    download_file $machine/$filename
+    check_result
+  done
+}
+
+download_images()
+{
+  select_rootfs_var="\$YOCTOADT_ROOTFS_$1"
+  select_sysroot_image_var="\$YOCTOADT_TARGET_SYSROOT_IMAGE_$1"
+  select_sysroot_var="\$YOCTOADT_TARGET_SYSROOT_LOC_$1"
+  select_machine_var="\$YOCTOADT_TARGET_MACHINE_$1"
+  select_rootfs=`eval echo $select_rootfs_var`
+  select_sysroot_image=`eval echo $select_sysroot_image_var`
+  select_sysroot=`eval echo $select_sysroot_var`
+  select_machine=`eval echo $select_machine_var`
+
+  if [ -n "$select_sysroot" ]; then
+    select_sysroot=`readlink -m $select_sysroot`
+  fi
+
+  if [ "$select_rootfs" != "" ]; then
+    if [ $2 ]; then
+    #echo_info "\n############################################################################"
+    #echo_info "# To be downloaded rootfs image details defined in adt_installer.conf"
+    #echo_info "############################################################################"
+    echo_info "# Target architecture:\t\t$1"
+    echo_info "# Target machine:\t\t$select_machine"
+    echo_info "# Root_fs images:\t\t$select_rootfs"
+    echo_info "# Target sysroot image:\t\t$select_sysroot_image"
+    echo_info "# Target sysroot loc:\t\t$select_sysroot"
+    echo_info "\n"
+    #echo_info "############################################################################\n"
+    else
+    get_image $1 $select_machine $select_rootfs
+    fi
+  fi
+}
+
+
+
+
+#Main body of installer
+
+clear
+
+run_path=`dirname $0`
+cd $run_path
+
+if [ ! -f "scripts/util" ]; then
+  echo -e "[ADT_INST] Error: Script file: util, can't be found under: $run_path!"
+  echo -e "\n#############################################################################"
+  echo -e "# Meet error(s) when installing Yocto ADT! Please check log file for details. "
+  echo -e "#############################################################################\n"
+  exit -1
+fi
+
+if [ ! -f "scripts/adt_installer_internal" ]; then
+  echo -e "[ADT_INST] Error: Script file: adt_installer_internal, can't be found under: $run_path!"
+  echo -e "\n#############################################################################"
+  echo -e "# Meet error(s) when installing Yocto ADT! Please check log file for details. "
+  echo -e "#############################################################################\n"
+  exit -1
+fi
+
+config_file="adt_installer.conf"
+if [ ! -f "$config_file" ]; then
+  echo_info "[ADT_INST] Error: Installation configuration file: adt_installer.conf is not found!\n"
+  echo_info "\n##################################################################################"
+  echo_info "# Meet error(s) when installing Yocto ADT. Please check log file for details. "
+  echo_info "##################################################################################\n"
+  exit -1
+fi
+
+. scripts/data_define
+. scripts/util
+
+
+if [ -f "$YOCTOADT_INSTALL_LOG_FILE" ]; then
+  rm $YOCTOADT_INSTALL_LOG_FILE
+fi
+
+echo -n "Please enter the install location (default: $DEFAULT_INSTALL_FOLDER): "
+read INSTALL_FOLDER
+
+if [ "$INSTALL_FOLDER" = "" ]; then
+    INSTALL_FOLDER=$DEFAULT_INSTALL_FOLDER
+fi
+
+eval INSTALL_FOLDER=$(printf "%q" "$INSTALL_FOLDER")
+if [ -d "$INSTALL_FOLDER" ]; then
+	export INSTALL_FOLDER=$(cd "$INSTALL_FOLDER"; pwd)
+else
+	export INSTALL_FOLDER=$(readlink -m "$INSTALL_FOLDER")
+fi
+
+if [ -n "$(echo $INSTALL_FOLDER|grep ' ')" ]; then
+       echo "The target directory path ($INSTALL_FOLDER) contains spaces. Abort!"
+       exit 1
+fi
+
+clear
+
+usage
+
+user_inst_type="$?"
+
+validate_config
+check_result
+
+#check adt_repo exist
+wget --spider $YOCTOADT_REPO 2>&1 | tee -a "$YOCTOADT_INSTALL_LOG_FILE"
+if grep -q "404 Not Found" $YOCTOADT_INSTALL_LOG_FILE; then
+  echo -e "[ADT_INST] Error: YOCTOADT_REPO does not exist: $YOCTOADT_REPO"
+  echo -e "\n#############################################################################"
+  echo -e "# Meet error(s) when installing Yocto ADT! Please check log file for details. "
+  echo -e "#############################################################################\n"
+  exit -1
+fi
+
+#firstly we need to install opkg host
+install_opkg
+
+#Create folders for holding rootfs/qemu images
+if [ ! -d "$LOCAL_DOWNLOAD" ]; then
+  echo_info "Creating new images downloading folder: $LOCAL_DOWNLOAD ..."
+  mkdir -p $LOCAL_DOWNLOAD
+fi
+
+#downloading required qemu images/rootfs
+if [ "$user_inst_type" == "0" ]; then
+  override_oldfile=1
+else
+  override_oldfile=0
+fi
+
+for arch_type in $YOCTOADT_TARGETS; do
+  download_images $arch_type
+done
+
+scripts/adt_installer_internal $user_inst_type
+
+result="$?"
+#echo_info "\n############################################################"
+if [ "$result" == "0" ]; then
+  echo_info "\n############################################################"
+  echo_info "# Yocto ADT has been successfully installed."
+  echo_info "############################################################\n"
+fi
+

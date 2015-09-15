@@ -1,0 +1,49 @@
+
+This patch checks for rpm5 related functions in order to allow rpm4 
+to work correctly. Currently the rpm4 archscore and filter work
+differently enough that they need to be changed.
+
+Upstream-Status: Inappropriate [OE-Core Specific]
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+Index: smart-1.4.1/smart/backends/rpm/base.py
+===================================================================
+--- smart-1.4.1.orig/smart/backends/rpm/base.py
++++ smart-1.4.1/smart/backends/rpm/base.py
+@@ -338,10 +338,14 @@ class RPMObsoletes(Depends):
+ 
+ _SCOREMAP = {}
+ def getArchScore(arch, _sm=_SCOREMAP):
+-    if arch not in _sm:
+-        score = rpm.archscore(arch)
+-        _sm[arch] = score
+-    return _sm.get(arch, 0)
++    try:
++        rpm.platformscore(arch)
++        if arch not in _sm:
++            score = rpm.archscore(arch)
++            _sm[arch] = score
++        return _sm.get(arch, 0)
++    except AttributeError:
++        return 1
+ 
+ # TODO: Embed color into nameprovides and obsoletes relations.
+ _COLORMAP = {"noarch": 0, "x86_64": 2, "ppc64": 2, "s390x": 2, "sparc64": 2}
+Index: smart-1.4.1/smart/backends/rpm/pm.py
+===================================================================
+--- smart-1.4.1.orig/smart/backends/rpm/pm.py
++++ smart-1.4.1/smart/backends/rpm/pm.py
+@@ -235,6 +235,12 @@ class RPMPackageManager(PackageManager):
+         if sysconf.get("rpm-order"):
+             ts.order()
+         probfilter = rpm.RPMPROB_FILTER_OLDPACKAGE
++        try:
++            # Test for RPM5 function
++            rpm.platformscore("")
++        except AttributeError:
++            probfilter |= rpm.RPMPROB_FILTER_IGNOREARCH
++
+         if force or reinstall:
+             probfilter |= rpm.RPMPROB_FILTER_REPLACEPKG
+             probfilter |= rpm.RPMPROB_FILTER_REPLACEOLDFILES

@@ -1,0 +1,71 @@
+From 83f318d68bbdab1ca898c94576a838cc97df4700 Mon Sep 17 00:00:00 2001
+From: Ludwig Nussel <ludwig.nussel@suse.de>
+Date: Wed, 21 Apr 2010 15:52:10 +0200
+Subject: [PATCH] also create old hash for compatibility
+
+Upstream-Status: Backport [debian]
+
+diff --git a/tools/c_rehash.in b/tools/c_rehash.in
+index b086ff9..b777d79 100644
+--- a/tools/c_rehash.in
++++ b/tools/c_rehash.in
+@@ -8,8 +8,6 @@ my $prefix;
+ 
+ my $openssl = $ENV{OPENSSL} || "openssl";
+ my $pwd;
+-my $x509hash = "-subject_hash";
+-my $crlhash = "-hash";
+ my $verbose = 0;
+ my $symlink_exists=eval {symlink("",""); 1};
+ my $removelinks = 1;
+@@ -18,10 +16,7 @@ my $removelinks = 1;
+ while ( $ARGV[0] =~ /^-/ ) {
+     my $flag = shift @ARGV;
+     last if ( $flag eq '--');
+-    if ( $flag eq '-old') {
+-	    $x509hash = "-subject_hash_old";
+-	    $crlhash = "-hash_old";
+-    } elsif ( $flag eq '-h') {
++    if ( $flag eq '-h') {
+ 	    help();
+     } elsif ( $flag eq '-n' ) {
+ 	    $removelinks = 0;
+@@ -113,7 +108,9 @@ sub hash_dir {
+ 			next;
+ 		}
+ 		link_hash_cert($fname) if($cert);
++		link_hash_cert_old($fname) if($cert);
+ 		link_hash_crl($fname) if($crl);
++		link_hash_crl_old($fname) if($crl);
+ 	}
+ }
+ 
+@@ -146,6 +143,7 @@ sub check_file {
+ 
+ sub link_hash_cert {
+ 		my $fname = $_[0];
++		my $x509hash = $_[1] || '-subject_hash';
+ 		$fname =~ s/'/'\\''/g;
+ 		my ($hash, $fprint) = `"$openssl" x509 $x509hash -fingerprint -noout -in "$fname"`;
+ 		chomp $hash;
+@@ -176,11 +174,21 @@ sub link_hash_cert {
+ 		$hashlist{$hash} = $fprint;
+ }
+ 
++sub link_hash_cert_old {
++		link_hash_cert($_[0], '-subject_hash_old');
++}
++
++sub link_hash_crl_old {
++		link_hash_crl($_[0], '-hash_old');
++}
++
++
+ # Same as above except for a CRL. CRL links are of the form <hash>.r<n>
+ 
+ sub link_hash_crl {
+ 		my $fname = $_[0];
++		my $crlhash = $_[1] || "-hash";
+ 		$fname =~ s/'/'\\''/g;
+ 		my ($hash, $fprint) = `"$openssl" crl $crlhash -fingerprint -noout -in '$fname'`;
+ 		chomp $hash;

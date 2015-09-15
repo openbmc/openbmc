@@ -1,0 +1,34 @@
+From d291c2fdd5cb8616605c67ecbfb04274fa094242 Mon Sep 17 00:00:00 2001
+From: Junling Zheng <zhengjunling@huawei.com>
+Date: Sun, 7 Jun 2015 02:32:23 +0200
+Subject: [PATCH] chown: fix help text
+
+Derived from:
+http://git.busybox.net/busybox/commit/?id=d291c2fdd5cb8616605c67ecbfb04274fa094242.
+
+Only when DESKTOP is enabled, chown has -L, -H and -P options.
+
+Upstream-Status: Backport
+
+Signed-off-by: Junling Zheng <zhengjunling@huawei.com>
+Signed-off-by: Denys Vlasenko <vda.linux@googlemail.com>
+---
+ coreutils/chown.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/coreutils/chown.c b/coreutils/chown.c
+index cb07bbc..679c0d8 100644
+--- a/coreutils/chown.c
++++ b/coreutils/chown.c
+@@ -11,7 +11,7 @@
+ /* http://www.opengroup.org/onlinepubs/007904975/utilities/chown.html */
+ 
+ //usage:#define chown_trivial_usage
+-//usage:       "[-RhLHP"IF_DESKTOP("cvf")"]... OWNER[<.|:>[GROUP]] FILE..."
++//usage:       "[-Rh"IF_DESKTOP("LHPcvf")"]... OWNER[<.|:>[GROUP]] FILE..."
+ //usage:#define chown_full_usage "\n\n"
+ //usage:       "Change the owner and/or group of each FILE to OWNER and/or GROUP\n"
+ //usage:     "\n	-R	Recurse"
+-- 
+1.8.3.4
+

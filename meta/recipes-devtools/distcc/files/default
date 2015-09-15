@@ -1,0 +1,24 @@
+# Defaults for distcc initscript
+# sourced by /etc/init.d/distcc
+
+#
+# should distcc be started on boot?
+#
+# STARTDISTCC="true"
+
+STARTDISTCC="true"
+
+#
+# Which networks/hosts should be allowed to connect to the daemon?
+# You can list multiple hosts/networks separated by spaces.
+# Networks have to be in CIDR notation, f.e. 192.168.1.0/24
+# Hosts are represented by a single IP Adress
+#
+# ALLOWEDNETS="127.0.0.1"
+
+ALLOWEDNETS="192.168.7.0/24"
+
+#
+# OPTIONS is used for the systemd service file
+#
+OPTIONS="--allow 192.168.7.0/24"

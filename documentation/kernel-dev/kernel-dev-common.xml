@@ -1,0 +1,1033 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
+[<!ENTITY % poky SYSTEM "../poky.ent"> %poky; ] >
+
+<chapter id='kernel-dev-common'>
+
+<title>Common Tasks</title>
+
+<para>
+    This chapter presents several common tasks you perform when you
+    work with the Yocto Project Linux kernel.
+    These tasks include preparing a layer, modifying an existing recipe,
+    iterative development, working with your own sources, and incorporating
+    out-of-tree modules.
+    <note>
+        The examples presented in this chapter work with the Yocto Project
+        1.2.2 Release and forward.
+    </note>
+</para>
+
+    <section id='creating-and-preparing-a-layer'>
+        <title>Creating and Preparing a Layer</title>
+
+        <para>
+            If you are going to be modifying kernel recipes, it is recommended
+            that you create and prepare your own layer in which to do your
+            work.
+            Your layer contains its own
+            <ulink url='&YOCTO_DOCS_DEV_URL;#bitbake-term'>BitBake</ulink>
+            append files
+            (<filename>.bbappend</filename>) and provides a convenient
+            mechanism to create your own recipe files
+            (<filename>.bb</filename>).
+            For details on how to create and work with layers, see the following
+            sections in the Yocto Project Development Manual:
+            <itemizedlist>
+                <listitem><para>"<ulink url='&YOCTO_DOCS_DEV_URL;#understanding-and-creating-layers'>Understanding and Creating Layers</ulink>" for
+                    general information on layers and how to create layers.</para></listitem>
+                <listitem><para>"<ulink url='&YOCTO_DOCS_DEV_URL;#set-up-your-layer-for-the-build'>Set Up Your Layer for the Build</ulink>" for
+                    specific instructions on setting up a layer for kernel
+                    development.</para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='modifying-an-existing-recipe'>
+        <title>Modifying an Existing Recipe</title>
+
+        <para>
+            In many cases, you can customize an existing linux-yocto recipe to
+            meet the needs of your project.
+            Each release of the Yocto Project provides a few Linux
+            kernel recipes from which you can choose.
+            These are located in the
+            <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+            in <filename>meta/recipes-kernel/linux</filename>.
+        </para>
+
+        <para>
+            Modifying an existing recipe can consist of the following:
+            <itemizedlist>
+                <listitem><para>Creating the append file</para></listitem>
+                <listitem><para>Applying patches</para></listitem>
+                <listitem><para>Changing the configuration</para></listitem>
+            </itemizedlist>
+        </para>
+
+        <para>
+            Before modifying an existing recipe, be sure that you have created
+            a minimal, custom layer from which you can work.
+            See the "<link linkend='creating-and-preparing-a-layer'>Creating and Preparing a Layer</link>"
+            section for some general resources.
+            You can also see the
+            "<ulink url='&YOCTO_DOCS_DEV_URL;#set-up-your-layer-for-the-build'>Set Up Your Layer for the Build</ulink>" section
+            of the Yocto Project Development Manual for a detailed
+            example.
+        </para>
+
+        <section id='creating-the-append-file'>
+            <title>Creating the Append File</title>
+
+            <para>
+                You create this file in your custom layer.
+                You also name it accordingly based on the linux-yocto recipe
+                you are using.
+                For example, if you are modifying the
+                <filename>meta/recipes-kernel/linux/linux-yocto_3.19.bb</filename>
+                recipe, the append file will typically be located as follows
+                within your custom layer:
+                <literallayout class='monospaced'>
+     <replaceable>your-layer</replaceable>/recipes-kernel/linux/linux-yocto_3.19.bbappend
+                </literallayout>
+                The append file should initially extend the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-FILESPATH'><filename>FILESPATH</filename></ulink>
+                search path by prepending the directory that contains your
+                files to the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-FILESEXTRAPATHS'><filename>FILESEXTRAPATHS</filename></ulink>
+                variable as follows:
+                <literallayout class='monospaced'>
+     FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+                </literallayout>
+                The path <filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-THISDIR'><filename>THISDIR</filename></ulink><filename>}/${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-PN'><filename>PN</filename></ulink><filename>}</filename>
+                expands to "linux-yocto" in the current directory for this
+                example.
+                If you add any new files that modify the kernel recipe and you
+                have extended <filename>FILESPATH</filename> as
+                described above, you must place the files in your layer in the
+                following area:
+                <literallayout class='monospaced'>
+     <replaceable>your-layer</replaceable>/recipes-kernel/linux/linux-yocto/
+                </literallayout>
+                <note>If you are working on a new machine Board Support Package
+                    (BSP), be sure to refer to the
+                    <ulink url='&YOCTO_DOCS_BSP_URL;'>Yocto Project Board Support Package (BSP) Developer's Guide</ulink>.
+                </note>
+            </para>
+        </section>
+
+        <section id='applying-patches'>
+            <title>Applying Patches</title>
+
+            <para>
+                If you have a single patch or a small series of patches
+                that you want to apply to the Linux kernel source, you
+                can do so just as you would with any other recipe.
+                You first copy the patches to the path added to
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-FILESEXTRAPATHS'><filename>FILESEXTRAPATHS</filename></ulink>
+                in your <filename>.bbappend</filename> file as described in
+                the previous section, and then reference them in
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>
+                statements.
+            </para>
+
+            <para>
+                For example, you can apply a three-patch series by adding the
+                following lines to your linux-yocto
+                <filename>.bbappend</filename> file in your layer:
+                <literallayout class='monospaced'>
+     SRC_URI += "file://0001-first-change.patch"
+     SRC_URI += "file://0002-second-change.patch"
+     SRC_URI += "file://0003-third-change.patch"
+                </literallayout>
+                The next time you run BitBake to build the Linux kernel,
+                BitBake detects the change in the recipe and fetches and
+                applies the patches before building the kernel.
+            </para>
+
+            <para>
+                For a detailed example showing how to patch the kernel, see the
+                "<ulink url='&YOCTO_DOCS_DEV_URL;#patching-the-kernel'>Patching the Kernel</ulink>"
+                section in the Yocto Project Development Manual.
+            </para>
+        </section>
+
+        <section id='changing-the-configuration'>
+            <title>Changing the Configuration</title>
+
+            <para>
+                You can make wholesale or incremental changes to the final
+                <filename>.config</filename> file used for the eventual
+                Linux kernel configuration by including a
+                <filename>defconfig</filename> file and by specifying
+                configuration fragments in the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>
+                to be applied to that file.
+            </para>
+
+            <para>
+                If you have a complete, working Linux kernel
+                <filename>.config</filename>
+                file you want to use for the configuration, as before, copy
+                that file to the appropriate <filename>${PN}</filename>
+                directory in your layer's
+                <filename>recipes-kernel/linux</filename> directory,
+                and rename the copied file to "defconfig".
+                Then, add the following lines to the linux-yocto
+                <filename>.bbappend</filename> file in your layer:
+                <literallayout class='monospaced'>
+     FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+     SRC_URI += "file://defconfig"
+                </literallayout>
+                The <filename>SRC_URI</filename> tells the build system how to
+                search for the file, while the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-FILESEXTRAPATHS'><filename>FILESEXTRAPATHS</filename></ulink>
+                extends the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-FILESPATH'><filename>FILESPATH</filename></ulink>
+                variable (search directories) to include the
+                <filename>${PN}</filename> directory you created to hold the
+                configuration changes.
+            </para>
+
+            <note>
+                The build system applies the configurations from the
+                <filename>defconfig</filename> file before applying any
+                subsequent configuration fragments.
+                The final kernel configuration is a combination of the
+                configurations in the <filename>defconfig</filename> file and
+                any configuration fragments you provide.
+                You need to realize that if you have any configuration
+                fragments, the build system applies these on top of and
+                after applying the existing <filename>defconfig</filename>
+                file configurations.
+            </note>
+
+            <para>
+                Generally speaking, the preferred approach is to determine the
+                incremental change you want to make and add that as a
+                configuration fragment.
+                For example, if you want to add support for a basic serial
+                console, create a file named <filename>8250.cfg</filename> in
+                the <filename>${PN}</filename> directory with the following
+                content (without indentation):
+                <literallayout class='monospaced'>
+     CONFIG_SERIAL_8250=y
+     CONFIG_SERIAL_8250_CONSOLE=y
+     CONFIG_SERIAL_8250_PCI=y
+     CONFIG_SERIAL_8250_NR_UARTS=4
+     CONFIG_SERIAL_8250_RUNTIME_UARTS=4
+     CONFIG_SERIAL_CORE=y
+     CONFIG_SERIAL_CORE_CONSOLE=y
+                </literallayout>
+                Next, include this configuration fragment and extend the
+                <filename>FILESPATH</filename> variable in your
+                <filename>.bbappend</filename> file:
+                <literallayout class='monospaced'>
+     FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+     SRC_URI += "file://8250.cfg"
+                </literallayout>
+                The next time you run BitBake to build the Linux kernel, BitBake
+                detects the change in the recipe and fetches and applies the
+                new configuration before building the kernel.
+            </para>
+
+            <para>
+                For a detailed example showing how to configure the kernel,
+                see the
+                "<ulink url='&YOCTO_DOCS_DEV_URL;#configuring-the-kernel'>Configuring the Kernel</ulink>"
+                section in the Yocto Project Development Manual.
+            </para>
+        </section>
+
+        <section id='using-an-in-tree-defconfig-file'>
+            <title>Using an "In-Tree"&nbsp;&nbsp;<filename>defconfig</filename> File</title>
+
+            <para>
+                It might be desirable to have kernel configuration fragment
+                support through a <filename>defconfig</filename> file that
+                is pulled from the kernel source tree for the configured
+                machine.
+                By default, the OpenEmbedded build system looks for
+                <filename>defconfig</filename> files in the layer used for
+                Metadata, which is "out-of-tree", and then configures them
+                using the following:
+                <literallayout class='monospaced'>
+     SRC_URI += "file://defconfig"
+                </literallayout>
+                If you do not want to maintain copies of
+                <filename>defconfig</filename> files in your layer but would
+                rather allow users to use the default configuration from the
+                kernel tree and still be able to add configuration fragments
+                to the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>
+                through, for example, append files, you can direct the
+                OpenEmbedded build system to use a
+                <filename>defconfig</filename> file that is "in-tree".
+            </para>
+
+            <para>
+                To specify an "in-tree" <filename>defconfig</filename> file,
+                edit the recipe that builds your kernel so that it has the
+                following command form:
+                <literallayout class='monospaced'>
+     KBUILD_DEFCONFIG_<ulink url='&YOCTO_DOCS_REF_URL;#var-KMACHINE'>KMACHINE</ulink> ?= <replaceable>defconfig_file</replaceable>
+                </literallayout>
+                You need to append the variable with
+                <filename>KMACHINE</filename> and then supply the path to
+                your "in-tree" <filename>defconfig</filename> file.
+            </para>
+
+            <para>
+                Aside from modifying your kernel recipe and providing your own
+                <filename>defconfig</filename> file, you need to be sure no
+                files or statements set <filename>SRC_URI</filename> to use a
+                <filename>defconfig</filename> other than your "in-tree"
+                file (e.g. a kernel's <filename>linux-</filename><replaceable>machine</replaceable><filename>.inc</filename>
+                file).
+                In other words, if the build system detects a statement
+                that identifies an "out-of-tree"
+                <filename>defconfig</filename> file, that statement
+                will override your
+                <filename>KBUILD_DEFCONFIG</filename> variable.
+            </para>
+
+            <para>
+                See the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-KBUILD_DEFCONFIG'><filename>KBUILD_DEFCONFIG</filename></ulink>
+                variable description for more information.
+            </para>
+        </section>
+    </section>
+
+    <section id='using-an-iterative-development-process'>
+        <title>Using an Iterative Development Process</title>
+
+        <para>
+            If you do not have existing patches or configuration files,
+            you can iteratively generate them from within the BitBake build
+            environment as described within this section.
+            During an iterative workflow, running a previously completed BitBake
+            task causes BitBake to invalidate the tasks that follow the
+            completed task in the build sequence.
+            Invalidated tasks rebuild the next time you run the build using
+            BitBake.
+        </para>
+
+        <para>
+            As you read this section, be sure to substitute the name
+            of your Linux kernel recipe for the term
+            "linux-yocto".
+        </para>
+
+        <section id='tip-dirty-string'>
+            <title>"-dirty" String</title>
+
+<!--
+            <para>
+                <emphasis>AR - Darren Hart:</emphasis>  This section
+                originated from the old Yocto Project Kernel Architecture
+                and Use Manual.
+                It was decided we need to put it in this section here.
+                Darren needs to figure out where we want it and what part
+                of it we want (all, revision???)
+            </para>
+-->
+
+            <para>
+                If kernel images are being built with "-dirty" on the
+                end of the version string, this simply means that
+                modifications in the source directory have not been committed.
+                <literallayout class='monospaced'>
+     $ git status
+                </literallayout>
+            </para>
+
+            <para>
+                You can use the above Git command to report modified,
+                removed, or added files.
+                You should commit those changes to the tree regardless of
+                whether they will be saved, exported, or used.
+                Once you commit the changes, you need to rebuild the kernel.
+            </para>
+
+            <para>
+                To force a pickup and commit of all such pending changes,
+                enter the following:
+                <literallayout class='monospaced'>
+     $ git add .
+     $ git commit -s -a -m "getting rid of -dirty"
+                </literallayout>
+            </para>
+
+            <para>
+                Next, rebuild the kernel.
+            </para>
+        </section>
+
+        <section id='generating-configuration-files'>
+            <title>Generating Configuration Files</title>
+
+            <para>
+                You can manipulate the <filename>.config</filename> file
+                used to build a linux-yocto recipe with the
+                <filename>menuconfig</filename> command as follows:
+                <literallayout class='monospaced'>
+     $ bitbake linux-yocto -c menuconfig
+                </literallayout>
+                This command starts the Linux kernel configuration tool,
+                which allows you to prepare a new
+                <filename>.config</filename> file for the build.
+                When you exit the tool, be sure to save your changes
+                at the prompt.
+            </para>
+
+            <para>
+                The resulting <filename>.config</filename> file is
+                located in
+                <filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-WORKDIR'><filename>WORKDIR</filename></ulink><filename>}</filename> under the
+                <filename>linux-${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-PACKAGE_ARCH'><filename>PACKAGE_ARCH</filename></ulink><filename>}-${<ulink url='&YOCTO_DOCS_REF_URL;#var-LINUX_KERNEL_TYPE'><filename>LINUX_KERNEL_TYPE</filename></ulink>}-build</filename> directory.
+                You can use the entire <filename>.config</filename> file as the
+                <filename>defconfig</filename> file as described in the
+                "<link linkend='changing-the-configuration'>Changing the Configuration</link>" section.
+            </para>
+
+            <para>
+                A better method is to create a configuration fragment using the
+                differences between two configuration files: one previously
+                created and saved, and one freshly created using the
+                <filename>menuconfig</filename> tool.
+            </para>
+
+            <para>
+                To create a configuration fragment using this method, follow
+                these steps:
+                <orderedlist>
+                    <listitem><para>Complete a build at least through the kernel
+                        configuration task as follows:
+                        <literallayout class='monospaced'>
+     $ bitbake linux-yocto -c kernel_configme -f
+                        </literallayout>
+                        This step ensures that you will be creating a
+                        <filename>.config</filename> file from a known state.
+                        Because situations exist where your build state might
+                        become unknown, it is best to run the previous
+                        command prior to starting up
+                        <filename>menuconfig</filename>.
+                        </para></listitem>
+                    <listitem><para>Run the <filename>menuconfig</filename>
+                        command:
+                        <literallayout class='monospaced'>
+     $ bitbake linux-yocto -c menuconfig
+                        </literallayout></para></listitem>
+                    <listitem><para>Run the <filename>diffconfig</filename>
+                        command to prepare a configuration fragment.
+                        The resulting file <filename>fragment.cfg</filename>
+                        will be placed in the
+                        <filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-WORKDIR'><filename>WORKDIR</filename></ulink><filename>}</filename> directory:
+                        <literallayout class='monospaced'>
+     $ bitbake linux-yocto -c diffconfig
+                        </literallayout></para></listitem>
+                </orderedlist>
+            </para>
+
+            <para>
+                The <filename>diffconfig</filename> command creates a file that is a
+                list of Linux kernel <filename>CONFIG_</filename> assignments.
+                See the "<link linkend='changing-the-configuration'>Changing the Configuration</link>"
+                section for information on how to use the output as a
+                configuration fragment.
+                <note>
+                    You can also use this method to create configuration
+                    fragments for a BSP.
+                    See the "<link linkend='bsp-descriptions'>BSP Descriptions</link>"
+                    section for more information.
+                </note>
+            </para>
+
+            <para>
+                The kernel tools also provide configuration validation.
+                You can use these tools to produce warnings for when a
+                requested configuration does not appear in the final
+                <filename>.config</filename> file or when you override a
+                policy configuration in a hardware configuration fragment.
+                Here is an example with some sample output of the command
+                that runs these tools:
+                <literallayout class='monospaced'>
+     $ bitbake linux-yocto -c kernel_configcheck -f
+
+     ...
+
+     NOTE: validating kernel configuration
+     This BSP sets 3 invalid/obsolete kernel options.
+     These config options are not offered anywhere within this kernel.
+     The full list can be found in your kernel src dir at:
+     meta/cfg/standard/mybsp/invalid.cfg
+
+     This BSP sets 21 kernel options that are possibly non-hardware related.
+     The full list can be found in your kernel src dir at:
+     meta/cfg/standard/mybsp/specified_non_hdw.cfg
+
+     WARNING: There were 2 hardware options requested that do not
+              have a corresponding value present in the final ".config" file.
+              This probably means you are not getting the config you wanted.
+              The full list can be found in your kernel src dir at:
+              meta/cfg/standard/mybsp/mismatch.cfg
+                </literallayout>
+            </para>
+
+            <para>
+                The output describes the various problems that you can
+                encounter along with where to find the offending configuration
+                items.
+                You can use the information in the logs to adjust your
+                configuration files and then repeat the
+                <filename>kernel_configme</filename> and
+                <filename>kernel_configcheck</filename> commands until
+                they produce no warnings.
+            </para>
+
+            <para>
+                For more information on how to use the
+                <filename>menuconfig</filename> tool, see the
+                "<ulink url='&YOCTO_DOCS_DEV_URL;#using-menuconfig'>Using <filename>menuconfig</filename></ulink>"
+                section in the Yocto Project Development Manual.
+            </para>
+        </section>
+
+        <section id='modifying-source-code'>
+            <title>Modifying Source Code</title>
+
+            <para>
+                You can experiment with source code changes and create a
+                simple patch without leaving the BitBake environment.
+                To get started, be sure to complete a build at
+                least through the kernel configuration task:
+                <literallayout class='monospaced'>
+     $ bitbake linux-yocto -c kernel_configme -f
+                </literallayout>
+                Taking this step ensures you have the sources prepared
+                and the configuration completed.
+                You can find the sources in the
+                <filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-WORKDIR'><filename>WORKDIR</filename></ulink><filename>}/linux</filename> directory.
+            </para>
+
+            <para>
+                You can edit the sources as you would any other Linux source
+                tree.
+                However, keep in mind that you will lose changes if you
+                trigger the
+                <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-fetch'><filename>do_fetch</filename></ulink>
+                task for the recipe.
+                You can avoid triggering this task by not using BitBake to
+                run the
+                <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-cleanall'><filename>cleanall</filename></ulink>,
+                <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-cleansstate'><filename>cleansstate</filename></ulink>,
+                or forced
+                <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-fetch'><filename>fetch</filename></ulink>
+                commands.
+                Also, do not modify the recipe itself while working
+                with temporary changes or BitBake might run the
+                <filename>fetch</filename> command depending on the
+                changes to the recipe.
+            </para>
+
+            <para>
+                To test your temporary changes, instruct BitBake to run the
+                <filename>compile</filename> again.
+                The <filename>-f</filename> option forces the command to run
+                even though BitBake might think it has already done so:
+                <literallayout class='monospaced'>
+     $ bitbake linux-yocto -c compile -f
+                </literallayout>
+                If the compile fails, you can update the sources and repeat
+                the <filename>compile</filename>.
+                Once compilation is successful, you can inspect and test
+                the resulting build (i.e. kernel, modules, and so forth) from
+                the following build directory:
+                <literallayout class='monospaced'>
+     ${WORKDIR}/linux-${PACKAGE_ARCH}-${LINUX_KERNEL_TYPE}-build
+                </literallayout>
+                Alternatively, you can run the <filename>deploy</filename>
+                command to place the kernel image in the
+                <filename>tmp/deploy/images</filename> directory:
+                <literallayout class='monospaced'>
+	$ bitbake linux-yocto -c deploy
+                </literallayout>
+                And, of course, you can perform the remaining installation and
+                packaging steps by issuing:
+                <literallayout class='monospaced'>
+	$ bitbake linux-yocto
+                </literallayout>
+            </para>
+
+            <para>
+                For rapid iterative development, the edit-compile-repeat loop
+                described in this section is preferable to rebuilding the
+                entire recipe because the installation and packaging tasks
+                are very time consuming.
+            </para>
+
+            <para>
+                Once you are satisfied with your source code modifications,
+                you can make them permanent by generating patches and
+                applying them to the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>
+                statement as described in the
+                "<link linkend='applying-patches'>Applying Patches</link>"
+                section.
+                If you are not familiar with generating patches, refer to the
+                "<ulink url='&YOCTO_DOCS_DEV_URL;#creating-the-patch'>Creating the Patch</ulink>"
+                section in the Yocto Project Development Manual.
+            </para>
+        </section>
+    </section>
+
+    <section id='working-with-your-own-sources'>
+        <title>Working With Your Own Sources</title>
+
+        <para>
+            If you cannot work with one of the Linux kernel
+            versions supported by existing linux-yocto recipes, you can
+            still make use of the Yocto Project Linux kernel tooling by
+            working with your own sources.
+            When you use your own sources, you will not be able to
+            leverage the existing kernel
+            <ulink url='&YOCTO_DOCS_DEV_URL;#metadata'>Metadata</ulink> and
+            stabilization work of the linux-yocto sources.
+            However, you will be able to manage your own Metadata in the same
+            format as the linux-yocto sources.
+            Maintaining format compatibility facilitates converging with
+            linux-yocto on a future, mutually-supported kernel version.
+        </para>
+
+        <para>
+            To help you use your own sources, the Yocto Project provides a
+            linux-yocto custom recipe
+            (<filename>linux-yocto-custom.bb</filename>) that uses
+            <filename>kernel.org</filename> sources
+            and the Yocto Project Linux kernel tools for managing
+            kernel Metadata.
+            You can find this recipe in the
+            <filename>poky</filename> Git repository of the
+            Yocto Project <ulink url='&YOCTO_GIT_URL;'>Source Repository</ulink>
+            at:
+            <literallayout class="monospaced">
+     poky/meta-skeleton/recipes-kernel/linux/linux-yocto-custom.bb
+            </literallayout>
+        </para>
+
+        <para>
+            Here are some basic steps you can use to work with your own sources:
+            <orderedlist>
+                <listitem><para>Copy the <filename>linux-yocto-custom.bb</filename>
+                    recipe to your layer and give it a meaningful name.
+                    The name should include the version of the Linux kernel you
+                    are using (e.g.
+                    <filename>linux-yocto-myproject_3.19.bb</filename>,
+                    where "3.19" is the base version of the Linux kernel
+                    with which you would be working).</para></listitem>
+                <listitem><para>In the same directory inside your layer,
+                    create a matching directory
+                    to store your patches and configuration files (e.g.
+                    <filename>linux-yocto-myproject</filename>).
+                    </para></listitem>
+                <listitem><para>Make sure you have either a
+                    <filename>defconfig</filename> file or configuration
+                    fragment files.
+                    When you use the <filename>linux-yocto-custom.bb</filename>
+                    recipe, you must specify a configuration.
+                    If you do not have a <filename>defconfig</filename> file,
+                    you can run the following:
+                    <literallayout class='monospaced'>
+     $ make defconfig
+                    </literallayout>
+                    After running the command, copy the resulting
+                    <filename>.config</filename> to the
+                    <filename>files</filename> directory as "defconfig" and
+                    then add it to the
+                    <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>
+                    variable in the recipe.</para>
+                    <para>Running the <filename>make defconfig</filename>
+                    command results in the default configuration for your
+                    architecture as defined by your kernel.
+                    However, no guarantee exists that this configuration is
+                    valid for your use case, or that your board will even boot.
+                    This is particularly true for non-x86 architectures.
+                    To use non-x86 <filename>defconfig</filename> files, you
+                    need to be more specific and find one that matches your
+                    board (i.e. for arm, you look in
+                    <filename>arch/arm/configs</filename> and use the one that
+                    is the best starting point for your board).
+                    </para></listitem>
+                <listitem><para>Edit the following variables in your recipe
+                    as appropriate for your project:
+                    <itemizedlist>
+                        <listitem><para><ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>:
+                            The <filename>SRC_URI</filename> should specify
+                            a Git repository that uses one of the supported Git
+                            fetcher protocols (i.e. <filename>file</filename>,
+                            <filename>git</filename>, <filename>http</filename>,
+                            and so forth).
+                            The <filename>SRC_URI</filename> variable should
+                            also specify either a <filename>defconfig</filename>
+                            file or some configuration fragment files.
+                            The skeleton recipe provides an example
+                            <filename>SRC_URI</filename> as a syntax reference.
+                            </para></listitem>
+                        <listitem><para><ulink url='&YOCTO_DOCS_REF_URL;#var-LINUX_VERSION'><filename>LINUX_VERSION</filename></ulink>:
+                            The Linux kernel version you are using (e.g.
+                            "3.19").</para></listitem>
+                        <listitem><para><ulink url='&YOCTO_DOCS_REF_URL;#var-LINUX_VERSION_EXTENSION'><filename>LINUX_VERSION_EXTENSION</filename></ulink>:
+                            The Linux kernel <filename>CONFIG_LOCALVERSION</filename>
+                            that is compiled into the resulting kernel and visible
+                            through the <filename>uname</filename> command.
+                            </para></listitem>
+                        <listitem><para><ulink url='&YOCTO_DOCS_REF_URL;#var-SRCREV'><filename>SRCREV</filename></ulink>:
+                            The commit ID from which you want to build.
+                            </para></listitem>
+                        <listitem><para><ulink url='&YOCTO_DOCS_REF_URL;#var-PR'><filename>PR</filename></ulink>:
+                            Treat this variable the same as you would in any other
+                            recipe.
+                            Increment the variable to indicate to the OpenEmbedded
+                            build system that the recipe has changed.
+                            </para></listitem>
+                        <listitem><para><ulink url='&YOCTO_DOCS_REF_URL;#var-PV'><filename>PV</filename></ulink>:
+                            The default <filename>PV</filename> assignment is
+                            typically adequate.
+                            It combines the <filename>LINUX_VERSION</filename>
+                            with the Source Control Manager (SCM) revision
+                            as derived from the
+                            <ulink url='&YOCTO_DOCS_REF_URL;#var-SRCPV'><filename>SRCPV</filename></ulink>
+                            variable.
+                            The combined results are a string with
+                            the following form:
+                            <literallayout class='monospaced'>
+     3.19.11+git1+68a635bf8dfb64b02263c1ac80c948647cc76d5f_1+218bd8d2022b9852c60d32f0d770931e3cf343e2
+                            </literallayout>
+                            While lengthy, the extra verbosity in <filename>PV</filename>
+                            helps ensure you are using the exact
+                            sources from which you intend to build.
+                            </para></listitem>
+                        <listitem><para><ulink url='&YOCTO_DOCS_REF_URL;#var-COMPATIBLE_MACHINE'><filename>COMPATIBLE_MACHINE</filename></ulink>:
+                            A list of the machines supported by your new recipe.
+                            This variable in the example recipe is set
+                            by default to a regular expression that matches
+                            only the empty string, "(^$)".
+                            This default setting triggers an explicit build
+                            failure.
+                            You must change it to match a list of the machines
+                            that your new recipe supports.
+                            For example, to support the <filename>qemux86</filename>
+                            and <filename>qemux86-64</filename> machines, use
+                            the following form:
+                            <literallayout class='monospaced'>
+     COMPATIBLE_MACHINE = "qemux86|qemux86-64"
+                            </literallayout></para></listitem>
+                    </itemizedlist></para></listitem>
+                <listitem><para>Provide further customizations to your recipe
+                    as needed just as you would customize an existing
+                    linux-yocto recipe.
+                    See the "<link linkend='modifying-an-existing-recipe'>Modifying
+                    an Existing Recipe</link>" section for information.
+                    </para></listitem>
+            </orderedlist>
+        </para>
+    </section>
+
+    <section id='working-with-out-of-tree-modules'>
+        <title>Working with Out-of-Tree Modules</title>
+
+        <para>
+            This section describes steps to build out-of-tree modules on
+            your target and describes how to incorporate out-of-tree modules
+            in the build.
+        </para>
+
+        <section id='building-out-of-tree-modules-on-the-target'>
+            <title>Building Out-of-Tree Modules on the Target</title>
+
+            <para>
+                While the traditional Yocto Project development model would be
+                to include kernel modules as part of the normal build
+                process, you might find it useful to build modules on the
+                target.
+                This could be the case if your target system is capable
+                and powerful enough to handle the necessary compilation.
+                Before deciding to build on your target, however, you should
+                consider the benefits of using a proper cross-development
+                environment from your build host.
+            </para>
+
+            <para>
+                If you want to be able to build out-of-tree modules on
+                the target, there are some steps you need to take
+                on the target that is running your SDK image.
+                Briefly, the <filename>kernel-dev</filename> package
+                is installed by default on all
+                <filename>*.sdk</filename> images and the
+                <filename>kernel-devsrc</filename> package is installed
+                on many of the <filename>*.sdk</filename> images.
+                However, you need to create some scripts prior to
+                attempting to build the out-of-tree modules on the target
+                that is running that image.
+            </para>
+
+            <para>
+                Prior to attempting to build the out-of-tree modules,
+                you need to be on the target as root and you need to
+                change to the <filename>/usr/src/kernel</filename> directory.
+                Next, <filename>make</filename> the scripts:
+                <literallayout class='monospaced'>
+     # cd /usr/src/kernel
+     # make scripts
+                </literallayout>
+                Because all SDK image recipes include
+                <filename>dev-pkgs</filename>, the
+                <filename>kernel-dev</filename> packages will be installed
+                as part of the SDK image and the
+                <filename>kernel-devsrc</filename> packages will be installed
+                as part of applicable SDK images.
+                The SDK uses the scripts when building out-of-tree
+                modules.
+                Once you have switched to that directory and created the
+                scripts, you should be able to build your out-of-tree modules
+                on the target.
+            </para>
+        </section>
+
+        <section id='incorporating-out-of-tree-modules'>
+            <title>Incorporating Out-of-Tree Modules</title>
+
+            <para>
+                While it is always preferable to work with sources integrated
+                into the Linux kernel sources, if you need an external kernel
+                module, the <filename>hello-mod.bb</filename> recipe is
+                available as a template from which you can create your
+                own out-of-tree Linux kernel module recipe.
+            </para>
+
+            <para>
+                This template recipe is located in the
+                <filename>poky</filename> Git repository of the
+                Yocto Project <ulink url='&YOCTO_GIT_URL;'>Source Repository</ulink>
+                at:
+                <literallayout class="monospaced">
+     poky/meta-skeleton/recipes-kernel/hello-mod/hello-mod_0.1.bb
+                </literallayout>
+            </para>
+
+            <para>
+                To get started, copy this recipe to your layer and give it a
+                meaningful name (e.g. <filename>mymodule_1.0.bb</filename>).
+                In the same directory, create a new directory named
+                <filename>files</filename> where you can store any source files,
+                patches, or other files necessary for building
+                the module that do not come with the sources.
+                Finally, update the recipe as needed for the module.
+                Typically, you will need to set the following variables:
+                <itemizedlist>
+                    <listitem><para><ulink url='&YOCTO_DOCS_REF_URL;#var-DESCRIPTION'><filename>DESCRIPTION</filename></ulink>
+                        </para></listitem>
+                    <listitem><para><ulink url='&YOCTO_DOCS_REF_URL;#var-LICENSE'><filename>LICENSE*</filename></ulink>
+                        </para></listitem>
+                    <listitem><para><ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>
+                        </para></listitem>
+                    <listitem><para><ulink url='&YOCTO_DOCS_REF_URL;#var-PV'><filename>PV</filename></ulink>
+                        </para></listitem>
+                </itemizedlist>
+            </para>
+
+            <para>
+                Depending on the build system used by the module sources,
+                you might need to make some adjustments.
+                For example, a typical module <filename>Makefile</filename>
+                looks much like the one provided with the
+                <filename>hello-mod</filename> template:
+                <literallayout class='monospaced'>
+     obj-m := hello.o
+
+     SRC := $(shell pwd)
+
+     all:
+         $(MAKE) -C $(KERNEL_SRC) M=$(SRC)
+
+     modules_install:
+         $(MAKE) -C $(KERNEL_SRC) M=$(SRC) modules_install
+     ...
+                </literallayout>
+            </para>
+
+            <para>
+                The important point to note here is the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-KERNEL_SRC'><filename>KERNEL_SRC</filename></ulink>
+                variable.
+                The
+                <ulink url='&YOCTO_DOCS_REF_URL;#ref-classes-module'><filename>module</filename></ulink>
+                class sets this variable and the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-KERNEL_PATH'><filename>KERNEL_PATH</filename></ulink>
+                variable to
+                <filename>${<ulink url='&YOCTO_DOCS_REF_URL;#var-STAGING_KERNEL_DIR'><filename>STAGING_KERNEL_DIR</filename></ulink>}</filename>
+                with the necessary Linux kernel build information to build
+                modules.
+                If your module <filename>Makefile</filename> uses a different
+                variable, you might want to override the
+                <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-compile'><filename>do_compile()</filename></ulink>
+                step, or create a patch to
+                the <filename>Makefile</filename> to work with the more typical
+                <filename>KERNEL_SRC</filename> or
+                <filename>KERNEL_PATH</filename> variables.
+            </para>
+
+            <para>
+                After you have prepared your recipe, you will likely want to
+                include the module in your images.
+                To do this, see the documentation for the following variables in
+                the Yocto Project Reference Manual and set one of them
+                appropriately for your machine configuration file:
+                <itemizedlist>
+                    <listitem><para><ulink url='&YOCTO_DOCS_REF_URL;#var-MACHINE_ESSENTIAL_EXTRA_RDEPENDS'><filename>MACHINE_ESSENTIAL_EXTRA_RDEPENDS</filename></ulink>
+                        </para></listitem>
+                    <listitem><para><ulink url='&YOCTO_DOCS_REF_URL;#var-MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS'><filename>MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS</filename></ulink>
+                        </para></listitem>
+                    <listitem><para><ulink url='&YOCTO_DOCS_REF_URL;#var-MACHINE_EXTRA_RDEPENDS'><filename>MACHINE_EXTRA_RDEPENDS</filename></ulink>
+                        </para></listitem>
+                    <listitem><para><ulink url='&YOCTO_DOCS_REF_URL;#var-MACHINE_EXTRA_RRECOMMENDS'><filename>MACHINE_EXTRA_RRECOMMENDS</filename></ulink>
+                        </para></listitem>
+                </itemizedlist>
+            </para>
+
+            <para>
+                Modules are often not required for boot and can be excluded from
+                certain build configurations.
+                The following allows for the most flexibility:
+                <literallayout class='monospaced'>
+     MACHINE_EXTRA_RRECOMMENDS += "kernel-module-mymodule"
+                </literallayout>
+                The value is derived by appending the module filename without
+                the <filename>.ko</filename> extension to the string
+                "kernel-module-".
+            </para>
+
+            <para>
+                Because the variable is
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-RRECOMMENDS'><filename>RRECOMMENDS</filename></ulink>
+                and not a
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-RDEPENDS'><filename>RDEPENDS</filename></ulink>
+                variable, the build will not fail if this module is not
+                available to include in the image.
+            </para>
+        </section>
+    </section>
+
+
+    <section id='inspecting-changes-and-commits'>
+        <title>Inspecting Changes and Commits</title>
+
+        <para>
+            A common question when working with a kernel is:
+            "What changes have been applied to this tree?"
+            Rather than using "grep" across directories to see what has
+            changed, you can use Git to inspect or search the kernel tree.
+            Using Git is an efficient way to see what has changed in the tree.
+        </para>
+
+        <section id='what-changed-in-a-kernel'>
+            <title>What Changed in a Kernel?</title>
+
+            <para>
+                Following are a few examples that show how to use Git
+                commands to examine changes.
+                These examples are by no means the only way to see changes.
+                <note>
+                    In the following examples, unless you provide a commit
+                    range, <filename>kernel.org</filename> history is blended
+                    with Yocto Project kernel changes.
+                    You can form ranges by using branch names from the
+                    kernel tree as the upper and lower commit markers with
+                    the Git commands.
+                    You can see the branch names through the web interface
+                    to the Yocto Project source repositories at
+                    <ulink url='http://git.yoctoproject.org/cgit.cgi'></ulink>.
+                </note>
+                To see a full range of the changes, use the
+                <filename>git whatchanged</filename> command and specify a
+                commit range for the branch
+                (<replaceable>commit</replaceable><filename>..</filename><replaceable>commit</replaceable>).
+            </para>
+
+            <para>
+                Here is an example that looks at what has changed in the
+                <filename>emenlow</filename> branch of the
+                <filename>linux-yocto-3.19</filename> kernel.
+                The lower commit range is the commit associated with the
+                <filename>standard/base</filename> branch, while
+                the upper commit range is the commit associated with the
+                <filename>standard/emenlow</filename> branch.
+                <literallayout class='monospaced'>
+     $ git whatchanged origin/standard/base..origin/standard/emenlow
+                </literallayout>
+            </para>
+
+            <para>
+                To see short, one line summaries of changes use the
+                <filename>git log</filename> command:
+                <literallayout class='monospaced'>
+     $ git log --oneline origin/standard/base..origin/standard/emenlow
+                </literallayout>
+            </para>
+
+            <para>
+                Use this command to see code differences for the changes:
+                <literallayout class='monospaced'>
+     $ git diff origin/standard/base..origin/standard/emenlow
+                </literallayout>
+            </para>
+
+            <para>
+                Use this command to see the commit log messages and the
+                text differences:
+                <literallayout class='monospaced'>
+     $ git show origin/standard/base..origin/standard/emenlow
+                </literallayout>
+            </para>
+
+            <para>
+                Use this command to create individual patches for
+                each change.
+                Here is an example that that creates patch files for each
+                commit and places them in your <filename>Documents</filename>
+                directory:
+                <literallayout class='monospaced'>
+     $ git format-patch -o $HOME/Documents origin/standard/base..origin/standard/emenlow
+                </literallayout>
+            </para>
+        </section>
+
+        <section id='showing-a-particular-feature-or-branch-change'>
+            <title>Showing a Particular Feature or Branch Change</title>
+
+            <para>
+                Tags in the Yocto Project kernel tree divide changes for
+                significant features or branches.
+                The <filename>git show</filename>&nbsp;<replaceable>tag</replaceable>
+                command shows changes based on a tag.
+                Here is an example that shows <filename>systemtap</filename>
+                changes:
+                <literallayout class='monospaced'>
+     $ git show systemtap
+                </literallayout>
+                You can use the
+                <filename>git branch --contains</filename>&nbsp;<replaceable>tag</replaceable>
+                command to show the branches that contain a particular feature.
+                This command shows the branches that contain the
+                <filename>systemtap</filename> feature:
+                <literallayout class='monospaced'>
+     $ git branch --contains systemtap
+                </literallayout>
+            </para>
+        </section>
+    </section>
+</chapter>
+<!--
+vim: expandtab tw=80 ts=4
+-->

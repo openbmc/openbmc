@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# run-ptest - 'ptest' test infrastructure shell script that
+#   wraps the valgrind regression script vg_regtest. 
+#   Must be run in the /usr/lib/valgrind/ptest directory. 
+#
+# Dave Lerner <dave.lerner@windriver.com>
+###############################################################
+VALGRINDLIB=@libdir@/valgrind
+tests/vg_regtest --all \
+    --valgrind=/usr/bin/valgrind --valgrind-lib=$VALGRINDLIB \
+	--yocto-ptest

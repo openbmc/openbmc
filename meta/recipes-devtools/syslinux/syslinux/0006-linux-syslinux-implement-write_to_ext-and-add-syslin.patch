@@ -1,0 +1,215 @@
+From 922e56c10e36d876777580c84daef9a66bea6525 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Wed, 31 Dec 2014 17:20:43 +0800
+Subject: [PATCH 6/9] linux/syslinux: implement write_to_ext() and add
+ syslinuxext.c
+
+* The write_to_ext() write file to the extX device, and handle the boot
+  sector.
+* The syslinuxext.c is used for placing the code which are used by
+  extlinux and syslinux (which is syslinux_patch_bootsect()).
+
+Upstream-Status: Submitted
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+Tested-by: Du Dolpher <dolpher.du@intel.com>
+---
+ libinstaller/syslinuxext.c |   7 +++
+ libinstaller/syslinuxext.h |   5 ++
+ linux/Makefile             |   3 +-
+ linux/syslinux.c           | 118 +++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 132 insertions(+), 1 deletion(-)
+ create mode 100644 libinstaller/syslinuxext.c
+ create mode 100644 libinstaller/syslinuxext.h
+
+diff --git a/libinstaller/syslinuxext.c b/libinstaller/syslinuxext.c
+new file mode 100644
+index 0000000..bb54cef
+--- /dev/null
++++ b/libinstaller/syslinuxext.c
+@@ -0,0 +1,7 @@
++#define _GNU_SOURCE
++
++/* Patch syslinux_bootsect */
++void syslinux_patch_bootsect(int dev_fd)
++{
++}
++
+diff --git a/libinstaller/syslinuxext.h b/libinstaller/syslinuxext.h
+new file mode 100644
+index 0000000..8abd8b9
+--- /dev/null
++++ b/libinstaller/syslinuxext.h
+@@ -0,0 +1,5 @@
++#ifndef EXT2_SUPER_OFFSET
++#define EXT2_SUPER_OFFSET 1024
++#endif
++
++void syslinux_patch_bootsect(int dev_fd);
+diff --git a/linux/Makefile b/linux/Makefile
+index ac1ac58..3b23867 100644
+--- a/linux/Makefile
++++ b/linux/Makefile
+@@ -30,7 +30,8 @@ SRCS     = syslinux.c \
+            ../libinstaller/syslxmod.c \
+ 	   ../libinstaller/bootsect_bin.c \
+ 	   ../libinstaller/ldlinuxc32_bin.c \
+-	   ../libinstaller/ldlinux_bin.c
++	   ../libinstaller/ldlinux_bin.c \
++	   ../libinstaller/syslinuxext.c
+ OBJS	 = $(patsubst %.c,%.o,$(notdir $(SRCS)))
+ 
+ .SUFFIXES: .c .o .i .s .S
+diff --git a/linux/syslinux.c b/linux/syslinux.c
+index de5d272..f0c97a8 100755
+--- a/linux/syslinux.c
++++ b/linux/syslinux.c
+@@ -46,6 +46,7 @@
+ #include <sys/types.h>
+ #include <sys/wait.h>
+ #include <sys/mount.h>
++#include <time.h>
+ 
+ #include "linuxioctl.h"
+ 
+@@ -72,6 +73,7 @@
+ #include "syslxfs.h"
+ #include "setadv.h"
+ #include "syslxopt.h" /* unified options */
++#include "syslinuxext.h"
+ #include <ext2fs/ext2fs.h>
+ 
+ extern const char *program;	/* Name of program */
+@@ -419,6 +421,12 @@ int install_bootblock(int fd, const char *device)
+ {
+ }
+ 
++/* Construct the boot file map */
++int ext_construct_sectmap_fs(ext2_filsys fs, ext2_ino_t newino,
++                                sector_t *sectors, int nsect)
++{
++}
++
+ static int handle_adv_on_ext(void)
+ {
+     int                 i, retval, found_file;
+@@ -524,6 +532,116 @@ fail:
+ static int write_to_ext(const char *filename, const char *str, int length,
+                         int i_flags, int dev_fd, const char *subdir)
+ {
++    ext2_ino_t          newino;
++    struct ext2_inode   inode;
++    int                 retval, i, modbytes, nsect;
++    ext2_file_t         e2_file;
++    sector_t            *sectors;
++
++    /* Remove it if it is already exists */
++    retval = ext2fs_namei(e2fs, root, cwd, filename, &newino);
++    if (retval == 0) {
++        retval = ext2fs_unlink(e2fs, cwd, filename, newino, 0);
++        if (retval) {
++            fprintf(stderr, "%s: failed to unlink: %s\n", program, filename);
++            return retval;
++        }
++    }
++
++    /* Create new inode */
++    retval = ext2fs_new_inode(e2fs, cwd, 010755, 0, &newino);
++    if (retval) {
++        fprintf(stderr, "%s: ERROR: failed to create inode for: %s\n",
++                program, filename);
++        return retval;
++    }
++
++    /* Link the inode and the filename */
++    retval = ext2fs_link(e2fs, cwd, filename, newino, EXT2_FT_REG_FILE);
++    if (retval) {
++        fprintf(stderr, "%s: ERROR: failed to link inode for: %s.\n",
++                program, filename);
++        return retval;
++    }
++
++    if (ext2fs_test_inode_bitmap2(e2fs->inode_map, newino))
++       fprintf(stderr, "%s: warning: inode already set %s.\n",
++            program, filename);
++
++        ext2fs_inode_alloc_stats2(e2fs, newino, +1, 0);
++        memset(&inode, 0, sizeof(inode));
++	inode.i_mode = LINUX_S_IFREG | LINUX_S_IRUSR | LINUX_S_IRGRP
++                        | LINUX_S_IROTH;
++	inode.i_flags |= i_flags;
++        inode.i_atime = inode.i_ctime = inode.i_mtime =
++            e2fs->now ? e2fs->now : time(0);
++        inode.i_links_count = 1;
++        if (e2fs->super->s_feature_incompat &
++            EXT3_FEATURE_INCOMPAT_EXTENTS) {
++            struct ext3_extent_header *eh;
++
++            eh = (struct ext3_extent_header *) &inode.i_block[0];
++            eh->eh_depth = 0;
++            eh->eh_entries = 0;
++            eh->eh_magic = ext2fs_cpu_to_le16(EXT3_EXT_MAGIC);
++            i = (sizeof(inode.i_block) - sizeof(*eh)) /
++                sizeof(struct ext3_extent);
++            eh->eh_max = ext2fs_cpu_to_le16(i);
++            inode.i_flags |= EXT4_EXTENTS_FL;
++    }
++
++    retval = ext2fs_write_new_inode(e2fs, newino, &inode);
++    if (retval) {
++        fprintf(stderr, "%s: ERROR: while writting inode %d.\n",
++                program, newino);
++        return 1;
++    }
++
++    retval = ext2fs_file_open(e2fs, newino, EXT2_FILE_WRITE, &e2_file);
++    if (retval) {
++        fprintf(stderr, "%s: ERROR: failed to open %s.\n",
++                program, filename);
++        return 1;
++    }
++
++    /* Write to file */
++    if (ext_file_write(e2_file, str, length, 0) == -1)
++        goto fail;
++
++    if (strcmp(filename, "ldlinux.sys") == 0) {
++        /* Write ADV */
++        if (ext_file_write(e2_file, syslinux_adv, 2 * ADV_SIZE,
++                boot_image_len) == -1)
++            goto fail;
++
++        /* Patch syslinux_bootsect */
++        syslinux_patch_bootsect(dev_fd);
++
++        /* Patch ldlinux.sys */
++        nsect = (boot_image_len + SECTOR_SIZE - 1) >> SECTOR_SHIFT;
++        nsect += 2;                        /* Two sectors for the ADV */
++        sectors = alloca(sizeof(sector_t) * nsect);
++        memset(sectors, 0, nsect * sizeof *sectors);
++        /* The sectors will be modified and used by syslinux_patch() */
++        retval = ext_construct_sectmap_fs(e2fs, newino, sectors, nsect);
++        if (retval)
++            goto fail;
++
++        /* Create the modified image in memory */
++        modbytes = syslinux_patch(sectors, nsect, opt.stupid_mode,
++                            opt.raid_mode, subdir, NULL);
++
++        /* Rewrite the first modbytes of ldlinux.sys */
++        if (ext_file_write(e2_file, str, modbytes, 0) == -1) {
++            fprintf(stderr, "%s: ERROR: failed to patch %s.\n", program,
++                    filename);
++            goto fail;
++        }
++    }
++
++fail:
++    (void) ext2fs_file_close(e2_file);
++    return retval;
+ }
+ 
+ /* The install func for ext2, ext3 and ext4 */
+-- 
+1.9.1
+

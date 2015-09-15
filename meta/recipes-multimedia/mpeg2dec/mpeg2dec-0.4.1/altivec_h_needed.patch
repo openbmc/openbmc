@@ -1,0 +1,43 @@
+Add new method to judge whether <altivec.h> is needed
+
+The original logic will use "typedef vector int t;" to judge
+whether <altivec.h> is needed. altivec.h contains the following
+statement:
+
+ #if !defined(__APPLE_ALTIVEC__)
+ #define vector __vector
+ #define pixel __pixel
+ #define bool 
+ #endif
+
+In gcc-4.3.3, __APPLE_ALTIVEC__ is not defined by compiler, neither
+as vector, pixel, and bool. In order to make "typedef vector int t;"
+pass the compilation, we need to include altivec.h.
+
+However in gcc-4.5.0, __APPLE_ALTIVEC__ is defined by compiler,
+so as vector, pixel, and bool. We could not judge whether
+altivec.h is needed by "typedef vector int t;".
+Here we include another statement "int tmp = __CR6_EQ;", in
+which __CR6_EQ is defined in altivec.h.
+
+Upstream-Status: Pending
+
+Signed-off-by: Dongxiao Xu <dongxiao.xu@intel.com>
+
+diff -ruN mpeg2dec-0.4.1-orig/configure.in mpeg2dec-0.4.1/configure.in
+--- mpeg2dec-0.4.1-orig/configure.in	2010-09-14 20:55:42.399687663 +0800
++++ mpeg2dec-0.4.1/configure.in	2010-09-14 20:56:43.403204648 +0800
+@@ -75,11 +75,11 @@
+ 		 CFLAGS="$OPT_CFLAGS $TRY_CFLAGS $CFLAGS"
+ 		 AC_MSG_CHECKING([if <altivec.h> is needed])
+ 		 AC_TRY_COMPILE([],
+-		    [typedef vector int t;
++		    [typedef vector int t; int tmp = __CR6_EQ;
+ 		     vec_ld(0, (unsigned char *)0);],
+ 		    [have_altivec=yes; AC_MSG_RESULT(no)],
+ 		    [AC_TRY_COMPILE([#include <altivec.h>],
+-			[typedef vector int t; vec_ld(0, (unsigned char *)0);],
++			[typedef vector int t; int tmp = __CR6_EQ; vec_ld(0, (unsigned char *)0);],
+ 			[AC_DEFINE([HAVE_ALTIVEC_H],,
+ 			    [Define to 1 if you have the <altivec.h> header.])
+ 			 have_altivec=yes; AC_MSG_RESULT(yes)],

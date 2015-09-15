@@ -1,0 +1,21 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          sendsigs
+# Required-Start:    
+# Required-Stop:     umountnfs
+# Default-Start:
+# Default-Stop:      0 6
+# Short-Description: Kill all remaining processes.
+# Description: 
+### END INIT INFO
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+# Kill all processes.
+echo "Sending all processes the TERM signal..."
+killall5 -15
+sleep 5
+echo "Sending all processes the KILL signal..."
+killall5 -9
+
+: exit 0

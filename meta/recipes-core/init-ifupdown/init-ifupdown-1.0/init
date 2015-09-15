@@ -1,0 +1,90 @@
+#!/bin/sh -e
+### BEGIN INIT INFO
+# Provides:          networking
+# Required-Start:    mountvirtfs $local_fs
+# Required-Stop:     $local_fs
+# Should-Start:      ifupdown
+# Should-Stop:       ifupdown
+# Default-Start:     S
+# Default-Stop:      0 6
+# Short-Description: Raise network interfaces.
+### END INIT INFO
+
+PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
+
+[ -x /sbin/ifup ] || exit 0
+
+check_network_file_systems() {
+    [ -e /proc/mounts ] || return 0
+
+    if [ -e /etc/iscsi/iscsi.initramfs ]; then
+	echo "not deconfiguring network interfaces: iSCSI root is mounted."
+	exit 0
+    fi
+
+    exec 9<&0 < /proc/mounts
+    while read DEV MTPT FSTYPE REST; do
+	case $DEV in
+	/dev/nbd*|/dev/nd[a-z]*|/dev/etherd/e*)
+	    echo "not deconfiguring network interfaces: network devices still mounted."
+	    exit 0
+	    ;;
+	esac
+	case $FSTYPE in
+	nfs|nfs4|smbfs|ncp|ncpfs|cifs|coda|ocfs2|gfs|pvfs|pvfs2|fuse.httpfs|fuse.curlftpfs)
+	    echo "not deconfiguring network interfaces: network file systems still mounted."
+	    exit 0
+	    ;;
+	esac
+    done
+    exec 0<&9 9<&-
+}
+
+check_network_swap() {
+    [ -e /proc/swaps ] || return 0
+
+    exec 9<&0 < /proc/swaps
+    while read DEV MTPT FSTYPE REST; do
+	case $DEV in
+	/dev/nbd*|/dev/nd[a-z]*|/dev/etherd/e*)
+	    echo "not deconfiguring network interfaces: network swap still mounted."
+	    exit 0
+	    ;;
+	esac
+    done
+    exec 0<&9 9<&-
+}
+
+case "$1" in
+start)
+	echo -n "Configuring network interfaces... "
+	sysctl -e -p /etc/sysctl.conf >/dev/null 2>&1
+	ifup -a
+	echo "done."
+	;;
+
+stop)
+	check_network_file_systems
+	check_network_swap
+
+	echo -n "Deconfiguring network interfaces... "
+	ifdown -a
+	echo "done."
+	;;
+
+force-reload|restart)
+	echo "Running $0 $1 is deprecated because it may not enable again some interfaces"
+	echo "Reconfiguring network interfaces... "
+	ifdown -a || true
+	ifup -a
+	echo "done."
+	;;
+
+*)
+	echo "Usage: /etc/init.d/networking {start|stop}"
+	exit 1
+	;;
+esac
+
+exit 0
+

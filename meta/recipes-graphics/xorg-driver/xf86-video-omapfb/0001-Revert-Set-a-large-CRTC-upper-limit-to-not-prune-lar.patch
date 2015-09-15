@@ -1,0 +1,41 @@
+From 8fb7d0f99d4afbb574b30cb4f1e66a8f89d94ad5 Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen@dominion.thruhere.net>
+Date: Wed, 26 Jan 2011 12:04:36 +0100
+Subject: [PATCH 1/6] Revert "Set a large CRTC upper limit to not prune larger
+ resolutions"
+
+Picture is garbled after switching resolutions, so revert it.
+Virtual size too big, revert the commit 9c4d7592dcb7dc20a48a6f941d9d94bd73d34153.
+
+Upstream-Status: Pending
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ src/omapfb-crtc.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/omapfb-crtc.c b/src/omapfb-crtc.c
+index 9aaa52f..cbeff35 100644
+--- a/src/omapfb-crtc.c
++++ b/src/omapfb-crtc.c
+@@ -190,13 +190,13 @@ OMAPFBCRTCInit(ScrnInfoPtr pScrn)
+ 	 * In practise, this doesn't seem to be supported.
+ 	 * (no way to setup the overlay offset/base address)
+ 	 */
+-	 /* FIXME: figure out what makes sense here. A known max resolution?
+-	  * framebuffer size?
+-	  */
+ 	xf86CrtcSetSizeRange(pScrn,
+-	                     8, 8, 2048, 2048);
++	                     8, 8,
++	                     ofb->state_info.xres_virtual,
++	                     ofb->state_info.yres_virtual);
+ 
+ 	ofb->crtc = xf86CrtcCreate(pScrn, &OMAPFBCrtcFuncs);
++
+ }
+ 
+ 
+-- 
+1.8.0
+

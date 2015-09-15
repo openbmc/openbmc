@@ -1,0 +1,27 @@
+disable external key server
+
+Upstream-Status: Pending
+
+When RPM experiences a signed package, with a signature that it does NOT know.
+By default it will send the -fingerprint- (and only the 16 digit fingerprint) to
+an external HKP server, trying to get the key down.
+
+This is probably not a reasonable default behavior for the system to do, instead
+it should simply fail the key lookup.  If someone wants to enable the HKP server
+it's easy enough to do by enabling the necessary macros.
+
+Signed-off-by: yzhu1 <yanjun.zhu@windriver.com>
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+--- a/macros/macros.in
++++ b/macros/macros.in
+@@ -546,8 +546,8 @@ $_arbitrary_tags_tests	Foo:Bar
+ # Horowitz Key Protocol server configuration
+ #
+ #%_hkp_keyserver         hkp://keys.n3npq.net
+-%_hkp_keyserver         hkp://pool.sks-keyservers.net
+-%_hkp_keyserver_query   %{_hkp_keyserver}/pks/lookup?op=get&search=
++#%_hkp_keyserver         hkp://pool.sks-keyservers.net
++#%_hkp_keyserver_query   %{_hkp_keyserver}/pks/lookup?op=get&search=
+ 
+ 
+ %_nssdb_path	/etc/pki/nssdb

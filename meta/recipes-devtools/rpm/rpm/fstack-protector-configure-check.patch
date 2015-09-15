@@ -1,0 +1,21 @@
+Some options checked in this loop are needing linking to find out
+if the option can be used or not e.g. -fstack-protector which needs
+libssp to be staged and available for compiler to link against
+Therefore we change the compile only check to compile and link check
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+
+Index: rpm-5.4.14/configure.ac
+===================================================================
+--- rpm-5.4.14.orig/configure.ac
++++ rpm-5.4.14/configure.ac
+@@ -201,7 +201,7 @@ dnl # GNU GCC (usually "gcc")
+  my_save_cflags="$CFLAGS"
+  CFLAGS=$c
+  AC_MSG_CHECKING([whether GCC supports $c])
+- AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
++ AC_LINK_IFELSE([AC_LANG_PROGRAM([])],
+     [AC_MSG_RESULT([yes])]
+     [my_cflags=$c],
+     [AC_MSG_RESULT([no])]

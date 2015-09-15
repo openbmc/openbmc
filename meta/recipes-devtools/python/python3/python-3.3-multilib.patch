@@ -1,0 +1,338 @@
+Upstream-Status: Pending
+
+get the sys.lib from python itself and do not use hardcoded value of 'lib'
+
+02/2015 Rebased for 3.4.2
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Alejandro Hernandez <alejandro.hernandez@linux.intel.com>
+
+Index: Python-3.4.2/Include/pythonrun.h
+===================================================================
+--- Python-3.4.2.orig/Include/pythonrun.h
++++ Python-3.4.2/Include/pythonrun.h
+@@ -220,6 +220,8 @@ int _Py_CheckPython3();
+ /* In their own files */
+ PyAPI_FUNC(const char *) Py_GetVersion(void);
+ PyAPI_FUNC(const char *) Py_GetPlatform(void);
++PyAPI_FUNC(const char *) Py_GetArch(void);
++PyAPI_FUNC(const char *) Py_GetLib(void);
+ PyAPI_FUNC(const char *) Py_GetCopyright(void);
+ PyAPI_FUNC(const char *) Py_GetCompiler(void);
+ PyAPI_FUNC(const char *) Py_GetBuildInfo(void);
+Index: Python-3.4.2/Lib/distutils/command/install.py
+===================================================================
+--- Python-3.4.2.orig/Lib/distutils/command/install.py
++++ Python-3.4.2/Lib/distutils/command/install.py
+@@ -19,6 +19,8 @@ from site import USER_BASE
+ from site import USER_SITE
+ HAS_USER_SITE = True
+ 
++libname = sys.lib
++
+ WINDOWS_SCHEME = {
+     'purelib': '$base/Lib/site-packages',
+     'platlib': '$base/Lib/site-packages',
+@@ -30,7 +32,7 @@ WINDOWS_SCHEME = {
+ INSTALL_SCHEMES = {
+     'unix_prefix': {
+         'purelib': '$base/lib/python$py_version_short/site-packages',
+-        'platlib': '$platbase/lib/python$py_version_short/site-packages',
++        'platlib': '$platbase/'+libname+'/python$py_version_short/site-packages',
+         'headers': '$base/include/python$py_version_short$abiflags/$dist_name',
+         'scripts': '$base/bin',
+         'data'   : '$base',
+Index: Python-3.4.2/Lib/pydoc.py
+===================================================================
+--- Python-3.4.2.orig/Lib/pydoc.py
++++ Python-3.4.2/Lib/pydoc.py
+@@ -394,7 +394,7 @@ class Doc:
+ 
+         docloc = os.environ.get("PYTHONDOCS", self.PYTHONDOCS)
+ 
+-        basedir = os.path.join(sys.base_exec_prefix, "lib",
++        basedir = os.path.join(sys.base_exec_prefix, sys.lib,
+                                "python%d.%d" %  sys.version_info[:2])
+         if (isinstance(object, type(os)) and
+             (object.__name__ in ('errno', 'exceptions', 'gc', 'imp',
+Index: Python-3.4.2/Lib/trace.py
+===================================================================
+--- Python-3.4.2.orig/Lib/trace.py
++++ Python-3.4.2/Lib/trace.py
+@@ -751,10 +751,10 @@ def main(argv=None):
+                 # should I also call expanduser? (after all, could use $HOME)
+ 
+                 s = s.replace("$prefix",
+-                              os.path.join(sys.base_prefix, "lib",
++                              os.path.join(sys.base_prefix, sys.lib,
+                                            "python" + sys.version[:3]))
+                 s = s.replace("$exec_prefix",
+-                              os.path.join(sys.base_exec_prefix, "lib",
++                              os.path.join(sys.base_exec_prefix, sys.lib,
+                                            "python" + sys.version[:3]))
+                 s = os.path.normpath(s)
+                 ignore_dirs.append(s)
+Index: Python-3.4.2/Makefile.pre.in
+===================================================================
+--- Python-3.4.2.orig/Makefile.pre.in
++++ Python-3.4.2/Makefile.pre.in
+@@ -101,6 +101,8 @@ PY_CORE_CFLAGS=	$(PY_CFLAGS) $(PY_CFLAGS
+ 
+ # Machine-dependent subdirectories
+ MACHDEP=	@MACHDEP@
++LIB=		@LIB@
++ARCH=		@ARCH@
+ 
+ # Multiarch directory (may be empty)
+ MULTIARCH=	@MULTIARCH@
+@@ -120,7 +122,7 @@ LIBDIR=		@libdir@
+ MANDIR=		@mandir@
+ INCLUDEDIR=	@includedir@
+ CONFINCLUDEDIR=	$(exec_prefix)/include
+-SCRIPTDIR=	$(prefix)/lib
++SCRIPTDIR=	@libdir@
+ ABIFLAGS=	@ABIFLAGS@
+ 
+ # Detailed destination directories
+@@ -712,6 +714,7 @@ Modules/getpath.o: $(srcdir)/Modules/get
+ 		-DEXEC_PREFIX='"$(exec_prefix)"' \
+ 		-DVERSION='"$(VERSION)"' \
+ 		-DVPATH='"$(VPATH)"' \
++		-DARCH='"$(ARCH)"' -DLIB='"$(LIB)"' \
+ 		-o $@ $(srcdir)/Modules/getpath.c
+ 
+ Modules/python.o: $(srcdir)/Modules/python.c
+@@ -780,7 +783,7 @@ $(AST_C): $(AST_H) $(AST_ASDL) $(ASDLGEN
+ Python/compile.o Python/symtable.o Python/ast.o: $(GRAMMAR_H) $(AST_H)
+ 
+ Python/getplatform.o: $(srcdir)/Python/getplatform.c
+-		$(CC) -c $(PY_CORE_CFLAGS) -DPLATFORM='"$(MACHDEP)"' -o $@ $(srcdir)/Python/getplatform.c
++		$(CC) -c $(PY_CORE_CFLAGS) -DPLATFORM='"$(MACHDEP)"' -DARCH='"$(ARCH)"' -DLIB='"$(LIB)"' -o $@ $(srcdir)/Python/getplatform.c
+ 
+ Python/importdl.o: $(srcdir)/Python/importdl.c
+ 		$(CC) -c $(PY_CORE_CFLAGS) -I$(DLINCLDIR) -o $@ $(srcdir)/Python/importdl.c
+Index: Python-3.4.2/Modules/getpath.c
+===================================================================
+--- Python-3.4.2.orig/Modules/getpath.c
++++ Python-3.4.2/Modules/getpath.c
+@@ -117,9 +117,11 @@
+ #define EXEC_PREFIX PREFIX
+ #endif
+ 
++#define LIB_PYTHON LIB "/python" VERSION
++
+ #ifndef PYTHONPATH
+-#define PYTHONPATH PREFIX "/lib/python" VERSION ":" \
+-              EXEC_PREFIX "/lib/python" VERSION "/lib-dynload"
++#define PYTHONPATH PREFIX "/" LIB_PYTHON ":" \
++              EXEC_PREFIX "/" LIB_PYTHON "/lib-dynload"
+ #endif
+ 
+ #ifndef LANDMARK
+@@ -130,6 +132,7 @@ static wchar_t prefix[MAXPATHLEN+1];
+ static wchar_t exec_prefix[MAXPATHLEN+1];
+ static wchar_t progpath[MAXPATHLEN+1];
+ static wchar_t *module_search_path = NULL;
++static wchar_t *lib_python = L"" LIB_PYTHON;
+ 
+ static void
+ reduce(wchar_t *dir)
+Index: Python-3.4.2/Python/getplatform.c
+===================================================================
+--- Python-3.4.2.orig/Python/getplatform.c
++++ Python-3.4.2/Python/getplatform.c
+@@ -10,3 +10,23 @@ Py_GetPlatform(void)
+ {
+ 	return PLATFORM;
+ }
++
++#ifndef ARCH
++#define ARCH "unknown"
++#endif
++
++const char *
++Py_GetArch(void)
++{
++	return ARCH;
++}
++
++#ifndef LIB
++#define LIB "lib"
++#endif
++
++const char *
++Py_GetLib(void)
++{
++	return LIB;
++}
+Index: Python-3.4.2/Python/sysmodule.c
+===================================================================
+--- Python-3.4.2.orig/Python/sysmodule.c
++++ Python-3.4.2/Python/sysmodule.c
+@@ -1697,6 +1697,10 @@ _PySys_Init(void)
+                         PyUnicode_FromString(Py_GetCopyright()));
+     SET_SYS_FROM_STRING("platform",
+                         PyUnicode_FromString(Py_GetPlatform()));
++    SET_SYS_FROM_STRING("arch",
++                        PyUnicode_FromString(Py_GetArch()));
++    SET_SYS_FROM_STRING("lib",
++                        PyUnicode_FromString(Py_GetLib()));
+     SET_SYS_FROM_STRING("executable",
+                         PyUnicode_FromWideChar(
+                                Py_GetProgramFullPath(), -1));
+Index: Python-3.4.2/setup.py
+===================================================================
+--- Python-3.4.2.orig/setup.py
++++ Python-3.4.2/setup.py
+@@ -454,7 +454,7 @@ class PyBuildExt(build_ext):
+         # directories (i.e. '.' and 'Include') must be first.  See issue
+         # 10520.
+         if not cross_compiling:
+-            add_dir_to_list(self.compiler.library_dirs, '/usr/local/lib')
++            add_dir_to_list(self.compiler.library_dirs, os.path.join('/usr/local', sys.lib))
+             add_dir_to_list(self.compiler.include_dirs, '/usr/local/include')
+         # only change this for cross builds for 3.3, issues on Mageia
+         if cross_compiling:
+@@ -512,8 +512,7 @@ class PyBuildExt(build_ext):
+         # be assumed that no additional -I,-L directives are needed.
+         if not cross_compiling:
+             lib_dirs = self.compiler.library_dirs + [
+-                '/lib64', '/usr/lib64',
+-                '/lib', '/usr/lib',
++                '/' + sys.lib, '/usr/' + sys.lib,
+                 ]
+             inc_dirs = self.compiler.include_dirs + ['/usr/include']
+         else:
+@@ -696,11 +695,11 @@ class PyBuildExt(build_ext):
+             elif curses_library:
+                 readline_libs.append(curses_library)
+             elif self.compiler.find_library_file(lib_dirs +
+-                                                     ['/usr/lib/termcap'],
++                                                     ['/usr/'+sys.lib+'/termcap'],
+                                                      'termcap'):
+                 readline_libs.append('termcap')
+             exts.append( Extension('readline', ['readline.c'],
+-                                   library_dirs=['/usr/lib/termcap'],
++                                   library_dirs=['/usr/'+sys.lib+'/termcap'],
+                                    extra_link_args=readline_extra_link_args,
+                                    libraries=readline_libs) )
+         else:
+Index: Python-3.4.2/Lib/sysconfig.py
+===================================================================
+--- Python-3.4.2.orig/Lib/sysconfig.py
++++ Python-3.4.2/Lib/sysconfig.py
+@@ -20,10 +20,10 @@ __all__ = [
+ 
+ _INSTALL_SCHEMES = {
+     'posix_prefix': {
+-        'stdlib': '{installed_base}/lib/python{py_version_short}',
+-        'platstdlib': '{platbase}/lib/python{py_version_short}',
++        'stdlib': '{installed_base}/'+sys.lib+'/python{py_version_short}',
++        'platstdlib': '{platbase}/'+sys.lib+'/python{py_version_short}',
+         'purelib': '{base}/lib/python{py_version_short}/site-packages',
+-        'platlib': '{platbase}/lib/python{py_version_short}/site-packages',
++        'platlib': '{platbase}/'+sys.lib+'/python{py_version_short}/site-packages',
+         'include':
+             '{installed_base}/include/python{py_version_short}{abiflags}',
+         'platinclude':
+@@ -32,10 +32,10 @@ _INSTALL_SCHEMES = {
+         'data': '{base}',
+         },
+     'posix_home': {
+-        'stdlib': '{installed_base}/lib/python',
+-        'platstdlib': '{base}/lib/python',
++        'stdlib': '{installed_base}/'+sys.lib+'/python',
++        'platstdlib': '{base}/'+sys.lib+'/python',
+         'purelib': '{base}/lib/python',
+-        'platlib': '{base}/lib/python',
++        'platlib': '{base}/'+sys.lib+'/python',
+         'include': '{installed_base}/include/python',
+         'platinclude': '{installed_base}/include/python',
+         'scripts': '{base}/bin',
+@@ -61,10 +61,10 @@ _INSTALL_SCHEMES = {
+         'data': '{userbase}',
+         },
+     'posix_user': {
+-        'stdlib': '{userbase}/lib/python{py_version_short}',
+-        'platstdlib': '{userbase}/lib/python{py_version_short}',
++        'stdlib': '{userbase}/'+sys.lib+'/python{py_version_short}',
++        'platstdlib': '{userbase}/'+sys.lib+'/python{py_version_short}',
+         'purelib': '{userbase}/lib/python{py_version_short}/site-packages',
+-        'platlib': '{userbase}/lib/python{py_version_short}/site-packages',
++        'platlib': '{userbase}/'+sys.lib+'/python{py_version_short}/site-packages',
+         'include': '{userbase}/include/python{py_version_short}',
+         'scripts': '{userbase}/bin',
+         'data': '{userbase}',
+Index: Python-3.4.2/configure.ac
+===================================================================
+--- Python-3.4.2.orig/configure.ac
++++ Python-3.4.2/configure.ac
+@@ -791,6 +791,41 @@ esac
+ MULTIARCH=$($CC --print-multiarch 2>/dev/null)
+ AC_SUBST(MULTIARCH)
+ 
++AC_SUBST(ARCH)
++AC_MSG_CHECKING(ARCH)
++ARCH=`uname -m`
++case $ARCH in
++i?86) ARCH=i386;;
++esac
++AC_MSG_RESULT($ARCH)
++
++AC_SUBST(LIB)
++AC_MSG_CHECKING(LIB)
++case $ac_sys_system in
++Linux*)
++  # Test if the compiler is 64bit
++  echo 'int i;' > conftest.$ac_ext
++  python_cv_cc_64bit_output=no
++  if AC_TRY_EVAL(ac_compile); then
++    case `/usr/bin/file conftest.$ac_objext` in
++    *"ELF 64"*)
++      python_cv_cc_64bit_output=yes
++      ;;
++    esac
++  fi
++  rm -rf conftest*
++  ;;
++esac
++
++case $ARCH:$python_cv_cc_64bit_output in
++ppc64:yes | powerpc64:yes | s390x:yes | sparc64:yes | x86_64:yes)
++  LIB="lib64"
++  ;;
++*:*)
++  LIB="lib"
++  ;;
++esac
++AC_MSG_RESULT($LIB)
+ 
+ AC_SUBST(LIBRARY)
+ AC_MSG_CHECKING(LIBRARY)
+Index: Python-3.4.2/Lib/site.py
+===================================================================
+--- Python-3.4.2.orig/Lib/site.py
++++ Python-3.4.2/Lib/site.py
+@@ -304,13 +304,19 @@ def getsitepackages(prefixes=None):
+         seen.add(prefix)
+ 
+         if os.sep == '/':
+-            sitepackages.append(os.path.join(prefix, "lib",
++            sitepackages.append(os.path.join(prefix, sys.lib,
+                                         "python" + sys.version[:3],
+                                         "site-packages"))
+-            sitepackages.append(os.path.join(prefix, "lib", "site-python"))
++            if sys.lib != "lib":
++                sitepackages.append(os.path.join(prefix, "lib",
++                                        "python" + sys.version[:3],
++                                        "site-packages"))
++            sitepackages.append(os.path.join(prefix, sys.lib, "site-python"))
++            if sys.lib != "lib":
++                sitepackages.append(os.path.join(prefix, sys.lib, "site-python"))
+         else:
+             sitepackages.append(prefix)
+-            sitepackages.append(os.path.join(prefix, "lib", "site-packages"))
++            sitepackages.append(os.path.join(prefix, sys.lib, "site-packages"))
+         if sys.platform == "darwin":
+             # for framework builds *only* we add the standard Apple
+             # locations.

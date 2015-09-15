@@ -1,0 +1,57 @@
+Author: Andrei Gherzan <andrei@gherzan.ro>
+Date:   Sun Mar 25 02:02:27 2012 +0200
+
+This patch was added for 64bit host machines. In the compile process python
+is checking if platform is a 64bit platform using sys.maxint which is the host's
+value. The patch fixes this issue so that python would check if TARGET machine
+is 64bit not the HOST machine. In this way will have "dl" and "imageop" modules
+built if HOST machine is 64bit but the target machine is 32bit.
+
+Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
+
+Upstream-Status: Pending
+
+Index: Python-2.7.2/setup.py
+===================================================================
+--- Python-2.7.2.orig/setup.py	2012-03-25 01:10:41.540163187 +0200
++++ Python-2.7.2/setup.py	2012-03-25 01:26:06.092539990 +0200
+@@ -23,6 +23,21 @@
+ # This global variable is used to hold the list of modules to be disabled.
+ disabled_module_list = []
+ 
++def target_is_64bit_platform ():
++    """
++    In case of cross-compile, some modules are not build as setup checks if HOST
++    is 64bit and not TARGET.
++    As python was built for TARGET we can check this in pyconfig.h in this way:
++	Sizeof LONG on a 32 bit platform is 4 bytes
++	Sizeof LONG on a 64 bit platform is 8 bytes
++    """
++    pyconf = open("pyconfig.h").read()
++    aux = re.search(r"#s*define\s+SIZEOF_LONG\s+8\s*", pyconf)
++    if aux is not None:
++	return True
++    else:
++	return False
++
+ def add_dir_to_list(dirlist, dir):
+     """Add the directory 'dir' to the list 'dirlist' (at the front) if
+     1) 'dir' is not already in 'dirlist'
+@@ -628,7 +643,7 @@
+         exts.append( Extension('audioop', ['audioop.c']) )
+ 
+         # Disabled on 64-bit platforms
+-        if sys.maxint != 9223372036854775807L:
++        if not target_is_64bit_platform():
+             # Operations on images
+             exts.append( Extension('imageop', ['imageop.c']) )
+         else:
+@@ -1418,7 +1433,7 @@
+                 missing.append('_codecs_%s' % loc)
+ 
+         # Dynamic loading module
+-        if sys.maxint == 0x7fffffff:
++        if not target_is_64bit_platform():
+             # This requires sizeof(int) == sizeof(long) == sizeof(char*)
+             dl_inc = find_file('dlfcn.h', [], inc_dirs)
+             if (dl_inc is not None) and (platform not in ['atheos']):

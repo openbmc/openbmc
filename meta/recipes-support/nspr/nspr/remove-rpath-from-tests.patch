@@ -1,0 +1,26 @@
+Author: Andrei Gherzan <andrei@gherzan.ro>
+Date:   Thu Feb 9 00:03:38 2012 +0200
+
+Avoid QA warnings by removing hardcoded rpath from binaries.
+
+[...]
+WARNING: QA Issue: package nspr contains bad RPATH {builddir}/tmp/work/armv5te-poky-linux-gnueabi/nspr-4.8.9-r1/nspr-4.8.9/mozilla/nsprpub/pr/tests/../../dist/lib
+in file {builddir}/tmp/work/armv5te-poky-linux-gnueabi/nspr-4.8.9-r1/packages-split/nspr/usr/lib/nspr/tests/multiwait
+[...]
+
+Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
+Upstream-Status: Pending
+
+Index: nspr-4.8.9/mozilla/nsprpub/pr/tests/Makefile.in
+===================================================================
+--- nsprpub.orig/pr/tests/Makefile.in	2012-02-11 00:01:10.476220505 +0200
++++ nsprpub/pr/tests/Makefile.in	2012-02-10 23:57:40.000000000 +0200
+@@ -379,7 +379,7 @@
+ endif
+ 
+ ifeq (,$(filter-out Linux GNU GNU_%,$(OS_ARCH)))
+-    LDOPTS += -Xlinker -rpath $(ABSOLUTE_LIB_DIR)
++    LDOPTS += -Xlinker
+     ifeq ($(USE_PTHREADS),1)
+         EXTRA_LIBS = -lpthread
+     endif

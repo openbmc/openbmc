@@ -1,0 +1,26 @@
+With libtool generating shared and static version of libraries needs -fPIC flags
+without this it will not generate the commands to create shared linked library
+Its more enforced by libtool 2.4. I have not checked it with older libtool
+libiconv 1.11.x is relatively old release and libtool 2.4 did not exist when it
+was released these kind of problem are more likely
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: libiconv-1.11.1/lib/Makefile.in
+===================================================================
+--- libiconv-1.11.1.orig/lib/Makefile.in
++++ libiconv-1.11.1/lib/Makefile.in
+@@ -70,9 +70,9 @@ preloadable_libiconv.so : preloadable_li
+ 
+ preloadable_libiconv_linux.so : $(SOURCES)
+ 	if test -n "@GCC@"; then \
+-	  $(LIBTOOL_LINK) $(CC) $(LDFLAGS) $(INCLUDES) $(CFLAGS) $(CPPFLAGS) $(DEFS) -fPIC -DPIC -DLIBICONV_PLUG $(SOURCES) -shared -o preloadable_libiconv_linux.so; \
++	  $(LIBTOOL_LINK) $(CC) $(LDFLAGS) $(INCLUDES) $(CFLAGS) $(CPPFLAGS) $(DEFS) -fPIC -DPIC -DLIBICONV_PLUG $(SOURCES) -rpath $(libdir) -o libpreload_iconv.la && cp .libs/libpreload_iconv.so preloadable_libiconv_linux.so; \
+ 	else \
+-	  $(LIBTOOL_LINK) $(CC) $(LDFLAGS) $(INCLUDES) $(CFLAGS) $(CPPFLAGS) $(DEFS) -KPIC -DPIC -DLIBICONV_PLUG $(SOURCES) -shared -o preloadable_libiconv_linux.so; \
++	  $(LIBTOOL_LINK) $(CC) $(LDFLAGS) $(INCLUDES) $(CFLAGS) $(CPPFLAGS) $(DEFS) -KPIC -DPIC -DLIBICONV_PLUG $(SOURCES) -rpath $(libdir) -o libpreload_iconv.la && cp .libs/libpreload_iconv.so preloadable_libiconv_linux.so; \
+ 	fi
+ 
+ preloadable_libiconv_solaris.so : $(SOURCES)

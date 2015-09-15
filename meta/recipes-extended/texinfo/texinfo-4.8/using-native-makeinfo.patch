@@ -1,0 +1,24 @@
+From 9b0df7d6d3c18cfac82c291d60a5357d1bc8d9d0 Mon Sep 17 00:00:00 2001
+From: "Roy.Li" <rongqing.li@windriver.com>
+Date: Wed, 10 Sep 2014 17:10:03 +0800
+Subject: [PATCH] using native makeinfo
+
+Upstream-Status: Pending
+
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+---
+ doc/Makefile.am                                |   2 +-
+
+diff --git a/doc/Makefile.am b/doc/Makefile.am
+index 63df818..b6ceb34 100644
+--- a/doc/Makefile.am
++++ b/doc/Makefile.am
+@@ -19,7 +19,7 @@ man_MANS = info.1 infokey.1 install-info.1 makeinfo.1 texindex.1 texi2dvi.1 \
+ 
+ # Use the programs built in our distribution, taking account of possible
+ # cross-compiling.
+-MAKEINFO = $(top_builddir)/$(native_tools)/makeinfo/makeinfo
++MAKEINFO = makeinfo
+ INSTALL_INFO = $(top_builddir)/$(native_tools)/util/install-info
+ 
+ TXI_XLATE = txi-cs.tex txi-de.tex txi-en.tex txi-es.tex txi-fr.tex \

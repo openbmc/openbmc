@@ -1,0 +1,29 @@
+Remove some sub-components which need gtk+.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Rogerio Nunes <ronunes@gmail.com>
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+
+Update patch for alsa-tools 1.0.29
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+diff --git a/Makefile b/Makefile
+index 2457a1c..72346d9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,9 +1,9 @@
+ VERSION = 1.0.29
+ TOP = .
+-SUBDIRS = as10k1 envy24control \
+-	  mixartloader pcxhrloader rmedigicontrol sb16_csp seq sscape_ctl \
+-	  us428control usx2yloader vxloader echomixer \
+-	  hwmixvolume hdajackretask hda-verb hdajacksensetest
++SUBDIRS = as10k1 \
++	  mixartloader pcxhrloader sb16_csp seq sscape_ctl \
++	  us428control usx2yloader vxloader \
++	  hwmixvolume hda-verb hdajacksensetest
+ 
+ all:
+ 	@for i in $(SUBDIRS); do \

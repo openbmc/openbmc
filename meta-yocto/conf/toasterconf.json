@@ -1,0 +1,119 @@
+{
+    "config": {
+        "MACHINE"      : "qemux86",
+        "DISTRO"       : "poky",
+        "IMAGE_FSTYPES": "ext3 jffs2 tar.bz2",
+        "IMAGE_INSTALL_append": "",
+        "PACKAGE_CLASSES": "package_rpm",
+        "SDKMACHINE"   : "x86_64"
+    },
+    "layersources": [
+        {
+            "name": "Local Yocto Project",
+            "sourcetype": "local",
+            "apiurl": "../../",
+            "branches": ["HEAD", "master", "fido", "dizzy"],
+            "layers": [
+                {
+                    "name": "openembedded-core",
+                    "local_path": "meta",
+                    "vcs_url": "remote:origin",
+                    "dirpath": "meta"
+                },
+                {
+                    "name": "meta-yocto",
+                    "local_path": "meta-yocto",
+                    "vcs_url": "remote:origin",
+                    "dirpath": "meta-yocto"
+                },
+                {
+                    "name": "meta-yocto-bsp",
+                    "local_path": "meta-yocto-bsp",
+                    "vcs_url": "remote:origin",
+                    "dirpath": "meta-yocto-bsp"
+                }
+
+            ]
+        },
+        {
+            "name": "OpenEmbedded",
+            "sourcetype": "layerindex",
+            "apiurl": "http://layers.openembedded.org/layerindex/api/",
+            "branches": ["master", "fido", "dizzy"]
+        },
+        {
+            "name": "Imported layers",
+            "sourcetype": "imported",
+            "apiurl": "",
+            "branches": ["master", "fido", "dizzy", "HEAD"]
+
+        }
+    ],
+    "bitbake" : [
+        {
+            "name": "master",
+            "giturl": "remote:origin",
+            "branch": "master",
+            "dirpath": "bitbake"
+        },
+        {
+            "name": "fido",
+            "giturl": "remote:origin",
+            "branch": "fido",
+            "dirpath": "bitbake"
+        },
+        {
+            "name": "dizzy",
+            "giturl": "remote:origin",
+            "branch": "dizzy",
+            "dirpath": "bitbake"
+        },
+        {
+            "name": "HEAD",
+            "giturl": "remote:origin",
+            "branch": "HEAD",
+            "dirpath": "bitbake"
+        }
+    ],
+
+    "defaultrelease": "master",
+
+    "releases": [
+        {
+            "name": "master",
+            "description": "Yocto Project master",
+            "bitbake": "master",
+            "branch": "master",
+            "defaultlayers": [ "openembedded-core", "meta-yocto", "meta-yocto-bsp"],
+            "layersourcepriority": { "Imported layers": 99, "Local Yocto Project" : 10, "OpenEmbedded" :  0 },
+            "helptext": "Toaster will run your builds using the tip of the <a href=\"http://git.yoctoproject.org/cgit/cgit.cgi/poky/log/\">Yocto Project master branch</a>, where active development takes place. This is not a stable branch, so your builds might not work as expected."
+        },
+        {
+            "name": "fido",
+            "description": "Yocto Project 1.8 Fido",
+            "bitbake": "fido",
+            "branch": "fido",
+            "defaultlayers": [ "openembedded-core", "meta-yocto", "meta-yocto-bsp"],
+            "layersourcepriority": { "Imported layers": 99, "Local Yocto Project" : 10, "OpenEmbedded" :  0 },
+            "helptext": "Toaster will run your builds with the tip of the <a href=\"http://git.yoctoproject.org/cgit/cgit.cgi/poky/log/?h=fido\">Yocto Project 1.8 \"Fido\"</a> branch."
+        },
+        {
+            "name": "dizzy",
+            "description": "Yocto Project 1.7 Dizzy",
+            "bitbake": "dizzy",
+            "branch": "dizzy",
+            "defaultlayers": [ "openembedded-core", "meta-yocto", "meta-yocto-bsp"],
+            "layersourcepriority": { "Imported layers": 99, "Local Yocto Project" : 10, "OpenEmbedded" :  0 },
+            "helptext": "Toaster will run your builds with the tip of the <a href=\"http://git.yoctoproject.org/cgit/cgit.cgi/poky/log/?h=dizzy\">Yocto Project 1.7 \"Dizzy\"</a> branch."
+        },
+        {
+            "name": "local",
+            "description": "Local Yocto Project",
+            "bitbake": "HEAD",
+            "branch": "HEAD",
+            "defaultlayers": [ "openembedded-core", "meta-yocto", "meta-yocto-bsp"],
+            "layersourcepriority": { "Imported layers": 99, "Local Yocto Project" : 10, "OpenEmbedded" :  0 },
+            "helptext": "Toaster will run your builds with the version of the Yocto Project you have cloned or downloaded to your computer."
+        }
+    ]
+}

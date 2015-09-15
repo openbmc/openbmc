@@ -1,0 +1,258 @@
+#!/bin/sh
+#
+# Copyright (c) 2010-2013,  Intel Corporation.
+# All Rights Reserved
+# 
+# This program is free software;  you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY;  without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+# the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program;  if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+#
+
+#
+# This script is intended to be used to prepare a series of patches
+# and a cover letter in an appropriate and consistent format for
+# submission to Open Embedded and The Yocto Project, as well as to
+# related projects and layers.
+#
+
+ODIR=pull-$$
+RELATIVE_TO="master"
+COMMIT_ID="HEAD"
+PREFIX="PATCH"
+RFC=0
+
+usage() {
+CMD=$(basename $0)
+cat <<EOM
+Usage: $CMD [-h] [-o output_dir] [-m msg_body_file] [-s subject] [-r relative_to] [-i commit_id] [-d relative_dir] -u remote [-b branch]
+  -b branch           Branch name in the specified remote (default: current branch)
+  -c                  Create an RFC (Request for Comment) patch series
+  -h                  Display this help message
+  -i commit_id        Ending commit (default: HEAD)
+  -m msg_body_file    The file containing a blurb to be inserted into the summary email
+  -o output_dir       Specify the output directory for the messages (default: pull-PID)
+  -p prefix           Use [prefix N/M] instead of [PATCH N/M] as the subject prefix
+  -r relative_to      Starting commit (default: master)
+  -s subject          The subject to be inserted into the summary email
+  -u remote           The git remote where the branch is located
+  -d relative_dir     Generate patches relative to directory
+
+ Examples:
+   $CMD -u contrib -b nitin/basic
+   $CMD -u contrib -r distro/master -i nitin/distro -b nitin/distro
+   $CMD -u contrib -r master -i misc -b nitin/misc -o pull-misc
+   $CMD -u contrib -p "RFC PATCH" -b nitin/experimental
+   $CMD -u contrib -i misc -b nitin/misc -d ./bitbake
+EOM
+}
+
+# Parse and validate arguments
+while getopts "b:cd:hi:m:o:p:r:s:u:" OPT; do
+	case $OPT in
+	b)
+		BRANCH="$OPTARG"
+		;;
+	c)
+		RFC=1
+		;;
+	d)
+		RELDIR="$OPTARG"
+		;;
+	h)
+		usage
+		exit 0
+		;;
+	i)
+		COMMIT_ID="$OPTARG"
+		;;
+	m)
+		BODY="$OPTARG"
+		if [ ! -e "$BODY" ]; then
+			echo "ERROR: Body file does not exist"
+			exit 1
+		fi
+		;;
+	o)
+		ODIR="$OPTARG"
+		;;
+	p)
+		PREFIX="$OPTARG"
+		;;
+	r)
+		RELATIVE_TO="$OPTARG"
+		;;
+	s)
+		SUBJECT="$OPTARG"
+		;;
+	u)
+		REMOTE="$OPTARG"
+		REMOTE_URL=$(git config remote.$REMOTE.url)
+		if [ $? -ne 0 ]; then
+			echo "ERROR: git config failed to find a url for '$REMOTE'"
+			echo
+			echo "To add a remote url for $REMOTE, use:"
+			echo "  git config remote.$REMOTE.url <url>"
+			exit 1
+		fi
+
+		# Rewrite private URLs to public URLs
+		# Determine the repository name for use in the WEB_URL later
+		case "$REMOTE_URL" in
+		*@*)
+			USER_RE="[A-Za-z0-9_.@][A-Za-z0-9_.@-]*\$\?"
+			PROTO_RE="[a-z][a-z+]*://"
+			GIT_RE="\(^\($PROTO_RE\)\?$USER_RE@\)\([^:/]*\)[:/]\(.*\)"
+			REMOTE_URL=${REMOTE_URL%.git}
+			REMOTE_REPO=$(echo $REMOTE_URL | sed "s#$GIT_RE#\4#")
+			REMOTE_URL=$(echo $REMOTE_URL | sed "s#$GIT_RE#git://\3/\4#")
+			;;
+		*)
+			echo "WARNING: Unrecognized remote URL: $REMOTE_URL"
+			echo "         The pull and browse URLs will likely be incorrect"
+			;;
+		esac
+		;;
+	esac
+done
+
+if [ -z "$BRANCH" ]; then
+	BRANCH=$(git branch | grep -e "^\* " | cut -d' ' -f2)
+	echo "NOTE: Assuming remote branch '$BRANCH', use -b to override."
+fi
+
+if [ -z "$REMOTE_URL" ]; then
+	echo "ERROR: Missing parameter -u, no git remote!"
+	usage
+	exit 1
+fi
+
+if [ $RFC -eq 1 ]; then
+	PREFIX="RFC $PREFIX"
+fi
+
+
+# Set WEB_URL from known remotes
+WEB_URL=""
+case "$REMOTE_URL" in
+	*git.yoctoproject.org*)
+		WEB_URL="http://git.yoctoproject.org/cgit.cgi/$REMOTE_REPO/log/?h=$BRANCH"
+		;;
+	*git.pokylinux.org*)
+		WEB_URL="http://git.pokylinux.org/cgit.cgi/$REMOTE_REPO/log/?h=$BRANCH"
+		;;
+	*git.openembedded.org*)
+		WEB_URL="http://cgit.openembedded.org/cgit.cgi/$REMOTE_REPO/log/?h=$BRANCH"
+		;;
+	*github.com*)
+		WEB_URL="https://github.com/$REMOTE_REPO/tree/$BRANCH"
+		;;
+esac
+
+# Perform a sanity test on the web URL. Issue a warning if it is not
+# accessible, but do not abort as users may want to run offline.
+if [ -n "$WEB_URL" ]; then
+	wget --no-check-certificate -q $WEB_URL -O /dev/null
+	if [ $? -ne 0 ]; then
+		echo "WARNING: Branch '$BRANCH' was not found on the contrib git tree."
+		echo "         Please check your remote and branch parameter before sending."
+		echo ""
+	fi
+fi
+
+if [ -e $ODIR ]; then
+	echo "ERROR: output directory $ODIR exists."
+	exit 1
+fi
+mkdir $ODIR
+
+if [ -n "$RELDIR" ]; then
+	ODIR=$(realpath $ODIR)
+	pdir=$(pwd)
+	cd $RELDIR
+	extraopts="--relative"
+fi
+
+# Generate the patches and cover letter
+git format-patch $extraopts -M40 --subject-prefix="$PREFIX" -n -o $ODIR --thread=shallow --cover-letter $RELATIVE_TO..$COMMIT_ID > /dev/null
+
+[ -n "$RELDIR" ] && cd $pdir
+
+# Customize the cover letter
+CL="$ODIR/0000-cover-letter.patch"
+PM="$ODIR/pull-msg"
+GIT_VERSION=$(`git --version` | tr -d '[:alpha:][:space:].' | sed 's/\(...\).*/\1/')
+NEWER_GIT_VERSION=210
+if [ $GIT_VERSION -lt $NEWER_GIT_VERSION ]; then
+	git request-pull $RELATIVE_TO $REMOTE_URL $COMMIT_ID >> "$PM"
+else
+	git request-pull $RELATIVE_TO $REMOTE_URL :$BRANCH >> "$PM"
+fi
+if [ $? -ne 0 ]; then
+	echo "ERROR: git request-pull reported an error"
+	exit 1
+fi
+
+# The cover letter already has a diffstat, remove it from the pull-msg
+# before inserting it.
+sed -n "0,\#$REMOTE_URL# p" "$PM" | sed -i "/BLURB HERE/ r /dev/stdin" "$CL"
+rm "$PM"
+
+# If this is an RFC, make that clear in the cover letter
+if [ $RFC -eq 1 ]; then
+(cat <<EOM
+Please review the following changes for suitability for inclusion. If you have
+any objections or suggestions for improvement, please respond to the patches. If
+you agree with the changes, please provide your Acked-by.
+
+EOM
+) | sed -i "/BLURB HERE/ r /dev/stdin" "$CL"
+fi
+
+# Insert the WEB_URL if there is one
+if [ -n "$WEB_URL" ]; then
+	echo "  $WEB_URL" | sed -i "\#$REMOTE_URL# r /dev/stdin" "$CL"
+fi
+
+
+# If the user specified a message body, insert it into the cover letter and
+# remove the BLURB token.
+if [ -n "$BODY" ]; then
+	sed -i "/BLURB HERE/ r $BODY" "$CL"
+	sed -i "/BLURB HERE/ d" "$CL"
+fi
+
+# If the user specified a subject, replace the SUBJECT token with it.
+if [ -n "$SUBJECT" ]; then
+	sed -i -e "s/\*\*\* SUBJECT HERE \*\*\*/$SUBJECT/" "$CL"
+fi
+
+
+# Generate report for user
+cat <<EOM
+The following patches have been prepared:
+$(for PATCH in $(ls $ODIR/*); do echo "    $PATCH"; done)
+
+Review their content, especially the summary mail:
+    $CL
+
+When you are satisfied, you can send them with:
+    send-pull-request -a -p $ODIR
+EOM
+
+# Check the patches for trailing white space
+egrep -q -e "^\+.*\s+$" $ODIR/*
+if [ $? -ne 1 ]; then
+	echo
+	echo "WARNING: Trailing white space detected at these locations"
+	egrep -nH --color -e "^\+.*\s+$" $ODIR/*
+fi

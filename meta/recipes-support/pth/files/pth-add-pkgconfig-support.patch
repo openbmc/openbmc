@@ -1,0 +1,105 @@
+Upstream-Status: Pending
+
+Add pkgconfig support to pth.
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+
+Index: Makefile.in
+===========================================================
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -47,6 +47,9 @@ datadir     = @datadir@
+ 
+ DESTDIR     =
+ 
++pkgconfigdir = ${libdir}/pkgconfig
++pkgconfig_DATA = pth.pc
++
+ ##
+ ##  ____ TOOL DEFINITIONS ___________________________________________
+ ##
+@@ -216,7 +219,7 @@ test_pthread: test_pthread.o test_common.o libpthread.la
+ 
+ #   install the package
+ install: all-for-install
+-	@$(MAKE) $(MKFLAGS) install-dirs install-pth @INSTALL_PTHREAD@
++	@$(MAKE) $(MKFLAGS) install-dirs install-pth @INSTALL_PTHREAD@ install-pkgconfigDATA
+ 	@touch .done-install >/dev/null 2>&1 || $(TRUE)
+ 	@$(MAKE) $(MKFLAGS) what-next
+ install-dirs:
+@@ -227,6 +230,7 @@ install-dirs:
+ 	$(SHTOOL) mkdir -f -p -m 755 $(DESTDIR)$(mandir)/man1
+ 	$(SHTOOL) mkdir -f -p -m 755 $(DESTDIR)$(mandir)/man3
+ 	$(SHTOOL) mkdir -f -p -m 755 $(DESTDIR)$(datadir)/aclocal
++	$(SHTOOL) mkdir -f -p -m 755 $(DESTDIR)$(pkgconfigdir)
+ install-pth:
+ 	$(SHTOOL) install -c -m 755 pth-config $(DESTDIR)$(bindir)/pth-config
+ 	$(SHTOOL) install -c -m 644 $(S)pth-config.1 $(DESTDIR)$(mandir)/man1/pth-config.1
+@@ -242,12 +246,16 @@ install-pthread:
+ 	$(SHTOOL) install -c -m 644 $(S)pthread.3 $(DESTDIR)$(mandir)/man3/pthread.3
+ 	@umask 022; $(LIBTOOL) --mode=install \
+ 	$(SHTOOL) install -c libpthread.la $(DESTDIR)$(libdir)/libpthread.la
++install-pkgconfigDATA: $(pkgconfig_DATA)
++	$(SHTOOL) install -c -m 644 $(pkgconfig_DATA) $(DESTDIR)$(pkgconfigdir)/$(pkgconfig_DATA)
+ 
+ #   uninstall the package
+ uninstall:
+-	@$(MAKE) $(MKFLAGS) @UNINSTALL_PTHREAD@ uninstall-pth uninstall-dirs
++	@$(MAKE) $(MKFLAGS) uninstall-pkgconfigDATA @UNINSTALL_PTHREAD@ uninstall-pth uninstall-dirs
+ 	@touch .done-uninstall >/dev/null 2>&1 || $(TRUE)
+ 	@$(MAKE) $(MKFLAGS) what-next
++uninstall-pkgconfigDATA:
++	$(RM) $(DESTDIR)$(pkgconfigdir)/$(pkgconfig_DATA)
+ uninstall-pthread:
+ 	$(RM) $(DESTDIR)$(bindir)/pthread-config
+ 	$(RM) $(DESTDIR)$(mandir)/man1/pthread-config.1
+@@ -271,6 +279,7 @@ uninstall-dirs:
+ 	-$(RMDIR) $(DESTDIR)$(includedir) >/dev/null 2>&1 || $(TRUE)
+ 	-$(RMDIR) $(DESTDIR)$(bindir) >/dev/null 2>&1 || $(TRUE)
+ 	-$(RMDIR) $(DESTDIR)$(prefix) >/dev/null 2>&1 || $(TRUE)
++	-$(RMDIR) $(DESTDIR)$(pkgconfigdir) > /dev/null 2>&1 ||$(TRUE)
+ 
+ #   strip down the source tree to its minimum
+ striptease:
+Index: configure.ac
+===========================================================
+--- a/configure.ac
++++ b/configure.ac
+@@ -656,6 +656,13 @@ pth_acmac.h dnl
+ chmod +rx pthread-config
+ chmod +rx pth-config
+ )dnl
++
++PTH_VERSION=`echo $PTH_VERSION_STR | cut -d' ' -f1`
++AC_SUBST(PTH_VERSION)
++
++AC_CONFIG_FILES([pth.pc])
++AC_OUTPUT
++
+ if test ".$enable_pthread" = .no; then
+     rm -f pthread-config
+     rm -f pthread.h
+Index: pth.pc.in
+===========================================================
+--- /dev/null
++++ b/pth.pc.in
+@@ -0,0 +1,16 @@
++prefix=@prefix@
++exec_prefix=@exec_prefix@
++libdir=@libdir@
++includedir=@includedir@
++bindir=@bindir@
++mandir=@mandir@
++datadir=@datadir@
++acdir=@datadir@/aclocal
++
++Name: pth
++Description: GNU Portable Threads
++Requires:
++Version: @PTH_VERSION@
++Libs: -L${libdir} -lpth
++Libs.private: 
++Cflags: -I${includedir}
+-- 
+1.7.5.4
+

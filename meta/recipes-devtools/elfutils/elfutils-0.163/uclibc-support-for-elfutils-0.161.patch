@@ -1,0 +1,106 @@
+From 3daec2dd11a04955f95e8f65a48820103d84dbec Mon Sep 17 00:00:00 2001
+From: Junling Zheng <zhengjunling@huawei.com>
+Date: Thu, 9 Apr 2015 12:12:49 +0000
+Subject: [PATCH] uclibc support for elfutils 0.161
+
+on uclibc systems libintl and libuargp are separate from libc.
+so they need to be specified on commandline when we use proxy-libintl
+then libintl is a static archive so it should be listed last since
+elfutils does not respect disable-nls we need to link in libintl
+
+We add a new option --enable-uclibc which will be used to control
+the uclibc specific configurations during build.
+
+Upstream-Status: Inappropriate [uclibc specific]
+
+Signed-off-by: Khem Raj <raj.khem>
+Signed-off-by: Junling Zheng <zhengjunling@huawei.com>
+[Junling Zheng:
+ - adjust context
+]
+---
+ configure.ac       | 8 ++++++++
+ libcpu/Makefile.am | 4 ++++
+ libdw/Makefile.am  | 7 ++++++-
+ libelf/Makefile.am | 5 +++++
+ 4 files changed, 23 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index a1ad6db..81fc33f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -70,6 +70,14 @@ AS_IF([test "$use_locks" = yes],
+ 
+ AH_TEMPLATE([USE_LOCKS], [Defined if libraries should be thread-safe.])
+ 
++AC_ARG_ENABLE([uclibc],
++AS_HELP_STRING([--enable-uclibc], [Use uclibc for system libraries]),
++use_uclibc=yes, use_uclibc=no)
++AM_CONDITIONAL(USE_UCLIBC, test "$use_uclibc" = yes)
++AS_IF([test "$use_uclibc" = yes], [AC_DEFINE(USE_UCLIBC)])
++
++AH_TEMPLATE([USE_UCLIBC], [Defined if uclibc libraries are used.])
++
+ AC_PROG_CC
+ AC_PROG_RANLIB
+ AC_PROG_YACC
+diff --git a/libcpu/Makefile.am b/libcpu/Makefile.am
+index 3beccf3..9ba6c04 100644
+--- a/libcpu/Makefile.am
++++ b/libcpu/Makefile.am
+@@ -80,6 +80,10 @@ i386_parse_CFLAGS = -DNMNES="`wc -l < i386.mnemonics`"
+ i386_lex.o: i386_parse.h
+ i386_gendis_LDADD = $(libeu) -lm
+ 
++if USE_UCLIBC
++i386_gendis_LDADD += -luargp -lintl
++endif
++
+ i386_parse.h: i386_parse.c ;
+ 
+ EXTRA_DIST = defs/i386
+diff --git a/libdw/Makefile.am b/libdw/Makefile.am
+index 887da6b..d31b428 100644
+--- a/libdw/Makefile.am
++++ b/libdw/Makefile.am
+@@ -102,6 +102,11 @@ endif
+ libdw_pic_a_SOURCES =
+ am_libdw_pic_a_OBJECTS = $(libdw_a_SOURCES:.c=.os)
+ 
++libdw_so_LDLIBS =
++if USE_UCLIBC
++libdw_so_LDLIBS += -lintl -luargp
++endif
++
+ libdw_so_SOURCES =
+ libdw.so$(EXEEXT): $(srcdir)/libdw.map libdw_pic.a ../libdwelf/libdwelf_pic.a \
+ 	  ../libdwfl/libdwfl_pic.a ../libebl/libebl.a \
+@@ -112,7 +117,7 @@ libdw.so$(EXEEXT): $(srcdir)/libdw.map libdw_pic.a ../libdwelf/libdwelf_pic.a \
+ 		-Wl,--enable-new-dtags,-rpath,$(pkglibdir) \
+ 		-Wl,--version-script,$<,--no-undefined \
+ 		-Wl,--whole-archive $(filter-out $<,$^) -Wl,--no-whole-archive\
+-		-ldl $(zip_LIBS)
++		-ldl $(zip_LIBS) $(libdw_so_LDLIBS)
+ 	@$(textrel_check)
+ 	ln -fs $@ $@.$(VERSION)
+ 
+diff --git a/libelf/Makefile.am b/libelf/Makefile.am
+index afcb2aa..02836a1 100644
+--- a/libelf/Makefile.am
++++ b/libelf/Makefile.am
+@@ -93,7 +93,12 @@ libelf_a_SOURCES = elf_version.c elf_hash.c elf_error.c elf_fill.c \
+ libelf_pic_a_SOURCES =
+ am_libelf_pic_a_OBJECTS = $(libelf_a_SOURCES:.c=.os)
+ 
++
+ libelf_so_LDLIBS =
++if USE_UCLIBC
++libelf_so_LDLIBS += -lintl -luargp
++endif
++
+ if USE_LOCKS
+ libelf_so_LDLIBS += -lpthread
+ endif
+-- 
+1.8.3.4
+

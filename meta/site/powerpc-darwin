@@ -1,0 +1,7 @@
+# pkgconfig-native for OS X buid
+ac_cv_sizeof_char=${ac_cv_sizeof_char=1}
+ac_cv_sizeof_int=${ac_cv_sizeof_int=4}
+ac_cv_sizeof_long=${ac_cv_sizeof_long=4}
+ac_cv_sizeof_long_long=${ac_cv_sizeof_long_long=8}
+ac_cv_sizeof_short=${ac_cv_sizeof_short=2}
+ac_cv_sizeof_void_p=${ac_cv_sizeof_void_p=4}

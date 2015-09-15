@@ -1,0 +1,41 @@
+Upstream-Status: Inappropriate [debian patch]
+
+This patch address a namespace collision with libc.
+
+Although there is no "#include <regex.h>" in the source file, at
+runtime, it's unintentionally linked to the libc version, the regcomp of
+libc is called instead the pcre one using pcre's data structure...
+that looks like a disaster.
+
+Can patch is from Debian (and Ubuntu 11.04alpha has it also).
+
+[sgw: added patch comment]
+Signed-off-by: Qing He <qing.he@intel.com>
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+--- a/pcreposix.h	2010-05-17 00:17:23.000000000 +0800
++++ b/pcreposix.h	2009-01-15 04:32:17.000000000 +0800
+@@ -133,14 +130,19 @@
+ 
+ /* The functions */
+ 
+-PCREPOSIX_EXP_DECL int regcomp(regex_t *, const char *, int);
+-PCREPOSIX_EXP_DECL int regexec(const regex_t *, const char *, size_t,
++PCREPOSIX_EXP_DECL int pcreposix_regcomp(regex_t *, const char *, int);
++PCREPOSIX_EXP_DECL int pcreposix_regexec(const regex_t *, const char *, size_t,
+                      regmatch_t *, int);
+-PCREPOSIX_EXP_DECL size_t regerror(int, const regex_t *, char *, size_t);
+-PCREPOSIX_EXP_DECL void regfree(regex_t *);
++PCREPOSIX_EXP_DECL size_t pcreposix_regerror(int, const regex_t *, char *, size_t);
++PCREPOSIX_EXP_DECL void pcreposix_regfree(regex_t *);
+ 
+ #ifdef __cplusplus
+ }   /* extern "C" */
+ #endif
+ 
++#define regcomp pcreposix_regcomp
++#define regexec pcreposix_regexec
++#define regerror pcreposix_regerror
++#define regfree pcreposix_regfree
++
+ #endif /* End of pcreposix.h */

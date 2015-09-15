@@ -1,0 +1,18 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+Don't build the doc examples - we don't need them and in fact they
+never successfully built in previous iterations of the lttng-ust
+recipe anyway.
+
+Signed-off-by: Tom Zanussi <tom.zanussi@intel.com>
+
+Index: doc/Makefile.am
+===================================================================
+--- a/doc/Makefile.am
++++ b/doc/Makefile.am
+@@ -1,4 +1,4 @@
+-SUBDIRS = . examples
++SUBDIRS = .
+ 
+ dist_man_MANS = man/lttng-gen-tp.1 \
+ 	man/lttng-ust.3 \

@@ -1,0 +1,26 @@
+JSObject: Create explicit instantiation of putByIndexBeyondVectorLengthWithoutAttributes
+
+Reason for change: newer gcc might optimize away the templates
+and they wont be available for other .cpp files to use as these
+are used in a different .cpp we need to tell compiler to explicitly
+instantiate them.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Pending
+
+Index: webkitgtk-2.8.5/Source/JavaScriptCore/runtime/JSObject.cpp
+===================================================================
+--- webkitgtk-2.8.5.orig/Source/JavaScriptCore/runtime/JSObject.cpp
++++ webkitgtk-2.8.5/Source/JavaScriptCore/runtime/JSObject.cpp
+@@ -1965,6 +1965,10 @@ void JSObject::putByIndexBeyondVectorLen
+     }
+ }
+ 
++template void JSObject::putByIndexBeyondVectorLengthWithoutAttributes<Int32Shape>(ExecState* exec, unsigned i, JSValue value);
++template void JSObject::putByIndexBeyondVectorLengthWithoutAttributes<DoubleShape>(ExecState* exec, unsigned i, JSValue value);
++template void JSObject::putByIndexBeyondVectorLengthWithoutAttributes<ContiguousShape>(ExecState* exec, unsigned i, JSValue value);
++
+ void JSObject::putByIndexBeyondVectorLengthWithArrayStorage(ExecState* exec, unsigned i, JSValue value, bool shouldThrow, ArrayStorage* storage)
+ {
+     VM& vm = exec->vm();

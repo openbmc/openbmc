@@ -1,0 +1,75 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          tcf-agent
+# Default-Start:     3 5
+# Default-Stop:      0 1 2 6
+# Short-Description: Target Communication Framework agent
+### END INIT INFO
+
+DAEMON_PATH=/usr/sbin/tcf-agent
+DAEMON_NAME=`basename $DAEMON_PATH`
+
+. /etc/init.d/functions
+
+test -x $DAEMON_PATH || exit 0
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+export PATH
+
+RETVAL=0
+
+case "$1" in
+    start)
+        echo -n "Starting $DAEMON_NAME: "
+        $DAEMON_PATH -d -L- -l0
+        RETVAL=$?
+        if [ $RETVAL -eq 0 ] ; then
+            echo "OK"
+            touch /var/lock/subsys/$DAEMON_NAME
+        else
+            echo "FAIL"
+        fi
+        ;;
+
+    stop)
+        echo -n "Stopping $DAEMON_NAME: "
+        count=0
+        while [ -n "`/bin/pidof $DAEMON_PATH`" -a $count -lt 10 ] ; do
+            killproc $DAEMON_PATH >& /dev/null
+            sleep 1
+            RETVAL=$?
+            if [ $RETVAL != 0 -o -n "`/bin/pidof $DAEMON_PATH`" ] ; then
+                sleep 3
+            fi
+            count=`expr $count + 1`
+        done
+        rm -f /var/lock/subsys/$DAEMON_NAME
+        if [ -n "`/bin/pidof $DAEMON_PATH`" ] ; then
+            echo "FAIL"
+        else
+            echo "OK"
+        fi
+        ;;
+
+    restart)
+        $0 stop
+        sleep 1
+        $0 start
+        ;;
+
+    status)
+        status $DAEMON_NAME
+        RETVAL=$?
+        ;;
+
+    condrestart)
+        [ -f /var/lock/subsys/$DAEMON_NAME ] && $0 restart
+        ;;
+
+    *)
+        echo "usage: $0 { start | stop | status | restart | condrestart | status }"
+        ;;
+esac
+
+exit $RETVAL
+

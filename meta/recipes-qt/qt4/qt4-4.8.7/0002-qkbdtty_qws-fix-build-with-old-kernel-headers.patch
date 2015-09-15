@@ -1,0 +1,50 @@
+From 5e6b1051afa3099a02a758b0596236759d70670e Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Wed, 26 Sep 2012 20:18:08 +0200
+Subject: [PATCH 02/21] qkbdtty_qws: fix build with old kernel headers
+
+This issue is that with C++ compiler process an old version of kernel
+header file, coincidently that file has a variable named 'new':
+
+* 'embedded/qkbdtty_qws.cpp' include 'linux/vt.h';
+* '/usr/include/linux/vt.h' has below code on SLED-11.x:
+    + unsigned int new;
+
+On mostly hosts it has been changed to: new -> newev.
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ src/gui/embedded/qkbdtty_qws.cpp | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/src/gui/embedded/qkbdtty_qws.cpp b/src/gui/embedded/qkbdtty_qws.cpp
+index a46811b..762138f 100644
+--- a/src/gui/embedded/qkbdtty_qws.cpp
++++ b/src/gui/embedded/qkbdtty_qws.cpp
+@@ -54,8 +54,20 @@
+ 
+ #if defined Q_OS_LINUX
+ #  include <linux/kd.h>
++
++/* Workaround kernel headers using "new" as variable name. The problem
++ is specific to SLED-11, other distros use "newev" rather than "new" */
++#ifdef __cplusplus
++#warning "workaround kernel headers using new as variable name on SLED 11"
++#define new newev
++#endif
++
+ #  include <linux/vt.h> //TODO: move vt handling somewhere else (QLinuxFbScreen?)
+ 
++#ifdef __cplusplus
++#undef new
++#endif
++
+ #  include "qscreen_qws.h"
+ #  include "qwindowsystem_qws.h"
+ #  include "qapplication.h"
+-- 
+1.8.0
+

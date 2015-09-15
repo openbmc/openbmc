@@ -1,0 +1,19 @@
+The awk pattern was checked *before* the Perl pattern, so the perl
+script with BEGIN{...} would be reported as awk, this patch fixes it.
+
+Upstream-Status: Backport [debian]
+
+Signed-off-by: Christoph Biedl <debian.axhn@manchmal.in-ulm.de>
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+diff --git a/magic/Magdir/commands b/magic/Magdir/commands
+--- a/magic/Magdir/commands
++++ b/magic/Magdir/commands
+@@ -57,6 +57,7 @@
+ 0	string/wt	#!\ /usr/bin/awk	awk script text executable
+ !:mime	text/x-awk
+ 0	regex/4096	=^\\s{0,100}BEGIN\\s{0,100}[{]	awk or perl script text
++!:strength - 12
+ 
+ # AT&T Bell Labs' Plan 9 shell
+ 0	string/wt	#!\ /bin/rc	Plan 9 rc shell script text executable

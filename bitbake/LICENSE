@@ -1,0 +1,10 @@
+BitBake is licensed under the GNU General Public License version 2.0. See COPYING for further details.
+
+The following external components are distributed with this software:
+
+* The Toaster Simple UI application is based upon the Django project template, the files of which are covered by the BSD license and are copyright (c) Django Software
+Foundation and individual contributors.
+
+* Twitter Bootstrap (including Glyphicons), redistributed under the Apache License 2.0.
+
+* jQuery is redistributed under the MIT license.

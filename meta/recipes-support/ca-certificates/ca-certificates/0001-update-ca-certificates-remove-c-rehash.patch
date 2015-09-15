@@ -1,0 +1,46 @@
+Upstream-Status: Pending
+
+From 111e905fe931da1a3800accfc675cc01c8ee080c Mon Sep 17 00:00:00 2001
+From: Ulf Samuelsson <ulf@emagii.com>
+Date: Tue, 28 Feb 2012 06:42:58 +0100
+Subject: [PATCH] update-ca-certificates: remove c rehash
+
+Updated earlier patch to apply clean on 2012-02-12
+Signed-off-by: Ulf Samuelsson <ulf@emagii.com>
+---
+ sbin/update-ca-certificates |   20 ++++++++++----------
+ 1 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/sbin/update-ca-certificates b/sbin/update-ca-certificates
+index 5375950..c567e3d 100755
+--- a/sbin/update-ca-certificates
++++ b/sbin/update-ca-certificates
+@@ -132,16 +132,16 @@ rm -f "$CERTBUNDLE"
+ ADDED_CNT=$(wc -l < "$ADDED")
+ REMOVED_CNT=$(wc -l < "$REMOVED")
+
+-if [ "$ADDED_CNT" -gt 0 ] || [ "$REMOVED_CNT" -gt 0 ]
+-then
+-  # only run if set of files has changed
+-  if [ "$verbose" = 0 ]
+-  then
+-    c_rehash . > /dev/null
+-  else
+-    c_rehash .
+-  fi
+-fi
++#if [ "$ADDED_CNT" -gt 0 ] || [ "$REMOVED_CNT" -gt 0 ]
++#then
++#  # only run if set of files has changed
++#  if [ "$verbose" = 0 ]
++#  then
++#    c_rehash . > /dev/null
++#  else
++#    c_rehash .
++#  fi
++#fi
+
+ chmod 0644 "$TEMPBUNDLE"
+ mv -f "$TEMPBUNDLE" "$CERTBUNDLE"
+--
+1.7.4.1

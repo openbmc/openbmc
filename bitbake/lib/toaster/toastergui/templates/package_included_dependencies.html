@@ -1,0 +1,110 @@
+{% extends "package_detail_base.html" %}
+{% load projecttags %}
+
+{% block title %}
+    <h1>
+        {{package.fullpackagespec}}
+        <script> fmtAliasHelp("{{package.name}}", "{{package.alias}}", false) </script>
+        <small>({{target.target}})</small>
+    </h1>
+{% endblock title %}
+
+{% block tabcontent %}
+    {% with packageFileCount=package.buildfilelist_package.count %}
+    {% include "package_included_tabs.html" with active_tab="dependencies" %}
+    <div class="tab-content">
+       <div class="tab-pane active" id="dependencies">
+       {% ifnotequal runtime_deps|length 0 %}
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>Package</th>
+                        <th>Version</th>
+                        <th class='sizecol span2'>Size</th>
+                    </tr>
+                </thead>
+                <tbody>
+					{% for runtime_dep in runtime_deps %}
+                        <tr {{runtime_dep.size|format_vpackage_rowclass}} >
+                            {% if runtime_dep.size != -1 %}
+                            <td>
+                               <a href="{% url 'package_included_detail' build.id target.id runtime_dep.depends_on_id %}">
+                                    {{runtime_dep.name}}
+                                </a>
+                                <script>fmtAliasHelp("{{runtime_dep.name}}", "{{runtime_dep.alias}}", true)</script>
+                            </td>
+                            {% else %}
+                            <td>
+                                {{runtime_dep.name|format_vpackage_namehelp}}
+                            </td>
+                            {% endif %}
+                            <td>{{runtime_dep.version}}&nbsp;</td>
+                            <td class='sizecol'>{{runtime_dep.size|filtered_filesizeformat}}&nbsp;</td>
+                        </tr>
+					{% endfor %}
+                 </tbody>
+            </table>
+        {% else %}
+            <div class="alert alert-info">
+                <strong>{{package.fullpackagespec}}</strong> has no runtime dependencies.
+            </div>
+        {% endifnotequal %}
+
+        {% ifnotequal other_deps|length 0 %}
+            <h3>Other runtime relationships</h3>
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>Package</th>
+                        <th>Version</th>
+                        <th class='sizecol span2'>Size</th>
+                        <th>
+                            <i class="icon-question-sign get-help" title="Five relationship types exist: recommends, suggests, provides, replaces and conflicts"></i>
+                            Relationship type
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+					{% for other_dep in other_deps %}
+                        {% if other_dep.installed %}
+                            <tr {{other_dep.size|format_vpackage_rowclass}}>
+                                {% if other_dep.size != -1 %}
+                                <td>
+                                    <a href="{% url 'package_included_detail' build.id target.id other_dep.depends_on_id %}">
+                                        {{other_dep.name}}
+                                        <script>
+                                        fmtAliasHelp("{{other_dep.name}}","{{other_dep.alias}}", true)
+                                        </script>
+                                    </a>
+                                </td>
+                                {% else %}
+                                    <td>
+                                        {{other_dep.name|format_vpackage_namehelp}}
+                                    </td>
+                                {% endif %}
+                                <td>{{other_dep.version}}&nbsp;</td>
+                                <td class='sizecol'>{{other_dep.size|filtered_filesizeformat}}&nbsp;</td>
+                                <td>
+                                    {{other_dep.dep_type_display}}
+                                    <i class="icon-question-sign get-help hover-help" title="{{other_dep.dep_type_help}}" ></i>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr class="muted">
+                                <td>{{other_dep.name}}</td>
+                                <td>{{other_dep.version}}</td>
+                                <td></td>
+                                <td>
+                                    {{other_dep.dep_type_display}}
+                                    <i class="icon-question-sign get-help hover-help" title="{{other_dep.dep_type_help}}" ></i>
+                                </td>
+                            </tr>
+                        {% endif %}
+					{% endfor %}
+                </tbody>
+            </table>
+        {% endifnotequal %}
+        </div> <!-- end tab-pane -->
+    </div> <!-- end tab content -->
+    {% endwith %}
+{% endblock tabcontent %}
