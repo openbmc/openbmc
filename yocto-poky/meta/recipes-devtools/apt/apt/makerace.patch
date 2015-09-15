@@ -1,0 +1,23 @@
+I was seeing various issues with parallel make, mainly due to to what was likely 
+partially installed headers. If you change into the source directory and
+"NOISY=1 make  ../obj/apt-pkg/sourcelist.opic" in apt-pkg, you'll see it 
+doesn't have any dependencies on the headers being installed. This patch
+fixes that so things build correctly.
+
+RP 2012/3/19
+
+Upstream-Status: Pending
+
+Index: apt-0.9.9.4/buildlib/library.mak
+===================================================================
+--- apt-0.9.9.4.orig/buildlib/library.mak	2013-07-31 15:45:07.320440575 +0300
++++ apt-0.9.9.4/buildlib/library.mak	2013-07-31 15:46:49.440440561 +0300
+@@ -61,7 +61,7 @@
+ 
+ # Compilation rules
+ vpath %.cc $(SUBDIRS)
+-$(OBJ)/%.opic: %.cc $(LIBRARYDEPENDS)
++$(OBJ)/%.opic: %.cc $(LIBRARYDEPENDS) $($(LOCAL)-HEADERS)
+ 	echo Compiling $< to $@
+ 	$(CXX) -c $(INLINEDEPFLAG) $(CPPFLAGS) $(CXXFLAGS) $(PICFLAGS) -o $@ $<
+ 	$(DoDep)

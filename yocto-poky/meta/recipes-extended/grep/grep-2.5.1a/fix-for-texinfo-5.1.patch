@@ -1,0 +1,17 @@
+Upstream-Status: Inappropriate [Poky Specific this is gplv2 version]
+
+Signed-off-by Saul Wold <sgw@linux.intel.com>
+
+Index: grep-2.5.1a/doc/grep.texi
+===================================================================
+--- grep-2.5.1a.orig/doc/grep.texi
++++ grep-2.5.1a/doc/grep.texi
+@@ -288,7 +288,7 @@ This version number should be included i
+ Print a usage message briefly summarizing these command-line options
+ and the bug-reporting address, then exit.
+ 
+-@itemx --binary-files=@var{type}
++@item --binary-files=@var{type}
+ @opindex --binary-files
+ @cindex binary files
+ If the first few bytes of a file indicate that the file contains binary

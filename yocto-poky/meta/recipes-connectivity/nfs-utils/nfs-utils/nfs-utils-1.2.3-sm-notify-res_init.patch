@@ -1,0 +1,36 @@
+Fixes errors like
+sm-notify[1070]: DNS resolution of a.b.c.d..com failed; retrying later
+This error will occur anytime sm-notify is run before the network if fully up,
+which is happening more and more with parallel startup systems.
+The res_init() call is simple, safe, quick, and a patch to use it should be
+able to go upstream.  Presumably the whole reason sm-notify tries several
+times is to wait for possible changes to the network configuration, but without
+calling res_init() it will never be aware of those changes
+
+Backported drom Fedora
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+
+diff -up nfs-utils-1.2.3/utils/statd/sm-notify.c.orig nfs-utils-1.2.3/utils/statd/sm-notify.c
+--- nfs-utils-1.2.3/utils/statd/sm-notify.c.orig	2010-09-28 08:24:16.000000000 -0400
++++ nfs-utils-1.2.3/utils/statd/sm-notify.c	2010-10-15 16:44:43.487119601 -0400
+@@ -28,6 +28,9 @@
+ #include <netdb.h>
+ #include <errno.h>
+ #include <grp.h>
++#include <netinet/in.h>
++#include <arpa/nameser.h>
++#include <resolv.h>
+ 
+ #include "sockaddr.h"
+ #include "xlog.h"
+@@ -84,6 +87,7 @@ smn_lookup(const char *name)
+ 	};
+ 	int error;
+ 
++	res_init();
+ 	error = getaddrinfo(name, NULL, &hint, &ai);
+ 	if (error != 0) {
+ 		xlog(D_GENERAL, "getaddrinfo(3): %s", gai_strerror(error));

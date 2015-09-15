@@ -1,0 +1,47 @@
+Fix visibility of various C++ functions, inspired by a similar patch in the Fink
+project: 
+http://www.mail-archive.com/fink-commits@lists.sourceforge.net/msg75742.html
+
+JL 05/07/10 
+
+Upstream-Status: Pending
+
+Index: beecrypt-4.2.1/include/beecrypt/c++/beeyond/BeeCertificate.h
+===================================================================
+--- beecrypt-4.2.1.orig/include/beecrypt/c++/beeyond/BeeCertificate.h	2010-11-26 17:22:57.000000000 +0800
++++ beecrypt-4.2.1/include/beecrypt/c++/beeyond/BeeCertificate.h	2010-11-26 17:23:01.000000000 +0800
+@@ -147,13 +147,13 @@
+ 			mutable bytearray* enc;
+ 
+ 			BeeCertificate();
+-			BeeCertificate(InputStream& in) throw (IOException);
+ 
+ 			void encodeTBS(DataOutputStream& out) const throw (IOException);
+ 
+ 			bytearray* encodeTBS() const throw (CertificateEncodingException);
+ 
+ 		public:
++			BeeCertificate(InputStream& in) throw (IOException);
+ 			BeeCertificate(const BeeCertificate&) throw (CloneNotSupportedException);
+ 			virtual ~BeeCertificate();
+ 
+Index: beecrypt-4.2.1/include/beecrypt/c++/security/Security.h
+===================================================================
+--- beecrypt-4.2.1.orig/include/beecrypt/c++/security/Security.h	2010-11-26 17:20:55.000000000 +0800
++++ beecrypt-4.2.1/include/beecrypt/c++/security/Security.h	2010-11-26 17:21:36.000000000 +0800
+@@ -61,7 +61,6 @@
+ 			friend class SecureRandom;
+ 			friend class Signature;
+ 
+-		private:
+ 			struct spi
+ 			{
+ 				Object* cspi;
+@@ -76,6 +75,7 @@
+ 			static spi* getSpi(const String& algo, const String& type, const Provider&) throw (NoSuchAlgorithmException);
+ 			static spi* getFirstSpi(const String& type);
+ 
++		private:
+ 			static const String& getKeyStoreDefault();
+ 
+ 			static bool _init;

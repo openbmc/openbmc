@@ -1,0 +1,32 @@
+From a5efaa96fd934eb245c234a5275fcf62698ef986 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 2 Apr 2015 21:38:03 -0700
+Subject: [PATCH] mips: Use compiler internal define for linux
+
+__linux__ is defined by compiler when building for
+linux platforms, lets use it
+
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/mips/ffitarget.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/mips/ffitarget.h b/src/mips/ffitarget.h
+index 717d659..6faa358 100644
+--- a/src/mips/ffitarget.h
++++ b/src/mips/ffitarget.h
+@@ -32,7 +32,7 @@
+ #error "Please do not include ffitarget.h directly into your source.  Use ffi.h instead."
+ #endif
+ 
+-#ifdef linux
++#ifdef __linux__
+ # include <asm/sgidefs.h>
+ #elif defined(__rtems__)
+ /*
+-- 
+2.1.4
+

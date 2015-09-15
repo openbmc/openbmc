@@ -1,0 +1,20 @@
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+Index: pygtk-2.24.0/gtk/gtkunixprint.override
+===================================================================
+--- pygtk-2.24.0.orig/gtk/gtkunixprint.override
++++ pygtk-2.24.0/gtk/gtkunixprint.override
+@@ -102,11 +102,6 @@ _wrap_gtk_print_job_get_surface(PyGObjec
+     if (pyg_error_check(&error))
+         return NULL;
+ 
+-#if PYCAIRO_VERSION_HEX >= 0x1010600
+-    return PycairoSurface_FromSurface(cairo_surface_reference(surface), NULL);
+-#else
+-    return PycairoSurface_FromSurface(cairo_surface_reference(surface), NULL, NULL);
+-#endif
+ }
+ %%
+ override gtk_print_job_send kwargs

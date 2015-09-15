@@ -1,0 +1,24 @@
+Make CHANNELSDIR in smart empty, since this causes host contamination issues
+on some RPM-based hosts on which smart is already installed.
+
+[YOCTO #3881]
+
+Upstream-Status: Inappropriate [embedded specific]
+
+diff --git a/smart/plugins/channelsync.py b/smart/plugins/channelsync.py
+index 3ba95ff..646d696 100644
+--- a/smart/plugins/channelsync.py
++++ b/smart/plugins/channelsync.py
+@@ -23,7 +23,11 @@ from smart.channel import *
+ from smart import *
+ import os
+ 
+-CHANNELSDIR = "/etc/smart/channels/"
++# For now, we leave the definition of CHANNELSDIR empty. This prevents smart
++# from erroneously consider the  build host's channels while setting up its
++# channels [YOCTO #3881]. If this feature will be used in the future, CHANNELSDIR
++# should be set to a proper value.
++CHANNELSDIR = ""
+ 
+ def syncChannels(channelsdir, force=None):
+ 

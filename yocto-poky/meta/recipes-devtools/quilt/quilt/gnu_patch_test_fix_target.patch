@@ -1,0 +1,26 @@
+Upstream-Status: Pending
+
+the test should be skipped for cross compiling.
+
+Signed-off-by: Qing He <qing.he@intel.com>
+
+diff --git a/configure.ac b/configure.ac
+index 026a36c..8af591b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -245,6 +245,7 @@ fi
+ QUILT_COMPAT_PROG_PATH(DIFF, diff)
+ QUILT_COMPAT_PROG_PATH(PATCH, patch)
+ 
++if test "x$cross_compiling" != "xyes"; then
+ # Sun diff and others will not work because GNU patch options are used.
+ AC_MSG_CHECKING([the version of $DIFF])
+ if $DIFF --version 2>/dev/null | grep GNU >/dev/null; then
+@@ -293,6 +294,7 @@ current version of patch from ftp.gnu.org, or if you already have GNU patch
+ then you can supply its path with the '--with-patch=' option.
+ ])
+ fi
++fi
+ 
+ QUILT_COMPAT_PROG_PATH(FIND, find)
+ 

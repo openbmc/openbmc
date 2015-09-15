@@ -1,0 +1,24 @@
+Source: None
+Upstream-Status: Pending
+Author: Khem Raj <raj.khem@gmail.com>
+Date: 2011-03-03
+Description:
+This patch fixes build issue found when compiling rpm-native on ubuntu
+11.04-alpha. Problem is that linker does not get correct set of dependent
+libraries when linking mtree binary which results in undefined symbols
+in librpmio.so. This patch adds correct flags to mtree_LDADD to account
+for rpmio deps
+
+Index: rpm-5.4.14/tools/Makefile.am
+===================================================================
+--- rpm-5.4.14.orig/tools/Makefile.am
++++ rpm-5.4.14/tools/Makefile.am
+@@ -186,7 +186,7 @@ grep_LDADD =		$(RPMIO_LDADD_COMMON)
+ 
+ mtree_SOURCES =		rpmmtree.c
+ mtree_LDFLAGS =		@LDFLAGS_STATIC@ $(LDFLAGS)
+-mtree_LDADD =		$(RPM_LDADD_COMMON)
++mtree_LDADD =		$(RPMIO_LDADD_COMMON)
+ 
+ rpmrepo_SOURCES =	rpmrepo.c
+ rpmrepo_CPPFLAGS =	$(AM_CPPFLAGS) -I$(top_srcdir)/scripts -I$(top_builddir)/scripts $(CPPFLAGS)

@@ -1,0 +1,63 @@
+Upstream-Status: Inappropriate [legacy version]
+
+# coreutils uses gnulib which conflicts with newer libc header on futimens
+# this patch simply renames coreutils futimes to avoid confliction
+#
+# Signed-off-by Kevin Tian <kevin.tian@intel.com>, 2010-08-18
+# (this patch is licensed under GPLv2)
+
+diff --git a/lib/utimens.c b/lib/utimens.c
+index 71bc510..ae870b8 100644
+--- a/lib/utimens.c
++++ b/lib/utimens.c
+@@ -75,7 +75,7 @@ struct utimbuf
+    Return 0 on success, -1 (setting errno) on failure.  */
+ 
+ int
+-futimens (int fd ATTRIBUTE_UNUSED,
++futimens_coreutils (int fd ATTRIBUTE_UNUSED,
+ 	  char const *file, struct timespec const timespec[2])
+ {
+   /* Some Linux-based NFS clients are buggy, and mishandle time stamps
+@@ -185,5 +185,5 @@ futimens (int fd ATTRIBUTE_UNUSED,
+ int
+ utimens (char const *file, struct timespec const timespec[2])
+ {
+-  return futimens (-1, file, timespec);
++  return futimens_coreutils (-1, file, timespec);
+ }
+diff --git a/lib/utimens.h b/lib/utimens.h
+index 0097aaa..13fc45a 100644
+--- a/lib/utimens.h
++++ b/lib/utimens.h
+@@ -1,3 +1,3 @@
+ #include <time.h>
+-int futimens (int, char const *, struct timespec const [2]);
++int futimens_coreutils (int, char const *, struct timespec const [2]);
+ int utimens (char const *, struct timespec const [2]);
+diff --git a/src/copy.c b/src/copy.c
+index 4bdb75c..04634f1 100644
+--- a/src/copy.c
++++ b/src/copy.c
+@@ -518,7 +518,7 @@ copy_reg (char const *src_name, char const *dst_name,
+       timespec[0] = get_stat_atime (src_sb);
+       timespec[1] = get_stat_mtime (src_sb);
+ 
+-      if (futimens (dest_desc, dst_name, timespec) != 0)
++      if (futimens_coreutils (dest_desc, dst_name, timespec) != 0)
+ 	{
+ 	  error (0, errno, _("preserving times for %s"), quote (dst_name));
+ 	  if (x->require_preserve)
+diff --git a/src/touch.c b/src/touch.c
+index a79c26d..6ef317d 100644
+--- a/src/touch.c
++++ b/src/touch.c
+@@ -182,7 +182,7 @@ touch (const char *file)
+       t = timespec;
+     }
+ 
+-  ok = (futimens (fd, (fd == STDOUT_FILENO ? NULL : file), t) == 0);
++  ok = (futimens_coreutils (fd, (fd == STDOUT_FILENO ? NULL : file), t) == 0);
+ 
+   if (fd == STDIN_FILENO)
+     {

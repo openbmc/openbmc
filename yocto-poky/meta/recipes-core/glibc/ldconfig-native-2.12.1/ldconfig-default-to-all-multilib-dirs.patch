@@ -1,0 +1,37 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+make ldconfig default to both /lib+/usr/lib, /lib32+/usr/lib32 and
+/lib64+/usr/lib64 on bi-ABI architectures.
+
+---
+ ldconfig.c |   10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff -urpN a/ldconfig.c b/ldconfig.c
+--- a/ldconfig.c
++++ b/ldconfig.c
+@@ -52,7 +52,11 @@
+ 
+ #define SYSCONFDIR "/etc"
+ #define LIBDIR "/usr/lib"
++#define LIBDIR32 "/usr/lib32"
++#define LIBDIR64 "/usr/lib64"
+ #define SLIBDIR "/lib"
++#define SLIBDIR32 "/lib32"
++#define SLIBDIR64 "/lib64"
+ # define N_(msgid)  msgid
+ #define _(msg) msg
+ 
+@@ -1373,6 +1377,12 @@ main (int argc, char **argv)
+       add_system_dir (SLIBDIR);
+       if (strcmp (SLIBDIR, LIBDIR))
+ 	add_system_dir (LIBDIR);
++      add_system_dir (SLIBDIR32);
++      if (strcmp (SLIBDIR32, LIBDIR32))
++	add_system_dir (LIBDIR32);
++      add_system_dir (SLIBDIR64);
++      if (strcmp (SLIBDIR64, LIBDIR64))
++	add_system_dir (LIBDIR64);
+     }
+ 
+   const char *aux_cache_file = _PATH_LDCONFIG_AUX_CACHE;

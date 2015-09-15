@@ -1,0 +1,43 @@
+From 5310abba864cfe3a8b65af130729447604190b29 Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen@dominion.thruhere.net>
+Date: Tue, 29 Nov 2011 17:03:27 +0100
+Subject: [PATCH] iw: version.sh: don't use git describe for versioning
+
+It will detect top-level git repositories like the Angstrom setup-scripts and break.
+
+Upstream-Status: Pending
+
+Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
+---
+ version.sh | 16 +---------------
+ 1 file changed, 1 insertion(+), 15 deletions(-)
+
+diff --git a/version.sh b/version.sh
+index 11d124b..5d423c4 100755
+--- a/version.sh
++++ b/version.sh
+@@ -3,21 +3,7 @@
+ VERSION="3.15"
+ OUT="$1"
+ 
+-if [ -d .git ] && head=`git rev-parse --verify HEAD 2>/dev/null`; then
+-	git update-index --refresh --unmerged > /dev/null
+-	descr=$(git describe)
+-
+-	# on git builds check that the version number above
+-	# is correct...
+-	[ "${descr%%-*}" = "v$VERSION" ] || exit 2
+-
+-	v="${descr#v}"
+-	if git diff-index --name-only HEAD | read dummy ; then
+-		v="$v"-dirty
+-	fi
+-else
+-	v="$VERSION"
+-fi
++v="$VERSION"
+ 
+ echo '#include "iw.h"' > "$OUT"
+ echo "const char iw_version[] = \"$v\";" >> "$OUT"
+-- 
+1.7.7.3

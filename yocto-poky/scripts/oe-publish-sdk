@@ -1,0 +1,143 @@
+#!/usr/bin/env python
+
+# OpenEmbedded SDK publishing tool
+
+# oe-publish-sdk publish <ext-sdk> <destination>
+# <ext-sdk>: extensible SDK to publish (path to the installer shell script)
+# <destination>: local or remote location which servers as an SDK update server
+# e.g.
+# oe-publish-sdk /path/to/sdk-ext.sh /mnt/poky/sdk-ext
+# oe-publish-sdk /path/to/sdk-ext.sh user@host:/opt/poky/sdk-ext
+#
+
+import sys
+import os
+import argparse
+import glob
+import re
+import subprocess
+import logging
+import shutil
+import errno
+
+scripts_path = os.path.dirname(os.path.realpath(__file__))
+lib_path = scripts_path + '/lib'
+sys.path = sys.path + [lib_path]
+import scriptutils
+logger = scriptutils.logger_create('sdktool')
+
+def mkdir(d):
+    try:
+        os.makedirs(d)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise e
+
+def publish(args):
+    logger.debug("In publish function")
+    target_sdk = args.sdk
+    destination = args.dest
+    logger.debug("target_sdk = %s, update_server = %s" % (target_sdk, destination))
+    sdk_basename = os.path.basename(target_sdk)
+
+    # Ensure the SDK exists
+    if not os.path.exists(target_sdk):
+        logger.error("%s doesn't exist" % target_sdk)
+        return -1
+
+    if ':' in destination:
+        is_remote = True
+        host, destdir = destination.split(':')
+        dest_sdk = os.path.join(destdir, sdk_basename)
+    else:
+        is_remote = False
+        dest_sdk = os.path.join(destination, sdk_basename)
+
+    # Making sure the directory exists
+    logger.debug("Making sure the destination directory exists")
+    if not is_remote:
+        mkdir(destination)
+    else:
+        cmd = "ssh %s 'mkdir -p %s'" % (host, destdir)
+        ret = subprocess.call(cmd, shell=True)
+        if ret != 0:
+            logger.error("Making directory %s on %s failed" % (destdir, host))
+            return ret
+
+    # Copying the SDK to the destination
+    logger.info("Copying the SDK to destination")
+    if not is_remote:
+        if os.path.exists(dest_sdk):
+            os.remove(dest_sdk)
+        if (os.stat(target_sdk).st_dev == os.stat(destination).st_dev):
+            os.link(target_sdk, dest_sdk)
+        else:
+            shutil.copy(target_sdk, dest_sdk)
+    else:
+        cmd = "scp %s %s" % (target_sdk, destination)
+        ret = subprocess.call(cmd, shell=True)
+        if ret != 0:
+            logger.error("scp %s %s failed" % (target_sdk, destination))
+            return ret
+
+    # Unpack the SDK
+    logger.info("Unpacking SDK")
+    if not is_remote:
+        cmd = "sh %s -n -y -d %s" % (dest_sdk, destination)
+        ret = subprocess.call(cmd, shell=True)
+        if ret == 0:
+            logger.info('Successfully unpacked %s to %s' % (dest_sdk, destination))
+        else:
+            logger.error('Failed to unpack %s to %s' % (dest_sdk, destination))
+            return ret
+    else:
+        cmd = "ssh %s 'sh %s -n -y -d %s'" % (host, dest_sdk, destdir)
+        ret = subprocess.call(cmd, shell=True)
+        if ret == 0:
+            logger.info('Successfully unpacked %s to %s' % (dest_sdk, destdir))
+        else:
+            logger.error('Failed to unpack %s to %s' % (dest_sdk, destdir))
+            return ret
+
+    # Setting up the git repo
+    if not is_remote:
+        cmd = 'set -e; cd %s/layers; if [ ! -e .git ]; then git init .; mv .git/hooks/post-update.sample .git/hooks/post-update; fi; git add -A .; git commit -q -m "init repo" || true;' % destination
+    else:
+        cmd = "ssh %s 'set -e; cd %s/layers; if [ ! -e .git ]; then git init .; mv .git/hooks/post-update.sample .git/hooks/post-update; fi; git add -A .; git commit -q -m \"init repo\" || true;'" % (host, destdir)
+    ret = subprocess.call(cmd, shell=True)
+    if ret == 0:
+        logger.info('SDK published successfully')
+    else:
+        logger.error('Failed to set up layer git repo')
+    return ret
+
+
+def main():
+    parser = argparse.ArgumentParser(description="OpenEmbedded development tool",
+                                     epilog="Use %(prog)s <subcommand> --help to get help on a specific command")
+    parser.add_argument('-d', '--debug', help='Enable debug output', action='store_true')
+    parser.add_argument('-q', '--quiet', help='Print only errors', action='store_true')
+
+    parser.add_argument('sdk', help='Extensible SDK to publish')
+    parser.add_argument('dest', help='Destination to publish SDK to')
+
+    parser.set_defaults(func=publish)
+
+    args = parser.parse_args()
+
+    if args.debug:
+        logger.setLevel(logging.DEBUG)
+    elif args.quiet:
+        logger.setLevel(logging.ERROR)
+
+    ret = args.func(args)
+    return ret
+
+if __name__ == "__main__":
+    try:
+        ret = main()
+    except Exception:
+        ret = 1
+        import traceback
+        traceback.print_exc(5)
+    sys.exit(ret)

@@ -1,0 +1,66 @@
+sed: add ptest
+
+ptest needs buildtest-TESTS and runtest-TESTS targets.
+serial-tests is required to generate those targets.
+
+And fix following error after add serial-tests.
+
+[snip]
+help2man: can't get `--help' info from ../sed/sed
+make[2]: *** [sed.1] Error 2
+[snip]
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Chong Lu <Chong.Lu@windriver.com>
+---
+ configure.ac          |    2 +-
+ doc/Makefile.am       |    2 +-
+ testsuite/Makefile.am |    6 ++++++
+ 3 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 9d33ec9..4f0c532 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -4,7 +4,7 @@ AC_CONFIG_AUX_DIR(build-aux)
+ AC_CONFIG_SRCDIR([sed/sed.c])
+ AM_CONFIG_HEADER(config.h:config_h.in)
+ AC_PREREQ(2.60)
+-AM_INIT_AUTOMAKE
++AM_INIT_AUTOMAKE([serial-tests])
+ 
+ SED_FEATURE_VERSION=4.2.2
+ AC_DEFINE_UNQUOTED(SED_FEATURE_VERSION, "$SED_FEATURE_VERSION",
+diff --git a/doc/Makefile.am b/doc/Makefile.am
+index af6975c..6fd8c9a 100644
+--- a/doc/Makefile.am
++++ b/doc/Makefile.am
+@@ -25,7 +25,7 @@ $(srcdir)/s-texi: sed-in.texi $(srcdir)/groupify.sed
+ 	fi
+ 	echo stamp > $(srcdir)/s-texi
+ 
+-sed.1: $(top_srcdir)/sed/sed.c $(top_srcdir)/configure.ac $(srcdir)/sed.x
++_sed.1: $(top_srcdir)/sed/sed.c $(top_srcdir)/configure.ac $(srcdir)/sed.x
+ 	$(HELP2MAN) --name "stream editor for filtering and transforming text" \
+ 	  -p sed --include $(srcdir)/sed.x -o $(srcdir)/sed.1 $(SED) 
+ 
+diff --git a/testsuite/Makefile.am b/testsuite/Makefile.am
+index d80e72c..b05f01e 100644
+--- a/testsuite/Makefile.am
++++ b/testsuite/Makefile.am
+@@ -99,5 +99,11 @@ EXTRA_DIST = \
+ # automake makes `check' depend on $(TESTS).  Declare
+ # dummy targets for $(TESTS) so that make does not complain.
+ 
++install-ptest:
++	cd $(BUILDDIR); tar -cf - $(TESTDIR) --exclude *.o | ( cd $(DESTDIR) && tar -xf - )
++	for i in $(EXTRA_DIST) tst-regex2.c; do install $(srcdir)/$$i $(DESTDIR)/$(TESTDIR); done
++	sed -e 's/^Makefile:/_Makefile:/' -e 's/^srcdir = \(.*\)/srcdir = ./' -e 's/bash/sh/' -i $(DESTDIR)/$(TESTDIR)/Makefile
++	for i in `grep -rl "../sed/sed" $(DESTDIR)/$(TESTDIR)`; do sed -e 's/..\/sed\/sed/sed/' -i $$i; done
++
+ .PHONY: $(SEDTESTS)
+ $(SEDTESTS):
+-- 
+1.7.9.5
+

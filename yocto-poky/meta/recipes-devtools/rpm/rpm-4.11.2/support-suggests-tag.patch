@@ -1,0 +1,384 @@
+
+Upstream-Status: Pending
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+Signed-off-by: Ronan Le Martret <ronan.lemartret@open.eurogiciel.org>
+
+diff --git a/build/pack.c b/build/pack.c
+index b6b2bea..5c3d8df 100644
+--- a/build/pack.c
++++ b/build/pack.c
+@@ -273,8 +273,10 @@ static rpmTagVal depevrtags[] = {
+     RPMTAG_CONFLICTVERSION,
+     RPMTAG_ORDERVERSION,
+     RPMTAG_TRIGGERVERSION,
+-    RPMTAG_SUGGESTSVERSION,
+-    RPMTAG_ENHANCESVERSION,
++    RPMTAG_SUGGESTVERSION,
++    RPMTAG_ENHANCEVERSION,
++    RPMTAG_RECOMMENDVERSION,
++    RPMTAG_SUPPLEMENTVERSION,
+     0
+ };
+ 
+diff --git a/build/parsePreamble.c b/build/parsePreamble.c
+index 5772bef..cbbbee3 100644
+--- a/build/parsePreamble.c
++++ b/build/parsePreamble.c
+@@ -821,6 +821,10 @@ static rpmRC handlePreambleTag(rpmSpec spec, Package pkg, rpmTagVal tag,
+ 	}
+ 	/* fallthrough */
+     case RPMTAG_PREREQ:
++    case RPMTAG_RECOMMENDFLAGS:
++    case RPMTAG_SUGGESTFLAGS:
++    case RPMTAG_SUPPLEMENTFLAGS:
++    case RPMTAG_ENHANCEFLAGS:
+     case RPMTAG_CONFLICTFLAGS:
+     case RPMTAG_OBSOLETEFLAGS:
+     case RPMTAG_PROVIDEFLAGS:
+@@ -922,6 +926,10 @@ static struct PreambleRec_s const preambleList[] = {
+     {RPMTAG_ICON,		0, 0, LEN_AND_STR("icon")},
+     {RPMTAG_PROVIDEFLAGS,	0, 0, LEN_AND_STR("provides")},
+     {RPMTAG_REQUIREFLAGS,	2, 0, LEN_AND_STR("requires")},
++    {RPMTAG_RECOMMENDFLAGS,	0, 0, LEN_AND_STR("recommends")},
++    {RPMTAG_SUGGESTFLAGS,	0, 0, LEN_AND_STR("suggests")},
++    {RPMTAG_SUPPLEMENTFLAGS,	0, 0, LEN_AND_STR("supplements")},
++    {RPMTAG_ENHANCEFLAGS,	0, 0, LEN_AND_STR("enhances")},
+     {RPMTAG_PREREQ,		2, 1, LEN_AND_STR("prereq")},
+     {RPMTAG_CONFLICTFLAGS,	0, 0, LEN_AND_STR("conflicts")},
+     {RPMTAG_OBSOLETEFLAGS,	0, 0, LEN_AND_STR("obsoletes")},
+diff --git a/build/parseReqs.c b/build/parseReqs.c
+index ba080a1..1427111 100644
+--- a/build/parseReqs.c
++++ b/build/parseReqs.c
+@@ -61,6 +61,18 @@ rpmRC parseRCPOT(rpmSpec spec, Package pkg, const char *field, rpmTagVal tagN,
+ 	nametag = RPMTAG_REQUIRENAME;
+ 	tagflags |= RPMSENSE_ANY;
+ 	break;
++    case RPMTAG_RECOMMENDFLAGS:
++	nametag = RPMTAG_RECOMMENDNAME;
++	break;
++    case RPMTAG_SUGGESTFLAGS:
++	nametag = RPMTAG_SUGGESTNAME;
++	break;
++    case RPMTAG_SUPPLEMENTFLAGS:
++	nametag = RPMTAG_SUPPLEMENTNAME;
++	break;
++    case RPMTAG_ENHANCEFLAGS:
++	nametag = RPMTAG_ENHANCENAME;
++	break;
+     case RPMTAG_PROVIDEFLAGS:
+ 	nametag = RPMTAG_PROVIDENAME;
+ 	break;
+diff --git a/build/reqprov.c b/build/reqprov.c
+index a368f42..c270af6 100644
+--- a/build/reqprov.c
++++ b/build/reqprov.c
+@@ -81,6 +81,30 @@ int addReqProv(Package pkg, rpmTagVal tagN,
+ 	extra = Flags & RPMSENSE_TRIGGER;
+ 	dsp = &pkg->triggers;
+ 	break;
++    case RPMTAG_RECOMMENDNAME:
++	versiontag = RPMTAG_RECOMMENDVERSION;
++	flagtag = RPMTAG_RECOMMENDFLAGS;
++	extra = Flags & _ALL_REQUIRES_MASK;
++	dsp = &pkg->recommends;
++	break;
++    case RPMTAG_SUGGESTNAME:
++	versiontag = RPMTAG_SUGGESTVERSION;
++	flagtag = RPMTAG_SUGGESTFLAGS;
++	extra = Flags & _ALL_REQUIRES_MASK;
++	dsp = &pkg->suggests;
++	break;
++    case RPMTAG_SUPPLEMENTNAME:
++	versiontag = RPMTAG_SUPPLEMENTVERSION;
++	flagtag = RPMTAG_SUPPLEMENTFLAGS;
++	extra = Flags & _ALL_REQUIRES_MASK;
++	dsp = &pkg->supplements;
++	break;
++    case RPMTAG_ENHANCENAME:
++	versiontag = RPMTAG_ENHANCEVERSION;
++	flagtag = RPMTAG_ENHANCEFLAGS;
++	extra = Flags & _ALL_REQUIRES_MASK;
++	dsp = &pkg->enhances;
++	break;
+     case RPMTAG_REQUIRENAME:
+     default:
+ 	tagN = RPMTAG_REQUIRENAME;
+diff --git a/build/rpmbuild_internal.h b/build/rpmbuild_internal.h
+index a9e4c7c..0a1977f 100644
+--- a/build/rpmbuild_internal.h
++++ b/build/rpmbuild_internal.h
+@@ -93,6 +93,10 @@ struct Package_s {
+     rpmds ds;			/*!< Requires: N = EVR */
+     rpmds requires;
+     rpmds provides;
++    rpmds recommends;
++    rpmds suggests;
++    rpmds supplements;
++    rpmds enhances;
+     rpmds conflicts;
+     rpmds obsoletes;
+     rpmds triggers;
+diff --git a/build/spec.c b/build/spec.c
+index 703ec78..7ae2120 100644
+--- a/build/spec.c
++++ b/build/spec.c
+@@ -139,6 +139,11 @@ static Package freePackage(Package pkg)
+     pkg->ds = rpmdsFree(pkg->ds);
+     pkg->requires = rpmdsFree(pkg->requires);
+     pkg->provides = rpmdsFree(pkg->provides);
++    pkg->recommends = rpmdsFree(pkg->recommends);
++    pkg->suggests = rpmdsFree(pkg->suggests);
++    pkg->supplements = rpmdsFree(pkg->supplements);
++    pkg->enhances = rpmdsFree(pkg->enhances);
++
+     pkg->conflicts = rpmdsFree(pkg->conflicts);
+     pkg->obsoletes = rpmdsFree(pkg->obsoletes);
+     pkg->triggers = rpmdsFree(pkg->triggers);
+diff --git a/lib/rpmds.c b/lib/rpmds.c
+index 7a51167..1e5dda0 100644
+--- a/lib/rpmds.c
++++ b/lib/rpmds.c
+@@ -52,6 +52,22 @@ static int dsType(rpmTagVal tag,
+ 	t = "Requires";
+ 	evr = RPMTAG_REQUIREVERSION;
+ 	f = RPMTAG_REQUIREFLAGS;
++    } else if (tag == RPMTAG_SUPPLEMENTNAME) {
++	t = "Supplements";
++	evr = RPMTAG_SUPPLEMENTVERSION;
++	f = RPMTAG_SUPPLEMENTFLAGS;
++    } else if (tag == RPMTAG_ENHANCENAME) {
++	t = "Enhances";
++	evr = RPMTAG_ENHANCEVERSION;
++	f = RPMTAG_ENHANCEFLAGS;
++    } else if (tag == RPMTAG_RECOMMENDNAME) {
++	t = "Recommends";
++	evr = RPMTAG_RECOMMENDVERSION;
++	f = RPMTAG_RECOMMENDFLAGS;
++    } else if (tag == RPMTAG_SUGGESTNAME) {
++	t = "Suggests";
++	evr = RPMTAG_SUGGESTVERSION;
++	f = RPMTAG_SUGGESTFLAGS;
+     } else if (tag == RPMTAG_CONFLICTNAME) {
+ 	t = "Conflicts";
+ 	evr = RPMTAG_CONFLICTVERSION;
+diff --git a/lib/rpmtag.h b/lib/rpmtag.h
+index 64b03f1..b943229 100644
+--- a/lib/rpmtag.h
++++ b/lib/rpmtag.h
+@@ -217,14 +217,14 @@ typedef enum rpmTag_e {
+     RPMTAG_PRETRANSPROG		= 1153,	/* s[] */
+     RPMTAG_POSTTRANSPROG	= 1154,	/* s[] */
+     RPMTAG_DISTTAG		= 1155,	/* s */
+-    RPMTAG_SUGGESTSNAME		= 1156,	/* s[] extension (unimplemented) */
+-#define	RPMTAG_SUGGESTS RPMTAG_SUGGESTSNAME	/* s[] (unimplemented) */
+-    RPMTAG_SUGGESTSVERSION	= 1157,	/* s[] extension (unimplemented) */
+-    RPMTAG_SUGGESTSFLAGS	= 1158,	/* i[] extension (unimplemented) */
+-    RPMTAG_ENHANCESNAME		= 1159,	/* s[] extension placeholder (unimplemented) */
+-#define	RPMTAG_ENHANCES RPMTAG_ENHANCESNAME	/* s[] (unimplemented) */
+-    RPMTAG_ENHANCESVERSION	= 1160,	/* s[] extension placeholder (unimplemented) */
+-    RPMTAG_ENHANCESFLAGS	= 1161,	/* i[] extension placeholder (unimplemented) */
++    RPMTAG_OLDSUGGESTSNAME	= 1156,	/* s[] (unimplemented) */
++#define	RPMTAG_OLDSUGGESTS RPMTAG_OLDSUGGESTSNAME /* s[] (unimplemented) */
++    RPMTAG_OLDSUGGESTSVERSION	= 1157,	/* s[] (unimplemented) */
++    RPMTAG_OLDSUGGESTSFLAGS	= 1158,	/* i[] (unimplemented) */
++    RPMTAG_OLDENHANCESNAME		= 1159,	/* s[] (unimplemented) */
++#define	RPMTAG_OLDENHANCES RPMTAG_OLDENHANCESNAME /* s[] (unimplemented) */
++    RPMTAG_OLDENHANCESVERSION	= 1160,	/* s[] (unimplemented) */
++    RPMTAG_OLDENHANCESFLAGS	= 1161,	/* i[] (unimplemented) */
+     RPMTAG_PRIORITY		= 1162, /* i[] extension placeholder (unimplemented) */
+     RPMTAG_CVSID		= 1163, /* s (unimplemented) */
+ #define	RPMTAG_SVNID	RPMTAG_CVSID	/* s (unimplemented) */
+@@ -261,6 +261,7 @@ typedef enum rpmTag_e {
+     RPMTAG_BUILDOBSOLETES	= 1194, /* internal (unimplemented) */
+     RPMTAG_DBINSTANCE		= 1195, /* i extension */
+     RPMTAG_NVRA			= 1196, /* s extension */
++
+     /* tags 1997-4999 reserved */
+     RPMTAG_FILENAMES		= 5000, /* s[] extension */
+     RPMTAG_FILEPROVIDE		= 5001, /* s[] extension */
+@@ -307,6 +308,26 @@ typedef enum rpmTag_e {
+     RPMTAG_OBSOLETENEVRS	= 5043, /* s[] extension */
+     RPMTAG_CONFLICTNEVRS	= 5044, /* s[] extension */
+     RPMTAG_FILENLINKS		= 5045,	/* i[] extension */
++    RPMTAG_RECOMMENDNAME	= 5046,	/* s[] */
++#define	RPMTAG_RECOMMENDS RPMTAG_RECOMMENDNAME	/* s[] */
++    RPMTAG_RECOMMENDVERSION	= 5047,	/* s[] */
++    RPMTAG_RECOMMENDFLAGS	= 5048,	/* i[] */
++    RPMTAG_SUGGESTNAME		= 5049,	/* s[] */
++#define	RPMTAG_SUGGESTS RPMTAG_SUGGESTNAME	/* s[] */
++    RPMTAG_SUGGESTVERSION	= 5050,	/* s[] extension */
++    RPMTAG_SUGGESTFLAGS		= 5051,	/* i[] extension */
++    RPMTAG_SUPPLEMENTNAME	= 5052,	/* s[] */
++#define	RPMTAG_SUPPLEMENTS RPMTAG_SUPPLEMENTNAME /* s[] */
++    RPMTAG_SUPPLEMENTVERSION	= 5053,	/* s[] */
++    RPMTAG_SUPPLEMENTFLAGS	= 5054,	/* i[] */
++    RPMTAG_ENHANCENAME		= 5055,	/* s[] */
++#define	RPMTAG_ENHANCES RPMTAG_ENHANCENAME	/* s[] */
++    RPMTAG_ENHANCEVERSION	= 5056,	/* s[] */
++    RPMTAG_ENHANCEFLAGS		= 5057,	/* i[] */
++    RPMTAG_RECOMMENDNEVRS	= 5058, /* s[] extension */
++    RPMTAG_SUGGESTNEVRS		= 5059, /* s[] extension */
++    RPMTAG_SUPPLEMENTNEVRS	= 5060, /* s[] extension */
++    RPMTAG_ENHANCENEVRS		= 5061, /* s[] extension */
+ 
+     RPMTAG_FIRSTFREE_TAG	/*!< internal */
+ } rpmTag;
+diff --git a/lib/tagexts.c b/lib/tagexts.c
+index 29b2bae..e940310 100644
+--- a/lib/tagexts.c
++++ b/lib/tagexts.c
+@@ -761,6 +761,26 @@ static int requirenevrsTag(Header h, rpmtd td, headerGetFlags hgflags)
+     return depnevrsTag(h, td, hgflags, RPMTAG_REQUIRENAME);
+ }
+ 
++static int recommendnevrsTag(Header h, rpmtd td, headerGetFlags hgflags)
++{
++    return depnevrsTag(h, td, hgflags, RPMTAG_RECOMMENDNAME);
++}
++
++static int suggestnevrsTag(Header h, rpmtd td, headerGetFlags hgflags)
++{
++    return depnevrsTag(h, td, hgflags, RPMTAG_SUGGESTNAME);
++}
++
++static int supplementnevrsTag(Header h, rpmtd td, headerGetFlags hgflags)
++{
++    return depnevrsTag(h, td, hgflags, RPMTAG_SUPPLEMENTNAME);
++}
++
++static int enhancenevrsTag(Header h, rpmtd td, headerGetFlags hgflags)
++{
++    return depnevrsTag(h, td, hgflags, RPMTAG_ENHANCENAME);
++}
++
+ static int providenevrsTag(Header h, rpmtd td, headerGetFlags hgflags)
+ {
+     return depnevrsTag(h, td, hgflags, RPMTAG_PROVIDENAME);
+@@ -823,6 +843,10 @@ static const struct headerTagFunc_s rpmHeaderTagExtensions[] = {
+     { RPMTAG_EPOCHNUM,		epochnumTag },
+     { RPMTAG_INSTFILENAMES,	instfilenamesTag },
+     { RPMTAG_REQUIRENEVRS,	requirenevrsTag },
++    { RPMTAG_RECOMMENDNEVRS,	recommendnevrsTag},
++    { RPMTAG_SUGGESTNEVRS,	suggestnevrsTag},
++    { RPMTAG_SUPPLEMENTNEVRS,	supplementnevrsTag},
++    { RPMTAG_ENHANCENEVRS,	enhancenevrsTag},
+     { RPMTAG_PROVIDENEVRS,	providenevrsTag },
+     { RPMTAG_OBSOLETENEVRS,	obsoletenevrsTag },
+     { RPMTAG_CONFLICTNEVRS,	conflictnevrsTag },
+diff --git a/rpmpopt.in b/rpmpopt.in
+index 805599e..036ab4e 100644
+--- a/rpmpopt.in
++++ b/rpmpopt.in
+@@ -67,6 +67,19 @@ rpm	alias --requires	--qf \
+ 	--POPTdesc=$"list capabilities required by package(s)"
+ rpm	alias -R --requires
+ 
++rpm	alias --recommends	--qf \
++  "[%|VERBOSE?{%{RECOMMENDFLAGS:deptype}: }:{}|%{RECOMMENDNEVRS}\n]" \
++	--POPTdesc=$"list capabilities recommended by package(s)"
++rpm	alias --suggests	--qf \
++  "[%|VERBOSE?{%{SUGGESTFLAGS:deptype}: }:{}|%{SUGGESTNEVRS}\n]" \
++	--POPTdesc=$"list capabilities suggested by package(s)"
++rpm	alias --supplements	--qf \
++  "[%|VERBOSE?{%{SUPPLEMENTFLAGS:deptype}: }:{}|%{SUPPLEMENTNEVRS}\n]" \
++	--POPTdesc=$"list capabilities supplemented by package(s)"
++rpm	alias --enhances	--qf \
++  "[%|VERBOSE?{%{ENHANCEFLAGS:deptype}: }:{}|%{ENHANCENEVRS}\n]" \
++	--POPTdesc=$"list capabilities enhanced by package(s)"
++
+ rpm	alias --info --qf '\
+ Name        : %{NAME}\n\
+ %|EPOCH?{Epoch       : %{EPOCH}\n}|\
+diff --git a/tests/data/SPECS/deptest.spec b/tests/data/SPECS/deptest.spec
+index cb4cbbd..7c47f6d 100644
+--- a/tests/data/SPECS/deptest.spec
++++ b/tests/data/SPECS/deptest.spec
+@@ -10,6 +10,10 @@ BuildArch:	noarch
+ %{?provs:Provides: %{provs}}
+ %{?cfls:Conflicts: %{cfls}}
+ %{?obs:Obsoletes: %{obs}}
++%{?recs:Recommends: %{recs}}
++%{?sugs:Suggests: %{sugs}}
++%{?sups:Supplements: %{sups}}
++%{?ens:Enhances: %{ens}}
+ 
+ %description
+ %{summary}
+diff --git a/tests/rpmbuild.at b/tests/rpmbuild.at
+index 6230903..c4c954c 100644
+--- a/tests/rpmbuild.at
++++ b/tests/rpmbuild.at
+@@ -185,3 +185,25 @@ lrwxrwxrwx /opt/globtest/linkgood
+ ],
+ [])
+ AT_CLEANUP
++
++# ------------------------------
++# Check if weak and reverse requires can be built
++AT_SETUP([Weak and reverse requires])
++AT_KEYWORDS([build])
++AT_CHECK([
++
++runroot rpmbuild -bb --quiet \
++	--define "pkg weakdeps" \
++	--define "recs foo > 1.2.3" \
++	--define "sugs bar >= 0.1.2" \
++	--define "sups baz" \
++	--define "ens zap = 3" \
++	  /data/SPECS/deptest.spec
++
++runroot rpm -qp --qf "[%{supplementname}\n]" /build/RPMS/noarch/deptest-weakdeps-1.0-1.noarch.rpm
++],
++[0],
++[baz
++],
++[ignore])
++AT_CLEANUP
+diff --git a/tests/rpmgeneral.at b/tests/rpmgeneral.at
+index 13131e2..80cca63 100644
+--- a/tests/rpmgeneral.at
++++ b/tests/rpmgeneral.at
+@@ -79,6 +79,11 @@ DISTTAG
+ DISTURL
+ DSAHEADER
+ E
++ENHANCEFLAGS
++ENHANCENAME
++ENHANCENEVRS
++ENHANCES
++ENHANCEVERSION
+ EPOCH
+ EPOCHNUM
+ EVR
+@@ -199,6 +204,11 @@ PROVIDES
+ PROVIDEVERSION
+ PUBKEYS
+ R
++RECOMMENDFLAGS
++RECOMMENDNAME
++RECOMMENDNEVRS
++RECOMMENDS
++RECOMMENDVERSION
+ RECONTEXTS
+ RELEASE
+ REMOVETID
+@@ -219,7 +229,17 @@ SOURCE
+ SOURCEPACKAGE
+ SOURCEPKGID
+ SOURCERPM
++SUGGESTFLAGS
++SUGGESTNAME
++SUGGESTNEVRS
++SUGGESTS
++SUGGESTVERSION
+ SUMMARY
++SUPPLEMENTFLAGS
++SUPPLEMENTNAME
++SUPPLEMENTNEVRS
++SUPPLEMENTS
++SUPPLEMENTVERSION
+ TRIGGERCONDS
+ TRIGGERFLAGS
+ TRIGGERINDEX

@@ -1,0 +1,19 @@
+openssl: Fix pod2man des.pod error on Ubuntu 12.04
+
+This is a formatting fix, '=back' is required before
+'=head1' on Ubuntu 12.04.
+
+Upstream-Status: Pending
+Signed-off-by: Baogen Shang <baogen.shang@windriver.com>
+diff -urpN a_origin/des.pod b_modify/des.pod
+--- a_origin/crypto/des/des.pod	2013-08-15 15:02:56.211674589 +0800
++++ b_modify/crypto/des/des.pod	2013-08-15 15:04:14.439674580 +0800
+@@ -181,6 +181,8 @@ the uuencoded file to embed in the begin
+ output.  If there is no name specified after the B<-u>, the name text.des
+ will be embedded in the header.
+ 
++=back
++
+ =head1 SEE ALSO
+ 
+ ps(1),

@@ -1,0 +1,32 @@
+Upstream-Status: Pending
+Signed-off-by: Cristian Iorga <cristian.iorga@intel.com>
+
+From 9ac096d8eccf2d56ece646320c282c8369f8337c Mon Sep 17 00:00:00 2001
+From: Cristian Iorga <cristian.iorga@intel.com>
+Date: Tue, 29 Jul 2014 18:35:59 +0300
+Subject: [PATCH] configure: fix Darwin target detection
+
+fix Darwin target detection for qemu
+cross-compilation.
+
+Signed-off-by: Cristian Iorga <cristian.iorga@intel.com>
+---
+ configure | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/configure b/configure
+index 283c71c..1c66a11 100755
+--- a/configure
++++ b/configure
+@@ -444,6 +444,8 @@ elif check_define __sun__ ; then
+   targetos='SunOS'
+ elif check_define __HAIKU__ ; then
+   targetos='Haiku'
++elif check_define __APPLE__ ; then
++  targetos='Darwin'
+ else
+   targetos=`uname -s`
+ fi
+-- 
+1.9.1
+

@@ -1,0 +1,70 @@
+Without this patch we see rpaths hardcoded into the build which results in QA
+warnings. These rpaths are not needed so lets turn this off.
+
+Upstream-Status: Inappropriate
+(but could be turned into a proper configure option)
+
+RP 2012/03/14
+
+Index: slang-2.2.4/configure
+===================================================================
+--- slang-2.2.4.orig/configure	2012-03-14 23:40:01.283560679 +0000
++++ slang-2.2.4/configure	2012-03-14 23:41:18.023558900 +0000
+@@ -6081,56 +6081,7 @@
+ ELF_CFLAGS="$ELF_CFLAGS $IEEE_CFLAGS"
+ CFLAGS="$CFLAGS $IEEE_CFLAGS"
+ 
+-
+-if test "X$libdir" != "X"
+-then
+-  if test "X$RPATH" = "X"
+-  then
+-
+-case "$host_os" in
+-  *linux*|*solaris* )
+-    if test "X$GCC" = Xyes
+-    then
+-      if test "X$ac_R_nospace" = "Xno"
+-      then
+-        RPATH="-Wl,-R,"
+-      else
+-        RPATH="-Wl,-R"
+-      fi
+-    else
+-      if test "X$ac_R_nospace" = "Xno"
+-      then
+-        RPATH="-R "
+-      else
+-	RPATH="-R"
+-      fi
+-    fi
+-  ;;
+-  *osf*|*openbsd*)
+-    if test "X$GCC" = Xyes
+-    then
+-      RPATH="-Wl,-rpath,"
+-    else
+-      RPATH="-rpath "
+-    fi
+-  ;;
+-  *netbsd*)
+-    if test "X$GCC" = Xyes
+-    then
+-      RPATH="-Wl,-R"
+-    fi
+-  ;;
+-esac
+-
+-    if test "X$RPATH" != "X"
+-    then
+-      RPATH="$RPATH$libdir"
+-    fi
+-  else
+-    RPATH="$RPATH:$libdir"
+-  fi
+-fi
+-
++RPATH=""
+ 
+ # The cast to long int works around a bug in the HP C Compiler
+ # version HP92453-01 B.11.11.23709.GP, which incorrectly rejects

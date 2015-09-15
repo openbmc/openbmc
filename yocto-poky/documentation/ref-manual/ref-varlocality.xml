@@ -1,0 +1,196 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
+[<!ENTITY % poky SYSTEM "../poky.ent"> %poky; ] >
+
+<chapter id='ref-varlocality'>
+    <title>Variable Context</title>
+
+    <para>
+        While you can use most variables in almost any context such as
+        <filename>.conf</filename>, <filename>.bbclass</filename>,
+        <filename>.inc</filename>, and <filename>.bb</filename> files,
+        some variables are often associated with a particular locality or context.
+        This chapter describes some common associations.
+    </para>
+
+    <section id='ref-varlocality-configuration'>
+        <title>Configuration</title>
+
+        <para>
+            The following subsections provide lists of variables whose context is
+            configuration: distribution, machine, and local.
+        </para>
+
+        <section id='ref-varlocality-config-distro'>
+            <title>Distribution (Distro)</title>
+
+            <para>
+               This section lists variables whose configuration context is the
+               distribution, or distro.
+               <itemizedlist>
+                   <listitem><para><filename><link linkend='var-DISTRO'>DISTRO</link></filename></para></listitem>
+                   <listitem><para><filename><link linkend='var-DISTRO_NAME'>DISTRO_NAME</link></filename>
+                       </para></listitem>
+                   <listitem><para><filename><link linkend='var-DISTRO_VERSION'>DISTRO_VERSION</link>
+                       </filename></para></listitem>
+                   <listitem><para><filename><link linkend='var-MAINTAINER'>MAINTAINER</link></filename>
+                       </para></listitem>
+                   <listitem><para><filename><link linkend='var-PACKAGE_CLASSES'>PACKAGE_CLASSES</link>
+                       </filename></para></listitem>
+                   <listitem><para><filename><link linkend='var-TARGET_OS'>TARGET_OS</link></filename>
+                       </para></listitem>
+                   <listitem><para><filename><link linkend='var-TARGET_FPU'>TARGET_FPU</link></filename>
+                       </para></listitem>
+                   <listitem><para><filename><link linkend='var-TCMODE'>TCMODE</link></filename>
+                       </para></listitem>
+                   <listitem><para><filename><link linkend='var-TCLIBC'>TCLIBC</link></filename>
+                       </para></listitem>
+                </itemizedlist>
+            </para>
+        </section>
+
+        <section id='ref-varlocality-config-machine'>
+            <title>Machine</title>
+
+            <para>
+                This section lists variables whose configuration context is the
+                machine.
+                <itemizedlist>
+                    <listitem><para><filename><link linkend='var-TARGET_ARCH'>TARGET_ARCH</link></filename>
+                        </para></listitem>
+                    <listitem><para><filename><link linkend='var-SERIAL_CONSOLES'>SERIAL_CONSOLES</link>
+                        </filename></para></listitem>
+                    <listitem><para><filename><link linkend='var-PACKAGE_EXTRA_ARCHS'>PACKAGE_EXTRA_ARCHS</link>
+                        </filename></para></listitem>
+                    <listitem><para><filename><link linkend='var-IMAGE_FSTYPES'>IMAGE_FSTYPES</link>
+                        </filename></para></listitem>
+                    <listitem><para><filename><link linkend='var-MACHINE_FEATURES'>MACHINE_FEATURES</link>
+                        </filename></para></listitem>
+                    <listitem><para><filename><link linkend='var-MACHINE_EXTRA_RDEPENDS'>MACHINE_EXTRA_RDEPENDS
+                        </link></filename></para></listitem>
+                    <listitem><para><filename><link linkend='var-MACHINE_EXTRA_RRECOMMENDS'>MACHINE_EXTRA_RRECOMMENDS
+                        </link></filename></para></listitem>
+                    <listitem><para><filename><link linkend='var-MACHINE_ESSENTIAL_EXTRA_RDEPENDS'>MACHINE_ESSENTIAL_EXTRA_RDEPENDS
+                        </link></filename></para></listitem>
+                    <listitem><para><filename><link linkend='var-MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS'>
+                        MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS</link></filename></para></listitem>
+                </itemizedlist>
+            </para>
+        </section>
+
+        <section id='ref-varlocality-config-local'>
+            <title>Local</title>
+
+            <para>
+                This section lists variables whose configuration context is the
+                local configuration through the <filename>local.conf</filename>
+                file.
+                <itemizedlist>
+                    <listitem><para><filename><link linkend='var-DISTRO'>DISTRO</link></filename>
+                        </para></listitem>
+                    <listitem><para><filename><link linkend='var-MACHINE'>MACHINE</link></filename>
+                        </para></listitem>
+                    <listitem><para><filename><link linkend='var-DL_DIR'>DL_DIR</link></filename>
+                        </para></listitem>
+                    <listitem><para><filename><link linkend='var-BBFILES'>BBFILES</link></filename>
+                        </para></listitem>
+                    <listitem><para><filename><link linkend='var-EXTRA_IMAGE_FEATURES'>EXTRA_IMAGE_FEATURES
+                        </link></filename></para></listitem>
+                    <listitem><para><filename><link linkend='var-PACKAGE_CLASSES'>PACKAGE_CLASSES</link>
+                        </filename></para></listitem>
+                    <listitem><para><filename><link linkend='var-BB_NUMBER_THREADS'>BB_NUMBER_THREADS</link>
+                        </filename></para></listitem>
+                    <listitem><para><filename><link linkend='var-BBINCLUDELOGS'>BBINCLUDELOGS</link>
+                        </filename></para></listitem>
+                    <listitem><para><filename><link linkend='var-ENABLE_BINARY_LOCALE_GENERATION'>
+                        ENABLE_BINARY_LOCALE_GENERATION</link></filename></para></listitem>
+                </itemizedlist>
+            </para>
+        </section>
+    </section>
+
+    <section id='ref-varlocality-recipes'>
+        <title>Recipes</title>
+
+        <para>
+            The following subsections provide lists of variables whose context is
+            recipes: required, dependencies, path, and extra build information.
+        </para>
+
+        <section id='ref-varlocality-recipe-required'>
+            <title>Required</title>
+
+            <para>
+                This section lists variables that are required for recipes.
+                <itemizedlist>
+                    <listitem><para><filename><link linkend='var-LICENSE'>LICENSE</link>
+                        </filename></para></listitem>
+                    <listitem><para><filename><link linkend='var-LIC_FILES_CHKSUM'>LIC_FILES_CHKSUM</link>
+                        </filename></para></listitem>
+                    <listitem><para><filename><link linkend='var-SRC_URI'>SRC_URI</link></filename> - used
+                        in recipes that fetch local or remote files.
+                        </para></listitem>
+                </itemizedlist>
+            </para>
+        </section>
+
+        <section id='ref-varlocality-recipe-dependencies'>
+            <title>Dependencies</title>
+
+            <para>
+                This section lists variables that define recipe dependencies.
+                <itemizedlist>
+                    <listitem><para><filename><link linkend='var-DEPENDS'>DEPENDS</link>
+                        </filename></para></listitem>
+                    <listitem><para><filename><link linkend='var-RDEPENDS'>RDEPENDS</link>
+                        </filename></para></listitem>
+                    <listitem><para><filename><link linkend='var-RRECOMMENDS'>RRECOMMENDS</link>
+                        </filename></para></listitem>
+                    <listitem><para><filename><link linkend='var-RCONFLICTS'>RCONFLICTS</link>
+                        </filename></para></listitem>
+                    <listitem><para><filename><link linkend='var-RREPLACES'>RREPLACES</link>
+                        </filename></para></listitem>
+                </itemizedlist>
+            </para>
+        </section>
+
+        <section id='ref-varlocality-recipe-paths'>
+            <title>Paths</title>
+
+            <para>
+                This section lists variables that define recipe paths.
+                <itemizedlist>
+                    <listitem><para><filename><link linkend='var-WORKDIR'>WORKDIR</link>
+                        </filename></para></listitem>
+                    <listitem><para><filename><link linkend='var-S'>S</link>
+                        </filename></para></listitem>
+                    <listitem><para><filename><link linkend='var-FILES'>FILES</link>
+                        </filename></para></listitem>
+                </itemizedlist>
+            </para>
+        </section>
+
+        <section id='ref-varlocality-recipe-build'>
+            <title>Extra Build Information</title>
+
+            <para>
+                This section lists variables that define extra build information for recipes.
+                <itemizedlist>
+                    <listitem><para><filename><link linkend='var-EXTRA_OECMAKE'>EXTRA_OECMAKE</link>
+                        </filename></para></listitem>
+                    <listitem><para><filename><link linkend='var-EXTRA_OECONF'>EXTRA_OECONF</link>
+                        </filename></para></listitem>
+                    <listitem><para><filename><link linkend='var-EXTRA_OEMAKE'>EXTRA_OEMAKE</link>
+                        </filename></para></listitem>
+                    <listitem><para><filename><link linkend='var-PACKAGES'>PACKAGES</link></filename>
+                        </para></listitem>
+                    <listitem><para><filename><link linkend='var-DEFAULT_PREFERENCE'>DEFAULT_PREFERENCE
+                        </link></filename></para></listitem>
+                </itemizedlist>
+            </para>
+        </section>
+    </section>
+</chapter>
+<!--
+vim: expandtab tw=80 ts=4 spell spelllang=en_gb
+-->

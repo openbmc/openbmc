@@ -1,0 +1,19 @@
+Upstream-Status:Inappropriate [embedded specific]
+
+Index: perl-5.8.8/config_h.SH
+===================================================================
+--- perl-5.8.8.orig/config_h.SH	2005-11-01 02:13:05.000000000 +0800
++++ perl-5.8.8/config_h.SH	2010-11-01 17:06:07.215219738 +0800
+@@ -709,6 +709,12 @@
+  */
+ #$i_float I_FLOAT		/**/
+ 
++/* I_GDBM:
++ *      This symbol, if defined, indicates that <gdbm.h> exists and should
++ *      be included.
++ */
++#$i_gdbm I_GDBM /**/
++
+ /* I_LIMITS:
+  *	This symbol, if defined, indicates to the C program that it should
+  *	include <limits.h> to get definition of symbols like WORD_BIT or

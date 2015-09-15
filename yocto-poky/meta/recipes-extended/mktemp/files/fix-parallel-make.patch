@@ -1,0 +1,24 @@
+This fixes the parallel make install failure
+
+Upstream-Status: Accepted
+http://www.gratisoft.us/bugzilla/show_bug.cgi?id=528
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+Index: mktemp-1.7/Makefile.in
+===================================================================
+--- mktemp-1.7.orig/Makefile.in
++++ mktemp-1.7/Makefile.in
+@@ -94,10 +94,10 @@ install-dirs:
+ 	$(SHELL) $(srcdir)/mkinstalldirs $(DESTDIR)$(bindir) \
+ 	    $(DESTDIR)$(mandir)/man1
+ 
+-install-binaries: $(PROG)
++install-binaries: install-dirs $(PROG)
+ 	$(INSTALL) -m 0555 $(PROG) $(DESTDIR)$(bindir)/$(PROG)
+ 
+-install-man:
++install-man: install-dirs
+ 	$(INSTALL) -m 0444 $(srcdir)/mktemp.$(mantype) \
+ 	    $(DESTDIR)$(mandir)/man1/mktemp.1
+ 

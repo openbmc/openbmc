@@ -1,0 +1,185 @@
+Upstream-Status: Pending
+
+Author: H.J. Lu <hjl.tools@gmail.com>
+Date:   Tue Dec 6 10:34:53 2011 -0800
+
+    Fix pax-3.4 build for x32
+    
+    off_t is 8byte for x32.  We need to check both _FILE_OFFSET_BITS and
+    size of off_t to see if file offset is 64bit.  This patch adds
+    AC_CHECK_SIZEOF(off_t) and checks SIZEOF_OFF_T == 8.
+
+Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com> 2011/12/06
+
+Index: pax-3.4/configure.in
+===================================================================
+--- pax-3.4.orig/configure.in
++++ pax-3.4/configure.in
+@@ -33,4 +33,7 @@ dnl Checks for header files.
+ dnl Checks for typedefs, structures, and compiler characteristics.
+ AC_C_CONST
+ 
++AC_CHECK_SIZEOF(off_t)
++AC_CHECK_SIZEOF(long)
++
+ AC_OUTPUT([Makefile lib/Makefile src/Makefile])
+Index: pax-3.4/src/ar_io.c
+===================================================================
+--- pax-3.4.orig/src/ar_io.c
++++ pax-3.4/src/ar_io.c
+@@ -378,7 +378,8 @@ ar_close(void)
+ 	 * could have written anything yet.
+ 	 */
+ 	if (frmt == NULL) {
+-#if defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64
++#if (SIZEOF_LONG == 4 && SIZEOF_OFF_T == 8) \
++    || (defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64)
+ 		(void)fprintf(listf, "%s: unknown format, %qu bytes skipped.\n",
+ #else
+ 		(void)fprintf(listf, "%s: unknown format, %lu bytes skipped.\n",
+@@ -391,7 +392,8 @@ ar_close(void)
+ 
+ 	if (strcmp(NM_CPIO, argv0) == 0)
+ 		(void)fprintf(listf,
+-#if defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64
++#if (SIZEOF_LONG == 4 && SIZEOF_OFF_T == 8) \
++    || (defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64)
+ 		    "%qu blocks\n",
+ #else
+ 		    "%lu blocks\n",
+@@ -399,7 +401,8 @@ ar_close(void)
+ 			(rdcnt ? rdcnt : wrcnt) / 5120);
+ 	else if (strcmp(NM_TAR, argv0) != 0)
+ 		(void)fprintf(listf,
+-#if defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64
++#if (SIZEOF_LONG == 4 && SIZEOF_OFF_T == 8) \
++    || (defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64)
+ 		    "%s: %s vol %d, %lu files, %qu bytes read, %qu bytes written.\n",
+ #else
+ 		    "%s: %s vol %d, %lu files, %lu bytes read, %lu bytes written.\n",
+Index: pax-3.4/src/cpio.c
+===================================================================
+--- pax-3.4.orig/src/cpio.c
++++ pax-3.4/src/cpio.c
+@@ -218,7 +218,8 @@ rd_ln_nm (ARCHD *arcn)
+ 	 */
+ 	if ((arcn->sb.st_size == 0) ||
+ 	    (arcn->sb.st_size >= (off_t) sizeof(arcn->ln_name))) {
+-#if defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64
++#if (SIZEOF_LONG == 4 && SIZEOF_OFF_T == 8) \
++    || (defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64)
+ 		paxwarn (1, "Cpio link name length is invalid: %qu",
+ 			 arcn->sb.st_size);
+ #else
+Index: pax-3.4/src/gen_subs.c
+===================================================================
+--- pax-3.4.orig/src/gen_subs.c
++++ pax-3.4/src/gen_subs.c
+@@ -133,7 +133,8 @@ ls_list (ARCHD *arcn, time_t now, FILE *
+    * print device id's for devices, or sizes for other nodes
+    */
+   if ((arcn->type == PAX_CHR) || (arcn->type == PAX_BLK))
+-#if defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64
++#if (SIZEOF_LONG == 4 && SIZEOF_OFF_T == 8) \
++    || (defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64)
+     (void) fprintf (fp, "%4lu,%4lu ", (unsigned long) MAJOR (sbp->st_rdev),
+ 		    (unsigned long) MINOR (sbp->st_rdev));
+ #else
+@@ -142,7 +143,8 @@ ls_list (ARCHD *arcn, time_t now, FILE *
+ #endif
+   else
+     {
+-#if defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64
++#if (SIZEOF_LONG == 4 && SIZEOF_OFF_T == 8) \
++    || (defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64)
+       (void) fprintf (fp, "%9qu ", sbp->st_size);
+ #else
+       (void) fprintf (fp, "%9lu ", sbp->st_size);
+@@ -334,7 +336,8 @@ ul_asc (u_long val, char *str, int len, 
+   return (0);
+ }
+ 
+-#if defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64
++#if (SIZEOF_LONG == 4 && SIZEOF_OFF_T == 8) \
++    || (defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64)
+ /*
+  * asc_uqd()
+  *	convert hex/octal character string into a u_quad_t. We do not have to
+Index: pax-3.4/src/options.c
+===================================================================
+--- pax-3.4.orig/src/options.c
++++ pax-3.4/src/options.c
+@@ -1545,7 +1545,8 @@ str_offt (char *val)
+   char *expr;
+   off_t num, t;
+ 
+-#if defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64
++#if (SIZEOF_LONG == 4 && SIZEOF_OFF_T == 8) \
++    || (defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64)
+   num = strtoq (val, &expr, 0);
+   if ((num == LONG_LONG_MAX) || (num <= 0) || (expr == val))
+ #else
+Index: pax-3.4/src/tar.c
+===================================================================
+--- pax-3.4.orig/src/tar.c
++++ pax-3.4/src/tar.c
+@@ -58,7 +58,8 @@
+ static unsigned long tar_chksm (char *, int);
+ static char *name_split (char *, int);
+ static int ul_oct (u_long, char *, int, int);
+-#if defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64
++#if (SIZEOF_LONG == 4 && SIZEOF_OFF_T == 8) \
++    || (defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64)
+ static int uqd_oct (u_quad_t, char *, int, int);
+ #endif
+ 
+@@ -196,7 +197,8 @@ ul_oct (u_long val, register char *str, 
+   return (0);
+ }
+ 
+-#if defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64
++#if (SIZEOF_LONG == 4 && SIZEOF_OFF_T == 8) \
++    || (defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64)
+ /*
+  * uqd_oct()
+  *	convert an u_quad_t to an octal string. one of many oddball field
+@@ -427,7 +429,8 @@ tar_rd (ARCHD *arcn, char *buf)
+ 			       0xfff);
+   arcn->sb.st_uid = (uid_t) asc_ul (hd->uid, sizeof (hd->uid), OCT);
+   arcn->sb.st_gid = (gid_t) asc_ul (hd->gid, sizeof (hd->gid), OCT);
+-#if defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64
++#if (SIZEOF_LONG == 4 && SIZEOF_OFF_T == 8) \
++    || (defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64)
+   arcn->sb.st_size = (off_t) asc_uqd (hd->size, sizeof (hd->size), OCT);
+ #else
+   arcn->sb.st_size = (off_t) asc_ul (hd->size, sizeof (hd->size), OCT);
+@@ -659,7 +662,8 @@ tar_wr (register ARCHD * arcn)
+        * data follows this file, so set the pad
+        */
+       hd->linkflag = AREGTYPE;
+-#if defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64
++#if (SIZEOF_LONG == 4 && SIZEOF_OFF_T == 8) \
++    || (defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64)
+       if (uqd_oct ((u_quad_t) arcn->sb.st_size, hd->size,
+ 		   sizeof (hd->size), 1))
+ #else
+@@ -834,7 +838,8 @@ ustar_rd (ARCHD *arcn, char *buf)
+    */
+   arcn->sb.st_mode = (mode_t) (asc_ul (hd->mode, sizeof (hd->mode), OCT) &
+ 			       0xfff);
+-#if defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64
++#if (SIZEOF_LONG == 4 && SIZEOF_OFF_T == 8) \
++    || (defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64)
+   arcn->sb.st_size = (off_t) asc_uqd (hd->size, sizeof (hd->size), OCT);
+ #else
+   arcn->sb.st_size = (off_t) asc_ul (hd->size, sizeof (hd->size), OCT);
+@@ -1081,7 +1086,8 @@ ustar_wr (register ARCHD * arcn)
+       else
+ 	hd->typeflag = REGTYPE;
+       arcn->pad = TAR_PAD (arcn->sb.st_size);
+-#if defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64
++#if (SIZEOF_LONG == 4 && SIZEOF_OFF_T == 8) \
++    || (defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64)
+       if (uqd_oct ((u_quad_t) arcn->sb.st_size, hd->size,
+ 		   sizeof (hd->size), 3))
+ 	{

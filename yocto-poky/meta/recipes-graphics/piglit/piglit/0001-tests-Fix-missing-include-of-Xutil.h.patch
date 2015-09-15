@@ -1,0 +1,28 @@
+Upstream-Status: Backport
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+
+From e40e0a25f996d2e205c4bdec2c8a5cc7f74e5065 Mon Sep 17 00:00:00 2001
+From: Otavio Salvador <otavio@ossystems.com.br>
+Date: Mon, 15 Jun 2015 16:25:30 -0300
+Subject: tests: Fix missing include of Xutil.h
+
+The EGL tests rely on Xutil.h being included. Some EGL implementation
+does not explitly include it by default and then the build fails.
+
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+Reviewed-by: Neil Roberts <neil@linux.intel.com>
+
+diff --git a/tests/egl/egl-configless-context.c b/tests/egl/egl-configless-context.c
+index 0504a26..154b55c 100644
+--- a/tests/egl/egl-configless-context.c
++++ b/tests/egl/egl-configless-context.c
+@@ -32,6 +32,7 @@
+ /* Chunks of code in this file are taken from egl-util.c */
+ 
+ #include <X11/Xlib.h>
++#include <X11/Xutil.h>
+ 
+ #include "piglit-util-gl.h"
+ #include "piglit-util-egl.h"
+-- 
+cgit v0.10.2

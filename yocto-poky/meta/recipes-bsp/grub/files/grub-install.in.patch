@@ -1,0 +1,20 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+Our use of grub-install doesn't require the -x option, so we should be
+be able make use of grep versions that don't support it.
+
+Signed-off-by: Tom Zanussi <tom.zanussi@intel.com>
+
+Index: grub-1.99/util/grub-install.in
+===================================================================
+--- grub-1.99.orig/util/grub-install.in	2011-09-09 22:37:20.093906679 -0500
++++ grub-1.99/util/grub-install.in	2011-09-09 22:37:30.854737882 -0500
+@@ -510,7 +510,7 @@
+ 
+ if [ "x${devabstraction_module}" = "x" ] ; then
+     if [ x"${install_device}" != x ]; then
+-      if echo "${install_device}" | grep -qx "(.*)" ; then
++      if echo "${install_device}" | grep -q "(.*)" ; then
+         install_drive="${install_device}"
+       else
+         install_drive="`"$grub_probe" --device-map="${device_map}" --target=drive --device "${install_device}"`" || exit 1

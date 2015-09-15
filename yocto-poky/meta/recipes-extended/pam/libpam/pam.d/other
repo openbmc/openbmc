@@ -1,0 +1,24 @@
+#
+# /etc/pam.d/other - specify the PAM fallback behaviour
+#
+# Note that this file is used for any unspecified service; for example
+#if /etc/pam.d/cron  specifies no session modules but cron calls
+#pam_open_session, the session module out of /etc/pam.d/other is
+#used.  
+
+# We use pam_warn.so to generate syslog notes that the 'other'
+#fallback rules are being used (as a hint to suggest you should setup
+#specific PAM rules for the service and aid to debugging). Then to be
+#secure, deny access to all services by default. 
+
+auth       required     pam_warn.so
+auth       required     pam_deny.so
+
+account    required     pam_warn.so
+account    required     pam_deny.so
+
+password   required     pam_warn.so
+password   required     pam_deny.so
+
+session    required     pam_warn.so
+session    required     pam_deny.so

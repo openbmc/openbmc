@@ -1,0 +1,29 @@
+The COPYING file sgml-common ships with is just a symlink to
+/usr/share/automake/COPYING, which means we can't verify it
+using our normal means. We workaround this by using this patch
+to create our own license file. 
+
+Upstream was notified about this on 2011-01-24. When upgrading
+this recipe, this should be fixed and you should remove this
+patch.
+
+Upstream-Status: Pending
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+diff -urN sgml-common-0.6.3.orig/LICENSE-GPLv2 sgml-common-0.6.3/LICENSE-GPLv2
+--- sgml-common-0.6.3.orig/LICENSE-GPLv2	1969-12-31 16:00:00.000000000 -0800
++++ sgml-common-0.6.3/LICENSE-GPLv2	2011-01-28 17:05:17.299528001 -0800
+@@ -0,0 +1,12 @@
++Copyright (C) 1997 Christian Schwarz <schwarz@debian.org>.
++Copyright (C) 2001-2004 Ardo van Rangelrooij <ardo@debian.org>
++
++This is free software; you may redistribute it and/or modify it under
++the terms of the GNU General Public License as published by the Free
++Software Foundation; either version 2, or (at your option) any later
++version.
++
++This is distributed in the hope that it will be useful, but without
++any warranty; without even the implied warranty of merchantability or
++fitness for a particular purpose.  See the GNU General Public License
++for more details.

@@ -1,0 +1,104 @@
+bind: port a patch to fix a build failure
+
+mips1 does not support ll and sc instructions, and lead to below error, now
+we port a patch from debian to fix it
+[http://security.debian.org/debian-security/pool/updates/main/b/bind9/bind9_9.8.4.dfsg.P1-6+nmu2+deb7u1.diff.gz]
+
+| {standard input}: Assembler messages:
+| {standard input}:47: Error: Opcode not supported on this processor: mips1 (mips1) `ll $3,0($6)'
+| {standard input}:50: Error: Opcode not supported on this processor: mips1 (mips1) `sc $3,0($6)'
+
+Upstream-Status: Pending
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+
+--- bind9-9.8.4.dfsg.P1.orig/lib/isc/mips/include/isc/atomic.h
++++ bind9-9.8.4.dfsg.P1/lib/isc/mips/include/isc/atomic.h
+@@ -31,18 +31,20 @@
+ isc_atomic_xadd(isc_int32_t *p, int val) {
+ 	isc_int32_t orig;
+ 
+-	/* add is a cheat, since MIPS has no mov instruction */
+-	__asm__ volatile (
+-	    "1:"
+-	    "ll $3, %1\n"
+-	    "add %0, $0, $3\n"
+-	    "add $3, $3, %2\n"
+-	    "sc $3, %1\n"
+-	    "beq $3, 0, 1b"
+-	    : "=&r"(orig)
+-	    : "m"(*p), "r"(val)
+-	    : "memory", "$3"
+-		);
++	__asm__ __volatile__ (
++	"	.set	push		\n"
++	"	.set	mips2		\n"
++	"	.set	noreorder	\n"
++	"	.set	noat		\n"
++	"1:	ll	$1, %1		\n"
++	"	addu	%0, $1, %2	\n"
++	"	sc	%0, %1		\n"
++	"	beqz	%0, 1b		\n"
++	"	move	%0, $1		\n"
++	"	.set	pop		\n"
++	: "=&r" (orig), "+R" (*p)
++	: "r" (val)
++	: "memory");
+ 
+ 	return (orig);
+ }
+@@ -52,16 +54,7 @@
+  */
+ static inline void
+ isc_atomic_store(isc_int32_t *p, isc_int32_t val) {
+-	__asm__ volatile (
+-	    "1:"
+-	    "ll $3, %0\n"
+-	    "add $3, $0, %1\n"
+-	    "sc $3, %0\n"
+-	    "beq $3, 0, 1b"
+-	    :
+-	    : "m"(*p), "r"(val)
+-	    : "memory", "$3"
+-		);
++	*p = val;
+ }
+ 
+ /*
+@@ -72,20 +65,23 @@
+ static inline isc_int32_t
+ isc_atomic_cmpxchg(isc_int32_t *p, int cmpval, int val) {
+ 	isc_int32_t orig;
++	isc_int32_t tmp;
+ 
+-	__asm__ volatile(
+-	    "1:"
+-	    "ll $3, %1\n"
+-	    "add %0, $0, $3\n"
+-	    "bne $3, %2, 2f\n"
+-	    "add $3, $0, %3\n"
+-	    "sc $3, %1\n"
+-	    "beq $3, 0, 1b\n"
+-	    "2:"
+-	    : "=&r"(orig)
+-	    : "m"(*p), "r"(cmpval), "r"(val)
+-	    : "memory", "$3"
+-		);
++	__asm__ __volatile__ (
++	"	.set	push		\n"
++	"	.set	mips2		\n"
++	"	.set	noreorder	\n"
++	"	.set	noat		\n"
++	"1:	ll	$1, %1		\n"
++	"	bne	$1, %3, 2f	\n"
++	"	move	%2, %4		\n"
++	"	sc	%2, %1		\n"
++	"	beqz	%2, 1b		\n"
++	"2:	move	%0, $1		\n"
++	"	.set	pop		\n"
++	: "=&r"(orig), "+R" (*p), "=r" (tmp)
++	: "r"(cmpval), "r"(val)
++	: "memory");
+ 
+ 	return (orig);
+ }

@@ -1,0 +1,25 @@
+From ebe26d855452d07e0152bd78d4966475d2de1de8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 5 Mar 2015 07:30:31 +0000
+Subject: [PATCH] gold/arm: Skip pic check for R_ARM_REL32
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ gold/arm.cc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/gold/arm.cc b/gold/arm.cc
+index 6c472bb..fb80435 100644
+--- a/gold/arm.cc
++++ b/gold/arm.cc
+@@ -7829,6 +7829,7 @@ Target_arm<big_endian>::Scan::check_non_pic(Relobj* object,
+     case elfcpp::R_ARM_TLS_DTPMOD32:
+     case elfcpp::R_ARM_TLS_DTPOFF32:
+     case elfcpp::R_ARM_TLS_TPOFF32:
++    case elfcpp::R_ARM_REL32:
+       return;
+ 
+     default:
+-- 
+2.1.4
+

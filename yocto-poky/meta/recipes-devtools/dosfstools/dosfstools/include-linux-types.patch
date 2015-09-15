@@ -1,0 +1,22 @@
+mkdsofs is using types of the style __u8, which it gets with some
+versions of libc headers via linux/hdreg.h including asm/types.h.
+Newer version of fedora (at least) have a hdreg.h whichdoes not
+include asm/types.h. To work around this patch mkdosfs.c to explicity
+include linux/types.h which will in turn pull in asm/types.h which
+defines these variables.
+
+Upstream-Status: Inappropriate [licensing]
+We're tracking an old release of dosfstools due to licensing issues.
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+--- dosfstools-2.10/mkdosfs/mkdosfs.c~	2006-07-12 18:46:21.000000000 +1000
++++ dosfstools-2.10/mkdosfs/mkdosfs.c	2006-07-12 18:46:21.000000000 +1000
+@@ -60,6 +60,7 @@
+ #include "../version.h"
+ 
+ #include <fcntl.h>
++#include <linux/types.h>
+ #include <linux/hdreg.h>
+ #include <linux/fs.h>
+ #include <linux/fd.h>

@@ -1,0 +1,25 @@
+Sadly cmake is broken. If it sees this reference and ansidecl is present, it will add a 
+dependency upon it, even if HAVE_ANSIDEC_H is never set.
+
+The easiest solution is to remove these lines, otherwise recipes like libzypp can have a 
+dependency on the ansidecl.h header via cmake. This can lead to odd results if the 
+header is removed (clean binutils) and then the code is recompiled.
+
+RP 2012/7/10
+
+Upstream-Status: Inappropriate [its really a cmake bug]
+
+Index: libxml2-2.8.0/include/libxml/xmlversion.h.in
+===================================================================
+--- libxml2-2.8.0.orig/include/libxml/xmlversion.h.in	2012-07-10 11:51:52.460750573 +0000
++++ libxml2-2.8.0/include/libxml/xmlversion.h.in	2012-07-10 11:52:41.436749397 +0000
+@@ -401,9 +401,6 @@
+ #endif
+ 
+ #ifdef __GNUC__
+-#ifdef HAVE_ANSIDECL_H
+-#include <ansidecl.h>
+-#endif
+ 
+ /**
+  * ATTRIBUTE_UNUSED:

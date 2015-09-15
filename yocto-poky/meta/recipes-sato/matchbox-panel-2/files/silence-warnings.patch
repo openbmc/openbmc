@@ -1,0 +1,64 @@
+Don't warn if the machine doesn't actually have a battery, or if the applets
+string contains consecutive separators.
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/applets/battery/battery-acpi.c b/applets/battery/battery-acpi.c
+index 6515cb0..c44dd12 100644
+--- a/applets/battery/battery-acpi.c
++++ b/applets/battery/battery-acpi.c
+@@ -14,8 +14,6 @@ int batt_state, ac_state;
+ int pm_support(void)
+ {
+ 	if(check_acpi_support() == NOT_SUPPORTED){
+-		g_warning("No ACPI support\n");
+-
+ 		return 0;
+ 	}
+ 
+@@ -32,8 +30,9 @@ const char* pm_battery_icon(void)
+ 	const char *icon;
+ 	battery_t *binfo;
+ 
++        /* No battery available (not present, disabled, or something
++           else. Silently do nothing. */
+ 	if (batt_state != SUCCESS) {
+-		g_warning("Couldnt initialize ACPI battery\n");
+ 		return NULL;
+ 	}
+ 
+diff --git a/applets/battery/battery-apm.c b/applets/battery/battery-apm.c
+index 5467438..2f39cb6 100644
+--- a/applets/battery/battery-apm.c
++++ b/applets/battery/battery-apm.c
+@@ -10,8 +10,6 @@
+ int pm_support(void)
+ {
+ 	if (1 == apm_exists ()) {
+-                g_warning ("No APM support");
+-
+                 return 0;
+         }
+ 
+diff --git a/matchbox-panel/mb-panel.c b/matchbox-panel/mb-panel.c
+index 2d8cafd..828a36d 100644
+--- a/matchbox-panel/mb-panel.c
++++ b/matchbox-panel/mb-panel.c
+@@ -110,10 +110,15 @@ load_applets (const char    *applets_desc,
+         applets = g_strsplit (applets_desc, ",", -1);
+ 
+         for (i = 0; applets[i]; i++) {
++                char *s;
+                 char **bits;
+                 GtkWidget *applet;
+ 
+-                bits = g_strsplit (applets[i], ":", 2);
++                s = applets[i];
++                if (s == NULL || s[0] == '\0')
++                        continue;
++
++                bits = g_strsplit (s, ":", 2);
+ 
+                 applet = load_applet (bits[0],
+                                       bits[1],

@@ -1,0 +1,18 @@
+Pass LDFLAGS to the linker 
+
+Upstream-Status: Pending
+
+Signed-off-by: Mikhail Durnev <Mikhail_Durnev@mentor.com>
+
+diff -Naur old/unix/configure new/unix/configure
+--- old/unix/configure	2014-01-13 21:59:27.000000000 +1100
++++ new/unix/configure	2014-01-14 16:36:02.000000000 +1100
+@@ -16,7 +16,7 @@
+ CFLAGSR=${CFLAGS}
+ IZ_BZIP2=${3}
+ CFLAGS="${CFLAGS} -I. -DUNIX"
+-LFLAGS1=""
++LFLAGS1=${LDFLAGS}
+ LFLAGS2=""
+ LN="ln -s"
+ 

@@ -1,0 +1,17 @@
+These modules are only used for tests that don't get installed, and the
+automatic detection without explicit dependencies means that a build can find
+e.g. xshmfence at configure time but then it's been removed from the sysroot by
+the time compile happens.
+
+As the tests don't get installed, just disable the checks.
+
+Upstream-Status: Inappropriate [OE-specific]
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/configure.ac b/configure.ac
+index bd654f3..78a0e0d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -251 +251 @@ fi
+-PKG_CHECK_MODULES(X11_DRI3, [xcb-dri3 xcb-sync xcb-present x11-xcb xshmfence x11 xrender xext libdrm], [x11_dri3="yes"], [x11_dri3="no"])
++#PKG_CHECK_MODULES(X11_DRI3, [xcb-dri3 xcb-sync xcb-present x11-xcb xshmfence x11 xrender xext libdrm], [x11_dri3="yes"], [x11_dri3="no"])

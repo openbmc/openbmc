@@ -1,0 +1,49 @@
+Added npth pkgconfig file
+
+Upstream-Status: Pending
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+Index: npth-1.1/src/npth.pc.in
+===================================================================
+--- /dev/null
++++ npth-1.1/src/npth.pc.in
+@@ -0,0 +1,10 @@
++prefix=@prefix@
++exec_prefix=@exec_prefix@
++libdir=@libdir@
++includedir=@includedir@
++
++Name: npth
++Description: a new portable posix threading library
++Version: @VERSION@
++Libs: -L${libdir} -lnpth -lpthread
++Cflags: -I${includedir}
+Index: npth-1.1/src/Makefile.am
+===================================================================
+--- npth-1.1.orig/src/Makefile.am
++++ npth-1.1/src/Makefile.am
+@@ -27,8 +27,10 @@
+ # License along with this program; if not, see <http://www.gnu.org/licenses/>.
+ 
+ ## Process this file with automake to produce Makefile.in
++pkgconfigdir = $(libdir)/pkgconfig
++pkgconfig_DATA = npth.pc
+ 
+-EXTRA_DIST = libnpth.vers
++EXTRA_DIST = libnpth.vers npth.pc
+ #	     versioninfo.rc.in
+ nodist_include_HEADERS = npth.h
+ 
+Index: npth-1.1/configure.ac
+===================================================================
+--- npth-1.1.orig/configure.ac
++++ npth-1.1/configure.ac
+@@ -337,6 +337,7 @@ src/Makefile
+ w32/Makefile
+ tests/Makefile])
+ AC_CONFIG_FILES(npth-config, chmod +x npth-config)
++AC_CONFIG_FILES([src/npth.pc])
+ AC_OUTPUT
+ 
+ echo "

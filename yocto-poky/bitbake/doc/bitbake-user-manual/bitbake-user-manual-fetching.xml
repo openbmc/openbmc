@@ -1,0 +1,765 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+
+<chapter>
+<title>File Download Support</title>
+
+    <para>
+        BitBake's fetch module is a standalone piece of library code
+        that deals with the intricacies of downloading source code
+        and files from remote systems.
+        Fetching source code is one of the cornerstones of building software.
+        As such, this module forms an important part of BitBake.
+    </para>
+
+    <para>
+        The current fetch module is called "fetch2" and refers to the
+        fact that it is the second major version of the API.
+        The original version is obsolete and has been removed from the codebase.
+        Thus, in all cases, "fetch" refers to "fetch2" in this
+        manual.
+    </para>
+
+    <section id='the-download-fetch'>
+        <title>The Download (Fetch)</title>
+
+        <para>
+            BitBake takes several steps when fetching source code or files.
+            The fetcher codebase deals with two distinct processes in order:
+            obtaining the files from somewhere (cached or otherwise)
+            and then unpacking those files into a specific location and
+            perhaps in a specific way.
+            Getting and unpacking the files is often optionally followed
+            by patching.
+            Patching, however, is not covered by this module.
+        </para>
+
+        <para>
+            The code to execute the first part of this process, a fetch,
+            looks something like the following:
+            <literallayout class='monospaced'>
+     src_uri = (d.getVar('SRC_URI', True) or "").split()
+     fetcher = bb.fetch2.Fetch(src_uri, d)
+     fetcher.download()
+            </literallayout>
+            This code sets up an instance of the fetch class.
+            The instance uses a space-separated list of URLs from the
+            <link linkend='var-SRC_URI'><filename>SRC_URI</filename></link>
+            variable and then calls the <filename>download</filename>
+            method to download the files.
+        </para>
+
+        <para>
+            The instantiation of the fetch class is usually followed by:
+            <literallayout class='monospaced'>
+     rootdir = l.getVar('WORKDIR', True)
+     fetcher.unpack(rootdir)
+            </literallayout>
+            This code unpacks the downloaded files to the
+            specified by <filename>WORKDIR</filename>.
+            <note>
+                For convenience, the naming in these examples matches
+                the variables used by OpenEmbedded.
+                If you want to see the above code in action, examine
+                the OpenEmbedded class file <filename>base.bbclass</filename>.
+            </note>
+            The <filename>SRC_URI</filename> and <filename>WORKDIR</filename>
+            variables are not hardcoded into the fetcher, since those fetcher
+            methods can be (and are) called with different variable names.
+            In OpenEmbedded for example, the shared state (sstate) code uses
+            the fetch module to fetch the sstate files.
+        </para>
+
+        <para>
+            When the <filename>download()</filename> method is called,
+            BitBake tries to resolve the URLs by looking for source files
+            in a specific search order:
+            <itemizedlist>
+                <listitem><para><emphasis>Pre-mirror Sites:</emphasis>
+                    BitBake first uses pre-mirrors to try and find source files.
+                    These locations are defined using the
+                    <link linkend='var-PREMIRRORS'><filename>PREMIRRORS</filename></link>
+                    variable.
+                    </para></listitem>
+                <listitem><para><emphasis>Source URI:</emphasis>
+                    If pre-mirrors fail, BitBake uses the original URL (e.g from
+                    <filename>SRC_URI</filename>).
+                    </para></listitem>
+                <listitem><para><emphasis>Mirror Sites:</emphasis>
+                    If fetch failures occur, BitBake next uses mirror locations as
+                    defined by the
+                    <link linkend='var-MIRRORS'><filename>MIRRORS</filename></link>
+                    variable.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+
+        <para>
+            For each URL passed to the fetcher, the fetcher
+            calls the submodule that handles that particular URL type.
+            This behavior can be the source of some confusion when you
+            are providing URLs for the <filename>SRC_URI</filename>
+            variable.
+            Consider the following two URLs:
+            <literallayout class='monospaced'>
+     http://git.yoctoproject.org/git/poky;protocol=git
+     git://git.yoctoproject.org/git/poky;protocol=http
+            </literallayout>
+            In the former case, the URL is passed to the
+            <filename>wget</filename> fetcher, which does not
+            understand "git".
+            Therefore, the latter case is the correct form since the
+            Git fetcher does know how to use HTTP as a transport.
+        </para>
+
+        <para>
+            Here are some examples that show commonly used mirror
+            definitions:
+            <literallayout class='monospaced'>
+     PREMIRRORS ?= "\
+         bzr://.*/.*   http://somemirror.org/sources/ \n \
+         cvs://.*/.*   http://somemirror.org/sources/ \n \
+         git://.*/.*   http://somemirror.org/sources/ \n \
+         hg://.*/.*    http://somemirror.org/sources/ \n \
+         osc://.*/.*   http://somemirror.org/sources/ \n \
+         p4://.*/.*    http://somemirror.org/sources/ \n \
+         svn://.*/.*   http://somemirror.org/sources/ \n"
+
+     MIRRORS =+ "\
+         ftp://.*/.*      http://somemirror.org/sources/ \n \
+         http://.*/.*     http://somemirror.org/sources/ \n \
+         https://.*/.*    http://somemirror.org/sources/ \n"
+            </literallayout>
+            It is useful to note that BitBake supports
+            cross-URLs.
+            It is possible to mirror a Git repository on an HTTP
+            server as a tarball.
+            This is what the <filename>git://</filename> mapping in
+            the previous example does.
+        </para>
+
+        <para>
+            Since network accesses are slow, Bitbake maintains a
+            cache of files downloaded from the network.
+            Any source files that are not local (i.e.
+            downloaded from the Internet) are placed into the download
+            directory, which is specified by the
+            <link linkend='var-DL_DIR'><filename>DL_DIR</filename></link>
+            variable.
+        </para>
+
+        <para>
+            File integrity is of key importance for reproducing builds.
+            For non-local archive downloads, the fetcher code can verify
+            SHA-256 and MD5 checksums to ensure the archives have been
+            downloaded correctly.
+            You can specify these checksums by using the
+            <filename>SRC_URI</filename> variable with the appropriate
+            varflags as follows:
+            <literallayout class='monospaced'>
+     SRC_URI[md5sum] = "<replaceable>value</replaceable>"
+     SRC_URI[sha256sum] = "<replaceable>value</replaceable>"
+            </literallayout>
+            You can also specify the checksums as parameters on the
+            <filename>SRC_URI</filename> as shown below:
+            <literallayout class='monospaced'>
+     SRC_URI = "http://example.com/foobar.tar.bz2;md5sum=4a8e0f237e961fd7785d19d07fdb994d"
+            </literallayout>
+            If multiple URIs exist, you can specify the checksums either
+            directly as in the previous example, or you can name the URLs.
+            The following syntax shows how you name the URIs:
+            <literallayout class='monospaced'>
+     SRC_URI = "http://example.com/foobar.tar.bz2;name=foo"
+     SRC_URI[foo.md5sum] = 4a8e0f237e961fd7785d19d07fdb994d
+            </literallayout>
+            After a file has been downloaded and has had its checksum checked,
+            a ".done" stamp is placed in <filename>DL_DIR</filename>.
+            BitBake uses this stamp during subsequent builds to avoid
+            downloading or comparing a checksum for the file again.
+            <note>
+                It is assumed that local storage is safe from data corruption.
+                If this were not the case, there would be bigger issues to worry about.
+            </note>
+        </para>
+
+        <para>
+            If
+            <link linkend='var-BB_STRICT_CHECKSUM'><filename>BB_STRICT_CHECKSUM</filename></link>
+            is set, any download without a checksum triggers an
+            error message.
+            The
+            <link linkend='var-BB_NO_NETWORK'><filename>BB_NO_NETWORK</filename></link>
+            variable can be used to make any attempted network access a fatal
+            error, which is useful for checking that mirrors are complete
+            as well as other things.
+        </para>
+    </section>
+
+    <section id='bb-the-unpack'>
+        <title>The Unpack</title>
+
+        <para>
+            The unpack process usually immediately follows the download.
+            For all URLs except Git URLs, BitBake uses the common
+            <filename>unpack</filename> method.
+        </para>
+
+        <para>
+            A number of parameters exist that you can specify within the
+            URL to govern the behavior of the unpack stage:
+            <itemizedlist>
+                <listitem><para><emphasis>unpack:</emphasis>
+                    Controls whether the URL components are unpacked.
+                    If set to "1", which is the default, the components
+                    are unpacked.
+                    If set to "0", the unpack stage leaves the file alone.
+                    This parameter is useful when you want an archive to be
+                    copied in and not be unpacked.
+                    </para></listitem>
+                <listitem><para><emphasis>dos:</emphasis>
+                    Applies to <filename>.zip</filename> and
+                    <filename>.jar</filename> files and specifies whether to
+                    use DOS line ending conversion on text files.
+                    </para></listitem>
+                <listitem><para><emphasis>basepath:</emphasis>
+                    Instructs the unpack stage to strip the specified
+                    directories from the source path when unpacking.
+                    </para></listitem>
+                <listitem><para><emphasis>subdir:</emphasis>
+                    Unpacks the specific URL to the specified subdirectory
+                    within the root directory.
+                    </para></listitem>
+            </itemizedlist>
+            The unpack call automatically decompresses and extracts files
+            with ".Z", ".z", ".gz", ".xz", ".zip", ".jar", ".ipk", ".rpm".
+            ".srpm", ".deb" and ".bz2" extensions as well as various combinations
+            of tarball extensions.
+        </para>
+
+        <para>
+            As mentioned, the Git fetcher has its own unpack method that
+            is optimized to work with Git trees.
+            Basically, this method works by cloning the tree into the final
+            directory.
+            The process is completed using references so that there is
+            only one central copy of the Git metadata needed.
+        </para>
+    </section>
+
+    <section id='bb-fetchers'>
+        <title>Fetchers</title>
+
+        <para>
+            As mentioned earlier, the URL prefix determines which
+            fetcher submodule BitBake uses.
+            Each submodule can support different URL parameters,
+            which are described in the following sections.
+        </para>
+
+        <section id='local-file-fetcher'>
+            <title>Local file fetcher (<filename>file://</filename>)</title>
+
+            <para>
+                This submodule handles URLs that begin with
+                <filename>file://</filename>.
+                The filename you specify within the URL can be
+                either an absolute or relative path to a file.
+                If the filename is relative, the contents of the
+                <link linkend='var-FILESPATH'><filename>FILESPATH</filename></link>
+                variable is used in the same way
+                <filename>PATH</filename> is used to find executables.
+                Failing that,
+                <link linkend='var-FILESDIR'><filename>FILESDIR</filename></link>
+                is used to find the appropriate relative file.
+                <note>
+                    <filename>FILESDIR</filename> is deprecated and can
+                    be replaced with <filename>FILESPATH</filename>.
+                    Because <filename>FILESDIR</filename> is likely to be
+                    removed, you should not use this variable in any new code.
+                </note>
+                If the file cannot be found, it is assumed that it is available in
+                <link linkend='var-DL_DIR'><filename>DL_DIR</filename></link>
+                by the time the <filename>download()</filename> method is called.
+            </para>
+
+            <para>
+                If you specify a directory, the entire directory is
+                unpacked.
+            </para>
+
+            <para>
+                Here are a couple of example URLs, the first relative and
+                the second absolute:
+                <literallayout class='monospaced'>
+     SRC_URI = "file://relativefile.patch"
+     SRC_URI = "file:///Users/ich/very_important_software"
+                </literallayout>
+            </para>
+        </section>
+
+        <section id='http-ftp-fetcher'>
+            <title>HTTP/FTP wget fetcher (<filename>http://</filename>, <filename>ftp://</filename>, <filename>https://</filename>)</title>
+
+            <para>
+                This fetcher obtains files from web and FTP servers.
+                Internally, the fetcher uses the wget utility.
+            </para>
+
+            <para>
+                The executable and parameters used are specified by the
+                <filename>FETCHCMD_wget</filename> variable, which defaults
+                to sensible values.
+                The fetcher supports a parameter "downloadfilename" that
+                allows the name of the downloaded file to be specified.
+                Specifying the name of the downloaded file is useful
+                for avoiding collisions in
+                <link linkend='var-DL_DIR'><filename>DL_DIR</filename></link>
+                when dealing with multiple files that have the same name.
+            </para>
+
+            <para>
+                Some example URLs are as follows:
+                <literallayout class='monospaced'>
+     SRC_URI = "http://oe.handhelds.org/not_there.aac"
+     SRC_URI = "ftp://oe.handhelds.org/not_there_as_well.aac"
+     SRC_URI = "ftp://you@oe.handhelds.org/home/you/secret.plan"
+                </literallayout>
+            </para>
+            <note>
+               Because URL parameters are delimited by semi-colons, this can
+               introduce ambiguity when parsing URLs that also contain semi-colons,
+               for example:
+                <literallayout class='monospaced'>
+     SRC_URI = "http://abc123.org/git/?p=gcc/gcc.git;a=snapshot;h=a5dd47"
+                </literallayout>
+               Such URLs should should be modified by replacing semi-colons with '&amp;' characters:
+               <literallayout class='monospaced'>
+     SRC_URI = "http://abc123.org/git/?p=gcc/gcc.git&amp;a=snapshot&amp;h=a5dd47"
+                </literallayout>
+                In most cases this should work. Treating semi-colons and '&amp;' in queries
+                identically is recommended by the World Wide Web Consortium (W3C).
+                Note that due to the nature of the URL, you may have to specify the name
+                of the downloaded file as well:
+              <literallayout class='monospaced'>
+     SRC_URI = "http://abc123.org/git/?p=gcc/gcc.git&amp;a=snapshot&amp;h=a5dd47;downloadfilename=myfile.bz2"
+                </literallayout>
+            </note>
+        </section>
+
+        <section id='cvs-fetcher'>
+            <title>CVS fetcher (<filename>(cvs://</filename>)</title>
+
+            <para>
+                This submodule handles checking out files from the
+                CVS version control system.
+                You can configure it using a number of different variables:
+                <itemizedlist>
+                    <listitem><para><emphasis><filename>FETCHCMD_cvs</filename>:</emphasis>
+                        The name of the executable to use when running
+                        the <filename>cvs</filename> command.
+                        This name is usually "cvs".
+                        </para></listitem>
+                    <listitem><para><emphasis><filename>SRCDATE</filename>:</emphasis>
+                        The date to use when fetching the CVS source code.
+                        A special value of "now" causes the checkout to
+                        be updated on every build.
+                        </para></listitem>
+                    <listitem><para><emphasis><link linkend='var-CVSDIR'><filename>CVSDIR</filename></link>:</emphasis>
+                        Specifies where a temporary checkout is saved.
+                        The location is often <filename>DL_DIR/cvs</filename>.
+                        </para></listitem>
+                    <listitem><para><emphasis><filename>CVS_PROXY_HOST</filename>:</emphasis>
+                        The name to use as a "proxy=" parameter to the
+                        <filename>cvs</filename> command.
+                        </para></listitem>
+                    <listitem><para><emphasis><filename>CVS_PROXY_PORT</filename>:</emphasis>
+                        The port number to use as a "proxyport=" parameter to
+                        the <filename>cvs</filename> command.
+                        </para></listitem>
+                </itemizedlist>
+                As well as the standard username and password URL syntax,
+                you can also configure the fetcher with various URL parameters:
+            </para>
+
+            <para>
+                The supported parameters are as follows:
+                <itemizedlist>
+                    <listitem><para><emphasis>"method":</emphasis>
+                        The protocol over which to communicate with the CVS server.
+                        By default, this protocol is "pserver".
+                        If "method" is set to "ext", BitBake examines the
+                        "rsh" parameter and sets <filename>CVS_RSH</filename>.
+                        You can use "dir" for local directories.
+                        </para></listitem>
+                    <listitem><para><emphasis>"module":</emphasis>
+                        Specifies the module to check out.
+                        You must supply this parameter.
+                        </para></listitem>
+                    <listitem><para><emphasis>"tag":</emphasis>
+                        Describes which CVS TAG should be used for
+                        the checkout.
+                        By default, the TAG is empty.
+                        </para></listitem>
+                    <listitem><para><emphasis>"date":</emphasis>
+                        Specifies a date.
+                        If no "date" is specified, the
+                        <link linkend='var-SRCDATE'><filename>SRCDATE</filename></link>
+                        of the configuration is used to checkout a specific date.
+                        The special value of "now" causes the checkout to be
+                        updated on every build.
+                        </para></listitem>
+                    <listitem><para><emphasis>"localdir":</emphasis>
+                        Used to rename the module.
+                        Effectively, you are renaming the output directory
+                        to which the module is unpacked.
+                        You are forcing the module into a special
+                        directory relative to
+                        <link linkend='var-CVSDIR'><filename>CVSDIR</filename></link>.
+                        </para></listitem>
+                    <listitem><para><emphasis>"rsh"</emphasis>
+                        Used in conjunction with the "method" parameter.
+                        </para></listitem>
+                    <listitem><para><emphasis>"scmdata":</emphasis>
+                        Causes the CVS metadata to be maintained in the tarball
+                        the fetcher creates when set to "keep".
+                        The tarball is expanded into the work directory.
+                        By default, the CVS metadata is removed.
+                        </para></listitem>
+                    <listitem><para><emphasis>"fullpath":</emphasis>
+                        Controls whether the resulting checkout is at the
+                        module level, which is the default, or is at deeper
+                        paths.
+                        </para></listitem>
+                    <listitem><para><emphasis>"norecurse":</emphasis>
+                        Causes the fetcher to only checkout the specified
+                        directory with no recurse into any subdirectories.
+                        </para></listitem>
+                    <listitem><para><emphasis>"port":</emphasis>
+                        The port to which the CVS server connects.
+                        </para></listitem>
+                </itemizedlist>
+                Some example URLs are as follows:
+                <literallayout class='monospaced'>
+     SRC_URI = "cvs://CVSROOT;module=mymodule;tag=some-version;method=ext"
+     SRC_URI = "cvs://CVSROOT;module=mymodule;date=20060126;localdir=usethat"
+                </literallayout>
+            </para>
+        </section>
+
+        <section id='svn-fetcher'>
+            <title>Subversion (SVN) Fetcher (<filename>svn://</filename>)</title>
+
+            <para>
+                This fetcher submodule fetches code from the
+                Subversion source control system.
+                The executable used is specified by
+                <filename>FETCHCMD_svn</filename>, which defaults
+                to "svn".
+                The fetcher's temporary working directory is set by
+                <link linkend='var-SVNDIR'><filename>SVNDIR</filename></link>,
+                which is usually <filename>DL_DIR/svn</filename>.
+            </para>
+
+            <para>
+                The supported parameters are as follows:
+                <itemizedlist>
+                    <listitem><para><emphasis>"module":</emphasis>
+                        The name of the svn module to checkout.
+                        You must provide this parameter.
+                        You can think of this parameter as the top-level
+                        directory of the repository data you want.
+                        </para></listitem>
+                    <listitem><para><emphasis>"protocol":</emphasis>
+                        The protocol to use, which defaults to "svn".
+                        Other options are "svn+ssh" and "rsh".
+                        For "rsh", the "rsh" parameter is also used.
+                        </para></listitem>
+                    <listitem><para><emphasis>"rev":</emphasis>
+                        The revision of the source code to checkout.
+                        </para></listitem>
+                    <listitem><para><emphasis>"date":</emphasis>
+                        The date of the source code to checkout.
+                        Specific revisions are generally much safer to checkout
+                        rather than by date as they do not involve timezones
+                        (e.g. they are much more deterministic).
+                        </para></listitem>
+                    <listitem><para><emphasis>"scmdata":</emphasis>
+                        Causes the “.svn” directories to be available during
+                        compile-time when set to "keep".
+                        By default, these directories are removed.
+                        </para></listitem>
+                    <listitem><para><emphasis>"transportuser":</emphasis>
+                        When required, sets the username for the transport.
+                        By default, this parameter is empty.
+                        The transport username is different than the username
+                        used in the main URL, which is passed to the subversion
+                        command.
+                        </para></listitem>
+                </itemizedlist>
+                Following are two examples using svn:
+                <literallayout class='monospaced'>
+     SRC_URI = "svn://svn.oe.handhelds.org/svn;module=vip;proto=http;rev=667"
+     SRC_URI = "svn://svn.oe.handhelds.org/svn/;module=opie;proto=svn+ssh;date=20060126"
+                </literallayout>
+            </para>
+        </section>
+
+        <section id='git-fetcher'>
+            <title>Git Fetcher (<filename>git://</filename>)</title>
+
+            <para>
+                This fetcher submodule fetches code from the Git
+                source control system.
+                The fetcher works by creating a bare clone of the
+                remote into
+                <link linkend='var-GITDIR'><filename>GITDIR</filename></link>,
+                which is usually <filename>DL_DIR/git2</filename>.
+                This bare clone is then cloned into the work directory during the
+                unpack stage when a specific tree is checked out.
+                This is done using alternates and by reference to
+                minimize the amount of duplicate data on the disk and
+                make the unpack process fast.
+                The executable used can be set with
+                <filename>FETCHCMD_git</filename>.
+            </para>
+
+            <para>
+                This fetcher supports the following parameters:
+                <itemizedlist>
+                    <listitem><para><emphasis>"protocol":</emphasis>
+                        The protocol used to fetch the files.
+                        The default is "git" when a hostname is set.
+                        If a hostname is not set, the Git protocol is "file".
+                        You can also use "http", "https", "ssh" and "rsync".
+                        </para></listitem>
+                    <listitem><para><emphasis>"nocheckout":</emphasis>
+                        Tells the fetcher to not checkout source code when
+                        unpacking when set to "1".
+                        Set this option for the URL where there is a custom
+                        routine to checkout code.
+                        The default is "0".
+                        </para></listitem>
+                    <listitem><para><emphasis>"rebaseable":</emphasis>
+                        Indicates that the upstream Git repository can be rebased.
+                        You should set this parameter to "1" if
+                        revisions can become detached from branches.
+                        In this case, the source mirror tarball is done per
+                        revision, which has a loss of efficiency.
+                        Rebasing the upstream Git repository could cause the
+                        current revision to disappear from the upstream repository.
+                        This option reminds the fetcher to preserve the local cache
+                        carefully for future use.
+                        The default value for this parameter is "0".
+                        </para></listitem>
+                    <listitem><para><emphasis>"nobranch":</emphasis>
+                        Tells the fetcher to not check the SHA validation
+                        for the branch when set to "1".
+                        The default is "0".
+                        Set this option for the recipe that refers to
+                        the commit that is valid for a tag instead of
+                        the branch.
+                        </para></listitem>
+                    <listitem><para><emphasis>"bareclone":</emphasis>
+                        Tells the fetcher to clone a bare clone into the
+                        destination directory without checking out a working tree.
+                        Only the raw Git metadata is provided.
+                        This parameter implies the "nocheckout" parameter as well.
+                        </para></listitem>
+                    <listitem><para><emphasis>"branch":</emphasis>
+                        The branch(es) of the Git tree to clone.
+                        If unset, this is assumed to be "master".
+                        The number of branch parameters much match the number of
+                        name parameters.
+                        </para></listitem>
+                    <listitem><para><emphasis>"rev":</emphasis>
+                        The revision to use for the checkout.
+                        The default is "master".
+                        </para></listitem>
+                    <listitem><para><emphasis>"tag":</emphasis>
+                        Specifies a tag to use for the checkout.
+                        To correctly resolve tags, BitBake must access the
+                        network.
+                        For that reason, tags are often not used.
+                        As far as Git is concerned, the "tag" parameter behaves
+                        effectively the same as the "rev" parameter.
+                        </para></listitem>
+                    <listitem><para><emphasis>"subpath":</emphasis>
+                        Limits the checkout to a specific subpath of the tree.
+                        By default, the whole tree is checked out.
+                        </para></listitem>
+                    <listitem><para><emphasis>"destsuffix":</emphasis>
+                        The name of the path in which to place the checkout.
+                        By default, the path is <filename>git/</filename>.
+                        </para></listitem>
+                </itemizedlist>
+                Here are some example URLs:
+                <literallayout class='monospaced'>
+     SRC_URI = "git://git.oe.handhelds.org/git/vip.git;tag=version-1"
+     SRC_URI = "git://git.oe.handhelds.org/git/vip.git;protocol=http"
+                </literallayout>
+            </para>
+        </section>
+
+        <section id='gitsm-fetcher'>
+            <title>Git Submodule Fetcher (<filename>gitsm://</filename>)</title>
+
+            <para>
+                This fetcher submodule inherits from the
+                <link linkend='git-fetcher'>Git fetcher</link> and extends
+                that fetcher's behavior by fetching a repository's submodules.
+                <link linkend='var-SRC_URI'><filename>SRC_URI</filename></link>
+                is passed to the Git fetcher as described in the
+                "<link linkend='git-fetcher'>Git Fetcher (<filename>git://</filename>)</link>"
+                section.
+                <note>
+                    <title>Notes and Warnings</title>
+                    <para>
+                        You must clean a recipe when switching between
+                        '<filename>git://</filename>' and
+                        '<filename>gitsm://</filename>' URLs.
+                    </para>
+
+                    <para>
+                        The Git Submodules fetcher is not a complete fetcher
+                        implementation.
+                        The fetcher has known issues where it does not use the
+                        normal source mirroring infrastructure properly.
+                    </para>
+                </note>
+            </para>
+        </section>
+
+        <section id='clearcase-fetcher'>
+            <title>ClearCase Fetcher (<filename>ccrc://</filename>)</title>
+
+            <para>
+                This fetcher submodule fetches code from a
+                <ulink url='http://en.wikipedia.org/wiki/Rational_ClearCase'>ClearCase</ulink>
+                repository.
+            </para>
+
+            <para>
+                To use this fetcher, make sure your recipe has proper
+                <link linkend='var-SRC_URI'><filename>SRC_URI</filename></link>,
+                <link linkend='var-SRCREV'><filename>SRCREV</filename></link>, and
+                <link linkend='var-PV'><filename>PV</filename></link> settings.
+                Here is an example:
+                <literallayout class='monospaced'>
+     SRC_URI = "ccrc://cc.example.org/ccrc;vob=/example_vob;module=/example_module"
+     SRCREV = "EXAMPLE_CLEARCASE_TAG"
+     PV = "${@d.getVar("SRCREV", False).replace("/", "+")}"
+                </literallayout>
+                The fetcher uses the <filename>rcleartool</filename> or
+                <filename>cleartool</filename> remote client, depending on
+                which one is available.
+            </para>
+
+            <para>
+                Following are options for the <filename>SRC_URI</filename>
+                statement:
+                <itemizedlist>
+                    <listitem><para><emphasis><filename>vob</filename></emphasis>:
+                        The name, which must include the
+                        prepending "/" character, of the ClearCase VOB.
+                        This option is required.
+                        </para></listitem>
+                    <listitem><para><emphasis><filename>module</filename></emphasis>:
+                        The module, which must include the
+                        prepending "/" character, in the selected VOB.
+                        <note>
+                            The <filename>module</filename> and <filename>vob</filename>
+                            options are combined to create the <filename>load</filename> rule in
+                            the view config spec.
+                            As an example, consider the <filename>vob</filename> and 
+                            <filename>module</filename> values from the 
+                            <filename>SRC_URI</filename> statement at the start of this section.
+                            Combining those values results in the following:
+                            <literallayout class='monospaced'>
+     load /example_vob/example_module
+                            </literallayout>
+                        </note>
+                        </para></listitem>
+                    <listitem><para><emphasis><filename>proto</filename></emphasis>:
+                        The protocol, which can be either <filename>http</filename> or
+                        <filename>https</filename>.
+                        </para></listitem>
+                </itemizedlist>
+            </para>
+
+            <para>
+                By default, the fetcher creates a configuration specification.
+                If you want this specification written to an area other than the default,
+                use the <filename>CCASE_CUSTOM_CONFIG_SPEC</filename> variable
+                in your recipe to define where the specification is written.
+                <note>
+                    the <filename>SRCREV</filename> loses its functionality if you
+                    specify this variable.
+                    However, <filename>SRCREV</filename> is still used to label the
+                    archive after a fetch even though it does not define what is
+                    fetched.
+                </note>
+            </para>
+
+            <para>
+                Here are a couple of other behaviors worth mentioning:
+                <itemizedlist>
+                    <listitem><para>
+                        When using <filename>cleartool</filename>, the login of
+                        <filename>cleartool</filename> is handled by the system.
+                        The login require no special steps.
+                        </para></listitem>
+                    <listitem><para>
+                        In order to use <filename>rcleartool</filename> with authenticated
+                        users, an "rcleartool login" is necessary before using the fetcher.
+                        </para></listitem>
+                </itemizedlist>
+            </para>
+        </section>
+
+        <section id='other-fetchers'>
+            <title>Other Fetchers</title>
+
+            <para>
+                Fetch submodules also exist for the following:
+                <itemizedlist>
+                    <listitem><para>
+                        Bazaar (<filename>bzr://</filename>)
+                        </para></listitem>
+                    <listitem><para>
+                        Perforce (<filename>p4://</filename>)
+                        </para></listitem>
+                    <listitem><para>
+                        Trees using Git Annex (<filename>gitannex://</filename>)
+                        </para></listitem>
+                    <listitem><para>
+                        Secure FTP (<filename>sftp://</filename>)
+                        </para></listitem>
+                    <listitem><para>
+                        Secure Shell (<filename>ssh://</filename>)
+                        </para></listitem>
+                    <listitem><para>
+                        Repo (<filename>repo://</filename>)
+                        </para></listitem>
+                    <listitem><para>
+                        OSC (<filename>osc://</filename>)
+                        </para></listitem>
+                    <listitem><para>
+                        Mercurial (<filename>hg://</filename>)
+                        </para></listitem>
+                </itemizedlist>
+                No documentation currently exists for these lesser used
+                fetcher submodules.
+                However, you might find the code helpful and readable.
+            </para>
+        </section>
+    </section>
+
+    <section id='auto-revisions'>
+        <title>Auto Revisions</title>
+
+        <para>
+            We need to document <filename>AUTOREV</filename> and
+            <filename>SRCREV_FORMAT</filename> here.
+        </para>
+    </section>
+</chapter>

@@ -1,0 +1,95 @@
+The patch comes from OpenEmbedded
+Rebased for ppp-2.4.5. Dongxiao Xu <dongxiao.xu@intel.com>
+
+Upstream-Status: Inappropriate [configuration]
+
+diff -ruN ppp-2.4.5-orig/chat/Makefile.linux ppp-2.4.5/chat/Makefile.linux
+--- ppp-2.4.5-orig/chat/Makefile.linux	2010-06-30 15:51:12.050166398 +0800
++++ ppp-2.4.5/chat/Makefile.linux	2010-06-30 15:51:30.450118446 +0800
+@@ -25,7 +25,7 @@
+ 
+ install: chat
+ 	mkdir -p $(BINDIR) $(MANDIR)
+-	$(INSTALL) -s -c chat $(BINDIR)
++	$(INSTALL) -c chat $(BINDIR)
+ 	$(INSTALL) -c -m 644 chat.8 $(MANDIR)
+ 
+ clean:
+diff -ruN ppp-2.4.5-orig/pppd/Makefile.linux ppp-2.4.5/pppd/Makefile.linux
+--- ppp-2.4.5-orig/pppd/Makefile.linux	2010-06-30 15:51:12.043682063 +0800
++++ ppp-2.4.5/pppd/Makefile.linux	2010-06-30 15:52:11.214170607 +0800
+@@ -99,7 +99,7 @@
+ CFLAGS	+= -DUSE_SRP -DOPENSSL -I/usr/local/ssl/include
+ LIBS	+= -lsrp -L/usr/local/ssl/lib -lcrypto
+ TARGETS	+= srp-entry
+-EXTRAINSTALL = $(INSTALL) -s -c -m 555 srp-entry $(BINDIR)/srp-entry
++EXTRAINSTALL = $(INSTALL) -c -m 555 srp-entry $(BINDIR)/srp-entry
+ MANPAGES += srp-entry.8
+ EXTRACLEAN += srp-entry.o
+ NEEDDES=y
+@@ -200,7 +200,7 @@
+ install: pppd
+ 	mkdir -p $(BINDIR) $(MANDIR)
+ 	$(EXTRAINSTALL)
+-	$(INSTALL) -s -c -m 555 pppd $(BINDIR)/pppd
++	$(INSTALL) -c -m 555 pppd $(BINDIR)/pppd
+ 	if chgrp pppusers $(BINDIR)/pppd 2>/dev/null; then \
+ 	  chmod o-rx,u+s $(BINDIR)/pppd; fi
+ 	$(INSTALL) -c -m 444 pppd.8 $(MANDIR)
+diff -ruN ppp-2.4.5-orig/pppd/plugins/radius/Makefile.linux ppp-2.4.5/pppd/plugins/radius/Makefile.linux
+--- ppp-2.4.5-orig/pppd/plugins/radius/Makefile.linux	2010-06-30 15:51:12.047676187 +0800
++++ ppp-2.4.5/pppd/plugins/radius/Makefile.linux	2010-06-30 15:53:47.750182267 +0800
+@@ -36,11 +36,11 @@
+ 
+ install: all
+ 	$(INSTALL) -d -m 755 $(LIBDIR)
+-	$(INSTALL) -s -c -m 755 radius.so $(LIBDIR)
+-	$(INSTALL) -s -c -m 755 radattr.so $(LIBDIR)
+-	$(INSTALL) -s -c -m 755 radrealms.so $(LIBDIR)
+-	$(INSTALL) -c -m 444 pppd-radius.8 $(MANDIR)
+-	$(INSTALL) -c -m 444 pppd-radattr.8 $(MANDIR)
++	$(INSTALL) -c -m 755 radius.so $(LIBDIR)
++	$(INSTALL) -c -m 755 radattr.so $(LIBDIR)
++	$(INSTALL) -c -m 755 radrealms.so $(LIBDIR)
++	$(INSTALL) -m 444 pppd-radius.8 $(MANDIR)
++	$(INSTALL) -m 444 pppd-radattr.8 $(MANDIR)
+ 
+ radius.so: radius.o libradiusclient.a
+ 	$(CC) -o radius.so -shared radius.o libradiusclient.a
+diff -ruN ppp-2.4.5-orig/pppd/plugins/rp-pppoe/Makefile.linux ppp-2.4.5/pppd/plugins/rp-pppoe/Makefile.linux
+--- ppp-2.4.5-orig/pppd/plugins/rp-pppoe/Makefile.linux	2010-06-30 15:51:12.047676187 +0800
++++ ppp-2.4.5/pppd/plugins/rp-pppoe/Makefile.linux	2010-06-30 15:53:15.454486877 +0800
+@@ -43,9 +43,9 @@
+ 
+ install: all
+ 	$(INSTALL) -d -m 755 $(LIBDIR)
+-	$(INSTALL) -s -c -m 4550 rp-pppoe.so $(LIBDIR)
++	$(INSTALL) -c -m 4550 rp-pppoe.so $(LIBDIR)
+ 	$(INSTALL) -d -m 755 $(BINDIR)
+-	$(INSTALL) -s -c -m 555 pppoe-discovery $(BINDIR)
++	$(INSTALL) -c -m 555 pppoe-discovery $(BINDIR)
+ 
+ clean:
+ 	rm -f *.o *.so pppoe-discovery
+diff -ruN ppp-2.4.5-orig/pppdump/Makefile.linux ppp-2.4.5/pppdump/Makefile.linux
+--- ppp-2.4.5-orig/pppdump/Makefile.linux	2010-06-30 15:51:12.058183383 +0800
++++ ppp-2.4.5/pppdump/Makefile.linux	2010-06-30 15:52:25.762183537 +0800
+@@ -17,5 +17,5 @@
+ 
+ install:
+ 	mkdir -p $(BINDIR) $(MANDIR)
+-	$(INSTALL) -s -c pppdump $(BINDIR)
++	$(INSTALL) -c pppdump $(BINDIR)
+ 	$(INSTALL) -c -m 444 pppdump.8 $(MANDIR)
+diff -ruN ppp-2.4.5-orig/pppstats/Makefile.linux ppp-2.4.5/pppstats/Makefile.linux
+--- ppp-2.4.5-orig/pppstats/Makefile.linux	2010-06-30 15:51:12.058183383 +0800
++++ ppp-2.4.5/pppstats/Makefile.linux	2010-06-30 15:52:42.486341081 +0800
+@@ -22,7 +22,7 @@
+ 
+ install: pppstats
+ 	-mkdir -p $(MANDIR)
+-	$(INSTALL) -s -c pppstats $(BINDIR)
++	$(INSTALL) -c pppstats $(BINDIR)
+ 	$(INSTALL) -c -m 444 pppstats.8 $(MANDIR)
+ 
+ pppstats: $(PPPSTATSRCS)

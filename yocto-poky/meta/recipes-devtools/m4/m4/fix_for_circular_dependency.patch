@@ -1,0 +1,77 @@
+Upstream-Status: Inappropriate [licensing]
+
+The older GPLv2 m4 does not work well with newer autoconf. It causes the 
+circular dependency as seen bellow.
+  Removing this m4 file which was needed only forl older autoconf
+
+| configure.ac:34: error: AC_REQUIRE: circular dependency of AC_GNU_SOURCE
+| /build_disk/poky_build/build1/tmp/work/i586-poky-linux/m4-1.4.9-r0/m4-1.4.9/m4/extensions.m4:19: AC_USE_SYSTEM_EXTENSIONS is expanded from...
+| ../../lib/autoconf/specific.m4:310: AC_GNU_SOURCE is expanded from...
+| /build_disk/poky_build/build1/tmp/work/i586-poky-linux/m4-1.4.9-r0/m4-1.4.9/m4/gnulib-comp.m4:21: M4_EARLY is expanded from...
+| configure.ac:34: the top level
+| autom4te: /build_disk/poky_build/build1/tmp/sysroots/x86_64-linux/usr/bin/m4 failed with exit status: 1
+| aclocal: /build_disk/poky_build/build1/tmp/sysroots/x86_64-linux/usr/bin/autom4te failed with exit status: 1
+| autoreconf: aclocal failed with exit status: 1
+
+Nitin A Kamble <nitin.a.kamble@intel.com>
+2011/03/16
+
+Index: m4-1.4.9/m4/extensions.m4
+===================================================================
+--- m4-1.4.9.orig/m4/extensions.m4
++++ m4-1.4.9/m4/extensions.m4
+@@ -6,53 +6,10 @@
+ # gives unlimited permission to copy and/or distribute it,
+ # with or without modifications, as long as this notice is preserved.
+ 
+-# This definition of AC_USE_SYSTEM_EXTENSIONS is stolen from CVS
+-# Autoconf.  Perhaps we can remove this once we can assume Autoconf
+-# 2.61 or later everywhere, but since CVS Autoconf mutates rapidly
+-# enough in this area it's likely we'll need to redefine
+-# AC_USE_SYSTEM_EXTENSIONS for quite some time.
+-
+-# AC_USE_SYSTEM_EXTENSIONS
+-# ------------------------
+-# Enable extensions on systems that normally disable them,
+-# typically due to standards-conformance issues.
+-AC_DEFUN([AC_USE_SYSTEM_EXTENSIONS],
+-[
+-  AC_BEFORE([$0], [AC_COMPILE_IFELSE])
+-  AC_BEFORE([$0], [AC_RUN_IFELSE])
+-
+-  AC_REQUIRE([AC_GNU_SOURCE])
+-  AC_REQUIRE([AC_AIX])
+-  AC_REQUIRE([AC_MINIX])
+-
+-  AH_VERBATIM([__EXTENSIONS__],
+-[/* Enable extensions on Solaris.  */
+-#ifndef __EXTENSIONS__
+-# undef __EXTENSIONS__
+-#endif
+-#ifndef _POSIX_PTHREAD_SEMANTICS
+-# undef _POSIX_PTHREAD_SEMANTICS
+-#endif
+-#ifndef _TANDEM_SOURCE
+-# undef _TANDEM_SOURCE
+-#endif])
+-  AC_CACHE_CHECK([whether it is safe to define __EXTENSIONS__],
+-    [ac_cv_safe_to_define___extensions__],
+-    [AC_COMPILE_IFELSE(
+-       [AC_LANG_PROGRAM([
+-#	  define __EXTENSIONS__ 1
+-	  AC_INCLUDES_DEFAULT])],
+-       [ac_cv_safe_to_define___extensions__=yes],
+-       [ac_cv_safe_to_define___extensions__=no])])
+-  test $ac_cv_safe_to_define___extensions__ = yes &&
+-    AC_DEFINE([__EXTENSIONS__])
+-  AC_DEFINE([_POSIX_PTHREAD_SEMANTICS])
+-  AC_DEFINE([_TANDEM_SOURCE])
+-])
+ 
+ # gl_USE_SYSTEM_EXTENSIONS
+ # ------------------------
+ # Enable extensions on systems that normally disable them,
+ # typically due to standards-conformance issues.
+ AC_DEFUN([gl_USE_SYSTEM_EXTENSIONS],
+-  [AC_REQUIRE([AC_USE_SYSTEM_EXTENSIONS])])
++  [])

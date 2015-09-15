@@ -1,0 +1,245 @@
+#!/usr/bin/env python
+
+# Copyright (c) 2013 Intel Corporation
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+# DESCRIPTION
+# This script runs tests defined in meta/lib/selftest/
+# It's purpose is to automate the testing of different bitbake tools.
+# To use it you just need to source your build environment setup script and
+# add the meta-selftest layer to your BBLAYERS.
+# Call the script as: "oe-selftest" to run all the tests in in meta/lib/selftest/
+# Call the script as: "oe-selftest <module>.<Class>.<method>" to run just a single test
+# E.g: "oe-selftest bboutput.BitbakeLayers" will run just the BitbakeLayers class from meta/lib/selftest/bboutput.py
+
+
+import os
+import sys
+import unittest
+import logging
+import argparse
+
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)) + '/lib')
+import scriptpath
+scriptpath.add_bitbake_lib_path()
+scriptpath.add_oe_lib_path()
+
+import oeqa.selftest
+import oeqa.utils.ftools as ftools
+from oeqa.utils.commands import runCmd, get_bb_var, get_test_layer
+from oeqa.selftest.base import oeSelfTest
+
+def logger_create():
+    log = logging.getLogger("selftest")
+    log.setLevel(logging.DEBUG)
+
+    fh = logging.FileHandler(filename='oe-selftest.log', mode='w')
+    fh.setLevel(logging.DEBUG)
+
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.INFO)
+
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    ch.setFormatter(formatter)
+
+    log.addHandler(fh)
+    log.addHandler(ch)
+
+    return log
+
+log = logger_create()
+
+def get_args_parser():
+    description = "Script that runs unit tests agains bitbake and other Yocto related tools. The goal is to validate tools functionality and metadata integrity. Refer to https://wiki.yoctoproject.org/wiki/Oe-selftest for more information."
+    parser = argparse.ArgumentParser(description=description)
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('--run-tests', required=False, action='store', nargs='*', dest="run_tests", default=None, help='Select what tests to run (modules, classes or test methods). Format should be: <module>.<class>.<test_method>')
+    group.add_argument('--run-all-tests', required=False, action="store_true", dest="run_all_tests", default=False, help='Run all (unhidden) tests')
+    group.add_argument('--list-modules', required=False, action="store_true", dest="list_modules", default=False, help='List all available test modules.')
+    group.add_argument('--list-classes', required=False, action="store_true", dest="list_allclasses", default=False, help='List all available test classes.')
+    return parser
+
+
+def preflight_check():
+
+    log.info("Checking that everything is in order before running the tests")
+
+    if not os.environ.get("BUILDDIR"):
+        log.error("BUILDDIR isn't set. Did you forget to source your build environment setup script?")
+        return False
+
+    builddir = os.environ.get("BUILDDIR")
+    if os.getcwd() != builddir:
+        log.info("Changing cwd to %s" % builddir)
+        os.chdir(builddir)
+
+    if not "meta-selftest" in get_bb_var("BBLAYERS"):
+        log.error("You don't seem to have the meta-selftest layer in BBLAYERS")
+        return False
+
+    log.info("Running bitbake -p")
+    runCmd("bitbake -p")
+
+    return True
+
+def add_include():
+    builddir = os.environ.get("BUILDDIR")
+    if "#include added by oe-selftest.py" \
+        not in ftools.read_file(os.path.join(builddir, "conf/local.conf")):
+            log.info("Adding: \"include selftest.inc\" in local.conf")
+            ftools.append_file(os.path.join(builddir, "conf/local.conf"), \
+                    "\n#include added by oe-selftest.py\ninclude selftest.inc")
+
+    if "#include added by oe-selftest.py" \
+        not in ftools.read_file(os.path.join(builddir, "conf/bblayers.conf")):
+            log.info("Adding: \"include bblayers.inc\" in bblayers.conf")
+            ftools.append_file(os.path.join(builddir, "conf/bblayers.conf"), \
+                    "\n#include added by oe-selftest.py\ninclude bblayers.inc")
+
+def remove_include():
+    builddir = os.environ.get("BUILDDIR")
+    if builddir is None:
+        return
+    if "#include added by oe-selftest.py" \
+        in ftools.read_file(os.path.join(builddir, "conf/local.conf")):
+            log.info("Removing the include from local.conf")
+            ftools.remove_from_file(os.path.join(builddir, "conf/local.conf"), \
+                    "#include added by oe-selftest.py\ninclude selftest.inc")
+
+    if "#include added by oe-selftest.py" \
+        in ftools.read_file(os.path.join(builddir, "conf/bblayers.conf")):
+            log.info("Removing the include from bblayers.conf")
+            ftools.remove_from_file(os.path.join(builddir, "conf/bblayers.conf"), \
+                    "#include added by oe-selftest.py\ninclude bblayers.inc")
+
+def remove_inc_files():
+    try:
+        os.remove(os.path.join(os.environ.get("BUILDDIR"), "conf/selftest.inc"))
+        for root, _, files in os.walk(get_test_layer()):
+            for f in files:
+                if f == 'test_recipe.inc':
+                    os.remove(os.path.join(root, f))
+    except (AttributeError, OSError,) as e:    # AttributeError may happen if BUILDDIR is not set
+        pass
+
+    try:
+        os.remove(os.path.join(os.environ.get("BUILDDIR"), "conf/bblayers.inc"))
+    except:
+        pass
+
+def get_tests(exclusive_modules=[], include_hidden=False):
+    testslist = []
+    for x in exclusive_modules:
+        testslist.append('oeqa.selftest.' + x)
+    if not testslist:
+        for testpath in oeqa.selftest.__path__:
+            files = sorted([f for f in os.listdir(testpath) if f.endswith('.py') and not (f.startswith('_') and not include_hidden) and not f.startswith('__') and f != 'base.py'])
+            for f in files:
+                module = 'oeqa.selftest.' + f[:-3]
+                if module not in testslist:
+                    testslist.append(module)
+
+    return testslist
+
+def main():
+    parser = get_args_parser()
+    args = parser.parse_args()
+
+    # Add <layer>/lib to sys.path, so layers can add selftests
+    log.info("Running bitbake -e to get BBPATH")
+    bbpath = get_bb_var('BBPATH').split(':')
+    layer_libdirs = [p for p in (os.path.join(l, 'lib') for l in bbpath) if os.path.exists(p)]
+    sys.path.extend(layer_libdirs)
+    reload(oeqa.selftest)
+
+    if args.list_allclasses:
+        args.list_modules = True
+
+    if args.list_modules:
+        log.info('Listing all available test modules:')
+        testslist = get_tests(include_hidden=True)
+        for test in testslist:
+            module = test.split('.')[-1]
+            info = ''
+            if module.startswith('_'):
+                info = ' (hidden)'
+            print module + info
+            if args.list_allclasses:
+                try:
+                    import importlib
+                    modlib = importlib.import_module(test)
+                    for v in vars(modlib):
+                        t = vars(modlib)[v]
+                        if isinstance(t, type(oeSelfTest)) and issubclass(t, oeSelfTest) and t!=oeSelfTest:
+                            print " --", v
+                            for method in dir(t):
+                                if method.startswith("test_"):
+                                    print " --  --", method
+
+                except (AttributeError, ImportError) as e:
+                    print e
+                    pass
+
+    if args.run_tests or args.run_all_tests:
+        if not preflight_check():
+            return 1
+
+        testslist = get_tests(exclusive_modules=(args.run_tests or []), include_hidden=False)
+        suite = unittest.TestSuite()
+        loader = unittest.TestLoader()
+        loader.sortTestMethodsUsing = None
+        runner = unittest.TextTestRunner(verbosity=2, resultclass=StampedResult)
+        # we need to do this here, otherwise just loading the tests
+        # will take 2 minutes (bitbake -e calls)
+        oeSelfTest.testlayer_path = get_test_layer()
+        for test in testslist:
+            log.info("Loading tests from: %s" % test)
+            try:
+                suite.addTests(loader.loadTestsFromName(test))
+            except AttributeError as e:
+                log.error("Failed to import %s" % test)
+                log.error(e)
+                return 1
+        add_include()
+        result = runner.run(suite)
+        log.info("Finished")
+        if result.wasSuccessful():
+            return 0
+        else:
+            return 1
+
+class StampedResult(unittest.TextTestResult):
+    """
+    Custom TestResult that prints the time when a test starts.  As oe-selftest
+    can take a long time (ie a few hours) to run, timestamps help us understand
+    what tests are taking a long time to execute.
+    """
+    def startTest(self, test):
+        import time
+        self.stream.write(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + " - ")
+        super(StampedResult, self).startTest(test)
+
+if __name__ == "__main__":
+    try:
+        ret = main()
+    except Exception:
+        ret = 1
+        import traceback
+        traceback.print_exc(5)
+    finally:
+        remove_include()
+        remove_inc_files()
+    sys.exit(ret)

@@ -1,0 +1,46 @@
+From 46edf01cc98db9f9feec984897836dfdd26bdc8d Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Wed, 12 Aug 2015 23:27:27 +0300
+Subject: [PATCH] Add target to only build tests (not run them)
+
+Not sending upstream as this is only a start of a solution to
+installable tests: It's useful for us already as is.
+
+Upstream-Status: Inappropriate [not a complete solution]
+
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ Makefile.in           | 3 +++
+ testsuite/Makefile.in | 2 ++
+ 2 files changed, 5 insertions(+)
+
+diff --git a/Makefile.in b/Makefile.in
+index 08efb7d..7909342 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -55,6 +55,9 @@ clean distclean mostlyclean maintainer-clean tags:
+ 	  echo "Making $@ in $$d" ; (cd $$d && $(MAKE) $@); done
+ 	$(MAKE) $@-here
+ 
++buildtest:
++	echo "Making $@ in testsuite" ; (cd testsuite && $(MAKE) $@)
++
+ check-here:
+ 	true
+ 
+diff --git a/testsuite/Makefile.in b/testsuite/Makefile.in
+index 6bc1907..bb65bf0 100644
+--- a/testsuite/Makefile.in
++++ b/testsuite/Makefile.in
+@@ -116,6 +116,8 @@ $(TARGETS) $(EXTRA_TARGETS): testutils.$(OBJEXT) ../nettle-internal.$(OBJEXT) \
+ # data.
+ VALGRIND = valgrind --error-exitcode=1 --leak-check=full --show-reachable=yes @IF_ASM@ --partial-loads-ok=yes
+ 
++buildtest: $(TS_ALL)
++
+ # The PATH update is for locating dlls on w*ndows.
+ check: $(TS_ALL)
+ 	LD_LIBRARY_PATH=../.lib PATH="../.lib:$$PATH" srcdir="$(srcdir)" \
+-- 
+2.1.4
+

@@ -1,0 +1,19 @@
+password-auth is the Fedora's common pam configure file, use oe common pam
+configure files instead.
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+--- cronie-1.4.7/pam/crond.orig	2010-12-16 16:59:02.000000000 +0800
++++ cronie-1.4.7/pam/crond	2011-07-20 09:47:16.080819203 +0800
+@@ -4,7 +4,7 @@
+ #
+ # No PAM authentication called, auth modules not needed
+ account    required   pam_access.so
+-account    include    password-auth
++account    include    common-account
+ session    required   pam_loginuid.so
+-session    include    password-auth
+-auth       include    password-auth
++session    include    common-session-noninteractive
++auth       include    common-auth

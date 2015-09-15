@@ -1,0 +1,103 @@
+From 74152ac74a3e1ea0f3be292aa1eeca5ad1fe69c0 Mon Sep 17 00:00:00 2001
+From: Paul Gortmaker <paul.gortmaker@windriver.com>
+Date: Wed, 6 Aug 2014 15:12:11 -0400
+Subject: [PATCH 2/2] inet[6].defn: fix inverted checks for loopback
+
+Compared to the hurd link.defn for loopback, we see these
+are inverted, meaning that you would only be able to configure
+a loopback device that was _not_ named "lo" (unlikely to exist).
+
+The result was that we'd update /run/network/ifstate for "lo"
+but never actually do anything for up/down, as shown below:
+
+root@localhost:~# ifconfig -s
+Iface   MTU Met   RX-OK RX-ERR RX-DRP RX-OVR    TX-OK TX-ERR TX-DRP TX-OVR Flg
+eth0       1500 0   7736329      0   2016 0       5289422      0      0      0 BMRU
+lo        65536 0        18      0      0 0            18      0      0      0 LRU
+root@localhost:~# ifdown lo
+root@localhost:~# echo $?
+0
+root@localhost:~# ifconfig -s
+Iface   MTU Met   RX-OK RX-ERR RX-DRP RX-OVR    TX-OK TX-ERR TX-DRP TX-OVR Flg
+eth0       1500 0   7736406      0   2016 0       5289455      0      0      0 BMRU
+lo        65536 0        18      0      0 0            18      0      0      0 LRU
+root@localhost:~# ifconfig lo down
+root@localhost:~# ifconfig -s
+Iface   MTU Met   RX-OK RX-ERR RX-DRP RX-OVR    TX-OK TX-ERR TX-DRP TX-OVR Flg
+eth0       1500 0   7736474      0   2016 0       5289481      0      0      0 BMRU
+root@localhost:~#
+
+Signed-off-by: Paul Gortmaker <paul.gortmaker@windriver.com>
+---
+ inet.defn  | 12 ++++++------
+ inet6.defn |  8 ++++----
+ 2 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/inet.defn b/inet.defn
+index b176ab4ed03e..5fdfb14a0e1c 100644
+--- a/inet.defn
++++ b/inet.defn
+@@ -6,10 +6,10 @@ method loopback
+     This method may be used to define the IPv4 loopback interface.
+ 
+   up
+-    ip link set dev %iface% up if (!iface_is_lo())
++    ip link set dev %iface% up if (iface_is_lo())
+ 
+   down
+-    ip link set dev %iface% down if (!iface_is_lo())
++    ip link set dev %iface% down if (iface_is_lo())
+ 
+ method static
+   description
+@@ -212,11 +212,11 @@ method loopback
+ 
+   up
+     ifconfig %iface% 127.0.0.1 up \
+-	if (!iface_is_lo())
++	if (iface_is_lo())
+ 
+   down
+     ifconfig %iface% down \
+-	if (!iface_is_lo())
++	if (iface_is_lo())
+ 
+ method static
+   description
+@@ -371,11 +371,11 @@ method loopback
+ 
+   up
+     inetutils-ifconfig --interface %iface% --address 127.0.0.1 --up \
+-	if (!iface_is_lo())
++	if (iface_is_lo())
+ 
+   down
+     inetutils-ifconfig --interface %iface% --down \
+-	if (!iface_is_lo())
++	if (iface_is_lo())
+ 
+ method static
+   description
+diff --git a/inet6.defn b/inet6.defn
+index 09325539cd01..4df64aff38cc 100644
+--- a/inet6.defn
++++ b/inet6.defn
+@@ -33,11 +33,11 @@ method loopback
+   description
+     This method may be used to define the IPv6 loopback interface.
+   up
+-    -ip link set dev %iface% up 2>/dev/null if (!iface_is_lo())
+-    -ip addr add dev %iface% ::1 2>/dev/null if (!iface_is_lo())
++    -ip link set dev %iface% up 2>/dev/null if (iface_is_lo())
++    -ip addr add dev %iface% ::1 2>/dev/null if (iface_is_lo())
+   down
+-    -ip addr del dev %iface% ::1 2>/dev/null if (!iface_is_lo())
+-    -ip link set dev %iface% down 2>/dev/null if (!iface_is_lo())
++    -ip addr del dev %iface% ::1 2>/dev/null if (iface_is_lo())
++    -ip link set dev %iface% down 2>/dev/null if (iface_is_lo())
+ 
+ method static
+   description
+-- 
+1.9.1
+

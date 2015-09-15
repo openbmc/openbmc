@@ -1,0 +1,32 @@
+Upstream-Status: Backport
+
+diff -ruNp tcp_wrappers_7.6.orig/rfc931.c tcp_wrappers_7.6/rfc931.c
+--- tcp_wrappers_7.6.orig/rfc931.c	2004-08-29 18:42:25.000000000 +0200
++++ tcp_wrappers_7.6/rfc931.c	2004-08-29 18:41:04.000000000 +0200
+@@ -33,7 +33,7 @@ static char sccsid[] = "@(#) rfc931.c 1.
+ 
+ int     rfc931_timeout = RFC931_TIMEOUT;/* Global so it can be changed */
+ 
+-static jmp_buf timebuf;
++static sigjmp_buf timebuf;
+ 
+ /* fsocket - open stdio stream on top of socket */
+ 
+@@ -62,7 +62,7 @@ int     protocol;
+ static void timeout(sig)
+ int     sig;
+ {
+-    longjmp(timebuf, sig);
++    siglongjmp(timebuf, sig);
+ }
+ 
+ /* rfc931 - return remote user name, given socket structures */
+@@ -135,7 +135,7 @@ char   *dest;
+ 	 * Set up a timer so we won't get stuck while waiting for the server.
+ 	 */
+ 
+-	if (setjmp(timebuf) == 0) {
++	if (sigsetjmp(timebuf, 0) == 0) {
+ 	    /* Save SIGALRM timer and handler. Sudheer Abdul-Salam, SUN. */
+ 	    saved_timeout = alarm(0);
+ 	    nact.sa_handler = timeout;

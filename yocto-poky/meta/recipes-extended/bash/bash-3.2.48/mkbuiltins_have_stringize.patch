@@ -1,0 +1,29 @@
+On hosts with FORTIFY_SOURCES, stringize support is required, as it's used by
+the macros to wrap functions (e.g. read and open in unistd.h). Those wrappers
+use the STRING() macro from unistd.h. A header in the bash sources overrides
+the unistd.h macro to 'x' when HAVE_STRINGIZE is not defined, causing the
+wrappers to generate calls to 'xread' and 'xopen', which do not exist,
+resulting in a failure to link.
+
+Assume we have stringize support when cross-compiling, which works around the
+issue.
+
+It may be best for upstream to either give up on supporting compilers without
+stringize support, or to not define STRING() at all when FORTIFY_SOURCES is
+defined, letting the unistd.h one be used, instead.
+
+Upstream-Status: Pending
+
+Signed-off-by: Christopher Larson <chris_larson@mentor.com>
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+--- bash-4.2.orig/builtins/mkbuiltins.c
++++ bash-4.2/builtins/mkbuiltins.c
+@@ -28,6 +28,7 @@
+ #  define HAVE_STDLIB_H
+
+ #  define HAVE_RENAME
++#  define HAVE_STRINGIZE
+ #endif /* CROSS_COMPILING */
+
+ #if defined (HAVE_UNISTD_H)

@@ -1,0 +1,19 @@
+uuid.pc is generated at build time so should be installed from the current
+directory, and not $S.
+
+Upstream-Status: Pending [should be submitted]
+Signed-Off-By: Ross Burton <ross.burton@intel.com>
+
+Index: uuid-1.6.2/Makefile.in
+===================================================================
+--- uuid-1.6.2.orig/Makefile.in	2012-11-13 16:58:28.624156000 +0000
++++ uuid-1.6.2/Makefile.in	2012-11-13 17:05:24.224158670 +0000
+@@ -232,7 +232,7 @@
+ 	$(SHTOOL) mkdir -f -p -m 755 $(DESTDIR)$(mandir)/man1
+ 	$(SHTOOL) install -c -m 755 uuid-config $(DESTDIR)$(bindir)/
+ 	$(SHTOOL) install -c -m 644 $(S)/uuid-config.1 $(DESTDIR)$(mandir)/man1/
+-	$(SHTOOL) install -c -m 644 $(S)/uuid.pc $(DESTDIR)$(libdir)/pkgconfig/
++	$(SHTOOL) install -c -m 644 uuid.pc $(DESTDIR)$(libdir)/pkgconfig/
+ 	$(SHTOOL) install -c -m 644 uuid.h $(DESTDIR)$(includedir)/
+ 	-@if [ ".$(WITH_DCE)" = .yes ]; then \
+ 	    echo "$(SHTOOL) install -c -m 644 $(S)/uuid_dce.h $(DESTDIR)$(includedir)/"; \

@@ -1,0 +1,28 @@
+From 0460e2a5f13aaf0081c3c9fec89280046842ddbb Mon Sep 17 00:00:00 2001
+From: Paul Eggleton <paul.eggleton@linux.intel.com>
+Date: Wed, 3 Jul 2013 17:48:30 +0100
+Subject: [PATCH] tools.pro: disable qmeegographicssystemhelper
+
+We don't want this enabled just because we have EGL and OpenGL ES 2.0
+enabled.
+
+Upstream-Status: Inappropriate [config]
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+---
+ tools/tools.pro | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/tools.pro b/tools/tools.pro
+index 0e27053..2d3f36d 100644
+--- a/tools/tools.pro
++++ b/tools/tools.pro
+@@ -49,4 +49,4 @@ QTDIR_build:REQUIRES = "contains(QT_CONFIG, full-config)"
+ 
+ !win32:!embedded:!mac:!symbian:CONFIG += x11
+ 
+-x11:contains(QT_CONFIG, opengles2):contains(QT_CONFIG, egl):SUBDIRS += qmeegographicssystemhelper
++#x11:contains(QT_CONFIG, opengles2):contains(QT_CONFIG, egl):SUBDIRS += qmeegographicssystemhelper
+-- 
+1.8.1.2
+

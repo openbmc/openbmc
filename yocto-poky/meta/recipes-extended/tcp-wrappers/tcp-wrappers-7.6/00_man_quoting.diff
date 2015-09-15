@@ -1,0 +1,77 @@
+Upstream-Status: Backport
+
+diff -ruN tcp_wrappers_7.6.orig/hosts_access.5 tcp_wrappers_7.6/hosts_access.5
+--- tcp_wrappers_7.6.orig/hosts_access.5	1995-01-30 19:51:47.000000000 +0100
++++ tcp_wrappers_7.6/hosts_access.5	2004-04-09 16:59:45.000000000 +0200
+@@ -173,7 +173,7 @@
+ Patterns like these can be used when the machine has different internet
+ addresses with different internet hostnames.  Service providers can use
+ this facility to offer FTP, GOPHER or WWW archives with internet names
+-that may even belong to different organizations. See also the `twist'
++that may even belong to different organizations. See also the `twist\'
+ option in the hosts_options(5) document. Some systems (Solaris,
+ FreeBSD) can have more than one internet address on one physical
+ interface; with other systems you may have to resort to SLIP or PPP
+@@ -236,10 +236,10 @@
+ Before accepting a client request, the wrappers can use the IDENT
+ service to find out that the client did not send the request at all.
+ When the client host provides IDENT service, a negative IDENT lookup
+-result (the client matches `UNKNOWN@host') is strong evidence of a host
++result (the client matches `UNKNOWN@host\') is strong evidence of a host
+ spoofing attack.
+ .PP
+-A positive IDENT lookup result (the client matches `KNOWN@host') is
++A positive IDENT lookup result (the client matches `KNOWN@host\') is
+ less trustworthy. It is possible for an intruder to spoof both the
+ client connection and the IDENT lookup, although doing so is much
+ harder than spoofing just a client connection. It may also be that
+diff -ruN tcp_wrappers_7.6.orig/hosts_options.5 tcp_wrappers_7.6/hosts_options.5
+--- tcp_wrappers_7.6.orig/hosts_options.5	1994-12-28 17:42:29.000000000 +0100
++++ tcp_wrappers_7.6/hosts_options.5	2004-04-09 16:59:49.000000000 +0200
+@@ -124,7 +124,7 @@
+ value is taken.
+ .SH MISCELLANEOUS
+ .IP "banners /some/directory"
+-Look for a file in `/some/directory' with the same name as the daemon
++Look for a file in `/some/directory\' with the same name as the daemon
+ process (for example in.telnetd for the telnet service), and copy its
+ contents to the client. Newline characters are replaced by
+ carriage-return newline, and %<letter> sequences are expanded (see
+diff -ruN tcp_wrappers_7.6.orig/tcpdmatch.8 tcp_wrappers_7.6/tcpdmatch.8
+--- tcp_wrappers_7.6.orig/tcpdmatch.8	1996-02-11 17:01:36.000000000 +0100
++++ tcp_wrappers_7.6/tcpdmatch.8	2004-04-09 17:00:49.000000000 +0200
+@@ -26,7 +26,7 @@
+ A daemon process name. Typically, the last component of a daemon
+ executable pathname.
+ .IP client
+-A host name or network address, or one of the `unknown' or `paranoid'
++A host name or network address, or one of the `unknown\' or `paranoid\'
+ wildcard patterns.
+ .sp
+ When a client host name is specified, \fItcpdmatch\fR gives a
+@@ -37,13 +37,13 @@
+ .PP
+ Optional information specified with the \fIdaemon@server\fR form:
+ .IP server
+-A host name or network address, or one of the `unknown' or `paranoid'
+-wildcard patterns. The default server name is `unknown'.
++A host name or network address, or one of the `unknown\' or `paranoid\'
++wildcard patterns. The default server name is `unknown\'.
+ .PP
+ Optional information specified with the \fIuser@client\fR form:
+ .IP user
+ A client user identifier. Typically, a login name or a numeric userid.
+-The default user name is `unknown'.
++The default user name is `unknown\'.
+ .SH OPTIONS
+ .IP -d
+ Examine \fIhosts.allow\fR and \fIhosts.deny\fR files in the current
+@@ -70,7 +70,7 @@
+ .ti +5
+ tcpdmatch in.telnetd paranoid
+ .PP
+-On some systems, daemon names have no `in.' prefix, or \fItcpdmatch\fR
++On some systems, daemon names have no `in.\' prefix, or \fItcpdmatch\fR
+ may need some help to locate the inetd configuration file.
+ .SH FILES
+ .PP

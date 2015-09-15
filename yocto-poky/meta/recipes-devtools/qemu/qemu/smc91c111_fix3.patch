@@ -1,0 +1,33 @@
+From: Peter Crosthwaite <crosthwaitepeter@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, richard.purdie@linuxfoundation.org
+Subject: [RFT PATCH v1 3/3] net: smc91c111: flush packets on RCR register
+ changes
+Date: Thu, 10 Sep 2015 21:24:12 -0700
+
+The SOFT_RST or RXEN in the control register can be used as a condition
+to unblock the net layer via can_receive(). So check for possible
+flushes on RCR changes. This will drop all pending packets on soft
+reset or disable which is the functional intent of the can_receive()
+logic.
+
+Signed-off-by: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+
+Upstream-Status: Submitted
+---
+
+ hw/net/smc91c111.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+Index: qemu-2.4.0/hw/net/smc91c111.c
+===================================================================
+--- qemu-2.4.0.orig/hw/net/smc91c111.c
++++ qemu-2.4.0/hw/net/smc91c111.c
+@@ -331,6 +331,7 @@ static void smc91c111_writeb(void *opaqu
+             if (s->rcr & RCR_SOFT_RST) {
+                 smc91c111_reset(DEVICE(s));
+             }
++            smc91c111_flush_queued_packets(s);
+             return;
+         case 10: case 11: /* RPCR */
+             /* Ignored */

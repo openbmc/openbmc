@@ -1,0 +1,491 @@
+From 294010b562c9846bb2bc4ee9c63ff78adc7c1f4f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Lisandro=20Dami=C3=A1n=20Nicanor=20P=C3=A9rez=20Meyer?=
+ <perezmeyer@gmail.com>
+Date: Sat, 15 Mar 2014 15:40:49 -0300
+Subject: [PATCH] Add qatomic support for AArch64 (aka arm64).
+
+Patch by Mark Salter <msalter@redhat.com>
+licensed under BSD:
+
+<https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=735488#195>
+
+This patch is known to not be the most correct way
+to implement them, as it seems to be possible to do it in a faster way,
+but should work non the less until we can provide something better.
+
+Change-Id: Ib392b27dc54691fd4c2ea9896240ad71fb8128cc
+
+
+Upstream-Status: Pending
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+---
+ src/corelib/arch/aarch64/arch.pri            |   4 +
+ src/corelib/arch/aarch64/qatomic_aarch64.cpp |  70 ++++++
+ src/corelib/arch/arch.pri                    |   4 +-
+ src/corelib/arch/qatomic_aarch64.h           | 335 +++++++++++++++++++++++++++
+ src/corelib/arch/qatomic_arch.h              |   2 +
+ 5 files changed, 414 insertions(+), 1 deletion(-)
+ create mode 100644 src/corelib/arch/aarch64/arch.pri
+ create mode 100644 src/corelib/arch/aarch64/qatomic_aarch64.cpp
+ create mode 100644 src/corelib/arch/qatomic_aarch64.h
+
+diff --git a/src/corelib/arch/aarch64/arch.pri b/src/corelib/arch/aarch64/arch.pri
+new file mode 100644
+index 0000000..63523d9
+--- /dev/null
++++ b/src/corelib/arch/aarch64/arch.pri
+@@ -0,0 +1,4 @@
++#
++# AArch64 architecture
++#
++SOURCES += $$QT_ARCH_CPP/qatomic_aarch64.cpp
+diff --git a/src/corelib/arch/aarch64/qatomic_aarch64.cpp b/src/corelib/arch/aarch64/qatomic_aarch64.cpp
+new file mode 100644
+index 0000000..fc851b9
+--- /dev/null
++++ b/src/corelib/arch/aarch64/qatomic_aarch64.cpp
+@@ -0,0 +1,70 @@
++/****************************************************************************
++**
++** Copyright (C) 2012, 2013 Digia Plc and/or its subsidiary(-ies).
++** Contact: http://www.qt-project.org/legal
++**
++** This file is part of the QtCore module of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** Commercial License Usage
++** Licensees holding valid commercial Qt licenses may use this file in
++** accordance with the commercial license agreement provided with the
++** Software or, alternatively, in accordance with the terms contained in
++** a written agreement between you and Digia.  For licensing terms and
++** conditions see http://qt.digia.com/licensing.  For further information
++** use the contact form at http://qt.digia.com/contact-us.
++**
++** GNU Lesser General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU Lesser
++** General Public License version 2.1 as published by the Free Software
++** Foundation and appearing in the file LICENSE.LGPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU Lesser General Public License version 2.1 requirements
++** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Digia gives you certain additional
++** rights.  These rights are described in the Digia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU
++** General Public License version 3.0 as published by the Free Software
++** Foundation and appearing in the file LICENSE.GPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU General Public License version 3.0 requirements will be
++** met: http://www.gnu.org/copyleft/gpl.html.
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#include <QtCore/qglobal.h>
++
++#include <unistd.h>
++#ifdef _POSIX_PRIORITY_SCHEDULING
++# include <sched.h>
++#endif
++#include <time.h>
++
++QT_BEGIN_NAMESPACE
++
++QT_USE_NAMESPACE
++
++Q_CORE_EXPORT void qt_atomic_yield(int *count)
++{
++#ifdef _POSIX_PRIORITY_SCHEDULING
++    if ((*count)++ < 50) {
++        sched_yield();
++    } else
++#endif
++    {
++        struct timespec tm;
++        tm.tv_sec = 0;
++        tm.tv_nsec = 2000001;
++        nanosleep(&tm, NULL);
++        *count = 0;
++    }
++}
++
++QT_END_NAMESPACE
+diff --git a/src/corelib/arch/arch.pri b/src/corelib/arch/arch.pri
+index cd23e5e..f50fca7 100644
+--- a/src/corelib/arch/arch.pri
++++ b/src/corelib/arch/arch.pri
+@@ -31,7 +31,9 @@ integrity:HEADERS += arch/qatomic_integrity.h
+                        arch/qatomic_s390.h \
+                        arch/qatomic_x86_64.h \
+                        arch/qatomic_sh.h \
+-                       arch/qatomic_sh4a.h
++                       arch/qatomic_sh4a.h \
++                       arch/qatomic_aarch64.h \
++
+ 
+ QT_ARCH_CPP = $$QT_SOURCE_TREE/src/corelib/arch/$$QT_ARCH
+ DEPENDPATH += $$QT_ARCH_CPP
+diff --git a/src/corelib/arch/qatomic_aarch64.h b/src/corelib/arch/qatomic_aarch64.h
+new file mode 100644
+index 0000000..de61ca8
+--- /dev/null
++++ b/src/corelib/arch/qatomic_aarch64.h
+@@ -0,0 +1,335 @@
++/****************************************************************************
++**
++** Copyright (C) 2012 Digia Plc and/or its subsidiary(-ies).
++** Contact: http://www.qt-project.org/legal
++**
++** This file is part of the QtCore module of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** Commercial License Usage
++** Licensees holding valid commercial Qt licenses may use this file in
++** accordance with the commercial license agreement provided with the
++** Software or, alternatively, in accordance with the terms contained in
++** a written agreement between you and Digia.  For licensing terms and
++** conditions see http://qt.digia.com/licensing.  For further information
++** use the contact form at http://qt.digia.com/contact-us.
++**
++** GNU Lesser General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU Lesser
++** General Public License version 2.1 as published by the Free Software
++** Foundation and appearing in the file LICENSE.LGPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU Lesser General Public License version 2.1 requirements
++** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Digia gives you certain additional
++** rights.  These rights are described in the Digia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU
++** General Public License version 3.0 as published by the Free Software
++** Foundation and appearing in the file LICENSE.GPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU General Public License version 3.0 requirements will be
++** met: http://www.gnu.org/copyleft/gpl.html.
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#ifndef QATOMIC_AARCH64_H
++#define QATOMIC_AARCH64_H
++
++QT_BEGIN_HEADER
++
++QT_BEGIN_NAMESPACE
++
++#define Q_ATOMIC_INT_REFERENCE_COUNTING_IS_ALWAYS_NATIVE
++
++inline bool QBasicAtomicInt::isReferenceCountingNative()
++{ return true; }
++inline bool QBasicAtomicInt::isReferenceCountingWaitFree()
++{ return false; }
++
++#define Q_ATOMIC_INT_TEST_AND_SET_IS_ALWAYS_NATIVE
++
++inline bool QBasicAtomicInt::isTestAndSetNative()
++{ return true; }
++inline bool QBasicAtomicInt::isTestAndSetWaitFree()
++{ return false; }
++
++#define Q_ATOMIC_INT_FETCH_AND_STORE_IS_ALWAYS_NATIVE
++
++inline bool QBasicAtomicInt::isFetchAndStoreNative()
++{ return true; }
++inline bool QBasicAtomicInt::isFetchAndStoreWaitFree()
++{ return false; }
++
++#define Q_ATOMIC_INT_FETCH_AND_ADD_IS_ALWAYS_NATIVE
++
++inline bool QBasicAtomicInt::isFetchAndAddNative()
++{ return true; }
++inline bool QBasicAtomicInt::isFetchAndAddWaitFree()
++{ return false; }
++
++#define Q_ATOMIC_POINTER_TEST_AND_SET_IS_ALWAYS_NATIVE
++
++template <typename T>
++Q_INLINE_TEMPLATE bool QBasicAtomicPointer<T>::isTestAndSetNative()
++{ return true; }
++template <typename T>
++Q_INLINE_TEMPLATE bool QBasicAtomicPointer<T>::isTestAndSetWaitFree()
++{ return false; }
++
++#define Q_ATOMIC_POINTER_FETCH_AND_STORE_IS_ALWAYS_NATIVE
++
++template <typename T>
++Q_INLINE_TEMPLATE bool QBasicAtomicPointer<T>::isFetchAndStoreNative()
++{ return true; }
++template <typename T>
++Q_INLINE_TEMPLATE bool QBasicAtomicPointer<T>::isFetchAndStoreWaitFree()
++{ return false; }
++
++#define Q_ATOMIC_POINTER_FETCH_AND_ADD_IS_ALWAYS_NATIVE
++
++template <typename T>
++Q_INLINE_TEMPLATE bool QBasicAtomicPointer<T>::isFetchAndAddNative()
++{ return true; }
++template <typename T>
++Q_INLINE_TEMPLATE bool QBasicAtomicPointer<T>::isFetchAndAddWaitFree()
++{ return false; }
++
++#ifndef Q_DATA_MEMORY_BARRIER
++# define Q_DATA_MEMORY_BARRIER asm volatile("dmb sy\n":::"memory")
++#endif
++#ifndef Q_COMPILER_MEMORY_BARRIER
++# define Q_COMPILER_MEMORY_BARRIER asm volatile("":::"memory")
++#endif
++
++inline bool QBasicAtomicInt::ref()
++{
++    int newValue;
++
++    Q_COMPILER_MEMORY_BARRIER;
++    newValue = __atomic_add_fetch(&_q_value, 1, __ATOMIC_ACQ_REL);
++    Q_COMPILER_MEMORY_BARRIER;
++
++    return newValue != 0;
++}
++
++inline bool QBasicAtomicInt::deref()
++{
++    int newValue;
++
++    Q_COMPILER_MEMORY_BARRIER;
++    newValue = __atomic_sub_fetch(&_q_value, 1, __ATOMIC_ACQ_REL);
++    Q_COMPILER_MEMORY_BARRIER;
++
++    return newValue != 0;
++}
++
++inline bool QBasicAtomicInt::testAndSetRelaxed(int expectedValue, int newValue)
++{
++    bool val;
++
++    Q_COMPILER_MEMORY_BARRIER;
++    val =  __atomic_compare_exchange_n (&_q_value, &expectedValue, newValue,
++                                        false, __ATOMIC_RELAXED, __ATOMIC_RELAXED);
++    Q_COMPILER_MEMORY_BARRIER;
++    return val;
++}
++
++inline int QBasicAtomicInt::fetchAndStoreRelaxed(int newValue)
++{
++    int val;
++    Q_COMPILER_MEMORY_BARRIER;
++    val = __atomic_exchange_n(&_q_value, newValue, __ATOMIC_RELAXED);
++    Q_COMPILER_MEMORY_BARRIER;
++    return val;
++}
++
++inline int QBasicAtomicInt::fetchAndAddRelaxed(int valueToAdd)
++{
++    int val;
++    Q_COMPILER_MEMORY_BARRIER;
++    val = __atomic_fetch_add(&_q_value, valueToAdd, __ATOMIC_RELAXED);
++    Q_COMPILER_MEMORY_BARRIER;
++    return val;
++}
++
++template <typename T>
++Q_INLINE_TEMPLATE bool QBasicAtomicPointer<T>::testAndSetRelaxed(T *expectedValue, T *newValue)
++{
++    bool val;
++    Q_COMPILER_MEMORY_BARRIER;
++    val =  __atomic_compare_exchange_n (&_q_value, &expectedValue, newValue,
++                                        false, __ATOMIC_RELAXED, __ATOMIC_RELAXED);
++    Q_COMPILER_MEMORY_BARRIER;
++    return val;
++}
++
++template <typename T>
++Q_INLINE_TEMPLATE T *QBasicAtomicPointer<T>::fetchAndStoreRelaxed(T *newValue)
++{
++    T *val;
++    Q_COMPILER_MEMORY_BARRIER;
++    val = __atomic_exchange_n(&_q_value, newValue, __ATOMIC_RELAXED);
++    Q_COMPILER_MEMORY_BARRIER;
++    return val;
++}
++
++template <typename T>
++Q_INLINE_TEMPLATE T *QBasicAtomicPointer<T>::fetchAndAddRelaxed(qptrdiff valueToAdd)
++{
++    T *val;
++    Q_COMPILER_MEMORY_BARRIER;
++    val = __atomic_fetch_add(&_q_value, valueToAdd, __ATOMIC_RELAXED);
++    Q_COMPILER_MEMORY_BARRIER;
++    return val;
++}
++
++inline bool QBasicAtomicInt::testAndSetAcquire(int expectedValue, int newValue)
++{
++    bool returnValue = testAndSetRelaxed(expectedValue, newValue);
++    Q_DATA_MEMORY_BARRIER;
++    return returnValue;
++}
++
++inline bool QBasicAtomicInt::testAndSetRelease(int expectedValue, int newValue)
++{
++    Q_DATA_MEMORY_BARRIER;
++    return testAndSetRelaxed(expectedValue, newValue);
++}
++
++inline bool QBasicAtomicInt::testAndSetOrdered(int expectedValue, int newValue)
++{
++    Q_DATA_MEMORY_BARRIER;
++    bool returnValue = testAndSetRelaxed(expectedValue, newValue);
++    Q_COMPILER_MEMORY_BARRIER;
++    return returnValue;
++}
++
++inline int QBasicAtomicInt::fetchAndStoreAcquire(int newValue)
++{
++    int returnValue = fetchAndStoreRelaxed(newValue);
++    Q_DATA_MEMORY_BARRIER;
++    return returnValue;
++}
++
++inline int QBasicAtomicInt::fetchAndStoreRelease(int newValue)
++{
++    Q_DATA_MEMORY_BARRIER;
++    return fetchAndStoreRelaxed(newValue);
++}
++
++inline int QBasicAtomicInt::fetchAndStoreOrdered(int newValue)
++{
++    Q_DATA_MEMORY_BARRIER;
++    int returnValue = fetchAndStoreRelaxed(newValue);
++    Q_COMPILER_MEMORY_BARRIER;
++    return returnValue;
++}
++
++inline int QBasicAtomicInt::fetchAndAddAcquire(int valueToAdd)
++{
++    int returnValue = fetchAndAddRelaxed(valueToAdd);
++    Q_DATA_MEMORY_BARRIER;
++    return returnValue;
++}
++
++inline int QBasicAtomicInt::fetchAndAddRelease(int valueToAdd)
++{
++    Q_DATA_MEMORY_BARRIER;
++    return fetchAndAddRelaxed(valueToAdd);
++}
++
++inline int QBasicAtomicInt::fetchAndAddOrdered(int valueToAdd)
++{
++    Q_DATA_MEMORY_BARRIER;
++    int returnValue = fetchAndAddRelaxed(valueToAdd);
++    Q_COMPILER_MEMORY_BARRIER;
++    return returnValue;
++}
++
++template <typename T>
++Q_INLINE_TEMPLATE bool QBasicAtomicPointer<T>::testAndSetAcquire(T *expectedValue, T *newValue)
++{
++    bool returnValue = testAndSetRelaxed(expectedValue, newValue);
++    Q_DATA_MEMORY_BARRIER;
++    return returnValue;
++}
++
++template <typename T>
++Q_INLINE_TEMPLATE bool QBasicAtomicPointer<T>::testAndSetRelease(T *expectedValue, T *newValue)
++{
++    Q_DATA_MEMORY_BARRIER;
++    return testAndSetRelaxed(expectedValue, newValue);
++}
++
++template <typename T>
++Q_INLINE_TEMPLATE bool QBasicAtomicPointer<T>::testAndSetOrdered(T *expectedValue, T *newValue)
++{
++    Q_DATA_MEMORY_BARRIER;
++    bool returnValue = testAndSetAcquire(expectedValue, newValue);
++    Q_COMPILER_MEMORY_BARRIER;
++    return returnValue;
++}
++
++template <typename T>
++Q_INLINE_TEMPLATE T *QBasicAtomicPointer<T>::fetchAndStoreAcquire(T *newValue)
++{
++    T *returnValue = fetchAndStoreRelaxed(newValue);
++    Q_DATA_MEMORY_BARRIER;
++    return returnValue;
++}
++
++template <typename T>
++Q_INLINE_TEMPLATE T *QBasicAtomicPointer<T>::fetchAndStoreRelease(T *newValue)
++{
++    Q_DATA_MEMORY_BARRIER;
++    return fetchAndStoreRelaxed(newValue);
++}
++
++template <typename T>
++Q_INLINE_TEMPLATE T *QBasicAtomicPointer<T>::fetchAndStoreOrdered(T *newValue)
++{
++    Q_DATA_MEMORY_BARRIER;
++    T *returnValue = fetchAndStoreRelaxed(newValue);
++    Q_COMPILER_MEMORY_BARRIER;
++    return returnValue;
++}
++
++template <typename T>
++Q_INLINE_TEMPLATE T *QBasicAtomicPointer<T>::fetchAndAddAcquire(qptrdiff valueToAdd)
++{
++    T *returnValue = fetchAndAddRelaxed(valueToAdd);
++    Q_DATA_MEMORY_BARRIER;
++    return returnValue;
++}
++
++template <typename T>
++Q_INLINE_TEMPLATE T *QBasicAtomicPointer<T>::fetchAndAddRelease(qptrdiff valueToAdd)
++{
++    Q_DATA_MEMORY_BARRIER;
++    return fetchAndAddRelaxed(valueToAdd);
++}
++
++template <typename T>
++Q_INLINE_TEMPLATE T *QBasicAtomicPointer<T>::fetchAndAddOrdered(qptrdiff valueToAdd)
++{
++    Q_DATA_MEMORY_BARRIER;
++    T *returnValue = fetchAndAddRelaxed(valueToAdd);
++    Q_COMPILER_MEMORY_BARRIER;
++    return returnValue;
++}
++
++#undef Q_DATA_MEMORY_BARRIER
++#undef Q_COMPILER_MEMORY_BARRIER
++
++QT_END_NAMESPACE
++
++QT_END_HEADER
++
++#endif // QATOMIC_AARCH64_H
+diff --git a/src/corelib/arch/qatomic_arch.h b/src/corelib/arch/qatomic_arch.h
+index 141726c..3e96926 100644
+--- a/src/corelib/arch/qatomic_arch.h
++++ b/src/corelib/arch/qatomic_arch.h
+@@ -94,6 +94,8 @@ QT_BEGIN_HEADER
+ #  include "QtCore/qatomic_sh4a.h"
+ #elif defined(QT_ARCH_NACL)
+ #  include "QtCore/qatomic_generic.h"
++#elif defined(QT_ARCH_AARCH64)
++#  include "QtCore/qatomic_aarch64.h"
+ #else
+ #  error "Qt has not been ported to this architecture"
+ #endif
+-- 
+2.1.0
+

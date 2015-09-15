@@ -1,0 +1,39 @@
+Upstream-Status: Inappropriate [embedded]
+
+Signed-off-by: Ming Liu <ming.liu@windriver.com>
+---
+ Makefile.sub |   10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+--- a/contrib/groffer/Makefile.sub
++++ b/contrib/groffer/Makefile.sub
+@@ -38,16 +38,16 @@ groffer: groffer.sh groffer2.sh version.
+ 	$(RM) $@;
+ 	sed \
+             -e "s|@g@|$(g)|g" \
+-	    -e "s|@BINDIR@|$(DESTDIR)$(bindir)|g" \
++	    -e "s|@BINDIR@|$(bindir)|g" \
+ 	    -e "s|@libdir@|$(DESTDIR)$(libdir)|g" \
+ 	    -e "s|@VERSION@|$(version)$(revision)|g" \
+ 	    $(srcdir)/groffer.sh >$@;
+ 	chmod +x $@
+ 
+ install_data: groffer
+-	-test -d $(DESTDIR)$(bindir) || $(mkinstalldirs) $(DESTDIR)$(bindir)
+-	-$(RM) $(DESTDIR)$(bindir)/groffer
+-	$(INSTALL_SCRIPT) groffer $(DESTDIR)$(bindir)/groffer
++	-test -d $(bindir) || $(mkinstalldirs) $(bindir)
++	-$(RM) $(bindir)/groffer
++	$(INSTALL_SCRIPT) groffer $(bindir)/groffer
+ 	-test -d $(DESTDIR)$(libdir)/groff/groffer || \
+           $(mkinstalldirs) $(DESTDIR)$(libdir)/groff/groffer
+ 	-$(RM) $(DESTDIR)$(libdir)/groff/groffer/groffer2.sh
+@@ -58,7 +58,7 @@ install_data: groffer
+ 	$(DESTDIR)$(libdir)/groff/groffer/version.sh
+ 
+ uninstall_sub:
+-	-$(RM) $(DESTDIR)$(bindir)/groffer
++	-$(RM) $(bindir)/groffer
+ 	-$(RM) $(DESTDIR)$(libdir)/groff/groffer/groffer2.sh
+ 	-$(RM) $(DESTDIR)$(libdir)/groff/groffer/version.sh
+ 	-rmdir $(DESTDIR)$(libdir)/groff/groffer

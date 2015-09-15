@@ -1,0 +1,49 @@
+Upstream-Status: Pending
+
+Index: settings-daemon/settings-daemon.c
+===================================================================
+--- settings-daemon.orig/settings-daemon.c	2009-05-22 14:57:05.000000000 +0100
++++ settings-daemon/settings-daemon.c	2009-05-22 14:58:22.000000000 +0100
+@@ -187,6 +187,10 @@
+     GCONF_VALUE_STRING, translate_string_string },
+   { "/desktop/poky/interface/gtk_color_scheme", "Gtk/ColorScheme",
+     GCONF_VALUE_STRING, translate_string_string },
++  { "/desktop/gnome/sound/theme_name", "Net/SoundThemeName",
++    GCONF_VALUE_STRING,   translate_string_string },
++  { "/desktop/gnome/sound/event_sounds", "Net/EnableEventSounds" ,
++    GCONF_VALUE_BOOL,     translate_bool_int },
+ };
+ 
+ static const TranslationEntry*
+Index: settings-daemon/settings-daemon.schemas
+===================================================================
+--- settings-daemon.orig/settings-daemon.schemas	2009-05-22 15:49:17.000000000 +0100
++++ settings-daemon/settings-daemon.schemas	2009-05-22 15:51:31.000000000 +0100
+@@ -196,6 +196,27 @@
+     </locale>
+   </schema>
+ 
++  <schema>
++    <key>/schemas/desktop/gnome/sound/theme_name</key>
++    <applyto>/desktop/gnome/sound/theme_name</applyto>
++    <owner>gnome</owner>
++    <type>string</type>
++    <default>freedesktop</default>
++    <locale name="C">
++      <short>Sound Theme Name</short>
++    </locale>
++  </schema>
++
++  <schema>
++    <key>/schemas/desktop/gnome/sound/event_sounds</key>
++    <applyto>/desktop/gnome/sound/event_sounds</applyto>
++    <owner>gnome</owner>
++    <type>bool</type>
++    <default>true</default>
++    <locale name="C">
++      <short>Enable Sound Events</short>
++    </locale>
++  </schema>
+ 
+ </schemalist>
+ </gconfschemafile>

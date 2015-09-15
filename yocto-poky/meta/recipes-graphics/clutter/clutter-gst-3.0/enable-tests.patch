@@ -1,0 +1,23 @@
+Install example binary needed for core-image-clutter
+
+Signed-off-by: Zhai Edwin <edwin.zhai@intel.com>
+
+Upstream-Status: Inappropriate [configuration]
+
+Imported from clutter-gst-1.8 package, git://git.openembedded.org/openembedded,
+commit ae28ee3f7a060b9e0d13154a84f2444a98490b5b, updated for clutter-gst 1.6
+
+Signed-off-by: Tomas Frydrych <tomas@sleepfive.com>
+
+Index: git/examples/Makefile.am
+===================================================================
+--- git.orig/examples/Makefile.am	2011-01-31 10:14:23.000000000 +0800
++++ git/examples/Makefile.am	2011-01-31 10:14:34.000000000 +0800
+@@ -1,6 +1,6 @@
+ NULL = #
+ 
+-noinst_PROGRAMS = video-player video-sink video-sink-navigation
++bin_PROGRAMS = video-player video-sink video-sink-navigation
+ 
+ INCLUDES = -I$(top_srcdir) \
+ 	   $(MAINTAINER_CFLAGS) \

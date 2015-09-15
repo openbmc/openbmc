@@ -1,0 +1,57 @@
+Add options "aio" and "acl" to enable/disable libaio and acl support.
+
+Upstream-Status: Pending
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+Signed-off-by: Chong Lu <Chong.Lu@windriver.com>
+---
+ configure.ac |   26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index e73958c..9099370 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -270,6 +270,18 @@ AC_CHECK_HEADERS(m4_normalize([
+ 	sys/vfs.h
+ 	sys/xattr.h
+ ]))
++
++AC_ARG_ENABLE([acl],
++	[AS_HELP_STRING([--enable-acl], [turn on acl support])],
++	[case $enableval in
++	yes)
++		AC_CHECK_HEADERS([sys/acl.h])
++		;;
++	no)  ;;
++	*)   AC_MSG_ERROR([bad value $enableval for aio option]) ;;
++	esac]
++)
++
+ AC_CHECK_HEADERS([linux/icmp.h linux/in6.h linux/netlink.h linux/if_packet.h],
+                  [], [], [#include <stddef.h>
+ #include <sys/socket.h>
+@@ -745,6 +757,20 @@ if test "x$ac_cv_lib_dl_dladdr" = xyes; then
+ fi
+ AC_SUBST(dl_LIBS)
+ 
++AC_ARG_ENABLE([aio],
++	[AS_HELP_STRING([--enable-aio], [turn on libaio support])],
++	[case $enableval in
++	yes)
++	AC_CHECK_HEADERS([libaio.h], [
++		AC_CHECK_MEMBERS([struct iocb.u.c.flags],,, [#include <libaio.h>])
++		AC_CHECK_DECLS([IO_CMD_PWRITE, IO_CMD_PWRITEV],,, [#include <libaio.h>])
++	])
++	;;
++	no)  ;;
++	*)   AC_MSG_ERROR([bad value $enableval for aio option]) ;;
++	esac]
++)
++
+ AC_PATH_PROG([PERL], [perl])
+ 
+ dnl stack trace with libunwind
+--
+1.9.1
+

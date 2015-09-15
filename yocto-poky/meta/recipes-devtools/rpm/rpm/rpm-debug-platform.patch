@@ -1,0 +1,65 @@
+Debug the platform score generation...
+
+Index: rpm-5.4.14/lib/rpmrc.c
+===================================================================
+--- rpm-5.4.14.orig/lib/rpmrc.c
++++ rpm-5.4.14/lib/rpmrc.c
+@@ -465,6 +465,8 @@ static rpmRC rpmPlatform(const char * pl
+ 
+     rc = (rpmRC) rpmiobSlurp(platform, &iob);
+ 
++    fprintf(stderr, "D: rpmPlatform file %s\n", platform);
++
+     if (rc || iob == NULL) {
+ 	rc = RPMRC_FAIL;
+ 	goto exit;
+@@ -486,6 +488,7 @@ static rpmRC rpmPlatform(const char * pl
+ 	    while (--t > p && xisspace(*t))
+ 		*t = '\0';
+ 	    if (t > p) {
++		fprintf(stderr, "D: rpmPlatform mireAppend REGEX %s\n", p);
+ 		xx = mireAppend(RPMMIRE_REGEX, 0, p, NULL, &mi_re, &mi_nre);
+ 	    }
+ 	    continue;
+@@ -503,6 +506,11 @@ static rpmRC rpmPlatform(const char * pl
+ 		_gnu = rpmExpand("-", cvog->gnu, NULL);
+ 
+ 	    addMacro(NULL, "_platform_gnu", NULL, (_gnu ? _gnu : ""), -1);
++	    fprintf(stderr, "D: rpmPlatform addMacro %s-%s-%s(%s)\n",
++	    	rpmExpand("%{_platform_cpu}", NULL),
++		rpmExpand("%{_platform_vendor}", NULL),
++		rpmExpand("%{_platform_os}", NULL),
++		rpmExpand("%{_platform_gnu}", NULL));
+ #else
+ 	    addMacro(NULL, "_host_cpu", NULL, cvog->cpu, -1);
+ 	    addMacro(NULL, "_host_vendor", NULL, cvog->vendor, -1);
+@@ -510,6 +518,7 @@ static rpmRC rpmPlatform(const char * pl
+ #endif
+ 	}
+ 
++	fprintf(stderr, "D: rpmPlatform mireAppend STRCMP %s -- ", p);
+ #if !defined(RPM_VENDOR_OE) /* Skip the explicit-platform */
+ #if defined(RPM_VENDOR_OPENPKG) /* explicit-platform */
+ 	/* do not use vendor and GNU attribution */
+@@ -519,6 +528,7 @@ static rpmRC rpmPlatform(const char * pl
+ 		(cvog && *cvog->gnu ? "-" : NULL),
+ 		(cvog ? cvog->gnu : NULL), NULL);
+ #endif
++	fprintf(stderr, "%s\n", p);
+ 	xx = mireAppend(RPMMIRE_STRCMP, 0, p, NULL, &mi_re, &mi_nre);
+ 	p = _free(p);
+ #endif
+@@ -688,9 +698,12 @@ int rpmPlatformScore(const char * platfo
+ 
+     if ((mire = (miRE) mi_re) != NULL)
+     for (i = 0; i < mi_nre; i++) {
+-	if (mireRegexec(mire + i, platform, 0) >= 0)
++	if (mireRegexec(mire + i, platform, 0) >= 0) {
++	    fprintf(stderr, "D: rpmPlatformScore %s (%d)\n", platform, i + 1);
+ 	    return (i + 1);
++	}
+     }
++    fprintf(stderr, "D: rpmPlatformScore %s (%d)\n", platform, 0);
+     return 0;
+ }
+ /*@=onlytrans@*/

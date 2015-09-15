@@ -1,0 +1,98 @@
+From 52c34001bad85c3032618070b1d6b2a3c6880715 Mon Sep 17 00:00:00 2001
+From: Neil Jerram <n...@ossau.homelinux.net>
+Date: Thu, 8 Nov 2012 08:18:32 +0000
+Subject: [PATCH] Fix QWSLock "invalid argument" logs
+
+There was no known actual problem associated with these logs, but they
+were spamming the log, so I thought it worth trying to understand and
+fix them.
+
+The confusion is that there are two different ways of creating QWSLock
+objects.  "QWSLock()" creates an object that creates a new set of
+semaphores, whereas "QWSLock(id)" creates an object that aliases the
+existing set of semaphores with ID id.  What seems to happen is that
+each application creates a semaphore set scoped to that
+application (QWSDisplay::Data::clientLock in qapplication_qws.cpp),
+then this semaphore set is passed by complex means to
+places (QWSClientPrivate and QWSMemorySurface) that use the semaphores
+for a short period and then delete their QWSLock objects.
+
+The problem was that the QWSLock destructor always destroyed the
+semaphore set, even when that QWSLock hadn't create the semaphores
+itself, hence making the semaphores invalid for other QWSLock objects
+still referencing the same set.
+
+Clearly a QWSLock object shouldn't destroy the semaphore set if it
+didn't create it itself, and that is confirmed by the fact that one of
+the implementations inside QWSLock already implements this logic, with
+the 'owned' flag.  The fix is to implement this for the #ifndef
+QT_POSIX_IPC case - which is what is used in QtMoko - just as is
+already implemented for the #ifdef QT_POSIX_IPC case.
+
+Original patch can be found here:
+ http://www.mail-archive.com/community@lists.openmoko.org/msg65512.html
+
+Upstream-Status: Submitted
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+ (Removed the commented-out debug statements from the original patch.)
+
+---
+
+diff --git a/src/gui/embedded/qwslock.cpp b/src/gui/embedded/qwslock.cpp
+index 9914a24..1055785 100644
+--- a/src/gui/embedded/qwslock.cpp
++++ b/src/gui/embedded/qwslock.cpp
+@@ -83,9 +83,12 @@ QWSLock::QWSLock(int id) : semId(id)
+     QWSSignalHandler::instance()->addWSLock(this);
+ #endif
+ 
++    owned = false;
++
+ #ifndef QT_POSIX_IPC
+     if (semId == -1) {
+         semId = semget(IPC_PRIVATE, 3, IPC_CREAT | 0666);
++        owned = true;
+         if (semId == -1) {
+             perror("QWSLock::QWSLock");
+             qFatal("Unable to create semaphore");
+@@ -100,7 +104,6 @@ QWSLock::QWSLock(int id) : semId(id)
+     }
+ #else
+     sems[0] = sems[1] = sems[2] = SEM_FAILED;
+-    owned = false;
+ 
+     if (semId == -1) {
+         // ### generate really unique IDs
+@@ -134,9 +137,11 @@ QWSLock::~QWSLock()
+ 
+     if (semId != -1) {
+ #ifndef QT_POSIX_IPC
+-        qt_semun semval;
+-        semval.val = 0;
+-        semctl(semId, 0, IPC_RMID, semval);
++	if (owned) {
++	    qt_semun semval;
++	    semval.val = 0;
++	    semctl(semId, 0, IPC_RMID, semval);
++	}
+         semId = -1;
+ #else
+         // emulate the SEM_UNDO behavior for the BackingStore lock
+diff --git a/src/gui/embedded/qwslock_p.h b/src/gui/embedded/qwslock_p.h
+index d324e4f..d867d20 100644
+--- a/src/gui/embedded/qwslock_p.h
++++ b/src/gui/embedded/qwslock_p.h
+@@ -86,8 +86,8 @@ private:
+     int lockCount[2];
+ #ifdef QT_POSIX_IPC
+     sem_t *sems[3];
+-    bool owned;
+ #endif
++    bool owned;
+ };
+ 
+ QT_END_NAMESPACE
+ 
+-- 
+1.7.10.4

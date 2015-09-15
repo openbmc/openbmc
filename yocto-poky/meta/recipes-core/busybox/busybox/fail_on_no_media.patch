@@ -1,0 +1,31 @@
+Upstream-Status: Pending
+
+The current behaviour of busybox is to try all fstype when automounting
+even when no media exists.  The util-linux mount command bails when no
+media exists, so change the behaviour of busybox to do the same.
+
+It could also be argued that the KERN_INFO message from btrfs could be
+removed, but that would be harder to accomplish.
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+
+Index: busybox-1.20.2/util-linux/mount.c
+===================================================================
+--- busybox-1.20.2.orig/util-linux/mount.c
++++ busybox-1.20.2/util-linux/mount.c
+@@ -598,7 +598,13 @@ static int mount_it_now(struct mntent *m
+ 				break;
+ 			errno = errno_save;
+ 		}
+-
++		/*
++		 * Break if there is no media, no point retrying for all
++		 * fs types since there is no media available
++		 */
++		if (rc == -1 && errno == ENOMEDIUM) {
++			bb_perror_msg_and_die("mounting %s on %s failed", mp->mnt_fsname, mp->mnt_dir);
++		}
+ 		if (!rc || (vfsflags & MS_RDONLY) || (errno != EACCES && errno != EROFS))
+ 			break;
+ 		if (!(vfsflags & MS_SILENT))

@@ -1,0 +1,37 @@
+[PATCH] add knob to control whether tirpc support should be checked
+
+Upstream-Status: Pending
+
+tirpc support is broken upstream. in the meantime, allow to disable tirpc.
+
+Signed-off-by: Fathi Boudra <fathi.boudra@linaro.org>
+---
+ configure.ac |    9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -98,6 +98,13 @@ if test "x$with_python" = xyes; then
+ else
+     AC_SUBST([WITH_PYTHON],["no"])
+ fi
++
++# TI RPC
++AC_ARG_WITH([tirpc],
++  AC_HELP_STRING([--without-tirpc],
++    [without libtirpc support]),
++  [],[with_tirpc=yes],
++)
+ # END tools knobs
+ 
+ # Testsuites knobs
+@@ -182,7 +189,9 @@ LTP_CHECK_RENAMEAT
+ LTP_CHECK_FALLOCATE
+ LTP_CHECK_SYSCALL_FCNTL
+ LTP_CHECK_SYSCALL_PERF_EVENT_OPEN
++if test "x$with_tirpc" = xyes; then
+ LTP_CHECK_TIRPC
++fi
+ LTP_CHECK_TEE
+ LTP_CHECK_SPLICE
+ LTP_CHECK_VMSPLICE

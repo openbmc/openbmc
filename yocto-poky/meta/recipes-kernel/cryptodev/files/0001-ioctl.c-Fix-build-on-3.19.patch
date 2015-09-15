@@ -1,0 +1,29 @@
+From 7d71124991030f99965e6e6aaed421115f185adb Mon Sep 17 00:00:00 2001
+From: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
+Date: Mon, 9 Feb 2015 13:51:56 +0100
+Subject: [PATCH] ioctl.c: Fix build on 3.19
+
+get_unused_fd() MACRO has been removed on kernel 3.19. Replace by the
+actual output of the macro.
+
+Signed-off-by: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
+---
+ ioctl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ioctl.c b/ioctl.c
+index f26cf93..cf8cc17 100644
+--- a/ioctl.c
++++ b/ioctl.c
+@@ -529,7 +529,7 @@ static int
+ clonefd(struct file *filp)
+ {
+ 	int ret;
+-	ret = get_unused_fd();
++	ret = get_unused_fd_flags(0);
+ 	if (ret >= 0) {
+ 			get_file(filp);
+ 			fd_install(ret, filp);
+-- 
+2.1.4
+

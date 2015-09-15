@@ -1,0 +1,58 @@
+To enable --disable-Werror for libomxil to avoid some compilers which check code strictly.
+
+For example, at least the following errors happened to some compilers:
+
+1) OMX_INDEXTYPE in include/OMX_Index.h IS NOT OMX_INDEXVENDORTYPE in src/base/omx_base_component.h
+| i586-poky-linux-libtool: compile:  i586-poky-linux-gcc -m32 -march=i586 --sysroot=/home/yocto-build5/poky/build/tmp/sysroots/qemux86 -DHAVE_Climinate-unused-debug-types -Wall -Werror -DCONFIG_DEBUG_LEVEL=0 -c OMXComponentRMExt.c  -fPIC -DPIC -o .libs/libomxbase_la-OMXComponentRMExt.o
+| omx_base_component.c: In function 'omx_base_component_GetParameter':
+| omx_base_component.c:991:3: error: case value '2130706435' not in enumerated type 'OMX_INDEXTYPE' [-Werror=switch]
+| omx_base_component.c:918:3: error: case value '2130706436' not in enumerated type 'OMX_INDEXTYPE' [-Werror=switch]
+
+2)
+| i586-poky-linux-gcc  -m32   -march=i586 --sysroot=/home/yocto-build5/poky/build/tmp/sysroots/qemux86 -DHAVE_CONFIG_H -I. -I..    -DOMXILCOMPOminate-unused-debug-types -Wall -Werror -DCONFIG_DEBUG_LEVEL=0 -c -o omxregister_bellagio-omxregister.o `test -f 'omxregister.c' || echo './'`o
+| omxregister.c: In function 'buildComponentsList':
+| omxregister.c:175:7: error: variable 'err' set but not used [-Werror=unused-but-set-variable]
+| cc1: all warnings being treated as errors
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Shane Wang <shane.wang@intel.com>
+
+diff -r 82d742d3ea90 configure.ac
+--- a/configure.ac	Tue Dec 27 15:30:35 2011 +0800
++++ b/configure.ac	Tue Dec 27 16:26:03 2011 +0800
+@@ -5,7 +5,7 @@
+ AC_PREREQ([2.59])
+ 
+ AC_CONFIG_HEADERS([config.h])
+-CFLAGS="${CFLAGS} -Wall -Werror"
++CFLAGS="${CFLAGS} -Wall"
+ 
+ ################################################################################
+ # Set the shared versioning info, according to section 6.3 of the libtool info #
+@@ -122,6 +122,14 @@
+     [with_android=$enableval],
+     [with_android=no])
+ 
++AC_ARG_ENABLE(
++    [Werror],
++    [AC_HELP_STRING(
++        [--disable-Werror],
++        [whether to diable treating gcc warnings as errors])],
++    [with_Werror=$enableval],
++    [with_Werror=yes])
++
+ ################################################################################
+ # Check for programs                                                           #
+ ################################################################################
+@@ -193,6 +201,10 @@
+  CFG_DEBUG_LEVEL=255
+ fi
+ 
++if test "x$with_Werror" = "xyes"; then
++ CFLAGS="${CFLAGS} -Werror"
++fi
++
+ AC_SUBST(CFG_DEBUG_LEVEL)
+ CFLAGS="${CFLAGS} -DCONFIG_DEBUG_LEVEL=$CFG_DEBUG_LEVEL"
+ 

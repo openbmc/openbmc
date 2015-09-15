@@ -1,0 +1,15 @@
+Upstream-Status: Pending
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+--- ./configure.ad	2003-12-11 19:17:10.000000000 +0100
++++ ./configure	2003-12-11 19:17:27.000000000 +0100
+@@ -26,7 +26,7 @@
+ # (Indeed, -r may cause the terminal to get into funny states.
+ # Very inconvenient. For viewing pages in strange locales, set LC_*.)
+ #
+-DEFAULTLESSOPT="-is"
++DEFAULTLESSOPT="-isr"
+ #
+ # Note that not creating any cat directories (/var/cache/man or so)
+ # and not making man suid or sgid is recommended.

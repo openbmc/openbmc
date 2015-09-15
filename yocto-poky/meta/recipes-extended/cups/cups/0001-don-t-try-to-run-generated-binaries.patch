@@ -1,0 +1,69 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+From 90069586167b930befce7303aea57078f04b4ed8 Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen@dominion.thruhere.net>
+Date: Sun, 30 Jan 2011 16:37:27 +0100
+Subject: [PATCH] don't try to run generated binaries
+
+Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
+---
+ ppdc/Makefile |   30 +++++++++++++++---------------
+ 1 files changed, 15 insertions(+), 15 deletions(-)
+
+Index: cups-2.0.0/ppdc/Makefile
+===================================================================
+--- cups-2.0.0.orig/ppdc/Makefile
++++ cups-2.0.0/ppdc/Makefile
+@@ -242,8 +242,8 @@ genstrings:		genstrings.o libcupsppdc.a
+ 	$(CXX) $(ARCHFLAGS) $(LDFLAGS) -o genstrings genstrings.o \
+ 		libcupsppdc.a ../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) \
+ 		$(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+-	echo Generating localization strings...
+-	./genstrings >sample.c
++#	echo Generating localization strings...
++#	./genstrings >sample.c
+ 
+ 
+ #
+@@ -260,9 +260,9 @@ ppdc-static:		ppdc.o libcupsppdc.a ../cu
+ 	$(CXX) $(ARCHFLAGS) $(LDFLAGS) -o ppdc-static ppdc.o libcupsppdc.a \
+ 		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
+ 		$(COMMONLIBS) $(LIBZ)
+-	echo Testing PPD compiler...
+-	./ppdc-static -l en,fr -I ../data foo.drv
+-	./ppdc-static -l en,fr -z -I ../data foo.drv
++#	echo Testing PPD compiler...
++#	./ppdc-static -l en,fr -I ../data foo.drv
++#	./ppdc-static -l en,fr -z -I ../data foo.drv
+ 
+ 
+ #
+@@ -288,17 +288,17 @@ ppdi-static:		ppdc-static ppdi.o libcups
+ 	$(CXX) $(ARCHFLAGS) $(LDFLAGS) -o ppdi-static ppdi.o libcupsppdc.a \
+ 		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
+ 		$(COMMONLIBS) $(LIBZ)
+-	echo Testing PPD importer...
+-	$(RM) -r ppd ppd2 sample-import.drv
+-	./ppdc-static -l en -I ../data sample.drv
+-	./ppdi-static -I ../data -o sample-import.drv ppd/*
+-	./ppdc-static -l en -I ../data -d ppd2 sample-import.drv
+-	if diff -r ppd ppd2 >/dev/null; then \
+-		echo PPD import OK; \
+-	else \
+-		echo PPD import FAILED; \
+-		exit 1; \
+-	fi
++#	echo Testing PPD importer...
++#	$(RM) -r ppd ppd2 sample-import.drv
++#	./ppdc-static -l en -I ../data sample.drv
++#	./ppdi-static -I ../data -o sample-import.drv ppd/*
++#	./ppdc-static -l en -I ../data -d ppd2 sample-import.drv
++#	if diff -r ppd ppd2 >/dev/null; then \
++#		echo PPD import OK; \
++#	else \
++#		echo PPD import FAILED; \
++#		exit 1; \
++#	fi
+ 
+ 
+ #

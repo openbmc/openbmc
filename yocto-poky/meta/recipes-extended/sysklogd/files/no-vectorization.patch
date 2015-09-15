@@ -1,0 +1,20 @@
+Upstream-Status: Inappropriate
+
+The compiler should not be generating vectorized instructions on this target.
+This is a work around until I can determine why this is occuring on this
+particular recipe
+
+Index: sysklogd-1.5/Makefile
+===================================================================
+--- sysklogd-1.5.orig/Makefile
++++ sysklogd-1.5/Makefile
+@@ -20,7 +20,8 @@
+ CC= gcc
+ #SKFLAGS= -g -DSYSV -Wall
+ #LDFLAGS= -g
+-SKFLAGS= $(RPM_OPT_FLAGS) -O3 -DSYSV -fomit-frame-pointer -Wall -fno-strength-reduce
++SKFLAGS= $(RPM_OPT_FLAGS) -O3 -DSYSV -fomit-frame-pointer -Wall -fno-strength-reduce \
++	-fno-tree-vectorize
+ # -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE
+ # -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE
+ # $(shell getconf LFS_SKFLAGS)

@@ -1,0 +1,17 @@
+shutils should consider symlinks
+
+-Khem
+
+Upstream-Status: Pending
+
+--- a/Lib/shutil.py	2013-01-29 12:31:06.926555779 -0800
++++ b/Lib/shutil.py	2013-01-29 16:31:39.097554182 -0800
+@@ -132,7 +132,7 @@ def copymode(src, dst, *, follow_symlink
+     st = stat_func(src)
+     chmod_func(dst, stat.S_IMODE(st.st_mode))
+ 
+-if hasattr(os, 'listxattr'):
++if hasattr(os, 'listxattr') and os.listxattr in os.supports_follow_symlinks:
+     def _copyxattr(src, dst, *, follow_symlinks=True):
+         """Copy extended filesystem attributes from `src` to `dst`.
+ 

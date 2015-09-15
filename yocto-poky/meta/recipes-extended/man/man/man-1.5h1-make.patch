@@ -1,0 +1,17 @@
+Upstream-Status: Pending
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+--- man-1.5g/man/Makefile.in.mike	Fri Apr  9 13:35:54 1999
++++ man-1.5g/man/Makefile.in	Fri Apr  9 13:36:45 1999
+@@ -1,8 +1,8 @@
+ # only executed from a subdir
+ MAN1 = man whatis apropos
+-MAN5 = man.conf
++MAN5 = man.config
+ MAN8 = makewhatis
+-ALL = man.1 whatis.1 apropos.1 man.conf.5
++ALL = man.1 whatis.1 apropos.1 man.config.5
+ MAYBE8 = makewhatis
+ 
+ .SUFFIXES: .man .1 .5 .8

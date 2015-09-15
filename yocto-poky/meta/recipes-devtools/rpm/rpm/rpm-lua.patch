@@ -1,0 +1,33 @@
+Add support for cross compiling lua
+
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.14/configure.ac
+===================================================================
+--- rpm-5.4.14.orig/configure.ac
++++ rpm-5.4.14/configure.ac
+@@ -121,6 +121,9 @@ AC_PROG_YACC
+ 
+ AC_PATH_PROG(AS, as, as)
+ 
++CC_FOR_BUILD=${CC_FOR_BUILD-\$(CC)}
++AC_SUBST(CC_FOR_BUILD)
++
+ dnl # GCC specifics
+ AC_PROG_GCC_TRADITIONAL
+ AC_ARG_ENABLE(build-pic,
+Index: rpm-5.4.14/lua/Makefile.am
+===================================================================
+--- rpm-5.4.14.orig/lua/Makefile.am
++++ rpm-5.4.14/lua/Makefile.am
+@@ -41,7 +41,7 @@ rpmluac_LDADD = liblua.la
+ 
+ # --- bin2c doesn't need anything but a compiler
+ bin2c$(EXEEXT):  bin2c.c
+-	$(CC) -o $@ $<
++	$(CC_FOR_BUILD) -o $@ $<
+ 
+ liblua_la_SOURCES =
+ liblua_la_CFLAGS = @WITH_LUA_SUBDIR_DEF@

@@ -1,0 +1,65 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Kumar Gala <galak@kernel.crashing.org>
+
+Updated for automake-1.12.6
+
+Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
+
+diff -Nurd automake-1.12.6/m4/python.m4 automake-1.12.6/m4/python.m4
+--- automake-1.12.6/m4/python.m4	2012-12-13 22:02:25.000000000 +0200
++++ automake-1.12.6/m4/python.m4	2012-12-27 17:40:26.558164660 +0200
+@@ -91,12 +91,13 @@
+     [am_cv_python_version=`$PYTHON -c "import sys; sys.stdout.write(sys.version[[:3]])"`])
+   AC_SUBST([PYTHON_VERSION], [$am_cv_python_version])
+ 
+-  dnl Use the values of $prefix and $exec_prefix for the corresponding
+-  dnl values of PYTHON_PREFIX and PYTHON_EXEC_PREFIX.  These are made
++  dnl Use the values of $prefix, $libdir and $exec_prefix for the corresponding
++  dnl values of PYTHON_PREFIX PYTHON_LIB_PREFIX, and PYTHON_EXEC_PREFIX.  These are made
+   dnl distinct variables so they can be overridden if need be.  However,
+   dnl general consensus is that you shouldn't need this ability.
+ 
+   AC_SUBST([PYTHON_PREFIX], ['${prefix}'])
++  AC_SUBST([PYTHON_LIB_PREFIX], ['${libdir}'])
+   AC_SUBST([PYTHON_EXEC_PREFIX], ['${exec_prefix}'])
+ 
+   dnl At times (like when building shared libraries) you may want
+@@ -148,7 +149,8 @@
+ else:
+     from distutils import sysconfig
+     sitedir = sysconfig.get_python_lib(0, 0, prefix='$am_py_prefix')
+-sys.stdout.write(sitedir)"`
++sys.stdout.write(sitedir)" ||
++     echo "$PYTHON_LIB_PREFIX/python$PYTHON_VERSION/site-packages"`
+      case $am_cv_python_pythondir in
+      $am_py_prefix*)
+        am__strip_prefix=`echo "$am_py_prefix" | sed 's|.|.|g'`
+@@ -158,7 +160,7 @@
+        case $am_py_prefix in
+          /usr|/System*) ;;
+          *)
+-	  am_cv_python_pythondir=$PYTHON_PREFIX/lib/python$PYTHON_VERSION/site-packages
++	  am_cv_python_pythondir=$PYTHON_LIB_PREFIX/python$PYTHON_VERSION/site-packages
+ 	  ;;
+        esac
+        ;;
+@@ -190,7 +192,8 @@
+ else:
+     from distutils import sysconfig
+     sitedir = sysconfig.get_python_lib(1, 0, prefix='$am_py_prefix')
+-sys.stdout.write(sitedir)"`
++sys.stdout.write(sitedir)" ||
++     echo "$PYTHON_LIB_PREFIX/python$PYTHON_VERSION/site-packages"`
+      case $am_cv_python_pyexecdir in
+      $am_py_exec_prefix*)
+        am__strip_prefix=`echo "$am_py_exec_prefix" | sed 's|.|.|g'`
+@@ -200,7 +203,7 @@
+        case $am_py_exec_prefix in
+          /usr|/System*) ;;
+          *)
+-	   am_cv_python_pyexecdir=$PYTHON_EXEC_PREFIX/lib/python$PYTHON_VERSION/site-packages
++	   am_cv_python_pyexecdir=$PYTHON_LIB_PREFIX/python$PYTHON_VERSION/site-packages
+ 	   ;;
+        esac
+        ;;

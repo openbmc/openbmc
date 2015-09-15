@@ -1,0 +1,18 @@
+Upstream-Status: Pending
+
+# Some versions of SWIG do not use the extension parameter.
+# Make it optional.
+# Signed-Off: Michael 'Mickey' Lauer <mickey@vanille-media.de>
+Index: Python-2.6.1/Lib/distutils/command/build_ext.py
+===================================================================
+--- Python-2.6.1.orig/Lib/distutils/command/build_ext.py
++++ Python-2.6.1/Lib/distutils/command/build_ext.py
+@@ -566,7 +566,7 @@ class build_ext (Command):
+             target_lang=language)
+ 
+ 
+-    def swig_sources (self, sources, extension):
++    def swig_sources (self, sources, extension=None):
+ 
+         """Walk the list of source files in 'sources', looking for SWIG
+         interface (.i) files.  Run SWIG on all that are found, and

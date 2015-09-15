@@ -1,0 +1,27 @@
+Upstream-Status: Inappropriate
+
+Hack to prevent unneeded demo app from building on older libc
+where it will break the build
+
+Index: rpm-5.4.14/tools/Makefile.am
+===================================================================
+--- rpm-5.4.14.orig/tools/Makefile.am
++++ rpm-5.4.14/tools/Makefile.am
+@@ -29,7 +29,7 @@ EXTRA_PROGRAMS = nix-copy-closure nix-en
+ 	xiu-instantiate xiu-store
+ noinst_PROGRAMS =
+ 
+-EXTRA_PROGRAMS += augtool cudftool dbconvert debugedit \
++EXTRA_PROGRAMS += augtool cudftool debugedit \
+ 	nix-build nix-channel nix-collect-garbage \
+ 	nix-log2xml nix-prefetch-url nix-pull nix-push \
+ 	xiu-echo xiu-hash \
+@@ -64,7 +64,7 @@ pkgbin_PROGRAMS =	\
+ 	rpmcache rpmdigest rpmrepo rpmspecdump \
+ 	rpmcmp rpmdeps rpmdeps-oecore sqlite3 @WITH_KEYUTILS_RPMKEY@ @WITH_LIBELF_DEBUGEDIT@
+ if WITH_DB
+-pkgbin_PROGRAMS +=	dbconvert
++pkgbin_PROGRAMS +=	
+ endif
+ dist_man_MANS =		rpmgrep.1
+ 

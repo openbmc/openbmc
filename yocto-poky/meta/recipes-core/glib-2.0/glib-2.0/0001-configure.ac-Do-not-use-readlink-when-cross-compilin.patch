@@ -1,0 +1,31 @@
+commit 9b38d507ec37b3d7d4df6095fa7ed16b47d399f7
+Author: Drew Moseley <drew_moseley@mentor.com>
+Date:   Sat Mar 29 21:10:43 2014 -0400
+
+    configure.ac: Do not use readlink when cross compiling.
+
+    Do not use readlink to set ABS_GLIB_RUNTIME_LIBDIR when cross
+    compiling.  Doing so causes host paths to potentially pollute
+    the target.
+
+    Note that in this case the path is not converted to absolute if
+    it contains any ".." references so it's not completely correct.
+
+    Upstream-Status: Submitted [https://bugzilla.gnome.org/show_bug.cgi?id=727575]
+    Signed-off-by: Drew Moseley <drew_moseley@mentor.com>
+
+diff -rub glib-2.38.2.orig/configure.ac glib-2.38.2/configure.ac
+--- glib-2.38.2.orig/configure.ac	2014-04-03 20:17:13.035567143 -0400
++++ glib-2.38.2/configure.ac	2014-04-03 20:19:07.071566057 -0400
+@@ -275,7 +275,11 @@
+            [],
+ 	   [with_runtime_libdir=""])
+ GLIB_RUNTIME_LIBDIR="$with_runtime_libdir"
++AS_IF([ test $cross_compiling = yes ], [
++ABS_GLIB_RUNTIME_LIBDIR="$libdir/$with_runtime_libdir"
++], [
+ ABS_GLIB_RUNTIME_LIBDIR="`readlink -m $libdir/$with_runtime_libdir`"
++])
+ AC_SUBST(GLIB_RUNTIME_LIBDIR)
+ AC_SUBST(ABS_GLIB_RUNTIME_LIBDIR)
+ AM_CONDITIONAL(HAVE_GLIB_RUNTIME_LIBDIR, [test "x$with_runtime_libdir" != "x"])

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=0.9.4
+Exec=distccmon-gnome
+Name=distcc monitor
+GenericName=Distributed Compile Monitor
+Comment=Graphical view of distributed compile tasks
+Icon=distccmon-gnome-icon
+TryExec=distccmon-gnome
+Terminal=false
+Type=Application
+Categories=GNOME;Development;
+StartupNotify=true

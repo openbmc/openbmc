@@ -1,0 +1,50 @@
+{% extends "package_detail_base.html" %}
+{% load projecttags %}
+
+{% block title %}
+        <h1>
+            {{package.fullpackagespec}}
+            <script> fmtAliasHelp("{{package.name}}", "{{package.alias}}", false) </script>
+            <small>({{target.target}})</small>
+        </h1>
+{% endblock title %}
+
+{% block tabcontent %}
+    {% with packageFileCount=package.buildfilelist_package.count %}
+    {% include "package_included_tabs.html" with active_tab="reverse" %}
+    <div class="tab-content">
+        <div class="tab-pane active" id="brought-in-by">
+
+        {% ifequal reverse_count 0 %}
+           <div class="alert alert-info">
+                <strong>{{package.fullpackagespec}}</strong> has no reverse runtime dependencies.
+            </div>
+        {% else %}
+            {% include "tablesort.html" %}
+                <tbody>
+					{% for reverse_dep in objects %}
+                        <tr {% if reverse_dep.size %}{{reverse_dep.size|format_vpackage_rowclass}}{%endif%} >
+                        {% if reverse_dep.size != -1 %}
+                            <td>
+                                <a href="{% url 'package_included_detail' build.id target.id reverse_dep.package_id %}">
+                                    {{reverse_dep.package.name}}
+                                </a>
+                                <script>fmtAliasHelp("{{reverse_dep.package.name}}", "{{reverse_dep.alias}}", true)</script>
+                            </td>
+                            {% else %}
+                            <td>
+                                {{reverse_dep.name|format_vpackage_namehelp}}
+                            </td>
+                            {% endif %}
+
+                            <td>{{reverse_dep.package.version}}&nbsp;</td>
+                            <td class='sizecol'>{{reverse_dep.package.size|filtered_filesizeformat}}&nbsp;</td>
+                        </tr>
+					{% endfor %}
+                </tbody>
+            </table>
+        {% endifequal %}
+        </div> <!-- end tab-pane -->
+    </div> <!-- end tab content -->
+    {% endwith %}
+{% endblock tabcontent %}

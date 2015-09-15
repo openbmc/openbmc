@@ -1,0 +1,18 @@
+# yocto-bsp-filename {{=machine}}.scc
+#
+# The top-level 'feature' for the {{=machine}} custom kernel.
+#
+# Essentially this is a convenient top-level container or starting
+# point for adding lower-level config fragements and features.
+#
+
+# {{=machine}}.cfg in the linux-yocto-custom subdir is just a
+# convenient place for adding random config fragments.
+
+kconf hardware {{=machine}}.cfg
+
+# These are used by yocto-kernel to add config fragments and features.
+# Don't remove if you plan on using yocto-kernel with this BSP.
+
+kconf hardware {{=machine}}-user-config.cfg
+include {{=machine}}-user-patches.scc

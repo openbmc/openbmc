@@ -1,0 +1,25 @@
+OPTIONS="-C"
+# The above option means syslogd will log to 16K shm circular buffer.
+# You could use `logread' to read it.
+
+# All available options are:
+# -O FILE       :      Log to FILE (default:/var/log/messages)
+# -l N          :      Log only messages more urgent than prio N (1-8)
+# -S            :      Smaller output
+# -s SIZE       :      Max size (KB) before rotation (default:200KB, 0=off)
+# -b N          :      N rotated logs to keep (default:1, max=99, 0=purge)
+# -R HOST[:PORT]:      Log to HOST:PORT (default PORT:514)
+# -L            :      Log locally and via network
+# -D            :      Drop duplicates
+# -C[size_kb]   :      Log to shared mem buffer (use logread to read it)
+# -f FILE       :      Use FILE as config (default:/etc/syslog.conf)
+# -m MIN        :      Minutes between mark lines (default:20, 0=off)
+# -K            :      Log to kernel printk buffer (use dmesg to read it)
+
+# Example 1:
+# Log to local file /var/log/mylog
+# OPTIONS="-O /var/log/mylog"
+#
+# Example 2:
+# Log to remote host
+# OPTIONS="-R 192.168.1.1:601"

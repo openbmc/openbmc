@@ -1,0 +1,38 @@
+
+Use pkgconfig to get the correct include paths
+
+Upstream-Status: Pending
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+Signed-off-by: Ronan Le Martret <ronan.lemartret@open.eurogiciel.org>
+
+diff --git a/configure.ac b/configure.ac
+index e97f727..8179f44 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -540,10 +540,10 @@ esac],
+ 
+ AS_IF([test "$enable_python" = yes],[
+   AM_PATH_PYTHON([2.6],[
+-    WITH_PYTHON_INCLUDE=`${PYTHON} -c 'from distutils.sysconfig import *; import sys; sys.stdout.write(get_python_inc())'`
++    WITH_PYTHON_INCLUDE=$(${PKG_CONFIG} --cflags-only-I  python)
+     WITH_PYTHON_SUBPACKAGE=1
+     save_CPPFLAGS="$CPPFLAGS"
+-    CPPFLAGS="$CPPFLAGS -I$WITH_PYTHON_INCLUDE"
++    CPPFLAGS="$CPPFLAGS $WITH_PYTHON_INCLUDE"
+     AC_CHECK_HEADER([Python.h],[],
+       [AC_MSG_ERROR([missing Python.h])
+       ])
+diff --git a/python/Makefile.am b/python/Makefile.am
+index fff51ae..f37cb9d 100644
+--- a/python/Makefile.am
++++ b/python/Makefile.am
+@@ -4,7 +4,7 @@ EXTRA_DIST = rpm/__init__.py rpm/transaction.py
+ 
+ AM_CPPFLAGS = -I$(top_builddir)/include/
+ AM_CPPFLAGS += -I$(top_srcdir)/python
+-AM_CPPFLAGS += -I@WITH_PYTHON_INCLUDE@
++AM_CPPFLAGS += @WITH_PYTHON_INCLUDE@
+ 
+ pkgpyexec_LTLIBRARIES = _rpmmodule.la _rpmbmodule.la _rpmsmodule.la
+ pkgpyexec_DATA = rpm/__init__.py rpm/transaction.py

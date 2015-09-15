@@ -1,0 +1,67 @@
+#!/bin/bash
+
+# Yocto ADT Installer
+#
+# Copyright 2010-2011 by Intel Corp.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy 
+# of this software and associated documentation files (the "Software"), to deal 
+# in the Software without restriction, including without limitation the rights 
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+# copies of the Software, and to permit persons to whom the Software is 
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in 
+# all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+# THE SOFTWARE.
+
+extract_rootfs()
+{
+
+  native_sysroot=$3
+  target_sysroot=$2
+  PSEUDO_COMMAND="$native_sysroot/usr/bin/pseudo"
+  TAR_OPTS="-xjf"
+  PSEUDO_OPTS="-P $native_sysroot/usr"
+
+
+  rm -rf $PSEUDO_LOCALSTATEDIR
+
+  if [ -d "$target_sysroot" ]; then
+    echo_info "\nTarget sysroot location: $target_sysroot, already exists! If you continue installation, this folder will be re-created."
+    confirm_install $4
+    rm -rf "$target_sysroot"
+  fi
+
+  if [ ! -d "$target_sysroot" ]; then
+    echo_info "Creating directory $target_sysroot..."
+    mkdir -p "$target_sysroot"
+  fi
+
+  pseudo_state_dir="$target_sysroot/../$(basename "$target_sysroot").pseudo_state"
+  mkdir -p "$pseudo_state_dir"
+  touch "$pseudo_state_dir/pseudo.pid"
+  PSEUDO_LOCALSTATEDIR="$pseudo_state_dir"
+  export PSEUDO_LOCALSTATEDIR
+
+  echo_info "Extracting rootfs: $1, using pseudo..."
+  $PSEUDO_COMMAND $PSEUDO_OPTS tar -C $2 "$TAR_OPTS" $LOCAL_DOWNLOAD/$1 &>> $YOCTOADT_INSTALL_LOG_FILE
+  check_result
+}
+
+#Main part
+. scripts/util
+
+#Parameter detail is listed below:
+#Param 4: Silent install or customize install
+#Param 3: OECORE_NATIVE_SYSROOT
+#Param 2: user defined rootfs extraction directory
+#param 1: sysroot image name
+extract_rootfs $1 $2 $3 $4

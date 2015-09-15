@@ -1,0 +1,68 @@
+Upstream-Status: Backport
+
+r14566 | florian | 2014-09-24 17:02:54 -0500 (Wed, 24 Sep 2014) | 4 lines
+
+The testbuckets none/tests/ppc{32,64} did not build in case the
+toolchain did not support -maltivec -mabi=altivec.
+This should work now. Fixes BZ #338731
+
+Index: none/tests/ppc32/Makefile.am
+===================================================================
+--- a/none/tests/ppc32/Makefile.am	(revision 14565)
++++ b/none/tests/ppc32/Makefile.am	(revision 14566)
+@@ -72,8 +72,12 @@
+ allexec_CFLAGS		= $(AM_CFLAGS) @FLAG_W_NO_NONNULL@
+ 
+ if HAS_ALTIVEC
++BUILD_FLAG_ALTIVEC = -maltivec
++BUILD_FLAG_ABI_ALTIVEC = -mabi=altivec
+ ALTIVEC_FLAG = -DHAS_ALTIVEC
+ else
++BUILD_FLAG_ALTIVEC =
++BUILD_FLAG_ABI_ALTIVEC =
+ ALTIVEC_FLAG =
+ endif
+ 
+@@ -101,11 +105,12 @@
+ ISA_2_07_FLAG =
+ endif
+ 
+-jm_insns_CFLAGS = $(AM_CFLAGS) -Winline -Wall -O -g -mregnames -maltivec \
+-			@FLAG_M32@ $(ALTIVEC_FLAG)
++jm_insns_CFLAGS = $(AM_CFLAGS) -Winline -Wall -O -g -mregnames \
++			@FLAG_M32@ $(ALTIVEC_FLAG) $(BUILD_FLAG_ALTIVEC)
+ 
+-testVMX_CFLAGS  = $(AM_CFLAGS) -O -g -Wall -maltivec -mabi=altivec -DALTIVEC \
+-			-DGCC_COMPILER @FLAG_M32@
++testVMX_CFLAGS  = $(AM_CFLAGS) -O -g -Wall -DALTIVEC \
++			-DGCC_COMPILER @FLAG_M32@  $(BUILD_FLAG_ALTIVEC) \
++			$(BUILD_FLAG_ABI_ALTIVEC)
+ 
+ test_isa_2_06_part1_CFLAGS = $(AM_CFLAGS) -Winline -Wall -O -g -mregnames $(VSX_FLAG) \
+ 			@FLAG_M32@ $(ALTIVEC_FLAG) $(BUILD_FLAG_VSX)
+Index: none/tests/ppc64/Makefile.am
+===================================================================
+--- a/none/tests/ppc64/Makefile.am	(revision 14565)
++++ b/none/tests/ppc64/Makefile.am	(revision 14566)
+@@ -50,8 +50,10 @@
+ allexec_CFLAGS		= $(AM_CFLAGS) @FLAG_W_NO_NONNULL@
+ 
+ if HAS_ALTIVEC
++BUILD_FLAG_ALTIVEC = -maltivec
+ ALTIVEC_FLAG = -DHAS_ALTIVEC
+ else
++BUILD_FLAG_ALTIVEC =
+ ALTIVEC_FLAG =
+ endif
+ 
+@@ -88,8 +90,8 @@
+ test_isa_2_06_part3_CFLAGS = $(AM_CFLAGS) -Winline -Wall -O -g -mregnames $(VSX_FLAG) \
+ 			@FLAG_M64@ $(ALTIVEC_FLAG) $(BUILD_FLAG_VSX)
+ 
+-jm_insns_CFLAGS = $(AM_CFLAGS) -Winline -Wall -O -g -mregnames -maltivec \
+-			@FLAG_M64@ $(ALTIVEC_FLAG)
++jm_insns_CFLAGS = $(AM_CFLAGS) -Winline -Wall -O -g -mregnames \
++			@FLAG_M64@ $(ALTIVEC_FLAG) $(BUILD_FLAG_ALTIVEC)
+ 
+ test_dfp1_CFLAGS = $(AM_CFLAGS) -Winline -Wall -O -g -mregnames $(DFP_FLAG) \
+ 			@FLAG_M64@ $(BUILD_FLAGS_DFP)

@@ -1,0 +1,27 @@
+Upstream-Status: Pending
+
+Avoids parallel make races linking errors when making Parser/PGEN
+
+- Implements Richard Purdie's idea
+
+Signed-Off-By: Richard Purdie <richard.purdie@linuxfoundation.org>
+Signed-Off-By: Alejandro Hernandez <alejandro.hernandez@linux.intel.com>
+
+Index: Python-2.7.9/Makefile.pre.in
+===================================================================
+--- Python-2.7.9.orig/Makefile.pre.in
++++ Python-2.7.9/Makefile.pre.in
+@@ -610,12 +610,10 @@ Modules/grpmodule.o: $(srcdir)/Modules/g
+ 
+ Modules/pwdmodule.o: $(srcdir)/Modules/pwdmodule.c $(srcdir)/Modules/posixmodule.h
+ 
+-$(GRAMMAR_H): $(GRAMMAR_INPUT) $(PGENSRCS)
++$(GRAMMAR_H): $(GRAMMAR_INPUT) $(PGENSRCS) $(PGEN)
+ 		@$(MKDIR_P) Include
+-		$(MAKE) $(PGEN)
+ 		$(PGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)
+ $(GRAMMAR_C): $(GRAMMAR_H) $(GRAMMAR_INPUT) $(PGENSRCS)
+-		$(MAKE) $(GRAMMAR_H)
+ 		touch $(GRAMMAR_C)
+ 
+ $(PGEN):	$(PGENOBJS)

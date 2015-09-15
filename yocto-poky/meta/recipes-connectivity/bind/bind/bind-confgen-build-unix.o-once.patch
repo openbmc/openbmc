@@ -1,0 +1,44 @@
+From 9b40619ff6fddfef2758ba797789f8487f412df3 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Mon, 16 Feb 2015 00:50:01 -0800
+Subject: [PATCH] confgen: don't build unix.o twice
+
+Fixed:
+unix/os.o: file not recognized: File truncated
+collect2: error: ld returned 1 exit status
+
+This is because os.o was built twice:
+* The implicity rule (depends on unix/os.o)
+* The "make all" in unix subdir (depends on unix/os.o)
+
+Depend on subdirs which is unix only rather than unix/os.o will fix the
+problem.
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ bin/confgen/Makefile.in |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/bin/confgen/Makefile.in b/bin/confgen/Makefile.in
+index 8b3e5aa..4868a24 100644
+--- a/bin/confgen/Makefile.in
++++ b/bin/confgen/Makefile.in
+@@ -74,11 +74,11 @@ rndc-confgen.@O@: rndc-confgen.c
+ ddns-confgen.@O@: ddns-confgen.c
+ 	${LIBTOOL_MODE_COMPILE} ${CC} ${ALL_CFLAGS} -c ${srcdir}/ddns-confgen.c
+ 
+-rndc-confgen@EXEEXT@: rndc-confgen.@O@ util.@O@ keygen.@O@ ${UOBJS} ${CONFDEPLIBS} 
++rndc-confgen@EXEEXT@: rndc-confgen.@O@ util.@O@ keygen.@O@ ${CONFDEPLIBS} $(SUBDIRS)
+ 	export BASEOBJS="rndc-confgen.@O@ util.@O@ keygen.@O@ ${UOBJS}"; \
+ 	${FINALBUILDCMD}
+ 
+-ddns-confgen@EXEEXT@: ddns-confgen.@O@ util.@O@ keygen.@O@ ${UOBJS} ${CONFDEPLIBS} 
++ddns-confgen@EXEEXT@: ddns-confgen.@O@ util.@O@ keygen.@O@ ${CONFDEPLIBS} $(SUBDIRS)
+ 	export BASEOBJS="ddns-confgen.@O@ util.@O@ keygen.@O@ ${UOBJS}"; \
+ 	${FINALBUILDCMD}
+ 
+-- 
+1.7.9.5
+

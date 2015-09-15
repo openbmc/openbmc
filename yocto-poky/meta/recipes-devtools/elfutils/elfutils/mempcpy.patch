@@ -1,0 +1,24 @@
+
+uclibc does not export __mempcpy like glibc so we alias it here.
+This patch may make sense for upstream but elfutils uses more
+glibc specific features like obstack_printf which are missing in
+uclibc they need to be fixed along to make it work all the way
+
+Upstream-Status: Inappropriate[Elfutils uses more glibc specific features]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: elfutils-0.148/libelf/elf_begin.c
+===================================================================
+--- elfutils-0.148.orig/libelf/elf_begin.c
++++ elfutils-0.148/libelf/elf_begin.c
+@@ -68,6 +68,9 @@
+ #include "libelfP.h"
+ #include "common.h"
+ 
++#ifdef __UCLIBC__
++#define __mempcpy mempcpy
++#endif
+ 
+ /* Create descriptor for archive in memory.  */
+ static inline Elf *

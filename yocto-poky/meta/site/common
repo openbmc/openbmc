@@ -1,0 +1,21 @@
+# libelf
+mr_cv_target_elf=${mr_cv_target_elf=yes}
+
+# Normally kernels have /dev/random enabled
+ac_cv_file__dev_random=${ac_cv_file__dev_random=yes}
+
+# Avoid sudo to assume void for unsetenv in cross environment, or else it conflicts with
+# target stdlib.h prototype which follows POSIX compiliance. Mark for upstream.
+sudo_cv_func_unsetenv_void=no
+
+# shadow dir info, to avoid searching build system
+shadow_cv_maildir=${localstatedir}/spool/mail
+shadow_cv_mailfile=Mailbox
+shadow_cv_utmpdir=${localstatedir}/run
+shadow_cv_logdir=${localstatedir}/log
+shadow_cv_passwd_dir=${bindir}
+
+# python: deactivate a runtime check for ipv6-support in python >=2.7.1 that fails when cross-compiling
+ac_cv_buggy_getaddrinfo=no
+
+ac_cv_path_SED=sed

@@ -1,0 +1,10 @@
+[Unit]
+Description=CUPS Printing Service
+
+[Service]
+ExecStart=@SBINDIR@/cupsd -f
+PrivateTmp=true
+
+[Install]
+Also=cups.socket cups.path
+WantedBy=printer.target

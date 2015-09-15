@@ -1,0 +1,26 @@
+The libc6-dev in Ubuntu 9.04 is so old that the elf.h doesn't
+define STT_GNU_IFUNC, so we have to define it ourselves.
+
+Upstream-Status: Inappropriate [other] - old release specific, maybe removable
+
+-- Dexuan Cui (dexuan.cui@intel.com) Feb 16, 2011.
+
+diff --git a/src/mklibs-readelf/main.cpp b/src/mklibs-readelf/main.cpp
+index 2444c39..56d93f8 100644
+--- a/src/mklibs-readelf/main.cpp
++++ b/src/mklibs-readelf/main.cpp
+@@ -6,6 +6,14 @@
+ #include <vector>
+ 
+ #include <elf.h>
++/*
++ * The /usr/include/elf.h in some distributions(like Ubuntu 9.04) doesn't
++ * define the macro. We need to define it here.
++ */
++#ifndef STT_GNU_IFUNC
++#define STT_GNU_IFUNC   10              /* Symbol is indirect code object */
++#endif
++
+ #include <getopt.h>
+ 
+ #include "elf.hpp"

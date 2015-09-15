@@ -1,0 +1,17 @@
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+Index: gnupg-1.4.7/configure.ac
+===================================================================
+--- gnupg-1.4.7.orig/configure.ac
++++ gnupg-1.4.7/configure.ac
+@@ -827,7 +827,6 @@ else
+   AC_SUBST(USE_NLS)
+   AC_SUBST(USE_INCLUDED_LIBINTL)
+   AC_SUBST(BUILD_INCLUDED_LIBINTL)
+-  AM_PO_SUBDIRS
+ fi
+ 
+ if test "$try_extensions" = yes || test x"$card_support" = xyes ; then

@@ -1,0 +1,131 @@
+Allow a compilation without -mcmodel=large
+
+It's provided by Vladimir Serbinenko, and he will commit
+it upstream so it should be backport patch.
+
+Upstream-Status: Backport
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+
+--
+diff --git a/configure.ac b/configure.ac
+index 9f8fb8a..2c5e6ed 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -723,9 +723,7 @@ if test "$target_cpu" = x86_64; then
+ 		      [grub_cv_cc_mcmodel=yes],
+ 		      [grub_cv_cc_mcmodel=no])
+   ])
+-  if test "x$grub_cv_cc_mcmodel" = xno; then
+-    AC_MSG_ERROR([-mcmodel=large not supported. Upgrade your gcc.])
+-  else
++  if test "x$grub_cv_cc_mcmodel" = xyes; then
+     TARGET_CFLAGS="$TARGET_CFLAGS -mcmodel=large"
+   fi
+ fi
+diff --git a/grub-core/kern/efi/mm.c b/grub-core/kern/efi/mm.c
+index 1409b5d..6e9dace 100644
+--- a/grub-core/kern/efi/mm.c
++++ b/grub-core/kern/efi/mm.c
+@@ -32,6 +32,12 @@
+ #define BYTES_TO_PAGES(bytes)	(((bytes) + 0xfff) >> 12)
+ #define PAGES_TO_BYTES(pages)	((pages) << 12)
+
++#if defined (__code_model_large__) || !defined (__x86_64__)
++#define MAX_USABLE_ADDRESS 0xffffffff
++#else
++#define MAX_USABLE_ADDRESS 0x7fffffff
++#endif
++
+ /* The size of a memory map obtained from the firmware. This must be
+    a multiplier of 4KB.  */
+ #define MEMORY_MAP_SIZE	0x3000
+@@ -58,7 +64,7 @@ grub_efi_allocate_pages (grub_efi_physical_address_t address,
+
+ #if 1
+   /* Limit the memory access to less than 4GB for 32-bit platforms.  */
+-  if (address > 0xffffffff)
++  if (address > MAX_USABLE_ADDRESS)
+     return 0;
+ #endif
+
+@@ -66,7 +72,7 @@ grub_efi_allocate_pages (grub_efi_physical_address_t address,
+   if (address == 0)
+     {
+       type = GRUB_EFI_ALLOCATE_MAX_ADDRESS;
+-      address = 0xffffffff;
++      address = MAX_USABLE_ADDRESS;
+     }
+   else
+     type = GRUB_EFI_ALLOCATE_ADDRESS;
+@@ -86,7 +92,7 @@ grub_efi_allocate_pages (grub_efi_physical_address_t address,
+     {
+       /* Uggh, the address 0 was allocated... This is too annoying,
+ 	 so reallocate another one.  */
+-      address = 0xffffffff;
++      address = MAX_USABLE_ADDRESS;
+       status = efi_call_4 (b->allocate_pages, type, GRUB_EFI_LOADER_DATA, pages, &address);
+       grub_efi_free_pages (0, pages);
+       if (status != GRUB_EFI_SUCCESS)
+@@ -319,7 +325,7 @@ filter_memory_map (grub_efi_memory_descriptor_t *memory_map,
+     {
+       if (desc->type == GRUB_EFI_CONVENTIONAL_MEMORY
+ #if 1
+-	  && desc->physical_start <= 0xffffffff
++	  && desc->physical_start <= MAX_USABLE_ADDRESS
+ #endif
+ 	  && desc->physical_start + PAGES_TO_BYTES (desc->num_pages) > 0x100000
+ 	  && desc->num_pages != 0)
+@@ -337,9 +343,9 @@ filter_memory_map (grub_efi_memory_descriptor_t *memory_map,
+ #if 1
+ 	  if (BYTES_TO_PAGES (filtered_desc->physical_start)
+ 	      + filtered_desc->num_pages
+-	      > BYTES_TO_PAGES (0x100000000LL))
++	      > BYTES_TO_PAGES (MAX_USABLE_ADDRESS+1LL))
+ 	    filtered_desc->num_pages
+-	      = (BYTES_TO_PAGES (0x100000000LL)
++	      = (BYTES_TO_PAGES (MAX_USABLE_ADDRESS+1LL)
+ 		 - BYTES_TO_PAGES (filtered_desc->physical_start));
+ #endif
+
+diff --git a/grub-core/kern/x86_64/dl.c b/grub-core/kern/x86_64/dl.c
+index 65f09ef..17c1215 100644
+--- a/grub-core/kern/x86_64/dl.c
++++ b/grub-core/kern/x86_64/dl.c
+@@ -100,14 +100,32 @@ grub_arch_dl_relocate_symbols (grub_dl_t mod, void *ehdr)
+ 		    break;
+
+ 		  case R_X86_64_PC32:
+-		    *addr32 += rel->r_addend + sym->st_value -
+-		              (Elf64_Xword) seg->addr - rel->r_offset;
++		    {
++		      grub_int64_t value;
++		      value = ((grub_int32_t) *addr32) + rel->r_addend + sym->st_value -
++			(Elf64_Xword) seg->addr - rel->r_offset;
++		      if (value != (grub_int32_t) value)
++			return grub_error (GRUB_ERR_BAD_MODULE, "relocation out of range");
++		      *addr32 = value;
++		    }
+ 		    break;
+
+                   case R_X86_64_32:
++		    {
++		      grub_uint64_t value = *addr32 + rel->r_addend + sym->st_value;
++		      if (value != (grub_uint32_t) value)
++			return grub_error (GRUB_ERR_BAD_MODULE, "relocation out of range");
++		      *addr32 = value;
++		    }
++		    break;
+                   case R_X86_64_32S:
+-                    *addr32 += rel->r_addend + sym->st_value;
+-                    break;
++		    {
++		      grub_int64_t value = ((grub_int32_t) *addr32) + rel->r_addend + sym->st_value;
++		      if (value != (grub_int32_t) value)
++			return grub_error (GRUB_ERR_BAD_MODULE, "relocation out of range");
++		      *addr32 = value;
++		    }
++		    break;
+
+ 		  default:
+ 		    return grub_error (GRUB_ERR_NOT_IMPLEMENTED_YET,

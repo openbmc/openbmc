@@ -1,0 +1,23 @@
+Upstream-Status: Backport
+
+Signed-off-by: Wenlin Kang <wenlin.kang@windriver.com>
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ Makefile.in | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Makefile.in b/Makefile.in
+index 8f9305a..694e837 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -251,6 +251,7 @@ install-scripts: ${DESTDIR}$(bindir)/mtools
+ 	@$(top_srcdir)/mkinstalldirs ${DESTDIR}$(bindir)
+ 	@for j in $(SCRIPTS) ; do \
+ 		$(INSTALL_SCRIPT) $(srcdir)/scripts/$$j ${DESTDIR}$(bindir)/$$j ; \
++		$(INSTALL_PROGRAM) $(srcdir)/scripts/$$j ${DESTDIR}$(bindir)/$$j ; \
+ 		echo ${DESTDIR}$(bindir)/$$j ; \
+ 	done
+ 	rm -f ${DESTDIR}$(bindir)/lz
+-- 
+2.0.0
+

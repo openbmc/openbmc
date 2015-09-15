@@ -1,0 +1,135 @@
+From 962f8b90045ab331fc04c9e65f80f1a53e68243b Mon Sep 17 00:00:00 2001
+From: Wayne Davison <wayned@samba.org>
+Date: Wed, 31 Dec 2014 12:41:03 -0800
+Subject: [PATCH] Complain if an inc-recursive path is not right for its dir.
+ This ensures that a malicious sender can't use a just-sent symlink as a
+ trasnfer path.
+
+Upstream-Status: BackPort
+
+Fix the CVE-2014-9512, rsync 3.1.1 allows remote attackers to write to arbitrary
+files via a symlink attack on a file in the synchronization path.
+
+BackPort and fix this patch to make it able to apply to source code
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ flist.c | 22 ++++++++++++++++++++--
+ io.c    |  2 +-
+ main.c  |  4 ++--
+ rsync.c |  2 +-
+ proto.h | 2 +-
+ 6 files changed, 31 insertions(+), 8 deletions(-)
+
+diff --git a/flist.c b/flist.c
+index c24672e..92e4b65 100644
+--- a/flist.c
++++ b/flist.c
+@@ -2435,8 +2435,9 @@ struct file_list *send_file_list(int f, int argc, char *argv[])
+ 	return flist;
+ }
+ 
+-struct file_list *recv_file_list(int f)
++struct file_list *recv_file_list(int f, int dir_ndx)
+ {
++	const char *good_dirname = NULL;
+ 	struct file_list *flist;
+ 	int dstart, flags;
+ 	int64 start_read;
+@@ -2492,6 +2493,23 @@ struct file_list *recv_file_list(int f)
+ 		flist_expand(flist, 1);
+ 		file = recv_file_entry(f, flist, flags);
+ 
++		if (inc_recurse) {
++			static const char empty_dir[] = "\0";
++			const char *cur_dir = file->dirname ? file->dirname : empty_dir;
++			if (relative_paths && *cur_dir == '/')
++				cur_dir++;
++			if (cur_dir != good_dirname) {
++				const char *d = dir_ndx >= 0 ? f_name(dir_flist->files[dir_ndx], NULL) : empty_dir;
++				if (strcmp(cur_dir, d) != 0) {
++					rprintf(FERROR,
++						"ABORTING due to invalid dir prefix from sender: %s (should be: %s)\n",
++						cur_dir, d);
++					exit_cleanup(RERR_PROTOCOL);
++				}
++				good_dirname = cur_dir;
++			}
++		}
++
+ 		if (S_ISREG(file->mode)) {
+ 			/* Already counted */
+ 		} else if (S_ISDIR(file->mode)) {
+@@ -2615,7 +2633,7 @@ void recv_additional_file_list(int f)
+ 			rprintf(FINFO, "[%s] receiving flist for dir %d\n",
+ 				who_am_i(), ndx);
+ 		}
+-		flist = recv_file_list(f);
++		flist = recv_file_list(f, ndx);
+ 		flist->parent_ndx = ndx;
+ 	}
+ }
+diff --git a/io.c b/io.c
+index b9a9bd0..a868fa9 100644
+--- a/io.c
++++ b/io.c
+@@ -1685,7 +1685,7 @@ void wait_for_receiver(void)
+ 				rprintf(FINFO, "[%s] receiving flist for dir %d\n",
+ 					who_am_i(), ndx);
+ 			}
+-			flist = recv_file_list(iobuf.in_fd);
++			flist = recv_file_list(iobuf.in_fd, ndx);
+ 			flist->parent_ndx = ndx;
+ #ifdef SUPPORT_HARD_LINKS
+ 			if (preserve_hard_links)
+diff --git a/main.c b/main.c
+index e7a13f7..713b818 100644
+--- a/main.c
++++ b/main.c
+@@ -1009,7 +1009,7 @@ static void do_server_recv(int f_in, int f_out, int argc, char *argv[])
+ 		filesfrom_fd = -1;
+ 	}
+ 
+-	flist = recv_file_list(f_in);
++	flist = recv_file_list(f_in, -1);
+ 	if (!flist) {
+ 		rprintf(FERROR,"server_recv: recv_file_list error\n");
+ 		exit_cleanup(RERR_FILESELECT);
+@@ -1183,7 +1183,7 @@ int client_run(int f_in, int f_out, pid_t pid, int argc, char *argv[])
+ 
+ 	if (write_batch && !am_server)
+ 		start_write_batch(f_in);
+-	flist = recv_file_list(f_in);
++	flist = recv_file_list(f_in, -1);
+ 	if (inc_recurse && file_total == 1)
+ 		recv_additional_file_list(f_in);
+ 
+diff --git a/rsync.c b/rsync.c
+index 68ff6b1..c3ecc51 100644
+--- a/rsync.c
++++ b/rsync.c
+@@ -364,7 +364,7 @@ int read_ndx_and_attrs(int f_in, int f_out, int *iflag_ptr, uchar *type_ptr,
+ 		}
+ 		/* Send all the data we read for this flist to the generator. */
+ 		start_flist_forward(ndx);
+-		flist = recv_file_list(f_in);
++		flist = recv_file_list(f_in, ndx);
+ 		flist->parent_ndx = ndx;
+ 		stop_flist_forward();
+ 	}
+diff --git a/proto.h b/proto.h
+index 22fc539..247c558 100644
+--- a/proto.h
++++ b/proto.h
+@@ -89,7 +89,7 @@ struct file_struct *make_file(const char *fname, struct file_list *flist,
+ void unmake_file(struct file_struct *file);
+ void send_extra_file_list(int f, int at_least);
+ struct file_list *send_file_list(int f, int argc, char *argv[]);
+-struct file_list *recv_file_list(int f);
++struct file_list *recv_file_list(int f, int dir_ndx);
+ void recv_additional_file_list(int f);
+ int flist_find(struct file_list *flist, struct file_struct *f);
+ int flist_find_ignore_dirness(struct file_list *flist, struct file_struct *f);
+-- 
+1.9.1
+

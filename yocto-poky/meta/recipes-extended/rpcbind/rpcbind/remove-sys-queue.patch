@@ -1,0 +1,22 @@
+musl does not provide this header and here is reasoning
+http://wiki.musl-libc.org/wiki/FAQ#Q:_why_is_sys.2Fqueue.h_not_included_.3F
+
+So include it only when __GLIBC__ is defined which is true for uclibc and glibc
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+
+Index: rpcbind-0.2.2/src/util.c
+===================================================================
+--- rpcbind-0.2.2.orig/src/util.c
++++ rpcbind-0.2.2/src/util.c
+@@ -41,7 +41,9 @@
+ 
+ #include <sys/types.h>
+ #include <sys/socket.h>
++#ifdef __GLIBC__
+ #include <sys/queue.h>
++#endif
+ #include <net/if.h>
+ #include <netinet/in.h>
+ #include <ifaddrs.h>

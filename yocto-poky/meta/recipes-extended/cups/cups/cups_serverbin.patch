@@ -1,0 +1,32 @@
+Make CUPS_SERVERBIN relative to libdir otherwise on 64bit arches
+e.g. ppc64 where base libdir is lib64 this does not go well
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Inappropriate [OE config specific]
+
+Index: cups-1.4.6/config-scripts/cups-directories.m4
+===================================================================
+--- cups-1.4.6.orig/config-scripts/cups-directories.m4	2009-04-12 16:04:51.000000000 -0700
++++ cups-1.4.6/config-scripts/cups-directories.m4	2012-07-21 12:12:05.896405923 -0700
+@@ -397,7 +397,7 @@
+ 	*)
+ 		# All others
+ 		INSTALL_SYSV="install-sysv"
+-		CUPS_SERVERBIN="$exec_prefix/lib/cups"
++		CUPS_SERVERBIN="$libdir/cups"
+ 		;;
+ esac
+ 
+Index: cups-1.4.6/configure
+===================================================================
+--- cups-1.4.6.orig/configure	2012-07-21 12:13:34.512405950 -0700
++++ cups-1.4.6/configure	2012-07-21 12:14:05.724406017 -0700
+@@ -11181,7 +11181,7 @@
+ 	*)
+ 		# All others
+ 		INSTALL_SYSV="install-sysv"
+-		CUPS_SERVERBIN="$exec_prefix/lib/cups"
++		CUPS_SERVERBIN="$libdir/cups"
+ 		;;
+ esac
+ 

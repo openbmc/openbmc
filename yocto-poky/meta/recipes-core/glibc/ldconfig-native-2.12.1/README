@@ -1,0 +1,8 @@
+The files are pulled verbatim from glibc 2.5 and then patched to allow
+standalone compilation of ldconfig.
+
+Richard Purdie
+OpenedHand Ltd.
+
+Upgraded the ldconfig recipe to eglibc 2.12.1
+Nitin A Kamble <nitin.a.kamble@intel.com> 2011/03/29

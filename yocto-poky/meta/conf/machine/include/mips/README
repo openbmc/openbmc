@@ -1,0 +1,36 @@
+2012/03/30 - Mark Hatle <mark.hatle@windriver.com>
+  - Initial Version
+
+MIPS currently defines 12 ABIs.  Combinations of:
+ *) Big/Little Endian
+ *) Hardware/Software Floating Point
+ *) o32, n32, n64 ABI
+
+TUNE_ARCH, the GNU canonical arch, is defined as:
+
+mips${MIPSPKGSFX_BYTE}${MIPSPKGSFX_ENDIAN}
+
+The package arch is defined in such a way to generated a standard naming
+scheme.  The scheme is: <mips variant>[-nf][-n32]
+
+TUNE_PKGARCH is defined as:
+
+${MIPSPKGSFX_VARIANT_tune-${DEFAULTTUNE}}${MIPSPKGSFX_FPU}${MIPSPKGSFX_ABI}
+
+The following is a list of MIPS specific variables:
+
+MIPSPKGSFX_BYTE - This is defined as either blank and "64" for MIPS64 CPUs.
+
+MIPSPKGSFX_ENDIAN - For bigendian hardware this is blank, otherwise it's
+defined as "el".
+
+MIPSPKGSFX_VARIANT_tune-<tune> - In the default tunings it is set to the
+same value as TUNE_ARCH.  In custom, optimized tunings, the value should
+be modified to more precisely describe the tuning.
+
+MIPSPKGSFX_FPU - The value is set to "" or "-nf", where "-nf" indicates 
+that the tune is using a non-floating point ABI.
+
+MIPSPKGSFX_ABI - This is used to specify an alternative ABI when the previous
+values are not enough to distringuish the package.  "-n32" is added when
+building for N32 ABI.

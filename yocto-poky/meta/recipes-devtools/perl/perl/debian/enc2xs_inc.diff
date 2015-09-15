@@ -1,0 +1,70 @@
+From 7fe59a3d0601c6d8634eae4f99dae3024cd02a92 Mon Sep 17 00:00:00 2001
+From: Brendan O'Dea <bod@debian.org>
+Date: Tue, 8 Mar 2005 19:30:38 +1100
+Subject: Tweak enc2xs to follow symlinks and ignore missing @INC directories.
+
+Bug-Debian: http://bugs.debian.org/290336
+
+- ignore missing directories,
+- follow symlinks (/usr/share/perl/5.8 -> 5.8.4).
+- filter "." out when running "enc2xs -C", it's unnecessary and causes
+  issues with follow => 1 (see #603686 and [rt.cpan.org #64585])
+
+Patch-Name: debian/enc2xs_inc.diff
+---
+ cpan/Encode/bin/enc2xs | 8 ++++----
+ t/porting/customized.t | 3 +++
+ 2 files changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/cpan/Encode/bin/enc2xs b/cpan/Encode/bin/enc2xs
+index 19f2b2b..4d64e38 100644
+--- a/cpan/Encode/bin/enc2xs
++++ b/cpan/Encode/bin/enc2xs
+@@ -944,11 +944,11 @@ use vars qw(
+ sub find_e2x{
+     eval { require File::Find; };
+     my (@inc, %e2x_dir);
+-    for my $inc (@INC){
++    for my $inc (grep -d, @INC){
+     push @inc, $inc unless $inc eq '.'; #skip current dir
+     }
+     File::Find::find(
+-         sub {
++         { wanted => sub {
+          my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
+              $atime,$mtime,$ctime,$blksize,$blocks)
+              = lstat($_) or return;
+@@ -958,7 +958,7 @@ sub find_e2x{
+              $e2x_dir{$File::Find::dir} ||= $mtime;
+          }
+          return;
+-         }, @inc);
++         }, follow => 1}, @inc);
+     warn join("\n", keys %e2x_dir), "\n";
+     for my $d (sort {$e2x_dir{$a} <=> $e2x_dir{$b}} keys %e2x_dir){
+     $_E2X = $d;
+@@ -1025,7 +1025,7 @@ sub make_configlocal_pm {
+ 	    $LocalMod{$enc} ||= $mod;
+ 	}
+     };
+-    File::Find::find({wanted => $wanted}, @INC);
++    File::Find::find({wanted => $wanted, follow => 1}, grep -d && !/^\./, @INC);
+     $_ModLines = "";
+     for my $enc ( sort keys %LocalMod ) {
+         $_ModLines .=
+diff --git a/t/porting/customized.t b/t/porting/customized.t
+index 45fcafb..3bd6adb 100644
+--- a/t/porting/customized.t
++++ b/t/porting/customized.t
+@@ -101,8 +101,11 @@ foreach my $module ( sort keys %Modules ) {
+       print $data_fh join(' ', $module, $file, $id), "\n";
+       next;
+     }
++SKIP: {
++    skip("$file modified for Debian", 1) if $file eq 'cpan/Encode/bin/enc2xs';
+     my $should_be = $customised{ $module }->{ $file };
+     is( $id, $should_be, "SHA for $file matches stashed SHA" );
++}
+   }
+ }
+ 

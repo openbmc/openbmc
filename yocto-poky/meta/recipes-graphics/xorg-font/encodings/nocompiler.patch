@@ -1,0 +1,33 @@
+Upstream-Status: Inappropriate [configuration]
+
+XORG_DEFAULT_OPTIONS pulls in the following dependency chains:
+
+XORG_CWARNFLAGS -> AC_PROG_CC_C99
+XORG_STRICT_OPTION -> AC_PROG_CC_C99, XORG_CWARNFLAGS
+XORG_MANPAGE_SECTIONS -> AC_CANONICAL_HOST -> Checks host 
+
+each of which triggers the use of the host compiler. As an "all"
+architecture package, it shouldn't need a compiler (and doesn't).
+
+RP 17/5/2011
+
+Index: encodings-1.0.4/configure.ac
+===================================================================
+--- encodings-1.0.4.orig/configure.ac	2011-05-17 23:36:19.505095876 +0100
++++ encodings-1.0.4/configure.ac	2011-05-17 23:54:14.935096128 +0100
+@@ -4,12 +4,12 @@
+ AM_INIT_AUTOMAKE([foreign dist-bzip2])
+ AM_MAINTAINER_MODE
+ 
+-# Require xorg-macros: XORG_DEFAULT_OPTIONS
+ m4_ifndef([XORG_MACROS_VERSION],
+ 	  [m4_fatal([must install xorg-macros 1.3 or later before running autoconf/autogen])])
+ XORG_MACROS_VERSION(1.3)
+-XORG_DEFAULT_OPTIONS
+-
++XORG_RELEASE_VERSION
++XORG_CHANGELOG
++XORG_INSTALL
+ AC_PROG_INSTALL
+ 
+ # Require X.Org's font util macros 1.2 or later

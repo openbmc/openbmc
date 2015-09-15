@@ -1,0 +1,33 @@
+From 43acc56d5506c7e318f717fb3634bc16e3438913 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Thu, 15 Jan 2015 18:12:07 -0800
+Subject: [PATCH] Makefile.am: fix parallel issue
+
+There might be no src dir if src/builtin.h runs earlier, create it to
+fix the race issue:
+
+src/genbuiltin nfctype1 nfctype2 nfctype3 nfctype4 p2p > src/builtin.h
+/bin/sh: src/builtin.h: No such file or directory
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ Makefile.am |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Makefile.am b/Makefile.am
+index 3241311..a43eaa2 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -164,6 +164,7 @@ MAINTAINERCLEANFILES = Makefile.in \
+ src/plugin.$(OBJEXT): src/builtin.h
+ 
+ src/builtin.h: src/genbuiltin $(builtin_sources)
++	$(AM_V_at)$(MKDIR_P) src
+ 	$(AM_V_GEN)$(srcdir)/src/genbuiltin $(builtin_modules) > $@
+ 
+ $(src_neard_OBJECTS) \
+-- 
+1.7.9.5
+

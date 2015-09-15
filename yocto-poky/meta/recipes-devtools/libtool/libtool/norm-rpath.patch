@@ -1,0 +1,38 @@
+libtool: normalize link paths before considering for RPATH
+
+Libtool may be passed link paths of the form "/usr/lib/../lib", which
+fool its detection code into thinking it should be included as an
+RPATH in the generated binary.  Normalize before comparision.
+
+Signed-off-by: Andy Ross <andy.ross@windriver.com>
+Upstream-Status: Pending
+
+Updated by: Robert Yang <liezhi.yang@windriver.com>
+
+diff -ur a/build-aux/ltmain.in b/build-aux/ltmain.in
+--- a/build-aux/ltmain.in	2012-08-16 13:58:55.058900363 -0700
++++ b/build-aux/ltmain.in	2012-08-22 11:01:34.191345989 -0700
+@@ -7288,8 +7288,10 @@
+ 	      else
+                 # We only want to hardcode in an rpath if it isn't in the
+                 # default dlsearch path.
++                func_normal_abspath "$libdir"
++                libdir_norm=$func_normal_abspath_result
+ 	        case " $sys_lib_dlsearch_path " in
+-	        *" $libdir "*) ;;
++	        *" $libdir_norm "*) ;;
+ 	        *) eval flag=\"$hardcode_libdir_flag_spec\"
+                    func_append dep_rpath " $flag"
+                    ;;
+@@ -8027,8 +8029,10 @@
+ 	  else
+             # We only want to hardcode in an rpath if it isn't in the
+             # default dlsearch path.
++            func_normal_abspath "$libdir"
++            libdir_norm=$func_normal_abspath_result
+ 	    case " $sys_lib_dlsearch_path " in
+-	    *" $libdir "*) ;;
++	    *" $libdir_norm "*) ;;
+ 	    *) eval flag=\"$hardcode_libdir_flag_spec\"
+                rpath+=" $flag"
+                ;;

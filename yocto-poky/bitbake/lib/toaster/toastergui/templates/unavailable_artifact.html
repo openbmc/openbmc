@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load projecttags %}
+{% load humanize %}
+{% load static %}
+
+{% block pagecontent %}
+
+<div class="row-fluid air">
+    <div class="alert alert-info span8 lead">
+        <p"> The build artifact you are trying to download no longer exists.</p>
+        <p><a href="javascript:window.history.back()">Back to previous page</a></p>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,4 @@
+d root root 0755 /var/run/resolvconf/interface none
+f root root 0644 /etc/resolvconf/run/resolv.conf none
+f root root 0644 /etc/resolvconf/run/enable-updates none
+l root root 0644 /etc/resolv.conf /etc/resolvconf/run/resolv.conf

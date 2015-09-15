@@ -1,0 +1,24 @@
+From 53ce69085918232a1b7e26e7762c1b2f70b1eb4a Mon Sep 17 00:00:00 2001
+From: Brendan O'Dea <bod@debian.org>
+Date: Fri, 18 Mar 2005 22:22:25 +1100
+Subject: Remove standard libs from LD_RUN_PATH as per Debian policy.
+
+Patch-Name: debian/ld_run_path.diff
+---
+ cpan/ExtUtils-MakeMaker/lib/ExtUtils/Liblist/Kid.pm | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/cpan/ExtUtils-MakeMaker/lib/ExtUtils/Liblist/Kid.pm b/cpan/ExtUtils-MakeMaker/lib/ExtUtils/Liblist/Kid.pm
+index 37bcfd4..bd66e65 100644
+--- a/cpan/ExtUtils-MakeMaker/lib/ExtUtils/Liblist/Kid.pm
++++ b/cpan/ExtUtils-MakeMaker/lib/ExtUtils/Liblist/Kid.pm
+@@ -56,6 +56,9 @@ sub _unix_os2_ext {
+     my ( $pwd )   = cwd();    # from Cwd.pm
+     my ( $found ) = 0;
+ 
++    # Debian-specific: don't use LD_RUN_PATH for standard dirs
++    $ld_run_path_seen{$_}++ for @libpath;
++
+     foreach my $thislib ( split ' ', $potential_libs ) {
+         my ( $custom_name ) = '';
+ 

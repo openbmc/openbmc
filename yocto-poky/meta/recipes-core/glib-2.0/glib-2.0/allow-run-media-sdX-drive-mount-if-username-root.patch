@@ -1,0 +1,39 @@
+From c53e94a520b573aa0dcf12903e9563fe8badc34c Mon Sep 17 00:00:00 2001
+From: Marius Avram <marius.avram@intel.com>
+Date: Wed, 27 Aug 2014 12:10:41 +0300
+Subject: [PATCH] Allow /run/media/sdX drive mount if username root
+
+In case that the username logged in the system is root
+the drives are directly mounted in /run/media/sdX and
+not /run/media/<username>/sdX as the function
+g_unix_mount_guess_should_display() expects.
+
+Without this change USB stick mounts are not accesible from
+graphical applications such as the File Manager (pcmanfm).
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Marius Avram <marius.avram@intel.com>
+---
+ gio/gunixmounts.c |    5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/gio/gunixmounts.c b/gio/gunixmounts.c
+index 4999354..f6c1472 100644
+--- a/gio/gunixmounts.c
++++ b/gio/gunixmounts.c
+@@ -2136,6 +2136,11 @@ g_unix_mount_guess_should_display (GUnixMountEntry *mount_entry)
+           mount_path[sizeof ("/run/media/") - 1 + user_name_len] == '/')
+         is_in_runtime_dir = TRUE;
+ 
++      /* Allow no username in path in /run/media if current user is root */
++      if (strcmp(user_name, "root") == 0 &&
++          strncmp (mount_path, "/run/media/", sizeof("run/media")) == 0)
++        is_in_runtime_dir = TRUE;
++
+       if (is_in_runtime_dir || g_str_has_prefix (mount_path, "/media/"))
+         {
+           char *path;
+-- 
+1.7.9.5
+

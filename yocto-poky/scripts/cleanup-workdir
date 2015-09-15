@@ -1,0 +1,198 @@
+#!/usr/bin/env python
+
+# Copyright (c) 2012 Wind River Systems, Inc.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+import os
+import sys
+import optparse
+import re
+import subprocess
+import shutil
+
+pkg_cur_dirs = {}
+obsolete_dirs = []
+parser = None
+
+def err_quit(msg):
+    print msg
+    parser.print_usage()
+    sys.exit(1)
+
+def parse_version(verstr):
+    elems = verstr.split(':')
+    epoch = elems[0]
+    if len(epoch) == 0:
+        return elems[1]
+    else:
+        return epoch + '_' + elems[1]
+
+def run_command(cmd):
+    pipe = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+    output = pipe.communicate()[0]
+    if pipe.returncode != 0:
+        print "Execute command '%s' failed." % cmd
+        sys.exit(1)
+    return output
+
+def get_cur_arch_dirs(workdir, arch_dirs):
+    pattern = workdir + '/(.*?)/'
+
+    cmd = "bitbake -e | grep ^SDK_ARCH="
+    output = run_command(cmd)
+    sdk_arch = output.split('"')[1]
+
+    # select thest 5 packages to get the dirs of current arch
+    pkgs = ['hicolor-icon-theme', 'base-files', 'acl-native', 'binutils-crosssdk-' + sdk_arch, 'nativesdk-autoconf']
+
+    for pkg in pkgs:
+        cmd = "bitbake -e " + pkg + " | grep ^IMAGE_ROOTFS="
+        output = run_command(cmd)
+        output = output.split('"')[1]
+        m = re.match(pattern, output)
+        arch_dirs.append(m.group(1))
+
+def main():
+    global parser
+    parser = optparse.OptionParser(
+        usage = """%prog
+
+%prog removes the obsolete packages' build directories in WORKDIR.
+This script must be ran under BUILDDIR after source file \"oe-init-build-env\".
+
+Any file or directory under WORKDIR which is not created by Yocto
+will be deleted. Be CAUTIOUS.""")
+
+    options, args = parser.parse_args(sys.argv)
+
+    builddir = run_command('echo $BUILDDIR').strip()
+    if len(builddir) == 0:
+        err_quit("Please source file \"oe-init-build-env\" first.\n")
+
+    if os.getcwd() != builddir:
+        err_quit("Please run %s under: %s\n" % (os.path.basename(args[0]), builddir))
+
+    print 'Updating bitbake caches...'
+    cmd = "bitbake -s"
+    output = run_command(cmd)
+
+    output = output.split('\n')
+    index = 0
+    while len(output[index]) > 0:
+        index += 1
+    alllines = output[index+1:]
+
+    for line in alllines:
+        # empty again means end of the versions output
+        if len(line) == 0:
+            break
+        line = line.strip()
+        line = re.sub('\s+', ' ', line)
+        elems = line.split(' ')
+        if len(elems) == 2:
+            version = parse_version(elems[1])
+        else:
+            version = parse_version(elems[2])
+        pkg_cur_dirs[elems[0]] = version
+
+    cmd = "bitbake -e"
+    output = run_command(cmd)
+
+    tmpdir = None
+    image_rootfs = None
+    output = output.split('\n')
+    for line in output:
+        if tmpdir and image_rootfs:
+            break
+
+        if not tmpdir:
+            m = re.match('TMPDIR="(.*)"', line)
+            if m:
+                tmpdir = m.group(1)
+
+        if not image_rootfs:
+            m = re.match('IMAGE_ROOTFS="(.*)"', line)
+            if m:
+                image_rootfs = m.group(1)
+
+    # won't fail just in case
+    if not tmpdir or not image_rootfs:
+        print "Can't get TMPDIR or IMAGE_ROOTFS."
+        return 1
+
+    pattern = tmpdir + '/(.*?)/(.*?)/'
+    m = re.match(pattern, image_rootfs)
+    if not m:
+        print "Can't get WORKDIR."
+        return 1
+
+    workdir = os.path.join(tmpdir, m.group(1))
+
+    # we only deal the dirs of current arch, total numbers of dirs are 6
+    cur_arch_dirs = [m.group(2)]
+    get_cur_arch_dirs(workdir, cur_arch_dirs)
+
+    for workroot, dirs, files in os.walk(workdir):
+        # For the files, they should NOT exist in WORKDIR. Remove them.
+        for f in files:
+            obsolete_dirs.append(os.path.join(workroot, f))
+
+        for d in dirs:
+            if d not in cur_arch_dirs:
+                continue
+
+            for pkgroot, pkgdirs, filenames in os.walk(os.path.join(workroot, d)):
+                for f in filenames:
+                    obsolete_dirs.append(os.path.join(pkgroot, f))
+
+                for pkgdir in sorted(pkgdirs):
+                    if pkgdir not in pkg_cur_dirs:
+                        obsolete_dirs.append(os.path.join(pkgroot, pkgdir))
+                    else:
+                        for verroot, verdirs, verfiles in os.walk(os.path.join(pkgroot, pkgdir)):
+                            for f in verfiles:
+                                obsolete_dirs.append(os.path.join(pkgroot, f))
+                            for v in sorted(verdirs):
+                               if v not in pkg_cur_dirs[pkgdir]:
+                                   obsolete_dirs.append(os.path.join(pkgroot, pkgdir, v))
+                            break
+
+                # just process the top dir of every package under tmp/work/*/,
+                # then jump out of the above os.walk()
+                break
+
+        # it is convenient to use os.walk() to get dirs and files at same time
+        # both of them have been dealed in the loop, so jump out
+        break
+
+    for d in obsolete_dirs:
+        print "Deleting %s" % d
+        shutil.rmtree(d, True)
+
+    if len(obsolete_dirs):
+        print '\nTotal %d items.' % len(obsolete_dirs)
+    else:
+        print '\nNo obsolete directory found under %s.' % workdir
+
+    return 0
+
+if __name__ == '__main__':
+    try:
+        ret = main()
+    except Exception:
+        ret = 2
+        import traceback
+        traceback.print_exc(3)
+    sys.exit(ret)

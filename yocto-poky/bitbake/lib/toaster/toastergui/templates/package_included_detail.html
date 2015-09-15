@@ -1,0 +1,44 @@
+{% extends "package_detail_base.html" %}
+{% load projecttags %}
+
+{% block title %}
+        <h1>
+            {{package.fullpackagespec}}
+            <script>
+                fmtAliasHelp("{{package.name}}", "{{package.alias}}", false)
+            </script>
+            <small>({{target.target}})</small>
+        </h1>
+{% endblock title %}
+
+{% block tabcontent %}
+{% with packageFileCount=package.buildfilelist_package.count %}
+    {% include "package_included_tabs.html" with active_tab="detail" %}
+    <div class="tab-content">
+        <div class="tab-pane active" id="files">
+            {% if packageFileCount > 0 %}
+            {% include "tablesort.html" %}
+                <tbody>
+					{% for file in objects %}
+                        <tr>
+                            <td class="path">
+                                <a href="{% url 'dirinfo_filepath' build.id target.id file.path %}">
+                                    {{file.path}}
+                                </a>
+                             </td>
+                            <td class="filesize sizecol" >{{file.size|filtered_filesizeformat}}</td>
+                        </tr>
+					{% endfor %}
+                </tbody>
+            </table>
+
+            {% else %}
+            <div class="alert alert-info">
+                <strong>{{package.fullpackagespec}}</strong> does not generate any files.
+            </div>
+            {% endif %}
+        </div> <!-- end tab-pane -->
+    </div> <!-- end tab content -->
+
+{% endwith %}
+{% endblock tabcontent %}

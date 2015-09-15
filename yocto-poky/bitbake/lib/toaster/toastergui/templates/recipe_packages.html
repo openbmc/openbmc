@@ -1,0 +1,123 @@
+{% extends "basebuilddetailpage.html" %}
+
+{% load projecttags %}
+{% load humanize %}
+{% block localbreadcrumb %}
+<li><a href="{% url 'recipes' build.pk %}">Recipes</a></li>
+<li>{{recipe.name}}_{{recipe.version}} </li>
+{% endblock %}
+
+{% block pagedetailinfomain %}
+
+<!-- Begin container -->
+
+<div class="row-fluid span11">
+    <div class="page-header">
+        <h1>{{recipe.name}}_{{recipe.version}}</h1>
+    </div>
+</div>
+
+<div class="row-fluid span7 tabbable">
+    <ul class="nav nav-pills">
+        <li>
+            <a href="{% url "recipe" build.pk recipe.id "1" %}">
+                <i class="icon-question-sign get-help" title="Build-related information about the recipe"></i>
+                Recipe details
+            </a>
+        </li>
+        <li class="active">
+			<a href="#packages-built" data-toggle="tab">
+                <i class="icon-question-sign get-help" title="The packaged output resulting from building the recipe"></i>
+                Packages ({{object_count}})
+            </a>
+        </li>
+        <li>
+            <a href="{% url "recipe" build.pk recipe.id "3" %}">
+                <i class="icon-question-sign get-help" title="The recipe build-time dependencies (i.e. other recipes)"></i>
+                Build dependencies ({{recipe.r_dependencies_recipe.all.count}})
+            </a>
+        </li>
+        <li>
+            <a href="{% url "recipe" build.pk recipe.id "4" %}">
+                <i class="icon-question-sign get-help" title="The recipe build-time reverse dependencies (i.e. the recipes that depend on this recipe)"></i>
+                Reverse build dependencies ({{recipe.r_dependencies_depends.all.count}})
+            </a>
+        </li>
+    </ul>
+    <div class="tab-content">
+{#        <div class="tab-pane active" id="packages-built" name="packages-built">#}
+       <div class="tab-pane active" id="packages-built">
+            {% if not objects and not request.GET.search %}
+            <div class="alert alert-info">
+                <strong>{{recipe.name}}_{{recipe.version}}</strong> does not build any packages.
+            </div>
+
+            {% elif not objects %}
+                {# have empty search results, no table nor pagination #}
+                {% with "packages" as search_what %}
+                {% include "detail_search_header.html" %}
+                {% endwith %}
+
+            {% else %}
+
+
+                {% with "packages" as search_what %}
+                {% include "detail_search_header.html" %}
+                {% endwith %}
+            <table class="table table-bordered table-hover tablesorter" id="otable">
+                {% include "detail_sorted_header.html" %}
+
+                <tbody>
+                    {% for package in objects %}
+
+                    <tr>
+                        <td><a href="{% url "package_built_detail" build.pk package.pk %}">{{package.name}}</a></td>
+                        <td><a href="{% url "package_built_detail" build.pk package.pk %}">{{package.version}}_{{package.revision}}</a></td>
+                        <td class="sizecol"><a href="{% url "package_built_detail" build.pk package.pk %}">{{package.size|filtered_filesizeformat}}</a></td>
+                    </tr>
+
+                        {% endfor %}
+
+            {% endif %}
+            {% if objects %}
+                </tbody>
+            </table>
+                {% include "detail_pagination_bottom.html" %}
+            {% endif %}
+        </div> {# tab-pane #}
+    </div> {# tab-content #}
+</div> {# span7 #}
+
+<div class="row span4 well">
+    <h2>About {{recipe.name}}</h2>
+    <dl class="item-info">
+        {% if recipe.summary %}
+            <dt>Summary</dt>
+            <dd>{{recipe.summary}}</dd>
+        {% endif %}
+        {% if recipe.description %}
+            <dt>Description</dt>
+            <dd>{{recipe.description}}</dd>
+        {% endif %}
+        {% if recipe.homepage %}
+            <dt>Homepage</dt>
+            <dd><a href="{{recipe.homepage}}">{{recipe.homepage}}</a></dd>
+        {% endif %}
+        {% if recipe.bugtracker %}
+            <dt>Bugtracker</dt>
+            <dd><a href="{{recipe.bugtracker}}">{{recipe.bugtracker}}</a></dd>
+        {% endif %}
+        {% if recipe.section %}
+            <dt>
+            Section
+            <i class="icon-question-sign get-help" title="The section in which recipes should be categorized"></i>
+            </dt>
+            <dd>{{recipe.section}}</dd>
+        {% endif %}
+        {% if recipe.license %}
+            <dt>License</dt>
+            <dd>{{recipe.license}}</dd>
+        {% endif %}
+    </dl>
+</div>
+{% endblock pagedetailinfomain %}

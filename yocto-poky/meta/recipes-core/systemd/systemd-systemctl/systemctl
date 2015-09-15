@@ -1,0 +1,182 @@
+#!/bin/sh
+echo "Started $0 $*"
+
+ROOT=
+
+# parse command line params
+action=
+while [ $# != 0 ]; do
+	opt="$1"
+
+	case "$opt" in
+		enable)
+			shift
+
+			action="$opt"
+			services="$1"
+			cmd_args="1"
+			shift
+			;;
+		disable)
+			shift
+
+			action="$opt"
+			services="$1"
+			cmd_args="1"
+			shift
+			;;
+		mask)
+			shift
+
+			action="$opt"
+			services="$1"
+			cmd_args="1"
+			shift
+			;;
+		preset)
+			shift
+
+			action="$opt"
+			services="$1"
+			cmd_args="1"
+			shift
+			;;
+		--root=*)
+			ROOT=${opt##--root=}
+			cmd_args="0"
+			shift
+			;;
+		*)
+			if [ "$cmd_args" = "1" ]; then
+				services="$services $opt" 
+				shift
+			else
+				echo "'$opt' is an unkown option; exiting with error"
+				exit 1
+			fi
+			;;
+	esac
+done
+if [ "$action" = "preset" -a "$service_file" = "" ]; then
+	services=$(for f in `find $ROOT/etc/systemd/system $ROOT/lib/systemd/system $ROOT/usr/lib/systemd/system -type f 2>1`; do basename $f; done)
+	services="$services $opt"
+	presetall=1
+fi
+
+for service in $services; do
+	if [ "$presetall" = "1" ]; then
+		action="preset"
+	fi
+	if [ "$action" = "mask" ]; then
+		if [ ! -d $ROOT/etc/systemd/system/ ]; then
+			mkdir -p $ROOT/etc/systemd/system/
+		fi
+		cmd="ln -s /dev/null $ROOT/etc/systemd/system/$service"
+		echo "$cmd"
+		$cmd
+		exit 0
+	fi
+
+	service_base_file=`echo $service | sed 's/\(@\).*\(\.[^.]\+\)/\1\2/'`
+	if [ -z `echo $service | sed '/@/p;d'` ]; then
+		echo "Try to find location of $service..."
+		service_template=false
+	else
+		echo "Try to find location of template $service_base_file of instance $service..."
+		service_template=true
+		if [ -z `echo $service | sed 's/^.\+@\(.*\)\.[^.]\+/\1/'` ]; then
+			instance_specified=false
+		else
+			instance_specified=true
+		fi
+	fi
+
+	# find service file
+	for p in $ROOT/etc/systemd/system \
+		 $ROOT/lib/systemd/system \
+		 $ROOT/usr/lib/systemd/system; do
+		if [ -e $p/$service_base_file ]; then
+			service_file=$p/$service_base_file
+			service_file=${service_file##$ROOT}
+		fi
+	done
+	if [ -z "$service_file" ]; then
+		echo "'$service_base_file' couldn't be found; exiting with error"
+		exit 1
+	fi
+	echo "Found $service in $service_file"
+
+	# If any new unit types are added to systemd they should be added
+	# to this regular expression.
+	unit_types_re='\.\(service\|socket\|device\|mount\|automount\|swap\|target\|path\|timer\|snapshot\)$'
+	if [ "$action" = "preset" ]; then
+		action=`egrep -sh  $service $ROOT/etc/systemd/user-preset/*.preset | cut -f1 -d' '`
+		if [ -z "$action" ]; then
+			globalpreset=`egrep -sh  '\*'  $ROOT/etc/systemd/user-preset/*.preset | cut -f1 -d' '`
+			if [ -n "$globalpreset" ]; then
+				action="$globalpreset"
+			else
+				action="enable"
+			fi
+		fi
+	fi
+	# create the required symbolic links
+	wanted_by=$(sed '/^WantedBy[[:space:]]*=/s,[^=]*=,,p;d' "$ROOT/$service_file" \
+		        | tr ',' '\n' \
+		        | grep "$unit_types_re")
+
+	for r in $wanted_by; do
+		echo "WantedBy=$r found in $service"
+		if [ "$action" = "enable" ]; then
+			enable_service=$service
+			if [ "$service_template" = true -a "$instance_specified" = false ]; then
+				default_instance=$(sed '/^DefaultInstance[[:space:]]*=/s,[^=]*=,,p;d' "$ROOT/$service_file")
+				if [ -z $default_instance ]; then
+					echo "Template unit without instance or DefaultInstance directive, nothing to enable"
+					continue
+				else
+					echo "Found DefaultInstance $default_instance, enabling it"
+					enable_service=$(echo $service | sed "s/@/@$default_instance/")
+				fi
+			fi
+			mkdir -p $ROOT/etc/systemd/system/$r.wants
+			ln -s $service_file $ROOT/etc/systemd/system/$r.wants/$enable_service
+			echo "Enabled $enable_service for $wanted_by."
+		else
+			if [ "$service_template" = true -a "$instance_specified" = false ]; then
+				disable_service="$ROOT/etc/systemd/system/$r.wants/`echo $service | sed 's/@/@*/'`"
+			else
+				disable_service="$ROOT/etc/systemd/system/$r.wants/$service"
+			fi
+			rm -f $disable_service
+			[ -d $ROOT/etc/systemd/system/$r.wants ] && rmdir --ignore-fail-on-non-empty -p $ROOT/etc/systemd/system/$r.wants
+			echo "Disabled ${disable_service##$ROOT/etc/systemd/system/$r.wants/} for $wanted_by."
+		fi
+	done
+
+	# create the required symbolic 'Alias' links
+	alias=$(sed '/^Alias[[:space:]]*=/s,[^=]*=,,p;d' "$ROOT/$service_file" \
+		        | tr ',' '\n' \
+		        | grep "$unit_types_re")
+
+	for r in $alias; do
+		if [ "$action" = "enable" ]; then
+			mkdir -p $ROOT/etc/systemd/system
+			ln -s $service_file $ROOT/etc/systemd/system/$r
+			echo "Enabled $service for $alias."
+		else
+			rm -f $ROOT/etc/systemd/system/$r
+			echo "Disabled $service for $alias."
+		fi
+	done
+
+	# call us for the other required scripts
+	also=$(sed '/^Also[[:space:]]*=/s,[^=]*=,,p;d' "$ROOT/$service_file" \
+		   | tr ',' '\n')
+	for a in $also; do
+		echo "Also=$a found in $service"
+		if [ "$action" = "enable" ]; then
+			$0 --root=$ROOT enable $a
+		fi
+	done
+done

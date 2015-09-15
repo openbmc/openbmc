@@ -1,0 +1,14 @@
+Upstream-Status: Inappropriate [poky-specific fix]
+
+--- a/Makefile.inc
++++ b/Makefile.inc
+@@ -57,6 +57,9 @@
+   ifeq ($(NO_UUID),)
+     LIBS += -luuid
+   endif
++  ifneq ($(RANLIB),)
++    RANLIB += $@
++  endif
+ endif
+ 
+ ifneq ($(OPSYS),Windows)

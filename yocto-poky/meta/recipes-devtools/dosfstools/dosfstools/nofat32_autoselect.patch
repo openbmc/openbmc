@@ -1,0 +1,27 @@
+FAT32 appears to be broken when used with the -d option to populate the msdos
+image. This disables the FAT32 autoselection code which means we don't get
+broken images with the -d option. It can still be enabled on the commandline
+at the users own risk. This changes us back to the 2.10 version's behaviour
+which was known to work well even with large images.
+
+Upstream-Status: Inappropriate [depends on other patches we apply]
+
+RP 2011/12/13
+
+Index: dosfstools-2.11/mkdosfs/mkdosfs.c
+===================================================================
+--- dosfstools-2.11.orig/mkdosfs/mkdosfs.c	2011-12-13 13:54:37.538509391 +0000
++++ dosfstools-2.11/mkdosfs/mkdosfs.c	2011-12-13 13:55:10.258508631 +0000
+@@ -808,10 +808,12 @@
+       bs.media = (char) 0xf8; /* Set up the media descriptor for a hard drive */
+       bs.dir_entries[0] = (char) 0;	/* Default to 512 entries */
+       bs.dir_entries[1] = (char) 2;
++/*
+       if (!size_fat && blocks*SECTORS_PER_BLOCK > 1064960) {
+ 	  if (verbose) printf("Auto-selecting FAT32 for large filesystem\n");
+ 	  size_fat = 32;
+       }
++*/
+       if (size_fat == 32) {
+ 	  /* For FAT32, try to do the same as M$'s format command:
+ 	   * fs size < 256M: 0.5k clusters

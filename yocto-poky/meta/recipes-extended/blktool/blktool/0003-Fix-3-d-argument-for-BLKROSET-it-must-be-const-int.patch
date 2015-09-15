@@ -1,0 +1,78 @@
+From 68faa63aaad81f4a289e4a03173ab4cf798deb53 Mon Sep 17 00:00:00 2001
+From: Azat Khuzhin <a3at.mail@gmail.com>
+Date: Sat, 1 Nov 2014 22:24:32 +0300
+Subject: [PATCH 3/3] Fix 3-d argument for BLKROSET it must be 'const int *'
+
+Most of *SET ioctls have int type for 3-d argument, except BLKROSET.
+So add bc_arg_type enum, build it into bool_comand and install arg_type
+to bc_arg_int_ptr for BLKROSET only.
+
+Debian-bug-id: 641164
+Link: https://bugs.debian.org/641164
+
+This patch is taken from
+ftp://ftp.debian.org/debian/pool/main/b/blktool/blktool_4-7.debian.tar.xz
+
+Upstream-Status: Inappropriate [upstream is dead]
+Signed-off-by: Alexander Kanavin <alexander.kanavin@linux.intel.com>
+
+---
+ blktool.c | 11 +++++++++--
+ blktool.h |  7 +++++++
+ 2 files changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/blktool.c b/blktool.c
+index fbefecd..221a195 100644
+--- a/blktool.c
++++ b/blktool.c
+@@ -85,7 +85,7 @@ static struct bool_command bool_cmd_tbl[] = {
+ 	{ { DEF_BOOL("pio-data"), dc_ata, DEF_HDIO(32BIT) },
+ 	  "16-bit", "32-bit" },
+ 	{ { DEF_BOOL("readonly"), dc_any, IOCNAME(BLKROGET), IOCNAME(BLKROSET) },
+-	  DEF_BOOLSTR },
++	  DEF_BOOLSTR, bc_arg_int_ptr },
+ 	{ { DEF_BOOL("unmask-irq"), dc_ata, DEF_HDIO(UNMASKINTR) },
+ 	  DEF_BOOLSTR },
+ 	{ { "wcache", ct_bool, handle_wcache, dc_any,
+@@ -171,7 +171,14 @@ static void handle_bool(int argc, char **argv, struct command *cmd)
+ 
+ 	} else if ((argc == 4) && (cmd->write_ioctl_name != NULL)) {
+ 		do_32 = parse_bool(argc, argv, bcm);
+-		if (ioctl(blkdev, cmd->write_ioctl, do_32))
++		
++		int ret;
++		if (bcm->arg_type == bc_arg_int_ptr) {
++			ret = ioctl(blkdev, cmd->write_ioctl, &do_32);
++		} else {
++			ret = ioctl(blkdev, cmd->write_ioctl, do_32);
++		}
++		if (ret)
+ 			pdie(cmd->write_ioctl_name, 1);
+ 	}
+ 	else {
+diff --git a/blktool.h b/blktool.h
+index fce4387..85add83 100644
+--- a/blktool.h
++++ b/blktool.h
+@@ -85,11 +85,18 @@ struct command {
+ 	const char		*write_ioctl_name;
+ };
+ 
++enum bc_arg_type {
++	bc_arg_int,
++	bc_arg_int_ptr,
++};
++
+ struct bool_command {
+ 	struct command		cmd;
+ 
+ 	const char		*str_false;
+ 	const char		*str_true;
++
++	enum bc_arg_type arg_type;
+ };
+ 
+ struct class_operations {
+-- 
+2.1.4
+

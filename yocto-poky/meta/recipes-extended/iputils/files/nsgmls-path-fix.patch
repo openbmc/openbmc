@@ -1,0 +1,27 @@
+Fix nsgmls path issue
+
+Upstream-Status: Pending
+
+Signed-off-by: Zhai Edwin <edwin.zhai@intel.com>
+
+Index: iputils-s20101006/doc/Makefile
+===================================================================
+--- iputils-s20101006.orig/doc/Makefile	2011-09-13 20:42:27.000000000 +0800
++++ iputils-s20101006/doc/Makefile	2011-09-13 21:01:52.000000000 +0800
+@@ -27,10 +27,15 @@
+ # docbook2man produces utterly ugly output and I did not find
+ # any way to customize this but hacking backend perl script a little.
+ # Well, hence...
++# nsgmls seems append path to search directory according to the sysid path.
++# e.g. if input ../index.db, it would search $search_directory/../ rather than
++# $search_directory, which leads searching failure. Fixing nsgmls probably
++# introduce some side effects, so use this ugly hack: running nsgmls in current
++# directory, and running docbook2man in tmp directory.
+ 
+ $(MANFILES): index.db
+ 	@-mkdir tmp.db2man
+-	@set -e; cd tmp.db2man; nsgmls ../$< | sgmlspl ../docbook2man-spec.pl ;	mv $@ ..
++	@set -e; nsgmls $< >tmp.db2man/output; cd tmp.db2man; cat output | sgmlspl ../docbook2man-spec.pl ;	mv $@ ..
+ 	@-rm -rf tmp.db2man
+ 
+ clean:

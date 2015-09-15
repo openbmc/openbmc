@@ -1,0 +1,64 @@
+macros/macros.in: Revert settings to the same as RPM 5.4.0
+
+Enable a reasonable set of rpmdeps dependency helper macros.  These sets
+were used by RPM 5.4.0.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.14/macros/macros.in
+===================================================================
+--- rpm-5.4.14.orig/macros/macros.in
++++ rpm-5.4.14/macros/macros.in
+@@ -1022,7 +1022,7 @@ $_arbitrary_tags_tests	Foo:Bar
+ 
+ #==============================================================================
+ # ---- rpmbuild macros.
+-#%%{load:%{_usrlibrpm}/macros.rpmbuild}
++%{load:%{_usrlibrpm}/macros.rpmbuild}
+ 
+ #------------------------------------------------------------------------
+ # cmake(...) configuration
+@@ -1038,15 +1038,15 @@ $_arbitrary_tags_tests	Foo:Bar
+ 
+ #------------------------------------------------------------------------
+ # perl(...) configuration
+-#%%{load:%{_usrlibrpm}/macros.d/perl}
++%{load:%{_usrlibrpm}/macros.d/perl}
+ 
+ #------------------------------------------------------------------------
+ # python(...) configuration.
+-#%%{load:%{_usrlibrpm}/macros.d/python}
++%{load:%{_usrlibrpm}/macros.d/python}
+ 
+ #------------------------------------------------------------------------
+ # php(...) configuration.
+-#%%{load:%{_usrlibrpm}/macros.d/php}
++%{load:%{_usrlibrpm}/macros.d/php}
+ 
+ #------------------------------------------------------------------------
+ # java(...) configuration.
+@@ -1054,11 +1054,11 @@ $_arbitrary_tags_tests	Foo:Bar
+ 
+ #------------------------------------------------------------------------
+ # libtool(...) configuration.
+-#%%{load:%{_usrlibrpm}/macros.d/libtool}
++%{load:%{_usrlibrpm}/macros.d/libtool}
+ 
+ #------------------------------------------------------------------------
+ # pkgconfig(...) configuration.
+-#%%{load:%{_usrlibrpm}/macros.d/pkgconfig}
++%{load:%{_usrlibrpm}/macros.d/pkgconfig}
+ 
+ #------------------------------------------------------------------------
+ # mono(...) configuration.
+@@ -1070,7 +1070,7 @@ $_arbitrary_tags_tests	Foo:Bar
+ 
+ #------------------------------------------------------------------------
+ # tcl(...) configuration.
+-#%%{load:%{_usrlibrpm}/macros.d/tcl}
++%{load:%{_usrlibrpm}/macros.d/tcl}
+ 
+ #------------------------------------------------------------------------
+ # typelib(...) configuration.

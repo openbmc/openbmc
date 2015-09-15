@@ -1,0 +1,33 @@
+rpm: Resolve parallel install issue when installing lua
+
+When lua is being installed on some systems that are being run with high levels
+of parallelization there are cases where install-data-am and install-exec-hook
+are processed at the same or a very short time apart. This causes
+install-pkgbinPROGRAMS, which is a dependency of both, to be run at around the
+same time This sometimes causes file contention and will sometimes be in a state
+where install-exec-hook is looking for a file that is being installed or both
+install-pkgbinPROGRAMS being run are installing the same file and fail because
+it cannon create a new file.
+
+This patch allows install-exec-hook to be called by install-data-am instead of
+install-exec-am. It also removed the dependency in install-data-hook on
+install-pkgbinPROGRAMS. This means install-pkgbinPROGRAMS will only be run once
+so there whould be any file contention.
+
+Upstream-Status: Pending
+
+Signed-off-by: Morgan Little <morgan.little@windriver.com>
+
+Index: rpm-5.4.14/lua/Makefile.am
+===================================================================
+--- rpm-5.4.14.orig/lua/Makefile.am
++++ rpm-5.4.14/lua/Makefile.am
+@@ -326,7 +326,7 @@ clean-local:
+ # XXX Build & install as rpmlua/rpmluac with hardlinks to lua/luac post install.
+ # XXX CVS has lua/luac sub-directories in the Attic that collide with the
+ # XXX lua/luac executable names when using cvs update.
+-install-exec-hook:	install-pkgbinPROGRAMS
++install-data-hook:	
+ 	mkdir -p $(DESTDIR)$(pkgbindir)
+ 	$(__RM) -f $(DESTDIR)$(pkgbindir)/lua
+ 	$(__LN) $(DESTDIR)$(pkgbindir)/rpmlua $(DESTDIR)$(pkgbindir)/lua

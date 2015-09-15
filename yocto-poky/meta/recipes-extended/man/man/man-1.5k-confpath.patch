@@ -1,0 +1,15 @@
+Upstream-Status: Pending
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+--- configure	2006-05-01 19:56:14.000000000 +0200
++++ configure.oden	2008-12-21 19:16:50.000000000 +0100
+@@ -198,7 +198,7 @@
+     confdir="${confprefix}/share/misc"
+   fi
+ fi
+-conffilename="man.conf"
++conffilename="man.config"
+ 
+ if test "$RANDOM" = "$RANDOM"; then
+   # Plain old Bourne shell.

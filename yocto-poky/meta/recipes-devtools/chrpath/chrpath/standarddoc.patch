@@ -1,0 +1,19 @@
+Upstream-Status: Pending
+
+autoconf/automake set docdir automatically, use their value ensuring 
+doc files are placed into $datadir/doc, not $prefix/doc.
+
+RP 5/7/2011
+
+Index: chrpath-0.13/Makefile.am
+===================================================================
+--- chrpath-0.13.orig/Makefile.am	2011-07-05 23:40:14.769920254 +0100
++++ chrpath-0.13/Makefile.am	2011-07-05 23:40:19.819920635 +0100
+@@ -1,7 +1,5 @@
+ SUBDIRS = testsuite deb
+ 
+-docdir = $(prefix)/doc/$(PACKAGE)-$(VERSION)
+-
+ doc_DATA = AUTHORS COPYING ChangeLog INSTALL NEWS README
+ 
+ bin_PROGRAMS = chrpath

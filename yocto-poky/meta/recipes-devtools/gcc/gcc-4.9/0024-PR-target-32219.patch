@@ -1,0 +1,62 @@
+From e0d15f4f8bf28c351b9215ca37f1caa24df0e1fd Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 29 Mar 2013 09:18:54 +0400
+Subject: [PATCH 24/35] PR target/32219
+
+* varasm.c (default_binds_local_p_1): Weak data is not local.
+
+Signed-off-by: Bernhard Reutner-Fischer <rep.dot.nop@gmail.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Backport
+---
+ gcc/testsuite/gcc.dg/visibility-21.c |   14 ++++++++++++++
+ gcc/varasm.c                         |    9 ++++-----
+ 2 files changed, 18 insertions(+), 5 deletions(-)
+ create mode 100644 gcc/testsuite/gcc.dg/visibility-21.c
+
+Index: gcc-4.9-20140316/gcc/varasm.c
+===================================================================
+--- gcc-4.9-20140316.orig/gcc/varasm.c
++++ gcc-4.9-20140316/gcc/varasm.c
+@@ -6771,6 +6771,10 @@ default_binds_local_p_1 (const_tree exp,
+   /* Static variables are always local.  */
+   else if (! TREE_PUBLIC (exp))
+     local_p = true;
++  /* hidden weak can't be overridden by something non-local, all
++     that is possible is that it is not defined at all. */
++  else if (DECL_WEAK (exp))
++    local_p = false;
+   /* A variable is local if the user has said explicitly that it will
+      be.  */
+   else if ((DECL_VISIBILITY_SPECIFIED (exp)
+@@ -6784,11 +6788,6 @@ default_binds_local_p_1 (const_tree exp,
+      local.  */
+   else if (DECL_VISIBILITY (exp) != VISIBILITY_DEFAULT)
+     local_p = true;
+-  /* Default visibility weak data can be overridden by a strong symbol
+-     in another module and so are not local.  */
+-  else if (DECL_WEAK (exp)
+-	   && !resolved_locally)
+-    local_p = false;
+   /* If PIC, then assume that any global name can be overridden by
+      symbols resolved from other modules.  */
+   else if (shlib)
+Index: gcc-4.9-20140316/gcc/testsuite/gcc.dg/visibility-22.c
+===================================================================
+--- /dev/null
++++ gcc-4.9-20140316/gcc/testsuite/gcc.dg/visibility-22.c
+@@ -0,0 +1,13 @@
++/* PR target/32219 */
++/* { dg-do run } */
++/* { dg-require-visibility "" } */
++/* { dg-options "-fPIC" { target fpic } } */
++
++extern void f() __attribute__((weak,visibility("hidden")));
++extern int puts( char const* );
++int main()
++{
++  if (f)
++    f();
++  return 0;
++}

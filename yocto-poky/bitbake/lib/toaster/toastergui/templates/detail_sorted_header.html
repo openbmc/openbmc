@@ -1,0 +1,25 @@
+{% comment %}
+    Adds sorted columns to a detail table.
+    Must be preceded by <table class="table table-bordered table-hover tablesorter" id="otable">
+    Must be followed by <tbody>...</tbody></table>.
+    Requires tablecols setup column fields dclass, clclass, qhelp, orderfield.
+{% endcomment %}
+{% load projecttags %}
+{#    <table class="table table-bordered table-hover tablesorter" id="otable"> #}
+    <thead>
+        <!-- Table header row; generated from "tablecols" entry in the context dict -->
+        <tr>
+            {% for tc in tablecols %}<th class="{%if tc.dclass%}{{tc.dclass}}{% endif %} {%if tc.class %}{{tc.clclass}}{% endif %}">
+                {%if tc.qhelp%}<i class="icon-question-sign get-help" title="{{tc.qhelp}}"></i>{%endif%}
+                {%if tc.orderfield%}<a {%if tc.ordericon%} class="sorted" {%endif%}href="javascript:reload_params({'page': 1, 'orderby' : '{{tc.orderfield}}' })">{{tc.name}}</a>{%else%}<span class="muted">{{tc.name}}</span>{%endif%}
+                {%if tc.ordericon%} <i class="icon-caret-{{tc.ordericon}}"></i>{%endif%}
+                {% if request.GET.search and forloop.first %}
+                    <span class="badge badge-info">{{objects.paginator.count}}</span>
+                {% endif %}
+                {%if tc.filter%}<div class="btn-group pull-right">
+                    <a href="#filter_{{tc.filter.class}}" role="button" class="btn btn-mini {%if request.GET.filter%}{{tc.filter.options|filtered_icon:request.GET.filter}} {%endif%}" {%if request.GET.filter and tc.filter.options|filtered_tooltip:request.GET.filter %} title="<p>{{tc.filter.options|filtered_tooltip:request.GET.filter}}</p><p><a class='btn btn-small btn-primary' href=javascript:reload_params({'filter':''})>Show all {% if filter_search_display %}{{filter_search_display}}{% else %}{{objectname}}{% endif %}</a></p>" {%endif%} data-toggle="modal"> <i class="icon-filter filtered"></i> </a>
+                </div>{%endif%}
+            </th>{% endfor %}
+        </tr>
+    </thead>
+

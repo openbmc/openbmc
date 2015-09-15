@@ -1,0 +1,14 @@
+Upstream-Status: Inappropriate
+
+Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
+diff -Nurd libtasn1-2.14/doc/Makefile.am libtasn1-2.14/doc/Makefile.am
+--- libtasn1-2.14/doc/Makefile.am	2012-09-24 15:08:42.000000000 +0300
++++ libtasn1-2.14/doc/Makefile.am	2013-01-03 07:35:26.702763403 +0200
+@@ -31,7 +31,7 @@
+ AM_MAKEINFOHTMLFLAGS = $(AM_MAKEINFOFLAGS) \
+	--no-split --number-sections --css-include=texinfo.css
+
+-dist_man_MANS = $(gdoc_MANS) asn1Parser.1 asn1Coding.1 asn1Decoding.1
++dist_man_MANS = $(gdoc_MANS)
+
+ HELP2MAN_OPTS = --info-page libtasn1

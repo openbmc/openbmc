@@ -1,0 +1,59 @@
+From 6eae3e637fcc22d21b51d44d61e3a9cb4825e776 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Thu, 30 Oct 2014 20:37:14 -0700
+Subject: [PATCH]PR rtl-optimization/63348
+ 
+PR rtl-optimization/63348
+* emit-rtl.c (try_split): Do not emit extra barrier.
+
+Note: this patch is to fix the side effect introduced by r212171 which was reported at:
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=63348
+
+git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/trunk@215613 138bc75d-0d04-0410-961f-82ee72b054a4
+
+Upstream-Status: Backport [https://gcc.gnu.org/viewcvs/gcc?view=revision&revision=215613]
+Signed-off-by: Baoshan Pang <baoshan.pang@windriver.com>
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ gcc/emit-rtl.c |   11 -----------
+ 1 files changed, 0 insertions(+), 11 deletions(-)
+
+diff --git a/gcc/emit-rtl.c b/gcc/emit-rtl.c
+index 4736f8d..ae69dbd 100644
+--- a/gcc/emit-rtl.c
++++ b/gcc/emit-rtl.c
+@@ -3422,7 +3422,6 @@ try_split (rtx pat, rtx trial, int last)
+ {
+   rtx before = PREV_INSN (trial);
+   rtx after = NEXT_INSN (trial);
+-  int has_barrier = 0;
+   rtx note, seq, tem;
+   int probability;
+   rtx insn_last, insn;
+@@ -3441,14 +3440,6 @@ try_split (rtx pat, rtx trial, int last)
+ 
+   split_branch_probability = -1;
+ 
+-  /* If we are splitting a JUMP_INSN, it might be followed by a BARRIER.
+-     We may need to handle this specially.  */
+-  if (after && BARRIER_P (after))
+-    {
+-      has_barrier = 1;
+-      after = NEXT_INSN (after);
+-    }
+-
+   if (!seq)
+     return trial;
+ 
+@@ -3594,8 +3585,6 @@ try_split (rtx pat, rtx trial, int last)
+   tem = emit_insn_after_setloc (seq, trial, INSN_LOCATION (trial));
+ 
+   delete_insn (trial);
+-  if (has_barrier)
+-    emit_barrier_after (tem);
+ 
+   /* Recursively call try_split for each new insn created; by the
+      time control returns here that insn will be fully split, so
+-- 
+1.7.1
+

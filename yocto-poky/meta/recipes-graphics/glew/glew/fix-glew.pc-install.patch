@@ -1,0 +1,46 @@
+
+We maintain the autotools configure.ac and Makefile.am, to correctly
+provide the glew.pc, the following patch is needed.
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+Index: glew-1.11.0/Makefile.am
+===================================================================
+--- glew-1.11.0.orig/Makefile.am
++++ glew-1.11.0/Makefile.am
+@@ -3,3 +3,5 @@ ACLOCAL_AMFLAGS = -I m4 --install
+ 
+ SUBDIRS = include src
+ 
++pkgconfigdir = $(libdir)/pkgconfig
++pkgconfig_DATA = glew.pc
+Index: glew-1.11.0/configure.ac
+===================================================================
+--- glew-1.11.0.orig/configure.ac
++++ glew-1.11.0/configure.ac
+@@ -66,5 +66,6 @@ AC_SUBST([LIBGLEW_SO_VERSION], [1:9:0])
+ 
+ AC_CONFIG_FILES([Makefile
+                  include/Makefile
+-                 src/Makefile])
++                 src/Makefile
++                 glew.pc])
+ AC_OUTPUT
+Index: glew-1.11.0/glew.pc.in
+===================================================================
+--- glew-1.11.0.orig/glew.pc.in
++++ glew-1.11.0/glew.pc.in
+@@ -5,7 +5,7 @@ includedir=${prefix}/include/GL
+ 
+ Name: glew
+ Description: The OpenGL Extension Wrangler library
+-Version: @version@
+-Cflags: -I${includedir} @cflags@
+-Libs: -L${libdir} -l@libname@
+-Requires: @requireslib@
++Version: @VERSION@
++Cflags: -I${includedir} @CFLAGS@
++Libs: -L${libdir} -lGLEW
++Requires: glu

@@ -1,0 +1,35 @@
+From b1de2c6290bc0651fe87a8c4fb52e7a0a5fe6322 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 5 Oct 2014 16:01:49 -0700
+Subject: [PATCH] gsystem-subprocess.c: Enable GNU extensions in system  C
+ library
+
+This should export O_CLOEXEC where it is only
+available when _GNU_SOURCE is defined .e.g. uclibc based systems
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Pending
+
+---
+ src/libgsystem/gsystem-subprocess.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/libgsystem/gsystem-subprocess.c b/src/libgsystem/gsystem-subprocess.c
+index a967896..a52a362 100644
+--- a/src/libgsystem/gsystem-subprocess.c
++++ b/src/libgsystem/gsystem-subprocess.c
+@@ -18,6 +18,10 @@
+ 
+ #include "config.h"
+ 
++#ifndef _GNU_SOURCE
++#define _GNU_SOURCE
++#endif
++
+ #define _GSYSTEM_NO_LOCAL_ALLOC
+ #include "libgsystem.h"
+ 
+-- 
+2.1.1
+

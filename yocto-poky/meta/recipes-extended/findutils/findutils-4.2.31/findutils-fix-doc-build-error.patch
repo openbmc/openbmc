@@ -1,0 +1,53 @@
+From 33cba24cba7b0973a702e9627bd5b93962948ae4 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Tue, 17 Sep 2013 16:11:16 +0800
+Subject: [PATCH] findutils: fix doc build error
+
+Upstream-Status: Backport
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ doc/find.texi |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/doc/find.texi b/doc/find.texi
+index 5b5f0cf..b3d9c6b 100644
+--- a/doc/find.texi
++++ b/doc/find.texi
+@@ -63,7 +63,7 @@ translation approved by the Foundation.
+
+ @page
+ @vskip 0pt plus 1filll
+-@insertcopying{}
++@insertcopying
+ @end titlepage
+
+ @contents
+@@ -1466,6 +1466,7 @@ no output is ever sent to it.
+ * Escapes::
+ * Format Directives::
+ * Time Formats::
++* Formatting Flags::
+ @end menu
+
+ @node Escapes
+@@ -1534,7 +1535,6 @@ from the novel you are reading.
+ * Size Directives::
+ * Location Directives::
+ * Time Directives::
+-* Formatting Flags::
+ @end menu
+
+ @node Name Directives
+@@ -1780,7 +1780,7 @@ setting the TZ environment variable).  This is a GNU extension.
+ @end table
+
+ @node Formatting Flags
+-@subsubsection Formatting Flags
++@subsection Formatting Flags
+
+ The @samp{%m} and @samp{%d} directives support the @samp{#}, @samp{0}
+ and @samp{+} flags, but the other directives do not, even if they
+--
+1.7.4.1
+

@@ -1,0 +1,47 @@
+Upstream-Status: Pending
+
+Fix libacpi for x32
+    
+    libacpi doesn't use base_libdir for install.  This patch adds
+    base_libdir support so that x32 libraries are installed properly.
+
+Patch Received from:  H.J. Lu <hjl.tools@gmail.com>
+
+Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com> 2011/12/05
+
+Index: libacpi-0.2/Makefile
+===================================================================
+--- libacpi-0.2.orig/Makefile
++++ libacpi-0.2/Makefile
+@@ -8,6 +8,10 @@ SRC_test = test-libacpi.c libacpi.c list
+ OBJ = ${SRC:.c=.o}
+ OBJ_test = ${SRC_test:.c=.o}
+ 
++ifndef base_libdir
++base_libdir=/lib
++endif
++
+ all: options libacpi.a libacpi.so test-libacpi
+ 
+ options:
+@@ -42,13 +46,13 @@ install: all
+ 	@mkdir -p ${DESTDIR}${PREFIX}/include
+ 	@cp -f libacpi.h ${DESTDIR}${PREFIX}/include
+ 	@chmod 644 ${DESTDIR}${PREFIX}/include/libacpi.h
+-	@echo installing library to ${DESTDIR}${PREFIX}/lib
+-	@mkdir -p ${DESTDIR}${PREFIX}/lib
+-	@cp -f libacpi.a ${DESTDIR}${PREFIX}/lib
+-	@chmod 644 ${DESTDIR}${PREFIX}/lib/libacpi.a
+-	@cp -f ${SONAME} ${DESTDIR}${PREFIX}/lib/
+-	@chmod 644 ${DESTDIR}${PREFIX}/lib/${SONAME}
+-	@ln -s ${SONAME} ${DESTDIR}${PREFIX}/lib/libacpi.so
++	@echo installing library to ${DESTDIR}${PREFIX}${base_libdir}
++	@mkdir -p ${DESTDIR}${PREFIX}${base_libdir}
++	@cp -f libacpi.a ${DESTDIR}${PREFIX}${base_libdir}
++	@chmod 644 ${DESTDIR}${PREFIX}${base_libdir}/libacpi.a
++	@cp -f ${SONAME} ${DESTDIR}${PREFIX}${base_libdir}/
++	@chmod 644 ${DESTDIR}${PREFIX}${base_libdir}/${SONAME}
++	@ln -s ${SONAME} ${DESTDIR}${PREFIX}${base_libdir}/libacpi.so
+ 	@echo installing test-libacpi to ${DESTDIR}${PREFIX}/bin
+ 	@mkdir -p ${DESTDIR}${PREFIX}/bin
+ 	@cp -f test-libacpi ${DESTDIR}${PREFIX}/bin

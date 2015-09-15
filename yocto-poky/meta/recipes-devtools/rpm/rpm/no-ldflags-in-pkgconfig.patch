@@ -1,0 +1,14 @@
+Don't put LDFLAGS into the Libs.private, all it generally contains is a linker
+hash selection (harmless) and the absolute path to the libdir in the sysroot
+(actively harmful).
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/scripts/rpm.pc.in b/scripts/rpm.pc.in
+index 8293471..2ea469c 100644
+--- a/scripts/rpm.pc.in
++++ b/scripts/rpm.pc.in
+@@ -17 +17 @@ Libs: -L${libdir} -lrpmbuild${suffix} -lrpm${suffix} -lrpmdb${suffix} -lrpmio${s
+-Libs.private: @LDFLAGS@ @LIBS@
++Libs.private: @LIBS@

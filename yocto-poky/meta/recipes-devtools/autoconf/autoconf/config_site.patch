@@ -1,0 +1,40 @@
+Upstream-Status: Pending
+
+Poky provides a list of site files in CONFIG_SITE whereas autoconf 
+only expects one file. This patch changes autoconf to accept a list of 
+them.
+
+RP 1/2/10
+
+Updated for 2.68 version: the CONFIG_SITE var was not getting used at all
+fixed the 2.68 code 
+Nitin A Kamble <nitin.a.kamble@intel.com> 2011/05/27
+
+Index: autoconf-2.68/lib/autoconf/general.m4
+===================================================================
+--- autoconf-2.68.orig/lib/autoconf/general.m4
++++ autoconf-2.68/lib/autoconf/general.m4
+@@ -1878,7 +1878,6 @@ AU_DEFUN([AC_VALIDATE_CACHED_SYSTEM_TUPL
+ m4_define([AC_SITE_LOAD],
+ [# Prefer an explicitly selected file to automatically selected ones.
+ ac_site_file1=NONE
+-ac_site_file2=NONE
+ if test -n "$CONFIG_SITE"; then
+   # We do not want a PATH search for config.site.
+   case $CONFIG_SITE in @%:@((
+@@ -1886,14 +1885,8 @@ if test -n "$CONFIG_SITE"; then
+     */*) ac_site_file1=$CONFIG_SITE;;
+     *)   ac_site_file1=./$CONFIG_SITE;;
+   esac
+-elif test "x$prefix" != xNONE; then
+-  ac_site_file1=$prefix/share/config.site
+-  ac_site_file2=$prefix/etc/config.site
+-else
+-  ac_site_file1=$ac_default_prefix/share/config.site
+-  ac_site_file2=$ac_default_prefix/etc/config.site
+ fi
+-for ac_site_file in "$ac_site_file1" "$ac_site_file2"
++for ac_site_file in $ac_site_file1
+ do
+   test "x$ac_site_file" = xNONE && continue
+   if test /dev/null != "$ac_site_file" && test -r "$ac_site_file"; then

@@ -1,0 +1,47 @@
+Disable perl-URPM support
+
+This causes a configure failure when perl-URPM is not used.
+
+| configure.ac:1159: required file `perl-URPM/Makefile.PL.in' not found
+| configure.ac:1159: required file `perl-URPM/Makefile.in' not found
+
+Upstream-Status: Inappropriate [disable feature]
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.14/configure.ac
+===================================================================
+--- rpm-5.4.14.orig/configure.ac
++++ rpm-5.4.14/configure.ac
+@@ -1186,30 +1186,10 @@ AC_SUBST(WITH_PERL_SUBDIR)
+ AC_SUBST(WITH_PERL_SUBPACKAGE)
+ AC_SUBST(WITH_PERL_LIBS)
+ 
+-dnl # optional Perl-URPM language bindings
++dnl # disable Perl-URPM language bindings
+ WITH_PERL_URPM_SUBDIR=""
+ WITH_PERL_URPM_SUBPACKAGE=0
+ WITH_PERL_URPM_LIBS=""
+-if test ".$WITH_PTHREADS" = .yes; then
+-    WITH_PERL_URPM_LIBS="$LIBS"
+-fi
+-AC_ARG_WITH(perl-urpm, AS_HELP_STRING([--with-perl-urpm], [build with Perl URPM language bindings]), [
+-    if test ".$withval" != .no; then
+-	PERL_URPM_INSTALLDIRS=""
+-	   if test "$withval" == "vendor"; then
+-		    PERL_URPM_INSTALLDIRS="'INSTALLDIRS'	=> 'vendor',"
+-	    fi
+-	    if test "$withval" == "site"; then
+-		    PERL_URPM_INSTALLDIRS="'INSTALLDIRS'     => 'site',"
+-	    fi
+-	    AC_DEFINE_UNQUOTED([PERL_URPM_INSTALLDIRS], [$PERL_URPM_INSTALLDIRS], [Perl install directory (vendor/site)])
+-	    AC_SUBST(PERL_URPM_INSTALLDIRS)
+-        WITH_PERL_URPM_SUBDIR=perl-URPM
+-        WITH_PERL_URPM_SUBPACKAGE=1
+-        AC_CONFIG_FILES([perl-URPM/Makefile.PL])
+-        AC_CONFIG_FILES([perl-URPM/Makefile])
+-    fi
+-])
+ AC_SUBST(WITH_PERL_URPM_SUBDIR)
+ AC_SUBST(WITH_PERL_URPM_SUBPACKAGE)
+ AC_SUBST(WITH_PERL_URPM_LIBS)

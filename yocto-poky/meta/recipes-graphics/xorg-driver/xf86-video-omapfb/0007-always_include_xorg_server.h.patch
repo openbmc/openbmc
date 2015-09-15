@@ -1,0 +1,48 @@
+Fix errors with glibc 2.20
+
+In file included from /home/ubuntu/work/upstream/openembedded-core/build/tmp-glibc/sysroots/qemux86/usr/include/string.h:634:0,
+                 from /home/ubuntu/work/upstream/openembedded-core/build/tmp-glibc/sysroots/qemux86/usr/include/xorg/os.h:53,
+                 from /home/ubuntu/work/upstream/openembedded-core/build/tmp-glibc/sysroots/qemux86/usr/include/xorg/misc.h:115,
+                 from /home/ubuntu/work/upstream/openembedded-core/build/tmp-glibc/sysroots/qemux86/usr/include/xorg/xf86str.h:37,
+                 from /home/ubuntu/work/upstream/openembedded-core/build/tmp-glibc/sysroots/qemux86/usr/include/xorg/xf86.h:44,
+                 from /home/ubuntu/work/upstream/openembedded-core/build/tmp-glibc/work/i586-oe-linux/xf86-video-omapfb/2_0.1.1+gitrAUTOINC+28c006c94e-r21.7/git/src/omapfb-xv-blizzard.c:33:
+/home/ubuntu/work/upstream/openembedded-core/build/tmp-glibc/sysroots/qemux86/usr/include/xorg/os.h:579:1: error: expected identifier or '(' before '__extension__'
+ strndup(const char *str, size_t n);
+ ^
+In file included from /home/ubuntu/work/upstream/openembedded-core/build/tmp-glibc/sysroots/qemux86/usr/include/string.h:634:0,
+                 from /home/ubuntu/work/upstream/openembedded-core/build/tmp-glibc/sysroots/qemux86/usr/include/xorg/os.h:53,
+                 from /home/ubuntu/work/upstream/openembedded-core/build/tmp-glibc/sysroots/qemux86/usr/include/xorg/misc.h:115,
+                 from /home/ubuntu/work/upstream/openembedded-core/build/tmp-glibc/sysroots/qemux86/usr/include/xorg/xf86str.h:37,
+                 from /home/ubuntu/work/upstream/openembedded-core/build/tmp-glibc/sysroots/qemux86/usr/include/xorg/xf86.h:44,
+                 from /home/ubuntu/work/upstream/openembedded-core/build/tmp-glibc/work/i586-oe-linux/xf86-video-omapfb/2_0.1.1+gitrAUTOINC+28c006c94e-r21.7/git/src/omapfb-xv-generic.c:28:
+/home/ubuntu/work/upstream/openembedded-core/build/tmp-glibc/sysroots/qemux86/usr/include/xorg/os.h:579:1: error: expected identifier or '(' before '__extension__'
+ strndup(const char *str, size_t n);
+ ^
+
+Singed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Pending
+Index: git/src/omapfb-xv-blizzard.c
+===================================================================
+--- git.orig/src/omapfb-xv-blizzard.c	2014-08-28 05:16:25.684070587 -0700
++++ git/src/omapfb-xv-blizzard.c	2014-08-28 19:05:39.440070587 -0700
+@@ -30,6 +30,7 @@
+  *  -
+  */
+ 
++#include <xorg-server.h>
+ #include "xf86.h"
+ #include "xf86_OSlib.h"
+ #include "xf86xv.h"
+Index: git/src/omapfb-xv-generic.c
+===================================================================
+--- git.orig/src/omapfb-xv-generic.c	2014-08-28 05:16:25.684070587 -0700
++++ git/src/omapfb-xv-generic.c	2014-08-28 19:05:51.780070587 -0700
+@@ -25,6 +25,7 @@
+  * Generic functions for the XV driver
+  */
+ 
++#include <xorg-server.h>
+ #include "xf86.h"
+ #include "xf86_OSlib.h"
+ #include "xf86xv.h"

@@ -1,0 +1,42 @@
+bind: make "/etc/init.d/bind stop" work
+
+Upstream-Status: Inappropriate [configuration]
+
+Add some configurations, make rndc command be able to controls
+the named daemon.
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ conf/named.conf |    5 +++++
+ conf/rndc.conf  |    5 +++++
+ 2 files changed, 10 insertions(+), 0 deletions(-)
+ create mode 100644 conf/rndc.conf
+
+diff --git a/conf/named.conf b/conf/named.conf
+index 95829cf..c8899e7 100644
+--- a/conf/named.conf
++++ b/conf/named.conf
+@@ -47,3 +47,8 @@ zone "255.in-addr.arpa" {
+ // root-delegation-only exclude { "DE"; "MUSEUM"; };
+ 
+ include "/etc/bind/named.conf.local";
++include "/etc/bind/rndc.key" ;
++controls {
++	inet 127.0.0.1 allow { localhost; }
++	keys { rndc-key; };
++};
+diff --git a/conf/rndc.conf b/conf/rndc.conf
+new file mode 100644
+index 0000000..a0b481d
+--- /dev/null
++++ b/conf/rndc.conf
+@@ -0,0 +1,5 @@
++include "/etc/bind/rndc.key";
++options {
++	default-server  localhost;
++	default-key     rndc-key;
++};
+
+-- 
+1.7.5.4
+

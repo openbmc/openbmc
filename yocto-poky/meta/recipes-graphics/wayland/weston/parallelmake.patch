@@ -1,0 +1,40 @@
+Backport two patches from upstream to fix parallel builds
+
+- mkdir races (2eff22b8e6f6e5255a1915c33dfd91cecf02cbbc)
+- weston.desktop race (315476fa7b1f1c44c1b35116036df54ac5cb9a03)
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/Makefile.am b/Makefile.am
+index 5819b19..ff13b19 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -20,7 +20,7 @@ weston.ini : $(srcdir)/weston.ini.in
+ 		$< > $@
+ 
+ ivi-shell/weston.ini : $(srcdir)/ivi-shell/weston.ini.in
+-	$(AM_V_GEN)$(SED) \
++	$(AM_V_GEN)$(MKDIR_P) $(dir $@) && $(SED) \
+ 		-e 's|@bindir[@]|$(bindir)|g' \
+ 		-e 's|@abs_top_builddir[@]|$(abs_top_builddir)|g' \
+ 		-e 's|@abs_top_srcdir[@]|$(abs_top_srcdir)|g' \
+@@ -29,7 +29,7 @@ ivi-shell/weston.ini : $(srcdir)/ivi-shell/weston.ini.in
+ 		$< > $@
+ 
+ tests/weston-ivi.ini : $(srcdir)/ivi-shell/weston.ini.in
+-	$(AM_V_GEN)$(SED) \
++	$(AM_V_GEN)$(MKDIR_P) $(dir $@) && $(SED) \
+ 		-e 's|@bindir[@]|$(bindir)|g' \
+ 		-e 's|@abs_top_builddir[@]|$(abs_top_builddir)|g' \
+ 		-e 's|@abs_top_srcdir[@]|$(abs_top_srcdir)|g' \
+@@ -179,8 +179,7 @@ pkgconfigdir = $(libdir)/pkgconfig
+ pkgconfig_DATA = src/weston.pc
+ 
+ wayland_sessiondir = $(datadir)/wayland-sessions
+-wayland_session_DATA = src/weston.desktop
+-dist_wayland_session_DATA = $(wayland_session_DATA)
++dist_wayland_session_DATA = src/weston.desktop
+ 
+ westonincludedir = $(includedir)/weston
+ westoninclude_HEADERS =				\

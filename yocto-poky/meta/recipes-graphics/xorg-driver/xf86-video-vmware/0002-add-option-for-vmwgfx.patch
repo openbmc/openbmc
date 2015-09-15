@@ -1,0 +1,98 @@
+Upstream-Status:Submitted
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From f103d6f570671c649ccd7b225e6d6c9f14371888 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Wed, 25 Jun 2014 16:16:44 +0100
+Subject: [PATCH 2/2] add option for vmwgfx
+
+---
+ configure.ac |   49 ++++++++++++++++++++-----------------------------
+ 1 file changed, 20 insertions(+), 29 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index be40ed7..8e15307 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -64,6 +64,13 @@ AC_ARG_ENABLE(vmwarectrl-client,
+                              [VMWARECTRL=$enableval], [VMWARECTRL=no])
+ AM_CONDITIONAL(BUILD_VMWARECTRL, [test "x$VMWARECTRL" = xyes])
+ 
++# Define a configure option to build the vmwgfx driver
++AC_ARG_ENABLE(vmwgfx,
++              AS_HELP_STRING([--disable-vmwgfx],
++                             [Disable vmwgfx driver (KMS/3D) (default: enabled)]),
++                             [VMWGFX="$enableval"], [VMWGFX="yes"])
++AM_CONDITIONAL(BUILD_VMWGFX, test "x$VMWGFX" = xyes)
++
+ # Store the list of server defined optional extensions in REQUIRED_MODULES
+ XORG_DRIVER_CHECK_EXT(RANDR, randrproto)
+ XORG_DRIVER_CHECK_EXT(RENDER, renderproto)
+@@ -85,11 +92,6 @@ PKG_CHECK_EXISTS([xorg-server >= 1.4.99],
+                  [AC_DEFINE([HAVE_XORG_SERVER_1_5_0], 1,
+                  [Has version 1.5.0 or greater of the Xserver])])
+ 
+-PKG_CHECK_EXISTS([xorg-server >= 1.7.0],
+-                 [AC_DEFINE([HAVE_XORG_SERVER_1_7_0], 1,
+-                 [Has version 1.7.0 or greater of the Xserver])
+-		 BUILD_VMWGFX=yes],[BUILD_VMWGFX=no])
+-
+ PKG_CHECK_EXISTS([xorg-server >= 1.12.0],
+                  [AC_DEFINE([HAVE_XORG_SERVER_1_12_0], 1,
+                  [Has version 1.12.0 or greater of the Xserver])])
+@@ -114,39 +116,28 @@ AM_CONDITIONAL(XSERVER_LIBPCIACCESS, test "x$XSERVER_LIBPCIACCESS" = xyes)
+ 
+ AC_SUBST([moduledir])
+ 
+-if test x$BUILD_VMWGFX = xyes; then
+-	PKG_CHECK_MODULES([LIBDRM], [libdrm],[],[BUILD_VMWGFX=no])
+-fi
+-if test x$BUILD_VMWGFX = xyes; then
+-#
+-# Early versions of mesa 10 forgot to bump the XA major version number in
+-# the xa_tracker.h header
+-#
+-	PKG_CHECK_MODULES([XATRACKER], [xatracker >= 0.4.0],
+-			  [PKG_CHECK_EXISTS([xatracker = 2.0.0],
+-	                  [AC_DEFINE([HAVE_XA_2], 1,
+-               		  [Has version 2 of XA])])],
+-			  [BUILD_VMWGFX=no])
+-#
+-# Check for prime.
+-#
++AC_MSG_CHECKING([whether to build Kernel Mode Setting and 3D])
++if test x$VMWGFX = xyes; then
++	PKG_CHECK_MODULES([LIBDRM], [libdrm])
++	# Check for prime.
+ 	PKG_CHECK_EXISTS([libdrm >= 2.4.38],
+ 			 [AC_DEFINE([HAVE_LIBDRM_2_4_38], 1,
+ 			 [Has version 2.4.38 or greater of libdrm])])
+-fi
+ 
+-DRIVER_NAME=vmware
+-AC_SUBST([DRIVER_NAME])
+-
+-AC_MSG_CHECKING([whether to build Kernel Mode Setting and 3D])
+-if test x$BUILD_VMWGFX = xyes; then
+-	AC_MSG_RESULT([yes])
++	# Early versions of mesa 10 forgot to bump the XA major version number
++	# in the xa_tracker.h header
++	PKG_CHECK_MODULES([XATRACKER], [xatracker >= 0.4.0],
++			  [PKG_CHECK_EXISTS([xatracker = 2.0.0],
++	                  [AC_DEFINE([HAVE_XA_2], 1,
++               		  [Has version 2 of XA])])])
+         AC_DEFINE([BUILD_VMWGFX], 1, [Building the vmwgfx driver path])
++	AC_MSG_RESULT([yes])
+ else
+ 	AC_MSG_RESULT([no])
+ fi
+ 
+-AM_CONDITIONAL(BUILD_VMWGFX, test "x$BUILD_VMWGFX" = xyes)
++DRIVER_NAME=vmware
++AC_SUBST([DRIVER_NAME])
+ 
+ AC_CONFIG_FILES([
+                 Makefile
+-- 
+1.7.10.4
+

@@ -1,0 +1,15 @@
+Enable operation with later versions of gettext.
+
+Upstream-Status: Inappropriate
+RP 2012/10/19
+
+Index: grep-2.5.1a/configure.in
+===================================================================
+--- grep-2.5.1a.orig/configure.in	2012-10-19 12:57:51.646970204 +0000
++++ grep-2.5.1a/configure.in	2012-10-19 12:59:49.946968803 +0000
+@@ -140,4 +140,4 @@
+ 	AC_CHECK_LIB(pcre, pcre_exec)
+ fi
+ 
+-AC_OUTPUT(Makefile lib/Makefile lib/posix/Makefile src/Makefile tests/Makefile po/Makefile.in intl/Makefile doc/Makefile m4/Makefile vms/Makefile bootstrap/Makefile, [sed -e "/POTFILES =/r po/POTFILES" po/Makefile.in > po/Makefile; echo timestamp > stamp-h])
++AC_OUTPUT(Makefile lib/Makefile lib/posix/Makefile src/Makefile tests/Makefile po/Makefile.in intl/Makefile doc/Makefile m4/Makefile vms/Makefile bootstrap/Makefile, [echo timestamp > stamp-h])

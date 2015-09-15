@@ -1,0 +1,12 @@
+oprofile doesn't want GNU-levels of automake strictness so tell it to be "foreign".
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/configure.ac b/configure.ac
+index 5740585..cf6c316 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -16 +16 @@ AC_CONFIG_SRCDIR([libop/op_config.h])
+-AM_INIT_AUTOMAKE
++AM_INIT_AUTOMAKE([foreign])

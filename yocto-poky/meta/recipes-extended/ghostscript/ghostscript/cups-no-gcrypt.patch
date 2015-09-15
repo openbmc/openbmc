@@ -1,0 +1,31 @@
+Subject: [PATCH] Don't build-depend on libgcrypt, as nothing is used from it
+
+Backported from http://www.cups.org/strfiles.php/3308/cups-no-gcrypt.patch
+
+This addresses the cryto dependency seen during build.
+
+Upstream-Status: Backport
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+
+Rebase the patch to ghostscript-9.15
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ cups/libs/cups/http-private.h | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/cups/libs/cups/http-private.h b/cups/libs/cups/http-private.h
+index 99a85c3..a674852 100644
+--- a/cups/libs/cups/http-private.h
++++ b/cups/libs/cups/http-private.h
+@@ -80,7 +80,6 @@ typedef int socklen_t;
+ #  elif defined HAVE_GNUTLS
+ #    include <gnutls/gnutls.h>
+ #    include <gnutls/x509.h>
+-#    include <gcrypt.h>
+ #  elif defined(HAVE_CDSASSL)
+ #    include <CoreFoundation/CoreFoundation.h>
+ #    include <Security/Security.h>
+-- 
+1.9.1
+

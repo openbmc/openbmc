@@ -1,0 +1,29 @@
+Fix elf_cvt_gunhash if dest and src are same.
+
+Upstream-Status: Pending
+
+The 'dest' and 'src' can be same, we need to save the value of src32[2]
+before swaping it.
+
+Signed-off-by: Baoshan Pang <BaoShan.Pang@windriver.com>
+diff --git a/libelf/gnuhash_xlate.h b/libelf/gnuhash_xlate.h
+index 6faf113..04d9ca1 100644
+--- a/libelf/gnuhash_xlate.h
++++ b/libelf/gnuhash_xlate.h
+@@ -40,6 +40,7 @@ elf_cvt_gnuhash (void *dest, const void *src, size_t len, int encode)
+      words.  We must detangle them here.   */
+   Elf32_Word *dest32 = dest;
+   const Elf32_Word *src32 = src;
++  Elf32_Word save_src32_2 = src32[2]; // dest could be equal to src
+ 
+   /* First four control words, 32 bits.  */
+   for (unsigned int cnt = 0; cnt < 4; ++cnt)
+@@ -50,7 +51,7 @@ elf_cvt_gnuhash (void *dest, const void *src, size_t len, int encode)
+       len -= 4;
+     }
+ 
+-  Elf32_Word bitmask_words = encode ? src32[2] : dest32[2];
++  Elf32_Word bitmask_words = encode ? save_src32_2 : dest32[2];
+ 
+   /* Now the 64 bit words.  */
+   Elf64_Xword *dest64 = (Elf64_Xword *) &dest32[4];

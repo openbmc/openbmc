@@ -1,0 +1,76 @@
+Lets install the include header and private header files into 
+usr/include/tcl8.6 when version of tcl is 8.6.x
+
+Upstream-Status: Inappropriate [Configuration Specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmai.com>
+
+Fixed the TCL_INCLUDE_SPEC
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ Makefile.in  |    2 +-
+ configure    |    4 ++--
+ configure.in |    4 ++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 97b983b..dc2a4df 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -53,7 +53,7 @@ DLL_INSTALL_DIR		= @DLL_INSTALL_DIR@
+ SCRIPT_INSTALL_DIR	= $(INSTALL_ROOT)$(TCL_LIBRARY)
+ 
+ # Directory in which to install the include file tcl.h:
+-INCLUDE_INSTALL_DIR	= $(INSTALL_ROOT)$(includedir)
++INCLUDE_INSTALL_DIR	= $(INSTALL_ROOT)$(includedir)/tcl$(VERSION)
+ 
+ # Path to the private tcl header dir:
+ PRIVATE_INCLUDE_DIR	= @PRIVATE_INCLUDE_DIR@
+diff --git a/configure b/configure
+index 3e78b49..24b3f92 100755
+--- a/configure
++++ b/configure
+@@ -19134,7 +19134,7 @@ eval "TCL_LIB_FILE=libtcl${LIB_SUFFIX}"
+ eval "TCL_LIB_FILE=${TCL_LIB_FILE}"
+ 
+ TCL_LIBRARY='$(libdir)/tcl$(VERSION)'
+-PRIVATE_INCLUDE_DIR='$(includedir)'
++PRIVATE_INCLUDE_DIR='$(includedir)/tcl$(VERSION)'
+ HTML_DIR='$(DISTDIR)/html'
+ 
+ # Note:  in the following variable, it's important to use the absolute
+@@ -19293,7 +19293,7 @@ TCL_BUILD_STUB_LIB_PATH="`pwd`/${TCL_STUB_LIB_FILE}"
+ TCL_STUB_LIB_PATH="${TCL_STUB_LIB_DIR}/${TCL_STUB_LIB_FILE}"
+ 
+ # Install time header dir can be set via --includedir
+-eval "TCL_INCLUDE_SPEC=\"-I${includedir}\""
++eval "TCL_INCLUDE_SPEC=\"-I${includedir}/tcl${VERSION}\""
+ 
+ #------------------------------------------------------------------------
+ # tclConfig.sh refers to this by a different name
+diff --git a/configure.in b/configure.in
+index 0e28b14..62d9b41 100755
+--- a/configure.in
++++ b/configure.in
+@@ -791,7 +791,7 @@ eval "TCL_LIB_FILE=libtcl${LIB_SUFFIX}"
+ eval "TCL_LIB_FILE=${TCL_LIB_FILE}"
+ 
+ TCL_LIBRARY='$(libdir)/tcl$(VERSION)'
+-PRIVATE_INCLUDE_DIR='$(includedir)'
++PRIVATE_INCLUDE_DIR='$(includedir)/tcl$(VERSION)'
+ HTML_DIR='$(DISTDIR)/html'
+ 
+ # Note:  in the following variable, it's important to use the absolute
+@@ -912,7 +912,7 @@ TCL_BUILD_STUB_LIB_PATH="`pwd`/${TCL_STUB_LIB_FILE}"
+ TCL_STUB_LIB_PATH="${TCL_STUB_LIB_DIR}/${TCL_STUB_LIB_FILE}"
+ 
+ # Install time header dir can be set via --includedir
+-eval "TCL_INCLUDE_SPEC=\"-I${includedir}\""
++eval "TCL_INCLUDE_SPEC=\"-I${includedir}/tcl${VERSION}\""
+ 
+ #------------------------------------------------------------------------
+ # tclConfig.sh refers to this by a different name
+-- 
+1.7.10.4
+

@@ -1,0 +1,53 @@
+From 8f5de12cc75bfaa8400adf32f30c015d8f813540 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 22 Aug 2015 07:12:20 -0700
+Subject: [PATCH] psplash-fb: Convert psplash_fb_plot_pixel() to a static
+ inline
+
+This function is not used outside psplash-fb.c and by making it
+static inline we keep the performance and also make it portable across
+multiple compilers and gcc versions
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ psplash-fb.c | 2 +-
+ psplash-fb.h | 8 --------
+ 2 files changed, 1 insertion(+), 9 deletions(-)
+
+diff --git a/psplash-fb.c b/psplash-fb.c
+index bd9cd9d..6d235db 100644
+--- a/psplash-fb.c
++++ b/psplash-fb.c
+@@ -260,7 +260,7 @@ psplash_fb_new (int angle)
+ 
+ #define OFFSET(fb,x,y) (((y) * (fb)->stride) + ((x) * ((fb)->bpp >> 3)))
+ 
+-inline void
++static inline void
+ psplash_fb_plot_pixel (PSplashFB    *fb,
+ 		       int          x,
+ 		       int          y,
+diff --git a/psplash-fb.h b/psplash-fb.h
+index 42592ed..c6c3144 100644
+--- a/psplash-fb.h
++++ b/psplash-fb.h
+@@ -57,14 +57,6 @@ psplash_fb_destroy (PSplashFB *fb);
+ PSplashFB*
+ psplash_fb_new (int angle);
+ 
+-inline void
+-psplash_fb_plot_pixel (PSplashFB    *fb, 
+-		       int          x, 
+-		       int          y, 
+-		       uint8        red,
+-		       uint8        green,
+-		       uint8        blue);
+-
+ void
+ psplash_fb_draw_rect (PSplashFB    *fb, 
+ 		      int          x, 
+-- 
+2.1.4
+

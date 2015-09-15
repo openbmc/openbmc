@@ -1,0 +1,40 @@
+lib/rpmts.c: Ensure that we check both providename and filepaths
+
+When looking up a missing dependencies, such as /bin/sh, we need to lookup
+in both the providename and filepaths DB, not just the filepaths DB.
+
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.14/lib/rpmts.c
+===================================================================
+--- rpm-5.4.14.orig/lib/rpmts.c
++++ rpm-5.4.14/lib/rpmts.c
+@@ -410,8 +410,8 @@ fprintf(stderr, "--> %s(%p,%p,%p)\n", __
+ 	if (sdb == NULL)
+ 	    continue;
+ 
+-	/* Look for a matching Provides: in suggested universe. */
+-	rpmtag = (*keyp == '/' ? RPMTAG_FILEPATHS : RPMTAG_PROVIDENAME);
++	rpmtag = RPMTAG_PROVIDENAME;
++       do {
+ 	mi = rpmmiInit(sdb, rpmtag, keyp, keylen);
+ 	while ((h = rpmmiNext(mi)) != NULL) {
+ 	    size_t hnamelen;
+@@ -446,6 +446,15 @@ fprintf(stderr, "--> %s(%p,%p,%p)\n", __
+ 	    bhnamelen = hnamelen;
+ 	}
+ 	mi = rpmmiFree(mi);
++
++	if (bh == NULL && *keyp == '/' && rpmtag == RPMTAG_PROVIDENAME) {
++	   rpmtag = RPMTAG_FILEPATHS;
++	   continue;
++        }
++
++        break;
++      } while (1);
++
+     }
+ 
+     /* Is there a suggested resolution? */

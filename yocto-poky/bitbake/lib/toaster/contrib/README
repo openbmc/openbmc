@@ -1,0 +1,6 @@
+contrib directory for toaster
+
+This directory holds code that works with Toaster, without being an integral part of the Toaster project.
+It is intended for testing code, testing fixtures, tools for Toaster, etc.
+
+NOTE: This directory is NOT a Python module.

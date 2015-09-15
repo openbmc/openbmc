@@ -1,0 +1,28 @@
+There is a race due to the execution of make inside the makefile:
+
+| gcc  -pthread -c -Wno-unused-result -DNDEBUG -g  -O3 -Wall -Wstrict-prototypes -isystem/home/pokybuild/yocto-autobuilder-dev/yocto-slave/nightly-world/build/build/tmp/sysroots/x86_64-linux/usr/include -O2 -pipe -isystem/home/pokybuild/yocto-autobuilder-dev/yocto-slave/nightly-world/build/build/tmp/sysroots/x86_64-linux/usr/include -O2 -pipe   -I. -IInclude -I./Include -isystem/home/pokybuild/yocto-autobuilder-dev/yocto-slave/nightly-world/build/build/tmp/sysroots/x86_64-linux/usr/include -isystem/home/pokybuild/yocto-autobuilder-dev/yocto-slave/nightly-world/build/build/tmp/sysroots/x86_64-linux/usr/include -fPIC -DPy_BUILD_CORE -o Objects/obmalloc.o Objects/obmalloc.c
+| gcc  -pthread -c -Wno-unused-result -DNDEBUG -g  -O3 -Wall -Wstrict-prototypes -isystem/home/pokybuild/yocto-autobuilder-dev/yocto-slave/nightly-world/build/build/tmp/sysroots/x86_64-linux/usr/include -O2 -pipe -isystem/home/pokybuild/yocto-autobuilder-dev/yocto-slave/nightly-world/build/build/tmp/sysroots/x86_64-linux/usr/include -O2 -pipe   -I. -IInclude -I./Include -isystem/home/pokybuild/yocto-autobuilder-dev/yocto-slave/nightly-world/build/build/tmp/sysroots/x86_64-linux/usr/include -isystem/home/pokybuild/yocto-autobuilder-dev/yocto-slave/nightly-world/build/build/tmp/sysroots/x86_64-linux/usr/include -fPIC -DPy_BUILD_CORE -o Parser/pgen.o Parser/pgen.c| gcc  -pthread -c -Wno-unused-result -DNDEBUG -g  -O3 -Wall -Wstrict-prototypes -isystem/home/pokybuild/yocto-autobuilder-dev/yocto-slave/nightly-world/build/build/tmp/sysroots/x86_64-linux/usr/include -O2 -pipe -isystem/home/pokybuild/yocto-autobuilder-dev/yocto-slave/nightly-world/build/build/tmp/sysroots/x86_64-linux/usr/include -O2 -pipe   -I. -IInclude -I./Include -isystem/home/pokybuild/yocto-autobuilder-dev/yocto-slave/nightly-world/build/build/tmp/sysroots/x86_64-linux/usr/include -isystem/home/pokybuild/yocto-autobuilder-dev/yocto-slave/nightly-world/build/build/tmp/sysroots/x86_64-linux/usr/include -fPIC -DPy_BUILD_CORE -o Objects/obmalloc.o Objects/obmalloc.c
+| gcc  -pthread -c -Wno-unused-result -DNDEBUG -g  -O3 -Wall -Wstrict-prototypes -isystem/home/pokybuild/yocto-autobuilder-dev/yocto-slave/nightly-world/build/build/tmp/sysroots/x86_64-linux/usr/include -O2 -pipe -isystem/home/pokybuild/yocto-autobuilder-dev/yocto-slave/nightly-world/build/build/tmp/sysroots/x86_64-linux/usr/include -O2 -pipe   -I. -IInclude -I./Include -isystem/home/pokybuild/yocto-autobuilder-dev/yocto-slave/nightly-world/build/build/tmp/sysroots/x86_64-linux/usr/include -isystem/home/pokybuild/yocto-autobuilder-dev/yocto-slave/nightly-world/build/build/tmp/sysroots/x86_64-linux/usr/include -fPIC -DPy_BUILD_CORE -o Objects/obmalloc.o Objects/obmalloc.c
+| Objects/obmalloc.o: file not recognized: File truncated
+| collect2: error: ld returned 1 exit status
+| make[1]: *** [Parser/pgen] Error 1
+
+The easiest way to avoid this is to list the dependencies explictly.
+
+RP 28/2/2014
+
+Upstream-Status: Pending
+
+Index: Python-3.3.3/Makefile.pre.in
+===================================================================
+--- Python-3.3.3.orig/Makefile.pre.in	2014-02-27 14:04:38.268339533 +0000
++++ Python-3.3.3/Makefile.pre.in	2014-02-28 10:40:59.166361125 +0000
+@@ -676,7 +676,7 @@
+ 
+ $(IO_OBJS): $(IO_H)
+ 
+-$(GRAMMAR_H): $(GRAMMAR_INPUT) $(PGENSRCS)
++$(GRAMMAR_H): $(GRAMMAR_INPUT) $(PGENSRCS) $(PGEN)
+ 		@$(MKDIR_P) Include
+ 		$(MAKE) $(PGEN)
+ 		$(HOSTPGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)

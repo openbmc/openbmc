@@ -1,0 +1,18 @@
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+Index: libffi-3.0.13/Makefile.am
+===================================================================
+--- libffi-3.0.13.orig/Makefile.am
++++ libffi-3.0.13/Makefile.am
+@@ -98,7 +98,7 @@ FLAGS_TO_PASS = $(AM_MAKEFLAGS)
+ 
+ MAKEOVERRIDES=
+ 
+-toolexeclib_LTLIBRARIES = libffi.la
++lib_LTLIBRARIES = libffi.la
+ noinst_LTLIBRARIES = libffi_convenience.la
+ 
+ libffi_la_SOURCES = src/prep_cif.c src/types.c \

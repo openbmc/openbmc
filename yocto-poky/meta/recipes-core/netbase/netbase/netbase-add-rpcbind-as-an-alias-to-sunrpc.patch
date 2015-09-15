@@ -1,0 +1,44 @@
+netbase: add rpcbind as an alias to sunrpc
+
+the patch comes from:
+https://bugs.archlinux.org/task/20273
+
+Upstream-Status: Pending
+
+Signed-off-by: Li Wang <li.wang@windriver.com>
+---
+ etc-rpc      |    2 +-
+ etc-services |    4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/etc-rpc b/etc-rpc
+index 1b30625..9a9a81a 100644
+--- a/etc-rpc
++++ b/etc-rpc
+@@ -1,7 +1,7 @@
+ # This file contains user readable names that can be used in place of rpc
+ # program numbers.
+ 
+-portmapper	100000	portmap sunrpc
++portmapper	100000	portmap sunrpc rpcbind
+ rstatd		100001	rstat rstat_svc rup perfmeter
+ rusersd		100002	rusers
+ nfs		100003	nfsprog
+diff --git a/etc-services b/etc-services
+index 9d64a52..a19f7c8 100644
+--- a/etc-services
++++ b/etc-services
+@@ -72,8 +72,8 @@ pop2		109/tcp		postoffice pop-2 # POP version 2
+ pop2		109/udp		pop-2
+ pop3		110/tcp		pop-3		# POP version 3
+ pop3		110/udp		pop-3
+-sunrpc		111/tcp		portmapper	# RPC 4.0 portmapper
+-sunrpc		111/udp		portmapper
++sunrpc		111/tcp		portmapper rpcbind	# RPC 4.0 portmapper
++sunrpc		111/udp		portmapper rpcbind
+ auth		113/tcp		authentication tap ident
+ sftp		115/tcp
+ uucp-path	117/tcp
+-- 
+1.7.9.5
+

@@ -1,0 +1,69 @@
+From ed09c8fd2c9c2b5384b72cc70af3728be6694e64 Mon Sep 17 00:00:00 2001
+From: Mingke Wang <mingke.wang@freescale.com>
+Date: Thu, 19 Mar 2015 14:20:26 +0800
+Subject: [PATCH 4/4] subparse: set need_segment after sink pad received
+ GST_EVENT_SEGMENT
+
+subparse works in push mode, chain funciton will be called once
+up stream element finished the seeking and flushing.
+if set need_segment flag in src pad event handler, the segment
+event will be pushed earlier, result in the subtitle text will
+be send out to down stream from the beginning.
+
+Upstream-Status: Submitted [https://bugzilla.gnome.org/show_bug.cgi?id=747498]
+
+Signed-off-by: Mingke Wang <mingke.wang@freescale.com>
+
+diff --git a/gst/subparse/gstsubparse.c b/gst/subparse/gstsubparse.c
+old mode 100644
+new mode 100755
+index b565e93..7741ccc
+--- a/gst/subparse/gstsubparse.c
++++ b/gst/subparse/gstsubparse.c
+@@ -266,22 +266,20 @@ gst_sub_parse_src_event (GstPad * pad, GstObject * parent, GstEvent * event)
+         goto beach;
+       }
+ 
++      /* Apply the seek to our segment */
++      gst_segment_do_seek (&self->segment, rate, format, flags,
++          start_type, start, stop_type, stop, &update);
++
++      GST_DEBUG_OBJECT (self, "segment after seek: %" GST_SEGMENT_FORMAT,
++          &self->segment);
++
+       /* Convert that seek to a seeking in bytes at position 0,
+          FIXME: could use an index */
+       ret = gst_pad_push_event (self->sinkpad,
+           gst_event_new_seek (rate, GST_FORMAT_BYTES, flags,
+               GST_SEEK_TYPE_SET, 0, GST_SEEK_TYPE_NONE, 0));
+ 
+-      if (ret) {
+-        /* Apply the seek to our segment */
+-        gst_segment_do_seek (&self->segment, rate, format, flags,
+-            start_type, start, stop_type, stop, &update);
+-
+-        GST_DEBUG_OBJECT (self, "segment after seek: %" GST_SEGMENT_FORMAT,
+-            &self->segment);
+-
+-        self->need_segment = TRUE;
+-      } else {
++      if (!ret) {
+         GST_WARNING_OBJECT (self, "seek to 0 bytes failed");
+       }
+ 
+@@ -1632,8 +1630,10 @@ gst_sub_parse_sink_event (GstPad * pad, GstObject * parent, GstEvent * event)
+       gst_event_parse_segment (event, &s);
+       if (s->format == GST_FORMAT_TIME)
+         gst_event_copy_segment (event, &self->segment);
+-      GST_DEBUG_OBJECT (self, "newsegment (%s)",
+-          gst_format_get_name (self->segment.format));
++      GST_DEBUG_OBJECT (self, "newsegment (%s) %" GST_SEGMENT_FORMAT,
++          gst_format_get_name (self->segment.format), &self->segment);
++
++      self->need_segment = TRUE;
+ 
+       /* if not time format, we'll either start with a 0 timestamp anyway or
+        * it's following a seek in which case we'll have saved the requested
+-- 
+1.7.9.5
+

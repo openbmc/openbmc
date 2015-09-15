@@ -1,0 +1,30 @@
+Instead of writing the temporary mapping files in the mappedfile test to the
+user runtime directory, write them to $TMP.  The runtime directory may not
+currently exist if the test is executed on a non-desktop system and the test
+doesn't attempt to create the directory structure.
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/glib/tests/mappedfile.c b/glib/tests/mappedfile.c
+index 40e0e60..27a24be 100644
+--- a/glib/tests/mappedfile.c
++++ b/glib/tests/mappedfile.c
+@@ -81,7 +81,7 @@ test_writable (void)
+   const gchar *new = "abcdefghijklmnopqrstuvxyz";
+   gchar *tmp_copy_path;
+ 
+-  tmp_copy_path = g_build_filename (g_get_user_runtime_dir (), "glib-test-4096-random-bytes", NULL);
++  tmp_copy_path = g_build_filename (g_get_tmp_dir (), "glib-test-4096-random-bytes", NULL);
+ 
+   g_file_get_contents (g_test_get_filename (G_TEST_DIST, "4096-random-bytes", NULL), &contents, &len, &error);
+   g_assert_no_error (error);
+@@ -125,7 +125,7 @@ test_writable_fd (void)
+   int fd;
+   gchar *tmp_copy_path;
+ 
+-  tmp_copy_path = g_build_filename (g_get_user_runtime_dir (), "glib-test-4096-random-bytes", NULL);
++  tmp_copy_path = g_build_filename (g_get_tmp_dir (), "glib-test-4096-random-bytes", NULL);
+ 
+   g_file_get_contents (g_test_get_filename (G_TEST_DIST, "4096-random-bytes", NULL), &contents, &len, &error);
+   g_assert_no_error (error);

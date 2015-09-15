@@ -1,0 +1,57 @@
+#!/bin/sh
+#
+#   /etc/init.d/ppp: start or stop PPP link.
+#
+# If you want PPP started on boot time (most dialup systems won't need it)
+# rename the /etc/ppp/no_ppp_on_boot file to /etc/ppp/ppp_on_boot, and
+# follow the instructions in the comments in that file.
+
+# Source function library.
+. /etc/init.d/functions
+
+test -x /usr/sbin/pppd -a -f /etc/ppp/ppp_on_boot || exit 0
+if [ -x /etc/ppp/ppp_on_boot ]; then RUNFILE=1; fi
+
+case "$1" in
+  start)
+      echo -n "Starting up PPP link: pppd"
+      if [ "$RUNFILE" = "1" ]; then
+        /etc/ppp/ppp_on_boot
+      else
+        pppd call provider
+      fi
+      echo "."
+    ;;
+  stop)
+      echo -n "Shutting down PPP link: pppd"
+      if [ "$RUNFILE" = "1" ]; then
+        poff
+      else
+        poff provider
+      fi
+      echo "."
+    ;;
+  status)
+    status /usr/sbin/pppd;
+    exit $?
+    ;;
+  restart|force-reload)
+    echo -n "Restarting PPP link: pppd"
+    if [ "$RUNFILE" = "1" ]; then      
+      poff
+      sleep 5
+      /etc/ppp/ppp_on_boot
+    else                  
+      poff provider
+      sleep 5
+      pppd call provider
+    fi
+    echo "."
+    ;;
+  *)
+      echo "Usage: /etc/init.d/ppp {start|stop|status|restart|force-reload}"
+      exit 1
+    ;;
+esac
+
+exit 0

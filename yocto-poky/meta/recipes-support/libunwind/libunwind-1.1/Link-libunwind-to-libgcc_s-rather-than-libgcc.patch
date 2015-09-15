@@ -1,0 +1,42 @@
+From 508ca17a7be01d1cc960d9a07d0af4513948fb8d Mon Sep 17 00:00:00 2001
+From: Thierry Reding <treding@nvidia.com>
+Date: Fri, 27 Jun 2014 08:40:33 +0200
+Subject: [PATCH] Link libunwind to libgcc_s rather than libgcc
+
+For some architectures, -lgcc and -lgcc_s are not equivalent. On ARM for
+example, libgcc_s.so.1 contains some symbols needed by libunwind which
+are not present in libgcc.
+
+This causes the following link error when building the X.Org X server
+with libunwind support:
+
+	  CCLD     Xorg
+	/usr/lib/libunwind.so: undefined reference to `__aeabi_unwind_cpp_pr0'
+	/usr/lib/libunwind.so: undefined reference to `__aeabi_unwind_cpp_pr1'
+
+Linking against libgcc_s explicitly solves this problem.
+
+Upstream-Status: Backport
+
+Signed-off-by: Thierry Reding <treding@nvidia.com>
+Signed-off-by: Jonathan Liu <net147@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index cffe19b..3beb5f2 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -258,7 +258,7 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[#ifndef __INTEL_COMPILER
+ 
+ if test x$GCC = xyes -a x$intel_compiler != xyes; then
+   CFLAGS="${CFLAGS} -fexceptions -Wall -Wsign-compare"
+-  LIBCRTS="-lgcc"
++  LIBCRTS="-lgcc_s"
+ fi
+ AC_MSG_RESULT([$intel_compiler])
+ 
+-- 
+2.3.2
+

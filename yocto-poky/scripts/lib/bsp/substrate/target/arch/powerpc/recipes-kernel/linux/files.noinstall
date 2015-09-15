@@ -1,0 +1,1 @@
+# yocto-bsp-dirname {{ if kernel_choice != "custom": }} files

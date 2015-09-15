@@ -1,0 +1,92 @@
+From 240f2f4aeb3850bc0c5370b9fbc3909573bed9b3 Mon Sep 17 00:00:00 2001
+From: Brendan O'Dea <bod@debian.org>
+Date: Tue, 8 Mar 2005 19:30:38 +1100
+Subject: Don't install .packlist or perllocal.pod for perl or vendor
+
+Patch-Name: debian/no_packlist_perllocal.diff
+---
+ cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_Unix.pm | 35 +++----------------------
+ 1 file changed, 3 insertions(+), 32 deletions(-)
+
+diff --git a/cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_Unix.pm b/cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_Unix.pm
+index 570a631..391dc22 100644
+--- a/cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_Unix.pm
++++ b/cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_Unix.pm
+@@ -2122,11 +2122,6 @@ pure_perl_install :: all
+ };
+ 
+     push @m,
+-q{		read "}.$self->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').q{" \
+-		write "}.$self->catfile('$(DESTINSTALLARCHLIB)','auto','$(FULLEXT)','.packlist').q{" \
+-} unless $self->{NO_PACKLIST};
+-
+-    push @m,
+ q{		"$(INST_LIB)" "$(DESTINSTALLPRIVLIB)" \
+ 		"$(INST_ARCHLIB)" "$(DESTINSTALLARCHLIB)" \
+ 		"$(INST_BIN)" "$(DESTINSTALLBIN)" \
+@@ -2158,10 +2153,6 @@ q{		"$(INST_LIB)" "$(DESTINSTALLSITELIB)" \
+ pure_vendor_install :: all
+ 	$(NOECHO) umask 022; $(MOD_INSTALL) \
+ };
+-    push @m,
+-q{		read "}.$self->catfile('$(VENDORARCHEXP)','auto','$(FULLEXT)','.packlist').q{" \
+-		write "}.$self->catfile('$(DESTINSTALLVENDORARCH)','auto','$(FULLEXT)','.packlist').q{" \
+-} unless $self->{NO_PACKLIST};
+ 
+     push @m,
+ q{		"$(INST_LIB)" "$(DESTINSTALLVENDORLIB)" \
+@@ -2187,37 +2178,19 @@ doc_vendor_install :: all
+ 
+     push @m, q{
+ doc_perl_install :: all
+-	$(NOECHO) $(ECHO) Appending installation info to "$(DESTINSTALLARCHLIB)/perllocal.pod"
+-	-$(NOECHO) umask 022; $(MKPATH) "$(DESTINSTALLARCHLIB)"
+-	-$(NOECHO) umask 022; $(DOC_INSTALL) \
+-		"Module" "$(NAME)" \
+-		"installed into" $(INSTALLPRIVLIB) \
+-		LINKTYPE "$(LINKTYPE)" \
+-		VERSION "$(VERSION)" \
+-		EXE_FILES "$(EXE_FILES)" \
+-		>> "}.$self->catfile('$(DESTINSTALLARCHLIB)','perllocal.pod').q{"
+ 
+ doc_site_install :: all
+-	$(NOECHO) $(ECHO) Appending installation info to "$(DESTINSTALLARCHLIB)/perllocal.pod"
+-	-$(NOECHO) umask 02; $(MKPATH) "$(DESTINSTALLARCHLIB)"
++	$(NOECHO) $(ECHO) Appending installation info to "$(DESTINSTALLSITEARCH)/perllocal.pod"
++	-$(NOECHO) umask 02; $(MKPATH) "$(DESTINSTALLSITEARCH)"
+ 	-$(NOECHO) umask 02; $(DOC_INSTALL) \
+ 		"Module" "$(NAME)" \
+ 		"installed into" $(INSTALLSITELIB) \
+ 		LINKTYPE "$(LINKTYPE)" \
+ 		VERSION "$(VERSION)" \
+ 		EXE_FILES "$(EXE_FILES)" \
+-		>> "}.$self->catfile('$(DESTINSTALLARCHLIB)','perllocal.pod').q{"
++		>> "}.$self->catfile('$(DESTINSTALLSITEARCH)','perllocal.pod').q{"
+ 
+ doc_vendor_install :: all
+-	$(NOECHO) $(ECHO) Appending installation info to "$(DESTINSTALLARCHLIB)/perllocal.pod"
+-	-$(NOECHO) umask 022; $(MKPATH) "$(DESTINSTALLARCHLIB)"
+-	-$(NOECHO) umask 022; $(DOC_INSTALL) \
+-		"Module" "$(NAME)" \
+-		"installed into" $(INSTALLVENDORLIB) \
+-		LINKTYPE "$(LINKTYPE)" \
+-		VERSION "$(VERSION)" \
+-		EXE_FILES "$(EXE_FILES)" \
+-		>> "}.$self->catfile('$(DESTINSTALLARCHLIB)','perllocal.pod').q{"
+ 
+ } unless $self->{NO_PERLLOCAL};
+ 
+@@ -2226,13 +2199,11 @@ uninstall :: uninstall_from_$(INSTALLDIRS)dirs
+ 	$(NOECHO) $(NOOP)
+ 
+ uninstall_from_perldirs ::
+-	$(NOECHO) $(UNINSTALL) "}.$self->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').q{"
+ 
+ uninstall_from_sitedirs ::
+ 	$(NOECHO) $(UNINSTALL) "}.$self->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist').q{"
+ 
+ uninstall_from_vendordirs ::
+-	$(NOECHO) $(UNINSTALL) "}.$self->catfile('$(VENDORARCHEXP)','auto','$(FULLEXT)','.packlist').q{"
+ };
+ 
+     join("",@m);

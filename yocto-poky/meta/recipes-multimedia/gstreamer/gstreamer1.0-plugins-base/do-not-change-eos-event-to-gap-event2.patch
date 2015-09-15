@@ -1,0 +1,49 @@
+commit f9536544f5ad182b4f78d0143d1daa45dd64e624
+Author: Song Bing <b06498@freescale.com>
+Date:   Thu Oct 9 17:37:43 2014 +0800
+
+[gststreamsynchronizer] send EOS event insterd of GAP event as GAP
+event has issue when A/V have different duration.
+    
+send EOS event insterd of GAP event as GAP event has issue when A/V have different duration.
+
+Upstream-Status: Submitted [https://bugzilla.gnome.org/show_bug.cgi?id=736655]
+
+Signed-off-by: Song Bing <b06498@freescale.com>
+
+diff --git a/gst/playback/gststreamsynchronizer.c b/gst/playback/gststreamsynchronizer.c
+index 3e17c55..ff42d72 100644
+--- a/gst/playback/gststreamsynchronizer.c
++++ b/gst/playback/gststreamsynchronizer.c
+@@ -488,19 +488,24 @@ gst_stream_synchronizer_sink_event (GstPad * pad, GstObject * parent,
+         }
+         g_slist_free (pads);
+       } else {
+-        /* if EOS, but no data has passed, then send EOS event */
++        /* if EOS, but no data has passed, then send something to replace EOS
++         * for preroll purposes */
+         if (!seen_data) {
+-          GstEvent *gap_event;
++          GstEvent *eos_event;
+ 
+-          gap_event = gst_event_new_eos ();
+-          ret = gst_pad_push_event (srcpad, gap_event);
++          /* FIXME: change to EOS event as GAP event has issue when A/V have
++           * different duration */
++          eos_event = gst_event_new_eos ();
++          ret = gst_pad_push_event (srcpad, eos_event);
+         } else {
+-          GstEvent *gap_event;
++          GstEvent *eos_event;
+ 
+           /* FIXME: Also send a GAP event to let audio sinks start their
+            * clock in case they did not have enough data yet */
+-          gap_event = gst_event_new_gap (timestamp, GST_CLOCK_TIME_NONE);
+-          ret = gst_pad_push_event (srcpad, gap_event);
++          /* FIXME: change to EOS event as GAP event has issue when A/V have
++           * different duration */
++          eos_event = gst_event_new_eos ();
++          ret = gst_pad_push_event (srcpad, eos_event);
+         }
+       }
+       gst_object_unref (srcpad);

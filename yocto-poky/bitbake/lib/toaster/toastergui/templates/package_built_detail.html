@@ -1,0 +1,65 @@
+{% extends "package_detail_base.html" %}
+{% load projecttags %}
+
+{% block tabcontent %}
+    {% with packageFileCount=package.buildfilelist_package.count %}
+        <!-- Generated Files -->
+        {% if package.buildtargetlist_package.count == 0 %}
+            {# Not included case #}
+            <ul class="nav nav-pills">
+                <li class="active"> <a href="#">
+                    <i class="icon-question-sign get-help" title="Files added to a root file system when you include {{package.name}} in an image"></i>
+                    Generated files ({{packageFileCount}})
+                </a></li>
+                <li class=""><a href="{% url 'package_built_dependencies' build.id package.id %}">
+                    <i class="icon-question-sign get-help" title="Projected runtime dependencies when you include {{package.name}} in an image"></i>
+                    Runtime dependencies ({{dependency_count}})
+                </a></li>
+            </ul>
+            <div class="tab-content">
+            <div class="tab-pane active" id="files">
+            <!-- Package file list or if empty, alert pane -->
+            {% if packageFileCount > 0 %}
+                <div class="alert alert-info">
+                    <strong>{{package.fullpackagespec}}</strong> is <strong>not included</strong> in any image. This page shows you the files added to an image root file system if you include <strong>{{package.fullpackagespec}}</strong> in future builds.
+                </div>
+                {% include "tablesort.html" %}
+                    <tbody>
+						{% for file in objects %}
+                            <tr>
+                                <td class="path">{{file.path}}</td>
+                                <td class="filesize sizecol">{{file.size|filtered_filesizeformat}}</td>
+                            </tr>
+						{% endfor %}
+                    </tbody>
+                </table>
+
+            {% else %}
+                <div class="alert alert-info">
+                    <strong>{{package.fullpackagespec}}</strong> does not generate any files.
+                </div>
+            {% endif %}
+
+            </div> <!-- tab-pane active -->
+            </div> <!-- tab-content -->
+        {% else %}
+            {# Included case #}
+            <div class="tab-content">
+            <div class="tab-pane active">
+            <div class="lead well">
+                    Package included in:
+                    {% for itarget in package.buildtargetlist_package.all|dictsort:"target.target" %}
+                        <a href="{% url 'package_included_detail' build.id itarget.target.id package.id %}">
+                        {% if forloop.counter0 > 0  %}
+                        ,&nbsp;
+                        {% endif %}
+                        {{itarget.target.target}}
+                        </a>
+                    {% endfor %}
+            </div>
+            </div> <!-- tab-pane active -->
+            </div> <!-- tab-content -->
+        {% endif %}
+
+    {% endwith %}
+{% endblock tabcontent %}

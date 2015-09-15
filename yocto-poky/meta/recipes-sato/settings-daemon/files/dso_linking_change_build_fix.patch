@@ -1,0 +1,31 @@
+Upstream-Status: Inappropriate [configuration]
+
+after gcc linking has changed, all the libraries must be explicitely specified to for linking. 
+This patch avoids this linking error:
+
+| make  all-am^M
+| make[1]: Entering directory `/disk0/pokybuild/build1/tmp/work/i586-poky-linux/settings-daemon-0.0+svnr2059-r3/settings-daemon'^M
+| ccache i586-poky-linux-gcc -march=i586 --sysroot=/disk0/pokybuild/build1/tmp/sysroots/i586-poky-linux -Wall -fexpensive-optimizations -fomit-frame-pointer -frename-registers -O2 -ggdb -feliminate-unused-debug-types  -Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed -o settings-daemon settings_daemon-xsettings-common.o settings_daemon-xsettings-manager.o settings_daemon-settings-daemon.o -pthread -lgconf-2 -ldbus-glib-1 -ldbus-1 -lpthread -lgdk-x11-2.0 -lgdk_pixbuf-2.0 -lpangocairo-1.0 -lpango-1.0 -lcairo -lgobject-2.0 -lgmodule-2.0 -lgthread-2.0 -lrt -lglib-2.0^M
+| /disk0/pokybuild/build1/tmp/sysroots/x86_64-linux/usr/libexec/i586-poky-linux/gcc/i586-poky-linux/4.5.1/ld: *^A: invalid DSO for symbol `XCreateSimpleWindow' definition^M
+| /disk0/pokybuild/build1/tmp/sysroots/i586-poky-linux/usr/lib/libX11.so.6: could not read symbols: Bad value^M
+| collect2: ld returned 1 exit status^M
+| make[1]: *** [settings-daemon] Error 1^M
+| make[1]: Leaving directory `/disk0/pokybuild/build1/tmp/work/i586-poky-linux/settings-daemon-0.0+svnr2059-r3/settings-daemon'^M
+| make: *** [all] Error 2^M
+
+Nitin A Kamble <nitin.a.kamble@intel.com>
+Date: 2011/01/11
+
+Index: settings-daemon/configure.ac
+===================================================================
+--- settings-daemon.orig/configure.ac
++++ settings-daemon/configure.ac
+@@ -14,7 +14,7 @@ AC_PROG_CC
+ 
+ 
+ dnl TODO: make gconf optional
+-PKG_CHECK_MODULES(APP, [gconf-2.0 gdk-x11-2.0])
++PKG_CHECK_MODULES(APP, [gconf-2.0 gdk-x11-2.0 x11])
+ 
+ 
+ AC_SUBST(APP_CFLAGS)

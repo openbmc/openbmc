@@ -1,0 +1,75 @@
+Patch from Matthias Goebl <oe@m.goebl.net>
+Added via OE bugtracker: bug #478
+
+Upstream-Status: Pending
+
+--- console-tools-0.3.2/kbdtools/kbd_mode.c.orig
++++ console-tools-0.3.2/kbdtools/kbd_mode.c
+@@ -29,11 +29,16 @@
+   OPT("-u --unicode  ", _("UTF-8 mode (UNICODE)"));
+   OPT("-s --scancode ", _("scancode mode (RAW)"));
+   OPT("   --mode={8bit,keycode,unicode,scancode} ", _("set mode"));
++  OPT("-r --rate=RATE ", _("set repeat rate (default: 33)"));
++  OPT("-d --delay=DELAY ", _("set repeat delay (default: 250)"));
+ 
+   OPT("-h --help     ", HELPDESC);
+   OPT("-V --version  ", VERSIONDESC);
+ }
+ 
++int rate=-1;
++int delay=-1;
++
+ static int parse_cmdline (int argc, char *argv[])
+ {
+     int mode = -1;
+@@ -46,11 +51,13 @@
+       { "mode"     , required_argument, NULL, 'm' },
+       { "scancode" , no_argument, NULL, 's' },
+       { "unicode"  , no_argument, NULL, 'u' },
++      { "rate"     , required_argument, NULL, 'r' },
++      { "delay"    , required_argument, NULL, 'd' },
+       { NULL, 0, NULL, 0 }
+     };
+     int c;
+ 
+-    while ( (c = getopt_long (argc, argv, "Vhaksu", long_opts, NULL)) != EOF) 
++    while ( (c = getopt_long (argc, argv, "Vhaksur:d:", long_opts, NULL)) != EOF) 
+       switch (c) {
+       case 'h':
+ 	usage ();
+@@ -58,6 +65,14 @@
+       case 'V':
+ 	version ();
+ 	exit(0);
++      case 'r':
++	rate = atoi(optarg);
++	mode = -2;
++	break;
++      case 'd':
++	delay = atoi(optarg);
++	mode = -2;
++	break;
+       case 'a':
+ 	mode = K_XLATE;
+ 	break;
+@@ -129,6 +144,20 @@
+       exit(0);
+     }
+   
++  if ( rate != -1 || delay != -1 )
++    {
++    struct kbd_repeat kbd_rep;
++    kbd_rep.delay = delay;
++    kbd_rep.period = rate;
++    if (ioctl(fd, KDKBDREP, &kbd_rep))
++      {
++	fprintf(stderr, progname);
++	perror(_(": error setting keyboard repeat mode\n"));
++	exit(1);
++      }
++    if(mode==-2) exit(0);
++    }
++  
+   if (ioctl(fd, KDSKBMODE, mode))
+     {
+       fprintf(stderr, progname);

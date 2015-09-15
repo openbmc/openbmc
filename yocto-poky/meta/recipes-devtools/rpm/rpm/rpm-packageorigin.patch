@@ -1,0 +1,25 @@
+Add the ability to query the packageorigin
+
+Written by jbj at rpm5.org
+
+Upstream-Status: Inappropriate [not author]
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.14/rpmdb/hdrfmt.c
+===================================================================
+--- rpm-5.4.14.orig/rpmdb/hdrfmt.c
++++ rpm-5.4.14/rpmdb/hdrfmt.c
+@@ -2409,8 +2409,10 @@ static int pkgoriginTag(Header h, HE_t h
+     int rc = 1;
+ 
+     he->tag = RPMTAG_PACKAGEORIGIN;
+-    if (!headerGet(h, he, HEADERGET_NOEXTENSION)
+-     && (origin = headerGetOrigin(h)) != NULL)
++    /* XXX two sources for tag data: what search precedence? */
++    if (headerGet(h, he, HEADERGET_NOEXTENSION))
++	rc = 0;
++    else if ((origin = headerGetOrigin(h)) != NULL)
+     {
+ 	he->t = RPM_STRING_TYPE;
+ 	he->p.str = xstrdup(origin);

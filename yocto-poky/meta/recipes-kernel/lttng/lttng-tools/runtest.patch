@@ -1,0 +1,52 @@
+diff --git a/Makefile.am b/Makefile.am
+index 584f59b..c2bcabd 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -12,3 +12,9 @@ dist_doc_DATA = LICENSE \
+ dist_noinst_DATA = CodingStyle
+ 
+ EXTRA_DIST = extras/lttng-bash_completion gpl-2.0.txt lgpl-2.1.txt
++
++install-ptest:
++	cp -r $(srcdir)/tests $(DESTDIR)
++	for m in $$(find $(DESTDIR)/tests -name Makefile); do \
++          sed -i -e 's|^Makefile:|_Makefile:|' $$m; \
++        done
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 6d5b00d..3774f9d 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -1,14 +1,17 @@
+ SUBDIRS = utils regression unit stress
+ 
+-if USE_PYTHON
+-check-am:
++installcheck-am:
+ 	./run.sh unit_tests
+ 	./run.sh fast_regression
++if USE_PYTHON
+ 	./run.sh with_bindings_regression
+-else
++endif
++
+ check-am:
+ 	./run.sh unit_tests
+ 	./run.sh fast_regression
++if USE_PYTHON
++	./run.sh with_bindings_regression
+ endif
+ 
+ dist_noinst_SCRIPTS = run.sh unit_tests fast_regression long_regression root_regression with_bindings_regression
+diff --git a/tests/run.sh b/tests/run.sh
+index c6c50fd..6455359 100755
+--- a/tests/run.sh
++++ b/tests/run.sh
+@@ -19,4 +19,7 @@
+ 
+ [ -z "$1" ] && echo "Error: No testlist. Please specify a testlist to run." && exit 1
+ 
+-prove --merge --exec '' - < $1
++prove --merge -v --exec '' - < $1 | sed \
++  -e 's|^ok \(.*\)|PASS: \1|' \
++  -e 's|^not ok \(.*\)|FAIL: \1|' \
++  | egrep -h 'PASS|FAIL'

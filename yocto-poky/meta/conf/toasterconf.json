@@ -1,0 +1,106 @@
+{
+    "config": {
+        "MACHINE"      : "qemux86",
+        "DISTRO"       : "poky",
+        "IMAGE_FSTYPES": "ext3 jffs2 tar.bz2",
+        "IMAGE_INSTALL_append": "",
+        "PACKAGE_CLASSES": "package_rpm",
+        "SDKMACHINE"   : "x86_64"
+    },
+    "layersources": [
+        {
+            "name": "Local OpenEmbedded",
+            "sourcetype": "local",
+            "apiurl": "../../",
+            "branches": ["HEAD", "master", "fido", "dizzy"],
+            "layers": [
+                {
+                    "name": "openembedded-core",
+                    "local_path": "meta",
+                    "vcs_url": "remote:origin",
+                    "dirpath": "meta"
+                }
+            ]
+        },
+        {
+            "name": "OpenEmbedded",
+            "sourcetype": "layerindex",
+            "apiurl": "http://layers.openembedded.org/layerindex/api/",
+            "branches": ["master", "fido", "dizzy"]
+        },
+        {
+            "name": "Imported layers",
+            "sourcetype": "imported",
+            "apiurl": "",
+            "branches": ["master", "fido", "dizzy", "HEAD"]
+
+        }
+    ],
+    "bitbake" : [
+        {
+            "name": "master",
+            "giturl": "git://git.openembedded.org/bitbake",
+            "branch": "master",
+            "dirpath": ""
+        },
+        {
+            "name": "fido",
+            "giturl": "git://git.openembedded.org/bitbake",
+            "branch": "1.26",
+            "dirpath": ""
+        },
+        {
+            "name": "dizzy",
+            "giturl": "git://git.openembedded.org/bitbake",
+            "branch": "1.24",
+            "dirpath": ""
+        },
+        {
+            "name": "HEAD",
+            "giturl": "git://git.openembedded.org/bitbake",
+            "branch": "HEAD",
+            "dirpath": ""
+        }
+    ],
+
+    "defaultrelease": "master",
+
+    "releases": [
+        {
+            "name": "master",
+            "description": "OpenEmbedded master",
+            "bitbake": "master",
+            "branch": "master",
+            "defaultlayers": [ "openembedded-core" ],
+            "layersourcepriority": { "Imported layers": 99, "Local OpenEmbedded" : 10, "OpenEmbedded" :  0 },
+            "helptext": "Toaster will run your builds using the tip of the <a href=\"http://cgit.openembedded.org/openembedded-core/log/\">OpenEmbedded master</a> branch, where active development takes place. This is not a stable branch, so your builds might not work as expected."
+        },
+        {
+            "name": "fido",
+            "description": "OpenEmbedded Fido",
+            "bitbake": "fido",
+            "branch": "fido",
+            "defaultlayers": [ "openembedded-core" ],
+            "layersourcepriority": { "Imported layers": 99, "Local OpenEmbedded" : 10, "OpenEmbedded" :  0 },
+            "helptext": "Toaster will run your builds with the tip of the <a href=\"http://cgit.openembedded.org/openembedded-core/log/?h=fido\">OpenEmbedded \"Fido\"</a> branch"
+        },
+        {
+            "name": "dizzy",
+            "description": "OpenEmbedded Dizzy",
+            "bitbake": "dizzy",
+            "branch": "dizzy",
+            "defaultlayers": [ "openembedded-core" ],
+            "layersourcepriority": { "Imported layers": 99, "Local OpenEmbedded" : 10, "OpenEmbedded" :  0 },
+            "helptext": "Toaster will run your builds with the tip of the <a href=\"http://cgit.openembedded.org/openembedded-core/log/?h=dizzy\">OpenEmbedded \"Dizzy\"</a> branch"
+        },
+        {
+            "name": "local",
+            "description": "Local OpenEmbedded",
+            "bitbake": "HEAD",
+            "branch": "HEAD",
+            "defaultlayers": [ "openembedded-core" ],
+            "layersourcepriority": { "Imported layers": 99, "Local OpenEmbedded" : 10, "OpenEmbedded" :  0 },
+            "helptext": "Toaster will run your builds with the version of OpenEmbedded that you have cloned or downloaded to your computer."
+        }
+    ]
+}

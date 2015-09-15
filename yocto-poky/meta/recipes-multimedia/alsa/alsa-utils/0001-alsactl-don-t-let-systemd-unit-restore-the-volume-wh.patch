@@ -1,0 +1,52 @@
+From 43a56fa36a12f09ccd78b3cf5e6ae197fcab501f Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen@dominion.thruhere.net>
+Date: Fri, 29 Aug 2014 18:58:56 +0300
+Subject: [PATCH] alsactl: don't let systemd unit restore the volume when
+ asound.state is missing
+
+This avoids an error on bootup
+
+Filed as https://bugtrack.alsa-project.org/alsa-bug/view.php?id=5459
+
+Upstream-Status: Pending
+
+Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
+Signed-off-by: Cristian Iorga <cristian.iorga@intel.com>
+---
+ alsactl/Makefile.am             | 7 ++++---
+ alsactl/alsa-restore.service.in | 1 +
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/alsactl/Makefile.am b/alsactl/Makefile.am
+index 47f06e9..b728c06 100644
+--- a/alsactl/Makefile.am
++++ b/alsactl/Makefile.am
+@@ -43,9 +43,10 @@ install-data-hook:
+ endif
+ 
+ edit = \
+-	$(SED) -r -e 's,@sbindir\@,$(sbindir),g' \
+-		  -e 's,@mydatadir\@,$(mydatadir),g' \
+-		  -e 's,@daemonswitch\@,$(ALSACTL_DAEMONSWITCH),g' \
++	$(SED) -e 's,@localstatedir\@,$(localstatedir),g' \
++	       -e 's,@sbindir\@,$(sbindir),g' \
++	       -e 's,@mydatadir\@,$(mydatadir),g' \
++	       -e 's,@daemonswitch\@,$(ALSACTL_DAEMONSWITCH),g' \
+ 							< $< > $@ || rm $@
+ 
+ alsa-state.service: alsa-state.service.in
+diff --git a/alsactl/alsa-restore.service.in b/alsactl/alsa-restore.service.in
+index 245a439..b017854 100644
+--- a/alsactl/alsa-restore.service.in
++++ b/alsactl/alsa-restore.service.in
+@@ -10,6 +10,7 @@ DefaultDependencies=no
+ After=alsa-state.service
+ Before=shutdown.target
+ Conflicts=shutdown.target
++ConditionPathExists=@localstatedir@/lib/alsa/asound.state
+ 
+ [Service]
+ Type=oneshot
+-- 
+1.9.1
+

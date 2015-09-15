@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# Lets see how many pppds are running....
+set -- `cat /var/run/ppp*.pid 2>/dev/null`
+
+case $# in
+  0) # pppd only creates a pid file once ppp is up, so let's try killing pppd
+     # on the assumption that we've not got that far yet.
+     killall pppd
+     ;;
+  1) # If only one was running then it can be killed (apparently killall
+     # caused problems for some, so lets try killing the pid from the file)
+     kill $1
+     ;;
+  *) # More than one! Aieehh.. Dont know which one to kill.
+     echo "More than one pppd running. None stopped"
+     exit 1
+     ;;
+esac
+
+if [ -r /var/run/ppp-quick ]
+then
+    rm -f /var/run/ppp-quick
+fi
+
+exit 0

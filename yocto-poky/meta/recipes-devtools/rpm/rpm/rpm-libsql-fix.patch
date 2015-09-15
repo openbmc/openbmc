@@ -1,0 +1,22 @@
+During installation, the libtool relink attempts to link to -lrpm...
+The problem is that it hasn't been installed yet!  So small change causes
+the libtool to instead use the build version.
+
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.14/lib/Makefile.am
+===================================================================
+--- rpm-5.4.14.orig/lib/Makefile.am
++++ rpm-5.4.14/lib/Makefile.am
+@@ -120,6 +120,9 @@ librpm.la: $(librpm_la_OBJECTS) $(librpm
+ #libsql_la_SOURCES	= libsql.c
+ #libsql_la_LIBADD	= librpm.la $(RPMDB_LDADD_COMMON)
+ 
++# pkglib libraries needs to have usrlib libraries already installed!
++install-pkglibLTLIBRARIES: install-usrlibLTLIBRARIES
++
+ install-data-hook:
+ if !ENABLE_BUILD_LAFILES
+ 	-for l in $(usrlib_LTLIBRARIES); do \

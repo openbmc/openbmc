@@ -1,0 +1,14 @@
+{{ input type:"edit" name:"layer_priority" prio:"20" msg:"Please enter the layer priority you'd like to use for the layer:" default:"6"}}
+
+{{ input type:"boolean" name:"create_example_recipe" prio:"20" msg:"Would you like to have an example recipe created? (y/n)" default:"n"}}
+
+{{ if create_example_recipe == "y": }}
+{{ input type:"edit" name:"example_recipe_name" prio:"20" msg:"Please enter the name you'd like to use for your example recipe:" default:"example"}}
+
+{{ input type:"boolean" name:"create_example_bbappend" prio:"20" msg:"Would you like to have an example bbappend file created? (y/n)" default:"n"}}
+
+{{ if create_example_bbappend == "y": }}
+{{ input type:"edit" name:"example_bbappend_name" prio:"20" msg:"Please enter the name you'd like to use for your bbappend file:" default:"example"}}
+
+{{ if create_example_bbappend == "y": }}
+{{ input type:"edit" name:"example_bbappend_version" prio:"20" msg:"Please enter the version number you'd like to use for your bbappend file (this should match the recipe you're appending to):" default:"0.1"}}

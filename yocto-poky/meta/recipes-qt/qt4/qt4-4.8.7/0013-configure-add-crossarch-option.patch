@@ -1,0 +1,51 @@
+From 549342fa380ed2a9ad41be3d04ee2f0585f6a465 Mon Sep 17 00:00:00 2001
+From: Michael Lauer <mickey@vanille-media.de>
+Date: Wed, 26 Sep 2012 20:41:32 +0200
+Subject: [PATCH 13/21] configure: add "-crossarch" option
+
+Upstream-Status: Pending
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
+Update for qt 4.8.7
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ configure | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/configure b/configure
+index 4eb4a3d..a4dacec 100755
+--- a/configure
++++ b/configure
+@@ -1160,7 +1160,7 @@ while [ "$#" -gt 0 ]; do
+         shift
+         VAL=$1
+         ;;
+-    -prefix|-docdir|-headerdir|-plugindir|-importdir|-datadir|-libdir|-bindir|-translationdir|-sysconfdir|-examplesdir|-demosdir|-depths|-make|-nomake|-platform|-xplatform|-device-option|-buildkey|-sdk|-arch|-host-arch|-mysql_config|-psql_config|-sysroot)
++    -prefix|-docdir|-headerdir|-plugindir|-importdir|-datadir|-libdir|-bindir|-translationdir|-sysconfdir|-examplesdir|-demosdir|-depths|-make|-nomake|-platform|-xplatform|-device-option|-buildkey|-sdk|-arch|-host-arch|-mysql_config|-psql_config|-sysroot|-crossarch)
+         VAR=`echo $1 | sed "s,^-\(.*\),\1,"`
+         shift
+         VAL="$1"
+@@ -1719,6 +1719,9 @@ while [ "$#" -gt 0 ]; do
+         DEV_VAL=`echo $VAL | sed "s,^.*=\(.*\),\1,"`
+         DeviceVar set $DEV_VAR $DEV_VAL
+         ;;
++    crossarch)
++        CROSSARCH="$VAL"
++        ;;
+     debug-and-release)
+         if [ "$VAL" = "yes" ] || [ "$VAL" = "no" ]; then
+             CFG_DEBUG_RELEASE="$VAL"
+@@ -3333,6 +3336,8 @@ arm*)
+     ;;
+ esac
+ 
++CFG_ARCH="$CROSSARCH"
++
+ if [ -d "$relpath/src/corelib/arch/$CFG_ARCH" ]; then
+     if [ "$OPT_VERBOSE" = "yes" ]; then
+         echo "    '$CFG_ARCH' is supported"
+-- 
+1.8.0
+

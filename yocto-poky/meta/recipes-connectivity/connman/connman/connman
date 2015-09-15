@@ -1,0 +1,83 @@
+#!/bin/sh
+
+DAEMON=/usr/sbin/connmand
+PIDFILE=/var/run/connmand.pid
+DESC="Connection Manager"
+
+if [ -f /etc/default/connman ] ; then
+	. /etc/default/connman
+fi
+
+set -e
+
+nfsroot=0
+
+exec 9<&0 < /proc/mounts
+while read dev mtpt fstype rest; do
+	if test $mtpt = "/" ; then
+		case $fstype in
+		    nfs | nfs4)
+			nfsroot=1
+			break
+			;;
+		    *)
+			;;
+		esac
+	fi
+done
+
+do_start() {
+	EXTRA_PARAM=""
+	if test $nfsroot -eq 1 ; then
+	    NET_DEVS=`cat /proc/net/dev | sed -ne 's/^\([a-zA-Z0-9 ]*\):.*$/\1/p'`
+	    NET_ADDR=`cat /proc/cmdline | sed -ne 's/^.*ip=\([^ :]*\).*$/\1/p'`
+
+	    if [ ! -z "$NET_ADDR" ]; then
+		if [ "$NET_ADDR" = dhcp ]; then
+		    ethn=`ifconfig | grep "^eth" | sed -e "s/\(eth[0-9]\)\(.*\)/\1/"`
+		    if [ ! -z "$ethn" ]; then
+			EXTRA_PARAM="-I $ethn"
+		    fi
+		else
+		    for i in $NET_DEVS; do
+			ADDR=`ifconfig $i | sed 's/addr://g' | sed -ne 's/^.*inet \([0-9.]*\) .*$/\1/p'`
+			if [ "$NET_ADDR" = "$ADDR" ]; then
+			    EXTRA_PARAM="-I $i"
+			    break
+			fi
+		    done
+		fi
+	    fi
+	fi
+	if [ -f @LIBDIR@/connman/wired-setup ] ; then
+		. @LIBDIR@/connman/wired-setup
+	fi
+	$DAEMON $EXTRA_PARAM
+}
+
+do_stop() {
+	start-stop-daemon --stop --name connmand --quiet
+}
+
+case "$1" in
+  start)
+	echo "Starting $DESC"
+	do_start
+	;;
+  stop)
+	echo "Stopping $DESC"
+	do_stop
+	;;
+  restart|force-reload)
+	echo "Restarting $DESC"
+	do_stop
+	sleep 1
+	do_start
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart|force-reload}" >&2
+	exit 1
+	;;
+esac
+
+exit 0

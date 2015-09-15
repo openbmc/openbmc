@@ -1,0 +1,43 @@
+From 89fca439f1b58595f2f424598a27869f8c7bd815 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Mon, 23 Dec 2013 04:43:18 -0500
+Subject: [PATCH 11/11] mke2fs.8.in: update the manual for the -d option
+
+Update the manual for the -d option
+
+Upstream-Status: Backport
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+Reviewed-by: Darren Hart <dvhart@linux.intel.com>
+---
+ misc/mke2fs.8.in |    7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/misc/mke2fs.8.in b/misc/mke2fs.8.in
+index fea50da..b1ca486 100644
+--- a/misc/mke2fs.8.in
++++ b/misc/mke2fs.8.in
+@@ -52,6 +52,10 @@ mke2fs \- create an ext2/ext3/ext4 filesystem
+ .I number-of-inodes
+ ]
+ [
++.B \-d
++.I root-directory
++]
++[
+ .B \-n
+ ]
+ [
+@@ -502,6 +506,9 @@ the
+ ratio).  This allows the user to specify the number
+ of desired inodes directly.
+ .TP
++.BI \-d " root-directory"
++Add the files from the root-directory to the filesystem.
++.TP
+ .BI \-o " creator-os"
+ Overrides the default value of the "creator operating system" field of the
+ filesystem.  The creator field is set by default to the name of the OS the
+-- 
+1.7.10.4
+

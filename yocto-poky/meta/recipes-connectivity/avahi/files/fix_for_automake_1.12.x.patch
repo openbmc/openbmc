@@ -1,0 +1,34 @@
+Upstream-Status: Pending
+
+autoamke 1.12.x has depricated use of mkdir_p , and recommends use of MKDIR_P
+instead. Fixed the automake files accordingly to avoid warning-errors.
+Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+2012/07/09
+
+
+Index: avahi-0.6.31/avahi-daemon/Makefile.am
+===================================================================
+--- avahi-0.6.31.orig/avahi-daemon/Makefile.am
++++ avahi-0.6.31/avahi-daemon/Makefile.am
+@@ -169,7 +169,7 @@ xmllint:
+ 	done
+ 
+ install-data-local:
+-	test -z "$(localstatedir)/run" || $(mkdir_p) "$(DESTDIR)$(localstatedir)/run"
++	test -z "$(localstatedir)/run" || $(MKDIR_P) "$(DESTDIR)$(localstatedir)/run"
+ 
+ update-systemd:
+ 	curl http://cgit.freedesktop.org/systemd/plain/src/sd-daemon.c > sd-daemon.c
+Index: avahi-0.6.31/avahi-autoipd/Makefile.am
+===================================================================
+--- avahi-0.6.31.orig/avahi-autoipd/Makefile.am
++++ avahi-0.6.31/avahi-autoipd/Makefile.am
+@@ -76,7 +76,7 @@ dhcliententerdir = $(sysconfdir)/dhcp/dh
+ dhclientexitdir = $(sysconfdir)/dhcp/dhclient-exit-hooks.d
+ 
+ install-exec-hook: dhclient-exit-hook dhclient-enter-hook
+-	$(mkdir_p) $(DESTDIR)$(dhcliententerdir) $(DESTDIR)$(dhclientexitdir)
++	$(MKDIR_P) $(DESTDIR)$(dhcliententerdir) $(DESTDIR)$(dhclientexitdir)
+ 	$(INSTALL) dhclient-enter-hook $(DESTDIR)$(dhcliententerdir)/avahi-autoipd
+ 	$(INSTALL) dhclient-exit-hook $(DESTDIR)$(dhclientexitdir)/avahi-autoipd
+ 

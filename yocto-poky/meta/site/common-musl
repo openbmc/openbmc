@@ -1,0 +1,52 @@
+# general
+ac_cv_have_decl_sys_siglist=${ac_cv_have_decl_sys_siglist=no}
+ac_cv_func_realloc_works=${ac_cv_func_realloc_works=yes}
+ac_cv_func_realloc_0_nonnull=${ac_cv_func_realloc_0_nonnull=yes}
+ac_cv_func_malloc_works=${ac_cv_func_malloc_works=yes}
+ac_cv_func_malloc_0_nonnull=${ac_cv_func_malloc_0_nonnull=yes}
+ac_cv_func_getpgrp_void=yes
+ac_cv_func_setpgrp_void=yes
+ac_cv_func_setgrent_void=yes
+ac_cv_func_getgrgid_r=${ac_cv_func_getgrgid_r=yes}
+ac_cv_func_getpwuid_r=${ac_cv_func_getpwuid_r=yes}
+ac_cv_func_posix_getpwuid_r=${ac_cv_func_posix_getpwuid_r=yes}
+ac_cv_func_posix_getgrgid_r=${ac_cv_func_posix_getgrgid_r=yes}
+ac_cv_func_getaddrinfo=${ac_cv_func_getaddrinfo=yes}
+
+# glib
+glib_cv_strlcpy=${glib_cv_strlcpy=no}
+ac_cv_func_printf_unix98=${ac_cv_func_printf_unix98=yes}
+ac_cv_func_snprintf_c99=${ac_cv_func_snprintf_c99=yes}
+ac_cv_func_vsnprintf_c99=${ac_cv_func_vsnprintf_c99=yes}
+glib_cv_compliant_posix_memalign=${glib_cv_compliant_posix_memalign=1}
+glib_cv_long_long_format=${glib_cv_long_long_format=ll}
+glib_cv_have_qsort_r=${glib_cv_have_qsort_r=no}
+
+#dbus-glib
+ac_cv_have_abstract_sockets=${ac_cv_have_abstract_sockets=yes}
+
+# bash
+bash_cv_under_sys_siglist=${bash_cv_under_sys_siglist=no}
+bash_cv_sys_siglist=${bash_cv_sys_siglist=no}
+
+# coreutils
+fu_cv_sys_stat_statfs2_bsize=${fu_cv_sys_stat_statfs2_bsize=yes}
+gl_cv_func_gettimeofday_clobber=${gl_cv_func_gettimeofday_clobber=no}
+gl_cv_func_tzset_clobber=${gl_cv_func_tzset_clobber=no}
+gl_cv_func_gettimeofday_posix_signature=${gl_cv_func_gettimeofday_posix_signature=yes}
+ac_cv_func_posix_spawn=${ac_cv_func_posix_spawn=yes}
+ac_cv_func_posix_spawn_works=${ac_cv_func_posix_spawn_works=yes}
+
+# va_copy and _va_copy
+ac_cv_va_copy=${ac_cv_va_copy=yes}
+ac_cv___va_copy=${ac_cv___va_copy=yes}
+ac_cv_func_va_copy=${ac_cv_func_va_copy=yes}
+ac_cv_func___va_copy=${ac_cv_func___va_copy=yes}
+
+# posix_getpwuid_r posix_getgrgid_r posix_getpwnam_r
+ac_cv_func_posix_getpwuid_r=${ac_cv_func_posix_getpwuid_r=yes}
+ac_cv_func_posix_getgrgid_r=${ac_cv_func_posix_getgrgid_r=yes}
+ac_cv_func_posix_getpwnam_r=${ac_cv_func_posix_getpwnam_r=yes}
+
+# Xorg
+xorg_cv_malloc0_returns_null=${xorg_cv_malloc0_returns_null=yes}

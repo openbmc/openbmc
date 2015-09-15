@@ -1,0 +1,93 @@
+[PATCH] exclude some arm EABI obsolete syscalls
+
+Upstream-Status: Pending
+
+some syscalls are obsolete and no longer available for EABI, exclude them to
+fix the below error:
+	In file included from qemu-seccomp.c:16:0:
+	qemu-seccomp.c:28:7: error: '__NR_select' undeclared here (not in a function)
+	      { SCMP_SYS(select), 252 },
+	        ^
+	qemu-seccomp.c:36:7: error: '__NR_mmap' undeclared here (not in a function)
+	      { SCMP_SYS(mmap), 247 },
+	        ^
+	qemu-seccomp.c:57:7: error: '__NR_getrlimit' undeclared here (not in a function)
+	      { SCMP_SYS(getrlimit), 245 },
+	        ^
+	qemu-seccomp.c:96:7: error: '__NR_time' undeclared here (not in a function)
+	      { SCMP_SYS(time), 245 },
+	        ^
+	qemu-seccomp.c:185:7: error: '__NR_alarm' undeclared here (not in a function)
+	      { SCMP_SYS(alarm), 241 },
+
+please refer source files:
+	arch/arm/include/uapi/asm/unistd.h
+or kernel header:
+	/usr/include/asm/unistd.h
+
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+---
+ qemu-seccomp.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/qemu-seccomp.c b/qemu-seccomp.c
+index caa926e..5a78502 100644
+--- a/qemu-seccomp.c
++++ b/qemu-seccomp.c
+@@ -25,15 +25,21 @@ static const struct QemuSeccompSyscall seccomp_whitelist[] = {
+     { SCMP_SYS(timer_settime), 255 },
+     { SCMP_SYS(timer_gettime), 254 },
+     { SCMP_SYS(futex), 253 },
++#if !defined(__ARM_EABI__)
+     { SCMP_SYS(select), 252 },
++    { SCMP_SYS(time), 245 },
++    { SCMP_SYS(alarm), 241 },
++    { SCMP_SYS(getrlimit), 245 },
++    { SCMP_SYS(mmap), 247 },
++    { SCMP_SYS(socketcall), 250 },
++    { SCMP_SYS(ipc), 245 },
++#endif
+     { SCMP_SYS(recvfrom), 251 },
+     { SCMP_SYS(sendto), 250 },
+-    { SCMP_SYS(socketcall), 250 },
+     { SCMP_SYS(read), 249 },
+     { SCMP_SYS(io_submit), 249 },
+     { SCMP_SYS(brk), 248 },
+     { SCMP_SYS(clone), 247 },
+-    { SCMP_SYS(mmap), 247 },
+     { SCMP_SYS(mprotect), 246 },
+     { SCMP_SYS(execve), 245 },
+     { SCMP_SYS(open), 245 },
+@@ -48,13 +54,11 @@ static const struct QemuSeccompSyscall seccomp_whitelist[] = {
+     { SCMP_SYS(bind), 245 },
+     { SCMP_SYS(listen), 245 },
+     { SCMP_SYS(semget), 245 },
+-    { SCMP_SYS(ipc), 245 },
+     { SCMP_SYS(gettimeofday), 245 },
+     { SCMP_SYS(readlink), 245 },
+     { SCMP_SYS(access), 245 },
+     { SCMP_SYS(prctl), 245 },
+     { SCMP_SYS(signalfd), 245 },
+-    { SCMP_SYS(getrlimit), 245 },
+     { SCMP_SYS(set_tid_address), 245 },
+     { SCMP_SYS(statfs), 245 },
+     { SCMP_SYS(unlink), 245 },
+@@ -93,7 +97,6 @@ static const struct QemuSeccompSyscall seccomp_whitelist[] = {
+     { SCMP_SYS(times), 245 },
+     { SCMP_SYS(exit), 245 },
+     { SCMP_SYS(clock_gettime), 245 },
+-    { SCMP_SYS(time), 245 },
+     { SCMP_SYS(restart_syscall), 245 },
+     { SCMP_SYS(pwrite64), 245 },
+     { SCMP_SYS(nanosleep), 245 },
+@@ -182,7 +185,6 @@ static const struct QemuSeccompSyscall seccomp_whitelist[] = {
+     { SCMP_SYS(lstat64), 241 },
+     { SCMP_SYS(sendfile64), 241 },
+     { SCMP_SYS(ugetrlimit), 241 },
+-    { SCMP_SYS(alarm), 241 },
+     { SCMP_SYS(rt_sigsuspend), 241 },
+     { SCMP_SYS(rt_sigqueueinfo), 241 },
+     { SCMP_SYS(rt_tgsigqueueinfo), 241 },
+-- 
+1.9.1
+

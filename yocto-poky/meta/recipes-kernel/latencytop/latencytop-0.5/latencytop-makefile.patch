@@ -1,0 +1,39 @@
+diff --git a/Makefile.orig b/Makefile
+index 16a2369..fa797a2 100644
+--- a/Makefile.orig
++++ b/Makefile
+@@ -1,10 +1,11 @@
+-# FIXME: Use autoconf ?
+-HAS_GTK_GUI = 1
++# Upstream-Status: Inappropriate [configuration]
++# Signed-off-by: Jack Mitchell <jack.mitchell@dbbroadcast.co.uk>
+ 
+ DESTDIR =
+ SBINDIR = /usr/sbin
+ XCFLAGS = -W  -g `pkg-config --cflags glib-2.0` -D_FORTIFY_SOURCE=2 -Wno-sign-compare
+-LDF = -Wl,--as-needed `pkg-config --libs glib-2.0`   -lncursesw 
++LDF = -Wl,--as-needed `pkg-config --libs glib-2.0`   -lncurses
++CC ?= gcc
+ 
+ OBJS= latencytop.o text_display.o translate.o fsync.o
+ 
+@@ -26,16 +27,17 @@ endif
+ 
+ # We write explicity this "implicit rule"
+ %.o : %.c
+-	gcc -c $(CFLAGS) $(XCFLAGS) $< -o $@
++	$(CC) -c $(CFLAGS) $(XCFLAGS) $< -o $@
+ 
+ latencytop:  $(OBJS) latencytop.h Makefile
+-	gcc $(CFLAGS) $(OBJS) $(LDF) -o latencytop 
++	$(CC) $(CFLAGS) $(OBJS) $(LDF) -o latencytop
+ 
+ clean:
+ 	rm -f *~ latencytop DEADJOE *.o
+ 
+ install: latencytop
+ 	mkdir -p $(DESTDIR)/usr/share/latencytop
++	mkdir -p $(DESTDIR)/$(SBINDIR)
+ 	install -m 0644 latencytop.trans $(DESTDIR)/usr/share/latencytop/latencytop.trans
+ 	install -m 0644 *.png $(DESTDIR)/usr/share/latencytop/
+ 	install -m 0755 latencytop $(DESTDIR)$(SBINDIR)/

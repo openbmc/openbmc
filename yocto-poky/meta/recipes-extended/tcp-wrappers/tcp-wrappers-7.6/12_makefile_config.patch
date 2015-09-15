@@ -1,0 +1,83 @@
+Upstream-Status: Backport
+
+diff -ruN tcp_wrappers_7.6.orig/Makefile tcp_wrappers_7.6/Makefile
+--- tcp_wrappers_7.6.orig/Makefile	2003-08-21 01:43:39.000000000 +0200
++++ tcp_wrappers_7.6/Makefile	2003-08-21 01:43:35.000000000 +0200
+@@ -45,7 +45,7 @@
+ #
+ # SysV.4 Solaris 2.x OSF AIX
+ #REAL_DAEMON_DIR=/usr/sbin
+-#
++REAL_DAEMON_DIR=/usr/sbin
+ # BSD 4.4
+ #REAL_DAEMON_DIR=/usr/libexec
+ #
+@@ -512,6 +519,7 @@
+ # (examples: allow, deny, banners, twist and spawn).
+ # 
+ #STYLE	= -DPROCESS_OPTIONS	# Enable language extensions.
++STYLE = -DPROCESS_OPTIONS
+ 
+ ################################################################
+ # Optional: Changing the default disposition of logfile records
+@@ -535,6 +543,7 @@
+ # The LOG_XXX names below are taken from the /usr/include/syslog.h file.
+ 
+ FACILITY= LOG_MAIL	# LOG_MAIL is what most sendmail daemons use
++FACILITY= LOG_DAEMON
+ 
+ # The syslog priority at which successful connections are logged.
+ 
+@@ -631,6 +640,7 @@
+ # lookups altogether, see the next section.
+ 
+ PARANOID= -DPARANOID
++PARANOID=
+ 
+ ########################################
+ # Optional: turning off hostname lookups
+@@ -644,6 +654,7 @@
+ # mode (see previous section) and comment out the following definition.
+ 
+ HOSTNAME= -DALWAYS_HOSTNAME
++HOSTNAME=
+ 
+ #############################################
+ # Optional: Turning on host ADDRESS checking
+@@ -670,6 +681,7 @@
+ # Solaris 2.x, and Linux. See your system documentation for details.
+ #
+ # KILL_OPT= -DKILL_IP_OPTIONS
++KILL_OPT= -DKILL_IP_OPTIONS
+ 
+ ## End configuration options
+ ############################
+@@ -677,9 +689,10 @@
+ # Protection against weird shells or weird make programs.
+ 
+ SHELL	= /bin/sh
+-.c.o:;	$(CC) $(CFLAGS) -c $*.c
++.c.o:;	$(CC) $(CFLAGS) -o $*.o -c $*.c
+ 
+-CFLAGS	= -O -DFACILITY=$(FACILITY) $(ACCESS) $(PARANOID) $(NETGROUP) \
++COPTS	= -O2 -g
++CFLAGS	= $(COPTS) -DFACILITY=$(FACILITY) $(ACCESS) $(PARANOID) $(NETGROUP) \
+ 	$(BUGS) $(SYSTYPE) $(AUTH) $(UMASK) \
+ 	-DREAL_DAEMON_DIR=\"$(REAL_DAEMON_DIR)\" $(STYLE) $(KILL_OPT) \
+ 	-DSEVERITY=$(SEVERITY) -DRFC931_TIMEOUT=$(RFC931_TIMEOUT) \
+@@ -712,10 +725,11 @@
+ 
+ config-check:
+ 	@set +e; test -n "$(REAL_DAEMON_DIR)" || { make; exit 1; }
+-	@set +e; echo $(CFLAGS) >/tmp/cflags.$$$$ ; \
+-	if cmp cflags /tmp/cflags.$$$$ ; \
+-	then rm /tmp/cflags.$$$$ ; \
+-	else mv /tmp/cflags.$$$$ cflags ; \
++	@set +e; echo $(CFLAGS) >cflags.new ; \
++	if cmp cflags cflags.new ; \
++	then rm cflags.new ; \
++	else mv cflags.new cflags ; \
+ 	fi >/dev/null 2>/dev/null
++	@if [ ! -d shared ]; then mkdir shared; fi
+ 
+ $(LIB):	$(LIB_OBJ)

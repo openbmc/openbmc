@@ -1,0 +1,104 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:          udev
+# Required-Start:    mountvirtfs
+# Required-Stop:
+# Default-Start:     S
+# Default-Stop:
+# Short-Description: Start udevd, populate /dev and load drivers.
+### END INIT INFO
+
+. /etc/init.d/functions
+
+export TZ=/etc/localtime
+
+[ -d /sys/class ] || exit 1
+[ -r /proc/mounts ] || exit 1
+[ -x @UDEVD@ ] || exit 1
+[ -f /etc/default/udev-cache ] && . /etc/default/udev-cache
+[ -f /etc/udev/udev.conf ] && . /etc/udev/udev.conf
+
+readfile () {
+   filename=$1
+   READDATA=""
+   if [ -r $filename ]; then
+       while read line; do
+           READDATA="$READDATA$line"
+       done < $filename
+   fi
+}
+
+case "$1" in
+  start)
+    export ACTION=add
+    # propagate /dev from /sys
+    echo "Starting udev"
+
+    # mount the devtmpfs on /dev, if not already done
+    LANG=C awk '$2 == "/dev" && ($3 == "devtmpfs") { exit 1 }' /proc/mounts && {
+            mount -n -o mode=0755 -t devtmpfs none "/dev"
+    }
+    [ -e /dev/pts ] || mkdir -m 0755 /dev/pts
+    [ -e /dev/shm ] || mkdir -m 1777 /dev/shm
+    mount -a -t tmpfs 2>/dev/null
+
+    # cache handling
+    if [ "$DEVCACHE" != "" ]; then
+            readfile /proc/version
+            VERSION="$READDATA"
+            readfile /proc/cmdline
+            CMDLINE="$READDATA"
+            readfile /proc/devices
+            DEVICES="$READDATA"
+            readfile /proc/atags
+            ATAGS="$READDATA"
+
+            if [ -e $DEVCACHE ]; then
+                    readfile /etc/udev/cache.data
+                    if [ "$READDATA" = "$VERSION$CMDLINE$DEVICES$ATAGS" ]; then
+                            (cd /; tar xf $DEVCACHE > /dev/null 2>&1)
+                            not_first_boot=1
+                            [ "$VERBOSE" != "no" ] && echo "udev: using cache file $DEVCACHE"
+                            [ -e /dev/shm/udev.cache ] && rm -f /dev/shm/udev.cache
+                    else
+                            echo "$VERSION$CMDLINE$DEVICES$ATAGS" > /dev/shm/udev.cache
+                    fi
+            else
+                    echo "$VERSION$CMDLINE$DEVICES$ATAGS" > /dev/shm/udev.cache
+            fi
+    fi
+
+    # make_extra_nodes
+    killproc systemd-udevd > "/dev/null" 2>&1
+
+    # trigger the sorted events
+    echo -e '\000\000\000\000' > /proc/sys/kernel/hotplug
+    @UDEVD@ -d
+
+    udevadm control --env=STARTUP=1
+    if [ "$not_first_boot" != "" ];then
+            udevadm trigger --action=add --subsystem-nomatch=tty --subsystem-nomatch=mem --subsystem-nomatch=vc --subsystem-nomatch=vtconsole --subsystem-nomatch=misc --subsystem-nomatch=dcon --subsystem-nomatch=pci_bus  --subsystem-nomatch=graphics	 --subsystem-nomatch=backlight --subsystem-nomatch=video4linux	--subsystem-nomatch=platform
+            (udevadm settle --timeout=3; udevadm control --env=STARTUP=)&
+    else
+            udevadm trigger --action=add
+            udevadm settle
+    fi
+    ;;
+  stop)
+    echo "Stopping udevd"
+    start-stop-daemon --stop --name systemd-udevd --quiet
+    ;;
+  restart)
+    $0 stop
+    sleep 1
+    $0 start
+    ;;
+  status)
+    status systemd-udevd
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|status|restart}"
+    exit 1
+esac
+exit 0

@@ -1,0 +1,54 @@
+From 36829a8d7ad2888515fbee95c2a70b3d636d7538 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Wed, 9 Jul 2014 14:30:33 +0200
+Subject: [PATCH 2/9] Correctly implement with AC_WITH(glut) so that
+ --without-glut works.
+
+---
+ configure.ac | 26 +++++++++++++++-----------
+ 1 file changed, 15 insertions(+), 11 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index c4ee12b..9445424 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -67,21 +67,25 @@ DEMO_CFLAGS="$DEMO_CFLAGS $GL_CFLAGS"
+ DEMO_LIBS="$DEMO_LIBS $GL_LIBS"
+ 
+ dnl Check for GLUT
+-GLUT_CFLAGS=""
+-GLUT_LIBS=-lglut
+-glut_enabled=yes
++glut_enabled=no
+ AC_ARG_WITH([glut],
+ 	[AS_HELP_STRING([--with-glut=DIR],
+ 			[glut install directory])],
+ 	[GLUT_CFLAGS="-I$withval/include"
+-	 GLUT_LIBS="-L$withval/lib -lglut"])
+-AC_CHECK_HEADER([GL/glut.h],
+-		[],
+-		[glut_enabled=no])
+-AC_CHECK_LIB([glut],
+-		[glutInit],
+-		[],
+-		[glut_enabled=no])
++	 GLUT_LIBS="-L$withval/lib -lglut"],
++	[GLUT_CFLAGS=""
++	 GLUT_LIBS="-lglut"]
++        )
++AS_IF([test "x$with_glut" != xno],
++      [AC_CHECK_HEADER([GL/glut.h],
++                       [],
++                       [glut_enabled=no])
++       AC_CHECK_LIB([glut],
++                    [glutInit],
++                    [],
++                    [glut_enabled=no])
++       glut_enabled=yes
++])
+ 
+ dnl Check for FreeGLUT 2.6 or later
+ AC_EGREP_HEADER([glutInitContextProfile],
+-- 
+2.0.0
+

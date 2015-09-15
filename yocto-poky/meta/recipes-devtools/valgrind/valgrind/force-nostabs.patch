@@ -1,0 +1,42 @@
+Suppress building ptest apps with the -gstabs option
+
+Force the configure tests for -gstabs compiler support to fail so that
+the regression tests don't try to build with the -gstabs option.
+Otherwise, the valgrind build when ptest is enabled fails with the
+error:
+    Stabs debuginfo not supported:
+    ../package/usr/lib/valgrind/ptest/memcheck/tests/deep_templates
+    ERROR: Function failed: split_and_strip_files
+
+Upstream-Status: Inappropriate [gstabs support is appropriate upstream,
+        but not for this distro]
+
+Signed-off-by: Dave Lerner <dave.lerner@windriver.com>
+
+diff --git a/configure.ac b/configure.ac
+index 755dfb9..cc8b5e1 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1743,22 +1743,7 @@ AM_CONDITIONAL(DWARF4, test x$ac_have_dwarf4 = xyes)
+ CFLAGS=$safe_CFLAGS
+ 
+ 
+-# does this compiler support -gstabs ?
+-
+-AC_MSG_CHECKING([if gcc accepts -gstabs])
+-
+-safe_CFLAGS=$CFLAGS
+-CFLAGS="-gstabs"
+-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[
+-  return 0;
+-]])], [
+-ac_have_gstabs=yes
+-AC_MSG_RESULT([yes])
+-], [
+ ac_have_gstabs=no
+-AC_MSG_RESULT([no])
+-])
+-CFLAGS=$safe_CFLAGS
+ AM_CONDITIONAL([HAVE_GSTABS], [test x$ac_have_gstabs = xyes])
+ 
+ 

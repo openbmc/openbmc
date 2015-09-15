@@ -1,0 +1,49 @@
+Upstream-Status: Pending
+
+This patch fixes following issue with automake 1.12
+
+| configure.in:95: error: automatic de-ANSI-fication support has been removed
+...
+| lib/Makefile.am:3: error: automatic de-ANSI-fication support has been removed
+| lib/Makefile.am: installing './depcomp'
+| src/Makefile.am:11: error: automatic de-ANSI-fication support has been removed
+
+
+Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+2012/05/03
+
+Index: lrzsz-0.12.20/configure.in
+===================================================================
+--- lrzsz-0.12.20.orig/configure.in
++++ lrzsz-0.12.20/configure.in
+@@ -92,7 +92,6 @@ AC_PROG_RANLIB
+ AC_ISC_POSIX
+ AC_AIX
+ AC_MINIX
+-AM_C_PROTOTYPES
+ AC_C_CONST
+ AC_C_INLINE
+ 
+Index: lrzsz-0.12.20/lib/Makefile.am
+===================================================================
+--- lrzsz-0.12.20.orig/lib/Makefile.am
++++ lrzsz-0.12.20/lib/Makefile.am
+@@ -1,6 +1,5 @@
+ noinst_LIBRARIES=libzmodem.a
+ CFLAGS=@CFLAGS@
+-AUTOMAKE_OPTIONS=ansi2knr
+ 
+ EXTRA_DIST = alloca.c ansi2knr.1 ansi2knr.c \
+ 	getopt.c getopt1.c mkdir.c mktime.c \
+Index: lrzsz-0.12.20/src/Makefile.am
+===================================================================
+--- lrzsz-0.12.20.orig/src/Makefile.am
++++ lrzsz-0.12.20/src/Makefile.am
+@@ -8,7 +8,6 @@ CFLAGS=@CFLAGS@
+ DISTCLEAN_FILES=lrzszbug
+ 
+ LDADD = ../lib/libzmodem.a @LIBINTL@
+-AUTOMAKE_OPTIONS=ansi2knr
+ EXTRA_DIST = ansi2knr.1 ansi2knr.c lrzszbug.in
+ INCLUDES = -I.. -I$(srcdir) -I$(top_srcdir)/src -I../intl -I$(top_srcdir)/lib
+ #DEFS = -DLOCALEDIR=\"$(localedir)\" -DOS=\"@host_os@\" -DCPU=\"@host_cpu@\"

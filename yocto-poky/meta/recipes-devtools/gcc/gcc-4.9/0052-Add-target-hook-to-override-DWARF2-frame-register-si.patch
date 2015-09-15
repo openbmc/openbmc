@@ -1,0 +1,138 @@
+From d626297e87e19251a284ea1e9360e831b48999ca Mon Sep 17 00:00:00 2001
+From: mpf <mpf@138bc75d-0d04-0410-961f-82ee72b054a4>
+Date: Thu, 4 Sep 2014 08:32:05 +0000
+Subject: [PATCH] Add target hook to override DWARF2 frame register size
+
+gcc/
+
+	* target.def (TARGET_DWARF_FRAME_REG_MODE): New target hook.
+	* targhooks.c (default_dwarf_frame_reg_mode): New function.
+	* targhooks.h (default_dwarf_frame_reg_mode): New prototype.
+	* doc/tm.texi.in (TARGET_DWARF_FRAME_REG_MODE): Document.
+	* doc/tm.texi: Regenerate.
+	* dwarf2cfi.c (expand_builtin_init_dwarf_reg_sizes): Abstract mode
+	selection logic to default_dwarf_frame_reg_mode.
+
+
+
+git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/trunk@214898 138bc75d-0d04-0410-961f-82ee72b054a4
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Backport [gcc 5.0]
+
+---
+ gcc/ChangeLog      | 10 ++++++++++
+ gcc/doc/tm.texi    |  7 +++++++
+ gcc/doc/tm.texi.in |  2 ++
+ gcc/dwarf2cfi.c    |  4 +---
+ gcc/target.def     | 11 +++++++++++
+ gcc/targhooks.c    | 13 +++++++++++++
+ gcc/targhooks.h    |  1 +
+ 7 files changed, 45 insertions(+), 3 deletions(-)
+
+Index: gcc-4.9.2/gcc/doc/tm.texi
+===================================================================
+--- gcc-4.9.2.orig/gcc/doc/tm.texi
++++ gcc-4.9.2/gcc/doc/tm.texi
+@@ -9017,6 +9017,13 @@ register in Dwarf.  Otherwise, this hook
+ If not defined, the default is to return @code{NULL_RTX}.
+ @end deftypefn
+ 
++@deftypefn {Target Hook} {enum machine_mode} TARGET_DWARF_FRAME_REG_MODE (int @var{regno})
++Given a register, this hook should return the mode which the
++corresponding Dwarf frame register should have.  This is normally
++used to return a smaller mode than the raw mode to prevent call
++clobbered parts of a register altering the frame register size
++@end deftypefn
++
+ @deftypefn {Target Hook} void TARGET_INIT_DWARF_REG_SIZES_EXTRA (tree @var{address})
+ If some registers are represented in Dwarf-2 unwind information in
+ multiple pieces, define this hook to fill in information about the
+Index: gcc-4.9.2/gcc/doc/tm.texi.in
+===================================================================
+--- gcc-4.9.2.orig/gcc/doc/tm.texi.in
++++ gcc-4.9.2/gcc/doc/tm.texi.in
+@@ -6745,6 +6745,8 @@ the target supports DWARF 2 frame unwind
+ 
+ @hook TARGET_DWARF_REGISTER_SPAN
+ 
++@hook TARGET_DWARF_FRAME_REG_MODE
++
+ @hook TARGET_INIT_DWARF_REG_SIZES_EXTRA
+ 
+ @hook TARGET_ASM_TTYPE
+Index: gcc-4.9.2/gcc/dwarf2cfi.c
+===================================================================
+--- gcc-4.9.2.orig/gcc/dwarf2cfi.c
++++ gcc-4.9.2/gcc/dwarf2cfi.c
+@@ -271,11 +271,9 @@ expand_builtin_init_dwarf_reg_sizes (tre
+       if (rnum < DWARF_FRAME_REGISTERS)
+ 	{
+ 	  HOST_WIDE_INT offset = rnum * GET_MODE_SIZE (mode);
+-	  enum machine_mode save_mode = reg_raw_mode[i];
+ 	  HOST_WIDE_INT size;
++	  enum machine_mode save_mode = targetm.dwarf_frame_reg_mode (i);
+ 
+-	  if (HARD_REGNO_CALL_PART_CLOBBERED (i, save_mode))
+-	    save_mode = choose_hard_reg_mode (i, 1, true);
+ 	  if (dnum == DWARF_FRAME_RETURN_COLUMN)
+ 	    {
+ 	      if (save_mode == VOIDmode)
+Index: gcc-4.9.2/gcc/target.def
+===================================================================
+--- gcc-4.9.2.orig/gcc/target.def
++++ gcc-4.9.2/gcc/target.def
+@@ -3218,6 +3218,17 @@ If not defined, the default is to return
+  rtx, (rtx reg),
+  hook_rtx_rtx_null)
+ 
++/* Given a register return the mode of the corresponding DWARF frame
++   register.  */
++DEFHOOK
++(dwarf_frame_reg_mode,
++ "Given a register, this hook should return the mode which the\n\
++corresponding Dwarf frame register should have.  This is normally\n\
++used to return a smaller mode than the raw mode to prevent call\n\
++clobbered parts of a register altering the frame register size",
++ enum machine_mode, (int regno),
++ default_dwarf_frame_reg_mode)
++
+ /* If expand_builtin_init_dwarf_reg_sizes needs to fill in table
+    entries not corresponding directly to registers below
+    FIRST_PSEUDO_REGISTER, this hook should generate the necessary
+Index: gcc-4.9.2/gcc/targhooks.c
+===================================================================
+--- gcc-4.9.2.orig/gcc/targhooks.c
++++ gcc-4.9.2/gcc/targhooks.c
+@@ -1438,6 +1438,19 @@ default_debug_unwind_info (void)
+   return UI_NONE;
+ }
+ 
++/* Determine the correct mode for a Dwarf frame register that represents
++   register REGNO.  */
++
++enum machine_mode
++default_dwarf_frame_reg_mode (int regno)
++{
++  enum machine_mode save_mode = reg_raw_mode[regno];
++
++  if (HARD_REGNO_CALL_PART_CLOBBERED (regno, save_mode))
++    save_mode = choose_hard_reg_mode (regno, 1, true);
++  return save_mode;
++}
++
+ /* To be used by targets where reg_raw_mode doesn't return the right
+    mode for registers used in apply_builtin_return and apply_builtin_arg.  */
+ 
+Index: gcc-4.9.2/gcc/targhooks.h
+===================================================================
+--- gcc-4.9.2.orig/gcc/targhooks.h
++++ gcc-4.9.2/gcc/targhooks.h
+@@ -194,6 +194,7 @@ extern int default_label_align_max_skip
+ extern int default_jump_align_max_skip (rtx);
+ extern section * default_function_section(tree decl, enum node_frequency freq,
+ 					  bool startup, bool exit);
++extern enum machine_mode default_dwarf_frame_reg_mode (int);
+ extern enum machine_mode default_get_reg_raw_mode (int);
+ 
+ extern void *default_get_pch_validity (size_t *);

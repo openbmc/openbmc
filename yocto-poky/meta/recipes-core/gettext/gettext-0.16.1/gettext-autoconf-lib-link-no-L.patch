@@ -1,0 +1,19 @@
+
+# Pulled from OpenEmbedded
+# 
+# Commented by: Saul Wold <saul.wold@intel.com>
+
+Upstream-Status: Inappropriate [licensing]
+
+--- gettext-0.17/autoconf-lib-link/m4/lib-link.m4~	2009-04-17 15:12:30.000000000 -0700
++++ gettext-0.17/autoconf-lib-link/m4/lib-link.m4	2009-04-17 15:37:39.000000000 -0700
+@@ -267,6 +267,9 @@
+               fi
+             fi
+           fi
++          dnl Just let the compiler find the library, the compiler and user are smarter then this script
++          dnl when cross compiling and working with a relocated install.
++          found_dir=""
+           if test "X$found_dir" = "X"; then
+             for x in $LDFLAGS $LTLIB[]NAME; do
+               AC_LIB_WITH_FINAL_PREFIX([eval x=\"$x\"])

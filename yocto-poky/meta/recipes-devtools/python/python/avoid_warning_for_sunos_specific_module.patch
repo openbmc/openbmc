@@ -1,0 +1,23 @@
+sunaudiodev module is sunos specific so we avoid a warning by not 
+adding this module to missing variable.
+
+Upstream-Status: Inappropriate [distribution]
+
+Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
+
+Index: Python-2.7.2/setup.py
+===================================================================
+--- Python-2.7.2.orig/setup.py	2012-04-05 22:29:18.049196608 +0300
++++ Python-2.7.2/setup.py	2012-04-05 22:29:57.505195453 +0300
+@@ -1522,8 +1522,9 @@
+         if platform == 'sunos5':
+             # SunOS specific modules
+             exts.append( Extension('sunaudiodev', ['sunaudiodev.c']) )
+-        else:
+-            missing.append('sunaudiodev')
++        # If platform is not sunos warning is useless
++        #else:
++        #    missing.append('sunaudiodev')
+ 
+         if platform == 'darwin':
+             # _scproxy

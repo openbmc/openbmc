@@ -1,0 +1,92 @@
+#!/bin/sh
+#
+# Copyright 2007 Openedhand Ltd.
+#
+# Author: Richard Purdie <rpurdie@openedhand.com>
+#
+
+# The following script will run all the scriptlets found in #SYSCONFDIR#/deb-postinsts,
+# #SYSCONFDIR#/ipk-postinsts or #SYSCONFDIR#/rpm-posinsts.
+
+# the order of this list is important, do not change!
+backend_list="rpm deb ipk"
+
+pm_installed=false
+
+for pm in $backend_list; do
+	pi_dir="#SYSCONFDIR#/$pm-postinsts"
+
+	[ -d $pi_dir ] && break
+
+	case $pm in
+		"deb")
+			if [ -s "#LOCALSTATEDIR#/lib/dpkg/status" ]; then
+				pm_installed=true
+				break
+			fi
+			;;
+
+		"ipk")
+			if [ -s "/var/lib/opkg/status" ]; then
+				pm_installed=true
+				break
+			fi
+			;;
+	esac
+done
+
+remove_rcsd_link () {
+	if [ -n "`which update-rc.d`" ]; then
+		update-rc.d -f run-postinsts remove
+	fi
+}
+
+if [ -z "$pi_dir" ]; then
+	remove_rcsd_link
+	exit 0
+fi
+
+[ -e #SYSCONFDIR#/default/postinst ] && . #SYSCONFDIR#/default/postinst
+
+if [ "$POSTINST_LOGGING" = "1" ]; then
+	rm -f $LOGFILE
+	append_log=">>$LOGFILE 2>&1"
+fi
+
+exec_postinst_scriptlets() {
+	for i in `ls $pi_dir`; do
+		i=$pi_dir/$i
+		echo "Running postinst $i..."
+		[ "$POSTINST_LOGGING" = "1" ] && eval echo "Running postinst $i..." $append_log
+		if [ -x $i ]; then
+			eval sh -c $i $append_log
+			rm $i
+		else
+			echo "ERROR: postinst $i failed."
+			[ "$POSTINST_LOGGING" = "1" ] && eval echo "ERROR: postinst $i failed." $append_log
+			remove_pi_dir=0
+		fi
+	done
+}
+
+remove_pi_dir=1
+if $pm_installed; then
+	case $pm in
+		"ipk")
+			eval opkg configure $append_log
+			;;
+
+		"deb")
+			eval dpkg --configure -a $append_log
+			;;
+	esac
+else
+	exec_postinst_scriptlets
+fi
+
+# since all postinstalls executed successfully, remove the postinstalls directory
+# and the rcS.d link
+if [ $remove_pi_dir = 1 ]; then
+	rm -rf $pi_dir
+	remove_rcsd_link
+fi

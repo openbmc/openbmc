@@ -1,0 +1,63 @@
+Upstream-Status: Inappropriate [enable feature]
+
+--- tmp/src/menu.c.orig	2007-04-23 12:08:41.000000000 +0100
++++ tmp/src/menu.c	2007-04-23 12:08:41.000000000 +0100
+@@ -152,7 +152,7 @@
+ 	}
+ 	
+ 	accel_group = gtk_accel_group_new();
+-	ifactory = gtk_item_factory_new(GTK_TYPE_MENU_BAR, "<main>", accel_group);
++	ifactory = gtk_item_factory_new(GTK_TYPE_MENU, "<main>", accel_group);
+ 	gtk_item_factory_set_translate_func(ifactory, menu_translate, NULL, NULL);
+ 	gtk_item_factory_create_items(ifactory, nmenu_items, menu_items, NULL);
+ 	gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
+
+--- tmp/src/window.c.orig	2007-04-23 12:14:07.000000000 +0100
++++ tmp/src/window.c	2007-04-23 12:14:07.000000000 +0100
+@@ -18,6 +18,8 @@
+  */
+ 
+ #include "leafpad.h"
++#include <libowl/owlwindowmenu.h>
++
+ /*
+ static void cb_scroll_event(GtkAdjustment *adj, GtkWidget *view)
+ {
+@@ -52,7 +54,6 @@
+ 	gtk_container_add(GTK_CONTAINER(window), vbox);
+ 	
+ 	menubar = create_menu_bar(window);
+-	gtk_box_pack_start(GTK_BOX(vbox), menubar, FALSE, FALSE, 0);
+ 	
+ 	sw = gtk_scrolled_window_new(NULL, NULL);
+ 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
+
+--- tmp/src/main.c.orig	2007-04-23 12:15:03.000000000 +0100
++++ tmp/src/main.c	2007-04-23 12:15:03.000000000 +0100
+@@ -244,6 +244,7 @@
+ 	Conf *conf;
+ 	GtkItemFactory *ifactory;
+ 	gchar *stdin_data = NULL;
++	GtkWidget *menu;
+ 	
+ 	bindtextdomain(PACKAGE, LOCALEDIR);
+ 	bind_textdomain_codeset(PACKAGE, "UTF-8");
+@@ -293,7 +294,10 @@
+ 		conf->autoindent);
+ 	
+ 	gtk_widget_show_all(pub->mw->window);
++	owl_set_window_menu (GTK_WINDOW(pub->mw->window),
++			     GTK_MENU(pub->mw->menubar));
++	
+ 	g_free(conf->fontname);
+ 	g_free(conf);
+ 	
+
+--- tmp/src/Makefile.am.orig	2007-04-23 12:17:54.000000000 +0100
++++ tmp/src/Makefile.am	2007-04-23 12:17:54.000000000 +0100
+@@ -27,4 +27,4 @@
+ 	i18n.h
+ 
+ leafpad_CFLAGS  = $(GTK_CFLAGS) $(GNOMEPRINT_CFLAGS)
+-leafpad_LDADD   = $(GTK_LIBS) $(INTLLIBS) $(GNOMEPRINT_LIBS)
++leafpad_LDADD   = $(GTK_LIBS) $(INTLLIBS) $(GNOMEPRINT_LIBS) -lowl

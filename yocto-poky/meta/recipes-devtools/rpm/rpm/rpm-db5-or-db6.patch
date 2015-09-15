@@ -1,0 +1,162 @@
+Support both db5 and db6.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm/configure.ac
+===================================================================
+--- rpm.orig/configure.ac
++++ rpm/configure.ac
+@@ -547,8 +547,6 @@ else
+     MYPATH=$PATH
+ fi
+ 
+-DBXY=db60
+-
+ AC_PATH_PROG(__BASH, bash, %{_bindir}/bash, $MYPATH)
+ AC_PATH_PROG(__BZIP2, bzip2, %{_bindir}/bzip2, $MYPATH)
+ AC_PATH_PROG(__CAT, cat, /bin/cat, $MYPATH)
+@@ -560,22 +558,6 @@ AC_PATH_PROG(__CMAKE, cmake, %{_bindir}/
+ AC_PATH_PROG(__CPIO, cpio, /bin/cpio, $MYPATH)
+ AC_PATH_PROG(__CURL, curl, %{_bindir}/curl, $MYPATH)
+ AC_PATH_PROG(__CVS, cvs, %{_bindir}/cvs, $MYPATH)
+-AC_PATH_PROG(__DB_ARCHIVE, ${DBXY}_archive, %{_bindir}/${DBXY}_archive, $MYPATH)
+-AC_PATH_PROG(__DB_CHECKPOINT, ${DBXY}_checkpoint, %{_bindir}/${DBXY}_checkpoint, $MYPATH)
+-AC_PATH_PROG(__DB_DEADLOCK, ${DBXY}_deadlock, %{_bindir}/${DBXY}_deadlock, $MYPATH)
+-AC_PATH_PROG(__DB_DUMP, ${DBXY}_dump, %{_bindir}/${DBXY}_dump, $MYPATH)
+-AC_PATH_PROG(__DB_HOTBACKUP, ${DBXY}_hotbackup, %{_bindir}/${DBXY}_hotbackup, $MYPATH)
+-AC_PATH_PROG(__DB_LOAD, ${DBXY}_load, %{_bindir}/${DBXY}_load, $MYPATH)
+-AC_PATH_PROG(__DB_LOG_VERIFY, ${DBXY}_log_verify, %{_bindir}/${DBXY}_log_verify, $MYPATH)
+-AC_PATH_PROG(__DB_PRINTLOG, ${DBXY}_printlog, %{_bindir}/${DBXY}_printlog, $MYPATH)
+-AC_PATH_PROG(__DB_RECOVER, ${DBXY}_recover, %{_bindir}/${DBXY}_recover, $MYPATH)
+-AC_PATH_PROG(__DB_REPLICATE, ${DBXY}_replicate, %{_bindir}/${DBXY}_replicate, $MYPATH)
+-AC_PATH_PROG(__DBSQL, ${DBXY}sql, %{_bindir}/${DBXY}sql, $MYPATH)
+-AC_PATH_PROG(__DB_SQL_CODEGEN, ${DBXY}_sql_codegen, %{_bindir}/${DBXY}_sql_codegen, $MYPATH)
+-AC_PATH_PROG(__DB_STAT, ${DBXY}_stat, %{_bindir}/${DBXY}_stat, $MYPATH)
+-AC_PATH_PROG(__DB_TUNER, ${DBXY}_tuner, %{_bindir}/${DBXY}_tuner, $MYPATH)
+-AC_PATH_PROG(__DB_UPGRADE, ${DBXY}_upgrade, %{_bindir}/${DBXY}_upgrade, $MYPATH)
+-AC_PATH_PROG(__DB_VERIFY, ${DBXY}_verify, %{_bindir}/${DBXY}_verify, $MYPATH)
+ AC_PATH_PROG(__DIFF, diff, /bin/diff, $MYPATH)
+ AC_PATH_PROG(__DITTO, ditto, %{_bindir}/ditto, $MYPATH)
+ AC_PATH_PROG(__FILE, file, %{_bindir}/file, $MYPATH)
+@@ -1604,13 +1586,18 @@ RPM_CHECK_LIB(
+ 
+ dnl # Berkeley-DB & SQLite
+ DBLIBSRCS=""
++DBXY=db
++
+ # XXX won't handle --includedir override
+-CPPFLAGS="${CPPFLAGS} -I${prefix}/include/${DBXY}"
++CPPFLAGS_save="${CPPFLAGS}"
++CPPFLAGS="${CPPFLAGS_save} -I${prefix}/include/db-6.0"
++with_db_save="${with_db}"
+ RPM_CHECK_LIB(
+     [Berkeley-DB], [db],
+     [db-6.0], [db_create], [db.h],
+-    [yes,external], [db3],
++    [yes,external], [db6],
+     [ DBLIBSRCS="$DBLIBSRCS db3.c"
++      DBXY=db60
+       AM_CONDITIONAL(WITH_DB, [ true ])
+       AM_CONDITIONAL(WITH_DB_INTERNAL, [ test ".$RPM_CHECK_LIB_LOCATION" = .internal ])
+       if test ".$RPM_CHECK_LIB_LOCATION" = .internal; then
+@@ -1619,10 +1606,32 @@ RPM_CHECK_LIB(
+           WITH_DB_SUBDIR=""
+       fi
+     ],
+-    [ AM_CONDITIONAL(WITH_DB, [ false ])
+-      AM_CONDITIONAL(WITH_DB_INTERNAL, [ false ])
++    [ # Reset a few variables to fresh
++      with_db="${with_db_save}"
++      CPPFLAGS="${CPPFLAGS_save} -I${prefix}/include/db-5.3"
++      RPM_CHECK_LIB(
++        [Berkeley-DB], [db],
++        [db-5.3], [db_create], [db.h],
++        [yes,external], [db53],
++        [ DBLIBSRCS="$DBLIBSRCS db3.c"
++          DBXY=db53
++          AM_CONDITIONAL(WITH_DB, [ true ])
++          AM_CONDITIONAL(WITH_DB_INTERNAL, [ test ".$RPM_CHECK_LIB_LOCATION" = .internal ])
++          if test ".$RPM_CHECK_LIB_LOCATION" = .internal; then
++              AC_DEFINE(HAVE_DB_H, 1, [Have <db.h> header])
++          else
++              WITH_DB_SUBDIR=""
++          fi
++        ],
++        [ AM_CONDITIONAL(WITH_DB, [ false ])
++          AM_CONDITIONAL(WITH_DB_INTERNAL, [ false ])
++        ])
+     ])
+ 
++if test ".$ac_cv_lib_db_6_0_db_create" != .yes -a ".$ac_cv_lib_db_5_3_db_create" != .yes; then
++    CPPFLAGS="${CPPFLAGS_save}"
++fi
++
+ dnl # Sqlite external
+ RPM_CHECK_LIB(
+     [SQLite], [sqlite],
+@@ -1633,10 +1642,11 @@ RPM_CHECK_LIB(
+ 
+ dnl # Sqlite 3.7.0.1 from db-5.1.19
+ dnl XXX error: `db3' is already registered with AC_CONFIG_SUBDIRS.
++if test ".$ac_cv_lib_db_6_0_db_create" = .yes; then
+ RPM_CHECK_LIB(
+     [Berkeley-DB (+SQLite3)], [dbsql],
+     [db_sql-6.0], [sqlite3_open], [dbsql.h],
+-    [yes,external], [db3/sql],
++    [yes,external], [db6/sql],
+     [
+       AM_CONDITIONAL(WITH_DBSQL, [ true ])
+       AC_DEFINE(WITH_SQLITE, 1, [Define as 1 if building with SQLite library])
+@@ -1650,12 +1660,50 @@ RPM_CHECK_LIB(
+     ], [
+       AM_CONDITIONAL(WITH_DBSQL, [ false ])
+     ])
++elif test ".$ac_cv_lib_db_5_3_db_create" = .yes; then
++RPM_CHECK_LIB(
++    [Berkeley-DB (+SQLite3)], [dbsql],
++    [db_sql-5.3], [sqlite3_open], [dbsql.h],
++    [yes,external], [db53/sql],
++    [
++      AM_CONDITIONAL(WITH_DBSQL, [ true ])
++      AC_DEFINE(WITH_SQLITE, 1, [Define as 1 if building with SQLite library])
++      if test ".$RPM_CHECK_LIB_LOCATION" = .internal; then
++        WITH_DB_CPPFLAGS="${WITH_DB_CPPFLAGS} -I\$(top_srcdir)/db/sql/generated"
++        WITH_DB_LIBS="${WITH_DBSQL_LIBS}"
++        DBLIBSRCS="$DBLIBSRCS sqlite.c"
++      else
++        WITH_DBSQL_SUBDIR=""
++      fi
++    ], [
++      AM_CONDITIONAL(WITH_DBSQL, [ false ])
++    ])
++else
++AM_CONDITIONAL(WITH_DBSQL, [ false ])
++fi
+ 
+ DBLIBOBJS=`echo $DBLIBSRCS | sed -e "s/\.c/\.lo/g"`
+ 
+ AC_SUBST(DBLIBSRCS)
+ AC_SUBST(DBLIBOBJS)
+ 
++AC_PATH_PROG(__DB_ARCHIVE, ${DBXY}_archive, %{_bindir}/${DBXY}_archive, $MYPATH)
++AC_PATH_PROG(__DB_CHECKPOINT, ${DBXY}_checkpoint, %{_bindir}/${DBXY}_checkpoint, $MYPATH)
++AC_PATH_PROG(__DB_DEADLOCK, ${DBXY}_deadlock, %{_bindir}/${DBXY}_deadlock, $MYPATH)
++AC_PATH_PROG(__DB_DUMP, ${DBXY}_dump, %{_bindir}/${DBXY}_dump, $MYPATH)
++AC_PATH_PROG(__DB_HOTBACKUP, ${DBXY}_hotbackup, %{_bindir}/${DBXY}_hotbackup, $MYPATH)
++AC_PATH_PROG(__DB_LOAD, ${DBXY}_load, %{_bindir}/${DBXY}_load, $MYPATH)
++AC_PATH_PROG(__DB_LOG_VERIFY, ${DBXY}_log_verify, %{_bindir}/${DBXY}_log_verify, $MYPATH)
++AC_PATH_PROG(__DB_PRINTLOG, ${DBXY}_printlog, %{_bindir}/${DBXY}_printlog, $MYPATH)
++AC_PATH_PROG(__DB_RECOVER, ${DBXY}_recover, %{_bindir}/${DBXY}_recover, $MYPATH)
++AC_PATH_PROG(__DB_REPLICATE, ${DBXY}_replicate, %{_bindir}/${DBXY}_replicate, $MYPATH)
++AC_PATH_PROG(__DBSQL, ${DBXY}sql, %{_bindir}/${DBXY}sql, $MYPATH)
++AC_PATH_PROG(__DB_SQL_CODEGEN, ${DBXY}_sql_codegen, %{_bindir}/${DBXY}_sql_codegen, $MYPATH)
++AC_PATH_PROG(__DB_STAT, ${DBXY}_stat, %{_bindir}/${DBXY}_stat, $MYPATH)
++AC_PATH_PROG(__DB_TUNER, ${DBXY}_tuner, %{_bindir}/${DBXY}_tuner, $MYPATH)
++AC_PATH_PROG(__DB_UPGRADE, ${DBXY}_upgrade, %{_bindir}/${DBXY}_upgrade, $MYPATH)
++AC_PATH_PROG(__DB_VERIFY, ${DBXY}_verify, %{_bindir}/${DBXY}_verify, $MYPATH)
++
+ AC_ARG_WITH(db-largefile, AS_HELP_STRING([--with-db-largefile], [build Berkeley-DB with LARGEFILE support]))
+ AC_ARG_WITH(db-mutex,     AS_HELP_STRING([--with-db-mutex=ARG], [build Berkeley-DB with MUTEX type ARG]))
+ 

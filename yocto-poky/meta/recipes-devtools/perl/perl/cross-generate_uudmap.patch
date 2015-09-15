@@ -1,0 +1,15 @@
+Upstream-Status:Inappropriate [embedded specific]
+
+Index: perl-5.14.2/Makefile.SH
+===================================================================
+--- perl-5.14.2.orig/Makefile.SH
++++ perl-5.14.2/Makefile.SH
+@@ -622,7 +622,7 @@ bitcount.h: generate_uudmap$(HOST_EXE_EX
+ 	$(RUN) ./generate_uudmap$(HOST_EXE_EXT) uudmap.h bitcount.h
+ 
+ generate_uudmap$(HOST_EXE_EXT): generate_uudmap$(OBJ_EXT)
+-	$(CC) -o generate_uudmap$(EXE_EXT) $(LDFLAGS) generate_uudmap$(OBJ_EXT) $(libs)
++	$(BUILD_CC) -o generate_uudmap$(EXE_EXT) generate_uudmap.c
+ 
+ miniperlmain$(OBJ_EXT): miniperlmain.c patchlevel.h
+ 	$(CCCMD) $(PLDLFLAGS) $*.c

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+./lzotest -mavail -n10 -q /etc/services
+LZOTEST=./lzotest /bin/sh -e "./check.sh" "/etc"
+./align
+./chksum
+./simple
+./testmini

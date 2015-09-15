@@ -1,0 +1,35 @@
+From 4ddaf78dad5a9ee4a0658235f71b75132192123e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 7 Apr 2012 18:52:12 -0700
+Subject: [PATCH] plugin.h: Change visibility to default for debug symbols
+
+gold refuses to link in undefined weak symbols which
+have hidden visibility
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+
+Upstream-Status: Pending
+---
+ include/plugin.h |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/plugin.h b/include/plugin.h
+index 692a4e5..a9361c3 100644
+--- a/include/plugin.h
++++ b/include/plugin.h
+@@ -89,9 +89,9 @@ struct connman_plugin_desc {
+ #else
+ #define CONNMAN_PLUGIN_DEFINE(name, description, version, priority, init, exit) \
+ 		extern struct connman_debug_desc __start___debug[] \
+-				__attribute__ ((weak, visibility("hidden"))); \
++				__attribute__ ((weak, visibility("default"))); \
+ 		extern struct connman_debug_desc __stop___debug[] \
+-				__attribute__ ((weak, visibility("hidden"))); \
++				__attribute__ ((weak, visibility("default"))); \
+ 		extern struct connman_plugin_desc connman_plugin_desc \
+ 				__attribute__ ((visibility("default"))); \
+ 		struct connman_plugin_desc connman_plugin_desc = { \
+-- 
+1.7.5.4
+

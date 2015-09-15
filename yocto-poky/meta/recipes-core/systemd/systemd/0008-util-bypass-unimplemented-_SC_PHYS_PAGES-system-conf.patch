@@ -1,0 +1,46 @@
+From b45ea3bfd6635744c8a6b74d0ac701b44bb1d294 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 20 Feb 2015 05:19:37 +0000
+Subject: [PATCH 08/11] util: bypass unimplemented _SC_PHYS_PAGES system
+ configuration API on uclibc
+
+Upstream-Status: Inappropriate [uclibc-specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/basic/util.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/src/basic/util.c b/src/basic/util.c
+index 72f4665..cbbe3b1 100644
+--- a/src/basic/util.c
++++ b/src/basic/util.c
+@@ -6793,10 +6793,25 @@ uint64_t physical_memory(void) {
+         /* We return this as uint64_t in case we are running as 32bit
+          * process on a 64bit kernel with huge amounts of memory */
+ 
++#ifdef __UCLIBC__
++        char line[128];
++        FILE *f = fopen("/proc/meminfo", "r");
++        if (f == NULL)
++                return 0;
++        while (!feof(f) && fgets(line, sizeof(line)-1, f)) {
++                if (sscanf(line, "MemTotal: %l kB", &mem) == 1) {
++                        mem *= 1024;
++                        break;
++                }
++        }
++        fclose(f);
++        return (uint64_t) mem;
++#else
+         mem = sysconf(_SC_PHYS_PAGES);
+         assert(mem > 0);
+ 
+         return (uint64_t) mem * (uint64_t) page_size();
++#endif
+ }
+ 
+ void hexdump(FILE *f, const void *p, size_t s) {
+-- 
+2.1.4
+

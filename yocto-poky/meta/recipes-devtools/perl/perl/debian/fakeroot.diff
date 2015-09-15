@@ -1,0 +1,42 @@
+From 27ae7b18078d801a2c943aa6de2f7e9808177251 Mon Sep 17 00:00:00 2001
+From: Brendan O'Dea <bod@debian.org>
+Date: Fri, 18 Mar 2005 22:22:25 +1100
+Subject: Postpone LD_LIBRARY_PATH evaluation to the binary targets.
+
+Modify the setting of LD_LIBRARY_PATH to append pre-existing values at the
+time the rule is evaluated rather than when the Makefile is created.
+
+This is required when building packages with dpkg-buildpackage and fakeroot,
+since fakeroot (which now sets LD_LIBRARY_PATH) is not used for the "build"
+rule where the Makefile is created, but is for the clean/binary* targets.
+
+Patch-Name: debian/fakeroot.diff
+---
+ Makefile.SH | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile.SH b/Makefile.SH
+index 034d812..04dd7d5 100755
+--- a/Makefile.SH
++++ b/Makefile.SH
+@@ -39,10 +39,7 @@ case "$useshrplib" in
+ true)
+ 	# Prefix all runs of 'miniperl' and 'perl' with
+ 	# $ldlibpth so that ./perl finds *this* shared libperl.
+-	case "$LD_LIBRARY_PATH" in
+-	'')  ldlibpth="LD_LIBRARY_PATH=` quote "$pwd" `" ;;
+-	*)   ldlibpth="LD_LIBRARY_PATH=` quote "$pwd" `:` quote "$LD_LIBRARY_PATH" `" ;;
+-	esac
++	ldlibpth="LD_LIBRARY_PATH=` quote "$pwd" `"'$${LD_LIBRARY_PATH:+:}$$LD_LIBRARY_PATH'
+ 
+ 	pldlflags="$cccdlflags"
+ 	static_ldflags=''
+@@ -113,7 +110,7 @@ true)
+ 	    ;;
+ 	esac
+ 	case "$ldlibpthname" in
+-	'') ;;
++	''|LD_LIBRARY_PATH) ;;
+ 	*)
+ 	    case "$osname" in
+ 	    os2)

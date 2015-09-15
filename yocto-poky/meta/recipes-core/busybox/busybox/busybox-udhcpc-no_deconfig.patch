@@ -1,0 +1,137 @@
+From 53626cd06a3ef05ed847daea802ef0aa9661caa7 Mon Sep 17 00:00:00 2001
+From: Anders Darander <anders@chargestorm.se>
+Date: Thu, 3 Nov 2011 08:51:31 +0100
+Subject: [PATCH] busybox-udhcpc-no_deconfig.patch
+
+Upstream-Status: Pending
+
+Add a new option -D to the udhcpc client that allows for
+dhcp renewal to occur without having to down the interface
+in the process.
+
+Signed-off-by: Greg Moffatt <greg.moffatt@windriver.com>
+
+Updated to latest Busybox 1.17.3
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Updated to Busybox 1.18.4
+option spec is changed
+
+Signed-off-by: Qing He <qing.he@intel.com>
+
+Updated to Busybox 1.19.3
+
+Signed-off-by: Anders Darander <anders@chargestorm.se>
+
+Fixed options -b, -a and -P.
+
+Signed-off-by: Andreas Oberritter <obi@opendreambox.org>
+---
+ networking/udhcp/dhcpc.c |   29 +++++++++++++++++++++--------
+ 1 files changed, 21 insertions(+), 8 deletions(-)
+
+Index: busybox-1.20.2/networking/udhcp/dhcpc.c
+===================================================================
+--- busybox-1.20.2.orig/networking/udhcp/dhcpc.c
++++ busybox-1.20.2/networking/udhcp/dhcpc.c
+@@ -29,6 +29,9 @@
+ #include <netpacket/packet.h>
+ #include <linux/filter.h>
+ 
++/* option whether to down the interface when reconfiguring */
++static int allow_deconfig = 1;
++
+ /* "struct client_config_t client_config" is in bb_common_bufsiz1 */
+ 
+ 
+@@ -81,8 +84,9 @@ enum {
+ 	OPT_x = 1 << 18,
+ 	OPT_f = 1 << 19,
+ 	OPT_B = 1 << 20,
++	OPT_D = 1 << 21,
+ /* The rest has variable bit positions, need to be clever */
+-	OPTBIT_B = 20,
++	OPTBIT_D = 21,
+ 	USE_FOR_MMU(             OPTBIT_b,)
+ 	IF_FEATURE_UDHCPC_ARPING(OPTBIT_a,)
+ 	IF_FEATURE_UDHCP_PORT(   OPTBIT_P,)
+@@ -1040,7 +1044,8 @@ static void perform_renew(void)
+ 		state = RENEW_REQUESTED;
+ 		break;
+ 	case RENEW_REQUESTED: /* impatient are we? fine, square 1 */
+-		udhcp_run_script(NULL, "deconfig");
++		if (allow_deconfig)
++			udhcp_run_script(NULL, "deconfig");
+ 	case REQUESTING:
+ 	case RELEASED:
+ 		change_listen_mode(LISTEN_RAW);
+@@ -1064,7 +1069,8 @@ static void perform_release(uint32_t ser
+ 		bb_info_msg("Unicasting a release of %s to %s",
+ 				inet_ntoa(temp_addr), buffer);
+ 		send_release(server_addr, requested_ip); /* unicast */
+-		udhcp_run_script(NULL, "deconfig");
++		if (allow_deconfig)
++			udhcp_run_script(NULL, "deconfig");
+ 	}
+ 	bb_info_msg("Entering released state");
+ 
+@@ -1215,7 +1221,7 @@ int udhcpc_main(int argc UNUSED_PARAM, c
+ 	/* O,x: list; -T,-t,-A take numeric param */
+ 	opt_complementary = "O::x::T+:t+:A+" IF_UDHCP_VERBOSE(":vv") ;
+ 	IF_LONG_OPTS(applet_long_options = udhcpc_longopts;)
+-	opt = getopt32(argv, "CV:H:h:F:i:np:qRr:s:T:t:SA:O:ox:fB"
++	opt = getopt32(argv, "CV:H:h:F:i:np:qRr:s:T:t:SA:O:ox:fBD"
+ 		USE_FOR_MMU("b")
+ 		IF_FEATURE_UDHCPC_ARPING("a")
+ 		IF_FEATURE_UDHCP_PORT("P:")
+@@ -1316,6 +1322,9 @@ int udhcpc_main(int argc UNUSED_PARAM, c
+ 		logmode |= LOGMODE_SYSLOG;
+ 	}
+ 
++	if (opt & OPT_D)
++		allow_deconfig = 0;
++
+ 	/* Make sure fd 0,1,2 are open */
+ 	bb_sanitize_stdio();
+ 	/* Equivalent of doing a fflush after every \n */
+@@ -1330,7 +1339,8 @@ int udhcpc_main(int argc UNUSED_PARAM, c
+ 	srand(monotonic_us());
+ 
+ 	state = INIT_SELECTING;
+-	udhcp_run_script(NULL, "deconfig");
++	if (allow_deconfig)
++		udhcp_run_script(NULL, "deconfig");
+ 	change_listen_mode(LISTEN_RAW);
+ 	packet_num = 0;
+ 	timeout = 0;
+@@ -1484,7 +1494,8 @@ int udhcpc_main(int argc UNUSED_PARAM, c
+ 				}
+ 				/* Timed out, enter init state */
+ 				bb_info_msg("Lease lost, entering init state");
+-				udhcp_run_script(NULL, "deconfig");
++				if (allow_deconfig)
++					udhcp_run_script(NULL, "deconfig");
+ 				state = INIT_SELECTING;
+ 				client_config.first_secs = 0; /* make secs field count from 0 */
+ 				/*timeout = 0; - already is */
+@@ -1667,7 +1678,8 @@ int udhcpc_main(int argc UNUSED_PARAM, c
+ 						send_decline(/*xid,*/ server_addr, packet.yiaddr);
+ 
+ 						if (state != REQUESTING)
+-							udhcp_run_script(NULL, "deconfig");
++							if (allow_deconfig)
++								udhcp_run_script(NULL, "deconfig");
+ 						change_listen_mode(LISTEN_RAW);
+ 						state = INIT_SELECTING;
+ 						client_config.first_secs = 0; /* make secs field count from 0 */
+@@ -1711,7 +1723,8 @@ int udhcpc_main(int argc UNUSED_PARAM, c
+ 				bb_info_msg("Received DHCP NAK");
+ 				udhcp_run_script(&packet, "nak");
+ 				if (state != REQUESTING)
+-					udhcp_run_script(NULL, "deconfig");
++					if (allow_deconfig)
++						udhcp_run_script(NULL, "deconfig");
+ 				change_listen_mode(LISTEN_RAW);
+ 				sleep(3); /* avoid excessive network traffic */
+ 				state = INIT_SELECTING;

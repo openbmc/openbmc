@@ -1,0 +1,27 @@
+From b4d258629f090066783c3b4c91b40f63b9d0a296 Mon Sep 17 00:00:00 2001
+From: Paul Gortmaker <paul.gortmaker@windriver.com>
+Date: Sun, 8 Feb 2015 16:51:57 -0500
+Subject: [PATCH] man: decouple manpages from build
+
+The use of "help2man" doesn't work at all for cross compile, in
+addition to the extra requirement of perl it adds.
+
+Just decouple the manpages from the build in order to pave the way for
+importing prebuilt manpages that can be used in a cross build situation.
+
+Upstream-Status: Inappropriate [upstream doesn't care about x-compile case.]
+Signed-off-by: Paul Gortmaker <paul.gortmaker@windriver.com>
+
+diff --git a/Makefile.am b/Makefile.am
+index fb4af27..7576b2c 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -214,5 +214,4 @@ AM_CPPFLAGS = -Ilib -I$(top_srcdir)/lib -Isrc -I$(top_srcdir)/src
+ include $(top_srcdir)/lib/local.mk
+ include $(top_srcdir)/src/local.mk
+ include $(top_srcdir)/doc/local.mk
+-include $(top_srcdir)/man/local.mk
+ include $(top_srcdir)/tests/local.mk
+-- 
+2.2.2
+

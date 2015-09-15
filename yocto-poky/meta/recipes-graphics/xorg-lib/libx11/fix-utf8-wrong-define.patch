@@ -1,0 +1,19 @@
+Upstream-Status: Pending
+
+Signed-off-by: Xiaofeng Yan <xiaofeng.yan@windriver.com>
+
+#
+# Patch managed by http://www.holgerschurig.de/patcher.html
+#
+
+--- libX11-X11R7.0-1.0.0/include/X11/Xlib.h~fix-utf8-wrong-define
++++ libX11-X11R7.0-1.0.0/include/X11/Xlib.h
+@@ -103,7 +103,7 @@
+ 
+ /* API mentioning "UTF8" or "utf8" is an XFree86 extension, introduced in
+    November 2000. Its presence is indicated through the following macro. */
+-#define X_HAVE_UTF8_STRING 1
++#undef X_HAVE_UTF8_STRING
+ 
+ typedef char *XPointer;
+ 

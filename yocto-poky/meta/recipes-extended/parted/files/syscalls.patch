@@ -1,0 +1,55 @@
+Upstream-Status: Pending
+
+---
+ libparted/arch/linux.c |   13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+Index: parted-1.9.0/libparted/arch/linux.c
+===================================================================
+--- parted-1.9.0.orig/libparted/arch/linux.c	2009-07-23 18:52:08.000000000 +0100
++++ parted-1.9.0/libparted/arch/linux.c	2010-02-02 14:14:16.523904768 +0000
+@@ -17,6 +17,8 @@
+ 
+ #define PROC_DEVICES_BUFSIZ 16384
+ 
++#include <linux/version.h>
++
+ #include <config.h>
+ #include <arch/linux.h>
+ 
+@@ -1477,12 +1479,14 @@
+ 
+ #if SIZEOF_OFF_T < 8
+ 
++#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,20)
+ static _syscall5(int,_llseek,
+                  unsigned int, fd,
+                  unsigned long, offset_high,
+                  unsigned long, offset_low,
+                  loff_t*, result,
+                  unsigned int, origin)
++#endif
+ 
+ loff_t
+ llseek (unsigned int fd, loff_t offset, unsigned int whence)
+@@ -1490,11 +1494,20 @@
+         loff_t result;
+         int retval;
+ 
++#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,20)
+         retval = _llseek(fd,
+                          ((unsigned long long)offset) >> 32,
+                          ((unsigned long long)offset) & 0xffffffff,
+                          &result,
+                          whence);
++#else
++ 	retval = syscall(__NR__llseek, fd,
++			 ((unsigned long long)offset) >> 32,
++                         ((unsigned long long)offset) & 0xffffffff,
++                          &result,
++			 whence);
++#endif
++
+         return (retval==-1 ? (loff_t) retval : result);
+ }
+ 

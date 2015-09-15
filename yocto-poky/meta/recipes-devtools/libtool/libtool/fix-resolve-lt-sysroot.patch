@@ -1,0 +1,42 @@
+Upstream-Status: Pending
+
+This patch updates libtool.m4 (and its output) to resolve a problem
+with variable 'lt_sysroot' not being properly updated if the option
+'--with[-libtool]-sysroot' is not provided when running the 'configure'
+script for a package.
+
+I have also reported the problem to libtool here
+
+http://lists.gnu.org/archive/html/bug-libtool/2013-09/msg00005.html
+
+Signed-off-by: Hans Beckerus <hans.beckerus at gmail.com>
+Updated by: Robert Yang <liezhi.yang@windriver.com>
+---
+diff --git a/m4/libtool.m4 b/m4/libtool.m4
+--- a/m4/libtool.m4
++++ b/m4/libtool.m4
+@@ -1225,16 +1225,21 @@ dnl lt_sysroot will always be passed unquoted.  We quote it here
+ dnl in case the user passed a directory name.
+ lt_sysroot=
+ case $with_libtool_sysroot in #(
+- yes)
++ no)
+    if test yes = "$GCC"; then
+      lt_sysroot=`$CC --print-sysroot 2>/dev/null`
++     # Treat "/" the same a an unset sysroot. It seems to be more
++     # compatible across host platforms that way!?
++     if test "$lt_sysroot" = /; then
++       lt_sysroot=
++     fi
+    fi
+    ;; #(
++ yes|''|/)
++   ;; #(
+  /*)
+    lt_sysroot=`echo "$with_libtool_sysroot" | sed -e "$sed_quote_subst"`
+    ;; #(
+- no|'')
+-   ;; #(
+  *)
+    AC_MSG_RESULT([$with_libtool_sysroot])
+    AC_MSG_ERROR([The sysroot must be an absolute path.])

@@ -1,0 +1,158 @@
+Sadly, smart is not deterministic so the same build can go down multiple different
+pathways. We'd expect to see the same warnings however depending on the pathway
+taken, it may or may not warn, particularly with Recommends since they're optional.
+
+For example, where a Recommended package is available but has Conflicts, we'd expect
+to see an warning that we couldn't install it. Some code paths silently hide this
+(its a LOCKED_CONFLICT). We add printing of warnings for this case.
+
+Also, if there are two compatible feeds available (e.g. i586 and core2_32), this 
+changes the code path from direct _install() to _pending() since there are multiple
+providers. This patch adds warning handling to _pending() so we don't hit hard 
+failures there. This is as seen with the mysterious libspeexdsp failures for x86-lsb
+on the autobuilder.
+
+Upstream-Status: Pending
+RP
+2015/7/16
+
+Index: git/smart/transaction.py
+===================================================================
+--- git.orig/smart/transaction.py
++++ git/smart/transaction.py
+@@ -651,13 +651,14 @@ class Transaction(object):
+ 
+             if not prvpkgs:
+                 # No packages provide it at all. Give up.
++
++                reasons = []
++                for prv in req.providedby:
++                    for prvpkg in prv.packages:
++                        lockedres = lockedpkgs.get(prvpkg, None)
++                        if lockedres:
++                            reasons.append(lock_reason(prvpkg, lockedres))
+                 if reqrequired:
+-                    reasons = []
+-                    for prv in req.providedby:
+-                        for prvpkg in prv.packages:
+-                            lockedres = lockedpkgs.get(prvpkg, None)
+-                            if lockedres:
+-                                reasons.append(lock_reason(prvpkg, lockedres))
+                     if reasons:
+                         raise Failed, _("Can't install %s: unable to install provider for %s:\n    %s") % \
+                                 (pkg, req, '\n    '.join(reasons))
+@@ -665,7 +666,11 @@ class Transaction(object):
+                         raise Failed, _("Can't install %s: no package provides %s") % \
+                                 (pkg, req)
+                 else:
++                    if reasons:
++                        iface.warning(_("Can't install %s: unable to install provider for %s:\n    %s") % \
++                                (pkg, req, '\n    '.join(reasons)))
++
+                     # It's only a recommend, skip
+                     continue
+ 
+             if len(prvpkgs) == 1:
+@@ -846,6 +852,14 @@ class Transaction(object):
+         isinst = changeset.installed
+         getweight = self._policy.getWeight
+ 
++        attempt = sysconf.has("attempt-install", soft=True)
++
++        def handle_failure(msg):
++            if attempt:
++                iface.warning(msg)
++            else:
++                raise Failed, msg
++
+         updown = []
+         while pending:
+             item = pending.pop(0)
+@@ -870,8 +884,9 @@ class Transaction(object):
+ 
+                 if not prvpkgs:
+                     # No packages provide it at all. Give up.
+-                    raise Failed, _("Can't install %s: no package "
+-                                    "provides %s") % (pkg, req)
++                    handle_failure(_("Can't install %s: no package "
++                                    "provides %s") % (pkg, req))
++                    continue
+ 
+                 if len(prvpkgs) > 1:
+                     # More than one package provide it. We use _pending here,
+@@ -894,9 +909,10 @@ class Transaction(object):
+                                                  keeporder, cs, lk))
+                             keeporder += 0.000001
+                     if not alternatives:
+-                        raise Failed, _("Can't install %s: all packages "
++                        handle_failure(_("Can't install %s: all packages "
+                                         "providing %s failed to install:\n%s")\
+-                                      % (pkg, req,  "\n".join(failures))
++                                      % (pkg, req,  "\n".join(failures)))
++                        continue
+                     alternatives.sort()
+                     changeset.setState(alternatives[0][1])
+                     if len(alternatives) == 1:
+@@ -954,18 +970,20 @@ class Transaction(object):
+ 
+                     for reqpkg in reqpkgs:
+                         if reqpkg in locked and isinst(reqpkg):
+-                            raise Failed, _("Can't remove %s: requiring "
++                            handle_failure(_("Can't remove %s: requiring "
+                                             "package %s is locked") % \
+-                                          (pkg, reqpkg)
++                                          (pkg, reqpkg))
++                            continue
+                     for reqpkg in reqpkgs:
+                         # We check again, since other actions may have
+                         # changed their state.
+                         if not isinst(reqpkg):
+                             continue
+                         if reqpkg in locked:
+-                            raise Failed, _("Can't remove %s: requiring "
++                            handle_failure(_("Can't remove %s: requiring "
+                                             "package %s is locked") % \
+-                                          (pkg, reqpkg)
++                                          (pkg, reqpkg))
++                            continue
+                         self._remove(reqpkg, changeset, locked,
+                                      pending, depth)
+                     continue
+@@ -978,12 +996,14 @@ class Transaction(object):
+                 try:
+                     for reqpkg in reqpkgs:
+                         if reqpkg in locked and isinst(reqpkg):
+-                            raise Failed, _("%s is locked") % reqpkg
++                            handle_failure(_("%s is locked") % reqpkg)
++                            continue
+                     for reqpkg in reqpkgs:
+                         if not cs.installed(reqpkg):
+                             continue
+                         if reqpkg in lk:
+-                            raise Failed, _("%s is locked") % reqpkg
++                            handle_failure(_("%s is locked") % reqpkg)
++                            continue
+                         self._remove(reqpkg, cs, lk, None, depth)
+                 except Failed, e:
+                     failures.append(unicode(e))
+@@ -991,9 +1011,10 @@ class Transaction(object):
+                     alternatives.append((getweight(cs), cs, lk))
+ 
+                 if not alternatives:
+-                    raise Failed, _("Can't install %s: all packages providing "
++                    handle_failure(_("Can't install %s: all packages providing "
+                                     "%s failed to install:\n%s") \
+-                                  % (pkg, prv,  "\n".join(failures))
++                                  % (pkg, prv,  "\n".join(failures)))
++                    continue
+ 
+                 alternatives.sort()
+                 changeset.setState(alternatives[0][1])
+@@ -1246,6 +1267,7 @@ class Transaction(object):
+                             changeset.setRequested(pkg, True)
+                     except Failed, e:
+                         if sysconf.has("attempt-install", soft=True):
++                            iface.warning(_("Can't install %s: %s") % (pkg, str(e)))
+                             if pkg in changeset:
+                                 del changeset[pkg]
+                             continue

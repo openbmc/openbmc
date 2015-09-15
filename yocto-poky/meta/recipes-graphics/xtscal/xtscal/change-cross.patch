@@ -1,0 +1,18 @@
+Upstream-Status: Pending
+
+--- tmp/main.c.orig	2007-01-02 15:39:54.000000000 +0000
++++ tmp/main.c	2007-01-02 15:39:54.000000000 +0000
+@@ -131,9 +131,10 @@
+ {
+   XRenderFillRectangles (dpy, PictOpSrc, pict, &rect_color, rectangles, 2);
+ 
+-  XFillArc (dpy, crosshair_w, crosshair_gc, (CROSSHAIR_SIZE / 2) - (WIDTH / 2) - 1, 
+-	    (CROSSHAIR_SIZE / 2) - (WIDTH / 2) - 1,
+-	    WIDTH + 1, WIDTH + 1, 0, 360 * 64);
++  XFillRectangle (dpy, crosshair_w, crosshair_gc,
++		  (CROSSHAIR_SIZE / 2) - (WIDTH / 2),
++		  (CROSSHAIR_SIZE / 2) - (WIDTH / 2),
++		  WIDTH, WIDTH);
+ }
+ 
+ void

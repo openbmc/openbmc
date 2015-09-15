@@ -1,0 +1,15 @@
+Disable the desktop preferences launcher as we don't use the pcmanfm desktop in
+Sato.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/data/pcmanfm-desktop-pref.desktop b/data/pcmanfm-desktop-pref.desktop
+index ccf8abb..3f6fc1c 100644
+--- a/data/pcmanfm-desktop-pref.desktop.in
++++ b/data/pcmanfm-desktop-pref.desktop.in
+@@ -7,3 +7,4 @@ Exec=pcmanfm --desktop-pref
+ StartupNotify=true
+ Terminal=false
+ NotShowIn=GNOME;XFCE;KDE;
++NoDisplay=true

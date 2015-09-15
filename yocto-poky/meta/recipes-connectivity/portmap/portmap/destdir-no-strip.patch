@@ -1,0 +1,46 @@
+Upstream-Status: Backport
+
+From: Mike Frysinger <vapier@gentoo.org>
+Date: Sun, 13 May 2007 21:15:12 +0000 (-0400)
+Subject: respect DESTDIR and dont use -s with install
+X-Git-Url: http://neil.brown.name/git?p=portmap;a=commitdiff_plain;h=603c59b978c04df2354f68d4a2dc676a758ff46d
+
+respect DESTDIR and dont use -s with install
+
+$(DESTDIR) is the standard for installing into other trees, not $(BASEDIR) ...
+so I've converted the Makefile to use that.  I've also left in $(BASEDIR) as a
+default to support old installs; not sure if you'd just cut it.
+
+Stripping should be left to the person to handle, not automatically done by
+the install step.  Also, `install -s` always calls `strip` which is
+wrong/undesired in cross-compiling scenarios.
+
+Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+Signed-off-by: Neil Brown <neilb@suse.de>
+---
+
+diff --git a/Makefile b/Makefile
+index 9e9a4b4..5343428 100644
+--- a/Makefile
++++ b/Makefile
+@@ -135,13 +135,14 @@ from_local: CPPFLAGS += -DTEST
+ portmap.man : portmap.8
+ 	sed $(MAN_SED) < portmap.8 > portmap.man
+ 
++DESTDIR = $(BASEDIR)
+ install: all
+-	install -o root -g root -m 0755 -s portmap ${BASEDIR}/sbin
+-	install -o root -g root -m 0755 -s pmap_dump ${BASEDIR}/sbin
+-	install -o root -g root -m 0755 -s pmap_set ${BASEDIR}/sbin
+-	install -o root -g root -m 0644 portmap.man ${BASEDIR}/usr/share/man/man8/portmap.8
+-	install -o root -g root -m 0644 pmap_dump.8 ${BASEDIR}/usr/share/man/man8
+-	install -o root -g root -m 0644 pmap_set.8 ${BASEDIR}/usr/share/man/man8
++	install -o root -g root -m 0755 portmap $(DESTDIR)/sbin
++	install -o root -g root -m 0755 pmap_dump $(DESTDIR)/sbin
++	install -o root -g root -m 0755 pmap_set $(DESTDIR)/sbin
++	install -o root -g root -m 0644 portmap.man $(DESTDIR)/usr/share/man/man8/portmap.8
++	install -o root -g root -m 0644 pmap_dump.8 $(DESTDIR)/usr/share/man/man8
++	install -o root -g root -m 0644 pmap_set.8 $(DESTDIR)/usr/share/man/man8
+ 
+ clean:
+ 	rm -f *.o portmap pmap_dump pmap_set from_local \

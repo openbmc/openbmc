@@ -1,0 +1,22 @@
+Upstream-Status: Backport [from debian: bugs.debian.org/439843]
+
+---
+ libxml.h |    3 +++
+ 1 file changed, 3 insertions(+)
+
+--- libxml2-2.6.29.orig/libxml.h
++++ libxml2-2.6.29/libxml.h
+@@ -11,10 +11,13 @@
+ 
+ #ifndef NO_LARGEFILE_SOURCE
+ #ifndef _LARGEFILE_SOURCE
+ #define _LARGEFILE_SOURCE
+ #endif
++#ifndef _LARGEFILE64_SOURCE
++#define _LARGEFILE64_SOURCE
++#endif
+ #ifndef _FILE_OFFSET_BITS
+ #define _FILE_OFFSET_BITS 64
+ #endif
+ #endif
+ 

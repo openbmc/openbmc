@@ -1,0 +1,5 @@
+#!/bin/sh
+
+./testing/run_test.sh ./testing/case*.pat |sed \
+  -e 's|** ok|PASS|' \
+  -e 's|?? fail|FAIL|'

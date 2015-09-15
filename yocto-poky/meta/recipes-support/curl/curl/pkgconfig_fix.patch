@@ -1,0 +1,32 @@
+Upstream-Status: Inappropriate [packaging]
+
+diff -Nurd curl-7.29.0/configure.ac curl-7.29.0/configure.ac
+--- curl-7.29.0/configure.ac	2013-02-06 11:47:19.000000000 +0200
++++ curl-7.29.0/configure.ac	2013-02-16 12:32:22.132327764 +0200
+@@ -1883,6 +1883,7 @@
+        AC_SUBST(USE_GNUTLS, [1])
+        GNUTLS_ENABLED=1
+        USE_GNUTLS="yes"
++       GNUTLS_REQUIRED="gnutls"
+        curl_ssl_msg="enabled (GnuTLS)"
+        ],
+        [
+@@ -1953,6 +1954,8 @@
+    ])
+ fi
+ 
++AC_SUBST(GNUTLS_REQUIRED)
++
+ dnl ----------------------------------------------------
+ dnl check for PolarSSL
+ dnl ----------------------------------------------------
+diff -Nurd curl-7.29.0/libcurl.pc.in curl-7.29.0/libcurl.pc.in
+--- curl-7.29.0/libcurl.pc.in	2012-12-12 00:32:22.000000000 +0200
++++ curl-7.29.0/libcurl.pc.in	2013-02-16 12:33:27.063844337 +0200
+@@ -35,5 +35,5 @@
+ Description: Library to transfer files with ftp, http, etc.
+ Version: @CURLVERSION@
+ Libs: -L${libdir} -lcurl
+-Libs.private: @LIBCURL_LIBS@
++Libs.private: -ldl -lz
+ Cflags: -I${includedir} @CPPFLAG_CURL_STATICLIB@

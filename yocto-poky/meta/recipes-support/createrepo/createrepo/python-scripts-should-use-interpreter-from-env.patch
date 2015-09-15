@@ -1,0 +1,47 @@
+Author: Andrei Gherzan <andrei@gherzan.ro>
+
+Python interpreter should be use from PATH - native python - and not the one from
+host.
+
+Upstream-Status: Inappropriate [configuration]
+
+Index: createrepo-0.4.11/genpkgmetadata.py
+===================================================================
+--- createrepo-0.4.11.orig/genpkgmetadata.py	2012-04-10 17:14:05.278649384 +0300
++++ createrepo-0.4.11/genpkgmetadata.py	2012-04-10 17:14:22.290648886 +0300
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python -t
++#! /usr/bin/env python
+ # primary functions and glue for generating the repository metadata
+ #
+ 
+Index: createrepo-0.4.11/modifyrepo.py
+===================================================================
+--- createrepo-0.4.11.orig/modifyrepo.py	2012-04-10 17:14:09.106649272 +0300
++++ createrepo-0.4.11/modifyrepo.py	2012-04-10 17:14:27.818648725 +0300
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#! /usr/bin/env python
+ # $Id$
+ #
+ # This tools is used to insert arbitrary metadata into an RPM repository.
+Index: createrepo-0.4.11/dumpMetadata.py
+===================================================================
+--- createrepo-0.4.11.orig/dumpMetadata.py	2012-04-10 17:19:23.874640068 +0300
++++ createrepo-0.4.11/dumpMetadata.py	2012-04-10 17:19:34.502639756 +0300
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python -t
++#! /usr/bin/env python
+ # base classes and functions for dumping out package Metadata
+ #
+ # This program is free software; you can redistribute it and/or modify
+Index: createrepo-0.4.11/readMetadata.py
+===================================================================
+--- createrepo-0.4.11.orig/readMetadata.py	2012-04-10 17:19:19.626640193 +0300
++++ createrepo-0.4.11/readMetadata.py	2012-04-10 17:19:40.198639590 +0300
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python -t
++#! /usr/bin/env python
+ 
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by

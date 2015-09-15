@@ -1,0 +1,12 @@
+Upstream-Status: Pending
+
+--- console-tools-0.3.2/kbdtools/showkey.c~compile	1999-08-25 17:20:08.000000000 -0400
++++ console-tools-0.3.2/kbdtools/showkey.c	2004-05-09 03:03:23.000000000 -0400
+@@ -264,7 +264,6 @@
+ 	  break;
+ 	case cmd_keymap:
+ 	  printf(")\n");
+-	default:
+ 	}
+     }
+ 

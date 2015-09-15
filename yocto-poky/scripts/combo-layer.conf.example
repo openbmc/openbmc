@@ -1,0 +1,93 @@
+# combo-layer example configuration file
+
+# Default values for all sections.
+[DEFAULT]
+
+# Add 'Signed-off-by' to all commits that get imported automatically.
+signoff = True
+
+# component name
+[bitbake]
+
+# Override signedoff default above (not very useful, but possible).
+signoff = False
+
+# mandatory options
+# git upstream uri
+src_uri = git://git.openembedded.org/bitbake
+
+# the directory to clone the component repo
+local_repo_dir = /home/kyu3/src/test/bitbake
+
+# the relative dir within the combo repo to put the component files
+# use "." if the files should be in the root dir
+dest_dir = bitbake
+
+# the last update revision.
+# "init" will set this to the latest revision automatically, however if it
+# is empty when "update" is run, the tool will start from the first commit.
+# Note that this value will get updated by "update" if the component repo's
+# latest revision changed and the operation completes successfully.
+last_revision =
+
+# optional options:
+
+# branch: specify the branch in the component repo to pull from
+# (master if not specified)
+
+# file_filter: only include the specified file(s)
+# file_filter = [path] [path] ...
+# example:
+#   file_filter = src/  : only include the subdir src
+#   file_filter = src/*.c : only include the src *.c file
+#   file_filter = src/main.c src/Makefile.am : only include these two files
+
+# file_exclude: filter out these file(s)
+# file_exclude = [path] [path] ...
+#
+# Each entry must match a file name. In contrast do file_filter, matching
+# a directory has no effect. To achieve that, use append a * wildcard
+# at the end.
+#
+# Wildcards are applied to the complete path and also match slashes.
+#
+# example:
+#   file_exclude = src/foobar/*  : exclude everything under src/foobar
+#   file_exclude = src/main.c : filter out main.c after including it with file_filter = src/*.c
+#   file_exclude = *~ : exclude backup files
+
+# hook: if provided, the tool will call the hook to process the generated
+#     patch from upstream, and then apply the modified patch to the combo
+#     repo.
+# the hook script is called as follows: ./hook patchpath revision reponame
+# example:
+#     hook = combo-layer-hook-default.sh
+
+# since_revision:
+#   since_revision = release-1-2
+#   since_revision = 12345 abcdf
+#
+# If provided, truncate imported history during "combo-layer --history
+# init" at the specified revision(s).  More than one can be specified
+# to cut off multiple component branches.
+#
+# The specified commits themselves do not get imported. Instead, an
+# artificial commit with "unknown" author is created with a content
+# that matches the original commit.
+
+[oe-core]
+src_uri = git://git.openembedded.org/openembedded-core
+local_repo_dir = /home/kyu3/src/test/oecore
+dest_dir = .
+last_revision =
+since_revision = some-tag-or-commit-on-master-branch
+
+# It is also possible to embed python code in the config values. Similar
+# to bitbake it considers every value starting with @ to be a python
+# script.
+# e.g. local_repo_dir could easily be configured using an environment
+# variable:
+#
+# [bitbake]
+# local_repo_dir = @os.getenv("LOCAL_REPO_DIR") + "/bitbake"
+#

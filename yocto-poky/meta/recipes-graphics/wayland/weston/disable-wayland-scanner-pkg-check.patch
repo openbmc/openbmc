@@ -1,0 +1,17 @@
+Index: git/configure.ac
+===================================================================
+--- git.orig/configure.ac
++++ git/configure.ac
+@@ -501,12 +501,6 @@ if test "x$have_lcms" = xyes; then
+ fi
+ AM_CONDITIONAL(HAVE_LCMS, [test "x$have_lcms" = xyes])
+ 
+-AC_PATH_PROG([wayland_scanner], [wayland-scanner])
+-if test x$wayland_scanner = x; then
+-	PKG_CHECK_MODULES(WAYLAND_SCANNER, [wayland-scanner])
+-	wayland_scanner=`$PKG_CONFIG --variable=wayland_scanner wayland-scanner`
+-fi
+-
+ AC_CONFIG_FILES([Makefile src/version.h src/weston.pc])
+ 
+ AM_CONDITIONAL([HAVE_GIT_REPO], [test -f $srcdir/.git/logs/HEAD])

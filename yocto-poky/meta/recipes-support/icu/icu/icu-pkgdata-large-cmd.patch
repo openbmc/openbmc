@@ -1,0 +1,29 @@
+pkgdata.cpp: use LARGE_BUFFER_MAX_SIZE for cmd
+
+Use LARGE_BUFFER_MAX_SIZE for cmd rather than SMALL_BUFFER_MAX_SIZE,
+otherwise there was a Segmentation fault error when the command line is
+long, this should be a misplay since other cmd uses
+LARGE_BUFFER_MAX_SIZE.
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ tools/pkgdata/pkgdata.cpp |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/pkgdata/pkgdata.cpp b/tools/pkgdata/pkgdata.cpp
+--- a/tools/pkgdata/pkgdata.cpp
++++ b/tools/pkgdata/pkgdata.cpp
+@@ -1019,7 +1019,7 @@ normal_symlink_mode:
+ 
+ static int32_t pkg_installLibrary(const char *installDir, const char *targetDir, UBool noVersion) {
+     int32_t result = 0;
+-    char cmd[SMALL_BUFFER_MAX_SIZE];
++    char cmd[LARGE_BUFFER_MAX_SIZE];
+ 
+     sprintf(cmd, "cd %s && %s %s %s%s%s",
+             targetDir,
+-- 
+1.7.10.4
+

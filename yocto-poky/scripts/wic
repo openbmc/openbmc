@@ -1,0 +1,323 @@
+#!/usr/bin/env python
+# ex:ts=4:sw=4:sts=4:et
+# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
+#
+# Copyright (c) 2013, Intel Corporation.
+# All rights reserved.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#
+# DESCRIPTION 'wic' is the OpenEmbedded Image Creator that users can
+# use to generate bootable images.  Invoking it without any arguments
+# will display help screens for the 'wic' command and list the
+# available 'wic' subcommands.  Invoking a subcommand without any
+# arguments will likewise display help screens for the specified
+# subcommand.  Please use that interface for detailed help.
+#
+# AUTHORS
+# Tom Zanussi <tom.zanussi (at] linux.intel.com>
+#
+
+__version__ = "0.2.0"
+
+# Python Standard Library modules
+import os
+import sys
+import optparse
+import logging
+from distutils import spawn
+
+# External modules
+scripts_path = os.path.abspath(os.path.dirname(__file__))
+lib_path = scripts_path + '/lib'
+sys.path.append(lib_path)
+
+bitbake_exe = spawn.find_executable('bitbake')
+if bitbake_exe:
+    bitbake_path = os.path.join(os.path.dirname(bitbake_exe), '../lib')
+    sys.path.append(bitbake_path)
+    from bb import cookerdata
+    from bb.main import bitbake_main, BitBakeConfigParameters
+else:
+    bitbake_main = None
+
+from wic.utils.oe.misc import get_bitbake_var, BB_VARS
+from wic.utils.errors import WicError
+from wic import engine
+from wic import help as hlp
+
+def rootfs_dir_to_args(krootfs_dir):
+    """
+    Get a rootfs_dir dict and serialize to string
+    """
+    rootfs_dir = ''
+    for key, val in krootfs_dir.items():
+        rootfs_dir += ' '
+        rootfs_dir += '='.join([key, val])
+    return rootfs_dir.strip()
+
+def callback_rootfs_dir(option, opt, value, parser):
+    """
+    Build a dict using --rootfs_dir connection=dir
+    """
+    if not type(parser.values.rootfs_dir) is dict:
+        parser.values.rootfs_dir = dict()
+
+    if '=' in value:
+        (key, rootfs_dir) = value.split('=')
+    else:
+        key = 'ROOTFS_DIR'
+        rootfs_dir = value
+
+    parser.values.rootfs_dir[key] = rootfs_dir
+
+def wic_create_subcommand(args, usage_str):
+    """
+    Command-line handling for image creation.  The real work is done
+    by image.engine.wic_create()
+    """
+    parser = optparse.OptionParser(usage=usage_str)
+
+    parser.add_option("-o", "--outdir", dest="outdir",
+                      help="name of directory to create image in")
+    parser.add_option("-e", "--image-name", dest="image_name",
+                      help="name of the image to use the artifacts from "
+                           "e.g. core-image-sato")
+    parser.add_option("-r", "--rootfs-dir", dest="rootfs_dir", type="string",
+                      action="callback", callback=callback_rootfs_dir,
+                      help="path to the /rootfs dir to use as the "
+                           ".wks rootfs source")
+    parser.add_option("-b", "--bootimg-dir", dest="bootimg_dir",
+                      help="path to the dir containing the boot artifacts "
+                           "(e.g. /EFI or /syslinux dirs) to use as the "
+                           ".wks bootimg source")
+    parser.add_option("-k", "--kernel-dir", dest="kernel_dir",
+                      help="path to the dir containing the kernel to use "
+                           "in the .wks bootimg")
+    parser.add_option("-n", "--native-sysroot", dest="native_sysroot",
+                      help="path to the native sysroot containing the tools "
+                           "to use to build the image")
+    parser.add_option("-p", "--skip-build-check", dest="build_check",
+                      action="store_false", default=True, help="skip the build check")
+    parser.add_option("-f", "--build-rootfs", action="store_true", help="build rootfs")
+    parser.add_option("-c", "--compress-with", choices=("gzip", "bzip2", "xz"),
+                      dest='compressor',
+                      help="compress image with specified compressor")
+    parser.add_option("-v", "--vars", dest='vars_dir',
+                      help="directory with <image>.env files that store "
+                           "bitbake variables")
+    parser.add_option("-D", "--debug", dest="debug", action="store_true",
+                      default=False, help="output debug information")
+
+    (options, args) = parser.parse_args(args)
+
+    if len(args) != 1:
+        logging.error("Wrong number of arguments, exiting\n")
+        parser.print_help()
+        sys.exit(1)
+
+    if options.build_rootfs and not bitbake_main:
+        logging.error("Can't build roofs as bitbake is not in the $PATH")
+        sys.exit(1)
+
+    if not options.image_name:
+        missed = []
+        for val, opt in [(options.rootfs_dir, 'rootfs-dir'),
+                         (options.bootimg_dir, 'bootimg-dir'),
+                         (options.kernel_dir, 'kernel-dir'),
+                         (options.native_sysroot, 'native-sysroot')]:
+            if not val:
+                missed.append(opt)
+        if missed:
+            print "The following build artifacts are not specified:"
+            print "  " + ", ".join(missed)
+            sys.exit(1)
+
+    if options.image_name:
+        BB_VARS.default_image = options.image_name
+    else:
+        options.build_check = False
+
+    if options.vars_dir:
+        BB_VARS.vars_dir = options.vars_dir
+
+    if options.build_check:
+        print "Checking basic build environment..."
+        if not engine.verify_build_env():
+            print "Couldn't verify build environment, exiting\n"
+            sys.exit(1)
+        else:
+            print "Done.\n"
+
+    bootimg_dir = ""
+
+    if options.image_name:
+        if options.build_rootfs:
+            argv = ["bitbake", options.image_name]
+            if options.debug:
+                argv.append("--debug")
+
+            print "Building rootfs...\n"
+            if bitbake_main(BitBakeConfigParameters(argv),
+                            cookerdata.CookerConfiguration()):
+                sys.exit(1)
+
+        rootfs_dir = get_bitbake_var("IMAGE_ROOTFS", options.image_name)
+        kernel_dir = get_bitbake_var("DEPLOY_DIR_IMAGE", options.image_name)
+        native_sysroot = get_bitbake_var("STAGING_DIR_NATIVE",
+                                         options.image_name)
+    else:
+        if options.build_rootfs:
+            print "Image name is not specified, exiting. (Use -e/--image-name to specify it)\n"
+            sys.exit(1)
+
+    wks_file = args[0]
+
+    if not wks_file.endswith(".wks"):
+        wks_file = engine.find_canned_image(scripts_path, wks_file)
+        if not wks_file:
+            print "No image named %s found, exiting.  (Use 'wic list images' "\
+                  "to list available images, or specify a fully-qualified OE "\
+                  "kickstart (.wks) filename)\n" % args[0]
+            sys.exit(1)
+
+    image_output_dir = ""
+    if options.outdir:
+        image_output_dir = options.outdir
+
+    if not options.image_name:
+        rootfs_dir = ''
+        if 'ROOTFS_DIR' in options.rootfs_dir:
+            rootfs_dir = options.rootfs_dir['ROOTFS_DIR']
+        bootimg_dir = options.bootimg_dir
+        kernel_dir = options.kernel_dir
+        native_sysroot = options.native_sysroot
+        if rootfs_dir and not os.path.isdir(rootfs_dir):
+            print "--roofs-dir (-r) not found, exiting\n"
+            sys.exit(1)
+        if not os.path.isdir(bootimg_dir):
+            print "--bootimg-dir (-b) not found, exiting\n"
+            sys.exit(1)
+        if not os.path.isdir(kernel_dir):
+            print "--kernel-dir (-k) not found, exiting\n"
+            sys.exit(1)
+        if not os.path.isdir(native_sysroot):
+            print "--native-sysroot (-n) not found, exiting\n"
+            sys.exit(1)
+    else:
+        not_found = not_found_dir = ""
+        if not os.path.isdir(rootfs_dir):
+            (not_found, not_found_dir) = ("rootfs-dir", rootfs_dir)
+        elif not os.path.isdir(kernel_dir):
+            (not_found, not_found_dir) = ("kernel-dir", kernel_dir)
+        elif not os.path.isdir(native_sysroot):
+            (not_found, not_found_dir) = ("native-sysroot", native_sysroot)
+        if not_found:
+            if not not_found_dir:
+                not_found_dir = "Completely missing artifact - wrong image (.wks) used?"
+            print "Build artifacts not found, exiting."
+            print "  (Please check that the build artifacts for the machine"
+            print "   selected in local.conf actually exist and that they"
+            print "   are the correct artifacts for the image (.wks file)).\n"
+            print "The artifact that couldn't be found was %s:\n  %s" % \
+                (not_found, not_found_dir)
+            sys.exit(1)
+
+    krootfs_dir = options.rootfs_dir
+    if krootfs_dir is None:
+        krootfs_dir = {}
+        krootfs_dir['ROOTFS_DIR'] = rootfs_dir
+
+    rootfs_dir = rootfs_dir_to_args(krootfs_dir)
+
+    print "Creating image(s)...\n"
+    engine.wic_create(wks_file, rootfs_dir, bootimg_dir, kernel_dir,
+                      native_sysroot, scripts_path, image_output_dir,
+                      options.compressor, options.debug)
+
+
+def wic_list_subcommand(args, usage_str):
+    """
+    Command-line handling for listing available images.
+    The real work is done by image.engine.wic_list()
+    """
+    parser = optparse.OptionParser(usage=usage_str)
+    args = parser.parse_args(args)[1]
+
+    if not engine.wic_list(args, scripts_path):
+        logging.error("Bad list arguments, exiting\n")
+        parser.print_help()
+        sys.exit(1)
+
+
+def wic_help_topic_subcommand(args, usage_str):
+    """
+    Command-line handling for help-only 'subcommands'.  This is
+    essentially a dummy command that doesn nothing but allow users to
+    use the existing subcommand infrastructure to display help on a
+    particular topic not attached to any particular subcommand.
+    """
+    pass
+
+
+wic_help_topic_usage = """
+"""
+
+subcommands = {
+    "create":    [wic_create_subcommand,
+                  hlp.wic_create_usage,
+                  hlp.wic_create_help],
+    "list":      [wic_list_subcommand,
+                  hlp.wic_list_usage,
+                  hlp.wic_list_help],
+    "plugins":   [wic_help_topic_subcommand,
+                  wic_help_topic_usage,
+                  hlp.get_wic_plugins_help],
+    "overview":  [wic_help_topic_subcommand,
+                  wic_help_topic_usage,
+                  hlp.wic_overview_help],
+    "kickstart": [wic_help_topic_subcommand,
+                  wic_help_topic_usage,
+                  hlp.wic_kickstart_help],
+}
+
+
+def start_logging(loglevel):
+    logging.basicConfig(filname='wic.log', filemode='w', level=loglevel)
+
+
+def main(argv):
+    parser = optparse.OptionParser(version="wic version %s" % __version__,
+                                   usage=hlp.wic_usage)
+
+    parser.disable_interspersed_args()
+
+    args = parser.parse_args(argv)[1]
+
+    if len(args):
+        if args[0] == "help":
+            if len(args) == 1:
+                parser.print_help()
+                sys.exit(1)
+
+    return hlp.invoke_subcommand(args, parser, hlp.wic_help_usage, subcommands)
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main(sys.argv[1:]))
+    except WicError as err:
+        print >> sys.stderr, "ERROR:", err
+        sys.exit(1)
+

@@ -1,0 +1,11 @@
+2012/03/30 - Mark Hatle <mark.hatle@windriver.com>
+ - Initial Revision
+
+Both big endian and little endian are defined for SH.
+
+Experimental -- SH tunings have not been validated.
+
+The TUNE_ARCH is defined as ${TUNE_ARCH_tune-${DEFAULTTUNE}}.
+
+The TUNE_PKGARCH is defind as ${TUNE_PKGARCH_tune-${DEFAULTTUNE}}.
+

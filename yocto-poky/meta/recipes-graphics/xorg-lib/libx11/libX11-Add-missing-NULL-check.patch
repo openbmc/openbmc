@@ -1,0 +1,72 @@
+From 4d85d5f3bd8afac893738fd88e19d8cb5cf998ff Mon Sep 17 00:00:00 2001
+From: Drew Moseley <drew_moseley@mentor.com>
+Date: Sun, 27 Jul 2014 13:10:07 -0400
+Subject: [PATCH] libX11: Add missing NULL check on im and im->methods
+
+Upstream-Status: Backport (c827edcd1c4a7f920aa25208083b5b58d60d2b44)
+Signed-off-by: Drew Moseley <drew_moseley@mentor.com>
+
+---
+ src/xlibi18n/ICWrap.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff -ru libX11-1.6.2-orig/src/xlibi18n/ICWrap.c libX11-1.6.2/src/xlibi18n/ICWrap.c
+--- libX11-1.6.2-orig/src/xlibi18n/ICWrap.c	2014-07-27 13:38:29.586666449 -0400
++++ libX11-1.6.2/src/xlibi18n/ICWrap.c	2014-07-27 13:41:39.671609030 -0400
+@@ -169,7 +169,7 @@
+     va_list var;
+     int     total_count;
+     XIMArg *args;
+-    char   *ret;
++    char   *ret = NULL;
+ 
+     /*
+      * so count the stuff dangling here
+@@ -185,7 +185,8 @@
+     _XIMVaToNestedList(var, total_count, &args);
+     va_end(var);
+ 
+-    ret = (*im->methods->set_values) (im, args);
++    if (im && im->methods)
++	ret = (*im->methods->set_values) (im, args);
+     Xfree(args);
+     return ret;
+ }
+@@ -196,7 +197,7 @@
+     va_list var;
+     int     total_count;
+     XIMArg *args;
+-    char   *ret;
++    char   *ret = NULL;
+ 
+     /*
+      * so count the stuff dangling here
+@@ -212,7 +213,8 @@
+     _XIMVaToNestedList(var, total_count, &args);
+     va_end(var);
+ 
+-    ret = (*im->methods->get_values) (im, args);
++    if (im && im->methods)
++	ret = (*im->methods->get_values) (im, args);
+     Xfree(args);
+     return ret;
+ }
+@@ -228,7 +230,7 @@
+     va_list var;
+     int     total_count;
+     XIMArg *args;
+-    XIC     ic;
++    XIC     ic = NULL;
+ 
+     /*
+      * so count the stuff dangling here
+@@ -244,7 +246,8 @@
+     _XIMVaToNestedList(var, total_count, &args);
+     va_end(var);
+ 
+-    ic = (XIC) (*im->methods->create_ic) (im, args);
++    if (im && im->methods)
++	ic = (XIC) (*im->methods->create_ic) (im, args);
+     Xfree(args);
+     if (ic) {
+ 	ic->core.next = im->core.ic_chain;

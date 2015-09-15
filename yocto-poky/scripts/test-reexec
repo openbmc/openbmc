@@ -1,0 +1,123 @@
+#!/bin/bash
+
+# Test Script for task re-execution
+# 
+# Copyright 2012 Intel Corporation
+# All rights reserved.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+# DESCRIPTION
+# This script is intended to address issues for re-execution of 
+# tasks. The test results are saved in ./reexeclogs. Force build
+# logs are saved with prefix "force". Build failure logs are saved with
+# prefix "failed". Log files with prefix "initial" are used to save
+# initial build logs for each recipe. Log files with prefix "clean" are
+# used to save logs of clean task after testing for a recipe is finished.
+#
+
+targets=`bitbake -s | cut -d " " -f 1`
+
+LOGS=./reexeclogs
+
+mkdir -p $LOGS
+
+# Clear sstate files for specified recipe
+function clearsstate {
+	target=$1
+
+	sstate_dir=`bitbake $target -e | grep "^SSTATE_DIR" | cut -d "\"" -f 2`
+	sstate_pkgspec=`bitbake $target -e | grep "^SSTATE_PKGSPEC" | cut -d "\"" -f 2`
+	sstasks=`bitbake $target -e | grep "^SSTATETASKS" | cut -d "\"" -f 2`
+
+	for sstask in $sstasks
+	do
+		sstask=${sstask:3}
+		case $sstask in
+			populate_sysroot) sstask="populate-sysroot"
+			;;
+			populate_lic) sstask="populate-lic"
+			;;
+			package_write_ipk) sstask="deploy-ipk"
+			;;
+			package_write_deb) sstask="deploy-deb"
+			;;
+			package_write_rpm) sstask="deploy-rpm"
+			;;
+			package) sstask="package"
+			;;
+			deploy) sstask="deploy"
+			;;
+			*)
+			;;
+		esac
+
+		echo "Removing ${sstate_dir}/${sstate_pkgspec}*_${sstask}.tgz* for $target"
+		rm -rf ${sstate_dir}/${sstate_pkgspec}*_${sstask}.tgz*
+	done
+}
+
+# Function to re-execute specified task of recipe
+function testit {
+	target=$1
+	task=$2
+
+	task=`echo $task | sed 's/_setscene//'`
+
+	if [ -f $LOGS/force.$target.$task ]; then
+		return
+	fi
+
+	case $task in
+		clean|build|cleansstate|cleanall|package|cleansstate2|package_write|package_write_ipk|package_write_rpm|package_write_deb|fetch|populate_lic) return;;
+		fetchall|devshell|buildall|listtasks|checkuri|checkuriall) return;;
+	esac
+
+	echo "Attempting target $target, task $task"
+	echo "Initial build"
+	bitbake $target -c cleansstate > $LOGS/initial.$target.$task
+	bitbake $target >> $LOGS/initial.$target.$task
+	clearsstate $target >> $LOGS/initial.$target.$task
+	echo "Re-execution build"
+	bitbake $target -c $task -f  > $LOGS/force.$target.$task
+	if [ "$?" != 0 ]; then
+		echo "FAILURE for $target $task"
+		cp $LOGS/force.$target.$task $LOGS/failed.$target.$task
+		bitbake $target -c clean > $LOGS/clean.$target.$task
+	else
+		bitbake $target >> $LOGS/force.$target.$task
+		if [ "$?" != 0 ]; then
+			echo "FAILURE2 for $target $task"
+			cp $LOGS/force.$target.$task $LOGS/failed.$target.$task
+			bitbake $target -c clean > $LOGS/clean.$target.$task
+		fi
+	fi
+	echo "Done"
+}
+
+# Go through the recipe list and these recipes' task list
+# Then re-execute them
+for target in $targets; do
+	# Remove log messages from bitbake output
+	case $target in
+		Summary*|WARNING*|Loading*|Loaded*|Package*|=====*) continue;;
+	esac
+	tasks=`bitbake $target -c listtasks | grep ^do_ | sed s/do_//`
+	for task in $tasks; do
+		testit $target $task
+	done
+done
+
+

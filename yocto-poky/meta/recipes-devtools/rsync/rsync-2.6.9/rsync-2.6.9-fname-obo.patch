@@ -1,0 +1,70 @@
+Upstream-Status: Backport [ The patch is rsync-2.6.9 specific ]
+
+The patch is from https://issues.rpath.com/browse/RPL-1647 and is used to
+address http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2007-4091
+
+Date:   Tue May 10 10:07:36 2011 +0800
+Dexuan Cui <dexuan.cui@intel.com>
+
+diff --git a/sender.c b/sender.c
+index 6fcaa65..053a8f1 100644
+--- a/sender.c
++++ b/sender.c
+@@ -123,6 +123,7 @@ void successful_send(int ndx)
+ 	char fname[MAXPATHLEN];
+ 	struct file_struct *file;
+ 	unsigned int offset;
++	size_t l = 0;
+ 
+ 	if (ndx < 0 || ndx >= the_file_list->count)
+ 		return;
+@@ -133,6 +134,20 @@ void successful_send(int ndx)
+ 				    file->dir.root, "/", NULL);
+ 	} else
+ 		offset = 0;
++
++	l = offset + 1;
++	if (file) {
++		if (file->dirname)
++			l += strlen(file->dirname);
++		if (file->basename)
++			l += strlen(file->basename);
++	}
++
++	if (l >= sizeof(fname)) {
++		rprintf(FERROR, "Overlong pathname\n");
++		exit_cleanup(RERR_FILESELECT);
++	}
++
+ 	f_name(file, fname + offset);
+ 	if (remove_source_files) {
+ 		if (do_unlink(fname) == 0) {
+@@ -224,6 +239,7 @@ void send_files(struct file_list *flist, int f_out, int f_in)
+ 	enum logcode log_code = log_before_transfer ? FLOG : FINFO;
+ 	int f_xfer = write_batch < 0 ? batch_fd : f_out;
+ 	int i, j;
++	size_t l = 0;
+ 
+ 	if (verbose > 2)
+ 		rprintf(FINFO, "send_files starting\n");
+@@ -259,6 +275,20 @@ void send_files(struct file_list *flist, int f_out, int f_in)
+ 				fname[offset++] = '/';
+ 		} else
+ 			offset = 0;
++
++		l = offset + 1;
++		if (file) {
++			if (file->dirname)
++				l += strlen(file->dirname);
++			if (file->basename)
++				l += strlen(file->basename);
++		}
++
++		if (l >= sizeof(fname)) {
++			rprintf(FERROR, "Overlong pathname\n");
++			exit_cleanup(RERR_FILESELECT);
++		}
++
+ 		fname2 = f_name(file, fname + offset);
+ 
+ 		if (verbose > 2)

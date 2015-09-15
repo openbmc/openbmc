@@ -1,0 +1,46 @@
+From 896fa02c24347e6e9259812cfda187b1d6ca6199 Mon Sep 17 00:00:00 2001
+From: Jiang Lu <lu.jiang@windriver.com>
+Date: Wed, 13 Nov 2013 10:38:08 +0800
+Subject: [PATCH] Qemu:Arm:versatilepb: Add memory size checking
+
+The machine can not work with memory over 256M, so add a checking
+at startup. If the memory size exceed 256M, just stop emulation then
+throw out warning about memory limitation.
+
+Upstream-Status: Pending
+
+Signed-off-by: Jiang Lu <lu.jiang@windriver.com>
+
+Updated it on 2014-01-15 for rebasing
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+
+Update it when upgrade qemu to 2.2.0
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+Signed-off-by: Cristian Iorga <cristian.iorga@intel.com>
+---
+ hw/arm/versatilepb.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/hw/arm/versatilepb.c b/hw/arm/versatilepb.c
+index 6c69f4e..9278d90 100644
+--- a/hw/arm/versatilepb.c
++++ b/hw/arm/versatilepb.c
+@@ -204,6 +204,13 @@ static void versatile_init(MachineState *machine, int board_id)
+         exit(1);
+     }
+
++    if (machine->ram_size > (256 << 20)) {
++        fprintf(stderr,
++                "qemu: Too much memory for this machine: %d MB, maximum 256 MB\n",
++                ((unsigned int)ram_size / (1 << 20)));
++        exit(1);
++    }
++
+     cpuobj = object_new(object_class_get_name(cpu_oc));
+
+     /* By default ARM1176 CPUs have EL3 enabled.  This board does not
+-- 
+2.1.0
+

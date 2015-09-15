@@ -1,0 +1,5 @@
+test: test.o
+	gcc -o test test.o -lm
+test.o: test.c
+	gcc -c test.c
+

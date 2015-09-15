@@ -1,0 +1,56 @@
+Upstream-Status:Inappropriate [embedded specific]
+
+Use the ld flags from the supplied configuration file. For sh we need the
+flags that specify to build PIC code so that the shared libraries work.
+
+Index: perl-5.14.2/Cross/generate_config_sh
+===================================================================
+--- perl-5.14.2.orig/Cross/generate_config_sh	2010-12-30 04:07:14.000000000 +0200
++++ perl-5.14.2/Cross/generate_config_sh	2012-11-22 15:58:49.852852805 +0200
+@@ -19,10 +19,10 @@
+ $callbacks->{'ar'} = [\&simple_process, ["AR", "arm-linux-ar"]];
+ $callbacks->{'archname'} = [\&simple_process, ["SYS", "armv4l-linux"]];
+ $callbacks->{'cc'} = [\&simple_process, ["CC", "arm-linux-gcc"]];
+-$callbacks->{'cccdlflags'} = [\&simple_process, ["CFLAGS", ""]];
+-$callbacks->{'ccdlflags'} = [\&simple_process, ["CFLAGS", ""]];
+-$callbacks->{'ccflags'} = [\&simple_process, ["CFLAGS", "-fno-strict-aliasing -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"]];
+-$callbacks->{'ccflags_uselargefiles'} = [\&simple_process, ["CFLAGS", "-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"]];
++#$callbacks->{'cccdlflags'} = [\&simple_process, ["CFLAGS", ""]];
++#$callbacks->{'ccdlflags'} = [\&simple_process, ["CFLAGS", ""]];
++$callbacks->{'ccflags'} = [\&simple_process_insert, ["CFLAGS", "-fno-strict-aliasing -D_GNU_SOURCE -DTHREADS_HAVE_PIDS -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"]];
++$callbacks->{'ccflags_uselargefiles'} = [\&simple_process_insert, ["CFLAGS", "-D_GNU_SOURCE -DTHREADS_HAVE_PIDS -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"]];
+ $callbacks->{'ccname'} = [\&simple_process, ["CC", "arm-linux-gcc"]];
+ $callbacks->{'cpp'} = [\&simple_process, ["CCP", "arm-linux-cpp"]];
+ $callbacks->{'cppflags'} = [\&simple_process, ["CCPFLAGS", "-fno-strict-aliasing"]];
+@@ -30,6 +30,7 @@
+ $callbacks->{'cppstdin'} = [\&simple_process_append, ["CC", "arm-linux-gcc -E", "-E"]];
+ $callbacks->{'full_ar'} = [\&backtick, ["AR", "which $ENV{AR}", "/usr/local/arm/2.95.3/bin/arm-linux-ar"]];
+ $callbacks->{'ld'} = [\&simple_process, ["LD", "arm-linux-ld"]];
++$callbacks->{'lddlflags'} = [\&simple_process, ["LDDLFLAGS", ""]];
+ $callbacks->{'ldflags'} = [\&simple_process, ["LDFLAGS", ""]];
+ $callbacks->{'ldflags_uselargefiles'} = [\&simple_process, ["LDFLAGS", ""]];
+ $callbacks->{'myarchname'} = [\&simple_process, ["SYS", "armv4l-linux"]];
+@@ -105,6 +106,23 @@
+ 
+ }
+ 
++# Insert env var into the variables value
++sub simple_process_insert {
++	my $key = shift;
++	my $value = shift;
++	my $envvar = $callbacks->{$key}->[1][0];
++
++	if ($ENV{$envvar}) {
++		# Strip quotes from value
++		$value =~ s/^\'//;
++		$value =~ s/\'$//;
++		# Remove -I/usr/local/... from the value
++		$value =~ s#\W-I/usr/local/\w+\W# #g;
++		# Prepend env var (OE setting) to value
++		print("$key=\'$ENV{$envvar} $value\'\n");
++	}
++}
++
+ sub library_munge {
+ 	my $key = shift;
+ 	my $value = shift;

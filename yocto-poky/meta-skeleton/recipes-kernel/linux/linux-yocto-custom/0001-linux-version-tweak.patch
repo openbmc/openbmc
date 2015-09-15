@@ -1,0 +1,26 @@
+From 5a55943a6bbb10a79994a0b18071b2427dffb15f Mon Sep 17 00:00:00 2001
+From: Bruce Ashfield <bruce.ashfield@windriver.com>
+Date: Mon, 11 Jun 2012 15:31:42 -0400
+Subject: [PATCH] linux: version tweak
+
+Signed-off-by: Bruce Ashfield <bruce.ashfield@windriver.com>
+---
+ Makefile |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index a687963..f5b1ac3 100644
+--- a/Makefile
++++ b/Makefile
+@@ -2,7 +2,7 @@ VERSION = 3
+ PATCHLEVEL = 4
+ SUBLEVEL = 0
+ EXTRAVERSION =
+-NAME = Saber-toothed Squirrel
++NAME = Saber-toothed Squirrel-custom
+ 
+ # *DOCUMENTATION*
+ # To see a list of typical targets execute "make help"
+-- 
+1.7.5.4
+

@@ -1,0 +1,29 @@
+From c99c61e8f863a508a0793168011c98dc74abbd05 Mon Sep 17 00:00:00 2001
+From: Dominic Hargreaves <dom@earth.li>
+Date: Sat, 14 Apr 2012 11:34:05 +0100
+Subject: Invoke x-terminal-emulator rather than xterm in perl5db.pl
+
+In Debian systems, xterm might not exist or might not be the preferred
+terminal emulator. Use x-terminal-emulator instead
+
+Bug-Debian: http://bugs.debian.org/668490
+Forwarded: not-needed
+
+Patch-Name: debian/perl5db-x-terminal-emulator.patch
+---
+ lib/perl5db.pl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/perl5db.pl b/lib/perl5db.pl
+index 7e7194e..c466bf3 100644
+--- a/lib/perl5db.pl
++++ b/lib/perl5db.pl
+@@ -6960,7 +6960,7 @@ properly set up.
+ sub xterm_get_fork_TTY {
+     ( my $name = $0 ) =~ s,^.*[/\\],,s;
+     open XT,
+-qq[3>&1 xterm -title "Daughter Perl debugger $pids $name" -e sh -c 'tty 1>&3;\
++qq[3>&1 x-terminal-emulator -T "Daughter Perl debugger $pids $name" -e sh -c 'tty 1>&3;\
+  sleep 10000000' |];
+ 
+     # Get the output from 'tty' and clean it up a little.

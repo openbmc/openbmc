@@ -1,0 +1,85 @@
+From: Peter Crosthwaite <crosthwaitepeter@gmail.com>
+Subject: [RFT PATCH v1 1/3] net: smc91c111: guard flush_queued_packets() on
+ can_rx()
+Date: Thu, 10 Sep 2015 21:23:43 -0700
+
+Check that the core can once again receive packets before asking the
+net layer to do a flush. This will make it more convenient to flush
+packets when adding new conditions to can_receive.
+
+Add missing if braces while moving the can_receive() core code.
+
+Signed-off-by: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+
+Upstream-Status: Submitted
+
+---
+
+ hw/net/smc91c111.c | 30 ++++++++++++++++++++++--------
+ 1 file changed, 22 insertions(+), 8 deletions(-)
+
+Index: qemu-2.4.0/hw/net/smc91c111.c
+===================================================================
+--- qemu-2.4.0.orig/hw/net/smc91c111.c
++++ qemu-2.4.0/hw/net/smc91c111.c
+@@ -124,6 +124,24 @@ static void smc91c111_update(smc91c111_s
+     qemu_set_irq(s->irq, level);
+ }
+ 
++static int smc91c111_can_receive(smc91c111_state *s)
++{
++    if ((s->rcr & RCR_RXEN) == 0 || (s->rcr & RCR_SOFT_RST)) {
++        return 1;
++    }
++    if (s->allocated == (1 << NUM_PACKETS) - 1) {
++        return 0;
++    }
++    return 1;
++}
++
++static inline void smc91c111_flush_queued_packets(smc91c111_state *s)
++{
++    if (smc91c111_can_receive(s)) {
++        qemu_flush_queued_packets(qemu_get_queue(s->nic));
++    }
++}
++
+ /* Try to allocate a packet.  Returns 0x80 on failure.  */
+ static int smc91c111_allocate_packet(smc91c111_state *s)
+ {
+@@ -185,7 +203,7 @@ static void smc91c111_release_packet(smc
+     s->allocated &= ~(1 << packet);
+     if (s->tx_alloc == 0x80)
+         smc91c111_tx_alloc(s);
+-    qemu_flush_queued_packets(qemu_get_queue(s->nic));
++    smc91c111_flush_queued_packets(s);
+ }
+ 
+ /* Flush the TX FIFO.  */
+@@ -636,15 +654,11 @@ static uint32_t smc91c111_readl(void *op
+     return val;
+ }
+ 
+-static int smc91c111_can_receive(NetClientState *nc)
++static int smc91c111_can_receive_nc(NetClientState *nc)
+ {
+     smc91c111_state *s = qemu_get_nic_opaque(nc);
+ 
+-    if ((s->rcr & RCR_RXEN) == 0 || (s->rcr & RCR_SOFT_RST))
+-        return 1;
+-    if (s->allocated == (1 << NUM_PACKETS) - 1)
+-        return 0;
+-    return 1;
++    return smc91c111_can_receive(s);
+ }
+ 
+ static ssize_t smc91c111_receive(NetClientState *nc, const uint8_t *buf, size_t size)
+@@ -739,7 +753,7 @@ static const MemoryRegionOps smc91c111_m
+ static NetClientInfo net_smc91c111_info = {
+     .type = NET_CLIENT_OPTIONS_KIND_NIC,
+     .size = sizeof(NICState),
+-    .can_receive = smc91c111_can_receive,
++    .can_receive = smc91c111_can_receive_nc,
+     .receive = smc91c111_receive,
+ };
+ 

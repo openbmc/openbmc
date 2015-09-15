@@ -1,0 +1,30 @@
+make_ext.pl: fix regenerate makefile failed while $cc changed
+
+While $cc changed, the existance of 'xdefine' caused makefile
+regeneration failed.
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ make_ext.pl | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/make_ext.pl b/make_ext.pl
+index b433762..9fc1a36 100644
+--- a/make_ext.pl
++++ b/make_ext.pl
+@@ -335,6 +335,10 @@ sub build_extension {
+                 print "Deleting non-Cross makefile\n";
+                 close $mfh or die "close $makefile: $!";
+                 _unlink($makefile);
++                if(-e 'xdefine') {
++                    print "Deleting xdefine for regenerate makefile\n";
++                    _unlink('xdefine');
++                }
+             }
+         }
+     }
+-- 
+1.8.1.2
+

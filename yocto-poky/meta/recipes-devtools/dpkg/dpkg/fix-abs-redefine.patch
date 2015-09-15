@@ -1,0 +1,40 @@
+Upstream-Status: Pending
+
+dpkg defines:
+#define DPKG_BEGIN_DECLS	extern "C" {
+
+That makes header cstdlib included in a extern "C" block which is not supported
+by gcc 4.8. It fails on Fedora 19:
+
+/usr/include/c++/4.8.1/cstdlib: In function ‘long long int std::abs(long long int)’:
+/usr/include/c++/4.8.1/cstdlib:174:20: error: declaration of C function ‘long long int std::abs(long long int)’ conflicts with
+   abs(long long __x) { return __builtin_llabs (__x); }
+                    ^
+/usr/include/c++/4.8.1/cstdlib:166:3: error: previous declaration ‘long int std::abs(long int)’ here
+   abs(long __i) { return __builtin_labs(__i); }
+   ^
+
+Move include gettext.h out of the extern "C" block to fix this issue.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+--- dpkg-1.17.1/lib/dpkg/i18n.h.orig	2013-08-13 17:31:28.870935573 +0800
++++ dpkg-1.17.1/lib/dpkg/i18n.h	2013-08-13 17:31:37.893065249 +0800
+@@ -23,8 +23,6 @@
+ 
+ #include <dpkg/macros.h>
+ 
+-DPKG_BEGIN_DECLS
+-
+ /**
+  * @defgroup i18n Internationalization support
+  * @ingroup dpkg-internal
+@@ -33,6 +31,8 @@
+ 
+ #include <gettext.h>
+ 
++DPKG_BEGIN_DECLS
++
+ /* We need to include this because pgettext() uses LC_MESSAGES, but libintl.h
+  * which gets pulled by gettext.h only includes it if building optimized. */
+ #include <locale.h>

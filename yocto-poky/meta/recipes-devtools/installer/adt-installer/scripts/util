@@ -1,0 +1,104 @@
+#!/bin/bash
+
+# Yocto ADT Installer
+#
+# Copyright 2010-2011 by Intel Corp.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy 
+# of this software and associated documentation files (the "Software"), to deal 
+# in the Software without restriction, including without limitation the rights 
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+# copies of the Software, and to permit persons to whom the Software is 
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in 
+# all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+# THE SOFTWARE.
+
+echo_info()
+{
+  echo -e $1 | tee -a $YOCTOADT_INSTALL_LOG_FILE
+}
+
+select_install_type()
+{
+# If choosing silent install, all older installation data will be
+# overriden without user's interaction
+while true; do
+  #echo_info "[ADT_INST] Silent install means overrides all existing older"
+  #echo_info "[ADT_INST] data and the installation needs least user interaction"
+  #echo_info "[ADT_INST] If you want to use silent installation, please enter S:"
+  #echo_info "[ADT_INST] If you want to customize installation, please enter C:"
+  #echo_info "[ADT_INST} If you want to exit current installation, please enter X:"
+  echo_info "There're two ways you can do installation: silent mode or interactive mode. To choose silent mode, which means you opt for the system to override the existing data under the specified installation directories without prompting for your confirmation.  Please be cautious with this selection which may trigger your losing data.  With the interactive mode, you have to closely monitor the installation process, since it will prompt you each step it needs to override some existing data.  To choose silent mode, please enter [S], for interactive mode, please enter [I] or [X] to exit the installation."
+  echo_info "[ADT_INST] Please enter your selections here:"
+  read YOCTOADT_SEL
+  YOCTOADT_SEL=`tr '[a-z]' '[A-Z]'<<<"$YOCTOADT_SEL"`
+  if [ "$YOCTOADT_SEL" == "S" ]; then
+    return "0"
+  elif [ "$YOCTOADT_SEL" == "I" ]; then
+    return "1"
+  elif [ "$YOCTOADT_SEL" == "X" ]; then
+    echo_info "\n############################################################"
+    echo_info "# User cancelled installation!"
+    echo_info "############################################################\n"
+    exit 1
+  fi
+done
+
+
+}
+
+confirm_install()
+{
+# below are prompt, make sure user still want to install even meet
+# some prompts
+
+#User likes to enjoy silent installation, we will not break his
+#installation process here
+if [ "$1" == "0" ]; then
+  return
+fi
+
+while true; do
+  echo_info "[ADT_INST] Do you want to continue installation? Please enter Y/N:"
+  read YOCTOADT_INSTALL
+  YOCTOADT_INSTALL=`tr '[a-z]' '[A-Z]'<<<"$YOCTOADT_INSTALL"`
+  if [ "$YOCTOADT_INSTALL" == "Y" ]; then
+    break
+  elif [ "$YOCTOADT_INSTALL" == "N" ]; then
+    echo_info "\n############################################################"
+    echo_info "# User cancelled installation!"
+    echo_info "############################################################\n"
+    exit 1
+  fi
+done
+}
+
+check_result()
+{
+  result=$?
+  if [ $result -eq 1 ]; then
+    exit -1
+  elif [  $result -ne 0 ]; then
+     echo_info "\n#############################################################################"
+     echo_info "# Meet error(s) when installing Yocto ADT! Please check log file for details. "
+     echo_info "#############################################################################\n"
+    exit -1
+  fi
+}
+
+# yocto adt installation log file
+YOCTOADT_INSTALL_LOG_FILE="adt_installer.log"
+# Temp folders holding qemu/rootfs downloaded images
+# It will be put into the installation folder
+LOCAL_DOWNLOAD="./download_image"
+
+

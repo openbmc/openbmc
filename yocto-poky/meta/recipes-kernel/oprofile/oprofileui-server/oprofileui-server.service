@@ -1,0 +1,6 @@
+[Unit]
+Description=OProfileUI Server
+After=network.target
+
+[Service]
+ExecStart=/bin/sh -c ". @SYSCONFDIR@/profile; @BINDIR@/oprofile-server"

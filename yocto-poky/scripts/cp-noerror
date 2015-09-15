@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+#
+# Allow copying of $1 to $2 but if files in $1 disappear during the copy operation,
+# don't error.
+# Also don't error if $1 disappears.
+#
+
+import sys
+import os
+import shutil
+
+def copytree(src, dst, symlinks=False, ignore=None):
+    """Based on shutil.copytree"""
+    names = os.listdir(src)
+    try:
+        os.makedirs(dst)
+    except OSError: 
+        # Already exists
+        pass
+    errors = []
+    for name in names:
+        srcname = os.path.join(src, name)
+        dstname = os.path.join(dst, name)
+        try:
+            d = dstname
+            if os.path.isdir(dstname):
+                d = os.path.join(dstname, os.path.basename(srcname))
+            if os.path.exists(d):
+                continue
+            try:
+                os.link(srcname, dstname)
+            except OSError:
+                shutil.copy2(srcname, dstname)
+        # catch the Error from the recursive copytree so that we can
+        # continue with other files
+        except shutil.Error, err:
+            errors.extend(err.args[0])
+        except EnvironmentError, why:
+            errors.append((srcname, dstname, str(why)))
+    try:
+        shutil.copystat(src, dst)
+    except OSError, why:
+        errors.extend((src, dst, str(why)))
+    if errors:
+        raise shutil.Error, errors
+
+try:
+    copytree(sys.argv[1], sys.argv[2])
+except shutil.Error:
+   pass
+except OSError:
+   pass

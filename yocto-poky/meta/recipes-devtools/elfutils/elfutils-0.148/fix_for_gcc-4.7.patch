@@ -1,0 +1,73 @@
+Upstream-Status: pending
+gcc 4.7 does not like pointer conversion, so have a void * tmp var to work 
+around following compilation issue.
+
+Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+2011/07/07
+
+| md5.c: In function 'md5_finish_ctx':
+| md5.c:108:3: error: dereferencing type-punned pointer will break strict-aliasing rules [-Werror=strict-aliasing]
+| md5.c:109:3: error: dereferencing type-punned pointer will break strict-aliasing rules [-Werror=strict-aliasing]
+| cc1: all warnings being treated as errors
+| 
+| make[2]: *** [md5.o] Error 1
+| make[2]: *** Waiting for unfinished jobs....
+| sha1.c: In function 'sha1_finish_ctx':
+| sha1.c:109:3: error: dereferencing type-punned pointer will break strict-aliasing rules [-Werror=strict-aliasing]
+| sha1.c:111:3: error: dereferencing type-punned pointer will break strict-aliasing rules [-Werror=strict-aliasing]
+| cc1: all warnings being treated as errors
+| 
+| make[2]: *** [sha1.o] Error 1
+
+Index: elfutils-0.148/lib/md5.c
+===================================================================
+--- elfutils-0.148.orig/lib/md5.c
++++ elfutils-0.148/lib/md5.c
+@@ -95,6 +95,7 @@ md5_finish_ctx (ctx, resbuf)
+   /* Take yet unprocessed bytes into account.  */
+   md5_uint32 bytes = ctx->buflen;
+   size_t pad;
++  void * tmp;
+ 
+   /* Now count remaining bytes.  */
+   ctx->total[0] += bytes;
+@@ -105,9 +106,10 @@ md5_finish_ctx (ctx, resbuf)
+   memcpy (&ctx->buffer[bytes], fillbuf, pad);
+ 
+   /* Put the 64-bit file length in *bits* at the end of the buffer.  */
+-  *(md5_uint32 *) &ctx->buffer[bytes + pad] = SWAP (ctx->total[0] << 3);
+-  *(md5_uint32 *) &ctx->buffer[bytes + pad + 4] = SWAP ((ctx->total[1] << 3) |
+-							(ctx->total[0] >> 29));
++  tmp = &ctx->buffer[bytes + pad];
++  *(md5_uint32 *) tmp = SWAP (ctx->total[0] << 3);
++  tmp = &ctx->buffer[bytes + pad + 4];
++  *(md5_uint32 *) tmp = SWAP ((ctx->total[1] << 3) | (ctx->total[0] >> 29));
+ 
+   /* Process last bytes.  */
+   md5_process_block (ctx->buffer, bytes + pad + 8, ctx);
+Index: elfutils-0.148/lib/sha1.c
+===================================================================
+--- elfutils-0.148.orig/lib/sha1.c
++++ elfutils-0.148/lib/sha1.c
+@@ -96,6 +96,7 @@ sha1_finish_ctx (ctx, resbuf)
+   /* Take yet unprocessed bytes into account.  */
+   sha1_uint32 bytes = ctx->buflen;
+   size_t pad;
++  void * tmp;
+ 
+   /* Now count remaining bytes.  */
+   ctx->total[0] += bytes;
+@@ -106,9 +107,10 @@ sha1_finish_ctx (ctx, resbuf)
+   memcpy (&ctx->buffer[bytes], fillbuf, pad);
+ 
+   /* Put the 64-bit file length in *bits* at the end of the buffer.  */
+-  *(sha1_uint32 *) &ctx->buffer[bytes + pad] = SWAP ((ctx->total[1] << 3) |
+-						     (ctx->total[0] >> 29));
+-  *(sha1_uint32 *) &ctx->buffer[bytes + pad + 4] = SWAP (ctx->total[0] << 3);
++  tmp = &ctx->buffer[bytes + pad];
++  *(sha1_uint32 *) tmp = SWAP ((ctx->total[1] << 3) | (ctx->total[0] >> 29));
++  tmp = &ctx->buffer[bytes + pad + 4];
++  *(sha1_uint32 *) tmp = SWAP (ctx->total[0] << 3);
+ 
+   /* Process last bytes.  */
+   sha1_process_block (ctx->buffer, bytes + pad + 8, ctx);

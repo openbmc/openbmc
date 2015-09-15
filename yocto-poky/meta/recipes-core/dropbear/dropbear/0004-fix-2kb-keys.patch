@@ -1,0 +1,22 @@
+Subject: [PATCH 4/6] fix 2kb keys
+
+Upstream-Status: Inappropriate [configuration]
+---
+ kex.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kex.h b/kex.h
+index 72430e9..375c677 100644
+--- a/kex.h
++++ b/kex.h
+@@ -67,6 +67,6 @@ struct KEXState {
+ };
+ 
+ 
+-#define MAX_KEXHASHBUF 2000
++#define MAX_KEXHASHBUF 3000
+ 
+ #endif /* _KEX_H_ */
+-- 
+1.7.11.7
+

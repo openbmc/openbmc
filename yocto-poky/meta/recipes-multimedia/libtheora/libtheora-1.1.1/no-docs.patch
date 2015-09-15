@@ -1,0 +1,15 @@
+Upstream-Status: Inappropriate [configuration]
+
+Index: libtheora-1.1.1/Makefile.am
+===================================================================
+--- libtheora-1.1.1.orig/Makefile.am	2009-11-25 22:01:53.593775926 +0100
++++ libtheora-1.1.1/Makefile.am	2009-11-25 22:02:00.777524017 +0100
+@@ -8,7 +8,7 @@
+ EXAMPLES_DIR =
+ endif
+ 
+-SUBDIRS = lib include doc tests m4 $(EXAMPLES_DIR)
++SUBDIRS = lib include tests m4 $(EXAMPLES_DIR)
+ 
+ 
+ # we include the whole debian/ dir in EXTRA_DIST because there's a problem

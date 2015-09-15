@@ -1,0 +1,272 @@
+From 803ecf2909949e6152f4a81b6cbb92a4430679ac Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Fri, 23 Nov 2012 00:31:06 +0100
+Subject: [PATCH 6/6] omapfb: port to new xserver video API
+
+Upstream-Status: Pending
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ src/compat-api.h    | 96 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/omapfb-driver.c | 41 ++++++++++++-----------
+ 2 files changed, 118 insertions(+), 19 deletions(-)
+ create mode 100644 src/compat-api.h
+
+diff --git a/src/compat-api.h b/src/compat-api.h
+new file mode 100644
+index 0000000..b1591b1
+--- /dev/null
++++ b/src/compat-api.h
+@@ -0,0 +1,96 @@
++/*
++ * Copyright 2012 Red Hat, Inc.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a
++ * copy of this software and associated documentation files (the "Software"),
++ * to deal in the Software without restriction, including without limitation
++ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
++ * and/or sell copies of the Software, and to permit persons to whom the
++ * Software is furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice (including the next
++ * paragraph) shall be included in all copies or substantial portions of the
++ * Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
++ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
++ * DEALINGS IN THE SOFTWARE.
++ *
++ * Author: Dave Airlie <airlied@redhat.com>
++ */
++
++/* this file provides API compat between server post 1.13 and pre it,
++   it should be reused inside as many drivers as possible */
++#ifndef COMPAT_API_H
++#define COMPAT_API_H
++
++#ifndef GLYPH_HAS_GLYPH_PICTURE_ACCESSOR
++#define GetGlyphPicture(g, s) GlyphPicture((g))[(s)->myNum]
++#define SetGlyphPicture(g, s, p) GlyphPicture((g))[(s)->myNum] = p
++#endif
++
++#ifndef XF86_HAS_SCRN_CONV
++#define xf86ScreenToScrn(s) xf86Screens[(s)->myNum]
++#define xf86ScrnToScreen(s) screenInfo.screens[(s)->scrnIndex]
++#endif
++
++#ifndef XF86_SCRN_INTERFACE
++
++#define SCRN_ARG_TYPE int
++#define SCRN_INFO_PTR(arg1) ScrnInfoPtr pScrn = xf86Screens[(arg1)]
++
++#define SCREEN_ARG_TYPE int
++#define SCREEN_PTR(arg1) ScreenPtr pScreen = screenInfo.screens[(arg1)]
++
++#define SCREEN_INIT_ARGS_DECL int index, ScreenPtr pScreen, int argc, char **argv
++
++#define BLOCKHANDLER_ARGS_DECL int arg, pointer blockData, pointer pTimeout, pointer pReadmask
++#define BLOCKHANDLER_ARGS arg, blockData, pTimeout, pReadmask
++
++#define CLOSE_SCREEN_ARGS_DECL int scrnIndex, ScreenPtr pScreen
++#define CLOSE_SCREEN_ARGS scrnIndex, pScreen
++
++#define ADJUST_FRAME_ARGS_DECL int arg, int x, int y, int flags
++
++#define SWITCH_MODE_ARGS_DECL int arg, DisplayModePtr mode, int flags
++
++#define FREE_SCREEN_ARGS_DECL int arg, int flags
++#define FREE_SCREEN_ARGS(x) (x)->scrnIndex, 0
++
++#define VT_FUNC_ARGS_DECL int arg, int flags
++#define VT_FUNC_ARGS(flags) pScrn->scrnIndex, (flags)
++
++#define XF86_ENABLEDISABLEFB_ARG(x) ((x)->scrnIndex)
++#else
++#define SCRN_ARG_TYPE ScrnInfoPtr
++#define SCRN_INFO_PTR(arg1) ScrnInfoPtr pScrn = (arg1)
++
++#define SCREEN_ARG_TYPE ScreenPtr
++#define SCREEN_PTR(arg1) ScreenPtr pScreen = (arg1)
++
++#define SCREEN_INIT_ARGS_DECL ScreenPtr pScreen, int argc, char **argv
++
++#define BLOCKHANDLER_ARGS_DECL ScreenPtr arg, pointer pTimeout, pointer pReadmask
++#define BLOCKHANDLER_ARGS arg, pTimeout, pReadmask
++
++#define CLOSE_SCREEN_ARGS_DECL ScreenPtr pScreen
++#define CLOSE_SCREEN_ARGS pScreen
++
++#define ADJUST_FRAME_ARGS_DECL ScrnInfoPtr arg, int x, int y
++#define SWITCH_MODE_ARGS_DECL ScrnInfoPtr arg, DisplayModePtr mode
++
++#define FREE_SCREEN_ARGS_DECL ScrnInfoPtr arg
++#define FREE_SCREEN_ARGS(x) (x)
++
++#define VT_FUNC_ARGS_DECL ScrnInfoPtr arg
++#define VT_FUNC_ARGS(flags) pScrn
++
++#define XF86_ENABLEDISABLEFB_ARG(x) (x)
++
++#endif
++
++#endif
+diff --git a/src/omapfb-driver.c b/src/omapfb-driver.c
+index 07989f5..486ffa4 100644
+--- a/src/omapfb-driver.c
++++ b/src/omapfb-driver.c
+@@ -44,6 +44,8 @@
+ 
+ #include "exa.h"
+ 
++#include "compat-api.h"
++
+ #ifdef HAVE_XEXTPROTO_71
+ #include <X11/extensions/dpmsconst.h>
+ #else
+@@ -70,10 +72,10 @@
+ 
+ static Bool OMAPFBProbe(DriverPtr drv, int flags);
+ static Bool OMAPFBPreInit(ScrnInfoPtr pScrn, int flags);
+-static Bool OMAPFBScreenInit(int scrnIndex, ScreenPtr pScreen, int argc, char **argv);
+-static Bool OMAPFBEnterVT(int scrnIndex, int flags);
+-static void OMAPFBLeaveVT(int scrnIndex, int flags);
+-static Bool OMAPFBSwitchMode(int scrnIndex, DisplayModePtr mode, int flags);
++static Bool OMAPFBScreenInit(SCREEN_INIT_ARGS_DECL);
++static Bool OMAPFBEnterVT(VT_FUNC_ARGS_DECL);
++static void OMAPFBLeaveVT(VT_FUNC_ARGS_DECL);
++static Bool OMAPFBSwitchMode(SWITCH_MODE_ARGS_DECL);
+ 
+ static Bool
+ OMAPFBEnsureRec(ScrnInfoPtr pScrn)
+@@ -481,7 +483,7 @@ OMAPFBXvScreenInit(ScreenPtr pScreen)
+ }
+ 
+ static Bool
+-OMAPFBCloseScreen(int scrnIndex, ScreenPtr pScreen)
++OMAPFBCloseScreen(CLOSE_SCREEN_ARGS_DECL)
+ {
+ 	ScrnInfoPtr pScrn = xf86Screens[pScreen->myNum];
+ 	OMAPFBPtr ofb = OMAPFB(pScrn);
+@@ -490,11 +492,11 @@ OMAPFBCloseScreen(int scrnIndex, ScreenPtr pScreen)
+ 
+ 	pScreen->CloseScreen = ofb->CloseScreen;
+ 	
+-	return (*pScreen->CloseScreen)(scrnIndex, pScreen);
++	return (*pScreen->CloseScreen)(CLOSE_SCREEN_ARGS);
+ }
+ 
+ static Bool
+-OMAPFBScreenInit(int scrnIndex, ScreenPtr pScreen, int argc, char **argv)
++OMAPFBScreenInit(SCREEN_INIT_ARGS_DECL)
+ {
+ 	ScrnInfoPtr pScrn = xf86Screens[pScreen->myNum];
+ 	OMAPFBPtr ofb = OMAPFB(pScrn);
+@@ -516,7 +518,7 @@ OMAPFBScreenInit(int scrnIndex, ScreenPtr pScreen, int argc, char **argv)
+ 	                PROT_READ | PROT_WRITE, MAP_SHARED,
+ 	                ofb->fd, 0);
+ 	if (ofb->fb == MAP_FAILED) {
+-		xf86DrvMsg(scrnIndex, X_ERROR, "Mapping framebuffer memory failed, wanted %d bytes.\n", ofb->mem_info.size);
++		xf86DrvMsg(pScrn->scrnIndex, X_ERROR, "Mapping framebuffer memory failed, wanted %d bytes.\n", ofb->mem_info.size);
+ 		return FALSE;
+ 	}
+ 
+@@ -526,7 +528,7 @@ OMAPFBScreenInit(int scrnIndex, ScreenPtr pScreen, int argc, char **argv)
+ 	/* Only support TrueColor for now */
+ 	if (!miSetVisualTypes(pScrn->depth, TrueColorMask,
+ 		pScrn->rgbBits, pScrn->defaultVisual)) {
+-		xf86DrvMsg(scrnIndex, X_ERROR, "visual type setup failed"
++		xf86DrvMsg(pScrn->scrnIndex, X_ERROR, "visual type setup failed"
+ 		           " for %d bits per pixel [1]\n",
+ 		           pScrn->bitsPerPixel);
+ 		return FALSE;
+@@ -534,7 +536,7 @@ OMAPFBScreenInit(int scrnIndex, ScreenPtr pScreen, int argc, char **argv)
+ 
+ 	/* Set up pixmap depth information */
+ 	if (!miSetPixmapDepths()) {
+-		xf86DrvMsg(scrnIndex,X_ERROR,"pixmap depth setup failed\n");
++		xf86DrvMsg(pScrn->scrnIndex,X_ERROR,"pixmap depth setup failed\n");
+ 		return FALSE;
+ 	}
+ 
+@@ -546,7 +548,7 @@ OMAPFBScreenInit(int scrnIndex, ScreenPtr pScreen, int argc, char **argv)
+ 	                  pScrn->virtualY, pScrn->xDpi,
+ 	                  pScrn->yDpi, pScrn->displayWidth,
+ 	                  pScrn->bitsPerPixel)) {
+-		xf86DrvMsg(scrnIndex, X_ERROR, "fbScreenInit failed\n");
++		xf86DrvMsg(pScrn->scrnIndex, X_ERROR, "fbScreenInit failed\n");
+ 		return FALSE;
+ 	}
+ 
+@@ -567,7 +569,7 @@ OMAPFBScreenInit(int scrnIndex, ScreenPtr pScreen, int argc, char **argv)
+ 
+ 	/* Initialize XRender fallbacks */
+ 	if (!fbPictureInit(pScreen, NULL, 0)) {
+-		xf86DrvMsg(scrnIndex, X_ERROR, "fbPictureInit failed\n");
++		xf86DrvMsg(pScrn->scrnIndex, X_ERROR, "fbPictureInit failed\n");
+ 		return FALSE;
+ 	}
+ 	
+@@ -579,7 +581,7 @@ OMAPFBScreenInit(int scrnIndex, ScreenPtr pScreen, int argc, char **argv)
+ 
+ 	/* Initialize default colormap */
+ 	if (!miCreateDefColormap(pScreen)) {
+-		xf86DrvMsg(scrnIndex, X_ERROR,
++		xf86DrvMsg(pScrn->scrnIndex, X_ERROR,
+ 		           "creating default colormap failed\n");
+ 		return FALSE;
+ 	}
+@@ -589,7 +591,7 @@ OMAPFBScreenInit(int scrnIndex, ScreenPtr pScreen, int argc, char **argv)
+ 		/* This is non-fatal since we might be running against older
+ 		 * kernel driver in which case we only do basic 2D stuff...
+ 		 */
+-		xf86DrvMsg(scrnIndex, X_ERROR, "Reading plane info failed\n");
++		xf86DrvMsg(pScrn->scrnIndex, X_ERROR, "Reading plane info failed\n");
+ 	} else if (!ofb->dss) {
+ 
+ 		ofb->plane_info.enabled = 1;
+@@ -602,7 +604,7 @@ OMAPFBScreenInit(int scrnIndex, ScreenPtr pScreen, int argc, char **argv)
+ 		}
+ 
+ 		if (ioctl (ofb->fd, OMAPFB_SETUP_PLANE, &ofb->plane_info)) {
+-			xf86DrvMsg(scrnIndex, X_ERROR,
++			xf86DrvMsg(pScrn->scrnIndex, X_ERROR,
+ 			            "%s: Plane setup failed: %s\n",
+ 			            __FUNCTION__, strerror(errno));
+ 			return FALSE;
+@@ -645,9 +647,10 @@ OMAPFBScreenInit(int scrnIndex, ScreenPtr pScreen, int argc, char **argv)
+ 	return TRUE;
+ }
+ 
+-static Bool OMAPFBSwitchMode(int scrnIndex, DisplayModePtr mode, int flags)
++static Bool OMAPFBSwitchMode(SWITCH_MODE_ARGS_DECL)
+ {
+-	return xf86SetSingleMode (xf86Screens[scrnIndex], mode, RR_Rotate_0);
++	SCRN_INFO_PTR(arg);
++	return xf86SetSingleMode (pScrn, mode, RR_Rotate_0);
+ }
+ 
+ void
+@@ -699,14 +702,14 @@ OMAPFBPrintCapabilities(ScrnInfoPtr pScrn,
+ /*** Unimplemented: */
+ 
+ static Bool
+-OMAPFBEnterVT(int scrnIndex, int flags)
++OMAPFBEnterVT(VT_FUNC_ARGS_DECL)
+ {
+ 	xf86Msg(X_NOT_IMPLEMENTED, "%s\n", __FUNCTION__);
+ 	return TRUE;
+ }
+ 
+ static void
+-OMAPFBLeaveVT(int scrnIndex, int flags)
++OMAPFBLeaveVT(VT_FUNC_ARGS_DECL)
+ {
+ 	xf86Msg(X_NOT_IMPLEMENTED, "%s\n", __FUNCTION__);
+ }
+-- 
+1.8.0
+

@@ -1,0 +1,44 @@
+grub-core/net/tftp.c: fix endianness problem.
+
+	* grub-core/net/tftp.c (ack): Fix endianness problem.
+	(tftp_receive): Likewise.
+	Reported by: Michael Davidsaver.
+
+Upstream-Status: Backport
+
+diff --git a/ChangeLog b/ChangeLog
+index 81bdae9..c2f42d5 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,9 @@
++2012-07-02  Vladimir Serbinenko  <phcoder@gmail.com>
++
++	* grub-core/net/tftp.c (ack): Fix endianness problem.
++	(tftp_receive): Likewise.
++	Reported by: Michael Davidsaver.
++
+ 2012-06-27  Vladimir Serbinenko  <phcoder@gmail.com>
+ 
+ 	* configure.ac: Bump version to 2.00.
+diff --git a/grub-core/net/tftp.c b/grub-core/net/tftp.c
+index 9c70efb..d0f39ea 100644
+--- a/grub-core/net/tftp.c
++++ b/grub-core/net/tftp.c
+@@ -143,7 +143,7 @@ ack (tftp_data_t data, grub_uint16_t block)
+ 
+   tftph_ack = (struct tftphdr *) nb_ack.data;
+   tftph_ack->opcode = grub_cpu_to_be16 (TFTP_ACK);
+-  tftph_ack->u.ack.block = block;
++  tftph_ack->u.ack.block = grub_cpu_to_be16 (block);
+ 
+   err = grub_net_send_udp_packet (data->sock, &nb_ack);
+   if (err)
+@@ -225,7 +225,7 @@ tftp_receive (grub_net_udp_socket_t sock __attribute__ ((unused)),
+ 	    grub_priority_queue_pop (data->pq);
+ 
+ 	    if (file->device->net->packs.count < 50)
+-	      err = ack (data, tftph->u.data.block);
++	      err = ack (data, data->block + 1);
+ 	    else
+ 	      {
+ 		file->device->net->stall = 1;

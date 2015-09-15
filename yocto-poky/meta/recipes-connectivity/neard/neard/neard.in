@@ -1,0 +1,54 @@
+#!/bin/sh
+#
+# start/stop neard daemon.
+
+### BEGIN INIT INFO
+# Provides:          neard
+# Required-Start:    $network
+# Required-Stop:     $network
+# Default-Start:     S 2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: NFC daemon
+# Description:       neard is a daemon used to enable NFC features
+### END INIT INFO
+
+DAEMON=@installpath@/neard
+PIDFILE=/var/run/neard.pid
+DESC="Linux NFC daemon"
+
+if [ -f /etc/default/neard ] ; then
+	. /etc/default/neard
+fi
+
+set -e
+
+do_start() {
+	$DAEMON
+}
+
+do_stop() {
+	start-stop-daemon --stop --name neard --quiet
+}
+
+case "$1" in
+  start)
+	echo "Starting $DESC"
+	do_start
+	;;
+  stop)
+	echo "Stopping $DESC"
+	do_stop
+	;;
+  restart|force-reload)
+	echo "Restarting $DESC"
+	do_stop
+	sleep 1
+	do_start
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart|force-reload}" >&2
+	exit 1
+	;;
+esac
+
+exit 0

@@ -1,0 +1,51 @@
+From 183bb4af7ad862a2cf31d0dcb3dd45c100f76776 Mon Sep 17 00:00:00 2001
+From: Russ Allbery <rra@cpan.org>
+Date: Wed, 15 Apr 2015 22:21:25 -0700
+Subject: Support an empty POD_MAN_DATE environment variable
+
+One may want to set this to an empty string.  Handle that correctly.
+
+(backported to Perl 5.20.2 by Niko Tyni <ntyni@debian.org>)
+
+Origin: upstream, http://git.eyrie.org/?p=perl/podlators.git;a=commitdiff;h=e0e9fcb53e8fc954b2b1955385eea18c27f869af
+Bug-Debian: https://bugs.debian.org/780259
+Patch-Name: fixes/podman-empty-date.diff
+---
+ cpan/podlators/lib/Pod/Man.pm  | 2 +-
+ cpan/podlators/t/devise-date.t | 6 +++++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/cpan/podlators/lib/Pod/Man.pm b/cpan/podlators/lib/Pod/Man.pm
+index 365892e..8997a15 100644
+--- a/cpan/podlators/lib/Pod/Man.pm
++++ b/cpan/podlators/lib/Pod/Man.pm
+@@ -894,7 +894,7 @@ sub devise_date {
+     my ($self) = @_;
+ 
+     # If POD_MAN_DATE is set, always use it.
+-    if ($ENV{POD_MAN_DATE}) {
++    if (defined($ENV{POD_MAN_DATE})) {
+         return $ENV{POD_MAN_DATE};
+     }
+ 
+diff --git a/cpan/podlators/t/devise-date.t b/cpan/podlators/t/devise-date.t
+index 9da9d1b..27271d9 100644
+--- a/cpan/podlators/t/devise-date.t
++++ b/cpan/podlators/t/devise-date.t
+@@ -12,7 +12,7 @@ use warnings;
+ use Pod::Man;
+ use POSIX qw(strftime);
+ 
+-use Test::More tests => 2;
++use Test::More tests => 3;
+ 
+ # Check that the results of device_date matches strftime.  There is no input
+ # file name, so this will use the current time.
+@@ -26,3 +26,7 @@ is(
+ # Set the override environment variable and ensure that it's honored.
+ local $ENV{POD_MAN_DATE} = '2014-01-01';
+ is($parser->devise_date, '2014-01-01', 'devise_date honors POD_MAN_DATE');
++
++# Check that an empty environment variable is honored.
++local $ENV{POD_MAN_DATE} = q{};
++is($parser->devise_date, q{}, 'devise_date honors empty POD_MAN_DATE');

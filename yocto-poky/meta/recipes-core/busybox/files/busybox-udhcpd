@@ -1,0 +1,43 @@
+#!/bin/sh
+DAEMON=/usr/sbin/udhcpd
+NAME=udhcpd
+DESC="Busybox UDHCP Server"
+ARGS="/etc/udhcpd.conf"
+
+test -f $DAEMON || exit 1
+
+set -e
+
+case "$1" in
+    start)
+        echo -n "starting $DESC: $NAME... "
+	if [ ! -f /etc/udhcpd.conf ]; then
+		echo "error: /etc/udhcpd.conf is missing."
+		exit 1
+	fi
+	/sbin/start-stop-daemon -S -b -n $NAME -a $DAEMON -- $ARGS
+	echo "done."
+	;;
+    stop)
+        echo -n "stopping $DESC: $NAME... "
+	/sbin/start-stop-daemon -K -n $NAME
+	echo "done."
+	;;
+    restart)
+        echo "restarting $DESC: $NAME... "
+ 	$0 stop
+	$0 start
+	echo "done."
+	;;
+    reload)
+    	echo -n "reloading $DESC: $NAME... "
+    	killall -HUP $(basename ${DAEMON})
+	echo "done."
+	;;
+    *)
+	echo "Usage: $0 {start|stop|restart|reload}"
+	exit 1
+	;;
+esac
+
+exit 0

@@ -1,0 +1,110 @@
+nss: fix incorrect shebang of perl
+
+Replace incorrect shebang of perl with `#!/usr/bin/env perl'.
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+Upstream-Status: Pending
+---
+ nss/cmd/smimetools/smime  | 2 +-
+ nss/coreconf/cpdist.pl    | 2 +-
+ nss/coreconf/import.pl    | 2 +-
+ nss/coreconf/jniregen.pl  | 2 +-
+ nss/coreconf/outofdate.pl | 2 +-
+ nss/coreconf/release.pl   | 2 +-
+ nss/coreconf/version.pl   | 2 +-
+ nss/tests/clean_tbx       | 2 +-
+ nss/tests/path_uniq       | 2 +-
+ 9 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/nss/cmd/smimetools/smime b/nss/cmd/smimetools/smime
+--- a/nss/cmd/smimetools/smime
++++ b/nss/cmd/smimetools/smime
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/perl
++#!/usr/bin/env perl
+ 
+ # This Source Code Form is subject to the terms of the Mozilla Public
+ # License, v. 2.0. If a copy of the MPL was not distributed with this
+diff --git a/nss/coreconf/cpdist.pl b/nss/coreconf/cpdist.pl
+index 800edfb..652187f 100755
+--- a/nss/coreconf/cpdist.pl
++++ b/nss/coreconf/cpdist.pl
+@@ -1,4 +1,4 @@
+-#! /usr/local/bin/perl
++#!/usr/bin/env perl
+ #
+ # This Source Code Form is subject to the terms of the Mozilla Public
+ # License, v. 2.0. If a copy of the MPL was not distributed with this
+diff --git a/nss/coreconf/import.pl b/nss/coreconf/import.pl
+index dd2d177..428eaa5 100755
+--- a/nss/coreconf/import.pl
++++ b/nss/coreconf/import.pl
+@@ -1,4 +1,4 @@
+-#! /usr/local/bin/perl
++#!/usr/bin/env perl
+ #
+ # This Source Code Form is subject to the terms of the Mozilla Public
+ # License, v. 2.0. If a copy of the MPL was not distributed with this
+diff --git a/nss/coreconf/jniregen.pl b/nss/coreconf/jniregen.pl
+index 2039180..5f4f69c 100755
+--- a/nss/coreconf/jniregen.pl
++++ b/nss/coreconf/jniregen.pl
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/perl
++#!/usr/bin/env perl
+ #
+ # This Source Code Form is subject to the terms of the Mozilla Public
+ # License, v. 2.0. If a copy of the MPL was not distributed with this
+diff --git a/nss/coreconf/outofdate.pl b/nss/coreconf/outofdate.pl
+index 33d80bb..01fc097 100755
+--- a/nss/coreconf/outofdate.pl
++++ b/nss/coreconf/outofdate.pl
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/perl
++#!/usr/bin/env perl
+ #
+ # This Source Code Form is subject to the terms of the Mozilla Public
+ # License, v. 2.0. If a copy of the MPL was not distributed with this
+diff --git a/nss/coreconf/release.pl b/nss/coreconf/release.pl
+index 7cde19d..b5df2f6 100755
+--- a/nss/coreconf/release.pl
++++ b/nss/coreconf/release.pl
+@@ -1,4 +1,4 @@
+-#! /usr/local/bin/perl
++#!/usr/bin/env perl
+ #
+ # This Source Code Form is subject to the terms of the Mozilla Public
+ # License, v. 2.0. If a copy of the MPL was not distributed with this
+diff --git a/nss/coreconf/version.pl b/nss/coreconf/version.pl
+index d2a4942..79359fe 100644
+--- a/nss/coreconf/version.pl
++++ b/nss/coreconf/version.pl
+@@ -1,4 +1,4 @@
+-#!/usr/sbin/perl
++#!/usr/bin/env perl
+ #
+ # This Source Code Form is subject to the terms of the Mozilla Public
+ # License, v. 2.0. If a copy of the MPL was not distributed with this
+diff --git a/nss/tests/clean_tbx b/nss/tests/clean_tbx
+index 4de9555..a7def9f 100755
+--- a/nss/tests/clean_tbx
++++ b/nss/tests/clean_tbx
+@@ -1,4 +1,4 @@
+-#! /bin/perl
++#!/usr/bin/env perl
+ 
+ #######################################################################
+ #
+diff --git a/nss/tests/path_uniq b/nss/tests/path_uniq
+index f29f60a..08fbffa 100755
+--- a/nss/tests/path_uniq
++++ b/nss/tests/path_uniq
+@@ -1,4 +1,4 @@
+-#! /bin/perl
++#!/usr/bin/env perl
+ 
+ ########################################################################
+ #
+-- 
+1.8.1.2
+

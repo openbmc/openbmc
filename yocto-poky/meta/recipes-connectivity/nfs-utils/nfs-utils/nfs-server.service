@@ -1,0 +1,18 @@
+[Unit]
+Description=NFS Server
+Requires=rpcbind.service nfs-mountd.service
+After=rpcbind.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=-@SYSCONFDIR@/nfs-utils.conf
+ExecStartPre=@SBINDIR@/exportfs -r
+ExecStart=@SBINDIR@/rpc.nfsd $NFSD_OPTS $NFSD_COUNT
+ExecStop=@SBINDIR@/rpc.nfsd 0
+ExecStopPost=@SBINDIR@/exportfs -f
+ExecReload=@SBINDIR@/exportfs -r
+StandardError=syslog
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

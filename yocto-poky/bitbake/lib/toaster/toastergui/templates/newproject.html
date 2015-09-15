@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% load projecttags %}
+{% load humanize %}
+{% block pagecontent %}
+<div class="row-fluid">
+    <div class="page-header">
+          <h1>Create a new project</h1>
+        </div>
+        <div class="container-fluid">
+    {% if alert %}
+      <div class="alert alert-error row-fluid" role="alert">{{alert}}</div>
+    {% endif %}
+        </div>
+
+      <div class="row-fluid">
+        <div class="span6">
+        <form method="POST">{% csrf_token %}
+
+            <fieldset>
+              <label>Project name <span class="muted">(required)</span></label>
+              <input type="text" class="input-xlarge" required id="new-project-name" name="projectname">
+            </fieldset>
+<!--
+            <fieldset>
+                <label class="project-form">Project type</label>
+                    <label class="project-form radio"><input type="radio" name="ptype" value="analysis" checked/> Analysis Project</label>
+
+                {% if releases.count > 0 %}
+                    <label class="project-form radio"><input type="radio" name="ptype" value="build" checked /> Build Project</label>
+                {% endif %}
+              </fieldset> -->
+        <input type="hidden" name="ptype" value="build" />
+
+        {% if releases.count > 0 %}
+            <fieldset class="release">
+            {% if releases.count > 1 %}
+              <label class="project-form">
+                Release
+                <i class="icon-question-sign get-help" title="The version of the build system you want to use"></i>
+              </label>
+              <select name="projectversion" id="projectversion">
+                {% for release in releases %}
+                    <option value="{{release.id}}"
+                        {%if defaultbranch == release.name %}
+                            selected
+                        {%endif%}
+                     >{{release.description}}</option>
+                {% endfor %}
+              </select>
+                {% for release in releases %}
+              <div class="row-fluid helptext" id="description-{{release.id}}" style="display: none">
+                <span class="help-block span5">{{release.helptext|safe}}</span>
+              </div>
+                {% endfor %}
+            {% else %}
+              <input type="hidden" name="projectversion" value="{{releases.0.id}}"/>
+            {% endif %}
+            </fieldset>
+        {% endif %}
+
+            <div class="form-actions">
+              <input type="submit" id="create-project-button" class="btn btn-primary btn-large" value="Create project"/>
+              <span class="help-inline" style="vertical-align:middle;">To create a project, you need to enter a project name</span>
+            </div>
+        </form>
+        </div>
+        <!--
+        <div class="span5 well">
+                <span class="help-block">
+                 <h4>Toaster project types</h4>
+                 <p>With a <strong>build project</strong> you configure and run your builds from Toaster.</p>
+                 <p>With an <strong>analysis project</strong>, the builds are configured and run by another tool
+                 (something like Buildbot or Jenkins), and the project only collects the information about the
+                 builds (packages, recipes, dependencies, logs, etc). </p>
+                 <p>You can read more on <a href="#">how to set up an analysis project</a>
+                 in the Toaster manual.</p>
+                 <h4>Release</h4>
+                 <p>If you create a <strong>build project</strong>, you will need to select a <strong>release</strong>,
+                 which is the version of the build system you want to use to run your builds.</p>
+             </div> -->
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // hide the new project button
+            $("#new-project-button").hide();
+            $('.btn-primary').attr('disabled', 'disabled');
+
+            // enable submit button when all required fields are populated
+            $("input#new-project-name").on('input', function() {
+                if ($("input#new-project-name").val().length > 0 ){
+                    $('.btn-primary').removeAttr('disabled');
+                    $(".help-inline").css('visibility','hidden');
+                }
+                else {
+                    $('.btn-primary').attr('disabled', 'disabled');
+                    $(".help-inline").css('visibility','visible');
+                }
+            });
+
+            // show relevant help text for the selected release
+            var selected_release = $('select').val();
+            $("#description-" + selected_release).show();
+
+
+            $('select').change(function(){
+                var new_release = $('select').val();
+                $(".helptext").hide();
+                $('#description-' + new_release).fadeIn();
+            });
+
+/*			// Hide the project release when you select an analysis project
+			function projectType() {
+				if ($("input[type='radio']:checked").val() == 'build') {
+					$('.release').fadeIn();
+				}
+				else {
+					$('.release').fadeOut();
+				}
+			}
+			projectType();
+
+			$('input:radio').change(function(){
+				projectType();
+			}); */
+        });
+    </script>
+
+{% endblock %}

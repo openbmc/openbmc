@@ -1,0 +1,240 @@
+From 9bdc197474795f2d000c2bc04f58f7cef8898f21 Mon Sep 17 00:00:00 2001
+From: Amarnath Valluri <amarnath.valluri@intel.com>
+Date: Wed, 15 Jul 2015 13:07:20 +0300
+Subject: [PATCH] Debian patch to add a new 'nullok_secure' option to pam_unix,
+ which accepts users with null passwords only when the applicant is connected
+ from a tty listed in /etc/securetty.
+
+Authors: Sam Hartman <hartmans@debian.org>,
+         Steve Langasek <vorlon@debian.org>
+
+Upstream-Status: Pending
+
+Signed-off-by: Ming Liu <ming.liu@windriver.com>
+
+v2:
+	- Forward ported from v1.1.6 to v1.2.1
+
+Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
+---
+ modules/pam_unix/Makefile.am    |  3 ++-
+ modules/pam_unix/README         | 11 ++++++++++-
+ modules/pam_unix/pam_unix.8     |  9 ++++++++-
+ modules/pam_unix/pam_unix.8.xml | 19 ++++++++++++++++++-
+ modules/pam_unix/support.c      | 40 +++++++++++++++++++++++++++++++++++-----
+ modules/pam_unix/support.h      |  8 ++++++--
+ 6 files changed, 79 insertions(+), 11 deletions(-)
+
+diff --git a/modules/pam_unix/Makefile.am b/modules/pam_unix/Makefile.am
+index 56ed591..9a372ac 100644
+--- a/modules/pam_unix/Makefile.am
++++ b/modules/pam_unix/Makefile.am
+@@ -30,7 +30,8 @@ if HAVE_VERSIONING
+   pam_unix_la_LDFLAGS += -Wl,--version-script=$(srcdir)/../modules.map
+ endif
+ pam_unix_la_LIBADD = $(top_builddir)/libpam/libpam.la \
+-	@LIBCRYPT@ @LIBSELINUX@ $(NIS_LIBS)
++	@LIBCRYPT@ @LIBSELINUX@ $(NIS_LIBS) \
++	../pam_securetty/tty_secure.lo
+ 
+ securelib_LTLIBRARIES = pam_unix.la
+ 
+diff --git a/modules/pam_unix/README b/modules/pam_unix/README
+index 3935dba..7880d91 100644
+--- a/modules/pam_unix/README
++++ b/modules/pam_unix/README
+@@ -67,7 +67,16 @@ nullok
+ 
+     The default action of this module is to not permit the user access to a
+     service if their official password is blank. The nullok argument overrides
+-    this default.
++    this default and allows any user with a blank password to access the
++    service.
++
++nullok_secure
++
++    The default action of this module is to not permit the user access to a
++    service if their official password is blank. The nullok_secure argument
++    overrides this default and allows any user with a blank password to access
++    the service as long as the value of PAM_TTY is set to one of the values
++    found in /etc/securetty.
+ 
+ try_first_pass
+ 
+diff --git a/modules/pam_unix/pam_unix.8 b/modules/pam_unix/pam_unix.8
+index 339178b..a4bd906 100644
+--- a/modules/pam_unix/pam_unix.8
++++ b/modules/pam_unix/pam_unix.8
+@@ -92,7 +92,14 @@ Turns off informational messages namely messages about session open and close vi
+ .RS 4
+ The default action of this module is to not permit the user access to a service if their official password is blank\&. The
+ \fBnullok\fR
+-argument overrides this default\&.
++argument overrides this default and allows any user with a blank password to access the service\&.
++.RE
++.PP
++\fBnullok_secure\fR
++.RS 4
++The default action of this module is to not permit the user access to a service if their official password is blank\&. The
++\fBnullok_secure\fR
++argument overrides this default and allows any user with a blank password to access the service as long as the value of PAM_TTY is set to one of the values found in /etc/securetty\&.
+ .RE
+ .PP
+ \fBtry_first_pass\fR
+diff --git a/modules/pam_unix/pam_unix.8.xml b/modules/pam_unix/pam_unix.8.xml
+index a8b64bb..1ced6f4 100644
+--- a/modules/pam_unix/pam_unix.8.xml
++++ b/modules/pam_unix/pam_unix.8.xml
+@@ -159,7 +159,24 @@
+           <para>
+             The default action of this module is to not permit the
+             user access to a service if their official password is blank.
+-            The <option>nullok</option> argument overrides this default.
++            The <option>nullok</option> argument overrides this default
++            and allows any user with a blank password to access the
++            service.
++          </para>
++        </listitem>
++      </varlistentry>
++      <varlistentry>
++        <term>
++          <option>nullok_secure</option>
++        </term>
++        <listitem>
++          <para>
++            The default action of this module is to not permit the
++            user access to a service if their official password is blank.
++            The <option>nullok_secure</option> argument overrides this
++            default and allows any user with a blank password to access
++            the service as long as the value of PAM_TTY is set to one of
++            the values found in /etc/securetty.
+           </para>
+         </listitem>
+       </varlistentry>
+diff --git a/modules/pam_unix/support.c b/modules/pam_unix/support.c
+index abccd82..2361957 100644
+--- a/modules/pam_unix/support.c
++++ b/modules/pam_unix/support.c
+@@ -189,13 +189,22 @@ int _set_ctrl(pam_handle_t *pamh, int flags, int *remember, int *rounds,
+ 	/* now parse the arguments to this module */
+ 
+ 	for (; argc-- > 0; ++argv) {
++		int sl;
+ 
+ 		D(("pam_unix arg: %s", *argv));
+ 
+ 		for (j = 0; j < UNIX_CTRLS_; ++j) {
+-			if (unix_args[j].token
+-			    && !strncmp(*argv, unix_args[j].token, strlen(unix_args[j].token))) {
+-				break;
++			if (unix_args[j].token) {
++				sl = strlen(unix_args[j].token);
++				if (unix_args[j].token[sl-1] == '=') {
++					/* exclude argument from comparison */
++					if (!strncmp(*argv, unix_args[j].token, sl))
++						break;
++				} else {
++				/* compare full strings */
++					if (!strcmp(*argv, unix_args[j].token))
++						break;
++				}
+ 			}
+ 		}
+ 
+@@ -566,6 +575,7 @@ static int _unix_run_helper_binary(pam_handle_t *pamh, const char *passwd,
+     if (child == 0) {
+ 	static char *envp[] = { NULL };
+ 	const char *args[] = { NULL, NULL, NULL, NULL };
++	int nullok = off(UNIX__NONULL, ctrl);
+ 
+ 	/* XXX - should really tidy up PAM here too */
+ 
+@@ -593,7 +603,16 @@ static int _unix_run_helper_binary(pam_handle_t *pamh, const char *passwd,
+ 	/* exec binary helper */
+ 	args[0] = CHKPWD_HELPER;
+ 	args[1] = user;
+-	if (off(UNIX__NONULL, ctrl)) {	/* this means we've succeeded */
++	if (on(UNIX_NULLOK_SECURE, ctrl)) {
++		const void *uttyname;
++		retval = pam_get_item(pamh, PAM_TTY, &uttyname);
++		if (retval != PAM_SUCCESS || uttyname == NULL
++			|| _pammodutil_tty_secure(pamh, (const char *)uttyname) != PAM_SUCCESS) {
++			nullok = 0;
++		}
++	}
++
++	if (nullok) {
+ 	  args[2]="nullok";
+ 	} else {
+ 	  args[2]="nonull";
+@@ -678,6 +697,17 @@ _unix_blankpasswd (pam_handle_t *pamh, unsigned int ctrl, const char *name)
+ 	if (on(UNIX__NONULL, ctrl))
+ 		return 0;	/* will fail but don't let on yet */
+ 
++	if (on(UNIX_NULLOK_SECURE, ctrl)) {
++		int retval2;
++		const void *uttyname;
++		retval2 = pam_get_item(pamh, PAM_TTY, &uttyname);
++		if (retval2 != PAM_SUCCESS || uttyname == NULL)
++			return 0;
++
++		if (_pammodutil_tty_secure(pamh, (const char *)uttyname) != PAM_SUCCESS)
++			return 0;
++	}
++
+ 	/* UNIX passwords area */
+ 
+ 	retval = get_pwd_hash(pamh, name, &pwd, &salt);
+@@ -764,7 +794,7 @@ int _unix_verify_password(pam_handle_t * pamh, const char *name
+ 			}
+ 		}
+ 	} else {
+-		retval = verify_pwd_hash(p, salt, off(UNIX__NONULL, ctrl));
++		retval = verify_pwd_hash(p, salt, _unix_blankpasswd(pamh, ctrl, name));
+ 	}
+ 
+ 	if (retval == PAM_SUCCESS) {
+diff --git a/modules/pam_unix/support.h b/modules/pam_unix/support.h
+index 3729ce0..43cdbea 100644
+--- a/modules/pam_unix/support.h
++++ b/modules/pam_unix/support.h
+@@ -99,8 +99,9 @@ typedef struct {
+ #define UNIX_MIN_PASS_LEN        27	/* min length for password */
+ #define UNIX_QUIET		 28	/* Don't print informational messages */
+ #define UNIX_DES                 29     /* DES, default */
++#define UNIX_NULLOK_SECURE       30     /* NULL passwords allowed only on secure ttys */
+ /* -------------- */
+-#define UNIX_CTRLS_              30	/* number of ctrl arguments defined */
++#define UNIX_CTRLS_              31	/* number of ctrl arguments defined */
+ 
+ #define UNIX_DES_CRYPT(ctrl)	(off(UNIX_MD5_PASS,ctrl)&&off(UNIX_BIGCRYPT,ctrl)&&off(UNIX_SHA256_PASS,ctrl)&&off(UNIX_SHA512_PASS,ctrl)&&off(UNIX_BLOWFISH_PASS,ctrl))
+ 
+@@ -118,7 +119,7 @@ static const UNIX_Ctrls unix_args[UNIX_CTRLS_] =
+ /* UNIX_NOT_SET_PASS */    {"not_set_pass",    _ALL_ON_,                0100, 0},
+ /* UNIX__PRELIM */         {NULL,              _ALL_ON_^(0600),         0200, 0},
+ /* UNIX__UPDATE */         {NULL,              _ALL_ON_^(0600),         0400, 0},
+-/* UNIX__NONULL */         {NULL,              _ALL_ON_,               01000, 0},
++/* UNIX__NONULL */         {NULL,              _ALL_ON_^(02000000000),   01000, 0},
+ /* UNIX__QUIET */          {NULL,              _ALL_ON_,               02000, 0},
+ /* UNIX_USE_AUTHTOK */     {"use_authtok",     _ALL_ON_,               04000, 0},
+ /* UNIX_SHADOW */          {"shadow",          _ALL_ON_,              010000, 0},
+@@ -139,6 +140,7 @@ static const UNIX_Ctrls unix_args[UNIX_CTRLS_] =
+ /* UNIX_MIN_PASS_LEN */    {"minlen=",		_ALL_ON_,         0400000000, 0},
+ /* UNIX_QUIET */           {"quiet",           _ALL_ON_,         01000000000, 0},
+ /* UNIX_DES */             {"des",             _ALL_ON_^(0260420000),      0, 1},
++/* UNIX_NULLOK_SECURE */   {"nullok_secure",   _ALL_ON_^(01000),  02000000000, 0},
+ };
+ 
+ #define UNIX_DEFAULTS  (unix_args[UNIX__NONULL].flag)
+@@ -171,6 +173,8 @@ extern int _unix_read_password(pam_handle_t * pamh
+ 			,const char *prompt2
+ 			,const char *data_name
+ 			,const void **pass);
++extern int _pammodutil_tty_secure(const pam_handle_t *pamh,
++         const char *uttyname);
+ 
+ extern int _unix_run_verify_binary(pam_handle_t *pamh,
+ 			unsigned int ctrl, const char *user, int *daysleft);
+-- 
+2.1.4
+

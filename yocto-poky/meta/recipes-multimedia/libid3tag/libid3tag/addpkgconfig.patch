@@ -1,0 +1,43 @@
+Upstream-Status: Inappropriate [configuration]
+
+Index: libid3tag-0.15.1b/Makefile.am
+===================================================================
+--- libid3tag-0.15.1b.orig/Makefile.am	2009-07-29 09:29:20.000000000 +0100
++++ libid3tag-0.15.1b/Makefile.am	2009-07-29 09:29:47.000000000 +0100
+@@ -27,6 +27,9 @@
+ lib_LTLIBRARIES =	libid3tag.la
+ include_HEADERS =	id3tag.h
+ 
++pkgconfigdir = $(libdir)/pkgconfig
++pkgconfig_DATA = id3tag.pc
++
+ ## From the libtool documentation on library versioning:
+ ##
+ ## CURRENT
+Index: libid3tag-0.15.1b/configure.ac
+===================================================================
+--- libid3tag-0.15.1b.orig/configure.ac	2009-07-29 09:27:15.000000000 +0100
++++ libid3tag-0.15.1b/configure.ac	2009-07-29 09:27:45.000000000 +0100
+@@ -201,5 +201,5 @@
+ dnl AC_SUBST(LTLIBOBJS)
+ 
+ AC_CONFIG_FILES([Makefile msvc++/Makefile  \
+-	libid3tag.list])
++	libid3tag.list id3tag.pc])
+ AC_OUTPUT
+Index: libid3tag-0.15.1b/id3tag.pc.in
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ libid3tag-0.15.1b/id3tag.pc.in	2009-07-29 09:29:10.000000000 +0100
+@@ -0,0 +1,11 @@
++prefix=@prefix@
++exec_prefix=@exec_prefix@
++libdir=@libdir@
++includedir=@includedir@
++
++Name: id3tag
++Description: ID3 tag reading library
++Requires:
++Version: @VERSION@
++Libs: -L${libdir} -lid3tag -lz
++Cflags: -I${includedir}

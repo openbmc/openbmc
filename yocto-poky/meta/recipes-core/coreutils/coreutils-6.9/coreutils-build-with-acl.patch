@@ -1,0 +1,28 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+Fix the following issue so that coreutils can build with ACL:
+
+configure: WARNING: libacl development library was not found or not usable.
+configure: WARNING: GNU coreutils will be built without ACL support.
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ m4/acl.m4 |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/m4/acl.m4 b/m4/acl.m4
+index d6a448a..a9d4836 100644
+--- a/m4/acl.m4
++++ b/m4/acl.m4
+@@ -159,7 +159,7 @@ AC_DEFUN([gl_ACL_GET_FILE],
+           ]])],
+        [gl_cv_func_working_acl_get_file=yes],
+        [gl_cv_func_working_acl_get_file=no],
+-       [gl_cv_func_working_acl_get_file=cross-compiling])])
++       [gl_cv_func_working_acl_get_file=yes])])
+ 
+   AS_IF([test $gl_cv_func_working_acl_get_file = yes], [$1], [$2])
+ ])
+-- 
+1.7.7
+

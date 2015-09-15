@@ -1,0 +1,47 @@
+From 50e5366005b0f6af27378e2a5c3cb9f9936a7e62 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 29 Mar 2013 08:58:36 +0400
+Subject: [PATCH 15/35] arm: Use TARGET_ENDIAN_OPTION for determining
+ MULTILIB_DEFAULTS
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Pending
+---
+ gcc/config/arm/linux-elf.h |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: gcc-4.9.2/gcc/config/arm/coff.h
+===================================================================
+--- gcc-4.9.2.orig/gcc/config/arm/coff.h
++++ gcc-4.9.2/gcc/config/arm/coff.h
+@@ -32,8 +32,11 @@
+ #define TARGET_DEFAULT (MASK_APCS_FRAME)
+ 
+ #ifndef MULTILIB_DEFAULTS
++#ifndef TARGET_ENDIAN_OPTION
++#define TARGET_ENDIAN_OPTION "mlittle-endian"
++#endif
+ #define MULTILIB_DEFAULTS \
+-  { "marm", "mlittle-endian", "mfloat-abi=soft", "mno-thumb-interwork" }
++  { "marm", TARGET_ENDIAN_OPTION, "mfloat-abi=soft", "mno-thumb-interwork" }
+ #endif
+ 
+ /* This is COFF, but prefer stabs.  */
+Index: gcc-4.9.2/gcc/config/arm/elf.h
+===================================================================
+--- gcc-4.9.2.orig/gcc/config/arm/elf.h
++++ gcc-4.9.2/gcc/config/arm/elf.h
+@@ -116,8 +116,11 @@
+ #endif
+ 
+ #ifndef MULTILIB_DEFAULTS
++#ifndef TARGET_ENDIAN_OPTION
++#define TARGET_ENDIAN_OPTION "mlittle-endian"
++#endif
+ #define MULTILIB_DEFAULTS \
+-  { "marm", "mlittle-endian", "mfloat-abi=soft", "mno-thumb-interwork", "fno-leading-underscore" }
++  { "marm", TARGET_ENDIAN_OPTION, "mfloat-abi=soft", "mno-thumb-interwork", "fno-leading-underscore" }
+ #endif
+ 
+ #define TARGET_ASM_FILE_START_APP_OFF true

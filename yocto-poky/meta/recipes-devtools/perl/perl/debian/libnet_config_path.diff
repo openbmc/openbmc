@@ -1,0 +1,37 @@
+From a7f6d453e60256d329469a75b642cca854cebea1 Mon Sep 17 00:00:00 2001
+From: Brendan O'Dea <bod@debian.org>
+Date: Tue, 8 Mar 2005 19:30:38 +1100
+Subject: Set location of libnet.cfg to /etc/perl/Net as /usr may not be
+ writable.
+
+Patch-Name: debian/libnet_config_path.diff
+---
+ cpan/libnet/lib/Net/Config.pm | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/cpan/libnet/lib/Net/Config.pm b/cpan/libnet/lib/Net/Config.pm
+index 953a826..61ba12a 100644
+--- a/cpan/libnet/lib/Net/Config.pm
++++ b/cpan/libnet/lib/Net/Config.pm
+@@ -68,9 +68,8 @@ my %nc = (
+ TRY_INTERNET_CONFIG
+ }
+ 
+-my $file = __FILE__;
++my $file = '/etc/perl/Net/libnet.cfg';
+ my $ref;
+-$file =~ s/Config.pm/libnet.cfg/;
+ if (-f $file) {
+   $ref = eval { local $SIG{__DIE__}; do $file };
+   if (ref($ref) eq 'HASH') {
+@@ -142,8 +141,8 @@ Net::Config - Local configuration data for libnet
+ C<Net::Config> holds configuration data for the modules in the libnet
+ distribution. During installation you will be asked for these values.
+ 
+-The configuration data is held globally in a file in the perl installation
+-tree, but a user may override any of these values by providing their own. This
++The configuration data is held globally in C</etc/perl/Net/libnet.cfg>,
++but a user may override any of these values by providing their own. This
+ can be done by having a C<.libnetrc> file in their home directory. This file
+ should return a reference to a HASH containing the keys described below.
+ For example

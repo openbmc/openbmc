@@ -1,0 +1,19 @@
+When using make -j with the 'install' target, it's possible for altbininstall
+(which normally creates BINDIR) and libainstall (which doesn't, though it
+installs python-config there) to race, resulting in a failure due to
+attempting to install python-config into a nonexistent BINDIR. Ensure it also
+exists in the libainstall target.
+
+Upstream-Status: Pending
+
+--- Python-2.7.3.orig/Makefile.pre.in
++++ Python-2.7.3/Makefile.pre.in
+@@ -1008,7 +1008,7 @@ LIBPL=		$(LIBP)/config
+ LIBPC=		$(LIBDIR)/pkgconfig
+
+ libainstall:	all python-config
+-	@for i in $(LIBDIR) $(LIBP) $(LIBPL) $(LIBPC); \
++	@for i in $(LIBDIR) $(LIBP) $(LIBPL) $(LIBPC) $(BINDIR); \
+	do \
+		if test ! -d $(DESTDIR)$$i; then \
+			echo "Creating directory $$i"; \

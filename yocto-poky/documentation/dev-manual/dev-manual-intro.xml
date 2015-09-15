@@ -1,0 +1,246 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
+[<!ENTITY % poky SYSTEM "../poky.ent"> %poky; ] >
+
+<chapter id='dev-manual-intro'>
+
+<title>The Yocto Project Development Manual</title>
+    <section id='dev-intro'>
+        <title>Introduction</title>
+
+        <para>
+            Welcome to the Yocto Project Development Manual!
+            This manual provides information on how to use the Yocto Project to
+            develop embedded Linux images and user-space applications that
+            run on targeted devices.
+            The manual provides an overview of image, kernel, and
+            user-space application development using the Yocto Project.
+            Because much of the information in this manual is general, it
+            contains many references to other sources where you can find more
+            detail.
+            For example, you can find detailed information on Git, repositories,
+            and open source in general in many places on the Internet.
+            Another example specific to the Yocto Project is how to quickly
+            set up your host development system and build an image, which you
+            find in the
+            <ulink url='&YOCTO_DOCS_QS_URL;'>Yocto Project Quick Start</ulink>.
+        </para>
+
+        <para>
+            The Yocto Project Development Manual does, however, provide
+            guidance and examples on how to change the kernel source code,
+            reconfigure the kernel, and develop an application using the
+            popular <trademark class='trade'>Eclipse</trademark> IDE.
+        </para>
+
+        <note>
+            By default, using the Yocto Project creates a Poky distribution.
+            However, you can create your own distribution by providing key
+            <link linkend='metadata'>Metadata</link>.
+            A good example is Angstrom, which has had a distribution
+            based on the Yocto Project since its inception.
+            Other examples include commercial distributions like
+            <ulink url='https://www.yoctoproject.org/organization/wind-river-systems'>Wind River Linux</ulink>,
+            <ulink url='https://www.yoctoproject.org/organization/mentor-graphics'>Mentor Embedded Linux</ulink>,
+            <ulink url='https://www.yoctoproject.org/organization/enea-ab'>ENEA Linux</ulink>
+            and <ulink url='https://www.yoctoproject.org/ecosystem/member-organizations'>others</ulink>.
+            See the "<link linkend='creating-your-own-distribution'>Creating Your Own Distribution</link>"
+            section for more information.
+        </note>
+    </section>
+
+    <section id='what-this-manual-provides'>
+        <title>What This Manual Provides</title>
+
+        <para>
+            The following list describes what you can get from this manual:
+            <itemizedlist>
+                <listitem><para>Information that lets you get set
+                    up to develop using the Yocto Project.</para></listitem>
+                <listitem><para>Information to help developers who are new to
+                    the open source environment and to the distributed revision
+                    control system Git, which the Yocto Project uses.
+                    </para></listitem>
+                <listitem><para>An understanding of common end-to-end
+                    development models and tasks.</para></listitem>
+                <listitem><para>Information about common development tasks
+                    generally used during image development for
+                    embedded devices.
+                    </para></listitem>
+                <listitem><para>Information on using the Yocto Project
+                    integration of the QuickEMUlator (QEMU), which lets you
+                    simulate running on hardware an image you have built using
+                    the OpenEmbedded build system.
+                    </para></listitem>
+                <listitem><para>Many references to other sources of related
+                    information.</para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='what-this-manual-does-not-provide'>
+        <title>What this Manual Does Not Provide</title>
+
+        <para>
+            This manual will not give you the following:
+            <itemizedlist>
+                <listitem><para><emphasis>Step-by-step instructions when those instructions exist in other Yocto
+                    Project documentation:</emphasis>
+                    For example, the Yocto Project Application Developer's Guide contains detailed
+                    instructions on how to run the
+                    <ulink url='&YOCTO_DOCS_ADT_URL;#installing-the-adt'>ADT Installer</ulink>,
+                    which is used to set up a cross-development environment.</para></listitem>
+                <listitem><para><emphasis>Reference material:</emphasis>
+                    This type of material resides in an appropriate reference manual.
+                    For example, system variables are documented in the
+                    <ulink url='&YOCTO_DOCS_REF_URL;'>Yocto Project Reference Manual</ulink>.</para></listitem>
+                <listitem><para><emphasis>Detailed public information that is not specific to the Yocto Project:</emphasis>
+                    For example, exhaustive information on how to use Git is covered better through the
+                    Internet than in this manual.</para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='other-information'>
+        <title>Other Information</title>
+
+        <para>
+            Because this manual presents overview information for many different
+            topics, supplemental information is recommended for full
+            comprehension.
+            The following list presents other sources of information you might find helpful:
+            <itemizedlist>
+                <listitem><para><emphasis><ulink url='&YOCTO_HOME_URL;'>Yocto Project Website</ulink>:
+                    </emphasis> The home page for the Yocto Project provides lots of information on the project
+                    as well as links to software and documentation.
+                    </para></listitem>
+                <listitem><para><emphasis>
+                    <ulink url='&YOCTO_DOCS_QS_URL;'>Yocto Project Quick Start</ulink>:</emphasis>
+                    This short document lets you get started
+                    with the Yocto Project and quickly begin building an image.
+                    </para></listitem>
+                <listitem><para><emphasis>
+                    <ulink url='&YOCTO_DOCS_REF_URL;'>Yocto Project Reference Manual</ulink>:</emphasis>
+                    This manual is a reference
+                    guide to the OpenEmbedded build system, which is based on BitBake.
+                    The build system is sometimes referred to as "Poky".
+                    </para></listitem>
+                <listitem><para><emphasis>
+                    <ulink url='&YOCTO_DOCS_ADT_URL;'>Yocto Project Application Developer's Guide</ulink>:</emphasis>
+                    This guide provides information that lets you get going with the Application
+                    Development Toolkit (ADT) and stand-alone cross-development toolchains to
+                    develop projects using the Yocto Project.
+                    </para></listitem>
+                <listitem><para><emphasis>
+                    <ulink url='&YOCTO_DOCS_BSP_URL;'>Yocto Project Board Support Package (BSP) Developer's Guide</ulink>:</emphasis>
+                    This guide defines the structure for BSP components.
+                    Having a commonly understood structure encourages standardization.
+                    </para></listitem>
+                <listitem><para><emphasis>
+                    <ulink url='&YOCTO_DOCS_KERNEL_DEV_URL;'>Yocto Project Linux Kernel Development Manual</ulink>:</emphasis>
+                    This manual describes how to work with Linux Yocto kernels as well as provides a bit
+                    of conceptual information on the construction of the Yocto Linux kernel tree.
+                    </para></listitem>
+                <listitem><para><emphasis>
+                    <ulink url='&YOCTO_DOCS_PROF_URL;'>Yocto Project Profiling and Tracing Manual</ulink>:</emphasis>
+                    This manual presents a set of common and generally useful tracing and
+                    profiling schemes along with their applications (as appropriate) to each tool.
+                    </para></listitem>
+                <listitem><para><emphasis>
+                    <ulink url='&YOCTO_DOCS_TOAST_URL;'>Toaster User Manual</ulink>:</emphasis>
+                    This manual introduces and describes how to set up and use
+                    Toaster, which is a web interface to the Yocto Project's
+                    <link linkend='build-system-term'>OpenEmbedded Build System</link>.
+                    </para></listitem>
+                <listitem><para><emphasis>
+                    <ulink url='http://www.youtube.com/watch?v=3ZlOu-gLsh0'>
+                    Eclipse IDE Yocto Plug-in</ulink>:</emphasis>
+                    A step-by-step instructional video that
+                    demonstrates how an application developer uses Yocto Plug-in features within
+                    the Eclipse IDE.
+                    </para></listitem>
+                <listitem><para><emphasis>
+                    <ulink url='&YOCTO_WIKI_URL;/wiki/FAQ'>FAQ</ulink>:</emphasis>
+                    A list of commonly asked questions and their answers.
+                    </para></listitem>
+                <listitem><para><emphasis>
+                    <ulink url='&YOCTO_RELEASE_NOTES;'>Release Notes</ulink>:</emphasis>
+                    Features, updates and known issues for the current
+                    release of the Yocto Project.
+                    </para></listitem>
+                <listitem><para><emphasis>
+                    <ulink url='&YOCTO_HOME_URL;/tools-resources/projects/hob'>Hob</ulink>:</emphasis>
+                    A graphical user interface for BitBake.
+                    Hob's primary goal is to enable a user to perform common tasks more easily.
+                    </para></listitem>
+                <listitem><para><emphasis>
+                    <ulink url='&YOCTO_HOME_URL;/tools-resources/projects/toaster'>Toaster</ulink>:</emphasis>
+                    An Application Programming Interface (API) and web-based
+                    interface to the OpenEmbedded build system, which uses
+                    BitBake, that reports build information.
+                    </para></listitem>
+                <listitem><para><emphasis>
+                    <ulink url='&YOCTO_HOME_URL;/tools-resources/projects/build-appliance'>Build Appliance</ulink>:</emphasis>
+                    A virtual machine that
+                    enables you to build and boot a custom embedded Linux image
+                    with the Yocto Project using a non-Linux development system.
+                    </para></listitem>
+                <listitem><para><emphasis>
+                    <ulink url='&YOCTO_BUGZILLA_URL;'>Bugzilla</ulink>:</emphasis>
+                    The bug tracking application the Yocto Project uses.
+                    If you find problems with the Yocto Project, you should report them using this
+                    application.
+                    </para></listitem>
+                <listitem><para><emphasis>Yocto Project Mailing Lists:</emphasis>
+                    To subscribe to the Yocto Project mailing
+                    lists, click on the following URLs and follow the instructions:
+                    <itemizedlist>
+                        <listitem><para><ulink url='&YOCTO_LISTS_URL;/listinfo/yocto'></ulink>
+                            for a Yocto Project Discussions mailing list.
+                            </para></listitem>
+                        <listitem><para><ulink url='&YOCTO_LISTS_URL;/listinfo/poky'></ulink>
+                            for a Yocto Project Discussions mailing list about the
+                            OpenEmbedded build system (Poky).
+                            </para></listitem>
+                        <listitem><para><ulink url='&YOCTO_LISTS_URL;/listinfo/yocto-announce'></ulink>
+                            for a mailing list to receive official Yocto Project announcements
+                            as well as Yocto Project milestones.
+                            </para></listitem>
+                        <listitem><para><ulink url='&YOCTO_LISTS_URL;/listinfo'></ulink>
+                            for a listing of all public mailing lists on
+                            <filename>lists.yoctoproject.org</filename>.
+                            </para></listitem>
+                    </itemizedlist></para></listitem>
+                <listitem><para><emphasis>Internet Relay Chat (IRC):</emphasis>
+                    Two IRC channels on freenode are available
+                    for Yocto Project and Poky discussions: <filename>#yocto</filename> and
+                    <filename>#poky</filename>, respectively.
+                    </para></listitem>
+                <listitem><para><emphasis>
+                    <ulink url='&OE_HOME_URL;'>OpenEmbedded</ulink>:</emphasis>
+                    The build system used by the Yocto Project.
+                    This project is the upstream, generic, embedded distribution
+                    from which the Yocto Project derives its build system (Poky)
+                    and to which it contributes.
+                    </para></listitem>
+                <listitem><para><emphasis>
+                    <ulink url='http://www.openembedded.org/wiki/BitBake'>BitBake</ulink>:</emphasis>
+                    The tool used by the OpenEmbedded build system
+                    to process project metadata.
+                    </para></listitem>
+                <listitem><para><emphasis>
+                    <ulink url='&YOCTO_DOCS_BB_URL;'>BitBake User Manual:</ulink></emphasis>
+                    A comprehensive guide to the BitBake tool.
+                    If you want information on BitBake, see this manual.
+                    </para></listitem>
+                <listitem><para><emphasis>
+                    <ulink url='http://wiki.qemu.org/Index.html'>Quick EMUlator (QEMU)</ulink>:</emphasis>
+                    An open-source machine emulator and virtualizer.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+</chapter>
+<!--
+vim: expandtab tw=80 ts=4
+-->

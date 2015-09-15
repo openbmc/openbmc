@@ -1,0 +1,23 @@
+Upstream-Status: Pending
+
+Taken from http://gcc.gnu.org/ml/gcc-patches/2014-04/msg02064.html
+
+2014-04-30  Cesar Philippidis  <cesar@codesourcery.com>
+
+	gcc/
+	* dwarf2cfi.c (dwf_regno): Don't assert reg is a pseudo
+	register.
+	
+
+diff --git a/gcc/dwarf2cfi.c b/gcc/dwarf2cfi.c
+index 4180890..40ef0e2 100644
+--- a/gcc/dwarf2cfi.c
++++ b/gcc/dwarf2cfi.c
+@@ -906,7 +906,6 @@ notice_eh_throw (rtx insn)
+ static inline unsigned
+ dwf_regno (const_rtx reg)
+ {
+-  gcc_assert (REGNO (reg) < FIRST_PSEUDO_REGISTER);
+   return DWARF_FRAME_REGNUM (REGNO (reg));
+ }
+ 

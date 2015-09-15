@@ -1,0 +1,30 @@
+configure.in: drop the test of xmllint and xsltproc
+
+The test is unnecessary, the xmllint and xsltproc were explicitly
+added to RDEPENDS.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.in b/configure.in
+--- a/configure.in
++++ b/configure.in
+@@ -42,10 +42,10 @@ AC_ARG_VAR([LOCALE], [Name and path of the `locale' program.])
+ AC_PATH_PROG([LOCALE], [locale], [locale])
+ 
+ AC_ARG_VAR([XMLLINT], [Name and path of the `xmllint' program.])
+-AC_PATH_PROG([XMLLINT], [xmllint], [xmllint])
++dnl AC_PATH_PROG([XMLLINT], [xmllint], [xmllint])
+ 
+ AC_ARG_VAR([XSLTPROC], [Name and path of the `xsltproc' program.])
+-AC_PATH_PROG([XSLTPROC], [xsltproc], [xsltproc])
++dnl AC_PATH_PROG([XSLTPROC], [xsltproc], [xsltproc])
+ 
+ dnl
+ dnl toolchains
+-- 
+1.8.1.2
+

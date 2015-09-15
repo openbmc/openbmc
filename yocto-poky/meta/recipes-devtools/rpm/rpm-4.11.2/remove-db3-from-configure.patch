@@ -1,0 +1,26 @@
+
+Disable configuring the db3 directory since we will be using the
+external DB provided as part of OE-Core already, no need to have
+duplicate database code.
+
+Upstream-Status: Inappropriate [OE-Core Specific]
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+Index: rpm-4.11.2/configure.ac
+===================================================================
+--- rpm-4.11.2.orig/configure.ac
++++ rpm-4.11.2/configure.ac
+@@ -825,9 +825,9 @@ AC_SUBST(RPMCONFIGDIR)
+ 
+ AC_SUBST(OBJDUMP)
+ 
+-if test "$with_external_db" = no; then
+-    AC_CONFIG_SUBDIRS(db3)
+-fi
++#if test "$with_external_db" = no; then
++#    AC_CONFIG_SUBDIRS(db3)
++#fi
+ 
+ AM_CONDITIONAL([WITH_INTERNAL_DB],[test "$with_external_db" = no])
+ AM_CONDITIONAL([DOXYGEN],[test "$DOXYGEN" != no])

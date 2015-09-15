@@ -1,0 +1,26 @@
+add "-disable-xkb" option
+
+Upstream-Status: Pending
+
+Rebase for 1.2.1 by: Yu Ke <ke.yu@intel.com>
+
+diff --git a/configure.ac b/configure.ac
+index 81c3ae4..26601bf 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -52,11 +52,15 @@ PKG_CHECK_MODULES(SET_XEXT, xext,
+ 	AC_CHECK_HEADERS([X11/extensions/dpms.h X11/extensions/MITMisc.h],,,[#include <X11/Xlib.h>])
+ 	CPPFLAGS="$SAVE_CPPFLAGS"],[echo "not found"])
+ 
++AC_ARG_ENABLE(xkb, AC_HELP_STRING([--disable-xkb], [Disable XKB support]),
++		XKB="$enableval", XKB="yes")
++if test "x$XKB" = "xyes" ; then
+ PKG_CHECK_MODULES(SET_XKB, x11,
+ 	[SAVE_CPPFLAGS="$CPPFLAGS"
+ 	CPPFLAGS="$CPPFLAGS $SET_XKB_CFLAGS $SET_X11_CFLAGS"
+ 	AC_CHECK_HEADERS([X11/XKBlib.h],,,[#include <X11/Xlib.h>])
+ 	CPPFLAGS="$SAVE_CPPFLAGS"],[echo "not found"])
++fi
+ 
+ AC_ARG_WITH(xf86misc, AC_HELP_STRING([--without-xf86misc],[Disable xf86misc support.]),
+                 [USE_XF86MISC="$withval"], [USE_XF86MISC="yes"])

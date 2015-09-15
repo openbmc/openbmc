@@ -1,0 +1,35 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
+
+Index: gtk+-3.8.2/configure.ac
+===================================================================
+--- gtk+-3.8.2.orig/configure.ac
++++ gtk+-3.8.2/configure.ac
+@@ -531,7 +531,7 @@ AC_MSG_CHECKING([Whether to write depend
+ case $enable_explicit_deps in
+   auto)
+     export SED
+-    deplibs_check_method=`(./libtool --config; echo 'eval echo \"$deplibs_check_method\"') | sh`
++    deplibs_check_method=`(./$host_alias-libtool --config; echo 'eval echo \"$deplibs_check_method\"') | sh`
+     if test "x$deplibs_check_method" != xpass_all || test "x$enable_static" = xyes ; then
+       enable_explicit_deps=yes
+     else
+@@ -793,7 +793,7 @@ else
+     dnl Now we check to see if our libtool supports shared lib deps
+     dnl (in a rather ugly way even)
+     if $dynworks; then
+-        module_libtool_config="${CONFIG_SHELL-/bin/sh} ./libtool --config"
++        module_libtool_config="${CONFIG_SHELL-/bin/sh} ./$host_alias-libtool --config"
+         module_deplibs_check=`$module_libtool_config | \
+             grep '^[[a-z_]]*check[[a-z_]]*_method=[['\''"]]' | \
+             sed 's/.*[['\''"]]\(.*\)[['\''"]]$/\1/'`
+@@ -1528,7 +1528,7 @@ fi
+ # We are using gmodule-no-export now, but I'm leaving the stripping
+ # code in place for now, since pango and atk still require gmodule.
+ export SED
+-export_dynamic=`(./libtool --config; echo eval echo \\$export_dynamic_flag_spec) | sh`
++export_dynamic=`(./$host_alias-libtool --config; echo eval echo \\$export_dynamic_flag_spec) | sh`
+ if test -n "$export_dynamic"; then
+   GDK_DEP_LIBS=`echo $GDK_DEP_LIBS | sed -e "s/$export_dynamic//"`
+   GTK_DEP_LIBS=`echo $GTK_DEP_LIBS | sed -e "s/$export_dynamic//"`

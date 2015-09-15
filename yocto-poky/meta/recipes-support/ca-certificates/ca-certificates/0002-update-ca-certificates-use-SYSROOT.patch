@@ -1,0 +1,46 @@
+Upstream-Status: Pending
+
+From 724cb153ca0f607fb38b3a8db3ebb2742601cd81 Mon Sep 17 00:00:00 2001
+From: Andreas Oberritter <obi@opendreambox.org>
+Date: Tue, 19 Mar 2013 17:14:33 +0100
+Subject: [PATCH 2/2] update-ca-certificates: use $SYSROOT
+
+Signed-off-by: Andreas Oberritter <obi@opendreambox.org>
+---
+ sbin/update-ca-certificates |   14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+Index: git/sbin/update-ca-certificates
+===================================================================
+--- git.orig/sbin/update-ca-certificates
++++ git/sbin/update-ca-certificates
+@@ -24,12 +24,12 @@
+ verbose=0
+ fresh=0
+ default=0
+-CERTSCONF=/etc/ca-certificates.conf
+-CERTSDIR=/usr/share/ca-certificates
+-LOCALCERTSDIR=/usr/local/share/ca-certificates
++CERTSCONF=$SYSROOT/etc/ca-certificates.conf
++CERTSDIR=$SYSROOT/usr/share/ca-certificates
++LOCALCERTSDIR=$SYSROOT/usr/local/share/ca-certificates
+ CERTBUNDLE=ca-certificates.crt
+-ETCCERTSDIR=/etc/ssl/certs
+-HOOKSDIR=/etc/ca-certificates/update.d
++ETCCERTSDIR=$SYSROOT/etc/ssl/certs
++HOOKSDIR=$SYSROOT/etc/ca-certificates/update.d
+ 
+ while [ $# -gt 0 ];
+ do
+@@ -92,9 +92,9 @@ add() {
+   PEM="$ETCCERTSDIR/$(basename "$CERT" .crt | sed -e 's/ /_/g' \
+                                                   -e 's/[()]/=/g' \
+                                                   -e 's/,/_/g').pem"
+-  if ! test -e "$PEM" || [ "$(readlink "$PEM")" != "$CERT" ]
++  if ! test -e "$PEM" || [ "$(readlink "$PEM")" != "${CERT##$SYSROOT}" ]
+   then
+-    ln -sf "$CERT" "$PEM"
++    ln -sf "${CERT##$SYSROOT}" "$PEM"
+     echo "+$PEM" >> "$ADDED"
+   fi
+   # Add trailing newline to certificate, if it is missing (#635570)

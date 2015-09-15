@@ -1,0 +1,62 @@
+From: Marco Nenciarini <marco.nenciarini@devise.it>
+Date: Wed, 27 Jan 2010 19:46:21 +0100
+Subject: [PATCH] uuid: preserve -m option status in -v option handling
+
+Bug: 531396
+---
+ uuid_cli.c |   19 ++++++++++---------
+ 1 files changed, 10 insertions(+), 9 deletions(-)
+
+----
+Upstream-Status: Inappropriate [not author]
+
+This patch is from debian ossp-uuid 1.6.2 integration.
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+diff --git a/uuid_cli.c b/uuid_cli.c
+index d1b0b11..14a67fe 100644
+--- a/uuid_cli.c
++++ b/uuid_cli.c
+@@ -140,11 +140,12 @@ int main(int argc, char *argv[])
+                 i = strtol(optarg, &p, 10);
+                 if (*p != '\0')
+                     usage("invalid argument to option 'v'");
++                version &= ~(UUID_MAKE_V1|UUID_MAKE_V3|UUID_MAKE_V4|UUID_MAKE_V5);
+                 switch (i) {
+-                    case 1: version = UUID_MAKE_V1; break;
+-                    case 3: version = UUID_MAKE_V3; break;
+-                    case 4: version = UUID_MAKE_V4; break;
+-                    case 5: version = UUID_MAKE_V5; break;
++                    case 1: version |= UUID_MAKE_V1; break;
++                    case 3: version |= UUID_MAKE_V3; break;
++                    case 4: version |= UUID_MAKE_V4; break;
++                    case 5: version |= UUID_MAKE_V5; break;
+                     default:
+                         usage("invalid version on option 'v'");
+                         break;
+@@ -213,10 +214,10 @@ int main(int argc, char *argv[])
+     }
+     else {
+         /* encoding */
+-        if (   (version == UUID_MAKE_V1 && argc != 0)
+-            || (version == UUID_MAKE_V3 && argc != 2)
+-            || (version == UUID_MAKE_V4 && argc != 0)
+-            || (version == UUID_MAKE_V5 && argc != 2))
++        if (   (version & UUID_MAKE_V1 && argc != 0)
++            || (version & UUID_MAKE_V3 && argc != 2)
++            || (version & UUID_MAKE_V4 && argc != 0)
++            || (version & UUID_MAKE_V5 && argc != 2))
+             usage("invalid number of arguments");
+         if ((rc = uuid_create(&uuid)) != UUID_RC_OK)
+             error(1, "uuid_create: %s", uuid_error(rc));
+@@ -232,7 +233,7 @@ int main(int argc, char *argv[])
+                 if ((rc = uuid_load(uuid, "nil")) != UUID_RC_OK)
+                     error(1, "uuid_load: %s", uuid_error(rc));
+             }
+-            if (version == UUID_MAKE_V3 || version == UUID_MAKE_V5) {
++            if (version & UUID_MAKE_V3 || version & UUID_MAKE_V5) {
+                 if ((rc = uuid_create(&uuid_ns)) != UUID_RC_OK)
+                     error(1, "uuid_create: %s", uuid_error(rc));
+                 if ((rc = uuid_load(uuid_ns, argv[0])) != UUID_RC_OK) {
+-- 

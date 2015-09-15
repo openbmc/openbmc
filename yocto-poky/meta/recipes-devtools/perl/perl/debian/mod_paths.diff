@@ -1,0 +1,99 @@
+From 6c6cf14e204f3c031372bfd9604ad524d5691186 Mon Sep 17 00:00:00 2001
+From: Brendan O'Dea <bod@debian.org>
+Date: Fri, 18 Mar 2005 22:22:25 +1100
+Subject: Tweak @INC ordering for Debian
+
+Our order is:
+
+    etc (for config files)
+    site (5.8.1)
+    vendor (all)
+    core (5.8.1)
+    site (version-indep)
+    site (pre-5.8.1)
+
+The rationale being that an admin (via site), or module packager
+(vendor) can chose to shadow core modules when there is a newer
+version than is included in core.
+
+Patch-Name: debian/mod_paths.diff
+---
+ perl.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 58 insertions(+)
+
+diff --git a/perl.c b/perl.c
+index 086645b..e64f1f4 100644
+--- a/perl.c
++++ b/perl.c
+@@ -4373,6 +4373,11 @@ S_init_perllib(pTHX)
+ 		      INCPUSH_ADD_SUB_DIRS|INCPUSH_CAN_RELOCATE);
+ #endif
+ 
++#ifdef DEBIAN
++    /* for configuration where /usr is mounted ro (CPAN::Config, Net::Config) */
++    S_incpush_use_sep(aTHX_ STR_WITH_LEN("/etc/perl"), 0x0);
++#endif
++
+ #ifdef SITEARCH_EXP
+     /* sitearch is always relative to sitelib on Windows for
+      * DLL-based path intuition to work correctly */
+@@ -4490,6 +4495,59 @@ S_init_perllib(pTHX)
+ 		      INCPUSH_ADD_OLD_VERS|INCPUSH_CAN_RELOCATE);
+ #endif
+ 
++#ifdef DEBIAN
++    /* Non-versioned site directory for local modules and for
++       compatability with the previous packages' site dirs */
++    S_incpush_use_sep(aTHX_ STR_WITH_LEN("/usr/local/lib/site_perl"),
++		      INCPUSH_ADD_SUB_DIRS);
++
++#ifdef PERL_INC_VERSION_LIST
++    {
++	struct stat s;
++
++	/* add small buffer in case old versions are longer than the
++	   current version */
++	char sitearch[sizeof(SITEARCH_EXP)+16] = SITEARCH_EXP;
++	char sitelib[sizeof(SITELIB_EXP)+16] = SITELIB_EXP;
++	char const *vers[] = { PERL_INC_VERSION_LIST };
++	char const **p;
++
++	char *arch_vers = strrchr(sitearch, '/');
++	char *lib_vers = strrchr(sitelib, '/');
++
++	if (arch_vers && isdigit(*++arch_vers))
++	    *arch_vers = 0;
++	else
++	    arch_vers = 0;
++
++	if (lib_vers && isdigit(*++lib_vers))
++	    *lib_vers = 0;
++	else
++	    lib_vers = 0;
++
++	/* there is some duplication here as incpush does something
++	   similar internally, but required as sitearch is not a
++	   subdirectory of sitelib */
++	for (p = vers; *p; p++)
++	{
++	    if (arch_vers)
++	    {
++		strcpy(arch_vers, *p);
++		if (PerlLIO_stat(sitearch, &s) >= 0 && S_ISDIR(s.st_mode))
++		    S_incpush_use_sep(aTHX_ sitearch, strlen(sitearch), 0x0);
++	    }
++
++	    if (lib_vers)
++	    {
++		strcpy(lib_vers, *p);
++		if (PerlLIO_stat(sitelib, &s) >= 0 && S_ISDIR(s.st_mode))
++		    S_incpush_use_sep(aTHX_ sitelib, strlen(sitelib), 0x0);
++	    }
++	}
++    }
++#endif
++#endif
++
+ #ifdef PERL_OTHERLIBDIRS
+     S_incpush_use_sep(aTHX_ STR_WITH_LEN(PERL_OTHERLIBDIRS),
+ 		      INCPUSH_ADD_OLD_VERS|INCPUSH_ADD_ARCHONLY_SUB_DIRS

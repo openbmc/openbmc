@@ -1,0 +1,243 @@
+Modify vg_test wrapper to support PTEST formats
+
+Change the valgrind regression test script vg_regtest to
+support the yocto ptest stdout reporting format.  The commit adds
+'--yocto-ptest' as an optional argument to vg_regtest, which alters
+the output to use the ptest infrastructure reporting format:
+    "[PASS|SKIP|FAIL]: testname"
+instead of valgrind's internal test reporting format.  Without the added
+option, --yocto-ptest, the valgrind regression test output is unchanged.
+
+Enforce 30 seconds limit for the test.
+This resume execution of the remaining tests when valgrind hangs.
+
+Upstream-Status: Pending
+
+Signed-off-by: Dave Lerner <dave.lerner@windriver.com>
+Signed-off-by: Tudor Florea <tudor.florea@enea.com>
+
+diff --git a/tests/vg_regtest.in b/tests/vg_regtest.in
+index 224385f..3e0383b 100755
+--- a/tests/vg_regtest.in
++++ b/tests/vg_regtest.in
+@@ -39,11 +39,11 @@
+ #               --valgrind.)
+ #   --keep-unfiltered: keep a copy of the unfiltered output/error output
+ #     of each test by adding an extension .unfiltered.out
+-#
+ #   --outer-valgrind: run this valgrind under the given outer valgrind.
+ #     This valgrind must be configured with --enable-inner.
+ #   --outer-tool: tool to use by the outer valgrind (default memcheck).
+ #   --outer-args: use this as outer tool args.
++#   --yocto-ptest: output in yocto ptest format
+ #
+ # The easiest way is to run all tests in valgrind/ with (assuming you installed
+ # in $PREFIX):
+@@ -126,7 +126,7 @@ use strict;
+ my $usage="\n"
+      . "Usage:\n"
+      . "   vg_regtest [--all, --valgrind, --valgrind-lib, --keep-unfiltered\n"
+-     . "                 --outer-valgrind, --outer-tool, --outer-args]\n"
++     . "                 --outer-valgrind, --outer-tool, --outer-args, --yocto-ptest]\n"
+      . "   Use EXTRA_REGTEST_OPTS to supply extra args for all tests\n"
+      . "\n";
+ 
+@@ -170,6 +170,7 @@ my $outer_args;
+ 
+ my $valgrind_lib = "$tests_dir/.in_place";
+ my $keepunfiltered = 0;
++my $yoctoptest = 0;
+ 
+ # default filter is the one named "filter_stderr" in the test's directory
+ my $default_stderr_filter = "filter_stderr";
+@@ -226,6 +227,8 @@ sub process_command_line()
+                 $valgrind_lib = $1;
+             } elsif ($arg =~ /^--keep-unfiltered$/) {
+                 $keepunfiltered = 1;
++            } elsif ($arg =~ /^--yocto-ptest$/) {
++                $yoctoptest = 1;
+             } else {
+                 die $usage;
+             }
+@@ -340,13 +343,28 @@ sub read_vgtest_file($)
+ #----------------------------------------------------------------------------
+ # Since most of the program time is spent in system() calls, need this to
+ # propagate a Ctrl-C enabling us to quit.
+-sub mysystem($) 
++# Enforce 30 seconds limit for the test.
++# This resume execution of the remaining tests if valgrind hangs.
++sub mysystem($)
+ {
+-    my $exit_code = system($_[0]);
+-    ($exit_code == 2) and exit 1;      # 2 is SIGINT
+-    return $exit_code;
++    my $exit_code=0;
++    eval {
++        local $SIG{'ALRM'} = sub { die "timed out\n" };
++        alarm(30);
++        $exit_code = system($_[0]);
++        alarm (0);
++        ($exit_code == 2) and die "SIGINT\n";   # 2 is SIGINT
++    };
++    if ($@) {
++        if ($@ eq "timed out\n") {
++            print "timed out\n";
++            return 1;
++        }
++        if ($@ eq "SIGINT\n") {
++            exit 1;
++        }
++    }
+ }
+-
+ # if $keepunfiltered, copies $1 to $1.unfiltered.out
+ # renames $0 tp $1
+ sub filtered_rename($$) 
+@@ -394,19 +412,21 @@ sub do_diffs($$$$)
+                 # A match;  remove .out and any previously created .diff files.
+                 unlink("$name.$mid.out");
+                 unlink(<$name.$mid.diff*>);
+-                return;
++                return 0;
+             }
+         }
+     }
+     # If we reach here, none of the .exp files matched.
+-    print "*** $name failed ($mid) ***\n";
++    print "*** $name failed ($mid) ***\n" if ($yoctoptest == 0) ;
+     push(@failures, sprintf("%-40s ($mid)", "$fullname"));
+     $num_failures{$mid}++;
++    return 1;
+ }
+ 
+ sub do_one_test($$) 
+ {
+     my ($dir, $vgtest) = @_;
++    my $diffStatus = 0;
+     $vgtest =~ /^(.*)\.vgtest/;
+     my $name = $1;
+     my $fullname = "$dir/$name"; 
+@@ -425,7 +445,11 @@ sub do_one_test($$)
+         } elsif (256 == $prereq_res) {
+             # Nb: weird Perl-ism -- exit code of '1' is seen by Perl as 256...
+             # Prereq failed, skip.
+-            printf("%-16s (skipping, prereq failed: $prereq)\n", "$name:");
++            if ($yoctoptest == 0) {
++                printf("%-16s (skipping, prereq failed: $prereq)\n", "$name:");
++            } else {
++                printf("SKIP: $fullname\n");
++            }
+             return;
+         } else {
+             # Bad prereq; abort.
+@@ -438,7 +462,7 @@ sub do_one_test($$)
+     if (defined $progB) {
+         # If there is a progB, let's start it in background:
+         printf("%-16s valgrind $extraopts $vgopts $prog $args (progB: $progB $argsB)\n",
+-               "$name:");
++               "$name:") if ($yoctoptest == 0);
+         # progB.done used to detect child has finished. See below.
+         # Note: redirection of stdout and stderr is before $progB to allow argsB
+         # to e.g. redirect stdoutB to stderrB
+@@ -452,7 +476,8 @@ sub do_one_test($$)
+                      . "touch progB.done)  &");
+         }
+     } else {
+-        printf("%-16s valgrind $extraopts $vgopts $prog $args\n", "$name:");
++        printf("%-16s valgrind $extraopts $vgopts $prog $args\n", "$name:")
++            if ($yoctoptest == 0);
+     }
+  
+     # Pass the appropriate --tool option for the directory (can be overridden
+@@ -487,7 +512,7 @@ sub do_one_test($$)
+     # Find all the .stdout.exp files.  If none, use /dev/null.
+     my @stdout_exps = <$name.stdout.exp*>;
+     @stdout_exps = ( "/dev/null" ) if (0 == scalar @stdout_exps);
+-    do_diffs($fullname, $name, "stdout", \@stdout_exps); 
++    $diffStatus |= do_diffs($fullname, $name, "stdout", \@stdout_exps);
+ 
+     # Filter stderr
+     $stderr_filter_args = $name if (! defined $stderr_filter_args);
+@@ -496,7 +521,7 @@ sub do_one_test($$)
+     # Find all the .stderr.exp files.  At least one must exist.
+     my @stderr_exps = <$name.stderr.exp*>;
+     (0 != scalar @stderr_exps) or die "Could not find `$name.stderr.exp*'\n";
+-    do_diffs($fullname, $name, "stderr", \@stderr_exps); 
++    $diffStatus |= do_diffs($fullname, $name, "stderr", \@stderr_exps);
+ 
+     if (defined $progB) {
+         # wait for the child to be finished
+@@ -520,7 +545,7 @@ sub do_one_test($$)
+         # Find all the .stdoutB.exp files.  If none, use /dev/null.
+         my @stdoutB_exps = <$name.stdoutB.exp*>;
+         @stdoutB_exps = ( "/dev/null" ) if (0 == scalar @stdoutB_exps);
+-        do_diffs($fullname, $name, "stdoutB", \@stdoutB_exps); 
++        $diffStatus |= do_diffs($fullname, $name, "stdoutB", \@stdoutB_exps);
+         
+         # Filter stderr
+         $stderrB_filter_args = $name if (! defined $stderrB_filter_args);
+@@ -529,7 +554,7 @@ sub do_one_test($$)
+         # Find all the .stderrB.exp files.  At least one must exist.
+         my @stderrB_exps = <$name.stderrB.exp*>;
+         (0 != scalar @stderrB_exps) or die "Could not find `$name.stderrB.exp*'\n";
+-        do_diffs($fullname, $name, "stderrB", \@stderrB_exps); 
++        $diffStatus |= do_diffs($fullname, $name, "stderrB", \@stderrB_exps);
+     }
+ 
+     # Maybe do post-test check
+@@ -541,7 +566,7 @@ sub do_one_test($$)
+ 	    # Find all the .post.exp files.  If none, use /dev/null.
+ 	    my @post_exps = <$name.post.exp*>;
+ 	    @post_exps = ( "/dev/null" ) if (0 == scalar @post_exps);
+-	    do_diffs($fullname, $name, "post", \@post_exps);
++	    $diffStatus |= do_diffs($fullname, $name, "post", \@post_exps);
+ 	}
+     }
+  
+@@ -550,6 +575,13 @@ sub do_one_test($$)
+             print("(cleanup operation failed: $cleanup)\n");
+     }
+ 
++    if ($yoctoptest == 1) {
++        if ($diffStatus == 0) {
++            print("PASS: $fullname\n");
++        } else {
++            print("FAIL: $fullname\n");
++        }
++    }
+     $num_tests_done++;
+ }
+ 
+@@ -589,7 +621,7 @@ sub test_one_dir($$)
+     my $found_tests = (0 != (grep { $_ =~ /\.vgtest$/ } @fs));
+ 
+     if ($found_tests) {
+-        print "-- Running  tests in $full_dir $dashes\n";
++        print "-- Running  tests in $full_dir $dashes\n" if ($yoctoptest == 0);
+     }
+     foreach my $f (@fs) {
+         if (-d $f) {
+@@ -599,7 +631,7 @@ sub test_one_dir($$)
+         }
+     }
+     if ($found_tests) {
+-        print "-- Finished tests in $full_dir $dashes\n";
++        print "-- Finished tests in $full_dir $dashes\n" if ($yoctoptest == 0);
+     }
+ 
+     chdir("..");
+@@ -625,10 +657,12 @@ sub summarise_results
+            $num_failures{"stdout"},   plural($num_failures{"stdout"}),
+            $num_failures{"stderrB"},  plural($num_failures{"stderrB"}),
+            $num_failures{"stdoutB"},  plural($num_failures{"stdoutB"}),
+-           $num_failures{"post"},     plural($num_failures{"post"}));
++           $num_failures{"post"},     plural($num_failures{"post"}))
++               if ($yoctoptest == 0);
+ 
+     foreach my $failure (@failures) {
+-        print "$failure\n";
++        print "$failure\n"
++           if ($yoctoptest == 0);
+     }
+     print "\n";
+ }

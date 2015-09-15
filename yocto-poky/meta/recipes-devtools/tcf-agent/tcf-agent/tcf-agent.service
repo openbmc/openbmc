@@ -1,0 +1,10 @@
+[Unit]
+Description=Target Communication Framework agent
+After=network.target
+
+[Service]
+Type=forking
+ExecStart=@SBINDIR@/tcf-agent -d -L- -l0
+
+[Install]
+WantedBy=multi-user.target

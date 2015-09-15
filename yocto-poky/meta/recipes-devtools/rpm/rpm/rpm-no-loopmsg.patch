@@ -1,0 +1,19 @@
+lib/order.c: Make the dependency loop messages into debug msgs
+
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.14/lib/order.c
+===================================================================
+--- rpm-5.4.14.orig/lib/order.c
++++ rpm-5.4.14/lib/order.c
+@@ -2175,7 +2175,7 @@ rescan:
+ 		const char * dp;
+ 		rpmlogLvl msglvl = (anaconda || (rpmtsDFlags(ts) & RPMDEPS_FLAG_DEPLOOPS))
+ 			? RPMLOG_WARNING : RPMLOG_ERR;
+-#if defined(RPM_VENDOR_MANDRIVA) /* loop-detection-optional-loglevel */
++#if defined(RPM_VENDOR_MANDRIVA) || defined(RPM_VENDOR_OE) /* loop-detection-optional-loglevel */
+ 		// Report loops as debug-level message by default (7 = RPMLOG_DEBUG), overridable
+ 		msglvl = rpmExpandNumeric("%{?_loop_detection_loglevel}%{?!_loop_detection_loglevel:7}");
+ #endif

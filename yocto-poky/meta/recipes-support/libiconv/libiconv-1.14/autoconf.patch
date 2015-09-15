@@ -1,0 +1,50 @@
+It adds the variables that are needed
+for autoconf 2.65 to reconfigure libiconv and delete the m4 macros
+directory. Its imported from OE.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: libiconv-1.13.1/configure.ac
+===================================================================
+--- libiconv-1.13.1.orig/configure.ac
++++ libiconv-1.13.1/configure.ac
+@@ -23,7 +23,7 @@ AC_CONFIG_AUX_DIR([build-aux])
+ AM_INIT_AUTOMAKE([libiconv], [1.13.1])
+ AC_CONFIG_HEADERS([config.h lib/config.h])
+ AC_PROG_MAKE_SET
+-
++AC_CONFIG_MACRO_DIR([m4])
+ dnl           checks for basic programs
+ 
+ AC_PROG_CC
+Index: libiconv-1.13.1/libcharset/configure.ac
+===================================================================
+--- libiconv-1.13.1.orig/libcharset/configure.ac
++++ libiconv-1.13.1/libcharset/configure.ac
+@@ -16,17 +16,17 @@ dnl along with the GNU CHARSET Library;
+ dnl write to the Free Software Foundation, Inc., 51 Franklin Street,
+ dnl Fifth Floor, Boston, MA 02110-1301, USA.
+ 
+-AC_PREREQ([2.13])
++AC_PREREQ(2.61)
++AC_INIT([libcharset],[1.4] )
++AC_CONFIG_SRCDIR([lib/localcharset.c])
+ 
+-PACKAGE=libcharset
+-VERSION=1.4
+-
+-AC_INIT([lib/localcharset.c])
+ AC_CONFIG_AUX_DIR([build-aux])
+ AC_CONFIG_HEADER([config.h])
+ AC_PROG_MAKE_SET
+-AC_SUBST([PACKAGE])
+-AC_SUBST([VERSION])
++dnl AC_SUBST(PACKAGE)
++dnl AC_SUBST(VERSION)
++
++AC_CONFIG_MACRO_DIR([m4])
+ 
+ dnl           checks for basic programs
+ 

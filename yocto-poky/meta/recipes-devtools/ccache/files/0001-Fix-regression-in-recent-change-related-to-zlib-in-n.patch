@@ -1,0 +1,73 @@
+From f74c76107933046309861680b741adc67ac2a34e Mon Sep 17 00:00:00 2001
+From: Joel Rosdahl <joel@rosdahl.net>
+Date: Mon, 17 Aug 2015 19:05:14 +0200
+Subject: [PATCH] Fix regression in recent change related to zlib in
+ nonstandard location
+
+To allow for specifying a -L flag in LDFLAGS and have it take effect for
+-lz, 0220de9c8ebfb18caae2ac1aa163d060e98ceade put -lz in extra_libs
+instead of extra_ldflags. However, extra_libs is supposed to contain
+paths to libraries which are prerequisites of the ccache link rule, and
+some older versions of make got confused by seeing -lz as a
+prerequisite.
+
+This fix is to revert 0220de9c8ebfb18caae2ac1aa163d060e98ceade and
+instead make sure that LDFLAGS comes before extra_ldflags.
+
+Upstream-Status: Backport
+---
+ Makefile.in  |  2 +-
+ NEWS.txt     | 10 ++++++++++
+ configure.ac |  2 +-
+ 3 files changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index e7515b1..d3621cd 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -20,7 +20,7 @@ RANLIB = @RANLIB@
+ 
+ all_cflags = $(CFLAGS)
+ all_cppflags = @DEFS@ @extra_cppflags@ -DSYSCONFDIR=$(sysconfdir) -I. -I$(srcdir) $(CPPFLAGS)
+-all_ldflags = @extra_ldflags@ $(LDFLAGS)
++all_ldflags = $(LDFLAGS) @extra_ldflags@
+ extra_libs = @extra_libs@
+ 
+ base_sources = \
+diff --git a/NEWS.txt b/NEWS.txt
+index f13feeb..eaeadf6 100644
+--- a/NEWS.txt
++++ b/NEWS.txt
+@@ -2,6 +2,16 @@ ccache news
+ ===========
+ 
+ 
++Unreleased 3.2.4
++----------------
++
++Bug fixes
++~~~~~~~~~
++
++- Fixed build error related to zlib on systems with older make versions
++  (regression in ccache 3.2.3).
++
++
+ ccache 3.2.3
+ ------------
+ Release date: 2015-08-16
+diff --git a/configure.ac b/configure.ac
+index 8d8ce92..9e65588 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -120,7 +120,7 @@ if test x${use_bundled_zlib} = xyes; then
+     extra_libs="zlib/libz.a"
+     mkdir -p zlib
+ else
+-    extra_libs="-lz"
++    extra_ldflags="-lz"
+ fi
+ 
+ dnl Linking on Windows needs ws2_32
+-- 
+2.1.4
+

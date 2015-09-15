@@ -1,0 +1,46 @@
+From 4c0d7733f30903f8d7c7cd7433f5c8a7505e35f5 Mon Sep 17 00:00:00 2001
+From: Marko Lindqvist <cazfi74@gmail.com>
+Date: Tue, 21 Apr 2015 00:48:45 -0700
+Subject: [PATCH] doc/local.mk: dont-depend-on-help2man.patch
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
+
+Updated for bison 3.0.4
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ doc/local.mk |    9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
+
+diff --git a/doc/local.mk b/doc/local.mk
+index c340452..642f385 100644
+--- a/doc/local.mk
++++ b/doc/local.mk
+@@ -98,10 +98,7 @@ endif ! CROSS_COMPILING
+ ## Man Pages.  ##
+ ## ----------- ##
+ 
+-dist_man_MANS = $(top_srcdir)/doc/bison.1
+-
+-EXTRA_DIST += $(dist_man_MANS:.1=.x)
+-MAINTAINERCLEANFILES += $(dist_man_MANS)
++EXTRA_DIST += bison.x
+ 
+ # Differences to ignore when comparing the man page (the date).
+ remove_time_stamp = \
+@@ -124,10 +121,6 @@ $(top_srcdir)/doc/bison.1: $(MAN_DEPS)
+ 	fi
+ 	$(AM_V_at)rm -f $@*.t
+ 
+-if ENABLE_YACC
+-nodist_man_MANS = doc/yacc.1
+-endif
+-
+ ## ----------------------------- ##
+ ## Graphviz examples generation. ##
+ ## ----------------------------- ##
+-- 
+1.7.9.5
+

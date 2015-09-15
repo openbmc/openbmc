@@ -1,0 +1,55 @@
+Author: Krishnanjanappa, Jagadeesh <jagadeesh.krishnanjanappa@caviumnetworks.com>
+Date:   Sun Apr 12 19:27:10 2015 +0530
+
+[PATCH] add checking for AArch64 ilp32
+
+Cross-compiling qt4-embedded and qt4-x11-free applications for AArch64 ilp32
+(both big and little endian) fails with below error,
+
+(snip)
+In file included from ../3rdparty/javascriptcore/JavaScriptCore/runtime/Collector.h:31:0,
+                 from ../3rdparty/javascriptcore/JavaScriptCore/runtime/JSGlobalData.h:32,
+                 from ../3rdparty/javascriptcore/JavaScriptCore/interpreter/CallFrame.h:26,
+                 from ../3rdparty/javascriptcore/JavaScriptCore/runtime/ClassInfo.h:26,
+                 from ../3rdparty/javascriptcore/JavaScriptCore/runtime/JSObject.h:27,
+                 from ../3rdparty/javascriptcore/JavaScriptCore/API/JSCallbackConstructor.h:30,
+                 from ../3rdparty/javascriptcore/JavaScriptCore/API/JSCallbackConstructor.cpp:27:
+../3rdparty/javascriptcore/JavaScriptCore/wtf/StdLibExtras.h: In instantiation of 'TO QTWTF::bitwise_cast(FROM) [w
+../3rdparty/javascriptcore/JavaScriptCore/runtime/JSImmediate.h:52:49: required from here
+../3rdparty/javascriptcore/JavaScriptCore/wtf/StdLibExtras.h:63:1: error: size of array is negative
+../3rdparty/javascriptcore/JavaScriptCore/wtf/StdLibExtras.h: In instantiation of 'TO QTWTF::bitwise_cast(FROM) [w
+../3rdparty/javascriptcore/JavaScriptCore/runtime/JSImmediate.h:57:47: required from here
+../3rdparty/javascriptcore/JavaScriptCore/wtf/StdLibExtras.h:63:1: error: size of array is negative
+make[1]: *** [obj/release/JSCallbackConstructor.o] Error 1
+-- CUT --
+
+the error is because of JSVALUE64 is being defined while compiling programs
+for AArch64 ilp32. This makes equal condition checking of intptr_t and double
+datatypes as false, and results in -1 (negative) as array size in bitwise_cast
+function.
+
+Upstream-Status: Pending
+
+Signed-off-by: Krishnanjanappa, Jagadeesh <jagadeesh.krishnanjanappa@caviumnetworks.com>
+
+--- a/src/3rdparty/javascriptcore/JavaScriptCore/wtf/Platform.h	2014-04-11 00:07:12.000000000 +0530
++++ b/src/3rdparty/javascriptcore/JavaScriptCore/wtf/Platform.h	2015-04-10 22:19:51.066279426 +0530
+@@ -214,6 +214,9 @@
+ #define WTF_CPU_AARCH64 1
+ #if defined(__AARCH64EB__)
+ #define WTF_CPU_BIG_ENDIAN 1
++#if !defined(__LP64__)
++#define WTF_CPU_AARCH64_32 1
++#endif
+ #endif
+ #endif
+ 
+@@ -903,7 +906,7 @@
+ #endif
+ 
+ #if !defined(WTF_USE_JSVALUE64) && !defined(WTF_USE_JSVALUE32) && !defined(WTF_USE_JSVALUE32_64)
+-#if (CPU(X86_64) && (OS(UNIX) || OS(WINDOWS) || OS(SOLARIS) || OS(HPUX))) || (CPU(IA64) && !CPU(IA64_32)) || CPU(ALPHA) || CPU(AIX64) || CPU(SPARC64) || CPU(MIPS64) || CPU(AARCH64)
++#if (CPU(X86_64) && (OS(UNIX) || OS(WINDOWS) || OS(SOLARIS) || OS(HPUX))) || (CPU(IA64) && !CPU(IA64_32)) || CPU(ALPHA) || CPU(AIX64) || CPU(SPARC64) || CPU(MIPS64) || (CPU(AARCH64) && !CPU(AARCH64_32))
+ #define WTF_USE_JSVALUE64 1
+ #elif CPU(ARM) || CPU(PPC64)
+ #define WTF_USE_JSVALUE32 1

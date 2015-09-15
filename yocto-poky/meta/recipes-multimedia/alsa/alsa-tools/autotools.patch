@@ -1,0 +1,32 @@
+Add parameters to autoreconf to support cross compile.
+Remove some sub-components which needs further recipe support.
+
+Signed-off-by: Dongxiao Xu <dongxiao.xu@intel.com>
+
+Upstream-Status: Inappropriate [configuration]
+
+diff -ruN alsa-tools-1.0.24.1-orig//ld10k1/gitcompile alsa-tools-1.0.24.1/ld10k1/gitcompile
+--- alsa-tools-1.0.24.1-orig//ld10k1/gitcompile	2011-07-06 11:27:40.227665002 +0800
++++ alsa-tools-1.0.24.1/ld10k1/gitcompile	2011-07-14 13:26:18.017665004 +0800
+@@ -1,6 +1,6 @@
+ #!/bin/bash
+ 
+-autoreconf -fi || exit 1
++autoreconf $ACLOCAL_FLAGS -fi || exit 1
+ export CFLAGS='-O2 -Wall -pipe -g'
+ echo "CFLAGS=$CFLAGS"
+ echo "./configure $@"
+diff -ruN alsa-tools-1.0.24.1-orig//Makefile alsa-tools-1.0.24.1/Makefile
+--- alsa-tools-1.0.24.1-orig//Makefile	2011-07-06 11:27:40.207665000 +0800
++++ alsa-tools-1.0.24.1/Makefile	2011-07-14 15:08:08.877665009 +0800
+@@ -1,8 +1,8 @@
+ VERSION = 1.0.29
+ TOP = .
+-SUBDIRS = as10k1 envy24control hdsploader hdspconf hdspmixer \
++SUBDIRS = as10k1 envy24control \
+ 	  mixartloader pcxhrloader rmedigicontrol sb16_csp seq sscape_ctl \
+-	  us428control usx2yloader vxloader echomixer ld10k1 qlo10k1 \
++	  us428control usx2yloader vxloader echomixer \
+ 	  hwmixvolume hdajackretask hda-verb hdajacksensetest
+ 
+ all:

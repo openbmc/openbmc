@@ -1,0 +1,123 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          dbus
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      1
+# Short-Description: D-Bus systemwide message bus
+# Description:       D-Bus is a simple interprocess messaging system, used
+#                    for sending messages between applications.
+### END INIT INFO
+#
+# -*- coding: utf-8 -*-
+# Debian init.d script for D-BUS
+# Copyright © 2003 Colin Walters <walters@debian.org>
+
+# set -e
+
+# Source function library.
+. /etc/init.d/functions
+
+DAEMON=@bindir@/dbus-daemon
+NAME=dbus
+DAEMONUSER=messagebus           # must match /etc/dbus-1/system.conf
+PIDFILE=/var/run/messagebus.pid # must match /etc/dbus-1/system.conf
+UUIDDIR=/var/lib/dbus
+DESC="system message bus"
+EVENTDIR=/etc/dbus-1/event.d
+
+test -x $DAEMON || exit 0
+
+# Source defaults file; edit that file to configure this script.
+ENABLED=1
+PARAMS=""
+if [ -e /etc/default/dbus ]; then
+  . /etc/default/dbus
+fi
+
+test "$ENABLED" != "0" || exit 0
+
+start_it_up()
+{
+  mkdir -p "`dirname $PIDFILE`"
+  if [ -e $PIDFILE ]; then
+    PIDDIR=/proc/$(cat $PIDFILE)
+    if [ -d ${PIDDIR} -a  "$(readlink -f ${PIDDIR}/exe)" = "${DAEMON}" ]; then 
+      echo "$DESC already started; not starting."
+    else
+      echo "Removing stale PID file $PIDFILE."
+      rm -f $PIDFILE
+    fi
+  fi
+
+  if [ ! -d $UUIDDIR ]; then
+    mkdir -p $UUIDDIR
+    chown $DAEMONUSER $UUIDDIR
+    chgrp $DAEMONUSER $UUIDDIR
+  fi
+ 
+  dbus-uuidgen --ensure  
+
+  echo -n "Starting $DESC: "
+  start-stop-daemon -o --start --quiet --pidfile $PIDFILE \
+    --user $DAEMONUSER --exec $DAEMON -- --system $PARAMS
+  echo "$NAME."
+  if [ -d $EVENTDIR ]; then
+      run-parts --arg=start $EVENTDIR
+  fi
+}
+
+shut_it_down()
+{
+  if [ -d $EVENTDIR ]; then
+      # TODO: --reverse when busybox supports it
+      run-parts --arg=stop $EVENTDIR
+  fi
+  echo -n "Stopping $DESC: "
+  start-stop-daemon -o --stop  --quiet --pidfile $PIDFILE \
+    --user $DAEMONUSER
+  # We no longer include these arguments so that start-stop-daemon
+  # can do its job even given that we may have been upgraded.
+  # We rely on the pidfile being sanely managed
+  # --exec $DAEMON -- --system $PARAMS
+  echo "$NAME."
+  rm -f $PIDFILE
+}
+
+reload_it()
+{
+  echo -n "Reloading $DESC config: "
+  dbus-send --print-reply --system --type=method_call \
+            --dest=org.freedesktop.DBus \
+            / org.freedesktop.DBus.ReloadConfig > /dev/null
+  # hopefully this is enough time for dbus to reload it's config file.
+  echo "done."
+}
+
+case "$1" in
+  start)
+    start_it_up
+  ;;
+  stop)
+    shut_it_down
+  ;;
+  status)
+    status $DAEMON
+    exit $?
+  ;;
+  reload|force-reload)
+    reload_it
+  ;;
+  restart)
+    shut_it_down
+    sleep 1
+    start_it_up
+  ;;
+  *)
+    echo "Usage: /etc/init.d/$NAME {start|stop|status|restart|reload|force-reload}" >&2
+    exit 1
+  ;;
+esac
+
+exit 0

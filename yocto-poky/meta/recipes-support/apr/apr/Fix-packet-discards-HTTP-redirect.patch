@@ -1,0 +1,32 @@
+Fix packet discards HTTP redirect.
+
+Disconnect the connection by poll() timeout.
+If timeout=0 and apr_wait_for_io_or_timeout()=APR_TIMEUP then
+apr_socket_recv() returns EAGAIN.
+
+Upstream-Status: Pending
+
+Signed-off-by: Noriaki Yoshitane <yoshitane.nrs@cnt.ncos.nec.co.jp>
+Signed-off-by: Li Wang <li.wang@windriver.com>
+---
+ network_io/unix/sendrecv.c |    4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/network_io/unix/sendrecv.c b/network_io/unix/sendrecv.c
+index c133a26..e8faf15 100644
+--- a/network_io/unix/sendrecv.c
++++ b/network_io/unix/sendrecv.c
+@@ -85,6 +85,10 @@ apr_status_t apr_socket_recv(apr_socket_t *sock, char *buf, apr_size_t *len)
+                       && (sock->timeout > 0)) {
+ do_select:
+         arv = apr_wait_for_io_or_timeout(NULL, sock, 1);
++        if ((arv == APR_TIMEUP) && (sock->timeout == 0)) {
++            *len = 0;
++            return EAGAIN;
++        }
+         if (arv != APR_SUCCESS) {
+             *len = 0;
+             return arv;
+-- 
+1.7.9.5
+

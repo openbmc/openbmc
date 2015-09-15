@@ -1,0 +1,55 @@
+package python-readline
+
+-Khem
+
+Upstream-Status: Inappropriate [Embedded Specific]
+
+--- a/setup.py
++++ b/setup.py
+@@ -666,45 +666,7 @@ class PyBuildExt(build_ext):
+         # readline
+         do_readline = self.compiler.find_library_file(lib_dirs, 'readline')
+         readline_termcap_library = ""
+-        curses_library = ""
+-        # Cannot use os.popen here in py3k.
+-        tmpfile = os.path.join(self.build_temp, 'readline_termcap_lib')
+-        if not os.path.exists(self.build_temp):
+-            os.makedirs(self.build_temp)
+-        # Determine if readline is already linked against curses or tinfo.
+-        if do_readline:
+-            if cross_compiling:
+-                ret = os.system("%s -d %s | grep '(NEEDED)' > %s" \
+-                                % (sysconfig.get_config_var('READELF'),
+-                                   do_readline, tmpfile))
+-            elif find_executable('ldd'):
+-                ret = os.system("ldd %s > %s" % (do_readline, tmpfile))
+-            else:
+-                ret = 256
+-            if ret >> 8 == 0:
+-                with open(tmpfile) as fp:
+-                    for ln in fp:
+-                        if 'curses' in ln:
+-                            readline_termcap_library = re.sub(
+-                                r'.*lib(n?cursesw?)\.so.*', r'\1', ln
+-                            ).rstrip()
+-                            break
+-                        # termcap interface split out from ncurses
+-                        if 'tinfo' in ln:
+-                            readline_termcap_library = 'tinfo'
+-                            break
+-            if os.path.exists(tmpfile):
+-                os.unlink(tmpfile)
+-        # Issue 7384: If readline is already linked against curses,
+-        # use the same library for the readline and curses modules.
+-        if 'curses' in readline_termcap_library:
+-            curses_library = readline_termcap_library
+-        elif self.compiler.find_library_file(lib_dirs, 'ncursesw'):
+-            curses_library = 'ncursesw'
+-        elif self.compiler.find_library_file(lib_dirs, 'ncurses'):
+-            curses_library = 'ncurses'
+-        elif self.compiler.find_library_file(lib_dirs, 'curses'):
+-            curses_library = 'curses'
++        curses_library = "ncurses"
+ 
+         if host_platform == 'darwin':
+             os_release = int(os.uname()[2].split('.')[0])

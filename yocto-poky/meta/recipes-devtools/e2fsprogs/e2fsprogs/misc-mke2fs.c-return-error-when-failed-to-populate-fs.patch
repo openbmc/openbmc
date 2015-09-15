@@ -1,0 +1,37 @@
+From e4ffd6fe975888d306b5f700ba54af18b59f6759 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Thu, 20 Mar 2014 11:10:21 +0800
+Subject: [PATCH] misc/mke2fs.c: return error when failed to populate filesystem
+
+We need return retval when "mke2fs -d" failed, otherwise the "$?" would
+be 0 which is misleading.
+
+Upstream-Status: Submitted
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ misc/mke2fs.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/misc/mke2fs.c b/misc/mke2fs.c
+index a63f0b7..846190e 100644
+--- a/misc/mke2fs.c
++++ b/misc/mke2fs.c
+@@ -2745,10 +2745,11 @@ no_journal:
+ 		current_fs = fs;
+ 		root = EXT2_ROOT_INO;
+ 		retval = populate_fs(root, root_dir);
+-		if (retval)
++		if (retval) {
+ 			fprintf(stderr, "%s",
+-				_("\nError while populating file system"));
+-		else if (!quiet)
++				_("\nError while populating file system\n"));
++			return retval;
++		} else if (!quiet)
+ 			printf("%s", _("done\n"));
+ 	}
+ 
+-- 
+1.8.3.1
+

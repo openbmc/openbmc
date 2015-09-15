@@ -1,0 +1,18 @@
+#!/bin/sh
+
+fail=0
+for test in ./test/*
+do
+	$test
+	if [ $? -eq 0 ]
+	then
+		fail=1
+	fi
+done
+
+if [ $fail -eq 0 ]
+then
+	echo "PASS: libevent"
+else
+	echo "FAIL: libevent"
+fi

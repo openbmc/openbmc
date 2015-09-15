@@ -1,0 +1,52 @@
+Upstream-Status: Pending
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+--- ./configure.less	2003-12-11 19:18:15.000000000 +0100
++++ ./configure	2003-12-11 19:20:03.000000000 +0100
+@@ -401,18 +401,13 @@
+ 
+ if test "$ans" = "false"
+ then
+-  for i in more less cmp cat awk gawk mawk
+-  do
+-    eval F$i="missing"
+-    for j in $DEFPATH
+-    do
+-      if test -f $j/$i
+-      then
+-	eval F$i=$j/$i
+-	break
+-      fi
+-    done
+-  done
++  Fmore=/bin/more
++  Fless=/usr/bin/less
++  Fcmp=/usr/bin/cmp
++  Fcat=/bin/cat
++  Fgawk=/bin/gawk
++  Fawk=/bin/gawk
++  Fmawk=missing
+   troff=""
+   nroff=""
+   jnroff=""
+@@ -457,6 +452,19 @@
+       fi
+     done
+   done
++  Fgroff=/usr/bin/groff
++  Fgeqn=/usr/bin/geqn
++  Fgtbl=/usr/bin/gtbl
++  Fcol=/usr/bin/col
++  Fgrefer=/usr/bin/grefer
++  Fgpic=/usr/bin/gpic
++  Fmore=/bin/more
++  Fless=/usr/bin/less
++  Fcmp=/usr/bin/cmp
++  Fcat=/bin/cat
++  Fgawk=/bin/gawk
++
++
+   for i in eqn tbl refer pic
+   do
+     if test `eval echo \\$Fg$i` = "missing"

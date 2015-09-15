@@ -1,0 +1,24 @@
+Upstream-Status: Pending
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+--- man-1.5j/src/man.c.sofix	Thu Nov 22 14:51:44 2001
++++ man-1.5j/src/man.c	Thu Nov 22 14:52:44 2001
+@@ -300,7 +300,7 @@
+ 
+      if (strlen(name0) >= sizeof(ultname))
+ 	     return name0;
+-     strcpy(ultname, name0);
++     strncpy(ultname, name0, BUFSIZE-32);
+      name = ultname;
+ 
+ again:
+@@ -332,7 +332,7 @@
+ 	   * .so files - we could glob for all possible extensions,
+ 	   * for now: only try .gz
+ 	   */
+-	  else if (fp == NULL && get_expander(".gz") &&
++	  if (fp == NULL && get_expander(".gz") &&
+ 		   strlen(name)+strlen(".gz") < BUFSIZE) {
+ 	       strcat(name, ".gz");
+ 	       fp = fopen (name, "r");

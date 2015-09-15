@@ -1,0 +1,58 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides: crond crontab
+# Default-Start:  2345
+# Default-Stop:   016
+# Short-Description: run cron daemon
+# Description: cron is a standard UNIX program that runs user-specified
+#              programs at periodic scheduled times. vixie cron adds a
+#              number of features to the basic UNIX cron, including better
+#              security and more powerful configuration options.
+### END INIT INFO
+
+CROND=/usr/sbin/crond
+CONFIG=/etc/sysconfig/crond
+
+[ -f $CONFIG ] || exit 1
+[ -x $CROND ] || exit 1
+
+. $CONFIG
+
+# Source function library.
+. /etc/init.d/functions
+
+case "$1" in
+  start)
+    echo -n "Starting crond: "
+    start-stop-daemon --start --quiet --exec $CROND -- $CRONDARGS
+    RETVAL=$?
+    if [ $RETVAL -eq 0 ] ; then
+        echo "OK"
+    else
+        echo "FAIL"
+    fi
+    ;;
+  stop)
+    echo -n "Stopping crond: "
+    start-stop-daemon --stop --quiet --pidfile /var/run/crond.pid
+    RETVAL=$?
+    if [ $RETVAL -eq 0 ] ; then
+        echo "OK"
+    else
+        echo "FAIL"
+    fi
+    ;;
+  status)
+    status crond
+    exit $?
+    ;;
+  restart)
+    $0 stop && sleep 1 && $0 start
+    ;;
+  *)
+    echo "Usage: /etc/init.d/crond {start|stop|status|restart}"
+    exit 1
+esac
+
+exit 0
+

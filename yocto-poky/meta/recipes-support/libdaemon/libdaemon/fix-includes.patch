@@ -1,0 +1,20 @@
+musl complains
+fatal error: sys/unistd.h: No such file or directory
+and rightly so
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+
+--- libdaemon-0.14.orig/examples/testd.c
++++ libdaemon-0.14/examples/testd.c
+@@ -21,9 +21,9 @@
+ #include <signal.h>
+ #include <errno.h>
+ #include <string.h>
++#include <unistd.h>
+ #include <sys/types.h>
+ #include <sys/time.h>
+-#include <sys/unistd.h>
+ #include <sys/select.h>
+ 
+ #include <libdaemon/dfork.h>

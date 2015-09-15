@@ -1,0 +1,10 @@
+/tmp
+/etc/localtime
+/etc/ld.so.cache
+/etc/ld.so.conf
+/etc/passwd
+/etc/group
+/etc/nsswitch.conf
+/proc
+/dev/null
+/dev/tty

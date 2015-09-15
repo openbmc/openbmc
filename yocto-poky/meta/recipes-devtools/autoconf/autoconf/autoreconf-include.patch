@@ -1,0 +1,14 @@
+Upstream-Status: Pending
+
+Index: autoconf-2.63/bin/autoreconf.in
+===================================================================
+--- autoconf-2.63.orig/bin/autoreconf.in	2008-08-28 03:08:10.000000000 +0100
++++ autoconf-2.63/bin/autoreconf.in	2008-12-31 17:38:40.000000000 +0000
+@@ -190,6 +190,7 @@
+   $autoconf   .= join (' --prepend-include=', '', map { shell_quote ($_) } @prepend_include);
+   $autoheader .= join (' --include=', '', map { shell_quote ($_) } @include);
+   $autoheader .= join (' --prepend-include=', '', map { shell_quote ($_) } @prepend_include);
++  $aclocal    .= join (' -I ', '', map { shell_quote ($_) } @include);
+ 
+   # --install and --symlink;
+   if ($install)

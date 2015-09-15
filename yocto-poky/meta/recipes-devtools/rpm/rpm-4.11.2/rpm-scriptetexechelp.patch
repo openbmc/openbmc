@@ -1,0 +1,194 @@
+Upstream-Status: Inappropriate [OE-Core]
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+Signed-off-by: Ronan Le Martret <ronan.lemartret@open.eurogiciel.org>
+
+
+Index: rpm-4.11.2/lib/psm.c
+===================================================================
+--- rpm-4.11.2.orig/lib/psm.c
++++ rpm-4.11.2/lib/psm.c
+@@ -421,7 +421,8 @@ static rpmRC runScript(rpmpsm psm, ARGV_
+ 
+     rpmswEnter(rpmtsOp(psm->ts, RPMTS_OP_SCRIPTLETS), 0);
+     rc = rpmScriptRun(script, arg1, arg2, sfd,
+-		      prefixes, warn_only, selinux);
++		      prefixes, warn_only, selinux, rpmtsRootDir(psm->ts) );
++
+     rpmswExit(rpmtsOp(psm->ts, RPMTS_OP_SCRIPTLETS), 0);
+ 
+     /* Map warn-only errors to "notfound" for script stop callback */
+@@ -958,15 +959,49 @@ static rpmRC rpmpsmStage(rpmpsm psm, pkg
+     case PSM_DESTROY:
+ 	break;
+     case PSM_SCRIPT:	/* Run current package scriptlets. */
++#ifdef RPM_VENDOR_OE
++        {
++        const char * scriptletWrapper = rpmExpand("%{?_cross_scriptlet_wrapper}", NULL);
++	if (scriptletWrapper && *scriptletWrapper)
++	     (void) rpmChrootOut();
++#endif
++
+ 	rc = runInstScript(psm);
++#ifdef RPM_VENDOR_OE
++	if (scriptletWrapper && *scriptletWrapper)
++	     (void) rpmChrootIn();
++        }
++#endif
+ 	break;
+     case PSM_TRIGGERS:
+ 	/* Run triggers in other package(s) this package sets off. */
++#ifdef RPM_VENDOR_OE
++        {
++        const char * scriptletWrapper = rpmExpand("%{?_cross_scriptlet_wrapper}", NULL);
++	if (scriptletWrapper && *scriptletWrapper)
++	     (void) rpmChrootOut();
++#endif
+ 	rc = runTriggers(psm);
++#ifdef RPM_VENDOR_OE
++	if (scriptletWrapper && *scriptletWrapper)
++	     (void) rpmChrootIn();
++        }
++#endif
+ 	break;
+     case PSM_IMMED_TRIGGERS:
+ 	/* Run triggers in this package other package(s) set off. */
++#ifdef RPM_VENDOR_OE
++	{
++            const char * scriptletWrapper = rpmExpand("%{?_cross_scriptlet_wrapper}", NULL);
++	    if (scriptletWrapper && *scriptletWrapper)
++	     (void) rpmChrootOut();
++#endif
+ 	rc = runImmedTriggers(psm);
++#ifdef RPM_VENDOR_OE
++	    if (scriptletWrapper && *scriptletWrapper)
++	     (void) rpmChrootIn();
++	}
++#endif
+ 	break;
+ 
+     case PSM_RPMDB_ADD: {
+Index: rpm-4.11.2/lib/rpmscript.c
+===================================================================
+--- rpm-4.11.2.orig/lib/rpmscript.c
++++ rpm-4.11.2/lib/rpmscript.c
+@@ -92,7 +92,7 @@ static rpmRC runLuaScript(int selinux, A
+ static const char * const SCRIPT_PATH = "PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/X11R6/bin";
+ 
+ static void doScriptExec(int selinux, ARGV_const_t argv, ARGV_const_t prefixes,
+-			FD_t scriptFd, FD_t out)
++			FD_t scriptFd, FD_t out, char * rootDir )
+ {
+     int pipes[2];
+     int flag;
+@@ -158,13 +158,12 @@ static void doScriptExec(int selinux, AR
+ 	    setenv("RPM_INSTALL_PREFIX", *pf, 1);
+ 	}
+     }
+-	
+-    if (chdir("/") == 0) {
++    if (chdir(rootDir) == 0) {
+ 	/* XXX Don't mtrace into children. */
+ 	unsetenv("MALLOC_CHECK_");
+ 
+ 	/* Permit libselinux to do the scriptlet exec. */
+-	if (selinux == 1) {	
++	if (selinux == 1) {
+ 	    xx = rpm_execcon(0, argv[0], argv, environ);
+ 	}
+ 
+@@ -175,12 +174,12 @@ static void doScriptExec(int selinux, AR
+     _exit(127); /* exit 127 for compatibility with bash(1) */
+ }
+ 
+-static char * writeScript(const char *cmd, const char *script)
++static char * writeScript(const char *cmd, const char *script, char * rootDir)
+ {
+     char *fn = NULL;
+     size_t slen = strlen(script);
+     int ok = 0;
+-    FD_t fd = rpmMkTempFile("/", &fn);
++    FD_t fd = rpmMkTempFile(rootDir, &fn);
+ 
+     if (Ferror(fd))
+ 	goto exit;
+@@ -204,7 +203,7 @@ exit:
+  */
+ static rpmRC runExtScript(int selinux, ARGV_const_t prefixes,
+ 		   const char *sname, rpmlogLvl lvl, FD_t scriptFd,
+-		   ARGV_t * argvp, const char *script, int arg1, int arg2)
++		   ARGV_t * argvp, const char *script, int arg1, int arg2,char * rootDir)
+ {
+     FD_t out = NULL;
+     char * fn = NULL;
+@@ -215,7 +214,7 @@ static rpmRC runExtScript(int selinux, A
+     rpmlog(RPMLOG_DEBUG, "%s: scriptlet start\n", sname);
+ 
+     if (script) {
+-	fn = writeScript(*argvp[0], script);
++	fn = writeScript(*argvp[0], script, rootDir);
+ 	if (fn == NULL) {
+ 	    rpmlog(RPMLOG_ERR,
+ 		   _("Couldn't create temporary file for %s: %s\n"),
+@@ -258,7 +257,7 @@ static rpmRC runExtScript(int selinux, A
+     } else if (pid == 0) {/* Child */
+ 	rpmlog(RPMLOG_DEBUG, "%s: execv(%s) pid %d\n",
+ 	       sname, *argvp[0], (unsigned)getpid());
+-	doScriptExec(selinux, *argvp, prefixes, scriptFd, out);
++	doScriptExec(selinux, *argvp, prefixes, scriptFd, out, rootDir);
+     }
+ 
+     do {
+@@ -297,13 +296,27 @@ exit:
+ }
+ 
+ rpmRC rpmScriptRun(rpmScript script, int arg1, int arg2, FD_t scriptFd,
+-		   ARGV_const_t prefixes, int warn_only, int selinux)
++		   ARGV_const_t prefixes, int warn_only, int selinux, char * rootDir)
+ {
+     ARGV_t args = NULL;
+     rpmlogLvl lvl = warn_only ? RPMLOG_WARNING : RPMLOG_ERR;
+     rpmRC rc;
+-
+-    if (script == NULL) return RPMRC_OK;
++#ifdef RPM_VENDOR_OE
++    const char * scriptletWrapper = rpmExpand("%{?_cross_scriptlet_wrapper}", NULL);
++#endif
++ 
++     if (script == NULL) return RPMRC_OK;
++#ifdef RPM_VENDOR_OE
++    if (scriptletWrapper && *scriptletWrapper) {
++       argvAdd(&args, scriptletWrapper);
++
++       if ( rootDir ) {
++         argvAdd(&args, rootDir);
++       } else {
++         argvAdd(&args, "/");
++       }
++    }
++#endif
+ 
+     /* construct a new argv as we can't modify the one from header */
+     if (script->args) {
+@@ -315,7 +328,7 @@ rpmRC rpmScriptRun(rpmScript script, int
+     if (rstreq(args[0], "<lua>")) {
+ 	rc = runLuaScript(selinux, prefixes, script->descr, lvl, scriptFd, &args, script->body, arg1, arg2);
+     } else {
+-	rc = runExtScript(selinux, prefixes, script->descr, lvl, scriptFd, &args, script->body, arg1, arg2);
++	rc = runExtScript(selinux, prefixes, script->descr, lvl, scriptFd, &args, script->body, arg1, arg2, rootDir);
+     }
+     argvFree(args);
+ 
+Index: rpm-4.11.2/lib/rpmscript.h
+===================================================================
+--- rpm-4.11.2.orig/lib/rpmscript.h
++++ rpm-4.11.2/lib/rpmscript.h
+@@ -29,7 +29,7 @@ rpmScript rpmScriptFree(rpmScript script
+ 
+ RPM_GNUC_INTERNAL
+ rpmRC rpmScriptRun(rpmScript script, int arg1, int arg2, FD_t scriptFd,
+-                   ARGV_const_t prefixes, int warn_only, int selinux);
++                   ARGV_const_t prefixes, int warn_only, int selinux, char * rootDir);
+ 
+ RPM_GNUC_INTERNAL
+ rpmTagVal rpmScriptTag(rpmScript script);

@@ -1,0 +1,15 @@
+Upstream-Status: Pending
+
+Install the pkgconfig file into libdir.
+
+--- popt-1.16.orig/Makefile.am	2012-04-26 13:42:54.021139813 +0800
++++ popt-1.16/Makefile.am	2012-04-26 13:36:03.552096912 +0800
+@@ -47,7 +47,7 @@
+ libpopt_la_SOURCES = popt.c poptparse.c poptconfig.c popthelp.c poptint.c
+ libpopt_la_LDFLAGS = -no-undefined @LTLIBINTL@ @LTLIBICONV@
+ 
+-pkgconfigdir = $(prefix)/lib/pkgconfig
++pkgconfigdir = $(libdir)/pkgconfig
+ pkgconfig_DATA = popt.pc
+ 
+ if HAVE_LD_VERSION_SCRIPT

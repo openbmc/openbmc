@@ -1,0 +1,30 @@
+From 1561549ea36e37cc25706f094a195de4928f4211 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Fri, 19 Jun 2015 01:23:46 -0700
+Subject: [PATCH] t/run/switches.t: perl5 -> perl
+
+We call it perl rather than perl5 in oe.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ t/run/switches.t |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/t/run/switches.t b/t/run/switches.t
+index 78915e0..e9e4b45 100644
+--- a/t/run/switches.t
++++ b/t/run/switches.t
+@@ -269,7 +269,7 @@ is runperl(stderr => 1, prog => '#!perl -M'),
+           '-V generates 20+ lines' );
+ 
+     like( runperl( switches => ['-V'] ),
+-	  qr/\ASummary of my perl5 .*configuration:/,
++	  qr/\ASummary of my perl .*configuration:/,
+           '-V looks okay' );
+ 
+     # lookup a known config var
+-- 
+1.7.9.5
+

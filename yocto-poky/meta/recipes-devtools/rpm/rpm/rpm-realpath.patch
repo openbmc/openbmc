@@ -1,0 +1,24 @@
+chroot: realpath is required before expanding _dbpath
+
+_usr turned out to be a relative path to support dyanmic config, but it's
+being used somewhere as a indicator to locate substrings, so we must get
+the real path of it in advance.
+
+Upstream-Status: Inappropriate (OpenEmbedded specific)
+
+Signed-off-by: Ming Liu <ming.liu@windriver.com>
+
+diff -urpN a/rpmio/rpmrpc.c b/rpmio/rpmrpc.c
+--- a/rpmio/rpmrpc.c
++++ b/rpmio/rpmrpc.c
+@@ -257,7 +257,9 @@ int Open(const char * path, int flags, m
+     /* XXX if the open(2) fails, try to strip a possible chroot(2) prefix. */
+     if (fdno < 0 && errno == ENOENT) {
+ 	const char *dbpath = rpmExpand("%{?_dbpath}/", NULL);
+-	const char * fn = strstr(path + 1, dbpath);
++	char resolved_dbpath[PATH_MAX];
++	realpath(dbpath, resolved_dbpath);
++	const char * fn = strstr(path + 1, resolved_dbpath);
+ 	if (fn)
+ 	    fdno = open(fn, flags, mode);
+ 	dbpath = _free(dbpath);

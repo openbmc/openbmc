@@ -1,0 +1,103 @@
+From 9d62544090b08849218cd1fc52a36cdd5d90363e Mon Sep 17 00:00:00 2001
+From: Yuanjie Huang <yuanjie.huang@windriver.com>
+Date: Fri, 24 Apr 2015 03:29:31 +0000
+Subject: [PATCH] Add 64-bit flag for ELF64 entries.
+
+ldconfig-native was grepped from an old version of glibc, and its output
+lacks neccessary 64bit flag in entries.
+Due to this defect, ctypes.util.find_library() python function fails to
+detect any library due to the old file format that ldconfig-native
+creates. This fix sets architecture-dependent 64bit flags for 64-bit ELF.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yuanjie Huang <yuanjie.huang@windriver.com>
+---
+ cache.c      |  4 ++++
+ ldconfig.h   |  4 ++++
+ readelflib.c | 34 ++++++++++++++++++++++++++++++++++
+ 3 files changed, 42 insertions(+)
+
+diff --git a/cache.c b/cache.c
+index a904d44..c4f5411 100644
+--- a/cache.c
++++ b/cache.c
+@@ -121,6 +121,10 @@ print_entry (const char *lib, int flag, unsigned int osversion,
+       break;
+     case FLAG_MIPS64_LIBN64:
+       fputs (",64bit", stdout);
++      break;
++    case FLAG_AARCH64_LIB64:
++      fputs (",AArch64", stdout);
++      break;
+     case 0:
+       break;
+     default:
+diff --git a/ldconfig.h b/ldconfig.h
+index fadd5ec..6a8a750 100644
+--- a/ldconfig.h
++++ b/ldconfig.h
+@@ -34,6 +34,10 @@
+ #define FLAG_POWERPC_LIB64	0x0500
+ #define FLAG_MIPS64_LIBN32	0x0600
+ #define FLAG_MIPS64_LIBN64	0x0700
++#define FLAG_X8664_LIBX32		0x0800
++#define FLAG_ARM_LIBHF			0x0900
++#define FLAG_AARCH64_LIB64		0x0a00
++#define FLAG_ARM_LIBSF			0x0b00
+ 
+ /* Name of auxiliary cache.  */
+ #define _PATH_LDCONFIG_AUX_CACHE "/var/cache/ldconfig/aux-cache"
+diff --git a/readelflib.c b/readelflib.c
+index 0bf0de3..6e87afc 100644
+--- a/readelflib.c
++++ b/readelflib.c
+@@ -28,6 +28,11 @@
+ 
+ #include "endian_extra.h"
+ 
++/* Work-around for old host that does not have AArch64 defined in elf.h. */
++#ifndef EM_AARCH64
++#define EM_AARCH64	183		/* ARM AARCH64 */
++#endif
++
+ #undef check_ptr
+ #define check_ptr(ptr)						\
+ do								\
+@@ -290,6 +295,35 @@ process_elf_file64 (const char *file_name, const char *lib, int *flag,
+      libc5/libc6.  */
+   *flag = FLAG_ELF;
+ 
++  /* Set flags according to information in ELF header to align with target
++     ldconfig */
++  switch (elf_header->e_machine)
++    {
++    case EM_IA_64:
++      *flag |= FLAG_IA64_LIB64;
++      break;
++    case EM_X86_64:
++      *flag |= FLAG_X8664_LIB64;
++      break;
++    case EM_S390:
++      *flag |= FLAG_S390_LIB64;
++      break;
++    case EM_PPC64:
++      *flag |= FLAG_POWERPC_LIB64;
++      break;
++    case EM_MIPS:
++    case EM_MIPS_RS3_LE:
++      *flag |= FLAG_MIPS64_LIBN64;
++      break;
++    case EM_AARCH64:
++      *flag |= FLAG_AARCH64_LIB64;
++      break;
++    default:
++      error(0, 0, "%s is a 64-bit ELF for unknown machine %lx\n",
++            file_name, (long)elf_header->e_machine);
++      break;
++    }
++
+   loadaddr = -1;
+   dynamic_addr = 0;
+   dynamic_size = 0;
+-- 

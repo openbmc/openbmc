@@ -1,0 +1,78 @@
+Upstream-Status: Backport
+Signed-off-by: Khem Raj
+
+2013-08-01  Martin Jambor  <mjambor@suse.cz>
+
+	PR middle-end/57748
+	* stor-layout.c (compute_record_mode): Treat zero-sized array fields
+	like incomplete types.
+
+testsuite/
+	* gcc.dg/torture/pr57748.c: New test.
+
+
+Index: gcc-4.8.1/gcc/stor-layout.c
+===================================================================
+--- gcc-4.8.1.orig/gcc/stor-layout.c	2013-04-28 10:29:18.000000000 -0700
++++ gcc-4.8.1/gcc/stor-layout.c	2013-08-01 15:02:08.018006125 -0700
+@@ -1618,7 +1618,9 @@
+ 		   && integer_zerop (TYPE_SIZE (TREE_TYPE (field)))))
+ 	  || ! host_integerp (bit_position (field), 1)
+ 	  || DECL_SIZE (field) == 0
+-	  || ! host_integerp (DECL_SIZE (field), 1))
++	  || ! host_integerp (DECL_SIZE (field), 1)
++	  || (TREE_CODE (TREE_TYPE (field)) == ARRAY_TYPE
++	      && tree_low_cst (DECL_SIZE (field), 1) == 0))
+ 	return;
+ 
+       /* If this field is the whole struct, remember its mode so
+Index: gcc-4.8.1/gcc/testsuite/gcc.dg/torture/pr57748.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gcc-4.8.1/gcc/testsuite/gcc.dg/torture/pr57748.c	2013-08-01 15:02:08.062006126 -0700
+@@ -0,0 +1,45 @@
++/* PR middle-end/57748 */
++/* { dg-do run } */
++
++#include <stdlib.h>
++
++extern void abort (void);
++
++typedef long long V
++  __attribute__ ((vector_size (2 * sizeof (long long)), may_alias));
++
++typedef struct S { V a; V b[0]; } P __attribute__((aligned (1)));
++
++struct __attribute__((packed)) T { char c; P s; };
++
++void __attribute__((noinline, noclone))
++check (struct T *t)
++{
++  if (t->s.b[0][0] != 3 || t->s.b[0][1] != 4)
++    abort ();
++}
++
++int __attribute__((noinline, noclone))
++get_i (void)
++{
++  return 0;
++}
++
++void __attribute__((noinline, noclone))
++foo (P *p)
++{
++  V a = { 3, 4 };
++  int i = get_i();
++  p->b[i] = a;
++}
++
++int
++main ()
++{
++  struct T *t = (struct T *) malloc (128);
++
++  foo (&t->s);
++  check (t);
++
++  return 0;
++}

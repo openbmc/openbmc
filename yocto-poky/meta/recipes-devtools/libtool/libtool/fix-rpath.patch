@@ -1,0 +1,65 @@
+We don't want to add RPATHS which match default linker
+search paths, they're a waste of space. This patch
+filters libtools list and removes the ones we don't need.
+
+RP 23/9/2011
+
+Upstream-Status: Pending
+
+Updated by: Robert Yang <liezhi.yang@windriver.com>
+
+Index: libtool-2.4.2/build-aux/ltmain.in
+===================================================================
+--- libtool-2.4.2.orig/build-aux/ltmain.in
++++ libtool-2.4.2/build-aux/ltmain.in
+@@ -7286,8 +7286,14 @@ EOF
+ 		  esac
+ 		fi
+ 	      else
+-		eval flag=\"$hardcode_libdir_flag_spec\"
+-		func_append dep_rpath " $flag"
++                # We only want to hardcode in an rpath if it isn't in the
++                # default dlsearch path.
++	        case " $sys_lib_dlsearch_path " in
++	        *" $libdir "*) ;;
++	        *) eval flag=\"$hardcode_libdir_flag_spec\"
++                   func_append dep_rpath " $flag"
++                   ;;
++	        esac
+ 	      fi
+ 	    elif test -n "$runpath_var"; then
+ 	      case "$perm_rpath " in
+@@ -8019,8 +8025,14 @@ EOF
+ 	      esac
+ 	    fi
+ 	  else
+-	    eval flag=\"$hardcode_libdir_flag_spec\"
+-	    func_append rpath " $flag"
++            # We only want to hardcode in an rpath if it isn't in the
++            # default dlsearch path.
++	    case " $sys_lib_dlsearch_path " in
++	    *" $libdir "*) ;;
++	    *) eval flag=\"$hardcode_libdir_flag_spec\"
++               rpath+=" $flag"
++               ;;
++	    esac
+ 	  fi
+ 	elif test -n "$runpath_var"; then
+ 	  case "$perm_rpath " in
+@@ -8070,8 +8082,14 @@ EOF
+ 	      esac
+ 	    fi
+ 	  else
+-	    eval flag=\"$hardcode_libdir_flag_spec\"
+-	    func_append rpath " $flag"
++            # We only want to hardcode in an rpath if it isn't in the
++            # default dlsearch path.
++	    case " $sys_lib_dlsearch_path " in
++	    *" $libdir "*) ;;
++	    *) eval flag=\"$hardcode_libdir_flag_spec\"
++               func_append rpath " $flag"
++               ;;
++	    esac    
+ 	  fi
+ 	elif test -n "$runpath_var"; then
+ 	  case "$finalize_perm_rpath " in

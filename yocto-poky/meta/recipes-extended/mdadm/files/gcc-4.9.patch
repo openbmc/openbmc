@@ -1,0 +1,22 @@
+super-intel.c:5063:2: error: right-hand operand of comma expression has no effect [-Werror=unused-value]
+  snprintf((char *) spare->sig, MAX_SIGNATURE_LENGTH,
+  ^
+cc1: all warnings being treated as errors
+make: *** [super-intel.o] Error 1
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+
+Index: mdadm-3.3/super-intel.c
+===================================================================
+--- mdadm-3.3.orig/super-intel.c	2014-05-02 15:08:21.154319651 -0700
++++ mdadm-3.3/super-intel.c	2014-05-02 15:09:31.470985794 -0700
+@@ -5060,7 +5060,7 @@
+ 	spare->cache_size = mpb->cache_size,
+ 	spare->pwr_cycle_count = __cpu_to_le32(1),
+ 
+-	snprintf((char *) spare->sig, MAX_SIGNATURE_LENGTH,
++	(void)snprintf((char *) spare->sig, MAX_SIGNATURE_LENGTH,
+ 		 MPB_SIGNATURE MPB_VERSION_RAID0);
+ 
+ 	for (d = super->disks; d; d = d->next) {

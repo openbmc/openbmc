@@ -1,0 +1,33 @@
+From 43238e1ac13e32984d015c92a5841f3de1fe1d15 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Tue, 18 Nov 2014 00:07:07 -0500
+Subject: [PATCH] setup.py: no host headers libs
+
+When we are cross-compiling, setup.py should never look in /usr
+or /usr/local to find headers or libraries.
+
+Upstream-Status: Inappropriate [Cross compile specific]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ setup.py | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index f020b28..e8339cd 100644
+--- a/setup.py
++++ b/setup.py
+@@ -444,10 +444,7 @@ class PyBuildExt(build_ext):
+         if not cross_compiling:
+             add_dir_to_list(self.compiler.library_dirs, os.path.join('/usr/local', sys.lib))
+             add_dir_to_list(self.compiler.include_dirs, '/usr/local/include')
+-        # only change this for cross builds for 3.3, issues on Mageia
+-        if cross_compiling:
+             self.add_gcc_paths()
+-        if not cross_compiling:
+             self.add_multiarch_paths()
+ 
+         # Add paths specified in the environment variables LDFLAGS and
+-- 
+2.0.0
+

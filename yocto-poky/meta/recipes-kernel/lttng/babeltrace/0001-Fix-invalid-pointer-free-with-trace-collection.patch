@@ -1,0 +1,44 @@
+From e4cad900994cf286d971796a947fea782dfc6651 Mon Sep 17 00:00:00 2001
+From: Francis Giraldeau <francis.giraldeau@gmail.com>
+Date: Mon, 15 Jun 2015 11:43:02 -0400
+Subject: [PATCH] Fix invalid pointer free with trace collection
+
+Upstream-Status: Submitted
+
+Patch proposed by Li RongQing related to bug# 790
+
+Signed-off-by: Mikael Beckius <mikael.beckius@windriver.com>
+Signed-off-by: Francis Giraldeau <francis.giraldeau@gmail.com>
+---
+ lib/context.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/lib/context.c b/lib/context.c
+index 45aab34..8d3770f 100644
+--- a/lib/context.c
++++ b/lib/context.c
+@@ -79,7 +79,7 @@ int bt_context_add_trace(struct bt_context *ctx, const char *path,
+ 	struct bt_trace_descriptor *td;
+ 	struct bt_format *fmt;
+ 	struct bt_trace_handle *handle;
+-	int ret, closeret;
++	int ret;
+ 
+ 	if (!ctx || !format_name || (!path && !stream_list))
+ 		return -EINVAL;
+@@ -159,10 +159,8 @@ int bt_context_add_trace(struct bt_context *ctx, const char *path,
+ 	return handle->id;
+ 
+ error:
+-	closeret = fmt->close_trace(td);
+-	if (closeret) {
+-		fprintf(stderr, "Error in close_trace callback\n");
+-	}
++	if (handle)
++		bt_context_remove_trace(ctx, handle->id);
+ end:
+ 	return ret;
+ }
+-- 
+1.9.1
+

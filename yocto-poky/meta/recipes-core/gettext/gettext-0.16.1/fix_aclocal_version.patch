@@ -1,0 +1,110 @@
+
+This patch updates the required version number from 2.61 to the 
+current 2.65 version of aclocal, this will need to be updated 
+when we update aclocal
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by Saul Wold <sgw@linux.intel.com>
+
+Index: gettext-0.16.1/autoconf-lib-link/m4/lib-link.m4
+===================================================================
+--- gettext-0.16.1.orig/autoconf-lib-link/m4/lib-link.m4	2011-03-17 02:24:36.391519775 -0700
++++ gettext-0.16.1/autoconf-lib-link/m4/lib-link.m4	2011-03-17 02:24:45.569526073 -0700
+@@ -148,7 +148,7 @@
+   define([NAME],[translit([$1],[abcdefghijklmnopqrstuvwxyz./-],
+                                [ABCDEFGHIJKLMNOPQRSTUVWXYZ___])])
+   dnl Autoconf >= 2.61 supports dots in --with options.
+-  define([N_A_M_E],[m4_if(m4_version_compare(m4_defn([m4_PACKAGE_VERSION]),[2.61]),[-1],[translit([$1],[.],[_])],[$1])])
++  define([N_A_M_E],[m4_if(m4_version_compare(m4_defn([m4_PACKAGE_VERSION]),[2.65]),[-1],[translit([$1],[.],[_])],[$1])])
+   dnl By default, look in $includedir and $libdir.
+   use_additional=yes
+   AC_LIB_WITH_FINAL_PREFIX([
+Index: gettext-0.16.1/autoconf-lib-link/tests/rpathly/aclocal.m4
+===================================================================
+--- gettext-0.16.1.orig/autoconf-lib-link/tests/rpathly/aclocal.m4	2011-03-17 02:24:36.391519775 -0700
++++ gettext-0.16.1/autoconf-lib-link/tests/rpathly/aclocal.m4	2011-03-17 02:24:45.570526904 -0700
+@@ -11,8 +11,8 @@
+ # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ # PARTICULAR PURPOSE.
+ 
+-m4_if(m4_PACKAGE_VERSION, [2.61],,
+-[m4_fatal([this file was generated for autoconf 2.61.
++m4_if(m4_PACKAGE_VERSION, [2.65],,
++[m4_fatal([this file was generated for autoconf 2.65.
+ You have another version of autoconf.  If you want to use that,
+ you should regenerate the build system entirely.], [63])])
+ 
+Index: gettext-0.16.1/autoconf-lib-link/tests/rpathx/aclocal.m4
+===================================================================
+--- gettext-0.16.1.orig/autoconf-lib-link/tests/rpathx/aclocal.m4	2011-03-17 02:24:36.391519775 -0700
++++ gettext-0.16.1/autoconf-lib-link/tests/rpathx/aclocal.m4	2011-03-17 02:24:45.572525773 -0700
+@@ -11,8 +11,8 @@
+ # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ # PARTICULAR PURPOSE.
+ 
+-m4_if(m4_PACKAGE_VERSION, [2.61],,
+-[m4_fatal([this file was generated for autoconf 2.61.
++m4_if(m4_PACKAGE_VERSION, [2.65],,
++[m4_fatal([this file was generated for autoconf 2.65.
+ You have another version of autoconf.  If you want to use that,
+ you should regenerate the build system entirely.], [63])])
+ 
+Index: gettext-0.16.1/autoconf-lib-link/tests/rpathy/aclocal.m4
+===================================================================
+--- gettext-0.16.1.orig/autoconf-lib-link/tests/rpathy/aclocal.m4	2011-03-17 02:24:36.391519775 -0700
++++ gettext-0.16.1/autoconf-lib-link/tests/rpathy/aclocal.m4	2011-03-17 02:24:45.578394916 -0700
+@@ -11,7 +11,7 @@
+ # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ # PARTICULAR PURPOSE.
+ 
+-m4_if(m4_PACKAGE_VERSION, [2.61],,
++m4_if(m4_PACKAGE_VERSION, [2.65],,
+ [m4_fatal([this file was generated for autoconf 2.61.
+ You have another version of autoconf.  If you want to use that,
+ you should regenerate the build system entirely.], [63])])
+Index: gettext-0.16.1/autoconf-lib-link/tests/rpathz/aclocal.m4
+===================================================================
+--- gettext-0.16.1.orig/autoconf-lib-link/tests/rpathz/aclocal.m4	2011-03-17 02:24:36.391519775 -0700
++++ gettext-0.16.1/autoconf-lib-link/tests/rpathz/aclocal.m4	2011-03-17 02:24:45.586395416 -0700
+@@ -11,8 +11,8 @@
+ # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ # PARTICULAR PURPOSE.
+ 
+-m4_if(m4_PACKAGE_VERSION, [2.61],,
+-[m4_fatal([this file was generated for autoconf 2.61.
++m4_if(m4_PACKAGE_VERSION, [2.65],,
++[m4_fatal([this file was generated for autoconf 2.65.
+ You have another version of autoconf.  If you want to use that,
+ you should regenerate the build system entirely.], [63])])
+ 
+Index: gettext-0.16.1/gettext-tools/aclocal.m4
+===================================================================
+--- gettext-0.16.1.orig/gettext-tools/aclocal.m4	2006-11-27 09:34:32.000000000 -0800
++++ gettext-0.16.1/gettext-tools/aclocal.m4	2011-03-17 02:27:01.135682807 -0700
+@@ -11,8 +11,8 @@
+ # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ # PARTICULAR PURPOSE.
+ 
+-m4_if(m4_PACKAGE_VERSION, [2.61],,
+-[m4_fatal([this file was generated for autoconf 2.61.
++m4_if(m4_PACKAGE_VERSION, [2.65],,
++[m4_fatal([this file was generated for autoconf 2.65.
+ You have another version of autoconf.  If you want to use that,
+ you should regenerate the build system entirely.], [63])])
+ 
+Index: gettext-0.16.1/gettext-tools/examples/aclocal.m4
+===================================================================
+--- gettext-0.16.1.orig/gettext-tools/examples/aclocal.m4	2006-11-27 09:16:23.000000000 -0800
++++ gettext-0.16.1/gettext-tools/examples/aclocal.m4	2011-03-17 02:26:52.589396683 -0700
+@@ -11,8 +11,8 @@
+ # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ # PARTICULAR PURPOSE.
+ 
+-m4_if(m4_PACKAGE_VERSION, [2.61],,
+-[m4_fatal([this file was generated for autoconf 2.61.
++m4_if(m4_PACKAGE_VERSION, [2.65],,
++[m4_fatal([this file was generated for autoconf 2.65.
+ You have another version of autoconf.  If you want to use that,
+ you should regenerate the build system entirely.], [63])])
+ 

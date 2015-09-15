@@ -1,0 +1,35 @@
+From e18f81e69c55d698abd293e71063d6b6b275cc07 Mon Sep 17 00:00:00 2001
+From: Brendan O'Dea <bod@debian.org>
+Date: Fri, 18 Mar 2005 22:22:25 +1100
+Subject: Replace generic man(1) instructions with Debian-specific information.
+
+Indicate that the user needs to install the perl-doc package.
+
+Patch-Name: debian/doc_info.diff
+---
+ pod/perl.pod | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/pod/perl.pod b/pod/perl.pod
+index 364e957..f97e103 100644
+--- a/pod/perl.pod
++++ b/pod/perl.pod
+@@ -291,8 +291,16 @@ aux c2ph h2ph h2xs perlbug pl2pm pod2html pod2man splain xsubpp
+ 
+ =for buildtoc __END__
+ 
+-On a Unix-like system, these documentation files will usually also be
+-available as manpages for use with the F<man> program.
++On Debian systems, you need to install the B<perl-doc> package which
++contains the majority of the standard Perl documentation and the
++F<perldoc> program.
++
++Extensive additional documentation for Perl modules is available, both
++those distributed with Perl and third-party modules which are packaged
++or locally installed.
++
++You should be able to view Perl's documentation with your man(1)
++program or perldoc(1).
+ 
+ Some documentation is not available as man pages, so if a
+ cross-reference is not found by man, try it with L<perldoc>.  Perldoc can

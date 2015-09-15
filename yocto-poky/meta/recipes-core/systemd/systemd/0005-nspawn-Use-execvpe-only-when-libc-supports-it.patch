@@ -1,0 +1,38 @@
+From a7417c2e6950d55c22c1b0d15783898b8ff229ef Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 20 Feb 2015 05:10:37 +0000
+Subject: [PATCH 05/11] nspawn: Use execvpe only when libc supports it
+
+Upstream-Status: Denied [no desire for uclibc support]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/nspawn/nspawn.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+Index: git/src/nspawn/nspawn.c
+===================================================================
+--- git.orig/src/nspawn/nspawn.c
++++ git/src/nspawn/nspawn.c
+@@ -143,6 +143,8 @@ typedef struct CustomMount {
+         char **lower;
+ } CustomMount;
+ 
++#include "config.h"
++
+ static char *arg_directory = NULL;
+ static char *arg_template = NULL;
+ static char *arg_user = NULL;
+@@ -4238,7 +4240,12 @@ static int inner_child(
+                 a[0] = (char*) "/sbin/init";
+                 execve(a[0], a, env_use);
+         } else if (argc > optind)
++#ifdef HAVE_EXECVPE
+                 execvpe(argv[optind], argv + optind, env_use);
++#else
++                environ = env_use;
++                execvp(argv[optind], argv + optind);
++#endif /* HAVE_EXECVPE */
+         else {
+                 chdir(home ? home : "/root");
+                 execle("/bin/bash", "-bash", NULL, env_use);

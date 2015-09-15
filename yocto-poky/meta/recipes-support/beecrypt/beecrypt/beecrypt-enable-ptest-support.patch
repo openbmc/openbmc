@@ -1,0 +1,37 @@
+beecrypt: enable ptest support
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Add install-ptest rules.
+
+Signed-off-by: Chong Lu <Chong.Lu@windriver.com>
+---
+ Makefile.am       | 3 +++
+ tests/Makefile.am | 3 +++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/Makefile.am b/Makefile.am
+index b7e7869..5076f59 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -73,3 +73,6 @@ DISTCLEANFILES = mpopt.s blowfishopt.s sha1opt.s
+ 
+ bench:
+ 	(cd tests && $(MAKE) $(AM_MAKEFLAGS) bench)
++
++install-ptest:
++	(cd tests && $(MAKE) $(AM_MAKEFLAGS) check_PROGRAMS)
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 1604e5e..d8db8d8 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -101,3 +101,6 @@ bench: benchme benchrsa benchhf benchbc
+ 	./benchbc AES 128
+ 	./benchbc Blowfish 128
+ 	./benchbc Blowfish 128
++
++check_PROGRAMS:
++	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
+-- 
+1.8.1.2
+

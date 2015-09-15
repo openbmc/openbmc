@@ -1,0 +1,16 @@
+Upstream-Status: Pending
+
+Index: pygtk-2.10.4/gtk/__init__.py
+===================================================================
+--- pygtk-2.10.4.orig/gtk/__init__.py	2007-11-27 19:27:05.000000000 -0300
++++ pygtk-2.10.4/gtk/__init__.py	2007-11-27 19:28:22.000000000 -0300
+@@ -78,7 +78,8 @@
+ 
+ keysyms = LazyModule('keysyms', locals())
+ 
+-_init()
++if not hasattr(sys.modules['__main__'], 'python_launcher_enabled'):
++    _init()
+ 
+ # CAPI
+ _PyGtk_API = _gtk._PyGtk_API

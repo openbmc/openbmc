@@ -1,0 +1,100 @@
+#!/usr/bin/env python
+
+# Report significant differences in the buildhistory repository since a specific revision
+#
+# Copyright (C) 2013 Intel Corporation
+# Author: Paul Eggleton <paul.eggleton@linux.intel.com>
+
+import sys
+import os
+import optparse
+from distutils.version import LooseVersion
+
+# Ensure PythonGit is installed (buildhistory_analysis needs it)
+try:
+    import git
+except ImportError:
+    print("Please install GitPython (python-git) 0.3.1 or later in order to use this script")
+    sys.exit(1)
+
+def main():
+    parser = optparse.OptionParser(
+        description = "Reports significant differences in the buildhistory repository.",
+        usage = """
+    %prog [options] [from-revision [to-revision]]
+(if not specified, from-revision defaults to build-minus-1, and to-revision defaults to HEAD)""")
+
+    parser.add_option("-p", "--buildhistory-dir",
+            help = "Specify path to buildhistory directory (defaults to buildhistory/ under cwd)",
+            action="store", dest="buildhistory_dir", default='buildhistory/')
+    parser.add_option("-v", "--report-version",
+            help = "Report changes in PKGE/PKGV/PKGR even when the values are still the default (PE/PV/PR)",
+            action="store_true", dest="report_ver", default=False)
+    parser.add_option("-a", "--report-all",
+            help = "Report all changes, not just the default significant ones",
+            action="store_true", dest="report_all", default=False)
+
+    options, args = parser.parse_args(sys.argv)
+
+    if len(args) > 3:
+        sys.stderr.write('Invalid argument(s) specified: %s\n\n' % ' '.join(args[3:]))
+        parser.print_help()
+        sys.exit(1)
+
+    if LooseVersion(git.__version__) < '0.3.1':
+        sys.stderr.write("Version of GitPython is too old, please install GitPython (python-git) 0.3.1 or later in order to use this script\n")
+        sys.exit(1)
+
+    if not os.path.exists(options.buildhistory_dir):
+        sys.stderr.write('Buildhistory directory "%s" does not exist\n\n' % options.buildhistory_dir)
+        parser.print_help()
+        sys.exit(1)
+
+    scripts_path = os.path.abspath(os.path.dirname(os.path.abspath(sys.argv[0])))
+    lib_path = scripts_path + '/lib'
+    sys.path = sys.path + [lib_path]
+
+    import scriptpath
+
+    # Set path to OE lib dir so we can import the buildhistory_analysis module
+    scriptpath.add_oe_lib_path()
+    # Set path to bitbake lib dir so the buildhistory_analysis module can load bb.utils
+    bitbakepath = scriptpath.add_bitbake_lib_path()
+    if not bitbakepath:
+        sys.stderr.write("Unable to find bitbake by searching parent directory of this script or PATH\n")
+        sys.exit(1)
+
+    import oe.buildhistory_analysis
+
+    fromrev = 'build-minus-1'
+    torev = 'HEAD'
+    if len(args) > 1:
+        if len(args) == 2 and '..' in args[1]:
+            revs = args[1].split('..')
+            fromrev = revs[0]
+            if revs[1]:
+                torev = revs[1]
+        else:
+            fromrev = args[1]
+    if len(args) > 2:
+        torev = args[2]
+
+    import gitdb
+    try:
+        changes = oe.buildhistory_analysis.process_changes(options.buildhistory_dir, fromrev, torev, options.report_all, options.report_ver)
+    except gitdb.exc.BadObject as e:
+        if len(args) == 1:
+            sys.stderr.write("Unable to find previous build revision in buildhistory repository\n\n")
+            parser.print_help()
+        else:
+            sys.stderr.write('Specified git revision "%s" is not valid\n' % e.args[0])
+        sys.exit(1)
+
+    for chg in changes:
+        print('%s' % chg)
+
+    sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()

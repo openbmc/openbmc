@@ -1,0 +1,64 @@
+From db112739dc4f608a968b8104b382955dc3d96ca3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 7 Sep 2015 07:40:10 +0000
+Subject: [PATCH] Rectify the function signatures to fix prototype mismatches
+
+clang is less forgiving when it comes to coding standards, correct the
+function signatures to reflect the function logic
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ fsync.c      | 7 ++++---
+ latencytop.h | 2 +-
+ 2 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/fsync.c b/fsync.c
+index 82dff0e..5cefba9 100644
+--- a/fsync.c
++++ b/fsync.c
+@@ -51,7 +51,7 @@ struct fsync_files {
+ static GList *fsync_data;
+ 
+ 
+-static chain_file(struct fsync_process *proc, char *filename)
++static void chain_file(struct fsync_process *proc, char *filename)
+ {
+ 	struct fsync_files *file;
+ 	GList *item;
+@@ -75,7 +75,7 @@ static chain_file(struct fsync_process *proc, char *filename)
+ 	proc->files = g_list_append(proc->files, file);
+ }
+ 
+-static report_file(char *process, char *file)
++static void report_file(char *process, char *file)
+ {
+ 	struct fsync_process *proc;
+ 	GList *item;
+@@ -157,9 +157,10 @@ int enable_fsync_tracer(void)
+ 	write_to_file("/sys/kernel/debug/tracing/current_tracer", "fsync");	
+ 	write_to_file("/sys/kernel/debug/tracing/iter_ctrl", "ftrace_printk");	
+ 	write_to_file("/sys/kernel/debug/tracing/tracing_on", "1");
++	return ret;
+ }
+ 
+-int disable_fsync_tracer(void)
++void disable_fsync_tracer(void)
+ {
+ 	write_to_file("/sys/kernel/debug/tracing/tracing_on", "0");
+ }
+diff --git a/latencytop.h b/latencytop.h
+index 5394d73..9d107a8 100644
+--- a/latencytop.h
++++ b/latencytop.h
+@@ -54,5 +54,5 @@ extern char *translate(char *line);
+ extern void init_translations(char *filename);
+ extern int fsync_display(int duration);
+ extern int enable_fsync_tracer(void);
+-extern int disable_fsync_tracer(void);
++extern void disable_fsync_tracer(void);
+ extern void update_list(void);
+-- 
+2.5.1
+

@@ -1,0 +1,160 @@
+Upstream-Status: Pending
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+diff -Naur man-1.6e.orig/catopen/catopen.c man-1.6e/catopen/catopen.c
+--- man-1.6e.orig/catopen/catopen.c	2005-08-20 20:26:06.000000000 -0300
++++ man-1.6e/catopen/catopen.c	2007-05-18 11:31:05.000000000 -0300
+@@ -9,22 +9,63 @@
+ extern char *index (const char *, int);         /* not always in <string.h> */
+ extern char *my_malloc(int);	/* in util.c */
+ 
++/* if the program has sgid/suid privileges then getenv doesn't return
++ * NLSPATH; so we set here a good default value.
++ */
+ #ifndef DEFAULT_NLSPATH
+ # if __GLIBC__ >= 2
+-#  define DEFAULT_NLSPATH "/usr/share/locale/%L/%N"
++#  define DEFAULT_NLSPATH "/usr/share/locale/%L/%N:/usr/share/locale/%l_%t/%N:/usr/share/locale/%l/%N"
+ # else
+ #  define DEFAULT_NLSPATH "/usr/lib/locale/%N/%L"
+ # endif
+ #endif
+ 
+-static nl_catd my_catopenpath(char *name, char *path);
++static nl_catd my_catopenpath(char *name, char *path, char *lang);
+ 
+ static				/* this source included in gripes.c */
+ nl_catd
+ my_catopen(char *name, int oflag) {
+-  nl_catd fd;
++  nl_catd fd = (nl_catd) -1;
++
++  /* using first the my_catopenpath, which looks with LANGUAGE
++   * and only if it fails ressort to catopen, it gives better i18n
++   */
++  {
++    char *nlspath, *lang, *s;
+ 
+-  fd = catopen(name, oflag);
++    /*
++     * "If NLSPATH does not exist in the environment, or if a
++     * message catalog cannot be opened in any of the paths specified
++     * by NLSPATH, then an implementation defined default path is used"
++     */
++    nlspath = getenv("NLSPATH");
++    if (!nlspath)
++      nlspath = DEFAULT_NLSPATH;
++ 
++    lang = getenv("LANGUAGE");
++    if (!lang)
++      lang = getenv("LC_ALL");
++    if (!lang)
++      lang = getenv("LC_MESSAGES");
++    if (!lang)
++      lang = getenv("LANG");
++    if (!lang)
++      lang = "";
++ 
++    while(*lang && (fd == (nl_catd) -1)) {
++      s = index(lang, ':');
++      if (s) *s = 0;
++        fd = my_catopenpath(name, nlspath, lang);
++      if (s) lang=s+1;
++      else lang = "";
++    }
++    if (fd == (nl_catd) -1)
++      fd = my_catopenpath(name, nlspath, "en");
++  }
++
++  /* still not found, use the system catopen */
++  if (fd == (nl_catd) -1)
++    fd = catopen(name, oflag);
+ 
+   if (fd == (nl_catd) -1 && oflag) {
+     oflag = 0;
+@@ -32,8 +73,6 @@
+   }
+ 
+   if (fd == (nl_catd) -1) {
+-    char *nlspath;
+-
+     /* The libc catopen fails - let us see if we can do better */
+     /* The quotes below are from X/Open, XPG 1987, Vol. 3. */
+ 
+@@ -58,17 +97,6 @@
+ #endif
+     }
+ 
+-    /*
+-     * "If NLSPATH does not exist in the environment, or if a
+-     * message catalog cannot be opened in any of the paths specified
+-     * by NLSPATH, then an implementation defined default path is used"
+-     */
+-
+-    nlspath = getenv("NLSPATH");
+-    if (nlspath)
+-      fd = my_catopenpath(name, nlspath);
+-    if (fd == (nl_catd) -1)
+-      fd = my_catopenpath(name, DEFAULT_NLSPATH);
+   }
+   return fd;
+ }
+@@ -90,15 +118,13 @@
+  *
+  */
+ static nl_catd
+-my_catopenpath(char *name, char *nlspath) {
+-  int fd;
++my_catopenpath(char *name, char *nlspath, char *lang) {
+   nl_catd cfd = (nl_catd) -1;
+-  char *path0, *path, *s, *file, *lang, *lang_l, *lang_t, *lang_c;
++  char *path0, *path, *s, *file, *lang_l, *lang_t, *lang_c;
+   int langsz, namesz, sz, lang_l_sz, lang_t_sz, lang_c_sz;
+ 
+   namesz = strlen(name);
+ 
+-  lang = getenv("LANG");
+   if (!lang)
+     lang = "";
+   langsz = strlen(lang);
+@@ -194,14 +220,9 @@
+       path = s+1;
+     } else
+       path = 0;
+-    fd = open(file, O_RDONLY);
+-    if (fd != -1) {
+-      /* we found the right catalog - but we don't know the
+-	 type of nl_catd, so close it again and ask libc */
+-      close(fd);
+-      cfd = catopen(file, 0);
+-      break;
+-    }
++	cfd = catopen(file, 0);
++	if (cfd != (nl_catd) -1)
++			break;
+   }
+ 
+   free(path0);
+diff -Naur man-1.6e.orig/src/manpath.c man-1.6e/src/manpath.c
+--- man-1.6e.orig/src/manpath.c	2006-08-03 18:18:33.000000000 -0300
++++ man-1.6e/src/manpath.c	2007-05-18 11:02:48.000000000 -0300
+@@ -282,13 +282,14 @@
+ 		/* We cannot use "lang = setlocale(LC_MESSAGES, NULL)" or so:
+ 		   the return value of setlocale is an opaque string. */
+ 		/* POSIX prescribes the order: LC_ALL, LC_MESSAGES, LANG */
+-		if((lang = getenv("LC_ALL")) != NULL)
++	        /* LANGUAGE is GNU/Linux and overrules all */
++		if((lang = getenv("LANGUAGE")) != NULL)
+ 			split2(dir, lang, add_to_mandirlist_x, perrs);
+-		if((lang = getenv("LC_MESSAGES")) != NULL)
++		else if((lang = getenv("LC_ALL")) != NULL)
+ 			split2(dir, lang, add_to_mandirlist_x, perrs);
+-		if((lang = getenv("LANG")) != NULL)
++		else if((lang = getenv("LC_MESSAGES")) != NULL)
+ 			split2(dir, lang, add_to_mandirlist_x, perrs);
+-		if((lang = getenv("LANGUAGE")) != NULL)
++		else if((lang = getenv("LANG")) != NULL)
+ 			split2(dir, lang, add_to_mandirlist_x, perrs);
+ 		add_to_mandirlist_x(dir, 0, perrs);
+ 	}

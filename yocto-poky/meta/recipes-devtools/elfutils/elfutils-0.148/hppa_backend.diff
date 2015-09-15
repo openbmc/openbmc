@@ -1,0 +1,801 @@
+Upstream-Status: Backport
+
+Index: elfutils-0.146/backends/parisc_init.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ elfutils-0.146/backends/parisc_init.c	2010-04-24 10:10:50.000000000 +0000
+@@ -0,0 +1,74 @@
++/* Initialization of PA-RISC specific backend library.
++   Copyright (C) 2002, 2005, 2006 Red Hat, Inc.
++   This file is part of Red Hat elfutils.
++   Written by Ulrich Drepper <drepper@redhat.com>, 2002.
++
++   Red Hat elfutils is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by the
++   Free Software Foundation; version 2 of the License.
++
++   Red Hat elfutils is distributed in the hope that it will be useful, but
++   WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   General Public License for more details.
++
++   You should have received a copy of the GNU General Public License along
++   with Red Hat elfutils; if not, write to the Free Software Foundation,
++   Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301 USA.
++
++   Red Hat elfutils is an included package of the Open Invention Network.
++   An included package of the Open Invention Network is a package for which
++   Open Invention Network licensees cross-license their patents.  No patent
++   license is granted, either expressly or impliedly, by designation as an
++   included package.  Should you wish to participate in the Open Invention
++   Network licensing program, please visit www.openinventionnetwork.com
++   <http://www.openinventionnetwork.com>.  */
++
++#ifdef HAVE_CONFIG_H
++# include <config.h>
++#endif
++
++#define BACKEND		parisc_
++#define RELOC_PREFIX	R_PARISC_
++#include "libebl_CPU.h"
++#include "libebl_parisc.h"
++
++/* This defines the common reloc hooks based on parisc_reloc.def.  */
++#include "common-reloc.c"
++
++
++const char *
++parisc_init (elf, machine, eh, ehlen)
++     Elf *elf __attribute__ ((unused));
++     GElf_Half machine __attribute__ ((unused));
++     Ebl *eh;
++     size_t ehlen;
++{
++  int pa64 = 0;
++
++  /* Check whether the Elf_BH object has a sufficent size.  */
++  if (ehlen < sizeof (Ebl))
++    return NULL;
++
++  if (elf) {
++    GElf_Ehdr ehdr_mem;
++    GElf_Ehdr *ehdr = gelf_getehdr (elf, &ehdr_mem);
++    if (ehdr && (ehdr->e_flags & EF_PARISC_WIDE))
++      pa64 = 1;
++  }
++  /* We handle it.  */
++  eh->name = "PA-RISC";
++  parisc_init_reloc (eh);
++  HOOK (eh, reloc_simple_type);
++  HOOK (eh, machine_flag_check);
++  HOOK (eh, symbol_type_name);
++  HOOK (eh, segment_type_name);
++  HOOK (eh, section_type_name);
++  HOOK (eh, register_info);
++  if (pa64)
++    eh->return_value_location = parisc_return_value_location_64;
++  else
++    eh->return_value_location = parisc_return_value_location_32;
++
++  return MODVERSION;
++}
+Index: elfutils-0.146/backends/parisc_regs.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ elfutils-0.146/backends/parisc_regs.c	2010-04-24 10:10:50.000000000 +0000
+@@ -0,0 +1,159 @@
++/* Register names and numbers for PA-RISC DWARF.
++   Copyright (C) 2005, 2006 Red Hat, Inc.
++   This file is part of Red Hat elfutils.
++
++   Red Hat elfutils is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by the
++   Free Software Foundation; version 2 of the License.
++
++   Red Hat elfutils is distributed in the hope that it will be useful, but
++   WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   General Public License for more details.
++
++   You should have received a copy of the GNU General Public License along
++   with Red Hat elfutils; if not, write to the Free Software Foundation,
++   Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301 USA.
++
++   Red Hat elfutils is an included package of the Open Invention Network.
++   An included package of the Open Invention Network is a package for which
++   Open Invention Network licensees cross-license their patents.  No patent
++   license is granted, either expressly or impliedly, by designation as an
++   included package.  Should you wish to participate in the Open Invention
++   Network licensing program, please visit www.openinventionnetwork.com
++   <http://www.openinventionnetwork.com>.  */
++
++#ifdef HAVE_CONFIG_H
++# include <config.h>
++#endif
++
++#include <string.h>
++#include <dwarf.h>
++
++#define BACKEND parisc_
++#include "libebl_CPU.h"
++
++ssize_t
++parisc_register_info (Ebl *ebl, int regno, char *name, size_t namelen,
++		     const char **prefix, const char **setname,
++		     int *bits, int *type)
++{
++  int pa64 = 0;
++
++  if (ebl->elf) {
++    GElf_Ehdr ehdr_mem;
++    GElf_Ehdr *ehdr = gelf_getehdr (ebl->elf, &ehdr_mem);
++    if (ehdr->e_flags & EF_PARISC_WIDE)
++      pa64 = 1;
++  }
++
++  int nregs = pa64 ? 127 : 128;
++
++  if (name == NULL)
++    return nregs;
++
++  if (regno < 0 || regno >= nregs || namelen < 6)
++    return -1;
++
++  *prefix = "%";
++
++  if (regno < 32)
++  {
++    *setname = "integer";
++    *type = DW_ATE_signed;
++    if (pa64)
++    {
++	*bits = 64;
++    }
++    else
++    {
++    	*bits = 32;
++    }
++  }
++  else if (regno == 32)
++  {
++    *setname = "special";
++    if (pa64)
++    {
++	*bits = 6;
++    }
++    else
++    {
++    	*bits = 5;
++    }
++    *type = DW_ATE_unsigned;
++  }
++  else
++  {
++    *setname = "FPU";
++    *type = DW_ATE_float;
++    if (pa64)
++    {
++	*bits = 64;
++    }
++    else
++    {
++    	*bits = 32;
++    }
++  }
++
++  if (regno < 33) {
++    switch (regno)
++      {
++      case 0 ... 9:
++        name[0] = 'r';
++        name[1] = regno + '0';
++        namelen = 2;
++        break;
++      case 10 ... 31:
++        name[0] = 'r';
++        name[1] = regno / 10 + '0';
++        name[2] = regno % 10 + '0';
++        namelen = 3;
++        break;
++      case 32:
++	*prefix = NULL;
++	name[0] = 'S';
++	name[1] = 'A';
++	name[2] = 'R';
++	namelen = 3;
++	break;
++      }
++  }
++  else {
++    if (pa64 && ((regno - 72) % 2)) {
++      *setname = NULL;
++      return 0;
++    }
++
++    switch (regno)
++      {
++      case 72 + 0 ... 72 + 11:
++        name[0] = 'f';
++	name[1] = 'r';
++        name[2] = (regno + 8 - 72) / 2 + '0';
++        namelen = 3;
++        if ((regno + 8 - 72) % 2) {
++	  name[3] = 'R';
++	  namelen++;
++        }
++        break;
++      case 72 + 12 ... 72 + 55:
++        name[0] = 'f';
++	name[1] = 'r';
++        name[2] = (regno + 8 - 72) / 2 / 10 + '0';
++        name[3] = (regno + 8 - 72) / 2 % 10 + '0';
++        namelen = 4;
++        if ((regno + 8 - 72) % 2) {
++	  name[4] = 'R';
++	  namelen++;
++        }
++        break;
++      default:
++        *setname = NULL;
++        return 0;
++      }
++  }
++  name[namelen++] = '\0';
++  return namelen;
++}
+Index: elfutils-0.146/backends/parisc_reloc.def
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ elfutils-0.146/backends/parisc_reloc.def	2010-04-24 10:10:50.000000000 +0000
+@@ -0,0 +1,128 @@
++/* List the relocation types for PA-RISC.  -*- C -*-
++   Copyright (C) 2005 Red Hat, Inc.
++   This file is part of Red Hat elfutils.
++
++   Red Hat elfutils is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by the
++   Free Software Foundation; version 2 of the License.
++
++   Red Hat elfutils is distributed in the hope that it will be useful, but
++   WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   General Public License for more details.
++
++   You should have received a copy of the GNU General Public License along
++   with Red Hat elfutils; if not, write to the Free Software Foundation,
++   Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301 USA.
++
++   Red Hat elfutils is an included package of the Open Invention Network.
++   An included package of the Open Invention Network is a package for which
++   Open Invention Network licensees cross-license their patents.  No patent
++   license is granted, either expressly or impliedly, by designation as an
++   included package.  Should you wish to participate in the Open Invention
++   Network licensing program, please visit www.openinventionnetwork.com
++   <http://www.openinventionnetwork.com>.  */
++
++/*	    NAME,		REL|EXEC|DYN	*/
++
++RELOC_TYPE (NONE,		EXEC|DYN)
++RELOC_TYPE (DIR32,		REL|EXEC|DYN)
++RELOC_TYPE (DIR21L,		REL|EXEC|DYN)
++RELOC_TYPE (DIR17R,		REL)
++RELOC_TYPE (DIR17F,		REL)
++RELOC_TYPE (DIR14R,		REL|DYN)
++RELOC_TYPE (PCREL32,		REL)
++RELOC_TYPE (PCREL21L,		REL)
++RELOC_TYPE (PCREL17R,		REL)
++RELOC_TYPE (PCREL17F,		REL)
++RELOC_TYPE (PCREL14R,		REL|EXEC)
++RELOC_TYPE (DPREL21L,		REL)
++RELOC_TYPE (DPREL14WR,		REL)
++RELOC_TYPE (DPREL14DR,          REL)
++RELOC_TYPE (DPREL14R,		REL)
++RELOC_TYPE (GPREL21L,		0)
++RELOC_TYPE (GPREL14R,		0)
++RELOC_TYPE (LTOFF21L,		REL)
++RELOC_TYPE (LTOFF14R,		REL)
++RELOC_TYPE (DLTIND14F,		0)
++RELOC_TYPE (SETBASE,		0)
++RELOC_TYPE (SECREL32,		REL)
++RELOC_TYPE (BASEREL21L,		0)
++RELOC_TYPE (BASEREL17R,		0)
++RELOC_TYPE (BASEREL14R,		0)
++RELOC_TYPE (SEGBASE,		0)
++RELOC_TYPE (SEGREL32,		REL)
++RELOC_TYPE (PLTOFF21L,		0)
++RELOC_TYPE (PLTOFF14R,		0)
++RELOC_TYPE (PLTOFF14F,		0)
++RELOC_TYPE (LTOFF_FPTR32,	0)
++RELOC_TYPE (LTOFF_FPTR21L,	0)
++RELOC_TYPE (LTOFF_FPTR14R,	0)
++RELOC_TYPE (FPTR64,		0)
++RELOC_TYPE (PLABEL32,		REL|DYN)
++RELOC_TYPE (PCREL64,		0)
++RELOC_TYPE (PCREL22C,		0)
++RELOC_TYPE (PCREL22F,		0)
++RELOC_TYPE (PCREL14WR,		0)
++RELOC_TYPE (PCREL14DR,		0)
++RELOC_TYPE (PCREL16F,		0)
++RELOC_TYPE (PCREL16WF,		0)
++RELOC_TYPE (PCREL16DF,		0)
++RELOC_TYPE (DIR64,		REL|DYN)
++RELOC_TYPE (DIR14WR,		REL)
++RELOC_TYPE (DIR14DR,		REL)
++RELOC_TYPE (DIR16F,		REL)
++RELOC_TYPE (DIR16WF,		REL)
++RELOC_TYPE (DIR16DF,		REL)
++RELOC_TYPE (GPREL64,		0)
++RELOC_TYPE (GPREL14WR,		0)
++RELOC_TYPE (GPREL14DR,		0)
++RELOC_TYPE (GPREL16F,		0)
++RELOC_TYPE (GPREL16WF,		0)
++RELOC_TYPE (GPREL16DF,		0)
++RELOC_TYPE (LTOFF64,		0)
++RELOC_TYPE (LTOFF14WR,		0)
++RELOC_TYPE (LTOFF14DR,		0)
++RELOC_TYPE (LTOFF16F,		0)
++RELOC_TYPE (LTOFF16WF,		0)
++RELOC_TYPE (LTOFF16DF,		0)
++RELOC_TYPE (SECREL64,		0)
++RELOC_TYPE (BASEREL14WR,	0)
++RELOC_TYPE (BASEREL14DR,	0)
++RELOC_TYPE (SEGREL64,		0)
++RELOC_TYPE (PLTOFF14WR,		0)
++RELOC_TYPE (PLTOFF14DR,		0)
++RELOC_TYPE (PLTOFF16F,		0)
++RELOC_TYPE (PLTOFF16WF,		0)
++RELOC_TYPE (PLTOFF16DF,		0)
++RELOC_TYPE (LTOFF_FPTR64,	0)
++RELOC_TYPE (LTOFF_FPTR14WR,	0)
++RELOC_TYPE (LTOFF_FPTR14DR,	0)
++RELOC_TYPE (LTOFF_FPTR16F,	0)
++RELOC_TYPE (LTOFF_FPTR16WF,	0)
++RELOC_TYPE (LTOFF_FPTR16DF,	0)
++RELOC_TYPE (COPY,		EXEC)
++RELOC_TYPE (IPLT,		EXEC|DYN)
++RELOC_TYPE (EPLT,		0)
++RELOC_TYPE (TPREL32,		DYN)
++RELOC_TYPE (TPREL21L,		0)
++RELOC_TYPE (TPREL14R,		0)
++RELOC_TYPE (LTOFF_TP21L,	0)
++RELOC_TYPE (LTOFF_TP14R,	0)
++RELOC_TYPE (LTOFF_TP14F,	0)
++RELOC_TYPE (TPREL64,		0)
++RELOC_TYPE (TPREL14WR,		0)
++RELOC_TYPE (TPREL14DR,		0)
++RELOC_TYPE (TPREL16F,		0)
++RELOC_TYPE (TPREL16WF,		0)
++RELOC_TYPE (TPREL16DF,		0)
++RELOC_TYPE (LTOFF_TP64,		0)
++RELOC_TYPE (LTOFF_TP14WR,	0)
++RELOC_TYPE (LTOFF_TP14DR,	0)
++RELOC_TYPE (LTOFF_TP16F,	0)
++RELOC_TYPE (LTOFF_TP16WF,	0)
++RELOC_TYPE (LTOFF_TP16DF,	0)
++RELOC_TYPE (TLS_DTPMOD32,	DYN)
++RELOC_TYPE (TLS_DTPMOD64,	DYN)
++
++#define NO_RELATIVE_RELOC       1
+Index: elfutils-0.146/backends/parisc_retval.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ elfutils-0.146/backends/parisc_retval.c	2010-04-24 10:10:50.000000000 +0000
+@@ -0,0 +1,213 @@
++/* Function return value location for Linux/PA-RISC ABI.
++   Copyright (C) 2005 Red Hat, Inc.
++   This file is part of Red Hat elfutils.
++
++   Red Hat elfutils is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by the
++   Free Software Foundation; version 2 of the License.
++
++   Red Hat elfutils is distributed in the hope that it will be useful, but
++   WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   General Public License for more details.
++
++   You should have received a copy of the GNU General Public License along
++   with Red Hat elfutils; if not, write to the Free Software Foundation,
++   Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301 USA.
++
++   Red Hat elfutils is an included package of the Open Invention Network.
++   An included package of the Open Invention Network is a package for which
++   Open Invention Network licensees cross-license their patents.  No patent
++   license is granted, either expressly or impliedly, by designation as an
++   included package.  Should you wish to participate in the Open Invention
++   Network licensing program, please visit www.openinventionnetwork.com
++   <http://www.openinventionnetwork.com>.  */
++
++#ifdef HAVE_CONFIG_H
++# include <config.h>
++#endif
++
++#include <assert.h>
++#include <dwarf.h>
++
++#define BACKEND parisc_
++#include "libebl_CPU.h"
++#include "libebl_parisc.h"
++
++/* %r28, or pair %r28, %r29.  */
++static const Dwarf_Op loc_intreg32[] =
++  {
++    { .atom = DW_OP_reg28 }, { .atom = DW_OP_piece, .number = 4 },
++    { .atom = DW_OP_reg29 }, { .atom = DW_OP_piece, .number = 4 },
++  };
++
++static const Dwarf_Op loc_intreg[] =
++  {
++    { .atom = DW_OP_reg28 }, { .atom = DW_OP_piece, .number = 8 },
++    { .atom = DW_OP_reg29 }, { .atom = DW_OP_piece, .number = 8 },
++  };
++#define nloc_intreg	1
++#define nloc_intregpair	4
++
++/* %fr4L, or pair %fr4L, %fr4R on pa-32 */
++static const Dwarf_Op loc_fpreg32[] =
++  {
++    { .atom = DW_OP_regx, .number = 72 }, { .atom = DW_OP_piece, .number = 4 },
++    { .atom = DW_OP_regx, .number = 73 }, { .atom = DW_OP_piece, .number = 4 },
++  };
++#define nloc_fpreg32 2
++#define nloc_fpregpair32 4
++
++/* $fr4 */
++static const Dwarf_Op loc_fpreg[] =
++  {
++    { .atom = DW_OP_regx, .number = 72 },
++  };
++#define nloc_fpreg  1
++
++#if 0
++/* The return value is a structure and is actually stored in stack space
++   passed in a hidden argument by the caller. Address of the location is stored
++   in %r28 before function call, but it may be changed by function. */
++static const Dwarf_Op loc_aggregate[] =
++  {
++    { .atom = DW_OP_breg28 },
++  };
++#define nloc_aggregate 1
++#endif
++
++static int
++parisc_return_value_location_ (Dwarf_Die *functypedie, const Dwarf_Op **locp, int pa64)
++{
++  Dwarf_Word regsize = pa64 ? 8 : 4;
++
++  /* Start with the function's type, and get the DW_AT_type attribute,
++     which is the type of the return value.  */
++
++  Dwarf_Attribute attr_mem;
++  Dwarf_Attribute *attr = dwarf_attr_integrate (functypedie, DW_AT_type, &attr_mem);
++  if (attr == NULL)
++    /* The function has no return value, like a `void' function in C.  */
++    return 0;
++
++  Dwarf_Die die_mem;
++  Dwarf_Die *typedie = dwarf_formref_die (attr, &die_mem);
++  int tag = dwarf_tag (typedie);
++
++  /* Follow typedefs and qualifiers to get to the actual type.  */
++  while (tag == DW_TAG_typedef
++	 || tag == DW_TAG_const_type || tag == DW_TAG_volatile_type
++	 || tag == DW_TAG_restrict_type || tag == DW_TAG_mutable_type)
++    {
++      attr = dwarf_attr_integrate (typedie, DW_AT_type, &attr_mem);
++      typedie = dwarf_formref_die (attr, &die_mem);
++      tag = dwarf_tag (typedie);
++    }
++
++  switch (tag)
++    {
++    case -1:
++      return -1;
++
++    case DW_TAG_subrange_type:
++      if (! dwarf_hasattr_integrate (typedie, DW_AT_byte_size))
++	{
++	  attr = dwarf_attr_integrate (typedie, DW_AT_type, &attr_mem);
++	  typedie = dwarf_formref_die (attr, &die_mem);
++	  tag = dwarf_tag (typedie);
++	}
++      /* Fall through.  */
++
++    case DW_TAG_base_type:
++    case DW_TAG_enumeration_type:
++    case DW_TAG_pointer_type:
++    case DW_TAG_ptr_to_member_type:
++      {
++        Dwarf_Word size;
++	if (dwarf_formudata (dwarf_attr_integrate (typedie, DW_AT_byte_size,
++					 &attr_mem), &size) != 0)
++	  {
++	    if (tag == DW_TAG_pointer_type || tag == DW_TAG_ptr_to_member_type)
++	      size = 4;
++	    else
++	      return -1;
++	  }
++	if (tag == DW_TAG_base_type)
++	  {
++	    Dwarf_Word encoding;
++	    if (dwarf_formudata (dwarf_attr_integrate (typedie, DW_AT_encoding,
++					     &attr_mem), &encoding) != 0)
++	      return -1;
++
++	    if (encoding == DW_ATE_float)
++	      {
++		if (pa64) {
++		  *locp = loc_fpreg;
++		  if (size <= 8)
++		      return nloc_fpreg;
++		}
++		else {
++		  *locp = loc_fpreg32;
++		  if (size <= 4)
++		    return nloc_fpreg32;
++		  else if (size <= 8)
++		    return nloc_fpregpair32;
++		}
++		goto aggregate;
++	      }
++	  }
++	if (pa64)
++	  *locp = loc_intreg;
++	else
++	  *locp = loc_intreg32;
++	if (size <= regsize)
++	  return nloc_intreg;
++	if (size <= 2 * regsize)
++	  return nloc_intregpair;
++
++	/* Else fall through.  */
++      }
++
++    case DW_TAG_structure_type:
++    case DW_TAG_class_type:
++    case DW_TAG_union_type:
++    case DW_TAG_array_type:
++    aggregate: {
++        Dwarf_Word size;
++	if (dwarf_aggregate_size (typedie, &size) != 0)
++	  return -1;
++	if (pa64)
++          *locp = loc_intreg;
++	else
++	  *locp = loc_intreg32;
++        if (size <= regsize)
++	  return nloc_intreg;
++        if (size <= 2 * regsize)
++	  return nloc_intregpair;
++#if 0
++	/* there should be some way to know this location... But I do not see it. */
++        *locp = loc_aggregate;
++        return nloc_aggregate;
++#endif
++	/* fall through.  */
++      }
++    }
++
++  /* XXX We don't have a good way to return specific errors from ebl calls.
++     This value means we do not understand the type, but it is well-formed
++     DWARF and might be valid.  */
++  return -2;
++}
++
++int
++parisc_return_value_location_32 (Dwarf_Die *functypedie, const Dwarf_Op **locp)
++{
++  return parisc_return_value_location_ (functypedie, locp, 0);
++}
++
++int
++parisc_return_value_location_64 (Dwarf_Die *functypedie, const Dwarf_Op **locp)
++{
++  return parisc_return_value_location_ (functypedie, locp, 1);
++}
++
+Index: elfutils-0.146/backends/parisc_symbol.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ elfutils-0.146/backends/parisc_symbol.c	2010-04-24 10:10:50.000000000 +0000
+@@ -0,0 +1,112 @@
++/* PA-RISC specific symbolic name handling.
++   Copyright (C) 2002, 2005 Red Hat, Inc.
++   This file is part of Red Hat elfutils.
++   Written by Ulrich Drepper <drepper@redhat.com>, 2002.
++
++   Red Hat elfutils is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by the
++   Free Software Foundation; version 2 of the License.
++
++   Red Hat elfutils is distributed in the hope that it will be useful, but
++   WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   General Public License for more details.
++
++   You should have received a copy of the GNU General Public License along
++   with Red Hat elfutils; if not, write to the Free Software Foundation,
++   Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301 USA.
++
++   Red Hat elfutils is an included package of the Open Invention Network.
++   An included package of the Open Invention Network is a package for which
++   Open Invention Network licensees cross-license their patents.  No patent
++   license is granted, either expressly or impliedly, by designation as an
++   included package.  Should you wish to participate in the Open Invention
++   Network licensing program, please visit www.openinventionnetwork.com
++   <http://www.openinventionnetwork.com>.  */
++
++#ifdef HAVE_CONFIG_H
++# include <config.h>
++#endif
++
++#include <elf.h>
++#include <stddef.h>
++
++#define BACKEND		parisc_
++#include "libebl_CPU.h"
++
++const char *
++parisc_segment_type_name (int segment, char *buf __attribute__ ((unused)),
++			size_t len __attribute__ ((unused)))
++{
++  switch (segment)
++    {
++    case PT_PARISC_ARCHEXT:
++      return "PARISC_ARCHEXT";
++    case PT_PARISC_UNWIND:
++      return "PARISC_UNWIND";
++    default:
++      break;
++    }
++  return NULL;
++}
++
++/* Return symbolic representation of symbol type.  */
++const char *
++parisc_symbol_type_name(int symbol, char *buf __attribute__ ((unused)),
++    size_t len __attribute__ ((unused)))
++{
++	if (symbol == STT_PARISC_MILLICODE)
++	  return "PARISC_MILLI";
++	return NULL;
++}
++
++/* Return symbolic representation of section type.  */
++const char *
++parisc_section_type_name (int type,
++			char *buf __attribute__ ((unused)),
++			size_t len __attribute__ ((unused)))
++{
++  switch (type)
++    {
++    case SHT_PARISC_EXT:
++      return "PARISC_EXT";
++    case SHT_PARISC_UNWIND:
++      return "PARISC_UNWIND";
++    case SHT_PARISC_DOC:
++      return "PARISC_DOC";
++    }
++
++  return NULL;
++}
++
++/* Check whether machine flags are valid.  */
++bool
++parisc_machine_flag_check (GElf_Word flags)
++{
++  if (flags &~ (EF_PARISC_TRAPNIL | EF_PARISC_EXT | EF_PARISC_LSB |
++	EF_PARISC_WIDE | EF_PARISC_NO_KABP |
++	EF_PARISC_LAZYSWAP | EF_PARISC_ARCH))
++    return 0;
++
++  GElf_Word arch = flags & EF_PARISC_ARCH;
++
++  return ((arch == EFA_PARISC_1_0) || (arch == EFA_PARISC_1_1) ||
++      (arch == EFA_PARISC_2_0));
++}
++
++/* Check for the simple reloc types.  */
++Elf_Type
++parisc_reloc_simple_type (Ebl *ebl __attribute__ ((unused)), int type)
++{
++  switch (type)
++    {
++    case R_PARISC_DIR64:
++    case R_PARISC_SECREL64:
++      return ELF_T_XWORD;
++    case R_PARISC_DIR32:
++    case R_PARISC_SECREL32:
++      return ELF_T_WORD;
++    default:
++      return ELF_T_NUM;
++    }
++}
+Index: elfutils-0.146/backends/libebl_parisc.h
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ elfutils-0.146/backends/libebl_parisc.h	2010-04-24 10:10:50.000000000 +0000
+@@ -0,0 +1,9 @@
++#ifndef _LIBEBL_HPPA_H
++#define _LIBEBL_HPPA_H 1
++
++#include <libdw.h>
++
++extern int parisc_return_value_location_32(Dwarf_Die *, const Dwarf_Op **locp);
++extern int parisc_return_value_location_64(Dwarf_Die *, const Dwarf_Op **locp);
++
++#endif
+Index: elfutils-0.146/backends/Makefile.am
+===================================================================
+--- elfutils-0.146.orig/backends/Makefile.am	2010-04-24 10:10:41.000000000 +0000
++++ elfutils-0.146/backends/Makefile.am	2010-04-24 10:10:50.000000000 +0000
+@@ -29,11 +29,11 @@
+ 	   -I$(top_srcdir)/libelf -I$(top_srcdir)/libdw
+ 
+ 
+-modules = i386 sh x86_64 ia64 alpha arm sparc ppc ppc64 s390
++modules = i386 sh x86_64 ia64 alpha arm sparc ppc ppc64 s390 parisc
+ libebl_pic = libebl_i386_pic.a libebl_sh_pic.a libebl_x86_64_pic.a \
+ 	     libebl_ia64_pic.a libebl_alpha_pic.a libebl_arm_pic.a \
+ 	     libebl_sparc_pic.a libebl_ppc_pic.a libebl_ppc64_pic.a \
+-	     libebl_s390_pic.a
++	     libebl_s390_pic.a libebl_parisc_pic.a
+ noinst_LIBRARIES = $(libebl_pic)
+ noinst_DATA = $(libebl_pic:_pic.a=.so)
+ 
+@@ -95,6 +95,9 @@
+ libebl_s390_pic_a_SOURCES = $(s390_SRCS)
+ am_libebl_s390_pic_a_OBJECTS = $(s390_SRCS:.c=.os)
+ 
++parisc_SRCS = parisc_init.c parisc_symbol.c parisc_regs.c parisc_retval.c
++libebl_parisc_pic_a_SOURCES = $(parisc_SRCS)
++am_libebl_parisc_pic_a_OBJECTS = $(parisc_SRCS:.c=.os)
+ 
+ libebl_%.so libebl_%.map: libebl_%_pic.a $(libelf) $(libdw)
+ 	@rm -f $(@:.so=.map)
+Index: elfutils-0.146/libelf/elf.h
+===================================================================
+--- elfutils-0.146.orig/libelf/elf.h	2010-04-13 20:08:02.000000000 +0000
++++ elfutils-0.146/libelf/elf.h	2010-04-24 10:10:50.000000000 +0000
+@@ -1789,16 +1789,24 @@
+ #define R_PARISC_PCREL17F	12	/* 17 bits of rel. address.  */
+ #define R_PARISC_PCREL14R	14	/* Right 14 bits of rel. address.  */
+ #define R_PARISC_DPREL21L	18	/* Left 21 bits of rel. address.  */
++#define R_PARISC_DPREL14WR	19
++#define R_PARISC_DPREL14DR	20
+ #define R_PARISC_DPREL14R	22	/* Right 14 bits of rel. address.  */
+ #define R_PARISC_GPREL21L	26	/* GP-relative, left 21 bits.  */
+ #define R_PARISC_GPREL14R	30	/* GP-relative, right 14 bits.  */
+ #define R_PARISC_LTOFF21L	34	/* LT-relative, left 21 bits.  */
+ #define R_PARISC_LTOFF14R	38	/* LT-relative, right 14 bits.  */
++#define R_PARISC_DLTIND14F	39
++#define R_PARISC_SETBASE	40
+ #define R_PARISC_SECREL32	41	/* 32 bits section rel. address.  */
++#define R_PARISC_BASEREL21L	42
++#define R_PARISC_BASEREL17R	43
++#define R_PARISC_BASEREL14R	46
+ #define R_PARISC_SEGBASE	48	/* No relocation, set segment base.  */
+ #define R_PARISC_SEGREL32	49	/* 32 bits segment rel. address.  */
+ #define R_PARISC_PLTOFF21L	50	/* PLT rel. address, left 21 bits.  */
+ #define R_PARISC_PLTOFF14R	54	/* PLT rel. address, right 14 bits.  */
++#define R_PARISC_PLTOFF14F	55
+ #define R_PARISC_LTOFF_FPTR32	57	/* 32 bits LT-rel. function pointer. */
+ #define R_PARISC_LTOFF_FPTR21L	58	/* LT-rel. fct ptr, left 21 bits. */
+ #define R_PARISC_LTOFF_FPTR14R	62	/* LT-rel. fct ptr, right 14 bits. */
+@@ -1807,6 +1815,7 @@
+ #define R_PARISC_PLABEL21L	66	/* Left 21 bits of fdesc address.  */
+ #define R_PARISC_PLABEL14R	70	/* Right 14 bits of fdesc address.  */
+ #define R_PARISC_PCREL64	72	/* 64 bits PC-rel. address.  */
++#define R_PARISC_PCREL22C	73
+ #define R_PARISC_PCREL22F	74	/* 22 bits PC-rel. address.  */
+ #define R_PARISC_PCREL14WR	75	/* PC-rel. address, right 14 bits.  */
+ #define R_PARISC_PCREL14DR	76	/* PC rel. address, right 14 bits.  */
+@@ -1832,6 +1841,8 @@
+ #define R_PARISC_LTOFF16WF	102	/* 16 bits LT-rel. address.  */
+ #define R_PARISC_LTOFF16DF	103	/* 16 bits LT-rel. address.  */
+ #define R_PARISC_SECREL64	104	/* 64 bits section rel. address.  */
++#define R_PARISC_BASEREL14WR	107
++#define R_PARISC_BASEREL14DR	108
+ #define R_PARISC_SEGREL64	112	/* 64 bits segment rel. address.  */
+ #define R_PARISC_PLTOFF14WR	115	/* PLT-rel. address, right 14 bits.  */
+ #define R_PARISC_PLTOFF14DR	116	/* PLT-rel. address, right 14 bits.  */

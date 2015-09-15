@@ -1,0 +1,58 @@
+Fix cross link using autoconf detected AR
+
+If building on 32bit host and creating 64bit libraries, the target
+package builds should not invoke the 32bit hosts's ar.  Specifically
+you will get an error message like:
+
+x86_64-linux-gcc    -m64 --sysroot=/opt/qemux86-64/tmp/sysroots/qemux86-64 -g -o test test.o libnewt.a -Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed -lslang
+libnewt.a: could not read symbols: Archive has no index; run ranlib to add one
+collect2: error: ld returned 1 exit status
+
+Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ Makefile.in  | 3 ++-
+ configure.ac | 4 ++++
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.in b/Makefile.in
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -7,6 +7,7 @@ CFLAGS = @CFLAGS@
+ LDFLAGS = @LDFLAGS@
+ CPPFLAGS = -D_GNU_SOURCE @CPPFLAGS@ 
+ GNU_LD = @GNU_LD@
++AR = @AR@
+ 
+ VERSION = @VERSION@
+ TAG = r$(subst .,-,$(VERSION))
+@@ -109,7 +110,7 @@ whiptcl.$(SOEXT): $(WHIPTCLOBJS) $(LIBNEWTSH)
+ 	$(CC) -shared $(SHCFLAGS) $(LDFLAGS) -o whiptcl.$(SOEXT) $(WHIPTCLOBJS) -L. -lnewt  $(LIBTCL) -lpopt $(LIBS)
+ 
+ $(LIBNEWT): $(LIBOBJS)
+-	ar rv $@ $^
++	$(AR) rv $@ $^
+ 
+ newt.o $(SHAREDDIR)/newt.o: newt.c Makefile
+ 
+diff --git a/configure.ac b/configure.ac
+index 92e6da8..cd83d57 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -15,6 +15,10 @@ AC_PROG_INSTALL
+ AC_PROG_LN_S
+ AC_PROG_GREP
+ AC_SYS_LARGEFILE
++AN_MAKEVAR([AR], [AC_PROG_AR])
++AN_PROGRAM([ar], [AC_PROG_AR])
++AC_DEFUN([AC_PROG_AR], [AC_CHECK_TOOL(AR, ar, :)])
++AC_PROG_AR
+ 
+ # Are we using GNU ld?
+ AC_MSG_CHECKING([for GNU ld])
+-- 
+1.8.1.2
+

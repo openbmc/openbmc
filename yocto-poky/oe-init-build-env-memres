@@ -1,0 +1,84 @@
+#!/bin/sh
+
+# OE Build Environment Setup Script
+#
+# Copyright (C) 2006-2011 Linux Foundation
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+#
+# Normally this is called as '. ./oe-init-build-env builddir <portnumber> <builddir>'
+#
+# This works in most shells (not dash), but not all of them pass arg1 when
+# being sourced.   To workaround the shell limitation use "set arg1" prior 
+# to sourcing this script.
+#
+if [ -z "$1" ]; then
+    echo "No port specified, using dynamically selected port"
+    port=-1
+else
+    port=$1
+    shift
+fi
+
+if [ -n "$BASH_SOURCE" ]; then
+  OEROOT="`dirname $BASH_SOURCE`"
+elif [ -n "$ZSH_NAME" ]; then
+  OEROOT="`dirname $0`"
+else
+  OEROOT="`pwd`"
+fi
+if [ -n "$BBSERVER" ]; then
+  unset BBSERVER
+fi
+
+THIS_SCRIPT=$OEROOT/oe-init-build-env-memres
+if [ -z "$ZSH_NAME" ] && [ "x$0" = "x$THIS_SCRIPT" ]; then
+   echo "Error: This script needs to be sourced. Please run as '. $THIS_SCRIPT'"
+   exit 1
+fi
+
+OEROOT=`readlink -f "$OEROOT"`
+export OEROOT
+. $OEROOT/scripts/oe-buildenv-internal && \
+    $OEROOT/scripts/oe-setup-builddir && \
+    [ -n "$BUILDDIR" ] && cd $BUILDDIR
+unset OEROOT
+unset BBPATH
+unset THIS_SCRIPT
+
+res=1
+if [ -e bitbake.lock ] && grep : bitbake.lock > /dev/null ; then
+    BBSERVER=`cat bitbake.lock` bitbake --status-only
+    res=$?
+fi
+
+if [ $res != 0 ] ; then
+    bitbake --server-only -t xmlrpc -B localhost:$port
+fi
+
+if [ $port = -1 ] ; then
+    export BBSERVER=localhost:-1
+    echo "Bitbake server started on demand as needed, use bitbake -m to shut it down"
+else
+    export BBSERVER=`cat bitbake.lock`
+
+    if [ $res = 0 ] ; then
+	echo "Using existing bitbake server at: $BBSERVER, use bitbake -m to shut it down"
+    else
+	echo "Bitbake server started at: $BBSERVER, use bitbake -m to shut it down"
+    fi
+    unset res
+fi

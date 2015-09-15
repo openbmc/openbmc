@@ -1,0 +1,98 @@
+From 307c8ff3ef666b7bd5ac733863f2fbb27a9d521e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 29 Mar 2013 09:12:56 +0400
+Subject: [PATCH 20/35] optional libstdc
+
+gcc-runtime builds libstdc++ separately from gcc-cross-*. Its configure tests using g++
+will not run correctly since by default the linker will try to link against libstdc++
+which shouldn't exist yet. We need an option to disable -lstdc++
+option whilst leaving -lc, -lgcc and other automatic library dependencies added by gcc
+driver. This patch adds such an option which only disables the -lstdc++.
+
+A "standard" gcc build uses xgcc and hence avoids this. We should ask upstream how to
+do this officially, the likely answer is don't build libstdc++ separately.
+
+RP 29/6/10
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Inappropriate [embedded specific]
+---
+ gcc/c-family/c.opt  |    4 ++++
+ gcc/cp/g++spec.c    |    1 +
+ gcc/doc/invoke.texi |    9 +++++++--
+ gcc/gcc.c           |    1 +
+ 4 files changed, 13 insertions(+), 2 deletions(-)
+
+Index: gcc-4.9-20140316/gcc/c-family/c.opt
+===================================================================
+--- gcc-4.9-20140316.orig/gcc/c-family/c.opt
++++ gcc-4.9-20140316/gcc/c-family/c.opt
+@@ -1323,6 +1323,10 @@ nostdinc++
+ C++ ObjC++
+ Do not search standard system include directories for C++
+ 
++nostdlib++
++Driver
++Do not link standard C++ runtime library
++
+ o
+ C ObjC C++ ObjC++ Joined Separate
+ ; Documented in common.opt
+Index: gcc-4.9-20140316/gcc/cp/g++spec.c
+===================================================================
+--- gcc-4.9-20140316.orig/gcc/cp/g++spec.c
++++ gcc-4.9-20140316/gcc/cp/g++spec.c
+@@ -138,6 +138,7 @@ lang_specific_driver (struct cl_decoded_
+       switch (decoded_options[i].opt_index)
+ 	{
+ 	case OPT_nostdlib:
++	case OPT_nostdlib__:
+ 	case OPT_nodefaultlibs:
+ 	  library = -1;
+ 	  break;
+Index: gcc-4.9-20140316/gcc/doc/invoke.texi
+===================================================================
+--- gcc-4.9-20140316.orig/gcc/doc/invoke.texi
++++ gcc-4.9-20140316/gcc/doc/invoke.texi
+@@ -193,6 +193,7 @@ in the following sections.
+ -fvisibility-inlines-hidden @gol
+ -fvtable-verify=@var{std|preinit|none} @gol
+ -fvtv-counts -fvtv-debug @gol
++-nostdlib++ @gol
+ -fvisibility-ms-compat @gol
+ -fext-numeric-literals @gol
+ -Wabi  -Wconversion-null  -Wctor-dtor-privacy @gol
+@@ -457,7 +458,7 @@ Objective-C and Objective-C++ Dialects}.
+ -nostartfiles  -nodefaultlibs  -nostdlib -pie -rdynamic @gol
+ -s  -static -static-libgcc -static-libstdc++ @gol
+ -static-libasan -static-libtsan -static-liblsan -static-libubsan @gol
+--shared -shared-libgcc  -symbolic @gol
++-shared -shared-libgcc  -symbolic -nostdlib++ @gol
+ -T @var{script}  -Wl,@var{option}  -Xlinker @var{option} @gol
+ -u @var{symbol}}
+ 
+@@ -10285,6 +10286,11 @@ These entries are usually resolved by en
+ libc.  These entry points should be supplied through some other
+ mechanism when this option is specified.
+ 
++@item -nostdlib++
++@opindex nostdlib++
++Do not use the standard system C++ runtime libraries when linking.
++Only the libraries you specify will be passed to the linker.
++
+ @cindex @option{-lgcc}, use with @option{-nostdlib}
+ @cindex @option{-nostdlib} and unresolved references
+ @cindex unresolved references and @option{-nostdlib}
+Index: gcc-4.9-20140316/gcc/gcc.c
+===================================================================
+--- gcc-4.9-20140316.orig/gcc/gcc.c
++++ gcc-4.9-20140316/gcc/gcc.c
+@@ -772,6 +772,7 @@ proper position among the other output f
+     %(mflib) " STACK_SPLIT_SPEC "\
+     %{fprofile-arcs|fprofile-generate*|coverage:-lgcov} " SANITIZER_SPEC " \
+     %{!nostdlib:%{!nodefaultlibs:%(link_ssp) %(link_gcc_c_sequence)}}\
++    %{!nostdlib++:}\
+     %{!nostdlib:%{!nostartfiles:%E}} %{T*} }}}}}}"
+ #endif
+ 

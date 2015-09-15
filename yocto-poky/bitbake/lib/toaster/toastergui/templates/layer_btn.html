@@ -1,0 +1,9 @@
+<button class="btn btn-danger btn-block layer-exists-{{data.pk}} layerbtn" style="display:none;" data-layer='{ "id": {{data.pk}}, "name":  "{{data.layer.name}}", "layerdetailurl": "{%url 'layerdetails' extra.pid data.pk%}"}' data-directive="remove" >
+  <i class="icon-trash"></i>
+  Delete layer
+</button>
+<button class="btn btn-block layer-add-{{data.pk}} layerbtn" data-layer='{ "id": {{data.pk}}, "name":  "{{data.layer.name}}", "layerdetailurl": "{%url 'layerdetails' extra.pid data.pk%}"}' data-directive="add">
+  <i class="icon-plus"></i>
+  Add layer
+</button>
+

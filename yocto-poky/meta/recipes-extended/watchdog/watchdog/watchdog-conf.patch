@@ -1,0 +1,11 @@
+--- watchdog-5.13.orig/watchdog.conf	2013-02-01 12:15:44.000000000 +0100
++++ watchdog-5.13/watchdog.conf	2014-11-13 10:59:43.233943000 +0100
+@@ -20,7 +20,7 @@
+ #test-binary		= 
+ #test-timeout		= 
+ 
+-#watchdog-device	= /dev/watchdog
++watchdog-device	= /dev/watchdog
+ 
+ # Defaults compiled into the binary
+ #temperature-device	=

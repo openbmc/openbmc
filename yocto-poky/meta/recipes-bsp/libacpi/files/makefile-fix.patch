@@ -1,0 +1,47 @@
+Upstream-Status: Pending
+
+---
+ Makefile  |    6 +++---
+ config.mk |    3 ++-
+ 2 files changed, 5 insertions(+), 4 deletions(-)
+
+Index: libacpi-0.2/Makefile
+===================================================================
+--- libacpi-0.2.orig/Makefile	2007-07-29 14:09:34.000000000 +0200
++++ libacpi-0.2/Makefile	2008-09-26 10:34:53.000000000 +0200
+@@ -25,16 +25,16 @@ ${OBJ}: config.mk libacpi.h
+ 
+ libacpi.a: ${OBJ}
+ 	@echo AR $@
+-	@${AR} $@ ${OBJ}
++	${AR} ${ARFLAGS} $@ ${OBJ}
+ 	@${RANLIB} $@
+ 
+ libacpi.so: ${OBJ}
+ 	@echo LD $@
+-	@${LD} ${SOFLAGS} -o $@.${SOVERSION} ${OBJ}
++	@${CC} ${SOFLAGS} -o $@.${SOVERSION} ${OBJ}
+ 
+ test-libacpi: ${OBJ_test}
+ 	@echo LD $@
+-	@${LD} -o $@ ${OBJ_test} ${LDFLAGS}
++	@${CC} -o $@ ${OBJ_test} ${LDFLAGS}
+ 	@strip $@
+ 
+ install: all
+Index: libacpi-0.2/config.mk
+===================================================================
+--- libacpi-0.2.orig/config.mk	2007-07-29 14:09:34.000000000 +0200
++++ libacpi-0.2/config.mk	2008-09-26 10:34:33.000000000 +0200
+@@ -9,9 +9,10 @@ MANPREFIX = ${PREFIX}/share/man
+ # flags
+ SOFLAGS = -shared -Wl,-soname,${SONAME}
+ CFLAGS += -fPIC -g --pedantic -Wall -Wextra
++ARFLAGS = cr
+ 
+ # Compiler and linker
+ CC = cc
+ LD = ${CC}
+-AR = ar cr
++AR = ar
+ RANLIB = ranlib

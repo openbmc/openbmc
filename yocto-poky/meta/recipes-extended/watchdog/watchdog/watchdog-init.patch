@@ -1,0 +1,53 @@
+--- watchdog-5.13.orig/redhat/watchdog.init	2014-11-12 17:18:39.125943000 +0100
++++ watchdog-5.13/redhat/watchdog.init	2014-11-12 18:27:36.189943000 +0100
+@@ -7,7 +7,7 @@
+ #                 Henning P. Schmiedehausen <hps@tanstaafl.de>
+ 
+ # Source function library.
+-. /etc/rc.d/init.d/functions
++. /etc/init.d/functions
+ 
+ [ -x /usr/sbin/watchdog -a -e /etc/watchdog.conf ] || exit 0
+ 
+@@ -23,22 +23,22 @@
+ 
+ start() {
+ 
+-	echo -n $"Starting $prog: "
++	echo -n "Starting $prog: "
+ 	if [ -n "$(pidofproc $prog)" ]; then
+-		echo -n $"$prog: already running"
+-		echo_failure
++		echo -n "$prog: already running "
++		failure
+ 		echo
+ 		return 1
+ 	fi
+ 	if [ "$VERBOSE" = "yes" ]; then
+-	    daemon /usr/sbin/${prog} -v
++	    /usr/sbin/${prog} -v
+ 	else
+-	    daemon /usr/sbin/${prog}
++	    /usr/sbin/${prog}
+         fi
+ 	RETVAL=$?
+ 	[ $RETVAL -eq 0 ] && touch $lockfile
+-	[ $RETVAL -eq 0 ] && echo_success
+-	[ $RETVAL -ne 0 ] && echo_failure
++	[ $RETVAL -eq 0 ] && success
++	[ $RETVAL -ne 0 ] && failure
+ 	echo
+ 	return $RETVAL
+ }
+@@ -50,8 +50,10 @@
+ 	# and reboot the box.
+ 	killproc $prog -TERM
+ 	RETVAL=$?
+-	echo
+ 	[ $RETVAL -eq 0 ] && rm -f $lockfile $pidfile
++	[ $RETVAL -eq 0 ] && success
++	[ $RETVAL -ne 0 ] && failure
++	echo
+ 	return $RETVAL
+ }
+ 

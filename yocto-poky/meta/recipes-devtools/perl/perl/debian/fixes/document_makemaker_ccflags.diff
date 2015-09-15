@@ -1,0 +1,31 @@
+From 9faf6dcc3a5c4154484d812eb3cc3dd78b35563b Mon Sep 17 00:00:00 2001
+From: Niko Tyni <ntyni@debian.org>
+Date: Mon, 30 May 2011 22:54:24 +0300
+Subject: Document that CCFLAGS should include $Config{ccflags}
+
+Bug: https://rt.cpan.org/Public/Bug/Display.html?id=68613
+Bug-Debian: http://bugs.debian.org/628522
+
+Compiling XS extensions without $Config{ccflags} can break the
+binary interface on some platforms.
+
+Patch-Name: fixes/document_makemaker_ccflags.diff
+---
+ cpan/ExtUtils-MakeMaker/lib/ExtUtils/MakeMaker.pm | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/cpan/ExtUtils-MakeMaker/lib/ExtUtils/MakeMaker.pm b/cpan/ExtUtils-MakeMaker/lib/ExtUtils/MakeMaker.pm
+index fe95b27..90403e8 100644
+--- a/cpan/ExtUtils-MakeMaker/lib/ExtUtils/MakeMaker.pm
++++ b/cpan/ExtUtils-MakeMaker/lib/ExtUtils/MakeMaker.pm
+@@ -1774,6 +1774,10 @@ currently used by MakeMaker but may be handy in Makefile.PLs.
+ String that will be included in the compiler call command line between
+ the arguments INC and OPTIMIZE.
+ 
++The default value is taken from $Config{ccflags}. When overriding
++CCFLAGS, make sure to include the $Config{ccflags} settings to avoid
++binary incompatibilities.
++
+ =item CONFIG
+ 
+ Arrayref. E.g. [qw(archname manext)] defines ARCHNAME & MANEXT from

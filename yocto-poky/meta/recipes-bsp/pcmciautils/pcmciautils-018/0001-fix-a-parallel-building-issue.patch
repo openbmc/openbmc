@@ -1,0 +1,45 @@
+From 5a793a1a9fb3477719aabf7e27ff22ed1acdf559 Mon Sep 17 00:00:00 2001
+From: Roy Li <rongqing.li@windriver.com>
+Date: Tue, 19 May 2015 15:54:24 +0800
+Subject: [PATCH] fix a parallel building issue
+
+Fixed:
+|   src/lex_config.c:34:25: fatal error: yacc_config.h: No such file or directory
+|
+|    #include "yacc_config.h"
+|                            ^
+|   compilation terminated.
+
+And:
+Compiling lex_config.c.
+  src/lex_config.l:34:25: fatal error: yacc_config.h: No such file or directory
+
+Upstream-Status: Pending
+
+there are two Makefile rules to generate lex_config.o, one is to generate
+lex_config.o other is to generate src/lex_config.o, so we can remove one.
+and add the needed dependence for lex_config.o
+
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ Makefile | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index d45fdc3..4c53bc2 100644
+--- a/Makefile
++++ b/Makefile
+@@ -246,8 +246,7 @@ $(PCMCIA_SOCKET_STARTUP): $(LIBC) src/startup.o src/yacc_config.o src/lex_config
+ 	$(QUIET) $(LD) $(LDFLAGS) -o $@ $(CRT0) src/startup.o src/yacc_config.o src/lex_config.o $(LIB_OBJS) $(ARCH_LIB_OBJS)
+ 	$(QUIET) $(STRIPCMD) $@
+ 
+-yacc_config.o lex_config.o: %.o: %.c
+-	$(CC) -c -MD -O -pipe $(CPPFLAGS) $<
++src/lex_config.o:src/yacc_config.h
+ 
+ debugtools: ccdv $(CBDUMP) $(CISDUMP)
+ 
+-- 
+1.9.1
+

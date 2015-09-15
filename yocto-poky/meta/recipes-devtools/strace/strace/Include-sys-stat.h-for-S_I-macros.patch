@@ -1,0 +1,52 @@
+Upstream-Status: Backport
+
+  http://sourceforge.net/p/strace/code/ci/d34e00b293942b1012ddc49ed3ab379a32337611
+
+Expected to be released officially as part of strace 4.11
+
+Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+
+From d34e00b293942b1012ddc49ed3ab379a32337611 Mon Sep 17 00:00:00 2001
+From: Felix Janda <felix.janda@posteo.de>
+Date: Sat, 28 Mar 2015 18:21:09 +0100
+Subject: [PATCH] Include <sys/stat.h> for S_I* macros
+
+Fix a compilation failure with musl libc.
+
+* mknod.c: Include <sys/stat.h>.
+* printmode.c: Likewise.
+
+Reported-by: Dima Krasner <dima@dimakrasner.com>
+Acked-by: Mike Frysinger <vapier@gentoo.org>
+---
+ mknod.c     | 1 +
+ printmode.c | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/mknod.c b/mknod.c
+index 07e9a45..1463232 100644
+--- a/mknod.c
++++ b/mknod.c
+@@ -1,6 +1,7 @@
+ #include "defs.h"
+ 
+ #include <fcntl.h>
++#include <sys/stat.h>
+ 
+ #ifdef MAJOR_IN_SYSMACROS
+ # include <sys/sysmacros.h>
+diff --git a/printmode.c b/printmode.c
+index 4df1b9f..a721936 100644
+--- a/printmode.c
++++ b/printmode.c
+@@ -1,6 +1,7 @@
+ #include "defs.h"
+ 
+ #include <fcntl.h>
++#include <sys/stat.h>
+ 
+ #include "xlat/modetypes.h"
+ 
+-- 
+1.9.1
+

@@ -1,0 +1,46 @@
+From: Peter Crosthwaite <crosthwaitepeter@gmail.com>
+X-Google-Original-From: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, richard.purdie@linuxfoundation.org
+Subject: [RFT PATCH v1 2/3] net: smc91c111: gate can_receive() on rx FIFO
+ having a slot
+Date: Thu, 10 Sep 2015 21:23:57 -0700
+
+Return false from can_receive() when the FIFO doesn't have a free RX
+slot. This fixes a bug in the current code where the allocated buffer
+is freed before the fifo pop, triggering a premature flush of queued RX
+packets. It also will handle a corner case, where the guest manually
+frees the allocated buffer before popping the rx FIFO (hence it is not
+enough to just delay the flush_queued_packets()).
+
+Reported-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+Signed-off-by: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+
+Upstream-Status: Submitted
+---
+
+ hw/net/smc91c111.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+Index: qemu-2.4.0/hw/net/smc91c111.c
+===================================================================
+--- qemu-2.4.0.orig/hw/net/smc91c111.c
++++ qemu-2.4.0/hw/net/smc91c111.c
+@@ -129,7 +129,8 @@ static int smc91c111_can_receive(smc91c1
+     if ((s->rcr & RCR_RXEN) == 0 || (s->rcr & RCR_SOFT_RST)) {
+         return 1;
+     }
+-    if (s->allocated == (1 << NUM_PACKETS) - 1) {
++    if (s->allocated == (1 << NUM_PACKETS) - 1 ||
++        s->rx_fifo_len == NUM_PACKETS) {
+         return 0;
+     }
+     return 1;
+@@ -182,6 +183,7 @@ static void smc91c111_pop_rx_fifo(smc91c
+     } else {
+         s->int_level &= ~INT_RCV;
+     }
++    smc91c111_flush_queued_packets(s);
+     smc91c111_update(s);
+ }
+ 

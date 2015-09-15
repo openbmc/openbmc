@@ -1,0 +1,41 @@
+Upstream-Status: Pending
+
+diff --git a/initscript/debian/avahi-daemon.in b/initscript/debian/avahi-daemon.in
+index 30a2c2f..b5848a8 100755
+--- a/initscript/debian/avahi-daemon.in
++++ b/initscript/debian/avahi-daemon.in
+@@ -1,2 +1,14 @@
+ #!/bin/sh
+-
++### BEGIN INIT INFO
++# Provides:          avahi
++# Required-Start:    $remote_fs dbus
++# Required-Stop:     $remote_fs dbus
++# Should-Start:	     $syslog
++# Should-Stop:       $syslog
++# Default-Start:     2 3 4 5
++# Default-Stop:      0 1 6
++# Short-Description: Avahi mDNS/DNS-SD Daemon
++# Description:       Zeroconf daemon for configuring your network 
++#                    automatically
++### END INIT INFO
++#
+diff --git a/initscript/debian/avahi-dnsconfd.in b/initscript/debian/avahi-dnsconfd.in
+index ac34804..f95c340 100755
+--- a/initscript/debian/avahi-dnsconfd.in
++++ b/initscript/debian/avahi-dnsconfd.in
+@@ -1,1 +1,14 @@
+ #!/bin/sh
++### BEGIN INIT INFO
++# Provides:          avahi-dnsconfd
++# Required-Start:    $remote_fs avahi
++# Required-Stop:     $remote_fs avahi
++# Should-Start:	     $syslog
++# Should-Stop:       $syslog
++# Default-Start:     2 3 4 5
++# Default-Stop:      0 1 6
++# Short-Description: Avahi mDNS/DNS-SD DNS configuration
++# Description:       Zeroconf daemon for configuring your network 
++#                    automatically
++### END INIT INFO
++#

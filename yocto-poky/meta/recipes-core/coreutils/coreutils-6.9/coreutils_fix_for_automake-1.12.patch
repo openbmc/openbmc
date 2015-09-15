@@ -1,0 +1,32 @@
+Upstream-Status: Pending
+
+automake 1.12 has depricated automatic de-ANSI-fication support
+
+this patch avoids these kinds of errors:
+
+| configure.ac:40: error: automatic de-ANSI-fication support has been removed
+| /srv/home/nitin/builds/build-gcc47/tmp/sysroots/x86_64-linux/usr/share/aclocal-1.12/protos.m4:12: AM_C_PROTOTYPES is expanded from...
+| /srv/home/nitin/builds/build-gcc47/tmp/work/x86_64-linux/coreutils-native-6.9-r2/coreutils-6.9/m4/jm-macros.m4:138: gl_CHECK_ALL_TYPES is expanded from...
+| /srv/home/nitin/builds/build-gcc47/tmp/work/x86_64-linux/coreutils-native-6.9-r2/coreutils-6.9/m4/jm-macros.m4:24: coreutils_MACROS is expanded from...
+| configure.ac:40: the top level
+| autom4te: m4 failed with exit status: 1
+
+Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+2012/05/04
+
+Index: coreutils-6.9/m4/jm-macros.m4
+===================================================================
+--- coreutils-6.9.orig/m4/jm-macros.m4
++++ coreutils-6.9/m4/jm-macros.m4
+@@ -142,11 +142,6 @@ AC_DEFUN([gl_CHECK_ALL_TYPES],
+   dnl whether functions and headers are available, whether they work, etc.
+   AC_REQUIRE([AC_SYS_LARGEFILE])
+ 
+-  dnl This test must precede tests of compiler characteristics like
+-  dnl that for the inline keyword, since it may change the degree to
+-  dnl which the compiler supports such features.
+-  AC_REQUIRE([AM_C_PROTOTYPES])
+-
+   dnl Checks for typedefs, structures, and compiler characteristics.
+   AC_REQUIRE([AC_C_BIGENDIAN])
+   AC_REQUIRE([AC_C_VOLATILE])

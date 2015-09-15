@@ -1,0 +1,27 @@
+Upstream-Status: Pending
+
+
+This patch avoids this configure failure
+
+configure:20306: checking whether `ccache i586-poky-linux-gcc  -m32    -march=core2 -msse3 -mtune=generic -mfpmath=sse --sysroot=/builddisk/build/build0/tmp/sysroots/emenlow' generates calls to `__enable_execute_stack()'
+configure:20320: ccache i586-poky-linux-gcc  -m32    -march=core2 -msse3 -mtune=generic -mfpmath=sse --sysroot=/builddisk/build/build0/tmp/sysroots/emenlow -O2 -pipe -g -feliminate-unused-debug-types -Wall -W -Wshadow -Wpointer-arith -Wmissing-prototypes -Wundef -Wstrict-prototypes -g -falign-jumps=1 -falign-loops=1 -falign-functions=1 -mno-mmx -mno-sse -mno-sse2 -mno-3dnow -mfpmath=387 -fno-dwarf2-cfi-asm -m32 -fno-stack-protector -mno-stack-arg-probe -Werror -Wno-trampolines -falign-loops=1 -S conftest.c
+conftest.c:308:6: error: no previous prototype for 'g' [-Werror=missing-prototypes]
+cc1: all warnings being treated as errors
+configure:20323: $? = 1
+configure:20327: error: ccache i586-poky-linux-gcc  -m32    -march=core2 -msse3 -mtune=generic -mfpmath=sse --sysroot=/builddisk/build/build0/tmp/sysroots/emenlow failed to produce assembly code
+
+Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+2012/04/13
+
+Index: grub-2.00/acinclude.m4
+===================================================================
+--- grub-2.00.orig/acinclude.m4
++++ grub-2.00/acinclude.m4
+@@ -317,6 +317,7 @@ dnl Check if the C compiler generates ca
+ AC_DEFUN([grub_CHECK_ENABLE_EXECUTE_STACK],[
+ AC_MSG_CHECKING([whether `$CC' generates calls to `__enable_execute_stack()'])
+ AC_LANG_CONFTEST([AC_LANG_SOURCE([[
++void g (int);
+ void f (int (*p) (void));
+ void g (int i)
+ {

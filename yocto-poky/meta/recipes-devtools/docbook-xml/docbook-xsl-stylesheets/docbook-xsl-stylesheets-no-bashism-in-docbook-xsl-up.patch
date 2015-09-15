@@ -1,0 +1,24 @@
+docbook-xsl-stylesheets: no bashism in docbook-xsl-update
+
+The checkbashisms shows there is no bashism, so use /bin/sh.
+
+Upstream-Status: Pending
+
+Signed-off-by: Chong Lu <Chong.Lu@windriver.com>
+---
+ tools/bin/docbook-xsl-update | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/bin/docbook-xsl-update b/tools/bin/docbook-xsl-update
+index aba0016..cc73aa2 100755
+--- a/tools/bin/docbook-xsl-update
++++ b/tools/bin/docbook-xsl-update
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ # vim: number
+ 
+ # docbook-xsl-update - Update environment to latest docbook-xsl snapshot
+-- 
+1.9.1
+

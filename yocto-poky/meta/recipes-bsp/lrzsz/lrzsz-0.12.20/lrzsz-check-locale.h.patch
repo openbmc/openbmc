@@ -1,0 +1,32 @@
+From 28b473c3c96682a820e292cc1be006e19aee11bc Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Fri, 24 May 2013 01:07:24 -0400
+Subject: [PATCH] lrzsz check locale.h
+
+fix the build failure when using -O0 in a debug build:
+lrz.c:284:13: error: 'LC_ALL' undeclared (first use in this function)
+
+Upstream-Status: Submitted [uwe@ohse.de]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+---
+ configure.in |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.in b/configure.in
+index 6e2064c..c10460c 100644
+--- a/configure.in
++++ b/configure.in
+@@ -130,7 +130,7 @@ AC_CHECK_HEADERS(fcntl.h limits.h sys/ioctl.h sys/time.h unistd.h sys/times.h)
+ LRZSZ_HEADERS_TERM_IO
+ AC_CHECK_HEADERS(termios.h sys/termios.h termio.h sys/termio.h sgtty.h)
+ AC_CHECK_HEADERS(sys/mman.h utime.h syslog.h sys/syslog.h sys/param.h)
+-AC_CHECK_HEADERS(sys/select.h strings.h arpa/inet.h)
++AC_CHECK_HEADERS(sys/select.h strings.h locale.h arpa/inet.h)
+ 
+ dnl Checks for typedefs, structures, and compiler characteristics.
+ AC_TYPE_SIZE_T
+-- 
+1.7.9.5
+

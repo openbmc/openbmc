@@ -1,0 +1,35 @@
+From c81dbdedff9e9b4fb75ac028aa718838c0292d2f Mon Sep 17 00:00:00 2001
+From: Andreas Marschke <andreas.marschke@googlemail.com>
+Date: Sat, 17 Sep 2011 11:38:42 +0100
+Subject: Configure CPAN::Distribution with correct name of html2text
+
+Bug-Debian: http://bugs.debian.org/640479
+Patch-Name: debian/find_html2text.diff
+
+If you use cpan from Debian you usually wind up trying to read online
+documentation through it. Unfortunately cpan can't find the
+html2text.pl script even though it is installed using the Debian
+package 'html2text'.
+
+Please see the attached patch for a quick fix of this issue.
+
+[Maintainer's note: html2text in Debian is not the same implementation
+as the html2text.pl which is expected, but should provide similar
+functionality].
+---
+ cpan/CPAN/lib/CPAN/Distribution.pm | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cpan/CPAN/lib/CPAN/Distribution.pm b/cpan/CPAN/lib/CPAN/Distribution.pm
+index 092b781..5c2bae1 100644
+--- a/cpan/CPAN/lib/CPAN/Distribution.pm
++++ b/cpan/CPAN/lib/CPAN/Distribution.pm
+@@ -4099,7 +4099,7 @@ sub _display_url {
+       if $CPAN::DEBUG;
+ 
+     # should we define it in the config instead?
+-    my $html_converter = "html2text.pl";
++    my $html_converter = "html2text";
+ 
+     my $web_browser = $CPAN::Config->{'lynx'} || undef;
+     my $web_browser_out = $web_browser

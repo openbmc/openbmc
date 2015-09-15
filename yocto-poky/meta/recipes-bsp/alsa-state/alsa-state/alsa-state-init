@@ -1,0 +1,39 @@
+#! /bin/sh
+#
+# Copyright Matthias Hentges <devel@hentges.net> (c) 2007
+# License: GPL (see http://www.gnu.org/licenses/gpl.txt for a copy of the license)
+#
+# Filename: alsa-state
+# Date: 20070308 (YMD)
+
+# source function library
+. /etc/init.d/functions
+
+asound_restore(){
+	echo "ALSA: Restoring mixer settings..."
+	if test -x /usr/sbin/alsactl -a -e #STATEDIR#/asound.state
+	then
+		/usr/sbin/alsactl -f #STATEDIR#/asound.state restore &
+	fi
+}
+
+asound_store(){
+	echo "ALSA: Storing mixer settings..."
+	if test -x /usr/sbin/alsactl
+	then
+		/usr/sbin/alsactl -f #STATEDIR#/asound.state store
+	fi
+}
+
+case "$1" in
+start)		asound_restore ;;
+stop)		asound_store ;;
+  status)
+    status /usr/sbin/alsactl;
+    exit $?
+  ;;
+  *)
+    echo "Usage: /etc/init.d/alsa-state {start|stop|status}"
+    exit 1
+  ;;
+esac

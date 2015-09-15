@@ -1,0 +1,29 @@
+From 8331fc4759d809512f404e7a27f817ad6d616450 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 13 Apr 2015 18:00:33 -0700
+Subject: [PATCH] zeroconf: Include fcntl.h
+
+We need it for getting deinitions for O_* e.g. O_CREAT
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/zeroconf.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/zeroconf.c b/src/zeroconf.c
+index 414ddc4..31bd33f 100644
+--- a/src/zeroconf.c
++++ b/src/zeroconf.c
+@@ -33,6 +33,7 @@
+ #include <unistd.h>
+ #include <stdlib.h>
+ #include <limits.h>
++#include <fcntl.h>
+ 
+ #include <avahi-common/domain.h>
+ #include <avahi-common/error.h>
+-- 
+2.1.4
+

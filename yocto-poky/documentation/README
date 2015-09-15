@@ -1,0 +1,91 @@
+documentation
+=============
+
+This is the directory that contains the Yocto Project documentation.  The Yocto
+Project source repositories at http://git.yoctoproject.org/cgit.cgi have two
+instances of the "documentation" directory.  You should understand each of
+these instances.
+
+  poky/documentation - The directory within the poky Git repository containing
+                       the set of Yocto Project manuals.  When you clone the
+                       poky Git repository, the documentation directory
+                       contains the manuals.  The state of the manuals in this
+                       directory is guaranteed to reflect the latest Yocto
+                       Project release.  The manuals at the tip of this
+                       directory will also likely contain most manual
+                       development changes.
+
+  yocto-docs/documentation - The Git repository for the Yocto Project manuals.
+                             This repository is where manual development
+                             occurs.  If you plan on contributing back to the
+                             Yocto Project documentation, you should set up
+                             a local Git repository based on this upstream
+                             repository as follows:
+
+                               git clone git://git.yoctoproject.org/yocto-docs
+
+                             Changes and patches are first pushed to the
+                             yocto-docs Git repository.  Later, they make it
+                             into the poky Git repository found at
+                             git://git.yoctoproject.org/poky.
+
+Manual Organization
+===================
+
+Folders exist for individual manuals as follows:
+
+* adt-manual       - The Yocto Project Application Developer's Guide.
+* bsp-guide        - The Yocto Project Board Support Package (BSP) Developer's Guide
+* dev-manual       - The Yocto Project Development Manual
+* kernel-dev       - The Yocto Project Linux Kernel Development Manual
+* ref-manual       - The Yocto Project Reference Manual
+* yocto-project-qs - The Yocto Project Quick Start
+* mega-manual      - An aggregated manual comprised of all YP manuals and guides
+* profile-manual   - The Yocto Project Profile and Tracing Manual
+
+Each folder is self-contained regarding content and figures.  Note that there
+is a sed file needed to process the links of the mega-manual.  The sed file
+is located in the tools directory.  Also note that the figures folder in the
+mega-manual directory contains duplicates of all the figures in the YP folders
+directories for all YP manuals and guides.
+
+If you want to find HTML versions of the Yocto Project manuals on the web,
+go to http://www.yoctoproject.org and click on the "Documentation" tab.  From
+there you have access to archived documentation from previous releases, current
+documentation for the latest release, and "Docs in Progress" for the release
+currently being developed.
+
+In general, the Yocto Project site (http://www.yoctoproject.org) is a great
+reference for both information and downloads.
+
+Makefile
+========
+
+The Makefile processes manual directories to create HTML, PDF,
+tarballs, etc.  Details on how the Makefile work are documented
+inside the Makefile.  See that file for more information.
+
+To build a manual, you run the make command and pass it the name
+of the folder containing the manual's contents.
+For example, the following command run from the documentation directory
+creates an HTML and a PDF version of the ADT manual.
+The DOC variable specifies the manual you are making:
+
+     $ make DOC=adt-manual
+
+poky.ent
+========
+
+This file defines variables used for documentation production.  The variables
+are used to define release pathnames, URLs for the published manuals, etc.
+
+template
+========
+Contains various templates, fonts, and some old PNG files.
+
+tools
+=====
+Contains a tool to convert the DocBook files to PDF format.  This folder also
+contains the mega-manual.sed file, which is used by Makefile to process
+cross-references from within the manual that normally go to an external
+manual.

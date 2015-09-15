@@ -1,0 +1,17 @@
+This script try to call git submodule, since we are downloading
+the tarball it seems in-correct to do this.
+
+Upstream-Status: Inappropriate [OE-Specific]
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+Index: syslinux-6.03/efi/Makefile
+===================================================================
+--- syslinux-6.03.orig/efi/Makefile
++++ syslinux-6.03/efi/Makefile
+@@ -101,7 +101,6 @@ tidy dist:
+ 	rm -f *.so *.o wrapper
+ 	find . \( -name \*.o -o -name \*.a -o -name .\*.d -o -name \*.tmp \) -print0 | \
+ 		xargs -0r rm -f
+-	$(topdir)/efi/clean-gnu-efi.sh $(EFI_SUBARCH) $(objdir)
+ 
+ clean: tidy
+ 

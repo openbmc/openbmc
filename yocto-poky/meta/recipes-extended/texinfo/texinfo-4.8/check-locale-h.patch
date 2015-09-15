@@ -1,0 +1,28 @@
+fix the macro check
+
+Upstream-Status: Pending
+
+configure does not check if locale.h exists, but check setlocale,
+if setlocale exist, the locale.h should exist.
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ lib/system.h |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/system.h b/lib/system.h
+index 946eb3c..c70037b 100644
+--- a/lib/system.h
++++ b/lib/system.h
+@@ -42,7 +42,7 @@ extern char *substring (const char *, const char *);
+ #include <ctype.h>
+ 
+ /* All systems nowadays probably have these functions, but ... */
+-#ifdef HAVE_LOCALE_H
++#ifdef HAVE_SETLOCALE
+ #include <locale.h>
+ #endif
+ #ifndef HAVE_SETLOCALE
+-- 
+1.7.10.4
+

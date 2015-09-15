@@ -1,0 +1,25 @@
+The "check" package is checked for without an explicit enable/disable option,
+which can lead to non-deterministic build issues with both check and libxslt.
+
+As the unit test suite is minimal at present, simply disable the test suite.  In
+the future if the test suite is expanded this can be made conditional on the
+ptest DISTRO_FEATURE.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+
+diff --git a/configure.ac b/configure.ac
+index 6d7c9a5..22cceb9 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -21,7 +21,8 @@ AC_USE_SYSTEM_EXTENSIONS
+ 
+ AM_PATH_PYTHON([2.6])
+ 
+-PKG_CHECK_MODULES(CHECK, [check >= 0.9.4], [HAVE_CHECK=yes], [HAVE_CHECK=no])
++dnl PKG_CHECK_MODULES(CHECK, [check >= 0.9.4], [HAVE_CHECK=yes], [HAVE_CHECK=no])
++HAVE_CHECK=no
+ AM_CONDITIONAL(HAVE_CHECK, test x$HAVE_CHECK = xyes)
+ 
+ AC_CONFIG_HEADERS([src/config.h])

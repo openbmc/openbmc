@@ -1,0 +1,26 @@
+{{ if kernel_choice == "custom": }}
+{{ input type:"boolean" name:"custom_kernel_remote" prio:"20" msg:"Is the custom kernel you'd like to use in a remote git repo? (y/n)" default:"y"}}
+
+{{ if kernel_choice == "custom" and custom_kernel_remote == "y": }}
+{{ input type:"edit-git-repo" name:"custom_kernel_remote_path" prio:"20" msg:"Please enter the full URI to the remote git repo (the default corresponds to linux-stable v3.16.3)" default:"git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git"}}
+
+{{ if kernel_choice == "custom" and custom_kernel_remote == "n": }}
+{{ input type:"edit-git-repo" name:"custom_kernel_local_path" prio:"20" msg:"You've indicated that you're not using a remote git repo.  Please enter the full path to the local git repo you want to use (the default assumes a local linux-stable v3.16.3)" default:"/home/trz/yocto/kernels/linux-stable.git"}}
+
+{{ if kernel_choice == "custom": }}
+{{ input type:"boolean" name:"custom_kernel_need_kbranch" prio:"20" msg:"Do you need to use a specific (non-master) branch? (y/n)" default:"n"}}
+
+{{ if kernel_choice == "custom" and custom_kernel_need_kbranch == "y": }}
+{{ input type:"edit" name:"custom_kernel_kbranch" prio:"20" msg:"Please enter the branch you want to use (the default branch corresponds to the linux-stable 'linux-3.16.y' branch):" default:"linux-3.16.y"}}
+
+{{ if kernel_choice == "custom": }}
+{{ input type:"edit" name:"custom_kernel_srcrev" prio:"20" msg:"Please enter the SRCREV (commit id) you'd like to use (use '${AUTOREV}' to track the current HEAD):" default:"${AUTOREV}"}}
+
+{{ if kernel_choice == "custom": }}
+{{ input type:"edit" name:"custom_kernel_linux_version" prio:"20" msg:"Please enter the Linux version of the kernel you've specified:" default:"3.16.3"}}
+
+{{ if kernel_choice == "custom": }}
+{{ input type:"edit" name:"custom_kernel_linux_version_extension" prio:"20" msg:"Please enter a Linux version extension if you want (it will show up at the end of the kernel name shown by uname):" default:"-custom"}}
+
+{{ if kernel_choice == "custom": }}
+{{ input type:"edit-file" name:"custom_kernel_defconfig" prio:"20" msg:"It's recommended (but not required) that custom kernels be built using a defconfig.  Please enter the full path to the defconfig for your kernel (NOTE: if you don't specify a defconfig the kernel probably won't build or boot):" default:""}}

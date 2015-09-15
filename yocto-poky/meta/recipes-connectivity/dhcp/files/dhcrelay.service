@@ -1,0 +1,9 @@
+[Unit]
+Description=DHCP Relay Agent Daemon
+After=network.target
+
+[Service]
+ExecStart=@SBINDIR@/dhcrelay -d --no-pid
+
+[Install]
+WantedBy=multi-user.target

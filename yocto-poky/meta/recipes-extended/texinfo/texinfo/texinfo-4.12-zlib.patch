@@ -1,0 +1,233 @@
+From 20e1d8a9481dc13dd1d4d168b90e0ed2ff097b98 Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Thu, 6 Aug 2015 14:29:57 +0300
+Subject: [PATCH] texinfo-4.12-zlib
+
+Upstream-Status: Pending
+---
+ install-info/Makefile.in    |  2 +-
+ install-info/install-info.c | 67 +++++++++++++++++++++++++++------------------
+ 2 files changed, 42 insertions(+), 27 deletions(-)
+
+diff --git a/install-info/Makefile.in b/install-info/Makefile.in
+index ad73abb..eaa2153 100644
+--- a/install-info/Makefile.in
++++ b/install-info/Makefile.in
+@@ -241,7 +241,7 @@ am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)"
+ PROGRAMS = $(bin_PROGRAMS)
+ am_ginstall_info_OBJECTS = install-info.$(OBJEXT)
+ ginstall_info_OBJECTS = $(am_ginstall_info_OBJECTS)
+-ginstall_info_LDADD = $(LDADD)
++ginstall_info_LDADD = $(LDADD) -lz
+ am__DEPENDENCIES_1 =
+ ginstall_info_DEPENDENCIES = $(top_builddir)/gnulib/lib/libgnu.a \
+ 	$(am__DEPENDENCIES_1)
+diff --git a/install-info/install-info.c b/install-info/install-info.c
+index b454c15..4e39122 100644
+--- a/install-info/install-info.c
++++ b/install-info/install-info.c
+@@ -22,6 +22,7 @@
+ #include <getopt.h>
+ #include <regex.h>
+ #include <argz.h>
++#include <zlib.h>
+ 
+ #define TAB_WIDTH 8
+ 
+@@ -684,15 +685,15 @@ The first time you invoke Info you start off looking at this node.\n\
+    
+    Return either stdin reading the file, or a non-stdin pipe reading
+    the output of the compression program.  */
+-FILE *
++void *
+ open_possibly_compressed_file (char *filename,
+     void (*create_callback) (char *),
+-    char **opened_filename, char **compression_program) 
++    char **opened_filename, char **compression_program, int *is_pipe) 
+ {
+   char *local_opened_filename, *local_compression_program;
+   int nread;
+   char data[13];
+-  FILE *f;
++  gzFile *f;
+ 
+   /* We let them pass NULL if they don't want this info, but it's easier
+      to always determine it.  */
+@@ -700,48 +701,48 @@ open_possibly_compressed_file (char *filename,
+     opened_filename = &local_opened_filename;
+ 
+   *opened_filename = filename;
+-  f = fopen (*opened_filename, FOPEN_RBIN);
++  f = gzopen (*opened_filename, FOPEN_RBIN);
+   if (!f)
+     {
+       *opened_filename = concat (filename, ".gz", "");
+-      f = fopen (*opened_filename, FOPEN_RBIN);
++      f = gzopen (*opened_filename, FOPEN_RBIN);
+     }
+   if (!f)
+     {
+       free (*opened_filename);
+       *opened_filename = concat (filename, ".xz", "");
+-      f = fopen (*opened_filename, FOPEN_RBIN);
++      f = gzopen (*opened_filename, FOPEN_RBIN);
+     }
+   if (!f)
+     {
+       free (*opened_filename);
+       *opened_filename = concat (filename, ".bz2", "");
+-      f = fopen (*opened_filename, FOPEN_RBIN);
++      f = gzopen (*opened_filename, FOPEN_RBIN);
+     }
+   if (!f)
+     {
+       free (*opened_filename);
+       *opened_filename = concat (filename, ".lz", "");
+-      f = fopen (*opened_filename, FOPEN_RBIN);
++      f = gzopen (*opened_filename, FOPEN_RBIN);
+     }
+   if (!f)
+     {
+      free (*opened_filename);
+      *opened_filename = concat (filename, ".lzma", "");
+-     f = fopen (*opened_filename, FOPEN_RBIN);
++     f = gzopen (*opened_filename, FOPEN_RBIN);
+     }
+ #ifdef __MSDOS__
+   if (!f)
+     {
+       free (*opened_filename);
+       *opened_filename = concat (filename, ".igz", "");
+-      f = fopen (*opened_filename, FOPEN_RBIN);
++      f = gzopen (*opened_filename, FOPEN_RBIN);
+     }
+   if (!f)
+     {
+       free (*opened_filename);
+       *opened_filename = concat (filename, ".inz", "");
+-      f = fopen (*opened_filename, FOPEN_RBIN);
++      f = gzopen (*opened_filename, FOPEN_RBIN);
+     }
+ #endif /* __MSDOS__ */
+   if (!f)
+@@ -757,7 +758,7 @@ open_possibly_compressed_file (char *filename,
+           (*create_callback) (filename);
+ 
+           /* And try opening it again.  */
+-          f = fopen (*opened_filename, FOPEN_RBIN);
++          f = gzopen (*opened_filename, FOPEN_RBIN);
+           if (!f)
+             return 0;
+         }
+@@ -767,12 +768,12 @@ open_possibly_compressed_file (char *filename,
+ 
+   /* Read first few bytes of file rather than relying on the filename.
+      If the file is shorter than this it can't be usable anyway.  */
+-  nread = fread (data, sizeof (data), 1, f);
+-  if (nread != 1)
++  nread = gzread (f, data, sizeof (data));
++  if (nread != sizeof (data))
+     {
+       /* Empty files don't set errno.  Calling code can check for
+          this, so make sure errno == 0 just in case it isn't already. */
+-      if (nread == 0)
++      if (nread >= 0)
+         errno = 0;
+       return 0;
+     }
+@@ -838,35 +839,40 @@ open_possibly_compressed_file (char *filename,
+     *compression_program = NULL;
+ 
+   /* Seek back over the magic bytes.  */
+-  if (fseek (f, 0, 0) < 0)
++  if (gzseek (f, 0, SEEK_SET) == -1)
+     return 0;
+ 
+   if (*compression_program)
+     { /* It's compressed, so open a pipe.  */
++      FILE *p;
+       char *command = concat (*compression_program, " -d", "");
+ 
+-      if (fclose (f) < 0)
++      if (gzclose (f) < 0)
+         return 0;
+-      f = freopen (*opened_filename, FOPEN_RBIN, stdin);
+-      if (!f)
++      p = freopen (*opened_filename, FOPEN_RBIN, stdin);
++      if (!p)
+         return 0;
+-      f = popen (command, "r");
+-      if (!f)
++      p = popen (command, "r");
++      if (!p)
+         {
+           /* Used for error message in calling code. */
+           *opened_filename = command;
+           return 0;
+         }
++      else
++        *is_pipe = 1;
++      return p;
+     }
+   else
+     {
+-#if O_BINARY
++#if 0 && O_BINARY
+       /* Since this is a text file, and we opened it in binary mode,
+          switch back to text mode.  */
+       f = freopen (*opened_filename, "r", f);
+       if (! f)
+ 	return 0;
+ #endif
++      *is_pipe = 0;
+     }
+ 
+   return f;
+@@ -885,7 +891,8 @@ readfile (char *filename, int *sizep,
+     void (*create_callback) (char *), char **opened_filename,
+     char **compression_program)
+ {
+-  FILE *f;
++  void *f;
++  int pipe_p;
+   int filled = 0;
+   int data_size = 8192;
+   char *data = xmalloc (data_size);
+@@ -893,14 +900,20 @@ readfile (char *filename, int *sizep,
+   /* If they passed the space for the file name to return, use it.  */
+   f = open_possibly_compressed_file (filename, create_callback,
+                                      opened_filename,
+-                                     compression_program);
++                                     compression_program,
++                                     &pipe_p);
+ 
+   if (!f)
+     return 0;
+ 
+   for (;;)
+     {
+-      int nread = fread (data + filled, 1, data_size - filled, f);
++      int nread;
++
++      if (pipe_p)
++        nread = fread (data + filled, 1, data_size - filled, f);
++      else
++        nread = gzread (f, data + filled, data_size - filled);
+       if (nread < 0)
+         return 0;
+       if (nread == 0)
+@@ -919,8 +932,10 @@ readfile (char *filename, int *sizep,
+   /* We need to close the stream, since on some systems the pipe created
+      by popen is simulated by a temporary file which only gets removed
+      inside pclose.  */
+-  if (f != stdin)
++  if (pipe_p)
+     pclose (f);
++  else
++    gzclose (f);
+ 
+   *sizep = filled;
+   return data;
+-- 
+2.1.4
+

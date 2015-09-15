@@ -1,0 +1,179 @@
+#!/bin/bash
+#
+# Copyright (c) 2010-2011,  Intel Corporation.
+# All Rights Reserved
+# 
+# This program is free software;  you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY;  without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+# the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program;  if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+#
+
+#
+# This script is intended to be used to send a patch series prepared by the
+# create-pull-request script to Open Embedded and The Yocto Project, as well
+# as to related projects and layers.
+#
+
+AUTO=0
+AUTO_CL=0
+GITSOBCC="--suppress-cc=all"
+
+# Prevent environment leakage to these vars.
+unset TO
+unset CC
+unset AUTO_CC
+unset EXTRA_CC
+
+usage()
+{
+cat <<EOM
+Usage: $(basename $0) [-h] [-a] [-c] [[-t email]...] -p pull-dir 
+  -a           Send the cover letter to every recipient listed in Cc and
+               Signed-off-by lines found in the cover letter and the patches.
+	       This option implies -c.
+  -c           Expand the Cc list for the individual patches using the Cc and
+               Signed-off-by lines from the same patch.
+  -C           Add extra CC to each email sent.
+  -p pull-dir  Directory containing summary and patch files
+  -t email     Explicitly add email to the recipients
+EOM
+}
+
+# Collect addresses from a patch into AUTO_CC
+# $1: a patch file
+harvest_recipients()
+{
+	PATCH=$1
+	export IFS=$',\n'
+	for REGX in "^[Cc][Cc]: *" "^[Ss]igned-[Oo]ff-[Bb]y: *"; do
+		for EMAIL in $(sed '/^---$/q' $PATCH | grep -e "$REGX" | sed "s/$REGX//"); do
+			if [ "${AUTO_CC/$EMAIL/}" == "$AUTO_CC" ] && [ -n "$EMAIL" ]; then
+				if [ -z "$AUTO_CC" ]; then
+					AUTO_CC=$EMAIL;
+				else
+					AUTO_CC="$AUTO_CC,$EMAIL";
+				fi
+			fi
+		done
+	done
+	unset IFS
+}
+
+# Parse and verify arguments
+while getopts "acC:hp:t:" OPT; do
+	case $OPT in
+	a)
+		AUTO=1
+		GITSOBCC="--signed-off-by-cc"
+		AUTO_CL=1
+		;;
+	c)
+		AUTO=1
+		GITSOBCC="--signed-off-by-cc"
+		;;
+	C)
+		EXTRA_CC="$OPTARG"
+		;;
+	h)
+		usage
+		exit 0
+		;;
+	p)
+		PDIR=${OPTARG%/}
+		if [ ! -d $PDIR ]; then
+			echo "ERROR: pull-dir \"$PDIR\" does not exist."
+			usage
+			exit 1
+		fi
+		;;
+	t)
+		if [ -n "$TO" ]; then
+			TO="$TO,$OPTARG"
+		else
+			TO="$OPTARG"
+		fi
+		;;
+	esac
+done
+
+if [ -z "$PDIR" ]; then
+	echo "ERROR: you must specify a pull-dir."
+	usage
+	exit 1
+fi
+
+
+# Verify the cover letter is complete and free of tokens
+if [ -e $PDIR/0000-cover-letter.patch ]; then
+	CL="$PDIR/0000-cover-letter.patch"
+	for TOKEN in SUBJECT BLURB; do
+		grep -q "*** $TOKEN HERE ***" "$CL"
+		if [ $? -eq 0 ]; then
+			echo "ERROR: Please edit $CL and try again (Look for '*** $TOKEN HERE ***')."
+			exit 1
+		fi
+	done
+else
+	echo "WARNING: No cover letter will be sent."
+fi
+
+# Harvest emails from the generated patches and populate AUTO_CC.
+if [ $AUTO_CL -eq 1 ]; then
+	for PATCH in $PDIR/*.patch; do
+		harvest_recipients $PATCH
+	done
+fi
+
+AUTO_TO="$(git config sendemail.to)"
+if [ -n "$AUTO_TO" ]; then
+	if [ -n "$TO" ]; then
+		TO="$TO,$AUTO_TO"
+	else
+		TO="$AUTO_TO"
+	fi
+fi
+
+if [ -z "$TO" ] && [ -z "$AUTO_CC" ]; then
+	echo "ERROR: you have not specified any recipients."
+	usage
+	exit 1
+fi
+
+
+# Convert the collected addresses into git-send-email argument strings
+export IFS=$','
+GIT_TO=$(for R in $TO; do echo -n "--to='$R' "; done)
+GIT_CC=$(for R in $AUTO_CC; do echo -n "--cc='$R' "; done)
+GIT_EXTRA_CC=$(for R in $EXTRA_CC; do echo -n "--cc='$R' "; done)
+unset IFS
+
+# Handoff to git-send-email. It will perform the send confirmation.
+PATCHES=$(echo $PDIR/*.patch)
+if [ $AUTO_CL -eq 1 ]; then
+	# Send the cover letter to every recipient, both specified as well as
+	# harvested. Then remove it from the patches list.
+	eval "git send-email $GIT_TO $GIT_CC $GIT_EXTRA_CC --confirm=always --no-chain-reply-to --suppress-cc=all $CL"
+	if [ $? -eq 1 ]; then
+		echo "ERROR: failed to send cover-letter with automatic recipients."
+		exit 1
+	fi
+	PATCHES=${PATCHES/"$CL"/}
+fi
+
+# Send the patch to the specified recipients and, if -c was specified, those git
+# finds in this specific patch.
+eval "git send-email $GIT_TO $GIT_EXTRA_CC --confirm=always --no-chain-reply-to $GITSOBCC $PATCHES"
+if [ $? -eq 1 ]; then
+	echo "ERROR: failed to send patches."
+	exit 1
+fi

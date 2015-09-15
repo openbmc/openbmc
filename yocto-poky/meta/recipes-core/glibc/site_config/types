@@ -1,0 +1,21 @@
+char
+char *
+double
+float
+int
+long
+long double
+long int
+long long
+long long int
+short
+short int
+signed char
+unsigned char
+unsigned int
+unsigned long
+unsigned long int
+unsigned long long int
+unsigned short
+unsigned short int
+void *

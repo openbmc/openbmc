@@ -1,0 +1,24 @@
+Avoid using expat's m4 files
+
+Upstream-Status: Inappropriate [Other]
+Workaround specific to our build system.
+
+Signed-off-by: Kevin Tian <kevin.tian@intel.com>
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+Updated to apply over expat 2.1.0
+
+Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
+
+diff -Nurd expat-2.1.0/configure.in expat-2.1.0/configure.in
+--- expat-2.1.0/configure.in	2012-03-04 01:45:53.000000000 +0200
++++ expat-2.1.0/configure.in	2012-05-10 21:04:44.000000000 +0300
+@@ -51,8 +51,6 @@
+ 
+ AC_CONFIG_HEADER(expat_config.h)
+ 
+-sinclude(conftools/ac_c_bigendian_cross.m4)
+-
+ AC_LIBTOOL_WIN32_DLL
+ AC_PROG_LIBTOOL
+ 

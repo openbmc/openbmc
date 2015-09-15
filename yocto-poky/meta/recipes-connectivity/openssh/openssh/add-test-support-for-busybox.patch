@@ -1,0 +1,69 @@
+Adjust test cases to work with busybox.
+
+- Replace dd parameter "obs" with "bs".
+- Replace "head -<num>" with "head -n <num>".
+
+Signed-off-by: Maxin B. John <maxin.john@enea.com>
+Upstream-Status: Pending
+
+Index: openssh-6.8p1/regress/cipher-speed.sh
+===================================================================
+--- openssh-6.8p1.orig/regress/cipher-speed.sh
++++ openssh-6.8p1/regress/cipher-speed.sh
+@@ -17,7 +17,7 @@ for c in `${SSH} -Q cipher`; do n=0; for
+ 		printf "%-60s" "$c/$m:"
+ 		( ${SSH} -o 'compression no' \
+ 			-F $OBJ/ssh_proxy -2 -m $m -c $c somehost \
+-			exec sh -c \'"dd of=/dev/null obs=32k"\' \
++			exec sh -c \'"dd of=/dev/null bs=32k"\' \
+ 		< ${DATA} ) 2>&1 | getbytes
+ 
+ 		if [ $? -ne 0 ]; then
+@@ -42,7 +42,7 @@ for c in $ciphers; do
+ 		printf "%-60s" "$c:"
+ 		( ${SSH} -o 'compression no' \
+ 			-F $OBJ/ssh_proxy -1 -c $c somehost \
+-			exec sh -c \'"dd of=/dev/null obs=32k"\' \
++			exec sh -c \'"dd of=/dev/null bs=32k"\' \
+ 		< ${DATA} ) 2>&1 | getbytes
+ 		if [ $? -ne 0 ]; then
+ 			fail "ssh -1 failed with cipher $c"
+Index: openssh-6.8p1/regress/transfer.sh
+===================================================================
+--- openssh-6.8p1.orig/regress/transfer.sh
++++ openssh-6.8p1/regress/transfer.sh
+@@ -15,7 +15,7 @@ for p in ${SSH_PROTOCOLS}; do
+ 	for s in 10 100 1k 32k 64k 128k 256k; do
+ 		trace "proto $p dd-size ${s}"
+ 		rm -f ${COPY}
+-		dd if=$DATA obs=${s} 2> /dev/null | \
++		dd if=$DATA bs=${s} 2> /dev/null | \
+ 			${SSH} -q -$p -F $OBJ/ssh_proxy somehost "cat > ${COPY}"
+ 		if [ $? -ne 0 ]; then
+ 			fail "ssh cat $DATA failed"
+Index: openssh-6.8p1/regress/yes-head.sh
+===================================================================
+--- openssh-6.8p1.orig/regress/yes-head.sh
++++ openssh-6.8p1/regress/yes-head.sh
+@@ -4,7 +4,7 @@
+ tid="yes pipe head"
+ 
+ for p in ${SSH_PROTOCOLS}; do
+-	lines=`${SSH} -$p -F $OBJ/ssh_proxy thishost 'sh -c "while true;do echo yes;done | _POSIX2_VERSION=199209 head -2000"' | (sleep 3 ; wc -l)`
++	lines=`${SSH} -$p -F $OBJ/ssh_proxy thishost 'sh -c "while true;do echo yes;done | _POSIX2_VERSION=199209 head -n 2000"' | (sleep 3 ; wc -l)`
+ 	if [ $? -ne 0 ]; then
+ 		fail "yes|head test failed"
+ 		lines = 0;
+Index: openssh-6.8p1/regress/key-options.sh
+===================================================================
+--- openssh-6.8p1.orig/regress/key-options.sh
++++ openssh-6.8p1/regress/key-options.sh
+@@ -54,7 +54,7 @@ for p in ${SSH_PROTOCOLS}; do
+ 	fi
+ 
+ 	sed 's/.*/from="'"$f"'" &/' $origkeys >$authkeys
+-	from=`head -1 $authkeys | cut -f1 -d ' '`
++	from=`head -n 1 $authkeys | cut -f1 -d ' '`
+ 	verbose "key option proto $p $from"
+ 	r=`${SSH} -$p -q -F $OBJ/ssh_proxy somehost 'echo true'`
+ 	if [ "$r" = "true" ]; then

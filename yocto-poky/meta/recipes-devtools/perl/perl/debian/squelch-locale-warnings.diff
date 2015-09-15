@@ -1,0 +1,56 @@
+From 487a6d6ada0b08e6a7276520ebc61cd851005e7c Mon Sep 17 00:00:00 2001
+From: Niko Tyni <ntyni@debian.org>
+Date: Sun, 3 Oct 2010 21:36:17 +0300
+Subject: Squelch locale warnings in Debian package maintainer scripts
+
+Bug-Debian: http://bugs.debian.org/508764
+
+The system locales are rather frequently out of sync with the C library
+during package upgrades, causing a huge amount of useless Perl locale
+warnings. Squelch them when running package maintainer scripts, detected
+by the DPKG_RUNNING_VERSION environment variable.
+
+Any real locale problem will show up after the system upgrade too, and
+the warning will be triggered normally again at that point.
+
+Patch-Name: debian/squelch-locale-warnings.diff
+---
+ locale.c           | 5 ++++-
+ pod/perllocale.pod | 8 ++++++++
+ 2 files changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/locale.c b/locale.c
+index 7a4a418..fdf911d 100644
+--- a/locale.c
++++ b/locale.c
+@@ -674,7 +674,10 @@ Perl_init_i18nl10n(pTHX_ int printwarn)
+ 
+     const bool locwarn = (printwarn > 1
+                           || (printwarn
+-                              && (! bad_lang_use_once
++                              &&
++                                 /* Debian specific change - see http://bugs.debian.org/508764 */
++                                 (!PerlEnv_getenv("DPKG_RUNNING_VERSION")) &&
++                                 (! bad_lang_use_once
+                                   || (
+                                     /* disallow with "" or "0" */
+                                     *bad_lang_use_once
+diff --git a/pod/perllocale.pod b/pod/perllocale.pod
+index 701b422..58cabaf 100644
+--- a/pod/perllocale.pod
++++ b/pod/perllocale.pod
+@@ -1217,6 +1217,14 @@ B<NOTE>: C<PERL_BADLANG> only gives you a way to hide the warning message.
+ The message tells about some problem in your system's locale support,
+ and you should investigate what the problem is.
+ 
++=item DPKG_RUNNING_VERSION
++
++On Debian systems, if the DPKG_RUNNING_VERSION environment variable is
++set (to any value), the locale failure warnings will be suppressed just
++like with a zero PERL_BADLANG setting. This is done to avoid floods
++of spurious warnings during system upgrades.
++See L<http://bugs.debian.org/508764>.
++
+ =back
+ 
+ The following environment variables are not specific to Perl: They are

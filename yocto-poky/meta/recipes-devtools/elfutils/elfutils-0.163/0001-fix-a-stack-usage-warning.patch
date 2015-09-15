@@ -1,0 +1,28 @@
+[PATCH] fix a stack-usage warning
+
+Upstream-Status: Pending
+
+not use a variable to as a array size, otherwise the warning to error that
+stack usage might be unbounded [-Werror=stack-usage=] will happen
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ backends/ppc_initreg.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/backends/ppc_initreg.c b/backends/ppc_initreg.c
+index 64f5379..52dde3e 100644
+--- a/backends/ppc_initreg.c
++++ b/backends/ppc_initreg.c
+@@ -93,7 +93,7 @@ ppc_set_initial_registers_tid (pid_t tid __attribute__ ((unused)),
+ 	return false;
+     }
+   const size_t gprs = sizeof (user_regs.r.gpr) / sizeof (*user_regs.r.gpr);
+-  Dwarf_Word dwarf_regs[gprs];
++  Dwarf_Word dwarf_regs[sizeof (user_regs.r.gpr) / sizeof (*user_regs.r.gpr)];
+   for (unsigned gpr = 0; gpr < gprs; gpr++)
+     dwarf_regs[gpr] = user_regs.r.gpr[gpr];
+   if (! setfunc (0, gprs, dwarf_regs, arg))
+-- 
+1.9.1
+

@@ -1,0 +1,49 @@
+#! /usr/bin/env python
+
+import sys
+try:
+    import xml.etree.cElementTree as etree
+except:
+    import xml.etree.ElementTree as etree
+
+def child (elem, name):
+    for e in elem.getchildren():
+        if e.tag == name:
+            return e
+    return None
+
+def children (elem, name=None):
+    l = elem.getchildren()
+    if name:
+        l = [e for e in l if e.tag == name]
+    return l
+
+xml = etree.parse(sys.argv[1])
+
+for schema in child(xml.getroot(), "schemalist").getchildren():
+    e = child(schema, "short")
+    if e is not None:
+        schema.remove(e)
+
+    e = child(schema, "long")
+    if e is not None:
+        schema.remove(e)
+
+    for locale in children(schema, "locale"):
+        # One locale must exist so leave C locale...
+        a = locale.attrib.get("name")
+        if a == 'C':
+            continue
+        e = child(locale, "default")
+        if e is None:
+            schema.remove(locale)
+        else:
+            e = child(locale, "short")
+            if e is not None:
+                locale.remove(e)
+            e = child(locale, "long")
+            if e is not None:
+                locale.remove(e)
+
+xml.write(sys.stdout, "UTF-8")
+

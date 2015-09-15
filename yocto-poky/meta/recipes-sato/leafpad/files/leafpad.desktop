@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Notes
+Exec=/usr/bin/leafpad
+Comment=Text Editor
+Icon=accessories-text-editor
+Terminal=false
+Type=Application
+Categories=GTK;Utility;TextEditor;
+X-MB-SingleInstance=true
+StartupNotify=true

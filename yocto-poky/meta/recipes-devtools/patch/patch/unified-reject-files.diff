@@ -1,0 +1,307 @@
+Upstream-Status: Inappropriate [debian patch]
+
+Generate unified diff style reject files. Also include the C function names
+in reject files whenever possible.
+
+	$ cat > f.orig
+	< a() {
+	< 2
+	< 3
+	<
+	< 5
+	< 6
+	< }
+
+	$ sed -e 's/5/5a/' f.orig > f
+	$ diff -U2 -p f.orig f > f.diff
+	$ sed -e 's/5/5a/' -e 's/6/6x/' f.orig > f
+	$ ./patch -F0 -s --no-backup-if-mismatch f --reject-unified < f.diff
+	> 1 out of 1 hunk FAILED -- saving rejects to file f.rej
+
+	$ cat f.rej
+	> @@ -3,5 +3,5 @@ a() {
+	>  3
+	>  
+	> -5
+	> +5a
+	>  6
+	>  }
+
+	$ ./patch -F0 -s --no-backup-if-mismatch f < f.diff
+	> 1 out of 1 hunk FAILED -- saving rejects to file f.rej
+
+	$ cat f.rej
+	> *************** a() {
+	> *** 3,7 ****
+	>   3
+	>   
+	> - 5
+	>   6
+	>   }
+	> --- 3,7 ----
+	>   3
+	>   
+	> + 5a
+	>   6
+	>   }
+
+	$ diff -Nu -p /dev/null f.orig > f2.diff
+	$ ./patch -F0 -s --no-backup-if-mismatch f --reject-unified < f2.diff
+	> Patch attempted to create file f, which already exists.
+	> 1 out of 1 hunk FAILED -- saving rejects to file f.rej
+
+	$ cat f.rej
+	> @@ -0,0 +1,7 @@
+	> +a() {
+	> +2
+	> +3
+	> +
+	> +5
+	> +6
+	> +}
+
+	$ rm -f f f.orig f.rej f.diff f2.diff
+
+Index: patch-2.5.9/pch.c
+===================================================================
+--- patch-2.5.9.orig/pch.c
++++ patch-2.5.9/pch.c
+@@ -68,6 +68,7 @@ static LINENUM p_sline;			/* and the lin
+ static LINENUM p_hunk_beg;		/* line number of current hunk */
+ static LINENUM p_efake = -1;		/* end of faked up lines--don't free */
+ static LINENUM p_bfake = -1;		/* beg of faked up lines */
++static char *p_c_function;		/* the C function a hunk is in */
+ 
+ enum nametype { OLD, NEW, INDEX, NONE };
+ 
+@@ -888,6 +889,19 @@ another_hunk (enum diff difftype, bool r
+ 	    next_intuit_at(line_beginning,p_input_line);
+ 	    return chars_read == (size_t) -1 ? -1 : 0;
+ 	}
++	s = buf;
++	while (*s == '*')
++	    s++;
++	if (*s == ' ')
++	  {
++	    p_c_function = s;
++	    while (*s != '\n')
++		s++;
++	    *s = '\0';
++	    p_c_function = savestr (p_c_function);
++	  }
++	else
++	    p_c_function = NULL;
+ 	p_hunk_beg = p_input_line + 1;
+ 	while (p_end < p_max) {
+ 	    chars_read = get_line ();
+@@ -1277,8 +1291,18 @@ another_hunk (enum diff difftype, bool r
+ 	else
+ 	    p_repl_lines = 1;
+ 	if (*s == ' ') s++;
+-	if (*s != '@')
++	if (*s++ != '@')
+ 	    malformed ();
++	if (*s++ == '@' && *s == ' ' && *s != '\0')
++	  {
++	    p_c_function = s;
++	    while (*s != '\n')
++		s++;
++	    *s = '\0';
++	    p_c_function = savestr (p_c_function);
++	  }
++	else
++	    p_c_function = NULL;
+ 	if (!p_ptrn_lines)
+ 	    p_first++;			/* do append rather than insert */
+ 	if (!p_repl_lines)
+@@ -1884,6 +1908,12 @@ pch_hunk_beg (void)
+     return p_hunk_beg;
+ }
+ 
++char const *
++pch_c_function (void)
++{
++    return p_c_function;
++}
++
+ /* Is the newline-terminated line a valid `ed' command for patch
+    input?  If so, return the command character; if not, return 0.
+    This accepts accepts just a subset of the valid commands, but it's
+Index: patch-2.5.9/pch.h
+===================================================================
+--- patch-2.5.9.orig/pch.h
++++ patch-2.5.9/pch.h
+@@ -25,6 +25,7 @@
+ LINENUM pch_end (void);
+ LINENUM pch_first (void);
+ LINENUM pch_hunk_beg (void);
++char const *pch_c_function (void);
+ LINENUM pch_newfirst (void);
+ LINENUM pch_prefix_context (void);
+ LINENUM pch_ptrn_lines (void);
+Index: patch-2.5.9/patch.man
+===================================================================
+--- patch-2.5.9.orig/patch.man
++++ patch-2.5.9/patch.man
+@@ -517,6 +517,9 @@ instead of the default
+ .B \&.rej
+ file.
+ .TP
++\fB\*=reject\-unified\fP
++Produce unified reject files. The default is to produce context type reject files.
++.TP
+ \fB\-R\fP  or  \fB\*=reverse\fP
+ Assume that this patch was created with the old and new files swapped.
+ (Yes, I'm afraid that does happen occasionally, human nature being what it
+Index: patch-2.5.9/common.h
+===================================================================
+--- patch-2.5.9.orig/common.h
++++ patch-2.5.9/common.h
+@@ -146,6 +146,7 @@ XTERN int invc;
+ XTERN struct stat instat;
+ XTERN bool dry_run;
+ XTERN bool posixly_correct;
++XTERN bool unified_reject_files;
+ 
+ XTERN char const *origprae;
+ XTERN char const *origbase;
+Index: patch-2.5.9/patch.c
+===================================================================
+--- patch-2.5.9.orig/patch.c
++++ patch-2.5.9/patch.c
+@@ -522,6 +522,7 @@ static struct option const longopts[] =
+   {"no-backup-if-mismatch", no_argument, NULL, CHAR_MAX + 6},
+   {"posix", no_argument, NULL, CHAR_MAX + 7},
+   {"quoting-style", required_argument, NULL, CHAR_MAX + 8},
++  {"unified-reject-files", no_argument, NULL, CHAR_MAX + 9},
+   {NULL, no_argument, NULL, 0}
+ };
+ 
+@@ -580,6 +581,7 @@ static char const *const option_help[] =
+ "  --verbose  Output extra information about the work being done.",
+ "  --dry-run  Do not actually change any files; just print what would happen.",
+ "  --posix  Conform to the POSIX standard.",
++"  --unified-reject-files  Create unified reject files.",
+ "",
+ "  -d DIR  --directory=DIR  Change the working directory to DIR first.",
+ #if HAVE_SETMODE_DOS
+@@ -779,6 +781,9 @@ get_some_switches (void)
+ 				     (enum quoting_style) i);
+ 		}
+ 		break;
++	    case CHAR_MAX + 9:
++		unified_reject_files = true;
++		break;
+ 	    default:
+ 		usage (stderr, 2);
+ 	}
+@@ -927,6 +932,24 @@ locate_hunk (LINENUM fuzz)
+     return 0;
+ }
+ 
++static char *
++format_linerange (char rangebuf[LINENUM_LENGTH_BOUND*2 + 2],
++		  LINENUM first, LINENUM lines)
++{
++    if (lines == 1)
++      rangebuf = format_linenum (rangebuf, first);
++    else
++      {
++	char *rb;
++	rangebuf = format_linenum (rangebuf + LINENUM_LENGTH_BOUND + 1, lines);
++	rb = rangebuf-1;
++	rangebuf = format_linenum (rangebuf - LINENUM_LENGTH_BOUND - 1,
++				   (lines > 0) ? first : 0);
++	*rb = ',';
++      }
++    return rangebuf;
++}
++
+ /* We did not find the pattern, dump out the hunk so they can handle it. */
+ 
+ static void
+@@ -943,8 +966,83 @@ abort_hunk (void)
+       (int) NEW_CONTEXT_DIFF <= (int) diff_type ? " ****" : "";
+     char const *minuses =
+       (int) NEW_CONTEXT_DIFF <= (int) diff_type ? " ----" : " -----";
++    char const *function = pch_c_function();
++    if (function == NULL)
++	function = "";
++
++    if (unified_reject_files)
++      {
++	/* produce unified reject files */
++	char rangebuf0[LINENUM_LENGTH_BOUND*2 + 2];
++	char rangebuf1[LINENUM_LENGTH_BOUND*2 + 2];
++	LINENUM j;
++
++	/* Find the beginning of the remove and insert section. */
++	for (j = 0; j <= pat_end; j++)
++	  if (pch_char (j) == '=')
++	    break;
++	for (i = j+1; i <= pat_end; i++)
++	  if (pch_char (i) == '^')
++	    break;
++	if (pch_char (0) != '*' || j > pat_end || i > pat_end+1)
++	  fatal ("internal error in abort_hunk");
++	i = 1; j++;
++
++	/* @@ -from,lines +to,lines @@ */
++	fprintf (rejfp, "@@ -%s +%s @@%s\n",
++		 format_linerange (rangebuf0, oldfirst, pch_ptrn_lines()),
++		 format_linerange (rangebuf1, newfirst, pch_repl_lines()),
++		 function);
++
++	while (   (i <= pat_end && pch_char (i) != '=')
++	       || (j <= pat_end && pch_char (j) != '^'))
++	  {
++	    if (i <= pat_end
++		&& (pch_char (i) == '-' || pch_char (i) == '!'))
++	      {
++		fputc('-', rejfp);
++		pch_write_line (i++, rejfp);
++	      }
++	    else if (j <= pat_end
++		     && (pch_char (j) == '+' || pch_char (j) == '!'))
++	      {
++		fputc('+', rejfp);
++		pch_write_line (j++, rejfp);
++	      }
++	    else if ((i <= pat_end
++		      && (pch_char (i) == ' ' || pch_char (i) == '\n')) &&
++		     (j > pat_end
++		      || (pch_char (j) == ' ' || pch_char (j) == '\n')))
++	      {
++		/* Unless j is already past the end, lines i and j
++		   must be equal here.  */
++
++		if (pch_char (i) == ' ')
++		  fputc(' ', rejfp);
++		pch_write_line (i++, rejfp);
++		if (j <= pat_end)
++		  j++;
++	      }
++	    else if ((j <= pat_end &&
++		     (pch_char (j) == ' ' || pch_char (j) == '\n')) &&
++		     (pch_char (i) == '='))
++	      {
++		if (pch_char (j) == ' ')
++		  fputc(' ', rejfp);
++		pch_write_line (j++, rejfp);
++	      }
++	    else
++	      fatal ("internal error in abort_hunk");
++	  }
++
++	if (ferror (rejfp))
++	  write_fatal ();
++	return;
++      }
+ 
+-    fprintf(rejfp, "***************\n");
++    /* produce context type reject files */
++   
++    fprintf(rejfp, "***************%s\n", function);
+     for (i=0; i<=pat_end; i++) {
+ 	char numbuf0[LINENUM_LENGTH_BOUND + 1];
+ 	char numbuf1[LINENUM_LENGTH_BOUND + 1];

@@ -1,0 +1,27 @@
+From a5e95a42e7bceddc9ecad06694c1a0588f4bafc8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 14 Apr 2015 07:22:47 -0700
+Subject: [PATCH] include sys/types.h for getting u_* typedefs
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ cfg.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/cfg.h b/cfg.h
+index d4d4cab..fe49e8f 100644
+--- a/cfg.h
++++ b/cfg.h
+@@ -33,6 +33,7 @@
+ #ifndef _CONF_H_
+ #define _CONF_H_
+ 
++#include <sys/types.h>
+ #include "queue.h"
+ 
+ struct conf_list_node {
+-- 
+2.1.4
+

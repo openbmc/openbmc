@@ -1,0 +1,23 @@
+Lib/cgi.py: Update the script as mentioned in the comment
+
+Upstream-Status: Inappropriate [distribution]
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+--- Python-2.6.6/Lib/cgi.py.orig	2010-08-01 22:14:27.000000000 -0500
++++ Python-2.6.6/Lib/cgi.py	2011-09-21 15:28:40.478208631 -0500
+@@ -1,13 +1,4 @@
+-#! /usr/local/bin/python
+-
+-# NOTE: the above "/usr/local/bin/python" is NOT a mistake.  It is
+-# intentionally NOT "/usr/bin/env python".  On many systems
+-# (e.g. Solaris), /usr/local/bin is not in $PATH as passed to CGI
+-# scripts, and /usr/local/bin is the default directory where Python is
+-# installed, so /usr/bin/env would be unable to find python.  Granted,
+-# binary installations by Linux vendors often install Python in
+-# /usr/bin.  So let those vendors patch cgi.py to match their choice
+-# of installation.
++#! /usr/bin/env python
+ 
+ """Support module for CGI (Common Gateway Interface) scripts.
+ 

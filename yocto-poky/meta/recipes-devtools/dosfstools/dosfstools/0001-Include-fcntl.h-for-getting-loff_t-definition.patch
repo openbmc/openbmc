@@ -1,0 +1,41 @@
+From b7c42c6a9829bea911b22201edd7df2a9bec1a14 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 13 Apr 2015 17:52:34 -0700
+Subject: [PATCH] Include fcntl.h for getting loff_t definition
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ dosfsck/dosfsck.h | 2 ++
+ dosfsck/lfn.c     | 1 +
+ 2 files changed, 3 insertions(+)
+
+diff --git a/dosfsck/dosfsck.h b/dosfsck/dosfsck.h
+index d9314b1..2076d5f 100644
+--- a/dosfsck/dosfsck.h
++++ b/dosfsck/dosfsck.h
+@@ -50,6 +50,8 @@
+ #define CT_LE_L(v) (v)
+ #endif /* __BIG_ENDIAN */
+ 
++#include <fcntl.h>
++
+ #define VFAT_LN_ATTR (ATTR_RO | ATTR_HIDDEN | ATTR_SYS | ATTR_VOLUME)
+ 
+ /* ++roman: Use own definition of boot sector structure -- the kernel headers'
+diff --git a/dosfsck/lfn.c b/dosfsck/lfn.c
+index 9b2cfc3..bb04fda 100644
+--- a/dosfsck/lfn.c
++++ b/dosfsck/lfn.c
+@@ -7,6 +7,7 @@
+ #include <string.h>
+ #include <limits.h>
+ #include <time.h>
++#include <fcntl.h>
+ 
+ #include "common.h"
+ #include "io.h"
+-- 
+2.1.4
+

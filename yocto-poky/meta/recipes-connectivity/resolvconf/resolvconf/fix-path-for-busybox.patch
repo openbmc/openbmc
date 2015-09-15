@@ -1,0 +1,20 @@
+
+busybox installs readlink into /usr/bin, so ensure /usr/bin
+is in the path.
+
+Upstream-Status: Submitted
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+Index: resolvconf-1.76/etc/resolvconf/update.d/libc
+===================================================================
+--- resolvconf-1.76.orig/etc/resolvconf/update.d/libc
++++ resolvconf-1.76/etc/resolvconf/update.d/libc
+@@ -16,7 +16,7 @@
+ #
+ 
+ set -e
+-PATH=/sbin:/bin
++PATH=/sbin:/bin:/usr/bin
+ 
+ [ -x /lib/resolvconf/list-records ] || exit 1
+ 

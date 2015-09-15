@@ -1,0 +1,16 @@
+Upstream-Status: Pending
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+Index: gnupg-2.1.0/dirmngr/Makefile.am
+===================================================================
+--- gnupg-2.1.0.orig/dirmngr/Makefile.am
++++ gnupg-2.1.0/dirmngr/Makefile.am
+@@ -78,7 +78,8 @@ endif
+ dirmngr_LDADD = $(libcommontlsnpth) $(libcommonpth) \
+         $(DNSLIBS) $(LIBASSUAN_LIBS) \
+ 	$(LIBGCRYPT_LIBS) $(KSBA_LIBS) $(NPTH_LIBS) \
+-	$(NTBTLS_LIBS) $(LIBGNUTLS_LIBS) $(LIBINTL) $(LIBICONV)
++	$(NTBTLS_LIBS) $(LIBGNUTLS_LIBS) $(LIBINTL) $(LIBICONV) \
++	$(GPG_ERROR_LIBS)
+ if USE_LDAP
+ dirmngr_LDADD += $(ldaplibs)
+ endif

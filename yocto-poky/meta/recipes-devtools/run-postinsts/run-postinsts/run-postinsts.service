@@ -1,0 +1,16 @@
+[Unit]
+Description=Run pending postinsts
+DefaultDependencies=no
+After=systemd-remount-fs.service systemd-tmpfiles-setup.service tmp.mount
+Before=sysinit.target
+ConditionPathExistsGlob=#SYSCONFDIR#/*-postinsts
+
+[Service]
+Type=oneshot
+ExecStart=#SBINDIR#/run-postinsts
+ExecStartPost=#BASE_BINDIR#/systemctl disable run-postinsts.service
+RemainAfterExit=No
+TimeoutSec=0
+
+[Install]
+WantedBy=sysinit.target

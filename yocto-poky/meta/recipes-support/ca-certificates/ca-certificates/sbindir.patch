@@ -1,0 +1,20 @@
+Upstream-Status: Pending
+
+Let us alter the install destination of the script via SBINDIR
+
+--- ca-certificates-20130119.orig/sbin/Makefile
++++ ca-certificates-20130119/sbin/Makefile
+@@ -3,9 +3,12 @@
+ #
+ #
+
++SBINDIR = /usr/sbin
++
+ all:
+
+ clean:
+
+ install:
+-	install -m755 update-ca-certificates $(DESTDIR)/usr/sbin/
++	install -d $(DESTDIR)$(SBINDIR)
++	install -m755 update-ca-certificates $(DESTDIR)$(SBINDIR)/

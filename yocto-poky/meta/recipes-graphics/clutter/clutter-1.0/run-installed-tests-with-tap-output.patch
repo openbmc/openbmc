@@ -1,0 +1,32 @@
+From 668e1d14af13249384ab324c7d79ec4147f07e48 Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Mon, 27 Apr 2015 20:12:33 +0300
+Subject: [PATCH] Run installed tests with tap output
+
+Configure output from installed-tests to be TAP compliant such that
+gnome-desktop-testing-runner properly interprets the results.
+
+Upstream-Status: Pending
+
+Signed-off-by: Tim Orling <TicoTimo@gmail.com>
+---
+ build/autotools/glib-tap.mk | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/build/autotools/glib-tap.mk b/build/autotools/glib-tap.mk
+index 7c5f82b..844e17e 100644
+--- a/build/autotools/glib-tap.mk
++++ b/build/autotools/glib-tap.mk
+@@ -127,7 +127,8 @@ installed_test_meta_DATA = $(installed_testcases:=.test)
+ %.test: %$(EXEEXT) Makefile
+ 	$(AM_V_GEN) (echo '[Test]' > $@.tmp; \
+ 	echo 'Type=session' >> $@.tmp; \
+-	echo 'Exec=env G_ENABLE_DIAGNOSTIC=0 CLUTTER_ENABLE_DIAGNOSTIC=0 $(installed_testdir)/$<' >> $@.tmp; \
++	echo 'Exec=env G_ENABLE_DIAGNOSTIC=0 CLUTTER_ENABLE_DIAGNOSTIC=0 $(installed_testdir)/$< --tap' >> $@.tmp; \
++	echo 'Output=TAP' >> $@.tmp; \
+ 	mv $@.tmp $@)
+ 
+ CLEANFILES += $(installed_test_meta_DATA)
+-- 
+2.1.4
+

@@ -1,0 +1,33 @@
+Upstream-Status: Pending
+
+--- ConsoleKit-0.4.6.orig/configure.ac
++++ ConsoleKit-0.4.6/configure.ac
+@@ -56,10 +56,24 @@ PKG_CHECK_MODULES(CONSOLE_KIT,
+   gthread-2.0 >= $GLIB_REQUIRED_VERSION
+ )
+
+-PKG_CHECK_MODULES(POLKIT,
+-  polkit-gobject-1 >= $POLKIT_REQUIRED_VERSION,
+-  have_polkit=yes,
+-  have_polkit=no)
++AC_ARG_WITH([polkit],
++  [AS_HELP_STRING([--with-polkit],
++    [support PolicyKit @<:@default=check@:>@])],
++  [],
++  [with_polkit=check])
++
++AS_IF([test "x$with_polkit" != xno],
++  [PKG_CHECK_MODULES(POLKIT,
++     polkit-gobject-1 >= $POLKIT_REQUIRED_VERSION,
++     have_polkit=yes,
++     [if test "x$with_polkit" != xcheck; then
++       AC_MSG_FAILURE(
++         [--with-polkit was given, but test for polkit failed])
++      else
++        have_polkit=no
++      fi
++     ])])
++
+ if test "x$have_polkit" = "xyes" ; then
+        AC_DEFINE(HAVE_POLKIT, [], [Define if we have polkit])
+ fi

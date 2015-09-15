@@ -1,0 +1,169 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
+[<!ENTITY % poky SYSTEM "../poky.ent"> %poky; ] >
+
+<chapter id='ref-images'>
+    <title>Images</title>
+
+    <para>
+        The OpenEmbedded build system provides several example
+        images to satisfy different needs.
+        When you issue the <filename>bitbake</filename> command you provide a “top-level” recipe
+        that essentially begins the build for the type of image you want.
+    </para>
+
+    <note>
+        Building an image without GNU General Public License Version 3 (GPLv3),
+        GNU Lesser General Public License Version 3 (LGPLv3), and the
+        GNU Affero General Public License Version 3 (AGPL-3.0) components
+        is only supported for minimal and base images.
+        Furthermore, if you are going to build an image using non-GPLv3 and
+        similarly licensed components, you must make the following changes in
+        the <filename>local.conf</filename> file before using the BitBake
+        command to build the minimal or base image:
+        <literallayout class='monospaced'>
+     1. Comment out the EXTRA_IMAGE_FEATURES line
+     2. Set INCOMPATIBLE_LICENSE = "GPL-3.0 LGPL-3.0 AGPL-3.0"
+        </literallayout>
+    </note>
+
+    <para>
+        From within the <filename>poky</filename> Git repository, you can use
+        the following command to display the list of directories within the
+        <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+        that containe image recipe files:
+        <literallayout class='monospaced'>
+     $ ls meta*/recipes*/images/*.bb
+        </literallayout>
+    </para>
+
+    <para>
+        Following is a list of supported recipes:
+        <itemizedlist>
+            <listitem><para><filename>build-appliance-image</filename>:
+                An example virtual machine that contains all the pieces required to
+                run builds using the build system as well as the build system itself.
+                You can boot and run the image using either the
+                <ulink url='http://www.vmware.com/products/player/overview.html'>VMware Player</ulink>
+                or <ulink url='http://www.vmware.com/products/workstation/overview.html'>VMware Workstation</ulink>.
+                For more information on this image, see the
+                <ulink url='&YOCTO_HOME_URL;/documentation/build-appliance'>Build Appliance</ulink> page on
+                the Yocto Project website.</para></listitem>
+            <listitem><para><filename>core-image-base</filename>:
+                A console-only image that fully supports the target device hardware.</para></listitem>
+            <listitem><para><filename>core-image-clutter</filename>:
+                An image with support for the Open GL-based toolkit Clutter, which enables development of
+                rich and animated graphical user interfaces.</para></listitem>
+            <listitem><para><filename>core-image-directfb</filename>:
+                An image that uses <filename>directfb</filename> instead of X11.
+                </para></listitem>
+            <listitem><para><filename>core-image-full-cmdline</filename>:
+                A console-only image with more full-featured Linux system
+                functionality installed.</para></listitem>
+                <listitem><para><filename>core-image-lsb</filename>:
+                An image that conforms to the Linux Standard Base (LSB)
+                specification.
+                This image requires a distribution configuration that
+                enables LSB compliance (e.g. <filename>poky-lsb</filename>).
+                If you build <filename>core-image-lsb</filename> without that
+                configuration, the image will not be LSB-compliant.
+                </para></listitem>
+            <listitem><para><filename>core-image-lsb-dev</filename>:
+                A <filename>core-image-lsb</filename> image that is suitable for development work
+                using the host.
+                The image includes headers and libraries you can use in a host development
+                environment.
+                This image requires a distribution configuration that
+                enables LSB compliance (e.g. <filename>poky-lsb</filename>).
+                If you build <filename>core-image-lsb-dev</filename> without that
+                configuration, the image will not be LSB-compliant.
+                </para></listitem>
+            <listitem><para><filename>core-image-lsb-sdk</filename>:
+                A <filename>core-image-lsb</filename> that includes everything in
+                meta-toolchain but also includes development headers and libraries
+                to form a complete standalone SDK.
+                This image requires a distribution configuration that
+                enables LSB compliance (e.g. <filename>poky-lsb</filename>).
+                If you build <filename>core-image-lsb-sdk</filename> without that
+                configuration, the image will not be LSB-compliant.
+                This image is suitable for development using the target.</para></listitem>
+            <listitem><para><filename>core-image-minimal</filename>:
+                A small image just capable of allowing a device to boot.</para></listitem>
+            <listitem><para><filename>core-image-minimal-dev</filename>:
+                A <filename>core-image-minimal</filename> image suitable for development work
+                using the host.
+                The image includes headers and libraries you can use in a host development
+                environment.
+                </para></listitem>
+            <listitem><para id='images-core-image-minimal-initramfs'><filename>core-image-minimal-initramfs</filename>:
+                A <filename>core-image-minimal</filename> image that has the Minimal RAM-based
+                Initial Root Filesystem (initramfs) as part of the kernel,
+                which allows the system to find the first “init” program more efficiently.
+                See the
+                <link linkend='var-PACKAGE_INSTALL'><filename>PACKAGE_INSTALL</filename></link>
+                variable for additional information helpful when working with
+                initramfs images.
+                </para></listitem>
+            <listitem><para><filename>core-image-minimal-mtdutils</filename>:
+                A <filename>core-image-minimal</filename> image that has support
+                for the Minimal MTD Utilities, which let the user interact with the
+                MTD subsystem in the kernel to perform operations on flash devices.
+                </para></listitem>
+            <listitem><para><filename>core-image-rt</filename>:
+                A <filename>core-image-minimal</filename> image plus a real-time test suite and
+                tools appropriate for real-time use.</para></listitem>
+            <listitem><para><filename>core-image-rt-sdk</filename>:
+                A <filename>core-image-rt</filename> image that includes everything in
+                <filename>meta-toolchain</filename>.
+                The image also includes development headers and libraries to form a complete
+                stand-alone SDK and is suitable for development using the target.
+                </para></listitem>
+            <listitem><para><filename>core-image-sato</filename>:
+                An image with Sato support, a mobile environment and visual style that works well
+                with mobile devices.
+                The image supports X11 with a Sato theme and applications such as
+                a terminal, editor, file manager, media player, and so forth.
+                </para></listitem>
+            <listitem><para><filename>core-image-sato-dev</filename>:
+                A <filename>core-image-sato</filename> image suitable for development
+                using the host.
+                The image includes libraries needed to build applications on the device itself,
+                testing and profiling tools, and debug symbols.
+                This image was formerly <filename>core-image-sdk</filename>.
+                </para></listitem>
+            <listitem><para><filename>core-image-sato-sdk</filename>:
+                A <filename>core-image-sato</filename> image that includes everything in meta-toolchain.
+                The image also includes development headers and libraries to form a complete standalone SDK
+                and is suitable for development using the target.</para></listitem>
+            <listitem><para><filename>core-image-testmaster</filename>:
+                A "master" image designed to be used for automated runtime testing.
+                Provides a "known good" image that is deployed to a separate
+                partition so that you can boot into it and use it to deploy a
+                second image to be tested.
+                You can find more information about runtime testing in the
+                "<ulink url='&YOCTO_DOCS_DEV_URL;#performing-automated-runtime-testing'>Performing Automated Runtime Testing</ulink>"
+                section in the Yocto Project Development Manual.
+                </para></listitem>
+            <listitem><para><filename>core-image-testmaster-initramfs</filename>:
+                A RAM-based Initial Root Filesystem (initramfs) image tailored for
+                use with the <filename>core-image-testmaster</filename> image.
+                </para></listitem>
+            <listitem><para><filename>core-image-weston</filename>:
+                A very basic Wayland image with a terminal.
+                This image provides the Wayland protocol libraries and the
+                reference Weston compositor.
+                For more information, see the
+                "<link linkend='wayland'>Wayland</link>" section.
+                </para></listitem>
+            <listitem><para><filename>core-image-x11</filename>:
+                A very basic X11 image with a terminal.
+                </para></listitem>
+            <listitem><para><filename>qt4e-demo-image</filename>:
+                An image that launches into the demo application for the embedded
+                (not based on X11) version of Qt.</para></listitem>
+        </itemizedlist>
+    </para>
+</chapter>
+<!--
+vim: expandtab tw=80 ts=4
+-->

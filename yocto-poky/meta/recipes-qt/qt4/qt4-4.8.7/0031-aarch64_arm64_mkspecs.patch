@@ -1,0 +1,124 @@
+From 7090fc80ff630712a90de92403190f647dd38a39 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Lisandro=20Dami=C3=A1n=20Nicanor=20P=C3=A9rez=20Meyer?=
+ <perezmeyer@gmail.com>
+Date: Sat, 15 Mar 2014 15:35:00 -0300
+Subject: [PATCH] mkspecs for AArch64 (aka arm64).
+
+Patch by Marcin Juszkiewicz <marcin@juszkiewicz.com.pl>
+licensed under either Public Domain or BSD:
+
+<https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=735488#179>
+
+Change-Id: I21f17953234cfb176bac023e52ecdc927fc5c1a9
+
+
+Upstream-Status: Pending
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+---
+ configure                                 |  3 +++
+ mkspecs/linux-g++-aarch64/qmake.conf      | 27 ++++++++++++++++++++
+ mkspecs/linux-g++-aarch64/qplatformdefs.h | 42 +++++++++++++++++++++++++++++++
+ 3 files changed, 72 insertions(+)
+ create mode 100644 mkspecs/linux-g++-aarch64/qmake.conf
+ create mode 100644 mkspecs/linux-g++-aarch64/qplatformdefs.h
+
+diff --git a/configure b/configure
+index a9ba7c8..e57d053 100755
+--- a/configure
++++ b/configure
+@@ -2808,6 +2808,9 @@ if [ "$CFG_EMBEDDED" != "no" ]; then
+             *86_64)
+                 PLATFORM=qws/linux-x86_64-g++
+                 ;;
++            aarch64)
++                PLATFORM=linux-aarch64-g++
++                ;;
+             *)
+                 PLATFORM=qws/linux-generic-g++
+                 ;;
+diff --git a/mkspecs/linux-g++-aarch64/qmake.conf b/mkspecs/linux-g++-aarch64/qmake.conf
+new file mode 100644
+index 0000000..ebc0a92
+--- /dev/null
++++ b/mkspecs/linux-g++-aarch64/qmake.conf
+@@ -0,0 +1,27 @@
++#
++# qmake configuration for linux-g++
++#
++# Written for GNU/Linux platforms that have both lib and lib64 directories,
++# like the AMD Opteron.
++#
++
++MAKEFILE_GENERATOR    = UNIX
++TARGET_PLATFORM       = unix
++TEMPLATE              = app
++CONFIG               += qt warn_on release incremental link_prl gdb_dwarf_index
++QT                   += core gui
++QMAKE_INCREMENTAL_STYLE = sublib
++
++QMAKE_CFLAGS     =
++QMAKE_LFLAGS     =
++
++QMAKE_CFLAGS_RELEASE   += -O2
++
++include(../common/linux.conf)
++include(../common/gcc-base-unix.conf)
++include(../common/g++-unix.conf)
++
++QMAKE_LIBDIR_X11      = /usr/X11R6/lib64
++QMAKE_LIBDIR_OPENGL   = /usr/X11R6/lib64
++
++load(qt_config)
+diff --git a/mkspecs/linux-g++-aarch64/qplatformdefs.h b/mkspecs/linux-g++-aarch64/qplatformdefs.h
+new file mode 100644
+index 0000000..562128b
+--- /dev/null
++++ b/mkspecs/linux-g++-aarch64/qplatformdefs.h
+@@ -0,0 +1,42 @@
++/****************************************************************************
++**
++** Copyright (C) 2012 Digia Plc and/or its subsidiary(-ies).
++** Contact: http://www.qt-project.org/legal
++**
++** This file is part of the qmake spec of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** Commercial License Usage
++** Licensees holding valid commercial Qt licenses may use this file in
++** accordance with the commercial license agreement provided with the
++** Software or, alternatively, in accordance with the terms contained in
++** a written agreement between you and Digia.  For licensing terms and
++** conditions see http://qt.digia.com/licensing.  For further information
++** use the contact form at http://qt.digia.com/contact-us.
++**
++** GNU Lesser General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU Lesser
++** General Public License version 2.1 as published by the Free Software
++** Foundation and appearing in the file LICENSE.LGPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU Lesser General Public License version 2.1 requirements
++** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Digia gives you certain additional
++** rights.  These rights are described in the Digia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU
++** General Public License version 3.0 as published by the Free Software
++** Foundation and appearing in the file LICENSE.GPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU General Public License version 3.0 requirements will be
++** met: http://www.gnu.org/copyleft/gpl.html.
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#include "../linux-g++/qplatformdefs.h"
+-- 
+2.1.0
+

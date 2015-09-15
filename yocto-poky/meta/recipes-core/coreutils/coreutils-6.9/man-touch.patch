@@ -1,0 +1,24 @@
+Upstream-Status: Inappropriate [legacy version]
+
+# man page for 'touch' is generated differently from others. All other utilities
+# are provided static man source files, while for 'touch' it requires help2man
+# to invoke "touch --help" and then convert the output into the manual. Since touch
+# is with target format which can't be invoked on build system, disable building
+# 'touch' man page here.
+#
+# Signed-off-by Kevin Tian <kevin.tian@intel.com>, 2010-08-18
+# (this patch is licensed under GPLv2)
+
+diff --git a/man/Makefile.am b/man/Makefile.am
+index 32df9d1..37b09e3 100644
+--- a/man/Makefile.am
++++ b/man/Makefile.am
+@@ -27,7 +27,7 @@ dist_man_MANS = \
+   paste.1 pathchk.1 pr.1 printenv.1 printf.1 ptx.1 pwd.1 readlink.1 \
+   rm.1 rmdir.1 seq.1 sha1sum.1 sha224sum.1 sha256sum.1 sha384sum.1 sha512sum.1 \
+   shred.1 shuf.1 sleep.1 sort.1 split.1 stat.1 \
+-  su.1 sum.1 sync.1 tac.1 tail.1 tee.1 test.1 touch.1 tr.1 true.1 tsort.1 \
++  su.1 sum.1 sync.1 tac.1 tail.1 tee.1 test.1 tr.1 true.1 tsort.1 \
+   tty.1 unexpand.1 uniq.1 unlink.1 vdir.1 wc.1 \
+   whoami.1 yes.1 $(MAN)
+ optional_mans = \

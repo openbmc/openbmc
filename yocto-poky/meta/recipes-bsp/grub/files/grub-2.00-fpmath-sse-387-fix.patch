@@ -1,0 +1,24 @@
+Upstream-Status: pending
+
+This patch fixes this configure issue for grub when -mfpmath=sse is in the gcc parameters.
+
+configure:20574: i586-poky-linux-gcc  -m32    -march=core2 -msse3 -mtune=generic -mfpmath=sse --sysroot=/usr/local/dev/yocto/grubtest2/build/tmp/sysroots/emenlow -o conftest -O2 -pipe -g -feliminate-unused-debug-types -Wall -W -Wshadow -Wpointer-arith -Wmissing-prototypes -Wundef -Wstrict-prototypes -g -falign-jumps=1 -falign-loops=1 -falign-functions=1 -mno-mmx -mno-sse -mno-sse2 -mno-3dnow -fno-dwarf2-cfi-asm -m32 -fno-stack-protector -mno-stack-arg-probe -Werror -nostdlib -Wl,--defsym,___main=0x8100  -Wall -W -I$(top_srcdir)/include -I$(top_builddir)/include  -DGRUB_MACHINE_PCBIOS=1 -DGRUB_MACHINE=I386_PC -Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed conftest.c  >&5
+conftest.c:1:0: error: SSE instruction set disabled, using 387 arithmetics [-Werror]
+cc1: all warnings being treated as errors
+
+Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+2012/04/13
+
+Index: grub-1.99/configure.ac
+===================================================================
+--- grub-1.99.orig/configure.ac
++++ grub-1.99/configure.ac
+@@ -378,7 +378,7 @@ if test "x$target_cpu" = xi386; then
+ 
+   # Some toolchains enable these features by default, but they need
+   # registers that aren't set up properly in GRUB.
+-  TARGET_CFLAGS="$TARGET_CFLAGS -mno-mmx -mno-sse -mno-sse2 -mno-3dnow"
++  TARGET_CFLAGS="$TARGET_CFLAGS -mno-mmx -mno-sse -mno-sse2 -mno-3dnow -mfpmath=387"
+ fi
+ 
+ # By default, GCC 4.4 generates .eh_frame sections containing unwind

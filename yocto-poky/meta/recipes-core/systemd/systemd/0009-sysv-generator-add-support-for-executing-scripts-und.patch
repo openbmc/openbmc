@@ -1,0 +1,143 @@
+From 8791b5b3934c55694872b6915a67340683ead91b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 20 Feb 2015 05:22:52 +0000
+Subject: [PATCH 09/11] sysv-generator: add support for executing scripts under
+ /etc/rcS.d/
+
+To be compatible, all services translated from scripts under /etc/rcS.d would
+run before services translated from scripts under /etc/rcN.d.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/sysv-generator/sysv-generator.c | 50 ++++++++++++++++++++++++++++---------
+ 1 file changed, 38 insertions(+), 12 deletions(-)
+
+diff --git a/src/sysv-generator/sysv-generator.c b/src/sysv-generator/sysv-generator.c
+index bd67f32..6756cc6 100644
+--- a/src/sysv-generator/sysv-generator.c
++++ b/src/sysv-generator/sysv-generator.c
+@@ -42,7 +42,8 @@
+ 
+ typedef enum RunlevelType {
+         RUNLEVEL_UP,
+-        RUNLEVEL_DOWN
++        RUNLEVEL_DOWN,
++        RUNLEVEL_SYSINIT
+ } RunlevelType;
+ 
+ static const struct {
+@@ -57,6 +58,9 @@ static const struct {
+         { "rc4.d",  SPECIAL_MULTI_USER_TARGET, RUNLEVEL_UP },
+         { "rc5.d",  SPECIAL_GRAPHICAL_TARGET,  RUNLEVEL_UP },
+ 
++        /* Debian style rcS.d, also adopted by OE */
++        { "rcS.d",  SPECIAL_SYSINIT_TARGET,   RUNLEVEL_SYSINIT},
++
+         /* Standard SysV runlevels for shutdown */
+         { "rc0.d",  SPECIAL_POWEROFF_TARGET,  RUNLEVEL_DOWN },
+         { "rc6.d",  SPECIAL_REBOOT_TARGET,    RUNLEVEL_DOWN }
+@@ -65,7 +69,7 @@ static const struct {
+            directories in this order, and we want to make sure that
+            sysv_start_priority is known when we first load the
+            unit. And that value we only know from S links. Hence
+-           UP must be read before DOWN */
++           UP/SYSINIT must be read before DOWN */
+ };
+ 
+ typedef struct SysvStub {
+@@ -81,6 +85,8 @@ typedef struct SysvStub {
+         char **conflicts;
+         bool has_lsb;
+         bool reload;
++        bool default_dependencies;
++        bool from_rcsd;
+ } SysvStub;
+ 
+ const char *arg_dest = "/tmp";
+@@ -183,6 +189,9 @@ static int generate_unit_file(SysvStub *s) {
+                 "Description=%s\n",
+                 s->path, s->description);
+ 
++        if (!s->default_dependencies)
++                fprintf(f, "DefaultDependencies=no\n");
++
+         if (!isempty(before))
+                 fprintf(f, "Before=%s\n", before);
+         if (!isempty(after))
+@@ -704,18 +713,30 @@ static int fix_order(SysvStub *s, Hashmap *all_services) {
+                 if (s->has_lsb && other->has_lsb)
+                         continue;
+ 
+-                if (other->sysv_start_priority < s->sysv_start_priority) {
+-                        r = strv_extend(&s->after, other->name);
++                /* All scripts under /etc/rcS.d should execute before scripts under
++                 * /etc/rcN.d */
++                if (!other->from_rcsd && s->from_rcsd) {
++                        r = strv_extend(&s->before, other->name);
+                         if (r < 0)
+                                 return log_oom();
+-                }
+-                else if (other->sysv_start_priority > s->sysv_start_priority) {
+-                        r = strv_extend(&s->before, other->name);
++                } else if (other->from_rcsd && !s->from_rcsd) {
++                        r = strv_extend(&s->after, other->name);
+                         if (r < 0)
+                                 return log_oom();
+-                }
+-                else
+-                        continue;
++                } else {
++                        if (other->sysv_start_priority < s->sysv_start_priority) {
++                                r = strv_extend(&s->after, other->name);
++                                if (r < 0)
++                                        return log_oom();
++                        }
++                        else if (other->sysv_start_priority > s->sysv_start_priority) {
++                                r = strv_extend(&s->before, other->name);
++                                if (r < 0)
++                                        return log_oom();
++                        }
++                        else
++                                continue;
++                 }
+ 
+                 /* FIXME: Maybe we should compare the name here lexicographically? */
+         }
+@@ -778,6 +799,8 @@ static int enumerate_sysv(LookupPaths lp, Hashmap *all_services) {
+                                 return log_oom();
+ 
+                         service->sysv_start_priority = -1;
++                        service->default_dependencies = true;
++                        service->from_rcsd = false;
+                         service->name = name;
+                         service->path = fpath;
+ 
+@@ -864,9 +887,11 @@ static int set_dependencies_from_rcnd(LookupPaths lp, Hashmap *all_services) {
+ 
+                                 if (de->d_name[0] == 'S')  {
+ 
+-                                        if (rcnd_table[i].type == RUNLEVEL_UP) {
++                                        if (rcnd_table[i].type == RUNLEVEL_UP || rcnd_table[i].type == RUNLEVEL_SYSINIT) {
+                                                 service->sysv_start_priority =
+                                                         MAX(a*10 + b, service->sysv_start_priority);
++                                                service->default_dependencies = (rcnd_table[i].type == RUNLEVEL_SYSINIT)?false:true;
++                                                service->from_rcsd = (rcnd_table[i].type == RUNLEVEL_SYSINIT)?true:false;
+                                         }
+ 
+                                         r = set_ensure_allocated(&runlevel_services[i], NULL);
+@@ -878,7 +903,8 @@ static int set_dependencies_from_rcnd(LookupPaths lp, Hashmap *all_services) {
+                                                 goto finish;
+ 
+                                 } else if (de->d_name[0] == 'K' &&
+-                                           (rcnd_table[i].type == RUNLEVEL_DOWN)) {
++                                           (rcnd_table[i].type == RUNLEVEL_DOWN ||
++                                            rcnd_table[i].type == RUNLEVEL_SYSINIT)) {
+ 
+                                         r = set_ensure_allocated(&shutdown_services, NULL);
+                                         if (r < 0)
+-- 
+2.1.4
+

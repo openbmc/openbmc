@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load projecttags %}
+{% load humanize %}
+{% load static %}
+{% block pagecontent %}
+
+<link rel="stylesheet" href="//code.jquery.com/qunit/qunit-1.18.0.css" />
+
+<script src="//code.jquery.com/qunit/qunit-1.18.0.js"></script>
+
+<script src="{% static 'js/layerDepsModal.js' %}"></script>
+<script src="{% static 'js/projectpage.js' %}"></script>
+
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/filtersnippet.js' %}"></script>
+<script src="{% static 'js/importlayer.js' %}"></script>
+<script src="{% static 'js/prettify.js' %}"></script>
+<script src="{% static 'js/layerBtn.js' %}"></script>
+<script src="{% static 'js/layerDepsModal.js' %}"></script>
+<script src="{% static 'js/projectpage.js' %}"></script>
+<script src="{% static 'js/layerdetails.js' %}"></script>
+<script src="{% static 'js/table.js' %}"></script>
+
+<script>
+  var tableUrl = '{% url 'projectlayers' project.pk %}';
+</script>
+
+<script src="{% static 'js/tests/test.js' %}"></script>
+
+<div id="qunit"></div>
+
+<input type="text" id="layers" placeholder="layers" ></input>
+<input type="text" id="recipes" placeholder="recipes"></input>
+<input type="text" id="projects" placeholder="projects"></input>
+<input type="text" id="machines" placeholder="machines"></input>
+
+{% endblock %}
+
+

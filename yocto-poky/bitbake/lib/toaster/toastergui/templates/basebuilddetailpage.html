@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block pagecontent %}
+
+<div class="row-fluid">
+<!-- Breadcrumbs -->
+    <div class="section">
+        <ul class="breadcrumb" id="breadcrumb">
+            <li class="muted">{{build.project.name}}:</li>
+            <li><a href="{% url 'projectbuilds' build.project.id %}">Builds</a></li>
+            <li><a href="{%url 'builddashboard' build.pk%}">{{build.target_set.all.0.target}} {%if build.target_set.all.count > 1%}(+ {{build.target_set.all.count|add:"-1"}}){%endif%} ({{build.completed_on|date:"d/m/y H:i"}})</a></li>
+            {% block localbreadcrumb %}{% endblock %}
+        </ul>
+        <script>
+        $( function () {
+            $('#breadcrumb > li').append('<span class="divider">&rarr;</span>');
+            $('#breadcrumb > li:last').addClass("active");
+            $('#breadcrumb > li:last > span, #breadcrumb > li:first > span').remove();
+        });
+        </script>
+    </div> <!--section-->
+
+        <!-- Begin container -->
+        {% block pagedetailinfomain %}{% endblock %}
+        <!-- End container -->
+
+</div>
+
+{% endblock %}

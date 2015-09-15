@@ -1,0 +1,23 @@
+Support form ARM endianness
+
+Fixes Yocto bug# 2729
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Pending
+
+Index: guile-2.0.5/module/system/base/target.scm
+===================================================================
+--- guile-2.0.5.orig/module/system/base/target.scm	2012-01-24 03:06:06.000000000 -0800
++++ guile-2.0.5/module/system/base/target.scm	2012-07-12 13:05:44.372364103 -0700
+@@ -70,7 +70,9 @@
+             ((member cpu '("sparc" "sparc64" "powerpc" "powerpc64" "spu"
+                            "mips" "mips64"))
+              (endianness big))
+-            ((string-match "^arm.*el" cpu)
++            ((string-match "^arm.*eb" cpu)
++             (endianness big))
++            ((string-match "^arm.*" cpu)
+              (endianness little))
+             (else
+              (error "unknown CPU endianness" cpu)))))

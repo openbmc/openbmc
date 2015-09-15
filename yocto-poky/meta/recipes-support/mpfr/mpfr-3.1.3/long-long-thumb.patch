@@ -1,0 +1,39 @@
+From 84021b1e236508169be65e802a9c0a25fc9a8827 Mon Sep 17 00:00:00 2001
+From: Phil Blundell <philb@gnu.org>
+Date: Mon, 27 Oct 2008 22:26:35 +0000
+Subject: [PATCH] mpfr: crusade against inline assembler
+
+Without this, build fails for thumb:
+| {standard input}: Assembler messages:
+| {standard input}:199: Error: selected processor does not support Thumb mode `umull sl,r0,r2,r1'
+| {standard input}:214: Error: selected processor does not support Thumb mode `umull sl,r2,r1,fp'
+| {standard input}:219: Error: instruction not supported in Thumb16 mode -- `adds fp,r0,sl'
+| {standard input}:220: Error: unshifted register required -- `adc r2,r2,#0'
+| {standard input}:235: Error: selected processor does not support Thumb mode `umull r0,sl,r1,r3'
+| {standard input}:244: Error: selected processor does not support Thumb mode `umull fp,ip,r1,r3'
+| {standard input}:253: Error: instruction not supported in Thumb16 mode -- `adds r3,sl,fp'
+| {standard input}:254: Error: unshifted register required -- `adc ip,ip,#0'
+| {standard input}:259: Error: instruction not supported in Thumb16 mode -- `adds sl,r1,r0'
+| {standard input}:642: Error: selected processor does not support Thumb mode `umull r0,r2,r3,r1'
+| ../arm-oe-linux-gnueabi-libtool --tag=CC   --mode=compile arm-oe-linux-gnueabi-gcc  -march=armv5te  -mthumb -mthumb-interwork  -mtune=xscale --sysroot=/OE/shr-core/tmp-eglibc/sysroots/spitz -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DTIME_WITH_SYS_TIME=1 -DHAVE_LOCALE_H=1 -DHAVE_WCHAR_H=1 -DHAVE_STDARG=1 -DHAVE_SYS_TIME_H=1 -DHAVE_ALLOCA_H=1 -DHAVE_STDINT_H=1 -DHAVE_VA_COPY=1 -DHAVE_SETLOCALE=1 -DHAVE_GETTIMEOFDAY=1 -DHAVE_LONG_LONG=1 -DHAVE_INTMAX_T=1 -DMPFR_HAVE_INTMAX_MAX=1 -DMPFR_HAVE_FESETROUND=1 -DHAVE_ROUND=1 -DHAVE_TRUNC=1 -DHAVE_FLOOR=1 -DHAVE_CEIL=1 -DHAVE_NEARBYINT=1 -DLT_OBJDIR=\".libs/\" -DHAVE_ATTRIBUTE_MODE=1 -DHAVE___GMPN_ROOTREM=1 -DHAVE___GMPN_SBPI1_DIVAPPR_Q=1 -I.     -O2 -pipe -g -feliminate-unused-debug-types -ffloat-store -c -o pow.lo pow.c
+| {standard input}:1154: Error: selected processor does not support Thumb mode `umull r0,r1,sl,ip'
+| {standard input}:1166: Error: selected processor does not support Thumb mode `umull r3,r2,ip,r0'
+| {standard input}:1171: Error: instruction not supported in Thumb16 mode -- `adds r0,r1,r3'
+| {standard input}:1172: Error: unshifted register required -- `adc r2,r2,#0'
+| make[2]: *** [mul.lo] Error 1
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
+Upstream-Status: Pending
+
+--- mpfr.old/src/mpfr-longlong.h	2008-01-01 03:29:09.000000000 +0000
++++ mpfr/src/mpfr-longlong.h	2008-10-27 21:46:44.000000000 +0000
+@@ -406,7 +406,7 @@
+ 	     "rIJ" ((USItype) (bl)))
+ #endif
+ 
+-#if defined (__arm__) && W_TYPE_SIZE == 32
++#if defined (__arm__) && W_TYPE_SIZE == 32 && !defined(__thumb__)
+ #define add_ssaaaa(sh, sl, ah, al, bh, bl) \
+   __asm__ ("adds\t%1, %4, %5\n\tadc\t%0, %2, %3"			\
+ 	   : "=r" (sh), "=&r" (sl)					\

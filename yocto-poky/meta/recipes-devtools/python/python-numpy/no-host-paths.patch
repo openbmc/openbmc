@@ -1,0 +1,57 @@
+Don't search /usr and so on for libraries by default to avoid host contamination.
+
+Upstream-Status: Inappropriate (As the code stands, this is a hack)
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/numpy/distutils/system_info.py b/numpy/distutils/system_info.py
+index bac90fb..a63d796 100644
+--- a/numpy/distutils/system_info.py
++++ b/numpy/distutils/system_info.py
+@@ -191,41 +191,12 @@ if sys.platform == 'win32':
+     default_x11_lib_dirs = []
+     default_x11_include_dirs = []
+ else:
+-    default_lib_dirs = libpaths(['/usr/local/lib', '/opt/lib', '/usr/lib',
+-                                 '/opt/local/lib', '/sw/lib'], platform_bits)
+-    default_include_dirs = ['/usr/local/include',
+-                            '/opt/include', '/usr/include',
+-                            # path of umfpack under macports
+-                            '/opt/local/include/ufsparse',
+-                            '/opt/local/include', '/sw/include',
+-                            '/usr/include/suitesparse']
+-    default_src_dirs = ['.', '/usr/local/src', '/opt/src', '/sw/src']
+-
+-    default_x11_lib_dirs = libpaths(['/usr/X11R6/lib', '/usr/X11/lib',
+-                                     '/usr/lib'], platform_bits)
+-    default_x11_include_dirs = ['/usr/X11R6/include', '/usr/X11/include',
+-                                '/usr/include']
+-
+-    if os.path.exists('/usr/lib/X11'):
+-        globbed_x11_dir = glob('/usr/lib/*/libX11.so')
+-        if globbed_x11_dir:
+-            x11_so_dir = os.path.split(globbed_x11_dir[0])[0]
+-            default_x11_lib_dirs.extend([x11_so_dir, '/usr/lib/X11'])
+-            default_x11_include_dirs.extend(['/usr/lib/X11/include',
+-                                             '/usr/include/X11'])
+-
+-    import subprocess as sp
+-    try:
+-        p = sp.Popen(["gcc", "-print-multiarch"], stdout=sp.PIPE,
+-                stderr=open(os.devnull, 'w'))
+-    except OSError:
+-        pass # gcc is not installed
+-    else:
+-        triplet = str(p.communicate()[0].decode().strip())
+-        if p.returncode == 0:
+-            # gcc supports the "-print-multiarch" option
+-            default_x11_lib_dirs += [os.path.join("/usr/lib/", triplet)]
+-            default_lib_dirs += [os.path.join("/usr/lib/", triplet)]
++    default_lib_dirs = libpaths(['/deadir/lib'], platform_bits)
++    default_include_dirs = ['/deaddir/include']
++    default_src_dirs = ['.', '/deaddir/src']
++
++    default_x11_lib_dirs = libpaths(['/deaddir/lib'], platform_bits)
++    default_x11_include_dirs = ['/deaddir/include']
+ 
+ if os.path.join(sys.prefix, 'lib') not in default_lib_dirs:
+     default_lib_dirs.insert(0, os.path.join(sys.prefix, 'lib'))

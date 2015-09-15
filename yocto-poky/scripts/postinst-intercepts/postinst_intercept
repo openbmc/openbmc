@@ -1,0 +1,56 @@
+#!/bin/sh
+#
+# This script is called from inside postinstall scriptlets at do_rootfs time. It
+# actually adds, at the end, the list of packages for which the intercept script
+# is valid. Also, if one wants to pass any variables to the intercept script from
+# the postinstall itself, they will be added immediately after the shebang line.
+#
+# Usage: postinst_intercept <intercept_script_name> <package_name> <mlprefix=...> <var1=...> ... <varN=...>
+#  * intercept_script_name - the name of the intercept script we want to change;
+#  * package_name - add the package_name to list of packages the intercept script
+#                   is used for;
+#  * mlprefix=... - this one is needed in order to have separate hooks for multilib.
+#  * var1=... - var1 will have the value we provide in the intercept script. This
+#               is useful when we want to pass on variables like ${libdir} to
+#               the intercept script;
+#
+[ $# -lt 3 ] && exit 1
+
+intercept_script=$INTERCEPT_DIR/$1 && shift
+package_name=$1 && shift
+mlprefix=$(echo $1 |sed -ne "s/^mlprefix=\(.*\)-/\1/p") && shift
+
+# if the hook we want to install does not exist, then there's nothing we can do
+[ -f "$intercept_script" ] || exit 1
+
+# if the postinstall wanting to install the hook belongs to a multilib package,
+# then we'd better have a separate hook for this because the default ${libdir} and
+# ${base_libdir} will point to the wrong locations
+if [ -n "$mlprefix" ]; then
+	ml_intercept_script=$intercept_script-$mlprefix
+	# if the multilib hook does not exist, create it from the default one
+	if [ ! -f "$ml_intercept_script" ]; then
+		cp $intercept_script $ml_intercept_script
+
+		# clear the ##PKGS: line and the already set variables
+		[ -x "$ml_intercept_script" ] && sed -i -e "2,$(($#+1)) {/.*/d}" -e "/^##PKGS: .*/d" $ml_intercept_script
+	fi
+
+	intercept_script=$ml_intercept_script
+fi
+
+chmod +x "$intercept_script"
+
+pkgs_line=$(grep "##PKGS:" $intercept_script)
+if [ -n "$pkgs_line" ]; then
+	# line exists, add this package to the list only if it's not already there
+	if [ -z "$(echo "$pkgs_line" | grep " $package_name ")" ]; then
+		sed -i -e "s/##PKGS:.*/\0${package_name} /" $intercept_script
+	fi
+else
+	for var in "$@"; do
+		sed -i -e "\%^#\!/bin/.*sh%a $var" $intercept_script
+	done
+	echo "##PKGS: ${package_name} " >> $intercept_script
+fi
+

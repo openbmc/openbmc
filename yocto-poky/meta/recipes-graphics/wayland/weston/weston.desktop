@@ -1,0 +1,9 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Name=Weston
+Comment=Wayland Compostitor
+Exec=weston
+Icon=weston
+Terminal=false
+Categories=Utility;

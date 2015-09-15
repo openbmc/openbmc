@@ -1,0 +1,24 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          single
+# Required-Start:    $local_fs $all killprocs
+# Required-Stop:
+# Default-Start:     1
+# Default-Stop:
+# Short-Description: executed by init(8) upon entering runlevel 1 (single).
+### END INIT INFO
+
+PATH="/sbin:/bin:/usr/sbin:/usr/bin"
+
+# Kill all processes.
+echo "Sending all processes the TERM signal..."
+killall5 -15
+sleep 5
+echo "Sending all processes the KILL signal..."
+killall5 -9
+
+# We start update here, since we just killed it.
+test -x /sbin/update && update
+
+echo "Entering single-user mode..."
+exec init -t1 S

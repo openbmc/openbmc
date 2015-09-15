@@ -1,0 +1,118 @@
+Use pkg-config to find gcrypt and libxml2.
+
+Upstream-Status: Pending [libxml2 is upstreamable]
+
+RP 2014/5/22
+
+Index: libxslt-1.1.28/configure.in
+===================================================================
+--- libxslt-1.1.28.orig/configure.in	2014-05-13 16:46:02.278474967 +0000
++++ libxslt-1.1.28/configure.in	2014-05-13 16:53:56.510472561 +0000
+@@ -376,6 +376,8 @@
+ AC_SUBST(PYTHON_SUBDIR)
+ AC_SUBST(PYTHON_LIBS)
+ 
++PKG_PROG_PKG_CONFIG
++
+ AC_ARG_WITH(crypto, [  --with-crypto           Add crypto support to exslt (on)])
+ WITH_CRYPTO=0
+ if test "$with_crypto" = "no" ; then
+@@ -391,26 +393,13 @@
+     WITH_CRYPTO=1
+     ;;
+   *)
+-    AC_PATH_PROG(LIBGCRYPT_CONFIG, libgcrypt-config, no)
+-    if test "$LIBGCRYPT_CONFIG" != "no" ; then
+-      LIBGCRYPT_VERSION=`$LIBGCRYPT_CONFIG --version`
+-      if test VERSION_TO_NUMBER(echo $LIBGCRYPT_VERSION) -lt VERSION_TO_NUMBER(echo "1.1.42")
+-      then
+-        LIBGCRYPT_CFLAGS=""
+-        LIBGCRYPT_LIBS=""
+-        echo 'gcrypt library version < 1.1.42 - Crypto extensions will not be available.'
+-      else
+-        LIBGCRYPT_CFLAGS=`$LIBGCRYPT_CONFIG $libgcrypt_config_args --cflags`
+-        LIBGCRYPT_LIBS=`$LIBGCRYPT_CONFIG $libgcrypt_config_args --libs`
+-        AC_DEFINE(HAVE_GCRYPT, 1, [Define if gcrypt library is available.])
+-        echo 'Crypto extensions will be available.'
++    PKG_CHECK_MODULES(LIBGCRYPT, [libgcrypt >= 1.1.42], [
++          AC_DEFINE(HAVE_GCRYPT, 1, [Define if gcrypt library is available.])
++          echo 'Crypto extensions will be available.'
+ 		WITH_CRYPTO=1
+-      fi
+-    else
+-      LIBGCRYPT_CFLAGS=""
+-      LIBGCRYPT_LIBS=""
+-      echo 'Crypto extensions will not be available. Install libgcrypt and reconfigure to make available.'
+-    fi
++	], [
++          echo 'Crypto extensions will not be available. Install libgcrypt >= 1.1.42 and reconfigure to make available.'
++        ])
+ esac
+ fi
+ AC_SUBST(WITH_CRYPTO)
+@@ -471,24 +460,8 @@
+ dnl some tweaking - David Härdeman 30/10/2001
+ dnl
+ 
+-LIBXML_CONFIG_PREFIX=""
+ LIBXML_SRC=""
+ 
+-AC_ARG_WITH(libxml-prefix,
+-        [  --with-libxml-prefix=[PFX]		Specify location of libxml config],
+-	LIBXML_CONFIG_PREFIX=$withval
+-)
+-        
+-AC_ARG_WITH(libxml-include-prefix,
+-        [  --with-libxml-include-prefix=[PFX]	Specify location of libxml headers],
+-        LIBXML_CFLAGS="-I$withval"
+-)
+-
+-AC_ARG_WITH(libxml-libs-prefix,
+-        [  --with-libxml-libs-prefix=[PFX]	Specify location of libxml libs],
+-        LIBXML_LIBS="-L$withval"
+-)
+-
+ AC_ARG_WITH(libxml-src,
+ 	[  --with-libxml-src=[DIR]              For libxml thats not installed yet (sets all three above)],
+ 	LIBXML_SRC="$withval"
+@@ -551,28 +524,9 @@
+ 	fi
+ fi
+ 
+-dnl
+-dnl make sure xml2-config is executable,
+-dnl test version and init our variables
+-dnl
+-
+-if ${XML_CONFIG} --libs print > /dev/null 2>&1
+-then
+-	XMLVERS=`$XML_CONFIG --version`
+-	if test VERSION_TO_NUMBER(echo $XMLVERS) -ge VERSION_TO_NUMBER(echo $LIBXML_REQUIRED_VERSION)
+-	then
+-		AC_MSG_RESULT($XMLVERS found)
+-	else
+-		AC_MSG_ERROR(Version $XMLVERS found. You need at least libxml2 $LIBXML_REQUIRED_VERSION for this version of libxslt)
+-	fi
+-	LIBXML_LIBS="$LIBXML_LIBS `$XML_CONFIG --libs`"
+-	if test "x$LIBXML_SRC" = "x"; then
+-		LIBXML_CFLAGS="$LIBXML_CFLAGS `$XML_CONFIG --cflags`"
+-	fi
+-else
+-	AC_MSG_ERROR([Could not find libxml2 anywhere, check ftp://xmlsoft.org/.])
+-fi
+-
++PKG_CHECK_MODULES(LIBXML, [libxml-2.0 >= $LIBXML_REQUIRED_VERSION],,
++    [AC_MSG_ERROR([Could not find libxml-2.0 >= $LIBXML_REQUIRED_VERSION anywhere, check ftp://xmlsoft.org/.])]
++)
+ 
+ AC_SUBST(CFLAGS)
+ AC_SUBST(CPPFLAGS)
+@@ -597,7 +551,7 @@
+ 
+ if test "$with_plugins" = "yes" ; then
+   AC_MSG_CHECKING([libxml2 module support])
+-  WITH_MODULES="`$XML_CONFIG --modules`"
++  WITH_MODULES="`$PKG_CONFIG --variable=modules libxml-2.0`"
+   if test "${WITH_MODULES}" = "1"; then
+     AC_MSG_RESULT(yes)
+   else

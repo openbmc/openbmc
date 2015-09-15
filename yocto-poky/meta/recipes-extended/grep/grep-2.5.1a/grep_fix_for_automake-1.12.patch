@@ -1,0 +1,52 @@
+Upstream-Status: Pending
+
+automake 1.12 has depricated automatic de-ANSI-fication support
+
+this patch avoids these kinds of errors:
+
+| configure.in:33: error: automatic de-ANSI-fication support has been removed
+| /srv/home/nitin/builds/build-gcc47/tmp/sysroots/x86_64-linux/usr/share/aclocal-1.12/protos.m4:12: AM_C_PROTOTYPES is expanded from...
+| configure.in:33: the top level
+| autom4te: m4 failed with exit status: 1
+...
+| lib/Makefile.am:2: error: automatic de-ANSI-fication support has been removed
+| src/Makefile.am:2: error: automatic de-ANSI-fication support has been removed
+| autoreconf: automake failed with exit status: 1
+
+Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+2012/05/04
+
+Index: grep-2.5.1a/configure.in
+===================================================================
+--- grep-2.5.1a.orig/configure.in
++++ grep-2.5.1a/configure.in
+@@ -30,7 +30,6 @@ AC_PROG_RANLIB
+ 
+ dnl Checks for typedefs, structures, and compiler characteristics.
+ AC_SYS_LARGEFILE
+-AM_C_PROTOTYPES
+ AC_TYPE_SIZE_T
+ AC_CHECK_TYPE(ssize_t, int)
+ AC_C_CONST
+Index: grep-2.5.1a/lib/Makefile.am
+===================================================================
+--- grep-2.5.1a.orig/lib/Makefile.am
++++ grep-2.5.1a/lib/Makefile.am
+@@ -1,5 +1,5 @@
+ #
+-AUTOMAKE_OPTIONS = ../src/ansi2knr
++AUTOMAKE_OPTIONS = 
+ 
+ SUBDIRS = posix
+ 
+Index: grep-2.5.1a/src/Makefile.am
+===================================================================
+--- grep-2.5.1a.orig/src/Makefile.am
++++ grep-2.5.1a/src/Makefile.am
+@@ -1,5 +1,5 @@
+ ## Process this file with automake to create Makefile.in
+-AUTOMAKE_OPTIONS = ansi2knr no-dependencies
++AUTOMAKE_OPTIONS = no-dependencies
+ 
+ LN = ln
+ 

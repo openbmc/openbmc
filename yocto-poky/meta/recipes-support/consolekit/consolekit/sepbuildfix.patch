@@ -1,0 +1,19 @@
+Fix builds in the case of seprate source from the build directory.
+
+RP 2013/4/17
+
+Upstream-Status: Pending
+
+Index: pam-ck-connector/Makefile.am
+===================================================================
+--- consolekit/pam-ck-connector.orig/Makefile.am	2010-09-03 13:54:31.000000000 +0000
++++ consolekit/pam-ck-connector/Makefile.am	2013-04-17 09:06:49.093524918 +0000
+@@ -4,7 +4,7 @@
+ 
+ INCLUDES = 					\
+ 	$(LIBDBUS_CFLAGS)			\
+-	-I$(top_builddir)/libck-connector	\
++	-I$(top_srcdir)/libck-connector	\
+ 	$(NULL)
+ 
+ pamlibdir = $(PAM_MODULE_DIR)

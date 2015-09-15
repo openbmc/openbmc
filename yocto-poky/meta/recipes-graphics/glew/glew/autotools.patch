@@ -1,0 +1,149 @@
+
+Upstream-Status: Inappropriate [configuration]
+
+Index: glew/Makefile.am
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ glew/Makefile.am	2009-12-02 00:30:23.296641663 +0100
+@@ -0,0 +1,5 @@
++
++ACLOCAL_AMFLAGS = -I m4 --install
++
++SUBDIRS = include src
++
+Index: glew/configure.ac
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ glew/configure.ac	2009-12-02 00:30:23.296641663 +0100
+@@ -0,0 +1,67 @@
++#                                               -*- Autoconf -*-
++# Process this file with autoconf to produce a configure script.
++
++AC_PREREQ([2.62])
++AC_INIT([glew], [1.9.0], [BUG-REPORT-ADDRESS])
++AC_CONFIG_SRCDIR([src/glew.c])
++AC_CONFIG_HEADERS([config.h])
++AM_INIT_AUTOMAKE([-Wall -Werror foreign])
++AC_CONFIG_MACRO_DIR([m4])
++
++LT_INIT
++
++# Checks for programs.
++AC_PROG_CC
++AC_PROG_INSTALL
++AC_PROG_LN_S
++
++# Checks for libraries.
++
++# Checks for header files.
++AC_CHECK_HEADERS([inttypes.h stddef.h stdint.h stdlib.h string.h])
++
++# Checks for typedefs, structures, and compiler characteristics.
++AC_TYPE_INT32_T
++AC_TYPE_INT64_T
++AC_TYPE_UINT64_T
++AC_CHECK_TYPES([ptrdiff_t])
++
++# Checks for library functions.
++AC_FUNC_MALLOC
++AC_CHECK_FUNCS([strtol])
++
++# Check for pkgconfig libs
++
++PKG_CHECK_MODULES([X11], [x11])
++AC_SUBST([X11_LIBS])
++AC_SUBST([X11_CFLAGS])
++
++PKG_CHECK_MODULES([XMU], [xmu])
++AC_SUBST([XMU_LIBS])
++AC_SUBST([XMU_CFLAGS])
++
++PKG_CHECK_MODULES([XI], [xi])
++AC_SUBST([XI_LIBS])
++AC_SUBST([XI_CFLAGS])
++
++PKG_CHECK_MODULES([XEXT], [xext])
++AC_SUBST([XEXT_LIBS])
++AC_SUBST([XEXT_CFLAGS])
++
++# Check for GLU is enough and imples gl so no doubled -lGL in LDFLAGS
++PKG_CHECK_MODULES([GLU], [glu])
++AC_SUBST([GLU_LIBS])
++AC_SUBST([GLU_CFLAGS])
++
++# ENABLE option for Multiple Rendering Contexts support
++AC_CHECK_ENABLE_GLEWMX
++
++# for now we use the same version as the package, but that should be avoided
++# in the future
++
++AC_SUBST([LIBGLEW_SO_VERSION], [1:9:0])
++
++AC_CONFIG_FILES([Makefile
++                 include/Makefile
++                 src/Makefile])
++AC_OUTPUT
+Index: glew/src/Makefile.am
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ glew/src/Makefile.am	2009-12-02 00:33:48.690786110 +0100
+@@ -0,0 +1,35 @@
++
++AM_CPPFLAGS = -I$(top_srcdir)/include
++
++if ENABLE_GLEWMX
++AM_CPPFLAGS += -DGLEW_MX
++endif
++
++AM_CFLAGS = @X11_CFLAGS@ \
++            @XMU_CFLAGS@ \
++            @XI_CFLAGS@ \
++            @XEXT_CFLAGS@ \
++            @GLU_CFLAGS@
++
++lib_LTLIBRARIES = libGLEW.la
++
++libGLEW_la_SOURCES = glew.c
++
++libGLEW_la_LIBADD = @X11_LIBS@ \
++                    @XMU_LIBS@ \
++                    @XI_LIBS@ \
++                    @XEXT_LIBS@ \
++                    @GLU_LIBS@
++
++libGLEW_la_LDFLAGS = -version-number @LIBGLEW_SO_VERSION@
++
++bin_PROGRAMS = glewinfo visualinfo
++
++glewinfo_SOURCES = glewinfo.c
++
++glewinfo_LDADD = libGLEW.la
++
++visualinfo_SOURCES =  visualinfo.c
++
++visualinfo_LDADD = libGLEW.la
++
+Index: glew/m4/glewmx.m4
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ glew/m4/glewmx.m4	2009-12-02 00:30:23.296641663 +0100
+@@ -0,0 +1,11 @@
++
++AC_DEFUN([AC_CHECK_ENABLE_GLEWMX],[
++AC_MSG_CHECKING([whether to include Multiple Rendering Contexts support])
++AC_ARG_ENABLE([glewmx],
++   [AS_HELP_STRING([--enable-glewmx], [enable GLEW Multiple Rendering Contexts (default is no)])],
++   [ENABLE_GLEWMX="$enableval"],
++   [ENABLE_GLEWMX="no"])
++AC_MSG_RESULT([${ENABLE_GLEWMX}])
++AM_CONDITIONAL([ENABLE_GLEWMX], [test x"${ENABLE_GLEWMX}" = "xyes"])
++])
++
+Index: glew/include/Makefile.am
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ glew/include/Makefile.am	2009-12-02 00:30:23.296641663 +0100
+@@ -0,0 +1,3 @@
++
++nobase_include_HEADERS = GL/glew.h  GL/glxew.h  GL/wglew.h
++

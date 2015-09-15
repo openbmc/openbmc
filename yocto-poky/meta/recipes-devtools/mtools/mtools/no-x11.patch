@@ -1,0 +1,21 @@
+---
+ Makefile.in |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Upstream-Status: Inappropriate [licensing]
+
+--- mtools-3.9.9.orig/Makefile.in
++++ mtools-3.9.9/Makefile.in
+@@ -128,11 +128,11 @@ X_EXTRA_LIBS = @X_EXTRA_LIBS@
+ X_PRE_LIBS = @X_PRE_LIBS@
+ CFLAGS = $(CPPFLAGS) $(DEFS) $(MYCFLAGS) -I. @extraincludedir@ -I@srcdir@ $(USERCFLAGS) 
+ CXXFLAGS  = $(CPPFLAGS) $(DEFS) $(MYCXXFLAGS) -I. @extraincludedir@ -I@srcdir@ $(USERCFLAGS) 
+ LINK      = $(CC) $(LDFLAGS) $(USERLDFLAGS) @extralibdir@
+ ALLLIBS   = $(USERLDLIBS) $(MACHDEPLIBS) $(SHLIB) $(LIBS)
+-X_LDFLAGS = $(X_EXTRA_LIBS) $(X_LIBS) $(X_PRE_LIBS) -lXau -lX11 $(LIBS) 
++X_LDFLAGS = $(X_EXTRA_LIBS) $(X_LIBS) $(X_PRE_LIBS) $(LIBS)
+ X_CCFLAGS = $(X_CFLAGS) $(CFLAGS)
+ 
+ all:    mtools $(LINKS) mkmanifest @FLOPPYD@
+ 
+ %.o: %.c

@@ -1,0 +1,28 @@
+Upstream-Status: Pending
+
+Fix to handle priority numbers correctly.
+Previously, if the priority number is '08' or '09', for example,
+the script cannot handle them correctly as these numbers are treated
+as octal numbers.
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ update-rc.d |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/update-rc.d b/update-rc.d
+index ec50d15..c70b859 100644
+--- a/update-rc.d
++++ b/update-rc.d
+@@ -205,7 +205,7 @@ case $1 in
+ 				exit 1
+ 			fi
+ 			shift
+-			NN=`printf %02d $1`
++			NN=`printf %02d $(expr $1 + 0)`
+ 			shift
+ 			while [ "x$1" != "x." ]; do
+ 				if [ $# -eq 0 ]; then
+-- 
+1.7.9.5
+

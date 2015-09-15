@@ -1,0 +1,22 @@
+Allow docs to build with makeinfo 5.X, fixing the error:
+
+doc/make.texi:8165: @itemx must follow @item
+
+Upstream-Status: Backport
+
+RP
+2014/03/29
+
+Index: make-3.81/doc/make.texi
+===================================================================
+--- make-3.81.orig/doc/make.texi	2006-04-01 06:36:40.000000000 +0000
++++ make-3.81/doc/make.texi	2014-03-29 09:39:51.007727012 +0000
+@@ -8162,7 +8162,7 @@
+ rarely need to specify this option since @samp{make} does it for you;
+ see @ref{-w Option, ,The @samp{--print-directory} Option}.)
+ 
+-@itemx --no-print-directory
++@item --no-print-directory
+ @cindex @code{--no-print-directory}
+ Disable printing of the working directory under @code{-w}.
+ This option is useful when @code{-w} is turned on automatically,

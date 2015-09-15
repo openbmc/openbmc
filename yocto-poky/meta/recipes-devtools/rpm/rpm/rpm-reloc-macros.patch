@@ -1,0 +1,31 @@
+macros: Use dyanmic config vs hard coded settings
+
+When the dynamic, runtime relocation is enables we need to make sure that the 
+RPM macro file does not override the dynamic settings.  Fix this by forcing the
+dynamic version to be used in all cases.
+
+Upstream-Status: Inappropriate (OpenEmbedded specific)
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.14/macros/macros.in
+===================================================================
+--- rpm-5.4.14.orig/macros/macros.in
++++ rpm-5.4.14/macros/macros.in
+@@ -27,11 +27,12 @@
+ #==============================================================================
+ # ---- filesystem macros.
+ #
+-%_usr			@usrprefix@
++%_usr			%{_usrlibrpm}/../..
+ %_usrsrc		%{_usr}/src
+-%_var			@varprefix@
+-%_usrlibrpm		@USRLIBRPM@
+-%_etcrpm		@SYSCONFIGDIR@
++%_var			%{_usr}/../var
++# The dynamic relocation code sets the following two items
++#%_usrlibrpm		@USRLIBRPM@
++#%_etcrpm		@SYSCONFIGDIR@
+ 
+ %__objext		@objext@
+ %__libext		@libext@

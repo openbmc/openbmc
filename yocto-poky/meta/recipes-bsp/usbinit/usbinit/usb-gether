@@ -1,0 +1,23 @@
+#! /bin/sh
+#
+# usb-ether 	Start up the gadget usb ethernet interface.
+#
+
+case "$1" in
+	start|"")
+		test "$VERBOSE" != no && echo "Initializing g_ether gadget..."
+		modprobe g_ether
+		ifup usb0
+		;;
+	stop)
+		test "$VERBOSE" != no && echo "Disabling g_ether..."
+		ifdown usb0
+		rmmod g_ether
+		;;
+	*)
+		echo "Usage: usb-ether {start|stop}" >&2
+		exit 1
+		;;
+esac
+
+exit 0

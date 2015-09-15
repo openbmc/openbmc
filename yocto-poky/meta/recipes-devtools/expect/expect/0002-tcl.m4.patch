@@ -1,0 +1,17 @@
+Use proper -L path when cross compiling.
+
+Signed-off-by: Anders Roxell <anders.roxell@enea.com>
+Upstream-Status: Pending
+---
+diff -uNr a/tclconfig/tcl.m4 b/tclconfig/tcl.m4
+--- a/tclconfig/tcl.m4	2012-12-14 09:16:58.789861281 +0100
++++ b/tclconfig/tcl.m4	2012-12-14 10:55:43.542297010 +0100
+@@ -371,7 +371,7 @@
+     # of TCL_BUILD_LIB_SPEC. An extension should make use of TCL_LIB_SPEC
+     # instead of TCL_BUILD_LIB_SPEC since it will work with both an
+     # installed and uninstalled version of Tcl.
+-    if test -f "${TCL_BIN_DIR}/Makefile" ; then
++    if test -f "${TCL_BIN_DIR}/Makefile" || test "$cross_compiling" = yes; then
+         TCL_LIB_SPEC="${TCL_BUILD_LIB_SPEC}"
+         TCL_STUB_LIB_SPEC="${TCL_BUILD_STUB_LIB_SPEC}"
+         TCL_STUB_LIB_PATH="${TCL_BUILD_STUB_LIB_PATH}"

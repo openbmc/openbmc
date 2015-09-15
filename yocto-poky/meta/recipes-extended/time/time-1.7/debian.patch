@@ -1,0 +1,1301 @@
+Upstream-Status: Backport
+
+--- time-1.7.orig/configure.in
++++ time-1.7/configure.in
+@@ -1,11 +1,8 @@
+ dnl Process this file with autoconf to produce a configure script.
+ AC_INIT(time.c)
+-VERSION=1.7
+-AC_SUBST(VERSION)
+-PACKAGE=time
+-AC_SUBST(PACKAGE)
++AM_INIT_AUTOMAKE(time, 1.7)
+ 
+-AC_ARG_PROGRAM
++AM_MAINTAINER_MODE
+ 
+ dnl Checks for programs.
+ AC_PROG_CC
+@@ -15,7 +12,7 @@
+ dnl Checks for header files.
+ AC_HEADER_STDC
+ AC_HEADER_SYS_WAIT
+-AC_CHECK_HEADERS(unistd.h string.h sys/rusage.h)
++AC_CHECK_HEADERS(unistd.h string.h sys/rusage.h sys/resource.h)
+ 
+ dnl Checks for typedefs, structures, and compiler characteristics.
+ AC_C_CONST
+--- time-1.7.orig/version.texi
++++ time-1.7/version.texi
+@@ -1,3 +1,3 @@
+-@set UPDATED 12 June 1996
++@set UPDATED 9 May 2002
+ @set EDITION 1.7
+ @set VERSION 1.7
+--- time-1.7.orig/time.c
++++ time-1.7/time.c
+@@ -147,6 +147,10 @@
+   NULL
+ };
+ 
++
++/* If true, do not show the exit message */
++static boolean quiet;
++
+ /* If true, show an English description next to each statistic.  */
+ static boolean verbose;
+ 
+@@ -172,6 +176,7 @@
+   {"help", no_argument, NULL, 'h'},
+   {"output-file", required_argument, NULL, 'o'},
+   {"portability", no_argument, NULL, 'p'},
++  {"quiet", no_argument,NULL, 'q'},
+   {"verbose", no_argument, NULL, 'v'},
+   {"version", no_argument, NULL, 'V'},
+   {NULL, no_argument, NULL, 0}
+@@ -333,7 +338,8 @@
+   else if (WIFSIGNALED (resp->waitstatus))
+     fprintf (fp, "Command terminated by signal %d\n",
+ 	     WTERMSIG (resp->waitstatus));
+-  else if (WIFEXITED (resp->waitstatus) && WEXITSTATUS (resp->waitstatus))
++  else if (WIFEXITED (resp->waitstatus) && WEXITSTATUS (resp->waitstatus)
++	   && !quiet)
+     fprintf (fp, "Command exited with non-zero status %d\n",
+ 	     WEXITSTATUS (resp->waitstatus));
+ 
+@@ -523,6 +529,7 @@
+   char *format;			/* Format found in environment.  */
+ 
+   /* Initialize the option flags.  */
++  quiet = false;
+   verbose = false;
+   outfile = NULL;
+   outfp = stderr;
+@@ -536,7 +543,7 @@
+   if (format)
+     output_format = format;
+ 
+-  while ((optc = getopt_long (argc, argv, "+af:o:pvV", longopts, (int *) 0))
++  while ((optc = getopt_long (argc, argv, "+af:o:pqvV", longopts, (int *) 0))
+ 	 != EOF)
+     {
+       switch (optc)
+@@ -555,6 +562,9 @@
+ 	case 'p':
+ 	  output_format = posix_format;
+ 	  break;
++	case 'q':
++	  quiet = true;
++	  break;
+ 	case 'v':
+ 	  verbose = true;
+ 	  break;
+@@ -642,9 +652,9 @@
+   fflush (outfp);
+ 
+   if (WIFSTOPPED (res.waitstatus))
+-    exit (WSTOPSIG (res.waitstatus));
++    exit (WSTOPSIG (res.waitstatus) + 128);
+   else if (WIFSIGNALED (res.waitstatus))
+-    exit (WTERMSIG (res.waitstatus));
++    exit (WTERMSIG (res.waitstatus) + 128);
+   else if (WIFEXITED (res.waitstatus))
+     exit (WEXITSTATUS (res.waitstatus));
+ }
+@@ -657,7 +667,7 @@
+   fprintf (stream, "\
+ Usage: %s [-apvV] [-f format] [-o file] [--append] [--verbose]\n\
+        [--portability] [--format=format] [--output=file] [--version]\n\
+-       [--help] command [arg...]\n",
++       [--quiet] [--help] command [arg...]\n",
+ 	   program_name);
+   exit (status);
+ }
+--- time-1.7.orig/resuse.h
++++ time-1.7/resuse.h
+@@ -36,19 +36,8 @@
+ # include <sys/rusage.h>
+ #else
+ # define TV_MSEC tv_usec / 1000
+-# if HAVE_WAIT3
++# if HAVE_SYS_RESOURCE_H
+ #  include <sys/resource.h>
+-# else
+-/* Process resource usage structure.  */
+-struct rusage
+-{
+-  struct timeval ru_utime;	/* User time used.  */
+-  struct timeval ru_stime;	/* System time used.  */
+-  int ru_maxrss, ru_ixrss, ru_idrss, ru_isrss,
+-  ru_minflt, ru_majflt, ru_nswap, ru_inblock, 
+-  ru_oublock, ru_msgsnd, ru_msgrcv, ru_nsignals,
+-  ru_nvcsw, ru_nivcsw;
+-};
+ # endif
+ #endif
+ 
+--- time-1.7.orig/time.texi
++++ time-1.7/time.texi
+@@ -11,6 +11,12 @@
+ @finalout
+ @end iftex
+ 
++@dircategory Individual utilities
++@direntry
++* time: (time).                     Run programs and summarize
++                                    system resource usage.
++@end direntry
++
+ @ifinfo
+ This file documents the the GNU @code{time} command for running programs
+ and summarizing the system resources they use.
+@@ -185,6 +191,10 @@
+ sys %S
+ @end example
+ 
++@item -q
++@itemx --quiet
++Suppress non-zero error code from the executed program.
++
+ @item -v
+ @itemx --verbose
+ @cindex format
+--- time-1.7.orig/time.info
++++ time-1.7/time.info
+@@ -1,5 +1,10 @@
+-This is Info file ./time.info, produced by Makeinfo-1.55 from the input
+-file time.texi.
++This is time.info, produced by makeinfo version 4.1 from time.texi.
++
++INFO-DIR-SECTION Individual utilities
++START-INFO-DIR-ENTRY
++* time: (time).                     Run programs and summarize
++                                    system resource usage.
++END-INFO-DIR-ENTRY
+ 
+    This file documents the the GNU `time' command for running programs
+ and summarizing the system resources they use.
+@@ -31,7 +36,7 @@
+ 
+ * Resource Measurement::  Measuring program resource use.
+ 
+- -- The Detailed Node Listing --
++ --- The Detailed Node Listing ---
+ 
+ Measuring Program Resource Use
+ 
+@@ -58,14 +63,14 @@
+    The `time' command runs another program, then displays information
+ about the resources used by that program, collected by the system while
+ the program was running.  You can select which information is reported
+-and the format in which it is shown (*note Setting Format::.), or have
++and the format in which it is shown (*note Setting Format::), or have
+ `time' save the information in a file instead of displaying it on the
+-screen (*note Redirecting::.).
++screen (*note Redirecting::).
+ 
+    The resources that `time' can report on fall into the general
+ categories of time, memory, and I/O and IPC calls.  Some systems do not
+ provide much information about program resource use; `time' reports
+-unavailable information as zero values (*note Accuracy::.).
++unavailable information as zero values (*note Accuracy::).
+ 
+    The format of the `time' command is:
+ 
+@@ -132,6 +137,10 @@
+           user %U
+           sys %S
+ 
++`-q'
++`--quiet'
++     Suppress non-zero error code from the executed program.
++
+ `-v'
+ `--verbose'
+      Use the built-in verbose format, which displays each available
+@@ -174,7 +183,7 @@
+    The resource specifiers, which are a superset of those recognized by
+ the `tcsh' builtin `time' command, are listed below.  Not all resources
+ are measured by all versions of Unix, so some of the values might be
+-reported as zero (*note Accuracy::.).
++reported as zero (*note Accuracy::).
+ 
+ * Menu:
+ 
+@@ -308,11 +317,11 @@
+ `-o FILE'
+ `--output=FILE'
+      Write the resource use statistics to FILE.  By default, this
+-     *overwrites* the file, destroying the file's previous contents.
++     _overwrites_ the file, destroying the file's previous contents.
+ 
+ `-a'
+ `--append'
+-     *Append* the resource use information to the output file instead
++     _Append_ the resource use information to the output file instead
+      of overwriting it.  This option is only useful with the `-o' or
+      `--output' option.
+ 
+@@ -437,7 +446,7 @@
+ 
+ `-a'
+ `--append'
+-     *Append* the resource use information to the output file instead
++     _Append_ the resource use information to the output file instead
+      of overwriting it.
+ 
+ `-f FORMAT'
+@@ -462,17 +471,17 @@
+ 
+ 
+ Tag Table:
+-Node: Top934
+-Node: Resource Measurement1725
+-Node: Setting Format3678
+-Node: Format String4907
+-Node: Time Resources6214
+-Node: Memory Resources6844
+-Node: I/O Resources7549
+-Node: Command Info8747
+-Node: Redirecting8964
+-Node: Examples9754
+-Node: Accuracy12064
+-Node: Invoking time13586
++Node: Top1115
++Node: Resource Measurement1908
++Node: Setting Format3858
++Node: Format String5164
++Node: Time Resources6470
++Node: Memory Resources7100
++Node: I/O Resources7805
++Node: Command Info9003
++Node: Redirecting9220
++Node: Examples10010
++Node: Accuracy12320
++Node: Invoking time13842
+ 
+ End Tag Table
+--- time-1.7.orig/time.html
++++ time-1.7/time.html
+@@ -0,0 +1,1021 @@
++<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
++                      "http://www.w3.org/TR/html40/loose.dtd">
++<HTML>
++<!-- Created on September, 1 2003 by texi2html 1.66 -->
++<!--
++Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
++            Karl Berry  <karl@freefriends.org>
++            Olaf Bachmann <obachman@mathematik.uni-kl.de>
++            and many others.
++Maintained by: Many creative people <dev@texi2html.cvshome.org>
++Send bugs and suggestions to <users@texi2html.cvshome.org>
++
++-->
++<HEAD>
++<TITLE>Measuring Program Resource Use</TITLE>
++
++<META NAME="description" CONTENT="Measuring Program Resource Use">
++<META NAME="keywords" CONTENT="Measuring Program Resource Use">
++<META NAME="resource-type" CONTENT="document">
++<META NAME="distribution" CONTENT="global">
++<META NAME="Generator" CONTENT="texi2html 1.66">
++
++</HEAD>
++
++<BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
++
++<A NAME="SEC_Top"></A>
++<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
++<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Top">Top</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Contents">Contents</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_About"> ? </A>]</TD>
++</TR></TABLE>
++<H1>Measuring Program Resource Use</H1>
++
++<P>
++
++This file documents the the GNU <CODE>time</CODE> command for running programs
++and summarizing the system resources they use.
++This is edition 1.7, for version 1.7.
++</P>
++<P>
++
++</P>
++<TABLE BORDER="0" CELLSPACING="0">
++<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="time.html#SEC1">1. Measuring Program Resource Use</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Measuring program resource use.</TD></TR>
++<TR><TH COLSPAN="3" ALIGN="left" VALIGN="TOP">
++</TH></TR>
++<TR><TH COLSPAN="3" ALIGN="left" VALIGN="TOP"> -- The Detailed Node Listing ---
++</TH></TR>
++<TR><TH COLSPAN="3" ALIGN="left" VALIGN="TOP">
++</TH></TR>
++<TR><TH COLSPAN="3" ALIGN="left" VALIGN="TOP">Measuring Program Resource Use
++</TH></TR>
++<TR><TH COLSPAN="3" ALIGN="left" VALIGN="TOP">
++</TH></TR>
++<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="time.html#SEC2">1.1 Setting the Output Format</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Selecting the information reported by <CODE>time</CODE>.</TD></TR>
++<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="time.html#SEC3">1.2 The Format String</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">The information <CODE>time</CODE> can report.</TD></TR>
++<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="time.html#SEC8">1.3 Redirecting Output</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Writing the information to a file.</TD></TR>
++<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="time.html#SEC9">1.4 Examples</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Examples of using <CODE>time</CODE>.</TD></TR>
++<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="time.html#SEC10">1.5 Accuracy</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Limitations on the accuracy of <CODE>time</CODE> output.</TD></TR>
++<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="time.html#SEC11">1.6 Running the <CODE>time</CODE> Command</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Summary of the options to the <CODE>time</CODE> command.</TD></TR>
++<TR><TH COLSPAN="3" ALIGN="left" VALIGN="TOP">
++</TH></TR>
++<TR><TH COLSPAN="3" ALIGN="left" VALIGN="TOP">The Format String
++</TH></TR>
++<TR><TH COLSPAN="3" ALIGN="left" VALIGN="TOP">
++</TH></TR>
++<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="time.html#SEC4">1.2.1 Time Resources</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP"></TD></TR>
++<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="time.html#SEC5">1.2.2 Memory Resources</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP"></TD></TR>
++<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="time.html#SEC6">1.2.3 I/O Resources</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP"></TD></TR>
++<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="time.html#SEC7">1.2.4 Command Info</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP"></TD></TR>
++</TABLE>
++<P>
++
++<HR SIZE=1>
++<A NAME="SEC1"></A>
++<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
++<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Top"> &lt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC2"> &gt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[ &lt;&lt; ]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Top"> Up </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[ &gt;&gt; ]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Top">Top</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Contents">Contents</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_About"> ? </A>]</TD>
++</TR></TABLE>
++<A NAME="Resource Measurement"></A>
++<H1> 1. Measuring Program Resource Use </H1>
++<!--docid::SEC1::-->
++<P>
++
++The <CODE>time</CODE> command runs another program, then displays information
++about the resources used by that program, collected by the system while
++the program was running.  You can select which information is reported
++and the format in which it is shown (see section <A HREF="time.html#SEC2">1.1 Setting the Output Format</A>), or have
++<CODE>time</CODE> save the information in a file instead of displaying it on the
++screen (see section <A HREF="time.html#SEC8">1.3 Redirecting Output</A>).
++</P>
++<P>
++
++The resources that <CODE>time</CODE> can report on fall into the general
++categories of time, memory, and I/O and IPC calls.  Some systems do not
++provide much information about program resource use; <CODE>time</CODE>
++reports unavailable information as zero values (see section <A HREF="time.html#SEC10">1.5 Accuracy</A>).
++</P>
++<P>
++
++The format of the <CODE>time</CODE> command is:
++</P>
++<P>
++
++<TABLE><tr><td>&nbsp;</td><td class=example><pre>time [option<small>...</small>] <VAR>command</VAR> [<VAR>arg</VAR><small>...</small>]
++</pre></td></tr></table><P>
++
++<A NAME="IDX1"></A>
++<CODE>time</CODE> runs the program <VAR>command</VAR>, with any given arguments
++<VAR>arg</VAR><small>...</small>.  When <VAR>command</VAR> finishes, <CODE>time</CODE> displays
++information about resources used by <VAR>command</VAR>.
++</P>
++<P>
++
++Here is an example of using <CODE>time</CODE> to measure the time and other
++resources used by running the program <CODE>grep</CODE>:
++</P>
++<P>
++
++<TABLE><tr><td>&nbsp;</td><td class=example><pre>eg$ time grep nobody /etc/aliases
++nobody:/dev/null
++etc-files:nobody
++misc-group:nobody
++0.07user 0.50system 0:06.69elapsed 8%CPU (0avgtext+489avgdata 324maxresident)k
++46inputs+7outputs (43major+251minor)pagefaults 0swaps
++</pre></td></tr></table><P>
++
++Mail suggestions and bug reports for GNU <CODE>time</CODE> to
++<CODE>bug-gnu-utils@prep.ai.mit.edu</CODE>.  Please include the version of
++<CODE>time</CODE>, which you can get by running `<SAMP>time --version</SAMP>', and the
++operating system and C compiler you used.
++</P>
++<P>
++
++<TABLE BORDER="0" CELLSPACING="0">
++<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="time.html#SEC2">1.1 Setting the Output Format</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Selecting the information reported by <CODE>time</CODE>.</TD></TR>
++<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="time.html#SEC3">1.2 The Format String</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">The information <CODE>time</CODE> can report.</TD></TR>
++<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="time.html#SEC8">1.3 Redirecting Output</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Writing the information to a file.</TD></TR>
++<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="time.html#SEC9">1.4 Examples</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Examples of using <CODE>time</CODE>.</TD></TR>
++<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="time.html#SEC10">1.5 Accuracy</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Limitations on the accuracy of <CODE>time</CODE> output.</TD></TR>
++<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="time.html#SEC11">1.6 Running the <CODE>time</CODE> Command</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Summary of the options to the <CODE>time</CODE> command.</TD></TR>
++</TABLE>
++<P>
++
++<A NAME="Setting Format"></A>
++<HR SIZE="6">
++<A NAME="SEC2"></A>
++<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
++<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC1"> &lt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC3"> &gt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC1"> &lt;&lt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Top"> Up </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[ &gt;&gt; ]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Top">Top</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Contents">Contents</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_About"> ? </A>]</TD>
++</TR></TABLE>
++<H2> 1.1 Setting the Output Format </H2>
++<!--docid::SEC2::-->
++<P>
++
++<CODE>time</CODE> uses a <EM>format string</EM> to determine which information to
++display about the resources used by the command it runs.  See section <A HREF="time.html#SEC3">1.2 The Format String</A>, for the interpretation of the format string contents.
++</P>
++<P>
++
++You can specify a format string with the command line options listed
++below.  If no format is specified on the command line, but the
++<CODE>TIME</CODE> environment variable is set, its value is used as the format
++string.  Otherwise, the default format built into <CODE>time</CODE> is used:
++</P>
++<P>
++
++<TABLE><tr><td>&nbsp;</td><td class=example><pre>%Uuser %Ssystem %Eelapsed %PCPU (%Xtext+%Ddata %Mmax)k
++%Iinputs+%Ooutputs (%Fmajor+%Rminor)pagefaults %Wswaps
++</pre></td></tr></table><P>
++
++The command line options to set the format are:
++</P>
++<P>
++
++</P>
++<DL COMPACT>
++<DT><CODE>-f <VAR>format</VAR></CODE>
++<DD><DT><CODE>--format=<VAR>format</VAR></CODE>
++<DD>Use <VAR>format</VAR> as the format string.
++<P>
++
++</P>
++<DT><CODE>-p</CODE>
++<DD><DT><CODE>--portability</CODE>
++<DD>Use the following format string, for conformance with POSIX standard
++1003.2:
++<P>
++
++<TABLE><tr><td>&nbsp;</td><td class=example><pre>real %e
++user %U
++sys %S
++</pre></td></tr></table><P>
++
++</P>
++<DT><CODE>-q</CODE>
++<DD><DT><CODE>--quiet</CODE>
++<DD>Suppress non-zero error code from the executed program.
++<P>
++
++</P>
++<DT><CODE>-v</CODE>
++<DD><DT><CODE>--verbose</CODE>
++<DD><A NAME="IDX2"></A>
++Use the built-in verbose format, which displays each available piece of
++information on the program's resource use on its own line, with an
++English description of its meaning.
++</DL>
++<P>
++
++<A NAME="Format String"></A>
++<HR SIZE="6">
++<A NAME="SEC3"></A>
++<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
++<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC2"> &lt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC4"> &gt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC1"> &lt;&lt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Top"> Up </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[ &gt;&gt; ]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Top">Top</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Contents">Contents</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_About"> ? </A>]</TD>
++</TR></TABLE>
++<H2> 1.2 The Format String </H2>
++<!--docid::SEC3::-->
++<P>
++
++<A NAME="IDX3"></A>
++<A NAME="IDX4"></A>
++The <EM>format string</EM> controls the contents of the <CODE>time</CODE> output.
++It consists of <EM>resource specifiers</EM> and <EM>escapes</EM>, interspersed
++with plain text.
++</P>
++<P>
++
++A backslash introduces an <EM>escape</EM>, which is translated
++into a single printing character upon output.  The valid escapes are
++listed below.  An invalid escape is output as a question mark followed
++by a backslash.
++</P>
++<P>
++
++</P>
++<DL COMPACT>
++<DT><CODE>\t</CODE>
++<DD>a tab character
++<P>
++
++</P>
++<DT><CODE>\n</CODE>
++<DD>a newline
++<P>
++
++</P>
++<DT><CODE>\\</CODE>
++<DD>a literal backslash
++</DL>
++<P>
++
++<CODE>time</CODE> always prints a newline after printing the resource use
++information, so normally format strings do not end with a newline
++character (or `<SAMP>\n</SAMP>').
++</P>
++<P>
++
++A resource specifier consists of a percent sign followed by another
++character.  An invalid resource specifier is output as a question mark
++followed by the invalid character.  Use `<SAMP>%%</SAMP>' to output a literal
++percent sign.
++</P>
++<P>
++
++The resource specifiers, which are a superset of those recognized by the
++<CODE>tcsh</CODE> builtin <CODE>time</CODE> command, are listed below.  Not all
++resources are measured by all versions of Unix, so some of the values
++might be reported as zero (see section <A HREF="time.html#SEC10">1.5 Accuracy</A>).
++</P>
++<P>
++
++<TABLE BORDER="0" CELLSPACING="0">
++<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="time.html#SEC4">1.2.1 Time Resources</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP"></TD></TR>
++<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="time.html#SEC5">1.2.2 Memory Resources</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP"></TD></TR>
++<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="time.html#SEC6">1.2.3 I/O Resources</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP"></TD></TR>
++<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="time.html#SEC7">1.2.4 Command Info</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP"></TD></TR>
++</TABLE>
++<P>
++
++<A NAME="Time Resources"></A>
++<HR SIZE="6">
++<A NAME="SEC4"></A>
++<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
++<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC3"> &lt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC5"> &gt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC1"> &lt;&lt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Top"> Up </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[ &gt;&gt; ]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Top">Top</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Contents">Contents</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_About"> ? </A>]</TD>
++</TR></TABLE>
++<H3> 1.2.1 Time Resources </H3>
++<!--docid::SEC4::-->
++<P>
++
++</P>
++<DL COMPACT>
++<DT><CODE>E</CODE>
++<DD>Elapsed real (wall clock) time used by the process, in
++[hours:]minutes:seconds.
++<P>
++
++</P>
++<DT><CODE>e</CODE>
++<DD>Elapsed real (wall clock) time used by the process, in
++seconds.
++<P>
++
++</P>
++<DT><CODE>S</CODE>
++<DD>Total number of CPU-seconds used by the system on behalf of the process
++(in kernel mode), in seconds.
++<P>
++
++</P>
++<DT><CODE>U</CODE>
++<DD>Total number of CPU-seconds that the process used directly (in user
++mode), in seconds.
++<P>
++
++</P>
++<DT><CODE>P</CODE>
++<DD>Percentage of the CPU that this job got.  This is just user + system
++times divied by the total running time.
++</DL>
++<P>
++
++<A NAME="Memory Resources"></A>
++<HR SIZE="6">
++<A NAME="SEC5"></A>
++<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
++<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC4"> &lt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC6"> &gt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC1"> &lt;&lt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Top"> Up </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[ &gt;&gt; ]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Top">Top</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Contents">Contents</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_About"> ? </A>]</TD>
++</TR></TABLE>
++<H3> 1.2.2 Memory Resources </H3>
++<!--docid::SEC5::-->
++<P>
++
++</P>
++<DL COMPACT>
++<DT><CODE>M</CODE>
++<DD>Maximum resident set size of the process during its lifetime, in
++Kilobytes.
++<P>
++
++</P>
++<DT><CODE>t</CODE>
++<DD>Average resident set size of the process, in Kilobytes.
++<P>
++
++</P>
++<DT><CODE>K</CODE>
++<DD>Average total (data+stack+text) memory use of the process, in Kilobytes.
++<P>
++
++</P>
++<DT><CODE>D</CODE>
++<DD>Average size of the process's unshared data area, in Kilobytes.
++<P>
++
++</P>
++<DT><CODE>p</CODE>
++<DD>Average size of the process's unshared stack, in Kilobytes.
++<P>
++
++</P>
++<DT><CODE>X</CODE>
++<DD>Average size of the process's shared text, in Kilobytes.
++<P>
++
++</P>
++<DT><CODE>Z</CODE>
++<DD>System's page size, in bytes.  This is a per-system constant, but
++varies between systems.
++</DL>
++<P>
++
++<A NAME="I/O Resources"></A>
++<HR SIZE="6">
++<A NAME="SEC6"></A>
++<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
++<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC5"> &lt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC7"> &gt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC1"> &lt;&lt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Top"> Up </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[ &gt;&gt; ]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Top">Top</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Contents">Contents</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_About"> ? </A>]</TD>
++</TR></TABLE>
++<H3> 1.2.3 I/O Resources </H3>
++<!--docid::SEC6::-->
++<P>
++
++</P>
++<DL COMPACT>
++<DT><CODE>F</CODE>
++<DD>Number of major, or I/O-requiring, page faults that occurred while the
++process was running.  These are faults where the page has actually
++migrated out of primary memory.
++<P>
++
++</P>
++<DT><CODE>R</CODE>
++<DD>Number of minor, or recoverable, page faults.  These are pages that are
++not valid (so they fault) but which have not yet been claimed by other
++virtual pages.  Thus the data in the page is still valid but the system
++tables must be updated.
++<P>
++
++</P>
++<DT><CODE>W</CODE>
++<DD>Number of times the process was swapped out of main memory.
++<P>
++
++</P>
++<DT><CODE>c</CODE>
++<DD>Number of times the process was context-switched involuntarily (because
++the time slice expired).
++<P>
++
++</P>
++<DT><CODE>w</CODE>
++<DD>Number of times that the program was context-switched voluntarily, for
++instance while waiting for an I/O operation to complete.
++<P>
++
++</P>
++<DT><CODE>I</CODE>
++<DD>Number of file system inputs by the process.
++<P>
++
++</P>
++<DT><CODE>O</CODE>
++<DD>Number of file system outputs by the process.
++<P>
++
++</P>
++<DT><CODE>r</CODE>
++<DD>Number of socket messages received by the process.
++<P>
++
++</P>
++<DT><CODE>s</CODE>
++<DD>Number of socket messages sent by the process.
++<P>
++
++</P>
++<DT><CODE>k</CODE>
++<DD>Number of signals delivered to the process.
++</DL>
++<P>
++
++<A NAME="Command Info"></A>
++<HR SIZE="6">
++<A NAME="SEC7"></A>
++<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
++<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC6"> &lt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC8"> &gt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC1"> &lt;&lt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Top"> Up </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[ &gt;&gt; ]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Top">Top</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Contents">Contents</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_About"> ? </A>]</TD>
++</TR></TABLE>
++<H3> 1.2.4 Command Info </H3>
++<!--docid::SEC7::-->
++<P>
++
++</P>
++<DL COMPACT>
++<DT><CODE>C</CODE>
++<DD>Name and command line arguments of the command being timed.
++<P>
++
++</P>
++<DT><CODE>x</CODE>
++<DD>Exit status of the command.
++</DL>
++<P>
++
++<A NAME="Redirecting"></A>
++<HR SIZE="6">
++<A NAME="SEC8"></A>
++<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
++<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC7"> &lt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC9"> &gt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC1"> &lt;&lt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Top"> Up </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[ &gt;&gt; ]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Top">Top</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Contents">Contents</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_About"> ? </A>]</TD>
++</TR></TABLE>
++<H2> 1.3 Redirecting Output </H2>
++<!--docid::SEC8::-->
++<P>
++
++By default, <CODE>time</CODE> writes the resource use statistics to the
++standard error stream.  The options below make it write the statistics
++to a file instead.  Doing this can be useful if the program you're
++running writes to the standard error or you're running <CODE>time</CODE>
++noninteractively or in the background.
++</P>
++<P>
++
++</P>
++<DL COMPACT>
++<DT><CODE>-o <VAR>file</VAR></CODE>
++<DD><DT><CODE>--output=<VAR>file</VAR></CODE>
++<DD>Write the resource use statistics to <VAR>file</VAR>.  By default, this
++<EM>overwrites</EM> the file, destroying the file's previous contents.
++<P>
++
++</P>
++<DT><CODE>-a</CODE>
++<DD><DT><CODE>--append</CODE>
++<DD><EM>Append</EM> the resource use information to the output file instead
++of overwriting it.  This option is only useful with the `<SAMP>-o</SAMP>' or
++`<SAMP>--output</SAMP>' option.
++</DL>
++<P>
++
++<A NAME="Examples"></A>
++<HR SIZE="6">
++<A NAME="SEC9"></A>
++<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
++<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC8"> &lt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC10"> &gt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC1"> &lt;&lt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Top"> Up </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[ &gt;&gt; ]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Top">Top</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Contents">Contents</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_About"> ? </A>]</TD>
++</TR></TABLE>
++<H2> 1.4 Examples </H2>
++<!--docid::SEC9::-->
++<P>
++
++Run the command `<SAMP>wc /etc/hosts</SAMP>' and show the default information:
++</P>
++<P>
++
++<TABLE><tr><td>&nbsp;</td><td class=example><pre>eg$ time wc /etc/hosts
++      35     111    1134 /etc/hosts
++0.00user 0.01system 0:00.04elapsed 25%CPU (0avgtext+0avgdata 0maxresident)k
++1inputs+1outputs (0major+0minor)pagefaults 0swaps
++</pre></td></tr></table><P>
++
++Run the command `<SAMP>ls -Fs</SAMP>' and show just the user, system, and
++wall-clock time:
++</P>
++<P>
++
++<TABLE><tr><td>&nbsp;</td><td class=example><pre>eg$ time -f &quot;\t%E real,\t%U user,\t%S sys&quot; ls -Fs
++total 16
++1 account/      1 db/           1 mail/         1 run/
++1 backups/      1 emacs/        1 msgs/         1 rwho/
++1 crash/        1 games/        1 preserve/     1 spool/
++1 cron/         1 log/          1 quotas/       1 tmp/
++        0:00.03 real,   0.00 user,      0.01 sys
++</pre></td></tr></table><P>
++
++Edit the file `<TT>.bashrc</TT>' and have <CODE>time</CODE> append the elapsed time
++and number of signals to the file `<TT>log</TT>', reading the format string
++from the environment variable <CODE>TIME</CODE>:
++</P>
++<P>
++
++<TABLE><tr><td>&nbsp;</td><td class=example><pre>eg$ export TIME=&quot;\t%E,\t%k&quot; # If using bash or ksh
++eg$ setenv TIME &quot;\t%E,\t%k&quot; # If using csh or tcsh
++eg$ time -a -o log emacs .bashrc
++eg$ cat log
++        0:16.55,        726
++</pre></td></tr></table><P>
++
++Run the command `<SAMP>sleep 4</SAMP>' and show all of the information about it
++verbosely:
++</P>
++<P>
++
++<TABLE><tr><td>&nbsp;</td><td class=example><pre>eg$ time -v sleep 4
++        Command being timed: &quot;sleep 4&quot;
++        User time (seconds): 0.00
++        System time (seconds): 0.05
++        Percent of CPU this job got: 1%
++        Elapsed (wall clock) time (h:mm:ss or m:ss): 0:04.26
++        Average shared text size (kbytes): 36
++        Average unshared data size (kbytes): 24
++        Average stack size (kbytes): 0
++        Average total size (kbytes): 60
++        Maximum resident set size (kbytes): 32
++        Average resident set size (kbytes): 24
++        Major (requiring I/O) page faults: 3
++        Minor (reclaiming a frame) page faults: 0
++        Voluntary context switches: 11
++        Involuntary context switches: 0
++        Swaps: 0
++        File system inputs: 3
++        File system outputs: 1
++        Socket messages sent: 0
++        Socket messages received: 0
++        Signals delivered: 1
++        Page size (bytes): 4096
++        Exit status: 0
++</pre></td></tr></table><P>
++
++<A NAME="Accuracy"></A>
++<HR SIZE="6">
++<A NAME="SEC10"></A>
++<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
++<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC9"> &lt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC11"> &gt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC1"> &lt;&lt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Top"> Up </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[ &gt;&gt; ]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Top">Top</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Contents">Contents</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_About"> ? </A>]</TD>
++</TR></TABLE>
++<H2> 1.5 Accuracy </H2>
++<!--docid::SEC10::-->
++<P>
++
++The elapsed time is not collected atomically with the execution of the
++program; as a result, in bizarre circumstances (if the <CODE>time</CODE>
++command gets stopped or swapped out in between when the program being
++timed exits and when <CODE>time</CODE> calculates how long it took to run), it
++could be much larger than the actual execution time.
++</P>
++<P>
++
++When the running time of a command is very nearly zero, some values
++(e.g., the percentage of CPU used) may be reported as either zero (which
++is wrong) or a question mark.
++</P>
++<P>
++
++Most information shown by <CODE>time</CODE> is derived from the <CODE>wait3</CODE>
++system call.  The numbers are only as good as those returned by
++<CODE>wait3</CODE>.  Many systems do not measure all of the resources that
++<CODE>time</CODE> can report on; those resources are reported as zero.  The
++systems that measure most or all of the resources are based on 4.2 or
++4.3BSD.  Later BSD releases use different memory management code that
++measures fewer resources.
++</P>
++<P>
++
++On systems that do not have a <CODE>wait3</CODE> call that returns status
++information, the <CODE>times</CODE> system call is used instead.  It provides
++much less information than <CODE>wait3</CODE>, so on those systems <CODE>time</CODE>
++reports most of the resources as zero.
++</P>
++<P>
++
++The `<SAMP>%I</SAMP>' and `<SAMP>%O</SAMP>' values are allegedly only &quot;real&quot; input
++and output and do not include those supplied by caching devices.  The
++meaning of &quot;real&quot; I/O reported by `<SAMP>%I</SAMP>' and `<SAMP>%O</SAMP>' may be
++muddled for workstations, especially diskless ones.
++</P>
++<P>
++
++<A NAME="Invoking time"></A>
++<HR SIZE="6">
++<A NAME="SEC11"></A>
++<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
++<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC10"> &lt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[ &gt; ]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC1"> &lt;&lt; </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Top"> Up </A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[ &gt;&gt; ]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Top">Top</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Contents">Contents</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_About"> ? </A>]</TD>
++</TR></TABLE>
++<H2> 1.6 Running the <CODE>time</CODE> Command </H2>
++<!--docid::SEC11::-->
++<P>
++
++The format of the <CODE>time</CODE> command is:
++</P>
++<P>
++
++<TABLE><tr><td>&nbsp;</td><td class=example><pre>time [option<small>...</small>] <VAR>command</VAR> [<VAR>arg</VAR><small>...</small>]
++</pre></td></tr></table><P>
++
++<A NAME="IDX5"></A>
++<CODE>time</CODE> runs the program <VAR>command</VAR>, with any given arguments
++<VAR>arg</VAR><small>...</small>.  When <VAR>command</VAR> finishes, <CODE>time</CODE> displays
++information about resources used by <VAR>command</VAR> (on the standard error
++output, by default).  If <VAR>command</VAR> exits with non-zero status or is
++terminated by a signal, <CODE>time</CODE> displays a warning message and the
++exit status or signal number.
++</P>
++<P>
++
++Options to <CODE>time</CODE> must appear on the command line before
++<VAR>command</VAR>.  Anything on the command line after <VAR>command</VAR> is
++passed as arguments to <VAR>command</VAR>.
++</P>
++<P>
++
++</P>
++<DL COMPACT>
++<DT><CODE>-o <VAR>file</VAR></CODE>
++<DD><DT><CODE>--output=<VAR>file</VAR></CODE>
++<DD>Write the resource use statistics to <VAR>file</VAR>.
++<P>
++
++</P>
++<DT><CODE>-a</CODE>
++<DD><DT><CODE>--append</CODE>
++<DD><EM>Append</EM> the resource use information to the output file instead
++of overwriting it.
++<P>
++
++</P>
++<DT><CODE>-f <VAR>format</VAR></CODE>
++<DD><DT><CODE>--format=<VAR>format</VAR></CODE>
++<DD>Use <VAR>format</VAR> as the format string.
++<P>
++
++</P>
++<DT><CODE>--help</CODE>
++<DD>Print a summary of the command line options to <CODE>time</CODE> and exit.
++<P>
++
++</P>
++<DT><CODE>-p</CODE>
++<DD><DT><CODE>--portability</CODE>
++<DD>Use the POSIX format.
++<P>
++
++</P>
++<DT><CODE>-v</CODE>
++<DD><DT><CODE>--verbose</CODE>
++<DD><A NAME="IDX6"></A>
++Use the built-in verbose format.
++<P>
++
++</P>
++<DT><CODE>-V</CODE>
++<DD><DT><CODE>--version</CODE>
++<DD><A NAME="IDX7"></A>
++Print the version number of <CODE>time</CODE> and exit.
++</DL>
++<P>
++
++<HR SIZE="6">
++<A NAME="SEC_Contents"></A>
++<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
++<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Top">Top</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Contents">Contents</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_About"> ? </A>]</TD>
++</TR></TABLE>
++<H1>Table of Contents</H1>
++<BLOCKQUOTE>
++<A NAME="TOC1" HREF="time.html#SEC1">1. Measuring Program Resource Use</A>
++<BR>
++<BLOCKQUOTE>
++<A NAME="TOC2" HREF="time.html#SEC2">1.1 Setting the Output Format</A>
++<BR>
++<A NAME="TOC3" HREF="time.html#SEC3">1.2 The Format String</A>
++<BR>
++<BLOCKQUOTE>
++<A NAME="TOC4" HREF="time.html#SEC4">1.2.1 Time Resources</A>
++<BR>
++<A NAME="TOC5" HREF="time.html#SEC5">1.2.2 Memory Resources</A>
++<BR>
++<A NAME="TOC6" HREF="time.html#SEC6">1.2.3 I/O Resources</A>
++<BR>
++<A NAME="TOC7" HREF="time.html#SEC7">1.2.4 Command Info</A>
++<BR>
++</BLOCKQUOTE>
++<A NAME="TOC8" HREF="time.html#SEC8">1.3 Redirecting Output</A>
++<BR>
++<A NAME="TOC9" HREF="time.html#SEC9">1.4 Examples</A>
++<BR>
++<A NAME="TOC10" HREF="time.html#SEC10">1.5 Accuracy</A>
++<BR>
++<A NAME="TOC11" HREF="time.html#SEC11">1.6 Running the <CODE>time</CODE> Command</A>
++<BR>
++</BLOCKQUOTE>
++</BLOCKQUOTE>
++<HR SIZE=1>
++<A NAME="SEC_OVERVIEW"></A>
++<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
++<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Top">Top</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Contents">Contents</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_About"> ? </A>]</TD>
++</TR></TABLE>
++<H1>Short Table of Contents</H1>
++<BLOCKQUOTE>
++<A NAME="TOC1" HREF="time.html#SEC1">1. Measuring Program Resource Use</A>
++<BR>
++
++</BLOCKQUOTE>
++<HR SIZE=1>
++<A NAME="SEC_About"></A>
++<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
++<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Top">Top</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_Contents">Contents</A>]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
++<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="time.html#SEC_About"> ? </A>]</TD>
++</TR></TABLE>
++<H1>About this document</H1>
++This document was generated
++by 
++using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
++<P></P>
++The buttons in the navigation panels have the following meaning:
++<P></P>
++<table border = "1">
++<TR>
++<TH> Button </TH>
++<TH> Name </TH>
++<TH> Go to </TH>
++<TH> From 1.2.3 go to</TH>
++</TR>
++<TR>
++<TD ALIGN="CENTER">
++ [ &lt; ] </TD>
++<TD ALIGN="CENTER">
++Back
++</TD>
++<TD>
++previous section in reading order
++</TD>
++<TD>
++1.2.2
++</TD>
++</TR>
++<TR>
++<TD ALIGN="CENTER">
++ [ &gt; ] </TD>
++<TD ALIGN="CENTER">
++Forward
++</TD>
++<TD>
++next section in reading order
++</TD>
++<TD>
++1.2.4
++</TD>
++</TR>
++<TR>
++<TD ALIGN="CENTER">
++ [ &lt;&lt; ] </TD>
++<TD ALIGN="CENTER">
++FastBack
++</TD>
++<TD>
++beginning of this chapter or previous chapter
++</TD>
++<TD>
++1
++</TD>
++</TR>
++<TR>
++<TD ALIGN="CENTER">
++ [ Up ] </TD>
++<TD ALIGN="CENTER">
++Up
++</TD>
++<TD>
++up section
++</TD>
++<TD>
++1.2
++</TD>
++</TR>
++<TR>
++<TD ALIGN="CENTER">
++ [ &gt;&gt; ] </TD>
++<TD ALIGN="CENTER">
++FastForward
++</TD>
++<TD>
++next chapter
++</TD>
++<TD>
++2
++</TD>
++</TR>
++<TR>
++<TD ALIGN="CENTER">
++ [Top] </TD>
++<TD ALIGN="CENTER">
++Top
++</TD>
++<TD>
++cover (top) of document
++</TD>
++<TD>
++ &nbsp; 
++</TD>
++</TR>
++<TR>
++<TD ALIGN="CENTER">
++ [Contents] </TD>
++<TD ALIGN="CENTER">
++Contents
++</TD>
++<TD>
++table of contents
++</TD>
++<TD>
++ &nbsp; 
++</TD>
++</TR>
++<TR>
++<TD ALIGN="CENTER">
++ [Index] </TD>
++<TD ALIGN="CENTER">
++Index
++</TD>
++<TD>
++concept index
++</TD>
++<TD>
++ &nbsp; 
++</TD>
++</TR>
++<TR>
++<TD ALIGN="CENTER">
++ [ ? ] </TD>
++<TD ALIGN="CENTER">
++About
++</TD>
++<TD>
++this page
++</TD>
++<TD>
++ &nbsp; 
++</TD>
++</TR>
++</TABLE>
++    <P>
++      where the <STRONG> Example </STRONG> assumes that the current position
++      is at <STRONG> Subsubsection One-Two-Three </STRONG> of a document of
++      the following structure:</P>
++    <UL>
++      <LI> 1. Section One
++        <UL>
++          <LI>1.1 Subsection One-One
++            <UL>
++              <LI>...</LI>
++            </UL>
++          <LI>1.2 Subsection One-Two
++            <UL>
++              <LI>1.2.1 Subsubsection One-Two-One</LI>
++              <LI>1.2.2 Subsubsection One-Two-Two</LI>
++              <LI>1.2.3 Subsubsection One-Two-Three &nbsp; &nbsp;
++                <STRONG>&lt;== Current Position </STRONG></LI>
++              <LI>1.2.4 Subsubsection One-Two-Four</LI>
++            </UL>
++          </LI>
++          <LI>1.3 Subsection One-Three
++            <UL>
++              <LI>...</LI>
++            </UL>
++          </LI>
++          <LI>1.4 Subsection One-Four</LI>
++        </UL>
++      </LI>
++    </UL>
++
++<HR SIZE=1>
++<BR>
++<FONT SIZE="-1">
++This document was generated
++by <I>root</I> on <I>September, 1 2003</I>
++using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
++</FONT>
++
++</BODY>
++</HTML>

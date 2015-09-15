@@ -1,0 +1,19 @@
+No reason to link with libfl since 'loadkeys' implements
+its own yywrap()/yylex() functions.
+
+Upstream-Status: Pending
+Signed-off-by: Jacob Kroon <jacob.kroon@mikrodidakt.se>
+
+Index: console-tools-0.3.2/kbdtools/Makefile.am
+===================================================================
+--- console-tools-0.3.2.orig/kbdtools/Makefile.am
++++ console-tools-0.3.2/kbdtools/Makefile.am
+@@ -19,8 +19,6 @@ LDADD = ../lib/ctlocal/libctlocal.a ../l
+ 	../lib/cfont/libcfont.la \
+ 	../lib/console/libconsole.la ../lib/generic/libctgeneric.la
+ 
+-loadkeys_LDADD = $(LDADD) @LEXLIB@
+-
+ bin_SCRIPTS = mk_modmap
+ 
+ noinst_HEADERS = loadkeys.h

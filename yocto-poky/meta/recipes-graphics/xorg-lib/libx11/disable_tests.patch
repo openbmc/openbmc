@@ -1,0 +1,22 @@
+Upstream-Status: Inappropriate [disable feature]
+
+Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
+
+Update for 1.6.1
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+diff -Nurd libX11-1.5.0/nls/Makefile.am libX11-1.5.0/nls/Makefile.am
+--- libX11-1.5.0/nls/Makefile.am	2012-06-02 09:37:18.000000000 +0300
++++ libX11-1.5.0/nls/Makefile.am	2013-01-02 16:10:24.960156131 +0200
+@@ -36,11 +36,6 @@
+         < locale.dir.l1 > locale.dir.l2
+	cat locale.dir.l2 locale.dir.l1 > locale.dir
+
+-if HAVE_PERL
+-LOG_COMPILER = $(PERL)
+-TESTS = compose-check.pl
+-endif HAVE_PERL
+-
+
+ # Per-locale data files

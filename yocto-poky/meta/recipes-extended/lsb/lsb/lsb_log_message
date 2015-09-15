@@ -1,0 +1,27 @@
+#!/bin/sh
+
+. /etc/init.d/functions
+
+ACTION=$1
+shift
+
+case "$ACTION" in
+  success)
+  	echo -n $*
+	success "$*"
+	echo
+	;;
+  failure)
+  	echo -n $*
+	failure "$*"
+	echo
+	;;
+  warning)
+  	echo -n $*
+	warning "$*"
+	echo
+	;;
+  *)
+  	;;
+esac
+exit 0

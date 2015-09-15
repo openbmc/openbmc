@@ -1,0 +1,26 @@
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Ionut Radu <ionutx.radu@intel.com>
+
+Index: pciutils-3.2.0/Makefile
+===================================================================
+--- pciutils-3.2.0.orig/Makefile
++++ pciutils-3.2.0/Makefile
+@@ -35,7 +35,7 @@ SHAREDIR=$(PREFIX)/share
+ IDSDIR=$(SHAREDIR)
+ MANDIR:=$(shell if [ -d $(PREFIX)/share/man ] ; then echo $(PREFIX)/share/man ; else echo $(PREFIX)/man ; fi)
+ INCDIR=$(PREFIX)/include
+-LIBDIR=$(PREFIX)/lib
++LIBDIR=$(libdir)
+ PKGCFDIR=$(LIBDIR)/pkgconfig
+ 
+ # Commands
+@@ -94,7 +94,7 @@ example: example.o lib/$(PCILIB_DEV)
+ example.o: example.c $(PCIINC)
+ 
+ %: %.o
+-	$(CC) $(LDFLAGS) $(TARGET_ARCH) $^ $(LIB_LDLIBS) -o $@
++	$(CC) $(LDFLAGS) $(TARGET_ARCH) $^ $(LIB_LDLIBS) $(LDLIBS) -o $@
+ 
+ %.8 %.7: %.man
+ 	M=`echo $(DATE) | sed 's/-01-/-January-/;s/-02-/-February-/;s/-03-/-March-/;s/-04-/-April-/;s/-05-/-May-/;s/-06-/-June-/;s/-07-/-July-/;s/-08-/-August-/;s/-09-/-September-/;s/-10-/-October-/;s/-11-/-November-/;s/-12-/-December-/;s/\(.*\)-\(.*\)-\(.*\)/\3 \2 \1/'` ; sed <$< >$@ "s/@TODAY@/$$M/;s/@VERSION@/pciutils-$(VERSION)/;s#@IDSDIR@#$(IDSDIR)#"

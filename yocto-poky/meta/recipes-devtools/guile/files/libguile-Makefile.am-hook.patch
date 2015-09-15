@@ -1,0 +1,42 @@
+From 9c4e120a7a87db34d22a50883a5a525170b480d7 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Tue, 6 Jan 2015 23:10:51 -0800
+Subject: [PATCH] libguile/Makefile.am: install-data-hook -> install-exec-hook
+
+It may install such a file:
+/usr/lib64/libguile-2.0*-gdb.scm
+
+This is because when there is no file in the directory:
+for f in libguile-2.0*; do
+    [snip]
+done
+
+The f would be libguile-2.0* itself, use install-exec-hook will fix the
+problem since it depends on install-libLTLIBRARIES.
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ libguile/Makefile.am |    4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/libguile/Makefile.am b/libguile/Makefile.am
+index 5decd99..52645b7 100644
+--- a/libguile/Makefile.am
++++ b/libguile/Makefile.am
+@@ -446,10 +446,8 @@ EXTRA_libguile_@GUILE_EFFECTIVE_VERSION@_la_SOURCES = _scm.h		\
+ ## delete guile-snarf.awk from the installation bindir, in case it's
+ ## lingering there due to an earlier guile version not having been
+ ## wiped out.
+-install-exec-hook:
++install-exec-hook: libguile-2.0-gdb.scm
+ 	rm -f $(DESTDIR)$(bindir)/guile-snarf.awk
+-
+-install-data-hook: libguile-2.0-gdb.scm
+ 	@$(MKDIR_P) $(DESTDIR)$(libdir)
+ ## We want to install libguile-2.0-gdb.scm as SOMETHING-gdb.scm.
+ ## SOMETHING is the full name of the final library.  We want to ignore
+-- 
+1.7.9.5
+

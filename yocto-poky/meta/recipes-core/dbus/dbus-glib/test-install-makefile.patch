@@ -1,0 +1,57 @@
+Change Makefile.am to install regression tests for test package purpose.
+
+Upstream-Status: Inappropriate [test not install is for purpose from upstream]
+
+Signed-off-by: Yao Zhao <yao.zhao@windriver.com>
+Signed-off-by: Chong Lu <Chong.Lu@windriver.com>
+---
+ test/Makefile.am            | 3 ++-
+ test/core/Makefile.am       | 3 ++-
+ test/interfaces/Makefile.am | 3 ++-
+ 3 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/test/Makefile.am b/test/Makefile.am
+index 379c8c3..6580927 100644
+--- a/test/Makefile.am
++++ b/test/Makefile.am
+@@ -48,7 +48,8 @@ TESTS = \
+ 	$(test_scripts) \
+ 	$(NULL)
+ 
+-noinst_PROGRAMS = \
++testdir = $(datadir)/@PACKAGE@/tests
++test_PROGRAMS = \
+ 	$(test_programs) \
+ 	$(test_related_programs) \
+ 	$(NULL)
+diff --git a/test/core/Makefile.am b/test/core/Makefile.am
+index e4bceb4..54b077d 100644
+--- a/test/core/Makefile.am
++++ b/test/core/Makefile.am
+@@ -64,7 +64,8 @@ endif
+ 
+ ## we use noinst_PROGRAMS not check_PROGRAMS for TESTS so that we
+ ## build even when not doing "make check"
+-noinst_PROGRAMS = \
++testdir = $(datadir)/@PACKAGE@/tests/core
++test_PROGRAMS = \
+ 	test-dbus-glib \
+ 	test-error-mapping \
+ 	test-service-glib \
+diff --git a/test/interfaces/Makefile.am b/test/interfaces/Makefile.am
+index a94d08d..707dcac 100644
+--- a/test/interfaces/Makefile.am
++++ b/test/interfaces/Makefile.am
+@@ -57,7 +57,8 @@ if DBUS_BUILD_TESTS
+ 
+ ## we use noinst_PROGRAMS not check_PROGRAMS for TESTS so that we
+ ## build even when not doing "make check"
+-noinst_PROGRAMS = test-service test-client
++testdir = $(datadir)/@PACKAGE@/tests/interfaces
++test_PROGRAMS = test-service test-client
+ 
+ test_service_SOURCES = \
+ 	test-interfaces.c \
+-- 
+1.9.1
+

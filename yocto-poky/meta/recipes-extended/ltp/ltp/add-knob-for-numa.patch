@@ -1,0 +1,39 @@
+[PATCH] add knob to control whether numa support should be checked
+
+Upstream-Status: Pending
+
+otherwise the random dependency will be generated
+
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+---
+ configure.ac                                       |   10 +-
+diff --git a/configure.ac b/configure.ac
+index 9f397e7..1357256 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -142,6 +142,12 @@ else
+     AC_SUBST([WITH_REALTIME_TESTSUITE],["no"])
+ fi
+ 
++AC_ARG_WITH([numa],
++  AC_HELP_STRING([--without-numa],
++    [without the numa support]),
++  [],[with_numa=yes],
++)
++
+ AC_CONFIG_SUBDIRS([utils/ffsb-6.0-rc2])
+ 
+ # END testsuites knobs
+@@ -159,7 +165,9 @@ LTP_CHECK_SIGNAL
+ LTP_CHECK_SYSCALL_EVENTFD
+ LTP_CHECK_SYSCALL_KEYCTL
+ LTP_CHECK_SYSCALL_MODIFY_LDT
++if test "x$with_numa" = xyes; then
+ LTP_CHECK_SYSCALL_NUMA
++fi
+ LTP_CHECK_SYSCALL_QUOTACTL
+ LTP_CHECK_SYSCALL_SIGNALFD
+ LTP_CHECK_SYSCALL_UNSHARE
+-- 
+1.9.1
+

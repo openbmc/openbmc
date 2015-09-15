@@ -1,0 +1,312 @@
+#!/bin/bash
+
+# Yocto ADT Installer
+#
+# Copyright 2010-2011 by Intel Corp.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy 
+# of this software and associated documentation files (the "Software"), to deal 
+# in the Software without restriction, including without limitation the rights 
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+# copies of the Software, and to permit persons to whom the Software is 
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in 
+# all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+# THE SOFTWARE.
+
+parse_config()
+{
+  INST_ARCH=`uname -m`
+
+  case $INST_ARCH in 
+  i[3-6]86)
+    OPKG_CONFIG_FILE=$YOCTOADT_OPKG_CONF_FILE_32
+    OECORE_NATIVE_SYSROOT="$INSTALL_FOLDER/sysroots/$INST_ARCH$SDK_VENDOR-linux/"
+    ;;
+  x86_64)
+    OPKG_CONFIG_FILE=$YOCTOADT_OPKG_CONF_FILE_64
+    OECORE_NATIVE_SYSROOT="$INSTALL_FOLDER/sysroots/x86_64$SDK_VENDOR-linux/"
+    ;;
+  *)
+    echo_info "[ADT_INST] Error: Installation Machine is not supported!"
+    exit -1
+    ;;
+  esac
+}
+
+get_sudo_app()
+{
+  username=$(id -nu)
+
+  # find the owner of the parent
+  dir=$1
+  while [ 1 ]; do
+      if [ -d $dir ]; then
+          owner=$(stat -c %U $dir)
+          break
+     else
+          dir=$(dirname $dir)
+     fi
+  done
+
+  if [ "$owner" = "$username" ]; then
+      true
+  else
+      echo sudo
+  fi
+}
+
+# this function accepts arch_type (x86, x86_64, arm, ppc, mips) as the first
+# argument, returning the location of the target rootfs
+get_target_rootfs_location() {
+	[ -z "$1" ] && return
+
+	arch_type=$1
+	# rootfs extraction directory
+	target_sysroot_var="\$YOCTOADT_TARGET_SYSROOT_LOC_$arch_type"
+	target_sysroot=`eval echo $target_sysroot_var`
+
+	if [ "$target_sysroot" == "" ]; then
+		return
+	else
+		echo "`readlink -m $target_sysroot`"
+	fi
+}
+
+
+#let us install a qemu-native firstly
+#installation step 2
+install_native_sdk()
+{
+
+echo_info "\nStart installing selected native ADT for archs: $YOCTOADT_TARGETS..."
+
+# where the packages are installed.
+NATIVE_INSTALL_DIR=$INSTALL_FOLDER
+
+if [ -d "$INSTALL_FOLDER" ]; then
+  echo_info "\nNative ADT installation directory \"$INSTALL_FOLDER\" already exists! Continue installation will override its contents!"
+  confirm_install $1
+fi
+
+#Now begin to install native sdk and extract qemu rootfs which needs privilege rights
+#depending on the install location
+SUDO=$(get_sudo_app $NATIVE_INSTALL_DIR)
+if [ -n "$SUDO" ]; then
+  echo_info "#######################################################################"
+  echo_info "Please note from this point on installation requires sudo password ..."
+  echo_info "#######################################################################"
+fi
+
+#we need to make this directory firstly since opkg need to use it.
+OPKG_LOCK_DIR="$NATIVE_INSTALL_DIR/$OPKG_LIBDIR/opkg"
+if [ ! -d "$OPKG_LOCK_DIR" ]; then
+  $SUDO mkdir -p $OPKG_LOCK_DIR
+  echo_info "Successfully create directory $OPKG_LOCK_DIR. "
+#if user delete /opt/xxx, while dangling folders there, report error
+elif [ ! -d "$INSTALL_FOLDER" ]; then
+  echo_info "\nDangling opkg cache folder $OPKG_LOCK_DIR detected. Continue installation will remove the folder!"
+  confirm_install $1
+  $SUDO rm -rf $OPKG_LOCK_DIR
+  $SUDO mkdir -p $OPKG_LOCK_DIR
+#if user are updating installing, just let him/her go, give her/him prompt
+else
+  echo_info "ADT has already been installed. Will update its contents..."
+fi
+
+#first update repository
+if [ "x$SUDO" = "x" ]; then
+    OPKG_CMD="$LOCAL_OPKG_LOC/bin/opkg"
+else
+    OPKG_CMD="sudo -E $LOCAL_OPKG_LOC/bin/opkg"
+fi
+
+echo_info "Updating opkg..."
+$OPKG_CMD -f $OPKG_CONFIG_FILE -o $NATIVE_INSTALL_DIR update &>> $YOCTOADT_INSTALL_LOG_FILE
+check_result
+echo_info "opkg update process ended..."
+
+#install below must sdk-host packages
+OPKG_INSTALL_CMD="$OPKG_CMD "
+OPKG_INSTALL_NATIVE_CMD="$OPKG_INSTALL_CMD  --force-overwrite -f $OPKG_CONFIG_FILE -o $NATIVE_INSTALL_DIR install"
+
+BASE_HOSTSDK_PKGNAMES="pseudo opkg pkgconfig libtool autoconf automake"
+for pkg in $BASE_HOSTSDK_PKGNAMES; do
+  echo_info "Installing ${pkg} nativesdk ...\n"
+  $OPKG_INSTALL_NATIVE_CMD nativesdk-${pkg} &>> $YOCTOADT_INSTALL_LOG_FILE
+  check_result
+done
+
+for target_type in $YOCTOADT_TARGETS; do
+  machine_var="\$YOCTOADT_TARGET_MACHINE_$target_type"
+  machine=`eval echo $machine_var`
+  echo_info "Installing cross canadian packages for $machine ..."
+  $OPKG_INSTALL_NATIVE_CMD packagegroup-cross-canadian-$machine &>> $YOCTOADT_INSTALL_LOG_FILE
+  check_result
+
+  target_sysroot=`get_target_rootfs_location $target_type`
+  [ -z "$target_sysroot" ] && continue
+
+  # get the environment setup script paths: original (the one before relocation)
+  # and relocated
+  env_script_original=`$OPKG_CMD -f $OPKG_CONFIG_FILE -o $NATIVE_INSTALL_DIR files meta-environment-$machine|\
+							grep environment-setup`
+  env_script_relocated=$INSTALL_FOLDER/${env_script_original##*/}
+
+  # opkg will not install packagegroup-cross-canadian package if it was already
+  # installed. So, the environment script is in one place or the other.
+  [ -e "$INSTALL_FOLDER/$env_script_original" ] && env_script=$INSTALL_FOLDER/$env_script_original
+  [ -e "$env_script_original" ] && env_script=$env_script_original
+  [ -e "$env_script_relocated" ] && env_script=$env_script_relocated
+
+  $SUDO sed -i -e "s%SDKTARGETSYSROOT=.*%SDKTARGETSYSROOT=$target_sysroot%g" $env_script
+done
+
+if [ "$YOCTOADT_QEMU" == "Y" ] || [ "$YOCTOADT_QEMU" == "y" ]; then
+  echo_info "\nInstalling qemu native ..."
+  $OPKG_INSTALL_NATIVE_CMD nativesdk-qemu &>> $YOCTOADT_INSTALL_LOG_FILE
+  check_result
+  $OPKG_INSTALL_NATIVE_CMD nativesdk-qemu-helper &>> $YOCTOADT_INSTALL_LOG_FILE
+  check_result
+fi
+
+if [ "$YOCTOADT_NFS_UTIL" == "Y" ] || [ "$YOCTOADT_NFS_UTIL" == "y" ]; then
+  echo_info "\nInstalling unfs ..."
+  $OPKG_INSTALL_NATIVE_CMD nativesdk-unfs3 &>> $YOCTOADT_INSTALL_LOG_FILE
+  check_result
+fi
+
+# Lose the ./opt/${DISTRO}/${SDK_VERSION} part, we don't really need to keep
+# the entire directory structure. We could patch opkg to do that but it's far
+# simpler to do that here and achieve the same result.
+# This is done in two steps:
+if [ -d $NATIVE_INSTALL_DIR/$DEFAULT_INSTALL_FOLDER ]; then
+    # Step 1: copy ./opt/${DISTRO}/${SDK_VERSION} contents to $NATIVE_INSTALL_DIR.
+    # We cannot use move if $NATIVE_INSTALL_DIR is not empty (for example: contains
+    # another SDK)
+    $SUDO cp -r $NATIVE_INSTALL_DIR/$DEFAULT_INSTALL_FOLDER/* $NATIVE_INSTALL_DIR
+
+    # delete the source directory now
+    $SUDO rm -rf $NATIVE_INSTALL_DIR/$DEFAULT_INSTALL_FOLDER/*
+
+    # Step 2: Delete the ./opt/${DISTRO}/${SDK_VERSION} directories too, they should be empty
+    dir=$NATIVE_INSTALL_DIR/$DEFAULT_INSTALL_FOLDER
+    while [ "$dir" != "$NATIVE_INSTALL_DIR" ]; do
+        # if the user chose / as the install folder, then we should leave /opt in place
+        if [ "$dir" = "/opt" ]; then
+            break
+        fi
+
+        # try to delete the directory, only if it's empty
+        $SUDO rmdir $dir
+        if [ $? -ne 0 ]; then
+            break
+        fi
+
+        # go to the next directory
+        dir=$(dirname $dir)
+    done
+    # Step 3: Rewrite the *.list files to contain the correct paths
+    $SUDO find $NATIVE_INSTALL_DIR/var/lib/opkg -type f -exec sed -i -e '#^$DEFAULT_INSTALL_FOLDER#$NATIVE_INSTALL_DIR#' {} \;
+fi
+
+# Link the ld.so.cache file into the hosts filesystem
+if [ ! -f "$OECORE_NATIVE_SYSROOT/etc/ld.so.cache" ]; then
+echo_info "Link the ld.so.cache file into the host filesystem"
+$SUDO ln -s /etc/ld.so.cache $OECORE_NATIVE_SYSROOT/etc/ld.so.cache
+check_result
+fi
+
+# relocate binaries
+echo_info "\nRelocating binaries ..."
+escaped_sdkpath=$(echo $DEFAULT_INSTALL_FOLDER |sed -e "s:[\+\.]:\\\\\\\\\0:g")
+
+# We don't change the script in-place since we may want the user to re-run
+# adt-installer script
+sed -e "s:##DEFAULT_INSTALL_DIR##:$escaped_sdkpath:" scripts/relocate_sdk.py > scripts/relocate_sdk_tmp.py
+chmod +x scripts/relocate_sdk_tmp.py
+
+dl_path=$(find $OECORE_NATIVE_SYSROOT/lib -name "ld-linux*")
+executable_files=$(find $OECORE_NATIVE_SYSROOT -type f -perm /111)
+
+$SUDO scripts/relocate_sdk_tmp.py $INSTALL_FOLDER $dl_path $executable_files
+check_result
+
+# replace /opt/${DISTRO}/${SDK_VERSION} with the install folder in all configs
+env_setup_script=$(find $NATIVE_INSTALL_DIR/ -name "environment-setup-*")
+$SUDO sed -i -e "s:$DEFAULT_INSTALL_FOLDER:$NATIVE_INSTALL_DIR:g" $env_setup_script
+
+find $OECORE_NATIVE_SYSROOT -type f -exec file '{}' \; | grep ":.*\(ASCII\|script\|source\).*text" | \
+    cut -d':' -f1 | xargs $SUDO sed -i -e "s:$DEFAULT_INSTALL_FOLDER:$NATIVE_INSTALL_DIR:g"
+
+# change all symlinks pointing to /opt/${DISTRO}/${SDK_VERSION}
+for l in $(find $NATIVE_INSTALL_DIR -type l); do
+    $SUDO ln -sfn $(readlink $l|sed -e "s:$DEFAULT_INSTALL_FOLDER:$NATIVE_INSTALL_DIR:") $l
+done
+
+# find out all perl scripts in $OECORE_NATIVE_SYSROOT and modify them
+# replacing the host perl with SDK perl.
+for perl_script in $($SUDO grep -m 1 "^#!.*perl" -rl $OECORE_NATIVE_SYSROOT); do
+    $SUDO sed -i -e "s:^#! */usr/bin/perl.*:#! /usr/bin/env perl:g" -e \
+        "s: /usr/bin/perl: /usr/bin/env perl:g" $perl_script
+done
+
+echo_info "\nSuccessfully installed selected native ADT!"
+}
+
+#Need three input params, $1 -- arch_type(arm powerpc x86 mips) #2 -- user installation type
+#customer or scilent
+
+install_target()
+{
+
+target_sysroot=`get_target_rootfs_location $1`
+[ -z "$target_sysroot" ] && return 0
+
+target_sysroot_image_var="\$YOCTOADT_TARGET_SYSROOT_IMAGE_$1"
+target_sysroot_image=`eval echo $target_sysroot_image_var`
+if [ "$target_sysroot_image" == "" ]; then
+  echo_info "[ADT_INST] Error: YOCTOADT_TARGET_SYSROOT_IMAGE_$1 selection is empty, failed to create target sysroot!"
+  return 1
+fi
+
+echo_info "Installing target sysroot for arch: $1, rootfs type: $target_sysroot_image, location: $target_sysroot"
+
+target_machine_var="\$YOCTOADT_TARGET_MACHINE_$1"
+target_machine=`eval echo $target_machine_var`
+sysroot_image_name="core-image-$target_sysroot_image-$target_machine.tar.bz2"
+    #echo_info "Extracting rootfs: $sysroot_image_name, using pseudo..."
+
+# sudo password might be needed to install the target sysroot
+SUDO=$(get_sudo_app $target_sysroot)
+
+$SUDO scripts/extract_rootfs $sysroot_image_name $target_sysroot $OECORE_NATIVE_SYSROOT $user_inst_type
+check_result
+}
+
+
+#Main part
+. scripts/data_define
+. scripts/util
+
+parse_config
+
+#secondly we will start to install native tools
+user_inst_type=$1
+install_native_sdk $user_inst_type
+check_result
+
+for arch_type in $YOCTOADT_TARGETS; do
+  install_target $arch_type
+  check_result
+done
+
+

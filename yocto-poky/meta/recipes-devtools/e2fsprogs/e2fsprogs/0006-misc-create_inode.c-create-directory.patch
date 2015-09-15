@@ -1,0 +1,62 @@
+From c8d1c43be24489036137f8fdebcfccc208f7cc8b Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Mon, 23 Dec 2013 03:34:14 -0500
+Subject: [PATCH 06/11] misc/create_inode.c: create directory
+
+The do_mkdir_internal() is used for making dir on the target fs, most of
+the code are from debugfs/debugfs.c, the debugfs/debugfs.c will be
+modified to use this function.
+
+Upstream-Status: Backport
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+Reviewed-by: Darren Hart <dvhart@linux.intel.com>
+---
+ misc/create_inode.c |   31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+
+diff --git a/misc/create_inode.c b/misc/create_inode.c
+index 98f4a93..6a8c92a 100644
+--- a/misc/create_inode.c
++++ b/misc/create_inode.c
+@@ -135,6 +135,37 @@ try_again:
+ /* Make a directory in the fs */
+ errcode_t do_mkdir_internal(ext2_ino_t cwd, const char *name, struct stat *st)
+ {
++	char			*cp;
++	ext2_ino_t		parent_ino, ino;
++	errcode_t		retval;
++	struct ext2_inode	inode;
++
++
++	cp = strrchr(name, '/');
++	if (cp) {
++		*cp = 0;
++		if ((retval =  ext2fs_namei(current_fs, root, cwd, name, &parent_ino))){
++			com_err(name, retval, 0);
++			return retval;
++		}
++		name = cp+1;
++	} else
++		parent_ino = cwd;
++
++try_again:
++	retval = ext2fs_mkdir(current_fs, parent_ino, 0, name);
++	if (retval == EXT2_ET_DIR_NO_SPACE) {
++		retval = ext2fs_expand_dir(current_fs, parent_ino);
++		if (retval) {
++			com_err(__func__, retval, "while expanding directory");
++			return retval;
++		}
++		goto try_again;
++	}
++	if (retval) {
++		com_err("ext2fs_mkdir", retval, 0);
++		return retval;
++	}
+ }
+ 
+ static errcode_t copy_file(int fd, ext2_ino_t newfile, int bufsize, int make_holes)
+-- 
+1.7.10.4
+

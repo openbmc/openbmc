@@ -1,0 +1,34 @@
+#!/bin/sh
+#
+# /etc/network/if-pre-up.d/zzz-wireless
+# by Stefan Tomanek (stefan@pico.ruhr.de)
+
+
+IWCONFIG=/sbin/iwconfig
+IFCONFIG=/sbin/ifconfig
+GREP=/bin/grep
+LOGGER=/usr/bin/logger
+SLEEP=/bin/sleep
+
+# How long do we wait for association?
+RETRIES=15
+SLEEPTIME=1
+
+# Only sleep if we use DHCP (add others methods seperated by spaces)
+ONLY_FOR="static dhcp"
+
+if [ -z "$IF_WIRELESS_TYPE" ] && echo "$ONLY_FOR" | grep -q "$METHOD" ; then
+	$IFCONFIG $IFACE up
+	$LOGGER Checking for WLAN association...
+	while ( [ $RETRIES -gt 0 ] && ($IWCONFIG "$IFACE" | $GREP -q "Access Point: Not-Associated") ); do
+		$LOGGER No association yet, $RETRIES retries until timeout
+		RETRIES=$(($RETRIES-1))
+		$SLEEP $SLEEPTIME
+	done
+	
+	if [ $RETRIES -eq 0 ]; then
+		$LOGGER Timeout waiting for association, continuing anyway...
+	else
+		$LOGGER Found association!
+	fi
+fi

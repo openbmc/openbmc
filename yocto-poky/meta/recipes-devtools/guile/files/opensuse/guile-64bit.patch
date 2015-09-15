@@ -1,0 +1,39 @@
+Upstream-Status: Inappropriate [opensuse patch]
+
+Signed-Off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
+
+Index: guile-2.0.3/libguile/hash.c
+===================================================================
+--- guile-2.0.3.orig/libguile/hash.c	2011-07-06 15:49:59.000000000 -0700
++++ guile-2.0.3/libguile/hash.c	2012-01-13 21:49:43.332844884 -0800
+@@ -270,7 +270,7 @@ scm_hasher(SCM obj, unsigned long n, siz
+ unsigned long
+ scm_ihashq (SCM obj, unsigned long n)
+ {
+-  return (SCM_UNPACK (obj) >> 1) % n;
++  return ((unsigned long) SCM_UNPACK (obj) >> 1) % n;
+ }
+ 
+ 
+@@ -306,7 +306,7 @@ scm_ihashv (SCM obj, unsigned long n)
+   if (SCM_NUMP(obj))
+     return (unsigned long) scm_hasher(obj, n, 10);
+   else
+-    return SCM_UNPACK (obj) % n;
++    return (unsigned long) SCM_UNPACK (obj) % n;
+ }
+ 
+ 
+Index: guile-2.0.3/libguile/struct.c
+===================================================================
+--- guile-2.0.3.orig/libguile/struct.c	2011-07-06 15:50:00.000000000 -0700
++++ guile-2.0.3/libguile/struct.c	2012-01-13 21:49:43.332844884 -0800
+@@ -942,7 +942,7 @@ scm_struct_ihashq (SCM obj, unsigned lon
+ {
+   /* The length of the hash table should be a relative prime it's not
+      necessary to shift down the address.  */
+-  return SCM_UNPACK (obj) % n;
++  return (unsigned long) SCM_UNPACK (obj) % n;
+ }
+ 
+ SCM_DEFINE (scm_struct_vtable_name, "struct-vtable-name", 1, 0, 0, 

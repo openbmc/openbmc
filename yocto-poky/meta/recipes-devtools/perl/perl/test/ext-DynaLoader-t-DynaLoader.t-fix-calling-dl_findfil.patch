@@ -1,0 +1,26 @@
+ext/DynaLoader/t/DynaLoader.t: fix calling dl_findfile() failed
+
+Use '$Config{libc}' as the libc file name
+
+Upstream-Status: Inappropriate
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ ext/DynaLoader/t/DynaLoader.t | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ext/DynaLoader/t/DynaLoader.t b/ext/DynaLoader/t/DynaLoader.t
+index ade1f8e..3567afe 100644
+--- a/ext/DynaLoader/t/DynaLoader.t
++++ b/ext/DynaLoader/t/DynaLoader.t
+@@ -106,7 +106,7 @@ ok( defined $dlerr, "dl_error() returning an error message: '$dlerr'" );
+ # ... dl_findfile()
+ SKIP: {
+     my @files = ();
+-    eval { @files = DynaLoader::dl_findfile("c") };
++    eval { @files = DynaLoader::dl_findfile($Config{libc}) };
+     is( $@, '', "calling dl_findfile()" );
+     # Some platforms are known to not have a "libc"
+     # (not at least by that name) that the dl_findfile()
+-- 
+1.8.1.2
+

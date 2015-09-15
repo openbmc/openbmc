@@ -1,0 +1,57 @@
+This patch fixes a warning seen with gcc 4.8 (especially on ubuntu 13.10)
+
+| addr2line.c: In function 'handle_address':
+| addr2line.c:450:7: error: format '%a' expects argument of type 'float *', but argument 3 has type 'char **' [-Werror=format=]
+|        if (sscanf (string, "(%a[^)])%" PRIiMAX "%n", &name, &addr, &i) == 2
+|        ^
+| addr2line.c:453:7: error: format '%a' expects argument of type 'float *', but argument 3 has type 'char **' [-Werror=format=]
+|        switch (sscanf (string, "%a[^-+]%n%" PRIiMAX "%n", &name, &i, &addr, &j))
+|        ^
+| cc1: all warnings being treated as errors
+
+
+%a is old GNU style and should be abandoned in favor of %m
+
+Also see
+
+http://gcc.gnu.org/bugzilla/show_bug.cgi?id=54361
+
+to support this assertion
+
+This patch is added via redhat-compatibility patch so lets revert this part
+here.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Inappropriate [Caused by an earlier patch]
+
+Index: elfutils-0.148/src/addr2line.c
+===================================================================
+--- elfutils-0.148.orig/src/addr2line.c	2013-09-23 17:46:45.513586538 -0700
++++ elfutils-0.148/src/addr2line.c	2013-09-23 17:46:46.329586558 -0700
+@@ -447,10 +447,10 @@
+       bool parsed = false;
+       int i, j;
+       char *name = NULL;
+-      if (sscanf (string, "(%a[^)])%" PRIiMAX "%n", &name, &addr, &i) == 2
++      if (sscanf (string, "(%m[^)])%" PRIiMAX "%n", &name, &addr, &i) == 2
+ 	  && string[i] == '\0')
+ 	parsed = adjust_to_section (name, &addr, dwfl);
+-      switch (sscanf (string, "%a[^-+]%n%" PRIiMAX "%n", &name, &i, &addr, &j))
++      switch (sscanf (string, "%m[^-+]%n%" PRIiMAX "%n", &name, &i, &addr, &j))
+ 	{
+ 	default:
+ 	  break;
+Index: elfutils-0.148/tests/line2addr.c
+===================================================================
+--- elfutils-0.148.orig/tests/line2addr.c	2013-09-23 17:46:45.521586538 -0700
++++ elfutils-0.148/tests/line2addr.c	2013-09-23 17:46:46.329586558 -0700
+@@ -132,7 +132,7 @@
+     {
+       struct args a = { .arg = argv[cnt] };
+ 
+-      switch (sscanf (a.arg, "%a[^:]:%d", &a.file, &a.line))
++      switch (sscanf (a.arg, "%m[^:]:%d", &a.file, &a.line))
+ 	{
+ 	default:
+ 	case 0:

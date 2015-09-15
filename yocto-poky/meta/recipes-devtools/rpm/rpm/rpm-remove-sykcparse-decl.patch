@@ -1,0 +1,14 @@
+Index: rpm-5.4.14/syck/lib/syck.h
+===================================================================
+--- rpm-5.4.14.orig/syck/lib/syck.h
++++ rpm-5.4.14/syck/lib/syck.h
+@@ -621,9 +621,6 @@ long syck_seq_count( SyckNode *seq )
+  */
+ void syckerror( char *msg )
+ 	/*@*/;
+-int syckparse( void * )
+-	/*@globals fileSystem @*/
+-	/*@modifies fileSystem @*/;
+ /* XXX union YYSTYPE *sycklval has issues on Mac OS X. */
+ int sycklex( void *_sycklval, SyckParser *parser )
+ 	/*@modifies _sycklval, parser @*/;

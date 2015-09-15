@@ -1,0 +1,28 @@
+Subject: [PATCH 5/6] dropbear enable pam
+
+dropbear: We need modify file option.h besides enabling pam in \
+configure if we want dropbear to support pam.
+
+Upstream-Status: Pending
+
+Signed-off-by: Xiaofeng Yan <xiaofeng.yan@windriver.com>
+---
+ options.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+Index: dropbear-2013.62/options.h
+===================================================================
+--- dropbear-2013.62.orig/options.h	2014-01-14 21:53:02.803262009 +0000
++++ dropbear-2013.62/options.h	2014-01-14 21:53:56.119263462 +0000
+@@ -192,9 +192,9 @@
+  * PAM challenge/response.
+  * You can't enable both PASSWORD and PAM. */
+ 
+-#define ENABLE_SVR_PASSWORD_AUTH
++/*#define ENABLE_SVR_PASSWORD_AUTH*/
+ /* PAM requires ./configure --enable-pam */
+-/*#define ENABLE_SVR_PAM_AUTH */
++#define ENABLE_SVR_PAM_AUTH
+ #define ENABLE_SVR_PUBKEY_AUTH
+ 
+ /* Whether to take public key options in 

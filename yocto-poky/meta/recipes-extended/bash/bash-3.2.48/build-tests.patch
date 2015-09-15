@@ -1,0 +1,44 @@
+Add 'ptest' target to Makefile, to run tests without checking dependencies.
+
+Signed-off-by: Anders Roxell <anders.roxell@enea.com>
+Upstream-Status: Pending
+---
+diff -dNaur bash-3.2.48/Makefile.in.orig bash-3.2.48/Makefile.in
+--- bash-3.2.48/Makefile.in.orig	2006-08-17 23:03:35.000000000 +0500
++++ bash-3.2.48/Makefile.in	2013-07-02 20:20:07.512709327 +0500
+@@ -803,17 +803,31 @@
+ 	fi
+ 
+ recho$(EXEEXT):		$(SUPPORT_SRC)recho.c
+-	@$(CC_FOR_BUILD) $(CCFLAGS_FOR_BUILD) -o $@ $(SUPPORT_SRC)recho.c ${LIBS_FOR_BUILD}
++	@$(CC) $(CCFLAGS) -o $@ $<
+ 
+ zecho$(EXEEXT):		$(SUPPORT_SRC)zecho.c
+-	@$(CC_FOR_BUILD) $(CCFLAGS_FOR_BUILD) -o $@ $(SUPPORT_SRC)zecho.c ${LIBS_FOR_BUILD}
++	@$(CC) $(CCFLAGS) -o $@ $<
+ 
+ printenv$(EXEEXT):	$(SUPPORT_SRC)printenv.c
+-	@$(CC_FOR_BUILD) $(CCFLAGS_FOR_BUILD) -o $@ $(SUPPORT_SRC)printenv.c ${LIBS_FOR_BUILD}
++	@$(CC) $(CCFLAGS) -o $@ $<
+ 
+-test tests check:	force $(Program) $(TESTS_SUPPORT)
++test tests check:
++	@$(MAKE) install-test
++	@$(MAKE) runtest
++
++install-test: buildtest
++ifeq ($(origin INSTALL_TEST_DIR), undefined)
+ 	@-test -d tests || mkdir tests
+ 	@cp $(TESTS_SUPPORT) tests
++else
++	@-test -d $(INSTALL_TEST_DIR) || mkdir -p $(INSTALL_TEST_DIR)
++	@cp -r $(srcdir)/tests/* $(INSTALL_TEST_DIR)/
++	@cp $(TESTS_SUPPORT) $(INSTALL_TEST_DIR)
++endif
++
++buildtest: force $(Program) $(TESTS_SUPPORT)
++
++runtest:
+ 	@( cd $(srcdir)/tests && \
+ 		PATH=$(BUILD_DIR)/tests:$$PATH THIS_SH=$(THIS_SH) $(SHELL) ${TESTSCRIPT} )
+ 

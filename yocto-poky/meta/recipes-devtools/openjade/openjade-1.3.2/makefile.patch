@@ -1,0 +1,39 @@
+This patch fixes libtool QA issues with WORKDIR creeping in to
+libospgrove.la and libostyle.la. Patch obtained from OpenEmbedded.
+
+Upstream-Status: Inappropriate [Other]
+Workaround is specific to our build system.
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+Index: openjade-1.3.2/spgrove/Makefile.sub
+===================================================================
+--- openjade-1.3.2.orig/spgrove/Makefile.sub
++++ openjade-1.3.2/spgrove/Makefile.sub
+@@ -1,8 +1,8 @@
+ LTVERSION=0:1:0
+ LIB=ospgrove
+ INCLUDE=-I$(srcdir)/../grove
+-DEPLIBS=-lm -L$(TOP)/grove -L$(TOP)/grove/.libs \
+-	-L$(TOP)/lib -L$(TOP)/lib/.libs \
++DEPLIBS=-lm $(TOP)/grove \
++	$(TOP)/lib \
+ 	$(LIB_THREADS)
+ OBJS=GroveApp.o GroveBuilder.o SdNode.o
+ GENSRCS=grove_inst.cxx
+Index: openjade-1.3.2/style/Makefile.sub
+===================================================================
+--- openjade-1.3.2.orig/style/Makefile.sub
++++ openjade-1.3.2/style/Makefile.sub
+@@ -1,8 +1,8 @@
+ LTVERSION=0:1:0
+ LIB=ostyle
+-DEPLIBS=-lm -L$(TOP)/grove -L$(TOP)/grove/.libs \
+-  -L$(TOP)/lib -L$(TOP)/lib/.libs \
+-  -L$(TOP)/spgrove -L$(TOP)/spgrove/.libs 
++DEPLIBS=-lm $(TOP)/grove \
++  $(TOP)/lib  \
++  $(TOP)/spgrove
+ OBJS=LangObj.o \
+   Collector.o \
+   DssslApp.o \

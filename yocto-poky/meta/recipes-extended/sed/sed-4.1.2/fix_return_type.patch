@@ -1,0 +1,18 @@
+Upstream-Status: Pending
+
+Change the getline return type to match its declaration.
+
+Signed-off-by: Dongxiao Xu <dongxiao.xu@intel.com>
+
+diff -urN sed-4.1.2-orig/lib/getline.c sed-4.1.2/lib/getline.c
+--- sed-4.1.2-orig/lib/getline.c	2010-08-31 08:47:50.070094024 +0800
++++ sed-4.1.2/lib/getline.c	2010-08-31 08:48:50.982178172 +0800
+@@ -30,7 +30,7 @@
+    necessary.  Returns the number of characters read (not including the
+    null terminator), or -1 on error or EOF.  */
+ 
+-size_t
++ssize_t
+ getline (lineptr, n, stream)
+      char **lineptr;
+      size_t *n;

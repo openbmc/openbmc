@@ -1,0 +1,31 @@
+#! /bin/sh -e
+
+test -x /usr/sbin/acpid || exit 0
+test -d /proc/acpi || exit 0
+mkdir -p /etc/acpi/events
+
+case "$1" in
+  start)
+    echo -n "Starting Advanced Configuration and Power Interface daemon: "
+    if [ ! -d /etc/acpi/events ]; then
+        echo "There is not any rule configuration file."
+    else
+        start-stop-daemon -o -S -x /usr/sbin/acpid -- -c /etc/acpi/events
+        echo "acpid."
+    fi
+    ;;
+  stop)
+    echo -n "Stopping Advanced Configuration and Power Interface daemon: "
+    start-stop-daemon -o -K -x /usr/sbin/acpid
+    echo "acpid."
+    ;;
+  restart|force-reload) 
+    $0 stop
+    $0 start
+    ;;
+  *)
+    echo "Usage: /etc/init.d/acpid {start|stop|restart|force-reload}"
+    exit 1
+esac
+
+exit 0

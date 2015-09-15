@@ -1,0 +1,55 @@
+Add 'ptest' target to Makefile, to run tests without checking dependencies.
+
+Upstream-Status: Pending
+Signed-off-by: Anders Roxell <anders.roxell@enea.com>
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ Makefile.in | 24 +++++++++++++++++++-----
+ 1 file changed, 19 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -848,20 +848,34 @@ maybe-clean:
+ 	fi
+ 
+ recho$(EXEEXT):		$(SUPPORT_SRC)recho.c
+-	@$(CC_FOR_BUILD) $(CCFLAGS_FOR_BUILD) ${LDFLAGS_FOR_BUILD} -o $@ $(SUPPORT_SRC)recho.c ${LIBS_FOR_BUILD}
++	@$(CC) $(CCFLAGS) ${LDFLAGS} -o $@ $<
+ 
+ zecho$(EXEEXT):		$(SUPPORT_SRC)zecho.c
+-	@$(CC_FOR_BUILD) $(CCFLAGS_FOR_BUILD) ${LDFLAGS_FOR_BUILD} -o $@ $(SUPPORT_SRC)zecho.c ${LIBS_FOR_BUILD}
++	@$(CC) $(CCFLAGS) ${LDFLAGS} -o $@ $<
+ 
+ printenv$(EXEEXT):	$(SUPPORT_SRC)printenv.c
+-	@$(CC_FOR_BUILD) $(CCFLAGS_FOR_BUILD) ${LDFLAGS_FOR_BUILD} -o $@ $(SUPPORT_SRC)printenv.c ${LIBS_FOR_BUILD}
++	@$(CC) $(CCFLAGS) ${LDFLAGS} -o $@ $<
+ 
+ xcase$(EXEEXT):	$(SUPPORT_SRC)xcase.c
+-	@$(CC_FOR_BUILD) $(CCFLAGS_FOR_BUILD) ${LDFLAGS_FOR_BUILD} -o $@ $(SUPPORT_SRC)xcase.c ${LIBS_FOR_BUILD}
++	@$(CC) $(CCFLAGS) ${LDFLAGS} -o $@ $<
+ 
+-test tests check:	force $(Program) $(TESTS_SUPPORT)
++test tests check:
++	@$(MAKE) install-test
++	@$(MAKE) runtest
++
++install-test: buildtest
++ifeq ($(origin INSTALL_TEST_DIR), undefined)
+ 	@-test -d tests || mkdir tests
+ 	@cp $(TESTS_SUPPORT) tests
++else
++	@-test -d $(INSTALL_TEST_DIR) || mkdir -p $(INSTALL_TEST_DIR)
++	@cp -r $(srcdir)/tests/* $(INSTALL_TEST_DIR)/
++	@cp $(TESTS_SUPPORT) $(INSTALL_TEST_DIR)
++endif
++
++buildtest: force $(Program) $(TESTS_SUPPORT)
++
++runtest:
+ 	@( cd $(srcdir)/tests && \
+ 		PATH=$(BUILD_DIR)/tests:$$PATH THIS_SH=$(THIS_SH) $(SHELL) ${TESTSCRIPT} )
+ 
+-- 
+1.8.1.2
+

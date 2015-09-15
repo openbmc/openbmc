@@ -1,0 +1,50 @@
+fix a endian incompatible error in generating rpm tag
+
+A flaw was found in the way rpm generating arbitrary tags, which leads to a
+incorrect query result, this issue is introduced by a incompatible endianess
+when the generating process is executed on different architectures.
+
+This patch resolves it by taking the byte order that host uses.
+
+Upstream-Status: Pending
+
+Signed-off-by: Ming Liu <ming.liu@windriver.com>
+---
+ tagname.c |   16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+Index: rpm-5.4.14/rpmdb/tagname.c
+===================================================================
+--- rpm-5.4.14.orig/rpmdb/tagname.c
++++ rpm-5.4.14/rpmdb/tagname.c
+@@ -3,6 +3,19 @@
+  */
+ 
+ #include "system.h"
++#include <endian.h>
++
++/* Don't redefine this macro if it already exists */
++#ifndef le32toh
++#ifdef __USE_BSD
++#include <byteswap.h>
++#if __BYTE_ORDER == __LITTLE_ENDIAN
++#define le32toh(x) (x)
++#else
++#define le32toh(x) __bswap_32(x)
++#endif
++#endif /* __USE_BSD */
++#endif /* le32toh */
+ 
+ #include <rpmio_internal.h>	/* XXX DIGEST_CTX, xtolower, xstrcasecmp */
+ #include <rpmmacro.h>
+@@ -152,7 +165,10 @@ static rpmTag _tagGenerate(const char *s
+     xx = rpmDigestUpdate(ctx, s, nb);
+     xx = rpmDigestFinal(ctx, &digest, &digestlen, 0);
+     if (digest && digestlen > 4) {
++	/* The tag is stored in a uniform byte order for cross-endian compatibility.
++	   Swap to the host uses. */
+ 	memcpy(&tag, digest + (digestlen - 4), 4);
++	tag = le32toh(tag);
+ 	tag = (rpmTag) (tag & 0x3fffffff);
+ 	tag = (rpmTag) (tag | 0x40000000);
+     }

@@ -1,0 +1,58 @@
+<fop version="1.0">
+
+  <!-- Strict user configuration -->
+  <strict-configuration>true</strict-configuration>
+
+  <!-- Strict FO validation -->
+  <strict-validation>true</strict-validation>
+
+   <!--
+    Set the baseDir so common/openedhand.svg references in plans still
+    work ok. Note, relative file references to current dir should still work.
+    -->	
+  <base>../template</base>
+  <font-base>../template</font-base>
+ 
+  <!-- Source resolution in dpi (dots/pixels per inch) for determining the
+       size of pixels in SVG and bitmap images, default: 72dpi -->
+  <!-- <source-resolution>72</source-resolution> -->
+  <!-- Target resolution in dpi (dots/pixels per inch) for specifying the
+       target resolution for generated bitmaps, default: 72dpi -->
+  <!-- <target-resolution>72</target-resolution> -->
+ 
+  <!-- default page-height and page-width, in case
+       value is specified as auto -->
+  <default-page-settings height="11in" width="8.26in"/> 
+ 
+  <!-- <use-cache>false</use-cache> -->
+ 
+  <renderers>
+    <renderer mime="application/pdf">
+      <fonts>
+        <font  metrics-file="VeraMono.xml"
+               kerning="yes" 
+               embed-url="VeraMono.ttf">
+          <font-triplet name="veramono" style="normal" weight="normal"/>
+        </font>
+
+        <font  metrics-file="VeraMoBd.xml"
+               kerning="yes" 
+               embed-url="VeraMoBd.ttf">
+          <font-triplet name="veramono" style="normal" weight="bold"/>
+        </font>
+
+        <font  metrics-file="Vera.xml"
+               kerning="yes" 
+               embed-url="Vera.ttf">
+          <font-triplet name="verasans" style="normal" weight="normal"/>
+          <font-triplet name="verasans" style="normal" weight="bold"/>
+          <font-triplet name="verasans" style="italic" weight="normal"/>
+          <font-triplet name="verasans" style="italic" weight="bold"/>
+        </font>
+        
+        <auto-detect/>
+      </fonts>
+    </renderer>
+  </renderers>
+</fop>
+

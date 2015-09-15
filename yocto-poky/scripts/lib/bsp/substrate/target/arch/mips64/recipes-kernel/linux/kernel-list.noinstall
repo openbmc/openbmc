@@ -1,0 +1,5 @@
+{{ if kernel_choice != "custom": }}
+{{ input type:"boolean" name:"use_default_kernel" prio:"10" msg:"Would you like to use the default (3.14) kernel? (y/n)" default:"y"}}
+
+{{ if kernel_choice != "custom" and use_default_kernel == "n": }}
+{{ input type:"choicelist" name:"kernel_choice" gen:"bsp.kernel.kernels" prio:"10" msg:"Please choose the kernel to use in this BSP:" default:"linux-yocto_3.14"}}

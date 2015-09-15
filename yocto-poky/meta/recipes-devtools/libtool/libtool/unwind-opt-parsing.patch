@@ -1,0 +1,179 @@
+Cut and paste the pieces of build-aux/options-parser inline into the main
+ltmain.sh code. This removes a performance degradation caused by the 
+repeated calls to func_quote_for_eval, the mechanism funclib uses
+to construct the functions used for option parsing.
+
+Upstream-Status: Submitted [Being discussed on mailing list Feb 2015]
+
+diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
+index d5cf07a..0f54303 100644
+--- a/build-aux/ltmain.in
++++ b/build-aux/ltmain.in
+@@ -342,11 +342,15 @@ _LT_EOF
+ # libtool_options_prep [ARG]...
+ # -----------------------------
+ # Preparation for options parsed by libtool.
+-libtool_options_prep ()
+-{
++#libtool_options_prep ()
++#{
+     $debug_mode
+ 
+     # Option defaults:
++    opt_verbose=false
++    opt_warning_types=
++
++    # Option defaults:
+     opt_config=false
+     opt_dlopen=
+     opt_dry_run=false
+@@ -382,19 +386,14 @@ libtool_options_prep ()
+       shift; set dummy --mode uninstall ${1+"$@"}; shift
+       ;;
+     esac
+-
+-    # Pass back the list of options.
+-    func_quote_for_eval ${1+"$@"}
+-    libtool_options_prep_result=$func_quote_for_eval_result
+-}
+-func_add_hook func_options_prep libtool_options_prep
++#}
+ 
+ 
+ # libtool_parse_options [ARG]...
+ # ---------------------------------
+ # Provide handling for libtool specific options.
+-libtool_parse_options ()
+-{
++#libtool_parse_options ()
++#{
+     $debug_cmd
+ 
+     # Perform our own loop to consume as many options as possible in
+@@ -474,29 +473,90 @@ libtool_parse_options ()
+                         func_append preserve_args " $_G_opt"
+                         ;;
+ 
+-	# An option not handled by this hook function:
+-        *)		set dummy "$_G_opt" ${1+"$@"};	shift; break  ;;
+-      esac
+-    done
++        --debug|-x)   debug_cmd='set -x'
++                      func_echo "enabling shell trace mode"
++                      $debug_cmd
++                      ;;
+ 
++        --no-warnings|--no-warning|--no-warn)
++                      set dummy --warnings none ${1+"$@"}
++                      shift
++		      ;;
+ 
+-    # save modified positional parameters for caller
+-    func_quote_for_eval ${1+"$@"}
+-    libtool_parse_options_result=$func_quote_for_eval_result
+-}
+-func_add_hook func_parse_options libtool_parse_options
++        --warnings|--warning|-W)
++                      test $# = 0 && func_missing_arg $_G_opt && break
++                      case " $warning_categories $1" in
++                        *" $1 "*)
++                          # trailing space prevents matching last $1 above
++                          func_append_uniq opt_warning_types " $1"
++                          ;;
++                        *all)
++                          opt_warning_types=$warning_categories
++                          ;;
++                        *none)
++                          opt_warning_types=none
++                          warning_func=:
++                          ;;
++                        *error)
++                          opt_warning_types=$warning_categories
++                          warning_func=func_fatal_error
++                          ;;
++                        *)
++                          func_fatal_error \
++                             "unsupported warning category: '$1'"
++                          ;;
++                      esac
++                      shift
++                      ;;
++
++        --verbose|-v) opt_verbose=: ;;
++        --version)    func_version ;;
++        -\?|-h)       func_usage ;;
++        --help)       func_help ;;
++
++	# Separate optargs to long options (plugins may need this):
++	--*=*)        func_split_equals "$_G_opt"
++	              set dummy "$func_split_equals_lhs" \
++                          "$func_split_equals_rhs" ${1+"$@"}
++                      shift
++                      ;;
++
++       # Separate optargs to short options:
++        -W*)
++                      func_split_short_opt "$_G_opt"
++                      set dummy "$func_split_short_opt_name" \
++                          "$func_split_short_opt_arg" ${1+"$@"}
++                      shift
++                      ;;
++
++        # Separate non-argument short options:
++        -\?*|-h*|-v*|-x*)
++                      func_split_short_opt "$_G_opt"
++                      set dummy "$func_split_short_opt_name" \
++                          "-$func_split_short_opt_arg" ${1+"$@"}
++                      shift
++                      ;;
++
++        --)           break ;;
++        -*)           func_fatal_help "unrecognised option: '$_G_opt'" ;;
++        *)            set dummy "$_G_opt" ${1+"$@"}; shift; break ;;
++      esac
++    done
++#}
+ 
++# Display all warnings if -W was not given.
++test -n "$opt_warning_types" || opt_warning_types=" $warning_categories"
+ 
+ 
+ # libtool_validate_options [ARG]...
+ # ---------------------------------
+ # Perform any sanity checks on option settings and/or unconsumed
+ # arguments.
+-libtool_validate_options ()
+-{
++#libtool_validate_options ()
++#{
+     # save first non-option argument
+     if test 0 -lt $#; then
+-      nonopt=$1
++      nonopt=$_G_opt
+       shift
+     fi
+ 
+@@ -537,20 +597,10 @@ libtool_validate_options ()
+       generic_help=$help
+       help="Try '$progname --help --mode=$opt_mode' for more information."
+     }
++#}
+ 
+-    # Pass back the unparsed argument list
+-    func_quote_for_eval ${1+"$@"}
+-    libtool_validate_options_result=$func_quote_for_eval_result
+-}
+-func_add_hook func_validate_options libtool_validate_options
+-
+-
+-# Process options as early as possible so that --help and --version
+-# can return quickly.
+-func_options ${1+"$@"}
+-eval set dummy "$func_options_result"; shift
+-
+-
++# Bail if the options were screwed!
++$exit_cmd $EXIT_FAILURE
+ 
+ ## ----------- ##
+ ##    Main.    ##

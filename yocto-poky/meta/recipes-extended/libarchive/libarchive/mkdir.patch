@@ -1,0 +1,45 @@
+Add missing mkdir calls so that out-of-tree builds work.
+
+Upstream-Status: Submitted (https://github.com/libarchive/libarchive/pull/534)
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/Makefile.am b/Makefile.am
+index 3fa2d22..5ecca52 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -508,6 +508,7 @@ libarchive_test_LDADD= $(LTLIBICONV)
+ # Building it automatically provides a sanity-check on libarchive_test_SOURCES
+ # above.
+ libarchive/test/list.h: Makefile
++	$(MKDIR_P) libarchive/test
+ 	cat $(top_srcdir)/libarchive/test/test_*.c | grep DEFINE_TEST > libarchive/test/list.h
+ 
+ libarchive_TESTS_ENVIRONMENT= LIBARCHIVE_TEST_FILES=`cd $(top_srcdir);/bin/pwd`/libarchive/test LRZIP=NOCONFIG
+@@ -835,6 +836,7 @@ bsdtar_test_CPPFLAGS=\
+ 	$(PLATFORMCPPFLAGS)
+ 
+ tar/test/list.h: Makefile
++	$(MKDIR_P) tar/test
+ 	cat $(top_srcdir)/tar/test/test_*.c | grep DEFINE_TEST > tar/test/list.h
+ 
+ if BUILD_BSDTAR
+@@ -975,6 +977,7 @@ bsdcpio_test_CPPFLAGS= \
+ bsdcpio_test_LDADD=libarchive_fe.la
+ 
+ cpio/test/list.h: Makefile
++	$(MKDIR_P) cpio/test
+ 	cat $(top_srcdir)/cpio/test/test_*.c | grep DEFINE_TEST > cpio/test/list.h
+ 
+ if BUILD_BSDCPIO
+diff --git a/configure.ac b/configure.ac
+index 38bd299..7bdb00c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -102,6 +102,7 @@ AC_USE_SYSTEM_EXTENSIONS
+ AC_LIBTOOL_WIN32_DLL
+ AC_PROG_LIBTOOL
+ AC_CHECK_TOOL([STRIP],[strip])
++AC_PROG_MKDIR_P
+ 
+ #
+ # Options for building bsdtar.

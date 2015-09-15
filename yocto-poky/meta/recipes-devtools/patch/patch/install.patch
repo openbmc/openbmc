@@ -1,0 +1,43 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+Index: patch-2.5.4/Makefile.in
+===================================================================
+--- patch-2.5.4.orig/Makefile.in	2005-03-09 07:23:54.779311824 -0500
++++ patch-2.5.4/Makefile.in	2005-03-09 07:26:09.616813408 -0500
+@@ -43,10 +43,11 @@
+ PACKAGE_NAME = @PACKAGE_NAME@
+ PACKAGE_VERSION = @PACKAGE_VERSION@
+ 
++DESTDIR =
+ prefix = @prefix@
+ exec_prefix = @exec_prefix@
+ 
+-bindir = $(exec_prefix)/bin
++bindir = @bindir@
+ 
+ # Where to put the manual pages.
+ mandir = @mandir@
+@@ -112,18 +113,18 @@
+ 	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(OBJS) $(LIBS)
+ 
+ install:: all installdirs
+-	$(INSTALL_PROGRAM) patch$(EXEEXT) $(bindir)/$(patch_name)$(EXEEXT)
+-	-$(INSTALL_DATA) $(srcdir)/patch.man $(man1dir)/$(patch_name)$(man1ext)
++	$(INSTALL_PROGRAM) patch$(EXEEXT) $(DESTDIR)$(bindir)/$(patch_name)$(EXEEXT)
++	-$(INSTALL_DATA) $(srcdir)/patch.man $(DESTDIR)$(man1dir)/$(patch_name)$(man1ext)
+ 
+ installdirs::
+-	$(SHELL) $(srcdir)/mkinstalldirs $(bindir) $(man1dir)
++	$(SHELL) $(srcdir)/mkinstalldirs $(DESTDIR)$(bindir) $(DESTDIR)$(man1dir)
+ 
+ install-strip::
+ 	$(MAKE) INSTALL_PROGRAM='$(INSTALL_PROGRAM) -s' install
+ 
+ uninstall::
+-	rm -f $(bindir)/$(patch_name)$(EXEEXT)
+-	rm -f $(man1dir)/$(patch_name)$(man1ext)
++	rm -f $(DESTDIR)$(bindir)/$(patch_name)$(EXEEXT)
++	rm -f $(DESTDIR)$(man1dir)/$(patch_name)$(man1ext)
+ 
+ Makefile: Makefile.in $(CONFIG_STATUS)
+ 	$(SHELL) $(CONFIG_STATUS)

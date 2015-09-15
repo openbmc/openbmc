@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+{% load static %}
+{% load projecttags %}
+<html lang="en">
+    <head>
+        <title>{% if objectname %} {{objectname|title}} - {% endif %}Toaster</title>
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" type="text/css"/>
+<link rel="stylesheet" href="{% static 'css/bootstrap-responsive.min.css' %}" type='text/css'/>
+<link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}" type='text/css'/>
+<link rel="stylesheet" href="{% static 'css/prettify.css' %}" type='text/css'/>
+<link rel="stylesheet" href="{% static 'css/default.css' %}" type='text/css'/>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <script src="{% static 'js/jquery-2.0.3.min.js' %}">
+    </script>
+    <script src="{% static 'js/jquery.cookie.js' %}">
+    </script>
+    <script src="{% static 'js/bootstrap.min.js' %}">
+    </script>
+    <script src="{% static 'js/prettify.js' %}">
+    </script>
+    <script src="{% static 'js/libtoaster.js' %}">
+    </script>
+    {% if DEBUG %}
+    <script>
+      libtoaster.debug = true;
+    </script>
+    {% endif %}
+    <script>
+      libtoaster.ctx = {
+        jsUrl : "{% static 'js/' %}",
+        htmlUrl : "{% static 'html/' %}",
+        projectsUrl : "{% url 'all-projects' %}",
+        projectsTypeAheadUrl: {% url 'xhr_projectstypeahead' as prjurl%}{{prjurl|json}},
+        {% if project.id %}
+        projectId : {{project.id}},
+        projectPageUrl : {% url 'project' project.id as purl%}{{purl|json}},
+        projectName : {{project.name|json}},
+        recipesTypeAheadUrl: {% url 'xhr_recipestypeahead' project.id as paturl%}{{paturl|json}},
+        layersTypeAheadUrl: {% url 'xhr_layerstypeahead' project.id as paturl%}{{paturl|json}},
+        machinesTypeAheadUrl: {% url 'xhr_machinestypeahead' project.id as paturl%}{{paturl|json}},
+
+        projectBuildsUrl: {% url 'projectbuilds' project.id as pburl %}{{pburl|json}},
+        projectId : {{project.id}},
+        {% else %}
+        projectId : undefined,
+        projectPageUrl : undefined,
+        projectName : undefined,
+        projectId : undefined,
+        {% endif %}
+      };
+    </script>
+    <script src="{% static 'js/base.js' %}"></script>
+    <script>
+      $(document).ready(function () {
+        /* Vars needed for base.js */
+        var ctx = {};
+        ctx.numProjects = {{projects|length}};
+        ctx.currentUrl = "{{request.path|escapejs}}";
+
+        basePageInit(ctx);
+      });
+    </script>
+
+{% block extraheadcontent %}
+{% endblock %}
+    </head>
+
+<body style="height: 100%">
+
+  {% csrf_token %}
+  <div id="loading-notification" class="alert lead text-center" style="display:none">
+    Loading <i class="fa-pulse icon-spinner"></i>
+  </div>
+
+  <div id="change-notification" class="alert lead alert-info" style="display:none">
+    <button type="button" class="close" id="hide-alert">&times;</button>
+    <span id="change-notification-msg"></span>
+  </div>
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="brand logo" href="#"><img src="{% static 'img/logo.png' %}" class="" alt="Yocto logo project"/></a>
+          <span class="brand">
+            <a href="/">Toaster</a>
+            {% if DEBUG %}
+            <i class="icon-info-sign" title="<strong>Toaster version information</strong>" data-content="<dl><dt>Branch</dt><dd>{{TOASTER_BRANCH}}</dd><dt>Revision</dt><dd>{{TOASTER_REVISION}}</dd></dl>"></i>
+            {% endif %}
+          </span>
+          {% if request.resolver_match.url_name != 'landing' and request.resolver_match.url_name != 'newproject' %}
+          <ul class="nav">
+            <li  {% if request.resolver_match.url_name == 'all-builds' %}
+                class="active"
+                {% endif %}>
+              <a href="{% url 'all-builds' %}">
+                <i class="icon-tasks"></i>
+                All builds
+              </a>
+            </li>
+            <li {% if request.resolver_match.url_name == 'all-projects'  %}
+                class="active"
+                {% endif %}>
+              <a href="{% url 'all-projects' %}">
+                <i class="icon-folder-open"></i>
+                All projects
+              </a>
+            </li>
+          </ul>
+          {% endif %}
+          <ul class="nav pull-right">
+            <li>
+              <a target="_blank" href="http://www.yoctoproject.org/docs/latest/toaster-manual/toaster-manual.html">
+                <i class="icon-book"></i>
+                Manual
+              </a>
+            </li>
+          </ul>
+          <span class="pull-right divider-vertical"></span>
+          <div class="btn-group pull-right">
+            <a class="btn" id="new-project-button" href="{% url 'newproject' %}">New project</a>
+          </div>
+          <!-- New build popover -->
+          <div class="btn-group pull-right" id="new-build-button" style="display:none">
+            <button class="btn dropdown-toggle" data-toggle="dropdown">
+              New build
+              <i class="icon-caret-down"></i>
+            </button>
+            <ul class="dropdown-menu new-build multi-select">
+              <li>
+                <h3>New build</h3>
+                <h6>Project:</h6>
+                <span id="project">
+                  {% if project.id %}
+                  <a class="lead" href="{% url 'project' project.id %}">{{project.name}}</a>
+                  {% else %}
+                  <a class="lead" href="#"></a>
+                  {% endif %}
+                  <i class="icon-pencil"></i>
+                </span>
+                <form id="change-project-form" style="display:none;">
+                  <div class="input-append">
+                    <input type="text" class="input-medium" id="project-name-input" placeholder="Type a project name" autocomplete="off" data-minLength="1" data-autocomplete="off" data-provide="typeahead"/>
+                    <button id="save-project-button" class="btn" type="button">Save</button>
+                    <a href="#" id="cancel-change-project" class="btn btn-link" style="display: none">Cancel</a>
+                  </div>
+                  <p><a id="view-all-projects" href="{% url 'all-projects' %}">View all projects</a></p>
+                </form>
+              </li>
+              <li>
+                <div class="alert" style="display:none;">
+                  <p>This project configuration is incomplete, so you cannot run builds.</p>
+                  <p><a href="{% if project.id %}{% url 'project' project.id %}{% endif %}">View project configuration</a></p>
+                </div>
+              </li>
+              <li id="targets-form">
+                <h6>Recipe(s):</h6>
+                <form>
+                  <input type="text" class="input-xlarge build-target-input" placeholder="Type a recipe name" autocomplete="off" data-minLength="1" data-autocomplete="off" data-provide="typeahead" disabled/>
+                  <div class="row-fluid">
+                    <button class="btn btn-primary build-button" disabled>Build</button>
+                  </div>
+                </form>
+              </li>
+            </ul>
+          </div>
+
+
+    </div>
+ </div>
+</div>
+
+<div class="container-fluid top-padded">
+<div class="row-fluid">
+{% block pagecontent %}
+{% endblock %}
+</div>
+</div>
+</body>
+</html>
+

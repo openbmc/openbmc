@@ -1,0 +1,82 @@
+#!/bin/sh
+# Copyright (C) 2011 O.S. Systems Software LTDA.
+# Licensed on MIT
+
+# Adds support to dynamic debugging of initramfs using bootparam in
+# following format:
+#   shell                 : starts a shell before and after each module
+#   shell=before:<module> : starts a shell before <module> is loaded and run
+#   shell=after:<module>  : starts a shell after <module> is loaded and run
+#
+#   shell-debug                 : run set -x as soon as possible
+#   shell-debug=before:<module> : run set -x before <module> is loaded and run
+#   shell-debug=after:<module>  : run set -x after <module> is loaded and run
+
+DEBUG_SHELL="false"
+
+debug_hook_handler() {
+	status=$1
+	module=$2
+
+	if [ -n "$bootparam_shell" ] && [ "$bootparam_shell" != "true" ]; then
+		shell_wanted_status=`expr $bootparam_shell : '\(.*\):.*'`
+		shell_wanted_module=`expr $bootparam_shell : '.*:\(.*\)'`
+
+		if [ "$shell_wanted_status" = "before" ]; then
+			shell_wanted_status=pre
+		else
+			shell_wanted_status=post
+		fi
+	fi
+
+	if [ "$bootparam_shell" = "true" ] ||
+		( [ "$status" = "$shell_wanted_status" ] &&
+			[ "$module" = "$shell_wanted_module" ] ); then
+		if [ "$status" = "pre" ]; then
+			status_msg="before"
+		else
+			status_msg="after"
+		fi
+
+		msg "Starting shell $status_msg $module..."
+		sh
+	fi
+
+	if [ -n "$bootparam_shell_debug" ] && [ "$bootparam_shell_debug" != "true" ]; then
+		shell_debug_wanted_status=`expr $bootparam_shell_debug : '\(.*\):.*'`
+		shell_debug_wanted_module=`expr $bootparam_shell_debug : '.*:\(.*\)'`
+
+		if [ "$shell_debug_wanted_status" = "before" ]; then
+			shell_debug_wanted_status=pre
+		else
+			shell_debug_wanted_status=post
+		fi
+	fi
+
+	if [ "$bootparam_shell_debug" = "true" ] ||
+		( [ "$status" = "$shell_debug_wanted_status" ] &&
+			[ "$module" = "$shell_debug_wanted_module" ] ); then
+		if [ "$DEBUG_SHELL" = "true" ]; then
+			return 0
+		fi
+
+		if [ "$status" = "pre" ]; then
+			status_msg="before"
+		else
+			status_msg="after"
+		fi
+
+		msg "Starting shell debugging $status_msg $module..."
+		DEBUG_SHELL="true"
+		set -x
+	fi
+}
+
+debug_enabled() {
+	return 0
+}
+
+debug_run() {
+	add_module_pre_hook "debug_hook_handler"
+	add_module_post_hook "debug_hook_handler"
+}

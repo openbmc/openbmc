@@ -1,0 +1,67 @@
+#!/bin/sh
+#
+### BEGIN INIT INFO
+# Provides:          portmap
+# Required-Start:    $network
+# Required-Stop:     $network
+# Default-Start:     S 2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: The RPC portmapper
+# Description:       Portmap is a server that converts RPC (Remote
+#                    Procedure Call) program numbers into DARPA
+#                    protocol port numbers. It must be running in
+#                    order to make RPC calls. Services that use
+#                    RPC include NFS and NIS.
+### END INIT INFO
+
+test -f /sbin/portmap || exit 0
+
+case "$1" in
+    start)
+	echo "Starting portmap daemon..."
+        start-stop-daemon --start --quiet --exec /sbin/portmap
+
+	if [ -f /var/run/portmap.upgrade-state ]; then
+          echo "Restoring old RPC service information..."
+          sleep 1 # needs a short pause or pmap_set won't work. :(
+	  pmap_set </var/run/portmap.upgrade-state
+	  rm -f /var/run/portmap.upgrade-state
+          echo "done."
+        fi
+
+	;;
+    stop)
+        echo "Stopping portmap daemon..."
+        start-stop-daemon --stop --quiet --exec /sbin/portmap
+	;;
+    reload)
+	;;
+    force-reload)
+        $0 restart
+	;;
+    restart)
+	# pmap_dump and pmap_set may be in a different package and not installed...
+	if [ -f /sbin/pmap_dump -a -f /sbin/pmap_set ]; then
+		do_state=1
+	else
+		do_state=0
+	fi
+	[ $do_state -eq 1 ] && pmap_dump >/var/run/portmap.state
+        $0 stop
+        $0 start
+	if [ $do_state -eq 1 ]; then
+	  if [ ! -f /var/run/portmap.upgrade-state ]; then
+            sleep 1
+	    pmap_set </var/run/portmap.state
+	  fi
+	  rm -f /var/run/portmap.state
+	fi
+	;;
+    *)
+	echo "Usage: /etc/init.d/portmap {start|stop|reload|restart}"
+	exit 1
+	;;
+esac
+
+exit 0
+

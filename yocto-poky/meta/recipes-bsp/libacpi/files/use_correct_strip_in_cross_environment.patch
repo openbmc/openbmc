@@ -1,0 +1,23 @@
+Upstream-Status: Pending
+
+Used the cross strip instead of host strip to avoid this build error:
+
+| strip: Unable to recognise the format of the input file `test-libacpi'
+| make: *** [test-libacpi] Error 1
+| ERROR: oe_runmake failed
+
+Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com> 2011/12/07
+
+Index: libacpi-0.2/Makefile
+===================================================================
+--- libacpi-0.2.orig/Makefile
++++ libacpi-0.2/Makefile
+@@ -39,7 +39,7 @@ libacpi.so: ${OBJ}
+ test-libacpi: ${OBJ_test}
+ 	@echo LD $@
+ 	@${CC} -o $@ ${OBJ_test} ${LDFLAGS}
+-	@strip $@
++	@${STRIP} $@
+ 
+ install: all
+ 	@echo installing header to ${DESTDIR}${PREFIX}/include

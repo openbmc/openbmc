@@ -1,0 +1,55 @@
+From 81fecd367b016e5ac4fb0c04b84da5c474f30da6 Mon Sep 17 00:00:00 2001
+From: Peter Urbanec <git.user@urbanec.net>
+Date: Fri, 27 Feb 2015 01:16:58 +1100
+Subject: [PATCH 1/1] gstinfo: Shorten __FILE__ on all platforms.
+
+This is useful not only for MSVC, but also with gcc/Linux when doing
+cross-compilation builds and out-of-tree builds.
+
+Upstream-Status: Submitted [https://bugzilla.gnome.org/show_bug.cgi?id=745213]
+
+Signed-off-by: Peter Urbanec <git.user@urbanec.net>
+---
+ gst/gstinfo.c | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
+
+diff --git a/gst/gstinfo.c b/gst/gstinfo.c
+index b2a3005..8b61d09 100644
+--- a/gst/gstinfo.c
++++ b/gst/gstinfo.c
+@@ -444,7 +444,6 @@ gst_debug_log (GstDebugCategory * category, GstDebugLevel level,
+   va_end (var_args);
+ }
+ 
+-#ifdef G_OS_WIN32
+ /* based on g_basename(), which we can't use because it was deprecated */
+ static inline const gchar *
+ gst_path_basename (const gchar * file_name)
+@@ -467,7 +466,6 @@ gst_path_basename (const gchar * file_name)
+ 
+   return file_name;
+ }
+-#endif
+ 
+ /**
+  * gst_debug_log_valist:
+@@ -497,12 +495,11 @@ gst_debug_log_valist (GstDebugCategory * category, GstDebugLevel level,
+   g_return_if_fail (function != NULL);
+   g_return_if_fail (format != NULL);
+ 
+-  /* The predefined macro __FILE__ is always the exact path given to the
+-   * compiler with MSVC, which may or may not be the basename.  We work
+-   * around it at runtime to improve the readability. */
+-#ifdef G_OS_WIN32
++  /* The predefined macro __FILE__ can be an absolute path in some build
++   * environments, such as MSVC or out-of-tree cross-compiles. This may
++   * be significantly longer than the filename.  We work around it at
++   * runtime to improve the readability. */
+   file = gst_path_basename (file);
+-#endif
+ 
+   message.message = NULL;
+   message.format = format;
+-- 
+2.3.0
+

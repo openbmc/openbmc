@@ -1,0 +1,191 @@
+device "hostap_cs"
+   class "network" module "hostap", "hostap_cs"
+
+card "Intersil PRISM2 Reference Design 11Mb/s WLAN Card"
+   version "INTERSIL", "HFA384x/IEEE"
+   bind "hostap_cs"
+
+card "Compaq WL100 11Mb/s WLAN Card"
+   manfid 0x0138, 0x0002
+   bind "hostap_cs"
+
+card "Compaq WL200"
+   version "Compaq", "WL200_11Mbps_Wireless_PCI_Card"
+   bind "hostap_cs"
+
+card "EMTAC A2424i 11Mbps WLAN Card"
+   manfid 0xc250, 0x0002
+#   cis "cis/Emtac.dat"
+   bind "hostap_cs"
+
+card "Linksys WPC11 11Mbps WLAN Card"
+   version "Instant Wireless ", " Network PC CARD", "Version 01.02"
+   bind "hostap_cs"
+
+card "Linksys WPC11 Ver 2.5 11Mbps WLAN Card"
+   manfid 0x0274, 0x1612
+   bind "hostap_cs"
+
+card "Linksys WPC11 Ver 3 11Mbps WLAN Card"
+   manfid 0x0274, 0x1613
+   bind "hostap_cs"
+
+card "Linksys WCF12 Wireless CompactFlash Card"
+   version "Linksys", "Wireless CompactFlash Card"
+   bind "hostap_cs"
+
+card "D-Link DWL-650 11Mbps WLAN Card"
+   version "D", "Link DWL-650 11Mbps WLAN Card", "Version 01.02"
+   bind "hostap_cs"
+
+card "D-Link DRC-650 11Mbps WLAN Card"
+#  version "D", "Link DRC-650 11Mbps WLAN Card", "Version 01.02"
+   manfid 0x028a, 0x0002
+   bind "hostap_cs"
+
+card "ZoomAir 4100 11Mb/s WLAN Card"
+   version "ZoomAir 11Mbps High", "Rate wireless Networking"
+   bind "hostap_cs"
+
+card "Addtron AWP-100 11Mbps WLAN Card"
+   version "Addtron", "AWP-100 Wireless PCMCIA", "Version 01.02"
+   bind "hostap_cs"
+
+card "Samsung SWL2000-N 11Mb/s WLAN Card"
+   manfid 0x0250, 0x0002
+   bind "hostap_cs"
+
+card "SMC 2632W 11Mbps WLAN Card"
+   version "SMC", "SMC2632W", "Version 01.02"
+   bind "hostap_cs"
+
+card "BroMax Freeport 11Mbps WLAN Card"
+   version "Intersil", "PRISM 2_5 PCMCIA ADAPTER", "ISL37300P", "Eval-RevA"
+   bind "hostap_cs"
+
+card "Z-Com XI300 11Mb/s WLAN Card"
+   manfid 0xd601, 0x0002
+   bind "hostap_cs"
+
+card "Zcomax XI-325H 200mW"
+#   version " ", "IEEE 802.11 Wireless LAN/PC Card"
+   manfid 0xd601, 0x0005
+   bind "hostap_cs"
+
+card "3Com AirConnect PCI 777A"
+   manfid 0x0101, 0x0777
+   bind "hostap_cs"
+
+card "U.S. Robotics IEEE 802.11b PC-CARD"
+   version "U.S. Robotics", "IEEE 802.11b PC-CARD", "Version 01.02"
+#   manfid 0x0156, 0x0002
+   bind "hostap_cs"
+
+card "Longshine LCR-8531 11Mbps WLAN PCMCIA CARD"
+   version "OEM", "PRISM2 IEEE 802.11 PC-Card", "Version 01.02"
+#   manfid 0x0156, 0x0002
+   bind "hostap_cs"
+
+card "Philips 802.11b WLAN PCMCIA"
+   manfid 0x000b, 0x7300
+   bind "hostap_cs"
+
+card "Proxim RangeLAN"
+#   version "PROXIM", "RangeLAN-DS/LAN PC CARD"
+   manfid 0x0126, 0x8000
+   bind "hostap_cs"
+
+card "Buffalo WLI-CF-S11G"
+   version "BUFFALO", "WLI-CF-S11G"
+#  manfid 0x026f, 0x030b
+   bind "hostap_cs"
+
+card "Level-One WPC-0100"
+   version "Digital Data Communications", "WPC-0100", "Version 00.00"
+   manfid 0x0156, 0x0002
+   bind "hostap_cs"
+
+card "Belkin 802.11b WLAN PCMCIA"
+   version "Belkin", "11Mbps Wireless Notebook Network Adapter", "Version 01.02"
+   manfid 0x0156, 0x0002
+   bind "hostap_cs"
+
+card "Senao SL-2011CD/SL-2011CDPLUS"
+   version "INTERSIL", "HFA384x/IEEE", "Version 01.02"
+   manfid 0x0156, 0x0002
+   bind "hostap_cs"
+
+card "Fulbond Airbond XI-300B"
+   version " ", "IEEE 802.11 Wireless LAN/PC Card"
+   manfid 0xd601, 0x0002
+   bind "hostap_cs"
+
+card "Netgear MA401"
+   version "NETGEAR MA401 Wireless PC", "Card", "Version 01.00"
+#   manfid 0x0156, 0x0002
+   bind "hostap_cs"
+
+card "D-Link DWL-650 Rev. P1"
+   version "D-Link", "DWL-650 Wireless PC Card RevP", "ISL37101P-10", "A3"
+#   manfid 0x000b, 0x7110
+   bind "hostap_cs"
+
+card "SonicWALL Long Range Wireless Card"
+   version "SonicWALL", "Long Range Wireless Card", "ISL37100P", "1.0"
+   manfid 0x000b, 0x7100
+   bind "hostap_cs"
+
+card "Senao NL-2011CD PLUS Ext2 Mercury"
+   version "WLAN", "11Mbps_PC-Card_3.0", "ISL37100P", "Eval-RevA"
+   manfid 0x000b, 0x7100
+   bind "hostap_cs"
+
+card "Airvast WL100"
+   version "AIRVAST", "IEEE 802.11b Wireless PCMCIA Card", "HFA3863"
+   manfid 0x50c2, 0x0001
+   bind "hostap_cs"
+
+card "Microsoft Wireless Notebook Adapter MN-520 1.0.3"
+   version "Microsoft", "Wireless Notebook Adapter MN-520", "", "1.0.3"
+   manfid 0x02d2, 0x0001
+   bind "hostap_cs"
+
+card "NETGEAR MA401RA"
+   version "NETGEAR MA401RA Wireless PC", "Card", "ISL37300P", "Eval-RevA"
+   manfid 0x000b, 0x7300
+   bind "hostap_cs"
+
+card "Allied Telesyn AT-WCL452"
+   version "Allied Telesyn", "AT-WCL452 Wireless PCMCIA Radio", "Ver. 1.00"
+   manfid 0xc00f, 0x0000
+   bind "hostap_cs"
+
+card "corega WL PCCL-11"
+   version "corega", "WL PCCL-11", "ISL37300P", "RevA"
+   manfid 0xc00f, 0x0000
+   bind "hostap_cs"
+
+card "SanDisk ConnectPlus"
+   version "SanDisk", "ConnectPlus"
+   manfid 0xd601, 0x0101
+   bind "hostap_cs" to 0
+   bind "ide-cs" to 1
+
+card "ASUS WL-100 8011b WLAN PC Card"
+   version "ASUS", "802_11b_PC_CARD_25", "Version 01.00"
+   manfid 0x02aa, 0x0002
+   bind "hostap_cs"
+
+card "ZyXel Zyair B-101 802.11b WLAN card"
+   version " ", "IEEE 802.11 Wireless LAN/PC Card"
+   manfid 0xd601, 0x0010
+   bind "hostap_cs"
+
+card "WLAN PRISM PCMCIA CARD 37300P RevB6"
+   version "WLAN", "PRISM PCMCIA CARD", "37300P", "Revision B6"
+   manfid 0x50c2, 0x7300
+   bind "hostap_cs"
+
+
+# Optional configuration parameters for hostap_cs.o
+# module "hostap_cs" opts "channel=3 iw_mode=3 essid=test ignore_cis_vcc=0"

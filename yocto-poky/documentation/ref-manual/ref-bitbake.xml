@@ -1,0 +1,472 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
+[<!ENTITY % poky SYSTEM "../poky.ent"> %poky; ] >
+
+<chapter id='ref-bitbake'>
+
+    <title>BitBake</title>
+
+    <para>
+        BitBake is a program written in Python that interprets the
+        <ulink url='&YOCTO_DOCS_DEV_URL;#metadata'>Metadata</ulink> used by
+        the OpenEmbedded build system.
+        At some point, developers wonder what actually happens when you enter:
+        <literallayout class='monospaced'>
+     $ bitbake core-image-sato
+        </literallayout>
+    </para>
+
+    <para>
+        This chapter provides an overview of what happens behind the scenes from BitBake's perspective.
+    </para>
+
+    <note>
+        BitBake strives to be a generic "task" executor that is capable of handling complex dependency relationships.
+        As such, it has no real knowledge of what the tasks being executed actually do.
+        BitBake just considers a list of tasks with dependencies and handles
+        <ulink url='&YOCTO_DOCS_DEV_URL;#metadata'>Metadata</ulink>
+        consisting of variables in a certain format that get passed to the tasks.
+    </note>
+
+    <section id='ref-bitbake-parsing'>
+        <title>Parsing</title>
+
+        <para>
+            BitBake parses configuration files, classes, and <filename>.bb</filename> files.
+        </para>
+
+        <para>
+            The first thing BitBake does is look for the <filename>bitbake.conf</filename> file.
+            This file resides in the
+            <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+            within the <filename>meta/conf/</filename> directory.
+            BitBake finds it by examining its
+            <link linkend='var-BBPATH'><filename>BBPATH</filename></link> environment
+            variable and looking for the <filename>meta/conf/</filename>
+            directory.
+        </para>
+
+        <para>
+            The <filename>bitbake.conf</filename> file lists other configuration
+            files to include from a <filename>conf/</filename>
+            directory below the directories listed in <filename>BBPATH</filename>.
+            In general, the most important configuration file from a user's perspective
+            is <filename>local.conf</filename>, which contains a user's customized
+            settings for the OpenEmbedded build environment.
+            Other notable configuration files are the distribution
+            configuration file (set by the
+            <filename><link linkend='var-DISTRO'>DISTRO</link></filename> variable)
+            and the machine configuration file
+            (set by the
+            <filename><link linkend='var-MACHINE'>MACHINE</link></filename> variable).
+            The <filename>DISTRO</filename> and <filename>MACHINE</filename> BitBake environment
+            variables are both usually set in
+            the <filename>local.conf</filename> file.
+            Valid distribution
+            configuration files are available in the <filename>meta/conf/distro/</filename> directory
+            and valid machine configuration
+            files in the <filename>meta/conf/machine/</filename> directory.
+            Within the <filename>meta/conf/machine/include/</filename>
+            directory are various <filename>tune-*.inc</filename> configuration files that provide common
+            "tuning" settings specific to and shared between particular architectures and machines.
+        </para>
+
+        <para>
+            After the parsing of the configuration files, some standard classes are included.
+            The <filename>base.bbclass</filename> file is always included.
+            Other classes that are specified in the configuration using the
+            <filename><link linkend='var-INHERIT'>INHERIT</link></filename>
+            variable are also included.
+            Class files are searched for in a <filename>classes</filename> subdirectory
+            under the paths in <filename>BBPATH</filename> in the same way as
+            configuration files.
+        </para>
+
+        <para>
+            After classes are included, the variable
+            <filename><link linkend='var-BBFILES'>BBFILES</link></filename>
+            is set, usually in
+            <filename>local.conf</filename>, and defines the list of places to search for
+            <filename>.bb</filename> files.
+            By default, the <filename>BBFILES</filename> variable specifies the
+            <filename>meta/recipes-*/</filename> directory within Poky.
+            Adding extra content to <filename>BBFILES</filename> is best achieved through the use of
+            BitBake layers as described in the
+            "<ulink url='&YOCTO_DOCS_DEV_URL;#understanding-and-creating-layers'>Understanding and
+            Creating Layers</ulink>" section of the Yocto Project Development Manual.
+        </para>
+
+        <para>
+            BitBake parses each <filename>.bb</filename> file in <filename>BBFILES</filename> and
+            stores the values of various variables.
+            In summary, for each <filename>.bb</filename>
+            file the configuration plus the base class of variables are set, followed
+            by the data in the <filename>.bb</filename> file
+            itself, followed by any inherit commands that
+            <filename>.bb</filename> file might contain.
+        </para>
+
+        <para>
+            Because parsing <filename>.bb</filename> files is a time
+            consuming process, a cache is kept to speed up subsequent parsing.
+            This cache is invalid if the timestamp of the <filename>.bb</filename>
+            file itself changes, or if the timestamps of any of the include,
+            configuration files or class files on which the
+            <filename>.bb</filename> file depends change.
+        </para>
+
+        <note>
+            <para>
+                You need to be aware of how BitBake parses curly braces.
+                If a recipe uses a closing curly brace within the function and
+                the character has no leading spaces, BitBake produces a parsing
+                error.
+                If you use a pair of curly brace in a shell function, the
+                closing curly brace must not be located at the start of the line
+                without leading spaces.
+            </para>
+
+            <para>
+                Here is an example that causes BitBake to produce a parsing
+                error:
+                <literallayout class='monospaced'>
+     fakeroot create_shar() {
+         cat &lt;&lt; "EOF" &gt; ${SDK_DEPLOY}/${TOOLCHAIN_OUTPUTNAME}.sh
+     usage()
+     {
+       echo "test"
+       ###### The following "}" at the start of the line causes a parsing error ######
+     }
+     EOF
+     }
+                </literallayout>
+                Writing the recipe this way avoids the error:
+                <literallayout class='monospaced'>
+     fakeroot create_shar() {
+         cat &lt;&lt; "EOF" &gt; ${SDK_DEPLOY}/${TOOLCHAIN_OUTPUTNAME}.sh
+     usage()
+     {
+       echo "test"
+       ######The following "}" with a leading space at the start of the line avoids the error ######
+      }
+     EOF
+     }
+                </literallayout>
+            </para>
+        </note>
+    </section>
+
+    <section id='ref-bitbake-providers'>
+        <title>Preferences and Providers</title>
+
+        <para>
+            Once all the <filename>.bb</filename> files have been
+            parsed, BitBake starts to build the target (<filename>core-image-sato</filename>
+            in the previous section's example) and looks for providers of that target.
+            Once a provider is selected, BitBake resolves all the dependencies for
+            the target.
+            In the case of <filename>core-image-sato</filename>, it would lead to
+            <filename>packagegroup-core-x11-sato</filename>,
+            which in turn leads to recipes like <filename>matchbox-terminal</filename>,
+            <filename>pcmanfm</filename> and <filename>gthumb</filename>.
+            These recipes in turn depend on <filename>glibc</filename> and the toolchain.
+        </para>
+
+        <para>
+            Sometimes a target might have multiple providers.
+            A common example is "virtual/kernel", which is provided by each kernel package.
+            Each machine often selects the best kernel provider by using a line similar to the
+            following in the machine configuration file:
+        </para>
+
+        <literallayout class='monospaced'>
+     PREFERRED_PROVIDER_virtual/kernel = "linux-yocto"
+        </literallayout>
+
+        <para>
+            The default <filename><link linkend='var-PREFERRED_PROVIDER'>PREFERRED_PROVIDER</link></filename>
+            is the provider with the same name as the target.
+        </para>
+
+        <para>
+            Understanding how providers are chosen is made complicated by the fact
+            that multiple versions might exist.
+            BitBake defaults to the highest version of a provider.
+            Version comparisons are made using the same method as Debian.
+            You can use the
+            <filename><link linkend='var-PREFERRED_VERSION'>PREFERRED_VERSION</link></filename>
+            variable to specify a particular version (usually in the distro configuration).
+            You can influence the order by using the
+            <filename><link linkend='var-DEFAULT_PREFERENCE'>DEFAULT_PREFERENCE</link></filename>
+            variable.
+            By default, files have a preference of "0".
+            Setting the <filename>DEFAULT_PREFERENCE</filename> to "-1" makes the
+            package unlikely to be used unless it is explicitly referenced.
+            Setting the <filename>DEFAULT_PREFERENCE</filename> to "1" makes it likely the package is used.
+            <filename>PREFERRED_VERSION</filename> overrides any <filename>DEFAULT_PREFERENCE</filename> setting.
+            <filename>DEFAULT_PREFERENCE</filename> is often used to mark newer and more experimental package
+            versions until they have undergone sufficient testing to be considered stable.
+        </para>
+
+        <para>
+            In summary, BitBake has created a list of providers, which is prioritized, for each target.
+        </para>
+    </section>
+
+    <section id='ref-bitbake-dependencies'>
+        <title>Dependencies</title>
+
+        <para>
+            Each target BitBake builds consists of multiple tasks such as
+            <filename>fetch</filename>, <filename>unpack</filename>,
+            <filename>patch</filename>, <filename>configure</filename>,
+            and <filename>compile</filename>.
+            For best performance on multi-core systems, BitBake considers each task as an independent
+            entity with its own set of dependencies.
+        </para>
+
+        <para>
+            Dependencies are defined through several variables.
+            You can find information about variables BitBake uses in the BitBake documentation,
+            which is found in the <filename>bitbake/doc/manual</filename> directory within the
+            <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+            At a basic level, it is sufficient to know that BitBake uses the
+            <filename><link linkend='var-DEPENDS'>DEPENDS</link></filename> and
+            <filename><link linkend='var-RDEPENDS'>RDEPENDS</link></filename> variables when
+            calculating dependencies.
+        </para>
+    </section>
+
+    <section id='ref-bitbake-tasklist'>
+        <title>The Task List</title>
+
+        <para>
+            Based on the generated list of providers and the dependency information,
+            BitBake can now calculate exactly what tasks it needs to run and in what
+            order it needs to run them.
+            The build now starts with BitBake forking off threads up to the limit set in the
+            <filename><link linkend='var-BB_NUMBER_THREADS'>BB_NUMBER_THREADS</link></filename> variable.
+            BitBake continues to fork threads as long as there are tasks ready to run,
+            those tasks have all their dependencies met, and the thread threshold has not been
+            exceeded.
+        </para>
+
+        <para>
+            It is worth noting that you can greatly speed up the build time by properly setting
+            the <filename>BB_NUMBER_THREADS</filename> variable.
+            See the
+            "<ulink url='&YOCTO_DOCS_QS_URL;#qs-building-images'>Building Images</ulink>"
+            section in the Yocto Project Quick Start for more information.
+        </para>
+
+        <para>
+            As each task completes, a timestamp is written to the directory specified by the
+            <filename><link linkend='var-STAMP'>STAMP</link></filename> variable.
+            On subsequent runs, BitBake looks within the <filename>build/tmp/stamps</filename>
+            directory and does not rerun
+            tasks that are already completed unless a timestamp is found to be invalid.
+            Currently, invalid timestamps are only considered on a per
+            <filename>.bb</filename> file basis.
+            So, for example, if the configure stamp has a timestamp greater than the
+            compile timestamp for a given target, then the compile task would rerun.
+            Running the compile task again, however, has no effect on other providers
+            that depend on that target.
+            This behavior could change or become configurable in future versions of BitBake.
+        </para>
+
+        <note>
+            Some tasks are marked as "nostamp" tasks.
+            No timestamp file is created when these tasks are run.
+            Consequently, "nostamp" tasks are always rerun.
+        </note>
+    </section>
+
+    <section id='ref-bitbake-runtask'>
+        <title>Running a Task</title>
+
+        <para>
+            Tasks can either be a shell task or a Python task.
+            For shell tasks, BitBake writes a shell script to
+            <filename>${WORKDIR}/temp/run.do_taskname.pid</filename> and then executes the script.
+            The generated shell script contains all the exported variables, and the shell functions
+            with all variables expanded.
+            Output from the shell script goes to the file <filename>${WORKDIR}/temp/log.do_taskname.pid</filename>.
+            Looking at the expanded shell functions in the run file and the output in the log files
+            is a useful debugging technique.
+        </para>
+
+        <para>
+            For Python tasks, BitBake executes the task internally and logs information to the
+            controlling terminal.
+            Future versions of BitBake will write the functions to files similar to the way
+            shell tasks are handled.
+            Logging will be handled in a way similar to shell tasks as well.
+        </para>
+
+        <para>
+            Once all the tasks have been completed BitBake exits.
+        </para>
+
+        <para>
+            When running a task, BitBake tightly controls the execution environment
+            of the build tasks to make sure unwanted contamination from the build machine
+            cannot influence the build.
+            Consequently, if you do want something to get passed into the build
+            task's environment, you must take a few steps:
+            <orderedlist>
+                <listitem><para>Tell BitBake to load what you want from the environment
+                    into the data store.
+                    You can do so through the <filename>BB_ENV_EXTRAWHITE</filename>
+                    variable.
+                    For example, assume you want to prevent the build system from
+                    accessing your <filename>$HOME/.ccache</filename> directory.
+                    The following command tells BitBake to load
+                    <filename>CCACHE_DIR</filename> from the environment into the data
+                    store:
+                    <literallayout class='monospaced'>
+     export BB_ENV_EXTRAWHITE="$BB_ENV_EXTRAWHITE CCACHE_DIR"
+                    </literallayout></para></listitem>
+                <listitem><para>Tell BitBake to export what you have loaded into the
+                    environment store to the task environment of every running task.
+                    Loading something from the environment into the data store
+                    (previous step) only makes it available in the datastore.
+                    To export it to the task environment of every running task,
+                    use a command similar to the following in your
+                    <filename>local.conf</filename> or distro configuration file:
+                    <literallayout class='monospaced'>
+     export CCACHE_DIR
+                    </literallayout></para></listitem>
+            </orderedlist>
+        </para>
+
+        <note>
+            A side effect of the previous steps is that BitBake records the variable
+            as a dependency of the build process in things like the shared state
+            checksums.
+            If doing so results in unnecessary rebuilds of tasks, you can whitelist the
+            variable so that the shared state code ignores the dependency when it creates
+            checksums.
+            For information on this process, see the <filename>BB_HASHBASE_WHITELIST</filename>
+            example in the "<link linkend='checksums'>Checksums (Signatures)</link>" section.
+        </note>
+    </section>
+
+    <section id='ref-bitbake-commandline'>
+        <title>BitBake Command Line</title>
+
+        <para>
+            Following is the BitBake help output:
+        </para>
+
+        <screen>
+$ bitbake --help
+Usage: bitbake [options] [recipename/target ...]
+
+    Executes the specified task (default is 'build') for a given set of target recipes (.bb files).
+    It is assumed there is a conf/bblayers.conf available in cwd or in BBPATH which
+    will provide the layer, BBFILES and other configuration information.
+
+Options:
+  --version             show program's version number and exit
+  -h, --help            show this help message and exit
+  -b BUILDFILE, --buildfile=BUILDFILE
+                        Execute tasks from a specific .bb recipe directly.
+                        WARNING: Does not handle any dependencies from other
+                        recipes.
+  -k, --continue        Continue as much as possible after an error. While the
+                        target that failed and anything depending on it cannot
+                        be built, as much as possible will be built before
+                        stopping.
+  -a, --tryaltconfigs   Continue with builds by trying to use alternative
+                        providers where possible.
+  -f, --force           Force the specified targets/task to run (invalidating
+                        any existing stamp file).
+  -c CMD, --cmd=CMD     Specify the task to execute. The exact options
+                        available depend on the metadata. Some examples might
+                        be 'compile' or 'populate_sysroot' or 'listtasks' may
+                        give a list of the tasks available.
+  -C INVALIDATE_STAMP, --clear-stamp=INVALIDATE_STAMP
+                        Invalidate the stamp for the specified task such as
+                        'compile' and then run the default task for the
+                        specified target(s).
+  -r PREFILE, --read=PREFILE
+                        Read the specified file before bitbake.conf.
+  -R POSTFILE, --postread=POSTFILE
+                        Read the specified file after bitbake.conf.
+  -v, --verbose         Output more log message data to the terminal.
+  -D, --debug           Increase the debug level. You can specify this more
+                        than once.
+  -n, --dry-run         Don't execute, just go through the motions.
+  -S, --dump-signatures
+                        Don't execute, just dump out the signature
+                        construction information.
+  -p, --parse-only      Quit after parsing the BB recipes.
+  -s, --show-versions   Show current and preferred versions of all recipes.
+  -e, --environment     Show the global or per-package environment complete
+                        with information about where variables were
+                        set/changed.
+  -g, --graphviz        Save dependency tree information for the specified
+                        targets in the dot syntax.
+  -I EXTRA_ASSUME_PROVIDED, --ignore-deps=EXTRA_ASSUME_PROVIDED
+                        Assume these dependencies don't exist and are already
+                        provided (equivalent to ASSUME_PROVIDED). Useful to
+                        make dependency graphs more appealing
+  -l DEBUG_DOMAINS, --log-domains=DEBUG_DOMAINS
+                        Show debug logging for the specified logging domains
+  -P, --profile         Profile the command and save reports.
+  -u UI, --ui=UI        The user interface to use (e.g. knotty, hob, depexp).
+  -t SERVERTYPE, --servertype=SERVERTYPE
+                        Choose which server to use, process or xmlrpc.
+  --revisions-changed   Set the exit code depending on whether upstream
+                        floating revisions have changed or not.
+  --server-only         Run bitbake without a UI, only starting a server
+                        (cooker) process.
+  -B BIND, --bind=BIND  The name/address for the bitbake server to bind to.
+  --no-setscene         Do not run any setscene tasks. sstate will be ignored
+                        and everything needed, built.
+  --remote-server=REMOTE_SERVER
+                        Connect to the specified server.
+  -m, --kill-server     Terminate the remote server.
+  --observe-only        Connect to a server as an observing-only client.
+        </screen>
+    </section>
+
+    <section id='ref-bitbake-fetchers'>
+        <title>Fetchers</title>
+
+        <para>
+            BitBake also contains a set of "fetcher" modules that allow
+            retrieval of source code from various types of sources.
+            For example, BitBake can get source code from a disk with the metadata, from websites,
+            from remote shell accounts, or from Source Code Management (SCM) systems
+            like <filename>cvs/subversion/git</filename>.
+        </para>
+
+        <para>
+            Fetchers are usually triggered by entries in
+            <filename><link linkend='var-SRC_URI'>SRC_URI</link></filename>.
+            You can find information about the options and formats of entries for specific
+            fetchers in the BitBake manual located in the
+            <filename>bitbake/doc/manual</filename> directory of the
+            <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+        </para>
+
+        <para>
+            One useful feature for certain Source Code Manager (SCM) fetchers is the ability to
+            "auto-update" when the upstream SCM changes version.
+            Since this ability requires certain functionality from the SCM, not all
+            systems support it.
+            Currently Subversion, Bazaar and to a limited extent, Git support the ability to "auto-update".
+            This feature works using the <filename><link linkend='var-SRCREV'>SRCREV</link></filename>
+            variable.
+            See the
+            "<ulink url='&YOCTO_DOCS_DEV_URL;#platdev-appdev-srcrev'>Using an External SCM</ulink>" section
+            in the Yocto Project Development Manual for more information.
+        </para>
+
+    </section>
+
+</chapter>
+<!--
+vim: expandtab tw=80 ts=4 spell spelllang=en_gb
+-->

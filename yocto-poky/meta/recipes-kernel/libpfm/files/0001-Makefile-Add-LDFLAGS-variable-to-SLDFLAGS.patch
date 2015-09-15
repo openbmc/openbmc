@@ -1,0 +1,31 @@
+From 272a8a069a8f5f06a1e5dfa0ef12f5f92984728b Mon Sep 17 00:00:00 2001
+From: Noor <noor_ahsan@mentor.com>
+Date: Wed, 12 Aug 2015 20:54:00 +0500
+Subject: [PATCH] Makefile: Add LDFLAGS variable to SLDFLAGS.
+
+* Add LDFLAGS variable to SLDFLAGS so that extra linker
+  flags can be sent via this variable.
+
+Upstream-Status: Submitted [perfmon2-libpfm4-commits@lists.sourceforge.net]
+
+Signed-off-by: Noor Ahsan <noor_ahsan@mentor.com>
+---
+ lib/Makefile |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/Makefile b/lib/Makefile
+index 1cc8765..4bd92ef 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -187,7 +187,7 @@ CFLAGS += -DCONFIG_PFMLIB_CELL
+ endif
+ 
+ ifeq ($(SYS),Linux)
+-SLDFLAGS=-shared -Wl,-soname -Wl,$(VLIBPFM)
++SLDFLAGS=$(LDFLAGS) -shared -Wl,-soname -Wl,$(VLIBPFM)
+ SLIBPFM=libpfm.so.$(VERSION).$(REVISION).$(AGE)
+ VLIBPFM=libpfm.so.$(VERSION)
+ SOLIBEXT=so
+-- 
+1.7.9.5
+

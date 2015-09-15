@@ -1,0 +1,27 @@
+From 0f37affbc6e6c71687301d99d7259f1968e57c48 Mon Sep 17 00:00:00 2001
+From: Leonardo Sandoval <leonardo.sandoval.gonzalez@linux.intel.com>
+Date: Wed, 26 Aug 2015 12:42:23 +0000
+Subject: [PATCH] helloword.c: exit with EXIT_SUCCESS instead of a magic number
+
+---
+ helloworld.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/helloworld.c b/helloworld.c
+index 71f2e46..54bf50b 100644
+--- a/helloworld.c
++++ b/helloworld.c
+@@ -1,8 +1,9 @@
+ #include <stdio.h>
++#include <stdlib.h>
+ 
+ int main(int argc, char **argv)
+ {
+     printf("Hello World!\n");
+ 
+-    return 0;
++    return EXIT_SUCCESS;
+ }
+-- 
+1.8.4.5
+

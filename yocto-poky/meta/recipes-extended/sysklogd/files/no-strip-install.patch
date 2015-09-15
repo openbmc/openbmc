@@ -1,0 +1,17 @@
+Upstream-Status: Inappropriate [configuration]
+
+Index: sysklogd-1.5/Makefile
+===================================================================
+--- sysklogd-1.5.orig/Makefile	2009-06-09 13:02:41.000000000 +0200
++++ sysklogd-1.5/Makefile	2009-06-09 13:03:06.000000000 +0200
+@@ -127,8 +127,8 @@
+ 	rm -f syslogd klogd ksym syslog_tst oops_test TAGS tsyslogd tklogd
+ 
+ install_exec: syslogd klogd
+-	${INSTALL} -m 500 -s syslogd ${BINDIR}/syslogd
+-	${INSTALL} -m 500 -s klogd ${BINDIR}/klogd
++	${INSTALL} -m 500 syslogd ${BINDIR}/syslogd
++	${INSTALL} -m 500 klogd ${BINDIR}/klogd
+ 
+ install_man:
+ 	${INSTALL} -m ${MAN_PERMS} sysklogd.8 ${MANDIR}/man8/sysklogd.8

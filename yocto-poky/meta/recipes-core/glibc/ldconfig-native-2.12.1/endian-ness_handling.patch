@@ -1,0 +1,454 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+Do data input/output handling according to endien-ness of the library file. That 
+enables use of ldconfig in the cross fashion for any architecture.
+
+2011/04/04
+Richard Purdie <richard.purdie@linuxfoundation.org>
+Nitin Kamble <nitin.a.kamble@intel.com>
+
+Index: ldconfig-native-2.12.1/readelflib.c
+===================================================================
+--- ldconfig-native-2.12.1.orig/readelflib.c
++++ ldconfig-native-2.12.1/readelflib.c
+@@ -38,6 +38,28 @@ do								\
+   }								\
+  while (0);
+ 
++int be;
++static uint16_t read16(uint16_t x, int be)
++{
++  if (be)
++        return be16toh(x);
++  return le16toh(x);
++}
++
++static uint32_t read32(uint32_t x, int be)
++{
++  if (be)
++        return be32toh(x);
++  return le32toh(x);
++}
++
++static uint64_t read64(uint64_t x, int be)
++{
++  if (be)
++        return be64toh(x);
++  return le64toh(x);
++}
++
+ /* Returns 0 if everything is ok, != 0 in case of error.  */
+ int
+ process_elf_file32 (const char *file_name, const char *lib, int *flag,
+@@ -59,15 +81,17 @@ process_elf_file32 (const char *file_nam
+   elf_header = (Elf32_Ehdr *) file_contents;
+   *osversion = 0;
+ 
+-  if (elf_header->e_type != ET_DYN)
++  be = (elf_header->e_ident[EI_DATA] == ELFDATA2MSB);
++
++  if (read16(elf_header->e_type, be) != ET_DYN)
+     {
+       error (0, 0, _("%s is not a shared object file (Type: %d).\n"), file_name,
+-	     elf_header->e_type);
++	     read16(elf_header->e_type, be));
+       return 1;
+     }
+ 
+   /* Get information from elf program header.  */
+-  elf_pheader = (Elf32_Phdr *) (elf_header->e_phoff + file_contents);
++  elf_pheader = (Elf32_Phdr *) (read32(elf_header->e_phoff, be) + file_contents);
+   check_ptr (elf_pheader);
+ 
+   /* The library is an elf library, now search for soname and
+@@ -79,27 +103,27 @@ process_elf_file32 (const char *file_nam
+   dynamic_size = 0;
+   program_interpreter = NULL;
+   for (i = 0, segment = elf_pheader;
+-       i < elf_header->e_phnum; i++, segment++)
++       i < read16(elf_header->e_phnum, be); i++, segment++)
+     {
+       check_ptr (segment);
+ 
+-      switch (segment->p_type)
++      switch (read32(segment->p_type, be))
+ 	{
+ 	case PT_LOAD:
+ 	  if (loadaddr == (Elf32_Addr) -1)
+-	    loadaddr = segment->p_vaddr - segment->p_offset;
++	    loadaddr = read32(segment->p_vaddr, be) - read32(segment->p_offset, be);
+ 	  break;
+ 
+ 	case PT_DYNAMIC:
+ 	  if (dynamic_addr)
+ 	    error (0, 0, _("more than one dynamic segment\n"));
+ 
+-	  dynamic_addr = segment->p_offset;
+-	  dynamic_size = segment->p_filesz;
++	  dynamic_addr = read32(segment->p_offset, be);
++	  dynamic_size = read32(segment->p_filesz, be);
+ 	  break;
+ 
+ 	case PT_INTERP:
+-	  program_interpreter = (char *) (file_contents + segment->p_offset);
++	  program_interpreter = (char *) (file_contents + read32(segment->p_offset, be));
+ 	  check_ptr (program_interpreter);
+ 
+ 	  /* Check if this is enough to classify the binary.  */
+@@ -113,20 +137,20 @@ process_elf_file32 (const char *file_nam
+ 	  break;
+ 
+ 	case PT_NOTE:
+-	  if (!*osversion && segment->p_filesz >= 32 && segment->p_align >= 4)
++	  if (!*osversion && read32(segment->p_filesz, be) >= 32 && segment->p_align >= 4)
+ 	    {
+ 	      Elf32_Word *abi_note = (Elf32_Word *) (file_contents
+-						     + segment->p_offset);
+-	      Elf32_Addr size = segment->p_filesz;
++						     + read32(segment->p_offset, be));
++	      Elf32_Addr size = read32(segment->p_filesz, be);
+ 
+-	      while (abi_note [0] != 4 || abi_note [1] != 16
+-		     || abi_note [2] != 1
++	      while (read32(abi_note [0], be) != 4 || read32(abi_note [1], be) != 16
++		     || read32(abi_note [2], be) != 1
+ 		     || memcmp (abi_note + 3, "GNU", 4) != 0)
+ 		{
+-#define ROUND(len) (((len) + sizeof (Elf32_Word)) - 1) & -sizeof (Elf32_Word)))
+-		  Elf32_Addr) note_size = 3 * sizeof (Elf32_Word))
+-					 + ROUND (abi_note[0])
+-					 + ROUND (abi_note[1]);
++#define ROUND(len) (((len) + sizeof (Elf32_Word) - 1) & -sizeof (Elf32_Word))
++		  Elf32_Addr note_size = 3 * sizeof (Elf32_Word)
++					 + ROUND (read32(abi_note[0], be))
++					 + ROUND (read32(abi_note[1], be));
+ 
+ 		  if (size - 32 < note_size || note_size == 0)
+ 		    {
+@@ -140,10 +164,10 @@ process_elf_file32 (const char *file_nam
+ 	      if (size == 0)
+ 		break;
+ 
+-	      *osversion = (abi_note [4] << 24) |
+-			   ((abi_note [5] & 0xff) << 16) |
+-			   ((abi_note [6] & 0xff) << 8) |
+-			   (abi_note [7] & 0xff);
++	      *osversion = (read32(abi_note [4], be) << 24) |
++			   ((read32(abi_note [5], be) & 0xff) << 16) |
++			   ((read32(abi_note [6], be) & 0xff) << 8) |
++			   (read32(abi_note [7], be) & 0xff);
+ 	    }
+ 	  break;
+ 
+@@ -167,13 +191,13 @@ process_elf_file32 (const char *file_nam
+ 
+   /* Find the string table.  */
+   dynamic_strings = NULL;
+-  for (dyn_entry = dynamic_segment; dyn_entry->d_tag != DT_NULL;
++  for (dyn_entry = dynamic_segment; read32(dyn_entry->d_tag, be) != DT_NULL;
+        ++dyn_entry)
+     {
+       check_ptr (dyn_entry);
+-      if (dyn_entry->d_tag == DT_STRTAB)
++      if (read32(dyn_entry->d_tag, be) == DT_STRTAB)
+ 	{
+-	  dynamic_strings = (char *) (file_contents + dyn_entry->d_un.d_val - loadaddr);
++	  dynamic_strings = (char *) (file_contents + read32(dyn_entry->d_un.d_val, be) - loadaddr);
+ 	  check_ptr (dynamic_strings);
+ 	  break;
+ 	}
+@@ -183,15 +207,15 @@ process_elf_file32 (const char *file_nam
+     return 1;
+ 
+   /* Now read the DT_NEEDED and DT_SONAME entries.  */
+-  for (dyn_entry = dynamic_segment; dyn_entry->d_tag != DT_NULL;
++  for (dyn_entry = dynamic_segment; read32(dyn_entry->d_tag, be) != DT_NULL;
+        ++dyn_entry)
+     {
+-      if (dyn_entry->d_tag == DT_NEEDED || dyn_entry->d_tag == DT_SONAME)
++      if (read32(dyn_entry->d_tag, be) == DT_NEEDED || read32(dyn_entry->d_tag, be) == DT_SONAME)
+ 	{
+-	  char *name = dynamic_strings + dyn_entry->d_un.d_val;
++	  char *name = dynamic_strings + read32(dyn_entry->d_un.d_val, be);
+ 	  check_ptr (name);
+ 
+-	  if (dyn_entry->d_tag == DT_NEEDED)
++	  if (read32(dyn_entry->d_tag, be) == DT_NEEDED)
+ 	    {
+ 
+ 	      if (*flag == FLAG_ELF)
+@@ -208,7 +232,7 @@ process_elf_file32 (const char *file_nam
+ 		}
+ 	    }
+ 
+-	  else if (dyn_entry->d_tag == DT_SONAME)
++	  else if (read32(dyn_entry->d_tag, be) == DT_SONAME)
+ 	    *soname = xstrdup (name);
+ 
+ 	  /* Do we have everything we need?  */
+@@ -246,15 +270,17 @@ process_elf_file64 (const char *file_nam
+   elf_header = (Elf64_Ehdr *) file_contents;
+   *osversion = 0;
+ 
+-  if (elf_header->e_type != ET_DYN)
++  be = (elf_header->e_ident[EI_DATA] == ELFDATA2MSB);
++
++  if (read16(elf_header->e_type, be) != ET_DYN)
+     {
+       error (0, 0, _("%s is not a shared object file (Type: %d).\n"), file_name,
+-	     elf_header->e_type);
++	     read16(elf_header->e_type, be));
+       return 1;
+     }
+ 
+   /* Get information from elf program header.  */
+-  elf_pheader = (Elf64_Phdr *) (elf_header->e_phoff + file_contents);
++  elf_pheader = (Elf64_Phdr *) (read64(elf_header->e_phoff, be) + file_contents);
+   check_ptr (elf_pheader);
+ 
+   /* The library is an elf library, now search for soname and
+@@ -266,27 +292,27 @@ process_elf_file64 (const char *file_nam
+   dynamic_size = 0;
+   program_interpreter = NULL;
+   for (i = 0, segment = elf_pheader;
+-       i < elf_header->e_phnum; i++, segment++)
++       i < read16(elf_header->e_phnum, be); i++, segment++)
+     {
+       check_ptr (segment);
+ 
+-      switch (segment->p_type)
++      switch (read32(segment->p_type, be))
+ 	{
+ 	case PT_LOAD:
+ 	  if (loadaddr == (Elf64_Addr) -1)
+-	    loadaddr = segment->p_vaddr - segment->p_offset;
++	    loadaddr = read64(segment->p_vaddr, be) - read64(segment->p_offset, be);
+ 	  break;
+ 
+ 	case PT_DYNAMIC:
+ 	  if (dynamic_addr)
+ 	    error (0, 0, _("more than one dynamic segment\n"));
+ 
+-	  dynamic_addr = segment->p_offset;
+-	  dynamic_size = segment->p_filesz;
++	  dynamic_addr = read64(segment->p_offset, be);
++	  dynamic_size = read32(segment->p_filesz, be);
+ 	  break;
+ 
+ 	case PT_INTERP:
+-	  program_interpreter = (char *) (file_contents + segment->p_offset);
++	  program_interpreter = (char *) (file_contents + read64(segment->p_offset, be));
+ 	  check_ptr (program_interpreter);
+ 
+ 	  /* Check if this is enough to classify the binary.  */
+@@ -300,20 +326,21 @@ process_elf_file64 (const char *file_nam
+ 	  break;
+ 
+ 	case PT_NOTE:
+-	  if (!*osversion && segment->p_filesz >= 32 && segment->p_align >= 4)
++	  if (!*osversion && read32(segment->p_filesz, be) >= 32 && read32(segment->p_align, be) >= 4)
+ 	    {
+ 	      Elf64_Word *abi_note = (Elf64_Word *) (file_contents
+-						     + segment->p_offset);
+-	      Elf64_Addr size = segment->p_filesz;
++						     + read64(segment->p_offset, be));
++	      Elf64_Addr size = read32(segment->p_filesz, be);
+ 
+-	      while (abi_note [0] != 4 || abi_note [1] != 16
+-		     || abi_note [2] != 1
++	      while (read32(abi_note [0], be) != 4 || read32(abi_note [1], be) != 16
++		     || read32(abi_note [2], be) != 1
+ 		     || memcmp (abi_note + 3, "GNU", 4) != 0)
+ 		{
++#undef ROUND
+ #define ROUND(len) (((len) + sizeof (Elf64_Word) - 1) & -sizeof (Elf64_Word))
+ 		  Elf64_Addr note_size = 3 * sizeof (Elf64_Word)
+-					 + ROUND (abi_note[0])
+-					 + ROUND (abi_note[1]);
++					 + ROUND (read32(abi_note[0], be))
++					 + ROUND (read32(abi_note[1], be));
+ 
+ 		  if (size - 32 < note_size || note_size == 0)
+ 		    {
+@@ -327,10 +354,10 @@ process_elf_file64 (const char *file_nam
+ 	      if (size == 0)
+ 		break;
+ 
+-	      *osversion = (abi_note [4] << 24) |
+-			   ((abi_note [5] & 0xff) << 16) |
+-			   ((abi_note [6] & 0xff) << 8) |
+-			   (abi_note [7] & 0xff);
++	      *osversion = (read32(abi_note [4], be) << 24) |
++			   ((read32(abi_note [5], be) & 0xff) << 16) |
++			   ((read32(abi_note [6], be) & 0xff) << 8) |
++			   (read32(abi_note [7], be) & 0xff);
+ 	    }
+ 	  break;
+ 
+@@ -354,13 +381,13 @@ process_elf_file64 (const char *file_nam
+ 
+   /* Find the string table.  */
+   dynamic_strings = NULL;
+-  for (dyn_entry = dynamic_segment; dyn_entry->d_tag != DT_NULL;
++  for (dyn_entry = dynamic_segment; read64(dyn_entry->d_tag, be) != DT_NULL;
+        ++dyn_entry)
+     {
+       check_ptr (dyn_entry);
+-      if (dyn_entry->d_tag == DT_STRTAB)
++      if (read64(dyn_entry->d_tag, be) == DT_STRTAB)
+ 	{
+-	  dynamic_strings = (char *) (file_contents + dyn_entry->d_un.d_val - loadaddr);
++	  dynamic_strings = (char *) (file_contents + read64(dyn_entry->d_un.d_val, be) - loadaddr);
+ 	  check_ptr (dynamic_strings);
+ 	  break;
+ 	}
+@@ -370,15 +397,15 @@ process_elf_file64 (const char *file_nam
+     return 1;
+ 
+   /* Now read the DT_NEEDED and DT_SONAME entries.  */
+-  for (dyn_entry = dynamic_segment; dyn_entry->d_tag != DT_NULL;
++  for (dyn_entry = dynamic_segment; read64(dyn_entry->d_tag, be) != DT_NULL;
+        ++dyn_entry)
+     {
+-      if (dyn_entry->d_tag == DT_NEEDED || dyn_entry->d_tag == DT_SONAME)
++      if (read64(dyn_entry->d_tag, be) == DT_NEEDED || read64(dyn_entry->d_tag, be) == DT_SONAME)
+ 	{
+-	  char *name = dynamic_strings + dyn_entry->d_un.d_val;
++	  char *name = dynamic_strings + read64(dyn_entry->d_un.d_val, be);
+ 	  check_ptr (name);
+ 
+-	  if (dyn_entry->d_tag == DT_NEEDED)
++	  if (read64(dyn_entry->d_tag, be) == DT_NEEDED)
+ 	    {
+ 
+ 	      if (*flag == FLAG_ELF)
+@@ -395,7 +422,7 @@ process_elf_file64 (const char *file_nam
+ 		}
+ 	    }
+ 
+-	  else if (dyn_entry->d_tag == DT_SONAME)
++	  else if (read64(dyn_entry->d_tag, be) == DT_SONAME)
+ 	    *soname = xstrdup (name);
+ 
+ 	  /* Do we have everything we need?  */
+Index: ldconfig-native-2.12.1/readlib.c
+===================================================================
+--- ldconfig-native-2.12.1.orig/readlib.c
++++ ldconfig-native-2.12.1/readlib.c
+@@ -169,7 +169,8 @@ process_file (const char *real_file_name
+       ret = 1;
+     }
+   /* Libraries have to be shared object files.  */
+-  else if (elf_header->e_type != ET_DYN)
++  else if ((elf_header->e_ident[EI_DATA] == ELFDATA2MSB && be16toh(elf_header->e_type) != ET_DYN) ||
++      (elf_header->e_ident[EI_DATA] == ELFDATA2LSB && le16toh(elf_header->e_type) != ET_DYN))
+     ret = 1;
+   else if (process_elf_file (file_name, lib, flag, osversion, soname,
+ 			     file_contents, statbuf.st_size))
+Index: ldconfig-native-2.12.1/cache.c
+===================================================================
+--- ldconfig-native-2.12.1.orig/cache.c
++++ ldconfig-native-2.12.1/cache.c
+@@ -39,6 +39,29 @@
+ # define N_(msgid)  msgid
+ #define _(msg) msg
+ 
++extern int be;
++
++static uint16_t write16(uint16_t x, int be)
++{
++  if (be)
++        return htobe16(x);
++  return htole16(x);
++}
++
++static uint32_t write32(uint32_t x, int be)
++{
++  if (be)
++        return htobe32(x);
++  return htole32(x);
++}
++
++static uint64_t write64(uint64_t x, int be)
++{
++  if (be)
++        return htobe64(x);
++  return htole64(x);
++}
++
+ struct cache_entry
+ {
+   char *lib;			/* Library name.  */
+@@ -279,7 +302,12 @@ save_cache (const char *cache_name)
+   /* Number of normal cache entries.  */
+   int cache_entry_old_count = 0;
+ 
+-  for (entry = entries; entry != NULL; entry = entry->next)
++    if (be)
++      printf("saving cache in big endian encoding\n");
++    else
++      printf("saving cache in little endian encoding\n");
++
++    for (entry = entries; entry != NULL; entry = entry->next)
+     {
+       /* Account the final NULs.  */
+       total_strlen += strlen (entry->lib) + strlen (entry->path) + 2;
+@@ -310,7 +338,7 @@ save_cache (const char *cache_name)
+       memset (file_entries, '\0', sizeof (struct cache_file));
+       memcpy (file_entries->magic, CACHEMAGIC, sizeof CACHEMAGIC - 1);
+ 
+-      file_entries->nlibs = cache_entry_old_count;
++      file_entries->nlibs = write32(cache_entry_old_count, be);
+     }
+ 
+   struct cache_file_new *file_entries_new = NULL;
+@@ -330,8 +358,8 @@ save_cache (const char *cache_name)
+       memcpy (file_entries_new->version, CACHE_VERSION,
+ 	      sizeof CACHE_VERSION - 1);
+ 
+-      file_entries_new->nlibs = cache_entry_count;
+-      file_entries_new->len_strings = total_strlen;
++      file_entries_new->nlibs = write32(cache_entry_count, be);
++      file_entries_new->len_strings = write32(total_strlen, be);
+     }
+ 
+   /* Pad for alignment of cache_file_new.  */
+@@ -358,9 +386,9 @@ save_cache (const char *cache_name)
+       /* First the library.  */
+       if (opt_format != 2 && entry->hwcap == 0)
+ 	{
+-	  file_entries->libs[idx_old].flags = entry->flags;
++	  file_entries->libs[idx_old].flags = write32(entry->flags, be);
+ 	  /* XXX: Actually we can optimize here and remove duplicates.  */
+-	  file_entries->libs[idx_old].key = str_offset + pad;
++	  file_entries->libs[idx_old].key = write32(str_offset + pad, be);
+ 	}
+       if (opt_format != 0)
+ 	{
+@@ -368,10 +396,10 @@ save_cache (const char *cache_name)
+ 	     not doing so makes the code easier, the string table
+ 	     always begins at the beginning of the the new cache
+ 	     struct.  */
+-	  file_entries_new->libs[idx_new].flags = entry->flags;
+-	  file_entries_new->libs[idx_new].osversion = entry->osversion;
+-	  file_entries_new->libs[idx_new].hwcap = entry->hwcap;
+-	  file_entries_new->libs[idx_new].key = str_offset;
++	  file_entries_new->libs[idx_new].flags = write32(entry->flags, be);
++	  file_entries_new->libs[idx_new].osversion = write32(entry->osversion, be);
++	  file_entries_new->libs[idx_new].hwcap = write64(entry->hwcap, be);
++	  file_entries_new->libs[idx_new].key = write32(str_offset, be);
+ 	}
+ 
+       size_t len = strlen (entry->lib) + 1;
+@@ -379,9 +407,9 @@ save_cache (const char *cache_name)
+       str_offset += len;
+       /* Then the path.  */
+       if (opt_format != 2 && entry->hwcap == 0)
+-	file_entries->libs[idx_old].value = str_offset + pad;
++	file_entries->libs[idx_old].value = write32(str_offset + pad, be);
+       if (opt_format != 0)
+-	file_entries_new->libs[idx_new].value = str_offset;
++	file_entries_new->libs[idx_new].value = write32(str_offset, be);
+       len = strlen (entry->path) + 1;
+       str = mempcpy (str, entry->path, len);
+       str_offset += len;

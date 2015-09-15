@@ -1,0 +1,71 @@
+From 8887132e85892a72a84ca3878e60f254ad2ce939 Mon Sep 17 00:00:00 2001
+From: Joe MacDonald <joe_macdonald@mentor.com>
+Date: Tue, 24 Feb 2015 15:56:06 -0500
+Subject: [PATCH] libpcap: pkgconfig support
+
+Adding basic structure to support pkg-config.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Joe MacDonald <joe_macdonald@mentor.com>
+---
+ Makefile.in   |  5 +++++
+ configure.in  |  1 +
+ libpcap.pc.in | 10 ++++++++++
+ 3 files changed, 16 insertions(+)
+ create mode 100644 libpcap.pc.in
+
+diff --git a/Makefile.in b/Makefile.in
+index 1c2d745..1f25faf 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -60,6 +60,10 @@ V_RPATH_OPT = @V_RPATH_OPT@
+ DEPENDENCY_CFLAG = @DEPENDENCY_CFLAG@
+ PROG=libpcap
+ 
++# pkgconfig support
++pkgconfigdir = $(libdir)/pkgconfig
++pkgconfig_DATA = libpcap.pc
++
+ # Standard CFLAGS
+ FULL_CFLAGS = $(CCOPT) $(INCLS) $(DEFS) $(CFLAGS)
+ 
+@@ -275,6 +279,7 @@ EXTRA_DIST = \
+ 	lbl/os-solaris2.h \
+ 	lbl/os-sunos4.h \
+ 	lbl/os-ultrix4.h \
++	libpcap.pc \
+ 	missing/snprintf.c \
+ 	mkdep \
+ 	msdos/bin2c.c \
+diff --git a/configure.in b/configure.in
+index 8f5c86b..fb51b35 100644
+--- a/configure.in
++++ b/configure.in
+@@ -1700,6 +1700,7 @@ esac
+ AC_PROG_INSTALL
+ 
+ AC_CONFIG_HEADER(config.h)
++AC_CONFIG_FILES([libpcap.pc])
+ 
+ AC_OUTPUT_COMMANDS([if test -f .devel; then
+ 	echo timestamp > stamp-h
+diff --git a/libpcap.pc.in b/libpcap.pc.in
+new file mode 100644
+index 0000000..4f78ad8
+--- /dev/null
++++ b/libpcap.pc.in
+@@ -0,0 +1,10 @@
++prefix=@prefix@
++exec_prefix=@exec_prefix@
++libdir=@libdir@
++includedir=@includedir@
++
++Name: libpcap
++Description: System-independent interface for user-level packet capture.
++Version: @VERSION@
++Libs: -L${libdir} -lpcap
++Cflags: -I${includedir}
+-- 
+1.9.1
+

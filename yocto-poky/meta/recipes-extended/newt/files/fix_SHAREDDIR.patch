@@ -1,0 +1,37 @@
+Upstream-Status: Pending
+
+Author: dexuan.cui@intel.com
+Date: Fri Apr 15 16:17:39 CST 2011
+
+The patch fixes a parallel-make issue: when generating $(SHAREDDIR)/%.o, we should
+ensure the directory ${SHAREDDIR} exists.
+
+We need to push the patch to upstream.
+
+Signed-off-by: Dexuan Cui <dexuan.cui@intel.com>
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ Makefile.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -128,12 +128,12 @@ $(SHAREDDIR):
+ 
+ sharedlib: $(LIBNEWTSH)
+ 
+-$(LIBNEWTSH): $(SHAREDDIR) $(SHAREDOBJS)
++$(LIBNEWTSH): $(SHAREDOBJS)
+ 	$(CC) -shared -o $(LIBNEWTSH) $(SHLIBFLAGS) $(SHAREDOBJS) $(LDFLAGS) $(LIBS)
+ 	ln -fs $(LIBNEWTSONAME) libnewt.$(SOEXT)
+ 	ln -fs $(LIBNEWTSH) $(LIBNEWTSONAME)
+ 
+-$(SHAREDDIR)/%.o : %.c
++$(SHAREDDIR)/%.o : %.c $(SHAREDDIR)
+ 	$(CC) $(SHCFLAGS) -c $(CFLAGS) $(CPPFLAGS) -o $@ $<
+ 
+ install: $(LIBNEWT) install-sh whiptail
+-- 
+1.8.1.2
+

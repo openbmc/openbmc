@@ -1,0 +1,23 @@
+Upstream-Status: Pending
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+Signed-off-by: Ronan Le Martret <ronan.lemartret@open.eurogiciel.org>
+
+
+Index: rpm-4.11.2/build/files.c
+===================================================================
+--- rpm-4.11.2.orig/build/files.c
++++ rpm-4.11.2/build/files.c
+@@ -1321,12 +1321,6 @@ static rpmRC addFile(FileList fl, const
+ 	}
+     }
+ 
+-    /* Error out when a non-directory is specified as one in spec */
+-    if (fl->cur.isDir && (statp == &statbuf) && !S_ISDIR(statp->st_mode)) {
+-	rpmlog(RPMLOG_ERR, _("Not a directory: %s\n"), diskPath);
+-	goto exit;
+-    }
+-
+     /* Don't recurse into explicit %dir, don't double-recurse from fts */
+     if ((fl->cur.isDir != 1) && (statp == &statbuf) && S_ISDIR(statp->st_mode)) {
+ 	return recurseDir(fl, diskPath);

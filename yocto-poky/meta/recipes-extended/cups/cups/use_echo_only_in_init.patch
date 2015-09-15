@@ -1,0 +1,15 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+Index: cups-1.6.1/scheduler/cups.sh.in
+===================================================================
+--- cups-1.6.1.orig/scheduler/cups.sh.in
++++ cups-1.6.1/scheduler/cups.sh.in
+@@ -67,7 +67,7 @@ case "`uname`" in
+ 		ECHO_ERROR=:
+ 		;;
+ 
+-	Linux*)
++	DisableLinux*)
+ 		IS_ON=/bin/true
+ 		if test -f /etc/init.d/functions; then
+ 			. /etc/init.d/functions

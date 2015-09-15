@@ -1,0 +1,104 @@
+#!/bin/bash
+#
+# This utility extracts an SDK image tarball using pseudo, and stores
+# the pseudo database in var/pseudo within the rootfs. If you want to
+# boot QEMU using an nfsroot, you *must* use this script to create the
+# rootfs to ensure it is done correctly with pseudo.
+#
+# Copyright (c) 2010 Intel Corp.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+function usage() {
+	echo "Usage: $0 <image-tarball> <extract-dir>"
+}
+
+if [ $# -ne 2 ]; then
+	usage
+	exit 1
+fi
+
+SYSROOT_SETUP_SCRIPT=`which oe-find-native-sysroot 2> /dev/null`
+if [ -z "$SYSROOT_SETUP_SCRIPT" ]; then
+    echo "Error: Unable to find the oe-find-native-sysroot script"
+    echo "Did you forget to source your build system environment setup script?"
+    exit 1
+fi
+. $SYSROOT_SETUP_SCRIPT
+PSEUDO_OPTS="-P $OECORE_NATIVE_SYSROOT/usr"
+
+ROOTFS_TARBALL=$1
+SDK_ROOTFS_DIR=$2
+
+if [ ! -e "$ROOTFS_TARBALL" ]; then
+   	echo "Error: sdk tarball '$ROOTFS_TARBALL' does not exist"
+   	usage
+   	exit 1
+fi
+
+# Convert SDK_ROOTFS_DIR to a full pathname
+if [[ ${SDK_ROOTFS_DIR:0:1} != "/" ]]; then
+	SDK_ROOTFS_DIR=$(readlink -f $(pwd)/$SDK_ROOTFS_DIR)
+fi
+
+TAR_OPTS=""
+if [[ "$ROOTFS_TARBALL" =~ tar\.bz2$ ]]; then
+	TAR_OPTS="--numeric-owner -xjf"
+fi
+if [[ "$ROOTFS_TARBALL" =~ tar\.gz$ ]]; then
+	TAR_OPTS="--numeric-owner -xzf"
+fi
+if [[ "$ROOTFS_TARBALL" =~ \.tar$ ]]; then
+	TAR_OPTS="--numeric-owner -xf"
+fi
+if [ -z "$TAR_OPTS" ]; then
+	echo "Error: Unable to determine sdk tarball format"
+	echo "Accepted types: .tar / .tar.gz / .tar.bz2"
+	exit 1
+fi
+
+if [ ! -d "$SDK_ROOTFS_DIR" ]; then
+	echo "Creating directory $SDK_ROOTFS_DIR"
+	mkdir -p "$SDK_ROOTFS_DIR"
+fi
+
+pseudo_state_dir="$SDK_ROOTFS_DIR/../$(basename "$SDK_ROOTFS_DIR").pseudo_state"
+pseudo_state_dir="$(readlink -f $pseudo_state_dir)"
+
+if [ -e "$pseudo_state_dir" ]; then
+	echo "Error: $pseudo_state_dir already exists!"
+	echo "Please delete the rootfs tree and pseudo directory manually"
+        echo "if this is really what you want."
+	exit 1
+fi
+
+mkdir -p "$pseudo_state_dir"
+touch "$pseudo_state_dir/pseudo.pid"
+PSEUDO_LOCALSTATEDIR="$pseudo_state_dir"
+export PSEUDO_LOCALSTATEDIR
+
+echo "Extracting rootfs tarball using pseudo..."
+echo "$PSEUDO $PSEUDO_OPTS tar -C \"$SDK_ROOTFS_DIR\" $TAR_OPTS \"$ROOTFS_TARBALL\""
+$PSEUDO $PSEUDO_OPTS tar -C "$SDK_ROOTFS_DIR" $TAR_OPTS "$ROOTFS_TARBALL"
+
+DIRCHECK=`ls -l "$SDK_ROOTFS_DIR" | wc -l`
+if [ "$DIRCHECK" -lt 5 ]; then
+	echo "Warning: I don't see many files in $SDK_ROOTFS_DIR"
+	echo "Please double-check the extraction worked as intended"
+	exit 0
+fi
+
+echo "SDK image successfully extracted to $SDK_ROOTFS_DIR"
+
+exit 0

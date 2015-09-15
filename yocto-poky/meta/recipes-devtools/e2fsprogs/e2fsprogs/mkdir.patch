@@ -1,0 +1,30 @@
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Mei Lei <lei.mei@intel.com>
+
+Index: e2fsprogs-1.41.5/po/Makefile.in.in
+===================================================================
+--- e2fsprogs-1.41.5.orig/po/Makefile.in.in	2009-02-14 13:49:08.000000000 +0000
++++ e2fsprogs-1.41.5/po/Makefile.in.in	2009-08-19 17:52:31.000000000 +0100
+@@ -30,7 +30,7 @@
+ INSTALL = @INSTALL@
+ INSTALL_DATA = @INSTALL_DATA@
+ MKINSTALLDIRS = @MKINSTALLDIRS@
+-mkinstalldirs = $(SHELL) $(MKINSTALLDIRS)
++mkinstalldirs = $(MKINSTALLDIRS)
+ 
+ GMSGFMT = @GMSGFMT@
+ MSGFMT = @MSGFMT@
+Index: e2fsprogs-1.41.5/configure.in
+===================================================================
+--- e2fsprogs-1.41.5.orig/configure.in	2009-08-19 17:53:50.000000000 +0100
++++ e2fsprogs-1.41.5/configure.in	2009-08-19 17:48:38.000000000 +0100
+@@ -970,6 +970,8 @@
+ fi
+ AC_SUBST(BUILD_CFLAGS)
+ AC_SUBST(BUILD_LDFLAGS)
++MKINSTALLDIRS="mkdir -p"
++AC_SUBST(MKINSTALLDIRS)
+ dnl
+ dnl Make our output files, being sure that we create the some miscellaneous 
+ dnl directories

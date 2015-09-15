@@ -1,0 +1,24 @@
+Fix the build error when a separate build directory is used:
+
+Making install in xtestsmake[1]: Entering directory `/media/build1/poky/build1/tmp/work/i586-poky-linux/libpam/1.1.6-r2/build/xtests'/usr/bin/install -c -d /media/build1/poky/build1/tmp/work/i586-poky-linux/libpam/1.1.6-r2/image/usr/share/Linux-PAM/xtestsfor file in run-xtests.sh tst-pam_dispatch1.pamd tst-pam_dispatch2.pamd tst-pam_dispatch3.pamd tst-pam_dispatch4.pamd tst-pam_dispatch5.pamd tst-pam_cracklib1.pamd tst-pam_cracklib2.pamd tst-pam_unix1.pamd tst-pam_unix2.pamd tst-pam_unix3.pamd tst-pam_unix4.pamd tst-pam_unix1.sh tst-pam_unix2.sh tst-pam_unix3.sh tst-pam_unix4.sh access.conf tst-pam_access1.pamd tst-pam_access1.sh tst-pam_access2.pamd tst-pam_access2.sh tst-pam_access3.pamd tst-pam_access3.sh tst-pam_access4.pamd tst-pam_access4.sh limits.conf tst-pam_limits1.pamd tst-pam_limits1.sh tst-pam_succeed_if1.pamd tst-pam_succeed_if1.sh group.conf tst-pam_group1.pamd tst-pam_group1.sh tst-pam_authfail.pamd tst-pam_authsucceed.pamd tst-pam_substack1.pamd tst-pam_substack1a.pamd tst-pam_substack1.sh tst-pam_substack2.pamd tst-pam_substack2a.pamd tst-pam_substack2.sh tst-pam_substack3.pamd tst-pam_substack3a.pamd tst-pam_substack3.sh tst-pam_substack4.pamd tst-pam_substack4a.pamd tst-pam_substack4.sh tst-pam_substack5.pamd tst-pam_substack5a.pamd tst-pam_substack5.sh tst-pam_assemble_line1.pamd tst-pam_assemble_line1.sh tst-pam_pwhistory1.pamd tst-pam_pwhistory1.sh tst-pam_time1.pamd time.conf ; do \/usr/bin/install -c $file /media/build1/poky/build1/tmp/work/i586-poky-linux/libpam/1.1.6-r2/image/usr/share/Linux-PAM/xtests ; \	done
+/usr/bin/install: cannot stat `run-xtests.sh': No such file or directory
+/usr/bin/install: cannot stat `tst-pam_dispatch1.pamd': No such file or directory
+/usr/bin/install: cannot stat `tst-pam_dispatch2.pamd': No such file or directory
+
+Upstream-Status: Pending
+
+RP 2013/03/21
+
+Index: Linux-PAM-1.1.6/xtests/Makefile.am
+===================================================================
+--- Linux-PAM-1.1.6.orig/xtests/Makefile.am	2013-03-08 12:26:30.360266000 +0000
++++ Linux-PAM-1.1.6/xtests/Makefile.am	2013-03-21 11:39:58.557166650 +0000
+@@ -59,7 +59,7 @@
+ install_xtests:
+ 	$(INSTALL) -d $(DESTDIR)$(pkgdatadir)/xtests
+ 	for file in $(EXTRA_DIST) ; do \
+-		$(INSTALL) $$file $(DESTDIR)$(pkgdatadir)/xtests ; \
++		$(INSTALL) $(srcdir)/$$file $(DESTDIR)$(pkgdatadir)/xtests ; \
+ 	done
+ 	for file in $(XTESTS); do \
+ 		$(INSTALL) .libs/$$file $(DESTDIR)$(pkgdatadir)/xtests ; \

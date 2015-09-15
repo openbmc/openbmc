@@ -1,0 +1,21 @@
+Upstream-Status: Inappropriate [configuration]
+
+---
+ configure.ac |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+Index: grub-0.97/configure.ac
+===================================================================
+--- grub-0.97.orig/configure.ac	2008-09-12 17:39:52.000000000 +0200
++++ grub-0.97/configure.ac	2008-09-12 17:40:21.000000000 +0200
+@@ -60,8 +60,8 @@ AC_PROG_CC
+ _AM_DEPENDENCIES(CC)
+ 
+ dnl Because recent automake complains about AS, set it here.
+-CCAS="$CC"
+-AC_SUBST(CCAS)
++AM_PROG_AS
++AC_SUBST(AS)
+ 
+ AC_ARG_WITH(binutils,
+   [  --with-binutils=DIR     search the directory DIR to find binutils])

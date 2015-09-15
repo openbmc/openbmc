@@ -1,0 +1,27 @@
+From 26209b55201a1b2d25252ac3b425bc49081299de Mon Sep 17 00:00:00 2001
+From: Brendan O'Dea <bod@debian.org>
+Date: Tue, 8 Mar 2005 19:30:38 +1100
+Subject: Debian policy doesn't install .packlist files for core or vendor.
+
+Patch-Name: debian/instmodsh_doc.diff
+---
+ cpan/ExtUtils-MakeMaker/bin/instmodsh | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/cpan/ExtUtils-MakeMaker/bin/instmodsh b/cpan/ExtUtils-MakeMaker/bin/instmodsh
+index 8b9aa95..e551434 100644
+--- a/cpan/ExtUtils-MakeMaker/bin/instmodsh
++++ b/cpan/ExtUtils-MakeMaker/bin/instmodsh
+@@ -18,9 +18,11 @@ instmodsh - A shell to examine installed modules
+ 
+ =head1 DESCRIPTION
+ 
+-A little interface to ExtUtils::Installed to examine installed modules,
++A little interface to ExtUtils::Installed to examine locally* installed modules,
+ validate your packlists and even create a tarball from an installed module.
+ 
++*On Debian system, B<core> and B<vendor> modules are managed by C<dpkg>.
++
+ =head1 SEE ALSO
+ 
+ ExtUtils::Installed

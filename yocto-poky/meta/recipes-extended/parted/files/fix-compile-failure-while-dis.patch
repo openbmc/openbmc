@@ -1,0 +1,57 @@
+From 060e74354774d36d2c11ef08e3e7ea9b9b6e23fb Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 13 Nov 2014 11:29:33 +0800
+Subject: [PATCH] libparted/arch/linux.c: fix compile failure while
+ --disable-device-mapper
+
+While --disable-device-mapper, the MACRO ENABLE_DEVICE_MAPPER is
+undef, but it missed to scope some device mapper functions.
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ libparted/arch/linux.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/libparted/arch/linux.c b/libparted/arch/linux.c
+index 6fd73c5..2afa479 100644
+--- a/libparted/arch/linux.c
++++ b/libparted/arch/linux.c
+@@ -2320,6 +2320,7 @@ zasprintf (const char *format, ...)
+ static char *
+ dm_canonical_path (PedDevice const *dev)
+ {
++#ifdef ENABLE_DEVICE_MAPPER
+         LinuxSpecific const *arch_specific = LINUX_SPECIFIC (dev);
+ 
+         /* Get map name from devicemapper */
+@@ -2337,6 +2338,7 @@ dm_canonical_path (PedDevice const *dev)
+         dm_task_destroy (task);
+         return dev_name;
+ err:
++#endif
+         return NULL;
+ }
+ 
+@@ -2957,13 +2959,15 @@ _disk_sync_part_table (PedDisk* disk)
+                                                unsigned long long *start,
+                                                unsigned long long *length);
+ 
+-
++#ifdef ENABLE_DEVICE_MAPPER
+         if (disk->dev->type == PED_DEVICE_DM) {
+                 add_partition = _dm_add_partition;
+                 remove_partition = _dm_remove_partition;
+                 resize_partition = _dm_resize_partition;
+                 get_partition_start_and_length = _dm_get_partition_start_and_length;
+-        } else {
++        } else
++#endif
++        {
+                 add_partition = _blkpg_add_partition;
+                 remove_partition = _blkpg_remove_partition;
+ #ifdef BLKPG_RESIZE_PARTITION
+-- 
+1.9.1
+

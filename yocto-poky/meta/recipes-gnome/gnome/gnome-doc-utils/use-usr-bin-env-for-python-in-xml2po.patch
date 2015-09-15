@@ -1,0 +1,30 @@
+We can't use #!/full/path/to/python -u as this can be longer than shebang
+allows for.  In order to be appropraite for upstream more work would be
+needed to make sure that the main xml2po code doesn't rely on python
+being invoked with -u (force stdin/out/err to be used raw).
+
+Upstream-Status: Inappropriate [Would break behavior on Windows]
+Signed-off-by: Constantin Musca <constantinx.musca@intel.com>
+
+Index: gnome-doc-utils-0.20.10/xml2po/xml2po/Makefile.am
+===================================================================
+--- gnome-doc-utils-0.20.10.orig/xml2po/xml2po/Makefile.am
++++ gnome-doc-utils-0.20.10/xml2po/xml2po/Makefile.am
+@@ -7,7 +7,6 @@ CLEANFILES = xml2po
+ 
+ xml2po: xml2po.py.in
+ 	$(AM_V_GEN)sed -e "s/^VERSION =.*/VERSION = \"@VERSION@\"/" \
+-	    -e "s+^#!.*python.*+#!$(PYTHON)+" \
+ 	  < $(srcdir)/xml2po.py.in > xml2po
+ 	$(AM_V_at)chmod +x xml2po
+ 
+Index: gnome-doc-utils-0.20.10/xml2po/xml2po/xml2po.py.in
+===================================================================
+--- gnome-doc-utils-0.20.10.orig/xml2po/xml2po/xml2po.py.in
++++ gnome-doc-utils-0.20.10/xml2po/xml2po/xml2po.py.in
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python -u
++#!/usr/bin/env python
+ # -*- encoding: utf-8 -*-
+ # Copyright (c) 2004, 2005, 2006 Danilo Šegan <danilo@gnome.org>.
+ # Copyright (c) 2009 Claude Paroz <claude@2xlibre.net>.

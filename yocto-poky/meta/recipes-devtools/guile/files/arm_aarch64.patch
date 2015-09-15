@@ -1,0 +1,19 @@
+guile: add aarch64 recognition
+
+Assume little-endian.
+
+Upstream-Status: Pending
+
+Signed-off-by: joe.slater@windriver.com
+
+--- a/module/system/base/target.scm
++++ b/module/system/base/target.scm
+@@ -70,6 +70,8 @@
+             ((member cpu '("sparc" "sparc64" "powerpc" "powerpc64" "spu"
+                            "mips" "mips64"))
+              (endianness big))
++            ((string-match "^aarch64" cpu)
++             (endianness little))
+             ((string-match "^arm.*eb" cpu)
+              (endianness big))
+             ((string-match "^arm.*" cpu)

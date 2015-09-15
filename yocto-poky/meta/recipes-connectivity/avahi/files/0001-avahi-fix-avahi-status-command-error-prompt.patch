@@ -1,0 +1,52 @@
+From f774ac25f436a782ccccc4dbe68378a684596799 Mon Sep 17 00:00:00 2001
+From: Lu Chong <Chong.Lu@windriver.com>
+Date: Thu, 7 Nov 2013 14:36:28 +0800
+Subject: [PATCH] avahi: fix avahi status command error prompt
+
+service --status-all command will display wrong status for avahi-daemon.
+This commit fix this error prompt and make service display right status
+for avahi-daemon.
+
+Upstream-Status: Pending
+
+Signed-off-by: Lu Chong <Chong.Lu@windriver.com>
+---
+ initscript/debian/avahi-daemon.in |   14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/initscript/debian/avahi-daemon.in b/initscript/debian/avahi-daemon.in
+index 4793b46..49ec358 100755
+--- a/initscript/debian/avahi-daemon.in
++++ b/initscript/debian/avahi-daemon.in
+@@ -153,7 +153,15 @@ d_reload() {
+ #       Function that check the status of the daemon/service.
+ #
+ d_status() {
+-    $DAEMON -c && echo "$DESC is running" || echo "$DESC is not running"
++    $DAEMON -c
++    status=$?
++    if [ $status = 0 ]; then
++        echo "$DESC is running"
++        return 0
++    else
++        echo "$DESC is not running"
++        return 3
++    fi
+ }
+ 
+ case "$1" in
+@@ -182,9 +190,9 @@ case "$1" in
+         d_status
+ 	;;
+     *)
+-        echo "Usage: $SCRIPTNAME {start|stop|restart|force-reload|reload}" >&2
++        echo "Usage: $SCRIPTNAME {start|stop|restart|force-reload|reload|status}" >&2
+         exit 1
+         ;;
+ esac
+ 
+-exit 0
++exit $?
+-- 
+1.7.9.5
+

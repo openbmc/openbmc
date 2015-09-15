@@ -1,0 +1,236 @@
+{% extends "basebuildpage.html" %}
+{% block extraheadcontent %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/jquery.treetable.css' %}" type="text/css">
+<link rel="stylesheet" href="{% static 'css/jquery.treetable.theme.toaster.css' %}" type="text/css">
+{% endblock extraheadcontent %}
+
+{% block localbreadcrumb %}
+<li>{{target.target}}</li>
+{% endblock localbreadcrumb%}
+
+{% block buildinfomain %}
+
+{% load static %}
+<script src="{% static 'js/jquery.treetable.js' %}">
+</script>
+{% load projecttags %}
+
+<script type='text/javascript'>
+    function setupTreetable() {
+        $("#dirtable").treetable({
+            expandable: true,
+            branchAttr: "ttBranch",
+            clickableNodeNames: true,
+            onNodeCollapse: function() {
+                /* Do nothing, keep cached */
+            },
+            onNodeExpand: function() {
+                var start = this.id;
+                var n = $("#dirtable").treetable("node", start);
+                if (this.children.length > 0) {
+                    /* already was expanded once */
+                    $("#dirtable").treetable("reveal", start);
+                }
+                else {
+                    var url = "{% url "dirinfo_ajax" build.id target.id  %}";
+                    $.ajax({
+                        async: false,
+                        type    : "GET",
+                        url     : url,
+                        data    : "start=" + start,
+                        success : function(response) {
+                            addRows(n, response)
+                        },
+                        error   : function(jqXHR, textStatus, errorThrown ) {alert(textStatus + ":" + errorThrown)},
+                     });
+                }
+             },
+       });
+    }
+    function td(data) {
+        if (data == null) {
+            data = '';
+        }
+        return '<td>' + data + '</td>'
+    }
+
+    function formatRow(o) {
+        /* setup tr-wide formatting */
+        var tr = '<tr class="';
+        if (o.link_to != null) {
+            tr += 'muted ';
+        }
+        if (o.isdir && o.childcount) {
+            tr += 'branch" data-tt-branch="true" ';
+        }
+        else {
+            tr += 'leaf" data-tt-branch="false" ';
+        }
+        tr +=    ' data-tt-id="' + o.fullpath +'" ';
+        if (o.parent != "/") {
+            tr +=    ' data-tt-parent-id="' + o.parent +'" ';
+        }
+        tr += '>';
+
+        /* setup td specific formatting */
+        var link_to = td(o.link_to);
+        var size = '<td class = "sizecol">' + o.size + '</td>'
+        var permission = td(o.permission);
+        var owner = td(o.owner);
+        var group = td(o.group);
+
+        /* handle the name column */
+        var name = null;;
+        var namespan=1;
+        if (o.isdir) {
+            if (o.link_to == null) {
+                namespan = 2;
+                if (o.package == null) {
+                    namespan = 3;
+                }
+            }
+            var colspan = 'colspan="' + namespan + '"';
+            name = '<td class="content-directory"' + colspan + '>';
+            if (o.childcount) {
+                name += '<a href="">';
+            }
+            name += '<i class="icon-folder-close"></i>';
+            name += '&nbsp;' + o.name;
+            if (o.childcount) {
+                name += '</a>';
+            }
+            name += '</td>';
+        }
+        else {
+            name = '<td>';
+            if (o.link_to == null) {
+                name += '<i class="icon-file"></i>';
+            }
+            else {
+                name += '<i class="icon-hand-right"></i>';
+            }
+            name += '&nbsp;' + o.name;
+            name += '</td>';
+        }
+
+        /* handle the package column */
+        var package = null;
+        if (o.package != null) {
+            /* add link to included package page */
+            build_id = {{ build.id }};
+            target_id = {{ target.id }};
+            /* Create a url for a dummy package id of 0 */
+            dummy = "{% url 'package_included_detail' build.id target.id 0 %}"
+            /* fill in the package id */
+            url = dummy.substr(0, dummy.length-1) + o.package_id;
+            package = '<a href=' + url + '>' ;
+            package += o.package;
+            package += '</a>';
+            if (o.installed_package != o.package) {
+                /* make class muted and add hover help */
+                package += '<span class="muted"> as ' + o.installed_package + ' </span>';
+                package += '<i class="icon-question-sign get-help hover-help" ';
+                package += 'title="' + o.package + ' was renamed at packaging time and was installed in your image as ' + o.installed_package + '">';
+                package += '</i>';
+            }
+        }
+        package = td(package);
+
+        var cols1to3;
+        switch (namespan) {
+            case 3:
+                cols1to3 = name;
+                break;
+            case  2:
+                cols1to3 = name + package;
+                break;
+            default:
+                cols1to3 = name + link_to + package;
+        }
+        r = tr + cols1to3 + size + permission + owner + group + "</tr>"
+        return r;
+    }
+
+    function addRows(n, objs) {
+        rows = "";
+        for (i=0; i<objs.length; i++) {
+            rows += formatRow(objs[i]);
+        }
+        $("#dirtable").treetable("loadBranch", n, rows);
+    }
+
+    $.fn.isOffScreen = function(){
+        var win = $(window);
+        viewportBottom = win.scrollTop() + win.height();
+        
+        var bounds = this.offset();
+        bounds.bottom = bounds.top + this.outerHeight();
+        
+        return (bounds.bottom > viewportBottom);
+    };
+
+    function selectRow(path) {
+        var row  = $('tr[data-tt-id="' + path + '"]');
+        row.addClass(" highlight");
+        if (row.isOffScreen()) {
+            $('html, body').animate({ scrollTop: row.offset().top - 150}, 2000);
+        }
+    }
+</script>
+
+<div class="span10">
+
+    <div class="page-header">
+        <h1> {{target.target}} </h1>
+    </div>
+
+    <ul class="nav nav-pills">
+        <li class="">
+            <a href="{% url 'target' build.id target.id %}">
+            <i class="icon-question-sign get-help" title="Of all the packages built, the subset installed in the root file system of this image"></i>
+                Packages included ({{target.package_count}} - {{packages_sum|filtered_filesizeformat}})
+            </a>
+        </li>
+        <li class="active">
+            <a href="{% url 'dirinfo' build.id target.id %}">
+                <i class="icon-question-sign get-help" title="The directories and files in the root file system of this image"></i>
+                Directory structure
+            </a>
+        </li>
+    </ul>
+
+    <div id="directory-structure" class="tab-pane active">
+        <table id="dirtable" class="table table-bordered table-hover treetable">
+            <thead>
+                <tr>
+                    <th>Directory / File</th>
+                    <th>Symbolic link to</th>
+                    <th>Source package</th>
+                    <th>Size</th>
+                    <th>Permissions</th>
+                    <th>Owner</th>
+                    <th>Group</th>
+                </tr>
+            </thead>
+            <tbody>
+            <script type='text/javascript'>
+                setupTreetable();
+                addRows(null, {{ objects|safe }} );
+                {% if file_path %}
+                    {% comment %}
+                        link from package_included_detail specifies file path
+                    {% endcomment %}
+                    {% for dir_elem in dir_list %}
+                        $("#dirtable").treetable("expandNode", "{{dir_elem}}");
+                    {% endfor %}
+                    selectRow("{{file_path}}");
+                {% endif %}
+            </script>
+            </tbody>
+        </table>
+    </div> <!-- directory-structure -->
+</div> <!-- span10 -->
+
+{% endblock buildinfomain %}
+

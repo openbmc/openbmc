@@ -1,0 +1,56 @@
+Fix the following error detected with i586-pokymllib32-linux-gcc (the
+multilib x86-64 lib32 compiler):
+    ../lib/ctutils/.libs/libctutils.so: undefined reference to `get_kernel_sfm'
+    collect2: error: ld returned 1 exit status
+
+It seems that libctutils.so (the library that uses get_kernel_sfm) must
+be stated before libconsole.so (the library that exports the function) when
+using multilib gcc
+
+Upstream-Status: Pending
+Signed-off-by: Constantin Musca <constantinx.musca@intel.com>
+
+Index: console-tools-0.3.2/fontfiletools/Makefile.am
+===================================================================
+--- console-tools-0.3.2.orig/fontfiletools/Makefile.am
++++ console-tools-0.3.2/fontfiletools/Makefile.am
+@@ -10,5 +10,5 @@ EXTRA_DIST = fonts2virfont.c virfont.h
+ 
+ # libconsole is needed by ctutils
+ LDADD = ../lib/ctlocal/libctlocal.a ../lib/cfont/libcfont.la \
+-	../lib/console/libconsole.la \
+-	../lib/ctutils/libctutils.la ../lib/generic/libctgeneric.la
++	../lib/ctutils/libctutils.la \
++	../lib/console/libconsole.la ../lib/generic/libctgeneric.la
+Index: console-tools-0.3.2/vttools/Makefile.am
+===================================================================
+--- console-tools-0.3.2.orig/vttools/Makefile.am
++++ console-tools-0.3.2/vttools/Makefile.am
+@@ -7,9 +7,9 @@ bin_PROGRAMS = chvt deallocvt writevt fg
+ 	vcstime vt-is-UTF8 openvt @RESIZECONS@
+ EXTRA_PROGRAMS = resizecons
+ 
+-LDADD = ../lib/ctlocal/libctlocal.a ../lib/console/libconsole.la \
++LDADD = ../lib/ctlocal/libctlocal.a ../lib/ctutils/libctutils.la \
+ 	../lib/cfont/libcfont.la \
+-	../lib/ctutils/libctutils.la ../lib/generic/libctgeneric.la
++	../lib/console/libconsole.la ../lib/generic/libctgeneric.la
+ 
+ vcstime_LDADD = ../lib/ctlocal/libctlocal.a
+ screendump_LDADD = ../lib/ctlocal/libctlocal.a
+Index: console-tools-0.3.2/kbdtools/Makefile.am
+===================================================================
+--- console-tools-0.3.2.orig/kbdtools/Makefile.am
++++ console-tools-0.3.2/kbdtools/Makefile.am
+@@ -15,9 +15,9 @@ EXTRA_PROGRAMS = getkeycodes setkeycodes
+ loadkeys_SOURCES = loadkeys.y analyze.l
+ 
+ YFLAGS = -d
+-LDADD = ../lib/ctlocal/libctlocal.a ../lib/console/libconsole.la \
++LDADD = ../lib/ctlocal/libctlocal.a ../lib/ctutils/libctutils.la \
+ 	../lib/cfont/libcfont.la \
+-	../lib/ctutils/libctutils.la ../lib/generic/libctgeneric.la
++	../lib/console/libconsole.la ../lib/generic/libctgeneric.la
+ 
+ loadkeys_LDADD = $(LDADD) @LEXLIB@
+ 

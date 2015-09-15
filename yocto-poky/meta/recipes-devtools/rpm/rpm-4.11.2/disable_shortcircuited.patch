@@ -1,0 +1,23 @@
+Upstream-Status: Pending
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+Signed-off-by: Ronan Le Martret <ronan.lemartret@open.eurogiciel.org>
+
+
+Index: rpm-4.11.2/build/pack.c
+===================================================================
+--- rpm-4.11.2.orig/build/pack.c
++++ rpm-4.11.2/build/pack.c
+@@ -571,9 +571,9 @@ rpmRC packageBinaries(rpmSpec spec, cons
+ 	    headerPutBin(pkg->header, RPMTAG_SOURCEPKGID, spec->sourcePkgId,16);
+ 	}
+ 
+-	if (cheating) {
+-	    (void) rpmlibNeedsFeature(pkg, "ShortCircuited", "4.9.0-1");
+-	}
++//	if (cheating) {
++//	    (void) rpmlibNeedsFeature(pkg, "ShortCircuited", "4.9.0-1");
++//	}
+ 	
+ 	{   char *binFormat = rpmGetPath("%{_rpmfilename}", NULL);
+ 	    char *binRpm, *binDir;

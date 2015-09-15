@@ -1,0 +1,22 @@
+# Set this to no to disable prelinking altogether
+# or to yes to enable it.
+# (if you change this from yes to no prelink -ua
+# will be run next night to undo prelinking)
+PRELINKING=yes
+
+# Options to pass to prelink
+# -m	Try to conserve virtual memory by allowing overlapping
+#	assigned virtual memory slots for libraries which
+#	never appear together in one binary
+# -R	Randomize virtual memory slot assignments for libraries.
+#	This makes it slightly harder for various buffer overflow
+#	attacks, since library addresses will be different on each
+#	host using -R.
+PRELINK_OPTS=-mR
+
+# How often should full prelink be run (in days)
+# Normally, prelink will be run in quick mode, every
+# $PRELINK_FULL_TIME_INTERVAL days it will be run
+# in normal mode.  Comment this line out if prelink 
+# should be run in normal mode always.
+PRELINK_FULL_TIME_INTERVAL=14

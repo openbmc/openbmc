@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load projecttags %}
+{% load humanize %}
+{% block pagecontent %}
+
+{% include "projecttopbar.html" %}
+
+<!-- Begin main page container -->
+<div>
+    {% block projectinfomain %}{% endblock %}
+</div>
+<!-- End main container -->
+
+{% endblock %}
+

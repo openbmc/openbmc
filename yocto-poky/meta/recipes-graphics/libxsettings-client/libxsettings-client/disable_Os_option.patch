@@ -1,0 +1,19 @@
+Upstream-Status: Inappropriate [configuration]
+
+Do not set Os optimization in target APP CFLAGS, since it may have potential
+error if "--enable-target-optspace" is not set when configuring GCC.
+
+Signed-off-by: Dongxiao Xu <dongxiao.xu@intel.com>
+
+diff -ruN Xsettings-client-0.10-orig/configure.ac Xsettings-client-0.10/configure.ac
+--- Xsettings-client-0.10-orig/configure.ac	2010-09-21 14:01:47.000000000 +0800
++++ Xsettings-client-0.10/configure.ac	2010-09-21 14:02:01.000000000 +0800
+@@ -3,7 +3,7 @@
+ AM_INIT_AUTOMAKE(Xsettings-client, 0.10)
+ AM_CONFIG_HEADER(config.h)
+ 
+-CFLAGS="-Os -Wall"
++CFLAGS="-O2 -Wall"
+ 
+ # Checks for programs.
+ AC_PROG_CC

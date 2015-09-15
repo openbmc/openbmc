@@ -1,0 +1,86 @@
+CentOS 5.8 kernels and headers support the sync_file_range() system call,
+but glibc 2.5 doesn't provide the syscall stub.  It appears that this
+problem is known but will never be fixed:
+
+  https://bugzilla.redhat.com/show_bug.cgi?id=518581
+
+  Bug 518581 - [RHEL5] glibc misses sync_file_range syscall interface 
+
+  Status:       CLOSED CANTFIX 
+  Last Closed:  2009-11-22 22:19:55
+
+  Kirby Zhou 2009-08-20 23:37:55 EDT
+
+  Description of problem:
+
+  glibc misses sync_file_range syscall interface.  The header file and
+  man page both say 'sync_file_range' should exist.  From man page,
+  sync_file_range should exist sinc kernel-2.6.17
+
+  Andreas Schwab 2009-08-21 03:24:24 EDT
+
+  It has only been added to glibc 2.6, and cannot be backported due to
+  ABI breakage.  You can always fall back to syscall(3).
+
+  Ulrich Drepper 2009-11-22 22:19:55 EST
+
+  As comment #1 says, no chance to backport this.
+
+  See the syscall man page for instructions.
+
+  Jon E 2010-03-19 10:32:37 EDT
+
+  then why document it if it's broken and you're not going to fix it?
+  .. might want to FTFM over at sync_file_range(2) - in the meantime -
+  borrowing from glibc 2.6 .. any thoughts on this implementation for a
+  hacky workaround for those still on your "ancient releases" .. (eg:
+  RHEL5.3)?:
+
+  #ifdef ULI_WONT_FIX_THIS_IN_GLIBC2.5
+  #define NR_sync_file_range 277
+  int sync_file_range (int fd, __off64_t from, __off64_t to, unsigned int flags)
+  {
+    return syscall (NR_sync_file_range, fd,
+                           __LONG_LONG_PAIR ((long) (from >> 32), (long) from),
+                           __LONG_LONG_PAIR ((long) (to >> 32), (long) to),
+                           flags);
+  }
+  #endif
+
+  assuming of course that you're on an x86_64 and include/asm-
+  x86_64/unistd.h has the correct entry
+
+  (fwiw - fio is starting to use this now)
+
+Rather than attempting to provide an implementation using syscall(),
+we take the more conservative route and ignore header support for
+sync_file_range() flags when the glibc version is <= 2.5.
+
+Upstream-Status: Inappropriate [everyone else builds on newer hosts :-)]
+
+Signed-off-by: Donn Seeley <donn.seeley@windriver.com>
+Signed-off-by: Lei Liu <lei.liu2@windriver.com>
+---
+ src/archives.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- a/src/archives.c
++++ b/src/archives.c
+@@ -75,7 +75,7 @@
+   /* Ignore the return code as it should be considered equivalent to an
+    * asynchronous hint for the kernel, we are doing an fsync() later on
+    * anyway. */
+-#if defined(SYNC_FILE_RANGE_WRITE)
++#if defined(SYNC_FILE_RANGE_WRITE) && __GLIBC_PREREQ(2, 6)
+   sync_file_range(fd, 0, 0, SYNC_FILE_RANGE_WRITE);
+ #elif defined(HAVE_POSIX_FADVISE)
+   posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
+@@ -1179,7 +1179,7 @@
+   return 0;
+ }
+ 
+-#if defined(SYNC_FILE_RANGE_WAIT_BEFORE)
++#if defined(SYNC_FILE_RANGE_WAIT_BEFORE) && __GLIBC_PREREQ(2, 6)
+ static void
+ tar_writeback_barrier(struct fileinlist *files, struct pkginfo *pkg)
+ {

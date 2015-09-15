@@ -1,0 +1,39 @@
+Upstream-Status: Inappropriate [debian patch]
+
+Signed-Off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
+
+From e52bfcdbaca5dce498678d8f512381e3e39a4066 Mon Sep 17 00:00:00 2001
+From: Rob Browning <rlb@defaultvalue.org>
+Date: Sun, 18 Mar 2012 11:40:55 -0500
+Subject: Mark "Unused modules are removed" gc test as unresolved.
+
+As per discussion with upstream, mark this test as unresolved since it
+may produce false negatives, depending on the behavior/timing of the
+garbage collector.
+---
+ test-suite/tests/gc.test |   11 ++++++-----
+ 1 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/test-suite/tests/gc.test b/test-suite/tests/gc.test
+index a969752..8c8e13e 100644
+--- a/test-suite/tests/gc.test
++++ b/test-suite/tests/gc.test
+@@ -84,11 +84,13 @@
+       ;; one gc round. not sure why.
+ 
+       (maybe-gc-flakiness
+-       (= (let lp ((i 0))
+-            (if (guard)
+-                (lp (1+ i))
+-                i))
+-          total))))
++       (or (= (let lp ((i 0))
++                (if (guard)
++                    (lp (1+ i))
++                    i))
++              total)
++           (throw 'unresolved)))))
++
+ 
+   (pass-if "Lexical vars are collectable"
+     (let ((l (compile

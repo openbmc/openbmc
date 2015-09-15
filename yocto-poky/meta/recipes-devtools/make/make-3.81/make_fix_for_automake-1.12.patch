@@ -1,0 +1,43 @@
+Upstream-Status: Pending
+
+automake 1.12 has depricated automatic de-ANSI-fication support
+
+this patch avoids these kinds of errors:
+
+| configure.in:48: error: automatic de-ANSI-fication support has been removed
+...
+| Makefile.am:19: error: automatic de-ANSI-fication support has been removed
+| autoreconf: automake failed with exit status: 1
+| ERROR: autoreconf execution failed.
+
+
+Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+2012/05/04
+
+Index: make-3.81/configure.in
+===================================================================
+--- make-3.81.orig/configure.in
++++ make-3.81/configure.in
+@@ -44,9 +44,6 @@ AC_AIX
+ AC_ISC_POSIX
+ AC_MINIX
+ 
+-# Needed for ansi2knr
+-AM_C_PROTOTYPES
+-
+ # Enable gettext, in "external" mode.
+ 
+ AM_GNU_GETTEXT_VERSION(0.14.1)
+Index: make-3.81/Makefile.am
+===================================================================
+--- make-3.81.orig/Makefile.am
++++ make-3.81/Makefile.am
+@@ -16,7 +16,7 @@
+ # GNU Make; see the file COPYING.  If not, write to the Free Software
+ # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ 
+-AUTOMAKE_OPTIONS = 1.8 dist-bzip2 check-news ansi2knr
++AUTOMAKE_OPTIONS = 1.8 dist-bzip2 check-news
+ ACLOCAL_AMFLAGS	=  -I config
+ 
+ MAKE_HOST =	@MAKE_HOST@

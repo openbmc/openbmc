@@ -1,0 +1,22 @@
+dumpMetadata.py: Fix for RPM5 - 5.4.9 integration
+
+RPM5 no longer has a switch to disable signature validation.  (Due to security
+validation concerns.)
+
+Upstream-Status: Inappropriate [other]
+  createrepo does not support RPM5 upstream
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+diff -u createrepo-0.4.11.orig/dumpMetadata.py createrepo-0.4.11/dumpMetadata.py
+--- createrepo-0.4.11.orig/dumpMetadata.py	2012-06-05 10:12:55.687964222 -0500
++++ createrepo-0.4.11/dumpMetadata.py	2012-06-05 10:40:08.154060600 -0500
+@@ -92,7 +92,7 @@
+             fdno = package # let's assume this is an fdno and go with it :)
+     except OSError:
+         raise MDError, "Error opening file"
+-    ts.setVSFlags((rpm._RPMVSF_NOSIGNATURES|rpm.RPMVSF_NOMD5|rpm.RPMVSF_NEEDPAYLOAD))
++    ts.setVSFlags((rpm.RPMVSF_NOMD5|rpm.RPMVSF_NEEDPAYLOAD))
+     try:
+         hdr = ts.hdrFromFdno(fdno)
+     except rpm.error:

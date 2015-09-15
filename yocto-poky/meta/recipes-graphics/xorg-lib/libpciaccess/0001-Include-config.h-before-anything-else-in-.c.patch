@@ -1,0 +1,187 @@
+From b14696a55796e739624bbda4f772427032efff2a Mon Sep 17 00:00:00 2001
+From: Julien Cristau <jcristau@debian.org>
+Date: Sun, 26 Apr 2015 15:20:57 +0200
+Subject: [PATCH 1/4] Include config.h before anything else in *.c
+
+Debian bug#749008 <https://bugs.debian.org/749008>
+
+Reported-by: Michael Tautschnig <mt@debian.org>
+Signed-off-by: Julien Cristau <jcristau@debian.org>
+Reviewed-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+---
+Upstream-Status: Backport
+
+ src/common_capability.c  | 3 +++
+ src/common_init.c        | 3 +++
+ src/common_interface.c   | 3 +++
+ src/common_io.c          | 3 +++
+ src/common_iterator.c    | 3 +++
+ src/common_map.c         | 3 +++
+ src/common_vgaarb_stub.c | 3 +++
+ src/linux_devmem.c       | 5 +++--
+ src/openbsd_pci.c        | 3 +++
+ src/solx_devfs.c         | 3 +++
+ src/x86_pci.c            | 4 +++-
+ 11 files changed, 33 insertions(+), 3 deletions(-)
+
+diff --git a/src/common_capability.c b/src/common_capability.c
+index 488743d..15d395d 100644
+--- a/src/common_capability.c
++++ b/src/common_capability.c
+@@ -31,6 +31,9 @@
+  *
+  * \author Ian Romanick <idr@us.ibm.com>
+  */
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif
+ 
+ #include <stdlib.h>
+ #include <stdio.h>
+diff --git a/src/common_init.c b/src/common_init.c
+index b1c0c3e..f7b59bd 100644
+--- a/src/common_init.c
++++ b/src/common_init.c
+@@ -28,6 +28,9 @@
+  *
+  * \author Ian Romanick <idr@us.ibm.com>
+  */
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif
+ 
+ #include <stdlib.h>
+ #include <errno.h>
+diff --git a/src/common_interface.c b/src/common_interface.c
+index 59778cf..cb95e90 100644
+--- a/src/common_interface.c
++++ b/src/common_interface.c
+@@ -28,6 +28,9 @@
+  *
+  * \author Ian Romanick <idr@us.ibm.com>
+  */
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif
+ 
+ #include <stdlib.h>
+ #include <string.h>
+diff --git a/src/common_io.c b/src/common_io.c
+index f5c9e45..e9586ad 100644
+--- a/src/common_io.c
++++ b/src/common_io.c
+@@ -22,6 +22,9 @@
+  * Author:
+  *	Adam Jackson <ajax@redhat.com>
+  */
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif
+ 
+ #include <stdlib.h>
+ #include <string.h>
+diff --git a/src/common_iterator.c b/src/common_iterator.c
+index ccf656d..2beb180 100644
+--- a/src/common_iterator.c
++++ b/src/common_iterator.c
+@@ -28,6 +28,9 @@
+  *
+  * \author Ian Romanick <idr@us.ibm.com>
+  */
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif
+ 
+ #include <stdlib.h>
+ #include <string.h>
+diff --git a/src/common_map.c b/src/common_map.c
+index 8757151..f1854bb 100644
+--- a/src/common_map.c
++++ b/src/common_map.c
+@@ -21,6 +21,9 @@
+  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+  * DEALINGS IN THE SOFTWARE.
+  */
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif
+ 
+ #include <sys/types.h>
+ #include <sys/mman.h>
+diff --git a/src/common_vgaarb_stub.c b/src/common_vgaarb_stub.c
+index 9394273..c1708f6 100644
+--- a/src/common_vgaarb_stub.c
++++ b/src/common_vgaarb_stub.c
+@@ -23,6 +23,9 @@
+  * OTHER DEALINGS IN THE SOFTWARE.
+  *
+  */
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif
+ 
+ #include <stdio.h>
+ #include "pciaccess.h"
+diff --git a/src/linux_devmem.c b/src/linux_devmem.c
+index 10e3bde..0d0567c 100644
+--- a/src/linux_devmem.c
++++ b/src/linux_devmem.c
+@@ -32,8 +32,9 @@
+  *
+  * \author Ian Romanick <idr@us.ibm.com>
+  */
+-
+-#define _GNU_SOURCE
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif
+ 
+ #include <stdlib.h>
+ #include <string.h>
+diff --git a/src/openbsd_pci.c b/src/openbsd_pci.c
+index 4d1b5cd..b8ce318 100644
+--- a/src/openbsd_pci.c
++++ b/src/openbsd_pci.c
+@@ -13,6 +13,9 @@
+  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+  */
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif
+ 
+ #include <sys/param.h>
+ #include <sys/ioctl.h>
+diff --git a/src/solx_devfs.c b/src/solx_devfs.c
+index f572393..cf96467 100644
+--- a/src/solx_devfs.c
++++ b/src/solx_devfs.c
+@@ -25,6 +25,9 @@
+ /*
+  * Solaris devfs interfaces
+  */
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif
+ 
+ #include <stdlib.h>
+ #include <strings.h>
+diff --git a/src/x86_pci.c b/src/x86_pci.c
+index 49c1cab..32daa04 100644
+--- a/src/x86_pci.c
++++ b/src/x86_pci.c
+@@ -18,8 +18,10 @@
+  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+  */
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif
+ 
+-#define _GNU_SOURCE
+ #include <unistd.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+-- 
+2.1.4
+

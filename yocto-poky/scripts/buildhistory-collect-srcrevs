@@ -1,0 +1,109 @@
+#!/usr/bin/env python
+#
+# Collects the recorded SRCREV values from buildhistory and reports on them
+#
+# Copyright 2013 Intel Corporation
+# Authored-by:  Paul Eggleton <paul.eggleton@intel.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+import os, sys
+import optparse
+import logging
+
+def logger_create():
+    logger = logging.getLogger("buildhistory")
+    loggerhandler = logging.StreamHandler()
+    loggerhandler.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
+    logger.addHandler(loggerhandler)
+    logger.setLevel(logging.INFO)
+    return logger
+
+logger = logger_create()
+
+def main():
+    parser = optparse.OptionParser(
+        description = "Collects the recorded SRCREV values from buildhistory and reports on them.",
+        usage = """
+    %prog [options]""")
+
+    parser.add_option("-a", "--report-all",
+            help = "Report all SRCREV values, not just ones where AUTOREV has been used",
+            action="store_true", dest="reportall")
+    parser.add_option("-f", "--forcevariable",
+            help = "Use forcevariable override for all output lines",
+            action="store_true", dest="forcevariable")
+    parser.add_option("-p", "--buildhistory-dir",
+            help = "Specify path to buildhistory directory (defaults to buildhistory/ under cwd)",
+            action="store", dest="buildhistory_dir", default='buildhistory/')
+
+    options, args = parser.parse_args(sys.argv)
+
+    if len(args) > 1:
+        sys.stderr.write('Invalid argument(s) specified: %s\n\n' % ' '.join(args[1:]))
+        parser.print_help()
+        sys.exit(1)
+
+    if not os.path.exists(options.buildhistory_dir):
+        sys.stderr.write('Buildhistory directory "%s" does not exist\n\n' % options.buildhistory_dir)
+        parser.print_help()
+        sys.exit(1)
+
+    if options.forcevariable:
+        forcevariable = '_forcevariable'
+    else:
+        forcevariable = ''
+
+    lastdir = ''
+    for root, dirs, files in os.walk(options.buildhistory_dir):
+        if '.git' in dirs:
+            dirs.remove('.git')
+        for fn in files:
+            if fn == 'latest_srcrev':
+                curdir = os.path.basename(os.path.dirname(root))
+                if lastdir != curdir:
+                    print('# %s' % curdir)
+                    lastdir = curdir
+                fullpath = os.path.join(root, fn)
+                pn = os.path.basename(root)
+                srcrev = None
+                orig_srcrev = None
+                orig_srcrevs = {}
+                srcrevs = {}
+                with open(fullpath) as f:
+                    for line in f:
+                        if '=' in line:
+                            splitval = line.split('=')
+                            value = splitval[1].strip('" \t\n\r')
+                        if line.startswith('# SRCREV = '):
+                            orig_srcrev = value
+                        elif line.startswith('# SRCREV_'):
+                            splitval = line.split('=')
+                            name = splitval[0].split('_')[1].strip()
+                            orig_srcrevs[name] = value
+                        elif line.startswith('SRCREV ='):
+                            srcrev = value
+                        elif line.startswith('SRCREV_'):
+                            name = splitval[0].split('_')[1].strip()
+                            srcrevs[name] = value
+                if srcrev and (options.reportall or srcrev != orig_srcrev):
+                    print('SRCREV_pn-%s%s = "%s"' % (pn, forcevariable, srcrev))
+                for name, value in srcrevs.items():
+                    orig = orig_srcrevs.get(name, orig_srcrev)
+                    if options.reportall or value != orig:
+                        print('SRCREV_%s_pn-%s%s = "%s"' % (name, pn, forcevariable, value))
+
+
+if __name__ == "__main__":
+    main()

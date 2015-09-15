@@ -1,0 +1,140 @@
+Upstream-Status: Pending
+
+The dropbearkey utility built in x32 abi format, when generating ssh
+keys, was getting lost in the infinite loop.
+
+This patch fixes the issue by fixing types of variables and
+parameters of functions used in the code, which were getting
+undesired size, when compiled with the x32 abi toolchain.
+
+2013/05/23
+Received this fix from H J Lu.
+
+Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+
+# HG changeset patch
+# User H.J. Lu <hjl.tools@gmail.com>
+# Date 1369344079 25200
+# Node ID a10a1c46b857cc8a3923c3bb6d1504aa25b6052f
+# Parent  e76614145aea67f66e4a4257685c771efba21aa1
+Typdef mp_digit to unsigned long long for MP_64BIT
+
+When GCC is used with MP_64BIT, we should typedef mp_digit to unsigned
+long long instead of unsigned long since for x32, unsigned long is
+32-bit and unsigned long long is 64-bit and it is safe to use unsigned
+long long for 64-bit integer with GCC.
+
+diff -r e76614145aea -r a10a1c46b857 libtommath/tommath.h
+--- a/libtommath/tommath.h	Thu Apr 18 22:57:47 2013 +0800
++++ b/libtommath/tommath.h	Thu May 23 14:21:19 2013 -0700
+@@ -73,7 +73,7 @@
+    typedef signed long long   long64;
+ #endif
+
+-   typedef unsigned long      mp_digit;
++   typedef unsigned long long mp_digit;
+    typedef unsigned long      mp_word __attribute__ ((mode(TI)));
+
+    #define DIGIT_BIT          60
+# HG changeset patch
+# User H.J. Lu <hjl.tools@gmail.com>
+# Date 1369344241 25200
+# Node ID c7555a4cb7ded3a88409ba85f4027baa7af5f536
+# Parent  a10a1c46b857cc8a3923c3bb6d1504aa25b6052f
+Cast to mp_digit when updating *rho
+
+There is
+
+int
+mp_montgomery_setup (mp_int * n, mp_digit * rho)
+
+We should cast to mp_digit instead of unsigned long when updating
+*rho since mp_digit may be unsigned long long and unsigned long long
+may be different from unsigned long, like in x32.
+
+diff -r a10a1c46b857 -r c7555a4cb7de libtommath/bn_mp_montgomery_setup.c
+--- a/libtommath/bn_mp_montgomery_setup.c	Thu May 23 14:21:19 2013 -0700
++++ b/libtommath/bn_mp_montgomery_setup.c	Thu May 23 14:24:01 2013 -0700
+@@ -48,7 +48,7 @@
+ #endif
+
+   /* rho = -1/m mod b */
+-  *rho = (unsigned long)(((mp_word)1 << ((mp_word) DIGIT_BIT)) - x) & MP_MASK;
++  *rho = (mp_digit)(((mp_word)1 << ((mp_word) DIGIT_BIT)) - x) & MP_MASK;
+
+   return MP_OKAY;
+ }
+# HG changeset patch
+# User H.J. Lu <hjl.tools@gmail.com>
+# Date 1369344541 25200
+# Node ID 7c656e7071a6412688b2f30a529a9afac6c7bf5a
+# Parent  c7555a4cb7ded3a88409ba85f4027baa7af5f536
+Define LTC_FAST_TYPE to unsigned long long for __x86_64__
+
+We should define LTC_FAST_TYPE to unsigned long long instead of unsigned
+long if __x86_64__ to support x32 where unsigned long long is 64-bit
+and unsigned long is 32-bit.
+
+diff -r c7555a4cb7de -r 7c656e7071a6 libtomcrypt/src/headers/tomcrypt_cfg.h
+--- a/libtomcrypt/src/headers/tomcrypt_cfg.h	Thu May 23 14:24:01 2013 -0700
++++ b/libtomcrypt/src/headers/tomcrypt_cfg.h	Thu May 23 14:29:01 2013 -0700
+@@ -74,7 +74,7 @@
+    #define ENDIAN_LITTLE
+    #define ENDIAN_64BITWORD
+    #define LTC_FAST
+-   #define LTC_FAST_TYPE    unsigned long
++   #define LTC_FAST_TYPE    unsigned long long
+ #endif
+
+ /* detect PPC32 */
+# HG changeset patch
+# User H.J. Lu <hjl.tools@gmail.com>
+# Date 1369344730 25200
+# Node ID a7d4690158fae4ede2c4e5b56233e83730bf38ee
+# Parent  7c656e7071a6412688b2f30a529a9afac6c7bf5a
+Use unsigned long long aas unsigned 64-bit integer for x86-64 GCC
+
+We should use unsigned long long instead of unsigned long as unsigned
+64-bit integer for x86-64 GCC to support x32 where unsigned long is
+32-bit.
+
+diff -r 7c656e7071a6 -r a7d4690158fa libtomcrypt/src/headers/tomcrypt_macros.h
+--- a/libtomcrypt/src/headers/tomcrypt_macros.h	Thu May 23 14:29:01 2013 -0700
++++ b/libtomcrypt/src/headers/tomcrypt_macros.h	Thu May 23 14:32:10 2013 -0700
+@@ -343,7 +343,7 @@
+ /* 64-bit Rotates */
+ #if !defined(__STRICT_ANSI__) && defined(__GNUC__) && defined(__x86_64__) && !defined(LTC_NO_ASM)
+
+-static inline unsigned long ROL64(unsigned long word, int i)
++static inline unsigned long long ROL64(unsigned long long word, int i)
+ {
+    asm("rolq %%cl,%0"
+       :"=r" (word)
+@@ -351,7 +351,7 @@
+    return word;
+ }
+
+-static inline unsigned long ROR64(unsigned long word, int i)
++static inline unsigned long long ROR64(unsigned long long word, int i)
+ {
+    asm("rorq %%cl,%0"
+       :"=r" (word)
+@@ -361,7 +361,7 @@
+
+ #ifndef LTC_NO_ROLC
+
+-static inline unsigned long ROL64c(unsigned long word, const int i)
++static inline unsigned long long ROL64c(unsigned long long word, const int i)
+ {
+    asm("rolq %2,%0"
+       :"=r" (word)
+@@ -369,7 +369,7 @@
+    return word;
+ }
+
+-static inline unsigned long ROR64c(unsigned long word, const int i)
++static inline unsigned long long ROR64c(unsigned long long word, const int i)
+ {
+    asm("rorq %2,%0"
+       :"=r" (word)
+

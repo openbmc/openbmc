@@ -1,0 +1,38 @@
+From 0daa354a16aa3cade56ed423d0f8a04cf1c22f9d Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Thu, 23 Apr 2015 01:49:31 -0700
+Subject: [PATCH] lib/Makefile: fix parallel issue
+
+Fixed:
+Assembler messages:
+Fatal error: can't create runtime/rtlock.o: No such file or directory
+Assembler messages:
+Fatal error: can't create runtime/rtdata.o: No such file or directory
+Assembler messages:
+Fatal error: can't create runtime/vm.o: No such file or directory
+Assembler messages:
+Fatal error: can't create runtime/efirtlib.o: No such file or directory
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ lib/Makefile |    2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/lib/Makefile b/lib/Makefile
+index dc4b94a..f64d1ed 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -73,6 +73,8 @@ all: libsubdirs libefi.a
+ libsubdirs:
+ 	for sdir in $(SUBDIRS); do mkdir -p $$sdir; done
+ 
++$(OBJS): libsubdirs
++
+ libefi.a: $(OBJS)
+ 	$(AR) rv $@ $(OBJS)
+ 
+-- 
+1.7.9.5
+

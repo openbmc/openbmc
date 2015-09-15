@@ -1,0 +1,31 @@
+Upstream-Status: Inappropriate [configuration]
+
+Index: apr-util-1.4.1/configure.in
+===================================================================
+--- apr-util-1.4.1.orig/configure.in	2009-12-18 03:15:19.000000000 +0800
++++ apr-util-1.4.1/configure.in	2011-12-30 13:32:07.000000000 +0800
+@@ -8,15 +8,15 @@
+ AC_CONFIG_HEADER(include/private/apu_config.h)
+ AC_CONFIG_AUX_DIR(build)
+ 
+-sinclude(build/apu-conf.m4)
+-sinclude(build/apu-iconv.m4)
+-sinclude(build/apu-hints.m4)
+-sinclude(build/apr_common.m4)
+-sinclude(build/find_apr.m4)
+-sinclude(build/crypto.m4)
+-sinclude(build/dbm.m4)
+-sinclude(build/dbd.m4)
+-sinclude(build/dso.m4)
++#sinclude(build/apu-conf.m4)
++#sinclude(build/apu-iconv.m4)
++#sinclude(build/apu-hints.m4)
++#sinclude(build/apr_common.m4)
++#sinclude(build/find_apr.m4)
++#sinclude(build/crypto.m4)
++#sinclude(build/dbm.m4)
++#sinclude(build/dbd.m4)
++#sinclude(build/dso.m4)
+ 
+ dnl Generate ./config.nice for reproducing runs of configure
+ dnl 

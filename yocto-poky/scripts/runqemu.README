@@ -1,0 +1,42 @@
+Using OE images with QEMU
+=========================
+
+OE-Core can generate qemu bootable kernels and images with can be used 
+on a desktop system. The scripts currently support booting ARM, MIPS, PowerPC
+and x86 (32 and 64 bit) images. The scripts can be used within the OE build 
+system or externaly.
+
+The runqemu script is run as: 
+
+   runqemu <machine> <zimage> <filesystem>
+
+where:
+
+   <machine> is the machine/architecture to use (qemuarm/qemumips/qemuppc/qemux86/qemux86-64)
+   <zimage> is the path to a kernel (e.g. zimage-qemuarm.bin)
+   <filesystem> is the path to an ext2 image (e.g. filesystem-qemuarm.ext2) or an nfs directory
+   
+If <machine> isn't specified, the script will try to detect the machine name 
+from the name of the <zimage> file.
+
+If <filesystem> isn't specified, nfs booting will be assumed.
+
+When used within the build system, it will default to qemuarm, ext2 and the last kernel and 
+core-image-sato-sdk image built by the build system. If an sdk image isn't present it will look
+for sato and minimal images.
+
+Full usage instructions can be seen by running the command with no options specified.
+
+
+Notes
+=====
+
+ - The scripts run qemu using sudo. Change perms on /dev/net/tun to 
+   run as non root. The runqemu-gen-tapdevs script can also be used by
+   root to prepopulate the appropriate network devices.
+ - You can access the host computer at 192.168.7.1 within the image.
+ - Your qemu system will be accessible as 192.16.7.2.
+ - The script extracts the root filesystem specified under pseudo and sets up a userspace
+   NFS server to share the image over by default meaning the filesystem can be accessed by
+   both the host and guest systems.
+

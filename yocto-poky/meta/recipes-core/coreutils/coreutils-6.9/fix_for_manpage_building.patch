@@ -1,0 +1,85 @@
+Upstream-Status: Inappropriate [legacy version]
+
+Use native coreutils binaries to build manpages in cross environment.
+This avoids man page build issues like this:
+
+| Making all in man
+| make[1]: Entering directory `/build_disk/poky_build/build1/tmp/work/i586-poky-linux/coreutils-6.9-r0/coreutils-6.9/man'
+| Updating man page cut.1
+| Updating man page dir.1
+| Updating man page expand.1
+| Updating man page fold.1
+| Updating man page install.1
+| Updating man page join.1
+| Updating man page pr.1
+| Updating man page ls.1
+| Updating man page sort.1
+| Updating man page unexpand.1
+| Updating man page uniq.1
+| Updating man page who.1
+| Updating man page vdir.1
+| help2man: can't get `--help' info from dir.td/dir
+| help2man: can't get `--help' info from cut.td/cut
+| make[1]: *** [dir.1] Error 126
+| make[1]: *** Waiting for unfinished jobs....
+| help2man: can't get `--help' info from fold.td/fold
+| help2man: can't get `--help' info from install.td/install
+| help2man: can't get `--help' info from expand.td/expand
+| help2man: can't get `--help' info from join.td/join
+| make[1]: *** [cut.1] Error 126
+| make[1]: *** [fold.1] Error 126
+| make[1]: *** [install.1] Error 126
+| help2man: can't get `--help' info from sort.td/sort
+| make[1]: *** [expand.1] Error 126
+| help2man: can't get `--help' info from pr.td/pr
+| make[1]: *** [join.1] Error 126
+| help2man: can't get `--help' info from ls.td/ls
+| help2man: can't get `--help' info from unexpand.td/unexpand
+| help2man: can't get `--help' info from uniq.td/uniq
+| help2man: can't get `--help' info from who.td/who
+| make[1]: *** [sort.1] Error 126
+| make[1]: *** [pr.1] Error 126
+| help2man: can't get `--help' info from vdir.td/vdir
+| make[1]: *** [ls.1] Error 126
+| make[1]: *** [uniq.1] Error 126
+| make[1]: *** [unexpand.1] Error 126
+| make[1]: *** [who.1] Error 126
+| make[1]: *** [vdir.1] Error 126
+| make[1]: Leaving directory `/build_disk/poky_build/build1/tmp/work/i586-poky-linux/coreutils-6.9-r0/coreutils-6.9/man'
+| make: *** [all-recursive] Error 1
+| FATAL: oe_runmake failed
+| ERROR: Function 'do_compile' failed (see /build_disk/poky_build/build1/tmp/work/i586-poky-linux/coreutils-6.9-r0/temp/log.do_compile.12780 for further information)
+NOTE: package coreutils-6.9-r0: task do_compile: Failed
+ERROR: Task 8 (/home/nitin/prj/poky.git/meta/recipes-core/coreutils/coreutils_6.9.bb, do_compile) failed with exit code '1'
+
+
+This patch is made for gplv2 coreutils the recipe
+Nitin A Kamble <nitin.a.kamble@intel.com>
+2011/03/17
+
+Index: man/Makefile.am
+===================================================================
+--- a/man.orig/Makefile.am
++++ b/man/Makefile.am
+@@ -167,7 +167,7 @@ mapped_name = `echo $*|sed 's/install/gi
+ 	            $(PERL) -- $(srcdir)/help2man		\
+ 	             --source='$(PACKAGE_STRING)'		\
+ 	             --include=$(srcdir)/$*.x			\
+-	             --output=$t/$@ $t/$*;			\
++	             --output=$t/$@ $*;			\
+ 	       }						\
+ 	    && sed 's|$*\.td/||g' $t/$@ > $@			\
+ 	    && chmod a-w $@					\
+Index: man/Makefile.in
+===================================================================
+--- a/man.orig/Makefile.in
++++ b/man/Makefile.in
+@@ -865,7 +865,7 @@ yes.1:		$(common_dep)	$(srcdir)/yes.x		.
+ 	            $(PERL) -- $(srcdir)/help2man		\
+ 	             --source='$(PACKAGE_STRING)'		\
+ 	             --include=$(srcdir)/$*.x			\
+-	             --output=$t/$@ $t/$*;			\
++	             --output=$t/$@ $*;			\
+ 	       }						\
+ 	    && sed 's|$*\.td/||g' $t/$@ > $@			\
+ 	    && chmod a-w $@					\

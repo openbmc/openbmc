@@ -1,0 +1,35 @@
+Fix nss multilib build on openSUSE 11.x 32bit
+
+While building lib64-nss on openSUSE 11.x 32bit, the nsinstall will
+fail with error:
+
+* nsinstall.c:1:0: sorry, unimplemented: 64-bit mode not compiled
+
+It caused by the '-m64' option which passed to host gcc.
+
+The nsinstall was built first while nss starting to build, it only runs
+on host to install built files, it doesn't need any cross-compling or
+multilib build options. Just clean the ARCHFLAG and LDFLAGS to fix this
+error.
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+===================================================
+diff --git a/nss/coreconf/nsinstall/Makefile b/nss/coreconf/nsinstall/Makefile
+index 1850bcb..5aee84f 100644
+--- a/nss/coreconf/nsinstall/Makefile
++++ b/nss/coreconf/nsinstall/Makefile
+@@ -18,6 +18,12 @@ INTERNAL_TOOLS  = 1
+ 
+ include $(DEPTH)/coreconf/config.mk
+ 
++# nsinstall is unfit for cross-compiling/multilib-build since it was
++# always run on local host to install built files. This change intends
++# to clean the '-m64' from ARCHFLAG and LDFLAGS.
++ARCHFLAG =
++LDFLAGS =
++
+ ifeq (,$(filter-out OS2 WIN%,$(OS_TARGET)))
+ PROGRAM		=
+ else

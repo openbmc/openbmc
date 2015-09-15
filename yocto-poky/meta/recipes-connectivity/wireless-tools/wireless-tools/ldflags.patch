@@ -1,0 +1,22 @@
+wireless-tools: Remove QA warning: No GNU_HASH in the elf binary
+
+Upstream-Status: Inappropriate [other]
+  Useful within bitbake environment only.
+
+Signed-off-by: Muhammad Shakeel <muhammad_shakeel@mentor.com>
+
+---
+ Makefile |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- wireless_tools.29.orig/Makefile
++++ wireless_tools.29/Makefile
+@@ -144,7 +144,7 @@ wireless.h:
+ 
+ # Compilation of the dynamic library
+ $(DYNAMIC): $(OBJS:.o=.so)
+-	$(CC) -shared -o $@ -Wl,-soname,$@ $(STRIPFLAGS) $(LIBS) -lc $^
++	$(CC) -shared -o $@ -Wl,-soname,$@ $(LDFLAGS) $(STRIPFLAGS) $(LIBS) -lc $^
+ 
+ # Compilation of the static library
+ $(STATIC): $(OBJS:.o=.so)

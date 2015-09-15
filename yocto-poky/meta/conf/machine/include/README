@@ -1,0 +1,100 @@
+2012/03/30 - Mark Hatle <mark.hatle@windriver.com>
+ - Initial Revision
+
+
+Introduction
+============
+The individual CPU, and ABI tunings are contained in this directory.  A
+number of local and global variables are used to control the way the
+tunings are setup and how they work together to specify an optimized
+configuration.
+
+The following is brief summary of the generic components that are used
+in these tunings.
+
+AVAILTUNES - This is a list of all of the tuning definitions currently
+available in the system.  Not all tunes in this list may be compatible
+with the machine configuration, or each other in a multilib
+configuration.  Each tuning file can add to this list using "+=", but
+should never replace the list using "=".
+
+DEFAULTTUNE - This specifies the tune to use for a particular build.
+Each tune should specify a reasonable default, which can be overriden by
+a machine or multilib configuration.  The specified tune must be listed
+in the AVAILTUNES.
+
+TUNEVALID[feature] - The <feature> is defined with a human readable
+explanation for what it does.  All architectural, cpu, abi, etc tuning
+features must be defined using TUNEVALID.
+
+TUNECONFLICTS[feature] - A list of features which conflict with <feature>.
+New sanity checks will try to reject combinations in which a single
+tuning ends up with features which conflict with each other.
+
+TUNE_FEATURES - This is automatically defined as TUNE_FEATURES_tune-<tune>.
+See TUNE_FEATURES_tune-<tune> for more information.
+
+TUNE_FEATURES_tune-<tune> - Specify the features used to describe a
+specific tune.  This is a list of features that a tune support, each
+feature must be in the TUNEVALID list.  Note: the tune and a given
+feature name may be the same, but they have different purposes.  Only
+features may be used to change behavior, while tunes are used to
+describe an overall set of features.
+
+ABIEXTENSION - An ABI extension may be specified by a specific feature
+or other tuning setting, such as TARGET_FPU.  Any ABI extensions either
+need to be defined in the architectures base arch file, i.e.
+ABIEXTENSION = "eabi" in the arm case, or appended to in specific tune
+files with a ".=".  Spaces are not allowed in this variable.
+
+TUNE_CCARGS - Setup the cflags based on the TUNE_FEATURES settings.
+These should be additive when defined using "+=".  All items in this
+list should be dynamic! i.e.
+${@bb.utils.contains("TUNE_FEATURES", "feature", "cflag", "!cflag", d)}
+
+TUNE_ARCH - The GNU canonical arch for a specific architecture.  i.e.
+arm, armeb, mips, mips64, etc.  This value is used by bitbake to setup
+configure. TUNE_ARCH definitions are specific to a given architecture.
+They may be a single static definition, or may be dynamically adjusted.
+See each architecture's README for details for that CPU family.
+
+TUNE_PKGARCH - The package architecture used by the packaging systems to
+define the architecture, abi and tuning of a particular package.
+Similarly to TUNE_ARCH, the definition of TUNE_PKGARCH is specific to
+each architecture. See each architectures README for details for that
+CPU family.
+
+PACKAGE_EXTRA_ARCHS - Lists all runtime compatible package
+architectures.  By default this is equal to
+PACKAGE_EXTRA_ARCHS_tune-<tune>.  If an architecture deviates from the
+default it will be listed in the architecture README.
+
+PACKAGE_EXTRA_ARCHS_tune-<tune> - List all of the package architectures
+that are compatible with this specific tune.  The package arch of this
+tune must be in the list.
+
+TARGET_FPU - The FPU setting for a given tune, hard (generate floating
+point instructions), soft (generate internal gcc calls), "other"
+architecture specific floating point.  This is synchronized with the
+compiler and other toolchain items.  This should be dynamically
+configured in the same way that TUNE_CCARGS is.
+
+BASE_LIB_tune-<tune> - The "/lib" location for a specific ABI.  This is
+used in a multilib configuration to place the libraries in the correct,
+non-conflicting locations.
+
+
+Best Practice
+=============
+The tune infrastructure is designed to be hierarchical. When writing a
+new tune file for a "fast-forward" CPU architecture (one that supports
+everything from a previous generation), it is recommended to require the
+previous generation tune file and specify PACKAGE_EXTRA_ARCHS using the
+previous generation's override and appending the new tune. Note that
+only one previous tune file should be included to avoid mutiple includes
+of the base arch which could lead to a broken configuration due to
+multiple prepend and append assignments.
+
+For example, for x86, there is a common x86/arch-x86.inc which is
+included in the base i586 tune file. The core2 tune builds
+on that, and corei7 builds on core2.

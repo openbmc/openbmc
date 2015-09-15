@@ -1,0 +1,33 @@
+From 933bd886af49667e88e2385409449ab598813dab Mon Sep 17 00:00:00 2001
+From: Andre McCurdy <armccurdy@gmail.com>
+Date: Wed, 15 Jul 2015 00:54:33 -0700
+Subject: [PATCH] dont include target CFLAGS in host LDFLAGS
+
+Building the host tool 'mkbuiltins' will fail if the target CFLAGS
+contains an option which isn't supported by the host's gcc. To prevent
+the issue, define LDFLAGS_FOR_BUILD based on CFLAGS_FOR_BUILD instead
+of CFLAGS.
+
+Upstream-Status: Inappropriate [required for bash 3.2.57 (GPLv2) recipe only]
+
+Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+---
+ builtins/Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/builtins/Makefile.in b/builtins/Makefile.in
+index e027f7a..ebfddf3 100644
+--- a/builtins/Makefile.in
++++ b/builtins/Makefile.in
+@@ -63,7 +63,7 @@ LOCAL_DEFS = @LOCAL_DEFS@
+ 
+ LIBS = @LIBS@
+ LDFLAGS = @LDFLAGS@ $(LOCAL_LDFLAGS) $(CFLAGS)
+-LDFLAGS_FOR_BUILD = $(LDFLAGS)
++LDFLAGS_FOR_BUILD = @LDFLAGS_FOR_BUILD@ $(LOCAL_LDFLAGS) $(CFLAGS_FOR_BUILD)
+ LOCAL_LDFLAGS = @LOCAL_LDFLAGS@
+ #LIBS_FOR_BUILD = @LIBS_FOR_BUILD@
+ LIBS_FOR_BUILD = $(LIBS)
+-- 
+1.9.1
+

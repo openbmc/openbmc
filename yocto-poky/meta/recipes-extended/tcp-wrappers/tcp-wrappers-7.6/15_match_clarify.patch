@@ -1,0 +1,14 @@
+Upstream-Status: Backport
+
+diff -ruN tcp_wrappers_7.6.orig/hosts_access.5 tcp_wrappers_7.6/hosts_access.5
+--- tcp_wrappers_7.6.orig/hosts_access.5	2004-04-25 12:17:59.000000000 +0200
++++ tcp_wrappers_7.6/hosts_access.5	2004-04-25 12:17:53.000000000 +0200
+@@ -89,6 +89,8 @@
+ bitwise AND of the address and the `mask\'. For example, the net/mask
+ pattern `131.155.72.0/255.255.254.0\' matches every address in the
+ range `131.155.72.0\' through `131.155.73.255\'.
++`255.255.255.255\' is not a valid mask value, so a single host can be
++matched just by its IP.
+ .IP \(bu
+ An expression of the form `n.n.n.n/mm' is interpreted as a
+ `net/masklength' pair, where `mm' is the number of consecutive `1'

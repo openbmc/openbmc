@@ -1,0 +1,33 @@
+From 817aed0d755bf8c0ba4ef6a77d41538e50b571fd Mon Sep 17 00:00:00 2001
+From: claymore <carlosmf.pt@gmail.com>
+Date: Fri, 24 Apr 2015 02:28:47 +0100
+Subject: [PATCH 1/2] mips1 fix added gcc.jam was passing the options -m32 and
+ -m64 to mips cross-compilers, when those do not use
+ such options This modification solves it by adding mips
+ as an exception
+
+Signed-off-by: Carlos M. Ferreira carlosmf.pt@gmail.com
+
+Upstream-Status: Backport
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+
+---
+ tools/build/src/tools/gcc.jam |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/build/src/tools/gcc.jam b/tools/build/src/tools/gcc.jam
+index db04534..eff95ae 100644
+--- a/tools/build/src/tools/gcc.jam
++++ b/tools/build/src/tools/gcc.jam
+@@ -451,7 +451,7 @@ rule setup-address-model ( targets * : sources * : properties * )
+         else
+         {
+             local arch = [ feature.get-values architecture : $(properties) ] ;
+-            if $(arch) != arm
++            if $(arch) != arm && $(arch) != mips1
+             {
+                 if $(model) = 32
+                 {
+-- 
+1.7.9.5
+

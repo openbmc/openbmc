@@ -1,0 +1,46 @@
+https://rt.openssl.org/Ticket/Display.html?id=3759&user=guest&pass=guest
+
+From 6257d59b3a68d2feb9d64317a1c556dc3813ee61 Mon Sep 17 00:00:00 2001
+From: Mike Frysinger <vapier@gentoo.org>
+Date: Sat, 21 Mar 2015 06:01:25 -0400
+Subject: [PATCH] crypto: use bigint in x86-64 perl
+
+Upstream-Status: Pending
+Signed-off-by: Cristian Iorga <cristian.iorga@intel.com>
+
+When building on x32 systems where the default type is 32bit, make sure
+we can transparently represent 64bit integers.  Otherwise we end up with
+build errors like:
+/usr/bin/perl asm/ghash-x86_64.pl elf > ghash-x86_64.s
+Integer overflow in hexadecimal number at asm/../../perlasm/x86_64-xlate.pl line 201, <> line 890.
+...
+ghash-x86_64.s: Assembler messages:
+ghash-x86_64.s:890: Error: junk '.15473355479995e+19' after expression
+
+We don't enable this globally as there are some cases where we'd get
+32bit values interpreted as unsigned when we need them as signed.
+
+Reported-by: Bertrand Jacquin <bertrand@jacquin.bzh>
+URL: https://bugs.gentoo.org/542618
+---
+ crypto/perlasm/x86_64-xlate.pl | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/crypto/perlasm/x86_64-xlate.pl b/crypto/perlasm/x86_64-xlate.pl
+index aae8288..0bf9774 100755
+--- a/crypto/perlasm/x86_64-xlate.pl
++++ b/crypto/perlasm/x86_64-xlate.pl
+@@ -195,6 +195,10 @@ my %globals;
+     sub out {
+     	my $self = shift;
+ 
++	# When building on x32 ABIs, the expanded hex value might be too
++	# big to fit into 32bits.  Enable transparent 64bit support here
++	# so we can safely print it out.
++	use bigint;
+ 	if ($gas) {
+ 	    # Solaris /usr/ccs/bin/as can't handle multiplications
+ 	    # in $self->{value}
+-- 
+2.3.3
+

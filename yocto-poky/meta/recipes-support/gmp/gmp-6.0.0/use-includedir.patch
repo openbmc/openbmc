@@ -1,0 +1,15 @@
+Upstream-Status: Pending
+
+Index: gmp-4.2.4/Makefile.am
+===================================================================
+--- gmp-4.2.4.orig/Makefile.am	2008-09-10 19:31:27.000000000 +0000
++++ gmp-4.2.4/Makefile.am	2009-07-06 20:19:19.000000000 +0000
+@@ -106,7 +106,7 @@
+ # but anyone knowledgable enough to be playing with exec_prefix will be able
+ # to address that.
+ #
+-includeexecdir = $(exec_prefix)/include
++includeexecdir = $(includedir)
+ include_HEADERS = $(GMPXX_HEADERS_OPTION)
+ nodist_includeexec_HEADERS = gmp.h $(MPBSD_HEADERS_OPTION)
+ lib_LTLIBRARIES = libgmp.la $(GMPXX_LTLIBRARIES_OPTION) $(MPBSD_LTLIBRARIES_OPTION)

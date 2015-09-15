@@ -1,0 +1,29 @@
+From 396b6c7ab737e2bff244d640601c436a26260ca1 Mon Sep 17 00:00:00 2001
+From: Arun Sharma <arun@sharma-home.net>
+Date: Fri, 19 Jun 2015 19:47:22 -0700
+Subject: [PATCH] Invalid dwarf opcodes can cause references beyond the end of
+ the array.
+
+Upstream-Status: backport
+
+Signed-off-by: Li Zhou <li.zhou@windriver.com>
+---
+ include/dwarf_i.h |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/dwarf_i.h b/include/dwarf_i.h
+index 1e6231e..4a02a7d 100644
+--- a/include/dwarf_i.h
++++ b/include/dwarf_i.h
+@@ -20,7 +20,7 @@
+ extern const uint8_t dwarf_to_unw_regnum_map[DWARF_REGNUM_MAP_LENGTH];
+ /* REG is evaluated multiple times; it better be side-effects free!  */
+ # define dwarf_to_unw_regnum(reg)					  \
+-  (((reg) <= DWARF_REGNUM_MAP_LENGTH) ? dwarf_to_unw_regnum_map[reg] : 0)
++  (((reg) < DWARF_REGNUM_MAP_LENGTH) ? dwarf_to_unw_regnum_map[reg] : 0)
+ #endif
+ 
+ #ifdef UNW_LOCAL_ONLY
+-- 
+1.7.9.5
+

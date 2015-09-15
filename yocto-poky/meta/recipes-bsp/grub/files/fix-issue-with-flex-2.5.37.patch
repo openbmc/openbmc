@@ -1,0 +1,21 @@
+Upstream-Status: Backport
+
+This fixes compilation issues when using flex-2.5.37. It was taken from upstream.
+
+Original author is: Vladimir Serbinenko  <phcoder@gmail.com>
+
+Signed-off-by: Laurentiu Palcu <laurentiu.palcu@intel.com>
+
+Index: grub-2.00/grub-core/script/yylex.l
+===================================================================
+--- grub-2.00.orig/grub-core/script/yylex.l	2012-06-08 23:24:15.000000000 +0300
++++ grub-2.00/grub-core/script/yylex.l	2013-07-31 14:34:40.708100982 +0300
+@@ -29,6 +29,8 @@
+ #pragma GCC diagnostic ignored "-Wmissing-prototypes"
+ #pragma GCC diagnostic ignored "-Wmissing-declarations"
+ #pragma GCC diagnostic ignored "-Wunsafe-loop-optimizations"
++#pragma GCC diagnostic ignored "-Wunused-function"
++#pragma GCC diagnostic ignored "-Wsign-compare"
+ 
+ #define yyfree    grub_lexer_yyfree
+ #define yyalloc   grub_lexer_yyalloc

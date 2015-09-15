@@ -1,0 +1,20 @@
+Revert part of http://cgit.freedesktop.org/fontconfig/commit/fontconfig.pc.in?id=338ffe6b886ad4ba86ff471cb59c4a5e5ffbe408
+We really dont do static linking so its not going to cause issues for us but as such this is harming us by adding absolute
+paths into -I options into fontconfig.pc which is them prepended with sysroot when read back by cross pkg-config and
+we end up with -I <sysroot>/<sysroot>/usr/include/fontconfig in CFLAGS of clients which depend on it. one such example
+is matchbox-panel-2 and it was working fine with gcc < 5 because it tolerated non-existing paths in -I flags but gcc-5
+gently refuses and rightly so.
+
+Upstream-Status: Inappropriate [OE-Specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: fontconfig-2.11.93/fontconfig.pc.in
+===================================================================
+--- fontconfig-2.11.93.orig/fontconfig.pc.in
++++ fontconfig-2.11.93/fontconfig.pc.in
+@@ -15,4 +15,4 @@ Requires: @PKGCONFIG_REQUIRES@
+ Requires.private: @PKGCONFIG_REQUIRES_PRIVATELY@
+ Libs: -L${libdir} -lfontconfig
+ Libs.private: @EXPAT_LIBS@ @FREETYPE_LIBS@ @ICONV_LIBS@ @LIBXML2_LIBS@
+-Cflags: -I${includedir} @EXPAT_CFLAGS@ @FREETYPE_CFLAGS@ @ICONV_CFLAGS@ @LIBXML2_CFLAGS@
++Cflags: -I${includedir}

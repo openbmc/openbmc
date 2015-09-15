@@ -1,0 +1,54 @@
+#! /bin/sh
+
+# Wipe out all of the sysroots and all of the stamps that populated it.
+# Author: Ross Burton <ross.burton@intel.com>
+#
+# Copyright (c) 2012 Intel Corporation
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+set -e
+
+if [ $# -gt 0 ]; then
+    echo "Wipe all sysroots and sysroot-related stamps for the current build directory." >&2
+    echo "Usage: $0" >&2
+    exit 1
+fi
+
+ENVS=`mktemp --suffix -wipe-sysroot-envs`
+bitbake -p -e > $ENVS
+
+eval `grep -F SSTATE_MANIFESTS= $ENVS`
+eval `grep -F STAGING_DIR= $ENVS`
+eval `grep -F STAMPS_DIR= $ENVS`
+rm -f $ENVS
+
+if [ -z "$SSTATE_MANIFESTS" -o -z "$STAGING_DIR" -o -z "$STAMPS_DIR" ]; then
+    echo "Could not determine SSTATE_MANIFESTS/STAGING_DIR/STAMPS_DIR from bitbake, check above for errors"
+    exit 1
+fi
+
+echo "Deleting the sysroots in $STAGING_DIR, and selected stamps in $SSTATE_MANIFESTS and $STAMPS_DIR."
+
+# The sysroots themselves
+rm -rf $STAGING_DIR
+
+# The stamps that said the sysroot was populated
+rm -rf $STAMPS_DIR/*/*/*.do_populate_sysroot.*
+rm -rf $STAMPS_DIR/*/*/*.do_populate_sysroot_setscene.*
+rm -rf $STAMPS_DIR/*/*/*.do_packagedata.*
+rm -rf $STAMPS_DIR/*/*/*.do_packagedata_setscene.*
+
+# The sstate manifests
+rm -rf $SSTATE_MANIFESTS/manifest-*.populate-sysroot

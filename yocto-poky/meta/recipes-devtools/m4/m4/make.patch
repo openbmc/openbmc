@@ -1,0 +1,42 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+#
+# Patch managed by http://www.holgerschurig.de/patcher.html
+#
+
+--- m4-1.4.2/doc/Makefile.in~make
++++ m4-1.4.2/doc/Makefile.in
+@@ -57,9 +57,9 @@
+ 	date > $(srcdir)/stamp-vti
+ 
+ install: all
+-	$(srcdir)/../mkinstalldirs $(infodir)
++	$(srcdir)/../mkinstalldirs $(DESTDIR)$(infodir)
+ 	cd $(srcdir) && for file in m4.info*; do \
+-	  $(INSTALL_DATA) $$file $(infodir)/$$file; \
++	  $(INSTALL_DATA) $$file $(DESTDIR)$(infodir)/$$file; \
+ 	done
+ 
+ uninstall:
+--- m4-1.4.2/src/Makefile.in~make
++++ m4-1.4.2/src/Makefile.in
+@@ -35,7 +35,7 @@
+ prefix = @prefix@
+ exec_prefix = @exec_prefix@
+ transform = @program_transform_name@
+-bindir = $(exec_prefix)/bin
++bindir = @bindir@
+ 
+ COMPILE = $(CC) -c $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)
+ LINK = $(CC) $(LDFLAGS) -o $@
+@@ -84,8 +84,8 @@
+ 	$(LINK) ansi2knr.o $(LIBS)
+ 
+ install: all
+-	$(srcdir)/../mkinstalldirs $(bindir)
+-	$(INSTALL_PROGRAM) m4 $(bindir)/`echo m4 | sed '$(transform)'`
++	$(srcdir)/../mkinstalldirs $(DESTDIR)$(bindir)
++	$(INSTALL_PROGRAM) m4 $(DESTDIR)$(bindir)/`echo m4 | sed '$(transform)'`
+ 
+ uninstall:
+ 	rm -f $(bindir)/`echo m4 | sed '$(transform)'`

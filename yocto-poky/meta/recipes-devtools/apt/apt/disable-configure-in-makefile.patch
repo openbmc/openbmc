@@ -1,0 +1,18 @@
+Disable configure at compilation stage
+
+Upstream-Status: Inappropriate [configuration]
+Signed-off-by: Constantin Musca <constantinx.musca@intel.com>
+
+Index: apt-0.9.7.7/Makefile
+===================================================================
+--- apt-0.9.7.7.orig/Makefile
++++ apt-0.9.7.7/Makefile
+@@ -33,7 +33,7 @@ veryclean: clean
+ # The startup target builds the necessary configure scripts. It should
+ # be used after a CVS checkout.
+ CONVERTED=environment.mak include/config.h include/apti18n.h build/doc/Doxyfile makefile
+-include buildlib/configure.mak
++#include buildlib/configure.mak
+ $(BUILDDIR)/include/config.h: buildlib/config.h.in
+ $(BUILDDIR)/include/apti18n.h: buildlib/apti18n.h.in
+ $(BUILDDIR)/environment.mak: buildlib/environment.mak.in

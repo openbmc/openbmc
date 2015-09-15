@@ -1,0 +1,22 @@
+
+#
+# Patch managed by http://www.holgerschurig.de/patcher.html
+#
+
+Upstream-Status: Inappropriate [configuration]
+
+--- hostap-utils-0.2.4/hostap_fw_load~hostap-fw-load
++++ hostap-utils-0.2.4/hostap_fw_load
+@@ -6,9 +6,9 @@
+ # Firmware images for the card
+ # TODO: could try to select correct firmware type automatically
+ 
+-PRI=/etc/pcmcia/PM010102.HEX
+-STA=/etc/pcmcia/RF010802.HEX
+-PRISM2_SREC=/usr/local/bin/prism2_srec
++PRI=/etc/pcmcia/pm010102.hex
++STA=/etc/pcmcia/rf010804.hex
++PRISM2_SREC=/usr/sbin/prism2_srec
+ 
+ set -e
+ 

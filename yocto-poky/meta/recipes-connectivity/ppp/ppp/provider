@@ -1,0 +1,35 @@
+# example configuration for a dialup connection authenticated with PAP or CHAP
+#
+# This is the default configuration used by pon(1) and poff(1).
+# See the manual page pppd(8) for information on all the options.
+
+# MUST CHANGE: replace myusername@realm with the PPP login name given to
+# your by your provider.
+# There should be a matching entry with the password in /etc/ppp/pap-secrets
+# and/or /etc/ppp/chap-secrets.
+user "myusername@realm"
+
+# MUST CHANGE: replace ******** with the phone number of your provider.
+# The /etc/chatscripts/pap chat script may be modified to change the
+# modem initialization string.
+connect "/usr/sbin/chat -v -f /etc/chatscripts/pap -T ********"
+
+# Serial device to which the modem is connected.
+/dev/modem
+
+# Speed of the serial line.
+115200
+
+# Assumes that your IP address is allocated dynamically by the ISP.
+noipdefault
+# Try to get the name server addresses from the ISP.
+usepeerdns
+# Use this connection as the default route.
+defaultroute
+
+# Makes pppd "dial again" when the connection is lost.
+persist
+
+# Do not ask the remote to authenticate.
+noauth
+

@@ -1,0 +1,19 @@
+# yocto-bsp-filename {{=machine}}-standard.scc
+define KMACHINE {{=machine}}
+define KTYPE standard
+define KARCH {{=qemuarch}}
+
+{{ if qemuarch == "i386" or qemuarch == "x86_64": }}
+include {{=map_standard_kbranch(need_new_kbranch, new_kbranch, existing_kbranch)}}
+{{ if qemuarch == "arm": }}
+include bsp/arm-versatile-926ejs/arm-versatile-926ejs-standard
+{{ if qemuarch == "powerpc": }}
+include bsp/qemu-ppc32/qemu-ppc32-standard
+{{ if qemuarch == "mips": }}
+include bsp/mti-malta32/mti-malta32-be-standard
+{{ if qemuarch == "mips64": }}
+include bsp/mti-malta64/mti-malta64-be-standard
+{{ if need_new_kbranch == "y": }}
+branch {{=machine}}
+
+include {{=machine}}.scc

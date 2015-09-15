@@ -1,0 +1,110 @@
+From 55d430eb02fc116581847304ca20321687978269 Mon Sep 17 00:00:00 2001
+From: Jonathan Nieder <jrnieder@gmail.com>
+Date: Fri, 27 Jul 2012 10:35:07 -0500
+Subject: Memoize::Storable: respect 'nstore' option not respected
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Memoize(3perl) says:
+
+                tie my %cache => 'Memoize::Storable', $filename, 'nstore';
+                memoize 'function', SCALAR_CACHE => [HASH => \%cache];
+
+        Include the ‘nstore’ option to have the "Storable" database
+        written in ‘network order’.  (See Storable for more details
+        about this.)
+
+In fact the "nstore" option does no such thing.  Option parsing looks
+like this:
+
+        @options{@_} = ();
+
+$self->{OPTIONS}{'nstore'} is accordingly set to undef.  Later
+Memoize::Storable checks if the option is true, and since undef is
+not true, the "else" branch is always taken.
+
+        if ($self->{OPTIONS}{'nstore'}) {
+                Storable::nstore($self->{H}, $self->{FILENAME});
+        } else {
+                Storable::store($self->{H}, $self->{FILENAME});
+        }
+
+Correcting the condition to (exists $self->{OPTIONS}{'nstore'}) fixes
+it.
+
+Noticed because git-svn, which uses the 'nstore' option for its
+on-disk caches, was producing
+
+        Byte order is not compatible at ../../lib/Storable.pm
+
+when run using a perl with a different integer size (and hence
+byteorder).
+
+Reported by Tim Retout (RT#77790)
+
+Bug-Debian: http://bugs.debian.org/587650
+Bug: https://rt.cpan.org/Public/Bug/Display.html?id=77790
+Forwarded: https://rt.cpan.org/Public/Bug/Display.html?id=77790
+Patch-Name: fixes/memoize_storable_nstore.diff
+---
+ cpan/Memoize/Memoize/Storable.pm |  2 +-
+ cpan/Memoize/t/tie_storable.t    | 24 ++++++++++++++++++++----
+ 2 files changed, 21 insertions(+), 5 deletions(-)
+
+diff --git a/cpan/Memoize/Memoize/Storable.pm b/cpan/Memoize/Memoize/Storable.pm
+index 1314797..87876f2 100644
+--- a/cpan/Memoize/Memoize/Storable.pm
++++ b/cpan/Memoize/Memoize/Storable.pm
+@@ -55,7 +55,7 @@ sub DESTROY {
+   require Carp if $Verbose;
+   my $self= shift;
+   print STDERR "Memoize::Storable::DESTROY(@_)\n" if $Verbose;
+-  if ($self->{OPTIONS}{'nstore'}) {
++  if (exists $self->{OPTIONS}{'nstore'}) {
+     Storable::nstore($self->{H}, $self->{FILENAME});
+   } else {
+     Storable::store($self->{H}, $self->{FILENAME});
+diff --git a/cpan/Memoize/t/tie_storable.t b/cpan/Memoize/t/tie_storable.t
+index de3b8dc..a624238 100644
+--- a/cpan/Memoize/t/tie_storable.t
++++ b/cpan/Memoize/t/tie_storable.t
+@@ -31,18 +31,34 @@ if ($@) {
+   exit 0;
+ }
+ 
+-print "1..4\n";
++print "1..9\n";
+ 
+ $file = "storable$$";
+ 1 while unlink $file;
+ tryout('Memoize::Storable', $file, 1);  # Test 1..4
+ 1 while unlink $file;
++tryout('Memoize::Storable', $file, 5, 'nstore');  # Test 5..8
++assert_netorder($file, 9);  # Test 9
++1 while unlink $file;
++
++
++sub assert_netorder {
++  my ($file, $testno) = @_;
++
++  my $netorder = Storable::file_magic($file)->{'netorder'};
++  print ($netorder ? "ok $testno\n" : "not ok $testno\n");
++}
+ 
+ sub tryout {
+-  my ($tiepack, $file, $testno) = @_;
++  my ($tiepack, $file, $testno, $option) = @_;
+ 
+-  tie my %cache => $tiepack, $file
+-    or die $!;
++  if (defined $option) {
++    tie my %cache => $tiepack, $file, $option
++      or die $!;
++  } else {
++    tie my %cache => $tiepack, $file
++      or die $!;
++  }
+ 
+   memoize 'c5', 
+   SCALAR_CACHE => [HASH => \%cache],

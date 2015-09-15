@@ -1,0 +1,19 @@
+Upstream-Status: Inappropriate [OE-Core specific]
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+Signed-off-by: Ronan Le Martret <ronan.lemartret@open.eurogiciel.org>
+
+
+diff --git a/installplatform b/installplatform
+index 8c3eba0..fa15e91 100755
+--- a/installplatform
++++ b/installplatform
+@@ -112,7 +112,7 @@ for ARCH in noarch `grep ^arch_canon $RPMRC | cut -d: -f2`; do
+   [ -z "$CANONARCH" ] && continue
+ 
+   if [ "$OS" = "linux" ] && [ "$CANONCOLOR" = 3 ]; then
+-      LIB=${LIB}64
++      LIB=${LIB}
+   fi
+ 
+   PPD="${DESTDIR}/${platformdir}/${ARCH}-${OS}"

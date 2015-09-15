@@ -1,0 +1,66 @@
+From a22a222c8f9299f6c07a0274388ade7d4ab8c28d Mon Sep 17 00:00:00 2001
+From: Paul Gortmaker <paul.gortmaker@windriver.com>
+Date: Fri, 20 Jun 2014 16:41:08 -0400
+Subject: [PATCH] gcc: fix segfault from calling free on non-malloc'd area
+
+We see the following on a 32bit gcc installed on 64 bit host:
+
+  Reading symbols from ./i586-pokymllib32-linux-gcc...done.
+  (gdb) run
+  Starting program: x86-pokymllib32-linux/lib32-gcc/4.9.0-r0/image/usr/bin/i586-pokymllib32-linux-gcc
+
+  Program received signal SIGSEGV, Segmentation fault.
+  0xf7e957e0 in free () from /lib/i386-linux-gnu/libc.so.6
+  (gdb) bt
+  #0  0xf7e957e0 in free () from /lib/i386-linux-gnu/libc.so.6
+  #1  0x0804b73c in set_multilib_dir () at gcc-4.9.0/gcc/gcc.c:7827
+  #2  main (argc=1, argv=0xffffd504) at gcc-4.9.0/gcc/gcc.c:6688
+  (gdb)
+
+The problem arises because we conditionally assign the pointer we
+eventually free, and the conditional may assign the pointer to the
+non-malloc'd internal string "." which fails when we free it here:
+
+   if (multilib_dir == NULL && multilib_os_dir != NULL
+       && strcmp (multilib_os_dir, ".") == 0)
+     {
+       free (CONST_CAST (char *, multilib_os_dir));
+       ...
+
+As suggested by Jakub, ensure the "." case is also malloc'd via
+xstrdup() and hence the pointer for the "." case can be freed.
+
+Cc: Jakub Jelinek <jakub@redhat.com>
+Cc: Jeff Law <law@redhat.com>
+Cc: Matthias Klose <doko@ubuntu.com>
+CC: Tobias Burnus <burnus@net-b.de>
+Upstream-Status: Accepted [ https://gcc.gnu.org/ml/gcc-patches/2014-06/msg02069.html ]
+Signed-off-by: Paul Gortmaker <paul.gortmaker@windriver.com>
+
+diff --git a/gcc/gcc.c b/gcc/gcc.c
+index 9ac18e60d801..168acf7eb0c9 100644
+--- a/gcc/gcc.c
++++ b/gcc/gcc.c
+@@ -7790,10 +7790,15 @@ set_multilib_dir (void)
+ 		q2++;
+ 	      if (*q2 == ':')
+ 		ml_end = q2;
+-	      new_multilib_os_dir = XNEWVEC (char, ml_end - q);
+-	      memcpy (new_multilib_os_dir, q + 1, ml_end - q - 1);
+-	      new_multilib_os_dir[ml_end - q - 1] = '\0';
+-	      multilib_os_dir = *new_multilib_os_dir ? new_multilib_os_dir : ".";
++	      if (ml_end - q == 1)
++		multilib_os_dir = xstrdup (".");
++	      else
++		{
++		  new_multilib_os_dir = XNEWVEC (char, ml_end - q);
++		  memcpy (new_multilib_os_dir, q + 1, ml_end - q - 1);
++		  new_multilib_os_dir[ml_end - q - 1] = '\0';
++		  multilib_os_dir = new_multilib_os_dir;
++		}
+ 
+ 	      if (q2 < end && *q2 == ':')
+ 		{
+-- 
+1.9.2
+

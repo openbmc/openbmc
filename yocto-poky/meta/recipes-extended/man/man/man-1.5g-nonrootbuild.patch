@@ -1,0 +1,16 @@
+Upstream-Status: Pending
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+diff -u -r man-1.5g.old/configure man-1.5g/configure
+--- man-1.5g.old/configure	Wed Apr  7 04:16:05 1999
++++ man-1.5g/configure	Mon May 15 15:22:44 2000
+@@ -791,7 +791,7 @@
+     read mode
+     if test "$mode" != ""; then man_mode=$mode; fi
+   fi
+-  man_install_flags="-m $man_mode -o $man_user -g $man_group"
++  man_install_flags=""
+ fi
+ 
+ # What sections do we anticipate?

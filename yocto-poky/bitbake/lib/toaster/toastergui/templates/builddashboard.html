@@ -1,0 +1,307 @@
+{% extends "basebuildpage.html" %}
+{% load humanize %}
+{% load projecttags %}
+
+{% block parentbreadcrumb %}
+{{build.get_sorted_target_list.0.target}} {%if build.target_set.all.count > 1%}(+ {{build.target_set.all.count|add:"-1"}}){%endif%} {{build.machine}} ({{build.completed_on|date:"d/m/y H:i"}})
+{% endblock %}
+
+{% block buildinfomain %}
+<!-- page title -->
+<div class="row-fluid span10">
+ <div class="page-header">
+     <h1>{{build.target_set.all|dictsort:"target"|join:", "}} {{build.machine}}</h1>
+ </div>
+</div>
+
+<!-- build result bar -->
+<div class="row-fluid span10 pull-right">
+  <div class="alert {%if build.outcome == build.SUCCEEDED%}alert-success{%elif build.outcome == build.FAILED%}alert-error{%else%}alert-info{%endif%}">
+    <div class="row-fluid lead">
+            <span class="pull-left"><strong>
+                {%if build.outcome == build.SUCCEEDED%}Completed{%elif build.outcome == build.FAILED%}Failed{%else%}{%endif%}
+              </strong> on
+            {{build.completed_on|date:"d/m/y H:i"}}
+</span>
+{% if  build.warnings.count or build.errors.count %}
+&nbsp;with
+{% endif %}
+{%if build.outcome == build.SUCCEEDED or build.outcome == build.FAILED %}
+{% if  build.errors.count %}
+     <span > <i class="icon-minus-sign red"></i><strong><a href="#errors" class="error show-errors"> {{build.errors.count}} error{{build.errors.count|pluralize}}</a></strong></span>
+{% endif %}
+{% if  build.warnings.count %}
+{% if  build.errors.count %}
+    and
+{% endif %}
+    <span > <i class="icon-warning-sign yellow"></i><strong><a href="#warnings" class="warning show-warnings"> {{build.warnings.count}} warning{{build.warnings.count|pluralize}}</a></strong></span>
+{% endif %}
+            <span class="pull-right">Build time: <a href="{% url 'buildtime' build.pk %}">{{ build.timespent_seconds|sectohms }}</a>
+            <a class="btn {%if build.outcome == build.SUCCEEDED%}btn-success{%else%}btn-danger{%endif%} pull-right log" href="{% url 'build_artifact' build.id "cookerlog" build.id %}">Download build log</a>
+            </span>
+
+{%endif%}
+    </div>
+    {% if build.toaster_exceptions.count > 0 %}
+    <div class="row">
+        <small class="pull-right">
+        <i class="icon-question-sign get-help get-help-blue" title="" data-original-title="Toaster exceptions do not affect your build: only the operation of Toaster"></i>
+        <a class="show-exceptions" href="#exceptions">Toaster threw {{build.toaster_exceptions.count}} exception{{build.toaster_exceptions.count|pluralize}}</a>
+    </small>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% if build.errors.count %}
+<div class="accordion span10 pull-right" id="errors">
+  <div class="accordion-group">
+    <div class="accordion-heading">
+            <a class="accordion-toggle error toggle-errors">
+         <h2 id="error-toggle">
+           <i class="icon-minus-sign"></i>
+           {{build.errors.count}} error{{build.errors.count|pluralize}}
+         </h2>
+      </a>
+    </div>
+    <div class="accordion-body collapse in" id="collapse-errors">
+      <div class="accordion-inner">
+        <div class="span10">
+          {% for error in logmessages %}{% if error.level == 2 %}
+            <div class="alert alert-error">
+              <pre>{{error.message}}</pre>
+            </div>
+          {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{%if build.outcome == build.SUCCEEDED%}
+<!-- built images -->
+{% if hasImages %}
+<div class="row-fluid span10 pull-right">
+    <h2>Images</h2>
+    {% for target in targets %}
+        {% if target.target.is_image %}
+    <div class="well dashboard-section">
+        <h3><a href="{% url 'target' build.pk target.target.pk %}">{{target.target}}</a>
+                </h3>
+        <dl class="dl-horizontal">
+            <dt>Packages included</dt>
+            <dd><a href="{% url 'target' build.pk target.target.pk %}">{{target.npkg}}</a></dd>
+            <dt>Total package size</dt>
+            <dd>{{target.pkgsz|filtered_filesizeformat}}</dd>
+                        {% if target.targetHasNoImages %}
+                </dl>
+                <div class="row-fluid">
+                    <div class="alert alert-info span7">
+                    <p>
+                                    <b>This build did not create any image files</b>
+                                  </p>
+                                  <p>
+                                    This is probably because valid image and license manifest
+                                    files from a previous build already exist in your
+                                    <code>.../poky/build/tmp/deploy</code>
+                                    directory. You can
+                                    also <a href="{% url 'targetpkg' build.pk target.target.pk %}">view the
+                                      license manifest information</a> in Toaster.
+                                  </p>
+                    </div>
+                </div>
+                        {% else %}
+            <dt>
+                <i class="icon-question-sign get-help" title="The location in disk of the license manifest, a document listing all packages installed in your image and their licenses"></i>
+
+                License manifest
+            </dt>
+            <dd>
+                <a href="{% url 'targetpkg' build.pk target.target.pk %}">View in Toaster</a> |
+                <a href="{% url 'build_artifact' build.pk 'licensemanifest' target.target.pk %}">Download</a></dd>
+            <dt>
+                <i class="icon-question-sign get-help" title="Image files are stored in <code>/build/tmp/deploy/images/</code>"></i>
+                Image files
+            </dt>
+            <dd>
+                <ul>
+                                  {% for i in target.imageFiles %}
+            {% if build.project %}
+                    <li><a href="{% url 'build_artifact' build.pk 'imagefile' i.id %}">{{i.path}}</a>
+            {% else %}
+                    <li>{{i.path}}
+            {% endif %}
+                    ({{i.size|filtered_filesizeformat}})</li>
+                                  {% endfor %}
+                </ul>
+            </dd>
+        </dl>
+                        {% endif %}
+    </div>
+        {% endif %}
+    {% endfor %}
+</div>
+{% endif %}
+
+{%else%}
+<!-- error dump -->
+{%endif%}
+
+<!-- other artifacts -->
+{% if build.buildartifact_set.all.count > 0 %}
+<div class="row-fluid span10 pull-right">
+<h2>Other artifacts</h2>
+
+    <div class="well dashboard-section">
+        <dl class="dl-horizontal">
+            <dt>
+                <i class="icon-question-sign get-help" title="Build artifacts discovered in <i>tmp/deploy/images</i>. Usually kernel images and kernel modules."></i>
+                Other artifacts</dt>
+            <dd><div>
+              {% for ba in build.buildartifact_set.all|dictsort:"file_name" %}
+                <a href="{%url 'build_artifact' build.id 'buildartifact' ba.id %}">
+                    {{ba.get_local_file_name}}
+                </a>
+
+                ({{ba.file_size|filtered_filesizeformat}}) <br/>
+              {% endfor %}
+                </div>
+            </dd>
+	</dl>
+    </div>
+
+</div>
+{% endif %}
+<!-- build summary -->
+<div class="row-fluid span10 pull-right">
+<h2>Build summary</h2>
+    <div class="well span4 dashboard-section" style="margin-left:0px;">
+        <h4><a href="{%url 'configuration' build.pk%}">Configuration</a></h4>
+            <dl>
+        <dt>Machine</dt><dd>{{build.machine}}</dd>
+        <dt>Distro</dt><dd>{{build.distro}}</dd>
+        <dt>Layers</dt>{% for i in build.layer_version_build.all|dictsort:"layer.name" %}<dd>{{i.layer.name}}</dd>{%endfor%}
+            </dl>
+    </div>
+    <div class="well span4 dashboard-section">
+        <h4><a href="{%url 'tasks' build.pk%}">Tasks</a></h4>
+            <dl>
+            {% query build.task_build outcome=4 order__gt=0 as exectask%}
+            {% if exectask.count > 0 %}
+                <dt>Failed tasks</dt>
+                <dd>
+                {% if exectask.count == 1 %}
+                    <a class="error" href="{% url "task" build.id exectask.0.id %}">
+                        {{exectask.0.recipe.name}}
+                        <span class="task-name">{{exectask.0.task_name}}</span>
+                    </a>
+
+                        <a href="{% url 'build_artifact' build.id "tasklogfile" exectask.0.id %}">
+                            <i class="icon-download-alt" title="" data-original-title="Download task log file"></i>
+                        </a>
+
+                {% elif exectask.count > 1%}
+                    <a class="error" href="{% url "tasks" build.id %}?filter=outcome%3A4">{{exectask.count}}</a>
+                {% endif %}
+                </dd>
+            {% endif %}
+        <dt>Total number of tasks</dt><dd><a href="{% url 'tasks' build.pk %}">{% query build.task_build order__gt=0 as alltasks %}{{alltasks.count}}</a></dd>
+        <dt>
+            Tasks executed
+            <i class="icon-question-sign get-help" title="'Executed' tasks are those that need to be run in order to generate the task output"></i>
+        </dt>
+        <dd><a href="{% url 'tasks' build.pk %}?filter=task_executed%3A1&amp;count=25&amp;search=&amp;page=1&amp;orderby=order%3A%2B">{% query build.task_build task_executed=1 order__gt=0 as exectask%}{{exectask.count}}</a></dd>
+        <dt>
+            Tasks not executed
+            <i class="icon-question-sign get-help" title="'Not executed' tasks don't need to run because their outcome is provided by another task"></i>
+        </dt>
+        <dd><a href="{% url 'tasks' build.pk %}?filter=task_executed%3A0&amp;count=25&amp;search=&amp;page=1&amp;orderby=order%3A%2B">{% query build.task_build task_executed=0 order__gt=0 as noexectask%}{{noexectask.count}}</a></dd>
+        <dt>
+            Reuse
+            <i class="icon-question-sign get-help" title="The percentage of 'not executed' tasks over the total number of tasks, which is a measure of the efficiency of your build"></i>
+        </dt>
+        <dd>
+{% query build.task_build order__gt=0 as texec %}
+{% if noexectask.count|multiply:100|divide:texec.count < 0 %}
+0
+{% else %}
+{{noexectask.count|multiply:100|divide:texec.count}}
+{% endif %}
+%
+        </dd>
+            </dl>
+    </div>
+    <div class="well span4 dashboard-section">
+        <h4><a href="{% url 'recipes' build.pk %}">Recipes</a> & <a href="{% url 'packages' build.pk %}">Packages</a></h4>
+            <dl>
+        <dt>Recipes built</dt><dd><a href="{% url 'recipes' build.pk %}">{{recipecount}}</a></dd>
+        <dt>Packages built</dt><dd><a href="{% url 'packages' build.pk %}">{{packagecount}}</a></dd>
+            </dl>
+    </div>
+</div>
+
+{% if build.warnings.count %}
+<div class="accordion span10 pull-right" id="warnings">
+  <div class="accordion-group">
+    <div class="accordion-heading">
+      <a class="accordion-toggle warning toggle-warnings">
+        <h2 id="warning-toggle">
+          <i class="icon-warning-sign"></i>
+          {{build.warnings.count}} warning{{build.warnings.count|pluralize}}
+        </h2>
+      </a>
+    </div>
+    <div class="accordion-body collapse" id="collapse-warnings">
+      <div class="accordion-inner">
+        <div class="span10">
+          {% for warning in logmessages %}{% if warning.level == 1 %}
+            <div class="alert alert-warning">
+              <pre>{{warning.message}}</pre>
+            </div>
+          {% endif %}{% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+
+{% if build.toaster_exceptions.count > 0 %}
+<div class="accordion span10 pull-right" id="exceptions">
+  <div class="accordion-group">
+    <div class="accordion-heading">
+      <a class="accordion-toggle exception toggle-exceptions">
+        <h2 id="exception-toggle">
+          <i class="icon-warning-sign"></i>
+          {{build.toaster_exceptions.count}} Toaster exception{{build.toaster_exceptions.count|pluralize}}
+        </h2>
+      </a>
+    </div>
+    <div class="accordion-body collapse" id="collapse-exceptions">
+      <div class="accordion-inner">
+        <div class="span10">
+          {% for exception in build.toaster_exceptions %}
+            <div class="alert alert-exception">
+              <pre>{{exception.message}}</pre>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        //show warnings section when requested from the previous page
+        if (location.href.search('#warnings') > -1) {
+            $('#collapse-warnings').addClass('in');
+        }
+    });
+</script>
+
+{% endblock %}

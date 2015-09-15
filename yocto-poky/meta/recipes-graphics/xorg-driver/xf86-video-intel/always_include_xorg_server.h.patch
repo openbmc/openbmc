@@ -1,0 +1,24 @@
+Include xorg-server.h to fix build errors seen with glibc 2.20
+
+In file included from /home/ubuntu/work/upstream/openembedded-core/build/tmp-glibc/sysroots/qemux86/usr/include/string.h:634:0,
+                 from /home/ubuntu/work/upstream/openembedded-core/build/tmp-glibc/work/i586-oe-linux/xf86-video-intel/2_2.99.912-r0/xf86-video-intel-2.99.912/src/backlight.c:39:
+/home/ubuntu/work/upstream/openembedded-core/build/tmp-glibc/sysroots/qemux86/usr/include/xorg/os.h:579:1: error: expected identifier or '(' before '__extension__'
+ strndup(const char *str, size_t n);
+ ^
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Pending
+
+Index: xf86-video-intel-2.99.912/src/backlight.c
+===================================================================
+--- xf86-video-intel-2.99.912.orig/src/backlight.c	2014-04-09 10:41:18.000000000 -0700
++++ xf86-video-intel-2.99.912/src/backlight.c	2014-08-28 18:52:25.524070587 -0700
+@@ -29,6 +29,7 @@
+ #include "config.h"
+ #endif
+ 
++#include <xorg-server.h>
+ #include <sys/types.h>
+ #include <sys/wait.h>
+ #include <sys/stat.h>

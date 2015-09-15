@@ -1,0 +1,288 @@
+guilt: explicitly call for bash
+
+Running complex guilt stacks of patches/commits can cause interesting
+failures after ~20m of processing, with errors like "Bad substitution".
+
+These have been traced back to having /bin/sh -->  /bin/dash on Ubuntu
+systems.  Putting a shell that actually *works* (such as /bin/bash)
+in as /bin/sh makes the problem go away.  So here we change the guilt
+scripts to explicitly call for bash to ensure we don't have a similar
+issue after deployment.
+
+Upstream-Status: Inappropriate [oe-specific]
+
+Signed-off-by: Paul Gortmaker <paul.gortmaker@windriver.com>
+
+---
+ guilt               |    2 +-
+ guilt-add           |    2 +-
+ guilt-applied       |    2 +-
+ guilt-branch        |    2 +-
+ guilt-delete        |    2 +-
+ guilt-diff          |    2 +-
+ guilt-export        |    2 +-
+ guilt-files         |    2 +-
+ guilt-fold          |    2 +-
+ guilt-fork          |    2 +-
+ guilt-graph         |    2 +-
+ guilt-header        |    2 +-
+ guilt-help          |    2 +-
+ guilt-import        |    2 +-
+ guilt-import-commit |    2 +-
+ guilt-init          |    4 ++--
+ guilt-new           |    2 +-
+ guilt-next          |    2 +-
+ guilt-patchbomb     |    2 +-
+ guilt-pop           |    2 +-
+ guilt-prev          |    2 +-
+ guilt-push          |    2 +-
+ guilt-rebase        |    2 +-
+ guilt-refresh       |    2 +-
+ guilt-rm            |    2 +-
+ guilt-series        |    2 +-
+ guilt-status        |    2 +-
+ guilt-top           |    2 +-
+ guilt-unapplied     |    2 +-
+ 29 files changed, 30 insertions(+), 30 deletions(-)
+
+--- a/guilt
++++ b/guilt
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (c) Josef "Jeff" Sipek, 2006-2010
+ #
+--- a/guilt-add
++++ b/guilt-add
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (c) Josef "Jeff" Sipek, 2006, 2007
+ #
+--- a/guilt-applied
++++ b/guilt-applied
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (c) Josef "Jeff" Sipek, 2006, 2007
+ #
+--- a/guilt-branch
++++ b/guilt-branch
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (c) Josef "Jeff" Sipek, 2007-2008
+ #
+--- a/guilt-delete
++++ b/guilt-delete
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (c) Josef "Jeff" Sipek, 2006, 2007
+ #
+--- a/guilt-diff
++++ b/guilt-diff
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (C) 2007 Josef 'Jeff' Sipek <jeffpc@josefsipek.net>
+ #
+--- a/guilt-export
++++ b/guilt-export
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (c) Pierre Habouzit, 2007
+ #
+--- a/guilt-files
++++ b/guilt-files
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (C) 2007 Yasushi SHOJI <yashi@atmark-techno.com>
+ #
+--- a/guilt-fold
++++ b/guilt-fold
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (c) Josef "Jeff" Sipek, 2006, 2007
+ #
+--- a/guilt-fork
++++ b/guilt-fork
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (c) Josef "Jeff" Sipek, 2007
+ #
+--- a/guilt-graph
++++ b/guilt-graph
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (c) Josef "Jeff" Sipek, 2007
+ #
+--- a/guilt-header
++++ b/guilt-header
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (c) Josef "Jeff" Sipek, 2006-2010
+ #
+--- a/guilt-help
++++ b/guilt-help
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (c) Josef "Jeff" Sipek, 2007
+ #
+--- a/guilt-import
++++ b/guilt-import
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (c) Josef "Jeff" Sipek, 2007
+ #
+--- a/guilt-import-commit
++++ b/guilt-import-commit
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (c) Josef "Jeff" Sipek, 2007
+ #
+--- a/guilt-init
++++ b/guilt-init
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (c) Josef "Jeff" Sipek, 2006, 2007
+ #
+@@ -31,7 +31,7 @@ touch "$GUILT_DIR/$branch/status"
+ 
+ mkdir -p "$GIT_DIR/hooks/guilt"
+ cat > "$GIT_DIR/hooks/guilt/delete" <<EOF
+-#!/bin/sh
++#!/bin/bash
+ # Usage: <script> <patch being removed>
+ 
+ echo "Removing patch '\$1'..."
+--- a/guilt-new
++++ b/guilt-new
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (c) Josef "Jeff" Sipek, 2006, 2007
+ #
+--- a/guilt-next
++++ b/guilt-next
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (c) Josef "Jeff" Sipek, 2006, 2007
+ #
+--- a/guilt-patchbomb
++++ b/guilt-patchbomb
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (c) Josef "Jeff" Sipek, 2007
+ #
+--- a/guilt-pop
++++ b/guilt-pop
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (c) Josef "Jeff" Sipek, 2006, 2007
+ #
+--- a/guilt-prev
++++ b/guilt-prev
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (c) Josef "Jeff" Sipek, 2006, 2007
+ #
+--- a/guilt-push
++++ b/guilt-push
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (c) Josef "Jeff" Sipek, 2006, 2007
+ #
+--- a/guilt-rebase
++++ b/guilt-rebase
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (c) Josef "Jeff" Sipek, 2007
+ #
+--- a/guilt-refresh
++++ b/guilt-refresh
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (c) Josef "Jeff" Sipek, 2006, 2007
+ #
+--- a/guilt-rm
++++ b/guilt-rm
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (c) Josef "Jeff" Sipek, 2006, 2007
+ #
+--- a/guilt-series
++++ b/guilt-series
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (c) Josef "Jeff" Sipek, 2006, 2007
+ #
+--- a/guilt-status
++++ b/guilt-status
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (c) Josef "Jeff" Sipek, 2006, 2007
+ #
+--- a/guilt-top
++++ b/guilt-top
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (c) Josef "Jeff" Sipek, 2006, 2007
+ #
+--- a/guilt-unapplied
++++ b/guilt-unapplied
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #
+ # Copyright (c) Josef "Jeff" Sipek, 2006, 2007
+ #

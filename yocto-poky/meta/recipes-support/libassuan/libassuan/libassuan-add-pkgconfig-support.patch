@@ -1,0 +1,158 @@
+Add pkgconfig support to libassuan.
+This patch is rejected by upstream for the reason below:
+They think pkgconfig adds no portability and maintaining them is not worthwhile.
+
+Upstream-Status: Denied
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+Signed-off-by: Constantin Musca <constantinx.musca@intel.com>
+
+Index: libassuan-2.1.2/Makefile.am
+===================================================================
+--- libassuan-2.1.2.orig/Makefile.am
++++ libassuan-2.1.2/Makefile.am
+@@ -24,10 +24,13 @@ AUTOMAKE_OPTIONS = dist-bzip2 no-dist-gz
+ # (A suitable gitlog-to-changelog script can be found in GnuPG master.)
+ GITLOG_TO_CHANGELOG=gitlog-to-changelog
+ 
++pkgconfigdir = $(libdir)/pkgconfig
++pkgconfig_DATA = libassuan.pc
++
+ EXTRA_DIST = autogen.sh autogen.rc README.GIT         	                \
+              ChangeLog-2011 doc/ChangeLog-2011 src/ChangeLog-2011 	\
+              tests/ChangeLog-2011 contrib/ChangeLog-2011     		\
+-             build-aux/git-log-footer build-aux/git-log-fix
++             build-aux/git-log-footer build-aux/git-log-fix libassuan.pc.in
+ 
+ SUBDIRS = m4 src doc tests
+ 
+Index: libassuan-2.1.2/libassuan.pc.in
+===================================================================
+--- /dev/null
++++ libassuan-2.1.2/libassuan.pc.in
+@@ -0,0 +1,14 @@
++prefix=@prefix@
++exec_prefix=@exec_prefix@
++libdir=@libdir@
++includedir=@includedir@
++api_version=@LIBASSUAN_CONFIG_API_VERSION@
++host=@LIBASSUAN_CONFIG_HOST@
++
++Name: libassuan
++Description: IPC library used by GnuPG and GPGME
++Requires:
++Version: @VERSION@
++Libs: -L${libdir} -lassuan
++Libs.private: -lgpg-error
++Cflags: -I${includedir}
+Index: libassuan-2.1.2/configure.ac
+===================================================================
+--- libassuan-2.1.2.orig/configure.ac
++++ libassuan-2.1.2/configure.ac
+@@ -439,7 +439,7 @@ AC_CONFIG_FILES([doc/Makefile])
+ AC_CONFIG_FILES([tests/Makefile])
+ AC_CONFIG_FILES([src/libassuan-config], [chmod +x src/libassuan-config])
+ AC_CONFIG_FILES([src/versioninfo.rc])
+-
++AC_CONFIG_FILES([libassuan.pc])
+ AC_OUTPUT
+ 
+ echo "
+Index: libassuan-2.1.2/src/libassuan.m4
+===================================================================
+--- libassuan-2.1.2.orig/src/libassuan.m4
++++ libassuan-2.1.2/src/libassuan.m4
+@@ -15,18 +15,6 @@ dnl Returns ok set to yes or no.
+ dnl
+ AC_DEFUN([_AM_PATH_LIBASSUAN_COMMON],
+ [ AC_REQUIRE([AC_CANONICAL_HOST])
+-  AC_ARG_WITH(libassuan-prefix,
+-              AC_HELP_STRING([--with-libassuan-prefix=PFX],
+-                             [prefix where LIBASSUAN is installed (optional)]),
+-     libassuan_config_prefix="$withval", libassuan_config_prefix="")
+-  if test x$libassuan_config_prefix != x ; then
+-    libassuan_config_args="$libassuan_config_args --prefix=$libassuan_config_prefix"
+-    if test x${LIBASSUAN_CONFIG+set} != xset ; then
+-      LIBASSUAN_CONFIG=$libassuan_config_prefix/bin/libassuan-config
+-    fi
+-  fi
+-
+-  AC_PATH_TOOL(LIBASSUAN_CONFIG, libassuan-config, no)
+ 
+   tmp=ifelse([$1], ,1:0.9.2,$1)
+   if echo "$tmp" | grep ':' >/dev/null 2>/dev/null ; then
+@@ -37,51 +25,12 @@ AC_DEFUN([_AM_PATH_LIBASSUAN_COMMON],
+     min_libassuan_version="$tmp"
+   fi
+ 
+-  AC_MSG_CHECKING(for LIBASSUAN - version >= $min_libassuan_version)
+-  ok=no
+-  if test "$LIBASSUAN_CONFIG" != "no" \
+-     && test -f "$LIBASSUAN_CONFIG" ; then
+-    req_major=`echo $min_libassuan_version | \
+-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\1/'`
+-    req_minor=`echo $min_libassuan_version | \
+-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\2/'`
+-    req_micro=`echo $min_libassuan_version | \
+-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\3/'`
+-
+-    libassuan_config_version=`$LIBASSUAN_CONFIG --version`
+-    major=`echo $libassuan_config_version | \
+-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\).*/\1/'`
+-    minor=`echo $libassuan_config_version | \
+-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\).*/\2/'`
+-    micro=`echo $libassuan_config_version | \
+-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\).*/\3/'`
+-
+-    if test "$major" -gt "$req_major"; then
+-        ok=yes
+-    else 
+-        if test "$major" -eq "$req_major"; then
+-            if test "$minor" -gt "$req_minor"; then
+-               ok=yes
+-            else
+-               if test "$minor" -eq "$req_minor"; then
+-                   if test "$micro" -ge "$req_micro"; then
+-                     ok=yes
+-                   fi
+-               fi
+-            fi
+-        fi
+-    fi
+-  fi
+-
+-  if test $ok = yes; then
+-    AC_MSG_RESULT([yes ($libassuan_config_version)])
+-  else
+-    AC_MSG_RESULT(no)
+-  fi
++  PKG_CHECK_MODULES(LIBASSUAN, [libassuan >= $min_libassuan_version], [ok=yes], [ok=no])
+ 
+   if test $ok = yes; then
+     if test "$req_libassuan_api" -gt 0 ; then
+       tmp=`$LIBASSUAN_CONFIG --api-version 2>/dev/null || echo 0`
++      tmp=`$PKG_CONFIG --variable=api_version libassuan`
+       if test "$tmp" -gt 0 ; then
+         AC_MSG_CHECKING([LIBASSUAN API version])
+         if test "$req_libassuan_api" -eq "$tmp" ; then
+@@ -96,7 +45,7 @@ AC_DEFUN([_AM_PATH_LIBASSUAN_COMMON],
+ 
+   if test $ok = yes; then
+     if test x"$host" != x ; then
+-      libassuan_config_host=`$LIBASSUAN_CONFIG --host 2>/dev/null || echo none`
++      libassuan_config_host=`$PKG_CONFIG --variable=host libassuan`
+       if test x"$libassuan_config_host" != xnone ; then
+         if test x"$libassuan_config_host" != x"$host" ; then
+   AC_MSG_WARN([[
+@@ -137,12 +86,8 @@ dnl
+ AC_DEFUN([AM_PATH_LIBASSUAN],
+ [ _AM_PATH_LIBASSUAN_COMMON($1)
+   if test $ok = yes; then
+-    LIBASSUAN_CFLAGS=`$LIBASSUAN_CONFIG $libassuan_config_args --cflags`
+-    LIBASSUAN_LIBS=`$LIBASSUAN_CONFIG $libassuan_config_args --libs`
+     ifelse([$2], , :, [$2])
+   else
+-    LIBASSUAN_CFLAGS=""
+-    LIBASSUAN_LIBS=""
+     ifelse([$3], , :, [$3])
+   fi
+   AC_SUBST(LIBASSUAN_CFLAGS)

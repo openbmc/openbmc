@@ -1,0 +1,46 @@
+Upstream-Status: Pending
+
+Index: unix/configure
+===================================================================
+--- unix.orig/configure	2013-09-19 13:17:13.000000000 -0700
++++ unix/configure	2013-11-11 00:20:51.519490342 -0800
+@@ -7599,6 +7599,9 @@
+ 	    # get rid of the warnings.
+ 	    #CFLAGS_OPTIMIZE="${CFLAGS_OPTIMIZE} -D__NO_STRING_INLINES -D__NO_MATH_INLINES"
+ 
++	    # following line added by CW for Debian GNU/Linux
++	    TCL_SHLIB_LD_EXTRAS="-Wl,-soname,\${TCL_LIB_FILE}.0"
++
+ 	    SHLIB_LD='${CC} -shared ${CFLAGS} ${LDFLAGS}'
+ 	    DL_OBJS="tclLoadDl.o"
+ 	    DL_LIBS="-ldl"
+Index: unix/tcl.m4
+===================================================================
+--- unix.orig/tcl.m4	2013-09-19 13:17:13.000000000 -0700
++++ unix/tcl.m4	2013-11-11 00:17:24.263485123 -0800
+@@ -1415,6 +1415,9 @@
+ 	    # get rid of the warnings.
+ 	    #CFLAGS_OPTIMIZE="${CFLAGS_OPTIMIZE} -D__NO_STRING_INLINES -D__NO_MATH_INLINES"
+ 
++	    # following line added by CW for Debian GNU/Linux
++	    TCL_SHLIB_LD_EXTRAS="-Wl,-soname,\${TCL_LIB_FILE}.0"
++
+ 	    SHLIB_LD='${CC} -shared ${CFLAGS} ${LDFLAGS}'
+ 	    DL_OBJS="tclLoadDl.o"
+ 	    DL_LIBS="-ldl"
+Index: unix/Makefile.in
+===================================================================
+--- unix.orig/Makefile.in	2013-09-19 13:17:13.000000000 -0700
++++ unix/Makefile.in	2013-11-11 00:20:32.423489861 -0800
+@@ -796,7 +796,10 @@
+ 	    done;
+ 	@echo "Installing $(LIB_FILE) to $(DLL_INSTALL_DIR)/"
+ 	@@INSTALL_LIB@
+-	@chmod 555 "$(DLL_INSTALL_DIR)/$(LIB_FILE)"
++	mv "$(DLL_INSTALL_DIR)"/$(LIB_FILE) "$(DLL_INSTALL_DIR)"/$(LIB_FILE).0
++	ln -sf $(LIB_FILE).0 "$(DLL_INSTALL_DIR)"/$(LIB_FILE)
++	ln -sf "$(DLL_INSTALL_DIR)"/$(LIB_FILE).0 ./
++	@chmod 555 "$(DLL_INSTALL_DIR)"/$(LIB_FILE).0
+ 	@echo "Installing ${TCL_EXE} as $(BIN_INSTALL_DIR)/tclsh$(VERSION)${EXE_SUFFIX}"
+ 	@$(INSTALL_PROGRAM) ${TCL_EXE} "$(BIN_INSTALL_DIR)/tclsh$(VERSION)${EXE_SUFFIX}"
+ 	@echo "Installing tclConfig.sh to $(CONFIG_INSTALL_DIR)/"

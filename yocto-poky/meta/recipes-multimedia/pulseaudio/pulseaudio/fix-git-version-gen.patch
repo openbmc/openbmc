@@ -1,0 +1,24 @@
+git-version-gen gets confused if a tarball is being built inside a git directory
+(ie your build directory is a subdirectory of a poky clone), and ends up calling
+the release 6.0-dirty.  Add a shortcut exit so if a tarball is detected it
+doesn't attempt to look at the git status.
+
+Upstream-Status: Submitted (https://bugs.freedesktop.org/show_bug.cgi?id=90936)
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/git-version-gen b/git-version-gen
+index 7546884..079b93e 100755
+--- a/git-version-gen
++++ b/git-version-gen
+@@ -84,7 +84,10 @@ then
+     v=`cat $tarball_version_file` || exit 1
+     case $v in
+ 	*$nl*) v= ;; # reject multi-line output
+-	[0-9]*) ;;
++	[0-9]*)
++		echo "$v" | tr -d '\012'
++		exit 0
++		;;
+ 	*) v= ;;
+     esac
+     test -z "$v" \

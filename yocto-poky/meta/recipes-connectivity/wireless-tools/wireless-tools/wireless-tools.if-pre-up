@@ -1,0 +1,122 @@
+#!/bin/sh
+
+case "$METHOD" in loopback) exit 0 ;; esac
+
+IWCONFIG=/sbin/iwconfig
+IWPRIV=/sbin/iwpriv
+
+if [ ! -x $IWCONFIG ]; then
+  exit 0
+fi
+
+# Detect and do nothing for linux-wlan-ng interfaces;
+# which are configured by thier own if-pre-up script.
+if [ -n "$IF_WIRELESS_TYPE" -a "$IF_WIRELESS_TYPE" = "wlan-ng" ]; then
+  exit 0
+fi
+
+if [ -n "$IF_NEEDS_RESET" ]; then
+  $IWPRIV "$IFACE" reset 1
+  sleep 1
+fi
+
+if [ -n "$IF_NEEDS_FIRMWARE" ]; then
+  $IF_NEEDS_FIRMWARE "$IFACE"
+fi
+
+if [ -n "$IF_WIRELESS_SENS" ]; then
+  $IWCONFIG "$IFACE" sens $IF_WIRELESS_SENS
+fi
+
+if [ -n "$IF_WIRELESS_RATE" ]; then
+  $IWCONFIG "$IFACE" rate $IF_WIRELESS_RATE
+fi
+
+if [ -n "$IF_WIRELESS_RTS" ]; then
+  $IWCONFIG "$IFACE" rts $IF_WIRELESS_RTS
+fi
+
+if [ -n "$IF_WIRELESS_FRAG" ]; then
+  $IWCONFIG "$IFACE" frag $IF_WIRELESS_FRAG
+fi
+
+if [ -n "$IF_WIRELESS_POWER" ]; then
+  $IWCONFIG "$IFACE" power $IF_WIRELESS_POWER
+fi
+
+if [ -n "$IF_WIRELESS_POWERPERIOD" ]; then
+  $IWCONFIG "$IFACE" power period $IF_WIRELESS_POWERPERIOD
+fi
+
+if [ -n "$IF_WIRELESS_POWERTIMEOUT" ]; then
+  $IWCONFIG "$IFACE" power timeout $IF_WIRELESS_POWERTIMEOUT
+fi
+
+if [ -n "$IF_WIRELESS_TXPOWER" ]; then
+  $IWCONFIG "$IFACE" txpower $IF_WIRELESS_TXPOWER
+fi
+
+if [ -n "$IF_WIRELESS_RETRY" ]; then
+  $IWCONFIG "$IFACE" retry $IF_WIRELESS_RETRY
+fi
+
+if [ -n "$IF_WIRELESS_NICK" ]; then
+  $IWCONFIG "$IFACE" nick "$IF_WIRELESS_NICK"
+fi
+
+if [ -n "$IF_WIRELESS_NWID" ]; then
+  $IWCONFIG "$IFACE" nwid "$IF_WIRELESS_NWID"
+fi
+
+if [ -n "$IF_WIRELESS_ENC" ]; then
+  eval $IWCONFIG "$IFACE" enc $IF_WIRELESS_ENC
+fi
+
+if [ -n "$IF_WIRELESS_KEY" ]; then
+  eval $IWCONFIG "$IFACE" key $IF_WIRELESS_KEY
+fi
+
+if [ -n "$IF_WIRELESS_KEY1" ]; then
+  $IWCONFIG "$IFACE" key [1] "$IF_WIRELESS_KEY1"
+fi
+
+if [ -n "$IF_WIRELESS_KEY2" ]; then
+  $IWCONFIG "$IFACE" key [2] "$IF_WIRELESS_KEY2"
+fi
+
+if [ -n "$IF_WIRELESS_KEY3" ]; then
+  $IWCONFIG "$IFACE" key [3] "$IF_WIRELESS_KEY3"
+fi
+
+if [ -n "$IF_WIRELESS_KEY4" ]; then
+  $IWCONFIG "$IFACE" key [4] "$IF_WIRELESS_KEY4"
+fi
+
+if [ -n "$IF_WIRELESS_DEFAULTKEY" ]; then
+  $IWCONFIG "$IFACE" key ["$IF_WIRELESS_DEFAULTKEY"]
+fi
+
+if [ -n "$IF_WIRELESS_KEYMODE" ]; then
+  $IWCONFIG "$IFACE" key "$IF_WIRELESS_KEYMODE"
+fi
+
+if [ -n "$IF_WIRELESS_MODE" ]; then
+  $IWCONFIG "$IFACE" mode $IF_WIRELESS_MODE
+fi
+
+if [ -n "$IF_WIRELESS_FREQ" ]; then
+  $IWCONFIG "$IFACE" freq $IF_WIRELESS_FREQ
+fi
+
+if [ -n "$IF_WIRELESS_CHANNEL" ]; then
+  $IWCONFIG "$IFACE" channel $IF_WIRELESS_CHANNEL
+fi
+
+if [ -n "$IF_WIRELESS_ESSID" ]; then
+  $IWCONFIG "$IFACE" essid "$IF_WIRELESS_ESSID"
+fi
+
+if [ -n "$IF_WIRELESS_COMMIT" ]; then
+  $IWCONFIG "$IFACE" commit
+fi
+

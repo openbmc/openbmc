@@ -1,0 +1,81 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+02/2015 Rebased for Python 3.4.2
+
+# The proper prefix is inside our staging area.
+# Signed-Off: Michael 'Mickey' Lauer <mickey@vanille-media.de>
+# Signed-off-by: Phil Blundell <philb@gnu.org>
+# Signed-off-by: Khem Raj <raj.khem@gmail.com>
+# Signed-off-by: Alejandro Hernandez <alejandro.hernandez@linux.intel.com>
+
+Index: Python-3.4.2/Lib/distutils/sysconfig.py
+===================================================================
+--- Python-3.4.2.orig/Lib/distutils/sysconfig.py
++++ Python-3.4.2/Lib/distutils/sysconfig.py
+@@ -16,10 +16,11 @@ import sys
+ from .errors import DistutilsPlatformError
+ 
+ # These are needed in a couple of spots, so just compute them once.
+-PREFIX = os.path.normpath(sys.prefix)
+-EXEC_PREFIX = os.path.normpath(sys.exec_prefix)
+-BASE_PREFIX = os.path.normpath(sys.base_prefix)
+-BASE_EXEC_PREFIX = os.path.normpath(sys.base_exec_prefix)
++PREFIX = os.path.normpath(sys.prefix).replace( os.getenv("BUILD_SYS"), os.getenv("HOST_SYS") )
++EXEC_PREFIX = os.path.normpath(sys.exec_prefix).replace( os.getenv("BUILD_SYS"), os.getenv("HOST_SYS") )
++BASE_PREFIX = os.path.normpath(sys.base_prefix).replace( os.getenv("BUILD_SYS"), os.getenv("HOST_SYS") )
++BASE_EXEC_PREFIX= os.path.normpath(sys.base_exec_prefix).replace( os.getenv("BUILD_SYS"), os.getenv("HOST_SYS") )
++
+ 
+ # Path to the base directory of the project. On Windows the binary may
+ # live in project/PCBuild9.  If we're dealing with an x64 Windows build,
+@@ -93,7 +94,9 @@ def get_python_inc(plat_specific=0, pref
+     If 'prefix' is supplied, use it instead of sys.base_prefix or
+     sys.base_exec_prefix -- i.e., ignore 'plat_specific'.
+     """
+-    if prefix is None:
++    if prefix is None and os.environ['STAGING_INCDIR'] != "":
++        prefix = os.environ['STAGING_INCDIR'].rstrip('include')
++    elif prefix is None:
+         prefix = plat_specific and BASE_EXEC_PREFIX or BASE_PREFIX
+     if os.name == "posix":
+         if python_build:
+@@ -134,6 +137,12 @@ def get_python_lib(plat_specific=0, stan
+     If 'prefix' is supplied, use it instead of sys.base_prefix or
+     sys.base_exec_prefix -- i.e., ignore 'plat_specific'.
+     """
++    if prefix is None and os.environ['STAGING_LIBDIR'] != "":
++        lib_basename = os.environ['STAGING_LIBDIR'].split('/')[-1]
++        prefix = os.environ['STAGING_LIBDIR'].rstrip(lib_basename)
++    else:
++        lib_basename = sys.lib
++
+     if prefix is None:
+         if standard_lib:
+             prefix = plat_specific and BASE_EXEC_PREFIX or BASE_PREFIX
+@@ -142,7 +151,7 @@ def get_python_lib(plat_specific=0, stan
+ 
+     if os.name == "posix":
+         libpython = os.path.join(prefix,
+-                                 "lib", "python" + get_python_version())
++                                 lib_basename, "python" + get_python_version())
+         if standard_lib:
+             return libpython
+         else:
+@@ -242,7 +251,7 @@ def get_config_h_filename():
+     else:
+         inc_dir = get_python_inc(plat_specific=1)
+ 
+-    return os.path.join(inc_dir, 'pyconfig.h')
++    return os.path.join(inc_dir, 'pyconfig.h'.replace( os.getenv("BUILD_SYS"), os.getenv("HOST_SYS") ))
+ 
+ 
+ def get_makefile_filename():
+@@ -251,7 +260,7 @@ def get_makefile_filename():
+         return os.path.join(_sys_home or project_base, "Makefile")
+     lib_dir = get_python_lib(plat_specific=0, standard_lib=1)
+     config_file = 'config-{}{}'.format(get_python_version(), build_flags)
+-    return os.path.join(lib_dir, config_file, 'Makefile')
++    return os.path.join(lib_dir, config_file, 'Makefile').replace( os.getenv("BUILD_SYS"), os.getenv("HOST_SYS") )
+ 
+ 
+ def parse_config_h(fp, g=None):

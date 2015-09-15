@@ -1,0 +1,92 @@
+#!/usr/bin/env python
+
+# Simple graph query utility
+# useful for getting answers from .dot files produced by bitbake -g
+#
+# Written by: Paul Eggleton <paul.eggleton@linux.intel.com>
+#
+# Copyright 2013 Intel Corporation
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#
+
+import sys
+
+def get_path_networkx(dotfile, fromnode, tonode):
+    try:
+        import networkx
+    except ImportError:
+        print('ERROR: Please install the networkx python module')
+        sys.exit(1)
+
+    graph = networkx.DiGraph(networkx.read_dot(dotfile))
+
+    def node_missing(node):
+        import difflib
+        close_matches = difflib.get_close_matches(node, graph.nodes(), cutoff=0.7)
+        if close_matches:
+            print('ERROR: no node "%s" in graph. Close matches:\n  %s' % (node, '\n  '.join(close_matches)))
+        sys.exit(1)
+
+    if not fromnode in graph:
+        node_missing(fromnode)
+    if not tonode in graph:
+        node_missing(tonode)
+    return networkx.all_simple_paths(graph, source=fromnode, target=tonode)
+
+
+def find_paths(args, usage):
+    if len(args) < 3:
+        usage()
+        sys.exit(1)
+
+    fromnode = args[1]
+    tonode = args[2]
+    paths = list(get_path_networkx(args[0], fromnode, tonode))
+    if paths:
+        for path in paths:
+            print ' -> '.join(path)
+    else:
+        print("ERROR: no path from %s to %s in graph" % (fromnode, tonode))
+        sys.exit(1)
+
+def main():
+    import optparse
+    parser = optparse.OptionParser(
+        usage = '''%prog [options] <command> <arguments>
+
+Available commands:
+    find-paths <dotfile> <from> <to>
+        Find all of the paths between two nodes in a dot graph''')
+
+    #parser.add_option("-d", "--debug",
+    #        help = "Report all SRCREV values, not just ones where AUTOREV has been used",
+    #        action="store_true", dest="debug", default=False)
+
+    options, args = parser.parse_args(sys.argv)
+    args = args[1:]
+
+    if len(args) < 1:
+        parser.print_help()
+        sys.exit(1)
+
+    if args[0] == "find-paths":
+        find_paths(args[1:], parser.print_help)
+    else:
+        parser.print_help()
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

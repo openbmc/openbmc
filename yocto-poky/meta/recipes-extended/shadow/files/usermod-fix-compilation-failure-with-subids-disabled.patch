@@ -1,0 +1,33 @@
+Upstream-Status: Pending
+
+usermod: fix compilation failure with subids disabled
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/usermod.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/usermod.c b/src/usermod.c
+index e7d4351..685b50a 100644
+--- a/src/usermod.c
++++ b/src/usermod.c
+@@ -1360,7 +1360,7 @@ static void process_flags (int argc, char **argv)
+ 		         Prog, (unsigned long) user_newid);
+ 		exit (E_UID_IN_USE);
+ 	}
+-
++#ifdef ENABLE_SUBIDS
+ 	if (   (vflg || Vflg)
+ 	    && !is_sub_uid) {
+ 		fprintf (stderr,
+@@ -1376,6 +1376,7 @@ static void process_flags (int argc, char **argv)
+ 		         Prog, sub_gid_dbname (), "-w", "-W");
+ 		exit (E_USAGE);
+ 	}
++#endif
+ }
+ 
+ /*
+-- 
+1.7.9.5
+

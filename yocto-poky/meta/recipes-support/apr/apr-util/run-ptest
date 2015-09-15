@@ -1,0 +1,6 @@
+#!/bin/sh
+
+cd test
+./testall |sed \
+  -e 's|\(.*\):  SUCCESS|PASS: \1|' \
+  -e 's|\(.*\):  FAILED|FAIL: \1|'

@@ -1,0 +1,56 @@
+From 4fe67dbafa1bee679daecc12ed30621d5c2605de Mon Sep 17 00:00:00 2001
+From: Yao Qi <yao@codesourcery.com>
+Date: Mon, 11 May 2015 10:57:33 +0800
+Subject: [PATCH] Fix detection of 64-bit PPC inferior in gdbserver
+
+Issue #16775
+
+* gdbserver/linux-ppc-low.c (ppc_arch_setup): Change variable msr to type
+'unsigned long'.  Check bit 63 or bit 31 is one.
+
+https://sourceware.org/ml/gdb-patches/2014-12/msg00239.html
+Written by: Yao Qi <yao@codesourcery.com>
+
+Upstream-Status: Pending
+
+Signed-off-by: Yuanjie Huang <yuanjie.huang@windriver.com>
+---
+ gdb/gdbserver/linux-ppc-low.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/gdb/gdbserver/linux-ppc-low.c b/gdb/gdbserver/linux-ppc-low.c
+index 63d4218..a62cf22 100644
+--- a/gdb/gdbserver/linux-ppc-low.c
++++ b/gdb/gdbserver/linux-ppc-low.c
+@@ -374,7 +374,7 @@ ppc_arch_setup (void)
+ {
+   const struct target_desc *tdesc;
+ #ifdef __powerpc64__
+-  long msr;
++  unsigned long msr;
+   struct regcache *regcache;
+ 
+   /* On a 64-bit host, assume 64-bit inferior process with no
+@@ -384,13 +384,16 @@ ppc_arch_setup (void)
+   current_process ()->tdesc = tdesc;
+   ppc_hwcap = 0;
+ 
+-  /* Only if the high bit of the MSR is set, we actually have
+-     a 64-bit inferior.  */
++  /* We actually have a 64-bit inferior only if the certain bit of the
++     MSR is set.  The PowerISA Book III-S MSR is different from the
++     PowerISA Book III-E MSR.  The Book III-S MSR is 64 bits wide, and
++     its MSR[SF] is the bit 0 of a 64-bit value.  Book III-E MSR is 32
++     bits wide, and its MSR[CM] is the bit 0 of a 32-bit value.  */
+   regcache = new_register_cache (tdesc);
+   fetch_inferior_registers (regcache, find_regno (tdesc, "msr"));
+   collect_register_by_name (regcache, "msr", &msr);
+   free_register_cache (regcache);
+-  if (msr < 0)
++  if (msr & 0x8000000080000000)
+     {
+       ppc_get_hwcap (&ppc_hwcap);
+       if (ppc_hwcap & PPC_FEATURE_CELL)
+-- 
+1.8.5.2.233.g932f7e4
+

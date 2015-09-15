@@ -1,0 +1,50 @@
+From 76c465e87312dbc6cffd05427f1f4d2ebdee4f13 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Fri, 2 Jan 2015 12:28:35 +0800
+Subject: [PATCH 9/9] linux/syslinux: implement install_bootblock()
+
+Refer to the install_bootblock() in extlinux/main.c to make
+linux/syslinux.c's install_bootblock() which only supports ext2/3/4.
+
+Upstream-Status: Submitted
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+Tested-by: Du Dolpher <dolpher.du@intel.com>
+---
+ linux/syslinux.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/linux/syslinux.c b/linux/syslinux.c
+index c741750..917f83a 100755
+--- a/linux/syslinux.c
++++ b/linux/syslinux.c
+@@ -419,6 +419,26 @@ static int ext_file_write(ext2_file_t e2_file, const void *buf, size_t count,
+  */
+ int install_bootblock(int fd, const char *device)
+ {
++    struct ext2_super_block sb;
++
++    if (xpread(fd, &sb, sizeof sb, EXT2_SUPER_OFFSET + opt.offset) != sizeof sb) {
++        perror("reading superblock");
++        return 1;
++    }
++
++    if (sb.s_magic != EXT2_SUPER_MAGIC) {
++        fprintf(stderr,
++                "no ext2/3/4 superblock found on %s\n", device);
++        return 1;
++    }
++
++    if (xpwrite(fd, syslinux_bootsect, syslinux_bootsect_len, 0)
++        != (signed)syslinux_bootsect_len) {
++        perror("writing bootblock");
++        return 1;
++    }
++
++    return 0;
+ }
+ 
+ /* The file's block count */
+-- 
+1.9.1
+

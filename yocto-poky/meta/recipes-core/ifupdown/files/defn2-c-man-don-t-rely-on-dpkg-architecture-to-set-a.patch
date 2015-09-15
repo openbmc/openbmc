@@ -1,0 +1,56 @@
+From 7af9db748974cb3a2c6ef8f9e03d7db1f9f8ee16 Mon Sep 17 00:00:00 2001
+From: Paul Gortmaker <paul.gortmaker@windriver.com>
+Date: Wed, 6 Aug 2014 14:54:12 -0400
+Subject: [PATCH 1/2] defn2[c|man]: don't rely on dpkg-architecture to set arch
+
+In yocto we'll always be cross compiling, and we'll always
+be building on linux for linux (vs. *BSD, hurd, etc.)
+
+Without this the arch is not detected, but it doesn't error
+out, and hence you get useless binaries that don't know any
+arch specific methods, and the end result will be strangeness
+like the loopback device not being configured/enabled.
+
+Signed-off-by: Paul Gortmaker <paul.gortmaker@windriver.com>
+---
+ defn2c.pl   | 6 +++---
+ defn2man.pl | 6 +++---
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/defn2c.pl b/defn2c.pl
+index c449de2f3d1c..38845e374c76 100755
+--- a/defn2c.pl
++++ b/defn2c.pl
+@@ -2,9 +2,9 @@
+ 
+ use strict;
+ 
+-my $DEB_HOST_ARCH_OS = `dpkg-architecture -qDEB_HOST_ARCH_OS`;
+-
+-$DEB_HOST_ARCH_OS =~ s/\n//;
++#my $DEB_HOST_ARCH_OS = `dpkg-architecture -qDEB_HOST_ARCH_OS`;
++#$DEB_HOST_ARCH_OS =~ s/\n//;
++my $DEB_HOST_ARCH_OS ="linux";
+ 
+ # declarations
+ my $address_family = "";
+diff --git a/defn2man.pl b/defn2man.pl
+index 6ddcfdd4fe68..c9c4dd046597 100755
+--- a/defn2man.pl
++++ b/defn2man.pl
+@@ -2,9 +2,9 @@
+ 
+ use strict;
+ 
+-my $DEB_HOST_ARCH_OS = `dpkg-architecture -qDEB_HOST_ARCH_OS`;
+-
+-$DEB_HOST_ARCH_OS =~ s/\n//;
++#my $DEB_HOST_ARCH_OS = `dpkg-architecture -qDEB_HOST_ARCH_OS`;
++#$DEB_HOST_ARCH_OS =~ s/\n//;
++my $DEB_HOST_ARCH_OS = "linux";
+ 
+ # declarations
+ my $line;
+-- 
+1.9.1
+

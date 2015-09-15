@@ -1,0 +1,22 @@
+Upstream-Status: Pending
+
+Index: git/util.h
+===================================================================
+--- git.orig/util.h	2010-12-08 01:22:44.486243001 -0600
++++ git/util.h	2010-12-08 01:23:27.836243001 -0600
+@@ -37,4 +37,15 @@
+ #define cpu_relax()     asm volatile("" ::: "memory");
+ #endif
+ 
++#ifdef __mips__
++#define rmb()		asm volatile(					\
++				".set	mips2\n\t"			\
++				"sync\n\t"				\
++				".set	mips0"				\
++				: /* no output */			\
++				: /* no input */			\
++				: "memory")
++#define cpu_relax()	asm volatile("" ::: "memory")
++#endif
++
+ #endif

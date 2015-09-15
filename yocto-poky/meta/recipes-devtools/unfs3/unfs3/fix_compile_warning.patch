@@ -1,0 +1,25 @@
+daemon.c: Check exit code of chdir()
+
+Stop the compile warning and fix the code to act on a chdir() failure.
+If this one does fail something is very, very wrong.
+
+Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
+
+Upstream-Status: Submitted http://sourceforge.net/p/unfs3/bugs/5/
+
+---
+ daemon.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+--- a/daemon.c
++++ b/daemon.c
+@@ -964,7 +964,8 @@ int main(int argc, char **argv)
+ 	sigaction(SIGALRM, &act, NULL);
+ 
+ 	/* don't make directory we started in busy */
+-	chdir("/");
++	if(chdir("/") < 0)
++	    daemon_exit(0);
+ 
+ 	/* detach from terminal */
+ 	if (opt_detach) {

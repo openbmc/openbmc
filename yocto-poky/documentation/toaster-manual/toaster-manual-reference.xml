@@ -1,0 +1,1078 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
+[<!ENTITY % poky SYSTEM "../poky.ent"> %poky; ] >
+
+<chapter id='toaster-manual-reference'>
+
+<title>Concepts and Reference</title>
+
+    <para>
+        In order to configure and use Toaster, you should understand some
+        concepts and have some basic command reference material available.
+        This final chapter provides conceptual information on layer sources,
+        releases, and JSON configuration files.
+        Also provided is a quick look at some useful
+        <filename>manage.py</filename> commands that are Toaster-specific.
+        Information on <filename>manage.py</filename> commands does exist
+        across the Web and the information in this manual by no means
+        attempts to provide a command comprehensive reference.
+    </para>
+
+    <section id='layer-source'>
+        <title>Layer Source</title>
+
+        <para>
+            In general, a "layer source" is a source of information about
+            existing layers.
+            In particular, we are concerned with layers that you can use
+            with the Yocto Project and Toaster.
+            This chapter describes a particular type of layer source called
+            a "layer index."
+        </para>
+
+        <para>
+            A layer index is a web application that contains information
+            about a set of custom layers.
+            A good example of an existing layer index is the
+            OpenEmbedded Metadata Index.
+            A public instance of this layer index exists at
+            <ulink url='http://layers.openembedded.org'></ulink>.
+            You can find the code for this layer index's web application at
+            <ulink url='http://git.yoctoproject.org/cgit/cgit.cgi/layerindex-web/'></ulink>.
+        </para>
+
+        <para>
+            When you tie a layer source into Toaster, it can query the layer
+            source through a
+            <ulink url='http://en.wikipedia.org/wiki/Representational_state_transfer'>REST</ulink>
+            API, store the information about the layers in the Toaster
+            database, and then show the information to users.
+            Users are then able to view that information and build layers
+            from Toaster itself without worrying about cloning or editing
+            the BitBake layers configuration file
+            <filename>bblayers.conf</filename>.
+        </para>
+
+        <para>
+            Tying a layer source into Toaster is convenient when you have
+            many custom layers that need to be built on a regular basis by
+            a community of developers.
+            In fact, Toaster comes pre-configured with the OpenEmbedded
+            Metadata Index.
+            <note>
+                You do not have to use a layer source to use Toaster.
+                Tying into a layer source is optional.
+            </note>
+        </para>
+
+        <section id='layer-source-using-with-toaster'>
+            <title>Setting Up and Using a Layer Source</title>
+
+            <para>
+                To use your own layer source, you need to set up the layer
+                source and then tie it into Toaster.
+                This section describes how to tie into a layer index in a manner
+                similar to the way Toaster ties into the OpenEmbedded Metadata
+                Index.
+           </para>
+
+            <section id='understanding-your-layers'>
+                <title>Understanding Your Layers</title>
+
+                <para>
+                    The obvious first step for using a layer index is to have
+                    several custom layers that developers build and access using
+                    the Yocto Project on a regular basis.
+                    This set of layers needs to exist and you need to be
+                    familiar with where they reside.
+                    You will need that information when you set up the
+                    code for the web application that "hooks" into your set of
+                    layers.
+                </para>
+
+                <para>
+                    For general information on layers, see the
+                    "<ulink url='&YOCTO_DOCS_BSP_URL;#bsp-layers'>BSP Layers</ulink>"
+                    and
+                    "<ulink url='&YOCTO_DOCS_BSP_URL;#using-the-yocto-projects-bsp-tools'>Using the Yocto Project's BSP Tools</ulink>"
+                    sections in the Yocto Project Board Support Package (BSP)
+                    Developer's Guide.
+                </para>
+            </section>
+
+            <section id='configuring-toaster-to-hook-into-your-layer-source'>
+                <title>Configuring Toaster to Hook Into Your Layer Index</title>
+
+                <para>
+                    If you want Toaster to use your layer index, you must host
+                    the web application in a server to which Toaster can
+                    connect.
+                    You also need to give Toaster the information about your
+                    layer index.
+                    In other words, you have to configure Toaster to use your
+                    layer index.
+                    This section describes two methods by which you can
+                    configure and use your layer index.
+                </para>
+
+                <para>
+                    In the previous section, the code for the OpenEmbedded
+                    Metadata Index (i.e.
+                    <ulink url='http://layers.openembedded.org'></ulink>) was
+                    referenced.
+                    You can use this code, which is at
+                    <ulink url='http://git.yoctoproject.org/cgit/cgit.cgi/layerindex-web/'></ulink>,
+                    as a base to create your own layer index.
+                </para>
+
+                <section id='use-the-administration-interface'>
+                    <title>Use the Administration Interface</title>
+
+                    <para>
+                        Access the administration interface through a
+                        browser by entering the URL of your Toaster instance and
+                        adding "<filename>/admin</filename>" to the end of the
+                        URL.
+                        As an example, if you are running Toaster locally, use
+                        the following URL:
+                        <literallayout class='monospaced'>
+     http://127.0.0.1:8000/admin
+                        </literallayout>
+                    </para>
+
+                    <para>
+                        The administration interface has a "Layer sources"
+                        section that includes an "Add layer source" button.
+                        Click that button and provide the required information.
+                        Make sure you select "layerindex" as the layer source type.
+                    </para>
+                </section>
+
+                <section id='select-the-toasterconf-json-file'>
+                    <title>Use the <filename>toasterconf.json</filename> File</title>
+
+                    <para>
+                        If you do not want to use the Administration
+                        Interface, you can edit the
+                        <link linkend='toaster-json-files'><filename>toasterconf.json</filename></link>
+                        file and reload it to Toaster.
+                    </para>
+
+                    <para>
+                        When you set up Toaster in Build Mode, you are prompted
+                        to select a Toaster configuration file.
+                        This configuration file is used to set up the initial
+                        configuration values within the Toaster database
+                        including the layer sources.
+                        Three versions of the configuration file exist:
+                        <itemizedlist>
+                            <listitem><para>
+                                The first version of the file is found in the
+                                <filename>conf</filename> directory of the
+                                <filename>meta-yocto</filename> layer
+                                (i.e.
+                                <filename>meta-yocto/conf/toasterconf.json</filename>).
+                                This version contains the default Yocto Project
+                                configuration for Toaster.
+                                You are prompted to select this file during the
+                                Toaster set up process if you had cloned the
+                                <filename>poky</filename> repository (i.e.
+                                <filename>git://git.yoctoproject.org/poky</filename>).
+                                </para></listitem>
+                            <listitem><para>
+                                The second version of the file is in the
+                                <filename>conf</filename> directory of the
+                                <filename>openembedded-core</filename> layer
+                                (i.e. <filename>meta/conf/toasterconf.json</filename>).
+                                This version contains the default OpenEmbedded
+                                configuration for Toaster.
+                                You are prompted to select this file during the
+                                Toaster set up process if you had cloned the
+                                <filename>openembedded-core</filename> repository
+                                (i.e.
+                                <filename>git://git.openembedded.org/openembedded-core</filename>).
+                                </para></listitem>
+                            <listitem><para>
+                                The third version is a sample configuration
+                                useful for when you want to set up a hosted
+                                service in Build Mode.
+                                You can find this version on the
+                                <ulink url='https://wiki.yoctoproject.org/wiki/File:Toasterconf.json.txt.patch'>File:Toasterconf.json.txt.patch</ulink>
+                                wiki page.
+                                </para></listitem>
+                        </itemizedlist>
+                    </para>
+                </section>
+
+                <section id='edit-the-configuration-file'>
+                    <title>Edit the Configuration File</title>
+
+                    <para>
+                        Edit the version of the
+                        <filename>toasterconf.json</filename> file you
+                        used to set up your Toaster instance.
+                        In the file, you will find a section for layer sources
+                        such as the following:
+                        <literallayout class='monospaced'>
+     "layersources": [
+         {
+             "name": "Local Yocto Project",
+             "sourcetype": "local",
+             "apiurl": "../../",
+             "branches": ["HEAD", "master", "fido", "dizzy"],
+             "layers": [
+                 {
+                     "name": "openembedded-core",
+                     "local_path": "meta",
+                     "vcs_url": "remote:origin",
+                     "dirpath": "meta"
+                 },
+                 {
+                     "name": "meta-yocto",
+                     "local_path": "meta-yocto",
+                     "vcs_url": "remote:origin",
+                     "dirpath": "meta-yocto"
+                 },
+                 {
+                     "name": "meta-yocto-bsp",
+                     "local_path": "meta-yocto-bsp",
+                     "vcs_url": "remote:origin",
+                     "dirpath": "meta-yocto-bsp"
+                 }
+
+             ]
+         },
+         {
+             "name": "OpenEmbedded",
+             "sourcetype": "layerindex",
+             "apiurl": "http://layers.openembedded.org/layerindex/api/",
+             "branches": ["master", "fido", "dizzy"]
+         },
+         {
+             "name": "Imported layers",
+             "sourcetype": "imported",
+             "apiurl": "",
+             "branches": ["master", "fido", "dizzy", "HEAD"]
+
+         }
+     ],
+                        </literallayout>
+                        You should add your own layer source to this section by
+                        following the same format used for the "OpenEmbedded"
+                        layer source shown above.
+                    </para>
+
+                    <para>
+                        Give your layer source a name, provide the URL of your
+                        layer source API, use the source type "layerindex", and
+                        indicate which branches from your layer source you want
+                        to make available through Toaster.
+                        For example, the OpenEmbedded layer source makes
+                        available only its "master", "fido", and "dizzy"
+                        branches.
+                    </para>
+
+                    <para>
+                        The branches must match the branch you
+                        set when configuring your releases.
+                        For example, if you configure one release in Toaster
+                        by setting its branch to "branch-one" and you configure
+                        another release in Toaster by setting its branch to
+                        "branch-two", the branches in your layer source should
+                        be "branch-one" and "branch-two" as well.
+                        Doing so creates a connection between the releases
+                        and the layer information from your layer source.
+                        Thus, when users create a project with a given
+                        release, they will see the appropriate layers from
+                        your layer source.
+                        This connection ensures that only layers that are
+                        compatible with the selected project release can be
+                        selected for building.
+                    </para>
+
+                    <para>
+                        Once you have added this information to the
+                        <filename>toasterconf.json</filename> file, save your
+                        changes.
+                    </para>
+
+                    <para>
+                        In a terminal window, navigate to the directory that
+                        contains the Toaster database, which by default is the
+                        root of the Yocto Project
+                        <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+                        Once you are located in that directory, run the
+                        "<filename>loadconf</filename>" command, which takes as
+                        an argument the full path to the
+                        <filename>toasterconf.json</filename> file you just edited.
+                        For example, if you cloned the
+                        <filename>poky</filename> repository and you edited the
+                        <filename>meta-yocto/conf/toasterconf.json</filename> file,
+                        you would type something like the following:
+                        <literallayout class='monospaced'>
+     $ bitbake/lib/toaster/manage.py loadconf /home/scottrif/poky/meta-yocto/conf/toasterconf.json
+                        </literallayout>
+                        After entering this command, you need to update the
+                        Toaster database with the information coming from your
+                        new layer source.
+                        To do that, you should run the
+                        "<filename>lsupdates</filename>" command from the directory
+                        that contains the Toaster database.
+                        Here is an example:
+                        <literallayout class='monospaced'>
+     $ bitbake/lib/toaster/manage.py lsupdates
+                        </literallayout>
+                        If Toaster can reach the API URL, you should see a message
+                        telling you that Toaster is updating the layer source
+                        information.
+                    </para>
+
+                    <para>
+                        Once the information has been updated, verify the new layer
+                        information is available by using the Toaster web interface.
+                        To do that, visit the "All compatible layers" page inside a
+                        Toaster project.
+                        The layers from your layer source should be listed there.
+                    </para>
+                </section>
+            </section>
+        </section>
+    </section>
+
+    <section id='toaster-releases'>
+        <title>Releases</title>
+
+        <para>
+            When you create a Toaster project using the web interface,
+            you are asked to choose a "Release."
+            In the context of Toaster, the term "Release" refers to a set of
+            layers and a BitBake version the OpenEmbedded build system uses
+            to build something.
+            As shipped, Toaster is pre-configured with releases that
+            correspond to Yocto Project release branches.
+            However, you can modify, delete, and create new releases
+            according to your needs.
+            This section provides some background information on releases.
+        </para>
+
+        <section id='toaster-releases-supported'>
+            <title>Pre-Configured Releases</title>
+
+            <para>
+                As shipped, Toaster is configured to use a specific set of
+                releases.
+                Of course, you can always configure Toaster to use any
+                release.
+                For example, you might want your project to build against a
+                specific commit of any of the "out-of-the-box" releases.
+                Or, you might want your project to build against different
+                revisions of OpenEmbedded and BitBake.
+            </para>
+
+            <para>
+                As shipped, Toaster is configured to work with the following
+                releases:
+                <itemizedlist>
+                    <listitem><para><emphasis>Yocto Project 1.7 "Dizzy" or OpenEmbedded "Dizzy":</emphasis>
+                        This release causes your Toaster projects to
+                        build against the head of the dizzy branch at
+                        <ulink url='&YOCTO_GIT_URL;/cgit/cgit.cgi/poky/log/?h=dizzy'></ulink>
+                        or
+                        <ulink url='http://git.openembedded.org/openembedded-core/commit/?h=dizzy'></ulink>.
+                        </para></listitem>
+                    <listitem><para><emphasis>Yocto Project 1.8 "Fido" or OpenEmbedded "Fido":</emphasis>
+                        This release causes your Toaster projects to
+                        build against the head of the fido branch at
+                        <ulink url='&YOCTO_GIT_URL;/cgit/cgit.cgi/poky/log/?h=fido'></ulink>
+                        or
+                        <ulink url='http://git.openembedded.org/openembedded-core/commit/?h=fido'></ulink>.
+                        </para></listitem>
+                    <listitem><para><emphasis>Yocto Project "Master" or OpenEmbedded "Master":</emphasis>
+                        This release causes your Toaster Projects to
+                        build against the head of the master branch, which is
+                        where active development takes place, at
+                        <ulink url='&YOCTO_GIT_URL;/cgit/cgit.cgi/poky/log/'></ulink>
+                        or
+                        <ulink url='http://git.openembedded.org/openembedded-core/log/'></ulink>.
+                        </para></listitem>
+                    <listitem><para><emphasis>Local Yocto Project or Local OpenEmbedded:</emphasis>
+                        This release causes your Toaster Projects to
+                        build against the head of the <filename>poky</filename>
+                        or <filename>openembedded-core</filename> clone you
+                        have local to the machine running Toaster.
+                        </para></listitem>
+                </itemizedlist>
+            </para>
+        </section>
+
+        <section id='toaster-releases-comprised-of'>
+            <title>What Makes Up a Release?</title>
+
+            <para>
+                A release consists of the following:
+                <itemizedlist>
+                    <listitem><para><emphasis>Name:</emphasis>
+                        The name of the release (<filename>name</filename>).
+                        This release name never appears in the the Toaster
+                        web interface.
+                        Consequently, a user never sees the release name.
+                        </para></listitem>
+                    <listitem><para><emphasis>Description:</emphasis>
+                        The textual description of the release
+                        (<filename>description</filename>).
+                        This description is what users encounter when creating
+                        projects with the Toaster web interface.
+                        When you configure your release, be sure to use
+                        a description that sufficiently describes and is
+                        understandable.
+                        If Toaster has more than one release configured, the
+                        release descriptions appear listed in a drop down menu
+                        when a user creates a new project.
+                        If Toaster has only one release configured, all
+                        projects created using the web interface take that
+                        release and the drop down menu does not display in the
+                        Toaster web interface.
+                        </para></listitem>
+                    <listitem><para><emphasis>BitBake:</emphasis>
+                        The Bitbake version (<filename>bitbake</filename>)
+                        used to build layers set in the current release.
+                        This version is described by a name, a Git URL, a
+                        branch in the Git URL, and a directory path in the
+                        Git repository.
+                        As an example, consider the following snippet from
+                        a Toaster JSON configuration file.
+                        This BitBake version uses the master branch from the
+                        OpenEmbedded repository:
+                        <literallayout class='monospaced'>
+     "bitbake" : [
+         {
+             "name": "master",
+             "giturl": "git://git.openembedded.org/bitbake",
+             "branch": "master",
+             "dirpath": ""
+         }
+     ]
+                        </literallayout>
+                        Here is more detail on each of the items that comprise
+                        the BitBake version:
+                        <itemizedlist>
+                            <listitem><para><emphasis>Name:</emphasis>
+                                A string
+                                (<filename>name</filename>) used to refer to
+                                the version of BitBake you are using with
+                                Toaster.
+                                This name is never exposed through Toaster.
+                                </para></listitem>
+                            <listitem><para><emphasis>Git URL:</emphasis>
+                                The URL (<filename>giturl</filename>)
+                                for the BitBake Git repository cloned
+                                for Toaster projects.
+                                </para></listitem>
+                            <listitem><para><emphasis>Branch:</emphasis>
+                                The Git branch, or revision,
+                                (<filename>branch</filename>) of the BitBake
+                                repository used with Toaster.
+                                </para></listitem>
+                            <listitem><para><emphasis>Directory Path:</emphasis>
+                                The sub-directory of the BitBake repository
+                                (<filename>dirpath</filename>).
+                                If the Git URL includes more than one
+                                repository, you need to set this directory.
+                                If the URL does not include more than a single
+                                repository, you can set
+                                <filename>dirpath</filename> to a null string
+                                (i.e. "").
+                                </para></listitem>
+                        </itemizedlist>
+                        </para></listitem>
+                    <listitem><para><emphasis>Branch:</emphasis>
+                        The branch for the layer source
+                        (<filename>branch</filename>) used with the release.
+                        For example, for the OpenEmbedded layer source, the
+                        "master", "fido", and "dizzy" branches are available.
+                        </para></listitem>
+                    <listitem><para><emphasis>Default Layers:</emphasis>
+                        The set of default layers
+                        (<filename>defaultlayers</filename>) automatically
+                        added to the project configuration when a project is
+                        created.
+                        </para></listitem>
+                    <listitem><para><emphasis>Layer Source Priorities</emphasis>
+                        A specification of
+                        <link linkend='layer-source'>layer source</link>
+                        priorities (<filename>layersourcepriority</filename>).
+                        In order for Toaster to work as intended, the
+                        "Imported layers" layer source should have the highest
+                        priority, which means that layers manually imported by
+                        users with the "Import layer" functionality will
+                        always be visible and available for selection.
+                        </para></listitem>
+                    <listitem><para><emphasis>Help Text:</emphasis>
+                        Help text (<filename>helptext</filename>) that explains
+                        what the release does when selected.
+                        This help text appears below the release drop-down
+                        menu when you create a Toaster project.
+                        The help text should assist users in making the correct
+                        decision regarding the release to use for a given
+                        project.
+                        </para></listitem>
+                </itemizedlist>
+            </para>
+
+            <para>
+                To summarize what comprises a release, consider the following
+                example from a Toaster JSON file.
+                The configuration names the release "master" and uses the
+                "master" branch provided by the layer source of type
+                "layerindex", which is called "OpenEmbedded", and sets
+                the <filename>openembedded-core</filename> layer as the one
+                to be added by default to any projects created in Toaster.
+                The BitBake version used would be defined as shown earlier
+                in the previous list:
+                <literallayout class='monospaced'>
+     "releases": [
+         {
+             "name": "master",
+             "description": "OpenEmbedded master",
+             "bitbake": "master",
+             "branch": "master",
+             "defaultlayers": [ "openembedded-core" ],
+             "layersourcepriority": { "Imported layers": 99, "Local OpenEmbedded" : 10, "OpenEmbedded" :  0 },
+             "helptext": "Toaster will run your builds using the OpenEmbedded master branch, where active development takes place. This is not a stable branch, so your builds might not work as expected."
+         }
+     ]
+                </literallayout>
+            </para>
+        </section>
+    </section>
+
+    <section id='toaster-json-files'>
+        <title>JSON Files</title>
+
+        <para>
+            If you are going to be using Toaster in Build Mode, it must
+            be initially configured before use.
+            Configuration customizes layer source settings and Toaster defaults
+            for all users and is performed by the person responsible for
+            Toaster Configuration (i.e  the Toaster Administrator).
+            The Toaster Administrator performs this configuration through the
+            Django administration interface.
+        </para>
+
+        <para>
+            To make it easier to initially start Toaster, you can import a
+            pre-defined configuration file using the
+            <link linkend='toaster-command-loadconf'><filename>loadconf</filename></link>
+            command.
+            <note>
+                The configuration file is a JSON-formatted text file with
+                specific fields that Toaster recognizes.
+                It is not a data dump from the database, so it cannot be
+                loaded directly in the database.
+            </note>
+        </para>
+
+        <para>
+            By convention, the supplied configuration files are named
+            <filename>toasterconf.json</filename>.
+            The Toaster Administrator can customize the file prior to loading
+            it into Toaster.
+            When you set up Toaster locally to run in Build Mode, the system
+            startup script actively looks for compatible configuration files
+            and prompts you to select a file to load if it detects that the
+            database has not been configured.
+        </para>
+
+        <section id='json-file-choices'>
+            <title>Configuration File Choices</title>
+
+            <para>
+                Three versions of the configuration file exist:
+                <itemizedlist>
+                    <listitem><para>
+                        The
+                        <filename>meta-yocto/conf/toasterconf.json</filename>
+                        in the <filename>conf</filename> directory of the
+                        Yocto Project's <filename>meta-yocto</filename> layer.
+                        This version contains the default Yocto Project
+                        configuration for Toaster.
+                        You are prompted to select this file during the Toaster
+                        set up process if you cloned the
+                        <filename>poky</filename> repository (i.e.
+                        <filename>&YOCTO_GIT_URL;/poky</filename>).
+                        </para></listitem>
+                    <listitem><para>
+                        The <filename>meta/conf/toasterconf.json</filename>
+                        in the <filename>conf</filename> directory of the
+                        OpenEmbedded's <filename>openembedded-core</filename>
+                        layer.
+                        This version contains the default OpenEmbedded
+                        configuration for Toaster.
+                        You are prompted to select this file during the Toaster
+                        set up process if you had cloned the
+                        <filename>openembedded-core</filename> repository (i.e.
+                        <filename>git://git.openembedded.org/openembedded-core</filename>).
+                        </para></listitem>
+                    <listitem><para>
+                        The <filename>Toasterconf.json.txt.patch</filename>
+                        located on the
+                        <ulink url='https://wiki.yoctoproject.org/wiki/File:Toasterconf.json.txt.patch'>File:Toasterconf.json.txt.patch</ulink>
+                        wiki page.
+                        This version of the file is useful as a sample
+                        configuration for when you want to set up Toaster as a
+                        hosted service in Build Mode.
+                        </para></listitem>
+                </itemizedlist>
+            </para>
+        </section>
+
+        <section id='json-structure'>
+            <title>File Structure</title>
+
+            <para>
+                The <filename>toasterconf.json</filename> file consists of
+                easily readable areas: configuration, layer sources, BitBake,
+                default release, and releases.
+            </para>
+
+            <section id='json-config-area'>
+                <title>Configuration Area</title>
+
+                <para>
+                    This area of the JSON file sets which variables are exposed
+                    to users through the Toaster web interface.
+                    Users can easily edit these variables.
+                </para>
+
+                <para>
+                    The variables you set here are displayed in the
+                    "Configuration variables" page in Toaster.
+                    Minimally, you should set the
+                    <ulink url='&YOCTO_DOCS_REF_URL;#var-MACHINE'><filename>MACHINE</filename></ulink>
+                    variable, which appears to users as part of the project
+                    page in Toaster.
+                </para>
+
+                <para>
+                    Here is the default <filename>config</filename> area:
+                    <literallayout class='monospaced'>
+     "config": {
+         "MACHINE"      : "qemux86",
+         "DISTRO"       : "poky",
+         "IMAGE_FSTYPES": "ext3 jffs2 tar.bz2",
+         "IMAGE_INSTALL_append": "",
+         "PACKAGE_CLASSES": "package_rpm",
+         "SDKMACHINE"   : "x86_64"
+     },
+                    </literallayout>
+                </para>
+            </section>
+
+            <section id='json-layersources-area'>
+                <title>Layer Sources Area</title>
+
+                <para>
+                    This area of the JSON file defines the
+                    <link linkend='layer-source'>layer sources</link>
+                    Toaster uses.
+                    Toaster reads layer information from layer sources.
+                    Three types of layer sources exist that Toaster
+                    recognizes: Local, LayerIndex, and Imported.
+                </para>
+
+                <para>
+                    The Local layer source reads layers from Git clones
+                    available on your local drive.
+                    Using a local layer source enables you to easily test
+                    Toaster.
+                    <note>
+                        If you are setting up a hosted version of Toaster,
+                        it does not make sense to have a local layer source.
+                    </note>
+                </para>
+
+                <para>
+                    The LayerIndex layer source uses a REST API exposed by
+                    instances of the Layer Index application (e.g the public
+                    <ulink url='http://layers.openembedded.org/'></ulink>)
+                    to read layer data.
+                </para>
+
+                <para>
+                    The Imported layer source is reserved for layer data
+                    manually introduced by the user or Toaster Administrator
+                    through the GUI.
+                    This layer source lets users import their own layers
+                    and build them with Toaster.
+                    You should not remove the imported layer source.
+                </para>
+
+                <para>
+                    Here is the default <filename>layersources</filename> area:
+                    <literallayout class='monospaced'>
+     "layersources": [
+         {
+             "name": "Local Yocto Project",
+             "sourcetype": "local",
+             "apiurl": "../../",
+             "branches": ["HEAD", "master", "fido", "dizzy"],
+             "layers": [
+                 {
+                     "name": "openembedded-core",
+                     "local_path": "meta",
+                     "vcs_url": "remote:origin",
+                     "dirpath": "meta"
+                 },
+                 {
+                     "name": "meta-yocto",
+                     "local_path": "meta-yocto",
+                     "vcs_url": "remote:origin",
+                     "dirpath": "meta-yocto"
+                 },
+                 {
+                     "name": "meta-yocto-bsp",
+                     "local_path": "meta-yocto-bsp",
+                     "vcs_url": "remote:origin",
+                     "dirpath": "meta-yocto-bsp"
+                 }
+
+             ]
+         },
+         {
+             "name": "OpenEmbedded",
+             "sourcetype": "layerindex",
+             "apiurl": "http://layers.openembedded.org/layerindex/api/",
+             "branches": ["master", "fido", "dizzy"]
+         },
+         {
+             "name": "Imported layers",
+             "sourcetype": "imported",
+             "apiurl": "",
+             "branches": ["master", "fido", "dizzy", "HEAD"]
+
+         }
+     ],
+                    </literallayout>
+                </para>
+            </section>
+
+            <section id='json-bitbake-area'>
+                <title>BitBake Area</title>
+
+                <para>
+                    This area of the JSON file defines the version of
+                    BitBake Toaster uses.
+                    As shipped, Toaster is configured to recognize four
+                    versions of BitBake: master, fido, dizzy, and HEAD.
+                    <note>
+                        HEAD is a special option that builds whatever is
+                        available on disk, without checking out any remote
+                        Git repositories.
+                    </note>
+                </para>
+
+                <para>
+                    Here is the default <filename>bitbake</filename> area:
+                    <literallayout class='monospaced'>
+     "bitbake" : [
+         {
+             "name": "master",
+             "giturl": "remote:origin",
+             "branch": "master",
+             "dirpath": "bitbake"
+         },
+         {
+             "name": "fido",
+             "giturl": "remote:origin",
+             "branch": "fido",
+            "dirpath": "bitbake"
+        },
+        {
+             "name": "dizzy",
+             "giturl": "remote:origin",
+             "branch": "dizzy",
+             "dirpath": "bitbake"
+         },
+         {
+             "name": "HEAD",
+             "giturl": "remote:origin",
+             "branch": "HEAD",
+             "dirpath": "bitbake"
+         }
+     ],
+                    </literallayout>
+                </para>
+            </section>
+
+            <section id='json-default-area'>
+                <title>Default Area</title>
+
+                <para>
+                    This area of the JSON file establishes a default
+                    release used by Toaster.
+                    As shipped, Toaster uses the "master" release.
+                </para>
+
+                <para>
+                    Here is the statement in the JSON file that establishes
+                    the default release:
+                    <literallayout class='monospaced'>
+     "defaultrelease": "master",
+                    </literallayout>
+                </para>
+            </section>
+
+            <section id='json-releases-area'>
+                <title>Releases Area</title>
+
+                <para>
+                    This area of the JSON file defines the versions of the
+                    OpenEmbedded build system Toaster recognizes.
+                    As shipped, Toaster is configured to work with the four
+                    releases described in the
+                    "<link linkend='toaster-releases-supported'>Pre-Configured Releases</link>"
+                    section.
+                </para>
+
+                <para>
+                    Here is the default <filename>releases</filename> area:
+                    <literallayout class='monospaced'>
+     "releases": [
+         {
+             "name": "master",
+             "description": "Yocto Project master",
+             "bitbake": "master",
+             "branch": "master",
+             "defaultlayers": [ "openembedded-core", "meta-yocto", "meta-yocto-bsp"],
+             "layersourcepriority": { "Imported layers": 99, "Local Yocto Project" : 10, "OpenEmbedded" :  0 },
+             "helptext": "Toaster will run your builds using the tip of the &lt;a href=\"http://git.yoctoproject.org/cgit/cgit.cgi/poky/log/\"&gt;Yocto Project master branch&lt;/a&gt;, where active development takes place. This is not a stable branch, so your builds might not work as expected."
+         },
+         {
+             "name": "fido",
+             "description": "Yocto Project 1.8 Fido",
+             "bitbake": "fido",
+             "branch": "fido",
+             "defaultlayers": [ "openembedded-core", "meta-yocto", "meta-yocto-bsp"],
+             "layersourcepriority": { "Imported layers": 99, "Local Yocto Project" : 10, "OpenEmbedded" :  0 },
+             "helptext": "Toaster will run your builds with the tip of the &lt;a href=\"http://git.yoctoproject.org/cgit/cgit.cgi/poky/log/?h=fido\"&gt;Yocto Project 1.8 \"Fido\"&lt;/a&gt; branch."
+         },
+         {
+             "name": "dizzy",
+             "description": "Yocto Project 1.7 Dizzy",
+             "bitbake": "dizzy",
+             "branch": "dizzy",
+             "defaultlayers": [ "openembedded-core", "meta-yocto", "meta-yocto-bsp"],
+             "layersourcepriority": { "Imported layers": 99, "Local Yocto Project" : 10, "OpenEmbedded" :  0 },
+             "helptext": "Toaster will run your builds with the tip of the &lt;a href=\"http://git.yoctoproject.org/cgit/cgit.cgi/poky/log/?h=dizzy\"&gt;Yocto Project 1.7 \"Dizzy\"&lt;/a&gt; branch."
+         },
+         {
+             "name": "local",
+             "description": "Local Yocto Project",
+             "bitbake": "HEAD",
+             "branch": "HEAD",
+             "defaultlayers": [ "openembedded-core", "meta-yocto", "meta-yocto-bsp"],
+             "layersourcepriority": { "Imported layers": 99, "Local Yocto Project" : 10, "OpenEmbedded" :  0 },
+             "helptext": "Toaster will run your builds with the version of the Yocto Project you have cloned or downloaded to your computer."
+         }
+     ]
+                    </literallayout>
+                </para>
+            </section>
+        </section>
+    </section>
+
+    <section id='toaster-useful-commands'>
+        <title>Useful Commands</title>
+
+        <para>
+            In addition to the web user interface and the scripts that start
+            and stop Toaster, command-line commands exist through the
+            <filename>manage.py</filename> management script.
+            You can find general documentation on
+            <filename>manage.py</filename> at the
+            <ulink url='https://docs.djangoproject.com/en/1.7/topics/settings/'>Django</ulink>
+            site.
+            However, several <filename>manage.py</filename> commands have been
+            created that are specific to Toaster and are used to control
+            configuration and back-end tasks.
+            You can locate these commands in the
+            <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+            (e.g. <filename>poky</filename>) at
+            <filename>bitbake/lib/manage.py</filename>.
+            This section documents those commands.
+            <note>
+                <para>
+                    When using <filename>manage.py</filename> commands given
+                    a default configuration, you must be sure that your
+                    working directory is set to the
+                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>.
+                    Using <filename>manage.py</filename> commands from the
+                    Build Directory allows Toaster to find the
+                    <filename>toaster.sqlite</filename> file, which is located
+                    in the Build Directory.
+                </para>
+
+                <para>
+                    For non-default database configurations, it is possible
+                    that you can use <filename>manage.py</filename> commands
+                    from a directory other than the Build directory.
+                    To do so, the
+                    <filename>toastermain/settings.py</filename> file must be
+                    configured to point to the correct database backend.
+                </para>
+            </note>
+        </para>
+
+        <section id='toaster-command-buildslist'>
+            <title><filename>buildslist</filename></title>
+
+            <para>
+                The <filename>buildslist</filename> command lists all builds
+                that Toaster has recorded.
+                Access the command as follows:
+                <literallayout class='monospaced'>
+     $ bitbake/lib/toaster/manage.py buildslist
+                </literallayout>
+                The command returns a list, which includes numeric
+                identifications, of the builds that Toaster has recorded in the
+                current database.
+            </para>
+
+            <para>
+                You need to run the <filename>buildslist</filename> command
+                first to identify existing builds in the database before
+                using the
+                <link linkend='toaster-command-builddelete'><filename>builddelete</filename></link>
+                command.
+                Here is an example that assumes default repository and build
+                directory names:
+                <literallayout class='monospaced'>
+     $ cd ~/poky/build
+     $ python ../bitbake/lib/toaster/manage.py buildslist
+                </literallayout>
+                If your Toaster database had only one build, the above
+                <filename>buildslist</filename> command would return something
+                like the following:
+                <literallayout class='monospaced'>
+     1: qemux86 poky core-image-minimal
+                </literallayout>
+            </para>
+        </section>
+
+        <section id='toaster-command-builddelete'>
+            <title><filename>builddelete</filename></title>
+
+            <para>
+                The <filename>builddelete</filename> command deletes data
+                associated with a build.
+                Access the command as follows:
+                <literallayout class='monospaced'>
+     $ bitbake/lib/toaster/manage.py builddelete <replaceable>build_id</replaceable>
+                </literallayout>
+                The command deletes all the build data for the specified
+                <replaceable>build_id</replaceable>.
+                This command is useful for removing old and unused data from
+                the database.
+            </para>
+
+            <para>
+                Prior to running the <filename>builddelete</filename>
+                command, you need to get the ID associated with builds
+                by using the
+                <link linkend='toaster-command-buildslist'><filename>buildslist</filename></link>
+                command.
+            </para>
+        </section>
+
+        <section id='toaster-command-perf'>
+            <title><filename>perf</filename></title>
+
+            <para>
+                The <filename>perf</filename> command measures Toaster
+                performance.
+                Access the command as follows:
+                <literallayout class='monospaced'>
+     $ bitbake/lib/toaster/manage.py perf
+                </literallayout>
+                The command is a sanity check that returns page loading
+                times in order to identify performance problems.
+            </para>
+        </section>
+
+        <section id='toaster-command-checksettings'>
+            <title><filename>checksettings</filename></title>
+
+            <para>
+                The <filename>checksettings</filename> command verifies
+                existing Toaster settings.
+                Access the command as follows:
+                <literallayout class='monospaced'>
+     $ bitbake/lib/toaster/manage.py checksettings
+                </literallayout>
+                In Build Mode, Toaster uses settings that are based on the
+                database to configure the building tasks.
+                The <filename>checksettings</filename> command verifies that
+                the database settings are valid in the sense that they have
+                the minimal information needed to start a build.
+            </para>
+
+            <para>
+                In order for the <filename>checksettings</filename> command
+                to work, the database must be correctly set up and not have
+                existing data.
+                To be sure the database is ready, you can run the following:
+                <literallayout class='monospaced'>
+     $ bitbake/lib/toaster/mana​ge.py syncdb
+     $ bitbake/lib/toaster/mana​ge.py migrate orm
+     $ bitbake/lib/toaster/mana​ge.py migrate bldcontrol
+                </literallayout>
+                After running these commands, you can run the
+                <filename>checksettings</filename> command.
+            </para>
+        </section>
+
+        <section id='toaster-command-loadconf'>
+            <title><filename>loadconf</filename></title>
+
+            <para>
+                The <filename>loadconf</filename> command loads an
+                existing Toaster configuration file (JSON file).
+                You must run this on a new database that does not have any
+                data.
+                Running this command on an existing database that has data
+                results in errors.
+                Access the command as follows:
+                <literallayout class='monospaced'>
+     $ bitbake/lib/toaster/manage.py loadconf <replaceable>filepath</replaceable>
+                </literallayout>
+                The <filename>loadconf</filename> command configures a database
+                based on the supplied existing
+                <filename>toasterconf.json</filename> file.
+                For information on the <filename>toasterconf.json</filename>,
+                see the
+                "<link linkend='toaster-json-files'>JSON Files</link>"
+                section.
+            </para>
+        </section>
+
+        <section id='toaster-command-runbuilds'>
+            <title><filename>runbuilds</filename></title>
+
+            <para>
+                The <filename>runbuilds</filename> command launches
+                scheduled builds.
+                Access the command as follows:
+                <literallayout class='monospaced'>
+     $ bitbake/lib/toaster/manage.py runbuilds
+                </literallayout>
+                The <filename>runbuilds</filename> command checks if
+                scheduled builds exist in the database and then launches them
+                per schedule.
+                The command returns after the builds start but before they
+                complete.
+                The Toaster Logging Interface records and updates the database
+                when the builds complete.
+            </para>
+        </section>
+    </section>
+</chapter>

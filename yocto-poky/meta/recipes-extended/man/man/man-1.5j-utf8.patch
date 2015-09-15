@@ -1,0 +1,61 @@
+Upstream-Status: Pending
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+--- man-1.5j/configure.utf8	Thu Nov 22 15:02:35 2001
++++ man-1.5j/configure	Thu Nov 22 15:03:15 2001
+@@ -408,9 +408,9 @@
+   Fgawk=/bin/gawk
+   Fawk=/bin/gawk
+   Fmawk=missing
+-  troff=""
+-  nroff=""
+-  jnroff=""
++  troff=/usr/bin/troff
++  nroff=/usr/bin/nroff
++  jnroff=/usr/bin/nroff
+   eqn=""
+   neqn=""
+   jneqn=""
+@@ -453,6 +453,8 @@
+     done
+   done
+   Fgroff=/usr/bin/groff
++  Fnroff=/usr/bin/nroff
++  Fjnroff=/usr/bin/nroff
+   Fgeqn=/usr/bin/geqn
+   Fgtbl=/usr/bin/gtbl
+   Fcol=/usr/bin/col
+@@ -485,25 +487,25 @@
+   then
+     if test $Fnroff = "missing"
+     then
+-      nroff="nroff -Tlatin1 -mandoc"
++      nroff="nroff -Tutf8 -mandoc"
+     else
+-      nroff="$Fnroff -Tlatin1 -mandoc"
++      nroff="$Fnroff -Tutf8 -mandoc"
+     fi
+     troff="troff -mandoc"
+     echo "Warning: could not find groff"
+   else
+     if test $Fnroff = "missing"
+     then
+-      nroff="$Fgroff -Tlatin1 -mandoc"
++      nroff="$Fgroff -Tutf8 -mandoc"
+     else
+-      nroff="$Fnroff -Tlatin1 -mandoc"
++      nroff="$Fnroff -Tutf8 -mandoc"
+     fi
+     troff="$Fgroff -Tps -mandoc"
+-    jnroff="$Fgroff -Tnippon -mandocj"
++    jnroff="$Fjnroff -Tutf8 -mandocj"
+   fi
+   eqn="$Fgeqn -Tps"
+-  neqn="$Fgeqn -Tlatin1"
+-  jneqn="$Fgeqn -Tnippon"
++  neqn="$Fgeqn -Tutf8"
++  jneqn="$Fgeqn -Tutf8"
+   tbl="$Fgtbl"
+   col="$Fcol"
+   vgrind="$Fvgrind"

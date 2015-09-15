@@ -1,0 +1,36 @@
+In networks that don't have a DHCP server configured, ipv4 address
+allocation fails and the ipv4 structure doesn't get populated. When
+the GUI is trying to read the ipv4_config.method field to see whether
+it contains "dhcp" string, a segmentation fault is generated.
+
+Ethernet manual configuration behavior remains unchanged after this fix.
+
+Upstream-Status: Pending
+
+Signed-off-by: Emilia Ciobanu <emilia.maria.silvia.ciobanu@intel.com>
+Index: git/properties/ethernet.c
+===================================================================
+--- git.orig/properties/ethernet.c
++++ git/properties/ethernet.c
+@@ -194,7 +194,7 @@ void add_ethernet_service(GtkWidget *mai
+
+ 	data->button = button;
+
+-	if (g_str_equal(ipv4_config.method, "dhcp") == TRUE)
++	if (!ipv4_config.method || g_str_equal(ipv4_config.method, "dhcp") == TRUE)
+ 		update_ethernet_ipv4(data, CONNMAN_POLICY_DHCP);
+ 	else
+ 		update_ethernet_ipv4(data, CONNMAN_POLICY_MANUAL);
+Index: git/properties/wifi.c
+===================================================================
+--- git.orig/properties/wifi.c
++++ git/properties/wifi.c
+@@ -230,7 +230,7 @@ static void wifi_ipconfig(GtkWidget *tab
+
+ 	data->ipv4_config = ipv4_config;
+
+-	if (g_str_equal(ipv4_config.method, "dhcp") == TRUE)
++	if (!ipv4_config.method || g_str_equal(ipv4_config.method, "dhcp") == TRUE)
+ 		update_wifi_ipv4(data, CONNMAN_POLICY_DHCP);
+ 	else
+ 		update_wifi_ipv4(data, CONNMAN_POLICY_MANUAL);

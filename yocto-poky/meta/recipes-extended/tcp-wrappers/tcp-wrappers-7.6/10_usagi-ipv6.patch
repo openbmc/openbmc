@@ -1,0 +1,1255 @@
+Upstream-Status: Backport
+
+diff -ruN tcp_wrappers_7.6.orig/fix_options.c tcp_wrappers_7.6/fix_options.c
+--- tcp_wrappers_7.6.orig/fix_options.c	1997-04-08 02:29:19.000000000 +0200
++++ tcp_wrappers_7.6/fix_options.c	2004-04-10 19:07:43.000000000 +0200
+@@ -11,6 +11,9 @@
+ 
+ #include <sys/types.h>
+ #include <sys/param.h>
++#ifdef INET6
++#include <sys/socket.h>
++#endif
+ #include <netinet/in.h>
+ #include <netinet/in_systm.h>
+ #include <netinet/ip.h>
+@@ -41,6 +44,22 @@
+     unsigned int opt;
+     int     optlen;
+     struct in_addr dummy;
++#ifdef INET6
++    struct sockaddr_storage ss;
++    int sslen;
++
++    /*
++     * check if this is AF_INET socket
++     * XXX IPv6 support?
++     */
++    sslen = sizeof(ss);
++    if (getsockname(fd, (struct sockaddr *)&ss, &sslen) < 0) {
++	syslog(LOG_ERR, "getpeername: %m");
++	clean_exit(request);
++    }
++    if (ss.ss_family != AF_INET)
++	return;
++#endif
+ 
+     if ((ip = getprotobyname("ip")) != 0)
+ 	ipproto = ip->p_proto;
+diff -ruN tcp_wrappers_7.6.orig/hosts_access.5 tcp_wrappers_7.6/hosts_access.5
+--- tcp_wrappers_7.6.orig/hosts_access.5	2004-04-10 19:22:58.000000000 +0200
++++ tcp_wrappers_7.6/hosts_access.5	2004-04-10 19:07:43.000000000 +0200
+@@ -85,11 +85,18 @@
+ for daemon process names or for client user names.
+ .IP \(bu
+ An expression of the form `n.n.n.n/m.m.m.m\' is interpreted as a
+-`net/mask\' pair. A host address is matched if `net\' is equal to the
++`net/mask\' pair. An IPv4 host address is matched if `net\' is equal to the
+ bitwise AND of the address and the `mask\'. For example, the net/mask
+ pattern `131.155.72.0/255.255.254.0\' matches every address in the
+ range `131.155.72.0\' through `131.155.73.255\'.
+ .IP \(bu
++An expression of the form `[n:n:n:n:n:n:n:n]/m\' is interpreted as a
++`[net]/prefixlen\' pair. An IPv6 host address is matched if
++`prefixlen\' bits of `net\' is equal to the `prefixlen\' bits of the
++address. For example, the [net]/prefixlen pattern
++`[3ffe:505:2:1::]/64\' matches every address in the range
++`3ffe:505:2:1::\' through `3ffe:505:2:1:ffff:ffff:ffff:ffff\'.
++.IP \(bu
+ Wildcards `*\' and `?\' can be used to match hostnames or IP addresses.  This
+ method of matching cannot be used in conjunction with `net/mask\' matching,
+ hostname matching beginning with `.\' or IP address matching ending with `.\'.
+diff -ruN tcp_wrappers_7.6.orig/hosts_access.c tcp_wrappers_7.6/hosts_access.c
+--- tcp_wrappers_7.6.orig/hosts_access.c	2004-04-10 19:22:58.000000000 +0200
++++ tcp_wrappers_7.6/hosts_access.c	2004-04-10 19:07:43.000000000 +0200
+@@ -24,7 +24,13 @@
+ /* System libraries. */
+ 
+ #include <sys/types.h>
++#ifdef INT32_T
++    typedef uint32_t u_int32_t;
++#endif
+ #include <sys/param.h>
++#ifdef INET6
++#include <sys/socket.h>
++#endif
+ #include <netinet/in.h>
+ #include <arpa/inet.h>
+ #include <stdio.h>
+@@ -33,6 +39,9 @@
+ #include <errno.h>
+ #include <setjmp.h>
+ #include <string.h>
++#ifdef INET6
++#include <netdb.h>
++#endif
+ 
+ extern char *fgets();
+ extern int errno;
+@@ -82,6 +91,10 @@
+ static int host_match();
+ static int string_match();
+ static int masked_match();
++#ifdef INET6
++static int masked_match4();
++static int masked_match6();
++#endif
+ 
+ /* Size of logical line buffer. */
+ 
+@@ -289,6 +302,13 @@
+ {
+     int     n;
+ 
++#ifdef INET6
++    /* convert IPv4 mapped IPv6 address to IPv4 address */
++    if (STRN_EQ(string, "::ffff:", 7)
++      && dot_quad_addr(string + 7) != INADDR_NONE) {
++      string += 7;
++    }
++#endif    
+ #ifndef DISABLE_WILDCARD_MATCHING
+     if (strchr(tok, '*') || strchr(tok,'?')) {  /* contains '*' or '?' */
+         return (match_pattern_ylo(string,tok)); 	       
+@@ -304,20 +324,72 @@
+     } else if (tok[(n = strlen(tok)) - 1] == '.') {	/* prefix */
+ 	return (STRN_EQ(tok, string, n));
+     } else {					/* exact match */
++#ifdef INET6
++	struct addrinfo hints, *res;
++	struct sockaddr_in6 pat, addr;
++	int len, ret;
++	char ch;
++
++	len = strlen(tok);
++	if (*tok == '[' && tok[len - 1] == ']') {
++	    ch = tok[len - 1];
++	    tok[len - 1] = '\0';
++	    memset(&hints, 0, sizeof(hints));
++	    hints.ai_family = AF_INET6;
++	    hints.ai_socktype = SOCK_STREAM;
++	    hints.ai_flags = AI_PASSIVE | AI_NUMERICHOST;
++	    if ((ret = getaddrinfo(tok + 1, NULL, &hints, &res)) == 0) {
++		memcpy(&pat, res->ai_addr, sizeof(pat));
++		freeaddrinfo(res);
++	    }
++	    tok[len - 1] = ch;
++	    if (ret != 0 || getaddrinfo(string, NULL, &hints, &res) != 0)
++		return NO;
++	    memcpy(&addr, res->ai_addr, sizeof(addr));
++	    freeaddrinfo(res);
++#ifdef NI_WITHSCOPEID
++	    if (pat.sin6_scope_id != 0 &&
++		addr.sin6_scope_id != pat.sin6_scope_id)
++		return NO;
++#endif
++	    return (!memcmp(&pat.sin6_addr, &addr.sin6_addr,
++			    sizeof(struct in6_addr)));
++	    return (ret);
++	}
++#endif
+ 	return (STR_EQ(tok, string));
+     }
+ }
+ 
+ /* masked_match - match address against netnumber/netmask */
+ 
++#ifdef INET6
+ static int masked_match(net_tok, mask_tok, string)
+ char   *net_tok;
+ char   *mask_tok;
+ char   *string;
+ {
++    return (masked_match4(net_tok, mask_tok, string) ||
++	    masked_match6(net_tok, mask_tok, string));
++}
++
++static int masked_match4(net_tok, mask_tok, string)
++#else
++static int masked_match(net_tok, mask_tok, string)
++#endif
++char   *net_tok;
++char   *mask_tok;
++char   *string;
++{
++#ifdef INET6
++    u_int32_t net;
++    u_int32_t mask;
++    u_int32_t addr;
++#else
+     unsigned long net;
+     unsigned long mask;
+     unsigned long addr;
++#endif
+ 
+     /*
+      * Disallow forms other than dotted quad: the treatment that inet_addr()
+@@ -329,12 +401,78 @@
+ 	return (NO);
+     if ((net = dot_quad_addr(net_tok)) == INADDR_NONE
+ 	|| (mask = dot_quad_addr(mask_tok)) == INADDR_NONE) {
++#ifndef INET6
+ 	tcpd_warn("bad net/mask expression: %s/%s", net_tok, mask_tok);
++#endif
+ 	return (NO);				/* not tcpd_jump() */
+     }
+     return ((addr & mask) == net);
+ }
+ 
++#ifdef INET6
++static int masked_match6(net_tok, mask_tok, string)
++char   *net_tok;
++char   *mask_tok;
++char   *string;
++{
++    struct addrinfo hints, *res;
++    struct sockaddr_in6 net, addr;
++    u_int32_t mask;
++    int len, mask_len, i = 0;
++    char ch;
++
++    memset(&hints, 0, sizeof(hints));
++    hints.ai_family = AF_INET6;
++    hints.ai_socktype = SOCK_STREAM;
++    hints.ai_flags = AI_PASSIVE | AI_NUMERICHOST;
++    if (getaddrinfo(string, NULL, &hints, &res) != 0)
++	return NO;
++    memcpy(&addr, res->ai_addr, sizeof(addr));
++    freeaddrinfo(res);
++
++    if (IN6_IS_ADDR_V4MAPPED(&addr.sin6_addr)) {
++	if ((*(u_int32_t *)&net.sin6_addr.s6_addr[12] = dot_quad_addr(net_tok)) == INADDR_NONE
++	 || (mask = dot_quad_addr(mask_tok)) == INADDR_NONE)
++	    return (NO);
++	return ((*(u_int32_t *)&addr.sin6_addr.s6_addr[12] & mask) == *(u_int32_t *)&net.sin6_addr.s6_addr[12]);
++    }
++
++    /* match IPv6 address against netnumber/prefixlen */
++    len = strlen(net_tok);
++    if (*net_tok != '[' || net_tok[len - 1] != ']')
++	return NO;
++    ch = net_tok[len - 1];
++    net_tok[len - 1] = '\0';
++    if (getaddrinfo(net_tok + 1, NULL, &hints, &res) != 0) {
++	net_tok[len - 1] = ch;
++	return NO;
++    }
++    memcpy(&net, res->ai_addr, sizeof(net));
++    freeaddrinfo(res);
++    net_tok[len - 1] = ch;
++    if ((mask_len = atoi(mask_tok)) < 0 || mask_len > 128)
++	return NO;
++
++#ifdef NI_WITHSCOPEID
++    if (net.sin6_scope_id != 0 && addr.sin6_scope_id != net.sin6_scope_id)
++	return NO;
++#endif
++    while (mask_len > 0) {
++	if (mask_len < 32) {
++	    mask = htonl(~(0xffffffff >> mask_len));
++	    if ((*(u_int32_t *)&addr.sin6_addr.s6_addr[i] & mask) != (*(u_int32_t *)&net.sin6_addr.s6_addr[i] & mask))
++		return NO;
++	    break;
++	}
++	if (*(u_int32_t *)&addr.sin6_addr.s6_addr[i] != *(u_int32_t *)&net.sin6_addr.s6_addr[i])
++	    return NO;
++	i += 4;
++	mask_len -= 32;
++    }
++    return YES;
++}
++#endif /* INET6 */
++
+ #ifndef DISABLE_WILDCARD_MATCHING
+ /* Note: this feature has been adapted in a pretty straightforward way
+    from Tatu Ylonen's last SSH version under free license by 
+diff -ruN tcp_wrappers_7.6.orig/Makefile tcp_wrappers_7.6/Makefile
+--- tcp_wrappers_7.6.orig/Makefile	1997-03-21 19:27:21.000000000 +0100
++++ tcp_wrappers_7.6/Makefile	2004-04-10 19:22:44.000000000 +0200
+@@ -21,7 +21,7 @@
+ 	@echo "	dynix epix esix freebsd hpux irix4 irix5 irix6 isc iunix"
+ 	@echo "	linux machten mips(untested) ncrsvr4 netbsd next osf power_unix_211"
+ 	@echo "	ptx-2.x ptx-generic pyramid sco sco-nis sco-od2 sco-os5 sinix sunos4"
+-	@echo "	sunos40 sunos5 sysv4 tandem ultrix unicos7 unicos8 unixware1 unixware2"
++	@echo "	sunos40 sunos5 solaris8 sysv4 tandem ultrix unicos7 unicos8 unixware1 unixware2"
+ 	@echo "	uts215 uxp"
+ 	@echo
+ 	@echo "If none of these match your environment, edit the system"
+@@ -131,20 +131,34 @@
+ 	NETGROUP=-DNETGROUP TLI= SYSTYPE="-systype bsd43" all
+ 
+ # Freebsd and linux by default have no NIS.
+-386bsd netbsd bsdos:
++386bsd bsdos:
+ 	@make REAL_DAEMON_DIR=$(REAL_DAEMON_DIR) STYLE=$(STYLE) \
+ 	LIBS= RANLIB=ranlib ARFLAGS=rv AUX_OBJ= NETGROUP= TLI= \
+ 	EXTRA_CFLAGS=-DSYS_ERRLIST_DEFINED VSYSLOG= all
+ 
+ freebsd:
+ 	@make REAL_DAEMON_DIR=$(REAL_DAEMON_DIR) STYLE=$(STYLE) \
++	LIBS="-L/usr/local/v6/lib -linet6" \
+ 	LIBS= RANLIB=ranlib ARFLAGS=rv AUX_OBJ= NETGROUP= TLI= \
+-	EXTRA_CFLAGS=-DSYS_ERRLIST_DEFINED VSYSLOG= all
++	EXTRA_CFLAGS="-DSYS_ERRLIST_DEFINED -DINET6 -Dss_family=__ss_family -Dss_len=__ss_len" \
++	VSYSLOG= all
++
++netbsd:
++	@make REAL_DAEMON_DIR=$(REAL_DAEMON_DIR) STYLE=$(STYLE) \
++	LIBS= RANLIB=ranlib ARFLAGS=rv AUX_OBJ= NETGROUP= TLI= \
++	EXTRA_CFLAGS="-DSYS_ERRLIST_DEFINED -DINET6 -Dss_family=__ss_family -Dss_len=__ss_len" VSYSLOG= all
+ 
+ linux:
+ 	@make REAL_DAEMON_DIR=$(REAL_DAEMON_DIR) STYLE=$(STYLE) \
+-	LIBS= RANLIB=ranlib ARFLAGS=rv AUX_OBJ=setenv.o \
+-	NETGROUP= TLI= EXTRA_CFLAGS="-DBROKEN_SO_LINGER" all
++	LIBS=-lnsl RANLIB=ranlib ARFLAGS=rv AUX_OBJ= \
++	NETGROUP="-DNETGROUP" TLI= VSYSLOG= BUGS= \
++	EXTRA_CFLAGS="-DSYS_ERRLIST_DEFINED -DHAVE_STRERROR -DINET6=1 -Dss_family=__ss_family -Dss_len=__ss_len" all
++
++gnu:
++	@make REAL_DAEMON_DIR=$(REAL_DAEMON_DIR) STYLE=$(STYLE) \
++	LIBS=-lnsl RANLIB=ranlib ARFLAGS=rv AUX_OBJ= \
++	NETGROUP=-DNETGROUP TLI= VSYSLOG= BUGS= \
++	EXTRA_CFLAGS="-DSYS_ERRLIST_DEFINED -DHAVE_STRERROR" all
+ 
+ # This is good for many SYSV+BSD hybrids with NIS, probably also for HP-UX 7.x.
+ hpux hpux8 hpux9 hpux10:
+@@ -196,6 +210,13 @@
+ 	NETGROUP=-DNETGROUP AUX_OBJ=setenv.o TLI=-DTLI \
+ 	BUGS="$(BUGS) -DSOLARIS_24_GETHOSTBYNAME_BUG" all
+ 
++# SunOS 5.8 is another SYSV4 variant, but has IPv6 support
++solaris8:
++	@make REAL_DAEMON_DIR=$(REAL_DAEMON_DIR) STYLE=$(STYLE) \
++	LIBS="-lsocket -lnsl" RANLIB=echo ARFLAGS=rv VSYSLOG= \
++	NETGROUP=-DNETGROUP AUX_OBJ=setenv.o TLI=-DTLI \
++	EXTRA_CFLAGS="-DINET6 -DNO_CLONE_DEVICE -DINT32_T" all
++
+ # Generic SYSV40
+ esix sysv4:
+ 	@make REAL_DAEMON_DIR=$(REAL_DAEMON_DIR) STYLE=$(STYLE) \
+diff -ruN tcp_wrappers_7.6.orig/misc.c tcp_wrappers_7.6/misc.c
+--- tcp_wrappers_7.6.orig/misc.c	1996-02-11 17:01:30.000000000 +0100
++++ tcp_wrappers_7.6/misc.c	2004-04-10 19:07:43.000000000 +0200
+@@ -58,9 +58,31 @@
+ {
+     char   *cp;
+ 
++#ifdef INET6
++    int bracket = 0;
++
++    for (cp = string; cp && *cp; cp++) {
++	switch (*cp) {
++	case '[':
++	    bracket++;
++	    break;
++	case ']':
++	    bracket--;
++	    break;
++	default:
++	    if (bracket == 0 && *cp == delimiter) {
++		*cp++ = 0;
++		return cp;
++	    }
++	    break;
++	}
++    }
++    return (NULL);
++#else
+     if ((cp = strchr(string, delimiter)) != 0)
+ 	*cp++ = 0;
+     return (cp);
++#endif
+ }
+ 
+ /* dot_quad_addr - convert dotted quad to internal form */
+diff -ruN tcp_wrappers_7.6.orig/refuse.c tcp_wrappers_7.6/refuse.c
+--- tcp_wrappers_7.6.orig/refuse.c	1994-12-28 17:42:40.000000000 +0100
++++ tcp_wrappers_7.6/refuse.c	2004-04-10 19:07:43.000000000 +0200
+@@ -25,7 +25,12 @@
+ void    refuse(request)
+ struct request_info *request;
+ {
++#ifdef INET6
++    syslog(deny_severity, "refused connect from %s (%s)",
++	   eval_client(request), eval_hostaddr(request->client));
++#else
+     syslog(deny_severity, "refused connect from %s", eval_client(request));
++#endif
+     clean_exit(request);
+     /* NOTREACHED */
+ }
+diff -ruN tcp_wrappers_7.6.orig/rfc931.c tcp_wrappers_7.6/rfc931.c
+--- tcp_wrappers_7.6.orig/rfc931.c	1995-01-02 16:11:34.000000000 +0100
++++ tcp_wrappers_7.6/rfc931.c	2004-04-10 19:07:43.000000000 +0200
+@@ -68,20 +68,50 @@
+ /* rfc931 - return remote user name, given socket structures */
+ 
+ void    rfc931(rmt_sin, our_sin, dest)
++#ifdef INET6
++struct sockaddr *rmt_sin;
++struct sockaddr *our_sin;
++#else
+ struct sockaddr_in *rmt_sin;
+ struct sockaddr_in *our_sin;
++#endif
+ char   *dest;
+ {
+     unsigned rmt_port;
+     unsigned our_port;
++#ifdef INET6
++    struct sockaddr_storage rmt_query_sin;
++    struct sockaddr_storage our_query_sin;
++    int alen;
++#else
+     struct sockaddr_in rmt_query_sin;
+     struct sockaddr_in our_query_sin;
++#endif
+     char    user[256];			/* XXX */
+     char    buffer[512];		/* XXX */
+     char   *cp;
+     char   *result = unknown;
+     FILE   *fp;
+ 
++#ifdef INET6
++    /* address family must be the same */
++    if (rmt_sin->sa_family != our_sin->sa_family) {
++	STRN_CPY(dest, result, STRING_LENGTH);
++	return;
++    }
++    switch (our_sin->sa_family) {
++    case AF_INET:
++	alen = sizeof(struct sockaddr_in);
++	break;
++    case AF_INET6:
++	alen = sizeof(struct sockaddr_in6);
++	break;
++    default:
++	STRN_CPY(dest, result, STRING_LENGTH);
++	return;
++    }
++#endif
++
+     /*
+      * Use one unbuffered stdio stream for writing to and for reading from
+      * the RFC931 etc. server. This is done because of a bug in the SunOS
+@@ -92,7 +122,11 @@
+      * sockets.
+      */
+ 
++#ifdef INET6
++    if ((fp = fsocket(our_sin->sa_family, SOCK_STREAM, 0)) != 0) {
++#else
+     if ((fp = fsocket(AF_INET, SOCK_STREAM, 0)) != 0) {
++#endif
+ 	setbuf(fp, (char *) 0);
+ 
+ 	/*
+@@ -112,6 +146,25 @@
+ 	     * addresses from the query socket.
+ 	     */
+ 
++#ifdef INET6
++	    memcpy(&our_query_sin, our_sin, alen);
++	    memcpy(&rmt_query_sin, rmt_sin, alen);
++	    switch (our_sin->sa_family) {
++	    case AF_INET:
++		((struct sockaddr_in *)&our_query_sin)->sin_port = htons(ANY_PORT);
++		((struct sockaddr_in *)&rmt_query_sin)->sin_port = htons(RFC931_PORT);
++		break;
++	    case AF_INET6:
++		((struct sockaddr_in6 *)&our_query_sin)->sin6_port = htons(ANY_PORT);
++		((struct sockaddr_in6 *)&rmt_query_sin)->sin6_port = htons(RFC931_PORT);
++		break;
++	    }
++
++	    if (bind(fileno(fp), (struct sockaddr *) & our_query_sin,
++		     alen) >= 0 &&
++		connect(fileno(fp), (struct sockaddr *) & rmt_query_sin,
++			alen) >= 0) {
++#else
+ 	    our_query_sin = *our_sin;
+ 	    our_query_sin.sin_port = htons(ANY_PORT);
+ 	    rmt_query_sin = *rmt_sin;
+@@ -121,6 +174,7 @@
+ 		     sizeof(our_query_sin)) >= 0 &&
+ 		connect(fileno(fp), (struct sockaddr *) & rmt_query_sin,
+ 			sizeof(rmt_query_sin)) >= 0) {
++#endif
+ 
+ 		/*
+ 		 * Send query to server. Neglect the risk that a 13-byte
+@@ -129,8 +183,13 @@
+ 		 */
+ 
+ 		fprintf(fp, "%u,%u\r\n",
++#ifdef INET6
++			ntohs(((struct sockaddr_in *)rmt_sin)->sin_port),
++			ntohs(((struct sockaddr_in *)our_sin)->sin_port));
++#else
+ 			ntohs(rmt_sin->sin_port),
+ 			ntohs(our_sin->sin_port));
++#endif
+ 		fflush(fp);
+ 
+ 		/*
+@@ -144,8 +203,13 @@
+ 		    && ferror(fp) == 0 && feof(fp) == 0
+ 		    && sscanf(buffer, "%u , %u : USERID :%*[^:]:%255s",
+ 			      &rmt_port, &our_port, user) == 3
++#ifdef INET6
++		    && ntohs(((struct sockaddr_in *)rmt_sin)->sin_port) == rmt_port
++		    && ntohs(((struct sockaddr_in *)our_sin)->sin_port) == our_port) {
++#else
+ 		    && ntohs(rmt_sin->sin_port) == rmt_port
+ 		    && ntohs(our_sin->sin_port) == our_port) {
++#endif
+ 
+ 		    /*
+ 		     * Strip trailing carriage return. It is part of the
+diff -ruN tcp_wrappers_7.6.orig/scaffold.c tcp_wrappers_7.6/scaffold.c
+--- tcp_wrappers_7.6.orig/scaffold.c	1997-03-21 19:27:24.000000000 +0100
++++ tcp_wrappers_7.6/scaffold.c	2004-04-10 19:07:43.000000000 +0200
+@@ -25,7 +25,9 @@
+ #define	INADDR_NONE	(-1)		/* XXX should be 0xffffffff */
+ #endif
+ 
++#ifndef INET6
+ extern char *malloc();
++#endif
+ 
+ /* Application-specific. */
+ 
+@@ -39,6 +41,7 @@
+ int     deny_severity = LOG_WARNING;
+ int     rfc931_timeout = RFC931_TIMEOUT;
+ 
++#ifndef INET6
+ /* dup_hostent - create hostent in one memory block */
+ 
+ static struct hostent *dup_hostent(hp)
+@@ -73,9 +76,46 @@
+     }
+     return (&hb->host);
+ }
++#endif
+ 
+ /* find_inet_addr - find all addresses for this host, result to free() */
+ 
++#ifdef INET6
++struct addrinfo *find_inet_addr(host)
++char   *host;
++{
++    struct addrinfo hints, *res;
++
++    memset(&hints, 0, sizeof(hints));
++    hints.ai_family = PF_UNSPEC;
++    hints.ai_socktype = SOCK_STREAM;
++    hints.ai_flags = AI_PASSIVE | AI_NUMERICHOST;
++    if (getaddrinfo(host, NULL, &hints, &res) == 0)
++	return (res);
++
++    memset(&hints, 0, sizeof(hints));
++    hints.ai_family = PF_UNSPEC;
++    hints.ai_socktype = SOCK_STREAM;
++    hints.ai_flags = AI_PASSIVE | AI_CANONNAME;
++    if (getaddrinfo(host, NULL, &hints, &res) != 0) {
++	tcpd_warn("%s: host not found", host);
++	return (0);
++    }
++    if (res->ai_family != AF_INET6 && res->ai_family != AF_INET) {
++	tcpd_warn("%d: not an internet host", res->ai_family);
++	freeaddrinfo(res);
++	return (0);
++    }
++    if (!res->ai_canonname) {
++	tcpd_warn("%s: hostname alias", host);
++	tcpd_warn("(cannot obtain official name)", res->ai_canonname);
++    } else if (STR_NE(host, res->ai_canonname)) {
++	tcpd_warn("%s: hostname alias", host);
++	tcpd_warn("(official name: %.*s)", STRING_LENGTH, res->ai_canonname);
++    }
++    return (res);
++}
++#else
+ struct hostent *find_inet_addr(host)
+ char   *host;
+ {
+@@ -118,6 +158,7 @@
+     }
+     return (dup_hostent(hp));
+ }
++#endif
+ 
+ /* check_dns - give each address thorough workout, return address count */
+ 
+@@ -125,8 +166,13 @@
+ char   *host;
+ {
+     struct request_info request;
++#ifdef INET6
++    struct sockaddr_storage sin;
++    struct addrinfo *hp, *res;
++#else
+     struct sockaddr_in sin;
+     struct hostent *hp;
++#endif
+     int     count;
+     char   *addr;
+ 
+@@ -134,11 +180,18 @@
+ 	return (0);
+     request_init(&request, RQ_CLIENT_SIN, &sin, 0);
+     sock_methods(&request);
++#ifndef INET6
+     memset((char *) &sin, 0, sizeof(sin));
+     sin.sin_family = AF_INET;
++#endif
+ 
++#ifdef INET6
++    for (res = hp, count = 0; res; res = res->ai_next, count++) {
++	memcpy(&sin, res->ai_addr, res->ai_addrlen);
++#else
+     for (count = 0; (addr = hp->h_addr_list[count]) != 0; count++) {
+ 	memcpy((char *) &sin.sin_addr, addr, sizeof(sin.sin_addr));
++#endif
+ 
+ 	/*
+ 	 * Force host name and address conversions. Use the request structure
+@@ -151,7 +204,11 @@
+ 	    tcpd_warn("host address %s->name lookup failed",
+ 		      eval_hostaddr(request.client));
+     }
++#ifdef INET6
++    freeaddrinfo(hp);
++#else
+     free((char *) hp);
++#endif
+     return (count);
+ }
+ 
+diff -ruN tcp_wrappers_7.6.orig/scaffold.h tcp_wrappers_7.6/scaffold.h
+--- tcp_wrappers_7.6.orig/scaffold.h	1994-12-31 18:19:20.000000000 +0100
++++ tcp_wrappers_7.6/scaffold.h	2004-04-10 19:07:43.000000000 +0200
+@@ -4,6 +4,10 @@
+   * Author: Wietse Venema, Eindhoven University of Technology, The Netherlands.
+   */
+ 
++#ifdef INET6
++extern struct addrinfo *find_inet_addr();
++#else
+ extern struct hostent *find_inet_addr();
++#endif
+ extern int check_dns();
+ extern int check_path();
+diff -ruN tcp_wrappers_7.6.orig/socket.c tcp_wrappers_7.6/socket.c
+--- tcp_wrappers_7.6.orig/socket.c	2004-04-10 19:22:58.000000000 +0200
++++ tcp_wrappers_7.6/socket.c	2004-04-10 19:07:43.000000000 +0200
+@@ -24,13 +24,22 @@
+ #include <sys/types.h>
+ #include <sys/param.h>
+ #include <sys/socket.h>
++#ifdef INT32_T
++typedef uint32_t u_int32_t;
++#endif
+ #include <netinet/in.h>
+ #include <netdb.h>
+ #include <stdio.h>
+ #include <syslog.h>
+ #include <string.h>
+ 
++#ifdef INET6
++#ifndef NI_WITHSCOPEID
++#define NI_WITHSCOPEID	0
++#endif
++#else
+ extern char *inet_ntoa();
++#endif
+ 
+ /* Local stuff. */
+ 
+@@ -79,8 +88,13 @@
+ void    sock_host(request)
+ struct request_info *request;
+ {
++#ifdef INET6
++    static struct sockaddr_storage client;
++    static struct sockaddr_storage server;
++#else
+     static struct sockaddr_in client;
+     static struct sockaddr_in server;
++#endif
+     int     len;
+     char    buf[BUFSIZ];
+     int     fd = request->fd;
+@@ -109,7 +123,11 @@
+ 	memset(buf, 0 sizeof(buf));
+ #endif
+     }
++#ifdef INET6
++    request->client->sin = (struct sockaddr *)&client;
++#else
+     request->client->sin = &client;
++#endif
+ 
+     /*
+      * Determine the server binding. This is used for client username
+@@ -122,7 +140,11 @@
+ 	tcpd_warn("getsockname: %m");
+ 	return;
+     }
++#ifdef INET6
++    request->server->sin = (struct sockaddr *)&server;
++#else
+     request->server->sin = &server;
++#endif
+ }
+ 
+ /* sock_hostaddr - map endpoint address to printable form */
+@@ -130,10 +152,26 @@
+ void    sock_hostaddr(host)
+ struct host_info *host;
+ {
++#ifdef INET6
++    struct sockaddr *sin = host->sin;
++    int salen;
++
++    if (!sin)
++	return;
++#ifdef SIN6_LEN
++    salen = sin->sa_len;
++#else
++    salen = (sin->sa_family == AF_INET) ? sizeof(struct sockaddr_in)
++					: sizeof(struct sockaddr_in6);
++#endif
++    getnameinfo(sin, salen, host->addr, sizeof(host->addr),
++		NULL, 0, NI_NUMERICHOST | NI_WITHSCOPEID);
++#else
+     struct sockaddr_in *sin = host->sin;
+ 
+     if (sin != 0)
+ 	STRN_CPY(host->addr, inet_ntoa(sin->sin_addr), sizeof(host->addr));
++#endif
+ }
+ 
+ /* sock_hostname - map endpoint address to host name */
+@@ -141,6 +179,160 @@
+ void    sock_hostname(host)
+ struct host_info *host;
+ {
++#ifdef INET6
++    struct sockaddr *sin = host->sin;
++    struct sockaddr_in sin4;
++    struct addrinfo hints, *res, *res0 = NULL;
++    int salen, alen, err = 1;
++    char *ap = NULL, *rap, hname[NI_MAXHOST];
++
++    if (sin != NULL) {
++	if (sin->sa_family == AF_INET6) {
++	    struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *)sin;
++
++	    if (IN6_IS_ADDR_V4MAPPED(&sin6->sin6_addr)) {
++		memset(&sin4, 0, sizeof(sin4));
++#ifdef SIN6_LEN
++		sin4.sin_len = sizeof(sin4);
++#endif
++		sin4.sin_family = AF_INET;
++		sin4.sin_port = sin6->sin6_port;
++		sin4.sin_addr.s_addr = *(u_int32_t *)&sin6->sin6_addr.s6_addr[12];
++		sin = (struct sockaddr *)&sin4;
++	    }
++	}
++	switch (sin->sa_family) {
++	case AF_INET:
++	    ap = (char *)&((struct sockaddr_in *)sin)->sin_addr;
++	    alen = sizeof(struct in_addr);
++	    salen = sizeof(struct sockaddr_in);
++	    break;
++	case AF_INET6:
++	    ap = (char *)&((struct sockaddr_in6 *)sin)->sin6_addr;
++	    alen = sizeof(struct in6_addr);
++	    salen = sizeof(struct sockaddr_in6);
++	    break;
++	default:
++	    break;
++	}
++	if (ap)
++	    err = getnameinfo(sin, salen, hname, sizeof(hname),
++			      NULL, 0, NI_WITHSCOPEID | NI_NAMEREQD);
++    }
++    if (!err) {
++
++	STRN_CPY(host->name, hname, sizeof(host->name));
++
++	/* reject numeric addresses */
++	memset(&hints, 0, sizeof(hints));
++	hints.ai_family = sin->sa_family;
++	hints.ai_socktype = SOCK_STREAM;
++	hints.ai_flags = AI_PASSIVE | AI_CANONNAME | AI_NUMERICHOST;
++	if ((err = getaddrinfo(host->name, NULL, &hints, &res0) == 0)) {
++	    freeaddrinfo(res0);
++	    res0 = NULL;
++	    tcpd_warn("host name/name mismatch: "
++		      "reverse lookup results in non-FQDN %s",
++		      host->name);
++	    strcpy(host->name, paranoid);	/* name is bad, clobber it */
++	}
++	err = !err;
++    }
++    if (!err) {
++	/* we are now sure that this is non-numeric */
++
++	/*
++	 * Verify that the address is a member of the address list returned
++	 * by gethostbyname(hostname).
++	 * 
++	 * Verify also that gethostbyaddr() and gethostbyname() return the same
++	 * hostname, or rshd and rlogind may still end up being spoofed.
++	 * 
++	 * On some sites, gethostbyname("localhost") returns "localhost.domain".
++	 * This is a DNS artefact. We treat it as a special case. When we
++	 * can't believe the address list from gethostbyname("localhost")
++	 * we're in big trouble anyway.
++	 */
++
++	memset(&hints, 0, sizeof(hints));
++	hints.ai_family = sin->sa_family;
++	hints.ai_socktype = SOCK_STREAM;
++	hints.ai_flags = AI_PASSIVE | AI_CANONNAME;
++	if (getaddrinfo(host->name, NULL, &hints, &res0) != 0) {
++
++	    /*
++	     * Unable to verify that the host name matches the address. This
++	     * may be a transient problem or a botched name server setup.
++	     */
++
++	    tcpd_warn("can't verify hostname: getaddrinfo(%s, %s) failed",
++		      host->name,
++		      (sin->sa_family == AF_INET) ? "AF_INET" : "AF_INET6");
++
++	} else if ((res0->ai_canonname == NULL
++		    || STR_NE(host->name, res0->ai_canonname))
++		   && STR_NE(host->name, "localhost")) {
++
++	    /*
++	     * The gethostbyaddr() and gethostbyname() calls did not return
++	     * the same hostname. This could be a nameserver configuration
++	     * problem. It could also be that someone is trying to spoof us.
++	     */
++
++	    tcpd_warn("host name/name mismatch: %s != %.*s",
++		      host->name, STRING_LENGTH,
++		      (res0->ai_canonname == NULL) ? "" : res0->ai_canonname);
++
++	} else {
++
++	    /*
++	     * The address should be a member of the address list returned by
++	     * gethostbyname(). We should first verify that the h_addrtype
++	     * field is AF_INET, but this program has already caused too much
++	     * grief on systems with broken library code.
++	     */
++
++	    for (res = res0; res; res = res->ai_next) {
++		if (res->ai_family != sin->sa_family)
++		    continue;
++		switch (res->ai_family) {
++		case AF_INET:
++		    rap = (char *)&((struct sockaddr_in *)res->ai_addr)->sin_addr;
++		    break;
++		case AF_INET6:
++		    /* need to check scope_id */
++		    if (((struct sockaddr_in6 *)sin)->sin6_scope_id !=
++		        ((struct sockaddr_in6 *)res->ai_addr)->sin6_scope_id) {
++			continue;
++		    }
++		    rap = (char *)&((struct sockaddr_in6 *)res->ai_addr)->sin6_addr;
++		    break;
++		default:
++		    continue;
++		}
++		if (memcmp(rap, ap, alen) == 0) {
++		    freeaddrinfo(res0);
++		    return;			/* name is good, keep it */
++		}
++	    }
++
++	    /*
++	     * The host name does not map to the initial address. Perhaps
++	     * someone has messed up. Perhaps someone compromised a name
++	     * server.
++	     */
++
++	    getnameinfo(sin, salen, hname, sizeof(hname),
++			NULL, 0, NI_NUMERICHOST | NI_WITHSCOPEID);
++	    tcpd_warn("host name/address mismatch: %s != %.*s",
++		      hname, STRING_LENGTH,
++		      (res0->ai_canonname == NULL) ? "" : res0->ai_canonname);
++	}
++	strcpy(host->name, paranoid);		/* name is bad, clobber it */
++	if (res0)
++	    freeaddrinfo(res0);
++    }
++#else /* INET6 */
+     struct sockaddr_in *sin = host->sin;
+     struct hostent *hp;
+     int     i;
+@@ -220,6 +412,7 @@
+ 	}
+ 	strcpy(host->name, paranoid);		/* name is bad, clobber it */
+     }
++#endif /* INET6 */
+ }
+ 
+ /* sock_sink - absorb unreceived IP datagram */
+@@ -228,7 +421,11 @@
+ int     fd;
+ {
+     char    buf[BUFSIZ];
++#ifdef INET6
++    struct sockaddr_storage sin;
++#else
+     struct sockaddr_in sin;
++#endif
+     int     size = sizeof(sin);
+ 
+     /*
+diff -ruN tcp_wrappers_7.6.orig/tcpd.c tcp_wrappers_7.6/tcpd.c
+--- tcp_wrappers_7.6.orig/tcpd.c	1996-02-11 17:01:33.000000000 +0100
++++ tcp_wrappers_7.6/tcpd.c	2004-04-10 19:07:43.000000000 +0200
+@@ -120,7 +120,12 @@
+ 
+     /* Report request and invoke the real daemon program. */
+ 
++#ifdef INET6
++    syslog(allow_severity, "connect from %s (%s)",
++	   eval_client(&request), eval_hostaddr(request.client));
++#else
+     syslog(allow_severity, "connect from %s", eval_client(&request));
++#endif
+     closelog();
+     (void) execv(path, argv);
+     syslog(LOG_ERR, "error: cannot execute %s: %m", path);
+diff -ruN tcp_wrappers_7.6.orig/tcpdchk.c tcp_wrappers_7.6/tcpdchk.c
+--- tcp_wrappers_7.6.orig/tcpdchk.c	1997-02-12 02:13:25.000000000 +0100
++++ tcp_wrappers_7.6/tcpdchk.c	2004-04-10 19:07:43.000000000 +0200
+@@ -22,6 +22,9 @@
+ 
+ #include <sys/types.h>
+ #include <sys/stat.h>
++#ifdef INET6
++#include <sys/socket.h>
++#endif
+ #include <netinet/in.h>
+ #include <arpa/inet.h>
+ #include <stdio.h>
+@@ -397,6 +400,31 @@
+     }
+ }
+ 
++#ifdef INET6
++static int is_inet6_addr(pat)
++    char *pat;
++{
++    struct addrinfo hints, *res;
++    int len, ret;
++    char ch;
++
++    if (*pat != '[')
++	return (0);
++    len = strlen(pat);
++    if ((ch = pat[len - 1]) != ']')
++	return (0);
++    pat[len - 1] = '\0';
++    memset(&hints, 0, sizeof(hints));
++    hints.ai_family = AF_INET6;
++    hints.ai_socktype = SOCK_STREAM;
++    hints.ai_flags = AI_PASSIVE | AI_NUMERICHOST;
++    if ((ret = getaddrinfo(pat + 1, NULL, &hints, &res)) == 0)
++	freeaddrinfo(res);
++    pat[len - 1] = ch;
++    return (ret == 0);
++}
++#endif
++
+ /* check_host - criticize host pattern */
+ 
+ static int check_host(pat)
+@@ -423,14 +451,27 @@
+ #endif
+ #endif
+     } else if (mask = split_at(pat, '/')) {	/* network/netmask */
++#ifdef INET6
++	int mask_len;
++
++	if ((dot_quad_addr(pat) == INADDR_NONE
++	    || dot_quad_addr(mask) == INADDR_NONE)
++	    && (!is_inet6_addr(pat)
++		|| ((mask_len = atoi(mask)) < 0 || mask_len > 128)))
++#else
+ 	if (dot_quad_addr(pat) == INADDR_NONE
+ 	    || dot_quad_addr(mask) == INADDR_NONE)
++#endif
+ 	    tcpd_warn("%s/%s: bad net/mask pattern", pat, mask);
+     } else if (STR_EQ(pat, "FAIL")) {		/* obsolete */
+ 	tcpd_warn("FAIL is no longer recognized");
+ 	tcpd_warn("(use EXCEPT or DENY instead)");
+     } else if (reserved_name(pat)) {		/* other reserved */
+ 	 /* void */ ;
++#ifdef INET6
++    } else if (is_inet6_addr(pat)) { /* IPv6 address */
++	addr_count = 1;
++#endif
+     } else if (NOT_INADDR(pat)) {		/* internet name */
+ 	if (pat[strlen(pat) - 1] == '.') {
+ 	    tcpd_warn("%s: domain or host name ends in dot", pat);
+diff -ruN tcp_wrappers_7.6.orig/tcpd.h tcp_wrappers_7.6/tcpd.h
+--- tcp_wrappers_7.6.orig/tcpd.h	1996-03-19 16:22:25.000000000 +0100
++++ tcp_wrappers_7.6/tcpd.h	2004-04-10 19:07:43.000000000 +0200
+@@ -11,7 +11,11 @@
+ struct host_info {
+     char    name[STRING_LENGTH];	/* access via eval_hostname(host) */
+     char    addr[STRING_LENGTH];	/* access via eval_hostaddr(host) */
++#ifdef INET6
++    struct sockaddr *sin;		/* socket address or 0 */
++#else
+     struct sockaddr_in *sin;		/* socket address or 0 */
++#endif
+     struct t_unitdata *unit;		/* TLI transport address or 0 */
+     struct request_info *request;	/* for shared information */
+ };
+diff -ruN tcp_wrappers_7.6.orig/tcpdmatch.c tcp_wrappers_7.6/tcpdmatch.c
+--- tcp_wrappers_7.6.orig/tcpdmatch.c	1996-02-11 17:01:36.000000000 +0100
++++ tcp_wrappers_7.6/tcpdmatch.c	2004-04-10 19:07:43.000000000 +0200
+@@ -57,7 +57,11 @@
+ int     argc;
+ char  **argv;
+ {
++#ifdef INET6
++    struct addrinfo hints, *hp, *res;
++#else
+     struct hostent *hp;
++#endif
+     char   *myname = argv[0];
+     char   *client;
+     char   *server;
+@@ -68,8 +72,13 @@
+     int     ch;
+     char   *inetcf = 0;
+     int     count;
++#ifdef INET6
++    struct sockaddr_storage server_sin;
++    struct sockaddr_storage client_sin;
++#else
+     struct sockaddr_in server_sin;
+     struct sockaddr_in client_sin;
++#endif
+     struct stat st;
+ 
+     /*
+@@ -172,13 +181,20 @@
+     if (NOT_INADDR(server) == 0 || HOSTNAME_KNOWN(server)) {
+ 	if ((hp = find_inet_addr(server)) == 0)
+ 	    exit(1);
++#ifndef INET6
+ 	memset((char *) &server_sin, 0, sizeof(server_sin));
+ 	server_sin.sin_family = AF_INET;
++#endif
+ 	request_set(&request, RQ_SERVER_SIN, &server_sin, 0);
+ 
++#ifdef INET6
++	for (res = hp, count = 0; res; res = res->ai_next, count++) {
++	    memcpy(&server_sin, res->ai_addr, res->ai_addrlen);
++#else
+ 	for (count = 0; (addr = hp->h_addr_list[count]) != 0; count++) {
+ 	    memcpy((char *) &server_sin.sin_addr, addr,
+ 		   sizeof(server_sin.sin_addr));
++#endif
+ 
+ 	    /*
+ 	     * Force evaluation of server host name and address. Host name
+@@ -194,7 +210,11 @@
+ 	    fprintf(stderr, "Please specify an address instead\n");
+ 	    exit(1);
+ 	}
++#ifdef INET6
++	freeaddrinfo(hp);
++#else
+ 	free((char *) hp);
++#endif
+     } else {
+ 	request_set(&request, RQ_SERVER_NAME, server, 0);
+     }
+@@ -208,6 +228,18 @@
+ 	tcpdmatch(&request);
+ 	exit(0);
+     }
++#ifdef INET6
++    memset(&hints, 0, sizeof(hints));
++    hints.ai_family = AF_INET6;
++    hints.ai_socktype = SOCK_STREAM;
++    hints.ai_flags = AI_PASSIVE | AI_NUMERICHOST;
++    if (getaddrinfo(client, NULL, &hints, &res) == 0) {
++	freeaddrinfo(res);
++	request_set(&request, RQ_CLIENT_ADDR, client, 0);
++	tcpdmatch(&request);
++	exit(0);
++    }
++#endif
+ 
+     /*
+      * Perhaps they are testing special client hostname patterns that aren't
+@@ -229,6 +261,34 @@
+      */
+     if ((hp = find_inet_addr(client)) == 0)
+ 	exit(1);
++#ifdef INET6
++    request_set(&request, RQ_CLIENT_SIN, &client_sin, 0);
++
++    for (res = hp, count = 0; res; res = res->ai_next, count++) {
++	memcpy(&client_sin, res->ai_addr, res->ai_addrlen);
++
++	/*
++	 * getnameinfo() doesn't do reverse lookup against link-local
++	 * address.  So, we pass through host name evaluation against
++	 * such addresses.
++	 */
++	if (res->ai_family != AF_INET6 ||
++	    !IN6_IS_ADDR_LINKLOCAL(&((struct sockaddr_in6 *)res->ai_addr)->sin6_addr)) {
++	    /*
++	     * Force evaluation of client host name and address. Host name
++	     * conflicts will be reported while eval_hostname() does its job.
++	     */
++	    request_set(&request, RQ_CLIENT_NAME, "", RQ_CLIENT_ADDR, "", 0);
++	    if (STR_EQ(eval_hostname(request.client), unknown))
++		tcpd_warn("host address %s->name lookup failed",
++			  eval_hostaddr(request.client));
++	}
++	tcpdmatch(&request);
++	if (res->ai_next)
++	    printf("\n");
++    }
++    freeaddrinfo(hp);
++#else
+     memset((char *) &client_sin, 0, sizeof(client_sin));
+     client_sin.sin_family = AF_INET;
+     request_set(&request, RQ_CLIENT_SIN, &client_sin, 0);
+@@ -250,6 +310,7 @@
+ 	    printf("\n");
+     }
+     free((char *) hp);
++#endif
+     exit(0);
+ }
+ 
+diff -ruN tcp_wrappers_7.6.orig/tli.c tcp_wrappers_7.6/tli.c
+--- tcp_wrappers_7.6.orig/tli.c	1997-03-21 19:27:26.000000000 +0100
++++ tcp_wrappers_7.6/tli.c	2004-04-10 19:07:43.000000000 +0200
+@@ -65,8 +65,13 @@
+ void    tli_host(request)
+ struct request_info *request;
+ {
++#ifdef INET6
++    static struct sockaddr_storage client;
++    static struct sockaddr_storage server;
++#else
+     static struct sockaddr_in client;
+     static struct sockaddr_in server;
++#endif
+ 
+     /*
+      * If we discover that we are using an IP transport, pretend we never
+@@ -76,14 +81,29 @@
+ 
+     tli_endpoints(request);
+     if ((request->config = tli_transport(request->fd)) != 0
++#ifdef INET6
++	&& (STR_EQ(request->config->nc_protofmly, "inet") ||
++	    STR_EQ(request->config->nc_protofmly, "inet6"))) {
++#else
+ 	&& STR_EQ(request->config->nc_protofmly, "inet")) {
++#endif
+ 	if (request->client->unit != 0) {
++#ifdef INET6
++	    client = *(struct sockaddr_storage *) request->client->unit->addr.buf;
++	    request->client->sin = (struct sockaddr *) &client;
++#else
+ 	    client = *(struct sockaddr_in *) request->client->unit->addr.buf;
+ 	    request->client->sin = &client;
++#endif
+ 	}
+ 	if (request->server->unit != 0) {
++#ifdef INET6
++	    server = *(struct sockaddr_storage *) request->server->unit->addr.buf;
++	    request->server->sin = (struct sockaddr *) &server;
++#else
+ 	    server = *(struct sockaddr_in *) request->server->unit->addr.buf;
+ 	    request->server->sin = &server;
++#endif
+ 	}
+ 	tli_cleanup(request);
+ 	sock_methods(request);
+@@ -187,7 +207,15 @@
+     }
+     while (config = getnetconfig(handlep)) {
+ 	if (stat(config->nc_device, &from_config) == 0) {
++#ifdef NO_CLONE_DEVICE
++	/*
++	 * If the network devices are not cloned (as is the case for
++	 * Solaris 8 Beta), we must compare the major device numbers.
++	 */
++	    if (major(from_config.st_rdev) == major(from_client.st_rdev))
++#else
+ 	    if (minor(from_config.st_rdev) == major(from_client.st_rdev))
++#endif
+ 		break;
+ 	}
+     }
+diff -ruN tcp_wrappers_7.6.orig/update.c tcp_wrappers_7.6/update.c
+--- tcp_wrappers_7.6.orig/update.c	1994-12-28 17:42:56.000000000 +0100
++++ tcp_wrappers_7.6/update.c	2004-04-10 19:07:43.000000000 +0200
+@@ -46,10 +46,18 @@
+ 	    request->fd = va_arg(ap, int);
+ 	    continue;
+ 	case RQ_CLIENT_SIN:
++#ifdef INET6
++	    request->client->sin = va_arg(ap, struct sockaddr *);
++#else
+ 	    request->client->sin = va_arg(ap, struct sockaddr_in *);
++#endif
+ 	    continue;
+ 	case RQ_SERVER_SIN:
++#ifdef INET6
++	    request->server->sin = va_arg(ap, struct sockaddr *);
++#else
+ 	    request->server->sin = va_arg(ap, struct sockaddr_in *);
++#endif
+ 	    continue;
+ 
+ 	    /*
+diff -ruN tcp_wrappers_7.6.orig/workarounds.c tcp_wrappers_7.6/workarounds.c
+--- tcp_wrappers_7.6.orig/workarounds.c	1996-03-19 16:22:26.000000000 +0100
++++ tcp_wrappers_7.6/workarounds.c	2004-04-10 19:07:43.000000000 +0200
+@@ -166,11 +166,22 @@
+ int    *len;
+ {
+     int     ret;
++#ifdef INET6
++    struct sockaddr *sin = sa;
++#else
+     struct sockaddr_in *sin = (struct sockaddr_in *) sa;
++#endif
+ 
+     if ((ret = getpeername(sock, sa, len)) >= 0
++#ifdef INET6
++	&& ((sin->su_si.si_family == AF_INET6
++	     && IN6_IS_ADDR_UNSPECIFIED(&sin->su_sin6.sin6_addr))
++	    || (sin->su_si.si_family == AF_INET
++		&& sin->su_sin.sin_addr.s_addr == 0))) {
++#else
+ 	&& sa->sa_family == AF_INET
+ 	&& sin->sin_addr.s_addr == 0) {
++#endif
+ 	errno = ENOTCONN;
+ 	return (-1);
+     } else {

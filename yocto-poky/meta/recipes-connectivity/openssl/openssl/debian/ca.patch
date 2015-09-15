@@ -1,0 +1,22 @@
+Upstream-Status: Backport [debian]
+
+Index: openssl-0.9.8m/apps/CA.pl.in
+===================================================================
+--- openssl-0.9.8m.orig/apps/CA.pl.in	2006-04-28 00:28:51.000000000 +0000
++++ openssl-0.9.8m/apps/CA.pl.in	2010-02-27 00:36:51.000000000 +0000
+@@ -65,6 +65,7 @@
+ foreach (@ARGV) {
+ 	if ( /^(-\?|-h|-help)$/ ) {
+ 	    print STDERR "usage: CA -newcert|-newreq|-newreq-nodes|-newca|-sign|-verify\n";
++	    print STDERR "usage: CA -signcert certfile keyfile|-newcert|-newreq|-newca|-sign|-verify\n";
+ 	    exit 0;
+ 	} elsif (/^-newcert$/) {
+ 	    # create a certificate
+@@ -165,6 +166,7 @@
+ 	} else {
+ 	    print STDERR "Unknown arg $_\n";
+ 	    print STDERR "usage: CA -newcert|-newreq|-newreq-nodes|-newca|-sign|-verify\n";
++	    print STDERR "usage: CA -signcert certfile keyfile|-newcert|-newreq|-newca|-sign|-verify\n";
+ 	    exit 1;
+ 	}
+ }

@@ -1,0 +1,32 @@
+From 55f6fd8f1958aa36584eefeecce782a505963c88 Mon Sep 17 00:00:00 2001
+From: benvm <benvm@yow-gmoffatt-lx2.wrs.com>
+Date: Wed, 9 Jan 2013 12:14:06 -0500
+Subject: [PATCH] Fix Makefile regular expression
+
+This patch modifies a regular expression within a Makefile to stop builds
+from failing in the case where the path contains the characters ".a".
+
+Upstream-Status: Submitted
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+---
+ Makefile.prog.in |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/Makefile.prog.in b/Makefile.prog.in
+index 76310c9..44c3534 100644
+--- a/Makefile.prog.in
++++ b/Makefile.prog.in
+@@ -12,7 +12,7 @@ LINKFLAGS = @LINKFLAGS@
+ 
+ ALL_LIBS = $(XLIBS) $(LIBS)
+ Makefile.lt:
+-	echo 'LT_LIBS='`echo $(ALL_LIBS)|sed 's/\.a/.la/g'` >Makefile.lt
++	echo 'LT_LIBS='`echo $(ALL_LIBS) | sed 's/\.a\s/\.la /g' | sed s/\.a$$/\.la/` > Makefile.lt
+ 
+ PROG:=$(shell echo "$(PROG)" | sed '@program_transform_name@')
+ 
+-- 
+1.7.0.4
+

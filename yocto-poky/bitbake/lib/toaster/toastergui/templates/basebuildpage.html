@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load projecttags %}
+{% load humanize %}
+{% block pagecontent %}
+
+
+ <div class="">
+<!-- Breadcrumbs -->
+    <div class="section">
+        <ul class="breadcrumb" id="breadcrumb">
+            <li class="muted">{{build.project.name}}:</li>
+            <li><a href="{% url 'projectbuilds' build.project.id %}">Builds</a></li>
+            <li>
+            {% block parentbreadcrumb %}
+            <a href="{%url 'builddashboard' build.pk%}">
+                {{build.get_sorted_target_list.0.target}} {%if build.target_set.all.count > 1%}(+ {{build.target_set.all.count|add:"-1"}}){%endif%} ({{build.completed_on|date:"d/m/y H:i"}})
+            </a>
+            {% endblock %}
+            </li>
+            {% block localbreadcrumb %}{% endblock %}
+        </ul>
+        <script>
+        $( function () {
+            $('#breadcrumb > li').append('<span class="divider">&rarr;</span>');
+            $('#breadcrumb > li:last').addClass("active");
+            $('#breadcrumb > li:last > span, #breadcrumb > li:first > span').remove();
+	    console.log("done");
+        });
+        </script>
+    </div>
+
+    <div class="row-fluid">
+
+        <!-- begin left sidebar container -->
+        <div id="nav" class="span2">
+            <ul class="nav nav-list well">
+              <li
+                {% if request.resolver_match.url_name == 'builddashboard'  %}
+                  class="active"
+                {% endif %} >
+                <a class="nav-parent" href="{% url 'builddashboard' build.pk %}">Build summary</a>
+              </li>
+              {% if build.target_set.all.0.is_image and build.outcome == 0 %}
+                <li class="nav-header">Images</li>
+                {% block nav-target %}
+                  {% for t in build.get_sorted_target_list %}
+                    <li><a href="{% url 'target' build.pk t.pk %}">{{t.target}}</a><li>
+                  {% endfor %}
+                {% endblock %}
+              {% endif %}
+              <li class="nav-header">Build</li>
+              {% block nav-configuration %}
+                  <li><a href="{% url 'configuration' build.pk %}">Configuration</a></li>
+              {% endblock %}
+              {% block nav-tasks %}
+                  <li><a href="{% url 'tasks' build.pk %}">Tasks</a></li>
+              {% endblock %}
+              {% block nav-recipes %}
+                  <li><a href="{% url 'recipes' build.pk %}">Recipes</a></li>
+              {% endblock %}
+              {% block nav-packages %}
+                  <li><a href="{% url 'packages' build.pk %}">Packages</a></li>
+              {% endblock %}
+                  <li class="nav-header">Performance</li>
+              {% block nav-buildtime %}
+                  <li><a href="{% url 'buildtime' build.pk %}">Time</a></li>
+              {% endblock %}
+              {% block nav-cpuusage %}
+                  <li><a href="{% url 'cpuusage' build.pk %}">CPU usage</a></li>
+              {% endblock %}
+              {% block nav-diskio %}
+                  <li><a href="{% url 'diskio' build.pk %}">Disk I/O</a></li>
+              {% endblock %}
+            </ul>
+        </div>
+        <!-- end left sidebar container -->
+
+        <!-- Begin right container -->
+        {% block buildinfomain %}{% endblock %}
+        <!-- End right container -->
+
+
+    </div>
+  </div>
+
+
+{% endblock %}
+

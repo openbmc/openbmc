@@ -1,0 +1,42 @@
+From f771407d3e0288ca0c06a894194d3ddad69b9a8e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 20 Feb 2015 05:17:05 +0000
+Subject: [PATCH 07/11] util: Use mkostemp only if libc supports it
+
+Upstream-Status: Denied [no desire for uclibc support]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/basic/util.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/src/basic/util.c b/src/basic/util.c
+index dc65280..72f4665 100644
+--- a/src/basic/util.c
++++ b/src/basic/util.c
+@@ -97,6 +97,8 @@
+ #include "def.h"
+ #include "sparse-endian.h"
+ 
++#include "config.h"
++
+ int saved_argc = 0;
+ char **saved_argv = NULL;
+ 
+@@ -6682,7 +6684,13 @@ int mkostemp_safe(char *pattern, int flags) {
+ 
+         u = umask(077);
+ 
++#ifdef HAVE_MKOSTEMP
+         fd = mkostemp(pattern, flags);
++#else
++        fd = mkstemp(pattern);
++        if (fd >= 0) fcntl(fd, F_SETFD, flags);
++#endif /* HAVE_MKOSTEMP */
++
+         if (fd < 0)
+                 return -errno;
+ 
+-- 
+2.1.4
+

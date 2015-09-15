@@ -1,0 +1,9 @@
+We need to implement tests:
+
+automated link checker; currently
+$ linkchecker -t 1000 -F csv http://localhost:8000/
+
+integrate the w3c-validation service; currently
+$ python urlcheck.py
+
+

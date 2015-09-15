@@ -1,0 +1,14 @@
+# yocto-bsp-filename {{=machine}}.scc
+kconf hardware {{=machine}}.cfg
+
+include features/serial/8250.scc
+{{ if xserver == "y" and xserver_choice == "xserver_vesa": }}
+include cfg/vesafb.scc
+{{ if xserver == "y" and xserver_choice == "xserver_i915" or xserver_choice == "xserver_i965": }}
+include features/i915/i915.scc
+
+include cfg/usb-mass-storage.scc
+include features/power/intel.scc
+
+kconf hardware {{=machine}}-user-config.cfg
+include {{=machine}}-user-patches.scc

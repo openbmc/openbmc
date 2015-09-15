@@ -1,0 +1,27 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+The FHS indicates that /etc must be capable of being mounted R/O.
+
+The FHS also indicates that lock files belong in /var/lock, and /var must
+be R/W as soon as possible during boot.
+
+This patch moves the mtab lock file from the potentially R/O /etc, to the
+R/W /var/lock area.  This lock file is used when mounting disks and making
+other mount adjustments.  The _PATH_MOUNTED_TMP is not adjusted, as failing
+to write to this file does not cause any functional limitations.
+
+(Note, if /etc is R/O, then /etc/mtab should be a symlink to /proc/mounts)
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+--- util-linux-ng-2.16/include/pathnames.h.orig
++++ util-linux-ng-2.16/include/pathnames.h
+@@ -90,7 +90,7 @@
+ # endif
+ #endif
+ 
+-#define _PATH_MOUNTED_LOCK	_PATH_MOUNTED "~"
++#define _PATH_MOUNTED_LOCK	"/var/lock/mtab~"
+ #define _PATH_MOUNTED_TMP	_PATH_MOUNTED ".tmp"
+ 
+ #ifndef _PATH_DEV

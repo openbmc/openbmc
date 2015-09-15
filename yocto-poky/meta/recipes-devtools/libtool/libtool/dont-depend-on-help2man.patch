@@ -1,0 +1,30 @@
+Upstream-Status: Inappropriate
+
+Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
+Updated by: Robert Yang <liezhi.yang@windriver.com>
+
+diff --git a/Makefile.am b/Makefile.am
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -404,21 +404,6 @@ $(notes_txt): $(notes_texi)
+ 	$(AM_V_GEN)$(MAKEINFO) -P '$(srcdir)/doc' --no-headers \
+ 	    $(MAKEINFOFLAGS) -o '$@' '$(notes_texi)'
+ 
+-dist_man1_MANS		= $(libtool_1) $(libtoolize_1)
+-MAINTAINERCLEANFILES	+= $(dist_man1_MANS)
+-update_mans = \
+-  PATH=".$(PATH_SEPARATOR)$$PATH"; export PATH; \
+-  $(HELP2MAN) --output='$@'
+-
+-# It's wrong to make distributed files (e.g. $(libtool_1)) rely on
+-# files created in the build tree, so instead we regenerate the
+-# manual pages if the sources for the build-tree files we want to
+-# run have changed.
+-$(libtool_1): $(ltmain_sh)
+-	$(AM_V_GEN)$(update_mans) --help-option=--help-all libtool
+-$(libtoolize_1): $(libtoolize_in)
+-	$(AM_V_GEN)$(update_mans) libtoolize
+-
+ 
+ ## ------------- ##
+ ## Installation. ##

@@ -1,0 +1,50 @@
+From 8a356d4b6a242ce63b73920d3ed33f88f9e12fe3 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Sun, 6 Sep 2015 05:20:43 -0400
+Subject: [PATCH] gnu-efi: Make setjmp.S portable to ARM
+
+This patch fixes the following error:
+
+  .../lib/arm/setjmp.S:18: Error: unrecognized symbol type ""
+  .../lib/arm/setjmp.S:26: Error: unrecognized symbol type ""
+
+The problem is the assembly syntax that is used is not portable to ARM,
+where the '@' symbol is a comment:
+
+  > Note on targets where the @ character is the start of a comment
+  > (eg ARM) then another character is used instead. For example the
+  > ARM port uses the % character.
+
+(From https://sourceware.org/binutils/docs-2.25/as/Section.html#Section)
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ lib/arm/setjmp.S | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/arm/setjmp.S b/lib/arm/setjmp.S
+index 6e3fbf0..85c8705 100644
+--- a/lib/arm/setjmp.S
++++ b/lib/arm/setjmp.S
+@@ -15,7 +15,7 @@ BASIS,
+ 	.text
+ 	.arm
+ 	.globl	setjmp
+-	.type	setjmp, @function
++	.type	setjmp, %function
+ setjmp:
+ 	mov	r3, r13
+ 	stmia	r0, {r3-r12,r14}
+@@ -23,6 +23,6 @@ setjmp:
+ 	bx	lr
+ 
+ 	.globl	longjmp
+-	.type	longjmp, @function
++	.type	longjmp, %function
+ longjmp:
+ 	ldmia	r0, {r3-r12,r14}
+-- 
+1.9.1
+

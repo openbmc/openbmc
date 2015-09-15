@@ -1,0 +1,20 @@
+OE has perl binary as 'nativeperl' in native sysroot so we look for it
+in order to avoid intltool searching and finding perl from /usr/bin
+on build system which may not have all the modules that it needs.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Inappropriate [OE specific]
+Index: intltool-0.40.6/intltool.m4
+===================================================================
+--- intltool-0.40.6.orig/intltool.m4	2009-02-14 14:12:28.000000000 -0800
++++ intltool-0.40.6/intltool.m4	2011-08-09 08:07:16.427347846 -0700
+@@ -110,7 +110,7 @@
+     AC_MSG_ERROR([GNU gettext tools not found; required for intltool])
+ fi
+ 
+-AC_PATH_PROG(INTLTOOL_PERL, perl)
++AC_PATH_PROG(INTLTOOL_PERL, nativeperl)
+ if test -z "$INTLTOOL_PERL"; then
+    AC_MSG_ERROR([perl not found])
+ fi

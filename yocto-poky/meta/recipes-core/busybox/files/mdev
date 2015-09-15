@@ -1,0 +1,19 @@
+#!/bin/sh
+
+mount -t tmpfs tmpfs /dev  -o size=64k,mode=0755
+mkdir /dev/pts /dev/shm
+chmod 777 /dev/shm
+mount -t devpts devpts /dev/pts
+touch /dev/mdev.seq
+echo "/sbin/mdev" > /proc/sys/kernel/hotplug
+mdev -s
+
+#
+# We might have mounted something over /dev, see if /dev/initctl is there.
+#
+if test ! -p /dev/initctl
+then
+        rm -f /dev/initctl
+        mknod -m 600 /dev/initctl p
+fi
+

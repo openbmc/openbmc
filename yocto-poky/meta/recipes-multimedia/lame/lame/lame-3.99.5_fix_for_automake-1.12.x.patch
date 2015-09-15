@@ -1,0 +1,59 @@
+Upstream-Status: Pending
+
+Fix this kind of errors with automake 1.12.x:
+| doc/man/Makefile.am:3: error: automatic de-ANSI-fication support has been removed
+| autoreconf: automake failed with exit status: 1
+
+Signed-Off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
+2012/07/13
+
+Index: lame-3.99.5/configure.in
+===================================================================
+--- lame-3.99.5.orig/configure.in
++++ lame-3.99.5/configure.in
+@@ -77,9 +77,6 @@ if test "${GCC}" = "yes"; then
+ 	AC_MSG_RESULT(${GCC_version})
+ fi
+ 
+-dnl more automake stuff
+-AM_C_PROTOTYPES
+-
+ AC_CHECK_HEADER(dmalloc.h)
+ if test "${ac_cv_header_dmalloc_h}" = "yes"; then
+ 	AM_WITH_DMALLOC
+Index: lame-3.99.5/doc/html/Makefile.am
+===================================================================
+--- lame-3.99.5.orig/doc/html/Makefile.am
++++ lame-3.99.5/doc/html/Makefile.am
+@@ -1,6 +1,6 @@
+ ## $Id: Makefile.am,v 1.7 2010/09/30 20:58:40 jaz001 Exp $
+ 
+-AUTOMAKE_OPTIONS = foreign ansi2knr
++AUTOMAKE_OPTIONS = foreign
+ 
+ docdir = $(datadir)/doc
+ pkgdocdir = $(docdir)/$(PACKAGE)
+Index: lame-3.99.5/libmp3lame/i386/Makefile.am
+===================================================================
+--- lame-3.99.5.orig/libmp3lame/i386/Makefile.am
++++ lame-3.99.5/libmp3lame/i386/Makefile.am
+@@ -1,6 +1,6 @@
+ ## $Id: Makefile.am,v 1.26 2011/04/04 09:42:34 aleidinger Exp $
+ 
+-AUTOMAKE_OPTIONS = foreign $(top_srcdir)/ansi2knr
++AUTOMAKE_OPTIONS = foreign
+ 
+ DEFS = @DEFS@ @CONFIG_DEFS@
+ 
+Index: lame-3.99.5/doc/man/Makefile.am
+===================================================================
+--- lame-3.99.5.orig/doc/man/Makefile.am
++++ lame-3.99.5/doc/man/Makefile.am
+@@ -1,6 +1,6 @@
+ ## $Id: Makefile.am,v 1.1 2000/10/22 11:39:44 aleidinger Exp $
+ 
+-AUTOMAKE_OPTIONS = foreign ansi2knr
++AUTOMAKE_OPTIONS = foreign
+ 
+ man_MANS = lame.1
+ EXTRA_DIST = ${man_MANS}

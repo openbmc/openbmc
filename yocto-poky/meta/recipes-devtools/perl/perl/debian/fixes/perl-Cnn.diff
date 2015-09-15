@@ -1,0 +1,73 @@
+From 0ecf83f259db09cb38cb37c9b22e72be185afa8f Mon Sep 17 00:00:00 2001
+From: Hugo van der Sanden <hv@crypt.org>
+Date: Thu, 11 Jun 2015 12:25:40 +0100
+Subject: fix -Cnn parsing
+
+Commit 22ff313068 for [perl #123814] inadvertently changed the logic when
+parsing a numeric parameter to the -C option, such that the successfully
+parsed number was not saved as the option value if it parsed to the end
+of the argument.
+
+Bug: https://rt.perl.org/Ticket/Display.html?id=125381
+Bug-Debian: https://bugs.debian.org/788636
+Origin: upstream, http://perl5.git.perl.org/perl.git/commit/89d84ff965
+Patch-Name: fixes/perl-Cnn.diff
+---
+ t/run/switchC.t |  7 ++++++-
+ util.c          | 17 ++++++++---------
+ 2 files changed, 14 insertions(+), 10 deletions(-)
+
+diff --git a/t/run/switchC.t b/t/run/switchC.t
+index f6aa868..4f63c3b 100644
+--- a/t/run/switchC.t
++++ b/t/run/switchC.t
+@@ -11,7 +11,7 @@ BEGIN {
+     skip_all_if_miniperl('-C and $ENV{PERL_UNICODE} are disabled on miniperl');
+ }
+ 
+-plan(tests => 13);
++plan(tests => 14);
+ 
+ my $r;
+ 
+@@ -25,6 +25,11 @@ $r = runperl( switches => [ '-CO', '-w' ],
+               stderr   => 1 );
+ like( $r, qr/^$b(?:\r?\n)?$/s, '-CO: no warning on UTF-8 output' );
+ 
++$r = runperl( switches => [ '-C2', '-w' ],
++	      prog     => 'print chr(256)',
++              stderr   => 1 );
++like( $r, qr/^$b(?:\r?\n)?$/s, '-C2: no warning on UTF-8 output' );
++
+ SKIP: {
+     if (exists $ENV{PERL_UNICODE} &&
+ 	($ENV{PERL_UNICODE} eq "" || $ENV{PERL_UNICODE} =~ /[SO]/)) {
+diff --git a/util.c b/util.c
+index 8cf62f5..ee23314 100644
+--- a/util.c
++++ b/util.c
+@@ -4420,16 +4420,15 @@ Perl_parse_unicode_opts(pTHX_ const char **popt)
+        if (isDIGIT(*p)) {
+             const char* endptr;
+             UV uv;
+-            if (grok_atoUV(p, &uv, &endptr)
+-                && uv <= U32_MAX
+-                && (p = endptr)
+-                && *p && *p != '\n' && *p != '\r'
+-            ) {
++            if (grok_atoUV(p, &uv, &endptr) && uv <= U32_MAX) {
+                 opt = (U32)uv;
+-                if (isSPACE(*p))
+-                    goto the_end_of_the_opts_parser;
+-                else
+-                    Perl_croak(aTHX_ "Unknown Unicode option letter '%c'", *p);
++                p = endptr;
++                if (p && *p && *p != '\n' && *p != '\r') {
++                    if (isSPACE(*p))
++                        goto the_end_of_the_opts_parser;
++                    else
++                        Perl_croak(aTHX_ "Unknown Unicode option letter '%c'", *p);
++                }
+             }
+         }
+         else {

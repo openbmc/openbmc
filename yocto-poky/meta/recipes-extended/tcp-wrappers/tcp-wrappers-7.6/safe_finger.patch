@@ -1,0 +1,31 @@
+Upstream-Status: Backport
+
+--- tcp-wrappers-7.6-ipv6.1.orig/safe_finger.c
++++ tcp-wrappers-7.6-ipv6.1/safe_finger.c
+@@ -26,21 +26,24 @@
+ #include <stdio.h>
+ #include <ctype.h>
+ #include <pwd.h>
++#include <syslog.h>
+ 
+ extern void exit();
+ 
+ /* Local stuff */
+ 
+-char    path[] = "PATH=/bin:/usr/bin:/usr/ucb:/usr/bsd:/etc:/usr/etc:/usr/sbin";
++char    path[] = "PATH=/bin:/usr/bin:/sbin:/usr/sbin";
+ 
+ #define	TIME_LIMIT	60		/* Do not keep listinging forever */
+ #define	INPUT_LENGTH	100000		/* Do not keep listinging forever */
+ #define	LINE_LENGTH	128		/* Editors can choke on long lines */
+ #define	FINGER_PROGRAM	"finger"	/* Most, if not all, UNIX systems */
+ #define	UNPRIV_NAME	"nobody"	/* Preferred privilege level */
+-#define	UNPRIV_UGID	32767		/* Default uid and gid */
++#define	UNPRIV_UGID	65534		/* Default uid and gid */
+ 
+ int     finger_pid;
++int	allow_severity = SEVERITY;
++int	deny_severity = LOG_WARNING;
+ 
+ void    cleanup(sig)
+ int     sig;

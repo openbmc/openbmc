@@ -1,0 +1,24 @@
+Upstream-Status: Pending
+
+This fixes sed issue when prefix has / in it, like /usr/local
+
+autoreconf error avoided:
+| sed: -e expression #1, char 9: unknown option to `s'
+| configure.ac:39: error: AC_INIT should be called with package and version arguments
+
+Signed-Off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
+2012/05/01
+
+Index: guile-2.0.5/build-aux/git-version-gen
+===================================================================
+--- guile-2.0.5.orig/build-aux/git-version-gen
++++ guile-2.0.5/build-aux/git-version-gen
+@@ -187,7 +187,7 @@ else
+     v=UNKNOWN
+ fi
+ 
+-v=`echo "$v" |sed "s/^$prefix//"`
++v=`echo "$v" |sed "s#^$prefix##"`
+ 
+ # Test whether to append the "-dirty" suffix only if the version
+ # string we're using came from git.  I.e., skip the test if it's "UNKNOWN"

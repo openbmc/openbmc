@@ -1,0 +1,30 @@
+Let makefile find libz and zlib.h by CFLAGS and LDFLAGS.
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+Upstream-Status: Pending
+---
+diff --git a/configure.ac b/configure.ac
+index d1acc36..6f865b0 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -62,7 +62,7 @@ AC_CHECK_PROG([RPM],   rpm,   rpm,   [], [$PATH])
+ AC_CHECK_PROG([SED],   sed,   sed,   [], [$PATH])
+ AC_CHECK_PROG([FIND],  find,  find,  [], [$PATH])
+ 
+-AC_CHECK_HEADER(zlib.h, AC_CHECK_LIB(z, inflateInit_, [AC_DEFINE(HAVE_ZLIB_H, 1) LIBS="$LIBS -lz"]))
++AC_CHECK_HEADER(zlib.h, AC_CHECK_LIB(z, inflateInit_, [AC_DEFINE(HAVE_ZLIB_H, 1) LIBS="$LIBS $LDFLAGS -lz"]))
+ 
+ dnl Find the default programs
+ if test "with_default" != no ; then
+@@ -175,7 +175,7 @@ fi
+ 
+ dnl ---Output variables...
+ 
+-HOST_CFLAGS="$HOST_CFLAGS -O2 -Wall \$(HOST_CPPFLAGS)"
++HOST_CFLAGS="$HOST_CFLAGS -O2 -Wall \$(HOST_CPPFLAGS) $CFLAGS"
+ 
+ dnl TODO: figure out how to set these appropriately for compilers other than gcc
+ I386_CFLAGS="$I386_CFLAGS -Os -ffreestanding -Wall -W -Wno-format \$(I386_CPPFLAGS)"
+-- 
+1.7.10.4
+

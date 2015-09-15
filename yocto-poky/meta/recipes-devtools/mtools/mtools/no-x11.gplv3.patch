@@ -1,0 +1,18 @@
+Disable building with X11 support.
+
+Upstream-Status: Inappropriate [disable feature]
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+diff -urN mtools-4.0.15.orig//Makefile.in mtools-4.0.15//Makefile.in
+--- mtools-4.0.15.orig//Makefile.in	2010-10-17 08:41:09.000000000 -0700
++++ mtools-4.0.15//Makefile.in	2010-11-23 13:59:49.258258374 -0800
+@@ -146,7 +146,7 @@
+ CXXFLAGS  = $(CPPFLAGS) $(DEFS) $(MYCXXFLAGS) -I. @extraincludedir@ -I@srcdir@ $(USERCFLAGS)
+ LINK      = $(CC) $(LDFLAGS) $(USERLDFLAGS) @extralibdir@
+ ALLLIBS   = $(USERLDLIBS) $(MACHDEPLIBS) $(SHLIB) $(LIBS)
+-X_LDFLAGS = $(X_EXTRA_LIBS) $(X_LIBS) -lXau -lX11 $(LIBS)
++X_LDFLAGS = $(X_EXTRA_LIBS) $(X_LIBS) $(LIBS)
+ X_CCFLAGS = $(X_CFLAGS) $(CFLAGS)
+ 
+ all:    mtools $(LINKS) mkmanifest @FLOPPYD@ mtools.1 mtools.5

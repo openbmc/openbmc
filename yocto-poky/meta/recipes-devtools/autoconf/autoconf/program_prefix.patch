@@ -1,0 +1,20 @@
+Upstream-Status: Pending
+
+#
+# Patch managed by http://www.mn-logistik.de/unsupported/pxa250/patcher
+#
+
+--- autoconf-2.57/lib/autoconf/general.m4~program_prefix
++++ autoconf-2.57/lib/autoconf/general.m4
+@@ -1676,8 +1676,9 @@
+ # The aliases save the names the user supplied, while $host etc.
+ # will get canonicalized.
+ test -n "$target_alias" &&
+-  test "$program_prefix$program_suffix$program_transform_name" = \
+-    NONENONEs,x,x, &&
++  test "$target_alias" != "$host_alias" &&
++    test "$program_prefix$program_suffix$program_transform_name" = \
++      NONENONEs,x,x, &&
+   program_prefix=${target_alias}-[]dnl
+ ])# AC_CANONICAL_TARGET
+ 

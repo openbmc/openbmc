@@ -1,0 +1,532 @@
+#!/bin/bash
+#
+# Handle running OE images standalone with QEMU
+#
+# Copyright (C) 2006-2011 Linux Foundation
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+usage() {
+    MYNAME=`basename $0`
+    echo ""
+    echo "Usage: you can run this script with any valid combination"
+    echo "of the following environment variables (in any order):"
+    echo "  QEMUARCH - the qemu machine architecture to use"
+    echo "  KERNEL - the kernel image file to use"
+    echo "  ROOTFS - the rootfs image file or nfsroot directory to use"
+    echo "  MACHINE - the machine name (optional, autodetected from KERNEL filename if unspecified)"
+    echo "  RAMFS - boot a ramfs-based image"
+    echo "  ISO - boot an ISO image"
+    echo "  VM - boot a virtual machine image (= a file representing a full disk with boot loader)"
+    echo "  Simplified QEMU command-line options can be passed with:"
+    echo "    nographic - disables video console"
+    echo "    serial - enables a serial console on /dev/ttyS0"
+    echo "    kvm - enables KVM when running qemux86/qemux86-64 (VT-capable CPU required)"
+    echo "    publicvnc - enable a VNC server open to all hosts"
+    echo "  qemuparams=\"xyz\" - specify custom parameters to QEMU"
+    echo "  bootparams=\"xyz\" - specify custom kernel parameters during boot"
+    echo ""
+    echo "Examples:"
+    echo "  $MYNAME qemuarm"
+    echo "  $MYNAME qemux86-64 core-image-sato ext4"
+    echo "  $MYNAME path/to/bzImage-qemux86.bin path/to/nfsrootdir/ serial"
+    echo "  $MYNAME qemux86 ramfs"
+    echo "  $MYNAME qemux86 iso"
+    echo "  $MYNAME qemux86 qemuparams=\"-m 256\""
+    echo "  $MYNAME qemux86 bootparams=\"psplash=false\""
+    echo "  $MYNAME path/to/<image>-<machine>.vmdk"
+    exit 1
+}
+
+if [ "x$1" = "x" ]; then
+    usage
+fi
+
+error() {
+    echo "Error: "$*
+    usage
+}
+
+MACHINE=${MACHINE:=""}
+KERNEL=${KERNEL:=""}
+ROOTFS=${ROOTFS:=""}
+VM=${VM:=""}
+FSTYPE=${FSTYPE:=""}
+LAZY_ROOTFS=""
+SCRIPT_QEMU_OPT=""
+SCRIPT_QEMU_EXTRA_OPT=""
+SCRIPT_KERNEL_OPT=""
+SERIALSTDIO=""
+TCPSERIAL_PORTNUM=""
+KVM_ENABLED="no"
+KVM_ACTIVE="no"
+
+# Determine whether the file is a kernel or QEMU image, and set the
+# appropriate variables
+process_filename() {
+    filename=$1
+
+    # Extract the filename extension
+    EXT=`echo $filename | awk -F . '{ print \$NF }'`
+    case /$EXT/ in
+	/bin/)
+		# A file ending in .bin is a kernel
+		[ -z "$KERNEL" ] && KERNEL=$filename || \
+		    error "conflicting KERNEL args [$KERNEL] and [$filename]"
+		;;
+	/ext[234]/|/jffs2/|/btrfs/)
+		# A file ending in a supportted fs type is a rootfs image
+		if [ -z "$FSTYPE" -o "$FSTYPE" = "$EXT" ]; then
+		    FSTYPE=$EXT
+		    ROOTFS=$filename
+		else
+		    error "conflicting FSTYPE types [$FSTYPE] and [$EXT]"
+		fi
+		;;
+	/hddimg/|/hdddirect/|/vmdk/)
+		FSTYPE=$EXT
+		VM=$filename
+		;;
+	*)
+		error "unknown file arg [$filename]"
+		;;
+    esac
+}
+
+# Parse command line args without requiring specific ordering. It's a
+# bit more complex, but offers a great user experience.
+while true; do
+    arg=${1}
+    case "$arg" in
+        "qemux86" | "qemux86-64" | "qemuarm" | "qemuarm64" | "qemumips" | "qemumipsel" | \
+        "qemumips64" | "qemush4"  | "qemuppc" | "qemumicroblaze" | "qemuzynq")
+            [ -z "$MACHINE" ] && MACHINE=$arg || \
+                error "conflicting MACHINE types [$MACHINE] and [$arg]"
+            ;;
+        "ext2" | "ext3" | "ext4" | "jffs2" | "nfs" | "btrfs" | "hddimg" | "hdddirect" )
+            [ -z "$FSTYPE" -o "$FSTYPE" = "$arg" ] && FSTYPE=$arg || \
+                error "conflicting FSTYPE types [$FSTYPE] and [$arg]"
+            ;;
+        "ramfs")
+            FSTYPE=cpio.gz
+            RAMFS=true
+            ;;
+        "iso")
+	    FSTYPE=iso
+	    ISOFS=true
+	    ;;
+        "nographic")
+            SCRIPT_QEMU_OPT="$SCRIPT_QEMU_OPT -nographic"
+            SCRIPT_KERNEL_OPT="$SCRIPT_KERNEL_OPT console=ttyS0"
+            ;;
+        "serial")
+            SCRIPT_QEMU_OPT="$SCRIPT_QEMU_OPT -serial stdio"
+            SCRIPT_KERNEL_OPT="$SCRIPT_KERNEL_OPT console=ttyS0"
+            SERIALSTDIO="1"
+            ;;
+        "tcpserial="*)
+            TCPSERIAL_PORTNUM=${arg##tcpserial=}
+            ;;
+	"biosdir="*)
+            CUSTOMBIOSDIR="${arg##biosdir=}"
+	    ;;
+        "biosfilename="*)
+            SCRIPT_QEMU_OPT="$SCRIPT_QEMU_OPT -bios ${arg##biosfilename=}"
+            ;;
+        "qemuparams="*)
+            SCRIPT_QEMU_EXTRA_OPT="${arg##qemuparams=}"
+
+            # Warn user if they try to specify serial or kvm options
+            # to use simplified options instead
+            serial_option=`expr "$SCRIPT_QEMU_EXTRA_OPT" : '.*\(-serial\)'`
+            kvm_option=`expr "$SCRIPT_QEMU_EXTRA_OPT" : '.*\(-enable-kvm\)'`
+            vga_option=`expr "$SCRIPT_QEMU_EXTRA_OPT" : '.*\(-vga\)'`
+            [ ! -z "$serial_option" -o ! -z "$kvm_option" ] && \
+                echo "Please use simplified serial or kvm options instead"
+            ;;
+        "bootparams="*)
+            SCRIPT_KERNEL_OPT="$SCRIPT_KERNEL_OPT ${arg##bootparams=}"
+            ;;
+        "audio")
+            if [ "x$MACHINE" = "xqemux86" -o "x$MACHINE" = "xqemux86-64" ]; then
+                echo "Enabling audio in qemu."
+                echo "Please install snd_intel8x0 or snd_ens1370 driver in linux guest."
+                QEMU_AUDIO_DRV="alsa"
+                SCRIPT_QEMU_OPT="$SCRIPT_QEMU_OPT -soundhw ac97,es1370"
+            fi
+            ;;
+        "kvm")
+            KVM_ENABLED="yes"
+            KVM_CAPABLE=`grep -q 'vmx\|svm' /proc/cpuinfo && echo 1`
+            ;;
+        "slirp")
+            SLIRP_ENABLED="yes"
+            ;;
+        "publicvnc")
+            SCRIPT_QEMU_OPT="$SCRIPT_QEMU_OPT -vnc 0.0.0.0:0"
+            ;;
+        *-image*)
+            [ -z "$ROOTFS" ] || \
+		error "conflicting ROOTFS args [$ROOTFS] and [$arg]"
+            if [ -f "$arg" ]; then
+                process_filename $arg
+            elif [ -d "$arg" ]; then
+                # Handle the case where the nfsroot dir has -image-
+                # in the pathname
+                echo "Assuming $arg is an nfs rootfs"
+                FSTYPE=nfs
+                ROOTFS=$arg
+            else
+                ROOTFS=$arg
+                LAZY_ROOTFS="true"
+            fi
+            ;;
+        "") break ;;
+        *)
+            # A directory name is an nfs rootfs
+            if [ -d "$arg" ]; then
+                echo "Assuming $arg is an nfs rootfs"
+                if [ -z "$FSTYPE" -o "$FSTYPE" = "nfs" ]; then
+                    FSTYPE=nfs
+                else
+                    error "conflicting FSTYPE types [$arg] and nfs"
+                fi
+
+                if [ -z "$ROOTFS" ]; then
+                    ROOTFS=$arg
+                else
+                    error "conflicting ROOTFS args [$ROOTFS] and [$arg]"
+                fi
+            elif [ -f "$arg" ]; then
+                process_filename $arg
+            else
+                error "unable to classify arg [$arg]"
+            fi
+            ;;
+    esac
+    shift
+done
+
+if [ ! -c /dev/net/tun ] ; then
+	echo "TUN control device /dev/net/tun is unavailable; you may need to enable TUN (e.g. sudo modprobe tun)"
+	exit 1
+elif [ ! -w /dev/net/tun ] ; then
+	echo "TUN control device /dev/net/tun is not writable, please fix (e.g. sudo chmod 666 /dev/net/tun)"
+	exit 1
+fi
+
+# Report errors for missing combinations of options
+if [ -z "$MACHINE" -a -z "$KERNEL" -a -z "$VM" ]; then
+    error "you must specify at least a MACHINE, VM, or KERNEL argument"
+fi
+if [ "$FSTYPE" = "nfs" -a -z "$ROOTFS" ]; then
+    error "NFS booting without an explicit ROOTFS path is not yet supported"
+fi
+
+if [ -z "$MACHINE" ]; then
+    if [ "x$FSTYPE" = "xvmdk" ] || [ "x$FSTYPE" = "xhddimg" ] || [ "x$FSTYPE" = "xhdddirect" ]; then
+        MACHINE=`basename $VM | sed -n 's/.*\(qemux86-64\|qemux86\|qemuarm64\|qemuarm\|qemumips64\|qemumips\|qemuppc\|qemush4\).*/\1/p'`
+        if [ -z "$MACHINE" ]; then
+            error "Unable to set MACHINE from image filename [$VM]"
+        fi
+        echo "Set MACHINE to [$MACHINE] based on image [$VM]"
+    else
+        MACHINE=`basename $KERNEL | sed -n 's/.*\(qemux86-64\|qemux86\|qemuarm64\|qemuarm\|qemumips64\|qemumips\|qemuppc\|qemush4\).*/\1/p'`
+        if [ -z "$MACHINE" ]; then
+            error "Unable to set MACHINE from kernel filename [$KERNEL]"
+        fi
+        echo "Set MACHINE to [$MACHINE] based on kernel [$KERNEL]"
+    fi
+fi
+
+YOCTO_KVM_WIKI="https://wiki.yoctoproject.org/wiki/How_to_enable_KVM_for_Poky_qemu"
+YOCTO_PARAVIRT_KVM_WIKI="https://wiki.yoctoproject.org/wiki/Running_an_x86_Yocto_Linux_image_under_QEMU_KVM"
+# Detect KVM configuration
+if [ "x$KVM_ENABLED" = "xyes" ]; then
+    if [ -z "$KVM_CAPABLE" ]; then
+        echo "You are trying to enable KVM on a cpu without VT support."
+        echo "Remove kvm from the command-line, or refer"
+        echo "$YOCTO_KVM_WIKI";
+        exit 1;
+    fi
+    if [ "x$MACHINE" != "xqemux86" -a "x$MACHINE" != "xqemux86-64" ]; then
+        echo "KVM only support x86 & x86-64. Remove kvm from the command-line";
+        exit 1;
+    fi
+    if [ ! -e /dev/kvm ]; then
+        echo "Missing KVM device. Have you inserted kvm modules?"
+        echo "For further help see:"
+        echo "$YOCTO_KVM_WIKI";
+        exit 1;
+    fi
+    if [ ! -e /dev/vhost-net ]; then
+        echo "Missing virtio net device. Have you inserted vhost-net module?"
+        echo "For further help see:"
+        echo "$YOCTO_PARAVIRT_KVM_WIKI";
+        exit 1;
+    fi
+    if [ -w /dev/kvm -a -r /dev/kvm ]; then
+        SCRIPT_QEMU_OPT="$SCRIPT_QEMU_OPT -enable-kvm"
+        KVM_ACTIVE="yes"
+    else
+        echo "You have no rights on /dev/kvm."
+        echo "Please change the ownership of this file as described at:"
+        echo "$YOCTO_KVM_WIKI";
+        exit 1;
+    fi
+    if [ ! -w /dev/vhost-net -o ! -r /dev/vhost-net ]; then
+	if [ "$SLIRP_ENABLED" != "yes" ] ; then
+            echo "You have no rights on /dev/vhost-net."
+            echo "Please change the ownership of this file as described at:"
+            echo "$YOCTO_PARAVIRT_KVM_WIKI";
+            exit 1;
+	fi
+    fi
+fi
+
+machine2=`echo $MACHINE | tr 'a-z' 'A-Z' | sed 's/-/_/'`
+# MACHINE is now set for all cases
+
+# Defaults used when these vars need to be inferred
+QEMUX86_DEFAULT_KERNEL=bzImage-qemux86.bin
+QEMUX86_DEFAULT_FSTYPE=ext4
+
+QEMUX86_64_DEFAULT_KERNEL=bzImage-qemux86-64.bin
+QEMUX86_64_DEFAULT_FSTYPE=ext4
+
+QEMUARM_DEFAULT_KERNEL=zImage-qemuarm.bin
+QEMUARM_DEFAULT_FSTYPE=ext4
+
+QEMUARM64_DEFAULT_KERNEL=Image-qemuarm64.bin
+QEMUARM64_DEFAULT_FSTYPE=ext4
+
+QEMUMIPS_DEFAULT_KERNEL=vmlinux-qemumips.bin
+QEMUMIPS_DEFAULT_FSTYPE=ext4
+
+QEMUMIPSEL_DEFAULT_KERNEL=vmlinux-qemumipsel.bin
+QEMUMIPSEL_DEFAULT_FSTYPE=ext4
+
+QEMUMIPS64_DEFAULT_KERNEL=vmlinux-qemumips64.bin
+QEMUMIPS64_DEFAULT_FSTYPE=ext4
+
+QEMUSH4_DEFAULT_KERNEL=vmlinux-qemumips.bin
+QEMUSH4_DEFAULT_FSTYPE=ext4
+
+QEMUPPC_DEFAULT_KERNEL=vmlinux-qemuppc.bin
+QEMUPPC_DEFAULT_FSTYPE=ext4
+
+QEMUMICROBLAZE_DEFAULT_KERNEL=linux.bin.ub
+QEMUMICROBLAZE_DEFAULT_FSTYPE=cpio
+
+QEMUZYNQ_DEFAULT_KERNEL=uImage
+QEMUZYNQ_DEFAULT_FSTYPE=cpio
+
+AKITA_DEFAULT_KERNEL=zImage-akita.bin
+AKITA_DEFAULT_FSTYPE=jffs2
+
+SPITZ_DEFAULT_KERNEL=zImage-spitz.bin
+SPITZ_DEFAULT_FSTYPE=ext3
+
+setup_path_vars() {
+    if [ -z "$OE_TMPDIR" ] ; then
+        PATHS_REQUIRED=true
+    elif [ "$1" = "1" -a -z "$DEPLOY_DIR_IMAGE" ] ; then
+        PATHS_REQUIRED=true
+    else
+        PATHS_REQUIRED=false
+    fi
+
+    if [ "$PATHS_REQUIRED" = "true" ]; then
+        # Try to get the variable values from bitbake
+        type -P bitbake &>/dev/null || {
+            echo "In order for this script to dynamically infer paths";
+            echo "to kernels or filesystem images, you either need";
+            echo "bitbake in your PATH or to source oe-init-build-env";
+            echo "before running this script" >&2;
+            exit 1; }
+
+        # We have bitbake in PATH, get the variable values from bitbake
+        BITBAKE_ENV_TMPFILE=`mktemp --tmpdir runqemu.XXXXXXXXXX`
+        if [ "$?" != "0" ] ; then
+            echo "Error: mktemp failed for bitbake environment output"
+            exit 1
+        fi
+
+        MACHINE=$MACHINE bitbake -e > $BITBAKE_ENV_TMPFILE
+        if [ -z "$OE_TMPDIR" ] ; then
+            OE_TMPDIR=`sed -n 's/^TMPDIR=\"\(.*\)\"/\1/p' $BITBAKE_ENV_TMPFILE`
+        fi
+        if [ -z "$DEPLOY_DIR_IMAGE" ] ; then
+            DEPLOY_DIR_IMAGE=`sed -n 's/^DEPLOY_DIR_IMAGE=\"\(.*\)\"/\1/p' $BITBAKE_ENV_TMPFILE`
+        fi
+        if [ -z "$OE_TMPDIR" ]; then
+            # Check for errors from bitbake that the user needs to know about
+            BITBAKE_OUTPUT=`cat $BITBAKE_ENV_TMPFILE | wc -l`
+            if [ "$BITBAKE_OUTPUT" -eq "0" ]; then
+                echo "Error: this script needs to be run from your build directory, or you need"
+                echo "to explicitly set OE_TMPDIR and DEPLOY_DIR_IMAGE in your environment"
+            else
+                echo "There was an error running bitbake to determine TMPDIR"
+                echo "Here is the output from 'bitbake -e':"
+                cat $BITBAKE_ENV_TMPFILE
+            fi
+            rm $BITBAKE_ENV_TMPFILE
+            exit 1
+        fi
+        rm $BITBAKE_ENV_TMPFILE
+    fi
+}
+
+setup_sysroot() {
+    # Toolchain installs set up $OECORE_NATIVE_SYSROOT in their
+    # environment script. If that variable isn't set, we're
+    # either in an in-tree build scenario or the environment
+    # script wasn't source'd.
+    if [ -z "$OECORE_NATIVE_SYSROOT" ]; then
+        setup_path_vars
+        BUILD_ARCH=`uname -m`
+        BUILD_OS=`uname | tr '[A-Z]' '[a-z]'`
+        BUILD_SYS="$BUILD_ARCH-$BUILD_OS"
+
+        OECORE_NATIVE_SYSROOT=$OE_TMPDIR/sysroots/$BUILD_SYS
+    fi 
+
+    # Some recipes store the BIOS under $OE_TMPDIR/sysroots/$MACHINE,
+    # now defined as OECORE_MACHINE_SYSROOT. The latter is used when searching
+    # BIOS, VGA BIOS and keymaps.
+    if [ -z "$OECORE_MACHINE_SYSROOT" ]; then
+        OECORE_MACHINE_SYSROOT=$OE_TMPDIR/sysroots/$MACHINE
+    fi
+}
+
+# Locate a rootfs image to boot which matches our expected
+# machine and fstype. 
+findimage() {
+    where=$1
+    machine=$2
+    extension=$3
+
+    # Sort rootfs candidates by modification time - the most
+    # recently created one is the one we most likely want to boot.
+    filename=`ls -t1 $where/*-image*$machine.$extension 2>/dev/null | head -n1`
+    if [ "x$filename" != "x" ]; then
+        ROOTFS=$filename
+        return
+    fi
+
+    echo "Couldn't find a $machine rootfs image in $where."
+    exit 1
+}
+
+if [ -e "$ROOTFS" -a -z "$FSTYPE" ]; then
+    # Extract the filename extension
+    EXT=`echo $ROOTFS | awk -F . '{ print \$NF }'`
+    if [ "x$EXT" = "xext2" -o "x$EXT" = "xext3" -o \
+          "x$EXT" = "xjffs2" -o "x$EXT" = "xbtrfs" -o \
+          "x$EXT" = "xext4" ]; then
+        FSTYPE=$EXT
+    else
+        echo "Note: Unable to determine filesystem extension for $ROOTFS"
+        echo "We will use the default FSTYPE for $MACHINE"
+        # ...which is done further below...
+    fi
+fi
+
+if [ -z "$KERNEL" -a "x$FSTYPE" != "xvmdk" -a "x$FSTYPE" != "xhddimg" -a "x$FSTYPE" != "xhdddirect" ]; then
+    setup_path_vars 1
+    eval kernel_file=\$${machine2}_DEFAULT_KERNEL
+    KERNEL=$DEPLOY_DIR_IMAGE/$kernel_file
+
+    if [ -z "$KERNEL" ]; then
+        error "Unable to determine default kernel for MACHINE [$MACHINE]"
+    fi
+fi
+# KERNEL is now set for all cases
+
+if [ -z "$FSTYPE" ]; then
+    eval FSTYPE=\$${machine2}_DEFAULT_FSTYPE
+
+    if [ -z "$FSTYPE" ]; then
+        error "Unable to determine default fstype for MACHINE [$MACHINE]"
+    fi
+fi
+
+# FSTYPE is now set for all cases
+
+# Handle cases where a ROOTFS type is given instead of a filename, e.g.
+# core-image-sato
+if [ "$LAZY_ROOTFS" = "true" ]; then
+    setup_path_vars 1
+    echo "Assuming $ROOTFS really means $DEPLOY_DIR_IMAGE/$ROOTFS-$MACHINE.$FSTYPE"
+    if [ "$FSTYPE" = "hddimg" -o "x$FSTYPE" = "xhdddirect" ]; then
+        VM=$DEPLOY_DIR_IMAGE/$ROOTFS-$MACHINE.$FSTYPE
+    else
+        ROOTFS=$DEPLOY_DIR_IMAGE/$ROOTFS-$MACHINE.$FSTYPE
+    fi
+fi
+
+if [ -z "$ROOTFS" -a "x$FSTYPE" != "xvmdk" -a "x$FSTYPE" != "xhddimg" -a "x$FSTYPE" != "xhdddirect" ]; then
+    setup_path_vars 1
+    T=$DEPLOY_DIR_IMAGE
+    eval rootfs_list=\$${machine2}_DEFAULT_ROOTFS
+    findimage $T $MACHINE $FSTYPE
+
+    if [ -z "$ROOTFS" ]; then
+        error "Unable to determine default rootfs for MACHINE [$MACHINE]"
+    fi
+fi
+# ROOTFS is now set for all cases, now expand it to be an absolute path, it should exist at this point
+
+ROOTFS=`readlink -f $ROOTFS`
+
+echo ""
+echo "Continuing with the following parameters:"
+if [ "x$FSTYPE" != "xvmdk" -a "x$FSTYPE" != "xhddimg" -a "x$FSTYPE" != "xhdddirect" ]; then
+    echo "KERNEL: [$KERNEL]"
+    echo "ROOTFS: [$ROOTFS]"
+else
+    echo "VMDK:   [$VM]"
+fi
+echo "FSTYPE: [$FSTYPE]"
+
+setup_sysroot
+# OECORE_NATIVE_SYSROOT and OECORE_MACHINE_SYSROOT are now set for all cases
+
+INTERNAL_SCRIPT="$0-internal"
+if [ ! -f "$INTERNAL_SCRIPT" -o ! -r "$INTERNAL_SCRIPT" ]; then
+INTERNAL_SCRIPT=`which runqemu-internal`
+fi
+
+# Specify directory for BIOS, VGA BIOS and keymaps
+if [ ! -z "$CUSTOMBIOSDIR" ]; then
+    if [ -d "$OECORE_NATIVE_SYSROOT/$CUSTOMBIOSDIR" ]; then
+        echo "Assuming biosdir is $OECORE_NATIVE_SYSROOT/$CUSTOMBIOSDIR"
+        SCRIPT_QEMU_OPT="$SCRIPT_QEMU_OPT -L $OECORE_NATIVE_SYSROOT/$CUSTOMBIOSDIR"
+    elif [ -d "$OECORE_MACHINE_SYSROOT/$CUSTOMBIOSDIR" ]; then
+        echo "Assuming biosdir is $OECORE_MACHINE_SYSROOT/$CUSTOMBIOSDIR"
+        SCRIPT_QEMU_OPT="$SCRIPT_QEMU_OPT -L $OECORE_MACHINE_SYSROOT/$CUSTOMBIOSDIR"
+    else
+        if [ ! -d "$CUSTOMBIOSDIR" ]; then
+            echo "Custom BIOS directory not found. Tried: $CUSTOMBIOSDIR"
+            echo "and $OECORE_NATIVE_SYSROOT/$CUSTOMBIOSDIR"
+            echo "and $OECORE_MACHINE_SYSROOT/$CUSTOMBIOSDIR"
+            exit 1;
+        fi
+        echo "Assuming biosdir is $CUSTOMBIOSDIR"
+        SCRIPT_QEMU_OPT="$SCRIPT_QEMU_OPT -L $CUSTOMBIOSDIR"
+    fi
+fi
+
+. $INTERNAL_SCRIPT
+exit $?

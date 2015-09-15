@@ -1,0 +1,49 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          urandom
+# Required-Start:    $local_fs mountvirtfs
+# Required-Stop:     $local_fs
+# Default-Start:     S
+# Default-Stop:      0 6
+# Short-Description: Save and restore the random seed
+# Description:       Save the random seed on shutdown and restore it on boot,
+#                    to ensure that the seed isn't predicable on startup
+#                    (because the boot process is predictable)
+### END INIT INFO
+
+test -c /dev/urandom || exit 0
+
+RANDOM_SEED_FILE=/var/lib/urandom/random-seed
+
+. /etc/default/rcS
+[ -f /etc/default/urandom ] && . /etc/default/urandom
+
+case "$1" in
+	start|"")
+		test "$VERBOSE" != no && echo "Initializing random number generator..."
+		# Load and then save 512 bytes, which is the size of the entropy
+		# pool. Also load the current date, in case the seed file is
+		# empty.
+		( date +%s.%N; [ -f "$RANDOM_SEED_FILE" ] && cat "$RANDOM_SEED_FILE" ) \
+			>/dev/urandom
+		rm -f "$RANDOM_SEED_FILE"
+		umask 077
+		dd if=/dev/urandom of=$RANDOM_SEED_FILE count=1 \
+			>/dev/null 2>&1 || echo "urandom start: failed."
+		umask 022
+		;;
+	stop)
+		# Carry a random seed from shut-down to start-up;
+		# see documentation in linux/drivers/char/random.c
+		test "$VERBOSE" != no && echo "Saving random seed..."
+		umask 077
+		dd if=/dev/urandom of=$RANDOM_SEED_FILE count=1 \
+			>/dev/null 2>&1 || echo "urandom stop: failed."
+		;;
+	*)
+		echo "Usage: urandom {start|stop}" >&2
+		exit 1
+		;;
+esac
+
+exit 0

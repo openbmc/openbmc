@@ -1,0 +1,32 @@
+Upstream-Status: Pending
+
+libgcrypt: fix building error with '-O2' in sysroot path
+
+Characters like '-O2' or '-Ofast' will be replaced by '-O1' when compiling cipher.
+If we are cross compiling libgcrypt and sysroot contains such characters, we would
+get compile errors because the sysroot path has been modified.
+
+Fix this by adding blank spaces before and after the original matching pattern in the
+sed command.
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ cipher/Makefile.am |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cipher/Makefile.am b/cipher/Makefile.am
+index 76cdc96..9a89792 100644
+--- a/cipher/Makefile.am
++++ b/cipher/Makefile.am
+@@ -69,7 +69,7 @@ rfc2268.c \
+ camellia.c camellia.h camellia-glue.c
+ 
+ if ENABLE_O_FLAG_MUNGING
+-o_flag_munging = sed -e 's/-O\([2-9s][2-9s]*\)/-O1/' -e 's/-Ofast/-O1/g'
++o_flag_munging = sed -e 's/ -O\([2-9s][2-9s]*\) / -O1 /' -e 's/ -Ofast / -O1 /g'
+ else
+ o_flag_munging = cat
+ endif
+-- 
+1.7.9.5
+

@@ -1,0 +1,39 @@
+
+gcc-4.7 seems to be stricter about some things, so follow
+the suggestion from the error/note information.
+
+    ../../x86_64-linux-libtool --tag=CXX   --mode=compile g++ -DHAVE_CONFIG_H -I. -I../.. 
+    x86_64-linux-libtool: compile:  g++ -DHAVE_CONFIG_H -I. -I../.. -I../../include -isyst
+    In file included from ../../include/beecrypt/c++/util/Hashtable.h:42:0,
+                     from ../../include/beecrypt/c++/util/Properties.h:36,
+                     from Properties.cxx:25:
+    ../../include/beecrypt/c++/util/AbstractSet.h: In instantiation of 'bool beecrypt::uti
+    Properties.cxx:228:1:   required from here
+    ../../include/beecrypt/c++/util/AbstractSet.h:59:27: error: 'containsAll' was not decl
+    ../../include/beecrypt/c++/util/AbstractSet.h:59:27: note: declarations in dependent b
+    ../../include/beecrypt/c++/util/AbstractSet.h:59:27: note: use 'this->containsAll' ins
+    ../../include/beecrypt/c++/util/AbstractSet.h: In instantiation of 'bool beecrypt::uti
+    Properties.cxx:228:1:   required from here
+    ../../include/beecrypt/c++/util/AbstractSet.h:59:27: error: 'containsAll' was not decl
+    ../../include/beecrypt/c++/util/AbstractSet.h:59:27: note: declarations in dependent b
+    ../../include/beecrypt/c++/util/AbstractSet.h:59:27: note: use 'this->containsAll' ins
+    
+
+Upstream-Status: Pending
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+
+Index: beecrypt-4.2.1/include/beecrypt/c++/util/AbstractSet.h
+===================================================================
+--- beecrypt-4.2.1.orig/include/beecrypt/c++/util/AbstractSet.h
++++ beecrypt-4.2.1/include/beecrypt/c++/util/AbstractSet.h
+@@ -56,7 +56,7 @@ namespace beecrypt {
+ 					if (c->size() != size())
+ 						return false;
+ 
+-					return containsAll(*c);
++					return this->containsAll(*c);
+ 				}
+ 				return false;
+ 			}

@@ -1,0 +1,21 @@
+Upstream-Status: pending
+
+This patch avoids this error with automake 1.12:
+
+| configure.ac:49: error: automatic de-ANSI-fication support has been removed
+
+Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+2012/05/02
+
+Index: popt-1.16/configure.ac
+===================================================================
+--- popt-1.16.orig/configure.ac
++++ popt-1.16/configure.ac
+@@ -46,7 +46,6 @@ AC_GCC_TRADITIONAL
+ AC_SYS_LARGEFILE
+ 
+ AC_ISC_POSIX
+-AM_C_PROTOTYPES
+ 
+ AC_CHECK_HEADERS(float.h fnmatch.h glob.h langinfo.h libintl.h mcheck.h unistd.h)
+ 

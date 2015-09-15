@@ -1,0 +1,40 @@
+From 2d729af0897d7d72b83d111876febf9e0eec1a68 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 3 Apr 2015 20:50:56 -0700
+Subject: [PATCH] backtrace: Disable for non-glibc C libraries
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+
+---
+ src/log.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/log.c b/src/log.c
+index febc874..9db4ae7 100644
+--- a/src/log.c
++++ b/src/log.c
+@@ -30,7 +30,9 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <syslog.h>
++#ifdef __GLIBC__
+ #include <execinfo.h>
++#endif
+ #include <dlfcn.h>
+ 
+ #include "ofono.h"
+@@ -219,8 +221,9 @@ static void signal_handler(int signo)
+ {
+ 	ofono_error("Aborting (signal %d) [%s]", signo, program_exec);
+ 
++#ifdef __GLIBC__
+ 	print_backtrace(2);
+-
++#endif
+ 	exit(EXIT_FAILURE);
+ }
+ 
+-- 
+2.1.4
+

@@ -1,0 +1,38 @@
+The problem is that unsigned char[2] is
+guranteed to be 8Bit aligned on arm
+but unsigned short is/needs to be 16bit aligned
+the union { unsigned short; unsigned char[2] } trick 
+didn't work so no we use the alpha hack.
+
+memcpy into an 16bit aligned
+
+    -zecke
+
+Upstream-Status: Inappropriate [licensing]
+We're tracking an old release of dosfstools due to licensing issues.
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+--- dosfstools/dosfsck/boot.c.orig	2003-05-15 19:32:23.000000000 +0200
++++ dosfstools/dosfsck/boot.c	2003-06-13 17:44:25.000000000 +0200
+@@ -36,17 +36,15 @@
+     { 0xff, "5.25\" 320k floppy 2s/40tr/8sec" },
+ };
+ 
+-#if defined __alpha || defined __ia64__ || defined __s390x__ || defined __x86_64__ || defined __ppc64__
++
+ /* Unaligned fields must first be copied byte-wise */
+ #define GET_UNALIGNED_W(f)			\
+     ({						\
+ 	unsigned short __v;			\
+ 	memcpy( &__v, &f, sizeof(__v) );	\
+-	CF_LE_W( *(unsigned short *)&f );	\
++	CF_LE_W( *(unsigned short *)&__v );	\
+     })
+-#else
+-#define GET_UNALIGNED_W(f) CF_LE_W( *(unsigned short *)&f )
+-#endif
++
+ 
+ 
+ static char *get_media_descr( unsigned char media )

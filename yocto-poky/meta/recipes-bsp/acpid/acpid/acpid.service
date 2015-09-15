@@ -1,0 +1,10 @@
+[Unit]
+Description=ACPI Event Daemon
+After=syslog.target
+
+[Service]
+Type=forking
+ExecStart=@SBINDIR@/acpid
+
+[Install]
+WantedBy=multi-user.target

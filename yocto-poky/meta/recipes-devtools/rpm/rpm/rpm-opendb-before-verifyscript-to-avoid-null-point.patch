@@ -1,0 +1,24 @@
+rpm: opendb before rpmverifyscript to avoid null point input
+
+If the command is "rpm -V" and the return value of (headerIsEntry(h, RPMTAG_VERIFYSCRIPT) 
+|| headerIsEntry(h, RPMTAG_SANITYCHECK)) located in /lib/verify.c is true, it will call
+rpmpsmStage function(rpmVerifyScript->rpmpsmScriptStage->rpmpsmStage) and occur segment
+fault because of null point(rpmtsGetRdb(ts) == NULL and rpmtsGetRdb(ts)->db_txn).
+So we open rpmdb to avoid bad input when find headerIsEntry true.
+
+Upstream-Status: Pending
+
+Signed-off-by: Zhixiong Chi <zhixiong.chi@windriver.com>
+Index: rpm-5.4.14/lib/verify.c
+===================================================================
+--- rpm-5.4.14.orig/lib/verify.c	2015-07-22 22:09:59.992895355 +0800
++++ rpm-5.4.14/lib/verify.c	2015-08-13 10:20:33.752177906 +0800
+@@ -613,6 +613,8 @@
+ 	{
+ 	    FD_t fdo = fdDup(STDOUT_FILENO);
+ 
++	    rpmtsOpenDB(ts, O_RDONLY);            /*Open the DB to avoid null point input in function rpmpsmStage()*/
++
+ 	    rc = rpmfiSetHeader(fi, h);
+ 	    if ((rc = rpmVerifyScript(qva, ts, fi, fdo)) != 0)
+ 		ec += rc;

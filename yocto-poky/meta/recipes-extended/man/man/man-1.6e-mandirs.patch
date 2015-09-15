@@ -1,0 +1,31 @@
+Upstream-Status: Pending
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+--- man-1.6e.orig/src/man.conf.in	2005-08-20 20:26:06.000000000 -0300
++++ man-1.6e/src/man.conf.in	2007-05-18 10:30:29.000000000 -0300
+@@ -36,11 +36,12 @@
+ #
+ # Every automatically generated MANPATH includes these fields
+ #
+-MANPATH	/usr/man
+ MANPATH	/usr/share/man
++MANPATH	/usr/X11R6/man
+ MANPATH	/usr/local/man
+ MANPATH	/usr/local/share/man
+-MANPATH	/usr/X11R6/man
++MANPATH	/usr/kerberos/man
++MANPATH	/usr/man
+ #
+ # Uncomment if you want to include one of these by default
+ #
+@@ -67,6 +68,9 @@
+ MANPATH_MAP	/usr/X11R6/bin		/usr/X11R6/man
+ MANPATH_MAP	/usr/bin/X11		/usr/X11R6/man
+ MANPATH_MAP	/usr/bin/mh		/usr/share/man
++MANPATH_MAP	/usr/kerberos/bin		/usr/kerberos/man
++MANPATH_MAP	/usr/kerberos/sbin		/usr/kerberos/man
++
+ #
+ # NOAUTOPATH keeps man from automatically adding directories that look like
+ # manual page directories to the path.

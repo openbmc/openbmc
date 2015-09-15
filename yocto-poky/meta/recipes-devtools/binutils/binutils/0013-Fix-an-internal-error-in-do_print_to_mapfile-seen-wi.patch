@@ -1,0 +1,35 @@
+From 8e8f77ec2b6262e7d10af54700c340173d957267 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 27 Feb 2015 09:05:49 +0000
+Subject: [PATCH 13/13] Fix an internal error in do_print_to_mapfile seen with
+ gold on arm
+
+This is due to missing implementation of do_print_to_mapfile for
+atrributea section (ARM.attributes), it started to show up after fix
+for PR gold/16980 was installed
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Submitted
+---
+ gold/attributes.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/gold/attributes.h b/gold/attributes.h
+index 2aa7a78..3d126e6 100644
+--- a/gold/attributes.h
++++ b/gold/attributes.h
+@@ -387,6 +387,10 @@ class Output_attributes_section_data : public Output_section_data
+   { }
+ 
+  protected:
++  // Write to a map file.
++  void
++  do_print_to_mapfile(Mapfile* mapfile) const
++  { mapfile->print_output_data(this, _("** attributes")); }
+   // Write the data to the output file.
+   void
+   do_write(Output_file*);
+-- 
+2.1.4
+

@@ -1,0 +1,58 @@
+The rule-syntax-check script fails with errors like this:
+
+Invalid line /lib/udev/rules.d/95-keymap.rules:49: ENV{DMI_VENDOR}=="ASUS*", KERNELS=="input*", ATTRS{name}=="Asus Extra Buttons", ATTR{[dmi/id]product_name}=="W3J", RUN+="keymap $name module-asus-w3j"
+('  clause:', 'ATTR{[dmi/id]product_name}=="W3J"')
+()
+
+
+Move line comment from end of rules file to its own line, the regex used to
+test correct syntax choke on it.
+
+The rule-syntax-check.py uses regex which errournessly complains on ATTR rules
+of the form ATTR{[dmi/id]board_name}=="30B7"
+Use the regex from systemd's script which allow [] characters and additional
+compare operators
+
+The Makefile passes rules-test.sh script a build host path to the testdata.
+Ignore the argument and use a relative path instead.
+
+
+Signed-off-by: Max Krummenacher <max.oss.09@gmail.com>
+Upstream-Status: Inappropriate (cross environment path)
+
+diff -Naur udev-182.orig/src/keymap/95-keymap.rules udev-182/src/keymap/95-keymap.rules
+--- udev-182.orig/src/keymap/95-keymap.rules	2012-02-07 00:01:55.154640792 +0100
++++ udev-182/src/keymap/95-keymap.rules	2015-01-24 20:58:40.156930520 +0100
+@@ -94,7 +94,8 @@
+ ENV{DMI_VENDOR}=="Hewlett-Packard", ATTR{[dmi/id]product_name}=="HP G62 Notebook PC", RUN+="keymap $name 0xB2 www"
+ ENV{DMI_VENDOR}=="Hewlett-Packard", ATTR{[dmi/id]product_name}=="HP ProBook*", RUN+="keymap $name 0xF8 rfkill"
+ # HP Pavillion dv6315ea has empty DMI_VENDOR
+-ATTR{[dmi/id]board_vendor}=="Quanta", ATTR{[dmi/id]board_name}=="30B7", ATTR{[dmi/id]board_version}=="65.2B", RUN+="keymap $name 0x88 media" # "quick play
++# "quick play"
++ATTR{[dmi/id]board_vendor}=="Quanta", ATTR{[dmi/id]board_name}=="30B7", ATTR{[dmi/id]board_version}=="65.2B", RUN+="keymap $name 0x88 media"
+ 
+ # Gateway clone of Acer Aspire One AOA110/AOA150
+ ENV{DMI_VENDOR}=="Gateway*", ATTR{[dmi/id]product_name}=="*AOA1*", RUN+="keymap $name acer"
+diff -Naur udev-182.orig/test/rule-syntax-check.py udev-182/test/rule-syntax-check.py
+--- udev-182.orig/test/rule-syntax-check.py	2012-02-15 20:10:12.872333342 +0100
++++ udev-182/test/rule-syntax-check.py	2015-01-24 21:08:00.496049600 +0100
+@@ -28,7 +28,7 @@
+ no_args_tests = re.compile('(ACTION|DEVPATH|KERNELS?|NAME|SYMLINK|SUBSYSTEMS?|DRIVERS?|TAG|RESULT|TEST)\s*(?:=|!)=\s*"([^"]*)"$')
+ args_tests = re.compile('(ATTRS?|ENV|TEST){([a-zA-Z0-9/_.*%-]+)}\s*(?:=|!)=\s*"([^"]*)"$')
+ no_args_assign = re.compile('(NAME|SYMLINK|OWNER|GROUP|MODE|TAG|PROGRAM|RUN|LABEL|GOTO|WAIT_FOR|OPTIONS|IMPORT)\s*(?:\+=|:=|=)\s*"([^"]*)"$')
+-args_assign = re.compile('(ATTR|ENV|IMPORT){([a-zA-Z0-9/_.*%-]+)}\s*=\s*"([^"]*)"$')
++args_assign = re.compile('(ATTR|ENV|IMPORT|RUN){([][a-zA-Z0-9/_.*%-]+)}\s*(=|==|\+=)\s*"([^"]*)"$')
+ 
+ result = 0
+ buffer = ''
+--- udev-182.orig/test/rules-test.sh	2012-01-29 01:15:46.000000000 +0100
++++ udev-182/test/rules-test.sh	2015-01-24 17:53:51.201858658 +0100
+@@ -4,7 +4,7 @@
+ # (C) 2010 Canonical Ltd.
+ # Author: Martin Pitt <martin.pitt@ubuntu.com>
+ 
+-[ -n "$srcdir" ] || srcdir=`dirname $0`/..
++srcdir=`dirname $0`/..
+ 
+ # skip if we don't have python
+ type python >/dev/null 2>&1 || {

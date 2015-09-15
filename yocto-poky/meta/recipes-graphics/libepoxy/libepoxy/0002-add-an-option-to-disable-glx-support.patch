@@ -1,0 +1,42 @@
+From 24868cbfb9dda5f6929dd277c47d35df016e8754 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Wed, 6 May 2015 11:05:48 +0200
+Subject: [PATCH 2/2] add an option to disable glx support
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+this option would help us in yocto to get deterministic build results
+
+Upstream-Status: Submitted [1]
+
+[1] https://github.com/anholt/libepoxy/pull/52
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ configure.ac | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index bdd70da..6c7153d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -58,7 +58,14 @@ AC_CHECK_HEADER([KHR/khrplatform.h],
+ # uintptr_t to a void *") by default.  Kill that.
+ XORG_TESTSET_CFLAG(CWARNFLAGS, [-Wno-int-conversion])
+ 
+-PKG_CHECK_MODULES(X11, [x11], [x11=yes], [x11=no])
++AC_ARG_ENABLE([glx],
++                [AS_HELP_STRING([--disable-glx],
++				[disable if you don't want x11/glx support])],
++                [],
++                [enable_glx=yes]
++             )
++
++PKG_CHECK_MODULES(X11, [x11], [x11=$enable_glx], [x11=no])
+ 
+ AM_CONDITIONAL(HAVE_X11, test x$x11 = xyes)
+ 
+-- 
+1.9.3
+

@@ -1,0 +1,60 @@
+#!/bin/sh
+
+# Copyright (C) 2014 Intel Corporation
+#
+# Released under the MIT license (see COPYING.MIT)
+
+if [ "$1" = "" -o "$1" = "--help" ] ; then
+    echo "Usage: $0 <serial terminal command>"
+    echo
+    echo "Simple script to handle maintaining a terminal for serial devices that"
+    echo "disappear when a device is powered down or reset, such as the USB"
+    echo "serial console on the original BeagleBone (white version)."
+    echo
+    echo "e.g. $0 picocom -b 115200 /dev/ttyUSB0"
+    echo
+    exit
+fi
+
+args="$@"
+DEVICE=""
+while [ "$1" != "" ]; do
+    case "$1" in
+        /dev/*)
+            DEVICE=$1
+            break;;
+    esac
+    shift
+done
+
+if [ "$DEVICE" != "" ] ; then
+    while true; do
+        if [ ! -e $DEVICE ] ; then
+            echo "serdevtry: waiting for $DEVICE to exist..."
+            while [ ! -e $DEVICE ]; do
+                sleep 0.1
+            done
+        fi
+        if [ ! -w $DEVICE ] ; then
+            # Sometimes (presumably because of a race with udev) we get to
+            # the device before its permissions have been set up
+            RETRYNUM=0
+            while [ ! -w $DEVICE ]; do
+                if [ "$RETRYNUM" = "2" ] ; then
+                    echo "Device $DEVICE exists but is not writable!"
+                    exit 1
+                fi
+                RETRYNUM=$((RETRYNUM+1))
+                sleep 0.1
+            done
+        fi
+        $args
+        if [ -e $DEVICE ] ; then
+            break
+        fi
+    done
+else
+    echo "Unable to determine device node from command: $args"
+    exit 1
+fi
+

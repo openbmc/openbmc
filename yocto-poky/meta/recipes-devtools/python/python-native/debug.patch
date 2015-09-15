@@ -1,0 +1,29 @@
+Upstream-Status: Pending
+
+Index: Python-2.6.1/Lib/distutils/unixccompiler.py
+===================================================================
+--- Python-2.6.1.orig/Lib/distutils/unixccompiler.py	2009-11-13 16:04:54.000000000 +0000
++++ Python-2.6.1/Lib/distutils/unixccompiler.py	2009-11-13 16:06:27.000000000 +0000
+@@ -300,6 +300,8 @@
+         dylib_f = self.library_filename(lib, lib_type='dylib')
+         static_f = self.library_filename(lib, lib_type='static')
+ 
++        print "Looking in %s for %s" % (lib, dirs)
++
+         for dir in dirs:
+             shared = os.path.join(dir, shared_f)
+             dylib = os.path.join(dir, dylib_f)
+@@ -309,10 +311,13 @@
+             # assuming that *all* Unix C compilers do.  And of course I'm
+             # ignoring even GCC's "-static" option.  So sue me.
+             if os.path.exists(dylib):
++                print "Found %s" % (dylib)
+                 return dylib
+             elif os.path.exists(shared):
++                print "Found %s" % (shared)
+                 return shared
+             elif os.path.exists(static):
++                print "Found %s" % (static)
+                 return static
+ 
+         # Oops, didn't find it in *any* of 'dirs'

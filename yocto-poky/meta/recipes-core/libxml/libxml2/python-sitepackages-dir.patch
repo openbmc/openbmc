@@ -1,0 +1,30 @@
+Allow us to pass in PYTHON_SITE_PACKAGES
+
+The python binary used when building for nativesdk doesn't give us the
+correct path here so we need to be able to specify it ourselves.
+
+Upstream-Status: Inappropriate [config]
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+
+Rebase to 2.9.2
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.ac | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+--- a/configure.ac
++++ b/configure.ac
+@@ -813,7 +813,8 @@ dnl
+ 
+ PYTHON_VERSION=
+ PYTHON_INCLUDES=
+-PYTHON_SITE_PACKAGES=
++# Allow this to be set externally
++#PYTHON_SITE_PACKAGES=
+ PYTHON_TESTS=
+ pythondir=
+ if test "$with_python" != "no" ; then
+-- 
+1.9.1
+

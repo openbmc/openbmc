@@ -1,0 +1,39 @@
+Documentation
+=============
+
+This is the directory that contains the BitBake documentation. 
+
+Manual Organization
+===================
+
+Folders exist for individual manuals as follows:
+
+* bitbake-user-manual      - The BitBake User Manual 
+
+Each folder is self-contained regarding content and figures.
+
+If you want to find HTML versions of the BitBake manuals on the web, 
+go to http://www.openembedded.org/wiki/Documentation. 
+
+Makefile
+========
+
+The Makefile processes manual directories to create HTML, PDF,
+tarballs, etc.  Details on how the Makefile work are documented
+inside the Makefile.  See that file for more information.
+
+To build a manual, you run the make command and pass it the name
+of the folder containing the manual's contents. 
+For example, the following command run from the documentation directory 
+creates an HTML and a PDF version of the BitBake User Manual.
+The DOC variable specifies the manual you are making:
+
+     $ make DOC=bitbake-user-manual
+
+template
+========
+Contains various templates, fonts, and some old PNG files.
+
+tools
+=====
+Contains a tool to convert the DocBook files to PDF format.

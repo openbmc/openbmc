@@ -1,0 +1,16 @@
+This patch fixies the wrong return code of stat -h.
+
+Upstream-Status: Pending
+Signed-off-by: Zhangle Yang <zhangle.yang@windriver.com>
+
+--- stat-3.3/stat.c.orig	2013-08-22 10:49:45.000000000 +0800
++++ stat-3.3/stat.c	2013-08-22 10:50:31.000000000 +0800
+@@ -845,7 +845,7 @@
+     fprintf(stderr, "\t\t%%S - Security ID in SE-Linux\n");
+     fprintf(stderr, "\t\t%%C - Security context in SE-Linux\n");
+     fprintf(stderr, "\t\t%%d - Free file nodes in file system\n");
+-    exit(1);
++    exit(0);
+ }
+   
+ 

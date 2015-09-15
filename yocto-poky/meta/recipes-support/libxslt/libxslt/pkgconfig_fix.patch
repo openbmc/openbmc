@@ -1,0 +1,24 @@
+Upstream-Status: Inappropriate [configuration]
+
+Index: libxslt-1.1.27/libexslt.pc.in
+===================================================================
+--- libxslt-1.1.27.orig/libexslt.pc.in
++++ libxslt-1.1.27/libexslt.pc.in
+@@ -8,5 +8,5 @@ Name: libexslt
+ Version: @LIBEXSLT_VERSION@
+ Description: EXSLT Extension library
+ Requires: libxml-2.0
+-Libs: @EXSLT_LIBDIR@ @EXSLT_LIBS@
++Libs: -lexslt @EXSLT_LIBDIR@ @EXSLT_LIBS@
+ Cflags: @EXSLT_INCLUDEDIR@
+Index: libxslt-1.1.27/libxslt.pc.in
+===================================================================
+--- libxslt-1.1.27.orig/libxslt.pc.in
++++ libxslt-1.1.27/libxslt.pc.in
+@@ -8,5 +8,5 @@ Name: libxslt
+ Version: @VERSION@
+ Description: XSLT library version 2.
+ Requires: libxml-2.0
+-Libs: @XSLT_LIBDIR@ @XSLT_LIBS@ @EXTRA_LIBS@
++Libs: -lxslt @XSLT_LIBDIR@ @XSLT_LIBS@ @EXTRA_LIBS@
+ Cflags: @XSLT_INCLUDEDIR@

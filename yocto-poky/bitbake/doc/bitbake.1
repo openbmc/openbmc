@@ -1,0 +1,142 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH BITBAKE 1 "November 19, 2006"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+BitBake \- simple tool for the execution of tasks
+.SH SYNOPSIS
+.B bitbake
+.RI [ options ] " packagenames"
+.br
+.SH DESCRIPTION
+This manual page documents briefly the
+.B bitbake
+command.
+.PP
+.\" TeX users may be more comfortable with the \fB<whatever>\fP and
+.\" \fI<whatever>\fP escape sequences to invode bold face and italics, 
+.\" respectively.
+\fBbitbake\fP is a program that executes the specified task (default is 'build')
+for a given set of BitBake files.
+.br
+It expects that BBFILES is defined, which is a space separated list of files to
+be executed. BBFILES does support wildcards.
+.br
+Default BBFILES are the .bb files in the current directory.
+.SH OPTIONS
+This program follow the usual GNU command line syntax, with long
+options starting with two dashes (`-').
+.TP
+.B \-h, \-\-help
+Show summary of options.
+.TP
+.B \-\-version
+Show version of program.
+.TP
+.B \-bBUILDFILE, \-\-buildfile=BUILDFILE
+execute the task against this .bb file, rather than a package from BBFILES.
+.TP
+.B \-k, \-\-continue
+continue as much as possible after an error. While the target that failed, and
+those that depend on it, cannot be remade, the other dependencies of these
+targets can be processed all the same.
+.TP
+.B \-a, \-\-tryaltconfigs
+continue with builds by trying to use alternative providers where possible.
+.TP
+.B \-f, \-\-force
+force run of specified cmd, regardless of stamp status
+.TP
+.B \-i, \-\-interactive
+drop into the interactive mode also called the BitBake shell.
+.TP
+.B \-cCMD, \-\-cmd=CMD
+Specify task to execute. Note that this only executes the specified task for
+the providee and the packages it depends on, i.e. 'compile' does not implicitly
+call stage for the dependencies (IOW: use only if you know what you are doing).
+Depending on the base.bbclass a listtasks task is defined and will show
+available tasks.
+.TP
+.B \-rFILE, \-\-read=FILE 
+read the specified file before bitbake.conf
+.TP
+.B \-v, \-\-verbose
+output more chit-chat to the terminal
+.TP
+.B \-D, \-\-debug
+Increase the debug level. You can specify this more than once.
+.TP
+.B \-n, \-\-dry-run
+don't execute, just go through the motions
+.TP
+.B \-p, \-\-parse-only
+quit after parsing the BB files (developers only)
+.TP
+.B \-s, \-\-show-versions
+show current and preferred versions of all packages
+.TP
+.B \-e, \-\-environment
+show the global or per-recipe environment (this is what used to be bbread)
+.TP
+.B \-g, \-\-graphviz
+emit the dependency trees of the specified packages in the dot syntax
+.TP
+.B \-IIGNORED\_DOT\_DEPS, \-\-ignore-deps=IGNORED_DOT_DEPS
+Stop processing at the given list of dependencies when generating dependency
+graphs. This can help to make the graph more appealing
+.TP
+.B \-lDEBUG_DOMAINS, \-\-log-domains=DEBUG_DOMAINS
+Show debug logging for the specified logging domains
+.TP
+.B \-P, \-\-profile
+profile the command and print a report
+.TP
+.B \-uUI, \-\-ui=UI
+User interface to use. Currently, hob, depexp, goggle or ncurses can be specified as UI.
+.TP
+.B \-tSERVERTYPE, \-\-servertype=SERVERTYPE
+Choose which server to use, none, process or xmlrpc.
+.TP
+.B \-\-revisions-changed
+Set the exit code depending on whether upstream floating revisions have changed or not.
+.TP
+.B \-\-server-only
+Run bitbake without UI,  the frontend can connect with bitbake server itself.
+.TP
+.B \-BBIND, \-\-bind=BIND
+The name/address for the bitbake server to bind to.
+.TP
+.B \-\-no\-setscene
+Do not run any setscene tasks, forces builds.
+
+.SH ENVIRONMENT VARIABLES
+bitbake uses the following environment variables to control its
+operation:
+.TP
+.B BITBAKE_UI
+The bitbake user interface; overridden by the \fB-u\fP commandline option.
+
+.SH AUTHORS
+BitBake was written by 
+Phil Blundell,
+Holger Freyther,
+Chris Larson,
+Mickey Lauer,
+Richard Purdie,
+Holger Schurig
+.PP
+This manual page was written by Marcin Juszkiewicz <marcin@hrw.one.pl>
+for the Debian project (but may be used by others).

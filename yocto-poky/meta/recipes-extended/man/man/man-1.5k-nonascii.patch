@@ -1,0 +1,18 @@
+Upstream-Status: Pending
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+--- ./src/apropos.sh.nonascii	2001-11-23 00:30:42.000000000 +0100
++++ ./src/apropos.sh	2002-08-13 15:44:53.000000000 +0200
+@@ -18,9 +18,9 @@
+ 
+ # When man pages in your favorite locale look to grep like binary files
+ # (and you use GNU grep) you may want to add the 'a' option to *grepopt1.
+-aproposgrepopt1='i'
++aproposgrepopt1='ia'
+ aproposgrepopt2=''
+-whatisgrepopt1='iw'
++whatisgrepopt1='iwa'
+ whatisgrepopt2='^'
+ grepopt1=$%apropos_or_whatis%grepopt1
+ grepopt2=$%apropos_or_whatis%grepopt2

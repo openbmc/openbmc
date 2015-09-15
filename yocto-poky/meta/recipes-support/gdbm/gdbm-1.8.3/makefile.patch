@@ -1,0 +1,60 @@
+Upstream-Status: Pending
+
+#
+# Patch managed by http://www.mn-logistik.de/unsupported/pxa250/patcher
+#
+
+--- gdbm-1.8.3/Makefile.in~makefile
++++ gdbm-1.8.3/Makefile.in
+@@ -22,6 +22,7 @@
+ TEXI2DVI = texi2dvi
+ 
+ DEFS =
++DESTDIR =
+ 
+ # Where the system [n]dbm routines are...
+ LIBS = @LIBS@ -lc
+@@ -127,26 +128,26 @@
+ progs: $(PROGS)
+ 
+ install: libgdbm.la gdbm.h gdbm.info
+-	$(srcdir)/mkinstalldirs $(INSTALL_ROOT)$(libdir) \
+-		$(INSTALL_ROOT)$(includedir) $(INSTALL_ROOT)$(man3dir) \
+-		$(INSTALL_ROOT)$(infodir)
+-	$(LIBTOOL) $(INSTALL) -c libgdbm.la $(INSTALL_ROOT)$(libdir)/libgdbm.la
+-	$(INSTALL_DATA) -o $(BINOWN) -g $(BINGRP) gdbm.h \
+-		$(INSTALL_ROOT)$(includedir)/gdbm.h
+-	$(INSTALL_DATA) -o $(BINOWN) -g $(BINGRP) $(srcdir)/gdbm.3 \
+-		$(INSTALL_ROOT)$(man3dir)/gdbm.3
+-	$(INSTALL_DATA) -o $(BINOWN) -g $(BINGRP) $(srcdir)/gdbm.info \
+-		$(INSTALL_ROOT)$(infodir)/gdbm.info
++	$(srcdir)/mkinstalldirs $(DESTDIR)$(libdir) \
++		$(DESTDIR)$(includedir) $(DESTDIR)$(man3dir) \
++		$(DESTDIR)$(infodir)
++	$(LIBTOOL) $(INSTALL) -c libgdbm.la $(DESTDIR)$(libdir)/libgdbm.la
++	$(INSTALL_DATA) gdbm.h \
++		$(DESTDIR)$(includedir)/gdbm.h
++	$(INSTALL_DATA) $(srcdir)/gdbm.3 \
++		$(DESTDIR)$(man3dir)/gdbm.3
++	$(INSTALL_DATA) $(srcdir)/gdbm.info \
++		$(DESTDIR)$(infodir)/gdbm.info
+ 
+ install-compat:
+-	$(srcdir)/mkinstalldirs $(INSTALL_ROOT)$(libdir) \
+-		$(INSTALL_ROOT)$(includedir)
++	$(srcdir)/mkinstalldirs $(DESTDIR)$(libdir) \
++		$(DESTDIR)$(includedir)
+ 	$(LIBTOOL) $(INSTALL) -c libgdbm_compat.la \
+-		$(INSTALL_ROOT)$(libdir)/libgdbm_compat.la
+-	$(INSTALL_DATA) -o $(BINOWN) -g $(BINGRP) $(srcdir)/dbm.h \
+-		$(INSTALL_ROOT)$(includedir)/dbm.h
+-	$(INSTALL_DATA) -o $(BINOWN) -g $(BINGRP) $(srcdir)/ndbm.h \
+-		$(INSTALL_ROOT)$(includedir)/ndbm.h
++		$(DESTDIR)$(libdir)/libgdbm_compat.la
++	$(INSTALL_DATA) $(srcdir)/dbm.h \
++		$(DESTDIR)$(includedir)/dbm.h
++	$(INSTALL_DATA) $(srcdir)/ndbm.h \
++		$(DESTDIR)$(includedir)/ndbm.h
+ 
+ #libgdbm.a: $(OBJS) gdbm.h
+ #	rm -f libgdbm.a

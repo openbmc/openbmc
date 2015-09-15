@@ -1,0 +1,18 @@
+Install the examples to $libdir/clutter/.
+
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+Upstream-Status: Inappropriate
+
+diff --git a/examples/Makefile.am b/examples/Makefile.am
+index 4b9b449..232cd19 100644
+--- a/examples/Makefile.am
++++ b/examples/Makefile.am
+@@ -38,6 +38,7 @@ AM_CPPFLAGS = \
+ 	-I$(top_srcdir)/clutter \
+ 	-I$(top_builddir)/clutter
+ 
+-noinst_PROGRAMS = $(all_examples)
++exampledir = $(pkglibdir)/examples
++example_PROGRAMS = $(all_examples)
+ 
+ EXTRA_DIST = redhand.png

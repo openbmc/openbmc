@@ -1,0 +1,35 @@
+Subject: [PATCH] fix minicom -h/-v return value is not 0
+
+Upstream-Status: Pending
+
+Signed-off-by: Lu Chong <Chong.Lu@windriver.com>
+
+---
+ src/minicom.c |    6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/src/minicom.c b/src/minicom.c
+index e1a557b..730da7c 100644
+--- a/src/minicom.c
++++ b/src/minicom.c
+@@ -1166,15 +1166,13 @@ int main(int argc, char **argv)
+ 	         "modify it under the terms of the GNU General Public License\n"
+                  "as published by the Free Software Foundation; either version\n"
+                  "2 of the License, or (at your option) any later version.\n\n");
+-          exit(1);
+-          break;
++          exit(0);
+         case 's': /* setup mode */
+           dosetup = 1;
+           break;
+         case 'h':
+           helpthem();
+-          exit(1);
+-          break;
++          exit(0);
+         case 'p': /* Pseudo terminal to use. */
+           if (strncmp(optarg, "/dev/", 5) == 0)
+             optarg += 5;
+-- 
+1.7.9.5
+

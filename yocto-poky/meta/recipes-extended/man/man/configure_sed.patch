@@ -1,0 +1,32 @@
+man: replace ',' with '#'
+
+Sometimes, the parameters of CC/BUILD_CC contains the ',', which
+cause the sed command failed, so replace the ',' with '#'
+
+Upstream-Status: Pending
+
+Signed-off-by: Yue Tao <Yue.Tao@windriver.com>
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ configure | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure b/configure
+index 9f62cf9..9a565ae 100755
+--- a/configure
++++ b/configure
+@@ -1321,9 +1321,9 @@ do
+   echo "Creating $infile from $infile.in"
+   sed -e '
+ s,@version@,$version,
+-s,@CC@,$CC,
++s#@CC@#$CC#
+ s,@EXEEXT@,$EXEEXT,
+-s,@BUILD_CC@,$BUILD_CC,
++s#@BUILD_CC@#$BUILD_CC#
+ s,@INSTALL@,$INSTALL,
+ s,@DEFS@,$DEFS,
+ s,@LIBS@,$LIBS,
+-- 
+1.9.1
+

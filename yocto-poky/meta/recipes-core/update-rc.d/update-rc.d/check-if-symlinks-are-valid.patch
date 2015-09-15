@@ -1,0 +1,59 @@
+Check if symlinks are valid
+
+When using root option and $initd/$bn is a symlink, the script would fail because
+the symlink points to a path on target. For example:
+
+/path/to/target/rootfs/etc/init.d/syslog -> /etc/init.d/syslog.busybox
+
+Hence, [ -f /path/to/target/rootfs/etc/init.d/syslog ] condition would return
+false.
+
+This patch adds the posibility to check whether the file the symlink points to
+actually exists in rootfs path and then continue.
+
+Upstream-Status: Pending
+
+Signed-off-by: Laurentiu Palcu <laurentiu.palcu@intel.com> 
+Signed-off-by: Christopher Larson <chris_larson@mentor.com>
+
+Index: git/update-rc.d
+===================================================================
+--- git.orig/update-rc.d
++++ git/update-rc.d
+@@ -147,13 +147,34 @@ fi
+ bn=$1
+ shift
+ 
++sn=$initd/$bn
++if [ -L "$sn" -a -n "$root" ]; then
++	if which readlink >/dev/null; then
++		while true; do
++			linksn="$(readlink "$sn")"
++			if [ -z "$linksn" ]; then
++				break
++			fi
++
++			sn="$linksn"
++			case "$sn" in
++				/*) sn="$root$sn" ;;
++				*)  sn="$initd/$sn" ;;
++			esac
++		done
++	else
++		echo "update-rc.d: readlink tool not present, cannot check whether \
++				$sn symlink points to a valid file." >&2
++	fi
++fi
++
+ if [ $1 != "remove" ]; then
+-	if [ ! -f "$initd/$bn" ]; then
++	if [ ! -f "$sn" ]; then
+ 		echo "update-rc.d: $initd/$bn: file does not exist" >&2
+ 		exit 1
+ 	fi
+ else
+-	if [ -f "$initd/$bn" ]; then
++	if [ -f "$sn" ]; then
+ 		if [ $force -eq 1 ]; then
+ 			echo "update-rc.d: $initd/$bn exists during rc.d purge (continuing)" >&2
+ 		else

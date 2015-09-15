@@ -1,0 +1,36 @@
+
+Upstream-Status: Inappropriate [embedded]
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+Index: groff-1.18.1.4/tmac/mdoc.local
+===================================================================
+--- groff-1.18.1.4.orig/tmac/mdoc.local	2001-03-23 08:17:51.000000000 +0800
++++ groff-1.18.1.4/tmac/mdoc.local	2010-08-24 14:20:22.014006846 +0800
+@@ -1,2 +1,26 @@
+ .\" This file is loaded after doc.tmac.
+ .\" Put any local modifications to doc.tmac here.
++.
++.if n \{\
++.  \" Debian: Map \(oq to ' rather than ` in nroff mode for devices other
++.  \" than utf8.
++.  if !'\*[.T]'utf8' \
++.    tr \[oq]'
++.
++.  \" Debian: Disable the use of SGR (ANSI colour) escape sequences by
++.  \" grotty.
++.  if '\V[GROFF_SGR]'' \
++.    output x X tty: sgr 0
++.
++.  \" Debian: Map \- to the Unicode HYPHEN-MINUS character, to make
++.  \" searching in man pages easier.
++.  if '\*[.T]'utf8' \
++.    char \- \N'45'
++.
++.  \" Debian: Many UTF-8 man pages use "-" instead of "\-" for dashes such
++.  \" as those in command-line options. This is a bug in those pages, but
++.  \" too many fonts are missing the Unicode HYPHEN character, so we render
++.  \" this as the ASCII-compatible HYPHEN-MINUS instead.
++.  if '\*[.T]'utf8' \
++.    char - \N'45'
++.\}

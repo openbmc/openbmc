@@ -1,0 +1,49 @@
+From 19593491f43b70c1a71c3b9b8f4ff4fd14500014 Mon Sep 17 00:00:00 2001
+From: Bruce Ashfield <bruce.ashfield@windriver.com>
+Date: Fri, 23 Mar 2012 14:27:20 -0400
+Subject: [PATCH] types.h: add defines that are required for if_packet.h
+
+The iptables local linux/types.h overrides the kernel/sysroot
+types.h. As such, we need to provide some defines that are required
+to build against 3.2+ kernel headers.
+
+ifndef protection is provided for the defines to ensure that
+configuration that already have these defines are still buildable.
+
+This commit is temporary until a new version of iptables can be
+used that contains the defines.
+
+This is similar to the commit in the iptables git repository:
+
+  https://git.netfilter.org/cgi-bin/gitweb.cgi?p=iptables.git;a=commit;h=dbe77cc974cee656eae37e75039dd1a410a4535b
+
+Upstream-Status: Backport
+
+Signed-off-by: Bruce Ashfield <bruce.ashfield@windriver.com>
+---
+ include/linux/types.h |   10 ++++++++++
+ 1 files changed, 10 insertions(+), 0 deletions(-)
+
+diff --git a/include/linux/types.h b/include/linux/types.h
+index 8b483c8..ebf6432 100644
+--- a/include/linux/types.h
++++ b/include/linux/types.h
+@@ -34,5 +34,15 @@ typedef __u64 __bitwise __be64;
+ typedef __u16 __bitwise __sum16;
+ typedef __u32 __bitwise __wsum;
+ 
++#ifndef __aligned_u64
++#define __aligned_u64 __u64 __attribute__((aligned(8)))
++#endif
++#ifndef __aligned_be64
++#define __aligned_be64 __be64 __attribute__((aligned(8)))
++#endif
++#ifndef __aligned_le64
++#define __aligned_le64 __le64 __attribute__((aligned(8)))
++#endif
++
+ #endif /*  __ASSEMBLY__ */
+ #endif /* _LINUX_TYPES_H */
+-- 
+1.7.0.4
+

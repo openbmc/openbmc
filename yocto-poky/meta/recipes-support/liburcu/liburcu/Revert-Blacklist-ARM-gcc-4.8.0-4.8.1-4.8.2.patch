@@ -1,0 +1,47 @@
+From 7b3df100346128d780f218b881d563d1fd12e310 Mon Sep 17 00:00:00 2001
+From: Jonathan Liu <net147@gmail.com>
+Date: Mon, 20 Oct 2014 13:46:10 +1100
+Subject: [PATCH] Revert "Blacklist ARM gcc 4.8.0, 4.8.1, 4.8.2"
+
+This reverts commit 4b79310aa3d408ba30fee02cc497a68072d38a99.
+OE-Core is using a patched GCC 4.8.2 which is able to compile liburcu
+properly.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Jonathan Liu <net147@gmail.com>
+---
+ urcu/compiler.h | 19 -------------------
+ 1 file changed, 19 deletions(-)
+
+diff --git a/urcu/compiler.h b/urcu/compiler.h
+index 1e30903..19534f0 100644
+--- a/urcu/compiler.h
++++ b/urcu/compiler.h
+@@ -108,23 +108,4 @@
+ 
+ #define CAA_ARRAY_SIZE(x)	(sizeof(x) / sizeof((x)[0]))
+ 
+-/*
+- * Don't allow compiling with buggy compiler.
+- */
+-
+-#ifdef __GNUC__
+-# define URCU_GCC_VERSION	(__GNUC__ * 10000 \
+-				+ __GNUC_MINOR__ * 100 \
+-				+ __GNUC_PATCHLEVEL__)
+-
+-/*
+- * http://gcc.gnu.org/bugzilla/show_bug.cgi?id=58854
+- */
+-# ifdef __ARMEL__
+-#  if URCU_GCC_VERSION >= 40800 && URCU_GCC_VERSION <= 40802
+-#   error Your gcc version produces clobbered frame accesses
+-#  endif
+-# endif
+-#endif
+-
+ #endif /* _URCU_COMPILER_H */
+-- 
+2.1.2
+

@@ -1,0 +1,52 @@
+The comment to this function says:
+
+"""
+  * Stupid algorithm --- we now just search forward starting from the
+  * goal.  Should put in a smarter one someday....
+"""
+
+This adds in a rather hacky algorthim which starts where we finished
+searching previously using a static variable rather than starting 
+from scratch if a hint isn't provided.
+
+This was after noticing that mkfs.ext4 -F X -d Y was spending *lots*
+of time in ext2fs_new_block2 called from ext2fs_bmap from ext2fs_file_write().
+
+Numbers wise, this took a core-image-sato-sdk mkfs time from over 
+8 minutes to around 35 seconds.
+
+Upstream-Status: Pending
+
+RP 2015/02/20
+
+Index: e2fsprogs-1.42.9/lib/ext2fs/alloc.c
+===================================================================
+--- e2fsprogs-1.42.9.orig/lib/ext2fs/alloc.c
++++ e2fsprogs-1.42.9/lib/ext2fs/alloc.c
+@@ -160,6 +160,8 @@ errcode_t ext2fs_new_inode(ext2_filsys f
+ 	return 0;
+ }
+ 
++static blk64_t last_goal = 0;
++
+ /*
+  * Stupid algorithm --- we now just search forward starting from the
+  * goal.  Should put in a smarter one someday....
+@@ -170,6 +172,9 @@ errcode_t ext2fs_new_block2(ext2_filsys
+ 	blk64_t	i;
+ 	int	c_ratio;
+ 
++        if (!goal)
++            goal = last_goal;
++
+ 	EXT2_CHECK_MAGIC(fs, EXT2_ET_MAGIC_EXT2FS_FILSYS);
+ 
+ 	if (!map)
+@@ -194,6 +199,7 @@ errcode_t ext2fs_new_block2(ext2_filsys
+ 
+ 		if (!ext2fs_fast_test_block_bitmap2(map, i)) {
+ 			*ret = i;
++			last_goal = i;
+ 			return 0;
+ 		}
+ 		i = (i + c_ratio) & ~(c_ratio - 1);

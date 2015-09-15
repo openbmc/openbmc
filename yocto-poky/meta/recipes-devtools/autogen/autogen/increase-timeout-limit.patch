@@ -1,0 +1,33 @@
+Subject: [PATCH] autogen: increase timeout limit for shell commands
+
+On some overloaded hosts, shell commands of autogen may can not
+finish in 5 secs. This has caused many build failures, so increase
+the timeout limit to fix this.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Xin Ouyang <Xin.Ouyang@windriver.com>
+---
+ configure.ac |    6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 0af7c18..5544f59 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -175,9 +175,9 @@ config_end_time=`date +%s 2>/dev/null`
+ time_delta=`expr ${config_end_time} - ${config_start_time} 2>/dev/null`
+ 
+ if test -z "${time_delta}"
+-then time_delta=10
+-elif test ${time_delta} -lt 5
+-then time_delta=5 ; fi
++then time_delta=60
++elif test ${time_delta} -lt 30
++then time_delta=30 ; fi
+ 
+ AG_TIMEOUT=${time_delta}
+ ]
+-- 
+1.7.9.5
+

@@ -1,0 +1,37 @@
+Upstream-Status: Inappropriate [configuration]
+Signed-off-by: Constantin Musca <constantinx.musca@intel.com>
+
+
+diff --git a/apt-pkg/packagemanager.cc b/apt-pkg/packagemanager.cc
+index 249542c..0a1911f 100644
+--- a/apt-pkg/packagemanager.cc
++++ b/apt-pkg/packagemanager.cc
+@@ -952,10 +952,12 @@ bool pkgPackageManager::SmartUnPack(PkgIterator Pkg, bool const Immediate, int c
+       return false;
+ 
+    if (Immediate == true) {
++#if 0
+       // Perform immedate configuration of the package. 
+          if (SmartConfigure(Pkg, Depth + 1) == false)
+             _error->Error(_("Could not perform immediate configuration on '%s'. "
+                "Please see man 5 apt.conf under APT::Immediate-Configure for details. (%d)"),Pkg.FullName().c_str(),2);
++#endif
+    }
+    
+    return true;
+@@ -1038,6 +1040,7 @@ pkgPackageManager::OrderResult pkgPackageManager::OrderInstall()
+       }
+    }
+ 
++#if 0
+    // Final run through the configure phase
+    if (ConfigureAll() == false)
+       return Failed;
+@@ -1052,6 +1055,7 @@ pkgPackageManager::OrderResult pkgPackageManager::OrderInstall()
+ 	 return Failed;
+       }
+    }
++#endif
+ 	 
+    return Completed;
+ }

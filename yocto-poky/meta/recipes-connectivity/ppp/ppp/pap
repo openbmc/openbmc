@@ -1,0 +1,22 @@
+# You can use this script unmodified to connect to sites which allow
+# authentication via PAP, CHAP and similar protocols.
+# This script can be shared among different pppd peer configurations.
+# To use it, add something like this to your /etc/ppp/peers/ file:
+#
+# connect "/usr/sbin/chat -v -f /etc/chatscripts/pap -T PHONE-NUMBER"
+# user YOUR-USERNAME-IN-PAP-SECRETS
+# noauth
+
+# Uncomment the following line to see the connect speed.
+# It will be logged to stderr or to the file specified with the -r chat option.
+#REPORT		CONNECT
+
+ABORT		BUSY
+ABORT		VOICE
+ABORT		"NO CARRIER"
+ABORT		"NO DIALTONE"
+ABORT		"NO DIAL TONE"
+""		ATZ
+OK		ATDT\T
+CONNECT		""
+

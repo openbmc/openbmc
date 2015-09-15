@@ -1,0 +1,27 @@
+python/rpmmodules.c: Change the way the python module loads the RPM config
+
+In order to support the RPM_VENDOR_WINDRIVER enhancement of dynamic
+runtime relocation paths, we need to call rpmcliInit instead of 
+rpmReadConfigFiles.  The rpmcliInit will end up calling rpmReadConfigFiles
+after the necessary relocation processing (if enabled).
+
+Code derived from changes suggested by Paul Eggleton.
+
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.14/python/rpmmodule.c
+===================================================================
+--- rpm-5.4.14.orig/python/rpmmodule.c
++++ rpm-5.4.14/python/rpmmodule.c
+@@ -392,7 +392,8 @@ void init_rpm(void)
+     if (Py_AtExit(rpm_exithook) == -1)
+ 	return;
+ 
+-    rpmReadConfigFiles(NULL, NULL);
++    const char *argv[1] = {"rpmmodule", 0};
++    rpmcliInit(1, argv, NULL);
+ 
+     d = PyModule_GetDict(m);
+ 

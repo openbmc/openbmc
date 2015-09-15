@@ -1,0 +1,144 @@
+Author: Mike Markley <mike@markley.org>
+Author: Sergei Golovan <sgolovan@debian.org>
+Description: Fixes shebangs in examples (Closes: #152367).
+
+Backported from Debian
+
+Upstream-Status: Pending
+Index: expect5.45/example/beer.exp
+===================================================================
+--- expect5.45.orig/example/beer.exp	2006-01-25 13:51:39.000000000 -0800
++++ expect5.45/example/beer.exp	2013-11-01 17:35:19.817318341 -0700
+@@ -1,4 +1,9 @@
+-#!/depot/path/expect -f
++#!/bin/sh
++# -*- tcl -*-
++# The next line is executed by /bin/sh, but not tcl \
++exec tclsh "$0" ${1+"$@"}
++
++package require Expect
+ 
+ # 99 bottles of beer on the wall, Expect-style
+ # Author: Don Libes <libes@nist.gov>
+Index: expect5.45/example/expectd.proto
+===================================================================
+--- expect5.45.orig/example/expectd.proto	2010-07-02 09:03:31.000000000 -0700
++++ expect5.45/example/expectd.proto	2013-11-01 17:35:19.821318341 -0700
+@@ -1,4 +1,10 @@
+-#!/depot/tcl/src/expect/e --
++#!/bin/sh
++# -*- tcl -*-
++# The next line is executed by /bin/sh, but not tcl \
++exec tclsh "$0" ${1+"$@"}
++
++package require Expect
++
+ # Description: Simple fragment to begin a telnet daemon
+ # For more information, see Chapter 17 of "Exploring Expect"
+ # Author: Don Libes, NIST
+Index: expect5.45/example/irsh
+===================================================================
+--- expect5.45.orig/example/irsh	2010-07-02 09:03:31.000000000 -0700
++++ expect5.45/example/irsh	2013-11-01 17:35:19.821318341 -0700
+@@ -1,4 +1,9 @@
+-#!/depot/path/expect --
++#!/bin/sh
++# -*- tcl -*-
++# The next line is executed by /bin/sh, but not tcl \
++exec tclsh "$0" ${1+"$@"}
++
++package require Expect
+ 
+ # Do rsh interactively.  For example, consider the following command:
+ #    rsh <remote> ls -l "|" more
+Index: expect5.45/example/passwd.cgi
+===================================================================
+--- expect5.45.orig/example/passwd.cgi	2000-01-06 15:22:07.000000000 -0800
++++ expect5.45/example/passwd.cgi	2013-11-01 17:35:19.821318341 -0700
+@@ -1,4 +1,9 @@
+-#!/depot/path/expect --
++#!/bin/sh
++# -*- tcl -*-
++# The next line is executed by /bin/sh, but not tcl \
++exec tclsh "$0" ${1+"$@"}
++
++package require Expect
+ 
+ # This is a CGI script to process requests created by the accompanying
+ # passwd.html form.  This script is pretty basic, although it is
+Index: expect5.45/example/passwdprompt
+===================================================================
+--- expect5.45.orig/example/passwdprompt	2003-09-05 12:01:59.000000000 -0700
++++ expect5.45/example/passwdprompt	2013-11-01 17:35:19.821318341 -0700
+@@ -1,4 +1,9 @@
+-#!/depot/path/expect
++#!/bin/sh
++# -*- tcl -*-
++# The next line is executed by /bin/sh, but not tcl \
++exec tclsh "$0" ${1+"$@"}
++
++package require Expect
+ 
+ # This script prompts for a passwd from stdin while echoing *'s
+ 
+Index: expect5.45/example/reprompt
+===================================================================
+--- expect5.45.orig/example/reprompt	2000-01-06 15:22:07.000000000 -0800
++++ expect5.45/example/reprompt	2013-11-01 17:35:19.821318341 -0700
+@@ -1,4 +1,9 @@
+-#!/depot/path/expect --
++#!/bin/sh
++# -*- tcl -*-
++# The next line is executed by /bin/sh, but not tcl \
++exec tclsh "$0" ${1+"$@"}
++
++package require Expect
+ 
+ # Name: reprompt
+ # Description: reprompt every so often until user enters something
+Index: expect5.45/example/term_expect
+===================================================================
+--- expect5.45.orig/example/term_expect	2005-02-15 10:11:31.000000000 -0800
++++ expect5.45/example/term_expect	2013-11-01 17:35:19.821318341 -0700
+@@ -1,4 +1,9 @@
+-#!/depot/path/expectk
++#!/bin/sh
++# -*- tcl -*-
++# The next line is executed by /bin/sh, but not tcl \
++exec wish "$0" ${1+"$@"}
++
++package require Expect
+ 
+ # Name: tkterm - terminal emulator using Expect and Tk text widget, v3.0
+ # Author: Don Libes, July '94
+Index: expect5.45/example/vrfy
+===================================================================
+--- expect5.45.orig/example/vrfy	2010-07-02 09:03:31.000000000 -0700
++++ expect5.45/example/vrfy	2013-11-01 17:35:19.821318341 -0700
+@@ -1,4 +1,9 @@
+-#!/depot/path/expect -f
++#!/bin/sh
++# -*- tcl -*-
++# The next line is executed by /bin/sh, but not tcl \
++exec tclsh "$0" ${1+"$@"}
++
++package require Expect
+ 
+ 
+ # separate address into user and host
+Index: expect5.45/example/xrlogin
+===================================================================
+--- expect5.45.orig/example/xrlogin	2000-01-06 15:22:08.000000000 -0800
++++ expect5.45/example/xrlogin	2013-11-01 17:35:19.821318341 -0700
+@@ -1,4 +1,10 @@
+-#!/depot/path/expect --
++#!/bin/sh
++# -*- tcl -*-
++# The next line is executed by /bin/sh, but not tcl \
++exec tclsh "$0" ${1+"$@"}
++
++package require Expect
++
+ # xrlogin - rlogin but with current DISPLAY
+ #
+ # You can extend this idea to save any arbitrary information across rlogin

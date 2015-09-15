@@ -1,0 +1,37 @@
+Fix parallel build dependency issue
+
+If building with make -j2 the lib.a will not get built in time.
+
+Jason Wessel <jason.wessel@windriver.com>
+
+Upstream-Status: Submitted http://sourceforge.net/p/unfs3/bugs/5/
+
+---
+ Config/Makefile.in |    3 +++
+ Makefile.in        |    3 ++-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -29,7 +29,8 @@ DESTDIR =
+ 
+ VPATH = $(srcdir)
+ 
+-all: subdirs unfsd$(EXEEXT)
++all: subdirs
++	$(MAKE) unfsd$(EXEEXT)
+ 
+ unfsd$(EXEEXT): $(OBJS) $(CONFOBJ) $(EXTRAOBJ)
+ 	$(CC) -o $@ $(OBJS) $(CONFOBJ) $(EXTRAOBJ) $(LDFLAGS)
+--- a/Config/Makefile.in
++++ b/Config/Makefile.in
+@@ -16,6 +16,9 @@ lib.a: $(OBJS)
+ 	$(AR) crs lib.a $(OBJS)
+ 
+ y.tab.h y.tab.c: $(srcdir)/exports.y
++y.tab.h: y.tab.c
++
++y.tab.c: $(srcdir)/exports.y
+ 	$(YACC) -d $(srcdir)/exports.y
+ 
+ y.tab.o: y.tab.c $(srcdir)/exports.h $(top_srcdir)/nfs.h $(top_srcdir)/mount.h $(top_srcdir)/daemon.h

@@ -1,0 +1,41 @@
+Upstream-Status: Backport
+
+diff -ruNp tcp_wrappers_7.6.orig/scaffold.c tcp_wrappers_7.6/scaffold.c
+--- tcp_wrappers_7.6.orig/scaffold.c	2005-03-09 18:22:04.000000000 +0100
++++ tcp_wrappers_7.6/scaffold.c	2005-03-09 18:20:47.000000000 +0100
+@@ -237,10 +237,17 @@ struct request_info *request;
+ 
+ /* ARGSUSED */
+ 
+-void    rfc931(request)
+-struct request_info *request;
++void    rfc931(rmt_sin, our_sin, dest)
++#ifdef INET6
++struct sockaddr *rmt_sin;
++struct sockaddr *our_sin;
++#else
++struct sockaddr_in *rmt_sin;
++struct sockaddr_in *our_sin;
++#endif
++char   *dest;
+ {
+-    strcpy(request->user, unknown);
++    strcpy(dest, unknown);
+ }
+ 
+ /* check_path - examine accessibility */
+diff -ruNp tcp_wrappers_7.6.orig/tcpd.h tcp_wrappers_7.6/tcpd.h
+--- tcp_wrappers_7.6.orig/tcpd.h	2005-03-09 18:22:04.000000000 +0100
++++ tcp_wrappers_7.6/tcpd.h	2005-03-09 18:21:23.000000000 +0100
+@@ -83,7 +83,11 @@ extern int hosts_access(struct request_i
+ extern void shell_cmd(char *);		/* execute shell command */
+ extern char *percent_x(char *, int, char *, struct request_info *);
+ 					/* do %<char> expansion */
++#ifdef INET6
+ extern void rfc931(struct sockaddr *, struct sockaddr *, char *);
++#else
++extern void rfc931(struct sockaddr_in *, struct sockaddr_in *, char *);
++#endif
+ 					/* client name from RFC 931 daemon */
+ extern void clean_exit(struct request_info *);	/* clean up and exit */
+ extern void refuse(struct request_info *);	/* clean up and exit */

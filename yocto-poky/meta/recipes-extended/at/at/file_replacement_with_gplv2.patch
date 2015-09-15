@@ -1,0 +1,30 @@
+Upstream-Status: Inappropriate [licensing]
+
+posixtm.[ch] files are replaced with gplv2 version from these locations:
+
+http://git.savannah.gnu.org/gitweb/?p=gnulib.git;a=blob;f=lib/posixtm.c;hb=5661ab9d49512b4cf3c19caa11bb581d8ce561ba
+http://git.savannah.gnu.org/gitweb/?p=gnulib.git;a=blob;f=lib/posixtm.h;hb=5661ab9d49512b4cf3c19caa11bb581d8ce561ba 
+
+update the Copyright file information to reflect the replaced files.
+
+Date: 2010/08/31
+Nitin A Kamble nitin.a.kamble@intel.com
+
+Index: at-3.1.12/Copyright
+===================================================================
+--- at-3.1.12.orig/Copyright
++++ at-3.1.12/Copyright
+@@ -31,10 +31,10 @@ The files posixtm.c and posixtm.h have t
+    Copyright (C) 1989, 1990, 1991, 1998, 2000, 2001, 2002, 2003, 2004,
+    2005, 2006, 2007 Free Software Foundation Inc.
+ 
+-   This program is free software: you can redistribute it and/or modify
++   This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+-   the Free Software Foundation; either version 3 of the License, or
+-   (at your option) any later version.
++   the Free Software Foundation; either version 2, or (at your option)
++   any later version.
+ 
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of

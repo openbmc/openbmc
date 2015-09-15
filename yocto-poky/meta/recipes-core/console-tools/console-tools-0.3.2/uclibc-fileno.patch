@@ -1,0 +1,49 @@
+Fixing the locale issues isn't enough, console-tools also does a couple of
+other pretty stupid things (like FILE *f; f->_fileno instead of fileno(f)),
+
+Upstream-Status: Pending
+
+--- console-tools-0.3.2/lib/cfont/fontstruct.c.ark	2005-05-22 19:12:38.000000000 +0000
++++ console-tools-0.3.2/lib/cfont/fontstruct.c	2005-05-22 19:13:23.000000000 +0000
+@@ -50,8 +50,7 @@
+    * get filesize
+    */
+   
+-  /* FIXME: should not use _fileno ! */
+-  if (fstat(fontfile->_fileno, &stbuf) == -1)
++  if (fstat(fileno(fontfile), &stbuf) == -1)
+     goto rsf_return_error;
+   
+   if (S_ISREG(stbuf.st_mode))
+@@ -211,8 +210,7 @@
+    * get filesize
+    */
+   
+-  /* FIXME: should not use _fileno ! */
+-  if (fstat(fontfile->_fileno, &stbuf) == -1)
++  if (fstat(fileno(fontfile), &stbuf) == -1)
+     goto rfg_return_error;
+   
+   if (S_ISREG(stbuf.st_mode))
+--- console-tools-0.3.2/lib/console/acm.c.ark	2005-05-22 19:17:15.000000000 +0000
++++ console-tools-0.3.2/lib/console/acm.c	2005-05-22 19:17:23.000000000 +0000
+@@ -30,7 +30,7 @@
+   lct_boolean parse_failed = False;
+   lct_boolean is_unicode;
+ 
+-  if (fstat(fp->_fileno, &stbuf)) 
++  if (fstat(fileno(fp), &stbuf)) 
+     perror(_("Cannot stat ACM file")), exit(1);
+ 
+   /* first try a wg15-charmap (glibc) file format */
+--- console-tools-0.3.2/include/lct/local.h.ark	2005-05-22 19:08:54.000000000 +0000
++++ console-tools-0.3.2/include/lct/local.h	2005-05-22 19:09:12.000000000 +0000
+@@ -8,7 +8,7 @@
+ #include <locale.h>
+ 
+ 
+-#ifdef HAVE_LOCALE_H
++#if defined(HAVE_LOCALE_H) && defined(HAVE_LIBINTL_H)
+ # include <libintl.h>
+ # define _(String) gettext (String)
+ # ifdef gettext_noop

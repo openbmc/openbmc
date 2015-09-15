@@ -1,0 +1,86 @@
+From 6198856b5323d6204094293f01b890472618f182 Mon Sep 17 00:00:00 2001
+From: Russ Allbery <rra@cpan.org>
+Date: Wed, 15 Apr 2015 20:49:07 -0700
+Subject: Documentation and test suite updates for UTC fix
+
+Update the Pod::Man and pod2man documentation and the test suite
+for the new UTC-based default page footer, and add a Changes
+entry.
+
+(backported to Perl 5.20.2 by Niko Tyni <ntyni@debian.org>)
+
+Origin: upstream, http://git.eyrie.org/?p=perl/podlators.git;a=commitdiff;h=52db93bf80e4a06f8497e4ebade0506b6ee0e70d
+Bug-Debian: https://bugs.debian.org/780259
+Patch-Name: fixes/podman-utc-docs.diff
+---
+ cpan/podlators/lib/Pod/Man.pm     |  6 +++++-
+ cpan/podlators/scripts/pod2man.PL | 11 ++++++-----
+ cpan/podlators/t/devise-date.t    |  2 +-
+ 3 files changed, 12 insertions(+), 7 deletions(-)
+
+diff --git a/cpan/podlators/lib/Pod/Man.pm b/cpan/podlators/lib/Pod/Man.pm
+index c3ba201..365892e 100644
+--- a/cpan/podlators/lib/Pod/Man.pm
++++ b/cpan/podlators/lib/Pod/Man.pm
+@@ -910,6 +910,8 @@ sub devise_date {
+ 
+     # Can't use POSIX::strftime(), which uses Fcntl, because MakeMaker uses
+     # this and it has to work in the core which can't load dynamic libraries.
++    # Use gmtime instead of localtime so that the generated man page does not
++    # depend on the local time zone setting and is more reproducible
+     my ($year, $month, $day) = (gmtime($time))[5,4,3];
+     return sprintf("%04d-%02d-%02d", $year + 1900, $month + 1, $day);
+ }
+@@ -1656,7 +1658,9 @@ environment variable POD_MAN_DATE, if set, will be used.  Failing that,
+ the modification date of the input file will be used, or the current time
+ if stat() can't find that file (which will be the case if the input is
+ from C<STDIN>).  If obtained from the file modification date or the
+-current time, he date will be formatted as C<YYYY-MM-DD>.
++current time, the date will be formatted as C<YYYY-MM-DD> and will be based
++on UTC (so that the output will be reproducible regardless of local time
++zone).
+ 
+ =item errors
+ 
+diff --git a/cpan/podlators/scripts/pod2man.PL b/cpan/podlators/scripts/pod2man.PL
+index 6af3474..38695f8 100644
+--- a/cpan/podlators/scripts/pod2man.PL
++++ b/cpan/podlators/scripts/pod2man.PL
+@@ -174,9 +174,10 @@ Contributed Perl Documentation", but also see B<--official> below.
+ 
+ =item B<-d> I<string>, B<--date>=I<string>
+ 
+-Set the left-hand footer string to this value.  By default, the modification
+-date of the input file will be used, or the current date if input comes from
+-C<STDIN>.
++Set the left-hand footer string to this value.  By default, the
++modification date of the input file will be used, or the current date if
++input comes from C<STDIN>, and will be based on UTC (so that the output
++will be reproducible regardless of local time zone).
+ 
+ =item B<-errors>=I<style>
+ 
+@@ -383,8 +384,8 @@ B<pod2man> by Larry Wall and Tom Christiansen.
+ 
+ =head1 COPYRIGHT AND LICENSE
+ 
+-Copyright 1999, 2000, 2001, 2004, 2006, 2008, 2010, 2012, 2013 Russ
+-Allbery <rra@stanford.edu>.
++Copyright 1999, 2000, 2001, 2004, 2006, 2008, 2010, 2012, 2013, 2014,
++2015 Russ Allbery <rra@cpan.org>.
+ 
+ This program is free software; you may redistribute it and/or modify it
+ under the same terms as Perl itself.
+diff --git a/cpan/podlators/t/devise-date.t b/cpan/podlators/t/devise-date.t
+index c610dd9..9da9d1b 100644
+--- a/cpan/podlators/t/devise-date.t
++++ b/cpan/podlators/t/devise-date.t
+@@ -19,7 +19,7 @@ use Test::More tests => 2;
+ my $parser = Pod::Man->new;
+ is(
+     $parser->devise_date,
+-    strftime('%Y-%m-%d', localtime()),
++    strftime('%Y-%m-%d', gmtime()),
+     'devise_date matches strftime'
+ );
+ 

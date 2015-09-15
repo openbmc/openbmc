@@ -1,0 +1,18 @@
+# This patch addes stdlib.h to fix compiler warnings due to the exit
+# built-in not being defined and getting an incorrect implicit definition
+
+Upstream-Status: Pending
+
+Created-by: Saul Wold <saul.wold@intel.com>
+
+--- setserial-2.17/setserial.c	2010-09-02 14:11:27.569763088 -0700
++++ setserial-2.17_fixed/setserial.c	2010-09-02 14:11:08.546264139 -0700
+@@ -11,6 +11,7 @@
+  */
+ 
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <fcntl.h>
+ #include <termios.h>
+ #include <string.h>
+

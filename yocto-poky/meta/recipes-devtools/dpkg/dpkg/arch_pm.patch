@@ -1,0 +1,22 @@
+configure cannot determine the proper cpu, os, or
+architecture for mips64, and possibly other arch's
+because of faulty code added to Arch.pm in the latest
+release from upstream.  We remove that code.
+
+Upstream-Status: Pending
+
+Signed-off-by: Joe Slater <jslater@windriver.com>
+
+
+--- a/scripts/Dpkg/Arch.pm
++++ b/scripts/Dpkg/Arch.pm
+@@ -233,9 +233,6 @@ sub read_triplettable()
+ 		    (my $dt = $debtriplet) =~ s/<cpu>/$_cpu/;
+ 		    (my $da = $debarch) =~ s/<cpu>/$_cpu/;
+ 
+-		    next if exists $debarch_to_debtriplet{$da}
+-		         or exists $debtriplet_to_debarch{$dt};
+-
+ 		    $debarch_to_debtriplet{$da} = $dt;
+ 		    $debtriplet_to_debarch{$dt} = $da;
+ 		}

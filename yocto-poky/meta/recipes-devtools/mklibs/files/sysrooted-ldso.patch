@@ -1,0 +1,18 @@
+In cross builds we will have to respect sysroot
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+
+Index: mklibs-0.1.39/src/mklibs
+===================================================================
+--- mklibs-0.1.39.orig/src/mklibs	2014-03-01 18:25:36.000000000 +0000
++++ mklibs-0.1.39/src/mklibs	2014-10-19 00:51:46.813534596 +0000
+@@ -495,7 +495,7 @@
+     present_symbols = {}
+     checked_libs = small_libs
+     checked_libs.extend(available_libs)
+-    checked_libs.append(ldlib)
++    checked_libs.append(sysroot + ldlib)
+     for lib in checked_libs:
+         for symbol in provided_symbols(lib):
+             debug(DEBUG_SPAM, "present_symbols adding %s" % symbol)

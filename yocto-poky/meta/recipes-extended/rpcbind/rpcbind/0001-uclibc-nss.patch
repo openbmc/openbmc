@@ -1,0 +1,30 @@
+Upstream-Status: Pending
+
+From b8f0d7b7318ba344c25785d6f5cf3f8de98012d4 Mon Sep 17 00:00:00 2001
+From: Natanael Copa <ncopa@alpinelinux.org>
+Date: Tue, 2 Feb 2010 09:36:03 +0000
+Subject: [PATCH 1/2] uclibc-nss
+
+---
+ src/rpcbind.c |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
+
+diff --git a/src/rpcbind.c b/src/rpcbind.c
+index 525ffba..1fe1a60 100644
+--- a/src/rpcbind.c
++++ b/src/rpcbind.c
+@@ -67,7 +67,11 @@
+ #include <pwd.h>
+ #include <string.h>
+ #include <errno.h>
++#if defined(__UCLIBC__)
++#define __nss_configure_lookup(x,y)
++#else
+ #include <nss.h>
++#endif
+ #include "config.h"
+ #include "rpcbind.h"
+ 
+-- 
+1.6.6.1
+

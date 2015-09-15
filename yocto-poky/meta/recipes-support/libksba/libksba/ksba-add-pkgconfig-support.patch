@@ -1,0 +1,152 @@
+Upstream-Status: Denied
+
+Add pkgconfig support to libksba.
+This patch is rejected by upstream for the reason below:
+They think pkgconfig adds no portability and maintaining them is not worthwhile.
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+
+Index: libksba-1.3.0/Makefile.am
+===================================================================
+--- libksba-1.3.0.orig/Makefile.am	2014-05-13 21:39:22.390385646 +0000
++++ libksba-1.3.0/Makefile.am	2014-05-13 21:39:22.462385646 +0000
+@@ -21,6 +21,9 @@
+ ACLOCAL_AMFLAGS = -I m4 -I gl/m4
+ AUTOMAKE_OPTIONS = dist-bzip2 no-dist-gzip
+ 
++pkgconfigdir = ${libdir}/pkgconfig
++pkgconfig_DATA = ksba.pc
++
+ # (A suitable gitlog-to-changelog script can be found in GnuPG master.)
+ GITLOG_TO_CHANGELOG=gitlog-to-changelog
+ 
+Index: libksba-1.3.0/configure.ac
+===================================================================
+--- libksba-1.3.0.orig/configure.ac	2014-05-13 21:39:22.390385646 +0000
++++ libksba-1.3.0/configure.ac	2014-05-13 21:39:22.462385646 +0000
+@@ -400,6 +400,7 @@
+ src/Makefile
+ src/ksba-config
+ src/versioninfo.rc
++ksba.pc
+ tests/Makefile
+ doc/Makefile
+ ])
+Index: libksba-1.3.0/ksba.pc.in
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ libksba-1.3.0/ksba.pc.in	2014-05-13 21:39:22.462385646 +0000
+@@ -0,0 +1,17 @@
++prefix=@prefix@
++exec_prefix=@exec_prefix@
++libdir=@libdir@
++includedir=@includedir@
++
++# API info
++api_version=@KSBA_CONFIG_API_VERSION@
++host=@KSBA_CONFIG_HOST@
++
++Name: ksba
++Description: Libksba provides an easy API to create and parse X.509 and CMS related objects
++Requires:
++Version: @VERSION@
++Libs: -L${libdir} -lksba
++Libs.private: -L{libdir} -lgpg-error
++Cflags: -I${includedir}
++
+Index: libksba-1.3.0/src/ksba.m4
+===================================================================
+--- libksba-1.3.0.orig/src/ksba.m4	2014-05-13 21:39:22.390385646 +0000
++++ libksba-1.3.0/src/ksba.m4	2014-05-13 21:49:03.650382696 +0000
+@@ -22,18 +22,7 @@
+ dnl
+ AC_DEFUN([AM_PATH_KSBA],
+ [AC_REQUIRE([AC_CANONICAL_HOST])
+- AC_ARG_WITH(ksba-prefix,
+-            AC_HELP_STRING([--with-ksba-prefix=PFX],
+-                           [prefix where KSBA is installed (optional)]),
+-     ksba_config_prefix="$withval", ksba_config_prefix="")
+-  if test x$ksba_config_prefix != x ; then
+-     ksba_config_args="$ksba_config_args --prefix=$ksba_config_prefix"
+-     if test x${KSBA_CONFIG+set} != xset ; then
+-        KSBA_CONFIG=$ksba_config_prefix/bin/ksba-config
+-     fi
+-  fi
+ 
+-  AC_PATH_PROG(KSBA_CONFIG, ksba-config, no)
+   tmp=ifelse([$1], ,1:1.0.0,$1)
+   if echo "$tmp" | grep ':' >/dev/null 2>/dev/null ; then
+      req_ksba_api=`echo "$tmp"     | sed 's/\(.*\):\(.*\)/\1/'`
+@@ -43,48 +32,13 @@
+      min_ksba_version="$tmp"
+   fi
+ 
+-  AC_MSG_CHECKING(for KSBA - version >= $min_ksba_version)
+-  ok=no
+-  if test "$KSBA_CONFIG" != "no" ; then
+-    req_major=`echo $min_ksba_version | \
+-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\1/'`
+-    req_minor=`echo $min_ksba_version | \
+-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\2/'`
+-    req_micro=`echo $min_ksba_version | \
+-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\3/'`
+-    ksba_config_version=`$KSBA_CONFIG $ksba_config_args --version`
+-    major=`echo $ksba_config_version | \
+-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\).*/\1/'`
+-    minor=`echo $ksba_config_version | \
+-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\).*/\2/'`
+-    micro=`echo $ksba_config_version | \
+-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\).*/\3/'`
+-    if test "$major" -gt "$req_major"; then
+-        ok=yes
+-    else
+-        if test "$major" -eq "$req_major"; then
+-            if test "$minor" -gt "$req_minor"; then
+-               ok=yes
+-            else
+-               if test "$minor" -eq "$req_minor"; then
+-                   if test "$micro" -ge "$req_micro"; then
+-                     ok=yes
+-                   fi
+-               fi
+-            fi
+-        fi
+-    fi
+-  fi
+-  if test $ok = yes; then
+-    AC_MSG_RESULT([yes ($ksba_config_version)])
+-  else
+-    AC_MSG_RESULT(no)
+-  fi
++  PKG_CHECK_MODULES(KSBA, [ksba >= $min_ksba_version], [ok=yes], [ok=no])
++
+   if test $ok = yes; then
+      # Even if we have a recent libksba, we should check that the
+      # API is compatible.
+      if test "$req_ksba_api" -gt 0 ; then
+-        tmp=`$KSBA_CONFIG --api-version 2>/dev/null || echo 0`
++        tmp=`$PKG_CONFIG --variable=api_version ksba`
+         if test "$tmp" -gt 0 ; then
+            AC_MSG_CHECKING([KSBA API version])
+            if test "$req_ksba_api" -eq "$tmp" ; then
+@@ -97,10 +51,8 @@
+      fi
+   fi
+   if test $ok = yes; then
+-    KSBA_CFLAGS=`$KSBA_CONFIG $ksba_config_args --cflags`
+-    KSBA_LIBS=`$KSBA_CONFIG $ksba_config_args --libs`
+     ifelse([$2], , :, [$2])
+-    libksba_config_host=`$LIBKSBA_CONFIG $ksba_config_args --host 2>/dev/null || echo none`
++    libksba_config_host=`$PKG_CONFIG --variable=host ksba`
+     if test x"$libksba_config_host" != xnone ; then
+       if test x"$libksba_config_host" != x"$host" ; then
+   AC_MSG_WARN([[
+@@ -114,8 +66,6 @@
+       fi
+     fi
+   else
+-    KSBA_CFLAGS=""
+-    KSBA_LIBS=""
+     ifelse([$3], , :, [$3])
+   fi
+   AC_SUBST(KSBA_CFLAGS)

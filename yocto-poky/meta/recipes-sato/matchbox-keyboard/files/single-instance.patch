@@ -1,0 +1,23 @@
+Multiple matchbox-keyboard instances would occupy whole screen and cause X
+window segfault(Bug 509). Making matchbox-keyboard singleton is one work
+around.
+
+This patch allow only one instance of matchbox-keyboard based on some mechanism
+in matchbox-desktop. In future, an applet and GTK-IM modules in
+matchbox-keyboard can be used to automatically map/unmap the virtual keyboard
+on demand.
+
+Signed-off-by: Zhai Edwin <edwin.zhai@intel.com>
+
+Upstream-Status: Inappropriate [configuration]
+
+Index: matchbox-keyboard/matchbox-keyboard.desktop
+===================================================================
+--- matchbox-keyboard.orig/matchbox-keyboard.desktop	2010-12-22 20:41:40.000000000 +0800
++++ matchbox-keyboard/matchbox-keyboard.desktop	2010-12-22 20:42:12.000000000 +0800
+@@ -6,3 +6,5 @@
+ Icon=matchbox-keyboard.png
+ Categories=Panel;Utility;MB
+ X-MB-INPUT-MECHANSIM=True
++X-MB-SingleInstance=true
++StartupNotify=true

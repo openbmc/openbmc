@@ -1,0 +1,5 @@
+#!/bin/sh
+touch testsuite/stamp-rootfs
+tar xf testmodule.tar
+make -k runtest-TESTS 2>/dev/null| grep -e ^PASS -e ^FAIL
+find testsuite -name *.ko -exec rm -f {} \;

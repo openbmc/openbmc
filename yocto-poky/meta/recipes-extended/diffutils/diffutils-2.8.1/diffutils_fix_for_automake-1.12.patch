@@ -1,0 +1,27 @@
+Upstream-Status: Pending
+
+automake 1.12 has depricated automatic de-ANSI-fication support
+
+this patch avoids these kinds of errors:
+
+| configure.ac:90: error: automatic de-ANSI-fication support has been removed
+| /srv/home/nitin/builds/build-gcc47/tmp/sysroots/x86_64-linux/usr/share/aclocal-1.12/protos.m4:12: AM_C_PROTOTYPES is expanded from...
+| /srv/home/nitin/builds/build-gcc47/tmp/work/i586-poky-linux/diffutils-2.8.1-r4/diffutils-2.8.1/m4/prereq.m4:110: jm_PREREQ_QUOTEARG is expanded from...
+| configure.ac:90: the top level
+| autom4te: m4 failed with exit status: 1
+
+Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+2012/05/04
+
+Index: diffutils-2.8.1/m4/prereq.m4
+===================================================================
+--- diffutils-2.8.1.orig/m4/prereq.m4
++++ diffutils-2.8.1/m4/prereq.m4
+@@ -115,7 +115,6 @@ AC_DEFUN([jm_PREREQ_QUOTEARG],
+   AC_HEADER_STDC
+   AC_C_BACKSLASH_A
+   AC_MBSTATE_T
+-  AM_C_PROTOTYPES
+ ])
+ 
+ AC_DEFUN([jm_PREREQ_REGEX],

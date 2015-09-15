@@ -1,0 +1,30 @@
+Upstream-Status: Pending
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+--- man-1.5m2/src/util.c_sigpipe	2006-12-09 13:43:21.000000000 +0100
++++ man-1.5m2/src/util.c	2006-12-09 13:53:13.000000000 +0100
+@@ -116,11 +116,14 @@
+ static int
+ system1 (const char *command) {
+ 	void (*prev_handler)(int) = signal (SIGINT,catch_int);
++	signal (SIGPIPE,SIG_IGN);
+ 	int ret = system(command);
+ 
+ 	/* child terminated with signal? */
+ 	if (WIFSIGNALED(ret) &&
+-	    (WTERMSIG(ret) == SIGINT || WTERMSIG(ret) == SIGQUIT))
++	    (WTERMSIG(ret) == SIGINT ||
++		 WTERMSIG(ret) == SIGPIPE ||
++		 WTERMSIG(ret) == SIGQUIT))
+ 		exit(1);
+ 
+ 	/* or we caught an interrupt? */
+@@ -128,6 +131,7 @@
+ 		exit(1);
+ 
+ 	signal(SIGINT,prev_handler);
++	signal(SIGPIPE,SIG_DFL);
+ 	return ret;
+ }
+ 

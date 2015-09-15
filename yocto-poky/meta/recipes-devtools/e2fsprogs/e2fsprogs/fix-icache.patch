@@ -1,0 +1,65 @@
+inode.c: only update the icache for ext2_inode
+
+We only read the cache when:
+
+bufsize == sizeof(struct ext2_inode)
+
+then we should only update the cache in the same condition, otherwise
+there would be errors, for example:
+
+cache[0]: cached ino 14 when bufsize = 128 by ext2fs_write_inode_full()
+cache[1]: cached ino 14 when bufsize = 156 by ext2fs_read_inode_full()
+
+Then update the cache:
+cache[0]: cached ino 15 when bufsize = 156 by ext2fs_read_inode_full()
+
+Then the ino 14 would hit the cache[1] when bufsize = 128 (but it was
+cached by bufsize = 156), so there would be errors.
+
+Upstream-Status: Submitted
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ lib/ext2fs/inode.c | 20 ++++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
+
+diff --git a/lib/ext2fs/inode.c b/lib/ext2fs/inode.c
+--- a/lib/ext2fs/inode.c
++++ b/lib/ext2fs/inode.c
+@@ -612,10 +612,12 @@ errcode_t ext2fs_read_inode_full(ext2_filsys fs, ext2_ino_t ino,
+ #endif
+ 
+ 	/* Update the inode cache */
+-	fs->icache->cache_last = (fs->icache->cache_last + 1) %
+-		fs->icache->cache_size;
+-	fs->icache->cache[fs->icache->cache_last].ino = ino;
+-	fs->icache->cache[fs->icache->cache_last].inode = *inode;
++	if (bufsize == sizeof(struct ext2_inode)) {
++		fs->icache->cache_last = (fs->icache->cache_last + 1) %
++			fs->icache->cache_size;
++		fs->icache->cache[fs->icache->cache_last].ino = ino;
++		fs->icache->cache[fs->icache->cache_last].inode = *inode;
++	}
+ 
+ 	return 0;
+ }
+@@ -648,10 +650,12 @@ errcode_t ext2fs_write_inode_full(ext2_filsys fs, ext2_ino_t ino,
+ 
+ 	/* Check to see if the inode cache needs to be updated */
+ 	if (fs->icache) {
+-		for (i=0; i < fs->icache->cache_size; i++) {
+-			if (fs->icache->cache[i].ino == ino) {
+-				fs->icache->cache[i].inode = *inode;
+-				break;
++		if (bufsize == sizeof(struct ext2_inode)) {
++			for (i=0; i < fs->icache->cache_size; i++) {
++				if (fs->icache->cache[i].ino == ino) {
++					fs->icache->cache[i].inode = *inode;
++					break;
++				}
+ 			}
+ 		}
+ 	} else {
+-- 
+1.8.1.2
+

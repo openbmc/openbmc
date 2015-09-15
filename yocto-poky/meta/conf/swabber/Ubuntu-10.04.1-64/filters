@@ -1,0 +1,7 @@
+/usr/local/lib/python2.6
+/usr/lib/python2.6
+/usr/lib/pymodules/python2.6
+/usr/lib/perl/5.10
+# which is part of the debianutils packages, but we don't want to put the entire
+# debianutils package in the whitelist.
+/usr/bin/which

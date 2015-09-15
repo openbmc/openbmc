@@ -1,0 +1,23 @@
+Upstream-Status: Backport
+
+ar.c (do_oper_delete): Fix num passed to memset
+native build failed as following on Fedora18+: 
+ar.c: In function 'do_oper_delete':
+ar.c:918:31: error: argument to 'sizeof' in 'memset' call is the same expression as the destination; did you mean to dereference it? [-Werror=sizeof-pointer-memaccess]
+   memset (found, '\0', sizeof (found));
+                                ^
+The original commit is http://git.fedorahosted.org/cgit/elfutils.git/commit/src/ar.c?id=1a4d0668d18bf1090c5c08cdb5cb3ba2b8eb5410
+
+Signed-off-by: Zhenhua Luo <zhenhua.luo@freescale.com>
+
+--- elfutils-0.148/src/ar.c.org	2013-03-12 21:12:17.928281375 -0500
++++ elfutils-0.148/src/ar.c	2013-03-12 21:15:30.053285271 -0500
+@@ -915,7 +915,7 @@
+ 		long int instance)
+ {
+   bool *found = alloca (sizeof (bool) * argc);
+-  memset (found, '\0', sizeof (found));
++  memset (found, '\0', sizeof (bool) * argc);
+ 
+   /* List of the files we keep.  */
+   struct armem *to_copy = NULL;

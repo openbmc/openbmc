@@ -1,0 +1,20 @@
+Upstream-Status: Inappropriate [configuration]
+
+If check is detected, it makes the builds non-determinstic so just force
+it to be disabled.
+
+RP - 4/11/08
+
+Index: parted-1.9.0/configure.ac
+===================================================================
+--- parted-1.9.0.orig/configure.ac	2009-07-23 18:52:08.000000000 +0100
++++ parted-1.9.0/configure.ac	2010-02-02 14:13:56.013905093 +0000
+@@ -477,7 +477,7 @@
+ AM_CONDITIONAL([BUILD_LINUX], [test "$OS" = linux])
+ 
+ dnl check for "check", unit testing library/header
+-PKG_CHECK_MODULES([CHECK], [check >= 0.9.3], have_check=yes, have_check=no)
++have_check=no
+ if test "$have_check" != "yes"; then
+     AC_MSG_RESULT([Unable to locate check version 0.9.3 or higher: not building])
+ fi

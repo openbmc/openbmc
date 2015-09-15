@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+{% load projecttags %}
+{% load humanize %}
+{% load static %}
+
+{% block pagecontent %}
+
+<div class="section">
+  <ul class="breadcrumb">
+    <li class="muted">{{project.name}}:</li>
+    <li>
+      <a href="{% url 'project' project.id %}">Configuration</a>
+      <span class="divider">&rarr;</span>
+    </li>
+    <li><a href="{% url 'projectlayers' project.id %}">Compatible layers</a>
+      <span class="divider">&rarr;</span>
+    </li>
+    <li class="active">
+      {{layerversion.layer.name}} ({{layerversion.get_vcs_reference|truncatechars:13}})
+    </li>
+  </ul>
+</div>
+
+{# If this is not an imported layer then hide the edit ui #}
+{% if not layerversion.layer_source_id or layerversion.layer_source.sourcetype != layerversion.layer_source.TYPE_IMPORTED %}
+<style scoped>
+ .icon-pencil {
+   display:none;
+ }
+.delete-current-value{
+  display: none;
+}
+ li .icon-trash {
+   display:none;
+ }
+ .add-deps {
+   display:none;
+ }
+</style>
+{% endif %}
+
+
+<script src="{% static 'js/layerdetails.js' %}"></script>
+<script>
+
+  $(document).ready(function (){
+    var ctx = {
+      projectBuildsUrl : "{% url 'projectbuilds' project.id %}",
+      xhrUpdateLayerUrl : "{% url 'xhr_updatelayer' %}",
+      layerVersion : {
+        name : "{{layerversion.layer.name}}",
+        id : {{layerversion.id}},
+        commit: "{{layerversion.get_vcs_reference}}",
+      {%if layerversion.id in projectlayers %}
+        inCurrentPrj : true,
+      {% else %}
+        inCurrentPrj : false,
+      {% endif %}
+        layerdetailurl : "{% url 'layerdetails' project.id layerversion.id  %}",
+        sourceId: {{layerversion.layer_source_id|json}},
+      }
+    };
+
+    try {
+      layerDetailsPageInit(ctx);
+    } catch (e) {
+      document.write("Sorry, An error has occurred loading this page");
+      console.warn(e);
+    }
+  });
+</script>
+
+<div class="row-fluid span11">
+  <div class="page-header">
+    <h1>{{layerversion.layer.name}} <small class="commit"
+          {% if layerversion.get_vcs_reference|length > 13 %}
+        data-toggle="tooltip" title="{{layerversion.get_vcs_reference}}"
+        {% endif %}>
+        ({{layerversion.get_vcs_reference|truncatechars:13}})</small></h1>
+  </div>
+</div>
+
+<!-- container for tabs -->
+<div class="row-fluid span7 tabbable">
+  <div class="alert alert-info lead" id="alert-area" style="display:none">
+    <button type="button" class="close" id="dismiss-alert">&times;</button>
+    <span id="alert-msg"></span>
+  </div>
+  <ul class="nav nav-pills">
+    <li class="active">
+      <a data-toggle="tab" href="#information" id="details-tab">Layer details</a>
+    </li>
+    <li>
+      <a data-toggle="tab" href="#recipes" class="muted" id="targets-tab">Recipes (<span class="table-count-recipestable"></span>)</a>
+    </li>
+    <li>
+      <a data-toggle="tab" href="#machines" class="muted" id="machines-tab">Machines (<span class="table-count-machinestable"></span>)</a>
+    </li>
+  </ul>
+  <div class="tab-content">
+    <span class="button-place">
+      {% if layerversion.id not in projectlayers %}
+      <button id="add-remove-layer-btn" data-directive="add" class="btn btn-large btn-block">
+        <span class="icon-plus"></span>
+        Add the {{layerversion.layer.name}} layer to your project
+      </button>
+      {% else %}
+      <button id="add-remove-layer-btn" data-directive="remove" class="btn btn-block btn-large btn-danger">
+        <span class="icon-trash"></span>
+        Delete the {{layerversion.layer.name}} layer from your project
+      </button>
+      {% endif %}
+    </span>
+
+    <!-- layer details pane -->
+    <div id="information" class="tab-pane active">
+      <dl class="dl-horizontal">
+        <dt class="">
+          <i class="icon-question-sign get-help" title="Fetch/clone URL of the repository"></i>
+          Repository URL
+        </dt>
+        <dd>
+          <span class="current-value">{{layerversion.layer.vcs_url}}</span>
+          {% if layerversion.get_vcs_link_url %}
+          <a href="{{layerversion.get_vcs_link_url}}/" class="icon-share get-info" target="_blank"></a>
+          {% endif %}
+          <form id="change-repo-form" class="control-group" style="display:none">
+            <div class="input-append">
+              <input type="text" class="input-xlarge" value="{{layerversion.layer.vcs_url}}">
+                <button data-layer-prop="vcs_url" class="btn change-btn" type="button">Save</button>
+                <a href="#" style="display:none" class="btn btn-link cancel">Cancel</a>
+              </div>
+            </form>
+            <i class="icon-pencil" ></i>
+          </dd>
+          <dt>
+            <i class="icon-question-sign get-help" title="Subdirectory within the repository where the layer is located, if not in the root (usually only used if the repository contains more than one layer)"></i>
+            Repository subdirectory
+          </dt>
+          <dd>
+            <span class="muted" style="display:none">Not set</span>
+            <span class="current-value">{{layerversion.dirpath}}</span>
+            {% if layerversion.get_vcs_dirpath_link_url %}
+            <a href="{{layerversion.get_vcs_dirpath_link_url}}" class="icon-share get-info" target="_blank"></a>
+            {% endif %}
+            <form id="change-subdir-form" style="display:none;">
+              <div class="input-append">
+                <input type="text" value="{{layerversion.dirpath}}">
+                  <button data-layer-prop="dirpath" class="btn change-btn" type="button">Save</button>
+                  <a href="#" style="display:none" class="btn btn-link cancel">Cancel</a>
+                </div>
+              </form>
+              <i id="change-subdir" class="icon-pencil"></i>
+              <span class="icon-trash delete-current-value" data-toggle="tooltip" title="Delete"></span>
+            </dd>
+            <dt>
+              <i class="icon-question-sign get-help" title="The Git branch, tag or commit"></i>
+              Revision
+            </dt>
+            <dd>
+              <span class="current-value">{{layerversion.get_vcs_reference}}</span>
+              <form style="display:none;">
+                <div class="input-append">
+                  <input type="text" value="{{layerversion.get_vcs_reference}}">
+                    <button  data-layer-prop="commit" class="btn change-btn" type="button">Save</button>
+                    <a href="#" style="display:none" class="btn btn-link cancel">Cancel</a>
+                  </div>
+                </form>
+                <i class="icon-pencil"></i>
+              </dd>
+              <dt>
+                <i class="icon-question-sign get-help" title="Other layers this layer depends upon"></i>
+                Layer dependencies
+              </dt>
+              <dd>
+                <ul class="unstyled current-value" id="layer-deps-list">
+                  {% for ld in layerversion.dependencies.all %}
+                  <li data-layer-id="{{ld.depends_on.id}}">
+                    <a data-toggle="tooltip" title="{{ld.depends_on.layer.vcs_url}} | {{ld.depends_on.get_vcs_reference}}" href="{% url 'layerdetails' project.id ld.depends_on.id %}">{{ld.depends_on.layer.name}}</a>
+                    <span class="icon-trash " data-toggle="tooltip" title="Delete"></span>
+                  </li>
+                  {% endfor %}
+                </ul>
+                <div class="input-append add-deps">
+                  <input type="text" autocomplete="off" data-minLength="1" data-autocomplete="off"  placeholder="Type a layer name" id="layer-dep-input">
+                    <a class="btn" id="add-layer-dependency-btn" >
+                      Add layer
+                    </a>
+                  </div>
+                  <span class="help-block add-deps">You can only add layers Toaster knows about</span>
+                </dd>
+              </dl>
+            </div>
+            <!-- end layerdetails tab -->
+            <!-- targets tab -->
+            <div id="recipes" class="tab-pane">
+              <!-- Recipe table -->
+              <div id="no-recipes-yet" class="alert alert-info" style="display:none">
+                <p>Toaster does not have recipe information for the <strong> {{layerversion.layer.name}} </strong> layer.</p>
+                <p>Toaster learns about layers when you build them. If this layer provides any recipes, they will be listed here after you build the <strong> {{layerversion.layer.name}} </strong> layer.</p>
+              </div>
+
+
+
+              {% url 'layerrecipestable' project.id layerversion.id  as xhr_table_url %}
+              {% with "recipestable" as table_name %}
+              {% with "Recipes" as title %}
+              {% include 'toastertable-simple.html' %}
+              {% endwith %}
+              {% endwith %}
+            </div>
+
+            <div id="machines" class="tab-pane">
+
+              <div id="no-machines-yet" class="alert alert-info" style="display:none">
+                <p>Toaster does not have machine information for the <strong> {{layerversion.layer.name}} </strong> layer.</p>
+                <p>Toaster learns about layers when you build them. If this layer provides any machines, they will be listed here after you build the <strong> {{layerversion.layer.name}} </strong> layer.</p>
+              </div>
+
+
+              <!-- Machines table -->
+              {% url 'layermachinestable' project.id layerversion.id  as xhr_table_url %}
+              {% with "machinestable" as table_name  %}
+              {% with "Machines" as title  %}
+              {% include 'toastertable-simple.html' %}
+              {% endwith %}
+              {% endwith %}
+            </div>
+          </div> <!-- end tab content -->
+        </div> <!-- end tabable -->
+
+        <div class="row-fluid span4 well"> <!-- info side panel -->
+          <h2>About {{layerversion.layer.name}}</h2>
+          <dl class="item-info">
+
+            <dt>
+              Summary
+              <i class="icon-question-sign get-help" title="One-line description of the layer"></i>
+            </dt>
+            <dd>
+              <span class="muted" style="display:none">Not set</span>
+              <span class="current-value">{{layerversion.layer.summary|default_if_none:''}}</span>
+              <form style="display:none; margin-bottom:20px">
+                <textarea class="span12" rows="2">{% if layerversion.layer.summary %}{{layerversion.layer.summary}}{% endif %}</textarea>
+                <button class="btn change-btn" data-layer-prop="summary" type="button">Save</button>
+                <a href="#" class="btn btn-link cancel">Cancel</a>
+              </form>
+              <i class="icon-pencil"></i>
+              <span class="icon-trash delete-current-value" data-toggle="tooltip" title="Delete"></span>
+            </dd>
+            <dt>
+              Description
+            </dt>
+            <dd>
+              <span class="muted" style="display:none">Not set</span>
+              <span class="current-value">{{layerversion.layer.description|default_if_none:''}}</span>
+              <form style="display:none; margin-bottom:20px">
+                <textarea class="span12" rows="6">{% if layerversion.layer.description %}{{layerversion.layer.description}}{% endif %}</textarea>
+                <button class="btn change-btn" data-layer-prop="description" type="button" >Save</button>
+                <a href="#" class="btn btn-link cancel">Cancel</a>
+              </form>
+              <i class="icon-pencil"></i>
+              <span class="icon-trash delete-current-value" data-toggle="tooltip" title="Delete"></span>
+            </dd>
+            {% if layerversion.layer.up_id %}
+            <dt>Layer index</dt>
+            <dd>
+              <a href="http://layers.openembedded.org/layerindex/branch/{{layerversion.up_branch.name}}/layer/{{layerversion.layer.name}}">layer index link</a>
+
+          </dd>
+          {% endif %}
+
+        </dl>
+      </div>
+
+      {% endblock %}

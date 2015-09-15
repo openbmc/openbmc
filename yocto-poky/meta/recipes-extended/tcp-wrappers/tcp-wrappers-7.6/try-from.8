@@ -1,0 +1,28 @@
+.TH TRY-FROM 8 "21th June 1997" Linux "Linux Programmer's Manual"
+.SH NAME
+try-from \- test program for the tcp_wrapper
+.SH SYNOPSIS
+.B try-from
+.SH DESCRIPTION
+The
+.B try-from
+command can be called via a remote shell command to find out
+if the hostname and address are properly recognized
+by the
+.B tcp_wrapper
+library, if username lookup works, and (SysV only) if the TLI
+on top of IP heuristics work. Diagnostics are reported through
+.BR syslog (3)
+and redirected to stderr.
+
+Example:
+
+rsh host /some/where/try-from
+
+.SH SEE ALSO
+.BR hosts_access (5),
+.BR hosts_options (5),
+.BR tcpd (8)
+.SH AUTHOR
+Wietse Venema, Eindhoven University of Technology, The Netherlands.
+

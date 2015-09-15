@@ -1,0 +1,226 @@
+From 555407ff6e2f742df64ae93859f14a0fc1397829 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Fri, 12 Sep 2014 05:35:05 -0400
+Subject: [PATCH] libpam/xtests: remove bash dependency
+
+There's not bash specific syntax in the xtest scripts:
+
+  # after below patches applied:
+  $ cd Linux-PAM-1.1.6/xtests
+  $ checkbashisms *.sh
+  No output
+
+Just remove the runtime dependency to bash.
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ xtests/run-xtests.sh             |    2 +-
+ xtests/tst-pam_access1.sh        |    2 +-
+ xtests/tst-pam_access2.sh        |    2 +-
+ xtests/tst-pam_access3.sh        |    2 +-
+ xtests/tst-pam_access4.sh        |    2 +-
+ xtests/tst-pam_assemble_line1.sh |    2 +-
+ xtests/tst-pam_group1.sh         |    2 +-
+ xtests/tst-pam_limits1.sh        |    2 +-
+ xtests/tst-pam_pwhistory1.sh     |    2 +-
+ xtests/tst-pam_substack1.sh      |    2 +-
+ xtests/tst-pam_substack2.sh      |    2 +-
+ xtests/tst-pam_substack3.sh      |    2 +-
+ xtests/tst-pam_substack4.sh      |    2 +-
+ xtests/tst-pam_substack5.sh      |    2 +-
+ xtests/tst-pam_succeed_if1.sh    |    2 +-
+ xtests/tst-pam_unix1.sh          |    2 +-
+ xtests/tst-pam_unix2.sh          |    2 +-
+ xtests/tst-pam_unix3.sh          |    2 +-
+ xtests/tst-pam_unix4.sh          |    2 +-
+ 19 files changed, 19 insertions(+), 19 deletions(-)
+
+diff --git a/xtests/run-xtests.sh b/xtests/run-xtests.sh
+index 3a89057..1cf8684 100755
+--- a/xtests/run-xtests.sh
++++ b/xtests/run-xtests.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ SRCDIR=$1
+ shift 1
+diff --git a/xtests/tst-pam_access1.sh b/xtests/tst-pam_access1.sh
+index 180d256..70521d2 100755
+--- a/xtests/tst-pam_access1.sh
++++ b/xtests/tst-pam_access1.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ /usr/sbin/groupadd tstpamaccess
+ /usr/sbin/useradd -G tstpamaccess -p '!!' tstpamaccess1
+diff --git a/xtests/tst-pam_access2.sh b/xtests/tst-pam_access2.sh
+index 0a30275..7e3e60f 100755
+--- a/xtests/tst-pam_access2.sh
++++ b/xtests/tst-pam_access2.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ /usr/sbin/groupadd tstpamaccess
+ /usr/sbin/useradd -p '!!' tstpamaccess2
+diff --git a/xtests/tst-pam_access3.sh b/xtests/tst-pam_access3.sh
+index 348e0c3..3630e2e 100755
+--- a/xtests/tst-pam_access3.sh
++++ b/xtests/tst-pam_access3.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ /usr/sbin/useradd -p '!!' tstpamaccess3
+ ./tst-pam_access3
+diff --git a/xtests/tst-pam_access4.sh b/xtests/tst-pam_access4.sh
+index 61e7b44..4538df4 100755
+--- a/xtests/tst-pam_access4.sh
++++ b/xtests/tst-pam_access4.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ /usr/sbin/useradd -p '!!' tstpamaccess4
+ ./tst-pam_access4
+diff --git a/xtests/tst-pam_assemble_line1.sh b/xtests/tst-pam_assemble_line1.sh
+index 248d47e..dc2a675 100755
+--- a/xtests/tst-pam_assemble_line1.sh
++++ b/xtests/tst-pam_assemble_line1.sh
+@@ -1,3 +1,3 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ exec ./tst-pam_authfail tst-pam_assemble_line1
+diff --git a/xtests/tst-pam_group1.sh b/xtests/tst-pam_group1.sh
+index b76377f..44faca9 100755
+--- a/xtests/tst-pam_group1.sh
++++ b/xtests/tst-pam_group1.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ /usr/sbin/groupadd tstpamgrpg
+ /usr/sbin/useradd -p '!!' tstpamgrp
+diff --git a/xtests/tst-pam_limits1.sh b/xtests/tst-pam_limits1.sh
+index 4faa822..32c021d 100755
+--- a/xtests/tst-pam_limits1.sh
++++ b/xtests/tst-pam_limits1.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ /usr/sbin/useradd -p '!!' tstpamlimits
+ ./tst-pam_limits1
+diff --git a/xtests/tst-pam_pwhistory1.sh b/xtests/tst-pam_pwhistory1.sh
+index ddb3b8b..0f212e2 100644
+--- a/xtests/tst-pam_pwhistory1.sh
++++ b/xtests/tst-pam_pwhistory1.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ /usr/sbin/useradd tstpampwhistory
+ ./tst-pam_pwhistory1
+diff --git a/xtests/tst-pam_substack1.sh b/xtests/tst-pam_substack1.sh
+index 5260175..f1b72a7 100755
+--- a/xtests/tst-pam_substack1.sh
++++ b/xtests/tst-pam_substack1.sh
+@@ -1,3 +1,3 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ exec ./tst-pam_authfail tst-pam_substack1
+diff --git a/xtests/tst-pam_substack2.sh b/xtests/tst-pam_substack2.sh
+index c02f597..3804fa7 100755
+--- a/xtests/tst-pam_substack2.sh
++++ b/xtests/tst-pam_substack2.sh
+@@ -1,3 +1,3 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ exec ./tst-pam_authsucceed tst-pam_substack2
+diff --git a/xtests/tst-pam_substack3.sh b/xtests/tst-pam_substack3.sh
+index 0e572aa..aa48e8e 100755
+--- a/xtests/tst-pam_substack3.sh
++++ b/xtests/tst-pam_substack3.sh
+@@ -1,3 +1,3 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ exec ./tst-pam_authsucceed tst-pam_substack3
+diff --git a/xtests/tst-pam_substack4.sh b/xtests/tst-pam_substack4.sh
+index a3ef08a..958a07a 100755
+--- a/xtests/tst-pam_substack4.sh
++++ b/xtests/tst-pam_substack4.sh
+@@ -1,3 +1,3 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ exec ./tst-pam_authsucceed tst-pam_substack4
+diff --git a/xtests/tst-pam_substack5.sh b/xtests/tst-pam_substack5.sh
+index e2714fd..7e0da74 100755
+--- a/xtests/tst-pam_substack5.sh
++++ b/xtests/tst-pam_substack5.sh
+@@ -1,3 +1,3 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ exec ./tst-pam_authfail tst-pam_substack5
+diff --git a/xtests/tst-pam_succeed_if1.sh b/xtests/tst-pam_succeed_if1.sh
+index a643b2e..58e57b4 100755
+--- a/xtests/tst-pam_succeed_if1.sh
++++ b/xtests/tst-pam_succeed_if1.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ /usr/sbin/useradd -p '!!' tstpamtest
+ /usr/sbin/useradd -p '!!' pamtest
+diff --git a/xtests/tst-pam_unix1.sh b/xtests/tst-pam_unix1.sh
+index f75bd84..72deac0 100755
+--- a/xtests/tst-pam_unix1.sh
++++ b/xtests/tst-pam_unix1.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ /usr/sbin/useradd -p '!!' tstpamunix
+ ./tst-pam_unix1
+diff --git a/xtests/tst-pam_unix2.sh b/xtests/tst-pam_unix2.sh
+index 7093155..c04d6e6 100755
+--- a/xtests/tst-pam_unix2.sh
++++ b/xtests/tst-pam_unix2.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ # pamunix0 = 0aXKZztA.d1KY
+ /usr/sbin/useradd -p 0aXKZztA.d1KY  tstpamunix
+diff --git a/xtests/tst-pam_unix3.sh b/xtests/tst-pam_unix3.sh
+index ef4a07c..b52db2b 100755
+--- a/xtests/tst-pam_unix3.sh
++++ b/xtests/tst-pam_unix3.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ # pamunix01 = 0aXKZztA.d1KYIuFXArmd2jU
+ /usr/sbin/useradd -p 0aXKZztA.d1KYIuFXArmd2jU tstpamunix
+diff --git a/xtests/tst-pam_unix4.sh b/xtests/tst-pam_unix4.sh
+index 787c2f9..e7976fd 100755
+--- a/xtests/tst-pam_unix4.sh
++++ b/xtests/tst-pam_unix4.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ # pamunix01 = 0aXKZztA.d1KYIuFXArmd2jU
+ /usr/sbin/useradd -p 0aXKZztA.d1KYIuFXArmd2jU tstpamunix
+-- 
+1.7.9.5
+

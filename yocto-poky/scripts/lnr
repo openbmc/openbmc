@@ -1,0 +1,21 @@
+#! /usr/bin/env python
+
+# Create a *relative* symlink, just like ln --relative does but without needing
+# coreutils 8.16.
+
+import sys, os
+
+if len(sys.argv) != 3:
+   print "$ lnr TARGET LINK_NAME"
+   sys.exit(1)
+
+target = sys.argv[1]
+linkname = sys.argv[2]
+
+if os.path.isabs(target):
+   if not os.path.isabs(linkname):
+      linkname = os.path.abspath(linkname)
+   start = os.path.dirname(linkname)
+   target = os.path.relpath(target, start)
+
+os.symlink(target, linkname)

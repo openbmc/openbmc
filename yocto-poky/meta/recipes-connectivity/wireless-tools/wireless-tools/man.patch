@@ -1,0 +1,15 @@
+Upstream-Status: Inappropriate [configuration]
+
+Index: wireless_tools.30/Makefile
+===================================================================
+--- wireless_tools.30.orig/Makefile	2014-02-01 00:21:04.148463382 -0800
++++ wireless_tools.30/Makefile	2014-02-01 00:23:35.448072279 -0800
+@@ -76,7 +76,7 @@
+ INSTALL_DIR= $(PREFIX)/sbin
+ INSTALL_LIB= $(PREFIX)/lib
+ INSTALL_INC= $(PREFIX)/include
+-INSTALL_MAN= $(PREFIX)/man
++INSTALL_MAN= $(PREFIX)/share/man
+ 
+ # Various commands
+ RM = rm -f

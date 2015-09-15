@@ -1,0 +1,19 @@
+[Unit]
+Description=Bind mount volatile @where@
+DefaultDependencies=false
+Before=local-fs.target
+RequiresMountsFor=@whatparent@ @whereparent@
+ConditionPathIsReadWrite=@whatparent@
+ConditionPathExists=@where@
+ConditionPathIsReadWrite=!@where@
+
+[Service]
+Type=oneshot
+RemainAfterExit=Yes
+StandardOutput=syslog
+TimeoutSec=0
+ExecStart=/sbin/mount-copybind @what@ @where@
+ExecStop=/bin/umount @where@
+
+[Install]
+WantedBy=local-fs.target

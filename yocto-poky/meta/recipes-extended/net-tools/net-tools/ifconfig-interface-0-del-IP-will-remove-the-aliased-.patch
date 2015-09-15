@@ -1,0 +1,32 @@
+From 81814dc2b14843009193efd307d814c26baa61f0 Mon Sep 17 00:00:00 2001
+From: Jiri Popelka <jpopelka@redhat.com>
+Date: Wed, 7 Dec 2011 19:14:09 +0100
+Subject: [PATCH] ifconfig interface:0 del <IP> will remove the aliased IP on IA64
+
+Upstream-Status: Backport
+
+commit 81814dc2b14843009193efd307d814c26baa61f0 from
+git://git.code.sf.net/p/net-tools/code
+
+---
+ ifconfig.c |    4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/ifconfig.c b/ifconfig.c
+index bc405c6..dae8922 100644
+--- a/ifconfig.c
++++ b/ifconfig.c
+@@ -890,7 +890,9 @@ int main(int argc, char **argv)
+ 		    continue;
+ 		}
+ 		
+-		memcpy(&ip, &sin.sin_addr.s_addr, sizeof(unsigned long));
++		/* Clear "ip" in case sizeof(unsigned long) > sizeof(sin.sin_addr.s_addr) */
++		ip = 0;
++		memcpy(&ip, &sin.sin_addr.s_addr, sizeof(sin.sin_addr.s_addr));
+ 		
+ 		if (get_nmbc_parent(ifr.ifr_name, &nm, &bc) < 0) {
+ 		    fprintf(stderr, _("Interface %s not initialized\n"),
+-- 
+1.7.9.5
+

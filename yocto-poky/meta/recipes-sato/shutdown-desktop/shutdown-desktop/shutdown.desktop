@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Name=Shutdown
+Comment=Close down the machine safely
+Exec=poweroff
+Icon=system-shutdown
+Terminal=false
+Categories=Utility;
+StartupNotify=true

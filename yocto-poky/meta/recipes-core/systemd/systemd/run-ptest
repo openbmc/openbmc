@@ -1,0 +1,5 @@
+#!/bin/sh
+
+tar -C test -xJf test/sys.tar.xz
+make test/rules-test.sh.log
+make test/udev-test.pl.log

@@ -1,0 +1,16 @@
+Upstream-Status: Pending
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+--- man-1.5j/msgs/inst.sh.i18n	Wed Apr 25 10:40:50 2001
++++ man-1.5j/msgs/inst.sh	Wed Apr 25 10:41:17 2001
+@@ -27,8 +27,7 @@
+ for j in $M; do
+   if [ -f $j ]; then
+     i=`echo $j | sed -e 's/mess.//; s/.cat//'`
+-    dest=`echo $locdir | sed -e "s/%N/man/; s/%L/$i/"`
+-    dest=${PREFIX}$dest
++    dest=${PREFIX}/`echo $locdir | sed -e "s/%N/man/; s/%L/$i/"`
+     echo "mkdir -p `dirname $dest`"
+     mkdir -p `dirname $dest`;
+     echo "install -c -m 644 $j $dest"

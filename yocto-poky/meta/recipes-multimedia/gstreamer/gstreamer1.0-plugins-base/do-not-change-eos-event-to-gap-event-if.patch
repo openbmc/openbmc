@@ -1,0 +1,37 @@
+From b608d027fff6efc2d1988ebf169cbe3b2b44a61b Mon Sep 17 00:00:00 2001
+From: zhouming <b42586@freescale.com>
+Date: Thu, 8 May 2014 12:01:17 +0800
+Subject: [PATCH] ENGR00312034: do not change eos event to gap event if no
+ data has passed to streamsynchronizer.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=727074
+
+Upstream-Status: Pending
+
+Signed-off-by: zhouming <b42586@freescale.com>
+---
+ gst/playback/gststreamsynchronizer.c |    5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/gst/playback/gststreamsynchronizer.c b/gst/playback/gststreamsynchronizer.c
+index 3997d1b..3e17c55 100644
+--- a/gst/playback/gststreamsynchronizer.c
++++ b/gst/playback/gststreamsynchronizer.c
+@@ -488,12 +488,11 @@ gst_stream_synchronizer_sink_event (GstPad * pad, GstObject * parent,
+         }
+         g_slist_free (pads);
+       } else {
+-        /* if EOS, but no data has passed, then send something to replace EOS
+-         * for preroll purposes */
++        /* if EOS, but no data has passed, then send EOS event */
+         if (!seen_data) {
+           GstEvent *gap_event;
+ 
+-          gap_event = gst_event_new_gap (timestamp, GST_CLOCK_TIME_NONE);
++          gap_event = gst_event_new_eos ();
+           ret = gst_pad_push_event (srcpad, gap_event);
+         } else {
+           GstEvent *gap_event;
+-- 
+1.7.9.5
+

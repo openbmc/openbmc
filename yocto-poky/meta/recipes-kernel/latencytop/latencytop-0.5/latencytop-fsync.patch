@@ -1,0 +1,49 @@
+linux: sysfs: use tracing_on as tracing_enabled is deprecated
+
+tracing_enabled use in the kernel is being deprecated as per commit
+6752ab4a9c30 [tracing: Deprecate tracing_enabled for tracing_on] in
+the linux mainline kernel. tracing_enabled use will generate a warning
+and may no longer function as expected, therefore move to use tracing_on.
+
+Upstream-Status: Pending
+
+Signed-off-by: Dennis Hall <dennis.hall@windriver.com>
+
+Index: latencytop-0.5/fsync.c
+===================================================================
+--- latencytop-0.5.orig/fsync.c	2012-08-03 10:45:49.000000000 -0400
++++ latencytop-0.5/fsync.c	2012-08-03 10:48:39.000000000 -0400
+@@ -149,19 +149,19 @@
+  * cd /sys/kernel/debug/tracing
+  * echo fsync > current_tracer
+  * echo ftrace_printk > iter_ctrl 
+- * echo 1 > tracing_enabled
++ * echo 1 > tracing_on
+  */
+ 	ret = system("/bin/mount -t debugfs none /sys/kernel/debug/");
+ 	if (!ret) 
+ 		return -1;
+ 	write_to_file("/sys/kernel/debug/tracing/current_tracer", "fsync");	
+ 	write_to_file("/sys/kernel/debug/tracing/iter_ctrl", "ftrace_printk");	
+-	write_to_file("/sys/kernel/debug/tracing/tracing_enabled", "1");
++	write_to_file("/sys/kernel/debug/tracing/tracing_on", "1");
+ }
+ 
+ int disable_fsync_tracer(void)
+ {
+-	write_to_file("/sys/kernel/debug/tracing/tracing_enabled", "0");
++	write_to_file("/sys/kernel/debug/tracing/tracing_on", "0");
+ }
+ 
+ 
+@@ -339,8 +339,8 @@
+ 		if (curduration > 5)
+ 			curduration = 5;
+ 		/* clear the ftrace buffer */
+-		write_to_file("/sys/kernel/debug/tracing/tracing_enabled", "0");
+-		write_to_file("/sys/kernel/debug/tracing/tracing_enabled", "1");
++		write_to_file("/sys/kernel/debug/tracing/tracing_on", "0");
++		write_to_file("/sys/kernel/debug/tracing/tracing_on", "1");
+ 		key = select(1, &rfds, NULL, NULL, &end);
+ 		parse_ftrace();
+ 		print_global_list();

@@ -1,0 +1,86 @@
+Upstream-Status: Inappropriate [distribution]
+
+--- client/scripts/bsdos
++++ client/scripts/bsdos
+@@ -47,6 +47,11 @@
+     . /etc/dhcp/dhclient-exit-hooks
+   fi
+ # probably should do something with exit status of the local script
++  if [ x$dhc_dbus != x -a $exit_status -eq 0 ]; then
++    dbus-send --system --dest=com.redhat.dhcp \
++      --type=method_call /com/redhat/dhcp/$interface com.redhat.dhcp.set \
++      'string:'"`env | grep -Ev '^(PATH|SHLVL|_|PWD|dhc_dbus)\='`"
++  fi
+   exit $exit_status
+ }
+ 
+--- client/scripts/freebsd
++++ client/scripts/freebsd
+@@ -57,6 +57,11 @@
+     . /etc/dhcp/dhclient-exit-hooks
+   fi
+ # probably should do something with exit status of the local script
++  if [ x$dhc_dbus != x -a $exit_status -eq 0 ]; then
++    dbus-send --system --dest=com.redhat.dhcp \
++      --type=method_call /com/redhat/dhcp/$interface com.redhat.dhcp.set \
++      'string:'"`env | grep -Ev '^(PATH|SHLVL|_|PWD|dhc_dbus)\='`"
++  fi
+   exit $exit_status
+ }
+ 
+--- client/scripts/linux
++++ client/scripts/linux
+@@ -69,6 +69,11 @@
+     . /etc/dhcp/dhclient-exit-hooks
+   fi
+ # probably should do something with exit status of the local script
++  if [ x$dhc_dbus != x -a $exit_status -eq 0 ]; then
++    dbus-send --system --dest=com.redhat.dhcp \
++      --type=method_call /com/redhat/dhcp/$interface com.redhat.dhcp.set \
++      'string:'"`env | grep -Ev '^(PATH|SHLVL|_|PWD|dhc_dbus)\='`"
++  fi
+   exit $exit_status
+ }
+ 
+--- client/scripts/netbsd
++++ client/scripts/netbsd
+@@ -47,6 +47,11 @@
+     . /etc/dhcp/dhclient-exit-hooks
+   fi
+ # probably should do something with exit status of the local script
++  if [ x$dhc_dbus != x -a $exit_status -eq 0 ]; then
++    dbus-send --system --dest=com.redhat.dhcp \
++      --type=method_call /com/redhat/dhcp/$interface com.redhat.dhcp.set \
++      'string:'"`env | grep -Ev '^(PATH|SHLVL|_|PWD|dhc_dbus)\='`"
++  fi
+   exit $exit_status
+ }
+ 
+--- client/scripts/openbsd
++++ client/scripts/openbsd
+@@ -47,6 +47,11 @@
+     . /etc/dhcp/dhclient-exit-hooks
+   fi
+ # probably should do something with exit status of the local script
++  if [ x$dhc_dbus != x -a $exit_status -eq 0 ]; then
++    dbus-send --system --dest=com.redhat.dhcp \
++      --type=method_call /com/redhat/dhcp/$interface com.redhat.dhcp.set \
++      'string:'"`env | grep -Ev '^(PATH|SHLVL|_|PWD|dhc_dbus)\='`"
++  fi
+   exit $exit_status
+ }
+ 
+--- client/scripts/solaris
++++ client/scripts/solaris
+@@ -47,6 +47,11 @@
+     . /etc/dhcp/dhclient-exit-hooks
+   fi
+ # probably should do something with exit status of the local script
++  if [ x$dhc_dbus != x -a $exit_status -eq 0 ]; then
++    dbus-send --system --dest=com.redhat.dhcp \
++      --type=method_call /com/redhat/dhcp/$interface com.redhat.dhcp.set \
++      'string:'"`env | grep -Ev '^(PATH|SHLVL|_|PWD|dhc_dbus)\='`"
++  fi
+   exit $exit_status
+ }
+ 

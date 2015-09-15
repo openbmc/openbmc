@@ -1,0 +1,39 @@
+Upstream-Status: Backport
+
+diff -ruN tcp_wrappers_7.6.orig/rfc931.c tcp_wrappers_7.6/rfc931.c
+--- tcp_wrappers_7.6.orig/rfc931.c	2004-08-29 18:40:08.000000000 +0200
++++ tcp_wrappers_7.6/rfc931.c	2004-08-29 18:40:02.000000000 +0200
+@@ -92,6 +92,8 @@
+     char   *cp;
+     char   *result = unknown;
+     FILE   *fp;
++    unsigned saved_timeout;
++    struct sigaction nact, oact;
+ 
+ #ifdef INET6
+     /* address family must be the same */
+@@ -134,7 +136,12 @@
+ 	 */
+ 
+ 	if (setjmp(timebuf) == 0) {
+-	    signal(SIGALRM, timeout);
++	    /* Save SIGALRM timer and handler. Sudheer Abdul-Salam, SUN. */
++	    saved_timeout = alarm(0);
++	    nact.sa_handler = timeout;
++	    nact.sa_flags = 0;
++	    (void) sigemptyset(&nact.sa_mask);
++	    (void) sigaction(SIGALRM, &nact, &oact);
+ 	    alarm(rfc931_timeout);
+ 
+ 	    /*
+@@ -223,6 +230,10 @@
+ 	    }
+ 	    alarm(0);
+ 	}
++	/* Restore SIGALRM timer and handler. Sudheer Abdul-Salam, SUN. */
++	(void) sigaction(SIGALRM, &oact, NULL);
++	if (saved_timeout > 0)
++	    alarm(saved_timeout);
+ 	fclose(fp);
+     }
+     STRN_CPY(dest, result, STRING_LENGTH);

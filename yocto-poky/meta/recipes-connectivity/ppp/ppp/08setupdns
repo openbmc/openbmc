@@ -1,0 +1,12 @@
+#!/bin/sh
+ACTUALCONF=/var/run/resolv.conf
+PPPCONF=/var/run/ppp/resolv.conf
+if [ -f $PPPCONF ] ; then
+	if [ -f $ACTUALCONF ] ; then
+		if [ ! -h $ACTUALCONF -o ! "`readlink $ACTUALCONF 2>&1`" = "$PPPCONF" ] ; then
+			mv $ACTUALCONF $ACTUALCONF.ppporig
+		fi
+	fi
+
+	ln -sf $PPPCONF $ACTUALCONF
+fi

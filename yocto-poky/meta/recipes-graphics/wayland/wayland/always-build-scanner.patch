@@ -1,0 +1,105 @@
+build: always build wayland-scanner
+
+The previous idiom for building a cross-compiled Wayland is to build once for
+the build host (with --enable-scanner --disable-libraries) to get a
+wayland-scanner binary that can then be used in a cross-compile (with
+--disable-scanner).  The problem with this is that the cross wayland is missing
+a wayland-scanner binary, which means you then can't do any Wayland development
+on the target.
+
+Instead, always build wayland-scanner for the target and change
+--enable/disable-scanner to --with/without-host-scanner.  Normal builds use the
+default of --without-host-scanner and run the wayland-scanner it just built, and
+cross-compiled builds pass --with-host-scanner to use a previously built host
+scanner but still get a wayland-scanner to install.
+
+(a theoretically neater solution would be to build two scanners if required (one
+to run and one to install), but automake makes this overly complicated)
+
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+Upstream-Status: Submitted
+
+diff --git a/Makefile.am b/Makefile.am
+index c19494f..c2d929b 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -64,16 +64,17 @@ nodist_libwayland_client_la_SOURCES =		\
+ 
+ pkgconfig_DATA += src/wayland-client.pc src/wayland-server.pc
+ 
+-if ENABLE_SCANNER
+-wayland_scanner = $(top_builddir)/wayland-scanner
+ bin_PROGRAMS = wayland-scanner
+ wayland_scanner_SOURCES = src/scanner.c
+ wayland_scanner_CFLAGS = $(EXPAT_CFLAGS) $(AM_CFLAGS)
+ wayland_scanner_LDADD = $(EXPAT_LIBS) libwayland-util.la
+-$(BUILT_SOURCES) : wayland-scanner
+ pkgconfig_DATA += src/wayland-scanner.pc
+-else
++
++if HOST_SCANNER
+ wayland_scanner = wayland-scanner
++else
++$(BUILT_SOURCES) : wayland-scanner
++wayland_scanner = $(top_builddir)/wayland-scanner
+ endif
+ 
+ protocol/%-protocol.c : $(top_srcdir)/protocol/%.xml
+diff --git a/configure.ac b/configure.ac
+index c2a804e..de0b02f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -65,11 +65,11 @@ AC_CHECK_DECL(CLOCK_MONOTONIC,[],
+ 	      [[#include <time.h>]])
+ AC_CHECK_HEADERS([execinfo.h])
+ 
+-AC_ARG_ENABLE([scanner],
+-              [AC_HELP_STRING([--disable-scanner],
+-                              [Disable compilation of wayland-scanner])],
+-              [],
+-              [enable_scanner=yes])
++AC_ARG_WITH([host-scanner],
++            [AC_HELP_STRING([--with-host-scanner],
++                            [Use a host wayland-scanner])],
++            [],
++            [with_host_scanner=no])
+ 
+ AC_ARG_ENABLE([documentation],
+ 	      [AC_HELP_STRING([--disable-documentation],
+@@ -77,25 +77,23 @@ AC_ARG_ENABLE([documentation],
+ 	      [],
+ 	      [enable_documentation=yes])
+ 
+-AM_CONDITIONAL(ENABLE_SCANNER, test "x$enable_scanner" = xyes)
++AM_CONDITIONAL(HOST_SCANNER, test "x$with_host_scanner" = xyes)
+ 
+ AC_ARG_WITH(icondir, [  --with-icondir=<dir>    Look for cursor icons here],
+ 		     [  ICONDIR=$withval],
+ 		     [  ICONDIR=${datadir}/icons])
+ AC_SUBST([ICONDIR])
+ 
+-if test "x$enable_scanner" = "xyes"; then
+-	PKG_CHECK_MODULES(EXPAT, [expat], [],
+-		[AC_CHECK_HEADERS(expat.h, [],
+-			[AC_MSG_ERROR([Can't find expat.h. Please install expat.])])
+-		 SAVE_LIBS="$LIBS"
+-		 AC_SEARCH_LIBS(XML_ParserCreate, expat, [],
+-			[AC_MSG_ERROR([Can't find expat library. Please install expat.])])
+-		 EXPAT_LIBS="$LIBS"
+-		 LIBS="$SAVE_LIBS"
+-		 AC_SUBST(EXPAT_LIBS)
+-		])
+-fi
++PKG_CHECK_MODULES(EXPAT, [expat], [],
++	[AC_CHECK_HEADERS(expat.h, [],
++		[AC_MSG_ERROR([Can't find expat.h. Please install expat.])])
++	 SAVE_LIBS="$LIBS"
++	 AC_SEARCH_LIBS(XML_ParserCreate, expat, [],
++		[AC_MSG_ERROR([Can't find expat library. Please install expat.])])
++	 EXPAT_LIBS="$LIBS"
++	 LIBS="$SAVE_LIBS"
++	 AC_SUBST(EXPAT_LIBS)
++	])
+ 
+ AC_PATH_PROG(XSLTPROC, xsltproc)
+ AM_CONDITIONAL([HAVE_XSLTPROC], [test "x$XSLTPROC" != "x"])

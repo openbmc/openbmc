@@ -1,0 +1,104 @@
+#!/bin/sh
+
+# Default to avoiding the first two disks on typical Linux and Mac OS installs
+# Better safe than sorry :-)
+BLACKLIST_DEVICES="/dev/sda /dev/sdb /dev/disk1 /dev/disk2"
+
+# 1MB blocksize
+BLOCKSIZE=1048576
+
+usage() {
+	echo "Usage: $(basename $0) IMAGE DEVICE"
+}
+
+image_details() {
+	IMG=$1
+	echo "Image details"
+	echo "============="
+	echo "    image: $(basename $IMG)"
+	# stat format is different on Mac OS and Linux
+	if [ "$(uname)" = "Darwin" ]; then
+		echo "     size: $(stat -L -f '%z bytes' $IMG)"
+		echo " modified: $(stat -L -f '%Sm' $IMG)"
+	else
+		echo "     size: $(stat -L -c '%s bytes' $IMG)"
+		echo " modified: $(stat -L -c '%y' $IMG)"
+	fi
+	echo "     type: $(file -L -b $IMG)"
+	echo ""
+}
+
+device_details() {
+	DEV=$1
+	BLOCK_SIZE=512
+
+	echo "Device details"
+	echo "=============="
+
+	# Collect disk info using diskutil on Mac OS
+	if [ "$(uname)" = "Darwin" ]; then
+		diskutil info $DEVICE | egrep "(Device Node|Media Name|Total Size)"
+		return
+	fi
+
+	# Default / Linux information collection
+	echo "  device: $DEVICE"
+	if [ -f "/sys/class/block/$DEV/device/vendor" ]; then
+		echo "  vendor: $(cat /sys/class/block/$DEV/device/vendor)"
+	else
+		echo "  vendor: UNKOWN"
+	fi
+	if [ -f "/sys/class/block/$DEV/device/model" ]; then
+		echo "   model: $(cat /sys/class/block/$DEV/device/model)"
+	else
+		echo "   model: UNKNOWN"
+	fi
+	if [ -f "/sys/class/block/$DEV/size" ]; then
+		echo "    size: $(($(cat /sys/class/block/$DEV/size) * $BLOCK_SIZE)) bytes"
+	else
+		echo "    size: UNKNOWN"
+	fi
+	echo ""
+}
+
+if [ $# -ne 2 ]; then
+	usage
+	exit 1
+fi
+
+IMAGE=$1
+DEVICE=$2
+
+if [ ! -e "$IMAGE" ]; then
+	echo "ERROR: Image $IMAGE does not exist"
+	usage
+	exit 1
+fi
+
+
+for i in ${BLACKLIST_DEVICES}; do
+	if [ "$i" = "$DEVICE" ]; then
+		echo "ERROR: Device $DEVICE is blacklisted"
+		exit 1
+	fi
+done
+
+if [ ! -w "$DEVICE" ]; then
+	echo "ERROR: Device $DEVICE does not exist or is not writable"
+	usage
+	exit 1
+fi
+
+image_details $IMAGE
+device_details $(basename $DEVICE)
+
+printf "Write $IMAGE to $DEVICE [y/N]? "
+read RESPONSE
+if [ "$RESPONSE" != "y" ]; then
+	echo "Write aborted"
+	exit 0
+fi
+
+echo "Writing image..."
+dd if="$IMAGE" of="$DEVICE" bs="$BLOCKSIZE"
+sync

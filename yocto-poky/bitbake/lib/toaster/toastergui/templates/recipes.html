@@ -1,0 +1,112 @@
+{% extends "basebuildpage.html" %}
+
+{% load projecttags %}
+
+{% block localbreadcrumb %}
+<li>Recipes</li>
+{% endblock %}
+
+{% block nav-recipes %}
+  <li class="active"><a href="{% url 'recipes' build.pk %}">Recipes</a></li>
+{% endblock %}
+
+{% block buildinfomain %}
+<div class="span10">
+<div class="page-header">
+<h1>
+  {% if request.GET.search and objects.paginator.count > 0  %}
+      {{objects.paginator.count}} recipe{{objects.paginator.count|pluralize}} found
+  {%elif request.GET.search and objects.paginator.count == 0%}
+      No recipes found
+  {%else%}
+      Recipes
+  {%endif%}
+ </h1>
+</div>
+
+{% if objects.paginator.count == 0 %}
+  <div class="row-fluid">
+      <div class="alert">
+        <form class="no-results input-append" id="searchform">
+            <input id="search" name="search" class="input-xxlarge" type="text" value="{%if request.GET.search%}{{request.GET.search}}{%endif%}"/>{% if request.GET.search %}<a href="javascript:$('#search').val('');searchform.submit()" class="add-on btn" tabindex="-1"><i class="icon-remove"></i></a>{% endif %}
+            <button class="btn" type="submit" value="Search">Search</button>
+            <button class="btn btn-link" onclick="javascript:$('#search').val('');searchform.submit()">Show all recipes</button>
+        </form>
+      </div>
+  </div>
+
+{% else %}
+{% include "basetable_top.html" %}
+
+    {% for recipe in objects %}
+
+    <tr class="data">
+        <td class="recipe__name">
+            <a href="{% url "recipe" build.pk recipe.pk %}">{{recipe.name}}</a>
+        </td>
+        <td class="recipe__version">
+            <a href="{% url "recipe" build.pk recipe.pk %}">{{recipe.version}}</a>
+        </td>
+        <!-- Depends -->
+        <td class="depends_on">
+            {% with deps=recipe_deps|get_dict_value:recipe.pk %}
+            {% with count=deps|length %}
+            {% if count %}
+            <a class="btn"
+                title="<a href='{% url "recipe" build.pk recipe.pk %}#dependencies'>{{recipe.name}}</a> dependencies"
+                data-content="<ul class='unstyled'>
+                  {% for i in deps|dictsort:"depends_on.name"%}
+                    <li><a href='{% url "recipe" build.pk i.depends_on.pk %}'>{{i.depends_on.name}}</a></li>
+                  {% endfor %}
+                </ul>">
+                {{count}}
+            </a>
+            {% endif %}
+            {% endwith %}
+            {% endwith %}
+        </td>
+        <!--  Brought in by -->
+        <td class="depends_by">
+            {% with revs=recipe_revs|get_dict_value:recipe.pk %}
+            {% with count=revs|length %}
+            {% if count %}
+            <a class="btn"
+                title="<a href='{% url "recipe" build.pk recipe.pk %}#brought-in-by'>{{recipe.name}}</a> reverse dependencies"
+                data-content="<ul class='unstyled'>
+                  {% for i in revs|dictsort:"recipe.name" %}
+                    <li><a href='{% url "recipe" build.pk i.recipe.pk %}'>{{i.recipe.name}}</a></li>
+                  {% endfor %}
+                </ul>">
+                {{count}}
+            </a>
+            {% endif %}
+            {% endwith %}
+            {% endwith %}
+        </td>
+        <!-- Recipe file -->
+        <td class="recipe_file">{{recipe.file_path}} {% if recipe.pathflags %}<i>({{recipe.pathflags}})</i>{% endif %}</td>
+        <!-- Section -->
+        <td class="recipe_section">{{recipe.section}}</td>
+        <!-- License -->
+        <td class="recipe_license">{{recipe.license}}</td>
+        <!-- Layer -->
+        <td class="layer_version__layer__name">{{recipe.layer_version.layer.name}}</td>
+        <!-- Layer branch -->
+        <td class="layer_version__branch">{{recipe.layer_version.branch}}</td>
+        <!-- Layer commit -->
+        <td class="layer_version__layer__commit">
+            <a class="btn"
+                data-content="<ul class='unstyled'>
+                  <li>{{recipe.layer_version.commit}}</li>
+                </ul>">
+                {{recipe.layer_version.commit|truncatechars:13}}
+            </a>
+        </td>
+    </tr>
+
+    {% endfor %}
+
+{% include "basetable_bottom.html" %}
+{% endif %}
+</div>
+{% endblock %}

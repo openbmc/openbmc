@@ -1,0 +1,13 @@
+#!/bin/bash
+
+aclocal $ACLOCAL_FLAGS || exit 1
+automake --foreign --add-missing || exit 1
+autoconf || exit 1
+export CFLAGS='-O2 -Wall -pipe -g'
+echo "CFLAGS=$CFLAGS"
+echo "./configure $@"
+./configure $@ || exit 1
+unset CFLAGS
+if [ -z "$GITCOMPILE_NO_MAKE" ]; then
+  make || exit 1
+fi

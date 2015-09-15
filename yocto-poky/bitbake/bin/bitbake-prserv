@@ -1,0 +1,55 @@
+#!/usr/bin/env python
+import os
+import sys,logging
+import optparse
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)),'lib'))
+
+import prserv
+import prserv.serv
+
+__version__="1.0.0"
+
+PRHOST_DEFAULT='0.0.0.0'
+PRPORT_DEFAULT=8585
+
+def main():
+    parser = optparse.OptionParser(
+        version="Bitbake PR Service Core version %s, %%prog version %s" % (prserv.__version__, __version__),
+        usage = "%prog < --start | --stop > [options]")
+
+    parser.add_option("-f", "--file", help="database filename(default: prserv.sqlite3)", action="store",
+                      dest="dbfile", type="string", default="prserv.sqlite3")
+    parser.add_option("-l", "--log", help="log filename(default: prserv.log)", action="store",
+                      dest="logfile", type="string", default="prserv.log")
+    parser.add_option("--loglevel", help="logging level, i.e. CRITICAL, ERROR, WARNING, INFO, DEBUG",
+                      action = "store", type="string", dest="loglevel", default = "INFO")
+    parser.add_option("--start", help="start daemon",
+                      action="store_true", dest="start")
+    parser.add_option("--stop", help="stop daemon",
+                      action="store_true", dest="stop")
+    parser.add_option("--host", help="ip address to bind", action="store",
+                      dest="host", type="string", default=PRHOST_DEFAULT)
+    parser.add_option("--port", help="port number(default: 8585)", action="store",
+                      dest="port", type="int", default=PRPORT_DEFAULT)
+
+    options, args = parser.parse_args(sys.argv)
+    prserv.init_logger(os.path.abspath(options.logfile),options.loglevel)
+
+    if options.start:
+        ret=prserv.serv.start_daemon(options.dbfile, options.host, options.port,os.path.abspath(options.logfile))
+    elif options.stop:
+        ret=prserv.serv.stop_daemon(options.host, options.port)
+    else:
+        ret=parser.print_help()
+    return ret
+
+if __name__ == "__main__":
+    try:
+        ret = main()
+    except Exception:
+        ret = 1
+        import traceback
+        traceback.print_exc(5)
+    sys.exit(ret)
+

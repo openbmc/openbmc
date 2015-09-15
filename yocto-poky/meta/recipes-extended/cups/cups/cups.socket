@@ -1,0 +1,8 @@
+[Unit]
+Description=CUPS Printing Service Sockets
+
+[Socket]
+ListenStream=/var/run/cups/cups.sock
+
+[Install]
+WantedBy=sockets.target

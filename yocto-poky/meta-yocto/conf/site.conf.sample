@@ -1,0 +1,31 @@
+#
+# local.conf covers user settings, site.conf covers site specific information
+# such as proxy server addresses and optionally any shared download location
+#
+# SITE_CONF_VERSION is increased each time build/conf/site.conf
+# changes incompatibly
+SCONF_VERSION = "1"
+
+# Uncomment to cause CVS to use the proxy host specified
+#CVS_PROXY_HOST = "proxy.example.com"
+#CVS_PROXY_PORT = "81"
+
+# For svn, you need to create ~/.subversion/servers containing:
+#[global]
+#http-proxy-host = proxy.example.com
+#http-proxy-port = 81
+#
+
+# To use git with a proxy, you must use an external git proxy command, such as
+# the one provided by scripts/oe-git-proxy.sh. To use this script, copy it to
+# your PATH and uncomment the following:
+#GIT_PROXY_COMMAND ?= "oe-git-proxy"
+#ALL_PROXY ?= "socks://socks.example.com:1080"
+#or
+#ALL_PROXY ?= "https://proxy.example.com:8080"
+# If you wish to use certain hosts without the proxy, specify them in NO_PROXY.
+# See the script for details on syntax.
+
+# Uncomment this to use a shared download directory
+#DL_DIR = "/some/shared/download/directory/"
+

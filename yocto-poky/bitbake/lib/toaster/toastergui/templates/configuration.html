@@ -1,0 +1,71 @@
+{% extends "basebuildpage.html" %}
+{% load projecttags %}
+
+{% block localbreadcrumb %}
+<li>Configuration</li>
+{% endblock %}
+
+{% block nav-configuration %}
+  <li class="active"><a href="{% url 'configuration' build.pk %}">Configuration</a></li>
+{% endblock %}
+
+{% block buildinfomain %}
+<!-- page title -->
+<div class="row-fluid span10">
+ <div class="page-header">
+     <h1>Configuration</h1>
+ </div>
+</div>
+
+<!-- configuration table -->
+<div class="row-fluid pull-right span10" id="navTab">
+<ul class="nav nav-pills">
+    <li class="active"><a href="#">Summary</a></li>
+    <li class=""><a href="{% url 'configvars' build.id %}">BitBake variables</a></li>
+</ul>
+
+  <!-- summary -->
+  <div id="summary" class="tab-pane active">
+    <h3>Build configuration</h3>
+    <dl class="dl-horizontal">
+      {%if BB_VERSION %}<dt>BitBake version</dt><dd>{{BB_VERSION}}</dd> {% endif %}
+      {%if BUILD_SYS %}<dt>Build system</dt><dd>{{BUILD_SYS}}</dd> {% endif %}
+      {%if NATIVELSBSTRING %}<dt>Host distribution</dt><dd>{{NATIVELSBSTRING}}</dd> {% endif %}
+      {%if TARGET_SYS %}<dt>Target system</dt><dd>{{TARGET_SYS}}</dd> {% endif %}
+      {%if MACHINE %}<dt>Machine</dt><dd>{{MACHINE}}</dd> {% endif %}
+      {%if DISTRO %}<dt>Distro</dt><dd>{{DISTRO}}</dd> {% endif %}
+      {%if DISTRO_VERSION %}<dt>Distro version</dt><dd>{{DISTRO_VERSION}}</dd> {% endif %}
+      {%if TUNE_FEATURES %}<dt>Tune features</dt><dd>{{TUNE_FEATURES}}</dd> {% endif %}
+      {%if TARGET_FPU %}<dt>Target FPU</dt><dd>{{TARGET_FPU}}</dd> {% endif %}
+      {%if targets.all %}<dt>Target(s)</dt>
+          <dd> <ul> {% for target in targets.all %}
+               <li>{{target.target}}{%if forloop.counter > 1 %}<br>{% endif %}</li>
+          {% endfor %} </ul> </dd> {% endif %}
+    </dl>
+    <h3>Layers</h3>
+    <div class="span9" style="margin-left:0px;">
+    <table class="table table-bordered table-hover">
+      <thead>
+        <tr>
+          <th>Layer</th>
+          <th>Layer branch</th>
+          <th>Layer commit</th>
+        </tr>
+      </thead>
+      <tbody>{% for lv in build.layer_version_build.all|dictsort:"layer.name" %}
+        <tr>
+            <td>{{lv.layer.name}}</td>
+            <td>{{lv.branch}}</td>
+            <td> <a class="btn" data-content="<ul class='unstyled'>
+                <li>{{lv.commit}}</li> </ul>">
+                    {{lv.commit|truncatechars:13}}
+                </a></td>
+        </tr>{% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+
+</div>
+{% endblock %}

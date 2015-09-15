@@ -1,0 +1,25 @@
+Add 'install-ptest' rule.
+
+Signed-off-by: Tudor Florea <tudor.florea@enea.com>
+Upstream-Status: Pending
+
+diff -ruN a/Makefile.am b/Makefile.am
+--- a/Makefile.am	2013-07-12 17:11:05.278331557 +0200
++++ b/Makefile.am	2013-07-12 17:14:27.033788016 +0200
+@@ -204,6 +204,16 @@
+ 
+ distclean-local: $(DISTCLEAN_LOCAL_HOOKS)
+ 
++install-ptest:
++	@$(MKDIR_P) $(DESTDIR)/testsuite
++	@for file in $(TESTSUITE); do \
++		install $$file $(DESTDIR)/testsuite; \
++	done;
++	@sed -e 's/^Makefile/_Makefile/' < Makefile > $(DESTDIR)/Makefile
++	@$(MKDIR_P) $(DESTDIR)/tools
++	@cp $(noinst_SCRIPTS) $(noinst_PROGRAMS) $(DESTDIR)/tools
++	@cp -r testsuite/rootfs testsuite/.libs $(DESTDIR)/testsuite
++
+ # ------------------------------------------------------------------------------
+ # custom release helpers
+ # ------------------------------------------------------------------------------

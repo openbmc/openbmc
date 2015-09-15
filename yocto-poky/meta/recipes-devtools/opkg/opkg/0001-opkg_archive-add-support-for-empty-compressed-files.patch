@@ -1,0 +1,64 @@
+From bd32bb8646459508bb0b0ce54a14bd6fe0e19b75 Mon Sep 17 00:00:00 2001
+From: Alejandro del Castillo <alejandro.delcastillo@ni.com>
+Date: Thu, 27 Aug 2015 15:52:16 -0500
+Subject: [PATCH] opkg_archive: add support for empty compressed files
+
+Regression from 0.2.x: opkg used to support empty Package.gz files.
+
+Signed-off-by: Alejandro del Castillo <alejandro.delcastillo@ni.com>
+
+Upstream-Status: Accepted
+---
+ libopkg/opkg_archive.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/libopkg/opkg_archive.c b/libopkg/opkg_archive.c
+index be903e4..7e91e48 100644
+--- a/libopkg/opkg_archive.c
++++ b/libopkg/opkg_archive.c
+@@ -121,6 +121,9 @@ static int copy_to_stream(struct archive *a, FILE * stream)
+     int eof;
+     size_t len = EXTRACT_BUFFER_LEN;
+ 
++    if (archive_format(a) == ARCHIVE_FORMAT_EMPTY)
++        return 0;
++
+     buffer = xmalloc(len);
+ 
+     while (1) {
+@@ -654,6 +657,13 @@ static struct archive *open_compressed_file(const char *filename)
+         goto err_cleanup;
+     }
+ 
++    r = archive_read_support_format_empty(ar);
++    if (r != ARCHIVE_OK) {
++        opkg_msg(ERROR, "Empty format not supported: %s\n",
++                 archive_error_string(ar));
++        goto err_cleanup;
++    }
++
+     /* Open input file and prepare for reading. */
+     r = archive_read_open_filename(ar, filename, EXTRACT_BUFFER_LEN);
+     if (r != ARCHIVE_OK) {
+@@ -723,6 +733,7 @@ struct opkg_ar *ar_open_compressed_file(const char *filename)
+ {
+     struct opkg_ar *ar;
+     struct archive_entry *entry;
++    int eof;
+ 
+     ar = (struct opkg_ar *)xmalloc(sizeof(struct opkg_ar));
+ 
+@@ -737,8 +748,8 @@ struct opkg_ar *ar_open_compressed_file(const char *filename)
+      * header. We skip over this header here so that the caller doesn't need
+      * to know about it.
+      */
+-    entry = read_header(ar->ar, NULL);
+-    if (!entry)
++    entry = read_header(ar->ar, &eof);
++    if (!entry && !eof)
+         goto err_cleanup;
+ 
+     return ar;
+-- 
+1.9.1
+

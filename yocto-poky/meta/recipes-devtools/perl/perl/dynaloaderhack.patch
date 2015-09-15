@@ -1,0 +1,23 @@
+Hack the dynamic module loader so that we use native modules since we can't load
+the target ones.
+
+Upstream-Status: Inappropriate
+
+RP
+2013/01/13
+
+Index: perl-5.14.2/ext/DynaLoader/DynaLoader_pm.PL
+===================================================================
+--- perl-5.14.2.orig/ext/DynaLoader/DynaLoader_pm.PL	2011-09-19 13:18:22.000000000 +0000
++++ perl-5.14.2/ext/DynaLoader/DynaLoader_pm.PL	2013-01-19 16:09:51.020584945 +0000
+@@ -310,6 +310,10 @@
+     foreach (@INC) {
+ 	<<$^O-eq-VMS>>chop($_ = VMS::Filespec::unixpath($_));<</$^O-eq-VMS>>
+ 	    my $dir = "$_/auto/$modpname";
++
++	if (defined $ENV{PERL_LIB} and defined $ENV{PERLHOSTLIB}) {
++	    $dir =~ s/$ENV{PERL_LIB}/$ENV{PERLHOSTLIB}/g;
++	}
+ 	
+ 	next unless -d $dir; # skip over uninteresting directories
+ 	

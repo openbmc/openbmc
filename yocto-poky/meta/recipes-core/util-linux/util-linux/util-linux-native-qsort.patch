@@ -1,0 +1,33 @@
+From f220d809be1baa654503bf6ff52f3630b0d7015c Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Wed, 26 Mar 2014 01:30:29 +0000
+Subject: [PATCH] sun.c: use qsort() to instead of qsort_r()
+
+qsort_r() was added to glibc in version 2.8, so there is no qsort_r() on
+the host like CentOS 5.x.
+
+Upstream-Status: Inappropriate [Other]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ libfdisk/src/sun.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+Index: util-linux-2.24.2/libfdisk/src/sun.c
+===================================================================
+--- util-linux-2.24.2.orig/libfdisk/src/sun.c
++++ util-linux-2.24.2/libfdisk/src/sun.c
+@@ -431,10 +431,9 @@ static int sun_verify_disklabel(struct f
+     }
+     verify_sun_starts = starts;
+ 
+-    qsort_r(array,ARRAY_SIZE(array),sizeof(array[0]),
+-	  (int (*)(const void *,const void *,void *)) verify_sun_cmp,
+-	  verify_sun_starts);
+-
++    qsort(array,ARRAY_SIZE(array),sizeof(array[0]),
++         (int (*)(const void *,const void *)) verify_sun_cmp);
++ 
+     if (array[0] == -1) {
+ 	fdisk_info(cxt, _("No partitions defined."));
+ 	return 0;

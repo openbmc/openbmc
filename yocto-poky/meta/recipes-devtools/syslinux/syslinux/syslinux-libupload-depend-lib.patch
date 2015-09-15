@@ -1,0 +1,34 @@
+From 490fc3bbd65c2c252c1fdf3da0fac9898aa9eea6 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Fri, 15 Aug 2014 21:09:16 -0700
+Subject: [PATCH] com32/Makefile: fix parallel issue
+
+Fixed:
+cp -r syslinux-6.01/com32/libupload/*.h image/usr/share/syslinux/com32/include/
+[snip]
+rm -rf image/usr/share/syslinux/com32/include
+[snip]
+cp: cannot create regular file `image/usr/share/syslinux/com32/include/serial.h': No such file or directory
+
+The cp is happened in the "libupload" dir, while "rm -fr" is happend in
+"lib" dir, let "libupload" depend "lib" will fix the problem.
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ com32/Makefile |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/com32/Makefile b/com32/Makefile
+index 9a1721b..f172db2 100644
+--- a/com32/Makefile
++++ b/com32/Makefile
+@@ -21,3 +21,4 @@ rosh: lib libutil
+ samples: libutil elflink/ldlinux
+ sysdump: libupload gpllib
+ gpllib: lib
++libupload: lib
+-- 
+1.7.9.5
+

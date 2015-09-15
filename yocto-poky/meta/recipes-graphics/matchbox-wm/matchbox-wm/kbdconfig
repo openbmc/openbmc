@@ -1,0 +1,42 @@
+#
+# This is an example keyboard config file for matchbox
+#
+# You can edit this file or change per user by copying to 
+#  ~/.matchbox/kbdconfig
+#
+# Se the matchbox manual for more info ( http://projects.o-hand.com/matchbox )
+
+### Window operation short cuts 
+
+<Alt>n=next
+<Alt>p=prev
+<Alt>c=close
+<Alt>d=desktop
+<Alt>m=!matchbox-remote -mbmenu
+
+### App launching.
+
+<ctrl><alt>x=!xterm
+<ctrl><alt>r=!rxvt
+
+### poky additions
+
+XF86Calendar=!$contacts
+telephone=!$dates
+XF86Start=!matchbox-remote -desktop
+F2=!matchbox-remote -mbmenu
+
+#XF86Mail=!$tasks
+#Escape=close
+
+### windows style key shortcuts
+
+<alt>Tab=next
+<alt><shift>Tab=prev
+
+<alt>space=taskmenu
+<alt>escape=!matchbox-remote -mbmenu
+<alt>f4=close
+
+f11=fullscreen
+

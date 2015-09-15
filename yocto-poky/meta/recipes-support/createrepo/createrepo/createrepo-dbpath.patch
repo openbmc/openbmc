@@ -1,0 +1,61 @@
+createrepo: Implement --dbpath command line option
+
+--dbpath option allows to specify path to the directory
+with rpm database. By default createrepo uses or creates
+rpm database in /var/lib/rpm/
+
+Upstream-Status: Pending
+
+Signed-off-by: Ed Bartosh <ed.bartosh@linux.intel.com>
+
+--- createrepo-0.4.11.orig/genpkgmetadata.py 2015-03-30 22:18:19.904000000 +0300
++++ createrepo-0.4.11/genpkgmetadata.py 2015-03-30 22:28:49.208000000 +0300
+@@ -65,6 +65,7 @@
+      -p, --pretty = output xml files in pretty format.
+      --update = update existing metadata (if present)
+      -d, --database = generate the sqlite databases.
++     --dbpath <dir> = specify path to rpm db directory.
+     """)
+ 
+     sys.exit(retval)
+@@ -72,10 +73,13 @@
+ class MetaDataGenerator:
+     def __init__(self, cmds):
+         self.cmds = cmds
+-        self.ts = rpm.TransactionSet()
+         self.pkgcount = 0
+         self.files = []
+ 
++        if self.cmds['dbpath']:
++            rpm.addMacro("_dbpath", self.cmds['dbpath'])
++        self.ts = rpm.TransactionSet()
++
+     def _os_path_walk(self, top, func, arg):
+         """Directory tree walk with callback function.
+          copy of os.path.walk, fixes the link/stating problem
+@@ -435,6 +439,7 @@
+     cmds['dir-pattern-match'] = ['.*bin\/.*', '^\/etc\/.*']
+     cmds['skip-symlinks'] = False
+     cmds['pkglist'] = []
++    cmds['dbpath'] = None
+ 
+     try:
+         gopts, argsleft = getopt.getopt(args, 'phqVvndg:s:x:u:c:o:CSi:', ['help', 'exclude=',
+@@ -442,7 +447,7 @@
+                                                                   'baseurl=', 'groupfile=', 'checksum=',
+                                                                   'version', 'pretty', 'split', 'outputdir=',
+                                                                   'noepoch', 'checkts', 'database', 'update',
+-                                                                  'skip-symlinks', 'pkglist='])
++                                                                  'skip-symlinks', 'pkglist=', 'dbpath='])
+     except getopt.error, e:
+         errorprint(_('Options Error: %s.') % e)
+         usage()
+@@ -516,6 +521,8 @@
+                 cmds['skip-symlinks'] = True
+             elif arg in ['-i', '--pkglist']:
+                 cmds['pkglist'] = a
++            elif arg == '--dbpath':
++                cmds['dbpath'] = os.path.realpath(a)
+                                 
+     except ValueError, e:
+         errorprint(_('Options Error: %s') % e)

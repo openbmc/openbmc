@@ -1,0 +1,58 @@
+Upstream-Status:Inappropriate [embedded specific]
+
+Index: perl-5.14.2/Cross/Makefile
+===================================================================
+--- perl-5.14.2.orig/Cross/Makefile
++++ perl-5.14.2/Cross/Makefile
+@@ -1,6 +1,7 @@
+ ## Toplevel Makefile for cross-compilation of perl
+ 
+-export TOPDIR=${shell pwd}
++override TOPDIR=${shell pwd}
++export TOPDIR
+ include $(TOPDIR)/config
+ export CFLAGS
+ export SYS=$(ARCH)-$(OS)
+@@ -10,7 +11,7 @@ export OPTIMIZATION = -O2
+ 
+ export CC = $(CROSS)gcc
+ export CXX = $(CROSS)g++
+-export LD = $(CROSS)ld
++export LD = $(CC)
+ export STRIP = $(CROSS)strip
+ export AR = $(CROSS)ar
+ export RANLIB = $(CROSS)ranlib
+@@ -32,17 +33,6 @@ CFLAGS+=$(FULL_OPTIMIZATION)
+ all:
+ 	@echo Please read the README file before doing anything else.
+ 
+-gen_patch:
+-	diff -Bbur ../Makefile.SH Makefile.SH > Makefile.SH.patch
+-	diff -Bbur ../installperl installperl > installperl.patch
+-
+-patch:
+-	cd .. ; if [ ! -e ./CROSS_PATCHED ] ; then \
+-		patch -p1 < Cross/Makefile.SH.patch; \
+-		patch -p1 < Cross/installperl.patch ; mv installperl installperl-patched; \
+-		sed -e 's/XXSTRIPXX/$(SYS)/' installperl-patched > installperl; \
+-		touch CROSS_PATCHED ; fi
+-
+ perl:
+ 	@echo Perl cross-build directory is $(TOPDIR)
+ 	@echo Target arch is $(SYS)
+@@ -52,11 +42,11 @@ perl:
+ 	$(TOPDIR)/generate_config_sh config.sh-$(SYS) > $(TOPDIR)/../config.sh
+ 	cd $(TOPDIR)/.. ; ./Configure -S ; make depend ; make ; make more
+ 	cd $(TOPDIR)/.. ; mkdir -p fake_config_library ; cp lib/Config.pm lib/Config_heavy.pl fake_config_library
+-	cd $(TOPDIR)/.. ; $(MAKE) more2 "PERLRUN=/usr/bin/perl -I$(TOPDIR)/../fake_config_library -MConfig"
+-	cd $(TOPDIR)/.. ; $(MAKE) more3 "PERLRUN=/usr/bin/perl -I$(TOPDIR)/../fake_config_library -MConfig"
+-	cd $(TOPDIR)/.. ; $(MAKE) more4 "PERLRUN=/usr/bin/perl -I$(TOPDIR)/../fake_config_library -MConfig"
++	cd $(TOPDIR)/.. ; $(MAKE) more2 "PERLRUN=hostperl -I$(TOPDIR)/../fake_config_library -MConfig"
++	cd $(TOPDIR)/.. ; $(MAKE) more3 "PERLRUN=hostperl -I$(TOPDIR)/../fake_config_library -MConfig"
++	cd $(TOPDIR)/.. ; $(MAKE) more4 "PERLRUN=hostperl -I$(TOPDIR)/../fake_config_library -MConfig"
+ 	cd $(TOPDIR)/.. ; rm -rf install_me_here
+-	cd $(TOPDIR)/.. ; make install-strip
++#	cd $(TOPDIR)/.. ; make install-strip
+ 	cd $(TOPDIR)/.. ; sh -x Cross/warp
+ 
+ 

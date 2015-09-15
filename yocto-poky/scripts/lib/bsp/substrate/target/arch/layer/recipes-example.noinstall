@@ -1,0 +1,1 @@
+# yocto-bsp-dirname {{ if create_example_recipe == "y": }} recipes-example
