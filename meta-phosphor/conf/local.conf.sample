@@ -115,7 +115,8 @@ PACKAGE_CLASSES ?= "package_rpm"
 # Supported values are i686 and x86_64
 #SDKMACHINE ?= "i686"
 
-SANITY_TESTED_DISTROS_append ?= " RedHatEnterpriseWorkstation-6.6"
+SANITY_TESTED_DISTROS_append ?= " RedHatEnterpriseWorkstation-6.*"
+"
 #
 # Extra image configuration defaults
 #
