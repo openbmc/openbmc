@@ -30,7 +30,7 @@ IMAGE_FEATURES += " \
        obmc-phosphor-event-mgmt \
        obmc-phosphor-policy-mgmt \
        obmc-phosphor-system-mgmt \
-       ssh-server-openssh \
+       ssh-server-dropbear \
        "
 
 IMAGE_INSTALL += " \
