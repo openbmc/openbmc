@@ -1,0 +1,24 @@
+diff --git a/Makefile b/Makefile
+new file mode 100644
+index 0000000..3d79547
+--- /dev/null
++++ b/Makefile
+@@ -0,0 +1,18 @@
++PACKAGE=rest-dbus
++
++prefix?=/usr/local
++bin=$(prefix)/usr/bin
++share=$(prefix)/usr/share/$(PACKAGE)
++
++build clean all:
++
++install:
++	@install -d $(bin) $(share)/resources $(srv)
++	@install -m 755 $(PACKAGE) $(bin)
++	@for f in resources/*; do \
++		install -m644 $$f $(share)/resources; \
++	done
++
++uninstall:
++	@rm -f $(bin)/$(PACKAGE)
++	@rm -rf $(share)

@@ -1,0 +1,12 @@
+Index: git/rest-dbus
+===================================================================
+--- git.orig/rest-dbus
++++ git/rest-dbus
+@@ -8,7 +8,6 @@ import os
+ from xml.etree import ElementTree
+ 
+ busses = {
+-    'session': dbus.SessionBus,
+     'system': dbus.SystemBus,
+ }
+ 

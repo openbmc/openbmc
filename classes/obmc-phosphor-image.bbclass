@@ -35,4 +35,5 @@ IMAGE_FEATURES += " \
 
 IMAGE_INSTALL += " \
        bash \
+       packagegroup-obmc-phosphor-apps-extras \
        "
