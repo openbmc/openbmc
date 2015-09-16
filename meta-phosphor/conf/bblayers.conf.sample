@@ -9,7 +9,6 @@ BBLAYERS ?= " \
   ##OEROOT##/meta \
   ##OEROOT##/meta-yocto \
   ##OEROOT##/meta-phosphor \
-  ##OEROOT##/meta-phosphor/meta-sample-bsp \
   "
 BBLAYERS_NON_REMOVABLE ?= " \
   ##OEROOT##/meta \
