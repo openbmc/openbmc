@@ -1,7 +1,0 @@
-define KMACHINE qemuphosphor
-define KTYPE tiny
-define KARCH arm
-
-include ktypes/tiny/tiny.scc
-
-include qemuphosphor.scc

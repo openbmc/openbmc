@@ -1,4 +1,0 @@
-kconf hardware qemuphosphor.cfg
-
-kconf hardware qemuphosphor-user-config.cfg
-include qemuphosphor-user-patches.scc

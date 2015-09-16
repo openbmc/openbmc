@@ -1,15 +1,4 @@
-#@TYPE: Machine
-#@NAME: qemuphosphor
-#@DESCRIPTION: Machine configuration for qemuphosphor systems
-
-require conf/machine/include/qemu.inc
-require conf/machine/include/tune-arm926ejs.inc
-require conf/machine/include/qemuphosphor.inc
-
-KERNEL_IMAGETYPE = "zImage"
-SERIAL_CONSOLE = "115200 ttyAMA0"
-
-MACHINE_FEATURES += "\
+OBMC_MACHINE_FEATURES += "\
         obmc-phosphor-fan-mgmt \
         obmc-phosphor-chassis-mgmt \
         obmc-phosphor-sensor-mgmt \
