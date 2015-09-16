@@ -1,3 +1,0 @@
-# Assume a USB mouse and keyboard are connected
-HAVE_TOUCHSCREEN=n
-HAVE_KEYBOARD=n
