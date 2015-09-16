@@ -1,0 +1,16 @@
+if [ -n "$BASH_SOURCE" ]; then
+   OBMCROOT="`dirname $BASH_SOURCE`"
+elif [ -n "$ZSH_NAME" ]; then
+   OBMCROOT="`dirname $0`"
+else
+   OBMCROOT="`pwd`"
+fi
+
+if [ -f $OBMCROOT/customrc ]; then
+    echo "### Sourcing customrc ###"
+    . $OBMCROOT/customrc
+fi
+
+echo "### Initializing OE build env ###"
+. $OBMCROOT/oe-init-build-env
+
