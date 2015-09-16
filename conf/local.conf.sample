@@ -116,7 +116,7 @@ PACKAGE_CLASSES ?= "package_rpm"
 #SDKMACHINE ?= "i686"
 
 SANITY_TESTED_DISTROS_append ?= " RedHatEnterpriseWorkstation-6.*"
-"
+
 #
 # Extra image configuration defaults
 #
