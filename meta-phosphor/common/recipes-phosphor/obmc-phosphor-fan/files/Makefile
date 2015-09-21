@@ -1,7 +1,7 @@
 EXE     = obmc-phosphor-fand
 OBJS    = $(EXE).o
 DEPPKGS = gio-unix-2.0 glib-2.0
-CC      = $(CROSS_COMPILE)gcc
+CC      ?= $(CROSS_COMPILE)gcc
 INCLUDES += $(shell pkg-config --cflags $(DEPPKGS))
 LIBS += $(shell pkg-config --libs $(DEPPKGS))
 
