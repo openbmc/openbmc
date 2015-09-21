@@ -1,14 +1,16 @@
-EXE     = obmc-phosphor-fand
+EXE     = obmc-phosphor-example-sdbus
 OBJS    = $(EXE).o
-DEPPKGS = gio-unix-2.0 glib-2.0
+DEPPKGS = libsystemd
 CC      ?= $(CROSS_COMPILE)gcc
 INCLUDES += $(shell pkg-config --cflags $(DEPPKGS))
 LIBS += $(shell pkg-config --libs $(DEPPKGS))
 
 %.o : %.c
-	$(CC) -c $^ $(CFLAGS) $(INCLUDES) -o $@
+	echo $(CFLAGS)
+	echo $(INCLUDES)
+	$(CC) -c $< $(CFLAGS) $(INCLUDES) -o $@
 $(EXE): $(OBJS)
-	$(CC) $^ $(LDFLAGS) $(LDFLAGS) -o $@
+	$(CC) $^ $(LDFLAGS) $(LIBS) -o $@
 clean:
 	rm -f $(OBJS) $(EXE) *.o *.d
 distclean: clean

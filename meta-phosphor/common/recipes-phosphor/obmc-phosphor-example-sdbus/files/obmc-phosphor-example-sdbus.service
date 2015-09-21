@@ -1,0 +1,8 @@
+[Unit]
+Description=Phosphor OpenBMC QEMU application example
+
+[Service]
+ExecStart=/usr/sbin/obmc-phosphor-example-sdbus
+
+[Install]
+WantedBy=multi-user.target

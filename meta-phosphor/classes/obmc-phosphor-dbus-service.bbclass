@@ -3,9 +3,10 @@
 # Class users should define DBUS_SERVICES prior to including.
 
 python() {
-        services = d.getVar('DBUS_SERVICES', True).split()
-        uris = " ".join( [ 'file://' + s + '.conf' for s in services ] )
-        d.appendVar('SRC_URI', uris)
+        services = d.getVar('DBUS_SERVICES', True)
+        if services:
+                uris = " ".join( [ 'file://' + s + '.conf' for s in services.split() ] )
+                d.appendVar('SRC_URI', uris)
 }
 
 do_install_append() {
