@@ -22,34 +22,40 @@ import dbus.service
 import dbus.mainloop.glib
 import gobject
 
-SERVICE_PREFIX = 'org.openbmc.examples.services'
-IFACE_PREFIX = 'org.openbmc.examples.interfaces'
+SERVICE_PREFIX = 'org.openbmc.examples'
+IFACE_PREFIX = 'org.openbmc.examples'
 BASE_OBJ_PATH = '/org/openbmc/examples/'
 
 class SampleObjectOne(dbus.service.Object):
 	def __init__(self, bus, name):
 		super(SampleObjectOne, self).__init__(bus, name)
 
-	@dbus.service.method(IFACE_PREFIX + '.Interface0', 's', 's')
-	def echo(self, val):
-		return str(type(self).__name__) + ": " + val
+	@dbus.service.method(IFACE_PREFIX + '.Echo', 's', 's')
+	def Echo(self, val):
+		self.MethodInvoked("Echo method was invoked", self._object_path)
+		return self._object_path + " says " + val
+	
+	@dbus.service.signal(IFACE_PREFIX + '.Echo', 'ss')
+	def MethodInvoked(self, message, path):
+		pass
 
 class SampleObjectTwo(SampleObjectOne):
 	def __init__(self, bus, name):
 		super(SampleObjectTwo, self).__init__(bus, name)
 		self.map = {}
 
-	@dbus.service.method(IFACE_PREFIX + '.Interface1', 'ss', '')
-	def set_a_value_in_the_dict(self, key, value):
+	@dbus.service.method(IFACE_PREFIX + '.Dict', 'ss', '')
+	def SetAValueInTheDict(self, key, value):
 		self.map[key] = value
 
-	@dbus.service.method(IFACE_PREFIX + '.Interface1', 's', 's')
-	def get_a_value_from_the_dict(self, key):
+	@dbus.service.method(IFACE_PREFIX + '.Dict', 's', 's')
+	def GetAValueFromTheDict(self, key):
 		return self.map.get(key, "set a value first")
 
-	@dbus.service.method(IFACE_PREFIX + '.Interface1', '', 's')
-	def get_all_values_from_the_dict(self):
+	@dbus.service.method(IFACE_PREFIX + '.Dict', '', 's')
+	def GetAllValuesFromTheDict(self):
 		return " ".join( [ x+ ':' + self.map[x] for x in self.map.keys() ] )
+
 
 if __name__ == '__main__':
 	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
@@ -57,15 +63,15 @@ if __name__ == '__main__':
 	bus = dbus.SystemBus()
 
 	services = []
-	services.append(dbus.service.BusName(SERVICE_PREFIX + '.Service0', bus))
-	services.append(dbus.service.BusName(SERVICE_PREFIX + '.Service1', bus))
+	services.append(dbus.service.BusName(SERVICE_PREFIX + '.PythonService0', bus))
+	services.append(dbus.service.BusName(SERVICE_PREFIX + '.PythonService1', bus))
 
 	objs = []
-	objs.append(SampleObjectOne(bus, BASE_OBJ_PATH + 'path0/Obj'))
-	objs.append(SampleObjectTwo(bus, BASE_OBJ_PATH + 'path1/Obj'))
+	objs.append(SampleObjectOne(bus, BASE_OBJ_PATH + 'path0/PythonObj'))
+	objs.append(SampleObjectTwo(bus, BASE_OBJ_PATH + 'path1/PythonObj'))
 
 	mainloop = gobject.MainLoop()
 
-	print "obmc-phosphor-qemu starting..."
+	print "obmc-phosphor-example-pydbus starting..."
 	mainloop.run()
 

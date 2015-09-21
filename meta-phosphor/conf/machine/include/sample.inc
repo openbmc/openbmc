@@ -6,14 +6,14 @@ OBMC_MACHINE_FEATURES += "\
         "
 
 VIRTUAL-RUNTIME_obmc-phosphor-fan-ctl = " \
-       obmc-phosphor-qemu \
+       obmc-phosphor-example-pydbus \
        "
 VIRTUAL-RUNTIME_obmc-phosphor-sensor-ctl = " \
-       obmc-phosphor-qemu \
+       obmc-phosphor-example-pydbus \
        "
 VIRTUAL-RUNTIME_obmc-phosphor-chassis-ctl = " \
-       obmc-phosphor-qemu \
+       obmc-phosphor-example-pydbus \
        "
 VIRTUAL-RUNTIME_obmc-phosphor-flash-ctl = " \
-       obmc-phosphor-qemu \
+       obmc-phosphor-example-pydbus \
        "

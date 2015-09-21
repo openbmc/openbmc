@@ -2,7 +2,7 @@
 Description=Phosphor OpenBMC QEMU application example
 
 [Service]
-ExecStart=/usr/sbin/obmc-phosphor-qemu
+ExecStart=/usr/sbin/obmc-phosphor-example-pydbus
 
 [Install]
 WantedBy=multi-user.target
