@@ -6,9 +6,9 @@ INCLUDES += $(shell pkg-config --cflags $(DEPPKGS))
 LIBS += $(shell pkg-config --libs $(DEPPKGS))
 
 %.o : %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+	$(CC) -c $^ $(CFLAGS) $(INCLUDES) -o $@
 $(EXE): $(OBJS)
-	$(CC) $(LDFLAGS) $(LIBS) $^ -o $@
+	$(CC) $^ $(LDFLAGS) $(LDFLAGS) -o $@
 clean:
 	rm -f $(OBJS) $(EXE) *.o *.d
 distclean: clean
