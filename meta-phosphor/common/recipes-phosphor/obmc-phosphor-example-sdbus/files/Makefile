@@ -6,8 +6,6 @@ INCLUDES += $(shell pkg-config --cflags $(DEPPKGS))
 LIBS += $(shell pkg-config --libs $(DEPPKGS))
 
 %.o : %.c
-	echo $(CFLAGS)
-	echo $(INCLUDES)
 	$(CC) -c $< $(CFLAGS) $(INCLUDES) -o $@
 $(EXE): $(OBJS)
 	$(CC) $^ $(LDFLAGS) $(LIBS) -o $@
