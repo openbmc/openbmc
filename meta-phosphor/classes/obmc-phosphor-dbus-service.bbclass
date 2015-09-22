@@ -6,7 +6,7 @@ python() {
         services = d.getVar('DBUS_SERVICES', True)
         if services:
                 uris = " ".join( [ 'file://' + s + '.conf' for s in services.split() ] )
-                d.appendVar('SRC_URI', uris)
+                d.appendVar('SRC_URI', ' ' + uris + ' ')
 }
 
 do_install_append() {
