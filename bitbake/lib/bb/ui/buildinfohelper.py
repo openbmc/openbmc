@@ -704,7 +704,7 @@ class BuildInfoHelper(object):
     ## methods to convert event/external info into objects that the ORM layer uses
 
 
-    def _get_build_information(self):
+    def _get_build_information(self, consolelogfile):
         build_info = {}
         # Generate an identifier for each new build
 
@@ -713,7 +713,7 @@ class BuildInfoHelper(object):
         build_info['distro_version'] = self.server.runCommand(["getVariable", "DISTRO_VERSION"])[0]
         build_info['started_on'] = timezone.now()
         build_info['completed_on'] = timezone.now()
-        build_info['cooker_log_path'] = self.server.runCommand(["getVariable", "BB_CONSOLELOG"])[0]
+        build_info['cooker_log_path'] = consolelogfile
         build_info['build_name'] = self.server.runCommand(["getVariable", "BUILDNAME"])[0]
         build_info['bitbake_version'] = self.server.runCommand(["getVariable", "BB_VERSION"])[0]
 
@@ -847,9 +847,9 @@ class BuildInfoHelper(object):
                 logger.warn("buildinfohelper: cannot identify layer exception:%s ", nee)
 
 
-    def store_started_build(self, event):
+    def store_started_build(self, event, consolelogfile):
         assert '_pkgs' in vars(event)
-        build_information = self._get_build_information()
+        build_information = self._get_build_information(consolelogfile)
 
         build_obj = self.orm_wrapper.create_build_object(build_information, self.brbe, self.project)
 

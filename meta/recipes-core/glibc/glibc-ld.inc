@@ -54,3 +54,4 @@ def glibc_dl_info(d):
 
 EGLIBC_KNOWN_INTERPRETER_NAMES = "${@glibc_dl_info(d)['ldconfig']}"
 RTLDLIST = "${@glibc_dl_info(d)['lddrewrite']}"
+glibc_dl_info[vardepsexclude] = "OVERRIDES"

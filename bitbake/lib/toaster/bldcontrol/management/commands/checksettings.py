@@ -64,27 +64,6 @@ class Command(NoArgsCommand):
             return ""
         return DN(self._find_first_path_for_file(DN(self.guesspath), "bblayers.conf", 4))
 
-
-    def _verify_artifact_storage_dir(self):
-        # verify that we have a settings for downloading artifacts
-        while ToasterSetting.objects.filter(name="ARTIFACTS_STORAGE_DIR").count() == 0:
-            guessedpath = os.getcwd() + "/toaster_build_artifacts/"
-            print("\nToaster needs to know in which directory it can download build log files and other artifacts.\nToaster suggests \"%s\"." % guessedpath)
-            artifacts_storage_dir = raw_input("Press Enter to select \"%s\" or type the full path to a different directory: " % guessedpath)
-            if len(artifacts_storage_dir) == 0:
-                artifacts_storage_dir = guessedpath
-            if len(artifacts_storage_dir) > 0 and artifacts_storage_dir.startswith("/"):
-                try:
-                    os.makedirs(artifacts_storage_dir)
-                except OSError as ose:
-                    if "File exists" in str(ose):
-                        pass
-                    else:
-                        raise ose
-                ToasterSetting.objects.create(name="ARTIFACTS_STORAGE_DIR", value=artifacts_storage_dir)
-        return 0
-
-
     def _verify_build_environment(self):
         # refuse to start if we have no build environments
         while BuildEnvironment.objects.count() == 0:
@@ -239,7 +218,6 @@ class Command(NoArgsCommand):
 
     def handle_noargs(self, **options):
         retval = 0
-        retval += self._verify_artifact_storage_dir()
         retval += self._verify_build_environment()
         retval += self._verify_default_settings()
         retval += self._verify_builds_in_progress()

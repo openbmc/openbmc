@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
+from django.core.exceptions import ObjectDoesNotExist
 from orm.models import Build
 from django.db import OperationalError
 import os
@@ -6,12 +7,16 @@ import os
 
 
 class Command(BaseCommand):
-    args    = "buildId"
+    args    = '<buildID1 buildID2 .....>'
     help    = "Deletes selected build(s)"
 
-    def handle(self, buildId, *args, **options):
-        for bid in buildId.split(","):
-            b = Build.objects.get(pk = bid)
+    def handle(self, *args, **options):
+        for bid in args:
+            try:
+                b = Build.objects.get(pk = bid)
+            except ObjectDoesNotExist:
+                print 'build %s does not exist, skipping...' %(bid)
+                continue
             # theoretically, just b.delete() would suffice
             # however SQLite runs into problems when you try to
             # delete too many rows at once, so we delete some direct

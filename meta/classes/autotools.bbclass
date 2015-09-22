@@ -105,7 +105,7 @@ autotools_preconfigure() {
 			if [ "${S}" != "${B}" ]; then
 				echo "Previously configured separate build directory detected, cleaning ${B}"
 				rm -rf ${B}
-				mkdir ${B}
+				mkdir -p ${B}
 			else
 				# At least remove the .la files since automake won't automatically
 				# regenerate them even if CFLAGS/LDFLAGS are different

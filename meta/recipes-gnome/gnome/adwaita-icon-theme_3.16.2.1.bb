@@ -27,6 +27,10 @@ do_install_append() {
 
 PACKAGES = "${PN}-cursors ${PN}-symbolic ${PN}-hires ${PN}"
 
+RREPLACES_${PN} = "gnome-icon-theme"
+RCONFLICTS_${PN} = "gnome-icon-theme"
+RPROVIDES_${PN} = "gnome-icon-theme"
+
 FILES_${PN}-cursors = "${prefix}/share/icons/Adwaita/cursors/"
 FILES_${PN}-symbolic = "${prefix}/share/icons/Adwaita/*/*/*.symbolic.png"
 FILES_${PN}-hires = "${prefix}/share/icons/Adwaita/256x256/"

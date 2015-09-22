@@ -163,8 +163,6 @@ class Hg(FetchMethod):
     def download(self, ud, d):
         """Fetch url"""
 
-        ud.repochanged = not os.path.exists(ud.fullmirror)
-
         logger.debug(2, "Fetch: checking for module directory '" + ud.moddir + "'")
 
         # If the checkout doesn't exist and the mirror tarball does, extract it
@@ -189,7 +187,11 @@ class Hg(FetchMethod):
                 logger.debug(1, "Running %s", pullcmd)
                 bb.fetch2.check_network_access(d, pullcmd, ud.url)
                 runfetchcmd(pullcmd, d)
-                ud.repochanged = True
+                try:
+                    os.unlink(ud.fullmirror)
+                except OSError as exc:
+                    if exc.errno != errno.ENOENT:
+                        raise
 
         # No source found, clone it.
         if not os.path.exists(ud.moddir):
@@ -238,7 +240,7 @@ class Hg(FetchMethod):
 
     def build_mirror_data(self, ud, d):
         # Generate a mirror tarball if needed
-        if ud.write_tarballs == "1" and (ud.repochanged or not os.path.exists(ud.fullmirror)):
+        if ud.write_tarballs == "1" and not os.path.exists(ud.fullmirror):
             # it's possible that this symlink points to read-only filesystem with PREMIRROR
             if os.path.islink(ud.fullmirror):
                 os.unlink(ud.fullmirror)

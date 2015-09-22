@@ -413,9 +413,11 @@ class DataSmart(MutableMapping):
         self.overrides = None
 
     def need_overrides(self):
-        if self.overrides is None:
-            if self.inoverride:
-                return
+        if self.overrides is not None:
+            return
+        if self.inoverride:
+            return
+        for count in range(5):
             self.inoverride = True
             # Can end up here recursively so setup dummy values
             self.overrides = []
@@ -424,6 +426,13 @@ class DataSmart(MutableMapping):
             self.overridesset = set(self.overrides)
             self.inoverride = False
             self.expand_cache = {}
+            newoverrides = (self.getVar("OVERRIDES", True) or "").split(":") or []
+            if newoverrides == self.overrides:
+                break
+            self.overrides = newoverrides
+            self.overridesset = set(self.overrides)
+        else:
+            bb.fatal("Overrides could not be expanded into a stable state after 5 iterations, overrides must be being referenced by other overridden variables in some recursive fashion. Please provide your configuration to bitbake-devel so we can laugh, er, I mean try and understand how to make it work.")
 
     def initVar(self, var):
         self.expand_cache = {}
@@ -484,10 +493,8 @@ class DataSmart(MutableMapping):
             if '_' in var:
                 self._setvar_update_overrides(base, **loginfo)
 
-
             if base in self.overridevars:
-                self.overridevars.update(self.expandWithRefs(value, var).references)
-                self.internal_finalize(True)
+                self._setvar_update_overridevars(var, value)
             return
 
         if not var in self.dict:
@@ -520,8 +527,21 @@ class DataSmart(MutableMapping):
         self.varhistory.record(**loginfo)
 
         if var in self.overridevars:
-            self.overridevars.update(self.expandWithRefs(value, var).references)
-            self.internal_finalize(True)
+            self._setvar_update_overridevars(var, value)
+
+    def _setvar_update_overridevars(self, var, value):
+        vardata = self.expandWithRefs(value, var)
+        new = vardata.references
+        new.update(vardata.contains.keys())
+        while not new.issubset(self.overridevars):
+            nextnew = set()
+            self.overridevars.update(new)
+            for i in new:
+                vardata = self.expandWithRefs(self.getVar(i, True), i)
+                nextnew.update(vardata.references)
+                nextnew.update(vardata.contains.keys())
+            new = nextnew
+        self.internal_finalize(True)
 
     def _setvar_update_overrides(self, var, **loginfo):
         # aka pay the cookie monster
@@ -628,6 +648,8 @@ class DataSmart(MutableMapping):
 
         if flag == "_defaultval" and '_' in var:
             self._setvar_update_overrides(var, **loginfo)
+        if flag == "_defaultval" and var in self.overridevars:
+            self._setvar_update_overridevars(var, value)
 
         if flag == "unexport" or flag == "export":
             if not "__exportlist" in self.dict:

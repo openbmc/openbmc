@@ -1,0 +1,61 @@
+Don't use bashisms (except for echo -n, which busybox supports) to avoid needing bash to start nscd.
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/nscd/nscd.init b/nscd/nscd.init
+index a882da7..b02986e 100644
+--- a/nscd/nscd.init
++++ b/nscd/nscd.init
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ #
+ # nscd:		Starts the Name Switch Cache Daemon
+ #
+@@ -49,7 +49,7 @@ prog=nscd
+ start () {
+     [ -d /var/run/nscd ] || mkdir /var/run/nscd
+     [ -d /var/db/nscd ] || mkdir /var/db/nscd
+-    echo -n $"Starting $prog: "
++    echo -n "Starting $prog: "
+     daemon /usr/sbin/nscd
+     RETVAL=$?
+     echo
+@@ -58,7 +58,7 @@ start () {
+ }
+ 
+ stop () {
+-    echo -n $"Stopping $prog: "
++    echo -n "Stopping $prog: "
+     /usr/sbin/nscd -K
+     RETVAL=$?
+     if [ $RETVAL -eq 0 ]; then
+@@ -67,9 +67,9 @@ stop () {
+ 	# a non-privileged user
+ 	rm -f /var/run/nscd/nscd.pid
+ 	rm -f /var/run/nscd/socket
+-       	success $"$prog shutdown"
++	success "$prog shutdown"
+     else
+-       	failure $"$prog shutdown"
++	failure "$prog shutdown"
+     fi
+     echo
+     return $RETVAL
+@@ -103,13 +103,13 @@ case "$1" in
+ 	RETVAL=$?
+ 	;;
+     force-reload | reload)
+-    	echo -n $"Reloading $prog: "
++	echo -n "Reloading $prog: "
+ 	killproc /usr/sbin/nscd -HUP
+ 	RETVAL=$?
+ 	echo
+ 	;;
+     *)
+-	echo $"Usage: $0 {start|stop|status|restart|reload|condrestart}"
++	echo "Usage: $0 {start|stop|status|restart|reload|condrestart}"
+ 	RETVAL=1
+ 	;;
+ esac

@@ -16,7 +16,6 @@ PYTHON_MAJMIN = "2.7"
 
 inherit autotools
 
-PYTHONLSBOPTS = "--with-wctype-functions"
 PYTHONLSBOPTS_linuxstdbase = "ac_cv_sizeof_off_t=8"
 
 EXTRA_OECONF = "\

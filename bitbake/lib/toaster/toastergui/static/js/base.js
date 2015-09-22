@@ -57,8 +57,8 @@ function basePageInit(ctx) {
 
   if ($(".total-builds").length !== 0){
     libtoaster.getProjectInfo(libtoaster.ctx.projectPageUrl, function(prjInfo){
-      if (prjInfo.builds)
-        $(".total-builds").text(prjInfo.builds.length);
+      if (prjInfo.completedbuilds)
+        $(".total-builds").text(prjInfo.completedbuilds.length);
     });
   }
 

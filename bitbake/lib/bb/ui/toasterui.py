@@ -126,7 +126,7 @@ def main(server, eventHandler, params ):
             # the code will look into the protected variables of the event; no easy way around this
 
             if isinstance(event, bb.event.BuildStarted):
-                buildinfohelper.store_started_build(event)
+                buildinfohelper.store_started_build(event, consolelogfile)
 
             if isinstance(event, (bb.build.TaskStarted, bb.build.TaskSucceeded, bb.build.TaskFailedSilent)):
                 buildinfohelper.update_and_store_task(event)
