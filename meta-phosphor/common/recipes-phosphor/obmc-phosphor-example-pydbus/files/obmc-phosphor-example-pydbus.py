@@ -42,10 +42,15 @@ class SampleObjectOne(dbus.service.Object):
 class SampleObjectTwo(SampleObjectOne):
 	def __init__(self, bus, name):
 		super(SampleObjectTwo, self).__init__(bus, name)
-		self.map = {}
+		self.map = { 'empty' : 'add values to me' }
+
+	@dbus.service.signal(IFACE_PREFIX + '.Dict', 'sss')
+	def DictMethodCalled(self, message, key, value):
+		pass
 
 	@dbus.service.method(IFACE_PREFIX + '.Dict', 'ss', '')
 	def SetAValueInTheDict(self, key, value):
+		self.DictMethodCalled("Dict method was invoked", key, value)
 		self.map[key] = value
 
 	@dbus.service.method(IFACE_PREFIX + '.Dict', 's', 's')
@@ -56,6 +61,24 @@ class SampleObjectTwo(SampleObjectOne):
 	def GetAllValuesFromTheDict(self):
 		return " ".join( [ x+ ':' + self.map[x] for x in self.map.keys() ] )
 
+	@dbus.service.method(dbus.PROPERTIES_IFACE, 'ss', 'v')
+	def Get(self, interface, prop):
+		return self.GetAll(interface)[prop]
+
+	@dbus.service.method(dbus.PROPERTIES_IFACE, 's', 'a{sv}')
+	def GetAll(self, interface):
+		if interface == IFACE_PREFIX + '.Dict':
+			return { 'Dict': self.map }
+
+	@dbus.service.method(dbus.PROPERTIES_IFACE, 'ssv')
+	def Set(self, interface, prop, value):
+		if prop == 'Dict':
+			self.map = value
+			self.PropertiesChanged(interface, { prop : value }, [])
+
+	@dbus.service.signal(dbus.PROPERTIES_IFACE, 'sa{sv}as')
+	def PropertiesChanged(self, interface, properties, invalidated_properties):
+		pass
 
 if __name__ == '__main__':
 	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
