@@ -3,6 +3,7 @@ import unittest
 import os
 import re
 import shutil
+import glob
 
 import oeqa.utils.ftools as ftools
 from oeqa.selftest.base import oeSelfTest
@@ -276,6 +277,8 @@ NATIVELSBSTRING = \"DistroB\"
         """
         The sstate checksums off allarch packages should be independent of whichever 
         MACHINE is set. Check this using bitbake -S.
+        Also, rather than duplicate the test, check nativesdk stamps are the same between
+        the two MACHINE values.
         """
 
         topdir = get_bb_var('TOPDIR')
@@ -286,18 +289,20 @@ TMPDIR = \"${TOPDIR}/tmp-sstatesamehash\"
 MACHINE = \"qemux86\"
 """)
         self.track_for_cleanup(topdir + "/tmp-sstatesamehash")
-        bitbake("world -S none")
+        bitbake("world meta-toolchain -S none")
         self.write_config("""
 TMPDIR = \"${TOPDIR}/tmp-sstatesamehash2\"
 MACHINE = \"qemuarm\"
 """)
         self.track_for_cleanup(topdir + "/tmp-sstatesamehash2")
-        bitbake("world -S none")
+        bitbake("world meta-toolchain -S none")
 
         def get_files(d):
             f = []
             for root, dirs, files in os.walk(d):
                 for name in files:
+                    if "meta-environment" in root or "cross-canadian" in root:
+                        continue
                     if "do_build" not in name:
                         f.append(os.path.join(root, name))
             return f
@@ -306,3 +311,12 @@ MACHINE = \"qemuarm\"
         files2 = [x.replace("tmp-sstatesamehash2", "tmp-sstatesamehash") for x in files2]
         self.maxDiff = None
         self.assertItemsEqual(files1, files2)
+
+        nativesdkdir = os.path.basename(glob.glob(topdir + "/tmp-sstatesamehash/stamps/*-nativesdk*-linux")[0])
+
+        files1 = get_files(topdir + "/tmp-sstatesamehash/stamps/" + nativesdkdir)
+        files2 = get_files(topdir + "/tmp-sstatesamehash2/stamps/" + nativesdkdir)
+        files2 = [x.replace("tmp-sstatesamehash2", "tmp-sstatesamehash") for x in files2]
+        self.maxDiff = None
+        self.assertItemsEqual(files1, files2)
+        

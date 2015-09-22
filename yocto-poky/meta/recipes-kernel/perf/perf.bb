@@ -120,7 +120,7 @@ do_install() {
 do_configure_prepend () {
     # Fix for rebuilding
     rm -rf ${B}/
-    mkdir ${B}/
+    mkdir -p ${B}/
 
     # If building a multlib based perf, the incorrect library path will be
     # detected by perf, since it triggers via: ifeq ($(ARCH),x86_64). In a 32 bit
@@ -148,7 +148,7 @@ do_configure_prepend () {
             ${S}/tools/perf/Makefile.perf
     fi
     sed -i -e "s,--root='/\$(DESTDIR_SQ)',--prefix='\$(DESTDIR_SQ)/usr' --install-lib='\$(DESTDIR)\$(PYTHON_SITEPACKAGES_DIR)',g" \
-        ${S}/tools/perf/Makefile
+        ${S}/tools/perf/Makefile*
 
     if [ -e "${S}/tools/build/Makefile.build" ]; then
         sed -i -e 's,\ .config-detected, $(OUTPUT)/config-detected,g' \

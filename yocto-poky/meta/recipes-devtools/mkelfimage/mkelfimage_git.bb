@@ -30,6 +30,7 @@ inherit autotools-brokensep
 do_install_append() {
 	rmdir ${D}${datadir}/mkelfImage/elf32-i386
 	rmdir ${D}${datadir}/mkelfImage
+	chown root:root ${D}/${sbindir}/mkelfImage
 }
 
 BBCLASSEXTEND = "native"

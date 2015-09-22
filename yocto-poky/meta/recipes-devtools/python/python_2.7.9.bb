@@ -161,7 +161,8 @@ FILES_${PN}-dbg += "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/.debug"
 # catch all the rest (unsorted)
 PACKAGES += "${PN}-misc"
 FILES_${PN}-misc = "${libdir}/python${PYTHON_MAJMIN}"
-RDEPENDS_${PN}-ptest = "${PN}-modules ${PN}-misc"
+RDEPENDS_${PN}-modules += "${PN}-misc"
+RDEPENDS_${PN}-ptest = "${PN}-modules"
 #inherit ptest after "require python-${PYTHON_MAJMIN}-manifest.inc" so PACKAGES doesn't get overwritten
 inherit ptest
 

@@ -220,3 +220,28 @@ def getAllTags(obj):
     ret = __gettags(obj)
     ret.update(__gettags(tc_method))
     return ret
+
+def timeout_handler(seconds):
+    def decorator(fn):
+        if hasattr(signal, 'alarm'):
+            @wraps(fn)
+            def wrapped_f(self, *args, **kw):
+                current_frame = sys._getframe()
+                def raiseTimeOut(signal, frame):
+                    if frame is not current_frame:
+                        try:
+                            self.target.restart()
+                            raise TimeOut('%s seconds' % seconds)
+                        except:
+                            raise TimeOut('%s seconds' % seconds)
+                prev_handler = signal.signal(signal.SIGALRM, raiseTimeOut)
+                try:
+                    signal.alarm(seconds)
+                    return fn(self, *args, **kw)
+                finally:
+                    signal.alarm(0)
+                    signal.signal(signal.SIGALRM, prev_handler)
+            return wrapped_f
+        else:
+            return fn
+    return decorator

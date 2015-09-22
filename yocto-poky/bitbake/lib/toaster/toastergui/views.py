@@ -40,16 +40,25 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from django.utils import timezone
 from django.utils.html import escape
-from datetime import timedelta, datetime, date
+from datetime import timedelta, datetime
 from django.utils import formats
 from toastergui.templatetags.projecttags import json as jsonfilter
 import json
 from os.path import dirname
 import itertools
 
+import magic
 import logging
 
 logger = logging.getLogger("toaster")
+
+class MimeTypeFinder(object):
+    _magic = magic.Magic(flags = magic.MAGIC_MIME_TYPE)
+
+    # returns the mimetype for a file path
+    @classmethod
+    def get_mimetype(self, path):
+        return self._magic.id_filename(path)
 
 # all new sessions should come through the landing page;
 # determine in which mode we are running in, and redirect appropriately
@@ -67,8 +76,6 @@ def landing(request):
     context = {'lvs_nos' : Layer_Version.objects.all().count()}
 
     return render(request, 'landing.html', context)
-
-
 
 # returns a list for most recent builds;
 def _get_latest_builds(prj=None):
@@ -435,8 +442,7 @@ def _modify_date_range_filter(filter_string):
 def _add_daterange_context(queryset_all, request, daterange_list):
     # calculate the exact begining of local today and yesterday
     today_begin = timezone.localtime(timezone.now())
-    today_begin = date(today_begin.year,today_begin.month,today_begin.day)
-    yesterday_begin = today_begin-timedelta(days=1)
+    yesterday_begin = today_begin - timedelta(days=1)
     # add daterange persistent
     context_date = {}
     context_date['last_date_from'] = request.GET.get('last_date_from',timezone.localtime(timezone.now()).strftime("%d/%m/%Y"))
@@ -1890,45 +1896,87 @@ if True:
         pass
 
     # shows the "all builds" page for managed mode; it displays build requests (at least started!) instead of actual builds
+    # WARNING _build_list_helper() may raise a RedirectException, which
+    # will set the GET parameters and redirect back to the
+    # all-builds or projectbuilds page as appropriate;
+    # TODO don't use exceptions to control program flow
     @_template_renderer("builds.html")
     def builds(request):
         # define here what parameters the view needs in the GET portion in order to
         # be able to display something.  'count' and 'page' are mandatory for all views
         # that use paginators.
 
-        queryset = Build.objects.exclude(outcome = Build.IN_PROGRESS)
+        queryset = Build.objects.all()
 
-        try:
-            context, pagesize, orderby = _build_list_helper(request, queryset)
-            # all builds page as a Project column
-            context['tablecols'].append({'name': 'Project', 'clcalss': 'project_column', })
-        except RedirectException as re:
-            # rewrite the RedirectException
-            re.view = resolve(request.path_info).url_name
-            raise re
+        redirect_page = resolve(request.path_info).url_name
+
+        context, pagesize, orderby = _build_list_helper(request,
+                                                        queryset,
+                                                        redirect_page)
+        # all builds page as a Project column
+        context['tablecols'].append({
+            'name': 'Project',
+            'clclass': 'project_column'
+        })
 
         _set_parameters_values(pagesize, orderby, request)
         return context
 
 
     # helper function, to be used on "all builds" and "project builds" pages
-    def _build_list_helper(request, queryset_all):
-
+    def _build_list_helper(request, queryset_all, redirect_page, pid=None):
         default_orderby = 'completed_on:-'
         (pagesize, orderby) = _get_parameters_values(request, 10, default_orderby)
         mandatory_parameters = { 'count': pagesize,  'page' : 1, 'orderby' : orderby }
         retval = _verify_parameters( request.GET, mandatory_parameters )
         if retval:
-            raise RedirectException( None, request.GET, mandatory_parameters)
+            params = {}
+            if pid:
+                params = {'pid': pid}
+            raise RedirectException(redirect_page,
+                                    request.GET,
+                                    mandatory_parameters,
+                                    **params)
 
         # boilerplate code that takes a request for an object type and returns a queryset
         # for that object type. copypasta for all needed table searches
         (filter_string, search_term, ordering_string) = _search_tuple(request, Build)
+
         # post-process any date range filters
-        filter_string,daterange_selected = _modify_date_range_filter(filter_string)
-        queryset_all = queryset_all.select_related("project").annotate(errors_no = Count('logmessage', only=Q(logmessage__level=LogMessage.ERROR)|Q(logmessage__level=LogMessage.EXCEPTION))).annotate(warnings_no = Count('logmessage', only=Q(logmessage__level=LogMessage.WARNING))).extra(select={'timespent':'completed_on - started_on'})
-        queryset_with_search = _get_queryset(Build, queryset_all, None, search_term, ordering_string, '-completed_on')
-        queryset = _get_queryset(Build, queryset_all, filter_string, search_term, ordering_string, '-completed_on')
+        filter_string, daterange_selected = _modify_date_range_filter(filter_string)
+
+        # don't show "in progress" builds in "all builds" or "project builds"
+        queryset_all = queryset_all.exclude(outcome = Build.IN_PROGRESS)
+
+        # append project info
+        queryset_all = queryset_all.select_related("project")
+
+        # annotate with number of ERROR and EXCEPTION log messages
+        queryset_all = queryset_all.annotate(
+            errors_no = Count(
+                'logmessage',
+                only=Q(logmessage__level=LogMessage.ERROR) |
+                     Q(logmessage__level=LogMessage.EXCEPTION)
+            )
+        )
+
+        # annotate with number of warnings
+        q_warnings = Q(logmessage__level=LogMessage.WARNING)
+        queryset_all = queryset_all.annotate(
+            warnings_no = Count('logmessage', only=q_warnings)
+        )
+
+        # add timespent field
+        timespent = 'completed_on - started_on'
+        queryset_all = queryset_all.extra(select={'timespent': timespent})
+
+        queryset_with_search = _get_queryset(Build, queryset_all,
+                                             None, search_term,
+                                             ordering_string, '-completed_on')
+
+        queryset = _get_queryset(Build, queryset_all,
+                                 filter_string, search_term,
+                                 ordering_string, '-completed_on')
 
         # retrieve the objects that will be displayed in the table; builds a paginator and gets a page range to display
         build_info = _build_page_range(Paginator(queryset, pagesize), request.GET.get('page', 1))
@@ -2226,7 +2274,7 @@ if True:
         context = {
             "project" : prj,
             "lvs_nos" : Layer_Version.objects.all().count(),
-            "completedbuilds": Build.objects.filter(project_id = pid).filter(outcome__lte = Build.IN_PROGRESS),
+            "completedbuilds": Build.objects.exclude(outcome = Build.IN_PROGRESS).filter(project_id = pid),
             "prj" : {"name": prj.name, },
             "buildrequests" : prj.build_set.filter(outcome=Build.IN_PROGRESS),
             "builds" : _project_recent_build_list(prj),
@@ -2632,6 +2680,10 @@ if True:
 
         return context
 
+    # WARNING _build_list_helper() may raise a RedirectException, which
+    # will set the GET parameters and redirect back to the
+    # all-builds or projectbuilds page as appropriate;
+    # TODO don't use exceptions to control program flow
     @_template_renderer('projectbuilds.html')
     def projectbuilds(request, pid):
         prj = Project.objects.get(id = pid)
@@ -2651,7 +2703,7 @@ if True:
             if 'buildDelete' in request.POST:
                 for i in request.POST['buildDelete'].strip().split(" "):
                     try:
-                        br = BuildRequest.objects.select_for_update().get(project = prj, pk = i, state__lte = BuildRequest.REQ_DELETED).delete()
+                        BuildRequest.objects.select_for_update().get(project = prj, pk = i, state__lte = BuildRequest.REQ_DELETED).delete()
                     except BuildRequest.DoesNotExist:
                         pass
 
@@ -2664,20 +2716,19 @@ if True:
                     else:
                         target = t
                         task = ""
-                    ProjectTarget.objects.create(project = prj, target = target, task = task)
+                    ProjectTarget.objects.create(project = prj,
+                                                 target = target,
+                                                 task = task)
+                prj.schedule_build()
 
-                br = prj.schedule_build()
+        queryset = Build.objects.filter(project_id = pid)
 
+        redirect_page = resolve(request.path_info).url_name
 
-        queryset = Build.objects.filter(outcome__lte = Build.IN_PROGRESS)
-
-        try:
-            context, pagesize, orderby = _build_list_helper(request, queryset)
-        except RedirectException as re:
-            # rewrite the RedirectException with our current url information
-            re.view = resolve(request.path_info).url_name
-            re.okwargs = {"pid" : pid}
-            raise re
+        context, pagesize, orderby = _build_list_helper(request,
+                                                        queryset,
+                                                        redirect_page,
+                                                        pid)
 
         context['project'] = prj
         _set_parameters_values(pagesize, orderby, request)
@@ -2710,47 +2761,17 @@ if True:
 
     def build_artifact(request, build_id, artifact_type, artifact_id):
         if artifact_type in ["cookerlog"]:
-            # these artifacts are saved after building, so they are on the server itself
-            def _mimetype_for_artifact(path):
-                try:
-                    import magic
-
-                    # fair warning: this is a mess; there are multiple competing and incompatible
-                    # magic modules floating around, so we try some of the most common combinations
-
-                    try:    # we try ubuntu's python-magic 5.4
-                        m = magic.open(magic.MAGIC_MIME_TYPE)
-                        m.load()
-                        return m.file(path)
-                    except AttributeError:
-                        pass
-
-                    try:    # we try python-magic 0.4.6
-                        m = magic.Magic(magic.MAGIC_MIME)
-                        return m.from_file(path)
-                    except AttributeError:
-                        pass
-
-                    try:    # we try pip filemagic 1.6
-                        m = magic.Magic(flags=magic.MAGIC_MIME_TYPE)
-                        return m.id_filename(path)
-                    except AttributeError:
-                        pass
-
-                    return "binary/octet-stream"
-                except ImportError:
-                    return "binary/octet-stream"
             try:
-                # match code with runbuilds.Command.archive()
-                build_artifact_storage_dir = os.path.join(ToasterSetting.objects.get(name="ARTIFACTS_STORAGE_DIR").value, "%d" % int(build_id))
-                file_name = os.path.join(build_artifact_storage_dir, "cooker_log.txt")
-
+                build = Build.objects.get(pk = build_id)
+                file_name = build.cooker_log_path
                 fsock = open(file_name, "r")
-                content_type=_mimetype_for_artifact(file_name)
+                content_type = MimeTypeFinder.get_mimetype(file_name)
 
                 response = HttpResponse(fsock, content_type = content_type)
 
-                response['Content-Disposition'] = 'attachment; filename=' + os.path.basename(file_name)
+                disposition = 'attachment; filename=cooker.log'
+                response['Content-Disposition'] = disposition
+
                 return response
             except IOError:
                 context = {

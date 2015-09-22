@@ -172,6 +172,8 @@ class Image(ImageDepGraph):
 
         if base_size != int(base_size):
             base_size = int(base_size + 1)
+        else:
+            base_size = int(base_size)
 
         base_size += rootfs_alignment - 1
         base_size -= base_size % rootfs_alignment

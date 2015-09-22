@@ -8,7 +8,7 @@ and executables, so that far fewer relocations need to be resolved at \
 runtime and thus programs come up faster."
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c93c0550bd3173f4504b2cbd8991e50b"
-SRCREV = "40327fb99654e96db6ef15e2f2d5ef140ac3e998"
+SRCREV = "cdee5a4dd226cc5e9f30f370067a9031f398ef3c"
 PV = "1.0+git${SRCPV}"
 
 #

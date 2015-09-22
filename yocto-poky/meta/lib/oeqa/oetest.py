@@ -151,6 +151,12 @@ class oeRuntimeTest(oeTest):
         elif (type(self.target).__name__ == "QemuTarget"):
             self.assertTrue(self.target.check(), msg = "Qemu not running?")
 
+        self.setUpLocal()
+
+    # a setup method before tests but after the class instantiation
+    def setUpLocal(self):
+        pass
+
     def tearDown(self):
         # If a test fails or there is an exception
         if not exc_info() == (None, None, None):

@@ -528,7 +528,20 @@ class Cache(object):
 
         if hasattr(info_array[0], 'file_checksums'):
             for _, fl in info_array[0].file_checksums.items():
-                for f in fl.split():
+                fl = fl.strip()
+                while fl:
+                    # A .split() would be simpler but means spaces or colons in filenames would break
+                    a = fl.find(":True")
+                    b = fl.find(":False")
+                    if ((a < 0) and b) or ((b > 0) and (b < a)):
+                       f = fl[:b+6]
+                       fl = fl[b+7:]
+                    elif ((b < 0) and a) or ((a > 0) and (a < b)):
+                       f = fl[:a+5]
+                       fl = fl[a+6:]
+                    else:
+                       break
+                    fl = fl.strip()
                     if "*" in f:
                         continue
                     f, exist = f.split(":")

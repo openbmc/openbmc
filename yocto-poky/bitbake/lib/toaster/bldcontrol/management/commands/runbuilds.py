@@ -77,31 +77,11 @@ class Command(NoArgsCommand):
             bec.be.save()
 
     def archive(self):
-        ''' archives data from the builds '''
-        artifact_storage_dir = ToasterSetting.objects.get(name="ARTIFACTS_STORAGE_DIR").value
         for br in BuildRequest.objects.filter(state = BuildRequest.REQ_ARCHIVE):
-            # save cooker log
             if br.build == None:
                 br.state = BuildRequest.REQ_FAILED
-                br.save()
-                continue
-            build_artifact_storage_dir = os.path.join(artifact_storage_dir, "%d" % br.build.pk)
-            try:
-                os.makedirs(build_artifact_storage_dir)
-            except OSError as ose:
-                if "File exists" in str(ose):
-                    pass
-                else:
-                    raise ose
-
-            file_name = os.path.join(build_artifact_storage_dir, "cooker_log.txt")
-            try:
-                with open(file_name, "w") as f:
-                    f.write(br.environment.get_artifact(br.build.cooker_log_path).read())
-            except IOError:
-                os.unlink(file_name)
-
-            br.state = BuildRequest.REQ_COMPLETED
+            else:
+                br.state = BuildRequest.REQ_COMPLETED
             br.save()
 
     def cleanup(self):

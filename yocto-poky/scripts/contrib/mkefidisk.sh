@@ -152,8 +152,55 @@ unmount() {
 # Parse and validate arguments
 #
 if [ $# -lt 3 ] || [ $# -gt 4 ]; then
-	usage
-	exit 1
+    if [ $# -eq 1 ]; then
+        AVAILABLE_DISK=`lsblk | grep "disk" | cut -f 1 -d " "`
+        X=0
+        for disk in `echo $AVAILABLE_DISK`; do
+            mounted=`lsblk /dev/$disk | awk {'print $7'} | sed "s/MOUNTPOINT//"`
+            if [ -z "$mounted" ]; then
+                UNMOUNTED_AVAILABLES="$UNMOUNTED_AVAILABLES /dev/$disk"
+                info "$X - /dev/$disk"
+                X=`expr $X + 1`
+            fi
+        done
+        if [ $X -eq 0 ]; then
+            die "No unmounted device found."
+        fi
+        read -p "Choose unmounted device number: " DISK_NUMBER
+        X=0
+        for line in `echo $UNMOUNTED_AVAILABLES`; do
+            if [ $DISK_NUMBER -eq $X ]; then
+                DISK_TO_BE_FLASHED=$line
+                break
+            else
+                X=`expr $X + 1`
+            fi
+        done
+        if [ -z "$DISK_TO_BE_FLASHED" ]; then
+            die "Option \"$DISK_NUMBER\" is invalid. Choose a valid option"
+        else
+            if [ -z `echo $DISK_TO_BE_FLASHED | grep "mmc"` ]; then
+                TARGET_TO_BE_BOOT="/dev/sda"
+            else
+                TARGET_TO_BE_BOOT="/dev/mmcblk0"
+            fi
+        fi
+        echo ""
+        echo "Choose a name of the device that will be boot from"
+        echo -n "Recommended name is: "
+        info "$TARGET_TO_BE_BOOT"
+        read -p "Is target device okay? [y/N]: " RESPONSE
+        if [ "$RESPONSE" != "y" ]; then
+            read -p "Choose target device name: " TARGET_TO_BE_BOOT
+        fi
+        echo ""
+        if [ -z "$TARGET_TO_BE_BOOT" ]; then
+            die "Error: choose a valid target name"
+        fi
+    else
+        usage
+	    exit 1
+    fi
 fi
 
 if [ "$1" = "-v" ]; then
@@ -162,9 +209,15 @@ if [ "$1" = "-v" ]; then
 	shift
 fi
 
-DEVICE=$1
-HDDIMG=$2
-TARGET_DEVICE=$3
+if [ -z "$AVAILABLE_DISK" ]; then
+    DEVICE=$1
+    HDDIMG=$2
+    TARGET_DEVICE=$3
+else
+    DEVICE=$DISK_TO_BE_FLASHED
+    HDDIMG=$1
+    TARGET_DEVICE=$TARGET_TO_BE_BOOT
+fi
 
 LINK=$(readlink $DEVICE)
 if [ $? -eq 0 ]; then

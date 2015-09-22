@@ -38,6 +38,7 @@ SRC_URI = "${GLIBC_GIT_URI};branch=${BRANCH};name=glibc \
            file://0025-eglibc-Install-PIC-archives.patch \
            file://0026-eglibc-dl_debug_mask-is-controlled-by-__OPTION_EGLIB.patch \
            file://0027-eglibc-use-option-groups-Conditionally-exclude-c-tes.patch \
+           file://nscd-no-bash.patch \
 "
 
 SRC_URI += "\

@@ -24,10 +24,11 @@
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.utils import timezone
-from orm.models import Project, Release, BitbakeVersion, Build
-from orm.models import ReleaseLayerSourcePriority, LayerSource, Layer
+from orm.models import Project, Release, BitbakeVersion, ProjectTarget
+from orm.models import ReleaseLayerSourcePriority, LayerSource, Layer, Build
 from orm.models import Layer_Version, Recipe, Machine, ProjectLayer
 import json
+from bs4 import BeautifulSoup
 
 PROJECT_NAME = "test project"
 
@@ -41,7 +42,6 @@ class ViewTests(TestCase):
                                          bitbake_version=bbv)
         self.project = Project.objects.create_project(name=PROJECT_NAME,
                                                       release=release)
-
         layersrc = LayerSource.objects.create(sourcetype=LayerSource.TYPE_IMPORTED)
         self.priority = ReleaseLayerSourcePriority.objects.create(release=release,
                                                                   layer_source=layersrc)
@@ -292,3 +292,88 @@ class ProjectsPageTests(TestCase):
                         'should be a project row in the page')
         self.assertTrue(self.PROJECT_NAME in response.content,
                         'default project "cli builds" should be in page')
+
+class ProjectBuildsDisplayTest(TestCase):
+    """ Test data at /project/X/builds is displayed correctly """
+
+    def setUp(self):
+        bbv = BitbakeVersion.objects.create(name="bbv1", giturl="/tmp/",
+                                            branch="master", dirpath="")
+        release = Release.objects.create(name="release1",
+                                         bitbake_version=bbv)
+        self.project1 = Project.objects.create_project(name=PROJECT_NAME,
+                                                       release=release)
+        self.project2 = Project.objects.create_project(name=PROJECT_NAME,
+                                                       release=release)
+
+        # parameters for builds to associate with the projects
+        now = timezone.now()
+
+        self.project1_build_success = {
+            "project": self.project1,
+            "started_on": now,
+            "completed_on": now,
+            "outcome": Build.SUCCEEDED
+        }
+
+        self.project1_build_in_progress = {
+            "project": self.project1,
+            "started_on": now,
+            "completed_on": now,
+            "outcome": Build.IN_PROGRESS
+        }
+
+        self.project2_build_success = {
+            "project": self.project2,
+            "started_on": now,
+            "completed_on": now,
+            "outcome": Build.SUCCEEDED
+        }
+
+        self.project2_build_in_progress = {
+            "project": self.project2,
+            "started_on": now,
+            "completed_on": now,
+            "outcome": Build.IN_PROGRESS
+        }
+
+    def _get_rows_for_project(self, project_id):
+        url = reverse("projectbuilds", args=(project_id,))
+        response = self.client.get(url, follow=True)
+        soup = BeautifulSoup(response.content)
+        return soup.select('tr[class="data"]')
+
+    def test_show_builds_for_project(self):
+        """ Builds for a project should be displayed """
+        build1a = Build.objects.create(**self.project1_build_success)
+        build1b = Build.objects.create(**self.project1_build_success)
+        build_rows = self._get_rows_for_project(self.project1.id)
+        self.assertEqual(len(build_rows), 2)
+
+    def test_show_builds_for_project_only(self):
+        """ Builds for other projects should be excluded """
+        build1a = Build.objects.create(**self.project1_build_success)
+        build1b = Build.objects.create(**self.project1_build_success)
+        build1c = Build.objects.create(**self.project1_build_success)
+
+        # shouldn't see these two
+        build2a = Build.objects.create(**self.project2_build_success)
+        build2b = Build.objects.create(**self.project2_build_in_progress)
+
+        build_rows = self._get_rows_for_project(self.project1.id)
+        self.assertEqual(len(build_rows), 3)
+
+    def test_show_builds_exclude_in_progress(self):
+        """ "in progress" builds should not be shown """
+        build1a = Build.objects.create(**self.project1_build_success)
+        build1b = Build.objects.create(**self.project1_build_success)
+
+        # shouldn't see this one
+        build1c = Build.objects.create(**self.project1_build_in_progress)
+
+        # shouldn't see these two either, as they belong to a different project
+        build2a = Build.objects.create(**self.project2_build_success)
+        build2b = Build.objects.create(**self.project2_build_in_progress)
+
+        build_rows = self._get_rows_for_project(self.project1.id)
+        self.assertEqual(len(build_rows), 2)

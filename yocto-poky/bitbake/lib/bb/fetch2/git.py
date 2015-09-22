@@ -66,6 +66,7 @@ Supported SRC_URI options are:
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import errno
 import os
 import re
 import bb
@@ -181,8 +182,6 @@ class Git(FetchMethod):
     def download(self, ud, d):
         """Fetch url"""
 
-        ud.repochanged = not os.path.exists(ud.fullmirror)
-
         # If the checkout doesn't exist and the mirror tarball does, extract it
         if not os.path.exists(ud.clonedir) and os.path.exists(ud.fullmirror):
             bb.utils.mkdirhier(ud.clonedir)
@@ -220,7 +219,11 @@ class Git(FetchMethod):
             runfetchcmd(fetch_cmd, d)
             runfetchcmd("%s prune-packed" % ud.basecmd, d)
             runfetchcmd("%s pack-redundant --all | xargs -r rm" % ud.basecmd, d)
-            ud.repochanged = True
+            try:
+                os.unlink(ud.fullmirror)
+            except OSError as exc:
+                if exc.errno != errno.ENOENT:
+                    raise
         os.chdir(ud.clonedir)
         for name in ud.names:
             if not self._contains_ref(ud, d, name):
@@ -228,7 +231,7 @@ class Git(FetchMethod):
 
     def build_mirror_data(self, ud, d):
         # Generate a mirror tarball if needed
-        if ud.write_tarballs and (ud.repochanged or not os.path.exists(ud.fullmirror)):
+        if ud.write_tarballs and not os.path.exists(ud.fullmirror):
             # it's possible that this symlink points to read-only filesystem with PREMIRROR
             if os.path.islink(ud.fullmirror):
                 os.unlink(ud.fullmirror)
