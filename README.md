@@ -9,4 +9,10 @@ To start a build:
     cd <builddir>
     . <repodir>/openbmc-env
     bitbake obmc-phosphor-image
+    
+If you are building on a headless machine, comment out the following lines in `build/local.conf` to remove the dependency on sdl:
+
+    PACKAGECONFIG_append_pn-qemu-native = " sdl"
+    PACKAGECONFIG_append_pn-nativesdk-qemu = " sdl"
+    ASSUME_PROVIDED += "libsdl-native"
 
