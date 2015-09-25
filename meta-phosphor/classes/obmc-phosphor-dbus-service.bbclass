@@ -2,6 +2,8 @@
 
 # Class users should define DBUS_SERVICES prior to including.
 
+RDEPENDS_${PN} += "dbus-perms"
+
 python() {
         services = d.getVar('DBUS_SERVICES', True)
         if services:
