@@ -1,1 +1,3 @@
-recipes-phosphor      - Phosphor OpenBMC applications and configuration
+recipes-phosphor     - Phosphor OpenBMC applications and configuration
+recipes-kernel       - The kernel and generic applications/libraries with strong kernel dependencies
+recipes-connectivity - Libraries and applications related to communication with other devices 
