@@ -9,11 +9,11 @@ BBLAYERS ?= " \
   ##OEROOT##/meta \
   ##OEROOT##/meta-yocto \
   ##OEROOT##/meta-phosphor \
-  ##OEROOT##/meta-aspeed \
-  ##OEROOT##/meta-aspeed/meta-ast2400 \
-  ##OEROOT##/meta-openpower \
-  ##OEROOT##/meta-openpower/meta-ibm \
-  ##OEROOT##/meta-openpower/meta-ibm/meta-palmetto \
+  ##OEROOT##/meta-openbmc-bsp/meta-aspeed \
+  ##OEROOT##/meta-openbmc-bsp/meta-aspeed/meta-ast2400 \
+  ##OEROOT##/meta-openbmc-machines/meta-openpower \
+  ##OEROOT##/meta-openbmc-machines/meta-openpower/meta-ibm \
+  ##OEROOT##/meta-openbmc-machines/meta-openpower/meta-ibm/meta-palmetto \
   "
 BBLAYERS_NON_REMOVABLE ?= " \
   ##OEROOT##/meta \
