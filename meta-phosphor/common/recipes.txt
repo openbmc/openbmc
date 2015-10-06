@@ -1,1 +1,3 @@
-recipes-phosphor      - Phosphor OpenBMC applications and configuration
+recipes-extended     - Applications which whilst not essential add features compared to the alternatives in
+                       core. May be needed for full tool functionality or LSB compliance.
+recipes-phosphor     - Phosphor OpenBMC applications and configuration
