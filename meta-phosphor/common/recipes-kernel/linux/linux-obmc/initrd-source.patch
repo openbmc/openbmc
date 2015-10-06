@@ -1,0 +1,11 @@
+--- a/arch/arm/configs/aspeed_defconfig
++++ b/arch/arm/configs/aspeed_defconfig
+@@ -6,7 +6,7 @@ CONFIG_SYSVIPC=y
+ CONFIG_IRQ_DOMAIN_DEBUG=y
+ CONFIG_LOG_BUF_SHIFT=14
+ CONFIG_BLK_DEV_INITRD=y
+-CONFIG_INITRAMFS_SOURCE="~/ibm/openbmc/buildroot-arm-rootfs.cpio.gz"
++CONFIG_INITRAMFS_SOURCE=""
+ CONFIG_CC_OPTIMIZE_FOR_SIZE=y
+ CONFIG_KALLSYMS_ALL=y
+ CONFIG_EMBEDDED=y
