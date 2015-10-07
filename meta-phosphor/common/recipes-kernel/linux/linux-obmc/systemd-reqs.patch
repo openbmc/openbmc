@@ -1,0 +1,8 @@
+--- a/arch/arm/configs/aspeed_defconfig
++++ b/arch/arm/configs/aspeed_defconfig
+@@ -192,3 +192,5 @@ CONFIG_CRYPTO_GHASH=y
+ # CONFIG_CRYPTO_HW is not set
+ CONFIG_CRC_CCITT=y
+ CONFIG_AVERAGE=y
++CONFIG_CGROUPS=y
++CONFIG_FHANDLE=y

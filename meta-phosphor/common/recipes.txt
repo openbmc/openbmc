@@ -1,1 +1,5 @@
-recipes-phosphor      - Phosphor OpenBMC applications and configuration
+recipes-connectivity - Libraries and applications related to communication with other devices 
+recipes-extended     - Applications which whilst not essential add features compared to the alternatives in
+                       core. May be needed for full tool functionality or LSB compliance.
+recipes-kernel       - The kernel and generic applications/libraries with strong kernel dependencies
+recipes-phosphor     - Phosphor OpenBMC applications and configuration

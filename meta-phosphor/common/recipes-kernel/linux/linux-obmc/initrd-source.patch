@@ -1,17 +1,11 @@
 --- a/arch/arm/configs/aspeed_defconfig
 +++ b/arch/arm/configs/aspeed_defconfig
-@@ -1,12 +1,12 @@
- CONFIG_CROSS_COMPILE="arm-linux-"
--CONFIG_LOCALVERSION="-joel"
-+# CONFIG_LOCALVERSION is not set
- CONFIG_KERNEL_XZ=y
- # CONFIG_SWAP is not set
- CONFIG_SYSVIPC=y
+@@ -6,7 +6,7 @@ CONFIG_SYSVIPC=y
  CONFIG_IRQ_DOMAIN_DEBUG=y
  CONFIG_LOG_BUF_SHIFT=14
  CONFIG_BLK_DEV_INITRD=y
 -CONFIG_INITRAMFS_SOURCE="~/ibm/openbmc/buildroot-arm-rootfs.cpio.gz"
-+# CONFIG_INITRAMFS_SOURCE is not set
++CONFIG_INITRAMFS_SOURCE=""
  CONFIG_CC_OPTIMIZE_FOR_SIZE=y
  CONFIG_KALLSYMS_ALL=y
  CONFIG_EMBEDDED=y

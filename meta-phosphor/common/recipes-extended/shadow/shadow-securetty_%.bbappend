@@ -1,3 +1,4 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-SRC_URI += "file://0000-config.patch"
+SRC_URI += "file://securetty.patch"
+
