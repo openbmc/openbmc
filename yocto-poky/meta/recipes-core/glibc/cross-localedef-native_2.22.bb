@@ -20,6 +20,7 @@ GLIBC_GIT_URI ?= "git://sourceware.org/git/glibc.git"
 SRC_URI = "${GLIBC_GIT_URI};branch=${BRANCH};name=glibc \
            git://github.com/kraj/localedef;branch=master;name=localedef;destsuffix=git/localedef \
            file://fix_for_centos_5.8.patch \
+           file://0001-add-support-for-Power8-LE-mode.patch \
            ${EGLIBCPATCHES} \
 "
 EGLIBCPATCHES = "\
