@@ -1,0 +1,14 @@
+--- a/include/configs/palmetto.h
++++ b/include/configs/palmetto.h
+@@ -96,11 +96,8 @@
+ #define CONFIG_UPDATE           "tftp 40800000 ast2400.scr; so 40800000'"
+ 
+ #define CONFIG_BOOTDELAY	3		/* autoboot after 3 seconds	*/
+-#define CONFIG_AUTOBOOT_KEYED
+ #define CONFIG_AUTOBOOT_PROMPT		\
+ 	"autoboot in %d seconds (stop with 'Delete' key)...\n", bootdelay
+-#define CONFIG_AUTOBOOT_STOP_STR	"\x1b\x5b\x33\x7e" /* 'Delete', ESC[3~ */
+-#define CONFIG_ZERO_BOOTDELAY_CHECK
+ 
+ #ifdef CONFIG_FLASH_AST2300
+ #define CONFIG_BOOTCOMMAND	"bootm 20080000 20300000"

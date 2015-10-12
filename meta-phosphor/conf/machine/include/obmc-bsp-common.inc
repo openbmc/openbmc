@@ -10,6 +10,9 @@ KERNEL_IMAGETYPE ?= "cuImage"
 KERNEL_EXTRA_ARGS += "LOADADDR=${UBOOT_ENTRYPOINT}"
 
 UBOOT_SUFFIX ?= "bin"
-IMAGE_BOOT_FILES ?= "u-boot.${UBOOT_SUFFIX}"
 
 MACHINEOVERRIDES =. "openbmc:"
+
+IMAGE_CLASSES += "obmc-phosphor-image_types_uboot"
+IMAGE_CTYPE = "gz"
+IMAGE_FSTYPES += "cpio.${IMAGE_CTYPE}.u-boot"
