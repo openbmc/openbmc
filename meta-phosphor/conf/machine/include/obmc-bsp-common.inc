@@ -14,5 +14,5 @@ UBOOT_SUFFIX ?= "bin"
 MACHINEOVERRIDES =. "openbmc:"
 
 IMAGE_CLASSES += "obmc-phosphor-image_types_uboot"
-IMAGE_CTYPE = "gz"
+IMAGE_CTYPE = "lzma"
 IMAGE_FSTYPES += "cpio.${IMAGE_CTYPE}.u-boot"
