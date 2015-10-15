@@ -4,17 +4,21 @@ HOMEPAGE = "http://github.com/openbmc/phosphor-host-ipmid"
 PR = "r1"
 
 inherit obmc-phosphor-license
-inherit obmc-phosphor-systemd
+inherit obmc-phosphor-sdbus-service
 
-DEPENDS += "glib-2.0"
 SRC_URI += "git://github.com/openbmc/phosphor-host-ipmid"
 
-SRCREV = "02d37aab090090af9a779f4039931a6721bff615"
+SRCREV = "98900a99254cd177c8308b63c341f793d2ac119d"
 
 S = "${WORKDIR}/git"
 
 do_install() {
-        install -m 0755 -d ${D}${sbindir} ${D}${libdir} ${D}${libdir}/host-ipmid/
+        install -m 0755 -d ${D}${sbindir}
         install -m 0755 ${S}/ipmid ${D}${sbindir}/
-        install -m 0755 ${S}/libapphandler.so ${D}${libdir}/host-ipmid/
+
+        install -m 0755 -d ${D}${libdir}/host-ipmid
+        install -m 0755 ${S}/*.so ${D}${libdir}/host-ipmid/
+
+        install -m 0755 -d ${D}${includedir}/host-ipmid
+        install -m 0644 ${S}/ipmid-api.h ${D}${includedir}/host-ipmid/
 }
