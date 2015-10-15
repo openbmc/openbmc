@@ -8,3 +8,4 @@ DBUS_SERVICES = " \
         "
 
 inherit obmc-phosphor-sdbus-service
+inherit obmc-phosphor-c-daemon

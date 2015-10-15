@@ -4,3 +4,4 @@ PR = "r1"
 
 inherit obmc-phosphor-fan-mgmt
 inherit obmc-phosphor-sdbus-service
+inherit obmc-phosphor-c-daemon

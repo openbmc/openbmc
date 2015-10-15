@@ -6,4 +6,3 @@ DEPENDS += "systemd"
 RDEPENDS_${PN} += "libsystemd"
 
 inherit obmc-phosphor-dbus-service
-inherit obmc-phosphor-c-daemon
