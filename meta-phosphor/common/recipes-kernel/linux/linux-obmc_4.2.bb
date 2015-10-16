@@ -5,7 +5,6 @@ LICENSE = "GPLv2"
 KBRANCH ?= "dev"
 
 SRC_URI = "git://github.com/openbmc/linux;protocol=git;branch=${KBRANCH}"
-SRC_URI += "file://systemd-reqs.patch file://initrd-source.patch"
 SRC_URI += "file://obmc-bsp.scc \
             file://obmc-bsp.cfg \
             file://obmc-bsp-user-config.cfg \
