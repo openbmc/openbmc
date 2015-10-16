@@ -2,13 +2,13 @@
 
 inherit systemd
 
-SYSTEMD_SERVICE_${PN} = "${PN}.service"
+SYSTEMD_SERVICE_${PN} = "${BPN}.service"
 SRC_URI += " \
-        file://${PN}.service \
+        file://${BPN}.service \
         "
 
 do_install_append() {
         # install systemd unit files
         install -d ${D}${systemd_unitdir}/system
-        install -m 0644 ${WORKDIR}/${PN}.service ${D}${systemd_unitdir}/system
+        install -m 0644 ${WORKDIR}/${BPN}.service ${D}${systemd_unitdir}/system
 }

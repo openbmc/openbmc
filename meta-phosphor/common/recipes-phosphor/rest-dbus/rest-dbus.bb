@@ -7,8 +7,6 @@ inherit allarch
 inherit obmc-phosphor-license
 inherit obmc-phosphor-systemd
 
-SYSTEMD_SERVICE_${PN} = "${PN}.service"
-
 RDEPENDS_${PN} += " \
         python-netserver \
         python-json \
