@@ -4,14 +4,12 @@ inherit obmc-phosphor-systemd
 inherit obmc-phosphor-license
 
 DEPENDS += "glib-2.0"
-SRC_URI += " \
-        file://Makefile \
-        file://${PN}.c \
-        "
-S = "${WORKDIR}"
+
+INSTALL_NAME ?= "${PN}"
+BIN_NAME ?= "${INSTALL_NAME}"
 
 do_install_append() {
         # install the binary
         install -d ${D}${sbindir}
-        install -m 0755 ${WORKDIR}/${PN} ${D}${sbindir}
+        install -m 0755 ${S}/${BIN_NAME} ${D}${sbindir}/${INSTALL_NAME}
 }

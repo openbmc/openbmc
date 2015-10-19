@@ -7,5 +7,9 @@ DBUS_SERVICES = " \
         org.openbmc.examples.SDBusService1 \
         "
 
+S = "${WORKDIR}"
+SRC_URI += "file://Makefile \
+           file://obmc-phosphor-example-sdbus.c \
+           "
 inherit obmc-phosphor-sdbus-service
 inherit obmc-phosphor-c-daemon
