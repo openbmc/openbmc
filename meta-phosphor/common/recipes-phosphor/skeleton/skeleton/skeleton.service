@@ -1,0 +1,8 @@
+[Unit]
+Description="Temp placeholder for skeleton function"
+
+[Service]
+ExecStart=/usr/sbin/system_manager.py Palmetto
+
+[Install]
+WantedBy=multi-user.target
