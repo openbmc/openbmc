@@ -9,6 +9,7 @@ inherit obmc-phosphor-systemd
 DEPENDS += "glib-2.0"
 RDEPENDS_${PN} += "python-subprocess"
 SRC_URI += "git://github.com/openbmc/skeleton"
+SRC_URI += "file://make.patch"
 
 SRCREV = "18d4591170779ceb81158c650d31c6c59115b2f2"
 
