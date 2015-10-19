@@ -1,5 +1,5 @@
 [Unit]
-Description="Phosphor OpenBMC IPMI daemon"
+Description=Phosphor OpenBMC IPMI daemon
 
 [Service]
 ExecStart=/usr/sbin/ipmid
