@@ -7,7 +7,7 @@ inherit obmc-phosphor-license
 inherit obmc-phosphor-systemd
 
 DEPENDS += "glib-2.0"
-RDEPENDS_${PN} += "python-subprocess"
+RDEPENDS_${PN} += "python-subprocess python-tftpy"
 SRC_URI += "git://github.com/openbmc/skeleton"
 SRC_URI += "file://make.patch"
 
@@ -21,7 +21,7 @@ do_compile() {
 
 do_install() {
         install -d ${D}/${sbindir} ${D}${libdir}
-        for i in ${S}/bin/*.py ${S}/bin/*.exe ${S}/bin/tftpy/*.py; do
+        for i in ${S}/bin/*.py ${S}/bin/*.exe; do
                 install $i ${D}/${sbindir}
         done
         install ${S}/bin/libopenbmc_intf.so ${D}/${libdir}
