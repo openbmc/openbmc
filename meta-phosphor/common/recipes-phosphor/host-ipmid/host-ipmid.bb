@@ -3,6 +3,8 @@ DESCRIPTION = "Phosphor OpenBMC IPMI router and plugin libraries"
 HOMEPAGE = "http://github.com/openbmc/phosphor-host-ipmid"
 PR = "r1"
 
+RRECOMMENDS_${PN} = "virtual/obmc-phosphor-host-ipmi-hw"
+
 inherit obmc-phosphor-license
 inherit obmc-phosphor-sdbus-service
 inherit obmc-phosphor-c-daemon
