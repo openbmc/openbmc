@@ -5,13 +5,11 @@ inherit obmc-phosphor-systemd
 inherit obmc-phosphor-license
 
 RDEPENDS_${PN} += "python-dbus python-pygobject"
-SRC_URI += " \
-        file://${PN}.py \
-        "
-S = "${WORKDIR}"
+INSTALL_NAME ?= "${PN}"
+SCRIPT_NAME ?= "${INSTALL_NAME}.py"
 
 do_install_append() {
         # install the script
         install -d ${D}${sbindir}
-        install -m 0755 ${WORKDIR}/${PN}.py ${D}${sbindir}/${PN}
+        install -m 0755 ${S}/${SCRIPT_NAME} ${D}${sbindir}/${INSTALL_NAME}
 }
