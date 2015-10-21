@@ -11,7 +11,6 @@ inherit obmc-phosphor-host-ipmi-hw
 
 S = "${WORKDIR}/git"
 SRC_URI += "git://github.com/openbmc/skeleton.git;subpath=bin;destsuffix=git"
-SRC_URI += "file://systembus.patch"
 SRCREV="${AUTOREV}"
 
 SCRIPT_NAME = "ipmi_debug.py"
