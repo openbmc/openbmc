@@ -6,16 +6,23 @@ OBMC_MACHINE_FEATURES += "\
         "
 
 VIRTUAL-RUNTIME_obmc-phosphor-fan-ctl = " \
-       obmc-phosphor-example-sdbus \
+       skeleton \
        "
 VIRTUAL-RUNTIME_obmc-phosphor-sensor-ctl = " \
-       obmc-phosphor-example-sdbus \
+       skeleton \
        "
 VIRTUAL-RUNTIME_obmc-phosphor-chassis-ctl = " \
-       obmc-phosphor-example-pydbus \
+       skeleton \
        "
 VIRTUAL-RUNTIME_obmc-phosphor-flash-ctl = " \
-       obmc-phosphor-example-pydbus \
+       skeleton \
        "
 
 PREFERRED_PROVIDER_virtual/obmc-phosphor-host-ipmi-hw = "host-ipmi-bt"
+PREFERRED_PROVIDER_virtual/obmc-phosphor-chassis-mgmt = "skeleton"
+PREFERRED_PROVIDER_virtual/obmc-phosphor-event-mgmt = "skeleton"
+PREFERRED_PROVIDER_virtual/obmc-phosphor-fan-mgmt = "skeleton"
+PREFERRED_PROVIDER_virtual/obmc-phosphor-flash-mgmt = "skeleton"
+PREFERRED_PROVIDER_virtual/obmc-phosphor-policy-mgmt = "skeleton"
+PREFERRED_PROVIDER_virtual/obmc-phosphor-sensor-mgmt = "skeleton"
+PREFERRED_PROVIDER_virtual/obmc-phosphor-system-mgmt = "skeleton"
