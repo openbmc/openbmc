@@ -5,6 +5,13 @@ PR = "r1"
 
 inherit obmc-phosphor-license
 inherit obmc-phosphor-systemd
+inherit obmc-phosphor-chassis-mgmt
+inherit obmc-phosphor-event-mgmt
+inherit obmc-phosphor-fan-mgmt
+inherit obmc-phosphor-flash-mgmt
+inherit obmc-phosphor-policy-mgmt
+inherit obmc-phosphor-sensor-mgmt
+inherit obmc-phosphor-system-mgmt
 
 DEPENDS += "glib-2.0"
 RDEPENDS_${PN} += "python-subprocess python-tftpy"
