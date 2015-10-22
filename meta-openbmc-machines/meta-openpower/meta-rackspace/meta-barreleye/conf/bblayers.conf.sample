@@ -12,8 +12,8 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-openbmc-bsp/meta-aspeed \
   ##OEROOT##/meta-openbmc-bsp/meta-aspeed/meta-ast2400 \
   ##OEROOT##/meta-openbmc-machines/meta-openpower \
-  ##OEROOT##/meta-openbmc-machines/meta-openpower/meta-foxconn \
-  ##OEROOT##/meta-openbmc-machines/meta-openpower/meta-foxconn/meta-barreleye \
+  ##OEROOT##/meta-openbmc-machines/meta-openpower/meta-rackspace \
+  ##OEROOT##/meta-openbmc-machines/meta-openpower/meta-rackspace/meta-barreleye \
   "
 BBLAYERS_NON_REMOVABLE ?= " \
   ##OEROOT##/meta \
@@ -22,6 +22,6 @@ BBLAYERS_NON_REMOVABLE ?= " \
   ##OEROOT##/meta-aspeed \
   ##OEROOT##/meta-aspeed/meta-ast2400 \
   ##OEROOT##/meta-openpower \
-  ##OEROOT##/meta-openpower/meta-foxconn \
-  ##OEROOT##/meta-openpower/meta-foxconn/meta-barreleye \
+  ##OEROOT##/meta-openpower/meta-rackspace \
+  ##OEROOT##/meta-openpower/meta-rackspace/meta-barreleye \
   "
