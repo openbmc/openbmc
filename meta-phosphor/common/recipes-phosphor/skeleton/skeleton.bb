@@ -6,7 +6,6 @@ PR = "r1"
 inherit obmc-phosphor-license
 inherit obmc-phosphor-systemd
 inherit obmc-phosphor-chassis-mgmt
-inherit obmc-phosphor-event-mgmt
 inherit obmc-phosphor-fan-mgmt
 inherit obmc-phosphor-flash-mgmt
 inherit obmc-phosphor-policy-mgmt
