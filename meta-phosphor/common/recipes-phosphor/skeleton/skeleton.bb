@@ -9,10 +9,12 @@ inherit obmc-phosphor-systemd
 DEPENDS += "glib-2.0"
 RDEPENDS_${PN} += "python-subprocess python-tftpy"
 SRC_URI += "git://github.com/openbmc/skeleton"
+#SRC_URI += "file:///home/njames/openbmc/skeleton"
 
-SRCREV = "47750bc1c06aebda189f2e8d7862c9d9b9ffe35b"
+SRCREV = "b4914ad2a185f8febfe79f1b794bb816d6b12621"
 
 S = "${WORKDIR}/git"
+#S = "${WORKDIR}/home/njames/skeleton/"
 
 do_compile() {
         oe_runmake all
@@ -24,4 +26,7 @@ do_install() {
                 install $i ${D}/${sbindir}
         done
         install ${S}/bin/libopenbmc_intf.so ${D}/${libdir}
+        install ${S}/bin/console ${D}/${sbindir}
+        install ${S}/bin/gpio2num ${D}/${sbindir}
+        install ${S}/bin/obmcutil ${D}/${sbindir}
 }
