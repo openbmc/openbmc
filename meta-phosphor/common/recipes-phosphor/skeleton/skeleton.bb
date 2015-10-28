@@ -19,16 +19,18 @@ SRC_URI += "git://github.com/openbmc/skeleton"
 
 SRCREV = "47750bc1c06aebda189f2e8d7862c9d9b9ffe35b"
 
-S = "${WORKDIR}/git"
+S = "${WORKDIR}"
 
 do_compile() {
-        oe_runmake all
+        oe_runmake -C git all
 }
 
 do_install() {
+        source=${S}/git
+
         install -d ${D}/${sbindir} ${D}${libdir}
-        for i in ${S}/bin/*.py ${S}/bin/*.exe; do
+        for i in ${source}/bin/*.py ${source}/bin/*.exe; do
                 install $i ${D}/${sbindir}
         done
-        install ${S}/bin/libopenbmc_intf.so ${D}/${libdir}
+        install ${source}/bin/libopenbmc_intf.so ${D}/${libdir}
 }
