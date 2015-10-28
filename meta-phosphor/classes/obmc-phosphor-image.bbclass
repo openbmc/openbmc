@@ -36,4 +36,6 @@ IMAGE_FEATURES += " \
 IMAGE_INSTALL += " \
        bash \
        packagegroup-obmc-phosphor-apps-extras \
+       i2c-tools \
+       screen \
        "
