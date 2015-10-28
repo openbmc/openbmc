@@ -14,7 +14,7 @@ SRC_URI += "file://obmc-bsp.scc \
 LINUX_VERSION ?= "4.2"
 LINUX_VERSION_EXTENSION ?= "-openbmc-${SRCPV}"
 
-SRCREV="${AUTOREV}"
+SRCREV="openbmc-20151028-1"
 
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
