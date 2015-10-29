@@ -17,20 +17,22 @@ DEPENDS += "glib-2.0"
 RDEPENDS_${PN} += "python-subprocess python-tftpy"
 SRC_URI += "git://github.com/openbmc/skeleton"
 
-SRCREV = "47750bc1c06aebda189f2e8d7862c9d9b9ffe35b"
+SRCREV = "597d49e68e8bf0ddedb2e01cbd3fb500ee1c22e3"
 
 S = "${WORKDIR}"
 
 do_compile() {
-        oe_runmake -C git all
+        oe_runmake -C git
 }
 
 do_install() {
         source=${S}/git
 
         install -d ${D}/${sbindir} ${D}${libdir}
-        for i in ${source}/bin/*.py ${source}/bin/*.exe; do
+        for i in ${source}/bin/*; do
                 install $i ${D}/${sbindir}
         done
-        install ${source}/bin/libopenbmc_intf.so ${D}/${libdir}
+        for i in ${source}/lib/*; do
+                install $i ${D}/${libdir}
+        done
 }
