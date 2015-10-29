@@ -1,0 +1,13 @@
+Index: git/drivers/net/aspeednic.c
+===================================================================
+--- git.orig/drivers/net/aspeednic.c	2015-10-29 13:23:42.225712001 -0500
++++ git/drivers/net/aspeednic.c	2015-10-29 13:26:52.205712001 -0500
+@@ -1155,7 +1155,7 @@
+ 
+   RESET_DE4X5(dev);
+ 
+-  aspeednic_probe_phy(dev);
++  //aspeednic_probe_phy(dev);
+ 
+   set_mac_address (dev, bis);
+   set_mac_control_register (dev);

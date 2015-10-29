@@ -1,0 +1,2 @@
+recipes-bsp          - Anything with links to specific hardware or hardware configuration information
+recipes-phosphor     - Phosphor OpenBMC applications and configuration
