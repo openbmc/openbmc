@@ -1,11 +1,13 @@
 diff --git a/Makefile b/Makefile
-index 7f62be2..52e1063 100644
+index a55897f..73206b4 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -2,3 +2,6 @@ all: btbridged
+@@ -5,5 +5,8 @@ EXE = btbridged
  
- btbridged: btbridged.c
- 	$(CC) $(CFLAGS) `pkg-config --cflags --libs libsystemd` $^ -o $@
+ all: $(EXE)
+ 
++btbridged: btbridged.c
++	$(CC) $(CFLAGS) `pkg-config --cflags --libs libsystemd` $^ -o $@
 +
-+clean:
-+	rm -f *.o btbridge
+ clean:
+ 	rm -rf *.o $(EXE)
