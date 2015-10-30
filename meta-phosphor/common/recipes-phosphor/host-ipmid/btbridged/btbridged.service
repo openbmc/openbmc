@@ -1,0 +1,8 @@
+[Unit]
+Description=Phosphor OpenBMC BT to DBUS
+
+[Service]
+ExecStart=/usr/sbin/btbridged
+
+[Install]
+WantedBy=multi-user.target
