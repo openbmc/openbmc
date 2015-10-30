@@ -1,2 +1,2 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
-SRC_URI += "file://defconfig hwmon.cfg"
+SRC_URI += "file://defconfig file://hwmon.cfg"
