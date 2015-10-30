@@ -14,7 +14,7 @@ inherit obmc-phosphor-c-daemon
 
 SRC_URI += "git://github.com/openbmc/phosphor-host-ipmid"
 
-SRCREV = "84a5a0a8fdb2a5df9e33ab9132f2c083eaa4b756"
+SRCREV = "5fc6492ff8882390e55592d776969a094567b0d5"
 
 
 S = "${WORKDIR}/git"
