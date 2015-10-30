@@ -1,6 +1,6 @@
 SUMMARY = "Phosphor OpenBMC Event Management"
 DESCRIPTION = "Phosphor OpenBMC event management reference implementation."
-HOMEPAGE = "https://github.com/causten/openbmc-eventd"
+HOMEPAGE = "https://github.com/openbmc/phosphor-event"
 PR = "r1"
 
 
@@ -9,9 +9,10 @@ inherit obmc-phosphor-event-mgmt
 inherit obmc-phosphor-sdbus-service
 inherit obmc-phosphor-c-daemon
 
-SRC_URI += "git://github.com/causten/openbmc-eventd"
 
-SRCREV = "417f69b7839034543405f1bb70a73cc701a1b3a5"
+SRC_URI += "git://github.com/openbmc/phosphor-event"
+
+SRCREV = "0a4a39e46622a9d6d4719b14f8955866fdb51a20"
 
 RDEPENDS_${PN} += "libsystemd"
 DEPENDS += "systemd"
