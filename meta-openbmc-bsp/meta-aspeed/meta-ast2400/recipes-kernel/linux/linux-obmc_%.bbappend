@@ -1,1 +1,2 @@
-KERNEL_CONFIG_COMMAND = "oe_runmake_call -C ${S} O=${B} ${KMACHINE}_defconfig"
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+SRC_URI += "file://defconfig hwmon.cfg"
