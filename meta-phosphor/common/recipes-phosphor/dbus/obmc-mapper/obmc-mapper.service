@@ -1,0 +1,10 @@
+[Unit]
+Description=Phosphor OpenBMC DBus service management daemon
+
+[Service]
+Type=dbus
+ExecStart=/usr/sbin/phosphor-mapper
+BusName=org.openbmc.objectmapper
+
+[Install]
+WantedBy=multi-user.target

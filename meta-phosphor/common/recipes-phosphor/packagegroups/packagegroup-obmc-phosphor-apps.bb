@@ -25,6 +25,7 @@ PACKAGES = " \
 SUMMARY_packagegroup-obmc-phosphor-apps-extras = "Extra features"
 RDEPENDS_packagegroup-obmc-phosphor-apps-extras = " \
         rest-dbus \
+	obmc-rest \
         host-ipmid \
         "
 
