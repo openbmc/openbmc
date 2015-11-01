@@ -10,7 +10,7 @@ SYSTEMD_SERVICE_${PN} = "btbridged.service"
 inherit obmc-phosphor-host-ipmi-hw
 
 S = "${WORKDIR}/git"
-SRC_URI += "git://github.com/openbmc/btbridge"
+SRC_URI += "git://github.com/openbmc/btbridge file://makefile.patch"
 SRCREV="c0ee3595f9a4784c7cf7ee60fd247d9712ec7e6b"
 
 # This is how linux-libc-headers says to include custom uapi headers
