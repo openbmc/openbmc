@@ -18,7 +18,9 @@ VIRTUAL-RUNTIME_obmc-phosphor-chassis-ctl = " \
 VIRTUAL-RUNTIME_obmc-phosphor-flash-ctl = " \
        skeleton \
        "
-
+VIRTUAL-RUNTIME_obmc-phosphor-ipmi-parsers = " \
+        host-ipmid-oem \
+       "
 PREFERRED_PROVIDER_virtual/obmc-phosphor-host-ipmi-hw = "btbridged"
 PREFERRED_PROVIDER_virtual/obmc-phosphor-chassis-mgmt = "skeleton"
 PREFERRED_PROVIDER_virtual/obmc-phosphor-event-mgmt = "obmc-phosphor-event"
