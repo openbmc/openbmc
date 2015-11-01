@@ -42,4 +42,4 @@ do_uboot_mkcimage() {
 	fi
 }
 
-addtask uboot_mkcimage before do_bundle_initramfs after do_compile
+addtask uboot_mkcimage before do_install after do_compile
