@@ -6,24 +6,21 @@ PR = "r1"
 inherit allarch
 inherit obmc-phosphor-license
 inherit obmc-phosphor-systemd
+inherit setuptools
 
 RDEPENDS_${PN} += " \
         python-netserver \
         python-json \
         python-dbus \
         python-xml \
+        obmc-mapper \
         "
+
 SRC_URI += " \
         git://github.com/openbmc/rest-dbus.git \
-        file://makefile.patch \
-        file://resources-path.patch \
-        file://no-session-bus.patch \
+        file://rest-dbus.service \
         "
 
-SRCREV = "9b0e0bab5150ccc4333ce442932f8969f365155e"
+SRCREV = "b10a57e2f34e94b13697328cc22f876f738feb0e"
 
 S = "${WORKDIR}/git"
-
-do_install() {
-        oe_runmake prefix=${D} install
-}
