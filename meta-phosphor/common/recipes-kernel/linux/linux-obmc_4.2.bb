@@ -10,7 +10,7 @@ SRC_URI = "git://github.com/openbmc/linux;protocol=git;branch=${KBRANCH}"
 LINUX_VERSION ?= "4.2"
 LINUX_VERSION_EXTENSION ?= "-${SRCREV}"
 
-SRCREV="openbmc-20151028-1"
+SRCREV="openbmc-20151102-1"
 
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
@@ -18,3 +18,13 @@ COMPATIBLE_MACHINE_${MACHINE} = "openbmc"
 
 inherit kernel
 require recipes-kernel/linux/linux-yocto.inc
+
+do_patch_append() {
+        for DTB in "${KERNEL_DEVICETREE}"; do
+		DT=`basename ${DTB} .dtb`
+                if [ -r "${WORKDIR}/${DT}.dts" ]; then
+                        cp ${WORKDIR}/${DT}.dts \
+                                ${STAGING_KERNEL_DIR}/arch/${ARCH}/boot/dts
+		fi
+	done
+}
