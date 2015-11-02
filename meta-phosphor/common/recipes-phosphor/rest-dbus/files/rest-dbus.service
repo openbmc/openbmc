@@ -2,7 +2,7 @@
 Description=DBUS introspecting REST server.
 
 [Service]
-ExecStart=/usr/bin/rest-dbus
+ExecStart=/usr/sbin/rest-dbus
 
 [Install]
 WantedBy=multi-user.target
