@@ -20,6 +20,7 @@ VIRTUAL-RUNTIME_obmc-phosphor-flash-ctl = " \
 VIRTUAL-RUNTIME_obmc-phosphor-ipmi-parsers = " \
         host-ipmid-oem \
         host-ipmid-fru \
+        host-ipmid-tool \
        "
 PREFERRED_PROVIDER_virtual/obmc-phosphor-host-ipmi-hw = "host-ipmi-hw-example"
 PREFERRED_PROVIDER_virtual/obmc-phosphor-chassis-mgmt = "obmc-phosphor-chassisd"
