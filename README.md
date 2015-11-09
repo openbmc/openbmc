@@ -10,3 +10,5 @@ To start a build:
     source <repodir>/openbmc-env
     bitbake obmc-phosphor-image
 
+
+Sourcing the build scripts create a build dir.. 
