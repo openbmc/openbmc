@@ -10,4 +10,3 @@ To start a build:
     source <repodir>/openbmc-env
     bitbake obmc-phosphor-image
 
-## Jenkins Test ##
