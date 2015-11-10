@@ -7,6 +7,8 @@ somewhere to hold the build.  This directory will get big.
 To start a build:
 
     cd <builddir>
-    . <repodir>/openbmc-env
+    source <repodir>/openbmc-env
     bitbake obmc-phosphor-image
 
+
+Sourcing the build scripts create a build dir.. 
