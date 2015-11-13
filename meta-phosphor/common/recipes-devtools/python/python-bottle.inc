@@ -12,7 +12,15 @@ LIC_FILES_CHKSUM = "file://${WORKDIR}/LICENSE;md5=94b9b2cc7e46ccea87e00af8970826
 inherit allarch
 inherit setuptools
 
+S = "${WORKDIR}/${SRCNAME}-${PV}"
 # bottle doesn't send email...it uses a utility in here to parse rfc1123 and rfc850 timestamps.
-RDEPENDS_${PN} += "python-email"
+RDEPENDS_${PN} += "python-email-utils-standalone"
+
+PROVIDES += "${PN}-app"
+PACKAGES += "${PN}-app"
+
+SUMMARY_${PN}-app = "${SRCNAME} app"
+RDEPENDS_${PN}-app = "${PN}"
+FILES_${PN}-app = "${bindir}/bottle.py"
 
 BBCLASSEXTEND = "nativesdk"
