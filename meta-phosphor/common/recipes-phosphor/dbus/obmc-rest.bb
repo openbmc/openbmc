@@ -21,6 +21,6 @@ SRC_URI += " \
         git://github.com/openbmc/phosphor-rest-server \
         "
 
-SRCREV = "2f7aef50b005c16a51065984f090e787c04c0c14"
+SRCREV = "275ec270684cd3b946674d02462bc9ed1890360e"
 
 S = "${WORKDIR}/git"

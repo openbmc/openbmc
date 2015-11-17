@@ -4,7 +4,7 @@ Requires=obmc-mapper.service
 After=obmc-mapper.service
 
 [Service]
-ExecStart=/usr/sbin/phosphor-rest
+ExecStart=/usr/sbin/obmc-rest
 
 [Install]
 WantedBy=multi-user.target

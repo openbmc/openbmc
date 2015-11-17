@@ -20,6 +20,6 @@ SRC_URI += " \
         git://github.com/openbmc/phosphor-objmgr \
         "
 
-SRCREV = "e290f5cdccf14e50e838366367c91e0464f792f6"
+SRCREV = "6aed08d480aa1e022df14d48b7a54f5b1790e7d9"
 
 S = "${WORKDIR}/git"
