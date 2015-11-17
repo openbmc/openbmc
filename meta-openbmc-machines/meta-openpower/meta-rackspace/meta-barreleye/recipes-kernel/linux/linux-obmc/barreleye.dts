@@ -166,14 +166,6 @@
 					bus = <6>;
 					clock-frequency = <100000>;
 					status = "okay";
-					nct7904@2d {
-						compatible = "nuvoton,nct7904";
-						reg = <0x2d>;
-					};
-					nct7904@2e {
-						compatible = "nuvoton,nct7904";
-						reg = <0x2e>;
-					};
 				};
 
 				i2c7: i2c-bus@0x300 {
