@@ -2,7 +2,7 @@ DESCRIPTION = "Linux kernel for OpenBMC"
 SECTION = "kernel"
 LICENSE = "GPLv2"
 
-KBRANCH ?= "dev"
+KBRANCH ?= "dev-4.3"
 KCONFIG_MODE="--alldefconfig"
 
 SRC_URI = "git://github.com/openbmc/linux;protocol=git;branch=${KBRANCH}"
@@ -10,7 +10,7 @@ SRC_URI = "git://github.com/openbmc/linux;protocol=git;branch=${KBRANCH}"
 LINUX_VERSION ?= "4.2"
 LINUX_VERSION_EXTENSION ?= "-${SRCREV}"
 
-SRCREV="openbmc-20151104-1"
+SRCREV="openbmc-20151118-1"
 
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
