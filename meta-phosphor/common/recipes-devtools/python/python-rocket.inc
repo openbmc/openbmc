@@ -15,9 +15,9 @@ inherit setuptools
 
 S = "${WORKDIR}/${SRCNAME}-${PV}"
 RDEPENDS_${PN} += "\
-        python-wsgiref-standalone-util \
-        python-wsgiref-standalone-headers \
-        python-email-utils-standalone \
+        python-wsgiref-util \
+        python-wsgiref-headers \
+        python-email-utils \
 	"
 
 BBCLASSEXTEND = "nativesdk"

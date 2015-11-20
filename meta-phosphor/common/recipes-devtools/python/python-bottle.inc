@@ -13,8 +13,7 @@ inherit allarch
 inherit setuptools
 
 S = "${WORKDIR}/${SRCNAME}-${PV}"
-# bottle doesn't send email...it uses a utility in here to parse rfc1123 and rfc850 timestamps.
-RDEPENDS_${PN} += "python-email-utils-standalone"
+RDEPENDS_${PN} += "python-email-utils"
 
 PROVIDES += "${PN}-app"
 PACKAGES += "${PN}-app"
