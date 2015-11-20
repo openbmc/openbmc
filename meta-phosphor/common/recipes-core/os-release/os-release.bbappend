@@ -1,8 +1,18 @@
-def git_describe(d):
-        return bb.process.run("git describe --dirty")[0]
-def git_tag(d):
-        return bb.process.run("git tag")[0]
+def run_git(d, cmd):
+        try:
+                oeroot = d.getVar('COREBASE', True)
+                return bb.process.run("git --git-dir %s/.git %s" %(oeroot, cmd))[0].strip('\n')
+        except:
+                pass
 
-VERSION_ID = "${@git_tag(d)}"
-BUILD_ID = "${@git_describe(d)}"
+python() {
+        version_id = run_git(d, 'tag')
+        if version_id:
+                d.setVar('VERSION_ID', version_id)
+
+        build_id = run_git(d, 'describe --dirty')
+        if build_id:
+                d.setVar('BUILD_ID', build_id)
+}
+
 OS_RELEASE_FIELDS_append = " BUILD_ID"
