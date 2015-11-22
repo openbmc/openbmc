@@ -16,7 +16,7 @@ DEPENDS += "glib-2.0"
 RDEPENDS_${PN} += "python-subprocess python-tftpy"
 SRC_URI += "git://github.com/openbmc/skeleton"
 
-SRCREV = "981f4dc59f23668b567949527c8e9585c2ab7089"
+SRCREV = "af915f1251b4989f41829f9ae8589b42ef81efd7"
 
 S = "${WORKDIR}"
 
