@@ -11,7 +11,7 @@ inherit obmc-phosphor-host-ipmi-hw
 
 S = "${WORKDIR}/git"
 SRC_URI += "git://github.com/openbmc/btbridge file://makefile.patch"
-SRCREV="c0ee3595f9a4784c7cf7ee60fd247d9712ec7e6b"
+SRCREV="e71c7941a35949c0b93ce5e7864ab35447d30df2"
 
 # This is how linux-libc-headers says to include custom uapi headers
 EXTRA_OEMAKE_append = "CFLAGS=-I${STAGING_KERNEL_DIR}/include/uapi"
