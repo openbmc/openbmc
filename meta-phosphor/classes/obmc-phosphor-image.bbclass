@@ -38,4 +38,5 @@ IMAGE_INSTALL += " \
        packagegroup-obmc-phosphor-apps-extras \
        i2c-tools \
        screen \
+       watchdog \
        "
