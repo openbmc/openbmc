@@ -18,14 +18,17 @@ TARGET_CFLAGS += "-std=gnu++14"
 
 SRC_URI += "git://github.com/openbmc/ipmi-fru-parser"
 
-SRCREV = "1c779b8570849a52dac828538c36a59798f4583a"
+SRCREV = "20656b1e15bebd7bc2754bd680f045e253bd2809"
 
 FILES_${PN} += "${libdir}/host-ipmid/*.so"
 FILES_${PN}-dbg += "${libdir}/host-ipmid/.debug"
 
 S = "${WORKDIR}/git"
 
-do_install() {  
-        install -m 0755 -d ${D}${libdir}/host-ipmid
-        install -m 0755 ${S}/*.so ${D}${libdir}/host-ipmid/
+do_install() {
+	oe_runmake install DESTDIR=${D} LIBDIR=${libdir} BINDIR=${sbindir}
 }
+
+
+#        install -m 0755 -d ${D}${libdir}/host-ipmid
+#        install -m 0755 ${S}/*.so ${D}${libdir}/host-ipmid/
