@@ -1,0 +1,255 @@
+From 946d0bac014f2def506812aec19961fab813b0dd Mon Sep 17 00:00:00 2001
+From: Hariharasubramanian R <hramasub@in.ibm.com>
+Date: Tue, 1 Dec 2015 07:37:14 -0600
+Subject: [PATCH] DBUS API support for systemd/networkd to configure the
+ interface parameters.
+
+---
+ src/network/networkd-network-bus.c | 108 +++++++++++++++++++++++++++++++++++++
+ src/network/networkd-network.c     |  85 +++++++++++++++++++++++++++++
+ 2 files changed, 193 insertions(+)
+
+diff --git a/src/network/networkd-network-bus.c b/src/network/networkd-network-bus.c
+index 5717a15..6f20d2d 100644
+--- a/src/network/networkd-network-bus.c
++++ b/src/network/networkd-network-bus.c
+@@ -19,10 +19,27 @@
+   along with systemd; If not, see <http://www.gnu.org/licenses/>.
+ ***/
+ 
++#define SYSTEMD_NETWORKD_DBUS 1
++
++#ifdef SYSTEMD_NETWORKD_DBUS
++#include <netinet/ether.h>
++#include <linux/if.h>
++#endif
++
+ #include "strv.h"
+ 
+ #include "networkd.h"
+ 
++#ifdef SYSTEMD_NETWORKD_DBUS
++#include "hostname-util.h"
++#include "network-internal.h"
++#include "networkd-link.h"
++#endif
++
++#ifdef SYSTEMD_NETWORKD_DBUS
++int network_address_added_handler (sd_netlink* rtnl, sd_netlink_message* m, void* userdata);
++#endif
++
+ static int property_get_ether_addrs(
+                 sd_bus *bus,
+                 const char *path,
+@@ -56,6 +73,10 @@ static int property_get_ether_addrs(
+         return sd_bus_message_close_container(reply);
+ }
+ 
++#ifdef SYSTEMD_NETWORKD_DBUS
++static int method_set_address (sd_bus_message *m, void* userdata, sd_bus_error *error);
++#endif
++
+ const sd_bus_vtable network_vtable[] = {
+         SD_BUS_VTABLE_START(0),
+ 
+@@ -67,6 +88,10 @@ const sd_bus_vtable network_vtable[] = {
+         SD_BUS_PROPERTY("MatchType", "as", NULL, offsetof(Network, match_type), SD_BUS_VTABLE_PROPERTY_CONST),
+         SD_BUS_PROPERTY("MatchName", "as", NULL, offsetof(Network, match_name), SD_BUS_VTABLE_PROPERTY_CONST),
+ 
++#ifdef SYSTEMD_NETWORKD_DBUS
++	    /* index, IP, netmask, family, flags, scope, gateway */
++    	SD_BUS_METHOD("SetAddress", "yssyyys", "x", method_set_address, SD_BUS_VTABLE_UNPRIVILEGED),
++#endif
+         SD_BUS_VTABLE_END
+ };
+ 
+@@ -152,3 +177,86 @@ int network_object_find(sd_bus *bus, const char *path, const char *interface, vo
+ 
+         return 1;
+ }
++
++#ifdef SYSTEMD_NETWORKD_DBUS
++static int method_set_address (sd_bus_message *m, void* userdata, sd_bus_error *error)
++{
++    _cleanup_address_free_ Address *addr = NULL;
++    _cleanup_route_free_ Route *rt = NULL;
++    unsigned char family;
++    unsigned char prefixlen;
++    unsigned char flags;
++    unsigned char scope;
++    unsigned char index;
++    const char* ipaddr;
++    const char* netmask;
++    const char* gateway;
++    struct in_addr nm;
++    struct in_addr ip;
++    struct in_addr gw;
++    Manager *mgr = userdata;
++    Link* link = NULL;
++    int r;
++
++    assert(m);
++    assert(mgr);
++
++    r = sd_bus_message_read (m, "yssyyys", &index, &ipaddr, &netmask, &family, &flags, &scope, &gateway);
++    if (r < 0)
++        return r;
++
++    if (isempty (ipaddr))
++        return sd_bus_error_setf(error, SD_BUS_ERROR_INVALID_ARGS, "Invalid IP Address '%s'", ipaddr);
++
++    if (isempty (netmask))
++        return sd_bus_error_setf(error, SD_BUS_ERROR_INVALID_ARGS, "Invalid IP Netmask '%s'", netmask);
++
++    inet_aton (netmask, &nm);
++    inet_aton (ipaddr, &ip);
++    inet_aton (gateway, &gw);
++
++    prefixlen = in_addr_netmask_to_prefixlen(&nm);
++
++    r = address_new_dynamic(&addr);
++    if (r < 0)
++        return sd_bus_error_setf(error, SD_BUS_ERROR_NO_MEMORY, "Error allocating new address");
++
++    r = link_get (mgr, index, &link);
++    if (r == -ENODEV)
++        return sd_bus_error_setf(error, SD_BUS_ERROR_BAD_ADDRESS, "No such Device at index ['%d'].", index);
++    else if (r < 0)
++        return sd_bus_error_setf(error, SD_BUS_ERROR_BAD_ADDRESS, "Unknown Device error at index ['%d'].", index);
++
++    r = link_initialized (link, link->udev_device);
++    if (r < 0)
++        /*return sd_bus_error_setf(error, SD_BUS_ERROR_IO_ERROR, "Device ['%s'] not ready.", link->udev_device->device->devpath);*/
++        return sd_bus_error_setf(error, SD_BUS_ERROR_IO_ERROR, "Device not ready.");
++
++    addr->family = AF_INET;
++    addr->in_addr.in.s_addr = ip.s_addr;
++    addr->prefixlen = prefixlen;
++    addr->broadcast.s_addr = ip.s_addr | ~nm.s_addr;
++
++    /* FIXME: Save default gateway in link->network->static_routes */
++    r = route_new_dynamic(&rt, RTPROT_STATIC);
++    if (r < 0)
++        return r;
++
++    rt->protocol = RTPROT_STATIC;
++    rt->network = link->network;
++    rt->family = family;
++    rt->scope = RT_SCOPE_LINK;
++    rt->dst_prefixlen = 32; /* FIXME: AF_INET assumed */
++    rt->dst_addr.in = gw;
++    /*rt->gw = defgw;*/
++
++    LIST_PREPEND(routes, link->network->static_routes, rt);
++
++    /* send an nlmsg (RTM_NEWADDR) and append address to link address list */
++    r = address_update (addr, link, network_address_added_handler);
++    if (r < 0)
++        return r;
++
++    return 0;
++}
++#endif
+diff --git a/src/network/networkd-network.c b/src/network/networkd-network.c
+index 6587ea9..8a38050 100644
+--- a/src/network/networkd-network.c
++++ b/src/network/networkd-network.c
+@@ -32,6 +32,14 @@
+ #include "network-internal.h"
+ #include "dns-domain.h"
+ 
++#define SYSTEMD_NETWORKD_DBUS 1
++
++#ifdef SYSTEMD_NETWORKD_DBUS
++int network_address_added_handler (sd_netlink* rtnl, sd_netlink_message* m, void* userdata);
++int network_set_gateway (Link* link);
++static int route_handler(sd_netlink *rtnl, sd_netlink_message *m, void *userdata);
++#endif
++
+ static int network_load_one(Manager *manager, const char *filename) {
+         _cleanup_network_free_ Network *network = NULL;
+         _cleanup_fclose_ FILE *file = NULL;
+@@ -850,3 +858,80 @@ int config_parse_hostname(const char *unit,
+ 
+         return 0;
+ }
++
++#ifdef SYSTEMD_NETWORKD_DBUS
++int network_address_added_handler (sd_netlink* rtnl, sd_netlink_message* m, void* userdata)
++{
++        _cleanup_link_unref_ Link *link = userdata;
++        int r;
++
++        assert(link);
++
++        r = sd_netlink_message_get_errno(m);
++        if (r < 0 && r != -EEXIST) {
++                log_debug("Error in set IP address!");
++                link_enter_failed(link);
++        } else if (r >= 0)
++                link_rtnl_process_address(rtnl, m, link->manager);
++
++	network_set_gateway (link);
++
++	return 1;
++}
++
++/* link_enter_set_routes */
++int network_set_gateway (Link* link)
++{
++        Route *rt;
++        int r;
++
++        assert(link);
++        assert(link->network);
++        assert(link->state == LINK_STATE_SETTING_ADDRESSES);
++
++        link->state = LINK_STATE_SETTING_ROUTES;
++
++        LIST_FOREACH(routes, rt, link->network->static_routes) {
++                r = route_configure(rt, link, &route_handler);
++                if (r < 0) {
++                        log_debug ("Could not set Gateway!");
++                        link_enter_failed(link);
++                        return r;
++                }
++
++                link->link_messages ++;
++        }
++
++        if (link->link_messages == 0) {
++                link->static_configured = true;
++                /*link_check_ready(link);*/
++        } else
++                log_debug("Setting Gateway");
++
++        return 0;
++}
++
++static int route_handler(sd_netlink *rtnl, sd_netlink_message *m, void *userdata) {
++        _cleanup_link_unref_ Link *link = userdata;
++        int r;
++
++        assert(link);
++        assert(link->dhcp4_messages);
++
++        link->dhcp4_messages --;
++
++        r = sd_netlink_message_get_errno(m);
++        if (r < 0 && r != -EEXIST) {
++                log_debug ("Could not set route! ");
++                link_enter_failed(link);
++        }
++
++        if (!link->dhcp4_messages) {
++                link->dhcp4_configured = true;
++                /*link_check_ready(link);*/
++        }
++
++        return 1;
++}
++
++#endif
+-- 
+1.8.2.2
+
