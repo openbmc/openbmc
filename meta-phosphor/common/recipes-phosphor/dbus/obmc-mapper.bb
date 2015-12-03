@@ -16,9 +16,7 @@ RDEPENDS_${PN} += " \
         python-dbus \
         python-pygobject \
         "
-SRC_URI += " \
-        git://github.com/openbmc/phosphor-objmgr \
-        "
+SRC_URI += "git://github.com/openbmc/phosphor-objmgr"
 
 SRCREV = "3f7aa329568d8f191baeeefa4a63dbb19cf26338"
 
