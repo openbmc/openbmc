@@ -17,9 +17,7 @@ RDEPENDS_${PN} += " \
 	python-rocket \
 	python-bottle \
         "
-SRC_URI += " \
-        git://github.com/openbmc/phosphor-rest-server \
-        "
+SRC_URI += "git://github.com/openbmc/phosphor-rest-server"
 
 SRCREV = "34cae732597fb3d4b18a23b6494efdbfeca2033b"
 
