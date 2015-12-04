@@ -12,7 +12,7 @@ inherit obmc-phosphor-c-daemon
 
 SRC_URI += "git://github.com/openbmc/phosphor-event"
 
-SRCREV = "bebdb23ea092df6cde23e6da2a8940bd84de4810"
+SRCREV = "aa9ec3aa2cc59fc7e2437041d89b19f4a8f1d7f0"
 
 RDEPENDS_${PN} += "libsystemd"
 DEPENDS += "systemd"
