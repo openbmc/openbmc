@@ -6,7 +6,7 @@ def run_git(d, cmd):
                 pass
 
 python() {
-        version_id = run_git(d, 'tag')
+        version_id = run_git(d, 'describe --abbrev=0')
         if version_id:
                 d.setVar('VERSION_ID', version_id)
 
@@ -16,3 +16,4 @@ python() {
 }
 
 OS_RELEASE_FIELDS_append = " BUILD_ID"
+do_compile[nostamp] = "1"
