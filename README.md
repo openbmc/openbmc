@@ -10,7 +10,8 @@ somewhere to hold the build.  This directory will get big.
 
 To start a build:
 
+```
     cd <builddir>
     . <repodir>/openbmc-env
     bitbake obmc-phosphor-image
-
+```
