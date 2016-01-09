@@ -16,6 +16,7 @@ RDEPENDS_${PN} += " \
 	obmc-mapper \
 	python-rocket \
 	python-bottle \
+	python-spwd \
         "
 SRC_URI += "git://github.com/openbmc/phosphor-rest-server"
 
