@@ -27,6 +27,7 @@ RDEPENDS_packagegroup-obmc-phosphor-apps-extras = " \
         rest-dbus \
 	obmc-rest \
         host-ipmid \
+        ipmi-fru-parser \
         "
 
 SUMMARY_packagegroup-obmc-phosphor-apps-fan-mgmt = "Fan management support"
