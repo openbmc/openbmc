@@ -1,0 +1,35 @@
+From 6f72f95d593a68f055e8edb46047cb5c0e9906b4 Mon Sep 17 00:00:00 2001
+From: "Milton D. Miller II" <miltonm@us.ibm.com>
+Date: Wed, 13 Jan 2016 08:37:42 -0600
+Subject: [PATCH] rtc: aspeed month is off-by-one
+
+Norm reported hwclock set the date one hour different from what it
+read back.
+
+The mktime64 call takes the month as the 1-based counted month not
+the 0-based months since January like struct rtc_tm and struct tm.
+No adjustment from the harware is needed.  Also mask off a few 0 bits.
+
+Reported-by: Norman James <nkskjames@gmail.com>
+Signed-off-by: Milton Miller <miltonm@us.ibm.com>
+---
+ drivers/rtc/rtc-aspeed.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/rtc/rtc-aspeed.c b/drivers/rtc/rtc-aspeed.c
+index cfb5ee0..1a5bbd1 100644
+--- a/drivers/rtc/rtc-aspeed.c
++++ b/drivers/rtc/rtc-aspeed.c
+@@ -48,8 +48,7 @@ static int aspeed_rtc_read_time(struct device *dev, struct rtc_time *tm)
+ 	sec  = (reg1 >>  0) & 0x3f;
+ 	cent = (reg2 >> 16) & 0x1f;
+ 	year = (reg2 >>  8) & 0x7f;
+-	/* struct rtc_time counts from 0 to 11, but hardware is 1 to 12 */
+-	mon  = ((reg2 >>  0) & 0x3f) - 1;
++	mon  = (reg2 >>  0) & 0xf;	/* mktime64 and hardware use 1 = Jan */
+ 
+ 	rtc_time64_to_tm(mktime64(cent*100 + year, mon, day, hour, min, sec),
+ 			 tm);
+-- 
+1.8.2.2
+
