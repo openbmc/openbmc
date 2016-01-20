@@ -1,0 +1,147 @@
+Add spi flash to aspeed dts
+From: Milton Miller II <miltonm@us.ibm.com>
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-opp-barreleye.dts b/arch/arm/boot/dts/aspeed-bmc-opp-barreleye.dts
+index 4d1a215..34daec6 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-opp-barreleye.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-opp-barreleye.dts
+@@ -6,6 +6,67 @@
+ 	model = "Barrelye BMC";
+ 	compatible = "rackspace,barreleye-bmc", "aspeed,ast2400";
+ 	ahb {
++		fmc@1e620000 {
++			reg = < 0x1e620000 0x94
++				0x20000000 0x02000000 >;
++			#address-cells = <1>;
++			#size-cells = <0>;
++			compatible = "aspeed,fmc";
++			bmc {
++				reg = < 0 >;
++				compatible = "jedec,spi-nor" ;
++				label = "bmc";
++				/*
++				 * Possibly required props:
++				 * spi-max-frequency = <>
++				 * spi-tx-bus-width = <>
++				 * spi-rx-bus-width  = <>
++				 * m25p,fast-read
++				 * spi-cpol if inverse clock polarity (CPOL)
++				 * spi-cpha if shifted clock phase (CPHA)
++				 */
++				#address-cells = < 1 >;
++				#size-cells = < 1 >;
++				u-boot {
++					reg = < 0 0x60000 >;
++					label = "u-boot";
++				};
++				u-boot-env {
++					reg = < 0x60000 0x20000 >;
++					label = "u-boot-env";
++				};
++				kernel  {
++					reg = < 0x80000 0x280000 >;
++					label = "kernel";
++				};
++				initramfs {
++					reg = < 0x300000 0x1c0000 >;
++					label = "initramfs";
++				};
++				rofs  {
++					reg = < 0x4c0000 0x1740000 >;
++					label = "rofs";
++				};
++				rwfs  {
++					reg = < 0x1c00000 0x400000 >;
++					label = "rwfs";
++				};
++			};
++		};
++		spi@1e630000 {
++			reg = < 0x1e630000 0x18
++				0x30000000 0x02000000 >;
++			#address-cells = <1>;
++			#size-cells = <0>;
++			compatible = "aspeed,smc";
++			pnor {
++				reg = < 0 >;
++				compatible = "jedec,spi-nor" ;
++				label = "pnor";
++				/* spi-max-frequency = <>; */
++				/* m25p,fast-read; */
++			};
++		};
+ 		apb {
+ 			i2c: i2c@1e78a040 {
+ 				i2c0: i2c-bus@40 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-opp-palmetto.dts b/arch/arm/boot/dts/aspeed-bmc-opp-palmetto.dts
+index 2c3e824..d864119 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-opp-palmetto.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-opp-palmetto.dts
+@@ -7,6 +7,67 @@
+ 	compatible = "tyan,palmetto-bmc", "aspeed,ast2400";
+ 
+ 	ahb {
++		fmc@1e620000 {
++			reg = < 0x1e620000 0x94
++				0x20000000 0x02000000 >;
++			#address-cells = <1>;
++			#size-cells = <0>;
++			compatible = "aspeed,fmc";
++			bmc {
++				reg = < 0 >;
++				compatible = "jedec,spi-nor" ;
++				label = "bmc";
++				/*
++				 * Possibly required props:
++				 * spi-max-frequency = <>
++				 * spi-tx-bus-width = <>
++				 * spi-rx-bus-width  = <>
++				 * m25p,fast-read
++				 * spi-cpol if inverse clock polarity (CPOL)
++				 * spi-cpha if shifted clock phase (CPHA)
++				 */
++				#address-cells = < 1 >;
++				#size-cells = < 1 >;
++				u-boot {
++					reg = < 0 0x60000 >;
++					label = "u-boot";
++				};
++				u-boot-env {
++					reg = < 0x60000 0x20000 >;
++					label = "u-boot-env";
++				};
++				kernel  {
++					reg = < 0x80000 0x280000 >;
++					label = "kernel";
++				};
++				initramfs {
++					reg = < 0x300000 0x1c0000 >;
++					label = "initramfs";
++				};
++				rofs  {
++					reg = < 0x4c0000 0x1740000 >;
++					label = "rofs";
++				};
++				rwfs  {
++					reg = < 0x1c00000 0x400000 >;
++					label = "rwfs";
++				};
++			};
++		};
++		spi@1e630000 {
++			reg = < 0x1e630000 0x18
++				0x30000000 0x02000000 >;
++			#address-cells = <1>;
++			#size-cells = <0>;
++			compatible = "aspeed,smc";
++			pnor {
++				reg = < 0 >;
++				compatible = "jedec,spi-nor" ;
++				label = "pnor";
++				/* spi-max-frequency = <>; */
++				/* m25p,fast-read; */
++			};
++		};
+ 		apb {
+ 			i2c: i2c@1e78a040 {
+ 				i2c0: i2c-bus@40 {
