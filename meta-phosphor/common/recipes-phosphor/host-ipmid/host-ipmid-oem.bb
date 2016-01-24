@@ -10,6 +10,7 @@ inherit obmc-phosphor-license
 DEPENDS += "systemd    \
 		 	host-ipmid \
 		 	"
+TARGET_CFLAGS += "-fpic"
 
 
 RDEPENDS_${PN} += "libsystemd"

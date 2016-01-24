@@ -14,7 +14,7 @@ DEPENDS += "systemd    \
 
 RDEPENDS_${PN} += "libsystemd"
 
-TARGET_CFLAGS += "-std=gnu++14"
+TARGET_CFLAGS += " -fpic -std=gnu++14"
 
 SRC_URI += "git://github.com/openbmc/ipmi-fru-parser"
 
