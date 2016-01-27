@@ -2,6 +2,7 @@
 Description=Phosphor OpenBMC chassis management daemon
 
 [Service]
+Restart=always
 ExecStart=/usr/sbin/obmc-phosphor-chassisd
 
 [Install]
