@@ -2,6 +2,7 @@
 Description=Phosphor OpenBMC IPMI daemon
 
 [Service]
+Restart=always
 ExecStart=/usr/sbin/ipmid
 
 [Install]

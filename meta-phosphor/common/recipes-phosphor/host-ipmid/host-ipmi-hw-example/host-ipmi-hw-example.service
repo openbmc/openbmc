@@ -2,6 +2,7 @@
 Description=Phosphor OpenBMC host IPMI to DBUS example implementation
 
 [Service]
+Restart=always
 ExecStart=/usr/sbin/host-ipmi-hw
 
 [Install]
