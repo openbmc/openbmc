@@ -2,6 +2,7 @@
 Description=Phosphor OpenBMC DBus service management daemon
 
 [Service]
+Restart=always
 Type=dbus
 ExecStart=/usr/sbin/phosphor-mapper
 BusName=org.openbmc.objectmapper

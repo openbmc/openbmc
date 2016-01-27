@@ -2,6 +2,7 @@
 Description=Phosphor OpenBMC event management daemon
 
 [Service]
+Restart=always
 ExecStart=/usr/sbin/obmc-phosphor-eventd -s 200000 -t 128
 
 [Install]
