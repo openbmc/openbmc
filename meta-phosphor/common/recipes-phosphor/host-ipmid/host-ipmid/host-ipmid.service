@@ -4,6 +4,7 @@ Wants=clear-once.service
 After=clear-once.service
 
 [Service]
+Restart=always
 ExecStart=/usr/sbin/ipmid
 
 [Install]

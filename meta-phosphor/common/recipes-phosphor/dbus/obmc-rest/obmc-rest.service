@@ -4,6 +4,7 @@ Requires=obmc-mapper.service
 After=obmc-mapper.service
 
 [Service]
+Restart=always
 ExecStart=/usr/sbin/obmc-rest
 
 [Install]

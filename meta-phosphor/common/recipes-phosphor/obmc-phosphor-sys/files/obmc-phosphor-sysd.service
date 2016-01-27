@@ -2,6 +2,7 @@
 Description=Phosphor OpenBMC system management daemon
 
 [Service]
+Restart=always
 ExecStart=/usr/sbin/obmc-phosphor-sysd
 
 [Install]
