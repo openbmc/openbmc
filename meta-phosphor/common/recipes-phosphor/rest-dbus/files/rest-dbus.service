@@ -2,6 +2,7 @@
 Description=DBUS introspecting REST server.
 
 [Service]
+Restart=always
 ExecStart=/usr/sbin/rest-dbus
 
 [Install]

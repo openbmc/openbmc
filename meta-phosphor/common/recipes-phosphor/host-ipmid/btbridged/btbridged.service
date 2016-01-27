@@ -2,6 +2,7 @@
 Description=Phosphor OpenBMC BT to DBUS
 
 [Service]
+Restart=always
 ExecStart=/usr/sbin/btbridged
 
 [Install]
