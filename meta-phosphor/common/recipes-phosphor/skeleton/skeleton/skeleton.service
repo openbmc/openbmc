@@ -2,6 +2,7 @@
 Description=Temp placeholder for skeleton function
 
 [Service]
+Restart=always
 ExecStart=/usr/sbin/system_manager.py Palmetto
 
 [Install]

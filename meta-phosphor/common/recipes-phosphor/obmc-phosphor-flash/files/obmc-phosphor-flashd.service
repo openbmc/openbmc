@@ -2,6 +2,7 @@
 Description=Phosphor OpenBMC flash management daemon
 
 [Service]
+Restart=always
 ExecStart=/usr/sbin/obmc-phosphor-flashd
 
 [Install]
