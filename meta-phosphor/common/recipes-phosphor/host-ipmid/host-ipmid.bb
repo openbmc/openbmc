@@ -12,6 +12,9 @@ inherit obmc-phosphor-license
 inherit obmc-phosphor-sdbus-service
 inherit obmc-phosphor-c-daemon
 
+TARGET_CFLAGS   += "-fpic"
+
+
 SRC_URI += "git://github.com/openbmc/phosphor-host-ipmid"
 
 SRCREV = "e90d8bf6a342649dba2fd1589a3cddb3cd051bb1"
