@@ -17,7 +17,6 @@ SRC_URI = "http://matt.ucc.asn.au/dropbear/releases/dropbear-${PV}.tar.bz2 \
            file://0003-configure.patch \
            file://0004-fix-2kb-keys.patch \
            file://0007-dropbear-fix-for-x32-abi.patch \
-           file://0010-stop-robot-test-SSHLibrary-from-hanging.patch \
            file://init \
            file://dropbearkey.service \
            file://dropbear@.service \
