@@ -29,6 +29,13 @@ findmtd() {
 	echo $m
 }
 
+env=$(findmtd u-boot-env)
+if test -n $env
+then
+	ln -s /dev/$env /run/mtd:u-boot-env
+	cp /run/mtd:u-boot-env /run/fw_env
+fi
+
 rofs=$(findmtd rofs)
 rwfs=$(findmtd rwfs)
 
