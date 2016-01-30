@@ -1,0 +1,10 @@
+[Unit]
+Description=Settings DBUS Object
+Requires=skeleton.service
+After=skeleton.service
+
+[Service]
+ExecStart=/usr/sbin/settings_manager.py
+
+[Install]
+WantedBy=multi-user.target
