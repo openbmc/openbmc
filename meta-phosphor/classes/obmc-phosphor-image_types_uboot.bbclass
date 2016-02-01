@@ -65,4 +65,13 @@ do_generate_flash() {
        dstlink="${ddir}/${FLASH_IMAGE_LINK}"
        rm -rf $dstlink
        ln -sf ${FLASH_IMAGE_NAME} $dstlink
+
+       ln -sf ${FLASH_IMAGE_NAME} ${ddir}/image-bmc
+       ln -sf ${uboot} ${ddir}/image-u-boot
+       ln -sf ${kernel} ${ddir}/image-kernel
+       ln -sf ${uinitrd} ${ddir}/image-initramfs
+       ln -sf ${rootfs} ${ddir}/image-rofs
+
+       tar -h -cvf ${ddir}/${MACHINE}-${DATETIME}.all.tar -C ${ddir} image-bmc
+       tar -h -cvf ${ddir}/${MACHINE}-${DATETIME}.tar -C ${ddir} image-u-boot image-kernel image-initramfs image-rofs
 }
