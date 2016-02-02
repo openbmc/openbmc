@@ -13,10 +13,10 @@ inherit obmc-phosphor-sensor-mgmt
 inherit obmc-phosphor-system-mgmt
 
 DEPENDS += "glib-2.0"
-RDEPENDS_${PN} += "python-subprocess python-tftpy"
+RDEPENDS_${PN} += "python-subprocess python-compression"
 SRC_URI += "git://github.com/openbmc/skeleton"
 
-SRCREV = "abe4953f941f63b4a3f531af15f6dba68870f3a9"
+SRCREV = "695f5d12e33daece376ddf1f9c7041a5bd6a3c7d"
 
 S = "${WORKDIR}"
 

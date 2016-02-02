@@ -18,7 +18,7 @@ RDEPENDS_${PN} += "settings"
 RDEPENDS_${PN} += "network"
 SRC_URI += "git://github.com/openbmc/phosphor-host-ipmid"
 
-SRCREV = ""
+SRCREV = "83edabb0e05fd71d4905ef255e97f65d966c6e7e"
 
 S = "${WORKDIR}/git"
 INSTALL_NAME = "ipmid"
