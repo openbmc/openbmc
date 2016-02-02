@@ -8,7 +8,9 @@ inherit obmc-phosphor-systemd
 
 RDEPENDS_${PN} += "python-dbus python-pygobject"
 
-SRC_URI += "git://github.com/openbmc/phosphor-networkd"
+SRC_URI += "git://github.com/openbmc/phosphor-networkd \
+            file://80-dhcp.network \
+            "
 
 SRCREV = "a657afc9cc76dc6678edb8de9df569f92dd108e1"
 
@@ -17,5 +19,7 @@ S = "${WORKDIR}/git"
 do_install() {
         install -d ${D}/${sbindir}
         install ${S}/netman.py ${D}/${sbindir}
+        install -d ${D}/etc/systemd/network/
+        install ${WORKDIR}/80-dhcp.network ${D}/etc/systemd/network/
 }
 
