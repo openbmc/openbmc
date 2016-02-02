@@ -10,7 +10,7 @@ SRC_URI = "git://github.com/openbmc/linux;protocol=git;branch=${KBRANCH}"
 LINUX_VERSION ?= "4.3"
 LINUX_VERSION_EXTENSION ?= "-${SRCREV}"
 
-SRCREV="openbmc-20160202-1"
+SRCREV="openbmc-20160202-2"
 
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
