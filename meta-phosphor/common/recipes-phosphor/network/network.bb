@@ -12,7 +12,7 @@ SRC_URI += "git://github.com/openbmc/phosphor-networkd \
             file://80-dhcp.network \
             "
 
-SRCREV = "a657afc9cc76dc6678edb8de9df569f92dd108e1"
+SRCREV = "6b3d6af5b9c38d734f20e859394db275e141328e"
 
 S = "${WORKDIR}/git"
 
