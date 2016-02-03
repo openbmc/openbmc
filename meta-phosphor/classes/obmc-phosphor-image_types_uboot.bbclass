@@ -71,7 +71,8 @@ do_generate_flash() {
        ln -sf ${kernel} ${ddir}/image-kernel
        ln -sf ${uinitrd} ${ddir}/image-initramfs
        ln -sf ${rootfs} ${ddir}/image-rofs
+       ln -sf ${rwfs} ${ddir}/image-rwfs
 
        tar -h -cvf ${ddir}/${MACHINE}-${DATETIME}.all.tar -C ${ddir} image-bmc
-       tar -h -cvf ${ddir}/${MACHINE}-${DATETIME}.tar -C ${ddir} image-u-boot image-kernel image-initramfs image-rofs
+       tar -h -cvf ${ddir}/${MACHINE}-${DATETIME}.tar -C ${ddir} image-u-boot image-kernel image-initramfs image-rofs image-rwfs
 }
