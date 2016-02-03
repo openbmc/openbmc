@@ -17,6 +17,12 @@ RDEPENDS_${PN} += " \
 	python-rocket \
 	python-bottle \
 	python-spwd \
+        python-gevent \
+        python-mime \
+        python-pprint \
+        python-re \
+        python-tblib \
+        python-ctypes \
         "
 SRC_URI += "git://github.com/openbmc/phosphor-rest-server"
 
