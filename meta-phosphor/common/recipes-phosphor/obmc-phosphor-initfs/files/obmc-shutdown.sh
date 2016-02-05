@@ -34,14 +34,13 @@ fi
 
 if test -x /update && ls $image* > /dev/null 2>&1
 then
-	exec /update ${1+"$@"}
+	/update ${1+"$@"}
 fi
 
 echo Remaining mounts:
 cat /proc/mounts
 
 test "umount_proc" && umount /proc && rmdir /proc
-
 
 
 # Execute the command systemd told us to ...
