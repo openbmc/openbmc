@@ -92,19 +92,12 @@ then
 	umount $rwdir
 fi
 
-# Execute the command systemd told us to ...
-if test -d /oldroot && test -x "/sbin/$1" && test -f "/sbin/$1"
-then
-	if test "$1" == kexec
-	then
-		/sbin/$1 -f -e
-	else
-		/sbin/$1 -f
-	fi
-fi
+exit
 
+# NOT REACHED without edit
+# NOT REACHED without edit
 
-echo "Execute ${1-reboot} -f if all is ok"
+echo "Flash completed.  Inspect, cleanup and reboot -f to continue."
 
 export PS1=update-sh#\ 
 exec /bin/sh
