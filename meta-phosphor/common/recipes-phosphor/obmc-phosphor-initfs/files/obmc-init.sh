@@ -1,12 +1,13 @@
 #!/bin/sh
 
+fslist="proc sys dev run"
 rodir=run/initramfs/ro
 rwdir=run/initramfs/rw
 upper=$rwdir/cow
 work=$rwdir/work
 
 cd /
-mkdir -p sys proc dev run
+mkdir -p $fslist
 mount dev dev -tdevtmpfs
 mount sys sys -tsysfs
 mount proc proc -tproc
@@ -39,13 +40,20 @@ fi
 rofs=$(findmtd rofs)
 rwfs=$(findmtd rwfs)
 
+rodev=/dev/mtdblock${rofs#mtd}
+rwdev=/dev/mtdblock${rwfs#mtd}
+
 rofst=squashfs
 rwfst=ext4
+roopts=ro
+rwopts=rw
+
+init=/sbin/init
 
 echo rofs = $rofs $rofst   rwfs = $rwfs $rwfst
 
 if grep -w debug-init-sh /proc/cmdline ||
-	! mount -o rw /dev/mtdblock${rwfs#mtd} $rwdir -t $rwfst
+	! mount $rwdev $rwdir -t $rwfst -o $rwopts
 then
 	echo Please mount the rw file system on $rwdir from this shell
 	while ! sulogin && ! test -f /takeover
@@ -61,7 +69,7 @@ then
 	exec /bin/sh
 fi
 
-mount -o ro /dev/mtdblock${rofs#mtd} $rodir -t $rofst
+mount $rodev $rodir -t $rofst -o $roopts
 
 rm -rf $work
 mkdir -p $upper
@@ -69,18 +77,18 @@ mkdir -p $work
 
 mount -t overlay -o lowerdir=$rodir,upperdir=$upper,workdir=$work cow /root
 
-if ! chroot /root /bin/sh -c "test -x /sbin/init -a -s /sbin/init"
+if ! chroot /root /bin/sh -c "test -x '$init' -a -s '$init'"
 then
 	echo "Unable to confirm /sbin/init is an executable non-empty file."
 	echo "Change Root test failed!  Invoking emergency shell."
 	PS1=rescue#\  sulogin
 fi
 
-for f in sys dev proc run
+for f in $fslist
 do
 	mount --move $f root/$f
 done
 
-# switch_root /root /sbin/init
-exec chroot /root /sbin/init
+# switch_root /root $init
+exec chroot /root $init
 

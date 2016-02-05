@@ -35,30 +35,35 @@ findmtd() {
 	echo $m
 }
 
-rofs=$(findmtd rofs)
 rwfs=$(findmtd rwfs)
 
-rofst=squahsfs
+rwdev=/dev/mtdblock${rwfs#mtd}
 rwfst=ext4
+rwopts=rw
+rorwopts=ro${rwopts#rw}
+
+rwdir=rw
+upper=$rwdir/cow
+save=save/${upper##*/}
 
 if test -n "$rwfs" && test -s whitelist
 then
 
-	mkdir -p rw
-	mount /dev/mtdblock${rwfs#mtd} rw -oro -t $rwfst
+	mkdir -p $rwdir
+	mount $rwdev $rwdir -t $rwfst -o $rorwopts
 
 	while read f
 	do
-		if ! test -e rw/cow/$f
+		if ! test -e $upper/$f
 		then
 			continue
 		fi
-		d="save/cow/$f"
+		d="$save/$f"
 		mkdir -p "${d%/*}"
-		cp -rp rw/cow/$f "${d%/*}/"
+		cp -rp $upper/$f "${d%/*}/"
 	done < whitelist
 
-	umount rw
+	umount $rwdir
 fi
 
 image=/run/initramfs/image-
@@ -67,7 +72,7 @@ do
 	m=$(findmtd ${f#$image})
 	if test -z "$m"
 	then
-		echo 1>&2  "Unable to find mtd partiton for $f"
+		echo 1>&2  "Unable to find mtd partiton for ${f##*/}."
 		exec /bin/sh
 	fi
 done
@@ -80,12 +85,11 @@ do
 	flashcp -v $f /dev/$m
 done
 
-
-if test -d save/cow
+if test -d $save
 then
-	mount /dev/mtdblock${rwfs#mtd} rw -o rw -t $rwfst
-	cp -rp save/cow/. rw/cow/
-	umount rw
+	mount $rwdev $rwdir -t $rwfst -o $rwopts
+	cp -rp $save/. $upper/
+	umount $rwdir
 fi
 
 # Execute the command systemd told us to ...
