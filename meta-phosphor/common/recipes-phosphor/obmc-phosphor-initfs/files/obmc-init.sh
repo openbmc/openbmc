@@ -69,9 +69,9 @@ mkdir -p $work
 
 mount -t overlay -o lowerdir=$rodir,upperdir=$upper,workdir=$work cow /root
 
-if ! chroot /root /bin/sh -c exit
+if ! chroot /root /bin/sh -c "test -x /sbin/init -a -s /sbin/init"
 then
-	echo 'chroot test failed; invoking emergency shell.'
+	echo "Change Root test failed!  Invoking emergency shell."
 	PS1=rescue#\  sulogin
 fi
 

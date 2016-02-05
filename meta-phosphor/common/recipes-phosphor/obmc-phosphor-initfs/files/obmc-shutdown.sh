@@ -5,10 +5,11 @@ echo shutdown: "$@"
 export PS1=shutdown-sh#\ 
 # exec bin/sh
 
+cd /
 if [ ! -e /proc/mounts ]
 then
 	mkdir -p /proc
-	mount  proc proc -tproc
+	mount  proc /proc -tproc
 	umount_proc=1
 else
 	umount_proc=
@@ -27,10 +28,10 @@ set +x
 if test -s /run/fw_env -a -c /run/mtd:u-boot-env -a ! -e /image-u-boot-env &&
 	! cmp /run/mtd:u-boot-env /run/fw_env
 then
-	ln -s /run/fw_env /image-u-boot-env
+	ln -sn /run/fw_env /image-u-boot-env
 fi
 
-if test -x /update && ls image-* > /dev/null 2>&1
+if test -x /update && ls /image-* > /dev/null 2>&1
 then
 	exec /update ${1+"$@"}
 fi
