@@ -27,7 +27,7 @@ set +x
 if test -s /run/fw_env -a -c /run/mtd:u-boot-env -a ! -e /image-u-boot-env &&
 	! cmp /run/mtd:u-boot-env /run/fw_env
 then
-	ln -s /run/fw_env /image-u-boot-env
+	ln -sn /run/fw_env /image-u-boot-env
 fi
 
 if test -x /update && ls image-* > /dev/null 2>&1
