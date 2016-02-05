@@ -61,10 +61,10 @@ then
 	umount rw
 fi
 
-
-for f in image-*
+image=/run/initramfs/image-
+for f in $image*
 do
-	m=$(findmtd ${f#image-})
+	m=$(findmtd ${f#$image})
 	if test -z "$m"
 	then
 		echo 1>&2  "Unable to find mtd partiton for $f"
@@ -72,10 +72,10 @@ do
 	fi
 done
 
-for f in image-*
+for f in $image*
 do
-	m=$(findmtd ${f#image-})
-	echo "Updating ${f#image-}"
+	m=$(findmtd ${f#$image})
+	echo "Updating ${f#$image}..."
 	# flasheraseall /dev/$m && dd if=$f of=/dev/$m
 	flashcp -v $f /dev/$m
 done
