@@ -15,11 +15,16 @@ else
 	umount_proc=
 fi
 
-# remove an empty oldroot, that means we are not invoked from systemd-shutdown
+# Remove an empty oldroot, that means we are not invoked from systemd-shutdown
 rmdir /oldroot 2>/dev/null
 
+# Move /oldroot/run to /mnt in case it has the underlying rofs loop mounted.
+# Ordered before /oldroot the overlay is unmounted before the loop mount
+mkdir -p /mnt
+mount --move /oldroot/run /mnt
+
 set -x
-for f in $( awk '/oldroot/ { print $2 }' < /proc/mounts | sort -r )
+for f in $( awk '/oldroot|mnt/ { print $2 }' < /proc/mounts | sort -r )
 do
 	umount $f
 done
