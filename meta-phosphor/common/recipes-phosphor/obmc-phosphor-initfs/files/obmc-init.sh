@@ -30,6 +30,34 @@ findmtd() {
 	echo $m
 }
 
+debug_takeover() {
+	echo "$@"
+	test -n "$@" && echo Enter password to try to manually fix.
+	cat << HERE
+After fixing run exit to continue this script, or reboot -f to retry, or
+touch /takeover and exit to become PID 1 allowing editing of this script.
+HERE
+
+	while ! sulogin && ! test -f /takeover
+	do
+		echo getty failed, retrying
+	done
+
+	# Touch /takeover in the above getty to become pid 1
+	if test -e /takeover
+	then
+		cat << HERE
+
+Takeover of init requested.  Executing /bin/sh as PID 1.
+When finished exec new init or cleanup and run reboot -f.
+
+Warning: No job control!  Shell exit will panic the system!
+HERE
+		export PS1=init#\ 
+		exec /bin/sh
+	fi
+}
+
 env=$(findmtd u-boot-env)
 if test -n $env
 then
@@ -52,21 +80,20 @@ init=/sbin/init
 
 echo rofs = $rofs $rofst   rwfs = $rwfs $rwfst
 
-if grep -w debug-init-sh /proc/cmdline ||
-	! mount $rwdev $rwdir -t $rwfst -o $rwopts
+if grep -w debug-init-sh /proc/cmdline
 then
-	echo Please mount the rw file system on $rwdir from this shell
-	while ! sulogin && ! test -f /takeover
-	do
-		echo getty failed, retrying
-	done
+	debug_takeover "Debug initial shell requested by command line."
 fi
 
-# Touch /takeover in the above getty to become pid 1
-if test -e /takeover
+if ! mount $rwdev $rwdir -t $rwfst -o $rwopts
 then
-	export PS1=init#\ 
-	exec /bin/sh
+	msg="$(cat)" << HERE
+
+Mounting read-write $rwdev filesystem failed.  Please fix and run
+	mount $rwdev $rwdir -t $rwfs -o $rwopts
+to to continue, or do change nothing to run from RAM for this boot.
+HERE
+	debug_takeover "$msg"
 fi
 
 mount $rodev $rodir -t $rofst -o $roopts
@@ -77,12 +104,17 @@ mkdir -p $work
 
 mount -t overlay -o lowerdir=$rodir,upperdir=$upper,workdir=$work cow /root
 
-if ! chroot /root /bin/sh -c "test -x '$init' -a -s '$init'"
-then
-	echo "Unable to confirm /sbin/init is an executable non-empty file."
-	echo "Change Root test failed!  Invoking emergency shell."
-	PS1=rescue#\  sulogin
-fi
+while ! chroot /root /bin/sh -c "test -x '$init' -a -s '$init'"
+do
+	msg="$(cat)" << HERE
+
+Unable to confirm /sbin/init is an executable non-empty file
+in merged file system mounted at /root.
+
+Change Root test failed!  Invoking emergency shell.
+HERE
+	debug_takeover "$msg"
+done
 
 for f in $fslist
 do
