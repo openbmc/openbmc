@@ -77,12 +77,36 @@ roopts=ro
 rwopts=rw
 
 init=/sbin/init
+fsck=/sbin/fsck.$rwfst
+fsckopts=-a
 
 echo rofs = $rofs $rofst   rwfs = $rwfs $rwfst
 
 if grep -w debug-init-sh /proc/cmdline
 then
 	debug_takeover "Debug initial shell requested by command line."
+fi
+
+mount $rodev $rodir -t $rofst -o $roopts
+
+if test -x $rodir$fsck
+then
+	for fs in $fslist
+	do
+		mount --bind $fs $rodir/$fs
+	done
+	chroot $rodir $fsck $fsckopts $rwdev
+	rc=$?
+	for fs in $fslist
+	do
+		umount $rodir/$fs
+	done
+	if test $rc -gt 1
+	then
+		debug_takeover "fsck of read-write fs on $rwdev failed (rc=$rc)"
+	fi
+else
+	echo "No '$fsck' in read only fs, skipping fsck."
 fi
 
 if ! mount $rwdev $rwdir -t $rwfst -o $rwopts
@@ -96,11 +120,8 @@ HERE
 	debug_takeover "$msg"
 fi
 
-mount $rodev $rodir -t $rofst -o $roopts
-
 rm -rf $work
-mkdir -p $upper
-mkdir -p $work
+mkdir -p $upper $work
 
 mount -t overlay -o lowerdir=$rodir,upperdir=$upper,workdir=$work cow /root
 
