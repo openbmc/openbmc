@@ -35,72 +35,69 @@ findmtd() {
 	echo $m
 }
 
-rofs=$(findmtd rofs)
 rwfs=$(findmtd rwfs)
 
-rofst=squahsfs
+rwdev=/dev/mtdblock${rwfs#mtd}
 rwfst=ext4
+rwopts=rw
+rorwopts=ro${rwopts#rw}
+
+rwdir=rw
+upper=$rwdir/cow
+save=save/${upper##*/}
 
 if test -n "$rwfs" && test -s whitelist
 then
 
-	mkdir -p rw
-	mount /dev/mtdblock${rwfs#mtd} rw -oro -t $rwfst
+	mkdir -p $rwdir
+	mount $rwdev $rwdir -t $rwfst -o $rorwopts
 
 	while read f
 	do
-		if ! test -e rw/cow/$f
+		if ! test -e $upper/$f
 		then
 			continue
 		fi
-		d="save/cow/$f"
+		d="$save/$f"
 		mkdir -p "${d%/*}"
-		cp -rp rw/cow/$f "${d%/*}/"
+		cp -rp $upper/$f "${d%/*}/"
 	done < whitelist
 
-	umount rw
+	umount $rwdir
 fi
 
-
-for f in image-*
+image=/run/initramfs/image-
+for f in $image*
 do
-	m=$(findmtd ${f#image-})
+	m=$(findmtd ${f#$image})
 	if test -z "$m"
 	then
-		echo 1>&2  "Unable to find mtd partiton for $f"
+		echo 1>&2  "Unable to find mtd partiton for ${f##*/}."
 		exec /bin/sh
 	fi
 done
 
-for f in image-*
+for f in $image*
 do
-	m=$(findmtd ${f#image-})
-	echo "Updating ${f#image-}"
+	m=$(findmtd ${f#$image})
+	echo "Updating ${f#$image}..."
 	# flasheraseall /dev/$m && dd if=$f of=/dev/$m
 	flashcp -v $f /dev/$m
 done
 
-
-if test -d save/cow
+if test -d $save
 then
-	mount /dev/mtdblock${rwfs#mtd} rw -o rw -t $rwfst
-	cp -rp save/cow/. rw/cow/
-	umount rw
+	mount $rwdev $rwdir -t $rwfst -o $rwopts
+	cp -rp $save/. $upper/
+	umount $rwdir
 fi
 
-# Execute the command systemd told us to ...
-if test -d /oldroot && test -x "/sbin/$1" && test -f "/sbin/$1"
-then
-	if test "$1" == kexec
-	then
-		/sbin/$1 -f -e
-	else
-		/sbin/$1 -f
-	fi
-fi
+exit
 
+# NOT REACHED without edit
+# NOT REACHED without edit
 
-echo "Execute ${1-reboot} -f if all is ok"
+echo "Flash completed.  Inspect, cleanup and reboot -f to continue."
 
 export PS1=update-sh#\ 
 exec /bin/sh
