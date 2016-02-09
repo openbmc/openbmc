@@ -6,3 +6,4 @@
 /etc/group
 /etc/shadow
 /etc/gshadow
+/var/lib/obmc/events/
