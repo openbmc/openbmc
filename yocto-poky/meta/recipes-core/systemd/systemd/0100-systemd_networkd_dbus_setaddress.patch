@@ -1,0 +1,1209 @@
+From 4bdb01553409269f992cd3ae76f06aeebf498ade Mon Sep 17 00:00:00 2001
+From: Hariharasubramanian R <hramasub@in.ibm.com>
+Date: Thu, 4 Feb 2016 09:52:48 -0600
+Subject: [PATCH] Sprint 5 : DBus API for network address configuration
+
+---
+ src/network/networkd-link-bus.c           | 375 +++++++++++++++++++
+ src/network/networkd-network-bus.c        | 601 ++++++++++++++++++++++++++++++
+ src/network/networkd-network.c            | 108 ++++++
+ src/network/org.freedesktop.network1.conf |  20 +
+ 4 files changed, 1104 insertions(+)
+
+diff --git a/src/network/networkd-link-bus.c b/src/network/networkd-link-bus.c
+index 1a1524d..5af57e1 100644
+--- a/src/network/networkd-link-bus.c
++++ b/src/network/networkd-link-bus.c
+@@ -25,15 +25,69 @@
+ #include "networkd.h"
+ #include "networkd-link.h"
+ 
++#define SYSTEMD_NETWORKD_DBUS 1
++#define SYSTEMD_NETWORKD_DBUS_SETMAC_NETLINK 1
++
++#ifdef SYSTEMD_NETWORKD_DBUS
++/*
++#include "hostname-util.h"
++#include "network-internal.h"
++#include "networkd-link.h"
++#include "bus-util.h"
++*/
++#include <stdio.h>
++#include <linux/filter.h>
++#include <netinet/if_ether.h>
++
++#include <linux/sockios.h>
++#include <sys/socket.h>
++#include <net/if.h>
++#include <sys/types.h>
++#include <sys/wait.h>
++
++#if 0
++#include "util.h" /* bus/util.h */
++#include "sparse-endian.h" /* bus/util.h */
++#endif
++
++#include "sd-network.h"
++#include "sd-netlink.h"
++#include "socket-util.h"
++#include "ether-addr-util.h"
++#include "netlink-internal.h"
++/*
++#include "local-addresses.h"
++*/
++#endif
++
+ static BUS_DEFINE_PROPERTY_GET_ENUM(property_get_operational_state, link_operstate, LinkOperationalState);
+ static BUS_DEFINE_PROPERTY_GET_ENUM(property_get_administrative_state, link_state, LinkState);
+ 
++#ifdef SYSTEMD_NETWORKD_DBUS
++static int method_get_address (sd_bus_message *m, void* userdata, sd_bus_error *error);
++static int method_set_address (sd_bus_message *m, void* userdata, sd_bus_error *error);
++#endif
++
++#if defined (SYSTEMD_NETWORKD_DBUS_SETMAC_IPV4LL)
++static int link_arp_network_bind_raw_socket(int index, union sockaddr_union *link);
++static int link_arp_network_send_raw_socket(int fd, const union sockaddr_union *link, const struct ether_arp *arp);
++#elif defined (SYSTEMD_NETWORKD_DBUS_SETMAC_NETLINK)
++static int link_if_updown(sd_netlink* rtnl, sd_netlink_message** req, sd_netlink_message** rep, int ifindex, int cmd);
++static int link_if_setaddr(sd_netlink* rtnl, sd_netlink_message** req, sd_netlink_message** rep, int ifindex, const char* ea);
++#endif
++
+ const sd_bus_vtable link_vtable[] = {
+         SD_BUS_VTABLE_START(0),
+ 
+         SD_BUS_PROPERTY("OperationalState", "s", property_get_operational_state, offsetof(Link, operstate), SD_BUS_VTABLE_PROPERTY_EMITS_CHANGE),
+         SD_BUS_PROPERTY("AdministrativeState", "s", property_get_administrative_state, offsetof(Link, state), SD_BUS_VTABLE_PROPERTY_EMITS_CHANGE),
+ 
++#ifdef SYSTEMD_NETWORKD_DBUS
++	    /* device name */
++    	SD_BUS_METHOD("GetAddress", "s", "s", method_get_address, SD_BUS_VTABLE_UNPRIVILEGED),
++	    /* device name, mac addr */
++    	SD_BUS_METHOD("SetAddress", "ss", "s", method_set_address, SD_BUS_VTABLE_UNPRIVILEGED),
++#endif
+         SD_BUS_VTABLE_END
+ };
+ 
+@@ -136,3 +190,324 @@ int link_send_changed(Link *link, const char *property, ...) {
+                         "org.freedesktop.network1.Link",
+                         l);
+ }
++
++static int method_set_address (sd_bus_message *m, void* userdata, sd_bus_error *error)
++{
++    _cleanup_netlink_unref_ sd_netlink                  *rtnl   = NULL;
++    _cleanup_netlink_message_unref_ sd_netlink_message  *req    = NULL;
++    _cleanup_netlink_message_unref_ sd_netlink_message  *reply  = NULL;
++    _cleanup_bus_message_unref_ sd_bus_message          *resp   = NULL;
++    Manager                                             *mgr    = userdata;
++
++    struct udev*        udev               = NULL;
++    struct udev_device* udev_eth           = NULL;
++    const char*         device             = NULL;
++    const char*         ea                  = NULL;
++    char                devpath [32]       = "/sys/class/net/"; 
++
++    int                 r;
++    int                 pid=0;
++    unsigned char       ifindex;
++
++#if defined(SYSTEMD_NETWORKD_DBUS_SETMAC_IPV4LL)
++        bool                have_mac;
++        struct ether_addr   e;
++        struct ether_addr*  ep = NULL;
++        union sockaddr_union link;
++        uint8_t             seed[8];
++        uint8_t             i=0;
++
++        struct ifreq        dev;
++        int                 sock;
++#endif
++
++
++    assert(m);
++    assert(mgr);
++
++    r = sd_bus_message_read (m, "ss", &device, &ea);
++    if (r < 0)
++        return r;
++
++/*
++    if (isempty (device))
++        return sd_bus_error_setf(error, SD_BUS_ERROR_INVALID_ARGS, "Invalid Device Name.");
++
++    if (isempty (ea))
++        return sd_bus_error_setf(error, SD_BUS_ERROR_INVALID_ARGS, "Invalid MAC Address.");
++*/
++
++    udev = udev_new();
++    udev_eth = udev_device_new_from_syspath(udev, strcat (devpath, device));
++    if (!udev_eth)
++        return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Could not find udev device");
++
++    ifindex = udev_device_get_ifindex(udev_eth);
++
++#if defined (SYSTEMD_NETWORKD_DBUS_SETMAC_IPV4LL)
++    r = link_arp_network_bind_raw_socket(ifindex, &link);
++    if (r < 0)
++        return sd_bus_error_setf(error, SD_BUS_ERROR_INVALID_ARGS, "Unable to bind ARP Raw socket.");
++#elif defined (SYSTEMD_NETWORKD_DBUS_SETMAC_IOCTL)
++    sock = socket (AF_INET, SOCK_DGRAM, 0);
++    if (sock < 0)
++        return sd_bus_error_setf(error, SD_BUS_ERROR_INVALID_ARGS, "Unable to bind socket.");
++
++    strcpy (dev.ifr_name, device);
++    if (ioctl(sock, SIOCGIFHWADDR, &dev) < 0)
++        return sd_bus_error_setf(error, SD_BUS_ERROR_INVALID_ARGS, "Unable to bind socket.");
++#elif defined (SYSTEMD_NETWORKD_DBUS_SETMAC_NETLINK)
++    r = link_if_updown (rtnl, &req, &reply, ifindex, 0); /* i/f down */
++    if (r < 0)
++        /*return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Error shutting down interface");*/
++        sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Error shutting down interface");
++
++    r = link_if_setaddr(rtnl, &req, &reply, ifindex, ea);
++    if (r < 0)
++        /*return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Error setting MAC addr on interface");*/
++        sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Error setting MAC addr on interface");
++
++    r = link_if_updown (rtnl, &req, &reply, ifindex, 1); /* i/f up */
++    if (r < 0)
++        /*return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Error starting up interface");*/
++        sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Error starting up interface");
++
++    /* Set U-Boot environment variable.*/
++    pid = fork (); 
++    if (!pid)
++    {
++        char* argv [] = {"/sbin/fw_setenv", "ethaddr", ea, NULL};
++        execv (argv[0], argv);
++        exit (1);
++    }
++    else
++    {
++        int childerror = 0;
++
++        waitpid (pid, &childerror, 0);
++        if (childerror)        
++        {
++            sd_bus_error_setf(error, SD_BUS_ERROR_NO_MEMORY, "Error setting u-boot env");
++        }
++    }
++#endif
++
++    r = sd_bus_message_new_method_return(m, &resp);
++    if (r < 0)
++        return sd_bus_error_setf(error, SD_BUS_ERROR_NO_MEMORY, "Error allocating reply messgage");
++
++    r = sd_bus_message_append(resp, "s", ea);
++    if (r < 0)
++        return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Error appending to reply messgage");
++
++    r = sd_bus_send(mgr->bus, resp, NULL);
++
++    /*return sd_bus_reply_method_return(m, "s", "Setting IFLA address ...");*/
++    return sd_bus_reply_method_return(m, "s", ea);
++
++}
++
++static int method_get_address (sd_bus_message *m, void* userdata, sd_bus_error *error)
++{
++    _cleanup_netlink_unref_ sd_netlink                  *rtnl   = NULL;
++    _cleanup_netlink_message_unref_ sd_netlink_message  *req    = NULL;
++    _cleanup_netlink_message_unref_ sd_netlink_message  *reply  = NULL;
++    _cleanup_bus_message_unref_ sd_bus_message          *resp   = NULL;
++    Manager                                             *mgr    = userdata;
++
++    struct udev*        udev               = NULL;
++    struct udev_device* udev_eth           = NULL;
++    const char*         device             = NULL;
++    char                devpath [32]       = "/sys/class/net/"; 
++
++    int                 r;
++    unsigned char       ifindex;
++    bool                have_mac;
++    struct ether_addr   e;
++    char                ea[ETHER_ADDR_TO_STRING_MAX];
++
++    assert(m);
++    assert(mgr);
++
++    r = sd_bus_message_read (m, "s", &device);
++    if (r < 0)
++        return r;
++
++    if (isempty (device))
++        return sd_bus_error_setf(error, SD_BUS_ERROR_INVALID_ARGS, "Invalid Device Name.");
++
++    udev = udev_new();
++    udev_eth = udev_device_new_from_syspath(udev, strcat (devpath, device));
++    if (!udev_eth)
++        return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Could not find udev device");
++
++    ifindex = udev_device_get_ifindex(udev_eth);
++
++    r = sd_netlink_open(&rtnl);
++    if (r < 0)
++            return log_error_errno(r, "Failed to connect to netlink:"); /* fixme */
++
++    r = sd_rtnl_message_new_link(rtnl, &req, RTM_GETLINK, ifindex);
++    if (r < 0)
++            return r;
++
++    r = sd_netlink_call(rtnl, req, 0, &reply); /* fixme */
++    if (r < 0)
++            return r;
++
++    have_mac = sd_netlink_message_read_ether_addr(reply, IFLA_ADDRESS, &e) >= 0;
++    if (!have_mac)
++        return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Error reading IFLA address");
++
++    ether_addr_to_string(&e, ea);
++
++    r = sd_bus_message_new_method_return(m, &resp);
++    if (r < 0)
++        return sd_bus_error_setf(error, SD_BUS_ERROR_NO_MEMORY, "Error allocating reply messgage");
++
++    r = sd_bus_message_append(resp, "s", ea);
++    if (r < 0)
++        return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Error appending to reply messgage");
++
++    r = sd_bus_send(mgr->bus, resp, NULL);
++
++    /*return sd_bus_reply_method_return(m, "s", "Getting IFLA address ...");*/
++    return sd_bus_reply_method_return(m, "s", ea);
++}
++
++#if defined (SYSTEMD_NETWORKD_DBUS_SETMAC_IPV4LL)
++/*----------------------------------------------------------------------------*/
++/* ARP helper routines copied from ipv4ll-network.c                           */
++/*----------------------------------------------------------------------------*/
++static int link_arp_network_bind_raw_socket(int ifindex, union sockaddr_union *link) {
++
++        static const struct sock_filter filter[] = {
++                BPF_STMT(BPF_LD + BPF_W + BPF_LEN, 0),                                         /* A <- packet length */
++                BPF_JUMP(BPF_JMP + BPF_JGE + BPF_K, sizeof(struct ether_arp), 1, 0),           /* packet >= arp packet ? */
++                BPF_STMT(BPF_RET + BPF_K, 0),                                                  /* ignore */
++                BPF_STMT(BPF_LD + BPF_H + BPF_ABS, offsetof(struct ether_arp, ea_hdr.ar_hrd)), /* A <- header */
++                BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, ARPHRD_ETHER, 1, 0),                       /* header == ethernet ? */
++                BPF_STMT(BPF_RET + BPF_K, 0),                                                  /* ignore */
++                BPF_STMT(BPF_LD + BPF_H + BPF_ABS, offsetof(struct ether_arp, ea_hdr.ar_pro)), /* A <- protocol */
++                BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, ETHERTYPE_IP, 1, 0),                       /* protocol == IP ? */
++                BPF_STMT(BPF_RET + BPF_K, 0),                                                  /* ignore */
++                BPF_STMT(BPF_LD + BPF_H + BPF_ABS, offsetof(struct ether_arp, ea_hdr.ar_op)),  /* A <- operation */
++                BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, ARPOP_REQUEST, 0, 1),                      /* protocol == request ? */
++                BPF_STMT(BPF_RET + BPF_K, 65535),                                              /* return all */
++                BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, ARPOP_REPLY, 0, 1),                        /* protocol == reply ? */
++                BPF_STMT(BPF_RET + BPF_K, 65535),                                              /* return all */
++                BPF_STMT(BPF_RET + BPF_K, 0),                                                  /* ignore */
++        };
++        struct sock_fprog fprog = {
++                .len = ELEMENTSOF(filter),
++                .filter = (struct sock_filter*) filter
++        };
++        _cleanup_close_ int s = -1;
++        int r;
++
++        assert(ifindex > 0);
++        assert(link);
++
++        s = socket(PF_PACKET, SOCK_DGRAM | SOCK_CLOEXEC | SOCK_NONBLOCK, 0);
++        if (s < 0)
++                return -errno;
++
++        r = setsockopt(s, SOL_SOCKET, SO_ATTACH_FILTER, &fprog, sizeof(fprog));
++        if (r < 0)
++                return -errno;
++
++        link->ll.sll_family = AF_PACKET;
++        link->ll.sll_protocol = htons(ETH_P_ARP);
++        link->ll.sll_ifindex = ifindex;
++        link->ll.sll_halen = ETH_ALEN;
++        memset(link->ll.sll_addr, 0xff, ETH_ALEN);
++
++        r = bind(s, &link->sa, sizeof(link->ll));
++        if (r < 0)
++                return -errno;
++
++        r = s;
++        s = -1;
++
++        return r;
++}
++static int arp_network_send_raw_socket(int fd, const union sockaddr_union *link,
++                                        const struct ether_arp *arp) {
++        int r;
++
++        assert(arp);
++        assert(link);
++        assert(fd >= 0);
++
++        r = sendto(fd, arp, sizeof(struct ether_arp), 0, &link->sa, sizeof(link->ll));
++        if (r < 0)
++                return -errno;
++
++        return 0;
++}
++#endif
++
++#if defined (SYSTEMD_NETWORKD_DBUS_SETMAC_NETLINK)
++/* */
++/* Bring interface up/down */
++int link_if_updown(sd_netlink* rtnl, sd_netlink_message** req, sd_netlink_message** rep, int ifindex, int cmd)
++{
++    int r=0;
++    struct ifinfomsg *ifi;
++
++    r = message_new(rtnl, req, RTM_NEWLINK);
++    if (r < 0)
++            return r;
++
++    (*req)->hdr->nlmsg_len = NLMSG_LENGTH(sizeof (struct ifinfomsg));
++    (*req)->hdr->nlmsg_flags = NLM_F_REQUEST;
++    (*req)->hdr->nlmsg_type = RTM_NEWLINK;
++
++    ifi = NLMSG_DATA((*req)->hdr);
++
++    ifi->ifi_family = AF_UNSPEC;
++    ifi->ifi_change |= IFF_UP;
++    ifi->ifi_index = index;
++
++    /* when IFF_UP flag is set i/f will be active, otherwise i/f is shut down */
++    if (cmd)
++        ifi->ifi_flags |= IFF_UP;
++
++    return sd_netlink_call(rtnl, *req, 0, rep);
++}
++
++/* Set interface MAC address */
++int link_if_setaddr(sd_netlink* rtnl, sd_netlink_message** req, sd_netlink_message** rep, int ifindex, const char* ea)
++{
++    int r=0;
++    int i=0;
++
++    struct ifinfomsg *ifi;
++    struct ether_addr   e;
++    struct ether_addr*  ep;
++
++    r = message_new(rtnl, req, RTM_NEWLINK);
++    if (r < 0)
++            return r;
++
++    (*req)->hdr->nlmsg_len = NLMSG_LENGTH(sizeof (struct ifinfomsg));
++    (*req)->hdr->nlmsg_flags = NLM_F_REQUEST;
++    (*req)->hdr->nlmsg_type = RTM_NEWLINK;
++
++    ifi = NLMSG_DATA((*req)->hdr);
++
++    ifi->ifi_family = AF_UNSPEC;
++    ifi->ifi_index = ifindex;
++
++    ep = ether_aton (ea);
++    if (!ep)
++        return -1;
++
++    for (i=0; i<6; i++)
++        e.ether_addr_octet[i] = ep->ether_addr_octet[i];
++
++    r = sd_netlink_message_append_ether_addr(*req, IFLA_ADDRESS, &e);
++
++    return sd_netlink_call(rtnl, *req, 0, rep);
++}
++#endif
+diff --git a/src/network/networkd-network-bus.c b/src/network/networkd-network-bus.c
+index 5717a15..0a4cdd6 100644
+--- a/src/network/networkd-network-bus.c
++++ b/src/network/networkd-network-bus.c
+@@ -19,10 +19,39 @@
+   along with systemd; If not, see <http://www.gnu.org/licenses/>.
+ ***/
+ 
++#define SYSTEMD_NETWORKD_DBUS 1
++
++#ifdef SYSTEMD_NETWORKD_DBUS
++#include <stdio.h>
++#include <stdlib.h>
++#include <errno.h>
++#include <string.h>
++#include <netinet/ether.h>
++#include <linux/if.h>
++#endif
++
+ #include "strv.h"
+ 
+ #include "networkd.h"
+ 
++#ifdef SYSTEMD_NETWORKD_DBUS
++#include "hostname-util.h"
++#include "network-internal.h"
++#include "networkd-link.h"
++#include "bus-util.h"
++
++#include "sd-network.h"
++#include "sd-netlink.h"
++#include "local-addresses.h"
++#endif
++
++#ifdef SYSTEMD_NETWORKD_DBUS
++int network_address_added_handler (sd_netlink* rtnl, sd_netlink_message* m, void* userdata);
++int network_rtnl_process_address(sd_netlink *rtnl, sd_netlink_message *message, void *userdata, Address* address); /* fixme */
++static int method_get_address (sd_bus_message *m, void* userdata, sd_bus_error *error); /* fixme */
++int network_save_static (int cmd, const char* device, const char* ipaddr, int prefixlen, const char* gwaddr);
++#endif
++
+ static int property_get_ether_addrs(
+                 sd_bus *bus,
+                 const char *path,
+@@ -56,6 +85,11 @@ static int property_get_ether_addrs(
+         return sd_bus_message_close_container(reply);
+ }
+ 
++#ifdef SYSTEMD_NETWORKD_DBUS
++static int method_add_address (sd_bus_message *m, void* userdata, sd_bus_error *error);
++static int method_del_address (sd_bus_message *m, void* userdata, sd_bus_error *error);
++#endif
++
+ const sd_bus_vtable network_vtable[] = {
+         SD_BUS_VTABLE_START(0),
+ 
+@@ -67,6 +101,13 @@ const sd_bus_vtable network_vtable[] = {
+         SD_BUS_PROPERTY("MatchType", "as", NULL, offsetof(Network, match_type), SD_BUS_VTABLE_PROPERTY_CONST),
+         SD_BUS_PROPERTY("MatchName", "as", NULL, offsetof(Network, match_name), SD_BUS_VTABLE_PROPERTY_CONST),
+ 
++#ifdef SYSTEMD_NETWORKD_DBUS
++	    /* device, IP, netmask, family, flags, scope, gateway */
++    	SD_BUS_METHOD("AddAddress", "sssyyys", "x", method_add_address, SD_BUS_VTABLE_UNPRIVILEGED),
++    	SD_BUS_METHOD("DelAddress", "sssyyys", "x", method_del_address, SD_BUS_VTABLE_UNPRIVILEGED),
++	    /* (family, prefixlen, flags, scope, IP)+ gateway */
++    	SD_BUS_METHOD("GetAddress", "s", "a(iyyus)s", method_get_address, SD_BUS_VTABLE_UNPRIVILEGED),
++#endif
+         SD_BUS_VTABLE_END
+ };
+ 
+@@ -152,3 +193,563 @@ int network_object_find(sd_bus *bus, const char *path, const char *interface, vo
+ 
+         return 1;
+ }
++
++#ifdef SYSTEMD_NETWORKD_DBUS
++
++static int method_add_address (sd_bus_message *m, void* userdata, sd_bus_error *error)
++{
++    _cleanup_bus_message_unref_ sd_bus_message*         resp    = NULL;
++    _cleanup_netlink_unref_ sd_netlink*                 rtnl    = NULL;
++    _cleanup_netlink_message_unref_ sd_netlink_message* req     = NULL;
++    _cleanup_netlink_message_unref_ sd_netlink_message* reply   = NULL;
++    _cleanup_address_free_ Address *addr                        = NULL;
++    _cleanup_route_free_ Route *rt                              = NULL;
++    Manager *mgr                                                = userdata;
++    Link*               link               = NULL;
++    struct udev*        udev               = NULL;
++    struct udev_device* udev_eth           = NULL;
++
++    const char*         device             = NULL;
++    const char*         ipaddr             = NULL;
++    const char*         netmask            = NULL;
++    const char*         gateway            = NULL;
++    char                devpath [32]       = "/sys/class/net/"; 
++
++    unsigned char       family;
++    unsigned char       prefixlen;
++    unsigned char       flags;
++    unsigned char       scope;
++    unsigned char       ifindex;
++
++    struct in_addr      nm;
++    struct in_addr      ip;
++    struct in_addr      gw;
++    int r;
++
++    assert(m);
++    assert(mgr);
++
++    r = sd_bus_message_read (m, "sssyyys", &device, &ipaddr, &netmask, &family, &flags, &scope, &gateway);
++    if (r < 0)
++        return r;
++
++    if (isempty (device))
++        return sd_bus_error_setf(error, SD_BUS_ERROR_INVALID_ARGS, "Invalid Device Name.");
++
++    if (isempty (ipaddr))
++        return sd_bus_error_setf(error, SD_BUS_ERROR_INVALID_ARGS, "Invalid IP Address.");
++
++    if (isempty (netmask))
++        return sd_bus_error_setf(error, SD_BUS_ERROR_INVALID_ARGS, "Invalid IP Netmask.");
++
++    assert(family == AF_INET || family == AF_INET6);
++
++    udev = udev_new();
++    udev_eth = udev_device_new_from_syspath(udev, strcat (devpath, device));
++    if (!udev_eth)
++            return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Could not find udev device");
++
++    ifindex = udev_device_get_ifindex(udev_eth);
++
++    inet_aton (netmask, &nm);
++    inet_aton (ipaddr, &ip);
++    if (!isempty (gateway)) inet_aton (gateway, &gw);
++
++    prefixlen = in_addr_netmask_to_prefixlen(&nm);
++    assert(prefixlen > 0);
++
++#if 0
++    r = network_save_static (1, device, ipaddr, prefixlen, gateway); /* persist config - add */
++    if (r)
++            return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, strerror(r));
++#endif
++
++    r = address_new_dynamic(&addr);
++    if (r < 0)
++        return sd_bus_error_setf(error, SD_BUS_ERROR_NO_MEMORY, "Error allocating new address");
++
++    r = sd_netlink_open(&rtnl);
++    if (r < 0)
++            return sd_bus_error_setf(error, SD_BUS_ERROR_IO_ERROR, "Failed to connect to netlink");
++
++    link = new0(Link, 1);
++    if (!link)
++            return -ENOMEM;
++
++    link->network = new0(Network, 1);
++    if (!link->network)
++            return sd_bus_error_setf(error, SD_BUS_ERROR_NO_MEMORY, "Could not alloc memory for Network");
++
++    link->n_ref                 = 1;
++    link->manager               = mgr;
++    link->manager->rtnl         = rtnl;
++    link->state                 = LINK_STATE_PENDING;
++    link->rtnl_extended_attrs   = true;
++    link->ifindex               = ifindex;
++    link->ifname                = strdup(device); /*FIXME:*/
++    if (!link->ifname)
++            return -ENOMEM;
++
++    addr->family                = family;
++    addr->in_addr.in.s_addr     = ip.s_addr;
++    addr->prefixlen             = prefixlen;
++    addr->broadcast.s_addr      = ip.s_addr | ~nm.s_addr;
++
++    LIST_PREPEND(addresses, link->network->static_addresses, addr);
++
++    if (!isempty (gateway))
++    {
++        r = route_new_dynamic(&rt, RTPROT_STATIC);
++        if (r < 0)
++            return r;
++
++        rt->protocol        = RTPROT_STATIC;
++        rt->network         = link->network;
++        rt->family          = family;
++        rt->scope           = RT_SCOPE_LINK;            /* FIXME: */
++        rt->dst_prefixlen   = prefixlen;                /* FIXME: AF_INET assumed */
++/*
++        rt->dst_addr.in     = gw;
++        rt->in_addr.in      = ip.s_addr & nm.s_addr;
++*/
++        rt->dst_addr.in.s_addr      = ip.s_addr & nm.s_addr;
++        rt->in_addr.in              = gw;
++
++        LIST_PREPEND(routes, link->network->static_routes, rt);
++    }
++
++    /* send an nlmsg (RTM_NEWADDR) and append address to link address list */
++    r = address_update (addr, link, network_address_added_handler);
++    if (r < 0)
++        return r;
++
++    r = sd_bus_message_new_method_return(m, &resp);
++    if (r < 0)
++        return sd_bus_error_setf(error, SD_BUS_ERROR_NO_MEMORY, "Error allocating reply messgage");
++
++    r = sd_bus_message_append(resp, "x", 0);
++    if (r < 0)
++            return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Error appending to reply messgage");
++
++    /*r = sd_bus_send(mgr->bus, resp, NULL);*/
++    r = sd_bus_send(NULL, resp, NULL);
++    if (r < 0)
++            return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Error sending reply messgage");
++
++
++    return sd_bus_reply_method_return(m, "s", "Adding IP address...");
++}
++
++static int method_del_address (sd_bus_message *m, void* userdata, sd_bus_error *error)
++{
++    _cleanup_bus_message_unref_ sd_bus_message*         resp    = NULL;
++    _cleanup_netlink_unref_ sd_netlink*                 rtnl    = NULL;
++    _cleanup_netlink_message_unref_ sd_netlink_message* req     = NULL;
++    _cleanup_netlink_message_unref_ sd_netlink_message* reply   = NULL;
++    _cleanup_address_free_ Address *addr                        = NULL;
++    _cleanup_route_free_ Route *rt                              = NULL;
++    Manager *mgr                                                = userdata;
++    Link*               link               = NULL;
++    struct udev*        udev               = NULL;
++    struct udev_device* udev_eth           = NULL;
++
++    const char*         device             = NULL;
++    const char*         ipaddr             = NULL;
++    const char*         netmask            = NULL;
++    const char*         gateway            = NULL;
++    char                devpath [32]       = "/sys/class/net/"; 
++
++    unsigned char       family;
++    unsigned char       prefixlen;
++    unsigned char       flags;
++    unsigned char       scope;
++    unsigned char       ifindex;
++
++    struct in_addr      nm;
++    struct in_addr      ip;
++    struct in_addr      gw;
++    int r;
++
++    assert(m);
++    assert(mgr);
++
++    r = sd_bus_message_read (m, "sssyyys", &device, &ipaddr, &netmask, &family, &flags, &scope, &gateway);
++    if (r < 0)
++        return r;
++
++    if (isempty (device))
++        return sd_bus_error_setf(error, SD_BUS_ERROR_INVALID_ARGS, "Invalid Device Name.");
++
++    if (isempty (ipaddr))
++        return sd_bus_error_setf(error, SD_BUS_ERROR_INVALID_ARGS, "Invalid IP Address.");
++
++    if (isempty (netmask))
++        return sd_bus_error_setf(error, SD_BUS_ERROR_INVALID_ARGS, "Invalid IP Netmask.");
++
++    assert(family == AF_INET || family == AF_INET6);
++
++    udev = udev_new();
++    udev_eth = udev_device_new_from_syspath(udev, strcat (devpath, device));
++    if (!udev_eth)
++            return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Could not find udev device");
++
++    ifindex = udev_device_get_ifindex(udev_eth);
++
++    inet_aton (netmask, &nm);
++    inet_aton (ipaddr, &ip);
++    if (!isempty (gateway)) inet_aton (gateway, &gw);
++
++    prefixlen = in_addr_netmask_to_prefixlen(&nm);
++    assert(prefixlen > 0);
++
++    r = address_new_dynamic(&addr);
++    if (r < 0)
++        return sd_bus_error_setf(error, SD_BUS_ERROR_NO_MEMORY, "Error allocating new address");
++
++    r = sd_netlink_open(&rtnl);
++    if (r < 0)
++            return sd_bus_error_setf(error, SD_BUS_ERROR_IO_ERROR, "Failed to connect to netlink");
++
++    link = new0(Link, 1);
++    if (!link)
++            return -ENOMEM;
++
++    link->network = new0(Network, 1);
++    if (!link->network)
++            return sd_bus_error_setf(error, SD_BUS_ERROR_NO_MEMORY, "Could not alloc memory for Network");
++
++    link->n_ref                 = 1;
++    link->manager               = mgr;
++    link->manager->rtnl         = rtnl;
++    link->state                 = LINK_STATE_PENDING;
++    link->rtnl_extended_attrs   = true;
++    link->ifindex               = ifindex;
++    link->ifname                = strdup(device);
++    if (!link->ifname)
++            return -ENOMEM;
++
++    addr->family                = family;
++    addr->in_addr.in.s_addr     = ip.s_addr;
++    addr->prefixlen             = prefixlen;
++    addr->broadcast.s_addr      = ip.s_addr | ~nm.s_addr;
++
++    if (!isempty (gateway))
++    {
++        r = route_new_dynamic(&rt, RTPROT_STATIC);
++        if (r < 0)
++            return r;
++
++        rt->network         = link->network;
++        rt->family          = family;
++        rt->scope           = RT_SCOPE_LINK;            /* FIXME: */
++        rt->dst_prefixlen   = 32;                       /* FIXME: AF_INET assumed */
++        rt->dst_addr.in     = gw;
++
++        /*LIST_PREPEND(routes, link->network->static_routes, rt);*/
++        /* Drop the Gateway */
++        route_drop (rt, link, link_route_drop_handler);
++    }
++
++    /* send an nlmsg to delete address from address list */
++    r = address_drop(addr, link, link_address_drop_handler);
++    if (r < 0)
++        return r;
++
++    r = sd_bus_message_new_method_return(m, &resp);
++    if (r < 0)
++        return sd_bus_error_setf(error, SD_BUS_ERROR_NO_MEMORY, "Error allocating reply messgage");
++
++    r = sd_bus_message_append(resp, "x", 0);
++    if (r < 0)
++            return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Error appending to reply messgage");
++
++    /*r = sd_bus_send(mgr->bus, resp, NULL);*/
++    r = sd_bus_send(NULL, resp, NULL);
++    if (r < 0)
++            return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Error sending reply messgage");
++
++#if 0
++    r = network_save_static (0, device, ipaddr, prefixlen, gateway); /* persist config - del */
++    if (r)
++            return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, strerror(r));
++#endif
++
++    return sd_bus_reply_method_return(m, "s", "Deleted IP address...");
++}
++
++static int method_get_address (sd_bus_message *m, void* userdata, sd_bus_error *error)
++{
++    _cleanup_netlink_unref_ sd_netlink  *rtnl   = NULL;
++    _cleanup_address_free_ Address      *addr   = NULL;
++    _cleanup_route_free_ Route          *rt     = NULL;
++    Manager                             *mgr    = userdata;
++    struct udev*        udev               = NULL;
++    struct udev_device* udev_eth           = NULL;
++    const char*         device             = NULL;
++    char                devpath [32]       = "/sys/class/net/"; 
++    unsigned char       ifindex;
++    int                 r;
++
++    sd_netlink_message* maddr;
++
++    _cleanup_netlink_message_unref_ sd_netlink_message  *req    = NULL;
++    _cleanup_netlink_message_unref_ sd_netlink_message  *reply    = NULL;
++    _cleanup_bus_message_unref_ sd_bus_message  *resp   = NULL;
++    _cleanup_address_free_ Address              *address = NULL;
++    _cleanup_free_ struct local_address         *local   = NULL;
++    _cleanup_free_ char                         *ipr     = NULL;
++    _cleanup_free_ char                         *gwr     = NULL;
++    int                 n;
++    int                 i;
++
++    assert(m);
++    assert(mgr);
++
++    r = sd_bus_message_read (m, "s", &device);
++    if (r < 0)
++        return r;
++
++    if (isempty (device))
++        return sd_bus_error_setf(error, SD_BUS_ERROR_INVALID_ARGS, "Invalid Device Name.");
++
++    udev = udev_new();
++    udev_eth = udev_device_new_from_syspath(udev, strcat (devpath, device));
++    if (!udev_eth)
++        return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Could not find udev device");
++
++    ifindex = udev_device_get_ifindex(udev_eth);
++
++    r = sd_netlink_open(&rtnl);
++    if (r < 0)
++            return log_error_errno(r, "Failed to connect to netlink:"); /* fixme */
++
++    r = sd_rtnl_message_new_addr(rtnl, &req, RTM_GETADDR, 0, 0);
++    if (r < 0)
++            return r;
++
++    r = sd_netlink_message_request_dump(req, true);
++    if (r < 0)
++            return r;
++
++    r = sd_netlink_call(rtnl, req, 0, &reply); /* fixme */
++    if (r < 0)
++            return r;
++
++    r = sd_bus_message_new_method_return(m, &resp);
++    if (r < 0)
++        return sd_bus_error_setf(error, SD_BUS_ERROR_NO_MEMORY, "Error allocating reply messgage");
++
++    r = sd_bus_message_open_container(resp, 'a', "(iyyus)"); /*family,prefixlen,scope,flags,addr*/
++    if (r < 0)
++        return sd_bus_error_setf(error, SD_BUS_ERROR_NO_MEMORY, "Error opening a container for reply message");
++
++    for (maddr = reply; maddr; maddr = sd_netlink_message_next(maddr)) {
++            int k;
++
++            r = address_new_dynamic(&address);
++            if (r < 0)
++                    return r;
++
++            k = network_rtnl_process_address(rtnl, maddr, mgr, address);
++            if (k) {
++                r = in_addr_to_string(address->family, &address->in_addr, &ipr); /* fixme */
++                if (r < 0)
++                        return r;
++
++                r = sd_bus_message_append (resp, "(iyyus)",
++                                                    address->family,
++                                                    address->prefixlen,
++                                                    address->scope,
++                                                    address->flags, 
++                                                    ipr);
++                if (r < 0)
++                        return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Error appending to reply messgage");
++#if 0
++                r = sd_bus_message_open_container(resp, 'r', "iyyus");
++                if (r < 0)
++                        return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Error opening struct in reply messgage");
++
++                r = sd_bus_message_append(resp, "i", address->family);
++                if (r < 0)
++                        return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Error appending to reply messgage");
++
++                r = sd_bus_message_append(resp, "y", address->prefixlen);
++                if (r < 0)
++                        return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Error appending to reply messgage");
++
++                r = sd_bus_message_append(resp, "y", address->scope);
++                if (r < 0)
++                        return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Error appending to reply messgage");
++
++                r = sd_bus_message_append(resp, "u", address->flags);
++                if (r < 0)
++                        return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Error appending to reply messgage");
++
++                r = in_addr_to_string(address->family, &address->in_addr, &ipr); /* fixme */
++                if (r < 0)
++                        return r;
++
++                r = sd_bus_message_append(resp, "s", ipr);
++                if (r < 0)
++                        return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Error appending to reply messgage");
++
++                r = sd_bus_message_close_container(resp);
++                if (r < 0)
++                        return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Error closing struct in reply messgage");
++#endif
++            }
++    }
++
++    r = sd_bus_message_close_container(resp);
++    if (r < 0)
++            return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Error closing reply container");
++
++    n = local_gateways(rtnl, ifindex, AF_UNSPEC, &local);
++    if (n < 0)
++            return n;
++
++    for (i = 0; i < n; i++) {
++
++            r = in_addr_to_string(local[i].family, &local[i].address, &gwr);
++            if (r < 0)
++                    return r;
++    }
++
++    r = sd_bus_message_append(resp, "s", gwr);
++    if (r < 0)
++            return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Error appending to reply messgage");
++
++    /*r = sd_bus_send(mgr->bus, resp, NULL);*/
++    r = sd_bus_send(NULL, resp, NULL);
++    if (r < 0)
++            return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Error sending reply messgage");
++
++    return sd_bus_reply_method_return(m, "s", "Getting IP configuration...");
++}
++
++
++int network_rtnl_process_address(sd_netlink *rtnl, sd_netlink_message *message, void *userdata, Address* address) {
++        Manager*        m       = (Manager*) userdata; /* fixme */
++        uint16_t        type;
++        unsigned char   flags;
++        char            buf[INET6_ADDRSTRLEN]; 
++        int             ifindex;
++        int             r; 
++        sd_bus_error err    = SD_BUS_ERROR_NULL; /* fixme */
++        sd_bus_error* error = &err;             /* fixme */
++
++        assert(rtnl);
++        assert(message);
++        assert(m);
++        assert(address);
++
++        if (sd_netlink_message_is_error(message)) {
++                r = sd_netlink_message_get_errno(message);
++                if (r < 0)
++                        sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "rtnl: failed to receive address: ");
++
++                return 0;
++        }
++
++        r = sd_netlink_message_get_type(message, &type);
++        if (r < 0) {
++                sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "rtnl: could not get message type: ");
++                return 0;
++        } else if (type != RTM_NEWADDR && type != RTM_DELADDR) {
++                sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "rtnl: received unexpected message type when processing address");
++                return 0;
++        }
++
++        r = sd_rtnl_message_addr_get_ifindex(message, &ifindex);
++        if (r < 0) {
++                sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "rtnl: could not get ifindex from address: %m");
++                return 0;
++        } else if (ifindex <= 0) {
++                sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "rtnl: received address message with invalid ifindex: %d", ifindex);
++                return 0;
++        } 
++
++        r = sd_rtnl_message_addr_get_family(message, &address->family); /* int : i*/
++        if (r < 0 || !IN_SET(address->family, AF_INET, AF_INET6)) {
++                sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "rtnl: received address with invalid family, ignoring.");
++                return 0;
++        }
++
++        r = sd_rtnl_message_addr_get_prefixlen(message, &address->prefixlen); /* uchar : byte : y */
++        if (r < 0) {
++                sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "rtnl: received address with invalid prefixlen, ignoring: ");
++                return 0;
++        }
++
++        r = sd_rtnl_message_addr_get_scope(message, &address->scope); /* uchar : byte : y*/
++        if (r < 0) {
++                sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "rtnl: received address with invalid scope, ignoring: ");
++                return 0;
++        }
++
++        r = sd_rtnl_message_addr_get_flags(message, &flags); /* uint32 : u*/
++        if (r < 0) {
++                sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "rtnl: received address with invalid flags, ignoring: ");
++                return 0;
++        }
++        address->flags = flags;
++
++        switch (address->family) {
++        case AF_INET:
++                r = sd_netlink_message_read_in_addr(message, IFA_LOCAL, &address->in_addr.in); /* ulong : uint64 : t */
++                if (r < 0) {
++                        sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "rtnl: received address without valid address, ignoring: ");
++                        return 0;
++                }
++
++                break;
++
++        case AF_INET6:
++                r = sd_netlink_message_read_in6_addr(message, IFA_ADDRESS, &address->in_addr.in6); /* ulong : uint64 : t */
++                if (r < 0) {
++                        sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "rtnl: received address without valid address, ignoring: ");
++                        return 0;
++                }
++
++                break;
++
++        default:
++                assert_not_reached("invalid address family");
++        }
++
++        if (!inet_ntop(address->family, &address->in_addr, buf, INET6_ADDRSTRLEN)) { /* string : s */
++                sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Could not print address");
++                return 0;
++        }
++
++        return 1;
++}
++
++int network_save_static (int cmd, const char* device, const char* ipaddr, int prefixlen, const char* gwaddr)
++{
++#define NETWORKD_CONFIG_FILE_NAME_LEN_MAX 64
++    char    ncfn [NETWORKD_CONFIG_FILE_NAME_LEN_MAX];
++    FILE*   ncfp = NULL;
++    int     r=0;
++
++    /* /usr/lib/systemd/network/10-bmc-ethx-192.168.255.255.32.network */
++    snprintf (ncfn, NETWORKD_CONFIG_FILE_NAME_LEN_MAX, "/usr/lib/systemd/network/10-bmc-%s-%s.%d.network", device, ipaddr, prefixlen);
++
++    if (cmd) /* add */
++    {
++        ncfp = fopen (ncfn, "w+");
++        if (!ncfp) {
++            r = errno;
++        }
++
++        fprintf (ncfp, "[Match]\nName=%s\n\n[Network]\nAddress=%s/%d\nGateway=%s\n", device, ipaddr, prefixlen, gwaddr);
++        fclose (ncfp);
++    }
++    else /* del */
++    {
++        r = remove (ncfn); 
++    }
++
++    return r;
++}
++#endif
+diff --git a/src/network/networkd-network.c b/src/network/networkd-network.c
+index 6587ea9..f773936 100644
+--- a/src/network/networkd-network.c
++++ b/src/network/networkd-network.c
+@@ -20,6 +20,9 @@
+ ***/
+ 
+ #include <ctype.h>
++#include <sys/socket.h>
++#include <netinet/in.h>
++#include <arpa/inet.h>
+ #include <net/if.h>
+ 
+ #include "conf-files.h"
+@@ -32,6 +35,15 @@
+ #include "network-internal.h"
+ #include "dns-domain.h"
+ 
++#define SYSTEMD_NETWORKD_DBUS 1
++
++#ifdef SYSTEMD_NETWORKD_DBUS
++int network_address_added_handler (sd_netlink* rtnl, sd_netlink_message* m, void* userdata);
++int network_set_gateway (Link* link);
++static int route_handler(sd_netlink *rtnl, sd_netlink_message *m, void *userdata);
++int network_save_static (int cmd, const char* device, const char* ipaddr, int prefixlen, const char* gwaddr);
++#endif
++
+ static int network_load_one(Manager *manager, const char *filename) {
+         _cleanup_network_free_ Network *network = NULL;
+         _cleanup_fclose_ FILE *file = NULL;
+@@ -850,3 +862,99 @@ int config_parse_hostname(const char *unit,
+ 
+         return 0;
+ }
++
++#ifdef SYSTEMD_NETWORKD_DBUS
++int network_address_added_handler (sd_netlink* rtnl, sd_netlink_message* m, void* userdata)
++{
++        _cleanup_link_unref_ Link *link = userdata;
++        int r;
++
++        assert(link);
++
++        r = sd_netlink_message_get_errno(m);
++        if (r < 0 && r != -EEXIST) {
++                log_debug("Error in set IP address!");
++                link_enter_failed(link);
++                return r;
++        } else if (r >= 0)
++                link_rtnl_process_address(rtnl, m, link->manager);
++
++	network_set_gateway (link);
++
++	return 0;
++}
++
++/* link_enter_set_routes */
++int network_set_gateway (Link* link)
++{
++        _cleanup_address_free_ Address* addr = NULL;
++        const char*                     device = NULL;
++        const char*                     ipaddr = NULL;
++        const char*                     gwaddr = NULL;
++        Route*                          rt;
++        unsigned char                   prefixlen;
++        int                             r=0;
++
++        assert(link);
++        assert(link->network);
++        assert(link->state == LINK_STATE_SETTING_ADDRESSES);
++
++        link->state = LINK_STATE_SETTING_ROUTES;
++
++        LIST_FOREACH(routes, rt, link->network->static_routes) {
++                gwaddr = inet_ntoa (rt->dst_addr.in);
++                r = route_configure(rt, link, &route_handler);
++                if (r < 0) {
++                        log_debug ("Could not set Gateway!");
++                        link_enter_failed(link);
++                        return r;
++                }
++
++                link->link_messages ++;
++        }
++
++        if (link->link_messages == 0) {
++                link->static_configured = true;
++
++                /*link_enter_configured (link);*/
++                log_link_info(link, "Configured");
++                link->state = LINK_STATE_CONFIGURED;
++                link_save(link);
++        } 
++        else
++        { 
++                log_debug("Setting Gateway");
++        } 
++
++        LIST_FOREACH(addresses, addr, link->network->static_addresses) {
++            device = strdup (link->ifname);
++            ipaddr = inet_ntoa (addr->in_addr.in);
++            prefixlen = addr->prefixlen;
++#if 1
++            r = network_save_static (1, device, ipaddr, prefixlen, gwaddr); /* persist config - add */
++            if (r)
++            {
++                log_debug(strerror(r));
++            }
++#endif
++        }
++
++        return r;
++}
++
++static int route_handler(sd_netlink *rtnl, sd_netlink_message *m, void *userdata) {
++        _cleanup_link_unref_ Link *link = userdata;
++        int r;
++
++        assert(link);
++
++        r = sd_netlink_message_get_errno(m);
++        if (r < 0 && r != -EEXIST) {
++                log_debug ("Could not set route! ");
++                link_enter_failed(link);
++        }
++
++        return 1;
++}
++
++#endif
+diff --git a/src/network/org.freedesktop.network1.conf b/src/network/org.freedesktop.network1.conf
+index 52dad33..3db7a90 100644
+--- a/src/network/org.freedesktop.network1.conf
++++ b/src/network/org.freedesktop.network1.conf
+@@ -36,6 +36,26 @@
+                        send_interface="org.freedesktop.DBus.Properties"
+                        send_member="GetAll"/>
+ 
++                <allow send_destination="org.freedesktop.network1"
++                       send_interface="org.freedesktop.network1.Network"
++                       send_member="AddAddress"/>
++
++                <allow send_destination="org.freedesktop.network1"
++                       send_interface="org.freedesktop.network1.Network"
++                       send_member="DelAddress"/>
++
++                <allow send_destination="org.freedesktop.network1"
++                       send_interface="org.freedesktop.network1.Network"
++                       send_member="GetAddress"/>
++
++                <allow send_destination="org.freedesktop.network1"
++                       send_interface="org.freedesktop.network1.Link"
++                       send_member="GetAddress"/>
++
++                <allow send_destination="org.freedesktop.network1"
++                       send_interface="org.freedesktop.network1.Link"
++                       send_member="SetAddress"/>
++
+                 <allow receive_sender="org.freedesktop.network1"/>
+         </policy>
+ 
+-- 
+1.8.2.2
+
