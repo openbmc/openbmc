@@ -1,0 +1,10 @@
+[Unit]
+Description=User DBUS object
+Requires=skeleton.service
+After=skeleton.service
+
+[Service]
+ExecStart=/usr/sbin/userman.py
+
+[Install]
+WantedBy=multi-user.target
