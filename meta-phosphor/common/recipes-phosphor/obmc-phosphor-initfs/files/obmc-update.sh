@@ -45,12 +45,12 @@ rorwopts=ro${rwopts#rw}
 rwdir=rw
 upper=$rwdir/cow
 save=save/${upper##*/}
-whitelist=/run/initramfs/whitelist
+whitelist=/run/initramfs/whitelist.d
 
-if test -n "$rwfs" && test -s $whitelist
+mkdir -p $rwdir
+
+if test -n "$rwfs"
 then
-
-	mkdir -p $rwdir
 	mount $rwdev $rwdir -t $rwfst -o $rorwopts
 
 	while read f
@@ -62,7 +62,9 @@ then
 		d="$save/$f"
 		mkdir -p "${d%/*}"
 		cp -rp $upper/$f "${d%/*}/"
-	done < $whitelist
+	done << HERE
+$(grep -vh ^# $whitelist/*)
+HERE
 
 	umount $rwdir
 fi

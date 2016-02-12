@@ -1,0 +1,4 @@
+/etc/passwd
+/etc/group
+/etc/shadow
+/etc/gshadow
