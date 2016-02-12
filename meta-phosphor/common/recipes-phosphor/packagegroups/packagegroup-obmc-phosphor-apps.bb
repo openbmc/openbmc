@@ -19,6 +19,7 @@ PACKAGES = " \
         ${@mf_enabled("obmc-phosphor-flash-mgmt", "packagegroup-obmc-phosphor-apps-flash-mgmt", d)} \
         ${@df_enabled("obmc-phosphor-event-mgmt", "packagegroup-obmc-phosphor-apps-event-mgmt", d)} \
         ${@df_enabled("obmc-phosphor-policy-mgmt", "packagegroup-obmc-phosphor-apps-policy-mgmt", d)} \
+        ${@df_enabled("obmc-phosphor-user-mgmt", "packagegroup-obmc-phosphor-apps-user-mgmt", d)} \
         ${@df_enabled("obmc-phosphor-system-mgmt", "packagegroup-obmc-phosphor-apps-system-mgmt", d)} \
         "
 
@@ -67,6 +68,12 @@ SUMMARY_packagegroup-obmc-phosphor-apps-policy-mgmt = "Policy management support
 RDEPENDS_packagegroup-obmc-phosphor-apps-policy-mgmt = " \
         ${@df_enabled("obmc-phosphor-policy-mgmt", " \
                 virtual/obmc-phosphor-policy-mgmt \
+        ", d)}"
+
+SUMMARY_packagegroup-obmc-phosphor-apps-user-mgmt = "User management support"
+RDEPENDS_packagegroup-obmc-phosphor-apps-user-mgmt = " \
+        ${@df_enabled("obmc-phosphor-user-mgmt", " \
+                virtual/obmc-phosphor-user-mgmt \
         ", d)}"
 
 SUMMARY_packagegroup-obmc-phosphor-apps-system-mgmt = "System management support"
