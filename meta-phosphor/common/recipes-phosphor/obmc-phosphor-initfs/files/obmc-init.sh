@@ -114,7 +114,7 @@ then
 	msg="$(cat)" << HERE
 
 Mounting read-write $rwdev filesystem failed.  Please fix and run
-	mount $rwdev $rwdir -t $rwfs -o $rwopts
+	mount $rwdev $rwdir -t $rwfst -o $rwopts
 to to continue, or do change nothing to run from RAM for this boot.
 HERE
 	debug_takeover "$msg"
