@@ -30,6 +30,20 @@ findmtd() {
 	echo $m
 }
 
+blkid_fs_type() {
+	# Emulate util-linux's `blkid -s TYPE -o value $1`
+	# Example busybox blkid output:
+	#    # blkid /dev/mtdblock5
+	#    /dev/mtdblock5: TYPE="squashfs"
+	# Process output to extract TYPE value "squashfs".
+	blkid $1 | sed -e 's/^.*TYPE="//' -e 's/".*$//'
+}
+
+probe_fs_type() {
+	fst=$(blkid_fs_type $1)
+	echo ${fst:=jffs2}
+}
+
 debug_takeover() {
 	echo "$@"
 	test -n "$@" && echo Enter password to try to manually fix.
@@ -72,7 +86,7 @@ rodev=/dev/mtdblock${rofs#mtd}
 rwdev=/dev/mtdblock${rwfs#mtd}
 
 rofst=squashfs
-rwfst=ext4
+rwfst=$(probe_fs_type $rwdev)
 roopts=ro
 rwopts=rw
 
