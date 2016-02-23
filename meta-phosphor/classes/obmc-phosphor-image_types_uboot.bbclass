@@ -27,6 +27,13 @@ RWFS_SIZE ?= "4096"
 
 # IMAGE_POSTPROCESS_COMMAND += "do_generate_flash"
 
+mk_nor_image() {
+       image_dst="$1"
+       image_size_kb=$2
+       dd if=/dev/zero bs=1k count=${image_size_kb} \
+              | tr '\000' '\377' > ${image_dst}
+}
+
 do_generate_flash() {
        INITRD_CTYPE=${INITRAMFS_CTYPE}
        ddir="${DEPLOY_DIR_IMAGE}"
@@ -51,12 +58,12 @@ do_generate_flash() {
        fi
 
        oe_mkimage  "${initrd}" "${INITRD_CTYPE}" || bbfatal "oe_mkimage initrd"
-       dd if=/dev/zero of=${ddir}/${rwfs} bs=1k count=${RWFS_SIZE}
+       mk_nor_image ${ddir}/${rwfs} ${RWFS_SIZE}
        mkfs.${OVERLAY_BASETYPE} -b 4096 -F -O^huge_file ${ddir}/${rwfs} || bbfatal "mkfs rwfs"
 
        dst="${ddir}/${FLASH_IMAGE_NAME}"
        rm -rf $dst
-       dd if=/dev/zero of=${dst} bs=1k count=${FLASH_SIZE}
+       mk_nor_image ${dst} ${FLASH_SIZE}
        dd if=${ddir}/${uboot} of=${dst} bs=1k seek=${FLASH_UBOOT_OFFSET}
        dd if=${ddir}/${kernel} of=${dst} bs=1k seek=${FLASH_KERNEL_OFFSET}
        dd if=${ddir}/${uinitrd} of=${dst} bs=1k seek=${FLASH_INITRD_OFFSET}
