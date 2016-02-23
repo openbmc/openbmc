@@ -3,7 +3,7 @@ INITRD_IMAGE ?= "core-image-minimal-initramfs"
 INITRD ?= "${DEPLOY_DIR_IMAGE}/${INITRD_IMAGE}-${MACHINE}.cpio.${INITRD_CTYPE}${uboot}"
 
 IMAGE_BASETYPE ?= "squashfs-xz"
-OVERLAY_BASETYPE ?= "ext4"
+OVERLAY_BASETYPE ?= "jffs2"
 
 IMAGE_TYPES_${PN} += "${IMAGE_BASETYPE}"
 
