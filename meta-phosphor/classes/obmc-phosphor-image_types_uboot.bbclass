@@ -23,6 +23,14 @@ FLASH_ROFS_OFFSET ?= "4864"
 FLASH_RWFS_OFFSET ?= "28672"
 RWFS_SIZE ?= "4096"
 
+# Allow rwfs mkfs configuration through OVERLAY_MKFS_OPTS and OVERRIDES. However,
+# avoid setting 'ext4' or 'jffs2' in OVERRIDES as such raw filesystem types are
+# reserved for the primary image (and setting them currently breaks the build).
+# Instead, prefix the overlay override value with 'rwfs-' to avoid collisions.
+DISTROOVERRIDES .= ":rwfs-${OVERLAY_BASETYPE}"
+
+OVERLAY_MKFS_OPTS_rwfs-ext4 = "-b 4096 -F -O^huge_file"
+
 # $(( ${FLASH_SIZE} - ${FLASH_RWFS_OFFSET} ))
 
 # IMAGE_POSTPROCESS_COMMAND += "do_generate_flash"
@@ -58,8 +66,12 @@ do_generate_flash() {
        fi
 
        oe_mkimage  "${initrd}" "${INITRD_CTYPE}" || bbfatal "oe_mkimage initrd"
+
        mk_nor_image ${ddir}/${rwfs} ${RWFS_SIZE}
-       mkfs.${OVERLAY_BASETYPE} -b 4096 -F -O^huge_file ${ddir}/${rwfs} || bbfatal "mkfs rwfs"
+       if [ "${OVERLAY_BASETYPE}" != jffs2 ]; then
+              mkfs.${OVERLAY_BASETYPE} ${OVERLAY_MKFS_OPTS} ${ddir}/${rwfs} || \
+                     bbfatal "mkfs rwfs"
+       fi
 
        dst="${ddir}/${FLASH_IMAGE_NAME}"
        rm -rf $dst
