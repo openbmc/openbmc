@@ -85,13 +85,21 @@ rwfs=$(findmtd rwfs)
 rodev=/dev/mtdblock${rofs#mtd}
 rwdev=/dev/mtdblock${rwfs#mtd}
 
+# Set to y for yes, anything else for no.
+force_rwfst_jffs2=y
+flash_images_before_init=n
+
 rofst=squashfs
 rwfst=$(probe_fs_type $rwdev)
 roopts=ro
 rwopts=rw
 
+image=/run/initramfs/image-
+trigger=${image}rwfs
+
 init=/sbin/init
-fsck=/sbin/fsck.$rwfst
+fsckbase=/sbin/fsck.
+fsck=$fsckbase$rwfst
 fsckopts=-a
 
 echo rofs = $rofs $rofst   rwfs = $rwfs $rwfst
@@ -99,6 +107,50 @@ echo rofs = $rofs $rofst   rwfs = $rwfs $rwfst
 if grep -w debug-init-sh /proc/cmdline
 then
 	debug_takeover "Debug initial shell requested by command line."
+fi
+
+# If there are images in root move them to run/initramfs/ now.
+imagebasename=${image##*/}
+if test -n "${imagebasename}" -a "x$flash_images_before_init" = xy &&
+	ls /${imagebasename}* > /dev/null 2>&1
+then
+	echo "Pending flash updates found."
+	mv /${imagebasename}* ${image%$imagebasename}
+fi
+
+if grep -w clean-rwfs-filesystem /proc/cmdline
+then
+	echo "Cleaning of read-write overlay filesystem requested."
+	touch $trigger
+fi
+
+if test "x$force_rwfst_jffs2" = xy -a $rwfst != jffs2 -a ! -f $trigger
+then
+	echo "Converting read-write overlay filesystem to jffs2 forced."
+	touch $trigger
+fi
+
+if ls $image* > /dev/null 2>&1
+then
+	if ! test -x /update
+	then
+		debug_takeover "Flash update requested but /update missing!"
+	elif test -f $trigger -a ! -s $trigger
+	then
+		echo "Saving selected files from read-write overlay filesystem."
+		/update && rm -f $image*
+		echo "Clearing read-write overlay filesystem."
+		flash_eraseall /dev/$rwfs
+		echo "Restoring saved files to read-write overlay filesystem."
+		touch $trigger
+		/update 
+		rm -rf /save $trigger
+	else
+		/update && rm -f $image*
+	fi
+
+	rwfst=$(probe_fs_type $rwdev)
+	fsck=$fsckbase$rwfst
 fi
 
 mount $rodev $rodir -t $rofst -o $roopts
