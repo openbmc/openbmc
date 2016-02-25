@@ -35,10 +35,23 @@ findmtd() {
 	echo $m
 }
 
+blkid_fs_type() {
+	# Emulate util-linux's `blkid -s TYPE -o value $1`
+	# Example busybox blkid output:
+	#    # blkid /dev/mtdblock5
+	#    /dev/mtdblock5: TYPE="squashfs"
+	# Process output to extract TYPE value "squashfs".
+	blkid $1 | sed -e 's/^.*TYPE="//' -e 's/".*$//'
+}
+
+probe_fs_type() {
+	fst=$(blkid_fs_type $1)
+	echo ${fst:=jffs2}
+}
+
 rwfs=$(findmtd rwfs)
 
 rwdev=/dev/mtdblock${rwfs#mtd}
-rwfst=ext4
 rwopts=rw
 rorwopts=ro${rwopts#rw}
 
@@ -50,7 +63,7 @@ if test -n "$rwfs" && test -s whitelist
 then
 
 	mkdir -p $rwdir
-	mount $rwdev $rwdir -t $rwfst -o $rorwopts
+	mount $rwdev $rwdir -t $(probe_fs_type $rwdev) -o $rorwopts
 
 	while read f
 	do
@@ -87,7 +100,7 @@ done
 
 if test -d $save
 then
-	mount $rwdev $rwdir -t $rwfst -o $rwopts
+	mount $rwdev $rwdir -t $(probe_fs_type $rwdev) -o $rwopts
 	cp -rp $save/. $upper/
 	umount $rwdir
 fi

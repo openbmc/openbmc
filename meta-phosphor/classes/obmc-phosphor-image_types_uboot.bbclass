@@ -4,9 +4,9 @@ inherit image_types_uboot
 # the image load address and entry point. Override it here.
 
 oe_mkimage () {
-    mkimage -A ${UBOOT_ARCH} -O linux -T ramdisk -C $2 -n ${IMAGE_BASENAME} \
-        -a ${INITRD_IMAGE_LOADADDRESS} -e ${INITRD_IMAGE_ENTRYPOINT} \
-        -d ${DEPLOY_DIR_IMAGE}/$1 ${DEPLOY_DIR_IMAGE}/$1.u-boot
+       mkimage -A ${UBOOT_ARCH} -O linux -T ramdisk -C $2 -n ${IMAGE_BASENAME} \
+              -a ${INITRD_IMAGE_LOADADDRESS} -e ${INITRD_IMAGE_ENTRYPOINT} \
+              -d ${DEPLOY_DIR_IMAGE}/$1 ${DEPLOY_DIR_IMAGE}/$1.u-boot
 }
 
 INITRD_IMAGE_ENTRYPOINT ?= "0x40800000"
@@ -23,9 +23,24 @@ FLASH_ROFS_OFFSET ?= "4864"
 FLASH_RWFS_OFFSET ?= "28672"
 RWFS_SIZE ?= "4096"
 
+# Allow rwfs mkfs configuration through OVERLAY_MKFS_OPTS and OVERRIDES. However,
+# avoid setting 'ext4' or 'jffs2' in OVERRIDES as such raw filesystem types are
+# reserved for the primary image (and setting them currently breaks the build).
+# Instead, prefix the overlay override value with 'rwfs-' to avoid collisions.
+DISTROOVERRIDES .= ":rwfs-${OVERLAY_BASETYPE}"
+
+OVERLAY_MKFS_OPTS_rwfs-ext4 = "-b 4096 -F -O^huge_file"
+
 # $(( ${FLASH_SIZE} - ${FLASH_RWFS_OFFSET} ))
 
 # IMAGE_POSTPROCESS_COMMAND += "do_generate_flash"
+
+mk_nor_image() {
+       image_dst="$1"
+       image_size_kb=$2
+       dd if=/dev/zero bs=1k count=${image_size_kb} \
+              | tr '\000' '\377' > ${image_dst}
+}
 
 do_generate_flash() {
        INITRD_CTYPE=${INITRAMFS_CTYPE}
@@ -51,12 +66,16 @@ do_generate_flash() {
        fi
 
        oe_mkimage  "${initrd}" "${INITRD_CTYPE}" || bbfatal "oe_mkimage initrd"
-       dd if=/dev/zero of=${ddir}/${rwfs} bs=1k count=${RWFS_SIZE}
-       mkfs.${OVERLAY_BASETYPE} -b 4096 -F -O^huge_file ${ddir}/${rwfs} || bbfatal "mkfs rwfs"
+
+       mk_nor_image ${ddir}/${rwfs} ${RWFS_SIZE}
+       if [ "${OVERLAY_BASETYPE}" != jffs2 ]; then
+              mkfs.${OVERLAY_BASETYPE} ${OVERLAY_MKFS_OPTS} ${ddir}/${rwfs} || \
+                     bbfatal "mkfs rwfs"
+       fi
 
        dst="${ddir}/${FLASH_IMAGE_NAME}"
        rm -rf $dst
-       dd if=/dev/zero of=${dst} bs=1k count=${FLASH_SIZE}
+       mk_nor_image ${dst} ${FLASH_SIZE}
        dd if=${ddir}/${uboot} of=${dst} bs=1k seek=${FLASH_UBOOT_OFFSET}
        dd if=${ddir}/${kernel} of=${dst} bs=1k seek=${FLASH_KERNEL_OFFSET}
        dd if=${ddir}/${uinitrd} of=${dst} bs=1k seek=${FLASH_INITRD_OFFSET}

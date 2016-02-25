@@ -30,6 +30,20 @@ findmtd() {
 	echo $m
 }
 
+blkid_fs_type() {
+	# Emulate util-linux's `blkid -s TYPE -o value $1`
+	# Example busybox blkid output:
+	#    # blkid /dev/mtdblock5
+	#    /dev/mtdblock5: TYPE="squashfs"
+	# Process output to extract TYPE value "squashfs".
+	blkid $1 | sed -e 's/^.*TYPE="//' -e 's/".*$//'
+}
+
+probe_fs_type() {
+	fst=$(blkid_fs_type $1)
+	echo ${fst:=jffs2}
+}
+
 debug_takeover() {
 	echo "$@"
 	test -n "$@" && echo Enter password to try to manually fix.
@@ -71,13 +85,21 @@ rwfs=$(findmtd rwfs)
 rodev=/dev/mtdblock${rofs#mtd}
 rwdev=/dev/mtdblock${rwfs#mtd}
 
+# Set to y for yes, anything else for no.
+force_rwfst_jffs2=y
+flash_images_before_init=n
+
 rofst=squashfs
-rwfst=ext4
+rwfst=$(probe_fs_type $rwdev)
 roopts=ro
 rwopts=rw
 
+image=/run/initramfs/image-
+trigger=${image}rwfs
+
 init=/sbin/init
-fsck=/sbin/fsck.$rwfst
+fsckbase=/sbin/fsck.
+fsck=$fsckbase$rwfst
 fsckopts=-a
 
 echo rofs = $rofs $rofst   rwfs = $rwfs $rwfst
@@ -85,6 +107,50 @@ echo rofs = $rofs $rofst   rwfs = $rwfs $rwfst
 if grep -w debug-init-sh /proc/cmdline
 then
 	debug_takeover "Debug initial shell requested by command line."
+fi
+
+# If there are images in root move them to run/initramfs/ now.
+imagebasename=${image##*/}
+if test -n "${imagebasename}" -a "x$flash_images_before_init" = xy &&
+	ls /${imagebasename}* > /dev/null 2>&1
+then
+	echo "Pending flash updates found."
+	mv /${imagebasename}* ${image%$imagebasename}
+fi
+
+if grep -w clean-rwfs-filesystem /proc/cmdline
+then
+	echo "Cleaning of read-write overlay filesystem requested."
+	touch $trigger
+fi
+
+if test "x$force_rwfst_jffs2" = xy -a $rwfst != jffs2 -a ! -f $trigger
+then
+	echo "Converting read-write overlay filesystem to jffs2 forced."
+	touch $trigger
+fi
+
+if ls $image* > /dev/null 2>&1
+then
+	if ! test -x /update
+	then
+		debug_takeover "Flash update requested but /update missing!"
+	elif test -f $trigger -a ! -s $trigger
+	then
+		echo "Saving selected files from read-write overlay filesystem."
+		/update && rm -f $image*
+		echo "Clearing read-write overlay filesystem."
+		flash_eraseall /dev/$rwfs
+		echo "Restoring saved files to read-write overlay filesystem."
+		touch $trigger
+		/update 
+		rm -rf /save $trigger
+	else
+		/update && rm -f $image*
+	fi
+
+	rwfst=$(probe_fs_type $rwdev)
+	fsck=$fsckbase$rwfst
 fi
 
 mount $rodev $rodir -t $rofst -o $roopts
@@ -105,7 +171,8 @@ then
 	then
 		debug_takeover "fsck of read-write fs on $rwdev failed (rc=$rc)"
 	fi
-else
+elif test $fsck != /sbin/fsck.jffs2
+then
 	echo "No '$fsck' in read only fs, skipping fsck."
 fi
 
@@ -114,7 +181,7 @@ then
 	msg="$(cat)" << HERE
 
 Mounting read-write $rwdev filesystem failed.  Please fix and run
-	mount $rwdev $rwdir -t $rwfs -o $rwopts
+	mount $rwdev $rwdir -t $rwfst -o $rwopts
 to to continue, or do change nothing to run from RAM for this boot.
 HERE
 	debug_takeover "$msg"
