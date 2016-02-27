@@ -159,6 +159,12 @@ then
 	fsck=$fsckbase$rwfst
 fi
 
+if test -s /run/image-rofs
+then
+	rodev=/run/image-rofs
+	roopts=$roopts,loop
+fi
+
 mount $rodev $rodir -t $rofst -o $roopts
 
 if test -x $rodir$fsck
