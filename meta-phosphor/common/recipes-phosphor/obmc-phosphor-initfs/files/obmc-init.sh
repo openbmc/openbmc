@@ -164,6 +164,11 @@ then
 	fsck=$fsckbase$rwfst
 fi
 
+if grep -w overlay-filesystem-in-ram $optfile
+then
+	rwfst=none
+fi
+
 if test -s /run/image-rofs
 then
 	rodev=/run/image-rofs
