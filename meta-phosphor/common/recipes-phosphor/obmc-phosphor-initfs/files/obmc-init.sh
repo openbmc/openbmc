@@ -183,12 +183,16 @@ then
 	then
 		debug_takeover "fsck of read-write fs on $rwdev failed (rc=$rc)"
 	fi
-elif test "$rwfst" != jffs2
+elif test "$rwfst" != jffs2 -a "$rwfst" != none
 then
 	echo "No '$fsck' in read only fs, skipping fsck."
 fi
 
-if ! mount $rwdev $rwdir -t $rwfst -o $rwopts
+if test "$rwfst" = none
+then
+	echo "Running with read-write overlay in RAM for this boot."
+	echo "No state will be preserved unless flash update performed."
+elif ! mount $rwdev $rwdir -t $rwfst -o $rwopts
 then
 	msg="$(cat)" << HERE
 
