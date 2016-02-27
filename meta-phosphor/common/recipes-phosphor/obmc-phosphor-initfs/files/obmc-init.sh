@@ -183,7 +183,7 @@ then
 	then
 		debug_takeover "fsck of read-write fs on $rwdev failed (rc=$rc)"
 	fi
-elif test $fsck != /sbin/fsck.jffs2
+elif test "$rwfst" != jffs2
 then
 	echo "No '$fsck' in read only fs, skipping fsck."
 fi
