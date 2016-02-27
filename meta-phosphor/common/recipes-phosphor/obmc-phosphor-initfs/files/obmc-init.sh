@@ -169,6 +169,18 @@ then
 	rwfst=none
 fi
 
+if grep -w copy-base-filesystem-to-ram $optfile &&
+	test ! -e /run/image-rofs && ! cp $rodev /run/image-rofs
+then
+	# Remove any partial copy to avoid attempted usage later
+	if test -e  /run/image-rofs
+	then
+		ls -l /run/image-rofs
+		rm -f /run/image-rofs
+	fi
+	debug_takeover "Copying $rodev to /run/image-rofs failed."
+fi
+
 if test -s /run/image-rofs
 then
 	rodev=/run/image-rofs
