@@ -101,10 +101,16 @@ init=/sbin/init
 fsckbase=/sbin/fsck.
 fsck=$fsckbase$rwfst
 fsckopts=-a
+optfile=/run/initramfs/init-options
+
+if test ! -f $optfile
+then
+	cat /proc/cmdline > $optfile
+fi
 
 echo rofs = $rofs $rofst   rwfs = $rwfs $rwfst
 
-if grep -w debug-init-sh /proc/cmdline
+if grep -w debug-init-sh $optfile
 then
 	debug_takeover "Debug initial shell requested by command line."
 fi
@@ -118,7 +124,7 @@ then
 	mv /${imagebasename}* ${image%$imagebasename}
 fi
 
-if grep -w clean-rwfs-filesystem /proc/cmdline
+if grep -w clean-rwfs-filesystem $optfile
 then
 	echo "Cleaning of read-write overlay filesystem requested."
 	touch $trigger
