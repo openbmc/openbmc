@@ -115,13 +115,18 @@ then
 	debug_takeover "Debug initial shell requested by command line."
 fi
 
-# If there are images in root move them to run/initramfs/ now.
+# If there are images in root move them to /run/initramfs/ or /run/ now.
 imagebasename=${image##*/}
-if test -n "${imagebasename}" -a "x$flash_images_before_init" = xy &&
-	ls /${imagebasename}* > /dev/null 2>&1
+if test -n "${imagebasename}" && ls /${imagebasename}* > /dev/null 2>&1
 then
-	echo "Pending flash updates found."
-	mv /${imagebasename}* ${image%$imagebasename}
+	if test "x$flash_images_before_init" = xy
+	then
+		echo "Flash images found, will update before starting init."
+		mv /${imagebasename}* ${image%$imagebasename}
+	else
+		echo "Flash images found, will use but deferring flash update."
+		mv /${imagebasename}* /run/
+	fi
 fi
 
 if grep -w clean-rwfs-filesystem $optfile
