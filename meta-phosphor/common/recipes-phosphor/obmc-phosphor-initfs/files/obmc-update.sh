@@ -90,7 +90,7 @@ do
 	esac
 done
 
-if test "x$dosave" = xy -a -n "$rwfs" -a -s whitelist
+if test "x$dosave" = xy -a -n "$rwfs"
 then
 	mkdir -p $rwdir
 	mount $rwdev $rwdir -t $(probe_fs_type $rwdev) -o $rorwopts
