@@ -47,7 +47,7 @@ cat /proc/mounts
 
 test "$umount_proc" && umount /proc && rmdir /proc
 
-# ioctl(TIOC_DRAIN) to drain tty messages to console
+# tcsattr(tty, TIOCDRAIN, mode) to drain tty messages to console
 test -t 1 && stty cooked 0<&1
 
 # Execute the command systemd told us to ...
