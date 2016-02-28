@@ -132,9 +132,15 @@ done
 
 if test -d $save -a "x$dorestore" = xy
 then
+	odir=$rwdir
+	rwdir=/run/rw
+	upper=$rwdir${upper#$odir}
+
+	mkdir -p $rwdir
 	mount $rwdev $rwdir -t $(probe_fs_type $rwdev) -o $rwopts
 	cp -rp $save/. $upper/
 	umount $rwdir
+	rmdir $rwdir
 fi
 
 if test "x$doclean" = xy
