@@ -59,6 +59,23 @@ rwdir=rw
 upper=$rwdir/cow
 save=save/${upper##*/}
 
+doclean=
+
+while test "$1" != "${1#-}"
+do
+	case "$1" in
+	--no-clean-saved-files)
+		doclean=
+		shift ;;
+	--clean-saved-files)
+		doclean=y
+		shift ;;
+	*)
+		echo 2>&1 "Unknown option $1"
+		exit 1 ;;
+	esac
+done
+
 if test -n "$rwfs" && test -s whitelist
 then
 
@@ -103,6 +120,11 @@ then
 	mount $rwdev $rwdir -t $(probe_fs_type $rwdev) -o $rwopts
 	cp -rp $save/. $upper/
 	umount $rwdir
+fi
+
+if test "x$doclean" = xy
+then
+	rm -rf $save
 fi
 
 exit
