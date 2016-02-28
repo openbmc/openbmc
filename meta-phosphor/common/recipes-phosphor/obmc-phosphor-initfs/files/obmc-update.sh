@@ -55,7 +55,7 @@ rwdev=/dev/mtdblock${rwfs#mtd}
 rwopts=rw
 rorwopts=ro${rwopts#rw}
 
-rwdir=rw
+rwdir=/run/initramfs/rw
 upper=$rwdir/cow
 save=/run/save/${upper##*/}
 
