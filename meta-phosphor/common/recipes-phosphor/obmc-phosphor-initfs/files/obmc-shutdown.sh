@@ -53,7 +53,7 @@ test -t 1 && stty cooked 0<&1
 # Execute the command systemd told us to ...
 if test -d /oldroot  && test "$1"
 then
-	if test "$1" == kexec
+	if test "$1" = kexec
 	then
 		$1 -f -e
 	else
