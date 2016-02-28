@@ -136,6 +136,12 @@ done
 
 for f in $image*
 do
+	if test ! -s $f
+	then
+		echo "Skipping empty update of ${f#$image}."
+		rm $f
+		continue
+	fi
 	m=$(findmtd ${f#$image})
 	echo "Updating ${f#$image}..."
 	flashcp -v $f /dev/$m && rm $f
