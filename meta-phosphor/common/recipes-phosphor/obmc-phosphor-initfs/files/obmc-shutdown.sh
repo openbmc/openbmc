@@ -37,9 +37,14 @@ then
 	ln -sn /run/fw_env ${image}u-boot-env
 fi
 
-if test -x /update && ls $image* > /dev/null 2>&1
+if ls $image* > /dev/null 2>&1
 then
-	/update ${1+"$@"}
+	if test -x /update
+	then
+		/update
+	else
+		echo 1>&2 "Flash update requested but /update program missing!"
+	fi
 fi
 
 echo Remaining mounts:
