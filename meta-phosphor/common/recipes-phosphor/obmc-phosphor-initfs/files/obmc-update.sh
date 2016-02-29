@@ -63,6 +63,9 @@ doclean=
 dosave=y
 dorestore=y
 
+whitelist=/run/initramfs/whitelist
+image=/run/initramfs/image-
+
 while test "$1" != "${1#-}"
 do
 	case "$1" in
@@ -104,12 +107,11 @@ then
 		d="$save/$f"
 		mkdir -p "${d%/*}"
 		cp -rp $upper/$f "${d%/*}/"
-	done < whitelist
+	done < $whitelist
 
 	umount $rwdir
 fi
 
-image=/run/initramfs/image-
 for f in $image*
 do
 	m=$(findmtd ${f#$image})
