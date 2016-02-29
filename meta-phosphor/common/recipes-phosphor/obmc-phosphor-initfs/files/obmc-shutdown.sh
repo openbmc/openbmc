@@ -43,7 +43,7 @@ if ls $image* > /dev/null 2>&1
 then
 	if test -x $update
 	then
-		$update
+		$update --clean-saved-files
 	else
 		echo 1>&2 "Flash update requested but $update program missing!"
 	fi
