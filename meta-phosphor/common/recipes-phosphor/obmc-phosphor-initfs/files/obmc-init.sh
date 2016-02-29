@@ -149,15 +149,14 @@ then
 	elif test -f $trigger -a ! -s $trigger
 	then
 		echo "Saving selected files from read-write overlay filesystem."
-		/update && rm -f $image*
+		/update --no-restore-files
 		echo "Clearing read-write overlay filesystem."
 		flash_eraseall /dev/$rwfs
 		echo "Restoring saved files to read-write overlay filesystem."
 		touch $trigger
-		/update 
-		rm -rf /save $trigger
+		/update --no-save-files --clean-saved-files
 	else
-		/update && rm -f $image*
+		/update --clean-saved-files
 	fi
 
 	rwfst=$(probe_fs_type $rwdev)
