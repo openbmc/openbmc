@@ -42,3 +42,10 @@ IMAGE_INSTALL += " \
         i2c-tools \
         screen \
         "
+
+def build_overlay(d):
+        if bb.utils.contains("IMAGE_FSTYPES", "overlay", "overlay", "0", d) != "0":
+                return "image-overlay"
+        return ""
+
+inherit ${@build_overlay(d)}
