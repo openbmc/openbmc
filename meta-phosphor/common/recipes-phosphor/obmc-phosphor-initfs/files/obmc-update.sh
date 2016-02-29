@@ -138,6 +138,7 @@ then
 
 	mkdir -p $rwdir
 	mount $rwdev $rwdir -t $(probe_fs_type $rwdev) -o $rwopts
+	mkdir -p $upper
 	cp -rp $save/. $upper/
 	umount $rwdir
 	rmdir $rwdir
