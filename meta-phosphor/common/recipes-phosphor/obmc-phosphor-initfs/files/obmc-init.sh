@@ -169,6 +169,21 @@ then
 	rwfst=none
 fi
 
+copyfiles=
+if grep -w copy-files-to-ram $optfile
+then
+	rwfst=none
+	copyfiles=y
+fi
+
+# It would be nice to do this after fsck but that mean rofs is mounted
+# which triggers the mtd is mounted check
+if test "$rwfst$copyfiles" = noney
+then
+	touch $trigger
+	$update --copy-files --clean-saved-files --no-restore-files
+fi
+
 if grep -w copy-base-filesystem-to-ram $optfile &&
 	test ! -e /run/image-rofs && ! cp $rodev /run/image-rofs
 then
