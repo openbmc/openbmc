@@ -25,20 +25,20 @@ FEATURE_PACKAGES_obmc-phosphor-system-mgmt ?= "packagegroup-obmc-phosphor-apps-s
 
 # Install entire Phosphor application stack by default
 IMAGE_FEATURES += " \
-       obmc-phosphor-fan-mgmt \
-       obmc-phosphor-chassis-mgmt \
-       obmc-phosphor-sensor-mgmt \
-       obmc-phosphor-flash-mgmt \
-       obmc-phosphor-event-mgmt \
-       obmc-phosphor-policy-mgmt \
-       obmc-phosphor-user-mgmt \
-       obmc-phosphor-system-mgmt \
-       ssh-server-dropbear \
-       "
+        obmc-phosphor-fan-mgmt \
+        obmc-phosphor-chassis-mgmt \
+        obmc-phosphor-sensor-mgmt \
+        obmc-phosphor-flash-mgmt \
+        obmc-phosphor-event-mgmt \
+        obmc-phosphor-policy-mgmt \
+        obmc-phosphor-user-mgmt \
+        obmc-phosphor-system-mgmt \
+        ssh-server-dropbear \
+        "
 
 IMAGE_INSTALL += " \
-       bash \
-       packagegroup-obmc-phosphor-apps-extras \
-       i2c-tools \
-       screen \
-       "
+        bash \
+        packagegroup-obmc-phosphor-apps-extras \
+        i2c-tools \
+        screen \
+        "
