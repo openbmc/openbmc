@@ -138,8 +138,7 @@ for f in $image*
 do
 	m=$(findmtd ${f#$image})
 	echo "Updating ${f#$image}..."
-	# flasheraseall /dev/$m && dd if=$f of=/dev/$m
-	flashcp -v $f /dev/$m
+	flashcp -v $f /dev/$m && rm $f
 done
 
 if test "x$toram" = xy
