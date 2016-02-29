@@ -30,7 +30,9 @@ do
 done
 set +x
 
+update=/run/initramfs/update
 image=/run/initramfs/image-
+
 if test -s /run/fw_env -a -c /run/mtd:u-boot-env -a ! -e ${image}u-boot-env &&
 	! cmp /run/mtd:u-boot-env /run/fw_env
 then
@@ -39,11 +41,11 @@ fi
 
 if ls $image* > /dev/null 2>&1
 then
-	if test -x /update
+	if test -x $update
 	then
-		/update
+		$update
 	else
-		echo 1>&2 "Flash update requested but /update program missing!"
+		echo 1>&2 "Flash update requested but $update program missing!"
 	fi
 fi
 
