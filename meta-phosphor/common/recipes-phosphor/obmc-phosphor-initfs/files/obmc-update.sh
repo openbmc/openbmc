@@ -57,7 +57,7 @@ rorwopts=ro${rwopts#rw}
 
 rwdir=rw
 upper=$rwdir/cow
-save=save/${upper##*/}
+save=/run/save/${upper##*/}
 
 doclean=
 dosave=y
