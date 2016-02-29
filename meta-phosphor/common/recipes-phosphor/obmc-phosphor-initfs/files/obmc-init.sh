@@ -102,6 +102,7 @@ fsckbase=/sbin/fsck.
 fsck=$fsckbase$rwfst
 fsckopts=-a
 optfile=/run/initramfs/init-options
+update=/run/initramfs/update
 
 if test ! -f $optfile
 then
@@ -143,20 +144,20 @@ fi
 
 if ls $image* > /dev/null 2>&1
 then
-	if ! test -x /update
+	if ! test -x $update
 	then
-		debug_takeover "Flash update requested but /update missing!"
+		debug_takeover "Flash update requested but $update missing!"
 	elif test -f $trigger -a ! -s $trigger
 	then
 		echo "Saving selected files from read-write overlay filesystem."
-		/update --no-restore-files
+		$update --no-restore-files
 		echo "Clearing read-write overlay filesystem."
 		flash_eraseall /dev/$rwfs
 		echo "Restoring saved files to read-write overlay filesystem."
 		touch $trigger
-		/update --no-save-files --clean-saved-files
+		$update --no-save-files --clean-saved-files
 	else
-		/update --clean-saved-files
+		$update --clean-saved-files
 	fi
 
 	rwfst=$(probe_fs_type $rwdev)
