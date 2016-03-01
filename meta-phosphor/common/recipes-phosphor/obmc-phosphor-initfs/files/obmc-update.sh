@@ -59,6 +59,7 @@ rwdir=/run/initramfs/rw
 upper=$rwdir/cow
 save=/run/save/${upper##*/}
 
+mounted=
 doclean=
 dosave=y
 dorestore=y
@@ -93,10 +94,14 @@ do
 	esac
 done
 
-if test "x$dosave" = xy -a -n "$rwfs"
+if test "x$dosave" = xy
 then
-	mkdir -p $rwdir
-	mount $rwdev $rwdir -t $(probe_fs_type $rwdev) -o $rorwopts
+	if test ! -d $upper -a -n "$rwfs"
+	then
+		mkdir -p $rwdir
+		mount $rwdev $rwdir -t $(probe_fs_type $rwdev) -o $rorwopts
+		mounted=$rwdir
+	fi
 
 	while read f
 	do
@@ -109,7 +114,10 @@ then
 		cp -rp $upper/$f "${d%/*}/"
 	done < $whitelist
 
-	umount $rwdir
+	if test -n "$mounted"
+	then
+		umount $mounted
+	fi
 fi
 
 for f in $image*
