@@ -63,6 +63,7 @@ mounted=
 doclean=
 dosave=y
 dorestore=y
+toram=
 
 whitelist=/run/initramfs/whitelist
 image=/run/initramfs/image-
@@ -87,6 +88,9 @@ do
 		shift ;;
 	--restore-files)
 		dorestore=y
+		shift ;;
+	--copy-files)
+		toram=y
 		shift ;;
 	*)
 		echo 2>&1 "Unknown option $1"
@@ -137,6 +141,12 @@ do
 	# flasheraseall /dev/$m && dd if=$f of=/dev/$m
 	flashcp -v $f /dev/$m
 done
+
+if test "x$toram" = xy
+then
+	mkdir -p $upper
+	cp -rp $save/. $upper/
+fi
 
 if test -d $save -a "x$dorestore" = xy
 then
