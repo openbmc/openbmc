@@ -60,6 +60,8 @@ upper=$rwdir/cow
 save=save/${upper##*/}
 
 doclean=
+dosave=y
+dorestore=y
 
 while test "$1" != "${1#-}"
 do
@@ -70,15 +72,26 @@ do
 	--clean-saved-files)
 		doclean=y
 		shift ;;
+	--no-save-files)
+		dosave=
+		shift ;;
+	--save-files)
+		dosave=y
+		shift ;;
+	--no-restore-files)
+		dorestore=
+		shift ;;
+	--restore-files)
+		dorestore=y
+		shift ;;
 	*)
 		echo 2>&1 "Unknown option $1"
 		exit 1 ;;
 	esac
 done
 
-if test -n "$rwfs" && test -s whitelist
+if test "x$dosave" = xy -a -n "$rwfs" -a -s whitelist
 then
-
 	mkdir -p $rwdir
 	mount $rwdev $rwdir -t $(probe_fs_type $rwdev) -o $rorwopts
 
@@ -115,7 +128,7 @@ do
 	flashcp -v $f /dev/$m
 done
 
-if test -d $save
+if test -d $save -a "x$dorestore" = xy
 then
 	mount $rwdev $rwdir -t $(probe_fs_type $rwdev) -o $rwopts
 	cp -rp $save/. $upper/
