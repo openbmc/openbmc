@@ -17,7 +17,6 @@ IMAGE_FSTYPES += "overlay"
 IMAGE_INSTALL += "u-boot-fw-utils"
 
 IMAGE_CLASSES += "obmc-phosphor-image_types_uboot"
-IMAGE_CLASSES += "image-overlay"
 
 INITRAMFS_CTYPE ?= "lzma"
 INITRAMFS_FSTYPES += "cpio.${INITRAMFS_CTYPE}"
