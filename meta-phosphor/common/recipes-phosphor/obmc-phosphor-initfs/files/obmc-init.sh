@@ -44,6 +44,19 @@ probe_fs_type() {
 	echo ${fst:=jffs2}
 }
 
+# This fw_get_env_var is a simple but slightly broken version of fw_printenv:
+# The u-boot environemnt starts with a crc32, followed by a flag byte
+# when a redundannt environment is configured, followed by var=value\0 sets.
+# The flag byte for nand is a 1 byte counter; for nor it is a 1 or 0 byte.
+# The crc and/or nand flag byte can contain printable characters and be
+# considered part of the first string and parsed as part of the variable
+# name.  In addition a variable could have a "\n" embedded in it, this code
+# would split that variable.  Ignore for now, the last set var is at the end.
+
+get_fw_env_var() {
+	strings /run/fw_env | sed -ne "s/^$1=//p"
+}
+
 debug_takeover() {
 	echo "$@"
 	test -n "$@" && echo Enter password to try to manually fix.
@@ -107,6 +120,8 @@ update=/run/initramfs/update
 if test ! -f $optfile
 then
 	cat /proc/cmdline > $optfile
+	get_fw_env_var openbmcinit >> $optfile
+	get_fw_env_var openbmconce >> $optfile
 fi
 
 echo rofs = $rofs $rofst   rwfs = $rwfs $rwfst
