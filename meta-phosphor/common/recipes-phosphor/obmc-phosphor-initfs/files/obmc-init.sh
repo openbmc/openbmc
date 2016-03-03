@@ -57,6 +57,58 @@ get_fw_env_var() {
 	strings /run/fw_env | sed -ne "s/^$1=//p"
 }
 
+setup_resolv() {
+	runresolv=/run/systemd/resolve/resolv.conf
+	etcresolv=/etc/resolv.conf
+
+	if test ! -e $etcresolv -a ! -L $etcresolv
+	then
+		mkdir -p ${runresolv%/*}
+		ln -s $runresolv $etcresolv
+	fi
+	if test ! -f $runresolv
+	then
+		cat  /proc/net/pnp > $runresolv
+	fi
+
+	return 0
+}
+
+try_tftp() {
+	# split into  tftp:// host:port/ path/on/remote
+	# then spilt off / and then :port from the end of host:port/
+	# and : from the beginning of port
+
+	rest="${1#tftp://}"
+	path=${rest#*/}
+	host=${rest%$path}
+	host="${host%/}"
+	port="${host#${host%:*}}"
+	host="${host%$port}"
+	port="${port#:}"
+
+	setup_resolv
+
+	if test -z "$host" -o -z "$path"
+	then
+		debug_takeover "Invalid tftp download url '$url'."
+	elif echo "Downloading '$url' from $host ..."  &&
+		! tftp -g -r "$path" -l /run/image-rofs "$host" ${port+"$port"}
+	then
+		debug_takeover "Download of '$url' failed."
+	fi
+}
+
+try_wget() {
+	setup_resolv
+
+	echo "Downloading '$1' ..."
+	if ! wget -O /run/image-rofs "$1"
+	then
+		debug_takeover "Download of '$url' failed."
+	fi
+}
+
 debug_takeover() {
 	echo "$@"
 	test -n "$@" && echo Enter password to try to manually fix.
@@ -101,6 +153,10 @@ rwdev=/dev/mtdblock${rwfs#mtd}
 # Set to y for yes, anything else for no.
 force_rwfst_jffs2=y
 flash_images_before_init=n
+consider_download_files=y
+consider_download_tftp=y
+consider_download_http=y
+consider_download_ftp=y
 
 rofst=squashfs
 rwfst=$(probe_fs_type $rwdev)
@@ -115,6 +171,7 @@ fsckbase=/sbin/fsck.
 fsck=$fsckbase$rwfst
 fsckopts=-a
 optfile=/run/initramfs/init-options
+urlfile=/run/initramfs/init-download-url
 update=/run/initramfs/update
 
 if test -e /${optfile##*/}
@@ -134,6 +191,56 @@ echo rofs = $rofs $rofst   rwfs = $rwfs $rwfst
 if grep -w debug-init-sh $optfile
 then
 	debug_takeover "Debug initial shell requested by command line."
+fi
+
+if test "x$consider_download_files" = xy &&
+	grep -w openbmc-init-download-files $optfile
+then
+	if test -f ${urlfile##*/}
+	then
+		cp ${urlfile##*/} $urlfile
+	fi
+	if test ! -f $urlfile
+	then
+		get_fw_env_var openbmcinitdownloadurl > $urlfile
+	fi
+	url="$(cat $urlfile)"
+	rest="${url#*://}"
+	proto="${url%$rest}"
+
+	if test -z "$url"
+	then
+		echo "Download url empty.  Ignoring download request."
+	elif test -z "$proto"
+	then
+		echo "Download failed."
+	elif test "$proto" = tftp://
+	then
+		if test "x$consider_download_tftp" = xy
+		then
+			try_tftp "$url"
+		else
+			echo "Download failed."
+		fi
+	elif test "$proto" = http://
+	then
+		if test "x$consider_download_http" = xy
+		then
+			try_wget "$url"
+		else
+			echo "Download failed."
+		fi
+	elif test "$proto" = ftp://
+	then
+		if test "x$consider_download_ftp" = xy
+		then
+			try_wget "$url"
+		else
+			echo "Download failed."
+		fi
+	else
+		echo "Download failed."
+	fi
 fi
 
 # If there are images in root move them to /run/initramfs/ or /run/ now.
