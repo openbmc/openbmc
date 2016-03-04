@@ -1,0 +1,15 @@
+[Unit]
+Description=Clear one time boot overrides
+
+ConditionFileNotEmpty=/etc/fw_env.config
+RequiresMountsFor=/run /sbin /etc
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+
+# It took 7 seconds to erase and write flash, be conservative
+TimeoutStartSec=60
+Restart=no
+
+ExecStart=/sbin/fw_setenv openbmconce
