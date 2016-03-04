@@ -14,6 +14,7 @@ inherit obmc-phosphor-c-daemon
 
 TARGET_CFLAGS   += "-fpic"
 
+RDEPENDS_${PN} += "clear-once"
 RDEPENDS_${PN} += "settings"
 RDEPENDS_${PN} += "network"
 SRC_URI += "git://github.com/openbmc/phosphor-host-ipmid"
