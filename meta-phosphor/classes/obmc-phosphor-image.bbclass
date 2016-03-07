@@ -41,6 +41,7 @@ IMAGE_INSTALL += " \
         packagegroup-obmc-phosphor-apps-extras \
         i2c-tools \
         screen \
+        inarp \
         "
 
 def build_overlay(d):
