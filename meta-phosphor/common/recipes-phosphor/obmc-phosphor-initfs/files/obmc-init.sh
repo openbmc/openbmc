@@ -44,17 +44,30 @@ probe_fs_type() {
 	echo ${fst:=jffs2}
 }
 
-# This fw_get_env_var is a simple but slightly broken version of fw_printenv:
+# This fw_get_env_var is a possibly broken version of fw_printenv that
+# does not check the crc or flag byte.
 # The u-boot environemnt starts with a crc32, followed by a flag byte
 # when a redundannt environment is configured, followed by var=value\0 sets.
 # The flag byte for nand is a 1 byte counter; for nor it is a 1 or 0 byte.
-# The crc and/or nand flag byte can contain printable characters and be
-# considered part of the first string and parsed as part of the variable
-# name.  In addition a variable could have a "\n" embedded in it, this code
-# would split that variable.  Ignore for now, the last set var is at the end.
 
 get_fw_env_var() {
-	strings /run/fw_env | sed -ne "s/^$1=//p"
+	# do we have 1 or 2 copies of the environment?
+	# count non-blank non-comment lines
+	# copies=$(grep -v ^# /etc/fw_env.config | grep -c [::alnum::])
+	# ... we could if we had the fw_env.config in the initramfs
+	copies=1
+
+	# * Change \n to \r and \0 to \n
+	# * Skip to the 5th byte to skip over crc
+	# * then skip to the first or 2nd byte to skip over flag if it exists
+	# * stop parsing at first empty line corresponding to the
+	#   double \0 at the end of the environment.
+	# * print the value of the variable name passed as argument
+
+	cat /run/fw_env | 
+	tr '\n\000' '\r\n' |
+	tail -c +5 | tail -c +${copies-1} | 
+	sed -ne '/^$/,$d' -e "s/^$1=//p"
 }
 
 setup_resolv() {
