@@ -16,7 +16,7 @@ DEPENDS += "glib-2.0 systemd"
 RDEPENDS_${PN} += "python-subprocess python-compression libsystemd"
 SRC_URI += "git://github.com/openbmc/skeleton"
 
-SRCREV = "ad8c3d3b7be6cc5cda80a2f215b40eae16381b09"
+SRCREV = "27ca44ad1a96f90d42dcb50183700e5ca5358642"
 
 S = "${WORKDIR}"
 
