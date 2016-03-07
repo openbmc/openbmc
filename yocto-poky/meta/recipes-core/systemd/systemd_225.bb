@@ -41,7 +41,6 @@ SRC_URI = "git://github.com/systemd/systemd.git;protocol=git \
            file://0012-implment-systemd-sysv-install-for-OE.patch \
            file://0014-Revert-rules-remove-firmware-loading-rules.patch \
            file://0015-Revert-udev-remove-userspace-firmware-loading-suppor.patch \
-           file://0100-systemd_networkd_dbus_setaddress.patch \
            file://touchscreen.rules \
            file://00-create-volatile.conf \
            file://init \
