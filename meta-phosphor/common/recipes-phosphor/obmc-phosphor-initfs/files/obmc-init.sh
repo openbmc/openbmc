@@ -117,6 +117,11 @@ fsckopts=-a
 optfile=/run/initramfs/init-options
 update=/run/initramfs/update
 
+if test -e /${optfile##*/}
+then
+	cp /${optfile##*/} $optfile
+fi
+
 if test ! -f $optfile
 then
 	cat /proc/cmdline > $optfile
