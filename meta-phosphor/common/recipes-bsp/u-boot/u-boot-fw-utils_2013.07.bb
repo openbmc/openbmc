@@ -12,7 +12,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=1707d6db1d42237583f50183a5651ecb \
 # We use the revision in order to avoid having to fetch it from the
 # repo during parse
 # SRCREV = "62c175fbb8a0f9a926c88294ea9f7e88eb898f6c"
-SRCREV="${AUTOREV}"
+SRCREV="4b44678c11ac82c7c797bb115e276181752ad54d"
 
 PV = "v2013.07+git${SRCPV}"
 
