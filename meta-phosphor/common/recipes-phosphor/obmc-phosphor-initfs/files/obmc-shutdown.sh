@@ -30,30 +30,37 @@ do
 done
 set +x
 
+update=/run/initramfs/update
 image=/run/initramfs/image-
+
 if test -s /run/fw_env -a -c /run/mtd:u-boot-env -a ! -e ${image}u-boot-env &&
 	! cmp /run/mtd:u-boot-env /run/fw_env
 then
 	ln -sn /run/fw_env ${image}u-boot-env
 fi
 
-if test -x /update && ls $image* > /dev/null 2>&1
+if ls $image* > /dev/null 2>&1
 then
-	/update ${1+"$@"}
+	if test -x $update
+	then
+		$update --clean-saved-files
+	else
+		echo 1>&2 "Flash update requested but $update program missing!"
+	fi
 fi
 
 echo Remaining mounts:
 cat /proc/mounts
 
-test "umount_proc" && umount /proc && rmdir /proc
+test "$umount_proc" && umount /proc && rmdir /proc
 
-# ioctl(TIOC_DRAIN) to drain tty messages to console
+# tcsattr(tty, TIOCDRAIN, mode) to drain tty messages to console
 test -t 1 && stty cooked 0<&1
 
 # Execute the command systemd told us to ...
 if test -d /oldroot  && test "$1"
 then
-	if test "$1" == kexec
+	if test "$1" = kexec
 	then
 		$1 -f -e
 	else

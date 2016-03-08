@@ -1,5 +1,7 @@
 [Unit]
 Description=Phosphor OpenBMC IPMI daemon
+Wants=clear-once.service
+After=clear-once.service
 
 [Service]
 ExecStart=/usr/sbin/ipmid

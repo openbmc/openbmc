@@ -12,6 +12,13 @@ SRC_URI += "file://obmc-update.sh"
 SRC_URI += "file://whitelist"
 
 do_install() {
+	for f in init-download-url init-options
+	do
+		if test -e $f
+		then
+			install -m 0755 ${WORKDIR}/$f ${D}/$f
+		fi
+	done
         install -m 0755 ${WORKDIR}/obmc-init.sh ${D}/init
         install -m 0755 ${WORKDIR}/obmc-shutdown.sh ${D}/shutdown
         install -m 0755 ${WORKDIR}/obmc-update.sh ${D}/update
@@ -21,3 +28,4 @@ do_install() {
 }
 
 FILES_${PN} += " /init /shutdown /update /whitelist /dev "
+FILES_${PN} += " /init-options /init-download-url "
