@@ -53,6 +53,9 @@ else
         "qemuarm64")
             mem_size=512
             ;;
+        "palmetto")
+            mem_size=512
+            ;;
         "qemumicroblaze")
             mem_size=256
             ;;
@@ -281,6 +284,7 @@ fi
 
 case "$MACHINE" in
     "qemuarm") ;;
+    "palmetto") ;;
     "qemuarm64") ;;
     "qemumicroblaze") ;;
     "qemumips") ;;
@@ -368,6 +372,14 @@ if [ "$MACHINE" = "qemuarm" -o "$MACHINE" = "qemuarmv6" -o "$MACHINE" = "qemuarm
     if [ "$MACHINE" = "qemuarmv7" ]; then
         QEMUOPTIONS="$QEMUOPTIONS -cpu cortex-a8"
     fi
+fi
+
+if [ "$MACHINE" = "palmetto" ]; then
+    QEMU=qemu-system-arm
+    MACHINE_SUBTYPE=palmetto-bmc
+    export QEMU_AUDIO_DRV="none"
+    KERNCMDLINE="console=ttyS4"
+    QEMUOPTIONS="$QEMU_NETWORK_CMD -M ${MACHINE_SUBTYPE} -initrd $ROOTFS -no-reboot -nographic"
 fi
 
 if [ "$MACHINE" = "qemuarm64" ]; then
