@@ -1,2 +1,5 @@
 Common targets are:
      obmc-phosphor-image
+
+You can also run generated images with qemu:
+     runqemu palmetto
