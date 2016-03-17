@@ -9,6 +9,7 @@ BBLAYERS ?= " \
   ##OEROOT##/meta \
   ##OEROOT##/meta-yocto \
   ##OEROOT##/meta-phosphor \
+  ##OEROOT##/meta-openbmc-bsp \
   ##OEROOT##/meta-openbmc-bsp/meta-aspeed \
   ##OEROOT##/meta-openbmc-bsp/meta-aspeed/meta-ast2400 \
   ##OEROOT##/meta-openbmc-machines/meta-openpower \
