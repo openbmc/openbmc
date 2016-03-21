@@ -1,0 +1,75 @@
+From 49e91e7079febe59a20ca885a87dd1c54240d0f1 Mon Sep 17 00:00:00 2001
+From: David Woodhouse <David.Woodhouse@intel.com>
+Date: Mon, 1 Feb 2016 12:37:20 +0000
+Subject: [PATCH 2/2] jffs2: Fix page lock / f->sem deadlock
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+With this fix, all code paths should now be obtaining the page lock before
+f->sem.
+
+Reported-by: Szabó Tamás <sztomi89@gmail.com>
+Tested-by: Thomas Betker <thomas.betker@rohde-schwarz.com>
+Signed-off-by: David Woodhouse <David.Woodhouse@intel.com>
+Cc: stable@vger.kernel.org
+---
+ fs/jffs2/README.Locking |  5 +----
+ fs/jffs2/gc.c           | 17 ++++++++++-------
+ 2 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/fs/jffs2/README.Locking b/fs/jffs2/README.Locking
+index 3ea3655..8918ac9 100644
+--- a/fs/jffs2/README.Locking
++++ b/fs/jffs2/README.Locking
+@@ -2,10 +2,6 @@
+ 	JFFS2 LOCKING DOCUMENTATION
+ 	---------------------------
+ 
+-At least theoretically, JFFS2 does not require the Big Kernel Lock
+-(BKL), which was always helpfully obtained for it by Linux 2.4 VFS
+-code. It has its own locking, as described below.
+-
+ This document attempts to describe the existing locking rules for
+ JFFS2. It is not expected to remain perfectly up to date, but ought to
+ be fairly close.
+@@ -69,6 +65,7 @@ Ordering constraints:
+ 	   any f->sem held.
+ 	2. Never attempt to lock two file mutexes in one thread.
+ 	   No ordering rules have been made for doing so.
++	3. Never lock a page cache page with f->sem held.
+ 
+ 
+ 	erase_completion_lock spinlock
+diff --git a/fs/jffs2/gc.c b/fs/jffs2/gc.c
+index 5a2dec2..95d5880 100644
+--- a/fs/jffs2/gc.c
++++ b/fs/jffs2/gc.c
+@@ -1296,14 +1296,17 @@ static int jffs2_garbage_collect_dnode(struct jffs2_sb_info *c, struct jffs2_era
+ 		BUG_ON(start > orig_start);
+ 	}
+ 
+-	/* First, use readpage() to read the appropriate page into the page cache */
+-	/* Q: What happens if we actually try to GC the _same_ page for which commit_write()
+-	 *    triggered garbage collection in the first place?
+-	 * A: I _think_ it's OK. read_cache_page shouldn't deadlock, we'll write out the
+-	 *    page OK. We'll actually write it out again in commit_write, which is a little
+-	 *    suboptimal, but at least we're correct.
+-	 */
++	/* The rules state that we must obtain the page lock *before* f->sem, so
++	 * drop f->sem temporarily. Since we also hold c->alloc_sem, nothing's
++	 * actually going to *change* so we're safe; we only allow reading.
++	 *
++	 * It is important to note that jffs2_write_begin() will ensure that its
++	 * page is marked Uptodate before allocating space. That means that if we
++	 * end up here trying to GC the *same* page that jffs2_write_begin() is
++	 * trying to write out, read_cache_page() will not deadlock. */
++	mutex_unlock(&f->sem);
+ 	pg_ptr = jffs2_gc_fetch_page(c, f, start, &pg);
++	mutex_lock(&f->sem);
+ 
+ 	if (IS_ERR(pg_ptr)) {
+ 		pr_warn("read_cache_page() returned error: %ld\n",
+-- 
+1.8.2.2
+
