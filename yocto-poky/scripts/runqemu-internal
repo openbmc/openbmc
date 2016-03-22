@@ -378,7 +378,10 @@ if [ "$MACHINE" = "palmetto" ]; then
     QEMU=qemu-system-arm
     MACHINE_SUBTYPE=palmetto-bmc
     export QEMU_AUDIO_DRV="none"
-    KERNCMDLINE="console=ttyS4"
+    if [ "$SLIRP_ENABLED" != "yes" ]; then
+        KERNEL_NETWORK_CMD=${KERNEL_NETWORK_CMD}"::eth0"
+    fi
+    KERNCMDLINE="console=ttyS4 $KERNEL_NETWORK_CMD mem=$QEMU_MEMORY highres=off"
     KERNELDTB=${DEPLOY_DIR_IMAGE}/${PALMETTO_DEFAULT_KERNEL}-aspeed-bmc-opp-qemu${MACHINE}.dtb
     QEMUOPTIONS="$QEMU_NETWORK_CMD -M ${MACHINE_SUBTYPE} -dtb $KERNELDTB -initrd $ROOTFS -no-reboot -nographic"
 fi
