@@ -1,0 +1,70 @@
+From ff221583a7dbfcc8aad2302e216306cc48eabdda Mon Sep 17 00:00:00 2001
+From: Adi Gangidi <adi.gangidi@rackspace.com>
+Date: Thu, 17 Mar 2016 10:01:10 -0500
+Subject: [PATCH] Updated SCU88 register and SCU90 init values
+
+From:    Adi Gangidi <adi.gangidi@rackspace.com>
+
+Before This change:
+a) SCU90[0]=1, function pin Incorrectly defined. It must be pull down internally.
+b) For SCU88, bits 7:0 were set to 1. That is: We were reading : PWMx or VPIGx instead of GPIONx (GPIONx gives us the PCIe inventory status, where x is bit number). Because of this PCIe inventory was showing up wrong.
+
+After This Change:
+a) SCU90[0]=0
+b) Bits (7:0) of SCU 88 are set to 0 . (According to Page 111 of data sheet these have to be set to 0 for us to to read GPION0 to GPIO N7 which indicate if PCIe device is present ).
+
+Description of pins 0 of SCU 90:
+Enable SD1 Function Pin
+
+Description of pins 7:0 of SCU 88:
+7 RW Enable PWM7 or VPIG7 function pin  (SCU90[5:4]=0x2 select Video pin)
+6 RW Enable PWM6 or VPIG6 function pin   (SCU90[5:4]=0x2 select Video pin)
+5 RW Enable PWM5 or VPIG5 function pin    (SCU90[5:4]!=0 select Video pin)
+4 RW Enable PWM4 or VPIG4 function pin     (SCU90[5:4]!=0 select Video pin)
+3 RW Enable PWM3 or VPIG3 function pin      (SCU90[5:4]!=0 select Video pin)
+2 RW Enable PWM2 or VPIG2 function pin        (SCU90[5:4]!=0 select Video pin)
+1 RW Enable PWM1 or VPIG1 function pin        (SCU90[5:4]=0x3 select Video pin)
+0 RW Enable PWM0 or VPIG0 function pin         (SCU90[5:4]=0x3 select Video pin)
+
+[ miltonm: move 88 to barreleye and palmetto with different values ]
+Signed-off-by: Milton Miller <miltonm@us.ibm.com>
+
+diff --git a/arch/arm/mach-aspeed/aspeed.c b/arch/arm/mach-aspeed/aspeed.c
+index f3180fc..d9d89e2 100644
+--- a/arch/arm/mach-aspeed/aspeed.c
++++ b/arch/arm/mach-aspeed/aspeed.c
+@@ -116,10 +116,8 @@ static void __init do_common_setup(void)
+ 	writel(0x00000000, AST_IO(AST_BASE_LPC | 0x9c));
+ 
+ 	/* SCU setup */
+-	writel(0x01C000FF, AST_IO(AST_BASE_SCU | 0x88));
+ 	writel(0xC1C000FF, AST_IO(AST_BASE_SCU | 0x8c));
+-	writel(0x01C0007F, AST_IO(AST_BASE_SCU | 0x88));
+-	writel(0x003FA009, AST_IO(AST_BASE_SCU | 0x90));
++	writel(0x003FA008, AST_IO(AST_BASE_SCU | 0x90));
+ 
+ 	/* Setup scratch registers */
+ 	writel(0x00000042, AST_IO(AST_BASE_LPC | 0x170));
+@@ -132,6 +130,9 @@ static void __init do_barreleye_setup(void)
+ 
+ 	do_common_setup();
+ 
++	/* More SCU setup */
++	writel(0x01C00000, AST_IO(AST_BASE_SCU | 0x88));    
++
+ 	/* Setup PNOR address mapping for 64M flash */
+ 	writel(0x30000C00, AST_IO(AST_BASE_LPC | 0x88));
+ 	writel(0xFC0003FF, AST_IO(AST_BASE_LPC | 0x8C));
+@@ -155,6 +156,9 @@ static void __init do_palmetto_setup(void)
+ {
+ 	do_common_setup();
+ 
++	/* More SCU setup */
++	writel(0x01C0007F, AST_IO(AST_BASE_SCU | 0x88));
++
+ 	/* Setup PNOR address mapping for 32M flash */
+ 	writel(0x30000E00, AST_IO(AST_BASE_LPC | 0x88));
+ 	writel(0xFE0001FF, AST_IO(AST_BASE_LPC | 0x8C));
+-- 
+1.8.2.2
+

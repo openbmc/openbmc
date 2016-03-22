@@ -1,0 +1,36 @@
+commit a7517cfcebd9ea45d65b3fbc6438602dd28cae86
+Author: Norman James <njames@us.ibm.com>
+Commit: Norman James <njames@us.ibm.com>
+
+    MAC needs to be stopped after starting
+    
+    We found that u-boot network was corrupting kernel memory.
+    This is because aspeednic_init is called at startup,
+    but if the u-boot network is not used, the network driver
+    is not cleaned up.  This fix is a temporary hack and just calls
+    the halt function after the init. This driver needs to be
+    reworked to not start network initially and use set_hwaddr hook
+    to setup MAC address.
+    
+    Signed-off-by: Norman James <nkskjames@gmail.com>
+
+diff --git a/drivers/net/aspeednic.c b/drivers/net/aspeednic.c
+index d70c7ab..a870c4a 100644
+--- a/drivers/net/aspeednic.c
++++ b/drivers/net/aspeednic.c
+@@ -580,6 +580,7 @@ int aspeednic_initialize(bd_t *bis)
+ #if defined(CONFIG_MII) || defined(CONFIG_CMD_MII)
+   miiphy_register(dev->name, faraday_mdio_read, faraday_mdio_write);
+ #endif
++  dev->halt(dev);
+ 
+   return 1;
+ }
+@@ -1359,6 +1360,7 @@ static int aspeednic_recv(struct eth_device* dev)
+ 
+ static void aspeednic_halt(struct eth_device* dev)
+ {
++  printf("Stopping Network\n");
+   STOP_MAC(dev);
+ }
+ 
