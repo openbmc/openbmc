@@ -5,12 +5,12 @@
 
 require qemu.inc
 
-SRCREV = "d1f8764099022bc1173f2413331b26d4ff609a0c"
+SRCREV = "openbmc-20160404-1"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=441c28d2cf86e15a37fa47e15a72fbac \
                     file://COPYING.LIB;endline=24;md5=c04def7ae38850e7d3ef548588159913"
 
-SRC_URI = "git://github.com/openbmc/qemu.git;protocol=https"
+SRC_URI = "git://github.com/openbmc/qemu.git;protocol=https;tag=${SRCREV};rebaseable=1"
 S = "${WORKDIR}/git"
 
 COMPATIBLE_HOST_class-target_mips64 = "null"
