@@ -18,7 +18,8 @@ inherit boot-directdisk
 IMAGE_TYPEDEP_vmdk = "ext4"
 IMAGE_TYPEDEP_vdi = "ext4"
 IMAGE_TYPEDEP_qcow2 = "ext4"
-IMAGE_TYPES_MASKED += "vmdk vdi qcow2"
+IMAGE_TYPEDEP_hdddirect = "ext4"
+IMAGE_TYPES_MASKED += "vmdk vdi qcow2 hdddirect"
 
 create_vmdk_image () {
     qemu-img convert -O vmdk ${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.hdddirect ${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.vmdk

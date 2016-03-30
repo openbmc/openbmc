@@ -8,6 +8,9 @@ SECTION = "x11/base"
 DEPENDS = "gtk+"
 RDEPENDS_gtk-theme-sato = "gtk-sato-engine"
 
+inherit distro_features_check
+ANY_OF_DISTRO_FEATURES = "${GTK2DISTROFEATURES}"
+
 PACKAGES += "gtk-theme-sato"
 FILES_${PN} = "${libdir}/gtk-2.0/*/engines/*.so "
 FILES_${PN}-dev = "${libdir}/gtk-2.0/*/engines/*.la"

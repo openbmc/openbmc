@@ -20,6 +20,11 @@ SRC_URI = "ftp://ftp.isc.org/isc/bind9/${PV}/${BPN}-${PV}.tar.gz \
            file://0001-build-use-pkg-config-to-find-libxml2.patch \
            file://bind-ensure-searching-for-json-headers-searches-sysr.patch \
            file://0001-gen.c-extend-DIRNAMESIZE-from-256-to-512.patch \
+           file://0001-lib-dns-gen.c-fix-too-long-error.patch \
+           file://CVE-2015-8704.patch \
+           file://CVE-2015-8705.patch \
+           file://CVE-2015-8000.patch \
+           file://CVE-2015-8461.patch \
            "
 
 SRC_URI[md5sum] = "8b1f5064837756c938eadc1537dec5c7"

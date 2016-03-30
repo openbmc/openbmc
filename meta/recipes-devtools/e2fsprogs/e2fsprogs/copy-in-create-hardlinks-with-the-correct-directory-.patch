@@ -1,0 +1,81 @@
+From 2dcf8e92bc39e05b3c799f53fe911c024aee4375 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Fri, 23 Oct 2015 03:21:05 -0700
+Subject: [PATCH] copy-in: create hardlinks with the correct directory
+ filetype
+
+When we're creating hard links via ext2fs_link, the (misnamed?) flags
+argument specifies the filetype for the directory entry.  This is
+*derived* from i_mode, so provide a translator.  Otherwise, fsck will
+complain about unset file types.
+
+Signed-off-by: Darrick J. Wong <darrick.wong@oracle.com>
+Signed-off-by: Theodore Ts'o <tytso@mit.edu>
+
+Upstream-Status: Backport
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ misc/create_inode.c |   33 +++++++++++++++++++++++++++++++--
+ 1 file changed, 31 insertions(+), 2 deletions(-)
+
+diff --git a/misc/create_inode.c b/misc/create_inode.c
+index fcec5aa..b8565da 100644
+--- a/misc/create_inode.c
++++ b/misc/create_inode.c
+@@ -22,6 +22,33 @@
+ /* For saving the hard links */
+ int hdlink_cnt = HDLINK_CNT;
+ 
++static int ext2_file_type(unsigned int mode)
++{
++	if (LINUX_S_ISREG(mode))
++		return EXT2_FT_REG_FILE;
++
++	if (LINUX_S_ISDIR(mode))
++		return EXT2_FT_DIR;
++
++	if (LINUX_S_ISCHR(mode))
++		return EXT2_FT_CHRDEV;
++
++	if (LINUX_S_ISBLK(mode))
++		return EXT2_FT_BLKDEV;
++
++	if (LINUX_S_ISLNK(mode))
++		return EXT2_FT_SYMLINK;
++
++	if (LINUX_S_ISFIFO(mode))
++		return EXT2_FT_FIFO;
++
++	if (LINUX_S_ISSOCK(mode))
++		return EXT2_FT_SOCK;
++
++	return 0;
++}
++
++
+ /* Link an inode number to a directory */
+ static errcode_t add_link(ext2_ino_t parent_ino, ext2_ino_t ino, const char *name)
+ {
+@@ -34,14 +61,16 @@ static errcode_t add_link(ext2_ino_t parent_ino, ext2_ino_t ino, const char *nam
+ 		return retval;
+ 	}
+ 
+-	retval = ext2fs_link(current_fs, parent_ino, name, ino, inode.i_flags);
++	retval = ext2fs_link(current_fs, parent_ino, name, ino,
++	             ext2_file_type(inode.i_mode));
+ 	if (retval == EXT2_ET_DIR_NO_SPACE) {
+ 		retval = ext2fs_expand_dir(current_fs, parent_ino);
+ 		if (retval) {
+ 			com_err(__func__, retval, "while expanding directory");
+ 			return retval;
+ 		}
+-		retval = ext2fs_link(current_fs, parent_ino, name, ino, inode.i_flags);
++		retval = ext2fs_link(current_fs, parent_ino, name, ino,
++	                     ext2_file_type(inode.i_mode));
+ 	}
+ 	if (retval) {
+ 		com_err(__func__, retval, "while linking %s", name);
+-- 
+1.7.9.5
+

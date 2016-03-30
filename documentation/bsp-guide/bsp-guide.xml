@@ -99,9 +99,9 @@
                 <revremark>Released with the Yocto Project 1.8 Release.</revremark>
             </revision>
             <revision>
-                <revnumber>1.9</revnumber>
+                <revnumber>2.0</revnumber>
                 <date>October 2015</date>
-                <revremark>Released with the Yocto Project 1.9 Release.</revremark>
+                <revremark>Released with the Yocto Project 2.0 Release.</revremark>
             </revision>
         </revhistory>
 
@@ -113,7 +113,7 @@
     <legalnotice>
       <para>
         Permission is granted to copy, distribute and/or modify this document under
-        the terms of the <ulink type="http" url="http://creativecommons.org/licenses/by-nc-sa/2.0/uk/">Creative Commons Attribution-Non-Commercial-Share Alike 2.0 UK: England &amp; Wales</ulink> as published by Creative Commons.
+        the terms of the <ulink type="http" url="http://creativecommons.org/licenses/by-nc-sa/2.0/uk/">Creative Commons Attribution-Share Alike 2.0 UK: England &amp; Wales</ulink> as published by Creative Commons.
       </para>
       <note>
           For the latest version of this manual associated with this

@@ -15,7 +15,7 @@ if [ "x$D" != "x" ]; then
 else
 
 	# Update the pixbuf loaders in case they haven't been registered yet
-	GDK_PIXBUF_MODULEDIR=${libdir}/gdk-pixbuf-2.0/2.10.0/loaders gdk-pixbuf-query-loaders --update-cache
+	${libdir}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders --update-cache
 
 	if [ -x ${bindir}/gtk-update-icon-cache ] && [ -d ${datadir}/icons ]; then
 		for icondir in /usr/share/icons/*; do
@@ -46,7 +46,7 @@ python populate_packages_append() {
 }
 
 gdkpixbuf_complete() {
-	GDK_PIXBUF_FATAL_LOADER=1 ${STAGING_BINDIR_NATIVE}/gdk-pixbuf-query-loaders --update-cache || exit 1
+	GDK_PIXBUF_FATAL_LOADER=1 ${STAGING_LIBDIR_NATIVE}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders --update-cache || exit 1
 }
 
 #

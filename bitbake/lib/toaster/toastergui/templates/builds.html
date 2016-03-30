@@ -2,8 +2,10 @@
 
 {% load static %}
 {% load projecttags %}
+{% load project_url_tag %}
 {% load humanize %}
 
+{% block title %} All builds - Toaster {% endblock %}
 {% block extraheadcontent %}
 <link rel="stylesheet" href="/static/css/jquery-ui.min.css" type='text/css'>
 <link rel="stylesheet" href="/static/css/jquery-ui.structure.min.css" type='text/css'>
@@ -28,8 +30,6 @@
 
   {% include "mrb_section.html" %}
 
-
-  {% if 1 %}
   <div class="page-header top-air">
      <h1>
       {% if request.GET.filter and objects.paginator.count > 0 or request.GET.search and objects.paginator.count > 0 %}
@@ -56,17 +56,25 @@
         </form>
       </div>
     </div>
-
-
   {% else %}
   {% include "basetable_top.html" %}
         <!-- Table data rows; the order needs to match the order of "tablecols" definitions; and the <td class value needs to match the tablecols clclass value for show/hide buttons to work -->
         {% for build in objects %}
-        <tr class="data">
+        <tr class="data" data-table-build-result="{{ build.id }}">
             <td class="outcome">
-        <a href="{% url "builddashboard" build.id %}">{%if build.outcome == build.SUCCEEDED%}<i class="icon-ok-sign success"></i>{%elif build.outcome == build.FAILED%}<i class="icon-minus-sign error"></i>{%else%}{%endif%}</a> &nbsp;
-        </td>
-            <td class="target">{% for t in build.target_set.all %} <a href="{% url "builddashboard" build.id %}"> {{t.target}} </a> <br />{% endfor %}</td>
+                <a href="{% url "builddashboard" build.id %}">{%if build.outcome == build.SUCCEEDED%}<i class="icon-ok-sign success"></i>{%elif build.outcome == build.FAILED%}<i class="icon-minus-sign error"></i>{%else%}{%endif%}</a> &nbsp;
+            </td>
+            <td class="target">
+                {% for t in build.target_set.all %}
+                    <a href="{% url "builddashboard" build.id %}">
+                        {% if t.task %}
+                            {{t.target}}:{{t.task}}
+                        {% else %}
+                            {{t.target}}
+                        {% endif %}
+                    </a> <br />
+                {% endfor %}
+            </td>
             <td class="machine"><a href="{% url "builddashboard" build.id %}">{{build.machine}}</a></td>
             <td class="started_on"><a href="{% url "builddashboard" build.id %}">{{build.started_on|date:"d/m/y H:i"}}</a></td>
             <td class="completed_on"><a href="{% url "builddashboard" build.id %}">{{build.completed_on|date:"d/m/y H:i"}}</a></td>
@@ -93,8 +101,11 @@
               <a href="{%url "builddashboard" build.id%}#images">{{fstypes|get_dict_value:build.id}}</a>
               {% endif %}
             </td>
-        <td>
-                <a href="{% url 'project' build.project.id %}">{{build.project.name}}</a>
+            <td class="project-name">
+                <a href="{% project_url build.project %}">{{build.project.name}}</a>
+                {% if build.project.is_default %}
+                    <i class="icon-question-sign get-help hover-help" title="" data-original-title="This project shows information about the builds you start from the command line while Toaster is running" style="visibility: hidden;"></i>
+                {% endif %}
             </td>
         </tr>
 
@@ -103,7 +114,6 @@
 
   {% include "basetable_bottom.html" %}
   {% endif %} {# objects.paginator.count #}
-{% endif %} {# empty #}
 </div><!-- end row-fluid-->
 
 {% endblock %}

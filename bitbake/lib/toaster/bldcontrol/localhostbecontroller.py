@@ -23,9 +23,11 @@
 import os
 import sys
 import re
+import shutil
 from django.db import transaction
 from django.db.models import Q
 from bldcontrol.models import BuildEnvironment, BRLayer, BRVariable, BRTarget, BRBitbake
+from orm.models import CustomImageRecipe, Layer, Layer_Version, ProjectLayer
 import subprocess
 
 from toastermain import settings
@@ -179,15 +181,9 @@ class LocalhostBEController(BuildEnvironmentController):
         logger.debug("localhostbecontroller: Stopped bitbake server")
 
     def getGitCloneDirectory(self, url, branch):
-        """ Utility that returns the last component of a git path as directory
-        """
-        import re
-        components = re.split(r'[:\.\/]', url)
-        base = components[-2] if components[-1] == "git" else components[-1]
-
+        """Construct unique clone directory name out of url and branch."""
         if branch != "HEAD":
-            return "_%s_%s.toaster_cloned" % (base, branch)
-
+            return "_toaster_clones/_%s_%s" % (re.sub('[:/@%]', '_', url), branch)
 
         # word of attention; this is a localhost-specific issue; only on the localhost we expect to have "HEAD" releases
         # which _ALWAYS_ means the current poky checkout
@@ -197,7 +193,7 @@ class LocalhostBEController(BuildEnvironmentController):
         return local_checkout_path
 
 
-    def setLayers(self, bitbakes, layers):
+    def setLayers(self, bitbakes, layers, targets):
         """ a word of attention: by convention, the first layer for any build will be poky! """
 
         assert self.be.sourcedir is not None
@@ -222,23 +218,26 @@ class LocalhostBEController(BuildEnvironmentController):
         logger.debug("localhostbecontroller, our git repos are %s" % pformat(gitrepos))
 
 
-        # 2. find checked-out git repos in the sourcedir directory that may help faster cloning
+        # 2. Note for future use if the current source directory is a
+        # checked-out git repos that could match a layer's vcs_url and therefore
+        # be used to speed up cloning (rather than fetching it again).
 
         cached_layers = {}
-        for ldir in os.listdir(self.be.sourcedir):
-            fldir = os.path.join(self.be.sourcedir, ldir)
-            if os.path.isdir(fldir):
+
+        try:
+            for remotes in self._shellcmd("git remote -v", self.be.sourcedir).split("\n"):
                 try:
-                    for line in self._shellcmd("git remote -v", fldir).split("\n"):
-                        try:
-                            remote = line.split("\t")[1].split(" ")[0]
-                            if remote not in cached_layers:
-                                cached_layers[remote] = fldir
-                        except IndexError:
-                            pass
-                except ShellCmdException:
-                    # ignore any errors in collecting git remotes
+                    remote = remotes.split("\t")[1].split(" ")[0]
+                    if remote not in cached_layers:
+                        cached_layers[remote] = self.be.sourcedir
+                except IndexError:
                     pass
+        except ShellCmdException:
+            # ignore any errors in collecting git remotes this is an optional
+            # step
+            pass
+
+        logger.info("Using pre-checked out source for layer %s", cached_layers)
 
         layerlist = []
 
@@ -260,13 +259,14 @@ class LocalhostBEController(BuildEnvironmentController):
                     self._shellcmd("git remote remove origin", localdirname)
                     self._shellcmd("git remote add origin \"%s\"" % giturl, localdirname)
                 else:
-                    logger.debug("localhostbecontroller: cloning %s:%s in %s" % (giturl, commit, localdirname))
-                    self._shellcmd("git clone \"%s\" --single-branch --branch \"%s\" \"%s\"" % (giturl, commit, localdirname))
+                    logger.debug("localhostbecontroller: cloning %s in %s" % (giturl, localdirname))
+                    self._shellcmd('git clone "%s" "%s"' % (giturl, localdirname))
 
             # branch magic name "HEAD" will inhibit checkout
             if commit != "HEAD":
                 logger.debug("localhostbecontroller: checking out commit %s to %s " % (commit, localdirname))
-                self._shellcmd("git fetch --all && git checkout \"%s\" && git rebase \"origin/%s\"" % (commit, commit) , localdirname)
+                ref = commit if re.match('^[a-fA-F0-9]+$', commit) else 'origin/%s' % commit
+                self._shellcmd('git fetch --all && git reset --hard "%s"' % ref, localdirname)
 
             # take the localdirname as poky dir if we can find the oe-init-build-env
             if self.pokydirname is None and os.path.exists(os.path.join(localdirname, "oe-init-build-env")):
@@ -299,6 +299,51 @@ class LocalhostBEController(BuildEnvironmentController):
         if not os.path.exists(bblayerconf):
             raise BuildSetupException("BE is not consistent: bblayers.conf file missing at %s" % bblayerconf)
 
+        # 6. create custom layer and add custom recipes to it
+        layerpath = os.path.join(self.be.sourcedir, "_meta-toaster-custom")
+        if os.path.isdir(layerpath):
+            shutil.rmtree(layerpath) # remove leftovers from previous builds
+        for target in targets:
+            try:
+                customrecipe = CustomImageRecipe.objects.get(name=target.target,
+                                                             project=bitbakes[0].req.project)
+            except CustomImageRecipe.DoesNotExist:
+                continue # not a custom recipe, skip
+
+            # create directory structure
+            for name in ("conf", "recipes"):
+                path = os.path.join(layerpath, name)
+                if not os.path.isdir(path):
+                    os.makedirs(path)
+
+            # create layer.oonf
+            config = os.path.join(layerpath, "conf", "layer.conf")
+            if not os.path.isfile(config):
+                with open(config, "w") as conf:
+                    conf.write('BBPATH .= ":${LAYERDIR}"\nBBFILES += "${LAYERDIR}/recipes/*.bb"\n')
+
+            # create recipe
+            recipe = os.path.join(layerpath, "recipes", "%s.bb" % target.target)
+            with open(recipe, "w") as recipef:
+                recipef.write("require %s\n" % customrecipe.base_recipe.recipe.file_path)
+                packages = [pkg.name for pkg in customrecipe.packages.all()]
+                if packages:
+                    recipef.write('IMAGE_INSTALL = "%s"\n' % ' '.join(packages))
+
+            # create *Layer* objects needed for build machinery to work
+            layer = Layer.objects.get_or_create(name="Toaster Custom layer",
+                                                summary="Layer for custom recipes",
+                                                vcs_url="file://%s" % layerpath)[0]
+            breq = target.req
+            lver = Layer_Version.objects.get_or_create(project=breq.project, layer=layer,
+                                                       dirpath=layerpath, build=breq.build)[0]
+            ProjectLayer.objects.get_or_create(project=breq.project, layercommit=lver,
+                                               optional=False)
+            BRLayer.objects.get_or_create(req=breq, name=layer.name, dirpath=layerpath,
+                                          giturl="file://%s" % layerpath)
+        if os.path.isdir(layerpath):
+            layerlist.append(layerpath)
+
         BuildEnvironmentController._updateBBLayers(bblayerconf, layerlist)
 
         self.islayerset = True
@@ -316,7 +361,7 @@ class LocalhostBEController(BuildEnvironmentController):
 
     def triggerBuild(self, bitbake, layers, variables, targets):
         # set up the buid environment with the needed layers
-        self.setLayers(bitbake, layers)
+        self.setLayers(bitbake, layers, targets)
         self.writeConfFile("conf/toaster-pre.conf", variables)
         self.writeConfFile("conf/toaster.conf", raw = "INHERIT+=\"toaster buildhistory\"")
 

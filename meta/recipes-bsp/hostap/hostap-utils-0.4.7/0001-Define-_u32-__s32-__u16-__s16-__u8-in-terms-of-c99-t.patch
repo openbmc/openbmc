@@ -1,0 +1,36 @@
+From 742fb110d9841a04b3ced256b0bf80ff304dcaff Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 31 Aug 2015 05:45:08 +0000
+Subject: [PATCH] Define _u32/__s32/__u16/__s16/__u8 in terms of c99 types
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ wireless_copy.h | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/wireless_copy.h b/wireless_copy.h
+index 8208258..1171a35 100644
+--- a/wireless_copy.h
++++ b/wireless_copy.h
+@@ -86,11 +86,11 @@
+ #else
+ #include <sys/types.h>
+ #include <net/if.h>
+-typedef __uint32_t __u32;
+-typedef __int32_t __s32;
+-typedef __uint16_t __u16;
+-typedef __int16_t __s16;
+-typedef __uint8_t __u8;
++typedef u_int32_t __u32;
++typedef int32_t __s32;
++typedef u_int16_t __u16;
++typedef int16_t __s16;
++typedef u_int8_t __u8;
+ #ifndef __user
+ #define __user
+ #endif /* __user */
+-- 
+2.5.1
+

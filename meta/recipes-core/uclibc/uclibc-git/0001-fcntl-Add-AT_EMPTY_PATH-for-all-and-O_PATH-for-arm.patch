@@ -1,0 +1,42 @@
+From 4c8f5fe7d41493e8e181941ae5a01713155f44d1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 15 Oct 2015 15:34:39 +0000
+Subject: [PATCH] fcntl: Add AT_EMPTY_PATH for all and O_PATH for arm
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ include/fcntl.h                     | 3 +++
+ libc/sysdeps/linux/arm/bits/fcntl.h | 1 +
+ 2 files changed, 4 insertions(+)
+
+diff --git a/include/fcntl.h b/include/fcntl.h
+index 11000dd..8a7ad9b 100644
+--- a/include/fcntl.h
++++ b/include/fcntl.h
+@@ -65,6 +65,9 @@ __BEGIN_DECLS
+ # define AT_SYMLINK_FOLLOW	0x400	/* Follow symbolic links.  */
+ # define AT_EACCESS		0x200	/* Test access permitted for
+ 					   effective IDs, not real IDs.  */
++# ifdef __USE_GNU
++#  define AT_EMPTY_PATH         0x1000  /* Allow empty relative pathname.  */
++# endif
+ #endif
+ 
+ /* Do the file control operation described by CMD on FD.
+diff --git a/libc/sysdeps/linux/arm/bits/fcntl.h b/libc/sysdeps/linux/arm/bits/fcntl.h
+index aedc154..c6ba958 100644
+--- a/libc/sysdeps/linux/arm/bits/fcntl.h
++++ b/libc/sysdeps/linux/arm/bits/fcntl.h
+@@ -50,6 +50,7 @@
+ # define O_DIRECT	0200000	/* Direct disk access.	*/
+ # define O_NOATIME     01000000 /* Do not set atime.  */
+ # define O_CLOEXEC     02000000 /* Set close_on_exec.  */
++# define O_PATH       010000000 /* Resolve pathname but do not open file.  */
+ #endif
+ 
+ /* For now Linux has synchronisity options for data and read operations.
+-- 
+2.6.1
+

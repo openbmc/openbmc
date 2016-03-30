@@ -5,7 +5,7 @@ import multiprocessing
 
 
 def generate_image(arg):
-    (type, subimages, create_img_cmd) = arg
+    (type, subimages, create_img_cmd, sprefix) = arg
 
     bb.note("Running image creation script for %s: %s ..." %
             (type, create_img_cmd))
@@ -54,14 +54,16 @@ class ImageDepGraph(object):
             base_type = self._image_base_type(node)
             deps = (self.d.getVar('IMAGE_TYPEDEP_' + node, True) or "")
             base_deps = (self.d.getVar('IMAGE_TYPEDEP_' + base_type, True) or "")
-            if deps != "" or base_deps != "":
-                graph[node] = deps
 
-                for dep in deps.split() + base_deps.split():
-                    if not dep in graph:
-                        add_node(dep)
-            else:
-                graph[node] = ""
+            graph[node] = ""
+            for dep in deps.split() + base_deps.split():
+                if not dep in graph[node]:
+                    if graph[node] != "":
+                        graph[node] += " "
+                    graph[node] += dep
+
+                if not dep in graph:
+                    add_node(dep)
 
         for fstype in image_fstypes:
             add_node(fstype)
@@ -264,9 +266,9 @@ class Image(ImageDepGraph):
 
         return (alltypes, filtered_groups, cimages)
 
-    def _write_script(self, type, cmds):
+    def _write_script(self, type, cmds, sprefix=""):
         tempdir = self.d.getVar('T', True)
-        script_name = os.path.join(tempdir, "create_image." + type)
+        script_name = os.path.join(tempdir, sprefix + "create_image." + type)
         rootfs_size = self._get_rootfs_size()
 
         self.d.setVar('img_creation_func', '\n'.join(cmds))
@@ -284,7 +286,7 @@ class Image(ImageDepGraph):
 
         return script_name
 
-    def _get_imagecmds(self):
+    def _get_imagecmds(self, sprefix=""):
         old_overrides = self.d.getVar('OVERRIDES', 0)
 
         alltypes, fstype_groups, cimages = self._get_image_types()
@@ -320,9 +322,9 @@ class Image(ImageDepGraph):
                 else:
                     subimages.append(type)
 
-                script_name = self._write_script(type, cmds)
+                script_name = self._write_script(type, cmds, sprefix)
 
-                image_cmds.append((type, subimages, script_name))
+                image_cmds.append((type, subimages, script_name, sprefix))
 
             image_cmd_groups.append(image_cmds)
 
@@ -355,6 +357,27 @@ class Image(ImageDepGraph):
 
         image_cmd_groups = self._get_imagecmds()
 
+        # Process the debug filesystem...
+        debugfs_d = bb.data.createCopy(self.d)
+        if self.d.getVar('IMAGE_GEN_DEBUGFS', True) == "1":
+            bb.note("Processing debugfs image(s) ...")
+            orig_d = self.d
+            self.d = debugfs_d
+
+            self.d.setVar('IMAGE_ROOTFS', orig_d.getVar('IMAGE_ROOTFS', True) + '-dbg')
+            self.d.setVar('IMAGE_NAME', orig_d.getVar('IMAGE_NAME', True) + '-dbg')
+            self.d.setVar('IMAGE_LINK_NAME', orig_d.getVar('IMAGE_LINK_NAME', True) + '-dbg')
+
+            debugfs_image_fstypes = orig_d.getVar('IMAGE_FSTYPES_DEBUGFS', True)
+            if debugfs_image_fstypes:
+                self.d.setVar('IMAGE_FSTYPES', orig_d.getVar('IMAGE_FSTYPES_DEBUGFS', True))
+
+            self._remove_old_symlinks()
+
+            image_cmd_groups += self._get_imagecmds("debugfs.")
+
+            self.d = orig_d
+
         self._write_wic_env()
 
         for image_cmds in image_cmd_groups:
@@ -369,9 +392,16 @@ class Image(ImageDepGraph):
                 if result is not None:
                     bb.fatal(result)
 
-            for image_type, subimages, script in image_cmds:
-                bb.note("Creating symlinks for %s image ..." % image_type)
-                self._create_symlinks(subimages)
+            for image_type, subimages, script, sprefix in image_cmds:
+                if sprefix == 'debugfs.':
+                    bb.note("Creating symlinks for %s debugfs image ..." % image_type)
+                    orig_d = self.d
+                    self.d = debugfs_d
+                    self._create_symlinks(subimages)
+                    self.d = orig_d
+                else:
+                    bb.note("Creating symlinks for %s image ..." % image_type)
+                    self._create_symlinks(subimages)
 
         execute_pre_post_process(self.d, post_process_cmds)
 

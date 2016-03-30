@@ -61,16 +61,6 @@ SSTATE_SIG_PASSPHRASE ?= ""
 # Whether to verify the GnUPG signatures when extracting sstate archives
 SSTATE_VERIFY_SIG ?= "0"
 
-# Specify dirs in which the shell function is executed and don't use ${B}
-# as default dirs to avoid possible race about ${B} with other task.
-sstate_create_package[dirs] = "${SSTATE_BUILDDIR}"
-sstate_unpack_package[dirs] = "${SSTATE_INSTDIR}"
-
-# Do not run sstate_hardcode_path() in ${B}:
-# the ${B} maybe removed by cmake_do_configure() while
-# sstate_hardcode_path() running.
-sstate_hardcode_path[dirs] = "${SSTATE_BUILDDIR}"
-
 python () {
     if bb.data.inherits_class('native', d):
         d.setVar('SSTATE_PKGARCH', d.getVar('BUILD_ARCH', False))
@@ -163,6 +153,8 @@ def sstate_install(ss, d):
     sharedfiles = []
     shareddirs = []
     bb.utils.mkdirhier(d.expand("${SSTATE_MANIFESTS}"))
+
+    sstateinst = d.expand("${WORKDIR}/sstate-install-%s/" % ss['task'])
 
     manifest, d2 = oe.sstatesig.sstate_get_manifest_filename(ss['task'], d)
 
@@ -267,7 +259,8 @@ def sstate_install(ss, d):
             oe.path.copyhardlinktree(state[1], state[2])
 
     for postinst in (d.getVar('SSTATEPOSTINSTFUNCS', True) or '').split():
-        bb.build.exec_func(postinst, d)
+        # All hooks should run in the SSTATE_INSTDIR
+        bb.build.exec_func(postinst, d, (sstateinst,))
 
     for lock in locks:
         bb.utils.unlockfile(lock)
@@ -307,7 +300,8 @@ def sstate_installpkg(ss, d):
             bb.warn("Cannot verify signature on sstate package %s" % sstatepkg)
 
     for f in (d.getVar('SSTATEPREINSTFUNCS', True) or '').split() + ['sstate_unpack_package'] + (d.getVar('SSTATEPOSTUNPACKFUNCS', True) or '').split():
-        bb.build.exec_func(f, d)
+        # All hooks should run in the SSTATE_INSTDIR
+        bb.build.exec_func(f, d, (sstateinst,))
 
     for state in ss['dirs']:
         prepdir(state[1])
@@ -579,8 +573,9 @@ def sstate_package(ss, d):
 
     for f in (d.getVar('SSTATECREATEFUNCS', True) or '').split() + ['sstate_create_package'] + \
              (d.getVar('SSTATEPOSTCREATEFUNCS', True) or '').split():
-        bb.build.exec_func(f, d)
-  
+        # All hooks should run in SSTATE_BUILDDIR.
+        bb.build.exec_func(f, d, (sstatebuild,))
+
     bb.siggen.dump_this_task(sstatepkg + ".siginfo", d)
 
     return
@@ -642,19 +637,22 @@ python sstate_task_prefunc () {
     shared_state = sstate_state_fromvars(d)
     sstate_clean(shared_state, d)
 }
+sstate_task_prefunc[dirs] = "${WORKDIR}"
 
 python sstate_task_postfunc () {
     shared_state = sstate_state_fromvars(d)
+
     sstate_install(shared_state, d)
     for intercept in shared_state['interceptfuncs']:
-        bb.build.exec_func(intercept, d)
+        bb.build.exec_func(intercept, d, (d.getVar("WORKDIR", True),))
     omask = os.umask(002)
     if omask != 002:
        bb.note("Using umask 002 (not %0o) for sstate packaging" % omask)
     sstate_package(shared_state, d)
     os.umask(omask)
 }
-  
+sstate_task_postfunc[dirs] = "${WORKDIR}"
+
 
 #
 # Shell function to generate a sstate package from a directory

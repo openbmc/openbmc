@@ -2,7 +2,7 @@
 {% load projecttags %}
 {% load humanize %}
 
-
+{% block title %} Builds - {{project.name}} - Toaster {% endblock %}
 {% block extraheadcontent %}
 <link rel="stylesheet" href="/static/css/jquery-ui.min.css" type='text/css'>
 <link rel="stylesheet" href="/static/css/jquery-ui.structure.min.css" type='text/css'>
@@ -21,13 +21,17 @@
     });
 </script>
 
+ {% with mrb_type='project' %}
+     {% include "mrb_section.html" %}
+ {% endwith %}
+
       <h2>
         {% if request.GET.filter and objects.paginator.count > 0 or request.GET.search and objects.paginator.count > 0 %}
-            {{objects.paginator.count}} build{{objects.paginator.count|pluralize}} found
+            {{objects.paginator.count}} project build{{objects.paginator.count|pluralize}} found
         {%elif request.GET.filter and objects.paginator.count == 0 or request.GET.search and objects.paginator.count == 0 %}
-            No builds found
+            No project builds found
         {%else%}
-            Project builds
+            All project builds
         {%endif%}
         <i class="icon-question-sign get-help heading-help" title="This page lists all the builds for the current project"></i>
       </h2>
@@ -66,7 +70,17 @@
                     {% endif %}
             </td>
 
-            <td class="target">{% for t in build.target_set.all %} <a href="{% url "builddashboard" build.id %}"> {{t.target}} </a> <br />{% endfor %}</td>
+            <td class="target">
+                {% for t in build.target_set.all %}
+                    <a href="{% url "builddashboard" build.id %}">
+                        {% if t.task %}
+                            {{t.target}}:{{t.task}}
+                        {% else %}
+                            {{t.target}}
+                        {% endif %}
+                    </a> <br />
+                {% endfor %}
+            </td>
             <td class="machine"><a href="{% url "builddashboard" build.id %}">{{build.machine}}</a></td>
             <td class="started_on"><a href="{% url "builddashboard" build.id %}">{{build.started_on|date:"d/m/y H:i"}}</a></td>
             <td class="completed_on"><a href="{% url "builddashboard" build.id %}">{{build.completed_on|date:"d/m/y H:i"}}</a></td>

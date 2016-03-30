@@ -1,0 +1,69 @@
+Upstream-Status: Backport [From https://github.com/linux-test-project/ltp/commit/40a2457cb8ec42a05a2f96b0810057efdb2a55f5]
+
+gcc 5.x defaults to -std=gnu11 instead of -std=gnu89 which causes
+semantics for inline functions changes.
+
+The standalone 'inline' causes error with gcc 5 such as:
+
+git/testcases/kernel/syscalls/kill/kill10.c:355: undefined reference to `k_sigaction'
+
+Replace inline with static inline to be compatible with both gcc 4 and 5.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ testcases/kernel/controllers/libcontrollers/libcontrollers.c | 2 +-
+ testcases/kernel/controllers/libcontrollers/libcontrollers.h | 2 +-
+ testcases/kernel/syscalls/kill/kill10.c                      | 4 ++--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/testcases/kernel/controllers/libcontrollers/libcontrollers.c b/testcases/kernel/controllers/libcontrollers/libcontrollers.c
+index b01e1b8..8857bc9 100644
+--- a/testcases/kernel/controllers/libcontrollers/libcontrollers.c
++++ b/testcases/kernel/controllers/libcontrollers/libcontrollers.c
+@@ -146,7 +146,7 @@ int read_file(char *filepath, int action, unsigned int *value)
+  * Prints error message and returns -1
+  */
+ 
+-inline int error_function(char *msg1, char *msg2)
++static inline int error_function(char *msg1, char *msg2)
+ {
+ 	fprintf(stdout, "ERROR: %s ", msg1);
+ 	fprintf(stdout, "%s\n", msg2);
+diff --git a/testcases/kernel/controllers/libcontrollers/libcontrollers.h b/testcases/kernel/controllers/libcontrollers/libcontrollers.h
+index 4001555..a1a0dfa 100644
+--- a/testcases/kernel/controllers/libcontrollers/libcontrollers.h
++++ b/testcases/kernel/controllers/libcontrollers/libcontrollers.h
+@@ -70,7 +70,7 @@ enum{
+ 	GET_TASKS
+ };
+ 
+-inline int error_function(char *msg1, char *msg2);
++static inline int error_function(char *msg1, char *msg2);
+ 
+ unsigned int read_shares_file (char *filepath);
+ 
+diff --git a/testcases/kernel/syscalls/kill/kill10.c b/testcases/kernel/syscalls/kill/kill10.c
+index 982d9da..33dbcd3 100644
+--- a/testcases/kernel/syscalls/kill/kill10.c
++++ b/testcases/kernel/syscalls/kill/kill10.c
+@@ -185,7 +185,7 @@ int child_checklist_total = 0;
+ int checklist_cmp(const void *a, const void *b);
+ void checklist_reset(int bit);
+ 
+-inline int k_sigaction(int sig, struct sigaction *sa, struct sigaction *osa);
++static inline int k_sigaction(int sig, struct sigaction *sa, struct sigaction *osa);
+ 
+ char *TCID = "kill10";
+ int TST_TOTAL = 1;
+@@ -756,7 +756,7 @@ void checklist_reset(int bit)
+ 
+ }
+ 
+-inline int k_sigaction(int sig, struct sigaction *sa, struct sigaction *osa)
++static inline int k_sigaction(int sig, struct sigaction *sa, struct sigaction *osa)
+ {
+ 	int ret;
+ 	if ((ret = sigaction(sig, sa, osa)) == -1) {
+---
+-1.9.1
+-

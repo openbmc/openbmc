@@ -10,12 +10,14 @@ inherit autotools texinfo
 EXTRA_OEMAKE_class-target = "GREP=${base_bindir}/grep"
 
 do_install_append () {
-	# Rename and move files into /bin (FHS), which is typical place for gzip
-	install -d ${D}${base_bindir}
-	mv ${D}${bindir}/gunzip ${D}${base_bindir}/gunzip
-	mv ${D}${bindir}/gzip ${D}${base_bindir}/gzip
-	mv ${D}${bindir}/zcat ${D}${base_bindir}/zcat
-	mv ${D}${bindir}/uncompress ${D}${base_bindir}/uncompress
+	if [ "${base_bindir}" != "${bindir}" ]; then
+		# Rename and move files into /bin (FHS), which is typical place for gzip
+		install -d ${D}${base_bindir}
+		mv ${D}${bindir}/gunzip ${D}${base_bindir}/gunzip
+		mv ${D}${bindir}/gzip ${D}${base_bindir}/gzip
+		mv ${D}${bindir}/zcat ${D}${base_bindir}/zcat
+		mv ${D}${bindir}/uncompress ${D}${base_bindir}/uncompress
+	fi
 }
 
 inherit update-alternatives

@@ -7,6 +7,8 @@ inherit packagegroup
 RDEPENDS_${PN} = "\
     libgcc \
     libgcc-dev \
+    libatomic \
+    libatomic-dev \
     libstdc++ \
     libstdc++-dev \
     ${LIBC_DEPENDENCIES} \

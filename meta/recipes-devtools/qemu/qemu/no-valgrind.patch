@@ -1,0 +1,19 @@
+There isn't an option to enable or disable valgrind support, so disable it to avoid non-deterministic builds.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/configure b/configure
+index b3c4f51..4d3929e 100755
+--- a/configure
++++ b/configure
+@@ -4193,9 +4192,0 @@ valgrind_h=no
+-cat > $TMPC << EOF
+-#include <valgrind/valgrind.h>
+-int main(void) {
+-  return 0;
+-}
+-EOF
+-if compile_prog "" "" ; then
+-    valgrind_h=yes
+-fi

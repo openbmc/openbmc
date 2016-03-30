@@ -6,7 +6,7 @@ SECTION = "base"
 # which is GPLv3 is an m4 macro which isn't shipped in any of our packages,
 # and the LGPL bits are under lib/, which appears to be used for libgnu, which
 # appears to be used for DOS builds. So we're left with GPLv2+ and PD.
-LICENSE = "GPLv2+ & GPLv3+ & LGPLv2.1+ & PD"
+LICENSE = "GPLv2+ & GPL-3.0-with-autoconf-exception & LGPLv2.1+ & PD"
 LICENSE_${PN} = "GPLv2+"
 LICENSE_${PN}-dev = "GPLv2+"
 LICENSE_${PN}-staticdev = "GPLv2+"

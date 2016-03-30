@@ -9,7 +9,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=3bf50002aefd002f49e7bb854063f7e7 \
 SECTION = "libs"
 
 DEPENDS = "glib-2.0"
-DEPENDS_append_linuxstdbase = " virtual/libx11"
 
 MAJ_VER = "${@oe.utils.trim_version("${PV}", 2)}"
 
@@ -19,6 +18,7 @@ SRC_URI = "${GNOME_MIRROR}/${BPN}/${MAJ_VER}/${BPN}-${PV}.tar.xz \
            file://run-ptest \
            file://fatal-loader.patch \
            file://0001-pixops-Be-more-careful-about-integer-overflow.patch \
+           file://CVE-2015-7674.patch \
            "
 
 SRC_URI[md5sum] = "4fed0d54432f1b69fc6e66e608bd5542"
@@ -50,18 +50,19 @@ PACKAGES =+ "${PN}-xlib"
 FILES_${PN}-xlib = "${libdir}/*pixbuf_xlib*${SOLIBS}"
 ALLOW_EMPTY_${PN}-xlib = "1"
 
-FILES_${PN} = "${bindir}/gdk-pixbuf-query-loaders \
-	${bindir}/gdk-pixbuf-pixdata \
+FILES_${PN} = "${libdir}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders \
 	${libdir}/lib*.so.*"
 
 FILES_${PN}-dev += " \
 	${bindir}/gdk-pixbuf-csource \
+	${bindir}/gdk-pixbuf-pixdata \
 	${includedir}/* \
 	${libdir}/gdk-pixbuf-2.0/${LIBV}/loaders/*.la \
 "
 
 FILES_${PN}-dbg += " \
-        ${libdir}/.debug/* \
+	${libdir}/.debug/* \
+	${libdir}/gdk-pixbuf-2.0/.debug/* \
 	${libdir}/gdk-pixbuf-2.0/${LIBV}/loaders/.debug/* \
 "
 
@@ -81,6 +82,12 @@ python populate_packages_prepend () {
     d.appendVar("RDEPENDS_gdk-pixbuf-ptest", " " + packages)
 }
 
+do_install_append() {
+	# Move gdk-pixbuf-query-loaders into libdir so it is always available
+	# in multilib builds.
+	mv ${D}/${bindir}/gdk-pixbuf-query-loaders ${D}/${libdir}/gdk-pixbuf-2.0/
+}
+
 do_install_append_class-native() {
 	find ${D}${libdir} -name "libpixbufloader-*.la" -exec rm \{\} \;
 
@@ -90,8 +97,17 @@ do_install_append_class-native() {
 	create_wrapper ${D}/${bindir}/gdk-pixbuf-pixdata \
 		GDK_PIXBUF_MODULE_FILE=${STAGING_LIBDIR_NATIVE}/gdk-pixbuf-2.0/${LIBV}/loaders.cache
 
-	create_wrapper ${D}/${bindir}/gdk-pixbuf-query-loaders \
+	create_wrapper ${D}/${libdir}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders \
 		GDK_PIXBUF_MODULE_FILE=${STAGING_LIBDIR_NATIVE}/gdk-pixbuf-2.0/${LIBV}/loaders.cache \
 		GDK_PIXBUF_MODULEDIR=${STAGING_LIBDIR_NATIVE}/gdk-pixbuf-2.0/${LIBV}/loaders
 }
 BBCLASSEXTEND = "native"
+
+SSTATEPREINSTFUNCS_append_class-native = " gdkpixbuf_sstate_preinst"
+SYSROOT_PREPROCESS_FUNCS_append_class-native = " gdkpixbuf_sstate_preinst"
+
+gdkpixbuf_sstate_preinst() {
+	if [ "${BB_CURRENTTASK}" = "populate_sysroot" ]; then
+		rm -rf ${STAGING_LIBDIR_NATIVE}/gdk-pixbuf-2.0/${LIBV}/*
+	fi
+}

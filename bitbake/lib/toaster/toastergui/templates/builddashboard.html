@@ -2,8 +2,14 @@
 {% load humanize %}
 {% load projecttags %}
 
+{% block title %} {{build.target_set.all|dictsort:"target"|join:", "}} {{build.machine}} - {{build.project.name}} - Toaster {% endblock %}
 {% block parentbreadcrumb %}
-{{build.get_sorted_target_list.0.target}} {%if build.target_set.all.count > 1%}(+ {{build.target_set.all.count|add:"-1"}}){%endif%} {{build.machine}} ({{build.completed_on|date:"d/m/y H:i"}})
+{% if build.get_sorted_target_list.count > 0 %}
+  {{build.get_sorted_target_list.0.target}}
+  &nbsp;
+{% endif %}
+
+{%if build.target_set.all.count > 1%}(+ {{build.target_set.all.count|add:"-1"}}){%endif%} {{build.machine}} ({{build.completed_on|date:"d/m/y H:i"}})
 {% endblock %}
 
 {% block buildinfomain %}
@@ -37,19 +43,13 @@
     <span > <i class="icon-warning-sign yellow"></i><strong><a href="#warnings" class="warning show-warnings"> {{build.warnings.count}} warning{{build.warnings.count|pluralize}}</a></strong></span>
 {% endif %}
             <span class="pull-right">Build time: <a href="{% url 'buildtime' build.pk %}">{{ build.timespent_seconds|sectohms }}</a>
-            <a class="btn {%if build.outcome == build.SUCCEEDED%}btn-success{%else%}btn-danger{%endif%} pull-right log" href="{% url 'build_artifact' build.id "cookerlog" build.id %}">Download build log</a>
+            {% if build.cooker_log_path %}
+                <a class="btn {%if build.outcome == build.SUCCEEDED%}btn-success{%else%}btn-danger{%endif%} pull-right log" href="{% url 'build_artifact' build.id "cookerlog" build.id %}">Download build log</a>
+            {% endif %}
             </span>
 
 {%endif%}
     </div>
-    {% if build.toaster_exceptions.count > 0 %}
-    <div class="row">
-        <small class="pull-right">
-        <i class="icon-question-sign get-help get-help-blue" title="" data-original-title="Toaster exceptions do not affect your build: only the operation of Toaster"></i>
-        <a class="show-exceptions" href="#exceptions">Toaster threw {{build.toaster_exceptions.count}} exception{{build.toaster_exceptions.count|pluralize}}</a>
-    </small>
-    </div>
-    {% endif %}
   </div>
 </div>
 
@@ -67,11 +67,10 @@
     <div class="accordion-body collapse in" id="collapse-errors">
       <div class="accordion-inner">
         <div class="span10">
-          {% for error in logmessages %}{% if error.level == 2 %}
-            <div class="alert alert-error">
+          {% for error in build.errors %}
+            <div class="alert alert-error" data-error="{{ error.id }}">
               <pre>{{error.message}}</pre>
             </div>
-          {% endif %}
           {% endfor %}
         </div>
       </div>
@@ -261,33 +260,6 @@
               <pre>{{warning.message}}</pre>
             </div>
           {% endif %}{% endfor %}
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-{% endif %}
-
-
-{% if build.toaster_exceptions.count > 0 %}
-<div class="accordion span10 pull-right" id="exceptions">
-  <div class="accordion-group">
-    <div class="accordion-heading">
-      <a class="accordion-toggle exception toggle-exceptions">
-        <h2 id="exception-toggle">
-          <i class="icon-warning-sign"></i>
-          {{build.toaster_exceptions.count}} Toaster exception{{build.toaster_exceptions.count|pluralize}}
-        </h2>
-      </a>
-    </div>
-    <div class="accordion-body collapse" id="collapse-exceptions">
-      <div class="accordion-inner">
-        <div class="span10">
-          {% for exception in build.toaster_exceptions %}
-            <div class="alert alert-exception">
-              <pre>{{exception.message}}</pre>
-            </div>
-          {% endfor %}
         </div>
       </div>
     </div>

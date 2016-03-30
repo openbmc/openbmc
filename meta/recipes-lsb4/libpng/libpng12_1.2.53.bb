@@ -9,7 +9,7 @@ DEPENDS = "zlib"
 PN = "libpng12"
 S = "${WORKDIR}/libpng-${PV}"
 
-SRC_URI = "${SOURCEFORGE_MIRROR}/project/libpng/libpng12/${PV}/libpng-${PV}.tar.xz"
+SRC_URI = "${SOURCEFORGE_MIRROR}/project/libpng/libpng12/older-releases/${PV}/libpng-${PV}.tar.xz"
 
 SRC_URI[md5sum] = "7d18a74e6fd2029aee76ccd00e00a9e6"
 SRC_URI[sha256sum] = "b45e49f689e7451bd576569e6a344f7e0d11c02ecbb797f4da0e431526765c0a"

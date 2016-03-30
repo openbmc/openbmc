@@ -1,7 +1,7 @@
-<!ENTITY DISTRO "1.9">
-<!ENTITY DISTRO_COMPRESSED "19">
-<!ENTITY DISTRO_NAME "tbd">
-<!ENTITY YOCTO_DOC_VERSION "1.9">
+<!ENTITY DISTRO "2.0">
+<!ENTITY DISTRO_COMPRESSED "20">
+<!ENTITY DISTRO_NAME "jethro">
+<!ENTITY YOCTO_DOC_VERSION "2.0">
 <!ENTITY POKYVERSION "14.0.0">
 <!ENTITY POKYVERSION_COMPRESSED "1400">
 <!ENTITY YOCTO_POKY "poky-&DISTRO_NAME;-&POKYVERSION;">
@@ -67,4 +67,5 @@
 <!ENTITY OPENSUSE_HOST_PACKAGES_ESSENTIAL "python gcc gcc-c++ git chrpath make wget python-xml \
      diffstat makeinfo python-curses patch socat">
 <!ENTITY CENTOS_HOST_PACKAGES_ESSENTIAL "gawk make wget tar bzip2 gzip python unzip perl patch \
-     diffutils diffstat git cpp gcc gcc-c++ glibc-devel texinfo chrpath socat">
+     diffutils diffstat git cpp gcc gcc-c++ glibc-devel texinfo chrpath socat \
+     perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue">

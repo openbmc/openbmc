@@ -980,7 +980,7 @@
         <para>
             A new automated image testing framework has been added
             through the
-            <link linkend='ref-classes-testimage'><filename>testimage*.bbclass</filename></link>
+            <link linkend='ref-classes-testimage*'><filename>testimage.bbclass</filename></link>
             class.
             This framework replaces the older
             <filename>imagetest-qemu</filename> framework.
@@ -1254,7 +1254,7 @@
                     <listitem><para><filename>bb.MalformedUrl</filename>:
                         Use <filename>bb.fetch.MalformedUrl</filename>.
                         </para></listitem>
-                    <listitem><para><filename>bb.fetch.encodeurl</filename>:
+                    <listitem><para><filename>bb.encodeurl</filename>:
                         Use <filename>bb.fetch.encodeurl</filename>.
                         </para></listitem>
                     <listitem><para><filename>bb.decodeurl</filename>:
@@ -1485,8 +1485,9 @@
             Recipes building Autotools-based
             software that fails to build with a separate build directory
             should be changed to inherit from the
-            <link linkend='ref-classes-autotools-brokensep'><filename>autotools-brokensep</filename></link>
-            class instead of the <filename>autotools</filename> class.
+            <link linkend='ref-classes-autotools'><filename>autotools-brokensep</filename></link>
+            class instead of the <filename>autotools</filename> or
+            <filename>autotools_stage</filename>classes.
         </para>
     </section>
 
@@ -1794,8 +1795,9 @@
                     need to either patch the software so that it can build
                     separately, or you will need to change the recipe to
                     inherit the
-                    <link linkend='ref-classes-autotools-brokensep'><filename>autotools-brokensep</filename></link>
-                    class instead of the <filename>autotools</filename> class.
+                    <link linkend='ref-classes-autotools'><filename>autotools-brokensep</filename></link>
+                    class instead of the <filename>autotools</filename> or
+                    <filename>autotools_stage</filename> classes.
                     </para></listitem>
                 <listitem><para><emphasis>
                     The <filename>--foreign</filename> option is
@@ -2312,6 +2314,427 @@
         </para>
     </section>
 </section>
+
+<section id='moving-to-the-yocto-project-2.0-release'>
+    <title>Moving to the Yocto Project 2.0 Release</title>
+
+    <para>
+        This section provides migration information for moving to the
+        Yocto Project 2.0 Release from the prior release.
+    </para>
+
+    <section id='migration-2.0-gcc-5'>
+        <title>GCC 5</title>
+
+        <para>
+            The default compiler is now GCC 5.2.
+            This change has required fixes for compilation errors in a number
+            of other recipes.
+        </para>
+
+        <para>
+            One important example is a fix for when the Linux kernel freezes at
+            boot time on ARM when built with GCC 5.
+            If you are using your own kernel recipe or source tree and
+            building for ARM, you will likely need to apply this
+            <ulink url='https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit?id=a077224fd35b2f7fbc93f14cf67074fc792fbac2'>patch</ulink>.
+            The standard <filename>linux-yocto</filename> kernel source tree
+            already has a workaround for the same issue.
+        </para>
+
+        <para>
+            For further details, see
+            <ulink url='https://gcc.gnu.org/gcc-5/changes.html'></ulink> and
+            the porting guide at
+            <ulink url='https://gcc.gnu.org/gcc-5/porting_to.html'></ulink>.
+        </para>
+
+        <para>
+            Alternatively, you can switch back to GCC 4.9 or 4.8 by
+            setting <filename>GCCVERSION</filename> in your configuration,
+            as follows:
+            <literallayout class='monospaced'>
+     GCCVERSION = "4.9%"
+            </literallayout>
+        </para>
+    </section>
+
+    <section id='migration-2.0-Gstreamer-0.10-removed'>
+        <title>Gstreamer 0.10 Removed</title>
+
+        <para>
+            Gstreamer 0.10 has been removed in favor of Gstreamer 1.x.
+            As part of the change, recipes for Gstreamer 0.10 and related
+            software are now located
+            in <filename>meta-multimedia</filename>.
+            This change results in Qt4 having Phonon and Gstreamer
+            support in QtWebkit disabled by default.
+        </para>
+    </section>
+
+    <section id='migration-2.0-removed-recipes'>
+        <title>Removed Recipes</title>
+
+        <para>
+            The following recipes have been moved or removed:
+            <itemizedlist>
+                <listitem><para>
+                    <filename>bluez4</filename>: The recipe is obsolete and
+                    has been moved due to <filename>bluez5</filename>
+                    becoming fully integrated.
+                    The <filename>bluez4</filename> recipe now resides in
+                    <filename>meta-oe</filename>.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>gamin</filename>: The recipe is obsolete and
+                    has been removed.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>gnome-icon-theme</filename>: The recipe's
+                    functionally has been replaced by
+                    <filename>adwaita-icon-theme</filename>.
+                    </para></listitem>
+                <listitem><para>
+                    Gstreamer 0.10 Recipes: Recipes for Gstreamer 0.10 have
+                    been removed in favor of the recipes for Gstreamer 1.x.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>insserv</filename>: The recipe is obsolete and
+                    has been removed.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>libunique</filename>: The recipe is no longer
+                    used and has been moved to <filename>meta-oe</filename>.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>midori</filename>: The recipe's functionally
+                    has been replaced by <filename>epiphany</filename>.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>python-gst</filename>: The recipe is obsolete
+                    and has been removed since it only contains bindings for
+                    Gstreamer 0.10.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>qt-mobility</filename>: The recipe is obsolete and
+                    has been removed since it requires
+                    <filename>Gstreamer 0.10</filename>, which has been
+                    replaced.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>subversion</filename>: All 1.6.x versions of this
+                    recipe have been removed.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>webkit-gtk</filename>: The older 1.8.3 version
+                    of this recipe has been removed in favor of
+                    <filename>webkitgtk</filename>.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='migration-2.0-bitbake-datastore-improvements'>
+        <title>BitBake datastore improvements</title>
+
+        <para>
+            The method by which BitBake's datastore handles overrides has
+            changed.
+            Overrides are now applied dynamically and
+            <filename>bb.data.update_data()</filename> is now a no-op.
+            Thus, <filename>bb.data.update_data()</filename> is no longer
+            required in order to apply the correct overrides.
+            In practice, this change is unlikely to require any changes to
+            Metadata.
+            However, these minor changes in behavior exist:
+            <itemizedlist>
+                <listitem><para>
+                    All potential overrides are now visible in the variable
+                    history as seen when you run the following:
+                    <literallayout class='monospaced'>
+     $ bitbake -e
+                    </literallayout>
+                    </para></listitem>
+                <listitem><para>
+                    <filename>d.delVar('VARNAME')</filename> and
+                    <filename>d.setVar('VARNAME', None)</filename> result
+                    in the variable and all of its overrides being cleared out.
+                    Before the change, only the non-overridden values
+                    were cleared.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='migration-2.0-shell-message-function-changes'>
+        <title>Shell Message Function Changes</title>
+
+        <para>
+            The shell versions of the BitBake message functions (i.e.
+            <filename>bbdebug</filename>, <filename>bbnote</filename>,
+            <filename>bbwarn</filename>, <filename>bbplain</filename>,
+            <filename>bberror</filename>, and <filename>bbfatal</filename>)
+            are now connected through to their BitBake equivalents
+            <filename>bb.debug()</filename>, <filename>bb.note()</filename>,
+            <filename>bb.warn()</filename>, <filename>bb.plain()</filename>,
+            <filename>bb.error()</filename>, and
+            <filename>bb.fatal()</filename>, respectively.
+            Thus, those message functions that you would expect to be printed
+            by the BitBake UI are now actually printed.
+            In practice, this change means two things:
+            <itemizedlist>
+                <listitem><para>
+                    If you now see messages on the console that you did not
+                    previously see as a result of this change, you might
+                    need to clean up the calls to
+                    <filename>bbwarn</filename>, <filename>bberror</filename>,
+                    and so forth.
+                    Or, you might want to simply remove the calls.
+                    </para></listitem>
+                <listitem><para>
+                    The <filename>bbfatal</filename> message function now
+                    suppresses the full error log in the UI, which means any
+                    calls to <filename>bbfatal</filename> where you still
+                    wish to see the full error log should be replaced by
+                    <filename>die</filename> or
+                    <filename>bbfatal_log</filename>.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='migration-2.0-extra-development-debug-package-cleanup'>
+        <title>Extra Development/Debug Package Cleanup</title>
+
+        <para>
+            The following recipes have had extra
+            <filename>dev/dbg</filename> packages removed:
+            <itemizedlist>
+                <listitem><para>
+                    <filename>acl</filename>
+                    </para></listitem>
+                <listitem><para>
+                    <filename>apmd</filename>
+                    </para></listitem>
+                <listitem><para>
+                    <filename>aspell</filename>
+                    </para></listitem>
+                <listitem><para>
+                    <filename>attr</filename>
+                    </para></listitem>
+                <listitem><para>
+                    <filename>augeas</filename>
+                    </para></listitem>
+                <listitem><para>
+                    <filename>bzip2</filename>
+                    </para></listitem>
+                <listitem><para>
+                    <filename>cogl</filename>
+                    </para></listitem>
+                <listitem><para>
+                    <filename>curl</filename>
+                    </para></listitem>
+                <listitem><para>
+                    <filename>elfutils</filename>
+                    </para></listitem>
+                <listitem><para>
+                    <filename>gcc-target</filename>
+                    </para></listitem>
+                <listitem><para>
+                    <filename>libgcc</filename>
+                    </para></listitem>
+                <listitem><para>
+                    <filename>libtool</filename>
+                    </para></listitem>
+                <listitem><para>
+                    <filename>libxmu</filename>
+                    </para></listitem>
+                <listitem><para>
+                    <filename>opkg</filename>
+                    </para></listitem>
+                <listitem><para>
+                    <filename>pciutils</filename>
+                    </para></listitem>
+                <listitem><para>
+                    <filename>rpm</filename>
+                    </para></listitem>
+                <listitem><para>
+                    <filename>sysfsutils</filename>
+                    </para></listitem>
+                <listitem><para>
+                    <filename>tiff</filename>
+                    </para></listitem>
+                <listitem><para>
+                    <filename>xz</filename>
+                    </para></listitem>
+            </itemizedlist>
+            All of the above recipes now conform to the standard packaging
+            scheme where a single <filename>-dev</filename>,
+            <filename>-dbg</filename>, and <filename>-staticdev</filename>
+            package exists per recipe.
+        </para>
+    </section>
+
+    <section id='migration-2.0-recipe-maintenance-tracking-data-moved-to-oe-core'>
+        <title>Recipe Maintenance Tracking Data Moved to OE-Core</title>
+
+        <para>
+            Maintenance tracking data for recipes that was previously part
+            of <filename>meta-yocto</filename> has been moved to OE-Core.
+            The change includes <filename>package_regex.inc</filename> and
+            <filename>distro_alias.inc</filename>, which are typically enabled
+            when using the
+            <link linkend='ref-classes-distrodata'><filename>distrodata</filename></link>
+            class.
+            Additionally, the contents of
+            <filename>upstream_tracking.inc</filename> has now been split out
+            to the relevant recipes.
+        </para>
+    </section>
+
+    <section id='migration-2.0-automatic-stale-sysroot-file-cleanup'>
+        <title>Automatic Stale Sysroot File Cleanup</title>
+
+        <para>
+            Stale files from recipes that no longer exist in the current
+            configuration are now automatically removed from
+            sysroot as well as removed from
+            any other place managed by shared state.
+            This automatic cleanup means that the build system now properly
+            handles situations such as renaming the build system side of
+            recipes, removal of layers from
+            <filename>bblayers.conf</filename>, and
+            <link linkend='var-DISTRO_FEATURES'><filename>DISTRO_FEATURES</filename></link>
+            changes.
+        </para>
+
+        <para>
+            Additionally, work directories for old versions of recipes are
+            now pruned.
+            If you wish to disable pruning old work directories, you can set
+            the following variable in your configuration:
+            <literallayout class='monospaced'>
+     SSTATE_PRUNE_OBSOLETEWORKDIR = "0"
+            </literallayout>
+        </para>
+    </section>
+
+    <section id='migration-2.0-linux-yocto-kernel-metadata-repository-now-split-from-source'>
+        <title><filename>linux-yocto</filename> Kernel Metadata Repository Now Split from Source</title>
+
+        <para>
+            The <filename>linux-yocto</filename> tree has up to now been a
+            combined set of kernel changes and configuration (meta) data
+            carried in a single tree.
+            While this format is effective at keeping kernel configuration and
+            source modifications synchronized, it is not always obvious to
+            developers how to manipulate the Metadata as compared to the
+            source.
+        </para>
+
+        <para>
+            Metadata processing has now been removed from the
+            <link linkend='ref-classes-kernel-yocto'><filename>kernel-yocto</filename></link>
+            class and the external Metadata repository
+            <filename>yocto-kernel-cache</filename>, which has always been used
+            to seed the <filename>linux-yocto</filename> "meta" branch.
+            This separate <filename>linux-yocto</filename> cache repository
+            is now the primary location for this data.
+            Due to this change, <filename>linux-yocto</filename> is no longer
+            able to process combined trees.
+            Thus, if you need to have your own combined kernel repository,
+            you must do the split there as well and update your recipes
+            accordingly.
+            See the <filename>meta/recipes-kernel/linux/linux-yocto_4.1.bb</filename>
+            recipe for an example.
+        </para>
+    </section>
+
+    <section id='migration-2.0-additional-qa-checks'>
+        <title>Additional QA checks</title>
+
+        <para>
+            The following QA checks have been added:
+            <itemizedlist>
+                <listitem><para>
+                    Added a "host-user-contaminated" check for ownership
+                    issues for packaged files outside of
+                    <filename>/home</filename>.
+                    The check looks for files that are incorrectly owned by the
+                    user that ran BitBake instead of owned by a valid user in
+                    the target system.
+                    </para></listitem>
+                <listitem><para>
+                    Added an "invalid-chars" check for invalid (non-UTF8)
+                    characters in recipe metadata variable values
+                    (i.e.
+                    <link linkend='var-DESCRIPTION'><filename>DESCRIPTION</filename></link>,
+                    <link linkend='var-SUMMARY'><filename>SUMMARY</filename></link>,
+                    <link linkend='var-LICENSE'><filename>LICENSE</filename></link>,
+                    and
+                    <link linkend='var-SECTION'><filename>SECTION</filename></link>).
+                    Some package managers do not support these characters.
+                    </para></listitem>
+                <listitem><para>
+                    Added an "invalid-packageconfig" check for any options
+                    specified in
+                    <link linkend='var-PACKAGECONFIG'><filename>PACKAGECONFIG</filename></link>
+                    that do not match any <filename>PACKAGECONFIG</filename>
+                    option defined for the recipe.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='migration-2.0-miscellaneous'>
+        <title>Miscellaneous Changes</title>
+
+        <para>
+            These additional changes exist:
+            <itemizedlist>
+                <listitem><para>
+                    <filename>gtk-update-icon-cache</filename> has been
+                    renamed to <filename>gtk-icon-utils</filename>.
+                    </para></listitem>
+                <listitem><para>
+                    The <filename>tools-profile</filename>
+                    <link linkend='var-IMAGE_FEATURES'><filename>IMAGE_FEATURES</filename></link>
+                    item as well as its corresponding packagegroup and
+                    <filename>packagegroup-core-tools-profile</filename> no
+                    longer bring in <filename>oprofile</filename>.
+                    Bringing in <filename>oprofile</filename> was originally
+                    added to aid compilation on resource-constrained
+                    targets.
+                    However, this aid has not been widely used and is not
+                    likely to be used going forward due to the more powerful
+                    target platforms and the existence of better
+                    cross-compilation tools.
+                    </para></listitem>
+                <listitem><para>
+                    The
+                    <link linkend='var-IMAGE_FSTYPES'><filename>IMAGE_FSTYPES</filename></link>
+                    variable's default value now specifies
+                    <filename>ext4</filename> instead of
+                    <filename>ext3</filename>.
+                    </para></listitem>
+                <listitem><para>
+                    All support for the <filename>PRINC</filename>
+                    variable has been removed.
+                    </para></listitem>
+                <listitem><para>
+                    The <filename>packagegroup-core-full-cmdline</filename>
+                    packagegroup no longer brings in
+                    <filename>lighttpd</filename> due to the fact that
+                    bringing in <filename>lighttpd</filename> is not really in
+                    line with the packagegroup's purpose, which is to add full
+                    versions of command-line tools that by default are
+                    provided by <filename>busybox</filename>.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+</section>
+
 
 </chapter>
 <!--

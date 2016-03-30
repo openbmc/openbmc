@@ -49,7 +49,11 @@ PERLVERSION[vardepvalue] = ""
 FILES_${PN}-dbg += "${PERLLIBDIRS}/auto/*/.debug \
                     ${PERLLIBDIRS}/auto/*/*/.debug \
                     ${PERLLIBDIRS}/auto/*/*/*/.debug \
+                    ${PERLLIBDIRS}/auto/*/*/*/*/.debug \
+                    ${PERLLIBDIRS}/auto/*/*/*/*/*/.debug \
                     ${PERLLIBDIRS}/vendor_perl/${PERLVERSION}/auto/*/.debug \
                     ${PERLLIBDIRS}/vendor_perl/${PERLVERSION}/auto/*/*/.debug \
                     ${PERLLIBDIRS}/vendor_perl/${PERLVERSION}/auto/*/*/*/.debug \
+                    ${PERLLIBDIRS}/vendor_perl/${PERLVERSION}/auto/*/*/*/*/.debug \
+                    ${PERLLIBDIRS}/vendor_perl/${PERLVERSION}/auto/*/*/*/*/*/.debug \
                     "

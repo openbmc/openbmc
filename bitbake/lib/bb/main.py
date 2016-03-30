@@ -383,6 +383,13 @@ def bitbake_main(configParams, configuration):
         # Collect the feature set for the UI
         featureset = getattr(ui_module, "featureSet", [])
 
+    if configParams.server_only:
+        for param in ('prefile', 'postfile'):
+            value = getattr(configParams, param)
+            if value:
+                setattr(configuration, "%s_server" % param, value)
+                param = "%s_server" % param
+
     if not configParams.remote_server:
         # we start a server with a given configuration
         server = start_server(servermodule, configParams, configuration, featureset)

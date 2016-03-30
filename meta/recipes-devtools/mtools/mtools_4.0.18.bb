@@ -45,3 +45,8 @@ do_install_prepend () {
     mkdir -p ${D}/${bindir}
     mkdir -p ${D}/${datadir}
 }
+
+do_install_append_class-native () {
+    create_wrapper ${D}${bindir}/mcopy \
+        GCONV_PATH=${libdir}/gconv
+}

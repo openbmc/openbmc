@@ -18,6 +18,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BP}.tar.bz2 \
            file://parallel-make-archives.patch \
            file://lib-Makefile-fix-parallel-issue.patch \
            file://gnu-efi-Make-setjmp.S-portable-to-ARM.patch \
+           file://gcc46-compatibility.patch \
           "
 
 SRC_URI[md5sum] = "15a4bcbc18a9a5e8110ed955970622e6"

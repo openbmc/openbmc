@@ -1,0 +1,48 @@
+The generic recursive target calls target-local so also adding it to the
+dependency list results in races due to install-local being executed twice in
+parallel.  For example, install-manx can fail if the two install processes race
+and one process tries to chown a file that the other process has just deleted.
+
+Also install-manx should be a phony target, and for clarity use $^ instead of $?
+in the install command.
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+
+diff --git a/Makefile.in b/Makefile.in
+index 9db6c52..3441afa 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -71,7 +71,7 @@ EXTRA_DATA =
+ 
+ ## List of phony targets
+ .PHONY : all all-local all-recursive install install-local install-udata install-udata-files install-udata-dlls		\
+-install-recursive clean clean-local clean-recursive distclean		\
++install-recursive install-manx clean clean-local clean-recursive distclean		\
+ distclean-local distclean-recursive doc dist dist-local dist-recursive	\
+ check check-local check-recursive clean-recursive-with-twist install-icu \
+ doc install-doc tests icu4j-data icu4j-data-install update-windows-makefiles xcheck-local xcheck-recursive xperf xcheck xperf-recursive \
+@@ -82,10 +82,10 @@ check-exhaustive check-exhaustive-local check-exhaustive-recursive releaseDist
+ 
+ ## List of standard targets
+ all: all-local all-recursive
+-install: install-recursive install-local
++install: install-recursive
+ clean: clean-recursive-with-twist clean-local
+-distclean : distclean-recursive distclean-local
+-dist: dist-recursive dist-local
++distclean : distclean-recursive
++dist: dist-recursive
+ check: all check-recursive
+ check-recursive: all
+ xcheck: all xcheck-recursive
+@@ -352,7 +352,7 @@ config.status: $(srcdir)/configure $(srcdir)/common/unicode/uvernum.h
+ 
+ install-manx: $(MANX_FILES)
+ 	$(MKINSTALLDIRS) $(DESTDIR)$(mandir)/man$(SECTION)
+-	$(INSTALL_DATA) $? $(DESTDIR)$(mandir)/man$(SECTION)
++	$(INSTALL_DATA) $^ $(DESTDIR)$(mandir)/man$(SECTION)
+ 
+ config/%.$(SECTION): $(srcdir)/config/%.$(SECTION).in
+ 	cd $(top_builddir) \

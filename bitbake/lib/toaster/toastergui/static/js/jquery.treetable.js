@@ -421,7 +421,7 @@
         columnElType: "td", // i.e. 'td', 'th' or 'td,th'
         expandable: false,
         expanderTemplate: "<a href='#'>&nbsp;</a>",
-        indent: 19,
+        indent: 10,
         indenterTemplate: "<span class='indenter'></span>",
         initialState: "collapsed",
         nodeIdAttr: "ttId", // maps to data-tt-id

@@ -1,0 +1,34 @@
+From 5bc3167a8b714ec0c4a3f1c7f3b9411296ec0a23 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Wed, 16 Sep 2015 20:23:47 -0700
+Subject: [PATCH] lib/dns/gen.c: fix too long error
+
+The 512 is a little short when build in deep dir, and cause "too long"
+error, use PATH_MAX if defined.
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ lib/dns/gen.c |    4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/lib/dns/gen.c b/lib/dns/gen.c
+index 51a0435..3d7214f 100644
+--- a/lib/dns/gen.c
++++ b/lib/dns/gen.c
+@@ -148,7 +148,11 @@ static const char copyright[] =
+ #define TYPECLASSBUF (TYPECLASSLEN + 1)
+ #define TYPECLASSFMT "%" STR(TYPECLASSLEN) "[-0-9a-z]_%d"
+ #define ATTRIBUTESIZE 256
++#ifdef PATH_MAX
++#define DIRNAMESIZE PATH_MAX
++#else
+ #define DIRNAMESIZE 512
++#endif
+ 
+ static struct cc {
+ 	struct cc *next;
+-- 
+1.7.9.5
+

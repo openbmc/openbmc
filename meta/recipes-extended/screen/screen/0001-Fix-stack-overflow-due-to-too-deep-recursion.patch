@@ -1,0 +1,57 @@
+Bug: 45713
+
+How to reproduce:
+Run this command inside screen
+$ printf '\x1b[10000000T'
+
+screen will recursively call MScrollV to depth n/256.
+This is time consuming and will overflow stack if n is huge.
+
+Fixes CVE-2015-6806
+
+Upstream-Status: Backport
+
+Signed-off-by: Kuang-che Wu <kcwu@csie.org>
+Signed-off-by: Amadeusz Sławiński <amade@asmblr.net>
+Signed-off-by: Maxin B. John <maxin.john@intel.com>
+---
+diff -Naur screen-4.3.1-orig/ansi.c screen-4.3.1/ansi.c
+--- screen-4.3.1-orig/ansi.c	2015-06-29 00:22:55.000000000 +0300
++++ screen-4.3.1/ansi.c	2015-10-06 13:13:58.297648039 +0300
+@@ -2502,13 +2502,13 @@
+     return;
+   if (n > 0)
+     {
++      if (ye - ys + 1 < n)
++	  n = ye - ys + 1;
+       if (n > 256)
+ 	{
+ 	  MScrollV(p, n - 256, ys, ye, bce);
+ 	  n = 256;
+ 	}
+-      if (ye - ys + 1 < n)
+-	n = ye - ys + 1;
+ #ifdef COPY_PASTE
+       if (compacthist)
+ 	{
+@@ -2562,15 +2562,15 @@
+     }
+   else
+     {
+-      if (n < -256)
+-	{
+-	  MScrollV(p, n + 256, ys, ye, bce);
+-	  n = -256;
+-	}
+       n = -n;
+       if (ye - ys + 1 < n)
+ 	n = ye - ys + 1;
+ 
++      if (n > 256)
++      {
++        MScrollV(p, - (n - 256), ys, ye, bce);
++        n = 256;
++      }
+       ml = p->w_mlines + ye;
+       /* Clear lines */
+       for (i = ye; i > ye - n; i--, ml--)

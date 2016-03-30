@@ -1,0 +1,46 @@
+From b2af652f43991e4ce6297917da542a9eb5135939 Mon Sep 17 00:00:00 2001
+From: Marek Vasut <marex@denx.de>
+Date: Thu, 17 Sep 2015 03:28:06 +0200
+Subject: [PATCH] libgpg-error: Add nios2 support
+
+Add configuration for the NIOS2 processor.
+
+Signed-off-by: Marek Vasut <marex@denx.de>
+Upstream-Status: Submitted
+---
+ src/syscfg/lock-obj-pub.nios2-unknown-linux-gnu.h | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
+ create mode 100644 src/syscfg/lock-obj-pub.nios2-unknown-linux-gnu.h
+
+diff --git a/src/syscfg/lock-obj-pub.nios2-unknown-linux-gnu.h b/src/syscfg/lock-obj-pub.nios2-unknown-linux-gnu.h
+new file mode 100644
+index 0000000..3a24571
+--- /dev/null
++++ b/src/syscfg/lock-obj-pub.nios2-unknown-linux-gnu.h
+@@ -0,0 +1,23 @@
++## lock-obj-pub.nios2-unknown-linux-gnu.h
++## File created by gen-posix-lock-obj - DO NOT EDIT
++## To be included by mkheader into gpg-error.h
++
++typedef struct
++{
++  long _vers;
++  union {
++    volatile char _priv[24];
++    long _x_align;
++    long *_xp_align;
++  } u;
++} gpgrt_lock_t;
++
++#define GPGRT_LOCK_INITIALIZER {1,{{0,0,0,0,0,0,0,0, \
++                                    0,0,0,0,0,0,0,0, \
++                                    0,0,0,0,0,0,0,0}}}
++##
++## Local Variables:
++## mode: c
++## buffer-read-only: t
++## End:
++##
+-- 
+2.5.1
+

@@ -1,9 +1,6 @@
-import unittest
 import os
-import logging
 import re
 import glob as g
-import pexpect as p
 
 from oeqa.selftest.base import oeSelfTest
 from oeqa.selftest.buildhistory import BuildhistoryBase
@@ -42,7 +39,7 @@ class ImageOptionsTests(oeSelfTest):
         for image_file in deploydir_files:
             if imagename in image_file and os.path.islink(os.path.join(deploydir, image_file)):
                 track_original_files.append(os.path.realpath(os.path.join(deploydir, image_file)))
-        self.append_config("RM_OLD_IMAGE = \"1\"")
+        self.write_config("RM_OLD_IMAGE = \"1\"")
         bitbake("-C rootfs core-image-minimal")
         deploydir_files = os.listdir(deploydir)
         remaining_not_expected = [path for path in track_original_files if os.path.basename(path) in deploydir_files]
@@ -100,7 +97,7 @@ class SanityOptionsTest(oeSelfTest):
 
     @testcase(278)
     def test_sanity_userspace_dependency(self):
-        self.append_config('WARN_QA_append = " unsafe-references-in-binaries unsafe-references-in-scripts"')
+        self.write_config('WARN_QA_append = " unsafe-references-in-binaries unsafe-references-in-scripts"')
         bitbake("-ccleansstate gzip nfs-utils")
         res = bitbake("gzip nfs-utils")
         self.assertTrue("WARNING: QA Issue: gzip" in res.output, "WARNING: QA Issue: gzip message is not present in bitbake's output: %s" % res.output)
@@ -128,7 +125,7 @@ class BuildImagesTest(oeSelfTest):
         This method is used to test the build of directfb image for arm arch.
         In essence we build a coreimagedirectfb and test the exitcode of bitbake that in case of success is 0.
         """
-        self.add_command_to_tearDown('cleanupworkdir')
+        self.add_command_to_tearDown('cleanup-workdir')
         self.write_config("DISTRO_FEATURES_remove = \"x11\"\nDISTRO_FEATURES_append = \" directfb\"\nMACHINE ??= \"qemuarm\"")
         res = bitbake("core-image-directfb", ignore_status=True)
         self.assertEqual(res.status, 0, "\ncoreimagedirectfb failed to build. Please check logs for further details.\nbitbake output %s" % res.output)
@@ -139,7 +136,7 @@ class ArchiverTest(oeSelfTest):
         """
         Test for archiving the work directory and exporting the source files.
         """
-        self.add_command_to_tearDown('cleanupworkdir')
+        self.add_command_to_tearDown('cleanup-workdir')
         self.write_config("INHERIT = \"archiver\"\nARCHIVER_MODE[src] = \"original\"\nARCHIVER_MODE[srpm] = \"1\"")
         res = bitbake("xcursor-transparent-theme", ignore_status=True)
         self.assertEqual(res.status, 0, "\nCouldn't build xcursortransparenttheme.\nbitbake output %s" % res.output)

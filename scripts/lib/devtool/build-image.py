@@ -21,65 +21,85 @@ import os
 import logging
 
 from bb.process import ExecutionError
-from devtool import exec_build_env_command, setup_tinfoil, parse_recipe
+from devtool import exec_build_env_command, setup_tinfoil, parse_recipe, DevtoolError
 
 logger = logging.getLogger('devtool')
 
-def _get_recipes(workspace, config):
-    """Get list of target recipes from the workspace."""
+def _get_packages(tinfoil, workspace, config):
+    """Get list of packages from recipes in the workspace."""
     result = []
-    tinfoil = setup_tinfoil()
     for recipe in workspace:
         data = parse_recipe(config, tinfoil, recipe, True)
         if 'class-target' in data.getVar('OVERRIDES', True).split(':'):
             if recipe in data.getVar('PACKAGES', True):
                 result.append(recipe)
             else:
-                logger.warning("Skipping recipe %s as it doesn't produce "
+                logger.warning("Skipping recipe %s as it doesn't produce a "
                                "package with the same name", recipe)
-    tinfoil.shutdown()
     return result
 
 def build_image(args, config, basepath, workspace):
     """Entry point for the devtool 'build-image' subcommand."""
-    image = args.recipe
+
+    image = args.imagename
+    auto_image = False
+    if not image:
+        sdk_targets = config.get('SDK', 'sdk_targets', '').split()
+        if sdk_targets:
+            image = sdk_targets[0]
+            auto_image = True
+    if not image:
+        raise DevtoolError('Unable to determine image to build, please specify one')
+
     appendfile = os.path.join(config.workspace_path, 'appends',
                               '%s.bbappend' % image)
 
-    # remove <image>.bbapend to make sure setup_tinfoil doesn't
-    # breake because of it
+    # remove <image>.bbappend to make sure setup_tinfoil doesn't
+    # break because of it
     if os.path.isfile(appendfile):
         os.unlink(appendfile)
 
-    recipes = _get_recipes(workspace, config)
-    if recipes:
-        with open(appendfile, 'w') as afile:
-            # include selected recipes into the image
-            afile.write('IMAGE_INSTALL_append = " %s"\n' % ' '.join(recipes))
+    tinfoil = setup_tinfoil(basepath=basepath)
+    rd = parse_recipe(config, tinfoil, image, True)
+    if not rd:
+        # Error already shown
+        return 1
+    if not bb.data.inherits_class('image', rd):
+        if auto_image:
+            raise DevtoolError('Unable to determine image to build, please specify one')
+        else:
+            raise DevtoolError('Specified recipe %s is not an image recipe' % image)
 
-            # Generate notification callback devtool_warn_image_extended
-            afile.write('do_rootfs[prefuncs] += "devtool_warn_image_extended"\n\n')
-            afile.write("python devtool_warn_image_extended() {\n")
-            afile.write("    bb.plain('NOTE: %%s: building with additional '\n"
-                        "             'packages due to \"devtool build-image\"'"
-                        "              %% d.getVar('PN', True))\n"
-                        "    bb.plain('NOTE: delete %%s to clear this' %% \\\n"
-                        "             '%s')\n" % os.path.relpath(appendfile, basepath))
-            afile.write("}\n")
-
-            logger.info('Building image %s with the following '
-                        'additional packages: %s', image, ' '.join(recipes))
-    else:
-        logger.warning('No recipes in workspace, building image %s unmodified', image)
-
-    # run bitbake to build image
     try:
-        exec_build_env_command(config.init_path, basepath,
-                               'bitbake %s' % image, watch=True)
-    except ExecutionError as err:
-        return err.exitcode
+        if workspace:
+            packages = _get_packages(tinfoil, workspace, config)
+            if packages:
+                with open(appendfile, 'w') as afile:
+                    # include packages from workspace recipes into the image
+                    afile.write('IMAGE_INSTALL_append = " %s"\n' % ' '.join(packages))
+                    logger.info('Building image %s with the following '
+                                'additional packages: %s', image, ' '.join(packages))
+            else:
+                logger.warning('No packages to add, building image %s unmodified', image)
+        else:
+            logger.warning('No recipes in workspace, building image %s unmodified', image)
 
-    logger.info('Successfully built %s', image)
+        deploy_dir_image = tinfoil.config_data.getVar('DEPLOY_DIR_IMAGE', True)
+
+        tinfoil.shutdown()
+
+        # run bitbake to build image
+        try:
+            exec_build_env_command(config.init_path, basepath,
+                                'bitbake %s' % image, watch=True)
+        except ExecutionError as err:
+            return err.exitcode
+    finally:
+        if os.path.isfile(appendfile):
+            os.unlink(appendfile)
+
+    logger.info('Successfully built %s. You can find output files in %s'
+                % (image, deploy_dir_image))
 
 def register_commands(subparsers, context):
     """Register devtool subcommands from the build-image plugin"""
@@ -87,5 +107,5 @@ def register_commands(subparsers, context):
                                    help='Build image including workspace recipe packages',
                                    description='Builds an image, extending it to include '
                                    'packages from recipes in the workspace')
-    parser.add_argument('recipe', help='Image recipe to build')
+    parser.add_argument('imagename', help='Image recipe to build', nargs='?')
     parser.set_defaults(func=build_image)

@@ -140,7 +140,7 @@ def main():
         if args[0] == "help":
             if len(args) == 1:
                 parser.print_help()
-                sys.exit(1)
+                sys.exit()
 
     invoke_subcommand(args, parser, yocto_bsp_help_usage, subcommands)
 

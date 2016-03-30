@@ -1,0 +1,55 @@
+From 00d4447395725abaa651e12ed40095081e04011e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 13 Sep 2015 13:22:01 -0700
+Subject: [PATCH 1/3] Detect backtrace() API availability before using it
+
+C libraries besides glibc do not have backtrace() implemented
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ configure.ac | 2 ++
+ src/log.c    | 5 ++---
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 69c0eeb..90099f2 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -171,6 +171,8 @@ fi
+ AM_CONDITIONAL(PPTP, test "${enable_pptp}" != "no")
+ AM_CONDITIONAL(PPTP_BUILTIN, test "${enable_pptp}" = "builtin")
+ 
++AC_CHECK_HEADERS([execinfo.h])
++
+ AC_CHECK_HEADERS(resolv.h, dummy=yes,
+ 	AC_MSG_ERROR(resolver header files are required))
+ AC_CHECK_LIB(resolv, ns_initparse, dummy=yes, [
+diff --git a/src/log.c b/src/log.c
+index a693bd0..5b40c1f 100644
+--- a/src/log.c
++++ b/src/log.c
+@@ -30,7 +30,6 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <syslog.h>
+-#include <execinfo.h>
+ #include <dlfcn.h>
+ 
+ #include "connman.h"
+@@ -215,9 +214,9 @@ static void print_backtrace(unsigned int offset)
+ static void signal_handler(int signo)
+ {
+ 	connman_error("Aborting (signal %d) [%s]", signo, program_exec);
+-
++#ifdef HAVE_EXECINFO_H
+ 	print_backtrace(2);
+-
++#endif /* HAVE_EXECINFO_H */
+ 	exit(EXIT_FAILURE);
+ }
+ 
+-- 
+2.5.1
+

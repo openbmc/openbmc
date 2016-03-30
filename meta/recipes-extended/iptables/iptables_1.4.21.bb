@@ -23,6 +23,7 @@ SRC_URI = "http://netfilter.org/projects/iptables/files/iptables-${PV}.tar.bz2 \
            file://types.h-add-defines-that-are-required-for-if_packet.patch \
            file://0001-configure-Add-option-to-enable-disable-libnfnetlink.patch \
            file://0001-fix-build-with-musl.patch \
+           file://0002-configure.ac-only-check-conntrack-when-libnfnetlink-enabled.patch \
           "
 
 SRC_URI[md5sum] = "536d048c8e8eeebcd9757d0863ebb0c0"
@@ -38,7 +39,7 @@ PACKAGECONFIG ?= "${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', 'ipv6', '', d)
 PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,"
 
 # libnfnetlink recipe is in meta-networking layer
-PACKAGECONFIG[libnfnetlink] = "--enable-libnfnetlink,--disable-libnfnetlink,libnfnetlink"
+PACKAGECONFIG[libnfnetlink] = "--enable-libnfnetlink,--disable-libnfnetlink,libnfnetlink libnetfilter-conntrack"
 
 do_configure_prepend() {
 	# Remove some libtool m4 files

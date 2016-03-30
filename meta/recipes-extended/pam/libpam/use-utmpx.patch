@@ -1,0 +1,233 @@
+utmp() may not be configured in and use posix compliant utmpx always
+UTMP is SVID legacy, UTMPX is mandated by POSIX
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Index: Linux-PAM-1.2.1/libpam/pam_modutil_getlogin.c
+===================================================================
+--- Linux-PAM-1.2.1.orig/libpam/pam_modutil_getlogin.c
++++ Linux-PAM-1.2.1/libpam/pam_modutil_getlogin.c
+@@ -10,8 +10,7 @@
+ 
+ #include <stdlib.h>
+ #include <unistd.h>
+-#include <utmp.h>
+-
++#include <utmpx.h>
+ #define _PAMMODUTIL_GETLOGIN "_pammodutil_getlogin"
+ 
+ const char *
+@@ -22,7 +21,7 @@ pam_modutil_getlogin(pam_handle_t *pamh)
+     const void *void_curr_tty;
+     const char *curr_tty;
+     char *curr_user;
+-    struct utmp *ut, line;
++    struct utmpx *ut, line;
+ 
+     status = pam_get_data(pamh, _PAMMODUTIL_GETLOGIN, &logname);
+     if (status == PAM_SUCCESS) {
+@@ -48,10 +47,10 @@ pam_modutil_getlogin(pam_handle_t *pamh)
+     }
+     logname = NULL;
+ 
+-    setutent();
++    setutxent();
+     strncpy(line.ut_line, curr_tty, sizeof(line.ut_line));
+ 
+-    if ((ut = getutline(&line)) == NULL) {
++    if ((ut = getutxline(&line)) == NULL) {
+ 	goto clean_up_and_go_home;
+     }
+ 
+@@ -74,7 +73,7 @@ pam_modutil_getlogin(pam_handle_t *pamh)
+ 
+ clean_up_and_go_home:
+ 
+-    endutent();
++    endutxent();
+ 
+     return logname;
+ }
+Index: Linux-PAM-1.2.1/modules/pam_issue/pam_issue.c
+===================================================================
+--- Linux-PAM-1.2.1.orig/modules/pam_issue/pam_issue.c
++++ Linux-PAM-1.2.1/modules/pam_issue/pam_issue.c
+@@ -25,7 +25,7 @@
+ #include <string.h>
+ #include <unistd.h>
+ #include <sys/utsname.h>
+-#include <utmp.h>
++#include <utmpx.h>
+ #include <time.h>
+ #include <syslog.h>
+ 
+@@ -246,13 +246,13 @@ read_issue_quoted(pam_handle_t *pamh, FI
+ 	      case 'U':
+ 		{
+ 		    unsigned int users = 0;
+-		    struct utmp *ut;
+-		    setutent();
+-		    while ((ut = getutent())) {
++		    struct utmpx *ut;
++		    setutxent();
++		    while ((ut = getutxent())) {
+ 			if (ut->ut_type == USER_PROCESS)
+ 			    ++users;
+ 		    }
+-		    endutent();
++		    endutxent();
+ 		    if (c == 'U')
+ 			snprintf (buf, sizeof buf, "%u %s", users,
+ 			          (users == 1) ? "user" : "users");
+Index: Linux-PAM-1.2.1/modules/pam_lastlog/pam_lastlog.c
+===================================================================
+--- Linux-PAM-1.2.1.orig/modules/pam_lastlog/pam_lastlog.c
++++ Linux-PAM-1.2.1/modules/pam_lastlog/pam_lastlog.c
+@@ -15,8 +15,9 @@
+ #include <errno.h>
+ #ifdef HAVE_UTMP_H
+ # include <utmp.h>
+-#else
+-# include <lastlog.h>
++#endif
++#ifdef HAVE_UTMPX_H
++# include <utmpx.h>
+ #endif
+ #include <pwd.h>
+ #include <stdlib.h>
+@@ -27,6 +28,12 @@
+ #include <syslog.h>
+ #include <unistd.h>
+ 
++#ifndef HAVE_UTMP_H
++#define UT_LINESIZE 32
++#define UT_HOSTSIZE 32
++#define UT_NAMESIZE 256
++#endif
++
+ #if defined(hpux) || defined(sunos) || defined(solaris)
+ # ifndef _PATH_LASTLOG
+ #  define _PATH_LASTLOG "/usr/adm/lastlog"
+@@ -38,7 +45,7 @@
+ #  define UT_LINESIZE 12
+ # endif /* UT_LINESIZE */
+ #endif
+-#if defined(hpux)
++#if defined(hpux) || !defined HAVE_UTMP_H
+ struct lastlog {
+     time_t  ll_time;
+     char    ll_line[UT_LINESIZE];
+@@ -447,8 +454,8 @@ last_login_failed(pam_handle_t *pamh, in
+ {
+     int retval;
+     int fd;
+-    struct utmp ut;
+-    struct utmp utuser;
++    struct utmpx ut;
++    struct utmpx utuser;
+     int failed = 0;
+     char the_time[256];
+     char *date = NULL;
+Index: Linux-PAM-1.2.1/modules/pam_limits/pam_limits.c
+===================================================================
+--- Linux-PAM-1.2.1.orig/modules/pam_limits/pam_limits.c
++++ Linux-PAM-1.2.1/modules/pam_limits/pam_limits.c
+@@ -33,7 +33,7 @@
+ #include <sys/resource.h>
+ #include <limits.h>
+ #include <glob.h>
+-#include <utmp.h>
++#include <utmpx.h>
+ #ifndef UT_USER  /* some systems have ut_name instead of ut_user */
+ #define UT_USER ut_user
+ #endif
+@@ -227,7 +227,7 @@ static int
+ check_logins (pam_handle_t *pamh, const char *name, int limit, int ctrl,
+               struct pam_limit_s *pl)
+ {
+-    struct utmp *ut;
++    struct utmpx *ut;
+     int count;
+ 
+     if (ctrl & PAM_DEBUG_ARG) {
+@@ -242,7 +242,7 @@ check_logins (pam_handle_t *pamh, const
+         return LOGIN_ERR;
+     }
+ 
+-    setutent();
++    setutxent();
+ 
+     /* Because there is no definition about when an application
+        actually adds a utmp entry, some applications bizarrely do the
+@@ -260,7 +260,7 @@ check_logins (pam_handle_t *pamh, const
+ 	count = 1;
+     }
+ 
+-    while((ut = getutent())) {
++    while((ut = getutxent())) {
+ #ifdef USER_PROCESS
+         if (ut->ut_type != USER_PROCESS) {
+             continue;
+@@ -296,7 +296,7 @@ check_logins (pam_handle_t *pamh, const
+ 	    break;
+ 	}
+     }
+-    endutent();
++    endutxent();
+     if (count > limit) {
+ 	if (name) {
+ 	    pam_syslog(pamh, LOG_WARNING,
+Index: Linux-PAM-1.2.1/modules/pam_timestamp/pam_timestamp.c
+===================================================================
+--- Linux-PAM-1.2.1.orig/modules/pam_timestamp/pam_timestamp.c
++++ Linux-PAM-1.2.1/modules/pam_timestamp/pam_timestamp.c
+@@ -56,7 +56,7 @@
+ #include <time.h>
+ #include <sys/time.h>
+ #include <unistd.h>
+-#include <utmp.h>
++#include <utmpx.h>
+ #include <syslog.h>
+ #include <paths.h>
+ #include "hmacsha1.h"
+@@ -197,15 +197,15 @@ timestamp_good(time_t then, time_t now,
+ static int
+ check_login_time(const char *ruser, time_t timestamp)
+ {
+-	struct utmp utbuf, *ut;
++	struct utmpx utbuf, *ut;
+ 	time_t oldest_login = 0;
+ 
+-	setutent();
++	setutxent();
+ 	while(
+ #ifdef HAVE_GETUTENT_R
+-	      !getutent_r(&utbuf, &ut)
++	      !getutxent_r(&utbuf, &ut)
+ #else
+-	      (ut = getutent()) != NULL
++	      (ut = getutxent()) != NULL
+ #endif
+ 	      ) {
+ 		if (ut->ut_type != USER_PROCESS) {
+@@ -218,7 +218,7 @@ check_login_time(const char *ruser, time
+ 			oldest_login = ut->ut_tv.tv_sec;
+ 		}
+ 	}
+-	endutent();
++	endutxent();
+ 	if(oldest_login == 0 || timestamp < oldest_login) {
+ 		return PAM_AUTH_ERR;
+ 	}
+Index: Linux-PAM-1.2.1/modules/pam_unix/support.c
+===================================================================
+--- Linux-PAM-1.2.1.orig/modules/pam_unix/support.c
++++ Linux-PAM-1.2.1/modules/pam_unix/support.c
+@@ -13,7 +13,6 @@
+ #include <pwd.h>
+ #include <shadow.h>
+ #include <limits.h>
+-#include <utmp.h>
+ #include <errno.h>
+ #include <signal.h>
+ #include <ctype.h>

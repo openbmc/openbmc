@@ -15,6 +15,12 @@ inherit update-alternatives
 
 EXTRA_OEMAKE = "CC='${CC}' KERNEL_INCLUDE=${STAGING_INCDIR} DOCDIR=${docdir}/iproute2 SUBDIRS='lib tc ip' SBINDIR='${base_sbindir}' LIBDIR='${libdir}'"
 
+do_configure_append () {
+    sh configure ${STAGING_INCDIR}
+    # Explicitly disable ATM support
+    sed -i -e '/TC_CONFIG_ATM/d' Config
+}
+
 do_install () {
     oe_runmake DESTDIR=${D} install
     mv ${D}${base_sbindir}/ip ${D}${base_sbindir}/ip.iproute2

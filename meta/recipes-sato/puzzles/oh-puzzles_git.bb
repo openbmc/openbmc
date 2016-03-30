@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://LICENCE;md5=f56ec6772dd1c7c367067bbea8ea1675 \
                     file://src/tree234.c;endline=28;md5=b4feb1976feebf8f1379093ed52f2945"
 
 SECTION = "x11"
-DEPENDS = "gtk+ gconf intltool-native librsvg"
+DEPENDS = "gtk+ gconf intltool-native librsvg gettext-native"
 
 # libowl requires x11 in DISTRO_FEATURES
 DEPENDS_append_poky = " ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'libowl', '', d)}"

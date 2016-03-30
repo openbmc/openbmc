@@ -2,7 +2,7 @@
 {% load projecttags %}
 {% load humanize %}
 
-
+{% block title %} BitBake variables - {{project.name}} - Toaster {% endblock %}
 {% block projectinfomain %}
 
 <h2>Bitbake variables</h2>
@@ -43,6 +43,7 @@
                     <input id="filter-image_fstypes" type="text" placeholder="Search image types" class="span4">
                     <div id="all-image_fstypes" class="scrolling">
                     </div>
+                    <span class="help-block" id="fstypes-error-message">You must select at least one image type</span>
                     <button id="apply-change-image_fstypes" type="button" class="btn">Save</button>
                     <button id="cancel-change-image_fstypes" type="button" class="btn btn-link">Cancel</button>
                 </form>
@@ -312,9 +313,11 @@
             });
             if ( 0 == any_checked ) {
                 $("#apply-change-image_fstypes").attr("disabled","disabled");
+                $('#fstypes-error-message').show();
             }
             else {
                 $("#apply-change-image_fstypes").removeAttr("disabled");
+                $('#fstypes-error-message').hide();
             }
         }
 
@@ -546,10 +549,14 @@
                 // Add the un-checked boxes second
                 for (var i = 0, length = fstypes_list.length; i < length; i++) {
                     if (0  > fstypes.indexOf(" "+fstypes_list[i].value+" ")) {
-                            html += '<label class="checkbox"><input type="checkbox" class="fs-checkbox-fstypes" value="'+fstypes_list[i].value+'">'+fstypes_list[i].value+'</label>\n';
+                        html += '<label class="checkbox"><input type="checkbox" class="fs-checkbox-fstypes" value="'+fstypes_list[i].value+'">'+fstypes_list[i].value+'</label>\n';
                     }
                 }
+                // Add the 'no search matches' line last
+                html += '<label id="no-match-fstypes">No image types found</label>\n';
+                // Display the list
                 document.getElementById("all-image_fstypes").innerHTML = html;
+                $('#no-match-fstypes').hide();
 
                 // Watch elements to disable Save when none are checked
                 $(".fs-checkbox-fstypes").each(function(){
@@ -558,8 +565,9 @@
                     });
                 });
 
-                // clear the previous filter values
+                // clear the previous filter values and warning messages
                 $("input#filter-image_fstypes").val("");
+                $('#fstypes-error-message').hide();
             });
 
             $('#cancel-change-image_fstypes').click(function(){
@@ -569,17 +577,24 @@
             });
 
             $('#filter-image_fstypes').on('input', function(){
-                   var valThis = $(this).val().toLowerCase();
+                var valThis = $(this).val().toLowerCase();
+                var matchCount=0;
                 $('#all-image_fstypes label').each(function(){
                     var text = $(this).text().toLowerCase();
                     var match = text.indexOf(valThis);
                     if (match >= 0) {
                         $(this).show();
+                        matchCount += 1;
                     }
                     else {
                         $(this).hide();
                     }
                 });
+                if (matchCount === 0) {
+                   $('#no-match-fstypes').show();
+                } else {
+                   $('#no-match-fstypes').hide();
+                }
             });
 
             $('#apply-change-image_fstypes').click(function(){

@@ -58,7 +58,7 @@ fatal() {
     echo $1 >/dev/console
     echo >/dev/console
 
-    if [ -n "bootparam_init_fatal_sh" ]; then
+    if [ -n "$bootparam_init_fatal_sh" ]; then
         sh
     else
 	while [ "true" ]; do

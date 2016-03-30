@@ -1,0 +1,51 @@
+From 2659fb25d32f4b29c1c96aa5730fe40e19d53ab0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 14 Oct 2015 17:38:37 -0700
+Subject: [PATCH] gcc5 optimizes away the write only static functions and we
+ end up with
+
+  librt/librt_so.a(rt-unwind-resume.oS): In function `_Unwind_Resume':
+  rt-unwind-resume.c:(.text+0x3c): undefined reference to `libgcc_s_resume'
+  collect2: error: ld returned 1 exit status
+  make[2]: *** [lib/librt.so] Error 1
+
+marking these functions explicitly used with __attribute_used__ avoids
+that optimization.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ libpthread/nptl/sysdeps/unix/sysv/linux/arm/unwind-forcedunwind.c | 2 +-
+ libpthread/nptl/sysdeps/unix/sysv/linux/arm/unwind-resume.c       | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libpthread/nptl/sysdeps/unix/sysv/linux/arm/unwind-forcedunwind.c b/libpthread/nptl/sysdeps/unix/sysv/linux/arm/unwind-forcedunwind.c
+index f4d6f41..0c2edd7 100644
+--- a/libpthread/nptl/sysdeps/unix/sysv/linux/arm/unwind-forcedunwind.c
++++ b/libpthread/nptl/sysdeps/unix/sysv/linux/arm/unwind-forcedunwind.c
+@@ -27,7 +27,7 @@
+ #define __libc_fatal(x)         {/*write(STDERR_FILENO, x, strlen(x));*/ abort();}
+ 
+ static void *libgcc_s_handle;
+-static void (*libgcc_s_resume) (struct _Unwind_Exception *exc);
++static void (*libgcc_s_resume) (struct _Unwind_Exception *exc) __attribute_used__;
+ static _Unwind_Reason_Code (*libgcc_s_personality)
+   (_Unwind_State, struct _Unwind_Exception *, struct _Unwind_Context *);
+ static _Unwind_Reason_Code (*libgcc_s_forcedunwind)
+diff --git a/libpthread/nptl/sysdeps/unix/sysv/linux/arm/unwind-resume.c b/libpthread/nptl/sysdeps/unix/sysv/linux/arm/unwind-resume.c
+index f9a4ffb..f0c3047 100644
+--- a/libpthread/nptl/sysdeps/unix/sysv/linux/arm/unwind-resume.c
++++ b/libpthread/nptl/sysdeps/unix/sysv/linux/arm/unwind-resume.c
+@@ -25,7 +25,7 @@
+ #define __libc_dlclose          dlclose
+ #define __libc_fatal(x)         {/*write(STDERR_FILENO, x, strlen(x));*/ abort();}
+ 
+-static void (*libgcc_s_resume) (struct _Unwind_Exception *exc);
++static void (*libgcc_s_resume) (struct _Unwind_Exception *exc) __attribute_used__;
+ static _Unwind_Reason_Code (*libgcc_s_personality)
+   (_Unwind_State, struct _Unwind_Exception *, struct _Unwind_Context *);
+ 
+-- 
+2.6.1
+

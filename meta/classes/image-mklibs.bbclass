@@ -25,7 +25,7 @@ mklibs_optimize_image_doit() {
 		x86_64)
 			dynamic_loader="${base_libdir}/ld-linux-x86-64.so.2"
 			;;
-		i586 )
+		i*86 )
 			dynamic_loader="${base_libdir}/ld-linux.so.2"
 			;;
 		arm )

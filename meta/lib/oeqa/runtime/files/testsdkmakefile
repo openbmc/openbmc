@@ -1,0 +1,5 @@
+test: test.o
+	$(CC) -o test test.o -lm
+test.o: test.c
+	$(CC) -c test.c
+

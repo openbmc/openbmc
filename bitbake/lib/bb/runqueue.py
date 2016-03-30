@@ -797,6 +797,15 @@ class RunQueueData:
                         st = "do_%s" % st
                     invalidate_task(fn, st, True)
 
+        # Create and print to the logs a virtual/xxxx -> PN (fn) table
+        virtmap = taskData.get_providermap()
+        virtpnmap = {}
+        for v in virtmap:
+            virtpnmap[v] = self.dataCache.pkg_fn[virtmap[v]]
+            bb.debug(2, "%s resolved to: %s (%s)" % (v, virtpnmap[v], virtmap[v]))
+        if hasattr(bb.parse.siggen, "tasks_resolved"):
+            bb.parse.siggen.tasks_resolved(virtmap, virtpnmap, self.dataCache)
+
         # Iterate over the task list and call into the siggen code
         dealtwith = set()
         todeal = set(range(len(self.runq_fnid)))

@@ -43,6 +43,7 @@ LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://COPYING.LIB;md5=2d5025d4aa3495befef8f17206a5b0a1"
 
 DEPENDS = "libpcre attr acl popt ossp-uuid file byacc-native"
+DEPENDS_append_class-native = " file-replacement-native"
 
 S = "${WORKDIR}/rpm"
 

@@ -4,7 +4,8 @@ LICENSE = "LGPLv2.0"
 DEPENDS = " glib-2.0 gtk+ intltool-native ncurses gobject-introspection-stub"
 RDEPENDS_libvte = "vte-termcap"
 
-inherit gnome gtk-doc
+inherit gnome gtk-doc distro_features_check
+ANY_OF_DISTRO_FEATURES = "${GTK2DISTROFEATURES}"
 
 EXTRA_OECONF = "--disable-python --disable-introspection"
 

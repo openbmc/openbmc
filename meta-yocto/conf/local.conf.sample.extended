@@ -165,6 +165,15 @@
 # currently an example class is image_types_uboot
 # IMAGE_CLASSES = " image_types_uboot"
 
+# The following options will build a companion 'debug filesystem' in addition
+# to the normal deployable filesystem.  This companion system allows a
+# debugger to know the symbols and related sources.  It can be used to
+# debug a remote 'production' system without having to add the debug symbols
+# and sources to remote system.  If IMAGE_FSTYPES_DEBUGFS is not defined, it
+# defaults to IMAGE_FSTYPES.
+#IMAGE_GEN_DEBUGFS = "1"
+#IMAGE_FSTYPES_DEBUGFS = "tar.gz"
+
 # Incremental rpm image generation, the rootfs would be totally removed
 # and re-created in the second generation by default, but with
 # INC_RPM_IMAGE_GEN = "1", the rpm based rootfs would be kept, and will

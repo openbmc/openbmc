@@ -10,7 +10,6 @@ SRC_URI = "git://github.com/openSUSE/build-compare.git \
            file://Ignore-DWARF-sections.patch;striplevel=1 \
            file://0001-Add-support-for-deb-and-ipk-packaging.patch \
            "
-PATCHTOOL = "git"
 
 SRCREV = "c5352c054c6ef15735da31b76d6d88620f4aff0a"
 

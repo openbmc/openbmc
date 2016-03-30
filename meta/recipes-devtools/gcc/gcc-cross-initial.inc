@@ -26,6 +26,7 @@ EXTRA_OECONF = "\
     ${EXTRA_OECONF_INITIAL} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', '--with-ld=${STAGING_BINDIR_TOOLCHAIN}/${TARGET_PREFIX}ld.bfd', '', d)} \
     ${EXTRA_OECONF_GCC_FLOAT} \
+    ${@get_gcc_ppc_plt_settings(bb, d)} \
 "
 
 EXTRA_OECONF += "--with-native-system-header-dir=${SYSTEMHEADERS}"

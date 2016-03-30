@@ -16,7 +16,9 @@ SRCREV = "5386c5b984d40ef5434673ed62204e69aaf52645"
 
 S = "${WORKDIR}/git"
 
-inherit autotools gtk-doc lib_package pkgconfig
+inherit autotools gtk-doc lib_package pkgconfig distro_features_check
+
+ANY_OF_DISTRO_FEATURES = "${GTK2DISTROFEATURES}"
 
 do_configure_prepend() {
 	touch ${S}/ChangeLog

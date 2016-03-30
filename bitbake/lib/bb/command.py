@@ -181,6 +181,16 @@ class CommandsSync:
         value = str(params[1])
         command.cooker.data.setVar(varname, value)
 
+    def getSetVariable(self, command, params):
+        """
+        Read the value of a variable from data and set it into the datastore
+        which effectively expands and locks the value.
+        """
+        varname = params[0]
+        result = self.getVariable(command, params)
+        command.cooker.data.setVar(varname, result)
+        return result
+
     def setConfig(self, command, params):
         """
         Set the value of variable in configuration

@@ -14,7 +14,7 @@ class GccCompileTest(oeSDKTest):
 
     @classmethod
     def setUpClass(self):
-        for f in ['test.c', 'test.cpp', 'testmakefile']:
+        for f in ['test.c', 'test.cpp', 'testsdkmakefile']:
             shutil.copyfile(os.path.join(self.tc.filesdir, f), self.tc.sdktestdir + f)
 
     def test_gcc_compile(self):
@@ -27,10 +27,10 @@ class GccCompileTest(oeSDKTest):
         self._run('$CXX %s/test.cpp -o %s/test -lm' % (self.tc.sdktestdir, self.tc.sdktestdir))
 
     def test_make(self):
-        self._run('cd %s; make -f testmakefile' % self.tc.sdktestdir)
+        self._run('cd %s; make -f testsdkmakefile' % self.tc.sdktestdir)
 
     @classmethod
     def tearDownClass(self):
-        files = [self.tc.sdktestdir + f for f in ['test.c', 'test.cpp', 'test.o', 'test', 'testmakefile']]
+        files = [self.tc.sdktestdir + f for f in ['test.c', 'test.cpp', 'test.o', 'test', 'testsdkmakefile']]
         for f in files:
             bb.utils.remove(f)

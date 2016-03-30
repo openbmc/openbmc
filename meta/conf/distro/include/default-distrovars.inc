@@ -47,3 +47,6 @@ DISTRO_VERSION ??= "nodistro.0"
 
 # Missing checksums should raise an error
 BB_STRICT_CHECKSUM = "1"
+
+GTK2DISTROFEATURES = "directfb x11"
+GTK3DISTROFEATURES = "x11 wayland"

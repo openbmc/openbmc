@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
-from orm.models import Project, ProjectLayer, ProjectVariable, ProjectTarget, Build
+from orm.models import Project, ProjectLayer, ProjectVariable, ProjectTarget, Build, Layer_Version
 
 # a BuildEnvironment is the equivalent of the "build/" directory on the localhost
 class BuildEnvironment(models.Model):
@@ -38,40 +38,6 @@ class BuildEnvironment(models.Model):
     lock        = models.IntegerField(choices = LOCK_STATE, default = LOCK_FREE)
     created     = models.DateTimeField(auto_now_add = True)
     updated     = models.DateTimeField(auto_now = True)
-
-
-    def get_artifact_type(self, path):
-        if self.betype == BuildEnvironment.TYPE_LOCAL:
-            try:
-                import magic
-
-                # fair warning: this is a mess; there are multiple competeing and incompatible
-                # magic modules floating around, so we try some of the most common combinations
-
-                try:    # we try ubuntu's python-magic 5.4
-                    m = magic.open(magic.MAGIC_MIME_TYPE)
-                    m.load()
-                    return m.file(path)
-                except AttributeError:
-                    pass
-
-                try:    # we try python-magic 0.4.6
-                    m = magic.Magic(magic.MAGIC_MIME)
-                    return m.from_file(path)
-                except AttributeError:
-                    pass
-
-                try:    # we try pip filemagic 1.6
-                    m = magic.Magic(flags=magic.MAGIC_MIME_TYPE)
-                    return m.id_filename(path)
-                except AttributeError:
-                    pass
-
-                return "binary/octet-stream"
-            except ImportError:
-                return "binary/octet-stream"
-        raise Exception("FIXME: artifact type not implemented for build environment type %s" % self.get_betype_display())
-
 
     def get_artifact(self, path):
         if self.betype == BuildEnvironment.TYPE_LOCAL:
@@ -137,6 +103,7 @@ class BRLayer(models.Model):
     giturl      = models.CharField(max_length = 254)
     commit      = models.CharField(max_length = 254)
     dirpath     = models.CharField(max_length = 254)
+    layer_version = models.ForeignKey(Layer_Version, null=True)
 
 class BRBitbake(models.Model):
     req         = models.ForeignKey(BuildRequest, unique = True)    # only one bitbake for a request

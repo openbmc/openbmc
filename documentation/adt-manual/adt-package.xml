@@ -27,7 +27,7 @@
                 information about OPKG.</para></listitem>
             <listitem><para><emphasis>RPM:</emphasis> A more widely known PMS intended for GNU/Linux
                 distributions.
-                This PMS works with files packaged in an <filename>.rms</filename> format.
+                This PMS works with files packaged in an <filename>.rpm</filename> format.
                 The build system currently installs through this PMS by default.
                 See <ulink url='http://en.wikipedia.org/wiki/RPM_Package_Manager'></ulink>
                 for more information about RPM.</para></listitem>

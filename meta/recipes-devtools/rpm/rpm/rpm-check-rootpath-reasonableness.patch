@@ -37,7 +37,7 @@ index 40c42bd..88d85ab 100644
 +    int ret,rootdir_len;
 +
 +    if(rootdir == NULL) {
-+        return;
++        return -1;
 +    }
 +
 +    rootdir_len = strlen(rootdir);

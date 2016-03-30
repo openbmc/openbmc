@@ -23,11 +23,13 @@ do_configure_prepend () {
 
 do_install () {
 	autotools_do_install
-	install -d ${D}${base_bindir}
-	mv ${D}${bindir}/grep ${D}${base_bindir}/grep
-	mv ${D}${bindir}/egrep ${D}${base_bindir}/egrep
-	mv ${D}${bindir}/fgrep ${D}${base_bindir}/fgrep
-	rmdir ${D}${bindir}/
+	if [ "${base_bindir}" != "${bindir}" ]; then
+		install -d ${D}${base_bindir}
+		mv ${D}${bindir}/grep ${D}${base_bindir}/grep
+		mv ${D}${bindir}/egrep ${D}${base_bindir}/egrep
+		mv ${D}${bindir}/fgrep ${D}${base_bindir}/fgrep
+		rmdir ${D}${bindir}/
+	fi
 }
 
 inherit update-alternatives

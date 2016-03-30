@@ -9,6 +9,7 @@ LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe \
                     file://src/ls.c;beginline=4;endline=16;md5=15ed60f67b1db5fedd5dbc37cf8a9543"
 PR = "r5"
+DEPENDS = "virtual/libiconv"
 
 inherit autotools gettext texinfo
 
@@ -25,6 +26,7 @@ SRC_URI = "${GNU_MIRROR}/coreutils/${BP}.tar.bz2 \
            file://coreutils-build-with-acl.patch \
            file://coreutils-fix-texinfo.patch \
            file://fix_for_manpage_building.patch \
+           file://loadavg.patch \
            "
 
 SRC_URI[md5sum] = "c9607d8495f16e98906e7ed2d9751a06"

@@ -1,26 +1,29 @@
-From 5a55943a6bbb10a79994a0b18071b2427dffb15f Mon Sep 17 00:00:00 2001
+From fb2c401374d4efe89e8da795e21d96fac038639d Mon Sep 17 00:00:00 2001
 From: Bruce Ashfield <bruce.ashfield@windriver.com>
 Date: Mon, 11 Jun 2012 15:31:42 -0400
 Subject: [PATCH] linux: version tweak
 
+Upstream-Status: Inappropriate [example code]
+
 Signed-off-by: Bruce Ashfield <bruce.ashfield@windriver.com>
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
 ---
- Makefile |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Makefile b/Makefile
-index a687963..f5b1ac3 100644
+index c361593..099e8ff 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -2,7 +2,7 @@ VERSION = 3
- PATCHLEVEL = 4
+@@ -2,7 +2,7 @@ VERSION = 4
+ PATCHLEVEL = 2
  SUBLEVEL = 0
  EXTRAVERSION =
--NAME = Saber-toothed Squirrel
-+NAME = Saber-toothed Squirrel-custom
+-NAME = Hurr durr I'ma sheep
++NAME = Hurr durr I'ma customized sheep 
  
  # *DOCUMENTATION*
  # To see a list of typical targets execute "make help"
 -- 
-1.7.5.4
+2.1.4
 

@@ -4,55 +4,69 @@
 {% load projecttags %}
 {% load humanize %}
 
+{% block title %} Welcome to Toaster {% endblock %}
 {% block pagecontent %}
 
-  <div class="container-fluid">
-   <div class="row-fluid">
-    <!-- Empty - no data in database -->
-    <div class="hero-unit span12 well-transparent">
-     <div class="row-fluid">
-      <div class="span6">
-       <h1>
-        This is Toaster
-       </h1>
-       <p>A web interface to <a href="http://www.openembedded.org">OpenEmbedded</a> and <a href="http://www.yoctoproject.org/tools-resources/projects/bitbake">BitBake</a>, the <a href="http://www.yoctoproject.org">Yocto Project</a> build system.</p>
+  {% if BUILD_MODE %}
+    <!-- build mode -->
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="hero-unit span12 well-transparent">
+          <div class="row-fluid">
 
+            <div class="span6">
+              <h1>This is Toaster</h1>
 
-		{% if lvs_nos %}
-		    <p class="hero-actions">
-			    <a class="btn btn-primary btn-large" href="{% url 'newproject' %}">
-				    To start building, create your first Toaster project
-			    </a>
-		    </p>
-		{% else %}
-		    <div class="alert alert-info lead air">
-			    Toaster has no layer information. Without layer information, you cannot run builds. To generate layer information you can:
-			    <ul>
-			        <li>
-			            <a href="http://www.yoctoproject.org/docs/latest/toaster-manual/toaster-manual.html#layer-source">Configure a layer source</a>
-			        </li>
-			        <li>
-			            <a href="{% url 'newproject' %}">Create a project</a>, then import layers
-			        </li>
-			    </ul>
-		    </div>
-	        {% endif %}
+              <p>A web interface to <a href="http://www.openembedded.org">OpenEmbedded</a> and <a href="http://www.yoctoproject.org/tools-resources/projects/bitbake">BitBake</a>, the <a href="http://www.yoctoproject.org">Yocto Project</a> build system.</p>
 
-        <ul class="unstyled">
-            <li>
-                <a href="http://www.yoctoproject.org/docs/latest/toaster-manual/toaster-manual.html">Read the Toaster manual</a>
-            </li>
-            <li>
-                <a href="https://wiki.yoctoproject.org/wiki/Contribute_to_Toaster">Contribute to Toaster</a>
-            </li>
-        </ul>
+		          {% if lvs_nos %}
+		            <p class="hero-actions">
+		              <a class="btn btn-primary btn-large" href="{% url 'newproject' %}">
+			              To start building, create your first Toaster project
+		              </a>
+		            </p>
+		          {% else %}
+                <div class="alert alert-info lead air">
+                  Toaster has no layer information. Without layer information, you cannot run builds. To generate layer information you can:
+                  <ul>
+                    <li>
+                      <a href="http://www.yoctoproject.org/docs/latest/toaster-manual/toaster-manual.html#layer-source">Configure a layer source</a>
+                    </li>
+                    <li>
+			                <a href="{% url 'newproject' %}">Create a project</a>, then import layers
+                    </li>
+                  </ul>
+                </div>
+              {% endif %}
 
+              <ul class="unstyled">
+                <li>
+                  <a href="http://www.yoctoproject.org/docs/latest/toaster-manual/toaster-manual.html">
+                    Read the Toaster manual
+                  </a>
+                </li>
+
+                <li>
+                  <a href="https://wiki.yoctoproject.org/wiki/Contribute_to_Toaster">
+                    Contribute to Toaster
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="span6">
+              <img alt="Yocto Project" class="thumbnail" src="{% static 'img/toaster_bw.png' %}"/>
+            </div>
+
+          </div>
+        </div>
       </div>
-      <div class="span6">
-          <img alt="Yocto Project" class="thumbnail" src="{% static 'img/toaster_bw.png' %}"/>
-      </div>
-     </div>
     </div>
-   </div>
+  {% else %}
+    <!-- analysis mode -->
+    <div class="alert alert-info lead top-air">
+      Toaster has not recorded any builds yet. Run a build from the command line to see it here.
+    </div>
+  {% endif %}
 
 {% endblock %}

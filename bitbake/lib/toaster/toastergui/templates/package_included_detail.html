@@ -1,7 +1,7 @@
 {% extends "package_detail_base.html" %}
 {% load projecttags %}
 
-{% block title %}
+{% block mainheading %}
         <h1>
             {{package.fullpackagespec}}
             <script>
@@ -9,7 +9,7 @@
             </script>
             <small>({{target.target}})</small>
         </h1>
-{% endblock title %}
+{% endblock %}
 
 {% block tabcontent %}
 {% with packageFileCount=package.buildfilelist_package.count %}

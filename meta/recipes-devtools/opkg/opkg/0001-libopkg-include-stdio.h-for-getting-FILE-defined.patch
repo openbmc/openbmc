@@ -1,0 +1,45 @@
+From 58f4d3d63cd6097154205ea7ee042005036659b3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 10 Sep 2015 21:43:32 -0700
+Subject: [PATCH] libopkg: include stdio.h for getting FILE defined
+To: opkg-devel@googlegroups.com
+Cc: paul@paulbarker.me.uk
+
+For some libc(musl) stdio.h may not get included indirectly which means
+we need to mention it in explicit include list
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted
+
+ libopkg/opkg_verify.c | 1 +
+ libopkg/pkg_src.c     | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/libopkg/opkg_verify.c b/libopkg/opkg_verify.c
+index 41dc3f4..a71591d 100644
+--- a/libopkg/opkg_verify.c
++++ b/libopkg/opkg_verify.c
+@@ -18,6 +18,7 @@
+ 
+ #include <malloc.h>
+ #include <string.h>
++#include <stdio.h>
+ 
+ #include "file_util.h"
+ #include "opkg_conf.h"
+diff --git a/libopkg/pkg_src.c b/libopkg/pkg_src.c
+index e31ec21..6b49a00 100644
+--- a/libopkg/pkg_src.c
++++ b/libopkg/pkg_src.c
+@@ -20,6 +20,7 @@
+ 
+ #include <malloc.h>
+ #include <unistd.h>
++#include <stdio.h>
+ 
+ #include "file_util.h"
+ #include "opkg_conf.h"
+-- 
+2.5.1
+

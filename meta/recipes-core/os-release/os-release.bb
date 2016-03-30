@@ -32,11 +32,12 @@ python do_compile () {
                 f.write('{0}={1}\n'.format(field, value))
     if d.getVar('RPM_SIGN_PACKAGES', True) == '1':
         rpm_gpg_pubkey = d.getVar('RPM_GPG_PUBKEY', True)
-        os.mkdir('${B}/rpm-gpg')
-        distro_version = self.d.getVar('DISTRO_VERSION', True) or "oe.0"
+        bb.utils.mkdirhier('${B}/rpm-gpg')
+        distro_version = d.getVar('DISTRO_VERSION', True) or "oe.0"
         shutil.copy2(rpm_gpg_pubkey, d.expand('${B}/rpm-gpg/RPM-GPG-KEY-%s' % distro_version))
 }
 do_compile[vardeps] += "${OS_RELEASE_FIELDS}"
+do_compile[depends] += "signing-keys:do_export_public_keys"
 
 do_install () {
     install -d ${D}${sysconfdir}

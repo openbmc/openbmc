@@ -25,6 +25,11 @@ def get_gcc_mips_plt_setting(bb, d):
         return "--with-mips-plt"
     return ""
 
+def get_gcc_ppc_plt_settings(bb, d):
+    if d.getVar('TRANSLATED_TARGET_ARCH', True) in [ 'powerpc' ] and not bb.utils.contains('DISTRO_FEATURES', 'bssplt', True, False, d):
+        return "--enable-secureplt"
+    return ""
+
 def get_long_double_setting(bb, d):
     if d.getVar('TRANSLATED_TARGET_ARCH', True) in [ 'powerpc', 'powerpc64' ] and d.getVar('TCLIBC', True) in [ 'uclibc', 'glibc' ]:
         return "--with-long-double-128"

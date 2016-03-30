@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 INST_ARCH=$(uname -m | sed -e "s/i[3-6]86/ix86/" -e "s/x86[-_]64/x86_64/")
 SDK_ARCH=$(echo @SDK_ARCH@ | sed -e "s/i[3-6]86/ix86/" -e "s/x86[-_]64/x86_64/")
@@ -68,8 +68,9 @@ while getopts ":yd:nDRS" OPT; do
 	esac
 done
 
-echo "@SDK_TITLE@ installer version @SDK_VERSION@"
-echo "==========================================================="
+titlestr="@SDK_TITLE@ installer version @SDK_VERSION@"
+printf "%s\n" "$titlestr"
+printf "%${#titlestr}s\n" | tr " " "="
 
 if [ $verbose = 1 ] ; then
 	set -x
@@ -86,7 +87,7 @@ if [ "$target_sdk_dir" = "" ]; then
 	if [ "$answer" = "Y" ]; then
 		target_sdk_dir="$DEFAULT_INSTALL_DIR"
 	else
-		read -e -p "Enter target directory for SDK (default: $DEFAULT_INSTALL_DIR): " target_sdk_dir
+		read -p "Enter target directory for SDK (default: $DEFAULT_INSTALL_DIR): " target_sdk_dir
 		[ "$target_sdk_dir" = "" ] && target_sdk_dir=$DEFAULT_INSTALL_DIR
 	fi
 fi
@@ -100,9 +101,9 @@ fi
 
 if [ "$SDK_EXTENSIBLE" = "1" ]; then
 	# We're going to be running the build system, additional restrictions apply
-	if echo "$target_sdk_dir" | grep -q '[+\ @]'; then
+	if echo "$target_sdk_dir" | grep -q '[+\ @$]'; then
 		echo "The target directory path ($target_sdk_dir) contains illegal" \
-		     "characters such as spaces, @ or +. Abort!"
+		     "characters such as spaces, @, \$ or +. Abort!"
 		exit 1
 	fi
 else
@@ -163,14 +164,25 @@ fi
 payload_offset=$(($(grep -na -m1 "^MARKER:$" $0|cut -d':' -f1) + 1))
 
 printf "Extracting SDK..."
-tail -n +$payload_offset $0| $SUDO_EXEC tar xj -C $target_sdk_dir
+tail -n +$payload_offset $0| $SUDO_EXEC tar xj -C $target_sdk_dir --checkpoint=.2500
 echo "done"
 
 printf "Setting it up..."
 # fix environment paths
+real_env_setup_script=""
 for env_setup_script in `ls $target_sdk_dir/environment-setup-*`; do
+	if grep -q 'OECORE_NATIVE_SYSROOT=' $env_setup_script; then
+		# Handle custom env setup scripts that are only named
+		# environment-setup-* so that they have relocation
+		# applied - what we want beyond here is the main one
+		# rather than the one that simply sorts last
+		real_env_setup_script="$env_setup_script"
+	fi
 	$SUDO_EXEC sed -e "s:@SDKPATH@:$target_sdk_dir:g" -i $env_setup_script
 done
+if [ -n "$real_env_setup_script" ] ; then
+	env_setup_script="$real_env_setup_script"
+fi
 
 @SDK_POST_INSTALL_COMMAND@
 
@@ -182,7 +194,9 @@ fi
 
 echo "SDK has been successfully set up and is ready to be used."
 echo "Each time you wish to use the SDK in a new shell session, you need to source the environment setup script e.g."
-echo " \$ . $target_sdk_dir/environment-setup-@REAL_MULTIMACH_TARGET_SYS@"
+for env_setup_script in `ls $target_sdk_dir/environment-setup-*`; do
+	echo " \$ . $env_setup_script"
+done
 
 exit 0
 

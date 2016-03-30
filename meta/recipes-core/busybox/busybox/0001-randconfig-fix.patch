@@ -1,0 +1,33 @@
+If CONFIG_FEATURE_LAST_SMALL is enabled the build fails because of a broken
+__UT_NAMESIZE test.
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From 932302666b0354ede63504d1bef8393cab28db8b Mon Sep 17 00:00:00 2001
+From: Denys Vlasenko <vda.linux@googlemail.com>
+Date: Sun, 11 Oct 2015 16:58:18 +0200
+Subject: [PATCH] randconfig fix
+
+Signed-off-by: Denys Vlasenko <vda.linux@googlemail.com>
+---
+ miscutils/last.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/miscutils/last.c b/miscutils/last.c
+index 6d8b584..f8f3437 100644
+--- a/miscutils/last.c
++++ b/miscutils/last.c
+@@ -34,7 +34,8 @@
+ 	&& ((UT_LINESIZE != 32) || (UT_NAMESIZE != 32) || (UT_HOSTSIZE != 256))
+ #error struct utmpx member char[] size(s) have changed!
+ #elif defined __UT_LINESIZE \
+-	&& ((__UT_LINESIZE != 32) || (__UT_NAMESIZE != 64) || (__UT_HOSTSIZE != 256))
++	&& ((__UT_LINESIZE != 32) || (__UT_NAMESIZE != 32) || (__UT_HOSTSIZE != 256))
++/* __UT_NAMESIZE was checked with 64 above, but glibc-2.11 definitely uses 32! */
+ #error struct utmpx member char[] size(s) have changed!
+ #endif
+ 
+-- 
+2.6.4
+

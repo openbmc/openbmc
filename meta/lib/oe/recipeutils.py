@@ -31,9 +31,13 @@ def pn_to_recipe(cooker, pn):
     import bb.providers
 
     if pn in cooker.recipecache.pkg_pn:
-        filenames = cooker.recipecache.pkg_pn[pn]
         best = bb.providers.findBestProvider(pn, cooker.data, cooker.recipecache, cooker.recipecache.pkg_pn)
         return best[3]
+    elif pn in cooker.recipecache.providers:
+        filenames = cooker.recipecache.providers[pn]
+        eligible, foundUnique = bb.providers.filterProviders(filenames, pn, cooker.expanded_data, cooker.recipecache)
+        filename = eligible[0]
+        return filename
     else:
         return None
 
@@ -72,6 +76,8 @@ def parse_recipe_simple(cooker, pn, d, appends=True):
             raise bb.providers.NoProvider('Unable to find any recipe file matching %s' % pn)
     if appends:
         appendfiles = cooker.collection.get_file_appends(recipefile)
+    else:
+        appendfiles = None
     return parse_recipe(recipefile, appendfiles, d)
 
 
@@ -95,6 +101,63 @@ def get_var_files(fn, varlist, d):
     return varfiles
 
 
+def split_var_value(value, assignment=True):
+    """
+    Split a space-separated variable's value into a list of items,
+    taking into account that some of the items might be made up of
+    expressions containing spaces that should not be split.
+    Parameters:
+        value:
+            The string value to split
+        assignment:
+            True to assume that the value represents an assignment
+            statement, False otherwise. If True, and an assignment
+            statement is passed in the first item in
+            the returned list will be the part of the assignment
+            statement up to and including the opening quote character,
+            and the last item will be the closing quote.
+    """
+    inexpr = 0
+    lastchar = None
+    out = []
+    buf = ''
+    for char in value:
+        if char == '{':
+            if lastchar == '$':
+                inexpr += 1
+        elif char == '}':
+            inexpr -= 1
+        elif assignment and char in '"\'' and inexpr == 0:
+            if buf:
+                out.append(buf)
+            out.append(char)
+            char = ''
+            buf = ''
+        elif char.isspace() and inexpr == 0:
+            char = ''
+            if buf:
+                out.append(buf)
+            buf = ''
+        buf += char
+        lastchar = char
+    if buf:
+        out.append(buf)
+
+    # Join together assignment statement and opening quote
+    outlist = out
+    if assignment:
+        assigfound = False
+        for idx, item in enumerate(out):
+            if '=' in item:
+                assigfound = True
+            if assigfound:
+                if '"' in item or "'" in item:
+                    outlist = [' '.join(out[:idx+1])]
+                    outlist.extend(out[idx+1:])
+                    break
+    return outlist
+
+
 def patch_recipe_file(fn, values, patch=False, relpath=''):
     """Update or insert variable values into a recipe file (assuming you
        have already identified the exact file you want to update.)
@@ -112,7 +175,7 @@ def patch_recipe_file(fn, values, patch=False, relpath=''):
             if name in nowrap_vars:
                 tf.write(rawtext)
             elif name in list_vars:
-                splitvalue = values[name].split()
+                splitvalue = split_var_value(values[name], assignment=False)
                 if len(splitvalue) > 1:
                     linesplit = ' \\\n' + (' ' * (len(name) + 4))
                     tf.write('%s = "%s%s"\n' % (name, linesplit.join(splitvalue), linesplit))
@@ -275,6 +338,22 @@ def copy_recipe_files(d, tgt_dir, whole_dir=False, download=True):
         shutil.copytree(bb_dir, tgt_dir)
 
     return remotes
+
+
+def get_recipe_local_files(d, patches=False):
+    """Get a list of local files in SRC_URI within a recipe."""
+    uris = (d.getVar('SRC_URI', True) or "").split()
+    fetch = bb.fetch2.Fetch(uris, d)
+    ret = {}
+    for uri in uris:
+        if fetch.ud[uri].type == 'file':
+            if (not patches and
+                    bb.utils.exec_flat_python_func('patch_path', uri, fetch, '')):
+                continue
+            # Skip files that are referenced by absolute path
+            if not os.path.isabs(fetch.ud[uri].basepath):
+                ret[fetch.ud[uri].basepath] = fetch.localpath(uri)
+    return ret
 
 
 def get_recipe_patches(d):
@@ -518,7 +597,7 @@ def bbappend_recipe(rd, destlayerdir, srcfiles, install=None, wildcardver=False,
                             instfunclines.append(line)
                     return (instfunclines, None, 4, False)
             else:
-                splitval = origvalue.split()
+                splitval = split_var_value(origvalue, assignment=False)
                 changed = False
                 removevar = varname
                 if varname in ['SRC_URI', 'SRC_URI_append%s' % appendoverride]:
@@ -673,11 +752,14 @@ def get_recipe_upstream_version(rd):
     ru['type'] = 'U'
     ru['datetime'] = ''
 
+    pv = rd.getVar('PV', True)
+
     # XXX: If don't have SRC_URI means that don't have upstream sources so
-    # returns 1.0.
+    # returns the current recipe version, so that upstream version check
+    # declares a match.
     src_uris = rd.getVar('SRC_URI', True)
     if not src_uris:
-        ru['version'] = '1.0'
+        ru['version'] = pv
         ru['type'] = 'M'
         ru['datetime'] = datetime.now()
         return ru
@@ -685,8 +767,6 @@ def get_recipe_upstream_version(rd):
     # XXX: we suppose that the first entry points to the upstream sources
     src_uri = src_uris.split()[0]
     uri_type, _, _, _, _, _ =  decodeurl(src_uri)
-
-    pv = rd.getVar('PV', True)
 
     manual_upstream_version = rd.getVar("RECIPE_UPSTREAM_VERSION", True)
     if manual_upstream_version:

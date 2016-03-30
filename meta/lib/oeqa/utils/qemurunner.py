@@ -13,11 +13,19 @@ import re
 import socket
 import select
 import errno
+import string
 import threading
+import codecs
 from oeqa.utils.dump import HostDumper
 
 import logging
 logger = logging.getLogger("BitBake.QemuRunner")
+
+# Get Unicode non printable control chars
+control_range = range(0,32)+range(127,160)
+control_chars = [unichr(x) for x in control_range
+                if unichr(x) not in string.printable]
+re_control_char = re.compile('[%s]' % re.escape("".join(control_chars)))
 
 class QemuRunner:
 
@@ -61,7 +69,10 @@ class QemuRunner:
 
     def log(self, msg):
         if self.logfile:
-            with open(self.logfile, "a") as f:
+            # It is needed to sanitize the data received from qemu
+            # because is possible to have control characters
+            msg = re_control_char.sub('', unicode(msg, 'utf-8'))
+            with codecs.open(self.logfile, "a", encoding="utf-8") as f:
                 f.write("%s" % msg)
 
     def getOutput(self, o):
@@ -170,6 +181,9 @@ class QemuRunner:
             cmdline = ''
             with open('/proc/%s/cmdline' % self.qemupid) as p:
                 cmdline = p.read()
+                # It is needed to sanitize the data received
+                # because is possible to have control characters
+                cmdline = re_control_char.sub('', cmdline)
             try:
                 ips = re.findall("((?:[0-9]{1,3}\.){3}[0-9]{1,3})", cmdline.split("ip=")[1])
                 if not ips or len(ips) != 3:
@@ -186,7 +200,6 @@ class QemuRunner:
             logger.info("Target IP: %s" % self.ip)
             logger.info("Server IP: %s" % self.server_ip)
 
-            logger.info("Starting logging thread")
             self.thread = LoggingThread(self.log, threadsock, logger)
             self.thread.start()
             if not self.thread.connection_established.wait(self.boottime):
@@ -197,6 +210,7 @@ class QemuRunner:
                 self.stop_thread()
                 return False
 
+            logger.info("Output from runqemu:\n%s", self.getOutput(output))
             logger.info("Waiting at most %d seconds for login banner" % self.boottime)
             endtime = time.time() + self.boottime
             socklist = [self.server_socket]
@@ -259,8 +273,9 @@ class QemuRunner:
 
     def stop(self):
         self.stop_thread()
-        if self.runqemu:
+        if hasattr(self, "origchldhandler"):
             signal.signal(signal.SIGCHLD, self.origchldhandler)
+        if self.runqemu:
             os.kill(self.monitorpid, signal.SIGKILL)
             logger.info("Sending SIGTERM to runqemu")
             try:
@@ -280,7 +295,6 @@ class QemuRunner:
             self.server_socket = None
         self.qemupid = None
         self.ip = None
-        signal.signal(signal.SIGCHLD, self.origchldhandler)
 
     def stop_thread(self):
         if self.thread and self.thread.is_alive():
@@ -440,9 +454,9 @@ class LoggingThread(threading.Thread):
 
     def eventloop(self):
         poll = select.poll()
-        eventmask = self.errorevents | self.readevents
+        event_read_mask = self.errorevents | self.readevents
         poll.register(self.serversock.fileno())
-        poll.register(self.readpipe, eventmask)
+        poll.register(self.readpipe, event_read_mask)
 
         breakout = False
         self.running = True
@@ -466,7 +480,7 @@ class LoggingThread(threading.Thread):
                     self.readsock, _ = self.serversock.accept()
                     self.readsock.setblocking(0)
                     poll.unregister(self.serversock.fileno())
-                    poll.register(self.readsock.fileno())
+                    poll.register(self.readsock.fileno(), event_read_mask)
 
                     self.logger.info("Setting connection established event")
                     self.connection_established.set()

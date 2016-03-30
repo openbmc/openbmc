@@ -1,0 +1,24 @@
+This patch alows using 64 bit atomic instructions on a
+32 bit platform. This is safe, providing x86 is Pentium or
+later (would not work on i386, i486). Using 64 bit atomic 
+instructions bypasses code containing a bug as documented in
+https://bugzilla.yoctoproject.org/show_bug.cgi?id=8140
+
+Upstream-Status: TBD
+
+Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
+
+
+Index: libc/sysdeps/i386/i486/bits/atomic.h
+===================================================================
+--- libc.orig/sysdeps/i386/i486/bits/atomic.h
++++ libc/sysdeps/i386/i486/bits/atomic.h
+@@ -54,7 +54,7 @@ typedef uintmax_t uatomic_max_t;
+ # endif
+ #endif
+ 
+-#define __HAVE_64B_ATOMICS 0
++#define __HAVE_64B_ATOMICS 1
+ #define USE_ATOMIC_COMPILER_BUILTINS 0
+ 
+ 

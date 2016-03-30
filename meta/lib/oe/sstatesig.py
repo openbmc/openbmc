@@ -94,6 +94,26 @@ class SignatureGeneratorOEBasicHash(bb.siggen.SignatureGeneratorBasicHash):
         self.machine = data.getVar("MACHINE", True)
         self.mismatch_msgs = []
         pass
+
+    def tasks_resolved(self, virtmap, virtpnmap, dataCache):
+        # Translate virtual/xxx entries to PN values
+        newabisafe = []
+        for a in self.abisaferecipes:
+            if a in virtpnmap:
+                newabisafe.append(virtpnmap[a])
+            else:
+                newabisafe.append(a)
+        self.abisaferecipes = newabisafe
+        newsafedeps = []
+        for a in self.saferecipedeps:
+            a1, a2 = a.split("->")
+            if a1 in virtpnmap:
+                a1 = virtpnmap[a1]
+            if a2 in virtpnmap:
+                a2 = virtpnmap[a2]
+            newsafedeps.append(a1 + "->" + a2)
+        self.saferecipedeps = newsafedeps
+
     def rundep_check(self, fn, recipename, task, dep, depname, dataCache = None):
         return sstate_rundepfilter(self, fn, recipename, task, dep, depname, dataCache)
 

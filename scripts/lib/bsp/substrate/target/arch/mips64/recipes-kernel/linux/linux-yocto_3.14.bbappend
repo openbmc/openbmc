@@ -22,11 +22,10 @@ KERNEL_FEATURES_append_{{=machine}} += " cfg/smp.scc"
 
 SRC_URI += "file://{{=machine}}-standard.scc \
             file://{{=machine}}-user-config.cfg \
-            file://{{=machine}}-user-patches.scc \
             file://{{=machine}}-user-features.scc \
            "
 
-# uncomment and replace these SRCREVs with the real commit ids once you've had
+# replace these SRCREVs with the real commit ids once you've had
 # the appropriate changes committed to the upstream linux-yocto repo
 SRCREV_machine_pn-linux-yocto_{{=machine}} ?= "dbe5b52e93ff114b2c0f5da6f6af91f52c18f2b8"
 SRCREV_meta_pn-linux-yocto_{{=machine}} ?= "6eddbf47875ef48ddc5864957a7b63363100782b"

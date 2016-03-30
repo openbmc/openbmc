@@ -3,7 +3,7 @@
 #
 
 SANITY_REQUIRED_UTILITIES ?= "patch diffstat makeinfo git bzip2 tar \
-    gzip gawk chrpath wget cpio perl"
+    gzip gawk chrpath wget cpio perl file"
 
 def bblayers_conf_file(d):
     return os.path.join(d.getVar('TOPDIR', True), 'conf/bblayers.conf')
@@ -839,9 +839,12 @@ def check_sanity_everybuild(status, d):
     else:
         bb.utils.mkdirhier(tmpdir)
         # Remove setuid, setgid and sticky bits from TMPDIR
-        os.chmod(tmpdir, os.stat(tmpdir).st_mode & ~ stat.S_ISUID)
-        os.chmod(tmpdir, os.stat(tmpdir).st_mode & ~ stat.S_ISGID)
-        os.chmod(tmpdir, os.stat(tmpdir).st_mode & ~ stat.S_ISVTX)
+        try:
+            os.chmod(tmpdir, os.stat(tmpdir).st_mode & ~ stat.S_ISUID)
+            os.chmod(tmpdir, os.stat(tmpdir).st_mode & ~ stat.S_ISGID)
+            os.chmod(tmpdir, os.stat(tmpdir).st_mode & ~ stat.S_ISVTX)
+        except OSError as exc:
+            bb.warn("Unable to chmod TMPDIR: %s" % exc)
         with open(checkfile, "w") as f:
             f.write(tmpdir)
 

@@ -31,9 +31,6 @@ SRC_URI_append_class-native = "\
 
 EXTRA_OECONF += "--target-list=${@get_qemu_target_list(d)} --disable-werror  --disable-bluez --disable-libiscsi --with-system-pixman --extra-cflags='${CFLAGS}'"
 
-EXTRA_OECONF_append_class-native = " --enable-debug --enable-debug-info"
-INHIBIT_SYSROOT_STRIP = "1"
-
 EXTRA_OECONF_class-nativesdk = "--target-list=${@get_qemu_target_list(d)} --disable-werror \
 				"
 export LIBTOOL="${HOST_SYS}-libtool"
@@ -128,10 +125,5 @@ PACKAGECONFIG[numa] = "--enable-numa,--disable-numa,numactl"
 PACKAGECONFIG[gnutls] = "--enable-gnutls,--disable-gnutls,gnutls"
 
 EXTRA_OECONF += "${@bb.utils.contains('PACKAGECONFIG', 'alsa', '--audio-drv-list=oss,alsa', '', d)}"
-
-# Qemu target will not build in world build for ARM or Mips
-BROKEN_qemuarm = "1"
-BROKEN_qemumips64 = "1"
-BROKEN_qemumips = "1"
 
 INSANE_SKIP_${PN} = "arch"

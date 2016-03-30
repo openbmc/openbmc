@@ -15,6 +15,8 @@
 /* Styles for the help information */
 .get-help { color: #CCCCCC; }
 .get-help:hover, .icon-plus-sign:hover { color: #999999; cursor: pointer; }
+.get-help-green { color: #468847; }
+.get-help-green:hover { color: #347132; cursor: pointer; }
 .get-help-blue { color: #3A87AD; }
 .get-help-blue:hover { color: #005580; cursor: pointer; }
 .get-help-yellow { color: #C09853; }
@@ -161,8 +163,15 @@ table { table-layout: fixed; word-wrap: break-word; }
 .project-name .label { font-weight: normal; margin-bottom: 5px; margin-left: -15px; padding: 5px; }
 .project-name .label > a { color: #fff; font-weight: normal; }
 
+/* styles for showing help icons next to command-line builds */
+.build-result .get-help-green, .build-result .get-help-red, .build-result .get-help-blue { margin-right: 35px; margin-top: 8px; font-size: 16px; }
+
 /* Remove bottom margin for forms inside modal dialogs */
 #dependencies-modal-form { margin-bottom: 0px; }
+
+/* Custom column widths */
+.narrow-col { width: 8%; }
+.medium-col { width: 12%; }
 
 /* Configuration styles */
 .icon-trash { color: #B94A48; font-size: 16px; padding-left: 5px; }

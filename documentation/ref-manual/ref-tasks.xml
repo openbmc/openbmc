@@ -619,6 +619,15 @@
         </para>
     </section>
 
+    <section id='ref-tasks-kernel_metadata'>
+        <title><filename>do_kernel_metadata</filename></title>
+
+        <para>
+            Collects kernel metadata for a
+            <filename>linux-yocto</filename> style kernel.
+        </para>
+    </section>
+
     <section id='ref-tasks-menuconfig'>
         <title><filename>do_menuconfig</filename></title>
 
@@ -635,6 +644,14 @@
 
         <para>
             Creates a minimal Linux kernel configuration file.
+        </para>
+    </section>
+
+    <section id='ref-tasks-shared_workdir'>
+        <title><filename>do_shared_workdir</filename></title>
+
+        <para>
+            Creates the shared working directory for the kernel.
         </para>
     </section>
 

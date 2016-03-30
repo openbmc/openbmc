@@ -1,6 +1,13 @@
 {% extends "basebuilddetailpage.html" %}
 {% load projecttags %}
 
+{% block title %}
+  {% if target %}
+    {{package.fullpackagespec}} - {{ target.target }} {{ build.machine }} - {{ build.project.name }} - Toaster
+  {% else %}
+    {{package.fullpackagespec}} - {{ build.target_set.all|dictsort:"target"|join:", " }} {{ build.machine }} - {{ build.project.name }} - Toaster
+  {% endif %}
+{% endblock %}
 {% block extraheadcontent %}
     <!-- functions to format package 'installed_package' alias -->
     <script>
@@ -38,9 +45,9 @@
 {% block pagedetailinfomain %}
     <div class="row span11">
         <div class="page-header">
-            {% block title %}
+            {% block mainheading %}
             <h1>{{package.fullpackagespec}}</h1>
-            {% endblock title %}
+            {% endblock %}
         </div> <!-- page-header -->
     </div> <!-- row span11 page-header -->
 

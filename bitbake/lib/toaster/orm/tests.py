@@ -23,12 +23,11 @@
 
 from django.test import TestCase, TransactionTestCase
 from orm.models import LocalLayerSource, LayerIndexLayerSource, ImportedLayerSource, LayerSource
-from orm.models import Branch
+from orm.models import Branch, LayerVersionDependency
 
-from orm.models import Project, Build, Layer, Layer_Version, Branch, ProjectLayer
+from orm.models import Project, Layer, Layer_Version, Branch, ProjectLayer
 from orm.models import Release, ReleaseLayerSourcePriority, BitbakeVersion
 
-from django.utils import timezone
 from django.db import IntegrityError
 
 import os
@@ -153,35 +152,29 @@ class LayerVersionEquivalenceTestCase(TestCase):
         equivqs = self.lver.get_equivalents_wpriority(self.project)
         self.assertEqual(list(equivqs), [lver2, self.lver])
 
-    def test_build_layerversion(self):
+    def test_compatible_layer_versions(self):
         """
-        Any layer version coming from the build should show up
-        before any layer version coming from upstream
-        """
-        build = Build.objects.create(project=self.project,
-                                     started_on=timezone.now(),
-                                     completed_on=timezone.now())
-        lvb = Layer_Version.objects.create(layer=self.layer, build=build,
-                                           commit="deadbeef")
-
-        # a build layerversion must be in the equivalence
-        # list for the original layerversion
-        equivqs = self.lver.get_equivalents_wpriority(self.project)
-        self.assertTrue(len(equivqs) == 2)
-        self.assertTrue(equivqs[0] == self.lver)
-        self.assertTrue(equivqs[1] == lvb)
-
-        # getting the build layerversion equivalent list must
-        # return the same list as the original layer
-        bequivqs = lvb.get_equivalents_wpriority(self.project)
-
-        self.assertEqual(list(equivqs), list(bequivqs))
-
-    def test_compatible_layerversions(self):
-        """
-        When we have a 2 layer versions, compatible_layerversions()
+        When we have a 2 layer versions, get_all_compatible_layerversions()
         should return a queryset with both.
         """
-        compat_lv = self.project.compatible_layerversions()
+        compat_lv = self.project.get_all_compatible_layer_versions()
         self.assertEqual(list(compat_lv), [self.lver, self.lver2])
 
+    def test_layerversion_get_alldeps(self):
+        """Test Layer_Version.get_alldeps API."""
+        lvers = {}
+        for i in range(10):
+            name = "layer%d" % i
+            lvers[name] = Layer_Version.objects.create(layer=Layer.objects.create(name=name),
+                                                       project=self.project)
+            if i:
+                LayerVersionDependency.objects.create(layer_version=lvers["layer%d" % (i - 1)],
+                                                      depends_on=lvers[name])
+                # Check dinamically added deps
+                self.assertEqual(lvers['layer0'].get_alldeps(self.project.id),
+                                 [lvers['layer%d' % n] for n in range(1, i+1)])
+
+        # Check chain of deps created in previous loop
+        for i in range(10):
+            self.assertEqual(lvers['layer%d' % i].get_alldeps(self.project.id),
+                             [lvers['layer%d' % n] for n in range(i+1, 10)])

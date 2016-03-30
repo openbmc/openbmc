@@ -18,9 +18,11 @@ EXTRA_OECONF += "DEFAULT_RMT_DIR=${base_sbindir}"
 
 do_install () {
     autotools_do_install
-    install -d ${D}${base_bindir}/
-    mv "${D}${bindir}/cpio" "${D}${base_bindir}/cpio"
-    rmdir ${D}${bindir}/
+    if [ "${base_bindir}" != "${bindir}" ]; then
+        install -d ${D}${base_bindir}/
+        mv "${D}${bindir}/cpio" "${D}${base_bindir}/cpio"
+        rmdir ${D}${bindir}/
+    fi
 }
 
 PACKAGES =+ "${PN}-rmt"

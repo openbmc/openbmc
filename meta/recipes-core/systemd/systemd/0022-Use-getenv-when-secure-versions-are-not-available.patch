@@ -1,0 +1,39 @@
+From cb71e4beea3b3b11e5951f95c829cd2eee9fcf7b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 12 Sep 2015 19:10:04 +0000
+Subject: [PATCH 22/31] Use getenv when secure versions are not available
+
+musl doesnt implement secure version, so we default
+to it if configure does not detect a secure imeplementation
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Rejected
+
+ src/basic/missing.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/basic/missing.h b/src/basic/missing.h
+index bf9b490..d6dbc7d 100644
+--- a/src/basic/missing.h
++++ b/src/basic/missing.h
+@@ -584,13 +584,14 @@ static inline int name_to_handle_at(int fd, const char *name, struct file_handle
+         return syscall(__NR_name_to_handle_at, fd, name, handle, mnt_id, flags);
+ }
+ #endif
+-
+-#ifndef HAVE_SECURE_GETENV
++#ifdef HAVE_SECURE_GETENV
+ #  ifdef HAVE___SECURE_GETENV
+ #    define secure_getenv __secure_getenv
+ #  else
+ #    error "neither secure_getenv nor __secure_getenv are available"
+ #  endif
++#else
++#  define secure_getenv getenv
+ #endif
+ 
+ #ifndef CIFS_MAGIC_NUMBER
+-- 
+2.5.2
+

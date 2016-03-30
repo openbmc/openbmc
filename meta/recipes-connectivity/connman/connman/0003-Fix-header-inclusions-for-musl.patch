@@ -1,0 +1,85 @@
+From 67645a01a2f3f52625d8dd77f2811a9e213e1b7d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 13 Sep 2015 13:28:20 -0700
+Subject: [PATCH] Fix header inclusions for musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ gweb/gresolv.c        | 1 +
+ plugins/wifi.c        | 3 +--
+ src/tethering.c       | 2 --
+ tools/dhcp-test.c     | 1 -
+ tools/dnsproxy-test.c | 1 +
+ 5 files changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/gweb/gresolv.c b/gweb/gresolv.c
+index 3ad8e70..61d6fe8 100644
+--- a/gweb/gresolv.c
++++ b/gweb/gresolv.c
+@@ -28,6 +28,7 @@
+ #include <stdarg.h>
+ #include <string.h>
+ #include <stdlib.h>
++#include <stdio.h>
+ #include <resolv.h>
+ #include <sys/types.h>
+ #include <sys/socket.h>
+diff --git a/plugins/wifi.c b/plugins/wifi.c
+index dfe849f..99cff3f 100644
+--- a/plugins/wifi.c
++++ b/plugins/wifi.c
+@@ -30,9 +30,8 @@
+ #include <string.h>
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
+-#include <linux/if_arp.h>
+-#include <linux/wireless.h>
+ #include <net/ethernet.h>
++#include <linux/wireless.h>
+ 
+ #ifndef IFF_LOWER_UP
+ #define IFF_LOWER_UP	0x10000
+diff --git a/src/tethering.c b/src/tethering.c
+index ceeec74..c44cb36 100644
+--- a/src/tethering.c
++++ b/src/tethering.c
+@@ -31,10 +31,8 @@
+ #include <stdio.h>
+ #include <sys/ioctl.h>
+ #include <net/if.h>
+-#include <linux/sockios.h>
+ #include <string.h>
+ #include <fcntl.h>
+-#include <linux/if_tun.h>
+ #include <netinet/in.h>
+ #include <linux/if_bridge.h>
+ 
+diff --git a/tools/dhcp-test.c b/tools/dhcp-test.c
+index c34e10a..eae66fc 100644
+--- a/tools/dhcp-test.c
++++ b/tools/dhcp-test.c
+@@ -33,7 +33,6 @@
+ #include <arpa/inet.h>
+ #include <net/route.h>
+ #include <net/ethernet.h>
+-#include <linux/if_arp.h>
+ 
+ #include <gdhcp/gdhcp.h>
+ 
+diff --git a/tools/dnsproxy-test.c b/tools/dnsproxy-test.c
+index 551cae9..226ba86 100644
+--- a/tools/dnsproxy-test.c
++++ b/tools/dnsproxy-test.c
+@@ -27,6 +27,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
++#include <stdio.h>
+ #include <arpa/inet.h>
+ #include <netinet/in.h>
+ #include <sys/types.h>
+-- 
+2.5.1
+

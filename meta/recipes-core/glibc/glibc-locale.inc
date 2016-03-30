@@ -87,7 +87,7 @@ do_install () {
 	if [ -e ${LOCALETREESRC}/${datadir}/locale ]; then
 		cp -fpPR ${LOCALETREESRC}/${datadir}/locale ${D}${datadir}
 	fi
-	chown root.root -R ${D}
+	chown root:root -R ${D}
 	cp -fpPR ${LOCALETREESRC}/SUPPORTED ${WORKDIR}
 }
 

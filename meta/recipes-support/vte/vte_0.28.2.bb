@@ -4,7 +4,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=3bf50002aefd002f49e7bb854063f7e7"
 
 PR = "r6"
 
-SRC_URI += "file://obsolete_automake_macros.patch"
+SRC_URI += "file://obsolete_automake_macros.patch \
+            file://cve-2012-2738.patch"
 
 CFLAGS += "-D_GNU_SOURCE"
 

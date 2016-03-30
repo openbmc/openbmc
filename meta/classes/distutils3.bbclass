@@ -21,6 +21,7 @@ distutils3_do_compile() {
         build ${DISTUTILS_BUILD_ARGS} || \
         bbfatal "${PYTHON_PN} setup.py build_ext execution failed."
 }
+distutils3_do_compile[vardepsexclude] = "MACHINE"
 
 distutils3_stage_headers() {
         install -d ${STAGING_DIR_HOST}${PYTHON_SITEPACKAGES_DIR}
@@ -33,6 +34,7 @@ distutils3_stage_headers() {
         ${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-native/${PYTHON_PN} setup.py install_headers ${DISTUTILS_STAGE_HEADERS_ARGS} || \
         bbfatal "${PYTHON_PN} setup.py install_headers execution failed."
 }
+distutils3_stage_headers[vardepsexclude] = "MACHINE"
 
 distutils3_stage_all() {
         if [ ${BUILD_SYS} != ${HOST_SYS} ]; then
@@ -48,6 +50,7 @@ distutils3_stage_all() {
         ${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-native/${PYTHON_PN} setup.py install ${DISTUTILS_STAGE_ALL_ARGS} || \
         bbfatal "${PYTHON_PN} setup.py install (stage) execution failed."
 }
+distutils3_stage_all[vardepsexclude] = "MACHINE"
 
 distutils3_do_install() {
         install -d ${D}${PYTHON_SITEPACKAGES_DIR}
@@ -90,6 +93,7 @@ distutils3_do_install() {
             rmdir ${D}${datadir}/share
         fi
 }
+distutils3_do_install[vardepsexclude] = "MACHINE"
 
 EXPORT_FUNCTIONS do_compile do_install
 

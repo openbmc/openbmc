@@ -9,6 +9,17 @@ SRC_URI += "file://configure-fix-Darwin-target-detection.patch \
             file://smc91c111_fix1.patch \
             file://smc91c111_fix2.patch \
             file://smc91c111_fix3.patch \
+            file://no-valgrind.patch \
+            file://CVE-2015-8504.patch \
+            file://CVE-2015-7504.patch \
+            file://CVE-2015-7512.patch \
+            file://CVE-2015-8345.patch \
+            file://CVE-2016-1568.patch \
+            file://CVE-2015-7295_1.patch \
+            file://CVE-2015-7295_2.patch \
+            file://CVE-2015-7295_3.patch \
+            file://CVE-2016-2197.patch \
+            file://CVE-2016-2198.patch \
            "
 SRC_URI_prepend = "http://wiki.qemu-project.org/download/${BP}.tar.bz2"
 SRC_URI[md5sum] = "186ee8194140a484a455f8e3c74589f4"

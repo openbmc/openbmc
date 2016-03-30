@@ -19,6 +19,7 @@ DEPENDS_class-native = ""
 SRC_URI_BASE = "http://downloads.ghostscript.com/public/ghostscript-${PV}.tar.gz \
                 file://ghostscript-9.15-parallel-make.patch \
                 file://ghostscript-9.16-Werror-return-type.patch \
+                file://png_mak.patch \
 "
 
 SRC_URI = "${SRC_URI_BASE} \

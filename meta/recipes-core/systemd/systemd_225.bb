@@ -18,7 +18,7 @@ PROVIDES = "udev"
 
 PE = "1"
 
-DEPENDS = "kmod docbook-sgml-dtd-4.1-native intltool-native gperf-native acl readline dbus libcap libcgroup glib-2.0 qemu-native util-linux"
+DEPENDS = "kmod docbook-sgml-dtd-4.1-native intltool-native gperf-native acl readline dbus libcap libcgroup qemu-native util-linux"
 
 SECTION = "base/shell"
 
@@ -45,6 +45,7 @@ SRC_URI = "git://github.com/systemd/systemd.git;protocol=git \
            file://00-create-volatile.conf \
            file://init \
            file://run-ptest \
+           file://rules-whitelist-hd-devices.patch \
           "
 SRC_URI_append_qemuall = " file://qemuall_io_latency-core-device.c-Change-the-default-device-timeout-to-2.patch"
 
@@ -52,6 +53,8 @@ S = "${WORKDIR}/git"
 
 SRC_URI_append_libc-uclibc = "\
             file://0001-units-Prefer-getty-to-agetty-in-console-setup-system.patch \
+            file://0022-Use-getenv-when-secure-versions-are-not-available.patch \
+            file://0001-fix-build-on-uClibc-exp10.patch \
            "
 LDFLAGS_append_libc-uclibc = " -lrt"
 
@@ -87,6 +90,7 @@ PACKAGECONFIG[iptc] = "--enable-libiptc,--disable-libiptc,iptables"
 PACKAGECONFIG[ldconfig] = "--enable-ldconfig,--disable-ldconfig,,"
 PACKAGECONFIG[selinux] = "--enable-selinux,--disable-selinux,libselinux"
 PACKAGECONFIG[valgrind] = "ac_cv_header_valgrind_memcheck_h=yes ac_cv_header_valgrind_valgrind_h=yes ,ac_cv_header_valgrind_memcheck_h=no ac_cv_header_valgrind_valgrind_h=no ,valgrind"
+PACKAGECONFIG[qrencode] = "--enable-qrencode,--disable-qrencode,qrencode"
 
 CACHED_CONFIGUREVARS += "ac_cv_path_KILL=${base_bindir}/kill"
 CACHED_CONFIGUREVARS += "ac_cv_path_KMOD=${base_bindir}/kmod"
@@ -122,6 +126,9 @@ EXTRA_OECONF = " --with-rootprefix=${rootprefix} \
                "
 # uclibc does not have NSS
 EXTRA_OECONF_append_libc-uclibc = " --disable-myhostname "
+
+# disable problematic GCC 5.2 optimizations [YOCTO #8291]
+FULL_OPTIMIZATION_append_arm = " -fno-schedule-insns -fno-schedule-insns2"
 
 do_configure_prepend() {
 	export NM="${HOST_PREFIX}gcc-nm"
@@ -186,8 +193,8 @@ do_install() {
 	sed -i -e 's/.*ForwardToSyslog.*/ForwardToSyslog=yes/' ${D}${sysconfdir}/systemd/journald.conf
 	# this file is needed to exist if networkd is disabled but timesyncd is still in use since timesyncd checks it
 	# for existence else it fails
-	if [ -s ${D}${libdir}/tmpfiles.d/systemd.conf ]; then
-		${@bb.utils.contains('PACKAGECONFIG', 'networkd', ':', 'sed -i -e "\$ad /run/systemd/netif/links 0755 root root -" ${D}${libdir}/tmpfiles.d/systemd.conf', d)}
+	if [ -s ${D}${exec_prefix}/lib/tmpfiles.d/systemd.conf ]; then
+		${@bb.utils.contains('PACKAGECONFIG', 'networkd', ':', 'sed -i -e "\$ad /run/systemd/netif/links 0755 root root -" ${D}${exec_prefix}/lib/tmpfiles.d/systemd.conf', d)}
 	fi
 	install -Dm 0755 ${S}/src/systemctl/systemd-sysv-install.SKELETON ${D}${systemd_unitdir}/systemd-sysv-install
 }

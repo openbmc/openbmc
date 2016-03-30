@@ -612,6 +612,18 @@ class TaskData:
                 break
         # self.dump_data()
 
+    def get_providermap(self):
+        virts = []
+        virtmap = {}
+
+        for name in self.build_names_index:
+            if name.startswith("virtual/"):
+                virts.append(name)
+        for v in virts:
+            if self.have_build_target(v):
+                virtmap[v] = self.fn_index[self.get_provider(v)[0]]
+        return virtmap
+
     def dump_data(self):
         """
         Dump some debug information on the internal data structures

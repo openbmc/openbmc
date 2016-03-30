@@ -1,6 +1,6 @@
 "use strict";
 
-function layerBtnsInit(ctx) {
+function layerBtnsInit() {
 
   /* Remove any current bindings to avoid duplicated binds */
   $(".layerbtn").unbind('click');
@@ -68,10 +68,16 @@ function layerBtnsInit(ctx) {
       });
   });
 
-  /* Setup the initial state of the buttons */
 
-  for (var i in ctx.projectLayers){
-      $(".layer-exists-" + ctx.projectLayers[i]).show();
-      $(".layer-add-" + ctx.projectLayers[i]).hide();
-  }
+  $(".customise-btn").unbind('click');
+  $(".customise-btn").click(function(e){
+    e.preventDefault();
+    var imgCustomModal = $("#new-custom-image-modal");
+
+    if (imgCustomModal.length == 0)
+      throw("Modal new-custom-image not found");
+
+    imgCustomModal.data('recipe', $(this).data('recipe'));
+    imgCustomModal.modal('show');
+  });
 }

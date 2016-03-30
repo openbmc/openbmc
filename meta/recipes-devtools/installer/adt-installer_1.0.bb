@@ -82,7 +82,6 @@ fakeroot do_populate_adt () {
 	cp ${WORKDIR}/adt_installer.tar.bz2 ${ADT_DEPLOY}
 }
 
-do_populate_adt[nostamp] = "1"
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"
 do_package[noexec] = "1"

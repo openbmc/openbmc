@@ -6,8 +6,487 @@
 
 <title>Setting Up and Using Toaster</title>
 
-    <section id='using-toaster-in-analysis-mode'>
+    <section id='starting-toaster-for-local-development'>
+        <title>Starting Toaster for Local Development</title>
+
+        <para>
+            Once you have set up the Yocto Project and installed the
+            Toaster system dependencies as described in
+            "<link linkend='toaster-manual-start'>Preparing to Use Toaster</link>",
+            you are ready to start Toaster.
+        </para>
+
+        <para>
+            If you want to configure and start your builds using the
+            Toaster web interface
+            (i.e. "<link linkend='toaster-build-mode'>Build Mode</link>"),
+            navigate to the root of your
+            <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+            (e.g. <filename>poky</filename>):
+            <literallayout class='monospaced'>
+     $ cd poky
+            </literallayout>
+            Next, start Toaster:
+            <literallayout class='monospaced'>
+     $ bitbake/bin/toaster
+            </literallayout>
+            Open your favourite browser and enter the following:
+            <literallayout class='monospaced'>
+     http://127.0.0.1:8000
+            </literallayout>
+            If you would rather configure and start your builds
+            using the command line
+            (i.e. <link linkend='toaster-analysis-mode'>Analysis Mode</link>),
+            you can get Toaster to "listen"
+            to your builds and collect information about them.
+            To do that, navigate to the root of your Source Directory:
+            <literallayout class='monospaced'>
+     $ cd poky
+            </literallayout>
+            Once in that directory, source the build environment script:
+            <literallayout class='monospaced'>
+     $ source oe-init-build-env
+            </literallayout>
+            Next, from the build directory (e.g.
+            <filename>poky/build</filename>), start Toaster using this
+            command:
+            <literallayout class='monospaced'>
+     $ source ../bitbake/bin/toaster
+            </literallayout>
+            You can now run builds normally.
+        </para>
+
+        <para>
+            To see the build information provided by Toaster, open your
+            favorite browser and enter the following:
+            <literallayout class='monospaced'>
+     http://127.0.0.1:8000
+            </literallayout>
+        </para>
+    </section>
+
+    <section id='setting-a-different-port'>
+        <title>Setting a Different Port</title>
+
+        <para>
+            By default, Toaster starts on port 8000.
+            You can use the <filename>WEBPORT</filename> parameter to
+            set a different port.
+            For example, either of the following commands sets the
+            port to "8400":
+            <literallayout class='monospaced'>
+     $ bitbake/bin/toaster webport=8400
+            </literallayout>
+            or
+            <literallayout class='monospaced'>
+     $ source ../bitbake/bin/toaster webport=8400
+            </literallayout>
+        </para>
+    </section>
+
+    <section id='the-directory-for-cloning-layers'>
+        <title>The Directory for Cloning Layers</title>
+
+        <para>
+            If you are running Toaster in
+            <link linkend='toaster-build-mode'>Build Mode</link>,
+            Toaster creates a <filename>_toaster_clones</filename>
+            directory inside your Source Directory
+            (i.e. <filename>poky</filename>).
+            For example, suppose you use this command to start Toaster:
+            <literallayout class='monospaced'>
+     poky/bitbake/bin/toaster
+            </literallayout>
+            In this example, Toaster creates and uses the
+            <filename>poky/_toaster_clones</filename>
+            directory to clone any layers needed for your builds.
+        </para>
+
+        <para>
+            Alternatively, if you would like all of your Toaster related
+            files and directories to be in a particular location other than
+            the default, you can set the <filename>TOASTER_DIR</filename>
+            environment variable, which takes precedence over your current
+            working directory.
+            Setting this environment variable causes Toaster to create and use
+            <filename>$TOASTER_DIR./_toaster_clones</filename>.
+        </para>
+    </section>
+
+    <section id='toaster-the-build-directory'>
+        <title>The Build Directory</title>
+
+        <para>
+            If you are running Toaster in
+            <link linkend='toaster-build-mode'>Build Mode</link>,
+            Toaster creates a build directory within your Source
+            Directory (e.g. <filename>poky</filename>).
+            For example, suppose you use this command to start Toaster:
+            <literallayout class='monospaced'>
+     poky/bitbake/bin/toaster
+            </literallayout>
+            In this example, Toaster creates and uses the
+            <filename>poky/build</filename>
+            directory to execute the builds.
+        </para>
+
+        <para>
+            Alternatively, if you would like all of your Toaster related files
+            and directories to be in a particular location, you can set
+            the <filename>TOASTER_DIR</filename> environment variable,
+            which takes precedence over your current working directory.
+            Setting this environment variable causes Toaster to use
+            <filename>$TOASTER_DIR./build</filename> as the build directory.
+        </para>
+    </section>
+
+    <section id='toaster-creating-a-django-super-user'>
+        <title>Creating a Django Superuser</title>
+
+        <para>
+            Toaster is built on the
+            <ulink url='https://www.djangoproject.com/'>Django framework</ulink>.
+            Django provides an administration interface you can use
+            to edit Toaster configuration parameters.
+        </para>
+
+        <para>
+            To access the Django administration interface, you must
+            create a superuser by following these steps:
+            <orderedlist>
+                <listitem><para>
+                    If you used <filename>virtualenv</filename>, which is
+                    recommended, to set up the Toaster system dependencies,
+                    you need be sure the virtual environment is activated.
+                    To activate this environment, use the following:
+                    <literallayout class='monospaced'>
+     $ source venv/bin/activate
+                    </literallayout>
+                    </para></listitem>
+                <listitem><para>
+                    From the root of your checkout directory, invoke the
+                    following command from <filename>manage.py</filename>:
+                    <literallayout class='monospaced'>
+     $ ./bitbake/lib/toaster/manage.py createsuperuser
+                    </literallayout>
+                    </para></listitem>
+                <listitem><para>
+                    Django prompts you for the username, which you need to
+                    provide.
+                    </para></listitem>
+                <listitem><para>
+                    Django prompts you for an email address, which is
+                    optional.
+                    </para></listitem>
+                <listitem><para>
+                    Django prompts you for a password, which you must provide.
+                    </para></listitem>
+                <listitem><para>
+                    Django prompts you to re-enter your password for verification.
+                    </para></listitem>
+            </orderedlist>
+            After completing these steps, the following confirmation message
+            appears:
+            <literallayout class='monospaced'>
+     Superuser created successfully.
+            </literallayout>
+        </para>
+
+        <para>
+            Creating a superuser allows you to access the Django administration
+            interface through a browser.
+            The URL for this interface is the same as the URL used for the
+            Toaster instance with "/admin" on the end.
+            For example, if you are running Toaster locally, use the
+            following URL:
+            <literallayout class='monospaced'>
+     http://127.0.0.1:8000/admin
+            </literallayout>
+            You can use the Django administration interface to set Toaster
+            configuration parameters such as the build directory, layer sources,
+            default variable values, and BitBake versions.
+        </para>
+    </section>
+
+    <section id='toaster-setting-up-a-production-instance-of-toaster'>
+        <title>Setting Up a Production Instance of Toaster</title>
+
+        <para>
+            You can use a production instance of Toaster to share the
+            Toaster instance with remote users, multiple users, or both.
+            The production instance is also the setup that can cope with
+            heavier loads on the web service.
+            Use the instructions in the following sections to set up
+            Toaster in
+            <link linkend='toaster-build-mode'>Build Mode</link>
+            where builds and projects are run,
+            viewed, and defined through the Toaster web interface.
+        </para>
+
+        <section id='toaster-production-instance-requirements'>
+            <title>Requirements</title>
+
+            <para>
+                Be sure you meet the following requirements:
+                <note>
+                    You must comply with all Apache,
+                    <filename>mod-wsgi</filename>, and Mysql requirements.
+                </note>
+                <itemizedlist>
+                    <listitem><para>
+                        Have all the build requirements as described in
+                        "<link linkend='toaster-setting-up-the-basic-system-requirements'>Setting Up the Basic System Requirements</link>"
+                        chapter.
+                        </para></listitem>
+                    <listitem><para>
+                        Have an Apache webserver.
+                        </para></listitem>
+                    <listitem><para>
+                        Have <filename>mod-wsgi</filename> for the Apache
+                        webserver.
+                        </para></listitem>
+                    <listitem><para>
+                        Use the Mysql database server.
+                        </para></listitem>
+                    <listitem><para>
+                        If you are using Ubuntu 14.04.3, run the following:
+                        <literallayout class='monospaced'>
+     $ sudo apt-get install apache2 libapache2-mod-wsgi mysql-server virtualenv libmysqlclient-dev
+                        </literallayout>
+                        </para></listitem>
+                    <listitem><para>
+                        If you are using Fedora 22 or a RedHat distribution, run
+                        the following:
+                        <literallayout class='monospaced'>
+     $ sudo dnf install httpd mod_wsgi python-virtualenv gcc mysql-devel
+                        </literallayout>
+                        </para></listitem>
+                </itemizedlist>
+            </para>
+        </section>
+
+        <section id='toaster-installation-steps'>
+            <title>Installation</title>
+
+            <para>
+                Perform the following steps to install Toaster:
+                <orderedlist>
+                    <listitem><para>
+                        Checkout a copy of <filename>poky</filename>
+                        into the web server directory.
+                        You will be using <filename>/var/www/toaster</filename>:
+                        <literallayout class='monospaced'>
+     $ mkdir -p /var/www/toaster
+     $ cd /var/www/toaster/
+     $ git clone git://git.yoctoproject.org/poky
+     $ git checkout &DISTRO_NAME;
+                        </literallayout>
+                        </para></listitem>
+                    <listitem><para>
+                        Initialize a virtual environment and install Toaster
+                        dependencies.
+                        Using a virtual environment keeps the Python packages
+                        isolated from your system-provided packages:
+                        <literallayout class='monospaced'>
+     $ cd /var/www/toaster/
+     $ virtualenv venv
+     $ source ./venv/bin/activate
+     $ pip install -r ./poky/bitbake/toaster-requirements.txt
+     $ pip install mysql
+     $ pip install MySQL-python
+                        </literallayout>
+                        <note>
+                            Isolating these packages is not required but is
+                            recommended.
+                            Alternatively, you can use your operating system's
+                            package manager to install the packages.
+                        </note>
+                        </para></listitem>
+                    <listitem><para>
+                        Configure Toaster by editing
+                        <filename>/var/www/toaster/poky/bitbake/lib/toaster/toastermain/settings.py</filename>
+                        as follows:
+                        <itemizedlist>
+                            <listitem><para>
+                                Edit the <filename>DATABASE</filename> settings:
+                                <literallayout class='monospaced'>
+     DATABASES = {
+         'default': {
+             'ENGINE': 'django.db.backends.mysql',
+             'NAME': 'toaster_data',
+             'USER': 'toaster',
+             'PASSWORD': 'yourpasswordhere',
+             'HOST': 'localhost',
+             'PORT': '3306',
+        }
+     }
+                                </literallayout>
+                                </para></listitem>
+                            <listitem><para>
+                                Edit the <filename>SECRET_KEY</filename>:
+                                <literallayout class='monospaced'>
+     SECRET_KEY = '<replaceable>your_secret_key</replaceable>'
+                                </literallayout>
+                                </para></listitem>
+                            <listitem><para>
+                                Edit the <filename>STATIC_ROOT</filename>:
+                                <literallayout class='monospaced'>
+     STATIC_ROOT = '/var/www/toaster/static_files/'
+                                </literallayout>
+                                </para></listitem>
+                            <listitem><para>
+                                Enable Build Mode by adding the following
+                                line to <filename>settings.py</filename>:
+                                <literallayout class='monospaced'>
+     BUILD_MODE=True
+                                </literallayout>
+                                </para></listitem>
+                        </itemizedlist>
+                        </para></listitem>
+                    <listitem><para>
+                        Add the database and user to the <filename>mysql</filename>
+                        server defined earlier:
+                        <literallayout class='monospaced'>
+     $ mysql -u root -p
+     mysql> CREATE DATABASE toaster_data;
+     mysql> CREATE USER 'toaster'@'localhost' identified by 'yourpasswordhere';
+     mysql> GRANT all on toaster_data.* to 'toaster'@'localhost';
+     mysql> quit
+                        </literallayout>
+                        </para></listitem>
+                    <listitem><para>
+                        Get Toaster to create the database schema,
+                        default data, and gather the statically-served files:
+                        <literallayout class='monospaced'>
+     $ cd  /var/www/toaster/poky/
+     $ ./bitbake/lib/toaster/manage.py syncdb
+     $ ./bitbake/lib/toaster/manage.py migrate
+     $ TOASTER_DIR=`pwd` TOASTER_CONF=./meta-yocto/conf/toasterconf.json ./bitbake/lib/toaster/manage.py checksettings
+     $ ./bitbake/lib/toaster/manage.py collectstatic
+                        </literallayout>
+                        </para>
+
+                        <para>
+                            For the above set of commands, after moving to the
+                            <filename>poky</filename> directory,
+                            the <filename>syncdb</filename> and <filename>migrate</filename>
+                            commands ensure the database
+                            schema has had changes propagated correctly (i.e.
+                            migrations).
+                        </para>
+
+                        <para>
+                            The next line sets the Toaster root directory
+                            <filename>TOASTER_DIR</filename> and the location of
+                            the Toaster configuration file
+                            <filename>TOASTER_CONF</filename>, which is
+                            relative to the Toaster root directory
+                            <filename>TOASTER_DIR</filename>.
+                            For more information on the Toaster configuration file
+                            <filename>TOASTER_CONF</filename>, see the
+                            <link linkend='toaster-json-files'>JSON Files</link>
+                            section of this manual.
+                        </para>
+
+                        <para>
+                            This line also runs the <filename>checksettings</filename>
+                            command, which configures the location of the Toaster
+                            <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build directory</ulink>.
+                            The Toaster root directory <filename>TOASTER_DIR</filename>
+                            determines where the Toaster build directory
+                            is created on the file system.
+                            In the example above,
+                            <filename>TOASTER_DIR</filename> is set as follows:
+                            <literallayout class="monospaced">
+     /var/www/toaster/poky
+                            </literallayout>
+                            This setting causes the Toaster build directory to be:
+                            <literallayout class="monospaced">
+     /var/www/toaster/poky/build
+                            </literallayout>
+                        </para>
+
+                        <para>
+                            Finally, the <filename>collectstatic</filename> command
+                            is a Django framework command that collects all the
+                            statically served files into a designated directory to
+                            be served up by the Apache web server.
+                        </para></listitem>
+                    <listitem><para>
+                        Add an Apache configuration file for Toaster to your Apache web
+                        server's configuration directory.
+                        If you are using Ubuntu or Debian, put the file here:
+                        <literallayout class='monospaced'>
+     /etc/apache2/conf-available/toaster.conf
+                        </literallayout>
+                        If you are using Fedora or RedHat, put it here:
+                        <literallayout class='monospaced'>
+     /etc/httpd/conf.d/toaster.conf
+                        </literallayout>
+                        Following is a sample Apache configuration for Toaster
+                        you can follow:
+                        <literallayout class='monospaced'>
+     Alias /static /var/www/toaster/static_files
+     &lt;Directory /var/www/toaster/static_files&gt;
+             Order allow,deny
+             Allow from all
+             Require all granted
+     &lt;/Directory&gt;
+
+     WSGIDaemonProcess toaster_wsgi python-path=/var/www/toaster/poky/bitbake/lib/toaster:/var/www/toaster/venv/lib/python2.7/site-packages
+
+     WSGIScriptAlias / "/var/www/toaster/poky/bitbake/lib/toaster/toastermain/wsgi.py"
+     &lt;Location /&gt;
+         WSGIProcessGroup toastern_wsgi
+     &lt;/Location&gt;
+                        </literallayout>
+                        If you are using Ubuntu or Debian,
+                        you will need to enable the config and module for Apache:
+                        <literallayout class='monospaced'>
+     $ sudo a2enmod wsgi
+     $ sudo a2enconf toaster
+     $ chmod +x bitbake/lib/toaster/toastermain/wsgi.py
+                        </literallayout>
+                        Finally, restart Apache to make sure all new configuration
+                        is loaded.
+                        For Ubuntu and Debian use:
+                        <literallayout class='monospaced'>
+     $ sudo service apache2 restart
+                        </literallayout>
+                        For Fedora and RedHat use:
+                        <literallayout class='monospaced'>
+     $ sudo service httpd restart
+                        </literallayout>
+                        </para></listitem>
+                    <listitem><para>
+                        Install the build runner service.
+                        This service needs to be running in order to dispatch
+                        builds.
+                        Use this command:
+                        <literallayout class='monospaced'>
+     /var/www/toaster/poky/bitbake/lib/toaster/manage.py runbuilds
+                        </literallayout>
+                        Here is an example:
+                        <literallayout class='monospaced'>
+     #!/bin/sh
+     # toaster run builds dispatcher
+     cd /var/www/toaster/
+     source ./venv/bin/activate
+     ./bitbake/lib/toaster/manage.py runbuilds
+                        </literallayout>
+                        </para></listitem>
+                </orderedlist>
+                You can now open up a browser and start using Toaster.
+            </para>
+        </section>
+    </section>
+
+
+
+
+<!--    <section id='using-toaster-in-analysis-mode'>
         <title>Using Toaster in Analysis Mode</title>
+
 
         <para>
             This section describes how to use Toaster in Analysis Mode
@@ -324,14 +803,14 @@
                     <listitem><para><emphasis>Start the BitBake Server:</emphasis>
                         Start the BitBake server using the following command:
                         <literallayout class='monospaced'>
-     $ bitbake --postread conf/toaster.conf --server-only -t xmlrpc -B localhost:0 &amp;&amp; export BBSERVER=localhost:-1
+     $ bitbake &dash;&dash;postread conf/toaster.conf &dash;&dash;server-only -t xmlrpc -B localhost:0 &amp;&amp; export BBSERVER=localhost:-1
                         </literallayout>
                         </para></listitem>
                     <listitem><para><emphasis>Start the Logging Server:</emphasis>
                         Start the Toaster Logging Interface using the following
                         command:
                         <literallayout class='monospaced'>
-     $ nohup bitbake --observe-only -u toasterui >toaster_ui.log &amp;
+     $ nohup bitbake &dash;&dash;observe-only -u toasterui >toaster_ui.log &amp;
                         </literallayout>
                         <note>
                             No hard-coded ports are used in the BitBake options
@@ -810,6 +1289,7 @@
             </para>
         </section>
     </section>
+-->
 
     <section id='using-the-toaster-web-interface'>
         <title>Using the Toaster Web Interface</title>
@@ -867,58 +1347,119 @@
                     CPU usage, and disk I/O.
                     </para></listitem>
             </itemizedlist>
-            Following are several videos that show how to use the Toaster GUI:
-            <itemizedlist>
-                <listitem><para><emphasis>Build Configuration:</emphasis>
-                    This
-                    <ulink url='https://www.youtube.com/watch?v=qYgDZ8YzV6w'>video</ulink>
-                    overviews and demonstrates build configuration for Toaster.
-                    </para></listitem>
-                <listitem><para><emphasis>Toaster Homepage and Table Controls:</emphasis>
-                    This
-                    <ulink url='https://www.youtube.com/watch?v=QEARDnrR1Xw'>video</ulink>
-                    goes over the Toaster entry page, and provides
-                    an overview of the data manipulation capabilities of
-                    Toaster, which include search, sorting and filtering by
-                    different criteria.
-                    </para></listitem>
-                <listitem><para><emphasis>Build Dashboard:</emphasis>
-                    This
-                    <ulink url='https://www.youtube.com/watch?v=KKqHYcnp2gE'>video</ulink>
-                    shows you the build dashboard, a page providing an
-                    overview of the information available for a selected build.
-                    </para></listitem>
-                <listitem><para><emphasis>Image Information:</emphasis>
-                    This
-                    <ulink url='https://www.youtube.com/watch?v=XqYGFsmA0Rw'>video</ulink>
-                    walks through the information Toaster provides
-                    about images: packages installed and root file system.
-                    </para></listitem>
-                <listitem><para><emphasis>Configuration:</emphasis>
-                    This
-                    <ulink url='https://www.youtube.com/watch?v=UW-j-T2TzIg'>video</ulink>
-                    provides Toaster build configuration information.
-                    </para></listitem>
-                <listitem><para><emphasis>Tasks:</emphasis>
-                    This
-                    <ulink url='https://www.youtube.com/watch?v=D4-9vGSxQtw'>video</ulink>
-                    shows the information Toaster provides about the
-                    tasks run by the build system.
-                    </para></listitem>
-                <listitem><para><emphasis>Recipes and Packages Built:</emphasis>
-                    This
-                    <ulink url='https://www.youtube.com/watch?v=x-6dx4huNnw'>video</ulink>
-                    shows the information Toaster provides about recipes
-                    and packages built.
-                    </para></listitem>
-                <listitem><para><emphasis>Performance Data:</emphasis>
-                    This
-                    <ulink url='https://www.youtube.com/watch?v=qWGMrJoqusQ'>video</ulink>
-                    shows the build performance data provided by
-                    Toaster.
-                    </para></listitem>
-            </itemizedlist>
         </para>
+
+        <section id='web-interface-videos'>
+            <title>Toaster Web Interface Videos</title>
+
+            <para>
+                Following are several videos that show how to use the Toaster GUI:
+                <itemizedlist>
+                    <listitem><para><emphasis>Build Configuration:</emphasis>
+                        This
+                        <ulink url='https://www.youtube.com/watch?v=qYgDZ8YzV6w'>video</ulink>
+                        overviews and demonstrates build configuration for Toaster.
+                        </para></listitem>
+                    <listitem><para><emphasis>Build Custom Layers:</emphasis>
+                        This
+                        <ulink url='https://www.youtube.com/watch?v=QJzaE_XjX5c'>video</ulink>
+                        shows you how to build custom layers that are used with
+                        Toaster.
+                        </para></listitem>
+                    <listitem><para><emphasis>Toaster Homepage and Table Controls:</emphasis>
+                        This
+                        <ulink url='https://www.youtube.com/watch?v=QEARDnrR1Xw'>video</ulink>
+                        goes over the Toaster entry page, and provides
+                        an overview of the data manipulation capabilities of
+                        Toaster, which include search, sorting and filtering by
+                        different criteria.
+                        </para></listitem>
+                    <listitem><para><emphasis>Build Dashboard:</emphasis>
+                        This
+                        <ulink url='https://www.youtube.com/watch?v=KKqHYcnp2gE'>video</ulink>
+                        shows you the build dashboard, a page providing an
+                        overview of the information available for a selected build.
+                        </para></listitem>
+                    <listitem><para><emphasis>Image Information:</emphasis>
+                        This
+                        <ulink url='https://www.youtube.com/watch?v=XqYGFsmA0Rw'>video</ulink>
+                        walks through the information Toaster provides
+                        about images: packages installed and root file system.
+                        </para></listitem>
+                    <listitem><para><emphasis>Configuration:</emphasis>
+                        This
+                        <ulink url='https://www.youtube.com/watch?v=UW-j-T2TzIg'>video</ulink>
+                        provides Toaster build configuration information.
+                        </para></listitem>
+                    <listitem><para><emphasis>Tasks:</emphasis>
+                        This
+                        <ulink url='https://www.youtube.com/watch?v=D4-9vGSxQtw'>video</ulink>
+                        shows the information Toaster provides about the
+                        tasks run by the build system.
+                        </para></listitem>
+                    <listitem><para><emphasis>Recipes and Packages Built:</emphasis>
+                        This
+                        <ulink url='https://www.youtube.com/watch?v=x-6dx4huNnw'>video</ulink>
+                        shows the information Toaster provides about recipes
+                        and packages built.
+                        </para></listitem>
+                    <listitem><para><emphasis>Performance Data:</emphasis>
+                        This
+                        <ulink url='https://www.youtube.com/watch?v=qWGMrJoqusQ'>video</ulink>
+                        shows the build performance data provided by
+                        Toaster.
+                        </para></listitem>
+                </itemizedlist>
+            </para>
+        </section>
+
+        <section id='toaster-web-interface-preferred-version'>
+            <title>Building a Specific Recipe Given Multiple Versions</title>
+
+            <para>
+                Occasionally, a layer might provide more than one version of
+                the same recipe.
+                For example, the <filename>openembedded-core</filename> layer
+                provides two versions of the <filename>bash</filename> recipe
+                (i.e. 3.2.48 and 4.3.30-r0) and two versions of the
+                <filename>which</filename> recipe (i.e. 2.21 and 2.18).
+                The following figure shows this exact scenario:
+                <imagedata fileref="figures/bash-oecore.png" align="center" width="9in" depth="6in" />
+            </para>
+
+            <para>
+                By default, the OpenEmbedded build system builds one of the
+                two recipes.
+                For the <filename>bash</filename> case, version 4.3.30-r0 is
+                built by default.
+                Unfortunately, Toaster as it exists, is not able to override
+                the default recipe version.
+                If you would like to build bash 3.2.48, you need to set the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-PREFERRED_VERSION'><filename>PREFERRED_VERSION</filename></ulink>
+                variable.
+                You can do so from Toaster, using the "Add variable" form,
+                which is available in the "BitBake variables" page of the
+                project configuration section as shown in the following screen:
+                <imagedata fileref="figures/add-variable.png" align="center" width="9in" depth="6in" />
+            </para>
+
+            <para>
+                To specify <filename>bash</filename> 3.2.48 as the version to build,
+                enter "PREFERRED_VERSION_bash" in the "Variable" field, and "3.2.48"
+                in the "Value" field.
+                Next, click the "Add variable" button:
+                <imagedata fileref="figures/set-variable.png" align="center" width="9in" depth="6in" />
+            </para>
+
+            <para>
+                After clicking the "Add variable" button, the settings for
+                <filename>PREFERRED_VERSION</filename> are added to the bottom
+                of the BitBake variables list.
+                With these settings, the OpenEmbedded build system builds the
+                desired version of the recipe rather than the default version:
+                <imagedata fileref="figures/variable-added.png" align="center" width="9in" depth="6in" />
+            </para>
+        </section>
     </section>
 
 <!--

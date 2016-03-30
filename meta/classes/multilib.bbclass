@@ -26,6 +26,7 @@ python multilib_virtclass_handler () {
     if bb.data.inherits_class('image', e.data):
         e.data.setVar("MLPREFIX", variant + "-")
         e.data.setVar("PN", variant + "-" + e.data.getVar("PN", False))
+        e.data.setVar('SDKTARGETSYSROOT', e.data.getVar('SDKTARGETSYSROOT', True))
         target_vendor = e.data.getVar("TARGET_VENDOR_" + "virtclass-multilib-" + variant, False)
         if target_vendor:
             e.data.setVar("TARGET_VENDOR", target_vendor)
@@ -92,10 +93,6 @@ python __anonymous () {
         d.setVar("LINGUAS_INSTALL", "")
         # FIXME, we need to map this to something, not delete it!
         d.setVar("PACKAGE_INSTALL_ATTEMPTONLY", "")
-
-    if bb.data.inherits_class('populate_sdk_base', d):
-        clsextend.map_depends_variable("TOOLCHAIN_TARGET_TASK")
-        clsextend.map_depends_variable("TOOLCHAIN_TARGET_TASK_ATTEMPTONLY")
 
     if bb.data.inherits_class('image', d):
         return

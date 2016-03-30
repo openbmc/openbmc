@@ -15,17 +15,10 @@ LICENSE_${PN}-dev = "GPL-3.0-with-GCC-exception"
 LICENSE_${PN}-dbg = "GPL-3.0-with-GCC-exception"
 
 
-FILES_${PN} = "${base_libdir}/libgcc*.so.*"
 FILES_${PN}-dev = "\
     ${base_libdir}/libgcc*.so \
-    ${libdir}/${TARGET_SYS}/${BINV}/*crt* \
-    ${libdir}/${TARGET_SYS}/${BINV}/64 \
-    ${libdir}/${TARGET_SYS}/${BINV}/32 \
-    ${libdir}/${TARGET_SYS}/${BINV}/x32 \
-    ${libdir}/${TARGET_SYS}/${BINV}/n32 \
-    ${libdir}/${TARGET_SYS}/${BINV}/libgcc* \
     ${@base_conditional('BASETARGET_SYS', '${TARGET_SYS}', '', '${libdir}/${BASETARGET_SYS}', d)} \
-    ${libdir}/${TARGET_SYS}/${BINV}/libgcov.a \
+    ${libdir}/${TARGET_SYS}/${BINV}* \
 "
 
 FILES_${PN}-dbg += "${base_libdir}/.debug/"

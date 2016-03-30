@@ -39,7 +39,6 @@
 #    packaging steps
 
 inherit packagedata
-inherit prserv
 inherit chrpath
 
 # Need the package_qa_handle_error() in insane.bbclass
@@ -1146,7 +1145,8 @@ python populate_packages () {
         else:
             for f in unshipped:
                 msg = msg + "\n  " + f
-            msg = msg + "\nPlease set FILES such that these items are packaged. Alternatively if they are unneeded, avoid installing them or delete them within do_install."
+            msg = msg + "\nPlease set FILES such that these items are packaged. Alternatively if they are unneeded, avoid installing them or delete them within do_install.\n"
+            msg = msg + "%s: %d installed and not shipped files." % (pn, len(unshipped))
             package_qa_handle_error("installed-vs-shipped", msg, d)
 }
 populate_packages[dirs] = "${D}"

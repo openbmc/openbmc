@@ -16,7 +16,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=a6f89e2100d9b6cdffcea4f398e37343 \
                    "
 inherit autotools gtk-doc
 
-SRCREV = "0d833715eaa65636dda2705b89359a1e0154dc58"
+SRCREV = "114ec87c85c35a2bd3682f9f891e494127be6fb5"
 # Lookout for PV bump too when SRCREV is changed
 PV = "21+git${SRCPV}"
 

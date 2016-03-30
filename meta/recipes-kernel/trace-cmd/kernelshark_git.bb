@@ -9,6 +9,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe \
 DEPENDS = "gtk+ libxml2"
 RDEPENDS_${PN} = "trace-cmd"
 
+inherit distro_features_check
+ANY_OF_DISTRO_FEATURES = "${GTK2DISTROFEATURES}"
+
 EXTRA_OEMAKE = "\
     'prefix=${prefix}' \
     'bindir_relative=${@oe.path.relative(prefix, bindir)}' \

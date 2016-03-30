@@ -12,7 +12,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552 \
 SECTION = "libs"
 
 SRC_URI = "ftp://ftp.gnupg.org/gcrypt/libgpg-error/libgpg-error-${PV}.tar.bz2 \
-           file://pkgconfig.patch"
+           file://pkgconfig.patch \
+	   file://0001-libgpg-error-Add-nios2-support.patch \
+	  "
 SRC_URI[md5sum] = "c04c16245b92829281f43b5bef7d16da"
 SRC_URI[sha256sum] = "53120e1333d5c5d28d87ff2854e9e98719c8e214152f17ad5291704d25c4978b"
 

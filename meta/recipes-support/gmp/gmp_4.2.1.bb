@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=892f569a555ba9c07a568a7c0c4fa63a \
                     file://COPYING.LIB;md5=fbc093901857fcd118f065f900982c24 \
                     file://gmp-h.in;beginline=6;endline=21;md5=e056f74a12c3277d730dbcfb85d2ca34"
 
-SRC_URI += "file://disable-stdc.patch \
+SRC_URI += "file://Use-__gnu_inline__-attribute.patch \
             file://gmp_fix_for_automake-1.12.patch \
             "
 

@@ -1,0 +1,62 @@
+From 42325faa88d64cce799977d611b2792beb154643 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 14 Sep 2015 08:36:59 +0000
+Subject: [PATCH] Include needed headers explicitly
+
+on glibc these headers get pulled in indirectly via other .h files
+but right fix is to include them directly when used
+
+fixes
+
+error: use of undeclared identifier 'PATH_MAX'
+error: called object type 'unsigned int' is not a function or function pointer
+dm_major = major(aux.st_rdev);
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ common.c    | 1 +
+ ioconf.c    | 1 +
+ sa_common.c | 1 +
+ 3 files changed, 3 insertions(+)
+
+diff --git a/common.c b/common.c
+index a23155b..ad86446 100644
+--- a/common.c
++++ b/common.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include <stdio.h>
++#include <limits.h>
+ #include <string.h>
+ #include <stdlib.h>
+ #include <time.h>
+diff --git a/ioconf.c b/ioconf.c
+index 7d88c5d..6d67691 100644
+--- a/ioconf.c
++++ b/ioconf.c
+@@ -27,6 +27,7 @@
+ #include <errno.h>
+ #include <dirent.h>
+ #include <sys/stat.h>
++#include <sys/types.h>
+ 
+ #include "ioconf.h"
+ #include "common.h"
+diff --git a/sa_common.c b/sa_common.c
+index b7351d9..c9e3299 100644
+--- a/sa_common.c
++++ b/sa_common.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include <stdio.h>
++#include <limits.h>
+ #include <string.h>
+ #include <stdlib.h>
+ #include <time.h>
+-- 
+2.5.2
+

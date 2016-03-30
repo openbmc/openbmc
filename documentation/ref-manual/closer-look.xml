@@ -1059,7 +1059,7 @@
                 the root filesystem image that lists out, line-by-line, the
                 installed packages.
                 This manifest file is useful for the
-                <link linkend='ref-classes-testimage'><filename>testimage</filename></link>
+                <link linkend='ref-classes-testimage*'><filename>testimage</filename></link>
                 class, for example, to determine whether or not to run
                 specific tests.
                 See the

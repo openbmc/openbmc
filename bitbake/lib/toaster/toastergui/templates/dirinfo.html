@@ -1,4 +1,5 @@
 {% extends "basebuildpage.html" %}
+{% block title %} Directory structure - {{ target.target }} {{ build.machine }} - {{ build.project.name }} - Toaster {% endblock %}
 {% block extraheadcontent %}
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/jquery.treetable.css' %}" type="text/css">
@@ -103,12 +104,16 @@
             name += '</td>';
         }
         else {
-            name = '<td>';
             if (o.link_to == null) {
-                name += '<i class="icon-file"></i>';
+                namespan = 2;
+                if (o.package == null) {
+                  namespan = 3;
+                }
+                var colspan = 'colspan="' + namespan + '"';
+                name = '<td ' + colspan + '><i class="icon-file"></i>';
             }
             else {
-                name += '<i class="icon-hand-right"></i>';
+                name = '<td><i class="icon-hand-right"></i>';
             }
             name += '&nbsp;' + o.name;
             name += '</td>';
@@ -207,10 +212,10 @@
                     <th>Directory / File</th>
                     <th>Symbolic link to</th>
                     <th>Source package</th>
-                    <th>Size</th>
-                    <th>Permissions</th>
-                    <th>Owner</th>
-                    <th>Group</th>
+                    <th class="narrow-col">Size</th>
+                    <th class="medium-col">Permissions</th>
+                    <th class="narrow-col">Owner</th>
+                    <th class="narrow-col">Group</th>
                 </tr>
             </thead>
             <tbody>

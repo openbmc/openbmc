@@ -221,9 +221,6 @@ def main():
     if not config.read():
         return -1
 
-    # We need to be in this directory or we won't be able to initialise tinfoil
-    os.chdir(basepath)
-
     bitbake_subdir = config.get('General', 'bitbake_subdir', '')
     if bitbake_subdir:
         # Normally set for use within the SDK
@@ -244,7 +241,7 @@ def main():
     scriptutils.logger_setup_color(logger, global_args.color)
 
     if global_args.bbpath is None:
-        tinfoil = setup_tinfoil(config_only=True)
+        tinfoil = setup_tinfoil(config_only=True, basepath=basepath)
         global_args.bbpath = tinfoil.config_data.getVar('BBPATH', True)
     else:
         tinfoil = None

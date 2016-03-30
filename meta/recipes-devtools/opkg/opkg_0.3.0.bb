@@ -15,6 +15,12 @@ SRC_URI = "http://downloads.yoctoproject.org/releases/${BPN}/${BPN}-${PV}.tar.gz
            file://opkg-configure.service \
            file://opkg.conf \
            file://0001-opkg_archive-add-support-for-empty-compressed-files.patch \
+           file://0001-libopkg-include-stdio.h-for-getting-FILE-defined.patch \
+           file://0001-opkg_conf-create-opkg.lock-in-run-instead-of-var-run.patch \
+           file://0001-string_util-New-file-with-bin_to_hex-function.patch \
+           file://0002-md5-Add-md5_to_string-function.patch \
+           file://0003-sha256-Add-sha256_to_string-function.patch \
+           file://0004-opkg_download-Use-short-cache-file-name.patch \
 "
 
 SRC_URI[md5sum] = "3412cdc71d78b98facc84b19331ec64e"

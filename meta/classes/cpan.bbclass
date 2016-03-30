@@ -17,7 +17,7 @@ export PERLHOSTLIB = "${STAGING_LIBDIR_NATIVE}/perl-native/perl/${@get_perl_vers
 
 cpan_do_configure () {
 	export PERL5LIB="${PERL_ARCHLIB}"
-	yes '' | perl ${EXTRA_PERLFLAGS} Makefile.PL ${EXTRA_CPANFLAGS}
+	yes '' | perl ${EXTRA_PERLFLAGS} Makefile.PL INSTALLDIRS=vendor ${EXTRA_CPANFLAGS}
 
 	# Makefile.PLs can exit with success without generating a
 	# Makefile, e.g. in cases of missing configure time

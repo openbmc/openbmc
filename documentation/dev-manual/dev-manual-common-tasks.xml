@@ -2249,6 +2249,19 @@
                 Typically, setting these options is accomplished by running a
                 configure script with some options, or by modifying a build
                 configuration file.
+                <note>
+                    As of Yocto Project Release 7.1, some of the core recipes
+                    that package binary configuration scripts now disable the
+                    scripts due to the scripts previously requiring error-prone
+                    path substitution.
+                    The OpenEmbedded build system uses
+                    <filename>pkg-config</filename> now, which is much more
+                    robust.
+                    You can find a list of the <filename>*-config</filename>
+                    scripts that are disabled list in the
+                    "<ulink url='&YOCTO_DOCS_REF_URL;#migration-1.7-binary-configuration-scripts-disabled'>Binary Configuration Scripts Disabled</ulink>"
+                    section in the Yocto Project Reference Manual.
+                </note>
             </para>
 
             <para>
@@ -2364,7 +2377,16 @@
             <para>
                 However, if the compile step fails, you need to diagnose the
                 failure.
-                Here are some common issues that cause failures:
+                Here are some common issues that cause failures.
+                <note>
+                    For cases where improper paths are detected for
+                    configuration files or for when libraries/headers cannot
+                    be found, be sure you are using the more robust
+                    <filename>pkg-config</filename>.
+                    See the note in section
+                    "<link linkend='new-recipe-configuring-the-recipe'>Configuring the Recipe</link>"
+                    for additional information.
+                </note>
                 <itemizedlist>
                     <listitem><para><emphasis>Parallel build failures:</emphasis>
                         These failures manifest themselves as intermittent
@@ -2708,23 +2730,20 @@
                         is configured, it might be important to mark the
                         packages produced as being specific to a particular
                         machine, or to mark them as not being specific to
-                        a particular machine or architecture at all.
-                        By default, packages produced for the target are
-                        marked as being specific to the architecture of the
-                        target machine because that is usually the desired
-                        result.
-                        However, if the recipe configures the software to be
-                        built specific to the target machine (e.g. the
+                        a particular machine or architecture at all.</para>
+                        <para>By default, packages apply to any machine with the
+                        same architecture as the target machine.
+                        When a recipe produces packages that are
+                        machine-specific (e.g. the
                         <ulink url='&YOCTO_DOCS_REF_URL;#var-MACHINE'><filename>MACHINE</filename></ulink>
                         value is passed into the configure script or a patch
-                        is applied only for a particular machine), then you
-                        should mark the packages produced as being
-                        machine-specific by adding the following to the
+                        is applied only for a particular machine), you should
+                        mark them as such by adding the following to the
                         recipe:
                         <literallayout class='monospaced'>
      PACKAGE_ARCH = "${MACHINE_ARCH}"
-                        </literallayout>
-                        On the other hand, if the recipe produces packages
+                        </literallayout></para>
+                        <para>On the other hand, if the recipe produces packages
                         that do not contain anything specific to the target
                         machine or architecture at all (e.g. recipes
                         that simply package script files or configuration
@@ -3554,7 +3573,7 @@
      require conf/multilib.conf
      MULTILIBS = "multilib:lib32"
      DEFAULTTUNE_virtclass-multilib-lib32 = "x86"
-     IMAGE_INSTALL = "lib32-connman"
+     IMAGE_INSTALL_append = " lib32-glib-2.0"
                     </literallayout>
                     This example enables an
                     additional library named <filename>lib32</filename> alongside the
@@ -3565,7 +3584,7 @@
                 </para>
 
                 <para>
-                    The example then includes <filename>lib32-connman</filename>
+                    The example then includes <filename>lib32-glib-2.0</filename>
                     in all the images, which illustrates one method of including a
                     multiple library dependency.
                     You can use a normal image build to include this dependency,
@@ -3575,7 +3594,7 @@
                     </literallayout>
                     You can also build Multilib packages specifically with a command like this:
                     <literallayout class='monospaced'>
-     $ bitbake lib32-connman
+     $ bitbake lib32-glib-2.0
                     </literallayout>
                 </para>
             </section>
@@ -4307,18 +4326,18 @@
 	            A source plugin is created as a subclass of
 	            <filename>SourcePlugin</filename>.
                 The plugin file containing it is added to
-	            <filename>scripts/lib/mic/plugins/source/</filename> to
+	            <filename>scripts/lib/wic/plugins/source/</filename> to
 	            make the plugin implementation available to the
 	            <filename>wic</filename> implementation.
                 For more information, see
-	            <filename>scripts/lib/mic/pluginbase.py</filename>.
+	            <filename>scripts/lib/wic/pluginbase.py</filename>.
             </para>
 
             <para>
 	            Source plugins can also be implemented and added by
 	            external layers.
                 As such, any plugins found in a
-	            <filename>scripts/lib/mic/plugins/source/</filename>
+	            <filename>scripts/lib/wic/plugins/source/</filename>
 	            directory in an external layer are also made
 	            available.
             </para>
@@ -4539,9 +4558,17 @@
                             option or the equivalent rootfs derived from the
 			                <filename>-e</filename> command-line
 			                option.
-                            Exactly what those contents and
-			                filesystem type end up being are dependent
-			                on the given plugin implementation.
+                            Exactly what those contents and filesystem type end
+                            up being are dependent on the given plugin
+                            implementation.
+                            </para>
+                            <para>If you do not use the
+                            <filename>--source</filename> option, the
+                            <filename>wic</filename> command creates an empty
+                            partition.
+                            Consequently, you must use the
+                            <filename>--size</filename> option to specify the
+                            size of the empty partition.
                             </para></listitem>
                         <listitem><para><emphasis><filename>--ondisk</filename> or <filename>--ondrive</filename>:</emphasis>
                             Forces the partition to be created on a particular
@@ -4585,6 +4612,49 @@
                             This option is a <filename>wic</filename>-specific
                             option that says to start a partition on an
                             x KBytes boundary.</para></listitem>
+                        <listitem><para><emphasis><filename>--no-table</filename>:</emphasis>
+                            This option is a <filename>wic</filename>-specific
+                            option.
+                            Using the option reserves space for the partition
+                            and causes it to become populated.
+                            However, the partition is not added to the
+                            partition table.
+                            </para></listitem>
+                        <listitem><para><emphasis><filename>--extra-space</filename>:</emphasis>
+                            This option is a <filename>wic</filename>-specific
+                            option that adds extra space after the space
+                            filled by the content of the partition.
+                            The final size can go beyond the size specified
+                            by the <filename>--size</filename> option.
+                            The default value is 10 Mbytes.
+                            </para></listitem>
+                        <listitem><para><emphasis><filename>--overhead-factor</filename>:</emphasis>
+                            This option is a <filename>wic</filename>-specific
+                            option that multiplies the size of the partition by
+                            the option's value.
+                            You must supply a value greater than or equal to
+                            "1".
+                            The default value is "1.3".
+                            </para></listitem>
+                        <listitem><para><emphasis><filename>--part-type</filename>:</emphasis>
+                            This option is a <filename>wic</filename>-specific
+                            option that specifies the partition type globally
+                            unique identifier (GUID) for GPT partitions.
+                            You can find the list of partition type GUIDs
+                            at
+                            <ulink url='http://en.wikipedia.org/wiki/GUID_Partition_Table#Partition_type_GUIDs'></ulink>.
+                            </para></listitem>
+                        <listitem><para><emphasis><filename>--use-uuid</filename>:</emphasis>
+                            This option is a <filename>wic</filename>-specific
+                            option that causes <filename>wic</filename> to
+                            generate a random GUID for the partition.
+                            The generated identifier is used in the bootloader
+                            configuration to specify the root partition.
+                            </para></listitem>
+                        <listitem><para><emphasis><filename>--uuid</filename>:</emphasis>
+                            This option is a <filename>wic</filename>-specific
+                            option that specifies the partition UUID.
+                            </para></listitem>
                     </itemizedlist>
                 </para>
             </section>
@@ -8166,6 +8236,29 @@
                             must accept incoming connections from 192.168.7.0/24,
                             which is the default IP range used for tap devices
                             by <filename>runqemu</filename>.</para></listitem>
+                        <listitem><para><emphasis>Be sure your host has the
+                            correct packages installed:</emphasis>
+                            Depending your host's distribution, you need
+                            to have the following packages installed:
+                            <itemizedlist>
+                                <listitem><para>Ubuntu and Debian:
+                                    <filename>sysstat</filename> and
+                                    <filename>iproute2</filename>
+                                    </para></listitem>
+                                <listitem><para>OpenSUSE:
+                                    <filename>sysstat</filename> and
+                                    <filename>iproute2</filename>
+                                    </para></listitem>
+                                <listitem><para>Fedora:
+                                    <filename>sysstat</filename> and
+                                    <filename>iproute</filename>
+                                    </para></listitem>
+                                <listitem><para>CentOS:
+                                    <filename>sysstat</filename> and
+                                    <filename>iproute</filename>
+                                    </para></listitem>
+                            </itemizedlist>
+                        </para></listitem>
                     </itemizedlist>
                 </para>
 
@@ -8563,7 +8656,7 @@
                         </literallayout></para></listitem>
                     <listitem><para><emphasis>Manually running tests:</emphasis>
                         To manually run the tests, first globally inherit the
-                        <ulink url='&YOCTO_DOCS_REF_URL;#ref-classes-testimage'><filename>testimage</filename></ulink>
+                        <ulink url='&YOCTO_DOCS_REF_URL;#ref-classes-testimage*'><filename>testimage</filename></ulink>
                         class by editing your <filename>local.conf</filename>
                         file:
                         <literallayout class='monospaced'>

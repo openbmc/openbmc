@@ -364,6 +364,10 @@
                     Comments within the <filename>local.conf</filename> file
                     list the values you can use for the
                     <filename>MACHINE</filename> variable.
+                    If you do not change the <filename>MACHINE</filename>
+                    variable, the OpenEmbedded build system uses
+                    <filename>qemux86</filename> as the default target
+                    machine when building the cross-toolchain.
                     <note>
                         You can populate the Build Directory with the
                         cross-toolchains for more than a single architecture.
@@ -371,6 +375,17 @@
                         variable in the <filename>local.conf</filename> file and
                         re-run the <filename>bitbake</filename> command.
                     </note></para></listitem>
+                <listitem><para><emphasis>Make Sure Your Layers are Enabled:</emphasis>
+                    Examine the <filename>conf/bblayers.conf</filename> file
+                    and make sure that you have enabled all the compatible
+                    layers for your target machine.
+                    The OpenEmbedded build system needs to be aware of each
+                    layer you want included when building images and
+                    cross-toolchains.
+                    For information on how to enable a layer, see the
+                    "<ulink url='&YOCTO_DOCS_DEV_URL;#enabling-your-layer'>Enabling Your Layer</ulink>"
+                    section in the Yocto Project Development Manual.
+                    </para></listitem>
                 <listitem><para><emphasis>Generate the Cross-Toolchain:</emphasis>
                     Run <filename>bitbake meta-ide-support</filename> to
                     complete the cross-toolchain generation.

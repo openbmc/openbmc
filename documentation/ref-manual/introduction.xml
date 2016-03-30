@@ -154,11 +154,14 @@
                 <listitem><para>Ubuntu 13.10</para></listitem> -->
                 <listitem><para>Ubuntu 14.04 (LTS)</para></listitem>
                 <listitem><para>Ubuntu 14.10</para></listitem>
+                <listitem><para>Ubuntu 15.04</para></listitem>
+                <listitem><para>Ubuntu 15.10</para></listitem>
 <!--                <listitem><para>Fedora 16 (Verne)</para></listitem>
                 <listitem><para>Fedora 17 (Spherical)</para></listitem>
                 <listitem><para>Fedora release 19 (Schrödinger's Cat)</para></listitem>
                 <listitem><para>Fedora release 20 (Heisenbug)</para></listitem> -->
                 <listitem><para>Fedora release 21</para></listitem>
+                <listitem><para>Fedora release 22</para></listitem>
 <!--                <listitem><para>CentOS release 5.6 (Final)</para></listitem>
                 <listitem><para>CentOS release 5.7 (Final)</para></listitem>
                 <listitem><para>CentOS release 5.8 (Final)</para></listitem>
@@ -250,8 +253,15 @@
                         Packages needed if you are going to be using the
                         <ulink url='&YOCTO_DOCS_ADT_URL;#using-the-adt-installer'>Application Development Toolkit (ADT) Installer</ulink>:
                         <literallayout class='monospaced'>
-     $ sudo apt-get install autoconf automake libtool libglib2.0-dev
+     $ sudo apt-get install autoconf automake libtool libglib2.0-dev libarchive-dev
                         </literallayout></para></listitem>
+                    <listitem><para><emphasis>OpenEmbedded Self-Test (<filename>oe-selftest</filename>):</emphasis>
+                        Packages needed if you are going to run
+                        <filename>oe-selftest</filename>:
+                        <literallayout class='monospaced'>
+     $ sudo apt-get install python-git
+                        </literallayout>
+                        </para></listitem>
                 </itemizedlist>
             </para>
         </section>
@@ -267,28 +277,35 @@
                         Packages needed to build an image for a headless
                         system:
                         <literallayout class='monospaced'>
-     $ sudo yum install &FEDORA_HOST_PACKAGES_ESSENTIAL;
+     $ sudo dnf install &FEDORA_HOST_PACKAGES_ESSENTIAL;
                         </literallayout></para></listitem>
                     <listitem><para><emphasis>Graphical and Eclipse Plug-In Extras:</emphasis>
                         Packages recommended if the host system has graphics
                         support or if you are going to use the Eclipse
                         IDE:
                         <literallayout class='monospaced'>
-     $ sudo yum install SDL-devel xterm perl-Thread-Queue
+     $ sudo dnf install SDL-devel xterm
                         </literallayout></para></listitem>
                     <listitem><para><emphasis>Documentation:</emphasis>
                         Packages needed if you are going to build out the
                         Yocto Project documentation manuals:
                         <literallayout class='monospaced'>
-     $ sudo yum install make docbook-style-dsssl docbook-style-xsl \
+     $ sudo dnf install make docbook-style-dsssl docbook-style-xsl \
      docbook-dtds docbook-utils fop libxslt dblatex xmlto xsltproc
                         </literallayout></para></listitem>
                     <listitem><para><emphasis>ADT Installer Extras:</emphasis>
                         Packages needed if you are going to be using the
                         <ulink url='&YOCTO_DOCS_ADT_URL;#using-the-adt-installer'>Application Development Toolkit (ADT) Installer</ulink>:
                         <literallayout class='monospaced'>
-     $ sudo yum install autoconf automake libtool glib2-devel
+     $ sudo dnf install autoconf automake libtool glib2-devel libarchive-devel
                         </literallayout></para></listitem>
+                    <listitem><para><emphasis>OpenEmbedded Self-Test (<filename>oe-selftest</filename>):</emphasis>
+                        Packages needed if you are going to run
+                        <filename>oe-selftest</filename>:
+                        <literallayout class='monospaced'>
+     $ sudo dnf install GitPython
+                        </literallayout>
+                        </para></listitem>
                 </itemizedlist>
             </para>
         </section>
@@ -323,7 +340,13 @@
                         Packages needed if you are going to be using the
                         <ulink url='&YOCTO_DOCS_ADT_URL;#using-the-adt-installer'>Application Development Toolkit (ADT) Installer</ulink>:
                         <literallayout class='monospaced'>
-     $ sudo zypper install autoconf automake libtool glib2-devel
+     $ sudo zypper install autoconf automake libtool glib2-devel libarchive-devel
+                        </literallayout></para></listitem>
+                    <listitem><para><emphasis>OpenEmbedded Self-Test (<filename>oe-selftest</filename>):</emphasis>
+                        Packages needed if you are going to run
+                        <filename>oe-selftest</filename>:
+                        <literallayout class='monospaced'>
+     $ sudo zypper install python-GitPython
                         </literallayout></para></listitem>
                 </itemizedlist>
             </para>
@@ -336,14 +359,14 @@
                 The following list shows the required packages by function
                 given a supported CentOS Linux distribution:
                 <note>
-                    For CentOS 6.x, some of the versions of the components
-                    provided by the distribution are too old (e.g. Git, Python,
-                    and tar).
-                    It is recommended that you install the buildtools in order
-                    to provide versions that will work with the OpenEmbedded
-                    build system.
-                    For information on how to install the buildtools tarball,
-                    see the
+                    For CentOS 6.x, some of the versions
+                    of the components provided by the distribution are
+                    too old (e.g. Git, Python, and tar).
+                    It is recommended that you install the buildtools
+                    in order to provide versions that will work with
+                    the OpenEmbedded build system.
+                    For information on how to install the buildtools
+                    tarball, see the
                     "<link linkend='required-git-tar-and-python-versions'>Required Git, Tar, and Python Versions</link>"
                     section.
                 </note>
@@ -372,8 +395,24 @@
                         Packages needed if you are going to be using the
                         <ulink url='&YOCTO_DOCS_ADT_URL;#using-the-adt-installer'>Application Development Toolkit (ADT) Installer</ulink>:
                         <literallayout class='monospaced'>
-     $ sudo yum install autoconf automake libtool glib2-devel
-                        </literallayout></para></listitem>
+     $ sudo yum install autoconf automake libtool glib2-devel libarchive-devel
+                        </literallayout>
+                        <note>
+                            For CentOS 6.x, in order for the
+                            ADT installer script to work, you must have
+                            installed the <filename>liblzma5</filename>,
+                            <filename>libarchive3.x</filename>, and
+                            <filename>libarchive-devel-3.1.3</filename>
+                            (or older) packages, in that order.
+                        </note>
+                        </para></listitem>
+                    <listitem><para><emphasis>OpenEmbedded Self-Test (<filename>oe-selftest</filename>):</emphasis>
+                        Packages needed if you are going to run
+                        <filename>oe-selftest</filename>:
+                        <literallayout class='monospaced'>
+     $ sudo yum install GitPython
+                        </literallayout>
+                        </para></listitem>
                 </itemizedlist>
             </para>
         </section>

@@ -7,6 +7,9 @@ function layerDetailsPageInit (ctx) {
   var layerDepsList = $("#layer-deps-list");
   var currentLayerDepSelection;
   var addRmLayerBtn = $("#add-remove-layer-btn");
+  var targetTab = $("#targets-tab");
+  var machineTab = $("#machines-tab");
+  var detailsTab = $("#details-tab");
 
   /* setup the dependencies typeahead */
   libtoaster.makeTypeahead(layerDepInput, libtoaster.ctx.layersTypeAheadUrl, { include_added: "true" }, function(item){
@@ -14,6 +17,21 @@ function layerDetailsPageInit (ctx) {
 
     layerDepBtn.removeAttr("disabled");
   });
+
+  $(window).on('hashchange', function(e){
+    switch(window.location.hash){
+      case '#machines':
+        machineTab.tab('show');
+        break;
+      case '#recipes':
+        targetTab.tab('show');
+        break;
+      default:
+        detailsTab.tab('show');
+        break;
+    }
+  });
+
 
   $(".breadcrumb li:first a").click(function(e){
     e.preventDefault();
@@ -143,7 +161,7 @@ function layerDetailsPageInit (ctx) {
       addRmLayerBtn.removeClass("btn-danger");
   }
 
-  $("#details-tab").on('show', function(){
+  detailsTab.on('show', function(){
     if (!ctx.layerVersion.inCurrentPrj)
       defaultAddBtnText();
 
@@ -174,7 +192,7 @@ function layerDetailsPageInit (ctx) {
       $("#no-recipes-yet").hide();
     }
 
-    $("#targets-tab").removeClass("muted");
+    targetTab.removeClass("muted");
     if (window.location.hash === "#recipes"){
       /* re run the machinesTabShow to update the text */
       targetsTabShow();
@@ -189,7 +207,7 @@ function layerDetailsPageInit (ctx) {
     else
       $("#no-machines-yet").hide();
 
-    $("#machines-tab").removeClass("muted");
+    machineTab.removeClass("muted");
     if (window.location.hash === "#machines"){
       /* re run the machinesTabShow to update the text */
       machinesTabShow();
@@ -202,7 +220,7 @@ function layerDetailsPageInit (ctx) {
 
   });
 
-  $("#targets-tab").on('show', targetsTabShow);
+  targetTab.on('show', targetsTabShow);
 
   function machinesTabShow(){
     if (!ctx.layerVersion.inCurrentPrj) {
@@ -219,7 +237,7 @@ function layerDetailsPageInit (ctx) {
     window.location.hash = "machines";
   }
 
-  $("#machines-tab").on('show', machinesTabShow);
+  machineTab.on('show', machinesTabShow);
 
   $(".pagesize").change(function(){
     var search = libtoaster.parseUrlParams();
@@ -236,7 +254,7 @@ function layerDetailsPageInit (ctx) {
 
     if (added){
       /* enable and switch all the button states */
-      $(".build-target-btn").removeAttr("disabled");
+      $(".build-recipe-btn").removeAttr("disabled");
       $(".select-machine-btn").removeAttr("disabled");
       addRmLayerBtn.addClass("btn-danger");
       addRmLayerBtn.data('directive', "remove");
@@ -245,7 +263,7 @@ function layerDetailsPageInit (ctx) {
 
     } else {
       /* disable and switch all the button states */
-      $(".build-target-btn").attr("disabled","disabled");
+      $(".build-recipe-btn").attr("disabled","disabled");
       $(".select-machine-btn").attr("disabled", "disabled");
       addRmLayerBtn.removeClass("btn-danger");
       addRmLayerBtn.data('directive', "add");

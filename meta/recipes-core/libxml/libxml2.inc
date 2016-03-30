@@ -21,6 +21,22 @@ SRC_URI = "ftp://xmlsoft.org/libxml2/libxml2-${PV}.tar.gz;name=libtar \
            file://libxml-m4-use-pkgconfig.patch \
            file://configure.ac-fix-cross-compiling-warning.patch \
            file://0001-CVE-2015-1819-Enforce-the-reader-to-run-in-constant-.patch \
+           file://CVE-2015-7941-1-Stop-parsing-on-entities-boundaries-errors.patch \
+           file://CVE-2015-7941-2-Cleanup-conditional-section-error-handling.patch \
+           file://CVE-2015-8317-Fail-parsing-early-on-if-encoding-conversion-failed.patch \
+           file://CVE-2015-7942-Another-variation-of-overflow-in-Conditional-section.patch \
+           file://CVE-2015-7942-2-Fix-an-error-in-previous-Conditional-section-patch.patch \
+           file://0001-CVE-2015-8035-Fix-XZ-compression-support-loop.patch \
+           file://CVE-2015-7498-Avoid-processing-entities-after-encoding-conversion-.patch \
+           file://0001-CVE-2015-7497-Avoid-an-heap-buffer-overflow-in-xmlDi.patch \
+           file://CVE-2015-7499-1-Add-xmlHaltParser-to-stop-the-parser.patch \
+           file://CVE-2015-7499-2-Detect-incoherency-on-GROW.patch \
+           file://0001-Fix-a-bug-on-name-parsing-at-the-end-of-current-inpu.patch \
+           file://0001-CVE-2015-7500-Fix-memory-access-error-due-to-incorre.patch \
+           file://0001-CVE-2015-8242-Buffer-overead-with-HTML-parser-in-pus.patch \
+           file://0001-CVE-2015-5312-Another-entity-expansion-issue.patch \
+           file://CVE-2015-8241.patch \
+           file://CVE-2015-8710.patch \
           "
 
 BINCONFIG = "${bindir}/xml2-config"

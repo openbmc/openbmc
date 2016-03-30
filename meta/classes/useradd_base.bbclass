@@ -104,7 +104,7 @@ perform_groupmems () {
 			sleep $count
 		done
 	else
-		bbwarn "${PN}: group $groupname already contains $username, not re-adding it"
+		bbnote "${PN}: group $groupname already contains $username, not re-adding it"
 	fi
 	if test "x$gshadow" = "xno"; then
 		rm -f $rootdir${sysconfdir}/gshadow
@@ -136,7 +136,7 @@ perform_groupdel () {
 			sleep $count
 		done
 	else
-		bbwarn "${PN}: group $groupname doesn't exist, not removing it"
+		bbnote "${PN}: group $groupname doesn't exist, not removing it"
 	fi
 }
 
@@ -164,7 +164,7 @@ perform_userdel () {
 		       sleep $count
 	       done
 	else
-		bbwarn "${PN}: user $username doesn't exist, not removing it"
+		bbnote "${PN}: user $username doesn't exist, not removing it"
 	fi
 }
 

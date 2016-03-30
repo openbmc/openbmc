@@ -18,6 +18,12 @@ inherit cmake pythonnative distro_features_check
 # depends on virtual/libx11
 REQUIRED_DISTRO_FEATURES = "x11"
 
+# The built scripts go into the temporary directory according to tempfile
+# (typically /tmp) which can race if multiple builds happen on the same machine,
+# so tell it to use a directory in ${B} to avoid overwriting.
+export TEMP = "${B}/temp/"
+do_compile[dirs] =+ "${B}/temp/"
+
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[freeglut] = "-DPIGLIT_USE_GLUT=1,-DPIGLIT_USE_GLUT=0,freeglut,"
 

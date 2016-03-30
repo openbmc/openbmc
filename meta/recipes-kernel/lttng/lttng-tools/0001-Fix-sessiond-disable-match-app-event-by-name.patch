@@ -1,0 +1,58 @@
+From 700c5a9d4dc7b552926b8ddcbba91cc13312aba0 Mon Sep 17 00:00:00 2001
+From: Jonathan Rajotte <jonathan.rajotte-julien@efficios.com>
+Date: Wed, 9 Sep 2015 17:08:20 -0400
+Subject: [PATCH] Fix: sessiond: disable: match app event by name
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The use of a simple lookup and match on event name is insufficient
+to identify the corresponding ust app event.
+
+Fixes #914
+
+Signed-off-by: Jonathan Rajotte <jonathan.rajotte-julien@efficios.com>
+Signed-off-by: Jérémie Galarneau <jeremie.galarneau@efficios.com>
+
+Upstream-Status: Backport
+
+Signed-off-by: Li Zhou <li.zhou@windriver.com>
+---
+ src/bin/lttng-sessiond/ust-app.c |   10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/bin/lttng-sessiond/ust-app.c b/src/bin/lttng-sessiond/ust-app.c
+index 4066b06..53a6f93 100644
+--- a/src/bin/lttng-sessiond/ust-app.c
++++ b/src/bin/lttng-sessiond/ust-app.c
+@@ -3873,7 +3873,7 @@ int ust_app_disable_event_glb(struct ltt_ust_session *usess,
+ {
+ 	int ret = 0;
+ 	struct lttng_ht_iter iter, uiter;
+-	struct lttng_ht_node_str *ua_chan_node, *ua_event_node;
++	struct lttng_ht_node_str *ua_chan_node;
+ 	struct ust_app *app;
+ 	struct ust_app_session *ua_sess;
+ 	struct ust_app_channel *ua_chan;
+@@ -3910,14 +3910,14 @@ int ust_app_disable_event_glb(struct ltt_ust_session *usess,
+ 		}
+ 		ua_chan = caa_container_of(ua_chan_node, struct ust_app_channel, node);
+ 
+-		lttng_ht_lookup(ua_chan->events, (void *)uevent->attr.name, &uiter);
+-		ua_event_node = lttng_ht_iter_get_node_str(&uiter);
+-		if (ua_event_node == NULL) {
++		ua_event = find_ust_app_event(ua_chan->events, uevent->attr.name,
++				uevent->filter, uevent->attr.loglevel,
++				uevent->exclusion);
++		if (ua_event == NULL) {
+ 			DBG2("Event %s not found in channel %s for app pid %d."
+ 					"Skipping", uevent->attr.name, uchan->name, app->pid);
+ 			continue;
+ 		}
+-		ua_event = caa_container_of(ua_event_node, struct ust_app_event, node);
+ 
+ 		ret = disable_ust_app_event(ua_sess, ua_event, app);
+ 		if (ret < 0) {
+-- 
+1.7.9.5
+

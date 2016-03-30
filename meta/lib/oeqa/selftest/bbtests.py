@@ -1,8 +1,5 @@
-import unittest
 import os
-import logging
 import re
-import shutil
 
 import oeqa.utils.ftools as ftools
 from oeqa.selftest.base import oeSelfTest
@@ -68,15 +65,43 @@ class BitbakeTests(oeSelfTest):
         bitbake('-cclean man')
         self.assertTrue("ERROR: Function failed: patch_do_patch" in result.output, msg = "Though no man-1.5h1-make.patch file exists, bitbake didn't output any err. message. bitbake output: %s" % result.output)
 
+    @testcase(1354)
+    def test_force_task_1(self):
+        # test 1 from bug 5875
+        test_recipe = 'zlib'
+        test_data = "Microsoft Made No Profit From Anyone's Zunes Yo"
+        image_dir = get_bb_var('D', test_recipe)
+        pkgsplit_dir = get_bb_var('PKGDEST', test_recipe)
+        man_dir = get_bb_var('mandir', test_recipe)
+
+        bitbake('-c cleansstate %s' % test_recipe)
+        bitbake(test_recipe)
+        self.add_command_to_tearDown('bitbake -c clean %s' % test_recipe)
+
+        man_file = os.path.join(image_dir + man_dir, 'man3/zlib.3')
+        ftools.append_file(man_file, test_data)
+        bitbake('-c package -f %s' % test_recipe)
+
+        man_split_file = os.path.join(pkgsplit_dir, 'zlib-doc' + man_dir, 'man3/zlib.3')
+        man_split_content = ftools.read_file(man_split_file)
+        self.assertIn(test_data, man_split_content, 'The man file has not changed in packages-split.')
+
+        ret = bitbake(test_recipe)
+        self.assertIn('task do_package_write_rpm:', ret.output, 'Task do_package_write_rpm did not re-executed.')
+
     @testcase(163)
-    def test_force_task(self):
-        bitbake('m4-native')
-        self.add_command_to_tearDown('bitbake -c clean m4-native')
-        result = bitbake('-C compile m4-native')
-        look_for_tasks = ['do_compile', 'do_install', 'do_populate_sysroot']
+    def test_force_task_2(self):
+        # test 2 from bug 5875
+        test_recipe = 'zlib'
+
+        bitbake('-c cleansstate %s' % test_recipe)
+        bitbake(test_recipe)
+        self.add_command_to_tearDown('bitbake -c clean %s' % test_recipe)
+
+        result = bitbake('-C compile %s' % test_recipe)
+        look_for_tasks = ['do_compile:', 'do_install:', 'do_populate_sysroot:', 'do_package:']
         for task in look_for_tasks:
-            find_task = re.search("m4-native.*%s" % task, result.output)
-            self.assertTrue(find_task, msg = "Couldn't find %s task. bitbake output %s" % (task, result.output))
+            self.assertIn(task, result.output, msg="Couldn't find %s task.")
 
     @testcase(167)
     def test_bitbake_g(self):
@@ -101,6 +126,8 @@ class BitbakeTests(oeSelfTest):
         self.write_config("""DL_DIR = \"${TOPDIR}/download-selftest\"
 SSTATE_DIR = \"${TOPDIR}/download-selftest\"
 """)
+        self.track_for_cleanup(os.path.join(self.builddir, "download-selftest"))
+
         bitbake('-ccleanall man')
         result = bitbake('-c fetch man', ignore_status=True)
         bitbake('-ccleanall man')
@@ -116,20 +143,20 @@ doesn't exist, yet fetcher didn't report any error. bitbake output: %s" % result
         self.write_config("""DL_DIR = \"${TOPDIR}/download-selftest\"
 SSTATE_DIR = \"${TOPDIR}/download-selftest\"
 """)
+        self.track_for_cleanup(os.path.join(self.builddir, "download-selftest"))
+
         data = 'SRC_URI_append = ";downloadfilename=test-aspell.tar.gz"'
         self.write_recipeinc('aspell', data)
         bitbake('-ccleanall aspell')
         result = bitbake('-c fetch aspell', ignore_status=True)
         self.delete_recipeinc('aspell')
-        self.addCleanup(bitbake, '-ccleanall aspell')
         self.assertEqual(result.status, 0, msg = "Couldn't fetch aspell. %s" % result.output)
         self.assertTrue(os.path.isfile(os.path.join(get_bb_var("DL_DIR"), 'test-aspell.tar.gz')), msg = "File rename failed. No corresponding test-aspell.tar.gz file found under %s" % str(get_bb_var("DL_DIR")))
         self.assertTrue(os.path.isfile(os.path.join(get_bb_var("DL_DIR"), 'test-aspell.tar.gz.done')), "File rename failed. No corresponding test-aspell.tar.gz.done file found under %s" % str(get_bb_var("DL_DIR")))
 
     @testcase(1028)
     def test_environment(self):
-        self.append_config("TEST_ENV=\"localconf\"")
-        self.addCleanup(self.remove_config, "TEST_ENV=\"localconf\"")
+        self.write_config("TEST_ENV=\"localconf\"")
         result = runCmd('bitbake -e | grep TEST_ENV=')
         self.assertTrue('localconf' in result.output, msg = "bitbake didn't report any value for TEST_ENV variable. To test, run 'bitbake -e | grep TEST_ENV='")
 
@@ -156,8 +183,7 @@ SSTATE_DIR = \"${TOPDIR}/download-selftest\"
         ftools.write_file(preconf ,"TEST_PREFILE=\"prefile\"")
         result = runCmd('bitbake -r conf/prefile.conf -e | grep TEST_PREFILE=')
         self.assertTrue('prefile' in result.output, "Preconfigure file \"prefile.conf\"was not taken into consideration. ")
-        self.append_config("TEST_PREFILE=\"localconf\"")
-        self.addCleanup(self.remove_config, "TEST_PREFILE=\"localconf\"")
+        self.write_config("TEST_PREFILE=\"localconf\"")
         result = runCmd('bitbake -r conf/prefile.conf -e | grep TEST_PREFILE=')
         self.assertTrue('localconf' in result.output, "Preconfigure file \"prefile.conf\"was not taken into consideration.")
 
@@ -166,8 +192,7 @@ SSTATE_DIR = \"${TOPDIR}/download-selftest\"
         postconf = os.path.join(self.builddir, 'conf/postfile.conf')
         self.track_for_cleanup(postconf)
         ftools.write_file(postconf , "TEST_POSTFILE=\"postfile\"")
-        self.append_config("TEST_POSTFILE=\"localconf\"")
-        self.addCleanup(self.remove_config, "TEST_POSTFILE=\"localconf\"")
+        self.write_config("TEST_POSTFILE=\"localconf\"")
         result = runCmd('bitbake -R conf/postfile.conf -e | grep TEST_POSTFILE=')
         self.assertTrue('postfile' in result.output, "Postconfigure file \"postfile.conf\"was not taken into consideration.")
 
@@ -181,6 +206,7 @@ SSTATE_DIR = \"${TOPDIR}/download-selftest\"
         self.write_config("""DL_DIR = \"${TOPDIR}/download-selftest\"
 SSTATE_DIR = \"${TOPDIR}/download-selftest\"
 """)
+        self.track_for_cleanup(os.path.join(self.builddir, "download-selftest"))
         self.write_recipeinc('man',"\ndo_fail_task () {\nexit 1 \n}\n\naddtask do_fail_task before do_fetch\n" )
         runCmd('bitbake -c cleanall man xcursor-transparent-theme')
         result = runCmd('bitbake man xcursor-transparent-theme -k', ignore_status=True)

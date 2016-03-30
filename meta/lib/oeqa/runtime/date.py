@@ -4,11 +4,11 @@ import re
 
 class DateTest(oeRuntimeTest):
 
-    def setUp(self):
+    def setUpLocal(self):
         if oeRuntimeTest.tc.d.getVar("VIRTUAL-RUNTIME_init_manager", True) == "systemd":
             self.target.run('systemctl stop systemd-timesyncd')
 
-    def tearDown(self):
+    def tearDownLocal(self):
         if oeRuntimeTest.tc.d.getVar("VIRTUAL-RUNTIME_init_manager", True) == "systemd":
             self.target.run('systemctl start systemd-timesyncd')
 

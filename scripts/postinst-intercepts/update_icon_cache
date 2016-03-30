@@ -1,8 +1,9 @@
 #!/bin/sh
 
 set -e
+
 # update native pixbuf loaders
-gdk-pixbuf-query-loaders --update-cache
+$STAGING_DIR_NATIVE/${libdir_native}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders --update-cache
 
 for icondir in $D/usr/share/icons/*/ ; do
     if [ -d $icondir ] ; then
