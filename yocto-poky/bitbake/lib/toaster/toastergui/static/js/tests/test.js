@@ -13,8 +13,6 @@ QUnit.test("Layer alert notification", function(assert) {
     "name":"meta-example"
   };
 
-  var correctResponse = "You have added <strong>3</strong> layers to your project: <a id=\"layer-affected-name\" href=\"/toastergui/project/1/layer/22\">meta-example</a> and its dependencies <a href=\"/toastergui/project/1/layer/9\" data-original-title=\"\" title=\"\">meta-example-two</a>, <a href=\"/toastergui/project/1/layer/9\" data-original-title=\"\" title=\"\">meta-example-three</a>";
-
   var layerDepsList = [
     {
     "layerdetailurl":"/toastergui/project/1/layer/9",
@@ -68,9 +66,9 @@ QUnit.test("Show notification", function(assert){
 });
 
 var layer = {
-  "id": 91,
-  "name":  "meta-crystalforest",
-  "layerdetailurl": "/toastergui/project/4/layer/91"
+  "id": 1,
+  "name":  "meta-testing",
+  "layerdetailurl": "/toastergui/project/1/layer/1"
 };
 
 QUnit.test("Add layer", function(assert){
@@ -84,11 +82,19 @@ QUnit.test("Add layer", function(assert){
     }
   }, 200);
 
-  libtoaster.addRmLayer(layer, true, function(deps){
-    assert.equal(deps.length, 1);
-    done();
-  });
+  /* Compare the number of layers before and after the add in the project */
+  libtoaster.getProjectInfo(libtoaster.ctx.projectPageUrl, function(prjInfo){
+    var origNumLayers = prjInfo.layers.length;
 
+    libtoaster.addRmLayer(layer, true, function(deps){
+      libtoaster.getProjectInfo(libtoaster.ctx.projectPageUrl,
+        function(prjInfo){
+        assert.ok(prjInfo.layers.length > origNumLayers,
+          "Layer not added to project");
+        done();
+      });
+    });
+  });
 });
 
 QUnit.test("Rm layer", function(assert){
@@ -152,11 +158,11 @@ QUnit.test("Layer details page init", function(assert){
 });
 
 QUnit.test("Layer btns init", function(assert){
-  assert.throws(layerBtnsInit({ projectLayers : [] }));
+  assert.throws(layerBtnsInit());
 });
 
 QUnit.test("Table init", function(assert){
-  assert.throws(tableInit({ url : tableUrl }));
+  assert.throws(tableInit({ url : ctx.tableUrl }));
 });
 
 $(document).ajaxError(function(event, jqxhr, settings, errMsg){
@@ -167,9 +173,3 @@ $(document).ajaxError(function(event, jqxhr, settings, errMsg){
     assert.notOk(jqxhr.responseText);
   });
 });
-
-
-
-
-
-

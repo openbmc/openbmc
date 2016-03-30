@@ -1,0 +1,55 @@
+From 8068659388127e8e63f2d2297ba2348c72b20705 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Mon, 12 Oct 2015 03:19:51 -0400
+Subject: [PATCH] bzip2: fix bunzip2 -qt returns 0 for corrupt archives
+
+"bzip2 -t FILE" returns 2 if FILE exists, but is not a valid bzip2 file.
+"bzip2 -qt FILE" returns 0 when this happens, although it does print out
+an error message as is does so.
+
+This has been fix by Debian, just port changes from Debian patch file
+"20-legacy.patch".
+
+Debian defect:
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=279025
+
+Fix item from changelog:
+http://archive.debian.net/changelogs/pool/main/b/bzip2/bzip2_1.0.2-7/changelog
+
+  * Fixed "bunzip2 -qt returns 0 for corrupt archives" (Closes: #279025).
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ bzip2.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/bzip2.c b/bzip2.c
+index 6de9d1d..f2ce668 100644
+--- a/bzip2.c
++++ b/bzip2.c
+@@ -2003,12 +2003,14 @@ IntNative main ( IntNative argc, Char *argv[] )
+             testf ( aa->name );
+ 	 }
+       }
+-      if (testFailsExist && noisy) {
+-         fprintf ( stderr,
+-           "\n"
+-           "You can use the `bzip2recover' program to attempt to recover\n"
+-           "data from undamaged sections of corrupted files.\n\n"
+-         );
++      if (testFailsExist) {
++         if (noisy) {
++            fprintf ( stderr,
++              "\n"
++              "You can use the `bzip2recover' program to attempt to recover\n"
++              "data from undamaged sections of corrupted files.\n\n"
++            );
++         }
+          setExit(2);
+          exit(exitValue);
+       }
+-- 
+1.9.1
+

@@ -1,0 +1,18 @@
+Remove hardcoded paths so OE's configure QA does not detect it and fail the builds
+For cross compilation is less interesting to look into host paths for target libraries anyway
+
+Upstream-Status: Inappropriate [OE Specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: coreutils-6.9/m4/getloadavg.m4
+===================================================================
+--- coreutils-6.9.orig/m4/getloadavg.m4
++++ coreutils-6.9/m4/getloadavg.m4
+@@ -49,7 +49,6 @@ if test $gl_have_func = no; then
+   # There is a commonly available library for RS/6000 AIX.
+   # Since it is not a standard part of AIX, it might be installed locally.
+   gl_getloadavg_LIBS=$LIBS
+-  LIBS="-L/usr/local/lib $LIBS"
+   AC_CHECK_LIB(getloadavg, getloadavg,
+ 	       [LIBS="-lgetloadavg $LIBS"], [LIBS=$gl_getloadavg_LIBS])
+ fi

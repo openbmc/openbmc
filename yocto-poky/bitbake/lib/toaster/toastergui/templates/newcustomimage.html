@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load projecttags %}
+{% load humanize %}
+{% load static %}
+{% block pagecontent %}
+
+<script src="{% static 'js/newcustomimage.js' %}"></script>
+<script>
+  $(document).ready(function (){
+    var ctx = {
+      xhrCustomRecipeUrl : "{% url 'xhr_customrecipe' %}",
+    };
+
+    try {
+      newCustomImagePageInit(ctx);
+    } catch (e) {
+      document.write("Sorry, An error has occurred loading this page");
+      console.warn(e);
+    }
+  });
+</script>
+
+</script>
+<div class="modal hide fade in" id="new-custom-image-modal" aria-hidden="false">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3>Name your custom image</h3>
+  </div>
+  <div class="modal-body">
+    <div class="row-fluid">
+      <span class="help-block span8">Image names must be unique. They should not contain spaces or capital letters, and the only allowed special character is dash (-).<p></p>
+      </span></div>
+    <div class="control-group controls">
+      <input type="text" class="huge span5" placeholder="Type the name, something like 'core-image-myimage'">
+        <span class="help-block" style="display:none">Image names cannot contain spaces or capital letters. The only allowed special character is dash (-)</span>
+        <span class="help-block" style="display: none">An image with this name already exists. Image names must be unique: try a different one.</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a href="#" id="create-new-custom-image-btn" class="btn btn-primary btn-large" data-original-title="" title="">Create custom image</a>
+    </div>
+</div>
+
+{% include "projecttopbar.html" %}
+
+
+{% url table_name project.id as xhr_table_url %}
+{% include "toastertable.html" %}
+
+
+
+{% endblock %}
+
+

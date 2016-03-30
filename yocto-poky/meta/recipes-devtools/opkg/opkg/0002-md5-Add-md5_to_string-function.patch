@@ -1,0 +1,110 @@
+From ecad8afab377d8be95eeaafc08afa228c8e030c3 Mon Sep 17 00:00:00 2001
+From: Paul Barker <paul@paulbarker.me.uk>
+Date: Sat, 7 Nov 2015 10:23:50 +0000
+Subject: [PATCH 2/4] md5: Add md5_to_string function
+
+Signed-off-by: Paul Barker <paul@paulbarker.me.uk>
+Signed-off-by: Alejandro del Castillo <alejandro.delcastillo@ni.com>
+
+Upstream-Status: Accepted
+---
+ libopkg/file_util.c | 28 +++-------------------------
+ libopkg/md5.c       |  7 +++++++
+ libopkg/md5.h       |  3 +++
+ 3 files changed, 13 insertions(+), 25 deletions(-)
+
+diff --git a/libopkg/file_util.c b/libopkg/file_util.c
+index 5eff469..cb3dbf0 100644
+--- a/libopkg/file_util.c
++++ b/libopkg/file_util.c
+@@ -349,27 +349,13 @@ int file_mkdir_hier(const char *path, long mode)
+ 
+ char *file_md5sum_alloc(const char *file_name)
+ {
+-    static const int md5sum_bin_len = 16;
+-    static const int md5sum_hex_len = 32;
+-
+-    static const unsigned char bin2hex[16] = {
+-        '0', '1', '2', '3',
+-        '4', '5', '6', '7',
+-        '8', '9', 'a', 'b',
+-        'c', 'd', 'e', 'f'
+-    };
+-
+-    int i, err;
++    int err;
+     FILE *file;
+-    char *md5sum_hex;
+-    unsigned char md5sum_bin[md5sum_bin_len];
+-
+-    md5sum_hex = xcalloc(1, md5sum_hex_len + 1);
++    unsigned char md5sum_bin[16];
+ 
+     file = fopen(file_name, "r");
+     if (file == NULL) {
+         opkg_perror(ERROR, "Failed to open file %s", file_name);
+-        free(md5sum_hex);
+         return NULL;
+     }
+ 
+@@ -377,20 +363,12 @@ char *file_md5sum_alloc(const char *file_name)
+     if (err) {
+         opkg_msg(ERROR, "Could't compute md5sum for %s.\n", file_name);
+         fclose(file);
+-        free(md5sum_hex);
+         return NULL;
+     }
+ 
+     fclose(file);
+ 
+-    for (i = 0; i < md5sum_bin_len; i++) {
+-        md5sum_hex[i * 2] = bin2hex[md5sum_bin[i] >> 4];
+-        md5sum_hex[i * 2 + 1] = bin2hex[md5sum_bin[i] & 0xf];
+-    }
+-
+-    md5sum_hex[md5sum_hex_len] = '\0';
+-
+-    return md5sum_hex;
++    return md5_to_string(md5sum_bin);
+ }
+ 
+ #ifdef HAVE_SHA256
+diff --git a/libopkg/md5.c b/libopkg/md5.c
+index d476b8b..bc2b229 100644
+--- a/libopkg/md5.c
++++ b/libopkg/md5.c
+@@ -30,6 +30,8 @@
+ #include <string.h>
+ #include <sys/types.h>
+ 
++#include "string_util.h"
++
+ #if USE_UNLOCKED_IO
+ #include "unlocked-io.h"
+ #endif
+@@ -431,3 +433,8 @@ void md5_process_block(const void *buffer, size_t len, struct md5_ctx *ctx)
+     ctx->C = C;
+     ctx->D = D;
+ }
++
++char *md5_to_string(const void *md5sum_bin)
++{
++    return bin_to_hex(md5sum_bin, 16);
++}
+diff --git a/libopkg/md5.h b/libopkg/md5.h
+index 01320f5..2a7274d 100644
+--- a/libopkg/md5.h
++++ b/libopkg/md5.h
+@@ -118,6 +118,9 @@ extern int __md5_stream(FILE * stream, void *resblock) __THROW;
+ extern void *__md5_buffer(const char *buffer, size_t len,
+                           void *resblock) __THROW;
+ 
++/* Convert a binary md5sum value to an ASCII string. */
++char *md5_to_string(const void *md5sum_bin);
++
+ #ifdef __cplusplus
+ }
+ #endif
+-- 
+1.9.1
+

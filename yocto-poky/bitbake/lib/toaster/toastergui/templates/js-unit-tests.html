@@ -22,9 +22,11 @@
 <script src="{% static 'js/table.js' %}"></script>
 
 <script>
-  var tableUrl = '{% url 'projectlayers' project.pk %}';
+  var ctx = {
+    tableUrl : '{% url 'projectlayers' project.pk %}',
+    projectId : {{project.pk}},
+  }
 </script>
-
 <script src="{% static 'js/tests/test.js' %}"></script>
 
 <div id="qunit"></div>
@@ -34,6 +36,12 @@
 <input type="text" id="projects" placeholder="projects"></input>
 <input type="text" id="machines" placeholder="machines"></input>
 
+<!-- import layer dependency input typeahead -->
+<input type="text" id="layer-dependency" style="display:none"></input>
+<!-- project page input typeaheads -->
+<input type="text" id="layer-add-input" style="display:none"></input>
+<input type="text" id="machine-change-input" style="display:none"></input>
+<!-- import layer dependency input typeahead on layer details edit layer -->
+<input type="text" id="layer-dep-input" style="display:none"></input>
+
 {% endblock %}
-
-

@@ -1,0 +1,16 @@
+<button class="btn btn-block btn-danger add-rm-package-btn" id="package-rm-btn-{{data.pk}}" data-directive="remove" data-package="{{data.pk}}" data-package-url="{% url 'xhr_customrecipe_packages' extra.recipe_id data.pk %}" style="
+  {% if data.pk not in extra.current_packages %}
+    display:none
+  {% endif %}
+  ">
+  <i class="icon-trash no-tooltip"></i>
+  Remove package
+</a>
+<button class="btn btn-block add-rm-package-btn" data-directive="add" id="package-add-btn-{{data.pk}}" data-package="{{data.pk}}" data-package-url="{% url 'xhr_customrecipe_packages' extra.recipe_id data.pk %}" style="
+  {% if data.pk in extra.current_packages %}
+    display:none
+  {% endif %}
+    ">
+<i class="icon-plus"></i>
+ Add package
+</button>

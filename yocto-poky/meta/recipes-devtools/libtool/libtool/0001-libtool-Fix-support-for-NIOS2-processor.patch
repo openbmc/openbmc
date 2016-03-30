@@ -1,0 +1,68 @@
+From df2cd898e48208f26320d40c3ed6b19c75c27142 Mon Sep 17 00:00:00 2001
+From: Marek Vasut <marex@denx.de>
+Date: Thu, 17 Sep 2015 00:43:15 +0200
+Subject: [PATCH] libtool: Fix support for NIOS2 processor
+
+The name of the system contains the string "nios2". This string
+is caught by the some of the greedy checks for OS/2 in libtool,
+in particular the *os2* branches of switch statements match for
+the nios2 string, which results in incorrect behavior of libtool.
+
+This patch adds an explicit check for *nios2* before the *os2*
+checks to prevent the OS/2 check incorrectly trapping the nios2
+as well.
+
+Signed-off-by: Marek Vasut <marex@denx.de>
+Upstream-Status: Submitted
+---
+ build-aux/ltmain.in | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
+index d5cf07a..4164284 100644
+--- a/build-aux/ltmain.in
++++ b/build-aux/ltmain.in
+@@ -504,6 +504,12 @@ libtool_validate_options ()
+     test : = "$debug_cmd" || func_append preserve_args " --debug"
+ 
+     case $host in
++      # For NIOS2, we want to make sure that it's not caught by the
++      # more general OS/2 check below. Otherwise, NIOS2 is the same
++      # as the default option.
++      *nios2*)
++        opt_duplicate_compiler_generated_deps=$opt_preserve_dup_deps
++        ;;
+       # Solaris2 added to fix http://debbugs.gnu.org/cgi/bugreport.cgi?bug=16452
+       # see also: http://gcc.gnu.org/bugzilla/show_bug.cgi?id=59788
+       *cygwin* | *mingw* | *pw32* | *cegcc* | *solaris2* | *os2*)
+@@ -6220,6 +6226,15 @@ func_mode_link ()
+ 	if test -n "$library_names" &&
+ 	   { test no = "$use_static_libs" || test -z "$old_library"; }; then
+ 	  case $host in
++	  *nios2*)
++	    # For NIOS2, we want to make sure that it's not caught by the
++	    # more general OS/2 check below. Otherwise, NIOS2 is the same
++	    # as the default option.
++	    if test no = "$installed"; then
++	      func_append notinst_deplibs " $lib"
++	      need_relink=yes
++	    fi
++	    ;;
+ 	  *cygwin* | *mingw* | *cegcc* | *os2*)
+ 	      # No point in relinking DLLs because paths are not encoded
+ 	      func_append notinst_deplibs " $lib"
+@@ -6290,6 +6305,11 @@ func_mode_link ()
+ 	    elif test -n "$soname_spec"; then
+ 	      # bleh windows
+ 	      case $host in
++	      *nios2*)
++		# For NIOS2, we want to make sure that it's not caught by the
++		# more general OS/2 check below. Otherwise, NIOS2 is the same
++		# as the default option.
++		;;
+ 	      *cygwin* | mingw* | *cegcc* | *os2*)
+ 	        func_arith $current - $age
+ 		major=$func_arith_result
+-- 
+2.5.1
+

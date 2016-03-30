@@ -9,6 +9,7 @@ PR = "r2"
 SRC_URI = "http://www.mega-nerd.com/libsndfile/files/libsndfile-${PV}.tar.gz \
            file://0001-src-sd2.c-Fix-segfault-in-SD2-RSRC-parser.patch \
            file://0001-src-sd2.c-Fix-two-potential-buffer-read-overflows.patch \
+           file://libsndfile-fix-CVE-2014-9756.patch \
 "
 
 SRC_URI[md5sum] = "e2b7bb637e01022c7d20f95f9c3990a2"

@@ -28,16 +28,15 @@ do_configure () {
 		-Dcf_by="Open Embedded" \
 		-Dprefix=${prefix} \
 		-Dvendorprefix=${prefix} \
-		-Dvendorprefix=${prefix} \
 		-Dsiteprefix=${prefix} \
 		\
 		-Dbin=${STAGING_BINDIR}/${PN} \
 		-Dprivlib=${STAGING_LIBDIR}/perl/${PV} \
 		-Darchlib=${STAGING_LIBDIR}/perl/${PV} \
-		-Dvendorlib=${STAGING_LIBDIR}/perl/${PV} \
-		-Dvendorarch=${STAGING_LIBDIR}/perl/${PV} \
-		-Dsitelib=${STAGING_LIBDIR}/perl/${PV} \
-		-Dsitearch=${STAGING_LIBDIR}/perl/${PV} \
+		-Dvendorlib=${STAGING_LIBDIR}/perl/vendor_perl/${PV} \
+		-Dvendorarch=${STAGING_LIBDIR}/perl/vendor_perl/${PV} \
+		-Dsitelib=${STAGING_LIBDIR}/perl/site_perl/${PV} \
+		-Dsitearch=${STAGING_LIBDIR}/perl/site_perl/${PV} \
 		\
 		-Duseshrplib \
 		-Dusethreads \
@@ -95,8 +94,11 @@ do_install () {
 		install $i ${D}${libdir}/perl/${PV}/CORE
 	done
 
-	create_wrapper ${D}${bindir}/perl PERL5LIB='$PERL5LIB:${STAGING_LIBDIR}/perl/${PV}:${STAGING_LIBDIR}/perl:${STAGING_LIBDIR}/perl/site_perl/${PV}:${STAGING_LIBDIR}/perl/vendor_perl/${PV}'
-	create_wrapper ${D}${bindir}/perl${PV} PERL5LIB='$PERL5LIB:${STAGING_LIBDIR}/perl/${PV}:${STAGING_LIBDIR}/perl${STAGING_LIBDIR}/perl:${STAGING_LIBDIR}/perl/site_perl/${PV}:${STAGING_LIBDIR}/perl/vendor_perl/${PV}'
+	# Those wrappers mean that perl installed from sstate (which may change
+	# path location) works and that in the nativesdk case, the SDK can be
+	# installed to a different location from the one it was built for.
+	create_wrapper ${D}${bindir}/perl PERL5LIB='$PERL5LIB:${STAGING_LIBDIR}/perl/site_perl/${PV}:${STAGING_LIBDIR}/perl/vendor_perl/${PV}:${STAGING_LIBDIR}/perl/${PV}'
+	create_wrapper ${D}${bindir}/perl${PV} PERL5LIB='$PERL5LIB:${STAGING_LIBDIR}/perl/site_perl/${PV}:${STAGING_LIBDIR}/perl/vendor_perl/${PV}:${STAGING_LIBDIR}/perl/${PV}'
 
 	# Use /usr/bin/env nativeperl for the perl script.
 	for f in `grep -Il '#! *${bindir}/perl' ${D}/${bindir}/*`; do

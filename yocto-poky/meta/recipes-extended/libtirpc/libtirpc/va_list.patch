@@ -1,0 +1,18 @@
+This patch is fixing build with uclibc where compiler ( gcc5 ) says it cant find va_list
+the patch is right for upstreaming as well
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+
+Index: libtirpc-0.2.5/src/debug.h
+===================================================================
+--- libtirpc-0.2.5.orig/src/debug.h
++++ libtirpc-0.2.5/src/debug.h
+@@ -22,6 +22,7 @@
+ #ifndef _DEBUG_H
+ #define _DEBUG_H
+ #include <syslog.h>
++#include <stdarg.h>
+ 
+ extern int libtirpc_debug_level;
+ extern int  log_stderr;

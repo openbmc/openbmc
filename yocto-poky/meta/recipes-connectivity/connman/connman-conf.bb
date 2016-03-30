@@ -13,14 +13,14 @@ S = "${WORKDIR}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-FILES_${PN} = "${localstatedir}/* ${libdir}/*"
+FILES_${PN} = "${localstatedir}/* ${datadir}/*"
 
 do_install() {
     #Configure Wired network interface in case of qemu* machines
     if test -e ${WORKDIR}/wired.config && test -e ${WORKDIR}/wired-setup; then
         install -d ${D}${localstatedir}/lib/connman
         install -m 0644 ${WORKDIR}/wired.config ${D}${localstatedir}/lib/connman
-        install -d ${D}${libdir}/connman
-        install -m 0755 ${WORKDIR}/wired-setup ${D}${libdir}/connman
+        install -d ${D}${datadir}/connman
+        install -m 0755 ${WORKDIR}/wired-setup ${D}${datadir}/connman
     fi
 }

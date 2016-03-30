@@ -12,7 +12,9 @@ SRC_URI = "http://curl.haxx.se/download/curl-${PV}.tar.bz2 \
 # curl likes to set -g0 in CFLAGS, so we stop it
 # from mucking around with debug options
 #
-SRC_URI += " file://configure_ac.patch"
+SRC_URI += " file://configure_ac.patch \
+             file://CVE-2016-0754.patch \
+             file://CVE-2016-0755.patch"
 
 SRC_URI[md5sum] = "6b952ca00e5473b16a11f05f06aa8dae"
 SRC_URI[sha256sum] = "1e2541bae6582bb697c0fbae49e1d3e6fad5d05d5aa80dbd6f072e0a44341814"
@@ -43,6 +45,11 @@ EXTRA_OECONF += "${@bb.utils.contains('DISTRO_FEATURES', 'largefile', 'ac_cv_siz
 
 do_install_append() {
 	oe_multilib_header curl/curlbuild.h
+}
+
+do_install_append_class-target() {
+	# cleanup buildpaths from curl-config
+	sed -i -e 's,${STAGING_DIR_HOST},,g' ${D}${bindir}/curl-config
 }
 
 PACKAGES =+ "lib${BPN}"

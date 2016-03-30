@@ -1,3 +1,15 @@
+Ubuntu defaults to passing _FORTIFY_SOURCE=2 which breaks byacc as it doesn't
+pass enough arguments to open():
+
+ inlined from 'open_tmpfile' at byacc-20150711/main.c:588:5:
+ /usr/include/x86_64-linux-gnu/bits/fcntl2.h:50:24: error: call to '__open_missing_mode' declared with attribute error:
+ open with O_CREAT in second argument needs 3 arguments
+
+Add a mode of 0666 to fix this.
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
 diff --git a/main.c b/main.c
 index 620ce3f..82071a4 100644
 --- a/main.c

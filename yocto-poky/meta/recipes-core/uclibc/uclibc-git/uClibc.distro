@@ -182,6 +182,8 @@ UCLIBC_HAS_FLOATS=y
 
 # COMPILE_IN_THUMB_MODE is not set
 
+# needed by shadow
+UCLIBC_HAS_UTMP=y
 # needed by systemd
 UCLIBC_HAS_UTMPX=y
 UCLIBC_LINUX_MODULE_26=y

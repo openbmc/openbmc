@@ -1177,7 +1177,7 @@ def edit_metadata(meta_lines, variables, varfunc, match_overrides=False):
             if not skip:
                 if checkspc:
                     checkspc = False
-                    if newlines[-1] == '\n' and line == '\n':
+                    if newlines and newlines[-1] == '\n' and line == '\n':
                         # Squash blank line if there are two consecutive blanks after a removal
                         continue
                 newlines.append(line)
@@ -1201,13 +1201,32 @@ def edit_metadata_file(meta_file, variables, varfunc):
 
 
 def edit_bblayers_conf(bblayers_conf, add, remove):
-    """Edit bblayers.conf, adding and/or removing layers"""
+    """Edit bblayers.conf, adding and/or removing layers
+    Parameters:
+        bblayers_conf: path to bblayers.conf file to edit
+        add: layer path (or list of layer paths) to add; None or empty
+            list to add nothing
+        remove: layer path (or list of layer paths) to remove; None or
+            empty list to remove nothing
+    Returns a tuple:
+        notadded: list of layers specified to be added but weren't
+            (because they were already in the list)
+        notremoved: list of layers that were specified to be removed
+            but weren't (because they weren't in the list)
+    """
 
     import fnmatch
 
     def remove_trailing_sep(pth):
         if pth and pth[-1] == os.sep:
             pth = pth[:-1]
+        return pth
+
+    approved = bb.utils.approved_variables()
+    def canonicalise_path(pth):
+        pth = remove_trailing_sep(pth)
+        if 'HOME' in approved and '~' in pth:
+            pth = os.path.expanduser(pth)
         return pth
 
     def layerlist_param(value):
@@ -1218,47 +1237,79 @@ def edit_bblayers_conf(bblayers_conf, add, remove):
         else:
             return [remove_trailing_sep(value)]
 
-    notadded = []
-    notremoved = []
-
     addlayers = layerlist_param(add)
     removelayers = layerlist_param(remove)
 
     # Need to use a list here because we can't set non-local variables from a callback in python 2.x
     bblayercalls = []
+    removed = []
+    plusequals = False
+    orig_bblayers = []
+
+    def handle_bblayers_firstpass(varname, origvalue, op, newlines):
+        bblayercalls.append(op)
+        if op == '=':
+            del orig_bblayers[:]
+        orig_bblayers.extend([canonicalise_path(x) for x in origvalue.split()])
+        return (origvalue, None, 2, False)
 
     def handle_bblayers(varname, origvalue, op, newlines):
-        bblayercalls.append(varname)
         updated = False
         bblayers = [remove_trailing_sep(x) for x in origvalue.split()]
         if removelayers:
             for removelayer in removelayers:
-                matched = False
                 for layer in bblayers:
-                    if fnmatch.fnmatch(layer, removelayer):
+                    if fnmatch.fnmatch(canonicalise_path(layer), canonicalise_path(removelayer)):
                         updated = True
-                        matched = True
                         bblayers.remove(layer)
+                        removed.append(removelayer)
                         break
-                if not matched:
-                    notremoved.append(removelayer)
-        if addlayers:
+        if addlayers and not plusequals:
             for addlayer in addlayers:
                 if addlayer not in bblayers:
                     updated = True
                     bblayers.append(addlayer)
-                else:
-                    notadded.append(addlayer)
+            del addlayers[:]
 
         if updated:
+            if op == '+=' and not bblayers:
+                bblayers = None
             return (bblayers, None, 2, False)
         else:
             return (origvalue, None, 2, False)
 
-    edit_metadata_file(bblayers_conf, ['BBLAYERS'], handle_bblayers)
+    with open(bblayers_conf, 'r') as f:
+        (_, newlines) = edit_metadata(f, ['BBLAYERS'], handle_bblayers_firstpass)
 
     if not bblayercalls:
         raise Exception('Unable to find BBLAYERS in %s' % bblayers_conf)
+
+    # Try to do the "smart" thing depending on how the user has laid out
+    # their bblayers.conf file
+    if bblayercalls.count('+=') > 1:
+        plusequals = True
+
+    removelayers_canon = [canonicalise_path(layer) for layer in removelayers]
+    notadded = []
+    for layer in addlayers:
+        layer_canon = canonicalise_path(layer)
+        if layer_canon in orig_bblayers and not layer_canon in removelayers_canon:
+            notadded.append(layer)
+    notadded_canon = [canonicalise_path(layer) for layer in notadded]
+    addlayers[:] = [layer for layer in addlayers if canonicalise_path(layer) not in notadded_canon]
+
+    (updated, newlines) = edit_metadata(newlines, ['BBLAYERS'], handle_bblayers)
+    if addlayers:
+        # Still need to add these
+        for addlayer in addlayers:
+            newlines.append('BBLAYERS += "%s"\n' % addlayer)
+        updated = True
+
+    if updated:
+        with open(bblayers_conf, 'w') as f:
+            f.writelines(newlines)
+
+    notremoved = list(set(removelayers) - set(removed))
 
     return (notadded, notremoved)
 
@@ -1310,3 +1361,27 @@ def signal_on_parent_exit(signame):
     result = cdll['libc.so.6'].prctl(PR_SET_PDEATHSIG, signum)
     if result != 0:
         raise PrCtlError('prctl failed with error code %s' % result)
+
+#
+# Manually call the ioprio syscall. We could depend on other libs like psutil
+# however this gets us enough of what we need to bitbake for now without the
+# dependency
+#
+_unamearch = os.uname()[4]
+IOPRIO_WHO_PROCESS = 1
+IOPRIO_CLASS_SHIFT = 13
+
+def ioprio_set(who, cls, value):
+    NR_ioprio_set = None
+    if _unamearch == "x86_64":
+      NR_ioprio_set = 251
+    elif _unamearch[0] == "i" and _unamearch[2:3] == "86":
+      NR_ioprio_set = 289
+
+    if NR_ioprio_set:
+        ioprio = value | (cls << IOPRIO_CLASS_SHIFT)
+        rc = cdll['libc.so.6'].syscall(NR_ioprio_set, IOPRIO_WHO_PROCESS, who, ioprio)
+        if rc != 0:
+            raise ValueError("Unable to set ioprio, syscall returned %s" % rc)
+    else:
+        bb.warn("Unable to set IO Prio for arch %s" % _unamearch)

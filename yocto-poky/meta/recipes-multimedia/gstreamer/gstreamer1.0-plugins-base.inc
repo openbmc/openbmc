@@ -25,13 +25,12 @@ PACKAGECONFIG[ogg]     = "--enable-ogg,--disable-ogg,libogg"
 PACKAGECONFIG[theora]  = "--enable-theora,--disable-theora,libtheora"
 PACKAGECONFIG[vorbis]  = "--enable-vorbis,--disable-vorbis,libvorbis"
 PACKAGECONFIG[pango]   = "--enable-pango,--disable-pango,pango"
+# libvisual do not seem to exist anywhere in OE
+PACKAGECONFIG[visual]  = "--enable-libvisual,--disable-libvisual,libvisual"
+PACKAGECONFIG[cdparanoia] = "--enable-cdparanoia,--disable-cdparanoia,cdparanoia"
 
-
-# cdparanoia and libvisual do not seem to exist anywhere in OE
 EXTRA_OECONF += " \
     --disable-freetypetest \
-    --disable-cdparanoia \
-    --disable-libvisual \
 "
 
 FILES_${MLPREFIX}libgsttag-1.0 += "${datadir}/gst-plugins-base/1.0/license-translations.dict"

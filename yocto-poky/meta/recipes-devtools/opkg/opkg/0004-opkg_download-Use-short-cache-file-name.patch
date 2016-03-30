@@ -1,0 +1,85 @@
+From 61636f15718edc7ea17b91f22f1d97b905eaf951 Mon Sep 17 00:00:00 2001
+From: Paul Barker <paul@paulbarker.me.uk>
+Date: Sat, 7 Nov 2015 10:23:52 +0000
+Subject: [PATCH 4/4] opkg_download: Use short cache file name
+
+Source URIs can be very long. The cache directory itself may already have a very
+long path, especially if we're installing packages into an offline rootfs.
+Therefore it's not a good idea to simply tag the source URI onto the cache
+directory path to create a cache file name.
+
+To create shorter cache file names which are deterministic and very likely to be
+unique, we use the md5sum of the source URI along with the basename of the
+source URI. The basename is length limited to ensure that it the resulting
+filename length is always reasonable.
+
+Signed-off-by: Paul Barker <paul@paulbarker.me.uk>
+Signed-off-by: Alejandro del Castillo <alejandro.delcastillo@ni.com>
+
+Upstream-Status: Accepted
+---
+ libopkg/opkg_download.c | 35 ++++++++++++++++++++++++++++-------
+ 1 file changed, 28 insertions(+), 7 deletions(-)
+
+diff --git a/libopkg/opkg_download.c b/libopkg/opkg_download.c
+index e9b86a5..a37b10d 100644
+--- a/libopkg/opkg_download.c
++++ b/libopkg/opkg_download.c
+@@ -29,10 +29,18 @@
+ #include "opkg_verify.h"
+ #include "opkg_utils.h"
+ 
++#include "md5.h"
+ #include "sprintf_alloc.h"
+ #include "file_util.h"
+ #include "xfuncs.h"
+ 
++/* Limit the short file name used to generate cache file names to 90 characters
++ * so that when added to the md5sum (32 characters) and an underscore, the
++ * resulting length is below 128 characters. The maximum file name length
++ * differs between plaforms but 128 characters should be reasonable.
++ */
++#define MAX_SHORT_FILE_NAME_LENGTH 90
++
+ static int opkg_download_set_env()
+ {
+     int r;
+@@ -135,15 +143,28 @@ int opkg_download_internal(const char *src, const char *dest,
+  */
+ char *get_cache_location(const char *src)
+ {
+-    char *cache_name = xstrdup(src);
+-    char *cache_location, *p;
++    unsigned char md5sum_bin[16];
++    char *md5sum_hex;
++    char *cache_location;
++    char *short_file_name;
++    char *tmp = xstrdup(src);
+ 
+-    for (p = cache_name; *p; p++)
+-        if (*p == '/')
+-            *p = '_';
++    md5_buffer(src, strlen(src), md5sum_bin);
++    md5sum_hex = md5_to_string(md5sum_bin);
+ 
+-    sprintf_alloc(&cache_location, "%s/%s", opkg_config->cache_dir, cache_name);
+-    free(cache_name);
++    /* Generate a short file name which will be used along with an md5sum of the
++     * full src URI in the cache file name. This short file name is limited to
++     * MAX_SHORT_FILE_NAME_LENGTH to ensure that the total cache file name
++     * length is reasonable.
++     */
++    short_file_name = basename(tmp);
++    if (strlen(short_file_name) > MAX_SHORT_FILE_NAME_LENGTH)
++        short_file_name[MAX_SHORT_FILE_NAME_LENGTH] = '\0';
++
++    sprintf_alloc(&cache_location, "%s/%s_%s", opkg_config->cache_dir,
++                  md5sum_hex, short_file_name);
++    free(md5sum_hex);
++    free(tmp);
+     return cache_location;
+ }
+ 
+-- 
+1.9.1
+

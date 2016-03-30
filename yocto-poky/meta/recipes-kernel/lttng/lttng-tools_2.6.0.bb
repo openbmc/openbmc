@@ -28,6 +28,7 @@ SRC_URI = "git://git.lttng.org/lttng-tools.git;branch=stable-2.6 \
            file://extern-decls.patch \
            file://run-ptest \
            file://lttng-tools-Fix-live-timer-calculation-error.patch \
+           file://0001-Fix-sessiond-disable-match-app-event-by-name.patch \
 	  "
 
 S = "${WORKDIR}/git"
@@ -36,8 +37,6 @@ inherit autotools-brokensep ptest pkgconfig useradd
 
 USERADD_PACKAGES = "${PN}"
 GROUPADD_PARAM_${PN} = "tracing"
-
-export KERNELDIR="${STAGING_KERNEL_DIR}"
 
 FILES_${PN} += "${libdir}/lttng/libexec/* ${datadir}/xml/lttng \
                 ${libdir}/python${PYTHON_BASEVERSION}/site-packages/*"

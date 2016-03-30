@@ -20,11 +20,10 @@ EXTRA_OECONF += "--disable-valgrind --with-omx-target=${GSTREAMER_1_0_OMX_TARGET
 python __anonymous () {
     omx_target = d.getVar("GSTREAMER_1_0_OMX_TARGET", True)
     if omx_target in ['generic', 'bellagio']:
-        srcdir = d.getVar("S", True)
         # Bellagio headers are incomplete (they are missing the OMX_VERSION_MAJOR,#
         # OMX_VERSION_MINOR, OMX_VERSION_REVISION, and OMX_VERSION_STEP macros);
         # appending a directory path to gst-omx' internal OpenMAX IL headers fixes this
-        d.appendVar("CFLAGS", " -I%s/omx/openmax" % srcdir)
+        d.appendVar("CFLAGS", " -I${S}/omx/openmax")
     elif omx_target == "rpi":
         # Dedicated Raspberry Pi OpenMAX IL support makes this package machine specific
         d.setVar("PACKAGE_ARCH", d.getVar("MACHINE_ARCH", True))

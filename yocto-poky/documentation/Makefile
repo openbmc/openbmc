@@ -333,7 +333,7 @@ ALLPREQ = html tarball
 TARFILES = toaster-manual.html toaster-manual-style.css \
 	   figures/toaster-title.png figures/simple-configuration.png \
 	   figures/hosted-service.png
-MANUALS = $(DOC)/$(DOC).html $(DOC)/$(DOC).pdf
+MANUALS = $(DOC)/$(DOC).html
 FIGURES = figures
 STYLESHEET = $(DOC)/*.css
 endif

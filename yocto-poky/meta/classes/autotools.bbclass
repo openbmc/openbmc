@@ -77,16 +77,20 @@ CONFIGUREOPTS = " --build=${BUILD_SYS} \
 		  ${@append_libtool_sysroot(d)}"
 CONFIGUREOPT_DEPTRACK ?= "--disable-dependency-tracking"
 
+AUTOTOOLS_SCRIPT_PATH ?= "${S}"
+CONFIGURE_SCRIPT ?= "${AUTOTOOLS_SCRIPT_PATH}/configure"
+
+AUTOTOOLS_AUXDIR ?= "${AUTOTOOLS_SCRIPT_PATH}"
 
 oe_runconf () {
-	cfgscript="${S}/configure"
+	cfgscript="${CONFIGURE_SCRIPT}"
 	if [ -x "$cfgscript" ] ; then
 		bbnote "Running $cfgscript ${CONFIGUREOPTS} ${EXTRA_OECONF} $@"
 		set +e
 		${CACHED_CONFIGUREVARS} $cfgscript ${CONFIGUREOPTS} ${EXTRA_OECONF} "$@"
 		if [ "$?" != "0" ]; then
 			echo "Configure failed. The contents of all config.log files follows to aid debugging"
-			find ${S} -ignore_readdir_race -name config.log -print -exec cat {} \;
+			find ${B} -ignore_readdir_race -name config.log -print -exec cat {} \;
 			die "oe_runconf failed"
 		fi
 		set -e
@@ -94,8 +98,6 @@ oe_runconf () {
 		bbfatal "no configure script found at $cfgscript"
 	fi
 }
-
-AUTOTOOLS_AUXDIR ?= "${S}"
 
 CONFIGURESTAMPFILE = "${WORKDIR}/configure.sstate"
 
@@ -134,7 +136,7 @@ do_configure[postfuncs] += "autotools_postconfigure"
 ACLOCALDIR = "${B}/aclocal-copy"
 
 python autotools_copy_aclocals () {
-    s = d.getVar("S", True)
+    s = d.getVar("AUTOTOOLS_SCRIPT_PATH", True)
     if not os.path.exists(s + "/configure.in") and not os.path.exists(s + "/configure.ac"):
         if not d.getVar("AUTOTOOLS_COPYACLOCAL", False):
             return
@@ -168,9 +170,9 @@ python autotools_copy_aclocals () {
             for datadep in data[3]:
                 if datadep in done:
                     continue
-                done.append(datadep)
                 if (not data[0].endswith("-native")) and taskdepdata[datadep][0].endswith("-native") and dep != start:
                     continue
+                done.append(datadep)
                 new.append(datadep)
                 if taskdepdata[datadep][1] == "do_configure":
                     configuredeps.append(taskdepdata[datadep][0])
@@ -228,13 +230,13 @@ autotools_do_configure() {
 	( for ac in `find ${S} -ignore_readdir_race -name configure.in -o -name configure.ac`; do
 		rm -f `dirname $ac`/configure
 		done )
-	if [ -e ${S}/configure.in -o -e ${S}/configure.ac ]; then
+	if [ -e ${AUTOTOOLS_SCRIPT_PATH}/configure.in -o -e ${AUTOTOOLS_SCRIPT_PATH}/configure.ac ]; then
 		olddir=`pwd`
-		cd ${S}
+		cd ${AUTOTOOLS_SCRIPT_PATH}
 		ACLOCAL="aclocal --system-acdir=${ACLOCALDIR}/"
 		if [ x"${acpaths}" = xdefault ]; then
 			acpaths=
-			for i in `find ${S} -ignore_readdir_race -maxdepth 2 -name \*.m4|grep -v 'aclocal.m4'| \
+			for i in `find ${AUTOTOOLS_SCRIPT_PATH} -ignore_readdir_race -maxdepth 2 -name \*.m4|grep -v 'aclocal.m4'| \
 				grep -v 'acinclude.m4' | grep -v 'aclocal-copy' | sed -e 's,\(.*/\).*$,\1,'|sort -u`; do
 				acpaths="$acpaths -I $i"
 			done
@@ -265,21 +267,20 @@ autotools_do_configure() {
 				bbnote Executing glib-gettextize --force --copy
 				echo "no" | glib-gettextize --force --copy
 			fi
-		else if grep "^[[:space:]]*AM_GNU_GETTEXT" $CONFIGURE_AC >/dev/null; then
+		elif grep "^[[:space:]]*AM_GNU_GETTEXT" $CONFIGURE_AC >/dev/null; then
 			# We'd call gettextize here if it wasn't so broken...
-				cp ${STAGING_DATADIR_NATIVE}/gettext/config.rpath ${AUTOTOOLS_AUXDIR}/
-				if [ -d ${S}/po/ ]; then
-					cp -f ${STAGING_DATADIR_NATIVE}/gettext/po/Makefile.in.in ${S}/po/
-					if [ ! -e ${S}/po/remove-potcdate.sin ]; then
-						cp ${STAGING_DATADIR_NATIVE}/gettext/po/remove-potcdate.sin ${S}/po/
-					fi
+			cp ${STAGING_DATADIR_NATIVE}/gettext/config.rpath ${AUTOTOOLS_AUXDIR}/
+			if [ -d ${S}/po/ ]; then
+				cp -f ${STAGING_DATADIR_NATIVE}/gettext/po/Makefile.in.in ${S}/po/
+				if [ ! -e ${S}/po/remove-potcdate.sin ]; then
+					cp ${STAGING_DATADIR_NATIVE}/gettext/po/remove-potcdate.sin ${S}/po/
 				fi
-				for i in gettext.m4 iconv.m4 lib-ld.m4 lib-link.m4 lib-prefix.m4 nls.m4 po.m4 progtest.m4; do
-					for j in `find ${S} -ignore_readdir_race -name $i | grep -v aclocal-copy`; do
-						rm $j
-					done
-				done
 			fi
+			for i in gettext.m4 iconv.m4 lib-ld.m4 lib-link.m4 lib-prefix.m4 nls.m4 po.m4 progtest.m4; do
+				for j in `find ${S} -ignore_readdir_race -name $i | grep -v aclocal-copy`; do
+					rm $j
+				done
+			done
 		fi
 		mkdir -p m4
 		if grep "^[[:space:]]*[AI][CT]_PROG_INTLTOOL" $CONFIGURE_AC >/dev/null; then
@@ -290,7 +291,7 @@ autotools_do_configure() {
 		ACLOCAL="$ACLOCAL" autoreconf -Wcross --verbose --install --force ${EXTRA_AUTORECONF} $acpaths || die "autoreconf execution failed."
 		cd $olddir
 	fi
-	if [ -e ${S}/configure ]; then
+	if [ -e ${CONFIGURE_SCRIPT} ]; then
 		oe_runconf
 	else
 		bbnote "nothing to configure"

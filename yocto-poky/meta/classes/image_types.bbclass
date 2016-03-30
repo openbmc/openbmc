@@ -13,7 +13,7 @@ def imagetypes_getdepends(d):
     deps = []
     ctypes = d.getVar('COMPRESSIONTYPES', True).split()
     for type in (d.getVar('IMAGE_FSTYPES', True) or "").split():
-        if type in ["vmdk", "vdi", "qcow2", "live", "iso", "hddimg"]:
+        if type in ["vmdk", "vdi", "qcow2", "hdddirect", "live", "iso", "hddimg"]:
             type = "ext4"
         basetype = type
         for ctype in ctypes:
@@ -139,17 +139,19 @@ multiubi_mkfs() {
 	# Cleanup cfg file
 	mv ubinize${vname}.cfg ${DEPLOY_DIR_IMAGE}/
 
-	# Create own symlink
-	cd ${DEPLOY_DIR_IMAGE}
-	if [ -e ${IMAGE_NAME}${vname}.rootfs.ubifs ]; then
-		ln -sf ${IMAGE_NAME}${vname}.rootfs.ubifs \
-		${IMAGE_LINK_NAME}${vname}.ubifs
+	# Create own symlinks for 'named' volumes
+	if [ -n "$vname" ]; then
+		cd ${DEPLOY_DIR_IMAGE}
+		if [ -e ${IMAGE_NAME}${vname}.rootfs.ubifs ]; then
+			ln -sf ${IMAGE_NAME}${vname}.rootfs.ubifs \
+			${IMAGE_LINK_NAME}${vname}.ubifs
+		fi
+		if [ -e ${IMAGE_NAME}${vname}.rootfs.ubi ]; then
+			ln -sf ${IMAGE_NAME}${vname}.rootfs.ubi \
+			${IMAGE_LINK_NAME}${vname}.ubi
+		fi
+		cd -
 	fi
-	if [ -e ${IMAGE_NAME}${vname}.rootfs.ubi ]; then
-		ln -sf ${IMAGE_NAME}${vname}.rootfs.ubi \
-		${IMAGE_LINK_NAME}${vname}.ubi
-	fi
-	cd -
 }
 
 IMAGE_CMD_multiubi () {
@@ -225,6 +227,7 @@ IMAGE_TYPES = " \
     vmdk \
     vdi \
     qcow2 \
+    hdddirect \
     elf \
     wic wic.gz wic.bz2 wic.lzma \
 "
@@ -252,7 +255,7 @@ DEPLOYABLE_IMAGE_TYPES ?= "hddimg iso"
 IMAGE_EXTENSION_live = "hddimg iso"
 
 # The IMAGE_TYPES_MASKED variable will be used to mask out from the IMAGE_FSTYPES,
-# images that will not be built at do_rootfs time: vmdk, vdi, qcow2, hddimg, iso, etc.
+# images that will not be built at do_rootfs time: vmdk, vdi, qcow2, hdddirect, hddimg, iso, etc.
 IMAGE_TYPES_MASKED ?= ""
 
 # The WICVARS variable is used to define list of bitbake variables used in wic code

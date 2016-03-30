@@ -4,7 +4,9 @@ Wants=sshdgenkeys.service
 After=sshdgenkeys.service
 
 [Service]
-ExecStart=-@SBINDIR@/sshd -i
+Environment="SSHD_OPTS="
+EnvironmentFile=-/etc/default/ssh
+ExecStart=-@SBINDIR@/sshd -i $SSHD_OPTS
 ExecReload=@BASE_BINDIR@/kill -HUP $MAINPID
 StandardInput=socket
 StandardError=syslog

@@ -13,3 +13,8 @@ PACKAGECONFIG[startup-notification] = "--enable-startup-notification,--disable-s
 inherit gnomebase
 SRC_URI[archive.md5sum] = "4538672e0d775fadedf10abeb8020047"
 SRC_URI[archive.sha256sum] = "f5080076346609b4c36394b879f3a86b92ced3b90a37cb54c8e9a14f00e7921c"
+
+inherit distro_features_check
+# libxres means x11 only
+REQUIRED_DISTRO_FEATURES = "x11"
+

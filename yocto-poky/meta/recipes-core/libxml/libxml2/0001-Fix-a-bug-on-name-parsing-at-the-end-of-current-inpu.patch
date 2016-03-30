@@ -1,0 +1,138 @@
+From 51f02b0a03ea1fa6c65b3f9fd88cf60fb5803783 Mon Sep 17 00:00:00 2001
+From: Daniel Veillard <veillard@redhat.com>
+Date: Tue, 15 Sep 2015 16:50:32 +0800
+Subject: [PATCH] Fix a bug on name parsing at the end of current input buffer
+
+For https://bugzilla.gnome.org/show_bug.cgi?id=754946
+
+When hitting the end of the current input buffer while parsing
+a name we could end up loosing the beginning of the name, which
+led to various issues.
+
+Upstream-Status: backport
+
+Depend patch for CVE-2015-7500
+
+Signed-off-by: Armin Kuster <akuster@mvista.com>
+---
+ parser.c                     | 29 ++++++++++++++++++++---------
+ result/errors/754946.xml     |  0
+ result/errors/754946.xml.err | 16 ++++++++++++++++
+ result/errors/754946.xml.str |  4 ++++
+ test/errors/754946.xml       |  1 +
+ 5 files changed, 41 insertions(+), 9 deletions(-)
+ create mode 100644 result/errors/754946.xml
+ create mode 100644 result/errors/754946.xml.err
+ create mode 100644 result/errors/754946.xml.str
+ create mode 100644 test/errors/754946.xml
+
+diff --git a/parser.c b/parser.c
+index 0edd53b..fd29a39 100644
+--- a/parser.c
++++ b/parser.c
+@@ -3491,7 +3491,14 @@ xmlParseNCNameComplex(xmlParserCtxtPtr ctxt) {
+ 	c = CUR_CHAR(l);
+ 	if (c == 0) {
+ 	    count = 0;
++	    /*
++	     * when shrinking to extend the buffer we really need to preserve
++	     * the part of the name we already parsed. Hence rolling back
++	     * by current lenght.
++	     */
++	    ctxt->input->cur -= l;
+ 	    GROW;
++	    ctxt->input->cur += l;
+             if (ctxt->instate == XML_PARSER_EOF)
+                 return(NULL);
+ 	    end = ctxt->input->cur;
+@@ -3523,7 +3530,7 @@ xmlParseNCNameComplex(xmlParserCtxtPtr ctxt) {
+ 
+ static const xmlChar *
+ xmlParseNCName(xmlParserCtxtPtr ctxt) {
+-    const xmlChar *in;
++    const xmlChar *in, *e;
+     const xmlChar *ret;
+     int count = 0;
+ 
+@@ -3535,16 +3542,19 @@ xmlParseNCName(xmlParserCtxtPtr ctxt) {
+      * Accelerator for simple ASCII names
+      */
+     in = ctxt->input->cur;
+-    if (((*in >= 0x61) && (*in <= 0x7A)) ||
+-	((*in >= 0x41) && (*in <= 0x5A)) ||
+-	(*in == '_')) {
++    e = ctxt->input->end;
++    if ((((*in >= 0x61) && (*in <= 0x7A)) ||
++	 ((*in >= 0x41) && (*in <= 0x5A)) ||
++	 (*in == '_')) && (in < e)) {
+ 	in++;
+-	while (((*in >= 0x61) && (*in <= 0x7A)) ||
+-	       ((*in >= 0x41) && (*in <= 0x5A)) ||
+-	       ((*in >= 0x30) && (*in <= 0x39)) ||
+-	       (*in == '_') || (*in == '-') ||
+-	       (*in == '.'))
++	while ((((*in >= 0x61) && (*in <= 0x7A)) ||
++	        ((*in >= 0x41) && (*in <= 0x5A)) ||
++	        ((*in >= 0x30) && (*in <= 0x39)) ||
++	        (*in == '_') || (*in == '-') ||
++	        (*in == '.')) && (in < e))
+ 	    in++;
++	if (in >= e)
++	    goto complex;
+ 	if ((*in > 0) && (*in < 0x80)) {
+ 	    count = in - ctxt->input->cur;
+             if ((count > XML_MAX_NAME_LENGTH) &&
+@@ -3562,6 +3572,7 @@ xmlParseNCName(xmlParserCtxtPtr ctxt) {
+ 	    return(ret);
+ 	}
+     }
++complex:
+     return(xmlParseNCNameComplex(ctxt));
+ }
+ 
+diff --git a/result/errors/754946.xml b/result/errors/754946.xml
+new file mode 100644
+index 0000000..e69de29
+diff --git a/result/errors/754946.xml.err b/result/errors/754946.xml.err
+new file mode 100644
+index 0000000..423dff5
+--- /dev/null
++++ b/result/errors/754946.xml.err
+@@ -0,0 +1,16 @@
++Entity: line 1: parser error : internal error: xmlParseInternalSubset: error detected in Markup declaration
++
++ %SYSTEM; 
++         ^
++Entity: line 1: 
++A<lbbbbbbbbbbbbbbbbbbb_
++^
++Entity: line 1: parser error : DOCTYPE improperly terminated
++ %SYSTEM; 
++         ^
++Entity: line 1: 
++A<lbbbbbbbbbbbbbbbbbbb_
++^
++./test/errors/754946.xml:1: parser error : Extra content at the end of the document
++<!DOCTYPEA[<!ENTITY %
++  ^
+diff --git a/result/errors/754946.xml.str b/result/errors/754946.xml.str
+new file mode 100644
+index 0000000..3b748cc
+--- /dev/null
++++ b/result/errors/754946.xml.str
+@@ -0,0 +1,4 @@
++./test/errors/754946.xml:1: parser error : Extra content at the end of the document
++<!DOCTYPEA[<!ENTITY %
++          ^
++./test/errors/754946.xml : failed to parse
+diff --git a/test/errors/754946.xml b/test/errors/754946.xml
+new file mode 100644
+index 0000000..6b5f9b0
+--- /dev/null
++++ b/test/errors/754946.xml
+@@ -0,0 +1 @@
++<!DOCTYPEA[<!ENTITY %SYSTEM "A<lbbbbbbbbbbbbbbbbbbb_">%SYSTEM;<![
+\ No newline at end of file
+-- 
+2.3.5
+

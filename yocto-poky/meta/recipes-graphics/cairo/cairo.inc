@@ -9,11 +9,14 @@ Extension."
 HOMEPAGE = "http://cairographics.org"
 BUGTRACKER = "http://bugs.freedesktop.org"
 SECTION = "libs"
+
 LICENSE = "MPL-1 & LGPLv2.1 & GPLv3+"
 LICENSE_${PN} = "MPL-1 & LGPLv2.1"
 LICENSE_${PN}-dev = "MPL-1 & LGPLv2.1"
 LICENSE_${PN}-gobject = "MPL-1 & LGPLv2.1"
+LICENSE_${PN}-script-interpreter = "MPL-1 & LGPLv2.1"
 LICENSE_${PN}-perf-utils = "GPLv3+"
+
 X11DEPENDS = "virtual/libx11 libsm libxrender libxext"
 DEPENDS = "libpng fontconfig pixman glib-2.0 zlib"
 

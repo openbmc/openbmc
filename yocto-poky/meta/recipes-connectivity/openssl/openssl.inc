@@ -118,7 +118,7 @@ do_configure () {
         linux-*-mips64)
                target=linux-mips
                 ;;
-	linux-microblaze*)
+	linux-microblaze*|linux-nios2*)
 		target=linux-generic32
 		;;
 	linux-powerpc)

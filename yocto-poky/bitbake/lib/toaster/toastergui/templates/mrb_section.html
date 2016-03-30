@@ -1,43 +1,68 @@
 {% load static %}
 {% load projecttags %}
+{% load project_url_tag %}
 {% load humanize %}
 
+{%if mru and mru.count > 0%}
 
-{%if mru.count > 0%}
+  {%if mrb_type == 'project' %}
+      <h2>
+      Latest project builds
 
-  <div class="page-header">
+      {% if project.is_default %}
+          <i class="icon-question-sign get-help heading-help" title="" data-original-title="Builds in this project cannot be started from Toaster: they are started from the command line"></i>
+      {% endif %}
+      </h2>
+  {% else %}
+    <div class="page-header">
       <h1>
-          Latest builds
-       </h1>
-  </div>
+      Latest builds
+      </h1>
+    </div>
+  {% endif %}
   <div id="latest-builds">
   {% for build in mru %}
-    <div class="alert {%if build.outcome == build.SUCCEEDED%}alert-success{%elif build.outcome == build.FAILED%}alert-error{%else%}alert-info{%endif%} project-name ">
-       <span class="label {%if build.outcome == build.SUCCEEDED%}label-success{%elif build.outcome == build.FAILED%}label-important{%else%}label-info{%endif%}">
-         <a href={% url 'project' build.project.pk %}>
-           {{build.project.name}}
-         </a>
-       </span>
-
+  <div data-latest-build-result="{{ build.id }}" class="alert build-result {%if build.outcome == build.SUCCEEDED%}alert-success{%elif build.outcome == build.FAILED%}alert-error{%else%}alert-info{%endif%}{% if mrb_type != 'project' %} project-name{% endif %}">
+      {% if mrb_type != 'project' %}
+        <span class="label {%if build.outcome == build.SUCCEEDED%}label-success{%elif build.outcome == build.FAILED%}label-important{%else%}label-info{%endif%}">
+            <a href={% project_url build.project %}>
+                {{build.project.name}}
+            </a>
+        </span>
+      {% endif %}
         <div class="row-fluid">
-            <div class="span3 lead">
+          <div class="span3 lead">
     {%if build.outcome == build.SUCCEEDED or build.outcome == build.FAILED %}
-                <a href="{%url 'builddashboard' build.pk%}" class="{%if build.outcome == build.SUCCEEDED %}success{%else%}error{%endif%}">
+              <a href="{%url 'builddashboard' build.pk%}" class="{%if build.outcome == build.SUCCEEDED %}success{%else%}error{%endif%}">
     {% endif %}
             {% if build.target_set.all.count > 0 %}
                 <span data-toggle="tooltip"
-                  {%if build.target_set.all.count > 1%}
-                    title="Targets: {%for target in build.target_set.all%}{{target.target}} {%endfor%}"
-                  {%endif%}
+                  {% if build.target_set.all.count > 1 %}
+                    title="Targets:
+                    {% for target in build.target_set.all %}
+                        {% if target.task %}
+                            {{target.target}}:{{target.task}}
+                        {% else %}
+                            {{target.target}}
+                        {% endif %}
+                    {% endfor %}"
+                  {% endif %}
                 >
-
-                  {{build.target_set.all.0.target}} {%if build.target_set.all.count > 1%}(+ {{build.target_set.all.count|add:"-1"}}){%endif%}
+                {% if build.target_set.all.0.task %}
+                    {{build.target_set.all.0.target}}:{{build.target_set.all.0.task}}
+                {% else %}
+                    {{build.target_set.all.0.target}}
+                {% endif %}
+                {% if build.target_set.all.count > 1 %}
+                    (+ {{build.target_set.all.count|add:"-1"}})
+                {% endif %}
                 </span>
              {% endif %}
     {%if build.outcome == build.SUCCEEDED or build.outcome == build.FAILED %}
                 </a>
     {% endif %}
             </div>
+    {% if build.outcome == build.SUCCEEDED or build.outcome == build.FAILED %}
             <div class="span2 lead">
                 {% if build.completed_on|format_build_date  %}
                     {{ build.completed_on|date:'d/m/y H:i' }}
@@ -45,6 +70,7 @@
                     {{ build.completed_on|date:'H:i' }}
                 {% endif %}
             </div>
+    {% endif %}
     {%if build.outcome == build.SUCCEEDED or build.outcome == build.FAILED %}
             <div class="span2 lead">
       {% if  build.errors.count %}
@@ -58,28 +84,41 @@
             </div>
             <div class="lead ">
               <span class="lead">
-                Build time: <a href="{% url 'buildtime' build.pk %}">{{ build.timespent_seconds|sectohms }}</a>
+                  Build time: <a href="{% url 'buildtime' build.pk %}">{{ build.timespent_seconds|sectohms }}</a>
               </span>
-              <button class="btn
+              {% if build.project.is_default %}
+                  <i class="pull-right icon-question-sign get-help
                   {% if build.outcome == build.SUCCEEDED %}
-                      btn-success
+                      get-help-green
                   {% elif build.outcome == build.FAILED %}
-                      btn-danger
+                      get-help-red
                   {% else %}
-                      btn-info
-                  {%endif%}
-                  pull-right"
-                  onclick='scheduleBuild({% url 'projectbuilds' build.project.id as bpi %}{{bpi|json}},
-                    {{build.project.name|json}},
-                    {% url 'project' build.project.id as bpurl %}{{bpurl|json}},
-                    {{build.target_set.all|get_tasks|json}})'>
+                      get-help-blue
+                  {% endif %}
+                  " title="Builds in this project cannot be started from Toaster: they are started from the command line">
+                  </i>
+              {% else %}
+                  <button class="btn
+                      {% if build.outcome == build.SUCCEEDED %}
+                          btn-success
+                      {% elif build.outcome == build.FAILED %}
+                          btn-danger
+                      {% else %}
+                          btn-info
+                      {%endif%}
+                      pull-right"
+                      onclick='scheduleBuild({% url 'projectbuilds' build.project.id as bpi %}{{bpi|json}},
+                        {{build.project.name|json}},
+                        {% url 'project' build.project.id as purl %}{{purl|json}},
+                        {{build.target_set.all|get_tasks|json}})'>
 
-                    Run again
-              </button>
+                        Run again
+                  </button>
+              {% endif %}
             </div>
     {%endif%}
     {%if build.outcome == build.IN_PROGRESS %}
-            <div class="span4">
+            <div class="span4 offset1">
                 <div class="progress" style="margin-top:5px;" data-toggle="tooltip" title="{{build.completeper}}% of tasks complete">
                     <div style="width: {{build.completeper}}%;" class="bar"></div>
                 </div>

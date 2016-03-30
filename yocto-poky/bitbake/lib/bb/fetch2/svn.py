@@ -54,6 +54,11 @@ class Svn(FetchMethod):
 
         ud.module = ud.parm["module"]
 
+        if not "path_spec" in ud.parm:
+            ud.path_spec = ud.module
+        else:
+            ud.path_spec = ud.parm["path_spec"]
+
         # Create paths to svn checkouts
         relpath = self._strip_leading_slashes(ud.path)
         ud.pkgdir = os.path.join(data.expand('${SVNDIR}', d), ud.host, relpath)
@@ -102,7 +107,7 @@ class Svn(FetchMethod):
 
             if command == "fetch":
                 transportuser = ud.parm.get("transportuser", "")
-                svncmd = "%s co %s %s://%s%s/%s%s %s" % (ud.basecmd, " ".join(options), proto, transportuser, svnroot, ud.module, suffix, ud.module)
+                svncmd = "%s co %s %s://%s%s/%s%s %s" % (ud.basecmd, " ".join(options), proto, transportuser, svnroot, ud.module, suffix, ud.path_spec)
             elif command == "update":
                 svncmd = "%s update %s" % (ud.basecmd, " ".join(options))
             else:
@@ -149,7 +154,7 @@ class Svn(FetchMethod):
 
         os.chdir(ud.pkgdir)
         # tar them up to a defined filename
-        runfetchcmd("tar %s -czf %s %s" % (tar_flags, ud.localpath, ud.module), d, cleanup = [ud.localpath])
+        runfetchcmd("tar %s -czf %s %s" % (tar_flags, ud.localpath, ud.path_spec), d, cleanup = [ud.localpath])
 
     def clean(self, ud, d):
         """ Clean SVN specific files and dirs """

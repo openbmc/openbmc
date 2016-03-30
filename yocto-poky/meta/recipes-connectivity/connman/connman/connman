@@ -49,8 +49,8 @@ do_start() {
 		fi
 	    fi
 	fi
-	if [ -f @LIBDIR@/connman/wired-setup ] ; then
-		. @LIBDIR@/connman/wired-setup
+	if [ -f @DATADIR@/connman/wired-setup ] ; then
+		. @DATADIR@/connman/wired-setup
 	fi
 	$DAEMON $EXTRA_PARAM
 }

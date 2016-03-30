@@ -73,7 +73,8 @@ python () {
 
         fetch_tasks = ['do_fetch', 'do_unpack']
         # If we deltask do_patch, there's no dependency to ensure do_unpack gets run, so add one
-        d.appendVarFlag('do_configure', 'deps', ['do_unpack'])
+        # Note that we cannot use d.appendVarFlag() here because deps is expected to be a list object, not a string
+        d.setVarFlag('do_configure', 'deps', (d.getVarFlag('do_configure', 'deps', False) or []) + ['do_unpack'])
 
         for task in d.getVar("SRCTREECOVEREDTASKS", True).split():
             if local_srcuri and task in fetch_tasks:
@@ -88,5 +89,5 @@ python () {
 
 python externalsrc_compile_prefunc() {
     # Make it obvious that this is happening, since forgetting about it could lead to much confusion
-    bb.warn('Compiling %s from external source %s' % (d.getVar('PN', True), d.getVar('EXTERNALSRC', True)))
+    bb.plain('NOTE: %s: compiling from external source tree %s' % (d.getVar('PN', True), d.getVar('EXTERNALSRC', True)))
 }

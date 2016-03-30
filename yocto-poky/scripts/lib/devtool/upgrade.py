@@ -29,7 +29,7 @@ import errno
 import bb
 import oe.recipeutils
 from devtool import standard
-from devtool import exec_build_env_command, setup_tinfoil, DevtoolError, parse_recipe
+from devtool import exec_build_env_command, setup_tinfoil, DevtoolError, parse_recipe, use_external_build
 
 logger = logging.getLogger('devtool')
 
@@ -53,7 +53,7 @@ def _copy_source_code(orig, dest):
         dest_dir = os.path.join(dest, os.path.dirname(path))
         bb.utils.mkdirhier(dest_dir)
         dest_path = os.path.join(dest, path)
-        os.rename(os.path.join(orig, path), dest_path)
+        shutil.move(os.path.join(orig, path), dest_path)
 
 def _get_checksums(rf):
     import re
@@ -91,15 +91,13 @@ def _remove_patch_dirs(recipefolder):
         for d in dirs:
             shutil.rmtree(os.path.join(root,d))
 
-def _recipe_contains(rf, var):
-    import re
-    found = False
-    with open(rf) as f:
-        for line in f:
-            if re.match("^%s.*=.*" % var, line):
-                found = True
-                break
-    return found
+def _recipe_contains(rd, var):
+    rf = rd.getVar('FILE', True)
+    varfiles = oe.recipeutils.get_var_files(rf, [var], rd)
+    for var, fn in varfiles.iteritems():
+        if fn and fn.startswith(os.path.dirname(rf) + os.sep):
+            return True
+    return False
 
 def _rename_recipe_dirs(oldpv, newpv, path):
     for root, dirs, files in os.walk(path):
@@ -119,27 +117,11 @@ def _rename_recipe_file(bpn, oldpv, newpv, path):
         recipe = "%s_git.bb" % bpn
         if os.path.isfile(os.path.join(path, recipe)):
             newrecipe = recipe
-            raise DevtoolError("Original recipe not found on workspace")
     return os.path.join(path, newrecipe)
 
 def _rename_recipe_files(bpn, oldpv, newpv, path):
     _rename_recipe_dirs(oldpv, newpv, path)
     return _rename_recipe_file(bpn, oldpv, newpv, path)
-
-def _use_external_build(same_dir, no_same_dir, d):
-    b_is_s = True
-    if no_same_dir:
-        logger.info('using separate build directory since --no-same-dir specified')
-        b_is_s = False
-    elif same_dir:
-        logger.info('using source tree as build directory since --same-dir specified')
-    elif bb.data.inherits_class('autotools-brokensep', d):
-        logger.info('using source tree as build directory since original recipe inherits autotools-brokensep')
-    elif d.getVar('B', True) == os.path.abspath(d.getVar('S', True)):
-        logger.info('using source tree as build directory since that is the default for this recipe')
-    else:
-        b_is_s = False
-    return b_is_s
 
 def _write_append(rc, srctree, same_dir, no_same_dir, rev, workspace, d):
     """Writes an append file"""
@@ -161,7 +143,8 @@ def _write_append(rc, srctree, same_dir, no_same_dir, rev, workspace, d):
         f.write(('# NOTE: We use pn- overrides here to avoid affecting'
                  'multiple variants in the case where the recipe uses BBCLASSEXTEND\n'))
         f.write('EXTERNALSRC_pn-%s = "%s"\n' % (pn, srctree))
-        if _use_external_build(same_dir, no_same_dir, d):
+        b_is_s = use_external_build(same_dir, no_same_dir, d)
+        if b_is_s:
             f.write('EXTERNALSRC_BUILD_pn-%s = "%s"\n' % (pn, srctree))
         if rev:
             f.write('\n# initial_rev: %s\n' % rev)
@@ -216,6 +199,7 @@ def _extract_new_source(newpv, srctree, no_patch, srcrev, branch, keep_temp, tin
     if srcrev:
         rev = srcrev
     if uri.startswith('git://'):
+        __run('git fetch')
         __run('git checkout %s' % rev)
         __run('git tag -f devtool-base-new')
         md5 = None
@@ -271,7 +255,7 @@ def _extract_new_source(newpv, srctree, no_patch, srcrev, branch, keep_temp, tin
 
     return (rev, md5, sha256)
 
-def _create_new_recipe(newpv, md5, sha256, workspace, rd):
+def _create_new_recipe(newpv, md5, sha256, srcrev, workspace, tinfoil, rd):
     """Creates the new recipe under workspace"""
     crd = rd.createCopy()
 
@@ -285,8 +269,16 @@ def _create_new_recipe(newpv, md5, sha256, workspace, rd):
         newpv = oldpv
     fullpath = _rename_recipe_files(bpn, oldpv, newpv, path)
 
-    if _recipe_contains(fullpath, 'PV') and newpv != oldpv:
-        oe.recipeutils.patch_recipe(d, fullpath, {'PV':newpv})
+    newvalues = {}
+    if _recipe_contains(rd, 'PV') and newpv != oldpv:
+        newvalues['PV'] = newpv
+
+    if srcrev:
+        newvalues['SRCREV'] = srcrev
+
+    if newvalues:
+        rd = oe.recipeutils.parse_recipe(fullpath, None, tinfoil.config_data)
+        oe.recipeutils.patch_recipe(rd, fullpath, newvalues)
 
     if md5 and sha256:
         # Unfortunately, oe.recipeutils.patch_recipe cannot update flags.
@@ -308,13 +300,19 @@ def upgrade(args, config, basepath, workspace):
     if reason:
         raise DevtoolError(reason)
 
-    tinfoil = setup_tinfoil()
+    tinfoil = setup_tinfoil(basepath=basepath, tracking=True)
 
     rd = parse_recipe(config, tinfoil, args.recipename, True)
     if not rd:
         return 1
 
-    standard._check_compatible_recipe(args.recipename, rd)
+    pn = rd.getVar('PN', True)
+    if pn != args.recipename:
+        logger.info('Mapping %s to %s' % (args.recipename, pn))
+    if pn in workspace:
+        raise DevtoolError("recipe %s is already in your workspace" % pn)
+
+    standard._check_compatible_recipe(pn, rd)
     if rd.getVar('PV', True) == args.version and rd.getVar('SRCREV', True) == args.srcrev:
         raise DevtoolError("Current and upgrade versions are the same version" % version)
 
@@ -324,16 +322,16 @@ def upgrade(args, config, basepath, workspace):
         rev2, md5, sha256 = _extract_new_source(args.version, args.srctree, args.no_patch,
                                                 args.srcrev, args.branch, args.keep_temp,
                                                 tinfoil, rd)
-        rf = _create_new_recipe(args.version, md5, sha256, config.workspace_path, rd)
+        rf = _create_new_recipe(args.version, md5, sha256, args.srcrev, config.workspace_path, tinfoil, rd)
     except bb.process.CmdError as e:
         _upgrade_error(e, rf, args.srctree)
     except DevtoolError as e:
         _upgrade_error(e, rf, args.srctree)
-    standard._add_md5(config, args.recipename, os.path.dirname(rf))
+    standard._add_md5(config, pn, os.path.dirname(rf))
 
     af = _write_append(rf, args.srctree, args.same_dir, args.no_same_dir, rev2,
                        config.workspace_path, rd)
-    standard._add_md5(config, args.recipename, af)
+    standard._add_md5(config, pn, af)
     logger.info('Upgraded source extracted to %s' % args.srctree)
     return 0
 

@@ -14,7 +14,9 @@ DEPENDS = "xcb-proto xproto libxau xcb-proto-native libpthread-stubs"
 
 SRC_URI = "http://xcb.freedesktop.org/dist/libxcb-${PV}.tar.bz2 \
            file://xcbincludedir.patch \
-           file://disable-check.patch"
+           file://disable-check.patch \
+           file://gcc-mips-pr68302-mips-workaround.patch \
+          "
 
 PACKAGES_DYNAMIC = "^libxcb-.*"
 

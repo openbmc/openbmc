@@ -4,12 +4,13 @@ DEPENDS += "${@['hicolor-icon-theme', '']['${BPN}' == 'hicolor-icon-theme']} gtk
 
 gtk_icon_cache_postinst() {
 if [ "x$D" != "x" ]; then
-	$INTERCEPT_DIR/postinst_intercept update_icon_cache ${PKG} mlprefix=${MLPREFIX} libdir=${libdir} \
-		base_libdir=${base_libdir}
+	$INTERCEPT_DIR/postinst_intercept update_icon_cache ${PKG} \
+		mlprefix=${MLPREFIX} \
+		libdir_native=${libdir_native}
 else
 
 	# Update the pixbuf loaders in case they haven't been registered yet
-	GDK_PIXBUF_MODULEDIR=${libdir}/gdk-pixbuf-2.0/2.10.0/loaders gdk-pixbuf-query-loaders --update-cache
+	${libdir}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders --update-cache
 
 	for icondir in /usr/share/icons/* ; do
 		if [ -d $icondir ] ; then
@@ -21,8 +22,9 @@ fi
 
 gtk_icon_cache_postrm() {
 if [ "x$D" != "x" ]; then
-	$INTERCEPT_DIR/postinst_intercept update_icon_cache ${PKG} mlprefix=${MLPREFIX} libdir=${libdir} \
-		base_libdir=${base_libdir}
+	$INTERCEPT_DIR/postinst_intercept update_icon_cache ${PKG} \
+		mlprefix=${MLPREFIX} \
+		libdir=${libdir}
 else
 	for icondir in /usr/share/icons/* ; do
 		if [ -d $icondir ] ; then

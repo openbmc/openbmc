@@ -1,0 +1,37 @@
+From 94bba6880b1f10c6b3bf33a17ac40935d65a81ae Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Fri, 6 Nov 2015 15:19:46 +0000
+Subject: [PATCH] Don't remove the system libraries and startup files from
+ libaio, as in some build configurations these are required.  For example,
+ including conf/include/security_flags.inc on PPC results in:
+
+io_queue_init.os: In function `io_queue_init':
+tmp/work/ppce300c3-poky-linux/libaio/0.3.110-r0/libaio-0.3.110/src/io_queue_init.c:33:
+undefined reference to `__stack_chk_fail_local'
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+---
+ src/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index eadb336..56ab701 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -3,10 +3,10 @@ includedir=$(prefix)/include
+ libdir=$(prefix)/lib
+ 
+ CFLAGS ?= -g -fomit-frame-pointer -O2
+-CFLAGS += -nostdlib -nostartfiles -Wall -I. -fPIC
++CFLAGS += -Wall -I. -fPIC
+ SO_CFLAGS=-shared $(CFLAGS)
+ L_CFLAGS=$(CFLAGS)
+-LINK_FLAGS=
++LINK_FLAGS=$(LDFLAGS)
+ LINK_FLAGS+=$(LDFLAGS)
+ 
+ soname=libaio.so.1
+-- 
+2.1.4
+

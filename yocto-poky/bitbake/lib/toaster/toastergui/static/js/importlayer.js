@@ -195,8 +195,8 @@ function importLayerPageInit (ctx) {
     var dupLayerInfo = $("#duplicate-layer-info");
     dupLayerInfo.find(".dup-layer-name").text(layer.name);
     dupLayerInfo.find(".dup-layer-link").attr("href", layer.layerdetailurl);
-    dupLayerInfo.find("#dup-layer-vcs-url").text(layer.layer__vcs_url);
-    dupLayerInfo.find("#dup-layer-revision").text(layer.revision.commit);
+    dupLayerInfo.find("#dup-layer-vcs-url").text(layer.vcs_url);
+    dupLayerInfo.find("#dup-layer-revision").text(layer.vcs_reference);
 
     $(".fields-apart-from-layer-name").fadeOut(function(){
 
@@ -214,11 +214,10 @@ function importLayerPageInit (ctx) {
       $.getJSON(libtoaster.ctx.layersTypeAheadUrl,
         { include_added: "true" , search: name, format: "json" },
         function(layer) {
-          if (layer.rows.length > 0) {
-            for (var i in layer.rows){
-              if (layer.rows[i].name == name) {
-                console.log(layer.rows[i])
-                layerExistsError(layer.rows[i]);
+          if (layer.results.length > 0) {
+            for (var i in layer.results){
+              if (layer.results[i].name == name) {
+                layerExistsError(layer.results[i]);
               }
             }
           }

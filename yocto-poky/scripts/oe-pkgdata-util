@@ -60,6 +60,7 @@ def glob(args):
         skipval += "|" + args.exclude
     skipregex = re.compile(skipval)
 
+    skippedpkgs = set()
     mappedpkgs = set()
     with open(args.pkglistfile, 'r') as f:
         for line in f:
@@ -73,6 +74,7 @@ def glob(args):
             # Skip packages for which there is no point applying globs
             if skipregex.search(pkg):
                 logger.debug("%s -> !!" % pkg)
+                skippedpkgs.add(pkg)
                 continue
 
             # Skip packages that already match the globs, so if e.g. a dev package
@@ -84,6 +86,7 @@ def glob(args):
                     already = True
                     break
             if already:
+                skippedpkgs.add(pkg)
                 logger.debug("%s -> !" % pkg)
                 continue
 
@@ -152,7 +155,7 @@ def glob(args):
 
     logger.debug("------")
 
-    print("\n".join(mappedpkgs))
+    print("\n".join(mappedpkgs - skippedpkgs))
 
 def read_value(args):
     # Handle both multiple arguments and multiple values within an arg (old syntax)
@@ -493,7 +496,7 @@ def main():
             sys.exit(1)
 
     if not os.path.exists(args.pkgdata_dir):
-        logger.error('Unable to find pkgdata directory %s' % pkgdata_dir)
+        logger.error('Unable to find pkgdata directory %s' % args.pkgdata_dir)
         sys.exit(1)
 
     ret = args.func(args)

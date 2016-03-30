@@ -1,0 +1,30 @@
+From 73df2b5c0aea58015788f5a94a3ec65296a688d3 Mon Sep 17 00:00:00 2001
+From: Song Bing <b06498@freescale.com>
+Date: Thu, 2 Jul 2015 14:32:21 +0800
+Subject: [PATCH] basesink: Shouldn't drop buffer when sync=false
+
+Shouldn't drop buffer when sync=false
+
+Upstream-Status: Accepted
+
+https://bugzilla.gnome.org/show_bug.cgi?id=751819
+---
+ libs/gst/base/gstbasesink.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libs/gst/base/gstbasesink.c b/libs/gst/base/gstbasesink.c
+index d44e8fc..cd759ac 100644
+--- a/libs/gst/base/gstbasesink.c
++++ b/libs/gst/base/gstbasesink.c
+@@ -3423,7 +3423,7 @@ gst_base_sink_chain_unlocked (GstBaseSink * basesink, GstPad * pad,
+     if (G_UNLIKELY (stepped))
+       goto dropped;
+ 
+-    if (syncable && do_sync) {
++    if (syncable && do_sync && gst_base_sink_get_sync (basesink)) {
+       GstClock *clock;
+ 
+       GST_OBJECT_LOCK (basesink);
+-- 
+1.7.9.5
+

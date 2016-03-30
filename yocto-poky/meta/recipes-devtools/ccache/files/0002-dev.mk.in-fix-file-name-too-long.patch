@@ -1,0 +1,32 @@
+From 71bd0082c6edcf73f054a8a4fa34bd8dd4de7cd7 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Wed, 16 Sep 2015 19:45:40 -0700
+Subject: [PATCH] dev.mk.in: fix file name too long
+
+The all_cppflags change paths to filename which cause file name too long
+error when the path is longer than NAME_MAX (usually 255). Strip srcdir
+to fix the problem.
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ dev.mk.in |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dev.mk.in b/dev.mk.in
+index 1261ad3..ec55ac4 100644
+--- a/dev.mk.in
++++ b/dev.mk.in
+@@ -1,7 +1,7 @@
+ # GNU make syntax reigns in this file.
+ 
+ all_cflags += -Werror
+-all_cppflags += -MD -MP -MF .deps/$(subst .._,,$(subst /,_,$<)).d
++all_cppflags += -MD -MP -MF .deps/$(subst .._,,$(subst /,_,$(subst $(srcdir)/,,$<))).d
+ 
+ ASCIIDOC = asciidoc
+ GPERF = gperf
+-- 
+1.7.9.5
+

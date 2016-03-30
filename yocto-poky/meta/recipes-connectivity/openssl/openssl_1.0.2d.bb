@@ -36,6 +36,14 @@ SRC_URI += "file://configure-targets.patch \
             file://run-ptest \
             file://crypto_use_bigint_in_x86-64_perl.patch \
             file://openssl-1.0.2a-x32-asm.patch \
+            file://ptest_makefile_deps.patch  \
+            file://CVE-2015-3193-bn-asm-x86_64-mont5.pl-fix-carry-propagating-bug-CVE.patch \
+            file://CVE-2015-3194-1-Add-PSS-parameter-check.patch \
+            file://0001-Add-test-for-CVE-2015-3194.patch \
+            file://CVE-2015-3195-Fix-leak-with-ASN.1-combine.patch \
+            file://CVE-2015-3197.patch \
+            file://CVE-2016-0701_1.patch \
+            file://CVE-2016-0701_2.patch \
            "
 
 SRC_URI[md5sum] = "38dd619b2e77cbac69b99f52a053d25a"
@@ -54,4 +62,14 @@ PARALLEL_MAKEINST = ""
 
 do_configure_prepend() {
   cp ${WORKDIR}/find.pl ${S}/util/find.pl
+}
+
+# The crypto_use_bigint patch means that perl's bignum module needs to be
+# installed, but some distributions (for example Fedora 23) don't ship it by
+# default.  As the resulting error is very misleading check for bignum before
+# building.
+do_configure_prepend() {
+	if ! perl -Mbigint -e true; then
+		bbfatal "The perl module 'bignum' was not found but this is required to build openssl.  Please install this module (often packaged as perl-bignum) and re-run bitbake."
+	fi
 }

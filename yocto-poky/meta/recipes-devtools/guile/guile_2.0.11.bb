@@ -39,7 +39,11 @@ DEPENDS = "libunistring bdwgc gmp libtool libffi ncurses readline"
 # add guile-native only to the target recipe's DEPENDS
 DEPENDS_append_class-target = " guile-native libatomic-ops"
 
-RDEPENDS_${PN}_append_libc-glibc_class-target = "glibc-gconv-iso8859-1"
+# The comment of the script guile-config said it has been deprecated but we should
+# at least add the required dependency to make it work since we still provide the script.
+RDEPENDS_${PN} = "pkgconfig"
+
+RDEPENDS_${PN}_append_libc-glibc_class-target = " glibc-gconv-iso8859-1"
 
 EXTRA_OECONF += "${@['--without-libltdl-prefix --without-libgmp-prefix --without-libreadline-prefix', ''][bb.data.inherits_class('native',d)]}"
 
@@ -77,6 +81,12 @@ do_install_append_class-native() {
 		GUILE_LOAD_COMPILED_PATH=${STAGING_LIBDIR_NATIVE}/guile/2.0/ccache
 }
 
+do_install_append_class-target() {
+	# cleanup buildpaths in scripts
+	sed -i -e 's:${STAGING_DIR_NATIVE}::' ${D}/usr/bin/guile-config
+	sed -i -e 's:${STAGING_DIR_HOST}::' ${D}/usr/bin/guile-snarf
+}
+
 SYSROOT_PREPROCESS_FUNCS = "guile_cross_config"
 
 guile_cross_config() {
@@ -109,3 +119,7 @@ guile_sstate_postinst() {
                 find ${STAGING_DIR_TARGET}/${libdir}/guile/2.0/ccache -type f | xargs touch
 	fi
 }
+
+# http://errors.yoctoproject.org/Errors/Details/20491/
+ARM_INSTRUCTION_SET_armv4 = "arm"
+ARM_INSTRUCTION_SET_armv5 = "arm"

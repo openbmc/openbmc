@@ -9,22 +9,25 @@
 ERR_REPORT_DIR ?= "${LOG_DIR}/error-report"
 
 def errorreport_getdata(e):
+    import codecs
     logpath = e.data.getVar('ERR_REPORT_DIR', True)
     datafile = os.path.join(logpath, "error-report.txt")
-    with open(datafile) as f:
+    with codecs.open(datafile, 'r', 'utf-8') as f:
         data = f.read()
     return data
 
 def errorreport_savedata(e, newdata, file):
     import json
+    import codecs
     logpath = e.data.getVar('ERR_REPORT_DIR', True)
     datafile = os.path.join(logpath, file)
-    with open(datafile, "w") as f:
+    with codecs.open(datafile, 'w', 'utf-8') as f:
         json.dump(newdata, f, indent=4, sort_keys=True)
     return datafile
 
 python errorreport_handler () {
         import json
+        import codecs
 
         logpath = e.data.getVar('ERR_REPORT_DIR', True)
         datafile = os.path.join(logpath, "error-report.txt")
@@ -53,8 +56,8 @@ python errorreport_handler () {
             taskdata['task'] = task
             if log:
                 try:
-                    logFile = open(log, 'r')
-                    logdata = logFile.read().decode('utf-8')
+                    logFile = codecs.open(log, 'r', 'utf-8')
+                    logdata = logFile.read()
                     logFile.close()
                 except:
                     logdata = "Unable to read log file"

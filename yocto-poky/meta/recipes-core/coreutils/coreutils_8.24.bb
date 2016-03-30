@@ -62,7 +62,7 @@ do_compile_prepend () {
 	mkdir -p ${B}/src
 }
 
-do_install_append() {
+do_install_append_class-target() {
 	for i in df mktemp base64; do mv ${D}${bindir}/$i ${D}${bindir}/$i.${BPN}; done
 
 	install -d ${D}${base_bindir}

@@ -6,7 +6,7 @@ LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://COPYING;md5=2d5025d4aa3495befef8f17206a5b0a1"
 
 SECTION = "x11/base"
-DEPENDS = "intltool-native gtk+"
+DEPENDS = "intltool-native gtk+ gettext-native"
 
 PR = "r3"
 
@@ -33,6 +33,9 @@ RDEPENDS_${PN}-dev = ""
 
 inherit gnomebase
 GNOME_COMPRESS_TYPE="bz2"
+
+inherit distro_features_check
+ANY_OF_DISTRO_FEATURES = "${GTK2DISTROFEATURES}"
 
 python populate_packages_prepend() {
     engines_root = os.path.join(d.getVar('libdir', True), "gtk-2.0/2.10.0/engines")

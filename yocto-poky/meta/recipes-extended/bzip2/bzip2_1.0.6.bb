@@ -9,6 +9,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;beginline=8;endline=37;md5=40d9d1eb05736d1bfc
 PR = "r5"
 
 SRC_URI = "http://www.bzip.org/${PV}/${BP}.tar.gz \
+           file://fix-bunzip2-qt-returns-0-for-corrupt-archives.patch \
            file://configure.ac;subdir=${BP} \
            file://Makefile.am;subdir=${BP} \
            file://run-ptest"

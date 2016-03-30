@@ -93,19 +93,37 @@ def preferred_ml_updates(d):
         if prov != provexp and d.getVar(prov, False):
             d.renameVar(prov, provexp)
 
+    def translate_provide(prefix, prov):
+        if not prov.startswith("virtual/"):
+            return prefix + "-" + prov
+        if prov == "virtual/kernel":
+            return prov
+        prov = prov.replace("virtual/", "")
+        return "virtual/" + prefix + "-" + prov
 
     mp = (d.getVar("MULTI_PROVIDER_WHITELIST", True) or "").split()
     extramp = []
     for p in mp:
         if p.endswith("-native") or "-crosssdk-" in p or p.startswith(("nativesdk-", "virtual/nativesdk-")) or 'cross-canadian' in p:
             continue
-        virt = ""
-        if p.startswith("virtual/"):
-            p = p.replace("virtual/", "")
-            virt = "virtual/"
         for pref in prefixes:
-            extramp.append(virt + pref + "-" + p)
+            extramp.append(translate_provide(pref, p))
     d.setVar("MULTI_PROVIDER_WHITELIST", " ".join(mp + extramp))
+
+    abisafe = (d.getVar("SIGGEN_EXCLUDERECIPES_ABISAFE", True) or "").split()
+    extras = []
+    for p in prefixes:
+        for a in abisafe:
+            extras.append(p + "-" + a)
+    d.appendVar("SIGGEN_EXCLUDERECIPES_ABISAFE", " " + " ".join(extras))
+
+    siggen_exclude = (d.getVar("SIGGEN_EXCLUDE_SAFE_RECIPE_DEPS", True) or "").split()
+    extras = []
+    for p in prefixes:
+        for a in siggen_exclude:
+            a1, a2 = a.split("->")
+            extras.append(translate_provide(p, a1) + "->" + translate_provide(p, a2))
+    d.appendVar("SIGGEN_EXCLUDE_SAFE_RECIPE_DEPS", " " + " ".join(extras))
 
 python multilib_virtclass_handler_vendor () {
     if isinstance(e, bb.event.ConfigParsed):

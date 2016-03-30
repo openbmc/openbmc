@@ -19,6 +19,7 @@ SRC_URI = "${GNU_MIRROR}/libtool/libtool-${PV}.tar.gz \
            file://fix-resolve-lt-sysroot.patch \
            file://nohardcodepaths.patch \
            file://unwind-opt-parsing.patch \
+           file://0001-libtool-Fix-support-for-NIOS2-processor.patch \
           "
 
 SRC_URI[md5sum] = "addf44b646ddb4e3919805aa88fa7c5e"

@@ -2,7 +2,10 @@
 
 {% load static %}
 {% load projecttags %}
+{% load project_url_tag %}
 {% load humanize %}
+
+{% block title %} All projects - Toaster {% endblock %}
 
 {% block pagecontent %}
 
@@ -36,17 +39,29 @@
   {% else %} {# We have builds to display #}
   {% include "basetable_top.html" %}
   {% for o in objects %}
-    <tr class="data">
-      <td><a href="{% url 'project' o.id %}">{{o.name}}</a></td>
-      <td class="updated"><a href="{% url 'project' o.id %}">{{o.updated|date:"d/m/y H:i"}}</a></td>
-      <td>
+    <tr class="data" data-project="{{ o.id }}">
+      <td data-project-field="name">
+          <a href="{% project_url o %}">{{o.name}}</a>
+      </td>
+      <td class="updated"><a href="{% project_url o %}">{{o.updated|date:"d/m/y H:i"}}</a></td>
+      <td data-project-field="release">
         {% if o.release %}
             <a href="{% url 'project' o.id %}#project-details">{{o.release.name}}</a>
+        {% elif o.is_default %}
+            <span class="muted">Not applicable</span>
+            <i class="icon-question-sign get-help hover-help" title="" data-original-title="This project does not have a release set. It simply collects information about the builds you start from the command line while Toaster is running" style="visibility: hidden;"></i>
         {% else %}
             No release available
         {% endif %}
       </td>
-      <td><a href="{% url 'project' o.id %}#machine-distro">{{o.get_current_machine_name}}</a></td>
+      <td data-project-field="machine">
+        {% if o.is_default %}
+            <span class="muted">Not applicable</span>
+            <i class="icon-question-sign get-help hover-help" title="" data-original-title="This project does not have a machine set. It simply collects information about the builds you start from the command line while Toaster is running" style="visibility: hidden;"></i>
+        {% else %}
+            <a href="{% url 'project' o.id %}#machine-distro">{{o.get_current_machine_name}}</a>
+        {% endif %}
+      </td>
       {% if o.get_number_of_builds == 0 %}
       <td class="muted">{{o.get_number_of_builds}}</td>
       <td class="loutcome"></td>

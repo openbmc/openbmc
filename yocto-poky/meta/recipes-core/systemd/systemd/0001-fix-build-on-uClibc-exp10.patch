@@ -1,0 +1,22 @@
+Inspired by: http://peter.korsgaard.com/patches/alsa-utils/alsamixer-fix-build-on-uClibc-exp10.patch
+
+exp10 extension is not part of uClibc, so compute it.
+
+
+Signed-off-by: Samuel Martin <s.martin49@gmail.com>
+
+Upstream-Status: Pending
+
+Index: git/src/basic/missing.h
+===================================================================
+--- git.orig/src/basic/missing.h
++++ git/src/basic/missing.h
+@@ -1036,3 +1036,8 @@ static inline int kcmp(pid_t pid1, pid_t
+ #ifndef INPUT_PROP_ACCELEROMETER
+ #define INPUT_PROP_ACCELEROMETER  0x06
+ #endif
++
++#ifdef __UCLIBC__
++/* 10^x = 10^(log e^x) = (e^x)^log10 = e^(x * log 10) */
++#define exp10(x) (exp((x) * log(10)))
++#endif /* __UCLIBC__ */

@@ -856,6 +856,56 @@
             </glossdef>
         </glossentry>
 
+        <glossentry id='var-BB_TASK_IONICE_LEVEL'><glossterm>BB_TASK_IONICE_LEVEL</glossterm>
+            <glossdef>
+                <para>
+                    Allows adjustment of a task's Input/Output priority.
+                    During Autobuilder testing, random failures can occur
+                    for tasks due to I/O starvation.
+                    These failures occur during various QEMU runtime timeouts.
+                    You can use the <filename>BB_TASK_IONICE_LEVEL</filename>
+                    variable to adjust the I/O priority of these tasks.
+                    <note>
+                        This variable works similarly to the
+                        <link linkend='var-BB_TASK_NICE_LEVEL'><filename>BB_TASK_NICE_LEVEL</filename></link>
+                        variable except with a task's I/O priorities.
+                    </note>
+                </para>
+
+                <para>
+                    Set the variable as follows:
+                    <literallayout class='monospaced'>
+     BB_TASK_IONICE_LEVEL = "<replaceable>class</replaceable>.<replaceable>prio</replaceable>"
+                    </literallayout>
+                    For <replaceable>class</replaceable>, the default value is
+                    "2", which is a best effort.
+                    You can use "1" for realtime and "3" for idle.
+                    If you want to use realtime, you must have superuser
+                    privileges.
+                </para>
+
+                <para>
+                    For <replaceable>prio</replaceable>, you can use any
+                    value from "0", which is the highest priority, to "7",
+                    which is the lowest.
+                    The default value is "4".
+                    You do not need any special privileges to use this range
+                    of priority values.
+                    <note>
+                        In order for your I/O priority settings to take effect,
+                        you need the Completely Fair Queuing (CFQ) Scheduler
+                        selected for the backing block device.
+                        To select the scheduler, use the following command form
+                        where <replaceable>device</replaceable> is the device
+                        (e.g. sda, sdb, and so forth):
+                        <literallayout class='monospaced'>
+      $ sudo sh -c “echo cfq > /sys/block/<replaceable>device</replaceable>/queu/scheduler
+                        </literallayout>
+                    </note>
+                </para>
+            </glossdef>
+        </glossentry>
+
         <glossentry id='var-BB_TASK_NICE_LEVEL'><glossterm>BB_TASK_NICE_LEVEL</glossterm>
             <glossdef>
                 <para>
@@ -1169,6 +1219,15 @@
                     Points to the server that runs memory-resident BitBake.
                     The variable is only used when you employ memory-resident
                     BitBake.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-BBTARGETS'><glossterm>BBTARGETS</glossterm>
+            <glossdef>
+                <para>
+                    Allows you to use a configuration file to add to the list
+                    of command-line target recipes you want to build.
                 </para>
             </glossdef>
         </glossentry>

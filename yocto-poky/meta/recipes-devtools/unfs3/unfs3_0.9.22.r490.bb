@@ -29,6 +29,7 @@ SRC_URI = "svn://svn.code.sf.net/p/unfs3/code;module=trunk;rev=${MOD_PV} \
 BBCLASSEXTEND = "native nativesdk"
 
 inherit autotools
+EXTRA_OECONF_append_class-native = " --sbindir=${bindir}"
 
 # Turn off these header detects else the inode search
 # will walk entire file systems and this is a real problem

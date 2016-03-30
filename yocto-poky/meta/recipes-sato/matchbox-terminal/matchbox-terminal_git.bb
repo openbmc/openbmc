@@ -15,4 +15,6 @@ SRC_URI = "git://git.yoctoproject.org/${BPN}"
 
 S = "${WORKDIR}/git"
 
-inherit autotools pkgconfig
+inherit autotools pkgconfig distro_features_check
+
+ANY_OF_DISTRO_FEATURES = "${GTK2DISTROFEATURES}"

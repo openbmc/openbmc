@@ -1,0 +1,60 @@
+From 339eb179baa7810113f6456accc05b3a32c1cdba Mon Sep 17 00:00:00 2001
+From: Tanu Kaskinen <tanuk@iki.fi>
+Date: Fri, 23 Oct 2015 12:36:34 +0300
+Subject: [PATCH 2/4] alsa, bluetooth: fail if user-requested profile doesn't
+ exist
+
+If we can't fulfill the user request fully, I think we shouldn't
+fulfill it at all, to make it clear that the requested operation
+didn't succeed.
+
+http://bugzilla.yoctoproject.org/show_bug.cgi?id=8448
+
+Upstream-Status: Submitted [http://lists.freedesktop.org/archives/pulseaudio-discuss/2015-October/024614.html]
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ src/modules/alsa/module-alsa-card.c          | 10 ++++++++--
+ src/modules/bluetooth/module-bluez4-device.c |  6 ++++--
+ 2 files changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/src/modules/alsa/module-alsa-card.c b/src/modules/alsa/module-alsa-card.c
+index a7fec04..32f517e 100644
+--- a/src/modules/alsa/module-alsa-card.c
++++ b/src/modules/alsa/module-alsa-card.c
+@@ -754,8 +754,14 @@ int pa__init(pa_module *m) {
+         goto fail;
+     }
+ 
+-    if ((profile = pa_modargs_get_value(u->modargs, "profile", NULL)))
+-        pa_card_new_data_set_profile(&data, profile);
++    if ((profile = pa_modargs_get_value(u->modargs, "profile", NULL))) {
++        if (pa_hashmap_get(data.profiles, profile))
++            pa_card_new_data_set_profile(&data, profile);
++        else {
++            pa_log("No such profile: %s", profile);
++            goto fail;
++        }
++    }
+ 
+     u->card = pa_card_new(m->core, &data);
+     pa_card_new_data_done(&data);
+diff --git a/src/modules/bluetooth/module-bluez4-device.c b/src/modules/bluetooth/module-bluez4-device.c
+index b40c6a0..94e6988 100644
+--- a/src/modules/bluetooth/module-bluez4-device.c
++++ b/src/modules/bluetooth/module-bluez4-device.c
+@@ -2310,8 +2310,10 @@ static int add_card(struct userdata *u) {
+     if ((default_profile = pa_modargs_get_value(u->modargs, "profile", NULL))) {
+         if (pa_hashmap_get(data.profiles, default_profile))
+             pa_card_new_data_set_profile(&data, default_profile);
+-        else
+-            pa_log_warn("Profile '%s' not valid or not supported by device.", default_profile);
++        else {
++            pa_log("Profile '%s' not valid or not supported by device.", default_profile);
++            return -1;
++        }
+     }
+ 
+     u->card = pa_card_new(u->core, &data);
+-- 
+2.1.4
+

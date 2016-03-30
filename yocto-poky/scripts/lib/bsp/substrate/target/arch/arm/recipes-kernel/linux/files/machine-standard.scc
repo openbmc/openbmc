@@ -1,10 +1,11 @@
 # yocto-bsp-filename {{=machine}}-standard.scc
 define KMACHINE {{=machine}}
-define KTYPE standard
+
 define KARCH arm
 
 include {{=map_standard_kbranch(need_new_kbranch, new_kbranch, existing_kbranch)}}
 {{ if need_new_kbranch == "y": }}
+define KTYPE {{=new_kbranch}}
 branch {{=machine}}
 
 include {{=machine}}.scc

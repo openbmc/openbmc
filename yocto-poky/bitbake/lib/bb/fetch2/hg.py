@@ -28,6 +28,7 @@ import os
 import sys
 import logging
 import bb
+import errno
 from bb import data
 from bb.fetch2 import FetchMethod
 from bb.fetch2 import FetchError

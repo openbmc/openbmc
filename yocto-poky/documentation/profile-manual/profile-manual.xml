@@ -62,9 +62,9 @@
                 <revremark>Released with the Yocto Project 1.8 Release.</revremark>
             </revision>
             <revision>
-                <revnumber>1.9</revnumber>
+                <revnumber>2.0</revnumber>
                 <date>October 2015</date>
-                <revremark>Released with the Yocto Project 1.9 Release.</revremark>
+                <revremark>Released with the Yocto Project 2.0 Release.</revremark>
             </revision>
         </revhistory>
 

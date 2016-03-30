@@ -30,5 +30,4 @@ FILES_${PN}-misc = "${sbindir}/i2c-stub-from-dump \
                         ${bindir}/decode-dimms \
                         ${bindir}/decode-vaio \
                        "
-RDEPENDS_${PN} += "${PN}-misc"
-RDEPENDS_${PN}-misc += "perl"
+RDEPENDS_${PN}-misc = "${PN} perl"

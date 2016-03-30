@@ -11,7 +11,7 @@ SRC_URI = "${GNOME_MIRROR}/${BPN}/${MAJ_VER}/${BPN}-${PV}.tar.xz \
 SRC_URI[md5sum] = "be6eeea370f913b7639b609913b2cf02"
 SRC_URI[sha256sum] = "1c0b77fb8ce81abbf1d80c0afee9858b3f9229f673b7881995fe0fc16b1a74d0"
 
-DEPENDS = "dbus glib-2.0 virtual/libx11 libxi libxtst intltool-native"
+DEPENDS = "dbus glib-2.0 virtual/libx11 libxi libxtst intltool-native gettext-native"
 
 inherit autotools gtk-doc pkgconfig distro_features_check
 # depends on virtual/libx11

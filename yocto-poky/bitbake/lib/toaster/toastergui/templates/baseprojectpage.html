@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% load projecttags %}
 {% load humanize %}
+
+{% block title %} {{title}} - {{project.name}} - Toaster {% endblock %}
+
 {% block pagecontent %}
 
 {% include "projecttopbar.html" %}
@@ -23,8 +26,11 @@
     <ul class="nav nav-list well">
       <li><a class="nav-parent" href="{% url 'project' project.id %}">Configuration</a></li>
       <li class="nav-header">Compatible metadata</li>
-<!--  <li><a href="all-image-recipes.html">Image recipes</a></li> -->
-      <li><a href="{% url 'projecttargets' project.id %}">Recipes</a></li>
+      {% if CUSTOM_IMAGE %}
+      <li><a href="{% url 'projectcustomimages' project.id %}">Custom images</a></li>
+      {% endif %}
+      <li><a href="{% url 'projectimagerecipes' project.id %}">Image recipes</a></li>
+      <li><a href="{% url 'projectsoftwarerecipes' project.id %}">Software recipes</a></li>
       <li><a href="{% url 'projectmachines' project.id %}">Machines</a></li>
       <li><a href="{% url 'projectlayers' project.id %}">Layers</a></li>
       <li class="nav-header">Extra configuration</li>

@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% load projecttags %}
+{% load humanize %}
+{% load static %}
+{% block pagecontent %}
+
+{% include "projecttopbar.html" %}
+
+<script src="{% static 'js/customrecipe.js' %}"></script>
+<script>
+  $(document).ready(function (){
+    var ctx = {
+      tableApiUrl: "{% url 'recipeselectpackages' project.id recipe.pk %}?format=json"
+    };
+
+    try {
+      customRecipePageInit(ctx);
+    } catch (e) {
+      document.write("Sorry, An error has occurred loading this page");
+      console.warn(e);
+    }
+  });
+</script>
+
+<div class="row-fluid span11">
+  <div class="alert alert-success lead" id="image-created-notification" style="margin-top: 15px; display: none">
+    <button type="button" data-dismiss="alert" class="close">x</button>
+    Your custom image <strong>{{recipe.name}}</strong> has been created. You can now add or remove packages as needed.
+  </div>
+  <div class="page-header air">
+    <h1>
+      {{recipe.name}}
+      <small>({{recipe.base_recipe.name}})</small>
+    </h1>
+  </div>
+</div>
+
+<div class="row-fluid span11">
+  <div class="span8">
+    <div class="button-place btn-group" style="width: 100%">
+      <a class="btn btn-large span6" href="#" id="build-custom-image" style="width: 50%">
+        Build {{recipe.name}}
+      </a>
+      <button class="btn btn-large span6" data-toggle="modal" data-target="#download-file" id="download" style="width: 50%">
+      Download recipe file
+    </button>
+  </div>
+  <div id="no-package-results" class="air" style="display:none;">
+    <div class="alert">
+      <h3>No packages found</h3>
+      <p>You might consider <a href="all-software-recipes.html">searching the list of recipes</a> instead. If you find a recipe that matches the name of the package you want:</p>
+      <ol>
+        <li>Add the layer providing the recipe to your project</li>
+        <li>Build the recipe</li>
+        <li>Once the build completes, come back to this page and search for the package</li>
+      </ol>
+      <form class="input-append no-results">
+        <input type="text" class="input-xlarge" value="search query">
+          <a href="#" class="add-on btn">
+            <i class="icon-remove"></i>
+          </a>
+          <button class="btn">Search</button>
+          <button class="btn btn-link" id="show-all">Show all packages</button>
+        </form>
+      </div>
+    </div>
+    <div id="packages-table">
+      {% url 'recipeselectpackages' project.id recipe.id as xhr_table_url %}
+      {% with 'recipeselection' as table_name %}
+      {% with 'Add | Remove packages' as  title %}
+
+      <h2>{{title}} (<span class="table-count-{{table_name}}"></span>) </h2>
+
+      {% include "toastertable.html" %}
+      {% endwith %}
+      {% endwith %}
+    </div>
+  </div>
+    <div class="span4 well">
+      <h2 style="margin-bottom:20px;">About {{recipe.name}}</h2>
+
+      <dl>
+        <dt>
+          Approx. packages included
+          <i class="icon-question-sign get-help" title="" data-original-title="The number of packages included is based on information from previous builds and from parsing layers, so we can never be sure it is 100% accurate"></i>
+        </dt>
+        <dd class="no-packages">{{recipe.packages.count}}</dd>
+        <!-- <dt>
+          Approx. package size
+          <i class="icon-question-sign get-help" title="" data-original-title="Package size is based on information from previous builds, so we can never be sure it is 100% accurate"></i>
+        </dt>
+        <dd>244.3 MB</dd>
+        <dt>Last build</dt>
+        <dd>
+          <i class="icon-ok-sign success"></i>
+          <a href="build-dashboard.html">11/06/15 15:22</a>
+        </dd>
+        <dt>Recipe file</dt>
+        <dd>
+          <code>custom-image-name.bb</code>
+          <a href="#download-file" data-toggle="modal"><i class="icon-download-alt" title="" data-original-title="Download recipe file"></i></a>
+          </dd> -->
+        <dt>Layer</dt>
+        <!-- TODO recipe details page -->
+        <dd><a href="{% url 'layerdetails' project.id recipe.base_recipe.layer_version.pk %}">{{recipe.base_recipe.layer_version.layer.name}}</a></dd>
+        <!--<dt>
+          Summary
+        </dt>
+        <dd>
+          <span class="muted">Not set</span>
+          <i class="icon-pencil" data-original-title="" title=""></i>
+        </dd>
+        <dt>
+          Description
+        </dt>
+        <dd>
+          <span class="muted">Not set</span>
+          <i class="icon-pencil" data-original-title="" title=""></i>
+        </dd>
+        <dt>Version</dt>
+        <dd>
+          1.0
+          <i class="icon-pencil" data-original-title="" title=""></i>
+        </dd>
+        <dt>Section</dt>
+        <dd>
+          base
+          <i class="icon-pencil" data-original-title="" title=""></i>
+          <i class="icon-trash" data-original-title="" title=""></i>
+        </dd>
+        <dt>License</dt>
+        <dd>
+          MIT
+          <i class="icon-question-sign get-help" title="" data-original-title="All custom images have their license set to MIT. This is because the license applies only to the recipe (.bb) file, and not to the image itself. To see which licenses apply to the image you must check the license manifest generated with each build"></i>
+          </dd> -->
+      </dl>
+      <i class="icon-trash no-tooltip"></i>
+      <a href="#" class="error" id="delete">Delete custom image</a>
+    </div>
+</div>
+
+  {% endblock %}

@@ -22,7 +22,8 @@ HOMEPAGE = "http://www.rpm.org"
 LICENSE = "GPL-2.0+"
 LIC_FILES_CHKSUM ??= "file://${COMMON_LICENSE_DIR}/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"
 
-DEPENDS = "db libxml2 xz findutils file popt nss bzip2 elfutils patch attr zlib acl gzip make binutils python"
+DEPENDS = "db libxml2 xz findutils file popt nss bzip2 elfutils attr zlib acl gzip python"
+DEPENDS_append_class-native = " file-replacement-native"
 
 SRC_URI += "http://rpm.org/releases/rpm-4.11.x/${BP}.tar.bz2 \
             file://use-pkgconfig-for-python.patch \

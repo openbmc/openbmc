@@ -955,7 +955,7 @@ def try_mirror_url(fetch, origud, ud, ld, check = False):
                 origud.method.download(origud, ld)
                 if hasattr(origud.method,"build_mirror_data"):
                     origud.method.build_mirror_data(origud, ld)
-            return ud.localpath
+            return origud.localpath
         # Otherwise the result is a local file:// and we symlink to it
         if not os.path.exists(origud.localpath):
             if os.path.islink(origud.localpath):

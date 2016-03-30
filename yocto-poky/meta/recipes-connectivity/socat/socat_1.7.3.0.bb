@@ -14,6 +14,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
 
 SRC_URI = "http://www.dest-unreach.org/socat/download/socat-${PV}.tar.bz2 \
            file://Makefile.in-fix-for-parallel-build.patch \
+           file://CVE-2016-2217.patch \
 "
 
 SRC_URI[md5sum] = "b607edb65bc6c57f4a43f06247504274"

@@ -91,10 +91,25 @@ fi
 
 n=$[ (`echo $TAP | sed 's/tap//'` * 2) + 1 ]
 $IFCONFIG addr add 192.168.7.$n/32 broadcast 192.168.7.255 dev $TAP
+STATUS=$?
+if [ $STATUS -ne 0 ]; then
+    echo "Failed to set up IP addressing on $TAP"
+    exit 1
+fi
 $IFCONFIG link set dev $TAP up
+STATUS=$?
+if [ $STATUS -ne 0 ]; then
+    echo "Failed to bring up $TAP"
+    exit 1
+fi
 
 dest=$[ (`echo $TAP | sed 's/tap//'` * 2) + 2 ]
 $IFCONFIG route add to 192.168.7.$dest dev $TAP
+STATUS=$?
+if [ $STATUS -ne 0 ]; then
+    echo "Failed to add route to 192.168.7.$dest using $TAP"
+    exit 1
+fi
 
 # setup NAT for tap0 interface to have internet access in QEMU
 $IPTABLES -A POSTROUTING -t nat -j MASQUERADE -s 192.168.7.$n/32

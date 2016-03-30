@@ -37,7 +37,7 @@ finish_run() {
 				fi
 				mount $flags $bootparam_root $ROOTFS_DIR
 			else
-				debug "root '$bootparam_root' doesn't exist."
+				msg "root '$bootparam_root' doesn't exist."
 			fi
 		fi
 

@@ -3,7 +3,7 @@ DESCRIPTION = "Provides common files needed to use IrDA. \
 IrDA allows communication over Infrared with other devices \
 such as phones and laptops."
 HOMEPAGE = "http://irda.sourceforge.net/"
-BUGTRACKER = "irda-users@lists.sourceforge.net"
+BUGTRACKER = "http://sourceforge.net/p/irda/bugs/"
 SECTION = "base"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://irdadump/COPYING;md5=94d55d512a9ba36caa9b7df079bae19f \

@@ -197,14 +197,14 @@
                     but also is not as easy to use or comprehensive
                     as the default.
                     </para></listitem>
-                <listitem><para><filename>kvm</filename>:
+                <listitem><para id='kvm-cond'><filename>kvm</filename>:
                     Enables KVM when running "qemux86" or "qemux86-64"
                     QEMU architectures.
                     For KVM to work, all the following conditions must be met:
                     <itemizedlist>
                         <listitem><para>
                             Your <replaceable>MACHINE</replaceable> must be either
-                            "qemux86" or "qemux86-64".
+qemux86" or "qemux86-64".
                             </para></listitem>
                         <listitem><para>
                             Your build host has to have the KVM modules
@@ -212,12 +212,24 @@
                             <filename>/dev/kvm</filename>.
                             </para></listitem>
                         <listitem><para>
-                            Your build host has to have virtio net device, which
-                            are <filename>/dev/vhost-net</filename>.
-                            </para></listitem>
-                        <listitem><para>
                             The  build host <filename>/dev/kvm</filename>
                             directory has to be both writable and readable.
+                            </para></listitem>
+                    </itemizedlist>
+                    </para></listitem>
+                <listitem><para><filename>kvm-vhost</filename>:
+                    Enables KVM with VHOST support when running "qemux86" or "qemux86-64"
+                    QEMU architectures.
+                    For KVM with VHOST to work, the following conditions must
+                    be met:
+                    <itemizedlist>
+                        <listitem><para>
+                            <link linkend='kvm-cond'>kvm</link> option
+                            conditions must be met.
+                            </para></listitem>
+                        <listitem><para>
+                            Your build host has to have virtio net device, which
+                            are <filename>/dev/vhost-net</filename>.
                             </para></listitem>
                         <listitem><para>
                             The build host <filename>/dev/vhost-net</filename>

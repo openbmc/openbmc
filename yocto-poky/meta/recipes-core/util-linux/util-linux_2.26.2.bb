@@ -13,6 +13,8 @@ SRC_URI += "file://util-linux-ng-replace-siginterrupt.patch \
             file://uclibc-__progname-conflict.patch \
             file://configure-sbindir.patch \
             file://fix-parallel-build.patch \
+            file://runuser.pamd \
+            file://runuser-l.pamd \
             ${OLDHOST} \
 "
 SRC_URI[md5sum] = "9bdf368c395f1b70325d0eb22c7f48fb"

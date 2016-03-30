@@ -42,7 +42,7 @@ FILE *outf;
 int getPackageStr(rpmts ts, const char *NVRA, rpmTag tag, char **value)
 {
     int rc = -1;
-    rpmmi mi = rpmtsInitIterator(ts, RPMTAG_NVRA, NVRA, 0);
+    rpmmi mi = rpmmiInit(rpmtsGetRdb(ts), RPMTAG_NVRA, NVRA, 0);
     Header h;
     if ((h = rpmmiNext(mi)) != NULL) {
         HE_t he = (HE_t) memset(alloca(sizeof(*he)), 0, sizeof(*he));
@@ -225,7 +225,7 @@ int processPackages(rpmts *ts, int tscount, const char *packagelistfn, int ignor
 int lookupProvider(rpmts ts, const char *req, char **provider)
 {
     int rc = 0;
-    rpmmi provmi = rpmtsInitIterator(ts, RPMTAG_PROVIDENAME, req, 0);
+    rpmmi provmi = rpmmiInit(rpmtsGetRdb(ts), RPMTAG_PROVIDENAME, req, 0);
     if(provmi) {
         Header h;
         if ((h = rpmmiNext(provmi)) != NULL) {
@@ -266,7 +266,7 @@ int printDepList(rpmts *ts, int tscount)
         HE_t he = (HE_t) memset(alloca(sizeof(*he)), 0, sizeof(*he));
         int nkeys = argvCount(keys);
         for(i=0; i<nkeys; i++) {
-            rpmmi mi = rpmtsInitIterator(ts[0], RPMTAG_NVRA, keys[i], 0);
+            rpmmi mi = rpmmiInit(db, RPMTAG_NVRA, keys[i], 0);
             Header h;
             if ((h = rpmmiNext(mi)) != NULL) {
                 /* Get name of package */
@@ -280,6 +280,8 @@ int printDepList(rpmts *ts, int tscount)
                         printf("DEBUG: %s requires null\n", name);
                     }
                     rc = 0;
+                    free(name);
+                    (void)rpmmiFree(mi);
                     continue;
                 }
                 ARGV_t reqs = (ARGV_t)he->p.ptr;
@@ -412,7 +414,7 @@ int main(int argc, char **argv)
     }
 
     for(i=0; i<tscount; i++)
-        (void) rpmtsCloseDB(ts[i]);
+        (void)rpmtsFree(ts[i]);
     free(ts);
 
     if( outfile ) {

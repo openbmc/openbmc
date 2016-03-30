@@ -1,0 +1,245 @@
+From 6f814b40a01d03f93b36184c19339033949de472 Mon Sep 17 00:00:00 2001
+From: Tanu Kaskinen <tanuk@iki.fi>
+Date: Fri, 23 Oct 2015 12:23:13 +0300
+Subject: [PATCH 1/4] card: add pa_card_profile.ports
+
+Having ports accessible from pa_card_profile allows checking whether all ports
+of a profile are unavailable, and therefore helps with managing the profile
+availability (implemented in a later patch).
+
+http://bugzilla.yoctoproject.org/show_bug.cgi?id=8448
+
+Upstream-Status: Submitted [http://lists.freedesktop.org/archives/pulseaudio-discuss/2015-October/024614.html]
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ src/modules/alsa/alsa-mixer.c                |  4 +++-
+ src/modules/alsa/alsa-ucm.c                  |  1 +
+ src/modules/bluetooth/module-bluez4-device.c |  6 ++++++
+ src/modules/bluetooth/module-bluez5-device.c |  6 ++++++
+ src/pulsecore/card.c                         | 16 ++++++++++++++++
+ src/pulsecore/card.h                         | 18 ++++++++++++------
+ src/pulsecore/device-port.c                  |  7 ++++++-
+ 7 files changed, 50 insertions(+), 8 deletions(-)
+
+diff --git a/src/modules/alsa/alsa-mixer.c b/src/modules/alsa/alsa-mixer.c
+index 47cbd14..c5b82b0 100644
+--- a/src/modules/alsa/alsa-mixer.c
++++ b/src/modules/alsa/alsa-mixer.c
+@@ -4654,8 +4654,10 @@ static pa_device_port* device_port_alsa_init(pa_hashmap *ports, /* card ports */
+         path->port = p;
+     }
+ 
+-    if (cp)
++    if (cp) {
+         pa_hashmap_put(p->profiles, cp->name, cp);
++        pa_card_profile_add_port(cp, p);
++    }
+ 
+     if (extra) {
+         pa_hashmap_put(extra, p->name, p);
+diff --git a/src/modules/alsa/alsa-ucm.c b/src/modules/alsa/alsa-ucm.c
+index aa2d601..c8199d6 100644
+--- a/src/modules/alsa/alsa-ucm.c
++++ b/src/modules/alsa/alsa-ucm.c
+@@ -761,6 +761,7 @@ static void ucm_add_port_combination(
+     if (cp) {
+         pa_log_debug("Adding profile %s to port %s.", cp->name, port->name);
+         pa_hashmap_put(port->profiles, cp->name, cp);
++        pa_card_profile_add_port(cp, port);
+     }
+ 
+     if (hash) {
+diff --git a/src/modules/bluetooth/module-bluez4-device.c b/src/modules/bluetooth/module-bluez4-device.c
+index db69d34..b40c6a0 100644
+--- a/src/modules/bluetooth/module-bluez4-device.c
++++ b/src/modules/bluetooth/module-bluez4-device.c
+@@ -2183,6 +2183,7 @@ static pa_card_profile *create_card_profile(struct userdata *u, const char *uuid
+         p->max_sink_channels = 2;
+         p->max_source_channels = 0;
+         pa_hashmap_put(output_port->profiles, p->name, p);
++        pa_card_profile_add_port(p, output_port);
+ 
+         d = PA_CARD_PROFILE_DATA(p);
+         *d = PA_BLUEZ4_PROFILE_A2DP;
+@@ -2194,6 +2195,7 @@ static pa_card_profile *create_card_profile(struct userdata *u, const char *uuid
+         p->max_sink_channels = 0;
+         p->max_source_channels = 2;
+         pa_hashmap_put(input_port->profiles, p->name, p);
++        pa_card_profile_add_port(p, input_port);
+ 
+         d = PA_CARD_PROFILE_DATA(p);
+         *d = PA_BLUEZ4_PROFILE_A2DP_SOURCE;
+@@ -2206,6 +2208,8 @@ static pa_card_profile *create_card_profile(struct userdata *u, const char *uuid
+         p->max_source_channels = 1;
+         pa_hashmap_put(input_port->profiles, p->name, p);
+         pa_hashmap_put(output_port->profiles, p->name, p);
++        pa_card_profile_add_port(p, input_port);
++        pa_card_profile_add_port(p, output_port);
+ 
+         d = PA_CARD_PROFILE_DATA(p);
+         *d = PA_BLUEZ4_PROFILE_HSP;
+@@ -2218,6 +2222,8 @@ static pa_card_profile *create_card_profile(struct userdata *u, const char *uuid
+         p->max_source_channels = 1;
+         pa_hashmap_put(input_port->profiles, p->name, p);
+         pa_hashmap_put(output_port->profiles, p->name, p);
++        pa_card_profile_add_port(p, input_port);
++        pa_card_profile_add_port(p, output_port);
+ 
+         d = PA_CARD_PROFILE_DATA(p);
+         *d = PA_BLUEZ4_PROFILE_HFGW;
+diff --git a/src/modules/bluetooth/module-bluez5-device.c b/src/modules/bluetooth/module-bluez5-device.c
+index 7238e6f..3321785 100644
+--- a/src/modules/bluetooth/module-bluez5-device.c
++++ b/src/modules/bluetooth/module-bluez5-device.c
+@@ -1790,6 +1790,7 @@ static pa_card_profile *create_card_profile(struct userdata *u, const char *uuid
+         cp->max_sink_channels = 2;
+         cp->max_source_channels = 0;
+         pa_hashmap_put(output_port->profiles, cp->name, cp);
++        pa_card_profile_add_port(cp, output_port);
+ 
+         p = PA_CARD_PROFILE_DATA(cp);
+         *p = PA_BLUETOOTH_PROFILE_A2DP_SINK;
+@@ -1801,6 +1802,7 @@ static pa_card_profile *create_card_profile(struct userdata *u, const char *uuid
+         cp->max_sink_channels = 0;
+         cp->max_source_channels = 2;
+         pa_hashmap_put(input_port->profiles, cp->name, cp);
++        pa_card_profile_add_port(cp, input_port);
+ 
+         p = PA_CARD_PROFILE_DATA(cp);
+         *p = PA_BLUETOOTH_PROFILE_A2DP_SOURCE;
+@@ -1813,6 +1815,8 @@ static pa_card_profile *create_card_profile(struct userdata *u, const char *uuid
+         cp->max_source_channels = 1;
+         pa_hashmap_put(input_port->profiles, cp->name, cp);
+         pa_hashmap_put(output_port->profiles, cp->name, cp);
++        pa_card_profile_add_port(cp, input_port);
++        pa_card_profile_add_port(cp, output_port);
+ 
+         p = PA_CARD_PROFILE_DATA(cp);
+         *p = PA_BLUETOOTH_PROFILE_HEADSET_HEAD_UNIT;
+@@ -1825,6 +1829,8 @@ static pa_card_profile *create_card_profile(struct userdata *u, const char *uuid
+         cp->max_source_channels = 1;
+         pa_hashmap_put(input_port->profiles, cp->name, cp);
+         pa_hashmap_put(output_port->profiles, cp->name, cp);
++        pa_card_profile_add_port(cp, input_port);
++        pa_card_profile_add_port(cp, output_port);
+ 
+         p = PA_CARD_PROFILE_DATA(cp);
+         *p = PA_BLUETOOTH_PROFILE_HEADSET_AUDIO_GATEWAY;
+diff --git a/src/pulsecore/card.c b/src/pulsecore/card.c
+index 6f9391e..cc4c784 100644
+--- a/src/pulsecore/card.c
++++ b/src/pulsecore/card.c
+@@ -50,6 +50,7 @@ pa_card_profile *pa_card_profile_new(const char *name, const char *description,
+     c->n_sinks = c->n_sources = 0;
+     c->max_sink_channels = c->max_source_channels = 0;
+     c->available = PA_AVAILABLE_UNKNOWN;
++    c->ports = pa_hashmap_new(pa_idxset_string_hash_func, pa_idxset_string_compare_func);
+ 
+     return c;
+ }
+@@ -57,11 +58,25 @@ pa_card_profile *pa_card_profile_new(const char *name, const char *description,
+ void pa_card_profile_free(pa_card_profile *c) {
+     pa_assert(c);
+ 
++    if (c->ports) {
++        pa_device_port *port;
++        void *state;
++        PA_HASHMAP_FOREACH(port, c->ports, state)
++            pa_hashmap_remove (port->profiles, c->name);
++        pa_hashmap_free(c->ports);
++    }
++
+     pa_xfree(c->name);
+     pa_xfree(c->description);
+     pa_xfree(c);
+ }
+ 
++void pa_card_profile_add_port(pa_card_profile *profile, pa_device_port *port) {
++    pa_assert(profile);
++
++    pa_hashmap_put(profile->ports, port->name, port);
++}
++
+ void pa_card_profile_set_available(pa_card_profile *c, pa_available_t available) {
+     pa_core *core;
+ 
+@@ -198,6 +213,7 @@ pa_card *pa_card_new(pa_core *core, pa_card_new_data *data) {
+ 
+     c->userdata = NULL;
+     c->set_profile = NULL;
++    c->active_profile = NULL;
+ 
+     pa_device_init_description(c->proplist, c);
+     pa_device_init_icon(c->proplist, true);
+diff --git a/src/pulsecore/card.h b/src/pulsecore/card.h
+index 3e2c004..1c33958 100644
+--- a/src/pulsecore/card.h
++++ b/src/pulsecore/card.h
+@@ -22,19 +22,21 @@
+ 
+ typedef struct pa_card pa_card;
+ 
+-#include <pulse/proplist.h>
+-#include <pulsecore/core.h>
+-#include <pulsecore/module.h>
+-#include <pulsecore/idxset.h>
+-
+ /* This enum replaces pa_port_available_t (defined in pulse/def.h) for
+- * internal use, so make sure both enum types stay in sync. */
++ * internal use, so make sure both enum types stay in sync. This is defined
++ * before the #includes, because device-port.h depends on this enum. */
+ typedef enum pa_available {
+     PA_AVAILABLE_UNKNOWN = 0,
+     PA_AVAILABLE_NO = 1,
+     PA_AVAILABLE_YES = 2,
+ } pa_available_t;
+ 
++#include <pulse/proplist.h>
++#include <pulsecore/core.h>
++#include <pulsecore/device-port.h>
++#include <pulsecore/module.h>
++#include <pulsecore/idxset.h>
++
+ typedef struct pa_card_profile {
+     pa_card *card;
+     char *name;
+@@ -43,6 +45,8 @@ typedef struct pa_card_profile {
+     unsigned priority;
+     pa_available_t available; /* PA_AVAILABLE_UNKNOWN, PA_AVAILABLE_NO or PA_AVAILABLE_YES */
+ 
++    pa_hashmap *ports; /* port name -> pa_device_port */
++
+     /* We probably want to have different properties later on here */
+     unsigned n_sinks;
+     unsigned n_sources;
+@@ -100,6 +104,8 @@ typedef struct pa_card_new_data {
+ pa_card_profile *pa_card_profile_new(const char *name, const char *description, size_t extra);
+ void pa_card_profile_free(pa_card_profile *c);
+ 
++void pa_card_profile_add_port(pa_card_profile *profile, pa_device_port *port);
++
+ /* The profile's available status has changed */
+ void pa_card_profile_set_available(pa_card_profile *c, pa_available_t available);
+ 
+diff --git a/src/pulsecore/device-port.c b/src/pulsecore/device-port.c
+index cfe2a80..f16ecef 100644
+--- a/src/pulsecore/device-port.c
++++ b/src/pulsecore/device-port.c
+@@ -95,8 +95,13 @@ static void device_port_free(pa_object *o) {
+     if (p->proplist)
+         pa_proplist_free(p->proplist);
+ 
+-    if (p->profiles)
++    if (p->profiles) {
++        pa_card_profile *profile;
++        void *state;
++        PA_HASHMAP_FOREACH(profile, p->profiles, state)
++            pa_hashmap_remove (profile->ports, p->name);
+         pa_hashmap_free(p->profiles);
++    }
+ 
+     pa_xfree(p->name);
+     pa_xfree(p->description);
+-- 
+2.1.4
+

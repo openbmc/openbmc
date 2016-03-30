@@ -1,0 +1,114 @@
+From a9333eb6a7b8dbda735947cd5bc981ff9352a2c9 Mon Sep 17 00:00:00 2001
+From: Nathan Phillip Brink <ohnobinki@ohnopublishing.net>
+Date: Thu, 10 Mar 2011 00:27:08 -0500
+Subject: [PATCH 1/2] Use $(CC) when linking instead of $(LD) and use $(CFLAGS)
+ and $(EXTRA_CFLAGS) when linking.
+
+This fixes the issue where LDFLAGS escaped with -Wl are ignored during
+compilation. It also simplifies using CFLAGS or EXTRA_CFLAGS (such as
+-m32 on x86_64 or -flto) which apply to both compilation and linking
+situations.
+
+Signed-off-by: Nathan Phillip Brink <ohnobinki@ohnopublishing.net>
+---
+Upstream-Status: Pending
+
+ Makefile               |  7 ++++---
+ scripts/Makefile.build |  8 ++++----
+ scripts/Makefile.lib   | 13 +++----------
+ 3 files changed, 11 insertions(+), 17 deletions(-)
+
+Index: busybox-1.23.2/Makefile
+===================================================================
+--- busybox-1.23.2.orig/Makefile
++++ busybox-1.23.2/Makefile
+@@ -309,7 +309,8 @@ CHECKFLAGS     := -D__linux__ -Dlinux -D
+ MODFLAGS	= -DMODULE
+ CFLAGS_MODULE   = $(MODFLAGS)
+ AFLAGS_MODULE   = $(MODFLAGS)
+-LDFLAGS_MODULE  = -r
++LDFLAGS_RELOCATABLE = -r -nostdlib
++LDFLAGS_MODULE  = $(LDFLAGS_RELOCATABLE)
+ CFLAGS_KERNEL	=
+ AFLAGS_KERNEL	=
+ 
+@@ -331,7 +332,7 @@ KERNELVERSION = $(VERSION).$(PATCHLEVEL)
+ export	VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION \
+ 	ARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC \
+ 	CPP AR NM STRIP OBJCOPY OBJDUMP MAKE AWK GENKSYMS PERL UTS_MACHINE \
+-	HOSTCXX HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
++	HOSTCXX HOSTCXXFLAGS LDFLAGS_RELOCATABLE LDFLAGS_MODULE CHECK CHECKFLAGS
+ 
+ export CPPFLAGS NOSTDINC_FLAGS LINUXINCLUDE OBJCOPYFLAGS LDFLAGS
+ export CFLAGS CFLAGS_KERNEL CFLAGS_MODULE
+@@ -610,7 +611,7 @@ quiet_cmd_busybox__ ?= LINK    $@
+       cmd_busybox__ ?= $(srctree)/scripts/trylink \
+       "$@" \
+       "$(CC)" \
+-      "$(CFLAGS) $(CFLAGS_busybox)" \
++      "$(CFLAGS) $(CFLAGS_busybox) $(EXTRA_CFLAGS)" \
+       "$(LDFLAGS) $(EXTRA_LDFLAGS)" \
+       "$(core-y)" \
+       "$(libs-y)" \
+Index: busybox-1.23.2/scripts/Makefile.build
+===================================================================
+--- busybox-1.23.2.orig/scripts/Makefile.build
++++ busybox-1.23.2/scripts/Makefile.build
+@@ -174,7 +174,7 @@ cmd_modversions =							\
+ 		| $(GENKSYMS) -a $(ARCH)				\
+ 		> $(@D)/.tmp_$(@F:.o=.ver);				\
+ 									\
+-		$(LD) $(LDFLAGS) -r -o $@ $(@D)/.tmp_$(@F) 		\
++               $(CC) $(ld_flags_partial) $(LDFLAGS_RELOCATABLE) -o $@ $(@D)/.tmp_$(@F)        \
+ 			-T $(@D)/.tmp_$(@F:.o=.ver);			\
+ 		rm -f $(@D)/.tmp_$(@F) $(@D)/.tmp_$(@F:.o=.ver);	\
+ 	else								\
+@@ -257,7 +257,7 @@ quiet_cmd_link_o_target = LD      $@
+ # If the list of objects to link is empty, just create an empty built-in.o
+ # -nostdlib is added to make "make LD=gcc ..." work (some people use that)
+ cmd_link_o_target = $(if $(strip $(obj-y)),\
+-		$(LD) -nostdlib $(ld_flags) -r -o $@ $(filter $(obj-y), $^),\
++		$(CC) $(ld_flags_partial) $(LDFLAGS_RELOCATABLE) -o $@ $(filter $(obj-y), $^),\
+ 		rm -f $@; $(AR) rcs $@)
+ 
+ $(builtin-target): $(obj-y) FORCE
+@@ -292,10 +292,10 @@ $($(subst $(obj)/,,$(@:.o=-objs)))    \
+ $($(subst $(obj)/,,$(@:.o=-y)))), $^)
+ 
+ quiet_cmd_link_multi-y = LD      $@
+-cmd_link_multi-y = $(LD) $(ld_flags) -r -o $@ $(link_multi_deps)
++cmd_link_multi-y = $(CC) $(ld_flags_partial) $(LDFLAGS_RELOCATABLE) -o $@ $(link_multi_deps)
+ 
+ quiet_cmd_link_multi-m = LD [M]  $@
+-cmd_link_multi-m = $(LD) $(ld_flags) $(LDFLAGS_MODULE) -o $@ $(link_multi_deps)
++cmd_link_multi-m = $(CC) $(ld_flags) $(LDFLAGS_MODULE) -o $@ $(link_multi_deps)
+ 
+ # We would rather have a list of rules like
+ # 	foo.o: $(foo-objs)
+Index: busybox-1.23.2/scripts/Makefile.lib
+===================================================================
+--- busybox-1.23.2.orig/scripts/Makefile.lib
++++ busybox-1.23.2/scripts/Makefile.lib
+@@ -121,7 +121,8 @@ cpp_flags      = -Wp,-MD,$(depfile) $(NO
+ # yet ld_flags is fed to ld.
+ #ld_flags       = $(LDFLAGS) $(EXTRA_LDFLAGS)
+ # Remove the -Wl, prefix from linker options normally passed through gcc
+-ld_flags       = $(filter-out -Wl$(comma)%,$(LDFLAGS) $(EXTRA_LDFLAGS))
++ld_flags       = $(filter-out -Wl$(comma)%,$(LDFLAGS) $(EXTRA_LDFLAGS) $(CFLAGS) $(EXTRA_CFLAGS))
++ld_flags_partial = $($(filter-out -shared%, $(filter-out -pie%,$(ld_flags))))
+ 
+ 
+ # Finds the multi-part object the current object will be linked into
+@@ -151,10 +152,8 @@ $(obj)/%:: $(src)/%_shipped
+ # Linking
+ # ---------------------------------------------------------------------------
+ 
+-# TODO: LDFLAGS usually is supposed to contain gcc's flags, not ld's.
+-# but here we feed them to ld!
+-quiet_cmd_ld = LD      $@
+-cmd_ld = $(LD) $(LDFLAGS) $(EXTRA_LDFLAGS) $(LDFLAGS_$(@F)) \
++quiet_cmd_ld = CC    $@
++cmd_ld = $(CC) $(ld_flags) $(LDFLAGS_$(@F)) \
+ 	       $(filter-out FORCE,$^) -o $@
+ 
+ # Objcopy

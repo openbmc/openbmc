@@ -84,11 +84,44 @@ class DevtoolBase(oeSelfTest):
 
 class DevtoolTests(DevtoolBase):
 
+    def setUp(self):
+        """Test case setup function"""
+        super(DevtoolTests, self).setUp()
+        self.workspacedir = os.path.join(self.builddir, 'workspace')
+        self.assertTrue(not os.path.exists(self.workspacedir),
+                        'This test cannot be run with a workspace directory '
+                        'under the build directory')
+
+    def _check_src_repo(self, repo_dir):
+        """Check srctree git repository"""
+        self.assertTrue(os.path.isdir(os.path.join(repo_dir, '.git')),
+                        'git repository for external source tree not found')
+        result = runCmd('git status --porcelain', cwd=repo_dir)
+        self.assertEqual(result.output.strip(), "",
+                         'Created git repo is not clean')
+        result = runCmd('git symbolic-ref HEAD', cwd=repo_dir)
+        self.assertEqual(result.output.strip(), "refs/heads/devtool",
+                         'Wrong branch in git repo')
+
+    def _check_repo_status(self, repo_dir, expected_status):
+        """Check the worktree status of a repository"""
+        result = runCmd('git status . --porcelain',
+                        cwd=repo_dir)
+        for line in result.output.splitlines():
+            for ind, (f_status, fn_re) in enumerate(expected_status):
+                if re.match(fn_re, line[3:]):
+                    if f_status != line[:2]:
+                        self.fail('Unexpected status in line: %s' % line)
+                    expected_status.pop(ind)
+                    break
+            else:
+                self.fail('Unexpected modified file in line: %s' % line)
+        if expected_status:
+            self.fail('Missing file changes: %s' % expected_status)
+
     @testcase(1158)
     def test_create_workspace(self):
         # Check preconditions
-        workspacedir = os.path.join(self.builddir, 'workspace')
-        self.assertTrue(not os.path.exists(workspacedir), 'This test cannot be run with a workspace directory under the build directory')
         result = runCmd('bitbake-layers show-layers')
         self.assertTrue('/workspace' not in result.output, 'This test cannot be run with a workspace layer in bblayers.conf')
         # Try creating a workspace layer with a specific path
@@ -99,19 +132,16 @@ class DevtoolTests(DevtoolBase):
         result = runCmd('bitbake-layers show-layers')
         self.assertIn(tempdir, result.output)
         # Try creating a workspace layer with the default path
-        self.track_for_cleanup(workspacedir)
+        self.track_for_cleanup(self.workspacedir)
         self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         result = runCmd('devtool create-workspace')
-        self.assertTrue(os.path.isfile(os.path.join(workspacedir, 'conf', 'layer.conf')), msg = "No workspace created. devtool output: %s " % result.output)
+        self.assertTrue(os.path.isfile(os.path.join(self.workspacedir, 'conf', 'layer.conf')), msg = "No workspace created. devtool output: %s " % result.output)
         result = runCmd('bitbake-layers show-layers')
         self.assertNotIn(tempdir, result.output)
-        self.assertIn(workspacedir, result.output)
+        self.assertIn(self.workspacedir, result.output)
 
     @testcase(1159)
     def test_devtool_add(self):
-        # Check preconditions
-        workspacedir = os.path.join(self.builddir, 'workspace')
-        self.assertTrue(not os.path.exists(workspacedir), 'This test cannot be run with a workspace directory under the build directory')
         # Fetch source
         tempdir = tempfile.mkdtemp(prefix='devtoolqa')
         self.track_for_cleanup(tempdir)
@@ -121,11 +151,11 @@ class DevtoolTests(DevtoolBase):
         srcdir = os.path.join(tempdir, 'pv-1.5.3')
         self.assertTrue(os.path.isfile(os.path.join(srcdir, 'configure')), 'Unable to find configure script in source directory')
         # Test devtool add
-        self.track_for_cleanup(workspacedir)
+        self.track_for_cleanup(self.workspacedir)
         self.add_command_to_tearDown('bitbake -c cleansstate pv')
         self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         result = runCmd('devtool add pv %s' % srcdir)
-        self.assertTrue(os.path.exists(os.path.join(workspacedir, 'conf', 'layer.conf')), 'Workspace directory not created')
+        self.assertTrue(os.path.exists(os.path.join(self.workspacedir, 'conf', 'layer.conf')), 'Workspace directory not created')
         # Test devtool status
         result = runCmd('devtool status')
         self.assertIn('pv', result.output)
@@ -144,9 +174,6 @@ class DevtoolTests(DevtoolBase):
 
     @testcase(1162)
     def test_devtool_add_library(self):
-        # Check preconditions
-        workspacedir = os.path.join(self.builddir, 'workspace')
-        self.assertTrue(not os.path.exists(workspacedir), 'This test cannot be run with a workspace directory under the build directory')
         # We don't have the ability to pick up this dependency automatically yet...
         bitbake('libusb1')
         # Fetch source
@@ -158,10 +185,10 @@ class DevtoolTests(DevtoolBase):
         srcdir = os.path.join(tempdir, 'libftdi1-1.1')
         self.assertTrue(os.path.isfile(os.path.join(srcdir, 'CMakeLists.txt')), 'Unable to find CMakeLists.txt in source directory')
         # Test devtool add (and use -V so we test that too)
-        self.track_for_cleanup(workspacedir)
+        self.track_for_cleanup(self.workspacedir)
         self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         result = runCmd('devtool add libftdi %s -V 1.1' % srcdir)
-        self.assertTrue(os.path.exists(os.path.join(workspacedir, 'conf', 'layer.conf')), 'Workspace directory not created')
+        self.assertTrue(os.path.exists(os.path.join(self.workspacedir, 'conf', 'layer.conf')), 'Workspace directory not created')
         # Test devtool status
         result = runCmd('devtool status')
         self.assertIn('libftdi', result.output)
@@ -185,9 +212,6 @@ class DevtoolTests(DevtoolBase):
 
     @testcase(1160)
     def test_devtool_add_fetch(self):
-        # Check preconditions
-        workspacedir = os.path.join(self.builddir, 'workspace')
-        self.assertTrue(not os.path.exists(workspacedir), 'This test cannot be run with a workspace directory under the build directory')
         # Fetch source
         tempdir = tempfile.mkdtemp(prefix='devtoolqa')
         self.track_for_cleanup(tempdir)
@@ -196,11 +220,11 @@ class DevtoolTests(DevtoolBase):
         testrecipe = 'python-markupsafe'
         srcdir = os.path.join(tempdir, testrecipe)
         # Test devtool add
-        self.track_for_cleanup(workspacedir)
+        self.track_for_cleanup(self.workspacedir)
         self.add_command_to_tearDown('bitbake -c cleansstate %s' % testrecipe)
         self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         result = runCmd('devtool add %s %s -f %s' % (testrecipe, srcdir, url))
-        self.assertTrue(os.path.exists(os.path.join(workspacedir, 'conf', 'layer.conf')), 'Workspace directory not created. %s' % result.output)
+        self.assertTrue(os.path.exists(os.path.join(self.workspacedir, 'conf', 'layer.conf')), 'Workspace directory not created. %s' % result.output)
         self.assertTrue(os.path.isfile(os.path.join(srcdir, 'setup.py')), 'Unable to find setup.py in source directory')
         # Test devtool status
         result = runCmd('devtool status')
@@ -232,9 +256,6 @@ class DevtoolTests(DevtoolBase):
 
     @testcase(1161)
     def test_devtool_add_fetch_git(self):
-        # Check preconditions
-        workspacedir = os.path.join(self.builddir, 'workspace')
-        self.assertTrue(not os.path.exists(workspacedir), 'This test cannot be run with a workspace directory under the build directory')
         # Fetch source
         tempdir = tempfile.mkdtemp(prefix='devtoolqa')
         self.track_for_cleanup(tempdir)
@@ -243,11 +264,11 @@ class DevtoolTests(DevtoolBase):
         testrecipe = 'libmatchbox2'
         srcdir = os.path.join(tempdir, testrecipe)
         # Test devtool add
-        self.track_for_cleanup(workspacedir)
+        self.track_for_cleanup(self.workspacedir)
         self.add_command_to_tearDown('bitbake -c cleansstate %s' % testrecipe)
         self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         result = runCmd('devtool add %s %s -f %s' % (testrecipe, srcdir, url))
-        self.assertTrue(os.path.exists(os.path.join(workspacedir, 'conf', 'layer.conf')), 'Workspace directory not created: %s' % result.output)
+        self.assertTrue(os.path.exists(os.path.join(self.workspacedir, 'conf', 'layer.conf')), 'Workspace directory not created: %s' % result.output)
         self.assertTrue(os.path.isfile(os.path.join(srcdir, 'configure.ac')), 'Unable to find configure.ac in source directory')
         # Test devtool status
         result = runCmd('devtool status')
@@ -284,32 +305,25 @@ class DevtoolTests(DevtoolBase):
 
     @testcase(1164)
     def test_devtool_modify(self):
-        # Check preconditions
-        workspacedir = os.path.join(self.builddir, 'workspace')
-        self.assertTrue(not os.path.exists(workspacedir), 'This test cannot be run with a workspace directory under the build directory')
         # Clean up anything in the workdir/sysroot/sstate cache
         bitbake('mdadm -c cleansstate')
         # Try modifying a recipe
         tempdir = tempfile.mkdtemp(prefix='devtoolqa')
         self.track_for_cleanup(tempdir)
-        self.track_for_cleanup(workspacedir)
+        self.track_for_cleanup(self.workspacedir)
         self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         self.add_command_to_tearDown('bitbake -c clean mdadm')
         result = runCmd('devtool modify mdadm -x %s' % tempdir)
         self.assertTrue(os.path.exists(os.path.join(tempdir, 'Makefile')), 'Extracted source could not be found')
-        self.assertTrue(os.path.isdir(os.path.join(tempdir, '.git')), 'git repository for external source tree not found')
-        self.assertTrue(os.path.exists(os.path.join(workspacedir, 'conf', 'layer.conf')), 'Workspace directory not created')
-        matches = glob.glob(os.path.join(workspacedir, 'appends', 'mdadm_*.bbappend'))
+        self.assertTrue(os.path.exists(os.path.join(self.workspacedir, 'conf', 'layer.conf')), 'Workspace directory not created')
+        matches = glob.glob(os.path.join(self.workspacedir, 'appends', 'mdadm_*.bbappend'))
         self.assertTrue(matches, 'bbappend not created %s' % result.output)
         # Test devtool status
         result = runCmd('devtool status')
         self.assertIn('mdadm', result.output)
         self.assertIn(tempdir, result.output)
         # Check git repo
-        result = runCmd('git status --porcelain', cwd=tempdir)
-        self.assertEqual(result.output.strip(), "", 'Created git repo is not clean')
-        result = runCmd('git symbolic-ref HEAD', cwd=tempdir)
-        self.assertEqual(result.output.strip(), "refs/heads/devtool", 'Wrong branch in git repo')
+        self._check_src_repo(tempdir)
         # Try building
         bitbake('mdadm')
         # Try making (minor) modifications to the source
@@ -336,13 +350,10 @@ class DevtoolTests(DevtoolBase):
 
     @testcase(1166)
     def test_devtool_modify_invalid(self):
-        # Check preconditions
-        workspacedir = os.path.join(self.builddir, 'workspace')
-        self.assertTrue(not os.path.exists(workspacedir), 'This test cannot be run with a workspace directory under the build directory')
         # Try modifying some recipes
         tempdir = tempfile.mkdtemp(prefix='devtoolqa')
         self.track_for_cleanup(tempdir)
-        self.track_for_cleanup(workspacedir)
+        self.track_for_cleanup(self.workspacedir)
         self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
 
         testrecipes = 'perf kernel-devsrc package-index core-image-minimal meta-toolchain packagegroup-core-sdk meta-ide-support'.split()
@@ -367,14 +378,14 @@ class DevtoolTests(DevtoolBase):
             self.assertNotEqual(result.status, 0, 'devtool modify on %s should have failed. devtool output: %s' %  (testrecipe, result.output))
             self.assertIn('ERROR: ', result.output, 'devtool modify on %s should have given an ERROR' % testrecipe)
 
+    @testcase(1365)
     def test_devtool_modify_native(self):
         # Check preconditions
-        workspacedir = os.path.join(self.builddir, 'workspace')
-        self.assertTrue(not os.path.exists(workspacedir), 'This test cannot be run with a workspace directory under the build directory')
+        self.assertTrue(not os.path.exists(self.workspacedir), 'This test cannot be run with a workspace directory under the build directory')
         # Try modifying some recipes
         tempdir = tempfile.mkdtemp(prefix='devtoolqa')
         self.track_for_cleanup(tempdir)
-        self.track_for_cleanup(workspacedir)
+        self.track_for_cleanup(self.workspacedir)
         self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
 
         bbclassextended = False
@@ -400,8 +411,6 @@ class DevtoolTests(DevtoolBase):
     @testcase(1165)
     def test_devtool_modify_git(self):
         # Check preconditions
-        workspacedir = os.path.join(self.builddir, 'workspace')
-        self.assertTrue(not os.path.exists(workspacedir), 'This test cannot be run with a workspace directory under the build directory')
         testrecipe = 'mkelfimage'
         src_uri = get_bb_var('SRC_URI', testrecipe)
         self.assertIn('git://', src_uri, 'This test expects the %s recipe to be a git recipe' % testrecipe)
@@ -410,32 +419,26 @@ class DevtoolTests(DevtoolBase):
         # Try modifying a recipe
         tempdir = tempfile.mkdtemp(prefix='devtoolqa')
         self.track_for_cleanup(tempdir)
-        self.track_for_cleanup(workspacedir)
+        self.track_for_cleanup(self.workspacedir)
         self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         self.add_command_to_tearDown('bitbake -c clean %s' % testrecipe)
         result = runCmd('devtool modify %s -x %s' % (testrecipe, tempdir))
         self.assertTrue(os.path.exists(os.path.join(tempdir, 'Makefile')), 'Extracted source could not be found')
-        self.assertTrue(os.path.isdir(os.path.join(tempdir, '.git')), 'git repository for external source tree not found')
-        self.assertTrue(os.path.exists(os.path.join(workspacedir, 'conf', 'layer.conf')), 'Workspace directory not created. devtool output: %s' % result.output)
-        matches = glob.glob(os.path.join(workspacedir, 'appends', 'mkelfimage_*.bbappend'))
+        self.assertTrue(os.path.exists(os.path.join(self.workspacedir, 'conf', 'layer.conf')), 'Workspace directory not created. devtool output: %s' % result.output)
+        matches = glob.glob(os.path.join(self.workspacedir, 'appends', 'mkelfimage_*.bbappend'))
         self.assertTrue(matches, 'bbappend not created')
         # Test devtool status
         result = runCmd('devtool status')
         self.assertIn(testrecipe, result.output)
         self.assertIn(tempdir, result.output)
         # Check git repo
-        result = runCmd('git status --porcelain', cwd=tempdir)
-        self.assertEqual(result.output.strip(), "", 'Created git repo is not clean')
-        result = runCmd('git symbolic-ref HEAD', cwd=tempdir)
-        self.assertEqual(result.output.strip(), "refs/heads/devtool", 'Wrong branch in git repo')
+        self._check_src_repo(tempdir)
         # Try building
         bitbake(testrecipe)
 
     @testcase(1167)
     def test_devtool_modify_localfiles(self):
         # Check preconditions
-        workspacedir = os.path.join(self.builddir, 'workspace')
-        self.assertTrue(not os.path.exists(workspacedir), 'This test cannot be run with a workspace directory under the build directory')
         testrecipe = 'lighttpd'
         src_uri = (get_bb_var('SRC_URI', testrecipe) or '').split()
         foundlocal = False
@@ -449,13 +452,13 @@ class DevtoolTests(DevtoolBase):
         # Try modifying a recipe
         tempdir = tempfile.mkdtemp(prefix='devtoolqa')
         self.track_for_cleanup(tempdir)
-        self.track_for_cleanup(workspacedir)
+        self.track_for_cleanup(self.workspacedir)
         self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         self.add_command_to_tearDown('bitbake -c clean %s' % testrecipe)
         result = runCmd('devtool modify %s -x %s' % (testrecipe, tempdir))
         self.assertTrue(os.path.exists(os.path.join(tempdir, 'configure.ac')), 'Extracted source could not be found')
-        self.assertTrue(os.path.exists(os.path.join(workspacedir, 'conf', 'layer.conf')), 'Workspace directory not created')
-        matches = glob.glob(os.path.join(workspacedir, 'appends', '%s_*.bbappend' % testrecipe))
+        self.assertTrue(os.path.exists(os.path.join(self.workspacedir, 'conf', 'layer.conf')), 'Workspace directory not created')
+        matches = glob.glob(os.path.join(self.workspacedir, 'appends', '%s_*.bbappend' % testrecipe))
         self.assertTrue(matches, 'bbappend not created')
         # Test devtool status
         result = runCmd('devtool status')
@@ -464,30 +467,46 @@ class DevtoolTests(DevtoolBase):
         # Try building
         bitbake(testrecipe)
 
+    @testcase(1378)
+    def test_devtool_modify_virtual(self):
+        # Try modifying a virtual recipe
+        virtrecipe = 'virtual/libx11'
+        realrecipe = 'libx11'
+        tempdir = tempfile.mkdtemp(prefix='devtoolqa')
+        self.track_for_cleanup(tempdir)
+        self.track_for_cleanup(self.workspacedir)
+        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
+        result = runCmd('devtool modify %s -x %s' % (virtrecipe, tempdir))
+        self.assertTrue(os.path.exists(os.path.join(tempdir, 'Makefile.am')), 'Extracted source could not be found')
+        self.assertTrue(os.path.exists(os.path.join(self.workspacedir, 'conf', 'layer.conf')), 'Workspace directory not created')
+        matches = glob.glob(os.path.join(self.workspacedir, 'appends', '%s_*.bbappend' % realrecipe))
+        self.assertTrue(matches, 'bbappend not created %s' % result.output)
+        # Test devtool status
+        result = runCmd('devtool status')
+        self.assertNotIn(virtrecipe, result.output)
+        self.assertIn(realrecipe, result.output)
+        # Check git repo
+        self._check_src_repo(tempdir)
+        # This is probably sufficient
+
+
     @testcase(1169)
     def test_devtool_update_recipe(self):
         # Check preconditions
-        workspacedir = os.path.join(self.builddir, 'workspace')
-        self.assertTrue(not os.path.exists(workspacedir), 'This test cannot be run with a workspace directory under the build directory')
         testrecipe = 'minicom'
         recipefile = get_bb_var('FILE', testrecipe)
         src_uri = get_bb_var('SRC_URI', testrecipe)
         self.assertNotIn('git://', src_uri, 'This test expects the %s recipe to NOT be a git recipe' % testrecipe)
-        result = runCmd('git status . --porcelain', cwd=os.path.dirname(recipefile))
-        self.assertEqual(result.output.strip(), "", '%s recipe is not clean' % testrecipe)
+        self._check_repo_status(os.path.dirname(recipefile), [])
         # First, modify a recipe
         tempdir = tempfile.mkdtemp(prefix='devtoolqa')
         self.track_for_cleanup(tempdir)
-        self.track_for_cleanup(workspacedir)
+        self.track_for_cleanup(self.workspacedir)
         self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         # (don't bother with cleaning the recipe on teardown, we won't be building it)
         result = runCmd('devtool modify %s -x %s' % (testrecipe, tempdir))
         # Check git repo
-        self.assertTrue(os.path.isdir(os.path.join(tempdir, '.git')), 'git repository for external source tree not found')
-        result = runCmd('git status --porcelain', cwd=tempdir)
-        self.assertEqual(result.output.strip(), "", 'Created git repo is not clean')
-        result = runCmd('git symbolic-ref HEAD', cwd=tempdir)
-        self.assertEqual(result.output.strip(), "refs/heads/devtool", 'Wrong branch in git repo')
+        self._check_src_repo(tempdir)
         # Add a couple of commits
         # FIXME: this only tests adding, need to also test update and remove
         result = runCmd('echo "Additional line" >> README', cwd=tempdir)
@@ -497,25 +516,14 @@ class DevtoolTests(DevtoolBase):
         result = runCmd('git commit -m "Add a new file"', cwd=tempdir)
         self.add_command_to_tearDown('cd %s; rm %s/*.patch; git checkout %s %s' % (os.path.dirname(recipefile), testrecipe, testrecipe, os.path.basename(recipefile)))
         result = runCmd('devtool update-recipe %s' % testrecipe)
-        result = runCmd('git status . --porcelain', cwd=os.path.dirname(recipefile))
-        self.assertNotEqual(result.output.strip(), "", '%s recipe should be modified' % testrecipe)
-        status = result.output.splitlines()
-        self.assertEqual(len(status), 3, 'Less/more files modified than expected. Entire status:\n%s' % result.output)
-        for line in status:
-            if line.endswith('0001-Change-the-README.patch'):
-                self.assertEqual(line[:3], '?? ', 'Unexpected status in line: %s' % line)
-            elif line.endswith('0002-Add-a-new-file.patch'):
-                self.assertEqual(line[:3], '?? ', 'Unexpected status in line: %s' % line)
-            elif re.search('%s_[^_]*.bb$' % testrecipe, line):
-                self.assertEqual(line[:3], ' M ', 'Unexpected status in line: %s' % line)
-            else:
-                raise AssertionError('Unexpected modified file in status: %s' % line)
+        expected_status = [(' M', '.*/%s$' % os.path.basename(recipefile)),
+                           ('??', '.*/0001-Change-the-README.patch$'),
+                           ('??', '.*/0002-Add-a-new-file.patch$')]
+        self._check_repo_status(os.path.dirname(recipefile), expected_status)
 
     @testcase(1172)
     def test_devtool_update_recipe_git(self):
         # Check preconditions
-        workspacedir = os.path.join(self.builddir, 'workspace')
-        self.assertTrue(not os.path.exists(workspacedir), 'This test cannot be run with a workspace directory under the build directory')
         testrecipe = 'mtd-utils'
         recipefile = get_bb_var('FILE', testrecipe)
         src_uri = get_bb_var('SRC_URI', testrecipe)
@@ -525,21 +533,16 @@ class DevtoolTests(DevtoolBase):
             if entry.startswith('file://') and entry.endswith('.patch'):
                 patches.append(entry[7:].split(';')[0])
         self.assertGreater(len(patches), 0, 'The %s recipe does not appear to contain any patches, so this test will not be effective' % testrecipe)
-        result = runCmd('git status . --porcelain', cwd=os.path.dirname(recipefile))
-        self.assertEqual(result.output.strip(), "", '%s recipe is not clean' % testrecipe)
+        self._check_repo_status(os.path.dirname(recipefile), [])
         # First, modify a recipe
         tempdir = tempfile.mkdtemp(prefix='devtoolqa')
         self.track_for_cleanup(tempdir)
-        self.track_for_cleanup(workspacedir)
+        self.track_for_cleanup(self.workspacedir)
         self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         # (don't bother with cleaning the recipe on teardown, we won't be building it)
         result = runCmd('devtool modify %s -x %s' % (testrecipe, tempdir))
         # Check git repo
-        self.assertTrue(os.path.isdir(os.path.join(tempdir, '.git')), 'git repository for external source tree not found')
-        result = runCmd('git status --porcelain', cwd=tempdir)
-        self.assertEqual(result.output.strip(), "", 'Created git repo is not clean')
-        result = runCmd('git symbolic-ref HEAD', cwd=tempdir)
-        self.assertEqual(result.output.strip(), "refs/heads/devtool", 'Wrong branch in git repo')
+        self._check_src_repo(tempdir)
         # Add a couple of commits
         # FIXME: this only tests adding, need to also test update and remove
         result = runCmd('echo "# Additional line" >> Makefile', cwd=tempdir)
@@ -549,19 +552,10 @@ class DevtoolTests(DevtoolBase):
         result = runCmd('git commit -m "Add a new file"', cwd=tempdir)
         self.add_command_to_tearDown('cd %s; rm -rf %s; git checkout %s %s' % (os.path.dirname(recipefile), testrecipe, testrecipe, os.path.basename(recipefile)))
         result = runCmd('devtool update-recipe -m srcrev %s' % testrecipe)
-        result = runCmd('git status . --porcelain', cwd=os.path.dirname(recipefile))
-        self.assertNotEqual(result.output.strip(), "", '%s recipe should be modified' % testrecipe)
-        status = result.output.splitlines()
-        for line in status:
-            for patch in patches:
-                if line.endswith(patch):
-                    self.assertEqual(line[:3], ' D ', 'Unexpected status in line: %s' % line)
-                    break
-            else:
-                if re.search('%s_[^_]*.bb$' % testrecipe, line):
-                    self.assertEqual(line[:3], ' M ', 'Unexpected status in line: %s' % line)
-                else:
-                    raise AssertionError('Unexpected modified file in status: %s' % line)
+        expected_status = [(' M', '.*/%s$' % os.path.basename(recipefile))] + \
+                          [(' D', '.*/%s$' % patch) for patch in patches]
+        self._check_repo_status(os.path.dirname(recipefile), expected_status)
+
         result = runCmd('git diff %s' % os.path.basename(recipefile), cwd=os.path.dirname(recipefile))
         addlines = ['SRCREV = ".*"', 'SRC_URI = "git://git.infradead.org/mtd-utils.git"']
         srcurilines = src_uri.split()
@@ -588,50 +582,33 @@ class DevtoolTests(DevtoolBase):
         # Now try with auto mode
         runCmd('cd %s; git checkout %s %s' % (os.path.dirname(recipefile), testrecipe, os.path.basename(recipefile)))
         result = runCmd('devtool update-recipe %s' % testrecipe)
-        result = runCmd('git rev-parse --show-toplevel')
+        result = runCmd('git rev-parse --show-toplevel', cwd=os.path.dirname(recipefile))
         topleveldir = result.output.strip()
-        result = runCmd('git status . --porcelain', cwd=os.path.dirname(recipefile))
-        status = result.output.splitlines()
         relpatchpath = os.path.join(os.path.relpath(os.path.dirname(recipefile), topleveldir), testrecipe)
-        expectedstatus = [('M', os.path.relpath(recipefile, topleveldir)),
-                          ('??', '%s/0001-Change-the-Makefile.patch' % relpatchpath),
-                          ('??', '%s/0002-Add-a-new-file.patch' % relpatchpath)]
-        for line in status:
-            statusline = line.split(None, 1)
-            for fstatus, fn in expectedstatus:
-                if fn == statusline[1]:
-                    if fstatus != statusline[0]:
-                        self.fail('Unexpected status in line: %s' % line)
-                    break
-            else:
-                self.fail('Unexpected modified file in line: %s' % line)
+        expected_status = [(' M', os.path.relpath(recipefile, topleveldir)),
+                           ('??', '%s/0001-Change-the-Makefile.patch' % relpatchpath),
+                           ('??', '%s/0002-Add-a-new-file.patch' % relpatchpath)]
+        self._check_repo_status(os.path.dirname(recipefile), expected_status)
 
     @testcase(1170)
     def test_devtool_update_recipe_append(self):
         # Check preconditions
-        workspacedir = os.path.join(self.builddir, 'workspace')
-        self.assertTrue(not os.path.exists(workspacedir), 'This test cannot be run with a workspace directory under the build directory')
         testrecipe = 'mdadm'
         recipefile = get_bb_var('FILE', testrecipe)
         src_uri = get_bb_var('SRC_URI', testrecipe)
         self.assertNotIn('git://', src_uri, 'This test expects the %s recipe to NOT be a git recipe' % testrecipe)
-        result = runCmd('git status . --porcelain', cwd=os.path.dirname(recipefile))
-        self.assertEqual(result.output.strip(), "", '%s recipe is not clean' % testrecipe)
+        self._check_repo_status(os.path.dirname(recipefile), [])
         # First, modify a recipe
         tempdir = tempfile.mkdtemp(prefix='devtoolqa')
         tempsrcdir = os.path.join(tempdir, 'source')
         templayerdir = os.path.join(tempdir, 'layer')
         self.track_for_cleanup(tempdir)
-        self.track_for_cleanup(workspacedir)
+        self.track_for_cleanup(self.workspacedir)
         self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         # (don't bother with cleaning the recipe on teardown, we won't be building it)
         result = runCmd('devtool modify %s -x %s' % (testrecipe, tempsrcdir))
         # Check git repo
-        self.assertTrue(os.path.isdir(os.path.join(tempsrcdir, '.git')), 'git repository for external source tree not found')
-        result = runCmd('git status --porcelain', cwd=tempsrcdir)
-        self.assertEqual(result.output.strip(), "", 'Created git repo is not clean')
-        result = runCmd('git symbolic-ref HEAD', cwd=tempsrcdir)
-        self.assertEqual(result.output.strip(), "refs/heads/devtool", 'Wrong branch in git repo')
+        self._check_src_repo(tempsrcdir)
         # Add a commit
         result = runCmd("sed 's!\\(#define VERSION\\W*\"[^\"]*\\)\"!\\1-custom\"!' -i ReadMe.c", cwd=tempsrcdir)
         result = runCmd('git commit -a -m "Add our custom version"', cwd=tempsrcdir)
@@ -642,8 +619,7 @@ class DevtoolTests(DevtoolBase):
         result = runCmd('devtool update-recipe %s -a %s' % (testrecipe, templayerdir))
         self.assertNotIn('WARNING:', result.output)
         # Check recipe is still clean
-        result = runCmd('git status . --porcelain', cwd=os.path.dirname(recipefile))
-        self.assertEqual(result.output.strip(), "", '%s recipe is not clean' % testrecipe)
+        self._check_repo_status(os.path.dirname(recipefile), [])
         # Check bbappend was created
         splitpath = os.path.dirname(recipefile).split(os.sep)
         appenddir = os.path.join(templayerdir, splitpath[-2], splitpath[-1])
@@ -685,8 +661,6 @@ class DevtoolTests(DevtoolBase):
     @testcase(1171)
     def test_devtool_update_recipe_append_git(self):
         # Check preconditions
-        workspacedir = os.path.join(self.builddir, 'workspace')
-        self.assertTrue(not os.path.exists(workspacedir), 'This test cannot be run with a workspace directory under the build directory')
         testrecipe = 'mtd-utils'
         recipefile = get_bb_var('FILE', testrecipe)
         src_uri = get_bb_var('SRC_URI', testrecipe)
@@ -695,23 +669,18 @@ class DevtoolTests(DevtoolBase):
             if entry.startswith('git://'):
                 git_uri = entry
                 break
-        result = runCmd('git status . --porcelain', cwd=os.path.dirname(recipefile))
-        self.assertEqual(result.output.strip(), "", '%s recipe is not clean' % testrecipe)
+        self._check_repo_status(os.path.dirname(recipefile), [])
         # First, modify a recipe
         tempdir = tempfile.mkdtemp(prefix='devtoolqa')
         tempsrcdir = os.path.join(tempdir, 'source')
         templayerdir = os.path.join(tempdir, 'layer')
         self.track_for_cleanup(tempdir)
-        self.track_for_cleanup(workspacedir)
+        self.track_for_cleanup(self.workspacedir)
         self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         # (don't bother with cleaning the recipe on teardown, we won't be building it)
         result = runCmd('devtool modify %s -x %s' % (testrecipe, tempsrcdir))
         # Check git repo
-        self.assertTrue(os.path.isdir(os.path.join(tempsrcdir, '.git')), 'git repository for external source tree not found')
-        result = runCmd('git status --porcelain', cwd=tempsrcdir)
-        self.assertEqual(result.output.strip(), "", 'Created git repo is not clean')
-        result = runCmd('git symbolic-ref HEAD', cwd=tempsrcdir)
-        self.assertEqual(result.output.strip(), "refs/heads/devtool", 'Wrong branch in git repo')
+        self._check_src_repo(tempsrcdir)
         # Add a commit
         result = runCmd('echo "# Additional line" >> Makefile', cwd=tempsrcdir)
         result = runCmd('git commit -a -m "Change the Makefile"', cwd=tempsrcdir)
@@ -731,8 +700,7 @@ class DevtoolTests(DevtoolBase):
         result = runCmd('devtool update-recipe -m srcrev %s -a %s' % (testrecipe, templayerdir))
         self.assertNotIn('WARNING:', result.output)
         # Check recipe is still clean
-        result = runCmd('git status . --porcelain', cwd=os.path.dirname(recipefile))
-        self.assertEqual(result.output.strip(), "", '%s recipe is not clean' % testrecipe)
+        self._check_repo_status(os.path.dirname(recipefile), [])
         # Check bbappend was created
         splitpath = os.path.dirname(recipefile).split(os.sep)
         appenddir = os.path.join(templayerdir, splitpath[-2], splitpath[-1])
@@ -779,28 +747,104 @@ class DevtoolTests(DevtoolBase):
             self.assertEqual(expectedlines, f.readlines())
         # Deleting isn't expected to work under these circumstances
 
+    @testcase(1370)
+    def test_devtool_update_recipe_local_files(self):
+        """Check that local source files are copied over instead of patched"""
+        testrecipe = 'makedevs'
+        recipefile = get_bb_var('FILE', testrecipe)
+        # Setup srctree for modifying the recipe
+        tempdir = tempfile.mkdtemp(prefix='devtoolqa')
+        self.track_for_cleanup(tempdir)
+        self.track_for_cleanup(self.workspacedir)
+        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
+        # (don't bother with cleaning the recipe on teardown, we won't be
+        # building it)
+        result = runCmd('devtool modify %s -x %s' % (testrecipe, tempdir))
+        # Check git repo
+        self._check_src_repo(tempdir)
+        # Edit / commit local source
+        runCmd('echo "/* Foobar */" >> oe-local-files/makedevs.c', cwd=tempdir)
+        runCmd('echo "Foo" > oe-local-files/new-local', cwd=tempdir)
+        runCmd('echo "Bar" > new-file', cwd=tempdir)
+        runCmd('git add new-file', cwd=tempdir)
+        runCmd('git commit -m "Add new file"', cwd=tempdir)
+        self.add_command_to_tearDown('cd %s; git clean -fd .; git checkout .' %
+                                     os.path.dirname(recipefile))
+        runCmd('devtool update-recipe %s' % testrecipe)
+        expected_status = [(' M', '.*/%s$' % os.path.basename(recipefile)),
+                           (' M', '.*/makedevs/makedevs.c$'),
+                           ('??', '.*/makedevs/new-local$'),
+                           ('??', '.*/makedevs/0001-Add-new-file.patch$')]
+        self._check_repo_status(os.path.dirname(recipefile), expected_status)
+
+    @testcase(1371)
+    def test_devtool_update_recipe_local_files_2(self):
+        """Check local source files support when oe-local-files is in Git"""
+        testrecipe = 'lzo'
+        recipefile = get_bb_var('FILE', testrecipe)
+        # Setup srctree for modifying the recipe
+        tempdir = tempfile.mkdtemp(prefix='devtoolqa')
+        self.track_for_cleanup(tempdir)
+        self.track_for_cleanup(self.workspacedir)
+        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
+        result = runCmd('devtool modify %s -x %s' % (testrecipe, tempdir))
+        # Check git repo
+        self._check_src_repo(tempdir)
+        # Add oe-local-files to Git
+        runCmd('rm oe-local-files/.gitignore', cwd=tempdir)
+        runCmd('git add oe-local-files', cwd=tempdir)
+        runCmd('git commit -m "Add local sources"', cwd=tempdir)
+        # Edit / commit local sources
+        runCmd('echo "# Foobar" >> oe-local-files/acinclude.m4', cwd=tempdir)
+        runCmd('git commit -am "Edit existing file"', cwd=tempdir)
+        runCmd('git rm oe-local-files/run-ptest', cwd=tempdir)
+        runCmd('git commit -m"Remove file"', cwd=tempdir)
+        runCmd('echo "Foo" > oe-local-files/new-local', cwd=tempdir)
+        runCmd('git add oe-local-files/new-local', cwd=tempdir)
+        runCmd('git commit -m "Add new local file"', cwd=tempdir)
+        runCmd('echo "Gar" > new-file', cwd=tempdir)
+        runCmd('git add new-file', cwd=tempdir)
+        runCmd('git commit -m "Add new file"', cwd=tempdir)
+        self.add_command_to_tearDown('cd %s; git clean -fd .; git checkout .' %
+                                     os.path.dirname(recipefile))
+        # Checkout unmodified file to working copy -> devtool should still pick
+        # the modified version from HEAD
+        runCmd('git checkout HEAD^ -- oe-local-files/acinclude.m4', cwd=tempdir)
+        runCmd('devtool update-recipe %s' % testrecipe)
+        expected_status = [(' M', '.*/%s$' % os.path.basename(recipefile)),
+                           (' M', '.*/acinclude.m4$'),
+                           (' D', '.*/run-ptest$'),
+                           ('??', '.*/new-local$'),
+                           ('??', '.*/0001-Add-new-file.patch$')]
+        self._check_repo_status(os.path.dirname(recipefile), expected_status)
+
     @testcase(1163)
     def test_devtool_extract(self):
-        # Check preconditions
-        workspacedir = os.path.join(self.builddir, 'workspace')
-        self.assertTrue(not os.path.exists(workspacedir), 'This test cannot be run with a workspace directory under the build directory')
         tempdir = tempfile.mkdtemp(prefix='devtoolqa')
         # Try devtool extract
         self.track_for_cleanup(tempdir)
-        self.track_for_cleanup(workspacedir)
+        self.track_for_cleanup(self.workspacedir)
         self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         result = runCmd('devtool extract remake %s' % tempdir)
         self.assertTrue(os.path.exists(os.path.join(tempdir, 'Makefile.am')), 'Extracted source could not be found')
-        self.assertTrue(os.path.isdir(os.path.join(tempdir, '.git')), 'git repository for external source tree not found')
+        self._check_src_repo(tempdir)
+
+    @testcase(1379)
+    def test_devtool_extract_virtual(self):
+        tempdir = tempfile.mkdtemp(prefix='devtoolqa')
+        # Try devtool extract
+        self.track_for_cleanup(tempdir)
+        self.track_for_cleanup(self.workspacedir)
+        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
+        result = runCmd('devtool extract virtual/libx11 %s' % tempdir)
+        self.assertTrue(os.path.exists(os.path.join(tempdir, 'Makefile.am')), 'Extracted source could not be found')
+        self._check_src_repo(tempdir)
 
     @testcase(1168)
     def test_devtool_reset_all(self):
-        # Check preconditions
-        workspacedir = os.path.join(self.builddir, 'workspace')
-        self.assertTrue(not os.path.exists(workspacedir), 'This test cannot be run with a workspace directory under the build directory')
         tempdir = tempfile.mkdtemp(prefix='devtoolqa')
         self.track_for_cleanup(tempdir)
-        self.track_for_cleanup(workspacedir)
+        self.track_for_cleanup(self.workspacedir)
         self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         testrecipe1 = 'mdadm'
         testrecipe2 = 'cronie'
@@ -823,6 +867,7 @@ class DevtoolTests(DevtoolBase):
         matches2 = glob.glob(stampprefix2 + '*')
         self.assertFalse(matches2, 'Stamp files exist for recipe %s that should have been cleaned' % testrecipe2)
 
+    @testcase(1272)
     def test_devtool_deploy_target(self):
         # NOTE: Whilst this test would seemingly be better placed as a runtime test,
         # unfortunately the runtime tests run under bitbake and you can't run
@@ -846,8 +891,7 @@ class DevtoolTests(DevtoolBase):
                 break
         else:
             self.skipTest('No tap devices found - you must set up tap devices with scripts/runqemu-gen-tapdevs before running this test')
-        workspacedir = os.path.join(self.builddir, 'workspace')
-        self.assertTrue(not os.path.exists(workspacedir), 'This test cannot be run with a workspace directory under the build directory')
+        self.assertTrue(not os.path.exists(self.workspacedir), 'This test cannot be run with a workspace directory under the build directory')
         # Definitions
         testrecipe = 'mdadm'
         testfile = '/sbin/mdadm'
@@ -863,7 +907,7 @@ class DevtoolTests(DevtoolBase):
         # Try devtool modify
         tempdir = tempfile.mkdtemp(prefix='devtoolqa')
         self.track_for_cleanup(tempdir)
-        self.track_for_cleanup(workspacedir)
+        self.track_for_cleanup(self.workspacedir)
         self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         self.add_command_to_tearDown('bitbake -c clean %s' % testrecipe)
         result = runCmd('devtool modify %s -x %s' % (testrecipe, tempdir))
@@ -908,18 +952,19 @@ class DevtoolTests(DevtoolBase):
             result = runCmd('ssh %s root@%s %s' % (sshargs, qemu.ip, testcommand), ignore_status=True)
             self.assertNotEqual(result, 0, 'undeploy-target did not remove command as it should have')
 
+    @testcase(1366)
     def test_devtool_build_image(self):
         """Test devtool build-image plugin"""
         # Check preconditions
-        workspacedir = os.path.join(self.builddir, 'workspace')
-        self.assertTrue(not os.path.exists(workspacedir), 'This test cannot be run with a workspace directory under the build directory')
+        self.assertTrue(not os.path.exists(self.workspacedir), 'This test cannot be run with a workspace directory under the build directory')
         image = 'core-image-minimal'
-        self.track_for_cleanup(workspacedir)
+        self.track_for_cleanup(self.workspacedir)
         self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         self.add_command_to_tearDown('bitbake -c clean %s' % image)
         bitbake('%s -c clean' % image)
         # Add target and native recipes to workspace
-        for recipe in ('mdadm', 'parted-native'):
+        recipes = ['mdadm', 'parted-native']
+        for recipe in recipes:
             tempdir = tempfile.mkdtemp(prefix='devtoolqa')
             self.track_for_cleanup(tempdir)
             self.add_command_to_tearDown('bitbake -c clean %s' % recipe)
@@ -927,17 +972,24 @@ class DevtoolTests(DevtoolBase):
         # Try to build image
         result = runCmd('devtool build-image %s' % image)
         self.assertNotEqual(result, 0, 'devtool build-image failed')
-        # Check if image.bbappend has required content
-        bbappend = os.path.join(workspacedir, 'appends', image+'.bbappend')
-        self.assertTrue(os.path.isfile(bbappend), 'bbappend not created %s' % result.output)
-        # NOTE: native recipe parted-native should not be in IMAGE_INSTALL_append
-        self.assertTrue('IMAGE_INSTALL_append = " mdadm"\n' in open(bbappend).readlines(),
-                        'IMAGE_INSTALL_append = " mdadm" not found in %s' % bbappend)
+        # Check if image contains expected packages
+        deploy_dir_image = get_bb_var('DEPLOY_DIR_IMAGE')
+        image_link_name = get_bb_var('IMAGE_LINK_NAME', image)
+        reqpkgs = [item for item in recipes if not item.endswith('-native')]
+        with open(os.path.join(deploy_dir_image, image_link_name + '.manifest'), 'r') as f:
+            for line in f:
+                splitval = line.split()
+                if splitval:
+                    pkg = splitval[0]
+                    if pkg in reqpkgs:
+                        reqpkgs.remove(pkg)
+        if reqpkgs:
+            self.fail('The following packages were not present in the image as expected: %s' % ', '.join(reqpkgs))
 
+    @testcase(1367)
     def test_devtool_upgrade(self):
         # Check preconditions
-        workspacedir = os.path.join(self.builddir, 'workspace')
-        self.assertTrue(not os.path.exists(workspacedir), 'This test cannot be run with a workspace directory under the build directory')
+        self.assertTrue(not os.path.exists(self.workspacedir), 'This test cannot be run with a workspace directory under the build directory')
         # Check parameters
         result = runCmd('devtool upgrade -h')
         for param in 'recipename srctree --version -V --branch -b --keep-temp --no-patch'.split():
@@ -955,9 +1007,9 @@ class DevtoolTests(DevtoolBase):
         # Check if srctree at least is populated
         self.assertTrue(len(os.listdir(tempdir)) > 0, 'scrtree (%s) should be populated with new (%s) source code' % (tempdir, version))
         # Check new recipe folder is present
-        self.assertTrue(os.path.exists(os.path.join(workspacedir,'recipes',recipe)), 'Recipe folder should exist')
+        self.assertTrue(os.path.exists(os.path.join(self.workspacedir,'recipes',recipe)), 'Recipe folder should exist')
         # Check new recipe file is present
-        self.assertTrue(os.path.exists(os.path.join(workspacedir,'recipes',recipe,"%s_%s.bb" % (recipe,version))), 'Recipe folder should exist')
+        self.assertTrue(os.path.exists(os.path.join(self.workspacedir,'recipes',recipe,"%s_%s.bb" % (recipe,version))), 'Recipe folder should exist')
         # Check devtool status and make sure recipe is present
         result = runCmd('devtool status')
         self.assertIn(recipe, result.output)
@@ -967,5 +1019,18 @@ class DevtoolTests(DevtoolBase):
         result = runCmd('devtool status')
         self.assertNotIn(recipe, result.output)
         self.track_for_cleanup(tempdir)
-        self.track_for_cleanup(workspacedir)
+        self.track_for_cleanup(self.workspacedir)
         self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
+
+    @testcase(1352)
+    def test_devtool_layer_plugins(self):
+        """Test that devtool can use plugins from other layers.
+
+        This test executes the selftest-reverse command from meta-selftest."""
+
+        self.track_for_cleanup(self.workspacedir)
+        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
+
+        s = "Microsoft Made No Profit From Anyone's Zunes Yo"
+        result = runCmd("devtool --quiet selftest-reverse \"%s\"" % s)
+        self.assertEqual(result.output, s[::-1])

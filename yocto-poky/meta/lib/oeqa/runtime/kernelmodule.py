@@ -10,7 +10,7 @@ def setUpModule():
 
 class KernelModuleTest(oeRuntimeTest):
 
-    def setUp(self):
+    def setUpLocal(self):
         self.target.copy_to(os.path.join(oeRuntimeTest.tc.filesdir, "hellomod.c"), "/tmp/hellomod.c")
         self.target.copy_to(os.path.join(oeRuntimeTest.tc.filesdir, "hellomod_makefile"), "/tmp/Makefile")
 
@@ -30,5 +30,5 @@ class KernelModuleTest(oeRuntimeTest):
             (status, output) = self.target.run(cmd, 900)
             self.assertEqual(status, 0, msg="\n".join([cmd, output]))
 
-    def tearDown(self):
+    def tearDownLocal(self):
         self.target.run('rm -f /tmp/Makefile /tmp/hellomod.c')

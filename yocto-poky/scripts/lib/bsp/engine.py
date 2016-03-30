@@ -1684,9 +1684,9 @@ def yocto_layer_list_properties(arch, scripts_path, properties_file, expand_comm
             print "Couldn't open properties file %s for writing, exiting" % properties_file
             sys.exit(1)
 
-        json.dump(properties, of)
-
-    print_dict(properties)
+        json.dump(properties, of, indent=1)
+    else:
+        print_dict(properties)
 
 
 def split_nested_property(property):

@@ -1,0 +1,34 @@
+From: Samuel Gaist <samuel.gaist@edeltech.ch>
+Date: Wed, 4 Mar 2015 20:16:50 +0000 (+0100)
+Subject: Fix kmap2qmap build on OS X
+X-Git-Tag: v5.4.2~6
+X-Git-Url: https://codereview.qt-project.org/gitweb?p=qt%2Fqttools.git;a=commitdiff_plain;h=cf196a2565235f649b88fac55b53270bea23458d;hp=3070815a24239bd0f469bfeb8d0a1f091974e28e
+
+Fix kmap2qmap build on OS X
+
+Currently kmap2qmap fails to build on OS X (clang) This patch aims to
+fix this.
+
+Change-Id: I61c985dc7ad1f2486368c39aa976599d274942ab
+Reviewed-by: Friedemann Kleint <Friedemann.Kleint@theqtcompany.com>
+---
+Upstream-Status: Backport
+Index: qt-everywhere-opensource-src-4.8.7/tools/kmap2qmap/main.cpp
+===================================================================
+--- qt-everywhere-opensource-src-4.8.7.orig/tools/kmap2qmap/main.cpp
++++ qt-everywhere-opensource-src-4.8.7/tools/kmap2qmap/main.cpp
+@@ -385,9 +385,11 @@ static const int symbol_synonyms_size =
+ 
+ // makes the generated array in --header mode a bit more human readable
+ QT_BEGIN_NAMESPACE
+-static bool operator<(const QWSKeyboard::Mapping &m1, const QWSKeyboard::Mapping &m2)
+-{
+-    return m1.keycode != m2.keycode ? m1.keycode < m2.keycode : m1.modifiers < m2.modifiers;
++namespace QWSKeyboard {
++    static bool operator<(const Mapping &m1, const Mapping &m2)
++    {
++        return m1.keycode != m2.keycode ? m1.keycode < m2.keycode : m1.modifiers < m2.modifiers;
++    }
+ }
+ QT_END_NAMESPACE
+ 

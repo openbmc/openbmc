@@ -3533,6 +3533,45 @@
             </glossdef>
         </glossentry>
 
+        <glossentry id='var-EXCLUDE_FROM_SHLIBS'><glossterm>EXCLUDE_FROM_SHLIBS</glossterm>
+            <info>
+                EXCLUDE_FROM_SHLIBS[doc] = "Causes the OpenEmbedded build system's shared libraries resolver to exclude an entire package when scanning for shared libraries."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Triggers the OpenEmbedded build system's shared libraries
+                    resolver to exclude an entire package when scanning for
+                    shared libraries.
+                    <note>
+                        The shared libraries resolver's functionality results
+                        in part from the internal function
+                        <filename>package_do_shlibs</filename>, which is part of
+                        the
+                        <link linkend='ref-tasks-package'><filename>do_package</filename></link>
+                        task.
+                        You should be aware that the shared libraries resolver
+                        might implicitly define some dependencies between
+                        packages.
+                    </note>
+                    The <filename>EXCLUDE_FROM_SHLIBS</filename> variable is
+                    similar to the
+                    <link linkend='var-PRIVATE_LIBS'><filename>PRIVATE_LIBS</filename></link>
+                    variable, which excludes a package's particular libraries
+                    only and not the whole package.
+                </para>
+
+                <para>
+                    Use the
+                    <filename>EXCLUDE_FROM_SHLIBS</filename> variable by
+                    setting it to "1" for a particular package:
+                    <literallayout class='monospaced'>
+     EXCLUDE_FROM_SHLIBS = "1"
+                    </literallayout>
+                </para>
+            </glossdef>
+        </glossentry>
+
         <glossentry id='var-EXCLUDE_FROM_WORLD'><glossterm>EXCLUDE_FROM_WORLD</glossterm>
             <info>
                 EXCLUDE_FROM_WORLD[doc] = "Directs BitBake to exclude a recipe from world builds (i.e. bitbake world)."
@@ -5532,6 +5571,9 @@
                     within the function, you can use
                     <filename>${IMAGE_ROOTFS}</filename>, which points to
                     the directory that becomes the root filesystem image.
+                    See the
+                    <link linkend='var-IMAGE_ROOTFS'><filename>IMAGE_ROOTFS</filename></link>
+                    variable for more information.
                 </para>
             </glossdef>
         </glossentry>
@@ -5557,6 +5599,9 @@
                     within the function, you can use
                     <filename>${IMAGE_ROOTFS}</filename>, which points to
                     the directory that becomes the root filesystem image.
+                    See the
+                    <link linkend='var-IMAGE_ROOTFS'><filename>IMAGE_ROOTFS</filename></link>
+                    variable for more information.
                 </para>
             </glossdef>
         </glossentry>
@@ -5723,32 +5768,45 @@
                     Specifies the complete list of supported image types
                     by default:
                     <literallayout class='monospaced'>
-     jffs2
-     jffs2.sum
-     cramfs
-     ext2
-     ext2.gz
-     ext2.bz2
-     ext3
-     ext3.gz
-     ext2.lzma
      btrfs
-     live
-     squashfs
-     squashfs-xz
-     ubi
-     ubifs
-     tar
-     tar.gz
-     tar.bz2
-     tar.xz
      cpio
      cpio.gz
-     cpio.xz
+     cpio.lz4
      cpio.lzma
+     cpio.xz
+     cramfs
+     elf
+     ext2
+     ext2.bz2
+     ext2.gz
+     ext2.lzma
+     ext3
+     ext3.gz
+     ext4
+     ext4.gz
+     hdddirect
+     hddimg
+     iso
+     jffs2
+     jffs2.sum
+     multiubi
+     qcow2
+     squashfs
+     squashfs-lzo
+     squashfs-xz
+     tar
+     tar.bz2
+     tar.gz
+     tar.lz4
+     tar.xz
+     ubi
+     ubifs
      vdi
      vmdk
-     elf
+     wic
+     wic.bz2
+     wic.gz
+     wic.lzma
                     </literallayout>
                 </para>
 
@@ -6409,6 +6467,21 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
             </glossdef>
         </glossentry>
 
+        <glossentry id='var-KERNEL_ALT_IMAGETYPE'><glossterm>KERNEL_ALT_IMAGETYPE</glossterm>
+            <info>
+                KERNEL_ALT_IMAGETYPE[doc] = "Specifies an alternate kernel image type for creation."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Specifies an alternate kernel image type for creation in
+                    addition to the kernel image type specified using the
+                    <link linkend='var-KERNEL_IMAGETYPE'><filename>KERNEL_IMAGETYPE</filename></link>
+                    variable.
+                </para>
+            </glossdef>
+        </glossentry>
+
         <glossentry id='var-KERNEL_CLASSES'><glossterm>KERNEL_CLASSES</glossterm>
             <info>
                 KERNEL_CLASSES[doc] = "A list of classes defining kernel image types that kernel class should inherit."
@@ -6426,6 +6499,34 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     <filename>meta/classes/kernel-fitimage.bbclass</filename>.
                     You can register custom kernel image types with the
                     <filename>kernel</filename> class using this variable.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-KERNEL_DEVICETREE'><glossterm>KERNEL_DEVICETREE</glossterm>
+            <info>
+                KERNEL_DEVICETREE[doc] = "Specifies the name of the generated Linux kernel device tree (i.e. the <filename>.dtb</filename>) file."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Specifies the name of the generated Linux kernel device tree
+                    (i.e. the <filename>.dtb</filename>) file.
+                    <note>
+                        Legacy support exists for specifying the full path
+                        to the device tree.
+                        However, providing just the <filename>.dtb</filename>
+                        file is preferred.
+                    </note>
+                    In order to use this variable, you must have the include
+                    files in your kernel recipe:
+                    <literallayout class='monospaced'>
+     require recipes-kernel/linux/linux-dtb.inc
+                    </literallayout>
+                    or
+                    <literallayout class='monospaced'>
+     require recipes-kernel/linux/linux-yocto.inc
+                    </literallayout>
                 </para>
             </glossdef>
         </glossentry>
@@ -6558,6 +6659,12 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     This variable is used
                     when building the kernel and is passed to <filename>make</filename> as the target to
                     build.
+                </para>
+
+                <para>
+                    If you want to build an alternate kernel image type, use the
+                    <link linkend='var-KERNEL_ALT_IMAGETYPE'><filename>KERNEL_ALT_IMAGETYPE</filename></link>
+                    variable.
                 </para>
             </glossdef>
         </glossentry>
@@ -6693,6 +6800,46 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     <filename>KERNEL_SRC</filename> variable.
                     Both variables are common variables used by external
                     Makefiles to point to the kernel source directory.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-KERNEL_VERSION'><glossterm>KERNEL_VERSION</glossterm>
+            <info>
+                KERNEL_VERSION[doc] = "Specifies the version of the kernel as extracted from version.h or utsrelease.h within the kernel sources."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Specifies the version of the kernel as extracted from
+                    <filename>version.h</filename> or
+                    <filename>utsrelease.h</filename> within the kernel sources.
+                    Effects of setting this variable do not take affect until
+                    the kernel has been configured.
+                    Consequently, attempting to refer to this variable in
+                    contexts prior to configuration will not work.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-KERNELDEPMODDEPEND'><glossterm>KERNELDEPMODDEPEND</glossterm>
+            <info>
+                KERNELDEPMODDEPEND[doc] = "Specifies whether or not to use the data referenced through the PKGDATA_DIR directory."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Specifies whether the data referenced through
+                    <link linkend='var-PKGDATA_DIR'><filename>PKGDATA_DIR</filename></link>
+                    is needed or not.
+                    The <filename>KERNELDEPMODDEPEND</filename> does not
+                    control whether or not that data exists,
+                    but simply whether or not it is used.
+                    If you do not need to use the data, set the
+                    <filename>KERNELDEPMODDEPEND</filename> variable in your
+                    <filename>initramfs</filename> recipe.
+                    Setting the variable there when the data is not needed
+                    avoids a potential dependency loop.
                 </para>
             </glossdef>
         </glossentry>
@@ -7376,6 +7523,16 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     <literallayout class='monospaced'>
      MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS += "kernel-module-ab123"
                     </literallayout>
+                    <note>
+                        In this example, the
+                        <filename>kernel-module-ab123</filename> recipe
+                        needs to explicitly set its
+                        <link linkend='var-PACKAGES'><filename>PACKAGES</filename></link>
+                        variable to ensure that BitBake does not use the
+                        kernel recipe's
+                        <link linkend='var-PACKAGES_DYNAMIC'><filename>PACKAGES_DYNAMIC</filename></link>
+                        variable to satisfy the dependency.
+                    </note>
                 </para>
 
                 <para>
@@ -8311,6 +8468,32 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
             </glossdef>
         </glossentry>
 
+        <glossentry id='var-PACKAGE_EXCLUDE_COMPLEMENTARY'><glossterm>PACKAGE_EXCLUDE_COMPLEMENTARY</glossterm>
+            <info>
+                PACKAGE_EXCLUDE_COMPLEMENTARY[doc] = "Prevents specific packages from being installed when you are installing complementary packages."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Prevents specific packages from being installed when
+                    you are installing complementary packages.
+                </para>
+
+                <para>
+                    You might find that you want to prevent installing certain
+                    packages when you are installing complementary packages.
+                    For example, if you are using
+                    <link linkend='var-IMAGE_FEATURES'><filename>IMAGE_FEATURES</filename></link>
+                    to install <filename>dev-pkgs</filename>, you might not want
+                    to install all packages from a particular multilib.
+                    If you find yourself in this situation, you can use the
+                    <filename>PACKAGE_EXCLUDE_COMPLEMENTARY</filename> variable
+                    to specify regular expressions to match the packages you
+                    want to exclude.
+                </para>
+            </glossdef>
+        </glossentry>
+
         <glossentry id='var-PACKAGE_EXCLUDE'><glossterm>PACKAGE_EXCLUDE</glossterm>
             <info>
                 PACKAGE_EXCLUDE[doc] = "Packages to exclude from the installation. If a listed package is required, an error is generated."
@@ -8373,6 +8556,144 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     Specifies the list of architectures compatible with the device CPU.
                     This variable is useful when you build for several different devices that use
                     miscellaneous processors such as XScale and ARM926-EJS.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-PACKAGE_FEED_ARCHS'><glossterm>PACKAGE_FEED_ARCHS</glossterm>
+            <info>
+                PACKAGE_FEED_ARCHS[doc] = "Specifies user-defined package architectures when constructing package feed URIs."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Specifies the package architectures used as part of the
+                    package feed URIs during the build.
+                    The <filename>PACKAGE_FEED_ARCHS</filename> variable is
+                    appended to the final package feed URI, which is constructed
+                    using the
+                    <link linkend='var-PACKAGE_FEED_URIS'><filename>PACKAGE_FEED_URIS</filename></link>
+                    and
+                    <link linkend='var-PACKAGE_FEED_BASE_PATHS'><filename>PACKAGE_FEED_BASE_PATHS</filename></link>
+                    variables.
+                </para>
+
+                <para>
+                    Consider the following example where the
+                    <filename>PACKAGE_FEED_URIS</filename>,
+                    <filename>PACKAGE_FEED_BASE_PATHS</filename>, and
+                    <filename>PACKAGE_FEED_ARCHS</filename> variables are
+                    defined in your <filename>local.conf</filename> file:
+                    <literallayout class='monospaced'>
+     PACKAGE_FEED_URIS = "https://example.com/packagerepos/release \
+                          https://example.com/packagerepos/updates"
+     PACKAGE_FEED_BASE_PATHS = "rpm rpm-dev"
+     PACKAGE_FEED_ARCHS = "all core2-64"
+                    </literallayout>
+                    Given these settings, the resulting package feeds are
+                    as follows:
+                    <literallayout class='monospaced'>
+     https://example.com/packagerepos/release/rpm/all
+     https://example.com/packagerepos/release/rpm/core2-64
+     https://example.com/packagerepos/release/rpm-dev/all
+     https://example.com/packagerepos/release/rpm-dev/core2-64
+     https://example.com/packagerepos/updates/rpm/all
+     https://example.com/packagerepos/updates/rpm/core2-64
+     https://example.com/packagerepos/updates/rpm-dev/all
+     https://example.com/packagerepos/updates/rpm-dev/core2-64
+                    </literallayout>
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-PACKAGE_FEED_BASE_PATHS'><glossterm>PACKAGE_FEED_BASE_PATHS</glossterm>
+            <info>
+                PACKAGE_FEED_BASE_PATHS[doc] = "Specifies base path used when constructing package feed URIs."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Specifies the base path used when constructing package feed
+                    URIs.
+                    The <filename>PACKAGE_FEED_BASE_PATHS</filename> variable
+                    makes up the middle portion of a package feed URI used
+                    by the OpenEmbedded build system.
+                    The base path lies between the
+                    <link linkend='var-PACKAGE_FEED_URIS'><filename>PACKAGE_FEED_URIS</filename></link>
+                    and
+                    <link linkend='var-PACKAGE_FEED_ARCHS'><filename>PACKAGE_FEED_ARCHS</filename></link>
+                    variables.
+                </para>
+
+                <para>
+                    Consider the following example where the
+                    <filename>PACKAGE_FEED_URIS</filename>,
+                    <filename>PACKAGE_FEED_BASE_PATHS</filename>, and
+                    <filename>PACKAGE_FEED_ARCHS</filename> variables are
+                    defined in your <filename>local.conf</filename> file:
+                    <literallayout class='monospaced'>
+     PACKAGE_FEED_URIS = "https://example.com/packagerepos/release \
+                          https://example.com/packagerepos/updates"
+     PACKAGE_FEED_BASE_PATHS = "rpm rpm-dev"
+     PACKAGE_FEED_ARCHS = "all core2-64"
+                    </literallayout>
+                    Given these settings, the resulting package feeds are
+                    as follows:
+                    <literallayout class='monospaced'>
+     https://example.com/packagerepos/release/rpm/all
+     https://example.com/packagerepos/release/rpm/core2-64
+     https://example.com/packagerepos/release/rpm-dev/all
+     https://example.com/packagerepos/release/rpm-dev/core2-64
+     https://example.com/packagerepos/updates/rpm/all
+     https://example.com/packagerepos/updates/rpm/core2-64
+     https://example.com/packagerepos/updates/rpm-dev/all
+     https://example.com/packagerepos/updates/rpm-dev/core2-64
+                    </literallayout>
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-PACKAGE_FEED_URIS'><glossterm>PACKAGE_FEED_URIS</glossterm>
+            <info>
+                PACKAGE_FEED_URIS[doc] = "Specifies the front portion of the package feed URI used by the OpenEmbedded build system."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Specifies the front portion of the package feed URI
+                    used by the OpenEmbedded build system.
+                    Each final package feed URI is comprised of
+                    <filename>PACKAGE_FEED_URIS</filename>,
+                    <link linkend='var-PACKAGE_FEED_BASE_PATHS'><filename>PACKAGE_FEED_BASE_PATHS</filename></link>,
+                    and
+                    <link linkend='var-PACKAGE_FEED_ARCHS'><filename>PACKAGE_FEED_ARCHS</filename></link>
+                    variables.
+                </para>
+
+                <para>
+                    Consider the following example where the
+                    <filename>PACKAGE_FEED_URIS</filename>,
+                    <filename>PACKAGE_FEED_BASE_PATHS</filename>, and
+                    <filename>PACKAGE_FEED_ARCHS</filename> variables are
+                    defined in your <filename>local.conf</filename> file:
+                    <literallayout class='monospaced'>
+     PACKAGE_FEED_URIS = "https://example.com/packagerepos/release \
+                          https://example.com/packagerepos/updates"
+     PACKAGE_FEED_BASE_PATHS = "rpm rpm-dev"
+     PACKAGE_FEED_ARCHS = "all core2-64"
+                    </literallayout>
+                    Given these settings, the resulting package feeds are
+                    as follows:
+                    <literallayout class='monospaced'>
+     https://example.com/packagerepos/release/rpm/all
+     https://example.com/packagerepos/release/rpm/core2-64
+     https://example.com/packagerepos/release/rpm-dev/all
+     https://example.com/packagerepos/release/rpm-dev/core2-64
+     https://example.com/packagerepos/updates/rpm/all
+     https://example.com/packagerepos/updates/rpm/core2-64
+     https://example.com/packagerepos/updates/rpm-dev/all
+     https://example.com/packagerepos/updates/rpm-dev/core2-64
+                    </literallayout>
                 </para>
             </glossdef>
         </glossentry>
@@ -10865,6 +11186,34 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
             </glossdef>
         </glossentry>
 
+        <glossentry id='var-SKIP_FILEDEPS'><glossterm>SKIP_FILEDEPS</glossterm>
+            <info>
+                SKIP_FILEDEPS[doc] = "Enables you to remove all files from
+                the "Provides" section of an RPM package."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Enables removal of all files from the "Provides" section of
+                    an RPM package.
+                    Removal of these files is required for packages containing
+                    prebuilt binaries and libraries such as
+                    <filename>libstdc++</filename> and
+                    <filename>glibc</filename>.
+                </para>
+
+                <para>
+                    To enable file removal, set the variable to "1" in your
+                    <filename>conf/local.conf</filename> configuration file
+                    in your:
+                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>.
+                    <literallayout class='monospaced'>
+     SKIP_FILEDEPS = "1"
+                    </literallayout>
+                </para>
+            </glossdef>
+        </glossentry>
+
         <glossentry id='var-SOC_FAMILY'><glossterm>SOC_FAMILY</glossterm>
             <info>
                 SOC_FAMILY[doc] = "Groups together machines based upon the same family of SOC (System On Chip). You typically set this variable in a common .inc file that you include in the configuration files of all the machines."
@@ -11052,7 +11401,14 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                 </para>
 
                 <para>
-                    The following list explains the available URI protocols:
+                    The following list explains the available URI protocols.
+                    URI protocols are highly dependent on particular BitBake
+                    Fetcher submodules.
+                    Depending on the fetcher BitBake uses, various URL
+                    parameters are employed.
+                    For specifics on the supported Fetchers, see the
+                    "<ulink url='&YOCTO_DOCS_BB_URL;#bb-fetchers'>Fetchers</ulink>"
+                    section in the BitBake User Manual.
                     <itemizedlist>
                         <listitem><para><emphasis><filename>file://</filename> -</emphasis>
                             Fetches files, which are usually files shipped with
@@ -11180,11 +11536,25 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                         <listitem><para><emphasis><filename>unpack</filename> -</emphasis> Controls
                             whether or not to unpack the file if it is an archive.
                             The default action is to unpack the file.</para></listitem>
+                        <listitem><para><emphasis><filename>destsuffix</filename> -</emphasis> Places the file
+                            (or extracts its contents) into the specified
+                            subdirectory of <link linkend='var-WORKDIR'><filename>WORKDIR</filename></link>
+                            when the Git fetcher is used.
+                            </para></listitem>
                         <listitem><para><emphasis><filename>subdir</filename> -</emphasis> Places the file
                             (or extracts its contents) into the specified
-                            subdirectory of <link linkend='var-WORKDIR'><filename>WORKDIR</filename></link>.
-                            This option is useful for unusual tarballs or other archives that
-                            do not have their files already in a subdirectory within the archive.
+                            subdirectory of <link linkend='var-WORKDIR'><filename>WORKDIR</filename></link>
+                            when the local (<filename>file://</filename>)
+                            fetcher is used.
+                            </para></listitem>
+                        <listitem><para><emphasis><filename>localdir</filename> -</emphasis> Places the file
+                            (or extracts its contents) into the specified
+                            subdirectory of <link linkend='var-WORKDIR'><filename>WORKDIR</filename></link>
+                            when the CVS fetcher is used.
+                            </para></listitem>
+                        <listitem><para><emphasis><filename>subpath</filename> -</emphasis>
+                            Limits the checkout to a specific subpath of the
+                            tree when using the Git fetcher is used.
                             </para></listitem>
                         <listitem><para><emphasis><filename>name</filename> -</emphasis> Specifies a
                             name to be used for association with <filename>SRC_URI</filename> checksums
@@ -11632,6 +12002,25 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
                     Specifies the path to the <filename>/usr/include</filename>
                     subdirectory of the sysroot directory for the build host.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-STAGING_KERNEL_BUILDDIR'><glossterm>STAGING_KERNEL_BUILDDIR</glossterm>
+            <info>
+                STAGING_KERNEL_BUILDDIR[doc] = "Points to the directory containing the kernel build artifacts."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Points to the directory containing the kernel build
+                    artifacts.
+                    Recipes building software that needs to access kernel
+                    build artifacts
+                    (e.g. <filename>systemtap-uprobes</filename>) can look in
+                    the directory specified with the
+                    <filename>STAGING_KERNEL_BUILDDIR</filename> variable to
+                    find these artifacts after the kernel has been built.
                 </para>
             </glossdef>
         </glossentry>
@@ -12569,7 +12958,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     these tests, see the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#performing-automated-runtime-testing'>Performing Automated Runtime Testing</ulink>"
                     section in the Yocto Project Development Manual and the
-                    "<link linkend='ref-classes-testimage'><filename>testimage.bbclass</filename></link>"
+                    "<link linkend='ref-classes-testimage*'><filename>testimage*.bbclass</filename></link>"
                     section.
                 </para>
             </glossdef>
@@ -13948,7 +14337,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                         <filename>uid</filename> and <filename>gid</filename>
                         values causes the OpenEmbedded build system to employ
                         the
-                        <link linkend='ref-classes-useradd-staticids'><filename>useradd-staticids</filename></link>
+                        <link linkend='ref-classes-useradd'><filename>useradd-staticids</filename></link>
                         class.
                     </note>
                 </para>

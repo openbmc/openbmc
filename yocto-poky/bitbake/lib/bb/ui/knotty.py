@@ -230,7 +230,7 @@ def _log_settings_from_server(server):
     if error:
         logger.error("Unable to get the value of BBINCLUDELOGS_LINES variable: %s" % error)
         raise BaseException(error)
-    consolelogfile, error = server.runCommand(["getVariable", "BB_CONSOLELOG"])
+    consolelogfile, error = server.runCommand(["getSetVariable", "BB_CONSOLELOG"])
     if error:
         logger.error("Unable to get the value of BB_CONSOLELOG variable: %s" % error)
         raise BaseException(error)

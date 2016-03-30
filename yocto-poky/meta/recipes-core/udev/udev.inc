@@ -15,6 +15,8 @@ LDFLAGS += "-lrt"
 DEPENDS = "glib-2.0 libusb usbutils pciutils glib-2.0-native gperf-native libxslt-native util-linux"
 RPROVIDES_${PN} = "hotplug"
 
+PROVIDES = "libgudev"
+
 SRC_URI = "${KERNELORG_MIRROR}/linux/utils/kernel/hotplug/udev-${PV}.tar.gz \
            file://0001-Fixing-keyboard_force_release.sh-shell-script-path.patch \
            file://avoid-mouse-autosuspend.patch \

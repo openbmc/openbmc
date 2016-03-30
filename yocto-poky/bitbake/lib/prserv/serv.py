@@ -3,6 +3,7 @@ import signal, time
 from SimpleXMLRPCServer import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
 import threading
 import Queue
+import socket
 
 try:
     import sqlite3
@@ -37,7 +38,6 @@ singleton = None
 class PRServer(SimpleXMLRPCServer):
     def __init__(self, dbfile, logfile, interface, daemon=True):
         ''' constructor '''
-        import socket
         try:
             SimpleXMLRPCServer.__init__(self, interface,
                                         logRequests=False, allow_none=True)
@@ -148,7 +148,7 @@ class PRServer(SimpleXMLRPCServer):
         while not self.quit:
             self.handle_request()
         self.handlerthread.join()
-        self.table.sync()
+        self.db.disconnect()
         logger.info("PRServer: stopping...")
         self.server_close()
         return
@@ -289,7 +289,8 @@ class PRServerConnection(object):
         return self.host, self.port
 
 def start_daemon(dbfile, host, port, logfile):
-    pidfile = PIDPREFIX % (host, port)
+    ip = socket.gethostbyname(host)
+    pidfile = PIDPREFIX % (ip, port)
     try:
         pf = file(pidfile,'r')
         pid = int(pf.readline().strip())
@@ -302,12 +303,21 @@ def start_daemon(dbfile, host, port, logfile):
                             % pidfile)
         return 1
 
-    server = PRServer(os.path.abspath(dbfile), os.path.abspath(logfile), (host,port))
+    server = PRServer(os.path.abspath(dbfile), os.path.abspath(logfile), (ip,port))
     server.start()
+
+    # Sometimes, the port (i.e. localhost:0) indicated by the user does not match with
+    # the one the server actually is listening, so at least warn the user about it
+    _,rport = server.getinfo()
+    if port != rport:
+        sys.stdout.write("Server is listening at port %s instead of %s\n"
+                         % (rport,port))
     return 0
 
 def stop_daemon(host, port):
-    pidfile = PIDPREFIX % (host, port)
+    import glob
+    ip = socket.gethostbyname(host)
+    pidfile = PIDPREFIX % (ip, port)
     try:
         pf = file(pidfile,'r')
         pid = int(pf.readline().strip())
@@ -316,11 +326,23 @@ def stop_daemon(host, port):
         pid = None
 
     if not pid:
-        sys.stderr.write("pidfile %s does not exist. Daemon not running?\n"
-                        % pidfile)
+        # when server starts at port=0 (i.e. localhost:0), server actually takes another port,
+        # so at least advise the user which ports the corresponding server is listening
+        ports = []
+        portstr = ""
+        for pf in glob.glob(PIDPREFIX % (ip,'*')):
+            bn = os.path.basename(pf)
+            root, _ = os.path.splitext(bn)
+            ports.append(root.split('_')[-1])
+        if len(ports):
+            portstr = "Wrong port? Other ports listening at %s: %s" % (host, ' '.join(ports))
+
+        sys.stderr.write("pidfile %s does not exist. Daemon not running? %s\n"
+                         % (pidfile,portstr))
+        return 1
 
     try:
-        PRServerConnection(host, port).terminate()
+        PRServerConnection(ip, port).terminate()
     except:
         logger.critical("Stop PRService %s:%d failed" % (host,port))
 

@@ -9,6 +9,7 @@ SRC_URI = " \
     file://0001-gstinfo-Shorten-__FILE__-on-all-platforms.patch \
     file://inputselector-sticky-events-haven-t-send-out-when-ac-1-4-1.patch \
     file://0002-basesink-Fix-QoS-lateness-checking-if-subclass-imple.patch \
+    file://0003-basesink-Shouldn-t-drop-buffer-when-sync-false.patch \
 "
 SRC_URI[md5sum] = "88a9289c64a4950ebb4f544980234289"
 SRC_URI[sha256sum] = "40801aa7f979024526258a0e94707ba42b8ab6f7d2206e56adbc4433155cb0ae"

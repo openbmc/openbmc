@@ -28,6 +28,7 @@ PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'zeroconf', 'avahi', 
 PACKAGECONFIG[avahi] = "--enable-avahi,--disable-avahi,avahi"
 PACKAGECONFIG[acl] = "--enable-acl,--disable-acl,acl"
 PACKAGECONFIG[pam] = "--enable-pam, --disable-pam, libpam"
+PACKAGECONFIG[xinetd] = "--with-xinetd=${sysconfdir}/xinetd.d,--without-xinetd,xinetd"
 
 EXTRA_OECONF = " \
                --enable-gnutls \
@@ -63,6 +64,11 @@ do_install () {
 	# Remove /var/run from package as cupsd will populate it on startup
 	rm -fr ${D}/${localstatedir}/run
 	rmdir ${D}/${libdir}/${BPN}/driver
+
+	# Fix the pam configuration file permissions
+	if ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'true', 'false', d)}; then
+	    chmod 0644 ${D}${sysconfdir}/pam.d/cups
+	fi
 
 	# Remove sysinit script and symlinks if sysvinit is not in DISTRO_FEATURES
 	if ${@bb.utils.contains('DISTRO_FEATURES','sysvinit','false','true',d)}; then

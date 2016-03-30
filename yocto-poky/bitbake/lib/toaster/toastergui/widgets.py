@@ -20,6 +20,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from django.views.generic import View, TemplateView
+from django.views.decorators.cache import cache_control
 from django.shortcuts import HttpResponse
 from django.http import HttpResponseBadRequest
 from django.core import serializers
@@ -38,6 +39,9 @@ import collections
 import operator
 import re
 
+import logging
+logger = logging.getLogger("toaster")
+
 from toastergui.views import objtojson
 
 class ToasterTable(TemplateView):
@@ -45,7 +49,7 @@ class ToasterTable(TemplateView):
         super(ToasterTable, self).__init__()
         if 'template_name' in kwargs:
             self.template_name = kwargs['template_name']
-        self.title = None
+        self.title = "Table"
         self.queryset = None
         self.columns = []
         self.filters = {}
@@ -60,6 +64,18 @@ class ToasterTable(TemplateView):
                         displayable=False,
                         orderable=True,
                         field_name="id")
+
+        # prevent HTTP caching of table data
+    @cache_control(must_revalidate=True, max_age=0, no_store=True, no_cache=True)
+    def dispatch(self, *args, **kwargs):
+        return super(ToasterTable, self).dispatch(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(ToasterTable, self).get_context_data(**kwargs)
+        context['title'] = self.title
+        context['table_name'] =  type(self).__name__.lower()
+
+        return context
 
 
     def get(self, request, *args, **kwargs):
@@ -219,7 +235,8 @@ class ToasterTable(TemplateView):
         """Creates a query based on the model's search_allowed_fields"""
 
         if not hasattr(self.queryset.model, 'search_allowed_fields'):
-            raise Exception("Err Search fields aren't defined in the model")
+            raise Exception("Search fields aren't defined in the model %s"
+                           % self.queryset.model)
 
         search_queries = []
         for st in search_term.split(" "):
@@ -242,11 +259,14 @@ class ToasterTable(TemplateView):
         search = request.GET.get("search", None)
         filters = request.GET.get("filter", None)
         orderby = request.GET.get("orderby", None)
+        nocache = request.GET.get("nocache", None)
 
         # Make a unique cache name
         cache_name = self.__class__.__name__
 
         for key, val in request.GET.iteritems():
+            if key == 'nocache':
+                continue
             cache_name = cache_name + str(key) + str(val)
 
         for key, val in kwargs.iteritems():
@@ -254,9 +274,14 @@ class ToasterTable(TemplateView):
 
         # No special chars allowed in the cache name apart from dash
         cache_name = re.sub(r'[^A-Za-z0-9-]', "", cache_name)
+
+        if nocache:
+            cache.delete(cache_name)
+
         data = cache.get(cache_name)
 
         if data:
+            logger.debug("Got cache data for table '%s'" % self.title)
             return data
 
         self.setup_columns(**kwargs)
@@ -330,33 +355,6 @@ class ToasterTable(TemplateView):
         return data
 
 
-class ToasterTemplateView(TemplateView):
-    # renders a instance in a template, or returns the context as json
-    # the class-equivalent of the _template_renderer decorator for views
-
-    def __init__(self, *args, **kwargs):
-        super(ToasterTemplateView, self).__init__(*args, **kwargs)
-        self.context_entries = []
-
-    def get(self, *args, **kwargs):
-        if self.request.GET.get('format', None) == 'json':
-            from django.core.urlresolvers import reverse
-            from django.shortcuts import HttpResponse
-            from views import objtojson
-            from toastergui.templatetags.projecttags import json as jsonfilter
-
-            context = self.get_context_data(**kwargs)
-
-            for x in context.keys():
-                if x not in self.context_entries:
-                    del context[x]
-
-            context["error"] = "ok"
-
-            return HttpResponse(jsonfilter(context,  default=objtojson ),
-                            content_type = "application/json; charset=utf-8")
-
-        return super(ToasterTemplateView, self).get(*args, **kwargs)
 
 class ToasterTypeAhead(View):
     """ A typeahead mechanism to support the front end typeahead widgets """

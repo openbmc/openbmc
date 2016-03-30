@@ -492,9 +492,12 @@ class RecipetoolAppendsrcBase(RecipetoolBase):
 
 
 class RecipetoolAppendsrcTests(RecipetoolAppendsrcBase):
+
+    @testcase(1273)
     def test_recipetool_appendsrcfile_basic(self):
         self._test_appendsrcfile('base-files', 'a-file')
 
+    @testcase(1274)
     def test_recipetool_appendsrcfile_basic_wildcard(self):
         testrecipe = 'base-files'
         self._test_appendsrcfile(testrecipe, 'a-file', options='-w')
@@ -502,12 +505,15 @@ class RecipetoolAppendsrcTests(RecipetoolAppendsrcBase):
         bbappendfile = self._check_bbappend(testrecipe, recipefile, self.templayerdir)
         self.assertEqual(os.path.basename(bbappendfile), '%s_%%.bbappend' % testrecipe)
 
+    @testcase(1281)
     def test_recipetool_appendsrcfile_subdir_basic(self):
         self._test_appendsrcfile('base-files', 'a-file', 'tmp')
 
+    @testcase(1282)
     def test_recipetool_appendsrcfile_subdir_basic_dirdest(self):
         self._test_appendsrcfile('base-files', destdir='tmp')
 
+    @testcase(1280)
     def test_recipetool_appendsrcfile_srcdir_basic(self):
         testrecipe = 'bash'
         srcdir = get_bb_var('S', testrecipe)
@@ -515,12 +521,14 @@ class RecipetoolAppendsrcTests(RecipetoolAppendsrcBase):
         subdir = os.path.relpath(srcdir, workdir)
         self._test_appendsrcfile(testrecipe, 'a-file', srcdir=subdir)
 
+    @testcase(1275)
     def test_recipetool_appendsrcfile_existing_in_src_uri(self):
         testrecipe = 'base-files'
         filepath = self._get_first_file_uri(testrecipe)
         self.assertTrue(filepath, 'Unable to test, no file:// uri found in SRC_URI for %s' % testrecipe)
         self._test_appendsrcfile(testrecipe, filepath, has_src_uri=False)
 
+    @testcase(1276)
     def test_recipetool_appendsrcfile_existing_in_src_uri_diff_params(self):
         testrecipe = 'base-files'
         subdir = 'tmp'
@@ -530,6 +538,7 @@ class RecipetoolAppendsrcTests(RecipetoolAppendsrcBase):
         output = self._test_appendsrcfile(testrecipe, filepath, subdir, has_src_uri=False)
         self.assertTrue(any('with different parameters' in l for l in output))
 
+    @testcase(1277)
     def test_recipetool_appendsrcfile_replace_file_srcdir(self):
         testrecipe = 'bash'
         filepath = 'Makefile.in'
@@ -541,6 +550,7 @@ class RecipetoolAppendsrcTests(RecipetoolAppendsrcBase):
         bitbake('%s:do_unpack' % testrecipe)
         self.assertEqual(open(self.testfile, 'r').read(), open(os.path.join(srcdir, filepath), 'r').read())
 
+    @testcase(1278)
     def test_recipetool_appendsrcfiles_basic(self, destdir=None):
         newfiles = [self.testfile]
         for i in range(1, 5):
@@ -550,5 +560,6 @@ class RecipetoolAppendsrcTests(RecipetoolAppendsrcBase):
             newfiles.append(testfile)
         self._test_appendsrcfiles('gcc', newfiles, destdir=destdir, options='-W')
 
+    @testcase(1279)
     def test_recipetool_appendsrcfiles_basic_subdir(self):
         self.test_recipetool_appendsrcfiles_basic(destdir='testdir')

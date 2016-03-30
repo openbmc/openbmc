@@ -1,0 +1,43 @@
+From 525fa9ded72d22b53c5eb366f61e2ac1d407a2db Mon Sep 17 00:00:00 2001
+From: Awais Belal <awais_belal@mentor.com>
+Date: Thu, 8 Oct 2015 13:49:31 +0500
+Subject: [PATCH] sharedtex_mt: fix rendering thread hang
+
+XNextEvent is a blocking call which locks up the display mutex
+this causes the rendering threads to hang when they try call
+glXSwapBuffers() as that tries to take the same mutex in
+underlying calls through XCopyArea().
+So we only go to XNextEvent when it has at least one event
+and we wouldn't lock indefinitely.
+
+Signed-off-by: Awais Belal <awais_belal@mentor.com>
+Upstream-Status: Backport (2b304e765695d385fd3bf414e6e444020bedb0a8)
+
+---
+ src/xdemos/sharedtex_mt.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/src/xdemos/sharedtex_mt.c b/src/xdemos/sharedtex_mt.c
+index a90903a..1d503c4 100644
+--- a/src/xdemos/sharedtex_mt.c
++++ b/src/xdemos/sharedtex_mt.c
+@@ -420,9 +420,14 @@ Resize(struct window *h, unsigned int width, unsigned int height)
+ static void
+ EventLoop(void)
+ {
++   int i;
++   XEvent event;
+    while (1) {
+-      int i;
+-      XEvent event;
++      /* Do we have an event? */
++      if (XPending(gDpy) == 0) {
++         usleep(10000);
++         continue;
++      }
+       XNextEvent(gDpy, &event);
+       for (i = 0; i < NumWindows; i++) {
+ 	 struct window *h = &Windows[i];
+-- 
+1.9.1
+

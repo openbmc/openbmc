@@ -69,6 +69,7 @@ SRC_URI = "\
     file://0047-repomembug.patch \
     file://0049-Enable-SPE-AltiVec-generation-on-powepc-linux-target.patch \
     file://target-gcc-includedir.patch \
+    file://0051-gcc-483-universal-initializer-no-warning.patch \
 "
 SRC_URI[md5sum] = "5a84a30839b2aca22a2d723de2a626ec"
 SRC_URI[sha256sum] = "4a80aa23798b8e9b5793494b8c976b39b8d9aa2e53cd5ed5534aff662a7f8695"

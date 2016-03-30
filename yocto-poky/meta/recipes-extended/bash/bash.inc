@@ -7,7 +7,7 @@ DEPENDS = "ncurses bison-native"
 inherit autotools gettext texinfo update-alternatives ptest
 
 EXTRA_AUTORECONF += "--exclude=autoheader"
-EXTRA_OECONF = "--enable-job-control"
+EXTRA_OECONF = "--enable-job-control --without-bash-malloc"
 
 # If NON_INTERACTIVE_LOGIN_SHELLS is defined, all login shells read the
 # startup files, even if they are not interactive.

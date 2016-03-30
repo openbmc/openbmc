@@ -9,7 +9,7 @@ SRC_URI = "git://git.yoctoproject.org/oprofileui \
            file://init \
            file://oprofileui-server.service "
 
-DEPENDS += "intltool-native"
+DEPENDS += "intltool-native gettext-native"
 
 EXTRA_OECONF += "--disable-client --enable-server"
 
