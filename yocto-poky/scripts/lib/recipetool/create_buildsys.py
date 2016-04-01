@@ -279,7 +279,7 @@ class MakefileRecipeHandler(RecipeHandler):
 
             installtarget = True
             try:
-                stdout, stderr = bb.process.run('make -qn install', cwd=srctree, shell=True)
+                stdout, stderr = bb.process.run('make -n install', cwd=srctree, shell=True)
             except bb.process.ExecutionError as e:
                 if e.exitcode != 1:
                     installtarget = False

@@ -4,6 +4,7 @@
 {% load humanize %}
 {% load static %}
 
+{% block title %} Configuration - {{project.name}} - Toaster {% endblock %}
 {% block projectinfomain %}
 
 <script src="{% static 'js/layerDepsModal.js' %}"></script>
@@ -67,7 +68,7 @@
 
       <div class="alert alert-info" style="display:none" id="no-most-built">
         <span class="lead">You haven't built any recipes yet</span>
-        <p style="margin-top: 10px;"><a href="{% url 'projecttargets' project.id %}">Choose a recipe to build</a></p>
+        <p style="margin-top: 10px;"><a href="{% url 'projectsoftwarerecipes' project.id %}">Choose a recipe to build</a></p>
       </div>
 
       <ul class="unstyled configuration-list" id="freq-build-list">

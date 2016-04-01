@@ -1,0 +1,32 @@
+From df2cc76cdebc4773361477f3db203790f6986e3b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 22 Aug 2015 23:42:40 -0700
+Subject: [PATCH 2/2] Passthrough -r to linker
+
+clang does not have -r switch and it does not pass it down to linker
+either, LDFLAGS_RELOCATABLE is used when CC is used for LD, so this
+should not cause side effects
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 9da02cb..10dd4a9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -309,7 +309,7 @@ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ -Wbitwise $(C
+ MODFLAGS	= -DMODULE
+ CFLAGS_MODULE   = $(MODFLAGS)
+ AFLAGS_MODULE   = $(MODFLAGS)
+-LDFLAGS_RELOCATABLE = -r -nostdlib
++LDFLAGS_RELOCATABLE = -Xlinker -r -nostdlib
+ LDFLAGS_MODULE  = $(LDFLAGS_RELOCATABLE)
+ CFLAGS_KERNEL	=
+ AFLAGS_KERNEL	=
+-- 
+2.1.4
+

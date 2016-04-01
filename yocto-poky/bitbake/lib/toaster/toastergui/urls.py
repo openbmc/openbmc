@@ -87,27 +87,28 @@ urlpatterns = patterns('toastergui.views',
         # the table pages that have been converted to ToasterTable widget
         url(r'^project/(?P<pid>\d+)/machines/$',
             tables.MachinesTable.as_view(template_name="generic-toastertable-page.html"),
-            { 'table_name': tables.MachinesTable.__name__.lower(),
-              'title' : 'Compatible machines' },
             name="projectmachines"),
 
-        url(r'^project/(?P<pid>\d+)/recipes/$',
-            tables.RecipesTable.as_view(template_name="generic-toastertable-page.html"),
-            { 'table_name': tables.RecipesTable.__name__.lower(),
-              'title' : 'Compatible recipes' },
-            name="projecttargets"),
+        url(r'^project/(?P<pid>\d+)/softwarerecipes/$',
+            tables.SoftwareRecipesTable.as_view(template_name="generic-toastertable-page.html"),
+            name="projectsoftwarerecipes"),
 
-        url(r'^project/(?P<pid>\d+)/availablerecipes/$',
-            tables.ProjectLayersRecipesTable.as_view(template_name="generic-toastertable-page.html"),
-            { 'table_name': tables.ProjectLayersRecipesTable.__name__.lower(),
-              'title' : 'Recipes available for layers in the current project' },
-            name="projectavailabletargets"),
+        url(r'^project/(?P<pid>\d+)/images/$',
+            tables.ImageRecipesTable.as_view(template_name="generic-toastertable-page.html"), name="projectimagerecipes"),
+
+        url(r'^project/(?P<pid>\d+)/customimages/$',
+            tables.CustomImagesTable.as_view(template_name="generic-toastertable-page.html"), name="projectcustomimages"),
+
+        url(r'^project/(?P<pid>\d+)/newcustomimage/$',
+            tables.NewCustomImagesTable.as_view(template_name="newcustomimage.html"),
+            name="newcustomimage"),
+
 
         url(r'^project/(?P<pid>\d+)/layers/$',
             tables.LayersTable.as_view(template_name="generic-toastertable-page.html"),
-            { 'table_name': tables.LayersTable.__name__.lower(),
-              'title' : 'Compatible layers' },
             name="projectlayers"),
+
+
 
         url(r'^project/(?P<pid>\d+)/layer/(?P<layerid>\d+)$',
             'layerdetails', name='layerdetails'),
@@ -123,6 +124,16 @@ urlpatterns = patterns('toastergui.views',
             { 'table_name': tables.LayerMachinesTable.__name__.lower(),
               'title' : 'All machines in layer' },
             name=tables.LayerMachinesTable.__name__.lower()),
+
+
+        url(r'^project/(?P<pid>\d+)/customrecipe/(?P<recipeid>\d+)/selectpackages/$',
+            tables.SelectPackagesTable.as_view(template_name="generic-toastertable-page.html"), name="recipeselectpackages"),
+
+
+        url(r'^project/(?P<pid>\d+)/customrecipe/(?P<recipe_id>\d+)$',
+            'customrecipe',
+            name="customrecipe"),
+
 
 
         # typeahead api end points
@@ -148,6 +159,14 @@ urlpatterns = patterns('toastergui.views',
         # JS Unit tests
         url(r'^js-unit-tests/$', 'jsunittests', name='js-unit-tests'),
 
-        # default redirection
+        # image customisation functionality
+        url(r'^xhr_customrecipe/(?P<recipe_id>\d+)/packages/(?P<package_id>\d+|)$',
+            'xhr_customrecipe_packages', name='xhr_customrecipe_packages'),
+        url(r'^xhr_customrecipe/(?P<recipe_id>\d+)$', 'xhr_customrecipe_id',
+            name='xhr_customrecipe_id'),
+        url(r'^xhr_customrecipe/', 'xhr_customrecipe',
+            name='xhr_customrecipe'),
+
+          # default redirection
         url(r'^$', RedirectView.as_view( url= 'landing')),
 )

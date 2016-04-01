@@ -33,14 +33,6 @@ function tableInit(ctx){
 
   loadData(tableParams);
 
-  window.onpopstate = function(event){
-    if (event.state){
-      tableParams = event.state.tableParams;
-      /* We skip loadData and just update the table */
-      updateTable(event.state.tableData);
-    }
-  };
-
   function loadData(tableParams){
     $.ajax({
         type: "GET",
@@ -49,10 +41,8 @@ function tableInit(ctx){
         headers: { 'X-CSRFToken' : $.cookie('csrftoken')},
         success: function(tableData) {
           updateTable(tableData);
-          window.history.pushState({
-              tableData: tableData,
-              tableParams: tableParams
-          }, null, libtoaster.dumpsUrlParams(tableParams));
+          window.history.replaceState(null, null,
+            libtoaster.dumpsUrlParams(tableParams));
         }
     });
   }
@@ -140,7 +130,7 @@ function tableInit(ctx){
       tableBody.append(row);
 
       /* If we have layerbtns then initialise them */
-      layerBtnsInit(ctx);
+      layerBtnsInit();
 
       /* If we have popovers initialise them now */
       $('td > a.btn').popover({

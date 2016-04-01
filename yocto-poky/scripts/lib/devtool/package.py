@@ -20,7 +20,7 @@ import os
 import subprocess
 import logging
 from bb.process import ExecutionError
-from devtool import exec_build_env_command, setup_tinfoil, DevtoolError
+from devtool import exec_build_env_command, setup_tinfoil, check_workspace_recipe, DevtoolError
 
 logger = logging.getLogger('devtool')
 
@@ -30,13 +30,11 @@ def plugin_init(pluginlist):
 
 def package(args, config, basepath, workspace):
     """Entry point for the devtool 'package' subcommand"""
-    if not args.recipename in workspace:
-        raise DevtoolError("no recipe named %s in your workspace" %
-                           args.recipename)
+    check_workspace_recipe(workspace, args.recipename)
 
     image_pkgtype = config.get('Package', 'image_pkgtype', '')
     if not image_pkgtype:
-        tinfoil = setup_tinfoil()
+        tinfoil = setup_tinfoil(basepath=basepath)
         try:
             tinfoil.prepare(config_only=True)
             image_pkgtype = tinfoil.config_data.getVar('IMAGE_PKGTYPE', True)

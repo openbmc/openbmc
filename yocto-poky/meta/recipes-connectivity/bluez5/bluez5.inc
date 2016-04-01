@@ -18,7 +18,6 @@ PACKAGECONFIG[experimental] = "--enable-experimental,--disable-experimental,"
 
 SRC_URI = "\
     ${KERNELORG_MIRROR}/linux/bluetooth/bluez-${PV}.tar.xz \
-    file://bluetooth.conf \
 "
 S = "${WORKDIR}/bluez-${PV}"
 
@@ -53,8 +52,8 @@ do_install_append() {
 	if [ -f ${S}/profiles/input/input.conf ]; then
 	    install -m 0644 ${S}/profiles/input/input.conf ${D}/${sysconfdir}/bluetooth/
 	fi
-	# at_console doesn't really work with the current state of OE, so punch some more holes so people can actually use BT
-	install -m 0644 ${WORKDIR}/bluetooth.conf ${D}/${sysconfdir}/dbus-1/system.d/
+
+	install -m 0644 ${S}/src/bluetooth.conf ${D}/${sysconfdir}/dbus-1/system.d/
 
 	# Install desired tools that upstream leaves in build area
         for f in ${NOINST_TOOLS} ; do

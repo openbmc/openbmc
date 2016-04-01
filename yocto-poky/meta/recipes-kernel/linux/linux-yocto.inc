@@ -11,6 +11,10 @@ DEPENDS_append_aarch64 = " libgcc"
 KERNEL_CC_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
 KERNEL_LD_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
 
+DEPENDS_append_nios2 = " libgcc"
+KERNEL_CC_append_nios2 = " ${TOOLCHAIN_OPTIONS}"
+KERNEL_LD_append_nios2 = " ${TOOLCHAIN_OPTIONS}"
+
 # A KMACHINE is the mapping of a yocto $MACHINE to what is built
 # by the kernel. This is typically the branch that should be built,
 # and it can be specific to the machine or shared

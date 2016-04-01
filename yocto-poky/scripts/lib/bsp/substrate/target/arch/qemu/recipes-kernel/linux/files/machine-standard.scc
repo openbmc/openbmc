@@ -1,6 +1,6 @@
 # yocto-bsp-filename {{=machine}}-standard.scc
 define KMACHINE {{=machine}}
-define KTYPE standard
+
 define KARCH {{=qemuarch}}
 
 {{ if qemuarch == "i386" or qemuarch == "x86_64": }}
@@ -14,6 +14,7 @@ include bsp/mti-malta32/mti-malta32-be-standard
 {{ if qemuarch == "mips64": }}
 include bsp/mti-malta64/mti-malta64-be-standard
 {{ if need_new_kbranch == "y": }}
+define KTYPE {{=new_kbranch}}
 branch {{=machine}}
 
 include {{=machine}}.scc

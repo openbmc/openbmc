@@ -1,0 +1,43 @@
+From ee05e55e84b53f4bb0d0baba13ca47a8f84b7cb4 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Wed, 30 Sep 2015 01:12:52 -0700
+Subject: [PATCH] smart:cache.py: getPackages() matches name + arch
+
+It only matched name ony in the past, for example:
+smart install busybox (matched)
+but:
+smart install busybox@core2_64 (didn't match)
+
+The installation is very slow when no match since it would seach all the
+packages in the repo
+This patch makes it match both.
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ smart/cache.py |    3 ++-
+ smart/ccache.c |    9 ++++++++-
+ 2 files changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/smart/control.py b/smart/control.py
+index d44abe7..f23a604 100644
+--- a/smart/control.py
++++ b/smart/control.py
+@@ -876,9 +876,13 @@ class Control(object):
+         objects = []
+ 
+         # If we find packages with exactly the given
+-        # name or name-version, use them.
+-        for pkg in self._cache.getPackages(s):
+-            if pkg.name == s or "%s-%s" % (pkg.name, pkg.version) == s:
++        # name, name-version, or name@arch, use them.
++        s_name = s
++        if "@" in s:
++            s_name = s.split("@")[0]
++        for pkg in self._cache.getPackages(s_name):
++            if pkg.name == s or "%s-%s" % (pkg.name, pkg.version) == s \
++                    or "%s@%s" % (pkg.name, pkg.version.split('@')[1]) == s:
+                 objects.append((1.0, pkg))
+          
+         if not objects:

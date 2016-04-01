@@ -1,6 +1,7 @@
 SUMMARY = "Subversion (svn) version control system client"
 SECTION = "console/network"
 DEPENDS = "apr-util serf sqlite3 file"
+DEPENDS_append_class-native = " file-replacement-native"
 RDEPENDS_${PN} = "serf"
 LICENSE = "Apache-2"
 HOMEPAGE = "http://subversion.tigris.org"
@@ -13,6 +14,8 @@ SRC_URI = "${APACHE_MIRROR}/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://libtool2.patch \
            file://disable_macos.patch \
            file://serf.m4-Regex-modified-to-allow-D-in-paths.patch \
+           file://subversion-CVE-2015-3184.patch \
+           file://subversion-CVE-2015-3187.patch \
 "
 SRC_URI[md5sum] = "4413417b529d7bdf82f74e50df02e88b"
 SRC_URI[sha256sum] = "1099cc68840753b48aedb3a27ebd1e2afbcc84ddb871412e5d500e843d607579"

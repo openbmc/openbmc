@@ -22,15 +22,29 @@
 """Test cases for Toaster GUI and ReST."""
 
 from django.test import TestCase
+from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
 from django.utils import timezone
-from orm.models import Project, Release, BitbakeVersion, ProjectTarget
+
+from orm.models import Project, Release, BitbakeVersion, Package, LogMessage
 from orm.models import ReleaseLayerSourcePriority, LayerSource, Layer, Build
-from orm.models import Layer_Version, Recipe, Machine, ProjectLayer
+from orm.models import Layer_Version, Recipe, Machine, ProjectLayer, Target
+from orm.models import CustomImageRecipe, ProjectVariable
+from orm.models import Branch
+
+import toastermain
+
+from toastergui.tables import SoftwareRecipesTable
 import json
 from bs4 import BeautifulSoup
+import re
 
 PROJECT_NAME = "test project"
+CLI_BUILDS_PROJECT_NAME = 'Command line builds'
+
+# by default, tests are run in build mode; to run in analysis mode,
+# set this to False in individual test cases
+toastermain.settings.BUILD_MODE = True
 
 class ViewTests(TestCase):
     """Tests to verify view APIs."""
@@ -39,26 +53,57 @@ class ViewTests(TestCase):
         bbv = BitbakeVersion.objects.create(name="test bbv", giturl="/tmp/",
                                             branch="master", dirpath="")
         release = Release.objects.create(name="test release",
+                                         branch_name="master",
                                          bitbake_version=bbv)
         self.project = Project.objects.create_project(name=PROJECT_NAME,
                                                       release=release)
+        now = timezone.now()
+
+        build = Build.objects.create(project=self.project,
+                                     started_on=now,
+                                     completed_on=now)
+
         layersrc = LayerSource.objects.create(sourcetype=LayerSource.TYPE_IMPORTED)
         self.priority = ReleaseLayerSourcePriority.objects.create(release=release,
                                                                   layer_source=layersrc)
         layer = Layer.objects.create(name="base-layer", layer_source=layersrc,
                                      vcs_url="/tmp/")
 
-        lver = Layer_Version.objects.create(layer=layer, project=self.project,
-                                            layer_source=layersrc, commit="master")
+        branch = Branch.objects.create(name="master", layer_source=layersrc)
 
-        Recipe.objects.create(layer_source=layersrc, name="base-recipe",
-                              version="1.2", summary="one recipe",
-                              description="recipe", layer_version=lver)
+        lver = Layer_Version.objects.create(layer=layer, project=self.project,
+                                            layer_source=layersrc, commit="master",
+                                            up_branch=branch)
+
+        self.recipe1 = Recipe.objects.create(layer_source=layersrc,
+                                             name="base-recipe",
+                                             version="1.2",
+                                             summary="one recipe",
+                                             description="recipe",
+                                             layer_version=lver)
 
         Machine.objects.create(layer_version=lver, name="wisk",
                                description="wisking machine")
 
         ProjectLayer.objects.create(project=self.project, layercommit=lver)
+
+
+        self.customr = CustomImageRecipe.objects.create(\
+                           name="custom recipe", project=self.project,
+                           base_recipe=self.recipe1)
+
+        self.package = Package.objects.create(name='pkg1', recipe=self.recipe1,
+                                              build=build)
+
+
+        # recipe with project for testing AvailableRecipe table
+        self.recipe2 = Recipe.objects.create(layer_source=layersrc,
+                                             name="fancy-recipe",
+                                             version="1.4",
+                                             summary="a fancy recipe",
+                                             description="fancy recipe",
+                                             layer_version=lver,
+                                             file_path='/home/foo')
 
         self.assertTrue(lver in self.project.compatible_layerversions())
 
@@ -181,6 +226,140 @@ class ViewTests(TestCase):
         data = json.loads(response.content)
         self.assertNotEqual(data["error"], "ok")
 
+    def test_custom_ok(self):
+        """Test successful return from ReST API xhr_customrecipe"""
+        url = reverse('xhr_customrecipe')
+        params = {'name': 'custom', 'project': self.project.id,
+                  'base': self.recipe1.id}
+        response = self.client.post(url, params)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual(data['error'], 'ok')
+        self.assertTrue('url' in data)
+        # get recipe from the database
+        recipe = CustomImageRecipe.objects.get(project=self.project,
+                                               name=params['name'])
+        args = (self.project.id, recipe.id,)
+        self.assertEqual(reverse('customrecipe', args=args), data['url'])
+
+    def test_custom_incomplete_params(self):
+        """Test not passing all required parameters to xhr_customrecipe"""
+        url = reverse('xhr_customrecipe')
+        for params in [{}, {'name': 'custom'},
+                       {'name': 'custom', 'project': self.project.id}]:
+            response = self.client.post(url, params)
+            self.assertEqual(response.status_code, 200)
+            data = json.loads(response.content)
+            self.assertNotEqual(data["error"], "ok")
+
+    def test_xhr_custom_wrong_project(self):
+        """Test passing wrong project id to xhr_customrecipe"""
+        url = reverse('xhr_customrecipe')
+        params = {'name': 'custom', 'project': 0, "base": self.recipe1.id}
+        response = self.client.post(url, params)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertNotEqual(data["error"], "ok")
+
+    def test_xhr_custom_wrong_base(self):
+        """Test passing wrong base recipe id to xhr_customrecipe"""
+        url = reverse('xhr_customrecipe')
+        params = {'name': 'custom', 'project': self.project.id, "base": 0}
+        response = self.client.post(url, params)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertNotEqual(data["error"], "ok")
+
+    def test_xhr_custom_details(self):
+        """Test getting custom recipe details"""
+        name = "custom recipe"
+        url = reverse('xhr_customrecipe_id', args=(self.customr.id,))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        expected = {"error": "ok",
+                    "info": {'id': self.customr.id,
+                             'name': name,
+                             'base_recipe_id': self.recipe1.id,
+                             'project_id': self.project.id,
+                            }
+                   }
+        self.assertEqual(json.loads(response.content), expected)
+
+    def test_xhr_custom_del(self):
+        """Test deleting custom recipe"""
+        name = "to be deleted"
+        recipe = CustomImageRecipe.objects.create(\
+                     name=name, project=self.project,
+                     base_recipe=self.recipe1)
+        url = reverse('xhr_customrecipe_id', args=(recipe.id,))
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), {"error": "ok"})
+        # try to delete not-existent recipe
+        url = reverse('xhr_customrecipe_id', args=(recipe.id,))
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotEqual(json.loads(response.content)["error"], "ok")
+
+    def test_xhr_custom_packages(self):
+        """Test adding and deleting package to a custom recipe"""
+        url = reverse('xhr_customrecipe_packages',
+                      args=(self.customr.id, self.package.id))
+        # add self.package1 to recipe
+        response = self.client.put(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), {"error": "ok"})
+        self.assertEqual(self.customr.packages.all()[0].id, self.package.id)
+        # delete it
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), {"error": "ok"})
+        self.assertFalse(self.customr.packages.all())
+        # delete it again to test error condition
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotEqual(json.loads(response.content)["error"], "ok")
+
+    def test_xhr_custom_packages_err(self):
+        """Test error conditions of xhr_customrecipe_packages"""
+        # test calls with wrong recipe id and wrong package id
+        for args in [(0, self.package.id), (self.customr.id, 0)]:
+            url = reverse('xhr_customrecipe_packages', args=args)
+            # test put and delete methods
+            for method in (self.client.put, self.client.delete):
+                response = method(url)
+                self.assertEqual(response.status_code, 200)
+                self.assertNotEqual(json.loads(response.content),
+                                    {"error": "ok"})
+
+    def test_software_recipes_table(self):
+        """Test structure returned for Software RecipesTable"""
+        table = SoftwareRecipesTable()
+        request = RequestFactory().get('/foo/', {'format': 'json'})
+        response = table.get(request, pid=self.project.id)
+        data = json.loads(response.content)
+
+        rows = data['rows']
+        row1 = next(x for x in rows if x['name'] == self.recipe1.name)
+        row2 = next(x for x in rows if x['name'] == self.recipe2.name)
+
+        self.assertEqual(response.status_code, 200, 'should be 200 OK status')
+        self.assertEqual(len(rows), 2, 'should be 2 recipes')
+
+        # check other columns have been populated correctly
+        self.assertEqual(row1['name'], self.recipe1.name)
+        self.assertEqual(row1['version'], self.recipe1.version)
+        self.assertEqual(row1['get_description_or_summary'],
+                         self.recipe1.description)
+        self.assertEqual(row1['layer_version__layer__name'],
+                         self.recipe1.layer_version.layer.name)
+        self.assertEqual(row2['name'], self.recipe2.name)
+        self.assertEqual(row2['version'], self.recipe2.version)
+        self.assertEqual(row2['get_description_or_summary'],
+                         self.recipe2.description)
+        self.assertEqual(row2['layer_version__layer__name'],
+                         self.recipe2.layer_version.layer.name)
+
 class LandingPageTests(TestCase):
     """ Tests for redirects on the landing page """
     # disable bogus pylint message error:
@@ -255,17 +434,47 @@ class LandingPageTests(TestCase):
         self.assertTrue('/builds' in response.url,
                         'should redirect to builds')
 
-class ProjectsPageTests(TestCase):
-    """ Tests for projects page """
+class AllProjectsPageTests(TestCase):
+    """ Tests for projects page /projects/ """
 
-    PROJECT_NAME = 'cli builds'
+    MACHINE_NAME = 'delorean'
 
     def setUp(self):
         """ Add default project manually """
-        project = Project.objects.create_project(self.PROJECT_NAME, None)
+        project = Project.objects.create_project(CLI_BUILDS_PROJECT_NAME, None)
         self.default_project = project
         self.default_project.is_default = True
         self.default_project.save()
+
+        # this project is only set for some of the tests
+        self.project = None
+
+        self.release = None
+
+    def _add_build_to_default_project(self):
+        """ Add a build to the default project (not used in all tests) """
+        now = timezone.now()
+        build = Build.objects.create(project=self.default_project,
+                                     started_on=now,
+                                     completed_on=now)
+        build.save()
+
+    def _add_non_default_project(self):
+        """ Add another project """
+        bbv = BitbakeVersion.objects.create(name="test bbv", giturl="/tmp/",
+                                            branch="master", dirpath="")
+        self.release = Release.objects.create(name="test release",
+                                              branch_name="master",
+                                              bitbake_version=bbv)
+        self.project = Project.objects.create_project(PROJECT_NAME, self.release)
+        self.project.is_default = False
+        self.project.save()
+
+        # fake the MACHINE variable
+        project_var = ProjectVariable.objects.create(project=self.project,
+                                                     name='MACHINE',
+                                                     value=self.MACHINE_NAME)
+        project_var.save()
 
     def test_default_project_hidden(self):
         """ The default project should be hidden if it has no builds """
@@ -274,26 +483,116 @@ class ProjectsPageTests(TestCase):
 
         self.assertTrue(not('tr class="data"' in response.content),
                         'should be no project rows in the page')
-        self.assertTrue(not(self.PROJECT_NAME in response.content),
+        self.assertTrue(not(CLI_BUILDS_PROJECT_NAME in response.content),
                         'default project "cli builds" should not be in page')
 
     def test_default_project_has_build(self):
         """ The default project should be shown if it has builds """
-        now = timezone.now()
-        build = Build.objects.create(project=self.default_project,
-                                     started_on=now,
-                                     completed_on=now)
-        build.save()
+        self._add_build_to_default_project()
 
         params = {"count": 10, "orderby": "updated:-", "page": 1}
         response = self.client.get(reverse('all-projects'), params)
 
         self.assertTrue('tr class="data"' in response.content,
                         'should be a project row in the page')
-        self.assertTrue(self.PROJECT_NAME in response.content,
+        self.assertTrue(CLI_BUILDS_PROJECT_NAME in response.content,
                         'default project "cli builds" should be in page')
 
-class ProjectBuildsDisplayTest(TestCase):
+    def test_default_project_release(self):
+        """
+        The release for the default project should display as
+        'Not applicable'
+        """
+        # need a build, otherwise project doesn't display at all
+        self._add_build_to_default_project()
+
+        # another project to test, which should show release
+        self._add_non_default_project()
+
+        response = self.client.get(reverse('all-projects'), follow=True)
+        soup = BeautifulSoup(response.content)
+
+        # check the release cell for the default project
+        attrs = {'data-project': str(self.default_project.id)}
+        rows = soup.find_all('tr', attrs=attrs)
+        self.assertEqual(len(rows), 1, 'should be one row for default project')
+        cells = rows[0].find_all('td', attrs={'data-project-field': 'release'})
+        self.assertEqual(len(cells), 1, 'should be one release cell')
+        text = cells[0].select('span.muted')[0].text
+        self.assertEqual(text, 'Not applicable',
+                         'release should be not applicable for default project')
+
+        # check the link in the release cell for the other project
+        attrs = {'data-project': str(self.project.id)}
+        rows = soup.find_all('tr', attrs=attrs)
+        cells = rows[0].find_all('td', attrs={'data-project-field': 'release'})
+        text = cells[0].select('a')[0].text
+        self.assertEqual(text, self.release.name,
+                         'release name should be shown for non-default project')
+
+    def test_default_project_machine(self):
+        """
+        The machine for the default project should display as
+        'Not applicable'
+        """
+        # need a build, otherwise project doesn't display at all
+        self._add_build_to_default_project()
+
+        # another project to test, which should show machine
+        self._add_non_default_project()
+
+        response = self.client.get(reverse('all-projects'), follow=True)
+        soup = BeautifulSoup(response.content)
+
+        # check the machine cell for the default project
+        attrs = {'data-project': str(self.default_project.id)}
+        rows = soup.find_all('tr', attrs=attrs)
+        self.assertEqual(len(rows), 1, 'should be one row for default project')
+        cells = rows[0].find_all('td', attrs={'data-project-field': 'machine'})
+        self.assertEqual(len(cells), 1, 'should be one machine cell')
+        text = cells[0].select('span.muted')[0].text
+        self.assertEqual(text, 'Not applicable',
+                         'machine should be not applicable for default project')
+
+        # check the link in the machine cell for the other project
+        attrs = {'data-project': str(self.project.id)}
+        rows = soup.find_all('tr', attrs=attrs)
+        cells = rows[0].find_all('td', attrs={'data-project-field': 'machine'})
+        text = cells[0].select('a')[0].text
+        self.assertEqual(text, self.MACHINE_NAME,
+                         'machine name should be shown for non-default project')
+
+    def test_project_page_links(self):
+        """
+        Test that links for the default project point to the builds
+        page /projects/X/builds for that project, and that links for
+        other projects point to their configuration pages /projects/X/
+        """
+
+        # need a build, otherwise project doesn't display at all
+        self._add_build_to_default_project()
+
+        # another project to test, which should show machine
+        self._add_non_default_project()
+
+        response = self.client.get(reverse('all-projects'), follow=True)
+        soup = BeautifulSoup(response.content)
+
+        # link for default project
+        row = soup.find('tr', attrs={'data-project': self.default_project.id})
+        cell = row.find('td', attrs={'data-project-field': 'name'})
+        expected_url = reverse('projectbuilds', args=(self.default_project.id,))
+        self.assertEqual(cell.find('a')['href'], expected_url,
+                         'link on default project name should point to builds')
+
+        # link for other project
+        row = soup.find('tr', attrs={'data-project': self.project.id})
+        cell = row.find('td', attrs={'data-project-field': 'name'})
+        expected_url = reverse('project', args=(self.project.id,))
+        self.assertEqual(cell.find('a')['href'], expected_url,
+                         'link on project name should point to configuration')
+
+class ProjectBuildsPageTests(TestCase):
     """ Test data at /project/X/builds is displayed correctly """
 
     def setUp(self):
@@ -303,8 +602,18 @@ class ProjectBuildsDisplayTest(TestCase):
                                          bitbake_version=bbv)
         self.project1 = Project.objects.create_project(name=PROJECT_NAME,
                                                        release=release)
+        self.project1.save()
+
         self.project2 = Project.objects.create_project(name=PROJECT_NAME,
                                                        release=release)
+        self.project2.save()
+
+        self.default_project = Project.objects.create_project(
+            name=CLI_BUILDS_PROJECT_NAME,
+            release=release
+        )
+        self.default_project.is_default = True
+        self.default_project.save()
 
         # parameters for builds to associate with the projects
         now = timezone.now()
@@ -338,6 +647,7 @@ class ProjectBuildsDisplayTest(TestCase):
         }
 
     def _get_rows_for_project(self, project_id):
+        """ Helper to retrieve HTML rows for a project """
         url = reverse("projectbuilds", args=(project_id,))
         response = self.client.get(url, follow=True)
         soup = BeautifulSoup(response.content)
@@ -345,35 +655,273 @@ class ProjectBuildsDisplayTest(TestCase):
 
     def test_show_builds_for_project(self):
         """ Builds for a project should be displayed """
-        build1a = Build.objects.create(**self.project1_build_success)
-        build1b = Build.objects.create(**self.project1_build_success)
+        Build.objects.create(**self.project1_build_success)
+        Build.objects.create(**self.project1_build_success)
         build_rows = self._get_rows_for_project(self.project1.id)
         self.assertEqual(len(build_rows), 2)
 
-    def test_show_builds_for_project_only(self):
+    def test_show_builds_project_only(self):
         """ Builds for other projects should be excluded """
-        build1a = Build.objects.create(**self.project1_build_success)
-        build1b = Build.objects.create(**self.project1_build_success)
-        build1c = Build.objects.create(**self.project1_build_success)
+        Build.objects.create(**self.project1_build_success)
+        Build.objects.create(**self.project1_build_success)
+        Build.objects.create(**self.project1_build_success)
 
         # shouldn't see these two
-        build2a = Build.objects.create(**self.project2_build_success)
-        build2b = Build.objects.create(**self.project2_build_in_progress)
+        Build.objects.create(**self.project2_build_success)
+        Build.objects.create(**self.project2_build_in_progress)
 
         build_rows = self._get_rows_for_project(self.project1.id)
         self.assertEqual(len(build_rows), 3)
 
-    def test_show_builds_exclude_in_progress(self):
+    def test_builds_exclude_in_progress(self):
         """ "in progress" builds should not be shown """
-        build1a = Build.objects.create(**self.project1_build_success)
-        build1b = Build.objects.create(**self.project1_build_success)
+        Build.objects.create(**self.project1_build_success)
+        Build.objects.create(**self.project1_build_success)
 
         # shouldn't see this one
-        build1c = Build.objects.create(**self.project1_build_in_progress)
+        Build.objects.create(**self.project1_build_in_progress)
 
         # shouldn't see these two either, as they belong to a different project
-        build2a = Build.objects.create(**self.project2_build_success)
-        build2b = Build.objects.create(**self.project2_build_in_progress)
+        Build.objects.create(**self.project2_build_success)
+        Build.objects.create(**self.project2_build_in_progress)
 
         build_rows = self._get_rows_for_project(self.project1.id)
         self.assertEqual(len(build_rows), 2)
+
+    def test_tasks_in_projectbuilds(self):
+        """ Task should be shown as suffix on build name """
+        build = Build.objects.create(**self.project1_build_success)
+        Target.objects.create(build=build, target='bash', task='clean')
+        url = reverse("projectbuilds", args=(self.project1.id,))
+        response = self.client.get(url, follow=True)
+        result = re.findall('^ +bash:clean$', response.content, re.MULTILINE)
+        self.assertEqual(len(result), 2)
+
+    def test_cli_builds_hides_tabs(self):
+        """
+        Display for command line builds should hide tabs;
+        note that the latest builds section is already tested in
+        AllBuildsPageTests, as the template is the same
+        """
+        url = reverse("projectbuilds", args=(self.default_project.id,))
+        response = self.client.get(url, follow=True)
+        soup = BeautifulSoup(response.content)
+        tabs = soup.select('#project-topbar')
+        self.assertEqual(len(tabs), 0,
+                         'should be no top bar shown for command line builds')
+
+    def test_non_cli_builds_has_tabs(self):
+        """
+        Non-command-line builds projects should show the tabs
+        """
+        url = reverse("projectbuilds", args=(self.project1.id,))
+        response = self.client.get(url, follow=True)
+        soup = BeautifulSoup(response.content)
+        tabs = soup.select('#project-topbar')
+        self.assertEqual(len(tabs), 1,
+                         'should be a top bar shown for non-command-line builds')
+
+class AllBuildsPageTests(TestCase):
+    """ Tests for all builds page /builds/ """
+
+    def setUp(self):
+        bbv = BitbakeVersion.objects.create(name="bbv1", giturl="/tmp/",
+                                            branch="master", dirpath="")
+        release = Release.objects.create(name="release1",
+                                         bitbake_version=bbv)
+        self.project1 = Project.objects.create_project(name=PROJECT_NAME,
+                                                       release=release)
+        self.default_project = Project.objects.create_project(
+            name=CLI_BUILDS_PROJECT_NAME,
+            release=release
+        )
+        self.default_project.is_default = True
+        self.default_project.save()
+
+        # parameters for builds to associate with the projects
+        now = timezone.now()
+
+        self.project1_build_success = {
+            "project": self.project1,
+            "started_on": now,
+            "completed_on": now,
+            "outcome": Build.SUCCEEDED
+        }
+
+        self.default_project_build_success = {
+            "project": self.default_project,
+            "started_on": now,
+            "completed_on": now,
+            "outcome": Build.SUCCEEDED
+        }
+
+    def test_show_tasks_in_allbuilds(self):
+        """ Task should be shown as suffix on build name """
+        build = Build.objects.create(**self.project1_build_success)
+        Target.objects.create(build=build, target='bash', task='clean')
+        url = reverse('all-builds')
+        response = self.client.get(url, follow=True)
+        result = re.findall('bash:clean', response.content, re.MULTILINE)
+        self.assertEqual(len(result), 3)
+
+    def test_no_run_again_for_cli_build(self):
+        """ "Run again" button should not be shown for command-line builds """
+        build = Build.objects.create(**self.default_project_build_success)
+        url = reverse('all-builds')
+        response = self.client.get(url, follow=True)
+        soup = BeautifulSoup(response.content)
+
+        attrs = {'data-latest-build-result': build.id}
+        result = soup.find('div', attrs=attrs)
+
+        # shouldn't see a run again button for command-line builds
+        run_again_button = result.select('button')
+        self.assertEqual(len(run_again_button), 0)
+
+        # should see a help icon for command-line builds
+        help_icon = result.select('i.get-help-green')
+        self.assertEqual(len(help_icon), 1)
+
+    def test_tooltips_on_project_name(self):
+        """
+        A tooltip should be present next to the command line
+        builds project name in the all builds page, but not for
+        other projects
+        """
+        build1 = Build.objects.create(**self.project1_build_success)
+        default_build = Build.objects.create(**self.default_project_build_success)
+
+        url = reverse('all-builds')
+        response = self.client.get(url, follow=True)
+        soup = BeautifulSoup(response.content)
+
+        # no help icon on non-default project name
+        result = soup.find('tr', attrs={'data-table-build-result': build1.id})
+        name = result.select('td.project-name')[0]
+        icons = name.select('i.get-help')
+        self.assertEqual(len(icons), 0,
+                         'should not be a help icon for non-cli builds name')
+
+        # help icon on default project name
+        result = soup.find('tr', attrs={'data-table-build-result': default_build.id})
+        name = result.select('td.project-name')[0]
+        icons = name.select('i.get-help')
+        self.assertEqual(len(icons), 1,
+                         'should be a help icon for cli builds name')
+
+class ProjectPageTests(TestCase):
+    """ Test project data at /project/X/ is displayed correctly """
+    CLI_BUILDS_PROJECT_NAME = 'Command line builds'
+
+    def test_command_line_builds_in_progress(self):
+        """
+        In progress builds should not cause an error to be thrown
+        when navigating to "command line builds" project page;
+        see https://bugzilla.yoctoproject.org/show_bug.cgi?id=8277
+        """
+
+        # add the "command line builds" default project; this mirrors what
+        # we do in migration 0026_set_default_project.py
+        default_project = Project.objects.create_project(self.CLI_BUILDS_PROJECT_NAME, None)
+        default_project.is_default = True
+        default_project.save()
+
+        # add an "in progress" build for the default project
+        now = timezone.now()
+        build = Build.objects.create(project=default_project,
+                                     started_on=now,
+                                     completed_on=now,
+                                     outcome=Build.IN_PROGRESS)
+
+        # navigate to the project page for the default project
+        url = reverse("project", args=(default_project.id,))
+        response = self.client.get(url, follow=True)
+
+        self.assertEqual(response.status_code, 200)
+
+class BuildDashboardTests(TestCase):
+    """ Tests for the build dashboard /build/X """
+
+    def setUp(self):
+        bbv = BitbakeVersion.objects.create(name="bbv1", giturl="/tmp/",
+                                            branch="master", dirpath="")
+        release = Release.objects.create(name="release1",
+                                         bitbake_version=bbv)
+        project = Project.objects.create_project(name=PROJECT_NAME,
+                                                 release=release)
+
+        now = timezone.now()
+
+        self.build1 = Build.objects.create(project=project,
+                                           started_on=now,
+                                           completed_on=now)
+
+        # exception
+        msg1 = 'an exception was thrown'
+        self.exception_message = LogMessage.objects.create(
+            build=self.build1,
+            level=LogMessage.EXCEPTION,
+            message=msg1
+        )
+
+        # critical
+        msg2 = 'a critical error occurred'
+        self.critical_message = LogMessage.objects.create(
+            build=self.build1,
+            level=LogMessage.CRITICAL,
+            message=msg2
+        )
+
+    def _get_build_dashboard_errors(self):
+        """
+        Get a list of HTML fragments representing the errors on the
+        build dashboard
+        """
+        url = reverse('builddashboard', args=(self.build1.id,))
+        response = self.client.get(url)
+        soup = BeautifulSoup(response.content)
+        return soup.select('#errors div.alert-error')
+
+    def _check_for_log_message(self, log_message):
+        """
+        Check whether the LogMessage instance <log_message> is
+        represented as an HTML error in the build dashboard page
+        """
+        errors = self._get_build_dashboard_errors()
+        self.assertEqual(len(errors), 2)
+
+        expected_text = log_message.message
+        expected_id = str(log_message.id)
+
+        found = False
+        for error in errors:
+            error_text = error.find('pre').text
+            text_matches = (error_text == expected_text)
+
+            error_id = error['data-error']
+            id_matches = (error_id == expected_id)
+
+            if text_matches and id_matches:
+                found = True
+                break
+
+        template_vars = (expected_text, error_text,
+                         expected_id, error_id)
+        assertion_error_msg = 'exception not found as error: ' \
+            'expected text "%s" and got "%s"; ' \
+            'expected ID %s and got %s' % template_vars
+        self.assertTrue(found, assertion_error_msg)
+
+    def test_exceptions_show_as_errors(self):
+        """
+        LogMessages with level EXCEPTION should display in the errors
+        section of the page
+        """
+        self._check_for_log_message(self.exception_message)
+
+    def test_criticals_show_as_errors(self):
+        """
+        LogMessages with level CRITICAL should display in the errors
+        section of the page
+        """
+        self._check_for_log_message(self.critical_message)

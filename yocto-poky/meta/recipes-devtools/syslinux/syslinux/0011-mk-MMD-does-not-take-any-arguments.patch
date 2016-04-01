@@ -1,0 +1,33 @@
+From 0f3d83c25491951f1fa84c7957358ef3d1bcd8a9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 9 Sep 2015 17:39:22 +0000
+Subject: [PATCH] mk: -MMD does not take any arguments
+
+Specify -Wp for each option, clang seems to not accept
+-Wp,-x,y,-a,b
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ mk/syslinux.mk | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+Index: syslinux-6.03/mk/syslinux.mk
+===================================================================
+--- syslinux-6.03.orig/mk/syslinux.mk
++++ syslinux-6.03/mk/syslinux.mk
+@@ -82,11 +82,11 @@ ARCH ?= $(strip $(SUBARCH))
+ GCCWARN  = -W -Wall -Wstrict-prototypes $(DEBUGOPT)
+ 
+ # Common stanza to make gcc generate .*.d dependency files
+-MAKEDEPS = -Wp,-MT,$@,-MD,$(dir $@).$(notdir $@).d
++MAKEDEPS = -MT $@ -MD
+ 
+ # Dependencies that exclude system headers; use whenever we use
+ # header files from the platform.
+-UMAKEDEPS = -Wp,-MT,$@,-MMD,$(dir $@).$(notdir $@).d
++UMAKEDEPS = -MT $@ -MMD
+ 
+ # Items that are only appropriate during development; this file is
+ # removed when tarballs are generated.

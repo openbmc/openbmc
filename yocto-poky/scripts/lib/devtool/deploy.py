@@ -19,7 +19,7 @@
 import os
 import subprocess
 import logging
-from devtool import exec_fakeroot, setup_tinfoil, DevtoolError
+from devtool import exec_fakeroot, setup_tinfoil, check_workspace_recipe, DevtoolError
 
 logger = logging.getLogger('devtool')
 
@@ -28,9 +28,8 @@ def deploy(args, config, basepath, workspace):
     import re
     import oe.recipeutils
 
-    if not args.recipename in workspace:
-        raise DevtoolError("no recipe named %s in your workspace" %
-                           args.recipename)
+    check_workspace_recipe(workspace, args.recipename, checksrc=False)
+
     try:
         host, destdir = args.target.split(':')
     except ValueError:
@@ -41,7 +40,7 @@ def deploy(args, config, basepath, workspace):
     deploy_dir = os.path.join(basepath, 'target_deploy', args.target)
     deploy_file = os.path.join(deploy_dir, args.recipename + '.list')
 
-    tinfoil = setup_tinfoil()
+    tinfoil = setup_tinfoil(basepath=basepath)
     try:
         rd = oe.recipeutils.parse_recipe_simple(tinfoil.cooker, args.recipename, tinfoil.config_data)
     except Exception as e:

@@ -376,3 +376,206 @@ do_functionname() {
         (updated, newlines) = bb.utils.edit_metadata(self._origfile.splitlines(True), varlist, handle_var)
         self.assertTrue(updated, 'List should be updated but isn\'t')
         self.assertEqual(newlines, newfile5.splitlines(True))
+
+
+class EditBbLayersConf(unittest.TestCase):
+
+    def _test_bblayers_edit(self, before, after, add, remove, notadded, notremoved):
+        with tempfile.NamedTemporaryFile('w', delete=False) as tf:
+            tf.write(before)
+            tf.close()
+            try:
+                actual_notadded, actual_notremoved = bb.utils.edit_bblayers_conf(tf.name, add, remove)
+                with open(tf.name) as f:
+                    actual_after = f.readlines()
+                self.assertEqual(after.splitlines(True), actual_after)
+                self.assertEqual(notadded, actual_notadded)
+                self.assertEqual(notremoved, actual_notremoved)
+            finally:
+                os.remove(tf.name)
+
+
+    def test_bblayers_remove(self):
+        before = r"""
+# A comment
+
+BBPATH = "${TOPDIR}"
+BBFILES ?= ""
+BBLAYERS = " \
+  /home/user/path/layer1 \
+  /home/user/path/layer2 \
+  /home/user/path/subpath/layer3 \
+  /home/user/path/layer4 \
+  "
+"""
+        after = r"""
+# A comment
+
+BBPATH = "${TOPDIR}"
+BBFILES ?= ""
+BBLAYERS = " \
+  /home/user/path/layer1 \
+  /home/user/path/subpath/layer3 \
+  /home/user/path/layer4 \
+  "
+"""
+        self._test_bblayers_edit(before, after,
+                                 None,
+                                 '/home/user/path/layer2',
+                                 [],
+                                 [])
+
+
+    def test_bblayers_add(self):
+        before = r"""
+# A comment
+
+BBPATH = "${TOPDIR}"
+BBFILES ?= ""
+BBLAYERS = " \
+  /home/user/path/layer1 \
+  /home/user/path/layer2 \
+  /home/user/path/subpath/layer3 \
+  /home/user/path/layer4 \
+  "
+"""
+        after = r"""
+# A comment
+
+BBPATH = "${TOPDIR}"
+BBFILES ?= ""
+BBLAYERS = " \
+  /home/user/path/layer1 \
+  /home/user/path/layer2 \
+  /home/user/path/subpath/layer3 \
+  /home/user/path/layer4 \
+  /other/path/to/layer5 \
+  "
+"""
+        self._test_bblayers_edit(before, after,
+                                 '/other/path/to/layer5/',
+                                 None,
+                                 [],
+                                 [])
+
+
+    def test_bblayers_add_remove(self):
+        before = r"""
+# A comment
+
+BBPATH = "${TOPDIR}"
+BBFILES ?= ""
+BBLAYERS = " \
+  /home/user/path/layer1 \
+  /home/user/path/layer2 \
+  /home/user/path/subpath/layer3 \
+  /home/user/path/layer4 \
+  "
+"""
+        after = r"""
+# A comment
+
+BBPATH = "${TOPDIR}"
+BBFILES ?= ""
+BBLAYERS = " \
+  /home/user/path/layer1 \
+  /home/user/path/layer2 \
+  /home/user/path/layer4 \
+  /other/path/to/layer5 \
+  "
+"""
+        self._test_bblayers_edit(before, after,
+                                 ['/other/path/to/layer5', '/home/user/path/layer2/'], '/home/user/path/subpath/layer3/',
+                                 ['/home/user/path/layer2'],
+                                 [])
+
+
+    def test_bblayers_add_remove_home(self):
+        before = r"""
+# A comment
+
+BBPATH = "${TOPDIR}"
+BBFILES ?= ""
+BBLAYERS = " \
+  ~/path/layer1 \
+  ~/path/layer2 \
+  ~/otherpath/layer3 \
+  ~/path/layer4 \
+  "
+"""
+        after = r"""
+# A comment
+
+BBPATH = "${TOPDIR}"
+BBFILES ?= ""
+BBLAYERS = " \
+  ~/path/layer2 \
+  ~/path/layer4 \
+  ~/path2/layer5 \
+  "
+"""
+        self._test_bblayers_edit(before, after,
+                                 [os.environ['HOME'] + '/path/layer4', '~/path2/layer5'],
+                                 [os.environ['HOME'] + '/otherpath/layer3', '~/path/layer1', '~/path/notinlist'],
+                                 [os.environ['HOME'] + '/path/layer4'],
+                                 ['~/path/notinlist'])
+
+
+    def test_bblayers_add_remove_plusequals(self):
+        before = r"""
+# A comment
+
+BBPATH = "${TOPDIR}"
+BBFILES ?= ""
+BBLAYERS += " \
+  /home/user/path/layer1 \
+  /home/user/path/layer2 \
+  "
+"""
+        after = r"""
+# A comment
+
+BBPATH = "${TOPDIR}"
+BBFILES ?= ""
+BBLAYERS += " \
+  /home/user/path/layer2 \
+  /home/user/path/layer3 \
+  "
+"""
+        self._test_bblayers_edit(before, after,
+                                 '/home/user/path/layer3',
+                                 '/home/user/path/layer1',
+                                 [],
+                                 [])
+
+
+    def test_bblayers_add_remove_plusequals2(self):
+        before = r"""
+# A comment
+
+BBPATH = "${TOPDIR}"
+BBFILES ?= ""
+BBLAYERS += " \
+  /home/user/path/layer1 \
+  /home/user/path/layer2 \
+  /home/user/path/layer3 \
+  "
+BBLAYERS += "/home/user/path/layer4"
+BBLAYERS += "/home/user/path/layer5"
+"""
+        after = r"""
+# A comment
+
+BBPATH = "${TOPDIR}"
+BBFILES ?= ""
+BBLAYERS += " \
+  /home/user/path/layer2 \
+  /home/user/path/layer3 \
+  "
+BBLAYERS += "/home/user/path/layer5"
+BBLAYERS += "/home/user/otherpath/layer6"
+"""
+        self._test_bblayers_edit(before, after,
+                                 ['/home/user/otherpath/layer6', '/home/user/path/layer3'], ['/home/user/path/layer1', '/home/user/path/layer4', '/home/user/path/layer7'],
+                                 ['/home/user/path/layer3'],
+                                 ['/home/user/path/layer7'])

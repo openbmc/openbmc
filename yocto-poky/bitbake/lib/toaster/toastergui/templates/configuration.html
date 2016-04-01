@@ -1,6 +1,7 @@
 {% extends "basebuildpage.html" %}
 {% load projecttags %}
 
+{% block title %} Configuration summary - {{build.target_set.all|dictsort:"target"|join:", "}} {{build.machine}} - {{build.project.name}} - Toaster {% endblock %}
 {% block localbreadcrumb %}
 <li>Configuration</li>
 {% endblock %}

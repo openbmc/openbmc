@@ -521,7 +521,7 @@ POPULATE_SDK_POST_TARGET_COMMAND_append = " buildhistory_list_installed_sdk_targ
 POPULATE_SDK_POST_HOST_COMMAND_append = " buildhistory_list_installed_sdk_host ;\
                                           buildhistory_get_sdk_installed_host ; "
 
-SDK_POSTPROCESS_COMMAND += "buildhistory_get_sdkinfo ; "
+SDK_POSTPROCESS_COMMAND_append = " buildhistory_get_sdkinfo ; "
 
 def buildhistory_get_build_id(d):
     if d.getVar('BB_WORKERCONTEXT', True) != '1':

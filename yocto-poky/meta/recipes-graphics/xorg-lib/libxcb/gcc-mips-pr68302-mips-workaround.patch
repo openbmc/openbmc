@@ -1,0 +1,22 @@
+Reduce debug info for xcb.c since on mips we run into a gcc5 bug
+
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=68302
+
+This patch is a workaround to get past the gcc bug until its resolved.
+it should have minimal impact on libxcb while make it work.
+
+Upstream-Status: Inappropriate [OE-Specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: libxcb-1.11.1/src/Makefile.am
+===================================================================
+--- libxcb-1.11.1.orig/src/Makefile.am
++++ libxcb-1.11.1/src/Makefile.am
+@@ -188,6 +188,7 @@ EXTSOURCES += xkb.c
+ if BUILD_XKB
+ lib_LTLIBRARIES += libxcb-xkb.la
+ libxcb_xkb_la_LDFLAGS = -version-info 1:0:0 -no-undefined
++CFLAGS += -g1
+ libxcb_xkb_la_LIBADD = $(XCB_LIBS)
+ nodist_libxcb_xkb_la_SOURCES = xkb.c xkb.h
+ endif

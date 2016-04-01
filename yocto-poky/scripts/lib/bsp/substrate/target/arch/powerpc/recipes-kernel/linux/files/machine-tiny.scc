@@ -1,10 +1,11 @@
 # yocto-bsp-filename {{=machine}}-tiny.scc
 define KMACHINE {{=machine}}
-define KTYPE tiny
+
 define KARCH powerpc
 
 include {{=map_tiny_kbranch(need_new_kbranch, new_kbranch, existing_kbranch)}}
 {{ if need_new_kbranch == "y": }}
+define KTYPE {{=new_kbranch}}
 branch {{=machine}}
 
 include {{=machine}}.scc

@@ -54,35 +54,55 @@ webserverStartAll()
     fi
 
     retval=0
-    if [ "$TOASTER_MANAGED" '=' '1' ]; then
-        python $BBBASEDIR/lib/toaster/manage.py syncdb || retval=1
-    else
-        python $BBBASEDIR/lib/toaster/manage.py syncdb --noinput || retval=1
-    fi
+    # you can always add a superuser later via
+    # python bitbake/lib/toaster/manage.py python manage.py createsuperuser --username=<ME>
+    python $BBBASEDIR/lib/toaster/manage.py syncdb --noinput || retval=1
+
     python $BBBASEDIR/lib/toaster/manage.py migrate orm || retval=2
+
     if [ $retval -eq 1 ]; then
-        echo "Failed db sync, stopping system start" 1>&2
-    elif [ $retval -eq 2 ]; then
-        printf "\nError on migration, trying to recover... \n"
+        echo "Failed db sync, aborting system start" 1>&2
+        return $retval
+    fi
+
+    python $BBBASEDIR/lib/toaster/manage.py migrate orm || retval=1
+
+    if [ $retval -eq 1 ]; then
+        printf "\nError on orm migration, rolling back...\n"
         python $BBBASEDIR/lib/toaster/manage.py migrate orm 0001_initial --fake
-        retval=0
-        python $BBBASEDIR/lib/toaster/manage.py migrate orm || retval=1
+        return $retval
     fi
+
+    python $BBBASEDIR/lib/toaster/manage.py migrate bldcontrol || retval=1
+
+    if [ $retval -eq 1 ]; then
+        printf "\nError on bldcontrol migration, rolling back...\n"
+        python $BBBASEDIR/lib/toaster/manage.py migrate bldcontrol 0001_initial --fake
+        return $retval
+    fi
+
     if [ "$TOASTER_MANAGED" = '1' ]; then
-        python $BBBASEDIR/lib/toaster/manage.py migrate bldcontrol || retval=1
-        python $BBBASEDIR/lib/toaster/manage.py checksettings  --traceback || retval=1
+        python $BBBASEDIR/lib/toaster/manage.py checksettings --traceback || retval=1
     fi
-    if [ $retval -eq 0 ]; then
-        echo "Starting webserver..."
-        python $BBBASEDIR/lib/toaster/manage.py runserver "0.0.0.0:$WEB_PORT" </dev/null >>${BUILDDIR}/toaster_web.log 2>&1 & echo $! >${BUILDDIR}/.toastermain.pid
-        sleep 1
-        if ! cat "${BUILDDIR}/.toastermain.pid" | xargs -I{} kill -0 {} ; then
-            retval=1
-            rm "${BUILDDIR}/.toastermain.pid"
-        else
-            echo "Webserver address:  http://0.0.0.0:$WEB_PORT/"
-        fi
+
+    if [ $retval -eq 1 ]; then
+        printf "\nError while checking settings; aborting\n"
+        return $retval
     fi
+
+    echo "Starting webserver..."
+
+    python $BBBASEDIR/lib/toaster/manage.py runserver "0.0.0.0:$WEB_PORT" </dev/null >>${BUILDDIR}/toaster_web.log 2>&1 & echo $! >${BUILDDIR}/.toastermain.pid
+
+    sleep 1
+
+    if ! cat "${BUILDDIR}/.toastermain.pid" | xargs -I{} kill -0 {} ; then
+        retval=1
+        rm "${BUILDDIR}/.toastermain.pid"
+    else
+        echo "Webserver address:  http://0.0.0.0:$WEB_PORT/"
+    fi
+
     return $retval
 }
 
@@ -156,6 +176,8 @@ else
     TOASTER=$0
 fi
 
+[ `basename \"$0\"` = `basename \"${TOASTER}\"` ] && TOASTER_MANAGED=1
+
 BBBASEDIR=`dirname $TOASTER`/..
 
 RUNNING=0
@@ -163,7 +185,34 @@ RUNNING=0
 NOTOASTERUI=0
 WEBSERVER=1
 TOASTER_BRBE=""
-WEB_PORT="8000"
+if [ "$WEB_PORT" = "" ]; then
+    WEB_PORT="8000"
+fi
+# this is the configuraton file we are using for toaster
+# note default is assuming yocto. Override this if you are
+# running in a pure OE environment and use the toasterconf.json
+# in meta/conf/toasterconf.json
+# note: for future there are a number of relative path assumptions
+# in the local layers that currently prevent using an arbitrary
+# toasterconf.json
+if [ "$TOASTER_CONF" = "" ]; then
+    TOASTER_CONF="$(dirname $TOASTER)/../../meta-yocto/conf/toasterconf.json"
+    export TOASTER_CONF=$(python -c "import os; print os.path.realpath('$TOASTER_CONF')")
+fi
+if [ ! -f $TOASTER_CONF ]; then
+    echo "$TOASTER_CONF configuration file not found. set TOASTER_CONF to specify a path"
+    [ "$TOASTER_MANAGED" = '1' ] && exit 1 || return 1
+fi
+# this defines the dir toaster will use for
+# 1) clones of layers (in _toaster_clones )
+# 2) the build dir (in build)
+# 3) the sqlite db if that is being used.
+# 4) pid's we need to clean up on exit/shutdown
+# note: for future. in order to make this an arbitrary directory, we need to
+# make sure that the toaster.sqlite file doesn't default to `pwd` like it currently does.
+export TOASTER_DIR=`pwd`
+
+
 NOBROWSER=0
 
 for param in $*; do
@@ -185,9 +234,7 @@ for param in $*; do
     esac
 done
 
-[ -n "${BASH_SOURCE}" ] && SRCFILE=${BASH_SOURCE} || SRCFILE=$_
-
-if [ `basename \"$0\"` = `basename \"${SRCFILE}\"` ]; then
+if [ "$TOASTER_MANAGED" = '1' ]; then
     # We are called as standalone. We refuse to run in a build environment - we need the interactive mode for that.
     # Start just the web server, point the web browser to the interface, and start any Django services.
 
@@ -197,7 +244,7 @@ if [ `basename \"$0\"` = `basename \"${SRCFILE}\"` ]; then
     fi
 
     if [ -n "$BUILDDIR" ]; then
-        printf "Error: It looks like you sourced oe-init-build-env. Toaster cannot start in build mode from an oe-core build environment.\n You should be starting Toaster from a new terminal window." 1>&2
+        printf "Error: It looks like you sourced oe-init-build-env. Toaster cannot start in build mode from an oe-core build environment.\n You should be starting Toaster from a new terminal window.\n" 1>&2
         exit 1
     fi
 
@@ -234,7 +281,6 @@ if [ `basename \"$0\"` = `basename \"${SRCFILE}\"` ]; then
             do_cleanup
         fi
     }
-    TOASTER_MANAGED=1
     export TOASTER_MANAGED=1
     if [ $WEBSERVER -gt 0 ] && ! webserverStartAll; then
         echo "Failed to start the web server, stopping" 1>&2

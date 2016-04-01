@@ -1,0 +1,60 @@
+From fc22058a10db913534f11348f86681fe9e1838e5 Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Fri, 16 Oct 2015 16:35:16 +0300
+Subject: [PATCH] Do not try to initialize GL without libGL
+
+_gdk_x11_screen_update_visuals_for_gl() will end up calling epoxys
+GLX api which will exit() if libGL.so.1 is not present. We do not
+want that to happen and we don't want every app to have to set
+"GDK_GL=disabled" environment variable: so use #ifdef set based on
+opengl distro feature.
+
+Upstream is not interested in the fix as it is: Either epoxy should be
+fixed (to not exit) or GTK+ possibly could do some additional probing
+before calling epoxy APIs.
+
+Upstream-Status: Denied
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ configure.ac            | 7 +++++++
+ gdk/x11/gdkvisual-x11.c | 5 +++++
+ 2 files changed, 12 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 729a62e..58cc1ac 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -328,6 +328,13 @@ AC_ARG_ENABLE(mir-backend,
+                               [enable the Mir gdk backend])],
+ 			      [backend_set=yes])
+ 
++AC_ARG_ENABLE(glx,
++              [AS_HELP_STRING([--enable-glx],
++                              [When enabled Gdk will try to initialize GLX])])
++AS_IF([test "x$enable_glx" != "xno"], [
++  AC_DEFINE([HAVE_GLX], [], [GLX will be available at runtime])
++])
++
+ if test -z "$backend_set"; then
+   if test "$platform_win32" = yes; then
+     enable_win32_backend=yes
+diff --git a/gdk/x11/gdkvisual-x11.c b/gdk/x11/gdkvisual-x11.c
+index f3b062d..c8243f4 100644
+--- a/gdk/x11/gdkvisual-x11.c
++++ b/gdk/x11/gdkvisual-x11.c
+@@ -345,7 +345,12 @@ _gdk_x11_screen_init_visuals (GdkScreen *screen)
+   /* If GL is available we want to pick better default/rgba visuals,
+      as we care about glx details such as alpha/depth/stencil depth,
+      stereo and double buffering */
++  /* update_visuals_for_gl() will end up calling epoxy GLX api which
++     will exit if libgl is not there: so only do this if we know GL
++     is available */
++#ifdef HAVE_GLX
+   _gdk_x11_screen_update_visuals_for_gl (screen);
++#endif
+ }
+ 
+ gint
+-- 
+2.1.4
+

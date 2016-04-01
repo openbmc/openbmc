@@ -60,7 +60,7 @@ if toastermain.settings.DEBUG_PANEL_ENABLED:
     #logger.info("Enabled django_toolbar extension")
 
 
-if toastermain.settings.MANAGED:
+if toastermain.settings.BUILD_MODE:
     urlpatterns = [
         # Uncomment the next line to enable the admin:
         url(r'^admin/', include(admin.site.urls)),

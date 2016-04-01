@@ -1,0 +1,29 @@
+configure.ac: search for both gpg2 and gpg
+
+On some platforms the GnuPG binary is named 'gpg2' whereas others have 'gpg'.
+This patch increases compatibility by searching for 'gpg' in addition to
+'gpg2'.
+
+Upstream-Status: Pending
+
+Signed-off-by: Markus Lehtonen <markus.lehtonen@linux.intel.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 6746b4c..f6922ae 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -562,7 +562,7 @@ AC_PATH_PROG(__DIFF, diff, /bin/diff, $MYPATH)
+ AC_PATH_PROG(__DITTO, ditto, %{_bindir}/ditto, $MYPATH)
+ AC_PATH_PROG(__FILE, file, %{_bindir}/file, $MYPATH)
+ AC_PATH_PROG(__GIT, git, %{_bindir}/git, $MYPATH)
+-AC_PATH_PROG(__GPG, gpg2, %{_bindir}/gpg2, $MYPATH)
++AC_PATH_PROGS(__GPG, [gpg2 gpg], %{_bindir}/gpg2, $MYPATH)
+ AC_PATH_PROG(__GSR, gsr, %{_bindir}/gsr, $MYPATH)
+ AC_PATH_PROG(__GST_INSPECT, gst-inspect-0.10, %{_bindir}/gst-inspect-0.10, $MYPATH)
+ AC_PATH_PROG(__GZIP, gzip, /bin/gzip, $MYPATH)
+-- 
+2.1.4
+

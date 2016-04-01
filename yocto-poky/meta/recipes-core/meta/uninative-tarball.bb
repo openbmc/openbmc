@@ -7,6 +7,7 @@ TOOLCHAIN_TARGET_TASK = ""
 
 TOOLCHAIN_HOST_TASK = "\
     nativesdk-glibc \
+    nativesdk-glibc-gconv-ibm850 \
     nativesdk-patchelf \
     "
 

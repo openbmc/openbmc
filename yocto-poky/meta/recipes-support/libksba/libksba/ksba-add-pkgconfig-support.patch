@@ -51,7 +51,7 @@ Index: libksba-1.3.0/ksba.pc.in
 +Requires:
 +Version: @VERSION@
 +Libs: -L${libdir} -lksba
-+Libs.private: -L{libdir} -lgpg-error
++Libs.private: -L${libdir} -lgpg-error
 +Cflags: -I${includedir}
 +
 Index: libksba-1.3.0/src/ksba.m4

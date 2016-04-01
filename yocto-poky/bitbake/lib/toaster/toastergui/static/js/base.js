@@ -6,6 +6,7 @@ function basePageInit(ctx) {
   var newBuildTargetInput;
   var newBuildTargetBuildBtn;
   var projectNameForm = $("#project-name-change-form");
+  var projectNameContainer = $("#project-name-container");
   var projectName = $("#project-name");
   var projectNameFormToggle = $("#project-change-form-toggle");
   var projectNameChangeCancel = $("#project-name-change-cancel");
@@ -23,24 +24,21 @@ function basePageInit(ctx) {
   /* Project name change functionality */
   projectNameFormToggle.click(function(e){
     e.preventDefault();
-
-    $(this).add(projectName).hide();
+    projectNameContainer.hide();
     projectNameForm.fadeIn();
   });
 
   projectNameChangeCancel.click(function(e){
     e.preventDefault();
-
     projectNameForm.hide();
-    projectName.add(projectNameFormToggle).fadeIn();
+    projectNameContainer.fadeIn();
   });
 
   $("#project-name-change-btn").click(function(e){
     var newProjectName = $("#project-name-change-input").val();
 
-    libtoaster.editCurrentProject({ projectName: newProjectName },function (){
-
-      projectName.text(newProjectName);
+    libtoaster.editCurrentProject({ projectName: newProjectName }, function (){
+      projectName.html(newProjectName);
       libtoaster.ctx.projectName = newProjectName;
       projectNameChangeCancel.click();
     });
@@ -123,14 +121,14 @@ function basePageInit(ctx) {
   });
 
   function _checkProjectBuildable() {
-    if (selectedProject.projectId === undefined) {
+    if (selectedProject.projectId === undefined || selectedProject.projectIsDefault) {
       return;
     }
 
     libtoaster.getProjectInfo(selectedProject.projectPageUrl,
       function (data) {
         if (data.machine === null || data.machine.name === undefined || data.layers.length === 0) {
-          /* we can't build anything with out a machine and some layers */
+          /* we can't build anything without a machine and some layers */
           $("#new-build-button #targets-form").hide();
           $("#new-build-button .alert").show();
         } else {
@@ -149,7 +147,7 @@ function basePageInit(ctx) {
     /* If we don't have a current project then present the set project
      * form.
      */
-    if (selectedProject.projectId === undefined) {
+    if (selectedProject.projectId === undefined || selectedProject.projectIsDefault) {
       $('#change-project-form').show();
       $('#project .icon-pencil').hide();
     }

@@ -4,7 +4,7 @@ specified programs at scheduled times and related tools. It is based on the \
 original cron and has security and configuration enhancements like the \
 ability to use pam and SELinux."
 HOMEPAGE = "https://fedorahosted.org/cronie/"
-BUGTRACKER = "mmaslano@redhat.com"
+BUGTRACKER = "https://bugzilla.redhat.com"
 
 # Internet Systems Consortium License
 LICENSE = "ISC & BSD-3-Clause & BSD-2-Clause & GPLv2+"

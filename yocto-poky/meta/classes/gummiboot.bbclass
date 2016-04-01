@@ -46,7 +46,8 @@ efi_iso_populate() {
         mkdir -p ${EFIIMGDIR}/${EFIDIR}
         cp $iso_dir/${EFIDIR}/* ${EFIIMGDIR}${EFIDIR}
         cp $iso_dir/vmlinuz ${EFIIMGDIR}
-        echo "${DEST_EFI_IMAGE}" > ${EFIIMGDIR}/startup.nsh
+        EFIPATH=$(echo "${EFIDIR}" | sed 's/\//\\/g')
+        echo "fs0:${EFIPATH}\\${DEST_EFI_IMAGE}" > ${EFIIMGDIR}/startup.nsh
         if [ -f "$iso_dir/initrd" ] ; then
             cp $iso_dir/initrd ${EFIIMGDIR}
         fi

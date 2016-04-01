@@ -11,9 +11,14 @@ import os, re, mmap
 import unittest
 import inspect
 import subprocess
-import bb
-from oeqa.utils.decorators import LogResults, gettag
-from sys import exc_info, exc_clear
+try:
+    import bb
+except ImportError:
+    pass
+import logging
+from oeqa.utils.decorators import LogResults, gettag, getResults
+
+logger = logging.getLogger("BitBake")
 
 def getVar(obj):
     #extend form dict, if a variable didn't exists, need find it in testcase
@@ -89,7 +94,7 @@ def loadTests(tc, type="runtime"):
                                 suite.dependencies.append(dep_suite)
                             break
                     else:
-                        bb.warn("Test %s was declared as @skipUnlessPassed('%s') but that test is either not defined or not active. Will run the test anyway." %
+                        logger.warning("Test %s was declared as @skipUnlessPassed('%s') but that test is either not defined or not active. Will run the test anyway." %
                                 (test, depends_on))
     # Use brute-force topological sort to determine ordering. Sort by
     # depth (higher depth = must run later), with original ordering to
@@ -106,14 +111,34 @@ def loadTests(tc, type="runtime"):
     suites.sort(cmp=lambda a,b: cmp((a.depth, a.index), (b.depth, b.index)))
     return testloader.suiteClass(suites)
 
+_buffer = ""
+
+def custom_verbose(msg, *args, **kwargs):
+    global _buffer
+    if msg[-1] != "\n":
+        _buffer += msg
+    else:
+        _buffer += msg
+        try:
+            bb.plain(_buffer.rstrip("\n"), *args, **kwargs)
+        except NameError:
+            logger.info(_buffer.rstrip("\n"), *args, **kwargs)
+        _buffer = ""
+
 def runTests(tc, type="runtime"):
 
     suite = loadTests(tc, type)
-    bb.note("Test modules  %s" % tc.testslist)
+    logger.info("Test modules  %s" % tc.testslist)
     if hasattr(tc, "tagexp") and tc.tagexp:
-        bb.note("Filter test cases by tags: %s" % tc.tagexp)
-    bb.note("Found %s tests" % suite.countTestCases())
+        logger.info("Filter test cases by tags: %s" % tc.tagexp)
+    logger.info("Found %s tests" % suite.countTestCases())
     runner = unittest.TextTestRunner(verbosity=2)
+    try:
+        if bb.msg.loggerDefaultVerbose:
+            runner.stream.write = custom_verbose
+    except NameError:
+        # Not in bb environment?
+        pass
     result = runner.run(suite)
 
     return result
@@ -158,17 +183,24 @@ class oeRuntimeTest(oeTest):
         pass
 
     def tearDown(self):
-        # If a test fails or there is an exception
-        if not exc_info() == (None, None, None):
-            exc_clear()
-            #Only dump for QemuTarget
-            if (type(self.target).__name__ == "QemuTarget"):
-                self.tc.host_dumper.create_dir(self._testMethodName)
-                self.tc.host_dumper.dump_host()
-                self.target.target_dumper.dump_target(
-                        self.tc.host_dumper.dump_dir)
-                print ("%s dump data stored in %s" % (self._testMethodName,
-                         self.tc.host_dumper.dump_dir))
+        res = getResults()
+        # If a test fails or there is an exception dump
+        # for QemuTarget only
+        if (type(self.target).__name__ == "QemuTarget" and
+                (self.id() in res.getErrorList() or
+                self.id() in  res.getFailList())):
+            self.tc.host_dumper.create_dir(self._testMethodName)
+            self.tc.host_dumper.dump_host()
+            self.target.target_dumper.dump_target(
+                    self.tc.host_dumper.dump_dir)
+            print ("%s dump data stored in %s" % (self._testMethodName,
+                     self.tc.host_dumper.dump_dir))
+
+        self.tearDownLocal()
+
+    # Method to be run after tearDown and implemented by child classes
+    def tearDownLocal(self):
+        pass
 
     #TODO: use package_manager.py to install packages on any type of image
     def install_packages(self, packagelist):
@@ -190,7 +222,7 @@ class oeSDKTest(oeTest):
         return False
 
     def _run(self, cmd):
-        return subprocess.check_output(cmd, shell=True)
+        return subprocess.check_output(". %s; " % self.tc.sdkenv + cmd, shell=True)
 
 def getmodule(pos=2):
     # stack returns a list of tuples containg frame information

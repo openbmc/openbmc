@@ -1,0 +1,32 @@
+Upstream-Status: Submitted (http://bugs.gw.com/view.php?id=485)
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From 3cde199d03b39632361c275cd30fa0612a03138b Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Mon, 19 Oct 2015 10:30:57 +0100
+Subject: [PATCH 2/2] When using the host file, respect FILE_COMPILE
+
+If we're cross-compiling and not using the file binary that was just built,
+execute the binary that we've been told to use (via FILE_COMPILE) when checking
+the version instead of assuming that "file" is correct as the actual compile
+uses FILE_COMPILE so different binaries may be used.
+---
+ magic/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/magic/Makefile.am b/magic/Makefile.am
+index 89ac844..67067fe 100644
+--- a/magic/Makefile.am
++++ b/magic/Makefile.am
+@@ -293,7 +293,7 @@ ${MAGIC}: $(EXTRA_DIST) $(FILE_COMPILE_DEP)
+ 	@(if expr "${FILE_COMPILE}" : '.*/.*' > /dev/null; then \
+ 	    echo "Using ${FILE_COMPILE} to generate ${MAGIC}" > /dev/null; \
+ 	  else \
+-	    v=$$(file --version | sed -e s/file-// -e q); \
++	    v=$$(${FILE_COMPILE} --version | sed -e s/file-// -e q); \
+ 	    if [ "$$v" != "${PACKAGE_VERSION}" ]; then \
+ 		echo "Cannot use the installed version of file ($$v) to"; \
+ 		echo "cross-compile file ${PACKAGE_VERSION}"; \
+-- 
+2.1.4
+

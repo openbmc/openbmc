@@ -33,7 +33,7 @@ python do_distrodata_np() {
         tmpdir = d.getVar('TMPDIR', True)
         distro_check_dir = os.path.join(tmpdir, "distro_check")
         datetime = localdata.getVar('DATETIME', True)
-        dist_check.update_distro_data(distro_check_dir, datetime)
+        dist_check.update_distro_data(distro_check_dir, datetime, localdata)
 
         if pn.find("-native") != -1:
             pnstripped = pn.split("-native")
@@ -118,7 +118,7 @@ python do_distrodata() {
         tmpdir = d.getVar('TMPDIR', True)
         distro_check_dir = os.path.join(tmpdir, "distro_check")
         datetime = localdata.getVar('DATETIME', True)
-        dist_check.update_distro_data(distro_check_dir, datetime)
+        dist_check.update_distro_data(distro_check_dir, datetime, localdata)
 
         pn = d.getVar("PN", True)
         bb.note("Package Name: %s" % pn)
@@ -271,10 +271,11 @@ python do_checkpkg() {
         from bb.fetch2 import FetchError, NoMethodError, decodeurl
 
         """first check whether a uri is provided"""
-        src_uri = d.getVar('SRC_URI', True)
-        if not src_uri:
-                return
-        uri_type, _, _, _, _, _ = decodeurl(src_uri)
+        src_uri = (d.getVar('SRC_URI', True) or '').split()
+        if src_uri:
+            uri_type, _, _, _, _, _ = decodeurl(src_uri[0])
+        else:
+            uri_type = "none"
 
         """initialize log files."""
         logpath = d.getVar('LOG_DIR', True)
@@ -354,7 +355,10 @@ python do_checkpkg() {
             elif cmp == 0:
                 pstatus = "MATCH"
 
-        psrcuri = psrcuri.split()[0]
+        if psrcuri:
+            psrcuri = psrcuri.split()[0]
+        else:
+            psrcuri = "none"
         pdepends = "".join(pdepends.split("\t"))
         pdesc = "".join(pdesc.split("\t"))
         no_upgr_reason = d.getVar('RECIPE_NO_UPDATE_REASON', True)
@@ -402,7 +406,7 @@ python do_distro_check() {
     bb.utils.mkdirhier(logpath)
     result_file = os.path.join(logpath, "distrocheck.csv")
     datetime = localdata.getVar('DATETIME', True)
-    dc.update_distro_data(distro_check_dir, datetime)
+    dc.update_distro_data(distro_check_dir, datetime, localdata)
 
     # do the comparison
     result = dc.compare_in_distro_packages_list(distro_check_dir, d)

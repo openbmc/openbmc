@@ -13,7 +13,7 @@ XSERVER ?= "${XSERVER_X86_BASE} \
             ${XSERVER_X86_MODESETTING} \
            "
 
-MACHINE_EXTRA_RRECOMMENDS += "linux-firmware v86d eee-acpi-scripts"
+MACHINE_EXTRA_RRECOMMENDS += "linux-firmware eee-acpi-scripts"
 
 GLIBC_ADDONS = "nptl"
 

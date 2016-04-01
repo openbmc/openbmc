@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-#
-# gen-lockedsig-cache <locked-sigs.inc> <input-cachedir> <output-cachedir>
-#
 
 import os
 import sys
@@ -18,14 +15,17 @@ def mkdir(d):
 
 if len(sys.argv) < 3:
     print("Incorrect number of arguments specified")
+    print("syntax: gen-lockedsig-cache <locked-sigs.inc> <input-cachedir> <output-cachedir>")
     sys.exit(1)
 
+print('Reading %s' % sys.argv[1])
 sigs = []
 with open(sys.argv[1]) as f:
     for l in f.readlines():
         if ":" in l:
             sigs.append(l.split(":")[2].split()[0])
 
+print('Gathering file list')
 files = set()
 for s in sigs:
     p = sys.argv[2] + "/" + s[:2] + "/*" + s + "*"
@@ -33,14 +33,25 @@ for s in sigs:
     p = sys.argv[2] + "/*/" + s[:2] + "/*" + s + "*"
     files |= set(glob.glob(p))
 
+print('Processing files')
 for f in files:
-    dst = f.replace(sys.argv[2], sys.argv[3])
+    sys.stdout.write('Processing %s... ' % f)
+    _, ext = os.path.splitext(f)
+    if not ext in ['.tgz', '.siginfo', '.sig']:
+        # Most likely a temp file, skip it
+        print('skipping')
+        continue
+    dst = os.path.join(sys.argv[3], os.path.relpath(f, sys.argv[2]))
     destdir = os.path.dirname(dst)
     mkdir(destdir)
 
     if os.path.exists(dst):
         os.remove(dst)
     if (os.stat(f).st_dev == os.stat(destdir).st_dev):
+        print('linking')
         os.link(f, dst)
     else:
+        print('copying')
         shutil.copyfile(f, dst)
+
+print('Done!')

@@ -248,7 +248,7 @@ class PRData(object):
         self.connection.execute("PRAGMA journal_mode = WAL;")
         self._tables={}
 
-    def __del__(self):
+    def disconnect(self):
         self.connection.close()
 
     def __getitem__(self,tblname):

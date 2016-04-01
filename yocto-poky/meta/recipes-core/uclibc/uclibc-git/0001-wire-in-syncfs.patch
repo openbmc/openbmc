@@ -1,0 +1,49 @@
+From 4f2db1b46bda5e376245ec36198b137709f069e8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 15 Oct 2015 17:03:37 +0000
+Subject: [PATCH] wire in syncfs
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ include/unistd.h                   |  2 +-
+ libc/sysdeps/linux/common/syncfs.c | 13 +++++++++++++
+ 2 files changed, 14 insertions(+), 1 deletion(-)
+ create mode 100644 libc/sysdeps/linux/common/syncfs.c
+
+diff --git a/include/unistd.h b/include/unistd.h
+index 3793d2d..d01bb08 100644
+--- a/include/unistd.h
++++ b/include/unistd.h
+@@ -1073,7 +1073,7 @@ extern char *getpass (const char *__prompt) __nonnull ((1));
+ extern int fsync (int __fd);
+ #endif /* Use BSD || X/Open || Unix98.  */
+ 
+-#if 0 /*def __USE_GNU */
++#ifdef __USE_GNU
+ /* Make all changes done to all files on the file system associated
+  *    with FD actually appear on disk.  */
+ extern int syncfs (int __fd) __THROW;
+diff --git a/libc/sysdeps/linux/common/syncfs.c b/libc/sysdeps/linux/common/syncfs.c
+new file mode 100644
+index 0000000..d2eed05
+--- /dev/null
++++ b/libc/sysdeps/linux/common/syncfs.c
+@@ -0,0 +1,13 @@
++/* vi: set sw=4 ts=4: */
++/*
++ * fsync() for uClibc
++ *
++ * Copyright (C) 2000-2006 Erik Andersen <andersen@uclibc.org>
++ *
++ * Licensed under the LGPL v2.1, see the file COPYING.LIB in this tarball.
++ */
++
++#include <sys/syscall.h>
++#include <unistd.h>
++
++_syscall1(int, syncfs, int, fd)
+-- 
+2.6.1
+

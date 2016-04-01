@@ -23,7 +23,7 @@ function projectPageInit(ctx) {
   var cancelReleaseChange = $("#cancel-release-change");
 
   var currentLayerAddSelection;
-  var currentMachineAddSelection = {};
+  var currentMachineAddSelection = "";
 
   var urlParams = libtoaster.parseUrlParams();
 
@@ -38,7 +38,7 @@ function projectPageInit(ctx) {
      */
     if (urlParams.hasOwnProperty('setMachine') &&
         urlParams.setMachine !== prjInfo.machine.name){
-        currentMachineAddSelection.name = urlParams.setMachine;
+        machineChangeInput.val(urlParams.setMachine);
         machineChangeBtn.click();
     } else {
       updateMachineName(prjInfo.machine.name);
@@ -103,6 +103,12 @@ function projectPageInit(ctx) {
     layerAddBtn.removeAttr("disabled");
   });
 
+  layerAddInput.keyup(function() {
+    if ($(this).val().length == 0) {
+      layerAddBtn.attr("disabled", "disabled")
+    }
+  });
+
   layerAddBtn.click(function(e){
     e.preventDefault();
     var layerObj = currentLayerAddSelection;
@@ -146,10 +152,7 @@ function projectPageInit(ctx) {
 
       link.attr("href", layerObj.layerdetailurl);
       link.text(layerObj.name);
-      /* YOCTO #8024
-        link.tooltip({title: layerObj.giturl + " | "+ layerObj.branch.name, placement: "right"});
-        branch name not accessible sometimes it is revision instead
-      */
+      link.tooltip({title: layerObj.vcs_url + " | "+ layerObj.vcs_reference, placement: "right"});
 
       var trashItem = projectLayer.children("span");
       trashItem.click(function (e) {
@@ -251,29 +254,33 @@ function projectPageInit(ctx) {
   }
 
   libtoaster.makeTypeahead(machineChangeInput, libtoaster.ctx.machinesTypeAheadUrl, { }, function(item){
-    currentMachineAddSelection = item;
+    currentMachineAddSelection = item.name;
     machineChangeBtn.removeAttr("disabled");
   });
 
   machineChangeBtn.click(function(e){
     e.preventDefault();
-    if (currentMachineAddSelection.name === undefined)
+    /* We accept any value regardless of typeahead selection or not */
+    if (machineChangeInput.val().length === 0)
       return;
 
-    libtoaster.editCurrentProject({ machineName : currentMachineAddSelection.name },
+    currentMachineAddSelection = machineChangeInput.val();
+
+    libtoaster.editCurrentProject(
+      { machineName : currentMachineAddSelection },
       function(){
         /* Success machine changed */
-        updateMachineName(currentMachineAddSelection.name);
+        updateMachineName(currentMachineAddSelection);
         machineChangeCancel.click();
 
         /* Show the alert message */
         var message = $('<span class="lead">You have changed the machine to: <strong><span id="notify-machine-name"></span></strong></span>');
-        message.find("#notify-machine-name").text(currentMachineAddSelection.name);
+        message.find("#notify-machine-name").text(currentMachineAddSelection);
         libtoaster.showChangeNotification(message);
     },
       function(){
         /* Failed machine changed */
-        console.log("failed to change machine");
+        console.warn("Failed to change machine");
     });
   });
 

@@ -60,6 +60,12 @@ do_configure_append_class-nativesdk() {
 	sed -i "s#\(LIBTOOL=\$(apr_builddir)\).*#\1/libtool#" ${S}/build/rules.mk
 }
 
+do_install_append_class-target() {
+	sed -i -e 's,${STAGING_DIR_HOST},,g' \
+	       -e 's,APU_SOURCE_DIR=.*,APR_SOURCE_DIR=,g' \
+	       -e 's,APU_BUILD_DIR=.*,APR_BUILD_DIR=,g' ${D}${bindir}/apu-1-config
+}
+
 FILES_${PN}     += "${libdir}/apr-util-1/apr_dbm_gdbm-1.so"
 FILES_${PN}-dev += "${libdir}/aprutil.exp ${libdir}/apr-util-1/apr_dbm_gdbm.so* ${libdir}/apr-util-1/apr_dbm_gdbm.la"
 FILES_${PN}-dbg += "${libdir}/apr-util-1/.debug/*"

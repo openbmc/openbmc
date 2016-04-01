@@ -30,6 +30,7 @@ EXTRA_OECONF += "\
     --disable-polkit \
     --enable-client \
 "
+CFLAGS += "-D_GNU_SOURCE"
 
 PACKAGECONFIG ??= "wispr \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'systemd','systemd', '', d)} \
@@ -67,15 +68,9 @@ python __anonymous () {
 
 SYSTEMD_SERVICE_${PN} = "connman.service"
 SYSTEMD_SERVICE_${PN}-vpn = "connman-vpn.service"
-SYSTEMD_WIRED_SETUP = "ExecStartPre=-${libdir}/connman/wired-setup"
+SYSTEMD_WIRED_SETUP = "ExecStartPre=-${datadir}/connman/wired-setup"
 
-# This allows *everyone* to access ConnMan over DBus, without any access
-# control.  Really the at_console flag should work, which would mean that
-# both this and the xuser patch can be dropped.
 do_compile_append() {
-	sed -i -e s:deny:allow:g ${S}/src/connman-dbus.conf
-	sed -i -e s:deny:allow:g ${S}/vpn/vpn-dbus.conf
-
 	sed -i "s#ExecStart=#${SYSTEMD_WIRED_SETUP}\nExecStart=#" ${B}/src/connman.service
 }
 
@@ -83,7 +78,7 @@ do_install_append() {
 	if ${@bb.utils.contains('DISTRO_FEATURES','sysvinit','true','false',d)}; then
 		install -d ${D}${sysconfdir}/init.d
 		install -m 0755 ${WORKDIR}/connman ${D}${sysconfdir}/init.d/connman
-		sed -i s%@LIBDIR@%${libdir}% ${D}${sysconfdir}/init.d/connman
+		sed -i s%@DATADIR@%${datadir}% ${D}${sysconfdir}/init.d/connman
 	fi
 
 	install -d ${D}${bindir}
@@ -112,7 +107,6 @@ RPROVIDES_${PN} = "\
 
 RDEPENDS_${PN} = "\
 	dbus \
-	${@base_conditional('ROOTLESS_X', '1', 'xuser-account', '', d)} \
 	"
 
 PACKAGES_DYNAMIC += "^${PN}-plugin-.*"

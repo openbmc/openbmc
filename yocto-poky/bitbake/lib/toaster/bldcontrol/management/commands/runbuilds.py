@@ -5,6 +5,7 @@ from bldcontrol.bbcontroller import getBuildEnvironmentController, ShellCmdExcep
 from bldcontrol.models import BuildRequest, BuildEnvironment, BRError, BRVariable
 import os
 import logging
+import time
 
 logger = logging.getLogger("ToasterScheduler")
 
@@ -118,7 +119,7 @@ class Command(NoArgsCommand):
             br.save()
             # transpose target information
             for brtarget in br.brtarget_set.all():
-                Target.objects.create(build = br.build, target= brtarget.target)
+                Target.objects.create(build=br.build, target=brtarget.target, task=brtarget.task)
             # transpose the launch errors in ToasterExceptions
             for brerror in br.brerror_set.all():
                 LogMessage.objects.create(build = br.build, level = LogMessage.EXCEPTION, message = brerror.errmsg)
@@ -128,6 +129,12 @@ class Command(NoArgsCommand):
 
 
     def handle_noargs(self, **options):
-        self.cleanup()
-        self.archive()
-        self.schedule()
+        while True:
+            try:
+                self.cleanup()
+                self.archive()
+                self.schedule()
+            except:
+                pass
+
+            time.sleep(1)

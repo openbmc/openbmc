@@ -39,7 +39,7 @@
         <para>
             You can use Toaster in Analysis Mode or Build Mode:
             <itemizedlist>
-                <listitem><para><emphasis>Analysis Mode:</emphasis>
+                <listitem><para id='toaster-analysis-mode'><emphasis>Analysis Mode:</emphasis>
                     In Analysis Mode, you can record builds and statistics.
                     In this Mode, you directly access the
                     <filename>bitbake</filename> command, which you then use to
@@ -82,7 +82,7 @@
                             </para></listitem>
                     </itemizedlist>
                     </para></listitem>
-                <listitem><para><emphasis>Build Mode:</emphasis>
+                <listitem><para id='toaster-build-mode'><emphasis>Build Mode:</emphasis>
                     In Build Mode, Toaster handles the build configuration,
                     scheduling and execution.
                     In this mode, all your interaction with the build system

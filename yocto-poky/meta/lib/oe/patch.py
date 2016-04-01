@@ -337,12 +337,15 @@ class GitApplyTree(PatchTree):
         return (tmpfile, cmd)
 
     @staticmethod
-    def extractPatches(tree, startcommit, outdir):
+    def extractPatches(tree, startcommit, outdir, paths=None):
         import tempfile
         import shutil
         tempdir = tempfile.mkdtemp(prefix='oepatch')
         try:
             shellcmd = ["git", "format-patch", startcommit, "-o", tempdir]
+            if paths:
+                shellcmd.append('--')
+                shellcmd.extend(paths)
             out = runcmd(["sh", "-c", " ".join(shellcmd)], tree)
             if out:
                 for srcfile in out.split():
@@ -407,6 +410,13 @@ class GitApplyTree(PatchTree):
                     runcmd(["sh", "-c", " ".join(shellcmd)], self.dir)
                 except CmdError:
                     pass
+                # git am won't always clean up after itself, sadly, so...
+                shellcmd = ["git", "--work-tree=%s" % reporoot, "reset", "--hard", "HEAD"]
+                runcmd(["sh", "-c", " ".join(shellcmd)], self.dir)
+                # Also need to take care of any stray untracked files
+                shellcmd = ["git", "--work-tree=%s" % reporoot, "clean", "-f"]
+                runcmd(["sh", "-c", " ".join(shellcmd)], self.dir)
+
                 # Fall back to git apply
                 shellcmd = ["git", "--git-dir=%s" % reporoot, "apply", "-p%s" % patch['strippath']]
                 try:

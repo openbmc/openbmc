@@ -389,6 +389,10 @@
                 You can use the entire <filename>.config</filename> file as the
                 <filename>defconfig</filename> file as described in the
                 "<link linkend='changing-the-configuration'>Changing the Configuration</link>" section.
+                For more information on the <filename>.config</filename> file,
+                see the
+                "<ulink url='&YOCTO_DOCS_DEV_URL;#using-menuconfig'>Using <filename>menuconfig</filename></ulink>"
+                section in the Yocto Project Development Manual.
             </para>
 
             <para>

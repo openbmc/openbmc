@@ -2,6 +2,7 @@
 # we need a function to reformat the params based on a static file
 def update_useradd_static_config(d):
     import argparse
+    import itertools
     import re
 
     class myArgumentParser( argparse.ArgumentParser ):
@@ -15,6 +16,11 @@ def update_useradd_static_config(d):
 
         def error(self, message):
             raise bb.build.FuncFailed(message)
+
+    def list_extend(iterable, length, obj = None):
+        """Ensure that iterable is the specified length by extending with obj
+        and return it as a list"""
+        return list(itertools.islice(itertools.chain(iterable, itertools.repeat(obj)), length))
 
     # We parse and rewrite the useradd components
     def rewrite_useradd(params):
@@ -84,7 +90,10 @@ def update_useradd_static_config(d):
                     for line in f:
                         if line.startswith('#'):
                             continue
-                        field = line.rstrip().split(":")
+                        # Make sure there always are at least seven elements in
+                        # the field list. This allows for leaving out trailing
+                        # colons in the passwd file.
+                        field = list_extend(line.rstrip().split(":"), 7)
                         if field[0] == uaargs.LOGIN:
                             if uaargs.uid and field[2] and (uaargs.uid != field[2]):
                                 bb.warn("%s: Changing username %s's uid from (%s) to (%s), verify configuration files!" % (d.getVar('PN', True), uaargs.LOGIN, uaargs.uid, field[2]))
@@ -220,7 +229,10 @@ def update_useradd_static_config(d):
                     for line in f:
                         if line.startswith('#'):
                             continue
-                        field = line.rstrip().split(":")
+                        # Make sure there always are at least four elements in
+                        # the field list. This allows for leaving out trailing
+                        # colons in the group file.
+                        field = list_extend(line.rstrip().split(":"), 4)
                         if field[0] == gaargs.GROUP and field[2]:
                             if gaargs.gid and (gaargs.gid != field[2]):
                                 bb.warn("%s: Changing groupname %s's gid from (%s) to (%s), verify configuration files!" % (d.getVar('PN', True), gaargs.GROUP, gaargs.gid, field[2]))

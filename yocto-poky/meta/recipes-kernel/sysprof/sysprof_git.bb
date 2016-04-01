@@ -19,7 +19,8 @@ SRC_URI_append_mips64n32 = " file://rmb-mips.patch"
 
 S = "${WORKDIR}/git"
 
-inherit autotools pkgconfig
+inherit autotools pkgconfig distro_features_check
+ANY_OF_DISTRO_FEATURES = "${GTK2DISTROFEATURES}"
 
 # We do not yet work for aarch64.
 #

@@ -1,0 +1,110 @@
+From 92e8378103bba3b91f2dec4e6fda3e1755a7c0fd Mon Sep 17 00:00:00 2001
+From: Paul Barker <paul@paulbarker.me.uk>
+Date: Sat, 7 Nov 2015 10:23:51 +0000
+Subject: [PATCH 3/4] sha256: Add sha256_to_string function
+
+Signed-off-by: Paul Barker <paul@paulbarker.me.uk>
+Signed-off-by: Alejandro del Castillo <alejandro.delcastillo@ni.com>
+
+Upstream-Status: Accepted
+---
+ libopkg/file_util.c | 28 +++-------------------------
+ libopkg/sha256.c    |  7 +++++++
+ libopkg/sha256.h    |  3 +++
+ 3 files changed, 13 insertions(+), 25 deletions(-)
+
+diff --git a/libopkg/file_util.c b/libopkg/file_util.c
+index cb3dbf0..864aedb 100644
+--- a/libopkg/file_util.c
++++ b/libopkg/file_util.c
+@@ -374,27 +374,13 @@ char *file_md5sum_alloc(const char *file_name)
+ #ifdef HAVE_SHA256
+ char *file_sha256sum_alloc(const char *file_name)
+ {
+-    static const int sha256sum_bin_len = 32;
+-    static const int sha256sum_hex_len = 64;
+-
+-    static const unsigned char bin2hex[16] = {
+-        '0', '1', '2', '3',
+-        '4', '5', '6', '7',
+-        '8', '9', 'a', 'b',
+-        'c', 'd', 'e', 'f'
+-    };
+-
+-    int i, err;
++    int err;
+     FILE *file;
+-    char *sha256sum_hex;
+-    unsigned char sha256sum_bin[sha256sum_bin_len];
+-
+-    sha256sum_hex = xcalloc(1, sha256sum_hex_len + 1);
++    unsigned char sha256sum_bin[32];
+ 
+     file = fopen(file_name, "r");
+     if (file == NULL) {
+         opkg_perror(ERROR, "Failed to open file %s", file_name);
+-        free(sha256sum_hex);
+         return NULL;
+     }
+ 
+@@ -402,20 +388,12 @@ char *file_sha256sum_alloc(const char *file_name)
+     if (err) {
+         opkg_msg(ERROR, "Could't compute sha256sum for %s.\n", file_name);
+         fclose(file);
+-        free(sha256sum_hex);
+         return NULL;
+     }
+ 
+     fclose(file);
+ 
+-    for (i = 0; i < sha256sum_bin_len; i++) {
+-        sha256sum_hex[i * 2] = bin2hex[sha256sum_bin[i] >> 4];
+-        sha256sum_hex[i * 2 + 1] = bin2hex[sha256sum_bin[i] & 0xf];
+-    }
+-
+-    sha256sum_hex[sha256sum_hex_len] = '\0';
+-
+-    return sha256sum_hex;
++    return sha256_to_string(sha256sum_bin);
+ }
+ 
+ #endif
+diff --git a/libopkg/sha256.c b/libopkg/sha256.c
+index 0816858..bceed72 100644
+--- a/libopkg/sha256.c
++++ b/libopkg/sha256.c
+@@ -29,6 +29,8 @@
+ #include <stddef.h>
+ #include <string.h>
+ 
++#include "string_util.h"
++
+ #if USE_UNLOCKED_IO
+ #include "unlocked-io.h"
+ #endif
+@@ -517,3 +519,8 @@ void sha256_process_block(const void *buffer, size_t len,
+         h = ctx->state[7] += h;
+     }
+ }
++
++char *sha256_to_string(const void *sha256sum_bin)
++{
++    return bin_to_hex(sha256sum_bin, 32);
++}
+diff --git a/libopkg/sha256.h b/libopkg/sha256.h
+index 734ab54..0d1e9e5 100644
+--- a/libopkg/sha256.h
++++ b/libopkg/sha256.h
+@@ -85,6 +85,9 @@ extern int sha224_stream(FILE * stream, void *resblock);
+ extern void *sha256_buffer(const char *buffer, size_t len, void *resblock);
+ extern void *sha224_buffer(const char *buffer, size_t len, void *resblock);
+ 
++/* Convert a binary sha256sum value to an ASCII string. */
++char *sha256_to_string(const void *sha256sum_bin);
++
+ #ifdef __cplusplus
+ }
+ #endif
+-- 
+1.9.1
+

@@ -5,6 +5,7 @@ MAJ_VER = "${@oe.utils.trim_version("${PV}", 2)}"
 SRC_URI = "http://ftp.gnome.org/pub/gnome/sources/gtk+/${MAJ_VER}/gtk+-${PV}.tar.xz \
            file://hardcoded_libtool.patch \
            file://Dont-force-csd.patch \
+           file://Do-not-try-to-initialize-GL-without-libGL.patch \
           "
 
 SRC_URI[md5sum] = "fc59e5c8b5a4585b60623dd708df400b"

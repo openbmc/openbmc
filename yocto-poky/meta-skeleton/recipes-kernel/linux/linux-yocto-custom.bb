@@ -43,9 +43,9 @@
 #   
 #   example configuration addition:
 #            SRC_URI += "file://smp.cfg"
-#   example patch addition (for kernel v3.4 only):
-#            SRC_URI += "file://0001-linux-version-tweak.patch
-#   example feature addition (for kernel v3.4 only):
+#   example patch addition (for kernel v4.x only):
+#            SRC_URI += "file://0001-linux-version-tweak.patch"
+#   example feature addition (for kernel v4.x only):
 #            SRC_URI += "file://feature.scc"
 #
 
@@ -56,15 +56,14 @@ require recipes-kernel/linux/linux-yocto.inc
 # tree if you do not want to build from Linus' tree.
 SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git;protocol=git;nocheckout=1;name=machine"
 
-LINUX_VERSION ?= "3.4"
-LINUX_VERSION_EXTENSION ?= "-custom"
+LINUX_VERSION ?= "4.2"
+LINUX_VERSION_EXTENSION_append = "-custom"
 
 # Modify SRCREV to a different commit hash in a copy of this recipe to
 # build a different release of the Linux kernel.
-# tag: v3.4 76e10d158efb6d4516018846f60c2ab5501900bc
-SRCREV_machine="76e10d158efb6d4516018846f60c2ab5501900bc"
+# tag: v4.2 64291f7db5bd8150a74ad2036f1037e6a0428df2
+SRCREV_machine="64291f7db5bd8150a74ad2036f1037e6a0428df2"
 
-PR = "r1"
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
 # Override COMPATIBLE_MACHINE to include your machine in a copy of this recipe

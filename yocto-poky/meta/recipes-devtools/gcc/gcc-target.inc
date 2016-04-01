@@ -31,7 +31,7 @@ PACKAGES = "\
 
 FILES_${PN} = "\
     ${bindir}/${TARGET_PREFIX}gcc* \
-    ${libexecdir}/gcc/${TARGET_SYS}/${BINV}/collect2 \
+    ${libexecdir}/gcc/${TARGET_SYS}/${BINV}/collect2* \
     ${libexecdir}/gcc/${TARGET_SYS}/${BINV}/cc* \
     ${libexecdir}/gcc/${TARGET_SYS}/${BINV}/lto* \
     ${libexecdir}/gcc/${TARGET_SYS}/${BINV}/lib*${SOLIBS} \
@@ -83,20 +83,20 @@ FILES_gfortran-symlinks = "\
     ${bindir}/f95"
 
 FILES_cpp = "\
-    ${bindir}/${TARGET_PREFIX}cpp \
+    ${bindir}/${TARGET_PREFIX}cpp* \
     ${base_libdir}/cpp \
     ${libexecdir}/gcc/${TARGET_SYS}/${BINV}/cc1"
 FILES_cpp-symlinks = "${bindir}/cpp"
 
-FILES_gcov = "${bindir}/${TARGET_PREFIX}gcov \
-    ${bindir}/${TARGET_PREFIX}gcov-tool \
+FILES_gcov = "${bindir}/${TARGET_PREFIX}gcov* \
+    ${bindir}/${TARGET_PREFIX}gcov-tool* \
 "
 FILES_gcov-symlinks = "${bindir}/gcov \
     ${bindir}/gcov-tool \
 "
 
 FILES_g++ = "\
-    ${bindir}/${TARGET_PREFIX}g++ \
+    ${bindir}/${TARGET_PREFIX}g++* \
     ${libexecdir}/gcc/${TARGET_SYS}/${BINV}/cc1plus \
 "
 FILES_g++-symlinks = "\
@@ -141,7 +141,7 @@ do_install () {
 	cd ${D}${bindir}
 
 	# We care about g++ not c++
-	rm -f *c++
+	rm -f *c++*
 
 	# We don't care about the gcc-<version> ones for this
 	rm -f *gcc-?.?*

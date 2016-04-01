@@ -73,6 +73,7 @@ SRC_URI = "\
            file://0039-libcc1-fix-libcc1-s-install-path-and-rpath.patch \
            file://0040-nativesdk-gcc-support.patch \
            file://0041-handle-target-sysroot-multilib.patch \
+           file://0042-cxxflags-for-build.patch \
           "
 
 BACKPORTS = ""
@@ -98,6 +99,7 @@ EXTRA_OECONF_BASE = "\
     --with-cloog=no \
     --enable-checking=release \
     --enable-cheaders=c_global \
+    --without-isl \
 "
 
 EXTRA_OECONF_INITIAL = "\
@@ -109,6 +111,7 @@ EXTRA_OECONF_INITIAL = "\
     --disable-lto \
     --disable-plugin \
     --enable-decimal-float=no \
+    --without-isl \
 "
 
 EXTRA_OECONF_append_libc-uclibc = " --disable-decimal-float "

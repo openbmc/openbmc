@@ -27,7 +27,7 @@ class LayersTypeAhead(ToasterTypeAhead):
       super(LayersTypeAhead, self).__init__()
 
     def apply_search(self, search_term, prj, request):
-        layers = prj.compatible_layerversions()
+        layers = prj.get_all_compatible_layer_versions()
         layers = layers.order_by('layer__name')
 
         # Unlike the other typeaheads we also don't want to show suggestions
@@ -35,7 +35,8 @@ class LayersTypeAhead(ToasterTypeAhead):
         # layerdeps to a new layer.
         if ("include_added" in request.GET and
                 request.GET['include_added'] != "true"):
-            layers = layers.exclude(pk__in=prj.projectlayer_equivalent_set)
+            layers = layers.exclude(
+                pk__in=prj.get_project_layer_versions(pk=True))
 
         primary_results = layers.filter(layer__name__istartswith=search_term)
         secondary_results = layers.filter(layer__name__icontains=search_term).exclude(pk__in=primary_results)
@@ -120,12 +121,12 @@ class RecipesTypeAhead(ToasterTypeAhead):
         return results
 
 class ProjectsTypeAhead(ToasterTypeAhead):
-    """ Typeahead for all the projects """
+    """ Typeahead for all the projects, except for command line builds """
     def __init__(self):
         super(ProjectsTypeAhead, self).__init__()
 
     def apply_search(self, search_term, prj, request):
-        projects = Project.objects.all().order_by("name")
+        projects = Project.objects.exclude(is_default=True).order_by("name")
 
         primary_results = projects.filter(name__istartswith=search_term)
         secondary_results = projects.filter(name__icontains=search_term).exclude(pk__in=primary_results)

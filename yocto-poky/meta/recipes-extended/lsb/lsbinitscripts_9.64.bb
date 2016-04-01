@@ -3,6 +3,8 @@ SECTION = "base"
 LICENSE = "GPLv2"
 DEPENDS = "popt glib-2.0"
 
+RDEPENDS_${PN} += "util-linux"
+
 LIC_FILES_CHKSUM = "file://COPYING;md5=ebf4e8b49780ab187d51bd26aaa022c6"
 
 S="${WORKDIR}/initscripts-${PV}"

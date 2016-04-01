@@ -96,18 +96,22 @@ def exec_fakeroot(d, cmd, **kwargs):
             newenv[splitval[0]] = splitval[1]
     return subprocess.call("%s %s" % (fakerootcmd, cmd), env=newenv, **kwargs)
 
-def setup_tinfoil(config_only=False):
+def setup_tinfoil(config_only=False, basepath=None, tracking=False):
     """Initialize tinfoil api from bitbake"""
     import scriptpath
+    orig_cwd = os.path.abspath(os.curdir)
+    if basepath:
+        os.chdir(basepath)
     bitbakepath = scriptpath.add_bitbake_lib_path()
     if not bitbakepath:
         logger.error("Unable to find bitbake by searching parent directory of this script or PATH")
         sys.exit(1)
 
     import bb.tinfoil
-    tinfoil = bb.tinfoil.Tinfoil()
+    tinfoil = bb.tinfoil.Tinfoil(tracking=tracking)
     tinfoil.prepare(config_only)
     tinfoil.logger.setLevel(logger.getEffectiveLevel())
+    os.chdir(orig_cwd)
     return tinfoil
 
 def get_recipe_file(cooker, pn):
@@ -134,5 +138,62 @@ def parse_recipe(config, tinfoil, pn, appends):
         # Filter out appends from the workspace
         append_files = [path for path in append_files if
                         not path.startswith(config.workspace_path)]
+    else:
+        append_files = None
     return oe.recipeutils.parse_recipe(recipefile, append_files,
                                        tinfoil.config_data)
+
+def check_workspace_recipe(workspace, pn, checksrc=True):
+    """
+    Check that a recipe is in the workspace and (optionally) that source
+    is present.
+    """
+    if not pn in workspace:
+        raise DevtoolError("No recipe named '%s' in your workspace" % pn)
+    if checksrc:
+        srctree = workspace[pn]['srctree']
+        if not os.path.exists(srctree):
+            raise DevtoolError("Source tree %s for recipe %s does not exist" % (srctree, pn))
+        if not os.listdir(srctree):
+            raise DevtoolError("Source tree %s for recipe %s is empty" % (srctree, pn))
+
+def use_external_build(same_dir, no_same_dir, d):
+    """
+    Determine if we should use B!=S (separate build and source directories) or not
+    """
+    b_is_s = True
+    if no_same_dir:
+        logger.info('Using separate build directory since --no-same-dir specified')
+        b_is_s = False
+    elif same_dir:
+        logger.info('Using source tree as build directory since --same-dir specified')
+    elif bb.data.inherits_class('autotools-brokensep', d):
+        logger.info('Using source tree as build directory since recipe inherits autotools-brokensep')
+    elif d.getVar('B', True) == os.path.abspath(d.getVar('S', True)):
+        logger.info('Using source tree as build directory since that would be the default for this recipe')
+    else:
+        b_is_s = False
+    return b_is_s
+
+def setup_git_repo(repodir, version, devbranch, basetag='devtool-base'):
+    """
+    Set up the git repository for the source tree
+    """
+    import bb.process
+    if not os.path.exists(os.path.join(repodir, '.git')):
+        bb.process.run('git init', cwd=repodir)
+        bb.process.run('git add .', cwd=repodir)
+        commit_cmd = ['git', 'commit', '-q']
+        stdout, _ = bb.process.run('git status --porcelain', cwd=repodir)
+        if not stdout:
+            commit_cmd.append('--allow-empty')
+            commitmsg = "Initial empty commit with no upstream sources"
+        elif version:
+            commitmsg = "Initial commit from upstream at version %s" % version
+        else:
+            commitmsg = "Initial commit from upstream"
+        commit_cmd += ['-m', commitmsg]
+        bb.process.run(commit_cmd, cwd=repodir)
+
+    bb.process.run('git checkout -b %s' % devbranch, cwd=repodir)
+    bb.process.run('git tag -f %s' % basetag, cwd=repodir)

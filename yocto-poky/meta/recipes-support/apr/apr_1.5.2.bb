@@ -32,6 +32,11 @@ CACHED_CONFIGUREVARS += "apr_cv_mutex_recursive=yes"
 #
 CACHED_CONFIGUREVARS += "ac_cv_header_netinet_sctp_h=no ac_cv_header_netinet_sctp_uio_h=no"
 
+# Otherwise libtool fails to compile apr-utils
+# x86_64-linux-libtool: compile: unable to infer tagged configuration
+# x86_64-linux-libtool:   error: specify a tag with '--tag'
+CCACHE = ""
+
 do_configure_prepend() {
 	# Avoid absolute paths for grep since it causes failures
 	# when using sstate between different hosts with different
@@ -55,7 +60,13 @@ do_configure_append() {
 do_install_append() {
 	oe_multilib_header apr.h
 	install -d ${D}${datadir}/apr
-	cp ${S}/${HOST_SYS}-libtool ${D}${datadir}/build-1/libtool
+}
+
+do_install_append_class-target() {
+	sed -i -e 's,${STAGING_DIR_HOST},,g' ${D}${datadir}/build-1/apr_rules.mk
+	sed -i -e 's,${STAGING_DIR_HOST},,g' \
+	       -e 's,APR_SOURCE_DIR=.*,APR_SOURCE_DIR=,g' \
+	       -e 's,APR_BUILD_DIR=.*,APR_BUILD_DIR=,g' ${D}${bindir}/apr-1-config
 }
 
 SSTATE_SCAN_FILES += "apr_rules.mk libtool"
@@ -73,6 +84,7 @@ apr_sysroot_preprocess () {
 	cp ${S}/build/mkdir.sh $d/
 	cp ${S}/build/make_exports.awk $d/
 	cp ${S}/build/make_var_export.awk $d/
+	cp ${S}/${HOST_SYS}-libtool ${SYSROOT_DESTDIR}${datadir}/build-1/libtool
 }
 
 do_compile_ptest() {

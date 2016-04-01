@@ -15,12 +15,13 @@
         <title>Setting Up the Basic System Requirements</title>
 
         <para>
-            You first need to be sure your build system is set up to run
-            the Yocto Project.
-            See the
-            "<ulink url='&YOCTO_DOCS_QS_URL;#yp-resources'>Setting Up to Use the Yocto Project</ulink>"
-            section in the Yocto Project Quick Start for information on how
-            to set up your system for the Yocto Project.
+            Before you can use Toaster, you need to first set up your
+            build system to run the Yocto Project.
+            To do this, follow the instructions in the
+            "<ulink url='&YOCTO_DOCS_QS_URL;#packages'>The Build Host Packages</ulink>"
+            and
+            "<ulink url='&YOCTO_DOCS_QS_URL;#releases'>Yocto Project Release</ulink>"
+            sections in the Yocto Project Quick Start.
         </para>
     </section>
 
@@ -41,16 +42,21 @@
             install-compatible format.
         </para>
 
-        <section id='toaster-optional-virtual-environment'>
-            <title>Optionally Setting Up a Python Virtual Environment</title>
+        <section id='toaster-virtual-environment'>
+            <title>Set Up a Python Virtual Environment</title>
 
             <para>
-                It is highly recommended that you use a Python virtual
-                environment that allows you to maintain a dedicated Python
-                executable and its own set of installed modules.
-                Doing so separates the executable from the Python and modules
-                provided by the operating system and therefore avoids any
-                version conflicts.
+                Set up a Python virtual environment that allows you
+                to maintain a dedicated Python executable and its own
+                set of installed modules.
+                Doing so separates the executable from Python and the
+                modules provided by the operating system.
+                This separation avoids any version conflicts.
+                <note>
+                    Creating a virtual environment is not absolutely
+                    necessary.
+                    However, doing so is highly recommended.
+                </note>
             </para>
 
             <para>
@@ -73,7 +79,7 @@
                         </para></listitem>
                 </orderedlist>
                 <note>
-                    If you do choose to set up a virtual environment in
+                    After setting up a virtual environment in
                     which to run Toaster, you must initialize that
                     virtual environment each time you want to start
                     Toaster.

@@ -99,27 +99,6 @@ python () {
                 d.appendVarFlag('do_package_write_rpm', 'depends', ' %s:do_ar_patched' % pn)
             elif ar_src == "configured":
                 d.appendVarFlag('do_package_write_rpm', 'depends', ' %s:do_ar_configured' % pn)
-
-    # The gcc staff uses shared source
-    flag = d.getVarFlag("do_unpack", "stamp-base", True)
-    if flag:
-        if ar_src in [ 'original', 'patched' ]:
-            ar_outdir = os.path.join(d.getVar('ARCHIVER_TOPDIR', True), 'work-shared')
-            d.setVar('ARCHIVER_OUTDIR', ar_outdir)
-        d.setVarFlag('do_ar_original', 'stamp-base', flag)
-        d.setVarFlag('do_ar_patched', 'stamp-base', flag)
-        d.setVarFlag('do_unpack_and_patch', 'stamp-base', flag)
-        d.setVarFlag('do_ar_original', 'vardepsexclude', 'PN PF ARCHIVER_OUTDIR WORKDIR')
-        d.setVarFlag('do_unpack_and_patch', 'vardepsexclude', 'PN PF ARCHIVER_OUTDIR WORKDIR')
-        d.setVarFlag('do_ar_patched', 'vardepsexclude', 'PN PF ARCHIVER_OUTDIR WORKDIR')
-        d.setVarFlag('create_diff_gz', 'vardepsexclude', 'PF')
-        d.setVarFlag('create_tarball', 'vardepsexclude', 'PF')
-
-        flag_clean = d.getVarFlag('do_unpack', 'stamp-base-clean', True)
-        if flag_clean:
-            d.setVarFlag('do_ar_original', 'stamp-base-clean', flag_clean)
-            d.setVarFlag('do_ar_patched', 'stamp-base-clean', flag_clean)
-            d.setVarFlag('do_unpack_and_patch', 'stamp-base-clean', flag_clean)
 }
 
 # Take all the sources for a recipe and puts them in WORKDIR/archiver-work/.
@@ -178,13 +157,8 @@ python do_ar_patched() {
     # Get the ARCHIVER_OUTDIR before we reset the WORKDIR
     ar_outdir = d.getVar('ARCHIVER_OUTDIR', True)
     bb.note('Archiving the patched source...')
-    d.setVar('WORKDIR', d.getVar('ARCHIVER_WORKDIR', True))
-    # The gcc staff uses shared source
-    flag = d.getVarFlag('do_unpack', 'stamp-base', True)
-    if flag:
-        create_tarball(d, d.getVar('S', True), 'patched', ar_outdir, 'gcc')
-    else:
-        create_tarball(d, d.getVar('S', True), 'patched', ar_outdir)
+    d.setVar('WORKDIR', ar_outdir)
+    create_tarball(d, d.getVar('S', True), 'patched', ar_outdir)
 }
 
 python do_ar_configured() {
@@ -222,17 +196,18 @@ python do_ar_configured() {
         create_tarball(d, srcdir, 'configured', ar_outdir)
 }
 
-def create_tarball(d, srcdir, suffix, ar_outdir, pf=None):
+def create_tarball(d, srcdir, suffix, ar_outdir):
     """
     create the tarball from srcdir
     """
     import tarfile
 
+    # Make sure we are only creating a single tarball for gcc sources
+    if d.getVar('SRC_URI', True) == "" and 'gcc' in d.getVar('PN', True):
+        return
+
     bb.utils.mkdirhier(ar_outdir)
-    if pf:
-        tarname = os.path.join(ar_outdir, '%s-%s.tar.gz' % (pf, suffix))
-    else:
-        tarname = os.path.join(ar_outdir, '%s-%s.tar.gz' % \
+    tarname = os.path.join(ar_outdir, '%s-%s.tar.gz' % \
             (d.getVar('PF', True), suffix))
 
     srcdir = srcdir.rstrip('/')
@@ -275,11 +250,9 @@ python do_unpack_and_patch() {
             [ 'patched', 'configured'] and \
             d.getVarFlag('ARCHIVER_MODE', 'diff', True) != '1':
         return
-
-    ar_outdir = d.getVar('ARCHIVER_OUTDIR', True)
-
     # Change the WORKDIR to make do_unpack do_patch run in another dir.
-    d.setVar('WORKDIR', d.getVar('ARCHIVER_WORKDIR', True))
+    ar_outdir = d.getVar('ARCHIVER_OUTDIR', True)
+    d.setVar('WORKDIR', ar_outdir)
 
     # The changed 'WORKDIR' also casued 'B' changed, create dir 'B' for the
     # possibly requiring of the following tasks (such as some recipes's
@@ -299,7 +272,11 @@ python do_unpack_and_patch() {
         src = d.getVar('S', True).rstrip('/')
         src_orig = '%s.orig' % src
         oe.path.copytree(src, src_orig)
-    bb.build.exec_func('do_patch', d)
+
+    # Make sure gcc sources are patched only once
+    if not ((d.getVar('SRC_URI', True) == "" and 'gcc' in d.getVar('PN', True))):
+        bb.build.exec_func('do_patch', d)
+
     # Create the patches
     if d.getVarFlag('ARCHIVER_MODE', 'diff', True) == '1':
         bb.note('Creating diff gz...')
@@ -370,7 +347,6 @@ do_deploy_archives[sstate-inputdirs] = "${ARCHIVER_TOPDIR}"
 do_deploy_archives[sstate-outputdirs] = "${DEPLOY_DIR_SRC}"
 
 addtask do_ar_original after do_unpack
-addtask do_unpack_and_patch after do_patch
 addtask do_ar_patched after do_unpack_and_patch
 addtask do_ar_configured after do_unpack_and_patch
 addtask do_dumpdata
@@ -382,4 +358,12 @@ do_deploy_all_archives[recrdeptask] = "do_deploy_archives"
 do_deploy_all_archives[recideptask] = "do_${BB_DEFAULT_TASK}"
 do_deploy_all_archives() {
         :
+}
+
+python () {
+    # Add tasks in the correct order, specifically for linux-yocto to avoid race condition
+    if bb.data.inherits_class('kernel-yocto', d):
+        bb.build.addtask('do_kernel_configme', 'do_configure', 'do_unpack_and_patch', d)
+    else:
+        bb.build.addtask('do_unpack_and_patch', None, 'do_patch', d)
 }

@@ -54,7 +54,7 @@ else
             mem_size=512
             ;;
         "qemumicroblaze")
-            mem_size=64
+            mem_size=256
             ;;
         "qemumips"|"qemumips64")
             mem_size=256
@@ -120,16 +120,9 @@ if [ "$SLIRP_ENABLED" = "yes" ]; then
     KERNEL_NETWORK_CMD="ip=dhcp"
     QEMU_TAP_CMD=""
     QEMU_UI_OPTIONS="-show-cursor -usb -usbdevice wacom-tablet"
-    if [ "$KVM_ACTIVE" = "yes" ]; then
-        QEMU_NETWORK_CMD=""
-        DROOT="/dev/vda"
-        ROOTFS_OPTIONS="-drive file=$ROOTFS,if=virtio,format=raw"
-    else
-        QEMU_NETWORK_CMD=""
-        DROOT="/dev/hda"
-        ROOTFS_OPTIONS="-drive file=$ROOTFS,if=ide,format=raw"
-    fi
-
+    QEMU_NETWORK_CMD=""
+    DROOT="/dev/vda"
+    ROOTFS_OPTIONS="-drive file=$ROOTFS,if=virtio,format=raw"
 else
         acquire_lock() {
             lockfile=$1
@@ -266,20 +259,13 @@ else
 
         KERNEL_NETWORK_CMD="ip=192.168.7.$n2::192.168.7.$n1:255.255.255.0"
         QEMU_TAP_CMD="-net tap,vlan=0,ifname=$TAP,script=no,downscript=no"
-        if [ "$KVM_ACTIVE" = "yes" ]; then
+        if [ "$VHOST_ACTIVE" = "yes" ]; then
             QEMU_NETWORK_CMD="-net nic,model=virtio $QEMU_TAP_CMD,vhost=on"
-            DROOT="/dev/vda"
-            ROOTFS_OPTIONS="-drive file=$ROOTFS,if=virtio,format=raw"
         else
-            QEMU_NETWORK_CMD="-net nic,vlan=0 $QEMU_TAP_CMD"
-            DROOT="/dev/hda"
-            ROOTFS_OPTIONS="-drive file=$ROOTFS,if=ide,format=raw"
+            QEMU_NETWORK_CMD="-net nic,model=virtio $QEMU_TAP_CMD"
         fi
-        if [ "$MACHINE" = "qemuarm64" ]; then
-            QEMU_NETWORK_CMD="-netdev tap,id=net0,ifname=$TAP,script=no,downscript=no -device virtio-net-device,netdev=net0 "
-            DROOT="/dev/vda"
-            ROOTFS_OPTIONS="-drive id=disk0,file=$ROOTFS,if=none,format=raw -device virtio-blk-device,drive=disk0"
-        fi
+        DROOT="/dev/vda"
+        ROOTFS_OPTIONS="-drive file=$ROOTFS,if=virtio,format=raw"
 
         KERNCMDLINE="mem=$QEMU_MEMORY"
         QEMU_UI_OPTIONS="-show-cursor -usb -usbdevice wacom-tablet"
@@ -364,8 +350,8 @@ if [ "$MACHINE" = "qemuarm" -o "$MACHINE" = "qemuarmv6" -o "$MACHINE" = "qemuarm
     QEMU_UI_OPTIONS="$QEMU_UI_OPTIONS"
     # QEMU_UI_OPTIONS="$QEMU_UI_OPTIONS -force-pointer"
     if [ "${FSTYPE:0:3}" = "ext" -o "$FSTYPE" = "btrfs" ]; then
-        KERNCMDLINE="root=/dev/sda rw console=ttyAMA0,115200 console=tty $KERNEL_NETWORK_CMD mem=$QEMU_MEMORY highres=off"
-        QEMUOPTIONS="$QEMU_NETWORK_CMD -M ${MACHINE_SUBTYPE} -drive file=$ROOTFS,format=raw -no-reboot $QEMU_UI_OPTIONS"
+        KERNCMDLINE="root=$DROOT rw console=ttyAMA0,115200 console=tty $KERNEL_NETWORK_CMD mem=$QEMU_MEMORY highres=off"
+        QEMUOPTIONS="$QEMU_NETWORK_CMD -M ${MACHINE_SUBTYPE} $ROOTFS_OPTIONS -no-reboot $QEMU_UI_OPTIONS"
     fi
     if [ "$FSTYPE" = "nfs" ]; then
         if [ "$NFS_SERVER" = "192.168.7.1" -a ! -d "$NFS_DIR" ]; then
@@ -387,6 +373,10 @@ fi
 if [ "$MACHINE" = "qemuarm64" ]; then
     QEMU=qemu-system-aarch64
 
+    QEMU_NETWORK_CMD="-netdev tap,id=net0,ifname=$TAP,script=no,downscript=no -device virtio-net-device,netdev=net0 "
+    DROOT="/dev/vda"
+    ROOTFS_OPTIONS="-drive id=disk0,file=$ROOTFS,if=none,format=raw -device virtio-blk-device,drive=disk0"
+
     export QEMU_AUDIO_DRV="none"
     if [ "x$SERIALSTDIO" = "x" ] ; then
         QEMU_UI_OPTIONS="-nographic"
@@ -394,7 +384,7 @@ if [ "$MACHINE" = "qemuarm64" ]; then
         QEMU_UI_OPTIONS=""
     fi
     if [ "${FSTYPE:0:3}" = "ext" -o "$FSTYPE" = "btrfs" ]; then
-        KERNCMDLINE="root=/dev/vda rw console=ttyAMA0,38400 mem=$QEMU_MEMORY highres=off $KERNEL_NETWORK_CMD"
+        KERNCMDLINE="root=$DROOT rw console=ttyAMA0,38400 mem=$QEMU_MEMORY highres=off $KERNEL_NETWORK_CMD"
         # qemu-system-aarch64 only support '-machine virt -cpu cortex-a57' for now
         QEMUOPTIONS="$QEMU_NETWORK_CMD -machine virt -cpu cortex-a57 $ROOTFS_OPTIONS $QEMU_UI_OPTIONS"
     fi
@@ -408,7 +398,6 @@ if [ "$MACHINE" = "qemuarm64" ]; then
         QEMUOPTIONS="$QEMU_NETWORK_CMD -machine virt -cpu cortex-a57 $QEMU_UI_OPTIONS"
     fi
 fi
-
 
 if [ "$MACHINE" = "qemux86" ]; then
     QEMU=qemu-system-i386
@@ -508,8 +497,8 @@ if [ "$MACHINE" = "qemumips" -o "$MACHINE" = "qemumipsel" -o "$MACHINE" = "qemum
     QEMU_UI_OPTIONS="-vga cirrus $QEMU_UI_OPTIONS"
     if [ "${FSTYPE:0:3}" = "ext" -o "$FSTYPE" = "btrfs" ]; then
         #KERNCMDLINE="root=/dev/hda console=ttyS0 console=tty0 $KERNEL_NETWORK_CMD mem=$QEMU_MEMORY"
-        KERNCMDLINE="root=/dev/hda rw console=ttyS0 console=tty $KERNEL_NETWORK_CMD mem=$QEMU_MEMORY"
-        QEMUOPTIONS="$QEMU_NETWORK_CMD -M $MACHINE_SUBTYPE -drive file=$ROOTFS,format=raw -no-reboot $QEMU_UI_OPTIONS"
+        KERNCMDLINE="root=$DROOT rw console=ttyS0 console=tty $KERNEL_NETWORK_CMD mem=$QEMU_MEMORY"
+        QEMUOPTIONS="$QEMU_NETWORK_CMD -M $MACHINE_SUBTYPE $ROOTFS_OPTIONS -no-reboot $QEMU_UI_OPTIONS"
     fi
     if [ "$FSTYPE" = "nfs" ]; then
         if [ "$NFS_SERVER" = "192.168.7.1" -a ! -d "$NFS_DIR" ]; then
@@ -533,8 +522,8 @@ if [ "$MACHINE" = "qemuppc" ]; then
         QEMU_NETWORK_CMD="-net nic,model=pcnet $QEMU_TAP_CMD"
     fi
     if [ "${FSTYPE:0:3}" = "ext" -o "$FSTYPE" = "btrfs" ]; then
-        KERNCMDLINE="root=/dev/hda rw console=ttyS0 console=tty $KERNEL_NETWORK_CMD mem=$QEMU_MEMORY"
-        QEMUOPTIONS="$QEMU_NETWORK_CMD -cpu $CPU_SUBTYPE -M $MACHINE_SUBTYPE -drive file=$ROOTFS,format=raw -no-reboot $QEMU_UI_OPTIONS"
+        KERNCMDLINE="root=$DROOT rw console=ttyS0 console=tty $KERNEL_NETWORK_CMD mem=$QEMU_MEMORY"
+        QEMUOPTIONS="$QEMU_NETWORK_CMD -cpu $CPU_SUBTYPE -M $MACHINE_SUBTYPE $ROOTFS_OPTIONS -no-reboot $QEMU_UI_OPTIONS"
     fi
     if [ "$FSTYPE" = "nfs" ]; then
         if [ "$NFS_SERVER" = "192.168.7.1" -a ! -d "$NFS_DIR" ]; then
@@ -587,20 +576,20 @@ fi
 
 if [ "$MACHINE" = "qemumicroblaze" ]; then
     QEMU=qemu-system-microblazeel
-    QEMU_SYSTEM_OPTIONS="-M petalogix-ml605 -serial mon:stdio -dtb $KERNEL-$MACHINE.dtb"
+    QEMU_SYSTEM_OPTIONS="$QEMU_NETWORK_CMD -M petalogix-ml605 -serial mon:stdio"
     if [ "${FSTYPE:0:3}" = "ext" -o "${FSTYPE:0:4}" = "cpio" ]; then
-        KERNCMDLINE="earlyprintk root=/dev/ram rw"
+        KERNCMDLINE="earlyprintk root=/dev/ram rw $KERNEL_NETWORK_CMD mem=$QEMU_MEMORY"
         QEMUOPTIONS="$QEMU_SYSTEM_OPTIONS -initrd $ROOTFS"
     fi
 fi
 
 if [ "$MACHINE" = "qemuzynq" ]; then
     QEMU=qemu-system-arm
-    QEMU_SYSTEM_OPTIONS="-M xilinx-zynq-a9 -serial null -serial mon:stdio -dtb $KERNEL-$MACHINE.dtb"
+    QEMU_SYSTEM_OPTIONS="$QEMU_NETWORK_CMD -M xilinx-zynq-a9 -serial null -serial mon:stdio -dtb $KERNEL-$MACHINE.dtb"
     # zynq serial ports are named 'ttyPS0' and 'ttyPS1', fixup the default values
     SCRIPT_KERNEL_OPT=$(echo "$SCRIPT_KERNEL_OPT" | sed 's/console=ttyS/console=ttyPS/g')
     if [ "${FSTYPE:0:3}" = "ext" -o "${FSTYPE:0:4}" = "cpio" ]; then
-        KERNCMDLINE="earlyprintk root=/dev/ram rw"
+        KERNCMDLINE="earlyprintk root=/dev/ram rw $KERNEL_NETWORK_CMD mem=$QEMU_MEMORY"
         QEMUOPTIONS="$QEMU_SYSTEM_OPTIONS -initrd $ROOTFS"
     fi
 fi
@@ -699,6 +688,38 @@ if [ "x$SERIALSTDIO" = "x1" ]; then
         echo "Interrupt character is '^]'"
         stty intr ^]
 fi
+
+
+# Preserve the multiplexing behavior for the monitor that would be there based
+# on whether nographic is used.
+if echo "$QEMUOPTIONS $SERIALOPTS $SCRIPT_QEMU_OPT $SCRIPT_QEMU_EXTRA_OPT" | grep -- "-nographic"; then
+    FIRST_SERIAL_OPT="-serial mon:stdio"
+else
+    FIRST_SERIAL_OPT="-serial mon:vc"
+fi
+
+# qemuarm64 uses virtio for any additional serial ports so the normal mechanism
+# of using -serial will not work
+if [ "$MACHINE" = "qemuarm64" ]; then
+    SECOND_SERIAL_OPT="$SCRIPT_QEMU_EXTRA_OPT -device virtio-serial-device -chardev null,id=virtcon -device virtconsole,chardev=virtcon"
+else
+    SECOND_SERIAL_OPT="-serial null"
+fi
+
+# We always want a ttyS1. Since qemu by default adds a serial port when
+# nodefaults is not specified, it seems that all that would be needed is to
+# make sure a "-serial" is there. However, it appears that when "-serial" is
+# specified, it ignores the default serial port that is normally added.
+# So here we make sure to add two -serial if there are none. And only one
+# if there is one -serial already.
+NUM_SERIAL_OPTS=`echo $QEMUOPTIONS $SERIALOPTS $SCRIPT_QEMU_OPT $SCRIPT_QEMU_EXTRA_OPT | sed -e 's/ /\n/g' | grep --count -- -serial`
+
+if [ "$NUM_SERIAL_OPTS" = "0" ]; then
+    SCRIPT_QEMU_EXTRA_OPT="$SCRIPT_QEMU_EXTRA_OPT $FIRST_SERIAL_OPT $SECOND_SERIAL_OPT"
+elif [ "$NUM_SERIAL_OPTS" = "1" ]; then
+    SCRIPT_QEMU_EXTRA_OPT="$SCRIPT_QEMU_EXTRA_OPT $SECOND_SERIAL_OPT"
+fi
+
 
 echo "Running $QEMU..."
 # -no-reboot is a mandatory option - see bug #100

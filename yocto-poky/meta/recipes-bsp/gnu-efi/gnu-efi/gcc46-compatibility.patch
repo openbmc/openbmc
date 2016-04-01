@@ -1,0 +1,21 @@
+don't break with old compilers and -DGNU_EFI_USE_MS_ABI
+It's entirely legitimate to request GNU_EFI_USE_MS_ABI even if the current
+compiler doesn't support it, and gnu-efi should transparently fall back to
+using legacy techniques to set the calling convention.  We don't get type
+checking, but at least it will still compile.
+
+Author: Steve Langasek <steve.langasek@ubuntu.com>
+Upstream-Status: Pending
+Index: gnu-efi-3.0.3/inc/x86_64/efibind.h
+===================================================================
+--- gnu-efi-3.0.3.orig/inc/x86_64/efibind.h
++++ gnu-efi-3.0.3/inc/x86_64/efibind.h
+@@ -25,8 +25,6 @@ Revision History
+ #if defined(GNU_EFI_USE_MS_ABI)
+     #if defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 7))
+         #define HAVE_USE_MS_ABI 1
+-    #else
+-        #error Compiler is too old for GNU_EFI_USE_MS_ABI
+     #endif
+ #endif
+ 

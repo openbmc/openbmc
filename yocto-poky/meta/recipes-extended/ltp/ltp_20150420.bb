@@ -29,6 +29,7 @@ SRC_URI = "git://github.com/linux-test-project/ltp.git \
     file://add-knob-for-numa.patch \
     file://add-knob-for-tirpc.patch \
     file://0001-ltp-vma03-fix-the-alginment-of-page-size.patch \
+    file://0001-replace-inline-with-static-inline-for-gcc-5.x.patch \
 "
 
 S = "${WORKDIR}/git"

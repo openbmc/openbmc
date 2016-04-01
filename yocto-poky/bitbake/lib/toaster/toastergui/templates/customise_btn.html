@@ -1,0 +1,9 @@
+<button class="btn btn-block layer-exists-{{data.layer_version.id}} customise-btn" style="display:none;" data-recipe="{{data.id}}">
+  Customise
+</button>
+
+<button class="btn btn-block layer-add-{{data.layer_version.id}} layerbtn" data-layer='{ "id": {{data.layer_version.id}}, "name": "{{data.layer_version.layer.name}}", "layerdetailurl": "{% url 'layerdetails' extra.pid data.layer_version.id %}"}' data-directive="add">
+  <i class="icon-plus"></i>
+  Add layer
+</button>
+

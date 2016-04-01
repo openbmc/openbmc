@@ -15,7 +15,9 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BP}.tar.bz2;name=libtirpc \
            file://libtirpc-0.2.1-fortify.patch \
           "
 
-SRC_URI_append_libc-uclibc = " file://remove-des-uclibc.patch"
+SRC_URI_append_libc-uclibc = " file://remove-des-uclibc.patch \
+                               file://va_list.patch \
+                             "
 
 SRC_URI[libtirpc.md5sum] = "8cd41a5ef5a9b50d0fb6abb98af15368"
 SRC_URI[libtirpc.sha256sum] = "62f9de7c2c8686c568757730e1fef66502a0e00d6cacf33546d0267984e002db"

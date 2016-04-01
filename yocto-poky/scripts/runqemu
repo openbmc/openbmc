@@ -33,6 +33,7 @@ usage() {
     echo "    nographic - disables video console"
     echo "    serial - enables a serial console on /dev/ttyS0"
     echo "    kvm - enables KVM when running qemux86/qemux86-64 (VT-capable CPU required)"
+    echo "    kvm-vhost - enables KVM with vhost support when running qemux86/qemux86-64 (VT-capable CPU required)"
     echo "    publicvnc - enable a VNC server open to all hosts"
     echo "  qemuparams=\"xyz\" - specify custom parameters to QEMU"
     echo "  bootparams=\"xyz\" - specify custom kernel parameters during boot"
@@ -71,6 +72,8 @@ SERIALSTDIO=""
 TCPSERIAL_PORTNUM=""
 KVM_ENABLED="no"
 KVM_ACTIVE="no"
+VHOST_ENABLED="no"
+VHOST_ACTIVE="no"
 
 # Determine whether the file is a kernel or QEMU image, and set the
 # appropriate variables
@@ -111,7 +114,7 @@ while true; do
     case "$arg" in
         "qemux86" | "qemux86-64" | "qemuarm" | "qemuarm64" | "qemumips" | "qemumipsel" | \
         "qemumips64" | "qemush4"  | "qemuppc" | "qemumicroblaze" | "qemuzynq")
-            [ -z "$MACHINE" ] && MACHINE=$arg || \
+            [ -z "$MACHINE" -o "$MACHINE" = "$arg" ] && MACHINE=$arg || \
                 error "conflicting MACHINE types [$MACHINE] and [$arg]"
             ;;
         "ext2" | "ext3" | "ext4" | "jffs2" | "nfs" | "btrfs" | "hddimg" | "hdddirect" )
@@ -169,6 +172,11 @@ while true; do
         "kvm")
             KVM_ENABLED="yes"
             KVM_CAPABLE=`grep -q 'vmx\|svm' /proc/cpuinfo && echo 1`
+            ;;
+        "kvm-vhost")
+            KVM_ENABLED="yes"
+            KVM_CAPABLE=`grep -q 'vmx\|svm' /proc/cpuinfo && echo 1`
+            VHOST_ENABLED="yes"
             ;;
         "slirp")
             SLIRP_ENABLED="yes"
@@ -270,12 +278,6 @@ if [ "x$KVM_ENABLED" = "xyes" ]; then
         echo "$YOCTO_KVM_WIKI";
         exit 1;
     fi
-    if [ ! -e /dev/vhost-net ]; then
-        echo "Missing virtio net device. Have you inserted vhost-net module?"
-        echo "For further help see:"
-        echo "$YOCTO_PARAVIRT_KVM_WIKI";
-        exit 1;
-    fi
     if [ -w /dev/kvm -a -r /dev/kvm ]; then
         SCRIPT_QEMU_OPT="$SCRIPT_QEMU_OPT -enable-kvm"
         KVM_ACTIVE="yes"
@@ -285,13 +287,22 @@ if [ "x$KVM_ENABLED" = "xyes" ]; then
         echo "$YOCTO_KVM_WIKI";
         exit 1;
     fi
-    if [ ! -w /dev/vhost-net -o ! -r /dev/vhost-net ]; then
-	if [ "$SLIRP_ENABLED" != "yes" ] ; then
-            echo "You have no rights on /dev/vhost-net."
-            echo "Please change the ownership of this file as described at:"
+    if [ "x$VHOST_ENABLED" = "xyes" ]; then
+        if [ ! -e /dev/vhost-net ]; then
+            echo "Missing virtio net device. Have you inserted vhost-net module?"
+            echo "For further help see:"
             echo "$YOCTO_PARAVIRT_KVM_WIKI";
             exit 1;
-	fi
+        fi
+
+        if [ -w /dev/vhost-net -a -r /dev/vhost-net ]; then
+            VHOST_ACTIVE="yes"
+        else
+            echo "You have no rights on /dev/vhost-net."
+            echo "Please change the ownership of this file as described at:"
+            echo "$YOCTO_KVM_WIKI";
+            exit 1;
+        fi
     fi
 fi
 

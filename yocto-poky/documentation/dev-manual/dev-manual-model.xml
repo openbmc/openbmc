@@ -939,14 +939,14 @@
                                 For example, if you are using Luna, do the
                                 following:
                                 <literallayout class='monospaced'>
-     $ git checkout luna/yocto-1.8
+     $ git checkout luna/yocto-&DISTRO;
                                 </literallayout>
                                 This puts you in a detached HEAD state, which
                                 is fine since you are only going to be building
                                 and not developing.
                                 <note>
                                     If you are building kepler, checkout the
-                                    <filename>kepler/yocto-1.8</filename>
+                                    <filename>kepler/yocto-&DISTRO;</filename>
                                     branch.
                                 </note>
                                 </para></listitem>
@@ -975,13 +975,13 @@
                                 Be sure to provide the tag name, documentation
                                 branch, and a release name.
                                 Here is an example that uses the
-                                <filename>luna/yocto-1.8</filename> tag, the
+                                <filename>luna/yocto-&DISTRO;</filename> tag, the
                                 <filename>master</filename> documentation
                                 branch, and
                                 <filename>&DISTRO_NAME;</filename> for the
                                 release name:
                                 <literallayout class='monospaced'>
-     $ ECLIPSE_HOME=/home/scottrif/eclipse-poky/scripts/eclipse ./build.sh luna/yocto-1.8 master &DISTRO_NAME; 2>&amp;1 | tee -a build.log
+     $ ECLIPSE_HOME=/home/scottrif/eclipse-poky/scripts/eclipse ./build.sh luna/yocto-&DISTRO; master &DISTRO_NAME; 2>&amp;1 | tee -a build.log
                                 </literallayout>
                                 After running the script, the file
                                 <filename>org.yocto.sdk-</filename><replaceable>release</replaceable><filename>-</filename><replaceable>date</replaceable><filename>-archive.zip</filename>
@@ -1340,6 +1340,40 @@
                 "Project" menu.
                 The console should update and you can note the cross-compiler
                 you are using.
+                <note>
+                    When building "Yocto Project ADT Autotools" projects, the Eclipse
+                    IDE might display error messages for Functions/Symbols/Types
+                    that cannot be "resolved", even when the related include file
+                    is listed at the project navigator and when the project is
+                    able to build.
+                    For these cases only, it is recommended to add a new linked
+                    folder to the appropriate sysroot.
+                    Use these steps to add the linked folder:
+                    <orderedlist>
+                        <listitem><para>
+                            Select the project.
+                            </para></listitem>
+                        <listitem><para>
+                            Select "Folder" from the
+                            <filename>File > New</filename> menu.
+                            </para></listitem>
+                        <listitem><para>
+                            In the "New Folder" Dialog, select "Link to alternate
+                            location (linked folder)".
+                            </para></listitem>
+                        <listitem><para>
+                            Click "Browse" to navigate to the include folder inside
+                            the same sysroot location selected in the Yocto Project
+                            configuration preferences.
+                            </para></listitem>
+                        <listitem><para>
+                            Click "OK".
+                            </para></listitem>
+                        <listitem><para>
+                            Click "Finish" to save the linked folder.
+                            </para></listitem>
+                    </orderedlist>
+                </note>
             </para>
         </section>
 
@@ -2183,7 +2217,7 @@
                 </literallayout>
                 <note>
                     For complete syntax, use the
-                    <filename>devtool update-recipe --help</filename> command.
+                    <filename>devtool build --help</filename> command.
                 </note>
                 Building your software using <filename>devtool build</filename>
                 is identical to using BitBake to build the software.

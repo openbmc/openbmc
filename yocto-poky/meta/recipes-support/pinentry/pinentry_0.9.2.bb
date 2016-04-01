@@ -10,6 +10,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=cbbd794e2a0a289b9dfcc9f513d1996e"
 
 inherit autotools
 
+DEPENDS = "gettext-native"
+
 SRC_URI = "ftp://ftp.gnupg.org/gcrypt/${BPN}/${BPN}-${PV}.tar.bz2"
 
 SRC_URI[md5sum] = "f51d454f921111b5156a2291cbf70278"

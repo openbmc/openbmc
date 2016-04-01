@@ -21,7 +21,7 @@ import bb
 import logging
 import argparse
 import tempfile
-from devtool import exec_build_env_command, DevtoolError
+from devtool import exec_build_env_command, check_workspace_recipe, DevtoolError
 
 logger = logging.getLogger('devtool')
 
@@ -42,9 +42,7 @@ def _create_conf_file(values, conf_file=None):
 
 def build(args, config, basepath, workspace):
     """Entry point for the devtool 'build' subcommand"""
-    if not args.recipename in workspace:
-        raise DevtoolError("no recipe named %s in your workspace" %
-                           args.recipename)
+    check_workspace_recipe(workspace, args.recipename)
 
     build_task = config.get('Build', 'build_task', 'populate_sysroot')
 

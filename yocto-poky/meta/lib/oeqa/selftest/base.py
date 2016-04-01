@@ -31,7 +31,7 @@ class oeSelfTest(unittest.TestCase):
         self.testinc_bblayers_path = os.path.join(self.builddir, "conf/bblayers.inc")
         self.testlayer_path = oeSelfTest.testlayer_path
         self._extra_tear_down_commands = []
-        self._track_for_cleanup = []
+        self._track_for_cleanup = [self.testinc_path]
         super(oeSelfTest, self).__init__(methodName)
 
     def setUp(self):

@@ -22,10 +22,12 @@ do_install () {
 }
 
 do_install_append_class-target() {
-    install -d ${D}${base_bindir}
-    mv ${D}${bindir}/tar ${D}${base_bindir}/tar
-    mv ${D}${bindir}/gtar ${D}${base_bindir}/gtar
-    rmdir ${D}${bindir}/
+    if [ "${base_bindir}" != "${bindir}" ]; then
+        install -d ${D}${base_bindir}
+        mv ${D}${bindir}/tar ${D}${base_bindir}/tar
+        mv ${D}${bindir}/gtar ${D}${base_bindir}/gtar
+        rmdir ${D}${bindir}/
+    fi
 }
 
 PACKAGES =+ "${PN}-rmt"

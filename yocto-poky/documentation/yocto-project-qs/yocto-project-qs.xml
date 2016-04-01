@@ -308,7 +308,7 @@
                         </para></listitem>
                     <listitem><para><emphasis>Fedora</emphasis>
                         <literallayout class='monospaced'>
-     $ sudo yum install &FEDORA_HOST_PACKAGES_ESSENTIAL; SDL-devel xterm
+     $ sudo dnf install &FEDORA_HOST_PACKAGES_ESSENTIAL; SDL-devel xterm
                         </literallayout>
                         </para></listitem>
                     <listitem><para><emphasis>OpenSUSE</emphasis>

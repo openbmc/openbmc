@@ -8,7 +8,7 @@ def setUpModule():
 
 class ScanelfTest(oeRuntimeTest):
 
-    def setUp(self):
+    def setUpLocal(self):
         self.scancmd = 'scanelf --quiet --recursive --mount --ldpath --path'
 
     @testcase(966)

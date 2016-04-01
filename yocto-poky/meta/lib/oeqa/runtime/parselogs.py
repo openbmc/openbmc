@@ -36,6 +36,8 @@ common_errors = [
     'VGA arbiter: cannot open kernel arbiter, no multi-card support',
     'Failed to find URL:http://ipv4.connman.net/online/status.html',
     'Online check failed for',
+    'netlink init failed',
+    'Fast TSC calibration',
     ]
 
 x86_common = [
@@ -46,7 +48,6 @@ x86_common = [
 ] + common_errors
 
 qemux86_common = [
-    'Fast TSC calibration', 
     'wrong ELF class',
     "fail to add MMCONFIG information, can't access extended PCI configuration space under this bridge.",
     "can't claim BAR ",
@@ -89,7 +90,7 @@ ignore_errors = {
         '(EE) open /dev/fb0: No such file or directory',
         '(EE) AIGLX: reverting to software rendering',
         ] + x86_common,
-    'core2_32' : [
+    'intel-core2-32' : [
         'ACPI: No _BQC method, cannot determine initial brightness',
         '[Firmware Bug]: ACPI: No _BQC method, cannot determine initial brightness',
         '(EE) Failed to load module "psb"',
@@ -98,6 +99,7 @@ ignore_errors = {
         '(EE) Failed to load module psbdrv',
         '(EE) open /dev/fb0: No such file or directory',
         '(EE) AIGLX: reverting to software rendering',
+        "controller can't do DEVSLP, turning off",
         ] + x86_common,
     'intel-corei7-64' : [
         "controller can't do DEVSLP, turning off",
@@ -108,13 +110,9 @@ ignore_errors = {
     'edgerouter' : [
         'Fatal server error:',
         ] + common_errors,
-    'minnow' : [
-        'netlink init failed',
-        ] + common_errors,
     'jasperforest' : [
         'Activated service \'org.bluez\' failed:',
         'Unable to find NFC netlink family',
-        'netlink init failed',
         ] + common_errors,
 }
 
@@ -233,8 +231,7 @@ class ParseLogsTest(oeRuntimeTest):
 
     #get the output of dmesg and write it in a file. This file is added to log_locations.
     def write_dmesg(self):
-        (status, dmesg) = self.target.run("dmesg")
-        (status, dmesg2) = self.target.run("echo \""+str(dmesg)+"\" > /tmp/dmesg_output.log")
+        (status, dmesg) = self.target.run("dmesg > /tmp/dmesg_output.log")
 
     @testcase(1059)
     @skipUnlessPassed('test_ssh')

@@ -1,0 +1,122 @@
+From 646b80024567a6245c598be3374653fa1fa09a12 Mon Sep 17 00:00:00 2001
+From: Paul Barker <paul@paulbarker.me.uk>
+Date: Sat, 7 Nov 2015 10:23:49 +0000
+Subject: [PATCH 1/4] string_util: New file with bin_to_hex function
+
+This function does very simple conversion from binary data to a hex string.
+
+Signed-off-by: Paul Barker <paul@paulbarker.me.uk>
+Signed-off-by: Alejandro del Castillo <alejandro.delcastillo@ni.com>
+
+Upstream-Status: Accepted
+---
+ libopkg/Makefile.am   |  4 ++--
+ libopkg/string_util.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+ libopkg/string_util.h | 24 ++++++++++++++++++++++++
+ 3 files changed, 68 insertions(+), 2 deletions(-)
+ create mode 100644 libopkg/string_util.c
+ create mode 100644 libopkg/string_util.h
+
+diff --git a/libopkg/Makefile.am b/libopkg/Makefile.am
+index ee3fbee..3e62c24 100644
+--- a/libopkg/Makefile.am
++++ b/libopkg/Makefile.am
+@@ -13,7 +13,7 @@ opkg_headers = active_list.h cksum_list.h conffile.h conffile_list.h \
+ 	pkg_depends.h pkg_dest.h pkg_dest_list.h pkg_extract.h pkg_hash.h \
+ 	pkg_parse.h pkg_src.h pkg_src_list.h pkg_vec.h release.h \
+ 	release_parse.h sha256.h sprintf_alloc.h str_list.h void_list.h \
+-	xregex.h xsystem.h xfuncs.h opkg_verify.h
++	xregex.h xsystem.h xfuncs.h opkg_verify.h string_util.h
+ 
+ opkg_sources = opkg_cmd.c opkg_configure.c opkg_download.c \
+ 	opkg_install.c opkg_remove.c opkg_conf.c release.c \
+@@ -23,7 +23,7 @@ opkg_sources = opkg_cmd.c opkg_configure.c opkg_download.c \
+ 	pkg_src.c pkg_src_list.c str_list.c void_list.c active_list.c \
+ 	file_util.c opkg_message.c md5.c parse_util.c cksum_list.c \
+ 	sprintf_alloc.c xregex.c xsystem.c xfuncs.c opkg_archive.c \
+-	opkg_verify.c
++	opkg_verify.c string_util.c
+ 
+ if HAVE_CURL
+ opkg_sources += opkg_download_curl.c
+diff --git a/libopkg/string_util.c b/libopkg/string_util.c
+new file mode 100644
+index 0000000..822cab6
+--- /dev/null
++++ b/libopkg/string_util.c
+@@ -0,0 +1,42 @@
++/* vi: set expandtab sw=4 sts=4: */
++/* string_util.c - convenience routines for common string operations
++
++   Copyright (C) 2015 Paul Barker
++
++   This program is free software; you can redistribute it and/or
++   modify it under the terms of the GNU General Public License as
++   published by the Free Software Foundation; either version 2, or (at
++   your option) any later version.
++
++   This program is distributed in the hope that it will be useful, but
++   WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   General Public License for more details.
++*/
++
++#include "config.h"
++
++#include "string_util.h"
++#include "xfuncs.h"
++
++char *bin_to_hex(const void *bin_data, size_t len)
++{
++    const unsigned char *src = (const unsigned char *)bin_data;
++    char *buf = xmalloc(2 * len + 1);
++    int i;
++
++    static const unsigned char bin2hex[16] = {
++        '0', '1', '2', '3',
++        '4', '5', '6', '7',
++        '8', '9', 'a', 'b',
++        'c', 'd', 'e', 'f'
++    };
++
++    for (i = 0; i < len; i++) {
++        buf[i * 2] = bin2hex[src[i] >> 4];
++        buf[i * 2 + 1] = bin2hex[src[i] & 0xf];
++    }
++
++    buf[len * 2] = '\0';
++    return buf;
++}
+diff --git a/libopkg/string_util.h b/libopkg/string_util.h
+new file mode 100644
+index 0000000..a920e2a
+--- /dev/null
++++ b/libopkg/string_util.h
+@@ -0,0 +1,24 @@
++/* vi: set expandtab sw=4 sts=4: */
++/* string_util.h - convenience routines for common file operations
++
++   Copyright (C) 2015 Paul Barker
++
++   This program is free software; you can redistribute it and/or
++   modify it under the terms of the GNU General Public License as
++   published by the Free Software Foundation; either version 2, or (at
++   your option) any later version.
++
++   This program is distributed in the hope that it will be useful, but
++   WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   General Public License for more details.
++*/
++
++#ifndef STRING_UTIL_H
++#define STRING_UTIL_H
++
++#include <stddef.h>
++
++char *bin_to_hex(const void *bin_data, size_t len);
++
++#endif /* STRING_UTIL_H */
+-- 
+1.9.1
+

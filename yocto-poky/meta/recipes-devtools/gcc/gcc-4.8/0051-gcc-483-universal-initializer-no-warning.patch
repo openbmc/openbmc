@@ -1,0 +1,107 @@
+Upstream-Status: Backport
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+Fix for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53119
+wrong warning when using the universal zero initializer {0}
+
+Backported to GCC 4.8.3
+
+Subject: 2014-06-05  S. Gilles  <sgilles@terpmail.umd.edu>
+X-Git-Url: http://repo.or.cz/w/official-gcc.git/commitdiff_plain/95cdf3fdf2d440eb7775def8e35ab970651c33d9?hp=14a3093e9943937cbc63dfbf4d51ca60f8325b29
+git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/trunk@211289 138bc75d-0d04-0410-961f-82ee72b054a4
+
+--- gcc-4.8.3.org/gcc/c/c-typeck.c	2014-08-03 20:52:09.257042137 +0200
++++ gcc-4.8.3/gcc/c/c-typeck.c	2014-08-03 20:57:10.645042614 +0200
+@@ -62,9 +62,9 @@
+    if expr.original_code == SIZEOF_EXPR.  */
+ tree c_last_sizeof_arg;
+ 
+-/* Nonzero if we've already printed a "missing braces around initializer"
+-   message within this initializer.  */
+-static int missing_braces_mentioned;
++/* Nonzero if we might need to print a "missing braces around
++   initializer" message within this initializer.  */
++static int found_missing_braces;
+ 
+ static int require_constant_value;
+ static int require_constant_elements;
+@@ -6379,6 +6379,9 @@
+ /* 1 if this constructor is erroneous so far.  */
+ static int constructor_erroneous;
+ 
++/* 1 if this constructor is the universal zero initializer { 0 }.  */
++static int constructor_zeroinit;
++
+ /* Structure for managing pending initializer elements, organized as an
+    AVL tree.  */
+ 
+@@ -6540,7 +6543,7 @@
+   constructor_stack = 0;
+   constructor_range_stack = 0;
+ 
+-  missing_braces_mentioned = 0;
++  found_missing_braces = 0;
+ 
+   spelling_base = 0;
+   spelling_size = 0;
+@@ -6635,6 +6638,7 @@
+   constructor_type = type;
+   constructor_incremental = 1;
+   constructor_designated = 0;
++  constructor_zeroinit = 1;
+   designator_depth = 0;
+   designator_erroneous = 0;
+ 
+@@ -6832,11 +6836,8 @@
+ 	set_nonincremental_init (braced_init_obstack);
+     }
+ 
+-  if (implicit == 1 && warn_missing_braces && !missing_braces_mentioned)
+-    {
+-      missing_braces_mentioned = 1;
+-      warning_init (OPT_Wmissing_braces, "missing braces around initializer");
+-    }
++  if (implicit == 1)
++    found_missing_braces = 1;
+ 
+   if (TREE_CODE (constructor_type) == RECORD_TYPE
+ 	   || TREE_CODE (constructor_type) == UNION_TYPE)
+@@ -6969,16 +6970,23 @@
+ 	}
+     }
+ 
++  if (vec_safe_length (constructor_elements) != 1)
++    constructor_zeroinit = 0;
++
++  /* Warn when some structs are initialized with direct aggregation.  */
++  if (!implicit && found_missing_braces && warn_missing_braces
++      && !constructor_zeroinit)
++    {
++      warning_init (OPT_Wmissing_braces,
++		    "missing braces around initializer");
++    }
++
+   /* Warn when some struct elements are implicitly initialized to zero.  */
+   if (warn_missing_field_initializers
+       && constructor_type
+       && TREE_CODE (constructor_type) == RECORD_TYPE
+       && constructor_unfilled_fields)
+     {
+-	bool constructor_zeroinit =
+-	 (vec_safe_length (constructor_elements) == 1
+-	  && integer_zerop ((*constructor_elements)[0].value));
+-
+ 	/* Do not warn for flexible array members or zero-length arrays.  */
+ 	while (constructor_unfilled_fields
+ 	       && (!DECL_SIZE (constructor_unfilled_fields)
+@@ -8093,6 +8101,9 @@
+   designator_depth = 0;
+   designator_erroneous = 0;
+ 
++  if (!implicit && value.value && !integer_zerop (value.value))
++    constructor_zeroinit = 0;
++
+   /* Handle superfluous braces around string cst as in
+      char x[] = {"foo"}; */
+   if (string_flag

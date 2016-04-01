@@ -14,12 +14,13 @@ inherit autotools
 
 FILESEXTRAPATHS =. "${FILE_DIRNAME}/${PN}:${FILE_DIRNAME}/glibc:"
 
-BRANCH ?= "release/${PV}/master"
+SRCBRANCH ?= "release/${PV}/master"
 GLIBC_GIT_URI ?= "git://sourceware.org/git/glibc.git"
 
-SRC_URI = "${GLIBC_GIT_URI};branch=${BRANCH};name=glibc \
+SRC_URI = "${GLIBC_GIT_URI};branch=${SRCBRANCH};name=glibc \
            git://github.com/kraj/localedef;branch=master;name=localedef;destsuffix=git/localedef \
            file://fix_for_centos_5.8.patch \
+	   file://strcoll-Remove-incorrect-STRDIFF-based-optimization-.patch \
            ${EGLIBCPATCHES} \
 "
 EGLIBCPATCHES = "\

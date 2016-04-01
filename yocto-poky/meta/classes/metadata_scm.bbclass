@@ -65,18 +65,19 @@ def base_get_metadata_svn_revision(path, d):
     return revision
 
 def base_get_metadata_git_branch(path, d):
-    branch = os.popen('cd %s; git branch 2>&1 | grep "^* " | tr -d "* "' % path).read()
+    import bb.process
 
-    if len(branch) != 0:
-        return branch
-    return "<unknown>"
+    try:
+        rev, _ = bb.process.run('git rev-parse --abbrev-ref HEAD', cwd=path)
+    except bb.process.ExecutionError:
+        rev = '<unknown>'
+    return rev.strip()
 
 def base_get_metadata_git_revision(path, d):
-    f = os.popen("cd %s; git log -n 1 --pretty=oneline -- 2>&1" % path)
-    data = f.read()
-    if f.close() is None:        
-        rev = data.split(" ")[0]
-        if len(rev) != 0:
-            return rev
-    return "<unknown>"
+    import bb.process
 
+    try:
+        rev, _ = bb.process.run('git rev-parse HEAD', cwd=path)
+    except bb.process.ExecutionError:
+        rev = '<unknown>'
+    return rev.strip()

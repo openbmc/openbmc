@@ -13,5 +13,4 @@ do_populate_ide_support () {
   toolchain_create_tree_env_script
 }
 
-do_populate_ide_support[nostamp] = "1"
 addtask populate_ide_support before do_build after do_install

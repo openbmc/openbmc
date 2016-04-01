@@ -103,9 +103,8 @@ python () {
 }
 
 do_prepare_config () {
-	sed -e 's#@DATADIR@#${datadir}#g' \
+	sed -e '/CONFIG_STATIC/d' \
 		< ${WORKDIR}/defconfig > ${S}/.config
-	sed -i -e '/CONFIG_STATIC/d' .config
 	echo "# CONFIG_STATIC is not set" >> .config
 	for i in 'CROSS' 'DISTRO FEATURES'; do echo "### $i"; done >> \
 		${S}/.config
