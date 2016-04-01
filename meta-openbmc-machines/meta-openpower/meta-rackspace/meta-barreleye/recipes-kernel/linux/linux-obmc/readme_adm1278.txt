@@ -23,10 +23,12 @@ I2C7: P12v_c for HDD and IO Board
 adm1275 and pmbus into kernel.
 
 3) When kernel booted, initialize the adm1278 devices:
-
+We have add adm1278 to device tree, so do not need to do bellow steps.
+(
 root@barreleye:~# echo adm1278 0x10 > /sys/class/i2c-adapter/i2c-4/new_device
 root@barreleye:~# echo adm1278 0x10 > /sys/class/i2c-adapter/i2c-5/new_device
 root@barreleye:~# echo adm1278 0x10 > /sys/class/i2c-adapter/i2c-6/new_device
+)
 
 There will be three new hwmon sysfs entries created:
 
@@ -65,9 +67,14 @@ For short, 'curr1_*' refers to 'IOUT', 'in1_*' refers to 'vin', 'in2_*' refers t
 5.1) Currently, i2c_aspeed driver does not handle "i2c_smbus_read_block_data()" correctly. So this patch has to bypass some detection code.
 We need to fix this issue when the patch is merged to kernel.
 5.2) According to adm1278 datasheet, there is a sense resistor used to measure power and current. The resistor will affect conversion between
-adm1278 register value to real-world value for current and power. I am not very sure about the resistor value. So using 1 mili-ohms (or 1000 micro-ohms) as default value. When build the adm1275 driver as kernel module, we can set this resistor value by:
+adm1278 register value to real-world value for current and power. The default resistor value is 250 microohms.
+When build the adm1275 driver as kernel module, we can set this resistor value by:
 
 # insmod adm1275.ko r_sense=500
+
+When the driver is built into kernel, in kernel boot option, add:
+
+adm1275.r_sense=500
 
 This will set the 'sense resistor' to 500 micro-ohms.
 5.3) Some of the sensor value, e.g, 'temp1_input' seems not reasonable, e.g:
@@ -76,3 +83,6 @@ root@barreleye:~# cat /sys/class/hwmon/hwmon4/temp1_input
 -270952
 
 Need further check on that.
+
+5.4) The adm1278 driver re-used sensor inteface of common pmbus driver. The adm1278 chip itself has more sensors, like 'READ_EIN'.
+If we need those sensors, we need to add additional interface.
