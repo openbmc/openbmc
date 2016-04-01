@@ -42,7 +42,6 @@ IMAGE_INSTALL += " \
         i2c-tools \
         screen \
         inarp \
-        obmc-console \
         "
 
 def build_overlay(d):
