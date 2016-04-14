@@ -1,0 +1,11 @@
+[Unit]
+Description=OpenBMC console ssh server socket
+Conflicts=obmc-console-ssh.service
+Requires=obmc-console.service
+
+[Socket]
+ListenStream=2200
+Accept=yes
+
+[Install]
+WantedBy=sockets.target
