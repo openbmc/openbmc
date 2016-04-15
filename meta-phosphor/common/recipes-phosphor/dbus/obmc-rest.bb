@@ -13,10 +13,10 @@ RDEPENDS_${PN} += " \
         python-xml \
         python-dbus \
         python-pygobject \
-	obmc-mapper \
-	python-rocket \
-	python-bottle \
-	python-spwd \
+        obmc-mapper \
+        python-rocket \
+        python-bottle \
+        python-spwd \
         "
 SRC_URI += "git://github.com/openbmc/phosphor-rest-server"
 
