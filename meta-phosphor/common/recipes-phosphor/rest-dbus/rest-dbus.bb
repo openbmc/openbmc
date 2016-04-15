@@ -13,7 +13,7 @@ RDEPENDS_${PN} += " \
         python-json \
         python-dbus \
         python-xml \
-        obmc-mapper \
+        pyphosphor \
         "
 
 SRC_URI += " \
