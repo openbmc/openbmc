@@ -328,6 +328,7 @@ EXTRA_OECONF += "--verbose \
 		--without-ruby \
 		--without-squirrel \
 		--without-sasl2 \
+		--without-tomcrypt \
 		--with-build-extlibdep \
 		--with-build-maxextlibdep \
 		--without-valgrind \
