@@ -42,6 +42,24 @@ UBOOT_NODTB_SYMLINK ?= "u-boot-nodtb-${MACHINE}.${UBOOT_SUFFIX}"
 # Following is relevant only for u-boot recipes:
 #
 
+do_deploy_dtb () {
+	mkdir -p ${DEPLOYDIR}
+	cd ${DEPLOYDIR}
+
+	if [ -f ${B}/${UBOOT_DTB_BINARY} ]; then
+		install ${B}/${UBOOT_DTB_BINARY} ${DEPLOYDIR}/${UBOOT_DTB_IMAGE}
+		rm -f ${UBOOT_DTB_BINARY} ${UBOOT_DTB_SYMLINK}
+		ln -sf ${UBOOT_DTB_IMAGE} ${UBOOT_DTB_SYMLINK}
+		ln -sf ${UBOOT_DTB_IMAGE} ${UBOOT_DTB_BINARY}
+	fi
+	if [ -f ${B}/${UBOOT_NODTB_BINARY} ]; then
+		install ${B}/${UBOOT_NODTB_BINARY} ${DEPLOYDIR}/${UBOOT_NODTB_IMAGE}
+		rm -f ${UBOOT_NODTB_BINARY} ${UBOOT_NODTB_SYMLINK}
+		ln -sf ${UBOOT_NODTB_IMAGE} ${UBOOT_NODTB_SYMLINK}
+		ln -sf ${UBOOT_NODTB_IMAGE} ${UBOOT_NODTB_BINARY}
+	fi
+}
+
 do_concat_dtb () {
 	# Concatenate U-Boot w/o DTB & DTB with public key
 	# (cf. kernel-fitimage.bbclass for more details)
@@ -59,6 +77,10 @@ python () {
 	uboot_pn = d.getVar('PREFERRED_PROVIDER_u-boot', True) or 'u-boot'
 	if d.getVar('UBOOT_SIGN_ENABLE', True) == '1' and d.getVar('PN', True) == uboot_pn:
 		kernel_pn = d.getVar('PREFERRED_PROVIDER_virtual/kernel', True)
+
+		# u-boot.dtb and u-boot-nodtb.bin are deployed _before_ do_deploy
+		# Thus, do_deploy_setscene will also populate them in DEPLOY_IMAGE_DIR
+		bb.build.addtask('do_deploy_dtb', 'do_deploy', 'do_compile', d)
 
 		# do_concat_dtb is scheduled _before_ do_install as it overwrite the
 		# u-boot.bin in both DEPLOYDIR and DEPLOY_IMAGE_DIR.
