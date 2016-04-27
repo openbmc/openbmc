@@ -1,4 +1,4 @@
-inherit kernel-uboot
+inherit kernel-uboot uboot-sign
 
 python __anonymous () {
     kerneltype = d.getVar('KERNEL_IMAGETYPE', True)
@@ -15,6 +15,13 @@ python __anonymous () {
         image = d.getVar('INITRAMFS_IMAGE', True)
         if image:
             d.appendVarFlag('do_assemble_fitimage', 'depends', ' ${INITRAMFS_IMAGE}:do_image_complete')
+
+        # Verified boot will sign the fitImage and append the public key to
+        # U-boot dtb. We ensure the U-Boot dtb is deployed before assembling
+        # the fitImage:
+        if d.getVar('UBOOT_SIGN_ENABLE', True):
+            uboot_pn = d.getVar('PREFERRED_PROVIDER_u-boot', True) or 'u-boot'
+            d.appendVarFlag('do_assemble_fitimage', 'depends', ' %s:do_deploy' % uboot_pn)
 }
 
 # Options for the device tree compiler passed to mkimage '-D' feature:
@@ -132,6 +139,9 @@ EOF
 fitimage_emit_section_config() {
 
 	conf_csum="sha1"
+	if [ -n "${UBOOT_SIGN_ENABLE}" ] ; then
+		conf_sign_keyname="${UBOOT_SIGN_KEYNAME}"
+	fi
 
 	# Test if we have any DTBs at all
 	if [ -z "${2}" ] ; then
@@ -152,6 +162,26 @@ fitimage_emit_section_config() {
                         hash@1 {
                                 algo = "${conf_csum}";
                         };
+EOF
+
+	if [ ! -z "${conf_sign_keyname}" ] ; then
+
+		if [ -z "${2}" ] ; then
+			sign_line="sign-images = \"kernel\";"
+		else
+			sign_line="sign-images = \"fdt\", \"kernel\";"
+		fi
+
+		cat << EOF >> fit-image.its
+                        signature@1 {
+                                algo = "${conf_csum},rsa2048";
+                                key-name-hint = "${conf_sign_keyname}";
+                                sign-images = "fdt", "kernel";
+                        };
+EOF
+	fi
+
+	cat << EOF >> fit-image.its
                 };
 EOF
 }
@@ -160,7 +190,7 @@ do_assemble_fitimage() {
 	if test "x${KERNEL_IMAGETYPE}" = "xfitImage" ; then
 		kernelcount=1
 		dtbcount=""
-		rm -f fit-image.its
+		rm -f fit-image.its arch/${ARCH}/boot/fitImage
 
 		fitimage_emit_fit_header
 
@@ -216,6 +246,17 @@ do_assemble_fitimage() {
 			${@'-D "${UBOOT_MKIMAGE_DTCOPTS}"' if len('${UBOOT_MKIMAGE_DTCOPTS}') else ''} \
 			-f fit-image.its \
 			arch/${ARCH}/boot/fitImage
+
+		#
+		# Step 5: Sign the image and add public key to U-Boot dtb
+		#
+		if test -n "${UBOOT_SIGN_ENABLE}"; then
+			uboot-mkimage \
+				${@'-D "${UBOOT_MKIMAGE_DTCOPTS}"' if len('${UBOOT_MKIMAGE_DTCOPTS}') else ''} \
+				-F -k "${UBOOT_SIGN_KEYDIR}" \
+				-K "${DEPLOY_DIR_IMAGE}/${UBOOT_DTB_BINARY}" \
+				-r arch/${ARCH}/boot/fitImage
+		fi
 	fi
 }
 
