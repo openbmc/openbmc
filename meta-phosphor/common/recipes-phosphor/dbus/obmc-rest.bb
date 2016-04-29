@@ -17,9 +17,10 @@ RDEPENDS_${PN} += " \
         python-rocket \
         python-bottle \
         python-spwd \
+        pyphosphor \
         "
 SRC_URI += "git://github.com/openbmc/phosphor-rest-server"
 
-SRCREV = "fe90e0c579edbc19699e5aa7abbe4dd29b4dd112"
+SRCREV = "b41507f3b9c9a79ccd0ef6f48ac839b306a604b7"
 
 S = "${WORKDIR}/git"
