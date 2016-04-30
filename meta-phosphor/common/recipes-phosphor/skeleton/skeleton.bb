@@ -20,7 +20,7 @@ SRC_URI += "git://github.com/openbmc/skeleton"
 PACKAGECONFIG ??= "${@bb.utils.contains('MACHINE_FEATURES', 'openpower-pflash', 'openpower-pflash', '', d)}"
 PACKAGECONFIG[openpower-pflash] = ",,,pflash"
 
-SRCREV = "27ca44ad1a96f90d42dcb50183700e5ca5358642"
+SRCREV = "d3e6edc748f026dcd68d20306a1cfe0e26df22a9"
 
 S = "${WORKDIR}"
 
