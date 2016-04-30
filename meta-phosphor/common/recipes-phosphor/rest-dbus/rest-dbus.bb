@@ -13,7 +13,7 @@ RDEPENDS_${PN} += " \
         python-json \
         python-dbus \
         python-xml \
-        obmc-mapper \
+        pyphosphor \
         "
 
 SRC_URI += " \
@@ -21,6 +21,6 @@ SRC_URI += " \
         file://rest-dbus.service \
         "
 
-SRCREV = "b10a57e2f34e94b13697328cc22f876f738feb0e"
+SRCREV = "c693ba1126dcb493058d4ebeb4604b71e3bb3f08"
 
 S = "${WORKDIR}/git"
