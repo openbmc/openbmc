@@ -1,0 +1,10 @@
+[Unit]
+Description=BMC Inventory Upload
+Requires=skeleton.service
+After=skeleton.service
+
+[Service]
+ExecStart=/usr/sbin/inventory_upload.py
+
+[Install]
+WantedBy=multi-user.target
