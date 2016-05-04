@@ -6,11 +6,11 @@ def run_git(d, cmd):
                 pass
 
 python() {
-        version_id = run_git(d, 'describe --abbrev=0')
+        version_id = run_git(d, 'describe --dirty')
         if version_id:
                 d.setVar('VERSION_ID', version_id)
 
-        build_id = run_git(d, 'describe --dirty')
+        build_id = run_git(d, 'describe --abbrev=0')
         if build_id:
                 d.setVar('BUILD_ID', build_id)
 }
