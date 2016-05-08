@@ -250,7 +250,7 @@ do_assemble_fitimage() {
 		#
 		# Step 5: Sign the image and add public key to U-Boot dtb
 		#
-		if test -n "${UBOOT_SIGN_ENABLE}"; then
+		if [ "x${UBOOT_SIGN_ENABLE}" = "x1" ] ; then
 			uboot-mkimage \
 				${@'-D "${UBOOT_MKIMAGE_DTCOPTS}"' if len('${UBOOT_MKIMAGE_DTCOPTS}') else ''} \
 				-F -k "${UBOOT_SIGN_KEYDIR}" \
