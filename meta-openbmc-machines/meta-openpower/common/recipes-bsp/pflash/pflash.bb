@@ -6,9 +6,8 @@ LICENSE = "Apache-2.0"
 SRC_URI += "git://github.com/open-power/skiboot.git"
 LIC_FILES_CHKSUM = "file://${S}/LICENCE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
-SRCREV = "skiboot-5.2.0"
-PV = "5.2.0"
-SRC_URI += "file://0001-pflash-Allow-building-under-yocto.patch"
+SRCREV = "skiboot-5.2.1"
+PV = "5.2.1"
 
 S = "${WORKDIR}/git"
 
