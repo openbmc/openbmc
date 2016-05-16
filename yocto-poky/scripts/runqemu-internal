@@ -53,6 +53,9 @@ else
         "qemuarm64")
             mem_size=512
             ;;
+        "palmetto")
+            mem_size=512
+            ;;
         "qemumicroblaze")
             mem_size=256
             ;;
@@ -281,6 +284,7 @@ fi
 
 case "$MACHINE" in
     "qemuarm") ;;
+    "palmetto") ;;
     "qemuarm64") ;;
     "qemumicroblaze") ;;
     "qemumips") ;;
@@ -368,6 +372,24 @@ if [ "$MACHINE" = "qemuarm" -o "$MACHINE" = "qemuarmv6" -o "$MACHINE" = "qemuarm
     if [ "$MACHINE" = "qemuarmv7" ]; then
         QEMUOPTIONS="$QEMUOPTIONS -cpu cortex-a8"
     fi
+fi
+
+if [ "$MACHINE" = "palmetto" ]; then
+    QEMU=qemu-system-arm
+    MACHINE_SUBTYPE=palmetto-bmc
+    export QEMU_AUDIO_DRV="none"
+    if [ "$SLIRP_ENABLED" != "yes" ]; then
+        KERNEL_NETWORK_CMD=${KERNEL_NETWORK_CMD}"::eth0"
+    fi
+    # In either case, don't use virtio, use the SoC net devices
+    if [ "$VHOST_ACTIVE" = "yes" ]; then
+      QEMU_NETWORK_CMD="-net nic $QEMU_TAP_CMD,vhost=on"
+    else
+      QEMU_NETWORK_CMD="-net nic $QEMU_TAP_CMD"
+    fi
+    KERNCMDLINE="console=ttyS4 $KERNEL_NETWORK_CMD mem=$QEMU_MEMORY highres=off"
+    KERNELDTB=${DEPLOY_DIR_IMAGE}/${PALMETTO_DEFAULT_KERNEL}-aspeed-bmc-opp-qemu${MACHINE}.dtb
+    QEMUOPTIONS="$QEMU_NETWORK_CMD -M ${MACHINE_SUBTYPE} -dtb $KERNELDTB -initrd $ROOTFS -no-reboot -nographic"
 fi
 
 if [ "$MACHINE" = "qemuarm64" ]; then
