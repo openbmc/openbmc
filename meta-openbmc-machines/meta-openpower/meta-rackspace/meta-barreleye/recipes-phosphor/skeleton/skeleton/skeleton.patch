@@ -1,9 +1,10 @@
 --- a/skeleton.service	2015-10-28 07:47:55.337712001 -0500
 +++ b/skeleton.service	2015-10-28 07:34:05.277712001 -0500
-@@ -2,7 +2,7 @@
+@@ -2,8 +2,8 @@
  Description=Temp placeholder for skeleton function
  
  [Service]
+ Restart=always
 -ExecStart=/usr/sbin/system_manager.py Palmetto
 +ExecStart=/usr/sbin/system_manager.py Barreleye
  
