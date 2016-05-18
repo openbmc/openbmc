@@ -1,0 +1,85 @@
+We started seeing:
+
+No real function for mknod: /home/paul/poky_sdk/tmp/sysroots/x86_64-
+linux/usr/bin/../lib/pseudo/lib64/libpseudo.so: undefined symbol: mknod
+No real function for mknodat: /home/paul/poky_sdk/tmp/sysroots/x86_64-
+linux/usr/bin/../lib/pseudo/lib64/libpseudo.so: undefined symbol: mknodat
+
+In glibc 2.24 they've merged:
+
+https://sourceware.org/git/?p=glibc.git;a=commit;h=7d45c163d00c88d5875a112343c4ea3e61349e6b
+related to bugzilla entry:
+https://sourceware.org/bugzilla/show_bug.cgi?id=19509
+
+which means that the behaviour of RTLD_NEXT is slightly different.
+As far as I can tell, mknod has not been present in glibc for a while. 
+To quote stat.h:
+
+/* To allow the `struct stat' structure and the file type `mode_t'
+   bits to vary without changing shared library major version number,
+   the `stat' family of functions and `mknod' are in fact inline
+   wrappers around calls to `xstat', `fxstat', `lxstat', and `xmknod',
+   which all take a leading version-number argument designating the
+   data structure and bits used.  <bits/stat.h> defines _STAT_VER with
+   the version number corresponding to `struct stat' as defined in
+   that file; and _MKNOD_VER with the version number corresponding to
+   the S_IF* macros defined therein.  It is arranged that when not
+   inlined these function are always statically linked; that way a
+   dynamically-linked executable always encodes the version number
+   corresponding to the data structures it uses, so the `x' functions
+   in the shared library can adapt without needing to recompile all
+   callers.  */
+
+so I suspect mknod has not existed for a while, if ever and what we
+were finding, who knows. Everying in the system links against _xmknod
+which we have a separate wrapper for.
+
+Anyhow, ignoring that problem which hasn't caused a issue in the past, 
+the RTLD_NEXT change causes messages to be printed to stdout which causes 
+carnage if for example the packaging code is expecting a list of packages:
+
+WARNING: core-image-minimal-1.0-r0 do_rootfs: No not found in the base feeds (qemux86_64 core2-64 x86_64 noarch any all).
+WARNING: core-image-minimal-1.0-r0 do_rootfs: real not found in the base feeds (qemux86_64 core2-64 x86_64 noarch any all).
+WARNING: core-image-minimal-1.0-r0 do_rootfs: function not found in the base feeds (qemux86_64 core2-64 x86_64 noarch any all).
+WARNING: core-image-minimal-1.0-r0 do_rootfs: for not found in the base feeds (qemux86_64 core2-64 x86_64 noarch any all).
+WARNING: core-image-minimal-1.0-r0 do_rootfs: mknod: not found in the base feeds (qemux86_64 core2-64 x86_64 noarch any all).
+[etc]
+
+This bug will affect:
+* any distro using glibc 2.24
+* any system using a uninative tarball for glibc 2.24
+* any system which took a backport for the fix which was merged into
+  the 2.23 branch for a while before it was reverted (Fedora 23 had this)
+
+The easiest thing to do is to ignore the problem and disable the diag
+message which masks the problem with no ill effects.
+
+As Peter notes, there are a few issues here:
+
+* the fact there is no mknod symbol
+* the fact an error here isn't fatal
+* the #ifdef/#else looks suspect
+* handle RTLD_NEXT chaining properly (need more libs?)
+
+which he'll work on upstream and hopefully have fixed in a new version.
+
+Upstream-Status: Submitted [Peter is aware of the issue]
+
+RP 2016/5/18
+
+Index: pseudo-1.7.5/pseudo_wrappers.c
+===================================================================
+--- pseudo-1.7.5.orig/pseudo_wrappers.c
++++ pseudo-1.7.5/pseudo_wrappers.c
+@@ -146,9 +146,9 @@ pseudo_init_one_wrapper(pseudo_function
+ 			return;
+ 		}
+ #else
+-		if (e != NULL) {
++		/*if (e != NULL) {
+ 			pseudo_diag("No real function for %s: %s\n", func->name, e);
+-		}
++		}*/
+ #endif
+ 	}
+ }
