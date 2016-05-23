@@ -57,6 +57,7 @@ upper=$rwdir/cow
 save=/run/save/${upper##*/}
 
 mounted=
+doflash=y
 doclean=
 dosave=y
 dorestore=y
@@ -87,6 +88,9 @@ do
 		shift ;;
 	--restore-files)
 		dorestore=y
+		shift ;;
+	--no-flash)
+		doflash=
 		shift ;;
 	--copy-files)
 		toram=y
@@ -133,18 +137,21 @@ do
 	fi
 done
 
-for f in $image*
-do
-	if test ! -s $f
-	then
-		echo "Skipping empty update of ${f#$image}."
-		rm $f
-		continue
-	fi
-	m=$(findmtd ${f#$image})
-	echo "Updating ${f#$image}..."
-	flashcp -v $f /dev/$m && rm $f
-done
+if test -n "$doflash"
+then
+	for f in $image*
+	do
+		if test ! -s $f
+		then
+			echo "Skipping empty update of ${f#$image}."
+			rm $f
+			continue
+		fi
+		m=$(findmtd ${f#$image})
+		echo "Updating ${f#$image}..."
+		flashcp -v $f /dev/$m && rm $f
+	done
+fi
 
 if test -d $save -a "x$toram" = xy
 then
