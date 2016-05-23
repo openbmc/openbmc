@@ -48,6 +48,14 @@ childmtds() {
 	done
 }
 
+toobig() {
+	if test $(stat -L -c "%s" "$1") -gt $(cat /sys/class/mtd/"$2"/size)
+	then
+		return 0
+	fi
+	return 1
+}
+
 findmtd() {
 	m=$(grep -xl "$1" /sys/class/mtd/*/name)
 	m=${m%/name}
@@ -85,6 +93,7 @@ doclean=
 dosave=y
 dorestore=y
 toram=
+checksize=y
 checkmount=y
 
 whitelist=/run/initramfs/whitelist
@@ -114,6 +123,9 @@ do
 		shift ;;
 	--no-flash)
 		doflash=
+		shift ;;
+	--ignore-size)
+		checksize=
 		shift ;;
 	--ignore-mount)
 		checkmount=
@@ -160,6 +172,11 @@ do
 	if test -z "$m"
 	then
 		echo 1>&2 "$E Unable to find mtd partiton for ${f##*/}."
+		exit 1
+	fi
+	if test -n "$checksize" && toobig "$f" "$m"
+	then
+		echo 1>&2 "$E Image ${f##*/} too big for $m."
 		exit 1
 	fi
 	for s in $m $(childmtds $m)
