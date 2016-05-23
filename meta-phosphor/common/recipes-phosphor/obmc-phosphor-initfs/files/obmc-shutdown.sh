@@ -44,6 +44,14 @@ then
 	if test -x $update
 	then
 		$update --clean-saved-files
+		remaining=$(ls $image*)
+		if test -n "$remaining"
+		then
+			echo 1>&2 "Flash update failed to flash these images:"
+			echo 1>&2 "$remaining"
+		else
+			echo "Flash update completed."
+		fi
 	else
 		echo 1>&2 "Flash update requested but $update program missing!"
 	fi
