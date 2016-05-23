@@ -2,9 +2,6 @@
 
 echo update: "$@"
 
-export PS1=update-sh#\ 
-# exec /bin/sh
-
 cd /
 if ! test -r /proc/mounts || ! test -f /proc/mounts
 then
@@ -21,12 +18,12 @@ then
 	mkdir -p /dev
 	mount -t devtmpfs dev dev
 fi
-while grep mtd /proc/mounts
-do
+
+if grep mtd /proc/mounts
+then
 	echo 1>&2 "Error: A mtd device is mounted."
-	sulogin
-	# exec /bin/sh
-done
+	exit 1
+fi
 
 findmtd() {
 	m=$(grep -xl "$1" /sys/class/mtd/*/name)
@@ -130,7 +127,7 @@ do
 	if test -z "$m"
 	then
 		echo 1>&2  "Unable to find mtd partiton for ${f##*/}."
-		exec /bin/sh
+		exit 1
 	fi
 done
 
@@ -173,11 +170,3 @@ then
 fi
 
 exit
-
-# NOT REACHED without edit
-# NOT REACHED without edit
-
-echo "Flash completed.  Inspect, cleanup and reboot -f to continue."
-
-export PS1=update-sh#\ 
-exec /bin/sh
