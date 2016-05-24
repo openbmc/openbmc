@@ -21,6 +21,6 @@ SRC_URI += " \
         file://rest-dbus.service \
         "
 
-SRCREV = "c693ba1126dcb493058d4ebeb4604b71e3bb3f08"
+SRCREV = "64077101d9f2b6e51c897db82ffc0a399a34d15b"
 
 S = "${WORKDIR}/git"

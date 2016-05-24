@@ -10,7 +10,7 @@ RDEPENDS_${PN} += "python-dbus python-pygobject"
 
 SRC_URI += "git://github.com/openbmc/phosphor-networkd"
 
-SRCREV = "682512485947977a8d130a1cf9832b12583ea253"
+SRCREV = "fbf7d68e78684739ff860f20f6cbdd0932003912"
 
 S = "${WORKDIR}/git"
 
