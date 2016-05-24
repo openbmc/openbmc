@@ -19,7 +19,7 @@ RDEPENDS_${PN} += "libsystemd"
 
 SRC_URI += "git://github.com/openbmc/openpower-host-ipmi-oem"
 
-SRCREV = "345932324ce63d42fd88e762cb539c864167b008"
+SRCREV = "ca99efb722ff757707e27f91ba6af293d7e09753"
 
 FILES_${PN} += "${libdir}/host-ipmid/*.so"
 FILES_${PN}-dbg += "${libdir}/host-ipmid/.debug"
