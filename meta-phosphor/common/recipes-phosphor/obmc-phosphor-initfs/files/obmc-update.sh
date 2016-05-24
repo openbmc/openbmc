@@ -19,11 +19,34 @@ then
 	mount -t devtmpfs dev dev
 fi
 
-if grep mtd /proc/mounts
-then
-	echo 1>&2 "ERROR: A mtd device is mounted."
-	exit 1
-fi
+# mtd number N with mtd name Name can be mounted via mtdN, or mtd:Name
+# (with a mtd aware fs) or by /dev/mtdblockN (with a mtd or block fs).
+mtdismounted() {
+	m=${1##mtd}
+	if grep -s "mtdblock$m " /proc/mounts || grep -s "mtd$m " /proc/mounts
+	then
+		return 0
+	fi
+	n=$(cat /sys/class/mtd/mtd$m/name)
+	if test -n "$n" && grep -s "mtd:$n " /proc/mounts
+	then
+		return 0
+	fi
+	return 1
+}
+
+# Detect child partitions when the whole flash is to be updated.
+# Ignore mtdNro and mtdblockN names in the class subsystem directory.
+childmtds() {
+	for m in /sys/class/mtd/$1/mtd*
+	do
+		m=${m##*/}
+		if test "${m%ro}" = "${m#mtdblock}"
+		then
+			echo $m
+		fi
+	done
+}
 
 findmtd() {
 	m=$(grep -xl "$1" /sys/class/mtd/*/name)
@@ -62,10 +85,10 @@ doclean=
 dosave=y
 dorestore=y
 toram=
+checkmount=y
 
 whitelist=/run/initramfs/whitelist
 image=/run/initramfs/image-
-
 E="ERROR:"
 
 while test "$1" != "${1#-}"
@@ -90,6 +113,10 @@ do
 		dorestore=y
 		shift ;;
 	--no-flash)
+		doflash=
+		shift ;;
+	--ignore-mount)
+		checkmount=
 		doflash=
 		shift ;;
 	--copy-files)
@@ -135,6 +162,14 @@ do
 		echo 1>&2 "$E Unable to find mtd partiton for ${f##*/}."
 		exit 1
 	fi
+	for s in $m $(childmtds $m)
+	do
+		if test -n "$checkmount" && mtdismounted $s
+		then
+			echo 1>&2 "$E Device $s is mounted, ${f##*/} is busy."
+			exit 1
+		fi
+	done
 done
 
 if test -n "$doflash"
