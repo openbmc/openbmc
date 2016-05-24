@@ -1,0 +1,32 @@
+From 40b3bfd73bccd3f62c9743404e5f1d768b30cf0f Mon Sep 17 00:00:00 2001
+From: Patrick Williams <patrick@stwcx.xyz>
+Date: Fri, 5 Aug 2016 18:50:57 -0500
+Subject: [PATCH] Makefile: Allow out-of-tree builds
+
+Signed-off-by: Patrick Williams <patrick@stwcx.xyz>
+---
+ Makefile.am | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index ca01f21..eced4f6 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,12 +1,12 @@
+ bin_PROGRAMS = pdbg
+ lib_LIBRARIES = libpdbg.a
+ 
+-AM_CFLAGS = -Iccan/array_size
++AM_CFLAGS = -I$(top_srcdir)/ccan/array_size
+ 
+ pdbg_SOURCES = \
+ 	src/main.c
+ pdbg_LDADD = libpdbg.a
+-pdbg_CFLAGS = -Ilibpdbg
++pdbg_CFLAGS = -I$(top_srcdir)/libpdbg
+ 
+ libpdbg_a_SOURCES = \
+ 	libpdbg/adu.c \
+-- 
+2.9.0
+
