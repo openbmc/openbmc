@@ -1,8 +1,8 @@
 inherit kernel-uboot uboot-sign
 
 python __anonymous () {
-    kerneltype = d.getVar('KERNEL_IMAGETYPE', True)
-    if kerneltype == 'fitImage':
+    kerneltypes = d.getVar('KERNEL_IMAGETYPES', True) or ""
+    if 'fitImage' in kerneltypes.split():
         depends = d.getVar("DEPENDS", True)
         depends = "%s u-boot-mkimage-native dtc-native" % depends
         d.setVar("DEPENDS", depends)
@@ -10,7 +10,9 @@ python __anonymous () {
 	# Override KERNEL_IMAGETYPE_FOR_MAKE variable, which is internal
 	# to kernel.bbclass . We have to override it, since we pack zImage
 	# (at least for now) into the fitImage .
-        d.setVar("KERNEL_IMAGETYPE_FOR_MAKE", "zImage")
+        typeformake = d.getVar("KERNEL_IMAGETYPE_FOR_MAKE", True) or ""
+        if 'fitImage' in typeformake.split():
+            d.setVar('KERNEL_IMAGETYPE_FOR_MAKE', typeformake.replace('fitImage', 'zImage'))
 
         image = d.getVar('INITRAMFS_IMAGE', True)
         if image:
@@ -187,7 +189,7 @@ EOF
 }
 
 do_assemble_fitimage() {
-	if test "x${KERNEL_IMAGETYPE}" = "xfitImage" ; then
+	if echo ${KERNEL_IMAGETYPES} | grep -wq "fitImage"; then
 		kernelcount=1
 		dtbcount=""
 		rm -f fit-image.its arch/${ARCH}/boot/fitImage
@@ -265,14 +267,14 @@ addtask assemble_fitimage before do_install after do_compile
 kernel_do_deploy[vardepsexclude] = "DATETIME"
 kernel_do_deploy_append() {
 	# Update deploy directory
-	if test "x${KERNEL_IMAGETYPE}" = "xfitImage" ; then
+	if echo ${KERNEL_IMAGETYPES} | grep -wq "fitImage"; then
 		cd ${B}
 		echo "Copying fit-image.its source file..."
-		its_base_name="${KERNEL_IMAGETYPE}-its-${PV}-${PR}-${MACHINE}-${DATETIME}"
-		its_symlink_name=${KERNEL_IMAGETYPE}-its-${MACHINE}
+		its_base_name="fitImage-its-${PV}-${PR}-${MACHINE}-${DATETIME}"
+		its_symlink_name=fitImage-its-${MACHINE}
 		install -m 0644 fit-image.its ${DEPLOYDIR}/${its_base_name}.its
-		linux_bin_base_name="${KERNEL_IMAGETYPE}-linux.bin-${PV}-${PR}-${MACHINE}-${DATETIME}"
-		linux_bin_symlink_name=${KERNEL_IMAGETYPE}-linux.bin-${MACHINE}
+		linux_bin_base_name="fitImage-linux.bin-${PV}-${PR}-${MACHINE}-${DATETIME}"
+		linux_bin_symlink_name=fitImage-linux.bin-${MACHINE}
 		install -m 0644 linux.bin ${DEPLOYDIR}/${linux_bin_base_name}.bin
 
 		cd ${DEPLOYDIR}

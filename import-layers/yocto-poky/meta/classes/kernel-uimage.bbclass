@@ -1,23 +1,25 @@
 inherit kernel-uboot
 
 python __anonymous () {
-    kerneltype = d.getVar('KERNEL_IMAGETYPE', True)
-    if kerneltype == 'uImage':
+    if "uImage" in (d.getVar('KERNEL_IMAGETYPES', True) or "").split():
         depends = d.getVar("DEPENDS", True)
         depends = "%s u-boot-mkimage-native" % depends
         d.setVar("DEPENDS", depends)
 
-	# Override KERNEL_IMAGETYPE_FOR_MAKE variable, which is internal
-	# to kernel.bbclass . We override the variable here, since we need
-	# to build uImage using the kernel build system if and only if
-	# KEEPUIMAGE == yes. Otherwise, we pack compressed vmlinux into
-	# the uImage .
-	if d.getVar("KEEPUIMAGE", True) != 'yes':
-            d.setVar("KERNEL_IMAGETYPE_FOR_MAKE", "zImage")
+        # Override KERNEL_IMAGETYPE_FOR_MAKE variable, which is internal
+        # to kernel.bbclass . We override the variable here, since we need
+        # to build uImage using the kernel build system if and only if
+        # KEEPUIMAGE == yes. Otherwise, we pack compressed vmlinux into
+        # the uImage .
+        if d.getVar("KEEPUIMAGE", True) != 'yes':
+            typeformake = d.getVar("KERNEL_IMAGETYPE_FOR_MAKE", True) or ""
+            if "uImage" in typeformake.split():
+                typeformake.replace('uImage', 'vmlinux')
+            d.setVar('KERNEL_IMAGETYPE_FOR_MAKE', typeformake)
 }
 
 do_uboot_mkimage() {
-	if test "x${KERNEL_IMAGETYPE}" = "xuImage" ; then
+	if echo "${KERNEL_IMAGETYPES}" | grep -wq "uImage"; then
 		if test "x${KEEPUIMAGE}" != "xyes" ; then
 			uboot_prep_kimage
 
