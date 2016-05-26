@@ -1,7 +1,6 @@
 PACKAGECONFIG += "networkd"
 FILESEXTRAPATHS_append := "${THISDIR}/${PN}:"
 SRC_URI += "file://default.network"
-SRC_URI += "file://0100-systemd_networkd_dbus_setaddress.patch"
 
 FILES_${PN} += "${libdir}/systemd/network/default.network"
 
