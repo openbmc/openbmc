@@ -63,9 +63,13 @@ do_deploy_dtb () {
 do_concat_dtb () {
 	# Concatenate U-Boot w/o DTB & DTB with public key
 	# (cf. kernel-fitimage.bbclass for more details)
-	cd ${DEPLOYDIR}
 	if [ "x${UBOOT_SIGN_ENABLE}" = "x1" ]; then
-		if [ -e "${UBOOT_NODTB_IMAGE}" -a -e "${UBOOT_DTB_IMAGE}" ]; then
+		if [ "x${UBOOT_SUFFIX}" = "ximg" -a -e "${DEPLOYDIR}/${UBOOT_DTB_IMAGE}" ]; then
+			oe_runmake EXT_DTB=${DEPLOYDIR}/${UBOOT_DTB_IMAGE}
+			install ${S}/${UBOOT_BINARY} ${DEPLOYDIR}/${UBOOT_IMAGE}
+			install ${S}/${UBOOT_BINARY} ${DEPLOY_DIR_IMAGE}/${UBOOT_IMAGE}
+		elif [ -e "${DEPLOYDIR}/${UBOOT_NODTB_IMAGE}" -a -e "${DEPLOYDIR}/${UBOOT_DTB_IMAGE}" ]; then
+			cd ${DEPLOYDIR}
 			cat ${UBOOT_NODTB_IMAGE} ${UBOOT_DTB_IMAGE} | tee ${B}/${UBOOT_BINARY} > ${UBOOT_IMAGE}
 		else
 			bbwarn "Failure while adding public key to u-boot binary. Verified boot won't be available."
