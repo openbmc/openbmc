@@ -1,0 +1,2 @@
+recipes-bsp          - Anything with links to specific hardware or hardware configuration information
+recipes-kernel       - The kernel and generic applications/libraries with strong kernel dependencies
