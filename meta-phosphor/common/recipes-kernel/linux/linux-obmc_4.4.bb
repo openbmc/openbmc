@@ -6,6 +6,7 @@ KBRANCH ?= "dev-4.4"
 KCONFIG_MODE="--alldefconfig"
 
 SRC_URI = "git://github.com/openbmc/linux;protocol=git;branch=${KBRANCH}"
+SRC_URI += "file://hwmon.cfg"
 
 LINUX_VERSION ?= "4.4"
 LINUX_VERSION_EXTENSION ?= "-${SRCREV}"
