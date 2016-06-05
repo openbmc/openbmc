@@ -1,0 +1,57 @@
+From 2e7be544f38127097b44799c5ec8004a3faafe2a Mon Sep 17 00:00:00 2001
+From: Brad Bishop <bradleyb@fuzziesquirrel.com>
+Date: Thu, 16 Jun 2016 22:17:45 -0400
+Subject: [PATCH] Add flash and layout to Witherspoon devtree
+
+Signed-off-by: Brad Bishop <bradleyb@fuzziesquirrel.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts | 33 ++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts b/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
+index bb5ec59..e0bbaf8 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
+@@ -19,6 +19,39 @@
+ 	memory {
+ 		reg = <0x80000000 0x40000000>;
+ 	};
++
++	ahb {
++
++		fmc@1e620000 {
++			reg = < 0x1e620000 0x94
++				0x20000000 0x02000000 >;
++			#address-cells = <1>;
++			#size-cells = <0>;
++			compatible = "aspeed,fmc";
++
++			flash@0 {
++				reg = < 0 >;
++				compatible = "jedec,spi-nor" ;
++#include "aspeed-bmc-opp-flash-layout.dtsi"
++			};
++		};
++		spi@1e630000 {
++			reg = < 0x1e630000 0x18
++				0x30000000 0x02000000 >;
++			#address-cells = <1>;
++			#size-cells = <0>;
++			compatible = "aspeed,smc";
++			flash {
++				reg = < 0 >;
++				compatible = "jedec,spi-nor" ;
++				label = "pnor";
++				/* spi-max-frequency = <>; */
++				/* m25p,fast-read; */
++			};
++		};
++
++	};
++
+ };
+ 
+ &uart5 {
+-- 
+1.8.3.1
+

@@ -1,0 +1,30 @@
+From 840d78ae902fa8ce7ba356de4aa685c1ebab3efc Mon Sep 17 00:00:00 2001
+From: Brad Bishop <bradleyb@fuzziesquirrel.com>
+Date: Thu, 16 Jun 2016 11:01:24 -0400
+Subject: [PATCH] Set witherspoon power pin and pgood nets
+
+Currently pointed at barreleye nets.
+
+Signed-off-by: Brad Bishop <bradleyb@fuzziesquirrel.com>
+---
+ op-pwrctl/power_control_obj.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/op-pwrctl/power_control_obj.c b/op-pwrctl/power_control_obj.c
+index 85a8cff..7bb7004 100644
+--- a/git/op-pwrctl/power_control_obj.c
++++ b/git/op-pwrctl/power_control_obj.c
+@@ -17,8 +17,8 @@ static const gchar* instance_name = "power0";
+ static const gchar* dbus_name = "org.openbmc.control.Power";
+ 
+ //This object will use these GPIOs
+-GPIO power_pin    = (GPIO){ "POWER_PIN" };
+-GPIO pgood        = (GPIO){ "PGOOD" };
++GPIO power_pin = (GPIO){ "BMC_POWER_UP" };
++GPIO pgood = (GPIO){ "SYS_PWROK_BUFF" };
+ GPIO usb_reset    = (GPIO){ "USB_RESET" };
+ GPIO pcie_reset   = (GPIO){ "PCIE_RESET" };
+ 
+-- 
+2.1.4
+

@@ -1,0 +1,29 @@
+From 809f469b92b9f2248a49f250bc002de0c6bd48f5 Mon Sep 17 00:00:00 2001
+From: Brad Bishop <bradleyb@fuzziesquirrel.com>
+Date: Wed, 8 Jun 2016 14:57:23 -0400
+Subject: [PATCH] Witherspoon OpenBMC configuration
+
+Set default boot arguments for OpenBMC.
+
+Signed-off-by: Brad Bishop <bradleyb@us.ibm.com>
+---
+ include/configs/witherspoon-bmc.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/include/configs/witherspoon-bmc.h b/include/configs/witherspoon-bmc.h
+index f9da307..f0f0ba9 100644
+--- a/include/configs/witherspoon-bmc.h
++++ b/include/configs/witherspoon-bmc.h
+@@ -91,6 +91,9 @@
+ 
+ #define CONFIG_SYS_LOAD_ADDR		0x83000000	/* default load address */
+ 
++#define CONFIG_BOOTARGS		"console=ttyS4,115200 earlyprintk"
++#define CONFIG_BOOTCOMMAND	"bootm 20080000 20300000"
++
+ #define CONFIG_AST_SPI_NOR    /* AST SPI NOR Flash */
+ 
+ #define CONFIG_FMC_CS			1
+-- 
+2.1.4
+
