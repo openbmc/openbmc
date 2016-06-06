@@ -16,9 +16,9 @@ DEPENDS += "glib-2.0 systemd"
 RDEPENDS_${PN} += "python-subprocess python-compression libsystemd"
 SRC_URI += "git://github.com/openbmc/skeleton"
 
-# RDEPEND on pflash if the openpower-pflash machine feature is set.
+# DEPEND/RDEPEND on pflash if the openpower-pflash machine feature is set.
 PACKAGECONFIG ??= "${@bb.utils.contains('MACHINE_FEATURES', 'openpower-pflash', 'openpower-pflash', '', d)}"
-PACKAGECONFIG[openpower-pflash] = ",,,pflash"
+PACKAGECONFIG[openpower-pflash] = ",,pflash,pflash"
 
 SRCREV = "2f9ee83356fba3f6f843bf2584f3e7e95763ec98"
 
@@ -26,9 +26,6 @@ S = "${WORKDIR}"
 
 do_compile() {
         oe_runmake -C git
-
-        # Remove deprecated files.
-        rm ${S}/git/bin/pflash
 }
 
 do_install() {
