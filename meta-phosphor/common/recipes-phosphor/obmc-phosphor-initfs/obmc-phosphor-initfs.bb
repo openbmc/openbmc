@@ -3,7 +3,6 @@ DESCRIPTION = "Phosphor OpenBMC filesytem mount reference implementation."
 PR = "r1"
 
 inherit obmc-phosphor-license
-inherit obmc-phosphor-initfs
 
 S = "${WORKDIR}"
 SRC_URI += "file://obmc-init.sh"
