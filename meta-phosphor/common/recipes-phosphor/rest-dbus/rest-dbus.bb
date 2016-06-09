@@ -16,11 +16,12 @@ RDEPENDS_${PN} += " \
         pyphosphor \
         "
 
+SYSTEMD_SERVICE_${PN} += "rest-dbus.service rest-dbus.socket"
+
 SRC_URI += " \
         git://github.com/openbmc/rest-dbus.git \
-        file://rest-dbus.service \
         "
 
-SRCREV = "64077101d9f2b6e51c897db82ffc0a399a34d15b"
+SRCREV = "5a65d2f605494d5c308171ba4fd1ab08d7b3a91d"
 
 S = "${WORKDIR}/git"
