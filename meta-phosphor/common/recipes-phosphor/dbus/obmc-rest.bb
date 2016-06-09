@@ -9,19 +9,21 @@ inherit allarch
 inherit obmc-phosphor-systemd
 inherit setuptools
 
+SYSTEMD_SERVICE_${PN} = "obmc-rest.service obmc-rest.socket"
+
 RDEPENDS_${PN} += " \
         python-xml \
         python-dbus \
         python-pygobject \
         obmc-mapper \
-        python-rocket \
+        python-gevent \
         python-bottle \
         python-spwd \
         python-netserver \
         pyphosphor \
         "
-SRC_URI += "git://github.com/openbmc/phosphor-rest-server"
+SRC_URI += "git://github.com/bradbishop/phosphor-rest-server"
 
-SRCREV = "b41507f3b9c9a79ccd0ef6f48ac839b306a604b7"
+SRCREV = "7fa86fb39145985e92765a0458ddd7561cabc256"
 
 S = "${WORKDIR}/git"
