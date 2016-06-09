@@ -18,6 +18,6 @@ RDEPENDS_${PN} += " \
 
 SRC_URI += "git://github.com/openbmc/openpower-inventory-upload"
 
-SRCREV = "867e058dd246739ab9c93df64e82b7526f42d67f"
+SRCREV = "b07de872ac18710dbf0d393a206e2598c6580f46"
 
 S = "${WORKDIR}/git"
