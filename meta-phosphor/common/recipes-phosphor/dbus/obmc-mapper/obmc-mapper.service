@@ -5,7 +5,7 @@ Description=Phosphor OpenBMC DBus service management daemon
 Restart=always
 Type=dbus
 ExecStart=/usr/sbin/phosphor-mapper
-BusName=org.openbmc.objectmapper
+BusName=org.openbmc.ObjectMapper
 
 [Install]
 WantedBy=multi-user.target
