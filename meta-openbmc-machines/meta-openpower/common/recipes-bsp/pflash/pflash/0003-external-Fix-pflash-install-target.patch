@@ -1,0 +1,28 @@
+From e5fc583e610d4360f8fe50f225c868cb3019c1a7 Mon Sep 17 00:00:00 2001
+From: Brad Bishop <bradleyb@fuzziesquirrel.com>
+Date: Thu, 26 May 2016 10:47:14 -0400
+Subject: [PATCH 2/5] external: Fix pflash install target
+
+The install target used $(sbindir) which isn't set anywhere.
+
+Signed-off-by: Brad Bishop <bradleyb@fuzziesquirrel.com>
+Signed-off-by: Stewart Smith <stewart@linux.vnet.ibm.com>
+---
+ external/pflash/rules.mk | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/external/pflash/rules.mk b/external/pflash/rules.mk
+index aa426b5..9e73adf 100644
+--- a/external/pflash/rules.mk
++++ b/external/pflash/rules.mk
+@@ -8,6 +8,7 @@ LIBFLASH_SRC := $(addprefix libflash/,$(LIBFLASH_FILES))
+ OBJS	+= $(LIBFLASH_OBJS)
+ OBJS	+= common-arch_flash.o
+ EXE     = pflash
++sbindir?=/usr/sbin
+ 
+ PFLASH_VERSION ?= $(shell ../../make_version.sh $(EXE))
+ 
+-- 
+1.8.3.1
+

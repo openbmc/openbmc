@@ -1,0 +1,32 @@
+From e415b3b9bf0441745f442e12bfce25ed49c589bf Mon Sep 17 00:00:00 2001
+From: Brad Bishop <bradleyb@fuzziesquirrel.com>
+Date: Thu, 26 May 2016 10:47:16 -0400
+Subject: [PATCH 3/5] external: Remove -m64 from shared CFLAGS on ARM
+
+-m64 isn't an ARM flag.
+
+Signed-off-by: Brad Bishop <bradleyb@fuzziesquirrel.com>
+Signed-off-by: Stewart Smith <stewart@linux.vnet.ibm.com>
+---
+ external/shared/Makefile | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/external/shared/Makefile b/external/shared/Makefile
+index 40ba2b9..b96c662 100644
+--- a/external/shared/Makefile
++++ b/external/shared/Makefile
+@@ -8,7 +8,10 @@ INCDIR = $(PREFIX)/include/libflash
+ 
+ VERSION = $(shell ../../make_version.sh)
+ 
+-CFLAGS += -m64 -Werror -Wall -g2 -ggdb -I. -fPIC
++ifneq ($(ARCH), ARCH_ARM)
++CFLAGS += -m64
++endif
++CFLAGS += -Werror -Wall -g2 -ggdb -I. -fPIC
+ 
+ LIBFLASH_OBJS = libflash-file.o libflash-libflash.o libflash-libffs.o libflash-ecc.o libflash-blocklevel.o
+ ARCHFLASH_OBJS = common-arch_flash.o
+-- 
+1.8.3.1
+

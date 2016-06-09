@@ -1,0 +1,60 @@
+From 45e548176e16ad8ba9540fcd75131ba4993e42b7 Mon Sep 17 00:00:00 2001
+From: Brad Bishop <bradleyb@fuzziesquirrel.com>
+Date: Thu, 26 May 2016 10:47:17 -0400
+Subject: [PATCH 4/5] external: Create shared rules.mk
+
+Building a dynamically linked pflash will need the shared library
+name.  Export it here.
+
+Signed-off-by: Brad Bishop <bradleyb@fuzziesquirrel.com>
+Signed-off-by: Stewart Smith <stewart@linux.vnet.ibm.com>
+---
+ external/shared/Makefile | 9 ++++-----
+ external/shared/rules.mk | 1 +
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+ create mode 100644 external/shared/rules.mk
+
+diff --git a/external/shared/Makefile b/external/shared/Makefile
+index b96c662..c643666 100644
+--- a/external/shared/Makefile
++++ b/external/shared/Makefile
+@@ -1,13 +1,12 @@
+ .DEFAULT_GOAL := all
+ GET_ARCH = ../../external/common/get_arch.sh
+ include ../../external/common/rules.mk
++include rules.mk
+ 
+ PREFIX ?= /usr/local/
+ LIBDIR = $(PREFIX)/lib
+ INCDIR = $(PREFIX)/include/libflash
+ 
+-VERSION = $(shell ../../make_version.sh)
+-
+ ifneq ($(ARCH), ARCH_ARM)
+ CFLAGS += -m64
+ endif
+@@ -30,11 +29,11 @@ distclean: clean
+ 	rm -f ccan libflash common
+ 
+ all: links arch_links $(OBJS)
+-	$(CC) -shared -Wl,-soname,libflash.so -o libflash.so.$(VERSION) $(OBJS)
++	$(CC) -shared -Wl,-soname,libflash.so -o $(SHARED_NAME) $(OBJS)
+ 
+ install-lib: all
+-	install -D -m 0755 libflash.so.$(VERSION) $(LIBDIR)/libflash.so.$(VERSION)
+-	ln -sf libflash.so.$(VERSION) $(LIBDIR)/libflash.so
++	install -D -m 0755 $(SHARED_NAME) $(LIBDIR)/$(SHARED_NAME)
++	ln -sf $(SHARED_NAME) $(LIBDIR)/libflash.so
+ 
+ install-dev: links arch_links
+ 	mkdir -p $(INCDIR)
+diff --git a/external/shared/rules.mk b/external/shared/rules.mk
+new file mode 100644
+index 0000000..a4976a1
+--- /dev/null
++++ b/external/shared/rules.mk
+@@ -0,0 +1 @@
++SHARED_NAME=libflash.so.$(shell ../../make_version.sh)
+-- 
+1.8.3.1
+
