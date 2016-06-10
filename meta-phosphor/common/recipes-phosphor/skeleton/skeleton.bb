@@ -14,8 +14,10 @@ inherit obmc-phosphor-system-mgmt
 inherit pythonnative
 inherit python-dir
 
+VIRTUAL-RUNTIME_skeleton_workbook ?= ""
+
 DEPENDS += "glib-2.0 systemd"
-RDEPENDS_${PN} += "python-subprocess python-compression libsystemd"
+RDEPENDS_${PN} += "python-subprocess python-compression libsystemd ${VIRTUAL-RUNTIME_skeleton_workbook}"
 SRC_URI += "git://github.com/openbmc/skeleton"
 
 FILES_${PN} += "${PYTHON_SITEPACKAGES_DIR}/*"
@@ -41,7 +43,7 @@ do_compile() {
 
 do_install() {
         oe_runmake -C git install \
-		PYTHON=${PYTHON} \
-		DESTDIR=${D} \
-		PREFIX=/usr
+                PYTHON=${PYTHON} \
+                DESTDIR=${D} \
+                PREFIX=/usr
 }
