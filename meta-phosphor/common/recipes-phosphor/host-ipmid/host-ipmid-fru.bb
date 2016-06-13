@@ -7,10 +7,10 @@ RRECOMMENDS_${PN} = "virtual/obmc-phosphor-host-ipmi-hw"
 
 inherit obmc-phosphor-license
 
-DEPENDS += "systemd    \
-		 	host-ipmid \
-		 	"
-
+DEPENDS += " \
+        systemd \
+        host-ipmid \
+        "
 
 RDEPENDS_${PN} += "libsystemd"
 
@@ -26,9 +26,5 @@ FILES_${PN}-dbg += "${libdir}/host-ipmid/.debug"
 S = "${WORKDIR}/git"
 
 do_install() {
-	oe_runmake install DESTDIR=${D} LIBDIR=${libdir} BINDIR=${sbindir}
+        oe_runmake install DESTDIR=${D} LIBDIR=${libdir} BINDIR=${sbindir}
 }
-
-
-#        install -m 0755 -d ${D}${libdir}/host-ipmid
-#        install -m 0755 ${S}/*.so ${D}${libdir}/host-ipmid/
