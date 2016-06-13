@@ -1,0 +1,68 @@
+From 24ae270984a37525f8393eeccbd0ac55da4503e1 Mon Sep 17 00:00:00 2001
+From: Brad Bishop <bradleyb@fuzziesquirrel.com>
+Date: Thu, 26 May 2016 10:47:18 -0400
+Subject: [PATCH 5/5] external: Add dynamically linked pflash
+
+Modify the $(EXE) and install target dependencies if LINKAGE=dynamic.
+The default remains a statically linked pflash binary.
+
+Signed-off-by: Brad Bishop <bradleyb@fuzziesquirrel.com>
+Signed-off-by: Stewart Smith <stewart@linux.vnet.ibm.com>
+---
+ external/pflash/Makefile |  2 +-
+ external/pflash/rules.mk | 19 ++++++++++++++++---
+ 2 files changed, 17 insertions(+), 4 deletions(-)
+
+diff --git a/external/pflash/Makefile b/external/pflash/Makefile
+index bc371a3..3a4c563 100644
+--- a/external/pflash/Makefile
++++ b/external/pflash/Makefile
+@@ -10,7 +10,7 @@ all: links arch_links $(EXE)
+ 	@cmp -s $@ $@.tmp || cp $@.tmp $@
+ 	@rm -f $@.tmp
+ 
+-install: all
++install: all $(INSTALLDEPS)
+ 	install -D pflash $(DESTDIR)$(sbindir)/pflash
+ 
+ .PHONY: dist
+diff --git a/external/pflash/rules.mk b/external/pflash/rules.mk
+index 9e73adf..df814fe 100644
+--- a/external/pflash/rules.mk
++++ b/external/pflash/rules.mk
+@@ -1,16 +1,29 @@
+ .DEFAULT_GOAL := all
+ 
+ override CFLAGS  += -O2 -Wall -I.
+-OBJS    = pflash.o progress.o version.o
++PFLASH_OBJS    = pflash.o progress.o version.o common-arch_flash.o
+ LIBFLASH_FILES := libflash.c libffs.c ecc.c blocklevel.c file.c
+ LIBFLASH_OBJS := $(addprefix libflash-, $(LIBFLASH_FILES:.c=.o))
+ LIBFLASH_SRC := $(addprefix libflash/,$(LIBFLASH_FILES))
+-OBJS	+= $(LIBFLASH_OBJS)
+-OBJS	+= common-arch_flash.o
++OBJS	= $(PFLASH_OBJS) $(LIBFLASH_OBJS)
+ EXE     = pflash
+ sbindir?=/usr/sbin
+ 
+ PFLASH_VERSION ?= $(shell ../../make_version.sh $(EXE))
++LINKAGE?=static
++
++ifeq ($(LINKAGE),dynamic)
++include ../shared/rules.mk
++SHARED=../shared/$(SHARED_NAME)
++OBJS=$(PFLASH_OBJS) $(SHARED)
++INSTALLDEPS+=install-shared
++
++install-shared:
++	$(MAKE) -C ../shared install PREFIX=$(PREFIX)
++
++$(SHARED):
++	$(MAKE) -C ../shared
++endif
+ 
+ version.c: .version
+ 	@(if [ "a$(PFLASH_VERSION)" = "a" ]; then \
+-- 
+1.8.3.1
+

@@ -1,0 +1,40 @@
+From 7c7911eb7bea505474c3062bf5b0c60d99b502a5 Mon Sep 17 00:00:00 2001
+From: Brad Bishop <bradleyb@fuzziesquirrel.com>
+Date: Wed, 25 May 2016 21:54:28 -0400
+Subject: [PATCH 1/5] external: Remove external/shared link targets
+
+These are already defined just like we need them in common/rules.mk
+
+Signed-off-by: Brad Bishop <bradleyb@fuzziesquirrel.com>
+Reviewed-by: Joel Stanley <joel@jms.id.au>
+Signed-off-by: Stewart Smith <stewart@linux.vnet.ibm.com>
+---
+ external/shared/Makefile | 12 ------------
+ 1 file changed, 12 deletions(-)
+
+diff --git a/external/shared/Makefile b/external/shared/Makefile
+index 4c31657..40ba2b9 100644
+--- a/external/shared/Makefile
++++ b/external/shared/Makefile
+@@ -10,18 +10,6 @@ VERSION = $(shell ../../make_version.sh)
+ 
+ CFLAGS += -m64 -Werror -Wall -g2 -ggdb -I. -fPIC
+ 
+-.PHONY: links
+-links: libflash ccan common
+-
+-libflash:
+-	ln -sf ../../libflash .
+-
+-common:
+-	ln -sf ../common .
+-
+-ccan:
+-	ln -sf ../../ccan .
+-
+ LIBFLASH_OBJS = libflash-file.o libflash-libflash.o libflash-libffs.o libflash-ecc.o libflash-blocklevel.o
+ ARCHFLASH_OBJS = common-arch_flash.o
+ OBJS = $(LIBFLASH_OBJS) $(ARCHFLASH_OBJS)
+-- 
+1.8.3.1
+

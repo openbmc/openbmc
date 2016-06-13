@@ -1,0 +1,186 @@
+From e42206bf0729782330778e77283af2aca23499dc Mon Sep 17 00:00:00 2001
+From: Dinar Valeev <dvaleev@suse.com>
+Date: Tue, 29 Mar 2016 14:36:37 +0200
+Subject: [PATCH] Make links target reusable
+
+Move symlinking target to external/common/rules.mk, so the rule
+could be reused by gard and opal-prd.
+
+Signed-off-by: Dinar Valeev <dvaleev@suse.com>
+Reviewed-by: Joel Stanley <joel@jms.id.au>
+Signed-off-by: Stewart Smith <stewart@linux.vnet.ibm.com>
+---
+ external/common/rules.mk   | 24 ++++++++++++++++++++++++
+ external/gard/Makefile     | 19 ++-----------------
+ external/opal-prd/Makefile | 25 ++-----------------------
+ external/pflash/Makefile   | 24 +-----------------------
+ 4 files changed, 29 insertions(+), 63 deletions(-)
+
+diff --git a/external/common/rules.mk b/external/common/rules.mk
+index ec20593..4a929d6 100644
+--- a/external/common/rules.mk
++++ b/external/common/rules.mk
+@@ -17,6 +17,30 @@ endif
+ endif
+ endif
+ 
++# Use make V=1 for a verbose build.
++ifndef V
++        Q_CC=	@echo '    CC ' $@;
++        Q_LINK=	@echo '  LINK ' $@;
++        Q_LN=   @echo '    LN ' $@;
++        Q_MKDIR=@echo ' MKDIR ' $@;
++endif
++
++
++.PHONY: links
++links: libflash ccan common
++
++libflash:
++	$(Q_LN)ln -sf ../../libflash ./libflash
++
++ccan:
++	$(Q_LN)ln -sf ../../ccan ./ccan
++
++common:
++	$(Q_LN)ln -sf ../common ./common
++
++make_version.sh:
++	$(Q_LN)ln -sf ../../make_version.sh
++
+ ARCH_SRC := $(addprefix common/,$(ARCH_FILES))
+ ARCH_OBJS := $(addprefix common-,$(ARCH_FILES:.c=.o))
+ 
+diff --git a/external/gard/Makefile b/external/gard/Makefile
+index be3d1ba..b54923d 100644
+--- a/external/gard/Makefile
++++ b/external/gard/Makefile
+@@ -3,22 +3,7 @@ include rules.mk
+ GET_ARCH = ../../external/common/get_arch.sh
+ include ../../external/common/rules.mk
+ 
+-all: $(EXE)
+-
+-.PHONY: links
+-links: libflash ccan common make_version.sh
+-
+-libflash:
+-	ln -sf ../../libflash .
+-
+-ccan:
+-	ln -sf ../../ccan .
+-
+-common:
+-	ln -sf ../common .
+-
+-make_version.sh:
+-	ln -sf ../../make_version.sh
++all: links arch_links $(EXE)
+ 
+ #Rebuild version.o so that the the version always matches
+ #what the test suite will get from ./make_version.sh
+@@ -26,7 +11,7 @@ check: version.o all
+ 	@ln -sf ../../test/test.sh test/test.sh
+ 	@test/test-gard
+ 
+-$(OBJS): | links arch_links
++links += make_version.sh
+ 
+ .PHONY: VERSION-always
+ .version: VERSION-always
+diff --git a/external/opal-prd/Makefile b/external/opal-prd/Makefile
+index 3f34371..e89f73d 100644
+--- a/external/opal-prd/Makefile
++++ b/external/opal-prd/Makefile
+@@ -10,19 +10,11 @@ sbindir = $(prefix)/sbin
+ datadir = $(prefix)/share
+ mandir = $(datadir)/man
+ 
+-all: opal-prd
++all: links arch_links | opal-prd
+ 
+ GET_ARCH = ../../external/common/get_arch.sh
+ include ../../external/common/rules.mk
+ 
+-# Use make V=1 for a verbose build.
+-ifndef V
+-        Q_CC=	@echo '    CC ' $@;
+-        Q_LINK=	@echo '  LINK ' $@;
+-        Q_LN=   @echo '    LN ' $@;
+-        Q_MKDIR=@echo ' MKDIR ' $@;
+-endif
+-
+ LIBFLASH_OBJS = libflash-blocklevel.o libflash-libffs.o \
+                 libflash-libflash.o libflash-ecc.o \
+                 libflash-file.o
+@@ -30,30 +22,17 @@ LIBFLASH_OBJS = libflash-blocklevel.o libflash-libffs.o \
+ OBJS = opal-prd.o thunk.o pnor.o i2c.o module.o version.o \
+        $(LIBFLASH_OBJS) common-arch_flash.o
+ 
+-LINKS = ccan common libflash $(ARCH_LINKS)
+-
+ OPAL_PRD_VERSION ?= $(shell ../../make_version.sh opal-prd)
+ 
+ ifdef KERNEL_DIR
+-LINKS += asm/opal-prd.h
++links += asm/opal-prd.h
+ endif
+ 
+-ccan:
+-	$(Q_LN)ln -sfr ../../ccan ./ccan
+-
+-libflash:
+-	$(Q_LN)ln -sfr ../../libflash ./libflash
+-
+-common:
+-	$(Q_LN)ln -sfr ../common ./common
+-
+ asm/opal-prd.h:
+ 	$(Q_MKDIR)mkdir -p asm
+ 	$(Q_LN)ln -sfr $(KERNEL_DIR)/arch/powerpc/include/uapi/asm/opal-prd.h \
+ 			asm/opal-prd.h
+ 
+-$(OBJS): | $(LINKS)
+-
+ %.o: %.c
+ 	$(Q_CC)$(COMPILE.c) $< -o $@
+ 
+diff --git a/external/pflash/Makefile b/external/pflash/Makefile
+index 9d7c183..bc371a3 100644
+--- a/external/pflash/Makefile
++++ b/external/pflash/Makefile
+@@ -1,30 +1,8 @@
+-# Use make V=1 for a verbose build.
+-ifndef V
+-        Q_CC=	@echo '    CC ' $@;
+-        Q_LD=	@echo '    LD ' $@;
+-        Q_LN=   @echo '    LN ' $@;
+-        Q_MKDIR=@echo ' MKDIR ' $@;
+-endif
+-
+ include rules.mk
+ GET_ARCH = ../../external/common/get_arch.sh
+ include ../../external/common/rules.mk
+ 
+-all: $(EXE)
+-
+-.PHONY: links
+-links: libflash ccan common
+-
+-libflash:
+-	$(Q_LN)ln -sf ../../libflash .
+-
+-ccan:
+-	$(Q_LN)ln -sf ../../ccan .
+-
+-common:
+-	$(Q_LN)ln -sf ../common .
+-
+-$(OBJS): | links arch_links
++all: links arch_links $(EXE)
+ 
+ .PHONY: VERSION-always
+ .version: VERSION-always
+-- 
+1.8.3.1
+
