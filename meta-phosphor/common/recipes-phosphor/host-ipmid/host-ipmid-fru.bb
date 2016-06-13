@@ -18,10 +18,11 @@ TARGET_CFLAGS += " -fpic -std=gnu++14"
 
 SRC_URI += "git://github.com/openbmc/ipmi-fru-parser"
 
-SRCREV = "2f5a3cfd2412c7e10d128a856ad2c37c8a1b4a10"
+SRCREV = "bf9385f56f715426ff2ac3a1d77af6b6d1575fe1"
 
-FILES_${PN} += "${libdir}/host-ipmid/*.so"
-FILES_${PN}-dbg += "${libdir}/host-ipmid/.debug"
+FILES_SOLIBSDEV += "${libdir}/host-ipmid/lib*${SOLIBSDEV}"
+FILES_${PN} += "${libdir}/host-ipmid/lib*${SOLIBS}"
+FILES_${PN}-dbg += "${libdir}/host-ipmid/.debug/lib*${SOLIBS}"
 
 S = "${WORKDIR}/git"
 
