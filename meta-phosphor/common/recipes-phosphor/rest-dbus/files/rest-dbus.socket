@@ -1,0 +1,8 @@
+[Unit]
+Description=DBUS introspecting REST server socket.
+
+[Socket]
+ListenStream=3000
+
+[Install]
+WantedBy=sockets.target
