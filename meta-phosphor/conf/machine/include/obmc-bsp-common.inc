@@ -15,7 +15,7 @@ MACHINEOVERRIDES =. "openbmc:"
 
 IMAGE_FSTYPES += "overlay"
 IMAGE_FSTYPES += "cpio.${INITRAMFS_CTYPE}.u-boot"
-IMAGE_INSTALL += "u-boot-fw-utils"
+OBMC_IMAGE_EXTRA_INSTALL_append = " u-boot-fw-utils"
 
 IMAGE_CLASSES += "obmc-phosphor-image_types_uboot"
 
