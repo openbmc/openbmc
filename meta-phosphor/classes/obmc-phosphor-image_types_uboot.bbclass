@@ -51,6 +51,8 @@ do_generate_flash() {
        uinitrd="${initrd}.u-boot"
        rootfs="${IMAGE_LINK_NAME}.${IMAGE_BASETYPE}"
        rwfs="rwfs.${OVERLAY_BASETYPE}"
+       rofsimg=rofs.${IMAGE_BASETYPE}.cpio
+       netimg=initramfs-netboot.cpio
 
        if [ ! -f $ddir/$kernel ]; then
               bbfatal "Kernel file ${ddir}/${kernel} does not exist"
@@ -94,4 +96,12 @@ do_generate_flash() {
 
        tar -h -cvf ${ddir}/${MACHINE}-${DATETIME}.all.tar -C ${ddir} image-bmc
        tar -h -cvf ${ddir}/${MACHINE}-${DATETIME}.tar -C ${ddir} image-u-boot image-kernel image-initramfs image-rofs image-rwfs
+
+       # Package the root image (rofs layer) with the initramfs for net booting.
+       # Uses the symlink above to get the desired name in the cpio
+       ( cd $ddir && echo image-rofs | cpio -oHnewc -L > ${rofsimg} )
+       # Prepend the rofs cpio -- being uncompressed it must be 4-byte aligned
+       cat ${ddir}/${rofsimg} ${ddir}/${initrd} > ${ddir}/${netimg}
+       oe_mkimage  "${netimg}" "${INITRD_CTYPE}"
+
 }
