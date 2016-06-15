@@ -36,14 +36,16 @@ IMAGE_FEATURES += " \
         ssh-server-dropbear \
         "
 
-IMAGE_INSTALL += " \
-        bash \
+CORE_IMAGE_EXTRA_INSTALL_append = " bash \
         packagegroup-obmc-phosphor-apps-extras \
         i2c-tools \
         screen \
         inarp \
         obmc-console \
+        ${OBMC_IMAGE_EXTRA_INSTALL} \
         "
+
+OBMC_IMAGE_EXTRA_INSTALL ?= ""
 
 def build_overlay(d):
         if bb.utils.contains("IMAGE_FSTYPES", "overlay", "overlay", "0", d) != "0":

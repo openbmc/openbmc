@@ -3,7 +3,7 @@ Description=Temp placeholder for skeleton function
 
 [Service]
 Restart=always
-ExecStart=/usr/sbin/system_manager.py Palmetto
+ExecStart=/usr/sbin/system_manager.py
 
 [Install]
 WantedBy=multi-user.target

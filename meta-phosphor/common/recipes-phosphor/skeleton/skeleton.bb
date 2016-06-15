@@ -11,34 +11,39 @@ inherit obmc-phosphor-flash-mgmt
 inherit obmc-phosphor-policy-mgmt
 inherit obmc-phosphor-sensor-mgmt
 inherit obmc-phosphor-system-mgmt
+inherit pythonnative
+inherit python-dir
+
+VIRTUAL-RUNTIME_skeleton_workbook ?= ""
 
 DEPENDS += "glib-2.0 systemd"
-RDEPENDS_${PN} += "python-subprocess python-compression libsystemd"
+RDEPENDS_${PN} += "python-subprocess python-compression libsystemd ${VIRTUAL-RUNTIME_skeleton_workbook}"
 SRC_URI += "git://github.com/openbmc/skeleton"
+
+FILES_${PN} += "${PYTHON_SITEPACKAGES_DIR}/*"
 
 # RDEPEND on pflash if the openpower-pflash machine feature is set.
 PACKAGECONFIG ??= "${@bb.utils.contains('MACHINE_FEATURES', 'openpower-pflash', 'openpower-pflash', '', d)}"
 PACKAGECONFIG[openpower-pflash] = ",,,pflash"
 
-SRCREV = "b2f3fd7a29ddf16ea6171b4b4649d9a0ea8be58d"
+SRCREV = "40187443840d0e419c13391b2091fda29d63dea4"
 
 S = "${WORKDIR}"
 
-do_compile() {
-        oe_runmake -C git
+# needed to invoke setuptools
+export STAGING_INCDIR
+export STAGING_LIBDIR
+export BUILD_SYS
+export HOST_SYS
+export PYTHON_SITEPACKAGES_DIR
 
-        # Remove deprecated files.
-        rm ${S}/git/bin/pflash
+do_compile() {
+        oe_runmake -C git PYTHON=${PYTHON}
 }
 
 do_install() {
-        source=${S}/git
-
-        install -d ${D}/${sbindir} ${D}${libdir}
-        for i in ${source}/bin/*; do
-                install $i ${D}/${sbindir}
-        done
-        for i in ${source}/lib/*; do
-                install $i ${D}/${libdir}
-        done
+        oe_runmake -C git install \
+                PYTHON=${PYTHON} \
+                DESTDIR=${D} \
+                PREFIX=/usr
 }
