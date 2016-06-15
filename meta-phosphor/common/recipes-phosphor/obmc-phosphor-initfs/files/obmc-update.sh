@@ -103,6 +103,24 @@ E="ERROR:"
 while test "$1" != "${1#-}"
 do
 	case "$1" in
+	--help)
+		cat <<HERE
+Usage: $0 [options] -- Write images in /run/initramfs to flash (/dev/mtd*)
+    --help                    Show this message
+    --no-flash	              Don't attempt to write images to flash
+    --ignore-size             Don't compare image size to mtd device size
+    --ignore-mount            Don't check if destination is mounted
+    --save-files              Copy whitelisted files to save directory in RAM
+    --no-save-files           Don't copy whitelisted files to save directory
+    --copy-files              Copy files from save directory to rwfs mountpoint
+    --restore-files           Restore files from save directory to rwfs layer
+    --no-restore-files        Don't restore saved files from ram to rwfs layer
+    --clean-saved-files       Delete saved whitelisted files from RAM
+    --no-clean-saved-files    Retain saved whitelisted files in RAM
+HERE
+
+	    exit 0 ;;
+
 	--no-clean-saved-files)
 		doclean=
 		shift ;;
@@ -135,7 +153,7 @@ do
 		toram=y
 		shift ;;
 	*)
-		echo 1>&2 "$E Unknown option $1"
+		echo 1>&2 "$E Unknown option $1.  Try $0 --help."
 		exit 1 ;;
 	esac
 done
