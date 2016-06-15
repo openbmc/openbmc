@@ -2,6 +2,10 @@
 
 echo update: "$@"
 
+echoerr() {
+	echo 1>&2 "ERROR: $@"
+}
+
 cd /
 if ! test -r /proc/mounts || ! test -f /proc/mounts
 then
@@ -21,7 +25,7 @@ fi
 
 if grep mtd /proc/mounts
 then
-	echo 1>&2 "Error: A mtd device is mounted."
+	echoerr "A mtd device is mounted."
 	exit 1
 fi
 
@@ -90,7 +94,7 @@ do
 		toram=y
 		shift ;;
 	*)
-		echo 2>&1 "Unknown option $1"
+		echoerr "Unknown option $1"
 		exit 1 ;;
 	esac
 done
@@ -126,7 +130,7 @@ do
 	m=$(findmtd ${f#$image})
 	if test -z "$m"
 	then
-		echo 1>&2  "Unable to find mtd partiton for ${f##*/}."
+		echoerr "Unable to find mtd partiton for ${f##*/}."
 		exit 1
 	fi
 done
