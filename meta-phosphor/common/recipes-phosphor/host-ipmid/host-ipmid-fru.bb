@@ -7,10 +7,10 @@ RRECOMMENDS_${PN} = "virtual/obmc-phosphor-host-ipmi-hw"
 
 inherit obmc-phosphor-license
 
-DEPENDS += "systemd    \
-		 	host-ipmid \
-		 	"
-
+DEPENDS += " \
+        systemd \
+        host-ipmid \
+        "
 
 RDEPENDS_${PN} += "libsystemd"
 
@@ -18,17 +18,14 @@ TARGET_CFLAGS += " -fpic -std=gnu++14"
 
 SRC_URI += "git://github.com/openbmc/ipmi-fru-parser"
 
-SRCREV = "2f5a3cfd2412c7e10d128a856ad2c37c8a1b4a10"
+SRCREV = "bf9385f56f715426ff2ac3a1d77af6b6d1575fe1"
 
-FILES_${PN} += "${libdir}/host-ipmid/*.so"
-FILES_${PN}-dbg += "${libdir}/host-ipmid/.debug"
+FILES_SOLIBSDEV += "${libdir}/host-ipmid/lib*${SOLIBSDEV}"
+FILES_${PN} += "${libdir}/host-ipmid/lib*${SOLIBS}"
+FILES_${PN}-dbg += "${libdir}/host-ipmid/.debug/lib*${SOLIBS}"
 
 S = "${WORKDIR}/git"
 
 do_install() {
-	oe_runmake install DESTDIR=${D} LIBDIR=${libdir} BINDIR=${sbindir}
+        oe_runmake install DESTDIR=${D} LIBDIR=${libdir} BINDIR=${sbindir}
 }
-
-
-#        install -m 0755 -d ${D}${libdir}/host-ipmid
-#        install -m 0755 ${S}/*.so ${D}${libdir}/host-ipmid/
