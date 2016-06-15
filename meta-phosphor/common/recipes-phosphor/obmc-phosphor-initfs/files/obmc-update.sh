@@ -21,7 +21,7 @@ fi
 
 if grep mtd /proc/mounts
 then
-	echo 1>&2 "Error: A mtd device is mounted."
+	echo 1>&2 "ERROR: A mtd device is mounted."
 	exit 1
 fi
 
@@ -65,6 +65,8 @@ toram=
 whitelist=/run/initramfs/whitelist
 image=/run/initramfs/image-
 
+E="ERROR:"
+
 while test "$1" != "${1#-}"
 do
 	case "$1" in
@@ -90,7 +92,7 @@ do
 		toram=y
 		shift ;;
 	*)
-		echo 2>&1 "Unknown option $1"
+		echo 1>&2 "$E Unknown option $1"
 		exit 1 ;;
 	esac
 done
@@ -126,7 +128,7 @@ do
 	m=$(findmtd ${f#$image})
 	if test -z "$m"
 	then
-		echo 1>&2  "Unable to find mtd partiton for ${f##*/}."
+		echo 1>&2 "$E Unable to find mtd partiton for ${f##*/}."
 		exit 1
 	fi
 done
