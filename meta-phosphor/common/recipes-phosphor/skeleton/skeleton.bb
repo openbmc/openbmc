@@ -16,7 +16,7 @@ inherit python-dir
 
 VIRTUAL-RUNTIME_skeleton_workbook ?= ""
 
-DEPENDS += "glib-2.0 systemd"
+DEPENDS += "glib-2.0 systemd python"
 RDEPENDS_${PN} += "python-subprocess python-compression libsystemd ${VIRTUAL-RUNTIME_skeleton_workbook}"
 SRC_URI += "git://github.com/openbmc/skeleton"
 
