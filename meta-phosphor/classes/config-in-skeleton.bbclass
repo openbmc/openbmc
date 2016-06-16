@@ -3,7 +3,9 @@
 
 inherit allarch
 inherit setuptools
+inherit pythonnative
 
+DEPENDS += "python"
 SRC_URI += "git://github.com/openbmc/skeleton;subpath=configs"
 S = "${WORKDIR}/configs"
 
