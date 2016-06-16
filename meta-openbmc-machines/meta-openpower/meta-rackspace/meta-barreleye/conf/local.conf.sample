@@ -243,3 +243,7 @@ INHERIT += "extrausers"
 EXTRA_USERS_PARAMS = " \
   usermod -p '\$1\$UGMqyqdG\$FZiylVFmRRfl9Z0Ue8G7e/' root; \
   "
+
+# Package exclusions - Exclude packages included by default in the common image
+IMAGE_INSTALL_remove = "packagegroup-obmc-phosphor-apps-extrasdev"
+
