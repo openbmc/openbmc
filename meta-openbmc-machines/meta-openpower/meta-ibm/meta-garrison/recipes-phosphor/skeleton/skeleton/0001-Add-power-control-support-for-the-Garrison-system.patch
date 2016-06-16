@@ -1,5 +1,17 @@
---- a/git/objects/power_control_obj.c
-+++ b/git/objects/power_control_obj.c
+From c2f1b1115f6a7f814a05622a33984f5a4797fede Mon Sep 17 00:00:00 2001
+From: Brad Bishop <bradleyb@fuzziesquirrel.com>
+Date: Wed, 15 Jun 2016 21:16:43 -0400
+Subject: [PATCH] Add power control support for the Garrison system
+
+Signed-off-by: Brad Bishop <bradleyb@fuzziesquirrel.com>
+---
+ op-pwrctl/power_control_obj.c | 70 +++++++++++++++++++++++++++++--------------
+ 1 file changed, 48 insertions(+), 22 deletions(-)
+
+diff --git a/op-pwrctl/power_control_obj.c b/op-pwrctl/power_control_obj.c
+index 85a8cff..f6bc996 100644
+--- a/git/op-pwrctl/power_control_obj.c
++++ b/git/op-pwrctl/power_control_obj.c
 @@ -17,11 +17,15 @@ static const gchar* instance_name = "power0";
  static const gchar* dbus_name = "org.openbmc.control.Power";
  
@@ -111,3 +123,6 @@
  
  		uint8_t gpio;
  		rc = gpio_open(&pgood);
+-- 
+2.1.4
+
