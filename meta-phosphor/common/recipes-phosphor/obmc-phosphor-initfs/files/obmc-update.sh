@@ -102,6 +102,7 @@ checkmount=y
 
 whitelist=/run/initramfs/whitelist
 image=/run/initramfs/image-
+imglist=
 
 while test "$1" != "${1#-}"
 do
@@ -187,7 +188,15 @@ then
 	fi
 fi
 
-for f in $image*
+imglist=$(echo $image*)
+if test "$imglist" = "$image*" -a ! -e "$imglist"
+then
+	# shell didn't expand the wildcard, so no files exist
+	echo "No images found to update."
+	imglist=
+fi
+
+for f in $imglist
 do
 	m=$(findmtd ${f#$image})
 	if test -z "$m"
@@ -212,7 +221,7 @@ done
 
 if test -n "$doflash"
 then
-	for f in $image*
+	for f in $imglist
 	do
 		if test ! -s $f
 		then
