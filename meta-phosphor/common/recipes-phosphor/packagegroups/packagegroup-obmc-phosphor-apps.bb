@@ -13,6 +13,7 @@ VIRTUAL-RUNTIME_obmc-phosphor-flash-ctl ?= "virtual/obmc-phosphor-flash-ctl"
 PROVIDES = "${PACKAGES}"
 PACKAGES = " \
         packagegroup-obmc-phosphor-apps-extras \
+        packagegroup-obmc-phosphor-apps-extrasdev \
         ${@mf_enabled("obmc-phosphor-fan-mgmt", "packagegroup-obmc-phosphor-apps-fan-mgmt", d)} \
         ${@mf_enabled("obmc-phosphor-chassis-mgmt", "packagegroup-obmc-phosphor-apps-chassis-mgmt", d)} \
         ${@mf_enabled("obmc-phosphor-sensor-mgmt", "packagegroup-obmc-phosphor-apps-sensor-mgmt", d)} \
@@ -25,9 +26,13 @@ PACKAGES = " \
 
 SUMMARY_packagegroup-obmc-phosphor-apps-extras = "Extra features"
 RDEPENDS_packagegroup-obmc-phosphor-apps-extras = " \
-        rest-dbus \
 	obmc-rest \
         host-ipmid \
+        "
+
+SUMMARY_packagegroup-obmc-phosphor-apps-extrasdev = "Development features"
+RDEPENDS_packagegroup-obmc-phosphor-apps-extrasdev = " \
+        rest-dbus \
         "
 
 SUMMARY_packagegroup-obmc-phosphor-apps-fan-mgmt = "Fan management support"
