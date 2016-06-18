@@ -17,7 +17,7 @@ inherit python-dir
 VIRTUAL-RUNTIME_skeleton_workbook ?= ""
 
 DEPENDS += "glib-2.0 systemd python"
-RDEPENDS_${PN} += "python-subprocess python-compression libsystemd ${VIRTUAL-RUNTIME_skeleton_workbook}"
+RDEPENDS_${PN} += "python-json python-subprocess python-compression libsystemd ${VIRTUAL-RUNTIME_skeleton_workbook}"
 SRC_URI += "git://github.com/openbmc/skeleton"
 
 FILES_${PN} += "${PYTHON_SITEPACKAGES_DIR}/*"
@@ -26,7 +26,7 @@ FILES_${PN} += "${PYTHON_SITEPACKAGES_DIR}/*"
 PACKAGECONFIG ??= "${@bb.utils.contains('MACHINE_FEATURES', 'openpower-pflash', 'openpower-pflash', '', d)}"
 PACKAGECONFIG[openpower-pflash] = ",,,pflash"
 
-SRCREV = "40187443840d0e419c13391b2091fda29d63dea4"
+SRCREV = "cbe32133dadf0945357e2bec67aa7a86ae9f0295"
 
 S = "${WORKDIR}"
 
