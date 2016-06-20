@@ -23,6 +23,9 @@ SRC_URI = "${GNU_MIRROR}/guile/guile-${PV}.tar.xz \
            file://workaround-ice-ssa-corruption.patch \
            file://libguile-Makefile.am-hook.patch \
            file://libguile-VM-ASM_MUL-for-ARM-Add-earlyclobber.patch \
+           file://remove_strcase_l_funcs.patch \
+           file://0001-libguile-Check-for-strtol_l-during-configure.patch \
+           file://0002-Recognize-nios2-as-compilation-target.patch \
            "
 
 #           file://debian/0001-Change-guile-to-guile-X.Y-for-info-pages.patch
@@ -50,25 +53,19 @@ EXTRA_OECONF += "${@['--without-libltdl-prefix --without-libgmp-prefix --without
 EXTRA_OECONF_append_class-target = " --with-libunistring-prefix=${STAGING_LIBDIR} \
                                      --with-libgmp-prefix=${STAGING_LIBDIR} \
                                      --with-libltdl-prefix=${STAGING_LIBDIR}"
+EXTRA_OECONF_append_libc-uclibc = " guile_cv_use_csqrt=no "
+
+CFLAGS_append_libc-musl = " -DHAVE_GC_SET_FINALIZER_NOTIFIER \
+	                    -DHAVE_GC_GET_HEAP_USAGE_SAFE \
+	                    -DHAVE_GC_GET_FREE_SPACE_DIVISOR \
+	                    -DHAVE_GC_SET_FINALIZE_ON_DEMAND \
+                           "
 
 do_configure_prepend() {
 	mkdir -p po
 }
 
 export GUILE_FOR_BUILD="${BUILD_SYS}-guile"
-
-do_compile_append() {
-	# just for target recipe
-	if [ "${PN}" = "guile" ]
-	then
-		sed -i -e s:${STAGING_DIR_TARGET}::g \
-	               -e s:/${TARGET_SYS}::g \
-	               -e s:-L/usr/lib::g \
-        	       -e s:-isystem/usr/include::g \
-	               -e s:,/usr/lib:,\$\{libdir\}:g \
-	                  meta/guile-2.0.pc
-	fi
-}
 
 do_install_append_class-native() {
 	install -m 0755  ${D}${bindir}/guile ${D}${bindir}/${HOST_SYS}-guile
@@ -83,8 +80,14 @@ do_install_append_class-native() {
 
 do_install_append_class-target() {
 	# cleanup buildpaths in scripts
-	sed -i -e 's:${STAGING_DIR_NATIVE}::' ${D}/usr/bin/guile-config
-	sed -i -e 's:${STAGING_DIR_HOST}::' ${D}/usr/bin/guile-snarf
+	sed -i -e 's:${STAGING_DIR_NATIVE}::' ${D}${bindir}/guile-config
+	sed -i -e 's:${STAGING_DIR_HOST}::' ${D}${bindir}/guile-snarf
+
+	sed -i -e 's:${STAGING_DIR_TARGET}::g' ${D}${libdir}/pkgconfig/guile-2.0.pc
+}
+
+do_install_append_libc-musl() {
+	rm -f ${D}${libdir}/charset.alias
 }
 
 SYSROOT_PREPROCESS_FUNCS = "guile_cross_config"

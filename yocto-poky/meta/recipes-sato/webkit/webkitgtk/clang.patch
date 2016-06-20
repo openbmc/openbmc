@@ -1,0 +1,25 @@
+Clang's builtin for clear_cache accepts char* and errors out when using void*,
+using char* work on both gcc and clang since char* is auto-converted to void* in gcc case
+
+Source/JavaScriptCore/assembler/ARM64Assembler.h:2857:33: error: cannot initialize a parameter of type 'char *' with an rvalue of type 'void *'
+        __builtin___clear_cache(reinterpret_cast<void*>(begin), reinterpret_cast<void*>(end));
+                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Accepted
+
+Index: webkitgtk-2.8.5/Source/JavaScriptCore/assembler/ARM64Assembler.h
+===================================================================
+--- webkitgtk-2.8.5.orig/Source/JavaScriptCore/assembler/ARM64Assembler.h
++++ webkitgtk-2.8.5/Source/JavaScriptCore/assembler/ARM64Assembler.h
+@@ -2854,7 +2854,7 @@ public:
+ #if OS(LINUX) && COMPILER(GCC)
+     static inline void linuxPageFlush(uintptr_t begin, uintptr_t end)
+     {
+-        __builtin___clear_cache(reinterpret_cast<void*>(begin), reinterpret_cast<void*>(end));
++        __builtin___clear_cache(reinterpret_cast<char*>(begin), reinterpret_cast<char*>(end));
+     }
+ #endif
+ 

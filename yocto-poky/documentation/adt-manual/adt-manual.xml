@@ -91,6 +91,11 @@
                 <date>October 2015</date>
                 <revremark>Released with the Yocto Project 2.0 Release.</revremark>
             </revision>
+            <revision>
+                <revnumber>2.1</revnumber>
+                <date>Sometime in 2016</date>
+                <revremark>Released with the future Yocto Project 2.1 Release.</revremark>
+            </revision>
        </revhistory>
 
     <copyright>

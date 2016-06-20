@@ -1,5 +1,5 @@
 # remove tasks that modify the source tree in case externalsrc is inherited
-SRCTREECOVEREDTASKS += "do_kernel_link_vmlinux do_kernel_configme do_validate_branches do_kernel_configcheck do_kernel_checkout do_shared_workdir do_fetch do_unpack do_patch"
+SRCTREECOVEREDTASKS += "do_kernel_configme do_validate_branches do_kernel_configcheck do_kernel_checkout do_shared_workdir do_fetch do_unpack do_patch"
 
 # returns local (absolute) path names for all valid patches in the
 # src_uri
@@ -169,6 +169,17 @@ do_patch() {
 			bbfatal "Neither SRCREV_machine or SRCREV was specified!"
 		fi
 	fi
+
+        current_branch=`git rev-parse --abbrev-ref HEAD`
+        machine_branch="${@ get_machine_branch(d, "${KBRANCH}" )}"
+        if [ "${current_branch}" != "${machine_branch}" ]; then
+            bbwarn "After meta data application, the kernel tree branch is ${current_branch}. The"
+            bbwarn "SRC_URI specified branch ${machine_branch}. The branch will be forced to ${machine_branch},"
+            bbwarn "but this means the board meta data (.scc files) do not match the SRC_URI specification."
+            bbwarn "The meta data and branch ${machine_branch} should be inspected to ensure the proper"
+            bbwarn "kernel is being built."
+            git checkout -f ${machine_branch}
+        fi
 
 	if [ "${machine_srcrev}" != "AUTOINC" ]; then
 		if ! [ "$(git rev-parse --verify ${machine_srcrev}~0)" = "$(git merge-base ${machine_srcrev} HEAD)" ]; then
@@ -353,18 +364,6 @@ do_validate_branches() {
 			git reset --hard ${force_srcrev}
 		fi
 	fi
-}
-
-# Many scripts want to look in arch/$arch/boot for the bootable
-# image. This poses a problem for vmlinux based booting. This 
-# task arranges to have vmlinux appear in the normalized directory
-# location.
-do_kernel_link_vmlinux() {
-	if [ ! -d "${B}/arch/${ARCH}/boot" ]; then
-		mkdir ${B}/arch/${ARCH}/boot
-	fi
-	cd ${B}/arch/${ARCH}/boot
-	ln -sf ../../../vmlinux
 }
 
 OE_TERMINAL_EXPORTS += "KBUILD_OUTPUT"

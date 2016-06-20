@@ -1,0 +1,43 @@
+From 5f94f5ad46c1ded54c3797979d384e4c1eb77bb0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 5 Sep 2015 06:31:47 +0000
+Subject: [PATCH 10/36] implment systemd-sysv-install for OE
+
+Use update-rc.d for enabling/disabling and status command
+to check the status of the sysv service
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/systemctl/systemd-sysv-install.SKELETON | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/systemctl/systemd-sysv-install.SKELETON b/src/systemctl/systemd-sysv-install.SKELETON
+index a53a3e6..5d877b0 100755
+--- a/src/systemctl/systemd-sysv-install.SKELETON
++++ b/src/systemctl/systemd-sysv-install.SKELETON
+@@ -30,17 +30,17 @@ case "$1" in
+     enable)
+         # call the command to enable SysV init script $NAME here
+         # (consider optional $ROOT)
+-        echo "IMPLEMENT ME: enabling SysV init.d script $NAME"
++        update-rc.d -f $NAME defaults
+         ;;
+     disable)
+         # call the command to disable SysV init script $NAME here
+         # (consider optional $ROOT)
+-        echo "IMPLEMENT ME: disabling SysV init.d script $NAME"
++        update-rc.d -f $NAME remove
+         ;;
+     is-enabled)
+         # exit with 0 if $NAME is enabled, non-zero if it is disabled
+         # (consider optional $ROOT)
+-        echo "IMPLEMENT ME: checking SysV init.d script $NAME"
++        /etc/init.d/$NAME status
+         ;;
+     *)
+         usage ;;
+-- 
+1.8.3.1
+

@@ -221,10 +221,8 @@
                 </literallayout>
                 where <replaceable>bsp_name</replaceable> is the recognized
                 BSP name.
-                Here are some examples:
+                Here is an example:
                 <literallayout class='monospaced'>
-     meta-crownbay
-     meta-emenlow
      meta-raspberrypi
                 </literallayout>
                 See the
@@ -263,11 +261,12 @@
      $ cd ~/poky
      $ git clone git://git.yoctoproject.org/meta-intel.git
      Cloning into 'meta-intel'...
-     remote: Counting objects: 8844, done.
-     remote: Compressing objects: 100% (2864/2864), done.
-     remote: Total 8844 (delta 4931), reused 8780 (delta 4867)
-     Receiving objects: 100% (8844/8844), 2.48 MiB | 264 KiB/s, done.
-     Resolving deltas: 100% (4931/4931), done.
+     remote: Counting objects: 11917, done.
+     remote: Compressing objects: 100% (3842/3842), done.
+     remote: Total 11917 (delta 6840), reused 11699 (delta 6622)
+     Receiving objects: 100% (11917/11917), 2.92 MiB | 2.88 MiB/s, done.
+     Resolving deltas: 100% (6840/6840), done.
+     Checking connectivity... done.
                 </literallayout></para>
 
                 <para>The same
@@ -279,8 +278,9 @@
                 applications using the Eclipse Integrated Development Environment (IDE),
                 you will need this plug-in.
                 See the
-                "<link linkend='setting-up-the-eclipse-ide'>Setting up the Eclipse IDE</link>"
-                section for more information.</para></listitem>
+                "<ulink url='&YOCTO_DOCS_SDK_URL;#setting-up-the-eclipse-ide'>Setting up the Eclipse IDE</ulink>"
+                section in the Yocto Project Software Development Kit (SDK)
+                Developer's Guide for more information.</para></listitem>
         </itemizedlist>
     </para>
 </section>
@@ -341,14 +341,17 @@
     </para>
 
     <para>
-        Using a pre-built binary is ideal for developing software applications to run on your
-        target hardware.
-        To do this, you need to be able to access the appropriate cross-toolchain tarball for
-        the architecture on which you are developing.
-        If you are using an SDK type image, the image ships with the complete toolchain native to
-        the architecture.
-        If you are not using an SDK type image, you need to separately download and
-        install the stand-alone Yocto Project cross-toolchain tarball.
+        Using a pre-built binary is ideal for developing software
+        applications to run on your target hardware.
+        To do this, you need to be able to access the appropriate
+        cross-toolchain tarball for the architecture on which you are
+        developing.
+        If you are using an SDK type image, the image ships with the complete
+        toolchain native to the architecture (i.e. a toolchain designed to
+        run on the
+        <ulink url='&YOCTO_DOCS_REF_URL;#var-SDKMACHINE'><filename>SDKMACHINE</filename></ulink>).
+        If you are not using an SDK type image, you need to separately download
+        and install the stand-alone Yocto Project cross-toolchain tarball.
     </para>
 
     <para>
@@ -363,8 +366,7 @@
         by sourcing an environment setup script.
         Finally, you start the QEMU emulator.
         You can find details on all these steps in the
-        "<ulink url='&YOCTO_DOCS_QS_URL;#using-pre-built'>Example Using Pre-Built Binaries and QEMU</ulink>"
-        section of the Yocto Project Application Developer's Guide.
+        <ulink url='&YOCTO_DOCS_SDK_URL;#sdk-manual'>Yocto Project Software Development Kit (SDK) Developer's Guide</ulink>.
         You can learn more about using QEMU with the Yocto Project in the
         "<link linkend='dev-manual-qemu'>Using the Quick EMUlator (QEMU)</link>"
         section.

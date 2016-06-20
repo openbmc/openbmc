@@ -8,7 +8,8 @@ PRSERV_DUMPFILE ??= "${PRSERV_DUMPDIR}/prserv.inc"
 
 python prexport_handler () {
     import bb.event
-    if not e.data:
+    if not e.data or bb.data.inherits_class('native', e.data) or \
+        bb.data.inherits_class('crosssdk', e.data):
         return
 
     if isinstance(e, bb.event.RecipeParsed):
@@ -21,7 +22,7 @@ python prexport_handler () {
             bb.fatal("prexport_handler: export failed!")
         (metainfo, datainfo) = retval
         if not datainfo:
-            bb.warn("prexport_handler: No AUTOPR values found for %s" % ver)
+            bb.note("prexport_handler: No AUTOPR values found for %s" % ver)
             return
         oe.prservice.prserv_export_tofile(e.data, None, datainfo, False)
         if 'AUTOINC' in ver:

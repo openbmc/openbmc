@@ -1,400 +1,504 @@
 # -*- coding: utf-8 -*-
-from south.utils import datetime_utils as datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import migrations, models
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'Build'
-        db.create_table(u'orm_build', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('machine', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('image_fstypes', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('distro', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('distro_version', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('started_on', self.gf('django.db.models.fields.DateTimeField')()),
-            ('completed_on', self.gf('django.db.models.fields.DateTimeField')()),
-            ('outcome', self.gf('django.db.models.fields.IntegerField')(default=2)),
-            ('errors_no', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('warnings_no', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('cooker_log_path', self.gf('django.db.models.fields.CharField')(max_length=500)),
-            ('build_name', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('bitbake_version', self.gf('django.db.models.fields.CharField')(max_length=50)),
-        ))
-        db.send_create_signal(u'orm', ['Build'])
+    dependencies = [
+    ]
 
-        # Adding model 'Target'
-        db.create_table(u'orm_target', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('build', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['orm.Build'])),
-            ('target', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('is_image', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('file_name', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('file_size', self.gf('django.db.models.fields.IntegerField')()),
-        ))
-        db.send_create_signal(u'orm', ['Target'])
-
-        # Adding model 'Task'
-        db.create_table(u'orm_task', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('build', self.gf('django.db.models.fields.related.ForeignKey')(related_name='task_build', to=orm['orm.Build'])),
-            ('order', self.gf('django.db.models.fields.IntegerField')(null=True)),
-            ('task_executed', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('outcome', self.gf('django.db.models.fields.IntegerField')(default=5)),
-            ('sstate_checksum', self.gf('django.db.models.fields.CharField')(max_length=100, blank=True)),
-            ('path_to_sstate_obj', self.gf('django.db.models.fields.FilePathField')(max_length=500, blank=True)),
-            ('recipe', self.gf('django.db.models.fields.related.ForeignKey')(related_name='build_recipe', to=orm['orm.Recipe'])),
-            ('task_name', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('source_url', self.gf('django.db.models.fields.FilePathField')(max_length=255, blank=True)),
-            ('work_directory', self.gf('django.db.models.fields.FilePathField')(max_length=255, blank=True)),
-            ('script_type', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('line_number', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('disk_io', self.gf('django.db.models.fields.IntegerField')(null=True)),
-            ('cpu_usage', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=6, decimal_places=2)),
-            ('elapsed_time', self.gf('django.db.models.fields.CharField')(default=0, max_length=50)),
-            ('sstate_result', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('message', self.gf('django.db.models.fields.CharField')(max_length=240)),
-            ('logfile', self.gf('django.db.models.fields.FilePathField')(max_length=255, blank=True)),
-        ))
-        db.send_create_signal(u'orm', ['Task'])
-
-        # Adding model 'Task_Dependency'
-        db.create_table(u'orm_task_dependency', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('task', self.gf('django.db.models.fields.related.ForeignKey')(related_name='task_dependencies_task', to=orm['orm.Task'])),
-            ('depends_on', self.gf('django.db.models.fields.related.ForeignKey')(related_name='task_dependencies_depends', to=orm['orm.Task'])),
-        ))
-        db.send_create_signal(u'orm', ['Task_Dependency'])
-
-        # Adding model 'Package'
-        db.create_table(u'orm_package', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('build', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['orm.Build'])),
-            ('recipe', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['orm.Recipe'], null=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('version', self.gf('django.db.models.fields.CharField')(max_length=100, blank=True)),
-            ('revision', self.gf('django.db.models.fields.CharField')(max_length=32, blank=True)),
-            ('summary', self.gf('django.db.models.fields.CharField')(max_length=200, blank=True)),
-            ('description', self.gf('django.db.models.fields.CharField')(max_length=200, blank=True)),
-            ('size', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('installed_size', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('section', self.gf('django.db.models.fields.CharField')(max_length=80, blank=True)),
-            ('license', self.gf('django.db.models.fields.CharField')(max_length=80, blank=True)),
-        ))
-        db.send_create_signal(u'orm', ['Package'])
-
-        # Adding model 'Package_Dependency'
-        db.create_table(u'orm_package_dependency', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('package', self.gf('django.db.models.fields.related.ForeignKey')(related_name='package_dependencies_source', to=orm['orm.Package'])),
-            ('depends_on', self.gf('django.db.models.fields.related.ForeignKey')(related_name='package_dependencies_target', to=orm['orm.Package'])),
-            ('dep_type', self.gf('django.db.models.fields.IntegerField')()),
-            ('target', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['orm.Target'], null=True)),
-        ))
-        db.send_create_signal(u'orm', ['Package_Dependency'])
-
-        # Adding model 'Target_Installed_Package'
-        db.create_table(u'orm_target_installed_package', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('target', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['orm.Target'])),
-            ('package', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['orm.Package'])),
-        ))
-        db.send_create_signal(u'orm', ['Target_Installed_Package'])
-
-        # Adding model 'Package_File'
-        db.create_table(u'orm_package_file', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('package', self.gf('django.db.models.fields.related.ForeignKey')(related_name='buildfilelist_package', to=orm['orm.Package'])),
-            ('path', self.gf('django.db.models.fields.FilePathField')(max_length=255, blank=True)),
-            ('size', self.gf('django.db.models.fields.IntegerField')()),
-        ))
-        db.send_create_signal(u'orm', ['Package_File'])
-
-        # Adding model 'Recipe'
-        db.create_table(u'orm_recipe', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=100, blank=True)),
-            ('version', self.gf('django.db.models.fields.CharField')(max_length=100, blank=True)),
-            ('layer_version', self.gf('django.db.models.fields.related.ForeignKey')(related_name='recipe_layer_version', to=orm['orm.Layer_Version'])),
-            ('summary', self.gf('django.db.models.fields.CharField')(max_length=100, blank=True)),
-            ('description', self.gf('django.db.models.fields.CharField')(max_length=100, blank=True)),
-            ('section', self.gf('django.db.models.fields.CharField')(max_length=100, blank=True)),
-            ('license', self.gf('django.db.models.fields.CharField')(max_length=200, blank=True)),
-            ('licensing_info', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('homepage', self.gf('django.db.models.fields.URLField')(max_length=200, blank=True)),
-            ('bugtracker', self.gf('django.db.models.fields.URLField')(max_length=200, blank=True)),
-            ('file_path', self.gf('django.db.models.fields.FilePathField')(max_length=255)),
-        ))
-        db.send_create_signal(u'orm', ['Recipe'])
-
-        # Adding model 'Recipe_Dependency'
-        db.create_table(u'orm_recipe_dependency', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('recipe', self.gf('django.db.models.fields.related.ForeignKey')(related_name='r_dependencies_recipe', to=orm['orm.Recipe'])),
-            ('depends_on', self.gf('django.db.models.fields.related.ForeignKey')(related_name='r_dependencies_depends', to=orm['orm.Recipe'])),
-            ('dep_type', self.gf('django.db.models.fields.IntegerField')()),
-        ))
-        db.send_create_signal(u'orm', ['Recipe_Dependency'])
-
-        # Adding model 'Layer'
-        db.create_table(u'orm_layer', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('local_path', self.gf('django.db.models.fields.FilePathField')(max_length=255)),
-            ('layer_index_url', self.gf('django.db.models.fields.URLField')(max_length=200)),
-        ))
-        db.send_create_signal(u'orm', ['Layer'])
-
-        # Adding model 'Layer_Version'
-        db.create_table(u'orm_layer_version', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('build', self.gf('django.db.models.fields.related.ForeignKey')(related_name='layer_version_build', to=orm['orm.Build'])),
-            ('layer', self.gf('django.db.models.fields.related.ForeignKey')(related_name='layer_version_layer', to=orm['orm.Layer'])),
-            ('branch', self.gf('django.db.models.fields.CharField')(max_length=50)),
-            ('commit', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('priority', self.gf('django.db.models.fields.IntegerField')()),
-        ))
-        db.send_create_signal(u'orm', ['Layer_Version'])
-
-        # Adding model 'Variable'
-        db.create_table(u'orm_variable', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('build', self.gf('django.db.models.fields.related.ForeignKey')(related_name='variable_build', to=orm['orm.Build'])),
-            ('variable_name', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('variable_value', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('changed', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('human_readable_name', self.gf('django.db.models.fields.CharField')(max_length=200)),
-            ('description', self.gf('django.db.models.fields.TextField')(blank=True)),
-        ))
-        db.send_create_signal(u'orm', ['Variable'])
-
-        # Adding model 'VariableHistory'
-        db.create_table(u'orm_variablehistory', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('variable', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['orm.Variable'])),
-            ('file_name', self.gf('django.db.models.fields.FilePathField')(max_length=255)),
-            ('line_number', self.gf('django.db.models.fields.IntegerField')(null=True)),
-            ('operation', self.gf('django.db.models.fields.CharField')(max_length=16)),
-        ))
-        db.send_create_signal(u'orm', ['VariableHistory'])
-
-        # Adding model 'LogMessage'
-        db.create_table(u'orm_logmessage', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('build', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['orm.Build'])),
-            ('level', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('message', self.gf('django.db.models.fields.CharField')(max_length=240)),
-            ('pathname', self.gf('django.db.models.fields.FilePathField')(max_length=255, blank=True)),
-            ('lineno', self.gf('django.db.models.fields.IntegerField')(null=True)),
-        ))
-        db.send_create_signal(u'orm', ['LogMessage'])
-
-
-    def backwards(self, orm):
-        # Deleting model 'Build'
-        db.delete_table(u'orm_build')
-
-        # Deleting model 'Target'
-        db.delete_table(u'orm_target')
-
-        # Deleting model 'Task'
-        db.delete_table(u'orm_task')
-
-        # Deleting model 'Task_Dependency'
-        db.delete_table(u'orm_task_dependency')
-
-        # Deleting model 'Package'
-        db.delete_table(u'orm_package')
-
-        # Deleting model 'Package_Dependency'
-        db.delete_table(u'orm_package_dependency')
-
-        # Deleting model 'Target_Installed_Package'
-        db.delete_table(u'orm_target_installed_package')
-
-        # Deleting model 'Package_File'
-        db.delete_table(u'orm_package_file')
-
-        # Deleting model 'Recipe'
-        db.delete_table(u'orm_recipe')
-
-        # Deleting model 'Recipe_Dependency'
-        db.delete_table(u'orm_recipe_dependency')
-
-        # Deleting model 'Layer'
-        db.delete_table(u'orm_layer')
-
-        # Deleting model 'Layer_Version'
-        db.delete_table(u'orm_layer_version')
-
-        # Deleting model 'Variable'
-        db.delete_table(u'orm_variable')
-
-        # Deleting model 'VariableHistory'
-        db.delete_table(u'orm_variablehistory')
-
-        # Deleting model 'LogMessage'
-        db.delete_table(u'orm_logmessage')
-
-
-    models = {
-        u'orm.build': {
-            'Meta': {'object_name': 'Build'},
-            'bitbake_version': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'build_name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'completed_on': ('django.db.models.fields.DateTimeField', [], {}),
-            'cooker_log_path': ('django.db.models.fields.CharField', [], {'max_length': '500'}),
-            'distro': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'distro_version': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'errors_no': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'image_fstypes': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'machine': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'outcome': ('django.db.models.fields.IntegerField', [], {'default': '2'}),
-            'started_on': ('django.db.models.fields.DateTimeField', [], {}),
-            'warnings_no': ('django.db.models.fields.IntegerField', [], {'default': '0'})
-        },
-        u'orm.layer': {
-            'Meta': {'object_name': 'Layer'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'layer_index_url': ('django.db.models.fields.URLField', [], {'max_length': '200'}),
-            'local_path': ('django.db.models.fields.FilePathField', [], {'max_length': '255'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        u'orm.layer_version': {
-            'Meta': {'object_name': 'Layer_Version'},
-            'branch': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'build': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'layer_version_build'", 'to': u"orm['orm.Build']"}),
-            'commit': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'layer': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'layer_version_layer'", 'to': u"orm['orm.Layer']"}),
-            'priority': ('django.db.models.fields.IntegerField', [], {})
-        },
-        u'orm.logmessage': {
-            'Meta': {'object_name': 'LogMessage'},
-            'build': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['orm.Build']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'level': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'lineno': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
-            'message': ('django.db.models.fields.CharField', [], {'max_length': '240'}),
-            'pathname': ('django.db.models.fields.FilePathField', [], {'max_length': '255', 'blank': 'True'})
-        },
-        u'orm.package': {
-            'Meta': {'object_name': 'Package'},
-            'build': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['orm.Build']"}),
-            'description': ('django.db.models.fields.CharField', [], {'max_length': '200', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'installed_size': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'license': ('django.db.models.fields.CharField', [], {'max_length': '80', 'blank': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'recipe': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['orm.Recipe']", 'null': 'True'}),
-            'revision': ('django.db.models.fields.CharField', [], {'max_length': '32', 'blank': 'True'}),
-            'section': ('django.db.models.fields.CharField', [], {'max_length': '80', 'blank': 'True'}),
-            'size': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'summary': ('django.db.models.fields.CharField', [], {'max_length': '200', 'blank': 'True'}),
-            'version': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'True'})
-        },
-        u'orm.package_dependency': {
-            'Meta': {'object_name': 'Package_Dependency'},
-            'dep_type': ('django.db.models.fields.IntegerField', [], {}),
-            'depends_on': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'package_dependencies_target'", 'to': u"orm['orm.Package']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'package': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'package_dependencies_source'", 'to': u"orm['orm.Package']"}),
-            'target': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['orm.Target']", 'null': 'True'})
-        },
-        u'orm.package_file': {
-            'Meta': {'object_name': 'Package_File'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'package': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'buildfilelist_package'", 'to': u"orm['orm.Package']"}),
-            'path': ('django.db.models.fields.FilePathField', [], {'max_length': '255', 'blank': 'True'}),
-            'size': ('django.db.models.fields.IntegerField', [], {})
-        },
-        u'orm.recipe': {
-            'Meta': {'object_name': 'Recipe'},
-            'bugtracker': ('django.db.models.fields.URLField', [], {'max_length': '200', 'blank': 'True'}),
-            'description': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'True'}),
-            'file_path': ('django.db.models.fields.FilePathField', [], {'max_length': '255'}),
-            'homepage': ('django.db.models.fields.URLField', [], {'max_length': '200', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'layer_version': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'recipe_layer_version'", 'to': u"orm['orm.Layer_Version']"}),
-            'license': ('django.db.models.fields.CharField', [], {'max_length': '200', 'blank': 'True'}),
-            'licensing_info': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'True'}),
-            'section': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'True'}),
-            'summary': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'True'}),
-            'version': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'True'})
-        },
-        u'orm.recipe_dependency': {
-            'Meta': {'object_name': 'Recipe_Dependency'},
-            'dep_type': ('django.db.models.fields.IntegerField', [], {}),
-            'depends_on': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'r_dependencies_depends'", 'to': u"orm['orm.Recipe']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'recipe': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'r_dependencies_recipe'", 'to': u"orm['orm.Recipe']"})
-        },
-        u'orm.target': {
-            'Meta': {'object_name': 'Target'},
-            'build': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['orm.Build']"}),
-            'file_name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'file_size': ('django.db.models.fields.IntegerField', [], {}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_image': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'target': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        u'orm.target_installed_package': {
-            'Meta': {'object_name': 'Target_Installed_Package'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'package': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['orm.Package']"}),
-            'target': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['orm.Target']"})
-        },
-        u'orm.task': {
-            'Meta': {'ordering': "('order', 'recipe')", 'object_name': 'Task'},
-            'build': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'task_build'", 'to': u"orm['orm.Build']"}),
-            'cpu_usage': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '6', 'decimal_places': '2'}),
-            'disk_io': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
-            'elapsed_time': ('django.db.models.fields.CharField', [], {'default': '0', 'max_length': '50'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'line_number': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'logfile': ('django.db.models.fields.FilePathField', [], {'max_length': '255', 'blank': 'True'}),
-            'message': ('django.db.models.fields.CharField', [], {'max_length': '240'}),
-            'order': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
-            'outcome': ('django.db.models.fields.IntegerField', [], {'default': '5'}),
-            'path_to_sstate_obj': ('django.db.models.fields.FilePathField', [], {'max_length': '500', 'blank': 'True'}),
-            'recipe': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'build_recipe'", 'to': u"orm['orm.Recipe']"}),
-            'script_type': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'source_url': ('django.db.models.fields.FilePathField', [], {'max_length': '255', 'blank': 'True'}),
-            'sstate_checksum': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'True'}),
-            'sstate_result': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'task_executed': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'task_name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'work_directory': ('django.db.models.fields.FilePathField', [], {'max_length': '255', 'blank': 'True'})
-        },
-        u'orm.task_dependency': {
-            'Meta': {'object_name': 'Task_Dependency'},
-            'depends_on': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'task_dependencies_depends'", 'to': u"orm['orm.Task']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'task': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'task_dependencies_task'", 'to': u"orm['orm.Task']"})
-        },
-        u'orm.variable': {
-            'Meta': {'object_name': 'Variable'},
-            'build': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'variable_build'", 'to': u"orm['orm.Build']"}),
-            'changed': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'human_readable_name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'variable_name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'variable_value': ('django.db.models.fields.TextField', [], {'blank': 'True'})
-        },
-        u'orm.variablehistory': {
-            'Meta': {'object_name': 'VariableHistory'},
-            'file_name': ('django.db.models.fields.FilePathField', [], {'max_length': '255'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'line_number': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
-            'operation': ('django.db.models.fields.CharField', [], {'max_length': '16'}),
-            'variable': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['orm.Variable']"})
-        }
-    }
-
-    complete_apps = ['orm']
+    operations = [
+        migrations.CreateModel(
+            name='BitbakeVersion',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(unique=True, max_length=32)),
+                ('giturl', models.URLField()),
+                ('branch', models.CharField(max_length=32)),
+                ('dirpath', models.CharField(max_length=255)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Branch',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('up_id', models.IntegerField(default=None, null=True)),
+                ('up_date', models.DateTimeField(default=None, null=True)),
+                ('name', models.CharField(max_length=50)),
+                ('short_description', models.CharField(max_length=50, blank=True)),
+            ],
+            options={
+                'verbose_name_plural': 'Branches',
+            },
+        ),
+        migrations.CreateModel(
+            name='Build',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('machine', models.CharField(max_length=100)),
+                ('distro', models.CharField(max_length=100)),
+                ('distro_version', models.CharField(max_length=100)),
+                ('started_on', models.DateTimeField()),
+                ('completed_on', models.DateTimeField()),
+                ('outcome', models.IntegerField(default=2, choices=[(0, b'Succeeded'), (1, b'Failed'), (2, b'In Progress')])),
+                ('cooker_log_path', models.CharField(max_length=500)),
+                ('build_name', models.CharField(max_length=100)),
+                ('bitbake_version', models.CharField(max_length=50)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='BuildArtifact',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('file_name', models.FilePathField()),
+                ('file_size', models.IntegerField()),
+                ('build', models.ForeignKey(to='orm.Build')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='HelpText',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('area', models.IntegerField(choices=[(0, b'variable')])),
+                ('key', models.CharField(max_length=100)),
+                ('text', models.TextField()),
+                ('build', models.ForeignKey(related_name='helptext_build', to='orm.Build')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Layer',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('up_id', models.IntegerField(default=None, null=True)),
+                ('up_date', models.DateTimeField(default=None, null=True)),
+                ('name', models.CharField(max_length=100)),
+                ('layer_index_url', models.URLField()),
+                ('vcs_url', models.URLField(default=None, null=True)),
+                ('vcs_web_url', models.URLField(default=None, null=True)),
+                ('vcs_web_tree_base_url', models.URLField(default=None, null=True)),
+                ('vcs_web_file_base_url', models.URLField(default=None, null=True)),
+                ('summary', models.TextField(default=None, help_text=b'One-line description of the layer', null=True)),
+                ('description', models.TextField(default=None, null=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Layer_Version',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('up_id', models.IntegerField(default=None, null=True)),
+                ('up_date', models.DateTimeField(default=None, null=True)),
+                ('branch', models.CharField(max_length=80)),
+                ('commit', models.CharField(max_length=100)),
+                ('dirpath', models.CharField(default=None, max_length=255, null=True)),
+                ('priority', models.IntegerField(default=0)),
+                ('local_path', models.FilePathField(default=b'/', max_length=1024)),
+                ('build', models.ForeignKey(related_name='layer_version_build', default=None, to='orm.Build', null=True)),
+                ('layer', models.ForeignKey(related_name='layer_version_layer', to='orm.Layer')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='LayerSource',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(unique=True, max_length=63)),
+                ('sourcetype', models.IntegerField(choices=[(0, b'local'), (1, b'layerindex'), (2, b'imported')])),
+                ('apiurl', models.CharField(default=None, max_length=255, null=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='LayerVersionDependency',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('up_id', models.IntegerField(default=None, null=True)),
+                ('depends_on', models.ForeignKey(related_name='dependees', to='orm.Layer_Version')),
+                ('layer_source', models.ForeignKey(default=None, to='orm.LayerSource', null=True)),
+                ('layer_version', models.ForeignKey(related_name='dependencies', to='orm.Layer_Version')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='LogMessage',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('level', models.IntegerField(default=0, choices=[(0, b'info'), (1, b'warn'), (2, b'error'), (3, b'critical'), (-1, b'toaster exception')])),
+                ('message', models.TextField(null=True, blank=True)),
+                ('pathname', models.FilePathField(max_length=255, blank=True)),
+                ('lineno', models.IntegerField(null=True)),
+                ('build', models.ForeignKey(to='orm.Build')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Machine',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('up_id', models.IntegerField(default=None, null=True)),
+                ('up_date', models.DateTimeField(default=None, null=True)),
+                ('name', models.CharField(max_length=255)),
+                ('description', models.CharField(max_length=255)),
+                ('layer_source', models.ForeignKey(default=None, to='orm.LayerSource', null=True)),
+                ('layer_version', models.ForeignKey(to='orm.Layer_Version')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Package',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=100)),
+                ('installed_name', models.CharField(default=b'', max_length=100)),
+                ('version', models.CharField(max_length=100, blank=True)),
+                ('revision', models.CharField(max_length=32, blank=True)),
+                ('summary', models.TextField(blank=True)),
+                ('description', models.TextField(blank=True)),
+                ('size', models.IntegerField(default=0)),
+                ('installed_size', models.IntegerField(default=0)),
+                ('section', models.CharField(max_length=80, blank=True)),
+                ('license', models.CharField(max_length=80, blank=True)),
+                ('build', models.ForeignKey(to='orm.Build', null=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Package_Dependency',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('dep_type', models.IntegerField(choices=[(0, b'depends'), (1, b'depends'), (3, b'recommends'), (2, b'recommends'), (4, b'suggests'), (5, b'provides'), (6, b'replaces'), (7, b'conflicts')])),
+                ('depends_on', models.ForeignKey(related_name='package_dependencies_target', to='orm.Package')),
+                ('package', models.ForeignKey(related_name='package_dependencies_source', to='orm.Package')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Package_File',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('path', models.FilePathField(max_length=255, blank=True)),
+                ('size', models.IntegerField()),
+                ('package', models.ForeignKey(related_name='buildfilelist_package', to='orm.Package')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Project',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=100)),
+                ('short_description', models.CharField(max_length=50, blank=True)),
+                ('created', models.DateTimeField(auto_now_add=True)),
+                ('updated', models.DateTimeField(auto_now=True)),
+                ('user_id', models.IntegerField(null=True)),
+                ('is_default', models.BooleanField(default=False)),
+                ('bitbake_version', models.ForeignKey(to='orm.BitbakeVersion', null=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='ProjectLayer',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('optional', models.BooleanField(default=True)),
+                ('layercommit', models.ForeignKey(to='orm.Layer_Version', null=True)),
+                ('project', models.ForeignKey(to='orm.Project')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='ProjectTarget',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('target', models.CharField(max_length=100)),
+                ('task', models.CharField(max_length=100, null=True)),
+                ('project', models.ForeignKey(to='orm.Project')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='ProjectVariable',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=100)),
+                ('value', models.TextField(blank=True)),
+                ('project', models.ForeignKey(to='orm.Project')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Recipe',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('up_id', models.IntegerField(default=None, null=True)),
+                ('up_date', models.DateTimeField(default=None, null=True)),
+                ('name', models.CharField(max_length=100, blank=True)),
+                ('version', models.CharField(max_length=100, blank=True)),
+                ('summary', models.TextField(blank=True)),
+                ('description', models.TextField(blank=True)),
+                ('section', models.CharField(max_length=100, blank=True)),
+                ('license', models.CharField(max_length=200, blank=True)),
+                ('homepage', models.URLField(blank=True)),
+                ('bugtracker', models.URLField(blank=True)),
+                ('file_path', models.FilePathField(max_length=255)),
+                ('pathflags', models.CharField(max_length=200, blank=True)),
+                ('is_image', models.BooleanField(default=False)),
+                ('layer_source', models.ForeignKey(default=None, to='orm.LayerSource', null=True)),
+                ('layer_version', models.ForeignKey(related_name='recipe_layer_version', to='orm.Layer_Version')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Recipe_Dependency',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('dep_type', models.IntegerField(choices=[(0, b'depends'), (1, b'rdepends')])),
+                ('depends_on', models.ForeignKey(related_name='r_dependencies_depends', to='orm.Recipe')),
+                ('recipe', models.ForeignKey(related_name='r_dependencies_recipe', to='orm.Recipe')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Release',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(unique=True, max_length=32)),
+                ('description', models.CharField(max_length=255)),
+                ('branch_name', models.CharField(default=b'', max_length=50)),
+                ('helptext', models.TextField(null=True)),
+                ('bitbake_version', models.ForeignKey(to='orm.BitbakeVersion')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='ReleaseDefaultLayer',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('layer_name', models.CharField(default=b'', max_length=100)),
+                ('release', models.ForeignKey(to='orm.Release')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='ReleaseLayerSourcePriority',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('priority', models.IntegerField(default=0)),
+                ('layer_source', models.ForeignKey(to='orm.LayerSource')),
+                ('release', models.ForeignKey(to='orm.Release')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Target',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('target', models.CharField(max_length=100)),
+                ('task', models.CharField(max_length=100, null=True)),
+                ('is_image', models.BooleanField(default=False)),
+                ('image_size', models.IntegerField(default=0)),
+                ('license_manifest_path', models.CharField(max_length=500, null=True)),
+                ('build', models.ForeignKey(to='orm.Build')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Target_File',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('path', models.FilePathField()),
+                ('size', models.IntegerField()),
+                ('inodetype', models.IntegerField(choices=[(1, b'regular'), (2, b'directory'), (3, b'symlink'), (4, b'socket'), (5, b'fifo'), (6, b'character'), (7, b'block')])),
+                ('permission', models.CharField(max_length=16)),
+                ('owner', models.CharField(max_length=128)),
+                ('group', models.CharField(max_length=128)),
+                ('directory', models.ForeignKey(related_name='directory_set', to='orm.Target_File', null=True)),
+                ('sym_target', models.ForeignKey(related_name='symlink_set', to='orm.Target_File', null=True)),
+                ('target', models.ForeignKey(to='orm.Target')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Target_Image_File',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('file_name', models.FilePathField(max_length=254)),
+                ('file_size', models.IntegerField()),
+                ('target', models.ForeignKey(to='orm.Target')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Target_Installed_Package',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('package', models.ForeignKey(related_name='buildtargetlist_package', to='orm.Package')),
+                ('target', models.ForeignKey(to='orm.Target')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Task',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('order', models.IntegerField(null=True)),
+                ('task_executed', models.BooleanField(default=False)),
+                ('outcome', models.IntegerField(default=-1, choices=[(-1, b'Not Available'), (0, b'Succeeded'), (1, b'Covered'), (2, b'Cached'), (3, b'Prebuilt'), (4, b'Failed'), (5, b'Empty')])),
+                ('sstate_checksum', models.CharField(max_length=100, blank=True)),
+                ('path_to_sstate_obj', models.FilePathField(max_length=500, blank=True)),
+                ('task_name', models.CharField(max_length=100)),
+                ('source_url', models.FilePathField(max_length=255, blank=True)),
+                ('work_directory', models.FilePathField(max_length=255, blank=True)),
+                ('script_type', models.IntegerField(default=0, choices=[(0, b'N/A'), (2, b'Python'), (3, b'Shell')])),
+                ('line_number', models.IntegerField(default=0)),
+                ('disk_io', models.IntegerField(null=True)),
+                ('cpu_usage', models.DecimalField(null=True, max_digits=8, decimal_places=2)),
+                ('elapsed_time', models.DecimalField(null=True, max_digits=8, decimal_places=2)),
+                ('sstate_result', models.IntegerField(default=0, choices=[(0, b'Not Applicable'), (1, b'File not in cache'), (2, b'Failed'), (3, b'Succeeded')])),
+                ('message', models.CharField(max_length=240)),
+                ('logfile', models.FilePathField(max_length=255, blank=True)),
+                ('build', models.ForeignKey(related_name='task_build', to='orm.Build')),
+                ('recipe', models.ForeignKey(related_name='tasks', to='orm.Recipe')),
+            ],
+            options={
+                'ordering': ('order', 'recipe'),
+            },
+        ),
+        migrations.CreateModel(
+            name='Task_Dependency',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('depends_on', models.ForeignKey(related_name='task_dependencies_depends', to='orm.Task')),
+                ('task', models.ForeignKey(related_name='task_dependencies_task', to='orm.Task')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='ToasterSetting',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=63)),
+                ('helptext', models.TextField()),
+                ('value', models.CharField(max_length=255)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Variable',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('variable_name', models.CharField(max_length=100)),
+                ('variable_value', models.TextField(blank=True)),
+                ('changed', models.BooleanField(default=False)),
+                ('human_readable_name', models.CharField(max_length=200)),
+                ('description', models.TextField(blank=True)),
+                ('build', models.ForeignKey(related_name='variable_build', to='orm.Build')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='VariableHistory',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('value', models.TextField(blank=True)),
+                ('file_name', models.FilePathField(max_length=255)),
+                ('line_number', models.IntegerField(null=True)),
+                ('operation', models.CharField(max_length=64)),
+                ('variable', models.ForeignKey(related_name='vhistory', to='orm.Variable')),
+            ],
+        ),
+        migrations.AddField(
+            model_name='project',
+            name='release',
+            field=models.ForeignKey(to='orm.Release', null=True),
+        ),
+        migrations.AddField(
+            model_name='package_dependency',
+            name='target',
+            field=models.ForeignKey(to='orm.Target', null=True),
+        ),
+        migrations.AddField(
+            model_name='package',
+            name='recipe',
+            field=models.ForeignKey(to='orm.Recipe', null=True),
+        ),
+        migrations.AddField(
+            model_name='logmessage',
+            name='task',
+            field=models.ForeignKey(blank=True, to='orm.Task', null=True),
+        ),
+        migrations.AlterUniqueTogether(
+            name='layersource',
+            unique_together=set([('sourcetype', 'apiurl')]),
+        ),
+        migrations.AddField(
+            model_name='layer_version',
+            name='layer_source',
+            field=models.ForeignKey(default=None, to='orm.LayerSource', null=True),
+        ),
+        migrations.AddField(
+            model_name='layer_version',
+            name='project',
+            field=models.ForeignKey(default=None, to='orm.Project', null=True),
+        ),
+        migrations.AddField(
+            model_name='layer_version',
+            name='up_branch',
+            field=models.ForeignKey(default=None, to='orm.Branch', null=True),
+        ),
+        migrations.AddField(
+            model_name='layer',
+            name='layer_source',
+            field=models.ForeignKey(default=None, to='orm.LayerSource', null=True),
+        ),
+        migrations.AddField(
+            model_name='build',
+            name='project',
+            field=models.ForeignKey(to='orm.Project'),
+        ),
+        migrations.AddField(
+            model_name='branch',
+            name='layer_source',
+            field=models.ForeignKey(default=True, to='orm.LayerSource', null=True),
+        ),
+        migrations.CreateModel(
+            name='ImportedLayerSource',
+            fields=[
+            ],
+            options={
+                'proxy': True,
+            },
+            bases=('orm.layersource',),
+        ),
+        migrations.CreateModel(
+            name='LayerIndexLayerSource',
+            fields=[
+            ],
+            options={
+                'proxy': True,
+            },
+            bases=('orm.layersource',),
+        ),
+        migrations.CreateModel(
+            name='LocalLayerSource',
+            fields=[
+            ],
+            options={
+                'proxy': True,
+            },
+            bases=('orm.layersource',),
+        ),
+        migrations.AlterUniqueTogether(
+            name='task',
+            unique_together=set([('build', 'recipe', 'task_name')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='releaselayersourcepriority',
+            unique_together=set([('release', 'layer_source')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='recipe',
+            unique_together=set([('layer_version', 'file_path', 'pathflags')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='projectlayer',
+            unique_together=set([('project', 'layercommit')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='machine',
+            unique_together=set([('layer_source', 'up_id')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='layerversiondependency',
+            unique_together=set([('layer_source', 'up_id')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='layer_version',
+            unique_together=set([('layer_source', 'up_id')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='layer',
+            unique_together=set([('layer_source', 'up_id'), ('layer_source', 'name')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='branch',
+            unique_together=set([('layer_source', 'up_id'), ('layer_source', 'name')]),
+        ),
+    ]

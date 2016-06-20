@@ -1,0 +1,27 @@
+
+The terms `FAIL` instead of `FAILED` and `SKIP` instead of `SKIPPED`
+match what Automake does
+
+Upstream-Status: Accepted
+[ https://git.gnome.org/browse/gnome-desktop-testing/commit/?id=048850731a640532ef55a61df7357fcc6d2ad501 ]
+
+Signed-off-by: Maxin B. John <maxin.john@intel.com>
+---
+diff -Naur gnome-desktop-testing-2014.1-orig/src/gnome-desktop-testing-runner.c gnome-desktop-testing-2014.1/src/gnome-desktop-testing-runner.c
+--- gnome-desktop-testing-2014.1-orig/src/gnome-desktop-testing-runner.c	2014-01-16 12:58:26.000000000 +0200
++++ gnome-desktop-testing-2014.1/src/gnome-desktop-testing-runner.c	2015-11-02 11:27:34.010594126 +0200
+@@ -280,12 +280,12 @@
+   else if (test->state == TEST_STATE_COMPLETE_FAILED)
+     {
+       msgid_value = ONE_TEST_FAILED_MSGID;
+-      msg = g_strconcat ("FAILED: ", test->name, " (", reason, ")", NULL);
++      msg = g_strconcat ("FAIL: ", test->name, " (", reason, ")", NULL);
+     }
+   else if (test->state == TEST_STATE_COMPLETE_SKIPPED)
+     {
+       msgid_value = ONE_TEST_SKIPPED_MSGID;
+-      msg = g_strconcat ("SKIPPED: ", test->name, NULL);
++      msg = g_strconcat ("SKIP: ", test->name, NULL);
+     }
+   else
+     g_assert_not_reached ();

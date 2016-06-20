@@ -15,6 +15,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import glob
+import operator
 import os
 import stat
 import bb.utils
@@ -88,3 +90,50 @@ class FileChecksumCache(MultiProcessCache):
                     dest[0][h] = source[0][h]
             else:
                 dest[0][h] = source[0][h]
+
+    def get_checksums(self, filelist, pn):
+        """Get checksums for a list of files"""
+
+        def checksum_file(f):
+            try:
+                checksum = self.get_checksum(f)
+            except OSError as e:
+                bb.warn("Unable to get checksum for %s SRC_URI entry %s: %s" % (pn, os.path.basename(f), e))
+                return None
+            return checksum
+
+        def checksum_dir(pth):
+            # Handle directories recursively
+            dirchecksums = []
+            for root, dirs, files in os.walk(pth):
+                for name in files:
+                    fullpth = os.path.join(root, name)
+                    checksum = checksum_file(fullpth)
+                    if checksum:
+                        dirchecksums.append((fullpth, checksum))
+            return dirchecksums
+
+        checksums = []
+        for pth in filelist.split():
+            exist = pth.split(":")[1]
+            if exist == "False":
+                continue
+            pth = pth.split(":")[0]
+            if '*' in pth:
+                # Handle globs
+                for f in glob.glob(pth):
+                    if os.path.isdir(f):
+                        if not os.path.islink(f):
+                            checksums.extend(checksum_dir(f))
+                    else:
+                        checksum = checksum_file(f)
+                        checksums.append((f, checksum))
+            elif os.path.isdir(pth):
+                if not os.path.islink(pth):
+                    checksums.extend(checksum_dir(pth))
+            else:
+                checksum = checksum_file(pth)
+                checksums.append((pth, checksum))
+
+        checksums.sort(key=operator.itemgetter(1))
+        return checksums

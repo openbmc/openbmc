@@ -22,5 +22,5 @@ Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
 +            ( (unsigned char*)(h->non_zero_count[mb_xy]) ) [i] = 16;
 +        }
          h->cur_pic.mb_type[mb_xy] = mb_type;
-         h->last_qscale_diff = 0;
+         sl->last_qscale_diff = 0;
          return 0;

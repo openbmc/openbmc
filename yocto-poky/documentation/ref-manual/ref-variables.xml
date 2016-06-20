@@ -32,7 +32,7 @@
 <!--               <link linkend='var-glossary-n'>N</link> -->
        <link linkend='var-OBJCOPY'>O</link>
        <link linkend='var-P'>P</link>
-       <link linkend='var-QMAKE_PROFILES'>Q</link>
+<!--               <link linkend='var-glossary-q'>Q</link> -->
        <link linkend='var-RANLIB'>R</link>
        <link linkend='var-S'>S</link>
        <link linkend='var-T'>T</link>
@@ -1130,24 +1130,11 @@
                     <literallayout class='monospaced'>
      BBLAYERS = " \
        /home/scottrif/poky/meta \
-       /home/scottrif/poky/meta-yocto \
+       /home/scottrif/poky/meta-poky \
        /home/scottrif/poky/meta-yocto-bsp \
        /home/scottrif/poky/meta-mykernel \
        "
-
-     BBLAYERS_NON_REMOVABLE ?= " \
-       /home/scottrif/poky/meta \
-       /home/scottrif/poky/meta-yocto \
-       "
                     </literallayout>
-                    <note>
-                        The
-                        <link linkend='var-BBLAYERS_NON_REMOVABLE'><filename>BBLAYERS_NON_REMOVABLE</filename></link>
-                        variable exists only for
-                        <ulink url='https://www.yoctoproject.org/tools-resources/projects/hob'>Hob</ulink>.
-                        The OpenEmbedded build system does not use this
-                        variable.
-                    </note>
                 </para>
 
                 <para>
@@ -1157,60 +1144,15 @@
             </glossdef>
         </glossentry>
 
-        <glossentry id='var-BBLAYERS_NON_REMOVABLE'><glossterm>BBLAYERS_NON_REMOVABLE</glossterm>
-            <info>
-                BBLAYERS_NON_REMOVABLE[doc] = "Lists core layers that cannot be removed from the bblayers.conf file."
-            </info>
-            <glossdef>
-                <para role="glossdeffirst">
-<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    Lists core layers that cannot be removed from the
-                    <filename>bblayers.conf</filename> file during a build
-                    using the
-                    <ulink url='https://www.yoctoproject.org/tools-resources/projects/hob'>Hob</ulink>.
-                    <note>
-                        When building an image outside of Hob, the OpenEmbedded
-                        build system ignores this variable.
-                    </note>
-                </para>
-
-                <para>
-                    In order for BitBake to build your image using Hob, your
-                    <filename>bblayers.conf</filename> file must include the
-                    <filename>meta</filename> and <filename>meta-yocto</filename>
-                    core layers.
-                    Here is an example that shows these two layers listed in
-                    the <filename>BBLAYERS_NON_REMOVABLE</filename> statement:
-                    <literallayout class='monospaced'>
-     BBLAYERS = " \
-       /home/scottrif/poky/meta \
-       /home/scottrif/poky/meta-yocto \
-       /home/scottrif/poky/meta-yocto-bsp \
-       /home/scottrif/poky/meta-mykernel \
-       "
-
-     BBLAYERS_NON_REMOVABLE ?= " \
-       /home/scottrif/poky/meta \
-       /home/scottrif/poky/meta-yocto \
-       "
-                    </literallayout>
-                </para>
-            </glossdef>
-        </glossentry>
-
         <glossentry id='var-BBMASK'><glossterm>BBMASK</glossterm>
             <info>
-                BBMASK[doc] = "Prevents BitBake from processing specific recipes or recipe append files. Use the BBMASK variable from within conf/local.conf."
+                BBMASK[doc] = "Prevents BitBake from processing specific recipes or recipe append files."
             </info>
             <glossdef>
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
                     Prevents BitBake from processing recipes and recipe
                     append files.
-                    Use the <filename>BBMASK</filename> variable from within the
-                    <filename>conf/local.conf</filename> file found
-                    in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>.
                 </para>
 
                 <para>
@@ -1218,14 +1160,14 @@
                     to "hide" these <filename>.bb</filename> and
                     <filename>.bbappend</filename> files.
                     BitBake ignores any recipe or recipe append files that
-                    match the expression.
+                    match any of the expressions.
                     It is as if BitBake does not see them at all.
                     Consequently, matching files are not parsed or otherwise
                     used by BitBake.</para>
                 <para>
-                    The value you provide is passed to Python's regular
+                    The values you provide are passed to Python's regular
                     expression compiler.
-                    The expression is compared against the full paths to
+                    The expressions are compared against the full paths to
                     the files.
                     For complete syntax information, see Python's
                     documentation at
@@ -1241,18 +1183,16 @@
      BBMASK = "meta-ti/recipes-misc/"
                     </literallayout>
                     If you want to mask out multiple directories or recipes,
-                    use the vertical bar to separate the regular expression
-                    fragments.
+                    you can specify multiple regular expression fragments.
                     This next example masks out multiple directories and
                     individual recipes:
                     <literallayout class='monospaced'>
-     BBMASK = "meta-ti/recipes-misc/|meta-ti/recipes-ti/packagegroup/"
-     BBMASK .= "|.*meta-oe/recipes-support/"
-     BBMASK .= "|.*openldap"
-     BBMASK .= "|.*opencv"
-     BBMASK .= "|.*lzma"
+     BBMASK += "/meta-ti/recipes-misc/ meta-ti/recipes-ti/packagegroup/"
+     BBMASK += "/meta-oe/recipes-support/"
+     BBMASK += "/meta-foo/.*/openldap"
+     BBMASK += "opencv.*\.bbappend"
+     BBMASK += "lzma"
                     </literallayout>
-                    Notice how the vertical bar is used to append the fragments.
                     <note>
                         When specifying a directory name, use the trailing
                         slash character to ensure you match just that directory
@@ -1402,15 +1342,22 @@
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
                     The bare name of the recipe.
-                    This variable is a version of the <link linkend='var-PN'><filename>PN</filename></link> variable
-                    but removes common suffixes such as "-native" and "-cross" as well
-                    as removes common prefixes such as multilib's "lib64-" and "lib32-".
+                    This variable is a version of the
+                    <link linkend='var-PN'><filename>PN</filename></link>
+                    variable but removes common suffixes such as
+                    <filename>-native</filename> and
+                    <filename>-cross</filename> as well
+                    as removes common prefixes such as multilib's
+                    <filename>lib64-</filename> and
+                    <filename>lib32-</filename>.
                     The exact list of suffixes removed is specified by the
-                    <link linkend='var-SPECIAL_PKGSUFFIX'><filename>SPECIAL_PKGSUFFIX</filename></link> variable.
+                    <link linkend='var-SPECIAL_PKGSUFFIX'><filename>SPECIAL_PKGSUFFIX</filename></link>
+                    variable.
                     The exact list of prefixes removed is specified by the
-                    <link linkend='var-MLPREFIX'><filename>MLPREFIX</filename></link> variable.
+                    <link linkend='var-MLPREFIX'><filename>MLPREFIX</filename></link>
+                    variable.
                     Prefixes are removed for <filename>multilib</filename>
-                    and <filename>nativesdk</filename> cases.
+                    and <filename>nativesdk-</filename> cases.
                 </para>
             </glossdef>
         </glossentry>
@@ -1473,7 +1420,7 @@
                     Specifies the flags to pass to the C pre-processor
                     (i.e. to both the C and the C++ compilers) when building
                     for the build host.
-                    When building in the <filename>native</filename> context,
+                    When building in the <filename>-native</filename> context,
                     <link linkend='var-CPPFLAGS'><filename>CPPFLAGS</filename></link>
                     is set to the value of this variable by default.
                 </para>
@@ -1489,7 +1436,7 @@
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
                     Specifies the flags to pass to the C++ compiler when
                     building for the build host.
-                    When building in the <filename>native</filename> context,
+                    When building in the <filename>-native</filename> context,
                     <link linkend='var-CXXFLAGS'><filename>CXXFLAGS</filename></link>
                     is set to the value of this variable by default.
                 </para>
@@ -1564,7 +1511,7 @@
                     The OpenEmbedded build system uses the
                     <filename>BUILD_PREFIX</filename> value to set the
                     <link linkend='var-TARGET_PREFIX'><filename>TARGET_PREFIX</filename></link>
-                    when building for native recipes.
+                    when building for <filename>native</filename> recipes.
                 </para>
             </glossdef>
         </glossentry>
@@ -1845,7 +1792,7 @@
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
                     Specifies the flags to pass to the C compiler when building
                     for the SDK.
-                    When building in the <filename>nativesdk</filename>
+                    When building in the <filename>nativesdk-</filename>
                     context,
                     <link linkend='var-CFLAGS'><filename>CFLAGS</filename></link>
                     is set to the value of this variable by default.
@@ -1863,7 +1810,7 @@
                     Specifies the flags to pass to the C pre-processor
                     (i.e. to both the C and the C++ compilers) when building
                     for the SDK.
-                    When building in the <filename>nativesdk</filename>
+                    When building in the <filename>nativesdk-</filename>
                     context,
                     <link linkend='var-CPPFLAGS'><filename>CPPFLAGS</filename></link>
                     is set to the value of this variable by default.
@@ -1880,7 +1827,7 @@
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
                     Specifies the flags to pass to the C++ compiler when
                     building for the SDK.
-                    When building in the <filename>nativesdk</filename>
+                    When building in the <filename>nativesdk-</filename>
                     context,
                     <link linkend='var-CXXFLAGS'><filename>CXXFLAGS</filename></link>
                     is set to the value of this variable by default.
@@ -2037,7 +1984,7 @@
                     and then can be used as an override.
                     Here is an example where "python-native" is added to
                     <link linkend='var-DEPENDS'><filename>DEPENDS</filename></link>
-                    only when building for the native case:
+                    only when building for the <filename>-native</filename> case:
                     <literallayout class='monospaced'>
      DEPENDS_append_class-native = " python-native"
                     </literallayout>
@@ -2354,7 +2301,20 @@
                     <filename>/usr/share/common-licenses</filename>,
                     for each package.
                     The license files are placed
-                    in directories within the image itself.
+                    in directories within the image itself during build time.
+                    <note>
+                        The <filename>COPY_LIC_DIRS</filename> does not
+                        offer a path for adding licenses for newly installed
+                        packages to an image, which might be most suitable
+                        for read-only filesystems that cannot be upgraded.
+                        See the
+                        <link linkend='var-LICENSE_CREATE_PACKAGE'><filename>LICENSE_CREATE_PACKAGE</filename></link>
+                        variable for additional information.
+                        You can also reference the
+                        "<ulink url='&YOCTO_DOCS_DEV_URL;#providing-license-text'>Providing License Text</ulink>"
+                        section in the Yocto Project Development Manual for
+                        information on providing license text.
+                    </note>
                 </para>
             </glossdef>
         </glossentry>
@@ -2369,7 +2329,20 @@
                     If set to "1", the OpenEmbedded build system copies
                     the license manifest for the image to
                     <filename>/usr/share/common-licenses/license.manifest</filename>
-                    within the image itself.
+                    within the image itself during build time.
+                    <note>
+                        The <filename>COPY_LIC_MANIFEST</filename> does not
+                        offer a path for adding licenses for newly installed
+                        packages to an image, which might be most suitable
+                        for read-only filesystems that cannot be upgraded.
+                        See the
+                        <link linkend='var-LICENSE_CREATE_PACKAGE'><filename>LICENSE_CREATE_PACKAGE</filename></link>
+                        variable for additional information.
+                        You can also reference the
+                        "<ulink url='&YOCTO_DOCS_DEV_URL;#providing-license-text'>Providing License Text</ulink>"
+                        section in the Yocto Project Development Manual for
+                        information on providing license text.
+                    </note>
                 </para>
             </glossdef>
         </glossentry>
@@ -2416,6 +2389,35 @@
                     the <filename>poky</filename> folder because it is the
                     parent directory of the <filename>poky/meta</filename>
                     layer.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-COREBASE_FILES'><glossterm>COREBASE_FILES</glossterm>
+            <info>
+                COREBASE_FILES[doc] = "Lists files from the COREBASE directory that should be copied other than the layers listed in the bblayers.conf file."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Lists files from the
+                    <link linkend='var-COREBASE'><filename>COREBASE</filename></link>
+                    directory that should be copied other than the layers
+                    listed in the <filename>bblayers.conf</filename> file.
+                    The <filename>COREBASE_FILES</filename> variable exists
+                    for the purpose of copying metadata from the
+                    OpenEmbedded build system into the extensible
+                    SDK.
+                </para>
+
+                <para>
+                    Explicitly listing files in <filename>COREBASE</filename>
+                    is needed because it typically contains build
+                    directories and other files that should not normally
+                    be copied into the extensible SDK.
+                    Consequently, the value of
+                    <filename>COREBASE_FILES</filename> is used in order to
+                    only copy the files that are actually needed.
                 </para>
             </glossdef>
         </glossentry>
@@ -2547,7 +2549,7 @@
                         <listitem><para>
                             <link linkend='var-BUILDSDK_CXXFLAGS'><filename>BUILDSDK_CXXFLAGS</filename></link>
                             when building for an SDK (i.e.
-                            <filename>nativesdk</filename>)
+                            <filename>nativesdk-</filename>)
                             </para></listitem>
                     </itemizedlist>
                 </para>
@@ -3110,7 +3112,7 @@
                     For example, the distribution configuration file for the
                     Poky distribution is named <filename>poky.conf</filename>
                     and resides in the
-                    <filename>meta-yocto/conf/distro</filename> directory of
+                    <filename>meta-poky/conf/distro</filename> directory of
                     the
                     <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
                 </para>
@@ -3413,6 +3415,9 @@
                     see this specific question in the
                     "<link linkend='how-does-the-yocto-project-obtain-source-code-and-will-it-work-behind-my-firewall-or-proxy-server'>FAQ</link>"
                     chapter.
+                    You can also refer to the
+                    "<ulink url='&YOCTO_WIKI_URL;/wiki/Working_Behind_a_Network_Proxy'>Working Behind a Network Proxy</ulink>"
+                    Wiki page.
                 </para>
             </glossdef>
         </glossentry>
@@ -3814,9 +3819,6 @@
 "tools-debug" - Adds debugging tools such as gdb and
                 strace.
 
-"tools-profile" - Adds profiling tools such as oprofile,
-                  exmap, lttng and valgrind (x86 only).
-
 "tools-sdk" - Adds development tools such as gcc, make,
               pkgconfig and so forth.
 
@@ -3924,6 +3926,12 @@
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
                     Additional GNU <filename>make</filename> options.
                 </para>
+
+                <para>
+                    Because the <filename>EXTRA_OEMAKE</filename> defaults to
+                    "", you need to set the variable to specify any required
+                    GNU options.
+                </para>
             </glossdef>
         </glossentry>
 
@@ -3939,50 +3947,6 @@
                     class, this variable specifies additional configuration
                     options you want to pass to the
                     <filename>scons</filename> command line.
-                </para>
-            </glossdef>
-        </glossentry>
-
-        <glossentry id='var-EXTRA_QMAKEVARS_POST'><glossterm>EXTRA_QMAKEVARS_POST</glossterm>
-            <info>
-                EXTRA_QMAKEVARS_POST[doc] = "Configuration variables or options you want to pass to qmake when the arguments need to be after the .pro file list on the command line."
-            </info>
-            <glossdef>
-                <para role="glossdeffirst">
-<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    Configuration variables or options you want to pass to
-                    <filename>qmake</filename>.
-                    Use this variable when the arguments need to be after the
-                    <filename>.pro</filename> file list on the command line.
-                </para>
-
-                <para>
-                    This variable is used with recipes that inherit the
-                    <link linkend='ref-classes-qmake*'><filename>qmake_base</filename></link>
-                    class or other classes that inherit
-                    <filename>qmake_base</filename>.
-                </para>
-            </glossdef>
-        </glossentry>
-
-       <glossentry id='var-EXTRA_QMAKEVARS_PRE'><glossterm>EXTRA_QMAKEVARS_PRE</glossterm>
-            <info>
-                EXTRA_QMAKEVARS_PRE[doc] = "Configuration variables or options you want to pass to qmake when the arguments need to be before the .pro file list on the command line."
-            </info>
-            <glossdef>
-                <para role="glossdeffirst">
-<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    Configuration variables or options you want to pass to
-                    <filename>qmake</filename>.
-                    Use this variable when the arguments need to be before the
-                    <filename>.pro</filename> file list on the command line.
-                </para>
-
-                <para>
-                    This variable is used with recipes that inherit the
-                    <link linkend='ref-classes-qmake*'><filename>qmake_base</filename></link>
-                    class or other classes that inherit
-                    <filename>qmake_base</filename>.
                 </para>
             </glossdef>
         </glossentry>
@@ -4760,12 +4724,12 @@
                         <listitem><para>
                             <filename>BUILD_CC_ARCH</filename>
                             when building for the build host (i.e.
-                            <filename>native</filename>)
+                            <filename>-native</filename>)
                             </para></listitem>
                         <listitem><para>
                             <filename>BUILDSDK_CC_ARCH</filename>
                             when building for an SDK (i.e.
-                            <filename>nativesdk</filename>)
+                            <filename>nativesdk-</filename>)
                             </para></listitem>
                     </itemizedlist>
                 </para>
@@ -5523,7 +5487,7 @@
 
                 <para>
                     The
-                    <link linkend='ref-classes-populate-sdk-*'><filename>package_sdk_base</filename></link>
+                    <link linkend='ref-classes-populate-sdk-*'><filename>populate_sdk_*</filename></link>
                     and
                     <link linkend='ref-classes-image'><filename>image</filename></link>
                     classes use the <filename>IMAGE_PKGTYPE</filename> for
@@ -5916,6 +5880,43 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
             </glossdef>
         </glossentry>
 
+        <glossentry id='var-INHERIT'><glossterm>INHERIT</glossterm>
+            <info>
+                INHERIT[doc] = "Causes the named class to be inherited at this point during parsing. The variable is only valid in configuration files."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Causes the named class to be inherited at
+                    this point during parsing.
+                    The variable is only valid in configuration files.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-INHERIT_DISTRO'><glossterm>INHERIT_DISTRO</glossterm>
+            <info>
+                INHERIT_DISTRO[doc] = "Lists classes that will be inherited at the distribution level. It is unlikely that you want to edit this variable."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Lists classes that will be inherited at the
+                    distribution level.
+                    It is unlikely that you want to edit this variable.
+                </para>
+
+                <para>
+                    The default value of the variable is set as follows in the
+                    <filename>meta/conf/distro/defaultsetup.conf</filename>
+                    file:
+                    <literallayout class='monospaced'>
+     INHERIT_DISTRO ?= "debian devshell sstate license"
+                    </literallayout>
+                </para>
+            </glossdef>
+        </glossentry>
+
         <glossentry id='var-INHIBIT_DEFAULT_DEPS'><glossterm>INHIBIT_DEFAULT_DEPS</glossterm>
             <info>
                 INHIBIT_DEFAULT_DEPS[doc] = "Prevents the default dependencies, namely the C compiler and standard C library (libc), from being added to DEPENDS."
@@ -5980,43 +5981,6 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
             </glossdef>
         </glossentry>
 
-        <glossentry id='var-INHERIT'><glossterm>INHERIT</glossterm>
-            <info>
-                INHERIT[doc] = "Causes the named class to be inherited at this point during parsing. The variable is only valid in configuration files."
-            </info>
-            <glossdef>
-                <para role="glossdeffirst">
-<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    Causes the named class to be inherited at
-                    this point during parsing.
-                    The variable is only valid in configuration files.
-                </para>
-            </glossdef>
-        </glossentry>
-
-        <glossentry id='var-INHERIT_DISTRO'><glossterm>INHERIT_DISTRO</glossterm>
-            <info>
-                INHERIT_DISTRO[doc] = "Lists classes that will be inherited at the distribution level. It is unlikely that you want to edit this variable."
-            </info>
-            <glossdef>
-                <para role="glossdeffirst">
-<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    Lists classes that will be inherited at the
-                    distribution level.
-                    It is unlikely that you want to edit this variable.
-                </para>
-
-                <para>
-                    The default value of the variable is set as follows in the
-                    <filename>meta/conf/distro/defaultsetup.conf</filename>
-                    file:
-                    <literallayout class='monospaced'>
-     INHERIT_DISTRO ?= "debian devshell sstate license"
-                    </literallayout>
-                </para>
-            </glossdef>
-        </glossentry>
-
         <glossentry id='var-INITRAMFS_FSTYPES'><glossterm>INITRAMFS_FSTYPES</glossterm>
             <info>
                 INITRAMFS_FSTYPES[doc] = "Defines the format for the output image of an initial RAM disk (initramfs), which is used during boot."
@@ -6071,7 +6035,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
 
                 <para>
                     See the
-                    <ulink url='&YOCTO_GIT_URL;/cgit/cgit.cgi/poky/tree/meta-yocto/conf/local.conf.sample.extended'><filename>local.conf.sample.extended</filename></ulink>
+                    <ulink url='&YOCTO_GIT_URL;/cgit/cgit.cgi/poky/tree/meta-poky/conf/local.conf.sample.extended'><filename>local.conf.sample.extended</filename></ulink>
                     file for additional information.
                     You can also reference the
                     <ulink url='&YOCTO_GIT_URL;/cgit/cgit.cgi/poky/tree/meta/classes/kernel.bbclass'><filename>kernel.bbclass</filename></ulink>
@@ -6125,7 +6089,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                         You cannot set the variable in a recipe file.
                     </note>
                     See the
-                    <ulink url='&YOCTO_GIT_URL;/cgit/cgit.cgi/poky/tree/meta-yocto/conf/local.conf.sample.extended'><filename>local.conf.sample.extended</filename></ulink>
+                    <ulink url='&YOCTO_GIT_URL;/cgit/cgit.cgi/poky/tree/meta-poky/conf/local.conf.sample.extended'><filename>local.conf.sample.extended</filename></ulink>
                     file for additional information.
                 </para>
             </glossdef>
@@ -6145,7 +6109,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                 <para>
                     The <filename>INITRD</filename> variable is an optional
                     variable used with the
-                    <link linkend='ref-classes-bootimg'><filename>bootimg</filename></link>
+                    <link linkend='ref-classes-image-live'><filename>image-live</filename></link>
                     class.
                 </para>
             </glossdef>
@@ -6273,6 +6237,22 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     See the "<link linkend='ref-classes-insane'><filename>insane.bbclass</filename></link>"
                     section for a list of the valid QA checks you can
                     specify using this variable.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-INSTALL_TIMEZONE_FILE'><glossterm>INSTALL_TIMEZONE_FILE</glossterm>
+            <info>
+                INSTALL_TIMEZONE_FILE[doc] = "Enables installation of the /etc/timezone file."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    By default, the <filename>tzdata</filename> recipe packages
+                    an <filename>/etc/timezone</filename> file.
+                    Set the <filename>INSTALL_TIMEZONE_FILE</filename>
+                    variable to "0" at the configuration level to disable this
+                    behavior.
                 </para>
             </glossdef>
         </glossentry>
@@ -7179,6 +7159,49 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
             </glossdef>
         </glossentry>
 
+        <glossentry id='var-LICENSE_CREATE_PACKAGE'><glossterm>LICENSE_CREATE_PACKAGE</glossterm>
+            <info>
+                LICENSE_CREATE_PACKAGE[doc] = "Creates an extra package (i.e. ${PN}-lic) for each recipe and adds that package to the RRECOMMENDS+${PN}."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                        Setting <filename>LICENSE_CREATE_PACKAGE</filename>
+                        to "1" causes the OpenEmbedded build system to create
+                        an extra package (i.e.
+                        <filename>${</filename><link linkend='var-PN'><filename>PN</filename></link><filename>}-lic</filename>)
+                        for each recipe and to add those packages to the
+                        <link linkend='var-RRECOMMENDS'><filename>RRECOMMENDS</filename></link><filename>_${PN}</filename>.
+                </para>
+
+                <para>
+                    The <filename>${PN}-lic</filename> package installs a
+                    directory in <filename>/usr/share/licenses</filename>
+                    named <filename>${PN}</filename>, which is the recipe's
+                    base name, and installs files in that directory that
+                    contain license and copyright information (i.e. copies of
+                    the appropriate license files from
+                    <filename>meta/common-licenses</filename> that match the
+                    licenses specified in the
+                    <link linkend='var-LICENSE'><filename>LICENSE</filename></link>
+                    variable of the recipe metadata and copies of files marked
+                    in
+                    <link linkend='var-LIC_FILES_CHKSUM'><filename>LIC_FILES_CHKSUM</filename></link>
+                    as containing license text).
+                </para>
+
+                <para>
+                    For related information on providing license text, see the
+                    <link linkend='var-COPY_LIC_DIRS'><filename>COPY_LIC_DIRS</filename></link>
+                    variable, the
+                    <link linkend='var-COPY_LIC_MANIFEST'><filename>COPY_LIC_MANIFEST</filename></link>
+                    variable, and the
+                    "<ulink url='&YOCTO_DOCS_DEV_URL;#providing-license-text'>Providing License Text</ulink>"
+                    section in the Yocto Project Development Manual.
+                </para>
+            </glossdef>
+        </glossentry>
+
         <glossentry id='var-LICENSE_FLAGS'><glossterm>LICENSE_FLAGS</glossterm>
             <info>
                 LICENSE_FLAGS[doc] = "Specifies additional flags for a recipe you must whitelist through LICENSE_FLAGS_WHITELIST in order to allow the recipe to be built."
@@ -7774,7 +7797,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     is "poky", the default value for
                     <filename>MIRRORS</filename> is defined in the
                     <filename>conf/distro/poky.conf</filename> file in the
-                    <filename>meta-yocto</filename> Git repository.
+                    <filename>meta-poky</filename> Git repository.
                 </para>
             </glossdef>
         </glossentry>
@@ -8066,7 +8089,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     Causes the OpenEmbedded build system to skip building the
                     <filename>.hddimg</filename> image.
                     The <filename>NOHDD</filename> variable is used with the
-                    <link linkend='ref-classes-bootimg'><filename>bootimg</filename></link>
+                    <link linkend='ref-classes-image-live'><filename>image-live</filename></link>
                     class.
                     Set the variable to "1" to prevent the
                     <filename>.hddimg</filename> image from being built.
@@ -8084,7 +8107,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     Causes the OpenEmbedded build system to skip building the
                     ISO image.
                     The <filename>NOISO</filename> variable is used with the
-                    <link linkend='ref-classes-bootimg'><filename>bootimg</filename></link>
+                    <link linkend='ref-classes-image-live'><filename>image-live</filename></link>
                     class.
                     Set the variable to "1" to prevent the ISO image from
                     being built.
@@ -8173,6 +8196,28 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     Do not set this variable.
                     It is for internal use only.
                 </note>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-OE_INIT_ENV_SCRIPT'><glossterm>OE_INIT_ENV_SCRIPT</glossterm>
+            <info>
+                OE_INIT_ENV_SCRIPT[doc] = "The name of the build environment setup script for the purposes of setting up the environment within the extensible SDK."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    The name of the build environment setup script for the
+                    purposes of setting up the environment within the
+                    extensible SDK.
+                    The default value is "oe-init-build-env".
+                </para>
+
+                <para>
+                    If you use a custom script to set up your build
+                    environment, set the
+                    <filename>OE_INIT_ENV_SCRIPT</filename> variable to its
+                    name.
+                </para>
             </glossdef>
         </glossentry>
 
@@ -9539,6 +9584,17 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
      PREFERRED_PROVIDER_virtual/xserver = "xserver-xf86"
      PREFERRED_PROVIDER_virtual/libgl ?= "mesa"
                     </literallayout>
+                    <note>
+                        If you set <filename>PREFERRED_PROVIDER</filename>
+                        for a <filename>virtual/*</filename> item, then any
+                        recipe that
+                        <link linkend='var-PROVIDES'><filename>PROVIDES</filename></link>
+                        that item that is not selected by
+                        <filename>PREFERRED_PROVIDER</filename> is prevented
+                        from building, which is usually desirable since this
+                        mechanism is designed to select between mutually
+                        exclusive alternative providers.
+                    </note>
                 </para>
             </glossdef>
         </glossentry>
@@ -9565,6 +9621,23 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     <literallayout class='monospaced'>
      PREFERRED_VERSION_python = "2.7.3"
      PREFERRED_VERSION_linux-yocto = "3.19%"
+                    </literallayout>
+                    Sometimes the <filename>PREFERRED_VERSION</filename>
+                    variable can be set by configuration files in a way that
+                    is hard to change.
+                    You can use
+                    <link linkend='var-OVERRIDES'><filename>OVERRIDES</filename></link>
+                    to set a machine-specific override.
+                    Here is an example:
+                    <literallayout class='monospaced'>
+     PREFERRED_VERSION_linux-yocto_qemux86 = "3.4%"
+                    </literallayout>
+                    Although not recommended, worst case, you can also use the
+                    "forcevariable" override, which is the strongest override
+                    possible.
+                    Here is an example:
+                    <literallayout class='monospaced'>
+     PREFERRED_VERSION_linux-yocto_forcevariable = "3.4%"
                     </literallayout>
                 </para>
             </glossdef>
@@ -9594,7 +9667,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     is "poky", the default value for
                     <filename>PREMIRRORS</filename> is defined in the
                     <filename>conf/distro/poky.conf</filename> file in the
-                    <filename>meta-yocto</filename> Git repository.
+                    <filename>meta-poky</filename> Git repository.
                 </para>
 
                 <para>
@@ -9848,35 +9921,6 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     </literallayout>
                     In the previous example, the version of the dependency
                     is <filename>PYTHON_PN</filename>.
-                </para>
-            </glossdef>
-        </glossentry>
-
-    </glossdiv>
-
-    <glossdiv id='var-glossary-q'><title>Q</title>
-
-        <glossentry id='var-QMAKE_PROFILES'><glossterm>QMAKE_PROFILES</glossterm>
-            <info>
-                QMAKE_PROFILES[doc] = "Specifies your own subset of .pro files to be built for use with qmake."
-            </info>
-            <glossdef>
-                <para role="glossdeffirst">
-<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    Specifies your own subset of <filename>.pro</filename>
-                    files to be built for use with
-                    <filename>qmake</filename>.
-                    If you do not set this variable, all
-                    <filename>.pro</filename> files in the directory pointed to
-                    by <link linkend='var-S'><filename>S</filename></link>
-                    will be built by default.
-                </para>
-
-                <para>
-                    This variable is used with recipes that inherit the
-                    <link linkend='ref-classes-qmake*'><filename>qmake_base</filename></link>
-                    class or other classes that inherit
-                    <filename>qmake_base</filename>.
                 </para>
             </glossdef>
         </glossentry>
@@ -10195,7 +10239,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                 <para>
                     The <filename>ROOTFS</filename> variable is an optional
                     variable used with the
-                    <link linkend='ref-classes-bootimg'><filename>bootimg</filename></link>
+                    <link linkend='ref-classes-image-live'><filename>image-live</filename></link>
                     class.
                 </para>
             </glossdef>
@@ -10532,17 +10576,16 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     The location in the
                     <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>
                     where unpacked recipe source code resides.
-                    This location is within the work directory
-                    (<filename><link linkend='var-WORKDIR'>WORKDIR</link></filename>),
-                    which is not static.
-                    The unpacked source location depends on the recipe name
-                    (<filename><link linkend='var-PN'>PN</link></filename>) and
-                    recipe version
-                    (<filename><link linkend='var-PV'>PV</link></filename>) as
-                    follows:
-                    <literallayout class='monospaced'>
-     ${WORKDIR}/${PN}-${PV}
-                    </literallayout>
+                    By default, this directory is
+                    <filename>${</filename><link linkend='var-WORKDIR'><filename>WORKDIR</filename></link><filename>}/${</filename><link linkend='var-BPN'><filename>BPN</filename></link><filename>}-${</filename><link linkend='var-PV'><filename>PV</filename></link><filename>}</filename>,
+                    where <filename>${BPN}</filename> is the base recipe name
+                    and <filename>${PV}</filename> is the recipe version.
+                    If the source tarball extracts the code to a directory
+                    named anything other than <filename>${BPN}-${PV}</filename>,
+                    or if the source code if fetched from an SCM such as
+                    Git or Subversion, then you must set <filename>S</filename>
+                    in the recipe so that the OpenEmbedded build system
+                    knows where to find the unpacked source.
                 </para>
 
                 <para>
@@ -10555,6 +10598,22 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     is the following:
                     <literallayout class='monospaced'>
      poky/build/tmp/work/qemux86-poky-linux/db/5.1.19-r3/db-5.1.19
+                    </literallayout>
+                    The unpacked source code resides in the
+                    <filename>db-5.1.19</filename> folder.
+                </para>
+
+                <para>
+                    This next example assumes a Git repository.
+                    By default, Git repositories are cloned to
+                    <filename>${WORKDIR}/git</filename> during
+                    <link linkend='ref-tasks-fetch'><filename>do_fetch</filename></link>.
+                    Since this path is different from the default value of
+                    <filename>S</filename>, you must set it specifically
+                    so the source can be located:
+                    <literallayout class='monospaced'>
+     SRC_URI = "git://path/to/repo.git"
+     S = "${WORKDIR}/git"
                     </literallayout>
                 </para>
             </glossdef>
@@ -10661,6 +10720,30 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
             </glossdef>
         </glossentry>
 
+        <glossentry id='var-SDK_EXT_TYPE'><glossterm>SDK_EXT_TYPE</glossterm>
+            <info>
+                SDK_EXT_TYPE[doc] = "Controls whether or not shared state artifacts are copied into the extensible SDK."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Controls whether or not shared state artifacts are copied
+                    into the extensible SDK.
+                    The default value of "full" copies all of the required
+                    shared state artifacts into the extensible SDK.
+                    The value "minimal" leaves these artifacts out of the
+                    SDK.
+                    <note>
+                        If you set the variable to "minimal", you need to
+                        ensure
+                        <link linkend='var-SSTATE_MIRRORS'><filename>SSTATE_MIRRORS</filename></link>
+                        is set in the SDK's configuration to enable the
+                        artifacts to be fetched as needed.
+                    </note>
+                </para>
+            </glossdef>
+        </glossentry>
+
         <glossentry id='var-SDK_HOST_MANIFEST'><glossterm>SDK_HOST_MANIFEST</glossterm>
             <info>
                 SDK_HOST_MANIFEST[doc] = "The manifest file for the host part of the SDK. This file lists all the installed packages that make up the host part of the SDK."
@@ -10690,6 +10773,88 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     and
                     <link linkend='var-TOOLCHAIN_OUTPUTNAME'><filename>TOOLCHAIN_OUTPUTNAME</filename></link>
                     variables.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-SDK_INCLUDE_PKGDATA'><glossterm>SDK_INCLUDE_PKGDATA</glossterm>
+            <info>
+                SDK_INCLUDE_PKGDATA[doc] = "When set to "1", specifies to include the packagedata for all recipes in the "world" target in the extensible SDK."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    When set to "1", specifies to include the packagedata for
+                    all recipes in the "world" target in the extensible SDK.
+                    Including this data allows the
+                    <filename>devtool search</filename> command to find these
+                    recipes in search results, as well as allows the
+                    <filename>devtool add</filename> command to map
+                    dependencies more effectively.
+                    <note>
+                        Enabling the <filename>SDK_INCLUDE_PKGDATA</filename>
+                        variable significantly increases build time because
+                        all of world needs to be built.
+                        Enabling the variable also slightly increases the size
+                        of the extensible SDK.
+                    </note>
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-SDK_INHERIT_BLACKLIST'><glossterm>SDK_INHERIT_BLACKLIST</glossterm>
+            <info>
+                SDK_INHERIT_BLACKLIST[doc] = "A list of classes to remove from the INHERIT value globally within the extensible SDK configuration."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    A list of classes to remove from the
+                    <link linkend='var-INHERIT'><filename>INHERIT</filename></link>
+                    value globally within the extensible SDK configuration.
+                    The default value is "buildhistory icecc".
+                </para>
+
+                <para>
+                    Some classes are not generally applicable within
+                    the extensible SDK context and you can use this variable
+                    to disable them.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-SDK_LOCAL_CONF_BLACKLIST'><glossterm>SDK_LOCAL_CONF_BLACKLIST</glossterm>
+            <info>
+                SDK_LOCAL_CONF_BLACKLIST[doc] = "A list of variables not allowed through from the build system configuration into the extensible SDK configuration."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    A list of variables not allowed through from the build
+                    system configuration into the extensible SDK configuration.
+                    Usually, these are variables that are specific to the
+                    machine on which the build system is running and thus
+                    would be potentially problematic within the extensible SDK.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-SDK_LOCAL_CONF_WHITELIST'><glossterm>SDK_LOCAL_CONF_WHITELIST</glossterm>
+            <info>
+                SDK_LOCAL_CONF_WHITELIST[doc] = "A list of variables allowed through from the build system configuration into the extensible SDK configuration."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    A list of variables allowed through from the build system
+                    configuration into the extensible SDK configuration.
+                    This list overrides the variables specified using the
+                    <link linkend='var-SDK_LOCAL_CONF_BLACKLIST'><filename>SDK_LOCAL_CONF_BLACKLIST</filename></link>
+                    variable as well as any variables identified by automatic
+                    blacklisting due to the "/" character being found at the
+                    start of the value, which is usually indicative of being a
+                    path and thus might not be valid on the system where the
+                    SDK is installed.
                 </para>
             </glossdef>
         </glossentry>
@@ -10814,12 +10979,40 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
             <glossdef>
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    The toolchain binary prefix used for nativesdk recipes.
+                    The toolchain binary prefix used for
+                    <filename>nativesdk</filename> recipes.
                     The OpenEmbedded build system uses the
                     <filename>SDK_PREFIX</filename> value to set the
                     <link linkend='var-TARGET_PREFIX'><filename>TARGET_PREFIX</filename></link>
                     when building <filename>nativesdk</filename> recipes.
                     The default value is "${SDK_SYS}-".
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-SDK_RECRDEP_TASKS'><glossterm>SDK_RECRDEP_TASKS</glossterm>
+            <info>
+                SDK_RECRDEP_TASKS[doc] = "A list of shared state tasks added to the extensible SDK."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    A list of shared state tasks added to the extensible SDK.
+                    By default, the following tasks are added:
+                    <literallayout class='monospaced'>
+     do_populate_lic
+     do_package_qa
+     do_populate_sysroot
+     do_deploy
+                    </literallayout>
+                    Despite the default value of "" for the
+                    <filename>SDK_RECRDEP_TASKS</filename> variable, the
+                    above four tasks are always added to the SDK.
+                    To specify tasks beyond these four, you need to use
+                    the <filename>SDK_RECRDEP_TASKS</filename> variable (e.g.
+                    you are defining additional tasks that are needed in
+                    order to build
+                    <link linkend='var-SDK_TARGETS'><filename>SDK_TARGETS</filename></link>).
                 </para>
             </glossdef>
         </glossentry>
@@ -10881,6 +11074,64 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
             </glossdef>
         </glossentry>
 
+        <glossentry id='var-SDK_TARGETS'><glossterm>SDK_TARGETS</glossterm>
+            <info>
+                SDK_TARGETS[doc] = "A list of targets to install from shared state as part of the standard or extensible SDK installation."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    A list of targets to install from shared state as part of
+                    the standard or extensible SDK installation.
+                    The default value is "${PN}" (i.e. the image from which
+                    the SDK is built).
+                </para>
+
+                <para>
+                    The <filename>SDK_TARGETS</filename> variable is an
+                    internal variable and typically would not be changed.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-SDK_TITLE'><glossterm>SDK_TITLE</glossterm>
+            <info>
+                SDK_TITLE[doc] = "Specifies a title to be printed when running the SDK installer."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Specifies a title to be printed when running the SDK
+                    installer.
+                    The <filename>SDK_TITLE</filename> variable defaults to
+                    "<replaceable>distro</replaceable> SDK" for the standard
+                    SDK and "<replaceable>distro</replaceable> Extensible SDK"
+                    for the extensible SDK, where
+                    <replaceable>distro</replaceable> is the first one of
+                    <link linkend='var-DISTRO_NAME'><filename>DISTRO_NAME</filename></link>
+                    or
+                    <link linkend='var-DISTRO'><filename>DISTRO</filename></link>
+                    that is set in your configuration.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-SDK_UPDATE_URL'><glossterm>SDK_UPDATE_URL</glossterm>
+            <info>
+                SDK_UPDATE_URL[doc] = "An optional URL for an update server for the extensible SDK."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    An optional URL for an update server for the extensible
+                    SDK.
+                    If set, the value is used as the default update server when
+                    running <filename>devtool sdk-update</filename> within the
+                    extensible SDK.
+                </para>
+            </glossdef>
+        </glossentry>
+
         <glossentry id='var-SDK_VENDOR'><glossterm>SDK_VENDOR</glossterm>
             <info>
                 SDK_VENDOR[doc] = "Specifies the name of the SDK vendor."
@@ -10902,7 +11153,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
                     Specifies the version of the SDK.
                     The distribution configuration file (e.g.
-                    <filename>/meta-yocto/conf/distro/poky.conf</filename>)
+                    <filename>/meta-poky/conf/distro/poky.conf</filename>)
                     defines the <filename>SDK_VERSION</filename> as follows:
                     <literallayout class='monospaced'>
      SDK_VERSION := "${@'${DISTRO_VERSION}'.replace('snapshot-${DATE}','snapshot')}"
@@ -10939,14 +11190,13 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
 
         <glossentry id='var-SDKMACHINE'><glossterm>SDKMACHINE</glossterm>
             <info>
-                SDKMACHINE[doc] = "Specifies the architecture (i.e. i686 or x86_64) for which to build SDK and ADT items."
+                SDKMACHINE[doc] = "Specifies the architecture (i.e. i686 or x86_64) for which to build SDK items."
             </info>
             <glossdef>
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    The machine for which the Application Development Toolkit
-                    (ADT) or SDK is built.
-                    In other words, the SDK or ADT is built such that it
+                    The machine for which the SDK is built.
+                    In other words, the SDK is built such that it
                     runs on the target you specify with the
                     <filename>SDKMACHINE</filename> value.
                     The value points to a corresponding
@@ -11892,14 +12142,14 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                         <listitem><para>For recipes building for the target
                            machine, the value is "${STAGING_DIR}/${MACHINE}".
                            </para></listitem>
-                        <listitem><para>For <filename>native</filename>
-                           recipes building
+                        <listitem><para>For native recipes building
                            for the build host, the value is empty given the
                            assumption that when building for the build host,
                            the build host's own directories should be used.
                            </para></listitem>
-                        <listitem><para>For <filename>nativesdk</filename>
-                           recipes that build for the SDK, the value is
+                        <listitem><para>For native SDK
+                           recipes that build for the SDK
+                           (<filename>nativesdk</filename>), the value is
                            "${STAGING_DIR}/${MULTIMACH_HOST_SYS}".
                            </para></listitem>
                     </itemizedlist>
@@ -12707,12 +12957,13 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                             "${<link linkend='var-TARGET_SYS'>TARGET_SYS</link>}-".
                             </para></listitem>
                         <listitem><para>
-                            For <filename>native</filename> recipes, the build
-                            system sets the variable to the value of
+                            For native recipes, the build system sets the
+                            variable to the value of
                             <filename>BUILD_PREFIX</filename>.
                             </para></listitem>
                         <listitem><para>
-                            For <filename>nativesdk</filename> recipes, the
+                            For native SDK recipes
+                            (<filename>nativesdk</filename>), the
                             build system sets the variable to the value of
                             <filename>SDK_PREFIX</filename>.
                             </para></listitem>
@@ -12751,9 +13002,8 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     Consider these two examples:
                     <itemizedlist>
                         <listitem><para>
-                            Given a <filename>native</filename> recipe on a
-                            32-bit, x86 machine running Linux, the value is
-                            "i686-linux".
+                            Given a native recipe on a 32-bit, x86 machine
+                            running Linux, the value is "i686-linux".
                             </para></listitem>
                         <listitem><para>
                             Given a recipe being built for a little-endian,
@@ -13359,11 +13609,14 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     toolchain set that runs on the
                     <link linkend='var-SDKMACHINE'><filename>SDKMACHINE</filename></link>,
                     and each package should usually have the prefix
-                    "nativesdk-".
-                    When building an SDK using
-                    <filename>bitbake -c populate_sdk &lt;imagename&gt;</filename>,
-                    a default list of packages is set in this variable, but
-                    you can add additional packages to the list.
+                    <filename>nativesdk-</filename>.
+                    For example, consider the following command when
+                    building an SDK:
+                    <literallayout class='monospaced'>
+     $ bitbake -c populate_sdk <replaceable>imagename</replaceable>
+                    </literallayout>
+                    In this case, a default list of packages is set in this
+                    variable, but you can add additional packages to the list.
                 </para>
 
                 <para>
@@ -13373,8 +13626,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     section.
                     For information on setting up a cross-development
                     environment, see the
-                    "<ulink url='&YOCTO_DOCS_ADT_URL;#installing-the-adt'>Installing the ADT and Toolchains</ulink>"
-                    section in the Yocto Project Application Developer's Guide.
+                    <ulink url='&YOCTO_DOCS_SDK_URL;#sdk-manual'>Yocto Project Software Development Kit (SDK) Developer's Guide</ulink>.
                 </para>
             </glossdef>
         </glossentry>
@@ -13425,8 +13677,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     section.
                     For information on setting up a cross-development
                     environment, see the
-                    "<ulink url='&YOCTO_DOCS_ADT_URL;#installing-the-adt'>Installing the ADT and Toolchains</ulink>"
-                    section in the Yocto Project Application Developer's Guide.
+                    <ulink url='&YOCTO_DOCS_SDK_URL;#sdk-manual'>Yocto Project Software Development Kit (SDK) Developer's Guide</ulink>.
                 </para>
             </glossdef>
         </glossentry>
@@ -14121,7 +14372,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
      USER_CLASSES ?= "buildstats image-mklibs image-prelink"
                     </literallayout>
                     For more information, see
-                    <filename>meta-yocto/conf/local.conf.sample</filename> in
+                    <filename>meta-poky/conf/local.conf.sample</filename> in
                     the
                     <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
                 </para>

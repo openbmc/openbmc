@@ -1,0 +1,48 @@
+{% load static %}
+
+<script src="{% static 'js/newcustomimage_modal.js' %}"></script>
+<script>
+  $(document).ready(function (){
+    try {
+      newCustomImageModalInit();
+    } catch (e) {
+      document.write("Sorry, An error has occurred loading this page");
+      console.warn(e);
+    }
+  });
+</script>
+
+<div class="modal hide fade in" id="new-custom-image-modal" aria-hidden="false">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3>New custom image</h3>
+  </div>
+
+  <div class="modal-body">
+    <!--
+    this container is visible if there are multiple image recipes which could
+    be used as a basis for the new custom image; radio buttons are added to it
+    via newCustomImageModalSetRecipes() as required
+    -->
+    <div data-role="image-selector" style="display:none;">
+      <h4>Which image do you want to customise?</h4>
+      <div data-role="image-selector-radios"></div>
+      <span class="help-block error" id="invalid-recipe-help" style="display:none"></span>
+      <div class="air"></div>
+    </div>
+
+    <h4>Name your custom image</h4>
+
+    <div class="row-fluid">
+      <span class="help-block span8">Image names must be unique. They should not contain spaces or capital letters, and the only allowed special character is dash (-).<p></p>
+      </span></div>
+    <div class="control-group controls">
+      <input type="text" class="huge" placeholder="Type the custom image name" required>
+      <span class="help-block error" id="invalid-name-help" style="display:none"></span>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button id="create-new-custom-image-btn" class="btn btn-primary btn-large" data-original-title="" title="" disabled>Create custom image</button>
+  </div>
+</div>

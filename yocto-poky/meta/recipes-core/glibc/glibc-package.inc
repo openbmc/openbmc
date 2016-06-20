@@ -54,7 +54,6 @@ FILES_nscd = "${sbindir}/nscd* ${sysconfdir}/init.d/nscd ${systemd_unitdir}/syst
 FILES_${PN}-mtrace = "${bindir}/mtrace"
 FILES_tzcode = "${bindir}/tzselect ${sbindir}/zic ${sbindir}/zdump"
 FILES_${PN}-utils = "${bindir}/* ${sbindir}/*"
-FILES_${PN}-dbg += "${libexecdir}/*/.debug ${libdir}/audit/.debug"
 FILES_catchsegv = "${bindir}/catchsegv"
 RDEPENDS_catchsegv = "libsegfault"
 FILES_${PN}-pcprofile = "${base_libdir}/libpcprofile.so"
@@ -82,9 +81,10 @@ do_install_append () {
 	rm -rf ${D}${localstatedir}
 
 	# remove empty glibc dir
-	if [ -d ${D}${libdir}/glibc -a ! -e ${D}${libdir}/glibc/pt_chown ]; then
-		rmdir ${D}${libdir}/glibc
+	if [ -d ${D}${libexecdir} ]; then
+		rmdir --ignore-fail-on-non-empty ${D}${libexecdir}
 	fi
+
 	oe_multilib_header bits/syscall.h
 
 	if [ -f ${D}${bindir}/mtrace ]; then

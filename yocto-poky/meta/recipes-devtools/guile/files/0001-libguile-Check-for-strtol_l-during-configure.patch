@@ -1,0 +1,56 @@
+From 814d6fb6c1f4a544c8fd37f5a390ba020c2d8c85 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 10 Jan 2016 22:28:17 +0000
+Subject: [PATCH] libguile: Check for strtol_l during configure
+
+strtol_l is a gnu extention which may not be available on other linux
+libc implementations e.g. musl. Therefore check for this funciton and
+conditionalize the use of it.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ configure.ac    | 5 +++--
+ libguile/i18n.c | 2 +-
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 3969929..f8a6a1a 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -752,7 +752,8 @@ AC_CHECK_HEADERS([assert.h crt_externs.h])
+ #   truncate - not in mingw
+ #   isblank - available as a GNU extension or in C99
+ #   _NSGetEnviron - Darwin specific
+-#   strcoll_l, newlocale - GNU extensions (glibc), also available on Darwin
++#   strcoll_l, newlocale, strtol_l - GNU extensions (glibc),
++#                                    also available on Darwin
+ #   fork - unavailable on Windows
+ #   utimensat - posix.1-2008
+ #   sched_getaffinity, sched_setaffinity - GNU extensions (glibc)
+@@ -768,7 +769,7 @@ AC_CHECK_FUNCS([DINFINITY DQNAN cexp chsize clog clog10 ctermid		\
+   getgrent kill getppid getpgrp fork setitimer getitimer strchr strcmp	\
+   index bcopy memcpy rindex truncate unsetenv isblank _NSGetEnviron	\
+   strcoll strcoll_l newlocale utimensat sched_getaffinity		\
+-  sched_setaffinity sendfile])
++  sched_setaffinity sendfile strtol_l])
+ 
+ AM_CONDITIONAL([BUILD_ICE_9_POPEN],
+   [test "x$enable_posix" = "xyes" && test "x$ac_cv_func_fork" = "xyes"])
+diff --git a/libguile/i18n.c b/libguile/i18n.c
+index 97d44b0..9fb6976 100644
+--- a/libguile/i18n.c
++++ b/libguile/i18n.c
+@@ -1352,7 +1352,7 @@ SCM_DEFINE (scm_locale_string_to_integer, "locale-string->integer",
+ 
+   if (c_locale != NULL)
+     {
+-#ifdef USE_GNU_LOCALE_API
++#if defined(USE_GNU_LOCALE_API) && defined(HAVE_STRTOL_L)
+       c_result = strtol_l (c_str, &c_endptr, c_base, c_locale);
+ #else
+       RUN_IN_LOCALE_SECTION (c_locale,
+-- 
+2.7.0
+

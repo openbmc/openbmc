@@ -1,0 +1,70 @@
+From 4b005ee56898309e8afba9b3c48cf94f0f5f78e4 Mon Sep 17 00:00:00 2001
+From: Marek Vasut <marex@denx.de>
+Date: Tue, 15 Mar 2016 10:09:26 +0300
+Subject: [PATCH] Add initial nios2 architecture support
+
+* src/Makefile.am (nobase_private_HEADERS): Add nios2.h.
+* src/atomic_ops.h: Include nios2.h if __nios2__.
+* src/atomic_ops/sysdeps/gcc/nios2.h: New file.
+
+Signed-off-by: Marek Vasut <marex@denx.de>
+Upstream-Status: Backport [ https://github.com/ivmai/libatomic_ops.git 4b005ee56898309e8afba9b3c48cf94f0f5f78e4 ]
+---
+ src/Makefile.am                    |  1 +
+ src/atomic_ops.h                   |  3 +++
+ src/atomic_ops/sysdeps/gcc/nios2.h | 17 +++++++++++++++++
+ 3 files changed, 21 insertions(+)
+ create mode 100644 src/atomic_ops/sysdeps/gcc/nios2.h
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index fc09b27..d463427 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -79,6 +79,7 @@ nobase_private_HEADERS = atomic_ops/ao_version.h \
+           atomic_ops/sysdeps/gcc/ia64.h \
+           atomic_ops/sysdeps/gcc/m68k.h \
+           atomic_ops/sysdeps/gcc/mips.h \
++          atomic_ops/sysdeps/gcc/nios2.h \
+           atomic_ops/sysdeps/gcc/powerpc.h \
+           atomic_ops/sysdeps/gcc/s390.h \
+           atomic_ops/sysdeps/gcc/sh.h \
+diff --git a/src/atomic_ops.h b/src/atomic_ops.h
+index 33fe00e..ec02ba4 100644
+--- a/src/atomic_ops.h
++++ b/src/atomic_ops.h
+@@ -262,6 +262,9 @@
+ # if defined(__m68k__)
+ #   include "atomic_ops/sysdeps/gcc/m68k.h"
+ # endif /* __m68k__ */
++# if defined(__nios2__)
++#   include "atomic_ops/sysdeps/gcc/nios2.h"
++# endif /* __nios2__ */
+ # if defined(__powerpc__) || defined(__ppc__) || defined(__PPC__) \
+      || defined(__powerpc64__) || defined(__ppc64__)
+ #   include "atomic_ops/sysdeps/gcc/powerpc.h"
+diff --git a/src/atomic_ops/sysdeps/gcc/nios2.h b/src/atomic_ops/sysdeps/gcc/nios2.h
+new file mode 100644
+index 0000000..f402cbb
+--- /dev/null
++++ b/src/atomic_ops/sysdeps/gcc/nios2.h
+@@ -0,0 +1,17 @@
++/*
++ * Copyright (C) 2016 Marek Vasut <marex@denx.de>
++ *
++ * THIS MATERIAL IS PROVIDED AS IS, WITH ABSOLUTELY NO WARRANTY EXPRESSED
++ * OR IMPLIED. ANY USE IS AT YOUR OWN RISK.
++ *
++ * Permission is hereby granted to use or copy this program
++ * for any purpose, provided the above notices are retained on all copies.
++ * Permission to modify the code and to distribute modified code is granted,
++ * provided the above notices are retained, and a notice that the code was
++ * modified is included with the above copyright notice.
++ */
++
++#include "../test_and_set_t_is_ao_t.h"
++#include "generic.h"
++
++#define AO_T_IS_INT
+-- 
+2.7.0
+

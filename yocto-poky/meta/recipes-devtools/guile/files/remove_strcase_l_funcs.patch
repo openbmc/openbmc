@@ -1,0 +1,38 @@
+These unused functions cause build failures with uclibc since they reference __uclibc_locale_struct
+and this is exposed by uclibc API headers only if C locales are built, but for OE we build full locale
+support
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+Index: guile-2.0.11/libguile/i18n.c
+===================================================================
+--- guile-2.0.11.orig/libguile/i18n.c
++++ guile-2.0.11/libguile/i18n.c
+@@ -851,27 +851,6 @@ str_downcase (register char *dst, regist
+   *dst = '\0';
+ }
+ 
+-#ifdef USE_GNU_LOCALE_API
+-static inline void
+-str_upcase_l (register char *dst, register const char *src,
+-	      scm_t_locale locale)
+-{
+-  for (; *src != '\0'; src++, dst++)
+-    *dst = toupper_l (*src, locale);
+-  *dst = '\0';
+-}
+-
+-static inline void
+-str_downcase_l (register char *dst, register const char *src,
+-		scm_t_locale locale)
+-{
+-  for (; *src != '\0'; src++, dst++)
+-    *dst = tolower_l (*src, locale);
+-  *dst = '\0';
+-}
+-#endif
+-
+-
+ SCM_DEFINE (scm_string_locale_lt, "string-locale<?", 2, 1, 0,
+ 	    (SCM s1, SCM s2, SCM locale),
+ 	    "Compare strings @var{s1} and @var{s2} in a locale-dependent way."

@@ -1,0 +1,363 @@
+From 1d386279a449a1a6b96b88a71f35bf13b14b2c2c Mon Sep 17 00:00:00 2001
+From: Li Zhou <li.zhou@windriver.com>
+Date: Thu, 14 Jan 2016 17:11:24 +0800
+Subject: [PATCH 3/3] net-tools: add SCTP support for netstat
+
+Upstream-Status: pending
+
+Signed-off-by: Li Zhou <li.zhou@windriver.com>
+---
+ netstat.c | 282 ++++++++++++++++++++++++--------------------------------------
+ 1 file changed, 108 insertions(+), 174 deletions(-)
+
+diff --git a/netstat.c b/netstat.c
+index 56a15c2..86adadb 100644
+--- a/netstat.c
++++ b/netstat.c
+@@ -1095,23 +1095,21 @@ static void sctp_eps_do_one(int lnr, char *line)
+     const char *lport_str;
+     const char *uid_str;
+     const char *inode_str;
+-    const char *pladdr_str;
+     char *laddrs_str;
+     
+     if(lnr == 0) {
+-	/* ENDPT     SOCK   STY SST HBKT LPORT   uid inode pladdr LADDRS*/
++        /* ENDPT     SOCK   STY SST HBKT LPORT   UID INODE LADDRS */
+ 	return;
+     }
+     
+-    strtok(line," \t\n"); /*skip ptr*/
+-    strtok(0," \t\n");    /*skip ptr*/
++    strtok(line," \t\n"); /*skip endpt*/
++    strtok(0," \t\n");    /*skip sock*/
+     sty_str = strtok(0," \t\n");
+     sst_str = strtok(0," \t\n");
+     strtok(0," \t\n"); /*skip hash bucket*/
+     lport_str=strtok(0," \t\n");
+     uid_str = strtok(0," \t\n");
+     inode_str = strtok(0," \t\n");
+-    pladdr_str = strtok(0," \t\n");
+     laddrs_str=strtok(0,"\t\n");
+     
+     type = atoi(sty_str);
+@@ -1119,61 +1117,35 @@ static void sctp_eps_do_one(int lnr, char *line)
+     port = atoi(lport_str);
+     uid = atoi(uid_str);
+     inode = strtoul(inode_str,0,0);
+-    
+-    if(flag_sctp<=1) {
+-	/* only print the primary address */
+-	char local_addr[64];
+-	char local_port[16];
+-	
+-	ap = process_sctp_addr_str(pladdr_str, (struct sockaddr*)&localaddr);
+-	if(ap)
+-	    safe_strncpy(local_addr,
+-	                 ap->sprint((struct sockaddr *) &localaddr, flag_not),
+-	                 sizeof(local_addr));
+-	else
+-	    sprintf(local_addr,_("unsupported address family %d"), ((struct sockaddr*)&localaddr)->sa_family);
+-	
+-	snprintf(local_port, sizeof(local_port), "%s",
+-	         get_sname(htons(port), "sctp",
+-	                   flag_not & FLAG_NUM_PORT));
+-	
+-	printf("sctp                ");
+-	sprintf(buffer,"%s:%s", local_addr, local_port);
+-	printf("%-47s", buffer);
+-    	printf(" %-12s", sctp_socket_state_str(state));
+-    } else {
+-    	/*print all addresses*/
+-	const char *this_local_addr;
+-	int first=1;
+-	char local_port[16];
+-	snprintf(local_port, sizeof(local_port), "%s",
+-		 get_sname(htons(port), "sctp",
+-			   flag_not & FLAG_NUM_PORT));
+-	for(this_local_addr=strtok(laddrs_str," \t\n");
+-	    this_local_addr;
+-	    this_local_addr=strtok(0," \t\n"))
+-	{
+-	    char local_addr[64];
+-	    ap = process_sctp_addr_str(this_local_addr, (struct sockaddr*)&localaddr);
+-	    if(ap)
+-		safe_strncpy(local_addr,
+-		             ap->sprint((struct sockaddr *) &localaddr, flag_not),
+-		             sizeof(local_addr));
+-	    else
+-		sprintf(local_addr,_("unsupported address family %d"), ((struct sockaddr*)&localaddr)->sa_family);
+ 
+-	    if(!first) printf("\n");
+-	    if(first)
+-	        printf("sctp                ");
+-	    else
+-	        printf("                    ");
+-	    sprintf(buffer,"%s:%s", local_addr, local_port);
+-	    printf("%-47s", buffer);
+-	    printf(" %-12s", first?sctp_socket_state_str(state):"");
+-	    first = 0;
+-	}
++    const char *this_local_addr;
++    int first=1;
++    char local_port[16];
++    snprintf(local_port, sizeof(local_port), "%s",
++        get_sname(htons(port), "sctp", flag_not & FLAG_NUM_PORT));
++    for(this_local_addr=strtok(laddrs_str," \t\n");
++        this_local_addr;
++        this_local_addr=strtok(0," \t\n"))
++    {
++        char local_addr[64];
++        ap = process_sctp_addr_str(this_local_addr, (struct sockaddr*)&localaddr);
++        if(ap)
++            safe_strncpy(local_addr,
++                ap->sprint((struct sockaddr *) &localaddr, flag_not),
++                sizeof(local_addr));
++        else
++            sprintf(local_addr,_("unsupported address family %d"), ((struct sockaddr*)&localaddr)->sa_family);
++
++        if(!first) printf("\n");
++        if(first)
++            printf("sctp                ");
++        else
++            printf("                    ");
++        sprintf(buffer,"%s:%s", local_addr, local_port);
++        printf("%-55s", buffer);
++        printf(" %-12s", first?sctp_socket_state_str(state):"");
++        first = 0;
+     }
+-
+     finish_this_one(uid,inode,"");
+ }
+ 
+@@ -1199,32 +1171,29 @@ static void sctp_assoc_do_one(int lnr, char *line)
+     const char *lport_str,*rport_str;
+     const char *uid_str;
+     const char *inode_str;
+-    const char *pladdr_str;
+     char *laddrs_str;
+-    const char *praddr_str;
+     char *raddrs_str;
+-    
++
+     if(lnr == 0) {
+-	/* ASSOC     SOCK   STY SST ST HBKT tx_queue rx_queue uid inode LPORT RPORT pladdr praddr LADDRS <-> RADDRS*/
++	/* ASSOC     SOCK   STY SST ST HBKT ASSOC-ID TX_QUEUE RX_QUEUE UID INODE LPORT RPORT LADDRS <-> RADDRS */
+ 	return;
+     }
+-    
+-    strtok(line," \t\n"); /*skip ptr*/
+-    strtok(0," \t\n");    /*skip ptr*/
++
++    strtok(line," \t\n"); /*skip assoc*/
++    strtok(0," \t\n");    /*skip sock*/
+     sty_str = strtok(0," \t\n");
+     sst_str = strtok(0," \t\n");
+     st_str = strtok(0," \t\n");
+     strtok(0," \t\n"); /*skip hash bucket*/
++    strtok(0," \t\n"); /*skip hash assoc-id*/
+     txqueue_str =  strtok(0," \t\n");
+     rxqueue_str =  strtok(0," \t\n");
+     uid_str = strtok(0," \t\n");
+     inode_str = strtok(0," \t\n");
+     lport_str=strtok(0," \t\n");
+     rport_str=strtok(0," \t\n");
+-    pladdr_str = strtok(0," \t\n");
+-    praddr_str = strtok(0," \t\n");
+-    laddrs_str=strtok(0,"<->\t\n");
+-    raddrs_str=strtok(0,"<->\t\n");
++    laddrs_str = strtok(0,"<->\t\n");
++    raddrs_str = strtok(0,"<->\t\n");
+ 
+     type = atoi(sty_str);
+     state = atoi(sst_str);
+@@ -1235,116 +1204,81 @@ static void sctp_assoc_do_one(int lnr, char *line)
+     inode = strtoul(inode_str,0,0);
+     lport = atoi(lport_str);
+     rport = atoi(rport_str);
+-    
+-    if(flag_sctp<=1) {
+-	/* only print the primary addresses */
+-	char local_addr[64];
+-	char local_port[16];
+-	char remote_addr[64];
+-	char remote_port[16];
+-	
+-	ap = process_sctp_addr_str(pladdr_str, (struct sockaddr*)&localaddr);
+-	if(ap)
+-	    safe_strncpy(local_addr,
+-	                 ap->sprint((struct sockaddr *) &localaddr, flag_not),
+-	                 sizeof(local_addr));
+-	else
+-	    sprintf(local_addr,_("unsupported address family %d"), ((struct sockaddr*)&localaddr)->sa_family);
+-	
+-	snprintf(local_port, sizeof(local_port), "%s",
+-	         get_sname(htons(lport), "sctp",
+-	                   flag_not & FLAG_NUM_PORT));
+-	
+-	ap = process_sctp_addr_str(praddr_str, (struct sockaddr*)&remoteaddr);
+-	if(ap)
+-	    safe_strncpy(remote_addr,
+-	                 ap->sprint((struct sockaddr *) &remoteaddr, flag_not),
+-	                 sizeof(remote_addr));
+-	else
+-	    sprintf(remote_addr,_("unsupported address family %d"), ((struct sockaddr*)&remoteaddr)->sa_family);
+-	
+-	snprintf(remote_port, sizeof(remote_port), "%s",
+-		 get_sname(htons(rport), "sctp",
+-			   flag_not & FLAG_NUM_PORT));
+-
+-	printf("sctp");
+-	printf("  %6u %6u ", rxqueue, txqueue);
+-	sprintf(buffer,"%s:%s", local_addr, local_port);
+-	printf("%-23s", buffer);
+-	printf(" ");
+-	sprintf(buffer,"%s:%s", remote_addr, remote_port);
+-	printf("%-23s", buffer);
+-    	printf(" %-12s", sctp_socket_state_str(state));
+-    } else {
+-    	/*print all addresses*/
+-	const char *this_local_addr;
+-	const char *this_remote_addr;
+-	char *ss1,*ss2;
+-	int first=1;
+-	char local_port[16];
+-	char remote_port[16];
+-	snprintf(local_port, sizeof(local_port), "%s",
+-	         get_sname(htons(lport), "sctp",
+-	                   flag_not & FLAG_NUM_PORT));
+-	snprintf(remote_port, sizeof(remote_port), "%s",
+-	         get_sname(htons(rport), "sctp",
+-	                   flag_not & FLAG_NUM_PORT));
+-
+-	this_local_addr=strtok_r(laddrs_str," \t\n",&ss1);
+-	this_remote_addr=strtok_r(raddrs_str," \t\n",&ss2);
+-	while(this_local_addr || this_remote_addr) {
+-	    char local_addr[64];
+-	    char remote_addr[64];
+-	    if(this_local_addr) {
+-		ap = process_sctp_addr_str(this_local_addr, (struct sockaddr*)&localaddr);
+-		if(ap)
+-		    safe_strncpy(local_addr,
+-		                 ap->sprint((struct sockaddr *) &localaddr, flag_not),
+-		                 sizeof(local_addr));
+-		else
+-		    sprintf(local_addr,_("unsupported address family %d"), ((struct sockaddr*)&localaddr)->sa_family);
+-	    }
+-	    if(this_remote_addr) {
+-		ap = process_sctp_addr_str(this_remote_addr, (struct sockaddr*)&remoteaddr);
+-		if(ap)
+-		    safe_strncpy(remote_addr,
+-		                 ap->sprint((struct sockaddr *) &remoteaddr, flag_not),
+-		                 sizeof(remote_addr));
+-		else
+-		    sprintf(remote_addr,_("unsupported address family %d"), ((struct sockaddr*)&remoteaddr)->sa_family);
+-	    }
+ 
+-	    if(!first) printf("\n");
+-	    if(first)
+-		printf("sctp  %6u %6u ", rxqueue, txqueue);
+-	    else
+-		printf("                    ");
+-	    if(this_local_addr) {
+-		if(first)
+-		    sprintf(buffer,"%s:%s", local_addr, local_port);
++    /*print all addresses*/
++    const char *this_local_addr;
++    const char *this_remote_addr;
++    char *ss1,*ss2;
++    int first=1;
++    char local_port[16];
++    char remote_port[16];
++    snprintf(local_port, sizeof(local_port), "%s",
++             get_sname(htons(lport), "sctp",
++             flag_not & FLAG_NUM_PORT));
++    snprintf(remote_port, sizeof(remote_port), "%s",
++             get_sname(htons(rport), "sctp",
++             flag_not & FLAG_NUM_PORT));
++
++    this_local_addr=strtok_r(laddrs_str," \t\n",&ss1);
++    this_remote_addr=strtok_r(raddrs_str," \t\n",&ss2);
++    while(this_local_addr || this_remote_addr) {
++        char local_addr[64];
++        char remote_addr[64];
++
++        if(this_local_addr) {
++            if (this_local_addr[0] == '*') {
++                /* skip * */
++                this_local_addr++;
++            }
++            ap = process_sctp_addr_str(this_local_addr, (struct sockaddr*)&localaddr);
++            if(ap)
++                safe_strncpy(local_addr,
++                    ap->sprint((struct sockaddr *) &localaddr, flag_not), sizeof(local_addr));
+ 		else
+-		    sprintf(buffer,"%s", local_addr);
+-		printf("%-23s", buffer);
+-	    } else
+-	    	printf("%-23s", "");
+-	    printf(" ");
+-	    if(this_remote_addr) {
+-		if(first)
+-		    sprintf(buffer,"%s:%s", remote_addr, remote_port);
++                    sprintf(local_addr,_("unsupported address family %d"), ((struct sockaddr*)&localaddr)->sa_family);
++        }
++	if(this_remote_addr) {
++            if (this_remote_addr[0] == '*') {
++                /* skip * */
++                this_remote_addr++;
++            }
++            ap = process_sctp_addr_str(this_remote_addr, (struct sockaddr*)&remoteaddr);
++            if(ap)
++                safe_strncpy(remote_addr,
++                    ap->sprint((struct sockaddr *) &remoteaddr, flag_not), sizeof(remote_addr));
+ 		else
+-		    sprintf(buffer,"%s", remote_addr);
+-		printf("%-23s", buffer);
+-	    } else
+-		printf("%-23s", "");
+-
+-	    printf(" %-12s", first?sctp_socket_state_str(state):"");
++                    sprintf(remote_addr,_("unsupported address family %d"), ((struct sockaddr*)&remoteaddr)->sa_family);
++       }
+ 
+-	    first = 0;
+-	    this_local_addr=strtok_r(0," \t\n",&ss1);
+-	    this_remote_addr=strtok_r(0," \t\n",&ss2);
+-	}
++       if(!first) printf("\n");
++       if(first)
++           printf("sctp  %6u %6u ", rxqueue, txqueue);
++       else
++           printf("                    ");
++       if(this_local_addr) {
++           if(first)
++               sprintf(buffer,"%s:%s", local_addr, local_port);
++           else
++               sprintf(buffer,"%s", local_addr);
++           printf("%-27s", buffer);
++       } else
++           printf("%-27s", "");
++       printf(" ");
++       if(this_remote_addr) {
++           if(first)
++               sprintf(buffer,"%s:%s", remote_addr, remote_port);
++           else
++               sprintf(buffer,"%s", remote_addr);
++           printf("%-27s", buffer);
++       } else
++       printf("%-27s", "");
++
++       printf(" %-12s", first?sctp_socket_state_str(state):"");
++
++       first = 0;
++       this_local_addr=strtok_r(0," \t\n",&ss1);
++       this_remote_addr=strtok_r(0," \t\n",&ss2);
+     }
+-
+     finish_this_one(uid,inode,"");
+ }
+ 
+-- 
+1.8.5.2.233.g932f7e4
+

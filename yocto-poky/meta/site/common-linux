@@ -1,6 +1,13 @@
+# gettext - these add sleep delays otherwise
+gl_cv_func_sleep_works=${gl_cv_func_sleep_works=yes}
+gl_cv_header_working_fcntl_h=${gl_cv_header_working_fcntl_h=yes}
+
 # apr
 ac_cv_file__dev_zero=${ac_cv_file__dev_zero=yes}
 ac_cv_sizeof_pid_t=${ac_cv_sizeof_pid_t=4}
+ac_cv_func_pthread_key_delete=${ac_cv_func_pthread_key_delete=yes}
+apr_cv_tcp_nodelay_with_cork=${apr_cv_tcp_nodelay_with_cork=yes}
+apr_cv_process_shared_works=${apr_cv_process_shared_works=no}
 
 # samba
 samba_cv_HAVE_IFACE_AIX=${samba_cv_HAVE_IFACE_AIX=no}
@@ -34,6 +41,10 @@ bash_cv_pgrp_pipe=${bash_cv_pgrp_pipe=no}
 bash_cv_job_control_missing=${bash_cv_job_control_missing=present}
 bash_cv_sys_named_pipes=${bash_cv_sys_named_pipes=present}
 bash_cv_unusable_rtsigs=${bash_cv_unusable_rtsigs=no}
+
+# ccache
+hw_cv_func_snprintf_c99=${hw_cv_func_snprintf_c99=yes}
+hw_cv_func_vsnprintf_c99=${hw_cv_func_vsnprintf_c99=yes}
 
 # coreutils
 gl_cv_func_fstatat_zero_flag=${gl_cv_func_fstatat_zero_flag=yes}

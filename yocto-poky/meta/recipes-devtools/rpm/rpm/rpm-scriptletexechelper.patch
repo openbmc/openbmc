@@ -12,22 +12,21 @@ Upstream-Status: Pending
 
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
 
-Index: rpm-5.4.14/lib/psm.c
+Index: rpm/lib/psm.c
 ===================================================================
---- rpm-5.4.14.orig/lib/psm.c
-+++ rpm-5.4.14/lib/psm.c
-@@ -806,6 +806,10 @@ static rpmRC runScript(rpmpsm psm, Heade
+--- rpm.orig/lib/psm.c
++++ rpm/lib/psm.c
+@@ -846,6 +846,9 @@ static rpmRC runScript(rpmpsm psm, Heade
+     pid_t pid;
      int xx;
      int i;
- 
 +#ifdef RPM_VENDOR_OE
 +    const char * scriptletWrapper = rpmExpand("%{?_cross_scriptlet_wrapper}", NULL);
 +#endif
-+    
-     if (psm->sstates != NULL && ix >= 0 && ix < RPMSCRIPT_MAX)
- 	ssp = psm->sstates + ix;
-     if (ssp != NULL)
-@@ -872,14 +876,29 @@ assert(he->p.str != NULL);
+ 
+ #ifdef	__clang__
+ #pragma clang diagnostic push
+@@ -923,14 +926,29 @@ assert(he->p.str != NULL);
  		(F_ISSET(psm, UNORDERED) ? "a" : ""));
  
      if (Phe->p.argv == NULL) {
@@ -63,7 +62,7 @@ Index: rpm-5.4.14/lib/psm.c
  	ldconfig_done = (ldconfig_path && !strcmp(argv[0], ldconfig_path)
  		? 1 : 0);
      }
-@@ -930,7 +949,12 @@ assert(he->p.str != NULL);
+@@ -981,7 +999,12 @@ assert(he->p.str != NULL);
  	    goto exit;
  
  	if (rpmIsDebug() &&
@@ -77,7 +76,7 @@ Index: rpm-5.4.14/lib/psm.c
  	{
  	    static const char set_x[] = "set -x\n";
  	    nw = Fwrite(set_x, sizeof(set_x[0]), sizeof(set_x)-1, fd);
-@@ -1065,12 +1089,22 @@ assert(he->p.str != NULL);
+@@ -1116,12 +1139,22 @@ assert(he->p.str != NULL);
  
  	{   const char * rootDir = rpmtsRootDir(ts);
  	    if (!rpmtsChrootDone(ts) && rootDir != NULL &&
@@ -100,7 +99,7 @@ Index: rpm-5.4.14/lib/psm.c
  	    xx = Chdir("/");
  	    rpmlog(RPMLOG_DEBUG, D_("%s: %s(%s)\texecv(%s) pid %d\n"),
  			psm->stepName, sln, NVRA,
-@@ -2985,6 +3019,13 @@ assert(psm->te != NULL);
+@@ -3052,6 +3085,13 @@ assert(psm->te != NULL);
      case PSM_SCRIPT:	/* Run current package scriptlets. */
  	/* XXX running %verifyscript/%sanitycheck doesn't have psm->te */
      {	rpmtxn _parent = (psm && psm->te ? psm->te->txn : NULL);
@@ -114,7 +113,7 @@ Index: rpm-5.4.14/lib/psm.c
  	xx = rpmtxnBegin(rpmtsGetRdb(ts), _parent, NULL);
  	rc = runInstScript(psm);
  	if (rc)
-@@ -2992,11 +3033,24 @@ assert(psm->te != NULL);
+@@ -3059,11 +3099,24 @@ assert(psm->te != NULL);
  	else
  	     xx = rpmtxnCommit(rpmtsGetRdb(ts)->db_txn);
  	rpmtsGetRdb(ts)->db_txn = NULL;
@@ -139,7 +138,7 @@ Index: rpm-5.4.14/lib/psm.c
  	break;
      case PSM_IMMED_TRIGGERS:
  	/* Run triggers in this package other package(s) set off. */
-@@ -3006,7 +3060,18 @@ assert(psm->te != NULL);
+@@ -3073,7 +3126,18 @@ assert(psm->te != NULL);
  	    F_SET(psm, GOTTRIGGERS);
  	}
  	if (psm->triggers != NULL)

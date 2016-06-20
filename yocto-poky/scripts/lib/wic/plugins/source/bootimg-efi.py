@@ -27,8 +27,9 @@
 import os
 import shutil
 
-from wic import kickstart, msger
+from wic import msger
 from wic.pluginbase import SourcePlugin
+from wic.utils.misc import get_custom_config
 from wic.utils.oe.misc import exec_cmd, exec_native_cmd, get_bitbake_var, \
                               BOOTDD_EXTRA_SPACE
 
@@ -45,22 +46,34 @@ class BootimgEFIPlugin(SourcePlugin):
         """
         Create loader-specific (grub-efi) config
         """
-        options = creator.ks.handler.bootloader.appendLine
+        configfile = creator.ks.bootloader.configfile
+        custom_cfg = None
+        if configfile:
+            custom_cfg = get_custom_config(configfile)
+            if custom_cfg:
+                # Use a custom configuration for grub
+                grubefi_conf = custom_cfg
+                msger.debug("Using custom configuration file "
+                        "%s for grub.cfg" % configfile)
+            else:
+                msger.error("configfile is specified but failed to "
+                        "get it from %s." % configfile)
 
-        grubefi_conf = ""
-        grubefi_conf += "serial --unit=0 --speed=115200 --word=8 --parity=no --stop=1\n"
-        grubefi_conf += "default=boot\n"
-        timeout = kickstart.get_timeout(creator.ks)
-        if not timeout:
-            timeout = 0
-        grubefi_conf += "timeout=%s\n" % timeout
-        grubefi_conf += "menuentry 'boot'{\n"
+        if not custom_cfg:
+            # Create grub configuration using parameters from wks file
+            bootloader = creator.ks.bootloader
 
-        kernel = "/bzImage"
+            grubefi_conf = ""
+            grubefi_conf += "serial --unit=0 --speed=115200 --word=8 --parity=no --stop=1\n"
+            grubefi_conf += "default=boot\n"
+            grubefi_conf += "timeout=%s\n" % bootloader.timeout
+            grubefi_conf += "menuentry 'boot'{\n"
 
-        grubefi_conf += "linux %s root=%s rootwait %s\n" \
-            % (kernel, creator.rootdev, options)
-        grubefi_conf += "}\n"
+            kernel = "/bzImage"
+
+            grubefi_conf += "linux %s root=%s rootwait %s\n" \
+                % (kernel, creator.rootdev, bootloader.append)
+            grubefi_conf += "}\n"
 
         msger.debug("Writing grubefi config %s/hdd/boot/EFI/BOOT/grub.cfg" \
                         % cr_workdir)
@@ -79,15 +92,11 @@ class BootimgEFIPlugin(SourcePlugin):
         install_cmd = "install -d %s/loader/entries" % hdddir
         exec_cmd(install_cmd)
 
-        options = creator.ks.handler.bootloader.appendLine
-
-        timeout = kickstart.get_timeout(creator.ks)
-        if not timeout:
-            timeout = 0
+        bootloader = creator.ks.bootloader
 
         loader_conf = ""
         loader_conf += "default boot\n"
-        loader_conf += "timeout %d\n" % timeout
+        loader_conf += "timeout %d\n" % bootloader.timeout
 
         msger.debug("Writing gummiboot config %s/hdd/boot/loader/loader.conf" \
                         % cr_workdir)
@@ -95,12 +104,28 @@ class BootimgEFIPlugin(SourcePlugin):
         cfg.write(loader_conf)
         cfg.close()
 
-        kernel = "/bzImage"
+        configfile = creator.ks.bootloader.configfile
+        custom_cfg = None
+        if configfile:
+            custom_cfg = get_custom_config(configfile)
+            if custom_cfg:
+                # Use a custom configuration for gummiboot
+                boot_conf = custom_cfg
+                msger.debug("Using custom configuration file "
+                        "%s for gummiboots's boot.conf" % configfile)
+            else:
+                msger.error("configfile is specified but failed to "
+                        "get it from %s." % configfile)
 
-        boot_conf = ""
-        boot_conf += "title boot\n"
-        boot_conf += "linux %s\n" % kernel
-        boot_conf += "options LABEL=Boot root=%s %s\n" % (creator.rootdev, options)
+        if not custom_cfg:
+            # Create gummiboot configuration using parameters from wks file
+            kernel = "/bzImage"
+
+            boot_conf = ""
+            boot_conf += "title boot\n"
+            boot_conf += "linux %s\n" % kernel
+            boot_conf += "options LABEL=Boot root=%s %s\n" % \
+                             (creator.rootdev, bootloader.append)
 
         msger.debug("Writing gummiboot config %s/hdd/boot/loader/entries/boot.conf" \
                         % cr_workdir)
@@ -117,8 +142,6 @@ class BootimgEFIPlugin(SourcePlugin):
         Called before do_prepare_partition(), creates loader-specific config
         """
         hdddir = "%s/hdd/boot" % cr_workdir
-        rm_cmd = "rm -rf %s" % cr_workdir
-        exec_cmd(rm_cmd)
 
         install_cmd = "install -d %s/EFI/BOOT" % hdddir
         exec_cmd(install_cmd)
@@ -210,5 +233,5 @@ class BootimgEFIPlugin(SourcePlugin):
         out = exec_cmd(du_cmd)
         bootimg_size = out.split()[0]
 
-        part.set_size(bootimg_size)
-        part.set_source_file(bootimg)
+        part.size = bootimg_size
+        part.source_file = bootimg

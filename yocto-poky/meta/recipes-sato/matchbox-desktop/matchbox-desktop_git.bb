@@ -13,7 +13,9 @@ SECTION = "x11/wm"
 SRCREV = "71e3e6e04271e9d5a14f1c231ef100c7f320134d"
 PV = "2.0+git${SRCPV}"
 
-SRC_URI = "git://git.yoctoproject.org/${BPN}-2"
+SRC_URI = "git://git.yoctoproject.org/${BPN}-2 \
+           file://0001-Do-nothing-on-delete-event-when-not-STANDALONE.patch \
+           "
 
 EXTRA_OECONF = "--enable-startup-notification --with-dbus"
 

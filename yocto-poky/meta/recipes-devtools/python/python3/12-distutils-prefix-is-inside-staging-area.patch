@@ -1,3 +1,8 @@
+From d4dd67daa1555bf13272cc071706338572539bad Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 14 May 2013 15:00:26 -0700
+Subject: [PATCH 01/20] python3: Add target and native recipes
+
 Upstream-Status: Inappropriate [embedded specific]
 
 02/2015 Rebased for Python 3.4.2
@@ -8,11 +13,12 @@ Upstream-Status: Inappropriate [embedded specific]
 # Signed-off-by: Khem Raj <raj.khem@gmail.com>
 # Signed-off-by: Alejandro Hernandez <alejandro.hernandez@linux.intel.com>
 
-Index: Python-3.4.2/Lib/distutils/sysconfig.py
-===================================================================
---- Python-3.4.2.orig/Lib/distutils/sysconfig.py
-+++ Python-3.4.2/Lib/distutils/sysconfig.py
-@@ -16,10 +16,11 @@ import sys
+---
+diff --git a/Lib/distutils/sysconfig.py b/Lib/distutils/sysconfig.py
+index 573724d..418b478 100644
+--- a/Lib/distutils/sysconfig.py
++++ b/Lib/distutils/sysconfig.py
+@@ -17,10 +17,11 @@ import sys
  from .errors import DistutilsPlatformError
  
  # These are needed in a couple of spots, so just compute them once.
@@ -27,8 +33,8 @@ Index: Python-3.4.2/Lib/distutils/sysconfig.py
 +
  
  # Path to the base directory of the project. On Windows the binary may
- # live in project/PCBuild9.  If we're dealing with an x64 Windows build,
-@@ -93,7 +94,9 @@ def get_python_inc(plat_specific=0, pref
+ # live in project/PCBuild/win32 or project/PCBuild/amd64.
+@@ -84,7 +85,9 @@ def get_python_inc(plat_specific=0, prefix=None):
      If 'prefix' is supplied, use it instead of sys.base_prefix or
      sys.base_exec_prefix -- i.e., ignore 'plat_specific'.
      """
@@ -39,20 +45,18 @@ Index: Python-3.4.2/Lib/distutils/sysconfig.py
          prefix = plat_specific and BASE_EXEC_PREFIX or BASE_PREFIX
      if os.name == "posix":
          if python_build:
-@@ -134,6 +137,12 @@ def get_python_lib(plat_specific=0, stan
+@@ -125,6 +128,10 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
      If 'prefix' is supplied, use it instead of sys.base_prefix or
      sys.base_exec_prefix -- i.e., ignore 'plat_specific'.
      """
++    lib_basename = os.environ['STAGING_LIBDIR'].split('/')[-1]
 +    if prefix is None and os.environ['STAGING_LIBDIR'] != "":
-+        lib_basename = os.environ['STAGING_LIBDIR'].split('/')[-1]
 +        prefix = os.environ['STAGING_LIBDIR'].rstrip(lib_basename)
-+    else:
-+        lib_basename = sys.lib
 +
      if prefix is None:
          if standard_lib:
              prefix = plat_specific and BASE_EXEC_PREFIX or BASE_PREFIX
-@@ -142,7 +151,7 @@ def get_python_lib(plat_specific=0, stan
+@@ -133,7 +140,7 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
  
      if os.name == "posix":
          libpython = os.path.join(prefix,
@@ -61,7 +65,7 @@ Index: Python-3.4.2/Lib/distutils/sysconfig.py
          if standard_lib:
              return libpython
          else:
-@@ -242,7 +251,7 @@ def get_config_h_filename():
+@@ -233,7 +240,7 @@ def get_config_h_filename():
      else:
          inc_dir = get_python_inc(plat_specific=1)
  
@@ -70,7 +74,7 @@ Index: Python-3.4.2/Lib/distutils/sysconfig.py
  
  
  def get_makefile_filename():
-@@ -251,7 +260,7 @@ def get_makefile_filename():
+@@ -242,7 +249,7 @@ def get_makefile_filename():
          return os.path.join(_sys_home or project_base, "Makefile")
      lib_dir = get_python_lib(plat_specific=0, standard_lib=1)
      config_file = 'config-{}{}'.format(get_python_version(), build_flags)
@@ -79,3 +83,6 @@ Index: Python-3.4.2/Lib/distutils/sysconfig.py
  
  
  def parse_config_h(fp, g=None):
+-- 
+2.7.0
+

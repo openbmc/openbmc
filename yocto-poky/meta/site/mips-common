@@ -30,10 +30,7 @@ ac_cv_alignof_CORBA_pointer=4
 ac_cv_alignof_CORBA_struct=1
 
 # apache
-ac_cv_func_pthread_key_delete=${ac_cv_func_pthread_key_delete=yes}
-apr_cv_process_shared_works=${apr_cv_process_shared_works=no}
 ac_cv_sizeof_ssize_t=${ac_cv_sizeof_ssize_t=4}
-apr_cv_tcp_nodelay_with_cork=${apr_cv_tcp_nodelay_with_cork=yes}
 
 # glib
 glib_cv_va_val_copy=${glib_cv_va_val_copy=yes}

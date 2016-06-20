@@ -1,0 +1,74 @@
+From 7b40212ed6c0c9fe4efe51f31bccd3d9f892f238 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 29 Mar 2013 09:20:50 +0400
+Subject: [PATCH 19/46] libgcc-sjlj-check
+
+ac_fn_c_try_compile doesnt seem to keep the intermediate files
+which are needed for sjlj test to pass since it greps into the
+generated file. So we run the compiler command using AC_TRY_COMMAND
+which then generates the needed .s file
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Pending
+---
+ libgcc/configure    | 10 ++++++----
+ libgcc/configure.ac | 10 ++++------
+ 2 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/libgcc/configure b/libgcc/configure
+index 203d384..6aef3e7 100644
+--- a/libgcc/configure
++++ b/libgcc/configure
+@@ -4570,17 +4570,19 @@ void foo ()
+ }
+ 
+ _ACEOF
+-CFLAGS_hold=$CFLAGS
+-CFLAGS="--save-temps -fexceptions"
+ libgcc_cv_lib_sjlj_exceptions=unknown
+-if ac_fn_c_try_compile; then :
++if { ac_try='${CC-cc} -fexceptions -S conftest.c -o conftest.s 1>&5'
++  { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_try\""; } >&5
++  (eval $ac_try) 2>&5
++  ac_status=$?
++  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
++  test $ac_status = 0; }; }; then
+   if grep _Unwind_SjLj_Resume conftest.s >/dev/null 2>&1; then
+     libgcc_cv_lib_sjlj_exceptions=yes
+   elif grep _Unwind_Resume conftest.s >/dev/null 2>&1; then
+     libgcc_cv_lib_sjlj_exceptions=no
+   fi
+ fi
+-CFLAGS=$CFLAGS_hold
+ rm -f conftest*
+ 
+ fi
+diff --git a/libgcc/configure.ac b/libgcc/configure.ac
+index a10a952..cc324f3 100644
+--- a/libgcc/configure.ac
++++ b/libgcc/configure.ac
+@@ -255,16 +255,14 @@ void foo ()
+   bar();
+ }
+ ])])
+-CFLAGS_hold=$CFLAGS
+-CFLAGS="--save-temps -fexceptions"
+ libgcc_cv_lib_sjlj_exceptions=unknown
+-AS_IF([ac_fn_c_try_compile],
+-  [if grep _Unwind_SjLj_Resume conftest.s >/dev/null 2>&1; then
++if AC_TRY_COMMAND(${CC-cc} -fexceptions -S conftest.c -o conftest.s 1>&AS_MESSAGE_LOG_FD); then
++  if grep _Unwind_SjLj_Resume conftest.s >/dev/null 2>&1; then
+     libgcc_cv_lib_sjlj_exceptions=yes
+   elif grep _Unwind_Resume conftest.s >/dev/null 2>&1; then
+     libgcc_cv_lib_sjlj_exceptions=no
+-  fi])
+-CFLAGS=$CFLAGS_hold
++  fi
++fi
+ rm -f conftest*
+ ])
+ 
+-- 
+2.6.3
+

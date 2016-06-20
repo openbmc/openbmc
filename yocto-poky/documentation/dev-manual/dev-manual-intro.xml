@@ -29,8 +29,8 @@
         <para>
             The Yocto Project Development Manual does, however, provide
             guidance and examples on how to change the kernel source code,
-            reconfigure the kernel, and develop an application using the
-            popular <trademark class='trade'>Eclipse</trademark> IDE.
+            reconfigure the kernel, and develop an application using
+            <filename>devtool</filename>.
         </para>
 
         <note>
@@ -86,17 +86,21 @@
             <itemizedlist>
                 <listitem><para><emphasis>Step-by-step instructions when those instructions exist in other Yocto
                     Project documentation:</emphasis>
-                    For example, the Yocto Project Application Developer's Guide contains detailed
-                    instructions on how to run the
-                    <ulink url='&YOCTO_DOCS_ADT_URL;#installing-the-adt'>ADT Installer</ulink>,
-                    which is used to set up a cross-development environment.</para></listitem>
+                    For example, the
+                    <ulink url='&YOCTO_DOCS_SDK_URL;'>Yocto Project Software Development Kit (SDK) Developer's Guide</ulink>
+                    manual contains detailed instructions on how to install an
+                    SDK, which is used to develop applications for target
+                    hardware.
+                    </para></listitem>
                 <listitem><para><emphasis>Reference material:</emphasis>
                     This type of material resides in an appropriate reference manual.
                     For example, system variables are documented in the
-                    <ulink url='&YOCTO_DOCS_REF_URL;'>Yocto Project Reference Manual</ulink>.</para></listitem>
+                    <ulink url='&YOCTO_DOCS_REF_URL;'>Yocto Project Reference Manual</ulink>.
+                    </para></listitem>
                 <listitem><para><emphasis>Detailed public information that is not specific to the Yocto Project:</emphasis>
                     For example, exhaustive information on how to use Git is covered better through the
-                    Internet than in this manual.</para></listitem>
+                    Internet than in this manual.
+                    </para></listitem>
             </itemizedlist>
         </para>
     </section>
@@ -126,10 +130,12 @@
                     The build system is sometimes referred to as "Poky".
                     </para></listitem>
                 <listitem><para><emphasis>
-                    <ulink url='&YOCTO_DOCS_ADT_URL;'>Yocto Project Application Developer's Guide</ulink>:</emphasis>
-                    This guide provides information that lets you get going with the Application
-                    Development Toolkit (ADT) and stand-alone cross-development toolchains to
-                    develop projects using the Yocto Project.
+                    <ulink url='&YOCTO_DOCS_SDK_URL;'>Yocto Project Software Development Kit (SDK) Developer's Guide</ulink>:</emphasis>
+                    This guide provides information that lets you get going
+                    with the standard or extensible SDK.
+                    An SDK, with its cross-development toolchains, allows you
+                    to develop projects inside or outside of the Yocto Project
+                    environment.
                     </para></listitem>
                 <listitem><para><emphasis>
                     <ulink url='&YOCTO_DOCS_BSP_URL;'>Yocto Project Board Support Package (BSP) Developer's Guide</ulink>:</emphasis>
@@ -167,11 +173,6 @@
                     <ulink url='&YOCTO_RELEASE_NOTES;'>Release Notes</ulink>:</emphasis>
                     Features, updates and known issues for the current
                     release of the Yocto Project.
-                    </para></listitem>
-                <listitem><para><emphasis>
-                    <ulink url='&YOCTO_HOME_URL;/tools-resources/projects/hob'>Hob</ulink>:</emphasis>
-                    A graphical user interface for BitBake.
-                    Hob's primary goal is to enable a user to perform common tasks more easily.
                     </para></listitem>
                 <listitem><para><emphasis>
                     <ulink url='&YOCTO_HOME_URL;/tools-resources/projects/toaster'>Toaster</ulink>:</emphasis>

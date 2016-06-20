@@ -1,0 +1,32 @@
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: gcc-4.9-20140316/libstdc++-v3/configure.host
+===================================================================
+--- gcc-4.9-20140316.orig/libstdc++-v3/configure.host	2014-03-26 01:12:19.466008193 -0700
++++ gcc-4.9-20140316/libstdc++-v3/configure.host	2014-03-26 01:43:48.222684357 -0700
+@@ -264,14 +264,24 @@
+     os_include_dir="os/bsd/freebsd"
+     ;;
+   gnu* | linux* | kfreebsd*-gnu | knetbsd*-gnu)
++    # check for musl by target
++    case "${host_os}" in
++      *-musl*)
++        os_include_dir="os/generic"
++        ;;
++      *)
+     if [ "$uclibc" = "yes" ]; then
+       os_include_dir="os/uclibc"
+     elif [ "$bionic" = "yes" ]; then
+       os_include_dir="os/bionic"
++    elif [ "$musl" = "yes" ]; then
++      os_include_dir="os/generic"
+     else
+       os_include_dir="os/gnu-linux"
+     fi
+     ;;
++    esac
++    ;;
+   hpux*)
+     os_include_dir="os/hpux"
+     ;;

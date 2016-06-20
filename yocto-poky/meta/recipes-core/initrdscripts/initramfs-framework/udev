@@ -38,6 +38,7 @@ udev_run() {
 	add_module_pre_hook "udev_shutdown_hook_handler"
 
 	mkdir -p /run
+	mkdir -p /var/run
 
 	$_UDEV_DAEMON --daemon
 	udevadm trigger --action=add

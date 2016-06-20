@@ -232,7 +232,7 @@ def run_fossology(foss_command, full_spdx):
     # Package info
     package_info = {}
     if full_spdx:
-        # All mandatory, only one occurance
+        # All mandatory, only one occurrence
         package_info['PackageCopyrightText'] = re.findall('PackageCopyrightText: (.*?</text>)', foss_output, re.S)[0]
         package_info['PackageLicenseDeclared'] = re.findall('PackageLicenseDeclared: (.*)', foss_output)[0]
         package_info['PackageLicenseConcluded'] = re.findall('PackageLicenseConcluded: (.*)', foss_output)[0]

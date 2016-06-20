@@ -27,8 +27,9 @@
 import os
 
 from wic.utils.errors import ImageError
-from wic import kickstart, msger
+from wic import msger
 from wic.utils import runner
+from wic.utils.misc import get_custom_config
 from wic.pluginbase import SourcePlugin
 from wic.utils.oe.misc import exec_cmd, exec_native_cmd, \
                               get_bitbake_var, BOOTDD_EXTRA_SPACE
@@ -77,40 +78,49 @@ class BootimgPcbiosPlugin(SourcePlugin):
         Called before do_prepare_partition(), creates syslinux config
         """
         hdddir = "%s/hdd/boot" % cr_workdir
-        rm_cmd = "rm -rf " + cr_workdir
-        exec_cmd(rm_cmd)
 
         install_cmd = "install -d %s" % hdddir
         exec_cmd(install_cmd)
 
-        splash = os.path.join(cr_workdir, "/hdd/boot/splash.jpg")
-        if os.path.exists(splash):
-            splashline = "menu background splash.jpg"
-        else:
-            splashline = ""
+        bootloader = creator.ks.bootloader
 
-        options = creator.ks.handler.bootloader.appendLine
+        custom_cfg = None
+        if bootloader.configfile:
+            custom_cfg = get_custom_config(bootloader.configfile)
+            if custom_cfg:
+                # Use a custom configuration for grub
+                syslinux_conf = custom_cfg
+                msger.debug("Using custom configuration file "
+                            "%s for syslinux.cfg" % bootloader.configfile)
+            else:
+                msger.error("configfile is specified but failed to "
+                            "get it from %s." % bootloader.configfile)
 
-        syslinux_conf = ""
-        syslinux_conf += "PROMPT 0\n"
-        timeout = kickstart.get_timeout(creator.ks)
-        if not timeout:
-            timeout = 0
-        syslinux_conf += "TIMEOUT " + str(timeout) + "\n"
-        syslinux_conf += "\n"
-        syslinux_conf += "ALLOWOPTIONS 1\n"
-        syslinux_conf += "SERIAL 0 115200\n"
-        syslinux_conf += "\n"
-        if splashline:
-            syslinux_conf += "%s\n" % splashline
-        syslinux_conf += "DEFAULT boot\n"
-        syslinux_conf += "LABEL boot\n"
+        if not custom_cfg:
+            # Create syslinux configuration using parameters from wks file
+            splash = os.path.join(cr_workdir, "/hdd/boot/splash.jpg")
+            if os.path.exists(splash):
+                splashline = "menu background splash.jpg"
+            else:
+                splashline = ""
 
-        kernel = "/vmlinuz"
-        syslinux_conf += "KERNEL " + kernel + "\n"
+            syslinux_conf = ""
+            syslinux_conf += "PROMPT 0\n"
+            syslinux_conf += "TIMEOUT " + str(bootloader.timeout) + "\n"
+            syslinux_conf += "\n"
+            syslinux_conf += "ALLOWOPTIONS 1\n"
+            syslinux_conf += "SERIAL 0 115200\n"
+            syslinux_conf += "\n"
+            if splashline:
+                syslinux_conf += "%s\n" % splashline
+            syslinux_conf += "DEFAULT boot\n"
+            syslinux_conf += "LABEL boot\n"
 
-        syslinux_conf += "APPEND label=boot root=%s %s\n" % \
-                             (creator.rootdev, options)
+            kernel = "/vmlinuz"
+            syslinux_conf += "KERNEL " + kernel + "\n"
+
+            syslinux_conf += "APPEND label=boot root=%s %s\n" % \
+                             (creator.rootdev, bootloader.append)
 
         msger.debug("Writing syslinux config %s/hdd/boot/syslinux.cfg" \
                     % cr_workdir)
@@ -194,7 +204,7 @@ class BootimgPcbiosPlugin(SourcePlugin):
         out = exec_cmd(du_cmd)
         bootimg_size = out.split()[0]
 
-        part.set_size(bootimg_size)
-        part.set_source_file(bootimg)
+        part.size = int(out.split()[0])
+        part.source_file = bootimg
 
 

@@ -13,9 +13,9 @@ def mkdir(d):
         if e.errno != errno.EEXIST:
             raise e
 
-if len(sys.argv) < 3:
+if len(sys.argv) < 5:
     print("Incorrect number of arguments specified")
-    print("syntax: gen-lockedsig-cache <locked-sigs.inc> <input-cachedir> <output-cachedir>")
+    print("syntax: gen-lockedsig-cache <locked-sigs.inc> <input-cachedir> <output-cachedir> <nativelsbstring>")
     sys.exit(1)
 
 print('Reading %s' % sys.argv[1])
@@ -30,7 +30,7 @@ files = set()
 for s in sigs:
     p = sys.argv[2] + "/" + s[:2] + "/*" + s + "*"
     files |= set(glob.glob(p))
-    p = sys.argv[2] + "/*/" + s[:2] + "/*" + s + "*"
+    p = sys.argv[2] + "/%s/" % sys.argv[4] + s[:2] + "/*" + s + "*"
     files |= set(glob.glob(p))
 
 print('Processing files')

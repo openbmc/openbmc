@@ -34,14 +34,16 @@ Manual Organization
 
 Folders exist for individual manuals as follows:
 
-* adt-manual       - The Yocto Project Application Developer's Guide.
+* sdk-manual       - The Yocto Project Software Development Kit (SDK) Developer's Guide.
 * bsp-guide        - The Yocto Project Board Support Package (BSP) Developer's Guide
 * dev-manual       - The Yocto Project Development Manual
 * kernel-dev       - The Yocto Project Linux Kernel Development Manual
 * ref-manual       - The Yocto Project Reference Manual
 * yocto-project-qs - The Yocto Project Quick Start
-* mega-manual      - An aggregated manual comprised of all YP manuals and guides
+* mega-manual      - The Yocto Project Mega-Manual, which is an aggregated manual comprised
+                     of all YP manuals and guides
 * profile-manual   - The Yocto Project Profile and Tracing Manual
+* toaster-manual   - The Toaster Manual
 
 Each folder is self-contained regarding content and figures.  Note that there
 is a sed file needed to process the links of the mega-manual.  The sed file
@@ -68,10 +70,10 @@ inside the Makefile.  See that file for more information.
 To build a manual, you run the make command and pass it the name
 of the folder containing the manual's contents.
 For example, the following command run from the documentation directory
-creates an HTML and a PDF version of the ADT manual.
+creates an HTML version of the SDK manual.
 The DOC variable specifies the manual you are making:
 
-     $ make DOC=adt-manual
+     $ make DOC=sdk-manual
 
 poky.ent
 ========

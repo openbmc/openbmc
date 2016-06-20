@@ -9,7 +9,6 @@ from django.test import TestCase
 
 from bldcontrol.bbcontroller import BitbakeController, BuildSetupException
 from bldcontrol.localhostbecontroller import LocalhostBEController
-from bldcontrol.sshbecontroller import SSHBEController
 from bldcontrol.models import BuildEnvironment, BuildRequest
 from bldcontrol.management.commands.runbuilds import Command
 
@@ -18,7 +17,7 @@ import subprocess
 import os
 
 # standard poky data hardcoded for testing
-BITBAKE_LAYERS = [type('bitbake_info', (object,), { "giturl": "git://git.yoctoproject.org/poky.git", "dirpath": "", "commit": "HEAD"})]
+BITBAKE_LAYER = type('bitbake_info', (object,), { "giturl": "git://git.yoctoproject.org/poky.git", "dirpath": "", "commit": "HEAD"})
 POKY_LAYERS = [
     type('poky_info', (object,), { "name": "meta", "giturl": "git://git.yoctoproject.org/poky.git", "dirpath": "meta", "commit": "HEAD"}),
     type('poky_info', (object,), { "name": "meta-yocto", "giturl": "git://git.yoctoproject.org/poky.git", "dirpath": "meta-yocto", "commit": "HEAD"}),
@@ -48,13 +47,12 @@ class BEControllerTests(object):
         self.assertTrue(err == '', "bitbake server pid %s not stopped" % err)
 
     def test_serverStartAndStop(self):
-        from bldcontrol.sshbecontroller import NotImplementedException
         obe =  self._getBuildEnvironment()
         bc = self._getBEController(obe)
         try:
             # setting layers, skip any layer info
-            bc.setLayers(BITBAKE_LAYERS, POKY_LAYERS)
-        except NotImplementedException,  e:
+            bc.setLayers(BITBAKE_LAYER, POKY_LAYERS)
+        except NotImplementedError:
             print "Test skipped due to command not implemented yet"
             return True
         # We are ok with the exception as we're handling the git already exists
@@ -71,20 +69,16 @@ class BEControllerTests(object):
 
         self.assertFalse(socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect_ex((hostname, int(bc.be.bbport))), "Server not answering")
 
-        bc.stopBBServer()
-        self.assertTrue(socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect_ex((hostname, int(bc.be.bbport))), "Server not stopped")
-
         self._serverForceStop(bc)
 
     def test_getBBController(self):
-        from bldcontrol.sshbecontroller import NotImplementedException
         obe = self._getBuildEnvironment()
         bc = self._getBEController(obe)
         layerSet = False
         try:
             # setting layers, skip any layer info
-            layerSet = bc.setLayers(BITBAKE_LAYERS, POKY_LAYERS)
-        except NotImplementedException:
+            layerSet = bc.setLayers(BITBAKE_LAYER, POKY_LAYERS)
+        except NotImplementedError:
             print "Test skipped due to command not implemented yet"
             return True
         # We are ok with the exception as we're handling the git already exists
@@ -96,7 +90,6 @@ class BEControllerTests(object):
 
         bbc = bc.getBBController()
         self.assertTrue(isinstance(bbc, BitbakeController))
-        bc.stopBBServer()
 
         self._serverForceStop(bc)
 
@@ -115,29 +108,6 @@ class LocalhostBEControllerTests(TestCase, BEControllerTests):
 
     def _getBEController(self, obe):
         return LocalhostBEController(obe)
-
-class SSHBEControllerTests(TestCase, BEControllerTests):
-    def __init__(self, *args):
-        super(SSHBEControllerTests, self).__init__(*args)
-
-    def _getBuildEnvironment(self):
-        return BuildEnvironment.objects.create(
-                lock = BuildEnvironment.LOCK_FREE,
-                betype = BuildEnvironment.TYPE_SSH,
-                address = test_address,
-                sourcedir = test_sourcedir,
-                builddir = test_builddir )
-
-    def _getBEController(self, obe):
-        return SSHBEController(obe)
-
-    def test_pathExists(self):
-        obe = BuildEnvironment.objects.create(betype = BuildEnvironment.TYPE_SSH, address= test_address)
-        sbc = SSHBEController(obe)
-        self.assertTrue(sbc._pathexists("/"))
-        self.assertFalse(sbc._pathexists("/.deadbeef"))
-        self.assertTrue(sbc._pathexists(sbc._shellcmd("pwd")))
-
 
 class RunBuildsCommandTests(TestCase):
     def test_bec_select(self):

@@ -1,0 +1,33 @@
+From 776757a23e9930588950c7fcbc7827ec7a3e51c4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Chv=C3=A1tal?= <tchvatal@suse.com>
+Date: Mon, 4 Jan 2016 15:48:19 +0100
+Subject: [PATCH] Do not accidentaly override commandline passed CFLAGS.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Backport
+
+Signed-off-by: Tomáš Chvátal <tchvatal@suse.com>
+Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Maxin B. John <maxin.john@intel.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 3ba1386..1552c15 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -53,7 +53,7 @@ AS_IF([test "x${prefix}" = "xNONE"], [
+ # ================
+ # Check for cflags
+ # ================
+-CFLAGS="-D_GNU_SOURCE -Wall -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64"
++CFLAGS="$CFLAGS -D_GNU_SOURCE -Wall -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64"
+ AC_ARG_ENABLE([werror],
+     [AS_HELP_STRING([--enable-werror], [Treat all warnings as errors, useful for development])],
+     [enable_werror="$enableval"],
+-- 
+2.4.0
+

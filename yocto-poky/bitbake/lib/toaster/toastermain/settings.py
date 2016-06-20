@@ -23,11 +23,6 @@
 
 import os, re
 
-# Temporary toggle for Image customisation
-CUSTOM_IMAGE = False
-if os.environ.get("CUSTOM_IMAGE", None) is not None:
-    CUSTOM_IMAGE = True
-
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -64,6 +59,7 @@ if 'sqlite' in DATABASES['default']['ENGINE']:
 
 if 'DATABASE_URL' in os.environ:
     dburl = os.environ['DATABASE_URL']
+
     if dburl.startswith('sqlite3://'):
         result = re.match('sqlite3://(.*)', dburl)
         if result is None:
@@ -78,7 +74,7 @@ if 'DATABASE_URL' in os.environ:
         }
     elif dburl.startswith('mysql://'):
         # URL must be in this form: mysql://user:pass@host:port/name
-        result = re.match(r"mysql://([^:]*):([^@]*)@([^:]*):(\d+)/([^/]*)", dburl)
+        result = re.match(r"mysql://([^:]*):([^@]*)@([^:]*):(\d*)/([^/]*)", dburl)
         if result is None:
             raise Exception("ERROR: Could not read mysql database url: %s" % dburl)
         DATABASES['default'] = {
@@ -92,9 +88,6 @@ if 'DATABASE_URL' in os.environ:
     else:
         raise Exception("FIXME: Please implement missing database url schema for url: %s" % dburl)
 
-BUILD_MODE = False
-if 'TOASTER_MANAGED' in os.environ and os.environ['TOASTER_MANAGED'] == "1":
-    BUILD_MODE = True
 
 # Allows current database settings to be exported as a DATABASE_URL environment variable value
 
@@ -231,7 +224,7 @@ CACHES = {
     #        },
            'default': {
                'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-               'LOCATION': '/tmp/django-default-cache',
+               'LOCATION': '/tmp/toaster_cache_%d' % os.getuid(),
                'TIMEOUT': 1,
             }
           }
@@ -279,7 +272,6 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'bldcollector',
     'toastermain',
-    'south',
 )
 
 
@@ -402,12 +394,3 @@ class InvalidString(str):
             "Undefined variable or unknown value for: \"%s\"" % other)
 
 TEMPLATE_STRING_IF_INVALID = InvalidString("%s")
-
-import sys
-sys.path.append(
-    os.path.join(
-    os.path.join(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            "contrib"),
-            "django-aggregate-if-master")
-    )

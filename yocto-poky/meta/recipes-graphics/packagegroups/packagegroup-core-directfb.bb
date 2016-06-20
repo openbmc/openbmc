@@ -11,7 +11,6 @@ RDEPENDS_${PN} = " \
 		directfb \
 		directfb-examples \
 		pango \
-		pango-modules \
 		fontconfig \
 		${TOUCH} \
 "

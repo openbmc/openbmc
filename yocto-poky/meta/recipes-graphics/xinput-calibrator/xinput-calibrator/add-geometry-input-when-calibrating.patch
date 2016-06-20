@@ -1,0 +1,33 @@
+Upstream-Status: Inappropriate [no longer maintained]
+
+From 93abf28d602da637376b78de8c88b7ab5cf13b4f Mon Sep 17 00:00:00 2001
+From: Jonathan David <jonathan.david@ni.com>
+Date: Mon, 30 Nov 2015 12:12:20 -0600
+Subject: [PATCH] add geometry input when calibrating
+
+Send monitor geometry to xinput_calibrator when running the script
+
+Signed-off-by: Jonathan David <jonathan.david@ni.com>
+---
+ scripts/xinput_calibrator_pointercal.sh | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/xinput_calibrator_pointercal.sh b/scripts/xinput_calibrator_pointercal.sh
+index 0ada7da..6a3aded 100755
+--- a/scripts/xinput_calibrator_pointercal.sh
++++ b/scripts/xinput_calibrator_pointercal.sh
+@@ -37,7 +37,10 @@ done
+ 
+ [ "$USER" != "root" ] && CALFILE=$USER_CALFILE
+ 
+-CALDATA=`$BINARY --output-type xinput -v | tee $LOGFILE | grep '    xinput set' | sed 's/^    //g; s/$/;/g'`
++read RESOLUTION <<< $(xrandr | awk -F '[[:space:]+]' '/ connected/ \
++  { if ($3 != "primary") print $3; if ($3 == "primary") print $4 }')
++
++CALDATA=`$BINARY --geometry $RESOLUTION --output-type xinput -v | tee $LOGFILE | grep '    xinput set' | sed 's/^    //g; s/$/;/g'`
+ if [ ! -z "$CALDATA" ] ; then
+   echo $CALDATA > $CALFILE
+   echo "Calibration data stored in $CALFILE (log in $LOGFILE)"
+-- 
+1.9.1
+

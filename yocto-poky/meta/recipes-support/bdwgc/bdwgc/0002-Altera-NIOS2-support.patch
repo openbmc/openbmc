@@ -1,0 +1,71 @@
+From 2571df0e30b4976d7a12dbc6fbec4f1c4027924d Mon Sep 17 00:00:00 2001
+From: Marek Vasut <marex@denx.de>
+Date: Thu, 28 Jan 2016 04:13:13 +0100
+Subject: [PATCH] Altera NIOS2 support
+
+Add simple nios2 configuration support.
+
+* include/private/gcconfig.h (NIOS2): New macro.
+* include/private/gcconfig.h (mach_type_known, CPP_WORDSZ, MACH_TYPE,
+OS_TYPE, DYNAMIC_LOADING, _end, __data_start, DATASTART, DATAEND,
+ALIGNMENT, HBLKSIZE, HBLKSIZE, LINUX_STACKBOTTOM, NO_GETCONTEXT):
+Define for NIOS2.
+
+Signed-off-by: Marek Vasut <marex@denx.de>
+Upstream-Status: Backport [ https://github.com/ivmai/bdwgc.git 2571df0e30b4976d7a12dbc6fbec4f1c4027924d ]
+---
+ include/private/gcconfig.h | 24 +++++++++++++++++++++++-
+ 1 file changed, 23 insertions(+), 1 deletion(-)
+
+diff --git a/include/private/gcconfig.h b/include/private/gcconfig.h
+index c467c26..92d4727 100644
+--- a/include/private/gcconfig.h
++++ b/include/private/gcconfig.h
+@@ -181,6 +181,10 @@
+ #    endif
+ #    define mach_type_known
+ # endif
++# if defined(__NIOS2__) || defined(__NIOS2) || defined(__nios2__)
++#   define NIOS2 /* Altera NIOS2 */
++#   define mach_type_known
++# endif
+ # if defined(DGUX) && (defined(i386) || defined(__i386__))
+ #    define I386
+ #    ifndef _USING_DGUX
+@@ -1658,6 +1662,24 @@
+ #   endif
+ # endif
+ 
++# ifdef NIOS2
++#  define CPP_WORDSZ 32
++#  define MACH_TYPE "NIOS2"
++#  ifdef LINUX
++#    define OS_TYPE "LINUX"
++#    define DYNAMIC_LOADING
++     extern int _end[];
++     extern int __data_start[];
++#    define DATASTART ((ptr_t)(__data_start))
++#    define DATAEND ((ptr_t)(_end))
++#    define ALIGNMENT 4
++#    ifndef HBLKSIZE
++#      define HBLKSIZE 4096
++#    endif
++#    define LINUX_STACKBOTTOM
++#  endif /* Linux */
++# endif
++
+ # ifdef HP_PA
+ #   define MACH_TYPE "HP_PA"
+ #   ifdef __LP64__
+@@ -2622,6 +2644,7 @@
+ #if ((defined(UNIX_LIKE) && (defined(DARWIN) || defined(HURD) \
+                              || defined(OPENBSD) || defined(ARM32) \
+-                             || defined(MIPS) || defined(AVR32))) \
++                             || defined(MIPS) || defined(AVR32) \
++                             || defined(NIOS2))) \
+      || (defined(LINUX) && (defined(SPARC) || defined(M68K))) \
+      || ((defined(RTEMS) || defined(PLATFORM_ANDROID)) && defined(I386))) \
+     && !defined(NO_GETCONTEXT)
+-- 
+2.7.0
+

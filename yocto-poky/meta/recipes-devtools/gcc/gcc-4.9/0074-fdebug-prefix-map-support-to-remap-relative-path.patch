@@ -1,0 +1,51 @@
+From 289ad2969a5966c603bf6928ce442db74c4cbb25 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 24 Mar 2016 11:23:14 -0400
+Subject: [PATCH] gcc/final.c: -fdebug-prefix-map support to remap sources with
+ relative path
+
+PR other/70428
+* final.c (remap_debug_filename): Use lrealpath to translate
+relative path before remapping
+
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=70428
+Upstream-Status: Submitted [gcc-patches@gcc.gnu.org]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+diff --git a/gcc/final.c b/gcc/final.c
+index 55cf509..c3594c2 100644
+--- a/gcc/final.c
++++ b/gcc/final.c
+@@ -1554,16 +1554,25 @@ remap_debug_filename (const char *filename)
+   const char *name;
+   size_t name_len;
+ 
++  /* Support to remap filename with relative path  */
++  char *realpath = lrealpath (filename);
++  if (realpath == NULL)
++    return filename;
++
+   for (map = debug_prefix_maps; map; map = map->next)
+-    if (filename_ncmp (filename, map->old_prefix, map->old_len) == 0)
++    if (filename_ncmp (realpath, map->old_prefix, map->old_len) == 0)
+       break;
+   if (!map)
+-    return filename;
+-  name = filename + map->old_len;
++    {
++      free (realpath);
++      return filename;
++    }
++  name = realpath + map->old_len;
+   name_len = strlen (name) + 1;
+   s = (char *) alloca (name_len + map->new_len);
+   memcpy (s, map->new_prefix, map->new_len);
+   memcpy (s + map->new_len, name, name_len);
++  free (realpath);
+   return ggc_strdup (s);
+ }
+ 
+-- 
+2.7.4
+

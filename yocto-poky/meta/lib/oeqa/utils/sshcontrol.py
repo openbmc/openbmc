@@ -136,8 +136,7 @@ class SSHControl(object):
         timeout=0 - no timeout, let command run until it returns
         """
 
-        # We need to source /etc/profile for a proper PATH on the target
-        command = self.ssh + [self.ip, ' . /etc/profile; ' + command]
+        command = self.ssh + [self.ip, 'export PATH=/usr/sbin:/sbin:/usr/bin:/bin; ' + command]
 
         if timeout is None:
             return self._internal_run(command, self.defaulttimeout, self.ignore_status)

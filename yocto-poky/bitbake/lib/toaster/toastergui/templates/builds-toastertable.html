@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extraheadcontent %}
+  <link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}" type='text/css'>
+  <link rel="stylesheet" href="{% static 'css/jquery-ui.structure.min.css' %}" type='text/css'>
+  <link rel="stylesheet" href="{% static 'css/jquery-ui.theme.min.css' %}" type='text/css'>
+  <script src="{% static 'js/jquery-ui.min.js' %}">
+  </script>
+{% endblock %}
+
+{% block title %} All builds - Toaster {% endblock %}
+
+{% block pagecontent %}
+
+  <div class="row-fluid">
+    {% with mru=mru mrb_type=mrb_type %}
+      {% include 'mrb_section.html' %}
+    {% endwith %}
+
+    <h1 class="page-header top-air" data-role="page-title"></h1>
+
+    {% url 'builds' as xhr_table_url %}
+    {% include 'toastertable.html' %}
+  </div>
+
+  <script>
+    $(document).ready(function () {
+      var tableElt = $("#{{table_name}}");
+      var titleElt = $("[data-role='page-title']");
+
+      tableElt.on("table-done", function (e, total, tableParams) {
+        var title = "All builds";
+
+        if (tableParams.search || tableParams.filter) {
+          if (total === 0) {
+            title = "No builds found";
+          }
+          else if (total > 0) {
+            title = total + " build" + (total > 1 ? 's' : '') + " found";
+          }
+        }
+
+        titleElt.text(title);
+      });
+    });
+  </script>
+{% endblock %}

@@ -29,6 +29,9 @@ python gcc_multilib_setup() {
     bb.utils.remove(build_conf_dir, True)
     ml_globs = ('%s/*/t-linux64' % src_conf_dir,
                 '%s/*/linux64.h' % src_conf_dir,
+                '%s/aarch64/t-aarch64' % src_conf_dir,
+                '%s/aarch64/aarch64.h' % src_conf_dir,
+                '%s/aarch64/aarch64-cores.def' % src_conf_dir,
                 '%s/*/linux.h' % src_conf_dir,
                 '%s/linux.h' % src_conf_dir)
 
@@ -130,6 +133,8 @@ python gcc_multilib_setup() {
         'mips64'    : ['gcc/config/mips/t-linux64'],
         'powerpc'   : ['gcc/config/rs6000/t-linux64'],
         'powerpc64' : ['gcc/config/rs6000/t-linux64'],
+        'aarch64'   : ['gcc/config/aarch64/t-aarch64'],
+        'arm'       : ['gcc/config/aarch64/t-aarch64'],
     }
 
     gcc_header_config_files = {
@@ -140,6 +145,8 @@ python gcc_multilib_setup() {
         'mips64'    : ['gcc/config/mips/linux.h', 'gcc/config/mips/linux64.h'],
         'powerpc'   : ['gcc/config/rs6000/linux64.h'],
         'powerpc64' : ['gcc/config/rs6000/linux64.h'],
+        'aarch64'   : ['gcc/config/aarch64/aarch64.h'],
+        'arm'       : ['gcc/config/aarch64/aarch64.h'],
     }
 
     libdir32 = 'SYSTEMLIBS_DIR'

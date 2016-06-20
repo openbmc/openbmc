@@ -1,0 +1,33 @@
+From 8facc29c3c56e6cf9cfef70986cf73876044a3fb Mon Sep 17 00:00:00 2001
+From: Andre McCurdy <armccurdy@gmail.com>
+Date: Tue, 19 Jan 2016 16:42:36 -0800
+Subject: [PATCH] avoid neon for targets which don't support it
+
+The sh-mem-random.c test app tries to use neon loads and stores to
+test 64-bit float copies when building for ARM. Allow it to do so if
+possible, but fallback to C when building for ARM targets which don't
+support neon.
+
+Upstream-Status: Pending
+
+Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+---
+ memcheck/tests/sh-mem-random.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/memcheck/tests/sh-mem-random.c b/memcheck/tests/sh-mem-random.c
+index ae82248..816e139 100644
+--- a/memcheck/tests/sh-mem-random.c
++++ b/memcheck/tests/sh-mem-random.c
+@@ -191,7 +191,7 @@ void do_test_at ( U1* arr )
+                "emms"
+                : : "r"(arr+dst), "r"(arr+src) : "memory"
+             );
+-#elif defined(__linux__) && defined(__arm__) && !defined(__aarch64__)
++#elif defined(__linux__) && defined(__arm__) && defined(__ARM_NEON__) && !defined(__aarch64__)
+             /* On arm32, many compilers generate a 64-bit float move
+                using two 32 bit integer registers, which completely
+                defeats this test.  Hence force a 64-bit NEON load and
+-- 
+1.9.1
+

@@ -2,13 +2,20 @@
 
 # OpenEmbedded SDK publishing tool
 
-# oe-publish-sdk publish <ext-sdk> <destination>
-# <ext-sdk>: extensible SDK to publish (path to the installer shell script)
-# <destination>: local or remote location which servers as an SDK update server
-# e.g.
-# oe-publish-sdk /path/to/sdk-ext.sh /mnt/poky/sdk-ext
-# oe-publish-sdk /path/to/sdk-ext.sh user@host:/opt/poky/sdk-ext
+# Copyright (C) 2015-2016 Intel Corporation
 #
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import sys
 import os
@@ -24,6 +31,7 @@ scripts_path = os.path.dirname(os.path.realpath(__file__))
 lib_path = scripts_path + '/lib'
 sys.path = sys.path + [lib_path]
 import scriptutils
+import argparse_oe
 logger = scriptutils.logger_create('sdktool')
 
 def mkdir(d):
@@ -42,7 +50,10 @@ def publish(args):
 
     # Ensure the SDK exists
     if not os.path.exists(target_sdk):
-        logger.error("%s doesn't exist" % target_sdk)
+        logger.error("Specified SDK %s doesn't exist" % target_sdk)
+        return -1
+    if os.path.isdir(target_sdk):
+        logger.error("%s is a directory - expected path to SDK installer file" % target_sdk)
         return -1
 
     if ':' in destination:
@@ -52,6 +63,7 @@ def publish(args):
     else:
         is_remote = False
         dest_sdk = os.path.join(destination, sdk_basename)
+        destdir = destination
 
     # Making sure the directory exists
     logger.debug("Making sure the destination directory exists")
@@ -83,15 +95,16 @@ def publish(args):
     # Unpack the SDK
     logger.info("Unpacking SDK")
     if not is_remote:
-        cmd = "sh %s -n -y -d %s" % (dest_sdk, destination)
+        cmd = "sh %s -p -y -d %s" % (dest_sdk, destination)
         ret = subprocess.call(cmd, shell=True)
         if ret == 0:
             logger.info('Successfully unpacked %s to %s' % (dest_sdk, destination))
+            os.remove(dest_sdk)
         else:
             logger.error('Failed to unpack %s to %s' % (dest_sdk, destination))
             return ret
     else:
-        cmd = "ssh %s 'sh %s -n -y -d %s'" % (host, dest_sdk, destdir)
+        cmd = "ssh %s 'sh %s -p -y -d %s && rm -f %s'" % (host, dest_sdk, destdir, dest_sdk)
         ret = subprocess.call(cmd, shell=True)
         if ret == 0:
             logger.info('Successfully unpacked %s to %s' % (dest_sdk, destdir))
@@ -101,9 +114,9 @@ def publish(args):
 
     # Setting up the git repo
     if not is_remote:
-        cmd = 'set -e; mkdir -p %s/layers; cd %s/layers; if [ ! -e .git ]; then git init .; mv .git/hooks/post-update.sample .git/hooks/post-update; fi; git add -A .; git commit -q -m "init repo" || true; git update-server-info' % (destination, destination)
+        cmd = 'set -e; mkdir -p %s/layers; cd %s/layers; if [ ! -e .git ]; then git init .; mv .git/hooks/post-update.sample .git/hooks/post-update; echo "*.pyc\n*.pyo" > .gitignore; fi; git add -A .; git config user.email "oe@oe.oe" && git config user.name "OE" && git commit -q -m "init repo" || true; git update-server-info' % (destination, destination)
     else:
-        cmd = "ssh %s 'set -e; mkdir-p %s/layers; cd %s/layers; if [ ! -e .git ]; then git init .; mv .git/hooks/post-update.sample .git/hooks/post-update; fi; git add -A .; git commit -q -m \"init repo\" || true; git update-server-info'" % (host, destdir, destdir)
+        cmd = "ssh %s 'set -e; mkdir -p %s/layers; cd %s/layers; if [ ! -e .git ]; then git init .; mv .git/hooks/post-update.sample .git/hooks/post-update; echo '*.pyc\n*.pyo' > .gitignore; fi; git add -A .; git config user.email 'oe@oe.oe' && git config user.name 'OE' && git commit -q -m \"init repo\" || true; git update-server-info'" % (host, destdir, destdir)
     ret = subprocess.call(cmd, shell=True)
     if ret == 0:
         logger.info('SDK published successfully')
@@ -113,13 +126,12 @@ def publish(args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="OpenEmbedded development tool",
-                                     epilog="Use %(prog)s <subcommand> --help to get help on a specific command")
+    parser = argparse_oe.ArgumentParser(description="OpenEmbedded extensible SDK publishing tool - writes server-side data to support the extensible SDK update process to a specified location")
     parser.add_argument('-d', '--debug', help='Enable debug output', action='store_true')
     parser.add_argument('-q', '--quiet', help='Print only errors', action='store_true')
 
-    parser.add_argument('sdk', help='Extensible SDK to publish')
-    parser.add_argument('dest', help='Destination to publish SDK to')
+    parser.add_argument('sdk', help='Extensible SDK to publish (path to .sh installer file)')
+    parser.add_argument('dest', help='Destination to publish SDK to; can be local path or remote in the form of user@host:/path (in the latter case ssh/scp will be used).')
 
     parser.set_defaults(func=publish)
 
@@ -139,5 +151,5 @@ if __name__ == "__main__":
     except Exception:
         ret = 1
         import traceback
-        traceback.print_exc(5)
+        traceback.print_exc()
     sys.exit(ret)

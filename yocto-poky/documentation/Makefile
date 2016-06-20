@@ -128,12 +128,14 @@ TARFILES = dev-style.css dev-manual.html \
            figures/wip.png
         else
 TARFILES = dev-style.css dev-manual.html \
-           figures/app-dev-flow.png figures/bsp-dev-flow.png \
+           figures/bsp-dev-flow.png \
            figures/dev-title.png figures/git-workflow.png \
            figures/index-downloads.png figures/kernel-dev-flow.png \
            figures/kernel-overview-1.png figures/kernel-overview-2-generic.png \
            figures/source-repos.png figures/yp-download.png \
            figures/recipe-workflow.png figures/build-workspace-directory.png \
+           figures/devtool-add-flow.png figures/devtool-modify-flow.png \
+           figures/devtool-upgrade-flow.png \
            eclipse
 	endif
 
@@ -198,9 +200,9 @@ TARFILES = mega-manual.html mega-style.css figures/yocto-environment.png \
 	figures/using-a-pre-built-image.png \
 	figures/poky-title.png figures/buildhistory.png \
         figures/buildhistory-web.png \
-	figures/adt-title.png figures/bsp-title.png \
+	figures/sdk-title.png figures/bsp-title.png \
 	figures/kernel-dev-title.png figures/kernel-architecture-overview.png \
-	figures/app-dev-flow.png figures/bsp-dev-flow.png \
+	figures/bsp-dev-flow.png \
         figures/dev-title.png \
 	figures/git-workflow.png figures/index-downloads.png \
         figures/kernel-dev-flow.png \
@@ -242,7 +244,12 @@ TARFILES = mega-manual.html mega-style.css figures/yocto-environment.png \
 	figures/sdk-generation.png figures/recipe-workflow.png \
 	figures/build-workspace-directory.png figures/mega-title.png \
 	figures/toaster-title.png figures/hosted-service.png \
-	figures/simple-configuration.png
+	figures/simple-configuration.png figures/devtool-add-flow.png \
+	figures/devtool-modify-flow.png figures/devtool-upgrade-flow.png \
+	figures/compatible-layers.png figures/import-layer.png figures/new-project.png \
+	figures/sdk-environment.png figures/sdk-installed-standard-sdk-directory.png \
+	figures/sdk-devtool-add-flow.png figures/sdk-installed-extensible-sdk-directory.png \
+	figures/sdk-devtool-modify-flow.png figures/sdk-eclipse-dev-flow.png
 	endif
 
 MANUALS = $(DOC)/$(DOC).html
@@ -268,12 +275,13 @@ FIGURES = figures
 STYLESHEET = $(DOC)/*.css
 endif
 
-
-ifeq ($(DOC),adt-manual)
+ifeq ($(DOC),sdk-manual)
 XSLTOPTS = --xinclude
 ALLPREQ = html eclipse tarball
-TARFILES = adt-manual.html adt-style.css figures/adt-title.png \
-           figures/using-a-pre-built-image.png \
+TARFILES = sdk-manual.html sdk-style.css figures/sdk-title.png \
+           figures/sdk-environment.png figures/sdk-installed-standard-sdk-directory.png \
+	   figures/sdk-installed-extensible-sdk-directory.png figures/sdk-devtool-add-flow.png \
+	   figures/sdk-devtool-modify-flow.png figures/sdk-eclipse-dev-flow.png \
            eclipse
 MANUALS = $(DOC)/$(DOC).html $(DOC)/eclipse
 FIGURES = figures
@@ -332,7 +340,8 @@ XSLTOPTS = --xinclude
 ALLPREQ = html tarball
 TARFILES = toaster-manual.html toaster-manual-style.css \
 	   figures/toaster-title.png figures/simple-configuration.png \
-	   figures/hosted-service.png
+	   figures/hosted-service.png \
+	   figures/compatible-layers.png figures/import-layer.png figures/new-project.png
 MANUALS = $(DOC)/$(DOC).html
 FIGURES = figures
 STYLESHEET = $(DOC)/*.css
@@ -394,11 +403,11 @@ eclipse: eclipse-generate eclipse-resolve-links
 .PHONY : eclipse-generate eclipse-resolve-links
 
 eclipse-generate:
-ifeq ($(filter $(DOC), adt-manual bsp-guide dev-manual kernel-dev profile-manual ref-manual yocto-project-qs),)
+ifeq ($(filter $(DOC), sdk-manual bsp-guide dev-manual kernel-dev profile-manual ref-manual yocto-project-qs),)
 	@echo " "
 	@echo "ERROR: You can only create eclipse documentation"
 	@echo "       of the following documentation parts:"
-	@echo "       - adt-manual"
+	@echo "       - sdk-manual"
 	@echo "       - bsp-guide"
 	@echo "       - dev-manual"
 	@echo "       - kernel-dev"

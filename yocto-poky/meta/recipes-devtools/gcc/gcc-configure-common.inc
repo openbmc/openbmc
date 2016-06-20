@@ -14,13 +14,6 @@ JAVA_sh3 ?= ""
 # gcc 3.x expects 'f77', 4.0 expects 'f95', 4.1 and 4.2 expect 'fortran'
 FORTRAN ?= ",f77"
 LANGUAGES ?= "c,c++${FORTRAN}${JAVA}"
-# disable --enable-target-optspace for powerpc SPE
-# at -Os libgcc.so.1 creates references into
-# hidden symbols in libgcc.a which linker complains
-# when linking shared libraries further in the build like (gnutls)
-
-SPECIAL_ARCH_LIST = "powerpc"
-OPTSPACE = '${@bb.utils.contains("SPECIAL_ARCH_LIST", "${TARGET_ARCH}", "", "--enable-target-optspace",d)}'
 
 EXTRA_OECONF_BASE ?= ""
 EXTRA_OECONF_PATHS ?= ""
@@ -42,7 +35,6 @@ EXTRA_OECONF = "\
     --enable-libstdcxx-pch \
     --program-prefix=${TARGET_PREFIX} \
     --without-local-prefix \
-    ${OPTSPACE} \
     ${EXTRA_OECONF_BASE} \
     ${EXTRA_OECONF_GCC_FLOAT} \
     ${EXTRA_OECONF_PATHS} \
@@ -72,6 +64,7 @@ EXTRA_OECONF_append_mips64eln32 = " --with-abi=64 --with-arch-64=mips64 --with-t
 # features used in OE.
 EXTRA_OECONF_append_armv6 = " --with-arch=armv6"
 EXTRA_OECONF_append_armv7a = " --with-arch=armv7-a"
+EXTRA_OECONF_append_armv7ve = " --with-arch=armv7-a"
 
 EXTRA_OECONF_GCC_FLOAT ??= ""
 CPPFLAGS = ""

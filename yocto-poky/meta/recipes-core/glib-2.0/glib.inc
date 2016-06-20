@@ -17,19 +17,22 @@ SECTION = "libs"
 
 BBCLASSEXTEND = "native nativesdk"
 
-DEPENDS = "glib-2.0-native virtual/libiconv libffi zlib"
-DEPENDS_append_class-target = "${@bb.utils.contains('DISTRO_FEATURES', 'ptest', ' dbus', '', d)}"
+DEPENDS = "virtual/libiconv libffi zlib glib-2.0-native"
+DEPENDS_append = " ${@bb.utils.contains('PTEST_ENABLED', '1', ' dbus', '', d)}"
 DEPENDS_class-native = "pkgconfig-native gettext-native libffi-native zlib-native"
-DEPENDS_class-nativesdk = "nativesdk-libtool nativesdk-gettext nativesdk-libffi nativesdk-zlib ${BPN}-native"
+DEPENDS_class-nativesdk = "nativesdk-libtool nativesdk-gettext nativesdk-libffi nativesdk-zlib glib-2.0-native"
 
-PACKAGES =+ "${PN}-utils ${PN}-bash-completion ${PN}-codegen"
+PACKAGES += "${PN}-codegen ${PN}-utils"
 
 LEAD_SONAME = "libglib-2.0.*"
-FILES_${PN}-utils = "${bindir}/* ${datadir}/glib-2.0/gettext"
 
-inherit autotools gettext gtk-doc pkgconfig ptest-gnome
+inherit autotools gettext gtk-doc pkgconfig ptest-gnome upstream-version-is-even bash-completion gio-module-cache
 
 S = "${WORKDIR}/glib-${PV}"
+
+PACKAGECONFIG ??= "system-pcre"
+# To use the system pcre it must be configured with --enable-unicode-properties
+PACKAGECONFIG[system-pcre] = "--with-pcre=system,--with-pcre=internal,libpcre"
 
 CORECONF = "--disable-dtrace --disable-fam --disable-libelf --disable-systemtap --disable-man"
 
@@ -44,19 +47,27 @@ do_configure_prepend() {
 	sed -i -e '1s,#!.*,#!${USRBINPATH}/env python,' ${S}/gio/gdbus-2.0/codegen/gdbus-codegen.in
 }
 
-FILES_${PN} = "${libdir}/lib*${SOLIBS} ${libdir}/gio ${datadir}/glib-2.0/schemas \
-               ${datadir}/glib-2.0/gettext/mkinstalldirs ${datadir}/glib-2.0/gettext/po/Makefile.in.in"
+FILES_${PN} = "${libdir}/lib*${SOLIBS} \
+               ${libdir}/gio \
+               ${libexecdir}/*gio-querymodules \
+               ${datadir}/glib-2.0/schemas"
 FILES_${PN}-dev += "${libdir}/glib-2.0/include \
                     ${libdir}/gio/modules/lib*${SOLIBSDEV} \
-                    ${libdir}/gio/modules/*.la"
-FILES_${PN}-dbg += "${datadir}/glib-2.0/gdb ${datadir}/gdb \
-                    ${libdir}/gio/modules/.debug \
-                    ${libdir}/glib-2.0/installed-tests/glib/.debug"
-FILES_${PN}-codegen = "${datadir}/glib-2.0/codegen/*.py"
-FILES_${PN}-bash-completion = "${sysconfdir}/bash_completion.d \
-                               ${datadir}/bash-completion"
+                    ${libdir}/gio/modules/*.la \
+                    ${bindir}/glib-genmarshal \
+                    ${bindir}/glib-gettextize \
+                    ${bindir}/glib-mkenums \
+                    ${bindir}/glib-compile-resources \
+                    ${datadir}/glib-2.0/gettext/po/Makefile.in.in \
+                    ${datadir}/glib-2.0/schemas/gschema.dtd"
+FILES_${PN}-dbg += "${datadir}/glib-2.0/gdb ${datadir}/gdb"
+FILES_${PN}-codegen = "${datadir}/glib-2.0/codegen/*.py \
+                       ${bindir}/gdbus-codegen"
+FILES_${PN}-utils = "${bindir}/*"
 
-ARM_INSTRUCTION_SET = "arm"
+ARM_INSTRUCTION_SET_armv4 = "arm"
+ARM_INSTRUCTION_SET_armv5 = "arm"
+
 USE_NLS = "yes"
 
 do_install_append () {
@@ -73,6 +84,21 @@ do_install_append () {
 	if [ -f ${D}${bindir}/glib-mkenums ]; then
 		sed -i -e '1s,#!.*perl,#! ${USRBINPATH}/env perl,' ${D}${bindir}/glib-mkenums
 	fi
+
+	if [ -f ${D}${datadir}/installed-tests/glib/gdbus-serialization.test ]; then
+		if ${@bb.utils.contains("DISTRO_FEATURES", "x11", "false", "true", d)}; then
+			rm ${D}${datadir}/installed-tests/glib/gdbus-serialization.test
+		fi
+	fi
+
+        # Make sure gio-querymodules is unique among multilibs
+        if test "x${MLPREFIX}" != "x"; then
+                mv ${D}${libexecdir}/gio-querymodules ${D}${libexecdir}/${MLPREFIX}gio-querymodules
+        fi
+}
+
+do_install_append_libc-musl () {
+	rm -f ${D}${libdir}/charset.alias
 }
 
 RDEPENDS_${PN}-ptest += "\

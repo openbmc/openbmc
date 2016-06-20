@@ -190,7 +190,7 @@ def print_depchanged(d_new = None, d_old = None, verbose = False):
             if sigdata_re.match(full_path_old) and sigdata_re.match(full_path_new):
                 output = bb.siggen.compare_sigfiles(full_path_old, full_path_new)
                 if output:
-                    print("\n=== The verbose changes of %s.do_%s:" % (pn, task))
+                    print("\n=== The verbose changes of %s.%s:" % (pn, task))
                     print('\n'.join(output))
         else:
             # Format the output, the format is:

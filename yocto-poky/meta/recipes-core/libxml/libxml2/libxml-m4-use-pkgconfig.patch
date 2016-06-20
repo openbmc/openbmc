@@ -190,7 +190,7 @@ index 68cd824..5fa0a9b 100644
 -          LIBS="$ac_save_LIBS"
 -       fi
 -     fi
-+  verdep=ifelse([$1], [], [], [>= $1])
++  verdep=ifelse([$1], [], [], [">= $1"])
 +  PKG_CHECK_MODULES(XML, [libxml-2.0 $verdep], [$2], [$3])
  
 -     XML_CPPFLAGS=""

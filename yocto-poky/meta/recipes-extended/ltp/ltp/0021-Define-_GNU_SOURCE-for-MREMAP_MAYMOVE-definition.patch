@@ -1,0 +1,71 @@
+From b216435bb362df10c45f544b78d8c884eaa901fd Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 8 Jan 2016 07:01:02 +0000
+Subject: [PATCH 21/32] Define _GNU_SOURCE for MREMAP_MAYMOVE definition
+
+musl guards MREMAP_MAYMOVE with _GNU_SOURCE unlike glibc which uses
+__USE_GNU
+
+Fixes errors like
+error: 'MREMAP_MAYMOVE' undeclared (first use in this function)
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ testcases/kernel/syscalls/mremap/mremap01.c | 4 +++-
+ testcases/kernel/syscalls/mremap/mremap02.c | 2 ++
+ testcases/kernel/syscalls/mremap/mremap03.c | 2 ++
+ 3 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/testcases/kernel/syscalls/mremap/mremap01.c b/testcases/kernel/syscalls/mremap/mremap01.c
+index d63d1e4..24ca174 100644
+--- a/testcases/kernel/syscalls/mremap/mremap01.c
++++ b/testcases/kernel/syscalls/mremap/mremap01.c
+@@ -76,10 +76,12 @@
+  */
+ #include <unistd.h>
+ #include <errno.h>
++#include <fcntl.h>
++#define _GNU_SOURCE
+ #define __USE_GNU
+ #include <sys/mman.h>
+ #undef __USE_GNU
+-#include <fcntl.h>
++#undef _GNU_SOURCE
+ 
+ #include "test.h"
+ 
+diff --git a/testcases/kernel/syscalls/mremap/mremap02.c b/testcases/kernel/syscalls/mremap/mremap02.c
+index 5a51b9a..a530a6b 100644
+--- a/testcases/kernel/syscalls/mremap/mremap02.c
++++ b/testcases/kernel/syscalls/mremap/mremap02.c
+@@ -75,9 +75,11 @@
+ #include <errno.h>
+ #include <unistd.h>
+ #include <fcntl.h>
++#define _GNU_SOURCE
+ #define __USE_GNU
+ #include <sys/mman.h>
+ #undef __USE_GNU
++#undef _GNU_SOURCE
+ 
+ #include "test.h"
+ 
+diff --git a/testcases/kernel/syscalls/mremap/mremap03.c b/testcases/kernel/syscalls/mremap/mremap03.c
+index 12e3829..9b39f8b 100644
+--- a/testcases/kernel/syscalls/mremap/mremap03.c
++++ b/testcases/kernel/syscalls/mremap/mremap03.c
+@@ -76,9 +76,11 @@
+ #include <errno.h>
+ #include <unistd.h>
+ #include <fcntl.h>
++#define _GNU_SOURCE
+ #define __USE_GNU
+ #include <sys/mman.h>
+ #undef __USE_GNU
++#undef _GNU_SOURCE
+ 
+ #include "test.h"
+ 
+-- 
+2.7.0
+

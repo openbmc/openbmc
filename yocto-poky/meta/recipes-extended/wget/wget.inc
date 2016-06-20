@@ -22,3 +22,8 @@ BBCLASSEXTEND += "nativesdk"
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[libuuid] = "--with-libuuid, --without-libuuid,util-linux"
+
+# Let aclocal use the relative path for the m4 file rather than
+# absolute, otherwise there might be an "Argument list too long" error
+# when it is built in a long/deep directory.
+acpaths = "-I ./m4"

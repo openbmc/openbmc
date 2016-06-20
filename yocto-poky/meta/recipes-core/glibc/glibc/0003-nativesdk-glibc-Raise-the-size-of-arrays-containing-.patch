@@ -1,7 +1,7 @@
-From fd595a5ec885bcb4c14417daa21c2e61c5b72e42 Mon Sep 17 00:00:00 2001
+From e76048898ae9aa49dc70d6f9b1bbc22082e61fe3 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:51:38 +0000
-Subject: [PATCH 03/27] nativesdk-glibc: Raise the size of arrays containing dl
+Subject: [PATCH 03/24] nativesdk-glibc: Raise the size of arrays containing dl
  paths
 
 This patch puts the dynamic loader path in the binaries, SYSTEM_DIRS strings
@@ -40,10 +40,10 @@ index dec49bc..862f1d8 100644
  internal_function
  _dl_cache_libcmp (const char *p1, const char *p2)
 diff --git a/elf/dl-load.c b/elf/dl-load.c
-index f1eb5ed..f664f50 100644
+index c4a42e9..acf6c03 100644
 --- a/elf/dl-load.c
 +++ b/elf/dl-load.c
-@@ -104,8 +104,8 @@ static size_t max_capstrlen attribute_relro;
+@@ -106,8 +106,8 @@ static size_t max_capstrlen attribute_relro;
  /* Get the generated information about the trusted directories.  */
  #include "trusted-dirs.h"
  
@@ -80,7 +80,7 @@ index f54ec22..0e78a83 100644
     a platform.  */
  static int
 diff --git a/elf/rtld.c b/elf/rtld.c
-index 69873c2..6d3add7 100644
+index 52160df..80f0582 100644
 --- a/elf/rtld.c
 +++ b/elf/rtld.c
 @@ -99,6 +99,7 @@ uintptr_t __pointer_chk_guard_local
@@ -91,7 +91,7 @@ index 69873c2..6d3add7 100644
  
  /* List of auditing DSOs.  */
  static struct audit_list
-@@ -877,12 +878,12 @@ of this helper program; chances are you did not intend to run this program.\n\
+@@ -873,12 +874,12 @@ of this helper program; chances are you did not intend to run this program.\n\
    --list                list all dependencies and how they are resolved\n\
    --verify              verify that given object really is a dynamically linked\n\
  			object we can handle\n\
@@ -107,7 +107,7 @@ index 69873c2..6d3add7 100644
        ++_dl_skip_args;
        --_dl_argc;
 diff --git a/sysdeps/generic/dl-cache.h b/sysdeps/generic/dl-cache.h
-index 4b49869..1800d03 100644
+index 70d4aeb..5c726d0 100644
 --- a/sysdeps/generic/dl-cache.h
 +++ b/sysdeps/generic/dl-cache.h
 @@ -27,10 +27,6 @@
@@ -121,6 +121,16 @@ index 4b49869..1800d03 100644
  #ifndef add_system_dir
  # define add_system_dir(dir) add_dir (dir)
  #endif
--- 
-2.1.4
-
+Index: git/iconv/gconv_conf.c
+===================================================================
+--- git.orig/iconv/gconv_conf.c
++++ git/iconv/gconv_conf.c
+@@ -36,7 +36,7 @@
+ 
+ 
+ /* This is the default path where we look for module lists.  */
+-static const char default_gconv_path[] = GCONV_PATH;
++static char default_gconv_path[4096] __attribute__ ((section (".gccrelocprefix"))) = GCONV_PATH;
+ 
+ /* The path elements, as determined by the __gconv_get_path function.
+    All path elements end in a slash.  */

@@ -1,0 +1,32 @@
+From f1b6e49f12a18eabe88eb732b578a16281d09499 Mon Sep 17 00:00:00 2001
+From: Jose Lamego <jose.a.lamego@linux.intel.com>
+Date: Thu, 2 Jul 2015 11:37:43 +0000
+Subject: [PATCH] serf.m4: Regex modified to allow '-D' in paths
+
+Upstream-Status: Accepted
+
+The patch is merged by subversion upstream with replacing '[[:space:]]' with ' '.
+
+http://svn.apache.org/viewvc/subversion/trunk/build/ac-macros/serf.m4?r1=1594156&r2=1689824  
+
+Signed-off-by: Jose Lamego <jose.a.lamego@linux.intel.com>
+---
+ build/ac-macros/serf.m4 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/build/ac-macros/serf.m4 b/build/ac-macros/serf.m4
+index ae11e75..ff8cbae 100644
+--- a/build/ac-macros/serf.m4
++++ b/build/ac-macros/serf.m4
+@@ -168,7 +168,7 @@
+         if $PKG_CONFIG $serf_pc_arg --atleast-version=$serf_check_version; then
+           AC_MSG_RESULT([yes])
+           serf_found=yes
+-          SVN_SERF_INCLUDES=[`$PKG_CONFIG $serf_pc_arg --cflags | $SED -e 's/-D[^ ]*//g'`]
++          SVN_SERF_INCLUDES=[`$PKG_CONFIG $serf_pc_arg --cflags | $SED -e 's/ -D[^ ]*//g' -e 's/^-D[^ ]*//g'`]
+           SVN_SERF_LIBS=`$PKG_CONFIG $serf_pc_arg --libs-only-l` 
+           dnl don't use --libs-only-L because then we might miss some options
+           LDFLAGS=["$LDFLAGS `$PKG_CONFIG $serf_pc_arg --libs | $SED -e 's/-l[^ ]*//g'`"]
+-- 
+1.8.4.5
+

@@ -80,7 +80,7 @@
                 </para></listitem>
             <listitem><para><filename>core-image-lsb-sdk</filename>:
                 A <filename>core-image-lsb</filename> that includes everything in
-                meta-toolchain but also includes development headers and libraries
+                the cross-toolchain but also includes development headers and libraries
                 to form a complete standalone SDK.
                 This image requires a distribution configuration that
                 enables LSB compliance (e.g. <filename>poky-lsb</filename>).
@@ -114,7 +114,7 @@
                 tools appropriate for real-time use.</para></listitem>
             <listitem><para><filename>core-image-rt-sdk</filename>:
                 A <filename>core-image-rt</filename> image that includes everything in
-                <filename>meta-toolchain</filename>.
+                the cross-toolchain.
                 The image also includes development headers and libraries to form a complete
                 stand-alone SDK and is suitable for development using the target.
                 </para></listitem>
@@ -132,7 +132,8 @@
                 This image was formerly <filename>core-image-sdk</filename>.
                 </para></listitem>
             <listitem><para><filename>core-image-sato-sdk</filename>:
-                A <filename>core-image-sato</filename> image that includes everything in meta-toolchain.
+                A <filename>core-image-sato</filename> image that includes everything in
+                the cross-toolchain.
                 The image also includes development headers and libraries to form a complete standalone SDK
                 and is suitable for development using the target.</para></listitem>
             <listitem><para><filename>core-image-testmaster</filename>:
@@ -158,9 +159,6 @@
             <listitem><para><filename>core-image-x11</filename>:
                 A very basic X11 image with a terminal.
                 </para></listitem>
-            <listitem><para><filename>qt4e-demo-image</filename>:
-                An image that launches into the demo application for the embedded
-                (not based on X11) version of Qt.</para></listitem>
         </itemizedlist>
     </para>
 </chapter>

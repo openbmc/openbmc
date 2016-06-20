@@ -31,7 +31,5 @@ do_compile_class-native() {
 	cpan_do_compile
 }
 
-FILES_${PN}-dbg += "${libdir}/perl/vendor_perl/*/auto/XML/Parser/Expat/.debug/"
-
 BBCLASSEXTEND="native"
 

@@ -14,7 +14,7 @@ root_is_nfs() {
 }
 
 have_bin_ip=0
-if [ -x /sbin/ip ]; then
+if [ -x /SBIN_DIR/ip ]; then
   have_bin_ip=1
   BROADCAST="broadcast +"
 fi
@@ -23,34 +23,34 @@ fi
 
 case "$1" in
 	deconfig)
-		if [ -x /sbin/resolvconf ]; then
-			/sbin/resolvconf -d "${interface}.udhcpc"
+		if [ -x /SBIN_DIR/resolvconf ]; then
+			/SBIN_DIR/resolvconf -d "${interface}.udhcpc"
 		fi
 		if ! root_is_nfs ; then
                         if [ $have_bin_ip -eq 1 ]; then
-                                ip addr flush dev $interface
-                                ip link set dev $interface up
+                                /SBIN_DIR/ip addr flush dev $interface
+                                /SBIN_DIR/ip link set dev $interface up
                         else
-                                /sbin/ifconfig $interface 0.0.0.0
+                                /SBIN_DIR/ifconfig $interface 0.0.0.0
                         fi
 		fi
 		;;
 
 	renew|bound)
                 if [ $have_bin_ip -eq 1 ]; then
-                        ip addr add dev $interface local $ip/$mask $BROADCAST
+                        /SBIN_DIR/ip addr add dev $interface local $ip/$mask $BROADCAST
                 else
-                        /sbin/ifconfig $interface $ip $BROADCAST $NETMASK
+                        /SBIN_DIR/ifconfig $interface $ip $BROADCAST $NETMASK
                 fi
 
 		if [ -n "$router" ] ; then
 			if ! root_is_nfs ; then
                                 if [ $have_bin_ip -eq 1 ]; then
-                                        while ip route del default dev $interface 2>/dev/null ; do
+                                        while /SBIN_DIR/ip route del default dev $interface 2>/dev/null ; do
                                                 :
                                         done
                                 else
-                                        while route del default gw 0.0.0.0 dev $interface 2>/dev/null ; do
+                                        while /SBIN_DIR/route del default gw 0.0.0.0 dev $interface 2>/dev/null ; do
                                                 :
                                         done
                                 fi
@@ -59,9 +59,9 @@ case "$1" in
 			metric=10
 			for i in $router ; do
                                 if [ $have_bin_ip -eq 1 ]; then
-                                        ip route add default via $i metric $metric
+                                        /SBIN_DIR/ip route add default via $i metric $metric
                                 else
-                                        route add default gw $i dev $interface metric $metric 2>/dev/null
+                                        /SBIN_DIR/route add default gw $i dev $interface metric $metric 2>/dev/null
                                 fi
                                 metric=$(($metric + 1))
 			done
@@ -77,8 +77,8 @@ case "$1" in
 "
 		done
 
-		if [ -x /sbin/resolvconf ]; then
-			echo -n "$R" | /sbin/resolvconf -a "${interface}.udhcpc"
+		if [ -x /SBIN_DIR/resolvconf ]; then
+			echo -n "$R" | /SBIN_DIR/resolvconf -a "${interface}.udhcpc"
 		else
 			echo -n "$R" > "$RESOLV_CONF"
 		fi

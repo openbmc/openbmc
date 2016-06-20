@@ -4,7 +4,7 @@ Date: Tue, 11 Nov 2014 16:28:22 +0800
 Subject: [PATCH] using poptParseArgvString to parse the
  _gpg_check_password_cmd
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [RPM5 maintainer]
 
 Both __gpg_check_password_cmd and __gpg_sign_cmd include "%{_gpg_name}", but
 strace shows that gpg_name has a quote when run _gpg_check_password,

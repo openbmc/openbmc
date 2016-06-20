@@ -1,0 +1,53 @@
+From c02354af7f3d9426da31503abfae70952c699a9d Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Fri, 18 Mar 2016 03:23:11 -0400
+Subject: [PATCH] configure: fix with/without selinux
+
+Problem:
+without-selinux doesn't work since WITH_SELINUX is always be defined no
+matter which option is given: with-selinux, without-selinux.
+
+Fix:
+Disable selinux support if without-selinux is given; otherwise check
+libselinux to determine if selinux support should be enabled.
+
+Upstream-Status: Submitted [at@packages.debian.org]
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ configure.ac | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 5a43419..8c9de62 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -240,10 +240,21 @@ AC_ARG_WITH(daemon_username,
+ AC_SUBST(DAEMON_USERNAME)
+ 
+ AC_ARG_WITH(selinux,
+-[ --with-selinux       Define to run with selinux],
+-AC_DEFINE(WITH_SELINUX, 1, [Define if you are building with_selinux]),
+-)
+-AC_CHECK_LIB(selinux, is_selinux_enabled, SELINUXLIB=-lselinux)
++[ --with-selinux       Define to run with selinux (default=check)],
++[],
++[with_selinux=check])
++
++if test "x$with_selinux" != xno; then
++  AC_CHECK_LIB([selinux], [is_selinux_enabled],
++    [SELINUXLIB=-lselinux
++     AC_DEFINE(WITH_SELINUX, 1, [Define if you are building with_selinux])
++    ],
++    [if test "x$with_selinux" != xcheck; then
++       AC_MSG_FAILURE([--with-selinux is given, but test for selinux failed])
++     fi
++    ]
++  )
++fi
+ AC_SUBST(SELINUXLIB)
+ AC_SUBST(WITH_SELINUX)
+ 
+-- 
+1.9.1
+

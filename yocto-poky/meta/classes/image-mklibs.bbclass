@@ -2,39 +2,24 @@ do_rootfs[depends] += "mklibs-native:do_populate_sysroot"
 
 IMAGE_PREPROCESS_COMMAND += "mklibs_optimize_image; "
 
+inherit linuxloader
+
 mklibs_optimize_image_doit() {
 	rm -rf ${WORKDIR}/mklibs
 	mkdir -p ${WORKDIR}/mklibs/dest
 	cd ${IMAGE_ROOTFS}
 	du -bs > ${WORKDIR}/mklibs/du.before.mklibs.txt
-	for i in `find .`; do file $i; done \
-		| grep ELF \
-		| grep "LSB *executable" \
-		| grep "dynamically linked" \
-		| sed "s/:.*//" \
-		| sed "s+^\./++" \
-		> ${WORKDIR}/mklibs/executables.list
 
-	case ${TARGET_ARCH} in
-		powerpc | mips | mipsel | microblaze )
-			dynamic_loader="${base_libdir}/ld.so.1"
-			;;
-		powerpc64)
-			dynamic_loader="${base_libdir}/ld64.so.1"
-			;;
-		x86_64)
-			dynamic_loader="${base_libdir}/ld-linux-x86-64.so.2"
-			;;
-		i*86 )
-			dynamic_loader="${base_libdir}/ld-linux.so.2"
-			;;
-		arm )
-			dynamic_loader="${base_libdir}/ld-linux.so.3"
-			;;
-		* )
-			dynamic_loader="/unknown_dynamic_linker"
-			;;
-	esac
+	# Build a list of dynamically linked executable ELF files.
+	# Omit libc/libpthread as a special case because it has an interpreter
+	# but is primarily what we intend to strip down.
+	for i in `find . -type f -executable ! -name 'libc-*' ! -name 'libpthread-*'`; do
+		file $i | grep -q ELF || continue
+		${HOST_PREFIX}readelf -l $i | grep -q INTERP || continue
+		echo $i
+	done > ${WORKDIR}/mklibs/executables.list
+
+	dynamic_loader=$(linuxloader)
 
 	mklibs -v \
 		--ldlib ${dynamic_loader} \

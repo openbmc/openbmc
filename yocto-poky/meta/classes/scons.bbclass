@@ -2,6 +2,8 @@ DEPENDS += "python-scons-native"
 
 EXTRA_OESCONS ?= ""
 
+do_configure[noexec] = "1"
+
 scons_do_compile() {
         ${STAGING_BINDIR_NATIVE}/scons ${PARALLEL_MAKE} PREFIX=${prefix} prefix=${prefix} ${EXTRA_OESCONS} || \
         die "scons build execution failed."

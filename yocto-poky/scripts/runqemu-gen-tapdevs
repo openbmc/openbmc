@@ -85,6 +85,15 @@ for ((index=0; index < $COUNT; index++)); do
 	fi
 done
 
+if [ $COUNT -gt 0 ]; then
+	echo "Note: For systems running NetworkManager, it's recommended"
+	echo "Note: that the tap devices be set as unmanaged in the"
+	echo "Note: NetworkManager.conf file. Add the following lines to"
+	echo "Note: /etc/NetworkManager/NetworkManager.conf"
+	echo "[keyfile]"
+	echo "unmanaged-devices=interface-name:tap*"
+fi
+
 # The runqemu script will check for this file, and if it exists,
 # will use the existing bank of tap devices without creating
 # additional ones via sudo.

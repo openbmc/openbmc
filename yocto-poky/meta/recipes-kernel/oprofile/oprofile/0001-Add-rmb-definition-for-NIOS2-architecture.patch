@@ -1,0 +1,30 @@
+From 34b0d9b1a32fb404a30327a7ae8931c7c75583bf Mon Sep 17 00:00:00 2001
+From: Marek Vasut <marex@denx.de>
+Date: Tue, 9 Feb 2016 02:00:29 +0100
+Subject: [PATCH] Add rmb() definition for NIOS2 architecture
+
+Signed-off-by: Marek Vasut <marex@denx.de>
+Upstream-Status: Submitted [ http://marc.info/?l=oprofile-list&m=145501915931874&w=2 ]
+---
+ libperf_events/operf_utils.h | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/libperf_events/operf_utils.h b/libperf_events/operf_utils.h
+index 32954cc..8270e53 100644
+--- a/libperf_events/operf_utils.h
++++ b/libperf_events/operf_utils.h
+@@ -178,6 +178,11 @@ void op_release_resources(void);
+ #define cpu_relax()	asm volatile("" ::: "memory")
+ #endif
+ 
++#ifdef __nios2__
++#define rmb()		asm volatile("" ::: "memory")
++#define cpu_relax()	asm volatile("" ::: "memory")
++#endif
++
+ #ifdef __tile__
+ #include <asm/unistd.h>
+ #define rmb()		__insn_mf()
+-- 
+2.7.0
+

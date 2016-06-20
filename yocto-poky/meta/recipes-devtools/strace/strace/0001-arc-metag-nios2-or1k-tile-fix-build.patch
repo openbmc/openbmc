@@ -1,0 +1,117 @@
+From dd1a80c8d213eed95fe55b7ebcb07ee165dd8e4b Mon Sep 17 00:00:00 2001
+From: "Dmitry V. Levin" <ldv@altlinux.org>
+Date: Thu, 24 Dec 2015 15:40:55 +0000
+Subject: [PATCH] arc, metag, nios2, or1k, tile: fix build
+
+Fix build regression introduced by commit
+34683e3926d8c2daa368afb805da422ee7043396.
+
+* linux/32/syscallent.h: Add sys_ prefix to ARCH_mmap and mmap.
+* linux/arc/syscallent.h: Add sys_ prefix to ARCH_mmap and mmap_pgoff.
+* linux/nios2/syscallent.h: Likewise.
+* linux/or1k/syscallent.h: Likewise.
+* linux/tile/syscallent1.h: Add sys_ prefix to ARCH_mmap and sys_mmap_4koff.
+* pathtrace.c (pathtrace_match): Handle SEN_ARCH_mmap.
+* NEWS: Mention this build fix.
+
+Reported-by: Alexey Brodkin <Alexey.Brodkin@synopsys.com>
+Signed-off-by: Marek Vasut <marex@denx.de>
+Upstream-Status: Backport
+---
+ NEWS                     | 3 +++
+ linux/32/syscallent.h    | 6 +++---
+ linux/arc/syscallent.h   | 2 +-
+ linux/nios2/syscallent.h | 2 +-
+ linux/or1k/syscallent.h  | 2 +-
+ linux/tile/syscallent1.h | 2 +-
+ pathtrace.c              | 1 +
+ 7 files changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/NEWS b/NEWS
+index fe40ca4..09263eb 100644
+--- a/NEWS
++++ b/NEWS
+@@ -1,3 +1,9 @@
++Noteworthy changes in release ?.?? (????-??-??)
++===============================================
++
++* Bug fixes
++  * Fixed build on arc, metag, nios2, or1k, and tile architectures.
++
+ Noteworthy changes in release 4.11 (2015-12-21)
+ ===============================================
+ 
+diff --git a/linux/32/syscallent.h b/linux/32/syscallent.h
+index 5f997e7..e6f895c 100644
+--- a/linux/32/syscallent.h
++++ b/linux/32/syscallent.h
+@@ -1,5 +1,5 @@
+-#ifndef ARCH_mmap
+-# define ARCH_mmap mmap
++#ifndef sys_ARCH_mmap
++# define sys_ARCH_mmap sys_mmap
+ #endif
+ [  0] = { 2,	0,		SEN(io_setup),			"io_setup"		},
+ [  1] = { 1,	0,		SEN(io_destroy),		"io_destroy"		},
+@@ -276,5 +276,5 @@
+ [283] = { 2,	0,		SEN(membarrier),		"membarrier",		},
+ [284] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
+ 
+-#undef ARCH_mmap
++#undef sys_ARCH_mmap
+ #undef ARCH_WANT_SYNC_FILE_RANGE2
+diff --git a/linux/arc/syscallent.h b/linux/arc/syscallent.h
+index 5847dc4..1100008 100644
+--- a/linux/arc/syscallent.h
++++ b/linux/arc/syscallent.h
+@@ -1,4 +1,4 @@
+-#define ARCH_mmap mmap_pgoff
++#define sys_ARCH_mmap sys_mmap_pgoff
+ #include "32/syscallent.h"
+ [244] = { 3,	0,	SEN(printargs),	"arc_cacheflush"},
+ [245] = { 1,	0,	SEN(printargs),	"arc_settls"	},
+diff --git a/linux/nios2/syscallent.h b/linux/nios2/syscallent.h
+index 8a4b70e..01efe3a 100644
+--- a/linux/nios2/syscallent.h
++++ b/linux/nios2/syscallent.h
+@@ -1,4 +1,4 @@
+-#define ARCH_mmap mmap_pgoff
++#define sys_ARCH_mmap sys_mmap_pgoff
+ #include "32/syscallent.h"
+ [244] = {4,    0,	SEN(cacheflush), "cacheflush"},
+ [245 ... 259] = { },
+diff --git a/linux/or1k/syscallent.h b/linux/or1k/syscallent.h
+index ed84b3b..351fe25 100644
+--- a/linux/or1k/syscallent.h
++++ b/linux/or1k/syscallent.h
+@@ -1,4 +1,4 @@
+-#define ARCH_mmap mmap_pgoff
++#define sys_ARCH_mmap sys_mmap_pgoff
+ #include "32/syscallent.h"
+ [244] = { 3,	NF,	SEN(or1k_atomic),	"or1k_atomic"	},
+ [245 ... 259] = { },
+diff --git a/linux/tile/syscallent1.h b/linux/tile/syscallent1.h
+index c86f059..28dbab4 100644
+--- a/linux/tile/syscallent1.h
++++ b/linux/tile/syscallent1.h
+@@ -1,4 +1,4 @@
+-#define ARCH_mmap mmap_4koff
++#define sys_ARCH_mmap sys_mmap_4koff
+ #define ARCH_WANT_SYNC_FILE_RANGE2 1
+ #include "32/syscallent.h"
+ [244] = { 1,	0,	SEN(printargs),	"cmpxchg_badaddr"	},
+diff --git a/pathtrace.c b/pathtrace.c
+index d530ec2..e72cdf7 100644
+--- a/pathtrace.c
++++ b/pathtrace.c
+@@ -216,6 +216,7 @@ pathtrace_match(struct tcb *tcp)
+ 	case SEN_mmap:
+ 	case SEN_mmap_4koff:
+ 	case SEN_mmap_pgoff:
++	case SEN_ARCH_mmap:
+ 		/* x, x, x, x, fd */
+ 		return fdmatch(tcp, tcp->u_arg[4]);
+ 
+-- 
+2.6.4
+

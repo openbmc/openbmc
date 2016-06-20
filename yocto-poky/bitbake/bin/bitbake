@@ -35,7 +35,7 @@ except RuntimeError as exc:
 from bb import cookerdata
 from bb.main import bitbake_main, BitBakeConfigParameters, BBMainException
 
-__version__ = "1.28.0"
+__version__ = "1.30.0"
 
 if __name__ == "__main__":
     if __version__ != bb.__version__:

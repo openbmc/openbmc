@@ -4,7 +4,7 @@
 
 # gummiboot.bbclass - equivalent of grub-efi.bbclass
 # Set EFI_PROVIDER = "gummiboot" to use gummiboot on your live images instead of grub-efi
-# (images built by bootimage.bbclass or boot-directdisk.bbclass)
+# (images built by image-live.bbclass or image-vm.bbclass)
 
 do_bootimg[depends] += "${MLPREFIX}gummiboot:do_deploy"
 do_bootdirectdisk[depends] += "${MLPREFIX}gummiboot:do_deploy"

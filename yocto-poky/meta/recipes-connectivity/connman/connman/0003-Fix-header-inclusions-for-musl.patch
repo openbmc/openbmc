@@ -14,10 +14,10 @@ Upstream-Status: Pending
  tools/dnsproxy-test.c | 1 +
  5 files changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/gweb/gresolv.c b/gweb/gresolv.c
-index 3ad8e70..61d6fe8 100644
---- a/gweb/gresolv.c
-+++ b/gweb/gresolv.c
+Index: connman-1.30/gweb/gresolv.c
+===================================================================
+--- connman-1.30.orig/gweb/gresolv.c
++++ connman-1.30/gweb/gresolv.c
 @@ -28,6 +28,7 @@
  #include <stdarg.h>
  #include <string.h>
@@ -26,10 +26,10 @@ index 3ad8e70..61d6fe8 100644
  #include <resolv.h>
  #include <sys/types.h>
  #include <sys/socket.h>
-diff --git a/plugins/wifi.c b/plugins/wifi.c
-index dfe849f..99cff3f 100644
---- a/plugins/wifi.c
-+++ b/plugins/wifi.c
+Index: connman-1.30/plugins/wifi.c
+===================================================================
+--- connman-1.30.orig/plugins/wifi.c
++++ connman-1.30/plugins/wifi.c
 @@ -30,9 +30,8 @@
  #include <string.h>
  #include <sys/ioctl.h>
@@ -41,10 +41,10 @@ index dfe849f..99cff3f 100644
  
  #ifndef IFF_LOWER_UP
  #define IFF_LOWER_UP	0x10000
-diff --git a/src/tethering.c b/src/tethering.c
-index ceeec74..c44cb36 100644
---- a/src/tethering.c
-+++ b/src/tethering.c
+Index: connman-1.30/src/tethering.c
+===================================================================
+--- connman-1.30.orig/src/tethering.c
++++ connman-1.30/src/tethering.c
 @@ -31,10 +31,8 @@
  #include <stdio.h>
  #include <sys/ioctl.h>
@@ -56,10 +56,10 @@ index ceeec74..c44cb36 100644
  #include <netinet/in.h>
  #include <linux/if_bridge.h>
  
-diff --git a/tools/dhcp-test.c b/tools/dhcp-test.c
-index c34e10a..eae66fc 100644
---- a/tools/dhcp-test.c
-+++ b/tools/dhcp-test.c
+Index: connman-1.30/tools/dhcp-test.c
+===================================================================
+--- connman-1.30.orig/tools/dhcp-test.c
++++ connman-1.30/tools/dhcp-test.c
 @@ -33,7 +33,6 @@
  #include <arpa/inet.h>
  #include <net/route.h>
@@ -68,10 +68,10 @@ index c34e10a..eae66fc 100644
  
  #include <gdhcp/gdhcp.h>
  
-diff --git a/tools/dnsproxy-test.c b/tools/dnsproxy-test.c
-index 551cae9..226ba86 100644
---- a/tools/dnsproxy-test.c
-+++ b/tools/dnsproxy-test.c
+Index: connman-1.30/tools/dnsproxy-test.c
+===================================================================
+--- connman-1.30.orig/tools/dnsproxy-test.c
++++ connman-1.30/tools/dnsproxy-test.c
 @@ -27,6 +27,7 @@
  #include <stdlib.h>
  #include <string.h>
@@ -80,6 +80,39 @@ index 551cae9..226ba86 100644
  #include <arpa/inet.h>
  #include <netinet/in.h>
  #include <sys/types.h>
--- 
-2.5.1
-
+Index: connman-1.30/configure.ac
+===================================================================
+--- connman-1.30.orig/configure.ac
++++ connman-1.30/configure.ac
+@@ -173,6 +173,8 @@ AM_CONDITIONAL(PPTP_BUILTIN, test "${ena
+ 
+ AC_CHECK_HEADERS([execinfo.h])
+ 
++AC_CHECK_MEMBERS([struct in6_pktinfo.ipi6_addr], [], [], [[#include <netinet/in.h>]])
++
+ AC_CHECK_HEADERS(resolv.h, dummy=yes,
+ 	AC_MSG_ERROR(resolver header files are required))
+ AC_CHECK_LIB(resolv, ns_initparse, dummy=yes, [
+Index: connman-1.30/gdhcp/common.h
+===================================================================
+--- connman-1.30.orig/gdhcp/common.h
++++ connman-1.30/gdhcp/common.h
+@@ -19,6 +19,7 @@
+  *
+  */
+ 
++#include <config.h>
+ #include <netinet/udp.h>
+ #include <netinet/ip.h>
+ 
+@@ -170,8 +171,8 @@ static const uint8_t dhcp_option_lengths
+ 	[OPTION_U32]	= 4,
+ };
+ 
+-/* already defined within netinet/in.h if using GNU compiler */
+-#ifndef __USE_GNU
++/* already defined within netinet/in.h if using GNU or musl libc */
++#ifndef HAVE_STRUCT_IN6_PKTINFO_IPI6_ADDR
+ struct in6_pktinfo {
+ 	struct in6_addr ipi6_addr;  /* src/dst IPv6 address */
+ 	unsigned int ipi6_ifindex;  /* send/recv interface index */

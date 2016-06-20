@@ -1,0 +1,39 @@
+From 0b68ad206d2d90df78d91cad4da19152084014cf Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 16 Sep 2015 05:15:04 +0000
+Subject: [PATCH] Enable backtrace on linux when using glibc
+
+We dont have backtrace() implemented on non-glibc libc's on linux
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Accepted
+
+ Source/WTF/wtf/Assertions.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Source/WTF/wtf/Assertions.cpp b/Source/WTF/wtf/Assertions.cpp
+index 191d53f..a4d86b5 100644
+--- a/Source/WTF/wtf/Assertions.cpp
++++ b/Source/WTF/wtf/Assertions.cpp
+@@ -68,7 +68,7 @@
+ #include <unistd.h>
+ #endif
+ 
+-#if OS(DARWIN) || (OS(LINUX) && !defined(__UCLIBC__))
++#if OS(DARWIN) || (OS(LINUX) && defined(__GLIBC__) && !defined(__UCLIBC__))
+ #include <cxxabi.h>
+ #include <dlfcn.h>
+ #include <execinfo.h>
+@@ -225,7 +225,7 @@ void WTFReportArgumentAssertionFailure(const char* file, int line, const char* f
+ 
+ void WTFGetBacktrace(void** stack, int* size)
+ {
+-#if OS(DARWIN) || (OS(LINUX) && !defined(__UCLIBC__))
++#if OS(DARWIN) || (OS(LINUX) && defined(__GLIBC__) && !defined(__UCLIBC__))
+     *size = backtrace(stack, *size);
+ #elif OS(WINDOWS)
+     // The CaptureStackBackTrace function is available in XP, but it is not defined
+-- 
+2.5.2
+

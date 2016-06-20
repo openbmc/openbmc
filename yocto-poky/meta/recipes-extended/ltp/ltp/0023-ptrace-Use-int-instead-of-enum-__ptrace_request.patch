@@ -1,0 +1,48 @@
+From 560347f77236616a635b4a997a0596b8da4d0799 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 8 Jan 2016 07:08:25 +0000
+Subject: [PATCH 23/32] ptrace:  Use int instead of enum __ptrace_request
+
+__ptrace_request is only available with glibc
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ testcases/kernel/syscalls/ptrace/ptrace03.c           | 4 ++++
+ testcases/kernel/syscalls/ptrace/spawn_ptrace_child.h | 4 ++++
+ 2 files changed, 8 insertions(+)
+
+diff --git a/testcases/kernel/syscalls/ptrace/ptrace03.c b/testcases/kernel/syscalls/ptrace/ptrace03.c
+index a4028fc..f1880cd 100644
+--- a/testcases/kernel/syscalls/ptrace/ptrace03.c
++++ b/testcases/kernel/syscalls/ptrace/ptrace03.c
+@@ -102,7 +102,11 @@ static pid_t unused_pid;
+ static pid_t zero_pid;
+ 
+ struct test_case_t {
++#ifdef __GLIBC__
+ 	enum __ptrace_request request;
++#else
++	int request;
++#endif
+ 	pid_t *pid;
+ 	int exp_errno;
+ } test_cases[] = {
+diff --git a/testcases/kernel/syscalls/ptrace/spawn_ptrace_child.h b/testcases/kernel/syscalls/ptrace/spawn_ptrace_child.h
+index ae538e9..85aa89d 100644
+--- a/testcases/kernel/syscalls/ptrace/spawn_ptrace_child.h
++++ b/testcases/kernel/syscalls/ptrace/spawn_ptrace_child.h
+@@ -130,7 +130,11 @@ static char *strings[] = {
+ 	SPT(KILL)
+ 	SPT(SINGLESTEP)
+ };
++#ifdef __GLIBC__
+ static inline char *strptrace(enum __ptrace_request request)
++#else
++static inline char *strptrace(int request)
++#endif
+ {
+ 	return strings[request];
+ }
+-- 
+2.7.0
+

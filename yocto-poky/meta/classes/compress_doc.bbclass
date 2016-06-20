@@ -40,8 +40,8 @@ python package_do_compress_doc() {
     compress_cmds = {}
     decompress_cmds = {}
     for mode in compress_list:
-        compress_cmds[mode] = d.getVarFlag('DOC_COMPRESS_CMD', mode)
-        decompress_cmds[mode] = d.getVarFlag('DOC_DECOMPRESS_CMD', mode)
+        compress_cmds[mode] = d.getVarFlag('DOC_COMPRESS_CMD', mode, True)
+        decompress_cmds[mode] = d.getVarFlag('DOC_DECOMPRESS_CMD', mode, True)
 
     mandir = os.path.abspath(dvar + os.sep + d.getVar("mandir", True))
     if os.path.exists(mandir):

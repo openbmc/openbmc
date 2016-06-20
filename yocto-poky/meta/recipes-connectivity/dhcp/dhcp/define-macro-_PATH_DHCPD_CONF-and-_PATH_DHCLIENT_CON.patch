@@ -1,6 +1,6 @@
 define macro _PATH_DHCPD_CONF and _PATH_DHCLIENT_CONF
 
-Upstream-Status: inappropriate <oe specific>
+Upstream-Status: Inappropriate [OE specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---

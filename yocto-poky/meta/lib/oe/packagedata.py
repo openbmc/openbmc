@@ -1,4 +1,5 @@
 import codecs
+import os
 
 def packaged(pkg, d):
     return os.access(get_subpkgedata_fn(pkg, d) + '.packaged', os.R_OK)

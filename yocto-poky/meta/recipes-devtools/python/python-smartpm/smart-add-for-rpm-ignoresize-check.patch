@@ -17,14 +17,15 @@ Signed-off-by: Chong Lu <Chong.Lu@windriver.com>
  smart/backends/rpm/pm.py | 4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/smart/backends/rpm/pm.py b/smart/backends/rpm/pm.py
-index 5da9ee6..f0488ec 100644
---- a/smart/backends/rpm/pm.py
-+++ b/smart/backends/rpm/pm.py
-@@ -241,6 +241,10 @@ class RPMPackageManager(PackageManager):
-         except AttributeError:
-             probfilter |= rpm.RPMPROB_FILTER_IGNOREARCH
- 
+Index: git/smart/backends/rpm/pm.py
+===================================================================
+--- git.orig/smart/backends/rpm/pm.py
++++ git/smart/backends/rpm/pm.py
+@@ -233,6 +233,11 @@ class RPMPackageManager(PackageManager):
+         if sysconf.get("rpm-order"):
+             ts.order()
+         probfilter = rpm.RPMPROB_FILTER_OLDPACKAGE
++
 +        if sysconf.get("rpm-ignoresize", False):
 +            probfilter |= rpm.RPMPROB_FILTER_DISKNODES
 +            probfilter |= rpm.RPMPROB_FILTER_DISKSPACE
@@ -32,6 +33,3 @@ index 5da9ee6..f0488ec 100644
          if force or reinstall:
              probfilter |= rpm.RPMPROB_FILTER_REPLACEPKG
              probfilter |= rpm.RPMPROB_FILTER_REPLACEOLDFILES
--- 
-1.9.1
-

@@ -1,0 +1,33 @@
+From b1f50320332c9c90fa33ab136ef0ec2d12cda461 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 6 Jan 2016 12:30:52 -0800
+Subject: [PATCH] use strtoll instead of strtoq
+
+Use LLONG_MAX instead of LONG_LONG_MAX
+LONG_LONG_MAX is GNU specific
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ src/options.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/options.c b/src/options.c
+index da8b4cf..c663b4e 100644
+--- a/src/options.c
++++ b/src/options.c
+@@ -1547,8 +1547,8 @@ str_offt (char *val)
+ 
+ #if (SIZEOF_LONG == 4 && SIZEOF_OFF_T == 8) \
+     || (defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64)
+-  num = strtoq (val, &expr, 0);
+-  if ((num == LONG_LONG_MAX) || (num <= 0) || (expr == val))
++  num = strtoll (val, &expr, 0);
++  if ((num == LLONG_MAX) || (num <= 0) || (expr == val))
+ #else
+   num = strtol (val, &expr, 0);
+   if ((num == LONG_MAX) || (num <= 0) || (expr == val))
+-- 
+2.6.4
+

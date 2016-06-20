@@ -80,6 +80,11 @@ class DataExpansions(unittest.TestCase):
         val = self.d.expand("${@d.getVar('foo', True) + ' ${bar}'}")
         self.assertEqual(str(val), "value_of_foo value_of_bar")
 
+    def test_python_unexpanded(self):
+        self.d.setVar("bar", "${unsetvar}")
+        val = self.d.expand("${@d.getVar('foo', True) + ' ${bar}'}")
+        self.assertEqual(str(val), "${@d.getVar('foo', True) + ' ${unsetvar}'}")
+
     def test_python_snippet_syntax_error(self):
         self.d.setVar("FOO", "${@foo = 5}")
         self.assertRaises(bb.data_smart.ExpansionError, self.d.getVar, "FOO", True)
@@ -394,13 +399,13 @@ class TestFlags(unittest.TestCase):
         self.d.setVarFlag("foo", "flag2", "value of flag2")
 
     def test_setflag(self):
-        self.assertEqual(self.d.getVarFlag("foo", "flag1"), "value of flag1")
-        self.assertEqual(self.d.getVarFlag("foo", "flag2"), "value of flag2")
+        self.assertEqual(self.d.getVarFlag("foo", "flag1", False), "value of flag1")
+        self.assertEqual(self.d.getVarFlag("foo", "flag2", False), "value of flag2")
 
     def test_delflag(self):
         self.d.delVarFlag("foo", "flag2")
-        self.assertEqual(self.d.getVarFlag("foo", "flag1"), "value of flag1")
-        self.assertEqual(self.d.getVarFlag("foo", "flag2"), None)
+        self.assertEqual(self.d.getVarFlag("foo", "flag1", False), "value of flag1")
+        self.assertEqual(self.d.getVarFlag("foo", "flag2", False), None)
 
 
 class Contains(unittest.TestCase):

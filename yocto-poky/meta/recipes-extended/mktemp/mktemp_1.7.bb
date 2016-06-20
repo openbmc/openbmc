@@ -27,7 +27,7 @@ do_install_append () {
 
 ALTERNATIVE_${PN} = "mktemp"
 ALTERNATIVE_LINK_NAME[mktemp] = "${base_bindir}/mktemp"
-ALTERNATIVE_PRIORITY = "100"
+ALTERNATIVE_PRIORITY = "60"
 
 ALTERNATIVE_${PN}-doc = "mktemp.1"
 ALTERNATIVE_PRIORITY_${PN}-doc = "300"

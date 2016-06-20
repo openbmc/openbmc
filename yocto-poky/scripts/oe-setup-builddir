@@ -75,12 +75,11 @@ if [ -z "$OECORELOCALCONF" ]; then
     OECORELOCALCONF="$OEROOT/meta/conf/local.conf.sample"
 fi
 if [ ! -r "$BUILDDIR/conf/local.conf" ]; then
-cat <<EOM
+    cat <<EOM
 You had no conf/local.conf file. This configuration file has therefore been
-created for you with some default values. You may wish to edit it to use a 
-different MACHINE (target hardware) or enable parallel build options to take 
-advantage of multiple cores for example. See the file for more information as 
-common configuration options are commented.
+created for you with some default values. You may wish to edit it to, for
+example, select a different MACHINE (target hardware). See conf/local.conf
+for more information as common configuration options are commented.
 
 EOM
     cp -f $OECORELOCALCONF "$BUILDDIR/conf/local.conf"
@@ -92,9 +91,9 @@ if [ -z "$OECORELAYERCONF" ]; then
 fi
 if [ ! -r "$BUILDDIR/conf/bblayers.conf" ]; then
     cat <<EOM
-You had no conf/bblayers.conf file. The configuration file has been created for
-you with some default values. To add additional metadata layers into your
-configuration please add entries to this file.
+You had no conf/bblayers.conf file. This configuration file has therefore been
+created for you with some default values. To add additional metadata layers
+into your configuration please add entries to conf/bblayers.conf.
 
 EOM
 

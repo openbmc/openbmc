@@ -1,0 +1,24 @@
+iproute2: fix building with musl
+
+We need limits.h for PATH_MAX, fixes:
+
+rt_names.c:364:13: error: ‘PATH_MAX’ undeclared (first use in this
+function)
+
+Upstream-Status: Backport
+
+Signed-off-by: Gustavo Zacarias <gustavo@zacarias.com.ar>
+Signed-off-by: Maxin B. John <maxin.john@intel.com>
+---
+diff --git a/lib/rt_names.c b/lib/rt_names.c
+index f6d17c0..b665d3e 100644
+--- a/lib/rt_names.c
++++ b/lib/rt_names.c
+@@ -18,6 +18,7 @@
+ #include <sys/time.h>
+ #include <sys/socket.h>
+ #include <dirent.h>
++#include <limits.h>
+ 
+ #include <asm/types.h>
+ #include <linux/rtnetlink.h>

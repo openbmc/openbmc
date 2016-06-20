@@ -1,0 +1,32 @@
+From 2902dda6e3f7b2cd5796a96af20deece610e2eb9 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Mon, 16 Nov 2015 22:20:49 -0800
+Subject: [PATCH] build_unix/Makefile: let libdb-6.0.la depend os_map.lo
+
+Fixed parallel issue:
+libtool: link: `os_map.lo' is not a valid libtool object
+Makefile:867: recipe for target 'libdb-6.0.la' failed
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ dist/Makefile.in |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dist/Makefile.in b/dist/Makefile.in
+index 0a42375..d9e05b9 100644
+--- a/dist/Makefile.in
++++ b/dist/Makefile.in
+@@ -863,7 +863,7 @@ $(libdb_version): $(C_OBJS)
+ 	$(LN) -s $(libdb_version) $(libdb)
+ 
+ # Shared C library.
+-$(libso_target): $(C_OBJS) bt_rec@o@
++$(libso_target): $(C_OBJS) bt_rec@o@ os_map@o@
+ 	$(SOLINK) $(SOFLAGS) $(LDFLAGS) -o $@ $(C_OBJS) \
+ 		$(LIBCSO_LIBS)
+ 	$(RM) $(libdb)
+-- 
+1.7.9.5
+

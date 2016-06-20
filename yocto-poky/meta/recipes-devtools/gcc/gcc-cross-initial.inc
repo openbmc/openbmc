@@ -5,6 +5,9 @@ PACKAGES = ""
 INHIBIT_AUTOTOOLS_DEPS = "1"
 INHIBIT_DEFAULT_DEPS = "1"
 
+# We still need gnu-config-native
+DEPENDS_prepend = "gnu-config-native autoconf-native "
+
 PN = "gcc-cross-initial-${TARGET_ARCH}"
 
 CROSS_TARGET_SYS_DIR_append = ".${PN}"
@@ -19,7 +22,6 @@ EXTRA_OECONF = "\
     --disable-multilib \
     --disable-__cxa_atexit \
     --enable-languages=c \
-    ${OPTSPACE} \
     --program-prefix=${TARGET_PREFIX} \
     --with-sysroot=/not/exist \
     --with-build-sysroot=${GCCCROSS_BUILDSYSROOT} \
@@ -95,3 +97,4 @@ sysroot_stage_all() {
 do_populate_sysroot[sstate-inputdirs] = "${SYSROOT_DESTDIR}/${STAGING_DIR_HOST}/ ${SYSROOT_DESTDIR}/${STAGING_DIR_TARGET}/${target_base_libdir}/"
 do_populate_sysroot[sstate-outputdirs] = "${STAGING_DIR_HOST}/ ${STAGING_DIR_TCBOOTSTRAP}/${target_base_libdir}/"
 
+inherit nopackages

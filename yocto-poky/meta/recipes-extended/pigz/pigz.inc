@@ -13,6 +13,8 @@ PROVIDES_class-native += "gzip-native"
 
 DEPENDS = "zlib"
 
+EXTRA_OEMAKE = "-e MAKEFLAGS="
+
 inherit update-alternatives
 
 do_install_class-target() {

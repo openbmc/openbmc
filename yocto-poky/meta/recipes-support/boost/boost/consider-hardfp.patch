@@ -1,0 +1,19 @@
+When using soft-float, on ARM we should not expect the FE_* symbols
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+
+Index: boost_1_60_0/boost/test/execution_monitor.hpp
+===================================================================
+--- boost_1_60_0.orig/boost/test/execution_monitor.hpp
++++ boost_1_60_0/boost/test/execution_monitor.hpp
+@@ -484,7 +484,8 @@ enum masks {
+     BOOST_FPE_UNDERFLOW = EM_UNDERFLOW|EM_DENORMAL,
+ 
+     BOOST_FPE_ALL       = MCW_EM,
+-#elif defined(BOOST_NO_FENV_H) || defined(BOOST_CLANG)
++#elif defined(BOOST_NO_FENV_H) || defined(BOOST_CLANG) \
++    || defined(__ARM_PCS)
+     BOOST_FPE_ALL       = 1,
+ #else
+     BOOST_FPE_DIVBYZERO = FE_DIVBYZERO,

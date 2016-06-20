@@ -14,17 +14,21 @@
 # ${APPEND} - an override list of append strings for each label
 # ${GRUB_OPTS} - additional options to add to the config, ';' delimited # (optional)
 # ${GRUB_TIMEOUT} - timeout before executing the deault label (optional)
+# ${GRUB_ROOT} - grub's root device.
 
 do_bootimg[depends] += "${MLPREFIX}grub-efi:do_deploy"
 do_bootdirectdisk[depends] += "${MLPREFIX}grub-efi:do_deploy"
 
 GRUB_SERIAL ?= "console=ttyS0,115200"
-GRUBCFG = "${S}/grub.cfg"
+GRUB_CFG_VM = "${S}/grub_vm.cfg"
+GRUB_CFG_LIVE = "${S}/grub_live.cfg"
 GRUB_TIMEOUT ?= "10"
 #FIXME: build this from the machine config
 GRUB_OPTS ?= "serial --unit=0 --speed=115200 --word=8 --parity=no --stop=1"
 
 EFIDIR = "/EFI/BOOT"
+GRUB_ROOT ?= "${ROOT}"
+APPEND ?= ""
 
 # Need UUID utility code.
 inherit fs-uuid
@@ -42,7 +46,7 @@ efi_populate() {
 	fi
 	install -m 0644 ${DEPLOY_DIR_IMAGE}/${GRUB_IMAGE} ${DEST}${EFIDIR}
 
-	install -m 0644 ${GRUBCFG} ${DEST}${EFIDIR}/grub.cfg
+	install -m 0644 ${GRUB_CFG} ${DEST}${EFIDIR}/grub.cfg
 }
 
 efi_iso_populate() {
@@ -82,9 +86,9 @@ python build_efi_cfg() {
         bb.debug(1, "No labels, nothing to do")
         return
 
-    cfile = d.getVar('GRUBCFG', True)
+    cfile = d.getVar('GRUB_CFG', True)
     if not cfile:
-        raise bb.build.FuncFailed('Unable to read GRUBCFG')
+        raise bb.build.FuncFailed('Unable to read GRUB_CFG')
 
     try:
          cfgfile = file(cfile, 'w')
@@ -105,6 +109,10 @@ python build_efi_cfg() {
         cfgfile.write('timeout=%s\n' % timeout)
     else:
         cfgfile.write('timeout=50\n')
+
+    root = d.getVar('GRUB_ROOT', True)
+    if not root:
+        raise bb.build.FuncFailed('GRUB_ROOT not defined')
 
     if gfxserial == "1":
         btypes = [ [ " graphics console", "" ],
@@ -128,6 +136,8 @@ python build_efi_cfg() {
             if label == "install":
                 lb = "install-efi"
             cfgfile.write('linux /vmlinuz LABEL=%s' % (lb))
+
+            cfgfile.write(' %s' % replace_rootfs_uuid(d, root))
 
             append = localdata.getVar('APPEND', True)
             initrd = localdata.getVar('INITRD', True)

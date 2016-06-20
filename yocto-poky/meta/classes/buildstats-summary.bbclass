@@ -3,8 +3,7 @@ python buildstats_summary () {
     import collections
     import os.path
 
-    bn = get_bn(e)
-    bsdir = os.path.join(e.data.getVar('BUILDSTATS_BASE', True), bn)
+    bsdir = e.data.expand("${BUILDSTATS_BASE}/${BUILDNAME}")
     if not os.path.exists(bsdir):
         return
 

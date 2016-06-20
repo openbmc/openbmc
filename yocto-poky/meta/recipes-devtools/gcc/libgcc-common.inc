@@ -12,7 +12,8 @@ do_configure () {
 	mkdir -p ${B}/$target/${BPN}/
 	cd ${B}/${BPN}
 	chmod a+x ${S}/${BPN}/configure
-	${S}/${BPN}/configure ${CONFIGUREOPTS} ${EXTRA_OECONF}
+	relpath=${@os.path.relpath("${S}/${BPN}", "${B}/${BPN}")}
+	$relpath/configure ${CONFIGUREOPTS} ${EXTRA_OECONF}
 }
 
 do_compile () {

@@ -4,7 +4,7 @@
 
 
 # DESCRIPTION
-# Base class inherited by test classes in meta/lib/selftest
+# Base class inherited by test classes in meta/lib/oeqa/selftest
 
 import unittest
 import os
@@ -16,6 +16,8 @@ import errno
 import oeqa.utils.ftools as ftools
 from oeqa.utils.commands import runCmd, bitbake, get_bb_var, get_test_layer
 from oeqa.utils.decorators import LogResults
+from random import choice
+import glob
 
 @LogResults
 class oeSelfTest(unittest.TestCase):
@@ -29,9 +31,10 @@ class oeSelfTest(unittest.TestCase):
         self.testinc_path = os.path.join(self.builddir, "conf/selftest.inc")
         self.local_bblayers_path = os.path.join(self.builddir, "conf/bblayers.conf")
         self.testinc_bblayers_path = os.path.join(self.builddir, "conf/bblayers.inc")
+        self.machineinc_path = os.path.join(self.builddir, "conf/machine.inc")
         self.testlayer_path = oeSelfTest.testlayer_path
         self._extra_tear_down_commands = []
-        self._track_for_cleanup = [self.testinc_path]
+        self._track_for_cleanup = [self.testinc_path, self.testinc_bblayers_path, self.machineinc_path]
         super(oeSelfTest, self).__init__(methodName)
 
     def setUp(self):
@@ -47,11 +50,25 @@ class oeSelfTest(unittest.TestCase):
             for f in files:
                 if f == 'test_recipe.inc':
                     os.remove(os.path.join(root, f))
-        try:
-            os.remove(self.testinc_bblayers_path)
-        except OSError as e:
-            if e.errno != errno.ENOENT:
-                raise
+
+        for incl_file in [self.testinc_bblayers_path, self.machineinc_path]:
+            try:
+                os.remove(incl_file)
+            except OSError as e:
+                if e.errno != errno.ENOENT:
+                    raise
+
+        # Get CUSTOMMACHINE from env (set by --machine argument to oe-selftest)
+        custommachine = os.getenv('CUSTOMMACHINE')
+        if custommachine:
+            if custommachine == 'random':
+                machine = get_random_machine()
+            else:
+                machine = custommachine
+            machine_conf = 'MACHINE ??= "%s"\n' % machine
+            self.set_machine_config(machine_conf)
+            print 'MACHINE: %s' % machine
+
         # tests might need their own setup
         # but if they overwrite this one they have to call
         # super each time, so let's give them an alternative
@@ -99,10 +116,20 @@ class oeSelfTest(unittest.TestCase):
         self.log.debug("Writing to: %s\n%s\n" % (self.testinc_path, data))
         ftools.write_file(self.testinc_path, data)
 
+        custommachine = os.getenv('CUSTOMMACHINE')
+        if custommachine and 'MACHINE' in data:
+            machine = get_bb_var('MACHINE')
+            self.log.warning('MACHINE overridden: %s' % machine)
+
     # append to <builddir>/conf/selftest.inc
     def append_config(self, data):
         self.log.debug("Appending to: %s\n%s\n" % (self.testinc_path, data))
         ftools.append_file(self.testinc_path, data)
+
+        custommachine = os.getenv('CUSTOMMACHINE')
+        if custommachine and 'MACHINE' in data:
+            machine = get_bb_var('MACHINE')
+            self.log.warning('MACHINE overridden: %s' % machine)
 
     # remove data from <builddir>/conf/selftest.inc
     def remove_config(self, data):
@@ -151,3 +178,28 @@ class oeSelfTest(unittest.TestCase):
     def remove_bblayers_config(self, data):
         self.log.debug("Removing from: %s\n\%s\n" % (self.testinc_bblayers_path, data))
         ftools.remove_from_file(self.testinc_bblayers_path, data)
+
+    # write to <builddir>/conf/machine.inc
+    def set_machine_config(self, data):
+        self.log.debug("Writing to: %s\n%s\n" % (self.machineinc_path, data))
+        ftools.write_file(self.machineinc_path, data)
+
+
+def get_available_machines():
+    # Get a list of all available machines
+    bbpath = get_bb_var('BBPATH').split(':')
+    machines = []
+
+    for path in bbpath:
+        found_machines = glob.glob(os.path.join(path, 'conf', 'machine', '*.conf'))
+        if found_machines:
+            for i in found_machines:
+                # eg: '/home/<user>/poky/meta-intel/conf/machine/intel-core2-32.conf'
+                machines.append(os.path.splitext(os.path.basename(i))[0])
+
+    return machines
+
+
+def get_random_machine():
+    # Get a random machine
+    return choice(get_available_machines())

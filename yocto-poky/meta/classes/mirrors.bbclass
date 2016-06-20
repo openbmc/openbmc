@@ -40,7 +40,8 @@ ftp://lsof.itap.purdue.edu/pub/tools/unix/lsof/  ftp://ftp.tux.org/pub/sites/vic
 ftp://lsof.itap.purdue.edu/pub/tools/unix/lsof/  ftp://gd.tuwien.ac.at/utils/admin-tools/lsof/ \n \
 ftp://lsof.itap.purdue.edu/pub/tools/unix/lsof/  ftp://sunsite.ualberta.ca/pub/Mirror/lsof/ \n \
 ftp://lsof.itap.purdue.edu/pub/tools/unix/lsof/  ftp://the.wiretapped.net/pub/security/host-security/lsof/ \n \
-http://www.apache.org/dist  http://archive.apache.org/dist \n \
+${APACHE_MIRROR}  http://www.us.apache.org/dist \n \
+${APACHE_MIRROR}  http://archive.apache.org/dist \n \
 http://downloads.sourceforge.net/watchdog/ http://fossies.org/linux/misc/ \n \
 ${SAVANNAH_GNU_MIRROR} http://download-mirror.savannah.gnu.org/releases \n \
 ${SAVANNAH_NONGNU_MIRROR} http://download-mirror.savannah.nongnu.org/releases \n \
@@ -53,6 +54,7 @@ p4://.*/.*      http://downloads.yoctoproject.org/mirror/sources/ \n \
 osc://.*/.*     http://downloads.yoctoproject.org/mirror/sources/ \n \
 https?$://.*/.* http://downloads.yoctoproject.org/mirror/sources/ \n \
 ftp://.*/.*     http://downloads.yoctoproject.org/mirror/sources/ \n \
+npm://.*/.*     http://downloads.yoctoproject.org/mirror/sources/ \n \
 cvs://.*/.*     http://sources.openembedded.org/ \n \
 svn://.*/.*     http://sources.openembedded.org/ \n \
 git://.*/.*     http://sources.openembedded.org/ \n \
@@ -62,6 +64,7 @@ p4://.*/.*      http://sources.openembedded.org/ \n \
 osc://.*/.*     http://sources.openembedded.org/ \n \
 https?$://.*/.* http://sources.openembedded.org/ \n \
 ftp://.*/.*     http://sources.openembedded.org/ \n \
+npm://.*/.*     http://sources.openembedded.org/ \n \
 ${CPAN_MIRROR}  http://cpan.metacpan.org/ \n \
 ${CPAN_MIRROR}  http://search.cpan.org/CPAN/ \n \
 "

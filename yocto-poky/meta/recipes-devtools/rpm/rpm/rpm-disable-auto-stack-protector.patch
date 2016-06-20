@@ -1,0 +1,24 @@
+Make security switches manual settings
+
+RPM checks for the availability of the stack protector switch and
+transactional-memory support.  If supported it unconditionally
+enables the compiler options which can cause errors if the support has
+not been built into the compiler.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.15/configure.ac
+===================================================================
+--- rpm-5.4.15.orig/configure.ac
++++ rpm-5.4.15/configure.ac
+@@ -425,7 +425,7 @@ dnl #  rpm_CFLAGS_ADD([-fstack-arrays],[
+ dnl # build RPM instrumented for extra optimization/security (GCC only)
+ dnl # --- other optimizations
+   rpm_CFLAGS_ADD([-fexceptions], [RPM_CFLAGS])
+-  rpm_CFLAGS_ADD([-D_FORTIFY_SOURCE=2 -fstack-protector], [RPM_CFLAGS])
++dnl  rpm_CFLAGS_ADD([-D_FORTIFY_SOURCE=2 -fstack-protector], [RPM_CFLAGS])
+ dnl #  rpm_CFLAGS_ADD([-fstack-protector-all],[RPM_CFLAGS])
+ 
+      if test \( ".`$CC --version 2>&1 | grep 'GCC'`" != . \); then

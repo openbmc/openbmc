@@ -1,0 +1,52 @@
+From 67ec7531e6297200eaa97ef917d49b0a75876cb4 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Wed, 2 Dec 2015 00:56:07 -0800
+Subject: [PATCH] lib/transaction.c: fix file conflicts for MIPS64 N32
+
+The following error can occur:
+  smart install libc6-2.22-r0.1@lib32_mips32r2octeon3 libc6-dbg-2.22-r0.1@lib32_mips32r2octeon3
+error: file /sbin/ldconfig conflicts between attempted installs of libc6-2.22-r0.1.lib32_mips32r2octeon3 and libc6-2.22-r0.1.octeon3_n32
+error: file /sbin/.debug/ldconfig conflicts between attempted installs of libc6-dbg-2.22-r0.1.lib32_mips32r2octeon3 and libc6-dbg-2.22-r0.1.octeon3_n32
+
+This was because:
+transactions_color = 001 (ELF32) & 010 (ELF64) & 100 (ELF32 N32 MIPS64)
+FColor = Current file color (001) & transaction_color (111)
+oFcolor = Previous file color (100) & transaction_color (111)
+
+There are two places where the conflict comparisons occur.  In both places
+the 'else' clause was too restrictive (opposite of the 'positive' clause).
+This caused the system to only permit a binary comparison - "new preferred" or
+"old preferred".  It did not permissing "neither preferred".  By removing the
+else comparison the system will now perform a 'last-in-wins' resolution when
+"neither is preferred".
+
+Upstream-Status: Submitted [RPM5 maintainer]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+---
+ lib/transaction.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+Index: rpm-5.4.14/lib/transaction.c
+===================================================================
+--- rpm-5.4.14.orig/lib/transaction.c
++++ rpm-5.4.14/lib/transaction.c
+@@ -154,7 +154,7 @@ static int handleInstInstalledFile(const
+ 		fi->actions[fx] = FA_SKIPCOLOR;
+ #endif
+ 		rConflicts = 0;
+-	    } else if (FColor & prefcolor) {
++	    } else {
+ #ifdef	REFERENCE
+ 		rpmfsSetAction(fs, fx, FA_CREATE);
+ #else
+@@ -420,7 +420,7 @@ assert(otherFi != NULL);
+ 			fi->actions[i] = FA_SKIPCOLOR;
+ 			rConflicts = 0;
+ 		    } else
+-		    if (FColor == 0 && oFColor == 0) {
++		    {
+ 			/* ... otherwise, do both, last in wins. */
+ 			otherFi->actions[otherFileNum] = FA_CREATE;
+ 			fi->actions[i] = FA_CREATE;

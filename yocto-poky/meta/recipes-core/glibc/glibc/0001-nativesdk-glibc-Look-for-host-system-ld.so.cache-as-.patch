@@ -1,7 +1,7 @@
-From 0876fea1b5b26da84f298714a2e23ba696607dba Mon Sep 17 00:00:00 2001
+From 66d04e2cd8badb0984050e4e9f2732f47151fbbf Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:48:24 +0000
-Subject: [PATCH 01/27] nativesdk-glibc: Look for host system ld.so.cache as
+Subject: [PATCH 01/24] nativesdk-glibc: Look for host system ld.so.cache as
  well
 
 Upstream-Status: Inappropriate [embedded specific]
@@ -27,18 +27,17 @@ RP 14/10/2010
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- elf/dl-load.c | 17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
+ elf/dl-load.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/elf/dl-load.c b/elf/dl-load.c
-index 0c052e4..f45085a 100644
+index 6fb615e..ee3d1e6 100644
 --- a/elf/dl-load.c
 +++ b/elf/dl-load.c
-@@ -2040,7 +2040,14 @@ _dl_map_object (struct link_map *loader, const char *name,
- 	fd = open_path (name, namelen, mode,
- 			&loader->l_runpath_dirs, &realname, &fb, loader,
- 			LA_SER_RUNPATH, &found_other_class);
--
+@@ -2094,6 +2094,14 @@ _dl_map_object (struct link_map *loader, const char *name,
+             }
+         }
+ 
 +      /* try the default path.  */
 +      if (fd == -1
 +	  && ((l = loader ?: GL(dl_ns)[nsid]._ns_loaded) == NULL
@@ -50,7 +49,7 @@ index 0c052e4..f45085a 100644
  #ifdef USE_LDCONFIG
        if (fd == -1
  	  && (__glibc_likely ((mode & __RTLD_SECURE) == 0)
-@@ -2099,14 +2106,6 @@ _dl_map_object (struct link_map *loader, const char *name,
+@@ -2152,14 +2160,6 @@ _dl_map_object (struct link_map *loader, const char *name,
  	}
  #endif
  
@@ -66,5 +65,5 @@ index 0c052e4..f45085a 100644
        if (__glibc_unlikely (GLRO(dl_debug_mask) & DL_DEBUG_LIBS))
  	_dl_debug_printf ("\n");
 -- 
-2.1.4
+2.6.4
 

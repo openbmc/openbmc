@@ -104,6 +104,7 @@ python do_distrodata_np() {
             line = line + "," + i
         bb.note("%s\n" % line)
 }
+do_distrodata_np[vardepsexclude] = "DATETIME"
 
 addtask distrodata
 do_distrodata[nostamp] = "1"
@@ -196,6 +197,7 @@ python do_distrodata() {
             f.close()
         bb.utils.unlockfile(lf)
 }
+do_distrodata[vardepsexclude] = "DATETIME"
 
 addtask distrodataall after do_distrodata
 do_distrodataall[recrdeptask] = "do_distrodataall do_distrodata"

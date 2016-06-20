@@ -34,7 +34,7 @@ EXTRA_OECONF = "\
 		--without-selinux \
 		"
 
-EXTRA_OECONF_append_class-target = " TAR=tar"
+EXTRA_OECONF += "TAR=tar"
 
 do_configure () {
     echo >> ${S}/m4/compiler.m4

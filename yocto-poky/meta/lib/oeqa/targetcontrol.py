@@ -68,7 +68,7 @@ class BaseTarget(object):
         bb.note("SSH log file: %s" %  self.sshlog)
 
     @abstractmethod
-    def start(self, params=None):
+    def start(self, params=None, ssh=True):
         pass
 
     @abstractmethod
@@ -113,7 +113,7 @@ class BaseTarget(object):
 
 class QemuTarget(BaseTarget):
 
-    supported_image_fstypes = ['ext3', 'ext4', 'cpio.gz']
+    supported_image_fstypes = ['ext3', 'ext4', 'cpio.gz', 'wic']
 
     def __init__(self, d):
 
@@ -176,11 +176,12 @@ class QemuTarget(BaseTarget):
         bb.note("Qemu log file: %s" % self.qemulog)
         super(QemuTarget, self).deploy()
 
-    def start(self, params=None):
-        if self.runner.start(params):
-            self.ip = self.runner.ip
-            self.server_ip = self.runner.server_ip
-            self.connection = SSHControl(ip=self.ip, logfile=self.sshlog)
+    def start(self, params=None, ssh=True):
+        if self.runner.start(params, get_ip=ssh):
+            if ssh:
+                self.ip = self.runner.ip
+                self.server_ip = self.runner.server_ip
+                self.connection = SSHControl(ip=self.ip, logfile=self.sshlog)
         else:
             self.stop()
             if os.path.exists(self.qemulog):
@@ -231,8 +232,9 @@ class SimpleRemoteTarget(BaseTarget):
     def deploy(self):
         super(SimpleRemoteTarget, self).deploy()
 
-    def start(self, params=None):
-        self.connection = SSHControl(self.ip, logfile=self.sshlog, port=self.port)
+    def start(self, params=None, ssh=True):
+        if ssh:
+            self.connection = SSHControl(self.ip, logfile=self.sshlog, port=self.port)
 
     def stop(self):
         self.connection = None

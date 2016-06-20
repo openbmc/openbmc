@@ -25,14 +25,12 @@ FILES_${PN} = "${libdir}/libnl-3.so.* \
                ${sysconfdir}"
 RREPLACES_${PN} = "libnl2"
 RCONFLICTS_${PN} = "libnl2"
-FILES_${PN}-dbg += "${libdir}/libnl/cli/*/.debug"
-FILES_${PN}-dev += "${libdir}/libnl/cli/*/*.so \
-                    ${libdir}/libnl/cli/*/*.la"
 FILES_${PN}-staticdev += "${libdir}/libnl/cli/*/*.a"
 
 PACKAGES += "${PN}-cli ${PN}-route ${PN}-nf ${PN}-genl ${PN}-idiag"
 FILES_${PN}-cli   = "${libdir}/libnl-cli-3.so.* \
-                     ${libdir}/libnl/cli/*/*.so.* \
+                     ${libdir}/libnl/cli/*/*.so \
+                     ${libdir}/libnl/cli/*/*.la \
                      ${sbindir}/nl-*"
 FILES_${PN}-route = "${libdir}/libnl-route-3.so.*"
 FILES_${PN}-idiag = "${libdir}/libnl-idiag-3.so.*"

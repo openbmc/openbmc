@@ -101,7 +101,7 @@ do_nothing () {
 
 # Read the input "y"
 read_confirm () {
-  echo "$total_deleted from $total_files files will be removed! "
+  echo "$total_deleted out of $total_files files will be removed! "
   if [ "$confirm" != "y" ]; then
       echo "Do you want to continue (y/n)? "
       while read confirm; do
@@ -282,7 +282,7 @@ remove_duplicated () {
       deleted_tgz=`cat $rm_list.* 2>/dev/null | grep ".tgz$" | wc -l`
       deleted_files=`cat $rm_list.* 2>/dev/null | wc -l`
       [ "$deleted_files" -gt 0 -a $debug -gt 0 ] && cat $rm_list.*
-      echo "($deleted_tgz from $total_tgz_suffix .tgz files for $suffix suffix will be removed or $deleted_files from $total_files_suffix when counting also .siginfo and .done files)"
+      echo "($deleted_tgz out of $total_tgz_suffix .tgz files for $suffix suffix will be removed or $deleted_files out of $total_files_suffix when counting also .siginfo and .done files)"
       let total_deleted=$total_deleted+$deleted_files
   done
   deleted_tgz=0

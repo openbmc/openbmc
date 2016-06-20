@@ -9,17 +9,17 @@ RP 2012/7/10
 
 Upstream-Status: Inappropriate [its really a cmake bug]
 
-Index: libxml2-2.8.0/include/libxml/xmlversion.h.in
-===================================================================
---- libxml2-2.8.0.orig/include/libxml/xmlversion.h.in	2012-07-10 11:51:52.460750573 +0000
-+++ libxml2-2.8.0/include/libxml/xmlversion.h.in	2012-07-10 11:52:41.436749397 +0000
-@@ -401,9 +401,6 @@
- #endif
- 
- #ifdef __GNUC__
+diff --git a/configure.ac b/configure.ac
+index 0260281..fdb58e9 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -484 +483,0 @@ AC_CHECK_HEADERS([time.h])
+-AC_CHECK_HEADERS([ansidecl.h])
+diff --git a/include/libxml/xmlversion.h.in b/include/libxml/xmlversion.h.in
+index b173be9..d10f975 100644
+--- a/include/libxml/xmlversion.h.in
++++ b/include/libxml/xmlversion.h.in
+@@ -413,3 +412,0 @@ XMLPUBFUN void XMLCALL xmlCheckVersion(int version);
 -#ifdef HAVE_ANSIDECL_H
 -#include <ansidecl.h>
 -#endif
- 
- /**
-  * ATTRIBUTE_UNUSED:

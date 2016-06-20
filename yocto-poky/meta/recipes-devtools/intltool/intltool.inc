@@ -4,6 +4,9 @@ LICENSE = "GPLv2"
 
 URLV="${@'.'.join(d.getVar('PV',1).split('.')[0:2])}"
 SRC_URI = "http://launchpad.net/${BPN}/trunk/${PV}/+download/${BP}.tar.gz"
+
+UPSTREAM_CHECK_URI = "https://launchpad.net/intltool/trunk/"
+
 S = "${WORKDIR}/intltool-${PV}"
 
 DEPENDS = "libxml-parser-perl-native"

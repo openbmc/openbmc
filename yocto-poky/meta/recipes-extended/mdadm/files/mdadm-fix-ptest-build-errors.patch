@@ -1,0 +1,45 @@
+From c65898b9da82df94e1bae7937e415a7eb80355d5 Mon Sep 17 00:00:00 2001
+From: "Maxin B. John" <maxin.john@intel.com>
+Date: Wed, 10 Feb 2016 17:28:05 +0200
+Subject: [PATCH] mdadm-fix-ptest-build-errors
+
+builds fail with ptest enabled:
+
+| restripe.c: In function 'test_stripes':
+| restripe.c:845:4: error: ignoring return value of 'read', declared with
+| attribute warn_unused_result [-Werror=unused-result]
+|     read(source[i], stripes[i], chunk_size);
+|     ^
+| cc1: all warnings being treated as errors
+| Makefile:214: recipe for target 'test_stripe' failed
+
+Upstream-Status: Pending
+
+Signed-off-by: Maxin B. John <maxin.john@intel.com>
+---
+ restripe.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/restripe.c b/restripe.c
+index 56dca73..d24b2b4 100644
+--- a/restripe.c
++++ b/restripe.c
+@@ -842,10 +842,14 @@ int test_stripes(int *source, unsigned long long *offsets,
+ 
+ 	while (length > 0) {
+ 		int disk;
++        ssize_t ret;
+ 
+ 		for (i = 0 ; i < raid_disks ; i++) {
+ 			lseek64(source[i], offsets[i]+start, 0);
+-			read(source[i], stripes[i], chunk_size);
++			ret = read(source[i], stripes[i], chunk_size);
++            if (ret == -1) {
++			  printf("Read Failed\n");
++            }
+ 		}
+ 		for (i = 0 ; i < data_disks ; i++) {
+ 			int disk = geo_map(i, start/chunk_size, raid_disks,
+-- 
+2.4.0
+

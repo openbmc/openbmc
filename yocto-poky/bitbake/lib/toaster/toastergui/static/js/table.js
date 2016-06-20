@@ -33,6 +33,10 @@ function tableInit(ctx){
 
   loadData(tableParams);
 
+  // clicking on this set of elements removes the search
+  var clearSearchElements = $('.remove-search-btn-'+ctx.tableName +
+                              ', .show-all-'+ctx.tableName);
+
   function loadData(tableParams){
     $.ajax({
         type: "GET",
@@ -62,31 +66,27 @@ function tableInit(ctx){
     paginationBtns.html("");
 
     if (tableParams.search)
-      $('.remove-search-btn-'+ctx.tableName).show();
+      clearSearchElements.show();
     else
-      $('.remove-search-btn-'+ctx.tableName).hide();
+      clearSearchElements.hide();
 
     $('.table-count-' + ctx.tableName).text(tableData.total);
     tableTotal = tableData.total;
 
     if (tableData.total === 0){
       tableContainer.hide();
-      /* If we were searching show the new search bar and return */
-      if (tableParams.search){
+      if ($("#no-results-special-"+ctx.tableName).length > 0) {
+        /* use this page's special no-results form instead of the default */
+        $("#no-results-search-input-"+ctx.tableName).val(tableParams.search);
+        $("#no-results-special-"+ctx.tableName).show();
+        $("#results-found-"+ctx.tableName).hide();
+      } else {
         $("#new-search-input-"+ctx.tableName).val(tableParams.search);
         $("#no-results-"+ctx.tableName).show();
       }
       table.trigger("table-done", [tableData.total, tableParams]);
 
       return;
-
-    /* We don't want to clutter the place with the table chrome if there
-     * are only a few results */
-    } else if (tableData.total <= 10 &&
-               !tableParams.filter &&
-               !tableParams.search){
-      $("#table-chrome-"+ctx.tableName).hide();
-      pagination.hide();
     } else {
       tableContainer.show();
       $("#no-results-"+ctx.tableName).hide();
@@ -239,16 +239,19 @@ function tableInit(ctx){
           }
         }
 
+       if (col.field_name === tableData.default_orderby){
+         title.addClass("default-orderby");
+       }
+
       } else {
         /* Not orderable */
-        header.addClass("muted");
         header.css("font-weight", "normal");
-        header.append(col.title+' ');
+        header.append('<span class="muted">' + col.title + '</span> ');
       }
 
       /* Setup the filter button */
       if (col.filter_name){
-        var filterBtn = $('<a href="#" role="button" class="pull-right btn btn-mini" data-toggle="modal"><i class="icon-filter filtered"></i></a>');
+        var filterBtn = $('<a href="#" role="button" data-filter-on="' + col.filter_name + '" class="pull-right btn btn-mini" data-toggle="modal"><i class="icon-filter filtered"></i></a>');
 
         filterBtn.data('filter-name', col.filter_name);
         filterBtn.prop('id', col.filter_name);
@@ -324,7 +327,7 @@ function tableInit(ctx){
       $("#"+ctx.tableName+" th").each(function(){
         for (var i in cols_hidden){
           if ($(this).hasClass(cols_hidden[i])){
-            $("."+cols_hidden[i]).hide();
+            table.find("."+cols_hidden[i]).hide();
             $("#checkbox-"+cols_hidden[i]).removeAttr("checked");
           }
         }
@@ -334,13 +337,14 @@ function tableInit(ctx){
          * user setting.
          */
         for (var i in defaultHiddenCols) {
-          $("."+defaultHiddenCols[i]).hide();
+          table.find("."+defaultHiddenCols[i]).hide();
           $("#checkbox-"+defaultHiddenCols[i]).removeAttr("checked");
         }
     }
   }
 
-  function sortColumnClicked(){
+  function sortColumnClicked(e){
+    e.preventDefault();
 
     /* We only have one sort at a time so remove any existing sort indicators */
     $("#"+ctx.tableName+" th .icon-caret-down").hide();
@@ -377,14 +381,14 @@ function tableInit(ctx){
     var disabled_cols = [];
 
     if ($(this).prop("checked")) {
-      $("."+col).show();
+      table.find("."+col).show();
     }  else {
-      $("."+col).hide();
+      table.find("."+col).hide();
       /* If we're ordered by the column we're hiding remove the order by */
       if (col === tableParams.orderby ||
           '-' + col === tableParams.orderby){
         tableParams.orderby = null;
-        loadData(tableParams);
+        $("#"+ctx.tableName +" .default-orderby").click();
       }
     }
 
@@ -396,11 +400,182 @@ function tableInit(ctx){
     $.cookie("cols", JSON.stringify(disabled_cols));
   }
 
+  /**
+   * Create the DOM/JS for the client side of a TableFilterActionToggle
+   * or TableFilterActionDay
+   *
+   * filterName: (string) internal name for the filter action
+   * filterActionData: (object)
+   * filterActionData.count: (number) The number of items this filter will
+   * show when selected
+   *
+   * NB this triggers a filtervalue event each time its radio button is checked
+   */
+  function createActionRadio(filterName, filterActionData) {
+    var hasNoRecords = (Number(filterActionData.count) == 0);
+
+    var actionStr = '<div class="radio">' +
+                    '<input type="radio" name="filter"' +
+                    '       value="' + filterName + '"';
+
+    if (hasNoRecords) {
+      actionStr += ' disabled="disabled"';
+    }
+
+    actionStr += ' id="' + filterName + '">' +
+                 '<input type="hidden" name="filter_value" value="on"' +
+                 '       data-value-for="' + filterName + '">' +
+                 '<label class="filter-title' +
+                 (hasNoRecords ? ' muted' : '') + '"' +
+                 '       for="' + filterName + '">' +
+                 filterActionData.title +
+                 ' (' + filterActionData.count + ')' +
+                 '</label>' +
+                 '</div>';
+
+    var action = $(actionStr);
+
+    // fire the filtervalue event from this action when the radio button
+    // is active so that the apply button can be enabled
+    action.find('[type="radio"]').change(function () {
+      if ($(this).is(':checked')) {
+        action.trigger('filtervalue', 'on');
+      }
+    });
+
+    return action;
+  }
+
+  /**
+   * Create the DOM/JS for the client side of a TableFilterActionDateRange
+   *
+   * filterName: (string) internal name for the filter action
+   * filterValue: (string) from,to date range in format yyyy-mm-dd,yyyy-mm-dd;
+   * used to select the current values for the from/to datepickers;
+   * if this is partial (e.g. "yyyy-mm-dd,") only the applicable datepicker
+   * will have a date pre-selected; if empty, neither will
+   * filterActionData: (object) data for generating the action's HTML
+   * filterActionData.title: label for the radio button
+   * filterActionData.max: (string) maximum date for the pickers, in ISO 8601
+   * datetime format
+   * filterActionData.min: (string) minimum date for the pickers, ISO 8601
+   * datetime
+   *
+   * NB this triggers a filtervalue event each time its radio button is checked
+   */
+  function createActionDateRange(filterName, filterValue, filterActionData) {
+    var action = $('<div class="radio">' +
+                   '<input type="radio" name="filter"' +
+                   '       value="' + filterName + '" ' +
+                   '       id="' + filterName + '">' +
+                   '<input type="hidden" name="filter_value" value=""' +
+                   '       data-value-for="' + filterName + '">' +
+                   '<label class="filter-title"' +
+                   '       for="' + filterName + '">' +
+                   filterActionData.title +
+                   '</label>' +
+                   '<input type="text" maxlength="10" class="input-small"' +
+                   '       data-date-from-for="' + filterName + '">' +
+                   '<span class="help-inline">to</span>' +
+                   '<input type="text" maxlength="10" class="input-small"' +
+                   '       data-date-to-for="' + filterName + '">' +
+                   '<span class="help-inline get-help">(yyyy-mm-dd)</span>' +
+                   '</div>');
+
+    var radio = action.find('[type="radio"]');
+    var value = action.find('[data-value-for]');
+
+    // make the datepickers for the range
+    var options = {
+      dateFormat: 'yy-mm-dd',
+      maxDate: new Date(filterActionData.max),
+      minDate: new Date(filterActionData.min)
+    };
+
+    // create date pickers, setting currently-selected from and to dates
+    var selectedFrom = null;
+    var selectedTo = null;
+
+    var selectedFromAndTo = [];
+    if (filterValue) {
+      selectedFromAndTo = filterValue.split(',');
+    }
+
+    if (selectedFromAndTo.length == 2) {
+      selectedFrom = selectedFromAndTo[0];
+      selectedTo = selectedFromAndTo[1];
+    }
+
+    options.defaultDate = selectedFrom;
+    var inputFrom =
+      action.find('[data-date-from-for]').datepicker(options);
+    inputFrom.val(selectedFrom);
+
+    options.defaultDate = selectedTo;
+    var inputTo =
+      action.find('[data-date-to-for]').datepicker(options);
+    inputTo.val(selectedTo);
+
+    // set filter_value based on date pickers when
+    // one of their values changes; if either from or to are unset,
+    // the new value is null;
+    // this triggers a 'filter_value-change' event on the action's element,
+    // which is used to determine the disabled/enabled state of the "Apply"
+    // button
+    var changeHandler = function () {
+      var fromValue = inputFrom.val();
+      var toValue = inputTo.val();
+
+      var newValue = undefined;
+      if (fromValue !== '' && toValue !== '') {
+        newValue = fromValue + ',' + toValue;
+      }
+
+      value.val(newValue);
+
+      // if this action is selected, fire an event for the new range
+      if (radio.is(':checked')) {
+        action.trigger('filtervalue', newValue);
+      }
+    };
+
+    inputFrom.change(changeHandler);
+    inputTo.change(changeHandler);
+
+    // check the associated radio button on clicking a date picker
+    var checkRadio = function () {
+      radio.prop('checked', 'checked');
+
+      // checking the radio button this way doesn't cause the "change"
+      // event to fire, so we manually call the changeHandler
+      changeHandler();
+    };
+
+    inputFrom.focus(checkRadio);
+    inputTo.focus(checkRadio);
+
+    // selecting a date in a picker constrains the date you can
+    // set in the other picker
+    inputFrom.change(function () {
+      inputTo.datepicker('option', 'minDate', inputFrom.val());
+    });
+
+    inputTo.change(function () {
+      inputFrom.datepicker('option', 'maxDate', inputTo.val());
+    });
+
+    // checking the radio input causes the "Apply" button disabled state to
+    // change, depending on which from/to dates are supplied
+    radio.change(changeHandler);
+
+    return action;
+  }
+
   function filterOpenClicked(){
     var filterName = $(this).data('filter-name');
 
-    /* We need to pass in the curren search so that the filter counts take
-     * into account the current search filter
+    /* We need to pass in the current search so that the filter counts take
+     * into account the current search term
      */
     var params = {
       'name' : filterName,
@@ -414,38 +589,92 @@ function tableInit(ctx){
         data: params,
         headers: { 'X-CSRFToken' : $.cookie('csrftoken')},
         success: function (filterData) {
-          var filterActionRadios = $('#filter-actions-'+ctx.tableName);
+          /*
+            filterData structure:
 
-          $('#filter-modal-title-'+ctx.tableName).text(filterData.title);
-
-          filterActionRadios.text("");
-
-          for (var i in filterData.filter_actions){
-            var filterAction = filterData.filter_actions[i];
-
-            var action = $('<label class="radio"><input type="radio" name="filter" value=""><span class="filter-title"></span></label>');
-            var actionTitle = filterAction.title + ' (' + filterAction.count + ')';
-
-            var radioInput = action.children("input");
-
-            if (Number(filterAction.count) == 0){
-              radioInput.attr("disabled", "disabled");
+            {
+              title: '<title for the filter popup>',
+              filter_actions: [
+                {
+                  title: '<label for radio button inside the popup>',
+                  name: '<name of the filter action>',
+                  count: <number of items this filter will show>,
+                  ... additional data for the action ...
+                }
+              ]
             }
 
-            action.children(".filter-title").text(actionTitle);
+            each filter_action gets a radio button; the value of this is
+            set to filterName + ':' + filter_action.name; e.g.
 
-            radioInput.val(filterName + ':' + filterAction.name);
+              in_current_project:in_project
 
-            /* Setup the current selected filter, default to 'all' if
-             * no current filter selected.
-             */
-            if ((tableParams.filter &&
-                tableParams.filter === radioInput.val()) ||
-                filterAction.name == 'all') {
-                radioInput.attr("checked", "checked");
+            specifies the "in_project" action of the "in_current_project"
+            filter
+
+            the filterName is set on the column filter icon, and corresponds
+            to a value in the table's filter map
+
+            when the filter popup's "Apply" button is clicked, the
+            value for the radio button which is checked is passed in the
+            querystring, along with a filter_value, and applied to the
+            queryset on the table
+          */
+          var filterActionRadios = $('#filter-actions-' + ctx.tableName);
+          var filterApplyBtn = $('[data-role="filter-apply"]');
+
+          var setApplyButtonState = function (e, filterActionValue) {
+            if (filterActionValue !== undefined) {
+              filterApplyBtn.removeAttr('disabled');
+            }
+            else {
+              filterApplyBtn.attr('disabled', 'disabled');
+            }
+          };
+
+          $('#filter-modal-title-' + ctx.tableName).text(filterData.title);
+
+          filterActionRadios.empty();
+
+          // create a radio button + form elements for each action associated
+          // with the filter on this column of the table
+          for (var i in filterData.filter_actions) {
+            var action = null;
+            var filterActionData = filterData.filter_actions[i];
+            var filterName = filterData.name + ':' +
+                             filterActionData.action_name;
+
+            if (filterActionData.type === 'toggle' ||
+                filterActionData.type === 'day') {
+              action = createActionRadio(filterName, filterActionData);
+            }
+            else if (filterActionData.type === 'daterange') {
+              // current values for the from/to dates
+              var filterValue = tableParams.filter_value;
+
+              action = createActionDateRange(
+                filterName,
+                filterValue,
+                filterActionData
+              );
             }
 
-            filterActionRadios.append(action);
+            if (action) {
+              // Setup the current selected filter; default to 'all' if
+              // no current filter selected
+              var radioInput = action.children('input[name="filter"]');
+              if ((tableParams.filter &&
+                  tableParams.filter === radioInput.val()) ||
+                  filterActionData.action_name == 'all') {
+                  radioInput.prop("checked", "checked");
+              }
+
+              filterActionRadios.append(action);
+
+              // if the action's filter_value changes but is falsy, disable
+              // the "Apply" button
+              action.on('filtervalue', setApplyButtonState);
+            }
           }
 
           $('#filter-modal-'+ctx.tableName).modal('show');
@@ -453,6 +682,13 @@ function tableInit(ctx){
     });
   }
 
+  /* Allow pages to trigger reload event */
+  table.on('reload', function(e, newTableParams){
+    if (newTableParams)
+      loadData(newTableParams);
+    else
+      loadData(tableParams)
+  });
 
   $(".get-help").tooltip({container:'body', html:true, delay:{show:300}});
 
@@ -476,6 +712,7 @@ function tableInit(ctx){
   });
 
   $("#search-submit-"+ctx.tableName).click(function(e){
+    e.preventDefault();
     var searchTerm = $("#search-input-"+ctx.tableName).val();
 
     tableParams.page = 1;
@@ -489,11 +726,9 @@ function tableInit(ctx){
     }
 
     loadData(tableParams);
-
-    e.preventDefault();
   });
 
-  $('.remove-search-btn-'+ctx.tableName).click(function(e){
+  clearSearchElements.click(function(e){
     e.preventDefault();
 
     tableParams.page = 1;
@@ -514,7 +749,9 @@ function tableInit(ctx){
     e.preventDefault();
   });
 
-  $("#clear-filter-btn-"+ctx.tableName).click(function(){
+  $("#clear-filter-btn-"+ctx.tableName).click(function(e){
+    e.preventDefault();
+
     var filterBtn = $("#" + tableParams.filter.split(":")[0]);
     filterBtnActive(filterBtn, false);
 
@@ -525,15 +762,27 @@ function tableInit(ctx){
   $("#filter-modal-form-"+ctx.tableName).submit(function(e){
     e.preventDefault();
 
-    tableParams.filter = $(this).find("input[type='radio']:checked").val();
+    /* remove active status from all filter buttons so that only one filter
+       can be active at a time */
+    $('[data-filter-on]').each(function (index, filterBtn) {
+      filterBtnActive($(filterBtn), false);
+    });
 
-    var filterBtn = $("#" + tableParams.filter.split(":")[0]);
+    // checked radio button
+    var checkedFilter = $(this).find("input[name='filter']:checked");
+    tableParams.filter = checkedFilter.val();
+
+    // hidden field holding the value for the checked filter
+    var checkedFilterValue = $(this).find("input[data-value-for='" +
+                                          tableParams.filter + "']");
+    tableParams.filter_value = checkedFilterValue.val();
 
     /* All === remove filter */
     if (tableParams.filter.match(":all$")) {
       tableParams.filter = null;
-      filterBtnActive(filterBtn, false);
+      tableParams.filter_value = null;
     } else {
+      var filterBtn = $("#" + tableParams.filter.split(":")[0]);
       filterBtnActive(filterBtn, true);
     }
 

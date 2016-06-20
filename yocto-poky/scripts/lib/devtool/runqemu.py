@@ -57,7 +57,8 @@ def register_commands(subparsers, context):
     """Register devtool subcommands from this plugin"""
     if context.fixed_setup:
         parser_runqemu = subparsers.add_parser('runqemu', help='Run QEMU on the specified image',
-                                               description='Runs QEMU to boot the specified image')
+                                               description='Runs QEMU to boot the specified image',
+                                               group='testbuild', order=-20)
         parser_runqemu.add_argument('imagename', help='Name of built image to boot within QEMU', nargs='?')
         parser_runqemu.add_argument('args', help='Any remaining arguments are passed to the runqemu script (pass --help after imagename to see what these are)',
                                     nargs=argparse.REMAINDER)

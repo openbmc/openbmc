@@ -1,2 +1,2 @@
 # Template settings
-TEMPLATECONF=${TEMPLATECONF:-meta-yocto/conf}
+TEMPLATECONF=${TEMPLATECONF:-meta-poky/conf}

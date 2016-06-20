@@ -11,25 +11,29 @@ DEFAULTTUNE ?= "corei7-64"
 # Pull in the previous tune in to pull in PACKAGE_EXTRA_ARCHS
 require conf/machine/include/tune-core2.inc
 
+
 # Extra tune features
 TUNEVALID[corei7] = "Enable corei7 specific processor optimizations"
-TUNE_CCARGS .= "${@bb.utils.contains("TUNE_FEATURES", "corei7", " -march=corei7 -mtune=corei7 -mfpmath=sse -msse4.2", "", d)}"
+TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'corei7', ' -march=corei7 -mtune=corei7 -mfpmath=sse -msse4.2', '', d)}"
 
 # Extra tune selections
 AVAILTUNES += "corei7-32"
 TUNE_FEATURES_tune-corei7-32 = "${TUNE_FEATURES_tune-x86} corei7"
 BASE_LIB_tune-corei7-32 = "lib"
 TUNE_PKGARCH_tune-corei7-32 = "corei7-32"
-PACKAGE_EXTRA_ARCHS_tune-corei7-32 = "${PACKAGE_EXTRA_ARCHS_tune-core2} corei7-32"
+PACKAGE_EXTRA_ARCHS_tune-corei7-32 = "${PACKAGE_EXTRA_ARCHS_tune-core2-32} corei7-32"
+QEMU_EXTRAOPTIONS_corei7-32 = " -cpu Nehalem,check=false"
 
 AVAILTUNES += "corei7-64"
 TUNE_FEATURES_tune-corei7-64 = "${TUNE_FEATURES_tune-x86-64} corei7"
 BASE_LIB_tune-corei7-64 = "lib64"
 TUNE_PKGARCH_tune-corei7-64 = "corei7-64"
 PACKAGE_EXTRA_ARCHS_tune-corei7-64 = "${PACKAGE_EXTRA_ARCHS_tune-core2-64} corei7-64"
+QEMU_EXTRAOPTIONS_corei7-64 = " -cpu Nehalem,check=false"
 
 AVAILTUNES += "corei7-64-x32"
 TUNE_FEATURES_tune-corei7-64-x32 = "${TUNE_FEATURES_tune-x86-64-x32} corei7"
 BASE_LIB_tune-corei7-64-x32 = "libx32"
 TUNE_PKGARCH_tune-corei7-64-x32 = "corei7-64-x32"
 PACKAGE_EXTRA_ARCHS_tune-corei7-64-x32 = "${PACKAGE_EXTRA_ARCHS_tune-core2-64-x32} corei7-64-x32"
+QEMU_EXTRAOPTIONS_corei7-64-x32 = " -cpu Nehalem,check=false"

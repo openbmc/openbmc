@@ -1,0 +1,65 @@
+From c43617b739e358064396912c7a7a8028ca91d201 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ville=20Syrj=C3=A4l=C3=A4?= <ville.syrjala@linux.intel.com>
+Date: Thu, 16 Apr 2015 20:40:39 +0300
+Subject: [PATCH] gen8: Fix the YUV->RGB shader
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Use the correct register (Yn_01) with first half of the
+Y samples instead of using the register (Yn_23) with the
+second half twice when computing the green channel.
+
+Also use the Yn_01 register name instead of Yn for the red
+channel as well, just for a bit of extra consistency.
+
+Bugzilla: https://bugs.freedesktop.org/show_bug.cgi?id=89807
+Signed-off-by: Ville Syrjälä <ville.syrjala@linux.intel.com>
+Tested-by: Chris Wilson <chris@chris-wilson.co.uk>
+
+Upstream-Status: Backport
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+---
+ src/render_program/exa_wm_yuv_rgb.g8a | 4 ++--
+ src/render_program/exa_wm_yuv_rgb.g8b | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/render_program/exa_wm_yuv_rgb.g8a b/src/render_program/exa_wm_yuv_rgb.g8a
+index 7def093..34973ba 100644
+--- a/src/render_program/exa_wm_yuv_rgb.g8a
++++ b/src/render_program/exa_wm_yuv_rgb.g8a
+@@ -76,7 +76,7 @@ add (16)    Cbn<1>F		Cb<8,8,1>F	-0.501961F  { compr align1 };
+     /* 
+      * R = Y + Cr * 1.596
+      */
+-mov (8)    acc0<1>F		Yn<8,8,1>F		    { compr align1 };
++mov (8)    acc0<1>F		Yn_01<8,8,1>F		    { compr align1 };
+ mac.sat(8) src_sample_r_01<1>F	Crn_01<8,8,1>F	1.596F	    { compr align1 };
+      
+ mov (8)    acc0<1>F		Yn_23<8,8,1>F		    { compr align1 };
+@@ -84,7 +84,7 @@ mac.sat(8) src_sample_r_23<1>F	Crn_23<8,8,1>F	1.596F	    { compr align1 };
+     /*
+      * G = Crn * -0.813 + Cbn * -0.392 + Y
+      */
+-mov (8)    acc0<1>F		Yn_23<8,8,1>F		    { compr align1 };
++mov (8)    acc0<1>F		Yn_01<8,8,1>F		    { compr align1 };
+ mac (8)    acc0<1>F		Crn_01<8,8,1>F    	-0.813F	    { compr align1 };
+ mac.sat(8) src_sample_g_01<1>F	Cbn_01<8,8,1>F    	-0.392F	    { compr align1 };
+ 
+diff --git a/src/render_program/exa_wm_yuv_rgb.g8b b/src/render_program/exa_wm_yuv_rgb.g8b
+index 4494953..2cd6fc4 100644
+--- a/src/render_program/exa_wm_yuv_rgb.g8b
++++ b/src/render_program/exa_wm_yuv_rgb.g8b
+@@ -6,7 +6,7 @@
+    { 0x80600048, 0x21c03ae8, 0x3e8d02c0, 0x3fcc49ba },
+    { 0x00600001, 0x24003ae0, 0x008d0320, 0x00000000 },
+    { 0x80600048, 0x21e03ae8, 0x3e8d02e0, 0x3fcc49ba },
+-   { 0x00600001, 0x24003ae0, 0x008d0320, 0x00000000 },
++   { 0x00600001, 0x24003ae0, 0x008d0300, 0x00000000 },
+    { 0x00600048, 0x24003ae0, 0x3e8d02c0, 0xbf5020c5 },
+    { 0x80600048, 0x22003ae8, 0x3e8d0340, 0xbec8b439 },
+    { 0x00600001, 0x24003ae0, 0x008d0320, 0x00000000 },
+-- 
+2.5.0
+

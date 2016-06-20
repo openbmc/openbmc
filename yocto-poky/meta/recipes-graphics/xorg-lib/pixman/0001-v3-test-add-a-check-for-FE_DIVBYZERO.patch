@@ -11,7 +11,7 @@ problematic code in test/utils.c.
 
 Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
 Signed-off-by: Marek Vasut <marex@denx.de>
-Upstream-Status: Submitted
+Upstream-Status: Backport [commit 4297e9058]
 ---
 Changes v1 -> v2:
 

@@ -8,7 +8,9 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=2d5025d4aa3495befef8f17206a5b0a1"
 DEPENDS = "avahi"
 PR = "r7"
 
-SRC_URI = "http://0pointer.de/lennart/projects/nss-mdns/nss-mdns-${PV}.tar.gz"
+SRC_URI = "http://0pointer.de/lennart/projects/nss-mdns/nss-mdns-${PV}.tar.gz \
+           file://0001-check-for-nss.h.patch \
+           "
 
 SRC_URI[md5sum] = "03938f17646efbb50aa70ba5f99f51d7"
 SRC_URI[sha256sum] = "1e683c2e7c3921814706d62fbbd3e9cbf493a75fa00255e0e715508d8134fa6d"

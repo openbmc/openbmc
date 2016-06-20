@@ -21,6 +21,34 @@ class SystemdTest(oeRuntimeTest):
         self.assertEqual(status, expected, message)
         return output
 
+    #TODO: use pyjournalctl instead
+    def journalctl(self, args='',l_match_units=[]):
+        """
+        Request for the journalctl output to the current target system
+
+        Arguments:
+        -args, an optional argument pass through argument
+        -l_match_units, an optional list of units to filter the output
+        Returns:
+        -string output of the journalctl command
+        Raises:
+        -AssertionError, on remote commands that fail
+        -ValueError, on a journalctl call with filtering by l_match_units that
+        returned no entries
+        """
+        query_units=""
+        if len(l_match_units):
+            query_units = ['_SYSTEMD_UNIT='+unit for unit in l_match_units]
+            query_units = " ".join(query_units)
+        command = 'journalctl %s %s' %(args, query_units)
+        status, output = self.target.run(command)
+        if status:
+            raise AssertionError("Command '%s' returned non-zero exit \
+                    code %d:\n%s" % (command, status, output))
+        if len(output) == 1 and "-- No entries --" in output:
+            raise ValueError("List of units to match: %s, returned no entries"
+                    % l_match_units)
+        return output
 
 class SystemdBasicTests(SystemdTest):
 
@@ -99,3 +127,52 @@ class SystemdJournalTests(SystemdTest):
     def test_systemd_journal(self):
         (status, output) = self.target.run('journalctl')
         self.assertEqual(status, 0, output)
+
+    @skipUnlessPassed('test_systemd_basic')
+    def test_systemd_boot_time(self, systemd_TimeoutStartSec=90):
+        """
+        Get the target boot time from journalctl and log it
+
+        Arguments:
+        -systemd_TimeoutStartSec, an optional argument containing systemd's
+        unit start timeout to compare against
+        """
+
+        # the expression chain that uniquely identifies the time boot message
+        expr_items=["Startup finished","kernel", "userspace","\.$"]
+        try:
+            output = self.journalctl(args="-o cat --reverse")
+        except AssertionError:
+            self.fail("Error occurred while calling journalctl")
+        if not len(output):
+            self.fail("Error, unable to get startup time from systemd journal")
+
+        # check for the regular expression items that match the startup time
+        for line in output.split('\n'):
+            check_match = "".join(re.findall(".*".join(expr_items), line))
+            if check_match: break
+        # put the startup time in the test log
+        if check_match:
+            print "%s" % check_match
+        else:
+            self.skipTest("Error at obtaining the boot time from journalctl")
+        boot_time_sec = 0
+
+        # get the numeric values from the string and convert them to seconds
+        # same data will be placed in list and string for manipulation
+        l_boot_time = check_match.split(" ")[-2:]
+        s_boot_time = " ".join(l_boot_time)
+        try:
+            # Obtain the minutes it took to boot
+            if l_boot_time[0].endswith('min') and l_boot_time[0][0].isdigit():
+                boot_time_min = s_boot_time.split("min")[0]
+                # convert to seconds and accumulate it
+                boot_time_sec += int(boot_time_min) * 60
+            # Obtain the seconds it took to boot and accumulate
+            boot_time_sec += float(l_boot_time[1].split("s")[0])
+        except ValueError:
+            self.skipTest("Error when parsing time from boot string")
+        #Assert the target boot time against systemd's unit start timeout
+        if boot_time_sec > systemd_TimeoutStartSec:
+            print "Target boot time %s exceeds systemd's TimeoutStartSec %s"\
+                    %(boot_time_sec, systemd_TimeoutStartSec)

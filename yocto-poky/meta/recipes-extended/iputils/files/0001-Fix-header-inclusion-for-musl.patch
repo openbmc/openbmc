@@ -1,0 +1,92 @@
+From be0bb81d72fea4d20da74f4f2236aa145684f332 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 6 Jan 2016 14:14:22 -0800
+Subject: [PATCH] Fix header inclusion for musl
+
+Fix errors e.g.
+
+In file included from tracepath.c:17:0:
+/usr/include/linux/errqueue.h:33:18:
+error: array type has incomplete element type 'struct timespec'
+  struct timespec ts[3];
+                  ^
+tracepath.c: In function 'main':
+tracepath.c:329:16: error: 'INT_MAX' undeclared (first use in this
+function)
+      overhead, INT_MAX);
+                ^
+tracepath.c:329:16: note: each undeclared identifier is reported only
+once for each function it appears in
+Makefile:131: recipe for target 'tracepath.o' failed
+make: *** [tracepath.o] Error 1
+
+ping_common.c: In function 'main_loop':
+ping_common.c:756:15: error: 'HZ' undeclared (first use in this
+function)
+    if (1000 % HZ == 0 ? next <= 1000 / HZ : (next < INT_MAX / HZ &&
+next * HZ <= 1000)) {
+
+protocols/timed.h is not needed and is absent in musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ clockdiff.c   | 1 -
+ ping_common.c | 1 +
+ tracepath.c   | 2 ++
+ tracepath6.c  | 1 +
+ 4 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/clockdiff.c b/clockdiff.c
+index 7c1ea1b..1d6341e 100644
+--- a/clockdiff.c
++++ b/clockdiff.c
+@@ -14,7 +14,6 @@
+ #include <netinet/ip.h>
+ #include <netinet/ip_icmp.h>
+ #define TSPTYPES
+-#include <protocols/timed.h>
+ #include <fcntl.h>
+ #include <netdb.h>
+ #include <arpa/inet.h>
+diff --git a/ping_common.c b/ping_common.c
+index 7f82851..3ce699d 100644
+--- a/ping_common.c
++++ b/ping_common.c
+@@ -2,6 +2,7 @@
+ #include <ctype.h>
+ #include <sched.h>
+ #include <math.h>
++#include <asm-generic/param.h>
+ 
+ int options;
+ 
+diff --git a/tracepath.c b/tracepath.c
+index 89e6d16..c9d6ddd 100644
+--- a/tracepath.c
++++ b/tracepath.c
+@@ -12,6 +12,8 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <unistd.h>
++#include <limits.h>
++#include <time.h>
+ #include <sys/socket.h>
+ #include <linux/types.h>
+ #include <linux/errqueue.h>
+diff --git a/tracepath6.c b/tracepath6.c
+index 126fadf..9d5745c 100644
+--- a/tracepath6.c
++++ b/tracepath6.c
+@@ -12,6 +12,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <unistd.h>
++#include <limits.h>
+ #include <sys/socket.h>
+ #include <netinet/in.h>
+ #include <netinet/icmp6.h>
+-- 
+2.6.4
+

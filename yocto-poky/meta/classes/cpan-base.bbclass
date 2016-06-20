@@ -29,31 +29,12 @@ def get_perl_version(d):
             return m.group(1)
     return None
 
-# Determine where the library directories are
-def perl_get_libdirs(d):
-    libdir = d.getVar('libdir', True)
-    if is_target(d) == "no":
-        libdir += '/perl-native'
-    libdir += '/perl'
-    return libdir
-
 def is_target(d):
     if not bb.data.inherits_class('native', d):
         return "yes"
     return "no"
 
-PERLLIBDIRS := "${@perl_get_libdirs(d)}"
+PERLLIBDIRS = "${libdir}/perl"
+PERLLIBDIRS_class-native = "${libdir}/perl-native"
 PERLVERSION := "${@get_perl_version(d)}"
 PERLVERSION[vardepvalue] = ""
-
-FILES_${PN}-dbg += "${PERLLIBDIRS}/auto/*/.debug \
-                    ${PERLLIBDIRS}/auto/*/*/.debug \
-                    ${PERLLIBDIRS}/auto/*/*/*/.debug \
-                    ${PERLLIBDIRS}/auto/*/*/*/*/.debug \
-                    ${PERLLIBDIRS}/auto/*/*/*/*/*/.debug \
-                    ${PERLLIBDIRS}/vendor_perl/${PERLVERSION}/auto/*/.debug \
-                    ${PERLLIBDIRS}/vendor_perl/${PERLVERSION}/auto/*/*/.debug \
-                    ${PERLLIBDIRS}/vendor_perl/${PERLVERSION}/auto/*/*/*/.debug \
-                    ${PERLLIBDIRS}/vendor_perl/${PERLVERSION}/auto/*/*/*/*/.debug \
-                    ${PERLLIBDIRS}/vendor_perl/${PERLVERSION}/auto/*/*/*/*/*/.debug \
-                    "

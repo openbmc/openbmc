@@ -8,3 +8,5 @@ SECTION = "devel"
 SRC_URI = "${GNU_MIRROR}/make/make-${PV}.tar.bz2"
 
 inherit autotools gettext pkgconfig texinfo
+
+PROVIDES = "virtual/make"

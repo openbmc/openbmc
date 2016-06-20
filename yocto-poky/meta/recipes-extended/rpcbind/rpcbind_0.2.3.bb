@@ -14,6 +14,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/rpcbind/rpcbind-${PV}.tar.bz2 \
            file://init.d \
            file://0001-Avoid-use-of-glibc-sys-cdefs.h-header.patch \
            file://remove-sys-queue.patch \
+           file://0001-handle_reply-Don-t-use-the-xp_auth-pointer-directly.patch \
            ${UCLIBCPATCHES} \
            ${MUSLPATCHES} \
            file://rpcbind.conf \

@@ -11,15 +11,17 @@ Upstream-Status: Pending
 
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
 
-Index: rpm-5.4.14/python/rpmmodule.c
+Index: rpm/python/rpmmodule.c
 ===================================================================
---- rpm-5.4.14.orig/python/rpmmodule.c
-+++ rpm-5.4.14/python/rpmmodule.c
-@@ -392,7 +392,8 @@ void init_rpm(void)
-     if (Py_AtExit(rpm_exithook) == -1)
- 	return;
+--- rpm.orig/python/rpmmodule.c
++++ rpm/python/rpmmodule.c
+@@ -382,9 +382,8 @@ static int initModule(PyObject *m)
+     /* XXX add --noparentdirs --nolinktos to rpmtsCheck() */
+     global_depFlags = (RPMDEPS_FLAG_NOPARENTDIRS | RPMDEPS_FLAG_NOLINKTOS);
  
--    rpmReadConfigFiles(NULL, NULL);
+-    /* failure to initialize rpm (crypto and all) is rather fatal too... */
+-    if (rpmReadConfigFiles(NULL, NULL) == -1)
+-	return 0;
 +    const char *argv[1] = {"rpmmodule", 0};
 +    rpmcliInit(1, argv, NULL);
  

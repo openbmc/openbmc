@@ -83,7 +83,7 @@ class Terminology(XTerminal):
     priority = 2
 
 class Konsole(XTerminal):
-    command = 'konsole --nofork -p tabtitle="{title}" -e {command}'
+    command = 'konsole --nofork --workdir . -p tabtitle="{title}" -e {command}'
     priority = 2
 
     def __init__(self, sh_cmd, title=None, env=None, d=None):
@@ -131,7 +131,7 @@ class TmuxRunning(Terminal):
             raise UnsupportedTerminal('tmux is not running')
 
         if not check_tmux_pane_size('tmux'):
-            raise UnsupportedTerminal('tmux pane too small')
+            raise UnsupportedTerminal('tmux pane too small or tmux < 1.9 version is being used')
 
         Terminal.__init__(self, sh_cmd, title, env, d)
 
@@ -218,6 +218,12 @@ def spawn(name, sh_cmd, title=None, env=None, d=None):
 
 def check_tmux_pane_size(tmux):
     import subprocess as sub
+    # On older tmux versions (<1.9), return false. The reason
+    # is that there is no easy way to get the height of the active panel
+    # on current window without nested formats (available from version 1.9)
+    vernum = check_terminal_version("tmux")
+    if vernum and LooseVersion(vernum) < '1.9':
+        return False
     try:
         p = sub.Popen('%s list-panes -F "#{?pane_active,#{pane_height},}"' % tmux,
                 shell=True,stdout=sub.PIPE,stderr=sub.PIPE)
@@ -229,14 +235,18 @@ def check_tmux_pane_size(tmux):
             return None
         else:
             raise
-    if size/2 >= 19:
-        return True
-    return False
+
+    return size/2 >= 19
 
 def check_terminal_version(terminalName):
     import subprocess as sub
     try:
-        p = sub.Popen(['sh', '-c', '%s --version' % terminalName],stdout=sub.PIPE,stderr=sub.PIPE)
+        cmdversion = '%s --version' % terminalName
+        if terminalName.startswith('tmux'):
+            cmdversion = '%s -V' % terminalName
+        newenv = os.environ.copy()
+        newenv["LANG"] = "C"
+        p = sub.Popen(['sh', '-c', cmdversion], stdout=sub.PIPE, stderr=sub.PIPE, env=newenv)
         out, err = p.communicate()
         ver_info = out.rstrip().split('\n')
     except OSError as exc:
@@ -251,6 +261,8 @@ def check_terminal_version(terminalName):
             vernum = ver.split(' ')[-1]
         if ver.startswith('GNOME Terminal'):
             vernum = ver.split(' ')[-1]
+        if ver.startswith('tmux'):
+            vernum = ver.split()[-1]
     return vernum
 
 def distro_name():

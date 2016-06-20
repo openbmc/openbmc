@@ -1,0 +1,54 @@
+From f5df01655a4b76d4fe415747de581d94ac593e6a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 22 Mar 2016 16:19:29 +0000
+Subject: [PATCH] x86: Stub out x86_local_resume()
+
+its purpose seems
+to be unwinding across signal handler boundaries, which cannot happen
+in correct programs anyway. Replacing the whole function with
+something like *(volatile char *)0=0; (i.e. crash), gets a working
+libunwind
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ src/x86/Gos-linux.c | 22 +---------------------
+ 1 file changed, 1 insertion(+), 21 deletions(-)
+
+diff --git a/src/x86/Gos-linux.c b/src/x86/Gos-linux.c
+index 31f83ba..3aaa34e 100644
+--- a/src/x86/Gos-linux.c
++++ b/src/x86/Gos-linux.c
+@@ -281,27 +281,7 @@ x86_r_uc_addr (ucontext_t *uc, int reg)
+ HIDDEN int
+ x86_local_resume (unw_addr_space_t as, unw_cursor_t *cursor, void *arg)
+ {
+-  struct cursor *c = (struct cursor *) cursor;
+-  ucontext_t *uc = c->uc;
+-
+-  /* Ensure c->pi is up-to-date.  On x86, it's relatively common to be
+-     missing DWARF unwind info.  We don't want to fail in that case,
+-     because the frame-chain still would let us do a backtrace at
+-     least.  */
+-  dwarf_make_proc_info (&c->dwarf);
+-
+-  if (unlikely (c->sigcontext_format != X86_SCF_NONE))
+-    {
+-      struct sigcontext *sc = (struct sigcontext *) c->sigcontext_addr;
+-
+-      Debug (8, "resuming at ip=%x via sigreturn(%p)\n", c->dwarf.ip, sc);
+-      sigreturn (sc);
+-    }
+-  else
+-    {
+-      Debug (8, "resuming at ip=%x via setcontext()\n", c->dwarf.ip);
+-      setcontext (uc);
+-    }
++  *(volatile char *)0=0;
+   return -UNW_EINVAL;
+ }
+ #endif
+-- 
+1.8.3.1
+

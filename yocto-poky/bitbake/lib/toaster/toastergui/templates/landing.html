@@ -6,9 +6,6 @@
 
 {% block title %} Welcome to Toaster {% endblock %}
 {% block pagecontent %}
-
-  {% if BUILD_MODE %}
-    <!-- build mode -->
     <div class="container-fluid">
       <div class="row-fluid">
         <div class="hero-unit span12 well-transparent">
@@ -62,11 +59,4 @@
         </div>
       </div>
     </div>
-  {% else %}
-    <!-- analysis mode -->
-    <div class="alert alert-info lead top-air">
-      Toaster has not recorded any builds yet. Run a build from the command line to see it here.
-    </div>
-  {% endif %}
-
 {% endblock %}

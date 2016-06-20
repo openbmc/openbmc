@@ -1,0 +1,43 @@
+"make src/lex_config.o"
+
+results in:
+
+src/lex_config.l:35:25: fatal error: yacc_config.h: No such file or directory
+
+so add missing dependency through a missing rule. Also remove a rule which
+doesn't appear to do anything.
+
+RP
+2016/1/31
+
+Upstream-Status: Pending
+
+Index: pcmciautils-018/Makefile
+===================================================================
+--- pcmciautils-018.orig/Makefile
++++ pcmciautils-018/Makefile
+@@ -249,6 +249,9 @@ $(PCMCIA_SOCKET_STARTUP): $(LIBC) src/st
+ yacc_config.o lex_config.o: %.o: %.c src/yacc_config.h
+ 	$(CC) -c -MD -O -pipe $(CPPFLAGS) $<
+ 
++src/lex_config.o : src/lex_config.c src/yacc_config.h
++	$(QUIET) $(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
++
+ debugtools: ccdv $(CBDUMP) $(CISDUMP)
+ 
+ $(CBDUMP): $(LIBC) debug/cbdump.o
+Index: pcmciautils-018/Makefile
+===================================================================
+--- pcmciautils-018.orig/Makefile
++++ pcmciautils-018/Makefile
+@@ -246,8 +246,8 @@ $(PCMCIA_SOCKET_STARTUP): $(LIBC) src/st
+ 	$(QUIET) $(LD) $(LDFLAGS) -o $@ $(CRT0) src/startup.o src/yacc_config.o src/lex_config.o $(LIB_OBJS) $(ARCH_LIB_OBJS)
+ 	$(QUIET) $(STRIPCMD) $@
+ 
+-yacc_config.o lex_config.o: %.o: %.c
+-	$(CC) -c -MD -O -pipe $(CPPFLAGS) $<
++src/lex_config.o : src/lex_config.c src/yacc_config.h ccdv
++	$(QUIET) $(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
+ 
+ debugtools: ccdv $(CBDUMP) $(CISDUMP)
+ 

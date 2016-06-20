@@ -1,0 +1,78 @@
+From cc2ce6d8b6a3e6e2c8874896c10897034a80cd4f Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 10 Dec 2015 13:20:30 +0200
+Subject: [PATCH] Don't search /usr and so on for libraries by default to avoid
+ host contamination.
+
+Upstream-Status: Inappropriate (As the code stands, this is a hack)
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ numpy/distutils/system_info.py | 50 +++++-------------------------------------
+ 1 file changed, 6 insertions(+), 44 deletions(-)
+
+diff --git a/numpy/distutils/system_info.py b/numpy/distutils/system_info.py
+index 9dd48e2..80e197a 100644
+--- a/numpy/distutils/system_info.py
++++ b/numpy/distutils/system_info.py
+@@ -204,51 +204,13 @@ if sys.platform == 'win32':
+     default_x11_lib_dirs = []
+     default_x11_include_dirs = []
+ else:
+-    default_lib_dirs = libpaths(['/usr/local/lib', '/opt/lib', '/usr/lib',
+-                                 '/opt/local/lib', '/sw/lib'], platform_bits)
+     default_runtime_dirs = []
+-    default_include_dirs = ['/usr/local/include',
+-                            '/opt/include', '/usr/include',
+-                            # path of umfpack under macports
+-                            '/opt/local/include/ufsparse',
+-                            '/opt/local/include', '/sw/include',
+-                            '/usr/include/suitesparse']
+-    default_src_dirs = ['.', '/usr/local/src', '/opt/src', '/sw/src']
+-
+-    default_x11_lib_dirs = libpaths(['/usr/X11R6/lib', '/usr/X11/lib',
+-                                     '/usr/lib'], platform_bits)
+-    default_x11_include_dirs = ['/usr/X11R6/include', '/usr/X11/include',
+-                                '/usr/include']
+-
+-    if os.path.exists('/usr/lib/X11'):
+-        globbed_x11_dir = glob('/usr/lib/*/libX11.so')
+-        if globbed_x11_dir:
+-            x11_so_dir = os.path.split(globbed_x11_dir[0])[0]
+-            default_x11_lib_dirs.extend([x11_so_dir, '/usr/lib/X11'])
+-            default_x11_include_dirs.extend(['/usr/lib/X11/include',
+-                                             '/usr/include/X11'])
+-
+-    import subprocess as sp
+-    tmp = None
+-    try:
+-        # Explicitly open/close file to avoid ResourceWarning when
+-        # tests are run in debug mode Python 3.
+-        tmp = open(os.devnull, 'w')
+-        p = sp.Popen(["gcc", "-print-multiarch"], stdout=sp.PIPE,
+-                stderr=tmp)
+-    except (OSError, DistutilsError):
+-        # OSError if gcc is not installed, or SandboxViolation (DistutilsError
+-        # subclass) if an old setuptools bug is triggered (see gh-3160).
+-        pass
+-    else:
+-        triplet = str(p.communicate()[0].decode().strip())
+-        if p.returncode == 0:
+-            # gcc supports the "-print-multiarch" option
+-            default_x11_lib_dirs += [os.path.join("/usr/lib/", triplet)]
+-            default_lib_dirs += [os.path.join("/usr/lib/", triplet)]
+-    finally:
+-        if tmp is not None:
+-            tmp.close()
++    default_lib_dirs = libpaths(['/deadir/lib'], platform_bits)
++    default_include_dirs = ['/deaddir/include']
++    default_src_dirs = ['.', '/deaddir/src']
++
++    default_x11_lib_dirs = libpaths(['/deaddir/lib'], platform_bits)
++    default_x11_include_dirs = ['/deaddir/include']
+ 
+ if os.path.join(sys.prefix, 'lib') not in default_lib_dirs:
+     default_lib_dirs.insert(0, os.path.join(sys.prefix, 'lib'))
+-- 
+2.6.2
+

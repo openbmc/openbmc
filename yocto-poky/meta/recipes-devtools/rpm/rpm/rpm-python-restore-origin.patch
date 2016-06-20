@@ -1,0 +1,49 @@
+Fix an issue where the PACKAGEORIGIN is not properly stored.
+
+Restore the rpmtsCallback fdSetOpen call and related code.
+
+Upstream-Status: Submitted [RPM5 maintainer]
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm/python/rpmts-py.c
+===================================================================
+--- rpm.orig/python/rpmts-py.c
++++ rpm/python/rpmts-py.c
+@@ -672,6 +672,8 @@ rpmtsCallback(const void * hd, const rpm
+     Header h = (Header) hd;
+     struct rpmtsCallbackType_s * cbInfo = data;
+     PyObject * pkgObj = (PyObject *) pkgKey;
++    PyObject * oh = NULL;
++    const char * origin = NULL;
+     PyObject * args, * result;
+     static FD_t fd;
+ 
+@@ -693,8 +695,16 @@ rpmtsCallback(const void * hd, const rpm
+ 	    pkgObj = Py_None;
+ 	    Py_INCREF(pkgObj);
+ 	}
+-    } else
++    } else {
+ 	Py_INCREF(pkgObj);
++	/* XXX yum has (h, rpmloc) tuple as pkgKey. Extract the path. */
++	if (!(PyTuple_Check(pkgObj) && PyArg_ParseTuple(pkgObj, "|Os", &oh, &origin)))
++	    origin = NULL;
++	/* XXX clean up the path, yum paths start "//..." */
++	if (origin && origin[0] == '/' && origin[1] == '/')
++	    origin++;
++    }
++
+ 
+     PyEval_RestoreThread(cbInfo->_save);
+ 
+@@ -723,6 +733,9 @@ SPEW((stderr, "\t%p = fdDup(%d)\n", fd,
+ 
+ 	fcntl(Fileno(fd), F_SETFD, FD_CLOEXEC);
+ 
++	if (origin != NULL)
++	    (void) fdSetOpen(fd, origin, 0, 0);
++
+ 	return fd;
+     } else
+     if (what == RPMCALLBACK_INST_CLOSE_FILE) {

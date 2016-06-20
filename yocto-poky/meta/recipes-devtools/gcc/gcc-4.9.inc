@@ -47,7 +47,6 @@ SRC_URI = "\
     file://0021-gcc-disable-MASK_RELAX_PIC_CALLS-bit.patch \
     file://0022-COLLECT_GCC_OPTIONS.patch \
     file://0023-Use-the-defaults.h-in-B-instead-of-S-and-t-oe-in-B.patch \
-    file://0024-PR-target-32219.patch \
     file://0025-fortran-cross-compile-hack.patch \
     file://0026-libgcc-sjlj-check.patch \
     file://0027-cpp-honor-sysroot.patch \
@@ -81,9 +80,21 @@ SRC_URI = "\
     file://0063-nativesdk-gcc-support.patch \
     file://0064-handle-target-sysroot-multilib.patch \
     file://0065-gcc-483-universal-initializer-no-warning.patch \
+    file://0066-cxxflags-for-build.patch \
+    file://0067-fix-arm-thumb.patch \
+    file://0067-gcc-musl-support.patch \
+    file://0068-musl-dynamic-linker.patch \
+    file://0069-musl-no-fixincludes.patch \
+    file://0070-libstdc-musl.patch \
+    file://0071-Ignore-fdebug-prefix-map-in-producer-string-by-Danie.patch \
+    file://0072-support-ffile-prefix-map.patch \
+    file://0073-Reuse-fdebug-prefix-map-to-replace-ffile-prefix-map.patch \
+    file://0074-fdebug-prefix-map-support-to-remap-relative-path.patch \
 "
 SRC_URI[md5sum] = "6f831b4d251872736e8e9cc09746f327"
 SRC_URI[sha256sum] = "2332b2a5a321b57508b9031354a8503af6fdfb868b8c1748d33028d100a8b67e"
+
+UPSTREAM_CHECK_REGEX = "gcc-(?P<pver>4\.9\.\d+).tar"
 
 S = "${TMPDIR}/work-shared/gcc-${PV}-${PR}/gcc-${PV}"
 B = "${WORKDIR}/gcc-${PV}/build.${HOST_SYS}.${TARGET_SYS}"

@@ -15,7 +15,8 @@ do_configure () {
 	mkdir -p ${B}/$target/libgfortran/
 	cd ${B}/$target/libgfortran/
 	chmod a+x ${S}/libgfortran/configure
-	${S}/libgfortran/configure ${CONFIGUREOPTS} ${EXTRA_OECONF}
+	relpath=${@os.path.relpath("${S}/libgfortran", "${B}/$target/libgfortran")}
+	$relpath/configure ${CONFIGUREOPTS} ${EXTRA_OECONF}
 	# Easiest way to stop bad RPATHs getting into the library since we have a
 	# broken libtool here
 	sed -i -e 's/hardcode_into_libs=yes/hardcode_into_libs=no/' ${B}/$target/libgfortran/libtool

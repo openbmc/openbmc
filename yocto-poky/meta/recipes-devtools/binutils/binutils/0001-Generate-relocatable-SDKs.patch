@@ -1,7 +1,7 @@
-From f71ecf251f84b4bbc9b7a832d5cd4a8bae95d83b Mon Sep 17 00:00:00 2001
+From 3c75355342a8562ccb65b8bbbe81a0495fec5c57 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:58:54 +0000
-Subject: [PATCH 01/13] Generate relocatable SDKs
+Subject: [PATCH 01/14] Generate relocatable SDKs
 
 This patch will modify the ELF linker scripts so that the crosssdk
 linker will generate binaries with a 4096 bytes PT_INTERP section. When the binaries
@@ -18,7 +18,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/ld/genscripts.sh b/ld/genscripts.sh
-index 499607a..075dd04 100755
+index a84d233..d12c4e2 100755
 --- a/ld/genscripts.sh
 +++ b/ld/genscripts.sh
 @@ -277,6 +277,7 @@ DATA_ALIGNMENT_u="${DATA_ALIGNMENT_u-${DATA_ALIGNMENT_r}}"
@@ -43,10 +43,10 @@ index 499607a..075dd04 100755
  LD_FLAG=
  DATA_ALIGNMENT=${DATA_ALIGNMENT_}
 diff --git a/ld/scripttempl/elf.sc b/ld/scripttempl/elf.sc
-index 4368fd9..9f01e8c 100644
+index ec78c90..f9e7a31 100644
 --- a/ld/scripttempl/elf.sc
 +++ b/ld/scripttempl/elf.sc
-@@ -131,8 +131,8 @@ if test -n "${COMMONPAGESIZE}"; then
+@@ -136,8 +136,8 @@ if test -n "${COMMONPAGESIZE}"; then
    DATA_SEGMENT_END=". = DATA_SEGMENT_END (.);"
    DATA_SEGMENT_RELRO_END=". = DATA_SEGMENT_RELRO_END (${SEPARATE_GOTPLT-0}, .);"
  fi
@@ -58,5 +58,5 @@ index 4368fd9..9f01e8c 100644
  if test -z "$PLT"; then
    IPLT=".iplt         ${RELOCATING-0} : { *(.iplt) }"
 -- 
-2.1.4
+2.7.1
 

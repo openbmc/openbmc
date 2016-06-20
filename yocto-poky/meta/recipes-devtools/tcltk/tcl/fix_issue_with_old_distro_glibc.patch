@@ -1,4 +1,4 @@
-Upstream-Status: inappropriate [embedded specific]
+Upstream-Status: Inappropriate [embedded specific]
 
 Fixes tcl target recipe build on old distros which have glibc older than 2.14
 

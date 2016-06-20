@@ -1,0 +1,72 @@
+From 9619a608528383a44ccc1637ae939b5f3e97adc5 Mon Sep 17 00:00:00 2001
+From: Sandra Loosemore <sandra@codesourcery.com>
+Date: Wed, 9 Dec 2015 16:13:58 -0800
+Subject: [PATCH 13/14] Fix GOT address computations in initial PLT entries for
+ nios2.
+
+2015-12-09  Sandra Loosemore  <sandra@codesourcery.com>
+
+	bfd/
+	* elf32-nios2.c (nios2_elf32_finish_dynamic_sections): Correct
+	%hiadj/%lo computations for _GLOBAL_OFFSET_TABLE_ in initial
+	PLT entries.  Assert alignment requirements.
+
+Signed-off-by: Marek Vasut <marex@denx.de>
+Upstream-Status: Backport
+---
+ bfd/elf32-nios2.c | 23 ++++++++++++++++-------
+ 1 file changed, 16 insertions(+), 7 deletions(-)
+
+diff --git a/bfd/elf32-nios2.c b/bfd/elf32-nios2.c
+index 6b29d8b..1c54320 100644
+--- a/bfd/elf32-nios2.c
++++ b/bfd/elf32-nios2.c
+@@ -5383,12 +5383,17 @@ nios2_elf32_finish_dynamic_sections (bfd *output_bfd,
+ 				 + sgotplt->output_offset);
+ 	  if (bfd_link_pic (info))
+ 	    {
+-	      bfd_vma corrected = got_address - (splt->output_section->vma
+-						 + splt->output_offset + 4);
++	      bfd_vma got_pcrel = got_address - (splt->output_section->vma
++						 + splt->output_offset);
++	      /* Both GOT and PLT must be aligned to a 16-byte boundary
++		 for the two loads to share the %hiadj part.  The 4-byte
++		 offset for nextpc is accounted for in the %lo offsets
++		 on the loads.  */
++	      BFD_ASSERT ((got_pcrel & 0xf) == 0);
+ 	      nios2_elf32_install_data (splt, nios2_so_plt0_entry, 0, 6);
+-	      nios2_elf32_install_imm16 (splt, 4, hiadj (corrected));
+-	      nios2_elf32_install_imm16 (splt, 12, (corrected & 0xffff) + 4);
+-	      nios2_elf32_install_imm16 (splt, 16, (corrected & 0xffff) + 8);
++	      nios2_elf32_install_imm16 (splt, 4, hiadj (got_pcrel));
++	      nios2_elf32_install_imm16 (splt, 12, got_pcrel & 0xffff);
++	      nios2_elf32_install_imm16 (splt, 16, (got_pcrel + 4) & 0xffff);
+ 	    }
+ 	  else
+ 	    {
+@@ -5404,6 +5409,10 @@ nios2_elf32_finish_dynamic_sections (bfd *output_bfd,
+ 			    6 | ((res_size - (res_offset + 4)) << 6),
+ 			    splt->contents + res_offset);
+ 
++	      /* The GOT must be aligned to a 16-byte boundary for the
++		 two loads to share the same %hiadj part.  */
++	      BFD_ASSERT ((got_address & 0xf) == 0);
++
+ 	      nios2_elf32_install_data (splt, nios2_plt0_entry, res_size, 7);
+ 	      nios2_elf32_install_imm16 (splt, res_size, hiadj (res_start));
+ 	      nios2_elf32_install_imm16 (splt, res_size + 4,
+@@ -5411,9 +5420,9 @@ nios2_elf32_finish_dynamic_sections (bfd *output_bfd,
+ 	      nios2_elf32_install_imm16 (splt, res_size + 12,
+ 					 hiadj (got_address));
+ 	      nios2_elf32_install_imm16 (splt, res_size + 16,
+-					 (got_address & 0xffff) + 4);
++					 (got_address + 4) & 0xffff);
+ 	      nios2_elf32_install_imm16 (splt, res_size + 20,
+-					 (got_address & 0xffff) + 8);
++					 (got_address + 8) & 0xffff);
+ 	    }
+ 	}
+     }
+-- 
+2.7.1
+

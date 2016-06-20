@@ -12,16 +12,20 @@ it's easy enough to do by enabling the necessary macros.
 
 Signed-off-by: yzhu1 <yanjun.zhu@windriver.com>
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
---- a/macros/macros.in
-+++ b/macros/macros.in
-@@ -546,8 +546,8 @@ $_arbitrary_tags_tests	Foo:Bar
+Index: rpm/macros/macros.in
+===================================================================
+--- rpm.orig/macros/macros.in
++++ rpm/macros/macros.in
+@@ -563,10 +563,10 @@ $_arbitrary_tags_tests	Foo:Bar
+ 
  # Horowitz Key Protocol server configuration
  #
+-%_hkp_keyserver         hkp://keys.rpm5.org
++#%_hkp_keyserver         hkp://keys.rpm5.org
  #%_hkp_keyserver         hkp://keys.n3npq.net
--%_hkp_keyserver         hkp://pool.sks-keyservers.net
+ #%_hkp_keyserver         hkp://pool.sks-keyservers.net
 -%_hkp_keyserver_query   %{_hkp_keyserver}/pks/lookup?op=get&search=
-+#%_hkp_keyserver         hkp://pool.sks-keyservers.net
 +#%_hkp_keyserver_query   %{_hkp_keyserver}/pks/lookup?op=get&search=
  
  
- %_nssdb_path	/etc/pki/nssdb
+ # NSS_InitContext() parameter configuration

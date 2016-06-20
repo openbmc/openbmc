@@ -1,0 +1,23 @@
+libdns requires libxml2 if bind was built with libxml2 support
+enabled. Compilation will fail for omapip/test.c in case
+lxml2 isn't used during the build. So, we add losely coupled
+search path which will pick up the lib if it is present.
+
+Signed-off-by: Awais Belal <awais_belal@mentor.com>
+Upstream-Status: Pending
+
+diff --git a/configure.ac b/configure.ac
+index c9dc8b5..85f59be 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -602,6 +602,10 @@ no)
+ esac
+ AC_SUBST([libbind])
+ 
++# We need to find libxml2 if bind was built with support enabled
++# otherwise we'll fail to build omapip/test.c
++AC_SEARCH_LIBS(xmlTextWriterStartElement, [xml2],)
++
+ # OpenLDAP support.
+ AC_ARG_WITH(ldap,
+     AS_HELP_STRING([--with-ldap],[enable OpenLDAP support in dhcpd (default is no)]),

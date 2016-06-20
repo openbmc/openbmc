@@ -8,7 +8,7 @@ are found. We need to fix the caller to check the return code too.
 
 RP 2014/6/10
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [RPM5 maintainer]
 
 Index: rpm-5.4.14/lib/fsm.c
 ===================================================================

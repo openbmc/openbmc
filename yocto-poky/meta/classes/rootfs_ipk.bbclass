@@ -13,7 +13,6 @@ do_rootfs[depends] += "opkg-native:do_populate_sysroot opkg-utils-native:do_popu
 do_populate_sdk[depends] += "opkg-native:do_populate_sysroot opkg-utils-native:do_populate_sysroot"
 do_rootfs[recrdeptask] += "do_package_write_ipk"
 do_rootfs[vardeps] += "PACKAGE_FEED_URIS"
-rootfs_ipk_do_rootfs[vardepsexclude] += "BUILDNAME"
 
 do_rootfs[lockfiles] += "${WORKDIR}/ipk.lock"
 do_populate_sdk[lockfiles] += "${WORKDIR}/ipk.lock"
@@ -29,7 +28,7 @@ MULTILIBRE_ALLOW_REP = "${OPKGLIBDIR}/opkg|/usr/lib/opkg"
 python () {
 
     if d.getVar('BUILD_IMAGES_FROM_FEEDS', True):
-        flags = d.getVarFlag('do_rootfs', 'recrdeptask')
+        flags = d.getVarFlag('do_rootfs', 'recrdeptask', True)
         flags = flags.replace("do_package_write_ipk", "")
         flags = flags.replace("do_deploy", "")
         flags = flags.replace("do_populate_sysroot", "")

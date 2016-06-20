@@ -32,8 +32,11 @@
       <a href="#" class="add-on btn remove-search-btn-{{table_name}}" tabindex="-1">
         <i class="icon-remove"></i>
       </a>
-      <button class="btn search-submit-{{table_name}}" >Search</button>
-      <button class="btn btn-link remove-search-btn-{{table_name}}">Show {{title|lower}}
+      <button class="btn search-submit-{{table_name}}">
+        Search
+      </button>
+      <button class="btn btn-link show-all-{{table_name}} remove-search-btn-{{table_name}}">
+        Show all
       </button>
     </form>
   </div>
@@ -43,9 +46,9 @@
   <!-- control header -->
   <div class="navbar" id="table-chrome-{{table_name}}">
     <div class="navbar-inner">
-      <div class="navbar-search input-append pull-left">
+      <div class="navbar-search input-append pull-left span6">
 
-        <input class="input-xxlarge" id="search-input-{{table_name}}" name="search" type="text" placeholder="Search {{title|lower}}" value="{%if request.GET.search%}{{request.GET.search}}{%endif%}"/>
+        <input id="search-input-{{table_name}}" name="search" type="text" placeholder="Search {{title|lower}}" value="{%if request.GET.search%}{{request.GET.search}}{%endif%}"/>
         <a href="#" style="display:none" class="add-on btn remove-search-btn-{{table_name}}" tabindex="-1">
           <i class="icon-remove"></i>
         </a>
@@ -54,7 +57,7 @@
 
       <div class="pull-right">
         <div class="btn-group">
-          <button class="btn dropdown-toggle" data-toggle="dropdown">Edit columns
+          <button id="edit-columns-button" class="btn dropdown-toggle" data-toggle="dropdown">Edit columns
             <span class="caret"></span>
           </button>
           <ul class="dropdown-menu editcol">

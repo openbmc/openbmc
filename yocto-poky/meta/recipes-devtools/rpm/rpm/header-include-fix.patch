@@ -1,4 +1,14 @@
-Upstream-Status: Pending
+Update two rpm headers to include other headers.
+
+Using rpmdb.h w/o including errno.h may result in a warning.
+
+Using rpmtag.h w/o also adding stdint.h will result in numerous failures
+about unknown types on modern compilers.
+
+Upstream-Status: Submitted [RPM5 maintainer]
+
+Signed-off-by: Qing He <qing.he@intel.com>
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
 
 Index: rpm-5.4.14/rpmdb/rpmdb.h
 ===================================================================

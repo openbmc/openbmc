@@ -1,6 +1,6 @@
 lib/order.c: Make the dependency loop messages into debug msgs
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [RPM5 maintainer]
 
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
 

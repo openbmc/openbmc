@@ -4,30 +4,28 @@ We want to see the RPMSENSE_SCRIPT values for use with SMART.  We also
 want to see the MISSINGOK value so we can avoid recommended packages causing
 failures.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [RPM5 maintainer]
 
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
 
-Index: rpm-5.4.14/python/rpmmodule.c
+Index: rpm/python/rpmmodule.c
 ===================================================================
---- rpm-5.4.14.orig/python/rpmmodule.c
-+++ rpm-5.4.14/python/rpmmodule.c
-@@ -494,12 +494,16 @@ void init_rpm(void)
-     REGISTER_ENUM(RPMSENSE_EQUAL);
-     REGISTER_ENUM(RPMSENSE_NOTEQUAL);
-     REGISTER_ENUM(RPMSENSE_FIND_REQUIRES);
--#if defined(RPM_VENDOR_MANDRIVA)
-+#if defined(RPM_VENDOR_MANDRIVA) || defined(RPM_VENDOR_WINDRIVER) || defined(RPM_VENDOR_OE)
+--- rpm.orig/python/rpmmodule.c
++++ rpm/python/rpmmodule.c
+@@ -525,12 +525,15 @@ static int initModule(PyObject *m)
      REGISTER_ENUM(RPMSENSE_PREREQ);
+     REGISTER_ENUM(RPMSENSE_PRETRANS);
+     REGISTER_ENUM(RPMSENSE_INTERP);
++#else
++ #if defined(RPM_VENDOR_WINDRIVER) || defined(RPM_VENDOR_OE)
      REGISTER_ENUM(RPMSENSE_SCRIPT_PRE);
      REGISTER_ENUM(RPMSENSE_SCRIPT_POST);
      REGISTER_ENUM(RPMSENSE_SCRIPT_PREUN);
--    REGISTER_ENUM(RPMSENSE_SCRIPT_POSTUN)
-+    REGISTER_ENUM(RPMSENSE_SCRIPT_POSTUN);
-+#endif
-+
-+#if defined(RPM_VENDOR_WINDRIVER) || defined(RPM_VENDOR_OE)
+     REGISTER_ENUM(RPMSENSE_SCRIPT_POSTUN);
+     REGISTER_ENUM(RPMSENSE_SCRIPT_VERIFY);
+-#else
 +    REGISTER_ENUM(RPMSENSE_MISSINGOK);
++ #endif
+     REGISTER_ENUM(RPMSENSE_NOTEQUAL);
  #endif
- 
-     REGISTER_ENUM(RPMDEPS_FLAG_NOUPGRADE);
+     REGISTER_ENUM(RPMSENSE_FIND_REQUIRES);

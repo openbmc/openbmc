@@ -1,10 +1,12 @@
 #!/bin/bash
 
 # oe-git-proxy is a simple tool to be via GIT_PROXY_COMMAND. It uses socat
-# to make SOCKS5 or HTTPS proxy connections. It uses ALL_PROXY to determine the
-# proxy server, protocol, and port. It uses NO_PROXY to skip using the proxy for
-# a comma delimited list of hosts, host globs (*.example.com), IPs, or CIDR
-# masks (192.168.1.0/24). It is known to work with both bash and dash shells.
+# to make SOCKS5 or HTTPS proxy connections.
+# It uses ALL_PROXY or all_proxy or http_proxy to determine the proxy server,
+# protocol, and port.
+# It uses NO_PROXY to skip using the proxy for a comma delimited list of
+# hosts, host globs (*.example.com), IPs, or CIDR masks (192.168.1.0/24). It
+# is known to work with both bash and dash shells.
 #
 # Example ALL_PROXY values:
 # ALL_PROXY=socks://socks.example.com:1080
@@ -99,6 +101,9 @@ match_host() {
 # If no proxy is set or needed, just connect directly
 METHOD="TCP:$1:$2"
 
+[ -z "${ALL_PROXY}" ] && ALL_PROXY=$all_proxy
+[ -z "${ALL_PROXY}" ] && ALL_PROXY=$http_proxy
+
 if [ -z "$ALL_PROXY" ]; then
 	exec $SOCAT STDIO $METHOD
 fi
@@ -111,14 +116,27 @@ for H in ${NO_PROXY//,/ }; do
 done
 
 # Proxy is necessary, determine protocol, server, and port
-PROTO=$(echo $ALL_PROXY | sed -e 's/\([^:]*\):\/\/.*/\1/')
-PROXY=$(echo $ALL_PROXY | sed -e 's/.*:\/\/\([^:]*\).*/\1/')
-# For backwards compatibility, this allows the port number to be followed by /?
-# in addition to the customary optional /
-PORT=$(echo $ALL_PROXY | sed -e 's/.*:\([0-9]*\)\(\/?\?\)\?$/\1/')
-if [ "$PORT" = "$ALL_PROXY" ]; then
+# extract protocol
+PROTO=${ALL_PROXY%://*}
+# strip protocol:// from string
+ALL_PROXY=${ALL_PROXY#*://}
+# extract host & port parts:
+#   1) drop username/password
+PROXY=${ALL_PROXY##*@}
+#   2) remove optional trailing /?
+PROXY=${PROXY%%/*}
+#   3) extract optional port
+PORT=${PROXY##*:}
+if [ "$PORT" = "$PROXY" ]; then
 	PORT=""
 fi
+#   4) remove port
+PROXY=${PROXY%%:*}
+
+# extract username & password
+PROXYAUTH="${ALL_PROXY%@*}"
+[ "$PROXYAUTH" = "$ALL_PROXY" ] && PROXYAUTH=
+[ -n "${PROXYAUTH}" ] && PROXYAUTH=",proxyauth=${PROXYAUTH}"
 
 if [ "$PROTO" = "socks" ] || [ "$PROTO" = "socks4a" ]; then
 	if [ -z "$PORT" ]; then
@@ -135,7 +153,7 @@ else
 	if [ -z "$PORT" ]; then
 		PORT="8080"
 	fi
-	METHOD="PROXY:$PROXY:$1:$2,proxyport=$PORT"
+	METHOD="PROXY:$PROXY:$1:$2,proxyport=${PORT}${PROXYAUTH}"
 fi
 
-exec $SOCAT STDIO $METHOD
+exec $SOCAT STDIO "$METHOD"

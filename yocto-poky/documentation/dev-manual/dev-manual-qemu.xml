@@ -47,11 +47,10 @@
 
     <para>
         QEMU is made available with the Yocto Project a number of ways.
-        The easiest and recommended method for getting QEMU is to run the
-        ADT installer.  For more information on how to make sure you have
+        One method is to install a Software Development Kit (SDK).
+        For more information on how to make sure you have
         QEMU available, see the
-        "<ulink url='&YOCTO_DOCS_ADT_URL;#the-qemu-emulator'>The QEMU Emulator</ulink>"
-        section in the Yocto Project Application Developer's Guide.
+        <ulink url='&YOCTO_DOCS_SDK_URL;#sdk-intro'>Yocto Project Software Development Kit (SDK) Developer's Guide</ulink>.
     </para>
 </section>
 

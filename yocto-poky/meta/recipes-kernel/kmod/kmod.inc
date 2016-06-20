@@ -16,9 +16,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=a6f89e2100d9b6cdffcea4f398e37343 \
                    "
 inherit autotools gtk-doc
 
-SRCREV = "114ec87c85c35a2bd3682f9f891e494127be6fb5"
+SRCREV = "42f32b8ae45ad8e3a1da29c9b20af9b5e2e9e676"
 # Lookout for PV bump too when SRCREV is changed
-PV = "21+git${SRCPV}"
+PV = "22+git${SRCPV}"
 
 SRC_URI = "git://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git \
            file://depmod-search.conf \

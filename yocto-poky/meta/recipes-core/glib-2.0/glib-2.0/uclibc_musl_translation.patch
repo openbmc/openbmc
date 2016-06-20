@@ -1,0 +1,22 @@
+Fix DATADIRNAME on uclibc/Linux
+
+translation files are always installed under PREFIX/share/locale in uclibc
+based systems therefore lets set DATADIRNAME to "share".
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+Index: glib-2.46.1/m4macros/glib-gettext.m4
+===================================================================
+--- glib-2.46.1.orig/m4macros/glib-gettext.m4
++++ glib-2.46.1/m4macros/glib-gettext.m4
+@@ -243,6 +243,10 @@ msgstr ""
+ 	    CATOBJEXT=.mo
+             DATADIRNAME=share
+ 	    ;;
++	    *-*-musl* | *-*-linux-uclibc*)
++	    CATOBJEXT=.gmo
++            DATADIRNAME=share
++	    ;;
+ 	    *)
+ 	    CATOBJEXT=.mo
+             DATADIRNAME=lib

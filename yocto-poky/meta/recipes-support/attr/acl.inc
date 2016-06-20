@@ -12,6 +12,8 @@ DEPENDS = "attr"
 SRC_URI = "${SAVANNAH_GNU_MIRROR}/acl/${BP}.src.tar.gz \
            file://run-ptest \
            file://acl-fix-the-order-of-expected-output-of-getfacl.patch \
+           file://test-fix-insufficient-quoting-of.patch \
+           file://test-fixups-on-SELinux-machines-for-root-testcases.patch \
 "
 
 require ea-acl.inc
