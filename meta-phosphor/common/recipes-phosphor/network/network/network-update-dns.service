@@ -1,0 +1,10 @@
+[Unit]
+Description=DNS update handler
+Requires=network.service
+After=network.service
+
+[Service]
+ExecStart=/usr/sbin/netman_watch_dns /run/systemd/netif/state
+
+[Install]
+WantedBy=multi-user.target
