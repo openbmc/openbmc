@@ -1,4 +1,4 @@
-Upsteram Status: Backport
+Upstream-Status: Backport
 
 When building on x32 systems where the default type is 32bit, make sure
 we can transparently represent 64bit integers.  Otherwise we end up with

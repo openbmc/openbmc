@@ -8,7 +8,7 @@ Remove the 'tools' dir creation, it always existed.
 And it caused gen_test_char unexpected rebuilt at
 do_install time.
 
-Upstream-Status: inappropriate [oe specific]
+Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---

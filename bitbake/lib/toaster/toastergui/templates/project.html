@@ -24,7 +24,9 @@
   });
 </script>
 
-<div id="change-release-modal" class="modal hide fade in" tabindex="-1" role="dialog" aria-labelledby="change-release-modal" aria-hidden="false">
+<!-- Comment out the ability to change the project release, until we decide what to do this functionality -->
+
+<!--div id="change-release-modal" class="modal hide fade in" tabindex="-1" role="dialog" aria-labelledby="change-release-modal" aria-hidden="false">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
     <h3>Changing Yocto Project release to <span class="proposed-release-change-name"></span></h3>
@@ -39,7 +41,7 @@
     <button id="change-release-and-rm-layers" data-dismiss="modal" type="submit" class="btn btn-primary">Change release and delete layers</button>
     <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
   </div>
-</div>
+</div-->
 
 
 <div class="row-fluid" id="project-page" style="display:none">
@@ -68,7 +70,7 @@
 
       <div class="alert alert-info" style="display:none" id="no-most-built">
         <span class="lead">You haven't built any recipes yet</span>
-        <p style="margin-top: 10px;"><a href="{% url 'projectsoftwarerecipes' project.id %}">Choose a recipe to build</a></p>
+        <p style="margin-top: 10px;"><a href="{% url 'projectimagerecipes' project.id %}">Choose a recipe to build</a></p>
       </div>
 
       <ul class="unstyled configuration-list" id="freq-build-list">
@@ -79,12 +81,19 @@
     <div class="well well-transparent">
       <h3>Project release</h3>
 
-      <p class="lead"><span id="project-release-title"></span> <i title="" data-original-title="" id="release-change-toggle" class="icon-pencil"></i></p>
+      <p class="lead"><span id="project-release-title"></span>
 
-      <form class="form-inline" id="change-release-form" style="display:none;">
+      <!-- Comment out the ability to change the project release, until we decide what to do with this functionality -->
+
+      <!--i title="" data-original-title="" id="release-change-toggle" class="icon-pencil"></i-->
+      </p>
+
+      <!-- Comment out the ability to change the project release, until we decide what to do with this functionality -->
+
+      <!--form class="form-inline" id="change-release-form" style="display:none;">
         <select></select>
         <button class="btn" style="margin-left:5px;" id="change-release-btn">Change</button> <a href="#" id="cancel-release-change" class="btn btn-link">Cancel</a>
-      </form>
+      </form-->
     </div>
   </div>
 

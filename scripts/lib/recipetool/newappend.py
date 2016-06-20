@@ -25,16 +25,13 @@ import errno
 import logging
 import os
 import re
+import subprocess
 import sys
+import scriptutils
 
 
 logger = logging.getLogger('recipetool')
 tinfoil = None
-
-
-def plugin_init(pluginlist):
-    # Don't need to do anything here right now, but plugins must have this function defined
-    pass
 
 
 def tinfoil_init(instance):
@@ -94,17 +91,21 @@ def newappend(args):
         bb.utils.mkdirhier(os.path.dirname(append_path))
 
         try:
-            open(append_path, 'a')
+            open(append_path, 'a').close()
         except (OSError, IOError) as exc:
             logger.critical(str(exc))
             return 1
 
-    print(append_path)
+    if args.edit:
+        return scriptutils.run_editor([append_path, recipe_path])
+    else:
+        print(append_path)
 
 
-def register_command(subparsers):
+def register_commands(subparsers):
     parser = subparsers.add_parser('newappend',
                                    help='Create a bbappend for the specified target in the specified layer')
+    parser.add_argument('-e', '--edit', help='Edit the new append. This obeys $VISUAL if set, otherwise $EDITOR, otherwise vi.', action='store_true')
     parser.add_argument('-w', '--wildcard-version', help='Use wildcard to make the bbappend apply to any recipe version', action='store_true')
     parser.add_argument('destlayer', help='Base directory of the destination layer to write the bbappend to', type=layer)
     parser.add_argument('target', help='Target recipe/provide to append')

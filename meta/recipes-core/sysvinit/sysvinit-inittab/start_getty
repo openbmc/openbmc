@@ -1,0 +1,5 @@
+#!/bin/sh
+if [ -c /dev/$2 ]
+then 
+	/sbin/getty -L $1 $2
+fi

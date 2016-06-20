@@ -1,0 +1,28 @@
+From 9d14edfc12eefac900dd54729a88b3ccf91c1c43 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 8 Jan 2016 07:18:15 +0000
+Subject: [PATCH 25/32] mc_gethost: include sys/types.h
+
+Fix build on musl
+error: unknown type name 'u_char'
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ testcases/network/multicast/mc_gethost/mc_gethost.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/testcases/network/multicast/mc_gethost/mc_gethost.c b/testcases/network/multicast/mc_gethost/mc_gethost.c
+index 5b9a790..c799e2a 100644
+--- a/testcases/network/multicast/mc_gethost/mc_gethost.c
++++ b/testcases/network/multicast/mc_gethost/mc_gethost.c
+@@ -6,6 +6,7 @@
+ 
+ #include <sys/param.h>
+ #include <sys/socket.h>
++#include <sys/types.h>
+ #include <netinet/in.h>
+ #include <arpa/inet.h>
+ #include <arpa/nameser.h>
+-- 
+2.7.0
+

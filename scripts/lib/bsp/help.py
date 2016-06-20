@@ -103,6 +103,7 @@ yocto_bsp_create_usage = """
 
  usage: yocto-bsp create <bsp-name> <karch> [-o <DIRNAME> | --outdir <DIRNAME>]
             [-i <JSON PROPERTY FILE> | --infile <JSON PROPERTY_FILE>]
+            [-c | --codedump] [-s | --skip-git-check]
 
  This command creates a Yocto BSP based on the specified parameters.
  The new BSP will be a new Yocto BSP layer contained by default within
@@ -113,7 +114,7 @@ yocto_bsp_create_usage = """
  The value of the 'karch' parameter determines the set of files that
  will be generated for the BSP, along with the specific set of
  'properties' that will be used to fill out the BSP-specific portions
- of the BSP.  The possible values for the 'karch' paramter can be
+ of the BSP.  The possible values for the 'karch' parameter can be
  listed via 'yocto-bsp list karch'.
 
  NOTE: Once created, you should add your new layer to your
@@ -131,6 +132,7 @@ NAME
 SYNOPSIS
     yocto-bsp create <bsp-name> <karch> [-o <DIRNAME> | --outdir <DIRNAME>]
         [-i <JSON PROPERTY FILE> | --infile <JSON PROPERTY_FILE>]
+        [-c | --codedump] [-s | --skip-git-check]
 
 DESCRIPTION
     This command creates a Yocto BSP based on the specified
@@ -142,7 +144,7 @@ DESCRIPTION
     The value of the 'karch' parameter determines the set of files
     that will be generated for the BSP, along with the specific set of
     'properties' that will be used to fill out the BSP-specific
-    portions of the BSP.  The possible values for the 'karch' paramter
+    portions of the BSP.  The possible values for the 'karch' parameter
     can be listed via 'yocto-bsp list karch'.
 
     The BSP-specific properties that define the values that will be
@@ -173,7 +175,7 @@ DESCRIPTION
 
     BBLAYERS ?= " \\
       /path/to/poky/meta \\
-      /path/to/poky/meta-yocto \\
+      /path/to/poky/meta-poky \\
       /path/to/poky/meta-mybsp \\
       "
 """
@@ -756,7 +758,7 @@ DESCRIPTION
     or config items along with patches.  The named feature must end
     with .scc and must not contain a feature directory to contain the
     feature (this will be determined automatically), and a feature
-    decription in double-quotes along with a capabilities string
+    description in double-quotes along with a capabilities string
     (which for the time being can be one of: 'all' or 'board').
 """
 

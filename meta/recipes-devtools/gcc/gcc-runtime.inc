@@ -1,6 +1,10 @@
 require gcc-configure-common.inc
 
-CXXFLAGS := "${@oe_filter_out('-fvisibility-inlines-hidden', '${CXXFLAGS}', d)}"
+# Over-ride the LICENSE set by gcc-${PV}.inc to remove "& GPLv3"
+# All gcc-runtime packages are now covered by the runtime exception.
+LICENSE = "GPL-3.0-with-GCC-exception"
+
+CXXFLAGS_remove = "-fvisibility-inlines-hidden"
 
 EXTRA_OECONF_PATHS = "\
     --with-gxx-include-dir=${includedir}/c++/${BINV} \
@@ -10,7 +14,18 @@ EXTRA_OECONF_PATHS = "\
 
 EXTRA_OECONF_append_linuxstdbase = " --enable-clocale=gnu"
 
-RUNTIMETARGET = "libssp libstdc++-v3 libgomp libatomic"
+RUNTIMELIBITM = "libitm"
+RUNTIMELIBITM_mips = ""
+RUNTIMELIBITM_mipsel = ""
+RUNTIMELIBITM_mips64 = ""
+RUNTIMELIBITM_mips64el = ""
+RUNTIMELIBITM_nios2 = ""
+RUNTIMELIBITM_microblaze = ""
+
+RUNTIMETARGET = "libssp libstdc++-v3 libgomp libatomic ${RUNTIMELIBITM} \
+    ${@bb.utils.contains_any('FORTRAN', [',fortran',',f77'], 'libquadmath', '', d)} \
+"
+
 #  ?
 # libiberty
 # libmudflap
@@ -27,7 +42,8 @@ do_configure () {
 		mkdir -p ${B}/$target/$d/
 		cd ${B}/$target/$d/
 		chmod a+x ${S}/$d/configure
-		${S}/$d/configure ${CONFIGUREOPTS} ${EXTRA_OECONF}
+		relpath=${@os.path.relpath("${S}/$d", "${B}/$target/$d")}
+		$relpath/configure ${CONFIGUREOPTS} ${EXTRA_OECONF}
 	done
 }
 
@@ -46,6 +62,7 @@ do_install () {
 		oe_runmake 'DESTDIR=${D}' MULTIBUILDTOP=${B}/$target/$d/ install
 	done
 	rm -rf ${D}${infodir}/libgomp.info ${D}${infodir}/dir
+	rm -rf ${D}${infodir}/libitm.info ${D}${infodir}/dir
 	rm -rf ${D}${infodir}/libquadmath.info ${D}${infodir}/dir
 	if [ -d ${D}${libdir}/gcc/${TARGET_SYS}/${BINV}/finclude ]; then
 		rmdir --ignore-fail-on-non-empty -p ${D}${libdir}/gcc/${TARGET_SYS}/${BINV}/finclude
@@ -91,37 +108,10 @@ PACKAGES = "\
     libatomic \
     libatomic-dev \
     libatomic-staticdev \
+    libitm \
+    libitm-dev \
+    libitm-staticdev \
 "
-
-# Most libraries are licensed with the exception, but
-# one library is really GPLv3.
-#
-LICENSE_${PN}-dbg = "GPL-3.0-with-GCC-exception & GPLv3"
-LICENSE_libstdc++ = "GPL-3.0-with-GCC-exception"
-LICENSE_libstdc++-precompile-dev = "GPL-3.0-with-GCC-exception"
-LICENSE_libstdc++-dev = "GPL-3.0-with-GCC-exception"
-LICENSE_libstdc++-staticdev = "GPL-3.0-with-GCC-exception"
-LICENSE_libg2c = "GPL-3.0-with-GCC-exception"
-LICENSE_libg2c-dev = "GPL-3.0-with-GCC-exception"
-LICENSE_libssp = "GPL-3.0-with-GCC-exception"
-LICENSE_libssp-dev = "GPL-3.0-with-GCC-exception"
-LICENSE_libssp-staticdev = "GPL-3.0-with-GCC-exception"
-LICENSE_libgfortran = "GPL-3.0-with-GCC-exception"
-LICENSE_libgfortran-dev = "GPL-3.0-with-GCC-exception"
-LICENSE_libgfortran-staticdev = "GPL-3.0-with-GCC-exception"
-LICENSE_libmudflap = "GPL-3.0-with-GCC-exception"
-LICENSE_libmudflap-dev = "GPL-3.0-with-GCC-exception"
-LICENSE_libmudflap-staticdev = "GPL-3.0-with-GCC-exception"
-LICENSE_libquadmath = "GPL-3.0-with-GCC-exception"
-LICENSE_libquadmath-dev = "GPL-3.0-with-GCC-exception"
-LICENSE_libquadmath-staticdev = "GPL-3.0-with-GCC-exception"
-LICENSE_libatomic = "GPL-3.0-with-GCC-exception"
-LICENSE_libatomic-dev = "GPL-3.0-with-GCC-exception"
-LICENSE_libatomic-staticdev = "GPL-3.0-with-GCC-exception"
-
-LICENSE_libgomp = "GPLv3"
-LICENSE_libgomp-dev = "GPLv3"
-LICENSE_libgomp-staticdev = "GPLv3"
 
 # The base package doesn't exist, so we clear the recommends.
 RRECOMMENDS_${PN}-dbg = ""
@@ -143,11 +133,11 @@ FILES_libstdc++ = "${libdir}/libstdc++.so.*"
 FILES_libstdc++-dev = "\
     ${includedir}/c++/ \
     ${libdir}/libstdc++.so \
-    ${libdir}/libstdc++.la \
+    ${libdir}/libstdc++*.la \
     ${libdir}/libsupc++.la \
 "
 FILES_libstdc++-staticdev = "\
-    ${libdir}/libstdc++.a \
+    ${libdir}/libstdc++*.a \
     ${libdir}/libsupc++.a \
 "
 
@@ -192,6 +182,14 @@ FILES_libatomic-dev = "\
     ${libdir}/libatomic.la \
 "
 FILES_libatomic-staticdev = "${libdir}/libatomic.a"
+
+FILES_libitm = "${libdir}/libitm.so.*"
+FILES_libitm-dev = "\
+    ${libdir}/libitm.so \
+    ${libdir}/libitm.la \
+    ${libdir}/libitm.spec \
+"
+FILES_libitm-staticdev = "${libdir}/libitm.a"
 
 do_package_write_ipk[depends] += "virtual/${MLPREFIX}libc:do_packagedata"
 do_package_write_deb[depends] += "virtual/${MLPREFIX}libc:do_packagedata"

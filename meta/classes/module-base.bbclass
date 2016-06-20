@@ -1,7 +1,7 @@
 inherit kernel-arch
 
 # This is instead of DEPENDS = "virtual/kernel"
-do_configure[depends] += "virtual/kernel:do_shared_workdir"
+do_configure[depends] += "virtual/kernel:do_compile_kernelmodules"
 
 export OS = "${TARGET_OS}"
 export CROSS_COMPILE = "${TARGET_PREFIX}"
@@ -19,7 +19,7 @@ KERNEL_OBJECT_SUFFIX = ".ko"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 # Function to ensure the kernel scripts are created. Expected to
-# be called before do_compile. See module.bbclass for an exmaple.
+# be called before do_compile. See module.bbclass for an example.
 do_make_scripts() {
 	unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS 
 	make CC="${KERNEL_CC}" LD="${KERNEL_LD}" AR="${KERNEL_AR}" \

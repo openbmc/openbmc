@@ -1,4 +1,4 @@
-DESCRIPTION = "SWIG - Simplified Wrapper and Interface Generator"
+SUMMARY = "SWIG - Simplified Wrapper and Interface Generator"
 HOMEPAGE = "http://swig.sourceforge.net/"
 LICENSE = "BSD & GPLv3"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e7807a6282784a7dde4c846626b08fc6 \

@@ -1,0 +1,33 @@
+From 1f5baf3ad95ae4c39efe4d8ad8b2e642b3a351da Mon Sep 17 00:00:00 2001
+From: "Maxin B. John" <maxin.john@intel.com>
+Date: Tue, 9 Feb 2016 11:44:01 +0200
+Subject: [PATCH] Fix the path of corosync and dlm header files check
+
+Original Makefile will check headers on host instead of sysroot.
+Fix it.
+
+Upstream-Status: Inappropriate [Yocto specific]
+
+Signed-off-by: Maxin B. John <maxin.john@intel.com>
+---
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index fd79cfb..34150a9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -80,8 +80,8 @@ MDMON_DIR = $(RUN_DIR)
+ FAILED_SLOTS_DIR = $(RUN_DIR)/failed-slots
+ SYSTEMD_DIR=/lib/systemd/system
+ 
+-COROSYNC:=$(shell [ -d /usr/include/corosync ] || echo -DNO_COROSYNC)
+-DLM:=$(shell [ -f /usr/include/libdlm.h ] || echo -DNO_DLM)
++COROSYNC:=$(shell [ -d $(SYSROOT)/usr/include/corosync ] || echo -DNO_COROSYNC)
++DLM:=$(shell [ -f $(SYSROOT)/usr/include/libdlm.h ] || echo -DNO_DLM)
+ 
+ DIRFLAGS = -DMAP_DIR=\"$(MAP_DIR)\" -DMAP_FILE=\"$(MAP_FILE)\"
+ DIRFLAGS += -DMDMON_DIR=\"$(MDMON_DIR)\"
+-- 
+2.4.0
+

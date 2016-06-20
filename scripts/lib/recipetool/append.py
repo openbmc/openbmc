@@ -343,6 +343,8 @@ def appendsrc(args, files, rd, extralines=None):
     simplified = {}
     src_uri = rd.getVar('SRC_URI', True).split()
     for uri in src_uri:
+        if uri.endswith(';'):
+            uri = uri[:-1]
         simple_uri = bb.fetch.URI(uri)
         simple_uri.params = {}
         simplified[str(simple_uri)] = uri
@@ -433,7 +435,7 @@ def target_path(targetpath):
     return targetpath
 
 
-def register_command(subparsers):
+def register_commands(subparsers):
     common = argparse.ArgumentParser(add_help=False)
     common.add_argument('-m', '--machine', help='Make bbappend changes specific to a machine only', metavar='MACHINE')
     common.add_argument('-w', '--wildcard-version', help='Use wildcard to make the bbappend apply to any recipe version', action='store_true')

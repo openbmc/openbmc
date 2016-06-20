@@ -25,13 +25,13 @@ SRC_URI_append_class-target = " \
            "
 
 SRC_URI_append_class-native = " \
-           file://disable-syslog.patch \
+           file://0001-Disable-use-of-syslog-for-sysroot.patch \
            file://allow-for-setting-password-in-clear-text.patch \
            file://commonio.c-fix-unexpected-open-failure-in-chroot-env.patch \
            file://0001-useradd.c-create-parent-directories-when-necessary.patch \
            "
 SRC_URI_append_class-nativesdk = " \
-           file://disable-syslog.patch \
+           file://0001-Disable-use-of-syslog-for-sysroot.patch \
            "
 
 SRC_URI[md5sum] = "2bfafe7d4962682d31b5eba65dba4fc8"

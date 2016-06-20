@@ -43,11 +43,14 @@ python __anonymous () {
 
 inherit kernel-arch
 
-KORG_ARCHIVE_COMPRESSION ?= "bz2"
+KORG_ARCHIVE_COMPRESSION ?= "xz"
 
 SRC_URI = "${KERNELORG_MIRROR}/linux/kernel/v${HEADER_FETCH_VER}/linux-${PV}.tar.${KORG_ARCHIVE_COMPRESSION}"
 
 S = "${WORKDIR}/linux-${PV}"
+
+# For the kernel, we don't want the '-e MAKEFLAGS=' in EXTRA_OEMAKE.
+EXTRA_OEMAKE = ""
 
 do_configure() {
 	oe_runmake allnoconfig

@@ -1,0 +1,168 @@
+From fdaab18a65ed2529656baa64cb6169f34d7e507b Mon Sep 17 00:00:00 2001
+From: James Cowgill <james410@cowgill.org.uk>
+Date: Mon, 5 Jan 2015 15:17:01 +0000
+Subject: [PATCH 2/3] Add support for mips64 abis in mips_retval.c
+
+Signed-off-by: James Cowgill <james410@cowgill.org.uk>
+---
+ backends/mips_retval.c | 104 ++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 94 insertions(+), 10 deletions(-)
+
+diff --git a/backends/mips_retval.c b/backends/mips_retval.c
+index 33f12a7..d5c6ef0 100644
+--- a/backends/mips_retval.c
++++ b/backends/mips_retval.c
+@@ -91,6 +91,8 @@ enum mips_abi find_mips_abi(Elf *elf)
+     default:
+       if ((elf_flags & EF_MIPS_ABI2))
+ 	return MIPS_ABI_N32;
++      else if ((ehdr->e_ident[EI_CLASS] == ELFCLASS64))
++	return MIPS_ABI_N64;
+     }
+ 
+   /* GCC creates a pseudo-section whose name describes the ABI.  */
+@@ -195,6 +197,57 @@ static const Dwarf_Op loc_aggregate[] =
+   };
+ #define nloc_aggregate 1
+ 
++/* Test if a struct member is a float */
++static int is_float_child(Dwarf_Die *childdie)
++{
++  /* Test if this is actually a struct member */
++  if (dwarf_tag(childdie) != DW_TAG_member)
++    return 0;
++
++  /* Get type of member */
++  Dwarf_Attribute attr_mem;
++  Dwarf_Die child_type_mem;
++  Dwarf_Die *child_typedie =
++    dwarf_formref_die(dwarf_attr_integrate(childdie,
++                                           DW_AT_type,
++                                           &attr_mem), &child_type_mem);
++
++  if (dwarf_tag(child_typedie) != DW_TAG_base_type)
++    return 0;
++
++  /* Get base subtype */
++  Dwarf_Word encoding;
++  if (dwarf_formudata (dwarf_attr_integrate (child_typedie,
++                                             DW_AT_encoding,
++                                             &attr_mem), &encoding) != 0)
++    return 0;
++
++  return encoding == DW_ATE_float;
++}
++
++/* Returns the number of fpregs which can be returned in the given struct */
++static int get_struct_fpregs(Dwarf_Die *structtypedie)
++{
++  Dwarf_Die child_mem;
++  int fpregs = 0;
++
++  /* Get first structure member */
++  if (dwarf_child(structtypedie, &child_mem) != 0)
++    return 0;
++
++  do
++    {
++      /* Ensure this register is a float */
++      if (!is_float_child(&child_mem))
++        return 0;
++
++      fpregs++;
++    }
++  while (dwarf_siblingof (&child_mem, &child_mem) == 0);
++
++  return fpregs;
++}
++
+ int
+ mips_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+ {
+@@ -240,6 +293,7 @@ mips_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+       tag = dwarf_tag (typedie);
+     }
+ 
++  Dwarf_Word size;
+   switch (tag)
+     {
+     case -1:
+@@ -258,8 +312,6 @@ mips_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+     case DW_TAG_enumeration_type:
+     case DW_TAG_pointer_type:
+     case DW_TAG_ptr_to_member_type:
+-      {
+-        Dwarf_Word size;
+ 	if (dwarf_formudata (dwarf_attr_integrate (typedie, DW_AT_byte_size,
+ 					 &attr_mem), &size) != 0)
+ 	  {
+@@ -289,7 +341,7 @@ mips_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+ 		if (size <= 4*regsize && abi == MIPS_ABI_O32)
+                   return nloc_fpregquad;
+ 
+-		goto aggregate;
++		goto large;
+ 	      }
+ 	  }
+ 	*locp = ABI_LOC(loc_intreg, regsize);
+@@ -298,18 +350,50 @@ mips_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+ 	if (size <= 2*regsize)
+ 	  return nloc_intregpair;
+ 
+-	/* Else fall through. Shouldn't happen though (at least with gcc) */
+-      }
++	/* Else pass in memory. Shouldn't happen though (at least with gcc) */
++	goto large;
+ 
+     case DW_TAG_structure_type:
+     case DW_TAG_class_type:
+     case DW_TAG_union_type:
+-    case DW_TAG_array_type:
+-    aggregate:
+-      /* XXX TODO: Can't handle structure return with other ABI's yet :-/ */
+-      if ((abi != MIPS_ABI_O32) && (abi != MIPS_ABI_O64))
+-        return -2;
++      /* Handle special cases for structures <= 128 bytes in newer ABIs */
++      if (abi == MIPS_ABI_EABI32 || abi == MIPS_ABI_EABI64 ||
++          abi == MIPS_ABI_N32 || abi == MIPS_ABI_N64)
++        {
++          if (dwarf_aggregate_size (typedie, &size) == 0 && size <= 16)
++            {
++              /*
++               * Special case in N64 / N32 -
++               * structures containing only floats are returned in fp regs.
++               * Everything else is returned in integer regs.
++               */
++              if (tag != DW_TAG_union_type &&
++                  (abi == MIPS_ABI_N32 || abi == MIPS_ABI_N64))
++                {
++                  int num_fpregs = get_struct_fpregs(typedie);
++                  if (num_fpregs == 1 || num_fpregs == 2)
++                    {
++                      *locp = loc_fpreg;
++                      if (num_fpregs == 1)
++                        return nloc_fpreg;
++                      else
++                        return nloc_fpregpair;
++                    }
++                }
++
++              *locp = loc_intreg;
++              if (size <= 8)
++                return nloc_intreg;
++              else
++                return nloc_intregpair;
++            }
++        }
++
++      /* Fallthrough to handle large types */
+ 
++    case DW_TAG_array_type:
++    large:
++      /* Return large structures in memory */
+       *locp = loc_aggregate;
+       return nloc_aggregate;
+     }
+-- 
+2.1.4
+

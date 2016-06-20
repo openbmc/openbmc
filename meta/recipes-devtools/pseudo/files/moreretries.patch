@@ -1,0 +1,19 @@
+Increase the number of retries in pseudo due to occasional slow
+server shutdowns.
+
+Upstream-Status: Pending
+RP 2016/2/28
+
+Index: pseudo-1.7.5/pseudo_client.c
+===================================================================
+--- pseudo-1.7.5.orig/pseudo_client.c
++++ pseudo-1.7.5/pseudo_client.c
+@@ -1214,7 +1214,7 @@ pseudo_client_setup(void) {
+ 	return 1;
+ }
+ 
+-#define PSEUDO_RETRIES 50
++#define PSEUDO_RETRIES 250
+ static pseudo_msg_t *
+ pseudo_client_request(pseudo_msg_t *msg, size_t len, const char *path) {
+ 	pseudo_msg_t *response = 0;

@@ -8,7 +8,7 @@
 #
 # 'what' can be one of
 # * target: Returns the target name ("<arch>-<os>")
-# * endianess: Return "be" for big endian targets, "le" for little endian
+# * endianness: Return "be" for big endian targets, "le" for little endian
 # * bits: Returns the bit size of the target, either "32" or "64"
 # * libc: Returns the name of the c library used by the target
 #
@@ -42,6 +42,7 @@ def siteinfo_data(d):
         "powerpc64": "endian-big bit-64 powerpc-common",
         "ppc": "endian-big bit-32 powerpc-common",
         "ppc64": "endian-big bit-64 powerpc-common",
+        "ppc64le" : "endian-little bit-64 powerpc-common",
         "sh3": "endian-little bit-32 sh-common",
         "sh4": "endian-little bit-32 sh-common",
         "sparc": "endian-big bit-32",
@@ -70,6 +71,8 @@ def siteinfo_data(d):
     targetinfo = {
         "aarch64-linux-gnu": "aarch64-linux",
         "aarch64_be-linux-gnu": "aarch64_be-linux",
+        "aarch64-linux-musl": "aarch64-linux",
+        "aarch64_be-linux-musl": "aarch64_be-linux",
         "arm-linux-gnueabi": "arm-linux",
         "arm-linux-musleabi": "arm-linux",
         "arm-linux-uclibceabi": "arm-linux-uclibc",
@@ -78,8 +81,8 @@ def siteinfo_data(d):
         "armeb-linux-musleabi": "armeb-linux",
         "mips-linux-musl": "mips-linux",
         "mipsel-linux-musl": "mipsel-linux",
-        "mips64-linux-musl": "mips-linux",
-        "mips64el-linux-musl": "mipsel-linux",
+        "mips64-linux-musl": "mips64-linux",
+        "mips64el-linux-musl": "mips64el-linux",
         "mips64-linux-gnun32": "mips-linux bit-32",
         "mips64el-linux-gnun32": "mipsel-linux bit-32",
         "powerpc-linux": "powerpc32-linux",
@@ -91,6 +94,7 @@ def siteinfo_data(d):
         "powerpc64-linux-gnuspe": "powerpc-linux powerpc64-linux",
         "powerpc64-linux-muslspe": "powerpc-linux powerpc64-linux",
         "powerpc64-linux": "powerpc-linux",
+        "powerpc64-linux-musl": "powerpc-linux",
         "x86_64-cygwin": "bit-64",
         "x86_64-darwin": "bit-64",
         "x86_64-darwin9": "bit-64",

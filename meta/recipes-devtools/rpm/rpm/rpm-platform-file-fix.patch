@@ -2,7 +2,7 @@ Don't add the first line of /etc/rpm/platform to the list of patterns
 to match when computing an arch score, use it just for getting
 information about the platform (cpu/vendor/os). Fixes #3864.
 
-Upstream-Status: Inappropriate [embedded specific]
+Upstream-Status: Submitted [RPM5 maintainer]
 
 Index: rpm-5.4.14/lib/rpmrc.c
 ===================================================================

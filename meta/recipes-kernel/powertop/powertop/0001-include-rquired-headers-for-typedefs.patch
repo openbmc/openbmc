@@ -1,0 +1,47 @@
+From 0856d8145d187a7e5a49625247abe43a13f95acc Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 15 Sep 2015 19:36:28 +0000
+Subject: [PATCH] include rquired headers for typedefs
+
+timeval struct needs to include sys/time.h and sprintf() usage requires
+to include stdio.h headers from system
+
+Fixes
+src/perf/perf_bundle.cpp:141:2: error: use of undeclared identifier 'sprintf'; did you mean 'vswprintf'?
+src/devices/devfreq.h:35:18: error: field has incomplete type 'struct timeval'
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ src/devices/devfreq.h    | 1 +
+ src/perf/perf_bundle.cpp | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/src/devices/devfreq.h b/src/devices/devfreq.h
+index 16a60fb..4bede7c 100644
+--- a/src/devices/devfreq.h
++++ b/src/devices/devfreq.h
+@@ -25,6 +25,7 @@
+ #ifndef _INCLUDE_GUARD_DEVFREQ_H
+ #define _INCLUDE_GUARD_DEVFREQ_H
+ 
++#include <sys/time.h>
+ #include "device.h"
+ #include "../parameters/parameters.h"
+ 
+diff --git a/src/perf/perf_bundle.cpp b/src/perf/perf_bundle.cpp
+index cf1ae11..232f894 100644
+--- a/src/perf/perf_bundle.cpp
++++ b/src/perf/perf_bundle.cpp
+@@ -27,6 +27,7 @@
+ #include <algorithm>
+ #include <string.h>
+ #include <stdint.h>
++#include <stdio.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <fcntl.h>
+-- 
+2.5.2
+

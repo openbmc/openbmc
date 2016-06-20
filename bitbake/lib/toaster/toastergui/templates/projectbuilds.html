@@ -63,11 +63,12 @@
         {% for build in objects %} {# if we have a build, just display it #}
         <tr class="data">
             <td class="outcome"><a href="{% url "builddashboard" build.id %}">{%if build.outcome == build.SUCCEEDED%}<i class="icon-ok-sign success"></i>{%elif build.outcome == build.FAILED%}<i class="icon-minus-sign error"></i>{%else%}{%endif%}</a>
-                   {% if build.project %}
-                        &nbsp; <a href="{% url 'build_artifact' build.id "cookerlog" build.id %}">
-                            <i class="icon-download-alt" title="" data-original-title="Download build log"></i>
-                        </a>
-                    {% endif %}
+              {% if build.cooker_log_path %}
+                &nbsp;
+                <a href="{% url 'build_artifact' build.id "cookerlog" build.id %}">
+                  <i class="icon-download-alt" title="Download build log"></i>
+                </a>
+              {% endif %}
             </td>
 
             <td class="target">

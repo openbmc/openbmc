@@ -1,0 +1,18 @@
+inb/outb family for arm is only implemented on glibc
+so assumption across linux is wrong
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+Index: xorg-server-1.18.0/hw/xfree86/common/compiler.h
+===================================================================
+--- xorg-server-1.18.0.orig/hw/xfree86/common/compiler.h
++++ xorg-server-1.18.0/hw/xfree86/common/compiler.h
+@@ -758,7 +758,7 @@ inl(unsigned short port)
+     return xf86ReadMmio32Le((void *) ioBase, port);
+ }
+ 
+-#elif defined(__arm__) && defined(__linux__)
++#elif defined(__arm__) && defined(__GLIBC__)
+ 
+ /* for Linux on ARM, we use the LIBC inx/outx routines */
+ /* note that the appropriate setup via "ioperm" needs to be done */

@@ -1,0 +1,100 @@
+Adjust headers for non-glibc cases
+especially exposed by musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+
+Index: net-tools-1.60/lib/inet6_gr.c
+===================================================================
+--- net-tools-1.60.orig/lib/inet6_gr.c
++++ net-tools-1.60/lib/inet6_gr.c
+@@ -23,7 +23,7 @@
+ #include <string.h>
+ #include <stdio.h>
+ #include <unistd.h>
+-#ifndef __GLIBC__
++#ifdef HAVE_IPV6_ROUTE_H
+ #include <netinet6/ipv6_route.h>	/* glibc doesn't have this */
+ #endif
+ #include "version.h"
+Index: net-tools-1.60/lib/inet6_sr.c
+===================================================================
+--- net-tools-1.60.orig/lib/inet6_sr.c
++++ net-tools-1.60/lib/inet6_sr.c
+@@ -23,10 +23,10 @@
+ #include <string.h>
+ #include <stdio.h>
+ #include <unistd.h>
+-#ifdef __GLIBC__
+-#include <net/route.h>
+-#else
++#ifdef HAVE_IPV6_ROUTE_H
+ #include <netinet6/ipv6_route.h>	/* glibc does not have this */
++#else
++#include <net/route.h>
+ #endif
+ #include "version.h"
+ #include "net-support.h"
+Index: net-tools-1.60/lib/inet_sr.c
+===================================================================
+--- net-tools-1.60.orig/lib/inet_sr.c
++++ net-tools-1.60/lib/inet_sr.c
+@@ -26,6 +26,7 @@
+ #include <string.h>
+ #include <stdio.h>
+ #include <unistd.h>
++#include <asm-generic/param.h>
+ #include "version.h"
+ #include "net-support.h"
+ #include "pathnames.h"
+Index: net-tools-1.60/lib/util-ank.c
+===================================================================
+--- net-tools-1.60.orig/lib/util-ank.c
++++ net-tools-1.60/lib/util-ank.c
+@@ -14,6 +14,7 @@
+  * Rani Assaf <rani@magic.metawire.com> 980929:	resolve addresses
+  */
+ 
++#include <limits.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <unistd.h>
+Index: net-tools-1.60/mii-tool.c
+===================================================================
+--- net-tools-1.60.orig/mii-tool.c
++++ net-tools-1.60/mii-tool.c
+@@ -47,10 +47,6 @@ static char Version[] = "$Id: mii-tool.c
+ #include <net/if.h>
+ #include <linux/sockios.h>
+ 
+-#ifndef __GLIBC__
+-#include <linux/if_arp.h>
+-#include <linux/if_ether.h>
+-#endif
+ #include "mii.h"
+ #include "version.h"
+ 
+Index: net-tools-1.60/netstat.c
+===================================================================
+--- net-tools-1.60.orig/netstat.c
++++ net-tools-1.60/netstat.c
+@@ -87,6 +87,7 @@
+ #include <dirent.h>
+ #include <sys/stat.h>
+ #include <sys/types.h>
++#include <asm-generic/param.h>
+ 
+ #include "net-support.h"
+ #include "pathnames.h"
+Index: net-tools-1.60/slattach.c
+===================================================================
+--- net-tools-1.60.orig/slattach.c
++++ net-tools-1.60/slattach.c
+@@ -44,6 +44,7 @@
+ #include <string.h>
+ #include <unistd.h>
+ #include <getopt.h>
++#include <termios.h>
+ #include <linux/if_slip.h>
+ 
+ #if defined(__GLIBC__)

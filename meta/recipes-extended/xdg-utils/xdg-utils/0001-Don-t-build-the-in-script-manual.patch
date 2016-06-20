@@ -1,0 +1,30 @@
+From 33f42aa8d190b40be18cd0541b5881d46978b572 Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Thu, 17 Dec 2015 11:50:05 +0200
+Subject: [PATCH] Don't build the in-script manual
+
+Building the contents for "--manual" option requires a web browser
+or java (these are the two options for "xmlto txt" support).
+That's bonkers so don't do it: the man pages are still available
+and contain the same info.
+
+Upstream-Status: Inappropriate [disables in-script docs]
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ scripts/Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/Makefile.in b/scripts/Makefile.in
+index 430032d..85359bc 100644
+--- a/scripts/Makefile.in
++++ b/scripts/Makefile.in
+@@ -112,5 +112,5 @@ html/%.html: desc/%.xml
+ 	(cd html;$(XMLTO) html-nochunks ../$<)
+ 
+ %.txt: desc/%.xml
+-	$(XMLTO) txt $<
++	echo "Please see the man pages." > $@
+ 
+-- 
+2.1.4
+

@@ -42,9 +42,9 @@
                 <literallayout class='monospaced'>
      $ grep processor /proc/cpuinfo
                 </literallayout>
-                This command returns the number of processors, which takes into 
-                account hyper-threading. 
-                Thus, a quad-core build host with hyper-threading most likely 
+                This command returns the number of processors, which takes into
+                account hyper-threading.
+                Thus, a quad-core build host with hyper-threading most likely
                 shows eight processors, which is the value you would then assign to
                 <filename>BB_NUMBER_THREADS</filename>.
             </para>
@@ -116,16 +116,35 @@
             Prior to parsing configuration files, Bitbake looks
             at certain variables, including:
             <itemizedlist>
-                <listitem><para><link linkend='var-BB_ENV_WHITELIST'><filename>BB_ENV_WHITELIST</filename></link></para></listitem>
-                <listitem><para><link linkend='var-BB_PRESERVE_ENV'><filename>BB_PRESERVE_ENV</filename></link></para></listitem>
-                <listitem><para><link linkend='var-BB_ENV_EXTRAWHITE'><filename>BB_ENV_EXTRAWHITE</filename></link></para></listitem>
+                <listitem><para>
+                    <link linkend='var-BB_ENV_WHITELIST'><filename>BB_ENV_WHITELIST</filename></link>
+                    </para></listitem>
+                <listitem><para>
+                    <link linkend='var-BB_ENV_EXTRAWHITE'><filename>BB_ENV_EXTRAWHITE</filename></link>
+                    </para></listitem>
+                <listitem><para>
+                    <link linkend='var-BB_PRESERVE_ENV'><filename>BB_PRESERVE_ENV</filename></link>
+                    </para></listitem>
+                <listitem><para>
+                    <link linkend='var-BB_ORIGENV'><filename>BB_ORIGENV</filename></link>
+                    </para></listitem>
                 <listitem><para>
                     <link linkend='var-BITBAKE_UI'><filename>BITBAKE_UI</filename></link>
                     </para></listitem>
             </itemizedlist>
-            You can find information on how to pass environment variables into the BitBake
-            execution environment in the
-            "<link linkend='passing-information-into-the-build-task-environment'>Passing Information Into the Build Task Environment</link>" section.
+            The first four variables in this list relate to how BitBake treats shell
+            environment variables during task execution.
+            By default, BitBake cleans the environment variables and provides tight
+            control over the shell execution environment.
+            However, through the use of these first four variables, you can
+            apply your control regarding the
+            environment variables allowed to be used by BitBake in the shell
+            during execution of tasks.
+            See the
+            "<link linkend='passing-information-into-the-build-task-environment'>Passing Information Into the Build Task Environment</link>"
+            section and the information about these variables in the
+            variable glossary for more information on how they work and
+            on how to use them.
         </para>
 
         <para>

@@ -219,6 +219,9 @@ class BitBakeConfigParameters(cookerdata.ConfigParameters):
         parser.add_option("", "--no-setscene", help = "Do not run any setscene tasks. sstate will be ignored and everything needed, built.",
                    action = "store_true", dest = "nosetscene", default = False)
 
+        parser.add_option("", "--setscene-only", help = "Only run setscene tasks, don't run any real tasks.",
+                   action = "store_true", dest = "setsceneonly", default = False)
+
         parser.add_option("", "--remote-server", help = "Connect to the specified server.",
                    action = "store", dest = "remote_server", default = False)
 
@@ -244,7 +247,7 @@ class BitBakeConfigParameters(cookerdata.ConfigParameters):
         if "BBTOKEN" in os.environ:
             options.xmlrpctoken = os.environ["BBTOKEN"]
 
-        if "BBEVENTLOG" is os.environ:
+        if "BBEVENTLOG" in os.environ:
             options.writeeventlog = os.environ["BBEVENTLOG"]
 
         # fill in proper log name if not supplied
@@ -279,12 +282,13 @@ class BitBakeConfigParameters(cookerdata.ConfigParameters):
 
 def start_server(servermodule, configParams, configuration, features):
     server = servermodule.BitBakeServer()
+    single_use = not configParams.server_only
     if configParams.bind:
         (host, port) = configParams.bind.split(':')
-        server.initServer((host, int(port)))
+        server.initServer((host, int(port)), single_use)
         configuration.interface = [ server.serverImpl.host, server.serverImpl.port ]
     else:
-        server.initServer()
+        server.initServer(single_use=single_use)
         configuration.interface = []
 
     try:
@@ -406,6 +410,13 @@ def bitbake_main(configParams, configuration):
         except Exception as e:
             bb.fatal("Could not connect to server %s: %s" % (configParams.remote_server, str(e)))
 
+        if configParams.kill_server:
+            server_connection.connection.terminateServer()
+            bb.event.ui_queue = []
+            return 0
+
+        server_connection.setupEventQueue()
+
         # Restore the environment in case the UI needs it
         for k in cleanedvars:
             os.environ[k] = cleanedvars[k]
@@ -415,11 +426,6 @@ def bitbake_main(configParams, configuration):
 
         if configParams.status_only:
             server_connection.terminate()
-            return 0
-
-        if configParams.kill_server:
-            server_connection.connection.terminateServer()
-            bb.event.ui_queue = []
             return 0
 
         try:

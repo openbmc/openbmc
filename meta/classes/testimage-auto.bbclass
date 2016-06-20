@@ -18,6 +18,6 @@ inherit testimage
 python do_testimage_auto() {
     testimage_main(d)
 }
-addtask testimage_auto before do_build after do_rootfs
+addtask testimage_auto before do_build after do_image_complete
 do_testimage_auto[depends] += "${TESTIMAGEDEPENDS}"
 do_testimage_auto[lockfiles] += "${TESTIMAGELOCK}"

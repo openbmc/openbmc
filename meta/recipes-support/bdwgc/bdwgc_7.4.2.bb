@@ -21,16 +21,16 @@ SECTION = "devel"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://README.QUICK;md5=55f5088f90a982fed7af9a4897047ef7"
 
-SRC_URI = "http://www.hboehm.info/gc/gc_source/gc-${PV}.tar.gz \
+SRCREV = "e31cdc288ffbee5bf25f948e19deb5a7ce846971"
+SRC_URI = "git://github.com/ivmai/bdwgc.git;branch=release-7_4 \
            file://0001-fix-build-with-musl.patch \
+           file://0001-configure.ac-add-check-for-NO_GETCONTEXT-definition.patch \
+           file://0002-Altera-NIOS2-support.patch \
           "
 
-SRC_URI[md5sum] = "12c05fd2811d989341d8c6d81f66af87"
-SRC_URI[sha256sum] = "63320ad7c45460e4a40e03f5aa4c6893783f21a16416c3282b994f933312afa2"
-FILES_${PN}-doc = "/usr/share"
+FILES_${PN}-doc = "${datadir}"
 
-REAL_PV = "${@[d.getVar('PV',1)[:-1], d.getVar('PV',1)][(d.getVar('PV',1)[-1]).isdigit()]}"
-S = "${WORKDIR}/gc-${REAL_PV}"
+S = "${WORKDIR}/git"
 
 ARM_INSTRUCTION_SET = "arm"
 

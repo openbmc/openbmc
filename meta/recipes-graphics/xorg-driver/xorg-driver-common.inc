@@ -12,7 +12,6 @@ DEPENDS = "virtual/xserver xproto randrproto util-macros"
 SRC_URI = "${XORG_MIRROR}/individual/driver/${BPN}-${PV}.tar.bz2"
 
 FILES_${PN} += " ${libdir}/xorg/modules/drivers/*.so"
-FILES_${PN}-dbg += " ${libdir}/xorg/modules/drivers/.debug"
 
 inherit autotools pkgconfig distro_features_check
 # depends on virtual/xserver

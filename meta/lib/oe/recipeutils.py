@@ -19,9 +19,9 @@ from collections import OrderedDict, defaultdict
 
 
 # Help us to find places to insert values
-recipe_progression = ['SUMMARY', 'DESCRIPTION', 'HOMEPAGE', 'BUGTRACKER', 'SECTION', 'LICENSE', 'LIC_FILES_CHKSUM', 'PROVIDES', 'DEPENDS', 'PR', 'PV', 'SRCREV', 'SRC_URI', 'S', 'do_fetch', 'do_unpack', 'do_patch', 'EXTRA_OECONF', 'do_configure', 'EXTRA_OEMAKE', 'do_compile', 'do_install', 'do_populate_sysroot', 'INITSCRIPT', 'USERADD', 'GROUPADD', 'PACKAGES', 'FILES', 'RDEPENDS', 'RRECOMMENDS', 'RSUGGESTS', 'RPROVIDES', 'RREPLACES', 'RCONFLICTS', 'ALLOW_EMPTY', 'do_package', 'do_deploy']
+recipe_progression = ['SUMMARY', 'DESCRIPTION', 'HOMEPAGE', 'BUGTRACKER', 'SECTION', 'LICENSE', 'LIC_FILES_CHKSUM', 'PROVIDES', 'DEPENDS', 'PR', 'PV', 'SRCREV', 'SRC_URI', 'S', 'do_fetch()', 'do_unpack()', 'do_patch()', 'EXTRA_OECONF', 'do_configure()', 'EXTRA_OEMAKE', 'do_compile()', 'do_install()', 'do_populate_sysroot()', 'INITSCRIPT', 'USERADD', 'GROUPADD', 'PACKAGES', 'FILES', 'RDEPENDS', 'RRECOMMENDS', 'RSUGGESTS', 'RPROVIDES', 'RREPLACES', 'RCONFLICTS', 'ALLOW_EMPTY', 'do_package()', 'do_deploy()']
 # Variables that sometimes are a bit long but shouldn't be wrapped
-nowrap_vars = ['SUMMARY', 'HOMEPAGE', 'BUGTRACKER']
+nowrap_vars = ['SUMMARY', 'HOMEPAGE', 'BUGTRACKER', 'SRC_URI[md5sum]', 'SRC_URI[sha256sum]']
 list_vars = ['SRC_URI', 'LIC_FILES_CHKSUM']
 meta_vars = ['SUMMARY', 'DESCRIPTION', 'HOMEPAGE', 'BUGTRACKER', 'SECTION']
 
@@ -164,84 +164,111 @@ def patch_recipe_file(fn, values, patch=False, relpath=''):
        Note that some manual inspection/intervention may be required
        since this cannot handle all situations.
     """
+
+    import bb.utils
+
+    recipe_progression_res = []
+    recipe_progression_restrs = []
+    for item in recipe_progression:
+        if item.endswith('()'):
+            key = item[:-2]
+        else:
+            key = item
+        restr = '%s(_[a-zA-Z0-9-_$(){}]+|\[[^\]]*\])?' % key
+        if item.endswith('()'):
+            recipe_progression_restrs.append(restr + '()')
+        else:
+            recipe_progression_restrs.append(restr)
+        recipe_progression_res.append(re.compile('^%s$' % restr))
+
+    def get_recipe_pos(variable):
+        for i, p in enumerate(recipe_progression_res):
+            if p.match(variable):
+                return i
+        return -1
+
     remainingnames = {}
     for k in values.keys():
-        remainingnames[k] = recipe_progression.index(k) if k in recipe_progression else -1
+        remainingnames[k] = get_recipe_pos(k)
     remainingnames = OrderedDict(sorted(remainingnames.iteritems(), key=lambda x: x[1]))
 
-    with tempfile.NamedTemporaryFile('w', delete=False) as tf:
-        def outputvalue(name):
-            rawtext = '%s = "%s"\n' % (name, values[name])
-            if name in nowrap_vars:
-                tf.write(rawtext)
-            elif name in list_vars:
-                splitvalue = split_var_value(values[name], assignment=False)
-                if len(splitvalue) > 1:
-                    linesplit = ' \\\n' + (' ' * (len(name) + 4))
-                    tf.write('%s = "%s%s"\n' % (name, linesplit.join(splitvalue), linesplit))
-                else:
-                    tf.write(rawtext)
+    modifying = False
+
+    def outputvalue(name, lines, rewindcomments=False):
+        if values[name] is None:
+            return
+        rawtext = '%s = "%s"\n' % (name, values[name])
+        addlines = []
+        if name in nowrap_vars:
+            addlines.append(rawtext)
+        elif name in list_vars:
+            splitvalue = split_var_value(values[name], assignment=False)
+            if len(splitvalue) > 1:
+                linesplit = ' \\\n' + (' ' * (len(name) + 4))
+                addlines.append('%s = "%s%s"\n' % (name, linesplit.join(splitvalue), linesplit))
             else:
-                wrapped = textwrap.wrap(rawtext)
-                for wrapline in wrapped[:-1]:
-                    tf.write('%s \\\n' % wrapline)
-                tf.write('%s\n' % wrapped[-1])
+                addlines.append(rawtext)
+        else:
+            wrapped = textwrap.wrap(rawtext)
+            for wrapline in wrapped[:-1]:
+                addlines.append('%s \\\n' % wrapline)
+            addlines.append('%s\n' % wrapped[-1])
+        if rewindcomments:
+            # Ensure we insert the lines before any leading comments
+            # (that we'd want to ensure remain leading the next value)
+            for i, ln in reversed(list(enumerate(lines))):
+                if ln[0] != '#':
+                    lines[i+1:i+1] = addlines
+                    break
+            else:
+                lines.extend(addlines)
+        else:
+            lines.extend(addlines)
 
-        tfn = tf.name
-        with open(fn, 'r') as f:
-            # First runthrough - find existing names (so we know not to insert based on recipe_progression)
-            # Second runthrough - make the changes
-            existingnames = []
-            for runthrough in [1, 2]:
-                currname = None
-                for line in f:
-                    if not currname:
-                        insert = False
-                        for k in remainingnames.keys():
-                            for p in recipe_progression:
-                                if re.match('^%s(_prepend|_append)*[ ?:=(]' % p, line):
-                                    if remainingnames[k] > -1 and recipe_progression.index(p) > remainingnames[k] and runthrough > 1 and not k in existingnames:
-                                        outputvalue(k)
-                                        del remainingnames[k]
-                                    break
-                        for k in remainingnames.keys():
-                            if re.match('^%s[ ?:=]' % k, line):
-                                currname = k
-                                if runthrough == 1:
-                                    existingnames.append(k)
-                                else:
-                                    del remainingnames[k]
-                                break
-                        if currname and runthrough > 1:
-                            outputvalue(currname)
+    existingnames = []
+    def patch_recipe_varfunc(varname, origvalue, op, newlines):
+        if modifying:
+            # Insert anything that should come before this variable
+            pos = get_recipe_pos(varname)
+            for k in remainingnames.keys()[:]:
+                if remainingnames[k] > -1 and pos >= remainingnames[k] and not k in existingnames:
+                    outputvalue(k, newlines, rewindcomments=True)
+                    del remainingnames[k]
+            # Now change this variable, if it needs to be changed
+            if varname in existingnames and op in ['+=', '=', '=+']:
+                if varname in remainingnames:
+                    outputvalue(varname, newlines)
+                    del remainingnames[varname]
+                return None, None, 0, True
+        else:
+            if varname in values:
+                existingnames.append(varname)
+        return origvalue, None, 0, True
 
-                    if currname:
-                        sline = line.rstrip()
-                        if not sline.endswith('\\'):
-                            currname = None
-                        continue
-                    if runthrough > 1:
-                        tf.write(line)
-                f.seek(0)
-        if remainingnames:
-            tf.write('\n')
-            for k in remainingnames.keys():
-                outputvalue(k)
+    # First run - establish which values we want to set are already in the file
+    varlist = [re.escape(item) for item in values.keys()]
+    with open(fn, 'r') as f:
+        changed, fromlines = bb.utils.edit_metadata(f, varlist, patch_recipe_varfunc)
+    # Second run - actually set everything
+    modifying = True
+    varlist.extend(recipe_progression_restrs)
+    changed, tolines = bb.utils.edit_metadata(fromlines, varlist, patch_recipe_varfunc, match_overrides=True)
 
-    with open(tfn, 'U') as f:
-        tolines = f.readlines()
+    if remainingnames:
+        if tolines[-1].strip() != '':
+            tolines.append('\n')
+        for k in remainingnames.keys():
+            outputvalue(k, tolines)
+
     if patch:
-        with open(fn, 'U') as f:
-            fromlines = f.readlines()
         relfn = os.path.relpath(fn, relpath)
         diff = difflib.unified_diff(fromlines, tolines, 'a/%s' % relfn, 'b/%s' % relfn)
-        os.remove(tfn)
         return diff
     else:
         with open(fn, 'w') as f:
             f.writelines(tolines)
-        os.remove(tfn)
         return None
+
 
 def localise_file_vars(fn, varfiles, varlist):
     """Given a list of variables and variable history (fetched with get_var_files())
@@ -398,6 +425,8 @@ def validate_pn(pn):
         return 'Recipe name "%s" is invalid: is a reserved keyword' % pn
     elif pn.startswith('pn-'):
         return 'Recipe name "%s" is invalid: names starting with "pn-" are reserved' % pn
+    elif pn.endswith(('.bb', '.bbappend', '.bbclass', '.inc', '.conf')):
+        return 'Recipe name "%s" is invalid: should be just a name, not a file name' % pn
     return ''
 
 

@@ -53,6 +53,12 @@ do_deploy_all_archives[dirs] = "${WORKDIR}"
 
 python () {
     pn = d.getVar('PN', True)
+    assume_provided = (d.getVar("ASSUME_PROVIDED", True) or "").split()
+    if pn in assume_provided:
+        for p in d.getVar("PROVIDES", True).split():
+            if p != pn:
+                pn = p
+                break
 
     included, reason = copyleft_should_include(d)
     if not included:
@@ -60,6 +66,12 @@ python () {
         return
     else:
         bb.debug(1, 'archiver: %s is included: %s' % (pn, reason))
+
+    # We just archive gcc-source for all the gcc related recipes
+    if d.getVar('BPN', True) in ['gcc', 'libgcc'] \
+            and not pn.startswith('gcc-source'):
+        bb.debug(1, 'archiver: %s is excluded, covered by gcc-source' % pn)
+        return
 
     ar_src = d.getVarFlag('ARCHIVER_MODE', 'src', True)
     ar_dumpdata = d.getVarFlag('ARCHIVER_MODE', 'dumpdata', True)
@@ -73,8 +85,15 @@ python () {
         # We can't use "addtask do_ar_configured after do_configure" since it
         # will cause the deptask of do_populate_sysroot to run not matter what
         # archives we need, so we add the depends here.
-        d.appendVarFlag('do_ar_configured', 'depends', ' %s:do_configure' % pn)
+
+        # There is a corner case with "gcc-source-${PV}" recipes, they don't have
+        # the "do_configure" task, so we need to use "do_preconfigure"
+        if pn.startswith("gcc-source-"):
+            d.appendVarFlag('do_ar_configured', 'depends', ' %s:do_preconfigure' % pn)
+        else:
+            d.appendVarFlag('do_ar_configured', 'depends', ' %s:do_configure' % pn)
         d.appendVarFlag('do_deploy_archives', 'depends', ' %s:do_ar_configured' % pn)
+
     elif ar_src:
         bb.fatal("Invalid ARCHIVER_MODE[src]: %s" % ar_src)
 
@@ -119,21 +138,9 @@ python do_ar_original() {
         if os.path.isfile(local):
             shutil.copy(local, ar_outdir)
         elif os.path.isdir(local):
-            basename = os.path.basename(local)
-
             tmpdir = tempfile.mkdtemp(dir=d.getVar('ARCHIVER_WORKDIR', True))
             fetch.unpack(tmpdir, (url,))
-
-            os.chdir(tmpdir)
-            # We eliminate any AUTOINC+ in the revision.
-            try:
-                src_rev = bb.fetch2.get_srcrev(d).replace('AUTOINC+','')
-            except:
-                src_rev = 'NOREV'
-            tarname = os.path.join(ar_outdir, basename + '.' + src_rev + '.tar.gz')
-            tar = tarfile.open(tarname, 'w:gz')
-            tar.add('.')
-            tar.close()
+            create_tarball(d, tmpdir + '/.', '', ar_outdir)
 
     # Emit patch series files for 'original'
     bb.note('Writing patch series files...')
@@ -156,8 +163,9 @@ python do_ar_patched() {
 
     # Get the ARCHIVER_OUTDIR before we reset the WORKDIR
     ar_outdir = d.getVar('ARCHIVER_OUTDIR', True)
+    ar_workdir = d.getVar('ARCHIVER_WORKDIR', True)
     bb.note('Archiving the patched source...')
-    d.setVar('WORKDIR', ar_outdir)
+    d.setVar('WORKDIR', ar_workdir)
     create_tarball(d, d.getVar('S', True), 'patched', ar_outdir)
 }
 
@@ -167,11 +175,18 @@ python do_ar_configured() {
     ar_outdir = d.getVar('ARCHIVER_OUTDIR', True)
     if d.getVarFlag('ARCHIVER_MODE', 'src', True) == 'configured':
         bb.note('Archiving the configured source...')
+        pn = d.getVar('PN', True)
+        # "gcc-source-${PV}" recipes don't have "do_configure"
+        # task, so we need to run "do_preconfigure" instead
+        if pn.startswith("gcc-source-"):
+            d.setVar('WORKDIR', d.getVar('ARCHIVER_WORKDIR', True))
+            bb.build.exec_func('do_preconfigure', d)
+
         # The libtool-native's do_configure will remove the
         # ${STAGING_DATADIR}/aclocal/libtool.m4, so we can't re-run the
         # do_configure, we archive the already configured ${S} to
         # instead of.
-        if d.getVar('PN', True) != 'libtool-native':
+        elif pn != 'libtool-native':
             # Change the WORKDIR to make do_configure run in another dir.
             d.setVar('WORKDIR', d.getVar('ARCHIVER_WORKDIR', True))
             if bb.data.inherits_class('kernel-yocto', d):
@@ -203,12 +218,15 @@ def create_tarball(d, srcdir, suffix, ar_outdir):
     import tarfile
 
     # Make sure we are only creating a single tarball for gcc sources
-    if d.getVar('SRC_URI', True) == "" and 'gcc' in d.getVar('PN', True):
+    if (d.getVar('SRC_URI', True) == ""):
         return
 
     bb.utils.mkdirhier(ar_outdir)
-    tarname = os.path.join(ar_outdir, '%s-%s.tar.gz' % \
-            (d.getVar('PF', True), suffix))
+    if suffix:
+        filename = '%s-%s.tar.gz' % (d.getVar('PF', True), suffix)
+    else:
+        filename = '%s.tar.gz' % d.getVar('PF', True)
+    tarname = os.path.join(ar_outdir, filename)
 
     srcdir = srcdir.rstrip('/')
     dirname = os.path.dirname(srcdir)
@@ -250,21 +268,19 @@ python do_unpack_and_patch() {
             [ 'patched', 'configured'] and \
             d.getVarFlag('ARCHIVER_MODE', 'diff', True) != '1':
         return
-    # Change the WORKDIR to make do_unpack do_patch run in another dir.
     ar_outdir = d.getVar('ARCHIVER_OUTDIR', True)
-    d.setVar('WORKDIR', ar_outdir)
+    ar_workdir = d.getVar('ARCHIVER_WORKDIR', True)
 
-    # The changed 'WORKDIR' also casued 'B' changed, create dir 'B' for the
-    # possibly requiring of the following tasks (such as some recipes's
-    # do_patch required 'B' existed).
-    bb.utils.mkdirhier(d.getVar('B', True))
+    # The kernel class functions require it to be on work-shared, so we dont change WORKDIR
+    if not bb.data.inherits_class('kernel-yocto', d):
+        # Change the WORKDIR to make do_unpack do_patch run in another dir.
+        d.setVar('WORKDIR', ar_workdir)
 
-    # The kernel source is ready after do_validate_branches
-    if bb.data.inherits_class('kernel-yocto', d):
-        bb.build.exec_func('do_unpack', d)
-        bb.build.exec_func('do_kernel_checkout', d)
-        bb.build.exec_func('do_validate_branches', d)
-    else:
+        # The changed 'WORKDIR' also caused 'B' changed, create dir 'B' for the
+        # possibly requiring of the following tasks (such as some recipes's
+        # do_patch required 'B' existed).
+        bb.utils.mkdirhier(d.getVar('B', True))
+
         bb.build.exec_func('do_unpack', d)
 
     # Save the original source for creating the patches
@@ -273,8 +289,8 @@ python do_unpack_and_patch() {
         src_orig = '%s.orig' % src
         oe.path.copytree(src, src_orig)
 
-    # Make sure gcc sources are patched only once
-    if not ((d.getVar('SRC_URI', True) == "" and 'gcc' in d.getVar('PN', True))):
+    # Make sure gcc and kernel sources are patched only once
+    if not ((d.getVar('SRC_URI', True) == "" or bb.data.inherits_class('kernel-yocto', d))):
         bb.build.exec_func('do_patch', d)
 
     # Create the patches
@@ -298,6 +314,16 @@ python do_ar_recipe () {
             '%s-recipe' % d.getVar('PF', True))
     bb.utils.mkdirhier(outdir)
     shutil.copy(bbfile, outdir)
+
+    pn = d.getVar('PN', True)
+    bbappend_files = d.getVar('BBINCLUDED', True).split()
+    # If recipe name is aa, we need to match files like aa.bbappend and aa_1.1.bbappend
+    # Files like aa1.bbappend or aa1_1.1.bbappend must be excluded.
+    bbappend_re = re.compile( r".*/%s_[^/]*\.bbappend$" %pn)
+    bbappend_re1 = re.compile( r".*/%s\.bbappend$" %pn)
+    for file in bbappend_files:
+        if bbappend_re.match(file) or bbappend_re1.match(file):
+            shutil.copy(file, outdir)
 
     dirname = os.path.dirname(bbfile)
     bbpath = '%s:%s' % (dirname, d.getVar('BBPATH', True))
@@ -326,27 +352,29 @@ python do_dumpdata () {
     dumpfile = os.path.join(d.getVar('ARCHIVER_OUTDIR', True), \
         '%s-showdata.dump' % d.getVar('PF', True))
     bb.note('Dumping metadata into %s' % dumpfile)
-    f = open(dumpfile, 'w')
-    # emit variables and shell functions
-    bb.data.emit_env(f, d, True)
-    # emit the metadata which isn't valid shell
-    for e in d.keys():
-        if bb.data.getVarFlag(e, 'python', d):
-            f.write("\npython %s () {\n%s}\n" % (e, bb.data.getVar(e, d, True)))
-    f.close()
+    with open(dumpfile, "w") as f:
+        # emit variables and shell functions
+        bb.data.emit_env(f, d, True)
+        # emit the metadata which isn't valid shell
+        for e in d.keys():
+            if d.getVarFlag(e, "python", False):
+                f.write("\npython %s () {\n%s}\n" % (e, d.getVar(e, False)))
 }
 
 SSTATETASKS += "do_deploy_archives"
 do_deploy_archives () {
-    echo "Deploying source archive files ..."
+    echo "Deploying source archive files from ${ARCHIVER_TOPDIR} to ${DEPLOY_DIR_SRC}."
 }
 python do_deploy_archives_setscene () {
     sstate_setscene(d)
 }
+do_deploy_archives[dirs] = "${ARCHIVER_TOPDIR}"
 do_deploy_archives[sstate-inputdirs] = "${ARCHIVER_TOPDIR}"
 do_deploy_archives[sstate-outputdirs] = "${DEPLOY_DIR_SRC}"
+addtask do_deploy_archives_setscene
 
 addtask do_ar_original after do_unpack
+addtask do_unpack_and_patch after do_patch
 addtask do_ar_patched after do_unpack_and_patch
 addtask do_ar_configured after do_unpack_and_patch
 addtask do_dumpdata
@@ -364,6 +392,4 @@ python () {
     # Add tasks in the correct order, specifically for linux-yocto to avoid race condition
     if bb.data.inherits_class('kernel-yocto', d):
         bb.build.addtask('do_kernel_configme', 'do_configure', 'do_unpack_and_patch', d)
-    else:
-        bb.build.addtask('do_unpack_and_patch', None, 'do_patch', d)
 }

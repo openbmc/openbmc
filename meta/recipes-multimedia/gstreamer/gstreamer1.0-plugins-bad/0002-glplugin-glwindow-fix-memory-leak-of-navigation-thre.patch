@@ -1,0 +1,35 @@
+From 95cda7fbcf1a81289d9315c801c8e2b3d896f4cb Mon Sep 17 00:00:00 2001
+From: Haihua Hu <b55597@freescale.com>
+Date: Mon, 30 Nov 2015 09:36:09 +0800
+Subject: [PATCH 2/5] [glplugin] glwindow: fix memory leak of navigation
+ thread
+
+When exit navigation thread, call g_thread_join() to release
+the resource hold by it.
+
+Upstream-Status: Backport [1.7.1]
+
+bugzilla URL: https://bugzilla.gnome.org/show_bug.cgi?id=758820
+
+Signed-off-by: Haihua Hu <b55597@freescale.com>
+---
+ gst-libs/gst/gl/gstglwindow.c |    3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/gst-libs/gst/gl/gstglwindow.c b/gst-libs/gst/gl/gstglwindow.c
+index 44b74ca..42ef296 100644
+--- a/gst-libs/gst/gl/gstglwindow.c
++++ b/gst-libs/gst/gl/gstglwindow.c
+@@ -343,6 +343,9 @@ gst_gl_window_finalize (GObject * object)
+     while (window->nav_alive) {
+       g_cond_wait (&window->nav_destroy_cond, &window->nav_lock);
+     }
++    /* release resource hold by navigation thread */
++    g_thread_join(window->priv->navigation_thread);
++    window->priv->navigation_thread = NULL;
+     g_mutex_unlock (&window->nav_lock);
+   }
+ 
+-- 
+1.7.9.5
+

@@ -1,0 +1,25 @@
+Upstream-Status: Inappropriate [configuration]
+
+Subject: [PATCH] site.h: enable gentle shutdown
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ includes/site.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/includes/site.h b/includes/site.h
+index 73fa4e8..9c33de3 100644
+--- a/includes/site.h
++++ b/includes/site.h
+@@ -280,7 +280,7 @@
+    situations.  We plan to revisit this feature and may
+    make non-backwards compatible changes including the
+    removal of this define.  Use at your own risk.  */
+-/* #define ENABLE_GENTLE_SHUTDOWN */
++#define ENABLE_GENTLE_SHUTDOWN
+ 
+ /* Include old error codes.  This is provided in case you
+    are building an external program similar to omshell for
+-- 
+1.9.1
+

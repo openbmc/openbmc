@@ -27,7 +27,7 @@
 import os
 import shutil
 
-from wic import kickstart, msger
+from wic import msger
 from wic.utils import fs_related
 from wic.utils.oe.misc import get_bitbake_var
 from wic.utils.partitionedfs import Image
@@ -64,7 +64,7 @@ class DirectImageCreator(BaseImageCreator):
         self.__disks = {}
         self.__disk_format = "direct"
         self._disk_names = []
-        self.ptable_format = self.ks.handler.bootloader.ptable
+        self.ptable_format = self.ks.bootloader.ptable
 
         self.oe_builddir = oe_builddir
         if image_output_dir:
@@ -151,15 +151,15 @@ class DirectImageCreator(BaseImageCreator):
                                "please check your kickstart setting.")
 
         # Set a default partition if no partition is given out
-        if not self.ks.handler.partition.partitions:
+        if not self.ks.partitions:
             partstr = "part / --size 1900 --ondisk sda --fstype=ext3"
             args = partstr.split()
-            part = self.ks.handler.partition.parse(args[1:])
-            if part not in self.ks.handler.partition.partitions:
-                self.ks.handler.partition.partitions.append(part)
+            part = self.ks.parse(args[1:])
+            if part not in self.ks.partitions:
+                self.ks.partitions.append(part)
 
         # partitions list from kickstart file
-        return kickstart.get_partitions(self.ks)
+        return self.ks.partitions
 
     def get_disk_names(self):
         """ Returns a list of physical target disk names (e.g., 'sdb') which
@@ -206,7 +206,7 @@ class DirectImageCreator(BaseImageCreator):
         bootloader object, the default can be explicitly set using the
         --source bootloader param.
         """
-        return self.ks.handler.bootloader.source
+        return self.ks.bootloader.source
 
     #
     # Actual implemention
@@ -224,16 +224,19 @@ class DirectImageCreator(BaseImageCreator):
         for part in parts:
             # as a convenience, set source to the boot partition source
             # instead of forcing it to be set via bootloader --source
-            if not self.ks.handler.bootloader.source and part.mountpoint == "/boot":
-                self.ks.handler.bootloader.source = part.source
+            if not self.ks.bootloader.source and part.mountpoint == "/boot":
+                self.ks.bootloader.source = part.source
 
         fstab_path = self._write_fstab(self.rootfs_dir.get("ROOTFS_DIR"))
+
+        shutil.rmtree(self.workdir)
+        os.mkdir(self.workdir)
 
         for part in parts:
             # get rootfs size from bitbake variable if it's not set in .ks file
             if not part.size:
                 # and if rootfs name is specified for the partition
-                image_name = part.get_rootfs()
+                image_name = part.rootfs_dir
                 if image_name:
                     # Bitbake variable ROOTFS_SIZE is calculated in
                     # Image._get_rootfs_size method from meta/lib/oe/image.py
@@ -336,13 +339,13 @@ class DirectImageCreator(BaseImageCreator):
 
         msg += 'The following build artifacts were used to create the image(s):\n'
         for part in parts:
-            if part.get_rootfs() is None:
+            if part.rootfs_dir is None:
                 continue
             if part.mountpoint == '/':
                 suffix = ':'
             else:
                 suffix = '["%s"]:' % (part.mountpoint or part.label)
-            msg += '  ROOTFS_DIR%s%s\n' % (suffix.ljust(20), part.get_rootfs())
+            msg += '  ROOTFS_DIR%s%s\n' % (suffix.ljust(20), part.rootfs_dir)
 
         msg += '  BOOTIMG_DIR:                  %s\n' % self.bootimg_dir
         msg += '  KERNEL_DIR:                   %s\n' % self.kernel_dir

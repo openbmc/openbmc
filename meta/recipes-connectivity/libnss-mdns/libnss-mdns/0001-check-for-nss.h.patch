@@ -1,0 +1,56 @@
+From bdf01a581d58eb5340e9238d143dbcac9db5b11c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 30 Jan 2016 19:29:45 +0000
+Subject: [PATCH] check for nss.h
+
+nss.h may not available on all libc implementations, e.g. musl does not
+have this header, this patch detects nss.h presence and defines the data
+types that are required if nss.h is missing on platform
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ configure.ac |  2 +-
+ src/nss.c    | 11 +++++++++++
+ 2 files changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index aa66bc6..ce19b07 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -71,7 +71,7 @@ AC_PROG_LIBTOOL
+ 
+ # Checks for header files.
+ AC_HEADER_STDC
+-AC_CHECK_HEADERS([arpa/inet.h fcntl.h inttypes.h netdb.h netinet/in.h stdlib.h string.h sys/socket.h sys/time.h unistd.h nss.h sys/ioctl.h])
++AC_CHECK_HEADERS([arpa/inet.h fcntl.h inttypes.h netdb.h netinet/in.h stdlib.h string.h sys/socket.h sys/time.h unistd.h nss.h sys/ioctl.h nss.h])
+ 
+ # Checks for typedefs, structures, and compiler characteristics.
+ AC_C_CONST
+diff --git a/src/nss.c b/src/nss.c
+index e48e315..406733b 100644
+--- a/src/nss.c
++++ b/src/nss.c
+@@ -29,7 +29,18 @@
+ #include <assert.h>
+ #include <netdb.h>
+ #include <sys/socket.h>
++#ifdef HAVE_NSS_H
+ #include <nss.h>
++#else
++enum nss_status {
++    NSS_STATUS_TRYAGAIN = -2,
++    NSS_STATUS_UNAVAIL,
++    NSS_STATUS_NOTFOUND,
++    NSS_STATUS_SUCCESS,
++    NSS_STATUS_RETURN
++};
++#endif
++
+ #include <stdio.h>
+ #include <stdlib.h>
+ 
+-- 
+2.7.0
+

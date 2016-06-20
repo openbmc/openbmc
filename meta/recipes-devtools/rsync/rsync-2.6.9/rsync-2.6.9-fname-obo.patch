@@ -1,4 +1,5 @@
 Upstream-Status: Backport [ The patch is rsync-2.6.9 specific ]
+CVE: CVE-2007-4091
 
 The patch is from https://issues.rpath.com/browse/RPL-1647 and is used to
 address http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2007-4091

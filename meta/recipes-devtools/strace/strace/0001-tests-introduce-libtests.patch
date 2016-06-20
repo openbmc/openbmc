@@ -1,0 +1,306 @@
+From 87e6b230fff800eb768b68b2e5173ebbe83fd3ef Mon Sep 17 00:00:00 2001
+From: "Dmitry V. Levin" <ldv@altlinux.org>
+Date: Sat, 2 Jan 2016 12:05:14 +0000
+Subject: [PATCH] tests: introduce libtests
+
+Introduce tests/libtests.a with common functions for use in tests.
+
+* tests/tests.h: New file.
+* tests/error_msg.c: Likewise.
+* tests/tail_alloc.c: Likewise.
+* tests/get_page_size.c: Likewise.
+* tests/Makefile.am (libtests_a_SOURCES, libtests_a_CPPFLAGS,
+check_LIBRARIES, LDADD): New variables.
+(clock_xettime_LDADD, filter_unavailable_LDADD, mq_LDADD,
+pc_LDADD, times_LDADD): Add $(LDADD).
+* tests/.gitignore: Add libtests.a.
+---
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Backport
+
+ tests/.gitignore      |  1 +
+ tests/Makefile.am     | 20 ++++++++++----
+ tests/error_msg.c     | 74 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/get_page_size.c | 13 +++++++++
+ tests/tail_alloc.c    | 52 ++++++++++++++++++++++++++++++++++++
+ tests/tests.h         | 62 ++++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 217 insertions(+), 5 deletions(-)
+ create mode 100644 tests/error_msg.c
+ create mode 100644 tests/get_page_size.c
+ create mode 100644 tests/tail_alloc.c
+ create mode 100644 tests/tests.h
+
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 386a2c2..62d0e56 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -40,6 +40,16 @@ AM_CPPFLAGS = $(ARCH_MFLAGS) \
+ 	      -I$(top_srcdir)
+ AM_LDFLAGS = $(ARCH_MFLAGS)
+ 
++libtests_a_SOURCES = \
++	get_page_size.c \
++	error_msg.c \
++	tail_alloc.c \
++	tests.h \
++	# end of libtests_a_SOURCES
++libtests_a_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
++check_LIBRARIES = libtests.a
++LDADD = libtests.a
++
+ check_PROGRAMS = \
+ 	_newselect \
+ 	adjtimex \
+@@ -146,19 +156,19 @@ check_PROGRAMS = \
+ 	xettimeofday \
+ 	# end of check_PROGRAMS
+ 
+-clock_xettime_LDADD = -lrt
+-filter_unavailable_LDADD = -lpthread
++clock_xettime_LDADD = -lrt $(LDADD)
++filter_unavailable_LDADD = -lpthread $(LDADD)
+ fstat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
+ fstatat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
+ ftruncate64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
+ lstat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
+ mmap64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
+-mq_LDADD = -lrt
++mq_LDADD = -lrt $(LDADD)
+ newfstatat_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
+-pc_LDADD = $(dl_LIBS)
++pc_LDADD = $(dl_LIBS) $(LDADD)
+ stat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
+ statfs_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
+-times_LDADD = -lrt
++times_LDADD = -lrt $(LDADD)
+ truncate64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
+ uio_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
+ stack_fcall_SOURCES = stack-fcall.c \
+diff --git a/tests/error_msg.c b/tests/error_msg.c
+new file mode 100644
+index 0000000..3fd3411
+--- /dev/null
++++ b/tests/error_msg.c
+@@ -0,0 +1,74 @@
++/*
++ * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ * 3. The name of the author may not be used to endorse or promote products
++ *    derived from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
++ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
++ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
++ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
++ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
++ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
++ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#include "tests.h"
++#include <errno.h>
++#include <stdarg.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++
++void
++perror_msg_and_fail(const char *fmt, ...)
++{
++	int err_no = errno;
++	va_list p;
++
++	va_start(p, fmt);
++	vfprintf(stderr, fmt, p);
++	if (err_no)
++		fprintf(stderr, ": %s\n", strerror(err_no));
++	else
++		putc('\n', stderr);
++	exit(1);
++}
++
++void
++error_msg_and_skip(const char *fmt, ...)
++{
++	va_list p;
++
++	va_start(p, fmt);
++	vfprintf(stderr, fmt, p);
++	putc('\n', stderr);
++	exit(77);
++}
++
++void
++perror_msg_and_skip(const char *fmt, ...)
++{
++	int err_no = errno;
++	va_list p;
++
++	va_start(p, fmt);
++	vfprintf(stderr, fmt, p);
++	if (err_no)
++		fprintf(stderr, ": %s\n", strerror(err_no));
++	else
++		putc('\n', stderr);
++	exit(77);
++}
+diff --git a/tests/get_page_size.c b/tests/get_page_size.c
+new file mode 100644
+index 0000000..aeea861
+--- /dev/null
++++ b/tests/get_page_size.c
+@@ -0,0 +1,13 @@
++#include "tests.h"
++#include <unistd.h>
++
++size_t
++get_page_size(void)
++{
++	static size_t page_size;
++
++	if (!page_size)
++		page_size = sysconf(_SC_PAGESIZE);
++
++	return page_size;
++}
+diff --git a/tests/tail_alloc.c b/tests/tail_alloc.c
+new file mode 100644
+index 0000000..2b8b14e
+--- /dev/null
++++ b/tests/tail_alloc.c
+@@ -0,0 +1,52 @@
++/*
++ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ * 3. The name of the author may not be used to endorse or promote products
++ *    derived from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
++ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
++ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
++ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
++ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
++ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
++ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#include "tests.h"
++#include <string.h>
++#include <sys/mman.h>
++
++void *
++tail_alloc(const size_t size)
++{
++	const size_t page_size = get_page_size();
++	const size_t len = (size + page_size - 1) & -page_size;
++	const size_t alloc_size = len + 2 * page_size;
++
++	void *p = mmap(NULL, alloc_size, PROT_READ | PROT_WRITE,
++		       MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
++	if (MAP_FAILED == p)
++		perror_msg_and_fail("mmap(%zu)", alloc_size);
++
++	void *start_work = p + page_size;
++	void *tail_guard = start_work + len;
++
++	if (munmap(p, page_size) || munmap(tail_guard, page_size))
++		perror_msg_and_fail("munmap");
++
++	memset(start_work, 0xff, len);
++	return tail_guard - size;
++}
+diff --git a/tests/tests.h b/tests/tests.h
+new file mode 100644
+index 0000000..91fa24e
+--- /dev/null
++++ b/tests/tests.h
+@@ -0,0 +1,62 @@
++/*
++ * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ * 3. The name of the author may not be used to endorse or promote products
++ *    derived from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
++ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
++ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
++ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
++ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
++ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
++ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#ifndef TESTS_H_
++# define TESTS_H_
++
++# ifdef HAVE_CONFIG_H
++#  include "config.h"
++# endif
++
++# include <sys/types.h>
++# include "gcc_compat.h"
++
++/* Cached sysconf(_SC_PAGESIZE). */
++size_t get_page_size(void);
++
++/* Print message and strerror(errno) to stderr, then exit(1). */
++void perror_msg_and_fail(const char *, ...)
++	ATTRIBUTE_FORMAT((printf, 1, 2)) ATTRIBUTE_NORETURN;
++/* Print message to stderr, then exit(77). */
++void error_msg_and_skip(const char *, ...)
++	ATTRIBUTE_FORMAT((printf, 1, 2)) ATTRIBUTE_NORETURN;
++/* Print message and strerror(errno) to stderr, then exit(77). */
++void perror_msg_and_skip(const char *, ...)
++	ATTRIBUTE_FORMAT((printf, 1, 2)) ATTRIBUTE_NORETURN;
++
++/*
++ * Allocate memory that ends on the page boundary.
++ * Pages allocated by this call are preceeded by an unmapped page
++ * and followed also by an unmapped page.
++ */
++void *tail_alloc(const size_t)
++	ATTRIBUTE_MALLOC ATTRIBUTE_ALLOC_SIZE((1));
++
++# define SKIP_MAIN_UNDEFINED(arg) \
++	int main(void) { error_msg_and_skip("undefined: %s", arg); }
++
++#endif
+-- 
+1.9.1
+

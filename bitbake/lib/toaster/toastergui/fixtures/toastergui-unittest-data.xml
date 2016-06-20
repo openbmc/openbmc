@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="utf-8"?>
+<django-objects version="1.0">
+  <object pk="1" model="orm.project">
+    <field type="CharField" name="name">a test project</field>
+    <field type="CharField" name="short_description"></field>
+    <field to="orm.bitbakeversion" name="bitbake_version" rel="ManyToOneRel">1</field>
+    <field to="orm.release" name="release" rel="ManyToOneRel">1</field>
+    <field type="DateTimeField" name="created">2016-02-15T18:46:20.098248+00:00</field>
+    <field type="DateTimeField" name="updated">2016-02-15T18:46:20.098392+00:00</field>
+    <field type="IntegerField" name="user_id"><None></None></field>
+    <field type="BooleanField" name="is_default">False</field>
+  </object>
+  <object pk="2" model="orm.project">
+    <field type="CharField" name="name">z test project</field>
+    <field type="CharField" name="short_description"></field>
+    <field to="orm.bitbakeversion" name="bitbake_version" rel="ManyToOneRel">1</field>
+    <field to="orm.release" name="release" rel="ManyToOneRel">2</field>
+    <field type="DateTimeField" name="created">2016-02-15T18:46:20.107936+00:00</field>
+    <field type="DateTimeField" name="updated">2016-02-15T18:46:20.108066+00:00</field>
+    <field type="IntegerField" name="user_id"><None></None></field>
+    <field type="BooleanField" name="is_default">False</field>
+  </object>
+  <object pk="1" model="orm.ProjectVariable">
+    <field to="orm.project" name="project" rel="ManyToOneRel">1</field>
+    <field type="CharField" name="name">MACHINE</field>
+    <field type="TextField" name="value">qemux86</field>
+  </object>
+  <object pk="2" model="orm.ProjectVariable">
+    <field to="orm.project" name="project" rel="ManyToOneRel">2</field>
+    <field type="CharField" name="name">MACHINE</field>
+    <field type="TextField" name="value">qemux86</field>
+  </object>
+  <object pk="1" model="orm.build">
+    <field to="orm.project" name="project" rel="ManyToOneRel">1</field>
+    <field type="CharField" name="machine">x12</field>
+    <field type="CharField" name="distro"></field>
+    <field type="CharField" name="distro_version"></field>
+    <field type="DateTimeField" name="started_on">2016-02-14T18:46:20.114530+00:00</field>
+    <field type="DateTimeField" name="completed_on">2016-02-14T18:46:20.114530+00:00</field>
+    <field type="IntegerField" name="outcome">0</field>
+    <field type="CharField" name="cooker_log_path"></field>
+    <field type="CharField" name="build_name">a</field>
+    <field type="CharField" name="bitbake_version"></field>
+  </object>
+  <object pk="2" model="orm.build">
+    <field to="orm.project" name="project" rel="ManyToOneRel">1</field>
+    <field type="CharField" name="machine">raspberrypi2</field>
+    <field type="CharField" name="distro"></field>
+    <field type="CharField" name="distro_version"></field>
+    <field type="DateTimeField" name="started_on">2016-02-13T18:46:20.114530+00:00</field>
+    <field type="DateTimeField" name="completed_on">2016-02-13T18:46:20.114530+00:00</field>
+    <field type="IntegerField" name="outcome">0</field>
+    <field type="CharField" name="cooker_log_path"></field>
+    <field type="CharField" name="build_name">b</field>
+    <field type="CharField" name="bitbake_version"></field>
+  </object>
+  <object pk="3" model="orm.build">
+    <field to="orm.project" name="project" rel="ManyToOneRel">1</field>
+    <field type="CharField" name="machine">qemux86</field>
+    <field type="CharField" name="distro"></field>
+    <field type="CharField" name="distro_version"></field>
+    <field type="DateTimeField" name="started_on">2016-02-12T18:46:20.114530+00:00</field>
+    <field type="DateTimeField" name="completed_on">2016-02-12T18:46:20.114530+00:00</field>
+    <field type="IntegerField" name="outcome">1</field>
+    <field type="CharField" name="cooker_log_path"></field>
+    <field type="CharField" name="build_name">c</field>
+    <field type="CharField" name="bitbake_version"></field>
+  </object>
+  <object pk="4" model="orm.build">
+    <field to="orm.project" name="project" rel="ManyToOneRel">2</field>
+    <field type="CharField" name="machine">qemux86</field>
+    <field type="CharField" name="distro"></field>
+    <field type="CharField" name="distro_version"></field>
+    <field type="DateTimeField" name="started_on">2016-02-11T18:46:20.114530+00:00</field>
+    <field type="DateTimeField" name="completed_on">2016-02-11T18:46:20.114530+00:00</field>
+    <field type="IntegerField" name="outcome">0</field>
+    <field type="CharField" name="cooker_log_path"></field>
+    <field type="CharField" name="build_name">d</field>
+    <field type="CharField" name="bitbake_version"></field>
+  </object>
+  <object pk="1" model="orm.target">
+    <field to="orm.build" name="build" rel="ManyToOneRel">1</field>
+    <field type="CharField" name="target">a image recipe</field>
+    <field type="CharField" name="task"><None></None></field>
+    <field type="BooleanField" name="is_image">False</field>
+    <field type="IntegerField" name="image_size">0</field>
+    <field type="CharField" name="license_manifest_path"><None></None></field>
+  </object>
+  <object pk="2" model="orm.target">
+    <field to="orm.build" name="build" rel="ManyToOneRel">2</field>
+    <field type="CharField" name="target">z something</field>
+    <field type="CharField" name="task"><None></None></field>
+    <field type="BooleanField" name="is_image">False</field>
+    <field type="IntegerField" name="image_size">0</field>
+    <field type="CharField" name="license_manifest_path"><None></None></field>
+  </object>
+  <object pk="3" model="orm.target">
+    <field to="orm.build" name="build" rel="ManyToOneRel">3</field>
+    <field type="CharField" name="target">h recipe</field>
+    <field type="CharField" name="task"><None></None></field>
+    <field type="BooleanField" name="is_image">False</field>
+    <field type="IntegerField" name="image_size">0</field>
+    <field type="CharField" name="license_manifest_path"><None></None></field>
+  </object>
+  <object pk="1" model="orm.package">
+    <field to="orm.build" name="build" rel="ManyToOneRel">1</field>
+    <field to="orm.recipe" name="recipe" rel="ManyToOneRel">2</field>
+    <field type="CharField" name="name">b pkg</field>
+    <field type="CharField" name="installed_name"></field>
+    <field type="CharField" name="version"></field>
+    <field type="CharField" name="revision"></field>
+    <field type="TextField" name="summary"></field>
+    <field type="TextField" name="description"></field>
+    <field type="IntegerField" name="size">777</field>
+    <field type="IntegerField" name="installed_size">0</field>
+    <field type="CharField" name="section"></field>
+    <field type="CharField" name="license">a license</field>
+  </object>
+  <object pk="2" model="orm.package">
+    <field to="orm.build" name="build" rel="ManyToOneRel">1</field>
+    <field to="orm.recipe" name="recipe" rel="ManyToOneRel">2</field>
+    <field type="CharField" name="name">f pkg</field>
+    <field type="CharField" name="installed_name"></field>
+    <field type="CharField" name="version"></field>
+    <field type="CharField" name="revision"></field>
+    <field type="TextField" name="summary"></field>
+    <field type="TextField" name="description"></field>
+    <field type="IntegerField" name="size">4</field>
+    <field type="IntegerField" name="installed_size">10</field>
+    <field type="CharField" name="section"></field>
+    <field type="CharField" name="license">z license</field>
+  </object>
+  <object pk="3" model="orm.package">
+    <field to="orm.build" name="build" rel="ManyToOneRel"><None></None></field>
+    <field to="orm.recipe" name="recipe" rel="ManyToOneRel">1</field>
+    <field type="CharField" name="name">a custom image pkg</field>
+    <field type="CharField" name="installed_name"></field>
+    <field type="CharField" name="version"></field>
+    <field type="CharField" name="revision"></field>
+    <field type="TextField" name="summary"></field>
+    <field type="TextField" name="description"></field>
+    <field type="IntegerField" name="size">10</field>
+    <field type="IntegerField" name="installed_size">0</field>
+    <field type="CharField" name="section"></field>
+    <field type="CharField" name="license">h license</field>
+  </object>
+  <object pk="4" model="orm.package">
+    <field to="orm.build" name="build" rel="ManyToOneRel"><None></None></field>
+    <field to="orm.recipe" name="recipe" rel="ManyToOneRel">2</field>
+    <field type="CharField" name="name">z custom image pkg</field>
+    <field type="CharField" name="installed_name"></field>
+    <field type="CharField" name="version"></field>
+    <field type="CharField" name="revision"></field>
+    <field type="TextField" name="summary"></field>
+    <field type="TextField" name="description"></field>
+    <field type="IntegerField" name="size">5</field>
+    <field type="IntegerField" name="installed_size">0</field>
+    <field type="CharField" name="section"></field>
+    <field type="CharField" name="license">z license</field>
+  </object>
+  <object pk="5" model="orm.package">
+    <field to="orm.build" name="build" rel="ManyToOneRel">1</field>
+    <field to="orm.recipe" name="recipe" rel="ManyToOneRel">4</field>
+    <field type="CharField" name="name">a custom image pkg</field>
+    <field type="CharField" name="installed_name"></field>
+    <field type="CharField" name="version"></field>
+    <field type="CharField" name="revision"></field>
+    <field type="TextField" name="summary"></field>
+    <field type="TextField" name="description"></field>
+    <field type="IntegerField" name="size">2</field>
+    <field type="IntegerField" name="installed_size">0</field>
+    <field type="CharField" name="section"></field>
+    <field type="CharField" name="license">h licence</field>
+  </object>
+  <object pk="1" model="orm.target_installed_package">
+    <field to="orm.target" name="target" rel="ManyToOneRel">1</field>
+    <field to="orm.package" name="package" rel="ManyToOneRel">1</field>
+  </object>
+  <object pk="2" model="orm.target_installed_package">
+    <field to="orm.target" name="target" rel="ManyToOneRel">1</field>
+    <field to="orm.package" name="package" rel="ManyToOneRel">2</field>
+  </object>
+  <object pk="3" model="orm.target_installed_package">
+    <field to="orm.target" name="target" rel="ManyToOneRel">1</field>
+    <field to="orm.package" name="package" rel="ManyToOneRel">3</field>
+  </object>
+  <!-- Note that these augment the existing orm.package of the same pk -->
+  <object pk="4" model="orm.customimagepackage">
+    <field to="orm.customimagerecipe" name="recipe_includes" rel="ManyToManyRel"></field>
+    <field to="orm.customimagerecipe" name="recipe_excludes" rel="ManyToManyRel"></field>
+    <field to="orm.customimagerecipe" name="recipe_appends" rel="ManyToManyRel"><object pk="3"></object></field>
+  </object>
+  <object pk="5" model="orm.customimagepackage">
+    <field to="orm.customimagerecipe" name="recipe_includes" rel="ManyToManyRel"></field>
+    <field to="orm.customimagerecipe" name="recipe_excludes" rel="ManyToManyRel"></field>
+    <field to="orm.customimagerecipe" name="recipe_appends" rel="ManyToManyRel"><object pk="3"></object></field>
+  </object>
+  <object pk="1" model="orm.recipe">
+    <field to="orm.layersource" name="layer_source" rel="ManyToOneRel">1</field>
+    <field type="IntegerField" name="up_id"><None></None></field>
+    <field type="DateTimeField" name="up_date"><None></None></field>
+    <field type="CharField" name="name">z recipe</field>
+    <field type="CharField" name="version">5.2</field>
+    <field to="orm.layer_version" name="layer_version" rel="ManyToOneRel">2</field>
+    <field type="TextField" name="summary">z recipe</field>
+    <field type="TextField" name="description">z recipe</field>
+    <field type="CharField" name="section">z section</field>
+    <field type="CharField" name="license">z license</field>
+    <field type="CharField" name="homepage"></field>
+    <field type="CharField" name="bugtracker"></field>
+    <field type="FilePathField" name="file_path"></field>
+    <field type="CharField" name="pathflags"></field>
+    <field type="BooleanField" name="is_image">False</field>
+  </object>
+  <object pk="2" model="orm.recipe">
+    <field to="orm.layersource" name="layer_source" rel="ManyToOneRel">1</field>
+    <field type="IntegerField" name="up_id"><None></None></field>
+    <field type="DateTimeField" name="up_date"><None></None></field>
+    <field type="CharField" name="name">a recipe</field>
+    <field type="CharField" name="version">1.2</field>
+    <field to="orm.layer_version" name="layer_version" rel="ManyToOneRel">1</field>
+    <field type="TextField" name="summary">a recipe</field>
+    <field type="TextField" name="description">a recipe</field>
+    <field type="CharField" name="section">a section</field>
+    <field type="CharField" name="license">a license</field>
+    <field type="CharField" name="homepage"></field>
+    <field type="CharField" name="bugtracker"></field>
+    <field type="FilePathField" name="file_path">a_recipe.bb</field>
+    <field type="CharField" name="pathflags"></field>
+    <field type="BooleanField" name="is_image">False</field>
+  </object>
+  <object pk="3" model="orm.recipe">
+    <field to="orm.layersource" name="layer_source" rel="ManyToOneRel"><None></None></field>
+    <field type="IntegerField" name="up_id"><None></None></field>
+    <field type="DateTimeField" name="up_date"><None></None></field>
+    <field type="CharField" name="name">a custom recipe</field>
+    <field type="CharField" name="version"></field>
+    <field to="orm.layer_version" name="layer_version" rel="ManyToOneRel">2</field>
+    <field type="TextField" name="summary"></field>
+    <field type="TextField" name="description"></field>
+    <field type="CharField" name="section"></field>
+    <field type="CharField" name="license"></field>
+    <field type="CharField" name="homepage"></field>
+    <field type="CharField" name="bugtracker"></field>
+    <field type="FilePathField" name="file_path">custr</field>
+    <field type="CharField" name="pathflags"></field>
+    <field type="BooleanField" name="is_image">False</field>
+  </object>
+  <object pk="4" model="orm.recipe">
+    <field to="orm.layersource" name="layer_source" rel="ManyToOneRel">1</field>
+    <field type="IntegerField" name="up_id"><None></None></field>
+    <field type="DateTimeField" name="up_date"><None></None></field>
+    <field type="CharField" name="name">a image recipe</field>
+    <field type="CharField" name="version">1.2</field>
+    <field to="orm.layer_version" name="layer_version" rel="ManyToOneRel">1</field>
+    <field type="TextField" name="summary">one recipe</field>
+    <field type="TextField" name="description">recipe</field>
+    <field type="CharField" name="section">A</field>
+    <field type="CharField" name="license">A</field>
+    <field type="CharField" name="homepage"></field>
+    <field type="CharField" name="bugtracker"></field>
+    <field type="FilePathField" name="file_path">/one/</field>
+    <field type="CharField" name="pathflags"></field>
+    <field type="BooleanField" name="is_image">True</field>
+  </object>
+  <object pk="5" model="orm.recipe">
+    <field to="orm.layersource" name="layer_source" rel="ManyToOneRel">1</field>
+    <field type="IntegerField" name="up_id"><None></None></field>
+    <field type="DateTimeField" name="up_date"><None></None></field>
+    <field type="CharField" name="name">z image recipe</field>
+    <field type="CharField" name="version">1.3</field>
+    <field to="orm.layer_version" name="layer_version" rel="ManyToOneRel">2</field>
+    <field type="TextField" name="summary">two image recipe</field>
+    <field type="TextField" name="description">recipe two</field>
+    <field type="CharField" name="section">B</field>
+    <field type="CharField" name="license">Z</field>
+    <field type="CharField" name="homepage"></field>
+    <field type="CharField" name="bugtracker"></field>
+    <field type="FilePathField" name="file_path">/two/</field>
+    <field type="CharField" name="pathflags"></field>
+    <field type="BooleanField" name="is_image">True</field>
+  </object>
+  <object pk="6" model="orm.recipe">
+    <field to="orm.layersource" name="layer_source" rel="ManyToOneRel"><None></None></field>
+    <field type="IntegerField" name="up_id"><None></None></field>
+    <field type="DateTimeField" name="up_date"><None></None></field>
+    <field type="CharField" name="name">z custom recipe</field>
+    <field type="CharField" name="version"></field>
+    <field to="orm.layer_version" name="layer_version" rel="ManyToOneRel">2</field>
+    <field type="TextField" name="summary"></field>
+    <field type="TextField" name="description"></field>
+    <field type="CharField" name="section"></field>
+    <field type="CharField" name="license"></field>
+    <field type="CharField" name="homepage"></field>
+    <field type="CharField" name="bugtracker"></field>
+    <field type="FilePathField" name="file_path">zzzz</field>
+    <field type="CharField" name="pathflags"></field>
+    <field type="BooleanField" name="is_image">False</field>
+  </object>
+  <object pk="1" model="orm.machine">
+    <field to="orm.layersource" name="layer_source" rel="ManyToOneRel"><None></None></field>
+    <field type="IntegerField" name="up_id"><None></None></field>
+    <field type="DateTimeField" name="up_date"><None></None></field>
+    <field to="orm.layer_version" name="layer_version" rel="ManyToOneRel">1</field>
+    <field type="CharField" name="name">a machine</field>
+    <field type="CharField" name="description">a machine</field>
+  </object>
+  <object pk="2" model="orm.machine">
+    <field to="orm.layersource" name="layer_source" rel="ManyToOneRel"><None></None></field>
+    <field type="IntegerField" name="up_id"><None></None></field>
+    <field type="DateTimeField" name="up_date"><None></None></field>
+    <field to="orm.layer_version" name="layer_version" rel="ManyToOneRel">2</field>
+    <field type="CharField" name="name">z machine</field>
+    <field type="CharField" name="description">z machine</field>
+  </object>
+  <object pk="3" model="orm.machine">
+    <field to="orm.layersource" name="layer_source" rel="ManyToOneRel"><None></None></field>
+    <field type="IntegerField" name="up_id"><None></None></field>
+    <field type="DateTimeField" name="up_date"><None></None></field>
+    <field to="orm.layer_version" name="layer_version" rel="ManyToOneRel">1</field>
+    <field type="CharField" name="name">g machine</field>
+    <field type="CharField" name="description">g machine</field>
+  </object>
+  <object pk="1" model="orm.layersource">
+    <field type="CharField" name="name">local</field>
+    <field type="IntegerField" name="sourcetype">1</field>
+    <field type="CharField" name="apiurl"></field>
+  </object>
+  <object pk="1" model="orm.bitbakeversion">
+    <field type="CharField" name="name">test bbv</field>
+    <field type="CharField" name="giturl">/tmp/</field>
+    <field type="CharField" name="branch">master</field>
+    <field type="CharField" name="dirpath"></field>
+  </object>
+  <object pk="1" model="orm.release">
+    <field type="CharField" name="name">test release</field>
+    <field type="CharField" name="description"></field>
+    <field to="orm.bitbakeversion" name="bitbake_version" rel="ManyToOneRel">1</field>
+    <field type="CharField" name="branch_name">master</field>
+    <field type="TextField" name="helptext"><None></None></field>
+  </object>
+  <object pk="2" model="orm.release">
+    <field type="CharField" name="name">test release 2</field>
+    <field type="CharField" name="description"></field>
+    <field to="orm.bitbakeversion" name="bitbake_version" rel="ManyToOneRel">1</field>
+    <field type="CharField" name="branch_name">master</field>
+    <field type="TextField" name="helptext"><None></None></field>
+  </object>
+  <object pk="1" model="orm.releaselayersourcepriority">
+    <field to="orm.release" name="release" rel="ManyToOneRel">1</field>
+    <field to="orm.layersource" name="layer_source" rel="ManyToOneRel">1</field>
+    <field type="IntegerField" name="priority">0</field>
+  </object>
+  <object pk="1" model="orm.branch">
+    <field to="orm.layersource" name="layer_source" rel="ManyToOneRel">1</field>
+    <field type="IntegerField" name="up_id"><None></None></field>
+    <field type="DateTimeField" name="up_date"><None></None></field>
+    <field type="CharField" name="name">master</field>
+    <field type="CharField" name="short_description"></field>
+  </object>
+  <object pk="1" model="orm.layer">
+    <field to="orm.layersource" name="layer_source" rel="ManyToOneRel"><None></None></field>
+    <field type="IntegerField" name="up_id"><None></None></field>
+    <field type="DateTimeField" name="up_date"><None></None></field>
+    <field type="CharField" name="name">a layer</field>
+    <field type="CharField" name="layer_index_url"></field>
+    <field type="CharField" name="vcs_url">/tmp/</field>
+    <field type="CharField" name="vcs_web_url"><None></None></field>
+    <field type="CharField" name="vcs_web_tree_base_url"><None></None></field>
+    <field type="CharField" name="vcs_web_file_base_url"><None></None></field>
+    <field type="TextField" name="summary"><None></None></field>
+    <field type="TextField" name="description"><None></None></field>
+  </object>
+  <object pk="2" model="orm.layer">
+    <field to="orm.layersource" name="layer_source" rel="ManyToOneRel">1</field>
+    <field type="IntegerField" name="up_id"><None></None></field>
+    <field type="DateTimeField" name="up_date"><None></None></field>
+    <field type="CharField" name="name">z layer</field>
+    <field type="CharField" name="layer_index_url"></field>
+    <field type="CharField" name="vcs_url">git://two/</field>
+    <field type="CharField" name="vcs_web_url"><None></None></field>
+    <field type="CharField" name="vcs_web_tree_base_url"><None></None></field>
+    <field type="CharField" name="vcs_web_file_base_url"><None></None></field>
+    <field type="TextField" name="summary"><None></None></field>
+    <field type="TextField" name="description"><None></None></field>
+  </object>
+  <object pk="1" model="orm.layer_version">
+    <field to="orm.build" name="build" rel="ManyToOneRel"><None></None></field>
+    <field to="orm.layer" name="layer" rel="ManyToOneRel">1</field>
+    <field to="orm.layersource" name="layer_source" rel="ManyToOneRel">1</field>
+    <field type="IntegerField" name="up_id"><None></None></field>
+    <field type="DateTimeField" name="up_date"><None></None></field>
+    <field to="orm.branch" name="up_branch" rel="ManyToOneRel">1</field>
+    <field type="CharField" name="branch"></field>
+    <field type="CharField" name="commit">master</field>
+    <field type="CharField" name="dirpath">/tmp/</field>
+    <field type="IntegerField" name="priority">0</field>
+    <field type="FilePathField" name="local_path">/</field>
+    <field to="orm.project" name="project" rel="ManyToOneRel">1</field>
+  </object>
+  <object pk="2" model="orm.layer_version">
+    <field to="orm.build" name="build" rel="ManyToOneRel"><None></None></field>
+    <field to="orm.layer" name="layer" rel="ManyToOneRel">2</field>
+    <field to="orm.layersource" name="layer_source" rel="ManyToOneRel">1</field>
+    <field type="IntegerField" name="up_id"><None></None></field>
+    <field type="DateTimeField" name="up_date"><None></None></field>
+    <field to="orm.branch" name="up_branch" rel="ManyToOneRel">1</field>
+    <field type="CharField" name="branch"></field>
+    <field type="CharField" name="commit">master</field>
+    <field type="CharField" name="dirpath"><None></None></field>
+    <field type="IntegerField" name="priority">0</field>
+    <field type="FilePathField" name="local_path">/</field>
+    <field to="orm.project" name="project" rel="ManyToOneRel"><None></None></field>
+  </object>
+  <object pk="1" model="orm.projectlayer">
+    <field to="orm.project" name="project" rel="ManyToOneRel">1</field>
+    <field to="orm.layer_version" name="layercommit" rel="ManyToOneRel">1</field>
+    <field type="BooleanField" name="optional">True</field>
+  </object>
+  <object pk="3" model="orm.customimagerecipe">
+    <field to="orm.recipe" name="base_recipe" rel="ManyToOneRel">2</field>
+    <field to="orm.project" name="project" rel="ManyToOneRel">1</field>
+    <field type="DateTimeField" name="last_updated"><None></None></field>
+  </object>
+  <object pk="6" model="orm.customimagerecipe">
+    <field to="orm.recipe" name="base_recipe" rel="ManyToOneRel">4</field>
+    <field to="orm.project" name="project" rel="ManyToOneRel">1</field>
+    <field type="DateTimeField" name="last_updated"><None></None></field>
+  </object>
+  <object pk="1" model="orm.logmessage">
+    <field to="orm.build" name="build" rel="ManyToOneRel">2</field>
+    <field to="orm.task" name="task" rel="ManyToOneRel"><None></None></field>
+    <field type="IntegerField" name="level">1</field>
+    <field type="TextField" name="message"><None></None></field>
+    <field type="FilePathField" name="pathname"></field>
+    <field type="IntegerField" name="lineno"><None></None></field>
+  </object>
+  <object pk="2" model="orm.logmessage">
+    <field to="orm.build" name="build" rel="ManyToOneRel">2</field>
+    <field to="orm.task" name="task" rel="ManyToOneRel"><None></None></field>
+    <field type="IntegerField" name="level">2</field>
+    <field type="TextField" name="message"><None></None></field>
+    <field type="FilePathField" name="pathname"></field>
+    <field type="IntegerField" name="lineno"><None></None></field>
+  </object>
+</django-objects>

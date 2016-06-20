@@ -7,7 +7,9 @@ LICENSE = "MIT"
 
 PR = "r6"
 
-inherit packagegroup
+inherit packagegroup distro_features_check
+# rdepends on clutter-*
+REQUIRED_DISTRO_FEATURES = "opengl"
 
 PACKAGES = "\
     ${PN}-core \

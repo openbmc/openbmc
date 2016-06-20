@@ -1,0 +1,46 @@
+From 154af50ed7ed8b91838d713052ebf29b0b14f765 Mon Sep 17 00:00:00 2001
+From: Andre McCurdy <armccurdy@gmail.com>
+Date: Mon, 18 Jan 2016 11:00:00 -0800
+Subject: [PATCH] mpers.m4: more robust test for -m32/-mx32 compile support
+
+When using the default OE toolchain for x86-64, the basic checks for
+-m32 and -mx32 compile support in mpers.m4 pass but later attempts to
+actually use the toolchain with -m32 fail, e.g.
+
+ | In file included from /home/andre/build/tmp/sysroots/qemux86-64/usr/include/sys/syscall.h:31:0,
+ |                  from ../strace-4.11/defs.h:55,
+ |                  from mpers-m32/kernel_dirent.c:32:
+ | /home/andre/build/tmp/sysroots/qemux86-64/usr/include/bits/syscall.h:41:29: fatal error: bits/syscall-32.h: No such file or directory
+
+Make the mpers.m4 tests more robust so that configure correctly
+detects the limitations of the OE toolchain.
+
+Upstream-Status: Pending
+
+Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+---
+ m4/mpers.m4 | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/m4/mpers.m4 b/m4/mpers.m4
+index 1fe8a8e..d72c717 100644
+--- a/m4/mpers.m4
++++ b/m4/mpers.m4
+@@ -53,12 +53,14 @@ case "$arch" in
+ 	CFLAGS="$CFLAGS CFLAG $IFLAG"
+ 	AC_CACHE_CHECK([for CFLAG compile support], [st_cv_cc],
+ 		[AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <stdint.h>
++						     #include <sys/syscall.h>
+ 						     int main(){return 0;}]])],
+ 				   [st_cv_cc=yes],
+ 				   [st_cv_cc=no])])
+ 	if test $st_cv_cc = yes; then
+ 		AC_CACHE_CHECK([for CFLAG runtime support], [st_cv_runtime],
+ 			[AC_RUN_IFELSE([AC_LANG_SOURCE([[#include <stdint.h>
++							 #include <sys/syscall.h>
+ 							 int main(){return 0;}]])],
+ 				       [st_cv_runtime=yes],
+ 				       [st_cv_runtime=no],
+-- 
+1.9.1
+

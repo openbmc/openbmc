@@ -1,5 +1,5 @@
 #
-# This class is used for architecture independent recipes/data files (usally scripts)
+# This class is used for architecture independent recipes/data files (usually scripts)
 #
 
 # Expand STAGING_DIR_HOST since for cross-canadian/native/nativesdk, this will

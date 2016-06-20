@@ -5,12 +5,11 @@ SECTION = "base"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://psplash.h;beginline=1;endline=16;md5=840fb2356b10a85bed78dd09dc7745c6"
 
-SRCREV = "14c8f7b705de944beb4de3f296506d80871e410f"
+SRCREV = "88343ad23c90fa1dd8d79ac0d784a691aa0c6d2b"
 PV = "0.1+git${SRCPV}"
 PR = "r15"
 
 SRC_URI = "git://git.yoctoproject.org/${BPN} \
-           file://0001-psplash-fb-Convert-psplash_fb_plot_pixel-to-a-static.patch \
            file://psplash-init \
            ${SPLASH_IMAGES}"
 

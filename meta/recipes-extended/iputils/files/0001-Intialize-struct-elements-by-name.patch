@@ -1,0 +1,52 @@
+From 000629f74908a2a95f6104444c77ad93cf40d62d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 13 Jan 2016 08:50:50 +0000
+Subject: [PATCH] Intialize struct elements by name
+
+makes it portable across glibc and musl
+
+Fixes errors
+
+| ping.c: In function 'send_probe':
+| ping.c:735:19: warning: initialization makes integer from pointer
+without a cast [-Wint-conversion]
+|           &iov, 1, &cmsg, 0, 0 };
+|                    ^
+| ping.c:735:19: note: (near initialization for 'm.__pad1')
+| ping.c:735:19: error: initializer element is not computable at load
+time
+| ping.c:735:19: note: (near initialization for 'm.__pad1')
+| make: *** [ping.o] Error 1
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ ping.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/ping.c b/ping.c
+index 4989760..e67f381 100644
+--- a/ping.c
++++ b/ping.c
+@@ -731,8 +731,15 @@ int send_probe()
+ 
+ 	do {
+ 		static struct iovec iov = {outpack, 0};
+-		static struct msghdr m = { &whereto, sizeof(whereto),
+-						   &iov, 1, &cmsg, 0, 0 };
++		static struct msghdr m = {
++			.msg_name = &whereto,
++			.msg_namelen = sizeof(whereto),
++			.msg_iov = &iov,
++			.msg_iovlen = 1,
++			.msg_control = &cmsg,
++			.msg_controllen = 0,
++			.msg_flags= 0,
++		};
+ 		m.msg_controllen = cmsg_len;
+ 		iov.iov_len = cc;
+ 
+-- 
+2.7.0
+

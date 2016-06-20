@@ -26,6 +26,10 @@ SRC_URI = "${DEBIAN_MIRROR}/main/h/heirloom-mailx/heirloom-mailx_12.5.orig.tar.g
 SRC_URI[archive.md5sum] = "29a6033ef1412824d02eb9d9213cb1f2"
 SRC_URI[archive.sha256sum] = "015ba4209135867f37a0245d22235a392b8bbed956913286b887c2e2a9a421ad"
 
+# for this package we're mostly interested in tracking debian patches,
+# and not in the upstream version where all development has effectively stopped
+UPSTREAM_CHECK_REGEX = "(?P<pver>((\d+\.*)+)-((\d+\.*)+))\.(diff|debian\.tar)\.(gz|xz)"
+
 S = "${WORKDIR}/heirloom-mailx-12.5"
 
 inherit autotools-brokensep

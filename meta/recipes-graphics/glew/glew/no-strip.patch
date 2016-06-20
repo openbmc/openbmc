@@ -1,0 +1,12 @@
+Don't forcibly strip the binaries.
+
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+Upstream-Status: Pending
+
+diff --git a/Makefile b/Makefile
+index 6a9803c..170c0ce 100644
+--- a/Makefile
++++ b/Makefile
+@@ -285 +285 @@ install.bin: glew.bin
+-	$(INSTALL) -s -m 0755 bin/$(GLEWINFO.BIN) bin/$(VISUALINFO.BIN) "$(DESTDIR)$(BINDIR)/"
++	$(INSTALL) -m 0755 bin/$(GLEWINFO.BIN) bin/$(VISUALINFO.BIN) "$(DESTDIR)$(BINDIR)/"

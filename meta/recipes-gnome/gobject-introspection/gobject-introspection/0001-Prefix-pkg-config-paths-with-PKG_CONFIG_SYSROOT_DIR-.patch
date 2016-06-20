@@ -1,0 +1,97 @@
+From a57604e205e6535acd9989444ad1f5f5038f4fba Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 8 Oct 2015 18:30:35 +0300
+Subject: [PATCH 1/4] Prefix pkg-config paths with PKG_CONFIG_SYSROOT_DIR
+ environment variable
+
+This environment variable sets the location of sysroot directory in cross-compilation
+environments; if the variable is not set, the prefix will be empty.
+
+Upstream-Status: Pending [review on oe-core list]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+---
+ Makefile-gir.am     | 18 +++++++++---------
+ m4/introspection.m4 |  8 ++++----
+ 2 files changed, 13 insertions(+), 13 deletions(-)
+
+diff --git a/Makefile-gir.am b/Makefile-gir.am
+index 9aca664..09b9360 100644
+--- a/Makefile-gir.am
++++ b/Makefile-gir.am
+@@ -55,8 +55,8 @@ else
+ endif
+ 
+ # glib
+-GLIB_INCLUDEDIR=$(shell "${PKG_CONFIG}" --variable=includedir glib-2.0)/glib-2.0
+-GLIB_LIBDIR=$(shell "${PKG_CONFIG}" --variable=libdir glib-2.0)
++GLIB_INCLUDEDIR=$(PKG_CONFIG_SYSROOT_DIR)$(shell "${PKG_CONFIG}" --variable=includedir glib-2.0)/glib-2.0
++GLIB_LIBDIR=$(PKG_CONFIG_SYSROOT_DIR)$(shell "${PKG_CONFIG}" --variable=libdir glib-2.0)
+ 
+ GLIB_LIBRARY=glib-2.0
+ 
+@@ -92,8 +92,8 @@ GLib-2.0.gir: g-ir-scanner g-ir-compiler$(EXEEXT)
+ gir/DBusGLib-1.0.typelib: GObject-2.0.gir
+ 
+ # gobject
+-GOBJECT_INCLUDEDIR=$(shell "${PKG_CONFIG}" --variable=includedir gobject-2.0)/glib-2.0
+-GOBJECT_LIBDIR=$(shell "${PKG_CONFIG}" --variable=libdir gobject-2.0)
++GOBJECT_INCLUDEDIR=$(PKG_CONFIG_SYSROOT_DIR)$(shell "${PKG_CONFIG}" --variable=includedir gobject-2.0)/glib-2.0
++GOBJECT_LIBDIR=$(PKG_CONFIG_SYSROOT_DIR)$(shell "${PKG_CONFIG}" --variable=libdir gobject-2.0)
+ 
+ GOBJECT_LIBRARY=gobject-2.0
+ 
+@@ -120,8 +120,8 @@ GObject_2_0_gir_FILES = \
+ BUILT_GIRSOURCES += GObject-2.0.gir
+ 
+ # gmodule
+-GMODULE_INCLUDEDIR=$(shell "${PKG_CONFIG}" --variable=includedir gmodule-2.0)/glib-2.0
+-GMODULE_LIBDIR=$(shell "${PKG_CONFIG}" --variable=libdir gmodule-2.0)
++GMODULE_INCLUDEDIR=$(PKG_CONFIG_SYSROOT_DIR)$(shell "${PKG_CONFIG}" --variable=includedir gmodule-2.0)/glib-2.0
++GMODULE_LIBDIR=$(PKG_CONFIG_SYSROOT_DIR)$(shell "${PKG_CONFIG}" --variable=libdir gmodule-2.0)
+ 
+ GMODULE_LIBRARY=gmodule-2.0
+ 
+@@ -146,13 +146,13 @@ GModule_2_0_gir_FILES = $(GLIB_INCLUDEDIR)/gmodule.h \
+ BUILT_GIRSOURCES += GModule-2.0.gir
+ 
+ # gio
+-GIO_INCLUDEDIR=$(shell "${PKG_CONFIG}" --variable=includedir gio-2.0)/glib-2.0
+-GIO_LIBDIR=$(shell "${PKG_CONFIG}" --variable=libdir gio-2.0)
++GIO_INCLUDEDIR=$(PKG_CONFIG_SYSROOT_DIR)$(shell "${PKG_CONFIG}" --variable=includedir gio-2.0)/glib-2.0
++GIO_LIBDIR=$(PKG_CONFIG_SYSROOT_DIR)$(shell "${PKG_CONFIG}" --variable=libdir gio-2.0)
+ 
+ GIO_LIBRARY=gio-2.0
+ 
+ if HAVE_GIO_UNIX
+-GIO_UNIX_HDRS=$(shell "${PKG_CONFIG}" --variable=includedir gio-unix-2.0)/gio-unix-2.0/gio/*.h
++GIO_UNIX_HDRS=$(PKG_CONFIG_SYSROOT_DIR)$(shell "${PKG_CONFIG}" --variable=includedir gio-unix-2.0)/gio-unix-2.0/gio/*.h
+ GIO_UNIX_PACKAGES = gio-unix-2.0
+ else
+ GIO_UNIX_HDRS=
+diff --git a/m4/introspection.m4 b/m4/introspection.m4
+index d89c3d9..b562266 100644
+--- a/m4/introspection.m4
++++ b/m4/introspection.m4
+@@ -56,14 +56,14 @@ m4_define([_GOBJECT_INTROSPECTION_CHECK_INTERNAL],
+     INTROSPECTION_GIRDIR=
+     INTROSPECTION_TYPELIBDIR=
+     if test "x$found_introspection" = "xyes"; then
+-       INTROSPECTION_SCANNER=`$PKG_CONFIG --variable=g_ir_scanner gobject-introspection-1.0`
+-       INTROSPECTION_COMPILER=`$PKG_CONFIG --variable=g_ir_compiler gobject-introspection-1.0`
+-       INTROSPECTION_GENERATE=`$PKG_CONFIG --variable=g_ir_generate gobject-introspection-1.0`
++       INTROSPECTION_SCANNER=$PKG_CONFIG_SYSROOT_DIR`$PKG_CONFIG --variable=g_ir_scanner gobject-introspection-1.0`
++       INTROSPECTION_COMPILER=$PKG_CONFIG_SYSROOT_DIR`$PKG_CONFIG --variable=g_ir_compiler gobject-introspection-1.0`
++       INTROSPECTION_GENERATE=$PKG_CONFIG_SYSROOT_DIR`$PKG_CONFIG --variable=g_ir_generate gobject-introspection-1.0`
+        INTROSPECTION_GIRDIR=`$PKG_CONFIG --variable=girdir gobject-introspection-1.0`
+        INTROSPECTION_TYPELIBDIR="$($PKG_CONFIG --variable=typelibdir gobject-introspection-1.0)"
+        INTROSPECTION_CFLAGS=`$PKG_CONFIG --cflags gobject-introspection-1.0`
+        INTROSPECTION_LIBS=`$PKG_CONFIG --libs gobject-introspection-1.0`
+-       INTROSPECTION_MAKEFILE=`$PKG_CONFIG --variable=datadir gobject-introspection-1.0`/gobject-introspection-1.0/Makefile.introspection
++       INTROSPECTION_MAKEFILE=$PKG_CONFIG_SYSROOT_DIR`$PKG_CONFIG --variable=datadir gobject-introspection-1.0`/gobject-introspection-1.0/Makefile.introspection
+     fi
+     AC_SUBST(INTROSPECTION_SCANNER)
+     AC_SUBST(INTROSPECTION_COMPILER)
+-- 
+2.7.0
+

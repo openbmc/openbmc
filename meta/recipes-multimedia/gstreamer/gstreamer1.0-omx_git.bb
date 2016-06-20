@@ -9,18 +9,17 @@ SRC_URI = " \
     git://anongit.freedesktop.org/gstreamer/gst-omx;branch=master;name=gst-omx \
     git://anongit.freedesktop.org/gstreamer/common;destsuffix=git/common;branch=master;name=common \
     file://0001-omx-fixed-type-error-in-printf-call.patch \
-    "
-
-S = "${WORKDIR}/git"
+"
 
 SRCREV_gst-omx = "a2db76b048db278ef0aa798e106b7594264e06c0"
 SRCREV_common = "5edcd857b2107cd8b78c16232dd10877513ec157"
 
 SRCREV_FORMAT = "gst-omx"
 
+S = "${WORKDIR}/git"
+
 do_configure_prepend() {
 	cd ${S}
 	./autogen.sh --noconfigure
 	cd ${B}
 }
-

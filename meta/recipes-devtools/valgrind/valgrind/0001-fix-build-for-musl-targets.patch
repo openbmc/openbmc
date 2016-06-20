@@ -1,0 +1,69 @@
+From 1b1a024efd18d44294e184e792c1e039cab02bfe Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 14 Feb 2016 09:14:12 +0000
+Subject: [PATCH] fix build for musl targets
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ configure.ac             | 2 --
+ coregrind/vg_preloaded.c | 2 +-
+ include/pub_tool_redir.h | 7 +++++--
+ 3 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 9366dc7..679f514 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1066,8 +1066,6 @@ case "${GLIBC_VERSION}" in
+ 	;;
+      2.0|2.1|*)
+ 	AC_MSG_RESULT([unsupported version ${GLIBC_VERSION}])
+-	AC_MSG_ERROR([Valgrind requires glibc version 2.2 or later,])
+-	AC_MSG_ERROR([Darwin libc, Bionic libc or Solaris libc])
+ 	;;
+ esac
+ 
+diff --git a/coregrind/vg_preloaded.c b/coregrind/vg_preloaded.c
+index 2ea7a7a..e49c832 100644
+--- a/coregrind/vg_preloaded.c
++++ b/coregrind/vg_preloaded.c
+@@ -56,7 +56,7 @@
+ void VG_NOTIFY_ON_LOAD(freeres)( void );
+ void VG_NOTIFY_ON_LOAD(freeres)( void )
+ {
+-#  if !defined(__UCLIBC__) \
++#  if !defined(__UCLIBC__) && defined(__GLIBC__) \
+       && !defined(VGPV_arm_linux_android) \
+       && !defined(VGPV_x86_linux_android) \
+       && !defined(VGPV_mips32_linux_android) \
+diff --git a/include/pub_tool_redir.h b/include/pub_tool_redir.h
+index bac00d7..fbb2ef2 100644
+--- a/include/pub_tool_redir.h
++++ b/include/pub_tool_redir.h
+@@ -242,8 +242,7 @@
+ /* --- Soname of the standard C library. --- */
+ 
+ #if defined(VGO_linux) || defined(VGO_solaris)
+-#  define  VG_Z_LIBC_SONAME  libcZdsoZa              // libc.so*
+-
++#  define  VG_Z_LIBC_SONAME  libcZdZa                // libc.*
+ #elif defined(VGO_darwin) && (DARWIN_VERS <= DARWIN_10_6)
+ #  define  VG_Z_LIBC_SONAME  libSystemZdZaZddylib    // libSystem.*.dylib
+ 
+@@ -274,7 +273,11 @@
+ /* --- Soname of the pthreads library. --- */
+ 
+ #if defined(VGO_linux)
++# if defined(__GLIBC__) || defined(__UCLIBC__)
+ #  define  VG_Z_LIBPTHREAD_SONAME  libpthreadZdsoZd0     // libpthread.so.0
++# else
++#  define  VG_Z_LIBPTHREAD_SONAME  libcZdZa              // libc.*
++#endif
+ #elif defined(VGO_darwin)
+ #  define  VG_Z_LIBPTHREAD_SONAME  libSystemZdZaZddylib  // libSystem.*.dylib
+ #elif defined(VGO_solaris)
+-- 
+2.7.1
+

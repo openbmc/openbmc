@@ -1,0 +1,33 @@
+From 699893a05edac5194f9670529bacfaeb67252edb Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 14 Dec 2015 00:42:49 +0000
+Subject: [PATCH 03/36] define exp10 if missing
+
+Inspired by: http://peter.korsgaard.com/patches/alsa-utils/alsamixer-fix-build-on-uClibc-exp10.patch
+
+exp10 extension is not part of uClibc, so compute it.
+
+Upstream-Status: Pending
+
+Signed-off-by: Samuel Martin <s.martin49@gmail.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/basic/missing.h | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/basic/missing.h b/src/basic/missing.h
+index f3d3236..ee7e7ea 100644
+--- a/src/basic/missing.h
++++ b/src/basic/missing.h
+@@ -1169,3 +1169,8 @@ static inline key_serial_t request_key(const char *type, const char *description
+ #endif
+ 
+ #endif
++
++#ifdef __UCLIBC__
++/* 10^x = 10^(log e^x) = (e^x)^log10 = e^(x * log 10) */
++#define exp10(x) (exp((x) * log(10)))
++#endif /* __UCLIBC__ */
+-- 
+1.8.3.1
+

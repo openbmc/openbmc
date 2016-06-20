@@ -1,0 +1,27 @@
+From 317a5ac120c44987219bc03486cd2f2d1842c9b9 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 27 Oct 2015 16:02:19 +0200
+Subject: [PATCH] FindGObjectIntrospection.cmake: prefix variables obtained
+ from pkg-config with PKG_CONFIG_SYSROOT_DIR
+
+Upstream-Status: Pending [review on oe-core list]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ Source/cmake/FindGObjectIntrospection.cmake | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Source/cmake/FindGObjectIntrospection.cmake b/Source/cmake/FindGObjectIntrospection.cmake
+index e1f49b4..03a4446 100644
+--- a/Source/cmake/FindGObjectIntrospection.cmake
++++ b/Source/cmake/FindGObjectIntrospection.cmake
+@@ -26,6 +26,7 @@ macro(_GIR_GET_PKGCONFIG_VAR _outvar _varname _extra_args)
+     else ()
+         string(REGEX REPLACE "[\r\n]" " " _result "${_result}")
+         string(REGEX REPLACE " +$" ""  _result "${_result}")
++        string(CONCAT _result $ENV{PKG_CONFIG_SYSROOT_DIR} "${_result}")
+         separate_arguments(_result)
+         set(${_outvar} ${_result} CACHE INTERNAL "")
+     endif ()
+-- 
+2.1.4
+

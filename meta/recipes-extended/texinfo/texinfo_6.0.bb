@@ -79,4 +79,4 @@ FILES_${PN}-doc = "${infodir}/texinfo* \
                    ${datadir}/${tex_texinfo} \
                    ${mandir}/man1 ${mandir}/man5"
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

@@ -38,6 +38,7 @@ ERROR_QA ?= "dev-so debug-deps dev-deps debug-files arch pkgconfig la \
             perms dep-cmp pkgvarcheck perm-config perm-line perm-link \
             split-strip packages-list pkgv-undefined var-undefined \
             version-going-backwards expanded-d invalid-chars \
+            license-checksum dev-elf \
             "
 FAKEROOT_QA = "host-user-contaminated"
 FAKEROOT_QA[doc] = "QA tests which need to run under fakeroot. If any \
@@ -45,7 +46,7 @@ enabled tests are listed here, the do_package_qa task will run under fakeroot."
 
 ALL_QA = "${WARN_QA} ${ERROR_QA}"
 
-UNKNOWN_CONFIGURE_WHITELIST ?= "--enable-nls --disable-nls --disable-silent-rules --disable-dependency-tracking --with-libtool-sysroot"
+UNKNOWN_CONFIGURE_WHITELIST ?= "--enable-nls --disable-nls --disable-silent-rules --disable-dependency-tracking --with-libtool-sysroot --disable-static"
 
 #
 # dictionary for elf headers
@@ -126,6 +127,9 @@ def package_qa_get_machine_dict():
                         "mipsel":     (   8,     0,    0,          True,          32),
                         "mips64":     (   8,     0,    0,          False,         64),
                         "mips64el":   (   8,     0,    0,          True,          64),
+                        "microblaze":  (189,     0,    0,          False,         32),
+                        "microblazeeb":(189,     0,    0,          False,         32),
+                        "microblazeel":(189,     0,    0,          True,          32),
                       },
             "uclinux-uclibc" : {
                         "bfin":       ( 106,     0,    0,          True,         32),
@@ -189,6 +193,12 @@ def package_qa_handle_error(error_class, error_msg, d):
         bb.note("QA Issue: %s [%s]" % (error_msg, error_class))
     return True
 
+def package_qa_add_message(messages, section, new_msg):
+    if section not in messages:
+        messages[section] = new_msg
+    else:
+        messages[section] = messages[section] + "\n" + new_msg
+
 QAPATHTEST[libexec] = "package_qa_check_libexec"
 def package_qa_check_libexec(path,name, d, elf, messages):
 
@@ -198,7 +208,7 @@ def package_qa_check_libexec(path,name, d, elf, messages):
         return True
 
     if 'libexec' in path.split(os.path.sep):
-        messages["libexec"] = "%s: %s is using libexec please relocate to %s" % (name, package_qa_clean_path(path, d), libexec)
+        package_qa_add_message(messages, "libexec", "%s: %s is using libexec please relocate to %s" % (name, package_qa_clean_path(path, d), libexec))
         return False
 
     return True
@@ -226,7 +236,7 @@ def package_qa_check_rpath(file,name, d, elf, messages):
             rpath = m.group(1)
             for dir in bad_dirs:
                 if dir in rpath:
-                    messages["rpaths"] = "package %s contains bad RPATH %s in file %s" % (name, rpath, file)
+                    package_qa_add_message(messages, "rpaths", "package %s contains bad RPATH %s in file %s" % (name, rpath, file))
 
 QAPATHTEST[useless-rpaths] = "package_qa_check_useless_rpaths"
 def package_qa_check_useless_rpaths(file, name, d, elf, messages):
@@ -256,7 +266,7 @@ def package_qa_check_useless_rpaths(file, name, d, elf, messages):
             if rpath_eq(rpath, libdir) or rpath_eq(rpath, base_libdir):
                 # The dynamic linker searches both these places anyway.  There is no point in
                 # looking there again.
-                messages["useless-rpaths"] = "%s: %s contains probably-redundant RPATH %s" % (name, package_qa_clean_path(file, d), rpath)
+                package_qa_add_message(messages, "useless-rpaths", "%s: %s contains probably-redundant RPATH %s" % (name, package_qa_clean_path(file, d), rpath))
 
 QAPATHTEST[dev-so] = "package_qa_check_dev"
 def package_qa_check_dev(path, name, d, elf, messages):
@@ -265,8 +275,19 @@ def package_qa_check_dev(path, name, d, elf, messages):
     """
 
     if not name.endswith("-dev") and not name.endswith("-dbg") and not name.endswith("-ptest") and not name.startswith("nativesdk-") and path.endswith(".so") and os.path.islink(path):
-        messages["dev-so"] = "non -dev/-dbg/nativesdk- package contains symlink .so: %s path '%s'" % \
-                 (name, package_qa_clean_path(path,d))
+        package_qa_add_message(messages, "dev-so", "non -dev/-dbg/nativesdk- package contains symlink .so: %s path '%s'" % \
+                 (name, package_qa_clean_path(path,d)))
+
+QAPATHTEST[dev-elf] = "package_qa_check_dev_elf"
+def package_qa_check_dev_elf(path, name, d, elf, messages):
+    """
+    Check that -dev doesn't contain real shared libraries.  The test has to
+    check that the file is not a link and is an ELF object as some recipes
+    install link-time .so files that are linker scripts.
+    """
+    if name.endswith("-dev") and path.endswith(".so") and not os.path.islink(path) and elf:
+        package_qa_add_message(messages, "dev-elf", "-dev package contains non-symlink .so: %s path '%s'" % \
+                 (name, package_qa_clean_path(path,d)))
 
 QAPATHTEST[staticdev] = "package_qa_check_staticdev"
 def package_qa_check_staticdev(path, name, d, elf, messages):
@@ -278,8 +299,8 @@ def package_qa_check_staticdev(path, name, d, elf, messages):
     """
 
     if not name.endswith("-pic") and not name.endswith("-staticdev") and not name.endswith("-ptest") and path.endswith(".a") and not path.endswith("_nonshared.a"):
-        messages["staticdev"] = "non -staticdev package contains static .a library: %s path '%s'" % \
-                 (name, package_qa_clean_path(path,d))
+        package_qa_add_message(messages, "staticdev", "non -staticdev package contains static .a library: %s path '%s'" % \
+                 (name, package_qa_clean_path(path,d)))
 
 def package_qa_check_libdir(d):
     """
@@ -292,10 +313,14 @@ def package_qa_check_libdir(d):
     pkgdest = d.getVar('PKGDEST', True)
     base_libdir = d.getVar("base_libdir",True) + os.sep
     libdir = d.getVar("libdir", True) + os.sep
+    libexecdir = d.getVar("libexecdir", True) + os.sep
     exec_prefix = d.getVar("exec_prefix", True) + os.sep
 
     messages = []
 
+    # The re's are purposely fuzzy, as some there are some .so.x.y.z files
+    # that don't follow the standard naming convention. It checks later
+    # that they are actual ELF files
     lib_re = re.compile("^/lib.+\.so(\..+)?$")
     exec_re = re.compile("^%s.*/lib.+\.so(\..+)?$" % exec_prefix)
 
@@ -307,6 +332,9 @@ def package_qa_check_libdir(d):
                 if 'libdir' in (d.getVar('INSANE_SKIP_' + package, True) or "").split():
                     bb.note("Package %s skipping libdir QA test" % (package))
                     skippackages.append(package)
+                elif d.getVar('PACKAGE_DEBUG_SPLIT_STYLE', True) == 'debug-file-directory' and package.endswith("-dbg"):
+                    bb.note("Package %s skipping libdir QA test for PACKAGE_DEBUG_SPLIT_STYLE equals debug-file-directory" % (package))
+                    skippackages.append(package)
             for package in skippackages:
                 dirs.remove(package)
         for file in files:
@@ -317,10 +345,22 @@ def package_qa_check_libdir(d):
                 rel_path = os.sep + rel_path
                 if lib_re.match(rel_path):
                     if base_libdir not in rel_path:
-                        messages.append("%s: found library in wrong location: %s" % (package, rel_path))
+                        # make sure it's an actual ELF file
+                        elf = oe.qa.ELFFile(full_path)
+                        try:
+                            elf.open()
+                            messages.append("%s: found library in wrong location: %s" % (package, rel_path))
+                        except (oe.qa.NotELFFileError):
+                            pass
                 if exec_re.match(rel_path):
-                    if libdir not in rel_path:
-                        messages.append("%s: found library in wrong location: %s" % (package, rel_path))
+                    if libdir not in rel_path and libexecdir not in rel_path:
+                        # make sure it's an actual ELF file
+                        elf = oe.qa.ELFFile(full_path)
+                        try:
+                            elf.open()
+                            messages.append("%s: found library in wrong location: %s" % (package, rel_path))
+                        except (oe.qa.NotELFFileError):
+                            pass
 
     if messages:
         package_qa_handle_error("libdir", "\n".join(messages), d)
@@ -333,8 +373,8 @@ def package_qa_check_dbg(path, name, d, elf, messages):
 
     if not "-dbg" in name and not "-ptest" in name:
         if '.debug' in path.split(os.path.sep):
-            messages["debug-files"] = "non debug package contains .debug directory: %s path %s" % \
-                     (name, package_qa_clean_path(path,d))
+            messages("debug-files", "non debug package contains .debug directory: %s path %s" % \
+                     (name, package_qa_clean_path(path,d)))
 
 QAPATHTEST[perms] = "package_qa_check_perm"
 def package_qa_check_perm(path,name,d, elf, messages):
@@ -403,7 +443,7 @@ def package_qa_check_unsafe_references_in_scripts(path, name, d, elf, messages):
         if bool(statinfo.st_mode & stat.S_IXUSR):
             # grep shell scripts for possible references to /exec_prefix/
             exec_prefix = d.getVar('exec_prefix', True)
-            statement = "grep -e '%s/' %s > /dev/null" % (exec_prefix, path)
+            statement = "grep -e '%s/[^ :]\{1,\}/[^ :]\{1,\}' %s > /dev/null" % (exec_prefix, path)
             if subprocess.call(statement, shell=True) == 0:
                 error_msg = pn + ": Found a reference to %s/ in %s" % (exec_prefix, path)
                 package_qa_handle_error("unsafe-references-in-scripts", error_msg, d)
@@ -465,7 +505,7 @@ def package_qa_check_arch(path,name,d, elf, messages):
 
     if target_arch == "allarch":
         pn = d.getVar('PN', True)
-        messages["arch"] = pn + ": Recipe inherits the allarch class, but has packaged architecture-specific binaries"
+        package_qa_add_message(messages, "arch", pn + ": Recipe inherits the allarch class, but has packaged architecture-specific binaries")
         return
 
     # FIXME: Cross package confuse this check, so just skip them
@@ -485,15 +525,15 @@ def package_qa_check_arch(path,name,d, elf, messages):
     # Check the architecture and endiannes of the binary
     if not ((machine == elf.machine()) or \
         ((("virtual/kernel" in provides) or bb.data.inherits_class("module", d) ) and (target_os == "linux-gnux32" or target_os == "linux-gnun32"))):
-        messages["arch"] = "Architecture did not match (%d to %d) on %s" % \
-                 (machine, elf.machine(), package_qa_clean_path(path,d))
+        package_qa_add_message(messages, "arch", "Architecture did not match (%d to %d) on %s" % \
+                 (machine, elf.machine(), package_qa_clean_path(path,d)))
     elif not ((bits == elf.abiSize()) or  \
         ((("virtual/kernel" in provides) or bb.data.inherits_class("module", d) ) and (target_os == "linux-gnux32" or target_os == "linux-gnun32"))):
-        messages["arch"] = "Bit size did not match (%d to %d) %s on %s" % \
-                 (bits, elf.abiSize(), bpn, package_qa_clean_path(path,d))
+        package_qa_add_message(messages, "arch", "Bit size did not match (%d to %d) %s on %s" % \
+                 (bits, elf.abiSize(), bpn, package_qa_clean_path(path,d)))
     elif not littleendian == elf.isLittleEndian():
-        messages["arch"] = "Endiannes did not match (%d to %d) on %s" % \
-                 (littleendian, elf.isLittleEndian(), package_qa_clean_path(path,d))
+        package_qa_add_message(messages, "arch", "Endiannes did not match (%d to %d) on %s" % \
+                 (littleendian, elf.isLittleEndian(), package_qa_clean_path(path,d)))
 
 QAPATHTEST[desktop] = "package_qa_check_desktop"
 def package_qa_check_desktop(path, name, d, elf, messages):
@@ -505,7 +545,7 @@ def package_qa_check_desktop(path, name, d, elf, messages):
         output = os.popen("%s %s" % (desktop_file_validate, path))
         # This only produces output on errors
         for l in output:
-            messages["desktop"] = "Desktop file issue: " + l.strip()
+            package_qa_add_message(messages, "desktop", "Desktop file issue: " + l.strip())
 
 QAPATHTEST[textrel] = "package_qa_textrel"
 def package_qa_textrel(path, name, d, elf, messages):
@@ -529,7 +569,7 @@ def package_qa_textrel(path, name, d, elf, messages):
             sane = False
 
     if not sane:
-        messages["textrel"] = "ELF binary '%s' has relocations in .text" % path
+        package_qa_add_message(messages, "textrel", "ELF binary '%s' has relocations in .text" % path)
 
 QAPATHTEST[ldflags] = "package_qa_hash_style"
 def package_qa_hash_style(path, name, d, elf, messages):
@@ -564,7 +604,7 @@ def package_qa_hash_style(path, name, d, elf, messages):
             sane = True
 
     if has_syms and not sane:
-        messages["ldflags"] = "No GNU_HASH in the elf binary: '%s'" % path
+        package_qa_add_message(messages, "ldflags", "No GNU_HASH in the elf binary: '%s'" % path)
 
 
 QAPATHTEST[buildpaths] = "package_qa_check_buildpaths"
@@ -580,11 +620,15 @@ def package_qa_check_buildpaths(path, name, d, elf, messages):
     if os.path.islink(path):
         return
 
+    # Ignore ipk and deb's CONTROL dir
+    if path.find(name + "/CONTROL/") != -1 or path.find(name + "/DEBIAN/") != -1:
+        return
+
     tmpdir = d.getVar('TMPDIR', True)
     with open(path) as f:
         file_content = f.read()
         if tmpdir in file_content:
-            messages["buildpaths"] = "File %s in package contained reference to tmpdir" % package_qa_clean_path(path,d)
+            package_qa_add_message(messages, "buildpaths", "File %s in package contained reference to tmpdir" % package_qa_clean_path(path,d))
 
 
 QAPATHTEST[xorg-driver-abi] = "package_qa_check_xorg_driver_abi"
@@ -603,7 +647,7 @@ def package_qa_check_xorg_driver_abi(path, name, d, elf, messages):
         for rdep in bb.utils.explode_deps(d.getVar('RDEPENDS_' + name, True) or ""):
             if rdep.startswith("%sxorg-abi-" % mlprefix):
                 return
-        messages["xorg-driver-abi"] = "Package %s contains Xorg driver (%s) but no xorg-abi- dependencies" % (name, os.path.basename(path))
+        package_qa_add_message(messages, "xorg-driver-abi", "Package %s contains Xorg driver (%s) but no xorg-abi- dependencies" % (name, os.path.basename(path)))
 
 QAPATHTEST[infodir] = "package_qa_check_infodir"
 def package_qa_check_infodir(path, name, d, elf, messages):
@@ -613,7 +657,7 @@ def package_qa_check_infodir(path, name, d, elf, messages):
     infodir = d.expand("${infodir}/dir")
 
     if infodir in path:
-        messages["infodir"] = "The /usr/share/info/dir file is not meant to be shipped in a particular package."
+        package_qa_add_message(messages, "infodir", "The /usr/share/info/dir file is not meant to be shipped in a particular package.")
 
 QAPATHTEST[symlink-to-sysroot] = "package_qa_check_symlink_to_sysroot"
 def package_qa_check_symlink_to_sysroot(path, name, d, elf, messages):
@@ -626,7 +670,8 @@ def package_qa_check_symlink_to_sysroot(path, name, d, elf, messages):
             tmpdir = d.getVar('TMPDIR', True)
             if target.startswith(tmpdir):
                 trimmed = path.replace(os.path.join (d.getVar("PKGDEST", True), name), "")
-                messages["symlink-to-sysroot"] = "Symlink %s in %s points to TMPDIR" % (trimmed, name)
+                package_qa_add_message(messages, "symlink-to-sysroot", "Symlink %s in %s points to TMPDIR" % (trimmed, name))
+
 def package_qa_check_license(workdir, d):
     """
     Check for changes in the license files 
@@ -639,11 +684,11 @@ def package_qa_check_license(workdir, d):
     pn = d.getVar('PN', True)
 
     if lic == "CLOSED":
-        return True
+        return
 
     if not lic_files:
-        bb.error(pn + ": Recipe file does not have license file information (LIC_FILES_CHKSUM)")
-        return False
+        package_qa_handle_error("license-checksum", pn + ": Recipe file does not have license file information (LIC_FILES_CHKSUM)", d)
+        return
 
     srcdir = d.getVar('S', True)
 
@@ -651,10 +696,12 @@ def package_qa_check_license(workdir, d):
         try:
             (type, host, path, user, pswd, parm) = bb.fetch.decodeurl(url)
         except bb.fetch.MalformedUrl:
-            raise bb.build.FuncFailed( pn + ": LIC_FILES_CHKSUM contains an invalid URL: " + url)
+            package_qa_handle_error("license-checksum", pn + ": LIC_FILES_CHKSUM contains an invalid URL: " + url, d)
+            continue
         srclicfile = os.path.join(srcdir, path)
         if not os.path.isfile(srclicfile):
-            raise bb.build.FuncFailed( pn + ": LIC_FILES_CHKSUM points to an invalid file: " + srclicfile)
+            package_qa_handle_error("license-checksum", pn + ": LIC_FILES_CHKSUM points to an invalid file: " + srclicfile, d)
+            continue
 
         recipemd5 = parm.get('md5', '')
         beginline, endline = 0, 0
@@ -689,8 +736,8 @@ def package_qa_check_license(workdir, d):
             bb.note (pn + ": md5 checksum matched for ", url)
         else:
             if recipemd5:
-                bb.error(pn + ": md5 data is not matching for ", url)
-                bb.error(pn + ": The new md5 checksum is ", md5chksum)
+                msg = pn + ": The LIC_FILES_CHKSUM does not match for " + url
+                msg = msg + "\n" + pn + ": The new md5 checksum is " + md5chksum
                 if beginline:
                     if endline:
                         srcfiledesc = "%s (lines %d through to %d)" % (srclicfile, beginline, endline)
@@ -700,29 +747,26 @@ def package_qa_check_license(workdir, d):
                     srcfiledesc = "%s (ending on line %d)" % (srclicfile, endline)
                 else:
                     srcfiledesc = srclicfile
-                bb.error(pn + ": Check if the license information has changed in %s to verify that the LICENSE value \"%s\" remains valid" % (srcfiledesc, lic))
-            else:
-                bb.error(pn + ": md5 checksum is not specified for ", url)
-                bb.error(pn + ": The md5 checksum is ", md5chksum)
-            sane = False
+                msg = msg + "\n" + pn + ": Check if the license information has changed in %s to verify that the LICENSE value \"%s\" remains valid" % (srcfiledesc, lic)
 
-    return sane
+            else:
+                msg = pn + ": LIC_FILES_CHKSUM is not specified for " +  url
+                msg = msg + "\n" + pn + ": The md5 checksum is " + md5chksum
+            package_qa_handle_error("license-checksum", msg, d)
 
 def package_qa_check_staged(path,d):
     """
-    Check staged la and pc files for sanity
-      -e.g. installed being false
+    Check staged la and pc files for common problems like references to the work
+    directory.
 
-        As this is run after every stage we should be able
-        to find the one responsible for the errors easily even
-        if we look at every .pc and .la file
+    As this is run after every stage we should be able to find the one
+    responsible for the errors easily even if we look at every .pc and .la file.
     """
 
     sane = True
     tmpdir = d.getVar('TMPDIR', True)
     workdir = os.path.join(tmpdir, "work")
 
-    installed = "installed=yes"
     if bb.data.inherits_class("native", d) or bb.data.inherits_class("cross", d):
         pkgconfigcheck = workdir
     else:
@@ -750,7 +794,7 @@ def package_qa_check_staged(path,d):
     return sane
 
 # Walk over all files in a directory and call func
-def package_qa_walk(path, warnfuncs, errorfuncs, skip, package, d):
+def package_qa_walk(warnfuncs, errorfuncs, skip, package, d):
     import oe.qa
 
     #if this will throw an exception, then fix the dict above
@@ -763,7 +807,8 @@ def package_qa_walk(path, warnfuncs, errorfuncs, skip, package, d):
             elf = oe.qa.ELFFile(path)
             try:
                 elf.open()
-            except:
+            except (IOError, oe.qa.NotELFFileError):
+                # IOError can happen if the packaging control files disappear,
                 elf = None
             for func in warnfuncs:
                 func(path, package, d, elf, warnings)
@@ -775,15 +820,12 @@ def package_qa_walk(path, warnfuncs, errorfuncs, skip, package, d):
     for e in errors:
         package_qa_handle_error(e, errors[e], d)
 
-    return len(errors) == 0
-
 def package_qa_check_rdepends(pkg, pkgdest, skip, taskdeps, packages, d):
     # Don't do this check for kernel/module recipes, there aren't too many debug/development
     # packages and you can get false positives e.g. on kernel-module-lirc-dev
     if bb.data.inherits_class("kernel", d) or bb.data.inherits_class("module-base", d):
-        return True
+        return
 
-    sane = True
     if not "-dbg" in pkg and not "packagegroup-" in pkg and not "-image" in pkg:
         localdata = bb.data.createCopy(d)
         localdata.setVar('OVERRIDES', pkg)
@@ -797,10 +839,10 @@ def package_qa_check_rdepends(pkg, pkgdest, skip, taskdeps, packages, d):
             for rdepend in rdepends:
                 if "-dbg" in rdepend and "debug-deps" not in skip:
                     error_msg = "%s rdepends on %s" % (pkg,rdepend)
-                    sane = package_qa_handle_error("debug-deps", error_msg, d)
+                    package_qa_handle_error("debug-deps", error_msg, d)
                 if (not "-dev" in pkg and not "-staticdev" in pkg) and rdepend.endswith("-dev") and "dev-deps" not in skip:
                     error_msg = "%s rdepends on %s" % (pkg, rdepend)
-                    sane = package_qa_handle_error("dev-deps", error_msg, d)
+                    package_qa_handle_error("dev-deps", error_msg, d)
                 if rdepend not in packages:
                     rdep_data = oe.packagedata.read_subpkgdata(rdepend, d)
                     if rdep_data and 'PN' in rdep_data and rdep_data['PN'] in taskdeps:
@@ -817,8 +859,11 @@ def package_qa_check_rdepends(pkg, pkgdest, skip, taskdeps, packages, d):
                                 break
                     if rdep_data and 'PN' in rdep_data and rdep_data['PN'] in taskdeps:
                         continue
-                    error_msg = "%s rdepends on %s, but it isn't a build dependency?" % (pkg, rdepend)
-                    sane = package_qa_handle_error("build-deps", error_msg, d)
+                    if rdep_data and 'PN' in rdep_data:
+                        error_msg = "%s rdepends on %s, but it isn't a build dependency, missing %s in DEPENDS or PACKAGECONFIG?" % (pkg, rdepend, rdep_data['PN'])
+                    else:
+                        error_msg = "%s rdepends on %s, but it isn't a build dependency?" % (pkg, rdepend)
+                    package_qa_handle_error("build-deps", error_msg, d)
 
         if "file-rdeps" not in skip:
             ignored_file_rdeps = set(['/bin/sh', '/usr/bin/env', 'rtld(GNU_HASH)'])
@@ -883,21 +928,17 @@ def package_qa_check_rdepends(pkg, pkgdest, skip, taskdeps, packages, d):
                         break
             if filerdepends:
                 for key in filerdepends:
-                    error_msg = "%s contained in package %s requires %s, but no providers found in its RDEPENDS" % \
-                            (filerdepends[key],pkg, key)
-                sane = package_qa_handle_error("file-rdeps", error_msg, d)
-
-    return sane
+                    error_msg = "%s contained in package %s requires %s, but no providers found in RDEPENDS_%s?" % \
+                            (filerdepends[key].replace("_%s" % pkg, "").replace("@underscore@", "_"), pkg, key, pkg)
+                package_qa_handle_error("file-rdeps", error_msg, d)
 
 def package_qa_check_deps(pkg, pkgdest, skip, d):
-    sane = True
 
     localdata = bb.data.createCopy(d)
     localdata.setVar('OVERRIDES', pkg)
     bb.data.update_data(localdata)
 
     def check_valid_deps(var):
-        sane = True
         try:
             rvar = bb.utils.explode_dep_versions2(localdata.getVar(var, True) or "")
         except ValueError as e:
@@ -906,24 +947,14 @@ def package_qa_check_deps(pkg, pkgdest, skip, d):
             for v in rvar[dep]:
                 if v and not v.startswith(('< ', '= ', '> ', '<= ', '>=')):
                     error_msg = "%s_%s is invalid: %s (%s)   only comparisons <, =, >, <=, and >= are allowed" % (var, pkg, dep, v)
-                    sane = package_qa_handle_error("dep-cmp", error_msg, d)
-        return sane
+                    package_qa_handle_error("dep-cmp", error_msg, d)
 
-    sane = True
-    if not check_valid_deps('RDEPENDS'):
-        sane = False
-    if not check_valid_deps('RRECOMMENDS'):
-        sane = False
-    if not check_valid_deps('RSUGGESTS'):
-        sane = False
-    if not check_valid_deps('RPROVIDES'):
-        sane = False
-    if not check_valid_deps('RREPLACES'):
-        sane = False
-    if not check_valid_deps('RCONFLICTS'):
-        sane = False
-
-    return sane
+    check_valid_deps('RDEPENDS')
+    check_valid_deps('RRECOMMENDS')
+    check_valid_deps('RSUGGESTS')
+    check_valid_deps('RPROVIDES')
+    check_valid_deps('RREPLACES')
+    check_valid_deps('RCONFLICTS')
 
 QAPATHTEST[expanded-d] = "package_qa_check_expanded_d"
 def package_qa_check_expanded_d(path,name,d,elf,messages):
@@ -945,10 +976,10 @@ def package_qa_check_expanded_d(path,name,d,elf,messages):
                 # Bitbake expands ${D} within bbvar during the previous step, so we check for its expanded value
                 if expanded_d in bbvar:
                     if var == 'FILES':
-                        messages["expanded-d"] = "FILES in %s recipe should not contain the ${D} variable as it references the local build directory not the target filesystem, best solution is to remove the ${D} reference" % pak
+                        package_qa_add_message(messages, "expanded-d", "FILES in %s recipe should not contain the ${D} variable as it references the local build directory not the target filesystem, best solution is to remove the ${D} reference" % pak)
                         sane = False
                     else:
-                        messages["expanded-d"] = "%s in %s recipe contains ${D}, it should be replaced by $D instead" % (var, pak)
+                        package_qa_add_message(messages, "expanded-d", "%s in %s recipe contains ${D}, it should be replaced by $D instead" % (var, pak))
                         sane = False
     return sane
 
@@ -996,12 +1027,12 @@ def package_qa_check_host_user(path, name, d, elf, messages):
         rootfs_path = path[len(dest):]
         check_uid = int(d.getVar('HOST_USER_UID', True))
         if stat.st_uid == check_uid:
-            messages["host-user-contaminated"] = "%s: %s is owned by uid %d, which is the same as the user running bitbake. This may be due to host contamination" % (pn, rootfs_path, check_uid)
+            package_qa_add_message(messages, "host-user-contaminated", "%s: %s is owned by uid %d, which is the same as the user running bitbake. This may be due to host contamination" % (pn, rootfs_path, check_uid))
             return False
 
         check_gid = int(d.getVar('HOST_USER_GID', True))
         if stat.st_gid == check_gid:
-            messages["host-user-contaminated"] = "%s: %s is owned by gid %d, which is the same as the user running bitbake. This may be due to host contamination" % (pn, rootfs_path, check_gid)
+            package_qa_add_message(messages, "host-user-contaminated", "%s: %s is owned by gid %d, which is the same as the user running bitbake. This may be due to host contamination" % (pn, rootfs_path, check_gid))
             return False
     return True
 
@@ -1068,9 +1099,6 @@ python do_package_qa () {
         taskdeps.add(taskdepdata[dep][0])
 
     g = globals()
-    walk_sane = True
-    rdepends_sane = True
-    deps_sane = True
     for package in packages:
         skip = (d.getVar('INSANE_SKIP_' + package, True) or "").split()
         if skip:
@@ -1081,12 +1109,17 @@ python do_package_qa () {
                continue
             if w in testmatrix and testmatrix[w] in g:
                 warnchecks.append(g[testmatrix[w]])
+            if w == 'unsafe-references-in-binaries':
+                oe.utils.write_ld_so_conf(d)
+
         errorchecks = []
         for e in (d.getVar("ERROR_QA", True) or "").split():
             if e in skip:
                continue
             if e in testmatrix and testmatrix[e] in g:
                 errorchecks.append(g[testmatrix[e]])
+            if e == 'unsafe-references-in-binaries':
+                oe.utils.write_ld_so_conf(d)
 
         bb.note("Checking Package: %s" % package)
         # Check package name
@@ -1095,23 +1128,21 @@ python do_package_qa () {
                     "%s doesn't match the [a-z0-9.+-]+ regex" % package, d)
 
         path = "%s/%s" % (pkgdest, package)
-        if not package_qa_walk(path, warnchecks, errorchecks, skip, package, d):
-            walk_sane  = False
-        if not package_qa_check_rdepends(package, pkgdest, skip, taskdeps, packages, d):
-            rdepends_sane = False
-        if not package_qa_check_deps(package, pkgdest, skip, d):
-            deps_sane = False
+        package_qa_walk(warnchecks, errorchecks, skip, package, d)
 
+        package_qa_check_rdepends(package, pkgdest, skip, taskdeps, packages, d)
+        package_qa_check_deps(package, pkgdest, skip, d)
 
     if 'libdir' in d.getVar("ALL_QA", True).split():
         package_qa_check_libdir(d)
 
     qa_sane = d.getVar("QA_SANE", True)
-    if not walk_sane or not rdepends_sane or not deps_sane or not qa_sane:
+    if not qa_sane:
         bb.fatal("QA run found fatal errors. Please consider fixing them.")
     bb.note("DONE with PACKAGE QA")
 }
 
+do_package_qa[vardepsexclude] = "BB_TASKDEPDATA"
 do_package_qa[rdeptask] = "do_packagedata"
 addtask do_package_qa after do_packagedata do_package before do_build
 
@@ -1126,7 +1157,7 @@ addtask do_package_qa_setscene
 python do_qa_staging() {
     bb.note("QA checking staging")
 
-    if not package_qa_check_staged(d.expand('${SYSROOT_DESTDIR}${STAGING_LIBDIR}'), d):
+    if not package_qa_check_staged(d.expand('${SYSROOT_DESTDIR}${libdir}'), d):
         bb.fatal("QA staging was broken by the package built above")
 }
 
@@ -1139,19 +1170,21 @@ python do_qa_configure() {
 
     configs = []
     workdir = d.getVar('WORKDIR', True)
-    bb.note("Checking autotools environment for common misconfiguration")
-    for root, dirs, files in os.walk(workdir):
-        statement = "grep -e 'CROSS COMPILE Badness:' -e 'is unsafe for cross-compilation' %s > /dev/null" % \
-                    os.path.join(root,"config.log")
-        if "config.log" in files:
-            if subprocess.call(statement, shell=True) == 0:
-                bb.fatal("""This autoconf log indicates errors, it looked at host include and/or library paths while determining system capabilities.
+
+    if bb.data.inherits_class('autotools', d):
+        bb.note("Checking autotools environment for common misconfiguration")
+        for root, dirs, files in os.walk(workdir):
+            statement = "grep -q -F -e 'CROSS COMPILE Badness:' -e 'is unsafe for cross-compilation' %s" % \
+                        os.path.join(root,"config.log")
+            if "config.log" in files:
+                if subprocess.call(statement, shell=True) == 0:
+                    bb.fatal("""This autoconf log indicates errors, it looked at host include and/or library paths while determining system capabilities.
 Rerun configure task after fixing this.""")
 
-        if "configure.ac" in files:
-            configs.append(os.path.join(root,"configure.ac"))
-        if "configure.in" in files:
-            configs.append(os.path.join(root, "configure.in"))
+            if "configure.ac" in files:
+                configs.append(os.path.join(root,"configure.ac"))
+            if "configure.in" in files:
+                configs.append(os.path.join(root, "configure.in"))
 
     ###########################################################################
     # Check gettext configuration and dependencies are correct
@@ -1178,8 +1211,7 @@ Missing inherit gettext?""" % (gt, config))
     # Check license variables
     ###########################################################################
 
-    if not package_qa_check_license(workdir, d):
-        bb.fatal("Licensing Error: LIC_FILES_CHKSUM does not match, please fix")
+    package_qa_check_license(workdir, d)
 
     ###########################################################################
     # Check unrecognised configure options (with a white list)
@@ -1211,6 +1243,10 @@ Missing inherit gettext?""" % (gt, config))
                 pn = d.getVar('PN', True)
                 error_msg = "%s: invalid PACKAGECONFIG: %s" % (pn, pconfig)
                 package_qa_handle_error("invalid-packageconfig", error_msg, d)
+
+    qa_sane = d.getVar("QA_SANE", True)
+    if not qa_sane:
+        bb.fatal("Fatal QA errors found, failing task.")
 }
 
 python do_qa_unpack() {
@@ -1255,9 +1291,6 @@ python () {
         msg += "%s\n" % extrapaths
         bb.warn(msg)
 
-    if d.getVar('do_stage', True) is not None:
-        bb.fatal("Legacy staging found for %s as it has a do_stage function. This will need conversion to a do_install or often simply removal to work with OE-core" % d.getVar("FILE", True))
-
     overrides = d.getVar('OVERRIDES', True).split(':')
     pn = d.getVar('PN', True)
     if pn in overrides:
@@ -1280,4 +1313,7 @@ python () {
         d.setVarFlag('do_package_qa', 'rdeptask', '')
     for i in issues:
         package_qa_handle_error("pkgvarcheck", "%s: Variable %s is set as not being package specific, please fix this." % (d.getVar("FILE", True), i), d)
+    qa_sane = d.getVar("QA_SANE", True)
+    if not qa_sane:
+        bb.fatal("Fatal QA errors found, failing task.")
 }

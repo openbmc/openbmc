@@ -1,0 +1,50 @@
+Add missing defines for uclibc
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Inappropriate
+
+--- fts.orig/fts.c
++++ fts/fts.c
+@@ -31,6 +31,10 @@
+  * SUCH DAMAGE.
+  */
+ 
++#define	alignof(TYPE)   ((int) &((struct { char dummy1; TYPE dummy2; } *) 0)->dummy2)
++#define	ALIGNBYTES	(alignof(long double) - 1)
++#define	ALIGN(p)	(((uintptr_t)(p) + ALIGNBYTES) & ~ALIGNBYTES) 
++
+ #if defined(LIBC_SCCS) && !defined(lint)
+ static char sccsid[] = "@(#)fts.c	8.6 (Berkeley) 8/14/94";
+ #endif /* LIBC_SCCS and not lint */
+@@ -652,10 +656,10 @@
+ 		if (!ISSET(FTS_SEEDOT) && ISDOT(dp->d_name))
+ 			continue;
+ 
+-		if ((p = fts_alloc(sp, dp->d_name, (int)dp->d_namlen)) == NULL)
++		if ((p = fts_alloc(sp, dp->d_name, (int)dp->d_reclen)) == NULL)
+ 			goto mem1;
+-		if (dp->d_namlen > maxlen) {
+-			if (fts_palloc(sp, (size_t)dp->d_namlen)) {
++		if (dp->d_reclen > maxlen) {
++			if (fts_palloc(sp, (size_t)dp->d_reclen)) {
+ 				/*
+ 				 * No more memory for path or structures.  Save
+ 				 * errno, free up the current structure and the
+@@ -675,7 +679,7 @@
+ 			maxlen = sp->fts_pathlen - sp->fts_cur->fts_pathlen - 1;
+ 		}
+ 
+-		p->fts_pathlen = len + dp->d_namlen + 1;
++		p->fts_pathlen = len + dp->d_reclen + 1;
+ 		p->fts_parent = sp->fts_cur;
+ 		p->fts_level = level;
+ 
+@@ -784,7 +788,7 @@
+ 	/* If user needs stat info, stat buffer already allocated. */
+ 	sbp = ISSET(FTS_NOSTAT) ? &sb : p->fts_statp;
+ 
+-#ifdef DT_WHT
++#ifdef S_IFWHT
+ 	/*
+ 	 * Whited-out files don't really exist.  However, there's stat(2) file
+ 	 * mask for them, so we set it so that programs (i.e., find) don't have

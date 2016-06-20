@@ -35,5 +35,3 @@ FILES_${PN}-staticdev += "${libdir}/bellagio/*.a \
 FILES_${PN}-dev += "${libdir}/bellagio/*.la \
                     ${libdir}/omxloaders/*.la \
                     ${libdir}/omxloaders/*${SOLIBSDEV}"
-FILES_${PN}-dbg += "${libdir}/bellagio/.debug/ \
-                    ${libdir}/omxloaders/.debug/"

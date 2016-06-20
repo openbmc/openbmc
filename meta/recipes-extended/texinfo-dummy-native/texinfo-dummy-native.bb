@@ -1,4 +1,4 @@
-DESCRIPTION = "Fake version of the texinfo utility suite"
+SUMMARY = "Fake version of the texinfo utility suite"
 SECTION = "console/utils"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d6bb62e73ca8b901d3f2e9d71542f4bb"

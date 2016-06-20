@@ -1,0 +1,34 @@
+From 94c0b97b62125d8bbc92dce0694e387d5b2ad181 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 10 Jan 2016 12:14:02 -0800
+Subject: [PATCH] Make dynamic linker a relative symlink to libc
+
+absolute symlink into $(libdir) fails to load in a cross build
+environment, especially when executing qemu in usermode to run target
+applications, which cross build systems often do, since not everything
+can be computed during cross builds, qemu in usermode often comes to aid
+in such situations to feed into cross builds.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index b2226fa..0d71f7f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -189,7 +189,7 @@ $(DESTDIR)$(includedir)/%: include/%
+ 	$(INSTALL) -D -m 644 $< $@
+ 
+ $(DESTDIR)$(LDSO_PATHNAME): $(DESTDIR)$(libdir)/libc.so
+-	$(INSTALL) -D -l $(libdir)/libc.so $@ || true
++	$(INSTALL) -D -l ..$(libdir)/libc.so $@ || true
+ 
+ install-libs: $(ALL_LIBS:lib/%=$(DESTDIR)$(libdir)/%) $(if $(SHARED_LIBS),$(DESTDIR)$(LDSO_PATHNAME),)
+ 
+-- 
+2.7.0
+

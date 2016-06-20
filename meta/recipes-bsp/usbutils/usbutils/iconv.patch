@@ -10,10 +10,10 @@ Upstream-Status: Pending
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
-Index: usbutils-007/configure.ac
+Index: usbutils-008/configure.ac
 ===================================================================
---- usbutils-007.orig/configure.ac
-+++ usbutils-007/configure.ac
+--- usbutils-008.orig/configure.ac
++++ usbutils-008/configure.ac
 @@ -10,7 +10,9 @@ AC_USE_SYSTEM_EXTENSIONS
  AC_SYS_LARGEFILE
  
@@ -23,18 +23,19 @@ Index: usbutils-007/configure.ac
 +AM_GNU_GETTEXT
 +AM_ICONV
  
- AC_ARG_ENABLE(zlib,
- 	AS_HELP_STRING(--disable-zlib,disable support for zlib))
-Index: usbutils-007/Makefile.am
+ PKG_CHECK_MODULES(LIBUSB, libusb-1.0 >= 1.0.0)
+ 
+Index: usbutils-008/Makefile.am
 ===================================================================
---- usbutils-007.orig/Makefile.am
-+++ usbutils-007/Makefile.am
-@@ -27,7 +27,7 @@ lsusb_CPPFLAGS = \
- 	-DDATADIR=\"$(datadir)\"
+--- usbutils-008.orig/Makefile.am
++++ usbutils-008/Makefile.am
+@@ -29,7 +29,8 @@ lsusb_CPPFLAGS = \
  
  lsusb_LDADD = \
--	$(LIBUSB_LIBS)
-+	$(LIBUSB_LIBS) $(LIBICONV)
+ 	$(LIBUSB_LIBS) \
+-	$(UDEV_LIBS)
++	$(UDEV_LIBS) \
++	$(LIBICONV)
  
- if HAVE_ZLIB
- lsusb_CPPFLAGS += -DHAVE_LIBZ
+ man_MANS = \
+ 	lsusb.8	\

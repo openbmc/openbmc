@@ -47,22 +47,12 @@ __addhandler_regexp__    = re.compile( r"addhandler\s+(.+)" )
 __def_regexp__           = re.compile( r"def\s+(\w+).*:" )
 __python_func_regexp__   = re.compile( r"(\s+.*)|(^$)" )
 
-
 __infunc__ = []
 __inpython__ = False
 __body__   = []
 __classname__ = ""
 
 cached_statements = {}
-
-# We need to indicate EOF to the feeder. This code is so messy that
-# factoring it out to a close_parse_file method is out of question.
-# We will use the IN_PYTHON_EOF as an indicator to just close the method
-#
-# The two parts using it are tightly integrated anyway
-IN_PYTHON_EOF = -9999999999999
-
-
 
 def supports(fn, d):
     """Return True if fn has a supported extension"""
@@ -110,7 +100,7 @@ def get_statements(filename, absolute_filename, base_name):
         file.close()
         if __inpython__:
             # add a blank line to close out any python definition
-            feeder(IN_PYTHON_EOF, "", filename, base_name, statements)
+            feeder(lineno, "", filename, base_name, statements, eof=True)
 
         if filename.endswith(".bbclass") or filename.endswith(".inc"):
             cached_statements[absolute_filename] = statements
@@ -171,12 +161,12 @@ def handle(fn, d, include):
 
     return d
 
-def feeder(lineno, s, fn, root, statements):
+def feeder(lineno, s, fn, root, statements, eof=False):
     global __func_start_regexp__, __inherit_regexp__, __export_func_regexp__, __addtask_regexp__, __addhandler_regexp__, __def_regexp__, __python_func_regexp__, __inpython__, __infunc__, __body__, bb, __residue__, __classname__
     if __infunc__:
         if s == '}':
             __body__.append('')
-            ast.handleMethod(statements, fn, lineno, __infunc__[0], __body__)
+            ast.handleMethod(statements, fn, lineno, __infunc__[0], __body__, __infunc__[3], __infunc__[4])
             __infunc__ = []
             __body__ = []
         else:
@@ -185,7 +175,7 @@ def feeder(lineno, s, fn, root, statements):
 
     if __inpython__:
         m = __python_func_regexp__.match(s)
-        if m and lineno != IN_PYTHON_EOF:
+        if m and not eof:
             __body__.append(s)
             return
         else:
@@ -194,7 +184,7 @@ def feeder(lineno, s, fn, root, statements):
             __body__ = []
             __inpython__ = False
 
-            if lineno == IN_PYTHON_EOF:
+            if eof:
                 return
 
     if s and s[0] == '#':
@@ -221,8 +211,7 @@ def feeder(lineno, s, fn, root, statements):
 
     m = __func_start_regexp__.match(s)
     if m:
-        __infunc__ = [m.group("func") or "__anonymous", fn, lineno]
-        ast.handleMethodFlags(statements, fn, lineno, __infunc__[0], m)
+        __infunc__ = [m.group("func") or "__anonymous", fn, lineno, m.group("py") is not None, m.group("fr") is not None]
         return
 
     m = __def_regexp__.match(s)

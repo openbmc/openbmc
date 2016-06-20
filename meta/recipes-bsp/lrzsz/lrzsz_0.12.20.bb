@@ -24,6 +24,8 @@ SRC_URI = "http://www.ohse.de/uwe/releases/lrzsz-${PV}.tar.gz \
 SRC_URI[md5sum] = "b5ce6a74abc9b9eb2af94dffdfd372a4"
 SRC_URI[sha256sum] = "c28b36b14bddb014d9e9c97c52459852f97bd405f89113f30bee45ed92728ff1"
 
+UPSTREAM_CHECK_URI = "http://ohse.de/uwe/software/lrzsz.html"
+
 inherit autotools gettext
 
 do_install() {

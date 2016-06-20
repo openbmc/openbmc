@@ -19,6 +19,8 @@ import sys
 import os
 import logging
 import glob
+import argparse
+import subprocess
 
 def logger_create(name):
     logger = logging.getLogger(name)
@@ -100,3 +102,17 @@ def fetch_uri(d, uri, destdir, srcrev=None):
         os.chdir(olddir)
     return ret
 
+def run_editor(fn):
+    if isinstance(fn, basestring):
+        params = '"%s"' % fn
+    else:
+        params = ''
+        for fnitem in fn:
+            params += ' "%s"' % fnitem
+
+    editor = os.getenv('VISUAL', os.getenv('EDITOR', 'vi'))
+    try:
+        return subprocess.check_call('%s %s' % (editor, params), shell=True)
+    except OSError as exc:
+        logger.error("Execution of editor '%s' failed: %s", editor, exc)
+        return 1

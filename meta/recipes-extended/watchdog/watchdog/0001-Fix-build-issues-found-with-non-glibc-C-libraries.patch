@@ -1,0 +1,99 @@
+From 83ec34df357218a1c9cfc13a23d3367d333652c3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 30 Dec 2015 01:01:15 +0000
+Subject: [PATCH] Fix build issues found with non glibc C libraries
+
+Add time.h for getting time_t definition
+limits.h for PATH_MAX
+linux/param.h for EXEC_PAGESIZE
+Replace deprecated MNTTAB with _PATH_MNTTAB
+include ext2_mnt.h for MNTOPT_USRQUOTA and MNTOPT_GRPQUOTA and
+MNTTYPE_EXT2
+Include sys/types.h for u_char definition
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+
+Upstream-Status: Submitted
+
+ include/extern.h | 1 +
+ src/configfile.c | 1 +
+ src/memory.c     | 3 +++
+ src/net.c        | 1 +
+ src/shutdown.c   | 3 ++-
+ 5 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/include/extern.h b/include/extern.h
+index 21db11b..04b16bc 100644
+--- a/include/extern.h
++++ b/include/extern.h
+@@ -3,6 +3,7 @@
+ 
+ #include <netinet/in.h>
+ #include <stdio.h>
++#include <time.h>
+ 
+ #include "logmessage.h"
+ #include "xmalloc.h"
+diff --git a/src/configfile.c b/src/configfile.c
+index be5d7b3..7c1d1dd 100644
+--- a/src/configfile.c
++++ b/src/configfile.c
+@@ -16,6 +16,7 @@
+ #include <errno.h>
+ #include <string.h>
+ #include <dirent.h>
++#include <limits.h>
+ #include <sys/stat.h>
+ 
+ #include "extern.h"
+diff --git a/src/memory.c b/src/memory.c
+index e9607e4..b5e08aa 100644
+--- a/src/memory.c
++++ b/src/memory.c
+@@ -21,6 +21,9 @@
+ #include <sys/stat.h>
+ #include <sys/param.h>
+ #include <sys/mman.h>
++#ifdef __linux__
++#include <linux/param.h>
++#endif
+ 
+ #include "extern.h"
+ #include "watch_err.h"
+diff --git a/src/net.c b/src/net.c
+index 21823ae..8930caf 100644
+--- a/src/net.c
++++ b/src/net.c
+@@ -17,6 +17,7 @@
+ #include <string.h>
+ #include <unistd.h>		/* for gethostname() etc */
+ #include <netdb.h>		/* for gethostbyname() */
++#include <sys/types.h>
+ #include <sys/param.h>	/* for MAXHOSTNAMELEN */
+ #include <sys/socket.h>
+ #include <netinet/in.h>
+diff --git a/src/shutdown.c b/src/shutdown.c
+index 74aafa5..46b99cf 100644
+--- a/src/shutdown.c
++++ b/src/shutdown.c
+@@ -25,6 +25,7 @@
+ 
+ #include "watch_err.h"
+ #include "extern.h"
++#include "ext2_mnt.h"
+ 
+ #if defined __GLIBC__
+ #include "ext2_mnt.h"
+@@ -123,7 +124,7 @@ static void mnt_off()
+ 	FILE *fp;
+ 	struct mntent *mnt;
+ 
+-	fp = setmntent(MNTTAB, "r");
++	fp = setmntent(_PATH_MNTTAB, "r");
+ 	/* in some rare cases fp might be NULL so be careful */
+ 	while (fp != NULL && ((mnt = getmntent(fp)) != (struct mntent *)0)) {
+ 		/* First check if swap */
+-- 
+2.6.4
+

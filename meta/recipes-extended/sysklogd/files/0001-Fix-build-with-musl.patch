@@ -1,0 +1,132 @@
+From f0af5bcfd753691652eac35efbcb208c933253f1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 31 Aug 2015 05:11:53 +0000
+Subject: [PATCH] Fix build with musl
+
+Explicitly include fcntl.h since with glibc is comes in as indirect
+include but not with musl
+
+linux/time.h inclusion is not required on musl so using !__GLIBC__ is
+not right for musl here
+
+wait type is glibc specific
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ klogd.c    | 10 +---------
+ ksym_mod.c |  5 +----
+ pidfile.c  |  1 +
+ syslog.c   |  3 ++-
+ syslogd.c  |  4 +---
+ 5 files changed, 6 insertions(+), 17 deletions(-)
+
+diff --git a/klogd.c b/klogd.c
+index 6cc80ed..9219671 100644
+--- a/klogd.c
++++ b/klogd.c
+@@ -260,11 +260,8 @@
+ #include <unistd.h>
+ #include <signal.h>
+ #include <errno.h>
+-#include <sys/fcntl.h>
++#include <fcntl.h>
+ #include <sys/stat.h>
+-#if !defined(__GLIBC__)
+-#include <linux/time.h>
+-#endif /* __GLIBC__ */
+ #include <stdarg.h>
+ #include <paths.h>
+ #include <stdlib.h>
+@@ -277,13 +274,8 @@
+ 
+ #define __LIBRARY__
+ #include <linux/unistd.h>
+-#if !defined(__GLIBC__)
+-# define __NR_ksyslog __NR_syslog
+-_syscall3(int,ksyslog,int, type, char *, buf, int, len);
+-#else
+ #include <sys/klog.h>
+ #define ksyslog klogctl
+-#endif
+ 
+ #define LOG_BUFFER_SIZE 4096
+ #define LOG_LINE_LENGTH 1000
+diff --git a/ksym_mod.c b/ksym_mod.c
+index 68cd6b6..6e26da1 100644
+--- a/ksym_mod.c
++++ b/ksym_mod.c
+@@ -113,12 +113,9 @@
+ #include <unistd.h>
+ #include <signal.h>
+ #include <errno.h>
+-#include <sys/fcntl.h>
++#include <fcntl.h>
+ #include <sys/stat.h>
+ #include "module.h"
+-#if !defined(__GLIBC__)
+-#include <linux/time.h>
+-#endif /* __GLIBC__ */
+ #include <stdarg.h>
+ #include <paths.h>
+ #include <linux/version.h>
+diff --git a/pidfile.c b/pidfile.c
+index e0959a0..6daa2e0 100644
+--- a/pidfile.c
++++ b/pidfile.c
+@@ -31,6 +31,7 @@
+ #include <string.h>
+ #include <errno.h>
+ #include <signal.h>
++#include <fcntl.h>
+ 
+ /* read_pid
+  *
+diff --git a/syslog.c b/syslog.c
+index bdb3ff2..ef7b34e 100644
+--- a/syslog.c
++++ b/syslog.c
+@@ -55,7 +55,7 @@ static char sccsid[] = "@(#)syslog.c	5.28 (Berkeley) 6/27/90";
+ #include <sys/types.h>
+ #include <sys/socket.h>
+ #include <sys/file.h>
+-#include <sys/signal.h>
++//#include <sys/signal.h>
+ #include <sys/syslog.h>
+ #if 0
+ #include "syslog.h"
+@@ -72,6 +72,7 @@ static char sccsid[] = "@(#)syslog.c	5.28 (Berkeley) 6/27/90";
+ #include <stdarg.h>
+ #include <paths.h>
+ #include <stdio.h>
++#include <fcntl.h>
+ 
+ #define	_PATH_LOGNAME	"/dev/log"
+ 
+diff --git a/syslogd.c b/syslogd.c
+index ea73ea5..1ca0595 100644
+--- a/syslogd.c
++++ b/syslogd.c
+@@ -818,9 +818,7 @@ void doexit(int sig);
+ void init();
+ void cfline(char *line, register struct filed *f);
+ int decode(char *name, struct code *codetab);
+-#if defined(__GLIBC__)
+ #define dprintf mydprintf
+-#endif /* __GLIBC__ */
+ static void dprintf(char *, ...);
+ static void allocate_log(void);
+ void sighup_handler();
+@@ -2094,7 +2092,7 @@ void reapchild()
+ 	(void) signal(SIGCHLD, reapchild);	/* reset signal handler -ASP */
+ 	wait ((int *)0);
+ #else
+-	union wait status;
++	int status;
+ 
+ 	while (wait3(&status, WNOHANG, (struct rusage *) NULL) > 0)
+ 		;
+-- 
+2.5.1
+

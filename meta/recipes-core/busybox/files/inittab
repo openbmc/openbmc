@@ -1,0 +1,24 @@
+# This is run first except when booting in single-user mode.
+
+# Startup the system
+null::sysinit:/bin/mount -t proc proc /proc
+null::sysinit:/bin/mount -t sysfs sysfs /sys
+null::sysinit:/bin/mount -t devtmpfs devtmpfs /dev
+null::sysinit:/bin/mount -o remount,rw /
+null::sysinit:/bin/mkdir -p /dev/pts
+null::sysinit:/bin/mount -t devpts devpts /dev/pts
+null::sysinit:/bin/mount -a
+
+::sysinit:/etc/init.d/rcS
+
+# Stuff to do before rebooting
+::ctrlaltdel:/sbin/reboot
+::shutdown:/etc/init.d/rcK
+::shutdown:/sbin/swapoff -a
+::shutdown:/bin/umount -a -r
+
+# Stuff to do when restarting the init process
+::restart:/sbin/init
+
+# set hostname
+null::sysinit:/bin/busybox hostname -F /etc/hostname

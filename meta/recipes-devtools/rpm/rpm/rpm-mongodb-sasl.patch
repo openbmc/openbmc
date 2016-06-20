@@ -1,0 +1,69 @@
+Fix errors when building with sasl2 disabled
+
+Upstream-Status: Submitted [RPM5 maintainer]
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm/rpmio/mongoc.c
+===================================================================
+--- rpm.orig/rpmio/mongoc.c
++++ rpm/rpmio/mongoc.c
+@@ -39,8 +39,10 @@
+ # include <winerror.h>
+ #endif
+ 
++#ifdef HAVE_LIBSASL2
+ #include <sasl/sasl.h>
+ #include <sasl/saslutil.h>
++#endif
+ 
+ #include <openssl/bio.h>
+ #include <openssl/ssl.h>
+@@ -14228,6 +14230,7 @@ mongoc_read_prefs_copy (const mongoc_rea
+    return ret;
+ }
+ 
++#ifdef MONGOC_ENABLE_SASL
+ /*==============================================================*/
+ /* --- mongoc-sasl.c */
+ 
+@@ -14555,6 +14558,7 @@ _mongoc_sasl_step (mongoc_sasl_t *sasl,
+ 
+    return true;
+ }
++#endif
+ 
+ /*==============================================================*/
+ /* --- mongoc-socket.c */
+Index: rpm/rpmio/mongoc.h
+===================================================================
+--- rpm.orig/rpmio/mongoc.h
++++ rpm/rpmio/mongoc.h
+@@ -38,8 +38,10 @@
+ # include <sys/un.h>
+ #endif
+ 
++#ifdef HAVE_LIBSASL2
+ #include <sasl/sasl.h>
+ #include <sasl/saslutil.h>
++#endif
+ 
+ #include <openssl/bio.h>
+ #include <openssl/ssl.h>
+@@ -2455,6 +2457,8 @@ BSON_END_DECLS
+ /*==============================================================*/
+ /* --- mongoc-sasl-private.h */
+ 
++#ifdef MONGOC_ENABLE_SASL
++
+ BSON_BEGIN_DECLS
+ 
+ 
+@@ -2498,6 +2502,7 @@ bool _mongoc_sasl_step             (mong
+ 
+ 
+ BSON_END_DECLS
++#endif
+ 
+ /*==============================================================*/
+ /* --- mongoc-ssl-private.h */

@@ -187,7 +187,7 @@
         This section provides some technical background on how
         cross-development toolchains are created and used.
         For more information on toolchains, you can also see the
-        <ulink url='&YOCTO_DOCS_ADT_URL;'>Yocto Project Application Developer's Guide</ulink>.
+        <ulink url='&YOCTO_DOCS_SDK_URL;'>Yocto Project Software Development Kit (SDK) Developer's Guide</ulink>.
     </para>
 
     <para>
@@ -219,6 +219,12 @@
         You can think of <filename>gcc-cross</filename> simply as an
         automatically generated cross-compiler that is used internally within
         BitBake only.
+        <note>
+            The extensible SDK does not use
+            <filename>gcc-cross-canadian</filename> since this SDK
+            ships a copy of the OpenEmbedded build system and the sysroot
+            within it contains <filename>gcc-cross</filename>.
+        </note>
     </para>
 
     <para>
@@ -282,8 +288,10 @@
         the development tools (e.g., the
         <filename>gcc-cross-canadian</filename>),
         <filename>binutils-cross-canadian</filename>, and other
-        <filename>nativesdk-*</filename> tools you need to cross-compile and
-        test your software.
+        <filename>nativesdk-*</filename> tools,
+        which are tools native to the SDK (i.e. native to
+        <link linkend='var-SDK_ARCH'><filename>SDK_ARCH</filename></link>),
+        you need to cross-compile and test your software.
         The figure shows the commands you use to easily build out this
         toolchain.
         This cross-development toolchain is built to execute on the
@@ -363,8 +371,9 @@
     <note>
         For information on advantages gained when building a
         cross-development toolchain installer, see the
-        "<ulink url='&YOCTO_DOCS_ADT_URL;#optionally-building-a-toolchain-installer'>Optionally Building a Toolchain Installer</ulink>"
-        section in the Yocto Project Application Developer's Guide.
+        "<ulink url='&YOCTO_DOCS_SDK_URL;#sdk-building-an-sdk-installer'>Building an SDK Installer</ulink>"
+        section in the Yocto Project Software Development Kit (SDK) Developer's
+        Guide.
     </note>
 </section>
 
@@ -470,17 +479,24 @@
         </para>
 
         <para>
-            To complicate the problem, there are things that should not be included in
-            the checksum.
+            To complicate the problem, there are things that should not be
+            included in the checksum.
             First, there is the actual specific build path of a given task -
             the <link linkend='var-WORKDIR'><filename>WORKDIR</filename></link>.
-            It does not matter if the work directory changes because it should not
-            affect the output for target packages.
-            Also, the build process has the objective of making native or cross packages relocatable.
-            The checksum therefore needs to exclude <filename>WORKDIR</filename>.
+            It does not matter if the work directory changes because it should
+            not affect the output for target packages.
+            Also, the build process has the objective of making native
+            or cross packages relocatable.
+            <note>
+                Both native and cross packages run on the build host.
+                However, cross packages generate output for the target
+                architecture.
+            </note>
+            The checksum therefore needs to exclude
+            <filename>WORKDIR</filename>.
             The simplistic approach for excluding the work directory is to set
-            <filename>WORKDIR</filename> to some fixed value and create the checksum
-            for the "run" script.
+            <filename>WORKDIR</filename> to some fixed value and create the
+            checksum for the "run" script.
         </para>
 
         <para>
@@ -665,7 +681,6 @@
             <literallayout class='monospaced'>
      DEPLOYDIR = "${WORKDIR}/deploy-${PN}"
      SSTATETASKS += "do_deploy"
-     do_deploy[sstate-name] = "deploy"
      do_deploy[sstate-inputdirs] = "${DEPLOYDIR}"
      do_deploy[sstate-outputdirs] = "${DEPLOY_DIR_IMAGE}"
 
@@ -770,22 +785,49 @@
                 Because of this, the Yocto Project includes strong debugging
                 tools:
                 <itemizedlist>
-                    <listitem><para>Whenever a shared state package is written out, so is a
-                        corresponding <filename>.siginfo</filename> file.
-                        This practice results in a pickled Python database of all
-                        the metadata that went into creating the hash for a given shared state
-                        package.</para></listitem>
-                    <listitem><para>If you run BitBake with the <filename>--dump-signatures</filename>
-                        (or <filename>-S</filename>) option, BitBake dumps out
-                        <filename>.siginfo</filename> files in
-                        the stamp directory for every task it would have executed instead of
-                        building the specified target package.</para></listitem>
-                    <listitem><para>There is a <filename>bitbake-diffsigs</filename> command that
-                        can process <filename>.siginfo</filename> files.
-                        If you specify one of these files, BitBake dumps out the dependency
-                        information in the file.
-                        If you specify two files, BitBake compares the two files and dumps out
-                        the differences between the two.
+                    <listitem><para>Whenever a shared state package is written
+                        out into the
+                        <link linkend='var-SSTATE_DIR'><filename>SSTATE_DIR</filename></link>,
+                        a corresponding <filename>.siginfo</filename> file is
+                        also written.
+                        This file contains a pickled Python database of all
+                        the Metadata that went into creating the hash for a
+                        given shared state package.
+                        Whenever a stamp is written into the stamp directory
+                        <link linkend='var-STAMP'><filename>STAMP</filename></link>,
+                        a corresponding <filename>.sigdata</filename> file
+                        is created that contains the same hash data that
+                        represented the executed task.
+                        </para></listitem>
+                    <listitem><para>You can use BitBake to dump out the
+                        signature construction information without executing
+                        tasks by using either of the following BitBake
+                        command-line options:
+                        <literallayout class='monospaced'>
+     &dash;&dash;dump-signatures=<replaceable>SIGNATURE_HANDLER</replaceable>
+     -S <replaceable>SIGNATURE_HANDLER</replaceable>
+                        </literallayout>
+                        <note>
+                            Two common values for
+                            <replaceable>SIGNATURE_HANDLER</replaceable> are
+                            "none" and "printdiff" to only dump the signature
+                            or to compare the dumped signature with the
+                            cached one, respectively.
+                        </note>
+                        Using BitBake with either of these options causes
+                        BitBake to dump out <filename>.sigdata</filename> files
+                        in the stamp directory for every task it would have
+                        executed instead of building the specified target
+                        package.
+                        </para></listitem>
+                    <listitem><para>There is a
+                        <filename>bitbake-diffsigs</filename> command that
+                        can process <filename>.sigdata</filename> and
+                        <filename>.siginfo</filename> files.
+                        If you specify one of these files, BitBake dumps out
+                        the dependency information in the file.
+                        If you specify two files, BitBake compares the two
+                        files and dumps out the differences between the two.
                         This more easily helps answer the question of "What
                         changed between X and Y?"</para></listitem>
                 </itemizedlist>
@@ -1378,7 +1420,6 @@
                 <literallayout class='monospaced'>
      COMMERCIAL_AUDIO_PLUGINS ?= ""
      COMMERCIAL_VIDEO_PLUGINS ?= ""
-     COMMERCIAL_QT = ""
                 </literallayout>
                 If you want to enable these components, you can do so by making sure you have
                 statements similar to the following
@@ -1388,7 +1429,6 @@
         gst-plugins-ugly-mpegaudioparse"
      COMMERCIAL_VIDEO_PLUGINS = "gst-plugins-ugly-mpeg2dec \
         gst-plugins-ugly-mpegstream gst-plugins-bad-mpegvideoparse"
-     COMMERCIAL_QT ?= "qmmp"
      LICENSE_FLAGS_WHITELIST = "commercial_gst-plugins-ugly commercial_gst-plugins-bad commercial_qmmp"
                 </literallayout>
                 Of course, you could also create a matching whitelist
@@ -1406,9 +1446,8 @@
                 Specifying audio and video plug-ins as part of the
                 <filename>COMMERCIAL_AUDIO_PLUGINS</filename> and
                 <filename>COMMERCIAL_VIDEO_PLUGINS</filename> statements
-                or commercial Qt components as part of
-                the <filename>COMMERCIAL_QT</filename> statement (along
-                with the enabling <filename>LICENSE_FLAGS_WHITELIST</filename>) includes the
+                (along with the enabling
+                <filename>LICENSE_FLAGS_WHITELIST</filename>) includes the
                 plug-ins or components into built images, thus adding
                 support for media formats or components.
             </para>

@@ -1,6 +1,6 @@
 Fix up platform and related sysinfo file loading.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [RPM5 maintainer]
 
 This ensures that RPM knows the compatible set of package types at all times.
 

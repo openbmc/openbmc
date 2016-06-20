@@ -280,23 +280,42 @@
 
     <qandaentry>
         <question>
-            <para>
+            <para id='i-am-behind-a-firewall-and-need-to-use-a-proxy-server'>
                 I'm behind a firewall and need to use a proxy server. How do I do that?
             </para>
         </question>
         <answer>
             <para>
-                Most source fetching by the OpenEmbedded build system is done by <filename>wget</filename>
-                and you therefore need to specify the proxy settings in a
-                <filename>.wgetrc</filename> file in your home directory.
-                Here are some example settings:
+                Most source fetching by the OpenEmbedded build system is done
+                by <filename>wget</filename> and you therefore need to specify
+                the proxy settings in a <filename>.wgetrc</filename> file,
+                which can be in your home directory if you are a single user
+                or can be in <filename>/usr/local/etc/wgetrc</filename> as
+                a global user file.
+            </para>
+
+            <para>
+                Following is the applicable code for setting various proxy
+                types in the <filename>.wgetrc</filename> file.
+                By default, these settings are disabled with comments.
+                To use them, remove the comments:
                 <literallayout class='monospaced'>
-     http_proxy = http://proxy.yoyodyne.com:18023/
-     ftp_proxy = http://proxy.yoyodyne.com:18023/
+     # You can set the default proxies for Wget to use for http, https, and ftp.
+     # They will override the value in the environment.
+     #https_proxy = http://proxy.yoyodyne.com:18023/
+     #http_proxy = http://proxy.yoyodyne.com:18023/
+     #ftp_proxy = http://proxy.yoyodyne.com:18023/
+
+     # If you do not want to use proxy at all, set this to off.
+     #use_proxy = on
                 </literallayout>
                 The Yocto Project also includes a
-                <filename>site.conf.sample</filename> file that shows how to
-                configure CVS and Git proxy servers if needed.
+                <filename>meta-poky/conf/site.conf.sample</filename> file that
+                shows how to configure CVS and Git proxy servers if needed.
+                For more information on setting up various proxy types and
+                configuring proxy servers, see the
+                "<ulink url='&YOCTO_WIKI_URL;/wiki/Working_Behind_a_Network_Proxy'>Working Behind a Network Proxy</ulink>"
+                Wiki page.
             </para>
         </answer>
     </qandaentry>
@@ -367,7 +386,7 @@
 
             <para>
                 This issue is just a single manifestation of "system
-                leakage" issues caused when the OpenEbedded build system
+                leakage" issues caused when the OpenEmbedded build system
                 finds and uses previously installed files during a native
                 build.
                 This type of issue might not be limited to
@@ -782,7 +801,7 @@
     <qandaentry>
         <question>
             <para>
-                The files provided by my <filename>-native</filename> recipe do
+                The files provided by my <filename>*-native</filename> recipe do
                 not appear to be available to other recipes.
                 Files are missing from the native sysroot, my recipe is
                 installing to the wrong place, or I am getting permissions

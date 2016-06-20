@@ -1,0 +1,26 @@
+rpmpgp.h: We do not require the popt header in order to use rpmpgp functions
+
+This can cause failures if the internal libpopt is used, as it's header is
+not exported.
+
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.14/rpmio/rpmpgp.h
+===================================================================
+--- rpm-5.4.14.orig/rpmio/rpmpgp.h
++++ rpm-5.4.14/rpmio/rpmpgp.h
+@@ -11,11 +11,11 @@
+  */
+ 
+ #include <string.h>
+-#include <popt.h>
+ #include <rpmiotypes.h>
+ #include <yarn.h>
+ 
+ #if defined(_RPMPGP_INTERNAL)
++#include <popt.h>
+ #include <rpmsw.h>
+ 
+ /*@unchecked@*/

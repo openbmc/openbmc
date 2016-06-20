@@ -1,0 +1,17 @@
+endianness check is OS wide and not specific to libc
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+Index: mesa-11.1.1/src/gallium/include/pipe/p_config.h
+===================================================================
+--- mesa-11.1.1.orig/src/gallium/include/pipe/p_config.h
++++ mesa-11.1.1/src/gallium/include/pipe/p_config.h
+@@ -130,7 +130,7 @@
+  * Endian detection.
+  */
+ 
+-#ifdef __GLIBC__
++#if defined(__linux__)
+ #include <endian.h>
+ 
+ #if __BYTE_ORDER == __LITTLE_ENDIAN

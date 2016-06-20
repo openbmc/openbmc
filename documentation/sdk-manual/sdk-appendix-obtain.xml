@@ -1,0 +1,252 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
+[<!ENTITY % poky SYSTEM "../poky.ent"> %poky; ] >
+
+<appendix id='sdk-appendix-obtain'>
+
+<title>Obtaining the SDK</title>
+
+<section id='sdk-locating-pre-built-sdk-installers'>
+    <title>Locating Pre-Built SDK Installers</title>
+
+    <para>
+        You can use existing, pre-built toolchains by locating and running
+        an SDK installer script that ships with the Yocto Project.
+        Using this method, you select and download an architecture-specific
+        toolchain installer and then run the script to hand-install the
+        toolchain.
+    </para>
+
+    <para>
+        You can find SDK installers here:
+        <itemizedlist>
+            <listitem><para><emphasis>Standard SDK Installers</emphasis>
+                Go to <ulink url='&YOCTO_TOOLCHAIN_DL_URL;'></ulink>
+                and find the folder that matches your host development system
+                (i.e. <filename>i686</filename> for 32-bit machines or
+                <filename>x86_64</filename> for 64-bit machines).</para>
+
+                <para>Go into that folder and download the toolchain installer
+                whose name includes the appropriate target architecture.
+                The toolchains provided by the Yocto Project are based off of
+                the <filename>core-image-sato</filename> image and contain
+                libraries appropriate for developing against that image.
+                For example, if your host development system is a 64-bit x86
+                system and you are going to use your cross-toolchain for a
+                32-bit x86 target, go into the <filename>x86_64</filename>
+                folder and download the following installer:
+                <literallayout class='monospaced'>
+     poky-glibc-x86_64-core-image-sato-i586-toolchain-&DISTRO;.sh
+                </literallayout>
+                </para></listitem>
+            <listitem><para><emphasis>Extensible SDK Installers</emphasis>
+                Installers for the extensible SDK are in
+                <ulink url='&YOCTO_TOOLCHAIN_DL_URL;'></ulink>.
+                </para></listitem>
+        </itemizedlist>
+    </para>
+</section>
+
+<section id='sdk-building-an-sdk-installer'>
+    <title>Building an SDK Installer</title>
+
+    <para>
+        As an alternative to locating and downloading a toolchain installer,
+        you can build the toolchain installer assuming you have first sourced
+        the environment setup script.
+        See the
+        "<ulink url='&YOCTO_DOCS_QS_URL;#qs-building-images'>Building Images</ulink>"
+        section in the Yocto Project Quick Start for steps that show you
+        how to set up the Yocto Project environment.
+        In particular, you need to be sure the
+        <ulink url='&YOCTO_DOCS_REF_URL;#var-MACHINE'><filename>MACHINE</filename></ulink>
+        variable matches the architecture for which you are building and that
+        the
+        <ulink url='&YOCTO_DOCS_REF_URL;#var-SDKMACHINE'><filename>SDKMACHINE</filename></ulink>
+        variable is correctly set if you are building a toolchain designed to
+        run on an architecture that differs from your current development host
+        machine (i.e. the build machine).
+    </para>
+
+    <para>
+        To build the toolchain installer for a standard SDK and populate
+        the SDK image, use the following command:
+        <literallayout class='monospaced'>
+     $ bitbake <replaceable>image</replaceable> -c populate_sdk
+        </literallayout>
+        You can do the same for the extensible SDK using this command:
+        <literallayout class='monospaced'>
+     $ bitbake <replaceable>image</replaceable> -c populate_sdk_ext
+        </literallayout>
+        These commands result in a toolchain installer that contains the sysroot
+        that matches your target root filesystem.
+    </para>
+
+    <para>
+        When the <filename>bitbake</filename> command completes, the toolchain
+        installer will be in
+        <filename>tmp/deploy/sdk</filename> in the Build Directory.
+        <note>
+            By default, this toolchain does not build static binaries.
+            If you want to use the toolchain to build these types of libraries,
+            you need to be sure your image has the appropriate static
+            development libraries.
+            Use the
+            <ulink url='&YOCTO_DOCS_REF_URL;#var-IMAGE_INSTALL'><filename>IMAGE_INSTALL</filename></ulink>
+            variable inside your <filename>local.conf</filename> file to
+            install the appropriate library packages.
+            Following is an example using <filename>glibc</filename> static
+            development libraries:
+            <literallayout class='monospaced'>
+     IMAGE_INSTALL_append = " glibc-staticdev"
+            </literallayout>
+        </note>
+    </para>
+</section>
+
+<section id='sdk-extracting-the-root-filesystem'>
+    <title>Extracting the Root Filesystem</title>
+
+    <para>
+        After installing the toolchain, for some use cases you
+        might need to separately extract a root filesystem:
+        <itemizedlist>
+            <listitem><para>You want to boot the image using NFS.
+                </para></listitem>
+            <listitem><para>You want to use the root filesystem as the
+                target sysroot.
+                For example, the Eclipse IDE environment with the Eclipse
+                Yocto Plug-in installed allows you to use QEMU to boot
+                under NFS.</para></listitem>
+            <listitem><para>You want to develop your target application
+                using the root filesystem as the target sysroot.
+                </para></listitem>
+        </itemizedlist>
+    </para>
+
+    <para>
+        To extract the root filesystem, first <filename>source</filename>
+        the cross-development environment setup script to establish
+        necessary environment variables.
+        If you built the toolchain in the Build Directory, you will find
+        the toolchain environment script in the
+        <filename>tmp</filename> directory.
+        If you installed the toolchain by hand, the environment setup
+        script is located in <filename>/opt/poky/&DISTRO;</filename>.
+    </para>
+
+    <para>
+        After sourcing the environment script, use the
+        <filename>runqemu-extract-sdk</filename> command and provide the
+        filesystem image.
+    </para>
+
+    <para>
+        Following is an example.
+        The second command sets up the environment.
+        In this case, the setup script is located in the
+        <filename>/opt/poky/&DISTRO;</filename> directory.
+        The third command extracts the root filesystem from a previously
+        built filesystem that is located in the
+        <filename>~/Downloads</filename> directory.
+        Furthermore, this command extracts the root filesystem into the
+        <filename>qemux86-sato</filename> directory:
+        <literallayout class='monospaced'>
+     $ cd ~
+     $ source /opt/poky/&DISTRO;/environment-setup-i586-poky-linux
+     $ runqemu-extract-sdk \
+        ~/Downloads/core-image-sato-sdk-qemux86-2011091411831.rootfs.tar.bz2 \
+        $HOME/qemux86-sato
+        </literallayout>
+        You could now point to the target sysroot at
+        <filename>qemux86-sato</filename>.
+    </para>
+</section>
+
+<section id='sdk-installed-standard-sdk-directory-structure'>
+    <title>Installed Standard SDK Directory Structure</title>
+
+    <para>
+        The following figure shows the resulting directory structure after
+        you install the Standard SDK by running the <filename>.sh</filename>
+        SDK installation script:
+    </para>
+
+    <para>
+        <imagedata fileref="figures/sdk-installed-standard-sdk-directory.png" scale="60" align="center" />
+    </para>
+
+    <para>
+        The installed SDK consists of an environment setup script for the SDK,
+        a configuration file for the target, a version file for the target,
+        and the root filesystem (<filename>sysroots</filename>) needed to
+        develop objects for the target system.
+    </para>
+
+    <para>
+        Within the figure, italicized text is used to indicate replaceable
+        portions of the file or directory name.
+        For example,
+        <replaceable>install_dir</replaceable>/<replaceable>version</replaceable>
+        is the directory where the SDK is installed.
+        By default, this directory is <filename>/opt/poky/</filename>.
+        And, <replaceable>version</replaceable> represents the specific
+        snapshot of the SDK (e.g. <filename>&DISTRO;+snapshot</filename>).
+        Furthermore, <replaceable>target</replaceable> represents the target
+        architecture (e.g. <filename>i586</filename>) and
+        <replaceable>host</replaceable> represents the development system's
+        architecture (e.g. <filename>x86_64</filename>).
+        Thus, the complete names of the two directories within the
+        <filename>sysroots</filename> could be
+        <filename>i586-poky-linux</filename> and
+        <filename>x86_64-pokysdk-linux</filename> for the target and host,
+        respectively.
+    </para>
+</section>
+
+<section id='sdk-installed-extensible-sdk-directory-structure'>
+    <title>Installed Extensible SDK Directory Structure</title>
+
+    <para>
+        The following figure shows the resulting directory structure after
+        you install the Extensible SDK by running the <filename>.sh</filename>
+        SDK installation script:
+    </para>
+
+    <para>
+        <imagedata fileref="figures/sdk-installed-extensible-sdk-directory.png" scale="60" align="center" />
+    </para>
+
+    <para>
+        The installed directory structure for the extensible SDK is quite
+        different than the installed structure for the standard SDK.
+        The extensible SDK does not separate host and target parts in the
+        same manner as does the standard SDK.
+        The extensible SDK uses an embedded copy of the OpenEmbedded
+        build system, which has its own sysroots.
+    </para>
+
+    <para>
+        Of note in the directory structure are an environment setup script
+        for the SDK, a configuration file for the target, a version file for
+        the target, and a log file for the OpenEmbedded build system
+        preparation script run by the installer.
+    </para>
+
+    <para>
+        Within the figure, italicized text is used to indicate replaceable
+        portions of the file or directory name.
+        For example,
+        <replaceable>install_dir</replaceable> is the directory where the SDK
+        is installed, which is <filename>poky_sdk</filename> by default.
+        <replaceable>target</replaceable> represents the target
+        architecture (e.g. <filename>i586</filename>) and
+        <replaceable>host</replaceable> represents the development system's
+        architecture (e.g. <filename>x86_64</filename>).
+    </para>
+</section>
+
+</appendix>
+<!--
+vim: expandtab tw=80 ts=4
+-->

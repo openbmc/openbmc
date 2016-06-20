@@ -17,7 +17,7 @@ Patch taken from http://git.pld-linux.org/?p=packages/rpm.git;a=commitdiff;h=105
 
 RP 2014/6/10
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [RPM5 maintainer]
 
 Index: rpm-5.4.14/build/files.c
 ===================================================================
@@ -124,23 +124,3 @@ Index: rpm-5.4.14/build/files.c
      }
  
      ui32 = fl->totalFileSize;
-Index: rpm-5.4.14/lib/fsm.c
-===================================================================
---- rpm-5.4.14.orig/lib/fsm.c
-+++ rpm-5.4.14/lib/fsm.c
-@@ -904,6 +904,7 @@ int fsmMapAttrs(IOSM_t fsm)
- 
-     if (fi && i >= 0 && i < (int) fi->fc) {
- 	mode_t perms = (S_ISDIR(st->st_mode) ? fi->dperms : fi->fperms);
-+	ino_t finalInode = (fi->finodes ? (ino_t)fi->finodes[i] : 0);
- 	mode_t finalMode = (fi->fmodes ? (mode_t)fi->fmodes[i] : perms);
- 	dev_t finalRdev = (dev_t)(fi->frdevs ? fi->frdevs[i] : 0);
- 	rpmuint32_t finalMtime = (fi->fmtimes ? fi->fmtimes[i] : 0);
-@@ -943,6 +944,7 @@ int fsmMapAttrs(IOSM_t fsm)
- 	    if ((S_ISCHR(st->st_mode) || S_ISBLK(st->st_mode))
- 	    && st->st_nlink == 0)
- 		st->st_nlink = 1;
-+	    st->st_ino = finalInode;
- 	    st->st_rdev = finalRdev;
- 	    st->st_mtime = finalMtime;
- 	}

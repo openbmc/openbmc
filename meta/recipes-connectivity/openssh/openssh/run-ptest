@@ -3,5 +3,42 @@
 export TEST_SHELL=sh
 
 cd regress
+sed -i "/\t\tagent-ptrace /d" Makefile
 make -k .OBJDIR=`pwd` .CURDIR=`pwd` SUDO="sudo" tests \
         | sed -e 's/^skipped/SKIP: /g' -e 's/^ok /PASS: /g' -e 's/^failed/FAIL: /g'
+
+SSHAGENT=`which ssh-agent`
+GDB=`which gdb`
+
+if [ -z "${SSHAGENT}" -o -z "${GDB}" ]; then
+       echo "SKIP: agent-ptrace"
+       exit
+fi
+
+useradd openssh-test
+
+eval `su -c "${SSHAGENT} -s" openssh-test` > /dev/null
+r=$?
+if [ $r -ne 0 ]; then
+	echo "FAIL: could not start ssh-agent: exit code $r"
+else
+	su -c "gdb -p ${SSH_AGENT_PID}" openssh-test > /tmp/gdb.out 2>&1 << EOF
+		quit
+EOF
+	r=$?
+	if [ $r -ne 0 ]; then
+		echo "gdb failed: exit code $r"
+	fi
+	egrep 'ptrace: Operation not permitted.|procfs:.*Permission denied.|ttrace.*Permission denied.|procfs:.*: Invalid argument.|Unable to access task ' >/dev/null /tmp/gdb.out
+	r=$?
+	rm -f /tmp/gdb.out
+	if [ $r -ne 0 ]; then
+		echo "FAIL: ptrace agent"
+	else
+		echo "PASS: ptrace agent"
+	fi
+
+	${SSHAGENT} -k > /dev/null
+fi
+userdel openssh-test
+

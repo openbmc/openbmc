@@ -29,15 +29,6 @@ diff --git a/gtk.c b/gtk.c
 index a2eba2c..c54bf63 100644
 --- a/gtk.c
 +++ b/gtk.c
-@@ -381,7 +381,7 @@ static void clear_backing_store(frontend *fe)
- 
- static void setup_backing_store(frontend *fe)
- {
--    cairo_t *cr;
-+    cairo_t *cr = NULL;
-     int i;
- 
-     fe->pixmap = gdk_pixmap_new(fe->area->window, fe->pw, fe->ph, -1);
 @@ -2481,7 +2481,7 @@ char *fgetline(FILE *fp)
  int main(int argc, char **argv)
  {

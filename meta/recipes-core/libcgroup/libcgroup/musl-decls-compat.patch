@@ -1,0 +1,235 @@
+commit ca780b4f7f71abeeb04a585f2a4d889caaa985fa
+Author: Isaac Dunham <ibid.ag@gmail.com>
+Date:   Fri Sep 5 22:35:32 2014 -0700
+
+    Remove __.*DECLS nonsense
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: libcgroup-0.41/include/libcgroup/config.h
+===================================================================
+--- libcgroup-0.41.orig/include/libcgroup/config.h
++++ libcgroup-0.41/include/libcgroup/config.h
+@@ -9,7 +9,9 @@
+ #include <features.h>
+ #endif
+ 
+-__BEGIN_DECLS
++#ifdef __cplusplus
++extern "C" {
++#endif
+ 
+ /**
+  * @defgroup group_config 5. Configuration
+@@ -107,6 +109,8 @@ int cgroup_config_create_template_group(
+  * @}
+  * @}
+  */
+-__END_DECLS
++#ifdef __cplusplus
++}
++#endif
+ 
+ #endif /*_LIBCGROUP_CONFIG_H*/
+Index: libcgroup-0.41/include/libcgroup/error.h
+===================================================================
+--- libcgroup-0.41.orig/include/libcgroup/error.h
++++ libcgroup-0.41/include/libcgroup/error.h
+@@ -9,7 +9,9 @@
+ #include <features.h>
+ #endif
+ 
+-__BEGIN_DECLS
++#ifdef __cplusplus
++extern "C" {
++#endif
+ 
+ /**
+  * @defgroup group_errors 6. Error handling
+@@ -99,6 +101,8 @@ int cgroup_get_last_errno(void);
+  * @}
+  * @}
+  */
+-__END_DECLS
++#ifdef __cplusplus
++}
++#endif
+ 
+ #endif /* _LIBCGROUP_INIT_H */
+Index: libcgroup-0.41/include/libcgroup/groups.h
+===================================================================
+--- libcgroup-0.41.orig/include/libcgroup/groups.h
++++ libcgroup-0.41/include/libcgroup/groups.h
+@@ -11,7 +11,9 @@
+ #include <stdbool.h>
+ #endif
+ 
+-__BEGIN_DECLS
++#ifdef __cplusplus
++extern "C" {
++#endif
+ 
+ /**
+  * Flags for cgroup_delete_cgroup_ext().
+@@ -577,6 +579,8 @@ char *cgroup_get_cgroup_name(struct cgro
+  */
+ 
+ 
+-__END_DECLS
++#ifdef __cplusplus
++}
++#endif
+ 
+ #endif /* _LIBCGROUP_GROUPS_H */
+Index: libcgroup-0.41/include/libcgroup/init.h
+===================================================================
+--- libcgroup-0.41.orig/include/libcgroup/init.h
++++ libcgroup-0.41/include/libcgroup/init.h
+@@ -9,7 +9,9 @@
+ #include <features.h>
+ #endif
+ 
+-__BEGIN_DECLS
++#ifdef __cplusplus
++extern "C" {
++#endif
+ 
+ /**
+  * @defgroup group_init 1. Initialization
+@@ -58,6 +60,8 @@ int cgroup_get_subsys_mount_point(const
+  * @}
+  * @}
+  */
+-__END_DECLS
++#ifdef __cplusplus
++}
++#endif
+ 
+ #endif /* _LIBCGROUP_INIT_H */
+Index: libcgroup-0.41/include/libcgroup/iterators.h
+===================================================================
+--- libcgroup-0.41.orig/include/libcgroup/iterators.h
++++ libcgroup-0.41/include/libcgroup/iterators.h
+@@ -11,7 +11,9 @@
+ #include <features.h>
+ #endif
+ 
+-__BEGIN_DECLS
++#ifdef __cplusplus
++extern "C" {
++#endif
+ 
+ /**
+  * @defgroup group_iterators 3. Iterators
+@@ -423,6 +425,8 @@ int cgroup_get_subsys_mount_point_end(vo
+  * @}
+  */
+ 
+-__END_DECLS
++#ifdef __cplusplus
++}
++#endif
+ 
+ #endif /* _LIBCGROUP_ITERATORS_H */
+Index: libcgroup-0.41/include/libcgroup/tasks.h
+===================================================================
+--- libcgroup-0.41.orig/include/libcgroup/tasks.h
++++ libcgroup-0.41/include/libcgroup/tasks.h
+@@ -12,7 +12,9 @@
+ #include <stdbool.h>
+ #endif
+ 
+-__BEGIN_DECLS
++#ifdef __cplusplus
++extern "C" {
++#endif
+ 
+ /** Flags for cgroup_change_cgroup_uid_gid(). */
+ enum cgflags {
+@@ -204,6 +206,8 @@ int cgroup_register_unchanged_process(pi
+  * @}
+  * @}
+  */
+-__END_DECLS
++#ifdef __cplusplus
++}
++#endif
+ 
+ #endif /* _LIBCGROUP_TASKS_H */
+Index: libcgroup-0.41/src/daemon/cgrulesengd.h
+===================================================================
+--- libcgroup-0.41.orig/src/daemon/cgrulesengd.h
++++ libcgroup-0.41/src/daemon/cgrulesengd.h
+@@ -17,7 +17,9 @@
+ 
+ #include <features.h>
+ 
+-__BEGIN_DECLS
++#ifdef __cplusplus
++extern "C" {
++#endif
+ 
+ #include "config.h"
+ #include "libcgroup.h"
+@@ -119,7 +121,9 @@ void cgre_flash_templates(int signum);
+  */
+ void cgre_catch_term(int signum);
+ 
+-__END_DECLS
++#ifdef __cplusplus
++}
++#endif
+ 
+ #endif /* _CGRULESENGD_H */
+ 
+Index: libcgroup-0.41/src/libcgroup-internal.h
+===================================================================
+--- libcgroup-0.41.orig/src/libcgroup-internal.h
++++ libcgroup-0.41/src/libcgroup-internal.h
+@@ -16,7 +16,9 @@
+ 
+ #define __LIBCG_INTERNAL
+ 
+-__BEGIN_DECLS
++#ifdef __cplusplus
++extern "C" {
++#endif
+ 
+ #include "config.h"
+ #include <fts.h>
+@@ -279,6 +281,8 @@ extern void cgroup_dictionary_iterator_e
+  */
+ int cg_chmod_path(const char *path, mode_t mode, int owner_is_umask);
+ 
+-__END_DECLS
++#ifdef __cplusplus
++}
++#endif
+ 
+ #endif
+Index: libcgroup-0.41/include/libcgroup/log.h
+===================================================================
+--- libcgroup-0.41.orig/include/libcgroup/log.h
++++ libcgroup-0.41/include/libcgroup/log.h
+@@ -11,7 +11,9 @@
+ 
+ #include <stdarg.h>
+ 
+-__BEGIN_DECLS
++#ifdef __cplusplus
++extern "C" {
++#endif
+ 
+ /**
+  * @defgroup group_log 7. Logging
+@@ -142,6 +144,8 @@ extern int cgroup_parse_log_level_str(co
+  * @}
+  * @}
+  */
+-__END_DECLS
++#ifdef __cplusplus
++}
++#endif
+ 
+ #endif /* _LIBCGROUP_LOG_H */

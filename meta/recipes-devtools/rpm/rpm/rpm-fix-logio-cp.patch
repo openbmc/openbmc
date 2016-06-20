@@ -1,7 +1,7 @@
 Occasionally the cp -p fails with a non-zero return code.  This will cause
 the system abort the build.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [RPM5 maintainer]
 
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
 

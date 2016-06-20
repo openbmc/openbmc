@@ -5,7 +5,7 @@ appears to be invalid.  Instead of relying solely on the platform comparison
 we also want to generate a perceived platform based on the valid rpm contents
 of arch and os.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [RPM5 maintainer]
 
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
 

@@ -142,7 +142,7 @@ def tinder_send_http(d, status, _log):
 
     selector = url + "/xml/build_status.pl"
 
-    # now post it - in chunks of 10.000 charachters
+    # now post it - in chunks of 10.000 characters
     new_log = _log
     while len(new_log) > 0:
         content_type, body = tinder_format_http_post(d,status,new_log[0:18000])

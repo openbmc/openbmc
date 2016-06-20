@@ -6,24 +6,25 @@ this patch is to allow building with external bind
 
 Signed-off-by: Qing He <qing.he@intel.com>
 
-Index: dhcp-4.3.0/Makefile.am
-===================================================================
---- dhcp-4.3.0.orig/Makefile.am
-+++ dhcp-4.3.0/Makefile.am
+Rebase the patch to 4.3.3
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+diff --git a/Makefile.am b/Makefile.am
+--- a/Makefile.am
++++ b/Makefile.am
 @@ -25,7 +25,7 @@ EXTRA_DIST = RELNOTES LICENSE \
- 	     bind/Makefile bind/bind.tar.gz bind/version.tmp \
+ 	     bind/Makefile.in bind/bind.tar.gz bind/version.tmp \
  	     common/tests/Atffile server/tests/Atffile
  
--SUBDIRS = bind includes tests common dst omapip client dhcpctl relay server
-+SUBDIRS = includes tests common dst omapip client dhcpctl relay server
+-SUBDIRS = bind includes tests common omapip client dhcpctl relay server
++SUBDIRS = includes tests common omapip client dhcpctl relay server
  
  nobase_include_HEADERS = dhcpctl/dhcpctl.h
  
-Index: dhcp-4.3.0/client/Makefile.am
-===================================================================
---- dhcp-4.3.0.orig/client/Makefile.am
-+++ dhcp-4.3.0/client/Makefile.am
-@@ -4,8 +4,8 @@ dhclient_SOURCES = clparse.c dhclient.c
+diff --git a/client/Makefile.am b/client/Makefile.am
+--- a/client/Makefile.am
++++ b/client/Makefile.am
+@@ -10,8 +10,8 @@ dhclient_SOURCES = clparse.c dhclient.c dhc6.c \
  		   scripts/bsdos scripts/freebsd scripts/linux scripts/macos \
  		   scripts/netbsd scripts/nextstep scripts/openbsd \
  		   scripts/solaris scripts/openwrt
@@ -34,22 +35,20 @@ Index: dhcp-4.3.0/client/Makefile.am
  man_MANS = dhclient.8 dhclient-script.8 dhclient.conf.5 dhclient.leases.5
  EXTRA_DIST = $(man_MANS)
  
-Index: dhcp-4.3.0/configure.ac
-===================================================================
---- dhcp-4.3.0.orig/configure.ac
-+++ dhcp-4.3.0/configure.ac
-@@ -566,6 +566,7 @@ no)
- 	libbind="$use_libbind"
+diff --git a/configure.ac b/configure.ac
+--- a/configure.ac
++++ b/configure.ac
+@@ -623,6 +623,7 @@ no)
+ 	fi	
  	;;
  esac
 +AC_SUBST([libbind])
  
  # OpenLDAP support.
  AC_ARG_WITH(ldap,
-Index: dhcp-4.3.0/dhcpctl/Makefile.am
-===================================================================
---- dhcp-4.3.0.orig/dhcpctl/Makefile.am
-+++ dhcp-4.3.0/dhcpctl/Makefile.am
+diff --git a/dhcpctl/Makefile.am b/dhcpctl/Makefile.am
+--- a/dhcpctl/Makefile.am
++++ b/dhcpctl/Makefile.am
 @@ -6,12 +6,12 @@ EXTRA_DIST = $(man_MANS)
  
  omshell_SOURCES = omshell.c
@@ -67,10 +66,9 @@ Index: dhcp-4.3.0/dhcpctl/Makefile.am
 -               ../bind/lib/libisccfg.a ../bind/lib/libisc.a
 +	       $(libbind)/libirs.a $(libbind)/libdns.a \
 +               $(libbind)/libisccfg.a $(libbind)/libisc.a
-Index: dhcp-4.3.0/omapip/Makefile.am
-===================================================================
---- dhcp-4.3.0.orig/omapip/Makefile.am
-+++ dhcp-4.3.0/omapip/Makefile.am
+diff --git a/omapip/Makefile.am b/omapip/Makefile.am
+--- a/omapip/Makefile.am
++++ b/omapip/Makefile.am
 @@ -10,6 +10,6 @@ man_MANS = omapi.3
  EXTRA_DIST = $(man_MANS)
  
@@ -80,11 +78,10 @@ Index: dhcp-4.3.0/omapip/Makefile.am
 +svtest_LDADD = libomapi.a $(libbind)/libirs.a $(libbind)/libdns.a \
 +		$(libbind)/libisccfg.a $(libbind)/libisc.a
  
-Index: dhcp-4.3.0/relay/Makefile.am
-===================================================================
---- dhcp-4.3.0.orig/relay/Makefile.am
-+++ dhcp-4.3.0/relay/Makefile.am
-@@ -3,8 +3,8 @@ AM_CPPFLAGS = -DLOCALSTATEDIR='"@localst
+diff --git a/relay/Makefile.am b/relay/Makefile.am
+--- a/relay/Makefile.am
++++ b/relay/Makefile.am
+@@ -3,8 +3,8 @@ AM_CPPFLAGS = -DLOCALSTATEDIR='"@localstatedir@"'
  sbin_PROGRAMS = dhcrelay
  dhcrelay_SOURCES = dhcrelay.c
  dhcrelay_LDADD = ../common/libdhcp.a ../omapip/libomapi.a \
@@ -95,18 +92,24 @@ Index: dhcp-4.3.0/relay/Makefile.am
  man_MANS = dhcrelay.8
  EXTRA_DIST = $(man_MANS)
  
-Index: dhcp-4.3.0/server/Makefile.am
-===================================================================
---- dhcp-4.3.0.orig/server/Makefile.am
-+++ dhcp-4.3.0/server/Makefile.am
-@@ -14,8 +14,8 @@ dhcpd_SOURCES = dhcpd.c dhcp.c bootp.c c
+diff --git a/server/Makefile.am b/server/Makefile.am
+--- a/server/Makefile.am
++++ b/server/Makefile.am
+@@ -14,10 +14,12 @@ dhcpd_SOURCES = dhcpd.c dhcp.c bootp.c confpars.c db.c class.c failover.c \
  
  dhcpd_CFLAGS = $(LDAP_CFLAGS)
  dhcpd_LDADD = ../common/libdhcp.a ../omapip/libomapi.a \
 -	      ../dhcpctl/libdhcpctl.a ../bind/lib/libirs.a \
--	      ../bind/lib/libdns.a ../bind/lib/libisccfg.a ../bind/lib/libisc.a
+-	      ../bind/lib/libdns.a ../bind/lib/libisccfg.a ../bind/lib/libisc.a \
 +	      ../dhcpctl/libdhcpctl.a $(libbind)/libirs.a \
-+	      $(libbind)/libdns.a $(libbind)/libisccfg.a $(libbind)/libisc.a
++	      $(libbind)/libdns.a $(libbind)/libisccfg.a $(libbind)/libisc.a \
+ 	      $(LDAP_LIBS)		
  
++ dhcpd_CFLAGS = $(LDAP_CFLAGS)
++
  man_MANS = dhcpd.8 dhcpd.conf.5 dhcpd.leases.5
  EXTRA_DIST = $(man_MANS)
+ 
+-- 
+1.9.1
+

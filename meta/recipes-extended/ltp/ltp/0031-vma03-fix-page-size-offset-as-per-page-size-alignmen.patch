@@ -1,0 +1,33 @@
+From 293ff1da06748ed4c69be6ece262d42e562e7298 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 8 Jan 2016 07:36:19 +0000
+Subject: [PATCH 31/32] vma03: fix page size offset as per page size alignment
+
+the offset the param of mmap2() doesn't align the page size, but,
+this param allow must be a multiple of the page size as returned
+by sysconf(_SC_PAGE_SIZE).meanwhile offset * 4096 must be a
+multiple of the system page size, so modify the input param of offset
+pgoff = (ULONG_MAX - 1)&(~((pgsz-1)>>12));
+
+Signed-off-by: Chuang Dong <Chuang.Dong@windriver.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ testcases/kernel/mem/vma/vma03.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/testcases/kernel/mem/vma/vma03.c b/testcases/kernel/mem/vma/vma03.c
+index ad8a7b4..a539233 100644
+--- a/testcases/kernel/mem/vma/vma03.c
++++ b/testcases/kernel/mem/vma/vma03.c
+@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
+ 		if (fd == -1)
+ 			tst_brkm(TBROK | TERRNO, NULL, "open %s", TESTFILE);
+ 
+-		pgoff = ULONG_MAX - 1;
++		pgoff = (ULONG_MAX - 1)&(~((pgsz-1)>>12));
+ 		map = mmap2(NULL, pgsz, PROT_READ | PROT_WRITE, MAP_PRIVATE,
+ 			    fd, pgoff);
+ 		if (map == MAP_FAILED)
+-- 
+2.7.0
+

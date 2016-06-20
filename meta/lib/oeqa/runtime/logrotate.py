@@ -14,9 +14,9 @@ class LogrotateTest(oeRuntimeTest):
 
     @skipUnlessPassed("test_ssh")
     def test_1_logrotate_setup(self):
-        (status, output) = self.target.run('mkdir /home/root/logrotate_dir')
+        (status, output) = self.target.run('mkdir $HOME/logrotate_dir')
         self.assertEqual(status, 0, msg = "Could not create logrotate_dir. Output: %s" % output)
-        (status, output) = self.target.run("sed -i 's#wtmp {#wtmp {\\n    olddir /home/root/logrotate_dir#' /etc/logrotate.conf")
+        (status, output) = self.target.run("sed -i \"s#wtmp {#wtmp {\\n    olddir $HOME/logrotate_dir#\" /etc/logrotate.conf")
         self.assertEqual(status, 0, msg = "Could not write to logrotate.conf file. Status and output: %s and %s)" % (status, output))
 
     @testcase(289)
@@ -24,5 +24,5 @@ class LogrotateTest(oeRuntimeTest):
     def test_2_logrotate(self):
         (status, output) = self.target.run('logrotate -f /etc/logrotate.conf')
         self.assertEqual(status, 0, msg = "logrotate service could not be reloaded. Status and output: %s and %s" % (status, output))
-        output = self.target.run('ls -la /home/root/logrotate_dir/ | wc -l')[1]
-        self.assertTrue(int(output)>=3, msg = "new logfile could not be created. List of files within log directory: %s" %(self.target.run('ls -la /home/root/logrotate_dir')[1]))
+        output = self.target.run('ls -la $HOME/logrotate_dir/ | wc -l')[1]
+        self.assertTrue(int(output)>=3, msg = "new logfile could not be created. List of files within log directory: %s" %(self.target.run('ls -la $HOME/logrotate_dir')[1]))

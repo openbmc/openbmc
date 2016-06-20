@@ -1,0 +1,68 @@
+Use BUILD_CC and target include files for configuration tests.
+If cross-compiling, force pathnames for helper programs, since
+autodiscovery by the configure script will not work.
+
+Upstream-Status: Pending
+
+Signed-off-by: Bill Randle <william.c.randle at intel.com>
+
+--- man-1.6g/configure.orig	2016-03-28 17:46:12.734910976 -0700
++++ man-1.6g/configure	2016-03-30 21:47:45.110572908 -0700
+@@ -216,7 +216,8 @@
+ INCLUDEDIR=${INCLUDEDIR-/usr/include}
+ 
+ rm -f conftest conftest.c
+-compile="$CC $DEFS conftest.c -o conftest $LIBS >/dev/null 2>&1"
++# since we are interested in target feature support, use that sysroot
++compile="$BUILD_CC -isystem/${PKG_CONFIG_SYSROOT_DIR}/usr/include $DEFS conftest.c -o conftest $LIBS >/dev/null 2>&1"
+ 
+ # Check for various header files.
+ 
+@@ -455,19 +456,23 @@
+       fi
+     done
+   done
+-  Fgroff=/usr/bin/groff
+-  Fnroff=/usr/bin/nroff
+-  Fjnroff=/usr/bin/nroff
+-  Fgeqn=/usr/bin/geqn
+-  Fgtbl=/usr/bin/gtbl
+-  Fcol=/usr/bin/col
+-  Fgrefer=/usr/bin/grefer
+-  Fgpic=/usr/bin/gpic
+-  Fmore=/bin/more
+-  Fless=/usr/bin/less
+-  Fcmp=/usr/bin/cmp
+-  Fcat=/bin/cat
+-  Fgawk=/bin/gawk
++  if [ $BUILD_CC != $CC ]; then
++    # cross compiling => target fs not available, so force defaults
++    Fgroff=/usr/bin/groff
++    Fnroff=/usr/bin/nroff
++    Fjnroff=/usr/bin/nroff
++    Fgeqn=/usr/bin/eqn
++    Fgneqn=/usr/bin/neqn
++    Fgtbl=/usr/bin/tbl
++    Fcol=/usr/bin/col
++    Fgrefer=/usr/bin/refer
++    Fgpic=/usr/bin/pic
++    Fmore=/bin/more
++    Fless=/usr/bin/less
++    Fcmp=/usr/bin/cmp
++    Fcat=/bin/cat
++    Fgawk=/usr/bin/gawk
++  fi
+ 
+ 
+   for i in eqn tbl refer pic
+@@ -507,8 +512,8 @@
+     jnroff="$Fjnroff -Tutf8 -mandocj"
+   fi
+   eqn="$Fgeqn -Tps"
+-  neqn="$Fgeqn -Tutf8"
+-  jneqn="$Fgeqn -Tutf8"
++  neqn="$Fgneqn -Tutf8"
++  jneqn="$Fgneqn -Tutf8"
+   tbl="$Fgtbl"
+   col="$Fcol"
+   vgrind="$Fvgrind"

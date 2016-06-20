@@ -1,0 +1,14 @@
+Freetype think that it knows best about where libtool is, and explicitly the
+libtool autoconf macros telling it where to find the libtool script.  Of course
+we prefix the script with the target triplet, so it's wrong.  Fix this by
+removing the forced assignment, so the configure script's knowledge of where it
+put libtool is used.
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+--- freetype-2.6/builds/unix/unix-cc.in.orig	2016-01-07 19:21:45.244943479 +0000
++++ freetype-2.6/builds/unix/unix-cc.in	2016-01-07 19:21:50.213112131 +0000
+@@ -19,1 +18,1 @@
+-LIBTOOL := $(FT_LIBTOOL_DIR)/libtool
++LIBTOOL := $(FT_LIBTOOL_DIR)/@LIBTOOL@

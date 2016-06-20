@@ -1,0 +1,294 @@
+From 0af17c2ae86c1e8e42b96f6dface08f535bb55ad Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 14 Feb 2016 08:33:24 +0000
+Subject: [PATCH] rpm: Fix build on musl
+
+Provide alternatives to assumptions about glibc
+on linux
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Updated to 5.4.16 (CVS)
+
+The patch will likely need additional rework before it can be accepted upsteam
+due to the way MUSL changes are patched in.
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+---
+Upstream-Status: Pending
+
+ lib/poptALL.c          |    2 ++
+ rpmio/fts.c            |    4 ++++
+ rpmio/poptIO.c         |    2 ++
+ rpmqv.c                |    2 ++
+ system.h               |   13 ++++++-------
+ tools/debugedit.c      |   47 +++++++++++++++++++++++++++++++++++++++++++++++
+ tools/rpm2cpio.c       |    2 ++
+ tools/rpmcache.c       |    2 ++
+ tools/rpmcmp.c         |    2 ++
+ tools/rpmdeps-oecore.c |    2 ++
+ tools/rpmdeps.c        |    2 ++
+ tools/rpmdigest.c      |    2 ++
+ tools/rpmfind.c        |    6 +++---
+ 13 files changed, 78 insertions(+), 10 deletions(-)
+
+Index: rpm-5.4.15/rpmio/fts.c
+===================================================================
+--- rpm-5.4.15.orig/rpmio/fts.c
++++ rpm-5.4.15/rpmio/fts.c
+@@ -124,6 +124,10 @@ static char sccsid[] = "@(#)fts.c	8.6 (B
+ #   define __fxstat64(_stat_ver, _fd, _sbp)    fstat((_fd), (_sbp))
+ #endif
+ 
++#ifndef _STAT_VER
++#   define _STAT_VER      0
++#endif
++
+ #if !defined(_D_EXACT_NAMLEN)
+ #   define _D_EXACT_NAMLEN(d) (strlen((d)->d_name))
+ #endif
+Index: rpm-5.4.15/tools/debugedit.c
+===================================================================
+--- rpm-5.4.15.orig/tools/debugedit.c
++++ rpm-5.4.15/tools/debugedit.c
+@@ -22,7 +22,12 @@
+ #include <byteswap.h>
+ #include <endian.h>
+ #include <errno.h>
++#ifdef __GLIBC__
+ #include <error.h>
++#else
++#include <stdarg.h>
++void error(int, int, const char *, ...);
++#endif
+ #include <limits.h>
+ #include <string.h>
+ #include <stdlib.h>
+@@ -1535,6 +1540,48 @@ handle_build_id (DSO *dso, Elf_Data *bui
+     puts (hex);
+   }
+ }
++#ifndef __GLIBC__
++extern char *__progname;
++
++void (*error_print_progname)(void) = 0;
++unsigned int error_message_count = 0;
++int error_one_per_line = 0;
++
++static void eprint(int status, int e, const char *file, unsigned int line, const char *fmt, va_list ap)
++{
++       if (file && error_one_per_line) {
++               static const char *oldfile;
++               static unsigned int oldline;
++               if (line == oldline && strcmp(file, oldfile) == 0)
++                       return;
++               oldfile = file;
++               oldline = line;
++       }
++       if (error_print_progname)
++               error_print_progname();
++       else
++               fprintf(stderr, "%s: ", __progname);
++       if (file)
++               fprintf(stderr, "%s:%u: ", file, line);
++       vfprintf(stderr, fmt, ap);
++      if (e)
++               fprintf(stderr, ": %s", strerror(e));
++       putc('\n', stderr);
++       fflush(stderr);
++       error_message_count++;
++       if (status)
++               exit(status);
++}
++
++void error(int status, int e, const char *fmt, ...)
++{
++       va_list ap;
++       va_start(ap,fmt);
++       eprint(status, e, 0, 0, fmt, ap);
++       va_end(ap);
++}
++
++#endif
+ 
+ /* It avoided the segment fault while file's bss offset have a large number.
+    See https://bugzilla.redhat.com/show_bug.cgi?id=1019707
+Index: rpm-5.4.15/tools/rpmfind.c
+===================================================================
+--- rpm-5.4.15.orig/tools/rpmfind.c
++++ rpm-5.4.15/tools/rpmfind.c
+@@ -1175,7 +1175,7 @@ find_parsenum(PLAN *plan, const char *op
+      * and endchar points to the beginning of the string we know we have
+      * a syntax error.
+      */
+-#if defined(__sun)
++#if defined(__sun) || !defined(__GLIBC_)
+     value = strtoll(str, &endchar, 10);
+ #else
+     value = strtoq(str, &endchar, 10);
+@@ -1215,7 +1215,7 @@ find_parsetime(PLAN *plan, const char *o
+ 	break;
+     }
+ 
+-#if defined(__sun)
++#if defined(__sun) || !defined(__GLIBC_)
+     value = strtoll(str, &unit, 10);
+ #else
+     value = strtoq(str, &unit, 10);
+@@ -1253,7 +1253,7 @@ find_parsetime(PLAN *plan, const char *o
+ 	str = unit + 1;
+ 	if (*str == '\0')	/* EOS */
+ 	    break;
+-#if defined(__sun)
++#if defined(__sun) || !defined(__GLIBC_)
+ 	value = strtoll(str, &unit, 10);
+ #else
+ 	value = strtoq(str, &unit, 10);
+Index: rpm-5.4.15/system.h
+===================================================================
+--- rpm-5.4.15.orig/system.h
++++ rpm-5.4.15/system.h
+@@ -372,16 +372,15 @@ extern int _tolower(int) __THROW	/*@*/;
+ #define	__progname	__assert_program_name
+ #endif
+ #define	setprogname(pn)
++/*@unchecked@*/
++extern const char *__progname;
+ #else
+-#define	__progname	program_name
+-#define	setprogname(pn)	\
+-  { if ((__progname = strrchr(pn, '/')) != NULL) __progname++; \
+-    else __progname = pn;		\
+-  }
+-#endif
++#define	setprogname(pn)
++#define	progname	__progname
+ 
+ /*@unchecked@*/
+-extern const char *__progname;
++extern char *__progname;
++#endif
+ 
+ /* -- Retrofit missing prototypes (if needed). */
+ #ifdef __cplusplus
+Index: rpm-5.4.15/rpmio/poptIO.c
+===================================================================
+--- rpm-5.4.15.orig/rpmio/poptIO.c
++++ rpm-5.4.15/rpmio/poptIO.c
+@@ -65,7 +65,9 @@ extern int _rpmsvn_debug;
+ GENfree(rpmioP)
+ #endif	/* __cplusplus */
+ 
++#ifdef __GLIBC__
+ const char *__progname;
++#endif
+ 
+ #if !defined(POPT_ARGFLAG_TOGGLE)	/* XXX compat with popt < 1.15 */
+ #define	POPT_ARGFLAG_TOGGLE	0
+Index: rpm-5.4.15/lib/poptALL.c
+===================================================================
+--- rpm-5.4.15.orig/lib/poptALL.c
++++ rpm-5.4.15/lib/poptALL.c
+@@ -4,7 +4,9 @@
+  */
+ 
+ #include "system.h"
++#ifdef __GLIBC__
+ extern const char *__progname;
++#endif
+ 
+ #if defined(RPM_VENDOR_WINDRIVER)
+ const char *__usrlibrpm = USRLIBRPM;
+Index: rpm-5.4.15/tools/rpm2cpio.c
+===================================================================
+--- rpm-5.4.15.orig/tools/rpm2cpio.c
++++ rpm-5.4.15/tools/rpm2cpio.c
+@@ -1,7 +1,9 @@
+ /* rpmarchive: spit out the main archive portion of a package */
+ 
+ #include "system.h"
++#ifdef __GLIBC__
+ const char *__progname;
++#endif
+ 
+ #include <rpmio.h>
+ #include <rpmiotypes.h>	/* XXX fnpyKey */
+Index: rpm-5.4.15/tools/rpmcache.c
+===================================================================
+--- rpm-5.4.15.orig/tools/rpmcache.c
++++ rpm-5.4.15/tools/rpmcache.c
+@@ -3,7 +3,9 @@
+  */
+ 
+ #include "system.h"
++#ifdef __GLIBC__
+ const char *__progname;
++#endif
+ 
+ #include <fnmatch.h>
+ #include <fts.h>
+Index: rpm-5.4.15/tools/rpmdeps-oecore.c
+===================================================================
+--- rpm-5.4.15.orig/tools/rpmdeps-oecore.c
++++ rpm-5.4.15/tools/rpmdeps-oecore.c
+@@ -1,5 +1,7 @@
+ #include "system.h"
++#ifdef __GLIBC__
+ const char *__progname;
++#endif
+ 
+ #include <rpmio.h>
+ #include <rpmiotypes.h>
+Index: rpm-5.4.15/tools/rpmdeps.c
+===================================================================
+--- rpm-5.4.15.orig/tools/rpmdeps.c
++++ rpm-5.4.15/tools/rpmdeps.c
+@@ -1,5 +1,7 @@
+ #include "system.h"
++#ifdef __GLIBC__
+ const char *__progname;
++#endif
+ 
+ #include <rpmio.h>
+ #include <rpmiotypes.h>
+Index: rpm-5.4.15/tools/rpmdigest.c
+===================================================================
+--- rpm-5.4.15.orig/tools/rpmdigest.c
++++ rpm-5.4.15/tools/rpmdigest.c
+@@ -1,6 +1,8 @@
+ #include "system.h"
++#ifdef __GLIBC__
+ /*@unchecked@*/
+ extern const char * __progname;
++#endif
+ 
+ #define	_RPMIOB_INTERNAL
+ #include <rpmiotypes.h>
+Index: rpm-5.4.15/tools/rpmcmp.c
+===================================================================
+--- rpm-5.4.15.orig/tools/rpmcmp.c
++++ rpm-5.4.15/tools/rpmcmp.c
+@@ -13,8 +13,10 @@
+ 
+ #include "debug.h"
+ 
++#ifdef __GLIBC__
+ const char *__progname;
+ #define	progname	__progname
++#endif
+ 
+ static int pointRpmEVR(ARGV_t av)
+ {
+Index: rpm-5.4.15/rpmqv.c
+===================================================================
+--- rpm-5.4.15.orig/rpmqv.c
++++ rpm-5.4.15/rpmqv.c
+@@ -1,5 +1,7 @@
+ #include "system.h"
++#ifdef __GLIBC__
+ extern const char *__progname;
++#endif
+ 
+ /* Copyright (C) 1998-2002 - Red Hat, Inc. */
+ 

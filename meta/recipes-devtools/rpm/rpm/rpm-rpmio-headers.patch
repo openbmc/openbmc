@@ -1,0 +1,19 @@
+Fix a typo in the rpmio Makefile.am
+
+Upstream-Status: Submitted [RPM5 maintainer]
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm/rpmio/Makefile.am
+===================================================================
+--- rpm.orig/rpmio/Makefile.am
++++ rpm/rpmio/Makefile.am
+@@ -121,7 +121,7 @@ luaLPATHdir =	${pkgsharedir)/lua
+ 
+ pkgincdir = $(pkgincludedir)$(WITH_PATH_VERSIONED_SUFFIX)
+ pkginc_HEADERS = argv.h mire.h rpmzlog.h yarn.h \
+-	rpmbf.h rpmcb.h rpmio.h rpmlog.h rpmiotypes.h rpmmacro.h
++	rpmbf.h rpmcb.h rpmio.h rpmlog.h rpmiotypes.h rpmmacro.h \
+ 	rpmpgp.h rpmsw.h rpmutil.h
+ noinst_HEADERS = \
+ 	ar.h bcon.h bson.h cpio.h crc.h envvar.h fnmatch.h fts.h glob.h iosm.h \

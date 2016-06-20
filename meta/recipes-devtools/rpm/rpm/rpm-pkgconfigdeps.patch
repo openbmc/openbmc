@@ -9,14 +9,14 @@ Upstream-Status: Inappropriate [configuration]
 
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
 
-Index: rpm-5.4.14/scripts/pkgconfigdeps.sh
+Index: rpm/scripts/pkgconfigdeps.sh
 ===================================================================
---- rpm-5.4.14.orig/scripts/pkgconfigdeps.sh
-+++ rpm-5.4.14/scripts/pkgconfigdeps.sh
+--- rpm.orig/scripts/pkgconfigdeps.sh
++++ rpm/scripts/pkgconfigdeps.sh
 @@ -18,8 +18,8 @@ case $1 in
      *.pc)
  	# Query the dependencies of the package.
- 	DIR=`dirname ${filename}`
+ 	DIR=$(dirname ${filename})
 -	PKG_CONFIG_PATH="$DIR:$DIR/../../share/pkgconfig"
 -	export PKG_CONFIG_PATH
 +	PKG_CONFIG_LIBDIR="$DIR:$DIR/../../share/pkgconfig"
@@ -27,7 +27,7 @@ Index: rpm-5.4.14/scripts/pkgconfigdeps.sh
 @@ -42,8 +42,8 @@ case $1 in
  	[ -n "$oneshot" ] && echo "$oneshot"; oneshot=""
  	# Query the dependencies of the package.
- 	DIR=`dirname ${filename}`
+ 	DIR=$(dirname ${filename})
 -	PKG_CONFIG_PATH="$DIR:$DIR/../../share/pkgconfig"
 -	export PKG_CONFIG_PATH
 +	PKG_CONFIG_LIBDIR="$DIR:$DIR/../../share/pkgconfig"

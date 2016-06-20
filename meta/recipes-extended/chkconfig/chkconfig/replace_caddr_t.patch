@@ -1,0 +1,33 @@
+caddr_t is a legacy BSD type which was rejected by the POSIX standard.
+Use void * instead.
+
+sys/unitstd.h is not needed and moreover its not available on all C library
+implementations e.g. musl
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Index: chkconfig-1.3.58/alternatives.c
+===================================================================
+--- chkconfig-1.3.58.orig/alternatives.c
++++ chkconfig-1.3.58/alternatives.c
+@@ -22,7 +22,6 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include <sys/stat.h>
+-#include <sys/unistd.h>
+ #include <unistd.h>
+ 
+ #define	FLAGS_TEST	(1 << 0)
+Index: chkconfig-1.3.58/leveldb.c
+===================================================================
+--- chkconfig-1.3.58.orig/leveldb.c
++++ chkconfig-1.3.58/leveldb.c
+@@ -442,7 +442,7 @@ int parseServiceInfo(int fd, char * name
+     fstat(fd, &sb);
+ 
+     bufstart = mmap(NULL, sb.st_size, PROT_READ, MAP_SHARED, fd, 0);
+-    if (bufstart == ((caddr_t) -1)) {
++    if (bufstart == ((void*) -1)) {
+ 	close(fd);
+ 	return -1;
+     }

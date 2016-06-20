@@ -1,0 +1,59 @@
+The autoptr types should be excluded from gobject-introspection parsing as
+they're not user-facing.
+
+Upstream-Status: Submitted
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/gio/gio-autocleanups.h b/gio/gio-autocleanups.h
+index a95ba65..24ccc2d 100644
+--- a/gio/gio-autocleanups.h
++++ b/gio/gio-autocleanups.h
+@@ -21,6 +21,8 @@
+ #error "Only <gio/gio.h> can be included directly."
+ #endif
+ 
++#ifndef __GI_SCANNER__
++
+ G_DEFINE_AUTOPTR_CLEANUP_FUNC(GAction, g_object_unref)
+ G_DEFINE_AUTOPTR_CLEANUP_FUNC(GActionMap, g_object_unref)
+ G_DEFINE_AUTOPTR_CLEANUP_FUNC(GAppInfo, g_object_unref)
+@@ -146,3 +148,5 @@ G_DEFINE_AUTOPTR_CLEANUP_FUNC(GVolume, g_object_unref)
+ G_DEFINE_AUTOPTR_CLEANUP_FUNC(GVolumeMonitor, g_object_unref)
+ G_DEFINE_AUTOPTR_CLEANUP_FUNC(GZlibCompressor, g_object_unref)
+ G_DEFINE_AUTOPTR_CLEANUP_FUNC(GZlibDecompressor, g_object_unref)
++
++#endif
+diff --git a/glib/glib-autocleanups.h b/glib/glib-autocleanups.h
+index 6355f75..09d28be 100644
+--- a/glib/glib-autocleanups.h
++++ b/glib/glib-autocleanups.h
+@@ -21,6 +21,8 @@
+ #error "Only <glib.h> can be included directly."
+ #endif
+ 
++#ifndef __GI_SCANNER__
++
+ static inline void
+ g_autoptr_cleanup_generic_gfree (void *p)
+ {
+@@ -87,3 +89,5 @@ G_DEFINE_AUTOPTR_CLEANUP_FUNC(GVariantDict, g_variant_dict_unref)
+ G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(GVariantDict, g_variant_dict_clear)
+ G_DEFINE_AUTOPTR_CLEANUP_FUNC(GVariantType, g_variant_type_free)
+ G_DEFINE_AUTO_CLEANUP_FREE_FUNC(GStrv, g_strfreev, NULL)
++
++#endif
+diff --git a/gobject/gobject-autocleanups.h b/gobject/gobject-autocleanups.h
+index 980203f..a1d4ba1 100644
+--- a/gobject/gobject-autocleanups.h
++++ b/gobject/gobject-autocleanups.h
+@@ -21,6 +21,10 @@
+ #error "Only <glib-object.h> can be included directly."
+ #endif
+ 
++#ifndef __GI_SCANNER__
++
+ G_DEFINE_AUTOPTR_CLEANUP_FUNC(GObject, g_object_unref)
+ G_DEFINE_AUTOPTR_CLEANUP_FUNC(GInitiallyUnowned, g_object_unref)
+ G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(GValue, g_value_unset)
++
++#endif

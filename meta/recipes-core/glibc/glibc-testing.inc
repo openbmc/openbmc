@@ -22,7 +22,6 @@ do_compile_append () {
 	sed -i -e "/^'/d" ${B}/${HOST_PREFIX}testglibc
 	sed -i -e "/^UID/d" ${B}/${HOST_PREFIX}testglibc
 	sed -i -e "/^TERM/d" ${B}/${HOST_PREFIX}testglibc
-	sed -i -e "/^PATCH_GET/d" ${B}/${HOST_PREFIX}testglibc
 	sed -i -e "/^PKG_/d" ${B}/${HOST_PREFIX}testglibc
 	sed -i -e "/^POSIXLY_/d" ${B}/${HOST_PREFIX}testglibc
 	sed -i -e "/^PPID/d" ${B}/${HOST_PREFIX}testglibc

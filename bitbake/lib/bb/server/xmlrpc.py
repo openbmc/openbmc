@@ -97,10 +97,10 @@ class BitBakeServerCommands():
 
         # we don't allow connections if the cooker is running
         if (self.cooker.state in [bb.cooker.state.parsing, bb.cooker.state.running]):
-            return None
+            return None, "Cooker is busy: %s" % bb.cooker.state.get_name(self.cooker.state)
 
         self.event_handle = bb.event.register_UIHhandler(s, True)
-        return self.event_handle
+        return self.event_handle, 'OK'
 
     def unregisterEventHandler(self, handlerNum):
         """
@@ -186,13 +186,12 @@ class XMLRPCServer(SimpleXMLRPCServer, BaseImplServer):
     # remove this when you're done with debugging
     # allow_reuse_address = True
 
-    def __init__(self, interface):
+    def __init__(self, interface, single_use=False):
         """
         Constructor
         """
         BaseImplServer.__init__(self)
-        if (interface[1] == 0):     # anonymous port, not getting reused
-            self.single_use = True
+        self.single_use = single_use
         # Use auto port configuration
         if (interface[1] == -1):
             interface = (interface[0], 0)
@@ -205,7 +204,6 @@ class XMLRPCServer(SimpleXMLRPCServer, BaseImplServer):
         self.commands = BitBakeServerCommands(self)
         self.autoregister_all_functions(self.commands, "")
         self.interface = interface
-        self.single_use = False
 
     def addcooker(self, cooker):
         BaseImplServer.addcooker(self, cooker)
@@ -302,7 +300,9 @@ class BitBakeXMLRPCServerConnection(BitBakeBaseServerConnection):
             return None
 
         self.transport.set_connection_token(token)
+        return self
 
+    def setupEventQueue(self):
         self.events = uievent.BBUIEventQueue(self.connection, self.clientinfo)
         for event in bb.event.ui_queue:
             self.events.queue_event(event)
@@ -313,8 +313,6 @@ class BitBakeXMLRPCServerConnection(BitBakeBaseServerConnection):
             self.connection.removeClient()
             # no need to log it here, the error shall be sent to the client
             raise BaseException(error)
-
-        return self
 
     def removeClient(self):
         if not self.observer_only:
@@ -334,9 +332,9 @@ class BitBakeXMLRPCServerConnection(BitBakeBaseServerConnection):
             pass
 
 class BitBakeServer(BitBakeBaseServer):
-    def initServer(self, interface = ("localhost", 0)):
+    def initServer(self, interface = ("localhost", 0), single_use = False):
         self.interface = interface
-        self.serverImpl = XMLRPCServer(interface)
+        self.serverImpl = XMLRPCServer(interface, single_use)
 
     def detach(self):
         daemonize.createDaemon(self.serverImpl.serve_forever, "bitbake-cookerdaemon.log")

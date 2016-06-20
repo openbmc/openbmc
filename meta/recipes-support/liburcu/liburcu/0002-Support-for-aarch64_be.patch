@@ -1,0 +1,19 @@
+liburcu: add support for aarch64_be
+
+Upstream-Status: Pending
+
+Signed-off-by: Tudor Florea <tudor.florea@enea.com>
+
+diff --git a/configure.ac b/configure.ac
+index 8ebfa8b..fe1c55d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -121,7 +121,7 @@ AS_CASE([$host_cpu],
+ 	[alpha*], [ARCHTYPE="alpha"],
+ 	[ia64], [ARCHTYPE="ia64"],
+ 	[arm*], [ARCHTYPE="arm"],
+-	[aarch64], [ARCHTYPE="aarch64"],
++	[aarch64*], [ARCHTYPE="aarch64"],
+ 	[mips*], [ARCHTYPE="mips"],
+ 	[nios2*], [ARCHTYPE="nios2"],
+ 	[tile*], [ARCHTYPE="tile"],

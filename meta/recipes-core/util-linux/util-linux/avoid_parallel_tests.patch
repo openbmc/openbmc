@@ -1,0 +1,19 @@
+Ptest needs buildtest-TESTS and runtest-TESTS targets.
+serial-tests is required to generate those targets.
+Revert run.sh script accordingly to serialize running tests 
+
+Signed-off-by: Tudor Florea  <tudor.florea@enea.com>
+Upstream-Status: Inappropriate 
+
+diff -ruN a/configure.ac b/configure.ac
+--- a/configure.ac	2014-05-27 12:37:42.119772658 +0200
++++ b/configure.ac	2014-05-27 12:41:46.225573272 +0200
+@@ -10,7 +10,7 @@
+ dnl AC_USE_SYSTEM_EXTENSIONS must be called before any macros that run
+ dnl the compiler (like AC_PROG_LIBTOOL) to avoid autoconf errors.
+ AC_USE_SYSTEM_EXTENSIONS
+-AM_INIT_AUTOMAKE([-Wall foreign 1.10 tar-pax dist-bzip2 no-dist-gzip dist-xz -Wno-portability subdir-objects])
++AM_INIT_AUTOMAKE([-Wall foreign 1.10 tar-pax dist-bzip2 no-dist-gzip dist-xz -Wno-portability subdir-objects serial-tests])
+
+ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])],
+ 			    [AC_SUBST([AM_DEFAULT_VERBOSITY], [1])])

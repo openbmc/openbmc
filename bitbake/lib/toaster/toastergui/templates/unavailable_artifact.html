@@ -3,15 +3,14 @@
 {% load humanize %}
 {% load static %}
 
-{% block title %} Build artifact no longer exists - Toaster {% endblock %}
+{% block title %} Build artifact does not exist - Toaster {% endblock %}
 
 {% block pagecontent %}
-
-<div class="row-fluid air">
-    <div class="alert alert-info span8 lead">
-        <p"> The build artifact you are trying to download no longer exists.</p>
-        <p><a href="javascript:window.history.back()">Back to previous page</a></p>
+    <div class="row-fluid air">
+        <div class="alert alert-info span8 lead">
+            <p>The build artifact you are trying to download does not exist.</p>
+            <p><a href="javascript:window.history.back()">Back to previous page</a></p>
+        </div>
     </div>
-</div>
 {% endblock %}
 

@@ -3,9 +3,9 @@ import itertools
 def is_optional(feature, d):
     packages = d.getVar("FEATURE_PACKAGES_%s" % feature, True)
     if packages:
-        return bool(d.getVarFlag("FEATURE_PACKAGES_%s" % feature, "optional"))
+        return bool(d.getVarFlag("FEATURE_PACKAGES_%s" % feature, "optional", True))
     else:
-        return bool(d.getVarFlag("PACKAGE_GROUP_%s" % feature, "optional"))
+        return bool(d.getVarFlag("PACKAGE_GROUP_%s" % feature, "optional", True))
 
 def packages(features, d):
     for feature in features:

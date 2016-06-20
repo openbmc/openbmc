@@ -14,7 +14,7 @@ install-exec-am. It also removed the dependency in install-data-hook on
 install-pkgbinPROGRAMS. This means install-pkgbinPROGRAMS will only be run once
 so there whould be any file contention.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [RPM5 maintainer]
 
 Signed-off-by: Morgan Little <morgan.little@windriver.com>
 

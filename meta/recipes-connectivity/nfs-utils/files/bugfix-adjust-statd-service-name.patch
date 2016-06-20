@@ -1,0 +1,34 @@
+From 398fed3bb0350cb1229e54e7020ae0e044c206d1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ulrich=20=C3=96lmann?= <u.oelmann@pengutronix.de>
+Date: Wed, 17 Feb 2016 08:33:45 +0100
+Subject: bugfix: adjust statd service name
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream uses 'rpc-statd.service' and Yocto introduced 'nfs-statd.service'
+instead but forgot to update the mount.nfs helper 'start-statd' accordingly.
+
+Upstream-Status: Inappropriate [other]
+
+Signed-off-by: Ulrich Ölmann <u.oelmann@pengutronix.de>
+---
+ utils/statd/start-statd | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/utils/statd/start-statd b/utils/statd/start-statd
+index 8211a90..3c2aa6f 100755
+--- a/utils/statd/start-statd
++++ b/utils/statd/start-statd
+@@ -16,7 +16,7 @@ fi
+ # First try systemd if it's installed.
+ if [ -d /run/systemd/system ]; then
+     # Quit only if the call worked.
+-    systemctl start rpc-statd.service && exit
++    systemctl start nfs-statd.service && exit
+ fi
+ 
+ # Fall back to launching it ourselves.
+-- 
+2.1.4
+

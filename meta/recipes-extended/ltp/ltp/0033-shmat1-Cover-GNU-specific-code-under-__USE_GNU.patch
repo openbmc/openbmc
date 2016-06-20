@@ -1,0 +1,41 @@
+From 5e3dea669e5b0b769f322d54a3bb9f320b5327da Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 22 Mar 2016 15:47:14 +0000
+Subject: [PATCH 26/26] shmat1: Cover GNU specific code under __USE_GNU
+
+on x86, we use uc_mcontext element from sigcontext
+which is marked gnu-specific in glibc, this patch
+adds this condition around the code
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ testcases/kernel/mem/mtest06/shmat1.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/testcases/kernel/mem/mtest06/shmat1.c b/testcases/kernel/mem/mtest06/shmat1.c
+index 0d6d7a4..bee69f6 100644
+--- a/testcases/kernel/mem/mtest06/shmat1.c
++++ b/testcases/kernel/mem/mtest06/shmat1.c
+@@ -111,7 +111,7 @@ int done_shmat = 0;		/* disallow read and writes before shmat      */
+ static void sig_handler(int signal,	/* signal number, set to handle SIGALRM       */
+ 			int code, struct ucontext *ut)
+ {				/* contains pointer to sigcontext structure   */
+-#ifdef __i386__
++#if defined(__i386__) && defined(__USE_GNU)
+ 	unsigned long except;	/* exception type.                            */
+ 	int ret = 0;		/* exit code from signal handler.             */
+ 	struct sigcontext *scp =	/* pointer to sigcontext structure            */
+@@ -122,7 +122,7 @@ static void sig_handler(int signal,	/* signal number, set to handle SIGALRM
+ 		fprintf(stdout, "Test ended, success\n");
+ 		exit(0);
+ 	}
+-#ifdef __i386__
++#if defined(__i386__) && defined(__USE_GNU)
+ 	else {
+ 		except = scp->trapno;
+ 		fprintf(stderr, "signal caught - [%d] ", signal);
+-- 
+1.9.1
+

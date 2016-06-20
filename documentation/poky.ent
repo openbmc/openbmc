@@ -1,11 +1,12 @@
-<!ENTITY DISTRO "2.0">
-<!ENTITY DISTRO_COMPRESSED "20">
-<!ENTITY DISTRO_NAME "jethro">
-<!ENTITY YOCTO_DOC_VERSION "2.0">
-<!ENTITY POKYVERSION "14.0.0">
-<!ENTITY POKYVERSION_COMPRESSED "1400">
-<!ENTITY YOCTO_POKY "poky-&DISTRO_NAME;-&POKYVERSION;">
-<!ENTITY COPYRIGHT_YEAR "2010-2015">
+<!ENTITY DISTRO "2.1">
+<!ENTITY DISTRO_COMPRESSED "21">
+<!ENTITY DISTRO_NAME_NO_CAP "krogoth">
+<!ENTITY DISTRO_NAME "Krogoth">
+<!ENTITY YOCTO_DOC_VERSION "2.1">
+<!ENTITY POKYVERSION "15.0.0">
+<!ENTITY POKYVERSION_COMPRESSED "1500">
+<!ENTITY YOCTO_POKY "poky-&DISTRO_NAME_NO_CAP;-&POKYVERSION;">
+<!ENTITY COPYRIGHT_YEAR "2010-2016">
 <!ENTITY YOCTO_DL_URL "http://downloads.yoctoproject.org">
 <!ENTITY YOCTO_HOME_URL "http://www.yoctoproject.org">
 <!ENTITY YOCTO_LISTS_URL "http://lists.yoctoproject.org">
@@ -14,7 +15,7 @@
 <!ENTITY YOCTO_AB_URL "http://autobuilder.yoctoproject.org">
 <!ENTITY YOCTO_GIT_URL "http://git.yoctoproject.org">
 <!ENTITY YOCTO_ADTREPO_URL "http://adtrepo.yoctoproject.org">
-<!ENTITY YOCTO_RELEASE_NOTES "&YOCTO_HOME_URL;/downloads/core/&DISTRO_NAME;&DISTRO_COMPRESSED;">
+<!ENTITY YOCTO_RELEASE_NOTES "&YOCTO_HOME_URL;/downloads/core/&DISTRO_NAME_NO_CAP;&DISTRO_COMPRESSED;">
 <!ENTITY OE_HOME_URL "http://www.openembedded.org">
 <!ENTITY OE_LISTS_URL "http://lists.openembedded.org/mailman">
 <!ENTITY OE_DOCS_URL "http://docs.openembedded.org">
@@ -54,6 +55,7 @@
 <!ENTITY YOCTO_DOCS_MM_URL "&YOCTO_DOCS_URL;/&YOCTO_DOC_VERSION;/mega-manual/mega-manual.html">
 <!ENTITY YOCTO_DOCS_BB_URL "&YOCTO_DOCS_URL;/&YOCTO_DOC_VERSION;/bitbake-user-manual/bitbake-user-manual.html">
 <!ENTITY YOCTO_DOCS_TOAST_URL "&YOCTO_DOCS_URL;/&YOCTO_DOC_VERSION;/toaster-manual/toaster-manual.html">
+<!ENTITY YOCTO_DOCS_SDK_URL "&YOCTO_DOCS_URL;/&YOCTO_DOC_VERSION;/sdk-manual/sdk-manual.html">
 <!ENTITY YOCTO_ADTPATH_DIR "/opt/poky/&DISTRO;">
 <!ENTITY YOCTO_POKY_TARBALL "&YOCTO_POKY;.tar.bz2">
 <!ENTITY OE_INIT_PATH "&YOCTO_POKY;/oe-init-build-env">
@@ -62,7 +64,7 @@
      build-essential chrpath socat">
 <!ENTITY FEDORA_HOST_PACKAGES_ESSENTIAL "gawk make wget tar bzip2 gzip python unzip perl patch \
      diffutils diffstat git cpp gcc gcc-c++ glibc-devel texinfo chrpath \
-     ccache perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue socat \
+     ccache perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue perl-bignum socat \
      findutils which">
 <!ENTITY OPENSUSE_HOST_PACKAGES_ESSENTIAL "python gcc gcc-c++ git chrpath make wget python-xml \
      diffstat makeinfo python-curses patch socat">

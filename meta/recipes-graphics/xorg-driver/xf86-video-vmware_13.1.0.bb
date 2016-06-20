@@ -15,4 +15,5 @@ SRC_URI[sha256sum] = "3c1d244e4b1b77e92126957965cdc9fb82de4c215c0706a3a8aaff6939
 
 COMPATIBLE_HOST = '(i.86.*-linux|x86_64.*-linux)'
 
-EXTRA_OECONF += "--disable-vmwgfx"
+PACKAGECONFIG ?= ""
+PACKAGECONFIG[vmwgfx] = "--enable-vmwgfx, --disable-vmwgfx, libdrm virtual/mesa"

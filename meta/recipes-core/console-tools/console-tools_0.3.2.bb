@@ -14,11 +14,18 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/lct/console-tools-${PV}.tar.gz \
            file://nodocs.patch \
            file://fix-libconsole-linking.patch \
            file://no-dep-on-libfl.patch \
+           file://0001-kbdtools-Include-sys-types.h-for-u_char-and-u_short-.patch \
+           file://0001-Cover-the-else-with-__GLIBC__.patch \
            file://lcmessage.m4 \
            file://Makevars"
 
 SRC_URI[md5sum] = "bf21564fc38b3af853ef724babddbacd"
 SRC_URI[sha256sum] = "eea6b441672dacd251079fc85ed322e196282e0e66c16303ec64c3a2b1c126c2"
+
+UPSTREAM_CHECK_URI = "http://sourceforge.net/projects/lct/files/console-tools-devel/"
+UPSTREAM_CHECK_REGEX = "/console-tools-devel/(?P<pver>(\d\d?\.)+\d\d?)/"
+
+CFLAGS_append_aarch64 = " -D_USE_TERMIOS "
 
 do_configure_prepend () {
 	mkdir -p ${S}/m4
@@ -29,7 +36,7 @@ do_configure_prepend () {
 
 inherit autotools gettext update-alternatives
 
-ALTERNATIVE_PRIORITY = "100"
+ALTERNATIVE_PRIORITY = "30"
 
 bindir_progs = "chvt deallocvt fgconsole openvt"
 ALTERNATIVE_${PN} = "${bindir_progs}"

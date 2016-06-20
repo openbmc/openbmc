@@ -163,6 +163,16 @@ apply_cfgfile() {
 			continue
 		}
 
+		[ "${TTYPE}" = "b" ] && {
+			TSOURCE="$TLTARGET"
+			[ "${VERBOSE}" != "no" ] && echo "Creating mount-bind -${TNAME}- from -${TSOURCE}-."
+			mount --bind "${TSOURCE}" "${TNAME}"
+			EXEC="
+	mount --bind \"${TSOURCE}\" \"${TNAME}\""
+			test "$VOLATILE_ENABLE_CACHE" = yes && echo "$EXEC" >> /etc/volatile.cache.build
+			continue
+		}
+
 		[ -L "${TNAME}" ] && {
 			[ "${VERBOSE}" != "no" ] && echo "Found link."
 			NEWNAME=`ls -l "${TNAME}" | sed -e 's/^.*-> \(.*\)$/\1/'`

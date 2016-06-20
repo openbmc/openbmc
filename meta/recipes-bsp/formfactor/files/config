@@ -9,7 +9,7 @@ if [ -z "$HAVE_TOUCHSCREEN" ]; then
 fi
 
 if [ -z "$HAVE_KEYBOARD" ]; then
-    HAVE_KEYBOARD=0
+    HAVE_KEYBOARD=1
 fi
 
 if [ -z "$HAVE_KEYBOARD_PORTRAIT" ]; then

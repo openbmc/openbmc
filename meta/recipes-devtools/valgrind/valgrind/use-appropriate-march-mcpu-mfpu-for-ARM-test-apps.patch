@@ -1,0 +1,44 @@
+From d134dafc2f11e0d247420a0ba360bcdef77b4093 Mon Sep 17 00:00:00 2001
+From: Andre McCurdy <armccurdy@gmail.com>
+Date: Tue, 19 Jan 2016 16:00:00 -0800
+Subject: [PATCH] use appropriate -march/-mcpu/-mfpu for ARM test apps
+
+Ensure that test apps in none/tests/arm are compiled with appropriate
+-march/-mcpu/-mfpu flags to support the instructions being tested.
+The aim is to build all tests, even ones which may not run correctly
+on all target CPUs.
+
+For tests requiring armv7ve instructions, ensure that we set both
+-march=armv7ve and -mcpu=cortex-a15 (since some TUNE_CCARGS may set
+-march=armv7-a and adding -mcpu=cortex-a15 alone is not enough to
+over-ride that).
+
+See similar cases in none/tests/arm/Makefile.am
+
+Upstream-Status: Pending
+
+Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+---
+ none/tests/arm/Makefile.am | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/none/tests/arm/Makefile.am b/none/tests/arm/Makefile.am
+index 4507a20..825290f 100644
+--- a/none/tests/arm/Makefile.am
++++ b/none/tests/arm/Makefile.am
+@@ -62,8 +62,10 @@ neon64_CFLAGS     = $(AM_CFLAGS) -g -O0 -mcpu=cortex-a8 \
+ 			-mfpu=neon \
+ 			-mthumb
+ 
+-intdiv_CFLAGS	  = $(AM_CFLAGS) -g -mcpu=cortex-a15 -mthumb
++intdiv_CFLAGS	  = $(AM_CFLAGS) -g -march=armv7ve -mcpu=cortex-a15 -mthumb
+ ldrt_CFLAGS	  = $(AM_CFLAGS) -g -mcpu=cortex-a8 -mthumb
+ ldrt_arm_CFLAGS	  = $(AM_CFLAGS) -g -mcpu=cortex-a8 -marm
+ 
+-vfpv4_fma_CFLAGS  = $(AM_CFLAGS) -g -O0 -mcpu=cortex-a15 -mfpu=vfpv4 -marm
++vcvt_fixed_float_VFP_CFLAGS = $(AM_CFLAGS) -g -mcpu=cortex-a8 -mfpu=vfpv3
++
++vfpv4_fma_CFLAGS  = $(AM_CFLAGS) -g -O0 -march=armv7ve -mcpu=cortex-a15 -mfpu=vfpv4 -marm
+-- 
+1.9.1
+

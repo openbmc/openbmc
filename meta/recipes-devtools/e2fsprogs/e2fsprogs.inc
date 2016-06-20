@@ -19,7 +19,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b48f21d765b875bd10400975d12c1ca2 \
 SECTION = "base"
 DEPENDS = "util-linux"
 
-SRC_URI = "${SOURCEFORGE_MIRROR}/e2fsprogs/e2fsprogs-${PV}.tar.gz \
-           file://mkdir.patch"
+SRC_URI = "git://git.kernel.org/pub/scm/fs/ext2/e2fsprogs.git"
+S = "${WORKDIR}/git"
 
-inherit autotools gettext texinfo pkgconfig multilib_header
+inherit autotools gettext texinfo pkgconfig multilib_header update-alternatives ptest
+
+BBCLASSEXTEND = "native nativesdk"

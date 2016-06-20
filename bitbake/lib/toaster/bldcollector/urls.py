@@ -18,7 +18,6 @@
 
 
 from django.conf.urls import patterns, include, url
-from django.views.generic import RedirectView
 
 urlpatterns = patterns('bldcollector.views',
         # landing point for pushing a bitbake_eventlog.json file to this toaster instace

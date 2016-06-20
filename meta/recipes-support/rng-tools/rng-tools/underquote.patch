@@ -1,0 +1,31 @@
+Fix underquoted m4 entry. This causes a failure if gcrypt isn't present:
+
+| configure: libgcrypt support disabled
+| ../rng-tools-5/configure: line 4345: ac_fn_c_try_link: command not found
+| configure: error: in `/media/build1/poky/build/tmp/work/i586-poky-linux/rng-tools/5-r0/build':
+
+RP
+2016/2/16
+
+Index: rng-tools-5/configure.ac
+===================================================================
+--- rng-tools-5.orig/configure.ac
++++ rng-tools-5/configure.ac
+@@ -71,7 +71,7 @@ AS_IF(
+ 	[test "x$with_libgcrypt" != "xno"],
+ 	[
+ 		AC_CHECK_HEADER([gcrypt.h],
+-			AC_CHECK_LIB(
++			[AC_CHECK_LIB(
+ 				[gcrypt],
+ 				[gcry_check_version], ,
+ 				[
+@@ -80,7 +80,7 @@ AS_IF(
+ 						AC_MSG_NOTICE([libgcrypt support disabled])
+ 					fi
+ 				]
+-			),
++			)],
+ 			[if test "x$with_libgcrypt" != "xcheck"; then
+ 				AC_MSG_FAILURE([libgcrypt headers not found]); else
+ 				AC_MSG_NOTICE([libgcrypt support disabled])

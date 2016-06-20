@@ -21,9 +21,7 @@ def map_kernel_arch(a, d):
 
     valid_archs = d.getVar('valid_archs', True).split()
 
-    if   re.match('i.86$', a):                  return 'i386'
-    elif re.match('x86.64$', a):                return 'x86_64'
-    elif re.match('athlon$', a):                return 'x86'
+    if   re.match('(i.86|athlon|x86.64)$', a):  return 'x86'
     elif re.match('armeb$', a):                 return 'arm'
     elif re.match('aarch64$', a):               return 'arm64'
     elif re.match('aarch64_be$', a):            return 'arm64'

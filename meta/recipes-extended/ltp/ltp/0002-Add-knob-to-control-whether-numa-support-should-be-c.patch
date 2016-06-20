@@ -1,0 +1,43 @@
+From 867ad5d5d64b9b27ee32148027532db0a00f6433 Mon Sep 17 00:00:00 2001
+From: "Roy.Li" <rongqing.li@windriver.com>
+Date: Thu, 7 Jan 2016 17:33:26 +0000
+Subject: [PATCH 02/32] Add knob to control whether numa support should be
+ checked
+
+otherwise undeterministic dependency will be generated
+during build depending upong numa being staged or not
+
+signed-off-by: Roy.Li <rongqing.li@windriver.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ m4/ltp-numa.m4 | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/m4/ltp-numa.m4 b/m4/ltp-numa.m4
+index 60ae07b..ed7078d 100644
+--- a/m4/ltp-numa.m4
++++ b/m4/ltp-numa.m4
+@@ -24,7 +24,13 @@ dnl ----------------------------
+ dnl
+ AC_DEFUN([LTP_CHECK_SYSCALL_NUMA],
+ [dnl
+-AC_CHECK_HEADERS([linux/mempolicy.h numa.h numaif.h],[
++AC_MSG_CHECKING([for numa])
++AC_ARG_WITH(
++	[numa],
++	AC_HELP_STRING([--without-numa],
++	[without numa support]),
++	[],
++	[AC_CHECK_HEADERS([linux/mempolicy.h numa.h numaif.h],[
+ 	LTP_SYSCALL_NUMA_HEADERS=yes
+ 	AC_CHECK_LIB(numa,numa_alloc_onnode,[have_numa_alloc_onnode="yes"])
+ 	if  test "x$have_numa_alloc_onnode" = "xyes"; then
+@@ -48,3 +54,5 @@ if test "x$have_mpol_constants" = "xyes"; then
+ 	AC_DEFINE(HAVE_MPOL_CONSTANTS,1,[define to 1 if you have all constants required to use mbind tests])
+ fi
+ )])
++AC_MSG_RESULT([$with_numa])
++])
+-- 
+2.7.0
+

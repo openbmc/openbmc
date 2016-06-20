@@ -1,0 +1,44 @@
+From e5f405aba347d216e7f2b73d7dd681b13be442e3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 20 Feb 2015 05:29:15 +0000
+Subject: [PATCH 02/36] units: Prefer getty to agetty in console setup systemd
+ units
+
+Upstream-Status: Inappropriate [configuration specific]
+
+Signed-off-by: Maxime Ripard <maxime.ripard@free-electrons.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ units/getty@.service.m4        | 2 +-
+ units/serial-getty@.service.m4 | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/units/getty@.service.m4 b/units/getty@.service.m4
+index 46164ab..bdf6ec8 100644
+--- a/units/getty@.service.m4
++++ b/units/getty@.service.m4
+@@ -27,7 +27,7 @@ ConditionPathExists=/dev/tty0
+ 
+ [Service]
+ # the VT is cleared by TTYVTDisallocate
+-ExecStart=-/sbin/agetty --noclear %I $TERM
++ExecStart=-/sbin/getty -L %I $TERM
+ Type=idle
+ Restart=always
+ RestartSec=0
+diff --git a/units/serial-getty@.service.m4 b/units/serial-getty@.service.m4
+index 4522d0d..e6d499d 100644
+--- a/units/serial-getty@.service.m4
++++ b/units/serial-getty@.service.m4
+@@ -22,7 +22,7 @@ Before=getty.target
+ IgnoreOnIsolate=yes
+ 
+ [Service]
+-ExecStart=-/sbin/agetty --keep-baud 115200,38400,9600 %I $TERM
++ExecStart=-/sbin/getty -L 115200 %I $TERM
+ Type=idle
+ Restart=always
+ UtmpIdentifier=%I
+-- 
+1.8.3.1
+

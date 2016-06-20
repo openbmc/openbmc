@@ -25,51 +25,62 @@ from devtool import exec_build_env_command, check_workspace_recipe, DevtoolError
 
 logger = logging.getLogger('devtool')
 
-def plugin_init(pluginlist):
-    """Plugin initialization"""
-    pass
 
-def _create_conf_file(values, conf_file=None):
-    if not conf_file:
-        fd, conf_file = tempfile.mkstemp(suffix='.conf')
-    elif not os.path.exists(os.path.dirname(conf_file)):
-        logger.debug("Creating folder %s" % os.path.dirname(conf_file))
-        bb.utils.mkdirhier(os.path.dirname(conf_file))
-    with open(conf_file, 'w') as f:
-        for key, value in values.iteritems():
-            f.write('%s = "%s"\n' % (key, value))
-    return conf_file
+def _set_file_values(fn, values):
+    remaining = values.keys()
+
+    def varfunc(varname, origvalue, op, newlines):
+        newvalue = values.get(varname, origvalue)
+        remaining.remove(varname)
+        return (newvalue, '=', 0, True)
+
+    with open(fn, 'r') as f:
+        (updated, newlines) = bb.utils.edit_metadata(f, values, varfunc)
+
+    for item in remaining:
+        updated = True
+        newlines.append('%s = "%s"' % (item, values[item]))
+
+    if updated:
+        with open(fn, 'w') as f:
+            f.writelines(newlines)
+    return updated
+
+def _get_build_tasks(config):
+    tasks = config.get('Build', 'build_task', 'populate_sysroot,packagedata').split(',')
+    return ['do_%s' % task.strip() for task in tasks]
 
 def build(args, config, basepath, workspace):
     """Entry point for the devtool 'build' subcommand"""
-    check_workspace_recipe(workspace, args.recipename)
+    workspacepn = check_workspace_recipe(workspace, args.recipename, bbclassextend=True)
 
-    build_task = config.get('Build', 'build_task', 'populate_sysroot')
+    build_tasks = _get_build_tasks(config)
 
-    postfile_param = ""
-    postfile = ""
+    bbappend = workspace[workspacepn]['bbappend']
     if args.disable_parallel_make:
         logger.info("Disabling 'make' parallelism")
-        postfile = os.path.join(basepath, 'conf', 'disable_parallelism.conf')
-        _create_conf_file({'PARALLEL_MAKE':''}, postfile)
-        postfile_param = "-R %s" % postfile
+        _set_file_values(bbappend, {'PARALLEL_MAKE': ''})
     try:
-        exec_build_env_command(config.init_path, basepath, 'bitbake -c %s %s %s' % (build_task, postfile_param, args.recipename), watch=True)
+        bbargs = []
+        for task in build_tasks:
+            if args.recipename.endswith('-native') and 'package' in task:
+                continue
+            bbargs.append('%s:%s' % (args.recipename, task))
+        exec_build_env_command(config.init_path, basepath, 'bitbake %s' % ' '.join(bbargs), watch=True)
     except bb.process.ExecutionError as e:
         # We've already seen the output since watch=True, so just ensure we return something to the user
         return e.exitcode
     finally:
-        if postfile:
-            logger.debug('Removing postfile')
-            os.remove(postfile)
+        if args.disable_parallel_make:
+            _set_file_values(bbappend, {'PARALLEL_MAKE': None})
 
     return 0
 
 def register_commands(subparsers, context):
     """Register devtool subcommands from this plugin"""
     parser_build = subparsers.add_parser('build', help='Build a recipe',
-                                         description='Builds the specified recipe using bitbake',
-                                         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+                                         description='Builds the specified recipe using bitbake (up to and including %s)' % ', '.join(_get_build_tasks(context.config)),
+                                         group='working')
     parser_build.add_argument('recipename', help='Recipe to build')
     parser_build.add_argument('-s', '--disable-parallel-make', action="store_true", help='Disable make parallelism')
     parser_build.set_defaults(func=build)

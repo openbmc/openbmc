@@ -1,0 +1,163 @@
+#! /bin/sh
+#
+#  kdump
+#
+#  Description: The kdump script provides the support:
+#		1. Load a kdump kernel image into memory;
+#		2. Copy away vmcore when system panic.
+#
+
+#default
+KDUMP_KVER="`uname -r`"
+KDUMP_KIMAGE="/boot/bzImage-${KDUMP_KVER}"
+KDUMP_CMDLINE="`cat /proc/cmdline`"
+KDUMP_CMDLINE_APPEND="kdump_needed maxcpus=1 irqpoll reset_devices"
+KDUMP_VMCORE_PATH="/var/crash/`date +"%Y-%m-%d"`"
+
+#get right kernel image
+march="`uname -m`"
+case ${march} in
+	x86*|i?86)
+		;;
+		*)
+		KDUMP_KIMAGE="/boot/uImage-${KDUMP_KVER}"
+		;;
+esac
+
+KEXEC=usr/sbin/kexec
+KEXEC_ARGS="-p"
+
+MAKEDUMPFILE=/usr/bin/makedumpfile
+MAKEDUMPFILE_ARGS="-E -d 1"
+
+LOGGER="logger -p info -t kdump"
+
+if [ -f /etc/sysconfig/kdump.conf ]; then
+	. /etc/sysconfig/kdump.conf
+fi
+
+do_check()
+{
+	#check makedumpfile
+	if [ ! -e ${MAKEDUMPFILE} -o ! -x ${MAKEDUMPFILE} ] ;then
+		echo "No makedumpfile found."
+		return 1;
+	fi
+
+	#check kexec
+	if [ ! -e ${KEXEC} -o ! -x ${KEXEC} ] ;then
+		echo "No kexec found."
+		return 1;
+	fi
+
+	#check whether kdump kernel image exists on the system
+	if [ ! -f ${KDUMP_KIMAGE} ]; then
+		echo "No kdump kernel image found."
+		return 1
+	fi
+}
+
+do_save_vmcore()
+{
+	mkdir -p ${KDUMP_VMCORE_PATH}
+	echo "Saving a vmcore to ${KDUMP_VMCORE_PATH}."
+
+	${MAKEDUMPFILE} ${MAKEDUMPFILE_ARGS} /proc/vmcore ${KDUMP_VMCORE_PATH}/vmcore-"`date +"%H:%M:%S"`"
+#	cp --sparse=always /proc/vmcore ${KDUMP_VMCORE_PATH}/vmcore-"`date +"%H:%M:%S"`"
+	rc=$?
+	if [ ${rc} == 0 ]; then
+		${LOGGER} "Saved a vmcore to ${KDUMP_VMCORE_PATH}."
+	else
+		${LOGGER} "Failed to save vmcore!"
+	fi
+	return ${rc}
+}
+
+do_start()
+{
+	#check file
+	do_check
+
+	#check whether the running kernel supports kdump.
+	if [ ! -e /sys/kernel/kexec_crash_loaded ]; then
+		echo "Kdump isn't supported on the running kernel!!!"
+		${LOGGER} "Kdump isn't supported on the running kernel!!!"
+		return 1
+	fi
+
+	#check whether kdump kernel image has been loaded
+	rc=`cat /sys/kernel/kexec_crash_loaded`
+	if [ ${rc} != 0 ]; then
+		echo "Kdump is already running.";
+		${LOGGER} "Kdump is already running."
+		return 0
+	fi
+
+	#check the running kernel cmdline option,insure "crashkenrel=" always set.
+	grep -q crashkernel= /proc/cmdline
+	if [ $? != 0 ]; then
+		echo "Kdump isn't supported on the running kernel,please check boot option!!!"
+		${LOGGER} "Kdump isn't supported on the running kernel,please check boot option!!!"
+		return 1
+	fi
+
+	#handle kdump cmdline parameters, remove some useless options
+	kcmdline=""
+	for x in `cat /proc/cmdline`; do
+		case $x in
+			crashkernel*)
+				;;
+			*)
+				kcmdline="${kcmdline} $x"
+				;;
+		esac
+	done
+
+	KDUMP_CMDLINE="${kcmdline} ${KDUMP_CMDLINE_APPEND}"
+
+	#Load the kdump kernel image
+	${KEXEC} ${KEXEC_ARGS} "${KDUMP_KIMAGE}" --append="${KDUMP_CMDLINE}"
+	if [ $? != 0 ]; then
+		echo "Failed to load kdump kernel!"
+		${LOGGER} "Failed to load kdump kernel!"
+		return 1
+	fi
+
+	echo "Kdump started up."
+	${LOGGER} "Kdump started up."
+}
+
+do_stop()
+{
+	${KEXEC} -p -u 2>/dev/null
+	if [ $? == 0 ]; then
+		echo "Kdump has been stopped."
+		${LOGGER} "Kdump has been stopped."
+	else
+		echo "Failed to stop kdump!"
+		${LOGGER} "Failed to stop kdump!"
+	fi
+}
+
+case "$1" in
+  start)
+	if [ -s /proc/vmcore ]; then
+		do_save_vmcore
+		reboot
+	else
+		do_start
+	fi
+	;;
+ restart)
+	do_stop
+	do_start
+	;;
+  stop)
+	do_stop
+	;;
+   *)
+	echo $"Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?
