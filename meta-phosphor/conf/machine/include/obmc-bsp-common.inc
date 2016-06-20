@@ -13,7 +13,7 @@ UBOOT_SUFFIX ?= "bin"
 
 MACHINEOVERRIDES =. "openbmc:"
 
-IMAGE_FSTYPES += "overlay"
+OBMC_PHOSPHOR_IMAGE_OVERLAY= "1"
 IMAGE_FSTYPES += "cpio.${INITRAMFS_CTYPE}.u-boot"
 OBMC_IMAGE_EXTRA_INSTALL_append = " u-boot-fw-utils"
 

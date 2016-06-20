@@ -48,9 +48,12 @@ CORE_IMAGE_EXTRA_INSTALL_append = " bash \
 
 OBMC_IMAGE_EXTRA_INSTALL ?= ""
 
-def build_overlay(d):
-        if bb.utils.contains("IMAGE_FSTYPES", "overlay", "overlay", "0", d) != "0":
-                return "image-overlay"
-        return ""
+def image_overlay_enabled(d, fstype):
+        if d.getVar('OBMC_PHOSPHOR_IMAGE_OVERLAY', True) != "1":
+            return ""
+        if fstype:
+            return "overlay"
+        return "image-overlay"
 
-inherit ${@build_overlay(d)}
+IMAGE_FSTYPES += "${@image_overlay_enabled(d, True)}"
+inherit ${@image_overlay_enabled(d, False)}
