@@ -3,6 +3,6 @@ DESCRIPTION = "Board wiring information for the Palmetto system."
 HOMEPAGE = "http://github.com/openbmc/skeleton"
 PR = "r1"
 
-SRCREV = "5213a991a5a3bd107636f1b2cc3bbca560843462"
+SRCREV = "cbe32133dadf0945357e2bec67aa7a86ae9f0295"
 inherit config-in-skeleton
 inherit obmc-phosphor-license
