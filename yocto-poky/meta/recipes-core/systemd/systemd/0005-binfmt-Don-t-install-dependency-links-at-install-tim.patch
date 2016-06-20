@@ -1,0 +1,74 @@
+From 3436b12d40bf4f4ab7e3e16600e5f6c35a470da4 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 20 Feb 2015 05:03:44 +0000
+Subject: [PATCH 05/36] binfmt: Don't install dependency links at install time
+ for the binfmt services
+
+use [Install] blocks so that they get created when the service is enabled
+like a traditional service.
+
+The [Install] blocks were rejected upstream as they don't have a way to
+"enable"
+it on install without static symlinks which can't be disabled, only
+masked.  We
+however can do that in a postinst.
+
+Upstream-Status: Denied
+
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile.am                             | 4 ----
+ units/proc-sys-fs-binfmt_misc.automount | 3 +++
+ units/systemd-binfmt.service.in         | 5 +++++
+ 3 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 03341fc..629740f 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -4387,10 +4387,6 @@ INSTALL_DIRS += \
+ 	$(prefix)/lib/binfmt.d \
+ 	$(sysconfdir)/binfmt.d
+ 
+-SYSINIT_TARGET_WANTS += \
+-	systemd-binfmt.service \
+-	proc-sys-fs-binfmt_misc.automount
+-
+ endif
+ 
+ EXTRA_DIST += \
+diff --git a/units/proc-sys-fs-binfmt_misc.automount b/units/proc-sys-fs-binfmt_misc.automount
+index 6be3893..709adef 100644
+--- a/units/proc-sys-fs-binfmt_misc.automount
++++ b/units/proc-sys-fs-binfmt_misc.automount
+@@ -16,3 +16,6 @@ ConditionPathIsReadWrite=/proc/sys/
+ 
+ [Automount]
+ Where=/proc/sys/fs/binfmt_misc
++
++[Install]
++WantedBy=sysinit.target
+diff --git a/units/systemd-binfmt.service.in b/units/systemd-binfmt.service.in
+index d53073e..8c57ee0 100644
+--- a/units/systemd-binfmt.service.in
++++ b/units/systemd-binfmt.service.in
+@@ -11,6 +11,8 @@ Documentation=man:systemd-binfmt.service(8) man:binfmt.d(5)
+ Documentation=https://www.kernel.org/doc/Documentation/binfmt_misc.txt
+ DefaultDependencies=no
+ Conflicts=shutdown.target
++Wants=proc-sys-fs-binfmt_misc.automount
++
+ After=proc-sys-fs-binfmt_misc.automount
+ Before=sysinit.target shutdown.target
+ ConditionPathIsReadWrite=/proc/sys/
+@@ -25,3 +27,6 @@ Type=oneshot
+ RemainAfterExit=yes
+ ExecStart=@rootlibexecdir@/systemd-binfmt
+ TimeoutSec=90s
++
++[Install]
++WantedBy=sysinit.target
+-- 
+1.8.3.1
+

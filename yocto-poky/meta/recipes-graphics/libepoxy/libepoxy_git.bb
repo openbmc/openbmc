@@ -17,7 +17,9 @@ PV = "1.3.1"
 
 S = "${WORKDIR}/git"
 
-inherit autotools pkgconfig
+inherit autotools pkgconfig distro_features_check
+# depends on virtual/egl
+REQUIRED_DISTRO_FEATURES = "opengl"
 
 DEPENDS = "util-macros virtual/egl"
 

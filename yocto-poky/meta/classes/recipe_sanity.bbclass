@@ -143,9 +143,8 @@ python recipe_sanity_eh () {
 
     cfgdata = {}
     for k in d.keys():
-    #for k in ["S", "PR", "PV", "PN", "DESCRIPTION", "LICENSE", "DEPENDS",
-    #          "SECTION"]:
-        cfgdata[k] = d.getVar(k, 0)
+        if not isinstance(d.getVar(k, 0), bb.data_smart.DataSmart):
+            cfgdata[k] = d.getVar(k, 0)
 
     d.setVar("__recipe_sanity_cfgdata", cfgdata)
     #d.setVar("__recipe_sanity_cfgdata", d)

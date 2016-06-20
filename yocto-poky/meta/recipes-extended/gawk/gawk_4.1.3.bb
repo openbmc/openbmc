@@ -26,7 +26,6 @@ inherit autotools gettext texinfo update-alternatives
 
 FILES_${PN} += "${datadir}/awk"
 FILES_${PN}-dev += "${libdir}/${BPN}/*.la"
-FILES_${PN}-dbg += "${libexecdir}/awk/.debug"
 
 ALTERNATIVE_${PN} = "awk"
 ALTERNATIVE_TARGET[awk] = "${bindir}/gawk"

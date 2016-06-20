@@ -1,0 +1,93 @@
+From 39fd30ce57e3c34c3649866bf9345a71f0b78667 Mon Sep 17 00:00:00 2001
+From: Jan Kara <jack@suse.cz>
+Date: Mon, 4 Jan 2016 15:10:53 +0100
+Subject: [PATCH] Fix build with disabled ldap
+
+Upstream-Status: Backport
+
+Reported-by: Tomas Chvatal <tchvatal@suse.com>
+Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Maxin B. John <maxin.john@intel.com>
+---
+ warnquota.c | 36 ++++++++++++++++++------------------
+ 1 file changed, 18 insertions(+), 18 deletions(-)
+
+diff --git a/warnquota.c b/warnquota.c
+index 3734f0e..e9868c1 100644
+--- a/warnquota.c
++++ b/warnquota.c
+@@ -109,13 +109,13 @@ struct configparams {
+ 	char *user_signature;
+ 	char *group_message;
+ 	char *group_signature;
++	time_t cc_before;
++#ifdef USE_LDAP_MAIL_LOOKUP
+ 	int use_ldap_mail; /* 0 */
++	int ldap_is_setup; /* 0 */
+ 	int ldap_starttls; /* 0 */
+ 	int ldap_tls; /* LDAP_OPT_X_TLS_NEVER */
+ 	int ldap_vers; /* LDAP_VERSION3 */
+-	time_t cc_before;
+-#ifdef USE_LDAP_MAIL_LOOKUP
+-	int ldap_is_setup; /* 0 */
+ 	char ldap_host[CNF_BUFFER];
+ 	int ldap_port;
+ 	char ldap_uri[CNF_BUFFER];
+@@ -729,13 +729,13 @@ static int readconfigfile(const char *filename, struct configparams *config)
+ 	}
+ 	maildev[0] = 0;
+ 	config->user_signature = config->user_message = config->group_signature = config->group_message = NULL;
++	config->cc_before = -1;
++
++#ifdef USE_LDAP_MAIL_LOOKUP
+ 	config->use_ldap_mail = 0;
+ 	config->ldap_starttls = 0;
+ 	config->ldap_tls = LDAP_OPT_X_TLS_NEVER;
+ 	config->ldap_vers = LDAP_VERSION3;
+-	config->cc_before = -1;
+-
+-#ifdef USE_LDAP_MAIL_LOOKUP
+ 	config->ldap_port = config->ldap_is_setup = 0;
+ 	config->ldap_host[0] = 0;
+ 	config->ldap_uri[0] = 0;
+@@ -820,6 +820,18 @@ static int readconfigfile(const char *filename, struct configparams *config)
+ 				create_eoln(config->group_signature);
+ 				verify_format(config->group_signature, "GROUP_SIGNATURE");
+ 			}
++			else if (!strcmp(var, "CC_BEFORE")) {
++				int num;
++				char unit[10];
++
++				if (sscanf(value, "%d%s", &num, unit) != 2)
++					goto cc_parse_err;
++				if (str2timeunits(num, unit, &config->cc_before) < 0) {
++cc_parse_err:
++					die(1, _("Cannot parse time at CC_BEFORE variable (line %d).\n"), line);
++				}
++			}
++#ifdef USE_LDAP_MAIL_LOOKUP
+ 			else if (!strcmp(var, "LDAP_MAIL")) {
+ 				if(strcasecmp(value, "true") == 0) 
+ 					config->use_ldap_mail = 1;
+@@ -846,18 +858,6 @@ static int readconfigfile(const char *filename, struct configparams *config)
+ 				else
+ 					config->ldap_starttls = 0;
+ 			}
+-			else if (!strcmp(var, "CC_BEFORE")) {
+-				int num;
+-				char unit[10];
+-
+-				if (sscanf(value, "%d%s", &num, unit) != 2)
+-					goto cc_parse_err;
+-				if (str2timeunits(num, unit, &config->cc_before) < 0) {
+-cc_parse_err:
+-					die(1, _("Cannot parse time at CC_BEFORE variable (line %d).\n"), line);
+-				}
+-			}
+-#ifdef USE_LDAP_MAIL_LOOKUP
+ 			else if (!strcmp(var, "LDAP_HOST"))
+ 				sstrncpy(config->ldap_host, value, CNF_BUFFER);
+ 			else if (!strcmp(var, "LDAP_PORT"))
+-- 
+2.4.0
+

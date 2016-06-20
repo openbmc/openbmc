@@ -29,6 +29,9 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/expect/Expect/${PV}/${BPN}${PV}.tar.gz \
 SRC_URI[md5sum] = "44e1a4f4c877e9ddc5a542dfa7ecc92b"
 SRC_URI[sha256sum] = "b28dca90428a3b30e650525cdc16255d76bb6ccd65d448be53e620d95d5cc040"
 
+UPSTREAM_CHECK_URI = "http://sourceforge.net/projects/expect/files/Expect/"
+UPSTREAM_CHECK_REGEX = "/Expect/(?P<pver>(\d+[\.\-_]*)+)/"
+
 S = "${WORKDIR}/${BPN}${PV}"
 
 do_install_append() {
@@ -48,9 +51,6 @@ EXTRA_OECONF += "--with-tcl=${STAGING_LIBDIR} \
                 "
 EXTRA_OEMAKE_install = " 'SCRIPTS=' "
 
-FILES_${PN}-dbg += "${libdir}/${BPN}${PV}/.debug \
-                    ${libdir}/.debug \
-                   "
 FILES_${PN}-dev = "${libdir_native}/expect${PV}/libexpect*.so \
                    ${includedir}/expect.h \
                    ${includedir}/expect_tcl.h \

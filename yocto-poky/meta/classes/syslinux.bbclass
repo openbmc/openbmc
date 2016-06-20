@@ -20,19 +20,20 @@
 do_bootimg[depends] += "${MLPREFIX}syslinux:do_populate_sysroot \
                         syslinux-native:do_populate_sysroot"
 
-SYSLINUXCFG  = "${S}/syslinux.cfg"
-
-ISOLINUXDIR = "/isolinux"
+ISOLINUXDIR ?= "/isolinux"
 SYSLINUXDIR = "/"
 # The kernel has an internal default console, which you can override with
 # a console=...some_tty...
 SYSLINUX_DEFAULT_CONSOLE ?= ""
 SYSLINUX_SERIAL ?= "0 115200"
 SYSLINUX_SERIAL_TTY ?= "console=ttyS0,115200"
-ISO_BOOTIMG = "isolinux/isolinux.bin"
-ISO_BOOTCAT = "isolinux/boot.cat"
-MKISOFS_OPTIONS = "-no-emul-boot -boot-load-size 4 -boot-info-table"
-APPEND_prepend = " ${SYSLINUX_ROOT} "
+SYSLINUX_PROMPT ?= "0"
+SYSLINUX_TIMEOUT ?= "50"
+AUTO_SYSLINUXMENU ?= "1"
+SYSLINUX_ROOT ?= "${ROOT}"
+SYSLINUX_CFG_VM  ?= "${S}/syslinux_vm.cfg"
+SYSLINUX_CFG_LIVE ?= "${S}/syslinux_live.cfg"
+APPEND ?= ""
 
 # Need UUID utility code.
 inherit fs-uuid
@@ -45,7 +46,7 @@ syslinux_populate() {
 	install -d ${DEST}${BOOTDIR}
 
 	# Install the config files
-	install -m 0644 ${SYSLINUXCFG} ${DEST}${BOOTDIR}/${CFGNAME}
+	install -m 0644 ${SYSLINUX_CFG} ${DEST}${BOOTDIR}/${CFGNAME}
 	if [ "${AUTO_SYSLINUXMENU}" = 1 ] ; then
 		install -m 0644 ${STAGING_DATADIR}/syslinux/vesamenu.c32 ${DEST}${BOOTDIR}/vesamenu.c32
 		install -m 0444 ${STAGING_DATADIR}/syslinux/libcom32.c32 ${DEST}${BOOTDIR}/libcom32.c32
@@ -96,9 +97,9 @@ python build_syslinux_cfg () {
         bb.debug(1, "No labels, nothing to do")
         return
 
-    cfile = d.getVar('SYSLINUXCFG', True)
+    cfile = d.getVar('SYSLINUX_CFG', True)
     if not cfile:
-        raise bb.build.FuncFailed('Unable to read SYSLINUXCFG')
+        raise bb.build.FuncFailed('Unable to read SYSLINUX_CFG')
 
     try:
         cfgfile = file(cfile, 'w')
@@ -120,7 +121,7 @@ python build_syslinux_cfg () {
     if syslinux_serial:
         cfgfile.write('SERIAL %s\n' % syslinux_serial)
 
-    menu = d.getVar('AUTO_SYSLINUXMENU', True)
+    menu = (d.getVar('AUTO_SYSLINUXMENU', True) == "1")
 
     if menu and syslinux_serial:
         cfgfile.write('DEFAULT Graphics console %s\n' % (labels.split()[0]))
@@ -163,6 +164,10 @@ python build_syslinux_cfg () {
             btypes = [ [ "Graphics console ", syslinux_default_console  ],
                 [ "Serial console ", syslinux_serial_tty ] ]
 
+        root= d.getVar('SYSLINUX_ROOT', True)
+        if not root:
+            raise bb.build.FuncFailed('SYSLINUX_ROOT not defined')
+
         for btype in btypes:
             cfgfile.write('LABEL %s%s\nKERNEL /vmlinuz\n' % (btype[0], label))
 
@@ -173,18 +178,15 @@ python build_syslinux_cfg () {
             append = localdata.getVar('APPEND', True)
             initrd = localdata.getVar('INITRD', True)
 
-            if append:
-                cfgfile.write('APPEND ')
+            append = root + " " + append
+            cfgfile.write('APPEND ')
 
-                if initrd:
-                    cfgfile.write('initrd=/initrd ')
+            if initrd:
+                cfgfile.write('initrd=/initrd ')
 
-                cfgfile.write('LABEL=%s '% (label))
-                append = replace_rootfs_uuid(d, append)
-                cfgfile.write('%s %s\n' % (append, btype[1]))
-            else:
-                cfgfile.write('APPEND %s\n' % btype[1])
+            cfgfile.write('LABEL=%s '% (label))
+            append = replace_rootfs_uuid(d, append)
+            cfgfile.write('%s %s\n' % (append, btype[1]))
 
     cfgfile.close()
 }
-build_syslinux_cfg[vardeps] += "APPEND"

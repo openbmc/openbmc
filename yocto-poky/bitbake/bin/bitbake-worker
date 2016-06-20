@@ -18,7 +18,7 @@ if len(sys.argv) != 2 or not sys.argv[1].startswith("decafbad"):
     sys.exit(1)
 
 profiling = False
-if sys.argv[1] == "decafbadbad":
+if sys.argv[1].startswith("decafbadbad"):
     profiling = True
     try:
         import cProfile as profile
@@ -202,6 +202,8 @@ def fork_off_task(cfg, data, workerdata, fn, task, taskname, appends, taskdepdat
                 the_data = bb.cache.Cache.loadDataFull(fn, appends, data)
                 the_data.setVar('BB_TASKHASH', workerdata["runq_hash"][task])
 
+                bb.utils.set_process_name("%s:%s" % (the_data.getVar("PN", True), taskname.replace("do_", "")))
+
                 # exported_vars() returns a generator which *cannot* be passed to os.environ.update() 
                 # successfully. We also need to unset anything from the environment which shouldn't be there 
                 exports = bb.data.exported_vars(the_data)
@@ -296,12 +298,16 @@ class BitbakeWorker(object):
         signal.signal(signal.SIGTERM, self.sigterm_exception)
         # Let SIGHUP exit as SIGTERM
         signal.signal(signal.SIGHUP, self.sigterm_exception)
+        if "beef" in sys.argv[1]:
+            bb.utils.set_process_name("Worker (Fakeroot)")
+        else:
+            bb.utils.set_process_name("Worker")
 
     def sigterm_exception(self, signum, stackframe):
         if signum == signal.SIGTERM:
-            bb.warn("Worker recieved SIGTERM, shutting down...")
+            bb.warn("Worker received SIGTERM, shutting down...")
         elif signum == signal.SIGHUP:
-            bb.warn("Worker recieved SIGHUP, shutting down...")
+            bb.warn("Worker received SIGHUP, shutting down...")
         self.handle_finishnow(None)
         signal.signal(signal.SIGTERM, signal.SIG_DFL)
         os.kill(os.getpid(), signal.SIGTERM)

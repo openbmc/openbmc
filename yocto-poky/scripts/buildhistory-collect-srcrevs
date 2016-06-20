@@ -18,7 +18,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import os, sys
+import collections
+import os
+import sys
 import optparse
 import logging
 
@@ -65,16 +67,13 @@ def main():
     else:
         forcevariable = ''
 
-    lastdir = ''
+    all_srcrevs = collections.defaultdict(list)
     for root, dirs, files in os.walk(options.buildhistory_dir):
         if '.git' in dirs:
             dirs.remove('.git')
         for fn in files:
             if fn == 'latest_srcrev':
                 curdir = os.path.basename(os.path.dirname(root))
-                if lastdir != curdir:
-                    print('# %s' % curdir)
-                    lastdir = curdir
                 fullpath = os.path.join(root, fn)
                 pn = os.path.basename(root)
                 srcrev = None
@@ -98,11 +97,20 @@ def main():
                             name = splitval[0].split('_')[1].strip()
                             srcrevs[name] = value
                 if srcrev and (options.reportall or srcrev != orig_srcrev):
-                    print('SRCREV_pn-%s%s = "%s"' % (pn, forcevariable, srcrev))
+                    all_srcrevs[curdir].append((pn, None, srcrev))
                 for name, value in srcrevs.items():
                     orig = orig_srcrevs.get(name, orig_srcrev)
                     if options.reportall or value != orig:
-                        print('SRCREV_%s_pn-%s%s = "%s"' % (name, pn, forcevariable, value))
+                        all_srcrevs[curdir].append((pn, name, srcrev))
+
+    for curdir, srcrevs in sorted(all_srcrevs.iteritems()):
+        if srcrevs:
+            print('# %s' % curdir)
+            for pn, name, srcrev in srcrevs:
+                if name:
+                    print('SRCREV_%s_pn-%s%s = "%s"' % (name, pn, forcevariable, srcrev))
+                else:
+                    print('SRCREV_pn-%s%s = "%s"' % (pn, forcevariable, srcrev))
 
 
 if __name__ == "__main__":

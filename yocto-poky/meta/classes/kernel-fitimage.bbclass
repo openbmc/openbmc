@@ -14,7 +14,7 @@ python __anonymous () {
 
         image = d.getVar('INITRAMFS_IMAGE', True)
         if image:
-            d.appendVarFlag('do_assemble_fitimage', 'depends', ' ${INITRAMFS_IMAGE}:do_rootfs')
+            d.appendVarFlag('do_assemble_fitimage', 'depends', ' ${INITRAMFS_IMAGE}:do_image_complete')
 }
 
 #
@@ -215,6 +215,7 @@ do_assemble_fitimage() {
 
 addtask assemble_fitimage before do_install after do_compile
 
+kernel_do_deploy[vardepsexclude] = "DATETIME"
 kernel_do_deploy_append() {
 	# Update deploy directory
 	if test "x${KERNEL_IMAGETYPE}" = "xfitImage" ; then

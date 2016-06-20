@@ -1,0 +1,31 @@
+
+Upstream-Status: Inappropriate [embedded specific] 
+  
+The binary _freeze_importlib is built and also used during build time to generate
+importlib*.h files, this is impossible to do on a cross-compile environment,
+this avoids executing the binary and forces it to use the packed importlib*.h files.
+
+ 
+Signed-Off-By: Alejandro Hernandez <alejandro.hernandez@linux.intel.com> 
+
+Index: Python-3.5.0/Makefile.pre.in
+===================================================================
+--- Python-3.5.0.orig/Makefile.pre.in
++++ Python-3.5.0/Makefile.pre.in
+@@ -700,12 +700,12 @@ Programs/_freeze_importlib.o: Programs/_
+ Programs/_freeze_importlib: Programs/_freeze_importlib.o $(LIBRARY_OBJS_OMIT_FROZEN)
+ 	$(LINKCC) $(PY_LDFLAGS) -o $@ Programs/_freeze_importlib.o $(LIBRARY_OBJS_OMIT_FROZEN) $(LIBS) $(MODLIBS) $(SYSLIBS) $(LDLAST)
+ 
+-Python/importlib_external.h: $(srcdir)/Lib/importlib/_bootstrap_external.py Programs/_freeze_importlib
+-	./Programs/_freeze_importlib \
++#Python/importlib_external.h: $(srcdir)/Lib/importlib/_bootstrap_external.py Programs/_freeze_importlib
++#	./Programs/_freeze_importlib \
+ 		$(srcdir)/Lib/importlib/_bootstrap_external.py Python/importlib_external.h
+ 
+-Python/importlib.h: $(srcdir)/Lib/importlib/_bootstrap.py Programs/_freeze_importlib
+-	./Programs/_freeze_importlib \
++#Python/importlib.h: $(srcdir)/Lib/importlib/_bootstrap.py Programs/_freeze_importlib
++#	./Programs/_freeze_importlib \
+ 		$(srcdir)/Lib/importlib/_bootstrap.py Python/importlib.h
+ 
+ 

@@ -113,8 +113,7 @@
         <filename class="directory">tmp/deploy/images</filename>.
         For information on how to run pre-built images such as <filename>qemux86</filename>
         and <filename>qemuarm</filename>, see the
-        "<ulink url='&YOCTO_DOCS_QS_URL;#using-pre-built'>Example Using Pre-Built Binaries and QEMU</ulink>"
-        section in the Yocto Project Application Developer's Guide.
+        <ulink url='&YOCTO_DOCS_SDK_URL;#sdk-manual'>Yocto Project Software Development Kit (SDK) Developer's Guide</ulink>.
         For information about how to install these images, see the documentation for your
         particular board or machine.
     </para>
@@ -150,10 +149,11 @@
 
     <para>
         For discussions on debugging, see the
-        "<ulink url='&YOCTO_DOCS_DEV_URL;#platdev-gdb-remotedebug'>Debugging With the GNU Project Debugger (GDB) Remotely</ulink>"
-        and
-        "<ulink url='&YOCTO_DOCS_DEV_URL;#adt-eclipse'>Working within Eclipse</ulink>"
-        sections in the Yocto Project Development Manual.
+        "<ulink url='&YOCTO_DOCS_DEV_URL;#platdev-gdb-remotedebug'>Debugging With the GNU Project Debugger (GDB) Remotely</ulink>" section
+        in the Yocto Project Developer's Manual
+        and the
+        "<ulink url='&YOCTO_DOCS_SDK_URL;#adt-eclipse'>Working within Eclipse</ulink>"
+        section in the Yocto Project Software Development Kit (SDK) Developer's Guide.
     </para>
 
     <note>
@@ -799,12 +799,18 @@
 
         <section id='build-history-sdk-information'>
             <title>Build History SDK Information</title>
+
             <para>
                 Build history collects similar information on the contents
-                of SDKs (e.g. <filename>meta-toolchain</filename>
-                or <filename>bitbake -c populate_sdk imagename</filename>)
+                of SDKs
+                (e.g. <filename>bitbake -c populate_sdk imagename</filename>)
                 as compared to information it collects for images.
-                The following list shows the files produced for each SDK:
+                Furthermore, this information differs depending on whether an
+                extensible or standard SDK is being produced.
+            </para>
+
+            <para>
+                The following list shows the files produced for SDKs:
                 <itemizedlist>
                     <listitem><para><filename>files-in-sdk.txt:</filename>
                         A list of files in the SDK with permissions,
@@ -817,11 +823,49 @@
                         about the SDK.
                         See the following listing example for more information.
                         </para></listitem>
+                    <listitem><para><filename>sstate-task-sizes.txt:</filename>
+                        A text file containing name-value pairs with information
+                        about task group sizes
+                        (e.g. <filename>do_populate_sysroot</filename> tasks
+                        have a total size).
+                        The <filename>sstate-task-sizes.txt</filename> file
+                        exists only when an extensible SDK is created.
+                        </para></listitem>
+                    <listitem><para><filename>sstate-package-sizes.txt:</filename>
+                        A text file containing name-value pairs with information
+                        for the shared-state packages and sizes in the SDK.
+                        The <filename>sstate-package-sizes.txt</filename> file
+                        exists only when an extensible SDK is created.
+                        </para></listitem>
+                    <listitem><para><filename>sdk-files:</filename>
+                        A folder that contains copies of the files mentioned in
+                        <filename>BUILDHISTORY_SDK_FILES</filename> if the
+                        files are present in the output.
+                        Additionally, the default value of
+                        <filename>BUILDHISTORY_SDK_FILES</filename> is specific
+                        to the extensible SDK although you can set it
+                        differently if you would like to pull in specific files
+                        from the standard SDK.</para>
+                        <para>The default files are
+                        <filename>conf/local.conf</filename>,
+                        <filename>conf/bblayers.conf</filename>,
+                        <filename>conf/auto.conf</filename>,
+                        <filename>conf/locked-sigs.inc</filename>, and
+                        <filename>conf/devtool.conf</filename>.
+                        Thus, for an extensible SDK, these files get copied
+                        into the <filename>sdk-files</filename> directory.
+                        </para></listitem>
                     <listitem><para>The following information appears under
                         each of the <filename>host</filename>
                         and <filename>target</filename> directories
                         for the portions of the SDK that run on the host and
                         on the target, respectively:
+                        <note>
+                            The following files for the most part are empty
+                            when producing an extensible SDK because this
+                            type of SDK is not constructed from packages as is
+                            the standard SDK.
+                        </note>
                         <itemizedlist>
                             <listitem><para><filename>depends.dot:</filename>
                                 Dependency graph for the SDK that is

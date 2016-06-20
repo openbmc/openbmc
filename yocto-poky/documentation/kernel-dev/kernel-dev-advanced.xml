@@ -29,8 +29,8 @@
         source Git repositories.
         This Metadata defines Board Support Packages (BSPs) that
         correspond to definitions in linux-yocto recipes for the same BSPs.
-        A BSP consists of an aggregation of kernel policy and hardware-specific
-        feature enablements.
+        A BSP consists of an aggregation of kernel policy and enabled
+        hardware-specific features.
         The BSP can be influenced from within the linux-yocto recipe.
         <note>
             Linux kernel source that contains kernel Metadata is said to be
@@ -171,8 +171,8 @@
     <title>Kernel Metadata Location</title>
 
     <para>
-        Kernel Metadata can be defined in either the kernel recipe
-        (recipe-space) or in the kernel tree (in-tree).
+        Kernel Metadata always exists outside of the kernel tree either
+        defined in a kernel recipe (recipe-space) or outside of the recipe.
         Where you choose to define the Metadata depends on what you want
         to do and how you intend to work.
         Regardless of where you define the kernel Metadata, the syntax used
@@ -195,10 +195,10 @@
     <para>
         Conversely, if you are actively developing a kernel and are already
         maintaining a Linux kernel Git repository of your own, you might find
-        it more convenient to work with the kernel Metadata in the same
-        repository as the Linux kernel sources.
-        This method can make iterative development of the Linux kernel
-        more efficient outside of the BitBake environment.
+        it more convenient to work with kernel Metadata kept outside the
+        recipe-space.
+        Working with Metadata in this area can make iterative development of
+        the Linux kernel more efficient outside of the BitBake environment.
     </para>
 
     <section id='recipe-space-metadata'>
@@ -249,38 +249,52 @@
         </para>
     </section>
 
-    <section id='in-tree-metadata'>
-        <title>In-Tree Metadata</title>
+    <section id='metadata-outside-the-recipe-space'>
+        <title>Metadata Outside the Recipe-Space</title>
 
         <para>
-            When stored in-tree, the kernel Metadata files reside in the
-            <filename>meta</filename> directory of the Linux kernel sources.
-            The <filename>meta</filename> directory can be present in the
-            same repository branch as the sources,
-            such as "master", or <filename>meta</filename> can be its own
-            orphan branch.
-            <note>
-                An orphan branch in Git is a branch with unique history and
-                content to the other branches in the repository.
-                Orphan branches are useful to track Metadata changes
-                independently from the sources of the Linux kernel, while
-                still keeping them together in the same repository.
-            </note>
-            For the purposes of this document, we will discuss all
-            in-tree Metadata as residing below the
-            <filename>meta/cfg/kernel-cache</filename> directory.
+            When stored outside of the recipe-space, the kernel Metadata
+            files reside in a separate repository.
+            The OpenEmbedded build system adds the Metadata to the build as
+            a "ktype=meta" repository through the
+            <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>
+            variable.
+            As an example, consider the following <filename>SRC_URI</filename>
+            statement from the <filename>linux-yocto_4.4.bb</filename>
+            kernel recipe:
+            <literallayout class='monospaced'>
+     SRC_URI = "git://git.yoctoproject.org/linux-yocto-4.4.git;name=machine;branch=${KBRANCH}; \
+                git://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=meta;branch=yocto-4.4;destsuffix=${KMETA}"
+            </literallayout>
+            <filename>${KMETA}</filename>, in this context, is simply used to
+            name the directory into which the Git fetcher places the Metadata.
+            This behavior is no different than any multi-repository
+            <filename>SRC_URI</filename> statement used in a recipe.
         </para>
+
+        <para>
+            You can keep kernel Metadata in a "kernel-cache", which is a
+            directory containing configuration fragments.
+            As with any Metadata kept outside the recipe-space, you simply
+            need to use the <filename>SRC_URI</filename> statement with the
+            "type=kmeta" attribute.
+            Doing so makes the kernel Metadata available during the
+            configuration phase.
+        </para>
+
+<!--
+
 
         <para>
             Following is an example that shows how a trivial tree of Metadata
             is stored in a custom Linux kernel Git repository:
             <literallayout class='monospaced'>
      meta/
-     `-- cfg
-         `-- kernel-cache
-             |-- bsp-standard.scc
-             |-- bsp.cfg
-             `-- standard.cfg
+     `&dash;&dash; cfg
+         `&dash;&dash; kernel-cache
+             |&dash;&dash; bsp-standard.scc
+             |&dash;&dash; bsp.cfg
+             `&dash;&dash; standard.cfg
             </literallayout>
         </para>
 
@@ -301,16 +315,15 @@
             orphan <filename>meta</filename> branch, use these commands
             from within your Linux kernel Git repository:
             <literallayout class='monospaced'>
-     $ git checkout --orphan meta
+     $ git checkout &dash;&dash;orphan meta
      $ git rm -rf .
-     $ git commit --allow-empty -m "Create orphan meta branch"
+     $ git commit &dash;&dash;allow-empty -m "Create orphan meta branch"
             </literallayout>
         </para>
+-->
 
         <para>
-            If you modify the Metadata in the linux-yocto
-            <filename>meta</filename> branch, you must not forget to update
-            the
+            If you modify the Metadata, you must not forget to update the
             <ulink url='&YOCTO_DOCS_REF_URL;#var-SRCREV'><filename>SRCREV</filename></ulink>
             statements in the kernel's recipe.
             In particular, you need to update the
@@ -437,7 +450,7 @@
         if you are creating Metadata in
         <link linkend='recipe-space-metadata'>recipe-space</link>,
         or <filename>meta/cfg/kernel-cache/</filename> if you are creating
-        Metadata <link linkend='in-tree-metadata'>in-tree</link>.
+        <link linkend='metadata-outside-the-recipe-space'>Metadata outside of the recipe-space</link>.
     </para>
 
     <section id='configuration'>

@@ -12,6 +12,8 @@ SRC_URI = "http://xkbcommon.org/download/${BPN}-${PV}.tar.xz"
 SRC_URI[md5sum] = "2e1faeafcc609c30af3a561a91e84158"
 SRC_URI[sha256sum] = "90bd7824742b9a6f52a6cf80e2cadd6f5349cf600a358d08260772615b89d19c"
 
+UPSTREAM_CHECK_URI = "http://xkbcommon.org/"
+
 inherit autotools pkgconfig
 
 EXTRA_OECONF = "--disable-docs"

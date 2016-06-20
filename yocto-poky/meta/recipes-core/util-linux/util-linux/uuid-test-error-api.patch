@@ -1,0 +1,92 @@
+This patch adds error() API implementation for non-glibc system C libs
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: util-linux-2.27.1/tests/helpers/test_uuidd.c
+===================================================================
+--- util-linux-2.27.1.orig/tests/helpers/test_uuidd.c
++++ util-linux-2.27.1/tests/helpers/test_uuidd.c
+@@ -23,7 +23,6 @@
+  *
+  *	make uuidd uuidgen localstatedir=/var
+  */
+-#include <error.h>
+ #include <libgen.h>
+ #include <pthread.h>
+ #include <stdio.h>
+@@ -39,6 +38,17 @@
+ #include "xalloc.h"
+ #include "strutils.h"
+ 
++#ifdef __GLIBC__
++#include <error.h>
++#else
++extern void (*error_print_progname)(void);
++extern unsigned int error_message_count;
++extern int error_one_per_line;
++
++void error(int, int, const char *, ...);
++void error_at_line(int, int, const char *, unsigned int, const char *, ...);
++#endif
++
+ #define LOG(level,args) if (loglev >= level) { fprintf args; }
+ 
+ size_t nprocesses = 4;
+@@ -257,6 +267,56 @@ static void object_dump(size_t idx, obje
+ 	fprintf(stderr, "}\n");
+ }
+ 
++#ifndef __GLIBC__
++extern char *__progname;
++
++void (*error_print_progname)(void) = 0;
++unsigned int error_message_count = 0;
++int error_one_per_line = 0;
++
++static void eprint(int status, int e, const char *file, unsigned int line, const char *fmt, va_list ap)
++{
++	if (file && error_one_per_line) {
++		static const char *oldfile;
++		static unsigned int oldline;
++		if (line == oldline && strcmp(file, oldfile) == 0)
++			return;
++		oldfile = file;
++		oldline = line;
++	}
++	if (error_print_progname)
++		error_print_progname();
++	else
++		fprintf(stderr, "%s: ", __progname);
++	if (file)
++		fprintf(stderr, "%s:%u: ", file, line);
++	vfprintf(stderr, fmt, ap);
++	if (e)
++		fprintf(stderr, ": %s", strerror(e));
++	putc('\n', stderr);
++	fflush(stderr);
++	error_message_count++;
++	if (status)
++		exit(status);
++}
++
++void error(int status, int e, const char *fmt, ...)
++{
++	va_list ap;
++	va_start(ap,fmt);
++	eprint(status, e, 0, 0, fmt, ap);
++	va_end(ap);
++}
++
++void error_at_line(int status, int e, const char *file, unsigned int line, const char *fmt, ...)
++{
++	va_list ap;
++	va_start(ap,fmt);
++	eprint(status, e, file, line, fmt, ap);
++	va_end(ap);
++}
++#endif /* __GLIBC__ */
++
+ int main(int argc, char *argv[])
+ {
+ 	size_t i, nfailed = 0, nignored = 0;

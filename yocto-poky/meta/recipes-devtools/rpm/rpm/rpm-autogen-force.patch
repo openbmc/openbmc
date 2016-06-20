@@ -1,0 +1,78 @@
+In order to enable musl or other libc support, force update the config.guess
+
+In order to reliably replace config.guess and config.sub, we need to remove
+them prior to the call to automake.  Adding the --force-missing is likely
+not necessary, but matching normal OE autoreconf usage.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.15/autogen.sh
+===================================================================
+--- rpm-5.4.15.orig/autogen.sh
++++ rpm-5.4.15/autogen.sh
+@@ -73,7 +73,8 @@ rm -f aclocal.m4
+ aclocal -I m4
+ autoheader -I m4
+ echo "---> generate files via GNU automake (automake)"
+-automake -Wall -Wno-override -a -c
++rm -f config.guess config.sub
++automake -Wall -Wno-override -a -c --force-missing
+ echo "---> generate files via GNU autoconf (autoconf)"
+ autoconf -I m4
+ echo "<=== rpm"
+Index: rpm-5.4.15/beecrypt/autogen.sh
+===================================================================
+--- rpm-5.4.15.orig/beecrypt/autogen.sh
++++ rpm-5.4.15/beecrypt/autogen.sh
+@@ -25,6 +25,7 @@ libtoolize () {
+ 
+ libtoolize --force --copy
+ aclocal
+-automake -a -c
++rm -f config.guess config.sub
++automake -a -c --force-missing
+ autoconf
+ autoheader
+Index: rpm-5.4.15/libtpm/autogen.sh
+===================================================================
+--- rpm-5.4.15.orig/libtpm/autogen.sh
++++ rpm-5.4.15/libtpm/autogen.sh
+@@ -46,7 +46,8 @@ echo "---> generate files via GNU autoco
+ aclocal
+ autoheader
+ echo "---> generate files via GNU automake (automake)"
+-automake -Wall -Wno-override -a -c
++rm -f config.guess config.sub
++automake -Wall -Wno-override -a -c --force-missing
+ echo "---> generate files via GNU autoconf (autoconf)"
+ autoconf
+ 
+Index: rpm-5.4.15/neon/autogen.sh
+===================================================================
+--- rpm-5.4.15.orig/neon/autogen.sh
++++ rpm-5.4.15/neon/autogen.sh
+@@ -63,7 +63,8 @@ echo "---> generate files via GNU autoco
+ ${ACLOCAL:-aclocal} -I macros
+ ${AUTOHEADER:-autoheader}
+ echo "---> generate files via GNU automake (automake)"
+-${AUTOMAKE:-automake} -Wall -Wno-override -a -c
++rm -f config.guess config.sub
++${AUTOMAKE:-automake} -Wall -Wno-override -a -c --force-missing
+ echo "---> generate files via GNU autoconf (autoconf)"
+ ${AUTOCONF:-autoconf} -Wall
+ 
+Index: rpm-5.4.15/syck/autogen.sh
+===================================================================
+--- rpm-5.4.15.orig/syck/autogen.sh
++++ rpm-5.4.15/syck/autogen.sh
+@@ -40,6 +40,7 @@ echo "---> generate files via GNU autoco
+ aclocal
+ autoheader
+ echo "---> generate files via GNU automake (automake)"
+-automake -Wall -Wno-override -a -c
++rm -f config.guess config.sub
++automake -Wall -Wno-override -a -c --force-missing
+ echo "---> generate files via GNU autoconf (autoconf)"
+ autoconf

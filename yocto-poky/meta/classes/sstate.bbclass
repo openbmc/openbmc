@@ -10,7 +10,7 @@ def generate_sstatefn(spec, hash, d):
 
 SSTATE_PKGARCH    = "${PACKAGE_ARCH}"
 SSTATE_PKGSPEC    = "sstate:${PN}:${PACKAGE_ARCH}${TARGET_VENDOR}-${TARGET_OS}:${PV}:${PR}:${SSTATE_PKGARCH}:${SSTATE_VERSION}:"
-SSTATE_SWSPEC     = "sstate:${BPN}::${PV}:${PR}::${SSTATE_VERSION}:"
+SSTATE_SWSPEC     = "sstate:${PN}::${PV}:${PR}::${SSTATE_VERSION}:"
 SSTATE_PKGNAME    = "${SSTATE_EXTRAPATH}${@generate_sstatefn(d.getVar('SSTATE_PKGSPEC', True), d.getVar('BB_TASKHASH', True), d)}"
 SSTATE_PKG        = "${SSTATE_DIR}/${SSTATE_PKGNAME}"
 SSTATE_EXTRAPATH   = ""
@@ -31,7 +31,7 @@ SSTATE_DUPWHITELIST += "${DEPLOY_DIR_SRC}"
 SSTATE_SCAN_FILES ?= "*.la *-config *_config"
 SSTATE_SCAN_CMD ?= 'find ${SSTATE_BUILDDIR} \( -name "${@"\" -o -name \"".join(d.getVar("SSTATE_SCAN_FILES", True).split())}" \) -type f'
 
-BB_HASHFILENAME = "${SSTATE_EXTRAPATH} ${SSTATE_PKGSPEC} ${SSTATE_SWSPEC}"
+BB_HASHFILENAME = "False ${SSTATE_PKGSPEC} ${SSTATE_SWSPEC}"
 
 SSTATE_ARCHS = " \
     ${BUILD_ARCH} \
@@ -51,8 +51,15 @@ SSTATEPREINSTFUNCS = ""
 SSTATEPOSTUNPACKFUNCS = "sstate_hardcode_path_unpack"
 SSTATEPOSTINSTFUNCS = ""
 EXTRA_STAGING_FIXMES ?= ""
+SSTATECLEANFUNCS = ""
 
-SIGGEN_LOCKEDSIGS_CHECK_LEVEL ?= 'error'
+# Check whether sstate exists for tasks that support sstate and are in the
+# locked signatures file.
+SIGGEN_LOCKEDSIGS_SSTATE_EXISTS_CHECK ?= 'error'
+
+# Check whether the task's computed hash matches the task's hash in the
+# locked signatures file.
+SIGGEN_LOCKEDSIGS_TASKSIG_CHECK ?= "error"
 
 # The GnuPG key ID and passphrase to use to sign sstate archives (or unset to
 # not sign)
@@ -79,6 +86,7 @@ python () {
 
     if bb.data.inherits_class('native', d) or bb.data.inherits_class('crosssdk', d) or bb.data.inherits_class('cross', d):
         d.setVar('SSTATE_EXTRAPATH', "${NATIVELSBSTRING}/")
+        d.setVar('BB_HASHFILENAME', "True ${SSTATE_PKGSPEC} ${SSTATE_SWSPEC}")
         d.setVar('SSTATE_EXTRAPATHWILDCARD', "*/")
 
     # These classes encode staging paths into their scripts data so can only be
@@ -124,6 +132,7 @@ def sstate_state_fromvars(d, task = None):
     if task == "populate_lic":
         d.setVar("SSTATE_PKGSPEC", "${SSTATE_SWSPEC}")
         d.setVar("SSTATE_EXTRAPATH", "")
+        d.setVar('SSTATE_EXTRAPATHWILDCARD', "")
 
     ss = sstate_init(task, d)
     for i in range(len(inputs)):
@@ -271,6 +280,7 @@ sstate_install[vardeps] += "${SSTATEPOSTINSTFUNCS}"
 def sstate_installpkg(ss, d):
     import oe.path
     import subprocess
+    from oe.gpg_sign import get_signer
 
     def prepdir(dir):
         # remove dir if it exists, ensure any parent directories do exist
@@ -296,7 +306,8 @@ def sstate_installpkg(ss, d):
     d.setVar('SSTATE_PKG', sstatepkg)
 
     if bb.utils.to_boolean(d.getVar("SSTATE_VERIFY_SIG", True), False):
-        if subprocess.call(["gpg", "--verify", sstatepkg + ".sig", sstatepkg]) != 0:
+        signer = get_signer(d, 'local')
+        if not signer.verify(sstatepkg + '.sig'):
             bb.warn("Cannot verify signature on sstate package %s" % sstatepkg)
 
     for f in (d.getVar('SSTATEPREINSTFUNCS', True) or '').split() + ['sstate_unpack_package'] + (d.getVar('SSTATEPOSTUNPACKFUNCS', True) or '').split():
@@ -440,6 +451,10 @@ def sstate_clean(ss, d):
                 stfile.endswith(rm_nohash):
             oe.path.remove(stfile)
 
+    # Removes the users/groups created by the package
+    for cleanfunc in (d.getVar('SSTATECLEANFUNCS', True) or '').split():
+        bb.build.exec_func(cleanfunc, d)
+
 sstate_clean[vardepsexclude] = "SSTATE_MANFILEPREFIX"
 
 CLEANFUNCS += "sstate_cleanall"
@@ -571,7 +586,8 @@ def sstate_package(ss, d):
     d.setVar('SSTATE_BUILDDIR', sstatebuild)
     d.setVar('SSTATE_PKG', sstatepkg)
 
-    for f in (d.getVar('SSTATECREATEFUNCS', True) or '').split() + ['sstate_create_package'] + \
+    for f in (d.getVar('SSTATECREATEFUNCS', True) or '').split() + \
+             ['sstate_create_package', 'sstate_sign_package'] + \
              (d.getVar('SSTATEPOSTCREATEFUNCS', True) or '').split():
         # All hooks should run in SSTATE_BUILDDIR.
         bb.build.exec_func(f, d, (sstatebuild,))
@@ -672,16 +688,23 @@ sstate_create_package () {
 	else
 		tar -cz --file=$TFILE --files-from=/dev/null
 	fi
-	chmod 0664 $TFILE 
+	chmod 0664 $TFILE
 	mv -f $TFILE ${SSTATE_PKG}
-
-	if [ -n "${SSTATE_SIG_KEY}" ]; then
-		rm -f ${SSTATE_PKG}.sig
-		echo ${SSTATE_SIG_PASSPHRASE} | gpg --batch --passphrase-fd 0 --detach-sign --local-user ${SSTATE_SIG_KEY} --output ${SSTATE_PKG}.sig ${SSTATE_PKG}
-	fi
 
 	cd ${WORKDIR}
 	rm -rf ${SSTATE_BUILDDIR}
+}
+
+python sstate_sign_package () {
+    from oe.gpg_sign import get_signer
+
+    if d.getVar('SSTATE_SIG_KEY', True):
+        signer = get_signer(d, 'local')
+        sstate_pkg = d.getVar('SSTATE_PKG', True)
+        if os.path.exists(sstate_pkg + '.sig'):
+            os.unlink(sstate_pkg + '.sig')
+        signer.detach_sign(sstate_pkg, d.getVar('SSTATE_SIG_KEY', False), None,
+                           d.getVar('SSTATE_SIG_PASSPHRASE', True), armor=False)
 }
 
 #
@@ -689,9 +712,11 @@ sstate_create_package () {
 # Will be run from within SSTATE_INSTDIR.
 #
 sstate_unpack_package () {
-	tar -xmvzf ${SSTATE_PKG}
+	tar -xvzf ${SSTATE_PKG}
 	# Use "! -w ||" to return true for read only files
 	[ ! -w ${SSTATE_PKG} ] || touch --no-dereference ${SSTATE_PKG}
+	[ ! -w ${SSTATE_PKG}.sig ] || [ ! -e ${SSTATE_PKG}.sig ] || touch --no-dereference ${SSTATE_PKG}.sig
+	[ ! -w ${SSTATE_PKG}.siginfo ] || [ ! -e ${SSTATE_PKG}.siginfo ] || touch --no-dereference ${SSTATE_PKG}.siginfo
 }
 
 BB_HASHCHECK_FUNCTION = "sstate_checkhashes"
@@ -708,7 +733,10 @@ def sstate_checkhashes(sq_fn, sq_task, sq_hash, sq_hashfn, d, siginfo=False):
         # Magic data from BB_HASHFILENAME
         splithashfn = sq_hashfn[task].split(" ")
         spec = splithashfn[1]
-        extrapath = splithashfn[0]
+        if splithashfn[0] == "True":
+            extrapath = d.getVar("NATIVELSBSTRING", True) + "/"
+        else:
+            extrapath = ""
 
         tname = sq_task[task][3:]
 
@@ -830,12 +858,20 @@ def setscene_depvalid(task, taskdependees, notneeded, d):
         return x.endswith("-native") or "-cross-" in x or "-crosssdk" in x
 
     def isPostInstDep(x):
-        if x in ["qemu-native", "gdk-pixbuf-native", "qemuwrapper-cross", "depmodwrapper-cross", "systemd-systemctl-native", "gtk-icon-utils-native"]:
+        if x in ["qemu-native", "gdk-pixbuf-native", "qemuwrapper-cross", "depmodwrapper-cross", "systemd-systemctl-native", "gtk-icon-utils-native", "ca-certificates-native"]:
             return True
         return False
 
     # We only need to trigger populate_lic through direct dependencies
     if taskdependees[task][1] == "do_populate_lic":
+        return True
+
+    # We only need to trigger packagedata through direct dependencies
+    # but need to preserve packagedata on packagedata links
+    if taskdependees[task][1] == "do_packagedata":
+        for dep in taskdependees:
+            if taskdependees[dep][1] == "do_packagedata":
+                return False
         return True
 
     for dep in taskdependees:
@@ -854,6 +890,11 @@ def setscene_depvalid(task, taskdependees, notneeded, d):
             continue
         # Native/Cross packages don't exist and are noexec anyway
         if isNativeCross(taskdependees[dep][0]) and taskdependees[dep][1] in ['do_package_write_deb', 'do_package_write_ipk', 'do_package_write_rpm', 'do_packagedata', 'do_package', 'do_package_qa']:
+            continue
+
+        # This is due to the [depends] in useradd.bbclass complicating matters
+        # The logic *is* reversed here due to the way hard setscene dependencies are injected
+        if (taskdependees[task][1] == 'do_package' or taskdependees[task][1] == 'do_populate_sysroot') and taskdependees[dep][0].endswith(('shadow-native', 'shadow-sysroot', 'base-passwd', 'pseudo-native')) and taskdependees[dep][1] == 'do_populate_sysroot':
             continue
 
         # Consider sysroot depending on sysroot tasks
@@ -879,10 +920,9 @@ def setscene_depvalid(task, taskdependees, notneeded, d):
         if taskdependees[task][1] == 'do_shared_workdir':
             continue
 
-        # This is due to the [depends] in useradd.bbclass complicating matters
-        # The logic *is* reversed here due to the way hard setscene dependencies are injected
-        if taskdependees[task][1] == 'do_package' and taskdependees[dep][0].endswith(('shadow-native', 'shadow-sysroot', 'base-passwd', 'pseudo-native')) and taskdependees[dep][1] == 'do_populate_sysroot':
+        if taskdependees[dep][1] == "do_populate_lic":
             continue
+
 
         # Safe fallthrough default
         bb.debug(2, " Default setscene dependency fall through due to dependency: %s" % (str(taskdependees[dep])))
@@ -933,8 +973,12 @@ python sstate_eventhandler2() {
                 if stamp not in stamps:
                     toremove.append(l)
                     if stamp not in seen:
-                        bb.note("Stamp %s is not reachable, removing related manifests" % stamp)
+                        bb.debug(2, "Stamp %s is not reachable, removing related manifests" % stamp)
                         seen.append(stamp)
+
+        if toremove:
+            bb.note("There are %d recipes to be removed from sysroot %s, removing..." % (len(toremove), a))
+
         for r in toremove:
             (stamp, manifest, workdir) = r.split()
             for m in glob.glob(manifest + ".*"):

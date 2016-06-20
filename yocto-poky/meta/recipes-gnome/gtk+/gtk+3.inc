@@ -10,7 +10,7 @@ DEPENDS = "glib-2.0 cairo pango atk jpeg libpng gdk-pixbuf \
 
 LICENSE = "LGPLv2 & LGPLv2+ & LGPLv2.1+"
 
-inherit autotools pkgconfig gtk-doc update-alternatives gtk-immodules-cache gsettings distro_features_check
+inherit autotools pkgconfig gtk-doc update-alternatives gtk-immodules-cache gsettings distro_features_check upstream-version-is-even gobject-introspection
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 
 # This should be in autotools.bbclass, but until something elses uses it putting
@@ -28,8 +28,12 @@ EXTRA_OECONF += " \
                  --disable-xinerama \
                  --enable-modules \
                  --disable-cups \
-                 --disable-introspection \
+                 --disable-colord \
 "
+
+do_compile_prepend() {
+        export GIR_EXTRA_LIBS_PATH="${B}/gdk/.libs"
+}
 
 PACKAGECONFIG ??= "${@bb.utils.contains("DISTRO_FEATURES", "x11", "x11", "", d)} \
                    ${@bb.utils.contains("DISTRO_FEATURES", "opengl x11", "glx", "", d)} \
@@ -37,7 +41,7 @@ PACKAGECONFIG ??= "${@bb.utils.contains("DISTRO_FEATURES", "x11", "x11", "", d)}
 
 PACKAGECONFIG[x11] = "--enable-x11-backend,--disable-x11-backend,at-spi2-atk fontconfig libx11 libxext libxcursor libxi libxdamage libxrandr libxrender libxcomposite libxfixes"
 PACKAGECONFIG[glx] = "--enable-glx,--disable-glx,,libgl"
-PACKAGECONFIG[wayland] = "--enable-wayland-backend,--disable-wayland-backend,wayland libxkbcommon virtual/mesa"
+PACKAGECONFIG[wayland] = "--enable-wayland-backend,--disable-wayland-backend,wayland libxkbcommon virtual/mesa wayland-native"
 
 do_install_append() {
 	mv ${D}${bindir}/gtk-update-icon-cache ${D}${bindir}/gtk-update-icon-cache-3.0
@@ -61,10 +65,9 @@ FILES_${PN}-demo = "${bindir}/gtk3-demo \
 # dependencies are present.
 RDEPENDS_${PN}-demo += "gdk-pixbuf-loader-png shared-mime-info"
 
-FILES_${PN} = "${bindir}/gtk-update-icon-cache-3.0 \
+FILES_${PN}_append = " ${bindir}/gtk-update-icon-cache-3.0 \
                ${bindir}/gtk-query-immodules-3.0 \
                ${bindir}/gtk-launch \
-               ${libdir}/lib*${SOLIBS} \
                ${datadir}/themes ${sysconfdir} ${datadir}/glib-2.0/schemas/ \
                ${libdir}/gtk-3.0/${LIBV}/engines/libpixmap.so \
                ${libdir}/gtk-3.0/modules/*.so"
@@ -79,14 +82,9 @@ FILES_${PN}-dev += " \
                     ${libdir}/gtk-3.0/${LIBV}/engines/*.la \
                     ${libdir}/gtk-3.0/modules/*.la \
                     ${bindir}/gtk-builder-convert \
-                    ${bindir}/gtk-encode-symbolic-svg"
-
-FILES_${PN}-dbg += " \
-                    ${libdir}/gtk-3.0/${LIBV}/loaders/.debug \
-                    ${libdir}/gtk-3.0/${LIBV}/immodules/.debug \
-                    ${libdir}/gtk-3.0/${LIBV}/engines/.debug \
-                    ${libdir}/gtk-3.0/${LIBV}/printbackends/.debug \
-                    ${libdir}/gtk-3.0/modules/.debug"
+                    ${bindir}/gtk-encode-symbolic-svg \
+                    ${bindir}/gtk-builder-tool \
+                    "
 
 RRECOMMENDS_${PN} = "adwaita-icon-theme-symbolic"
 
@@ -94,6 +92,7 @@ PACKAGES_DYNAMIC += "^gtk3-immodule-.* ^gtk3-printbackend-.*"
 
 ALTERNATIVE_${PN} = "gtk-update-icon-cache"
 ALTERNATIVE_TARGET[gtk-update-icon-cache] = "${bindir}/gtk-update-icon-cache-3.0"
+ALTERNATIVE_PRIORITY = "30"
 
 python populate_packages_prepend () {
     import os.path
@@ -108,7 +107,7 @@ python populate_packages_prepend () {
 
     do_split_packages(d, printmodules_root, '^libprintbackend-(.*)\.so$', 'gtk3-printbackend-%s', 'GTK printbackend module for %s')
 
-    if (d.getVar('DEBIAN_NAMES', 1)):
-        d.setVar('PKG_${PN}', '${MLPREFIX}libgtk-3.0')
+    if (d.getVar('DEBIAN_NAMES', True)):
+        d.setVar(d.expand('PKG_${PN}'), '${MLPREFIX}libgtk-3.0')
 }
 

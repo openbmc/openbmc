@@ -59,6 +59,8 @@ systemd_populate_packages[vardepsexclude] += "OVERRIDES"
 
 
 python systemd_populate_packages() {
+    import re
+
     if not bb.utils.contains('DISTRO_FEATURES', 'systemd', True, False, d):
         return
 
@@ -144,10 +146,22 @@ python systemd_populate_packages() {
         for pkg_systemd in systemd_packages.split():
             for service in get_package_var(d, 'SYSTEMD_SERVICE', pkg_systemd).split():
                 path_found = ''
+
+                # Deal with adding, for example, 'ifplugd@eth0.service' from
+                # 'ifplugd@.service'
+                base = None
+                if service.find('@') != -1:
+                    base = re.sub('@[^.]+.', '@.', service)
+
                 for path in searchpaths:
                     if os.path.exists(oe.path.join(d.getVar("D", True), path, service)):
                         path_found = path
                         break
+                    elif base is not None:
+                        if os.path.exists(oe.path.join(d.getVar("D", True), path, base)):
+                            path_found = path
+                            break
+
                 if path_found != '':
                     systemd_add_files_and_parse(pkg_systemd, path_found, service, keys)
                 else:

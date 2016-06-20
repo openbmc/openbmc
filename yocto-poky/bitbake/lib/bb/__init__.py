@@ -21,7 +21,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-__version__ = "1.28.0"
+__version__ = "1.30.0"
 
 import sys
 if sys.version_info < (2, 7, 3):
@@ -70,6 +70,8 @@ logger = logging.getLogger("BitBake")
 logger.addHandler(NullHandler())
 logger.setLevel(logging.DEBUG - 2)
 
+mainlogger = logging.getLogger("BitBake.Main")
+
 # This has to be imported after the setLoggerClass, as the import of bb.msg
 # can result in construction of the various loggers.
 import bb.msg
@@ -79,26 +81,26 @@ sys.modules['bb.fetch'] = sys.modules['bb.fetch2']
 
 # Messaging convenience functions
 def plain(*args):
-    logger.plain(''.join(args))
+    mainlogger.plain(''.join(args))
 
 def debug(lvl, *args):
     if isinstance(lvl, basestring):
-        logger.warn("Passed invalid debug level '%s' to bb.debug", lvl)
+        mainlogger.warn("Passed invalid debug level '%s' to bb.debug", lvl)
         args = (lvl,) + args
         lvl = 1
-    logger.debug(lvl, ''.join(args))
+    mainlogger.debug(lvl, ''.join(args))
 
 def note(*args):
-    logger.info(''.join(args))
+    mainlogger.info(''.join(args))
 
 def warn(*args):
-    logger.warn(''.join(args))
+    mainlogger.warn(''.join(args))
 
 def error(*args, **kwargs):
-    logger.error(''.join(args), extra=kwargs)
+    mainlogger.error(''.join(args), extra=kwargs)
 
 def fatal(*args, **kwargs):
-    logger.critical(''.join(args), extra=kwargs)
+    mainlogger.critical(''.join(args), extra=kwargs)
     raise BBHandledException()
 
 def deprecated(func, name=None, advice=""):

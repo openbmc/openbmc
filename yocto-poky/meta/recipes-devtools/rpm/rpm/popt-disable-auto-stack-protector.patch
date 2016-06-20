@@ -1,0 +1,27 @@
+popt: Disable default stack protection on internal version of popt
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.15/popt/configure.ac
+===================================================================
+--- rpm-5.4.15.orig/popt/configure.ac
++++ rpm-5.4.15/popt/configure.ac
+@@ -123,7 +123,6 @@ AS_IF([test "x$popt_gcc_warnings" = xyes
+   popt_CFLAGS_ADD([-Wjump-misses-init],[POPT_CFLAGS])
+   popt_CFLAGS_ADD([-Wno-format-nonliteral],[POPT_CFLAGS])
+   popt_CFLAGS_ADD([-Wframe-larger-than=$MAX_STACK_SIZE],[POPT_CFLAGS])
+-  popt_CFLAGS_ADD([-fstack-protector-all],[POPT_CFLAGS])
+   popt_CFLAGS_ADD([-fasynchronous-unwind-tables],[POPT_CFLAGS])
+   popt_CFLAGS_ADD([-fdiagnostics-show-option],[POPT_CFLAGS])
+   popt_CFLAGS_ADD([-funit-at-a-time],[POPT_CFLAGS])
+@@ -203,7 +202,7 @@ AC_SUBST([POPT_LDFLAGS])
+ # -fno-delete-null-pointer as the kernel does http://patchwork.kernel.org/patch/36060/
+ # GNU GCC (usually "gcc")
+ AS_IF([test "x$GCC" != x],
+- [ for c in -fno-delete-null-pointer-checks -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector -fexceptions
++ [ for c in -fno-delete-null-pointer-checks -fexceptions
+    do
+   	popt_CFLAGS_ADD([$c], [POPT_CFLAGS])
+    done

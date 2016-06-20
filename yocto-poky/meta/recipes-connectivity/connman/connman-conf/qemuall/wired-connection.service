@@ -1,0 +1,10 @@
+[Unit]
+Description=Setup a wired interface
+Before=connman.service
+
+[Service]
+Type=oneshot
+ExecStart=@SCRIPTDIR@/wired-setup
+
+[Install]
+WantedBy=network.target

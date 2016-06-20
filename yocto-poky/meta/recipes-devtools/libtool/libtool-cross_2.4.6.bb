@@ -16,7 +16,11 @@ do_configure_prepend () {
 do_install () {
 	install -d ${D}${bindir_crossscripts}/
 	install -m 0755 ${HOST_SYS}-libtool ${D}${bindir_crossscripts}/${HOST_SYS}-libtool
-	install -d ${D}${bindir_crossscripts}/
+	sed -e 's@^\(predep_objects="\).*@\1"@' \
+	    -e 's@^\(postdep_objects="\).*@\1"@' \
+	    -i ${D}${bindir_crossscripts}/${HOST_SYS}-libtool
+	sed -i '/^archive_cmds=/s/\-nostdlib//g' ${D}${bindir_crossscripts}/${HOST_SYS}-libtool
+	sed -i '/^archive_expsym_cmds=/s/\-nostdlib//g' ${D}${bindir_crossscripts}/${HOST_SYS}-libtool
 	GREP='/bin/grep' SED='sed' ${S}/build-aux/inline-source libtoolize > ${D}${bindir_crossscripts}/libtoolize
 	chmod 0755 ${D}${bindir_crossscripts}/libtoolize
 	install -d ${D}${target_datadir}/libtool/build-aux/

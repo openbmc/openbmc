@@ -123,7 +123,7 @@ do_install () {
 #
 	update-rc.d -r ${D} rmnologin.sh start 99 2 3 4 5 .
 	update-rc.d -r ${D} sendsigs start 20 0 6 .
-	update-rc.d -r ${D} urandom start 30 S 0 6 .
+	update-rc.d -r ${D} urandom start 38 S 0 6 .
 	update-rc.d -r ${D} umountnfs.sh start 31 0 1 6 .
 	update-rc.d -r ${D} umountfs start 40 0 6 .
 	update-rc.d -r ${D} reboot start 90 6 .

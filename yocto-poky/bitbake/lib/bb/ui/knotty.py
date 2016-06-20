@@ -104,10 +104,11 @@ class InteractConsoleLogFilter(logging.Filter):
         return True
 
 class TerminalFilter(object):
+    rows = 25
     columns = 80
 
     def sigwinch_handle(self, signum, frame):
-        self.columns = self.getTerminalColumns()
+        self.rows, self.columns = self.getTerminalColumns()
         if self._sigwinch_default:
             self._sigwinch_default(signum, frame)
 
@@ -131,7 +132,7 @@ class TerminalFilter(object):
                 cr = (env['LINES'], env['COLUMNS'])
             except:
                 cr = (25, 80)
-        return cr[1]
+        return cr
 
     def __init__(self, main, helper, console, errconsole, format):
         self.main = main
@@ -170,9 +171,13 @@ class TerminalFilter(object):
                 signal.signal(signal.SIGWINCH, self.sigwinch_handle)
             except:
                 pass
-            self.columns = self.getTerminalColumns()
+            self.rows, self.columns = self.getTerminalColumns()
         except:
             self.cuu = None
+        if not self.cuu:
+            self.interactive = False
+            bb.note("Unable to use interactive mode for this terminal, using fallback")
+            return
         console.addFilter(InteractConsoleLogFilter(self, format))
         errconsole.addFilter(InteractConsoleLogFilter(self, format))
 
@@ -207,7 +212,7 @@ class TerminalFilter(object):
             content = "Currently %s running tasks (%s of %s):" % (len(activetasks), self.helper.tasknumber_current, self.helper.tasknumber_total)
         print(content)
         lines = 1 + int(len(content) / (self.columns + 1))
-        for tasknum, task in enumerate(tasks):
+        for tasknum, task in enumerate(tasks[:(self.rows - 2)]):
             content = "%s: %s" % (tasknum, task)
             print(content)
             lines = lines + 1 + int(len(content) / (self.columns + 1))
@@ -267,6 +272,8 @@ def main(server, eventHandler, params, tf = TerminalFilter):
     logger.addHandler(console)
     logger.addHandler(errconsole)
 
+    bb.utils.set_process_name("KnottyUI")
+
     if params.options.remote_server and params.options.kill_server:
         server.terminateServer()
         return
@@ -282,6 +289,7 @@ def main(server, eventHandler, params, tf = TerminalFilter):
     llevel, debug_domains = bb.msg.constructLogOptions()
     server.runCommand(["setEventMask", server.getEventHandle(), llevel, debug_domains, _evt_list])
 
+    universe = False
     if not params.observe_only:
         params.updateFromServer(server)
         params.updateToServer(server, os.environ.copy())
@@ -292,6 +300,8 @@ def main(server, eventHandler, params, tf = TerminalFilter):
         if 'msg' in cmdline and cmdline['msg']:
             logger.error(cmdline['msg'])
             return 1
+        if cmdline['action'][0] == "buildTargets" and "universe" in cmdline['action'][1]:
+            universe = True
 
         ret, error = server.runCommand(cmdline['action'])
         if error:
@@ -349,11 +359,20 @@ def main(server, eventHandler, params, tf = TerminalFilter):
                     return_value = 1
                 elif event.levelno == format.WARNING:
                     warnings = warnings + 1
-                # For "normal" logging conditions, don't show note logs from tasks
-                # but do show them if the user has changed the default log level to
-                # include verbose/debug messages
-                if event.taskpid != 0 and event.levelno <= format.NOTE and (event.levelno < llevel or (event.levelno == format.NOTE and llevel != format.VERBOSE)):
-                    continue
+
+                if event.taskpid != 0:
+                    # For "normal" logging conditions, don't show note logs from tasks
+                    # but do show them if the user has changed the default log level to
+                    # include verbose/debug messages
+                    if event.levelno <= format.NOTE and (event.levelno < llevel or (event.levelno == format.NOTE and llevel != format.VERBOSE)):
+                        continue
+
+                    # Prefix task messages with recipe/task
+                    if event.taskpid in helper.running_tasks:
+                        taskinfo = helper.running_tasks[event.taskpid]
+                        event.msg = taskinfo['title'] + ': ' + event.msg
+                if hasattr(event, 'fn'):
+                        event.msg = event.fn + ': ' + event.msg
                 logger.handle(event)
                 continue
 
@@ -434,11 +453,12 @@ def main(server, eventHandler, params, tf = TerminalFilter):
                 logger.info("multiple providers are available for %s%s (%s)", event._is_runtime and "runtime " or "",
                             event._item,
                             ", ".join(event._candidates))
-                logger.info("consider defining a PREFERRED_PROVIDER entry to match %s", event._item)
+                rtime = ""
+                if event._is_runtime:
+                    rtime = "R"
+                logger.info("consider defining a PREFERRED_%sPROVIDER entry to match %s" % (rtime, event._item))
                 continue
             if isinstance(event, bb.event.NoProvider):
-                return_value = 1
-                errors = errors + 1
                 if event._runtime:
                     r = "R"
                 else:
@@ -449,13 +469,20 @@ def main(server, eventHandler, params, tf = TerminalFilter):
                     if event._close_matches:
                         extra = ". Close matches:\n  %s" % '\n  '.join(event._close_matches)
 
+                # For universe builds, only show these as warnings, not errors
+                h = logger.warning
+                if not universe:
+                    return_value = 1
+                    errors = errors + 1
+                    h = logger.error
+
                 if event._dependees:
-                    logger.error("Nothing %sPROVIDES '%s' (but %s %sDEPENDS on or otherwise requires it)%s", r, event._item, ", ".join(event._dependees), r, extra)
+                    h("Nothing %sPROVIDES '%s' (but %s %sDEPENDS on or otherwise requires it)%s", r, event._item, ", ".join(event._dependees), r, extra)
                 else:
-                    logger.error("Nothing %sPROVIDES '%s'%s", r, event._item, extra)
+                    h("Nothing %sPROVIDES '%s'%s", r, event._item, extra)
                 if event._reasons:
                     for reason in event._reasons:
-                        logger.error("%s", reason)
+                        h("%s", reason)
                 continue
 
             if isinstance(event, bb.runqueue.sceneQueueTaskStarted):
@@ -475,6 +502,7 @@ def main(server, eventHandler, params, tf = TerminalFilter):
                 continue
 
             if isinstance(event, bb.runqueue.runQueueTaskFailed):
+                return_value = 1
                 taskfailures.append(event.taskstring)
                 logger.error("Task %s (%s) failed with exit code '%s'",
                              event.taskid, event.taskstring, event.exitcode)
@@ -532,10 +560,12 @@ def main(server, eventHandler, params, tf = TerminalFilter):
             main.shutdown = main.shutdown + 1
             pass
         except Exception as e:
-            sys.stderr.write(str(e))
+            import traceback
+            sys.stderr.write(traceback.format_exc())
             if not params.observe_only:
                 _, error = server.runCommand(["stateForceShutdown"])
             main.shutdown = 2
+            return_value = 1
     try:
         summary = ""
         if taskfailures:

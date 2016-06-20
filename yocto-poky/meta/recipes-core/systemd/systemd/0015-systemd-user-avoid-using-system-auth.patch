@@ -1,0 +1,36 @@
+From f70a1a9605cd3adac450c49a5a69da6e9acda517 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 20 Feb 2015 05:26:25 +0000
+Subject: [PATCH 15/36] systemd-user: avoid using system-auth
+
+In OE, we don't provide system-auth, instead, we use common-* files.
+So modify systemd-user file to use common-* files.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/login/systemd-user.m4 | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/login/systemd-user.m4 b/src/login/systemd-user.m4
+index 7933508..16b73d2 100644
+--- a/src/login/systemd-user.m4
++++ b/src/login/systemd-user.m4
+@@ -2,10 +2,10 @@
+ #
+ # Used by systemd --user instances.
+ 
+-account  include system-auth
++account  include common-account
+ 
+ m4_ifdef(`HAVE_SELINUX',
+ session  required pam_selinux.so close
+ session  required pam_selinux.so nottys open
+ )m4_dnl
+-session  include system-auth
++session  include common-session
+-- 
+1.8.3.1
+

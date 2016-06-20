@@ -6,10 +6,9 @@
 {% block parentbreadcrumb %}
 {% if build.get_sorted_target_list.count > 0 %}
   {{build.get_sorted_target_list.0.target}}
-  &nbsp;
 {% endif %}
 
-{%if build.target_set.all.count > 1%}(+ {{build.target_set.all.count|add:"-1"}}){%endif%} {{build.machine}} ({{build.completed_on|date:"d/m/y H:i"}})
+{%if build.target_set.all.count > 1%}(+{{build.target_set.all.count|add:"-1"}}){%endif%} {{build.machine}} ({{build.completed_on|date:"d/m/y H:i"}})
 {% endblock %}
 
 {% block buildinfomain %}
@@ -111,7 +110,7 @@
                                   </p>
                     </div>
                 </div>
-                        {% else %}
+        {% else %}
             <dt>
                 <i class="icon-question-sign get-help" title="The location in disk of the license manifest, a document listing all packages installed in your image and their licenses"></i>
 
@@ -126,18 +125,18 @@
             </dt>
             <dd>
                 <ul>
-                                  {% for i in target.imageFiles %}
-            {% if build.project %}
-                    <li><a href="{% url 'build_artifact' build.pk 'imagefile' i.id %}">{{i.path}}</a>
-            {% else %}
-                    <li>{{i.path}}
-            {% endif %}
-                    ({{i.size|filtered_filesizeformat}})</li>
-                                  {% endfor %}
+                    {% for i in target.imageFiles %}
+                        <li>
+                            <a href="{% url 'build_artifact' build.pk 'imagefile' i.id %}">
+                                {{i.suffix}}
+                            </a>
+                            &nbsp;({{i.size|filtered_filesizeformat}})
+                        </li>
+                    {% endfor %}
                 </ul>
             </dd>
         </dl>
-                        {% endif %}
+        {% endif %}
     </div>
         {% endif %}
     {% endfor %}
@@ -161,7 +160,7 @@
             <dd><div>
               {% for ba in build.buildartifact_set.all|dictsort:"file_name" %}
                 <a href="{%url 'build_artifact' build.id 'buildartifact' ba.id %}">
-                    {{ba.get_local_file_name}}
+                    {{ba.get_basename}}
                 </a>
 
                 ({{ba.file_size|filtered_filesizeformat}}) <br/>

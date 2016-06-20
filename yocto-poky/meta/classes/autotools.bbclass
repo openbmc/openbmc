@@ -83,17 +83,16 @@ CONFIGURE_SCRIPT ?= "${AUTOTOOLS_SCRIPT_PATH}/configure"
 AUTOTOOLS_AUXDIR ?= "${AUTOTOOLS_SCRIPT_PATH}"
 
 oe_runconf () {
-	cfgscript="${CONFIGURE_SCRIPT}"
+	# Use relative path to avoid buildpaths in files
+	cfgscript_name="`basename ${CONFIGURE_SCRIPT}`"
+	cfgscript=`python -c "import os; print os.path.relpath(os.path.dirname('${CONFIGURE_SCRIPT}'), '.')"`/$cfgscript_name
 	if [ -x "$cfgscript" ] ; then
 		bbnote "Running $cfgscript ${CONFIGUREOPTS} ${EXTRA_OECONF} $@"
-		set +e
-		${CACHED_CONFIGUREVARS} $cfgscript ${CONFIGUREOPTS} ${EXTRA_OECONF} "$@"
-		if [ "$?" != "0" ]; then
-			echo "Configure failed. The contents of all config.log files follows to aid debugging"
-			find ${B} -ignore_readdir_race -name config.log -print -exec cat {} \;
-			die "oe_runconf failed"
+		if ! ${CACHED_CONFIGUREVARS} $cfgscript ${CONFIGUREOPTS} ${EXTRA_OECONF} "$@"; then
+			bbnote "The following config.log files may provide further information."
+			bbnote `find ${B} -ignore_readdir_race -type f -name config.log`
+			bbfatal_log "configure failed"
 		fi
-		set -e
 	else
 		bbfatal "no configure script found at $cfgscript"
 	fi
@@ -113,8 +112,7 @@ autotools_preconfigure() {
 				# regenerate them even if CFLAGS/LDFLAGS are different
 				cd ${S}
 				if [ "${CLEANBROKEN}" != "1" -a \( -e Makefile -o -e makefile -o -e GNUmakefile \) ]; then
-					echo "Running \"${MAKE} clean\" in ${S}"
-					${MAKE} clean
+					oe_runmake clean
 				fi
 				find ${S} -ignore_readdir_race -name \*.la -delete
 			fi
@@ -124,6 +122,7 @@ autotools_preconfigure() {
 
 autotools_postconfigure(){
 	if [ -n "${CONFIGURESTAMPFILE}" ]; then
+		mkdir -p `dirname ${CONFIGURESTAMPFILE}`
 		echo ${BB_TASKHASH} > ${CONFIGURESTAMPFILE}
 	fi
 }
@@ -149,20 +148,26 @@ python autotools_copy_aclocals () {
     bb.utils.mkdirhier(aclocaldir)
     start = None
     configuredeps = []
+    # Detect bitbake -b usage
+    # Everything but quilt-native would have dependencies
+    nodeps = (pn != "quilt-native")
 
     for dep in taskdepdata:
         data = taskdepdata[dep]
         if data[1] == "do_configure" and data[0] == pn:
             start = dep
+        if not nodeps and start:
             break
+        if nodeps and data[0] != pn:
+            nodeps = False
     if start is None:
         bb.fatal("Couldn't find ourself in BB_TASKDEPDATA?")
 
     # We need to find configure tasks which are either from <target> -> <target>
     # or <native> -> <native> but not <target> -> <native> unless they're direct
     # dependencies. This mirrors what would get restored from sstate.
-    done = [dep]
-    next = [dep]
+    done = [start]
+    next = [start]
     while next:
         new = []
         for dep in next:
@@ -189,7 +194,11 @@ python autotools_copy_aclocals () {
     #bb.warn(str(configuredeps2))
 
     cp = []
-    siteconf = []    
+    if nodeps:
+        bb.warn("autotools: Unable to find task dependencies, -b being used? Pulling in all m4 files")
+        for l in [d.expand("${STAGING_DATADIR_NATIVE}/aclocal/"), d.expand("${STAGING_DATADIR}/aclocal/")]:
+            cp.extend(os.path.join(l, f) for f in os.listdir(l))
+
     for c in configuredeps:
         if c.endswith("-native"):
             manifest = d.expand("${SSTATE_MANIFESTS}/manifest-${BUILD_ARCH}-%s.populate_sysroot" % c)
@@ -227,9 +236,9 @@ autotools_do_configure() {
 	# for a package whose autotools are old, on an x86_64 machine, which the old
 	# config.sub does not support.  Work around this by installing them manually
 	# regardless.
-	( for ac in `find ${S} -ignore_readdir_race -name configure.in -o -name configure.ac`; do
+	for ac in `find ${S} -ignore_readdir_race -name configure.in -o -name configure.ac`; do
 		rm -f `dirname $ac`/configure
-		done )
+	done
 	if [ -e ${AUTOTOOLS_SCRIPT_PATH}/configure.in -o -e ${AUTOTOOLS_SCRIPT_PATH}/configure.ac ]; then
 		olddir=`pwd`
 		cd ${AUTOTOOLS_SCRIPT_PATH}

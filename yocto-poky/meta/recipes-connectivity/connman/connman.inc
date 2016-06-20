@@ -15,7 +15,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=12f884d2ae1ff87c09e5b7ccc2c4ca7e \
 
 inherit autotools pkgconfig systemd update-rc.d bluetooth
 
-DEPENDS  = "dbus glib-2.0 ppp iptables"
+DEPENDS  = "dbus glib-2.0 ppp iptables readline"
 
 INC_PR = "r20"
 
@@ -43,7 +43,7 @@ PACKAGECONFIG ??= "wispr \
 # local.conf or distro config
 # PACKAGECONFIG_append_pn-connman = " openvpn vpnc l2tp pptp"
 
-PACKAGECONFIG[systemd] = "--with-systemdunitdir=${systemd_unitdir}/system/,--with-systemdunitdir="
+PACKAGECONFIG[systemd] = "--with-systemdunitdir=${systemd_unitdir}/system/ --with-tmpfilesdir=${sysconfdir}/tmpfiles.d/,--with-systemdunitdir='' --with-tmpfilesdir=''"
 PACKAGECONFIG[wifi] = "--enable-wifi, --disable-wifi, wpa-supplicant, wpa-supplicant"
 PACKAGECONFIG[bluez] = "--enable-bluetooth, --disable-bluetooth, ${BLUEZ}, ${BLUEZ}"
 PACKAGECONFIG[3g] = "--enable-ofono, --disable-ofono, ofono, ofono"
@@ -68,11 +68,7 @@ python __anonymous () {
 
 SYSTEMD_SERVICE_${PN} = "connman.service"
 SYSTEMD_SERVICE_${PN}-vpn = "connman-vpn.service"
-SYSTEMD_WIRED_SETUP = "ExecStartPre=-${datadir}/connman/wired-setup"
-
-do_compile_append() {
-	sed -i "s#ExecStart=#${SYSTEMD_WIRED_SETUP}\nExecStart=#" ${B}/src/connman.service
-}
+SYSTEMD_SERVICE_${PN}-wait-online = "connman-wait-online.service"
 
 do_install_append() {
 	if ${@bb.utils.contains('DISTRO_FEATURES','sysvinit','true','false',d)}; then
@@ -142,23 +138,26 @@ python populate_packages_prepend() {
 PACKAGES =+ "${PN}-tools ${PN}-tests ${PN}-client"
 
 FILES_${PN}-tools = "${bindir}/wispr"
+RDEPENDS_${PN}-tools ="${PN}"
 
 FILES_${PN}-tests = "${bindir}/*-test ${libdir}/${BPN}/test/*"
-RDEPENDS_${PN}-tests = "python-dbus python-pygobject python-textutils python-subprocess python-fcntl python-netclient"
+RDEPENDS_${PN}-tests = "python-dbus python-pygobject python-textutils python-subprocess python-fcntl python-netclient \
+                        ${PN} \
+"
 
 FILES_${PN}-client = "${bindir}/connmanctl"
+RDEPENDS_${PN}-client ="${PN}"
 
 FILES_${PN} = "${bindir}/* ${sbindir}/* ${libexecdir}/* ${libdir}/lib*.so.* \
             ${libdir}/connman/plugins \
             ${sysconfdir} ${sharedstatedir} ${localstatedir} \
             ${base_bindir}/* ${base_sbindir}/* ${base_libdir}/*.so* ${datadir}/${PN} \
-            ${datadir}/dbus-1/system-services/*"
-
-FILES_${PN}-dbg += "${libdir}/connman/*/.debug"
+            ${datadir}/dbus-1/system-services/* \
+            ${sysconfdir}/tmpfiles.d/connman_resolvconf.conf"
 
 FILES_${PN}-dev += "${libdir}/connman/*/*.la"
 
-PACKAGES =+ "${PN}-vpn"
+PACKAGES =+ "${PN}-vpn ${PN}-wait-online"
 
 SUMMARY_${PN}-vpn = "A daemon for managing VPN connections within embedded devices"
 DESCRIPTION_${PN}-vpn = "The ConnMan VPN provides a daemon for \
@@ -171,6 +170,12 @@ FILES_${PN}-vpn += "${sbindir}/connman-vpnd \
                     ${sysconfdir}/dbus-1/system.d/connman-vpn-dbus.conf \
                     ${datadir}/dbus-1/system-services/net.connman.vpn.service \
                     ${systemd_unitdir}/system/connman-vpn.service"
+
+SUMMARY_${PN}-wait-online = "A program that will return once ConnMan has connected to a network"
+DESCRIPTION_${PN}-wait-online = "A service that can be enabled so that \
+the system waits until a network connection is established."
+FILES_${PN}-wait-online += "${sbindir}/connmand-wait-online \
+                            ${systemd_unitdir}/system/connman-wait-online.service"
 
 SUMMARY_${PN}-plugin-vpn-openvpn = "An OpenVPN plugin for ConnMan VPN"
 DESCRIPTION_${PN}-plugin-vpn-openvpn = "The ConnMan OpenVPN plugin uses openvpn client \

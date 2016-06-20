@@ -32,21 +32,6 @@ function layerDetailsPageInit (ctx) {
     }
   });
 
-
-  $(".breadcrumb li:first a").click(function(e){
-    e.preventDefault();
-    /* By default this link goes to the project configuration page. However
-     * if we have some builds we go there instead of the default href
-     */
-    libtoaster.getProjectInfo(libtoaster.ctx.projectPageUrl, function(prjInfo){
-      if (prjInfo.builds && prjInfo.builds.length > 0) {
-        window.location.replace(libtoaster.ctx.projectBuildsUrl);
-      } else {
-        window.location.replace(libtoaster.ctx.projectPageUrl);
-      }
-    });
-  });
-
   function addRemoveDep(depLayerId, add, doneCb) {
     var data = { layer_version_id : ctx.layerVersion.id };
     if (add)
@@ -258,7 +243,7 @@ function layerDetailsPageInit (ctx) {
       $(".select-machine-btn").removeAttr("disabled");
       addRmLayerBtn.addClass("btn-danger");
       addRmLayerBtn.data('directive', "remove");
-      addRmLayerBtn.text(" Delete the "+ctx.layerVersion.name+" layer from your project");
+      addRmLayerBtn.text(" Remove the "+ctx.layerVersion.name+" layer from your project");
       addRmLayerBtn.prepend("<span class=\"icon-trash\"></span>");
 
     } else {

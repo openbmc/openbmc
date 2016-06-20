@@ -1,16 +1,34 @@
-<button class="btn btn-block btn-danger add-rm-package-btn" id="package-rm-btn-{{data.pk}}" data-directive="remove" data-package="{{data.pk}}" data-package-url="{% url 'xhr_customrecipe_packages' extra.recipe_id data.pk %}" style="
-  {% if data.pk not in extra.current_packages %}
-    display:none
-  {% endif %}
-  ">
-  <i class="icon-trash no-tooltip"></i>
-  Remove package
-</a>
-<button class="btn btn-block add-rm-package-btn" data-directive="add" id="package-add-btn-{{data.pk}}" data-package="{{data.pk}}" data-package-url="{% url 'xhr_customrecipe_packages' extra.recipe_id data.pk %}" style="
-  {% if data.pk in extra.current_packages %}
-    display:none
-  {% endif %}
-    ">
-<i class="icon-plus"></i>
- Add package
-</button>
+{# TODO move to snippets dir #}
+{% if data.is_locale_package %}
+<p class="text-center">
+  <span class="muted">Locale package</span>
+  <i class="icon-question-sign get-help hover-help" title=""
+      data-original-title="This package is included in your image
+      based on the locale specified in the IMAGE_LINGUAS variable"
+      style="visibility: hidden;">
+  </i>
+</p>
+
+{% else %}
+
+<div id="package-btn-cell-{{data.pk}}">
+  <div style="display: none; font-size: 11px; line-height: 1.3;" class="tooltip-inner inline-notification"></div>
+  <button class="btn btn-block btn-danger add-rm-package-btn" data-directive="remove" data-id="{{data.pk}}" data-package-url="{% url 'xhr_customrecipe_packages' extra.recipe_id data.pk %}" data-name="{{data.name}}" style="
+      {% if data.pk not in extra.current_packages %}
+      display:none
+      {% endif %}
+      ">
+    <i class="icon-trash no-tooltip"></i>
+    Remove package
+  </button>
+  <button class="btn btn-block add-rm-package-btn" data-directive="add" data-id="{{data.pk}}" data-package-url="{% url 'xhr_customrecipe_packages' extra.recipe_id data.pk %}" data-name="{{data.name}}" style="
+      {% if data.pk in extra.current_packages %}
+      display:none
+      {% endif %}
+      ">
+    <i class="icon-plus"></i>
+    Add package
+  </button>
+</div>
+
+{% endif %}

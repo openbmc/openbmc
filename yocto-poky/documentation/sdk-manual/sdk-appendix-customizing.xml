@@ -1,0 +1,388 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
+[<!ENTITY % poky SYSTEM "../poky.ent"> %poky; ] >
+
+<appendix id='sdk-appendix-customizing'>
+
+<title>Customizing the SDK</title>
+
+<para>
+    This appendix presents customizations you can apply to both the standard
+    and extensible SDK.
+    Each subsection identifies the type of SDK to which the section applies.
+</para>
+
+<section id='sdk-configuring-the-extensible-sdk'>
+    <title>Configuring the Extensible SDK</title>
+
+    <para>
+        The extensible SDK primarily consists of a pre-configured copy of
+        the OpenEmbedded build system from which it was produced.
+        Thus, the SDK's configuration is derived using that build system and
+        the following filters, which the OpenEmbedded build system applies
+        against <filename>local.conf</filename> and
+        <filename>auto.conf</filename> if they are present:
+        <itemizedlist>
+            <listitem><para>
+                Variables whose values start with "/" are excluded since the
+                assumption is that those values are paths that are likely to
+                be specific to the build host.
+                </para></listitem>
+            <listitem><para>
+                Variables listed in
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-SDK_LOCAL_CONF_BLACKLIST'><filename>SDK_LOCAL_CONF_BLACKLIST</filename></ulink>
+                are excluded.
+                The default value blacklists
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-CONF_VERSION'><filename>CONF_VERSION</filename></ulink>,
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-BB_NUMBER_THREADS'><filename>BB_NUMBER_THREADS</filename></ulink>,
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-PARALLEL_MAKE'><filename>PARALLEL_MAKE</filename></ulink>,
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-PRSERV_HOST'><filename>PRSERV_HOST</filename></ulink>,
+                and
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-SSTATE_MIRRORS'><filename>SSTATE_MIRRORS</filename></ulink>.
+                </para></listitem>
+            <listitem><para>
+                Variables listed in
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-SDK_LOCAL_CONF_WHITELIST'><filename>SDK_LOCAL_CONF_WHITELIST</filename></ulink>
+                are included.
+                Including a variable in the value of
+                <filename>SDK_LOCAL_CONF_WHITELIST</filename> overrides either
+                of the above two conditions.
+                The default value is blank.
+                </para></listitem>
+            <listitem><para>
+                Classes inherited globally with
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-INHERIT'><filename>INHERIT</filename></ulink>
+                that are listed in
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-SDK_INHERIT_BLACKLIST'><filename>SDK_INHERIT_BLACKLIST</filename></ulink>
+                are disabled.
+                Using <filename>SDK_INHERIT_BLACKLIST</filename> to disable
+                these classes is is the typical method to disable classes that
+                are problematic or unnecessary in the SDK context.
+                The default value blacklists the
+                <ulink url='&YOCTO_DOCS_REF_URL;#ref-classes-buildhistory'><filename>buildhistory</filename></ulink>
+                and
+                <ulink url='&YOCTO_DOCS_REF_URL;#ref-classes-icecc'><filename>icecc</filename></ulink>
+                classes.
+                </para></listitem>
+        </itemizedlist>
+        Additionally, the contents of <filename>conf/sdk-extra.conf</filename>,
+        when present, are appended to the end of
+        <filename>conf/local.conf</filename> within the produced SDK, without
+        any filtering.
+        The <filename>sdk-extra.conf</filename> file is particularly useful
+        if you want to set a variable value just for the SDK and not the
+        OpenEmbedded build system used to create the SDK.
+    </para>
+</section>
+
+<section id='adjusting-the-extensible-sdk-to-suit-your-build-system-setup'>
+    <title>Adjusting the Extensible SDK to Suit Your Build System Setup</title>
+
+    <para>
+        In most cases, the extensible SDK defaults should work.
+        However, some cases exist for which you might consider making
+        adjustments:
+        <itemizedlist>
+            <listitem><para>
+                If your SDK configuration inherits additional classes
+                using the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-INHERIT'><filename>INHERIT</filename></ulink>
+                variable and you do not need or want those classes enabled in
+                the SDK, you can blacklist them by adding them to the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-SDK_INHERIT_BLACKLIST'><filename>SDK_INHERIT_BLACKLIST</filename></ulink>
+                variable.
+                The default value of <filename>SDK_INHERIT_BLACKLIST</filename>
+                is set using the "?=" operator.
+                Consequently, you will need to either set the complete value
+                using "=" or append the value using "_append".
+                </para></listitem>
+            <listitem><para>
+                If you have classes or recipes that add additional tasks to
+                the standard build flow (i.e. that execute as part of building
+                the recipe as opposed to needing to be called explicitly), then
+                you need to do one of the following:
+                <itemizedlist>
+                    <listitem><para>
+                        Ensure the tasks are shared state tasks (i.e. their
+                        output is saved to and can be restored from the shared
+                        state cache), or that the tasks are able to be
+                        produced quickly from a task that is a shared state
+                        task and add the task name to the value of
+                        <ulink url='&YOCTO_DOCS_REF_URL;#var-SDK_RECRDEP_TASKS'><filename>SDK_RECRDEP_TASKS</filename></ulink>.
+                        </para></listitem>
+                    <listitem><para>
+                        Disable the tasks if they are added by a class and
+                        you do not need the functionality the class provides
+                        in the extensible SDK.
+                        To disable the tasks, add the class to
+                        <filename>SDK_INHERIT_BLACKLIST</filename> as previously
+                        described.
+                        </para></listitem>
+                </itemizedlist>
+                </para></listitem>
+            <listitem><para>
+                Generally, you want to have a shared state mirror set up so
+                users of the SDK can add additional items to the SDK after
+                installation without needing to build the items from source.
+                See the
+                "<link linkend='sdk-providing-additional-installable-extensible-sdk-content'>Providing Additional Installable Extensible SDK Content</link>"
+                section for information.
+                </para></listitem>
+            <listitem><para>
+                If you want users of the SDK to be able to easily update the
+                SDK, you need to set the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-SDK_UPDATE_URL'><filename>SDK_UPDATE_URL</filename></ulink>
+                variable.
+                For more information, see the
+                "<link linkend='sdk-providing-updates-after-installing-the-extensible-sdk'>Providing Updates After Installing the Extensible SDK</link>"
+                section.
+                </para></listitem>
+            <listitem><para>
+                If you have adjusted the list of files and directories that
+                appear in
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-COREBASE'><filename>COREBASE</filename></ulink>
+                (other than layers that are enabled through
+                <filename>bblayers.conf</filename>), then you must list these
+                files in
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-COREBASE_FILES'><filename>COREBASE_FILES</filename></ulink>
+                so that the files are copied into the SDK.
+                </para></listitem>
+            <listitem><para>
+                If your OpenEmbedded build system setup uses a different
+                environment setup script other than
+                <ulink url='&YOCTO_DOCS_REF_URL;#structure-core-script'><filename>&OE_INIT_FILE;</filename></ulink>
+                or
+                <ulink url='&YOCTO_DOCS_REF_URL;#structure-memres-core-script'><filename>oe-init-build-env-memres</filename></ulink>,
+                then you must set
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-OE_INIT_ENV_SCRIPT'><filename>OE_INIT_ENV_SCRIPT</filename></ulink>
+                to point to the environment setup script you use.
+                <note>
+                    You must also reflect this change in the value used for the
+                    <filename>COREBASE_FILES</filename> variable as previously
+                    described.
+                </note>
+                </para></listitem>
+        </itemizedlist>
+    </para>
+</section>
+
+<section id='sdk-changing-the-appearance-of-the-extensible-sdk'>
+    <title>Changing the Appearance of the Extensible SDK</title>
+
+    <para>
+        You can change the title shown by the SDK installer by setting the
+        <ulink url='&YOCTO_DOCS_REF_URL;#var-SDK_TITLE'><filename>SDK_TITLE</filename></ulink>
+        variable.
+        By default, this title is derived from
+        <ulink url='&YOCTO_DOCS_REF_URL;#var-DISTRO_NAME'><filename>DISTRO_NAME</filename></ulink>
+        when it is set.
+        If the <filename>DISTRO_NAME</filename> variable is not set, the title
+        is derived from the
+        <ulink url='&YOCTO_DOCS_REF_URL;#var-DISTRO'><filename>DISTRO</filename></ulink>
+        variable.
+    </para>
+</section>
+
+<section id='sdk-providing-updates-after-installing-the-extensible-sdk'>
+    <title>Providing Updates After Installing the Extensible SDK</title>
+
+    <para>
+        When you make changes to your configuration or to the metadata and
+        if you want those changes to be reflected in installed SDKs, you need
+        to perform additional steps to make it possible for those that use
+        the SDK to update their installations with the
+        <filename>devtool sdk-update</filename> command:
+        <orderedlist>
+            <listitem><para>
+                Arrange to be created a directory that can be shared over
+                HTTP or HTTPS.
+                </para></listitem>
+            <listitem><para>
+                Set the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-SDK_UPDATE_URL'><filename>SDK_UPDATE_URL</filename></ulink>
+                variable to point to the corresponding HTTP or HTTPS URL.
+                Setting this variable causes any SDK built to default to that
+                URL and thus, the user does not have to pass the URL to the
+                <filename>devtool sdk-update</filename> command.
+                </para></listitem>
+            <listitem><para>
+                Build the extensible SDK normally (i.e., use the
+                <filename>bitbake -c populate_sdk_ext</filename> <replaceable>imagename</replaceable>
+                command).
+                </para></listitem>
+            <listitem><para>
+                Publish the SDK using the following command:
+                <literallayout class='monospaced'>
+     $ oe-publish-sdk <replaceable>some_path</replaceable>/sdk-installer.sh <replaceable>path_to_shared/http_directory</replaceable>
+                </literallayout>
+                You must repeat this step each time you rebuild the SDK
+                with changes that you want to make available through the
+                update mechanism.
+                </para></listitem>
+        </orderedlist>
+    </para>
+
+    <para>
+        Completing the above steps allows users of the existing SDKs to
+        simply run <filename>devtool sdk-update</filename> to retrieve the
+        latest updates.
+        See the
+        "<link linkend='sdk-updating-the-extensible-sdk'>Updating the Extensible SDK</link>"
+        section for further information.
+    </para>
+</section>
+
+<section id='sdk-providing-additional-installable-extensible-sdk-content'>
+    <title>Providing Additional Installable Extensible SDK Content</title>
+
+    <para>
+        If you want the users of the extensible SDK you are building to be
+        able to add items to the SDK without needing to build the
+        items from source, you need to do a number of things:
+        <orderedlist>
+            <listitem><para>
+                Ensure the additional items you want the user to be able to
+                install are actually built.
+                You can ensure these items are built a number of different
+                ways: 1) Build them explicitly, perhaps using one or more
+                "meta" recipes that depend on lists of other recipes to keep
+                things tidy, or 2) Build the "world" target and set
+                <filename>EXCLUDE_FROM_WORLD_pn-</filename><replaceable>recipename</replaceable>
+                for the recipes you do not want built.
+                See the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-EXCLUDE_FROM_WORLD'><filename>EXCLUDE_FROM_WORLD</filename></ulink>
+                variable for additional information.
+                </para></listitem>
+            <listitem><para>
+                Expose the <filename>sstate-cache</filename> directory
+                produced by the build.
+                Typically, you expose this directory over HTTP or HTTPS.
+                </para></listitem>
+            <listitem><para>
+                Set the appropriate configuration so that the produced SDK
+                knows how to find the configuration.
+                The variable you need to set is
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-SSTATE_MIRRORS'><filename>SSTATE_MIRRORS</filename></ulink>:
+                <literallayout class='monospaced'>
+     SSTATE_MIRRORS = "file://.*  http://<replaceable>example</replaceable>.com/<replaceable>some_path</replaceable>/sstate-cache/PATH"
+                </literallayout>
+                You can set the <filename>SSTATE_MIRRORS</filename> variable
+                in two different places:
+                <itemizedlist>
+                    <listitem><para>
+                        If the mirror value you are setting is appropriate to
+                        be set for both the OpenEmbedded build system that is
+                        actually building the SDK and the SDK itself (i.e. the
+                        mirror is accessible in both places or it will fail
+                        quickly on the OpenEmbedded build system side, and its
+                        contents will not interfere with the build), then you
+                        can set the variable in your
+                        <filename>local.conf</filename> or custom distro
+                        configuration file.
+                        You can then "whitelist" the variable through
+                        to the SDK by adding the following:
+                        <literallayout class='monospaced'>
+     SDK_LOCAL_CONF_WHITELIST = "SSTATE_MIRRORS"
+                        </literallayout>
+                        </para></listitem>
+                    <listitem><para>
+                        Alternatively, if you just want to set the
+                        <filename>SSTATE_MIRRORS</filename> variable's value
+                        for the SDK alone, create a
+                        <filename>conf/sdk-extra.conf</filename> either in
+                        your
+                        <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>
+                        or within any layer and put your
+                        <filename>SSTATE_MIRRORS</filename> setting within
+                        that file.
+                        <note>
+                            This second option is the safest option should
+                            you have any doubts as to which method to use when
+                            setting <filename>SSTATE_MIRRORS</filename>.
+                        </note>
+                        </para></listitem>
+                </itemizedlist>
+                </para></listitem>
+        </orderedlist>
+    </para>
+</section>
+
+<section id='sdk-minimizing-the-size-of-the-extensible-sdk-installer-download'>
+    <title>Minimizing the Size of the Extensible SDK Installer Download</title>
+
+    <para>
+        By default, the extensible SDK bundles the shared state artifacts for
+        everything needed to reconstruct the image for which the SDK was built.
+        This bundling can lead to an SDK installer file that is a Gigabyte or
+        more in size.
+        If the size of this file causes a problem, you can build an SDK that
+        has just enough in it to install and provide access to the
+        <filename>devtool command</filename> by setting the following in your
+        configuration:
+        <literallayout class='monospaced'>
+     SDK_EXT_TYPE = "minimal"
+        </literallayout>
+        Setting
+        <ulink url='&YOCTO_DOCS_REF_URL;#var-SDK_EXT_TYPE'><filename>SDK_EXT_TYPE</filename></ulink>
+        to "minimal" produces an SDK installer that is around 35 Mbytes in
+        size, which downloads and installs quickly.
+        You need to realize, though, that the minimal installer does not
+        install any libraries or tools out of the box.
+        These must be installed either "on the fly" or through actions you
+        perform using <filename>devtool</filename> or explicitly with the
+        <filename>devtool sdk-install</filename> command.
+    </para>
+
+    <para>
+        In most cases, when building a minimal SDK you will need to also enable
+        bringing in the information on a wider range of packages produced by
+        the system.
+        This is particularly true so that <filename>devtool add</filename>
+        is able to effectively map dependencies it discovers in a source tree
+        to the appropriate recipes.
+        Also so that the <filename>devtool search</filename> command
+        is able to return useful results.
+    </para>
+
+    <para>
+        To facilitate this wider range of information, you would additionally
+        set the following:
+        <literallayout class='monospaced'>
+     SDK_INCLUDE_PKGDATA = "1"
+        </literallayout>
+        See the
+        <ulink url='&YOCTO_DOCS_REF_URL;#var-SDK_INCLUDE_PKGDATA'><filename>SDK_INCLUDE_PKGDATA</filename></ulink>
+        variable for additional information.
+    </para>
+
+    <para>
+        Setting the <filename>SDK_INCLUDE_PKGDATA</filename> variable as
+        shown causes the "world" target to be built so that information
+        for all of the recipes included within it are available.
+        Having these recipes available increases build time significantly and
+        increases the size of the SDK installer by 30-80 Mbytes depending on
+        how many recipes are included in your configuration.
+    </para>
+
+    <para>
+        You can use
+        <filename>EXCLUDE_FROM_WORLD_pn-</filename><replaceable>recipename</replaceable>
+        for recipes you want to exclude.
+        However, it is assumed that you would need to be building the "world"
+        target if you want to provide additional items to the SDK.
+        Consequently, building for "world" should not represent undue
+        overhead in most cases.
+        <note>
+            If you set <filename>SDK_EXT_TYPE</filename> to "minimal",
+            then providing a shared state mirror is mandatory so that items
+            can be installed as needed.
+            See the
+            "<link linkend='sdk-providing-additional-installable-extensible-sdk-content'>Providing Additional Installable Extensible SDK Content</link>"
+            section for more information.
+        </note>
+    </para>
+</section>
+</appendix>
+<!--
+vim: expandtab tw=80 ts=4
+-->

@@ -1,0 +1,19 @@
+Fix the testsuite to built out of tree
+in OE S != B
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+Index: argp-standalone-1.3/testsuite/Makefile.am
+===================================================================
+--- argp-standalone-1.3.orig/testsuite/Makefile.am
++++ argp-standalone-1.3/testsuite/Makefile.am
+@@ -5,7 +5,8 @@ TS_ALL = $(TS_PROGS) $(TS_SH)
+ 
+ noinst_PROGRAMS = $(TS_PROGS) ex1 ex3 ex4
+ 
+-LDADD = ../libargp.a
++AM_CPPFLAGS = -I$(top_srcdir)
++LDADD = $(top_builddir)/libargp.a
+ 
+ EXTRA_DIST = $(TS_SH) run-tests
+ CLEANFILES = test.out

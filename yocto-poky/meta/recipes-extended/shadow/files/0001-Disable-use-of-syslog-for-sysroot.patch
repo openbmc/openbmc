@@ -1,0 +1,124 @@
+From 8cf3454d567f77233023be49a39a33e9f0836f89 Mon Sep 17 00:00:00 2001
+From: Scott Garman <scott.a.garman@intel.com>
+Date: Thu, 14 Apr 2016 12:28:57 +0200
+Subject: [PATCH] Disable use of syslog for sysroot
+
+Disable use of syslog to prevent sysroot user and group additions from
+writing entries to the host's syslog. This patch should only be used
+with the shadow-native recipe.
+
+Upstream-Status: Inappropriate [disable feature]
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+---
+ src/groupadd.c  | 3 +++
+ src/groupdel.c  | 3 +++
+ src/groupmems.c | 3 +++
+ src/groupmod.c  | 3 +++
+ src/useradd.c   | 3 +++
+ src/userdel.c   | 3 +++
+ src/usermod.c   | 3 +++
+ 7 files changed, 21 insertions(+)
+
+diff --git a/src/groupadd.c b/src/groupadd.c
+index 39b4ec0..f716f57 100644
+--- a/src/groupadd.c
++++ b/src/groupadd.c
+@@ -34,6 +34,9 @@
+ 
+ #ident "$Id$"
+ 
++/* Disable use of syslog since we're running this command against a sysroot */
++#undef USE_SYSLOG
++
+ #include <ctype.h>
+ #include <fcntl.h>
+ #include <getopt.h>
+diff --git a/src/groupdel.c b/src/groupdel.c
+index da99347..46a679c 100644
+--- a/src/groupdel.c
++++ b/src/groupdel.c
+@@ -34,6 +34,9 @@
+ 
+ #ident "$Id$"
+ 
++/* Disable use of syslog since we're running this command against a sysroot */
++#undef USE_SYSLOG
++
+ #include <ctype.h>
+ #include <fcntl.h>
+ #include <grp.h>
+diff --git a/src/groupmems.c b/src/groupmems.c
+index e4f107f..95cb073 100644
+--- a/src/groupmems.c
++++ b/src/groupmems.c
+@@ -32,6 +32,9 @@
+ 
+ #include <config.h>
+ 
++/* Disable use of syslog since we're running this command against a sysroot */
++#undef USE_SYSLOG
++
+ #include <fcntl.h>
+ #include <getopt.h>
+ #include <grp.h>
+diff --git a/src/groupmod.c b/src/groupmod.c
+index d9d3807..6229737 100644
+--- a/src/groupmod.c
++++ b/src/groupmod.c
+@@ -34,6 +34,9 @@
+ 
+ #ident "$Id$"
+ 
++/* Disable use of syslog since we're running this command against a sysroot */
++#undef USE_SYSLOG
++
+ #include <ctype.h>
+ #include <fcntl.h>
+ #include <getopt.h>
+diff --git a/src/useradd.c b/src/useradd.c
+index e1ebf50..25679d8 100644
+--- a/src/useradd.c
++++ b/src/useradd.c
+@@ -34,6 +34,9 @@
+ 
+ #ident "$Id$"
+ 
++/* Disable use of syslog since we're running this command against a sysroot */
++#undef USE_SYSLOG
++
+ #include <assert.h>
+ #include <ctype.h>
+ #include <errno.h>
+diff --git a/src/userdel.c b/src/userdel.c
+index 19b12bc..a083929 100644
+--- a/src/userdel.c
++++ b/src/userdel.c
+@@ -34,6 +34,9 @@
+ 
+ #ident "$Id$"
+ 
++/* Disable use of syslog since we're running this command against a sysroot */
++#undef USE_SYSLOG
++
+ #include <errno.h>
+ #include <fcntl.h>
+ #include <getopt.h>
+diff --git a/src/usermod.c b/src/usermod.c
+index 685b50a..28e5cfc 100644
+--- a/src/usermod.c
++++ b/src/usermod.c
+@@ -34,6 +34,9 @@
+ 
+ #ident "$Id$"
+ 
++/* Disable use of syslog since we're running this command against a sysroot */
++#undef USE_SYSLOG
++
+ #include <ctype.h>
+ #include <errno.h>
+ #include <fcntl.h>
+-- 
+2.1.0
+

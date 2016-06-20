@@ -9,4 +9,3 @@ SRC_URI[md5sum] = "d24e8c0153c35dfefee3e26b1c2c35f8"
 SRC_URI[sha256sum] = "0b4874961e6488ad9e5808114bd486ea981c540907262caab1419355fd82d745"
 
 S = "${WORKDIR}/gst-omx-${PV}"
-

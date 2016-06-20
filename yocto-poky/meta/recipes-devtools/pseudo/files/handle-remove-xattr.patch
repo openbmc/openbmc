@@ -1,0 +1,36 @@
+From a24cf102967a4966bfabe36c3542fb65f35bf539 Mon Sep 17 00:00:00 2001
+From: Peter Seebach <peter.seebach@windriver.com>
+Date: Wed, 23 Mar 2016 11:55:25 -0500
+Subject: actually handle remove_xattr correctly
+
+The path is required but wasn't being extracted from the client's message,
+resulting in xattr removal never working. This does not fully address some
+deeper problems with the xattr implementation, but at least the common
+removal case works.
+
+Upstream-Status: Backport
+
+Index: pseudo-1.7.5/ChangeLog.txt
+===================================================================
+--- pseudo-1.7.5.orig/ChangeLog.txt
++++ pseudo-1.7.5/ChangeLog.txt
+@@ -1,3 +1,7 @@
++2016-03-22:
++       * (seebs) extract path from message for remove_xattr so it
++         actually works.
++
+ 2016-02-09:
+         * (seebs) 1.7.5 release
+ 
+Index: pseudo-1.7.5/pseudo.c
+===================================================================
+--- pseudo-1.7.5.orig/pseudo.c
++++ pseudo-1.7.5/pseudo.c
+@@ -543,6 +543,7 @@ pseudo_op(pseudo_msg_t *msg, const char
+ 		case OP_GET_XATTR:
+ 		case OP_LIST_XATTR:
+ 		case OP_REPLACE_XATTR:
++		case OP_REMOVE_XATTR:
+ 		case OP_SET_XATTR:
+ 			/* In a rename there are two paths, null separated in msg->path */
+ 			initial_len = strlen(msg->path);

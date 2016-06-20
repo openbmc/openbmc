@@ -279,6 +279,7 @@ class CommandsSync:
         mask = params[3]
         return bb.event.set_UIHmask(handlerNum, llevel, debug_domains, mask)
     setEventMask.needconfig = False
+    setEventMask.readonly = True
 
     def setFeatures(self, command, params):
         """

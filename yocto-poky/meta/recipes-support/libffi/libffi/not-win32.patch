@@ -1,0 +1,22 @@
+libffi's configure assumes that cross-compiled builds are complicated and
+introduces convoluted path manipulation involving gcc search paths to the
+install paths, resulting in paths like -L/usr/lib/../lib/ appearing in
+libffi.pc.  When pkg-config is then used to obtain the linker flags for libffi
+it can't tell that this path is on the default search path and returns
+$SYSROOT/usr/lib/../lib which then gets written all over the target sysroot.
+This then means the sstate can't be shared and triggers QA errors.
+
+As this block is generally pointless, disable it.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+--- a/configure.ac~	2014-11-12 11:56:51.000000000 +0000
++++ b/configure.ac	2016-02-04 14:02:53.765710532 +0000
+@@ -593,5 +593,5 @@
+ # These variables are only ever used when we cross-build to X86_WIN32.
+ # And we only support this with GCC, so...
+-if test "x$GCC" = "xyes"; then
++if false; then
+   if test -n "$with_cross_host" &&
+      test x"$with_cross_host" != x"no"; then

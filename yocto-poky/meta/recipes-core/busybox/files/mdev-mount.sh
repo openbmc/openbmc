@@ -15,7 +15,7 @@ case "$ACTION" in
 			exit 0
 		fi
 		DEVBASE=`expr substr $MDEV 1 3`
-		if [ "${DEVBASE}" == "mmc" ] ; then
+		if [ "${DEVBASE}" = "mmc" ] ; then
 			DEVBASE=`expr substr $MDEV 1 7`
 		fi
 		# check for "please don't mount it" file
@@ -24,7 +24,7 @@ case "$ACTION" in
 			exit 0
 		fi
 		# check for full-disk partition
-		if [ "${DEVBASE}" == "${MDEV}" ] ; then
+		if [ "${DEVBASE}" = "${MDEV}" ] ; then
 			if [ -d /sys/block/${DEVBASE}/${DEVBASE}*1 ] ; then
 				# Partition detected, just quit
 				exit 0
@@ -33,7 +33,7 @@ case "$ACTION" in
 				# No size at all
 				exit 0
 			fi
-			if [ `cat /sys/block/${DEVBASE}/size` == 0 ] ; then
+			if [ "`cat /sys/block/${DEVBASE}/size`" = "0" ] ; then
 				# empty device, bail out
 				exit 0
 			fi
@@ -42,7 +42,7 @@ case "$ACTION" in
 		if ! mount /dev/$MDEV > /dev/null 2>&1
 		then
 			MOUNTPOINT="${MDEV_AUTOMOUNT_ROOT}/$MDEV"
-			mkdir "$MOUNTPOINT"
+			mkdir -p "$MOUNTPOINT"
 			mount -t auto /dev/$MDEV "$MOUNTPOINT"
 		fi
 		;;

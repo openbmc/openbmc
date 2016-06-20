@@ -15,7 +15,7 @@ SRC_URI = "http://dbus.freedesktop.org/releases/dbus-glib/dbus-glib-${PV}.tar.gz
            file://test-install-makefile.patch \
 "
 
-inherit autotools pkgconfig gettext
+inherit autotools pkgconfig gettext bash-completion
 
 #default disable regression tests, some unit test code in non testing code
 #PACKAGECONFIG_pn-${PN} = "tests" enable regression tests local.conf
@@ -26,18 +26,14 @@ EXTRA_OECONF = "--with-introspect-xml=${STAGING_DATADIR_NATIVE}/dbus/dbus-bus-in
                 --with-dbus-binding-tool=${STAGING_BINDIR_NATIVE}/dbus-binding-tool"
 EXTRA_OECONF_class-native = "--with-introspect-xml=${STAGING_DATADIR_NATIVE}/dbus/dbus-bus-introspect.xml"
 
-PACKAGES += "${PN}-bash-completion ${PN}-tests-dbg ${PN}-tests"
+PACKAGES += "${PN}-tests"
 
 FILES_${PN} = "${libdir}/lib*${SOLIBS}"
-FILES_${PN}-bash-completion = "${sysconfdir}/bash_completion.d/dbus-bash-completion.sh \
-   ${libexecdir}/dbus-bash-completion-helper"
+FILES_${PN}-bash-completion += "${libexecdir}/dbus-bash-completion-helper"
 FILES_${PN}-dev += "${libdir}/dbus-1.0/include ${bindir}/dbus-glib-tool"
 FILES_${PN}-dev += "${bindir}/dbus-binding-tool"
 
 RDEPENDS_${PN}-tests += "dbus-x11"
 FILES_${PN}-tests = "${datadir}/${BPN}/tests"
-FILES_${PN}-tests-dbg = "${datadir}/${BPN}/tests/.debug/* \
-                         ${datadir}/${BPN}/tests/core/.debug/* \
-                         ${datadir}/${BPN}/tests/interfaces/.debug/*"
 
 BBCLASSEXTEND = "native"

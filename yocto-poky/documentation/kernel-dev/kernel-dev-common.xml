@@ -270,11 +270,12 @@
                 edit the recipe that builds your kernel so that it has the
                 following command form:
                 <literallayout class='monospaced'>
-     KBUILD_DEFCONFIG_<ulink url='&YOCTO_DOCS_REF_URL;#var-KMACHINE'>KMACHINE</ulink> ?= <replaceable>defconfig_file</replaceable>
+     KBUILD_DEFCONFIG_KMACHINE ?= <replaceable>defconfig_file</replaceable>
                 </literallayout>
                 You need to append the variable with
-                <filename>KMACHINE</filename> and then supply the path to
-                your "in-tree" <filename>defconfig</filename> file.
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-KMACHINE'><filename>KMACHINE</filename></ulink>
+                and then supply the path to your "in-tree"
+                <filename>defconfig</filename> file.
             </para>
 
             <para>
@@ -1030,6 +1031,127 @@
                 </literallayout>
             </para>
         </section>
+    </section>
+
+    <section id='adding-recipe-space-kernel-features'>
+        <title>Adding Recipe-Space Kernel Features</title>
+
+        <para>
+            You can add kernel features in the
+            <link linkend='recipe-space-metadata'>recipe-space</link> by
+            using the
+            <ulink url='&YOCTO_DOCS_REF_URL;#var-KERNEL_FEATURES'><filename>KERNEL_FEATURES</filename></ulink>
+            variable and by specifying the feature's <filename>.scc</filename>
+            file path in the
+            <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>
+            statement.
+            When you add features using this method, the OpenEmbedded build
+            system checks to be sure the features are present.
+            If the features are not present, the build stops.
+            Kernel features are the last elements processed for configuring
+            and patching the kernel.
+            Therefore, adding features in this manner is a way
+            to enforce specific features are present and enabled
+            without needing to do a full audit of any other layer's additions
+            to the <filename>SRC_URI</filename> statement.
+        </para>
+
+        <para>
+            You add a kernel feature by providing the feature as part of the
+            <filename>KERNEL_FEATURES</filename> variable and by providing the
+            path to the feature's <filename>.scc</filename> file, which is
+            relative to the root of the kernel Metadata.
+            The OpenEmbedded build system searches all forms of kernel
+            Metadata on the <filename>SRC_URI</filename> statement regardless
+            of whether the Metadata is in the "kernel-cache", system kernel
+            Metadata, or a recipe-space Metadata.
+            See the
+            "<link linkend='kernel-metadata-location'>Kernel Metadata Location</link>"
+            section for additional information.
+        </para>
+
+        <para>
+            When you specify the feature's <filename>.scc</filename> file
+            on the <filename>SRC_URI</filename> statement, the OpenEmbedded
+            build system adds the directory of that
+            <filename>.scc</filename> file along with all its subdirectories
+            to the kernel feature search path.
+            Because subdirectories are searched, you can reference a single
+            <filename>.scc</filename> file in the
+            <filename>SRC_URI</filename> statement to reference multiple kernel
+            features.
+        </para>
+
+        <para>
+            Consider the following example that adds the "test.scc" feature
+            to the build.
+            <orderedlist>
+                <listitem><para>
+                    Create a <filename>.scc</filename> file and locate it
+                    just as you would any other patch file,
+                    <filename>.cfg</filename> file, or fetcher item
+                    you specify in the <filename>SRC_URI</filename>
+                    statement.
+                    <note><title>Notes</title>
+                        <itemizedlist>
+                            <listitem><para>
+                                You must add the directory of the
+                                <filename>.scc</filename> file to the fetcher's
+                                search path in the same manner as you would
+                                add a <filename>.patch</filename> file.
+                                </para></listitem>
+                            <listitem><para>
+                                You can create additional
+                                <filename>.scc</filename> files beneath the
+                                directory that contains the file you are
+                                adding.
+                                All subdirectories are searched during the
+                                build as potential feature directories.
+                                </para></listitem>
+                        </itemizedlist>
+                    </note>
+                    Continuing with the example, suppose the "test.scc"
+                    feature you are adding has a
+                    <filename>test.scc</filename> file in the following
+                    directory:
+                    <literallayout class='monospaced'>
+     <replaceable>my_recipe</replaceable>
+        |
+        +-linux-yocto
+           |
+           +-test.cfg
+           +-test.scc
+                    </literallayout>
+                    In this example, the <filename>linux-yocto</filename>
+                    directory has both the feature
+                    <filename>test.scc</filename> file and a similarly
+                    named configuration fragment file
+                    <filename>test.cfg</filename>.
+                    </para></listitem>
+                <listitem><para>
+                    Add the <filename>.scc</filename> file to the
+                    recipe's <filename>SRC_URI</filename> statement:
+                    <literallayout class='monospaced'>
+     SRC_URI_append = " file://test.scc"
+                    </literallayout>
+                    The leading space before the path is important as the
+                    path is appended to the existing path.
+                    </para></listitem>
+                <listitem><para>
+                    Specify the feature as a kernel feature:
+                    <literallayout class='monospaced'>
+     KERNEL_FEATURES_append = " test.scc"
+                    </literallayout>
+                    The OpenEmbedded build system processes the kernel feature
+                    when it builds the kernel.
+                    <note>
+                        If other features are contained below "test.scc",
+                        then their directories are relative to the directory
+                        containing the <filename>test.scc</filename> file.
+                    </note>
+                    </para></listitem>
+            </orderedlist>
+        </para>
     </section>
 </chapter>
 <!--

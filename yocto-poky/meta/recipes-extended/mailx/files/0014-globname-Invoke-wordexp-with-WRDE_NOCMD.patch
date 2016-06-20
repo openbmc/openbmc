@@ -7,6 +7,7 @@ This patch is taken from
 ftp://ftp.debian.org/debian/pool/main/h/heirloom-mailx/heirloom-mailx_12.5-5.debian.tar.xz
 
 Upstream-Status: Inappropriate [upstream is dead]
+CVE: CVE-2004-2771
 ---
  fio.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

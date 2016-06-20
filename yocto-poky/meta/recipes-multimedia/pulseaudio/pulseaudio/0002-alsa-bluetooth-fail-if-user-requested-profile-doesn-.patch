@@ -10,8 +10,13 @@ didn't succeed.
 
 http://bugzilla.yoctoproject.org/show_bug.cgi?id=8448
 
-Upstream-Status: Submitted [http://lists.freedesktop.org/archives/pulseaudio-discuss/2015-October/024614.html]
 Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+
+Upstream-Status: Denied [The patch set needs some work to be accepted.
+The review thread:
+http://thread.gmane.org/gmane.comp.audio.pulseaudio.general/24301]
+
+Signed-off-by: Tanu Kaskinen <tanuk@iki.fi>
 ---
  src/modules/alsa/module-alsa-card.c          | 10 ++++++++--
  src/modules/bluetooth/module-bluez4-device.c |  6 ++++--

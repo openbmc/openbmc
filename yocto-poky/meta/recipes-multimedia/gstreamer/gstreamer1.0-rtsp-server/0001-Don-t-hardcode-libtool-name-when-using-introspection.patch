@@ -1,0 +1,27 @@
+From 4a12569e5ae5be63cd92a9b178860026a99746b1 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 27 Oct 2015 16:55:45 +0200
+Subject: [PATCH] Don't hardcode libtool name when using introspection
+
+Upstream-Status: Pending [review on oe-core maillist]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ gst/rtsp-server/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gst/rtsp-server/Makefile.am b/gst/rtsp-server/Makefile.am
+index 4fcd366..c67f5ab 100644
+--- a/gst/rtsp-server/Makefile.am
++++ b/gst/rtsp-server/Makefile.am
+@@ -87,7 +87,7 @@ GstRtspServer-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstrtspserver-@
+ 		--include=Gst-@GST_API_VERSION@ \
+ 		--include=GstRtsp-@GST_API_VERSION@ \
+ 		--include=GstNet-@GST_API_VERSION@ \
+-		--libtool="$(top_builddir)/libtool" \
++		--libtool="$(LIBTOOL)" \
+ 		--pkg gstreamer-@GST_API_VERSION@ \
+ 		--pkg gstreamer-rtsp-@GST_API_VERSION@ \
+ 		--pkg gstreamer-net-@GST_API_VERSION@ \
+-- 
+2.1.4
+

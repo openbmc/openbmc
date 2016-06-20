@@ -42,7 +42,7 @@ fi
 echo "Deleting the sysroots in $STAGING_DIR, and selected stamps in $SSTATE_MANIFESTS and $STAMPS_DIR."
 
 # The sysroots themselves
-rm -rf $STAGING_DIR
+rm -rf $STAGING_DIR ${STAGING_DIR}-uninative
 
 # The stamps that said the sysroot was populated
 rm -rf $STAMPS_DIR/*/*/*.do_populate_sysroot.*

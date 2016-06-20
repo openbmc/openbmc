@@ -1,0 +1,39 @@
+Upstream-Status: Accepted
+
+Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+---
+
+2015-11-25  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/67954
+	* lra-constraints.c (curr_insn_transform): Add check on scratch
+	pseudo when change class to NO_REGS.  Add an assert.
+
+
+
+git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/trunk@230894 138bc75d-0d04-0410-961f-82ee72b054a4
+---
+
+diff --git a/gcc/lra-constraints.c b/gcc/lra-constraints.c
+index 4670e81..c62bf6a 100644
+--- a/gcc/lra-constraints.c
++++ b/gcc/lra-constraints.c
+@@ -3725,7 +3725,8 @@ curr_insn_transform (bool check_only_p)
+ 		 assigment pass and the scratch pseudo will be
+ 		 spilled.  Spilled scratch pseudos are transformed
+ 		 back to scratches at the LRA end.  */
+-	      && lra_former_scratch_operand_p (curr_insn, i))
++	      && lra_former_scratch_operand_p (curr_insn, i)
++	      && lra_former_scratch_p (REGNO (op)))
+ 	    {
+ 	      int regno = REGNO (op);
+ 	      lra_change_class (regno, NO_REGS, "      Change to", true);
+@@ -3734,6 +3735,8 @@ curr_insn_transform (bool check_only_p)
+ 		   spilled pseudo as there is only one such insn, the
+ 		   current one.  */
+ 		reg_renumber[regno] = -1;
++	      lra_assert (bitmap_single_bit_set_p
++			  (&lra_reg_info[REGNO (op)].insn_bitmap));
+ 	    }
+ 	  /* We can do an optional reload.  If the pseudo got a hard
+ 	     reg, we might improve the code through inheritance.  If

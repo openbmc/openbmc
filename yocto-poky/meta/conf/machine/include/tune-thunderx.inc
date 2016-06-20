@@ -5,13 +5,13 @@ AVAILTUNES += "thunderx thunderx_be"
 
 TUNEVALID[thunderx] = "Enable instructions for Cavium ThunderX"
 
-TUNE_CCARGS .= "${@bb.utils.contains("TUNE_FEATURES", "thunderx", " -mcpu=thunderx ", "",d)}"
+TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'thunderx', ' -mcpu=thunderx ', '',d)}"
 
 ARMPKGARCH_tune-thunderx ?= "thunderx"
 ARMPKGARCH_tune-thunderx_be ?= "thunderx_be"
 
-TUNE_FEATURES_tune-thunderx ?= "${TUNE_FEATURES_tune-aarch64} thunderx"
-TUNE_FEATURES_tune-thunderx_be ?= "${TUNE_FEATURES_tune-thunderx} bigendian"
+TUNE_FEATURES_tune-thunderx = "${TUNE_FEATURES_tune-aarch64} thunderx"
+TUNE_FEATURES_tune-thunderx_be = "${TUNE_FEATURES_tune-thunderx} bigendian"
 BASE_LIB_tune-thunderx = "lib64"
 BASE_LIB_tune-thunderx_be = "lib64"
 

@@ -1,0 +1,51 @@
+From b6a59b05f1fa514c6b387c9544bd63b1bfcf2eed Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 13 Jan 2016 05:38:29 +0000
+Subject: [PATCH] Cover the else with __GLIBC__
+
+Fixes build errors on musl/x86
+
+| In file included from
+/home/ubuntu/work/oe/openembedded-core/build/tmp-musl/sysroots/qemux86/usr/include/asm/termios.h:1:0,
+|                  from
+/home/ubuntu/work/oe/openembedded-core/build/tmp-musl/sysroots/qemux86/usr/include/linux/termios.h:5,
+|                  from
+/home/ubuntu/work/oe/openembedded-core/build/tmp-musl/work/i586-oe-linux-musl/console-tools/0.3.2-r8/console-tools-0.3.2/vttools/resizecons.c:86:
+|
+/home/ubuntu/work/oe/openembedded-core/build/tmp-musl/sysroots/qemux86/usr/include/asm-generic/termios.h:14:8:
+error: redefinition of 'struct winsize'
+|  struct winsize {
+|         ^
+| In file included from
+/home/ubuntu/work/oe/openembedded-core/build/tmp-musl/sysroots/qemux86/usr/include/sys/ioctl.h:7:0,
+|                  from
+/home/ubuntu/work/oe/openembedded-core/build/tmp-musl/work/i586-oe-linux-musl/console-tools/0.3.2-r8/console-tools-0.3.2/vttools/resizecons.c:81:
+|
+/home/ubuntu/work/oe/openembedded-core/build/tmp-musl/sysroots/qemux86/usr/include/bits/ioctl.h:90:8:
+note: originally defined here
+|  struct winsize {
+|         ^
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ vttools/resizecons.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/vttools/resizecons.c b/vttools/resizecons.c
+index f0a7055..e8753b1 100644
+--- a/vttools/resizecons.c
++++ b/vttools/resizecons.c
+@@ -81,7 +81,7 @@
+ #include <sys/ioctl.h>
+ #if (__GNU_LIBRARY__ >= 6)
+ # include <sys/perm.h>
+-#else
++#elif defined __GLIBC__
+ # include <linux/types.h>
+ # include <linux/termios.h>
+ #endif
+-- 
+2.7.0
+

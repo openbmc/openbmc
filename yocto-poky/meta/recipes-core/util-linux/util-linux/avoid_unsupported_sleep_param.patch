@@ -1,0 +1,20 @@
+Avoid unsupported sleep parameter
+
+Signed-off-by: Tudor Florea <tudor.florea@enea.com>
+Upstream-Status: Pending
+
+diff -ruN a/simple b/simple
+--- a/tests/ts/tailf/simple	2015-11-12 11:34:49.971817130 +0200
++++ b/tests/ts/tailf/simple	2013-11-12 11:34:37.876325128 +0200
+@@ -27,9 +27,9 @@
+ 
+ $TS_CMD_TAILF $INPUT > $TS_OUTPUT 2>&1 &
+ 
+-sleep 0.5
++sleep 1
+ echo {0..9} >> $INPUT
+-sleep 0.5
++sleep 1
+ 
+ rm -f $INPUT
+ 

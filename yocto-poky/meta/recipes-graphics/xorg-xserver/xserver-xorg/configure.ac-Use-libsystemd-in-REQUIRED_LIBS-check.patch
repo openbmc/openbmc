@@ -1,0 +1,50 @@
+From 0c2153d468229f56e6fef71d2f002e0cae14aa55 Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Mon, 16 Nov 2015 16:18:40 +0200
+Subject: [PATCH] configure.ac: Use libsystemd in REQUIRED_LIBS check
+
+REQUIRED_LIBS needs to be set to the correct systemd library,
+otherwise the later check will either fail or use the wrong
+pc file.
+
+Upstream-Status: Submitted [xorg-devel@lists.x.org]
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ configure.ac | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 96c0242..f63eca1 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -837,9 +837,16 @@ AC_ARG_WITH([systemd-daemon],
+ 		[support systemd socket activation (default: auto)]),
+ 	[WITH_SYSTEMD_DAEMON=$withval], [WITH_SYSTEMD_DAEMON=auto])
+ PKG_CHECK_MODULES([SYSTEMD_DAEMON], [libsystemd-daemon],
+-                  [HAVE_SYSTEMD_DAEMON=yes],
++                  [REQUIRED_SYSTEMD_DAEMON=libsystemd-daemon],
+                   [PKG_CHECK_MODULES([SYSTEMD_DAEMON], [libsystemd],
+-                                     [HAVE_SYSTEMD_DAEMON=yes], [HAVE_SYSTEMD_DAEMON=no])])
++                                     [REQUIRED_SYSTEMD_DAEMON=libsystemd],
++                                     [REQUIRED_SYSTEMD_DAEMON=])])
++if test "x$REQUIRED_SYSTEMD_DAEMON" = x; then
++        HAVE_SYSTEMD_DAEMON=no
++else
++        HAVE_SYSTEMD_DAEMON=yes
++fi
++
+ if test "x$WITH_SYSTEMD_DAEMON" = xauto; then
+ 	WITH_SYSTEMD_DAEMON="$HAVE_SYSTEMD_DAEMON"
+ fi
+@@ -848,7 +855,7 @@ if test "x$WITH_SYSTEMD_DAEMON" = xyes; then
+ 		AC_MSG_ERROR([systemd support requested but no library has been found])
+ 	fi
+ 	AC_DEFINE(HAVE_SYSTEMD_DAEMON, 1, [Define to 1 if libsystemd-daemon is available])
+-	REQUIRED_LIBS="$REQUIRED_LIBS libsystemd-daemon"
++	REQUIRED_LIBS="$REQUIRED_LIBS $REQUIRED_SYSTEMD_DAEMON"
+ fi
+ AM_CONDITIONAL([HAVE_SYSTEMD_DAEMON], [test "x$HAVE_SYSTEMD_DAEMON" = "xyes"])
+ 
+-- 
+2.1.4
+

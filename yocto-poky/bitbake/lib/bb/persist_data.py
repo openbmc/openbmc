@@ -201,6 +201,7 @@ class PersistData(object):
 def connect(database):
     connection = sqlite3.connect(database, timeout=5, isolation_level=None)
     connection.execute("pragma synchronous = off;")
+    connection.text_factory = str
     return connection
 
 def persist(domain, d):

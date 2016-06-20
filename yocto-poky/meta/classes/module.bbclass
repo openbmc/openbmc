@@ -6,6 +6,8 @@ do_make_scripts[depends] += "virtual/kernel:do_shared_workdir"
 
 EXTRA_OEMAKE += "KERNEL_SRC=${STAGING_KERNEL_DIR}"
 
+MODULES_INSTALL_TARGET ?= "modules_install"
+
 module_do_compile() {
 	unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS
 	oe_runmake KERNEL_PATH=${STAGING_KERNEL_DIR}   \
@@ -21,7 +23,7 @@ module_do_install() {
 	oe_runmake DEPMOD=echo INSTALL_MOD_PATH="${D}" \
 	           CC="${KERNEL_CC}" LD="${KERNEL_LD}" \
 	           O=${STAGING_KERNEL_BUILDDIR} \
-	           modules_install
+	           ${MODULES_INSTALL_TARGET}
 }
 
 EXPORT_FUNCTIONS do_compile do_install

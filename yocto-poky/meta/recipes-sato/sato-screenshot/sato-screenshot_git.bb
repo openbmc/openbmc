@@ -19,7 +19,6 @@ S = "${WORKDIR}/git"
 inherit autotools pkgconfig distro_features_check
 
 FILES_${PN} += "${libdir}/matchbox-panel/*.so"
-FILES_${PN}-dbg += "${libdir}/matchbox-panel/.debug"
 
 do_install_append () {
 	rm ${D}${libdir}/matchbox-panel/*.la

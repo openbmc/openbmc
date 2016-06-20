@@ -18,7 +18,6 @@ ac_cv_sizeof_unsigned_long=${ac_cv_sizeof_unsigned_long=8}
 ac_cv_sizeof_long_double=${ac_cv_sizeof_long_double=16}
 ac_cv_sizeof_long_int=${ac_cv_sizeof_long_int=8}
 ac_cv_sizeof_long_long=${ac_cv_sizeof_long_long=8}
-ac_cv_sizeof_off_t=${ac_cv_sizeof_off_t=8}
 ac_cv_sizeof_short=${ac_cv_sizeof_short=2}
 ac_cv_sizeof_unsigned_short=${ac_cv_sizeof_unsigned_short=2}
 ac_cv_sizeof_short_int=${ac_cv_sizeof_short_int=2}

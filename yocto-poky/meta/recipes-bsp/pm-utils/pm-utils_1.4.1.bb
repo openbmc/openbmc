@@ -22,5 +22,4 @@ do_configure_prepend () {
 }
 
 FILES_${PN} += "${libdir}/${BPN}/*"
-FILES_${PN}-dbg += "${libdir}/${BPN}/bin/.debug \
-		    ${datadir}/doc/pm-utils/README.debugging"
+FILES_${PN}-dbg += "${datadir}/doc/pm-utils/README.debugging"

@@ -1,4 +1,4 @@
-PYTHON_BASEVERSION = "3.4"
+PYTHON_BASEVERSION = "3.5"
 
 inherit python-dir
 

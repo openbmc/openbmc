@@ -1,0 +1,31 @@
+#! /bin/sh
+
+cd unit
+
+failed=0
+all=0
+
+for f in test-*; do
+    "./$f"
+    case "$?" in
+        0)
+            echo "PASS: $f"
+            all=$((all + 1))
+            ;;
+        77)
+            echo "SKIP: $f"
+            ;;
+        *)
+            echo "FAIL: $f"
+            failed=$((failed + 1))
+            all=$((all + 1))
+            ;;
+    esac
+done
+
+if [ "$failed" -eq 0 ] ; then
+  echo "All $all tests passed"
+else
+  echo "$failed of $all tests failed"
+fi
+

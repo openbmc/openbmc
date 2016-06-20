@@ -1,0 +1,59 @@
+From 545ded56095c570426fe102ff2192889681ea75c Mon Sep 17 00:00:00 2001
+From: Dmitry Rozhkov <dmitry.rozhkov@linux.intel.com>
+Date: Mon, 29 Feb 2016 14:38:25 +0200
+Subject: [PATCH] Set xattrs after setting times
+
+With Integrity Measurement Architecture (IMA) enabled in Linux
+kernel the security.ima extended attribute gets overwritten
+when setting times on a file with a futimens() call. So it's safer
+to set xattrs after times.
+
+Upstream-Status: Submitted [https://github.com/libarchive/libarchive/pull/664]
+
+Signed-off-by: Dmitry Rozhkov <dmitry.rozhkov@linux.intel.com>
+
+---
+ libarchive/archive_write_disk_posix.c | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
+
+diff --git a/libarchive/archive_write_disk_posix.c b/libarchive/archive_write_disk_posix.c
+index 0fc6193..27c9c1e 100644
+--- a/libarchive/archive_write_disk_posix.c
++++ b/libarchive/archive_write_disk_posix.c
+@@ -1620,16 +1620,6 @@ _archive_write_disk_finish_entry(struct archive *_a)
+	}
+
+	/*
+-	 * Security-related extended attributes (such as
+-	 * security.capability on Linux) have to be restored last,
+-	 * since they're implicitly removed by other file changes.
+-	 */
+-	if (a->todo & TODO_XATTR) {
+-		int r2 = set_xattrs(a);
+-		if (r2 < ret) ret = r2;
+-	}
+-
+-	/*
+	 * Some flags prevent file modification; they must be restored after
+	 * file contents are written.
+	 */
+@@ -1648,6 +1638,17 @@ _archive_write_disk_finish_entry(struct archive *_a)
+	}
+
+	/*
++	 * Security-related extended attributes (such as
++	 * security.capability or security.ima on Linux) have to be restored last,
++	 * since they're implicitly removed by other file changes like setting
++	 * times.
++	 */
++	if (a->todo & TODO_XATTR) {
++		int r2 = set_xattrs(a);
++		if (r2 < ret) ret = r2;
++	}
++
++	/*
+	 * Mac extended metadata includes ACLs.
+	 */
+	if (a->todo & TODO_MAC_METADATA) {
+--
+2.5.0

@@ -1,0 +1,24 @@
+drmdevice.c: define _GNU_SOURCE
+
+Include config.h to fix this build error with uclibc:
+
+libdrm-2.4.66/tests/drmdevice.c: In function 'main':
+libdrm-2.4.66/tests/drmdevice.c:96:60: error:
+'O_CLOEXEC' undeclared (first use in this function)
+fd = open(devices[i]->nodes[j],O_RDONLY | O_CLOEXEC, 0);
+
+Upstream-Status: Pending
+
+Signed-off-by: Maxin B. John <maxin.john@intel.com>
+---
+diff -Naur libdrm-2.4.66-orig/tests/drmdevice.c libdrm-2.4.66/tests/drmdevice.c
+--- libdrm-2.4.66-orig/tests/drmdevice.c	2016-02-23 11:34:02.054904502 +0200
++++ libdrm-2.4.66/tests/drmdevice.c	2016-02-23 11:35:34.371750383 +0200
+@@ -21,6 +21,7 @@
+  *
+  */
+ 
++#include <config.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <sys/stat.h>

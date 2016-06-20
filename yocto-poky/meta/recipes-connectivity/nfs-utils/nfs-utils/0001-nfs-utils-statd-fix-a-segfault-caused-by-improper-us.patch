@@ -1,0 +1,113 @@
+Upstream-Status: Pending
+
+Subject: nfs-utils/statd: fix a segfault caused by improper usage of RPC interface
+
+There is a hack which uses the bottom-level RPC improperly as below
+in the current statd implementation:
+insert a socket in the svc_fdset without a corresponding transport handle
+and passes the socket to the svc_getreqset subroutine, this usage causes
+a segfault of statd on a huge amount of sm-notifications.
+
+Fix the issue by separating the non-RPC-server sock from RPC dispatcher.
+
+Signed-off-by: Shan Hai <shan.hai@windriver.com>
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ utils/statd/rmtcall.c | 1 -
+ utils/statd/statd.c   | 5 +++--
+ utils/statd/statd.h   | 2 +-
+ utils/statd/svc_run.c | 8 ++++++--
+ 4 files changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/utils/statd/rmtcall.c b/utils/statd/rmtcall.c
+index fd576d9..cde091b 100644
+--- a/utils/statd/rmtcall.c
++++ b/utils/statd/rmtcall.c
+@@ -104,7 +104,6 @@ statd_get_socket(void)
+ 	if (sockfd < 0)
+ 		return -1;
+ 
+-	FD_SET(sockfd, &SVC_FDSET);
+ 	return sockfd;
+ }
+ 
+diff --git a/utils/statd/statd.c b/utils/statd/statd.c
+index 51a016e..e21a259 100644
+--- a/utils/statd/statd.c
++++ b/utils/statd/statd.c
+@@ -247,6 +247,7 @@ int main (int argc, char **argv)
+ 	int port = 0, out_port = 0;
+ 	int nlm_udp = 0, nlm_tcp = 0;
+ 	struct rlimit rlim;
++	int notify_sockfd;
+ 
+ 	int pipefds[2] = { -1, -1};
+ 	char status;
+@@ -473,7 +474,7 @@ int main (int argc, char **argv)
+ 		}
+ 
+ 	/* Make sure we have a privilege port for calling into the kernel */
+-	if (statd_get_socket() < 0)
++	if ((notify_sockfd = statd_get_socket()) < 0)
+ 		exit(1);
+ 
+ 	/* If sm-notify didn't take all the state files, load
+@@ -528,7 +529,7 @@ int main (int argc, char **argv)
+ 		 * Handle incoming requests:  SM_NOTIFY socket requests, as
+ 		 * well as callbacks from lockd.
+ 		 */
+-		my_svc_run();	/* I rolled my own, Olaf made it better... */
++		my_svc_run(notify_sockfd);	/* I rolled my own, Olaf made it better... */
+ 
+ 		/* Only get here when simulating a crash so we should probably
+ 		 * start sm-notify running again.  As we have already dropped
+diff --git a/utils/statd/statd.h b/utils/statd/statd.h
+index a1d8035..231ac7e 100644
+--- a/utils/statd/statd.h
++++ b/utils/statd/statd.h
+@@ -28,7 +28,7 @@ extern _Bool	statd_present_address(const struct sockaddr *sap, char *buf,
+ __attribute__((__malloc__))
+ extern char *	statd_canonical_name(const char *hostname);
+ 
+-extern void	my_svc_run(void);
++extern void	my_svc_run(int);
+ extern void	notify_hosts(void);
+ extern void	shuffle_dirs(void);
+ extern int	statd_get_socket(void);
+diff --git a/utils/statd/svc_run.c b/utils/statd/svc_run.c
+index d98ecee..28c1ad6 100644
+--- a/utils/statd/svc_run.c
++++ b/utils/statd/svc_run.c
+@@ -78,7 +78,7 @@ my_svc_exit(void)
+  * The heart of the server.  A crib from libc for the most part...
+  */
+ void
+-my_svc_run(void)
++my_svc_run(int sockfd)
+ {
+ 	FD_SET_TYPE	readfds;
+ 	int             selret;
+@@ -96,6 +96,8 @@ my_svc_run(void)
+ 		}
+ 
+ 		readfds = SVC_FDSET;
++		/* Set notify sockfd for waiting for reply */
++		FD_SET(sockfd, &readfds);
+ 		if (notify) {
+ 			struct timeval	tv;
+ 
+@@ -125,8 +127,10 @@ my_svc_run(void)
+ 
+ 		default:
+ 			selret -= process_reply(&readfds);
+-			if (selret)
++			if (selret) {
++				FD_CLR(sockfd, &readfds);
+ 				svc_getreqset(&readfds);
++			}
+ 		}
+ 	}
+ }
+-- 
+1.9.1
+

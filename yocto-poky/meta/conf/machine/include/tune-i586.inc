@@ -4,7 +4,7 @@ require conf/machine/include/x86/arch-x86.inc
 
 # Extra tune features
 TUNEVALID[i586] = "Enable i586 specific processor optimizations"
-TUNE_CCARGS .= "${@bb.utils.contains("TUNE_FEATURES", "i586", " -march=i586", "", d)}"
+TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'i586', ' -march=i586', '', d)}"
 
 # Extra tune selections
 AVAILTUNES += "i586"

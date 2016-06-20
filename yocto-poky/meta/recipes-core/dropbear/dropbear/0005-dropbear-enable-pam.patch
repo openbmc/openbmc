@@ -1,28 +1,36 @@
-Subject: [PATCH 5/6] dropbear enable pam
+From b8cece92ba19aa77ac013ea161bfe4c7147747c9 Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Wed, 2 Dec 2015 11:36:02 +0200
+Subject: Enable pam
 
-dropbear: We need modify file option.h besides enabling pam in \
+We need modify file option.h besides enabling pam in
 configure if we want dropbear to support pam.
 
 Upstream-Status: Pending
 
 Signed-off-by: Xiaofeng Yan <xiaofeng.yan@windriver.com>
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
 ---
  options.h | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-Index: dropbear-2013.62/options.h
-===================================================================
---- dropbear-2013.62.orig/options.h	2014-01-14 21:53:02.803262009 +0000
-+++ dropbear-2013.62/options.h	2014-01-14 21:53:56.119263462 +0000
-@@ -192,9 +192,9 @@
-  * PAM challenge/response.
-  * You can't enable both PASSWORD and PAM. */
+diff --git a/options.h b/options.h
+index 94261f6..90bfe2f 100644
+--- a/options.h
++++ b/options.h
+@@ -208,10 +208,10 @@ If you test it please contact the Dropbear author */
  
+ /* This requires crypt() */
+ #ifdef HAVE_CRYPT
 -#define ENABLE_SVR_PASSWORD_AUTH
 +/*#define ENABLE_SVR_PASSWORD_AUTH*/
+ #endif
  /* PAM requires ./configure --enable-pam */
 -/*#define ENABLE_SVR_PAM_AUTH */
 +#define ENABLE_SVR_PAM_AUTH
  #define ENABLE_SVR_PUBKEY_AUTH
  
  /* Whether to take public key options in 
+-- 
+2.1.4
+

@@ -1,0 +1,14 @@
+{# Popover that displays the reverse dependencies and sizes of a package 'data' used in the Packages table #}
+{% with data.package_dependencies_target.all_depends.count as dep_count %}
+{% load projecttags %}
+{% if dep_count %}
+ <a data-content="<ul class='unstyled'>
+   {% for dep in data.package_dependencies_target.all_depends|dictsort:'package.name' %}
+  <li>{{dep.package.name}} {% if dep.package.size > 0 %}({{dep.package.size|filtered_filesizeformat}}){% endif %}</li>
+    {% endfor %}
+  </ul>" title="" class="btn" data-original-title="
+  <strong>{{data.name}}</strong> reverse dependencies - <strong>{{data.package_dependencies_target.get_total_revdeps_size.package_id__size__sum|filtered_filesizeformat}}</strong>">
+    {{dep_count}}
+</a>
+{% endif %}
+{% endwith %}

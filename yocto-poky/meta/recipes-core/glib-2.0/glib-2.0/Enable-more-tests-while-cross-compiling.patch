@@ -1,0 +1,81 @@
+From 310dfe1bdd16d4b254732fcc202c6211629bc7b6 Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Mon, 9 Nov 2015 11:07:27 +0200
+Subject: [PATCH] Enable more tests while cross-compiling
+
+Upstream disables a few tests while cross-compiling because their build requires
+running other built binaries. This usually makes sense but in the cross-compile
+case we can depend on glib-2.0-native.
+
+Upstream-Status: Inappropriate [OE specific]
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ gio/tests/Makefile.am     | 8 +++-----
+ tests/gobject/Makefile.am | 8 +++-----
+ 2 files changed, 6 insertions(+), 10 deletions(-)
+
+diff --git a/gio/tests/Makefile.am b/gio/tests/Makefile.am
+index 868873f..533e454 100644
+--- a/gio/tests/Makefile.am
++++ b/gio/tests/Makefile.am
+@@ -503,10 +503,9 @@ test_programs += \
+ endif
+ 
+ # -----------------------------------------------------------------------------
+-#  The resources test is a bit more complicated, and we cannot build it when
+-#  cross-compiling GIO because it requires running a binary...
++#  The resources test is a bit more complicated, and requires glib-native
++#  for running a binary
+ 
+-if !CROSS_COMPILING
+ test_programs += resources
+ resources_SOURCES = resources.c
+ nodist_resources_SOURCES = test_resources.c test_resources2.c test_resources2.h
+@@ -528,7 +527,11 @@ if !ENABLE_INSTALLED_TESTS
+ libresourceplugin_la_LDFLAGS += -rpath /
+ endif
+ 
++if !CROSS_COMPILING
+ glib_compile_resources=$(top_builddir)/gio/glib-compile-resources
++else
++glib_compile_resources=glib-compile-resources
++endif
+ 
+ resources.o: test_resources2.h
+ test_resources.c: test2.gresource.xml Makefile $(shell $(glib_compile_resources) --sourcedir=$(srcdir) --generate-dependencies $(srcdir)/test2.gresource.xml)
+@@ -545,7 +548,6 @@ test.gresource: test.gresource.xml Makefile $(shell $(glib_compile_resources) --
+ 
+ EXTRA_DIST += test.gresource.xml test1.txt test2.gresource.xml test2.txt test3.gresource.xml test3.txt test4.gresource.xml
+ CLEANFILES += test_resources.c test_resources2.[ch] plugin_resources.c test.gresource
+-endif # !CROSS_COMPILING
+ 
+ BUILT_SOURCES += giotypefuncs.c
+ 
+diff --git a/tests/gobject/Makefile.am b/tests/gobject/Makefile.am
+index 16f2827..4c2208e 100644
+--- a/tests/gobject/Makefile.am
++++ b/tests/gobject/Makefile.am
+@@ -48,10 +48,13 @@ if ENABLE_TIMELOOP
+ installed_test_programs += timeloop-closure
+ endif
+ 
+-# The marshal test requires running a binary, which means we cannot
+-# build it when cross-compiling
++# The marshal test requires running a binary, which means we require
++# glib-native when cross-compiling
+ if !CROSS_COMPILING
+ glib_genmarshal=$(top_builddir)/gobject/glib-genmarshal
++else
++glib_genmarshal=$(shell which glib-genmarshal)
++endif
+ 
+ testmarshal.h: stamp-testmarshal.h
+ 	@true
+@@ -69,7 +72,6 @@ BUILT_SOURCES += testmarshal.h testmarshal.c
+ CLEANFILES += stamp-testmarshal.h
+ EXTRA_DIST += testcommon.h testmarshal.list
+ BUILT_EXTRA_DIST += testmarshal.h testmarshal.c
+-endif # !CROSS_COMPILING
+ 
+ dist-hook: $(BUILT_EXTRA_DIST)
+ 	files='$(BUILT_EXTRA_DIST)';				\

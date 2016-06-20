@@ -34,13 +34,13 @@ class Osc(FetchMethod):
 
         # Create paths to osc checkouts
         relpath = self._strip_leading_slashes(ud.path)
-        ud.pkgdir = os.path.join(data.expand('${OSCDIR}', d), ud.host)
+        ud.pkgdir = os.path.join(d.getVar('OSCDIR', True), ud.host)
         ud.moddir = os.path.join(ud.pkgdir, relpath, ud.module)
 
         if 'rev' in ud.parm:
             ud.revision = ud.parm['rev']
         else:
-            pv = data.getVar("PV", d, 0)
+            pv = d.getVar("PV", False)
             rev = bb.fetch2.srcrev_internal_helper(ud, d)
             if rev and rev != True:
                 ud.revision = rev
@@ -84,7 +84,7 @@ class Osc(FetchMethod):
 
         logger.debug(2, "Fetch: checking for module directory '" + ud.moddir + "'")
 
-        if os.access(os.path.join(data.expand('${OSCDIR}', d), ud.path, ud.module), os.R_OK):
+        if os.access(os.path.join(d.getVar('OSCDIR', True), ud.path, ud.module), os.R_OK):
             oscupdatecmd = self._buildosccommand(ud, d, "update")
             logger.info("Update "+ ud.url)
             # update sources there
@@ -114,7 +114,7 @@ class Osc(FetchMethod):
         Generate a .oscrc to be used for this run.
         """
 
-        config_path = os.path.join(data.expand('${OSCDIR}', d), "oscrc")
+        config_path = os.path.join(d.getVar('OSCDIR', True), "oscrc")
         if (os.path.exists(config_path)):
             os.remove(config_path)
 
@@ -123,8 +123,8 @@ class Osc(FetchMethod):
         f.write("apisrv = %s\n" % ud.host)
         f.write("scheme = http\n")
         f.write("su-wrapper = su -c\n")
-        f.write("build-root = %s\n" % data.expand('${WORKDIR}', d))
-        f.write("urllist = http://moblin-obs.jf.intel.com:8888/build/%(project)s/%(repository)s/%(buildarch)s/:full/%(name)s.rpm\n")
+        f.write("build-root = %s\n" % d.getVar('WORKDIR', True))
+        f.write("urllist = %s\n" % d.getVar("OSCURLLIST", True))
         f.write("extra-pkgs = gzip\n")
         f.write("\n")
         f.write("[%s]\n" % ud.host)

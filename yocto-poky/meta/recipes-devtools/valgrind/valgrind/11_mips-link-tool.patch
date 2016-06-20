@@ -1,0 +1,37 @@
+Debian fix for MIPS: mmap(0x400000, 32768) failed in UME with error 22 (Invalid argument)
+
+  https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=777704
+
+Upstream-Status: Pending
+
+Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+
+
+Description: Disable the MIPS linker workarounds when using -Ttext-section
+Origin: vendor
+Bug-Debian: http://bugs.debian.org/777704
+Author: James Cowgill <james410@cowgill.org.uk>
+Last-Update: 2015-04-25
+
+--- a/coregrind/link_tool_exe_linux.in
++++ b/coregrind/link_tool_exe_linux.in
+@@ -76,12 +76,13 @@
+ my $arch = substr($x, 0, index($x, "'"));
+ 
+ my $extra_args;
+-if (($arch eq 'mips') || ($arch eq 'mipsel')
+-    || ($arch eq 'mipsisa32r2el')) {
+-   $extra_args = "-static -Wl,--section-start=.reginfo=$ala";
+-} elsif (($arch eq 'mips64') || ($arch eq 'mips64el') ||
+-         ($arch eq 'mipsisa64el')) {
+-   $extra_args = "-static -Wl,--section-start=.MIPS.options=$ala";
++if ($arch =~ /^mips/ && "@FLAG_T_TEXT@" eq '-Ttext') {
++   # We only need to use the special mips options when using -Ttext
++   if ($arch =~ /^mips(64|isa64)/) {
++      $extra_args = "-static -Wl,--section-start=.MIPS.options=$ala";
++   } else {
++      $extra_args = "-static -Wl,--section-start=.reginfo=$ala";
++   }
+ } else {
+    $extra_args = "-static -Wl,@FLAG_T_TEXT@=$ala";
+ }

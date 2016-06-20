@@ -11,5 +11,5 @@ index ccf8abb..3f6fc1c 100644
 @@ -7,3 +7,4 @@ Exec=pcmanfm --desktop-pref
  StartupNotify=true
  Terminal=false
- NotShowIn=GNOME;XFCE;KDE;
+ NotShowIn=GNOME;XFCE;KDE;MATE;
 +NoDisplay=true

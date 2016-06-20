@@ -26,5 +26,3 @@ PACKAGECONFIG[libvirt] = "--enable-libvirt,--disable-libvirt,libvirt"
 inherit autotools gettext pkgconfig
 
 BBCLASSEXTEND = "native nativesdk"
-
-FILES_${PN}-dbg += "${libexecdir}/systemtap/.debug"

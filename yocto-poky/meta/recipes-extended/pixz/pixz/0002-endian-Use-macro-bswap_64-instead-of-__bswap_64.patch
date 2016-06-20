@@ -1,0 +1,47 @@
+From 5f3a535987bae4c3e3d9e9079c7526e399f7aecd Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 22 Mar 2016 07:42:39 +0000
+Subject: [PATCH 2/2] endian: Use macro bswap_64 instead of __bswap_64
+
+byteswap.h defines then as public APIs on all libc
+on linux including musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted
+ src/endian.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/endian.c b/src/endian.c
+index b7724f3..51aea58 100644
+--- a/src/endian.c
++++ b/src/endian.c
+@@ -15,6 +15,7 @@ void xle64enc(uint8_t *d, uint64_t n) {
+ #include <stdint.h>
+ #ifdef __linux__
+ 	#include <endian.h>
++	#include <byteswap.h>
+ #else
+ 	#include <sys/endian.h>
+ #endif
+@@ -23,7 +24,7 @@ void xle64enc(uint8_t *d, uint64_t n) {
+ # if __BYTE_ORDER == __LITTLE_ENDIAN
+ #  define htole64(x) (x)
+ # else
+-#  define htole64(x) __bswap_64 (x)
++#  define htole64(x) bswap_64 (x)
+ # endif
+ #endif
+ 
+@@ -31,7 +32,7 @@ void xle64enc(uint8_t *d, uint64_t n) {
+ # if __BYTE_ORDER == __LITTLE_ENDIAN
+ #  define le64toh(x) (x)
+ # else
+-#  define le64toh(x) __bswap_64 (x)
++#  define le64toh(x) bswap_64 (x)
+ # endif
+ #endif
+ 
+-- 
+1.8.3.1
+

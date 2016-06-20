@@ -1,0 +1,49 @@
+#! /bin/sh 
+#
+# This is an init script for openembedded
+# Copy it to /etc/init.d/rng-tools and type
+# > update-rc.d rng-tools defaults 60
+#
+
+rngd=/usr/sbin/rngd
+test -x "$rngd" || exit 1
+
+if [ -e /etc/default/rng-tools ]; then
+    . /etc/default/rng-tools
+fi
+
+if [ -n "$RNG_DEVICE" ]; then
+    EXTRA_ARGS="-- -r $RNG_DEVICE"
+fi
+
+
+case "$1" in
+  start)
+    echo -n "Starting random number generator daemon"
+    start-stop-daemon -S -q -x $rngd $EXTRA_ARGS
+    echo "."
+    ;;
+  stop)
+    echo -n "Stopping random number generator daemon"
+    start-stop-daemon -K -q -n rngd
+    echo "."
+    ;;
+  reload|force-reload)
+    echo -n "Signalling rng daemon restart"
+    start-stop-daemon -K -q -s 1 -x $rngd
+    start-stop-daemon -K -q -s 1 -x $rngd
+    ;;
+  restart)
+    echo -n "Stopping random number generator daemon"
+    start-stop-daemon -K -q -n rngd
+    echo "."
+    echo -n "Starting random number generator daemon"
+    start-stop-daemon -S -q -x $rngd $EXTRA_ARGS
+    echo "."
+    ;;
+  *)
+    echo "Usage: /etc/init.d/rng-tools {start|stop|reload|restart|force-reload}"
+    exit 1
+esac
+
+exit 0

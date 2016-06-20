@@ -1,0 +1,64 @@
+Upstream-Status: Rejected
+
+Subject: uname: report processor and hardware correctly
+
+This patch is rejected by coreutils upstream, but distros like debian and fedora
+uses this patch to make `uname -i' and `uname -p' to not report 'unknown'.
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/uname.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/src/uname.c b/src/uname.c
+index 39bd28c..c84582d 100644
+--- a/src/uname.c
++++ b/src/uname.c
+@@ -299,13 +299,19 @@ main (int argc, char **argv)
+ 
+   if (toprint & PRINT_PROCESSOR)
+     {
+-      char const *element = unknown;
++      char *element = unknown;
+ #if HAVE_SYSINFO && defined SI_ARCHITECTURE
+       {
+         static char processor[257];
+         if (0 <= sysinfo (SI_ARCHITECTURE, processor, sizeof processor))
+           element = processor;
+       }
++#else
++      {
++	static struct utsname u;
++	uname(&u);
++	element = u.machine;
++      }
+ #endif
+ #ifdef UNAME_PROCESSOR
+       if (element == unknown)
+@@ -343,7 +349,7 @@ main (int argc, char **argv)
+ 
+   if (toprint & PRINT_HARDWARE_PLATFORM)
+     {
+-      char const *element = unknown;
++      char *element = unknown;
+ #if HAVE_SYSINFO && defined SI_PLATFORM
+       {
+         static char hardware_platform[257];
+@@ -361,6 +367,14 @@ main (int argc, char **argv)
+           if (sysctl (mib, 2, hardware_platform, &s, 0, 0) >= 0)
+             element = hardware_platform;
+         }
++#else
++      {
++	static struct utsname u;
++	uname(&u);
++	element = u.machine;
++	if(strlen(element)==4 && element[0]=='i' && element[2]=='8' && element[3]=='6')
++	  element[1]='3';
++      }
+ #endif
+       if (! (toprint == UINT_MAX && element == unknown))
+         print_element (element);
+-- 
+1.9.1
+

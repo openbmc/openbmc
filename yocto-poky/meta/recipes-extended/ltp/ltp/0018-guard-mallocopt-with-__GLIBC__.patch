@@ -1,0 +1,32 @@
+From f42b060e80c9f40627c712d4d56d45221bd7d9fa Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 8 Jan 2016 06:51:20 +0000
+Subject: [PATCH 18/32] guard mallocopt() with __GLIBC__
+
+mallocopt is not available on non glibc implementations
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ utils/benchmark/ebizzy-0.3/ebizzy.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/utils/benchmark/ebizzy-0.3/ebizzy.c b/utils/benchmark/ebizzy-0.3/ebizzy.c
+index 5bb8eff..934d951 100644
+--- a/utils/benchmark/ebizzy-0.3/ebizzy.c
++++ b/utils/benchmark/ebizzy-0.3/ebizzy.c
+@@ -215,10 +215,10 @@ static void read_options(int argc, char *argv[])
+ 			"\"never mmap\" option specified\n");
+ 		usage();
+ 	}
+-
++#ifdef __GLIBC__
+ 	if (never_mmap)
+ 		mallopt(M_MMAP_MAX, 0);
+-
++#endif
+ 	if (chunk_size < record_size) {
+ 		fprintf(stderr, "Chunk size %u smaller than record size %u\n",
+ 			chunk_size, record_size);
+-- 
+2.7.0
+

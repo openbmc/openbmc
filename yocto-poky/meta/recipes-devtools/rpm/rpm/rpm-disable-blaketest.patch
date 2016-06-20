@@ -1,0 +1,28 @@
+rpmio: Disable building of the tblake2 test(s).
+
+There is some type of a dependency fault here that can occasionally result in:
+
+gcc: error: tblake2b.o: No such file or directory
+or
+gcc: error: tblake2bp.o: No such file or directory
+
+These items are simply test cases that are not packaged, so they can be
+safely disabled to resolve the dependency issue.
+
+Upstream-Status: Inappropriate [workaround]
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.15/rpmio/Makefile.am
+===================================================================
+--- rpm-5.4.15.orig/rpmio/Makefile.am
++++ rpm-5.4.15/rpmio/Makefile.am
+@@ -29,7 +29,7 @@ EXTRA_PROGRAMS += bsdiff bspatch pcrsed
+ 	tmire todbc toid tperl tpython tput trpmio tsexp tsvn tsw ttcl \
+ 	dumpasn1 lookup3 trel twitter github tmicrojson duk
+ 
+-noinst_PROGRAMS += b2sum tset tblake2b tblake2bp tblake2s tblake2sp tgfs
++#noinst_PROGRAMS += b2sum tset tblake2b tblake2bp tblake2s tblake2sp tgfs
+ if WITH_LIBGIT2
+ noinst_PROGRAMS += tgit
+ else

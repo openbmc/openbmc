@@ -1,2 +1,2 @@
 #!/bin/sh
-make -k THIS_SH=/bin/bash BUILD_DIR=. srcdir=.  runtest
+make -k THIS_SH=/bin/bash BUILD_DIR=`pwd` srcdir=`pwd`  runtest

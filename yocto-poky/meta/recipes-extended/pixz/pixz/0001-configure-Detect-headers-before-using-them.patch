@@ -1,0 +1,51 @@
+From c84480be8df6966c538d1fb67ccae2f42cc46421 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 22 Mar 2016 07:36:54 +0000
+Subject: [PATCH 1/2] configure: Detect headers before using them
+
+Current logic does not work when system does not have
+sys/endian.h, since it tried to reuse the cached results
+from first try of detecting htole64 in sys/endian.h which is
+'no' and hence the second try to look into endian.h also
+comes out negative.
+
+So we check for header and then run the test for symbols
+and these symbols are not standard and we need to define _GNU_SOURCE
+for it to work, this issue is exposed by systems using musl e.g.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted
+
+ configure.ac | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 4cb56bc..5e23c50 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -69,12 +69,17 @@ AC_FUNC_MALLOC
+ AC_FUNC_REALLOC
+ AC_FUNC_STRTOD
+ AC_CHECK_FUNCS([memchr memmove memset strerror strtol])
+-AC_CHECK_DECLS([htole64, le64toh],
+-               [],
++AC_CHECK_HEADER([sys/endian.h],
+                [
+-                 AC_CHECK_DECLS([htole64, le64toh], [], [], [#include <endian.h>])
++                 AC_CHECK_DECLS([htole64, le64toh], [], [], [#define _GNU_SOURCE 1 #include <sys/endian.h>])
+                ],
+-               [#include <sys/endian.h>])
++               [], [])
++
++AC_CHECK_HEADER([endian.h],
++               [
++                 AC_CHECK_DECLS([htole64, le64toh], [], [], [#define _GNU_SOURCE 1 #include <endian.h>])
++               ],
++               [], [])
+ 
+ AC_CONFIG_FILES([Makefile
+                  src/Makefile
+-- 
+1.8.3.1
+

@@ -1,0 +1,30 @@
+From 7c4f8d87473d6238c120ec6031b58f83a17a39a5 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Mon, 28 Dec 2015 22:52:06 -0800
+Subject: [PATCH] configure.ac: fix LIBPL
+
+Use LIBDIR rather than prefix/lib, so that it would work when lib64.
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ configure.ac |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 63aef8e..aefb27f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -4366,7 +4366,7 @@ AC_MSG_RESULT($LDVERSION)
+ 
+ dnl define LIBPL after ABIFLAGS and LDVERSION is defined.
+ AC_SUBST(PY_ENABLE_SHARED)
+-LIBPL='$(prefix)'"/lib/python${VERSION}/config-${LDVERSION}"
++LIBPL='$(LIBDIR)'"/python${VERSION}/config-${LDVERSION}"
+ AC_SUBST(LIBPL)
+ 
+ # Check whether right shifting a negative integer extends the sign bit
+-- 
+1.7.9.5
+

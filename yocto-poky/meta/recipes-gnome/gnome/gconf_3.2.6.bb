@@ -3,11 +3,9 @@ SECTION = "x11/gnome"
 LICENSE = "LGPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=55ca817ccb7d5b5b66355690e9abc605"
 
-DEPENDS = "glib-2.0 dbus dbus-glib libxml2 intltool-native gobject-introspection-stub"
-DEPENDS_class-native = "glib-2.0-native dbus-native dbus-glib-native libxml2-native intltool-native gnome-common-native gobject-introspection-stub-native"
+DEPENDS = "glib-2.0 dbus dbus-glib libxml2 intltool-native"
 
-
-inherit gnomebase gtk-doc gettext
+inherit gnomebase gtk-doc gettext gobject-introspection gio-module-cache
 
 SRC_URI = "${GNOME_MIRROR}/GConf/${@gnome_verdir("${PV}")}/GConf-${PV}.tar.xz;name=archive \
            file://remove_plus_from_invalid_characters_list.patch \
@@ -19,8 +17,8 @@ SRC_URI[archive.sha256sum] = "1912b91803ab09a5eed34d364bf09fe3a2a9c96751fde03a4e
 
 S = "${WORKDIR}/GConf-${PV}"
 
-EXTRA_OECONF = "--enable-shared --disable-static --enable-debug=yes \
-                --disable-introspection --disable-orbit --with-openldap=no --disable-gtk"
+EXTRA_OECONF = "--enable-shared --disable-static \
+                --disable-orbit --with-openldap=no --disable-gtk"
 
 # Disable PolicyKit by default
 PACKAGECONFIG ??= ""
@@ -29,6 +27,7 @@ PACKAGECONFIG_class-native = ""
 PACKAGECONFIG_libc-uclibc = ""
 
 PACKAGECONFIG[policykit] = "--enable-defaults-service,--disable-defaults-service,polkit"
+PACKAGECONFIG[debug] = "--enable-debug=yes, --enable-debug=minimum"
 
 do_install_append() {
 	# this directory need to be created to avoid an Error 256 at gdm launch
@@ -44,17 +43,12 @@ do_install_append_class-native() {
 		GCONF_BACKEND_DIR=${STAGING_LIBDIR_NATIVE}/GConf/2
 }
 
-# disable dbus-x11 when x11 isn't in DISTRO_FEATURES
-RDEPENDS_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'dbus-x11', '', d)}"
-RDEPENDS_${PN}_class-native = ""
-
 FILES_${PN} += "${libdir}/GConf/* \
                 ${libdir}/gio/*/*.so \
                 ${datadir}/polkit* \
                 ${datadir}/dbus-1/services/*.service \
                 ${datadir}/dbus-1/system-services/*.service \
                "
-FILES_${PN}-dbg += "${libdir}/*/*/.debug"
 FILES_${PN}-dev += "${datadir}/sgml/gconf/gconf-1.0.dtd"
 
 BBCLASSEXTEND = "native"

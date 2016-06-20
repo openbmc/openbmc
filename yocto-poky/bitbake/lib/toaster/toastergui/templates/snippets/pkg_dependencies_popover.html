@@ -1,0 +1,14 @@
+{# Popover that displays the dependences and sizes of a package 'data' used in the Packages table #}
+{% with data.package_dependencies_source.all_depends.count as dep_count %}
+{% load projecttags %}
+{% if dep_count %}
+ <a data-content="<ul class='unstyled'>
+   {% for dep in data.package_dependencies_source.all_depends %}
+  <li>{{dep.depends_on.name}} {% if dep.depends_on.size > 0 %}({{dep.depends_on.size|filtered_filesizeformat}}){% endif %}</li>
+    {% endfor %}
+  </ul>" title="" class="btn" data-original-title="
+  <strong>{{data.name}}</strong> dependencies - <strong>{{data.package_dependencies_source.get_total_source_deps_size.depends_on__size__sum|filtered_filesizeformat}}</strong>">
+    {{dep_count}}
+</a>
+{% endif %}
+{% endwith %}

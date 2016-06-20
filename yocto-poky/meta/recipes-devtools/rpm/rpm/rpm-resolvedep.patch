@@ -3,7 +3,7 @@ lib/rpmts.c: Ensure that we check both providename and filepaths
 When looking up a missing dependencies, such as /bin/sh, we need to lookup
 in both the providename and filepaths DB, not just the filepaths DB.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [RPM5 maintainer]
 
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
 

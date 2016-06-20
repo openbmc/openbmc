@@ -471,7 +471,7 @@
                 Following is the usage and syntax for BitBake:
                 <literallayout class='monospaced'>
      $ bitbake -h
-     Usage: bitbake [options] [recipename/target ...]
+     Usage: bitbake [options] [recipename/target recipe:do_task ...]
 
          Executes the specified task (default is 'build') for a given set of target recipes (.bb files).
          It is assumed there is a conf/bblayers.conf available in cwd or in BBPATH which
@@ -529,9 +529,11 @@
        -l DEBUG_DOMAINS, --log-domains=DEBUG_DOMAINS
                              Show debug logging for the specified logging domains
        -P, --profile         Profile the command and save reports.
-       -u UI, --ui=UI        The user interface to use (e.g. knotty, hob, depexp).
+       -u UI, --ui=UI        The user interface to use (depexp, goggle, hob, knotty
+                             or ncurses - default knotty).
        -t SERVERTYPE, --servertype=SERVERTYPE
-                             Choose which server to use, process or xmlrpc.
+                             Choose which server type to use (process or xmlrpc -
+                             default process).
        --token=XMLRPCTOKEN   Specify the connection token to be used when
                              connecting to a remote server.
        --revisions-changed   Set the exit code depending on whether upstream
@@ -546,6 +548,10 @@
        -m, --kill-server     Terminate the remote server.
        --observe-only        Connect to a server as an observing-only client.
        --status-only         Check the status of the remote bitbake server.
+       -w WRITEEVENTLOG, --write-log=WRITEEVENTLOG
+                             Writes the event log of the build to a bitbake event
+                             json file. Use '' (empty string) to assign the name
+                             automatically.
                 </literallayout>
             </para>
         </section>

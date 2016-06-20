@@ -1,0 +1,23 @@
+Fix test_proc_kill hanging
+
+Sometimes the signal is delivered to memcg_process before the framework took
+into consideration its pid entered in the tasks. Fixed by delaying the signal
+send command.
+
+Signed-off-by: George Nita <george.nita@enea.com>
+Upstream-Status: Pending 
+
+diff --git a/testcases/kernel/controllers/memcg/functional/memcg_lib.sh b/testcases/kernel/controllers/memcg/functional/memcg_lib.sh
+index ffbe006..e81bf74 100755
+--- a/testcases/kernel/controllers/memcg/functional/memcg_lib.sh
++++ b/testcases/kernel/controllers/memcg/functional/memcg_lib.sh
+@@ -220,8 +220,8 @@ test_proc_kill()
+ 
+ 	$TEST_PATH/memcg_process $2 -s $3 &
+ 	pid=$!
+-	sleep 1
+ 	echo $pid > tasks
++	sleep 1
+ 
+ 	kill -s USR1 $pid 2> /dev/null
+ 	sleep 1

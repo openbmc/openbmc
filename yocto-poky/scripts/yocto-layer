@@ -75,7 +75,11 @@ def yocto_layer_create_subcommand(args, usage_str):
     if options.outdir:
         layer_output_dir = options.outdir
     else:
-        layer_output_dir = "meta-" + layer_name
+        prefix="meta-"
+        if not layer_name.startswith(prefix):
+            layer_output_dir="%s%s"%(prefix,layer_name)
+        else:
+            layer_output_dir=layer_name
 
     yocto_layer_create(layer_name, scripts_path, layer_output_dir, options.codedump, options.properties_file, properties)
 
@@ -142,6 +146,6 @@ if __name__ == "__main__":
     except Exception:
         ret = 1
         import traceback
-        traceback.print_exc(5)
+        traceback.print_exc()
     sys.exit(ret)
 

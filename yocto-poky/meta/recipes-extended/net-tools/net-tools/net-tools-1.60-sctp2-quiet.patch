@@ -1,0 +1,28 @@
+From 14287b594e1f02b811f889fb515c1a51b72c08d4 Mon Sep 17 00:00:00 2001
+From: Li Zhou <li.zhou@windriver.com>
+Date: Thu, 14 Jan 2016 17:07:48 +0800
+Subject: [PATCH 2/3] net-tools: add SCTP support for netstat
+
+Upstream-Status: pending
+
+Signed-off-by: Li Zhou <li.zhou@windriver.com>
+---
+ netstat.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/netstat.c b/netstat.c
+index 5d1a4a1..56a15c2 100644
+--- a/netstat.c
++++ b/netstat.c
+@@ -2104,7 +2104,7 @@ int main
+ 	usage();
+ 
+     if ((flag_inet || flag_inet6 || flag_sta) && !(flag_tcp || flag_udp || flag_sctp || flag_raw))
+-	flag_tcp = flag_udp = flag_sctp = flag_raw = 1;
++	flag_tcp = flag_udp = flag_raw = 1;
+ 
+     if ((flag_tcp || flag_udp || flag_sctp || flag_raw || flag_igmp) && !(flag_inet || flag_inet6))
+         flag_inet = flag_inet6 = 1;
+-- 
+1.8.5.2.233.g932f7e4
+

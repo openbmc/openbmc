@@ -41,12 +41,12 @@ from distutils import spawn
 # External modules
 scripts_path = os.path.abspath(os.path.dirname(__file__))
 lib_path = scripts_path + '/lib'
-sys.path.append(lib_path)
+sys.path.insert(0, lib_path)
 
 bitbake_exe = spawn.find_executable('bitbake')
 if bitbake_exe:
     bitbake_path = os.path.join(os.path.dirname(bitbake_exe), '../lib')
-    sys.path.append(bitbake_path)
+    sys.path.insert(0, bitbake_path)
     from bb import cookerdata
     from bb.main import bitbake_main, BitBakeConfigParameters
 else:

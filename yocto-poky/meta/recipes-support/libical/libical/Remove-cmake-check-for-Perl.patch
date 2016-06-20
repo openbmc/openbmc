@@ -1,0 +1,33 @@
+From 918cd8764a845a9d25918a444fbaa5070d2be609 Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Fri, 21 Aug 2015 16:38:05 +0300
+Subject: [PATCH] Remove cmake check for Perl
+
+We set "CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY" in cmake bbclass to
+make sure cmake does not find host programs. In this case we actually
+are fine with host perl: remove the check.
+
+Upstream-Status: Inappropriate [workaround]
+
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ CMakeLists.txt | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index d5aad80..5cc9863 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -91,8 +91,7 @@ if(SHARED_ONLY)
+   set(LIBRARY_TYPE SHARED)
+ endif()
+ 
+-# must have Perl to create the derived stuff
+-find_package(Perl REQUIRED)
++set(PERL_EXECUTABLE perl)
+ 
+ # MSVC specific definitions
+ if(WIN32)
+-- 
+2.1.4
+

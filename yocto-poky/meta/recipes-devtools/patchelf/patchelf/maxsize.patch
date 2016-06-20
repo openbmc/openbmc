@@ -1,0 +1,30 @@
+From f6886c2c33a1cf8771163919f3d20f6340c0ce38 Mon Sep 17 00:00:00 2001
+From: Eelco Dolstra <eelco.dolstra@logicblox.com>
+Date: Fri, 10 Jul 2015 18:12:37 +0200
+Subject: [PATCH] Quick fix for #47
+
+https://github.com/NixOS/patchelf/issues/47
+
+Avoid issues with holes in binaries such as qemu-pcc from qemu-native.
+
+Upstream-Status: Submitted
+RP
+2016/2/3
+
+---
+ src/patchelf.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/patchelf.cc b/src/patchelf.cc
+index 8566ed9..df75593 100644
+--- a/src/patchelf.cc
++++ b/src/patchelf.cc
+@@ -248,7 +248,7 @@ static void readFile(string fileName, mode_t * fileMode)
+     if (stat(fileName.c_str(), &st) != 0) error("stat");
+     fileSize = st.st_size;
+     *fileMode = st.st_mode;
+-    maxSize = fileSize + 8 * 1024 * 1024;
++    maxSize = fileSize + 64 * 1024 * 1024;
+ 
+     contents = (unsigned char *) malloc(fileSize + maxSize);
+     if (!contents) abort();

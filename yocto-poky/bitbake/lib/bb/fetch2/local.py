@@ -45,6 +45,7 @@ class Local(FetchMethod):
         ud.decodedurl = urllib.unquote(ud.url.split("://")[1].split(";")[0])
         ud.basename = os.path.basename(ud.decodedurl)
         ud.basepath = ud.decodedurl
+        ud.needdonestamp = False
         return
 
     def localpath(self, urldata, d):

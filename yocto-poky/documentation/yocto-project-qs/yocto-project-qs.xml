@@ -60,7 +60,7 @@
         </para>
 
         <para>
-            This quick start is written so that you can quickly get a host
+            This quick start is written so that you can quickly get a
             build host set up to use the Yocto Project and then build some
             Linux images.
             Rather than go into great detail about the Yocto Project and its
@@ -71,7 +71,7 @@
             basic understanding of what the Yocto Project is and how to use
             some of its core components.
             You will also have worked through steps to produce two images:
-            one suitable for emulation and one that can be used on actual
+            one that is suitable for emulation and one that boots on actual
             hardware.
             The examples highlight the ease with which you can use the
             Yocto Project to create images for multiple types of hardware.
@@ -249,7 +249,7 @@
                 Git, tar, and Python.
                 <itemizedlist>
                     <listitem><para>
-                        Git 1.7.8 or greater
+                        Git 1.8.3.1 or greater
                         </para></listitem>
                     <listitem><para>
                         tar 1.24 or greater
@@ -360,7 +360,7 @@
      remote: Total 226790 (delta 165212), reused 225887 (delta 164327)
      Receiving objects: 100% (226790/226790), 100.98 MiB | 263 KiB/s, done.
      Resolving deltas: 100% (165212/165212), done.
-     $ git checkout &DISTRO_NAME;
+     $ git checkout &DISTRO_NAME_NO_CAP;
                 </literallayout>
                 You can also get the Yocto Project Files by downloading
                 Yocto Project releases from the
@@ -381,8 +381,19 @@
 
         <para>
             Now that you have your system requirements in order, you can give
-            the Yocto Project a try.
-            This section presents steps that let you do the following:
+            Yocto Project a try.
+            You can try out Yocto Project using either the command-line
+            interface or using Toaster, which uses a graphical user
+            interface.
+            If you want to try out the Yocto Project using a GUI, see the
+            <ulink url='&YOCTO_DOCS_TOAST_URL;'>Toaster User Manual</ulink>
+            for information on how to install and set up Toaster.
+        </para>
+
+        <para>
+            You can try out the Yocto Project using the command-line interface
+            by finishing this quick start, which presents steps that let you
+            do the following:
             <itemizedlist>
                 <listitem><para>
                     Build a <filename>qemux86</filename> reference image
@@ -453,12 +464,12 @@
                     Release:
                     <literallayout class='monospaced'>
      $ cd ~/poky
-     $ git checkout -b &DISTRO_NAME; origin/&DISTRO_NAME;
+     $ git checkout -b &DISTRO_NAME_NO_CAP; origin/&DISTRO_NAME_NO_CAP;
                     </literallayout>
                     Git's <filename>checkout</filename> command checks out
                     the current Yocto Project release into a local branch
                     whose name matches the release (i.e.
-                    <filename>&DISTRO_NAME;</filename>).
+                    <filename>&DISTRO_NAME_NO_CAP;</filename>).
                     The local branch tracks the upstream branch of the
                     same name.
                     Creating your own branch based on the released
@@ -539,7 +550,7 @@
                             in the target image.</para>
                             <para>For additional package manager selection
                             information, see the
-                            "<ulink url='&YOCTO_DOCS_REF_URL;#ref-classes-package'><filename>package*.bbclass</filename></ulink>"
+                            "<ulink url='&YOCTO_DOCS_REF_URL;#ref-classes-package'><filename>package.bbclass</filename></ulink>"
                             section in the Yocto Project Reference Manual.
                             </para></listitem>
                     </itemizedlist>
@@ -587,7 +598,7 @@
             </orderedlist>
         </para>
 
-        <para>
+        <para id='qs-minnowboard-example'>
             The following steps show how easy it is to set up to build an
             image for a new machine.
             These steps build an image for the MinnowBoard MAX, which is
@@ -610,16 +621,35 @@
                     Building an image for the MinnowBoard MAX requires the
                     <filename>meta-intel</filename> layer.
                     Use the <filename>git clone</filename> command to create
-                    a local copy of the repository:
+                    a local copy of the repository inside your
+                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>,
+                    which is <filename>poky</filename> in this example:
                     <literallayout class='monospaced'>
+     $ cd $HOME/poky
      $ git clone git://git.yoctoproject.org/meta-intel
      Cloning into 'meta-intel'...
-     remote: Counting objects: 10824, done.
-     remote: Compressing objects: 100% (3508/3508), done.
-     remote: Total 10824 (delta 6219), reused 10580 (delta 5975)
-     Receiving objects: 100% (10824/10824), 2.72 MiB | 482.00 KiB/s, done.
-     Resolving deltas: 100% (6219/6219), done.
+     remote: Counting objects: 11988, done.
+     remote: Compressing objects: 100% (3884/3884), done.
+     Receiving objects: 100% (11988/11988), 2.93 MiB | 2.51 MiB/s, done.
+     remote: Total 11988 (delta 6881), reused 11752 (delta 6645)
+     Resolving deltas: 100% (6881/6881), done.
      Checking connectivity... done.
+                    </literallayout>
+                    By default when you clone a Git repository, the
+                    "master" branch is checked out.
+                    Before you build your image that uses the
+                    <filename>meta-intel</filename> layer, you must be
+                    sure that both repositories
+                    (<filename>meta-intel</filename> and
+                    <filename>poky</filename>) are using the same releases.
+                    Consequently, you need to checkout out the
+                    "<filename>&DISTRO_NAME_NO_CAP;</filename>" release after
+                    cloning <filename>meta-intel</filename>:
+                    <literallayout class='monospaced'>
+     $ cd $HOME/poky/meta-intel
+     $ git checkout &DISTRO_NAME_NO_CAP;
+     Branch &DISTRO_NAME_NO_CAP; set up to track remote branch &DISTRO_NAME_NO_CAP; from origin.
+     Switched to a new branch '&DISTRO_NAME_NO_CAP;'
                     </literallayout>
                     </para></listitem>
                 <listitem><para><emphasis>Configure the Build:</emphasis>
@@ -639,7 +669,8 @@
                     <ulink url='&YOCTO_DOCS_REF_URL;#var-MACHINE'><filename>MACHINE</filename></ulink>
                     variable.
                     <literallayout class='monospaced'>
-     $ bitbake-layers add-layer "$HOME/source/poky/meta-intel"
+     $ cd $HOME/poky/build
+     $ bitbake-layers add-layer "$HOME/poky/meta-intel"
      $ echo 'MACHINE = "intel-corei7-64"' >> conf/local.conf
                     </literallayout>
                     <note><title>Notes</title>
@@ -725,7 +756,7 @@
 
         <para>
             If you completed all the steps in the previous section then
-            congratulations to you!
+            congratulations!
             What now?
         </para>
 
@@ -740,36 +771,41 @@
                     Visiting this site is a good way to familiarize yourself
                     with the overall project.
                     </para></listitem>
-                <listitem><para><emphasis>Explore Development Models:</emphasis>
-                    You can see the
-                    "<ulink url='&YOCTO_DOCS_DEV_URL;#dev-manual-model'>Common Development Models</ulink>"
-                    section in the Yocto Project Development Manual
-                    to get an overview of the various ways by which
-                    you can use the Yocto Project to develop projects.
+                <listitem><para><emphasis>Look Through the Yocto Project Development Manual:</emphasis>
+                    The
+                    <ulink url='&YOCTO_DOCS_DEV_URL;#dev-manual-intro'>Yocto Project Development Manual</ulink>
+                    is a great place to get a feel for how to use the Yocto
+                    Project.
+                    The manual contains conceptual and procedural information
+                    that covers
+                    <ulink url='&YOCTO_DOCS_DEV_URL;#dev-manual-model'>common development models</ulink>
+                    and introduces
+                    <ulink url='&YOCTO_DOCS_DEV_URL;#dev-manual-newbie'>the Yocto Project open source development environment</ulink>.
+                    The manual also contains several targeted sections that
+                    cover specific
+                    <ulink url='&YOCTO_DOCS_DEV_URL;#extendpoky'>common tasks</ulink>
+                    such as understanding and creating layers, customizing
+                    images, writing new recipes, working with libraries, and
+                    configuring and patching the kernel.
                     </para></listitem>
-                <listitem><para><emphasis>Learn Some Open Source Basics:</emphasis>
-                    If you are new to the open source environment, you might
-                    read the
-                    "<ulink url='&YOCTO_DOCS_DEV_URL;#dev-manual-newbie'>The Yocto Project Open Source Development Environment</ulink>"
-                    chapter of the Yocto Project Development Manual.
-                    This chapter presents overview material for open source
-                    development in the context of the Yocto Project.
-                    </para></listitem>
-                <listitem><para><emphasis>Learn About Application Development:</emphasis>
-                    If your primary interests lie in developing applications,
-                    you can reference the
-                    <ulink url='&YOCTO_DOCS_ADT_URL;#adt-manual-intro'>Yocto Project Application Developer's Guide</ulink>.
+                <listitem><para><emphasis>Look Through the Yocto Project Software Development Kit (SDK) Developer's Guide:</emphasis>
+                    The
+                    <ulink url='&YOCTO_DOCS_SDK_URL;#sdk-intro'>Yocto Project Software Development Kit (SDK) Developer's Guide</ulink>
+                    describes how to use both the
+                    <ulink url='&YOCTO_DOCS_SDK_URL;#sdk-using-the-standard-sdk'>standard SDK</ulink>
+                    and the
+                    <ulink url='&YOCTO_DOCS_SDK_URL;#sdk-extensible'>extensible SDK</ulink>,
+                    which are used primarily for application development.
+                    This manual also provides an example workflow that uses
+                    the popular <trademark class='trade'>Eclipse</trademark>
+                    development environment.
+                    See the
+                    "<ulink url='&YOCTO_DOCS_SDK_URL;#workflow-using-eclipse'>Workflow using Eclipse™</ulink>"
+                    section.
                     </para></listitem>
                 <listitem><para><emphasis>Learn About Board Support Packages (BSPs):</emphasis>
                     If you want to learn about BSPs, see the
                     <ulink url='&YOCTO_DOCS_BSP_URL;#bsp'>Yocto Project Board Support Packages (BSP) Developer's Guide</ulink>.
-                    </para></listitem>
-                <listitem><para><emphasis>Learn About Using Eclipse With the Yocto Project:</emphasis>
-                    If you are an Eclipse user, you can learn about using the
-                    Yocto Project in that development environment by reading
-                    the
-                    "<ulink url='&YOCTO_DOCS_DEV_URL;#workflow-using-the-adt-and-eclipse'>Workflow Using the ADT and Eclipse™</ulink>"
-                    section in the Yocto Project Development Manual.
                     </para></listitem>
                 <listitem><para><emphasis>Learn About Toaster:</emphasis>
                     Toaster is a web interface to the Yocto Project's
@@ -778,13 +814,30 @@
                     create images, see the
                     <ulink url='&YOCTO_DOCS_TOAST_URL;#toaster-manual-intro'>Toaster User Manual</ulink>.
                     </para></listitem>
-                <listitem><para><emphasis>Explore Yocto Project Common Tasks and Technical Details:</emphasis>
-                    If you are interested in a mix of common tasks that have to
-                    do with project develop using the Yocto Project, see the
-                    "<ulink url='&YOCTO_DOCS_DEV_URL;#extendpoky'>Common Tasks</ulink>"
-                    section of the Yocto Project Development Manual.
-                    If you want more detail, see the
-                    <ulink url='&YOCTO_DOCS_REF_URL;#ref-manual-intro'>Yocto Project Reference Manual</ulink>.
+                <listitem><para><emphasis>Have Available the Yocto Project Reference Manual</emphasis>
+                    The
+                    <ulink url='&YOCTO_DOCS_REF_URL;#ref-manual-intro'>Yocto Project Reference Manual</ulink>,
+                    unlike the rest of the Yocto Project manual set, is
+                    comprised of material suited for reference rather than
+                    procedures.
+                    You can get
+                    <ulink url='&YOCTO_DOCS_REF_URL;#usingpoky'>build details</ulink>,
+                    a
+                    <ulink url='&YOCTO_DOCS_REF_URL;#closer-look'>closer look</ulink>
+                    at how the pieces of the Yocto Project development
+                    environment work together, information on various
+                    <ulink url='&YOCTO_DOCS_REF_URL;#technical-details'>technical details</ulink>,
+                    guidance on
+                    <ulink url='&YOCTO_DOCS_REF_URL;#migration'>migrating to a newer Yocto Project release</ulink>,
+                    reference material on the
+                    <ulink url='&YOCTO_DOCS_REF_URL;#ref-structure'>directory structure</ulink>,
+                    <ulink url='&YOCTO_DOCS_REF_URL;#ref-classes'>classes</ulink>,
+                    and
+                    <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks'>tasks</ulink>.
+                    The Yocto Project Reference Manual also contains a fairly
+                    comprehensive
+                    <ulink url='&YOCTO_DOCS_REF_URL;#ref-variables-glossary'>glossary of variables</ulink>
+                    used within the Yocto Project.
                     </para></listitem>
             </itemizedlist>
         </para>

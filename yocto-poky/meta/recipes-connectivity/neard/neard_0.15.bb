@@ -43,7 +43,6 @@ do_install_append() {
 PACKAGES =+ "${PN}-tests"
 
 FILES_${PN}-tests = "${libdir}/${BPN}/*-test"
-FILES_${PN}-dbg += "${libdir}/${BPN}/*/.debug"
 
 RDEPENDS_${PN} = "dbus python python-dbus python-pygobject"
 

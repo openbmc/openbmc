@@ -81,11 +81,13 @@ can be found then it should be implemented.  I can't find one at the moment.
 
                 <para>
                     The specified package contains files in
-                    <filename>/usr/libexec</filename>.
-                    By default, <filename>libexecdir</filename> is set to
-                    "${libdir}/${BPN}" rather than to "/usr/libexec".
-                    Thus, installing to <filename>/usr/libexec</filename>
-                    is likely not desirable.
+                    <filename>/usr/libexec</filename> when the distro
+                    configuration uses a different path for
+                    <filename>&lt;libexecdir&gt;</filename>
+                    By default, <filename>&lt;libexecdir&gt;</filename> is
+                    <filename>$prefix/libexec</filename>.
+                    However, this default can be changed (e.g.
+                    <filename>${libdir}</filename>).
                 </para>
 
                 <para>

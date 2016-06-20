@@ -14,7 +14,7 @@ This patch changes the list of supported items to:
   <arch>-<vendor>-<os>
   <arch>-<vendor>-<os>-<extension>
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [RPM5 maintainer]
 
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
 

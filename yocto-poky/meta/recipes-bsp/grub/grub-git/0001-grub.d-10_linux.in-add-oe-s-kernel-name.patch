@@ -1,0 +1,56 @@
+From b512c77222a8b133d7dd71a0dcef081a921d97d4 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 13 Jan 2016 19:28:00 +0000
+Subject: [PATCH] grub.d/10_linux.in: add oe's kernel name
+
+Our kernel's name is bzImage, we need add it to grub.d/10_linux.in so
+that the grub-mkconfig and grub-install can work correctly.
+
+We only need add the bzImage to util/grub.d/10_linux.in, but also add it
+to util/grub.d/20_linux_xen.in to keep compatibility.
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Inappropriate [OE specific]
+
+ util/grub.d/10_linux.in     | 6 +++---
+ util/grub.d/20_linux_xen.in | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
+index 859b608..946be5d 100644
+--- a/util/grub.d/10_linux.in
++++ b/util/grub.d/10_linux.in
+@@ -148,12 +148,12 @@ machine=`uname -m`
+ case "x$machine" in
+     xi?86 | xx86_64)
+ 	list=
+-	for i in /boot/vmlinuz-* /vmlinuz-* /boot/kernel-* ; do
++	for i in /boot/bzImage-* /bzImage-* /boot/vmlinuz-* /vmlinuz-* /boot/kernel-* ; do
+ 	    if grub_file_is_not_garbage "$i" ; then list="$list $i" ; fi
+ 	done ;;
+-    *) 
++    *)
+ 	list=
+-	for i in /boot/vmlinuz-* /boot/vmlinux-* /vmlinuz-* /vmlinux-* /boot/kernel-* ; do
++	for i in /boot/bzImage-* /boot/vmlinuz-* /boot/vmlinux-* /bzImage-* /vmlinuz-* /vmlinux-* /boot/kernel-* ; do
+                   if grub_file_is_not_garbage "$i" ; then list="$list $i" ; fi
+ 	done ;;
+ esac
+diff --git a/util/grub.d/20_linux_xen.in b/util/grub.d/20_linux_xen.in
+index f532fb9..1994244 100644
+--- a/util/grub.d/20_linux_xen.in
++++ b/util/grub.d/20_linux_xen.in
+@@ -138,7 +138,7 @@ EOF
+ }
+ 
+ linux_list=
+-for i in /boot/vmlinu[xz]-* /vmlinu[xz]-* /boot/kernel-*; do
++for i in /boot/bzImage[xz]-* /bzImage[xz]-* /boot/vmlinu[xz]-* /vmlinu[xz]-* /boot/kernel-*; do
+     if grub_file_is_not_garbage "$i"; then
+     	basename=$(basename $i)
+ 	version=$(echo $basename | sed -e "s,^[^0-9]*-,,g")
+-- 
+2.7.0
+

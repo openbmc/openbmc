@@ -1,0 +1,50 @@
+From 835baf02fd42012bbc0603dffb1f80c6ecf0fb9e Mon Sep 17 00:00:00 2001
+From: Xiao Ni <xni@redhat.com>
+Date: Mon, 8 Feb 2016 11:18:52 +0200
+Subject: [PATCH] Fix some type comparison problems
+
+As 26714713cd2bad9e0bf7f4669f6cc4659ceaab6c said, 32 bit signed
+timestamps will overflow in the year 2038. It already changed the
+utime and ctime in struct mdu_array_info_s from int to unsigned
+int. So we need to change the values that compared with them to
+unsigned int too.
+
+Upstream-Status: Backport
+
+Signed-off-by : Xiao Ni <xni@redhat.com>
+Signed-off-by: Maxin B. John <maxin.john@intel.com>
+---
+
+ Monitor.c | 2 +-
+ util.c    | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Monitor.c b/Monitor.c
+index f19c2e5..6df80f9 100644
+--- a/Monitor.c
++++ b/Monitor.c
+@@ -33,7 +33,7 @@
+ struct state {
+ 	char *devname;
+ 	char devnm[32];	/* to sync with mdstat info */
+-	long utime;
++	unsigned int utime;
+ 	int err;
+ 	char *spare_group;
+ 	int active, working, failed, spare, raid;
+diff --git a/util.c b/util.c
+index 3e6d293..96a806d 100644
+--- a/util.c
++++ b/util.c
+@@ -1267,7 +1267,7 @@ struct supertype *guess_super_type(int fd, enum guess_types guess_type)
+ 	 */
+ 	struct superswitch  *ss;
+ 	struct supertype *st;
+-	time_t besttime = 0;
++	unsigned int besttime = 0;
+ 	int bestsuper = -1;
+ 	int i;
+ 
+-- 
+2.4.0
+

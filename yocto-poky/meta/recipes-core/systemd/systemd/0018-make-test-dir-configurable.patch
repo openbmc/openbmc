@@ -1,0 +1,64 @@
+From 569cd3cf9806a02226d26c4104dbe44262f93d33 Mon Sep 17 00:00:00 2001
+From: Roy Li <rongqing.li@windriver.com>
+Date: Fri, 22 Jan 2016 16:44:11 +0800
+Subject: [PATCH 18/36] make test dir configurable
+
+Upstream-Status: Pending
+
+test maybe be run on target in cross-compile environment, and test dir
+is not the compilation dir, so make it configurable
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ Makefile.am  | 2 +-
+ configure.ac | 7 +++++++
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index b5c6ba7..d3cd961 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -203,7 +203,7 @@ AM_CPPFLAGS = \
+ 	-DROOTLIBDIR=\"$(rootlibdir)\" \
+ 	-DROOTLIBEXECDIR=\"$(rootlibexecdir)\" \
+ 	-DROOTHOMEDIR=\"$(roothomedir)\" \
+-	-DTEST_DIR=\"$(abs_top_srcdir)/test\" \
++	-DTEST_DIR=\"$(testdir)/test\" \
+ 	-I $(top_srcdir)/src \
+ 	-I $(top_builddir)/src/basic \
+ 	-I $(top_srcdir)/src/basic \
+diff --git a/configure.ac b/configure.ac
+index 36d20b5..d96dc5a 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1494,6 +1494,11 @@ AC_ARG_WITH([roothomedir],
+         [],
+         [with_roothomedir=/root])
+ 
++AC_ARG_WITH([testdir],
++        AS_HELP_STRING([--with-testdir=DIR], [test file directory]),
++        [],
++        [with_testdir=${abs_top_srcdir}])
++
+ AC_ARG_WITH([pamlibdir],
+         AS_HELP_STRING([--with-pamlibdir=DIR], [Directory for PAM modules]),
+         [],
+@@ -1578,6 +1583,7 @@ AC_SUBST([pamconfdir], [$with_pamconfdir])
+ AC_SUBST([rootprefix], [$with_rootprefix])
+ AC_SUBST([rootlibdir], [$with_rootlibdir])
+ AC_SUBST([roothomedir], [$with_roothomedir])
++AC_SUBST([testdir], [$with_testdir])
+ 
+ AC_CONFIG_FILES([
+         Makefile
+@@ -1669,6 +1675,7 @@ AC_MSG_RESULT([
+         lib dir:                 ${libdir}
+         rootlib dir:             ${with_rootlibdir}
+         root home dir:           ${with_roothomedir}
++        test dir:                ${with_testdir}
+         SysV init scripts:       ${SYSTEM_SYSVINIT_PATH}
+         SysV rc?.d directories:  ${SYSTEM_SYSVRCND_PATH}
+         Build Python:            ${PYTHON}
+-- 
+1.8.3.1
+

@@ -31,12 +31,16 @@ do_install() {
     oe_runmake 'DESTDIR=${D}' install
 }
 
-FILES_${PN} += "${datadir}/rubygems \
-                ${datadir}/ri"
+PACKAGES =+ "${PN}-ri-docs ${PN}-rdoc"
 
-FILES_${PN}-dbg += "${libdir}/ruby/*/.debug \
-                    ${libdir}/ruby/*/*/.debug \
-                    ${libdir}/ruby/*/*/*/.debug \
-                    ${libdir}/ruby/*/*/*/*/.debug"
+SUMMARY_${PN}-ri-docs = "ri (Ruby Interactive) documentation for the Ruby standard library"
+RDEPENDS_${PN}-ri-docs = "${PN}"
+FILES_${PN}-ri-docs += "${datadir}/ri"
+
+SUMMARY_${PN}-rdoc = "RDoc documentation generator from Ruby source"
+RDEPENDS_${PN}-rdoc = "${PN}"
+FILES_${PN}-rdoc += "${libdir}/ruby/*/rdoc ${bindir}/rdoc"
+
+FILES_${PN} += "${datadir}/rubygems"
 
 BBCLASSEXTEND = "native"

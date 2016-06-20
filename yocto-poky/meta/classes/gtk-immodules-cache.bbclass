@@ -10,47 +10,51 @@ GTKIMMODULES_PACKAGES ?= "${PN}"
 
 gtk_immodule_cache_postinst() {
 if [ "x$D" != "x" ]; then
-    for maj_ver in 2 3; do
-        if [ -x $D${bindir}/gtk-query-immodules-$maj_ver.0 ]; then
-            IMFILES=$(ls $D${libdir}/gtk-$maj_ver.0/*/immodules/*.so)
-            ${@qemu_run_binary(d, '$D', '${bindir}/gtk-query-immodules-$maj_ver.0')} \
-                $IMFILES > $D/etc/gtk-$maj_ver.0/gtk.immodules 2>/dev/null &&
-                sed -i -e "s:$D::" $D/etc/gtk-$maj_ver.0/gtk.immodules
-
-            [ $? -ne 0 ] && exit 1
+        if [ -x $D${bindir}/gtk-query-immodules-2.0 ]; then
+            IMFILES=$(ls $D${libdir}/gtk-2.0/*/immodules/*.so)
+            ${@qemu_run_binary(d, '$D', '${bindir}/gtk-query-immodules-2.0')} \
+                $IMFILES > $D${libdir}/gtk-2.0/2.10.0/immodules.cache 2>/dev/null &&
+                sed -i -e "s:$D::" $D${libdir}/gtk-2.0/2.10.0/immodules.cache
+        elif [ -x $D${bindir}/gtk-query-immodules-3.0 ]; then
+            IMFILES=$(ls $D${libdir}/gtk-3.0/*/immodules/*.so)
+            ${@qemu_run_binary(d, '$D', '${bindir}/gtk-query-immodules-3.0')} \
+                $IMFILES > $D${libdir}/gtk-3.0/3.0.0/immodules.cache 2>/dev/null &&
+                sed -i -e "s:$D::" $D${libdir}/gtk-3.0/3.0.0/immodules.cache
         fi
-    done
 
+    [ $? -ne 0 ] && exit 1
     exit 0
 fi
 if [ ! -z `which gtk-query-immodules-2.0` ]; then
-    gtk-query-immodules-2.0 > /etc/gtk-2.0/gtk.immodules
+    gtk-query-immodules-2.0 > ${libdir}/gtk-2.0/2.10.0/immodules.cache
 fi
 if [ ! -z `which gtk-query-immodules-3.0` ]; then
-    gtk-query-immodules-3.0 > /etc/gtk-3.0/gtk.immodules
+    gtk-query-immodules-3.0 > ${libdir}/gtk-3.0/3.0.0/immodules.cache
 fi
 }
 
 gtk_immodule_cache_postrm() {
 if [ "x$D" != "x" ]; then
-    for maj_ver in 2 3; do
-        if [ -x $D${bindir}/gtk-query-immodules-$maj_ver.0 ]; then
-            IMFILES=$(ls $D${libdir}/gtk-$maj_ver.0/*/immodules/*.so)
-            ${@qemu_run_binary(d, '$D', '${bindir}/gtk-query-immodules-$maj_ver.0')} \
-                $IMFILES > $D/etc/gtk-$maj_ver.0/gtk.immodules 2>/dev/null &&
-                sed -i -e "s:$D::" $D/etc/gtk-$maj_ver.0/gtk.immodules
-
-            [ $? -ne 0 ] && exit 1
+        if [ -x $D${bindir}/gtk-query-immodules-2.0 ]; then
+            IMFILES=$(ls $D${libdir}/gtk-2.0/*/immodules/*.so)
+            ${@qemu_run_binary(d, '$D', '${bindir}/gtk-query-immodules-2.0')} \
+                $IMFILES > $D${libdir}/gtk-2.0/2.10.0/immodules.cache 2>/dev/null &&
+                sed -i -e "s:$D::" $D${libdir}/gtk-2.0/2.10.0/immodules.cache
+        elif [ -x $D${bindir}/gtk-query-immodules-3.0 ]; then
+            IMFILES=$(ls $D${libdir}/gtk-3.0/*/immodules/*.so)
+            ${@qemu_run_binary(d, '$D', '${bindir}/gtk-query-immodules-3.0')} \
+                $IMFILES > $D${libdir}/gtk-3.0/3.0.0/immodules.cache 2>/dev/null &&
+                sed -i -e "s:$D::" $D${libdir}/gtk-3.0/3.0.0/immodules.cache
         fi
-    done
 
+    [ $? -ne 0 ] && exit 1
     exit 0
 fi
 if [ ! -z `which gtk-query-immodules-2.0` ]; then
-    gtk-query-immodules-2.0 > /etc/gtk-2.0/gtk.immodules
+    gtk-query-immodules-2.0 > ${libdir}/gtk-2.0/2.10.0/immodules.cache
 fi
 if [ ! -z `which gtk-query-immodules-3.0` ]; then
-    gtk-query-immodules-3.0 > /etc/gtk-3.0/gtk.immodules
+    gtk-query-immodules-3.0 > ${libdir}/gtk-3.0/3.0.0/immodules.cache
 fi
 }
 

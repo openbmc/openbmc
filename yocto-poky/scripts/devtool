@@ -37,6 +37,7 @@ lib_path = scripts_path + '/lib'
 sys.path = sys.path + [lib_path]
 from devtool import DevtoolError, setup_tinfoil
 import scriptutils
+import argparse_oe
 logger = scriptutils.logger_create('devtool')
 
 plugins = []
@@ -111,8 +112,37 @@ def read_workspace():
                 res = externalsrc_re.match(line.rstrip())
                 if res:
                     pn = res.group(2) or os.path.splitext(os.path.basename(fn))[0].split('_')[0]
+                    # Find the recipe file within the workspace, if any
+                    bbfile = os.path.basename(fn).replace('.bbappend', '.bb').replace('%', '*')
+                    recipefile = glob.glob(os.path.join(config.workspace_path,
+                                                        'recipes',
+                                                        pn,
+                                                        bbfile))
+                    if recipefile:
+                        recipefile = recipefile[0]
                     workspace[pn] = {'srctree': res.group(3),
-                                     'bbappend': fn}
+                                     'bbappend': fn,
+                                     'recipefile': recipefile}
+                    logger.debug('Found recipe %s' % workspace[pn])
+
+def create_unlockedsigs():
+    """ This function will make unlocked-sigs.inc match the recipes in the
+    workspace. This runs on every run of devtool, but it lets us ensure
+    the unlocked items are in sync with the workspace. """
+
+    confdir = os.path.join(basepath, 'conf')
+    unlockedsigs = os.path.join(confdir, 'unlocked-sigs.inc')
+    bb.utils.mkdirhier(confdir)
+    with open(os.path.join(confdir, 'unlocked-sigs.inc'), 'w') as f:
+        f.write("# DO NOT MODIFY! YOUR CHANGES WILL BE LOST.\n" +
+                "# This layer was created by the OpenEmbedded devtool" +
+                " utility in order to\n" +
+                "# contain recipes that are unlocked.\n")
+
+        f.write('SIGGEN_UNLOCKED_RECIPES += "\\\n')
+        for pn in workspace:
+            f.write('    ' + pn)
+        f.write('"')
 
 def create_workspace(args, config, basepath, workspace):
     if args.layerpath:
@@ -151,6 +181,10 @@ def _create_workspace(workspacedir, config, basepath):
             f.write('\nIf you no longer need to use devtool you can remove the path to this\n')
             f.write('workspace layer from your conf/bblayers.conf file (and then delete the\n')
             f.write('layer, if you wish).\n')
+            f.write('\nNote that by default, if devtool fetches and unpacks source code, it\n')
+            f.write('will place it in a subdirectory of a "sources" subdirectory of the\n')
+            f.write('layer. If you prefer it to be elsewhere you can specify the source\n')
+            f.write('tree path on the command line.\n')
 
 def _enable_workspace_layer(workspacedir, config, basepath):
     """Ensure the workspace layer is in bblayers.conf"""
@@ -177,17 +211,10 @@ def main():
 
     # Default basepath
     basepath = os.path.dirname(os.path.abspath(__file__))
-    pth = basepath
-    while pth != '' and pth != os.sep:
-        if os.path.exists(os.path.join(pth, '.devtoolbase')):
-            context.fixed_setup = True
-            basepath = pth
-            break
-        pth = os.path.dirname(pth)
 
-    parser = argparse.ArgumentParser(description="OpenEmbedded development tool",
-                                     add_help=False,
-                                     epilog="Use %(prog)s <subcommand> --help to get help on a specific command")
+    parser = argparse_oe.ArgumentParser(description="OpenEmbedded development tool",
+                                        add_help=False,
+                                        epilog="Use %(prog)s <subcommand> --help to get help on a specific command")
     parser.add_argument('--basepath', help='Base directory of SDK / build directory')
     parser.add_argument('--bbpath', help='Explicitly specify the BBPATH, rather than getting it from the metadata')
     parser.add_argument('-d', '--debug', help='Enable debug output', action='store_true')
@@ -209,17 +236,29 @@ def main():
     if global_args.basepath:
         # Override
         basepath = global_args.basepath
-    elif not context.fixed_setup:
-        basepath = os.environ.get('BUILDDIR')
-        if not basepath:
-            logger.error("This script can only be run after initialising the build environment (e.g. by using oe-init-build-env)")
-            sys.exit(1)
+        if os.path.exists(os.path.join(basepath, '.devtoolbase')):
+            context.fixed_setup = True
+    else:
+        pth = basepath
+        while pth != '' and pth != os.sep:
+            if os.path.exists(os.path.join(pth, '.devtoolbase')):
+                context.fixed_setup = True
+                basepath = pth
+                break
+            pth = os.path.dirname(pth)
+
+        if not context.fixed_setup:
+            basepath = os.environ.get('BUILDDIR')
+            if not basepath:
+                logger.error("This script can only be run after initialising the build environment (e.g. by using oe-init-build-env)")
+                sys.exit(1)
 
     logger.debug('Using basepath %s' % basepath)
 
     config = ConfigHandler(os.path.join(basepath, 'conf', 'devtool.conf'))
     if not config.read():
         return -1
+    context.config = config
 
     bitbake_subdir = config.get('General', 'bitbake_subdir', '')
     if bitbake_subdir:
@@ -255,13 +294,21 @@ def main():
 
     subparsers = parser.add_subparsers(dest="subparser_name", title='subcommands', metavar='<subcommand>')
 
+    subparsers.add_subparser_group('sdk', 'SDK maintenance', -2)
+    subparsers.add_subparser_group('advanced', 'Advanced', -1)
+    subparsers.add_subparser_group('starting', 'Beginning work on a recipe', 100)
+    subparsers.add_subparser_group('info', 'Getting information')
+    subparsers.add_subparser_group('working', 'Working on a recipe in the workspace')
+    subparsers.add_subparser_group('testbuild', 'Testing changes on target')
+
     if not context.fixed_setup:
         parser_create_workspace = subparsers.add_parser('create-workspace',
-                                                        help='Set up a workspace',
-                                                        description='Sets up a new workspace. NOTE: other devtool subcommands will create a workspace automatically as needed, so you only need to use %(prog)s if you want to specify where the workspace should be located.')
+                                                        help='Set up workspace in an alternative location',
+                                                        description='Sets up a new workspace. NOTE: other devtool subcommands will create a workspace automatically as needed, so you only need to use %(prog)s if you want to specify where the workspace should be located.',
+                                                        group='advanced')
         parser_create_workspace.add_argument('layerpath', nargs='?', help='Path in which the workspace layer should be created')
         parser_create_workspace.add_argument('--create-only', action="store_true", help='Only create the workspace layer, do not alter configuration')
-        parser_create_workspace.set_defaults(func=create_workspace)
+        parser_create_workspace.set_defaults(func=create_workspace, no_workspace=True)
 
     for plugin in plugins:
         if hasattr(plugin, 'register_commands'):
@@ -269,8 +316,9 @@ def main():
 
     args = parser.parse_args(unparsed_args, namespace=global_args)
 
-    if args.subparser_name != 'create-workspace':
+    if not getattr(args, 'no_workspace', False):
         read_workspace()
+        create_unlockedsigs()
 
     try:
         ret = args.func(args, config, basepath, workspace)
@@ -278,6 +326,8 @@ def main():
         if str(err):
             logger.error(str(err))
         ret = 1
+    except argparse_oe.ArgumentUsageError as ae:
+        parser.error_subcommand(ae.message, ae.subcommand)
 
     return ret
 
@@ -288,5 +338,5 @@ if __name__ == "__main__":
     except Exception:
         ret = 1
         import traceback
-        traceback.print_exc(5)
+        traceback.print_exc()
     sys.exit(ret)

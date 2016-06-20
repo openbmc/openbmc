@@ -1,0 +1,25 @@
+From 1478846ebfac690684e9c48049d08e0065f97a36 Mon Sep 17 00:00:00 2001
+From: Paul Eggleton <paul.eggleton@linux.intel.com>
+Date: Wed, 24 Feb 2016 17:43:03 +1300
+Subject: [PATCH] Add a note line to the quick reference
+
+A test patch so we have a file to move around.
+---
+ doc/quickref.1.in | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/doc/quickref.1.in b/doc/quickref.1.in
+index 389008b..226615c 100644
+--- a/doc/quickref.1.in
++++ b/doc/quickref.1.in
+@@ -560,6 +560,7 @@ you want, at runtime, to change the parameters of.
+ .P
+ If you find any other problems, please report them.
+ 
++NOTE: this is an important note.
+ 
+ .SH REPORTING BUGS
+ Report bugs in
+-- 
+2.5.0
+

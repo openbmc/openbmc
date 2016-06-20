@@ -18,14 +18,14 @@ RPROVIDES_${PN} = "lttng2-ust"
 RREPLACES_${PN} = "lttng2-ust"
 RCONFLICTS_${PN} = "lttng2-ust"
 
-SRCREV = "c49ee9040ada6984c880756614e8a6f7fd645bd6"
+SRCREV = "f89c1a3cf2b06a4970b9154c00ff6409870aefb5"
 PE = "2"
-PV = "2.6.2+git${SRCPV}"
+PV = "2.7.1+git${SRCPV}"
 
-SRC_URI = "git://git.lttng.org/lttng-ust.git;branch=stable-2.6 \
+SRC_URI = "git://git.lttng.org/lttng-ust.git;branch=stable-2.7 \
            file://lttng-ust-doc-examples-disable.patch \
-           file://lttng-ust-Fix-live-timer-calculation-error.patch \
-        "
+           file://lttng-ust-add-support-for-aarch64_be.patch \
+          "
 
 S = "${WORKDIR}/git"
 

@@ -27,7 +27,6 @@ SRC_URI += "\
         file://elf_additions.diff \
         file://elfutils-fsize.patch \
         file://remove-unused.patch \
-        file://mempcpy.patch \
         file://fix_for_gcc-4.7.patch \
         file://dso-link-change.patch \
         file://nm-Fix-size-passed-to-snprintf-for-invalid-sh_name-case.patch \

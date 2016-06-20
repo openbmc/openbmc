@@ -1,0 +1,73 @@
+Some architectures do not have __sync_add_and_fetch_8 implemented.
+
+MIPS (32-bit) and some PPC systems do not have sync_add_and_fetch_8.
+
+Provide an alternative.  This alternative function is based on code from:
+  https://github.com/mongodb/libbson/blob/master/src/bson/bson-atomic.c
+
+Code is under an Apache 2.0 License.
+
+Upstream-Status: Submitted [RPM5 maintainer]
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.15/rpmio/bson.h
+===================================================================
+--- rpm-5.4.15.orig/rpmio/bson.h
++++ rpm-5.4.15/rpmio/bson.h
+@@ -879,10 +879,18 @@ BSON_END_DECLS
+ 
+ BSON_BEGIN_DECLS
+ 
++/* Some architectures do not support __sync_add_and_fetch_8 */
++#if (__mips == 32) || (defined(__PPC__) && !defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8))
++# define __BSON_NEED_ATOMIC_64 1
++#endif
+ 
+ #if defined(__GNUC__)
+ # define bson_atomic_int_add(p, v)   (__sync_add_and_fetch(p, v))
+-# define bson_atomic_int64_add(p, v) (__sync_add_and_fetch_8(p, v))
++#ifndef __BSON_NEED_ATOMIC_64
++#  define bson_atomic_int64_add(p, v) (__sync_add_and_fetch_8(p, v))
++# else
++   int64_t bson_atomic_int64_add (volatile int64_t *p, int64_t n);
++# endif
+ # define bson_memory_barrier         __sync_synchronize
+ #elif defined(_MSC_VER) || defined(_WIN32)
+ # define bson_atomic_int_add(p, v)   (InterlockedExchangeAdd((long int *)(p), v))
+Index: rpm-5.4.15/rpmio/bson.c
+===================================================================
+--- rpm-5.4.15.orig/rpmio/bson.c
++++ rpm-5.4.15/rpmio/bson.c
+@@ -3863,13 +3863,30 @@ _bson_context_get_oid_seq64_threadsafe (
+ #elif defined BSON_OS_WIN32
+    uint64_t seq = InterlockedIncrement64 ((int64_t *)&context->seq64);
+ #else
+-   uint64_t seq = __sync_fetch_and_add_8 (&context->seq64, 1);
++   uint64_t seq = bson_atomic_int64_add (&context->seq64, 1);
+ #endif
+ 
+    seq = BSON_UINT64_TO_BE (seq);
+    memcpy (&oid->bytes[4], &seq, 8);
+ }
+ 
++#ifdef __BSON_NEED_ATOMIC_64
++#include <pthread.h>
++static pthread_mutex_t gSync64 = PTHREAD_MUTEX_INITIALIZER;
++int64_t
++bson_atomic_int64_add (volatile int64_t *p,
++                       int64_t           n)
++{
++   int64_t ret;
++
++   pthread_mutex_lock (&gSync64);
++   *p += n;
++   ret = *p;
++   pthread_mutex_unlock (&gSync64);
++
++   return ret;
++}
++#endif
+ 
+ /**
+  * bson_context_new:

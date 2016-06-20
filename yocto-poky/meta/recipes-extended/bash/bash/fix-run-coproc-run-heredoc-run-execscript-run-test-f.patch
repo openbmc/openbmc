@@ -1,0 +1,169 @@
+From 2c30dff8ea8b17ad5ba9881e35ad1eba9c515f13 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 26 Nov 2015 22:09:07 -0500
+Subject: [PATCH] fix run-coproc/run-heredoc/run-execscript/run-test/ failed
+
+FAIL: run-coproc
+update test case:tests/coproc.right, tests/coproc.tests
+git://git.sv.gnu.org/bash.git bash-4.4-testing
+
+FAIL: run-heredoc
+update test case: tests/heredoc.right tests/heredoc3.sub
+git://git.sv.gnu.org/bash.git bash-4.4-testing
+
+FAIL: run-execscript:
+the test suite should not be run as root
+
+FAIL: run-test
+the test suite should not be run as root
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ tests/coproc.right   |  5 +----
+ tests/coproc.tests   | 30 +++++++++++++++++++++++++-----
+ tests/heredoc.right  |  5 ++---
+ tests/heredoc3.sub   |  3 ++-
+ tests/run-execscript |  3 ++-
+ tests/run-test       |  3 ++-
+ 6 files changed, 34 insertions(+), 15 deletions(-)
+
+diff --git a/tests/coproc.right b/tests/coproc.right
+index 6d9deaa..94b001c 100644
+--- a/tests/coproc.right
++++ b/tests/coproc.right
+@@ -1,11 +1,8 @@
+-84575
+ 63 60
+ a b c
+-84577
+ 63 60
+ flop
+-./coproc.tests: line 22: 84577 Terminated              coproc REFLECT { cat -; }
+-84579
++coproc.tests: REFLECT: status 143
+ 63 60
+ FOO
+ 63 60
+diff --git a/tests/coproc.tests b/tests/coproc.tests
+index 8be3563..d347eb7 100644
+--- a/tests/coproc.tests
++++ b/tests/coproc.tests
+@@ -1,6 +1,13 @@
++: ${TMPDIR:=/tmp}
++TMPOUT=${TMPDIR}/coproc-wait-$BASHPID
++
+ coproc { echo a b c; sleep 2; }
+ 
+-echo $COPROC_PID
++case $COPROC_PID in
++[0-9]*)	;;
++*)	echo COPROC_PID not integer ;;
++esac
++
+ echo ${COPROC[@]}
+ 
+ read LINE <&${COPROC[0]}
+@@ -10,7 +17,11 @@ wait $COPROC_PID
+ 
+ coproc REFLECT { cat - ; }
+ 
+-echo $REFLECT_PID
++case $REFLECT_PID in
++[0-9]*)	;;
++*)	echo REFLECT_PID not integer ;;
++esac
++
+ echo ${REFLECT[@]}
+ 
+ echo flop >&${REFLECT[1]}
+@@ -18,12 +29,21 @@ read LINE <&${REFLECT[0]}
+ 
+ echo $LINE
+ 
+-kill $REFLECT_PID
+-wait $REFLECT_PID
++{ sleep 1; kill $REFLECT_PID; } &
++wait $REFLECT_PID >$TMPOUT 2>&1 || echo "coproc.tests: REFLECT: status $?"
++grep 'Terminated.*coproc.*REFLECT' < $TMPOUT >/dev/null 2>&1 || {
++	echo "coproc.tests: wait for REFLECT failed" >&2
++}
++rm -f $TMPOUT
++exec 2>&1
+ 
+ coproc xcase -n -u
+ 
+-echo $COPROC_PID
++case $COPROC_PID in
++[0-9]*)	;;
++*)	echo COPROC_PID not integer ;;
++esac
++
+ echo ${COPROC[@]}
+ 
+ echo foo >&${COPROC[1]}
+diff --git a/tests/heredoc.right b/tests/heredoc.right
+index 6abaa1f..8df91c5 100644
+--- a/tests/heredoc.right
++++ b/tests/heredoc.right
+@@ -76,15 +76,14 @@ ENDEND
+ end ENDEND
+ hello
+ end hello
+-x star x
+ end x*x
+ helloEND
+ end helloEND
+ hello
+ \END
+ end hello<NL>\END
+-./heredoc3.sub: line 74: warning: here-document at line 72 delimited by end-of-file (wanted `EOF')
+-./heredoc3.sub: line 75: syntax error: unexpected end of file
++./heredoc3.sub: line 75: warning: here-document at line 73 delimited by end-of-file (wanted `EOF')
++./heredoc3.sub: line 76: syntax error: unexpected end of file
+ comsub here-string
+ ./heredoc.tests: line 105: warning: here-document at line 103 delimited by end-of-file (wanted `EOF')
+ hi
+diff --git a/tests/heredoc3.sub b/tests/heredoc3.sub
+index 73a111e..9d3d846 100644
+--- a/tests/heredoc3.sub
++++ b/tests/heredoc3.sub
+@@ -49,9 +49,10 @@ hello
+     END    
+ echo end hello
+ 
+-cat <<x*x & touch 'x*x'
++cat <<x*x >/dev/null & touch 'x*x'
+ x star x
+ x*x
++wait $!
+ echo end 'x*x'
+ rm 'x*x'
+ 
+diff --git a/tests/run-execscript b/tests/run-execscript
+index f97ab21..0d00a1b 100644
+--- a/tests/run-execscript
++++ b/tests/run-execscript
+@@ -5,5 +5,6 @@ echo "warning: \`/tmp/bash-notthere' not being found or \`/' being a directory"
+ echo "warning: produce diff output, please do not consider this a test failure" >&2
+ echo "warning: if diff output differing only in the location of the bash" >&2
+ echo "warning: binary appears, please do not consider this a test failure" >&2
+-${THIS_SH} ./execscript > /tmp/xx 2>&1
++rm -f /tmp/xx
++su -c "${THIS_SH} ./execscript > /tmp/xx 2>&1" test
+ diff /tmp/xx exec.right && rm -f /tmp/xx
+diff --git a/tests/run-test b/tests/run-test
+index b2482c3..2e8f049 100644
+--- a/tests/run-test
++++ b/tests/run-test
+@@ -1,4 +1,5 @@
+ unset GROUPS UID 2>/dev/null
+ 
+-${THIS_SH} ./test.tests >/tmp/xx 2>&1
++rm -f /tmp/xx
++su -c "${THIS_SH} ./test.tests >/tmp/xx 2>&1" test
+ diff /tmp/xx test.right && rm -f /tmp/xx
+-- 
+1.9.1
+

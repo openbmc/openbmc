@@ -11,10 +11,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 DEPENDS += "ncurses"
 
-SRC_URI = "${GNU_MIRROR}/readline/${BPN}-${PV}.tar.gz;name=archive \
-           file://configure-fix.patch \
-           file://config-dirent-symbols.patch \
-           file://norpath.patch"
+SRC_URI = "${GNU_MIRROR}/readline/${BPN}-${PV}.tar.gz;name=archive"
+SRC_URI += "file://inputrc"
 
 inherit autotools texinfo
 
@@ -34,6 +32,11 @@ do_install_append () {
 	oe_libinstall -so -C shlib libreadline ${D}${libdir}
 
 	rmdir ${D}${bindir}
+
+	install -m 0755 -d ${D}${sysconfdir}
+	install -m 0644 ${WORKDIR}/inputrc ${D}${sysconfdir}/inputrc
 }
 
 BBCLASSEXTEND = "native nativesdk"
+
+CONFFILES_${PN} += "${sysconfdir}/inputrc"

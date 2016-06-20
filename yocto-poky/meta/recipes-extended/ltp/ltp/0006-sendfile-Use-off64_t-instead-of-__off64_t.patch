@@ -1,0 +1,31 @@
+From fb8b895385a641d74f2186fe5f20a872209692ed Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 7 Jan 2016 18:24:20 +0000
+Subject: [PATCH 06/32] sendfile: Use off64_t instead of __off64_t
+
+__off64_t is specific to glibc where as off64_t is widely available
+Add _GNU_SOURCE for off64_t defines from sys/types.h
+Fixes
+<command-line>:0:7: error: unknown type name 'off64_t'
+sendfile02.c:97:18: note: in expansion of macro 'OFF_T'
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ testcases/kernel/syscalls/sendfile/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/testcases/kernel/syscalls/sendfile/Makefile b/testcases/kernel/syscalls/sendfile/Makefile
+index df7b63f..1bd1b57 100644
+--- a/testcases/kernel/syscalls/sendfile/Makefile
++++ b/testcases/kernel/syscalls/sendfile/Makefile
+@@ -21,6 +21,6 @@ top_srcdir		?= ../../../..
+ include $(top_srcdir)/include/mk/testcases.mk
+ include $(abs_srcdir)/../utils/newer_64.mk
+ 
+-%_64: CPPFLAGS += -D_FILE_OFFSET_BITS=64 -DOFF_T=__off64_t
++%_64: CPPFLAGS += -D_FILE_OFFSET_BITS=64 -DOFF_T=off64_t -D_GNU_SOURCE
+ 
+ include $(top_srcdir)/include/mk/generic_leaf_target.mk
+-- 
+2.7.0
+

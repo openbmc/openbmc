@@ -1,0 +1,38 @@
+From 045c99b5f1eb6e4e0d8ad1ef9f0ba6574f738150 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 23 Oct 2015 12:25:09 +0300
+Subject: [PATCH] Do not use the shell version of python-config that was
+ introduced in 3.4
+
+Revert instead to the original python version: it has our tweaks and
+outputs directories correctly.
+
+Upstream-Status: Inappropriate [oe-specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ Makefile.pre.in | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
+
+diff --git a/Makefile.pre.in b/Makefile.pre.in
+index d7fc9a0..47e60bc 100644
+--- a/Makefile.pre.in
++++ b/Makefile.pre.in
+@@ -1270,12 +1270,9 @@ python-config: $(srcdir)/Misc/python-config.in Misc/python-config.sh
+ 	sed -e "s,@EXENAME@,$(BINDIR)/python$(LDVERSION)$(EXE)," < $(srcdir)/Misc/python-config.in >python-config.py
+ 	# Replace makefile compat. variable references with shell script compat. ones; $(VAR) -> ${VAR}
+ 	sed -e 's,\$$(\([A-Za-z0-9_]*\)),\$$\{\1\},g' < Misc/python-config.sh >python-config
+-	# On Darwin, always use the python version of the script, the shell
+-	# version doesn't use the compiler customizations that are provided
+-	# in python (_osx_support.py).
+-	if test `uname -s` = Darwin; then \
+-		cp python-config.py python-config; \
+-	fi
++	# In OpenEmbedded, always use the python version of the script, the shell
++	# version is broken in multiple ways, and doesn't return correct directories
++	cp python-config.py python-config
+ 
+ 
+ # Install the include files
+-- 
+2.1.4
+

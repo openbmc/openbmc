@@ -7,15 +7,17 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=0636e73ff0215e8d672dc4c32c317bb3 \
 
 DEPENDS = "zlib lzo e2fsprogs util-linux"
 
-PV = "1.5.1+git${SRCPV}"
+PV = "1.5.2"
 
-SRCREV = "9f107132a6a073cce37434ca9cda6917dd8d866b"
+SRCREV = "aea36417067dade75192bafa03af70b6eb2677b1"
 SRC_URI = "git://git.infradead.org/mtd-utils.git \
            file://add-exclusion-to-mkfs-jffs2-git-2.patch \
            file://fix-armv7-neon-alignment.patch \
-           file://0001-hashtable-Remove-duplicate-hashtable_iterator_value-.patch \
            file://mtd-utils-fix-corrupt-cleanmarker-with-flash_erase--j-command.patch \
+           file://0001-Fix-build-with-musl.patch \
 "
+
+SRC_URI_append_libc-musl = " file://010-fix-rpmatch.patch "
 
 S = "${WORKDIR}/git/"
 

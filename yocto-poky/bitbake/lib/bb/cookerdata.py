@@ -137,6 +137,7 @@ class CookerConfiguration(object):
         self.force = False
         self.profile = False
         self.nosetscene = False
+        self.setsceneonly = False
         self.invalidate_stamp = False
         self.dump_signatures = []
         self.dry_run = False
@@ -181,7 +182,7 @@ def catch_parse_error(func):
             parselog.critical(traceback.format_exc())
             parselog.critical("Unable to parse %s: %s" % (fn, exc))
             sys.exit(1)
-        except (bb.parse.ParseError, bb.data_smart.ExpansionError) as exc:
+        except bb.data_smart.ExpansionError as exc:
             import traceback
 
             bbdir = os.path.dirname(__file__) + os.sep
@@ -192,6 +193,8 @@ def catch_parse_error(func):
                 if not fn.startswith(bbdir):
                     break
             parselog.critical("Unable to parse %s", fn, exc_info=(exc_class, exc, tb))
+        except bb.parse.ParseError as exc:
+            parselog.critical(str(exc))
             sys.exit(1)
     return wrapped
 
@@ -289,6 +292,8 @@ class CookerDataBuilder(object):
                 parselog.debug(2, "Adding layer %s", layer)
                 if 'HOME' in approved and '~' in layer:
                     layer = os.path.expanduser(layer)
+                if layer.endswith('/'):
+                    layer = layer.rstrip('/')
                 data.setVar('LAYERDIR', layer)
                 data = parse_config_file(os.path.join(layer, "conf", "layer.conf"), data)
                 data.expandVarref('LAYERDIR')
@@ -317,7 +322,9 @@ class CookerDataBuilder(object):
         # Nomally we only register event handlers at the end of parsing .bb files
         # We register any handlers we've found so far here...
         for var in data.getVar('__BBHANDLERS', False) or []:
-            bb.event.register(var, data.getVar(var, False),  (data.getVarFlag(var, "eventmask", True) or "").split())
+            handlerfn = data.getVarFlag(var, "filename", False)
+            handlerln = int(data.getVarFlag(var, "lineno", False))
+            bb.event.register(var, data.getVar(var, False),  (data.getVarFlag(var, "eventmask", True) or "").split(), handlerfn, handlerln)
 
         if data.getVar("BB_WORKERCONTEXT", False) is None:
             bb.fetch.fetcher_init(data)

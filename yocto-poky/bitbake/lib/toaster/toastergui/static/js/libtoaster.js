@@ -21,6 +21,9 @@ var libtoaster = (function (){
     var xhrReq;
 
     jQElement.typeahead({
+        // each time the typeahead's choices change, a
+        // "typeahead-choices-change" event is fired with an object
+        // containing the available choices in a "choices" property
         source: function(query, process){
           xhrParams.search = query;
 
@@ -35,6 +38,8 @@ var libtoaster = (function (){
             }
 
             xhrReq = null;
+
+            jQElement.trigger("typeahead-choices-change", {choices: data.results});
 
             return process(data.results);
           });
@@ -90,27 +95,35 @@ var libtoaster = (function (){
     jQElement.data('typeahead').render = customRenderFunc;
   }
 
-  /*
-   * url - the url of the xhr build */
-  function _startABuild (url, project_id, targets, onsuccess, onfail) {
+  /* startABuild:
+   * url: xhr_buildrequest or null for current project
+   * targets: an array or space separated list of targets to build
+   * onsuccess: callback for successful execution
+   * onfail: callback for failed execution
+   */
+  function _startABuild (url, targets, onsuccess, onfail) {
 
-    var data = {
-      project_id : project_id,
-      targets : targets,
+    if (!url)
+      url = libtoaster.ctx.xhrBuildRequestUrl;
+
+    /* Flatten the array of targets into a space spearated list */
+    if (targets instanceof Array){
+      targets = targets.reduce(function(prevV, nextV){
+        return prev + ' ' + next;
+      });
     }
 
     $.ajax( {
         type: "POST",
         url: url,
-        data: data,
+        data: { 'targets' : targets },
         headers: { 'X-CSRFToken' : $.cookie('csrftoken')},
         success: function (_data) {
-          /* No proper reponse YOCTO #7995
           if (_data.error !== "ok") {
             console.warn(_data.error);
-          } else { */
+          } else {
             if (onsuccess !== undefined) onsuccess(_data);
-        //  }
+          }
         },
         error: function (_data) {
           console.warn("Call failed");
@@ -120,22 +133,25 @@ var libtoaster = (function (){
   }
 
   /* cancelABuild:
-   * url: projectbuilds
-   * builds_ids: space separated list of build request ids
+   * url: xhr_buildrequest url or null for current project
+   * buildRequestIds: space separated list of build request ids
    * onsuccess: callback for successful execution
    * onfail: callback for failed execution
    */
-  function _cancelABuild(url, build_ids, onsuccess, onfail){
+  function _cancelABuild(url, buildRequestIds, onsuccess, onfail){
+    if (!url)
+      url = libtoaster.ctx.xhrBuildRequestUrl;
+
     $.ajax( {
         type: "POST",
         url: url,
-        data: { 'buildCancel': build_ids },
+        data: { 'buildCancel': buildRequestIds },
         headers: { 'X-CSRFToken' : $.cookie('csrftoken')},
         success: function (_data) {
           if (_data.error !== "ok") {
             console.warn(_data.error);
           } else {
-            if (onsuccess !== undefined) onsuccess(_data);
+            if (onsuccess) onsuccess(_data);
           }
         },
         error: function (_data) {
@@ -316,7 +332,7 @@ var libtoaster = (function (){
     } else if (layerDepsList.length === 0 && add === true) {
       alertMsg = $("<span>You have added <strong>1</strong> layer to your project: <a id=\"layer-affected-name\"></a></span></span>");
     } else if (add === false) {
-      alertMsg = $("<span>You have deleted <strong>1</strong> layer from your project: <a id=\"layer-affected-name\"></a></span>");
+      alertMsg = $("<span>You have removed <strong>1</strong> layer from your project: <a id=\"layer-affected-name\"></a></span>");
     }
 
     alertMsg.children("#layer-affected-name").text(layer.name);
@@ -330,6 +346,32 @@ var libtoaster = (function (){
 
     alertMsg.html(message);
     $("#change-notification, #change-notification *").fadeIn();
+  }
+
+  function _createCustomRecipe(name, baseRecipeId, doneCb){
+    var data = {
+      'name' : name,
+      'project' : libtoaster.ctx.projectId,
+      'base' : baseRecipeId,
+    };
+
+    $.ajax({
+        type: "POST",
+        url: libtoaster.ctx.xhrCustomRecipeUrl,
+        data: data,
+        headers: { 'X-CSRFToken' : $.cookie('csrftoken')},
+        success: function (ret) {
+          if (doneCb){
+            doneCb(ret);
+          } else if (ret.error !== "ok") {
+            console.warn(ret.error);
+          }
+        },
+        error: function (ret) {
+          console.warn("Call failed");
+          console.warn(ret);
+        }
+    });
   }
 
 
@@ -347,6 +389,7 @@ var libtoaster = (function (){
     addRmLayer : _addRmLayer,
     makeLayerAddRmAlertMsg : _makeLayerAddRmAlertMsg,
     showChangeNotification : _showChangeNotification,
+    createCustomRecipe: _createCustomRecipe,
   };
 })();
 
@@ -443,15 +486,21 @@ $(document).ready(function() {
         $('.tooltip').hide();
     });
 
-    // enable help information tooltip
-    $(".get-help").tooltip({container:'body', html:true, delay:{show:300}});
+    /* Initialise bootstrap tooltips */
+    $(".get-help, [data-toggle=tooltip]").tooltip({
+      container : 'body',
+      html : true,
+      delay: { show : 300 }
+    });
 
     // show help bubble only on hover inside tables
     $(".hover-help").css("visibility","hidden");
-    $("th, td").hover(function () {
+
+    $("table").on("mouseover", "th, td", function () {
         $(this).find(".hover-help").css("visibility","visible");
     });
-    $("th, td").mouseleave(function () {
+
+    $("table").on("mouseleave", "th, td", function () {
         $(this).find(".hover-help").css("visibility","hidden");
     });
 

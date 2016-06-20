@@ -1,0 +1,23 @@
+Fix control path where we have str as uninitialized string
+
+| /home/ubuntu/work/oe/openembedded-core/build/tmp-musl/work/i586-oe-linux-musl/elfutils/0.164-r0/elfutils-0.164/libcpu/i386_disasm.c: In function 'i386_disasm':
+| /home/ubuntu/work/oe/openembedded-core/build/tmp-musl/work/i586-oe-linux-musl/elfutils/0.164-r0/elfutils-0.164/libcpu/i386_disasm.c:310:5: error: 'str' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+|      memcpy (buf + bufcnt, _str, _len);           \
+|      ^
+| /home/ubuntu/work/oe/openembedded-core/build/tmp-musl/work/i586-oe-linux-musl/elfutils/0.164-r0/elfutils-0.164/libcpu/i386_disasm.c:709:17: note: 'str' was declared here
+|      const char *str;
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+Index: elfutils-0.164/libcpu/i386_disasm.c
+===================================================================
+--- elfutils-0.164.orig/libcpu/i386_disasm.c
++++ elfutils-0.164/libcpu/i386_disasm.c
+@@ -821,6 +821,7 @@ i386_disasm (const uint8_t **startp, con
+ 			    }
+ 
+ 			default:
++			  str = "";
+ 			  assert (! "INVALID not handled");
+ 			}
+ 		    }

@@ -13,6 +13,8 @@ SRC_URI += "file://autoreconf-include.patch \
             file://remove-usr-local-lib-from-m4.patch \
             file://preferbash.patch \
             file://autotest-automake-result-format.patch \
+            file://add_musl_config.patch \
+            file://performance.patch \
            "
 
 SRC_URI[md5sum] = "82d05e03b93e45f5a39b828dc9c6c29b"

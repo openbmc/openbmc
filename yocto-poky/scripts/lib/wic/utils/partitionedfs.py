@@ -96,25 +96,23 @@ class Image(object):
         # Converting kB to sectors for parted
         size = size * 1024 / self.sector_size
 
-        # We still need partition for "/" or non-subvolume
-        if mountpoint == "/" or not fsopts:
-            part = {'ks_pnum': ks_pnum, # Partition number in the KS file
-                    'size': size, # In sectors
-                    'mountpoint': mountpoint, # Mount relative to chroot
-                    'source_file': source_file, # partition contents
-                    'fstype': fstype, # Filesystem type
-                    'fsopts': fsopts, # Filesystem mount options
-                    'label': label, # Partition label
-                    'disk_name': disk_name, # physical disk name holding partition
-                    'device': None, # kpartx device node for partition
-                    'num': None, # Partition number
-                    'boot': boot, # Bootable flag
-                    'align': align, # Partition alignment
-                    'no_table' : no_table, # Partition does not appear in partition table
-                    'part_type' : part_type, # Partition type
-                    'uuid': uuid} # Partition UUID
+        part = {'ks_pnum': ks_pnum, # Partition number in the KS file
+                'size': size, # In sectors
+                'mountpoint': mountpoint, # Mount relative to chroot
+                'source_file': source_file, # partition contents
+                'fstype': fstype, # Filesystem type
+                'fsopts': fsopts, # Filesystem mount options
+                'label': label, # Partition label
+                'disk_name': disk_name, # physical disk name holding partition
+                'device': None, # kpartx device node for partition
+                'num': None, # Partition number
+                'boot': boot, # Bootable flag
+                'align': align, # Partition alignment
+                'no_table' : no_table, # Partition does not appear in partition table
+                'part_type' : part_type, # Partition type
+                'uuid': uuid} # Partition UUID
 
-            self.__add_partition(part)
+        self.__add_partition(part)
 
     def layout_partitions(self, ptable_format="msdos"):
         """ Layout the partitions, meaning calculate the position of every

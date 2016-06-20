@@ -1,0 +1,36 @@
+Set relative to top_builddir path in Makefile to access test-driver
+
+Signed-off-by: Adrian Calianu <adrian.calianu@enea.com>
+Upstream-Status: Pending
+Bug-Report: http://debbugs.gnu.org/cgi/bugreport.cgi?bug=19042
+
+--- a/bin/automake.in
++++ b/bin/automake.in
+@@ -272,6 +272,9 @@
+ # $AM_CONFIG_AUX_DIR is prefixed with $(top_srcdir), so it can be used
+ # in Makefiles.
+ my $am_config_aux_dir = '';
++# Directory used at runtime like running test-driver that should not
++# depend on $(top_srcdir)
++my $am_config_rt_aux_dir = '';
+
+ # Directory to search for AC_LIBSOURCE files, as set by AC_CONFIG_LIBOBJ_DIR
+ # in configure.ac.
+@@ -4700,7 +4703,7 @@
+     {
+       require_conf_file ("parallel-tests", FOREIGN, 'test-driver');
+       define_variable ("${pfx}LOG_DRIVER",
+-                       "\$(SHELL) $am_config_aux_dir/test-driver",
++                       "\$(SHELL) $am_config_rt_aux_dir/test-driver",
+                        INTERNAL);
+     }
+   my $driver = '$(' . $pfx . 'LOG_DRIVER)';
+@@ -7284,6 +7287,10 @@
+   $am_config_aux_dir =
+     '$(top_srcdir)' . ($config_aux_dir eq '.' ? "" : "/$config_aux_dir");
+   $am_config_aux_dir =~ s,/*$,,;
++
++  $am_config_rt_aux_dir =
++    '$(top_builddir)' . ($config_aux_dir eq '.' ? "" : "/$config_aux_dir");
++  $am_config_rt_aux_dir =~ s,/*$,,;
+ }

@@ -1,0 +1,28 @@
+Upstream-Status: Pending
+
+From d92af0483c20365fd0af740d0baef8870b4aa374 Mon Sep 17 00:00:00 2001
+From: Abdur Rehman <abdur_rehman@mentor.com>
+Date: Wed, 26 Aug 2015 19:18:11 +0500
+Subject: [PATCH] tcf-agent: obey LDFLAGS
+
+Signed-off-by: Abdur Rehman <abdur_rehman@mentor.com>
+---
+ Makefile.inc |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.inc b/Makefile.inc
+index 959028f..3148942 100644
+--- a/Makefile.inc
++++ b/Makefile.inc
+@@ -96,7 +96,7 @@ NO_LINK_F	?= -c
+ # Linker definition and flags
+ 
+ LINK		?= $(CC)
+-LINK_FLAGS	?= $(CFLAGS)
++LINK_FLAGS	?= $(LDFLAGS) $(CFLAGS)
+ LINK_OUT_F	?= $(OUT_OBJ_F)
+ 
+ # Archiver definition and flags
+-- 
+1.7.9.5
+

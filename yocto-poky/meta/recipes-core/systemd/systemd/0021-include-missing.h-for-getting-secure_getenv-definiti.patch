@@ -1,0 +1,27 @@
+From 6cedbaee7964f6a6c61b9f2c8f0b87cef9370424 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 15 Dec 2015 22:51:55 +0000
+Subject: [PATCH 26/38] include missing.h for getting secure_getenv definition
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ src/basic/user-util.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/basic/user-util.c b/src/basic/user-util.c
+index 55672b3..22c4a23 100644
+--- a/src/basic/user-util.c
++++ b/src/basic/user-util.c
+@@ -38,6 +38,7 @@
+ #include "path-util.h"
+ #include "string-util.h"
+ #include "user-util.h"
++#include "missing.h"
+ 
+ bool uid_is_valid(uid_t uid) {
+ 
+-- 
+1.8.3.1
+

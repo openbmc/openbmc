@@ -1,0 +1,30 @@
+From: Otavio Salvador <otavio@ossystems.com.br>
+Date: Fri, 4 Dec 2015 16:11:41 +0000
+Subject: [PATCH] Revert "Build: look for python >= 3.0 when building python bindings"
+Organization: O.S. Systems Software LTDA.
+
+This reverts commit 227703a2ceada3c104edd56756d48455ca4c271a.
+
+Upstream-Status: Pending
+
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 4dee4b4..6608bcd 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -339,7 +339,7 @@ AM_CONDITIONAL([PYTHON_BINDING], [test "x${enable_python_binding:-yes}" = xyes])
+ 
+ if test "x${enable_python_binding:-yes}" = xyes; then
+   AX_PKG_SWIG($swig_version, [], [ AC_MSG_ERROR([SWIG $swig_version or newer is needed]) ])
+-  AM_PATH_PYTHON([3.0])
++  AM_PATH_PYTHON
+ 
+   AC_ARG_VAR([PYTHON_INCLUDE], [Include flags for python, bypassing python-config])
+   AC_ARG_VAR([PYTHON_CONFIG], [Path to python-config])
+-- 
+2.1.4
+
