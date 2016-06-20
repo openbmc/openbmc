@@ -48,6 +48,10 @@ CORE_IMAGE_EXTRA_INSTALL_append = " bash \
 
 OBMC_IMAGE_EXTRA_INSTALL ?= ""
 
+IMAGE_FSTYPES += \
+    "${@bb.utils.contains("MACHINE_FEATURES", "image-overlay", \
+                          "overlay", "", d)}"
+
 def build_overlay(d):
         if bb.utils.contains("IMAGE_FSTYPES", "overlay", "overlay", "0", d) != "0":
                 return "image-overlay"
