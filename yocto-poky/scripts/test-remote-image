@@ -38,6 +38,7 @@ lib_path = scripts_path + '/lib'
 sys.path = sys.path + [lib_path]
 
 import scriptpath
+import argparse_oe
 
 # Add meta/lib to sys.path
 scriptpath.add_oe_lib_path()
@@ -82,7 +83,7 @@ log = logger_create()
 # Define and return the arguments parser for the script
 def get_args_parser():
     description = "This script is used to run automated runtime tests using remotely published image files. You should prepare the build environment just like building local images and running the tests."
-    parser = argparse.ArgumentParser(description=description)
+    parser = argparse_oe.ArgumentParser(description=description)
     parser.add_argument('--image-types', required=True, action="store", nargs='*', dest="image_types", default=None, help='The image types to test(ex: core-image-minimal).')
     parser.add_argument('--repo-link', required=True, action="store", type=str, dest="repo_link", default=None, help='The link to the remote images repository.')
     parser.add_argument('--required-packages', required=False, action="store", nargs='*', dest="required_packages", default=None, help='Required packages for the tests. They will be built before the testing begins.')
@@ -356,5 +357,5 @@ if __name__ == "__main__":
     except Exception:
         ret = 1
         import traceback
-        traceback.print_exc(5)
+        traceback.print_exc()
     sys.exit(ret)

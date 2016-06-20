@@ -379,6 +379,12 @@
                 You can use <filename>OVERRIDES</filename> to conditionally select
                 a specific version of a variable and to conditionally
                 append or prepend the value of a variable.
+                <note>
+                    Overrides can only use lower-case characters.
+                    Additionally, underscores are not permitted in override names
+                    as they are used to separate overrides from each other and
+                    from the variable name.
+                </note>
                 <itemizedlist>
                     <listitem><para><emphasis>Selecting a Variable:</emphasis>
                         The <filename>OVERRIDES</filename> variable is
@@ -603,8 +609,13 @@
                 BitBake uses the
                 <link linkend='var-BBPATH'><filename>BBPATH</filename></link>
                 variable to locate needed include and class files.
-                The <filename>BBPATH</filename> variable is analogous to
-                the environment variable <filename>PATH</filename>.
+                Additionally, BitBake searches the current directory for
+                <filename>include</filename> and <filename>require</filename>
+                directives.
+                <note>
+                    The <filename>BBPATH</filename> variable is analogous to
+                    the environment variable <filename>PATH</filename>.
+                </note>
             </para>
 
             <para>
@@ -651,6 +662,51 @@
                     inherited class within your recipe by doing so
                     after the "inherit" statement.
                 </note>
+            </para>
+
+            <para>
+                If necessary, it is possible to inherit a class
+                conditionally by using
+                a variable expression after the <filename>inherit</filename>
+                statement.
+                Here is an example:
+                <literallayout class='monospaced'>
+     inherit ${VARNAME}
+                </literallayout>
+                If <filename>VARNAME</filename> is going to be set, it needs
+                to be set before the <filename>inherit</filename> statement
+                is parsed.
+                One way to achieve a conditional inherit in this case is to use
+                overrides:
+                <literallayout class='monospaced'>
+     VARIABLE = ""
+     VARIABLE_someoverride = "myclass"
+                </literallayout>
+            </para>
+
+            <para>
+                Another method is by using anonymous Python.
+                Here is an example:
+                <literallayout class='monospaced'>
+     python () {
+         if condition == value:
+             d.setVar('VARIABLE', 'myclass')
+         else:
+             d.setVar('VARIABLE', '')
+     }
+                </literallayout>
+            </para>
+
+            <para>
+                Alternatively, you could use an in-line Python expression
+                in the following form:
+                <literallayout class='monospaced'>
+     inherit ${@'classname' if condition else ''}
+     inherit ${@functionname(params)}
+                </literallayout>
+                In all cases, if the expression evaluates to an empty
+                string, the statement does not trigger a syntax error
+                because it becomes a no-op.
             </para>
         </section>
 
@@ -759,6 +815,16 @@
                     <filename>INHERIT</filename> to inherit a class effectively
                     inherits the class globally (i.e. for all recipes).
                 </note>
+                If you want to use the directive to inherit
+                multiple classes, you can provide them on the same line in the
+                <filename>local.conf</filename> file.
+                Use spaces to separate the classes.
+                The following example shows how to inherit both the
+                <filename>autotools</filename> and <filename>pkgconfig</filename>
+                classes:
+                <literallayout class='monospaced'>
+     inherit autotools pkgconfig
+                </literallayout>
             </para>
         </section>
     </section>
@@ -840,6 +906,18 @@
                 is a global variable and is always automatically
                 available.
            </para>
+
+           <note>
+                Variable expressions (e.g. <filename>${X}</filename>) are no
+                longer expanded within Python functions.
+                This behavior is intentional in order to allow you to freely
+                set variable values to expandable expressions without having
+                them expanded prematurely.
+                If you do wish to expand a variable within a Python function,
+                use <filename>d.getVar("X", True)</filename>.
+                Or, for more complicated expressions, use
+                <filename>d.expand()</filename>.
+           </note>
         </section>
 
         <section id='python-functions'>
@@ -1107,10 +1185,18 @@
             <title>Passing Information Into the Build Task Environment</title>
 
             <para>
-                When running a task, BitBake tightly controls the execution
+                When running a task, BitBake tightly controls the shell execution
                 environment of the build tasks to make
                 sure unwanted contamination from the build machine cannot
                 influence the build.
+                <note>
+                    By default, BitBake cleans the environment to include only those
+                    things exported or listed in its whitelist to ensure that the build
+                    environment is reproducible and consistent.
+                    You can prevent this "cleaning" by setting the
+                    <link linkend='var-BB_PRESERVE_ENV'><filename>BB_PRESERVE_ENV</filename></link>
+                    variable.
+                </note>
                 Consequently, if you do want something to get passed into the
                 build task environment, you must take these two steps:
                 <orderedlist>
@@ -1118,14 +1204,16 @@
                         Tell BitBake to load what you want from the environment
                         into the datastore.
                         You can do so through the
+                        <link linkend='var-BB_ENV_WHITELIST'><filename>BB_ENV_WHITELIST</filename></link>
+                        and
                         <link linkend='var-BB_ENV_EXTRAWHITE'><filename>BB_ENV_EXTRAWHITE</filename></link>
-                        variable.
+                        variables.
                         For example, assume you want to prevent the build system from
                         accessing your <filename>$HOME/.ccache</filename>
                         directory.
-                        The following command tells BitBake to load
-                        <filename>CCACHE_DIR</filename> from the environment into
-                        the datastore:
+                        The following command "whitelists" the environment variable
+                        <filename>CCACHE_DIR</filename> causing BitBack to allow that
+                        variable into the datastore:
                         <literallayout class='monospaced'>
      export BB_ENV_EXTRAWHITE="$BB_ENV_EXTRAWHITE CCACHE_DIR"
                         </literallayout></para></listitem>
@@ -1173,12 +1261,6 @@
                 </literallayout>
                 The previous example returns <filename>BAR</filename> from the original
                 execution environment.
-            </para>
-
-            <para>
-                By default, BitBake cleans the environment to include only those
-                things exported or listed in its whitelist to ensure that the build
-                environment is reproducible and consistent.
             </para>
         </section>
     </section>
@@ -1234,6 +1316,8 @@
                     </para></listitem>
                 <listitem><para><emphasis>dirs:</emphasis>
                     Directories that should be created before the task runs.
+                    The last directory listed will be used as the work directory
+                    for the task.
                     </para></listitem>
                 <listitem><para><emphasis>lockfiles:</emphasis>
                      Specifies one or more lockfiles to lock while the task
@@ -1764,6 +1848,10 @@
                         <row>
                             <entry align="left"><filename>d.delVarFlags("X")</filename></entry>
                             <entry align="left">Deletes all the flags for the variable "X".</entry>
+                        </row>
+                        <row>
+                            <entry align="left"><filename>d.expand(expression)</filename></entry>
+                            <entry align="left">Expands variable references in the specified string expression.</entry>
                         </row>
                     </tbody>
                 </tgroup>

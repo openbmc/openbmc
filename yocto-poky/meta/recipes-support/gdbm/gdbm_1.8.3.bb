@@ -19,6 +19,7 @@ inherit autotools texinfo
 BBCLASSEXTEND = "native nativesdk"
 
 do_install_append () {
+    oe_runmake install-compat DESTDIR=${D}
     install -d ${D}${includedir}/gdbm
     install -m 0644 ${S}/dbm.h ${D}${includedir}/
     install -m 0644 ${S}/ndbm.h ${D}${includedir}/

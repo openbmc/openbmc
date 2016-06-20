@@ -63,6 +63,15 @@ class Rootfs(object):
                 if 'log_check' in line:
                     continue
 
+                if hasattr(self, 'log_check_expected_errors_regexes'):
+                    m = None
+                    for ee in self.log_check_expected_errors_regexes:
+                        m = re.search(ee, line)
+                        if m:
+                            break
+                    if m:
+                        continue
+
                 m = r.search(line)
                 if m:
                     found_error = 1
@@ -164,6 +173,7 @@ class Rootfs(object):
         bb.note("###### Generate rootfs #######")
         pre_process_cmds = self.d.getVar("ROOTFS_PREPROCESS_COMMAND", True)
         post_process_cmds = self.d.getVar("ROOTFS_POSTPROCESS_COMMAND", True)
+        rootfs_post_install_cmds = self.d.getVar('ROOTFS_POSTINSTALL_COMMAND', True)
 
         postinst_intercepts_dir = self.d.getVar("POSTINST_INTERCEPTS_DIR", True)
         if not postinst_intercepts_dir:
@@ -192,6 +202,8 @@ class Rootfs(object):
         bb.utils.mkdirhier(sysconfdir)
         with open(sysconfdir + "/version", "w+") as ver:
             ver.write(self.d.getVar('BUILDNAME', True) + "\n")
+
+        execute_pre_post_process(self.d, rootfs_post_install_cmds)
 
         self._run_intercepts()
 
@@ -229,46 +241,28 @@ class Rootfs(object):
                                       self.d.getVar('IMAGE_ROOTFS', True),
                                       "run-postinsts", "remove"])
 
-        runtime_pkgmanage = bb.utils.contains("IMAGE_FEATURES", "package-management",
-                         True, False, self.d)
-        sysvcompat_in_distro = bb.utils.contains("DISTRO_FEATURES", [ "systemd", "sysvinit" ],
-                         True, False, self.d)
         image_rorfs = bb.utils.contains("IMAGE_FEATURES", "read-only-rootfs",
-                         True, False, self.d)
-        if sysvcompat_in_distro and not image_rorfs:
-            pkg_to_remove = ""
-        else:
-            pkg_to_remove = "update-rc.d"
-        if not runtime_pkgmanage:
-            # Remove components that we don't need if we're not going to install
-            # additional packages at runtime
-            if delayed_postinsts is None:
-                installed_pkgs_dir = self.d.expand('${WORKDIR}/installed_pkgs.txt')
-                pkgs_to_remove = list()
-                with open(installed_pkgs_dir, "r+") as installed_pkgs:
-                    pkgs_installed = installed_pkgs.read().splitlines()
-                    for pkg_installed in pkgs_installed[:]:
-                        pkg = pkg_installed.split()[0]
-                        if pkg in ["update-rc.d",
-                                "base-passwd",
-                                "shadow",
-                                "update-alternatives", pkg_to_remove,
-                                self.d.getVar("ROOTFS_BOOTSTRAP_INSTALL", True)
-                                ]:
-                            pkgs_to_remove.append(pkg)
-                            pkgs_installed.remove(pkg_installed)
+                                        True, False, self.d)
+        if image_rorfs:
+            # Remove components that we don't need if it's a read-only rootfs
+            unneeded_pkgs = self.d.getVar("ROOTFS_RO_UNNEEDED", True).split()
+            pkgs_installed = image_list_installed_packages(self.d)
+            pkgs_to_remove = [pkg for pkg in pkgs_installed if pkg in unneeded_pkgs]
 
-                if len(pkgs_to_remove) > 0:
-                    self.pm.remove(pkgs_to_remove, False)
-                    # Update installed_pkgs.txt
-                    open(installed_pkgs_dir, "w+").write('\n'.join(pkgs_installed))
+            if len(pkgs_to_remove) > 0:
+                self.pm.remove(pkgs_to_remove, False)
 
-            else:
-                self._save_postinsts()
+        if delayed_postinsts:
+            self._save_postinsts()
+            if image_rorfs:
+                bb.warn("There are post install scripts "
+                        "in a read-only rootfs")
 
         post_uninstall_cmds = self.d.getVar("ROOTFS_POSTUNINSTALL_COMMAND", True)
         execute_pre_post_process(self.d, post_uninstall_cmds)
 
+        runtime_pkgmanage = bb.utils.contains("IMAGE_FEATURES", "package-management",
+                                              True, False, self.d)
         if not runtime_pkgmanage:
             # Remove the package manager data files
             self.pm.remove_packaging_data()
@@ -628,6 +622,10 @@ class DpkgRootfs(DpkgOpkgRootfs):
     def __init__(self, d, manifest_dir):
         super(DpkgRootfs, self).__init__(d)
         self.log_check_regex = '^E:'
+        self.log_check_expected_errors_regexes = \
+        [
+            "^E: Unmet dependencies."
+        ]
 
         bb.utils.remove(self.image_rootfs, True)
         bb.utils.remove(self.d.getVar('MULTILIB_TEMP_ROOTFS', True), True)
@@ -882,7 +880,6 @@ class OpkgRootfs(DpkgOpkgRootfs):
         pkgs_to_install = self.manifest.parse_initial_manifest()
         opkg_pre_process_cmds = self.d.getVar('OPKG_PREPROCESS_COMMANDS', True)
         opkg_post_process_cmds = self.d.getVar('OPKG_POSTPROCESS_COMMANDS', True)
-        rootfs_post_install_cmds = self.d.getVar('ROOTFS_POSTINSTALL_COMMAND', True)
 
         # update PM index files, unless users provide their own feeds
         if (self.d.getVar('BUILD_IMAGES_FROM_FEEDS', True) or "") != "1":
@@ -913,7 +910,6 @@ class OpkgRootfs(DpkgOpkgRootfs):
         self._setup_dbg_rootfs(['/var/lib/opkg'])
 
         execute_pre_post_process(self.d, opkg_post_process_cmds)
-        execute_pre_post_process(self.d, rootfs_post_install_cmds)
 
         if self.inc_opkg_image_gen == "1":
             self.pm.backup_packaging_data()
@@ -941,7 +937,7 @@ class OpkgRootfs(DpkgOpkgRootfs):
         self._log_check_error()
 
     def _cleanup(self):
-        pass
+        self.pm.remove_lists()
 
 def get_class_for_type(imgtype):
     return {"rpm": RpmRootfs,
@@ -968,17 +964,17 @@ def create_rootfs(d, manifest_dir=None):
     os.environ.update(env_bkp)
 
 
-def image_list_installed_packages(d, format=None, rootfs_dir=None):
+def image_list_installed_packages(d, rootfs_dir=None):
     if not rootfs_dir:
         rootfs_dir = d.getVar('IMAGE_ROOTFS', True)
 
     img_type = d.getVar('IMAGE_PKGTYPE', True)
     if img_type == "rpm":
-        return RpmPkgsList(d, rootfs_dir).list(format)
+        return RpmPkgsList(d, rootfs_dir).list_pkgs()
     elif img_type == "ipk":
-        return OpkgPkgsList(d, rootfs_dir, d.getVar("IPKGCONF_TARGET", True)).list(format)
+        return OpkgPkgsList(d, rootfs_dir, d.getVar("IPKGCONF_TARGET", True)).list_pkgs()
     elif img_type == "deb":
-        return DpkgPkgsList(d, rootfs_dir).list(format)
+        return DpkgPkgsList(d, rootfs_dir).list_pkgs()
 
 if __name__ == "__main__":
     """

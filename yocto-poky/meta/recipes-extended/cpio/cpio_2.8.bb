@@ -5,7 +5,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b7f772ea3a2489231cb4872656cac34b"
 
 PR = "r4"
 
-SRC_URI += "file://m4extensions.patch \
+SRC_URI += " \
+	    file://statdef.patch \
+	    file://m4extensions.patch \
 	    file://avoid_heap_overflow.patch \
 	    file://fix-memory-overrun.patch \
 	   "

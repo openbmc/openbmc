@@ -1,0 +1,53 @@
+From d1345871b992f9a055c968963967e728da1a7ffb Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 30 Jan 2016 20:29:06 +0000
+Subject: [PATCH] nss-myhostname: Check for nss.h presense before use
+
+We do not have nss.h on musl e.g. and configury is already checking for
+nss.h presence, use this to define needed data structures if nss.h is
+missing on a given libc implementation on a platform
+
+include stdint.h for uint32_h definition
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ nss-myhostname.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/nss-myhostname.c b/nss-myhostname.c
+index 293166c..6f287f5 100644
+--- a/nss-myhostname.c
++++ b/nss-myhostname.c
+@@ -21,7 +21,27 @@
+ ***/
+ 
+ #include <limits.h>
++#include <stdint.h>
++#ifdef HAVE_NSS_H
+ #include <nss.h>
++#else
++enum nss_status {
++    NSS_STATUS_TRYAGAIN = -2,
++    NSS_STATUS_UNAVAIL,
++    NSS_STATUS_NOTFOUND,
++    NSS_STATUS_SUCCESS,
++    NSS_STATUS_RETURN
++};
++/* Data structure used for the 'gethostbyname4_r' function.  */
++struct gaih_addrtuple
++  {
++    struct gaih_addrtuple *next;
++    char *name;
++    int family;
++    uint32_t addr[4];
++    uint32_t scopeid;
++  };
++#endif
+ #include <sys/types.h>
+ #include <netdb.h>
+ #include <errno.h>
+-- 
+2.7.0
+

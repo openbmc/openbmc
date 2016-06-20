@@ -24,6 +24,5 @@ do_install () {
 PACKAGES_remove = "whiptail"
 
 FILES_${PN} = "${PYTHON_SITEPACKAGES_DIR}/*"
-FILES_${PN}-dbg += "${PYTHON_SITEPACKAGES_DIR}/.debug/"
 
 BBCLASSEXTEND = "native"

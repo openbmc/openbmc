@@ -4,6 +4,7 @@ aliases. As a workaround we use "sunprc" instead of "portmapper"
 ported from alpine linux
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
 
 Index: rpcbind-0.2.2/src/rpcbind.c
 ===================================================================

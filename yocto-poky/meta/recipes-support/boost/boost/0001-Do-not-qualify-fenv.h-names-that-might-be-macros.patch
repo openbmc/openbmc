@@ -1,0 +1,45 @@
+From f50e7bc9fed323c5705c0ed992c03e80eeec1dd6 Mon Sep 17 00:00:00 2001
+From: Jonathan Wakely <jwakely@redhat.com>
+Date: Mon, 14 Sep 2015 15:05:24 +0100
+Subject: [PATCH] Do not qualify <fenv.h> names that might be macros.
+
+The patch was imported from the boost-test git repository
+(https://github.com/boostorg/test) as of commit id
+f50e7bc9fed323c5705c0ed992c03e80eeec1dd6.
+  
+Upstream-Status: Accepted [commit f50e7bc9fed in develop branch]
+
+Signed-off-by: Lukas Bulwahn <lukas.bulwahn@oss.bmw-carit.de>
+---
+ include/boost/test/impl/execution_monitor.ipp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/include/boost/test/impl/execution_monitor.ipp b/include/boost/test/impl/execution_monitor.ipp
+index b3e873e..a7bdce2 100644
+--- a/include/boost/test/impl/execution_monitor.ipp
++++ b/include/boost/test/impl/execution_monitor.ipp
+@@ -1380,8 +1380,8 @@ enable( unsigned mask )
+ 
+     return ~old_cw & BOOST_FPE_ALL;
+ #elif defined(__GLIBC__) && defined(__USE_GNU) && !defined(BOOST_CLANG) && !defined(BOOST_NO_FENV_H)
+-    ::feclearexcept(BOOST_FPE_ALL);
+-    int res = ::feenableexcept( mask );
++    feclearexcept(BOOST_FPE_ALL);
++    int res = feenableexcept( mask );
+     return res == -1 ? (unsigned)BOOST_FPE_INV : (unsigned)res;
+ #else
+     /* Not Implemented  */
+@@ -1417,8 +1417,8 @@ disable( unsigned mask )
+ 
+     return ~old_cw & BOOST_FPE_ALL;
+ #elif defined(__GLIBC__) && defined(__USE_GNU) && !defined(BOOST_CLANG) && !defined(BOOST_NO_FENV_H)
+-    ::feclearexcept(BOOST_FPE_ALL);
+-    int res = ::fedisableexcept( mask );
++    feclearexcept(BOOST_FPE_ALL);
++    int res = fedisableexcept( mask );
+     return res == -1 ? (unsigned)BOOST_FPE_INV : (unsigned)res;
+ #else
+     /* Not Implemented */
+-- 
+1.9.1
+

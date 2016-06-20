@@ -1,0 +1,28 @@
+From 3c2c2d5dd08aa30ed0e8acd8566ec99412bb8209 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Mon, 26 Oct 2015 17:29:37 +0200
+Subject: [PATCH 3/4] riff: add missing include directories when calling
+ introspection scanner
+
+Upstream-Status: Pending [review on oe-core maillist]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ gst-libs/gst/riff/Makefile.am | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/gst-libs/gst/riff/Makefile.am b/gst-libs/gst/riff/Makefile.am
+index 0a115cc..5057a58 100644
+--- a/gst-libs/gst/riff/Makefile.am
++++ b/gst-libs/gst/riff/Makefile.am
+@@ -39,6 +39,8 @@ libgstriff_@GST_API_VERSION@_la_LDFLAGS = $(GST_LIB_LDFLAGS) $(GST_ALL_LDFLAGS)
+ #		--strip-prefix=Gst \
+ #		--warn-all \
+ #		--c-include "gst/riff/riff.h" \
++#               -I$(top_srcdir)/gst-libs \
++#               -I$(top_builddir)/gst-libs \
+ #		--add-include-path=$(builddir)/../tag \
+ #		--add-include-path=$(builddir)/../audio \
+ #		--add-include-path=$(PKG_CONFIG_SYSROOT_DIR)`PKG_CONFIG_PATH="$(GST_PKG_CONFIG_PATH)" $(PKG_CONFIG) --variable=girdir gstreamer-@GST_API_VERSION@` \
+-- 
+2.6.2
+

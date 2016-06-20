@@ -1,0 +1,19 @@
+defer setting largefile flags to build makery
+in a cross build we can not do runtime config tests
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Inappropriate[Cross compile Specific]
+Index: dosfstools-3.0.28/Makefile
+===================================================================
+--- dosfstools-3.0.28.orig/Makefile
++++ dosfstools-3.0.28/Makefile
+@@ -27,8 +27,7 @@ SBINDIR = $(PREFIX)/sbin
+ DOCDIR = $(PREFIX)/share/doc
+ MANDIR = $(PREFIX)/share/man
+ 
+-#OPTFLAGS = -O2 -fomit-frame-pointer -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
+-OPTFLAGS = -O2 -fomit-frame-pointer -D_GNU_SOURCE $(shell getconf LFS_CFLAGS)
++OPTFLAGS = -O2 -fomit-frame-pointer
+ #WARNFLAGS = -Wall -pedantic -std=c99
+ WARNFLAGS = -Wall -Wextra -Wno-sign-compare -Wno-missing-field-initializers -Wmissing-prototypes -Wstrict-prototypes -Wwrite-strings
+ DEBUGFLAGS = -g

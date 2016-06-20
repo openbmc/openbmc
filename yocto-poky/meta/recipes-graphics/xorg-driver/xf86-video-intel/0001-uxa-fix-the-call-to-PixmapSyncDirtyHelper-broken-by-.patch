@@ -1,0 +1,30 @@
+From 2c5063938cc809f624e56efd4673041fa8141e81 Mon Sep 17 00:00:00 2001
+From: Martin Peres <martin.peres@linux.intel.com>
+Date: Thu, 9 Jul 2015 11:26:38 +0300
+Subject: [PATCH] uxa: fix the call to PixmapSyncDirtyHelper, broken by
+ xserver's 90db5ed
+
+[ickle: switch to HAS_DIRTYTRACKING_ROTATION as suggested by Dave Airlie]
+Signed-off-by: Martin Peres <martin.peres@linux.intel.com>
+
+Upstream-Status: Backport
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+---
+ src/compat-api.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/compat-api.h b/src/compat-api.h
+index aa93bee..293e9d7 100644
+--- a/src/compat-api.h
++++ b/src/compat-api.h
+@@ -247,3 +247,7 @@ static inline void FreePixmap(PixmapPtr pixmap)
+ #endif
+ 
+ #endif
++
++#if HAS_DIRTYTRACKING_ROTATION
++#define PixmapSyncDirtyHelper(d, dd) PixmapSyncDirtyHelper(d)
++#endif
+-- 
+2.5.0
+

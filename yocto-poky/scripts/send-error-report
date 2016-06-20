@@ -15,6 +15,10 @@ import subprocess
 import argparse
 import logging
 
+scripts_lib_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'lib')
+sys.path.insert(0, scripts_lib_path)
+import argparse_oe
+
 version = "0.3"
 
 log = logging.getLogger("send-error-report")
@@ -143,7 +147,7 @@ def send_data(data, args):
 
 
 if __name__ == '__main__':
-    arg_parse = argparse.ArgumentParser(description="This scripts will send an error report to your specified error-report-web server.")
+    arg_parse = argparse_oe.ArgumentParser(description="This scripts will send an error report to your specified error-report-web server.")
 
     arg_parse.add_argument("error_file",
                            help="Generated error report file location",

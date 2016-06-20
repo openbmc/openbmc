@@ -19,6 +19,7 @@ SRC_URI = "http://createrepo.baseurl.org/download/${BP}.tar.gz \
            file://createrepo-dbpath.patch \
            file://dumpMetadata-disable-signature-validation.patch \
            file://rpm-createsolvedb.py \
+           file://fixstat.patch \
            "
 
 SRC_URI[md5sum] = "3e9ccf4abcffe3f49af078c83611eda2"

@@ -1,0 +1,38 @@
+From dbb1c58e86f2af4613f3ac9571d9b163d4bca675 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 23 Oct 2015 16:13:54 +0300
+Subject: [PATCH] vapigen.m4: use $PKG_CONFIG_SYSROOT_DIR
+
+This is necessary in cross-compiling environments, where directories
+returned by pkg-config should be prefixed with sysroot location.
+
+Upstream-Status: Pending [review in oe-core list]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ vapigen/vapigen.m4 | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/vapigen/vapigen.m4 b/vapigen/vapigen.m4
+index 2c435e7..6228991 100644
+--- a/vapigen/vapigen.m4
++++ b/vapigen/vapigen.m4
+@@ -82,12 +82,12 @@ AC_DEFUN([VAPIGEN_CHECK],
+ 
+   AS_CASE([$enable_vala],
+     [yes], [
+-      VAPIGEN=`$PKG_CONFIG --variable=vapigen $vapigen_pkg_name`
+-      VAPIGEN_MAKEFILE=`$PKG_CONFIG --variable=datadir $vapigen_pkg_name`/vala/Makefile.vapigen
++      VAPIGEN=$PKG_CONFIG_SYSROOT_DIR`$PKG_CONFIG --variable=vapigen $vapigen_pkg_name`
++      VAPIGEN_MAKEFILE=$PKG_CONFIG_SYSROOT_DIR`$PKG_CONFIG --variable=datadir $vapigen_pkg_name`/vala/Makefile.vapigen
+       AS_IF([test "x$2" = "x"], [
+-          VAPIGEN_VAPIDIR=`$PKG_CONFIG --variable=vapidir $vapigen_pkg_name`
++          VAPIGEN_VAPIDIR=$PKG_CONFIG_SYSROOT_DIR`$PKG_CONFIG --variable=vapidir $vapigen_pkg_name`
+         ], [
+-          VAPIGEN_VAPIDIR=`$PKG_CONFIG --variable=vapidir_versioned $vapigen_pkg_name`
++          VAPIGEN_VAPIDIR=$PKG_CONFIG_SYSROOT_DIR`$PKG_CONFIG --variable=vapidir_versioned $vapigen_pkg_name`
+         ])
+     ])
+ 
+-- 
+2.1.4
+

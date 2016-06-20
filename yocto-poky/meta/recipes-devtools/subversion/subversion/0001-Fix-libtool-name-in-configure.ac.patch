@@ -1,0 +1,29 @@
+From cbcfe0399347989e45a8fb695f55c855d6b3da72 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Mon, 7 Dec 2015 17:11:02 +0200
+Subject: [PATCH] Fix libtool name in configure.ac
+
+Upstream-Status: Inappropriate [embedded specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 4ed66d4..ceb64f9 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -221,8 +221,8 @@ if test "$experimental_libtool" = "yes"; then
+   LIBTOOL="$sh_libtool"
+   SVN_LIBTOOL="$sh_libtool"
+ else
+-  sh_libtool="$abs_builddir/libtool"
+-  SVN_LIBTOOL="\$(SHELL) \"$sh_libtool\""
++  sh_libtool="$abs_builddir/$host_alias-libtool"
++  SVN_LIBTOOL="\$(SHELL) \$(abs_builddir)/$host_alias-libtool"
+ fi
+ AC_SUBST(SVN_LIBTOOL)
+ 
+-- 
+2.6.2
+

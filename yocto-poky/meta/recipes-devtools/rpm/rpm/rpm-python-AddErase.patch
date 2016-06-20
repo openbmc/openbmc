@@ -1,0 +1,35 @@
+rpm/python: The RPM5 API requires a hdrNum to be passed in
+
+The former behavior of passing in -1 as the hdrNum resulting in erase
+operations that did not complete, but also did not error.  Changing to
+using the header instance resolves this problem.
+
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.15/python/rpmts-py.c
+===================================================================
+--- rpm-5.4.15.orig/python/rpmts-py.c
++++ rpm-5.4.15/python/rpmts-py.c
+@@ -241,12 +241,19 @@ static PyObject *
+ rpmts_AddErase(rpmtsObject * s, PyObject * args)
+ {
+     Header h;
++    uint32_t hdrNum;
+ 
+     if (!PyArg_ParseTuple(args, "O&:AddErase", hdrFromPyObject, &h))
+         return NULL;
+ 
+-SPEW((stderr, "*** %s(%p,%p) ts %p\n", __FUNCTION__, s, h, s->ts));
++    hdrNum = headerGetInstance(h);
++
++SPEW((stderr, "*** %s(%p,%p) ts %p hdrNum %ld\n", __FUNCTION__, s, h, s->ts, hdrNum));
++#ifdef REFERENCE /* this doesn't work, RPM5 requires a unique hdrNum */
+     return PyBool_FromLong(rpmtsAddEraseElement(s->ts, h, -1) == 0);
++#else
++    return PyBool_FromLong(rpmtsAddEraseElement(s->ts, h, hdrNum) == 0);
++#endif
+ }
+ 
+ static int

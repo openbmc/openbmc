@@ -47,7 +47,6 @@
      -rw-rw-r--. 1 wmat wmat   849 Nov 26 04:55 HEADER
      drwxrwxr-x. 5 wmat wmat  4096 Jan 31 13:44 lib
      -rw-rw-r--. 1 wmat wmat   195 Nov 26 04:55 MANIFEST.in
-     -rwxrwxr-x. 1 wmat wmat  3195 Jan 31 11:57 setup.py
      -rw-rw-r--. 1 wmat wmat  2887 Nov 26 04:55 TODO
             </literallayout>
         </para>

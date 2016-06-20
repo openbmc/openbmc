@@ -24,7 +24,6 @@ EXTRA_OECONF = "--with-apr=${STAGING_BINDIR_CROSS}/apr-1-config \
 		--with-dbm=gdbm \
 		--with-gdbm=${STAGING_DIR_HOST}${prefix} \
 		--without-sqlite2 \
-		--without-sqlite3 \
 		--with-expat=${STAGING_DIR_HOST}${prefix}"
 
 
@@ -54,10 +53,10 @@ do_configure_prepend_class-nativesdk() {
 }
 
 do_configure_append_class-nativesdk() {
-	sed -i "s#\(apr_builddir\)=.*#\1=${STAGING_DATADIR}/build-1#" ${S}/build/rules.mk
-	sed -i "s#\(apr_builders\)=.*#\1=${STAGING_DATADIR}/build-1#" ${S}/build/rules.mk
-	sed -i "s#\(top_builddir\)=.*#\1=${STAGING_DATADIR}/build-1#" ${S}/build/rules.mk
-	sed -i "s#\(LIBTOOL=\$(apr_builddir)\).*#\1/libtool#" ${S}/build/rules.mk
+	sed -i "s#\(apr_builddir\)=.*#\1=${STAGING_DATADIR}/build-1#" ${B}/build/rules.mk
+	sed -i "s#\(apr_builders\)=.*#\1=${STAGING_DATADIR}/build-1#" ${B}/build/rules.mk
+	sed -i "s#\(top_builddir\)=.*#\1=${STAGING_DATADIR}/build-1#" ${B}/build/rules.mk
+	sed -i "s#\(LIBTOOL=\$(apr_builddir)\).*#\1/libtool#" ${B}/build/rules.mk
 }
 
 do_install_append_class-target() {
@@ -66,12 +65,21 @@ do_install_append_class-target() {
 	       -e 's,APU_BUILD_DIR=.*,APR_BUILD_DIR=,g' ${D}${bindir}/apu-1-config
 }
 
-FILES_${PN}     += "${libdir}/apr-util-1/apr_dbm_gdbm-1.so"
-FILES_${PN}-dev += "${libdir}/aprutil.exp ${libdir}/apr-util-1/apr_dbm_gdbm.so* ${libdir}/apr-util-1/apr_dbm_gdbm.la"
-FILES_${PN}-dbg += "${libdir}/apr-util-1/.debug/*"
-FILES_${PN}-staticdev += "${libdir}/apr-util-1/apr_dbm_gdbm.a"
+PACKAGECONFIG ??= "crypto"
+PACKAGECONFIG[ldap] = "--with-ldap,--without-ldap,openldap"
+PACKAGECONFIG[crypto] = "--with-openssl=${STAGING_DIR_HOST}${prefix} --with-crypto,--without-crypto,openssl"
+PACKAGECONFIG[sqlite3] = "--with-sqlite3=${STAGING_DIR_HOST}${prefix},--without-sqlite3,sqlite3"
+
+#files ${libdir}/apr-util-1/*.so are not symlinks but loadable modules thus they are packaged in ${PN}
+FILES_${PN}     += "${libdir}/apr-util-1/apr*${SOLIBS} ${libdir}/apr-util-1/apr*${SOLIBSDEV}"
+FILES_${PN}-dev += "${libdir}/aprutil.exp ${libdir}/apr-util-1/*.la"
+FILES_${PN}-staticdev += "${libdir}/apr-util-1/*.a"
+
+INSANE_SKIP_${PN} += "dev-so"
 
 inherit ptest
+
+RDEPENDS_${PN}-ptest_append_libc-glibc = " glibc-gconv-iso8859-1 glibc-gconv-iso8859-2 glibc-gconv-utf-7"
 
 do_compile_ptest() {
 	cd ${B}/test

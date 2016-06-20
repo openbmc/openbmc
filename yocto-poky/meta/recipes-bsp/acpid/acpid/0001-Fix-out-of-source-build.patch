@@ -1,0 +1,46 @@
+From 5d32b65af750e2007730f3d55a552a186aed81a6 Mon Sep 17 00:00:00 2001
+From: "Maxin B. John" <maxin.john@intel.com>
+Date: Wed, 20 Jan 2016 14:08:29 +0200
+Subject: [PATCH] Fix out of source build
+
+Since the source directory contains another config.h, the build
+directory should be searched first.
+
+Upstream-Status: Submitted
+[https://sourceforge.net/p/acpid2/tickets/10/]
+
+Signed-off-by: Maxin B. John <maxin.john@intel.com>
+---
+ sock.c      | 2 +-
+ ud_socket.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/sock.c b/sock.c
+index 644d460..9e04501 100644
+--- a/sock.c
++++ b/sock.c
+@@ -21,7 +21,7 @@
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+-#include "config.h"
++#include <config.h>
+ #endif
+ 
+ #include <unistd.h>
+diff --git a/ud_socket.c b/ud_socket.c
+index 1790917..83b2aa9 100644
+--- a/ud_socket.c
++++ b/ud_socket.c
+@@ -4,7 +4,7 @@
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+-#include "config.h"
++#include <config.h>
+ #endif
+ 
+ #include <stdio.h>
+-- 
+2.4.0
+

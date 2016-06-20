@@ -4,12 +4,12 @@ python do_listtasks() {
     taskdescs = {}
     maxlen = 0
     for e in d.keys():
-        if d.getVarFlag(e, 'task'):
+        if d.getVarFlag(e, 'task', True):
             maxlen = max(maxlen, len(e))
             if e.endswith('_setscene'):
-                desc = "%s (setscene version)" % (d.getVarFlag(e[:-9], 'doc') or '')
+                desc = "%s (setscene version)" % (d.getVarFlag(e[:-9], 'doc', True) or '')
             else:
-                desc = d.getVarFlag(e, 'doc') or ''
+                desc = d.getVarFlag(e, 'doc', True) or ''
             taskdescs[e] = desc
 
     tasks = sorted(taskdescs.keys())
@@ -43,11 +43,8 @@ python do_checkuri() {
     if len(src_uri) == 0:
         return
 
-    localdata = bb.data.createCopy(d)
-    bb.data.update_data(localdata)
-
     try:
-        fetcher = bb.fetch2.Fetch(src_uri, localdata)
+        fetcher = bb.fetch2.Fetch(src_uri, d)
         fetcher.checkstatus()
     except bb.fetch2.BBFetchException, e:
         raise bb.build.FuncFailed(e)

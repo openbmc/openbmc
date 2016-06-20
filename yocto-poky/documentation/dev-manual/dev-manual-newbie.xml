@@ -96,7 +96,10 @@
             <para>
                 For developers who mainly do application level work
                 on top of an existing software stack,
-                here are some practices that work best:
+                the following list shows practices that work best.
+                For information on using a Software Development Kit (SDK), see
+                the
+                <ulink url='&YOCTO_DOCS_SDK_URL;#sdk-intro'>Yocto Project Software Development Kit (SDK) Developer's Guide</ulink>:
                 <itemizedlist>
                     <listitem><para>Use a pre-built toolchain that
                         contains the software stack itself.
@@ -106,12 +109,9 @@
                         isolated applications.</para></listitem>
                     <listitem><para>When possible, use the Yocto Project
                         plug-in for the <trademark class='trade'>Eclipse</trademark> IDE
-                        and other pieces of Application Development
-                        Technology (ADT).
+                        and SDK development practices.
                         For more information, see the
-                        "<link linkend='application-development-workflow'>Application
-                        Development Workflow</link>" section as well as the
-                        <ulink url='&YOCTO_DOCS_ADT_URL;'>Yocto Project Application Developer's Guide</ulink>.
+                        "<ulink url='&YOCTO_DOCS_SDK_URL;'>Yocto Project Software Development Kit (SDK) Developer's Guide</ulink>".
                         </para></listitem>
                     <listitem><para>Keep your cross-development toolchains
                         updated.
@@ -603,7 +603,7 @@
                 the
                 <link linkend='build-directory'>Build Directory</link>
                 contains user-defined variables that affect every build.
-                The <filename>meta-yocto/conf/distro/poky.conf</filename>
+                The <filename>meta-poky/conf/distro/poky.conf</filename>
                 configuration file defines Yocto "distro" configuration
                 variables used only when building with this policy.
                 Machine configuration files, which
@@ -636,8 +636,6 @@
                         <listitem><para>A relocatable toolchain used outside of
                             BitBake by developers when developing applications
                             that will run on a targeted device.
-                            Sometimes this relocatable cross-development
-                            toolchain is referred to as the meta-toolchain.
                             </para></listitem>
                     </itemizedlist>
                 </para>
@@ -650,8 +648,7 @@
                     section in the Yocto Project Reference Manual.
                     You can also find more information on using the
                     relocatable toolchain in the
-                    <ulink url='&YOCTO_DOCS_ADT_URL;'>Yocto Project
-                    Application Developer's Guide</ulink>.
+                    <ulink url='&YOCTO_DOCS_SDK_URL;'>Yocto Project Software Development Kit (SDK) Developer's Guide</ulink>.
                 </para></listitem>
             <listitem><para><emphasis>Image:</emphasis>
                 An image is an artifact of the BitBake build process given
@@ -667,10 +664,6 @@
                 "<ulink url='&YOCTO_DOCS_BSP_URL;#bsp-layers'>BSP Layers</ulink>"
                 section in the Yocto Project Board Support Packages (BSP)
                 Developer's Guide.</para></listitem>
-            <listitem><para id='meta-toolchain'><emphasis>Meta-Toolchain:</emphasis>
-                A term sometimes used for
-                <link linkend='cross-development-toolchain'>Cross-Development Toolchain</link>.
-                </para></listitem>
             <listitem><para id='metadata'><emphasis>Metadata:</emphasis>
                 The files that BitBake parses when building an image.
                 In general, Metadata includes recipes, classes, and
@@ -983,7 +976,7 @@
             Git uses "branches" to organize different development efforts.
             For example, the <filename>poky</filename> repository has
             several branches that include the current
-            <filename>&DISTRO_NAME;</filename> branch, the
+            <filename>&DISTRO_NAME_NO_CAP;</filename> branch, the
             <filename>master</filename> branch, and many branches for past
             Yocto Project releases.
             You can see all the branches by going to
@@ -1015,14 +1008,14 @@
      $ cd ~
      $ git clone git://git.yoctoproject.org/poky
      $ cd poky
-     $ git checkout -b &DISTRO_NAME; origin/&DISTRO_NAME;
+     $ git checkout -b &DISTRO_NAME_NO_CAP; origin/&DISTRO_NAME_NO_CAP;
             </literallayout>
             In this example, the name of the top-level directory of your local
             <link linkend='source-directory'>Source Directory</link>
             is "poky" and the name of that local working area (local branch)
-            you just created and checked out is "&DISTRO_NAME;".
+            you just created and checked out is "&DISTRO_NAME_NO_CAP;".
             The files in your local repository now reflect the same files that
-            are in the "&DISTRO_NAME;" development branch of the
+            are in the "&DISTRO_NAME_NO_CAP;" development branch of the
             Yocto Project's "poky" upstream repository.
             It is important to understand that when you create and checkout a
             local working branch based on a branch name,
@@ -1030,7 +1023,7 @@
             at the time you created your local branch, which could be
             different from the files at the time of a similarly named release.
             In other words, creating and checking out a local branch based on
-            the "&DISTRO_NAME;" branch name is not the same as
+            the "&DISTRO_NAME_NO_CAP;" branch name is not the same as
             cloning and checking out the "master" branch.
             Keep reading to see how you create a local snapshot of a Yocto
             Project Release.
@@ -1049,10 +1042,11 @@
         </para>
 
         <para>
-            Some key tags are <filename>dylan-9.0.4</filename>,
-            <filename>dora-10.0.4</filename>, <filename>daisy-11.0.2</filename>,
-            <filename>dizzy-12.0.0</filename>, and
-            <filename>&DISTRO_NAME;-&POKYVERSION;</filename>.
+            Some key tags are
+            <filename>dizzy-12.0.0</filename>,
+            <filename>fido-13.0.0</filename>,
+            <filename>jethro-14.0.0</filename>, and
+            <filename>&DISTRO_NAME_NO_CAP;-&POKYVERSION;</filename>.
             These tags represent Yocto Project releases.
         </para>
 
@@ -1070,14 +1064,14 @@
      $ cd ~
      $ git clone git://git.yoctoproject.org/poky
      $ cd poky
-     $ git checkout -b my-&DISTRO_NAME;-&POKYVERSION; &DISTRO_NAME;-&POKYVERSION;
+     $ git checkout -b my-&DISTRO_NAME_NO_CAP;-&POKYVERSION; &DISTRO_NAME_NO_CAP;-&POKYVERSION;
             </literallayout>
             In this example, the name of the top-level directory of your local Yocto Project
             Files Git repository is <filename>poky</filename>.
             And, the name of the local branch you have created and checked out is
-            <filename>my-&DISTRO_NAME;-&POKYVERSION;</filename>.
+            <filename>my-&DISTRO_NAME_NO_CAP;-&POKYVERSION;</filename>.
             The files in your repository now exactly match the Yocto Project &DISTRO;
-            Release tag (<filename>&DISTRO_NAME;-&POKYVERSION;</filename>).
+            Release tag (<filename>&DISTRO_NAME_NO_CAP;-&POKYVERSION;</filename>).
             It is important to understand that when you create and checkout a local
             working branch based on a tag, your environment matches a specific point
             in time and not the entire development branch.
@@ -1131,20 +1125,20 @@
                     into the project’s upstream (or master) repository.</para></listitem>
                 <listitem><para><emphasis><filename>git status</filename>:</emphasis> Reports any modified files that
                     possibly need to be staged and committed.</para></listitem>
-                <listitem><para><emphasis><filename>git checkout &lt;branch-name&gt;</filename>:</emphasis> Changes
+                <listitem><para><emphasis><filename>git checkout</filename> <replaceable>branch-name</replaceable>:</emphasis> Changes
                     your working branch.
                     This command is analogous to "cd".</para></listitem>
-                <listitem><para><emphasis><filename>git checkout –b &lt;working-branch&gt;</filename>:</emphasis> Creates
+                <listitem><para><emphasis><filename>git checkout –b</filename> <replaceable>working-branch</replaceable>:</emphasis> Creates
                     a working branch on your local machine where you can isolate work.
                     It is a good idea to use local branches when adding specific features or changes.
                     This way if you do not like what you have done you can easily get rid of the work.</para></listitem>
                 <listitem><para><emphasis><filename>git branch</filename>:</emphasis> Reports
                     existing local branches and
                     tells you the branch in which you are currently working.</para></listitem>
-                <listitem><para><emphasis><filename>git branch -D &lt;branch-name&gt;</filename>:</emphasis>
+                <listitem><para><emphasis><filename>git branch -D</filename> <replaceable>branch-name</replaceable>:</emphasis>
                     Deletes an existing local branch.
                     You need to be in a local branch other than the one you are deleting
-                    in order to delete <filename>&lt;branch-name&gt;</filename>.</para></listitem>
+                    in order to delete <replaceable>branch-name</replaceable>.</para></listitem>
                 <listitem><para><emphasis><filename>git pull</filename>:</emphasis> Retrieves information
                     from an upstream Git
                     repository and places it in your local Git repository.
@@ -1410,7 +1404,7 @@
                 Examine the <filename>maintainers.inc</filename> file, which is
                 located in the
                 <link linkend='source-directory'>Source Directory</link>
-                at <filename>meta-yocto/conf/distro/include</filename>, to
+                at <filename>meta-poky/conf/distro/include</filename>, to
                 see who is responsible for code.
                 </para></listitem>
             <listitem><para><emphasis>Board Support Package (BSP) README Files:</emphasis>
@@ -1454,7 +1448,7 @@
             <listitem><para>For changes to BitBake (anything under the <filename>bitbake</filename>
                 directory), send your patch to the
                 <ulink url='&OE_LISTS_URL;/listinfo/bitbake-devel'>bitbake-devel</ulink> mailing list.</para></listitem>
-            <listitem><para>For changes to <filename>meta-yocto</filename>, send your patch to the
+            <listitem><para>For changes to <filename>meta-poky</filename>, send your patch to the
                 <ulink url='&YOCTO_LISTS_URL;/listinfo/poky'>poky</ulink> mailing list.</para></listitem>
             <listitem><para>For changes to other layers hosted on
                 <filename>yoctoproject.org</filename> (unless the

@@ -159,7 +159,7 @@ class PythonRecipeHandler(RecipeHandler):
     def __init__(self):
         pass
 
-    def process(self, srctree, classes, lines_before, lines_after, handled):
+    def process(self, srctree, classes, lines_before, lines_after, handled, extravalues):
         if 'buildsystem' in handled:
             return False
 
@@ -278,7 +278,10 @@ class PythonRecipeHandler(RecipeHandler):
             for k in sorted(bbinfo):
                 v = bbinfo[k]
                 mdinfo.append('{} = "{}"'.format(k, v))
-            lines_before[src_uri_line-1:src_uri_line-1] = mdinfo
+            if src_uri_line:
+                lines_before[src_uri_line-1:src_uri_line-1] = mdinfo
+            else:
+                lines_before.extend(mdinfo)
 
         mapped_deps, unmapped_deps = self.scan_setup_python_deps(srctree, setup_info, setup_non_literals)
 
@@ -713,4 +716,4 @@ def has_non_literals(value):
 
 def register_recipe_handlers(handlers):
     # We need to make sure this is ahead of the makefile fallback handler
-    handlers.insert(0, PythonRecipeHandler())
+    handlers.append((PythonRecipeHandler(), 70))

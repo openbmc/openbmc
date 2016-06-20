@@ -11,11 +11,14 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=dcf3c825659e82539645da41a7908589"
 HOMEPAGE = "http://directfb.org"
 DEPENDS = "jpeg libpng freetype zlib tslib sysfsutils"
 
-SRC_URI = "http://www.directfb.org/downloads/Core/DirectFB-1.7/DirectFB-${PV}.tar.gz \
+SRC_URI = "http://downloads.yoctoproject.org/mirror/sources/DirectFB-${PV}.tar.gz \
            file://configurefix.patch \
            file://fusion.patch \
            file://bashism.patch \
            file://0001-gfx-direct-Aboid-usng-VLAs-and-printf-formats.patch \
+           file://compar_fn_t.patch \
+           file://union-sigval.patch \
+           file://use-PTHREAD_MUTEX_RECURSIVE.patch \
           "
 
 S = "${WORKDIR}/DirectFB-${PV}"
@@ -23,7 +26,7 @@ S = "${WORKDIR}/DirectFB-${PV}"
 LDFLAGS_append =" -lts -lm"
 
 # Workaround for linking issues seen with armv7a + gold
-LDFLAGS_append_armv7a = "${@base_contains('DISTRO_FEATURES', 'ld-is-gold', ' -fuse-ld=bfd ', '', d)}"
+LDFLAGS_append_arm = "${@base_contains('DISTRO_FEATURES', 'ld-is-gold', ' -fuse-ld=bfd ', '', d)}"
 
 BINCONFIG = "${bindir}/directfb-config"
 
@@ -58,13 +61,6 @@ TARGET_CFLAGS_remove_x86 = "-fno-omit-frame-pointer"
 #}
 
 # NOTE: monolithic packaging for now, should improve that eventually
-
-
-
-FILES_${PN}-dbg += "\
-  ${libdir}/directfb-${RV}/*/*/.debug/*.so \
-  ${libdir}/directfb-${RV}/*/.debug/*.so \
-"
 
 FILES_${PN}-dev += "\
   ${bindir}/directfb-config \

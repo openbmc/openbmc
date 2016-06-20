@@ -1,0 +1,29 @@
+From 8331b87845cafdda40e59a682f2ca8120ed0c472 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 31 Dec 2015 08:17:40 +0000
+Subject: [PATCH] lttng-live: Include sys/param.h for MAXNAMLEN defintion
+
+exposed on musl based systems
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: pending
+
+ formats/lttng-live/lttng-live.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/formats/lttng-live/lttng-live.h b/formats/lttng-live/lttng-live.h
+index 4ab641d..808ed2b 100644
+--- a/formats/lttng-live/lttng-live.h
++++ b/formats/lttng-live/lttng-live.h
+@@ -25,6 +25,7 @@
+  */
+ 
+ #include <stdint.h>
++#include <sys/param.h>
+ #include "lttng-viewer-abi.h"
+ 
+ #define LTTNG_DEFAULT_NETWORK_VIEWER_PORT	5344
+-- 
+2.6.4
+

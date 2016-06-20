@@ -30,7 +30,7 @@ except ImportError:
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "oeqa")))
 
-from oeqa.oetest import runTests
+from oeqa.oetest import TestContext
 from oeqa.utils.sshcontrol import SSHControl
 from oeqa.utils.dump import get_host_dumper
 
@@ -49,7 +49,7 @@ class FakeTarget(object):
     def exportStart(self):
         self.sshlog = os.path.join(self.testdir, "ssh_target_log.%s" % self.datetime)
         sshloglink = os.path.join(self.testdir, "ssh_target_log")
-        if os.path.exists(sshloglink):
+        if os.path.lexists(sshloglink):
             os.remove(sshloglink)
         os.symlink(self.sshlog, sshloglink)
         print("SSH log file: %s" %  self.sshlog)
@@ -69,10 +69,9 @@ class MyDataDict(dict):
     def getVar(self, key, unused = None):
         return self.get(key, "")
 
-class TestContext(object):
-    def __init__(self):
-        self.d = None
-        self.target = None
+class ExportTestContext(TestContext):
+    def __init__(self, d):
+        self.d = d
 
 def main():
 
@@ -121,7 +120,9 @@ def main():
     host_dumper.parent_dir = loaded["host_dumper"]["parent_dir"]
     host_dumper.cmds = loaded["host_dumper"]["cmds"]
 
-    tc = TestContext()
+    target.exportStart()
+    tc = ExportTestContext(d)
+
     setattr(tc, "d", d)
     setattr(tc, "target", target)
     setattr(tc, "host_dumper", host_dumper)
@@ -129,8 +130,8 @@ def main():
         if key != "d" and key != "target" and key != "host_dumper":
             setattr(tc, key, loaded[key])
 
-    target.exportStart()
-    runTests(tc)
+    tc.loadTests()
+    tc.runTests()
 
     return 0
 
@@ -140,5 +141,5 @@ if __name__ == "__main__":
     except Exception:
         ret = 1
         import traceback
-        traceback.print_exc(5)
+        traceback.print_exc()
     sys.exit(ret)

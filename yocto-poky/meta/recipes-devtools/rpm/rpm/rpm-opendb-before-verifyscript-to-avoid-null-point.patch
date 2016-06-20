@@ -6,7 +6,7 @@ rpmpsmStage function(rpmVerifyScript->rpmpsmScriptStage->rpmpsmStage) and occur 
 fault because of null point(rpmtsGetRdb(ts) == NULL and rpmtsGetRdb(ts)->db_txn).
 So we open rpmdb to avoid bad input when find headerIsEntry true.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [RPM5 maintainer]
 
 Signed-off-by: Zhixiong Chi <zhixiong.chi@windriver.com>
 Index: rpm-5.4.14/lib/verify.c

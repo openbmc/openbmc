@@ -1,0 +1,29 @@
+From 7ac6fd51991ac61d1d7594f601d87842060ee284 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 8 Jan 2016 07:06:11 +0000
+Subject: [PATCH 22/32] include sys/types.h
+
+Fixes
+
+error: unknown type name 'uint'
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ testcases/kernel/ipc/ipc_stress/shmem_test_04.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/testcases/kernel/ipc/ipc_stress/shmem_test_04.c b/testcases/kernel/ipc/ipc_stress/shmem_test_04.c
+index 72c2e60..e7e5f61 100644
+--- a/testcases/kernel/ipc/ipc_stress/shmem_test_04.c
++++ b/testcases/kernel/ipc/ipc_stress/shmem_test_04.c
+@@ -65,6 +65,7 @@
+ #include <signal.h>
+ #include <stdint.h>
+ #include <sys/mman.h>
++#include <sys/types.h>
+ 
+ #ifdef _LINUX_
+ typedef unsigned long ulong_t;
+-- 
+2.7.0
+

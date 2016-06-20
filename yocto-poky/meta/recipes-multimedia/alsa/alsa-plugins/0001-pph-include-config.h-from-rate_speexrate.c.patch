@@ -1,0 +1,35 @@
+From 4350314c941489833a8baa930e16512e55f72a13 Mon Sep 17 00:00:00 2001
+From: Tanu Kaskinen <tanuk@iki.fi>
+Date: Wed, 27 Jan 2016 13:22:38 +0200
+Subject: [PATCH] pph: include config.h from rate_speexrate.c
+
+Fixes compilation against libspeexdsp 1.2rc3.
+
+rate_speexrate.c includes speex_resampler.h, which depends on config.h
+by referencing the HAVE_SPEEX_SPEEXDSP_TYPES_H macro. AFAIK it's not
+a good idea to include config.h from headers (I don't know/remember
+why, though), which is why I include config.h from rate_speexrate.c
+instead of speex_resampler.h.
+
+Upstream-Status: Accepted [expected in 1.1.1]
+
+Signed-off-by: Tanu Kaskinen <tanuk@iki.fi>
+---
+ pph/rate_speexrate.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/pph/rate_speexrate.c b/pph/rate_speexrate.c
+index 0a1325c..8fc4cef 100644
+--- a/pph/rate_speexrate.c
++++ b/pph/rate_speexrate.c
+@@ -28,6 +28,7 @@
+    POSSIBILITY OF SUCH DAMAGE.
+ */
+ 
++#include "config.h"
+ #include <stdio.h>
+ #include <alsa/asoundlib.h>
+ #include <alsa/pcm_rate.h>
+-- 
+2.7.0.rc3
+

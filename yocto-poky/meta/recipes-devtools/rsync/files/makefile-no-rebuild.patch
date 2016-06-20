@@ -1,0 +1,69 @@
+Remove the Makefile rules to reinvoke autoconf, they're not out-of-tree safe and
+generally overcomplicated, and we ensure that autoreconf is invoked if required.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/Makefile.in b/Makefile.in
+index 151247d..8f3fdb6 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -141,58 +141,6 @@ gen: conf proto.h man
+ gensend: gen
+ 	rsync -aivzc $(GENFILES) $${SAMBA_HOST-samba.org}:/home/ftp/pub/rsync/generated-files/
+ 
+-conf:
+-	cd $(srcdir) && $(MAKE) -f prepare-source.mak conf
+-
+-aclocal.m4: $(srcdir)/m4/*.m4
+-	aclocal -I $(srcdir)/m4
+-
+-configure.sh config.h.in: configure.ac aclocal.m4
+-	@if test -f configure.sh; then cp -p configure.sh configure.sh.old; else touch configure.sh.old; fi
+-	@if test -f config.h.in; then cp -p config.h.in config.h.in.old; else touch config.h.in.old; fi
+-	autoconf -o configure.sh
+-	autoheader && touch config.h.in
+-	@if diff configure.sh configure.sh.old >/dev/null 2>&1; then \
+-	    echo "configure.sh is unchanged."; \
+-	    rm configure.sh.old; \
+-	else \
+-	    echo "configure.sh has CHANGED."; \
+-	fi
+-	@if diff config.h.in config.h.in.old >/dev/null 2>&1; then \
+-	    echo "config.h.in is unchanged."; \
+-	    rm config.h.in.old; \
+-	else \
+-	    echo "config.h.in has CHANGED."; \
+-	fi
+-	@if test -f configure.sh.old -o -f config.h.in.old; then \
+-	    if test "$(MAKECMDGOALS)" = reconfigure; then \
+-		echo 'Continuing with "make reconfigure".'; \
+-	    else \
+-		echo 'You may need to run:'; \
+-		echo '  make reconfigure'; \
+-		exit 1; \
+-	    fi \
+-	fi
+-
+-reconfigure: configure.sh
+-	./config.status --recheck
+-	./config.status
+-
+-Makefile: Makefile.in config.status configure.sh config.h.in
+-	@if test -f Makefile; then cp -p Makefile Makefile.old; else touch Makefile.old; fi
+-	@./config.status
+-	@if diff Makefile Makefile.old >/dev/null 2>&1; then \
+-	    echo "Makefile is unchanged."; \
+-	    rm Makefile.old; \
+-	else \
+-	    if test "$(MAKECMDGOALS)" = reconfigure; then \
+-		echo 'Continuing with "make reconfigure".'; \
+-	    else \
+-		echo "Makefile updated -- rerun your make command."; \
+-		exit 1; \
+-	    fi \
+-	fi
+-
+ rsync-ssl: $(srcdir)/rsync-ssl.in Makefile
+ 	sed 's;\@bindir\@;$(bindir);g' <$(srcdir)/rsync-ssl.in >rsync-ssl
+ 	@chmod +x rsync-ssl

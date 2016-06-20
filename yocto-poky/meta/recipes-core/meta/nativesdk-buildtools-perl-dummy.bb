@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 inherit allarch
 
-PR = "r1"
+PR = "r2"
 
 python() {
     # Put the package somewhere separate to ensure it's never used except
@@ -20,7 +20,8 @@ PERLPACKAGES = "nativesdk-perl \
 ALLOW_EMPTY_${PN} = "1"
 
 python populate_packages_prepend() {
-    d.appendVar('RPROVIDES_${PN}', '${PERLPACKAGES}')
-    d.appendVar('RCONFLICTS_${PN}', '${PERLPACKAGES}')
+    d.appendVar(d.expand('RPROVIDES_${PN}'), '${PERLPACKAGES}')
+    d.appendVar(d.expand('RCONFLICTS_${PN}'), '${PERLPACKAGES}')
+    d.appendVar(d.expand('RREPLACES_${PN}'), '${PERLPACKAGES}')
 }
 

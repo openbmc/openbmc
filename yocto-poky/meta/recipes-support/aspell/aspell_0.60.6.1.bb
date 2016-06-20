@@ -17,7 +17,6 @@ PACKAGES += "libaspell libpspell aspell-utils"
 
 RDEPENDS_${PN}-utils += "perl"
 
-FILES_${PN}-dbg += "${libdir}/aspell-0.60/.debu*"
 FILES_libaspell = "${libdir}/libaspell.so.* ${libdir}/aspell*"
 FILES_aspell-utils = "${bindir}/word-list-compress ${bindir}/aspell-import ${bindir}/run-with-aspell ${bindir}/pre*"
 FILES_${PN} = "${bindir}/aspell"

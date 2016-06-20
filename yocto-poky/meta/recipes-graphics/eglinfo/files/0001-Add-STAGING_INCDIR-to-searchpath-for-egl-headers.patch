@@ -1,0 +1,34 @@
+From 94b1e6daf7d70550b0e32fbb269fcf6887948d3f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 13 Jan 2016 16:08:22 -0800
+Subject: [PATCH] Add STAGING_INCDIR to searchpath for egl headers
+
+bcm_host.h is in standard includedir in sysroot
+add that to header search paths.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted
+
+ wscript | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/wscript b/wscript
+index fcbb55b..cece8bf 100644
+--- a/wscript
++++ b/wscript
+@@ -163,9 +163,10 @@ def configure_raspberrypi_device(conf, platform):
+ 	conf.check_cxx(mandatory = 1, lib = ['GLESv2', 'EGL', 'bcm_host'], uselib_store = 'EGL')
+ 	import os
+ 	sysroot = conf.options.sysroot + conf.options.prefix
++        std_include_path = os.path.join(sysroot, 'include')
+ 	vcos_pthread_path = os.path.join(sysroot, 'include/interface/vcos/pthreads')
+ 	vcms_host_path = os.path.join(sysroot, 'include/interface/vmcs_host/linux')
+-	if not conf.check_cxx(mandatory = 0, header_name = ['vcos_platform_types.h', 'EGL/egl.h', 'bcm_host.h'], includes = [vcos_pthread_path, vcms_host_path], uselib_store = 'EGL'):
++	if not conf.check_cxx(mandatory = 0, header_name = ['vcos_platform_types.h', 'EGL/egl.h', 'bcm_host.h'], includes = [vcos_pthread_path, vcms_host_path, std_include_path], uselib_store = 'EGL'):
+ 		conf.fatal('Check if --prefix and --sysroot are set correctly.')
+ 	conf.env['WITH_APIS'] = []
+ 	if check_gles2(conf):
+-- 
+2.7.0
+

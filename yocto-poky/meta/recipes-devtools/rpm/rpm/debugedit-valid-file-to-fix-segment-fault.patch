@@ -14,7 +14,7 @@ Before the above operations, invoke elf_begin/elf_update/elf_end
 with ELF_C_RDWR and ELF_F_LAYOUT set to enlarge the above file, it
 could make sure the file is safe for the following elf operations.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [RPM5 maintainer]
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  tools/debugedit.c | 25 +++++++++++++++++++++++++

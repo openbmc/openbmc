@@ -33,10 +33,6 @@ from devtool import exec_build_env_command, setup_tinfoil, DevtoolError, parse_r
 
 logger = logging.getLogger('devtool')
 
-def plugin_init(pluginlist):
-    """Plugin initialization"""
-    pass
-
 def _run(cmd, cwd=''):
     logger.debug("Running command %s> %s" % (cwd,cmd))
     return bb.process.run('%s' % cmd, cwd=cwd)
@@ -66,26 +62,6 @@ def _get_checksums(rf):
                     checksums[cs] = m.group(1)
     return checksums
 
-def _replace_checksums(rf, md5, sha256):
-    if not md5 and not sha256:
-        return
-    checksums = {'md5sum':md5, 'sha256sum':sha256}
-    with open(rf + ".tmp", "w+") as tmprf:
-        with open(rf) as f:
-            for line in f:
-                m = None
-                for cs in checksums.keys():
-                    m = re.match("^SRC_URI\[%s\].*=.*\"(.*)\"" % cs, line)
-                    if m:
-                        if checksums[cs]:
-                            oldcheck = m.group(1)
-                            newcheck = checksums[cs]
-                            line = line.replace(oldcheck, newcheck)
-                        break
-                tmprf.write(line)
-    os.rename(rf + ".tmp", rf)
-
-
 def _remove_patch_dirs(recipefolder):
     for root, dirs, files in os.walk(recipefolder):
         for d in dirs:
@@ -105,23 +81,21 @@ def _rename_recipe_dirs(oldpv, newpv, path):
             if olddir.find(oldpv) != -1:
                 newdir = olddir.replace(oldpv, newpv)
                 if olddir != newdir:
-                    _run('mv %s %s' % (olddir, newdir))
+                    shutil.move(os.path.join(path, olddir), os.path.join(path, newdir))
 
-def _rename_recipe_file(bpn, oldpv, newpv, path):
-    oldrecipe = "%s_%s.bb" % (bpn, oldpv)
-    newrecipe = "%s_%s.bb" % (bpn, newpv)
-    if os.path.isfile(os.path.join(path, oldrecipe)):
+def _rename_recipe_file(oldrecipe, bpn, oldpv, newpv, path):
+    oldrecipe = os.path.basename(oldrecipe)
+    if oldrecipe.endswith('_%s.bb' % oldpv):
+        newrecipe = '%s_%s.bb' % (bpn, newpv)
         if oldrecipe != newrecipe:
-            _run('mv %s %s' % (oldrecipe, newrecipe), cwd=path)
+            shutil.move(os.path.join(path, oldrecipe), os.path.join(path, newrecipe))
     else:
-        recipe = "%s_git.bb" % bpn
-        if os.path.isfile(os.path.join(path, recipe)):
-            newrecipe = recipe
+        newrecipe = oldrecipe
     return os.path.join(path, newrecipe)
 
-def _rename_recipe_files(bpn, oldpv, newpv, path):
+def _rename_recipe_files(oldrecipe, bpn, oldpv, newpv, path):
     _rename_recipe_dirs(oldpv, newpv, path)
-    return _rename_recipe_file(bpn, oldpv, newpv, path)
+    return _rename_recipe_file(oldrecipe, bpn, oldpv, newpv, path)
 
 def _write_append(rc, srctree, same_dir, no_same_dir, rev, workspace, d):
     """Writes an append file"""
@@ -171,7 +145,15 @@ def _get_uri(rd):
     srcuris = rd.getVar('SRC_URI', True).split()
     if not len(srcuris):
         raise DevtoolError('SRC_URI not found on recipe')
-    srcuri = srcuris[0] # it is assumed, URI is at first position
+    # Get first non-local entry in SRC_URI - usually by convention it's
+    # the first entry, but not always!
+    srcuri = None
+    for entry in srcuris:
+        if not entry.startswith('file://'):
+            srcuri = entry
+            break
+    if not srcuri:
+        raise DevtoolError('Unable to find non-local entry in SRC_URI')
     srcrev = '${AUTOREV}'
     if '://' in srcuri:
         # Fetch a URL
@@ -205,7 +187,7 @@ def _extract_new_source(newpv, srctree, no_patch, srcrev, branch, keep_temp, tin
         md5 = None
         sha256 = None
     else:
-        __run('git checkout -b devtool-%s' % newpv)
+        __run('git checkout devtool-base -b devtool-%s' % newpv)
 
         tmpdir = tempfile.mkdtemp(prefix='devtool')
         try:
@@ -214,9 +196,19 @@ def _extract_new_source(newpv, srctree, no_patch, srcrev, branch, keep_temp, tin
             raise DevtoolError(e)
 
         tmpsrctree = _get_srctree(tmpdir)
+        srctree = os.path.abspath(srctree)
 
-        scrtree = os.path.abspath(srctree)
+        # Delete all sources so we ensure no stray files are left over
+        for item in os.listdir(srctree):
+            if item in ['.git', 'oe-local-files']:
+                continue
+            itempath = os.path.join(srctree, item)
+            if os.path.isdir(itempath):
+                shutil.rmtree(itempath)
+            else:
+                os.remove(itempath)
 
+        # Copy in new ones
         _copy_source_code(tmpsrctree, srctree)
 
         (stdout,_) = __run('git ls-files --modified --others --exclude-standard')
@@ -255,19 +247,20 @@ def _extract_new_source(newpv, srctree, no_patch, srcrev, branch, keep_temp, tin
 
     return (rev, md5, sha256)
 
-def _create_new_recipe(newpv, md5, sha256, srcrev, workspace, tinfoil, rd):
+def _create_new_recipe(newpv, md5, sha256, srcrev, srcbranch, workspace, tinfoil, rd):
     """Creates the new recipe under workspace"""
-    crd = rd.createCopy()
 
-    bpn = crd.getVar('BPN', True)
+    bpn = rd.getVar('BPN', True)
     path = os.path.join(workspace, 'recipes', bpn)
     bb.utils.mkdirhier(path)
-    oe.recipeutils.copy_recipe_files(crd, path)
+    oe.recipeutils.copy_recipe_files(rd, path)
 
-    oldpv = crd.getVar('PV', True)
+    oldpv = rd.getVar('PV', True)
     if not newpv:
         newpv = oldpv
-    fullpath = _rename_recipe_files(bpn, oldpv, newpv, path)
+    origpath = rd.getVar('FILE', True)
+    fullpath = _rename_recipe_files(origpath, bpn, oldpv, newpv, path)
+    logger.debug('Upgraded %s => %s' % (origpath, fullpath))
 
     newvalues = {}
     if _recipe_contains(rd, 'PV') and newpv != oldpv:
@@ -276,15 +269,39 @@ def _create_new_recipe(newpv, md5, sha256, srcrev, workspace, tinfoil, rd):
     if srcrev:
         newvalues['SRCREV'] = srcrev
 
-    if newvalues:
-        rd = oe.recipeutils.parse_recipe(fullpath, None, tinfoil.config_data)
-        oe.recipeutils.patch_recipe(rd, fullpath, newvalues)
+    if srcbranch:
+        src_uri = oe.recipeutils.split_var_value(rd.getVar('SRC_URI', False) or '')
+        changed = False
+        replacing = True
+        new_src_uri = []
+        for entry in src_uri:
+            scheme, network, path, user, passwd, params = bb.fetch2.decodeurl(entry)
+            if replacing and scheme in ['git', 'gitsm']:
+                branch = params.get('branch', 'master')
+                if rd.expand(branch) != srcbranch:
+                    # Handle case where branch is set through a variable
+                    res = re.match(r'\$\{([^}@]+)\}', branch)
+                    if res:
+                        newvalues[res.group(1)] = srcbranch
+                        # We know we won't change SRC_URI now, so break out
+                        break
+                    else:
+                        params['branch'] = srcbranch
+                        entry = bb.fetch2.encodeurl((scheme, network, path, user, passwd, params))
+                        changed = True
+                replacing = False
+            new_src_uri.append(entry)
+        if changed:
+            newvalues['SRC_URI'] = ' '.join(new_src_uri)
+
+    newvalues['PR'] = None
 
     if md5 and sha256:
-        # Unfortunately, oe.recipeutils.patch_recipe cannot update flags.
-        # once the latter feature is implemented, we should call patch_recipe
-        # instead of the following function
-        _replace_checksums(fullpath, md5, sha256)
+        newvalues['SRC_URI[md5sum]'] = md5
+        newvalues['SRC_URI[sha256sum]'] = sha256
+
+    rd = oe.recipeutils.parse_recipe(fullpath, None, tinfoil.config_data)
+    oe.recipeutils.patch_recipe(rd, fullpath, newvalues)
 
     return fullpath
 
@@ -295,13 +312,10 @@ def upgrade(args, config, basepath, workspace):
         raise DevtoolError("recipe %s is already in your workspace" % args.recipename)
     if not args.version and not args.srcrev:
         raise DevtoolError("You must provide a version using the --version/-V option, or for recipes that fetch from an SCM such as git, the --srcrev/-S option")
-
-    reason = oe.recipeutils.validate_pn(args.recipename)
-    if reason:
-        raise DevtoolError(reason)
+    if args.srcbranch and not args.srcrev:
+        raise DevtoolError("If you specify --srcbranch/-B then you must use --srcrev/-S to specify the revision" % args.recipename)
 
     tinfoil = setup_tinfoil(basepath=basepath, tracking=True)
-
     rd = parse_recipe(config, tinfoil, args.recipename, True)
     if not rd:
         return 1
@@ -312,37 +326,53 @@ def upgrade(args, config, basepath, workspace):
     if pn in workspace:
         raise DevtoolError("recipe %s is already in your workspace" % pn)
 
+    if args.srctree:
+        srctree = os.path.abspath(args.srctree)
+    else:
+        srctree = standard.get_default_srctree(config, pn)
+
     standard._check_compatible_recipe(pn, rd)
-    if rd.getVar('PV', True) == args.version and rd.getVar('SRCREV', True) == args.srcrev:
-        raise DevtoolError("Current and upgrade versions are the same version" % version)
+    old_srcrev = rd.getVar('SRCREV', True)
+    if old_srcrev == 'INVALID':
+        old_srcrev = None
+    if old_srcrev and not args.srcrev:
+        raise DevtoolError("Recipe specifies a SRCREV value; you must specify a new one when upgrading")
+    if rd.getVar('PV', True) == args.version and old_srcrev == args.srcrev:
+        raise DevtoolError("Current and upgrade versions are the same version")
 
     rf = None
     try:
-        rev1 = standard._extract_source(args.srctree, False, 'devtool-orig', rd)
-        rev2, md5, sha256 = _extract_new_source(args.version, args.srctree, args.no_patch,
+        rev1 = standard._extract_source(srctree, False, 'devtool-orig', False, rd)
+        rev2, md5, sha256 = _extract_new_source(args.version, srctree, args.no_patch,
                                                 args.srcrev, args.branch, args.keep_temp,
                                                 tinfoil, rd)
-        rf = _create_new_recipe(args.version, md5, sha256, args.srcrev, config.workspace_path, tinfoil, rd)
+        rf = _create_new_recipe(args.version, md5, sha256, args.srcrev, args.srcbranch, config.workspace_path, tinfoil, rd)
     except bb.process.CmdError as e:
-        _upgrade_error(e, rf, args.srctree)
+        _upgrade_error(e, rf, srctree)
     except DevtoolError as e:
-        _upgrade_error(e, rf, args.srctree)
+        _upgrade_error(e, rf, srctree)
     standard._add_md5(config, pn, os.path.dirname(rf))
 
-    af = _write_append(rf, args.srctree, args.same_dir, args.no_same_dir, rev2,
+    af = _write_append(rf, srctree, args.same_dir, args.no_same_dir, rev2,
                        config.workspace_path, rd)
     standard._add_md5(config, pn, af)
-    logger.info('Upgraded source extracted to %s' % args.srctree)
+    logger.info('Upgraded source extracted to %s' % srctree)
+    logger.info('New recipe is %s' % rf)
     return 0
 
 def register_commands(subparsers, context):
     """Register devtool subcommands from this plugin"""
+
+    defsrctree = standard.get_default_srctree(context.config)
+
     parser_upgrade = subparsers.add_parser('upgrade', help='Upgrade an existing recipe',
-                                           description='Upgrades an existing recipe to a new upstream version')
-    parser_upgrade.add_argument('recipename', help='Name for recipe to extract the source for')
-    parser_upgrade.add_argument('srctree', help='Path to where to extract the source tree')
+                                           description='Upgrades an existing recipe to a new upstream version. Puts the upgraded recipe file into the workspace along with any associated files, and extracts the source tree to a specified location (in case patches need rebasing or adding to as a result of the upgrade).',
+                                           group='starting')
+    parser_upgrade.add_argument('recipename', help='Name of recipe to upgrade (just name - no version, path or extension)')
+    parser_upgrade.add_argument('srctree',  nargs='?', help='Path to where to extract the source tree. If not specified, a subdirectory of %s will be used.' % defsrctree)
     parser_upgrade.add_argument('--version', '-V', help='Version to upgrade to (PV)')
     parser_upgrade.add_argument('--srcrev', '-S', help='Source revision to upgrade to (if fetching from an SCM such as git)')
+    parser_upgrade.add_argument('--srcbranch', '-B', help='Branch in source repository containing the revision to use (if fetching from an SCM such as git)')
     parser_upgrade.add_argument('--branch', '-b', default="devtool", help='Name for new development branch to checkout (default "%(default)s")')
     parser_upgrade.add_argument('--no-patch', action="store_true", help='Do not apply patches from the recipe to the new source code')
     group = parser_upgrade.add_mutually_exclusive_group()

@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% load projecttags %}
+{% load humanize %}
+{% load static %}
+{% block pagecontent %}
+
+<div class="section">
+  <ul class="breadcrumb">
+    <li>
+      <a href="{% url 'project' project.id %}">{{project.name}}</a>
+      <span class="divider">&rarr;</span>
+    </li>
+    <li>
+      {% if recipe.is_image %}
+      <a href="{% url 'projectimagerecipes' project.id %}">Image recipes</a>
+      {% else %}
+      <a href="{% url 'projectsoftwarerecipes' project.id %}">Software recipes</a>
+      {% endif %}
+      <span class="divider">&rarr;</span>
+    </li>
+    <li class="active">
+      {{recipe.name}} ({{recipe.layer_version.layer.name}})
+    </li>
+  </ul>
+</div>
+
+<script src="{% static 'js/recipedetails.js' %}"></script>
+<script>
+  $(document).ready(function (){
+    var ctx = {
+      recipe : {
+        id: {{recipe.pk}},
+        name: "{{recipe.name}}",
+        totalPackages: {{packages.count}},
+        layer_version : {
+         id: {{recipe.layer_version.pk}},
+         name: "{{recipe.layer_version.layer.name}}",
+         layerdetailurl: "{% url 'layerdetails' project.pk recipe.layer_version.pk %}"
+        }
+      }
+    };
+
+    try {
+      recipeDetailsPageInit(ctx);
+    } catch (e) {
+      document.write("Sorry, An error has occurred loading this page");
+      console.warn(e);
+    }
+  });
+</script>
+
+{% include 'newcustomimage_modal.html' %}
+
+<div class="row-fluid span11">
+  <div class="alert alert-success lead" id="image-created-notification" style="margin-top: 15px; display: none">
+    <button type="button" data-dismiss="alert" class="close">x</button>
+    Your custom image <strong>{{recipe.name}}</strong> has been created. You can now add or remove packages as needed.
+  </div>
+  <div class="page-header air">
+    <h1>
+      {{recipe.name}}
+      <small>({{recipe.layer_version.layer.name}})</small>
+    </h1>
+  </div>
+</div>
+
+<div class="row-fluid span11">
+  <div class="span8">
+    <div class="button-place btn-group" id="customise-build-btns"
+        style="width: 100%;
+      {% if not in_project %}
+      display:none;
+      {% endif %}">
+      <button class="btn btn-large span6 build-recipe-btn" style="width: 50%">
+        Build {{recipe.name}}
+      </button>
+      {% if recipe.is_image %}
+      <button class="btn btn-large span6 customise-btn" data-recipe="{{recipe.pk}}" style="width: 50%">
+        Customise {{recipe.name}}
+      </button>
+      {% endif %}
+    </div>
+    <div class="button-place">
+      <button class="btn btn-block btn-large" id="add-layer-btn"
+          style="width:100%;
+          {% if in_project %}
+          display:none;
+          {% endif %}">
+        <i class="icon-plus"></i>
+        Add the {{recipe.layer_version.layer.name}} layer to your project to build or customise this image recipe
+      </button>
+    </div>
+
+    <div id="packages-table">
+      {% if  packages.count %}
+       {% url 'recipepackages' project.id recipe.id as xhr_table_url %}
+       <h2>{{title}} (<span class="table-count-{{table_name}}">0</span>) </h2>
+       {% include "toastertable.html" %}
+      {% else %}
+       <h2>{{title}}</h2>
+      {% endif %}
+
+      <div class="alert alert-info air" id="build-to-get-packages-msg"
+      {# if there are packages and it's in the project don't show this msg #}
+      {% if packages.count or not packages.count and not in_project %}
+       style="display:none"
+      {% endif %} >
+        <p class="lead">Toaster has no package information for {{recipe.name}}. To generate package information, build {{recipe.name}}</p>
+        <button class="btn btn-info btn-large build-recipe-btn" style="margin:20px 0 10px 0;">Build {{recipe.name}}</button>
+      </div>
+
+      <div class="alert alert-info air" id="packages-alert"
+      {% if packages.count or  in_project %}
+      style="display:none"
+      {% endif %}
+      >
+        <p class="lead">Toaster has no package information for {{recipe.name}}
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="span4 well">
+    <h2 style="margin-bottom:20px;">About {{recipe.name}}</h2>
+    <dl>
+      <dt>
+        Approx. packages included
+        <i class="icon-question-sign get-help" title="" data-original-title="The number of packages included is based on information from previous builds and from parsing layers, so we can never be sure it is 100% accurate"></i>
+      </dt>
+      <dd class="no-packages">{{packages.count}}</dd>
+      <dt>
+        Approx. package size
+        <i class="icon-question-sign get-help" title="" data-original-title="Package size is based on information from previous builds, so we can never be sure it is 100% accurate"></i>
+      </dt>
+      <dd>{{approx_pkg_size.size__sum|filtered_filesizeformat}}</dd>
+      {% if last_build %}
+      <dt>Last build</dt>
+      <dd>
+        <i class="icon-ok-sign success"></i>
+        <a href="{% url 'projectbuilds' project.id%}">{{last_build.completed_on|date:"d/m/y H:i"}}</a>
+      </dd>
+      {% endif %}
+      <dt>Recipe file</dt>
+      <dd>
+        <code>{{recipe.file_path|cut_path_prefix:recipe.layer_version.local_path}}</code>
+        <a href="{{recipe.get_vcs_recipe_file_link_url}}"><i class="icon-share" title="" data-original-title="View recipe file"></i></a>
+      </dd> 
+      <dt>Layer</dt>
+      <dd><a href="{% url 'layerdetails' project.id recipe.layer_version.pk %}">{{recipe.layer_version.layer.name}}</a></dd>
+      <dt>
+        Summary
+      </dt>
+      <dd>
+        {{recipe.summary}}
+      </dd>
+      <dt>
+        Description
+      </dt>
+      <dd>
+        {{recipe.description}}
+      </dd>
+      <dt>Version</dt>
+      <dd>
+        {{recipe.version}}
+      </dd>
+      <dt>Section</dt>
+      <dd>
+        {{recipe.section}}
+      </dd>
+      <dt>License</dt>
+      <dd>
+        {{recipe.license}}
+      </dd>
+    </dl>
+  </div>
+</div>
+
+{% endblock %}

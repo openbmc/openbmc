@@ -7,5 +7,6 @@ python add_xorg_abi_depends() {
 }
 PACKAGEFUNCS =+ "add_xorg_abi_depends"
 
-FILES_${PN} += " ${libdir}/xorg/modules/input/*.so"
-FILES_${PN}-dbg += " ${libdir}/xorg/modules/input/.debug"
+FILES_${PN} += " ${libdir}/xorg/modules/input/*.so \
+                 ${datadir}/X11/xorg.conf.d \
+                 "

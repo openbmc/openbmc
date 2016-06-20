@@ -1,0 +1,60 @@
+From 5fe37ef38500f858a22ecdf9bf69bf06e213bf68 Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Tue, 22 Mar 2016 12:41:35 +0200
+Subject: [PATCH] Do nothing on delete-event when not STANDALONE
+
+This prevents an opportunistic alt-F4 from closing the desktop.
+
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+
+Upstream-Status: Backport
+---
+ src/desktop.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/src/desktop.c b/src/desktop.c
+index d4fc2fb..94b4ddf 100644
+--- a/src/desktop.c
++++ b/src/desktop.c
+@@ -122,6 +122,15 @@ load_items (TakuMenu *menu)
+ 
+ }
+ 
++#ifndef STANDALONE
++static gboolean
++delete_event_cb (GtkWidget *widget, GdkEvent *event, gpointer user_data)
++{
++  /* prevent default handler from destroying the window */
++  return TRUE;
++}
++#endif
++
+ static void
+ workarea_changed (int x, int y, int w, int h)
+ {
+@@ -144,11 +153,11 @@ create_desktop (void)
+   gtk_icon_size_register ("taku-icon", 64, 64);
+ 
+   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+-  g_signal_connect (window, "delete-event", G_CALLBACK (gtk_main_quit), NULL);
+   gtk_widget_set_name (window, "TakuWindow");
+   gtk_window_set_title (GTK_WINDOW (window), _("Desktop"));
+ 
+ #ifndef STANDALONE
++  g_signal_connect (window, "delete-event", G_CALLBACK (delete_event_cb), NULL);
+   gtk_window_set_type_hint (GTK_WINDOW (window), GDK_WINDOW_TYPE_HINT_DESKTOP);
+   gtk_window_set_skip_taskbar_hint (GTK_WINDOW (window), TRUE);
+ 
+@@ -156,6 +165,7 @@ create_desktop (void)
+   screen_w = gdk_screen_get_width (screen);
+   screen_h = gdk_screen_get_height (screen);
+ #else
++  g_signal_connect (window, "delete-event", G_CALLBACK (gtk_main_quit), NULL);
+   screen_w = 640;
+   screen_h = 480;
+ #endif
+-- 
+2.7.0
+

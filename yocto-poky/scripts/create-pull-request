@@ -36,6 +36,7 @@ CMD=$(basename $0)
 cat <<EOM
 Usage: $CMD [-h] [-o output_dir] [-m msg_body_file] [-s subject] [-r relative_to] [-i commit_id] [-d relative_dir] -u remote [-b branch]
   -b branch           Branch name in the specified remote (default: current branch)
+  -l local branch     Local branch name (default: HEAD)
   -c                  Create an RFC (Request for Comment) patch series
   -h                  Display this help message
   -i commit_id        Ending commit (default: HEAD)
@@ -50,6 +51,7 @@ Usage: $CMD [-h] [-o output_dir] [-m msg_body_file] [-s subject] [-r relative_to
  Examples:
    $CMD -u contrib -b nitin/basic
    $CMD -u contrib -r distro/master -i nitin/distro -b nitin/distro
+   $CMD -u contrib -r distro/master -i nitin/distro -b nitin/distro -l distro
    $CMD -u contrib -r master -i misc -b nitin/misc -o pull-misc
    $CMD -u contrib -p "RFC PATCH" -b nitin/experimental
    $CMD -u contrib -i misc -b nitin/misc -d ./bitbake
@@ -57,10 +59,13 @@ EOM
 }
 
 # Parse and validate arguments
-while getopts "b:cd:hi:m:o:p:r:s:u:" OPT; do
+while getopts "b:cd:hi:m:o:p:r:s:u:l:" OPT; do
 	case $OPT in
 	b)
 		BRANCH="$OPTARG"
+		;;
+	l)
+		L_BRANCH="$OPTARG"
 		;;
 	c)
 		RFC=1
@@ -130,6 +135,11 @@ if [ -z "$BRANCH" ]; then
 	echo "NOTE: Assuming remote branch '$BRANCH', use -b to override."
 fi
 
+if [ -z "$L_BRANCH" ]; then
+	L_BRANCH=HEAD
+	echo "NOTE: Assuming local branch HEAD, use -l to override."
+fi
+
 if [ -z "$REMOTE_URL" ]; then
 	echo "ERROR: Missing parameter -u, no git remote!"
 	usage
@@ -185,6 +195,14 @@ fi
 # Generate the patches and cover letter
 git format-patch $extraopts -M40 --subject-prefix="$PREFIX" -n -o $ODIR --thread=shallow --cover-letter $RELATIVE_TO..$COMMIT_ID > /dev/null
 
+if [ -z "$(ls -A $ODIR 2> /dev/null)" ]; then
+    echo "ERROR: $ODIR is empty, no cover letter and patches was generated!"
+    echo "       This is most likely due to that \$RRELATIVE_TO..\$COMMIT_ID"
+    echo "       ($RELATIVE_TO..$COMMIT_ID) don't contain any differences."
+    rmdir $ODIR
+    exit 1
+fi
+
 [ -n "$RELDIR" ] && cd $pdir
 
 # Customize the cover letter
@@ -195,7 +213,7 @@ NEWER_GIT_VERSION=210
 if [ $GIT_VERSION -lt $NEWER_GIT_VERSION ]; then
 	git request-pull $RELATIVE_TO $REMOTE_URL $COMMIT_ID >> "$PM"
 else
-	git request-pull $RELATIVE_TO $REMOTE_URL :$BRANCH >> "$PM"
+	git request-pull $RELATIVE_TO $REMOTE_URL $L_BRANCH:$BRANCH >> "$PM"
 fi
 if [ $? -ne 0 ]; then
 	echo "ERROR: git request-pull reported an error"

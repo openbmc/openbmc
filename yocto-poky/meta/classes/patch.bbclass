@@ -136,7 +136,6 @@ python patch_do_patch() {
 
     s = d.getVar('S', True)
 
-    path = os.getenv('PATH')
     os.putenv('PATH', d.getVar('PATH', True))
 
     # We must use one TMPDIR per process so that the "patch" processes

@@ -1,4 +1,4 @@
-From 0136b73158f60d5dc630ae348b18df3b59a2a5c2 Mon Sep 17 00:00:00 2001
+From 690d567e298f6687b61c82660b051df5b25482ee Mon Sep 17 00:00:00 2001
 From: Tanu Kaskinen <tanuk@iki.fi>
 Date: Fri, 23 Oct 2015 13:37:11 +0300
 Subject: [PATCH 4/4] alsa: set availability for (some) unavailable profiles
@@ -22,28 +22,36 @@ pa_card_profile, however.
 
 BugLink: https://bugzilla.yoctoproject.org/show_bug.cgi?id=8448
 
-Upstream-Status: Submitted [http://lists.freedesktop.org/archives/pulseaudio-discuss/2015-October/024614.html]
 Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+
+Rebased on 8.0.
+
+Upstream-Status: Denied [The patch set needs some work to be accepted.
+The review thread:
+http://thread.gmane.org/gmane.comp.audio.pulseaudio.general/24301]
+
+Signed-off-by: Tanu Kaskinen <tanuk@iki.fi>
 ---
- src/modules/alsa/module-alsa-card.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ src/modules/alsa/module-alsa-card.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
 diff --git a/src/modules/alsa/module-alsa-card.c b/src/modules/alsa/module-alsa-card.c
-index 5b39654..73a846c 100644
+index fe240f0..bdbdc12 100644
 --- a/src/modules/alsa/module-alsa-card.c
 +++ b/src/modules/alsa/module-alsa-card.c
-@@ -366,6 +366,7 @@ static int report_jack_state(snd_mixer_elem_t *melem, unsigned int mask) {
+@@ -366,6 +366,8 @@ static int report_jack_state(snd_mixer_elem_t *melem, unsigned int mask) {
      void *state;
      pa_alsa_jack *jack;
-     pa_device_port *port;
+     struct temp_port_avail *tp, *tports;
++    pa_device_port *port;
 +    pa_card_profile *profile;
  
      pa_assert(u);
  
-@@ -396,6 +397,29 @@ static int report_jack_state(snd_mixer_elem_t *melem, unsigned int mask) {
-             }
-             report_port_state(port, u);
-         }
+@@ -412,6 +414,29 @@ static int report_jack_state(snd_mixer_elem_t *melem, unsigned int mask) {
+            pa_device_port_set_available(tp->port, tp->avail);
+ 
+     pa_xfree(tports);
 +
 +    /* Update profile availabilities. The logic could be improved; for now we
 +     * only set obviously unavailable profiles (those that contain only
@@ -71,5 +79,5 @@ index 5b39654..73a846c 100644
  }
  
 -- 
-2.1.4
+2.7.0
 

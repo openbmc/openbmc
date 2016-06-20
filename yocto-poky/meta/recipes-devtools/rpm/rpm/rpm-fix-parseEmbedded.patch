@@ -1,0 +1,27 @@
+Fix an issue where parseEmbedded is not defined, but is still used.
+
+Upstream-Status: Submitted [RPM5 maintainer]
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm/rpmio/macro.c
+===================================================================
+--- rpm.orig/rpmio/macro.c
++++ rpm/rpmio/macro.c
+@@ -1616,8 +1616,6 @@ exit:
+  * @retval *avp		invocation args
+  * @return		script string
+  */
+-#if defined(WITH_AUGEAS) || defined(WITH_FICL) || defined(WITH_MOZJS) || defined(WITH_JNIEMBED) || defined(WITH_PERLEMBED) || defined(WITH_PYTHONEMBED) || defined(WITH_RUBYEMBED) || defined(WITH_MRUBY_EMBED) || defined(WITH_SQLITE) || defined(WITH_SQUIRREL) || defined(WITH_TCL)
+-
+ static char _FIXME_embedded_interpreter_eval_returned_null[] =
+     "FIXME: embedded interpreter eval returned null.";
+ 
+@@ -1668,7 +1666,6 @@ bingo:
+     script[nb] = '\0';
+     return script;
+ }
+-#endif
+ 
+ /**
+  * The main macro recursion loop.

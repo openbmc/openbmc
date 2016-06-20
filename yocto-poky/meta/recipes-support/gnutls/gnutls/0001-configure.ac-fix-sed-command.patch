@@ -1,0 +1,32 @@
+From 67c638c7e209554d9b19627e9402a20fdabead21 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 4 Dec 2015 13:19:28 +0200
+Subject: [PATCH] configure.ac: fix sed command
+
+The "sed 's/.bak//g'" matchs "bitbake", which would cause strange errors
+when the S contains "bitbake", fix to "sed 's/\.bak$//'`"
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index e634236..dc9e6a8 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -549,7 +549,7 @@ if test "$enable_tools" != "no" || test "$enable_doc" != "no"; then
+ 		dnl replace libopts-generated files with distributed backups, if present
+ 		missing_baks=
+ 		for i in ${srcdir}/src/*-args.c.bak ${srcdir}/src/*-args.h.bak; do
+-			nam=`echo $i|sed 's/.bak//g'`
++                        nam=`echo $i|sed 's/\.bak$//'`
+ 			if test -f $i;then
+ 				cp -f $i $nam
+ 			else
+-- 
+2.6.2
+

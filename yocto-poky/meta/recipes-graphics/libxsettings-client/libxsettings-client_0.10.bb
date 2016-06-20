@@ -19,7 +19,6 @@ headers = "xsettings-common.h xsettings-client.h"
 SRC_URI = "http://downloads.yoctoproject.org/releases/matchbox/optional-dependencies/Xsettings-client-0.10.tar.gz \
         file://MIT-style-license \
         file://link-x11.patch;apply=yes \
-        file://disable_Os_option.patch \
         file://obsolete_automake_macros.patch \
 "
 

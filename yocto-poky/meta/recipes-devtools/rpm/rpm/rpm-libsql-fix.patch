@@ -2,7 +2,7 @@ During installation, the libtool relink attempts to link to -lrpm...
 The problem is that it hasn't been installed yet!  So small change causes
 the libtool to instead use the build version.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [RPM5 maintainer]
 
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
 

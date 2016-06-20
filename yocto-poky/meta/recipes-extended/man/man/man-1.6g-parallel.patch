@@ -1,0 +1,30 @@
+The Makefile for man has a rule to create two generated targets with
+a program run from the shell. Because the rule was run twice, with
+parallel make, the generated files were being overwritten at the same
+time they were being compiled. This patch forces the rule to be run
+only once.
+
+Upstream-Status: Pending
+
+Signed-off-by: Bill Randle <william.c.randle at intel.com>
+
+--- man-1.6g/src/Makefile.in.orig	2010-12-31 12:28:46.000000000 -0800
++++ man-1.6g/src/Makefile.in	2016-03-28 09:09:16.845458798 -0700
+@@ -43,8 +43,10 @@
+ makemsg:
+ 	$(BUILD_CC) -o makemsg makemsg.c
+ 
+-msg.c gripedefs.h: ../msgs/mess.en makemsg
++msg.c gripedefs.h: genfiles-stamp
++genfiles-stamp: ../msgs/mess.en makemsg
+ 	./makemsg ../msgs/mess.en gripedefs.h msg.c
++	touch genfiles-stamp
+ 
+ # glob.c does not have prototypes
+ glob.o: glob.c ndir.h
+@@ -117,4 +119,4 @@
+ 
+ spotless: clean
+ 	rm -f Makefile config.status paths.h version.h man.conf
+-	rm -f gripedefs.h msg.c mess.*.cat
++	rm -f gripedefs.h msg.c mess.*.cat genfiles-stamp

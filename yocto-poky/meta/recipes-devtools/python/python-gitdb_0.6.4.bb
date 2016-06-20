@@ -10,6 +10,8 @@ SRC_URI = "https://pypi.python.org/packages/source/g/gitdb/gitdb-${PV}.tar.gz"
 SRC_URI[md5sum] = "44e4366b8bdfd306b075c3a52c96ae1a"
 SRC_URI[sha256sum] = "a3ebbc27be035a2e874ed904df516e35f4a29a778a764385de09de9e0f139658"
 
+UPSTREAM_CHECK_URI = "https://pypi.python.org/pypi/gitdb/"
+
 S = "${WORKDIR}/gitdb-${PV}"
 
 inherit distutils

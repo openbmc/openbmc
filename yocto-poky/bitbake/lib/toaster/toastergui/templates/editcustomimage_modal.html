@@ -1,0 +1,71 @@
+<!--
+modal dialog shown on the build dashboard, for editing an existing custom image;
+only shown if more than one custom image was built, so the user needs to
+choose which one to edit
+
+required context:
+  build - a Build object
+-->
+<div class="modal hide fade in" aria-hidden="false" id="edit-custom-image-modal">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3>Which image do you want to edit?</h3>
+  </div>
+
+  <div class="modal-body">
+    <div class="row-fluid">
+      {% for recipe in build.get_custom_image_recipes %}
+        <label class="radio">
+          {{recipe.name}}
+          <input type="radio" class="form-control" name="select-custom-image"
+                 data-url="{% url 'customrecipe' build.project.id recipe.id %}">
+        </label>
+      {% endfor %}
+    </div>
+    <span class="help-block error" id="invalid-custom-image-help" style="display:none">
+      Please select a custom image to edit.
+    </span>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-primary btn-large" data-url="#"
+       data-action="edit-custom-image" disabled>
+      Edit custom image
+    </button>
+  </div>
+</div>
+
+<script>
+$(document).ready(function () {
+  var editCustomImageButton = $('[data-action="edit-custom-image"]');
+  var error = $('#invalid-custom-image-help');
+  var radios = $('[name="select-custom-image"]');
+
+  // return custom image radio buttons which are selected
+  var getSelectedRadios = function () {
+    return $('[name="select-custom-image"]:checked');
+  };
+
+  radios.change(function () {
+    if (getSelectedRadios().length === 1) {
+      editCustomImageButton.removeAttr('disabled');
+      error.hide();
+    }
+    else {
+      editCustomImageButton.attr('disabled', 'disabled');
+      error.show();
+    }
+  });
+
+  editCustomImageButton.click(function () {
+    var selectedRadios = getSelectedRadios();
+
+    if (selectedRadios.length === 1) {
+      document.location.href = selectedRadios.first().attr('data-url');
+    }
+    else {
+      error.show();
+    }
+  });
+});
+</script>

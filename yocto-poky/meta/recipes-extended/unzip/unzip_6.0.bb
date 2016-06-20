@@ -20,13 +20,17 @@ SRC_URI = "ftp://ftp.info-zip.org/pub/infozip/src/unzip60.tgz \
 
 SRC_URI[md5sum] = "62b490407489521db863b523a7f86375"
 SRC_URI[sha256sum] = "036d96991646d0449ed0aa952e4fbe21b476ce994abc276e49d30e686708bd37"
+
+# exclude version 5.5.2 which triggers a false positive
+UPSTREAM_CHECK_REGEX = "unzip(?P<pver>(?!552).+)\.tgz"
+
 S = "${WORKDIR}/unzip60"
 
 # Makefile uses CF_NOOPT instead of CFLAGS.  We lifted the values from
 # Makefile and add CFLAGS.  Optimization will be overriden by unzip
 # configure to be -O3.
 #
-EXTRA_OEMAKE += "STRIP=true LF2='' \
+EXTRA_OEMAKE = "-e MAKEFLAGS= STRIP=true LF2='' \
                 'CF_NOOPT=-I. -Ibzip2 -DUNIX ${CFLAGS}'"
 
 export LD = "${CC}"

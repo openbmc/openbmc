@@ -147,7 +147,7 @@ class SmartRepoTest(SmartTest):
         for i in output.split("\n"):
             if ("rpmsys" != str(i)) and ("myrpmdir" != str(i)):
                 self.smart('channel --disable '+str(i))
-        self.target.run('cd /home/root')
+        self.target.run('cd $HOME')
         self.smart('install psplash')
         for i in output.split("\n"):
             if ("rpmsys" != str(i)) and ("myrpmdir" != str(i)):

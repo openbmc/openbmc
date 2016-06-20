@@ -19,19 +19,24 @@ def image_buildinfo_outputvars(vars, listvars, d):
     ret = ""
     for var in vars:
         value = d.getVar(var, True) or ""
-        if (d.getVarFlag(var, 'type') == "list"):
+        if (d.getVarFlag(var, 'type', True) == "list"):
             value = oe.utils.squashspaces(value)
         ret += "%s = %s\n" % (var, value)
     return ret.rstrip('\n')
 
 # Gets git branch's status (clean or dirty)
 def get_layer_git_status(path):
-    f = os.popen("cd %s; git diff --stat 2>&1 | tail -n 1" % path)
-    data = f.read()
-    if f.close() is None:
-        if len(data) != 0:
-            return "-- modified"
-    return ""
+    import subprocess
+    try:
+        subprocess.check_output("cd %s; PSEUDO_UNLOAD=1 git diff --quiet --no-ext-diff" % path,
+                                shell=True,
+                                stderr=subprocess.STDOUT)
+        return ""
+    except subprocess.CalledProcessError, ex:
+        # Silently treat errors as "modified", without checking for the
+        # (expected) return code 1 in a modified git repo. For example, we get
+        # output and a 129 return code when a layer isn't a git repo at all.
+        return "-- modified"
 
 # Returns layer revisions along with their respective status
 def get_layer_revs(d):
@@ -53,17 +58,21 @@ def buildinfo_target(d):
         return image_buildinfo_outputvars(vars, listvars, d)
 
 # Write build information to target filesystem
-buildinfo () {
-cat > ${IMAGE_ROOTFS}${sysconfdir}/build << END
------------------------
+python buildinfo () {
+    with open(d.expand('${IMAGE_ROOTFS}${sysconfdir}/build'), 'w') as build:
+        build.writelines((
+            '''-----------------------
 Build Configuration:  |
 -----------------------
-${@buildinfo_target(d)}
+''',
+            buildinfo_target(d),
+            '''
 -----------------------
-Layer Revisions:      |   
+Layer Revisions:      |
 -----------------------
-${@get_layer_revs(d)}
-END
+''',
+            get_layer_revs(d)
+       ))
 }
 
 IMAGE_PREPROCESS_COMMAND += "buildinfo;"

@@ -18,9 +18,16 @@ SRC_URI = "ftp://ftp.isc.org/isc/dhcp/${PV}/dhcp-${PV}.tar.gz \
            file://init-server file://default-server \
            file://dhclient.conf file://dhcpd.conf \
            file://dhcpd.service file://dhcrelay.service \
-           file://dhcpd6.service "
+           file://dhcpd6.service \
+           file://search-for-libxml2.patch "
 
-inherit autotools systemd
+UPSTREAM_CHECK_URI = "ftp://ftp.isc.org/isc/dhcp/"
+UPSTREAM_CHECK_REGEX = "(?P<pver>\d+\.\d+\.(\d+?))/"
+
+inherit autotools systemd useradd update-rc.d
+
+USERADD_PACKAGES = "${PN}-server"
+USERADD_PARAM_${PN}-server = "--system --no-create-home --home-dir /var/run/${PN} --shell /bin/false --user-group ${PN}"
 
 SYSTEMD_PACKAGES = "${PN}-server ${PN}-relay"
 SYSTEMD_SERVICE_${PN}-server = "dhcpd.service dhcpd6.service"
@@ -29,12 +36,17 @@ SYSTEMD_AUTO_ENABLE_${PN}-server = "disable"
 SYSTEMD_SERVICE_${PN}-relay = "dhcrelay.service"
 SYSTEMD_AUTO_ENABLE_${PN}-relay = "disable"
 
+INITSCRIPT_PACKAGES = "dhcp-server"
+INITSCRIPT_NAME_dhcp-server = "dhcp-server"
+INITSCRIPT_PARAMS_dhcp-server = "defaults"
+
 TARGET_CFLAGS += "-D_GNU_SOURCE"
 EXTRA_OECONF = "--with-srv-lease-file=${localstatedir}/lib/dhcp/dhcpd.leases \
                 --with-srv6-lease-file=${localstatedir}/lib/dhcp/dhcpd6.leases \
                 --with-cli-lease-file=${localstatedir}/lib/dhcp/dhclient.leases \
                 --with-cli6-lease-file=${localstatedir}/lib/dhcp/dhclient6.leases \
                 --with-libbind=${STAGING_LIBDIR}/ \
+		--enable-paranoia \
                "
 
 do_install_append () {

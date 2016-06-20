@@ -22,6 +22,7 @@ DEPENDS = "expat freetype zlib"
 
 SRC_URI = "http://fontconfig.org/release/fontconfig-${PV}.tar.gz \
            file://revert-static-pkgconfig.patch \
+           file://0001-Revert-changes-made-to-FcConfigAppFontAddDir-recentl.patch \
            "
 SRC_URI[md5sum] = "479be870c7f83f15f87bac085b61d641"
 SRC_URI[sha256sum] = "73f6d323c7bcfbde25d78397675191d55b8f4139132c6a9444410f3a2d8a9a95"
@@ -40,6 +41,10 @@ inherit autotools pkgconfig
 
 FONTCONFIG_CACHE_DIR ?= "${localstatedir}/cache/fontconfig"
 
-EXTRA_OECONF = " --disable-docs --with-default-fonts=${datadir}/fonts --with-cache-dir=${FONTCONFIG_CACHE_DIR}"
+# comma separated list of additional directories
+# /usr/share/fonts is already included by default (you can change it with --with-default-fonts)
+FONTCONFIG_FONT_DIRS ?= "no"
+
+EXTRA_OECONF = " --disable-docs --with-default-fonts=${datadir}/fonts --with-cache-dir=${FONTCONFIG_CACHE_DIR} --with-add-fonts=${FONTCONFIG_FONT_DIRS}"
 
 BBCLASSEXTEND = "native"

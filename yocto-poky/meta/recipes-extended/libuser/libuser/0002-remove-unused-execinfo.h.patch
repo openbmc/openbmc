@@ -1,0 +1,27 @@
+From 4b2f81f307ffeac12956e5c16e894e5ebb937ea5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 7 Jan 2016 02:26:00 +0000
+Subject: [PATCH 2/2] remove unused execinfo.h
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ lib/error.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/lib/error.c b/lib/error.c
+index a5ec30a..443e601 100644
+--- a/lib/error.c
++++ b/lib/error.c
+@@ -18,7 +18,6 @@
+ #include <config.h>
+ #include <sys/types.h>
+ #include <errno.h>
+-#include <execinfo.h>
+ #include <libintl.h>
+ #include <stdarg.h>
+ #include <stdlib.h>
+-- 
+2.7.0
+

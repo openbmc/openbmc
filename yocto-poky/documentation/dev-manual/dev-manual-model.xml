@@ -27,11 +27,10 @@
              that you intend to run on target hardware.
              For information on how to set up your host development system for
              user-space application development, see the
-             <ulink url='&YOCTO_DOCS_ADT_URL;'>Yocto Project Application Developer's Guide</ulink>.
+             <ulink url='&YOCTO_DOCS_SDK_URL;'>Yocto Project Software Development Kit (SDK) Developer's Guide</ulink>.
              For a simple example of user-space application development using
              the <trademark class='trade'>Eclipse</trademark> IDE, see the
-             "<link linkend='application-development-workflow'>Application
-             Development Workflow</link>" section.
+             "<ulink url='&YOCTO_DOCS_SDK_URL;#sdk-developing-applications-using-eclipse'>Developing Applications Using <trademark class='trade'>Eclipse</trademark></ulink>" section.
              </para></listitem>
          <listitem><para><emphasis>Temporary Source Code Modification:</emphasis>
              Direct modification of temporary source code is a convenient
@@ -48,14 +47,10 @@
              Toaster provides an efficient interface to the OpenEmbedded build
              that allows you to start builds and examine build statistics.
              </para></listitem>
-         <listitem><para><emphasis>Image Development using Hob:</emphasis>
-             You can use the <ulink url='&YOCTO_HOME_URL;/tools-resources/projects/hob'>Hob</ulink>
-             to build custom operating system images within the build
-             environment.
-             Hob provides an efficient interface to the OpenEmbedded build system.
-             </para></listitem>
          <listitem><para><emphasis>Using a Development Shell:</emphasis>
-             You can use a <filename>devshell</filename> to efficiently debug
+             You can use a
+             <link linkend='platdev-appdev-devshell'><filename>devshell</filename></link>
+             to efficiently debug
              commands or simply edit packages.
              Working inside a development shell is a quick way to set up the
              OpenEmbedded build environment to work on parts of a project.
@@ -154,38 +149,60 @@
                     "<ulink url='&YOCTO_DOCS_BSP_URL;#creating-a-new-bsp-layer-using-the-yocto-bsp-script'>Creating a New BSP Layer Using the yocto-bsp Script</ulink>"
                     section in the Yocto Project Board Support (BSP) Developer's Guide.
                     </para>
+
                     <para>
-                    Another example that illustrates a layer is an application.
-                    Suppose you are creating an application that has library or other dependencies in
-                    order for it to compile and run.
-                    The layer, in this case, would be where all the recipes that define those dependencies
-                    are kept.
-                    The key point for a layer is that it is an isolated area that contains
-                    all the relevant information for the project that the OpenEmbedded build
-                    system knows about.
-                    For more information on layers, see the
-                    "<link linkend='understanding-and-creating-layers'>Understanding and Creating Layers</link>"
-                    section.
-                    For more information on BSP layers, see the
-                    "<ulink url='&YOCTO_DOCS_BSP_URL;#bsp-layers'>BSP Layers</ulink>" section in the
-                    Yocto Project Board Support Package (BSP) Developer's Guide.</para>
-                    <note>Five BSPs exist that are part of the
-                    Yocto Project release: <filename>genericx86</filename>, <filename>genericx86-64</filename>,
-                    <filename>beaglebone</filename> (ARM),
-                    <filename>mpc8315e</filename> (PowerPC),
-                    and <filename>edgerouter</filename> (MIPS).
-                    The recipes and configurations for these five BSPs are located and dispersed
-                    within the <link linkend='source-directory'>Source Directory</link>.
-                    On the other hand, the <filename>meta-intel</filename> layer
-                    contains BSP layers for many supported BSPs (e.g.
-                    Crystal Forest, Emenlow, Fish River Island 2, Haswell,
-                    Jasper Forest, and so forth).
-                    Aside from the BSPs in the <filename>meta-intel</filename>
-                    layer, the
-                    <ulink url='&YOCTO_GIT_URL;'>Source Repositories</ulink>
-                    contain additional BSP layers such as
-                    <filename>meta-minnow</filename> and
-                    <filename>meta-raspberrypi</filename>.</note>
+                        Another example that illustrates a layer
+                        is an application.
+                        Suppose you are creating an application that has
+                        library or other dependencies in order for it to
+                        compile and run.
+                        The layer, in this case, would be where all the
+                        recipes that define those dependencies are kept.
+                        The key point for a layer is that it is an isolated
+                        area that contains all the relevant information for
+                        the project that the OpenEmbedded build system knows
+                        about.
+                        For more information on layers, see the
+                        "<link linkend='understanding-and-creating-layers'>Understanding and Creating Layers</link>"
+                        section.
+                        For more information on BSP layers, see the
+                        "<ulink url='&YOCTO_DOCS_BSP_URL;#bsp-layers'>BSP Layers</ulink>"
+                        section in the Yocto Project Board Support Package (BSP)
+                        Developer's Guide.
+                        <note>
+                            <para>
+                                Five BSPs exist that are part of the Yocto Project release:
+                                <filename>beaglebone</filename> (ARM),
+                                <filename>mpc8315e</filename> (PowerPC),
+                                and <filename>edgerouter</filename> (MIPS).
+                                The recipes and configurations for these five BSPs
+                                are located and dispersed within the
+                                <link linkend='source-directory'>Source Directory</link>.
+                            </para>
+
+                            <para>
+                                Three core Intel BSPs exist as part of the Yocto
+                                Project release in the
+                                <filename>meta-intel</filename> layer:
+                                <itemizedlist>
+                                    <listitem><para><filename>intel-core2-32</filename>,
+                                        which is a BSP optimized for the Core2 family of CPUs
+                                        as well as all CPUs prior to the Silvermont core.
+                                        </para></listitem>
+                                    <listitem><para><filename>intel-corei7-64</filename>,
+                                        which is a BSP optimized for Nehalem and later
+                                        Core and Xeon CPUs as well as Silvermont and later
+                                        Atom CPUs, such as the Baytrail SoCs.
+                                        </para></listitem>
+                                    <listitem><para><filename>intel-quark</filename>,
+                                        which is a BSP optimized for the Intel Galileo
+                                        gen1 &amp; gen2 development boards.
+                                        </para></listitem>
+                                </itemizedlist>
+                            </para>
+                        </note>
+                    </para>
+
                     <para>When you set up a layer for a new BSP, you should follow a standard layout.
                     This layout is described in the
                     "<ulink url='&YOCTO_DOCS_BSP_URL;#bsp-filelayout'>Example Filesystem Layout</ulink>"
@@ -296,18 +313,6 @@
                 the Yocto Project:
                 <itemizedlist>
                     <listitem><para><emphasis>
-                        <filename>linux-yocto-3.8</filename></emphasis> - The
-                        stable Yocto Project kernel to use with the Yocto
-                        Project Release 1.4. This kernel is based on the
-                        Linux 3.8 released kernel.
-                        </para></listitem>
-                    <listitem><para><emphasis>
-                        <filename>linux-yocto-3.10</filename></emphasis> - An
-                        additional, unsupported Yocto Project kernel used with
-                        the Yocto Project Release 1.5.
-                        This kernel is based on the Linux 3.10 released kernel.
-                        </para></listitem>
-                    <listitem><para><emphasis>
                         <filename>linux-yocto-3.14</filename></emphasis> - The
                         stable Yocto Project kernel to use with the Yocto
                         Project Releases 1.6 and 1.7.
@@ -326,11 +331,35 @@
                         This kernel is based on the Linux 3.19 released kernel.
                         </para></listitem>
                     <listitem><para><emphasis>
+                        <filename>linux-yocto-4.1</filename></emphasis> - The
+                        stable Yocto Project kernel to use with the Yocto
+                        Project Release 2.0.
+                        This kernel is based on the Linux 4.1 released kernel.
+                        </para></listitem>
+                    <listitem><para><emphasis>
+                        <filename>linux-yocto-4.4</filename></emphasis> - The
+                        stable Yocto Project kernel to use with the Yocto
+                        Project Release 2.1.
+                        This kernel is based on the Linux 4.4 released kernel.
+                        </para></listitem>
+                    <listitem><para><emphasis>
                         <filename>linux-yocto-dev</filename></emphasis> - A
                         development kernel based on the latest upstream release
                         candidate available.
                         </para></listitem>
                 </itemizedlist>
+                <note>
+                    Long Term Support Initiative (LTSI) for Yocto Project kernels
+                    is as follows:
+                    <itemizedlist>
+                        <listitem><para>For Yocto Project releases 1.7, 1.8, and 2.0,
+                            the LTSI kernel is <filename>linux-yocto-3.14</filename>.
+                            </para></listitem>
+                        <listitem><para>For Yocto Project release 2.1, the
+                            LTSI kernel is <filename>linux-yocto-4.1</filename>.
+                            </para></listitem>
+                    </itemizedlist>
+                </note>
             </para>
 
             <para>
@@ -535,1161 +564,18 @@
     </section>
 </section>
 
-<section id='application-development-workflow'>
-    <title>Application Development Workflow</title>
+<section id='application-development-workflow-using-an-sdk'>
+    <title>Application Development Workflow Using an SDK</title>
 
     <para>
-        Application development involves creating an application that you want
-        to run on your target hardware, which is running a kernel image created using the
-        OpenEmbedded build system.
-        The Yocto Project provides an
-        <ulink url='&YOCTO_DOCS_ADT_URL;#adt-intro'>Application Development Toolkit (ADT)</ulink>
-        and stand-alone
-        <ulink url='&YOCTO_DOCS_ADT_URL;#the-cross-development-toolchain'>cross-development toolchains</ulink>
-        that facilitate quick development and integration of your application into its runtime environment.
-        Using the ADT and toolchains, you can compile and link your application.
-        You can then deploy your application to the actual hardware or to the QEMU emulator for testing.
-        If you are familiar with the popular <trademark class='trade'>Eclipse</trademark> IDE,
-        you can use an Eclipse Yocto Plug-in to
-        allow you to develop, deploy, and test your application all from within Eclipse.
+        Standard and extensible Software Development Kits (SDK) make it easy
+        to develop applications inside or outside of the Yocto Project
+        development environment.
+        Tools exist to help the application developer during any phase
+        of development.
+        For information on how to install and use an SDK, see the
+        <ulink url='&YOCTO_DOCS_SDK_URL;#sdk-intro'>Yocto Project Software Development Kit (SDK) Developer's Guide</ulink>.
     </para>
-
-    <para>
-        While we strongly suggest using the ADT to develop your application, this option might not
-        be best for you.
-        If this is the case, you can still use pieces of the Yocto Project for your development process.
-        However, because the process can vary greatly, this manual does not provide detail on the process.
-    </para>
-
-    <section id='workflow-using-the-adt-and-eclipse'>
-        <title>Workflow Using the ADT and <trademark class='trade'>Eclipse</trademark></title>
-
-        <para>
-            To help you understand how application development works using the ADT, this section
-            provides an overview of the general development process and a detailed example of the process
-            as it is used from within the Eclipse IDE.
-        </para>
-
-        <para>
-            The following illustration and list summarize the application development general workflow.
-        </para>
-
-        <para>
-            <imagedata fileref="figures/app-dev-flow.png"
-                width="7in" depth="8in" align="center" scale="100" />
-        </para>
-
-        <para>
-            <orderedlist>
-                <listitem><para><emphasis>Prepare the host system for the Yocto Project</emphasis>:
-                    See
-                    "<ulink url='&YOCTO_DOCS_REF_URL;#detailed-supported-distros'>Supported Linux Distributions</ulink>"
-                    and
-                    "<ulink url='&YOCTO_DOCS_REF_URL;#required-packages-for-the-host-development-system'>Required Packages for the Host Development System</ulink>" sections both
-                    in the Yocto Project Reference Manual for requirements.
-                    In particular, be sure your host system has the
-                    <filename>xterm</filename> package installed.
-                    </para></listitem>
-                <listitem><para><emphasis>Secure the Yocto Project kernel target image</emphasis>:
-                    You must have a target kernel image that has been built using the OpenEmbedded
-                    build system.</para>
-                    <para>Depending on whether the Yocto Project has a pre-built image that matches your target
-                    architecture and where you are going to run the image while you develop your application
-                    (QEMU or real hardware), the area from which you get the image differs.
-                        <itemizedlist>
-                            <listitem><para>Download the image from
-                                <ulink url='&YOCTO_MACHINES_DL_URL;'><filename>machines</filename></ulink>
-                                if your target architecture is supported and you are going to develop
-                                and test your application on actual hardware.</para></listitem>
-                            <listitem><para>Download the image from
-                                <ulink url='&YOCTO_QEMU_DL_URL;'>
-                                <filename>machines/qemu</filename></ulink> if your target architecture is supported
-                                and you are going to develop and test your application using the QEMU
-                                emulator.</para></listitem>
-                            <listitem><para>Build your image if you cannot find a pre-built image that matches
-                                your target architecture.
-                                If your target architecture is similar to a supported architecture, you can
-                                modify the kernel image before you build it.
-                                See the
-                                "<link linkend='patching-the-kernel'>Patching the Kernel</link>"
-                                section for an example.</para></listitem>
-                        </itemizedlist></para>
-                    <para>For information on pre-built kernel image naming schemes for images
-                    that can run on the QEMU emulator, see the
-                    "<ulink url='&YOCTO_DOCS_QS_URL;#downloading-the-pre-built-linux-kernel'>Downloading the Pre-Built Linux Kernel</ulink>"
-                    section in the Yocto Project Application Developer's Guide.</para></listitem>
-                <listitem><para><emphasis>Install the ADT</emphasis>:
-                    The ADT provides a target-specific cross-development toolchain, the root filesystem,
-                    the QEMU emulator, and other tools that can help you develop your application.
-                    While it is possible to get these pieces separately, the ADT Installer provides an
-                    easy, inclusive method.
-                    You can get these pieces by running an ADT installer script, which is configurable.
-                    For information on how to install the ADT, see the
-                    "<ulink url='&YOCTO_DOCS_ADT_URL;#using-the-adt-installer'>Using the ADT Installer</ulink>"
-                    section
-                    in the Yocto Project Application Developer's Guide.</para></listitem>
-                <listitem><para><emphasis>If applicable, secure the target root filesystem
-                    and the Cross-development toolchain</emphasis>:
-                    If you choose not to install the ADT using the ADT Installer,
-                    you need to find and download the appropriate root filesystem and
-                    the cross-development toolchain.</para>
-                    <para>You can find the tarballs for the root filesystem in the same area used
-                    for the kernel image.
-                    Depending on the type of image you are running, the root filesystem you need differs.
-                    For example, if you are developing an application that runs on an image that
-                    supports Sato, you need to get a root filesystem that supports Sato.</para>
-                    <para>You can find the cross-development toolchains at
-                    <ulink url='&YOCTO_TOOLCHAIN_DL_URL;'><filename>toolchains</filename></ulink>.
-                    Be sure to get the correct toolchain for your development host and your
-                    target architecture.
-                    See the "<ulink url='&YOCTO_DOCS_ADT_URL;#using-an-existing-toolchain-tarball'>Using a Cross-Toolchain Tarball</ulink>"
-                    section in the Yocto Project Application Developer's Guide for information
-                    and the
-                    "<ulink url='&YOCTO_DOCS_QS_URL;#installing-the-toolchain'>Installing the Toolchain</ulink>"
-                    in the Yocto Project Application Developer's Guide for information on finding and installing
-                    the correct toolchain based on your host development system and your target
-                    architecture.
-                    </para></listitem>
-                <listitem><para><emphasis>Create and build your application</emphasis>:
-                    At this point, you need to have source files for your application.
-                    Once you have the files, you can use the Eclipse IDE to import them and build the
-                    project.
-                    If you are not using Eclipse, you need to use the cross-development tools you have
-                    installed to create the image.</para></listitem>
-                <listitem><para><emphasis>Deploy the image with the application</emphasis>:
-                    If you are using the Eclipse IDE, you can deploy your image to the hardware or to
-                    QEMU through the project's preferences.
-                    If you are not using the Eclipse IDE, then you need to deploy the application
-                    to the hardware using other methods.
-                    Or, if you are using QEMU, you need to use that tool and
-                    load your image in for testing.
-                    See the
-                    "<link linkend='dev-manual-qemu'>Using the Quick EMUlator (QEMU)</link>"
-                    chapter for information on using QEMU.
-                    </para></listitem>
-                <listitem><para><emphasis>Test and debug the application</emphasis>:
-                    Once your application is deployed, you need to test it.
-                    Within the Eclipse IDE, you can use the debugging environment along with the
-                    set of user-space tools installed along with the ADT to debug your application.
-                    Of course, the same user-space tools are available separately if you choose
-                    not to use the Eclipse IDE.</para></listitem>
-           </orderedlist>
-        </para>
-    </section>
-
-    <section id='adt-eclipse'>
-        <title>Working Within Eclipse</title>
-
-        <para>
-            The Eclipse IDE is a popular development environment and it fully
-            supports development using the Yocto Project.
-            <note>
-                This release of the Yocto Project supports both the Luna
-                and Kepler versions of the Eclipse IDE.
-                Thus, the following information provides setup information for
-                both versions.
-            </note>
-        </para>
-
-        <para>
-            When you install and configure the Eclipse Yocto Project Plug-in
-            into the Eclipse IDE, you maximize your Yocto Project experience.
-            Installing and configuring the Plug-in results in an environment
-            that has extensions specifically designed to let you more easily
-            develop software.
-            These extensions allow for cross-compilation, deployment, and
-            execution of your output into a QEMU emulation session as well as
-            actual target hardware.
-            You can also perform cross-debugging and profiling.
-            The environment also supports a suite of tools that allows you
-            to perform remote profiling, tracing, collection of power data,
-            collection of latency data, and collection of performance data.
-        </para>
-
-        <para>
-            This section describes how to install and configure the Eclipse IDE
-            Yocto Plug-in and how to use it to develop your application.
-        </para>
-
-        <section id='setting-up-the-eclipse-ide'>
-            <title>Setting Up the Eclipse IDE</title>
-
-            <para>
-                To develop within the Eclipse IDE, you need to do the following:
-                <orderedlist>
-                    <listitem><para>Install the optimal version of the Eclipse
-                       IDE.</para></listitem>
-                    <listitem><para>Configure the Eclipse IDE.
-                       </para></listitem>
-                    <listitem><para>Install the Eclipse Yocto Plug-in.
-                       </para></listitem>
-                    <listitem><para>Configure the Eclipse Yocto Plug-in.
-                       </para></listitem>
-                </orderedlist>
-                <note>
-                    Do not install Eclipse from your distribution's package
-                    repository.
-                    Be sure to install Eclipse from the official Eclipse
-                    download site as directed in the next section.
-                </note>
-            </para>
-
-            <section id='installing-eclipse-ide'>
-                <title>Installing the Eclipse IDE</title>
-
-                <para>
-                    It is recommended that you have the Luna SR2 (4.4.2)
-                    version of the Eclipse IDE installed on your development
-                    system.
-                    However, if you currently have the Kepler 4.3.2 version
-                    installed and you do not want to upgrade the IDE, you can
-                    configure Kepler to work with the Yocto Project.
-                </para>
-
-                <para>
-                    If you do not have the Luna SR2 (4.4.2) Eclipse IDE
-                    installed, you can find the tarball at
-                    <ulink url='&ECLIPSE_MAIN_URL;'></ulink>.
-                    From that site, choose the appropriate download from the
-                    "Eclipse IDE for C/C++ Developers".
-                    This version contains the Eclipse Platform, the Java
-                    Development Tools (JDT), and the Plug-in Development
-                    Environment.
-                </para>
-
-                <para>
-                    Once you have downloaded the tarball, extract it into a
-                    clean directory.
-                    For example, the following commands unpack and install the
-                    downloaded Eclipse IDE tarball into a clean directory
-                    using the default name <filename>eclipse</filename>:
-                    <literallayout class='monospaced'>
-     $ cd ~
-     $ tar -xzvf ~/Downloads/eclipse-cpp-luna-SR2-linux-gtk-x86_64.tar.gz
-                    </literallayout>
-                </para>
-            </section>
-
-            <section id='configuring-the-eclipse-ide'>
-                <title>Configuring the Eclipse IDE</title>
-
-                <para>
-                    This section presents the steps needed to configure the
-                    Eclipse IDE.
-                </para>
-
-                <para>
-                    Before installing and configuring the Eclipse Yocto Plug-in,
-                    you need to configure the Eclipse IDE.
-                    Follow these general steps:
-                    <orderedlist>
-                        <listitem><para>Start the Eclipse IDE.</para></listitem>
-                        <listitem><para>Make sure you are in your Workbench and
-                            select "Install New Software" from the "Help"
-                            pull-down menu.</para></listitem>
-                        <listitem><para>Select
-                            <filename>Luna - &ECLIPSE_LUNA_URL;</filename>
-                            from the "Work with:" pull-down menu.
-                            <note>
-                                For Kepler, select
-                                <filename>Kepler - &ECLIPSE_KEPLER_URL;</filename>
-                            </note>
-                            </para></listitem>
-                        <listitem><para>Expand the box next to "Linux Tools"
-                            and select the
-                            <filename>Linux Tools LTTng Tracer Control</filename>,
-                            <filename>Linux Tools LTTng Userspace Analysis</filename>,
-                            and
-                            <filename>LTTng Kernel Analysis</filename> boxes.
-                            If these selections do not appear in the list,
-                            that means the items are already installed.
-                            <note>
-                                For Kepler, select
-                                <filename>LTTng - Linux Tracing Toolkit</filename>
-                                box.
-                            </note>
-                            </para></listitem>
-                        <listitem><para>Expand the box next to "Mobile and
-                            Device Development" and select the following boxes.
-                            Again, if any of the following items are not
-                            available for selection, that means the items are
-                            already installed:
-                            <itemizedlist>
-                                <listitem><para><filename>C/C++ Remote Launch (Requires RSE Remote System Explorer)</filename></para></listitem>
-                                <listitem><para><filename>Remote System Explorer End-user Runtime</filename></para></listitem>
-                                <listitem><para><filename>Remote System Explorer User Actions</filename></para></listitem>
-                                <listitem><para><filename>Target Management Terminal (Core SDK)</filename></para></listitem>
-                                <listitem><para><filename>TCF Remote System Explorer add-in</filename></para></listitem>
-                                <listitem><para><filename>TCF Target Explorer</filename></para></listitem>
-                            </itemizedlist></para></listitem>
-                        <listitem><para>Expand the box next to "Programming
-                            Languages" and select the
-                            <filename>C/C++ Autotools Support</filename>
-                            and <filename>C/C++ Development Tools</filename>
-                            boxes.
-                            For Luna, these items do not appear on the list
-                            as they are already installed.
-                            </para></listitem>
-                        <listitem><para>Complete the installation and restart
-                            the Eclipse IDE.</para></listitem>
-                    </orderedlist>
-                </para>
-            </section>
-
-            <section id='installing-the-eclipse-yocto-plug-in'>
-                <title>Installing or Accessing the Eclipse Yocto Plug-in</title>
-
-                <para>
-                    You can install the Eclipse Yocto Plug-in into the Eclipse
-                    IDE one of two ways:  use the Yocto Project's Eclipse
-                    Update site to install the pre-built plug-in or build and
-                    install the plug-in from the latest source code.
-                </para>
-
-                <section id='new-software'>
-                    <title>Installing the Pre-built Plug-in from the Yocto Project Eclipse Update Site</title>
-
-                    <para>
-                        To install the Eclipse Yocto Plug-in from the update
-                        site, follow these steps:
-                        <orderedlist>
-                            <listitem><para>Start up the Eclipse IDE.
-                                </para></listitem>
-                            <listitem><para>In Eclipse, select "Install New
-                                Software" from the "Help" menu.
-                                </para></listitem>
-                            <listitem><para>Click "Add..." in the "Work with:"
-                                area.</para></listitem>
-                           <listitem><para>Enter
-                                <filename>&ECLIPSE_DL_PLUGIN_URL;/luna</filename>
-                                in the URL field and provide a meaningful name
-                                in the "Name" field.
-                                <note>
-                                    If you are using Kepler, use
-                                    <filename>&ECLIPSE_DL_PLUGIN_URL;/kepler</filename>
-                                    in the URL field.
-                                </note></para></listitem>
-                            <listitem><para>Click "OK" to have the entry added
-                                to the "Work with:" drop-down list.
-                                </para></listitem>
-                            <listitem><para>Select the entry for the plug-in
-                                from the "Work with:" drop-down list.
-                                </para></listitem>
-                            <listitem><para>Check the boxes next to
-                                <filename>Yocto Project ADT Plug-in</filename>,
-                                <filename>Yocto Project Bitbake Commander Plug-in</filename>,
-                                and
-                                <filename>Yocto Project Documentation plug-in</filename>.
-                                </para></listitem>
-                            <listitem><para>Complete the remaining software
-                                installation steps and then restart the Eclipse
-                                IDE to finish the installation of the plug-in.
-                                <note>
-                                    You can click "OK" when prompted about
-                                    installing software that contains unsigned
-                                    content.
-                                </note>
-                                </para></listitem>
-                        </orderedlist>
-                    </para>
-                </section>
-
-               <section id='zip-file-method'>
-                   <title>Installing the Plug-in Using the Latest Source Code</title>
-
-                   <para>
-                        To install the Eclipse Yocto Plug-in from the latest
-                        source code, follow these steps:
-                        <orderedlist>
-                            <listitem><para>Be sure your development system
-                                is not using OpenJDK to build the plug-in
-                                by doing the following:
-                                <orderedlist>
-                                    <listitem><para>Use the Oracle JDK.
-                                        If you don't have that, go to
-                                        <ulink url='http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html'></ulink>
-                                        and download the latest appropriate
-                                        Java SE Development Kit tarball for
-                                        your development system and
-                                        extract it into your home directory.
-                                        </para></listitem>
-                                    <listitem><para>In the shell you are going
-                                        to do your work, export the location of
-                                        the Oracle Java.
-                                        The previous step creates a new folder
-                                        for the extracted software.
-                                        You need to use the following
-                                        <filename>export</filename> command
-                                        and provide the specific location:
-                                        <literallayout class='monospaced'>
-     export PATH=~/<replaceable>extracted_jdk_location</replaceable>/bin:$PATH
-                                        </literallayout>
-                                        </para></listitem>
-                                </orderedlist>
-                                </para></listitem>
-                            <listitem><para>In the same shell, create a Git
-                                repository with:
-                                <literallayout class='monospaced'>
-     $ cd ~
-     $ git clone git://git.yoctoproject.org/eclipse-poky
-                                </literallayout>
-                                </para></listitem>
-                            <listitem><para>Be sure to checkout the correct
-                                tag.
-                                For example, if you are using Luna, do the
-                                following:
-                                <literallayout class='monospaced'>
-     $ git checkout luna/yocto-&DISTRO;
-                                </literallayout>
-                                This puts you in a detached HEAD state, which
-                                is fine since you are only going to be building
-                                and not developing.
-                                <note>
-                                    If you are building kepler, checkout the
-                                    <filename>kepler/yocto-&DISTRO;</filename>
-                                    branch.
-                                </note>
-                                </para></listitem>
-                            <listitem><para>Change to the
-                                <filename>scripts</filename>
-                                directory within the Git repository:
-                                <literallayout class='monospaced'>
-     $ cd scripts
-                                </literallayout>
-                                </para></listitem>
-                            <listitem><para>Set up the local build environment
-                                by running the setup script:
-                                <literallayout class='monospaced'>
-     $ ./setup.sh
-                                </literallayout>
-                                </para></listitem>
-                            <listitem><para>When the script finishes execution,
-                                it prompts you with instructions on how to run
-                                the <filename>build.sh</filename> script, which
-                                is also in the <filename>scripts</filename>
-                                directory of the Git repository created
-                                earlier.
-                                </para></listitem>
-                            <listitem><para>Run the <filename>build.sh</filename>
-                                script as directed.
-                                Be sure to provide the tag name, documentation
-                                branch, and a release name.
-                                Here is an example that uses the
-                                <filename>luna/yocto-&DISTRO;</filename> tag, the
-                                <filename>master</filename> documentation
-                                branch, and
-                                <filename>&DISTRO_NAME;</filename> for the
-                                release name:
-                                <literallayout class='monospaced'>
-     $ ECLIPSE_HOME=/home/scottrif/eclipse-poky/scripts/eclipse ./build.sh luna/yocto-&DISTRO; master &DISTRO_NAME; 2>&amp;1 | tee -a build.log
-                                </literallayout>
-                                After running the script, the file
-                                <filename>org.yocto.sdk-</filename><replaceable>release</replaceable><filename>-</filename><replaceable>date</replaceable><filename>-archive.zip</filename>
-                                is in the current directory.
-                                </para></listitem>
-                            <listitem><para>If necessary, start the Eclipse IDE
-                                and be sure you are in the Workbench.
-                                </para></listitem>
-                            <listitem><para>Select "Install New Software" from
-                                the "Help" pull-down menu.
-                                </para></listitem>
-                            <listitem><para>Click "Add".</para></listitem>
-                            <listitem><para>Provide anything you want in the
-                                "Name" field.
-                                </para></listitem>
-                            <listitem><para>Click "Archive" and browse to the
-                                ZIP file you built in step eight.
-                                This ZIP file should not be "unzipped", and must
-                                be the <filename>*archive.zip</filename> file
-                                created by running the
-                                <filename>build.sh</filename> script.
-                                </para></listitem>
-                            <listitem><para>Click the "OK" button.
-                                </para></listitem>
-                            <listitem><para>Check the boxes that appear in
-                                the installation window to install the
-                                <filename>Yocto Project ADT Plug-in</filename>,
-                                <filename>Yocto Project Bitbake Commander Plug-in</filename>,
-                                and the
-                                <filename>Yocto Project Documentation plug-in</filename>.
-                                </para></listitem>
-                            <listitem><para>Finish the installation by clicking
-                                through the appropriate buttons.
-                                You can click "OK" when prompted about
-                                installing software that contains unsigned
-                                content.
-                                </para></listitem>
-                            <listitem><para>Restart the Eclipse IDE if
-                                necessary.
-                                </para></listitem>
-                        </orderedlist>
-                    </para>
-
-                    <para>
-                        At this point you should be able to configure the
-                        Eclipse Yocto Plug-in as described in the
-                        "<link linkend='configuring-the-eclipse-yocto-plug-in'>Configuring the Eclipse Yocto Plug-in</link>"
-                        section.</para>
-                </section>
-            </section>
-
-            <section id='configuring-the-eclipse-yocto-plug-in'>
-                <title>Configuring the Eclipse Yocto Plug-in</title>
-
-                <para>
-                    Configuring the Eclipse Yocto Plug-in involves setting the
-                    Cross Compiler options and the Target options.
-                    The configurations you choose become the default settings
-                    for all projects.
-                    You do have opportunities to change them later when
-                    you configure the project (see the following section).
-                </para>
-
-                <para>
-                    To start, you need to do the following from within the
-                    Eclipse IDE:
-                    <itemizedlist>
-                        <listitem><para>Choose "Preferences" from the
-                            "Window" menu to display the Preferences Dialog.
-                            </para></listitem>
-                        <listitem><para>Click "Yocto Project ADT" to display
-                            the configuration screen.
-                            </para></listitem>
-                    </itemizedlist>
-                </para>
-
-                <section id='configuring-the-cross-compiler-options'>
-                    <title>Configuring the Cross-Compiler Options</title>
-
-                    <para>
-                        To configure the Cross Compiler Options, you must select
-                        the type of toolchain, point to the toolchain, specify
-                        the sysroot location, and select the target
-                        architecture.
-                        <itemizedlist>
-                            <listitem><para><emphasis>Selecting the Toolchain Type:</emphasis>
-                                Choose between
-                                <filename>Standalone pre-built toolchain</filename>
-                                and
-                                <filename>Build system derived toolchain</filename>
-                                for Cross Compiler Options.
-                                    <itemizedlist>
-                                        <listitem><para><emphasis>
-                                            <filename>Standalone Pre-built Toolchain:</filename></emphasis>
-                                            Select this mode when you are using
-                                            a stand-alone cross-toolchain.
-                                            For example, suppose you are an
-                                            application developer and do not
-                                            need to build a target image.
-                                            Instead, you just want to use an
-                                            architecture-specific toolchain on
-                                            an existing kernel and target root
-                                            filesystem.</para></listitem>
-                                       <listitem><para><emphasis>
-                                            <filename>Build System Derived Toolchain:</filename></emphasis>
-                                            Select this mode if the
-                                            cross-toolchain has been installed
-                                            and built as part of the
-                                            <link linkend='build-directory'>Build Directory</link>.
-                                            When you select
-                                            <filename>Build system derived toolchain</filename>,
-                                            you are using the toolchain bundled
-                                            inside the Build Directory.
-                                            </para></listitem>
-                                    </itemizedlist>
-                                </para></listitem>
-                            <listitem><para><emphasis>Point to the Toolchain:</emphasis>
-                                If you are using a stand-alone pre-built
-                                toolchain, you should be pointing to where it is
-                                installed.
-                                If you used the ADT Installer script and
-                                accepted the default installation directory, the
-                                toolchain will be installed in the
-                                <filename>&YOCTO_ADTPATH_DIR;</filename>
-                                directory.
-                                Sections "<ulink url='&YOCTO_DOCS_ADT_URL;#configuring-and-running-the-adt-installer-script'>Configuring and Running the ADT Installer Script</ulink>"
-                                and
-                                "<ulink url='&YOCTO_DOCS_ADT_URL;#using-an-existing-toolchain-tarball'>Using a Cross-Toolchain Tarball</ulink>"
-                                in the Yocto Project Application Developer's
-                                Guide describe how to install a stand-alone
-                                cross-toolchain.</para>
-                                <para>If you are using a system-derived
-                                toolchain, the path you provide for the
-                                <filename>Toolchain Root Location</filename>
-                                field is the
-                                <link linkend='build-directory'>Build Directory</link>.
-                                See the
-                                "<ulink url='&YOCTO_DOCS_ADT_URL;#using-the-toolchain-from-within-the-build-tree'>Using BitBake and the Build Directory</ulink>"
-                                section in the Yocto Project Application
-                                Developer's Guide for information on how to
-                                install the toolchain into the Build
-                                Directory.</para></listitem>
-                            <listitem><para><emphasis>Specify the Sysroot Location:</emphasis>
-                                This location is where the root filesystem for
-                                the target hardware resides.
-                                If you used the ADT Installer script and
-                                accepted the default installation directory,
-                                then the location in your home directory
-                                in a folder named
-                                <filename>test-yocto/</filename><replaceable>target_arch</replaceable>.
-                                Additionally, when you use the ADT Installer
-                                script, the
-                                <filename>/opt/poky/&DISTRO;/sysroots</filename>
-                                location is used for the QEMU
-                                user-space tools and the NFS boot process.
-                                </para>
-                                <para>If you used either of the other two
-                                methods to install the toolchain or did not
-                                accept the ADT Installer script's default
-                                installation directory, then the location of
-                                the sysroot filesystem depends on where you
-                                separately extracted and installed the
-                                filesystem.</para>
-                                <para>For information on how to install the
-                                toolchain and on how to extract and install the
-                                sysroot filesystem, see the
-                                "<ulink url='&YOCTO_DOCS_ADT_URL;#installing-the-adt'>Installing the ADT and Toolchains</ulink>"
-                                section in the Yocto Project Application
-                                Developer's Guide.
-                                </para></listitem>
-                            <listitem><para><emphasis>Select the Target Architecture:</emphasis>
-                                The target architecture is the type of hardware
-                                you are going to use or emulate.
-                                Use the pull-down
-                                <filename>Target Architecture</filename> menu
-                                to make your selection.
-                                The pull-down menu should have the supported
-                                architectures.
-                                If the architecture you need is not listed in
-                                the menu, you will need to build the image.
-                                See the
-                                "<ulink url='&YOCTO_DOCS_QS_URL;#qs-building-images'>Building Images</ulink>"
-                                section of the Yocto Project Quick Start for
-                                more information.</para></listitem>
-                        </itemizedlist>
-                    </para>
-                </section>
-
-                <section id='configuring-the-target-options'>
-                    <title>Configuring the Target Options</title>
-
-                    <para>
-                        You can choose to emulate hardware using the QEMU
-                        emulator, or you can choose to run your image on actual
-                        hardware.
-                        <itemizedlist>
-                            <listitem><para><emphasis>QEMU:</emphasis>
-                                Select this option if you will be using the
-                                QEMU emulator.
-                                If you are using the emulator, you also need to
-                                locate the kernel and specify any custom
-                                options.</para>
-                                <para>If you selected
-                                <filename>Build system derived toolchain</filename>,
-                                the target kernel you built will be located in
-                                the Build Directory in
-                                <filename>tmp/deploy/images/<replaceable>machine</replaceable></filename>
-                                directory.
-                                If you selected
-                                <filename>Standalone pre-built toolchain</filename>,
-                                the pre-built image you downloaded is located
-                                in the directory you specified when you
-                                downloaded the image.</para>
-                                <para>Most custom options are for advanced QEMU
-                                users to further customize their QEMU instance.
-                                These options are specified between paired
-                                angled brackets.
-                                Some options must be specified outside the
-                                brackets.
-                                In particular, the options
-                                <filename>serial</filename>,
-                                <filename>nographic</filename>, and
-                                <filename>kvm</filename> must all be outside the
-                                brackets.
-                                Use the <filename>man qemu</filename> command
-                                to get help on all the options and their use.
-                                The following is an example:
-                               <literallayout class='monospaced'>
-    serial ‘&lt;-m 256 -full-screen&gt;’
-                                </literallayout></para>
-                                <para>
-                                Regardless of the mode, Sysroot is already
-                                defined as part of the Cross-Compiler Options
-                                configuration in the
-                                <filename>Sysroot Location:</filename> field.
-                                </para></listitem>
-                            <listitem><para><emphasis>External HW:</emphasis>
-                                Select this option if you will be using actual
-                                hardware.</para></listitem>
-                        </itemizedlist>
-                    </para>
-
-                    <para>
-                        Click the "OK" to save your plug-in configurations.
-                    </para>
-                </section>
-            </section>
-        </section>
-
-        <section id='creating-the-project'>
-            <title>Creating the Project</title>
-
-            <para>
-                You can create two types of projects:  Autotools-based, or
-                Makefile-based.
-                This section describes how to create Autotools-based projects
-                from within the Eclipse IDE.
-                For information on creating Makefile-based projects in a
-                terminal window, see the section
-                "<ulink url='&YOCTO_DOCS_ADT_URL;#using-the-command-line'>Using the Command Line</ulink>"
-                in the Yocto Project Application Developer's Guide.
-                <note>
-                    Do not use special characters in project names
-                    (e.g. spaces, underscores, etc.).  Doing so can
-                    cause configuration to fail.
-                </note>
-            </para>
-
-            <para>
-                To create a project based on a Yocto template and then display
-                the source code, follow these steps:
-                <orderedlist>
-                    <listitem><para>Select "Project" from the "File -> New" menu.
-                        </para></listitem>
-                    <listitem><para>Double click <filename>CC++</filename>.
-                        </para></listitem>
-                    <listitem><para>Double click <filename>C Project</filename>
-                        to create the project.</para></listitem>
-                    <listitem><para>Expand <filename>Yocto Project ADT Autotools Project</filename>.
-                        </para></listitem>
-                    <listitem><para>Select <filename>Hello World ANSI C Autotools Project</filename>.
-                        This is an Autotools-based project based on a Yocto
-                        template.</para></listitem>
-                    <listitem><para>Put a name in the <filename>Project name:</filename>
-                        field.
-                        Do not use hyphens as part of the name.
-                        </para></listitem>
-                    <listitem><para>Click "Next".</para></listitem>
-                    <listitem><para>Add information in the
-                        <filename>Author</filename> and
-                        <filename>Copyright notice</filename> fields.
-                        </para></listitem>
-                    <listitem><para>Be sure the <filename>License</filename>
-                        field is correct.</para></listitem>
-                    <listitem><para>Click "Finish".</para></listitem>
-                    <listitem><para>If the "open perspective" prompt appears,
-                        click "Yes" so that you in the C/C++ perspective.
-                        </para></listitem>
-                    <listitem><para>The left-hand navigation pane shows your
-                        project.
-                        You can display your source by double clicking the
-                        project's source file.</para></listitem>
-                </orderedlist>
-            </para>
-        </section>
-
-        <section id='configuring-the-cross-toolchains'>
-            <title>Configuring the Cross-Toolchains</title>
-
-            <para>
-                The earlier section,
-                "<link linkend='configuring-the-eclipse-yocto-plug-in'>Configuring the Eclipse Yocto Plug-in</link>",
-                sets up the default project configurations.
-                You can override these settings for a given project by following
-                these steps:
-                <orderedlist>
-                    <listitem><para>Select "Change Yocto Project Settings" from
-                        the "Project" menu.
-                        This selection brings up the Yocto Project Settings
-                        Dialog and allows you to make changes specific to an
-                        individual project.</para>
-                        <para>By default, the Cross Compiler Options and Target
-                        Options for a project are inherited from settings you
-                        provided using the Preferences Dialog as described
-                        earlier in the
-                        "<link linkend='configuring-the-eclipse-yocto-plug-in'>Configuring the Eclipse Yocto Plug-in</link>" section.
-                        The Yocto Project Settings Dialog allows you to override
-                        those default settings for a given project.
-                        </para></listitem>
-                    <listitem><para>Make your configurations for the project
-                        and click "OK".
-                        </para></listitem>
-                    <listitem><para>Right-click in the navigation pane and
-                        select "Reconfigure Project" from the pop-up menu.
-                        This selection reconfigures the project by running
-                        <filename>autogen.sh</filename> in the workspace for
-                        your project.
-                        The script also runs <filename>libtoolize</filename>,
-                        <filename>aclocal</filename>,
-                        <filename>autoconf</filename>,
-                        <filename>autoheader</filename>,
-                        <filename>automake --a</filename>, and
-                        <filename>./configure</filename>.
-                        Click on the "Console" tab beneath your source code to
-                        see the results of reconfiguring your project.
-                        </para></listitem>
-                </orderedlist>
-            </para>
-        </section>
-
-        <section id='building-the-project'>
-            <title>Building the Project</title>
-
-            <para>
-                To build the project select "Build Project" from the
-                "Project" menu.
-                The console should update and you can note the cross-compiler
-                you are using.
-                <note>
-                    When building "Yocto Project ADT Autotools" projects, the Eclipse
-                    IDE might display error messages for Functions/Symbols/Types
-                    that cannot be "resolved", even when the related include file
-                    is listed at the project navigator and when the project is
-                    able to build.
-                    For these cases only, it is recommended to add a new linked
-                    folder to the appropriate sysroot.
-                    Use these steps to add the linked folder:
-                    <orderedlist>
-                        <listitem><para>
-                            Select the project.
-                            </para></listitem>
-                        <listitem><para>
-                            Select "Folder" from the
-                            <filename>File > New</filename> menu.
-                            </para></listitem>
-                        <listitem><para>
-                            In the "New Folder" Dialog, select "Link to alternate
-                            location (linked folder)".
-                            </para></listitem>
-                        <listitem><para>
-                            Click "Browse" to navigate to the include folder inside
-                            the same sysroot location selected in the Yocto Project
-                            configuration preferences.
-                            </para></listitem>
-                        <listitem><para>
-                            Click "OK".
-                            </para></listitem>
-                        <listitem><para>
-                            Click "Finish" to save the linked folder.
-                            </para></listitem>
-                    </orderedlist>
-                </note>
-            </para>
-        </section>
-
-        <section id='starting-qemu-in-user-space-nfs-mode'>
-            <title>Starting QEMU in User-Space NFS Mode</title>
-
-            <para>
-                To start the QEMU emulator from within Eclipse, follow these
-                steps:
-                <note>
-                    See the
-                    "<link linkend='dev-manual-qemu'>Using the Quick EMUlator (QEMU)</link>"
-                    chapter for more information on using QEMU.
-                </note>
-                <orderedlist>
-                    <listitem><para>Expose and select "External Tools" from
-                        the "Run" menu.
-                        Your image should appear as a selectable menu item.
-                        </para></listitem>
-                    <listitem><para>Select your image from the menu to launch
-                        the emulator in a new window.
-                        </para></listitem>
-                    <listitem><para>If needed, enter your host root password in
-                        the shell window at the prompt.
-                        This sets up a <filename>Tap 0</filename> connection
-                        needed for running in user-space NFS mode.
-                        </para></listitem>
-                    <listitem><para>Wait for QEMU to launch.</para></listitem>
-                    <listitem><para>Once QEMU launches, you can begin operating
-                        within that environment.
-                        One useful task at this point would be to determine the
-                        IP Address for the user-space NFS by using the
-                       <filename>ifconfig</filename> command.
-                       </para></listitem>
-                </orderedlist>
-            </para>
-        </section>
-
-        <section id='deploying-and-debugging-the-application'>
-            <title>Deploying and Debugging the Application</title>
-
-            <para>
-                Once the QEMU emulator is running the image, you can deploy
-                your application using the Eclipse IDE and then use
-                the emulator to perform debugging.
-                Follow these steps to deploy the application.
-                <orderedlist>
-                    <listitem><para>Select "Debug Configurations..." from the
-                        "Run" menu.</para></listitem>
-                    <listitem><para>In the left area, expand
-                        <filename>C/C++Remote Application</filename>.
-                        </para></listitem>
-                    <listitem><para>Locate your project and select it to bring
-                        up a new tabbed view in the Debug Configurations Dialog.
-                        </para></listitem>
-                    <listitem><para>Enter the absolute path into which you want
-                        to deploy the application.
-                        Use the "Remote Absolute File Path for
-                        C/C++Application:" field.
-                        For example, enter
-                        <filename>/usr/bin/<replaceable>programname</replaceable></filename>.
-                        </para></listitem>
-                    <listitem><para>Click on the "Debugger" tab to see the
-                        cross-tool debugger you are using.</para></listitem>
-                    <listitem><para>Click on the "Main" tab.</para></listitem>
-                    <listitem><para>Create a new connection to the QEMU instance
-                        by clicking on "new".</para></listitem>
-                    <listitem><para>Select <filename>TCF</filename>, which means
-                        Target Communication Framework.</para></listitem>
-                    <listitem><para>Click "Next".</para></listitem>
-                    <listitem><para>Clear out the "host name" field and enter
-                        the IP Address determined earlier.</para></listitem>
-                    <listitem><para>Click "Finish" to close the
-                        New Connections Dialog.</para></listitem>
-                    <listitem><para>Use the drop-down menu now in the
-                        "Connection" field and pick the IP Address you entered.
-                         </para></listitem>
-                    <listitem><para>Click "Debug" to bring up a login screen
-                        and login.</para></listitem>
-                    <listitem><para>Accept the debug perspective.
-                        </para></listitem>
-                </orderedlist>
-            </para>
-        </section>
-
-        <section id='running-user-space-tools'>
-            <title>Running User-Space Tools</title>
-
-            <para>
-                As mentioned earlier in the manual, several tools exist that
-                enhance your development experience.
-                These tools are aids in developing and debugging applications
-                and images.
-                You can run these user-space tools from within the Eclipse
-                IDE through the "YoctoProjectTools" menu.
-            </para>
-
-            <para>
-                Once you pick a tool, you need to configure it for the remote
-                target.
-                Every tool needs to have the connection configured.
-                You must select an existing TCF-based RSE connection to the
-                remote target.
-                If one does not exist, click "New" to create one.
-            </para>
-
-            <para>
-                Here are some specifics about the remote tools:
-                <itemizedlist>
-                    <listitem><para><emphasis><filename>OProfile</filename>:</emphasis>
-                        Selecting this tool causes the
-                        <filename>oprofile-server</filename> on the remote
-                        target to launch on the local host machine.
-                        The <filename>oprofile-viewer</filename> must be
-                        installed on the local host machine and the
-                        <filename>oprofile-server</filename> must be installed
-                        on the remote target, respectively, in order to use.
-                        You must compile and install the
-                        <filename>oprofile-viewer</filename> from the source
-                        code on your local host machine.
-                        Furthermore, in order to convert the target's sample
-                        format data into a form that the host can use, you must
-                        have OProfile version 0.9.4 or greater installed on the
-                        host.</para>
-                        <para>You can locate both the viewer and server from
-                        <ulink url='&YOCTO_GIT_URL;/cgit/cgit.cgi/oprofileui/'></ulink>.
-                        You can also find more information on setting up and
-                        using this tool in the
-                        "<ulink url='&YOCTO_DOCS_PROF_URL;#profile-manual-oprofile'>oprofile</ulink>"
-                        section of the Yocto Project Profiling and Tracing
-                        Manual.
-                        <note>The <filename>oprofile-server</filename> is
-                        installed by default on the
-                        <filename>core-image-sato-sdk</filename> image.</note>
-                        </para></listitem>
-                    <listitem><para><emphasis><filename>Lttng2.0 trace import</filename>:</emphasis>
-                        Selecting this tool transfers the remote target's
-                        <filename>Lttng</filename> tracing data back to the
-                        local host machine and uses the Lttng Eclipse plug-in
-                        to graphically display the output.
-                        For information on how to use Lttng to trace an
-                        application,
-                        see <ulink url='http://lttng.org/documentation'></ulink>
-                        and the
-                        "<ulink url='&YOCTO_DOCS_PROF_URL;#lttng-linux-trace-toolkit-next-generation'>LTTng (Linux Trace Toolkit, next generation)</ulink>"
-                        section, which is in the Yocto Project Profiling and
-                        Tracing Manual.
-                        <note>Do not use
-                            <filename>Lttng-user space (legacy)</filename> tool.
-                            This tool no longer has any upstream support.</note>
-                        </para>
-                        <para>Before you use the
-                        <filename>Lttng2.0 trace import</filename> tool,
-                        you need to setup the Lttng Eclipse plug-in and create a
-                        Tracing project.
-                        Do the following:
-                        <orderedlist>
-                            <listitem><para>Select "Open Perspective" from the
-                                "Window" menu and then select "Other..." to
-                                bring up a menu of other perspectives.
-                                Choose "Tracing".
-                                </para></listitem>
-                            <listitem><para>Click "OK" to change the Eclipse
-                                perspective into the Tracing perspective.
-                                </para></listitem>
-                            <listitem><para>Create a new Tracing project by
-                                selecting "Project" from the "File -> New" menu.
-                                </para></listitem>
-                            <listitem><para>Choose "Tracing Project" from the
-                                "Tracing" menu and click "Next".
-                                </para></listitem>
-                            <listitem><para>Provide a name for your tracing
-                                project and click "Finish".
-                                </para></listitem>
-                            <listitem><para>Generate your tracing data on the
-                                remote target.</para></listitem>
-                            <listitem><para>Select "Lttng2.0 trace import"
-                                from the "Yocto Project Tools" menu to
-                                start the data import process.</para></listitem>
-                            <listitem><para>Specify your remote connection name.
-                                </para></listitem>
-                            <listitem><para>For the Ust directory path, specify
-                                the location of your remote tracing data.
-                                Make sure the location ends with
-                                <filename>ust</filename> (e.g.
-                                <filename>/usr/mysession/ust</filename>).
-                                </para></listitem>
-                            <listitem><para>Click "OK" to complete the import
-                                process.
-                                The data is now in the local tracing project
-                                you created.</para></listitem>
-                            <listitem><para>Right click on the data and then use
-                                the menu to Select "Generic CTF Trace" from the
-                                "Trace Type... -> Common Trace Format" menu to
-                                map the tracing type.</para></listitem>
-                            <listitem><para>Right click the mouse and select
-                                "Open" to bring up the Eclipse Lttng Trace
-                                Viewer so you view the tracing data.
-                                </para></listitem>
-                        </orderedlist></para></listitem>
-                    <listitem><para><emphasis><filename>PowerTOP</filename>:</emphasis>
-                        Selecting this tool runs PowerTOP on the remote target
-                        machine and displays the results in a new view called
-                        PowerTOP.</para>
-                        <para>The "Time to gather data(sec):" field is the time
-                        passed in seconds before data is gathered from the
-                        remote target for analysis.</para>
-                        <para>The "show pids in wakeups list:" field corresponds
-                        to the <filename>-p</filename> argument passed to
-                        <filename>PowerTOP</filename>.</para></listitem>
-                    <listitem><para><emphasis><filename>LatencyTOP and Perf</filename>:</emphasis>
-                        LatencyTOP identifies system latency, while
-                        Perf monitors the system's performance counter
-                        registers.
-                        Selecting either of these tools causes an RSE terminal
-                        view to appear from which you can run the tools.
-                        Both tools refresh the entire screen to display results
-                        while they run.
-                        For more information on setting up and using
-                        <filename>perf</filename>, see the
-                        "<ulink url='&YOCTO_DOCS_PROF_URL;#profile-manual-perf'>perf</ulink>"
-                        section in the Yocto Project Profiling and Tracing
-                        Manual.
-                        </para></listitem>
-                    <listitem><para><emphasis><filename>SystemTap</filename>:</emphasis>
-                        Systemtap is a tool that lets you create and reuse
-                        scripts to examine the activities of a live Linux
-                        system.
-                        You can easily extract, filter, and summarize data
-                        that helps you diagnose complex performance or
-                        functional problems.
-                        For more information on setting up and using
-                        <filename>SystemTap</filename>, see the
-                        <ulink url='https://sourceware.org/systemtap/documentation.html'>SystemTap Documentation</ulink>.
-                        </para></listitem>
-                    <listitem><para><emphasis><filename>yocto-bsp</filename>:</emphasis>
-                        The <filename>yocto-bsp</filename> tool lets you
-                        quickly set up a Board Support Package (BSP) layer.
-                        The tool requires a Metadata location, build location,
-                        BSP name, BSP output location, and a kernel
-                        architecture.
-                        For more information on the
-                        <filename>yocto-bsp</filename> tool outside of Eclipse,
-                        see the
-                        "<ulink url='&YOCTO_DOCS_BSP_URL;#creating-a-new-bsp-layer-using-the-yocto-bsp-script'>Creating a new BSP Layer Using the yocto-bsp Script</ulink>"
-                        section in the Yocto Project Board Support Package
-                        (BSP) Developer's Guide.
-                        </para></listitem>
-                </itemizedlist>
-            </para>
-        </section>
-    </section>
-
-    <section id='workflow-using-stand-alone-cross-development-toolchains'>
-        <title>Workflow Using Stand-Alone Cross-Development Toolchains</title>
-
-        <para>
-            If you want to develop an application without prior installation
-            of the ADT, you still can employ the
-            <link linkend='cross-development-toolchain'>Cross Development Toolchain</link>,
-            the QEMU emulator, and a number of supported  target image files.
-            You just need to follow these general steps:
-            <orderedlist>
-                <listitem><para><emphasis>Install the cross-development
-                    toolchain for your target hardware:</emphasis>
-                    For information on how to install the toolchain, see the
-                    "<ulink url='&YOCTO_DOCS_ADT_URL;#using-an-existing-toolchain-tarball'>Using a Cross-Toolchain Tarball</ulink>"
-                    section in the Yocto Project Application Developer's
-                    Guide.</para></listitem>
-                <listitem><para><emphasis>Download the Target Image:</emphasis>
-                    The Yocto Project supports several target architectures
-                    and has many pre-built kernel images and root filesystem
-                    images.</para>
-                    <para>If you are going to develop your application on
-                    hardware, go to the
-                    <ulink url='&YOCTO_MACHINES_DL_URL;'><filename>machines</filename></ulink>
-                    download area and choose a target machine area
-                    from which to download the kernel image and root filesystem.
-                    This download area could have several files in it that
-                    support development using actual hardware.
-                    For example, the area might contain
-                    <filename>.hddimg</filename> files that combine the
-                    kernel image with the filesystem, boot loaders, and
-                    so forth.
-                    Be sure to get the files you need for your particular
-                    development process.</para>
-                    <para>If you are going to develop your application and
-                    then run and test it using the QEMU emulator, go to the
-                    <ulink url='&YOCTO_QEMU_DL_URL;'><filename>machines/qemu</filename></ulink>
-                    download area.
-                    From this area, go down into the directory for your
-                    target architecture (e.g. <filename>qemux86_64</filename>
-                    for an <trademark class='registered'>Intel</trademark>-based
-                    64-bit architecture).
-                    Download kernel, root filesystem, and any other files you
-                    need for your process.
-                    <note>In order to use the root filesystem in QEMU, you
-                    need to extract it.
-                    See the
-                    "<ulink url='&YOCTO_DOCS_ADT_URL;#extracting-the-root-filesystem'>Extracting the Root Filesystem</ulink>"
-                    section for information on how to extract the root
-                    filesystem.</note></para></listitem>
-                <listitem><para><emphasis>Develop and Test your
-                    Application:</emphasis>  At this point, you have the tools
-                    to develop your application.
-                    If you need to separately install and use the QEMU
-                    emulator, you can go to
-                    <ulink url='http://wiki.qemu.org/Main_Page'>QEMU Home Page</ulink>
-                    to download and learn about the emulator.
-                    You can see the
-                    "<link linkend='dev-manual-qemu'>Using the Quick EMUlator (QEMU)</link>"
-                    chapter for information on using QEMU within the Yocto
-                    Project.</para></listitem>
-            </orderedlist>
-        </para>
-    </section>
 </section>
 
 <section id="dev-modifying-source-code">
@@ -1719,7 +605,7 @@
                 describes this workflow.
                 If you want more information that showcases the workflow, click
                 <ulink url='https://drive.google.com/a/linaro.org/file/d/0B3KGzY5fW7laTDVxUXo3UDRvd2s/view'>here</ulink>
-                for an excellent presentation by Trevor Woerner that
+                for a presentation by Trevor Woerner that, while somewhat dated,
                 provides detailed background information and a complete
                 working tutorial.
                 </para></listitem>
@@ -1743,212 +629,647 @@
             As mentioned earlier, <filename>devtool</filename> helps
             you easily develop projects whose build output must be part of
             an image built using the OpenEmbedded build system.
-            The remainder of this section presents the workflow you would
-            use that includes <filename>devtool</filename>.
-            <footnote>
-                <para>
-                    Kudos and thanks to
-                    <ulink url='mailto:twoerner@gmail.com'>Trevor Woerner</ulink>
-                    whose
-                    "<ulink url='https://drive.google.com/file/d/0B3KGzY5fW7laTDVxUXo3UDRvd2s/view'>Yocto Project Developer Workflow Tutorial</ulink>"
-                    paper contributed nicely towards the development of this
-                    section.
-                </para>
-            </footnote>
         </para>
 
         <para>
-            The steps in this section assume you have a previously built
-            image that is already either running in QEMU or running on actual
-            hardware.
-            Also, it is assumed that for deployment of the image to the
-            target, SSH is installed in the image and if the image is running
-            on real hardware that you have network access to and from your
-            development machine.
+            Three entry points exist that allow you to develop using
+            <filename>devtool</filename>:
+            <itemizedlist>
+                <listitem><para><emphasis><filename>devtool add</filename></emphasis>
+                    </para></listitem>
+                <listitem><para><emphasis><filename>devtool modify</filename></emphasis>
+                    </para></listitem>
+                <listitem><para><emphasis><filename>devtool upgrade</filename></emphasis>
+                    </para></listitem>
+            </itemizedlist>
         </para>
 
-        <section id='update-your-external-source'>
-            <title>Update Your External Source</title>
+        <para>
+            The remainder of this section presents these workflows.
+        </para>
+
+        <section id='use-devtool-to-integrate-new-code'>
+            <title>Use <filename>devtool add</filename> to Integrate New Code</title>
 
             <para>
-                Part of the development flow using
-                <filename>devtool</filename> of course involves updating
-                your source files.
-                Several opportunities exist in the workflow to extract and
-                work on the files.
-                For now, just realize that you need to be able to have
-                access to and edit files.
-                One obvious solution is to initially extract the code into an
-                isolated area in preparation for modification.
+                The <filename>devtool add</filename> command generates
+                a new recipe based on existing source code.
+                This command takes advantage of the
+                <link linkend='devtool-the-workspace-layer-structure'>workspace</link>
+                layer that many <filename>devtool</filename> commands
+                use.
+                The command is flexible enough to allow you to extract source
+                code into both the workspace or a separate local Git repository
+                and to use existing code that does not need to be extracted.
             </para>
 
             <para>
-                Another option is to use the
-                <filename>devtool modify</filename> command.
-                This command makes use of a "workspace" layer where much of
-                the transitional work occurs, which is needed for setting up
-                Metadata used by the OpenEmbedded build system that lets you
-                build your software.
-                Options (i.e. "-x") exist using <filename>devtool</filename>
-                that enable you to use the tool to extract source code.
+                Depending on your particular scenario, the arguments and options
+                you use with <filename>devtool add</filename> form different
+                combinations.
+                The following diagram shows common development flows
+                you would use with the <filename>devtool add</filename>
+                command:
+            </para>
+
+            <para>
+                <imagedata fileref="figures/devtool-add-flow.png" align="center" />
+            </para>
+
+            <para>
+                <orderedlist>
+                    <listitem><para><emphasis>Generating the New Recipe</emphasis>:
+                        The top part of the flow shows three scenarios by which
+                        you could use <filename>devtool add</filename> to
+                        generate a recipe based on existing source code.</para>
+
+                        <para>In a shared development environment, it is
+                        typical where other developers are responsible for
+                        various areas of source code.
+                        As a developer, you are probably interested in using
+                        that source code as part of your development using
+                        the Yocto Project.
+                        All you need is access to the code, a recipe, and a
+                        controlled area in which to do your work.</para>
+
+                        <para>Within the diagram, three possible scenarios
+                        feed into the <filename>devtool add</filename> workflow:
+                        <itemizedlist>
+                            <listitem><para><emphasis>Left</emphasis>:
+                                The left scenario represents a common situation
+                                where the source code does not exist locally
+                                and needs to be extracted.
+                                In this situation, you just let it get
+                                extracted to the default workspace - you do not
+                                want it in some specific location outside of the
+                                workspace.
+                                Thus, everything you need will be located in the
+                                workspace:
+                                <literallayout class='monospaced'>
+     $ devtool add <replaceable>recipe fetchuri</replaceable>
+                                </literallayout>
+                                With this command, <filename>devtool</filename>
+                                creates a recipe and an append file in the
+                                workspace as well as extracts the upstream
+                                source files into a local Git repository also
+                                within the <filename>sources</filename> folder.
+                                </para></listitem>
+                            <listitem><para><emphasis>Middle</emphasis>:
+                                The middle scenario also represents a situation where
+                                the source code does not exist locally.
+                                In this case, the code is again upstream
+                                and needs to be extracted to some
+                                local area - this time outside of the default
+                                workspace.
+                                As always, if required <filename>devtool</filename> creates
+                                a Git repository locally during the extraction.
+                                Furthermore, the first positional argument
+                                <replaceable>srctree</replaceable> in this case
+                                identifies where the
+                                <filename>devtool add</filename> command
+                                will locate the extracted code outside of the
+                                workspace:
+                                <literallayout class='monospaced'>
+     $ devtool add <replaceable>recipe srctree fetchuri</replaceable>
+                                </literallayout>
+                                In summary, the source code is pulled from
+                                <replaceable>fetchuri</replaceable> and extracted
+                                into the location defined by
+                                <replaceable>srctree</replaceable> as a local
+                                Git repository.</para>
+
+                                <para>Within workspace, <filename>devtool</filename>
+                                creates both the recipe and an append file
+                                for the recipe.
+                                </para></listitem>
+                            <listitem><para><emphasis>Right</emphasis>:
+                                The right scenario represents a situation
+                                where the source tree (srctree) has been
+                                previously prepared outside of the
+                                <filename>devtool</filename> workspace.
+                                </para>
+
+                                <para>The following command names the recipe
+                                and identifies where the existing source tree
+                                is located:
+                                <literallayout class='monospaced'>
+     $ devtool add <replaceable>recipe srctree</replaceable>
+                                </literallayout>
+                                The command examines the source code and creates
+                                a recipe for it placing the recipe into the
+                                workspace.</para>
+
+                                <para>Because the extracted source code already exists,
+                                <filename>devtool</filename> does not try to
+                                relocate it into the workspace - just the new
+                                the recipe is placed in the workspace.</para>
+
+                                <para>Aside from a recipe folder, the command
+                                also creates an append folder and places an initial
+                                <filename>*.bbappend</filename> within.
+                                </para></listitem>
+                        </itemizedlist>
+                        </para></listitem>
+                    <listitem><para><emphasis>Edit the Recipe</emphasis>:
+                        At this point, you can use <filename>devtool edit-recipe</filename>
+                        to open up the editor as defined by the
+                        <filename>$EDITOR</filename> environment variable
+                        and modify the file:
+                        <literallayout class='monospaced'>
+     $ devtool edit-recipe <replaceable>recipe</replaceable>
+                        </literallayout>
+                        From within the editor, you can make modifications to the
+                        recipe that take affect when you build it later.
+                        </para></listitem>
+                    <listitem><para><emphasis>Build the Recipe or Rebuild the Image</emphasis>:
+                        At this point in the flow, the next step you
+                        take depends on what you are going to do with
+                        the new code.</para>
+                        <para>If you need to take the build output and eventually
+                        move it to the target hardware, you would use
+                        <filename>devtool build</filename>:
+                        <note>
+                            You could use <filename>bitbake</filename> to build
+                            the recipe as well.
+                        </note>
+                        <literallayout class='monospaced'>
+     $ devtool build <replaceable>recipe</replaceable>
+                        </literallayout></para>
+                        <para>On the other hand, if you want an image to
+                        contain the recipe's packages for immediate deployment
+                        onto a device (e.g. for testing purposes), you can use
+                        the <filename>devtool build-image</filename> command:
+                        <literallayout class='monospaced'>
+     $ devtool build-image <replaceable>image</replaceable>
+                        </literallayout>
+                        </para></listitem>
+                    <listitem><para><emphasis>Deploy the Build Output</emphasis>:
+                        When you use the <filename>devtool build</filename>
+                        command to build out your recipe, you probably want to
+                        see if the resulting build output works as expected on target
+                        hardware.
+                        <note>
+                            This step assumes you have a previously built
+                            image that is already either running in QEMU or
+                            running on actual hardware.
+                            Also, it is assumed that for deployment of the image
+                            to the target, SSH is installed in the image and if
+                            the image is running on real hardware that you have
+                            network access to and from your development machine.
+                        </note>
+                        You can deploy your build output to that target hardware by
+                        using the <filename>devtool deploy-target</filename> command:
+                        <literallayout class='monospaced'>
+     $ devtool deploy-target <replaceable>recipe target</replaceable>
+                        </literallayout>
+                        The <replaceable>target</replaceable> is a live target machine
+                        running as an SSH server.</para>
+
+                        <para>You can, of course, also deploy the image you build
+                        using the <filename>devtool build-image</filename> command
+                        to actual hardware.
+                        However, <filename>devtool</filename> does not provide a
+                        specific command that allows you to do this.
+                        </para></listitem>
+                    <listitem><para><emphasis>Optionally Update the Recipe With Patch Files</emphasis>:
+                        Once you are satisfied with the recipe, if you have made
+                        any changes to the source tree that you want to have
+                        applied by the recipe, you need to generate patches
+                        from those changes.
+                        You do this before moving the recipe
+                        to its final layer and cleaning up the workspace area
+                        <filename>devtool</filename> uses.
+                        This optional step is especially relevant if you are
+                        using or adding third-party software.</para>
+                        <para>To convert commits created using Git to patch files,
+                        use the <filename>devtool update-recipe</filename> command.
+                        <note>
+                            Any changes you want to turn into patches must be
+                            committed to the Git repository in the source tree.
+                        </note>
+                        <literallayout class='monospaced'>
+     $ devtool update-recipe <replaceable>recipe</replaceable>
+                        </literallayout>
+                        </para></listitem>
+                    <listitem><para><emphasis>Move the Recipe to its Permanent Layer</emphasis>:
+                        Before cleaning up the workspace, you need to move the
+                        final recipe to its permanent layer.
+                        You must do this before using the
+                        <filename>devtool reset</filename> command if you want to
+                        retain the recipe.
+                        </para></listitem>
+                    <listitem><para><emphasis>Reset the Recipe</emphasis>:
+                        As a final step, you can restore the state such that
+                        standard layers and the upstream source is used to build
+                        the recipe rather than data in the workspace.
+                        To reset the recipe, use the <filename>devtool reset</filename>
+                        command:
+                        <literallayout class='monospaced'>
+     $ devtool reset <replaceable>recipe</replaceable>
+                        </literallayout>
+                        </para></listitem>
+                </orderedlist>
             </para>
         </section>
 
-        <section id='use-devtool-to-integrate-your-code-with-the-image'>
-            <title>Use <filename>devtool add</filename> to Integrate Your Code with the Image</title>
+        <section id='devtool-use-devtool-modify-to-enable-work-on-code-associated-with-an-existing-recipe'>
+            <title>Use <filename>devtool modify</filename> to Enable Work on Code Associated with an Existing Recipe</title>
 
             <para>
-                The <filename>devtool add</filename> command automatically
-                generates the needed Metadata that allows the OpenEmbedded
-                build system to build your code into the image.
-                <note>
-                    If a package or packages produced by the recipe on which
-                    you are working are not already in
-                    <ulink url='&YOCTO_DOCS_REF_URL;#var-IMAGE_INSTALL'><filename>IMAGE_INSTALL</filename></ulink>
-                    for the image, you must add them.
-                    The <filename>devtool add</filename> command does not
-                    add them for you.
-                </note>
-                Use the following command form:
-                <literallayout class='monospaced'>
-     $ devtool add <replaceable>your-project-name</replaceable>&nbsp;<replaceable>path-to-source</replaceable>
-                </literallayout>
+                The <filename>devtool modify</filename> command prepares the
+                way to work on existing code that already has a recipe in
+                place.
+                The command is flexible enough to allow you to extract code,
+                specify the existing recipe, and keep track of and gather any
+                patch files from other developers that are
+                associated with the code.
             </para>
 
             <para>
-                Running <filename>devtool</filename> for the first time
-                creates a workspace layer through the
-                <filename>bblayers.conf</filename> file that
-                is based on your project's location:
-                <literallayout class='monospaced'>
-     <replaceable>path-to-source</replaceable>/<replaceable>build-directory</replaceable>/<replaceable>workspace-layer</replaceable>
-                </literallayout>
-                By default, the name of the workspace layer is "workspace".
+                Depending on your particular scenario, the arguments and options
+                you use with <filename>devtool modify</filename> form different
+                combinations.
+                The following diagram shows common development flows
+                you would use with the <filename>devtool modify</filename>
+                command:
             </para>
 
             <para>
-                For details on the workspace layer created in the
-                <replaceable>build-directory</replaceable>,
-                see the
-                "<link linkend='devtool-adding-a-new-recipe-to-the-workspace'>Adding a New Recipe to the Workspace Layer</link>"
-                section.
-            </para>
-
-<!--
-            <para>
-                Of course, each layer must have a
-                <filename>layer.conf</filename> configuration file.
-                <filename>devtool</filename> also creates this configuration
-                file:
-                <literallayout class='monospaced'>
-     $ cat workspace/conf/layer.conf
-     # ### workspace layer auto­generated by devtool ###
-     BBPATH =. "${LAYERDIR}:"
-     BBFILES += "${LAYERDIR}/recipes/*/*.bb \
-                 ${LAYERDIR}/appends/*.bbappend"
-     BBFILE_COLLECTIONS += "workspacelayer"
-     BBFILE_PATTERN_workspacelayer = "^${LAYERDIR}/"
-     BBFILE_PATTERN_IGNORE_EMPTY_workspacelayer = "1"
-     BBFILE_PRIORITY_workspacelayer = "99"
-                </literallayout>
-            </para>
--->
-
-            <para>
-                Running <filename>devtool add</filename> automatically
-                generates your recipe:
-                <literallayout class='monospaced'>
-     $ cat workspace/recipes/<replaceable>your-project-name</replaceable>/<replaceable>your-project-name</replaceable>.bb
-     # Recipe created by recipetool
-     # This is the basis of a recipe and may need further editing in order to be fully functional.
-     # (Feel free to remove these comments when editing.)
-     #
-     # Unable to find any files that looked like license statements. Check the accompanying
-     # documentation and source headers and set LICENSE and LIC_FILES_CHKSUM accordingly.
-     LICENSE = "CLOSED"
-     LIC_FILES_CHKSUM = ""
-
-     # No information for SRC_URI yet (only an external source tree was
-     # specified)
-     SRC_URI = ""
-
-     DEPENDS = "libx11"
-     # NOTE: if this software is not capable of being built in a separate build directory
-     # from the source, you should replace autotools with autotools­-brokensep in the
-     # inherit line
-     inherit autotools
-
-     # Specify any options you want to pass to the configure script using EXTRA_OECONF:
-     EXTRA_OECONF = ""
-                </literallayout>
+                <imagedata fileref="figures/devtool-modify-flow.png" align="center" />
             </para>
 
             <para>
-                Lastly, the <filename>devtool add</filename> command creates the
-                <filename>.bbappend</filename> file:
-                <literallayout class='monospaced'>
-     $ cat workspace/appends/<replaceable>your-project-name</replaceable>.bbappend
-     inherit externalsrc
-     EXTERNALSRC = "/<replaceable>path-to-source</replaceable>/<replaceable>your-project-name</replaceable>"
+                <orderedlist>
+                    <listitem><para><emphasis>Preparing to Modify the Code</emphasis>:
+                        The top part of the flow shows three scenarios by which
+                        you could use <filename>devtool modify</filename> to
+                        prepare to work on source files.
+                        Each scenario assumes the following:
+                        <itemizedlist>
+                            <listitem><para>The recipe exists in some layer external
+                                to the <filename>devtool</filename> workspace.
+                                </para></listitem>
+                            <listitem><para>The source files exist upstream in an
+                                un-extracted state or locally in a previously
+                                extracted state.
+                                </para></listitem>
+                        </itemizedlist>
+                        The typical situation is where another developer has
+                        created some layer for use with the Yocto Project and
+                        their recipe already resides in that layer.
+                        Furthermore, their source code is readily available
+                        either upstream or locally.
+                        <itemizedlist>
+                            <listitem><para><emphasis>Left</emphasis>:
+                                The left scenario represents a common situation
+                                where the source code does not exist locally
+                                and needs to be extracted.
+                                In this situation, the source is extracted
+                                into the default workspace location.
+                                The recipe, in this scenario, is in its own
+                                layer outside the workspace
+                                (i.e.
+                                <filename>meta-</filename><replaceable>layername</replaceable>).
+                                </para>
 
-     # initial_rev: <replaceable>commit-ID</replaceable>
-                </literallayout>
+                                <para>The following command identifies the recipe
+                                and by default extracts the source files:
+                                <literallayout class='monospaced'>
+     $ devtool modify <replaceable>recipe</replaceable>
+                                </literallayout>
+                                Once <filename>devtool</filename>locates the recipe,
+                                it uses the
+                                <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>
+                                variable to locate the source code and
+                                any local patch files from other developers are
+                                located.
+                                <note>
+                                    You cannot provide an URL for
+                                    <replaceable>srctree</replaceable> when using the
+                                    <filename>devtool modify</filename> command.
+                                </note>
+                                With this scenario, however, since no
+                                <replaceable>srctree</replaceable> argument exists, the
+                                <filename>devtool modify</filename> command by default
+                                extracts the source files to a Git structure.
+                                Furthermore, the location for the extracted source is the
+                                default area within the workspace.
+                                The result is that the command sets up both the source
+                                code and an append file within the workspace with the
+                                recipe remaining in its original location.
+                                </para></listitem>
+                            <listitem><para><emphasis>Middle</emphasis>:
+                                The middle scenario represents a situation where
+                                the source code also does not exist locally.
+                                In this case, the code is again upstream
+                                and needs to be extracted to some
+                                local area as a Git repository.
+                                The recipe, in this scenario, is again in its own
+                                layer outside the workspace.</para>
+
+                                <para>The following command tells
+                                <filename>devtool</filename> what recipe with
+                                which to work and, in this case, identifies a local
+                                area for the extracted source files that is outside
+                                of the default workspace:
+                                <literallayout class='monospaced'>
+     $ devtool modify <replaceable>recipe srctree</replaceable>
+                                </literallayout>
+                                As with all extractions, the command uses
+                                the recipe's <filename>SRC_URI</filename> to locate the
+                                source files.
+                                Once the files are located, the command by default
+                                extracts them.
+                                Providing the <replaceable>srctree</replaceable>
+                                argument instructs <filename>devtool</filename> where
+                                place the extracted source.</para>
+
+                                <para>Within workspace, <filename>devtool</filename>
+                                creates an append file for the recipe.
+                                The recipe remains in its original location but
+                                the source files are extracted to the location you
+                                provided with <replaceable>srctree</replaceable>.
+                                </para></listitem>
+                            <listitem><para><emphasis>Right</emphasis>:
+                                The right scenario represents a situation
+                                where the source tree
+                                (<replaceable>srctree</replaceable>) exists as a
+                                previously extracted Git structure outside of
+                                the <filename>devtool</filename> workspace.
+                                In this example, the recipe also exists
+                                elsewhere in its own layer.
+                                </para>
+
+                                <para>The following command tells
+                                <filename>devtool</filename> the recipe
+                                with which to work, uses the "-n" option to indicate
+                                source does not need to be extracted, and uses
+                                <replaceable>srctree</replaceable> to point to the
+                                previously extracted source files:
+                                <literallayout class='monospaced'>
+     $ devtool modify -n <replaceable>recipe srctree</replaceable>
+                                </literallayout>
+                                </para>
+
+                                <para>Once the command finishes, it creates only
+                                an append file for the recipe in the workspace.
+                                The recipe and the source code remain in their
+                                original locations.
+                                </para></listitem>
+                            </itemizedlist>
+                        </para></listitem>
+                    <listitem><para><emphasis>Edit the Source</emphasis>:
+                        Once you have used the <filename>devtool modify</filename>
+                        command, you are free to make changes to the source
+                        files.
+                        You can use any editor you like to make and save
+                        your source code modifications.
+                        </para></listitem>
+                    <listitem><para><emphasis>Build the Recipe</emphasis>:
+                        Once you have updated the source files, you can build
+                        the recipe.
+                        You can either use <filename>devtool build</filename> or
+                        <filename>bitbake</filename>.
+                        Either method produces build output that is stored
+                        in
+                        <ulink url='&YOCTO_DOCS_REF_URL;#var-TMPDIR'><filename>TMPDIR</filename></ulink>.
+                        </para></listitem>
+                    <listitem><para><emphasis>Deploy the Build Output</emphasis>:
+                        When you use the <filename>devtool build</filename>
+                        command or <filename>bitbake</filename> to build out your
+                        recipe, you probably want to see if the resulting build
+                        output works as expected on target hardware.
+                        <note>
+                            This step assumes you have a previously built
+                            image that is already either running in QEMU or
+                            running on actual hardware.
+                            Also, it is assumed that for deployment of the image
+                            to the target, SSH is installed in the image and if
+                            the image is running on real hardware that you have
+                            network access to and from your development machine.
+                        </note>
+                        You can deploy your build output to that target hardware by
+                        using the <filename>devtool deploy-target</filename> command:
+                        <literallayout class='monospaced'>
+     $ devtool deploy-target <replaceable>recipe target</replaceable>
+                        </literallayout>
+                        The <replaceable>target</replaceable> is a live target machine
+                        running as an SSH server.</para>
+
+                        <para>You can, of course, also deploy the image you build
+                        using the <filename>devtool build-image</filename> command
+                        to actual hardware.
+                        However, <filename>devtool</filename> does not provide a
+                        specific command that allows you to do this.
+                        </para></listitem>
+                    <listitem><para><emphasis>Optionally Create Patch Files for Your Changes</emphasis>:
+                        After you have debugged your changes, you can
+                        use <filename>devtool update-recipe</filename> to
+                        generate patch files for all the commits you have
+                        made.
+                        <note>
+                            Patch files are generated only for changes
+                            you have committed.
+                        </note>
+                        <literallayout class='monospaced'>
+     $ devtool update-recipe <replaceable>recipe</replaceable>
+                        </literallayout>
+                        By default, the
+                        <filename>devtool update-recipe</filename> command
+                        creates the patch files in a folder named the same
+                        as the recipe beneath the folder in which the recipe
+                        resides, and updates the recipe's
+                        <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>
+                        statement to point to the generated patch files.
+                        <note>
+                            You can use the
+                            "--append <replaceable>LAYERDIR</replaceable>"
+                            option to cause the command to create append files
+                            in a specific layer rather than the default
+                            recipe layer.
+                        </note>
+                        </para></listitem>
+                    <listitem><para><emphasis>Restore the Workspace</emphasis>:
+                        The <filename>devtool reset</filename> restores the
+                        state so that standard layers and upstream sources are
+                        used to build the recipe rather than what is in the
+                        workspace.
+                        <literallayout class='monospaced'>
+     $ devtool reset <replaceable>recipe</replaceable>
+                        </literallayout>
+                        </para></listitem>
+                </orderedlist>
             </para>
         </section>
 
-        <section id='build-your-project'>
-            <title>Build Your Project</title>
+        <section id='devtool-use-devtool-upgrade-to-create-a-version-of-the-recipe-that-supports-a-newer-version-of-the-software'>
+            <title>Use <filename>devtool upgrade</filename> to Create a Version of the Recipe that Supports a Newer Version of the Software</title>
 
             <para>
-                You can use BitBake or <filename>devtool build</filename> to
-                build your modified project.
+                The <filename>devtool upgrade</filename> command updates
+                an existing recipe so that you can build it for an updated
+                set of source files.
+                The command is flexible enough to allow you to specify
+                source code revision and versioning schemes, extract code into
+                or out of the <filename>devtool</filename> workspace, and
+                work with any source file forms that the fetchers support.
             </para>
 
             <para>
-                To use BitBake, use the following:
-                <literallayout class='monospaced'>
-     $ bitbake <replaceable>your-project-name</replaceable>
-                </literallayout>
-                Alternatively, you can use
-                <filename>devtool build</filename>, which is equivalent to
-                <filename>bitbake -c populate_sysroot</filename>.
-                For example:
-                <literallayout class='monospaced'>
-     $ devtool build <replaceable>your-project-name</replaceable>
-                </literallayout>
+                Depending on your particular scenario, the arguments and options
+                you use with <filename>devtool upgrade</filename> form different
+                combinations.
+                The following diagram shows a common development flow
+                you would use with the <filename>devtool modify</filename>
+                command:
+            </para>
+
+            <para>
+                <imagedata fileref="figures/devtool-upgrade-flow.png" align="center" />
+            </para>
+
+            <para>
+                <orderedlist>
+                    <listitem><para><emphasis>Initiate the Upgrade</emphasis>:
+                        The top part of the flow shows a typical scenario by which
+                        you could use <filename>devtool upgrade</filename>.
+                        The following conditions exist:
+                        <itemizedlist>
+                            <listitem><para>The recipe exists in some layer external
+                                to the <filename>devtool</filename> workspace.
+                                </para></listitem>
+                            <listitem><para>The source files for the new release
+                                exist adjacent to the same location pointed to by
+                                <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>
+                                in the recipe (e.g. a tarball with the new version
+                                number in the name, or as a different revision in
+                                the upstream Git repository).
+                                </para></listitem>
+                        </itemizedlist>
+                        A common situation is where third-party software has
+                        undergone a revision so that it has been upgraded.
+                        The recipe you have access to is likely in your own layer.
+                        Thus, you need to upgrade the recipe to use the
+                        newer version of the software:
+                        <literallayout class='monospaced'>
+     $ devtool upgrade -V <replaceable>version recipe</replaceable>
+                        </literallayout>
+                        By default, the <filename>devtool upgrade</filename> command
+                        extracts source code into the <filename>sources</filename>
+                        directory in the workspace.
+                        If you want the code extracted to any other location, you
+                        need to provide the <replaceable>srctree</replaceable>
+                        positional argument with the command as follows:
+                        <literallayout class='monospaced'>
+     $ devtool upgrade -V <replaceable>version recipe srctree</replaceable>
+                        </literallayout>
+                        Also, in this example, the "-V" option is used to specify
+                        the new version.
+                        If the source files pointed to by the
+                        <filename>SRC_URI</filename> statement in the recipe are
+                        in a Git repository, you must provide the "-S" option and
+                        specify a revision for the software.</para>
+
+                        <para>Once <filename>devtool</filename> locates the recipe,
+                        it uses the <filename>SRC_URI</filename> variable to locate
+                        the source code and any local patch files from other
+                        developers are located.
+                        The result is that the command sets up the source
+                        code, the new version of the recipe, and an append file
+                        all within the workspace.
+                        </para></listitem>
+                    <listitem><para><emphasis>Resolve any Conflicts created by the Upgrade</emphasis>:
+                        At this point, there could be some conflicts due to the
+                        software being upgraded to a new version.
+                        This would occur if your recipe specifies some patch files in
+                        <filename>SRC_URI</filename> that conflict with changes
+                        made in the new version of the software.
+                        If this is the case, you need to resolve the conflicts
+                        by editing the source and following the normal
+                        <filename>git rebase</filename> conflict resolution
+                        process.</para>
+
+                        <para>Before moving onto the next step, be sure to resolve any
+                        such conflicts created through use of a newer or different
+                        version of the software.
+                        </para></listitem>
+                    <listitem><para><emphasis>Build the Recipe</emphasis>:
+                        Once you have your recipe in order, you can build it.
+                        You can either use <filename>devtool build</filename> or
+                        <filename>bitbake</filename>.
+                        Either method produces build output that is stored
+                        in
+                        <ulink url='&YOCTO_DOCS_REF_URL;#var-TMPDIR'><filename>TMPDIR</filename></ulink>.
+                        </para></listitem>
+                    <listitem><para><emphasis>Deploy the Build Output</emphasis>:
+                        When you use the <filename>devtool build</filename>
+                        command or <filename>bitbake</filename> to build out your
+                        recipe, you probably want to see if the resulting build
+                        output works as expected on target hardware.
+                        <note>
+                            This step assumes you have a previously built
+                            image that is already either running in QEMU or
+                            running on actual hardware.
+                            Also, it is assumed that for deployment of the image
+                            to the target, SSH is installed in the image and if
+                            the image is running on real hardware that you have
+                            network access to and from your development machine.
+                        </note>
+                        You can deploy your build output to that target hardware by
+                        using the <filename>devtool deploy-target</filename> command:
+                        <literallayout class='monospaced'>
+     $ devtool deploy-target <replaceable>recipe target</replaceable>
+                        </literallayout>
+                        The <replaceable>target</replaceable> is a live target machine
+                        running as an SSH server.</para>
+
+                        <para>You can, of course, also deploy the image you build
+                        using the <filename>devtool build-image</filename> command
+                        to actual hardware.
+                        However, <filename>devtool</filename> does not provide a
+                        specific command that allows you to do this.
+                        </para></listitem>
+                    <listitem><para><emphasis>Optionally Create Patch Files for Your Changes</emphasis>:
+                        After you have debugged your changes, you can
+                        use <filename>devtool update-recipe</filename> to
+                        generate patch files for all the commits you have
+                        made.
+                        <note>
+                            Patch files are generated only for changes
+                            you have committed.
+                        </note>
+                        <literallayout class='monospaced'>
+     $ devtool update-recipe <replaceable>recipe</replaceable>
+                        </literallayout>
+                        By default, the
+                        <filename>devtool update-recipe</filename> command
+                        creates the patch files in a folder named the same
+                        as the recipe beneath the folder in which the recipe
+                        resides, and updates the recipe's
+                        <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>
+                        statement to point to the generated patch files.
+                        </para></listitem>
+                    <listitem><para><emphasis>Move the Recipe to its Permanent Layer</emphasis>:
+                        Before cleaning up the workspace, you need to move the
+                        final recipe to its permanent layer.
+                        You can either overwrite the original recipe or you can
+                        overlay the upgraded recipe into a separate layer.
+                        You must do this before using the
+                        <filename>devtool reset</filename> command if you want to
+                        retain the upgraded recipe.
+                        </para></listitem>
+                    <listitem><para><emphasis>Restore the Workspace</emphasis>:
+                        The <filename>devtool reset</filename> restores the
+                        state so that standard layers and upstream sources are
+                        used to build the recipe rather than what is in the
+                        workspace.
+                        <literallayout class='monospaced'>
+     $ devtool reset <replaceable>recipe</replaceable>
+                        </literallayout>
+                        </para></listitem>
+                </orderedlist>
             </para>
         </section>
-
-<!--
-        <section id='dev-build-the-image'>
-            <title>Build the Image</title>
-
-            <para>
-                The final step before testing is to rebuild the base image
-                with your project changes as part of the image.
-                Simply run BitBake again on your image.
-                Here is an example:
-                <literallayout class='monospaced'>
-     $ bitbake <replaceable>image</replaceable>
-                </literallayout>
-            </para>
-        </section>
-
-        <section id='dev-testing-the-image'>
-            <title>Testing the Image</title>
-
-            <para>
-                Once you have the image, you can test it using QEMU.
-                Here is an example assuming "qemux86":
-                <literallayout class='monospaced'>
-     $ runqemu qemux86 <replaceable>image</replaceable>
-                </literallayout>
-                For information on how to test an image using QEMU, see the
-                "<link linkend='dev-manual-qemu'>Using the Quick EMUlator (QEMU)</link>"
-                section.
-            </para>
-        </section>
--->
     </section>
 
     <section id='devtool-quick-reference'>
@@ -1959,7 +1280,7 @@
             adding a new recipe and the supporting Metadata to a temporary
             workspace layer.
             This section provides a short reference on
-            <filename>devtool</filename> for most of the commands.
+            <filename>devtool</filename> and its commands.
         </para>
 
         <section id='devtool-getting-help'>
@@ -1970,32 +1291,43 @@
                 <filename>devtool</filename> command is using the
                 <filename>--help</filename> option:
                 <literallayout class='monospaced'>
-     $ devtool --help
-     usage: devtool [-h] [--basepath BASEPATH] [-d] [-q] [--color COLOR]
-               &lt;subcommand&gt; ...
+     usage: devtool [--basepath BASEPATH] [--bbpath BBPATH] [-d] [-q]
+                    [--color COLOR] [-h]
+                    &lt;subcommand&gt; ...
 
      OpenEmbedded development tool
 
      optional arguments:
-       -h, --help           show this help message and exit
        --basepath BASEPATH  Base directory of SDK / build directory
+       --bbpath BBPATH      Explicitly specify the BBPATH, rather than getting it
+                            from the metadata
        -d, --debug          Enable debug output
        -q, --quiet          Print only errors
        --color COLOR        Colorize output (where COLOR is auto, always, never)
+       -h, --help           show this help message and exit
 
      subcommands:
-       &lt;subcommand&gt;
-         create-workspace   Set up a workspace
-         deploy-target      Deploy recipe output files to live target machine
-         undeploy-target    Undeploy recipe output files in live target machine
-         add                Add a new recipe
-         modify             Modify the source for an existing recipe
-         extract            Extract the source for an existing recipe
-         update-recipe      Apply changes from external source tree to recipe
-         status             Show workspace status
-         build              Build a recipe
-         reset              Remove a recipe from your workspace
-
+       Beginning work on a recipe:
+         add                  Add a new recipe
+         modify               Modify the source for an existing recipe
+         upgrade              Upgrade an existing recipe
+       Getting information:
+         status               Show workspace status
+         search               Search available recipes
+       Working on a recipe in the workspace:
+         build                Build a recipe
+         edit-recipe          Edit a recipe file in your workspace
+         configure-help       Get help on configure script options
+         update-recipe        Apply changes from external source tree to recipe
+         reset                Remove a recipe from your workspace
+       Testing changes on target:
+         deploy-target        Deploy recipe output files to live target machine
+         undeploy-target      Undeploy recipe output files in live target machine
+         build-image          Build image including workspace recipe packages
+       Advanced:
+         create-workspace     Set up workspace in an alternative location
+         extract              Extract the source for an existing recipe
+         sync                 Synchronize the source tree for an existing recipe
      Use devtool &lt;subcommand&gt; --help to get help on a specific command
                 </literallayout>
             </para>
@@ -2006,22 +1338,95 @@
                 name and using <filename>--help</filename>:
                 <literallayout class='monospaced'>
      $ devtool add --help
-     usage: devtool add [-h] [--same-dir] [--fetch URI] [--version VERSION]
-                        recipename srctree
+     usage: devtool add [-h] [--same-dir | --no-same-dir] [--fetch URI]
+                        [--version VERSION] [--no-git] [--binary] [--also-native]
+                        [--src-subdir SUBDIR]
+                        [recipename] [srctree] [fetchuri]
 
-     Adds a new recipe
+     Adds a new recipe to the workspace to build a specified source tree. Can
+     optionally fetch a remote URI and unpack it to create the source tree.
 
      positional arguments:
-       recipename            Name for new recipe to add
-       srctree               Path to external source tree
+       recipename            Name for new recipe to add (just name - no version,
+                             path or extension). If not specified, will attempt to
+                             auto-detect it.
+       srctree               Path to external source tree. If not specified, a
+                             subdirectory of
+                             /home/scottrif/poky/build/workspace/sources will be
+                             used.
+       fetchuri              Fetch the specified URI and extract it to create the
+                             source tree
 
      optional arguments:
        -h, --help            show this help message and exit
        --same-dir, -s        Build in same directory as source
+       --no-same-dir         Force build in a separate build directory
        --fetch URI, -f URI   Fetch the specified URI and extract it to create the
-                             source tree
+                             source tree (deprecated - pass as positional argument
+                             instead)
        --version VERSION, -V VERSION
                              Version to use within recipe (PV)
+       --no-git, -g          If fetching source, do not set up source tree as a git
+                             repository
+       --binary, -b          Treat the source tree as something that should be
+                             installed verbatim (no compilation, same directory
+                             structure). Useful with binary packages e.g. RPMs.
+       --also-native         Also add native variant (i.e. support building recipe
+                             for the build host as well as the target machine)
+       --src-subdir SUBDIR   Specify subdirectory within source tree to use
+                </literallayout>
+            </para>
+        </section>
+
+        <section id='devtool-the-workspace-layer-structure'>
+            <title>The Workspace Layer Structure</title>
+
+            <para>
+                <filename>devtool</filename> uses a "Workspace" layer
+                in which to accomplish builds.
+                This layer is not specific to any single
+                <filename>devtool</filename> command but is rather a common
+                working area used across the tool.
+            </para>
+
+            <para>
+                The following figure shows the workspace structure:
+            </para>
+
+            <para>
+                <imagedata fileref="figures/build-workspace-directory.png"
+                    width="6in" depth="5in" align="left" scale="70" />
+            </para>
+
+            <para>
+                <literallayout class='monospaced'>
+     attic - A directory created if devtool believes it preserve
+             anything when you run "devtool reset".  For example, if you
+             run "devtool add", make changes to the recipe, and then
+             run "devtool reset", devtool takes notice that the file has
+             been changed and moves it into the attic should you still
+             want the recipe.
+
+     README - Provides information on what is in workspace layer and how to
+              manage it.
+
+     .devtool_md5 - A checksum file used by devtool.
+
+     appends - A directory that contains *.bbappend files, which point to
+               external source.
+
+     conf - A configuration directory that contains the layer.conf file.
+
+     recipes - A directory containing recipes.  This directory contains a
+               folder for each directory added whose name matches that of the
+               added recipe.  devtool places the <replaceable>recipe</replaceable>.bb file
+               within that sub-directory.
+
+     sources - A directory containing a working copy of the source files used
+               when building the recipe.  This is the default directory used
+               as the location of the source tree when you do not provide a
+               source tree path.  This directory contains a folder for each
+               set of source files matched to a corresponding recipe.
                 </literallayout>
             </para>
         </section>
@@ -2040,51 +1445,69 @@
 
             <para>
                 The following example creates and adds a new recipe named
-                <filename>jackson</filename> to the workspace layer.
+                <filename>jackson</filename> to a workspace layer the tool creates.
                 The source code built by the recipes resides in
                 <filename>/home/scottrif/sources/jackson</filename>:
                 <literallayout class='monospaced'>
      $ devtool add jackson /home/scottrif/sources/jackson
                 </literallayout>
-                <note>
-                    For complete syntax, use the
-                    <filename>devtool add --help</filename> command.
-                </note>
             </para>
 
             <para>
                 If you add a recipe and the workspace layer does not exist,
-                the command creates the layer and populates it as follows:
-            </para>
-
-            <para>
-                <imagedata fileref="figures/build-workspace-directory.png"
-                    width="6in" depth="4in" align="center" scale="100" />
-            </para>
-
-            <para>
-                <literallayout class='monospaced'>
-     README - Provides information on what is in workspace layer and how to
-              manage it.
-
-     appends - A directory that contains *.bbappend files, which point to
-               external source.
-
-     conf - A configuration directory that contains the layer.conf file.
-
-     recipes - A directory containing recipes.  This directory contains a
-               folder for each directory added whose name matches that of the
-               added recipe.  devtool places the <replaceable>recipe</replaceable>.bb file
-               within that sub-directory.
-                </literallayout>
+                the command creates the layer and populates it as
+                described in
+                "<link linkend='devtool-the-workspace-layer-structure'>The Workspace Layer Structure</link>"
+                section.
             </para>
 
             <para>
                 Running <filename>devtool add</filename> when the
-                workspace layer exists causes the tool to add the recipe
-                and append files into the existing workspace layer.
+                workspace layer exists causes the tool to add the recipe,
+                append files, and source files into the existing workspace layer.
                 The <filename>.bbappend</filename> file is created to point
                 to the external source tree.
+            </para>
+        </section>
+
+        <section id='devtool-extracting-the-source-for-an-existing-recipe'>
+            <title>Extracting the Source for an Existing Recipe</title>
+
+            <para>
+                Use the <filename>devtool extract</filename> command to
+                extract the source for an existing recipe.
+                When you use this command, you must supply the root name
+                of the recipe (i.e. no version, paths, or extensions), and
+                you must supply the directory to which you want the source
+                extracted.
+            </para>
+
+            <para>
+                Additional command options let you control the name of a
+                development branch into which you can checkout the source
+                and whether or not to keep a temporary directory, which is
+                useful for debugging.
+            </para>
+        </section>
+
+        <section id='devtool-synchronizing-a-recipes-extracted-source-tree'>
+            <title>Synchronizing a Recipe's Extracted Source Tree</title>
+
+            <para>
+                Use the <filename>devtool sync</filename> command to
+                synchronize a previously extracted source tree for an
+                existing recipe.
+                When you use this command, you must supply the root name
+                of the recipe (i.e. no version, paths, or extensions), and
+                you must supply the directory to which you want the source
+                extracted.
+            </para>
+
+            <para>
+                Additional command options let you control the name of a
+                development branch into which you can checkout the source
+                and whether or not to keep a temporary directory, which is
+                useful for debugging.
             </para>
         </section>
 
@@ -2110,14 +1533,37 @@
                 You can use the following command to checkout the source
                 files:
                 <literallayout class='monospaced'>
-     $ devtool modify -x <replaceable>recipe</replaceable>&nbsp;<replaceable>path-to-source</replaceable>
+     $ devtool modify <replaceable>recipe</replaceable>
                 </literallayout>
-                Using the above command form, the default development branch
-                would be "devtool".
-                <note>
-                    For complete syntax, use the
-                    <filename>devtool modify --help</filename> command.
-                </note>
+                Using the above command form, <filename>devtool</filename> uses
+                the existing recipe's
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>
+                statement to locate the upstream source, extracts the source
+                into the default sources location in the workspace.
+                The default development branch used is "devtool".
+            </para>
+        </section>
+
+        <section id='devtool-edit-an-existing-recipe'>
+            <title>Edit an Existing Recipe</title>
+
+            <para>
+                Use the <filename>devtool edit-recipe</filename> command
+                to run the default editor, which is identified using the
+                <filename>EDITOR</filename> variable, on the specified recipe.
+            </para>
+
+            <para>
+                When you use the <filename>devtool edit-recipe</filename>
+                command, you must supply the root name of the recipe
+                (i.e. no version, paths, or extensions).
+                Also, the recipe file itself must reside in the workspace
+                as a result of the <filename>devtool add</filename> or
+                <filename>devtool upgrade</filename> commands.
+                However, you can override that requirement by using the
+                "-a" or "--any-recipe" option.
+                Using either of these options allows you to edit any recipe
+                regardless of its location.
             </para>
         </section>
 
@@ -2167,10 +1613,32 @@
                  file.
                  If an append file already exists, the command updates it
                  appropriately.
-                <note>
-                    For complete syntax, use the
-                    <filename>devtool update-recipe --help</filename> command.
-                </note>
+            </para>
+        </section>
+
+        <section id='devtool-upgrading-a-recipe'>
+            <title>Upgrading a Recipe</title>
+
+            <para>
+                Use the <filename>devtool upgrade</filename> command
+                to upgrade an existing recipe to a new upstream version.
+                The command puts the upgraded recipe file into the
+                workspace along with any associated files, and extracts
+                the source tree to a specified location should patches
+                need rebased or added to as a result of the upgrade.
+            </para>
+
+            <para>
+                When you use the <filename>devtool upgrade</filename> command,
+                you must supply the root name of the recipe (i.e. no version,
+                paths, or extensions), and you must supply the directory
+                to which you want the source extracted.
+                Additional command options let you control things such as
+                the version number to which you want to upgrade (i.e. the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-PV'><filename>PV</filename></ulink>),
+                the source revision to which you want to upgrade (i.e. the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-SRCREV'><filename>SRCREV</filename></ulink>,
+                whether or not to apply patches, and so forth.
             </para>
         </section>
 
@@ -2195,32 +1663,64 @@
                 the recipe or the append files have been modified, the
                 command preserves the modified files in a separate "attic"
                 subdirectory under the workspace layer.
-                <note>
-                    For complete syntax, use the
-                    <filename>devtool reset --help</filename> command.
-                </note>
+            </para>
+
+            <para>
+                Here is an example that resets the workspace directory that
+                contains the <filename>mtr</filename> recipe:
+                <literallayout class='monospaced'>
+     $ devtool reset mtr
+     NOTE: Cleaning sysroot for recipe mtr...
+     NOTE: Leaving source tree /home/scottrif/poky/build/workspace/sources/mtr as-is; if you no
+        longer need it then please delete it manually
+     $
+                </literallayout>
             </para>
         </section>
 
-        <section id='devtool-building-your-software'>
-            <title>Building Your Software</title>
+        <section id='devtool-building-your-recipe'>
+            <title>Building Your Recipe</title>
 
             <para>
                 Use the <filename>devtool build</filename> command to cause the
-                OpenEmbedded build system to build your software based
-                on the recipe file.
+                OpenEmbedded build system to build your recipe.
                 The <filename>devtool build</filename> command is equivalent to
                 <filename>bitbake -c populate_sysroot</filename>.
+            </para>
+
+            <para>
+                When you use the <filename>devtool build</filename> command,
+                you must supply the root name of the recipe (i.e. no version,
+                paths, or extensions).
+                You can use either the "-s" or the "--disable-parallel-make"
+                option to disable parallel makes during the build.
                 Here is an example:
                 <literallayout class='monospaced'>
      $ devtool build <replaceable>recipe</replaceable>
                 </literallayout>
-                <note>
-                    For complete syntax, use the
-                    <filename>devtool build --help</filename> command.
-                </note>
-                Building your software using <filename>devtool build</filename>
-                is identical to using BitBake to build the software.
+            </para>
+        </section>
+
+        <section id='devtool-building-your-image'>
+            <title>Building Your Image</title>
+
+            <para>
+                Use the <filename>devtool build-image</filename> command
+                to build an image, extending it to include packages from
+                recipes in the workspace.
+                Using this command is useful when you want an image that
+                ready for immediate deployment onto a device for testing.
+                For proper integration into a final image, you need to
+                edit your custom image recipe appropriately.
+            </para>
+
+            <para>
+                When you use the <filename>devtool build-image</filename>
+                command, you must supply the name of the image.
+                This command has no command line options:
+                <literallayout class='monospaced'>
+     $ devtool build-image <replaceable>image</replaceable>
+                </literallayout>
             </para>
         </section>
 
@@ -2252,12 +1752,6 @@
                         You should never use it to update an image that will be
                         used in production.
                     </para>
-
-                    <para>
-                        For complete syntax, use the
-                        <filename>devtool deploy-target --help</filename>
-                        command.
-                    </para>
                 </note>
             </para>
         </section>
@@ -2278,10 +1772,6 @@
                 The <replaceable>target</replaceable> is the address of the
                 target machine, which must be running an SSH server (i.e.
                 <filename>user@hostname</filename>).
-                <note>
-                    For complete syntax, use the
-                    <filename>devtool undeploy-target --help</filename> command.
-                </note>
             </para>
         </section>
 
@@ -2304,10 +1794,6 @@
                 <literallayout class='monospaced'>
      $ devtool create-workspace
                 </literallayout>
-                <note>
-                    For complete syntax, use the
-                    <filename>devtool create-workspace --help</filename> command.
-                </note>
             </para>
 
             <para>
@@ -2318,6 +1804,54 @@
                 <literallayout class='monospaced'>
      $ devtool create-workspace /home/scottrif/new-workspace
                 </literallayout>
+            </para>
+        </section>
+
+        <section id='devtool-get-the-status-of-the-recipes-in-your-workspace'>
+            <title>Get the Status of the Recipes in Your Workspace</title>
+
+            <para>
+                Use the <filename>devtool status</filename> command to
+                list the recipes currently in your workspace.
+                Information includes the paths to their respective
+                external source trees.
+            </para>
+
+            <para>
+                The <filename>devtool status</filename> command has no
+                command-line options:
+                <literallayout class='monospaced'>
+     devtool status
+                </literallayout>
+                Following is sample output after using
+                <link linkend='devtool-adding-a-new-recipe-to-the-workspace'><filename>devtool add</filename></link>
+                to create and add the <filename>mtr_0.86.bb</filename> recipe
+                to the <filename>workspace</filename> directory:
+                <literallayout class='monospaced'>
+     $ devtool status
+     mtr: /home/scottrif/poky/build/workspace/sources/mtr (/home/scottrif/poky/build/workspace/recipes/mtr/mtr_0.86.bb)
+     $
+                </literallayout>
+            </para>
+        </section>
+
+        <section id='devtool-search-for-available-target-recipes'>
+            <title>Search for Available Target Recipes</title>
+
+            <para>
+                Use the <filename>devtool search</filename> command to
+                search for available target recipes.
+                The command matches the recipe name, package name,
+                description, and installed files.
+                The command displays the recipe name as a result of a
+                match.
+            </para>
+
+            <para>
+                When you use the <filename>devtool search</filename> command,
+                you must supply a <replaceable>keyword</replaceable>.
+                The command uses the <replaceable>keyword</replaceable> when
+                searching for a match.
             </para>
         </section>
     </section>
@@ -2541,56 +2075,19 @@
     </para>
 </section>
 
-<section id='image-development-using-hob'>
-    <title>Image Development Using Hob</title>
-
-    <para>
-        The <ulink url='&YOCTO_HOME_URL;/tools-resources/projects/hob'>Hob</ulink> is a graphical user interface for the
-        OpenEmbedded build system, which is based on BitBake.
-        You can use the Hob to build custom operating system images within the Yocto Project build environment.
-        Hob simply provides a friendly interface over the build system used during development.
-        In other words, building images with the Hob lets you take care of common build tasks more easily.
-    </para>
-
-    <para>
-        For a better understanding of Hob, see the project page at
-        <ulink url='&YOCTO_HOME_URL;/tools-resources/projects/hob'></ulink>
-        on the Yocto Project website.
-        If you follow the "Documentation" link from the Hob page, you will
-        find a short introductory training video on Hob.
-        The following lists some features of Hob:
-        <itemizedlist>
-            <listitem><para>You can setup and run Hob using these commands:
-            <literallayout class='monospaced'>
-     $ source oe-init-build-env
-     $ hob
-            </literallayout></para></listitem>
-            <listitem><para>You can set the
-                <ulink url='&YOCTO_DOCS_REF_URL;#var-MACHINE'><filename>MACHINE</filename></ulink>
-                for which you are building the image.</para></listitem>
-            <listitem><para>You can modify various policy settings such as the
-                package format with which to build,
-                the parallelism BitBake uses, whether or not to build an
-                external toolchain, and which host to build against.
-                </para></listitem>
-            <listitem><para>You can manage
-                <link linkend='understanding-and-creating-layers'>layers</link>.</para></listitem>
-            <listitem><para>You can select a base image and then add extra packages for your custom build.
-                </para></listitem>
-            <listitem><para>You can launch and monitor the build from within Hob.</para></listitem>
-        </itemizedlist>
-    </para>
-</section>
-
 <section id="platdev-appdev-devshell">
     <title>Using a Development Shell</title>
 
     <para>
         When debugging certain commands or even when just editing packages,
         <filename>devshell</filename> can be a useful tool.
-        When you invoke <filename>devshell</filename>, source files are
-        extracted into your working directory and patches are applied.
-        Then, a new terminal is opened and you are placed in the working directory.
+        When you invoke <filename>devshell</filename>, all tasks up to and
+        including
+        <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-patch'><filename>do_patch</filename></ulink>
+        are run for the specified target.
+        Then, a new terminal is opened and you are placed in
+        <filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-S'><filename>S</filename></ulink><filename>}</filename>,
+        the source directory.
         In the new terminal, all the OpenEmbedded build-related environment variables are
         still defined so you can use commands such as <filename>configure</filename> and
         <filename>make</filename>.
@@ -2634,24 +2131,64 @@
     </para>
 
     <para>
-        When you are finished, you just exit the shell or close the terminal window.
+        To manually run a specific task using <filename>devshell</filename>,
+        run the corresponding <filename>run.*</filename> script in
+        the
+        <filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-WORKDIR'><filename>WORKDIR</filename></ulink><filename>}/temp</filename>
+        directory (e.g.,
+        <filename>run.do_configure.</filename><replaceable>pid</replaceable>).
+        If a task's script does not exist, which would be the case if the task was
+        skipped by way of the sstate cache, you can create the task by first running
+        it outside of the <filename>devshell</filename>:
+        <literallayout class='monospaced'>
+     $ bitbake -c <replaceable>task</replaceable>
+        </literallayout>
+        <note><title>Notes</title>
+            <itemizedlist>
+                <listitem><para>Execution of a task's <filename>run.*</filename>
+                    script and BitBake's execution of a task are identical.
+                    In other words, running the script re-runs the task
+                    just as it would be run using the
+                    <filename>bitbake -c</filename> command.
+                    </para></listitem>
+                <listitem><para>Any <filename>run.*</filename> file that does not
+                    have a <filename>.pid</filename> extension is a
+                    symbolic link (symlink) to the most recent version of that
+                    file.
+                    </para></listitem>
+            </itemizedlist>
+        </note>
     </para>
 
-    <note>
-        <para>
-            It is worth remembering that when using <filename>devshell</filename>
-            you need to use the full compiler name such as <filename>arm-poky-linux-gnueabi-gcc</filename>
-            instead of just using <filename>gcc</filename>.
-            The same applies to other applications such as <filename>binutils</filename>,
-            <filename>libtool</filename> and so forth.
-            BitBake sets up environment variables such as <filename>CC</filename>
-            to assist applications, such as <filename>make</filename> to find the correct tools.
-        </para>
+    <para>
+        Remember, that the <filename>devshell</filename> is a mechanism that allows
+        you to get into the BitBake task execution environment.
+        And as such, all commands must be called just as BitBake would call them.
+        That means you need to provide the appropriate options for
+        cross-compilation and so forth as applicable.
+    </para>
 
-        <para>
-            It is also worth noting that <filename>devshell</filename> still works over
-            X11 forwarding and similar situations.
-        </para>
+    <para>
+        When you are finished using <filename>devshell</filename>, exit the shell
+        or close the terminal window.
+    </para>
+
+    <note><title>Notes</title>
+        <itemizedlist>
+            <listitem><para>
+                It is worth remembering that when using <filename>devshell</filename>
+                you need to use the full compiler name such as <filename>arm-poky-linux-gnueabi-gcc</filename>
+                instead of just using <filename>gcc</filename>.
+                The same applies to other applications such as <filename>binutils</filename>,
+                <filename>libtool</filename> and so forth.
+                BitBake sets up environment variables such as <filename>CC</filename>
+                to assist applications, such as <filename>make</filename> to find the correct tools.
+                </para></listitem>
+            <listitem><para>
+                It is also worth noting that <filename>devshell</filename> still works over
+                X11 forwarding and similar situations.
+                </para></listitem>
+        </itemizedlist>
     </note>
 </section>
 

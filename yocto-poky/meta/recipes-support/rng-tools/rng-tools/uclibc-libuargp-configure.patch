@@ -1,0 +1,63 @@
+In case of uclibc, use libuargp
+
+If we use uclibc for system libraries, select libuargp
+
+Upstream-Status: Pending
+
+Signed-off-by: Maxin B. John <maxin.john@intel.com>
+---
+diff -Naur rng-tools-5-orig/configure.ac rng-tools-5/configure.ac
+--- rng-tools-5-orig/configure.ac	2016-02-24 18:11:24.023690235 +0200
++++ rng-tools-5/configure.ac	2016-02-24 18:14:49.763118138 +0200
+@@ -39,6 +39,13 @@
+ 	[with_libargp=check]
+ )
+ 
++AC_ARG_ENABLE([uclibc],
++    AS_HELP_STRING([--enable-uclibc], [Use uclibc for system libraries]),
++        use_uclibc=yes, use_uclibc=no)
++AM_CONDITIONAL(USE_UCLIBC, test "x$use_uclibc" = "xyes")
++AS_IF([test "x$use_uclibc" = "xyes"], [AC_DEFINE(USE_UCLIBC)])
++AH_TEMPLATE([USE_UCLIBC], [Defined if uclibc libraries are used.])
++
+ dnl Make sure anyone changing configure.ac/Makefile.am has a clue
+ AM_MAINTAINER_MODE
+ 
+@@ -101,7 +108,7 @@
+ 			[need_libargp=no],
+ 			[need_libargp=yes
+ 			 if test "x$with_libargp" = "xno"; then
+-				AC_MSG_FAILURE([libargp disabled and libc does not have argp])
++				AC_MSG_WARN([libargp disabled and libc does not have argp])
+ 			 fi]
+ 		)
+ 	],
+@@ -110,7 +117,7 @@
+ 
+ dnl Check for libargp
+ AS_IF(
+-	[test "x$need_libargp" = "xyes"],
++	[test "x$need_libargp" = "xyes" -a "x$use_uclibc" = "xno"],
+ 	[
+ 		AC_CHECK_LIB(
+ 			[argp],
+@@ -120,6 +127,19 @@
+ 		)
+ 	]
+ )
++
++dnl Check for libuargp
++AS_IF(
++	[test "x$use_uclibc" = "xyes"],
++	[
++		AC_CHECK_LIB(
++			[uargp],
++			[argp_parse],
++			[LIBS="$LIBS -luargp"],
++			[AC_MSG_FAILURE([libuargp not found])]
++		)
++	]
++)
+ 
+ dnl -----------------
+ dnl Configure options

@@ -1,0 +1,24 @@
+icu: Ticket #11959: pkgdata dies when compiled with lots'o'flags
+
+See: http://bugs.icu-project.org/trac/ticket/11959
+
+The patch avoids premature failure which results in a segfault.
+
+Upstream-Status: Backport of r38081
+Signed-off-by: Mike Crowe <mac@mcrowe.com>
+
+Index: source/tools/toolutil/flagparser.c
+===================================================================
+--- source/tools/toolutil/flagparser.c	(revision 38046)
++++ source/tools/toolutil/flagparser.c	(working copy)
+@@ -96,8 +96,8 @@
+     uprv_free(buffer);
+ 
+     T_FileStream_close(f);
+-    
+-    if (U_FAILURE(*status)) {
++
++    if (U_FAILURE(*status) && *status != U_BUFFER_OVERFLOW_ERROR) {
+         return -1;
+     }
+ 

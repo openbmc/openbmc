@@ -72,7 +72,6 @@ do_compile () {
 	sed -i -e "/^'/d" ${B}/${TARGET_PREFIX}testgcc
 	sed -i -e "/^UID/d" ${B}/${TARGET_PREFIX}testgcc
 	sed -i -e "/^TERM/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^PATCH_GET/d" ${B}/${TARGET_PREFIX}testgcc
 	sed -i -e "/^PKG_/d" ${B}/${TARGET_PREFIX}testgcc
 	sed -i -e "/^POSIXLY_/d" ${B}/${TARGET_PREFIX}testgcc
 	sed -i -e "/^PPID/d" ${B}/${TARGET_PREFIX}testgcc

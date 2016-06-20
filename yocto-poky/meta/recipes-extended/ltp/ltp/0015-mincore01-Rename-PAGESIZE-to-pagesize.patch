@@ -1,0 +1,64 @@
+From f091839532f3afe0a58e8ba0b45615c899a43a47 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 7 Jan 2016 20:12:09 +0000
+Subject: [PATCH 15/32] mincore01: Rename PAGESIZE to pagesize
+
+PAGESIZE conflicts with system headers on musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ testcases/kernel/syscalls/mincore/mincore01.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/testcases/kernel/syscalls/mincore/mincore01.c b/testcases/kernel/syscalls/mincore/mincore01.c
+index 97a3d95..fa426d1 100644
+--- a/testcases/kernel/syscalls/mincore/mincore01.c
++++ b/testcases/kernel/syscalls/mincore/mincore01.c
+@@ -45,7 +45,7 @@
+ #include "test.h"
+ #include "safe_macros.h"
+ 
+-static int PAGESIZE;
++static int pagesize;
+ static rlim_t STACK_LIMIT = 10485760;
+ 
+ static void cleanup(void);
+@@ -146,7 +146,7 @@ static void setup4(struct test_case_t *tc)
+ 	}
+ 
+ 	tc->addr = global_pointer;
+-	tc->len = as_lim.rlim_cur - (rlim_t)global_pointer + PAGESIZE;
++	tc->len = as_lim.rlim_cur - (rlim_t)global_pointer + pagesize;
+ 	tc->vector = global_vec;
+ 
+ 	/*
+@@ -161,7 +161,7 @@ static void setup(void)
+ 	char *buf;
+ 	int fd;
+ 
+-	PAGESIZE = getpagesize();
++	pagesize = getpagesize();
+ 
+ 	tst_sig(NOFORK, DEF_HANDLER, cleanup);
+ 
+@@ -170,7 +170,7 @@ static void setup(void)
+ 	TEST_PAUSE;
+ 
+ 	/* global_pointer will point to a mmapped area of global_len bytes */
+-	global_len = PAGESIZE * 2;
++	global_len = pagesize * 2;
+ 
+ 	buf = SAFE_MALLOC(cleanup, global_len);
+ 	memset(buf, 42, global_len);
+@@ -186,7 +186,7 @@ static void setup(void)
+ 				   PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+ 
+ 	global_vec = SAFE_MALLOC(cleanup,
+-				 (global_len + PAGESIZE - 1) / PAGESIZE);
++				 (global_len + pagesize - 1) / pagesize);
+ 
+ 	SAFE_CLOSE(cleanup, fd);
+ }
+-- 
+2.7.0
+

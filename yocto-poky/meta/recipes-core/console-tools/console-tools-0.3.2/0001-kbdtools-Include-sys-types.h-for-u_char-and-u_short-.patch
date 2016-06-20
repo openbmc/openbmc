@@ -1,0 +1,44 @@
+From 0fd5dda51d68e1ec2a87e27b5ed0dff3503b4681 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 31 Dec 2015 08:12:38 +0000
+Subject: [PATCH] kbdtools: Include sys/types.h for u_char and u_short
+ definition
+
+on musl this gets exposed since sys/types.h is not
+included via some other indirect inclusion as is the case with glibc
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ kbdtools/dumpkeys.c | 1 +
+ kbdtools/loadkeys.y | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/kbdtools/dumpkeys.c b/kbdtools/dumpkeys.c
+index 6159d49..c19fb21 100644
+--- a/kbdtools/dumpkeys.c
++++ b/kbdtools/dumpkeys.c
+@@ -26,6 +26,7 @@
+ #include <errno.h>
+ #include <sysexits.h>
+ #include <sys/ioctl.h>
++#include <sys/types.h>
+ #include <linux/types.h>
+ #include <linux/kd.h>
+ #include <linux/keyboard.h>
+diff --git a/kbdtools/loadkeys.y b/kbdtools/loadkeys.y
+index b6a8e01..4468f77 100644
+--- a/kbdtools/loadkeys.y
++++ b/kbdtools/loadkeys.y
+@@ -71,6 +71,7 @@
+ #include <linux/kd.h>
+ #include <linux/keyboard.h>
+ #include <sys/ioctl.h>
++#include <sys/types.h>
+ #include <ctype.h>
+ #include <sysexits.h>
+ #include <signal.h>
+-- 
+2.6.4
+

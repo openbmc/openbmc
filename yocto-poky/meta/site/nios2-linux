@@ -7,10 +7,7 @@ ac_cv_header_netinet_sctp_uio_h=${ac_cv_header_netinet_sctp_uio_h=no}
 ac_cv_sctp=${ac_cv_sctp=no}
 
 # apache
-ac_cv_func_pthread_key_delete=${ac_cv_func_pthread_key_delete=yes}
-apr_cv_process_shared_works=${apr_cv_process_shared_works=no}
 ac_cv_sizeof_ssize_t=${ac_cv_sizeof_ssize_t=4}
-apr_cv_tcp_nodelay_with_cork=${apr_cv_tcp_nodelay_with_cork=yes}
 
 # bash
 ac_cv_c_long_double=${ac_cv_c_long_double=yes}
@@ -244,7 +241,6 @@ ac_cv_sizeof_int_p=${ac_cv_sizeof_int_p=4}
 ac_cv_sizeof_long=${ac_cv_sizeof_long=4}
 ac_cv_sizeof_long_int=${ac_cv_sizeof_long_int=4}
 ac_cv_sizeof_long_long=${ac_cv_sizeof_long_long=8}
-ac_cv_sizeof_off_t=${ac_cv_sizeof_off_t=4}
 ac_cv_sizeof_short=${ac_cv_sizeof_short=2}
 ac_cv_sizeof_short_int=${ac_cv_sizeof_short_int=2}
 ac_cv_sizeof_size_t=${ac_cv_sizeof_size_t=4}

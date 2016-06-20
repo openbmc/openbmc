@@ -1,10 +1,13 @@
 require gdb-common.inc
 
-DEPENDS = "expat-native ncurses-native readline-native python-native"
+DEPENDS = "expat-native ncurses-native"
 
 inherit pythonnative
 
-EXTRA_OECONF += "--with-python=${STAGING_BINDIR_NATIVE}/python-native/python"
+# Overrides PACKAGECONFIG variables in gdb-common.inc
+PACKAGECONFIG ??= "python readline"
+PACKAGECONFIG[python] = "--with-python=${STAGING_BINDIR_NATIVE}/python-native/python,--without-python,python-native"
+PACKAGECONFIG[readline] = "--with-system-readline,--without-system-readline,readline-native"
 
 do_compile_prepend() {
     export BUILD_SYS="${BUILD_SYS}"

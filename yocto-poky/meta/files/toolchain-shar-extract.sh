@@ -1,5 +1,11 @@
 #!/bin/sh
 
+[ -z "$ENVCLEANED" ] && exec /usr/bin/env -i ENVCLEANED=1 HOME="$HOME" \
+	http_proxy="$http_proxy" https_proxy="$https_proxy" ftp_proxy="$ftp_proxy" \
+	no_proxy="$no_proxy" all_proxy="$all_proxy" GIT_PROXY_COMMAND="$GIT_PROXY_COMMAND" "$0" "$@"
+[ -f /etc/environment ] && . /etc/environment
+export PATH=`echo "$PATH" | sed -e 's/:\.//' -e 's/::/:/'`
+
 INST_ARCH=$(uname -m | sed -e "s/i[3-6]86/ix86/" -e "s/x86[-_]64/x86_64/")
 SDK_ARCH=$(echo @SDK_ARCH@ | sed -e "s/i[3-6]86/ix86/" -e "s/x86[-_]64/x86_64/")
 
@@ -25,14 +31,21 @@ if [ "$INST_ARCH" != "$SDK_ARCH" ]; then
 	fi
 fi
 
+if ! xz -V > /dev/null 2>&1; then
+	echo "Error: xz is required for installation of this SDK, please install it first"
+	exit 1
+fi
+
 DEFAULT_INSTALL_DIR="@SDKPATH@"
 SUDO_EXEC=""
+EXTRA_TAR_OPTIONS=""
 target_sdk_dir=""
 answer=""
 relocate=1
 savescripts=0
 verbose=0
-while getopts ":yd:nDRS" OPT; do
+publish=0
+while getopts ":yd:npDRS" OPT; do
 	case $OPT in
 	y)
 		answer="Y"
@@ -42,6 +55,10 @@ while getopts ":yd:nDRS" OPT; do
 		;;
 	n)
 		prepare_buildsystem="no"
+		;;
+	p)
+		prepare_buildsystem="no"
+		publish=1
 		;;
 	D)
 		verbose=1
@@ -59,6 +76,7 @@ while getopts ":yd:nDRS" OPT; do
 		echo "  -d <dir>   Install the SDK to <dir>"
 		echo "======== Extensible SDK only options ============"
 		echo "  -n         Do not prepare the build system"
+		echo "  -p         Publish mode (implies -n)"
 		echo "======== Advanced DEBUGGING ONLY OPTIONS ========"
 		echo "  -S         Save relocation scripts"
 		echo "  -R         Do not relocate executables"
@@ -97,6 +115,12 @@ if [ -d "$target_sdk_dir" ]; then
 	target_sdk_dir=$(cd "$target_sdk_dir"; pwd)
 else
 	target_sdk_dir=$(readlink -m "$target_sdk_dir")
+fi
+
+# limit the length for target_sdk_dir, ensure the relocation behaviour in relocate_sdk.py has right result.
+if [ ${#target_sdk_dir} -gt 2048 ]; then
+	echo "Error: The target directory path is too long!!!"
+	exit 1
 fi
 
 if [ "$SDK_EXTENSIBLE" = "1" ]; then
@@ -164,7 +188,7 @@ fi
 payload_offset=$(($(grep -na -m1 "^MARKER:$" $0|cut -d':' -f1) + 1))
 
 printf "Extracting SDK..."
-tail -n +$payload_offset $0| $SUDO_EXEC tar xj -C $target_sdk_dir --checkpoint=.2500
+tail -n +$payload_offset $0| $SUDO_EXEC tar xJ -C $target_sdk_dir --checkpoint=.2500 $EXTRA_TAR_OPTIONS || exit 1
 echo "done"
 
 printf "Setting it up..."

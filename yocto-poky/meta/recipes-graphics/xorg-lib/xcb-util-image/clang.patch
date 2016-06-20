@@ -1,0 +1,24 @@
+Make clang happy since it squashes the control warning, ideally it will never reach that return value due to assert
+but there is a chance when NDEBUG is defined
+
+| In file included from ../../xcb-util-image-0.4.0/image/xcb_image.c:37:
+| ../../xcb-util-image-0.4.0/image/xcb_bitops.h:210:1: error: control may reach end of non-void function [-Werror,-Wreturn-type]
+| }
+| ^
+| 1 error generated.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+
+Index: xcb-util-image-0.4.0/image/xcb_bitops.h
+===================================================================
+--- xcb-util-image-0.4.0.orig/image/xcb_bitops.h
++++ xcb-util-image-0.4.0/image/xcb_bitops.h
+@@ -207,6 +207,7 @@ xcb_host_byte_order(void) {
+       return XCB_IMAGE_ORDER_LSB_FIRST;
+   }
+   assert(0);
++  return -1;
+ }
+ 
+ #endif /* __XCB_BITOPS_H__ */

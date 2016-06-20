@@ -228,7 +228,38 @@ class URITest(unittest.TestCase):
             'params': {},
             'query': {},
             'relative': False
+        },
+        "http://somesite.net;someparam=1": {
+            'uri': 'http://somesite.net;someparam=1',
+            'scheme': 'http',
+            'hostname': 'somesite.net',
+            'port': None,
+            'hostport': 'somesite.net',
+            'path': '',
+            'userinfo': '',
+            'userinfo': '',
+            'username': '',
+            'password': '',
+            'params': {"someparam" : "1"},
+            'query': {},
+            'relative': False
+        },
+        "file://somelocation;someparam=1": {
+            'uri': 'file:somelocation;someparam=1',
+            'scheme': 'file',
+            'hostname': '',
+            'port': None,
+            'hostport': '',
+            'path': 'somelocation',
+            'userinfo': '',
+            'userinfo': '',
+            'username': '',
+            'password': '',
+            'params': {"someparam" : "1"},
+            'query': {},
+            'relative': True
         }
+
     }
 
     def test_uri(self):
@@ -451,9 +482,7 @@ class FetcherLocalTest(FetcherTest):
 
     def test_local_wildcard(self):
         tree = self.fetchUnpack(['file://a', 'file://dir/*'])
-        # FIXME: this is broken - it should return ['a', 'dir/c', 'dir/d', 'dir/subdir/e']
-        # see https://bugzilla.yoctoproject.org/show_bug.cgi?id=6128
-        self.assertEqual(tree, ['a', 'b', 'dir/c', 'dir/d', 'dir/subdir/e'])
+        self.assertEqual(tree, ['a',  'dir/c', 'dir/d', 'dir/subdir/e'])
 
     def test_local_dir(self):
         tree = self.fetchUnpack(['file://a', 'file://dir'])
@@ -461,17 +490,15 @@ class FetcherLocalTest(FetcherTest):
 
     def test_local_subdir(self):
         tree = self.fetchUnpack(['file://dir/subdir'])
-        # FIXME: this is broken - it should return ['dir/subdir/e']
-        # see https://bugzilla.yoctoproject.org/show_bug.cgi?id=6129
-        self.assertEqual(tree, ['subdir/e'])
+        self.assertEqual(tree, ['dir/subdir/e'])
 
     def test_local_subdir_file(self):
         tree = self.fetchUnpack(['file://dir/subdir/e'])
         self.assertEqual(tree, ['dir/subdir/e'])
 
     def test_local_subdirparam(self):
-        tree = self.fetchUnpack(['file://a;subdir=bar'])
-        self.assertEqual(tree, ['bar/a'])
+        tree = self.fetchUnpack(['file://a;subdir=bar', 'file://dir;subdir=foo/moo'])
+        self.assertEqual(tree, ['bar/a', 'foo/moo/dir/c', 'foo/moo/dir/d', 'foo/moo/dir/subdir/e'])
 
     def test_local_deepsubdirparam(self):
         tree = self.fetchUnpack(['file://dir/subdir/e;subdir=bar'])
@@ -584,42 +611,49 @@ class FetcherNetworkTest(FetcherTest):
             os.chdir(os.path.dirname(self.unpackdir))
             fetcher.unpack(self.unpackdir)
 
-        def test_trusted_network(self):
-            # Ensure trusted_network returns False when the host IS in the list.
-            url = "git://Someserver.org/foo;rev=1"
-            self.d.setVar("BB_ALLOWED_NETWORKS", "server1.org someserver.org server2.org server3.org")
-            self.assertTrue(bb.fetch.trusted_network(self.d, url))
 
-        def test_wild_trusted_network(self):
-            # Ensure trusted_network returns true when the *.host IS in the list.
-            url = "git://Someserver.org/foo;rev=1"
-            self.d.setVar("BB_ALLOWED_NETWORKS", "server1.org *.someserver.org server2.org server3.org")
-            self.assertTrue(bb.fetch.trusted_network(self.d, url))
+class TrustedNetworksTest(FetcherTest):
+    def test_trusted_network(self):
+        # Ensure trusted_network returns False when the host IS in the list.
+        url = "git://Someserver.org/foo;rev=1"
+        self.d.setVar("BB_ALLOWED_NETWORKS", "server1.org someserver.org server2.org server3.org")
+        self.assertTrue(bb.fetch.trusted_network(self.d, url))
 
-        def test_prefix_wild_trusted_network(self):
-            # Ensure trusted_network returns true when the prefix matches *.host.
-            url = "git://git.Someserver.org/foo;rev=1"
-            self.d.setVar("BB_ALLOWED_NETWORKS", "server1.org *.someserver.org server2.org server3.org")
-            self.assertTrue(bb.fetch.trusted_network(self.d, url))
+    def test_wild_trusted_network(self):
+        # Ensure trusted_network returns true when the *.host IS in the list.
+        url = "git://Someserver.org/foo;rev=1"
+        self.d.setVar("BB_ALLOWED_NETWORKS", "server1.org *.someserver.org server2.org server3.org")
+        self.assertTrue(bb.fetch.trusted_network(self.d, url))
 
-        def test_two_prefix_wild_trusted_network(self):
-            # Ensure trusted_network returns true when the prefix matches *.host.
-            url = "git://something.git.Someserver.org/foo;rev=1"
-            self.d.setVar("BB_ALLOWED_NETWORKS", "server1.org *.someserver.org server2.org server3.org")
-            self.assertTrue(bb.fetch.trusted_network(self.d, url))
+    def test_prefix_wild_trusted_network(self):
+        # Ensure trusted_network returns true when the prefix matches *.host.
+        url = "git://git.Someserver.org/foo;rev=1"
+        self.d.setVar("BB_ALLOWED_NETWORKS", "server1.org *.someserver.org server2.org server3.org")
+        self.assertTrue(bb.fetch.trusted_network(self.d, url))
 
-        def test_untrusted_network(self):
-            # Ensure trusted_network returns False when the host is NOT in the list.
-            url = "git://someserver.org/foo;rev=1"
-            self.d.setVar("BB_ALLOWED_NETWORKS", "server1.org server2.org server3.org")
-            self.assertFalse(bb.fetch.trusted_network(self.d, url))
+    def test_two_prefix_wild_trusted_network(self):
+        # Ensure trusted_network returns true when the prefix matches *.host.
+        url = "git://something.git.Someserver.org/foo;rev=1"
+        self.d.setVar("BB_ALLOWED_NETWORKS", "server1.org *.someserver.org server2.org server3.org")
+        self.assertTrue(bb.fetch.trusted_network(self.d, url))
 
-        def test_wild_untrusted_network(self):
-            # Ensure trusted_network returns False when the host is NOT in the list.
-            url = "git://*.someserver.org/foo;rev=1"
-            self.d.setVar("BB_ALLOWED_NETWORKS", "server1.org server2.org server3.org")
-            self.assertFalse(bb.fetch.trusted_network(self.d, url))
+    def test_port_trusted_network(self):
+        # Ensure trusted_network returns True, even if the url specifies a port.
+        url = "git://someserver.org:8080/foo;rev=1"
+        self.d.setVar("BB_ALLOWED_NETWORKS", "someserver.org")
+        self.assertTrue(bb.fetch.trusted_network(self.d, url))
 
+    def test_untrusted_network(self):
+        # Ensure trusted_network returns False when the host is NOT in the list.
+        url = "git://someserver.org/foo;rev=1"
+        self.d.setVar("BB_ALLOWED_NETWORKS", "server1.org server2.org server3.org")
+        self.assertFalse(bb.fetch.trusted_network(self.d, url))
+
+    def test_wild_untrusted_network(self):
+        # Ensure trusted_network returns False when the host is NOT in the list.
+        url = "git://*.someserver.org/foo;rev=1"
+        self.d.setVar("BB_ALLOWED_NETWORKS", "server1.org server2.org server3.org")
+        self.assertFalse(bb.fetch.trusted_network(self.d, url))
 
 class URLHandle(unittest.TestCase):
 
@@ -627,11 +661,18 @@ class URLHandle(unittest.TestCase):
        "http://www.google.com/index.html" : ('http', 'www.google.com', '/index.html', '', '', {}),
        "cvs://anoncvs@cvs.handhelds.org/cvs;module=familiar/dist/ipkg" : ('cvs', 'cvs.handhelds.org', '/cvs', 'anoncvs', '', {'module': 'familiar/dist/ipkg'}),
        "cvs://anoncvs:anonymous@cvs.handhelds.org/cvs;tag=V0-99-81;module=familiar/dist/ipkg" : ('cvs', 'cvs.handhelds.org', '/cvs', 'anoncvs', 'anonymous', {'tag': 'V0-99-81', 'module': 'familiar/dist/ipkg'}),
-       "git://git.openembedded.org/bitbake;branch=@foo" : ('git', 'git.openembedded.org', '/bitbake', '', '', {'branch': '@foo'})
+       "git://git.openembedded.org/bitbake;branch=@foo" : ('git', 'git.openembedded.org', '/bitbake', '', '', {'branch': '@foo'}),
+       "file://somelocation;someparam=1": ('file', '', 'somelocation', '', '', {'someparam': '1'}),
     }
+    # we require a pathname to encodeurl but users can still pass such urls to 
+    # decodeurl and we need to handle them
+    decodedata = datatable.copy()
+    decodedata.update({
+       "http://somesite.net;someparam=1": ('http', 'somesite.net', '', '', '', {'someparam': '1'}),
+    })
 
     def test_decodeurl(self):
-        for k, v in self.datatable.items():
+        for k, v in self.decodedata.items():
             result = bb.fetch.decodeurl(k)
             self.assertEqual(result, v)
 
@@ -663,7 +704,7 @@ class FetchLatestVersionTest(FetcherTest):
         # version pattern "yyyymmdd"
         ("mobile-broadband-provider-info", "git://git.gnome.org/mobile-broadband-provider-info", "4ed19e11c2975105b71b956440acdb25d46a347d", "")
             : "20120614",
-        # packages with a valid GITTAGREGEX
+        # packages with a valid UPSTREAM_CHECK_GITTAGREGEX
         ("xf86-video-omap", "git://anongit.freedesktop.org/xorg/driver/xf86-video-omap", "ae0394e687f1a77e966cf72f895da91840dffb8f", "(?P<pver>(\d+\.(\d\.?)*))")
             : "0.4.3",
         ("build-appliance-image", "git://git.yoctoproject.org/poky", "b37dd451a52622d5b570183a81583cc34c2ff555", "(?P<pver>(([0-9][\.|_]?)+[0-9]))")
@@ -692,8 +733,8 @@ class FetchLatestVersionTest(FetcherTest):
             : "5.0",
         ("xserver-xorg", "http://xorg.freedesktop.org/releases/individual/xserver/xorg-server-1.15.1.tar.bz2", "", "")
             : "1.15.1",
-        # packages with valid REGEX_URI and REGEX
-        ("cups", "http://www.cups.org/software/1.7.2/cups-1.7.2-source.tar.bz2", "http://www.cups.org/software.php", "(?P<name>cups\-)(?P<pver>((\d+[\.\-_]*)+))\-source\.tar\.gz")
+        # packages with valid UPSTREAM_CHECK_URI and UPSTREAM_CHECK_REGEX
+        ("cups", "http://www.cups.org/software/1.7.2/cups-1.7.2-source.tar.bz2", "https://github.com/apple/cups/releases", "(?P<name>cups\-)(?P<pver>((\d+[\.\-_]*)+))\-source\.tar\.gz")
             : "2.0.0",
         ("db", "http://download.oracle.com/berkeley-db/db-5.3.21.tar.gz", "http://www.oracle.com/technetwork/products/berkeleydb/downloads/index-082944.html", "http://download.oracle.com/otn/berkeley-db/(?P<name>db-)(?P<pver>((\d+[\.\-_]*)+))\.tar\.gz")
             : "6.1.19",
@@ -705,7 +746,7 @@ class FetchLatestVersionTest(FetcherTest):
             for k, v in self.test_git_uris.items():
                 self.d.setVar("PN", k[0])
                 self.d.setVar("SRCREV", k[2])
-                self.d.setVar("GITTAGREGEX", k[3])
+                self.d.setVar("UPSTREAM_CHECK_GITTAGREGEX", k[3])
                 ud = bb.fetch2.FetchData(k[1], self.d)
                 pupver= ud.method.latest_versionstring(ud, self.d)
                 verstring = pupver[0]
@@ -715,8 +756,8 @@ class FetchLatestVersionTest(FetcherTest):
         def test_wget_latest_versionstring(self):
             for k, v in self.test_wget_uris.items():
                 self.d.setVar("PN", k[0])
-                self.d.setVar("REGEX_URI", k[2])
-                self.d.setVar("REGEX", k[3])
+                self.d.setVar("UPSTREAM_CHECK_URI", k[2])
+                self.d.setVar("UPSTREAM_CHECK_REGEX", k[3])
                 ud = bb.fetch2.FetchData(k[1], self.d)
                 pupver = ud.method.latest_versionstring(ud, self.d)
                 verstring = pupver[0]
@@ -738,6 +779,8 @@ class FetchCheckStatusTest(FetcherTest):
                       "ftp://ftp.gnu.org/gnu/autoconf/autoconf-2.60.tar.gz",
                       "ftp://ftp.gnu.org/gnu/chess/gnuchess-5.08.tar.gz",
                       "ftp://ftp.gnu.org/gnu/gmp/gmp-4.0.tar.gz",
+                      # GitHub releases are hosted on Amazon S3, which doesn't support HEAD
+                      "https://github.com/kergoth/tslib/releases/download/1.1/tslib-1.1.tar.xz"
                       ]
 
     if os.environ.get("BB_SKIP_NETTESTS") == "yes":

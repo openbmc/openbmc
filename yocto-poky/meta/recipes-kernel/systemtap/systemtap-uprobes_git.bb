@@ -4,8 +4,6 @@ require systemtap_git.inc
 
 DEPENDS = "systemtap virtual/kernel"
 
-PR = "r1"
-
 # On systems without CONFIG_UTRACE, this package is empty.
 ALLOW_EMPTY_${PN} = "1"
 

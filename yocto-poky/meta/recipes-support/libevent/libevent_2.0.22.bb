@@ -14,6 +14,8 @@ SRC_URI = " \
 SRC_URI[md5sum] = "c4c56f986aa985677ca1db89630a2e11"
 SRC_URI[sha256sum] = "71c2c49f0adadacfdbe6332a372c38cf9c8b7895bb73dabeaa53cdcc1d4e1fa3"
 
+UPSTREAM_CHECK_URI = "http://libevent.org/"
+
 S = "${WORKDIR}/${BPN}-${PV}-stable"
 
 PACKAGECONFIG ??= ""

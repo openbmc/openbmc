@@ -36,10 +36,11 @@ def remove_from_file(path, data):
             return
         else:
             raise
-    lines = rdata.splitlines()
-    rmdata = data.strip().splitlines()
-    for l in rmdata:
-        for c in range(0, lines.count(l)):
-            i = lines.index(l)
-            del(lines[i])
-    write_file(path, "\n".join(lines))
+
+    contents = rdata.strip().splitlines()
+    for r in data.strip().splitlines():
+        try:
+            contents.remove(r)
+        except ValueError:
+            pass
+    write_file(path, "\n".join(contents))

@@ -1,0 +1,36 @@
+From 76155065c70b5ab65c6c805423183b360141db84 Mon Sep 17 00:00:00 2001
+From: Marek Vasut <marex@denx.de>
+Date: Thu, 28 Jan 2016 04:46:23 +0100
+Subject: [PATCH] Recognize nios2 as compilation target
+
+Signed-off-by: Marek Vasut <marex@denx.de>
+Upstream-Status: Submitted [ http://debbugs.gnu.org/cgi/bugreport.cgi?bug=22480 ]
+---
+ module/system/base/target.scm | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/module/system/base/target.scm b/module/system/base/target.scm
+index d60a8e0..d1f6cff 100644
+--- a/module/system/base/target.scm
++++ b/module/system/base/target.scm
+@@ -65,7 +65,7 @@
+       (cond ((string-match "^i[0-9]86$" cpu)
+              (endianness little))
+             ((member cpu '("x86_64" "ia64"
+-                           "powerpcle" "powerpc64le" "mipsel" "mips64el"))
++                           "powerpcle" "powerpc64le" "mipsel" "mips64el" "nios2"))
+              (endianness little))
+             ((member cpu '("sparc" "sparc64" "powerpc" "powerpc64" "spu"
+                            "mips" "mips64"))
+@@ -100,7 +100,7 @@
+ 
+           ((string-match "64$" cpu) 8)
+           ((string-match "64[lbe][lbe]$" cpu) 8)
+-          ((member cpu '("sparc" "powerpc" "mips" "mipsel")) 4)
++          ((member cpu '("sparc" "powerpc" "mips" "mipsel" "nios2")) 4)
+           ((string-match "^arm.*" cpu) 4)
+           (else (error "unknown CPU word size" cpu)))))
+ 
+-- 
+2.7.0.rc3
+

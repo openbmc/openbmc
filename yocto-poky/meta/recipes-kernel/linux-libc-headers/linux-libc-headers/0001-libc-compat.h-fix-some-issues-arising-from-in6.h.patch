@@ -1,0 +1,89 @@
+From 2872f5d8bcef84e62b15b37ba4ffeccfb6402dad Mon Sep 17 00:00:00 2001
+From: rofl0r <retnyg@gmx.net>
+Date: Wed, 22 Jan 2014 00:48:28 +0100
+Subject: [PATCH 1/3] libc-compat.h: fix some issues arising from in6.h
+
+namely redefinition of some structs provided by netinet/in.h.
+---
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Submitted
+
+ include/uapi/linux/libc-compat.h | 25 ++++++++-----------------
+ 1 file changed, 8 insertions(+), 17 deletions(-)
+
+Index: linux-4.4/include/uapi/linux/libc-compat.h
+===================================================================
+--- linux-4.4.orig/include/uapi/linux/libc-compat.h
++++ linux-4.4/include/uapi/linux/libc-compat.h
+@@ -48,13 +48,12 @@
+ #ifndef _UAPI_LIBC_COMPAT_H
+ #define _UAPI_LIBC_COMPAT_H
+ 
+-/* We have included glibc headers... */
+-#if defined(__GLIBC__)
++#ifndef __KERNEL__ /* we're used from userspace */
+ 
+-/* Coordinate with glibc netinet/in.h header. */
++/* Coordinate with libc netinet/in.h header. */
+ #if defined(_NETINET_IN_H)
+ 
+-/* GLIBC headers included first so don't define anything
++/* LIBC headers included first so don't define anything
+  * that would already be defined. */
+ #define __UAPI_DEF_IN_ADDR		0
+ #define __UAPI_DEF_IN_IPPROTO		0
+@@ -64,15 +63,7 @@
+ #define __UAPI_DEF_IN_CLASS		0
+ 
+ #define __UAPI_DEF_IN6_ADDR		0
+-/* The exception is the in6_addr macros which must be defined
+- * if the glibc code didn't define them. This guard matches
+- * the guard in glibc/inet/netinet/in.h which defines the
+- * additional in6_addr macros e.g. s6_addr16, and s6_addr32. */
+-#if defined(__USE_MISC) || defined (__USE_GNU)
+ #define __UAPI_DEF_IN6_ADDR_ALT		0
+-#else
+-#define __UAPI_DEF_IN6_ADDR_ALT		1
+-#endif
+ #define __UAPI_DEF_SOCKADDR_IN6		0
+ #define __UAPI_DEF_IPV6_MREQ		0
+ #define __UAPI_DEF_IPPROTO_V6		0
+@@ -80,10 +71,10 @@
+ #define __UAPI_DEF_IN6_PKTINFO		0
+ #define __UAPI_DEF_IP6_MTUINFO		0
+ 
+-#else
++#else /* defined(_NETINET_IN_H) */
+ 
+ /* Linux headers included first, and we must define everything
+- * we need. The expectation is that glibc will check the
++ * we need. The expectation is that libc will check the
+  * __UAPI_DEF_* defines and adjust appropriately. */
+ #define __UAPI_DEF_IN_ADDR		1
+ #define __UAPI_DEF_IN_IPPROTO		1
+@@ -93,7 +84,7 @@
+ #define __UAPI_DEF_IN_CLASS		1
+ 
+ #define __UAPI_DEF_IN6_ADDR		1
+-/* We unconditionally define the in6_addr macros and glibc must
++/* We unconditionally define the in6_addr macros and libc must
+  * coordinate. */
+ #define __UAPI_DEF_IN6_ADDR_ALT		1
+ #define __UAPI_DEF_SOCKADDR_IN6		1
+@@ -115,7 +106,7 @@
+ /* If we did not see any headers from any supported C libraries,
+  * or we are being included in the kernel, then define everything
+  * that we need. */
+-#else /* !defined(__GLIBC__) */
++#else /* __KERNEL__ */
+ 
+ /* Definitions for in.h */
+ #define __UAPI_DEF_IN_ADDR		1
+@@ -138,6 +129,6 @@
+ /* Definitions for xattr.h */
+ #define __UAPI_DEF_XATTR		1
+ 
+-#endif /* __GLIBC__ */
++#endif /* __KERNEL__ */
+ 
+ #endif /* _UAPI_LIBC_COMPAT_H */

@@ -1,3 +1,6 @@
+Signed-off-by: Diego Rondini <diego.ml@zoho.com>
+Upstream-Status: Inappropriate
+
 --- watchdog-5.13.orig/redhat/watchdog.init	2014-11-12 17:18:39.125943000 +0100
 +++ watchdog-5.13/redhat/watchdog.init	2014-11-12 18:27:36.189943000 +0100
 @@ -7,7 +7,7 @@

@@ -1,0 +1,56 @@
+From 8df3e7007a22c9d6be5d5ae4b9b169c5c8431917 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 27 May 2015 17:06:06 -0700
+Subject: [PATCH 38/46] fix g++ sysroot
+
+Portions of
+
+http://www.mail-archive.com/gcc-patches@gcc.gnu.org/msg26013.html
+
+are not upstreamed yet. So lets keep missing pieces.
+
+Upstream-Status: Pending
+
+Without this, compiling something simple like #include <limits> on target
+with c++ test.cpp fails unable to find the header. strace shows it looking in
+usr/include/xxxx rather than /usr/include/xxxx
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ gcc/configure    | 4 +++-
+ gcc/configure.ac | 4 +++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/gcc/configure b/gcc/configure
+index 9b60aad..6df594c 100755
+--- a/gcc/configure
++++ b/gcc/configure
+@@ -3375,7 +3375,9 @@ gcc_gxx_include_dir_add_sysroot=0
+ if test "${with_sysroot+set}" = set; then
+   gcc_gxx_without_sysroot=`expr "${gcc_gxx_include_dir}" : "${with_sysroot}"'\(.*\)'`
+   if test "${gcc_gxx_without_sysroot}"; then
+-    gcc_gxx_include_dir="${gcc_gxx_without_sysroot}"
++    if test x${with_sysroot} != x/; then
++      gcc_gxx_include_dir="${gcc_gxx_without_sysroot}"
++    fi
+     gcc_gxx_include_dir_add_sysroot=1
+   fi
+ fi
+diff --git a/gcc/configure.ac b/gcc/configure.ac
+index e1e54f2..3bb2173 100644
+--- a/gcc/configure.ac
++++ b/gcc/configure.ac
+@@ -152,7 +152,9 @@ gcc_gxx_include_dir_add_sysroot=0
+ if test "${with_sysroot+set}" = set; then
+   gcc_gxx_without_sysroot=`expr "${gcc_gxx_include_dir}" : "${with_sysroot}"'\(.*\)'`
+   if test "${gcc_gxx_without_sysroot}"; then
+-    gcc_gxx_include_dir="${gcc_gxx_without_sysroot}"
++    if test x${with_sysroot} != x/; then
++      gcc_gxx_include_dir="${gcc_gxx_without_sysroot}"
++    fi
+     gcc_gxx_include_dir_add_sysroot=1
+   fi
+ fi
+-- 
+2.6.3
+

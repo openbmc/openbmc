@@ -617,7 +617,7 @@ DESCRIPTION
        This command creates a partition on the system and uses the
        following syntax:
 
-         part <mountpoint>
+         part [<mountpoint>]
 
        The <mountpoint> is where the partition will be mounted and
        must take of one of the following forms:
@@ -625,6 +625,16 @@ DESCRIPTION
          /<path>: For example: /, /usr, or /home
 
          swap: The partition will be used as swap space.
+
+       If a <mountpoint> is not specified the partition will be created
+       but will not be mounted.
+
+       Partitions with a <mountpoint> specified will be automatically mounted.
+       This is achieved by wic adding entries to the fstab during image
+       generation. In order for a valid fstab to be generated one of the
+       --ondrive, --ondisk or --use-uuid partition options must be used for
+       each partition that specifies a mountpoint.
+
 
        The following are supported 'part' options:
 
@@ -740,8 +750,28 @@ DESCRIPTION
                   bootloader command-line - for example, the syslinux
                   APPEND or grub kernel command line.
 
+        --configfile: Specifies a user defined configuration file for
+                      the bootloader. This file must be located in the
+                      canned-wks folder or could be the full path to the
+                      file. Using this option will override any other
+                      bootloader option.
+
       Note that bootloader functionality and boot partitions are
       implemented by the various --source plugins that implement
       bootloader functionality; the bootloader command essentially
       provides a means of modifying bootloader configuration.
+
+    * include
+
+      This command allows the user to include the content of .wks file
+      into original .wks file.
+
+      Command uses the following syntax:
+
+         include <file>
+
+      The <file> is either path to the file or its name. If name is
+      specified wic will try to find file in the directories with canned
+      .wks files.
+
 """

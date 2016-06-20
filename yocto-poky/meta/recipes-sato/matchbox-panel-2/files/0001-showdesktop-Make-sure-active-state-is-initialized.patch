@@ -1,0 +1,50 @@
+From a0b5fca04da208990f3c40e65dbb045da4cdb35e Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Sun, 20 Mar 2016 13:24:37 +0200
+Subject: [PATCH] showdesktop: Make sure active state is initialized
+
+There are cases (in qemu at least) where set_active()
+is never called on startup. Make sure we initialize the active
+state so the icon gets loaded and the applet is not confused
+about the current state.
+
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+
+Upstream-Status: Backport
+---
+ applets/showdesktop/showdesktop.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/applets/showdesktop/showdesktop.c b/applets/showdesktop/showdesktop.c
+index 61dd5c2..33c13e1 100644
+--- a/applets/showdesktop/showdesktop.c
++++ b/applets/showdesktop/showdesktop.c
+@@ -181,6 +181,12 @@ button_clicked_cb (GtkButton         *button,
+ 	            &xev);
+ }
+ 
++static void
++realize_cb (GtkWidget *button, ShowDesktopApplet *applet)
++{
++        sync_applet (applet);
++}
++
+ G_MODULE_EXPORT GtkWidget *
+ mb_panel_applet_create (const char    *id,
+                         GtkOrientation orientation)
+@@ -216,6 +222,10 @@ mb_panel_applet_create (const char    *id,
+                           "clicked",
+                           G_CALLBACK (button_clicked_cb),
+                           applet);
++        g_signal_connect (button,
++                          "realize",
++                          G_CALLBACK (realize_cb),
++                          applet);
+ 
+         g_object_weak_ref (G_OBJECT (button),
+                            (GWeakNotify) show_desktop_applet_free,
+-- 
+2.7.0
+

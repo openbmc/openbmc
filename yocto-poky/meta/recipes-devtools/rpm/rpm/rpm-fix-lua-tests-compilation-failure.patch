@@ -1,0 +1,43 @@
+Upstream-Status: Pending
+
+Subject: lua: fix to build test libs correctly
+
+This patch fixes errors like below.
+
+  | gcc: error: lib21.c: No such file or directory
+  | gcc: fatal error: no input files
+
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ lua/tests/libs/Makefile.am | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/lua/tests/libs/Makefile.am b/lua/tests/libs/Makefile.am
+index 19d1a0b..1e5de72 100644
+--- a/lua/tests/libs/Makefile.am
++++ b/lua/tests/libs/Makefile.am
+@@ -28,16 +28,16 @@ clean:
+ 	rm -f lib1.so lib11.so lib2.so lib21.so lib2-v2.so
+ 
+ lib1.so: lib1.c
+-	$(CC) $(CFLAGS) -o lib1.so lib1.c
++	$(CC) $(CFLAGS) -o lib1.so $(top_srcdir)/lua/tests/libs/lib1.c
+ 
+ lib11.so: lib11.c
+-	$(CC) $(CFLAGS) -o lib11.so lib11.c
++	$(CC) $(CFLAGS) -o lib11.so $(top_srcdir)/lua/tests/libs/lib11.c
+ 
+ lib2.so: lib2.c
+-	$(CC) $(CFLAGS) -o lib2.so lib2.c
++	$(CC) $(CFLAGS) -o lib2.so $(top_srcdir)/lua/tests/libs/lib2.c
+ 
+ lib21.so: lib21.c
+-	$(CC) $(CFLAGS) -o lib21.so lib21.c
++	$(CC) $(CFLAGS) -o lib21.so $(top_srcdir)/lua/tests/libs/lib21.c
+ 
+ lib2-v2.so: lib2.so
+ 	mv lib2.so ./lib2-v2.so
+-- 
+1.9.1
+

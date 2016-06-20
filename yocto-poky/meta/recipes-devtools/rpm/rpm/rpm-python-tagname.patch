@@ -1,0 +1,24 @@
+rpm-python-module: Change the extension tag from PyCObject to PyInt
+
+Use the tagValue to determine the custom PyInt value to use for the extension
+tag.  Without this, any custom tag extensions will be returned in a format
+that the tagNumFromPyObject and related functions like hdr_subscript will
+failed to process.  Usually the failure is error: expected a string or integer
+
+Upstream-Status: Submitted [RPM5 maintainer]
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.15/python/rpmmodule.c
+===================================================================
+--- rpm-5.4.15.orig/python/rpmmodule.c
++++ rpm-5.4.15/python/rpmmodule.c
+@@ -316,7 +316,7 @@ static void addRpmTags(PyObject *module)
+     {
+ 	if (ext->name == NULL || ext->type != HEADER_EXT_TAG)
+ 	    continue;
+-	PyDict_SetItemString(d, (char *) ext->name, to=PyCObject_FromVoidPtr((void *)ext, NULL));
++	PyDict_SetItemString(d, (char *) ext->name, to=PyInt_FromLong(tagValue(ext->name)));
+ 	Py_XDECREF(to);
+         PyDict_SetItem(dict, to, o=PyString_FromString(ext->name + 7));
+ 	Py_XDECREF(o);

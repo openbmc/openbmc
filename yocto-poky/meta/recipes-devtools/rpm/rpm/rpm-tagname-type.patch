@@ -1,0 +1,25 @@
+rpmdb/tagname.c: Add the 0x54aafb71 (filenames) type to rpmTagGetType
+
+There is already a workaround in the _tagName function to show that the
+special 'filenames' item is value.  This adds a similar patch to the
+_tagType to return the proper type, otherwise it comes back as a simple
+RPM_STRING_ARRAY_TYPE which limits the response to the first element.
+
+Upstream-Status: Submitted [RPM5 maintainer]
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.15/rpmdb/tagname.c
+===================================================================
+--- rpm-5.4.15.orig/rpmdb/tagname.c
++++ rpm-5.4.15/rpmdb/tagname.c
+@@ -353,6 +353,9 @@ static unsigned int _tagType(rpmTag tag)
+     case RPMDBI_RECNO:
+     case RPMDBI_HEAP:
+ 	break;
++    /* XXX make sure that h.['filenames'] in python "works". */
++    case 0x54aafb71:
++	return (RPM_STRING_ARRAY_TYPE + RPM_ARRAY_RETURN_TYPE);
+     default:
+ 	if (_rpmTags.byValue == NULL)
+ 	    break;

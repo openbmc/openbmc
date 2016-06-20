@@ -1,0 +1,37 @@
+From 280f0d37c642d68bad2a2e49ef437953474d99e6 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Wed, 6 Apr 2016 23:15:02 -0700
+Subject: [PATCH] CMakeLists.txt: fix MAN_INSTALL_DIR
+
+It checks ${CMAKE_INSTALL_PREFIX}/share/man when configure, but it may
+not exist when crosscompile, for example, when CMAKE_INSTALL_PREFIX="/",
+it is OK, but when CMAKE_INSTALL_PREFIX="/some/path/else", then it
+doesn't exist, and the man dir would be set to "/usr/man" which is
+incorrect.
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ CMakeLists.txt | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index fd1426b..747db22 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -57,10 +57,7 @@ else (DEFINED INCLUDE)
+ ENDIF (DEFINED  INCLUDE)
+ MESSAGE (STATUS "Header files will be installed in ${INCLUDE_INSTALL_DIR}")
+ SET (BIN_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/bin")
+-SET (MAN_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/man")
+-IF (IS_DIRECTORY "${CMAKE_INSTALL_PREFIX}/share/man"  AND NOT IS_DIRECTORY "${CMAKE_INSTALL_PREFIX}/man")
+-  SET (MAN_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/man")
+-ENDIF (IS_DIRECTORY "${CMAKE_INSTALL_PREFIX}/share/man"  AND NOT IS_DIRECTORY "${CMAKE_INSTALL_PREFIX}/man")
++SET (MAN_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/man")
+ MESSAGE(STATUS "Man pages will be installed in ${MAN_INSTALL_DIR}")
+ 
+ ####################################################################
+-- 
+2.7.4
+

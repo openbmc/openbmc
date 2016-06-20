@@ -44,10 +44,6 @@ FILES_${PN} = "\
 "
 INSANE_SKIP_${PN} += "dev-so"
 
-FILES_${PN}-dbg += "\
-    ${libexecdir}/gcc/${TARGET_SYS}/${BINV}/.debug/ \
-    ${libexecdir}/gcc/${TARGET_SYS}/${BINV}/plugin/.debug/ \
-"
 FILES_${PN}-dev = "\
     ${gcclibdir}/${TARGET_SYS}/${BINV}/lib*${SOLIBSDEV} \
     ${libexecdir}/gcc/${TARGET_SYS}/${BINV}/lib*${SOLIBSDEV} \

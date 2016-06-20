@@ -5,14 +5,25 @@ is the same as the one being used to build the perl binary. Since most people ar
 systems with gcc 5, it is unlikely that it will work on any supported host. Switch out gccversion
 for the version extracted from $CC --version.
 
---- perl-5.22.0/ext/Errno/Errno_pm.PL	2015-10-19 18:01:20.622143786 -0400
-+++ perl-5.22.0-fixed/ext/Errno/Errno_pm.PL	2015-10-19 17:50:35.662137367 -0400
-@@ -224,9 +224,12 @@
+Jeremy Puhlman <jpuhlman@mvista.com>
+
+Fix spaces in brackets while running $CC --version
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ ext/Errno/Errno_pm.PL | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/ext/Errno/Errno_pm.PL b/ext/Errno/Errno_pm.PL
+index 1fd29d0..7976ea2 100644
+--- a/ext/Errno/Errno_pm.PL
++++ b/ext/Errno/Errno_pm.PL
+@@ -224,9 +224,13 @@ sub write_errno_pm {
  
      {	# BeOS (support now removed) did not enter this block
      # invoke CPP and read the output
 +        my $compiler = $ENV{'CC'};
 +        my $compiler_out = `$compiler --version`;
++        $compiler_out =~ s/\(.*\)/;/;
 +        my @compiler_version = split / /,$compiler_out; 
  
  	my $inhibit_linemarkers = '';
@@ -21,3 +32,6 @@ for the version extracted from $CC --version.
  	    # GCC 5.0 interleaves expanded macros with line numbers breaking
  	    # each line into multiple lines. RT#123784
  	    $inhibit_linemarkers = ' -P';
+-- 
+1.9.1
+

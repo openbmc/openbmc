@@ -3,7 +3,7 @@ inherit terminal
 DEVSHELL = "${SHELL}"
 
 python do_devshell () {
-    if d.getVarFlag("do_devshell", "manualfakeroot"):
+    if d.getVarFlag("do_devshell", "manualfakeroot", True):
        d.prependVar("DEVSHELL", "pseudo ")
        fakeenv = d.getVar("FAKEROOTENV", True).split()
        for f in fakeenv:
@@ -27,7 +27,7 @@ do_devshell[nostamp] = "1"
 # be done as the normal user. We therfore carefully construct the envionment
 # manually
 python () {
-    if d.getVarFlag("do_devshell", "fakeroot"):
+    if d.getVarFlag("do_devshell", "fakeroot", True):
        # We need to signal our code that we want fakeroot however we
        # can't manipulate the environment and variables here yet (see YOCTO #4795)
        d.setVarFlag("do_devshell", "manualfakeroot", "1")

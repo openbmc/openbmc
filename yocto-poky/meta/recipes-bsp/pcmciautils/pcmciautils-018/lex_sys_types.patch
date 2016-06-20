@@ -1,0 +1,21 @@
+Include sys/types.h for u_long definition
+
+Fix errors like
+In file included from src/lex_config.l:34:0:
+src/yacc_config.y:45:5: error: unknown type name 'u_long'
+     u_long num;
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+Index: pcmciautils-018/src/lex_config.l
+===================================================================
+--- pcmciautils-018.orig/src/lex_config.l
++++ pcmciautils-018/src/lex_config.l
+@@ -22,6 +22,7 @@
+ #include <unistd.h>
+ #include <string.h>
+ #include <syslog.h>
++#include <sys/types.h>
+ 
+ #ifdef HAS_WORDEXP
+ #include <wordexp.h>

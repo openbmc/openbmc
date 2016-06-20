@@ -18,10 +18,38 @@ function importLayerPageInit (ctx) {
 
   libtoaster.makeTypeahead(layerDepInput, libtoaster.ctx.layersTypeAheadUrl, { include_added: "true" }, function(item){
     currentLayerDepSelection = item;
-
-    layerDepBtn.removeAttr("disabled");
   });
 
+  // choices available in the typeahead
+  var layerDepsChoices = {};
+
+  // when the typeahead choices change, store an array of the available layer
+  // choices locally, to use for enabling/disabling the "Add layer" button
+  layerDepInput.on("typeahead-choices-change", function (event, data) {
+    layerDepsChoices = {};
+
+    if (data.choices) {
+      data.choices.forEach(function (item) {
+        layerDepsChoices[item.name] = item;
+      });
+    }
+  });
+
+  // disable the "Add layer" button when the layer input typeahead is empty
+  // or not in the typeahead choices
+  layerDepInput.on("input change", function () {
+    // get the choices from the typeahead
+    var choice = layerDepsChoices[$(this).val()];
+
+    if (choice) {
+      layerDepBtn.removeAttr("disabled");
+      currentLayerDepSelection = choice;
+    }
+    else {
+      layerDepBtn.attr("disabled", "disabled");
+      currentLayerDepSelection = undefined;
+    }
+  });
 
   /* We automatically add "openembedded-core" layer for convenience as a
    * dependency as pretty much all layers depend on this one

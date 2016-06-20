@@ -1,0 +1,26 @@
+From fad40cfc18a42946a9a9e440c3434cd6b847ff9d Mon Sep 17 00:00:00 2001
+From: Otavio Salvador <otavio@ossystems.com.br>
+Date: Mon, 18 Jan 2016 17:05:19 +0000
+Subject: [PATCH] Makefile.in: Add tinfo library to the linking libraries
+Organization: O.S. Systems Software LTDA.
+
+Upstream-Status: Pending
+
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+---
+ Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index a85d00f..98b85f9 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -1,4 +1,4 @@
+-LIBS = -lslang @LIBS@
++LIBS = -lslang -ltinfo @LIBS@
+ LIBTCL = @TCL_LIB_FLAG@
+ 
+ CC = @CC@
+-- 
+2.1.4
+

@@ -47,7 +47,7 @@ python() {
     # and cross packages which aren't swabber-native or one of its dependencies
     # I have ignored them for now...
     if not bb.data.inherits_class('native', d) and not bb.data.inherits_class('nativesdk', d) and not bb.data.inherits_class('cross', d):
-        deps = (d.getVarFlag('do_setscene', 'depends') or "").split()
+        deps = (d.getVarFlag('do_setscene', 'depends', True) or "").split()
         deps.append('strace-native:do_populate_sysroot')
         d.setVarFlag('do_setscene', 'depends', " ".join(deps))
         logdir = d.expand("${TRACE_LOGDIR}")

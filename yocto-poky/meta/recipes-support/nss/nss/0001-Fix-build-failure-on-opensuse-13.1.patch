@@ -1,0 +1,27 @@
+From 8758c6a4508a5ca01505a8d69a269c912ce10bee Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Mon, 18 Jan 2016 18:26:16 +0000
+Subject: [PATCH] Fix build failure on opensuse 13.1
+
+Upstream-Status: Inappropriate [gcc 4.8 specific issue]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ nss/cmd/modutil/install-ds.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/nss/cmd/modutil/install-ds.h b/nss/cmd/modutil/install-ds.h
+index 3a3afb3..433efe0 100644
+--- a/nss/cmd/modutil/install-ds.h
++++ b/nss/cmd/modutil/install-ds.h
+@@ -243,7 +243,7 @@ struct Pk11Install_Info_str {
+ Pk11Install_Info*
+ Pk11Install_Info_new();
+ void
+-Pk11Install_Info_init();
++Pk11Install_Info_init(Pk11Install_Info* _this);
+ void
+ Pk11Install_Info_delete(Pk11Install_Info* _this);
+ /*// Returns NULL for success, error message if parse error.*/
+-- 
+1.8.4.5
+

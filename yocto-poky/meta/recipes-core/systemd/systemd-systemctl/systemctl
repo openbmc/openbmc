@@ -108,7 +108,7 @@ for service in $services; do
 
 	# If any new unit types are added to systemd they should be added
 	# to this regular expression.
-	unit_types_re='\.\(service\|socket\|device\|mount\|automount\|swap\|target\|path\|timer\|snapshot\)$'
+	unit_types_re='\.\(service\|socket\|device\|mount\|automount\|swap\|target\|path\|timer\|snapshot\)\s*$'
 	if [ "$action" = "preset" ]; then
 		action=`egrep -sh  $service $ROOT/etc/systemd/user-preset/*.preset | cut -f1 -d' '`
 		if [ -z "$action" ]; then
@@ -125,33 +125,46 @@ for service in $services; do
 		        | tr ',' '\n' \
 		        | grep "$unit_types_re")
 
-	for r in $wanted_by; do
-		echo "WantedBy=$r found in $service"
-		if [ "$action" = "enable" ]; then
-			enable_service=$service
-			if [ "$service_template" = true -a "$instance_specified" = false ]; then
-				default_instance=$(sed '/^DefaultInstance[[:space:]]*=/s,[^=]*=,,p;d' "$ROOT/$service_file")
-				if [ -z $default_instance ]; then
-					echo "Template unit without instance or DefaultInstance directive, nothing to enable"
-					continue
-				else
-					echo "Found DefaultInstance $default_instance, enabling it"
-					enable_service=$(echo $service | sed "s/@/@$default_instance/")
-				fi
-			fi
-			mkdir -p $ROOT/etc/systemd/system/$r.wants
-			ln -s $service_file $ROOT/etc/systemd/system/$r.wants/$enable_service
-			echo "Enabled $enable_service for $wanted_by."
-		else
-			if [ "$service_template" = true -a "$instance_specified" = false ]; then
-				disable_service="$ROOT/etc/systemd/system/$r.wants/`echo $service | sed 's/@/@*/'`"
-			else
-				disable_service="$ROOT/etc/systemd/system/$r.wants/$service"
-			fi
-			rm -f $disable_service
-			[ -d $ROOT/etc/systemd/system/$r.wants ] && rmdir --ignore-fail-on-non-empty -p $ROOT/etc/systemd/system/$r.wants
-			echo "Disabled ${disable_service##$ROOT/etc/systemd/system/$r.wants/} for $wanted_by."
+	required_by=$(sed '/^RequiredBy[[:space:]]*=/s,[^=]*=,,p;d' "$ROOT/$service_file" \
+		        | tr ',' '\n' \
+		        | grep "$unit_types_re")
+
+	for dependency in WantedBy RequiredBy; do
+		if [ "$dependency" = "WantedBy" ]; then
+			suffix="wants"
+			dependency_list="$wanted_by"
+		elif [ "$dependency" = "RequiredBy" ]; then
+			suffix="requires"
+			dependency_list="$required_by"
 		fi
+		for r in $dependency_list; do
+			echo "$dependency=$r found in $service"
+			if [ "$action" = "enable" ]; then
+				enable_service=$service
+				if [ "$service_template" = true -a "$instance_specified" = false ]; then
+					default_instance=$(sed '/^DefaultInstance[[:space:]]*=/s,[^=]*=,,p;d' "$ROOT/$service_file")
+					if [ -z $default_instance ]; then
+						echo "Template unit without instance or DefaultInstance directive, nothing to enable"
+						continue
+					else
+						echo "Found DefaultInstance $default_instance, enabling it"
+						enable_service=$(echo $service | sed "s/@/@$(echo $default_instance | sed 's/\\/\\\\/g')/")
+					fi
+				fi
+				mkdir -p $ROOT/etc/systemd/system/$r.$suffix
+				ln -s $service_file $ROOT/etc/systemd/system/$r.$suffix/$enable_service
+				echo "Enabled $enable_service for $r."
+			else
+				if [ "$service_template" = true -a "$instance_specified" = false ]; then
+					disable_service="$ROOT/etc/systemd/system/$r.$suffix/`echo $service | sed 's/@/@*/'`"
+				else
+					disable_service="$ROOT/etc/systemd/system/$r.$suffix/$service"
+				fi
+				rm -f $disable_service
+				[ -d $ROOT/etc/systemd/system/$r.$suffix ] && rmdir --ignore-fail-on-non-empty -p $ROOT/etc/systemd/system/$r.$suffix
+				echo "Disabled ${disable_service##$ROOT/etc/systemd/system/$r.$suffix/} for $r."
+			fi
+		done
 	done
 
 	# create the required symbolic 'Alias' links

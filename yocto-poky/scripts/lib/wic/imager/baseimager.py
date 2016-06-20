@@ -85,7 +85,7 @@ class BaseImageCreator(object):
         # No ks provided when called by convertor, so skip the dependency check
         if self.ks:
             # If we have btrfs partition we need to check necessary tools
-            for part in self.ks.handler.partition.partitions:
+            for part in self.ks.partitions:
                 if part.fstype and part.fstype == "btrfs":
                     self._dep_checks.append("mkfs.btrfs")
                     break

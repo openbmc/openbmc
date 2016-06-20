@@ -1,0 +1,68 @@
+#!/bin/sh
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+DESC=bluetooth
+
+DAEMON=/usr/lib/bluez5/bluetooth/bluetoothd
+
+# If you want to be ignore error of "org.freedesktop.hostname1",
+# please enable NOPLUGIN_OPTION.
+# NOPLUGIN_OPTION="--noplugin=hostname"
+NOPLUGIN_OPTION=""
+SSD_OPTIONS="--oknodo --quiet --exec $DAEMON -- $NOPLUGIN_OPTION"
+
+test -f $DAEMON || exit 0
+
+# FIXME: any of the sourced files may fail if/with syntax errors
+test -f /etc/default/bluetooth && . /etc/default/bluetooth
+test -f /etc/default/rcS && . /etc/default/rcS
+
+set -e
+
+case $1 in
+  start)
+	echo "Starting $DESC"
+
+	if test "$BLUETOOTH_ENABLED" = 0; then
+		echo "disabled. see /etc/default/bluetooth"
+		exit 0
+	fi
+
+	start-stop-daemon --start --background $SSD_OPTIONS
+	echo "${DAEMON##*/}"
+
+  ;;
+  stop)
+	echo "Stopping $DESC"
+	if test "$BLUETOOTH_ENABLED" = 0; then
+		echo "disabled."
+		exit 0
+	fi
+	start-stop-daemon --stop $SSD_OPTIONS
+	echo "${DAEMON}"
+  ;;
+  restart|force-reload)
+	$0 stop
+	sleep 1
+	$0 start
+  ;;
+  status)
+	 pidof ${DAEMON} >/dev/null
+	 status=$?
+        if [ $status -eq 0 ]; then
+                 echo "bluetooth is running."
+        else
+                echo "bluetooth is not running"
+        fi
+        exit $status
+   ;;
+   *)
+	N=/etc/init.d/bluetooth
+	echo "Usage: $N {start|stop|restart|force-reload|status}" >&2
+	exit 1
+	;;
+esac
+
+exit 0
+
+# vim:noet

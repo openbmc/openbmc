@@ -1,0 +1,53 @@
+From e18bd3a571be716d90bedc835a014472470ae7bd Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 30 Dec 2015 10:58:39 +0800
+Subject: [PATCH] configure.ac: support large-file for stat64
+
+While starting dbus-daemon on a 32-bit linux host and it invokes
+fstat to load /etc/dbus-1/system.conf through NFS. If system.conf
+was created with a large indoe number on 64-bit host. The above
+fstat invoking failed. Here is the log of strace:
+............
+$ ls -i /etc/dbus-1/system.conf
+53778558109 /etc/dbus-1/system.conf
+
+$ strace /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation
+|open("/etc/dbus-1/system.conf", O_RDONLY) = 4
+|fstat64(4, {st_mode=S_IFREG|0644, st_size=3340, ...}) = 0
+|close(4) = 0
+|close(3) = 0
+|write(2, "Failed to start message bus: Fai"..., 109Failed to start message bus:
+Failed to stat "/etc/dbus-1/system.conf": Value too large for defined data type
+|) = 109
+|exit_group(1) = ?
+|+++ exited with 1 +++
+............
+
+In this situation, we should support large-file for stat64. Add marco
+AC_SYS_LARGEFILE to do the detection at configure time. It can be disabled
+by configuring with the `--disable-largefile' option.
+
+Upstream-Status: Backport
+
+Bug: https://bugs.freedesktop.org/show_bug.cgi?id=93545
+https://bugs.freedesktop.org/attachment.cgi?id=120747
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.ac | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configure.ac b/configure.ac
+index 82806ba..cb5a60b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -64,6 +64,7 @@ AC_SUBST(DBUS_VERSION)
+ AC_PROG_CC
+ AM_PROG_CC_C_O
+ AC_PROG_CXX
+ AC_USE_SYSTEM_EXTENSIONS
++AC_SYS_LARGEFILE
+ AC_ISC_POSIX
+ AC_HEADER_STDC
+-- 
+1.9.1
+

@@ -27,6 +27,7 @@ scripts_path = os.path.dirname(os.path.realpath(__file__))
 lib_path = scripts_path + '/lib'
 sys.path = sys.path + [lib_path]
 import scriptutils
+import argparse_oe
 logger = scriptutils.logger_create('recipetool')
 
 plugins = []
@@ -34,7 +35,7 @@ plugins = []
 def tinfoil_init(parserecipes):
     import bb.tinfoil
     import logging
-    tinfoil = bb.tinfoil.Tinfoil()
+    tinfoil = bb.tinfoil.Tinfoil(tracking=True)
     tinfoil.prepare(not parserecipes)
     tinfoil.logger.setLevel(logger.getEffectiveLevel())
     return tinfoil
@@ -45,9 +46,9 @@ def main():
         logger.error("This script can only be run after initialising the build environment (e.g. by using oe-init-build-env)")
         sys.exit(1)
 
-    parser = argparse.ArgumentParser(description="OpenEmbedded recipe tool",
-                                     add_help=False,
-                                     epilog="Use %(prog)s <subcommand> --help to get help on a specific command")
+    parser = argparse_oe.ArgumentParser(description="OpenEmbedded recipe tool",
+                                        add_help=False,
+                                        epilog="Use %(prog)s <subcommand> --help to get help on a specific command")
     parser.add_argument('-d', '--debug', help='Enable debug output', action='store_true')
     parser.add_argument('-q', '--quiet', help='Print only errors', action='store_true')
     parser.add_argument('--color', choices=['auto', 'always', 'never'], default='auto', help='Colorize output (where %(metavar)s is %(choices)s)', metavar='COLOR')
@@ -82,7 +83,11 @@ def main():
 
     registered = False
     for plugin in plugins:
-        if hasattr(plugin, 'register_command'):
+        if hasattr(plugin, 'register_commands'):
+            registered = True
+            plugin.register_commands(subparsers)
+        elif hasattr(plugin, 'register_command'):
+            # Legacy function name
             registered = True
             plugin.register_command(subparsers)
         if hasattr(plugin, 'tinfoil_init'):
@@ -96,7 +101,9 @@ def main():
 
     try:
         if getattr(args, 'parserecipes', False):
+            tinfoil.config_data.disableTracking()
             tinfoil.parseRecipes()
+            tinfoil.config_data.enableTracking()
         ret = args.func(args)
     except bb.BBHandledException:
         ret = 1
@@ -110,5 +117,5 @@ if __name__ == "__main__":
     except Exception:
         ret = 1
         import traceback
-        traceback.print_exc(5)
+        traceback.print_exc()
     sys.exit(ret)

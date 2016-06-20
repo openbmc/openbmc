@@ -22,6 +22,7 @@ import os
 import sys
 import subprocess
 import logging
+import re
 
 logger = logging.getLogger('devtool')
 
@@ -100,18 +101,20 @@ def setup_tinfoil(config_only=False, basepath=None, tracking=False):
     """Initialize tinfoil api from bitbake"""
     import scriptpath
     orig_cwd = os.path.abspath(os.curdir)
-    if basepath:
-        os.chdir(basepath)
-    bitbakepath = scriptpath.add_bitbake_lib_path()
-    if not bitbakepath:
-        logger.error("Unable to find bitbake by searching parent directory of this script or PATH")
-        sys.exit(1)
+    try:
+        if basepath:
+            os.chdir(basepath)
+        bitbakepath = scriptpath.add_bitbake_lib_path()
+        if not bitbakepath:
+            logger.error("Unable to find bitbake by searching parent directory of this script or PATH")
+            sys.exit(1)
 
-    import bb.tinfoil
-    tinfoil = bb.tinfoil.Tinfoil(tracking=tracking)
-    tinfoil.prepare(config_only)
-    tinfoil.logger.setLevel(logger.getEffectiveLevel())
-    os.chdir(orig_cwd)
+        import bb.tinfoil
+        tinfoil = bb.tinfoil.Tinfoil(tracking=tracking)
+        tinfoil.prepare(config_only)
+        tinfoil.logger.setLevel(logger.getEffectiveLevel())
+    finally:
+        os.chdir(orig_cwd)
     return tinfoil
 
 def get_recipe_file(cooker, pn):
@@ -126,7 +129,7 @@ def get_recipe_file(cooker, pn):
             logger.error("Unable to find any recipe file matching %s" % pn)
     return recipefile
 
-def parse_recipe(config, tinfoil, pn, appends):
+def parse_recipe(config, tinfoil, pn, appends, filter_workspace=True):
     """Parse recipe of a package"""
     import oe.recipeutils
     recipefile = get_recipe_file(tinfoil.cooker, pn)
@@ -135,27 +138,44 @@ def parse_recipe(config, tinfoil, pn, appends):
         return None
     if appends:
         append_files = tinfoil.cooker.collection.get_file_appends(recipefile)
-        # Filter out appends from the workspace
-        append_files = [path for path in append_files if
-                        not path.startswith(config.workspace_path)]
+        if filter_workspace:
+            # Filter out appends from the workspace
+            append_files = [path for path in append_files if
+                            not path.startswith(config.workspace_path)]
     else:
         append_files = None
     return oe.recipeutils.parse_recipe(recipefile, append_files,
                                        tinfoil.config_data)
 
-def check_workspace_recipe(workspace, pn, checksrc=True):
+def check_workspace_recipe(workspace, pn, checksrc=True, bbclassextend=False):
     """
     Check that a recipe is in the workspace and (optionally) that source
     is present.
     """
-    if not pn in workspace:
+
+    workspacepn = pn
+
+    for recipe, value in workspace.iteritems():
+        if recipe == pn:
+            break
+        if bbclassextend:
+            recipefile = value['recipefile']
+            if recipefile:
+                targets = get_bbclassextend_targets(recipefile, recipe)
+                if pn in targets:
+                    workspacepn = recipe
+                    break
+    else:
         raise DevtoolError("No recipe named '%s' in your workspace" % pn)
+
     if checksrc:
-        srctree = workspace[pn]['srctree']
+        srctree = workspace[workspacepn]['srctree']
         if not os.path.exists(srctree):
-            raise DevtoolError("Source tree %s for recipe %s does not exist" % (srctree, pn))
+            raise DevtoolError("Source tree %s for recipe %s does not exist" % (srctree, workspacepn))
         if not os.listdir(srctree):
-            raise DevtoolError("Source tree %s for recipe %s is empty" % (srctree, pn))
+            raise DevtoolError("Source tree %s for recipe %s is empty" % (srctree, workspacepn))
+
+    return workspacepn
 
 def use_external_build(same_dir, no_same_dir, d):
     """
@@ -197,3 +217,41 @@ def setup_git_repo(repodir, version, devbranch, basetag='devtool-base'):
 
     bb.process.run('git checkout -b %s' % devbranch, cwd=repodir)
     bb.process.run('git tag -f %s' % basetag, cwd=repodir)
+
+def recipe_to_append(recipefile, config, wildcard=False):
+    """
+    Convert a recipe file to a bbappend file path within the workspace.
+    NOTE: if the bbappend already exists, you should be using
+    workspace[args.recipename]['bbappend'] instead of calling this
+    function.
+    """
+    appendname = os.path.splitext(os.path.basename(recipefile))[0]
+    if wildcard:
+        appendname = re.sub(r'_.*', '_%', appendname)
+    appendpath = os.path.join(config.workspace_path, 'appends')
+    appendfile = os.path.join(appendpath, appendname + '.bbappend')
+    return appendfile
+
+def get_bbclassextend_targets(recipefile, pn):
+    """
+    Cheap function to get BBCLASSEXTEND and then convert that to the
+    list of targets that would result.
+    """
+    import bb.utils
+
+    values = {}
+    def get_bbclassextend_varfunc(varname, origvalue, op, newlines):
+        values[varname] = origvalue
+        return origvalue, None, 0, True
+    with open(recipefile, 'r') as f:
+        bb.utils.edit_metadata(f, ['BBCLASSEXTEND'], get_bbclassextend_varfunc)
+
+    targets = []
+    bbclassextend = values.get('BBCLASSEXTEND', '').split()
+    if bbclassextend:
+        for variant in bbclassextend:
+            if variant == 'nativesdk':
+                targets.append('%s-%s' % (variant, pn))
+            elif variant in ['native', 'cross', 'crosssdk']:
+                targets.append('%s-%s' % (pn, variant))
+    return targets

@@ -1,6 +1,6 @@
 [PATCH] redirect the dir of mklibsrc-log.tx
 
-Upstream-Statue: Pending
+Upstream-Status: Pending
 
 redirect mklibsrc-log.tx to builddir, not /tmp; otherwise mklibsrc-log.tx
 maybe unable to be written if other users is building autogen at the same time.

@@ -1,0 +1,52 @@
+From 5d6509313198ec9b686cad50b002212e4344004b Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 11 Mar 2016 01:15:45 -0500
+Subject: [PATCH] configure.ac: tweak MULTIARCH for powerpc-linux-gnuspe
+
+For p1022ds bsp, the MULTIARCH is powerpc-linux-gnuspev1 and
+python3 did not recognize the extra 'v1' which caused python3
+configure error for the platform triplet.
+
+Q:Why Python3 check platform triplet?
+
+A:Under Linux, GNU/KFreeBSD and the Hurd, C extensions now include
+the architecture triplet in the extension name, to make it easy to
+test builds for different ABIs in the same working tree.
+
+Here is the generated  C extensions which take platform triplet into account.
+...
+|image/usr/lib/python3.5/lib-dynload/_datetime.cpython-35m-powerpc-linux-gnuspe.so
+...
+
+https://bugs.python.org/issue22980
+https://www.python.org/dev/peps/pep-3149/
+https://bugs.python.org/review/22980/patch/14593/54808
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.ac | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 9eb3d22..c34a9a0 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -724,6 +724,13 @@ fi
+ 
+ 
+ MULTIARCH=$($CC --print-multiarch 2>/dev/null)
++
++# Tweak MULTIARCH
++if test x$MULTIARCH = xpowerpc-linux-gnuspev1
++then
++	MULTIARCH="powerpc-linux-gnuspe"
++fi
++
+ AC_SUBST(MULTIARCH)
+ 
+ AC_MSG_CHECKING([for the platform triplet based on compiler characteristics])
+-- 
+1.9.1
+

@@ -11,7 +11,15 @@ SRC_URI = "http://snapshot.debian.org/archive/debian/20050312T000000Z/pool/main/
            file://net-tools-config.h \
            file://net-tools-config.make \
            file://ifconfig-interface-0-del-IP-will-remove-the-aliased-.patch \
-	   "
+           file://musl-fixes.patch \
+           file://net-tools-1.60-sctp1.patch \
+           file://net-tools-1.60-sctp2-quiet.patch \
+           file://net-tools-1.60-sctp3-addrs.patch \
+          "
+
+# for this package we're mostly interested in tracking debian patches,
+# and not in the upstream version where all development has effectively stopped
+UPSTREAM_CHECK_REGEX = "(?P<pver>((\d+\.*)+)-((\d+\.*)+))\.(diff|debian\.tar)\.(gz|xz)"
 
 S = "${WORKDIR}/net-tools-1.60"
 
@@ -21,7 +29,15 @@ SRC_URI[tarball.sha256sum] = "ec67967cf7b1a3a3828a84762fbc013ac50ee5dc9aa3095d5c
 SRC_URI[patch.md5sum] = "ea3592f49ac8380962bc4d9b66c7e7e9"
 SRC_URI[patch.sha256sum] = "aeeeafaff68866a446f01bb639d4e0146a60af34dcd20e31a3e46585022fc76c"
 
+# the package is taken from snapshots.debian.org; that source is static and goes stale
+# so we check the latest upstream from a directory that does get updated
+UPSTREAM_CHECK_URI = "${DEBIAN_MIRROR}/main/n/net-tools/"
+
 inherit gettext
+
+do_patch[depends] = "quilt-native:do_populate_sysroot"
+
+LDFLAGS_append_libc-uclibc = " -lintl "
 
 # The Makefile is lame, no parallel build
 PARALLEL_MAKE = ""
@@ -70,6 +86,10 @@ do_compile() {
 }
 
 do_install() {
+	export COPTS="$CFLAGS"
+	export LOPTS="$LDFLAGS"
+	unset CFLAGS
+	unset LDFLAGS
 	oe_runmake 'BASEDIR=${D}' install
 }
 

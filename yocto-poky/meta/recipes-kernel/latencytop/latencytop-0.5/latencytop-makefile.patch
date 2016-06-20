@@ -12,7 +12,7 @@ index 16a2369..fa797a2 100644
  SBINDIR = /usr/sbin
  XCFLAGS = -W  -g `pkg-config --cflags glib-2.0` -D_FORTIFY_SOURCE=2 -Wno-sign-compare
 -LDF = -Wl,--as-needed `pkg-config --libs glib-2.0`   -lncursesw 
-+LDF = -Wl,--as-needed `pkg-config --libs glib-2.0`   -lncurses
++LDF = -Wl,--as-needed `pkg-config --libs glib-2.0`   -lncurses $(LDFLAGS)
 +CC ?= gcc
  
  OBJS= latencytop.o text_display.o translate.o fsync.o

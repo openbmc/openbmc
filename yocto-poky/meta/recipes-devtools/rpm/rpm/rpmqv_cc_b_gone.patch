@@ -1,4 +1,7 @@
-rpm: compile rpmqv.c instead of rpmqv.cc
+From e8bae261615e19ff8a28683765c9539cfb22a086 Mon Sep 17 00:00:00 2001
+From: Joe Slater <jslater@windriver.com>
+Date: Thu, 17 Jul 2014 18:14:54 -0700
+Subject: [PATCH 1/9] rpm: compile rpmqv.c instead of rpmqv.cc
 
 Some versions of gcc, 4.4.5 for example, will put a reference to __gxx_personality_v0
 into rpm.o and rpmbuild.o.  This means we must link with g++, and the Makefile we
@@ -10,23 +13,38 @@ Upstream-Status: Inappropriate [other]
 
    When linking with g++ is really necessary, the upstream package will do that.
 
-Signed-off-by: Joe Slater <joe.slater@windriver.com>
+Also instead of symlinking files in two places, which can and does race in
+parallel builds, simply refer to the file's full location [RB]
 
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+---
+ Makefile.am | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 1dade0a..55f8669 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -127,13 +127,13 @@ rpm_SOURCES =		build.c
+@@ -201,15 +201,13 @@ rpm_SOURCES =		build.c
  rpm_LDFLAGS =		@LDFLAGS_STATIC@ $(LDFLAGS)
  rpm_LDADD =		rpm.o $(myLDADD)
  rpm.o:	$(top_srcdir)/rpmqv.c
--	$(COMPILE) -DIAM_RPMBT -DIAM_RPMDB -DIAM_RPMEIU -DIAM_RPMK -DIAM_RPMQV -o $@ -c $(top_srcdir)/rpmqv.cc
-+	$(COMPILE) -DIAM_RPMBT -DIAM_RPMDB -DIAM_RPMEIU -DIAM_RPMK -DIAM_RPMQV -o $@ -c $(top_srcdir)/rpmqv.c
+-	ln -sf $< rpmqv.cc
+-	$(COMPILE) -DIAM_RPMBT -DIAM_RPMDB -DIAM_RPMEIU -DIAM_RPMK -DIAM_RPMQV -o $@ -c rpmqv.cc
++	$(COMPILE) -DIAM_RPMBT -DIAM_RPMDB -DIAM_RPMEIU -DIAM_RPMK -DIAM_RPMQV -o $@ -c $^
  
  rpmbuild_SOURCES =	build.c
  rpmbuild_LDFLAGS =	@LDFLAGS_STATIC@ $(LDFLAGS)
  rpmbuild_LDADD =	rpmbuild.o $(myLDADD)
- rpmbuild.o: $(top_srcdir)/rpmqv.c
--	$(COMPILE) -DIAM_RPMBT -o $@ -c $(top_srcdir)/rpmqv.cc
-+	$(COMPILE) -DIAM_RPMBT -o $@ -c $(top_srcdir)/rpmqv.c
+ rpmbuild.o:	$(top_srcdir)/rpmqv.c
+-	ln -sf $< rpmqv.cc
+-	$(COMPILE) -DIAM_RPMBT -o $@ -c rpmqv.cc
++	$(COMPILE) -DIAM_RPMBT -o $@ -c $^
  
- .PHONY:	splint
- splint:
+ .syntastic_c_config: Makefile
+ 	@echo $(COMPILE) | tr ' ' '\n' | sed -e '1d' > $@
+-- 
+2.7.0
+

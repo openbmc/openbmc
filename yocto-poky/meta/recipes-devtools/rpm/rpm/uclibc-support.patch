@@ -1,13 +1,13 @@
 Define the x* wrappers for uclibc as well
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [RPM5 maintainer]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
-Index: rpm-5.4.14/rpmio/rpmio.h
+Index: rpm/rpmio/rpmio.h
 ===================================================================
---- rpm-5.4.14.orig/rpmio/rpmio.h
-+++ rpm-5.4.14/rpmio/rpmio.h
+--- rpm.orig/rpmio/rpmio.h
++++ rpm/rpmio/rpmio.h
 @@ -23,7 +23,8 @@
   */
  /*@{*/
@@ -18,11 +18,11 @@ Index: rpm-5.4.14/rpmio/rpmio.h
  #define USE_COOKIE_SEEK_POINTER 1
  typedef _IO_off64_t 	_libio_off_t;
  typedef _libio_off_t *	_libio_pos_t;
-Index: rpm-5.4.14/system.h
+Index: rpm/system.h
 ===================================================================
---- rpm-5.4.14.orig/system.h
-+++ rpm-5.4.14/system.h
-@@ -481,7 +481,7 @@ extern void muntrace (void)
+--- rpm.orig/system.h
++++ rpm/system.h
+@@ -489,7 +489,7 @@ extern void muntrace (void)
  #endif /* defined(__LCLINT__) */
  
  /* Memory allocation via macro defs to get meaningful locations from mtrace() */
@@ -31,11 +31,11 @@ Index: rpm-5.4.14/system.h
  #define	xmalloc(_size) 		(malloc(_size) ? : vmefail(_size))
  #define	xcalloc(_nmemb, _size)	(calloc((_nmemb), (_size)) ? : vmefail(_size))
  #define	xrealloc(_ptr, _size)	(realloc((_ptr), (_size)) ? : vmefail(_size))
-Index: rpm-5.4.14/lib/librpm.vers
+Index: rpm/lib/librpm.vers
 ===================================================================
---- rpm-5.4.14.orig/lib/librpm.vers
-+++ rpm-5.4.14/lib/librpm.vers
-@@ -405,6 +405,10 @@ LIBRPM_0
+--- rpm.orig/lib/librpm.vers
++++ rpm/lib/librpm.vers
+@@ -406,6 +406,10 @@ LIBRPM_0
      specedit;
      strict_erasures;
      XrpmtsiInit;
@@ -46,14 +46,14 @@ Index: rpm-5.4.14/lib/librpm.vers
    local:
      *;
  };
-Index: rpm-5.4.14/rpmio/librpmio.vers
+Index: rpm/rpmio/librpmio.vers
 ===================================================================
---- rpm-5.4.14.orig/rpmio/librpmio.vers
-+++ rpm-5.4.14/rpmio/librpmio.vers
-@@ -1056,6 +1056,10 @@ LIBRPMIO_0
-     mongo_write_concern_set_mode;
-     mongo_write_concern_set_w;
-     mongo_write_concern_set_wtimeout;
+--- rpm.orig/rpmio/librpmio.vers
++++ rpm/rpmio/librpmio.vers
+@@ -1455,6 +1455,10 @@ LIBRPMIO_0
+     _mongoc_write_result_init;
+     _mongoc_write_result_merge;
+     _mongoc_write_result_merge_legacy;
 +    xmalloc;
 +    xrealloc;
 +    xcalloc;

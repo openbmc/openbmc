@@ -2,9 +2,9 @@
 # long-description: This image contains boot partition and 3 rootfs partitions
 # created from core-image-minimal and wic-image-minimal image recipes.
 
-part /boot --source bootimg-pcbios --ondisk sda --label boot --active --align 1024
-part / --source rootfs --ondisk sda --fstype=ext4 --label platform --align 1024
-part /core --source rootfs --rootfs-dir=core-image-minimal --ondisk sda --fstype=ext4 --label core --align 1024
-part /backup --source rootfs --rootfs-dir=wic-image-minimal --ondisk sda --fstype=ext4 --label backup --align 1024
+part /boot --source bootimg-pcbios --ondisk vda --label boot --active --align 1024
+part / --source rootfs --ondisk vda --fstype=ext4 --label platform --align 1024 --use-uuid
+part /mnt --source rootfs --rootfs-dir=core-image-minimal --ondisk vda --fstype=ext4 --label core --align 1024
+part backup --source rootfs --rootfs-dir=wic-image-minimal --ondisk vda --fstype=ext4 --label backup --align 1024
 
-bootloader  --timeout=0  --append="rootwait console=tty0"
+bootloader --ptable gpt --timeout=0  --append="rootwait console=tty0"

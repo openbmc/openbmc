@@ -1,0 +1,78 @@
+Fix build on musl use realpath() API its available on all libcs
+
+realpath() API doesnt work on systems with PATH_MAX set to be unlimited e.g. GNU/Hurd
+However for Linux it should always work
+
+Upstream-Status: Inappropriate[Linux specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: sysvinit-2.88dsf/src/ifdown.c
+===================================================================
+--- sysvinit-2.88dsf.orig/src/ifdown.c	2010-03-23 07:37:01.000000000 -0700
++++ sysvinit-2.88dsf/src/ifdown.c	2014-04-02 00:43:43.675437029 -0700
+@@ -26,11 +26,11 @@
+ #include <unistd.h>
+ #include <time.h>
+ #include <string.h>
++#include <errno.h>
+ 
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
+ #include <sys/time.h>
+-#include <sys/errno.h>
+ 
+ #include <net/if.h>
+ #include <netinet/in.h>
+Index: sysvinit-2.88dsf/src/init.c
+===================================================================
+--- sysvinit-2.88dsf.orig/src/init.c	2014-04-02 00:42:10.488770162 -0700
++++ sysvinit-2.88dsf/src/init.c	2014-04-02 00:42:59.432103823 -0700
+@@ -49,6 +49,7 @@
+ #include <utmp.h>
+ #include <ctype.h>
+ #include <stdarg.h>
++#include <sys/ttydefaults.h>
+ #include <sys/syslog.h>
+ #include <sys/time.h>
+ 
+Index: sysvinit-2.88dsf/src/mountpoint.c
+===================================================================
+--- sysvinit-2.88dsf.orig/src/mountpoint.c	2009-09-10 01:28:49.000000000 -0700
++++ sysvinit-2.88dsf/src/mountpoint.c	2014-04-02 00:44:18.248770942 -0700
+@@ -23,6 +23,7 @@
+  *		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+  */
+ 
++#include <sys/types.h>
+ #include <sys/stat.h>
+ #include <unistd.h>
+ #include <stdlib.h>
+Index: sysvinit-2.88dsf/src/killall5.c
+===================================================================
+--- sysvinit-2.88dsf.orig/src/killall5.c	2014-03-26 00:49:52.982668074 -0700
++++ sysvinit-2.88dsf/src/killall5.c	2014-04-02 00:46:45.838771653 -0700
+@@ -846,9 +846,9 @@
+ 	char *oargv1, *pargv1;
+ 	if ((o->argv0 && p->argv0 && !strcmp(o->argv0,p->argv0))) {
+ 		if (o->argv1 && p->argv1) {
+-			if ((oargv1 = canonicalize_file_name(o->argv1)) == NULL)
++			if ((oargv1 = realpath(o->argv1, NULL)) == NULL)
+ 				oargv1 = strdup(o->argv1);
+-			if ((pargv1 = canonicalize_file_name(p->argv1)) == NULL)
++			if ((pargv1 = realpath(p->argv1, NULL)) == NULL)
+ 				pargv1 = strdup(p->argv1);
+ 			if (! strcmp(oargv1, pargv1)) {
+ 				ret = 1;
+Index: sysvinit-2.88dsf/src/wall.c
+===================================================================
+--- sysvinit-2.88dsf.orig/src/wall.c	2009-11-22 14:05:53.000000000 -0800
++++ sysvinit-2.88dsf/src/wall.c	2014-04-02 00:49:15.258772217 -0700
+@@ -29,6 +29,7 @@
+ #include <unistd.h>
+ #include <pwd.h>
+ #include <syslog.h>
++#include <time.h>
+ #include "init.h"
+ 
+ 

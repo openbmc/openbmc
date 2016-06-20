@@ -172,6 +172,8 @@ class TaskData:
         if fnid in self.tasks_fnid:
             return
 
+        self.add_extra_deps(fn, dataCache)
+
         for task in task_deps['tasks']:
 
             # Work out task dependencies
@@ -241,6 +243,21 @@ class TaskData:
             if dep in self.failed_rdeps:
                 self.fail_fnid(fnid)
                 return
+
+    def add_extra_deps(self, fn, dataCache):
+        func = dataCache.extradepsfunc.get(fn, None)
+        if func:
+            bb.providers.buildWorldTargetList(dataCache)
+            pn = dataCache.pkg_fn[fn]
+            params = {'deps': dataCache.deps[fn],
+                      'world_target': dataCache.world_target,
+                      'pkg_pn': dataCache.pkg_pn,
+                      'self_pn': pn}
+            funcname = '_%s_calculate_extra_depends' % pn.replace('-', '_')
+            paramlist = ','.join(params.keys())
+            func = 'def %s(%s):\n%s\n\n%s(%s)' % (funcname, paramlist, func, funcname, paramlist)
+            bb.utils.better_exec(func, params)
+
 
     def have_build_target(self, target):
         """
@@ -429,7 +446,14 @@ class TaskData:
             return
 
         if not item in dataCache.providers:
-            bb.event.fire(bb.event.NoProvider(item, dependees=self.get_dependees_str(item), reasons=self.get_reasons(item), close_matches=self.get_close_matches(item, dataCache.providers.keys())), cfgData)
+            close_matches = self.get_close_matches(item, dataCache.providers.keys())
+            # Is it in RuntimeProviders ?
+            all_p = bb.providers.getRuntimeProviders(dataCache, item)
+            for fn in all_p:
+                new = dataCache.pkg_fn[fn] + " RPROVIDES " + item
+                if new not in close_matches:
+                    close_matches.append(new)
+            bb.event.fire(bb.event.NoProvider(item, dependees=self.get_dependees_str(item), reasons=self.get_reasons(item), close_matches=close_matches), cfgData)
             raise bb.providers.NoProvider(item)
 
         if self.have_build_target(item):
@@ -612,17 +636,16 @@ class TaskData:
                 break
         # self.dump_data()
 
-    def get_providermap(self):
-        virts = []
-        virtmap = {}
-
+    def get_providermap(self, prefix=None):
+        provmap = {}
         for name in self.build_names_index:
-            if name.startswith("virtual/"):
-                virts.append(name)
-        for v in virts:
-            if self.have_build_target(v):
-                virtmap[v] = self.fn_index[self.get_provider(v)[0]]
-        return virtmap
+            if prefix and not name.startswith(prefix):
+                continue
+            if self.have_build_target(name):
+                provider = self.get_provider(name)
+                if provider:
+                    provmap[name] = self.fn_index[provider[0]]
+        return provmap
 
     def dump_data(self):
         """

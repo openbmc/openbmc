@@ -204,7 +204,7 @@ def buildcfg_neededvars(d):
         bb.fatal('The following variable(s) were not set: %s\nPlease set them directly, or choose a MACHINE or DISTRO that sets them.' % ', '.join(pesteruser))
 
 addhandler base_eventhandler
-base_eventhandler[eventmask] = "bb.event.ConfigParsed bb.event.BuildStarted bb.event.RecipePreFinalise bb.runqueue.sceneQueueComplete"
+base_eventhandler[eventmask] = "bb.event.ConfigParsed bb.event.BuildStarted bb.event.RecipePreFinalise bb.runqueue.sceneQueueComplete bb.event.RecipeParsed"
 python base_eventhandler() {
     import bb.runqueue
 
@@ -230,7 +230,8 @@ python base_eventhandler() {
                     statuslines.extend(flines)
 
         statusheader = e.data.getVar('BUILDCFG_HEADER', True)
-        bb.plain('\n%s\n%s\n' % (statusheader, '\n'.join(statuslines)))
+        if statusheader:
+            bb.plain('\n%s\n%s\n' % (statusheader, '\n'.join(statuslines)))
 
     # This code is to silence warnings where the SDK variables overwrite the 
     # target ones and we'd see dulpicate key names overwriting each other
@@ -254,6 +255,24 @@ python base_eventhandler() {
             bb.debug(1, "Executing SceneQueue Completion commands: %s" % "\n".join(cmds))
             bb.build.exec_func("completion_function", e.data)
             os.remove(completions)
+
+    if isinstance(e, bb.event.RecipeParsed):
+        #
+        # If we have multiple providers of virtual/X and a PREFERRED_PROVIDER_virtual/X is set
+        # skip parsing for all the other providers which will mean they get uninstalled from the
+        # sysroot since they're now "unreachable". This makes switching virtual/kernel work in 
+        # particular.
+        #
+        pn = d.getVar('PN', True)
+        source_mirror_fetch = d.getVar('SOURCE_MIRROR_FETCH', False)
+        if not source_mirror_fetch:
+            provs = (d.getVar("PROVIDES", True) or "").split()
+            multiwhitelist = (d.getVar("MULTI_PROVIDER_WHITELIST", True) or "").split()
+            for p in provs:
+                if p.startswith("virtual/") and p not in multiwhitelist:
+                    profprov = d.getVar("PREFERRED_PROVIDER_" + p, True)
+                    if profprov and pn != profprov:
+                        raise bb.parse.SkipPackage("PREFERRED_PROVIDER_%s set to %s, not %s" % (p, profprov, pn))
 }
 
 CONFIGURESTAMPFILE = "${WORKDIR}/configure.sstate"
@@ -273,6 +292,7 @@ base_do_configure() {
 		fi
 	fi
 	if [ -n "${CONFIGURESTAMPFILE}" ]; then
+		mkdir -p `dirname ${CONFIGURESTAMPFILE}`
 		echo ${BB_TASKHASH} > ${CONFIGURESTAMPFILE}
 	fi
 }
@@ -363,7 +383,10 @@ python () {
                     newappends.append(a)
                 elif a.startswith("virtual/"):
                     subs = a.split("/", 1)[1]
-                    newappends.append("virtual/" + prefix + subs + extension)
+                    if subs.startswith(prefix):
+                        newappends.append(a + extension)
+                    else:
+                        newappends.append("virtual/" + prefix + subs + extension)
                 else:
                     if a.startswith(prefix):
                         newappends.append(a + extension)
@@ -375,11 +398,11 @@ python () {
             if not appends:
                 return
             if varname.find("DEPENDS") != -1:
-                if pn.startswith("nativesdk-"):
+                if bb.data.inherits_class('nativesdk', d) or bb.data.inherits_class('cross-canadian', d) :
                     appends = expandFilter(appends, "", "nativesdk-")
-                if pn.endswith("-native"):
+                elif bb.data.inherits_class('native', d):
                     appends = expandFilter(appends, "-native", "")
-                if mlprefix:
+                elif mlprefix:
                     appends = expandFilter(appends, "", mlprefix)
             varname = d.expand(varname)
             d.appendVar(varname, " " + " ".join(appends))
@@ -405,9 +428,12 @@ python () {
                     extraconf.append(items[1])
         appendVar('DEPENDS', extradeps)
         appendVar('RDEPENDS_${PN}', extrardeps)
-        if bb.data.inherits_class('cmake', d):
-            appendVar('EXTRA_OECMAKE', extraconf)
-        else:
+        appendVar('PACKAGECONFIG_CONFARGS', extraconf)
+
+        # TODO: once all recipes/classes abusing EXTRA_OECONF
+        # to get PACKAGECONFIG options are fixed to use PACKAGECONFIG_CONFARGS
+        # move this appendVar to autotools.bbclass.
+        if not bb.data.inherits_class('cmake', d):
             appendVar('EXTRA_OECONF', extraconf)
 
     pn = d.getVar('PN', True)
@@ -431,15 +457,26 @@ python () {
         d.setVarFlag('do_configure', 'umask', '022')
         d.setVarFlag('do_compile', 'umask', '022')
         d.appendVarFlag('do_install', 'depends', ' virtual/fakeroot-native:do_populate_sysroot')
-        d.setVarFlag('do_install', 'fakeroot', 1)
+        d.setVarFlag('do_install', 'fakeroot', '1')
         d.setVarFlag('do_install', 'umask', '022')
         d.appendVarFlag('do_package', 'depends', ' virtual/fakeroot-native:do_populate_sysroot')
-        d.setVarFlag('do_package', 'fakeroot', 1)
+        d.setVarFlag('do_package', 'fakeroot', '1')
         d.setVarFlag('do_package', 'umask', '022')
-        d.setVarFlag('do_package_setscene', 'fakeroot', 1)
+        d.setVarFlag('do_package_setscene', 'fakeroot', '1')
         d.appendVarFlag('do_package_setscene', 'depends', ' virtual/fakeroot-native:do_populate_sysroot')
-        d.setVarFlag('do_devshell', 'fakeroot', 1)
+        d.setVarFlag('do_devshell', 'fakeroot', '1')
         d.appendVarFlag('do_devshell', 'depends', ' virtual/fakeroot-native:do_populate_sysroot')
+
+    need_machine = d.getVar('COMPATIBLE_MACHINE', True)
+    if need_machine:
+        import re
+        compat_machines = (d.getVar('MACHINEOVERRIDES', True) or "").split(":")
+        for m in compat_machines:
+            if re.match(need_machine, m):
+                break
+        else:
+            raise bb.parse.SkipPackage("incompatible with machine %s (not in COMPATIBLE_MACHINE)" % d.getVar('MACHINE', True))
+
     source_mirror_fetch = d.getVar('SOURCE_MIRROR_FETCH', 0)
     if not source_mirror_fetch:
         need_host = d.getVar('COMPATIBLE_HOST', True)
@@ -448,17 +485,6 @@ python () {
             this_host = d.getVar('HOST_SYS', True)
             if not re.match(need_host, this_host):
                 raise bb.parse.SkipPackage("incompatible with host %s (not in COMPATIBLE_HOST)" % this_host)
-
-        need_machine = d.getVar('COMPATIBLE_MACHINE', True)
-        if need_machine:
-            import re
-            compat_machines = (d.getVar('MACHINEOVERRIDES', True) or "").split(":")
-            for m in compat_machines:
-                if re.match(need_machine, m):
-                    break
-            else:
-                raise bb.parse.SkipPackage("incompatible with machine %s (not in COMPATIBLE_MACHINE)" % d.getVar('MACHINE', True))
-
 
         bad_licenses = (d.getVar('INCOMPATIBLE_LICENSE', True) or "").split()
 
@@ -476,31 +502,23 @@ python () {
 
             whitelist = []
             incompatwl = []
-            htincompatwl = []
             for lic in bad_licenses:
                 spdx_license = return_spdx(d, lic)
-                for w in ["HOSTTOOLS_WHITELIST_", "LGPLv2_WHITELIST_", "WHITELIST_"]:
+                for w in ["LGPLv2_WHITELIST_", "WHITELIST_"]:
                     whitelist.extend((d.getVar(w + lic, True) or "").split())
                     if spdx_license:
                         whitelist.extend((d.getVar(w + spdx_license, True) or "").split())
                     '''
-                    We need to track what we are whitelisting and why. If pn is 
-                    incompatible and is not HOSTTOOLS_WHITELIST_ we need to be 
-                    able to note that the image that is created may infact 
-                    contain incompatible licenses despite INCOMPATIBLE_LICENSE 
-                    being set.
+                    We need to track what we are whitelisting and why. If pn is
+                    incompatible we need to be able to note that the image that
+                    is created may infact contain incompatible licenses despite
+                    INCOMPATIBLE_LICENSE being set.
                     '''
-                    if "HOSTTOOLS" in w:
-                        htincompatwl.extend((d.getVar(w + lic, True) or "").split())
-                        if spdx_license:
-                            htincompatwl.extend((d.getVar(w + spdx_license, True) or "").split())
-                    else:
-                        incompatwl.extend((d.getVar(w + lic, True) or "").split())
-                        if spdx_license:
-                            incompatwl.extend((d.getVar(w + spdx_license, True) or "").split())
+                    incompatwl.extend((d.getVar(w + lic, True) or "").split())
+                    if spdx_license:
+                        incompatwl.extend((d.getVar(w + spdx_license, True) or "").split())
 
             if not pn in whitelist:
-                recipe_license = d.getVar('LICENSE', True)
                 pkgs = d.getVar('PACKAGES', True).split()
                 skipped_pkgs = []
                 unskipped_pkgs = []
@@ -512,54 +530,71 @@ python () {
                 all_skipped = skipped_pkgs and not unskipped_pkgs
                 if unskipped_pkgs:
                     for pkg in skipped_pkgs:
-                        bb.debug(1, "SKIPPING the package " + pkg + " at do_rootfs because it's " + recipe_license)
+                        bb.debug(1, "SKIPPING the package " + pkg + " at do_rootfs because it's " + license)
                         mlprefix = d.getVar('MLPREFIX', True)
                         d.setVar('LICENSE_EXCLUSION-' + mlprefix + pkg, 1)
                     for pkg in unskipped_pkgs:
                         bb.debug(1, "INCLUDING the package " + pkg)
                 elif all_skipped or incompatible_license(d, bad_licenses):
-                    bb.debug(1, "SKIPPING recipe %s because it's %s" % (pn, recipe_license))
-                    raise bb.parse.SkipPackage("incompatible with license %s" % recipe_license)
+                    bb.debug(1, "SKIPPING recipe %s because it's %s" % (pn, license))
+                    raise bb.parse.SkipPackage("incompatible with license %s" % license)
             elif pn in whitelist:
                 if pn in incompatwl:
                     bb.note("INCLUDING " + pn + " as buildable despite INCOMPATIBLE_LICENSE because it has been whitelisted")
-                elif pn in htincompatwl:
-                    bb.note("INCLUDING " + pn + " as buildable despite INCOMPATIBLE_LICENSE because it has been whitelisted for HOSTTOOLS")
 
+    needsrcrev = False
     srcuri = d.getVar('SRC_URI', True)
-    # Svn packages should DEPEND on subversion-native
-    if "svn://" in srcuri:
-        d.appendVarFlag('do_fetch', 'depends', ' subversion-native:do_populate_sysroot')
+    for uri in srcuri.split():
+        (scheme, _ , path) = bb.fetch.decodeurl(uri)[:3]
 
-    # Git packages should DEPEND on git-native
-    if "git://" in srcuri:
-        d.appendVarFlag('do_fetch', 'depends', ' git-native:do_populate_sysroot')
+        # HTTP/FTP use the wget fetcher
+        if scheme in ("http", "https", "ftp"):
+            d.appendVarFlag('do_fetch', 'depends', ' wget-native:do_populate_sysroot')
 
-    # Mercurial packages should DEPEND on mercurial-native
-    elif "hg://" in srcuri:
-        d.appendVarFlag('do_fetch', 'depends', ' mercurial-native:do_populate_sysroot')
+        # Svn packages should DEPEND on subversion-native
+        if scheme == "svn":
+            needsrcrev = True
+            d.appendVarFlag('do_fetch', 'depends', ' subversion-native:do_populate_sysroot')
 
-    # OSC packages should DEPEND on osc-native
-    elif "osc://" in srcuri:
-        d.appendVarFlag('do_fetch', 'depends', ' osc-native:do_populate_sysroot')
+        # Git packages should DEPEND on git-native
+        elif scheme in ("git", "gitsm"):
+            needsrcrev = True
+            d.appendVarFlag('do_fetch', 'depends', ' git-native:do_populate_sysroot')
 
-    # *.lz4 should depends on lz4-native for unpacking
-    # Not endswith because of "*.patch.lz4;patch=1". Need bb.fetch.decodeurl in future
-    if '.lz4' in srcuri:
-        d.appendVarFlag('do_unpack', 'depends', ' lz4-native:do_populate_sysroot')
+        # Mercurial packages should DEPEND on mercurial-native
+        elif scheme == "hg":
+            needsrcrev = True
+            d.appendVarFlag('do_fetch', 'depends', ' mercurial-native:do_populate_sysroot')
 
-    # *.xz should depends on xz-native for unpacking
-    # Not endswith because of "*.patch.xz;patch=1". Need bb.fetch.decodeurl in future
-    if '.xz' in srcuri:
-        d.appendVarFlag('do_unpack', 'depends', ' xz-native:do_populate_sysroot')
+        # OSC packages should DEPEND on osc-native
+        elif scheme == "osc":
+            d.appendVarFlag('do_fetch', 'depends', ' osc-native:do_populate_sysroot')
 
-    # unzip-native should already be staged before unpacking ZIP recipes
-    if ".zip" in srcuri:
-        d.appendVarFlag('do_unpack', 'depends', ' unzip-native:do_populate_sysroot')
+        elif scheme == "npm":
+            d.appendVarFlag('do_fetch', 'depends', ' nodejs-native:do_populate_sysroot')
 
-    # file is needed by rpm2cpio.sh
-    if ".src.rpm" in srcuri:
-        d.appendVarFlag('do_unpack', 'depends', ' file-native:do_populate_sysroot')
+        # *.lz4 should DEPEND on lz4-native for unpacking
+        if path.endswith('.lz4'):
+            d.appendVarFlag('do_unpack', 'depends', ' lz4-native:do_populate_sysroot')
+
+        # *.lz should DEPEND on lzip-native for unpacking
+        elif path.endswith('.lz'):
+            d.appendVarFlag('do_unpack', 'depends', ' lzip-native:do_populate_sysroot')
+
+        # *.xz should DEPEND on xz-native for unpacking
+        elif path.endswith('.xz'):
+            d.appendVarFlag('do_unpack', 'depends', ' xz-native:do_populate_sysroot')
+
+        # .zip should DEPEND on unzip-native for unpacking
+        elif path.endswith('.zip'):
+            d.appendVarFlag('do_unpack', 'depends', ' unzip-native:do_populate_sysroot')
+
+        # file is needed by rpm2cpio.sh
+        elif path.endswith('.src.rpm'):
+            d.appendVarFlag('do_unpack', 'depends', ' file-native:do_populate_sysroot')
+
+    if needsrcrev:
+        d.setVar("SRCPV", "${@bb.fetch2.get_srcrev(d)}")
 
     set_packagetriplet(d)
 
@@ -612,8 +647,9 @@ addtask cleansstate after do_clean
 python do_cleansstate() {
         sstate_clean_cachefiles(d)
 }
-
 addtask cleanall after do_cleansstate
+do_cleansstate[nostamp] = "1"
+
 python do_cleanall() {
     src_uri = (d.getVar('SRC_URI', True) or "").split()
     if len(src_uri) == 0:

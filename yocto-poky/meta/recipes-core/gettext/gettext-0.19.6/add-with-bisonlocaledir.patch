@@ -1,0 +1,58 @@
+From 04bd40fe2c48c6e01ab418a04d27c4aff644ad96 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 17 Feb 2016 23:54:02 -0500
+Subject: [PATCH] m4/bison-i18n.m4: add --with-bisonlocaledir to assign
+ BISON_LOCALEDIR
+
+The variable BISON_LOCALEDIR is assigned only by the output of
+'bison --print-localedir', we add option --with-bisonlocaledir
+to assign it explicitly. It is helpful for user to split the
+native compile and cross compile.
+
+For backward compatibility, if option not used, it still
+make use of the output of 'bison --print-localedir'.
+
+Upstream-Status: Submitted [bison-patches@gnu.org]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ gettext-tools/gnulib-m4/bison-i18n.m4 | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/gettext-tools/gnulib-m4/bison-i18n.m4 b/gettext-tools/gnulib-m4/bison-i18n.m4
+index f5cfd3a..fb6ac4d 100644
+--- a/gettext-tools/gnulib-m4/bison-i18n.m4
++++ b/gettext-tools/gnulib-m4/bison-i18n.m4
+@@ -14,11 +14,16 @@ dnl sets BISON_LOCALEDIR to indicate where to find the bison-runtime.mo files
+ dnl and defines YYENABLE_NLS if there are bison-runtime.mo files at all.
+ AC_DEFUN([BISON_I18N],
+ [
++  dnl Default is not to set bisonlocaledir
++  AC_ARG_WITH([bisonlocaledir],
++    [  --with-bisonlocaledir   sets BISON_LOCALEDIR to indicate where to find the bison-runtime.mo files],
++    BISON_LOCALEDIR=$withval,
++    BISON_LOCALEDIR=)
++
+   if test -z "$USE_NLS"; then
+     echo "The BISON-I18N macro is used without being preceded by AM-GNU-GETTEXT." 1>&2
+     exit 1
+   fi
+-  BISON_LOCALEDIR=
+   BISON_USE_NLS=no
+   if test "$USE_NLS" = yes; then
+     dnl Determine bison's localedir.
+@@ -26,9 +31,10 @@ AC_DEFUN([BISON_I18N],
+     dnl But even is YACC is called "yacc", it may be a script that invokes bison
+     dnl and accepts the --print-localedir option.
+     dnl YACC's default value is empty; BISON's default value is :.
+-    if (${YACC-${BISON-:}} --print-localedir) >/dev/null 2>&1; then
++    if test -z "$BISON_LOCALEDIR" -a ${YACC-${BISON-:}} --print-localedir >/dev/null 2>&1; then
+       BISON_LOCALEDIR=`${YACC-${BISON-:}} --print-localedir`
+     fi
++    AC_MSG_RESULT([$BISON_LOCALEDIR])
+     AC_SUBST([BISON_LOCALEDIR])
+     if test -n "$BISON_LOCALEDIR"; then
+       dnl There is no need to enable internationalization if the user doesn't
+-- 
+1.9.1
+

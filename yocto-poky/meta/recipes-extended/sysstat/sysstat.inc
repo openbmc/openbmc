@@ -9,6 +9,9 @@ SRC_URI = "http://pagesperso-orange.fr/sebastien.godard/sysstat-${PV}.tar.xz \
            file://sysstat.service \
           "
 
+UPSTREAM_CHECK_URI = "http://sebastien.godard.pagesperso-orange.fr/download.html"
+UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)\.tar"
+
 DEPENDS += "base-passwd"
 
 inherit autotools-brokensep gettext systemd
@@ -49,7 +52,6 @@ pkg_postinst_${PN} () {
 
 
 FILES_${PN} += "${libdir}/sa"
-FILES_${PN}-dbg += "${libdir}/sa/.debug/"
 
 TARGET_CC_ARCH += "${LDFLAGS}"
 LDFLAGS_append_libc-uclibc = " -lintl"

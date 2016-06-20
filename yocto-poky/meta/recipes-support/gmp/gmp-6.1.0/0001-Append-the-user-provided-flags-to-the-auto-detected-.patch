@@ -1,0 +1,61 @@
+From d3b9fc523fc11260ced890c35bc5c9e6391c8656 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Mon, 14 Dec 2015 14:19:49 +0200
+Subject: [PATCH] Append the user provided flags to the auto-detected ones.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Laurentiu Palcu <laurentiu.palcu@intel.com>
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ configure.ac | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 9cedfeb..87caee5 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1921,8 +1921,12 @@ cclist=$cclist
+ EOF
+ 
+ 
+-test_CFLAGS=${CFLAGS+set}
+-test_CPPFLAGS=${CPPFLAGS+set}
++test_CFLAGS=
++test_CPPFLAGS=
++
++user_CFLAGS=$CFLAGS
++user_CPPFLAGS=$CPPFLAGS
++user_CXXFLAGS=$CXXFLAGS
+ 
+ for abi in $abilist; do
+   abi_last="$abi"
+@@ -2353,7 +2357,7 @@ AC_SUBST(CCAS)
+ # The C++ compiler, if desired.
+ want_cxx=no
+ if test $enable_cxx != no; then
+-  test_CXXFLAGS=${CXXFLAGS+set}
++  test_CXXFLAGS=
+   AC_PROG_CXX
+ 
+   echo "CXXFLAGS chosen by autoconf: $CXXFLAGS" >&AC_FD_CC
+@@ -2381,7 +2385,7 @@ if test $enable_cxx != no; then
+   # Automake includes $CPPFLAGS in a C++ compile, so we do the same here.
+   #
+   for cxxflags_choice in $cxxflags_list; do
+-    eval CXXFLAGS=\"\$cxxflags_$cxxflags_choice\"
++    eval CXXFLAGS=\"\$cxxflags_$cxxflags_choice $user_CXXFLAGS\"
+     GMP_PROG_CXX_WORKS($CXX $CPPFLAGS $CXXFLAGS,
+       [want_cxx=yes
+       break])
+@@ -2477,6 +2481,8 @@ if test "$enable_assembly" = "no"; then
+ #  done
+ fi
+ 
++CFLAGS="$CFLAGS $user_CFLAGS"
++CPPFLAGS="$CPPFLAGS $user_CPPFLAGS"
+ 
+ cat >&AC_FD_CC <<EOF
+ Decided:
+-- 
+2.6.2
+

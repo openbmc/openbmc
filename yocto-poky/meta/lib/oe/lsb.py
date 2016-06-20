@@ -62,6 +62,8 @@ def distro_identifier(adjust_hook=None):
     """Return a distro identifier string based upon lsb_release -ri,
        with optional adjustment via a hook"""
 
+    import re
+
     lsb_data = release_dict()
     if lsb_data:
         distro_id, release = lsb_data['Distributor ID'], lsb_data['Release']
@@ -76,6 +78,9 @@ def distro_identifier(adjust_hook=None):
         distro_id, release = adjust_hook(distro_id, release)
     if not distro_id:
         return "Unknown"
+    # Filter out any non-alphanumerics
+    distro_id = re.sub(r'\W', '', distro_id)
+
     if release:
         id_str = '{0}-{1}'.format(distro_id, release)
     else:

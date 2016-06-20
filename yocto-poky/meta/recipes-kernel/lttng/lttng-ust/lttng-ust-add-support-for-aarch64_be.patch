@@ -1,0 +1,17 @@
+lttng-ust: add support for aarch64_be
+
+Upstream-Status: Pending
+
+Signed-off-by: Tudor Florea <tudor.florea@enea.com>
+
+diff --ruN a/configure.ac b/configure.ac
+--- a/configure.ac	2016-02-18 14:54:54.651713647 +0100
++++ b/configure.ac	2016-02-18 14:56:11.057865297 +0100
+@@ -240,6 +240,7 @@
+ 	s390x) NO_UNALIGNED_ACCESS=1 ;;
+         arm*) NO_UNALIGNED_ACCESS=1 ;;
+ 	aarch64) NO_UNALIGNED_ACCESS=1 ;;
++        aarch64_be) NO_UNALIGNED_ACCESS=1 ;;
+ 	mips*) NO_UNALIGNED_ACCESS=1 ;;
+ 	tile*) NO_UNALIGNED_ACCESS=1 ;;
+ 	*)

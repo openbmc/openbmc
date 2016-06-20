@@ -5,10 +5,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  Makefile.SH |  145 +++++++++++++++++++++++++++--------------------------------
  1 file changed, 67 insertions(+), 78 deletions(-)
 
-diff --git a/Makefile.SH b/Makefile.SH
-index 034d812..67e08fd 100755
---- a/Makefile.SH
-+++ b/Makefile.SH
+Index: perl-5.22.1/Makefile.SH
+===================================================================
+--- perl-5.22.1.orig/Makefile.SH
++++ perl-5.22.1/Makefile.SH
 @@ -39,10 +39,10 @@ case "$useshrplib" in
  true)
  	# Prefix all runs of 'miniperl' and 'perl' with
@@ -67,6 +67,10 @@ index 034d812..67e08fd 100755
 -all: $(FIRSTMAKEFILE) $(MINIPERL_EXE) $(generated_pods) $(private) $(unidatafiles) $(public) $(dynamic_ext) $(nonxs_ext) extras.make $(MANIFEST_SRT)
 -	@echo " ";
 -	@echo "	Everything is up to date. Type '$(MAKE) test' to run test suite."
+-
+-$(MANIFEST_SRT):	MANIFEST $(PERL_EXE)
+-	@$(RUN_PERL) Porting/manisort -q || (echo "WARNING: re-sorting MANIFEST"; \
+-	    $(RUN_PERL) Porting/manisort -q -o MANIFEST; sh -c true)
 +#all: $(FIRSTMAKEFILE) $(MINIPERL_EXE) $(generated_pods) $(private) $(unidatafiles) $(public) $(dynamic_ext) $(nonxs_ext) extras.make $(MANIFEST_SRT)
 +#	@echo " ";
 +#	@echo "	Everything is up to date. Type '$(MAKE) test' to run test suite."
@@ -76,10 +80,7 @@ index 034d812..67e08fd 100755
 +more: $(generated_pods) $(private) $(public)
 +
 +more2: $(dynamic_ext)
- 
--$(MANIFEST_SRT):	MANIFEST $(PERL_EXE)
--	@$(RUN_PERL) Porting/manisort -q || (echo "WARNING: re-sorting MANIFEST"; \
--	    $(RUN_PERL) Porting/manisort -q -o MANIFEST; sh -c true)
++
 +more3: $(nonxs_ext)
 +
 +more4: extras.make $(MANIFEST_SRT)
@@ -144,7 +145,7 @@ index 034d812..67e08fd 100755
  	./$(MINIPERLEXP) makedef.pl PLATFORM=os2 -DPERL_DLL=$(PERL_DLL) CC_FLAGS="$(OPTIMIZE)" > perl5.def
  
  !NO!SUBS!
-@@ -829,7 +829,7 @@ $(LIBPERL): $& $(obj) $(DYNALOADER) $(LIBPERLEXPORT)
+@@ -829,7 +829,7 @@ $(LIBPERL): $& $(obj) $(DYNALOADER) $(LI
  	true)
  		$spitshell >>$Makefile <<'!NO!SUBS!'
  	rm -f $@
@@ -175,7 +176,7 @@ index 034d812..67e08fd 100755
  	$(MINIPERL) -f write_buildcustomize.pl    
  !NO!SUBS!
  		;;
-@@ -907,7 +911,9 @@ lib/buildcustomize.pl: $& $(mini_obj) write_buildcustomize.pl
+@@ -907,7 +911,9 @@ lib/buildcustomize.pl: $& $(mini_obj) wr
  	-@rm -f miniperl.xok
  	$(CC) $(CLDFLAGS) $(NAMESPACEFLAGS) -o $(MINIPERL_EXE) \
  	    $(mini_obj) $(libs)
@@ -186,7 +187,7 @@ index 034d812..67e08fd 100755
  	$(MINIPERL) -f write_buildcustomize.pl
  !NO!SUBS!
  		;;
-@@ -918,7 +924,9 @@ lib/buildcustomize.pl: \$& \$(mini_obj) write_buildcustomize.pl
+@@ -918,7 +924,9 @@ lib/buildcustomize.pl: \$& \$(mini_obj)
  	-@rm -f miniperl.xok
  	-@rm \$(MINIPERL_EXE)
  	\$(LNS) \$(HOST_PERL) \$(MINIPERL_EXE)
@@ -197,7 +198,7 @@ index 034d812..67e08fd 100755
  	\$(MINIPERL) -f write_buildcustomize.pl 'osname' "$osname"
  !GROK!THIS!
  		else
-@@ -927,7 +935,9 @@ lib/buildcustomize.pl: $& $(mini_obj) write_buildcustomize.pl
+@@ -927,7 +935,9 @@ lib/buildcustomize.pl: $& $(mini_obj) wr
  	-@rm -f miniperl.xok
  	$(CC) $(CLDFLAGS) -o $(MINIPERL_EXE) \
  	    $(mini_obj) $(libs)
@@ -217,7 +218,7 @@ index 034d812..67e08fd 100755
  	-@for f in Makefile.PL PPPort_pm.PL PPPort_xs.PL ppport_h.PL; do \
  	(cd ext/Devel-PPPort && `pwd`/run.sh ../../$(MINIPERL_EXE) -I../../lib \$\$f); \
  	done
-@@ -981,7 +991,7 @@ makeppport: \$(MINIPERL_EXE) \$(CONFIGPM)
+@@ -981,7 +991,7 @@ makeppport: \$(MINIPERL_EXE) \$(CONFIGPM
  *)
  $spitshell >>$Makefile <<'!NO!SUBS!'
  .PHONY: makeppport
@@ -246,7 +247,7 @@ index 034d812..67e08fd 100755
  	$(MINIPERL) lib/unicore/mktables -C lib/unicore -P pod -maketest -makelist -p
  #	Commented out so always runs, mktables looks at far more files than we
  #	can in this makefile to decide if needs to run or not
-@@ -1009,12 +1019,12 @@ uni.data: $(MINIPERL_EXE) $(CONFIGPM) lib/unicore/mktables $(nonxs_ext)
+@@ -1009,12 +1019,12 @@ uni.data: $(MINIPERL_EXE) $(CONFIGPM) li
  # $(PERL_EXE) and ext because pod_lib.pl needs Digest::MD5
  # But also this ensures that all extensions are built before we try to scan
  # them, which picks up Devel::PPPort's documentation.
@@ -262,9 +263,9 @@ index 034d812..67e08fd 100755
  	$(MINIPERL) autodoc.pl
  
  pod/perlmodlib.pod: $(MINIPERL_EXE) pod/perlmodlib.PL MANIFEST
-@@ -1024,7 +1034,7 @@ pod/perl5220delta.pod: pod/perldelta.pod
- 	$(RMS) pod/perl5220delta.pod
- 	$(LNS) perldelta.pod pod/perl5220delta.pod
+@@ -1024,7 +1034,7 @@ pod/perl5221delta.pod: pod/perldelta.pod
+ 	$(RMS) pod/perl5221delta.pod
+ 	$(LNS) perldelta.pod pod/perl5221delta.pod
  
 -extra.pods: $(MINIPERL_EXE)
 +extra.pods:
@@ -300,11 +301,11 @@ index 034d812..67e08fd 100755
  install.perl:	$(INSTALL_DEPENDENCE) installperl
 -	$(RUN_PERL) installperl --destdir=$(DESTDIR) $(INSTALLFLAGS) $(STRIPFLAGS)
 -	-@test ! -s extras.lst || PATH="`pwd`:\${PATH}" PERL5LIB="`pwd`/lib" \$(RUN_PERL) -Ilib -MCPAN -e '@ARGV&&install(@ARGV)' `cat extras.lst`
-+	./hostperl -Ifake_config_library -Ilib -MConfig installperl --destdir=$(DESTDIR) $(INSTALLFLAGS) $(STRIPFLAGS)
- 
+-
 -install.man:	all installman
 -	$(RUN_PERL) installman --destdir=$(DESTDIR) $(INSTALLFLAGS)
--
++	./hostperl -Ifake_config_library -Ilib -MConfig installperl --destdir=$(DESTDIR) $(INSTALLFLAGS) $(STRIPFLAGS)
+ 
 -# XXX Experimental. Hardwired values, but useful for testing.
 -# Eventually Configure could ask for some of these values.
 -install.html: all installhtml
@@ -337,7 +338,7 @@ index 034d812..67e08fd 100755
  	$(MINIPERL) make_ext.pl $@ $(MAKE_EXT_ARGS) MAKE="$(MAKE)" LIBPERL_A=$(LIBPERL) LINKTYPE=static $(STATIC_LDFLAGS)
  
  n_dummy $(nonxs_ext):	$(MINIPERL_EXE) lib/buildcustomize.pl preplibrary FORCE
-@@ -1405,14 +1394,14 @@ test_prep_pre: preplibrary utilities $(nonxs_ext)
+@@ -1405,14 +1394,14 @@ test_prep_pre: preplibrary utilities $(n
  
  case "$targethost" in
  '') $spitshell >>$Makefile <<'!NO!SUBS!'
@@ -354,7 +355,7 @@ index 034d812..67e08fd 100755
  	\$(dynamic_ext) \$(TEST_PERL_DLL) runtests \
  	\$(generated_pods)
  	$to libperl.*
-@@ -1465,7 +1454,7 @@ test_prep test-prep: test_prep_pre \$(MINIPERL_EXE) \$(unidatafiles) \$(PERL_EXE
+@@ -1465,7 +1454,7 @@ test_prep test-prep: test_prep_pre \$(MI
  esac
  
  $spitshell >>$Makefile <<'!NO!SUBS!'
@@ -363,12 +364,12 @@ index 034d812..67e08fd 100755
  	$(MINIPERL) make_ext.pl $(dynamic_ext_re) MAKE="$(MAKE)" LIBPERL_A=$(LIBPERL) LINKTYPE=dynamic
  	cd t && (rm -f $(PERL_EXE); $(LNS) ../$(PERL_EXE) $(PERL_EXE))
  !NO!SUBS!
-@@ -1516,7 +1505,7 @@ $spitshell >>$Makefile <<'!NO!SUBS!'
+@@ -1526,7 +1515,7 @@ minitest_prep:
  
- # Can't depend on lib/Config.pm because that might be where miniperl
- # is crashing.
--minitest: $(MINIPERL_EXE)
-+minitest:
- 	-@test -f lib/Config.pm || $(MAKE) lib/Config.pm $(unidatafiles)
- 	@echo " "
- 	@echo "You may see some irrelevant test failures if you have been unable"
+ MINITEST_TESTS = base/*.t comp/*.t cmd/*.t run/*.t io/*.t re/*.t opbasic/*.t op/*.t uni/*.t perf/*.t
+ 
+-minitest: $(MINIPERL_EXE) minitest_prep
++minitest: minitest_prep
+ 	- cd t && $(RUN_PERL) TEST $(MINITEST_TESTS) </dev/tty
+ 
+ minitest-notty minitest_notty: $(MINIPERL_EXE) minitest_prep

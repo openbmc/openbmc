@@ -1,0 +1,35 @@
+From a51f61d675a0e7d6649182c6a1325ceab8342df2 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Mon, 4 Jan 2016 22:47:29 -0800
+Subject: [PATCH] test-backface-culling.c: fix may be used uninitialized error
+
+Fixed when gcc -O:
+test-backface-culling.c:206:7: error: 'cull_front' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+|        validate_part (framebuffer,
+|        ^
+| cc1: some warnings being treated as errors
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ tests/conform/test-backface-culling.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/tests/conform/test-backface-culling.c b/tests/conform/test-backface-culling.c
+index e90c2f5..7c45592 100644
+--- a/tests/conform/test-backface-culling.c
++++ b/tests/conform/test-backface-culling.c
+@@ -164,7 +164,8 @@ validate_result (CoglFramebuffer *framebuffer, int y_offset)
+ 
+   for (draw_num = 0; draw_num < 16; draw_num++)
+     {
+-      CoglBool cull_front, cull_back;
++      CoglBool cull_front = FALSE;
++      CoglBool cull_back = FALSE;
+       CoglPipelineCullFaceMode cull_mode;
+ 
+       if (USE_LEGACY_STATE (draw_num))
+-- 
+1.7.9.5
+

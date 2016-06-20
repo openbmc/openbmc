@@ -8,6 +8,7 @@ SRC_URI = "${SAVANNAH_GNU_MIRROR}/quilt/quilt-${PV}.tar.gz \
         file://install.patch \
         file://run-ptest \
         file://Makefile \
+	file://test.sh \
 "
 
 SRC_URI[md5sum] = "fc0310db5868a0873d602d4332a76d43"
@@ -50,8 +51,9 @@ do_install_ptest() {
 	tar -cf - bin/ --exclude \*.in | ( cd ${D}${PTEST_PATH} && tar -xf - )
 	tar -cf - compat/ --exclude \*.in | ( cd ${D}${PTEST_PATH} && tar -xf - )
 	tar -cf - quilt/ --exclude \*.in | ( cd ${D}${PTEST_PATH} && tar -xf - )
-	tar -cf - test/ --exclude mail.test --exclude delete.test | ( cd ${D}${PTEST_PATH} && tar -xf - )
+	tar -cf - test/ --exclude mail.test --exclude delete.test | ( cd ${D}${PTEST_PATH} && tar -xf - && chmod 777 test)
 	cp ${WORKDIR}/Makefile ${D}${PTEST_PATH}
+	cp ${WORKDIR}/test.sh ${D}${PTEST_PATH}
 }
 
 RDEPENDS_${PN}-ptest = "make file sed gawk diffutils findutils ed perl \

@@ -14,8 +14,10 @@ DEPENDS += "zlib"
 
 SRC_URI = "git://review.coreboot.org/p/coreboot;protocol=http \
            file://cross-compile.patch   \
-           file://fix-makefile-to-find-libz.patch   \
           "
+SRC_URI_append_class-native = " \
+           file://fix-makefile-to-find-libz.patch   \
+"
 
 CLEANBROKEN = "1"
 

@@ -1,0 +1,33 @@
+From 38da4cd575edb7463cfff241afff64c2f66ea09a Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Tue, 12 Apr 2016 09:40:37 +0300
+Subject: [PATCH] desktop file: Hide the keyboard from app list
+
+matchbox-keyboard is not a normal app and there's no need to start
+it via the desktop app grid when using Sato desktop:
+* when there's no hardware keyboard, the panel applet can be used to
+  show/hide the daemonized matchbox-keyboard
+* when there is a hardware keyboard, matchbox-keyboard can still be
+  started for debug purposes from command line or the applet can be
+  enabled by editing /etc/formfactor/machconfig
+
+So hide the keyboard from the desktop app list.
+
+Upstream-Status: Inappropriate [configuration]
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ matchbox-keyboard.desktop | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/matchbox-keyboard.desktop b/matchbox-keyboard.desktop
+index c092bfe..613d349 100644
+--- a/matchbox-keyboard.desktop
++++ b/matchbox-keyboard.desktop
+@@ -6,3 +6,4 @@ Type=Application
+ Icon=matchbox-keyboard.png
+ Categories=Panel;Utility;MB
+ X-MB-INPUT-MECHANSIM=True
++NoDisplay=true
+-- 
+2.1.4
+

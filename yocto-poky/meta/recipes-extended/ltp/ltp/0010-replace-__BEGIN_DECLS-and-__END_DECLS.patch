@@ -1,0 +1,73 @@
+From 0130f4146ced320aadb01b22e36b13d269a8ebba Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 7 Jan 2016 19:48:14 +0000
+Subject: [PATCH 10/32] replace __BEGIN_DECLS and __END_DECLS
+
+They are not portable across libc implementations
+therefore replace them with expanded macros
+
+Include <asm-generic/types.h> to get __s32 definitions
+its not a generally available typedef
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ testcases/kernel/syscalls/epoll2/include/epoll.h | 8 ++++++--
+ utils/sctp/include/netinet/sctp.h                | 9 +++++++--
+ 2 files changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/testcases/kernel/syscalls/epoll2/include/epoll.h b/testcases/kernel/syscalls/epoll2/include/epoll.h
+index be599c7..8cc5e7e 100644
+--- a/testcases/kernel/syscalls/epoll2/include/epoll.h
++++ b/testcases/kernel/syscalls/epoll2/include/epoll.h
+@@ -85,7 +85,9 @@ struct epoll_event
+ } EPOLL_PACKED;
+ 
+ 
+-__BEGIN_DECLS
++#ifdef __cplusplus
++extern "C" {
++#endif
+ 
+ /* Creates an epoll instance.  Returns an fd for the new instance.
+    The "size" parameter is a hint specifying the number of file
+@@ -114,6 +116,8 @@ extern int epoll_ctl (int __epfd, int __op, int __fd,
+ extern int epoll_wait (int __epfd, struct epoll_event *__events,
+ 		       int __maxevents, int __timeout) __THROW;
+ 
+-__END_DECLS
++#ifdef __cplusplus
++}
++#endif
+ 
+ #endif /* sys/epoll.h */
+diff --git a/utils/sctp/include/netinet/sctp.h b/utils/sctp/include/netinet/sctp.h
+index 51f5bfb..c61aef3 100644
+--- a/utils/sctp/include/netinet/sctp.h
++++ b/utils/sctp/include/netinet/sctp.h
+@@ -35,9 +35,12 @@
+ 
+ #include <stdint.h>
+ #include <linux/types.h>
++#include <asm-generic/types.h>
+ #include <sys/socket.h>
+ 
+-__BEGIN_DECLS
++#ifdef __cplusplus
++extern "C" {
++#endif
+ 
+ typedef __s32 sctp_assoc_t;
+ 
+@@ -862,6 +865,8 @@ int sctp_recvmsg(int s, void *msg, size_t len, struct sockaddr *from,
+ /* Return the address length for an address family. */
+ int sctp_getaddrlen(sa_family_t family);
+ 
+-__END_DECLS
++#ifdef __cplusplus
++}
++#endif
+ 
+ #endif /* __linux_sctp_h__ */
+-- 
+2.7.0
+

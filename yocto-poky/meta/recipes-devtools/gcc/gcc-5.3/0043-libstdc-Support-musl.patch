@@ -1,0 +1,44 @@
+From df430b943a2df6b72054c808d4b93338a82562de Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 8 Dec 2015 08:23:34 +0000
+Subject: [PATCH 43/46] libstdc++: Support musl
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libstdc++-v3/configure.host | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/libstdc++-v3/configure.host b/libstdc++-v3/configure.host
+index 640199c..1756444 100644
+--- a/libstdc++-v3/configure.host
++++ b/libstdc++-v3/configure.host
+@@ -274,14 +274,24 @@ case "${host_os}" in
+     os_include_dir="os/bsd/freebsd"
+     ;;
+   gnu* | linux* | kfreebsd*-gnu | knetbsd*-gnu)
++    # check for musl by target
++    case "${host_os}" in
++      *-musl*)
++        os_include_dir="os/generic"
++        ;;
++      *)
+     if [ "$uclibc" = "yes" ]; then
+       os_include_dir="os/uclibc"
+     elif [ "$bionic" = "yes" ]; then
+       os_include_dir="os/bionic"
++    elif [ "$musl" = "yes" ]; then
++      os_include_dir="os/generic"
+     else
+       os_include_dir="os/gnu-linux"
+     fi
+     ;;
++    esac
++    ;;
+   hpux*)
+     os_include_dir="os/hpux"
+     ;;
+-- 
+2.6.3
+

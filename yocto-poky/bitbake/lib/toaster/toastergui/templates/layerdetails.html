@@ -8,9 +8,8 @@
 
 <div class="section">
   <ul class="breadcrumb">
-    <li class="muted">{{project.name}}:</li>
     <li>
-      <a href="{% url 'project' project.id %}">Configuration</a>
+      <a href="{% url 'project' project.id %}">{{project.name}}</a>
       <span class="divider">&rarr;</span>
     </li>
     <li><a href="{% url 'projectlayers' project.id %}">Compatible layers</a>
@@ -46,7 +45,6 @@
 
   $(document).ready(function (){
     var ctx = {
-      projectBuildsUrl : "{% url 'projectbuilds' project.id %}",
       xhrUpdateLayerUrl : "{% url 'xhr_updatelayer' %}",
       layerVersion : {
         name : "{{layerversion.layer.name}}",
@@ -108,7 +106,7 @@
       {% else %}
       <button id="add-remove-layer-btn" data-directive="remove" class="btn btn-block btn-large btn-danger">
         <span class="icon-trash"></span>
-        Delete the {{layerversion.layer.name}} layer from your project
+        Remove the {{layerversion.layer.name}} layer from your project
       </button>
       {% endif %}
     </span>
@@ -156,7 +154,7 @@
             </dd>
             <dt>
               <i class="icon-question-sign get-help" title="The Git branch, tag or commit"></i>
-              Revision
+              Git revision
             </dt>
             <dd>
               <span class="current-value">{{layerversion.get_vcs_reference}}</span>

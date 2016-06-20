@@ -21,7 +21,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/hdparm/${BP}.tar.gz "
 SRC_URI[md5sum] = "213efdbe7471fad3408198918e164354"
 SRC_URI[sha256sum] = "ce97b4a71cb04146f54cf6f69787e7f97ddfda9836dc803b459d3b3df3a4fbee"
 
-EXTRA_OEMAKE += 'STRIP="echo"'
+EXTRA_OEMAKE = '-e MAKEFLAGS= STRIP="echo"'
 
 inherit update-alternatives
 

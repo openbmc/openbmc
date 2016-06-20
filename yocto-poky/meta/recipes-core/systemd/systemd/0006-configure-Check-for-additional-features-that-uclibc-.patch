@@ -1,0 +1,48 @@
+From bb6f1d8a000b337280541afde7cccdcfe03cdeb1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 20 Feb 2015 05:05:45 +0000
+Subject: [PATCH 06/36] configure: Check for additional features that uclibc
+ doesnt support
+
+This helps in supporting uclibc which does not have all features that
+glibc might have
+
+Upstream-Status: Denied [no desire for uclibc support]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index f51533c..0239fd0 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -112,6 +112,24 @@ AC_PATH_PROG([UMOUNT_PATH], [umount], [/usr/bin/umount], [$PATH:/usr/sbin:/sbin]
+ 
+ AS_IF([! ln --relative --help > /dev/null 2>&1], [AC_MSG_ERROR([*** ln doesn't support --relative ***])])
+ 
++# check for few functions not implemented in uClibc
++
++AC_CHECK_FUNCS_ONCE(mkostemp execvpe posix_fallocate)
++
++# check for %ms format support - assume always no if cross compiling
++
++AC_MSG_CHECKING([whether %ms format is supported by *scanf])
++
++AC_LINK_IFELSE(
++	[AC_LANG_PROGRAM([
++	 #include <stdio.h>
++	 ],[
++	    char *buf1, *buf2, *buf3, str="1 2.3 abcde" ;
++	    int rc = sscanf(str, "%ms %ms %ms", &buf1, &buf2, &buf3) ;
++	    return (rc==3)?0:1;])],
++	[AC_DEFINE([HAVE_MSFORMAT], [1], [Define if %ms format is supported by *scanf.])],
++	[AC_MSG_RESULT([no])])
++
+ M4_DEFINES=
+ 
+ AC_CHECK_TOOL(OBJCOPY, objcopy)
+-- 
+1.8.3.1
+

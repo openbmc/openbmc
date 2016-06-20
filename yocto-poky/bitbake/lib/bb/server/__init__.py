@@ -63,6 +63,9 @@ class BitBakeBaseServerConnection():
     def terminate(self):
         pass
 
+    def setupEventQueue(self):
+        pass
+
 
 """ BitBakeBaseServer class is the common ancestor to all Bitbake servers
 

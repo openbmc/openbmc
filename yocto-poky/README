@@ -42,7 +42,7 @@ documentation:
     Git repository: http://git.yoctoproject.org/cgit/cgit.cgi/yocto-docs/
     Mailing list: yocto@yoctoproject.org
 
-meta-yocto(-bsp):
+meta-poky, meta-yocto-bsp:
     Git repository: http://git.yoctoproject.org/cgit/cgit.cgi/meta-yocto(-bsp)
     Mailing list: poky@yoctoproject.org
 

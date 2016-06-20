@@ -1,0 +1,60 @@
+The check for solaris 'print' causes significant problems on a linux machine
+with dash as /bin/sh since it triggers the execution of "print" which on some 
+linux systems is a perl script which is part of mailcap. Worse, this perl 
+script calls "which file" and if successful ignores the path file was found 
+in and just runs "file" without a path. Each exection causes PATH to be searched.
+
+Simply assuming the shell's printf function works cuts out all the fork overhead
+and when parallel tasks are running, this overhead appears to be significant.
+
+RP
+2015/11/28
+Upstream-Status: Inappropriate
+
+Index: autoconf-2.69/lib/m4sugar/m4sh.m4
+===================================================================
+--- autoconf-2.69.orig/lib/m4sugar/m4sh.m4
++++ autoconf-2.69/lib/m4sugar/m4sh.m4
+@@ -1045,40 +1045,8 @@ m4_defun([_AS_ECHO_PREPARE],
+ [[as_nl='
+ '
+ export as_nl
+-# Printing a long string crashes Solaris 7 /usr/bin/printf.
+-as_echo='\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'
+-as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo
+-as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo$as_echo
+-# Prefer a ksh shell builtin over an external printf program on Solaris,
+-# but without wasting forks for bash or zsh.
+-if test -z "$BASH_VERSION$ZSH_VERSION" \
+-    && (test "X`print -r -- $as_echo`" = "X$as_echo") 2>/dev/null; then
+-  as_echo='print -r --'
+-  as_echo_n='print -rn --'
+-elif (test "X`printf %s $as_echo`" = "X$as_echo") 2>/dev/null; then
+-  as_echo='printf %s\n'
+-  as_echo_n='printf %s'
+-else
+-  if test "X`(/usr/ucb/echo -n -n $as_echo) 2>/dev/null`" = "X-n $as_echo"; then
+-    as_echo_body='eval /usr/ucb/echo -n "$][1$as_nl"'
+-    as_echo_n='/usr/ucb/echo -n'
+-  else
+-    as_echo_body='eval expr "X$][1" : "X\\(.*\\)"'
+-    as_echo_n_body='eval
+-      arg=$][1;
+-      case $arg in @%:@(
+-      *"$as_nl"*)
+-	expr "X$arg" : "X\\(.*\\)$as_nl";
+-	arg=`expr "X$arg" : ".*$as_nl\\(.*\\)"`;;
+-      esac;
+-      expr "X$arg" : "X\\(.*\\)" | tr -d "$as_nl"
+-    '
+-    export as_echo_n_body
+-    as_echo_n='sh -c $as_echo_n_body as_echo'
+-  fi
+-  export as_echo_body
+-  as_echo='sh -c $as_echo_body as_echo'
+-fi
++as_echo='printf %s\n'
++as_echo_n='printf %s'
+ ]])# _AS_ECHO_PREPARE
+ 
+ 

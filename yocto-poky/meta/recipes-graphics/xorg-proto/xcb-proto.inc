@@ -9,17 +9,18 @@ BUGTRACKER = "https://bugs.freedesktop.org/enter_bug.cgi?product=XCB"
 SECTION = "x11/libs"
 LICENSE = "MIT-X"
 
-SRC_URI = "http://xcb.freedesktop.org/dist/xcb-proto-${PV}.tar.bz2"
+SRC_URI = "http://xcb.freedesktop.org/dist/xcb-proto-${PV}.tar.bz2 \
+           file://no-python-native.patch"
 
-inherit autotools pkgconfig pythonnative
+inherit autotools pkgconfig
 
 PACKAGES += "python-xcbgen"
 
+FILES_${PN} = ""
 FILES_${PN}-dev += "${datadir}/xcb/*.xml ${datadir}/xcb/*.xsd"
-FILES_python-xcbgen = "${libdir}/python*"
+FILES_python-xcbgen = "${libdir}/xcb-proto"
 
 RDEPENDS_${PN}-dev = ""
 RRECOMMENDS_${PN}-dbg = "${PN}-dev (= ${EXTENDPKGV})"
 
-DEPENDS_append_class-native = " python-native"
 BBCLASSEXTEND = "native nativesdk"

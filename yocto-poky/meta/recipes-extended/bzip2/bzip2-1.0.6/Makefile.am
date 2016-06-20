@@ -1,5 +1,6 @@
 
 lib_LTLIBRARIES = libbz2.la
+libbz2_la_LDFLAGS = -version-info 1:6:0
 
 libbz2_la_SOURCES = blocksort.c  \
                     huffman.c    \

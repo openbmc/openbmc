@@ -19,11 +19,11 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #
-# Normally this is called as '. ./oe-init-build-env builddir <portnumber> <builddir>'
+# Normally this is called as '. ./oe-init-build-env-memres <portnumber> <builddir>'
 #
-# This works in most shells (not dash), but not all of them pass arg1 when
-# being sourced.   To workaround the shell limitation use "set arg1" prior 
-# to sourcing this script.
+# This works in most shells (not dash), but not all of them pass the arguments
+# when being sourced.  To workaround the shell limitation use "set <portnumber>
+# <builddir>" prior to sourcing this script.
 #
 if [ -z "$1" ]; then
     echo "No port specified, using dynamically selected port"
@@ -34,51 +34,57 @@ else
 fi
 
 if [ -n "$BASH_SOURCE" ]; then
-  OEROOT="`dirname $BASH_SOURCE`"
+    THIS_SCRIPT=$BASH_SOURCE
 elif [ -n "$ZSH_NAME" ]; then
-  OEROOT="`dirname $0`"
+    THIS_SCRIPT=$0
 else
-  OEROOT="`pwd`"
+    THIS_SCRIPT="$(pwd)/oe-init-build-env"
 fi
 if [ -n "$BBSERVER" ]; then
-  unset BBSERVER
+    unset BBSERVER
 fi
 
-THIS_SCRIPT=$OEROOT/oe-init-build-env-memres
-if [ -z "$ZSH_NAME" ] && [ "x$0" = "x$THIS_SCRIPT" ]; then
-   echo "Error: This script needs to be sourced. Please run as '. $THIS_SCRIPT'"
-   exit 1
+if [ -z "$ZSH_NAME" ] && [ "$0" = "$THIS_SCRIPT" ]; then
+    echo "Error: This script needs to be sourced. Please run as '. $THIS_SCRIPT'"
+    exit 1
 fi
 
-OEROOT=`readlink -f "$OEROOT"`
-export OEROOT
-. $OEROOT/scripts/oe-buildenv-internal && \
-    $OEROOT/scripts/oe-setup-builddir && \
-    [ -n "$BUILDDIR" ] && cd $BUILDDIR
-unset OEROOT
-unset BBPATH
+if [ -z "$OEROOT" ]; then
+    OEROOT=$(dirname "$THIS_SCRIPT")
+    OEROOT=$(readlink -f "$OEROOT")
+fi
 unset THIS_SCRIPT
 
+export OEROOT
+. $OEROOT/scripts/oe-buildenv-internal &&
+    TEMPLATECONF="$TEMPLATECONF" $OEROOT/scripts/oe-setup-builddir || {
+    unset OEROOT
+    return 1
+}
+unset OEROOT
+
+[ -z "$BUILDDIR" ] || cd "$BUILDDIR"
+
 res=1
-if [ -e bitbake.lock ] && grep : bitbake.lock > /dev/null ; then
-    BBSERVER=`cat bitbake.lock` bitbake --status-only
+if [ -e bitbake.lock ] && grep : bitbake.lock > /dev/null; then
+    BBSERVER=$(cat bitbake.lock) bitbake --status-only
     res=$?
 fi
 
-if [ $res != 0 ] ; then
+if [ $res != 0 ]; then
     bitbake --server-only -t xmlrpc -B localhost:$port
 fi
 
-if [ $port = -1 ] ; then
+if [ $port = -1 ]; then
     export BBSERVER=localhost:-1
     echo "Bitbake server started on demand as needed, use bitbake -m to shut it down"
 else
-    export BBSERVER=`cat bitbake.lock`
+    export BBSERVER=$(cat bitbake.lock)
 
-    if [ $res = 0 ] ; then
-	echo "Using existing bitbake server at: $BBSERVER, use bitbake -m to shut it down"
+    if [ $res = 0 ]; then
+        echo "Using existing bitbake server at: $BBSERVER, use bitbake -m to shut it down"
     else
-	echo "Bitbake server started at: $BBSERVER, use bitbake -m to shut it down"
+        echo "Bitbake server started at: $BBSERVER, use bitbake -m to shut it down"
     fi
-    unset res
 fi
+unset port res

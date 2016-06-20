@@ -35,6 +35,8 @@ do_compile_prepend () {
 inherit autotools texinfo
 EXTRA_AUTORECONF = "--exclude=libtoolize"
 
+CACHED_CONFIGUREVARS += "ac_cv_path_GREP=grep"
+
 DEPENDS = "libtool-native"
 
 PACKAGES =+ "libltdl"

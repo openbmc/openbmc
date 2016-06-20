@@ -9,6 +9,9 @@ TARGET_CC_ARCH_append_libc-musl = " -mmusl"
 # This function creates an environment-setup-script for use in a deployable SDK
 toolchain_create_sdk_env_script () {
 	# Create environment setup script
+	base_sbindir=${10:-${base_sbindir_nativesdk}}
+	base_bindir=${9:-${base_bindir_nativesdk}}
+	sbindir=${8:-${sbindir_nativesdk}}
 	sdkpathnative=${7:-${SDKPATHNATIVE}}
 	prefix=${6:-${prefix_nativesdk}}
 	bindir=${5:-${bindir_nativesdk}}
@@ -23,7 +26,7 @@ toolchain_create_sdk_env_script () {
 	for i in ${CANADIANEXTRAOS}; do
 		EXTRAPATH="$EXTRAPATH:$sdkpathnative$bindir/${TARGET_ARCH}${TARGET_VENDOR}-$i"
 	done
-	echo "export PATH=$sdkpathnative$bindir:$sdkpathnative$bindir/../${HOST_SYS}/bin:$sdkpathnative$bindir/${TARGET_SYS}"$EXTRAPATH':$PATH' >> $script
+	echo "export PATH=$sdkpathnative$bindir:$sdkpathnative$sbindir:$sdkpathnative$base_bindir:$sdkpathnative$base_sbindir:$sdkpathnative$bindir/../${HOST_SYS}/bin:$sdkpathnative$bindir/${TARGET_SYS}"$EXTRAPATH':$PATH' >> $script
 	echo "export CCACHE_PATH=$sdkpathnative$bindir:$sdkpathnative$bindir/../${HOST_SYS}/bin:$sdkpathnative$bindir/${TARGET_SYS}"$EXTRAPATH':$CCACHE_PATH' >> $script
 	echo 'export PKG_CONFIG_SYSROOT_DIR=$SDKTARGETSYSROOT' >> $script
 	echo 'export PKG_CONFIG_PATH=$SDKTARGETSYSROOT'"$libdir"'/pkgconfig' >> $script
@@ -31,7 +34,6 @@ toolchain_create_sdk_env_script () {
 	echo "export OECORE_NATIVE_SYSROOT=\"$sdkpathnative\"" >> $script
 	echo 'export OECORE_TARGET_SYSROOT="$SDKTARGETSYSROOT"' >> $script
 	echo "export OECORE_ACLOCAL_OPTS=\"-I $sdkpathnative/usr/share/aclocal\"" >> $script
-	echo "export PYTHONHOME=$sdkpathnative$prefix" >> $script
 	echo 'unset command_not_found_handle' >> $script
 
 	toolchain_shared_env_script

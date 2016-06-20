@@ -11,7 +11,7 @@ SRC_URI = "file://rpmresolve.c"
 S = "${WORKDIR}"
 
 do_compile() {
-	${CC} ${CFLAGS} -ggdb -I${STAGING_INCDIR}/rpm ${LDFLAGS} rpmresolve.c -o rpmresolve -lrpmbuild -lrpm -lrpmio -lrpmdb -lpopt
+	${CC} ${CFLAGS} -ggdb -I${STAGING_INCDIR}/rpm ${LDFLAGS} rpmresolve.c -o rpmresolve -lrpmbuild -lrpm -lrpmio -lrpmdb
 }
 
 do_install() {

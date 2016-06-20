@@ -12,6 +12,8 @@ SRC_URI = "http://www.mpfr.org/mpfr-${PV}/mpfr-${PV}.tar.xz \
 SRC_URI[md5sum] = "6969398cd2fbc56a6af570b5273c56a9"
 SRC_URI[sha256sum] = "6835a08bd992c8257641791e9a6a2b35b02336c8de26d0a8577953747e514a16"
 
+UPSTREAM_CHECK_URI = "http://www.mpfr.org/mpfr-current/"
+
 S = "${WORKDIR}/mpfr-${PV}"
 
 BBCLASSEXTEND = "native nativesdk"
