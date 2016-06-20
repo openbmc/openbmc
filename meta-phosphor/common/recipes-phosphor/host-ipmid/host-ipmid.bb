@@ -17,7 +17,8 @@ TARGET_CFLAGS   += "-fpic"
 RDEPENDS_${PN} += "clear-once"
 RDEPENDS_${PN} += "settings"
 RDEPENDS_${PN} += "network"
-SRC_URI += "git://github.com/openbmc/phosphor-host-ipmid"
+SRC_URI += "git://github.com/openbmc/phosphor-host-ipmid \
+            file://whitelist.conf"
 
 SRCREV = "092360e55605c205aedd2ab40044c42e64b7d38c"
 
@@ -26,8 +27,10 @@ INSTALL_NAME = "ipmid"
 
 do_install() {
         install -m 0755 -d ${D}${libdir}/host-ipmid
+        install -m 0755 -d ${D}${datadir}/host-ipmid
         install -m 0755 ${S}/*.so ${D}${libdir}/host-ipmid/
 
         install -m 0755 -d ${D}${includedir}/host-ipmid
         install -m 0644 ${S}/ipmid-api.h ${D}${includedir}/host-ipmid/
+        install -m 0644 ${WORKDIR}/whitelist.conf ${D}${datadir}/host-ipmid
 }
