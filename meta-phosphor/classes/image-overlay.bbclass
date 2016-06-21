@@ -14,7 +14,7 @@ IMAGE_TYPES_MASKED += "overlay"
 
 ROOTFS ?= "${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}-${MACHINE}.${IMAGE_BASETYPE}"
 
-do_generate_flash[depends] += "${INITRD_IMAGE}:do_rootfs"
-do_generate_flash[depends] += "${PN}:do_rootfs"
+do_generate_flash[depends] += "${INITRD_IMAGE}:do_image_complete"
+do_generate_flash[depends] += "${PN}:do_image_complete"
 
 addtask generate_flash before do_build
