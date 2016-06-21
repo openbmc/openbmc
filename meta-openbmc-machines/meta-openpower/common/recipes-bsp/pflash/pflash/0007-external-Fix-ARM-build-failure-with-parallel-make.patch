@@ -1,0 +1,28 @@
+From 55749b091414e0cf2691bd8f72c4cb48235b51c3 Mon Sep 17 00:00:00 2001
+From: Brad Bishop <bradleyb@fuzziesquirrel.com>
+Date: Mon, 20 Jun 2016 20:31:07 -0400
+Subject: [PATCH] external: Fix ARM build failure with parallel make
+
+Arch headers need to be linked in before compiling.
+
+Signed-off-by: Brad Bishop <bradleyb@fuzziesquirrel.com>
+---
+ external/common/rules.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/external/common/rules.mk b/external/common/rules.mk
+index 5558cd3..bb12fd5 100644
+--- a/external/common/rules.mk
++++ b/external/common/rules.mk
+@@ -67,7 +67,7 @@ arch_clean:
+ 
+ $(ARCH_SRC): | common
+ 
+-$(ARCH_OBJS): common-%.o: common/%.c
++$(ARCH_OBJS): common-%.o: common/%.c $(ARCH_LINKS)
+ 	$(Q_CC)$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+ 
+ common-arch_flash.o: $(ARCH_OBJS)
+-- 
+1.8.3.1
+

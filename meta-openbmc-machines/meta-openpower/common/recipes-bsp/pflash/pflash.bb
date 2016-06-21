@@ -11,6 +11,7 @@ SRC_URI += "file://0003-external-Fix-pflash-install-target.patch"
 SRC_URI += "file://0004-external-Remove-m64-from-shared-CFLAGS-on-ARM.patch"
 SRC_URI += "file://0005-external-Create-shared-rules.mk.patch"
 SRC_URI += "file://0006-external-Add-dynamically-linked-pflash.patch"
+SRC_URI += "file://0007-external-Fix-ARM-build-failure-with-parallel-make.patch"
 
 LIC_FILES_CHKSUM = "file://${S}/LICENCE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
