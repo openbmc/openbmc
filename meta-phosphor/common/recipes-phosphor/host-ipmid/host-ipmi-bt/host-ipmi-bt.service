@@ -1,9 +1,0 @@
-[Unit]
-Description=Phosphor OpenBMC BT to DBUS 
-
-[Service]
-Restart=always
-ExecStart=/usr/sbin/host-ipmi-bt
-
-[Install]
-WantedBy=multi-user.target
