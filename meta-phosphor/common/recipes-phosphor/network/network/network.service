@@ -1,7 +1,5 @@
 [Unit]
 Description=Network DBUS object
-Requires=skeleton.service
-After=skeleton.service
 
 [Service]
 ExecStart=/usr/sbin/netman.py
