@@ -1,0 +1,23 @@
+Upstream-Status: Accepted [https://bugzilla.gnome.org/show_bug.cgi?id=691101]
+
+Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
+diff -Nurd pygobject-2.27.91/configure.ac pygobject-2.27.91/configure.ac
+--- pygobject-2.27.91/configure.ac	2011-02-23 22:14:37.000000000 +0200
++++ pygobject-2.27.91/configure.ac	2013-01-03 05:13:44.034949954 +0200
+@@ -35,7 +35,7 @@
+ AC_DEFINE(PYGOBJECT_MICRO_VERSION, pygobject_micro_version, [pygobject micro version])
+ AC_SUBST(PYGOBJECT_MICRO_VERSION, pygobject_micro_version)
+
+-AM_CONFIG_HEADER(config.h)
++AC_CONFIG_HEADERS(config.h)
+ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES(yes)])
+ AM_INIT_AUTOMAKE(foreign)
+ AM_MAINTAINER_MODE
+@@ -82,7 +82,6 @@
+ m4_ifdef([LT_OUTPUT], [LT_OUTPUT])
+ AC_ISC_POSIX
+ AC_PROG_CC
+-AM_PROG_CC_STDC
+ AM_PROG_CC_C_O
+
+ # check that we have the minimum version of python necisary to build
