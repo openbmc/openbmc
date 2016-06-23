@@ -1,4 +1,5 @@
-PACKAGECONFIG += "networkd"
+PACKAGECONFIG_append = " networkd"
+PACKAGECONFIG_remove = "machined hibernate ldconfig binfmt backlight quotacheck localed kdbus ima smack polkit"
 FILESEXTRAPATHS_append := "${THISDIR}/${PN}:"
 SRC_URI += "file://default.network"
 
