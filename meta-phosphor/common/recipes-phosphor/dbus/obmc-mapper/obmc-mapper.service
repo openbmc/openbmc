@@ -6,6 +6,7 @@ Restart=always
 Type=dbus
 ExecStart=/usr/sbin/phosphor-mapper
 BusName=org.openbmc.ObjectMapper
+TimeoutStartSec=300
 
 [Install]
 WantedBy=multi-user.target
