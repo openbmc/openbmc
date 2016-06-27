@@ -14,6 +14,7 @@ INITRD_IMAGE_LOADADDRESS ?= "${INITRD_IMAGE_ENTRYPOINT}"
 INITRD_LINK_NAME = "${INITRD_IMAGE}-${MACHINE}${INITRAMFS_FSTYPE}"
 
 FLASH_IMAGE_NAME ?= "flash-${MACHINE}-${DATETIME}"
+FLASH_IMAGE_NAME[vardepsexclude] = "DATETIME"
 FLASH_IMAGE_LINK ?= "flash-${MACHINE}"
 
 FLASH_UBOOT_OFFSET ?= "0"
@@ -95,3 +96,4 @@ do_generate_flash() {
        tar -h -cvf ${ddir}/${MACHINE}-${DATETIME}.all.tar -C ${ddir} image-bmc
        tar -h -cvf ${ddir}/${MACHINE}-${DATETIME}.tar -C ${ddir} image-u-boot image-kernel image-initramfs image-rofs image-rwfs
 }
+do_generate_flash[vardepsexclude] = "DATETIME"

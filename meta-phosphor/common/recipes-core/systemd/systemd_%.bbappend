@@ -1,7 +1,7 @@
-PACKAGECONFIG += "networkd"
+PACKAGECONFIG_append = " networkd"
+PACKAGECONFIG_remove = "machined hibernate ldconfig binfmt backlight quotacheck localed kdbus ima smack polkit"
 FILESEXTRAPATHS_append := "${THISDIR}/${PN}:"
 SRC_URI += "file://default.network"
-SRC_URI += "file://0100-systemd_networkd_dbus_setaddress.patch"
 
 FILES_${PN} += "${libdir}/systemd/network/default.network"
 
