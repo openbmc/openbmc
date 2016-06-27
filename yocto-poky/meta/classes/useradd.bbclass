@@ -50,14 +50,14 @@ fi
 
 # Perform group additions first, since user additions may depend
 # on these groups existing
-if test "x$GROUPADD_PARAM" != "x"; then
+if test "x`echo $GROUPADD_PARAM | tr -d '[:space:]'`" != "x"; then
 	echo "Running groupadd commands..."
 	# Invoke multiple instances of groupadd for parameter lists
 	# separated by ';'
 	opts=`echo "$GROUPADD_PARAM" | cut -d ';' -f 1`
 	remaining=`echo "$GROUPADD_PARAM" | cut -d ';' -f 2-`
 	while test "x$opts" != "x"; do
-		perform_groupadd "$SYSROOT" "$OPT $opts" 10
+		perform_groupadd "$SYSROOT" "$OPT $opts"
 		if test "x$opts" = "x$remaining"; then
 			break
 		fi
@@ -66,14 +66,14 @@ if test "x$GROUPADD_PARAM" != "x"; then
 	done
 fi 
 
-if test "x$USERADD_PARAM" != "x"; then
+if test "x`echo $USERADD_PARAM | tr -d '[:space:]'`" != "x"; then
 	echo "Running useradd commands..."
 	# Invoke multiple instances of useradd for parameter lists
 	# separated by ';'
 	opts=`echo "$USERADD_PARAM" | cut -d ';' -f 1`
 	remaining=`echo "$USERADD_PARAM" | cut -d ';' -f 2-`
 	while test "x$opts" != "x"; do
-		perform_useradd "$SYSROOT" "$OPT $opts" 10
+		perform_useradd "$SYSROOT" "$OPT $opts"
 		if test "x$opts" = "x$remaining"; then
 			break
 		fi
@@ -82,14 +82,14 @@ if test "x$USERADD_PARAM" != "x"; then
 	done
 fi
 
-if test "x$GROUPMEMS_PARAM" != "x"; then
+if test "x`echo $GROUPMEMS_PARAM | tr -d '[:space:]'`" != "x"; then
 	echo "Running groupmems commands..."
 	# Invoke multiple instances of groupmems for parameter lists
 	# separated by ';'
 	opts=`echo "$GROUPMEMS_PARAM" | cut -d ';' -f 1`
 	remaining=`echo "$GROUPMEMS_PARAM" | cut -d ';' -f 2-`
 	while test "x$opts" != "x"; do
-		perform_groupmems "$SYSROOT" "$OPT $opts" 10
+		perform_groupmems "$SYSROOT" "$OPT $opts"
 		if test "x$opts" = "x$remaining"; then
 			break
 		fi
@@ -126,6 +126,35 @@ useradd_sysroot_sstate () {
 		useradd_sysroot
 	fi
 }
+
+userdel_sysroot_sstate () {
+if test "x${STAGING_DIR_TARGET}" != "x"; then
+    if [ "${BB_CURRENTTASK}" = "configure" -o "${BB_CURRENTTASK}" = "clean" ]; then
+        export PSEUDO="${FAKEROOTENV} PSEUDO_LOCALSTATEDIR=${STAGING_DIR_TARGET}${localstatedir}/pseudo ${STAGING_DIR_NATIVE}${bindir}/pseudo"
+        OPT="--root ${STAGING_DIR_TARGET}"
+
+        # Remove groups and users defined for package
+        GROUPADD_PARAM="${@get_all_cmd_params(d, 'groupadd')}"
+        USERADD_PARAM="${@get_all_cmd_params(d, 'useradd')}"
+
+        if test "x`echo $USERADD_PARAM | tr -d '[:space:]'`" != "x"; then
+            user=`echo "$USERADD_PARAM" | cut -d ';' -f 1 | awk '{ print $NF }'`
+            perform_userdel "${STAGING_DIR_TARGET}" "$OPT $user"
+        fi
+
+        if test "x`echo $GROUPADD_PARAM | tr -d '[:space:]'`" != "x"; then
+            group=`echo "$GROUPADD_PARAM" | cut -d ';' -f 1 | awk '{ print $NF }'`
+            perform_groupdel "${STAGING_DIR_TARGET}" "$OPT $group"
+        fi
+
+    fi
+fi
+}
+
+SSTATECLEANFUNCS = "userdel_sysroot_sstate"
+SSTATECLEANFUNCS_class-cross = ""
+SSTATECLEANFUNCS_class-native = ""
+SSTATECLEANFUNCS_class-nativesdk = ""
 
 do_install[prefuncs] += "${SYSROOTFUNC}"
 SYSROOTFUNC = "useradd_sysroot"

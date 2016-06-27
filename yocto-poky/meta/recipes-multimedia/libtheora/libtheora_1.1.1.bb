@@ -15,6 +15,8 @@ SRC_URI = "http://downloads.xiph.org/releases/theora/libtheora-${PV}.tar.bz2 \
 SRC_URI[md5sum] = "292ab65cedd5021d6b7ddd117e07cd8e"
 SRC_URI[sha256sum] = "b6ae1ee2fa3d42ac489287d3ec34c5885730b1296f0801ae577a35193d3affbc"
 
+UPSTREAM_CHECK_REGEX = "libtheora-(?P<pver>\d+(\.\d)+)\.(tar\.gz|tgz)"
+
 inherit autotools pkgconfig
 
 EXTRA_OECONF = "--disable-examples"

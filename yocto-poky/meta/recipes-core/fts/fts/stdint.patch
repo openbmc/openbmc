@@ -1,0 +1,15 @@
+Include stdint.h for u_* typedefs
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Inappropriate
+
+--- ./fts.c.orig
++++ ./fts.c
+@@ -46,6 +46,7 @@
+ #include <errno.h>
+ #include <fcntl.h>
+ #include <fts.h>
++#include <stdint.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>

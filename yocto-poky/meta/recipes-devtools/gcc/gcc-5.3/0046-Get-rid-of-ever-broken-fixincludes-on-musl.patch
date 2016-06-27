@@ -1,0 +1,28 @@
+From 047116e8c9cbb340264f4f28db3f21a68ba57ff3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 8 Dec 2015 08:32:24 +0000
+Subject: [PATCH 46/46] Get rid of ever-broken fixincludes on musl.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ fixincludes/mkfixinc.sh | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/fixincludes/mkfixinc.sh b/fixincludes/mkfixinc.sh
+index 6653fedb..0d96c8c 100755
+--- a/fixincludes/mkfixinc.sh
++++ b/fixincludes/mkfixinc.sh
+@@ -19,7 +19,8 @@ case $machine in
+     powerpc-*-eabi*    | \
+     powerpc-*-rtems*   | \
+     powerpcle-*-eabisim* | \
+-    powerpcle-*-eabi* )
++    powerpcle-*-eabi* | \
++    *-musl* )
+ 	#  IF there is no include fixing,
+ 	#  THEN create a no-op fixer and exit
+ 	(echo "#! /bin/sh" ; echo "exit 0" ) > ${target}
+-- 
+2.6.3
+

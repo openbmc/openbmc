@@ -1,0 +1,27 @@
+rpm - rpmio/keccak.c: make SSE/MMX dependent upon gcc config
+
+Upstream-Status: Submitted [RPM5 maintainer]
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.15/rpmio/keccak.c
+===================================================================
+--- rpm-5.4.15.orig/rpmio/keccak.c
++++ rpm-5.4.15/rpmio/keccak.c
+@@ -17,9 +17,13 @@ http://keccak.noekeon.org/
+ #if OPTIMIZED == 64
+ /* ===== "KeccakOpt64-settings.h" */
+ #define Unrolling 18
+-//#define UseBebigokimisa
+-#define UseSSE
+-//#define UseMMX
++#if defined(__SSE2__)
++ #define UseSSE
++#elif defined(__MMX__)
++ #define UseMMX
++#else
++ #define UseBebigokimisa
++#endif
+ /* ===== */
+ #endif
+ 

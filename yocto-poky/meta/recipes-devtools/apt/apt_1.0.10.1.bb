@@ -1,4 +1,4 @@
-DEPENDS = "curl db"
+DEPENDS = "curl db zlib"
 RDEPENDS_${PN} = "dpkg bash debianutils"
 require apt.inc
 
@@ -6,6 +6,7 @@ require apt-package.inc
 
 PACKAGECONFIG ??= "lzma"
 PACKAGECONFIG[lzma] = "ac_cv_lib_lzma_lzma_easy_encoder=yes,ac_cv_lib_lzma_lzma_easy_encoder=no,xz"
+PACKAGECONFIG[bz2] = "ac_cv_lib_bz2_BZ2_bzopen=yes,ac_cv_lib_bz2_BZ2_bzopen=no,bzip2"
 
 FILES_${PN} += "${bindir}/apt-key"
 apt-manpages += "doc/apt-key.8"

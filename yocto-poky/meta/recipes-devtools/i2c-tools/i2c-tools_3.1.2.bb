@@ -3,7 +3,7 @@ SECTION = "base"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
-SRC_URI = "http://dl.lm-sensors.org/i2c-tools/releases/${BP}.tar.bz2 \
+SRC_URI = "http://downloads.yoctoproject.org/mirror/sources/${BP}.tar.bz2 \
            file://Module.mk \
 "
 SRC_URI[md5sum] = "7104a1043d11a5e2c7b131614eb1b962"

@@ -1,10 +1,9 @@
+SUMMARY = "Library for obtaining the call-chain of a program"
 DESCRIPTION = "a portable and efficient C programming interface (API) to determine the call-chain of a program"
 HOMEPAGE = "http://www.nongnu.org/libunwind"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=3fced11d6df719b47505837a51c16ae5"
 DEPENDS += "libatomic-ops"
-
-SRC_URI = "${SAVANNAH_NONGNU_MIRROR}/${BPN}/${BPN}-${PV}.tar.gz"
 
 inherit autotools
 
@@ -25,7 +24,9 @@ LDFLAGS_append_x86-64 = " -fuse-ld=gold"
 LDFLAGS_append_arm = " -fuse-ld=gold"
 LDFLAGS_append_aarch64 = " -fuse-ld=gold"
 
-LDFLAGS_append_powerpc = " -fuse-ld=gold"
-LDFLAGS_append_powerpc64 = " -fuse-ld=gold"
+LDFLAGS_append_powerpc = " -fuse-ld=gold -mbss-plt"
+LDFLAGS_append_powerpc64 = " -fuse-ld=gold -mbss-plt"
+
+SECURITY_LDFLAGS_append_libc-musl = " -lssp_nonshared -lssp"
 
 BBCLASSEXTEND = "native"

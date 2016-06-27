@@ -1,0 +1,28 @@
+From b4aa18d939fc0c8825fa584dfcee1a7da61099cf Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 10 Dec 2015 16:09:26 +0200
+Subject: [PATCH] tests: add a target for building tests without running them
+
+Upstream-Status: Inappropriate [oe specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ tests/Makefile.am | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 4ac3c17..0025cfe 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -21,6 +21,9 @@
+ 
+ TESTS = $(check_PROGRAMS) options.cn
+ 
++# This allows building tests without running them
++buildtests: $(TESTS)
++
+ # The script testwrapper.sh will run most tests as is. A couple tests
+ # in the suite end in .reject, .table and the like so that we can pass
+ # different arguments to the test runner. We list those extensions so
+-- 
+2.6.2
+

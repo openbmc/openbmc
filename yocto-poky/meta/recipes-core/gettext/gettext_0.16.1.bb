@@ -39,6 +39,11 @@ do_configure_prepend() {
 	rm -f ${S}/config/m4/libtool.m4
 }
 
+do_install_append_libc-musl () {
+	rm -f ${D}${libdir}/charset.alias
+	rm -f ${D}${includedir}/libintl.h
+}
+
 # these lack the .x behind the .so, but shouldn't be in the -dev package
 # Otherwise you get the following results:
 # 7.4M    glibc/images/ep93xx/Angstrom-console-image-glibc-ipk-2008.1-test-20080104-ep93xx.rootfs.tar.gz

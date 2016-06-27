@@ -1,0 +1,70 @@
+From bb48dbc88a58bc05a43d71a3375fb05358119ec5 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Sun, 20 Mar 2016 20:20:16 -0700
+Subject: [PATCH] rpmqv.c: check _gpg_passphrase before ask for input
+
+rpm always asked for pass phrasae when add signature, which made it
+can't work non-interactively, this patch fix the problem. It will work
+non-interactively if _gpg_passphrase is defined, and work as before if
+not.
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ macros/macros.in |    7 +++++--
+ rpmqv.c          |   17 ++++++++++-------
+ 2 files changed, 15 insertions(+), 9 deletions(-)
+
+diff --git a/macros/macros.in b/macros/macros.in
+index 2e5b07d..01b3aad 100644
+--- a/macros/macros.in
++++ b/macros/macros.in
+@@ -520,15 +520,18 @@ $_arbitrary_tags_tests	Foo:Bar
+ #	Macro(s) to hold the arguments passed to GPG/PGP for package
+ #	signing and verification.
+ #
++
++%_gpg_passphrase_way %{?_gpg_passphrase:--passphrase "%{_gpg_passphrase}"}%{!?_gpg_passphrase:--passphrase-fd 3}
++
+ %__gpg_check_password_cmd	%{__gpg} \
+-	gpg --batch --no-verbose --passphrase-fd 3 -u "%{_gpg_name}" -so -
++	gpg --batch --no-verbose %{_gpg_passphrase_way} -u "%{_gpg_name}" -so -
+ #%__pgp_check_password_cmd	%{__pgp} \
+ #	pgp +batchmode=on +verbose=0 "%{_pgp_name}" -sf
+ #%__pgp5_check_password_cmd	%{__pgp} \
+ #	pgps +batchmode=on +verbose=0 +armor=off "%{_pgp_name}" -f
+ 
+ %__gpg_sign_cmd			%{__gpg} \
+-	gpg --batch --no-verbose --no-armor --passphrase-fd 3 --no-secmem-warning \
++	gpg --batch --no-verbose --no-armor %{_gpg_passphrase_way}  --no-secmem-warning \
+ 	-u "%{_gpg_name}" -sbo %{__signature_filename} %{__plaintext_filename}
+ #%__pgp_sign_cmd			%{__pgp} \
+ #	pgp +batchmode=on +verbose=0 +armor=off \
+diff --git a/rpmqv.c b/rpmqv.c
+index b306486..7604396 100644
+--- a/rpmqv.c
++++ b/rpmqv.c
+@@ -831,13 +831,16 @@ int main(int argc, const char ** argv)
+ #endif
+ 	    )
+ 	    {
+-		passPhrase = Getpass(_("Enter pass phrase: "));
+-		if (rpmCheckPassPhrase(passPhrase)) {
+-		    fprintf(stderr, _("Pass phrase check failed\n"));
+-		    ec = EXIT_FAILURE;
+-		    goto exit;
++		passPhrase = rpmExpand("%{?_gpg_passphrase}", NULL);
++		if (passPhrase == NULL || passPhrase[0] == '\0') {
++			passPhrase = Getpass(_("Enter pass phrase: "));
++			if (rpmCheckPassPhrase(passPhrase)) {
++			    fprintf(stderr, _("Pass phrase check failed\n"));
++			    ec = EXIT_FAILURE;
++			    goto exit;
++			}
++			fprintf(stderr, _("Pass phrase is good.\n"));
+ 		}
+-		fprintf(stderr, _("Pass phrase is good.\n"));
+ 		/* XXX Getpass() should realloc instead. */
+ 		passPhrase = xstrdup(passPhrase);
+ 	    }

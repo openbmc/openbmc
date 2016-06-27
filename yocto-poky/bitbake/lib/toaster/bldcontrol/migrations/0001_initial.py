@@ -1,154 +1,113 @@
 # -*- coding: utf-8 -*-
-from south.utils import datetime_utils as datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import migrations, models
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'BuildEnvironment'
-        db.create_table(u'bldcontrol_buildenvironment', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('address', self.gf('django.db.models.fields.CharField')(max_length=254)),
-            ('betype', self.gf('django.db.models.fields.IntegerField')()),
-            ('bbaddress', self.gf('django.db.models.fields.CharField')(max_length=254, blank=True)),
-            ('bbport', self.gf('django.db.models.fields.IntegerField')(default=-1)),
-            ('bbtoken', self.gf('django.db.models.fields.CharField')(max_length=126, blank=True)),
-            ('bbstate', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('lock', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-        ))
-        db.send_create_signal(u'bldcontrol', ['BuildEnvironment'])
+    dependencies = [
+        ('orm', '0001_initial'),
+    ]
 
-        # Adding model 'BuildRequest'
-        db.create_table(u'bldcontrol_buildrequest', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('project', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['orm.Project'])),
-            ('build', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['orm.Build'], null=True)),
-            ('state', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-        ))
-        db.send_create_signal(u'bldcontrol', ['BuildRequest'])
-
-        # Adding model 'BRLayer'
-        db.create_table(u'bldcontrol_brlayer', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('req', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['bldcontrol.BuildRequest'])),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('giturl', self.gf('django.db.models.fields.CharField')(max_length=254)),
-            ('commit', self.gf('django.db.models.fields.CharField')(max_length=254)),
-        ))
-        db.send_create_signal(u'bldcontrol', ['BRLayer'])
-
-        # Adding model 'BRVariable'
-        db.create_table(u'bldcontrol_brvariable', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('req', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['bldcontrol.BuildRequest'])),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('value', self.gf('django.db.models.fields.TextField')(blank=True)),
-        ))
-        db.send_create_signal(u'bldcontrol', ['BRVariable'])
-
-        # Adding model 'BRTarget'
-        db.create_table(u'bldcontrol_brtarget', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('req', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['bldcontrol.BuildRequest'])),
-            ('target', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('task', self.gf('django.db.models.fields.CharField')(max_length=100, null=True)),
-        ))
-        db.send_create_signal(u'bldcontrol', ['BRTarget'])
-
-
-    def backwards(self, orm):
-        # Deleting model 'BuildEnvironment'
-        db.delete_table(u'bldcontrol_buildenvironment')
-
-        # Deleting model 'BuildRequest'
-        db.delete_table(u'bldcontrol_buildrequest')
-
-        # Deleting model 'BRLayer'
-        db.delete_table(u'bldcontrol_brlayer')
-
-        # Deleting model 'BRVariable'
-        db.delete_table(u'bldcontrol_brvariable')
-
-        # Deleting model 'BRTarget'
-        db.delete_table(u'bldcontrol_brtarget')
-
-
-    models = {
-        u'bldcontrol.brlayer': {
-            'Meta': {'object_name': 'BRLayer'},
-            'commit': ('django.db.models.fields.CharField', [], {'max_length': '254'}),
-            'giturl': ('django.db.models.fields.CharField', [], {'max_length': '254'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'req': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['bldcontrol.BuildRequest']"})
-        },
-        u'bldcontrol.brtarget': {
-            'Meta': {'object_name': 'BRTarget'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'req': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['bldcontrol.BuildRequest']"}),
-            'target': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'task': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True'})
-        },
-        u'bldcontrol.brvariable': {
-            'Meta': {'object_name': 'BRVariable'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'req': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['bldcontrol.BuildRequest']"}),
-            'value': ('django.db.models.fields.TextField', [], {'blank': 'True'})
-        },
-        u'bldcontrol.buildenvironment': {
-            'Meta': {'object_name': 'BuildEnvironment'},
-            'address': ('django.db.models.fields.CharField', [], {'max_length': '254'}),
-            'bbaddress': ('django.db.models.fields.CharField', [], {'max_length': '254', 'blank': 'True'}),
-            'bbport': ('django.db.models.fields.IntegerField', [], {'default': '-1'}),
-            'bbstate': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'bbtoken': ('django.db.models.fields.CharField', [], {'max_length': '126', 'blank': 'True'}),
-            'betype': ('django.db.models.fields.IntegerField', [], {}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'lock': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
-        },
-        u'bldcontrol.buildrequest': {
-            'Meta': {'object_name': 'BuildRequest'},
-            'build': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['orm.Build']", 'null': 'True'}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'project': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['orm.Project']"}),
-            'state': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
-        },
-        u'orm.build': {
-            'Meta': {'object_name': 'Build'},
-            'bitbake_version': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'build_name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'completed_on': ('django.db.models.fields.DateTimeField', [], {}),
-            'cooker_log_path': ('django.db.models.fields.CharField', [], {'max_length': '500'}),
-            'distro': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'distro_version': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'errors_no': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'machine': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'outcome': ('django.db.models.fields.IntegerField', [], {'default': '2'}),
-            'project': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['orm.Project']", 'null': 'True'}),
-            'started_on': ('django.db.models.fields.DateTimeField', [], {}),
-            'timespent': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'warnings_no': ('django.db.models.fields.IntegerField', [], {'default': '0'})
-        },
-        u'orm.project': {
-            'Meta': {'object_name': 'Project'},
-            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
-        }
-    }
-
-    complete_apps = ['bldcontrol']
+    operations = [
+        migrations.CreateModel(
+            name='BRBitbake',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('giturl', models.CharField(max_length=254)),
+                ('commit', models.CharField(max_length=254)),
+                ('dirpath', models.CharField(max_length=254)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='BRError',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('errtype', models.CharField(max_length=100)),
+                ('errmsg', models.TextField()),
+                ('traceback', models.TextField()),
+            ],
+        ),
+        migrations.CreateModel(
+            name='BRLayer',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=100)),
+                ('giturl', models.CharField(max_length=254)),
+                ('commit', models.CharField(max_length=254)),
+                ('dirpath', models.CharField(max_length=254)),
+                ('layer_version', models.ForeignKey(to='orm.Layer_Version', null=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='BRTarget',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('target', models.CharField(max_length=100)),
+                ('task', models.CharField(max_length=100, null=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='BRVariable',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=100)),
+                ('value', models.TextField(blank=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='BuildEnvironment',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('address', models.CharField(max_length=254)),
+                ('betype', models.IntegerField(choices=[(0, b'local'), (1, b'ssh')])),
+                ('bbaddress', models.CharField(max_length=254, blank=True)),
+                ('bbport', models.IntegerField(default=-1)),
+                ('bbtoken', models.CharField(max_length=126, blank=True)),
+                ('bbstate', models.IntegerField(default=0, choices=[(0, b'stopped'), (1, b'started')])),
+                ('sourcedir', models.CharField(max_length=512, blank=True)),
+                ('builddir', models.CharField(max_length=512, blank=True)),
+                ('lock', models.IntegerField(default=0, choices=[(0, b'free'), (1, b'lock'), (2, b'running')])),
+                ('created', models.DateTimeField(auto_now_add=True)),
+                ('updated', models.DateTimeField(auto_now=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='BuildRequest',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('state', models.IntegerField(default=0, choices=[(0, b'created'), (1, b'queued'), (2, b'in progress'), (3, b'completed'), (4, b'failed'), (5, b'deleted'), (6, b'archive')])),
+                ('created', models.DateTimeField(auto_now_add=True)),
+                ('updated', models.DateTimeField(auto_now=True)),
+                ('build', models.OneToOneField(null=True, to='orm.Build')),
+                ('environment', models.ForeignKey(to='bldcontrol.BuildEnvironment', null=True)),
+                ('project', models.ForeignKey(to='orm.Project')),
+            ],
+        ),
+        migrations.AddField(
+            model_name='brvariable',
+            name='req',
+            field=models.ForeignKey(to='bldcontrol.BuildRequest'),
+        ),
+        migrations.AddField(
+            model_name='brtarget',
+            name='req',
+            field=models.ForeignKey(to='bldcontrol.BuildRequest'),
+        ),
+        migrations.AddField(
+            model_name='brlayer',
+            name='req',
+            field=models.ForeignKey(to='bldcontrol.BuildRequest'),
+        ),
+        migrations.AddField(
+            model_name='brerror',
+            name='req',
+            field=models.ForeignKey(to='bldcontrol.BuildRequest'),
+        ),
+        migrations.AddField(
+            model_name='brbitbake',
+            name='req',
+            field=models.OneToOneField(to='bldcontrol.BuildRequest'),
+        ),
+    ]

@@ -1,0 +1,34 @@
+From 30378026d136efa779732e3f6664e2ecf461e458 Mon Sep 17 00:00:00 2001
+From: Patrick Ohly <patrick.ohly@intel.com>
+Date: Thu, 17 Mar 2016 12:38:09 +0100
+Subject: [PATCH] update-ca-certificates: support Toybox
+
+"mktemp -t" is deprecated and does not work when using Toybox. Replace
+with something that works also with Toybox.
+
+Upstream-Status: Pending
+
+Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
+---
+ sbin/update-ca-certificates | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/sbin/update-ca-certificates b/sbin/update-ca-certificates
+index 79c41bb..ae9e3f1 100755
+--- a/sbin/update-ca-certificates
++++ b/sbin/update-ca-certificates
+@@ -113,9 +113,9 @@ trap cleanup 0
+ 
+ # Helper files.  (Some of them are not simple arrays because we spawn
+ # subshells later on.)
+-TEMPBUNDLE="$(mktemp -t "${CERTBUNDLE}.tmp.XXXXXX")"
+-ADDED="$(mktemp -t "ca-certificates.tmp.XXXXXX")"
+-REMOVED="$(mktemp -t "ca-certificates.tmp.XXXXXX")"
++TEMPBUNDLE="$(mktemp -p${TMPDIR:-/tmp} "${CERTBUNDLE}.tmp.XXXXXX")"
++ADDED="$(mktemp -p${TMPDIR:-/tmp} "ca-certificates.tmp.XXXXXX")"
++REMOVED="$(mktemp -p${TMPDIR:-/tmp} "ca-certificates.tmp.XXXXXX")"
+ 
+ # Adds a certificate to the list of trusted ones.  This includes a symlink
+ # in /etc/ssl/certs to the certificate file and its inclusion into the
+-- 
+2.1.4

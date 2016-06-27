@@ -1,7 +1,11 @@
+from __future__ import unicode_literals
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.utils.encoding import force_bytes
 from orm.models import Project, ProjectLayer, ProjectVariable, ProjectTarget, Build, Layer_Version
 
+import logging
+logger = logging.getLogger("toaster")
 # a BuildEnvironment is the equivalent of the "build/" directory on the localhost
 class BuildEnvironment(models.Model):
     SERVER_STOPPED = 0
@@ -12,10 +16,8 @@ class BuildEnvironment(models.Model):
     )
 
     TYPE_LOCAL = 0
-    TYPE_SSH   = 1
     TYPE = (
         (TYPE_LOCAL, "local"),
-        (TYPE_SSH, "ssh"),
     )
 
     LOCK_FREE = 0
@@ -42,13 +44,17 @@ class BuildEnvironment(models.Model):
     def get_artifact(self, path):
         if self.betype == BuildEnvironment.TYPE_LOCAL:
             return open(path, "r")
-        raise Exception("FIXME: artifact download not implemented for build environment type %s" % self.get_betype_display())
+        raise NotImplementedError("FIXME: artifact download not implemented "\
+                                  "for build environment type %s" % \
+                                  self.get_betype_display())
 
     def has_artifact(self, path):
         import os
         if self.betype == BuildEnvironment.TYPE_LOCAL:
             return os.path.exists(path)
-        raise Exception("FIXME: has artifact not implemented for build environment type %s" % self.get_betype_display())
+        raise NotImplementedError("FIXME: has artifact not implemented for "\
+                                  "build environment type %s" % \
+                                  self.get_betype_display())
 
 # a BuildRequest is a request that the scheduler will build using a BuildEnvironment
 # the build request queue is the table itself, ordered by state
@@ -60,7 +66,8 @@ class BuildRequest(models.Model):
     REQ_COMPLETED = 3
     REQ_FAILED = 4
     REQ_DELETED = 5
-    REQ_ARCHIVE = 6
+    REQ_CANCELLING = 6
+    REQ_ARCHIVE = 7
 
     REQUEST_STATE = (
         (REQ_CREATED, "created"),
@@ -69,6 +76,7 @@ class BuildRequest(models.Model):
         (REQ_COMPLETED, "completed"),
         (REQ_FAILED, "failed"),
         (REQ_DELETED, "deleted"),
+        (REQ_CANCELLING, "cancelling"),
         (REQ_ARCHIVE, "archive"),
     )
 
@@ -81,6 +89,27 @@ class BuildRequest(models.Model):
     created     = models.DateTimeField(auto_now_add = True)
     updated     = models.DateTimeField(auto_now = True)
 
+    def __init__(self, *args, **kwargs):
+        super(BuildRequest, self).__init__(*args, **kwargs)
+        # Save the old state incase it's about to be modified
+        self.old_state = self.state
+
+    def save(self, *args, **kwargs):
+        # Check that the state we're trying to set is not going backwards
+        # e.g. from REQ_FAILED to REQ_INPROGRESS
+        if self.old_state != self.state and self.old_state > self.state:
+            logger.warn("Invalid state change requested: "
+                        "Cannot go from %s to %s - ignoring request" %
+                        (BuildRequest.REQUEST_STATE[self.old_state][1],
+                         BuildRequest.REQUEST_STATE[self.state][1])
+                       )
+            # Set property back to the old value
+            self.state = self.old_state
+            return
+
+        super(BuildRequest, self).save(*args, **kwargs)
+
+
     def get_duration(self):
         return (self.updated - self.created).total_seconds()
 
@@ -92,7 +121,7 @@ class BuildRequest(models.Model):
         return self.brvariable_set.get(name="MACHINE").value
 
     def __str__(self):
-        return "%s %s" % (self.project, self.get_state_display())
+        return force_bytes('%s %s' % (self.project, self.get_state_display()))
 
 # These tables specify the settings for running an actual build.
 # They MUST be kept in sync with the tables in orm.models.Project*
@@ -106,7 +135,7 @@ class BRLayer(models.Model):
     layer_version = models.ForeignKey(Layer_Version, null=True)
 
 class BRBitbake(models.Model):
-    req         = models.ForeignKey(BuildRequest, unique = True)    # only one bitbake for a request
+    req         = models.OneToOneField(BuildRequest)    # only one bitbake for a request
     giturl      = models.CharField(max_length =254)
     commit      = models.CharField(max_length = 254)
     dirpath     = models.CharField(max_length = 254)

@@ -37,11 +37,12 @@ class BitbakeController(object):
         It is outside the scope of this class on how the server is started and aquired
     """
 
-    def __init__(self, connection):
-        self.connection = connection
+    def __init__(self, be):
+        self.connection = bb.server.xmlrpc._create_server(be.bbaddress,
+                                                          int(be.bbport))[0]
 
     def _runCommand(self, command):
-        result, error = self.connection.connection.runCommand(command)
+        result, error = self.connection.runCommand(command)
         if error:
             raise Exception(error)
         return result
@@ -52,10 +53,19 @@ class BitbakeController(object):
     def setVariable(self, name, value):
         return self._runCommand(["setVariable", name, value])
 
+    def getVariable(self, name):
+        return self._runCommand(["getVariable", name])
+
+    def triggerEvent(self, event):
+        return self._runCommand(["triggerEvent", event])
+
     def build(self, targets, task = None):
         if task is None:
             task = "build"
         return self._runCommand(["buildTargets", targets, task])
+
+    def forceShutDown(self):
+        return self._runCommand(["stateForceShutdown"])
 
 
 
@@ -70,13 +80,10 @@ def getBuildEnvironmentController(**kwargs):
     """
 
     from localhostbecontroller import LocalhostBEController
-    from sshbecontroller    import SSHBEController
 
     be = BuildEnvironment.objects.filter(Q(**kwargs))[0]
     if be.betype == BuildEnvironment.TYPE_LOCAL:
         return LocalhostBEController(be)
-    elif be.betype == BuildEnvironment.TYPE_SSH:
-        return SSHBEController(be)
     else:
         raise Exception("FIXME: Implement BEC for type %s" % str(be.betype))
 
@@ -99,9 +106,6 @@ class BuildEnvironmentController(object):
         on the local machine, with the "build/" directory under the "poky/" source checkout directory.
         Bash is expected to be available.
 
-            * SSH controller will run the Toaster BE on a remote machine, where the current user
-        can connect without raise Exception("FIXME: implement")word (set up with either ssh-agent or raise Exception("FIXME: implement")phrase-less key authentication)
-
     """
     def __init__(self, be):
         """ Takes a BuildEnvironment object as parameter that points to the settings of the BE.
@@ -109,89 +113,25 @@ class BuildEnvironmentController(object):
         self.be = be
         self.connection = None
 
-    @staticmethod
-    def _updateBBLayers(bblayerconf, layerlist):
-        conflines = open(bblayerconf, "r").readlines()
-
-        bblayerconffile = open(bblayerconf, "w")
-        skip = 0
-        for i in xrange(len(conflines)):
-            if skip > 0:
-                skip =- 1
-                continue
-            if conflines[i].startswith("# line added by toaster"):
-                skip = 1
-            else:
-                bblayerconffile.write(conflines[i])
-
-        bblayerconffile.write("# line added by toaster build control\nBBLAYERS = \"" + " ".join(layerlist) + "\"")
-        bblayerconffile.close()
-
-
-    def writeConfFile(self, variable_list = None, raw = None):
-        """ Writes a configuration file in the build directory. Override with buildenv-specific implementation. """
-        raise Exception("FIXME: Must override to actually write a configuration file")
-
-
-    def startBBServer(self):
-        """ Starts a  BB server with Toaster toasterui set up to record the builds, an no controlling UI.
-            After this method executes, self.be bbaddress/bbport MUST point to a running and free server,
-            and the bbstate MUST be  updated to "started".
-        """
-        raise Exception("FIXME: Must override in order to actually start the BB server")
-
-    def stopBBServer(self):
-        """ Stops the currently running BB server.
-            The bbstate MUST be updated to "stopped".
-            self.connection must be none.
-        """
-        raise Exception("FIXME: Must override stoBBServer")
-
-    def setLayers(self, bbs, ls):
+    def setLayers(self, bitbake, ls):
         """ Checks-out bitbake executor and layers from git repositories.
             Sets the layer variables in the config file, after validating local layer paths.
-            The bitbakes must be a 1-length list of BRBitbake
+            bitbake must be a single BRBitbake instance
             The layer paths must be in a list of BRLayer object
 
             a word of attention: by convention, the first layer for any build will be poky!
         """
-        raise Exception("FIXME: Must override setLayers")
-
-
-    def getBBController(self):
-        """ returns a BitbakeController to an already started server; this is the point where the server
-            starts if needed; or reconnects to the server if we can
-        """
-        if not self.connection:
-            self.startBBServer()
-            self.be.lock = BuildEnvironment.LOCK_RUNNING
-            self.be.save()
-
-        server = bb.server.xmlrpc.BitBakeXMLRPCClient()
-        server.initServer()
-        server.saveConnectionDetails("%s:%s" % (self.be.bbaddress, self.be.bbport))
-        self.connection = server.establishConnection([])
-
-        self.be.bbtoken = self.connection.transport.connection_token
-        self.be.save()
-
-        return BitbakeController(self.connection)
+        raise NotImplementedError("FIXME: Must override setLayers")
 
     def getArtifact(self, path):
         """ This call returns an artifact identified by the 'path'. How 'path' is interpreted as
             up to the implementing BEC. The return MUST be a REST URL where a GET will actually return
             the content of the artifact, e.g. for use as a "download link" in a web UI.
         """
-        raise Exception("Must return the REST URL of the artifact")
-
-    def release(self):
-        """ This stops the server and releases any resources. After this point, all resources
-            are un-available for further reference
-        """
-        raise Exception("Must override BE release")
+        raise NotImplementedError("Must return the REST URL of the artifact")
 
     def triggerBuild(self, bitbake, layers, variables, targets):
-        raise Exception("Must override BE release")
+        raise NotImplementedError("Must override BE release")
 
 class ShellCmdException(Exception):
     pass

@@ -1,0 +1,64 @@
+configure.ac: Check if the current compiler supports the transactions
+
+Some distributions appear to have compilers that are built without support
+for transactions, even though they are GCC 4.7 or newer.
+
+Upstream-Status: Submitted [RPM5 maintainer]
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm-5.4.15/configure.ac
+===================================================================
+--- rpm-5.4.15.orig/configure.ac
++++ rpm-5.4.15/configure.ac
+@@ -425,9 +425,34 @@ dnl # --- other optimizations
+   rpm_CFLAGS_ADD([-D_FORTIFY_SOURCE=2 -fstack-protector], [RPM_CFLAGS])
+ dnl #  rpm_CFLAGS_ADD([-fstack-protector-all],[RPM_CFLAGS])
+ 
+-     if test \( ".`$CC --version 2>&1 | grep 'GCC'`" != . \); then
+-         rpm_CFLAGS_ADD([-fgnu-tm], [RPM_CFLAGS])
+-     fi
++dnl # Check if the current gcc supports -fgnu-tm and __transaction_atomic
++AC_MSG_CHECKING([If the compiler supports __transaction_atomic])
++save_CFLAGS="$CFLAGS"
++save_LDFLAGS="$LDFLAGS"
++CFLAGS="${CFLAGS} -fgnu-tm -litm"
++LDFLAGS="${LDFLAGS} -litm"
++AC_LINK_IFELSE([AC_LANG_SOURCE([[
++int
++main()
++{
++#if !__clang__ &&  ((__GNUC__ == 4 && __GNUC_MINOR__ >= 7) || (__GNUC__ > 4)) /* XXX gud enuf? */
++        int i = 0;
++        __transaction_atomic { i++; }
++#else
++# error Compiler does not support __transaction_atomic
++#endif
++        return 0;
++}
++]])], [
++        AC_DEFINE([HAVE_GNUC_TM_ATOMIC], [1],
++                [Define to 1 if the compiler supports __transaction_atomic.])
++        AC_MSG_RESULT([yes])
++], [
++	CFLAGS="$save_CFLAGS"
++	LDFLAGS="$save_LDFLAGS"
++	AC_MSG_RESULT([no])
++])
++
+ 
+ dnl # --- options below are added to RPM_CFLAGS but _NOT_ added to CFLAGS
+             CPPFLAGS="$CPPFLAGS $RPM_CPPFLAGS"
+Index: rpm-5.4.15/rpmio/rpmutil.h
+===================================================================
+--- rpm-5.4.15.orig/rpmio/rpmutil.h
++++ rpm-5.4.15/rpmio/rpmutil.h
+@@ -105,7 +105,7 @@
+ #  define RPM_GNUC_INTERNAL
+ #endif
+ 
+-#if !__clang__ &&  __GNUC__ == 4 && __GNUC_MINOR__ >= 7	/* XXX gud enuf? */
++#ifdef HAVE_GNUC_TM_ATOMIC
+ #  define RPM_GNUC_TM_SAFE	__attribute__((transaction_safe))
+ #  define RPM_GNUC_TM_PURE	__attribute__((transaction_pure))
+ #  define RPM_GNUC_TM_CALLABLE	__attribute__((transaction_callable))

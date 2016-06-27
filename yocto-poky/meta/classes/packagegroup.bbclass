@@ -22,13 +22,15 @@ inherit ${@oe.utils.ifelse(d.getVar('PACKAGE_ARCH_EXPANDED', True) == 'all', 'al
 # Also mark all packages as ALLOW_EMPTY
 python () {
     packages = d.getVar('PACKAGES', True).split()
-    genpackages = []
-    for pkg in packages:
-        d.setVar("ALLOW_EMPTY_%s" % pkg, "1")
-        for postfix in ['-dbg', '-dev', '-ptest']:
-            genpackages.append(pkg+postfix)
     if d.getVar('PACKAGEGROUP_DISABLE_COMPLEMENTARY', True) != '1':
-        d.setVar('PACKAGES', ' '.join(packages+genpackages))
+        types = ['', '-dbg', '-dev']
+        if bb.utils.contains('DISTRO_FEATURES', 'ptest', True, False, d):
+            types.append('-ptest')
+        packages = [pkg + suffix for pkg in packages
+                    for suffix in types]
+        d.setVar('PACKAGES', ' '.join(packages))
+    for pkg in packages:
+        d.setVar('ALLOW_EMPTY_%s' % pkg, '1')
 }
 
 # We don't want to look at shared library dependencies for the

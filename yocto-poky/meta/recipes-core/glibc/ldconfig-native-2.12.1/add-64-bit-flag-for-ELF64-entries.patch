@@ -64,7 +64,7 @@ index 0bf0de3..6e87afc 100644
  #undef check_ptr
  #define check_ptr(ptr)						\
  do								\
-@@ -290,6 +295,35 @@ process_elf_file64 (const char *file_name, const char *lib, int *flag,
+@@ -290,6 +295,48 @@ process_elf_file64 (const char *file_name, const char *lib, int *flag,
       libc5/libc6.  */
    *flag = FLAG_ELF;
  
@@ -73,23 +73,36 @@ index 0bf0de3..6e87afc 100644
 +  switch (elf_header->e_machine)
 +    {
 +    case EM_IA_64:
-+      *flag |= FLAG_IA64_LIB64;
++      /* Intel 64bit libraries are always libc.so.6+. */
++      /* see sysdeps/unix/sysv/linux/ia64/readelflib.c */
++      *flag |= FLAG_IA64_LIB64|FLAG_ELF_LIBC6;
 +      break;
 +    case EM_X86_64:
-+      *flag |= FLAG_X8664_LIB64;
++      /* X86-64 64bit libraries are always libc.so.6+. */
++      /* see sysdeps/unix/sysv/linux/i386/readelflib.c */
++      *flag |= FLAG_X8664_LIB64|FLAG_ELF_LIBC6;
 +      break;
 +    case EM_S390:
-+      *flag |= FLAG_S390_LIB64;
++      /* S/390 64bit libraries are always libc.so.6+. */
++      /* see sysdeps/unix/sysv/linux/s390/readelflib.c */
++      *flag |= FLAG_S390_LIB64|FLAG_ELF_LIBC6;
 +      break;
 +    case EM_PPC64:
-+      *flag |= FLAG_POWERPC_LIB64;
++      /* PowerPC 64bit libraries are always libc.so.6+. */
++      /* see sysdeps/unix/sysv/linux/powerpc/readelflib.c */
++      *flag |= FLAG_POWERPC_LIB64|FLAG_ELF_LIBC6;
 +      break;
 +    case EM_MIPS:
 +    case EM_MIPS_RS3_LE:
-+      *flag |= FLAG_MIPS64_LIBN64;
++      /* n64 libraries are always libc.so.6+. */
++      /* NOTE: This does not correctly distinguish NAN2008 binaries and is possibly broken */
++      /* see sysdeps/unix/sysv/linux/mips/readelflib.c */
++      *flag |= FLAG_MIPS64_LIBN64|FLAG_ELF_LIBC6;
 +      break;
 +    case EM_AARCH64:
-+      *flag |= FLAG_AARCH64_LIB64;
++      /* AArch64 libraries are always libc.so.6+. */
++      /* see sysdeps/unix/sysv/linux/arm/readelflib.c */
++      *flag |= FLAG_AARCH64_LIB64|FLAG_ELF_LIBC6;
 +      break;
 +    default:
 +      error(0, 0, "%s is a 64-bit ELF for unknown machine %lx\n",

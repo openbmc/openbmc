@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+
 {% load projecttags %}
 {% load humanize %}
 
@@ -26,9 +27,7 @@
     <ul class="nav nav-list well">
       <li><a class="nav-parent" href="{% url 'project' project.id %}">Configuration</a></li>
       <li class="nav-header">Compatible metadata</li>
-      {% if CUSTOM_IMAGE %}
       <li><a href="{% url 'projectcustomimages' project.id %}">Custom images</a></li>
-      {% endif %}
       <li><a href="{% url 'projectimagerecipes' project.id %}">Image recipes</a></li>
       <li><a href="{% url 'projectsoftwarerecipes' project.id %}">Software recipes</a></li>
       <li><a href="{% url 'projectmachines' project.id %}">Machines</a></li>

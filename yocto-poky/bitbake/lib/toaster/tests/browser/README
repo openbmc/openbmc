@@ -1,0 +1,41 @@
+# Running Toaster's browser-based test suite
+
+These tests require Selenium to be installed in your Python environment.
+
+The simplest way to install this is via pip:
+
+  pip install selenium
+
+Alternatively, if you used pip to install the libraries required by Toaster,
+selenium will already be installed.
+
+To run tests against Chrome:
+
+* Download chromedriver for your host OS from
+  https://code.google.com/p/chromedriver/downloads/list
+* On *nix systems, put chromedriver on PATH
+* On Windows, put chromedriver.exe in the same directory as chrome.exe
+
+To run tests against PhantomJS (headless):
+
+* Download and install PhantomJS:
+  http://phantomjs.org/download.html
+* On *nix systems, put phantomjs on PATH
+* Not tested on Windows
+
+Firefox should work without requiring additional software to be installed.
+
+The test case will instantiate a Selenium driver set by the
+TOASTER_TESTS_BROWSER environment variable, or Chrome if this is not specified.
+
+Available drivers:
+
+* chrome (default)
+* firefox
+* ie
+* phantomjs
+
+e.g. to run the test suite with phantomjs where you have phantomjs installed
+in /home/me/apps/phantomjs:
+
+PATH=/home/me/apps/phantomjs/bin:$PATH TOASTER_TESTS_BROWSER=phantomjs manage.py test tests.browser

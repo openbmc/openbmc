@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block extraheadcontent %}
+  <link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}" type='text/css'>
+  <link rel="stylesheet" href="{% static 'css/jquery-ui.structure.min.css' %}" type='text/css'>
+  <link rel="stylesheet" href="{% static 'css/jquery-ui.theme.min.css' %}" type='text/css'>
+  <script src="{% static 'js/jquery-ui.min.js' %}">
+  </script>
+{% endblock %}
+
+{% block title %} {{title}} - {{project.name}} - Toaster {% endblock %}
+
+{% block pagecontent %}
+
+  {% include "projecttopbar.html" %}
+
+  <div class="row-fluid">
+    {% with mru=mru mrb_type=mrb_type %}
+      {% include 'mrb_section.html' %}
+    {% endwith %}
+
+    <h2 class="page-header top-air" data-role="page-title"></h2>
+
+    {% url 'projectbuilds' project.id as xhr_table_url %}
+    {% include 'toastertable.html' %}
+  </div>
+
+  <script>
+    $(document).ready(function () {
+      // title
+      var tableElt = $("#{{table_name}}");
+      var titleElt = $("[data-role='page-title']");
+
+      tableElt.on("table-done", function (e, total, tableParams) {
+        var title = "All project builds";
+
+        if (tableParams.search || tableParams.filter) {
+          if (total === 0) {
+            title = "No project builds found";
+          }
+          else if (total > 0) {
+            title = total + " project build" + (total > 1 ? 's' : '') + " found";
+          }
+        }
+
+        titleElt.text(title);
+      });
+
+      // highlight builds tab
+      $("#topbar-builds-tab").addClass("active")
+    });
+  </script>
+
+{% endblock %}

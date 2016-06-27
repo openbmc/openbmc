@@ -1,0 +1,35 @@
+From f96cf1f4eaa72860ab8b5e18ad10fdc704d78c5f Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 15 Dec 2015 15:01:34 +0200
+Subject: [PATCH 2/5] remove rpath
+
+Upstream-Status: Inappropriate [embedded config]
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+---
+ none/tests/Makefile.am | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/none/tests/Makefile.am b/none/tests/Makefile.am
+index 54f2a7e..25b0f49 100644
+--- a/none/tests/Makefile.am
++++ b/none/tests/Makefile.am
+@@ -326,7 +326,6 @@ threadederrno_CFLAGS	+= --std=c99
+ endif
+ tls_SOURCES		= tls.c tls2.c
+ tls_DEPENDENCIES	= tls.so tls2.so
+-tls_LDFLAGS		= -Wl,-rpath,$(abs_top_builddir)/none/tests
+ tls_LDADD		= tls.so tls2.so -lpthread
+ tls_so_SOURCES		= tls_so.c
+ tls_so_DEPENDENCIES	= tls2.so
+@@ -334,7 +333,7 @@ if VGCONF_OS_IS_DARWIN
+  tls_so_LDFLAGS		= -dynamic -dynamiclib -all_load -fpic
+  tls_so_LDADD		= `pwd`/tls2.so
+ else
+- tls_so_LDFLAGS		= -Wl,-rpath,$(abs_top_builddir)/none/tests -shared -fPIC
++ tls_so_LDFLAGS		= -shared -fPIC
+  tls_so_LDADD		= tls2.so
+ endif
+ tls_so_CFLAGS		= $(AM_CFLAGS) -fPIC
+-- 
+2.6.2
+

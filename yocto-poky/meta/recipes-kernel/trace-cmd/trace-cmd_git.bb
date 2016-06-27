@@ -22,8 +22,6 @@ EXTRA_OEMAKE = "\
     NO_PYTHON=1 \
 "
 
-FILES_${PN}-dbg += "${libdir}/trace-cmd/plugins/.debug"
-
 do_compile_prepend() {
     # Make sure the recompile is OK
     rm -f ${B}/.*.d

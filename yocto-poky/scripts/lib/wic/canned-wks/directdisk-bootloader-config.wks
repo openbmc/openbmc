@@ -1,0 +1,8 @@
+# short-description: Create a 'pcbios' direct disk image with custom bootloader config
+# long-description: Creates a partitioned legacy BIOS disk image that the user
+# can directly dd to boot media. The bootloader configuration source is a user file.
+
+include common.wks.inc
+
+bootloader --configfile="directdisk-bootloader-config.cfg"
+

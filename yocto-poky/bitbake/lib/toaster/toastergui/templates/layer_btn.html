@@ -4,7 +4,7 @@
     {% endif %}
   >
   <i class="icon-trash"></i>
-  Delete layer
+  Remove layer
 </button>
 <button class="btn btn-block layer-add-{{data.pk}} layerbtn" data-layer='{ "id": {{data.pk}}, "name":  "{{data.layer.name}}", "layerdetailurl": "{%url 'layerdetails' extra.pid data.pk%}"}' data-directive="add"
     {% if data.pk in extra.current_layers %}

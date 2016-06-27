@@ -1,0 +1,20 @@
+The openjade build is fairly unique in auto-generating explicit dependencies to
+installed .la files.  As some distributions may delete these files unless
+clearly required, change the Makefile fragment to depend on the .so instead.
+
+Patch originally by Phil Blundell <philb@brightsign.biz>.
+
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+Upstream-Status: Inappropriate
+
+--- openjade-1.3.2/Makefile.prog.in~	2013-05-14 11:42:02.646782318 +0100
++++ openjade-1.3.2/Makefile.prog.in	2013-05-14 11:54:55.051728343 +0100
+@@ -12,7 +12,7 @@
+ 
+ ALL_LIBS = $(XLIBS) $(LIBS)
+ Makefile.lt:
+-	echo 'LT_LIBS='`echo $(ALL_LIBS) | sed 's/\.a\s/\.la /g' | sed s/\.a$$/\.la/` > Makefile.lt
++	echo 'LT_LIBS='`for d in $(ALL_LIBS); do case $$d in ../*) echo $$d | sed s/\.a$$/.la/g ;; *) echo $$d | sed s/\.a$$/.so/g ;; esac ; done` >Makefile.lt
+ 
+ PROG:=$(shell echo "$(PROG)" | sed '@program_transform_name@')
+ 

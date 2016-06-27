@@ -10,6 +10,5 @@ recipes-kernel       - The kernel and generic applications/libraries with strong
 recipes-lsb4         - Recipes added for the sole purpose of supporting the Linux Standard Base (LSB) 4.x
 recipes-multimedia   - Codecs and support utilties for audio, images and video
 recipes-rt           - Provides package and image recipes for using and testing the PREEMPT_RT kernel
-recipes-qt           - All things related to the Qt application framework
 recipes-sato         - The Sato demo/reference UI/UX, its associated apps and configuration 
 recipes-support      - Recipes used by other recipes but that are not directly included in images

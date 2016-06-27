@@ -30,5 +30,4 @@ do_compile[noexec] = "1"
 do_install(){
 	install -d ${D}${sysconfdir}/init.d/
 	install -m 0644 ${S}/rc.d/init.d/functions ${D}${sysconfdir}/init.d/functions
-	sed -i 's,${base_bindir}/mountpoint,${bindir}/mountpoint,g' ${D}${sysconfdir}/init.d/functions
 }

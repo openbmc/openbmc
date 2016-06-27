@@ -1,0 +1,51 @@
+From 9762fd23e1f1db66d4b977c694a17d3bca3fe99a Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 8 Jan 2016 16:36:29 +0200
+Subject: [PATCH] Remove tests that fail to build on some PPC32 configurations
+
+Failures are documented here:
+http://errors.yoctoproject.org/Errors/Search/?items=10&query=862d702fbb99e484631315aa44b9e46f8fc567da&filter=valgrind&type=recipe
+
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+Upstream-Status: Pending
+---
+ memcheck/tests/ppc32/Makefile.am | 2 +-
+ none/tests/ppc32/Makefile.am     | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/memcheck/tests/ppc32/Makefile.am b/memcheck/tests/ppc32/Makefile.am
+index 26b95a2..8f05743 100644
+--- a/memcheck/tests/ppc32/Makefile.am
++++ b/memcheck/tests/ppc32/Makefile.am
+@@ -10,7 +10,7 @@ EXTRA_DIST = $(noinst_SCRIPTS) \
+ 	power_ISA2_07.stderr.exp power_ISA2_07.vgtest
+ 
+ check_PROGRAMS = \
+-	power_ISA2_05 power_ISA2_07
++	power_ISA2_07
+ 
+ power_ISA2_05_CFLAGS = $(AM_CFLAGS) $(WERROR) -Winline -Wall -Wshadow -g \
+ 		-I$(top_srcdir)/include @FLAG_M32@
+diff --git a/none/tests/ppc32/Makefile.am b/none/tests/ppc32/Makefile.am
+index 196239e..0fe3425 100644
+--- a/none/tests/ppc32/Makefile.am
++++ b/none/tests/ppc32/Makefile.am
+@@ -50,13 +50,13 @@ EXTRA_DIST = \
+ 
+ check_PROGRAMS = \
+ 	allexec \
+-	lsw jm-insns round \
++	lsw \
+ 	test_isa_2_06_part1 test_isa_2_06_part2 test_isa_2_06_part3 \
+ 	test_dfp1 test_dfp2 test_dfp3 test_dfp4 test_dfp5 \
+ 	test_isa_2_07_part1 test_isa_2_07_part2 \
+ 	test_tm test_touch_tm ldst_multiple data-cache-instructions \
+ 	test_fx test_gx \
+-	testVMX twi tw xlc_dbl_u32 power5+_round power6_bcmp \
++	twi tw xlc_dbl_u32 power6_bcmp \
+ 	bug129390-ppc32 bug139050-ppc32 \
+ 	ldstrev mftocrf mcrfs
+ 
+-- 
+2.6.4
+

@@ -19,34 +19,33 @@
 
 usage() {
     MYNAME=`basename $0`
-    echo ""
-    echo "Usage: you can run this script with any valid combination"
-    echo "of the following environment variables (in any order):"
-    echo "  QEMUARCH - the qemu machine architecture to use"
-    echo "  KERNEL - the kernel image file to use"
-    echo "  ROOTFS - the rootfs image file or nfsroot directory to use"
-    echo "  MACHINE - the machine name (optional, autodetected from KERNEL filename if unspecified)"
-    echo "  RAMFS - boot a ramfs-based image"
-    echo "  ISO - boot an ISO image"
-    echo "  VM - boot a virtual machine image (= a file representing a full disk with boot loader)"
-    echo "  Simplified QEMU command-line options can be passed with:"
-    echo "    nographic - disables video console"
-    echo "    serial - enables a serial console on /dev/ttyS0"
-    echo "    kvm - enables KVM when running qemux86/qemux86-64 (VT-capable CPU required)"
-    echo "    kvm-vhost - enables KVM with vhost support when running qemux86/qemux86-64 (VT-capable CPU required)"
-    echo "    publicvnc - enable a VNC server open to all hosts"
-    echo "  qemuparams=\"xyz\" - specify custom parameters to QEMU"
-    echo "  bootparams=\"xyz\" - specify custom kernel parameters during boot"
-    echo ""
-    echo "Examples:"
-    echo "  $MYNAME qemuarm"
-    echo "  $MYNAME qemux86-64 core-image-sato ext4"
-    echo "  $MYNAME path/to/bzImage-qemux86.bin path/to/nfsrootdir/ serial"
-    echo "  $MYNAME qemux86 ramfs"
-    echo "  $MYNAME qemux86 iso"
-    echo "  $MYNAME qemux86 qemuparams=\"-m 256\""
-    echo "  $MYNAME qemux86 bootparams=\"psplash=false\""
-    echo "  $MYNAME path/to/<image>-<machine>.vmdk"
+cat <<_EOF
+
+Usage: you can run this script with any valid combination
+of the following environment variables (in any order):
+  KERNEL - the kernel image file to use
+  ROOTFS - the rootfs image file or nfsroot directory to use
+  MACHINE - the machine name (optional, autodetected from KERNEL filename if unspecified)
+  Simplified QEMU command-line options can be passed with:
+    nographic - disables video console
+    serial - enables a serial console on /dev/ttyS0
+    kvm - enables KVM when running qemux86/qemux86-64 (VT-capable CPU required)
+    kvm-vhost - enables KVM with vhost support when running qemux86/qemux86-64 (VT-capable CPU required)
+    publicvnc - enable a VNC server open to all hosts
+  qemuparams="xyz" - specify custom parameters to QEMU
+  bootparams="xyz" - specify custom kernel parameters during boot
+
+Examples:
+  $MYNAME qemuarm
+  $MYNAME qemux86-64 core-image-sato ext4
+  $MYNAME qemux86-64 wic-image-minimal wic
+  $MYNAME path/to/bzImage-qemux86.bin path/to/nfsrootdir/ serial
+  $MYNAME qemux86 iso/hddimg/vmdk/qcow2/vdi/ramfs/cpio.gz...
+  $MYNAME qemux86 qemuparams="-m 256"
+  $MYNAME qemux86 bootparams="psplash=false"
+  $MYNAME path/to/<image>-<machine>.vmdk
+  $MYNAME path/to/<image>-<machine>.wic
+_EOF
     exit 1
 }
 
@@ -62,7 +61,6 @@ error() {
 MACHINE=${MACHINE:=""}
 KERNEL=${KERNEL:=""}
 ROOTFS=${ROOTFS:=""}
-VM=${VM:=""}
 FSTYPE=${FSTYPE:=""}
 LAZY_ROOTFS=""
 SCRIPT_QEMU_OPT=""
@@ -74,6 +72,7 @@ KVM_ENABLED="no"
 KVM_ACTIVE="no"
 VHOST_ENABLED="no"
 VHOST_ACTIVE="no"
+IS_VM="false"
 
 # Determine whether the file is a kernel or QEMU image, and set the
 # appropriate variables
@@ -97,9 +96,11 @@ process_filename() {
 		    error "conflicting FSTYPE types [$FSTYPE] and [$EXT]"
 		fi
 		;;
-	/hddimg/|/hdddirect/|/vmdk/)
+	/hddimg/|/hdddirect/|/vmdk/|/wic/|/qcow2/|/vdi/)
 		FSTYPE=$EXT
 		VM=$filename
+		ROOTFS=$filename
+		IS_VM="true"
 		;;
 	*)
 		error "unknown file arg [$filename]"
@@ -107,6 +108,13 @@ process_filename() {
     esac
 }
 
+check_fstype_conflicts() {
+    if [ -z "$FSTYPE" -o "$FSTYPE" = "$1" ]; then
+        FSTYPE=$1
+    else
+        error "conflicting FSTYPE types [$FSTYPE] and [$1]"
+    fi
+}
 # Parse command line args without requiring specific ordering. It's a
 # bit more complex, but offers a great user experience.
 while true; do
@@ -117,18 +125,16 @@ while true; do
             [ -z "$MACHINE" -o "$MACHINE" = "$arg" ] && MACHINE=$arg || \
                 error "conflicting MACHINE types [$MACHINE] and [$arg]"
             ;;
-        "ext2" | "ext3" | "ext4" | "jffs2" | "nfs" | "btrfs" | "hddimg" | "hdddirect" )
-            [ -z "$FSTYPE" -o "$FSTYPE" = "$arg" ] && FSTYPE=$arg || \
-                error "conflicting FSTYPE types [$FSTYPE] and [$arg]"
+        "ext"[234] | "jffs2" | "nfs" | "btrfs")
+            check_fstype_conflicts $arg
             ;;
-        "ramfs")
+        "hddimg" | "hdddirect" | "wic" | "vmdk" | "qcow2" | "vdi" | "iso")
+            check_fstype_conflicts $arg
+            IS_VM="true"
+            ;;
+        "ramfs" | "cpio.gz")
             FSTYPE=cpio.gz
-            RAMFS=true
             ;;
-        "iso")
-	    FSTYPE=iso
-	    ISOFS=true
-	    ;;
         "nographic")
             SCRIPT_QEMU_OPT="$SCRIPT_QEMU_OPT -nographic"
             SCRIPT_KERNEL_OPT="$SCRIPT_KERNEL_OPT console=ttyS0"
@@ -141,7 +147,7 @@ while true; do
         "tcpserial="*)
             TCPSERIAL_PORTNUM=${arg##tcpserial=}
             ;;
-	"biosdir="*)
+        "biosdir="*)
             CUSTOMBIOSDIR="${arg##biosdir=}"
 	    ;;
         "biosfilename="*)
@@ -182,11 +188,11 @@ while true; do
             SLIRP_ENABLED="yes"
             ;;
         "publicvnc")
-            SCRIPT_QEMU_OPT="$SCRIPT_QEMU_OPT -vnc 0.0.0.0:0"
+            SCRIPT_QEMU_OPT="$SCRIPT_QEMU_OPT -vnc :0"
             ;;
         *-image*)
             [ -z "$ROOTFS" ] || \
-		error "conflicting ROOTFS args [$ROOTFS] and [$arg]"
+        		error "conflicting ROOTFS args [$ROOTFS] and [$arg]"
             if [ -f "$arg" ]; then
                 process_filename $arg
             elif [ -d "$arg" ]; then
@@ -235,16 +241,17 @@ elif [ ! -w /dev/net/tun ] ; then
 fi
 
 # Report errors for missing combinations of options
-if [ -z "$MACHINE" -a -z "$KERNEL" -a -z "$VM" ]; then
-    error "you must specify at least a MACHINE, VM, or KERNEL argument"
+if [ -z "$MACHINE" -a -z "$KERNEL" -a -z "$VM" -a "$FSTYPE" != "wic" ]; then
+    error "you must specify at least a MACHINE or KERNEL argument"
 fi
 if [ "$FSTYPE" = "nfs" -a -z "$ROOTFS" ]; then
     error "NFS booting without an explicit ROOTFS path is not yet supported"
 fi
 
 if [ -z "$MACHINE" ]; then
-    if [ "x$FSTYPE" = "xvmdk" ] || [ "x$FSTYPE" = "xhddimg" ] || [ "x$FSTYPE" = "xhdddirect" ]; then
-        MACHINE=`basename $VM | sed -n 's/.*\(qemux86-64\|qemux86\|qemuarm64\|qemuarm\|qemumips64\|qemumips\|qemuppc\|qemush4\).*/\1/p'`
+    if [ "$IS_VM" = "true" ]; then
+        [ "x$FSTYPE" = "xwic" ] && filename=$ROOTFS || filename=$VM
+        MACHINE=`basename $filename | sed -n 's/.*\(qemux86-64\|qemux86\|qemuarm64\|qemuarm\|qemumips64\|qemumips\|qemuppc\|qemush4\).*/\1/p'`
         if [ -z "$MACHINE" ]; then
             error "Unable to set MACHINE from image filename [$VM]"
         fi
@@ -342,12 +349,6 @@ QEMUMICROBLAZE_DEFAULT_FSTYPE=cpio
 
 QEMUZYNQ_DEFAULT_KERNEL=uImage
 QEMUZYNQ_DEFAULT_FSTYPE=cpio
-
-AKITA_DEFAULT_KERNEL=zImage-akita.bin
-AKITA_DEFAULT_FSTYPE=jffs2
-
-SPITZ_DEFAULT_KERNEL=zImage-spitz.bin
-SPITZ_DEFAULT_FSTYPE=ext3
 
 setup_path_vars() {
     if [ -z "$OE_TMPDIR" ] ; then
@@ -454,7 +455,7 @@ if [ -e "$ROOTFS" -a -z "$FSTYPE" ]; then
     fi
 fi
 
-if [ -z "$KERNEL" -a "x$FSTYPE" != "xvmdk" -a "x$FSTYPE" != "xhddimg" -a "x$FSTYPE" != "xhdddirect" ]; then
+if [ -z "$KERNEL" -a "$IS_VM" = "false" ]; then \
     setup_path_vars 1
     eval kernel_file=\$${machine2}_DEFAULT_KERNEL
     KERNEL=$DEPLOY_DIR_IMAGE/$kernel_file
@@ -480,14 +481,14 @@ fi
 if [ "$LAZY_ROOTFS" = "true" ]; then
     setup_path_vars 1
     echo "Assuming $ROOTFS really means $DEPLOY_DIR_IMAGE/$ROOTFS-$MACHINE.$FSTYPE"
-    if [ "$FSTYPE" = "hddimg" -o "x$FSTYPE" = "xhdddirect" ]; then
+    if [ "$IS_VM" = "true" ]; then
         VM=$DEPLOY_DIR_IMAGE/$ROOTFS-$MACHINE.$FSTYPE
     else
         ROOTFS=$DEPLOY_DIR_IMAGE/$ROOTFS-$MACHINE.$FSTYPE
     fi
 fi
 
-if [ -z "$ROOTFS" -a "x$FSTYPE" != "xvmdk" -a "x$FSTYPE" != "xhddimg" -a "x$FSTYPE" != "xhdddirect" ]; then
+if [ -z "$ROOTFS" ]; then
     setup_path_vars 1
     T=$DEPLOY_DIR_IMAGE
     eval rootfs_list=\$${machine2}_DEFAULT_ROOTFS
@@ -495,6 +496,8 @@ if [ -z "$ROOTFS" -a "x$FSTYPE" != "xvmdk" -a "x$FSTYPE" != "xhddimg" -a "x$FSTY
 
     if [ -z "$ROOTFS" ]; then
         error "Unable to determine default rootfs for MACHINE [$MACHINE]"
+    elif [ "$IS_VM" = "true" ]; then
+		VM=$ROOTFS
     fi
 fi
 # ROOTFS is now set for all cases, now expand it to be an absolute path, it should exist at this point
@@ -503,11 +506,11 @@ ROOTFS=`readlink -f $ROOTFS`
 
 echo ""
 echo "Continuing with the following parameters:"
-if [ "x$FSTYPE" != "xvmdk" -a "x$FSTYPE" != "xhddimg" -a "x$FSTYPE" != "xhdddirect" ]; then
+if [ "$IS_VM" = "false" ]; then
     echo "KERNEL: [$KERNEL]"
     echo "ROOTFS: [$ROOTFS]"
 else
-    echo "VMDK:   [$VM]"
+    echo "VM:   [$VM]"
 fi
 echo "FSTYPE: [$FSTYPE]"
 

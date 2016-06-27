@@ -1,0 +1,36 @@
+specify -fPIC after CFLAGS so it can override the CFLAGS containing -pie and -fpie
+this makes sure the objects that go into shared objects are compiled with -fPIC
+and not with -fpie. We can not use -fpie on objects which will go into .so files
+Fixes errors like
+
+| /mnt/oe/build/tmp-glibc/sysroots/x86_64-linux/usr/libexec/x86_64-oe-linux/gcc/x86_64-oe-linux/5.3.0/ld: shared/newt.o: relocation R_X86_64_PC32 against undefined symbol `SLtt_Screen_Rows@@SLANG2' can not be used when making a shared object; recompile with -fPIC
+| /mnt/oe/build/tmp-glibc/sysroots/x86_64-linux/usr/libexec/x86_64-oe-linux/gcc/x86_64-oe-linux/5.3.0/ld: final link failed: Bad value
+| collect2: error: ld returned 1 exit status
+| make: *** [libnewt.so.0.52.18] Error 1
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+Index: newt-0.52.18/Makefile.in
+===================================================================
+--- newt-0.52.18.orig/Makefile.in
++++ newt-0.52.18/Makefile.in
+@@ -96,8 +96,8 @@ _snack.$(SOEXT):   snack.c $(LIBNEWTSH)
+ 		PIFLAGS=`$$pyconfig --includes`; \
+ 		PLDFLAGS=`$$pyconfig --ldflags`; \
+ 		PLFLAGS=`$$pyconfig --libs`; \
+-		echo $(CC) $(SHCFLAGS) $(CPPFLAGS) $$PIFLAGS $$PCFLAGS -c -o $$ver/snack.o snack.c; \
+-		$(CC) $(SHCFLAGS) $(CPPFLAGS) $$PIFLAGS $$PCFLAGS -c -o $$ver/snack.o snack.c; \
++		echo $(CC) $(CPPFLAGS) $(SHCFLAGS) $$PIFLAGS $$PCFLAGS -c -o $$ver/snack.o snack.c; \
++		$(CC) $(CPPFLAGS) $(SHCFLAGS) $$PIFLAGS $$PCFLAGS -c -o $$ver/snack.o snack.c; \
+ 		echo $(CC) --shared $$PLDFLAGS $$PLFLAGS $(LDFLAGS) -o $$ver/_snack.$(SOEXT) $$ver/snack.o -L.  -lnewt $(LIBS); \
+ 		$(CC) --shared $$PLDFLAGS $$PLFLAGS $(LDFLAGS) -o $$ver/_snack.$(SOEXT) $$ver/snack.o -L.  -lnewt $(LIBS); \
+ 	done || :
+@@ -135,7 +135,7 @@ $(LIBNEWTSH): $(SHAREDOBJS)
+ 	ln -fs $(LIBNEWTSH) $(LIBNEWTSONAME)
+ 
+ $(SHAREDDIR)/%.o : %.c $(SHAREDDIR)
+-	$(CC) $(SHCFLAGS) -c $(CFLAGS) $(CPPFLAGS) -o $@ $<
++	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(SHCFLAGS) -o $@ $<
+ 
+ install: $(LIBNEWT) install-sh whiptail
+ 	[ -d $(instroot)/$(bindir) ] || install -m 755 -d $(instroot)/$(bindir)

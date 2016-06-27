@@ -1,0 +1,48 @@
+From 3b43f93ec02611c4d554612953f5b64765b8683b Mon Sep 17 00:00:00 2001
+From: Chris Liddell <chris.liddell@artifex.com>
+Date: Wed, 13 Jan 2016 02:14:55 -0500
+Subject: [PATCH 2/2] Bug 696497 (part 2): fix support for building with a JPX
+ decoder
+
+Author: Chris Liddell <chris.liddell@artifex.com>
+
+Upstream-Status: Backport
+http://bugs.ghostscript.com/show_bug.cgi?id=696497
+http://git.ghostscript.com/?p=ghostpdl.git;a=commitdiff;h=b0f5a975
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ base/lib.mak | 3 +++
+ psi/int.mak  | 3 +++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/base/lib.mak b/base/lib.mak
+index daa7056..8853dd5 100644
+--- a/base/lib.mak
++++ b/base/lib.mak
+@@ -1774,6 +1774,9 @@ $(GLOBJ)sjpx.$(OBJ) : $(GLSRC)sjpx.c $(AK) \
+  $(gdebug_h) $(strimpl_h) $(sjpx_h) $(MAKEDIRS)
+ 	$(GLJASCC) $(GLO_)sjpx.$(OBJ) $(C_) $(GLSRC)sjpx.c
+ 
++$(GLD)sjpx_.dev : $(LIB_MAK) $(ECHOGS_XE) $(LIB_MAK) $(MAKEDIRS)
++	$(SETMOD) $(GLD)sjpx_
++
+ # luratech version
+ sjpx_luratech=$(GLOBJ)sjpx_luratech.$(OBJ)
+ $(GLD)sjpx_luratech.dev : $(LIB_MAK) $(ECHOGS_XE) \
+diff --git a/psi/int.mak b/psi/int.mak
+index f9d667d..db01b65 100644
+--- a/psi/int.mak
++++ b/psi/int.mak
+@@ -1290,6 +1290,9 @@ $(PSD)jpx.dev : $(INT_MAK) $(ECHOGS_XE) $(PSD)jpx_$(JPX_LIB).dev\
+  $(MAKEDIRS)
+ 	$(CP_) $(PSD)jpx_$(JPX_LIB).dev $(PSD)jpx.dev
+ 
++$(PSD)jpx_.dev : $(ECHOGS_XE) $(INT_MAK) $(MAKEDIRS)
++	$(SETMOD) $(PSD)jpx_
++
+ fjpx_luratech=$(PSOBJ)zfjpx_luratech.$(OBJ)
+ 
+ $(PSOBJ)zfjpx.$(OBJ) : $(PSSRC)zfjpx.c $(OP) $(memory__h)\
+-- 
+1.9.1
+

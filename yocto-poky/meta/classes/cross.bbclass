@@ -68,10 +68,4 @@ do_install () {
 
 USE_NLS = "no"
 
-deltask package
-deltask packagedata
-deltask package_qa
-deltask package_write_ipk
-deltask package_write_deb
-deltask package_write_rpm
-deltask package_write
+inherit nopackages

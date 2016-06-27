@@ -1,0 +1,29 @@
+From 2f8aa21ace375c18977ed908b291c80a210a93c6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 31 Dec 2015 08:06:12 +0000
+Subject: [PATCH] environment.mak: musl based systems can generate shared
+ objects too
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ buildlib/environment.mak.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/buildlib/environment.mak.in b/buildlib/environment.mak.in
+index b0a8d9d..3a52344 100644
+--- a/buildlib/environment.mak.in
++++ b/buildlib/environment.mak.in
+@@ -68,7 +68,7 @@ NEED_SOCKLEN_T_DEFINE = @NEED_SOCKLEN_T_DEFINE@
+ 
+ # Shared library things
+ HOST_OS = @host_os@
+-ifneq ($(words $(filter gnu% linux-gnu% kfreebsd-gnu% %-gnu,$(HOST_OS))),0)
++ifneq ($(words $(filter gnu% linux-gnu% kfreebsd-gnu% %-gnu linux-musl%,$(HOST_OS))),0)
+    SONAME_MAGIC=-Wl,-soname -Wl,
+    LFLAGS_SO=
+ else
+-- 
+2.6.4
+

@@ -1,0 +1,33 @@
+From 77c95dacffe90382a1f131c801ac569120d95949 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 8 Jan 2016 07:32:24 +0000
+Subject: [PATCH 30/32] lib: Use PTHREAD_MUTEX_RECURSIVE in place of
+ PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP for non-glibc
+
+e.g. musl does not implement the _NP mutex types
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/tst_res.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/lib/tst_res.c b/lib/tst_res.c
+index 5c1c58c..3244b5e 100644
+--- a/lib/tst_res.c
++++ b/lib/tst_res.c
+@@ -104,8 +104,11 @@ int TEST_ERRNO;
+ 	assert(strlen(buf) > 0);		\
+ } while (0)
+ 
++#ifdef __GLIBC__
+ static pthread_mutex_t tmutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
+-
++#else
++static pthread_mutex_t tmutex = {  PTHREAD_MUTEX_RECURSIVE };
++#endif
+ /*
+  * Define local function prototypes.
+  */
+-- 
+2.7.0
+

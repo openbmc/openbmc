@@ -11,6 +11,9 @@ SRC_URI = "http://www.mega-nerd.com/SRC/libsamplerate-${PV}.tar.gz"
 
 SRC_URI[md5sum] = "1c7fb25191b4e6e3628d198a66a84f47"
 SRC_URI[sha256sum] = "93b54bdf46d5e6d2354b7034395fe329c222a966790de34520702bb9642f1c06"
+
+UPSTREAM_CHECK_URI = "http://www.mega-nerd.com/SRC/download.html"
+
 S = "${WORKDIR}/libsamplerate-${PV}"
 
 inherit autotools pkgconfig

@@ -28,6 +28,3 @@ do_install_append() {
 	rm -f ${D}${datadir}/applications/*.cache
 }
 
-EXTRA_OECONF += "--disable-introspection"
-
-UNKNOWN_CONFIGURE_WHITELIST += "--disable-introspection"

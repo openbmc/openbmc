@@ -1,0 +1,124 @@
+Disable various items that do not cross compile well.
+
+Upstream-Status: Inappropriate [Configuration]
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm/rpmdb/Makefile.am
+===================================================================
+--- rpm.orig/rpmdb/Makefile.am
++++ rpm/rpmdb/Makefile.am
+@@ -34,10 +34,10 @@ EXTRA_DIST = \
+ 	db3.c sqlite.c db_emu.h librpmdb.vers bdb.sql libsqldb.c \
+ 	logio.awk logio.src logio_recover_template logio_template logio.c \
+ 	logio_rec.c logio_auto.c logio_autop.c logio_auto.h \
+-	qf.l qf.y qf.inp tqf.l tqf.y tqf.inp grammar.y scanner.l json1.js
++	tqf.l tqf.y tqf.inp grammar.y scanner.l json1.js
+ 
+-EXTRA_PROGRAMS = qfcalc qfgraph logio tjfn tqf # tbdb
+-noinst_PROGRAMS = json
++EXTRA_PROGRAMS = qfcalc qfgraph logio # tjfn tqf tbdb
++noinst_PROGRAMS = # json
+ 
+ RPMMISC_LDADD_COMMON = \
+ 	$(top_builddir)/misc/librpmmisc.la \
+@@ -321,54 +321,39 @@ BUILT_SOURCES += .syntastic_c_config
+ .syntastic_c_config: Makefile
+ 	@echo $(COMPILE) | tr ' ' '\n' | sed -e '1d' > $@
+ 
+-tjfn_SOURCES = tjfn.c
+-tjfn_LDADD = $(mylibs)
+-
+-LEX =	flex
+-LFLAGS=	-d -T -v -8 -b --yylineno --reentrant --bison-bridge --perf-report
+-YACC =	bison
+-YFLAGS=	-Dapi.pure -t -d -v --report=all
+-
+-BUILT_SOURCES += Jgrammar.c Jgrammar.h Jscanner.c
+-Jgrammar.c: grammar.y
+-	$(YACC) $(YFLAGS) -o $@ $<
+-Jscanner.c: scanner.l
+-	$(LEX) -R -o $@ $<
+-json_SOURCES = Jgrammar.c Jscanner.c json.c
+-
+-testjson: json1.js json
+-	./json json1.js
+-
+-BUILT_SOURCES += Qgrammar.c Qgrammar.h Qscanner.c
+-Qgrammar.c: qf.y
+-	$(YACC) $(YFLAGS) -o $@ $<
+-Qscanner.c: qf.l
+-	$(LEX) -R -o $@ $<
+-qfcalc_SOURCES = Qgrammar.c Qscanner.c interpreter.c
+-qfgraph_SOURCES = Qgrammar.c Qscanner.c graph.c
+-
+-testqf: qfcalc qfgraph
+-	./qfcalc < qf.inp
+-	./qfgraph < qf.inp
+-
+-BUILT_SOURCES += Tgrammar.c Tgrammar.h Tscanner.c
+-Tgrammar.c Tgrammar.h: tqf.y
+-	$(YACC) $(YFLAGS) -o $@ $<
+-Tscanner.c Tscanner.h: tqf.l
+-	$(LEX) --prefix="Tyy" $(LFLAGS) -o $@ $<
+-tqf_SOURCES =	Tgrammar.c Tscanner.c tgraph.c
+-tqf_CFLAGS =	$(CFLAGS) -fsanitize=address # -DTSCANNER_MAIN
+-tqf_LDADD =	../lib/librpm.la \
+-		./librpmdb.la \
+-		../popt/libpopt.la
+-
+-testdir =	$(abs_top_builddir)/tests
+-foo: tqf
+-	-../libtool --mode=execute \
+-	    ./tqf \
+-		--dbpath=$(testdir) \
+-		-r $(testdir)/fodder/*.rpm \
+-		   $(testdir)/fodder/fmtmod.qf
++#tjfn_SOURCES = tjfn.c
++#tjfn_LDADD = $(mylibs)
++#
++#LFLAGS=	-d -T -v -8 -b --yylineno --reentrant --bison-bridge --perf-report
++#
++#BUILT_SOURCES += Jgrammar.c Jgrammar.h Jscanner.c
++#Jgrammar.c Jgrammar.h: grammar.y
++#	$(YACC) $(YFLAGS) -t -d -v -o $@ $<
++#Jscanner.c: scanner.l
++#	$(LEX) -R -o $@ $<
++#json_SOURCES = Jgrammar.c Jscanner.c json.c
++#
++#testjson: json1.js json
++#	./json json1.js
++#
++#BUILT_SOURCES += Tgrammar.c Tgrammar.h Tscanner.c
++#Tgrammar.c Tgrammar.h: tqf.y
++#	$(YACC) $(YFLAGS) -t -d -v -o $@ $<
++#Tscanner.c Tscanner.h: tqf.l
++#	$(LEX) --prefix="Tyy" $(LFLAGS) -o $@ $<
++#tqf_SOURCES =	Tgrammar.c Tscanner.c tgraph.c
++#tqf_CFLAGS =	$(CFLAGS) -fsanitize=address # -DTSCANNER_MAIN
++#tqf_LDADD =	../lib/librpm.la \
++#		./librpmdb.la \
++#		../popt/libpopt.la
++
++#testdir =	$(abs_top_builddir)/tests
++#foo: tqf
++#	-../libtool --mode=execute \
++#	    ./tqf \
++#		--dbpath=$(testdir) \
++#		-r $(testdir)/fodder/*.rpm \
++#		   $(testdir)/fodder/fmtmod.qf
+ 
+ #tbdb_SOURCES = tbdb.c bdb.c
+ #tbdb_LDADD = $(mylibs)
+Index: rpm/configure.ac
+===================================================================
+--- rpm.orig/configure.ac
++++ rpm/configure.ac
+@@ -119,6 +119,7 @@ AC_PROG_MAKE_SET
+ AC_PROG_LIBTOOL
+ AC_PROG_RANLIB
+ AC_PROG_YACC
++AM_PROG_LEX
+ 
+ AC_PATH_PROG(AS, as, as)
+ 

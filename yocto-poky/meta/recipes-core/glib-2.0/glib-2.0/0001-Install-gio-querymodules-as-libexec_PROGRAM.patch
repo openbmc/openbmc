@@ -1,0 +1,31 @@
+From 80682c171ccb27d01343d4cfcfb4dd49b7863ccc Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Tue, 22 Mar 2016 15:14:58 +0200
+Subject: [PATCH] Install gio-querymodules as libexec_PROGRAM
+
+We want to install this binary with the gio library, and debian
+renamer does not cope with library packages with files in ${bindir}
+
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Upstream-Status: Inappropriate [OE specific]
+---
+ gio/Makefile.am | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/gio/Makefile.am b/gio/Makefile.am
+index b7f91cc..4d81cc0 100644
+--- a/gio/Makefile.am
++++ b/gio/Makefile.am
+@@ -702,7 +702,8 @@ gio.def: libgio-2.0.la
+ gio-2.0.lib: libgio-2.0.la gio.def
+ 	$(AM_V_GEN) lib.exe -machine:@LIB_EXE_MACHINE_FLAG@ -name:libgio-2.0-$(LT_CURRENT_MINUS_AGE).dll -def:$(builddir)/gio.def -out:$@
+ 
+-bin_PROGRAMS = gio-querymodules glib-compile-schemas glib-compile-resources gsettings
++bin_PROGRAMS = glib-compile-schemas glib-compile-resources gsettings
++libexec_PROGRAMS = gio-querymodules
+ 
+ glib_compile_resources_LDADD = libgio-2.0.la 		\
+ 	$(top_builddir)/gobject/libgobject-2.0.la	\
+-- 
+2.1.4
+

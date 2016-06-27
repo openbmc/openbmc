@@ -73,7 +73,7 @@
         </para>
 
         <para>
-            <imagedata fileref="figures/user-configuration.png" align="center" width="5.5in" depth="3.5in" />
+            <imagedata fileref="figures/user-configuration.png" align="center" />
         </para>
 
         <para>
@@ -100,7 +100,7 @@
         </para>
 
         <para>
-            The <filename>meta-yocto</filename> layer inside Poky contains
+            The <filename>meta-poky</filename> layer inside Poky contains
             a <filename>conf</filename> directory that has example
             configuration files.
             These example files are used as a basis for creating actual
@@ -158,7 +158,7 @@
             To see the default configurations in a <filename>local.conf</filename>
             file created by the build environment script, see the
             <filename>local.conf.sample</filename> in the
-            <filename>meta-yocto</filename> layer:
+            <filename>meta-poky</filename> layer:
             <itemizedlist>
                 <listitem><para><emphasis>Parallelism Options:</emphasis>
                     Controlled by the
@@ -208,8 +208,10 @@
             The files <filename>site.conf</filename> and
             <filename>auto.conf</filename> are not created by the environment
             initialization script.
-            If you want these configuration files, you must create them
-            yourself:
+            If you want the <filename>site.conf</filename> file, you need to
+            create that yourself.
+            The <filename>auto.conf</filename> file is typically created by
+            an autobuilder:
             <itemizedlist>
                 <listitem><para><emphasis><filename>site.conf</filename>:</emphasis>
                     You can use the <filename>conf/site.conf</filename>
@@ -235,8 +237,7 @@
                     directory's <filename>conf/local.conf</filename> file.
                     </para></listitem>
                 <listitem><para><emphasis><filename>auto.conf</filename>:</emphasis>
-                    This file is not hand-created.
-                    Rather, the file is usually created and written to by
+                    The file is usually created and written to by
                     an autobuilder.
                     The settings put into the file are typically the same as
                     you would find in the <filename>conf/local.conf</filename>
@@ -254,9 +255,24 @@
 
         <para>
             When you launch your build with the
-            <filename>bitbake <replaceable>target</replaceable></filename> command, BitBake
-            sorts out the configurations to ultimately define your build
-            environment.
+            <filename>bitbake <replaceable>target</replaceable></filename>
+            command, BitBake sorts out the configurations to ultimately
+            define your build environment.
+            It is important to understand that the OpenEmbedded build system
+            reads the configuration files in a specific order:
+            <filename>site.conf</filename>, <filename>auto.conf</filename>,
+            and <filename>local.conf</filename>.
+            And, the build system applies the normal assignment statement
+            rules.
+            Because the files are parsed in a specific order, variable
+            assignments for the same variable could be affected.
+            For example, if the <filename>auto.conf</filename> file and
+            the <filename>local.conf</filename> set
+            <replaceable>variable1</replaceable> to different values, because
+            the build system parses <filename>local.conf</filename> after
+            <filename>auto.conf</filename>,
+            <replaceable>variable1</replaceable> is assigned the value from
+            the <filename>local.conf</filename> file.
         </para>
     </section>
 
@@ -992,11 +1008,13 @@
 
             <para>
                 The image generation process consists of several stages and
-                depends on many variables.
+                depends on several tasks and variables.
                 The
                 <link linkend='ref-tasks-rootfs'><filename>do_rootfs</filename></link>
-                task uses these key variables
-                to help create the list of packages to actually install:
+                task creates the root filesystem (file and directory structure)
+                for an image.
+                This task uses several key variables to help create the list
+                of packages to actually install:
                 <itemizedlist>
                     <listitem><para><link linkend='var-IMAGE_INSTALL'><filename>IMAGE_INSTALL</filename></link>:
                         Lists out the base set of packages to install from
@@ -1016,7 +1034,20 @@
                         Determines the language(s) for which additional
                         language support packages are installed.
                         </para></listitem>
+                    <listitem><para><link linkend='var-PACKAGE_INSTALL'><filename>PACKAGE_INSTALL</filename></link>:
+                        The final list of packages passed to the package manager
+                        for installation into the image.
+                        </para></listitem>
                 </itemizedlist>
+            </para>
+
+            <para>
+                With
+                <link linkend='var-IMAGE_ROOTFS'><filename>IMAGE_ROOTFS</filename></link>
+                pointing to the location of the filesystem under construction and
+                the <filename>PACKAGE_INSTALL</filename> variable providing the
+                final list of packages to install, the root file system is
+                created.
             </para>
 
             <para>
@@ -1026,13 +1057,11 @@
                 At the end of the process, if package management is not
                 enabled for the target, the package manager's data files
                 are deleted from the root filesystem.
-            </para>
-
-            <para>
-                During image generation, the build system attempts to run
-                all post-installation scripts.
-                Any that fail to run on the build host are run on the
-                target when the target system is first booted.
+                As part of the final stage of package installation, postinstall
+                scripts that are part of the packages are run.
+                Any scripts that fail to run
+                on the build host are run on the target when the target system
+                is first booted.
                 If you are using a
                 <ulink url='&YOCTO_DOCS_DEV_URL;#creating-a-read-only-root-filesystem'>read-only root filesystem</ulink>,
                 all the post installation scripts must succeed during the
@@ -1041,24 +1070,17 @@
             </para>
 
             <para>
-                During Optimization, optimizing processes are run across
-                the image.
-                These processes include <filename>mklibs</filename> and
-                <filename>prelink</filename>.
-                The <filename>mklibs</filename> process optimizes the size
-                of the libraries.
-                A <filename>prelink</filename> process optimizes the dynamic
-                linking of shared libraries to reduce start up time of
-                executables.
+                The final stages of the <filename>do_rootfs</filename> task
+                handle post processing.
+                Post processing includes creation of a manifest file and
+                optimizations.
             </para>
 
             <para>
-                Along with writing out the root filesystem image, the
-                <filename>do_rootfs</filename> task creates a manifest file
-                (<filename>.manifest</filename>) in the same directory as
-                the root filesystem image that lists out, line-by-line, the
-                installed packages.
-                This manifest file is useful for the
+                The manifest file (<filename>.manifest</filename>) resides
+                in the same directory as the root filesystem image.
+                This file lists out, line-by-line, the installed packages.
+                The manifest file is useful for the
                 <link linkend='ref-classes-testimage*'><filename>testimage</filename></link>
                 class, for example, to determine whether or not to run
                 specific tests.
@@ -1068,19 +1090,52 @@
             </para>
 
             <para>
-                Part of the image generation process includes compressing the
-                root filesystem image.
-                Compression is accomplished through several optimization
-                routines designed to reduce the overall size of the image.
+                Optimizing processes run across the image include
+                <filename>mklibs</filename>, <filename>prelink</filename>,
+                and any other post-processing commands as defined by the
+                <link linkend='var-ROOTFS_POSTPROCESS_COMMAND'><filename>ROOTFS_POSTPROCESS_COMMAND</filename></link>
+                variable.
+                The <filename>mklibs</filename> process optimizes the size
+                of the libraries, while the
+                <filename>prelink</filename> process optimizes the dynamic
+                linking of shared libraries to reduce start up time of
+                executables.
             </para>
 
             <para>
-                After the root filesystem has been constructed, the image
-                generation process turns everything into an image file or
-                a set of image files.
+                After the root filesystem is built, processing begins on
+                the image through the <filename>do_image</filename> task.
+                The build system runs any pre-processing commands as defined
+                by the
+                <link linkend='var-IMAGE_PREPROCESS_COMMAND'><filename>IMAGE_PREPROCESS_COMMAND</filename></link>
+                variable.
+                This variable specifies a list of functions to call before
+                the OpenEmbedded build system creates the final image output
+                files.
+            </para>
+
+            <para>
+                The <filename>do_image</filename> task dynamically creates
+                other <filename>do_image_*</filename> tasks as needed, which
+                include compressing the root filesystem image to reduce the
+                overall size of the image.
+                The process turns everything into an image file or a set of
+                image files.
                 The formats used for the root filesystem depend on the
                 <link linkend='var-IMAGE_FSTYPES'><filename>IMAGE_FSTYPES</filename></link>
                 variable.
+            </para>
+
+            <para>
+                The final task involved in image creation is the
+                <filename>do_image_complete</filename> task.
+                This task completes the image by applying any image
+                post processing as defined through the
+                <link linkend='var-IMAGE_POSTPROCESS_COMMAND'><filename>IMAGE_POSTPROCESS_COMMAND</filename></link>
+                variable.
+                The variable specifies a list of functions to call once the
+                OpenEmbedded build system has created the final image output
+                files.
             </para>
 
             <note>
@@ -1095,8 +1150,9 @@
 
             <para>
                 The OpenEmbedded build system uses BitBake to generate the
-                Software Development Kit (SDK) installer script:
-                <imagedata fileref="figures/sdk-generation.png" align="center" width="6in" depth="7in" />
+                Software Development Kit (SDK) installer script for both the
+                standard and extensible SDKs:
+                <imagedata fileref="figures/sdk-generation.png" align="center" />
             </para>
 
             <note>
@@ -1108,14 +1164,16 @@
                 cross-development toolchain using the
                 <link linkend='ref-tasks-populate_sdk'><filename>do_populate_sdk</filename></link>
                 task, see the
-                "<ulink url='&YOCTO_DOCS_ADT_URL;#optionally-building-a-toolchain-installer'>Optionally Building a Toolchain Installer</ulink>"
-                section in the Yocto Project Application Developer's Guide.
+                "<ulink url='&YOCTO_DOCS_SDK_URL;#sdk-building-an-sdk-installer'>Building an SDK Installer</ulink>"
+                section in the Yocto Project Software Development Kit (SDK)
+                Developer's Guide.
             </note>
 
             <para>
                 Like image generation, the SDK script process consists of
                 several stages and depends on many variables.
-                The <filename>do_populate_sdk</filename> task uses these
+                The <filename>do_populate_sdk</filename> and
+                <filename>do_populate_sdk_ext</filename> tasks use these
                 key variables to help create the list of packages to actually
                 install.
                 For information on the variables listed in the figure, see the
@@ -1124,8 +1182,9 @@
             </para>
 
             <para>
-                The <filename>do_populate_sdk</filename> task handles two
-                parts: a target part and a host part.
+                The <filename>do_populate_sdk</filename> task helps create
+                the standard SDK and handles two parts: a target part and a
+                host part.
                 The target part is the part built for the target hardware and
                 includes libraries and headers.
                 The host part is the part of the SDK that runs on the
@@ -1133,16 +1192,19 @@
             </para>
 
             <para>
-                Once both parts are constructed, the
-                <filename>do_populate_sdk</filename> task performs some cleanup
-                on both parts.
-                After the cleanup, the task creates a cross-development
-                environment setup script and any configuration files that
-                might be needed.
+                The <filename>do_populate_sdk_ext</filename> task helps create
+                the extensible SDK and handles host and target parts
+                differently than its counter part does for the standard SDK.
+                For the extensible SDK, the task encapsulates the build system,
+                which includes everything needed (host and target) for the SDK.
             </para>
 
             <para>
-                The final output of the task is the Cross-development
+                Regardless of the type of SDK being constructed, the
+                tasks perform some cleanup after which a cross-development
+                environment setup script and any needed configuration files
+                are created.
+                The final output is the Cross-development
                 toolchain installation script (<filename>.sh</filename> file),
                 which includes the environment setup script.
             </para>
@@ -1239,8 +1301,13 @@
             <link linkend='general-yocto-environment-figure'>general Yocto Project Development Environment figure</link>,
             the output labeled "Application Development SDK" represents an
             SDK.
+            The SDK generation process differs depending on whether you build
+            a standard SDK
+            (e.g. <filename>bitbake -c populate_sdk</filename> <replaceable>imagename</replaceable>)
+            or an extensible SDK
+            (e.g. <filename>bitbake -c populate_sdk_ext</filename> <replaceable>imagename</replaceable>).
             This section is going to take a closer look at this output:
-            <imagedata fileref="figures/sdk.png" align="center" width="5in" depth="4in" />
+            <imagedata fileref="figures/sdk.png" align="center" width="9in" depth="7.25in" />
         </para>
 
         <para>
@@ -1255,20 +1322,16 @@
             part because it runs on the SDK machine.
             You can think of the libraries and headers as the "target"
             part because they are built for the target hardware.
-            The setup script is added so that you can initialize the
-            environment before using the tools.
+            The environment setup script is added so that you can initialize
+            the environment before using the tools.
         </para>
 
         <note>
             <para>
                 The Yocto Project supports several methods by which you can
                 set up this cross-development environment.
-                These methods include downloading pre-built SDK installers,
-                building and installing your own SDK installer, or running
-                an Application Development Toolkit (ADT) installer to
-                install not just cross-development toolchains
-                but also additional tools to help in this type of
-                development.
+                These methods include downloading pre-built SDK installers
+                or building and installing your own SDK installer.
             </para>
 
             <para>
@@ -1278,8 +1341,7 @@
                 section.
                 For information on setting up a cross-development
                 environment, see the
-                "<ulink url='&YOCTO_DOCS_ADT_URL;#installing-the-adt'>Installing the ADT and Toolchains</ulink>"
-                section in the Yocto Project Application Developer's Guide.
+                <ulink url='&YOCTO_DOCS_SDK_URL;#sdk-manual'>Yocto Project Software Development Kit (SDK) Developer's Guide</ulink>.
             </para>
         </note>
 
@@ -1288,7 +1350,10 @@
             <filename>deploy/sdk</filename> folder inside the
             <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>
             as shown in the figure at the beginning of this section.
-            Several variables exist that help configure these files:
+            Depending on the type of SDK, several variables exist that help
+            configure these files.
+            The following list shows the variables associated with a standard
+            SDK:
             <itemizedlist>
                 <listitem><para><link linkend='var-DEPLOY_DIR'><filename>DEPLOY_DIR</filename></link>:
                     Points to the <filename>deploy</filename>
@@ -1320,6 +1385,36 @@
                 <listitem><para><link linkend='var-SDKPATH'><filename>SDKPATH</filename></link>:
                     Defines the default SDK installation path offered by the
                     installation script.
+                    </para></listitem>
+            </itemizedlist>
+            This next list, shows the variables associated with an extensible
+            SDK:
+            <itemizedlist>
+                <listitem><para><link linkend='var-DEPLOY_DIR'><filename>DEPLOY_DIR</filename></link>:
+                    Points to the <filename>deploy</filename> directory.
+                    </para></listitem>
+                <listitem><para><link linkend='var-SDK_EXT_TYPE'><filename>SDK_EXT_TYPE</filename></link>:
+                    Controls whether or not shared state artifacts are copied
+                    into the extensible SDK.
+                    By default, all required shared state artifacts are copied
+                    into the SDK.
+                    </para></listitem>
+                <listitem><para><link linkend='var-SDK_INCLUDE_PKGDATA'><filename>SDK_INCLUDE_PKGDATA</filename></link>:
+                    Specifies whether or not packagedata will be included in
+                    the extensible SDK for all recipes in the "world" target.
+                    </para></listitem>
+                <listitem><para><link linkend='var-SDK_LOCAL_CONF_WHITELIST'><filename>SDK_LOCAL_CONF_WHITELIST</filename></link>:
+                    A list of variables allowed through from the build system
+                    configuration into the extensible SDK configuration.
+                    </para></listitem>
+                <listitem><para><link linkend='var-SDK_LOCAL_CONF_BLACKLIST'><filename>SDK_LOCAL_CONF_BLACKLIST</filename></link>:
+                    A list of variables not allowed through from the build
+                    system configuration into the extensible SDK configuration.
+                    </para></listitem>
+                <listitem><para><link linkend='var-SDK_INHERIT_BLACKLIST'><filename>SDK_INHERIT_BLACKLIST</filename></link>:
+                    A list of classes to remove from the
+                    <link linkend='var-INHERIT'><filename>INHERIT</filename></link>
+                    value globally within the extensible SDK configuration.
                     </para></listitem>
             </itemizedlist>
         </para>

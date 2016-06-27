@@ -21,8 +21,6 @@ FILES_${PN}-dev = "\
     ${libdir}/${TARGET_SYS}/${BINV}* \
 "
 
-FILES_${PN}-dbg += "${base_libdir}/.debug/"
-
 LIBGCCBUILDTREENAME = "gcc-build-internal-"
 
 do_package[depends] += "virtual/${MLPREFIX}libc:do_packagedata"

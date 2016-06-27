@@ -10,6 +10,9 @@ SRC_URI = "${GNU_MIRROR}/automake/automake-${PV}.tar.gz"
 inherit autotools texinfo
 
 do_configure() {
+	# We can end up patching macros, which would then mean autoreconf
+	# Cheat by saying everything is up to date.
+	touch ${S}/aclocal.m4 ${S}/Makefile.in ${S}/configure
 	oe_runconf
 }
 

@@ -1,0 +1,118 @@
+From 3836518c46bd5bb3e71371b1b18274bf2d487133 Mon Sep 17 00:00:00 2001
+From: Andre McCurdy <armccurdy@gmail.com>
+Date: Mon, 18 Jan 2016 11:01:00 -0800
+Subject: [PATCH] update gawk paths, /bin/gawk -> /usr/bin/gawk
+
+The default path to gawk is /usr/bin/gawk, so update test scripts etc
+from #!/bin/gawk to #!/usr/bin/gawk. Fixes missing RDPENDS QA tests:
+
+  WARNING: QA Issue: /usr/lib/strace/ptest/tests/unix-yy-accept.awk_strace-ptest contained in package strace-ptest requires /bin/gawk, but no providers found in its RDEPENDS [file-rdeps]
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+---
+ mpers.awk                 | 2 +-
+ tests/caps.awk            | 2 +-
+ tests/match.awk           | 2 +-
+ tests/net-yy-accept.awk   | 2 +-
+ tests/net-yy-connect.awk  | 2 +-
+ tests/sigaction.awk       | 2 +-
+ tests/uid.awk             | 2 +-
+ tests/unix-yy-accept.awk  | 2 +-
+ tests/unix-yy-connect.awk | 2 +-
+ 9 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/mpers.awk b/mpers.awk
+index 73bf0b0..50e6c16 100644
+--- a/mpers.awk
++++ b/mpers.awk
+@@ -1,4 +1,4 @@
+-#!/bin/gawk
++#!/usr/bin/gawk
+ #
+ # Copyright (c) 2015 Elvira Khabirova <lineprinter0@gmail.com>
+ # Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+diff --git a/tests/caps.awk b/tests/caps.awk
+index bad8b0f..845f37c 100644
+--- a/tests/caps.awk
++++ b/tests/caps.awk
+@@ -1,4 +1,4 @@
+-#!/bin/gawk
++#!/usr/bin/gawk
+ #
+ # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
+ # All rights reserved.
+diff --git a/tests/match.awk b/tests/match.awk
+index abfbae9..f2740bf 100644
+--- a/tests/match.awk
++++ b/tests/match.awk
+@@ -1,4 +1,4 @@
+-#!/bin/gawk
++#!/usr/bin/gawk
+ #
+ # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
+ # All rights reserved.
+diff --git a/tests/net-yy-accept.awk b/tests/net-yy-accept.awk
+index fed3e30..e916ab0 100644
+--- a/tests/net-yy-accept.awk
++++ b/tests/net-yy-accept.awk
+@@ -1,4 +1,4 @@
+-#!/bin/gawk
++#!/usr/bin/gawk
+ #
+ # Copyright (c) 2014 Masatake YAMATO <yamato@redhat.com>
+ # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
+diff --git a/tests/net-yy-connect.awk b/tests/net-yy-connect.awk
+index f4dcf91..b3cec8c 100644
+--- a/tests/net-yy-connect.awk
++++ b/tests/net-yy-connect.awk
+@@ -1,4 +1,4 @@
+-#!/bin/gawk
++#!/usr/bin/gawk
+ #
+ # Copyright (c) 2014 Masatake YAMATO <yamato@redhat.com>
+ # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
+diff --git a/tests/sigaction.awk b/tests/sigaction.awk
+index 5c6b6d0..3e14464 100644
+--- a/tests/sigaction.awk
++++ b/tests/sigaction.awk
+@@ -1,4 +1,4 @@
+-#!/bin/gawk
++#!/usr/bin/gawk
+ #
+ # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
+ # All rights reserved.
+diff --git a/tests/uid.awk b/tests/uid.awk
+index a56c5be..67b0749 100644
+--- a/tests/uid.awk
++++ b/tests/uid.awk
+@@ -1,4 +1,4 @@
+-#!/bin/gawk
++#!/usr/bin/gawk
+ #
+ # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
+ # All rights reserved.
+diff --git a/tests/unix-yy-accept.awk b/tests/unix-yy-accept.awk
+index 4ed60e4..2a9d9c0 100644
+--- a/tests/unix-yy-accept.awk
++++ b/tests/unix-yy-accept.awk
+@@ -1,4 +1,4 @@
+-#!/bin/gawk
++#!/usr/bin/gawk
+ #
+ # Copyright (c) 2014 Masatake YAMATO <yamato@redhat.com>
+ # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
+diff --git a/tests/unix-yy-connect.awk b/tests/unix-yy-connect.awk
+index 262bf2e..c809dfa 100644
+--- a/tests/unix-yy-connect.awk
++++ b/tests/unix-yy-connect.awk
+@@ -1,4 +1,4 @@
+-#!/bin/gawk
++#!/usr/bin/gawk
+ #
+ # Copyright (c) 2014 Masatake YAMATO <yamato@redhat.com>
+ # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
+-- 
+1.9.1
+

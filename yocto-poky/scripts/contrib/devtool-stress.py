@@ -35,6 +35,7 @@ import fnmatch
 scripts_lib_path = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'lib'))
 sys.path.insert(0, scripts_lib_path)
 import scriptutils
+import argparse_oe
 logger = scriptutils.logger_create('devtool-stress')
 
 def select_recipes(args):
@@ -204,8 +205,8 @@ def stress_modify(args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="devtool stress tester",
-                                     epilog="Use %(prog)s <subcommand> --help to get help on a specific command")
+    parser = argparse_oe.ArgumentParser(description="devtool stress tester",
+                                        epilog="Use %(prog)s <subcommand> --help to get help on a specific command")
     parser.add_argument('-d', '--debug', help='Enable debug output', action='store_true')
     parser.add_argument('-r', '--resume-from', help='Resume from specified recipe', metavar='PN')
     parser.add_argument('-o', '--only', help='Only test specified recipes (comma-separated without spaces, wildcards allowed)', metavar='PNLIST')

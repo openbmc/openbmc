@@ -1,0 +1,42 @@
+From f8910022dc3ec622272f168cd0022dbdf6dff93a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 30 Dec 2015 23:05:41 +0000
+Subject: [PATCH] add musleabi to known target tripets
+
+helps compiling dpkg for musl/arm-softfloat
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ ostable      | 1 +
+ triplettable | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/ostable b/ostable
+index 3bb6819..d0ffdc7 100644
+--- a/ostable
++++ b/ostable
+@@ -15,6 +15,7 @@
+ uclibceabi-linux	linux-uclibceabi	linux[^-]*-uclibceabi
+ uclibc-linux		linux-uclibc		linux[^-]*-uclibc
+ musleabihf-linux	linux-musleabihf	linux[^-]*-musleabihf
++musleabi-linux		linux-musleabi		linux[^-]*-musleabi
+ musl-linux		linux-musl		linux[^-]*-musl
+ gnueabihf-linux		linux-gnueabihf		linux[^-]*-gnueabihf
+ gnueabi-linux		linux-gnueabi		linux[^-]*-gnueabi
+diff --git a/triplettable b/triplettable
+index 1213584..70d24c1 100644
+--- a/triplettable
++++ b/triplettable
+@@ -6,6 +6,7 @@
+ uclibceabi-linux-arm	uclibc-linux-armel
+ uclibc-linux-<cpu>	uclibc-linux-<cpu>
+ musleabihf-linux-arm	musl-linux-armhf
++musleabi-linux-arm	musl-linux-armel
+ musl-linux-<cpu>	musl-linux-<cpu>
+ gnueabihf-linux-arm	armhf
+ gnueabi-linux-arm	armel
+-- 
+2.6.4
+

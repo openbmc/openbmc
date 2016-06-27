@@ -9,7 +9,7 @@ require conf/machine/include/x86/arch-x86.inc
 
 # x86 with no lock prefix
 TUNEVALID[i586-nlp] = "IA32 with Lock Prefix omitted"
-TUNE_CCARGS .= "${@bb.utils.contains("TUNE_FEATURES", "i586-nlp", " -march=i586 -Wa,-momit-lock-prefix=yes", "", d)}"
+TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'i586-nlp', ' -march=i586 -Wa,-momit-lock-prefix=yes', '', d)}"
 
 # Quark tune feature
 AVAILTUNES = "i586-nlp-32"

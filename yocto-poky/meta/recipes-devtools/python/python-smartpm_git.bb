@@ -19,7 +19,6 @@ SRC_URI = "\
           file://smart-channelsdir.patch \
           file://smart-attempt.patch \
           file://smart-attempt-fix.patch \
-          file://smart-rpm4-fixes.patch \
           file://smart-add-for-rpm-ignoresize-check.patch \
           file://smart-already-installed-message.patch \
           file://smart-set-noprogress-for-pycurl.patch \
@@ -127,8 +126,6 @@ RDEPENDS_${PN}-interface-qt4 = "qt4-x11 ${PN}-interface-images"
 RDEPENDS_${PN}-interface-gtk = "gtk+ ${PN}-interface-images"
 
 FILES_smartpm = "${bindir}/smart"
-
-FILES_${PN}-dbg += "${libdir}/python*/site-packages/smart/backends/rpm/.debug"
 
 FILES_${PN}-backend-rpm = "${libdir}/python*/site-packages/smart/backends/rpm"
 

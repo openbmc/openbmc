@@ -1,0 +1,56 @@
+Use extern "C" instead of __BEGIN_DECL/__END_DECL macros
+these macros are defined in sys/cdefs.h for glibc and this header is not available on all libc
+
+anyway they defined like below
+
+#ifdef __cplusplus
+# define __BEGIN_DECLS extern "C" {
+# define __END_DECLS }
+#else
+# define __BEGIN_DECLS /* empty */
+# define __END_DECLS /* empty */
+#endif
+
+__THROW macro is also not available on musl, defined thusly
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: attr-2.4.47/include/xattr.h
+===================================================================
+--- attr-2.4.47.orig/include/xattr.h	2014-04-02 00:01:30.252091280 -0700
++++ attr-2.4.47/include/xattr.h	2014-04-02 00:12:57.985428099 -0700
+@@ -30,8 +30,20 @@
+ #define XATTR_CREATE  0x1       /* set value, fail if attr already exists */
+ #define XATTR_REPLACE 0x2       /* set value, fail if attr does not exist */
+ 
+-
+-__BEGIN_DECLS
++#ifndef __THROW
++# ifndef __GNUC_PREREQ
++#  define __GNUC_PREREQ(maj, min) (0)
++# endif
++# if defined __cplusplus && __GNUC_PREREQ (2,8)
++#  define __THROW       throw ()
++# else
++#  define __THROW
++# endif
++#endif
++
++#ifdef __cplusplus
++extern "C" {
++#endif
+ 
+ extern int setxattr (const char *__path, const char *__name,
+ 		      const void *__value, size_t __size, int __flags) __THROW;
+@@ -58,6 +70,8 @@
+ extern int lremovexattr (const char *__path, const char *__name) __THROW;
+ extern int fremovexattr (int __filedes,   const char *__name) __THROW;
+ 
+-__END_DECLS
++#ifdef __cplusplus
++}
++#endif
+ 
+ #endif	/* __XATTR_H__ */

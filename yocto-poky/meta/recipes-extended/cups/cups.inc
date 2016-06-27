@@ -3,14 +3,14 @@ SECTION = "console/utils"
 LICENSE = "GPLv2 & LGPLv2"
 DEPENDS = "gnutls libpng jpeg dbus dbus-glib zlib libusb"
 
-SRC_URI = "http://www.cups.org/software/${PV}/${BP}-source.tar.bz2 \
+SRC_URI = "https://www.cups.org/software/${PV}/${BP}-source.tar.bz2 \
            file://use_echo_only_in_init.patch \
            file://0001-don-t-try-to-run-generated-binaries.patch \
            file://cups_serverbin.patch \
-           file://cups.socket \
-           file://cups.path \
-           file://cups.service \
 	  "
+
+UPSTREAM_CHECK_URI = "http://www.cups.org/software.php"
+UPSTREAM_CHECK_REGEX = "cups-(?P<pver>\d+\.\d+(\.\d+)?)-source.tar"
 
 LEAD_SONAME = "libcupsdriver.so"
 
@@ -21,13 +21,15 @@ inherit autotools-brokensep binconfig useradd systemd
 USERADD_PACKAGES = "${PN}"
 GROUPADD_PARAM_${PN} = "--system lpadmin"
 
-SYSTEMD_SERVICE_${PN} = "cups.socket cups.path cups.service"
+SYSTEMD_SERVICE_${PN} = "org.cups.cupsd.socket org.cups.cupsd.path org.cups.cupsd.service org.cups.cups-lpd.socket org.cups.cups-lpd@.service"
 
 PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'zeroconf', 'avahi', '', d)} \
+                   ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)} \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'pam', '', d)}"
 PACKAGECONFIG[avahi] = "--enable-avahi,--disable-avahi,avahi"
 PACKAGECONFIG[acl] = "--enable-acl,--disable-acl,acl"
 PACKAGECONFIG[pam] = "--enable-pam, --disable-pam, libpam"
+PACKAGECONFIG[systemd] = "--with-systemd=${systemd_system_unitdir},--without-systemd,systemd"
 PACKAGECONFIG[xinetd] = "--with-xinetd=${sysconfdir}/xinetd.d,--without-xinetd,xinetd"
 
 EXTRA_OECONF = " \
@@ -75,13 +77,6 @@ do_install () {
 	    rm -rf ${D}${sysconfdir}/init.d/
 	    rm -rf ${D}${sysconfdir}/rc*
 	fi
-
-	# Install systemd unit files
-	install -d ${D}${systemd_unitdir}/system
-	install -m 0644 ${WORKDIR}/cups.socket ${D}${systemd_unitdir}/system
-	install -m 0644 ${WORKDIR}/cups.path ${D}${systemd_unitdir}/system
-	install -m 0644 ${WORKDIR}/cups.service ${D}${systemd_unitdir}/system
-	sed -i -e 's,@SBINDIR@,${sbindir},g' ${D}${systemd_unitdir}/system/cups.service
 }
 
 python do_package_append() {
@@ -105,14 +100,6 @@ FILES_${PN} += "${libdir}/cups/backend \
 FILES_${PN}-lib = "${libdir}/libcups.so.*"
 
 FILES_${PN}-libimage = "${libdir}/libcupsimage.so.*"
-
-FILES_${PN}-dbg += "${libdir}/cups/backend/.debug \
-                    ${libdir}/cups/cgi-bin/.debug \
-                    ${libdir}/cups/filter/.debug \
-                    ${libdir}/cups/monitor/.debug \
-                    ${libdir}/cups/notifier/.debug \
-                    ${libdir}/cups/daemon/.debug \
-                   "
 
 #package the html for the webgui inside the main packages (~1MB uncompressed)
 

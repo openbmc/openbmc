@@ -1,0 +1,51 @@
+From 1f54181c2df1fb92c3323a6dbf8273fb66b883b6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?J=C3=A9r=C3=A9mie=20Galarneau?=
+ <jeremie.galarneau@efficios.com>
+Date: Sat, 17 Oct 2015 19:41:47 -0400
+Subject: [PATCH] Port: Don't use SIGUNUSED which is not defined on Solaris
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Organization: O.S. Systems Software LTDA.
+
+Upstream-Status: Backport [2.8.0]
+
+Signed-off-by: Jérémie Galarneau <jeremie.galarneau@efficios.com>
+---
+ src/common/runas.c | 18 +++++-------------
+ 1 file changed, 5 insertions(+), 13 deletions(-)
+
+diff --git a/src/common/runas.c b/src/common/runas.c
+index 57f7382..0825470 100644
+--- a/src/common/runas.c
++++ b/src/common/runas.c
+@@ -530,21 +530,13 @@ int run_as_rmdir_recursive(const char *path, uid_t uid, gid_t gid)
+ static
+ int reset_sighandler(void)
+ {
+-	int sig, ret = 0;
++	int sig;
+ 
+-	for (sig = SIGHUP; sig <= SIGUNUSED; sig++) {
+-		/* Skip unblockable signals. */
+-		if (sig == SIGKILL || sig == SIGSTOP) {
+-			continue;
+-		}
+-		if (signal(sig, SIG_DFL) == SIG_ERR) {
+-			PERROR("reset signal %d", sig);
+-			ret = -1;
+-			goto end;
+-		}
++	DBG("Resetting run_as worker signal handlers to default");
++	for (sig = 1; sig <= 31; sig++) {
++		(void) signal(sig, SIG_DFL);
+ 	}
+-end:
+-	return ret;
++	return 0;
+ }
+ 
+ static
+-- 
+2.6.2
+

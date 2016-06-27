@@ -1,0 +1,67 @@
+From 1ef8c32317064438ec3b37a114f5d82957f4e0c6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 7 Jan 2016 20:05:54 +0000
+Subject: [PATCH 13/32] include fcntl.h for getting O_* definitions
+
+musl exposes this issue, with glibc fcntl.h is included via some other
+header and this problem remained latent
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ testcases/kernel/ipc/ipc_stress/shmem_test_03.c   | 1 +
+ testcases/kernel/syscalls/mq_notify/mq_notify01.c | 1 +
+ testcases/network/tcp_cmds/sendfile/testsf_c.c    | 1 +
+ testcases/network/tcp_cmds/sendfile/testsf_s.c    | 1 +
+ 4 files changed, 4 insertions(+)
+
+diff --git a/testcases/kernel/ipc/ipc_stress/shmem_test_03.c b/testcases/kernel/ipc/ipc_stress/shmem_test_03.c
+index c1b11fd..8be156f 100644
+--- a/testcases/kernel/ipc/ipc_stress/shmem_test_03.c
++++ b/testcases/kernel/ipc/ipc_stress/shmem_test_03.c
+@@ -72,6 +72,7 @@
+ #include <string.h>
+ #include <unistd.h>
+ #include <limits.h>
++#include <fcntl.h>
+ #include <sys/file.h>
+ #include <sys/ipc.h>
+ #include <sys/mman.h>
+diff --git a/testcases/kernel/syscalls/mq_notify/mq_notify01.c b/testcases/kernel/syscalls/mq_notify/mq_notify01.c
+index 4728c70..5c7846c 100644
+--- a/testcases/kernel/syscalls/mq_notify/mq_notify01.c
++++ b/testcases/kernel/syscalls/mq_notify/mq_notify01.c
+@@ -41,6 +41,7 @@
+ #include <mqueue.h>
+ #include <signal.h>
+ #include <stdlib.h>
++#include <fcntl.h>
+ 
+ #include "../utils/include_j_h.h"
+ 
+diff --git a/testcases/network/tcp_cmds/sendfile/testsf_c.c b/testcases/network/tcp_cmds/sendfile/testsf_c.c
+index 449784f..38d3274 100644
+--- a/testcases/network/tcp_cmds/sendfile/testsf_c.c
++++ b/testcases/network/tcp_cmds/sendfile/testsf_c.c
+@@ -9,6 +9,7 @@
+ #include <sys/types.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <fcntl.h>
+ #include <sys/file.h>
+ #include <arpa/inet.h>
+ #include <netinet/in.h>
+diff --git a/testcases/network/tcp_cmds/sendfile/testsf_s.c b/testcases/network/tcp_cmds/sendfile/testsf_s.c
+index 17e98ad..bce8dd1 100644
+--- a/testcases/network/tcp_cmds/sendfile/testsf_s.c
++++ b/testcases/network/tcp_cmds/sendfile/testsf_s.c
+@@ -6,6 +6,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <unistd.h>
++#include <fcntl.h>
+ #include <sys/file.h>
+ #include <errno.h>
+ #include <sys/signal.h>
+-- 
+2.7.0
+

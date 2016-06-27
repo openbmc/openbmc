@@ -6,7 +6,7 @@ when the generating process is executed on different architectures.
 
 This patch resolves it by taking the byte order that host uses.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [RPM5 maintainer]
 
 Signed-off-by: Ming Liu <ming.liu@windriver.com>
 ---

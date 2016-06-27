@@ -1,23 +1,29 @@
-Support both db5 and db6.
+From 7bad268de8b32281e2a12ccd88038b3ec5eb1be3 Mon Sep 17 00:00:00 2001
+From: Yuanjie Huang <Yuanjie.Huang@windriver.com>
+Date: Tue, 15 Dec 2015 18:50:21 +0800
+Subject: [PATCH] Support both db5 and db6.
 
 Upstream-Status: Inappropriate [configuration]
 
-Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+Signed-off-by: Yuanjie Huang <Yuanjie.Huang@windriver.com>
+---
+ configure.ac | 103 ++++++++++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 81 insertions(+), 22 deletions(-)
 
 Index: rpm/configure.ac
 ===================================================================
 --- rpm.orig/configure.ac
 +++ rpm/configure.ac
-@@ -547,8 +547,6 @@ else
+@@ -871,8 +871,6 @@ else
      MYPATH=$PATH
  fi
  
--DBXY=db60
+-DBXY=db61
 -
  AC_PATH_PROG(__BASH, bash, %{_bindir}/bash, $MYPATH)
  AC_PATH_PROG(__BZIP2, bzip2, %{_bindir}/bzip2, $MYPATH)
  AC_PATH_PROG(__CAT, cat, /bin/cat, $MYPATH)
-@@ -560,22 +558,6 @@ AC_PATH_PROG(__CMAKE, cmake, %{_bindir}/
+@@ -884,22 +882,6 @@ AC_PATH_PROG(__CMAKE, cmake, %{_bindir}/
  AC_PATH_PROG(__CPIO, cpio, /bin/cpio, $MYPATH)
  AC_PATH_PROG(__CURL, curl, %{_bindir}/curl, $MYPATH)
  AC_PATH_PROG(__CVS, cvs, %{_bindir}/cvs, $MYPATH)
@@ -40,7 +46,7 @@ Index: rpm/configure.ac
  AC_PATH_PROG(__DIFF, diff, /bin/diff, $MYPATH)
  AC_PATH_PROG(__DITTO, ditto, %{_bindir}/ditto, $MYPATH)
  AC_PATH_PROG(__FILE, file, %{_bindir}/file, $MYPATH)
-@@ -1604,13 +1586,18 @@ RPM_CHECK_LIB(
+@@ -2050,13 +2032,46 @@ RPM_CHECK_LIB(
  
  dnl # Berkeley-DB & SQLite
  DBLIBSRCS=""
@@ -48,68 +54,74 @@ Index: rpm/configure.ac
 +
  # XXX won't handle --includedir override
 -CPPFLAGS="${CPPFLAGS} -I${prefix}/include/${DBXY}"
+-RPM_CHECK_LIB(
 +CPPFLAGS_save="${CPPFLAGS}"
-+CPPFLAGS="${CPPFLAGS_save} -I${prefix}/include/db-6.0"
++CPPFLAGS="${CPPFLAGS_save}"
 +with_db_save="${with_db}"
- RPM_CHECK_LIB(
++
++AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
++#include <db.h>
++]],
++[[
++#if DB_VERSION_MAJOR < 6
++#error DB_VERSION_MAJOR is below 6
++#endif
++]])],
++[RPM_CHECK_LIB(
      [Berkeley-DB], [db],
-     [db-6.0], [db_create], [db.h],
+     [db-6.1], [db_create], [db.h],
 -    [yes,external], [db3],
 +    [yes,external], [db6],
      [ DBLIBSRCS="$DBLIBSRCS db3.c"
-+      DBXY=db60
++      DBXY=db61
++      AM_CONDITIONAL(WITH_DB, [ true ])
++      AM_CONDITIONAL(WITH_DB_INTERNAL, [ test ".$RPM_CHECK_LIB_LOCATION" = .internal ])
++      if test ".$RPM_CHECK_LIB_LOCATION" = .internal; then
++          AC_DEFINE(HAVE_DB_H, 1, [Have <db.h> header])
++      else
++          WITH_DB_SUBDIR=""
++      fi
++    ],
++    [ AM_CONDITIONAL(WITH_DB, [ false ])
++      AM_CONDITIONAL(WITH_DB_INTERNAL, [ false ])
++    ])],
++[with_db="${with_db_save}"
++ CPPFLAGS="${CPPFLAGS_save}"
++ RPM_CHECK_LIB(
++    [Berkeley-DB], [db],
++    [db-5.3], [db_create], [db.h],
++    [yes,external], [db53],
++    [ DBLIBSRCS="$DBLIBSRCS db3.c"
++      DBXY=db53
        AM_CONDITIONAL(WITH_DB, [ true ])
        AM_CONDITIONAL(WITH_DB_INTERNAL, [ test ".$RPM_CHECK_LIB_LOCATION" = .internal ])
        if test ".$RPM_CHECK_LIB_LOCATION" = .internal; then
-@@ -1619,10 +1606,32 @@ RPM_CHECK_LIB(
-           WITH_DB_SUBDIR=""
-       fi
-     ],
--    [ AM_CONDITIONAL(WITH_DB, [ false ])
--      AM_CONDITIONAL(WITH_DB_INTERNAL, [ false ])
-+    [ # Reset a few variables to fresh
-+      with_db="${with_db_save}"
-+      CPPFLAGS="${CPPFLAGS_save} -I${prefix}/include/db-5.3"
-+      RPM_CHECK_LIB(
-+        [Berkeley-DB], [db],
-+        [db-5.3], [db_create], [db.h],
-+        [yes,external], [db53],
-+        [ DBLIBSRCS="$DBLIBSRCS db3.c"
-+          DBXY=db53
-+          AM_CONDITIONAL(WITH_DB, [ true ])
-+          AM_CONDITIONAL(WITH_DB_INTERNAL, [ test ".$RPM_CHECK_LIB_LOCATION" = .internal ])
-+          if test ".$RPM_CHECK_LIB_LOCATION" = .internal; then
-+              AC_DEFINE(HAVE_DB_H, 1, [Have <db.h> header])
-+          else
-+              WITH_DB_SUBDIR=""
-+          fi
-+        ],
-+        [ AM_CONDITIONAL(WITH_DB, [ false ])
-+          AM_CONDITIONAL(WITH_DB_INTERNAL, [ false ])
-+        ])
+@@ -2068,6 +2083,11 @@ RPM_CHECK_LIB(
+     [ AM_CONDITIONAL(WITH_DB, [ false ])
+       AM_CONDITIONAL(WITH_DB_INTERNAL, [ false ])
      ])
- 
-+if test ".$ac_cv_lib_db_6_0_db_create" != .yes -a ".$ac_cv_lib_db_5_3_db_create" != .yes; then
++])
++
++if test ".$ac_cv_lib_db_6_1_db_create" != .yes -a ".$ac_cv_lib_db_5_3_db_create" != .yes; then
 +    CPPFLAGS="${CPPFLAGS_save}"
 +fi
-+
+ 
  dnl # Sqlite external
  RPM_CHECK_LIB(
-     [SQLite], [sqlite],
-@@ -1633,10 +1642,11 @@ RPM_CHECK_LIB(
+@@ -2078,10 +2098,11 @@ RPM_CHECK_LIB(
+     [])
  
- dnl # Sqlite 3.7.0.1 from db-5.1.19
- dnl XXX error: `db3' is already registered with AC_CONFIG_SUBDIRS.
-+if test ".$ac_cv_lib_db_6_0_db_create" = .yes; then
+ dnl # Sqlite 3.8.3.1 from db-6.1.19
++if test ".$ac_cv_lib_db_6_1_db_create" = .yes; then
  RPM_CHECK_LIB(
      [Berkeley-DB (+SQLite3)], [dbsql],
-     [db_sql-6.0], [sqlite3_open], [dbsql.h],
+     [db_sql-6.1], [sqlite3_open], [dbsql.h],
 -    [yes,external], [db3/sql],
 +    [yes,external], [db6/sql],
      [
        AM_CONDITIONAL(WITH_DBSQL, [ true ])
        AC_DEFINE(WITH_SQLITE, 1, [Define as 1 if building with SQLite library])
-@@ -1650,12 +1660,50 @@ RPM_CHECK_LIB(
+@@ -2095,12 +2116,50 @@ RPM_CHECK_LIB(
      ], [
        AM_CONDITIONAL(WITH_DBSQL, [ false ])
      ])

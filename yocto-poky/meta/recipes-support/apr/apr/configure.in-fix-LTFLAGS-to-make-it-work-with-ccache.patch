@@ -1,0 +1,36 @@
+From d439093aa07a486f559206ac9e5808a6a18218cd Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Thu, 19 Nov 2015 18:25:38 -0800
+Subject: [PATCH] configure.in: fix LTFLAGS to make it work with ccache
+
+When ccache is enabled, libtool requires --tag=CC when use ccache,
+otherwise when building apr-util with ccache enabled:
+
+| libtool: compile: unable to infer tagged configuration
+| libtool: error: specify a tag with '--tag'
+| libtool: compile: unable to infer tagged configuration
+| make[1]: *** [buckets/apr_buckets.lo] Error 1
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ configure.in |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.in b/configure.in
+index 5a4a988..9d57ae6 100644
+--- a/configure.in
++++ b/configure.in
+@@ -246,7 +246,7 @@ case $host in
+     ;;
+ *)
+     if test "x$LTFLAGS" = "x"; then
+-        LTFLAGS='--silent'
++        LTFLAGS='--silent --tag=CC'
+     fi
+     if test "$experimental_libtool" = "yes"; then
+         # Use a custom-made libtool replacement
+-- 
+1.7.9.5
+

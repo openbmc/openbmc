@@ -11,38 +11,40 @@ Note: in all other places a backup copy was used, just not buildid processing.
 Also the process (...) function was modified to verify the data is not
 NULL as well.  This is an extra check and is not strictly necessary.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [RPM5 maintainer]
 
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
 
-Index: rpm-5.4.14/tools/debugedit.c
+Index: rpm/tools/debugedit.c
 ===================================================================
---- rpm-5.4.14.orig/tools/debugedit.c
-+++ rpm-5.4.14/tools/debugedit.c
-@@ -1445,21 +1445,24 @@ handle_build_id (DSO *dso, Elf_Data *bui
-     auto inline void process (const void *data, size_t size)
-     {
-       memchunk chunk = { .data = (void *) data, .size = size };
--      hashFunctionContextUpdateMC (&ctx, &chunk);
-+      if (data != NULL && size != 0)
-+        hashFunctionContextUpdateMC (&ctx, &chunk);
-     }
-     union
-     {
+--- rpm.orig/tools/debugedit.c
++++ rpm/tools/debugedit.c
+@@ -1403,7 +1403,8 @@ static inline void process (hashFunction
+ 		const void *data, size_t size)
+ {
+     memchunk chunk = { .data = (void *) data, .size = size };
+-    hashFunctionContextUpdateMC (ctx, &chunk);
++    if (data != NULL && size != 0)
++      hashFunctionContextUpdateMC (ctx, &chunk);
+ }
+ 
+ /* Compute a fresh build ID bit-string from the editted file contents.  */
+@@ -1456,14 +1457,16 @@ handle_build_id (DSO *dso, Elf_Data *bui
        GElf_Ehdr ehdr;
        GElf_Phdr phdr;
        GElf_Shdr shdr;
 -    } u;
 -    Elf_Data x = { .d_version = EV_CURRENT, .d_buf = &u };
-+    } u1, u2;
-+    Elf_Data src  = { .d_version = EV_CURRENT, .d_buf = &u1 };
-+    Elf_Data dest = { .d_version = EV_CURRENT, .d_buf = &u2 };
- 
+-
 -    x.d_type = ELF_T_EHDR;
 -    x.d_size = sizeof u.ehdr;
 -    u.ehdr = dso->ehdr;
 -    u.ehdr.e_phoff = u.ehdr.e_shoff = 0;
 -    if (elf64_xlatetom (&x, &x, dso->ehdr.e_ident[EI_DATA]) == NULL)
++    } u1, u2;
++    Elf_Data src  = { .d_version = EV_CURRENT, .d_buf = &u1 };
++    Elf_Data dest = { .d_version = EV_CURRENT, .d_buf = &u2 };
++
 +    src.d_type = ELF_T_EHDR;
 +    src.d_size = sizeof u1.ehdr;
 +    dest.d_size = sizeof u2.ehdr;
@@ -52,7 +54,7 @@ Index: rpm-5.4.14/tools/debugedit.c
        {
        bad:
  	fprintf (stderr, "Failed to compute header checksum: %s\n",
-@@ -1467,29 +1470,31 @@ handle_build_id (DSO *dso, Elf_Data *bui
+@@ -1471,29 +1474,31 @@ handle_build_id (DSO *dso, Elf_Data *bui
  	exit (1);
        }
  
@@ -69,8 +71,8 @@ Index: rpm-5.4.14/tools/debugedit.c
 -	if (elf64_xlatetom (&x, &x, dso->ehdr.e_ident[EI_DATA]) == NULL)
 +	if (elf64_xlatetom (&dest, &src, dso->ehdr.e_ident[EI_DATA]) == NULL)
  	  goto bad;
--	process (x.d_buf, x.d_size);
-+	process (dest.d_buf, dest.d_size);
+-	process (&ctx, x.d_buf, x.d_size);
++	process (&ctx, dest.d_buf, dest.d_size);
        }
  
 -    x.d_type = ELF_T_SHDR;
@@ -88,8 +90,8 @@ Index: rpm-5.4.14/tools/debugedit.c
 +	  u1.shdr.sh_offset = 0;
 +	  if (elf64_xlatetom (&dest, &src, dso->ehdr.e_ident[EI_DATA]) == NULL)
  	    goto bad;
--	  process (x.d_buf, x.d_size);
-+	  process (dest.d_buf, dest.d_size);
+-	  process (&ctx, x.d_buf, x.d_size);
++	  process (&ctx, dest.d_buf, dest.d_size);
  
 -	  if (u.shdr.sh_type != SHT_NOBITS)
 +	  if (u1.shdr.sh_type != SHT_NOBITS)

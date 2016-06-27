@@ -1,7 +1,7 @@
-From acf7a028817e71eb99d785037659abd4d120ffe2 Mon Sep 17 00:00:00 2001
+From 502f061d846e58aac7aca67e4e0d6ba9e0763b17 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:20:09 +0000
-Subject: [PATCH 09/27] Quote from bug 1443 which explains what the patch does
+Subject: [PATCH 09/24] Quote from bug 1443 which explains what the patch does
  :
 
   We build some random program and link it with -lust.  When we run it,
@@ -58,5 +58,5 @@ index 6fb20bd..8805537 100644
  
  	case R_ARM_TLS_TPOFF32:
 -- 
-2.1.4
+2.6.4
 

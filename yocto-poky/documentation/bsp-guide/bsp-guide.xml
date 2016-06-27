@@ -22,11 +22,11 @@
 
         <authorgroup>
             <author>
-                <firstname>Tom</firstname> <surname>Zanussi</surname>
+                <firstname>Saul</firstname> <surname>Wold</surname>
                 <affiliation>
                     <orgname>Intel Corporation</orgname>
                 </affiliation>
-                <email>tom.zanussi@intel.com</email>
+                <email>saul.wold@intel.com</email>
             </author>
             <author>
                 <firstname>Richard</firstname> <surname>Purdie</surname>
@@ -102,6 +102,11 @@
                 <revnumber>2.0</revnumber>
                 <date>October 2015</date>
                 <revremark>Released with the Yocto Project 2.0 Release.</revremark>
+            </revision>
+            <revision>
+                <revnumber>2.1</revnumber>
+                <date>April 2016</date>
+                <revremark>Released with the Yocto Project 2.1 Release.</revremark>
             </revision>
         </revhistory>
 

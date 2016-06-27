@@ -15,3 +15,7 @@ PE = "1"
 
 SRC_URI[md5sum] = "127ddb6131eb4a56fdf6644a63ade788"
 SRC_URI[sha256sum] = "f9e2e7a590e27f84b6708ab7a81e546399b949bf652fb9b95193e0e543e6a548"
+
+do_install_append() {
+	sed -i "s,--sysroot=${STAGING_DIR_TARGET},," ${D}${bindir}/gccmakedep
+}

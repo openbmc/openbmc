@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %} All projects - Toaster {% endblock %}
+
+{% block pagecontent %}
+
+  <div class="page-header top-air">
+    <h1 data-role="page-title"></h1>
+  </div>
+
+  {% url 'projects' as xhr_table_url %}
+  {% include 'toastertable.html' %}
+
+  <script>
+    $(document).ready(function () {
+      var tableElt = $("#{{table_name}}");
+      var titleElt = $("[data-role='page-title']");
+
+      tableElt.on("table-done", function (e, total, tableParams) {
+        var title = "All projects";
+
+        if (tableParams.search || tableParams.filter) {
+          if (total === 0) {
+            title = "No projects found";
+          }
+          else if (total > 0) {
+            title = total + " project" + (total > 1 ? 's' : '') + " found";
+          }
+        }
+
+        titleElt.text(title);
+      });
+    });
+  </script>
+
+{% endblock %}

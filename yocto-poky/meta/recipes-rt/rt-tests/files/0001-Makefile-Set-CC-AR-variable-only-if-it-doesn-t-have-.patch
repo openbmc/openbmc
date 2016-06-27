@@ -1,0 +1,30 @@
+From 9640dde4241e1314b8e8ea35b0c8dab0b30ae51f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 3 Jan 2016 10:50:56 -0800
+Subject: [PATCH] Makefile: Set CC/AR variable only if it doesn't have a value
+
+This helps it compile with clang or any other compilers besides gcc
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted
+
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 1e4b7d1..2c2d396 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,6 +1,6 @@
+ VERSION = 0.96
+-CC=$(CROSS_COMPILE)gcc
+-AR=$(CROSS_COMPILE)ar
++CC?=$(CROSS_COMPILE)gcc
++AR?=$(CROSS_COMPILE)ar
+ 
+ OBJDIR = bld
+ 
+-- 
+2.6.4
+

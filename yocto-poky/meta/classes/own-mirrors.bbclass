@@ -9,4 +9,5 @@ p4://.*/.*      ${SOURCE_MIRROR_URL}
 osc://.*/.*     ${SOURCE_MIRROR_URL}
 https?$://.*/.* ${SOURCE_MIRROR_URL}
 ftp://.*/.*     ${SOURCE_MIRROR_URL}
+npm://.*/.*     ${SOURCE_MIRROR_URL}
 }

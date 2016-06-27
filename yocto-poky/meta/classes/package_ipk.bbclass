@@ -10,7 +10,7 @@ PKGWRITEDIRIPK = "${WORKDIR}/deploy-ipks"
 # Program to be used to build opkg packages
 OPKGBUILDCMD ??= "opkg-build"
 
-OPKG_ARGS = "--force_postinstall --prefer-arch-to-version"
+OPKG_ARGS += "--force_postinstall --prefer-arch-to-version"
 OPKG_ARGS += "${@['', '--no-install-recommends'][d.getVar("NO_RECOMMENDATIONS", True) == "1"]}"
 OPKG_ARGS += "${@['', '--add-exclude ' + ' --add-exclude '.join((d.getVar('PACKAGE_EXCLUDE', True) or "").split())][(d.getVar("PACKAGE_EXCLUDE", True) or "") != ""]}"
 
@@ -245,6 +245,11 @@ python do_package_ipk () {
         if ret != 0:
             bb.utils.unlockfile(lf)
             raise bb.build.FuncFailed("opkg-build execution failed")
+
+        if d.getVar('IPK_SIGN_PACKAGES', True) == '1':
+            ipkver = "%s-%s" % (d.getVar('PKGV', True), d.getVar('PKGR', True))
+            ipk_to_sign = "%s/%s_%s_%s.ipk" % (pkgoutdir, pkgname, ipkver, d.getVar('PACKAGE_ARCH', True))
+            sign_ipk(d, ipk_to_sign)
 
         cleanupcontrol(root)
         bb.utils.unlockfile(lf)

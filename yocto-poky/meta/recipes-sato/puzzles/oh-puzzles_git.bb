@@ -60,7 +60,6 @@ PACKAGES += "${PN}-extra"
 RDEPENDS_${PN}-extra += "oh-puzzles"
 
 FILES_${PN} = "/usr/share/pixmaps /usr/share/oh-puzzles/"
-FILES_${PN}-dbg += "/usr/games/.debug/*"
 FILES_${PN}-extra = "/usr/games/ /usr/share/applications /etc/gconf/schemas"
 
 python __anonymous () {

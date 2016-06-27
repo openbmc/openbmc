@@ -1,0 +1,32 @@
+From e6a7d96fa3675bdd3f4d7a3d7682381789eef22f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 15 Feb 2016 20:25:34 +0000
+Subject: [PATCH] define NETDB_INTERNAL to -1 if not available
+
+helps build with musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ compat.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/compat.h b/compat.h
+index c8bee4d..bfb013a 100644
+--- a/compat.h
++++ b/compat.h
+@@ -666,6 +666,10 @@ typedef int sig_atomic_t;
+ #  define NETDB_INTERNAL h_NETDB_INTERNAL
+ #endif
+ 
++#if !defined(NETDB_INTERNAL)
++#  define NETDB_INTERNAL (-1)
++#endif
++
+ #ifndef INET_ADDRSTRLEN
+ #  define INET_ADDRSTRLEN sizeof(struct sockaddr_in)
+ #endif
+-- 
+2.7.1
+

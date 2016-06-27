@@ -1,0 +1,198 @@
+From 3fdcdd47c6a67585123a0a0c8fffabcc9f79a3a2 Mon Sep 17 00:00:00 2001
+From: "Dmitry V. Levin" <ldv@altlinux.org>
+Date: Tue, 12 Jan 2016 14:47:12 +0000
+Subject: [PATCH] scm_rights-fd.test: rewrite without fork
+
+* tests/scm_rights.c (main): Rewrite without fork.
+Place all objects passed to sendmsg and recvmsg at the end
+of memory pages followed by inaccessible pages.
+* tests/scm_rights-fd.test: Update.
+---
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Backport
+
+ tests/scm_rights-fd.test |  12 ++---
+ tests/scm_rights.c       | 122 ++++++++++++++++++++++-------------------------
+ 2 files changed, 63 insertions(+), 71 deletions(-)
+
+diff --git a/tests/scm_rights-fd.test b/tests/scm_rights-fd.test
+index a32ef36..48c5028 100755
+--- a/tests/scm_rights-fd.test
++++ b/tests/scm_rights-fd.test
+@@ -49,18 +49,18 @@ touch -- "$file" ||
+ 	framework_skip_ 'failed to create a file'
+ 
+ run_prog ./scm_rights /dev/zero
+-run_strace_merge -y -x -enetwork $args "$file"
++run_strace -y -x -enetwork $args "$file"
+ 
++sample='\\xf1\\xf2\\xf3\\xf4\\xf5\\xf6\\xf7\\xf8\\xf9\\xfa\\xfb\\xfc\\xfd\\xfe\\xff'
+ n='[1-9][0-9]*'
+-msg='\{msg_name\(0\)=NULL, msg_iov\(1\)=\[\{"\\x00\\x00\\x00\\x00[^"]*", '"$n"'\}\], msg_controllen='"$n"
+-rights='\{cmsg_len='"$n"', cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS, \[3</dev/null>, 4</dev/zero>, 5</[^}>]*/(A\\n){127}Z>\]\}'
++msg='\{msg_name\(0\)=NULL, msg_iov\(1\)=\[\{"'"$sample"'", 15\}\], msg_controllen='"$n"
++rights='\{cmsg_len='"$n"', cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS, \[4</dev/null>, 5</dev/zero>, 6</[^}>]*/(A\\n){127}Z>\]\}'
+ creds='\{cmsg_len='"$n"', cmsg_level=SOL_SOCKET, cmsg_type=SCM_CREDENTIALS, \{pid='"$n"', uid=[0-9]+, gid=[0-9]+\}\}'
+-prefix='[1-9][0-9]* +[0-9]+:[0-9]+:[0-9]+\.[0-9]+ +'
+ EXPECTED="$LOG.expected"
+ 
+ cat > "$EXPECTED" << __EOF__
+-${prefix}sendmsg\\(1<socket:\\[[0-9]+\\]>, $msg, \\[$rights\\], msg_flags=0\\}, 0\\) += $n
+-${prefix}recvmsg\\(0<socket:\\[[0-9]+\\]>, $msg, \\[$creds, $rights\\], msg_flags=0\\}, 0\\) += $n
++sendmsg\\(3<socket:\\[[0-9]+\\]>, $msg, \\[$rights\\], msg_flags=0\\}, 0\\) = 15
++recvmsg\\(0<socket:\\[[0-9]+\\]>, $msg, \\[$creds, $rights\\], msg_flags=0\\}, 0\\) = 15
+ __EOF__
+ 
+ match_grep "$LOG" "$EXPECTED"
+diff --git a/tests/scm_rights.c b/tests/scm_rights.c
+index 1e5e850..00af4d5 100644
+--- a/tests/scm_rights.c
++++ b/tests/scm_rights.c
+@@ -27,26 +27,39 @@
+ 
+ #include "tests.h"
+ #include <assert.h>
+-#include <string.h>
+-#include <stdlib.h>
+-#include <unistd.h>
+ #include <errno.h>
+ #include <fcntl.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
+ #include <sys/socket.h>
+-#include <sys/wait.h>
+ 
+ int main(int ac, const char **av)
+ {
+-	int i;
+-	int data = 0;
+-	struct iovec iov = {
+-		.iov_base = &data,
+-		.iov_len = sizeof(iov)
+-	};
++	assert(ac > 0);
++	int fds[ac];
++
++	static const char sample[] =
++		"\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff";
++	const unsigned int data_size = sizeof(sample) - 1;
++	void *data = tail_alloc(data_size);
++	memcpy(data, sample, data_size);
++
++	struct iovec *iov = tail_alloc(sizeof(struct iovec));
++	iov->iov_base = data;
++	iov->iov_len = data_size;
+ 
+-	while ((i = open("/dev/null", O_RDWR)) < 3)
++	struct msghdr *mh = tail_alloc(sizeof(struct msghdr));
++	memset(mh, 0, sizeof(*mh));
++	mh->msg_iov = iov;
++	mh->msg_iovlen = 1;
++
++	int i;
++	while ((i = open("/dev/null", O_RDWR)) <= ac + 2)
+ 		assert(i >= 0);
+-	(void) close(3);
++	while (i > 2)
++		assert(close(i--) == 0);
++	assert(close(0) == 0);
+ 
+ 	int sv[2];
+ 	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sv))
+@@ -55,60 +68,39 @@ int main(int ac, const char **av)
+ 	if (setsockopt(sv[0], SOL_SOCKET, SO_PASSCRED, &one, sizeof(one)))
+ 		perror_msg_and_skip("setsockopt");
+ 
+-	pid_t pid = fork();
+-	if (pid < 0)
+-		perror_msg_and_fail("fork");
+-
+-	if (pid) {
+-		assert(close(sv[0]) == 0);
+-		assert(dup2(sv[1], 1) == 1);
+-		assert(close(sv[1]) == 0);
+-
+-		int fds[ac];
+-		assert((fds[0] = open("/dev/null", O_RDWR)) == 3);
+-		for (i = 1; i < ac; ++i)
+-			assert((fds[i] = open(av[i], O_RDONLY)) == i + 3);
+-
+-		union {
+-			struct cmsghdr cmsg;
+-			char buf[CMSG_LEN(sizeof(fds))];
+-		} control;
+-
+-		control.cmsg.cmsg_level = SOL_SOCKET;
+-		control.cmsg.cmsg_type = SCM_RIGHTS;
+-		control.cmsg.cmsg_len = CMSG_LEN(sizeof(fds));
+-		memcpy(CMSG_DATA(&control.cmsg), fds, sizeof(fds));
+-
+-		struct msghdr mh = {
+-			.msg_iov = &iov,
+-			.msg_iovlen = 1,
+-			.msg_control = &control,
+-			.msg_controllen = sizeof(control)
+-		};
+-
+-		assert(sendmsg(1, &mh, 0) == sizeof(iov));
+-		assert(close(1) == 0);
+-
+-                int status;
+-		assert(waitpid(pid, &status, 0) == pid);
+-		assert(status == 0);
+-	} else {
+-		assert(close(sv[1]) == 0);
+-		assert(dup2(sv[0], 0) == 0);
+-		assert(close(sv[0]) == 0);
+-
+-		struct cmsghdr control[4 + ac * sizeof(int) / sizeof(struct cmsghdr)];
+-
+-		struct msghdr mh = {
+-			.msg_iov = &iov,
+-			.msg_iovlen = 1,
+-			.msg_control = control,
+-			.msg_controllen = sizeof(control)
+-		};
+-
+-		assert(recvmsg(0, &mh, 0) == sizeof(iov));
+-		assert(close(0) == 0);
++	assert((fds[0] = open("/dev/null", O_RDWR)) == 4);
++	for (i = 1; i < ac; ++i)
++		assert((fds[i] = open(av[i], O_RDONLY)) == i + 4);
++
++	unsigned int cmsg_size = CMSG_SPACE(sizeof(fds));
++	struct cmsghdr *cmsg = tail_alloc(cmsg_size);
++	memset(cmsg, 0, cmsg_size);
++	cmsg->cmsg_level = SOL_SOCKET;
++	cmsg->cmsg_type = SCM_RIGHTS;
++	cmsg->cmsg_len = CMSG_LEN(sizeof(fds));
++	memcpy(CMSG_DATA(cmsg), fds, sizeof(fds));
++
++	mh->msg_control = cmsg;
++	mh->msg_controllen = cmsg_size;
++
++	assert(sendmsg(sv[1], mh, 0) == (int) data_size);
++
++	assert(close(sv[1]) == 0);
++	assert(open("/dev/null", O_RDWR) == sv[1]);
++
++	for (i = 0; i < ac; ++i) {
++		assert(close(fds[i]) == 0);
++		fds[i] = 0;
+ 	}
+ 
++	cmsg_size += CMSG_SPACE(sizeof(struct ucred));
++	cmsg = tail_alloc(cmsg_size);
++	memset(cmsg, 0, cmsg_size);
++	mh->msg_control = cmsg;
++	mh->msg_controllen = cmsg_size;
++
++	assert(recvmsg(0, mh, 0) == (int) data_size);
++	assert(close(0) == 0);
++
+ 	return 0;
+ }
+-- 
+1.9.1
+

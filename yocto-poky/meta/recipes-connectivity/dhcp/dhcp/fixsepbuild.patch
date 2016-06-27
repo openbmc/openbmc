@@ -7,15 +7,6 @@ RP 2013/03/21
 Rebase to 4.3.1
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- client/Makefile.am  | 6 ++++--
- common/Makefile.am  | 2 +-
- dhcpctl/Makefile.am | 2 ++
- dst/Makefile.am     | 2 +-
- omapip/Makefile.am  | 2 ++
- relay/Makefile.am   | 2 +-
- server/Makefile.am  | 2 +-
- 7 files changed, 12 insertions(+), 6 deletions(-)
-
 diff --git a/client/Makefile.am b/client/Makefile.am
 index 8411960..1740f72 100644
 --- a/client/Makefile.am
@@ -60,16 +51,6 @@ index 2987a53..cd72d75 100644
  bin_PROGRAMS = omshell
  lib_LIBRARIES = libdhcpctl.a
  noinst_PROGRAMS = cltest
-diff --git a/dst/Makefile.am b/dst/Makefile.am
-index 8937fe8..a14798b 100644
---- a/dst/Makefile.am
-+++ b/dst/Makefile.am
-@@ -1,4 +1,4 @@
--AM_CPPFLAGS = -DMINIRES_LIB -DHMAC_MD5
-+AM_CPPFLAGS = -DMINIRES_LIB -DHMAC_MD5 -I$(top_srcdir)/includes
- 
- lib_LIBRARIES = libdst.a
- 
 diff --git a/omapip/Makefile.am b/omapip/Makefile.am
 index 5074479..9c0fab3 100644
 --- a/omapip/Makefile.am

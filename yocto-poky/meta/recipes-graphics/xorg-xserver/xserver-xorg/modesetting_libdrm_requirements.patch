@@ -1,0 +1,30 @@
+From bf23db42a4e5943129501223a47b48884cdeb62f Mon Sep 17 00:00:00 2001
+From: Adam Jackson <ajax@redhat.com>
+Date: Wed, 27 Jan 2016 11:50:13 -0500
+Subject: modesetting: Require sufficiently new libdrm
+
+Bugzilla: https://bugs.freedesktop.org/93883
+Signed-off-by: Adam Jackson <ajax@redhat.com>
+Reviewed-by: Alex Deucher <alexander.deucher@amd.com>
+Reviewed-by: Julien Cristau <jcristau@debian.org>
+
+Upstream-Status: Backport
+Signed-off-by: Johannes Pointner <johannes.pointner@gmail.com>
+
+diff --git a/configure.ac b/configure.ac
+index ac3bb64..312fc69 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2035,8 +2035,7 @@ if test "x$XORG" = xyes; then
+ 
+ 	if test "x$DRM" = xyes; then
+ 		dnl 2.4.46 is required for cursor hotspot support.
+-		PKG_CHECK_EXISTS(libdrm >= 2.4.46)
+-		XORG_DRIVER_MODESETTING=yes
++		PKG_CHECK_EXISTS(libdrm >= 2.4.46, XORG_DRIVER_MODESETTING=yes, XORG_DRIVER_MODESETTING=no)
+ 	fi
+ 
+ 	AC_SUBST([XORG_LIBS])
+-- 
+cgit v0.10.2
+

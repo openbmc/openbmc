@@ -1,0 +1,42 @@
+From 3ca534935460647fed66e31aaa90b364e29eab5c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 22 Feb 2016 05:59:01 +0000
+Subject: [PATCH 1/2] remove duplicate include uchar.h
+
+missing.h already includes it
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ src/basic/escape.h | 1 -
+ src/basic/utf8.h   | 1 -
+ 2 files changed, 2 deletions(-)
+
+diff --git a/src/basic/escape.h b/src/basic/escape.h
+index deaa4de..36d437c 100644
+--- a/src/basic/escape.h
++++ b/src/basic/escape.h
+@@ -23,7 +23,6 @@
+ #include <stddef.h>
+ #include <stdint.h>
+ #include <sys/types.h>
+-#include <uchar.h>
+ 
+ #include "string-util.h"
+ #include "missing.h"
+diff --git a/src/basic/utf8.h b/src/basic/utf8.h
+index 12c272d..bea93a6 100644
+--- a/src/basic/utf8.h
++++ b/src/basic/utf8.h
+@@ -22,7 +22,6 @@
+ #include <stdbool.h>
+ #include <stddef.h>
+ #include <stdint.h>
+-#include <uchar.h>
+ 
+ #include "macro.h"
+ #include "missing.h"
+-- 
+1.8.3.1
+

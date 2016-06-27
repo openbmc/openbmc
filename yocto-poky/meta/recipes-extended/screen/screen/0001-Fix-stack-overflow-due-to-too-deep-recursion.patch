@@ -10,6 +10,7 @@ This is time consuming and will overflow stack if n is huge.
 Fixes CVE-2015-6806
 
 Upstream-Status: Backport
+CVE: CVE-2015-6806
 
 Signed-off-by: Kuang-che Wu <kcwu@csie.org>
 Signed-off-by: Amadeusz Sławiński <amade@asmblr.net>

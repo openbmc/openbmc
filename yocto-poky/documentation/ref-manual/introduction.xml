@@ -9,19 +9,26 @@
     <title>Introduction</title>
 
     <para>
-        This manual provides reference information for the current release of the Yocto Project.
-        The Yocto Project is an open-source collaboration project focused on embedded Linux
-        developers.
-        Amongst other things, the Yocto Project uses the OpenEmbedded build system, which
-        is based on the Poky project, to construct complete Linux images.
-        You can find complete introductory and getting started information on the Yocto Project
-        by reading the
+        This manual provides reference information for the current release
+        of the Yocto Project.
+        The Yocto Project is an open-source collaboration project focused
+        on embedded Linux developers.
+        Amongst other things, the Yocto Project uses the OpenEmbedded build
+        system, which is based on the Poky project, to construct complete
+        Linux images.
+        You can find complete introductory and getting started information
+        on the Yocto Project by reading the
         <ulink url='&YOCTO_DOCS_QS_URL;'>Yocto Project Quick Start</ulink>.
+    </para>
+
+    <para>
         For task-based information using the Yocto Project, see the
         <ulink url='&YOCTO_DOCS_DEV_URL;'>Yocto Project Development Manual</ulink>
         and the <ulink url='&YOCTO_DOCS_KERNEL_DEV_URL;'>Yocto Project Linux Kernel Development Manual</ulink>.
         For Board Support Package (BSP) structure information, see the
         <ulink url='&YOCTO_DOCS_BSP_URL;'>Yocto Project Board Support Package (BSP) Developer's Guide</ulink>.
+        For information on how to use a Software Development Kit, (SDK), see the
+        <ulink url='&YOCTO_DOCS_SDK_URL;'>Yocto Project Software Development Kit (SDK) Developer's Guide</ulink>.
         You can find information on tracing and profiling in the
         <ulink url='&YOCTO_DOCS_PROF_URL;'>Yocto Project Profiling and Tracing Manual</ulink>.
         For information on BitBake, which is the task execution tool the
@@ -40,7 +47,7 @@
             <listitem><para><emphasis>
                 <link linkend='usingpoky'>Using the Yocto Project</link>:</emphasis>
                 Provides an overview of the components that make up the Yocto Project
-                followed by information about debugging images created in the Yocto Project.
+                followed by information about debugng images created in the Yocto Project.
                 </para></listitem>
             <listitem><para><emphasis>
                 <link linkend='closer-look'>A Closer Look at the Yocto Project Development Environment</link>:</emphasis>
@@ -192,10 +199,6 @@
             supported Linux distribution, instances might exist where you
             encounter a problem while using the Yocto Project on a specific
             distribution.
-            For example, the CentOS 6.4 distribution does not include the
-            Gtk+ 2.20.0 and PyGtk 2.21.0 (or higher) packages, which are
-            required to run
-            <ulink url='&YOCTO_HOME_URL;/tools-resources/projects/hob'>Hob</ulink>.
         </note>
     </section>
 
@@ -249,9 +252,9 @@
                         <literallayout class='monospaced'>
      $ sudo apt-get install make xsltproc docbook-utils fop dblatex xmlto
                         </literallayout></para></listitem>
-                    <listitem><para><emphasis>ADT Installer Extras:</emphasis>
+                    <listitem><para><emphasis>SDK Installer Extras:</emphasis>
                         Packages needed if you are going to be using the
-                        <ulink url='&YOCTO_DOCS_ADT_URL;#using-the-adt-installer'>Application Development Toolkit (ADT) Installer</ulink>:
+                        the standard or extensible SDK:
                         <literallayout class='monospaced'>
      $ sudo apt-get install autoconf automake libtool libglib2.0-dev libarchive-dev
                         </literallayout></para></listitem>
@@ -293,9 +296,9 @@
      $ sudo dnf install make docbook-style-dsssl docbook-style-xsl \
      docbook-dtds docbook-utils fop libxslt dblatex xmlto xsltproc
                         </literallayout></para></listitem>
-                    <listitem><para><emphasis>ADT Installer Extras:</emphasis>
+                    <listitem><para><emphasis>SDK Installer Extras:</emphasis>
                         Packages needed if you are going to be using the
-                        <ulink url='&YOCTO_DOCS_ADT_URL;#using-the-adt-installer'>Application Development Toolkit (ADT) Installer</ulink>:
+                        standard or extensible SDK:
                         <literallayout class='monospaced'>
      $ sudo dnf install autoconf automake libtool glib2-devel libarchive-devel
                         </literallayout></para></listitem>
@@ -336,9 +339,9 @@
                         <literallayout class='monospaced'>
      $ sudo zypper install make fop xsltproc dblatex xmlto
                         </literallayout></para></listitem>
-                    <listitem><para><emphasis>ADT Installer Extras:</emphasis>
+                    <listitem><para><emphasis>SDK Installer Extras:</emphasis>
                         Packages needed if you are going to be using the
-                        <ulink url='&YOCTO_DOCS_ADT_URL;#using-the-adt-installer'>Application Development Toolkit (ADT) Installer</ulink>:
+                        standard or extensible SDK:
                         <literallayout class='monospaced'>
      $ sudo zypper install autoconf automake libtool glib2-devel libarchive-devel
                         </literallayout></para></listitem>
@@ -359,14 +362,14 @@
                 The following list shows the required packages by function
                 given a supported CentOS Linux distribution:
                 <note>
-                    For CentOS 6.x, some of the versions
-                    of the components provided by the distribution are
-                    too old (e.g. Git, Python, and tar).
-                    It is recommended that you install the buildtools
-                    in order to provide versions that will work with
-                    the OpenEmbedded build system.
-                    For information on how to install the buildtools
-                    tarball, see the
+                    For CentOS 6.x, some of the versions of the components
+                    provided by the distribution are too old (e.g. Git, Python,
+                    and tar).
+                    It is recommended that you install the buildtools in order
+                    to provide versions that will work with the OpenEmbedded
+                    build system.
+                    For information on how to install the buildtools tarball,
+                    see the
                     "<link linkend='required-git-tar-and-python-versions'>Required Git, Tar, and Python Versions</link>"
                     section.
                 </note>
@@ -391,21 +394,12 @@
      $ sudo yum install make docbook-style-dsssl docbook-style-xsl \
      docbook-dtds docbook-utils fop libxslt dblatex xmlto xsltproc
                         </literallayout></para></listitem>
-                    <listitem><para><emphasis>ADT Installer Extras:</emphasis>
+                    <listitem><para><emphasis>SDK Installer Extras:</emphasis>
                         Packages needed if you are going to be using the
-                        <ulink url='&YOCTO_DOCS_ADT_URL;#using-the-adt-installer'>Application Development Toolkit (ADT) Installer</ulink>:
+                        standard or extensible SDK:
                         <literallayout class='monospaced'>
      $ sudo yum install autoconf automake libtool glib2-devel libarchive-devel
-                        </literallayout>
-                        <note>
-                            For CentOS 6.x, in order for the
-                            ADT installer script to work, you must have
-                            installed the <filename>liblzma5</filename>,
-                            <filename>libarchive3.x</filename>, and
-                            <filename>libarchive-devel-3.1.3</filename>
-                            (or older) packages, in that order.
-                        </note>
-                        </para></listitem>
+                        </literallayout></para></listitem>
                     <listitem><para><emphasis>OpenEmbedded Self-Test (<filename>oe-selftest</filename>):</emphasis>
                         Packages needed if you are going to run
                         <filename>oe-selftest</filename>:
@@ -426,7 +420,7 @@
             must meet the following version requirements for Git, tar, and
             Python:
             <itemizedlist>
-                <listitem><para>Git 1.7.8 or greater</para></listitem>
+                <listitem><para>Git 1.8.3.1 or greater</para></listitem>
                 <listitem><para>tar 1.24 or greater</para></listitem>
                 <listitem><para>Python 2.7.3 or greater not including
                     Python 3.x, which is not supported.</para></listitem>
@@ -597,8 +591,8 @@
             <listitem><para><emphasis>Nightly Builds:</emphasis> These
                 tarball releases are available at
                 <ulink url='&YOCTO_AB_NIGHTLY_URL;'/>.
-                These builds include Yocto Project releases, meta-toolchain
-                tarball installation scripts, and experimental builds.
+                These builds include Yocto Project releases, SDK installation
+                scripts, and experimental builds.
                 </para></listitem>
             <listitem><para><emphasis>Yocto Project Website:</emphasis> You can
                 find tarball releases of the Yocto Project and supported BSPs

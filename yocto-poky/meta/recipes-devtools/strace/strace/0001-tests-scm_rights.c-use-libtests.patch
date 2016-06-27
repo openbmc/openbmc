@@ -1,0 +1,54 @@
+From 339a15b619b479c63cafba21d5fc359e613d9ee8 Mon Sep 17 00:00:00 2001
+From: "Dmitry V. Levin" <ldv@altlinux.org>
+Date: Mon, 4 Jan 2016 23:53:31 +0000
+Subject: [PATCH] tests/scm_rights.c: use libtests
+
+* tests/scm_rights.c (main): Use perror_msg_and_fail and perror_msg_and_skip.
+---
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Backport
+
+ tests/scm_rights.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/tests/scm_rights.c b/tests/scm_rights.c
+index c41444f..1e5e850 100644
+--- a/tests/scm_rights.c
++++ b/tests/scm_rights.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
++ * Copyright (c) 2014-2016 Dmitry V. Levin <ldv@altlinux.org>
+  * All rights reserved.
+  *
+  * Redistribution and use in source and binary forms, with or without
+@@ -25,6 +25,7 @@
+  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  */
+ 
++#include "tests.h"
+ #include <assert.h>
+ #include <string.h>
+ #include <stdlib.h>
+@@ -48,12 +49,15 @@ int main(int ac, const char **av)
+ 	(void) close(3);
+ 
+ 	int sv[2];
+-	assert(socketpair(AF_UNIX, SOCK_STREAM, 0, sv) == 0);
++	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sv))
++		perror_msg_and_skip("socketpair");
+ 	int one = 1;
+-	assert(setsockopt(sv[0], SOL_SOCKET, SO_PASSCRED, &one, sizeof(one)) == 0);
++	if (setsockopt(sv[0], SOL_SOCKET, SO_PASSCRED, &one, sizeof(one)))
++		perror_msg_and_skip("setsockopt");
+ 
+ 	pid_t pid = fork();
+-	assert(pid >= 0);
++	if (pid < 0)
++		perror_msg_and_fail("fork");
+ 
+ 	if (pid) {
+ 		assert(close(sv[0]) == 0);
+-- 
+1.9.1
+

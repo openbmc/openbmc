@@ -13,6 +13,7 @@ SRCREV = "9c1db6d13a51a2e009f0027ef336ce03624eac0d"
 SRC_URI = "git://github.com/plougher/squashfs-tools.git;protocol=https \
            http://downloads.sourceforge.net/sevenzip/lzma465.tar.bz2;name=lzma \
            file://0001-mksquashfs.c-get-inline-functions-work-with-C99.patch;striplevel=2 \
+           file://fix-compat.patch \
 "
 SRC_URI[lzma.md5sum] = "29d5ffd03a5a3e51aef6a74e9eafb759"
 SRC_URI[lzma.sha256sum] = "c935fd04dd8e0e8c688a3078f3675d699679a90be81c12686837e0880aa0fa1e"

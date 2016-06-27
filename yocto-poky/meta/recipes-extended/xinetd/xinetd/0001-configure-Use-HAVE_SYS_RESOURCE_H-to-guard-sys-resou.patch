@@ -1,0 +1,100 @@
+From e8b0ffc7ea04cc71dba97a38e1a134aaf2285c2d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 30 Dec 2015 07:14:50 +0000
+Subject: [PATCH] configure: Use HAVE_SYS_RESOURCE_H to guard sys/resource.h
+ inclusion
+
+HAVE_RLIM_T check will not let sys/resource.h to be checked and
+rlim_t is defined in sys/resource.h so the check would fail.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ aclocal.m4 |  2 +-
+ configure  | 14 +++++++-------
+ 2 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/aclocal.m4 b/aclocal.m4
+index 6e6f32c..70e7076 100644
+--- a/aclocal.m4
++++ b/aclocal.m4
+@@ -11,7 +11,7 @@ AC_CACHE_VAL(xinetd_cv_type_$1,
+ #if HAVE_NETDB_H
+ #include <netdb.h>
+ #endif
+-#if HAVE_RLIM_T
++#if HAVE_SYS_RESOURCE_H
+ #include <sys/resource.h>
+ #endif
+ #if HAVE_STDINT_H
+diff --git a/configure b/configure
+index b507d38..bec56ea 100755
+--- a/configure
++++ b/configure
+@@ -7640,7 +7640,7 @@ cat >>conftest.$ac_ext <<_ACEOF
+ #if HAVE_NETDB_H
+ #include <netdb.h>
+ #endif
+-#if HAVE_RLIM_T
++#if HAVE_SYS_RESOURCE_H
+ #include <sys/resource.h>
+ #endif
+ #if HAVE_STDINT_H
+@@ -7686,7 +7686,7 @@ cat >>conftest.$ac_ext <<_ACEOF
+ #if HAVE_NETDB_H
+ #include <netdb.h>
+ #endif
+-#if HAVE_RLIM_T
++#if HAVE_SYS_RESOURCE_H
+ #include <sys/resource.h>
+ #endif
+ #if HAVE_STDINT_H
+@@ -7732,7 +7732,7 @@ cat >>conftest.$ac_ext <<_ACEOF
+ #if HAVE_NETDB_H
+ #include <netdb.h>
+ #endif
+-#if HAVE_RLIM_T
++#if HAVE_SYS_RESOURCE_H
+ #include <sys/resource.h>
+ #endif
+ #if HAVE_STDINT_H
+@@ -7778,7 +7778,7 @@ cat >>conftest.$ac_ext <<_ACEOF
+ #if HAVE_NETDB_H
+ #include <netdb.h>
+ #endif
+-#if HAVE_RLIM_T
++#if HAVE_SYS_RESOURCE_H
+ #include <sys/resource.h>
+ #endif
+ #if HAVE_STDINT_H
+@@ -7824,7 +7824,7 @@ cat >>conftest.$ac_ext <<_ACEOF
+ #if HAVE_NETDB_H
+ #include <netdb.h>
+ #endif
+-#if HAVE_RLIM_T
++#if HAVE_SYS_RESOURCE_H
+ #include <sys/resource.h>
+ #endif
+ #if HAVE_STDINT_H
+@@ -7870,7 +7870,7 @@ cat >>conftest.$ac_ext <<_ACEOF
+ #if HAVE_NETDB_H
+ #include <netdb.h>
+ #endif
+-#if HAVE_RLIM_T
++#if HAVE_SYS_RESOURCE_H
+ #include <sys/resource.h>
+ #endif
+ #if HAVE_STDINT_H
+@@ -7916,7 +7916,7 @@ cat >>conftest.$ac_ext <<_ACEOF
+ #if HAVE_NETDB_H
+ #include <netdb.h>
+ #endif
+-#if HAVE_RLIM_T
++#if HAVE_SYS_RESOURCE_H
+ #include <sys/resource.h>
+ #endif
+ #if HAVE_STDINT_H
+-- 
+2.6.4
+

@@ -7,7 +7,7 @@ SECTION = "libs"
 LICENSE = "MIT"
 
 SRC_URI = " \
-           http://www.directfb.org/downloads/Extras/DirectFB-examples-${PV}.tar.gz \
+           http://downloads.yoctoproject.org/mirror/sources/DirectFB-examples-${PV}.tar.gz \
            file://configure.in-Fix-string-argument-syntax.patch \
           "
 

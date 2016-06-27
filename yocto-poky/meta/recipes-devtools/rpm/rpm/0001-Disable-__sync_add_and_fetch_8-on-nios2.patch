@@ -1,0 +1,30 @@
+From 06967a50f20095f5ca30b8214f4c98ba0f5262bf Mon Sep 17 00:00:00 2001
+From: Marek Vasut <marex@denx.de>
+Date: Sun, 3 Apr 2016 06:55:25 +0200
+Subject: [PATCH] Disable __sync_add_and_fetch_8 on nios2
+
+The NIOS2 softcore does not implement the __sync_add_and_fetch_8,
+so disable it accordingly.
+
+Signed-off-by: Marek Vasut <marex@denx.de>
+Upstream-Status: Submitted
+---
+ rpmio/bson.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/rpmio/bson.h b/rpmio/bson.h
+index 57023f1..60c7d02 100644
+--- a/rpmio/bson.h
++++ b/rpmio/bson.h
+@@ -880,7 +880,7 @@ BSON_END_DECLS
+ BSON_BEGIN_DECLS
+ 
+ /* Some architectures do not support __sync_add_and_fetch_8 */
+-#if (__mips == 32) || (defined(__PPC__) && !defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8))
++#if (__mips == 32) || (__nios2__) || (defined(__PPC__) && !defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8))
+ # define __BSON_NEED_ATOMIC_64 1
+ #endif
+ 
+-- 
+2.8.0.rc3
+

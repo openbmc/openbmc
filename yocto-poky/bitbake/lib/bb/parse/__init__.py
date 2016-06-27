@@ -161,8 +161,8 @@ def vars_from_file(mypkg, d):
 def get_file_depends(d):
     '''Return the dependent files'''
     dep_files = []
-    depends = d.getVar('__base_depends', True) or []
-    depends = depends + (d.getVar('__depends', True) or [])
+    depends = d.getVar('__base_depends', False) or []
+    depends = depends + (d.getVar('__depends', False) or [])
     for (fn, _) in depends:
         dep_files.append(os.path.abspath(fn))
     return " ".join(dep_files)

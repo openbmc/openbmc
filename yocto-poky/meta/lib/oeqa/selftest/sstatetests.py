@@ -4,6 +4,7 @@ import os
 import re
 import shutil
 import glob
+import subprocess
 
 import oeqa.utils.ftools as ftools
 from oeqa.selftest.base import oeSelfTest
@@ -23,11 +24,20 @@ class SStateTests(SStateBase):
             bitbake(['-ccleansstate'] + targets)
 
         bitbake(targets)
-        file_tracker = self.search_sstate('|'.join(map(str, targets)), distro_specific, distro_nonspecific)
+        file_tracker = []
+        results = self.search_sstate('|'.join(map(str, targets)), distro_specific, distro_nonspecific)
+        if distro_nonspecific:
+            for r in results:
+                if r.endswith(("_populate_lic.tgz", "_populate_lic.tgz.siginfo", "_fetch.tgz.siginfo", "_unpack.tgz.siginfo", "_patch.tgz.siginfo")):
+                    continue
+                file_tracker.append(r)
+        else:
+            file_tracker = results
+
         if should_pass:
             self.assertTrue(file_tracker , msg="Could not find sstate files for: %s" % ', '.join(map(str, targets)))
         else:
-            self.assertTrue(not file_tracker , msg="Found sstate files in the wrong place for: %s" % ', '.join(map(str, targets)))
+            self.assertTrue(not file_tracker , msg="Found sstate files in the wrong place for: %s (found %s)" % (', '.join(map(str, targets)), str(file_tracker)))
 
     @testcase(975)
     def test_sstate_creation_distro_specific_pass(self):
@@ -56,14 +66,14 @@ class SStateTests(SStateBase):
 
         bitbake(targets)
         tgz_created = self.search_sstate('|'.join(map(str, [s + '.*?\.tgz$' for s in targets])), distro_specific, distro_nonspecific)
-        self.assertTrue(tgz_created, msg="Could not find sstate .tgz files for: %s" % ', '.join(map(str, targets)))
+        self.assertTrue(tgz_created, msg="Could not find sstate .tgz files for: %s (%s)" % (', '.join(map(str, targets)), str(tgz_created)))
 
         siginfo_created = self.search_sstate('|'.join(map(str, [s + '.*?\.siginfo$' for s in targets])), distro_specific, distro_nonspecific)
-        self.assertTrue(siginfo_created, msg="Could not find sstate .siginfo files for: %s" % ', '.join(map(str, targets)))
+        self.assertTrue(siginfo_created, msg="Could not find sstate .siginfo files for: %s (%s)" % (', '.join(map(str, targets)), str(siginfo_created)))
 
         bitbake(['-ccleansstate'] + targets)
         tgz_removed = self.search_sstate('|'.join(map(str, [s + '.*?\.tgz$' for s in targets])), distro_specific, distro_nonspecific)
-        self.assertTrue(not tgz_removed, msg="do_cleansstate didn't remove .tgz sstate files for: %s" % ', '.join(map(str, targets)))
+        self.assertTrue(not tgz_removed, msg="do_cleansstate didn't remove .tgz sstate files for: %s (%s)" % (', '.join(map(str, targets)), str(tgz_removed)))
 
     @testcase(977)
     def test_cleansstate_task_distro_specific_nonspecific(self):
@@ -87,7 +97,13 @@ class SStateTests(SStateBase):
         bitbake(['-ccleansstate'] + targets)
 
         bitbake(targets)
-        self.assertTrue(self.search_sstate('|'.join(map(str, [s + '.*?\.tgz$' for s in targets])), distro_specific=False, distro_nonspecific=True) == [], msg="Found distro non-specific sstate for: %s" % ', '.join(map(str, targets)))
+        results = self.search_sstate('|'.join(map(str, [s + '.*?\.tgz$' for s in targets])), distro_specific=False, distro_nonspecific=True)
+        filtered_results = []
+        for r in results:
+            if r.endswith(("_populate_lic.tgz", "_populate_lic.tgz.siginfo")):
+                continue
+            filtered_results.append(r)
+        self.assertTrue(filtered_results == [], msg="Found distro non-specific sstate for: %s (%s)" % (', '.join(map(str, targets)), str(filtered_results)))
         file_tracker_1 = self.search_sstate('|'.join(map(str, [s + '.*?\.tgz$' for s in targets])), distro_specific=True, distro_nonspecific=False)
         self.assertTrue(len(file_tracker_1) >= len(targets), msg = "Not all sstate files ware created for: %s" % ', '.join(map(str, targets)))
 
@@ -208,28 +224,28 @@ class SStateTests(SStateBase):
     def test_sstate_32_64_same_hash(self):
         """
         The sstate checksums for both native and target should not vary whether
-        they're built on a 32 or 64 bit system. Rather than requiring two different 
+        they're built on a 32 or 64 bit system. Rather than requiring two different
         build machines and running a builds, override the variables calling uname()
         manually and check using bitbake -S.
-        
-        Also check that SDKMACHINE changing doesn't change any of these stamps.
         """
 
         topdir = get_bb_var('TOPDIR')
         targetvendor = get_bb_var('TARGET_VENDOR')
         self.write_config("""
-TMPDIR = \"${TOPDIR}/tmp-sstatesamehash\"
-BUILD_ARCH = \"x86_64\"
-BUILD_OS = \"linux\"
-SDKMACHINE = \"x86_64\"
+MACHINE = "qemux86"
+TMPDIR = "${TOPDIR}/tmp-sstatesamehash"
+BUILD_ARCH = "x86_64"
+BUILD_OS = "linux"
+SDKMACHINE = "x86_64"
 """)
         self.track_for_cleanup(topdir + "/tmp-sstatesamehash")
         bitbake("core-image-sato -S none")
         self.write_config("""
-TMPDIR = \"${TOPDIR}/tmp-sstatesamehash2\"
-BUILD_ARCH = \"i686\"
-BUILD_OS = \"linux\"
-SDKMACHINE = \"i686\"
+MACHINE = "qemux86"
+TMPDIR = "${TOPDIR}/tmp-sstatesamehash2"
+BUILD_ARCH = "i686"
+BUILD_OS = "linux"
+SDKMACHINE = "i686"
 """)
         self.track_for_cleanup(topdir + "/tmp-sstatesamehash2")
         bitbake("core-image-sato -S none")
@@ -238,9 +254,10 @@ SDKMACHINE = \"i686\"
             f = []
             for root, dirs, files in os.walk(d):
                 if "core-image-sato" in root:
-                        # SDKMACHINE changing will change do_rootfs/do_testimage/do_build stamps of core-image-sato itself
-                        # which is safe to ignore
-                        continue
+                    # SDKMACHINE changing will change
+                    # do_rootfs/do_testimage/do_build stamps of images which
+                    # is safe to ignore.
+                    continue
                 f.extend(os.path.join(root, name) for name in files)
             return f
         files1 = get_files(topdir + "/tmp-sstatesamehash/stamps/")
@@ -254,7 +271,7 @@ SDKMACHINE = \"i686\"
     def test_sstate_nativelsbstring_same_hash(self):
         """
         The sstate checksums should be independent of whichever NATIVELSBSTRING is
-        detected. Rather than requiring two different build machines and running 
+        detected. Rather than requiring two different build machines and running
         builds, override the variables manually and check using bitbake -S.
         """
 
@@ -286,7 +303,7 @@ NATIVELSBSTRING = \"DistroB\"
     @testcase(1368)
     def test_sstate_allarch_samesigs(self):
         """
-        The sstate checksums of allarch packages should be independent of whichever 
+        The sstate checksums of allarch packages should be independent of whichever
         MACHINE is set. Check this using bitbake -S.
         Also, rather than duplicate the test, check nativesdk stamps are the same between
         the two MACHINE values.
@@ -309,32 +326,32 @@ MACHINE = \"qemuarm\"
         bitbake("world meta-toolchain -S none")
 
         def get_files(d):
-            f = []
+            f = {}
             for root, dirs, files in os.walk(d):
                 for name in files:
                     if "meta-environment" in root or "cross-canadian" in root:
                         continue
                     if "do_build" not in name:
-                        f.append(os.path.join(root, name))
+                        # 1.4.1+gitAUTOINC+302fca9f4c-r0.do_package_write_ipk.sigdata.f3a2a38697da743f0dbed8b56aafcf79
+                        (_, task, _, shash) = name.rsplit(".", 3)
+                        f[os.path.join(os.path.basename(root), task)] = shash
             return f
         files1 = get_files(topdir + "/tmp-sstatesamehash/stamps/all" + targetvendor + "-" + targetos)
         files2 = get_files(topdir + "/tmp-sstatesamehash2/stamps/all" + targetvendor + "-" + targetos)
-        files2 = [x.replace("tmp-sstatesamehash2", "tmp-sstatesamehash") for x in files2]
         self.maxDiff = None
-        self.assertItemsEqual(files1, files2)
+        self.assertEqual(files1, files2)
 
         nativesdkdir = os.path.basename(glob.glob(topdir + "/tmp-sstatesamehash/stamps/*-nativesdk*-linux")[0])
 
         files1 = get_files(topdir + "/tmp-sstatesamehash/stamps/" + nativesdkdir)
         files2 = get_files(topdir + "/tmp-sstatesamehash2/stamps/" + nativesdkdir)
-        files2 = [x.replace("tmp-sstatesamehash2", "tmp-sstatesamehash") for x in files2]
         self.maxDiff = None
-        self.assertItemsEqual(files1, files2)
+        self.assertEqual(files1, files2)
 
     @testcase(1369)
     def test_sstate_sametune_samesigs(self):
         """
-        The sstate checksums of two identical machines (using the same tune) should be the 
+        The sstate checksums of two identical machines (using the same tune) should be the
         same, apart from changes within the machine specific stamps directory. We use the
         qemux86copy machine to test this. Also include multilibs in the test.
         """
@@ -377,3 +394,68 @@ DEFAULTTUNE_virtclass-multilib-lib32 = "x86"
         files2 = [x.replace("tmp-sstatesamehash2", "tmp-sstatesamehash") for x in files2]
         self.maxDiff = None
         self.assertItemsEqual(files1, files2)
+
+
+    def test_sstate_noop_samesigs(self):
+        """
+        The sstate checksums of two builds with these variables changed or
+        classes inherits should be the same.
+        """
+
+        topdir = get_bb_var('TOPDIR')
+        targetvendor = get_bb_var('TARGET_VENDOR')
+        self.write_config("""
+TMPDIR = "${TOPDIR}/tmp-sstatesamehash"
+BB_NUMBER_THREADS = "1"
+PARALLEL_MAKE = "-j 1"
+DL_DIR = "${TOPDIR}/download1"
+TIME = "111111"
+DATE = "20161111"
+INHERIT_remove = "buildstats-summary buildhistory"
+""")
+        self.track_for_cleanup(topdir + "/tmp-sstatesamehash")
+        bitbake("world meta-toolchain -S none")
+        self.write_config("""
+TMPDIR = "${TOPDIR}/tmp-sstatesamehash2"
+BB_NUMBER_THREADS = "2"
+PARALLEL_MAKE = "-j 2"
+DL_DIR = "${TOPDIR}/download2"
+TIME = "222222"
+DATE = "20161212"
+INHERIT += "buildstats-summary buildhistory"
+""")
+        self.track_for_cleanup(topdir + "/tmp-sstatesamehash2")
+        bitbake("world meta-toolchain -S none")
+
+        def get_files(d):
+            f = {}
+            for root, dirs, files in os.walk(d):
+                for name in files:
+                    name, shash = name.rsplit('.', 1)
+                    # Extract just the machine and recipe name
+                    base = os.sep.join(root.rsplit(os.sep, 2)[-2:] + [name])
+                    f[base] = shash
+            return f
+        files1 = get_files(topdir + "/tmp-sstatesamehash/stamps/")
+        files2 = get_files(topdir + "/tmp-sstatesamehash2/stamps/")
+        # Remove items that are identical in both sets
+        for k,v in files1.viewitems() & files2.viewitems():
+            del files1[k]
+            del files2[k]
+        if not files1 and not files2:
+            # No changes, so we're done
+            return
+
+        for k in files1.viewkeys() | files2.viewkeys():
+            if k in files1 and k in files2:
+                print "%s differs:" % k
+                print subprocess.check_output(("bitbake-diffsigs",
+                                               topdir + "/tmp-sstatesamehash/stamps/" + k + "." + files1[k],
+                                               topdir + "/tmp-sstatesamehash2/stamps/" + k + "." + files2[k]))
+            elif k in files1 and k not in files2:
+                print "%s in files1" % k
+            elif k not in files1 and k in files2:
+                print "%s in files2" % k
+            else:
+                assert "shouldn't reach here"
+        self.fail("sstate hashes not identical.")

@@ -38,11 +38,13 @@ import json
 import collections
 import operator
 import re
+import urllib
 
 import logging
 logger = logging.getLogger("toaster")
 
 from toastergui.views import objtojson
+from toastergui.tablefilter import TableFilterMap
 
 class ToasterTable(TemplateView):
     def __init__(self, *args, **kwargs):
@@ -52,10 +54,12 @@ class ToasterTable(TemplateView):
         self.title = "Table"
         self.queryset = None
         self.columns = []
-        self.filters = {}
+
+        # map from field names to Filter instances
+        self.filter_map = TableFilterMap()
+
         self.total_count = 0
         self.static_context_extra = {}
-        self.filter_actions = {}
         self.empty_state = "Sorry - no data found"
         self.default_orderby = ""
 
@@ -65,7 +69,7 @@ class ToasterTable(TemplateView):
                         orderable=True,
                         field_name="id")
 
-        # prevent HTTP caching of table data
+    # prevent HTTP caching of table data
     @cache_control(must_revalidate=True, max_age=0, no_store=True, no_cache=True)
     def dispatch(self, *args, **kwargs):
         return super(ToasterTable, self).dispatch(*args, **kwargs)
@@ -107,26 +111,10 @@ class ToasterTable(TemplateView):
             self.apply_search(search)
 
         name = request.GET.get("name", None)
-        if name is None:
-            data = json.dumps(self.filters,
-                              indent=2,
-                              cls=DjangoJSONEncoder)
-        else:
-            for actions in self.filters[name]['filter_actions']:
-                actions['count'] = self.filter_actions[actions['name']](count_only=True)
-
-            # Add the "All" items filter action
-            self.filters[name]['filter_actions'].insert(0, {
-                'name' : 'all',
-                'title' : 'All',
-                'count' : self.queryset.count(),
-            })
-
-            data = json.dumps(self.filters[name],
-                              indent=2,
-                              cls=DjangoJSONEncoder)
-
-            return data
+        table_filter = self.filter_map.get_filter(name)
+        return json.dumps(table_filter.to_json(self.queryset),
+                          indent=2,
+                          cls=DjangoJSONEncoder)
 
     def setup_columns(self, *args, **kwargs):
         """ function to implement in the subclass which sets up the columns """
@@ -138,30 +126,13 @@ class ToasterTable(TemplateView):
         """ function to implement in the subclass which sets up the queryset"""
         pass
 
-    def add_filter(self, name, title, filter_actions):
+    def add_filter(self, table_filter):
         """Add a filter to the table.
 
         Args:
-            name (str): Unique identifier of the filter.
-            title (str): Title of the filter.
-            filter_actions: Actions for all the filters.
+            table_filter: Filter instance
         """
-        self.filters[name] = {
-          'title' : title,
-          'filter_actions' : filter_actions,
-        }
-
-    def make_filter_action(self, name, title, action_function):
-        """ Utility to make a filter_action """
-
-        action = {
-          'title' : title,
-          'name' : name,
-        }
-
-        self.filter_actions[name] = action_function
-
-        return action
+        self.filter_map.add_filter(table_filter.name, table_filter)
 
     def add_column(self, title="", help_text="",
                    orderable=False, hideable=True, hidden=False,
@@ -197,6 +168,24 @@ class ToasterTable(TemplateView):
                              'computation': computation,
                             })
 
+    def set_column_hidden(self, title, hidden):
+        """
+        Set the hidden state of the column to the value of hidden
+        """
+        for col in self.columns:
+            if col['title'] == title:
+                col['hidden'] = hidden
+                break
+
+    def set_column_hideable(self, title, hideable):
+        """
+        Set the hideable state of the column to the value of hideable
+        """
+        for col in self.columns:
+            if col['title'] == title:
+                col['hideable'] = hideable
+                break
+
     def render_static_data(self, template, row):
         """Utility function to render the static data template"""
 
@@ -210,19 +199,35 @@ class ToasterTable(TemplateView):
 
         return template.render(context)
 
-    def apply_filter(self, filters, **kwargs):
+    def apply_filter(self, filters, filter_value, **kwargs):
+        """
+        Apply a filter submitted in the querystring to the ToasterTable
+
+        filters: (str) in the format:
+          '<filter name>:<action name>'
+        filter_value: (str) parameters to pass to the named filter
+
+        <filter name> and <action name> are used to look up the correct filter
+        in the ToasterTable's filter map; the <action params> are set on
+        TableFilterAction* before its filter is applied and may modify the
+        queryset returned by the filter
+        """
         self.setup_filters(**kwargs)
 
         try:
-            filter_name, filter_action = filters.split(':')
+            filter_name, action_name = filters.split(':')
+            action_params = urllib.unquote_plus(filter_value)
         except ValueError:
             return
 
-        if "all" in filter_action:
+        if "all" in action_name:
             return
 
         try:
-            self.filter_actions[filter_action]()
+            table_filter = self.filter_map.get_filter(filter_name)
+            action = table_filter.get_action(action_name)
+            action.set_filter_params(action_params)
+            self.queryset = action.filter(self.queryset)
         except KeyError:
             # pass it to the user - programming error here
             raise
@@ -251,13 +256,20 @@ class ToasterTable(TemplateView):
 
 
     def get_data(self, request, **kwargs):
-        """Returns the data for the page requested with the specified
-        parameters applied"""
+        """
+        Returns the data for the page requested with the specified
+        parameters applied
+
+        filters: filter and action name, e.g. "outcome:build_succeeded"
+        filter_value: value to pass to the named filter+action, e.g. "on"
+        (for a toggle filter) or "2015-12-11,2015-12-12" (for a date range filter)
+        """
 
         page_num = request.GET.get("page", 1)
         limit = request.GET.get("limit", 10)
         search = request.GET.get("search", None)
         filters = request.GET.get("filter", None)
+        filter_value = request.GET.get("filter_value", "on")
         orderby = request.GET.get("orderby", None)
         nocache = request.GET.get("nocache", None)
 
@@ -289,7 +301,7 @@ class ToasterTable(TemplateView):
         if search:
             self.apply_search(search)
         if filters:
-            self.apply_filter(filters, **kwargs)
+            self.apply_filter(filters, filter_value, **kwargs)
         if orderby:
             self.apply_orderby(orderby)
 

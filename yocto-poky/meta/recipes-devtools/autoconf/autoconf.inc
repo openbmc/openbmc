@@ -20,6 +20,7 @@ RDEPENDS_${PN} = "m4 gnu-config \
 		  perl-module-file-glob \
 		  perl-module-file-path \
 		  perl-module-file-stat \
+		  perl-module-file-find \
 		  perl-module-getopt-long \
 		  perl-module-io-file \
 		  perl-module-posix \

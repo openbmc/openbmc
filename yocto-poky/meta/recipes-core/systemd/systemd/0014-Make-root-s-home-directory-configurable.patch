@@ -1,0 +1,184 @@
+From 786883cfa13e21f060ee6da6cabb94845f4349a0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 14 Dec 2015 05:18:20 +0000
+Subject: [PATCH 14/36] Make root's home directory configurable
+
+OpenEmbedded has a configurable home directory for root. Allow
+systemd to be built using its idea of what root's home directory
+should be.
+
+Upstream-Status: Denied
+Upstream wants to have a unified hierarchy where everyone is
+using the same root folder.
+https://github.com/systemd/systemd/issues/541
+
+Signed-off-by: Dan McGregor <dan.mcgregor@usask.ca>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile.am                       | 2 ++
+ configure.ac                      | 7 +++++++
+ src/basic/user-util.c             | 4 ++--
+ src/core/namespace.c              | 2 +-
+ src/nspawn/nspawn.c               | 4 ++--
+ units/console-shell.service.m4.in | 4 ++--
+ units/emergency.service.in        | 4 ++--
+ units/rescue.service.in           | 4 ++--
+ 8 files changed, 20 insertions(+), 11 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index b3f3343..a99e8eb 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -202,6 +202,7 @@ AM_CPPFLAGS = \
+ 	-DLIBDIR=\"$(libdir)\" \
+ 	-DROOTLIBDIR=\"$(rootlibdir)\" \
+ 	-DROOTLIBEXECDIR=\"$(rootlibexecdir)\" \
++	-DROOTHOMEDIR=\"$(roothomedir)\" \
+ 	-DTEST_DIR=\"$(abs_top_srcdir)/test\" \
+ 	-I $(top_srcdir)/src \
+ 	-I $(top_builddir)/src/basic \
+@@ -5713,6 +5714,7 @@ EXTRA_DIST += \
+ substitutions = \
+        '|rootlibexecdir=$(rootlibexecdir)|' \
+        '|rootbindir=$(rootbindir)|' \
++       '|roothomedir=$(roothomedir)|' \
+        '|bindir=$(bindir)|' \
+        '|SYSTEMCTL=$(rootbindir)/systemctl|' \
+        '|SYSTEMD_NOTIFY=$(rootbindir)/systemd-notify|' \
+diff --git a/configure.ac b/configure.ac
+index c5ab9d0..16c83bb 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1470,6 +1470,11 @@ AC_ARG_WITH([rootlibdir],
+         [with_rootlibdir=${libdir}])
+ AX_NORMALIZE_PATH([with_rootlibdir])
+ 
++AC_ARG_WITH([roothomedir],
++        AS_HELP_STRING([--with-roothomedir=DIR], [Home directory for the root user]),
++        [],
++        [with_roothomedir=/root])
++
+ AC_ARG_WITH([pamlibdir],
+         AS_HELP_STRING([--with-pamlibdir=DIR], [Directory for PAM modules]),
+         [],
+@@ -1553,6 +1558,7 @@ AC_SUBST([pamlibdir], [$with_pamlibdir])
+ AC_SUBST([pamconfdir], [$with_pamconfdir])
+ AC_SUBST([rootprefix], [$with_rootprefix])
+ AC_SUBST([rootlibdir], [$with_rootlibdir])
++AC_SUBST([roothomedir], [$with_roothomedir])
+ 
+ AC_CONFIG_FILES([
+         Makefile
+@@ -1643,6 +1649,7 @@ AC_MSG_RESULT([
+         includedir:              ${includedir}
+         lib dir:                 ${libdir}
+         rootlib dir:             ${with_rootlibdir}
++        root home dir:           ${with_roothomedir}
+         SysV init scripts:       ${SYSTEM_SYSVINIT_PATH}
+         SysV rc?.d directories:  ${SYSTEM_SYSVRCND_PATH}
+         Build Python:            ${PYTHON}
+diff --git a/src/basic/user-util.c b/src/basic/user-util.c
+index 19155bc..55672b3 100644
+--- a/src/basic/user-util.c
++++ b/src/basic/user-util.c
+@@ -122,7 +122,7 @@ int get_user_creds(
+                         *gid = 0;
+ 
+                 if (home)
+-                        *home = "/root";
++                        *home = ROOTHOMEDIR;
+ 
+                 if (shell)
+                         *shell = "/bin/sh";
+@@ -353,7 +353,7 @@ int get_home_dir(char **_h) {
+         /* Hardcode home directory for root to avoid NSS */
+         u = getuid();
+         if (u == 0) {
+-                h = strdup("/root");
++                h = strdup(ROOTHOMEDIR);
+                 if (!h)
+                         return -ENOMEM;
+ 
+diff --git a/src/core/namespace.c b/src/core/namespace.c
+index b573f00..0f70b14 100644
+--- a/src/core/namespace.c
++++ b/src/core/namespace.c
+@@ -409,7 +409,7 @@ int setup_namespace(
+                         home_dir = strjoina("-", home_dir);
+                         run_user_dir = prefix_roota(root_directory, "/run/user");
+                         run_user_dir = strjoina("-", run_user_dir);
+-                        root_dir = prefix_roota(root_directory, "/root");
++                        root_dir = prefix_roota(root_directory, ROOTHOMEDIR);
+                         root_dir = strjoina("-", root_dir);
+ 
+                         r = append_mounts(&m, STRV_MAKE(home_dir, run_user_dir, root_dir),
+diff --git a/src/nspawn/nspawn.c b/src/nspawn/nspawn.c
+index 65e65ec..12f0ee8 100644
+--- a/src/nspawn/nspawn.c
++++ b/src/nspawn/nspawn.c
+@@ -2564,7 +2564,7 @@ static int inner_child(
+         if (envp[n_env])
+                 n_env ++;
+ 
+-        if ((asprintf((char**)(envp + n_env++), "HOME=%s", home ? home: "/root") < 0) ||
++        if ((asprintf((char**)(envp + n_env++), "HOME=%s", home ? home: ROOTHOMEDIR) < 0) ||
+             (asprintf((char**)(envp + n_env++), "USER=%s", arg_user ? arg_user : "root") < 0) ||
+             (asprintf((char**)(envp + n_env++), "LOGNAME=%s", arg_user ? arg_user : "root") < 0))
+                 return log_oom();
+@@ -2647,7 +2647,7 @@ static int inner_child(
+ #endif /* HAVE_EXECVPE */
+         else {
+                 if (!arg_chdir)
+-                        chdir(home ?: "/root");
++                        chdir(home ?: ROOTHOMEDIR);
+ 
+                 execle("/bin/bash", "-bash", NULL, env_use);
+                 execle("/bin/sh", "-sh", NULL, env_use);
+diff --git a/units/console-shell.service.m4.in b/units/console-shell.service.m4.in
+index a345ec2..3caae7d 100644
+--- a/units/console-shell.service.m4.in
++++ b/units/console-shell.service.m4.in
+@@ -15,8 +15,8 @@ After=rc-local.service
+ Before=getty.target
+ 
+ [Service]
+-Environment=HOME=/root
+-WorkingDirectory=-/root
++Environment=HOME=@roothomedir@
++WorkingDirectory=-@roothomedir@
+ ExecStart=-@SULOGIN@
+ ExecStopPost=-@SYSTEMCTL@ poweroff
+ Type=idle
+diff --git a/units/emergency.service.in b/units/emergency.service.in
+index fb390ea..5623a57 100644
+--- a/units/emergency.service.in
++++ b/units/emergency.service.in
+@@ -14,8 +14,8 @@ Conflicts=rescue.service
+ Before=shutdown.target
+ 
+ [Service]
+-Environment=HOME=/root
+-WorkingDirectory=-/root
++Environment=HOME=@roothomedir@
++WorkingDirectory=-@roothomedir@
+ ExecStartPre=-/bin/plymouth --wait quit
+ ExecStartPre=-/bin/echo -e 'Welcome to emergency mode! After logging in, type "journalctl -xb" to view\\nsystem logs, "systemctl reboot" to reboot, "systemctl default" or ^D to\\ntry again to boot into default mode.'
+ ExecStart=-/bin/sh -c "@SULOGIN@; @SYSTEMCTL@ --job-mode=fail --no-block default"
+diff --git a/units/rescue.service.in b/units/rescue.service.in
+index 92553f6..590ae17 100644
+--- a/units/rescue.service.in
++++ b/units/rescue.service.in
+@@ -14,8 +14,8 @@ After=sysinit.target plymouth-start.service
+ Before=shutdown.target
+ 
+ [Service]
+-Environment=HOME=/root
+-WorkingDirectory=-/root
++Environment=HOME=@roothomedir@
++WorkingDirectory=-@roothomedir@
+ ExecStartPre=-/bin/plymouth quit
+ ExecStartPre=-/bin/echo -e 'Welcome to rescue mode! After logging in, type "journalctl -xb" to view\\nsystem logs, "systemctl reboot" to reboot, "systemctl default" or ^D to\\nboot into default mode.'
+ ExecStart=-/bin/sh -c "@SULOGIN@; @SYSTEMCTL@ --job-mode=fail --no-block default"
+-- 
+1.8.3.1
+

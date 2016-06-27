@@ -1,0 +1,68 @@
+From 936d8068ae19d95260d3058f41dd6cf718101cd6 Mon Sep 17 00:00:00 2001
+From: Christian Krause <kizkizzbangbang@googlemail.com>
+Date: Sat, 26 Dec 2015 14:36:17 +0100
+Subject: [PATCH] option to not build man page
+
+fixes #56
+---
+ configure.ac    | 23 +++++++++++++++++++----
+ src/Makefile.am |  2 ++
+ 2 files changed, 21 insertions(+), 4 deletions(-)
+
+Upstream-Status: Backport
+RP 2016/01/22
+
+diff --git a/configure.ac b/configure.ac
+index b437e56..4cb56bc 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -20,13 +20,28 @@ AC_CHECK_FILE(
+   [src/pixz.1],
+   [],
+   [
+-    AC_CHECK_PROG(A2X, a2x, a2x, [])
+-    if test "x$A2X" = x ; then
+-      AC_MSG_ERROR([AsciiDoc not found, not able to generate the man page.])
+-    fi
++    AC_ARG_WITH(
++      [manpage],
++      [  --without-manpage       don't build man page],
++      [case ${withval} in
++        yes) manpage=true ;;
++        no)  manpage=false ;;
++        *)   AC_MSG_ERROR([bad value ${withval} for --with-manpage]) ;;
++      esac],
++      [manpage=true]
++    )
+   ]
+ )
+ 
++AM_CONDITIONAL([MANPAGE], [test x$manpage = xtrue])
++
++if test x$manpage = xtrue ; then
++  AC_CHECK_PROG(A2X, a2x, a2x, [])
++  if test "x$A2X" = x ; then
++    AC_MSG_ERROR([AsciiDoc not found, not able to generate the man page.])
++  fi
++fi
++
+ # Checks for libraries.
+ AC_CHECK_LIB([m], [ceil])
+ AX_PTHREAD
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 600ec90..b98f450 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -15,6 +15,7 @@ pixz_SOURCES = \
+ 	read.c \
+ 	write.c
+ 
++if MANPAGE
+ # TODO remove when possible: This is a hack because a2x is not able to output the man pages to a
+ # specific directory, only to where the source is.
+ pixz.1: pixz.1.asciidoc
+@@ -26,3 +27,4 @@ man_MANS = pixz.1
+ CLEANFILES = pixz.1
+ 
+ EXTRA_DIST = $(man_MANS) pixz.1.asciidoc
++endif

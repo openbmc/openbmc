@@ -1,0 +1,19 @@
+When reading the mtime from disk, the system can get a floating point 
+value. Convert this to an int for comparision purposes, else some
+packages always get reindexed as the value in the index is an int.
+RP 2016/3/2
+Upstream-Status: Pending
+
+Index: createrepo-0.4.11/readMetadata.py
+===================================================================
+--- createrepo-0.4.11.orig/readMetadata.py
++++ createrepo-0.4.11/readMetadata.py
+@@ -126,7 +126,7 @@ class MetadataIndex(object):
+             if self.opts.get('verbose'):
+                 print _("Size (%i -> %i) changed for file %s") % (size,st.st_size,filepath)
+             return
+-        if st.st_mtime != mtime:
++        if int(st.st_mtime) != mtime:
+             if self.opts.get('verbose'):
+                 print _("Modification time changed for %s") % filepath
+             return

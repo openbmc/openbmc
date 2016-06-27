@@ -28,6 +28,10 @@ def check_indent(codestr):
         return codestr
 
     if codestr[i-1] == "\t" or codestr[i-1] == " ":
+        if codestr[0] == "\n":
+            # Since we're adding a line, we need to remove one line of any empty padding
+            # to ensure line numbers are correct
+            codestr = codestr[1:]
         return "if 1:\n" + codestr
 
     return codestr
@@ -144,6 +148,10 @@ class CodeParserCache(MultiProcessCache):
         return cacheline
 
     def init_cache(self, d):
+        # Check if we already have the caches
+        if self.pythoncache:
+            return
+
         MultiProcessCache.init_cache(self, d)
 
         # cachedata gets re-assigned in the parent
@@ -159,11 +167,11 @@ codeparsercache = CodeParserCache()
 def parser_cache_init(d):
     codeparsercache.init_cache(d)
 
-def parser_cache_save(d):
-    codeparsercache.save_extras(d)
+def parser_cache_save():
+    codeparsercache.save_extras()
 
-def parser_cache_savemerge(d):
-    codeparsercache.save_merge(d)
+def parser_cache_savemerge():
+    codeparsercache.save_merge()
 
 Logger = logging.getLoggerClass()
 class BufferedLogger(Logger):
@@ -213,6 +221,17 @@ class PythonParser():
                     self.references.add(node.args[0].s)
             else:
                 self.warn(node.func, node.args[0])
+        elif name and name.endswith(".expand"):
+            if isinstance(node.args[0], ast.Str):
+                value = node.args[0].s
+                d = bb.data.init()
+                parser = d.expandWithRefs(value, self.name)
+                self.references |= parser.references
+                self.execs |= parser.execs
+                for varname in parser.contains:
+                    if varname not in self.contains:
+                        self.contains[varname] = set()
+                    self.contains[varname] |= parser.contains[varname]
         elif name in self.execfuncs:
             if isinstance(node.args[0], ast.Str):
                 self.var_execs.add(node.args[0].s)
@@ -235,6 +254,7 @@ class PythonParser():
                 break
 
     def __init__(self, name, log):
+        self.name = name
         self.var_execs = set()
         self.contains = {}
         self.execs = set()
@@ -244,7 +264,7 @@ class PythonParser():
         self.unhandled_message = "in call of %s, argument '%s' is not a string literal"
         self.unhandled_message = "while parsing %s, %s" % (name, self.unhandled_message)
 
-    def parse_python(self, node):
+    def parse_python(self, node, lineno=0, filename="<string>"):
         if not node or not node.strip():
             return
 
@@ -266,7 +286,9 @@ class PythonParser():
                 self.contains[i] = set(codeparsercache.pythoncacheextras[h].contains[i])
             return
 
-        code = compile(check_indent(str(node)), "<string>", "exec",
+        # We can't add to the linenumbers for compile, we can pad to the correct number of blank lines though
+        node = "\n" * int(lineno) + node
+        code = compile(check_indent(str(node)), filename, "exec",
                        ast.PyCF_ONLY_AST)
 
         for n in ast.walk(code):

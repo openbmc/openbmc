@@ -116,7 +116,7 @@ if [ ! -L /etc/mtab ]; then
     cat /proc/mounts > /etc/mtab
 fi
 
-disk_size=$(parted ${device} unit mb print | grep Disk | cut -d" " -f 3 | sed -e "s/MB//")
+disk_size=$(parted ${device} unit mb print | grep '^Disk .*: .*MB' | cut -d" " -f 3 | sed -e "s/MB//")
 
 grub_version=$(grub-install -v|sed 's/.* \([0-9]\).*/\1/')
 
@@ -141,7 +141,7 @@ swap_start=$((rootfs_end))
 # 2) they are detected asynchronously (need rootwait)
 rootwait=""
 part_prefix=""
-if [ ! "${device#mmcblk}" = "${device}" ]; then
+if [ ! "${device#/dev/mmcblk}" = "${device}" ]; then
     part_prefix="p"
     rootwait="rootwait"
 fi
@@ -211,13 +211,13 @@ echo "Copying rootfs files..."
 cp -a /src_root/* /tgt_root
 if [ -d /tgt_root/etc/ ] ; then
     if [ $grub_version -ne 0 ] ; then
-        boot_uuid=$(blkid -o value -s UUID ${device}2)
-        swap_part_uuid=$(blkid -o value -s PARTUUID ${device}4)
+        boot_uuid=$(blkid -o value -s UUID ${bootfs})
+        swap_part_uuid=$(blkid -o value -s PARTUUID ${swap})
         bootdev="UUID=$boot_uuid"
         swapdev=/dev/disk/by-partuuid/$swap_part_uuid
     else
-        bootdev=${device}2
-        swapdev=${device}4
+        bootdev=${bootfs}
+        swapdev=${swap}
     fi
     echo "$swapdev                swap             swap       defaults              0  0" >> /tgt_root/etc/fstab
     echo "$bootdev              /boot            ext3       defaults              1  2" >> /tgt_root/etc/fstab
@@ -234,8 +234,8 @@ mount $bootfs /boot
 echo "Preparing boot partition..."
 if [ -f /etc/grub.d/00_header -a $grub_version -ne 0 ] ; then
     echo "Preparing custom grub2 menu..."
-    root_part_uuid=$(blkid -o value -s PARTUUID ${device}3)
-    boot_uuid=$(blkid -o value -s UUID ${device}2)
+    root_part_uuid=$(blkid -o value -s PARTUUID ${rootfs})
+    boot_uuid=$(blkid -o value -s UUID ${bootfs})
     GRUBCFG="/boot/grub/grub.cfg"
     mkdir -p $(dirname $GRUBCFG)
     cat >$GRUBCFG <<_EOF

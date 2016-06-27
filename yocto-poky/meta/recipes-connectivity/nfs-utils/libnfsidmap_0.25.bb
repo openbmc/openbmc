@@ -14,6 +14,8 @@ SRC_URI = "http://www.citi.umich.edu/projects/nfsv4/linux/libnfsidmap/${BPN}-${P
 SRC_URI[md5sum] = "2ac4893c92716add1a1447ae01df77ab"
 SRC_URI[sha256sum] = "656d245d84400e1030f8f40a5a27da76370690c4a932baf249110f047fe7efcf"
 
+UPSTREAM_CHECK_URI = "http://www.citi.umich.edu/projects/nfsv4/linux/libnfsidmap/"
+
 inherit autotools
 
 EXTRA_OECONF = "--disable-ldap"

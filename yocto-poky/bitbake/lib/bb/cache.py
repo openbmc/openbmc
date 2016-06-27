@@ -43,7 +43,7 @@ except ImportError:
     logger.info("Importing cPickle failed. "
                 "Falling back to a very slow implementation.")
 
-__cache_version__ = "148"
+__cache_version__ = "149"
 
 def getCacheFile(path, filename, data_hash):
     return os.path.join(path, filename + "." + data_hash)
@@ -85,8 +85,8 @@ class RecipeInfoCommon(object):
             return out_dict
 
     @classmethod
-    def getvar(cls, var, metadata):
-        return metadata.getVar(var, True) or ''
+    def getvar(cls, var, metadata, expand = True):
+        return metadata.getVar(var, expand) or ''
 
 
 class CoreRecipeInfo(RecipeInfoCommon):
@@ -99,7 +99,7 @@ class CoreRecipeInfo(RecipeInfoCommon):
         self.timestamp = bb.parse.cached_mtime(filename)
         self.variants = self.listvar('__VARIANTS', metadata) + ['']
         self.appends = self.listvar('__BBAPPEND', metadata)
-        self.nocache = self.getvar('__BB_DONT_CACHE', metadata)
+        self.nocache = self.getvar('BB_DONT_CACHE', metadata)
 
         self.skipreason = self.getvar('__SKIPPED', metadata)
         if self.skipreason:
@@ -129,8 +129,6 @@ class CoreRecipeInfo(RecipeInfoCommon):
         self.not_world = self.getvar('EXCLUDE_FROM_WORLD', metadata)
         self.stamp = self.getvar('STAMP', metadata)
         self.stampclean = self.getvar('STAMPCLEAN', metadata)        
-        self.stamp_base = self.flaglist('stamp-base', self.tasks, metadata)
-        self.stamp_base_clean = self.flaglist('stamp-base-clean', self.tasks, metadata)
         self.stamp_extrainfo = self.flaglist('stamp-extra-info', self.tasks, metadata)
         self.file_checksums = self.flaglist('file-checksums', self.tasks, metadata, True)
         self.packages_dynamic = self.listvar('PACKAGES_DYNAMIC', metadata)
@@ -142,10 +140,11 @@ class CoreRecipeInfo(RecipeInfoCommon):
         self.rprovides_pkg    = self.pkgvar('RPROVIDES', self.packages, metadata)
         self.rdepends_pkg     = self.pkgvar('RDEPENDS', self.packages, metadata)
         self.rrecommends_pkg  = self.pkgvar('RRECOMMENDS', self.packages, metadata)
-        self.inherits         = self.getvar('__inherit_cache', metadata)
+        self.inherits         = self.getvar('__inherit_cache', metadata, expand=False)
         self.fakerootenv      = self.getvar('FAKEROOTENV', metadata)
         self.fakerootdirs     = self.getvar('FAKEROOTDIRS', metadata)
         self.fakerootnoenv    = self.getvar('FAKEROOTNOENV', metadata)
+        self.extradepsfunc    = self.getvar('calculate_extra_depends', metadata)
 
     @classmethod
     def init_cacheData(cls, cachedata):
@@ -158,8 +157,6 @@ class CoreRecipeInfo(RecipeInfoCommon):
 
         cachedata.stamp = {}
         cachedata.stampclean = {}
-        cachedata.stamp_base = {}
-        cachedata.stamp_base_clean = {}
         cachedata.stamp_extrainfo = {}
         cachedata.file_checksums = {}
         cachedata.fn_provides = {}
@@ -183,6 +180,7 @@ class CoreRecipeInfo(RecipeInfoCommon):
         cachedata.fakerootenv = {}
         cachedata.fakerootnoenv = {}
         cachedata.fakerootdirs = {}
+        cachedata.extradepsfunc = {}
 
     def add_cacheData(self, cachedata, fn):
         cachedata.task_deps[fn] = self.task_deps
@@ -192,8 +190,6 @@ class CoreRecipeInfo(RecipeInfoCommon):
         cachedata.pkg_dp[fn] = self.defaultpref
         cachedata.stamp[fn] = self.stamp
         cachedata.stampclean[fn] = self.stampclean
-        cachedata.stamp_base[fn] = self.stamp_base
-        cachedata.stamp_base_clean[fn] = self.stamp_base_clean
         cachedata.stamp_extrainfo[fn] = self.stamp_extrainfo
         cachedata.file_checksums[fn] = self.file_checksums
 
@@ -220,7 +216,8 @@ class CoreRecipeInfo(RecipeInfoCommon):
             rprovides += self.rprovides_pkg[package]
 
         for rprovide in rprovides:
-            cachedata.rproviders[rprovide].append(fn)
+            if fn not in cachedata.rproviders[rprovide]:
+                cachedata.rproviders[rprovide].append(fn)
 
         for package in self.packages_dynamic:
             cachedata.packages_dynamic[package].append(fn)
@@ -251,6 +248,7 @@ class CoreRecipeInfo(RecipeInfoCommon):
         cachedata.fakerootenv[fn] = self.fakerootenv
         cachedata.fakerootnoenv[fn] = self.fakerootnoenv
         cachedata.fakerootdirs[fn] = self.fakerootdirs
+        cachedata.extradepsfunc[fn] = self.extradepsfunc
 
 
 
@@ -757,13 +755,14 @@ class MultiProcessCache(object):
         self.cachedata = self.create_cachedata()
         self.cachedata_extras = self.create_cachedata()
 
-    def init_cache(self, d):
+    def init_cache(self, d, cache_file_name=None):
         cachedir = (d.getVar("PERSISTENT_DIR", True) or
                     d.getVar("CACHE", True))
         if cachedir in [None, '']:
             return
         bb.utils.mkdirhier(cachedir)
-        self.cachefile = os.path.join(cachedir, self.__class__.cache_file_name)
+        self.cachefile = os.path.join(cachedir,
+                                      cache_file_name or self.__class__.cache_file_name)
         logger.debug(1, "Using cache in '%s'", self.cachefile)
 
         glf = bb.utils.lockfile(self.cachefile + ".lock")
@@ -787,7 +786,7 @@ class MultiProcessCache(object):
         data = [{}]
         return data
 
-    def save_extras(self, d):
+    def save_extras(self):
         if not self.cachefile:
             return
 
@@ -817,7 +816,7 @@ class MultiProcessCache(object):
                 if h not in dest[j]:
                     dest[j][h] = source[j][h]
 
-    def save_merge(self, d):
+    def save_merge(self):
         if not self.cachefile:
             return
 

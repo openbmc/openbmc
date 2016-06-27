@@ -8,9 +8,11 @@ Upstream-Status: Inappropriate[Embedded-Specific]
  Makefile.pre.in |   16 ----------------
  1 file changed, 16 deletions(-)
 
---- a/Makefile.pre.in
-+++ b/Makefile.pre.in
-@@ -1078,24 +1078,6 @@ libinstall:	build_all $(srcdir)/Lib/$(PL
+Index: Python-3.5.0/Makefile.pre.in
+===================================================================
+--- Python-3.5.0.orig/Makefile.pre.in
++++ Python-3.5.0/Makefile.pre.in
+@@ -1262,33 +1262,6 @@ libinstall:	build_all $(srcdir)/Lib/$(PL
  		$(INSTALL_DATA) $(srcdir)/Modules/xxmodule.c \
  			$(DESTDIR)$(LIBDEST)/distutils/tests ; \
  	fi
@@ -24,12 +26,21 @@ Upstream-Status: Inappropriate[Embedded-Specific]
 -		-d $(LIBDEST) -f \
 -		-x 'bad_coding|badsyntax|site-packages|lib2to3/tests/data' \
 -		$(DESTDIR)$(LIBDEST)
--	-PYTHONPATH=$(DESTDIR)$(LIBDEST)  $(RUNSHARED) \
+-	-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
+-		$(PYTHON_FOR_BUILD) -Wi -OO $(DESTDIR)$(LIBDEST)/compileall.py \
+-		-d $(LIBDEST) -f \
+-		-x 'bad_coding|badsyntax|site-packages|lib2to3/tests/data' \
+-		$(DESTDIR)$(LIBDEST)
+-	-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
 -		$(PYTHON_FOR_BUILD) -Wi $(DESTDIR)$(LIBDEST)/compileall.py \
 -		-d $(LIBDEST)/site-packages -f \
 -		-x badsyntax $(DESTDIR)$(LIBDEST)/site-packages
 -	-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
 -		$(PYTHON_FOR_BUILD) -Wi -O $(DESTDIR)$(LIBDEST)/compileall.py \
+-		-d $(LIBDEST)/site-packages -f \
+-		-x badsyntax $(DESTDIR)$(LIBDEST)/site-packages
+-	-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
+-		$(PYTHON_FOR_BUILD) -Wi -OO $(DESTDIR)$(LIBDEST)/compileall.py \
 -		-d $(LIBDEST)/site-packages -f \
 -		-x badsyntax $(DESTDIR)$(LIBDEST)/site-packages
  	-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \

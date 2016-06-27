@@ -1,0 +1,11 @@
+#!/bin/sh
+# busybox init does not have LSB ( sysvinit ) like initlevels
+# so lets fake it to 5 which is what we default anyway
+# this helps with opkg post installs where it tries to invoke
+# update-rc.d ad post install step.
+# for package upgrades
+# See code in update-rc.d around line 190 where it calls runlevel
+# program
+#
+echo "5"
+

@@ -1,6 +1,6 @@
 SUMMARY = "A daemon for delivering ACPI events"
-HOMEPAGE = "http://sourceforge.net/projects/acpid/"
-BUGTRACKER = "http://sourceforge.net/tracker/?group_id=33140&atid=407341"
+HOMEPAGE = "http://sourceforge.net/projects/acpid2"
+BUGTRACKER = "http://sourceforge.net/p/acpid2/tickets/?source=navbar"
 SECTION = "base"
 LICENSE = "GPLv2+"
 

@@ -53,7 +53,7 @@ python debian_package_name_hook () {
         return (s[stat.ST_MODE] & stat.S_IEXEC)
 
     def add_rprovides(pkg, d):
-        newpkg = d.getVar('PKG_' + pkg, False)
+        newpkg = d.getVar('PKG_' + pkg, True)
         if newpkg and newpkg != pkg:
             provs = (d.getVar('RPROVIDES_' + pkg, True) or "").split()
             if pkg not in provs:

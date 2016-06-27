@@ -71,6 +71,16 @@
                     Layer commit
                 </dt>
                 <dd class="iscommit">{{layer_version.commit}}</dd>
+                {% if object.provides_set.all %}
+                <dt>
+                    <i class="icon-question-sign get-help"
+                     title="A list of aliases by which a particular recipe can be known. The additional aliases are
+                           synonyms for the recipe and can be useful satisfying dependencies of other recipes during
+                           the build"></i>
+                    PROVIDES
+                </dt>
+                 <dd><code>{% for provider in object.provides_set.all %}{{ provider.name }}&nbsp;{% endfor %}</code></dd>
+                {% endif %}
             </dl>
 
             <h2 class="details">Tasks</h2>
@@ -162,7 +172,14 @@
 
                     {% for rr in object.r_dependencies_recipe.all|dictsort:"depends_on.name" %}
                     <tr>
-                        <td><a href="{% url "recipe" build.pk rr.depends_on.pk %}">{{rr.depends_on.name}}</a></td>
+                        <td><a href="{% url "recipe" build.pk rr.depends_on.pk %}">{{rr.depends_on.name}}</a>
+                            {% if rr.via %}
+                                <span class="muted">satisfied via {{rr.via.name}}</span>
+                                <i class="icon-question-sign get-help hover-help"
+                                 title="This dependency is satisfied by the PROVIDES value
+                                       {{rr.via.name}} in the {{rr.depends_on.name}} recipe"></i>
+                            {% endif %}
+                        </td>
                         <td><a href="{% url "recipe" build.pk rr.depends_on.pk %}">{{rr.depends_on.version}}</a></td>
                     </tr>
                     {% endfor %}
@@ -194,7 +211,14 @@
 
                     {% for rr in object.r_dependencies_depends.all|dictsort:"recipe.name" %}
                     <tr>
-                        <td><a href="{% url "recipe" build.pk rr.recipe.pk %}">{{rr.recipe.name}}</a></td>
+                        <td><a href="{% url "recipe" build.pk rr.recipe.pk %}">{{rr.recipe.name}}</a>
+                        {% if rr.via %}
+                            <span class="muted"> satisfied via {{rr.via.name}}</span>
+                            <i class="icon-question-sign get-help hover-help"
+                             title="This dependency is satisfied by the PROVIDES value
+                            {{rr.via.name}} in the {{rr.depends_on.name}} recipe"></i>
+                        {% endif %}
+                        </td>
                         <td><a href="{% url "recipe" build.pk rr.recipe.pk %}">{{rr.recipe.version}}</a></td>
                     </tr>
                     {% endfor %}

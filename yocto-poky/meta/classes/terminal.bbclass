@@ -1,8 +1,7 @@
 OE_TERMINAL ?= 'auto'
 OE_TERMINAL[type] = 'choice'
 OE_TERMINAL[choices] = 'auto none \
-                        ${@" ".join(o.name \
-                                    for o in oe.terminal.prioritized())}'
+                        ${@oe_terminal_prioritized()}'
 
 OE_TERMINAL_EXPORTS += 'EXTRA_OEMAKE'
 OE_TERMINAL_EXPORTS[type] = 'list'
@@ -10,12 +9,15 @@ OE_TERMINAL_EXPORTS[type] = 'list'
 XAUTHORITY ?= "${HOME}/.Xauthority"
 SHELL ?= "bash"
 
+def oe_terminal_prioritized():
+    import oe.terminal
+    return " ".join(o.name for o in oe.terminal.prioritized())
 
 def emit_terminal_func(command, envdata, d):
     cmd_func = 'do_terminal'
 
     envdata.setVar(cmd_func, 'exec ' + command)
-    envdata.setVarFlag(cmd_func, 'func', 1)
+    envdata.setVarFlag(cmd_func, 'func', '1')
 
     runfmt = d.getVar('BB_RUNFMT', True) or "run.{func}.{pid}"
     runfile = runfmt.format(func=cmd_func, task=cmd_func, taskfunc=cmd_func, pid=os.getpid())
@@ -39,14 +41,14 @@ def oe_terminal(command, title, d):
 
     for v in os.environ:
         envdata.setVar(v, os.environ[v])
-        envdata.setVarFlag(v, 'export', 1)
+        envdata.setVarFlag(v, 'export', '1')
 
     for export in oe.data.typed_value('OE_TERMINAL_EXPORTS', d):
         value = d.getVar(export, True)
         if value is not None:
             os.environ[export] = str(value)
             envdata.setVar(export, str(value))
-            envdata.setVarFlag(export, 'export', 1)
+            envdata.setVarFlag(export, 'export', '1')
         if export == "PSEUDO_DISABLED":
             if "PSEUDO_UNLOAD" in os.environ:
                 del os.environ["PSEUDO_UNLOAD"]
@@ -62,7 +64,7 @@ def oe_terminal(command, title, d):
         if value is not None:
             os.environ[key] = str(value)
             envdata.setVar(key, str(value))
-            envdata.setVarFlag(key, 'export', 1)
+            envdata.setVarFlag(key, 'export', '1')
 
     # A complex PS1 might need more escaping of chars.
     # Lets not export PS1 instead.

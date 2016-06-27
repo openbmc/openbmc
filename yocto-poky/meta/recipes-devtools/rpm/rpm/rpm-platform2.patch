@@ -1,7 +1,5 @@
 Fix up platform and related sysinfo file loading (part 2).
 
-Upstream-Status: Pending
-
 We need to ensure that we set the _gnu flag somehow.  We do this by reading
 from the platform file, and setting a new _platform_gnu and related vars.
 
@@ -10,6 +8,8 @@ reference either the automatically determined _target_... or _platform_...
 values.  The macros file uses the configure time defaults in _platform_...
 versions have not been defined.  This preserves existing behavior, but
 ensures reasonable defaults are always available.
+
+Upstream-Status: Submitted [RPM5 maintainer]
 
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
 

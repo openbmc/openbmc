@@ -383,7 +383,7 @@ class RecipetoolTests(RecipetoolBase):
     @testcase(1194)
     def test_recipetool_create_git(self):
         # Ensure we have the right data in shlibs/pkgdata
-        bitbake('libpng pango libx11 libxext jpeg')
+        bitbake('libpng pango libx11 libxext jpeg libxsettings-client libcheck')
         # Try adding a recipe
         tempsrc = os.path.join(self.tempdir, 'srctree')
         os.makedirs(tempsrc)
@@ -395,12 +395,52 @@ class RecipetoolTests(RecipetoolBase):
         checkvars['LICENSE'] = 'LGPLv2.1'
         checkvars['LIC_FILES_CHKSUM'] = 'file://COPYING;md5=7fbc338309ac38fefcd64b04bb903e34'
         checkvars['S'] = '${WORKDIR}/git'
-        checkvars['PV'] = '1.0+git${SRCPV}'
+        checkvars['PV'] = '1.11+git${SRCPV}'
         checkvars['SRC_URI'] = srcuri
-        checkvars['DEPENDS'] = 'libpng pango libx11 libxext jpeg'
+        checkvars['DEPENDS'] = set(['libcheck', 'libjpeg-turbo', 'libpng', 'libx11', 'libxsettings-client', 'libxext', 'pango'])
         inherits = ['autotools', 'pkgconfig']
         self._test_recipe_contents(recipefile, checkvars, inherits)
 
+    @testcase(1392)
+    def test_recipetool_create_simple(self):
+        # Try adding a recipe
+        temprecipe = os.path.join(self.tempdir, 'recipe')
+        os.makedirs(temprecipe)
+        pv = '1.7.3.0'
+        srcuri = 'http://www.dest-unreach.org/socat/download/socat-%s.tar.bz2' % pv
+        result = runCmd('recipetool create %s -o %s' % (srcuri, temprecipe))
+        dirlist = os.listdir(temprecipe)
+        if len(dirlist) > 1:
+            self.fail('recipetool created more than just one file; output:\n%s\ndirlist:\n%s' % (result.output, str(dirlist)))
+        if len(dirlist) < 1 or not os.path.isfile(os.path.join(temprecipe, dirlist[0])):
+            self.fail('recipetool did not create recipe file; output:\n%s\ndirlist:\n%s' % (result.output, str(dirlist)))
+        self.assertEqual(dirlist[0], 'socat_%s.bb' % pv, 'Recipe file incorrectly named')
+        checkvars = {}
+        checkvars['LICENSE'] = set(['Unknown', 'GPLv2'])
+        checkvars['LIC_FILES_CHKSUM'] = set(['file://COPYING.OpenSSL;md5=5c9bccc77f67a8328ef4ebaf468116f4', 'file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263'])
+        # We don't check DEPENDS since they are variable for this recipe depending on what's in the sysroot
+        checkvars['S'] = None
+        checkvars['SRC_URI'] = srcuri.replace(pv, '${PV}')
+        inherits = ['autotools']
+        self._test_recipe_contents(os.path.join(temprecipe, dirlist[0]), checkvars, inherits)
+
+    @testcase(1418)
+    def test_recipetool_create_cmake(self):
+        # Try adding a recipe
+        temprecipe = os.path.join(self.tempdir, 'recipe')
+        os.makedirs(temprecipe)
+        recipefile = os.path.join(temprecipe, 'navit_0.5.0.bb')
+        srcuri = 'http://downloads.sourceforge.net/project/navit/v0.5.0/navit-0.5.0.tar.gz'
+        result = runCmd('recipetool create -o %s %s' % (temprecipe, srcuri))
+        self.assertTrue(os.path.isfile(recipefile))
+        checkvars = {}
+        checkvars['LICENSE'] = set(['Unknown', 'GPLv2', 'LGPLv2'])
+        checkvars['SRC_URI'] = 'http://downloads.sourceforge.net/project/navit/v${PV}/navit-${PV}.tar.gz'
+        checkvars['SRC_URI[md5sum]'] = '242f398e979a6b8c0f3c802b63435b68'
+        checkvars['SRC_URI[sha256sum]'] = '13353481d7fc01a4f64e385dda460b51496366bba0fd2cc85a89a0747910e94d'
+        checkvars['DEPENDS'] = set(['freetype', 'zlib', 'openssl', 'glib-2.0', 'virtual/libgl', 'virtual/egl', 'gtk+', 'libpng', 'libsdl', 'freeglut', 'dbus-glib'])
+        inherits = ['cmake', 'python-dir', 'gettext', 'pkgconfig']
+        self._test_recipe_contents(recipefile, checkvars, inherits)
 
 class RecipetoolAppendsrcBase(RecipetoolBase):
     def _try_recipetool_appendsrcfile(self, testrecipe, newfile, destfile, options, expectedlines, expectedfiles):

@@ -1,0 +1,35 @@
+From 3e562bed7dced25eb3e9174ca9395324b6c873c1 Mon Sep 17 00:00:00 2001
+From: Alejandro del Castillo <alejandro.delcastillo@ni.com>
+Date: Wed, 9 Dec 2015 13:36:14 -0600
+Subject: [PATCH] libsolv_solver_set_arch_policy: use correct logic during
+ archs resizing
+
+If there are more than INITIAL_ARCH_LIST_SIZE archs defined in the
+configuration, libsolv_solver_set_arch_policy crashes due to flawed
+logic when resizing the archs array.
+
+Signed-off-by: Alejandro del Castillo <alejandro.delcastillo@ni.com>
+---
+ libopkg/opkg_solver_libsolv.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/libopkg/opkg_solver_libsolv.c b/libopkg/opkg_solver_libsolv.c
+index 1cdcf1f..b5af0fa 100644
+--- a/libopkg/opkg_solver_libsolv.c
++++ b/libopkg/opkg_solver_libsolv.c
+@@ -66,8 +66,10 @@ static void libsolv_solver_set_arch_policy(libsolv_solver_t *libsolv_solver)
+     nv_pair_list_elt_t *arch_info;
+ 
+     list_for_each_entry(arch_info, &opkg_config->arch_list.head, node) {
+-        if (arch_count > arch_list_size)
+-            archs = xrealloc(archs, arch_list_size *= 2);
++        if (arch_count >= arch_list_size) {
++            arch_list_size *= 2;
++            archs = xrealloc(archs, arch_list_size * sizeof(arch_data_t));
++        }
+ 
+         archs[arch_count].arch = ((nv_pair_t *)(arch_info->data))->name;
+         archs[arch_count].priority = atoi(((nv_pair_t *)
+-- 
+1.9.1
+

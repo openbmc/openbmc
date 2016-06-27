@@ -1,0 +1,57 @@
+Avoid unsupported grep options
+
+Signed-off-by: Tudor Florea <tudor.florea@enea.com>
+Upstream-Status: Pending
+
+diff -ruN a/ts/ipcs/headers b/ts/ipcs/headers
+--- a/tests/ts/ipcs/headers	2013-09-04 11:03:36.118613250 +0200
++++ b/teste/ts/ipcs/headers	2013-09-04 11:03:27.906958437 +0200
+@@ -22,35 +22,35 @@
+ ts_init "$*"
+ 
+ ts_log "test: shm headers"
+-$TS_CMD_IPCS -m -t | grep --after-context=1 "^---"  >> $TS_OUTPUT
+-$TS_CMD_IPCS -m -p | grep --after-context=1 "^---"  >> $TS_OUTPUT
+-$TS_CMD_IPCS -m -c | grep --after-context=1 "^---"  >> $TS_OUTPUT
++$TS_CMD_IPCS -m -t | grep -A 1 "^---"  >> $TS_OUTPUT
++$TS_CMD_IPCS -m -p | grep -A 1 "^---"  >> $TS_OUTPUT
++$TS_CMD_IPCS -m -c | grep -A 1 "^---"  >> $TS_OUTPUT
+ $TS_CMD_IPCS -m -l | grep "^---"  >> $TS_OUTPUT
+ $TS_CMD_IPCS -m -u | grep "^---"  >> $TS_OUTPUT
+ echo >> $TS_OUTPUT
+ 
+ ts_log "test: mesg headers"
+-$TS_CMD_IPCS -q -t | grep --after-context=1 "^---"  >> $TS_OUTPUT
+-$TS_CMD_IPCS -q -p | grep --after-context=1 "^---"  >> $TS_OUTPUT
+-$TS_CMD_IPCS -q -c | grep --after-context=1 "^---"  >> $TS_OUTPUT
++$TS_CMD_IPCS -q -t | grep -A 1 "^---"  >> $TS_OUTPUT
++$TS_CMD_IPCS -q -p | grep -A 1 "^---"  >> $TS_OUTPUT
++$TS_CMD_IPCS -q -c | grep -A 1 "^---"  >> $TS_OUTPUT
+ $TS_CMD_IPCS -q -l | grep  "^---"  >> $TS_OUTPUT
+ $TS_CMD_IPCS -q -u | grep  "^---"  >> $TS_OUTPUT
+ echo >> $TS_OUTPUT
+ 
+ ts_log "test: sem headers"
+-$TS_CMD_IPCS -s -t | grep --after-context=1 "^---"  >> $TS_OUTPUT
+-$TS_CMD_IPCS -s -p | grep --after-context=1 "^---"  >> $TS_OUTPUT
+-$TS_CMD_IPCS -s -c | grep --after-context=1 "^---"  >> $TS_OUTPUT
++$TS_CMD_IPCS -s -t | grep -A 1 "^---"  >> $TS_OUTPUT
++$TS_CMD_IPCS -s -p | grep -A 1 "^---"  >> $TS_OUTPUT
++$TS_CMD_IPCS -s -c | grep -A 1 "^---"  >> $TS_OUTPUT
+ $TS_CMD_IPCS -s -l | grep  "^---"  >> $TS_OUTPUT
+ $TS_CMD_IPCS -s -u | grep  "^---"  >> $TS_OUTPUT
+ echo >> $TS_OUTPUT
+ 
+ ts_log "test: all headers"
+-$TS_CMD_IPCS -a | grep --after-context=1 "^---"  >> $TS_OUTPUT
++$TS_CMD_IPCS -a | grep -A 1 "^---"  >> $TS_OUTPUT
+ 
+-$TS_CMD_IPCS -a -t | grep --after-context=1 "^---"  >> $TS_OUTPUT
+-$TS_CMD_IPCS -a -p | grep --after-context=1 "^---"  >> $TS_OUTPUT
+-$TS_CMD_IPCS -a -c | grep --after-context=1 "^---"  >> $TS_OUTPUT
++$TS_CMD_IPCS -a -t | grep -A 1 "^---"  >> $TS_OUTPUT
++$TS_CMD_IPCS -a -p | grep -A 1 "^---"  >> $TS_OUTPUT
++$TS_CMD_IPCS -a -c | grep -A 1 "^---"  >> $TS_OUTPUT
+ $TS_CMD_IPCS -a -l | grep "^---"  >> $TS_OUTPUT
+ $TS_CMD_IPCS -a -u | grep "^---"  >> $TS_OUTPUT
+ 

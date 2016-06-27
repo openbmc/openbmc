@@ -4,6 +4,9 @@ Date: Wed, 9 Jul 2014 14:30:33 +0200
 Subject: [PATCH 2/9] Correctly implement with AC_WITH(glut) so that
  --without-glut works.
 
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+Upstream-Status: Submitted (https://patchwork.freedesktop.org/patch/64417/)
+
 ---
  configure.ac | 26 +++++++++++++++-----------
  1 file changed, 15 insertions(+), 11 deletions(-)

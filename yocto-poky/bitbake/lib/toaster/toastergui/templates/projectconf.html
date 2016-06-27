@@ -31,6 +31,28 @@
             </dd>
             {% endif %}
 
+            {% if dl_dir_defined %}
+            <dt>
+                <span class="js-config-var-name js-config-var-managed-name">DL_DIR</span>
+                <i class="icon-question-sign get-help" title="Absolute path to the directory used to store downloads required for your builds. By default, Toaster projects share the same downloads directory.<br /><a href='http://www.yoctoproject.org/docs/2.1/ref-manual/ref-manual.html#var-DL_DIR' target='_blank'>Read more in the manual</a>"></i>
+            </dt>
+            <dd class="lead">
+                <span id="dl_dir"{% if dl_dir %}{%else%} class="muted"{%endif%}>{% if dl_dir %}{{dl_dir}}{%else%}Not set{%endif%}</span>
+                <i class="icon-pencil" id="change-dl_dir-icon"></i>
+                <form id="change-dl_dir-form" style="display:none;">
+                    <div class="row-fluid">
+                        <span class="help-block span4">To set DL_DIR type the absolute path of the download folder.</span>
+                    </div>
+                    <div class="input-append" id="validate-dl_dir">
+                        <input type="text" class="input-xlarge" id="new-dl_dir" placeholder="Type absolute path of the DL_DIR folder">
+                        <button id="apply-change-dl_dir" class="btn" type="button">Save</button>
+                        <button id="cancel-change-dl_dir" type="button" class="btn btn-link">Cancel</button>
+			</br><span class="help-block error" id="hintError-dl_dir">A valid directory cannot include spaces or any of these characters: . \ ? % * : | " " < ></span>
+                    </div>
+                </form>
+            </dd>
+            {% endif %}
+
             {% if fstypes_defined %}
             <dt>
                 <span class="js-config-var-name js-config-var-managed-name">IMAGE_FSTYPES</span>
@@ -108,31 +130,28 @@
             </dd>
             {% endif %}
 
-            {% if sdk_machine_defined %}
+            {% if sstate_dir_defined %}
             <dt>
-                <span class="js-config-var-name js-config-var-managed-name">SDKMACHINE</span>
-                <i class="icon-question-sign get-help" title="Specifies the architecture (i.e. i686 or x86_64) for which to build SDK and ADT items <br /><a href='http://www.yoctoproject.org/docs/1.6.1/ref-manual/ref-manual.html#var-SDKMACHINE' target='_blank'>Read more in the manual</a>"></i>
+                <span class="js-config-var-name js-config-var-managed-name">SSTATE_DIR</span>
+                <i class="icon-question-sign get-help" title="Absolute path to the directory used to store shared state cache files. These files are reused across the builds, which makes the builds faster. By default, Toaster projects share the same cache directory.<br /><a href='http://www.yoctoproject.org/docs/2.1/ref-manual/ref-manual.html#var-SSTATE_DIR' target='_blank'>Read more in the manual</a>"></i>
             </dt>
             <dd class="lead">
-                <span id="sdkmachine">{{sdk_machine}}</span>
-                <i id="change-sdkmachine-icon" class="icon-pencil"></i>
-                <form id="change-sdkmachine-form" style="display:none;">
-                    <label class="radio">
-                        <input type="radio" name="sdkmachine" value="i686">
-                        i686
-                    </label>
-                    <label class="radio">
-                        <input type="radio" name="sdkmachine" value="x86_64">
-                        x86_64
-                    </label>
-                    <div style="padding-top:10px;">
-                        <button id="apply-change-sdkmachine" type="button" class="btn">Save</button>
-                        <button id="cancel-change-sdkmachine" type="button" class="btn btn-link">Cancel</button>
+                <span id="sstate_dir"{% if sstate_dir %}{%else%} class="muted"{%endif%}>{% if sstate_dir %}{{sstate_dir}}{%else%}Not set{%endif%}</span>
+                <i class="icon-pencil" id="change-sstate_dir-icon"></i>
+                <form id="change-sstate_dir-form" style="display:none;">
+                    <div class="row-fluid">
+                        <span class="help-block span4">To set SSTATE_DIR type the absolute path of the download folder.</span>
+                    </div>
+                    <div class="input-append" id="validate-sstate_dir">
+                        <input type="text" class="input-xlarge" id="new-sstate_dir" placeholder="Type absolute path of the SSTATE_DIR folder">
+                        <span class="error">A valid directory name required</span>
+                        <button id="apply-change-sstate_dir" class="btn" type="button">Save</button>
+                        <button id="cancel-change-sstate_dir" type="button" class="btn btn-link">Cancel</button>
+			</br><p class="help-block error" id="hintError-sstate_dir">A valid directory cannot include spaces or any of these characters: . \ ? % * : | " " < ></span>
                     </div>
                 </form>
             </dd>
             {% endif %}
-
         </dl>
 
         <!-- <ul class="unstyled configuration-list" id="configvar-list"> -->
@@ -182,9 +201,7 @@
                     <code><a href="http://www.yoctoproject.org/docs/1.6.1/ref-manual/ref-manual.html#var-BB_NUMBER_THREADS" target="_blank">BB_NUMBER_THREADS</a></code>
                     <code>CVS_PROXY_HOST</code>
                     <code>CVS_PROXY_PORT</code>
-                    <code><a href="http://www.yoctoproject.org/docs/1.6.1/ref-manual/ref-manual.html#var-DL_DIR" target="_blank">DL_DIR</a></code>
                     <code><a href="http://www.yoctoproject.org/docs/1.6.1/ref-manual/ref-manual.html#var-PARALLEL_MAKE" target="_blank">PARALLEL_MAKE</a></code>
-                    <code><a href="http://www.yoctoproject.org/docs/1.6.1/ref-manual/ref-manual.html#var-SSTATE_DIR" target="_blank">SSTATE_DIR</a></code>
                     <code><a href="http://www.yoctoproject.org/docs/1.6.1/ref-manual/ref-manual.html#var-SSTATE_MIRRORS" target="_blank">SSTATE_MIRRORS</a></code>
                     <code><a href="http://www.yoctoproject.org/docs/1.6.1/ref-manual/ref-manual.html#var-TMPDIR" target="_blank">TMPDIR</a></code></p>
                     <p>Plus the following standard shell environment variables:</p>
@@ -527,6 +544,61 @@
             });
             {% endif %}
 
+            {% if dl_dir_defined %}
+
+            // change DL_DIR variable
+            $('#change-dl_dir-icon').click(function() {
+                $('#hintError-dl_dir').hide();
+	        // preset the edit value
+                var current_val = $("span#dl_dir").text().trim();
+                if (current_val == "Not set") {
+                    current_val="";
+                    $("#apply-change-dl_dir").attr("disabled","disabled");
+                }
+                $("input#new-dl_dir").val(current_val);
+
+                $('#change-dl_dir-icon, #dl_dir').hide();
+                $("#change-dl_dir-form").slideDown();
+            });
+
+            $('#cancel-change-dl_dir').click(function(){
+                $("#change-dl_dir-form").slideUp(function() {
+                    $('#dl_dir, #change-dl_dir-icon').show();
+                });
+            });
+
+            $("#new-dl_dir").on('input', function(){
+	        if ($(this).val().trim().length == 0) {
+                    $("#apply-change-dl_dir").attr("disabled","disabled");
+                }
+                else {
+                    var input = $(this);
+                    var re = /^\/([^ <>\\|":\.%\?\*]+)$/;
+	            var invalidDir = re.test(input.val());
+		    console.log(invalidDir);
+                    if ( invalidDir ) {
+                        $('#validate-dl_dir').removeClass('control-group error');
+			$("#apply-change-dl_dir").removeAttr("disabled");
+                        $('#hintError-dl_dir').hide();
+                    } else {
+                        $('#validate-dl_dir').addClass('control-group error');
+			$("#apply-change-dl_dir").attr("disabled","disabled");
+                        $('#hintError-dl_dir').show();
+                    }
+                }
+            });
+
+            $('#apply-change-dl_dir').click(function(){
+                var value = $('#new-dl_dir').val().trim();
+                postEditAjaxRequest({"configvarChange" : 'DL_DIR:'+value});
+                $('#dl_dir').text(value);
+                $('#dl_dir').removeClass('muted');
+                $("#change-dl_dir-form").slideUp(function () {
+                    $('#dl_dir, #change-dl_dir-icon').show();
+               });
+            });
+
+            {% endif %}
 
             {% if fstypes_defined %}
             // change IMAGE_FSTYPES variable
@@ -774,47 +846,61 @@
             });
             {% endif %}
 
+            {% if sstate_dir_defined %}
 
-            {% if sdk_machine_defined %}
-            // change SDKMACHINE variable
-            $('#change-sdkmachine-icon').click(function() {
-                var current_value = document.getElementById("sdkmachine").innerHTML;
-                var radios = document.getElementsByName('sdkmachine');
-                for (var i = 0, length = radios.length; i < length; i++) {
-                    radios[i].checked = false;
-                    if (radios[i].value == current_value) {
-                        radios[i].checked = true;
-                    }
+            // change SSTATE_DIR variable
+            $('#change-sstate_dir-icon').click(function() {
+                $('#hintError-sstate_dir').hide();
+                // preset the edit value
+                var current_val = $("span#sstate_dir").text().trim();
+                if (current_val == "Not set") {
+                    current_val="";
+                    $("#apply-change-sstate_dir").attr("disabled","disabled");
                 }
-                $('#change-sdkmachine-icon, #sdkmachine').hide();
-                $("#change-sdkmachine-form").slideDown();
+                $("input#new-sstate_dir").val(current_val);
+
+                $('#change-sstate_dir-icon, #sstate_dir').hide();
+                $("#change-sstate_dir-form").slideDown();
             });
 
-            $('#cancel-change-sdkmachine').click(function(){
-                $("#change-sdkmachine-form").slideUp(function() {
-                    $('#sdkmachine, #change-sdkmachine-icon').show();
+            $('#cancel-change-sstate_dir').click(function(){
+                $("#change-sstate_dir-form").slideUp(function() {
+                    $('#sstate_dir, #change-sstate_dir-icon').show();
                 });
             });
 
-            $('#apply-change-sdkmachine').click(function(){
-                var value="";
-                var radios = document.getElementsByName('sdkmachine');
-                for (var i = 0, length = radios.length; i < length; i++) {
-                    if (radios[i].checked) {
-                        // do whatever you want with the checked radio
-                        value=radios[i].value;
-                        break;
+            $("#new-sstate_dir").on('input', function(){
+                if ($(this).val().trim().length == 0) {
+                    $("#apply-change-sstate_dir").attr("disabled","disabled");
+                }
+                else {
+                    var input = $(this);
+                    var re = /^\/([^ <>\\|":\.%\?\*]+)$/;
+	            var invalidDir = re.test(input.val());
+		    console.log(invalidDir);
+                    if ( invalidDir ) {
+                        $('#validate-sstate_dir').removeClass('control-group error');
+			$("#apply-change-sstate_dir").removeAttr("disabled");
+                        $('#hintError-sstate_dir').hide();
+                    } else {
+                        $('#validate-sstate_dir').addClass('control-group error');
+			$("#apply-change-sstate_dir").attr("disabled","disabled");
+                        $('#hintError-sstate_dir').show();
                     }
                 }
-                postEditAjaxRequest({"configvarChange" : 'SDKMACHINE:'+value});
-                $('#sdkmachine').text(value);
-                $("#change-sdkmachine-form").slideUp(function() {
-                    $('#sdkmachine, #change-sdkmachine-icon').show();
-                });
-
             });
+
+            $('#apply-change-sstate_dir').click(function(){
+                var value = $('#new-sstate_dir').val().trim();
+                postEditAjaxRequest({"configvarChange" : 'SSTATE_DIR:'+value});
+                $('#sstate_dir').text(value);
+                $('#sstate_dir').removeClass('muted');
+                $("#change-sstate_dir-form").slideUp(function () {
+                    $('#sstate_dir, #change-sstate_dir-icon').show();
+               });
+            });
+
             {% endif %}
-
 
             // add new variable
             $("button#add-configvar-button").click( function (evt) {
@@ -830,7 +916,7 @@
                 $(".save").attr("disabled","disabled");
 
                 // Reload page if admin-removed core managed value is manually added back in
-                if (0 <= " DISTRO IMAGE_FSTYPES IMAGE_INSTALL_append PACKAGE_CLASSES SDKMACHINE ".indexOf( " "+variable+" " )) {
+                if (0 <= " DISTRO DL_DIR IMAGE_FSTYPES IMAGE_INSTALL_append PACKAGE_CLASSES SSTATE_DIR ".indexOf( " "+variable+" " )) {
                     // delayed reload to avoid race condition with postEditAjaxRequest
                     do_reload=true;
                 }

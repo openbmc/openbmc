@@ -1,0 +1,32 @@
+From 78d6d1706c21ad467520075ff7a8bf15cfbd68b3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 30 Dec 2015 22:13:16 +0000
+Subject: [PATCH] rect: Fix compiler errors about uninitialized use of
+ variables
+
+error: 'r2.x' may be used uninitialized in this function
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted
+
+ rect.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/rect.c b/rect.c
+index 55667c0..fa3a786 100644
+--- a/rect.c
++++ b/rect.c
+@@ -1317,7 +1317,8 @@ static char *new_game_desc(const game_params *params_in, random_state *rs,
+                     if (ndirs > 0) {
+                         int which, dir;
+                         struct rect r1, r2;
+-
++                        memset(&r1, 0, sizeof(struct rect));
++                        memset(&r2, 0, sizeof(struct rect));
+                         which = random_upto(rs, ndirs);
+                         dir = dirs[which];
+ 
+-- 
+2.6.4
+

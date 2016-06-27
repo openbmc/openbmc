@@ -1,0 +1,25 @@
+#!/bin/sh
+
+cd tests || exit 1                                                          
+
+comps=$(find ts/ -type f -perm -111 -regex ".*/[^\.~]*" |  sort)
+
+
+echo
+echo "-------------------- util-linux regression tests --------------------"
+echo
+echo "                    For development purpose only.                    "
+echo "                 Don't execute on production system!                 "
+echo
+
+res=0
+count=0
+for ts in $comps; 
+do 
+   $ts | sed '{        
+      s/^\(.*\):\(.*\) \.\.\. OK$/PASS: \1:\2/                              
+      s/^\(.*\):\(.*\) \.\.\. FAILED \(.*\)$/FAIL: \1:\2 \3/                
+      s/^\(.*\):\(.*\) \.\.\. SKIPPED \(.*\)$/SKIP: \1:\2 \3/               
+   }' 
+done
+

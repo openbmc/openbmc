@@ -4,15 +4,18 @@ libxml2.
 Upstream-Status: Inappropriate
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 
+Update context for version 9.10.3-P2.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- configure.in | 18 +++---------------
- 1 file changed, 3 insertions(+), 15 deletions(-)
+ configure.in | 23 +++--------------------
+ 1 file changed, 3 insertions(+), 20 deletions(-)
 
 diff --git a/configure.in b/configure.in
-index d566e1c..c9ef3a6 100644
+index 0db826d..75819eb 100644
 --- a/configure.in
 +++ b/configure.in
-@@ -2102,21 +2102,9 @@ case "$use_libxml2" in
+@@ -2107,26 +2107,9 @@ case "$use_libxml2" in
  		DST_LIBXML2_INC=""
  		;;
  	auto|yes)
@@ -22,8 +25,13 @@ index d566e1c..c9ef3a6 100644
 -			libxml2_cflags=`xml2-config --cflags`
 -			;;
 -		*)
--			libxml2_libs=
--			libxml2_cflags=
+-			if test "$use_libxml2" = "yes" ; then
+-				AC_MSG_RESULT(no)
+-				AC_MSG_ERROR(required libxml2 version not available)
+-			else
+-				libxml2_libs=
+-				libxml2_cflags=
+-			fi
 -			;;
 -		esac
 -		;;

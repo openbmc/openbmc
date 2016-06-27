@@ -1,0 +1,53 @@
+rpmdb: more verbose error logging in rpmTempFile()
+
+Upstream-Status: Inappropriate [debugging]
+
+Signed-off-by: Markus Lehtonen <markus.lehtonen@linux.intel.com>
+
+diff --git a/rpmdb/signature.c b/rpmdb/signature.c
+index dce6c4e..a1d0f06 100644
+--- a/rpmdb/signature.c
++++ b/rpmdb/signature.c
+@@ -37,6 +37,7 @@ int rpmTempFile(const char * prefix, const char ** fnptr, void * fdptr)
+     int temput;
+     FD_t fd = NULL;
+     unsigned int ran;
++    int ret = 0;
+ 
+     if (!prefix) prefix = "";
+ 
+@@ -44,8 +45,11 @@ int rpmTempFile(const char * prefix, const char ** fnptr, void * fdptr)
+     if (!_initialized) {
+ 	_initialized = 1;
+ 	tempfn = rpmGenPath(prefix, tpmacro, NULL);
+-	if (rpmioMkpath(tempfn, 0755, (uid_t) -1, (gid_t) -1))
+-	    goto errxit;
++        ret = rpmioMkpath(tempfn, 0755, (uid_t) -1, (gid_t) -1);
++        if (ret) {
++            rpmlog(RPMLOG_ERR, _("error creating temporary directory %s: %d\n"), tempfn, ret);
++            goto errxit;
++        }
+     }
+ 
+     /* XXX should probably use mkstemp here */
+@@ -68,12 +72,16 @@ int rpmTempFile(const char * prefix, const char ** fnptr, void * fdptr)
+ #endif
+ 
+ 	temput = urlPath(tempfn, &tfn);
+-	if (*tfn == '\0') goto errxit;
++	if (*tfn == '\0') {
++            rpmlog(RPMLOG_ERR, _("error creating tempfile: empty filename\n"));
++            goto errxit;
++        }
+ 
+ 	switch (temput) {
+ 	case URL_IS_DASH:
+ 	case URL_IS_HKP:
+ 	case URL_IS_MONGO:	/* XXX FIXME */
++            rpmlog(RPMLOG_ERR, _("error creating temporary file, invalid uri type: %d\n"), temput);
+ 	    goto errxit;
+ 	    /*@notreached@*/ /*@switchbreak@*/ break;
+ 	case URL_IS_HTTPS:
+-- 
+2.6.6
+

@@ -1,0 +1,27 @@
+Upstream uses AM_PATH_PYTHON to find a python binary and ask it where to install
+libraries.  This means we either need to depend on python-native (large build
+dependency, early in the build) or use the host python (pythondir reflects the
+host and not the target, breaks builds).
+
+The third option is to just hardcode the path where the module goes, as most
+callers of the code use pkg-config to find where it was installed anyway.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/configure.ac b/configure.ac
+index d140bfe..c7b68da 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -14,7 +14,10 @@ if test "$XMLLINT" = "no"; then
+    AC_MSG_WARN([xmllint not found; unable to validate against schema.])
+ fi
+
+-AM_PATH_PYTHON([2.5])
++pythondir="${libdir}/xcb-proto"
++AC_SUBST(pythondir)
++PYTHON="python"
++AC_SUBST(PYTHON)
+
+ xcbincludedir='${datadir}/xcb'
+ AC_SUBST(xcbincludedir)

@@ -8,6 +8,11 @@ from oeqa.utils.decorators import testcase
 
 class BitbakeTests(oeSelfTest):
 
+    def getline(self, res, line):
+        for l in res.output.split('\n'):
+            if line in l:
+                return l
+
     @testcase(789)
     def test_run_bitbake_from_dir_1(self):
         os.chdir(os.path.join(self.builddir, 'conf'))
@@ -63,7 +68,8 @@ class BitbakeTests(oeSelfTest):
         result = bitbake('man -c patch', ignore_status=True)
         self.delete_recipeinc('man')
         bitbake('-cclean man')
-        self.assertTrue("ERROR: Function failed: patch_do_patch" in result.output, msg = "Though no man-1.5h1-make.patch file exists, bitbake didn't output any err. message. bitbake output: %s" % result.output)
+        line = self.getline(result, "Function failed: patch_do_patch")
+        self.assertTrue(line and line.startswith("ERROR:"), msg = "Though no man-1.5h1-make.patch file exists, bitbake didn't output any err. message. bitbake output: %s" % result.output)
 
     @testcase(1354)
     def test_force_task_1(self):
@@ -135,7 +141,8 @@ SSTATE_DIR = \"${TOPDIR}/download-selftest\"
         self.assertEqual(result.status, 1, msg="Command succeded when it should have failed. bitbake output: %s" % result.output)
         self.assertTrue('Fetcher failure: Unable to find file file://invalid anywhere. The paths that were searched were:' in result.output, msg = "\"invalid\" file \
 doesn't exist, yet no error message encountered. bitbake output: %s" % result.output)
-        self.assertTrue('ERROR: Function failed: Fetcher failure for URL: \'file://invalid\'. Unable to fetch URL from any source.' in result.output, msg = "\"invalid\" file \
+        line = self.getline(result, 'Function failed: Fetcher failure for URL: \'file://invalid\'. Unable to fetch URL from any source.')
+        self.assertTrue(line and line.startswith("ERROR:"), msg = "\"invalid\" file \
 doesn't exist, yet fetcher didn't report any error. bitbake output: %s" % result.output)
 
     @testcase(171)
@@ -225,3 +232,41 @@ SSTATE_DIR = \"${TOPDIR}/download-selftest\"
         self.assertEqual(result.status, 0, "Bitbake failed, exit code %s, output %s" % (result.status, result.output))
         self.assertFalse(os.path.isfile(os.path.join(self.builddir, 'tmp/deploy/licenses/readline/generic_GPLv3')))
         self.assertTrue(os.path.isfile(os.path.join(self.builddir, 'tmp/deploy/licenses/readline/generic_GPLv2')))
+
+    @testcase(1422)
+    def test_setscene_only(self):
+        """ Bitbake option to restore from sstate only within a build (i.e. execute no real tasks, only setscene)"""
+        test_recipe = 'ed'
+
+        bitbake(test_recipe)
+        bitbake('-c clean %s' % test_recipe)
+        ret = bitbake('--setscene-only %s' % test_recipe)
+
+        tasks = re.findall(r'task\s+(do_\S+):', ret.output)
+
+        for task in tasks:
+            self.assertIn('_setscene', task, 'A task different from _setscene ran: %s.\n'
+                                             'Executed tasks were: %s' % (task, str(tasks)))
+
+    @testcase(1425)
+    def test_bbappend_order(self):
+        """ Bitbake should bbappend to recipe in a predictable order """
+        test_recipe = 'ed'
+        test_recipe_summary_before = get_bb_var('SUMMARY', test_recipe)
+        test_recipe_pv = get_bb_var('PV', test_recipe)
+        recipe_append_file = test_recipe + '_' + test_recipe_pv + '.bbappend'
+        expected_recipe_summary = test_recipe_summary_before
+
+        for i in range(5):
+            recipe_append_dir = test_recipe + '_test_' + str(i)
+            recipe_append_path = os.path.join(self.testlayer_path, 'recipes-test', recipe_append_dir, recipe_append_file)
+            os.mkdir(os.path.join(self.testlayer_path, 'recipes-test', recipe_append_dir))
+            feature = 'SUMMARY += "%s"\n' % i
+            ftools.write_file(recipe_append_path, feature)
+            expected_recipe_summary += ' %s' % i
+
+        self.add_command_to_tearDown('rm -rf %s' % os.path.join(self.testlayer_path, 'recipes-test',
+                                                               test_recipe + '_test_*'))
+
+        test_recipe_summary_after = get_bb_var('SUMMARY', test_recipe)
+        self.assertEqual(expected_recipe_summary, test_recipe_summary_after)

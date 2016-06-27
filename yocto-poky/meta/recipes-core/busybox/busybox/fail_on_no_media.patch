@@ -1,4 +1,5 @@
-Upstream-Status: Pending
+Upstream-Status: Denied
+[https://www.mail-archive.com/busybox@busybox.net/msg22354.html]
 
 The current behaviour of busybox is to try all fstype when automounting
 even when no media exists.  The util-linux mount command bails when no

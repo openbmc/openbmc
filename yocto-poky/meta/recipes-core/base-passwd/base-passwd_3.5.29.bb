@@ -17,6 +17,10 @@ SRC_URI = "https://launchpad.net/debian/+archive/primary/+files/${BPN}_${PV}.tar
 SRC_URI[md5sum] = "6beccac48083fe8ae5048acd062e5421"
 SRC_URI[sha256sum] = "f0b66388b2c8e49c15692439d2bee63bcdd4bbbf7a782c7f64accc55986b6a36"
 
+# the package is taken from launchpad; that source is static and goes stale
+# so we check the latest upstream from a directory that does get updated
+UPSTREAM_CHECK_URI = "${DEBIAN_MIRROR}/main/b/base-passwd/"
+
 inherit autotools
 
 SSTATEPOSTINSTFUNCS += "base_passwd_sstate_postinst"
@@ -85,7 +89,7 @@ if [ ! -e $D${sysconfdir}/group ]; then
 """ + group + """EOF
 fi
 """
-    d.setVar('pkg_preinst_${PN}', preinst)
+    d.setVar(d.expand('pkg_preinst_${PN}'), preinst)
 }
 
 addtask do_package after do_populate_sysroot

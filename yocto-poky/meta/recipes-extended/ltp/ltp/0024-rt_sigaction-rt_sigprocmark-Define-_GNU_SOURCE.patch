@@ -1,0 +1,68 @@
+From e01e9862c248dc90a8ec6f2d06f8469d7a50cd8e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 8 Jan 2016 07:14:58 +0000
+Subject: [PATCH 24/32] rt_sigaction/rt_sigprocmark: Define _GNU_SOURCE
+
+Fixes musl build failure e.g.
+error: 'SA_NOMASK' undeclared here (not in a function)
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ testcases/kernel/syscalls/rt_sigaction/rt_sigaction01.c     | 1 +
+ testcases/kernel/syscalls/rt_sigaction/rt_sigaction02.c     | 2 +-
+ testcases/kernel/syscalls/rt_sigaction/rt_sigaction03.c     | 1 +
+ testcases/kernel/syscalls/rt_sigprocmask/rt_sigprocmask01.c | 1 +
+ 4 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/testcases/kernel/syscalls/rt_sigaction/rt_sigaction01.c b/testcases/kernel/syscalls/rt_sigaction/rt_sigaction01.c
+index 5cf89cc..bdcb91a 100644
+--- a/testcases/kernel/syscalls/rt_sigaction/rt_sigaction01.c
++++ b/testcases/kernel/syscalls/rt_sigaction/rt_sigaction01.c
+@@ -28,6 +28,7 @@
+ /*		sigset_t type.                       			      */
+ /******************************************************************************/
+ 
++#define _GNU_SOURCE
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <unistd.h>
+diff --git a/testcases/kernel/syscalls/rt_sigaction/rt_sigaction02.c b/testcases/kernel/syscalls/rt_sigaction/rt_sigaction02.c
+index a1da743..8a27a0f 100644
+--- a/testcases/kernel/syscalls/rt_sigaction/rt_sigaction02.c
++++ b/testcases/kernel/syscalls/rt_sigaction/rt_sigaction02.c
+@@ -23,7 +23,7 @@
+ /* Description: This tests the rt_sigaction() syscall                         */
+ /*		rt_sigaction Expected EFAULT error check                      */
+ /******************************************************************************/
+-
++#define _GNU_SOURCE
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <unistd.h>
+diff --git a/testcases/kernel/syscalls/rt_sigaction/rt_sigaction03.c b/testcases/kernel/syscalls/rt_sigaction/rt_sigaction03.c
+index 175d220..e7627cd 100644
+--- a/testcases/kernel/syscalls/rt_sigaction/rt_sigaction03.c
++++ b/testcases/kernel/syscalls/rt_sigaction/rt_sigaction03.c
+@@ -24,6 +24,7 @@
+ /*		rt_sigaction Expected EINVAL error check                      */
+ /******************************************************************************/
+ 
++#define _GNU_SOURCE
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <unistd.h>
+diff --git a/testcases/kernel/syscalls/rt_sigprocmask/rt_sigprocmask01.c b/testcases/kernel/syscalls/rt_sigprocmask/rt_sigprocmask01.c
+index 74e5a61..75c57fc 100644
+--- a/testcases/kernel/syscalls/rt_sigprocmask/rt_sigprocmask01.c
++++ b/testcases/kernel/syscalls/rt_sigprocmask/rt_sigprocmask01.c
+@@ -39,6 +39,7 @@
+ /*		    sigsetsize should indicate the size of a sigset_t type.   */
+ /******************************************************************************/
+ 
++#define _GNU_SOURCE
+ #include <stdio.h>
+ #include <signal.h>
+ #include <errno.h>
+-- 
+2.7.0
+

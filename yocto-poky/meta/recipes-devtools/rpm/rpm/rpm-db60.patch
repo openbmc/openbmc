@@ -1,0 +1,56 @@
+Set the DB 6 version to match oe-core db 6.0.30
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: rpm/configure.ac
+===================================================================
+--- rpm.orig/configure.ac
++++ rpm/configure.ac
+@@ -2049,10 +2049,10 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+ ]])],
+ [RPM_CHECK_LIB(
+     [Berkeley-DB], [db],
+-    [db-6.1], [db_create], [db.h],
++    [db-6.0], [db_create], [db.h],
+     [yes,external], [db6],
+     [ DBLIBSRCS="$DBLIBSRCS db3.c"
+-      DBXY=db61
++      DBXY=db60
+       AM_CONDITIONAL(WITH_DB, [ true ])
+       AM_CONDITIONAL(WITH_DB_INTERNAL, [ test ".$RPM_CHECK_LIB_LOCATION" = .internal ])
+       if test ".$RPM_CHECK_LIB_LOCATION" = .internal; then
+@@ -2085,7 +2085,7 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+     ])
+ ])
+ 
+-if test ".$ac_cv_lib_db_6_1_db_create" != .yes -a ".$ac_cv_lib_db_5_3_db_create" != .yes; then
++if test ".$ac_cv_lib_db_6_0_db_create" != .yes -a ".$ac_cv_lib_db_5_3_db_create" != .yes; then
+     CPPFLAGS="${CPPFLAGS_save}"
+ fi
+ 
+@@ -2097,11 +2097,11 @@ RPM_CHECK_LIB(
+     [ DBLIBSRCS="$DBLIBSRCS sqlite.c" ],
+     [])
+ 
+-dnl # Sqlite 3.8.3.1 from db-6.1.19
+-if test ".$ac_cv_lib_db_6_1_db_create" = .yes; then
++dnl # Sqlite 3.8.3.1 from db-6.0.30
++if test ".$ac_cv_lib_db_6_0_db_create" = .yes; then
+ RPM_CHECK_LIB(
+     [Berkeley-DB (+SQLite3)], [dbsql],
+-    [db_sql-6.1], [sqlite3_open], [dbsql.h],
++    [db_sql-6.0], [sqlite3_open], [dbsql.h],
+     [yes,external], [db6/sql],
+     [
+       AM_CONDITIONAL(WITH_DBSQL, [ true ])
+@@ -2253,7 +2253,7 @@ AC_SUBST(WITH_RUBY_CPPFLAGS)
+ AC_SUBST(WITH_RUBY_SUBDIR)
+ AC_SUBST(WITH_RUBY_VENDORARCHDIR)
+ 
+-dnl # Java prerequisites (swiped from db-6.1.19/dist/aclocal_java et al)
++dnl # Java prerequisites (swiped from db-6.0.30/dist/aclocal_java et al)
+ WITH_JAVA=no
+ AC_ARG_WITH([java],
+     AS_HELP_STRING([--with-java], [build RPM with java support]),

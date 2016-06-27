@@ -1,0 +1,31 @@
+From b07435a90bd636ee718e2238fb46c74a6dd5e069 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 22 Mar 2016 16:41:13 +0000
+Subject: [PATCH] disable tests
+
+Tests use getcontext() API which is
+not there on musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Inappropriate [MUSL-only]
+
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index e24fe1e..15380e4 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -39,7 +39,7 @@ endif
+ 
+ nodist_include_HEADERS = include/libunwind-common.h
+ 
+-SUBDIRS = src tests doc
++SUBDIRS = src doc
+ 
+ noinst_HEADERS = include/dwarf.h include/dwarf_i.h include/dwarf-eh.h	\
+ 	include/compiler.h include/libunwind_i.h include/mempool.h	\
+-- 
+1.8.3.1
+

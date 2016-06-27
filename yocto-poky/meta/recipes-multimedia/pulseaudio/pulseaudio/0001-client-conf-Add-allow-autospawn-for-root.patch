@@ -7,7 +7,12 @@ Usually autospawning for root is a bad idea, since it can easily
 interfere with other users' PulseAudio instances, but in embedded
 environments where only root exists, autospawning is fine.
 
-Upstream-Status: Submitted [http://thread.gmane.org/gmane.comp.audio.pulseaudio.general/23549]
+Upstream-Status: Denied [Upstream hasn't so far been convinced that
+this feature is needed. The view is that running the graphical session
+as root doesn't make sense even on embedded systems, or if it does,
+running PulseAudio in the system mode should be a good solution for
+that use case. If someone can prove otherwise, the patch would
+probably be accepted.]
 
 Signed-off-by: Tanu Kaskinen <tanu.kaskinen@linux.intel.com>
 ---

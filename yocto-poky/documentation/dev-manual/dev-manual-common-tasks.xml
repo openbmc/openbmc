@@ -72,7 +72,7 @@
                 <filename>meta</filename>,
                 <filename>meta-skeleton</filename>,
                 <filename>meta-selftest</filename>,
-                <filename>meta-yocto</filename>, and
+                <filename>meta-poky</filename>, and
                 <filename>meta-yocto-bsp</filename>.
                 Each of these folders represents a distinct layer.
             </para>
@@ -165,12 +165,12 @@
                                     directory to the
                                     <filename>BBPATH</filename>.
                                     On the other hand, distro layers, such as
-                                    <filename>meta-yocto</filename>, can choose
+                                    <filename>meta-poky</filename>, can choose
                                     to enforce their own precedence over
                                     <filename>BBPATH</filename>.
                                     For an example of that syntax, see the
                                     <filename>layer.conf</filename> file for
-                                    the <filename>meta-yocto</filename> layer.
+                                    the <filename>meta-poky</filename> layer.
                                 </note></para></listitem>
                             <listitem><para>The recipes for the layers are
                                 appended to
@@ -336,11 +336,12 @@
      DEPENDS_append_one = " foo"
      DEPENDS_prepend_one = "foo "
                             </literallayout>
-                            As an actual example, here's a line from the recipe for
-                            the OProfile profiler, which lists an extra build-time
-                            dependency when building specifically for 64-bit PowerPC:
+                            As an actual example, here's a line from the recipe
+                            for gnutls, which adds dependencies on
+                            "argp-standalone" when building with the musl C
+                            library:
                             <literallayout class='monospaced'>
-     DEPENDS_append_powerpc64 = " libpfm4"
+     DEPENDS_append_libc-musl = " argp-standalone"
                             </literallayout>
                             <note>
                                 Avoiding "+=" and "=+" and using
@@ -444,7 +445,7 @@
 
      BBLAYERS ?= " \
        $HOME/poky/meta \
-       $HOME/poky/meta-yocto \
+       $HOME/poky/meta-poky \
        $HOME/poky/meta-yocto-bsp \
        $HOME/poky/meta-mylayer \
        "
@@ -550,8 +551,8 @@
             <para>
                 Following is the append file, which is named
                 <filename>formfactor_0.0.bbappend</filename> and is from the
-                Emenlow BSP Layer named
-                <filename>meta-intel/meta-emenlow</filename>.
+                Raspberry Pi BSP Layer named
+                <filename>meta-raspberrypi</filename>.
                 The file is in <filename>recipes-bsp/formfactor</filename>:
                 <literallayout class='monospaced'>
      FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
@@ -577,7 +578,7 @@
                 which resolves to a directory named
                 <filename>formfactor</filename> in the same directory
                 in which the append file resides (i.e.
-                <filename>meta-intel/meta-emenlow/recipes-bsp/formfactor/formfactor</filename>.
+                <filename>meta-raspberrypi/recipes-bsp/formfactor/formfactor</filename>.
                 This implies that you must have the supporting directory
                 structure set up that will contain any files or patches you
                 will be including from the layer.
@@ -870,7 +871,7 @@
                 <literallayout class='monospaced'>
      BBLAYERS = ?" \
         /usr/local/src/yocto/meta \
-        /usr/local/src/yocto/meta-yocto \
+        /usr/local/src/yocto/meta-poky \
         /usr/local/src/yocto/meta-yocto-bsp \
         /usr/local/src/yocto/meta-mylayer \
         "
@@ -3495,14 +3496,7 @@
             </para>
 
             <para>
-                This section overviews the Multilib process only.
-                For more details on how to implement Multilib, see the
-                <ulink url='&YOCTO_WIKI_URL;/wiki/Multilib'>Multilib</ulink> wiki
-                page.
-            </para>
-
-            <para>
-                Aside from this wiki page, several examples exist in the
+                Several examples exist in the
                 <filename>meta-skeleton</filename> layer found in the
                <link linkend='source-directory'>Source Directory</link>:
                 <itemizedlist>
@@ -3603,8 +3597,39 @@
                 <title>Additional Implementation Details</title>
 
                 <para>
-                    Different packaging systems have different levels of native Multilib
-                    support.
+                    Generic implementation details as well as details that are
+                    specific to package management systems exist.
+                    Following are implementation details that exist regardless
+                    of the package management system:
+                    <itemizedlist>
+                        <listitem><para>The typical convention used for the
+                            class extension code as used by
+                            Multilib assumes that all package names specified
+                            in
+                            <ulink url='&YOCTO_DOCS_REF_URL;#var-PACKAGES'><filename>PACKAGES</filename></ulink>
+                            that contain <filename>${PN}</filename> have
+                            <filename>${PN}</filename> at the start of the name.
+                            When that convention is not followed and
+                            <filename>${PN}</filename> appears at
+                            the middle or the end of a name, problems occur.
+                            </para></listitem>
+                        <listitem><para>The
+                            <ulink url='&YOCTO_DOCS_REF_URL;#var-TARGET_VENDOR'><filename>TARGET_VENDOR</filename></ulink>
+                            value under Multilib will be extended to
+                            "-<replaceable>vendor</replaceable>ml<replaceable>multilib</replaceable>"
+                            (e.g. "-pokymllib32" for a "lib32" Multilib with
+                            Poky).
+                            The reason for this slightly unwieldy contraction
+                            is that any "-" characters in the vendor
+                            string presently break Autoconf's
+                            <filename>config.sub</filename>, and
+                            other separators are problematic for different
+                            reasons.
+                            </para></listitem>
+                    </itemizedlist>
+                </para>
+'
+                <para>
                     For the RPM Package Management System, the following implementation details
                     exist:
                     <itemizedlist>
@@ -3701,6 +3726,46 @@
         </section>
     </section>
 
+    <section id='dev-optionally-using-an-external-toolchain'>
+        <title>Optionally Using an External Toolchain</title>
+
+        <para>
+            You might want to use an external toolchain as part of your
+            development.
+            If this is the case, the fundamental steps you need to accomplish
+            are as follows:
+            <itemizedlist>
+                <listitem><para>
+                    Understand where the installed toolchain resides.
+                    For cases where you need to build the external toolchain,
+                    you would need to take separate steps to build and install
+                    the toolchain.
+                    </para></listitem>
+                <listitem><para>
+                    Make sure you add the layer that contains the toolchain to
+                    your <filename>bblayers.conf</filename> file through the
+                    <ulink url='&YOCTO_DOCS_REF_URL;#var-BBLAYERS'><filename>BBLAYERS</filename></ulink>
+                    variable.
+                    </para></listitem>
+                <listitem><para>
+                    Set the
+                    <ulink url='&YOCTO_DOCS_REF_URL;#var-EXTERNAL_TOOLCHAIN'><filename>EXTERNAL_TOOLCHAIN</filename></ulink>
+                    variable in your <filename>local.conf</filename> file
+                    to the location in which you installed the toolchain.
+                    </para></listitem>
+            </itemizedlist>
+            A good example of an external toolchain used with the Yocto Project
+            is <trademark class='registered'>Mentor Graphics</trademark>
+            Sourcery G++ Toolchain.
+            You can see information on how to use that particular layer in the
+            <filename>README</filename> file at
+            <ulink url='http://github.com/MentorEmbedded/meta-sourcery/'></ulink>.
+            You can find further information by reading about the
+            <ulink url='&YOCTO_DOCS_REF_URL;#var-TCMODE'><filename>TCMODE</filename></ulink>
+            variable in the Yocto Project Reference Manual's variable glossary.
+        </para>
+    </section>
+
     <section id='creating-partitioned-images'>
         <title>Creating Partitioned Images</title>
 
@@ -3779,8 +3844,8 @@
                         standalone utility that initially provides
                         easier-to-use and more flexible replacements for a
                         couple bits of existing functionality in OE Core's
-                        <filename>boot-directdisk.bbclass</filename> and
-                        <filename>mkefidisk.sh</filename> scripts.
+                        <ulink url='&YOCTO_DOCS_REF_URL;#ref-classes-image-live'><filename>image-live</filename></ulink>
+                        class and <filename>mkefidisk.sh</filename> script.
                         The difference between
                         <filename>wic</filename> and those examples is
                         that with <filename>wic</filename> the
@@ -3823,7 +3888,8 @@
                         in the form generated by the build system.
                         </para></listitem>
                     <listitem><para>
-                        You must build several native tools:
+                        You must build several native tools, which are tools
+                        built to run on the build system:
                         <literallayout class='monospaced'>
      $ bitbake parted-native dosfstools-native mtools-native
                         </literallayout>
@@ -4102,8 +4168,8 @@
                 </para>
 
                 <para>
-                    The output specifies the exact created as well as where
-                    it was created.
+                    The output specifies the exact image created as well as
+                    where it was created.
                     The output also names the artifacts used and the exact
                     <filename>.wks</filename> script that was used to generate
                     the image.
@@ -4491,11 +4557,18 @@
                 <title>Command: part or partition</title>
 
                 <para>
-                This command creates a partition on the system and uses the
-                following syntax:
+                Either of these commands create a partition on the system
+                and uses the following syntax:
                     <literallayout class='monospaced'>
-     part <replaceable>mntpoint</replaceable>
+     part [<replaceable>mntpoint</replaceable>]
+     partition [<replaceable>mntpoint</replaceable>]
                     </literallayout>
+                    If you do not provide
+                    <replaceable>mntpoint</replaceable>, wic creates a partition
+                    but does not mount it.
+                </para>
+
+                <para>
                     The <filename><replaceable>mntpoint</replaceable></filename>
                     is where the
                     partition will be mounted and must be of one of the
@@ -4503,16 +4576,36 @@
                     <itemizedlist>
                         <listitem><para><filename>/<replaceable>path</replaceable></filename>:
                             For example, <filename>/</filename>,
-                            <filename>/usr</filename>, and
+                            <filename>/usr</filename>, or
                             <filename>/home</filename></para></listitem>
                         <listitem><para><filename>swap</filename>:
-                            The partition will be used as swap space.
+                            The created partition is used as swap space.
                             </para></listitem>
                     </itemizedlist>
                 </para>
 
                 <para>
-                    Following are the supported options:
+                    Specifying a <replaceable>mntpoint</replaceable> causes
+                    the partition to automatically be mounted.
+                    Wic achieves this by adding entries to the filesystem
+                    table (fstab) during image generation.
+                    In order for wic to generate a valid fstab, you must
+                    also provide one of the <filename>--ondrive</filename>,
+                    <filename>--ondisk</filename>, or
+                    <filename>--use-uuid</filename> partition options as part
+                    of the command.
+                    Here is an example using "/" as the mountpoint.
+                    The command uses "--ondisk" to force the partition onto
+                    the <filename>sdb</filename> disk:
+                    <literallayout class='monospaced'>
+     part / --source rootfs --ondisk sdb --fstype=ext3 --label platform --align 1024
+                    </literallayout>
+                </para>
+
+                <para>
+                    Here is a list that describes other supported options you
+                    can use with the <filename>part</filename> and
+                    <filename>partition</filename> commands:
                     <itemizedlist>
                         <listitem><para><emphasis><filename>--size</filename>:</emphasis>
                             The minimum partition size in MBytes.
@@ -4683,6 +4776,14 @@
                             These parameters will be added to the syslinux
                             <filename>APPEND</filename> or
                             <filename>grub</filename> kernel command line.
+                            </para></listitem>
+                        <listitem><para><emphasis><filename>--configfile</filename>:</emphasis>
+                            Specifies a user-defined configuration file for
+                            the bootloader.
+                            You can provide a full pathname for the file or
+                            a file that exists in the
+                            <filename>canned-wks</filename> folder.
+                            This option overrides all other bootloader options.
                             </para></listitem>
                     </itemizedlist>
                 </para>
@@ -5013,7 +5114,7 @@
                         This configuration file will be your baseline.
                         </para></listitem>
                     <listitem><para>Separately run the
-                        <filename>do_configme</filename> and
+                        <filename>do_kernel_configme</filename> and
                         <filename>do_kernel_configcheck</filename> tasks.
                         </para></listitem>
                     <listitem><para>Take the resulting list of files from the
@@ -5041,7 +5142,7 @@
                     <listitem><para>
                         After you have worked through the output of the kernel
                         configuration audit, you can re-run the
-                        <filename>do_configme</filename> and
+                        <filename>do_kernel_configme</filename> and
                         <filename>do_kernel_configcheck</filename> tasks to
                         see the results of your changes.
                         If you have more issues, you can deal with them as
@@ -5055,6 +5156,112 @@
                 a minimal, streamlined configuration file.
                 Once you have the best <filename>.config</filename>, you can build the Linux
                 Yocto kernel.
+            </para>
+        </section>
+
+        <section id='determining-hardware-and-non-hardware-features-for-the-kernel-configuration-audit-phase'>
+            <title>Determining Hardware and Non-Hardware Features for the Kernel Configuration Audit Phase</title>
+
+            <para>
+                This section describes part of the kernel configuration audit
+                phase that most developers can ignore.
+                During this part of the audit phase, the contents of the final
+                <filename>.config</filename> file are compared against the
+                fragments specified by the system.
+                These fragments can be system fragments, distro fragments,
+                or user specified configuration elements.
+                Regardless of their origin, the OpenEmbedded build system
+                warns the user if a specific option is not included in the
+                final kernel configuration.
+            </para>
+
+            <para>
+                In order to not overwhelm the user with configuration warnings,
+                by default the system only reports on missing "hardware"
+                options because a missing hardware option could mean a boot
+                failure or that important hardware is not available.
+            </para>
+
+            <para>
+                To determine whether or not a given option is "hardware" or
+                "non-hardware", the kernel Metadata contains files that
+                classify individual or groups of options as either hardware
+                or non-hardware.
+                To better show this, consider a situation where the
+                Yocto Project kernel cache contains the following files:
+                <literallayout class='monospaced'>
+     kernel-cache/features/drm-psb/hardware.cfg
+     kernel-cache/features/kgdb/hardware.cfg
+     kernel-cache/ktypes/base/hardware.cfg
+     kernel-cache/bsp/mti-malta32/hardware.cfg
+     kernel-cache/bsp/fsl-mpc8315e-rdb/hardware.cfg
+     kernel-cache/bsp/qemu-ppc32/hardware.cfg
+     kernel-cache/bsp/qemuarma9/hardware.cfg
+     kernel-cache/bsp/mti-malta64/hardware.cfg
+     kernel-cache/bsp/arm-versatile-926ejs/hardware.cfg
+     kernel-cache/bsp/common-pc/hardware.cfg
+     kernel-cache/bsp/common-pc-64/hardware.cfg
+     kernel-cache/features/rfkill/non-hardware.cfg
+     kernel-cache/ktypes/base/non-hardware.cfg
+     kernel-cache/features/aufs/non-hardware.kcf
+     kernel-cache/features/ocf/non-hardware.kcf
+     kernel-cache/ktypes/base/non-hardware.kcf
+     kernel-cache/ktypes/base/hardware.kcf
+     kernel-cache/bsp/qemu-ppc32/hardware.kcf
+                </literallayout>
+                The following list provides explanations for the various
+                files:
+                <itemizedlist>
+                    <listitem><para><filename>hardware.kcf</filename>:
+                        Specifies a list of kernel Kconfig files that contain
+                        hardware options only.
+                        </para></listitem>
+                    <listitem><para><filename>non-hardware.kcf</filename>:
+                        Specifies a list of kernel Kconfig files that contain
+                        non-hardware options only.
+                        </para></listitem>
+                    <listitem><para><filename>hardware.cfg</filename>:
+                        Specifies a list of kernel
+                        <filename>CONFIG_</filename> options that are hardware,
+                        regardless of whether or not they are within a Kconfig
+                        file specified by a hardware or non-hardware
+                        Kconfig file (i.e. <filename>hardware.kcf</filename> or
+                        <filename>non-hardware.kcf</filename>).
+                        </para></listitem>
+                    <listitem><para><filename>non-hardware.cfg</filename>:
+                        Specifies a list of kernel
+                        <filename>CONFIG_</filename> options that are
+                        not hardware, regardless of whether or not they are
+                        within a Kconfig file specified by a hardware or
+                        non-hardware Kconfig file (i.e.
+                        <filename>hardware.kcf</filename> or
+                        <filename>non-hardware.kcf</filename>).
+                        </para></listitem>
+                </itemizedlist>
+                Here is a specific example using the
+                <filename>kernel-cache/bsp/mti-malta32/hardware.cfg</filename>:
+                <literallayout class='monospaced'>
+     CONFIG_SERIAL_8250
+     CONFIG_SERIAL_8250_CONSOLE
+     CONFIG_SERIAL_8250_NR_UARTS
+     CONFIG_SERIAL_8250_PCI
+     CONFIG_SERIAL_CORE
+     CONFIG_SERIAL_CORE_CONSOLE
+     CONFIG_VGA_ARB
+                </literallayout>
+                The kernel configuration audit automatically detects these
+                files (hence the names must be exactly the ones discussed here),
+                and uses them as inputs when generating warnings about the
+                final <filename>.config</filename> file.
+            </para>
+
+            <para>
+                A user-specified kernel Metadata repository, or recipe space
+                feature, can use these same files to classify options that are
+                found within its <filename>.cfg</filename> files as hardware
+                or non-hardware, to prevent the OpenEmbedded build system from
+                producing an error or warning when an option is not in the
+                final <filename>.config</filename> file.
             </para>
         </section>
     </section>
@@ -5305,14 +5512,14 @@
                         <filename>poky/build/conf</filename> directory needs to have the path to your local
                         <filename>meta-mylayer</filename> layer.
                         By default, the <filename>BBLAYERS</filename> variable contains paths to
-                        <filename>meta</filename>, <filename>meta-yocto</filename>, and
+                        <filename>meta</filename>, <filename>meta-poky</filename>, and
                         <filename>meta-yocto-bsp</filename> in the
                         <filename>poky</filename> Git repository.
                         Add the path to your <filename>meta-mylayer</filename> location:
                         <literallayout class='monospaced'>
      BBLAYERS ?= " \
        $HOME/poky/meta \
-       $HOME/poky/meta-yocto \
+       $HOME/poky/meta-poky \
        $HOME/poky/meta-yocto-bsp \
        $HOME/poky/meta-mylayer \
        "
@@ -5415,10 +5622,6 @@
                 <listitem><para><emphasis>
                     "<ulink url='http://elinux.org/images/6/6f/Security-issues.pdf'>Security Issues for Embedded Devices</ulink>"</emphasis>
                     by Jake Edge
-                    </para></listitem>
-                <listitem><para><emphasis>
-                    "<ulink url='https://www.nccgroup.com/media/18475/exploiting_security_gateways_via_their_web_interfaces.pdf'>They ought to know better: Exploiting Security Gateways via their Web Interfaces</ulink>"</emphasis>
-                    by Ben Williams
                     </para></listitem>
             </itemizedlist>
         </para>
@@ -5785,7 +5988,7 @@
             By default, <filename>TEMPLATECONF</filename> is set as
             follows in the <filename>poky</filename> repository:
             <literallayout class='monospaced'>
-     TEMPLATECONF=${TEMPLATECONF:-meta-yocto/conf}
+     TEMPLATECONF=${TEMPLATECONF:-meta-poky/conf}
             </literallayout>
             This is the directory used by the build system to find templates
             from which to build some key configuration files.
@@ -5837,7 +6040,7 @@
         <para>
             Aside from the <filename>*.sample</filename> configuration files,
             the <filename>conf-notes.txt</filename> also resides in the
-            default <filename>meta-yocto/conf</filename> directory.
+            default <filename>meta-poky/conf</filename> directory.
             The scripts that set up the build environment
             (i.e.
             <ulink url="&YOCTO_DOCS_REF_URL;#structure-core-script"><filename>&OE_INIT_FILE;</filename></ulink>
@@ -5860,7 +6063,6 @@
          core-image-minimal
          core-image-sato
          meta-toolchain
-         adt-installer
          meta-ide-support
             </literallayout>
         </para>
@@ -7544,13 +7746,16 @@
                             Consequently, you usually need to add a
                             cross-compilation function to the package.
                             </para>
+
                             <para>Many packages based on Automake compile and
                             run the test suite by using a single command
                             such as <filename>make check</filename>.
-                            However, the native <filename>make check</filename>
+                            However, the host <filename>make check</filename>
                             builds and runs on the same computer, while
                             cross-compiling requires that the package is built
-                            on the host but executed on the target.
+                            on the host but executed for the target
+                            architecture (though often, as in the case for
+                            ptest, the execution occurs on the host).
                             The built version of Automake that ships with the
                             Yocto Project includes a patch that separates
                             building and execution.
@@ -7999,21 +8204,22 @@
             This line pulls in the listed include file that contains
             numerous lines of exactly that form:
             <literallayout class='monospaced'>
+     #SRCREV_pn-opkg-native ?= "${AUTOREV}"
+     #SRCREV_pn-opkg-sdk ?= "${AUTOREV}"
+     #SRCREV_pn-opkg ?= "${AUTOREV}"
+     #SRCREV_pn-opkg-utils-native ?= "${AUTOREV}"
+     #SRCREV_pn-opkg-utils ?= "${AUTOREV}"
      SRCREV_pn-gconf-dbus ?= "${AUTOREV}"
      SRCREV_pn-matchbox-common ?= "${AUTOREV}"
      SRCREV_pn-matchbox-config-gtk ?= "${AUTOREV}"
      SRCREV_pn-matchbox-desktop ?= "${AUTOREV}"
      SRCREV_pn-matchbox-keyboard ?= "${AUTOREV}"
-     SRCREV_pn-matchbox-panel ?= "${AUTOREV}"
      SRCREV_pn-matchbox-panel-2 ?= "${AUTOREV}"
      SRCREV_pn-matchbox-themes-extra ?= "${AUTOREV}"
      SRCREV_pn-matchbox-terminal ?= "${AUTOREV}"
      SRCREV_pn-matchbox-wm ?= "${AUTOREV}"
-     SRCREV_pn-matchbox-wm-2 ?= "${AUTOREV}"
      SRCREV_pn-settings-daemon ?= "${AUTOREV}"
      SRCREV_pn-screenshot ?= "${AUTOREV}"
-     SRCREV_pn-libfakekey ?= "${AUTOREV}"
-     SRCREV_pn-oprofileui ?= "${AUTOREV}"
           .
           .
           .
@@ -8134,7 +8340,8 @@
                         specific to or dependent on the target
                         architecture:</emphasis>
                         You can work around these attempts by using native
-                        tools to accomplish the same tasks, or
+                        tools, which run on the host system,
+                        to accomplish the same tasks, or
                         by alternatively running the processes under QEMU,
                         which has the <filename>qemu_run_binary</filename>
                         function.
@@ -9080,11 +9287,8 @@
                 Before you can initiate a remote debugging session, you need
                 to be sure you have set up the cross-development environment,
                 toolchain, and sysroot.
-                The "<ulink url='&YOCTO_DOCS_ADT_URL;#adt-prepare'>Preparing for Application Development</ulink>"
-                chapter of the Yocto Project Application Developer's Guide
+                The <ulink url='&YOCTO_DOCS_SDK_URL;#sdk-intro'>Yocto Project Software Development Kit (SDK) Developer's Guide</ulink>
                 describes this process.
-                Be sure you have read that chapter and have set up
-                your environment.
             </para>
         </section>
 
@@ -9193,9 +9397,8 @@
                     location is at <filename>/opt/poky/&DISTRO;</filename>
                     and begins with the string "environment-setup".
                     For more information, see the
-                    "<ulink url='&YOCTO_DOCS_ADT_URL;#setting-up-the-cross-development-environment'>Setting Up the Cross-Development Environment</ulink>"
-                    section in the Yocto Project Application Developer's
-                    Guide.
+                    <ulink url='&YOCTO_DOCS_SDK_URL;#sdk-manual'>Yocto Project Software Development Kit (SDK) Developer's
+                    Guide</ulink>.
                 </para>
 
                 <para>
@@ -9533,6 +9736,7 @@
         </section>
     </section>
 
+<!--
     <section id="platdev-oprofile">
         <title>Profiling with OProfile</title>
 
@@ -9594,14 +9798,14 @@
 
             <para>
                 <literallayout class='monospaced'>
-     # opcontrol --reset
-     # opcontrol --start --separate=lib --no-vmlinux -c 5
+     # opcontrol &dash;&dash;reset
+     # opcontrol &dash;&dash;start &dash;&dash;separate=lib &dash;&dash;no-vmlinux -c 5
               .
               .
         [do whatever is being profiled]
               .
               .
-     # opcontrol --stop
+     # opcontrol &dash;&dash;stop
      $ opreport -cl
                 </literallayout>
             </para>
@@ -9614,7 +9818,7 @@
                 five levels deep.
                 <note>
                     To profile the kernel, you would specify the
-                    <filename>--vmlinux=/path/to/vmlinux</filename> option.
+                    <filename>&dash;&dash;vmlinux=/path/to/vmlinux</filename> option.
                     The <filename>vmlinux</filename> file is usually in the source directory in the
                     <filename>/boot/</filename> directory and must match the running kernel.
                 </note>
@@ -9677,7 +9881,7 @@
                     With this connection, you just need to run "oprofile-server" on the device.
                     By default, OProfile listens on port 4224.
                     <note>
-                        You can change the port using the <filename>--port</filename> command-line
+                        You can change the port using the <filename>&dash;&dash;port</filename> command-line
                         option.
                     </note>
                 </para>
@@ -9767,14 +9971,14 @@
                     If network access to the target is unavailable, you can generate
                     an archive for processing in <filename>oprofile-viewer</filename> as follows:
                     <literallayout class='monospaced'>
-     # opcontrol --reset
-     # opcontrol --start --separate=lib --no-vmlinux -c 5
+     # opcontrol &dash;&dash;reset
+     # opcontrol &dash;&dash;start &dash;&dash;separate=lib &dash;&dash;no-vmlinux -c 5
             .
             .
      [do whatever is being profiled]
             .
             .
-     # opcontrol --stop
+     # opcontrol &dash;&dash;stop
      # oparchive -o my_archive
                     </literallayout>
                 </para>
@@ -9789,6 +9993,7 @@
             </section>
         </section>
     </section>
+-->
 
     <section id='maintaining-open-source-license-compliance-during-your-products-lifecycle'>
         <title>Maintaining Open Source License Compliance During Your Product's Lifecycle</title>
@@ -9937,10 +10142,33 @@
                 <literallayout class='monospaced'>
      COPY_LIC_MANIFEST = "1"
      COPY_LIC_DIRS = "1"
+     LICENSE_CREATE_PACKAGE = "1"
                 </literallayout>
                 Adding these statements to the configuration file ensures
                 that the licenses collected during package generation
                 are included on your image.
+                <note>
+                    <para>Setting all three variables to "1" results in the
+                    image having two copies of the same license file.
+                    One copy resides in
+                    <filename>/usr/share/common-licenses</filename> and
+                    the other resides in
+                    <filename>/usr/share/license</filename>.</para>
+
+                    <para>The reason for this behavior is because
+                    <ulink url='&YOCTO_DOCS_REF_URL;#var-COPY_LIC_DIRS'><filename>COPY_LIC_DIRS</filename></ulink>
+                    and
+                    <ulink url='&YOCTO_DOCS_REF_URL;#var-COPY_LIC_MANIFEST'><filename>COPY_LIC_MANIFEST</filename></ulink>
+                    add a copy of the license when the image is built but do not
+                    offer a path for adding licenses for newly installed packages
+                    to an image.
+                    <ulink url='&YOCTO_DOCS_REF_URL;#var-LICENSE_CREATE_PACKAGE'><filename>LICENSE_CREATE_PACKAGE</filename></ulink>
+                    adds a separate package and an upgrade path for adding
+                    licenses to an image.</para>
+                </note>
+            </para>
+
+            <para>
                 As the source archiver has already archived the original
                 unmodified source that contains the license files,
                 you would have already met the requirements for inclusion
@@ -9979,8 +10207,8 @@
                 during your build.
                 Here is an example:
                 <literallayout class='monospaced'>
-     # We built using the &DISTRO_NAME; branch of the poky repo
-     $ git clone -b &DISTRO_NAME; git://git.yoctoproject.org/poky
+     # We built using the &DISTRO_NAME_NO_CAP; branch of the poky repo
+     $ git clone -b &DISTRO_NAME_NO_CAP; git://git.yoctoproject.org/poky
      $ cd poky
      # We built using the release_branch for our layers
      $ git clone -b release_branch git://git.mycompany.com/meta-my-bsp-layer
@@ -9990,7 +10218,7 @@
                 </literallayout>
                 One thing a development organization might want to consider
                 for end-user convenience is to modify
-                <filename>meta-yocto/conf/bblayers.conf.sample</filename> to
+                <filename>meta-poky/conf/bblayers.conf.sample</filename> to
                 ensure that when the end user utilizes the released build
                 system to build an image, the development organization's
                 layers are included in the <filename>bblayers.conf</filename>
@@ -10005,7 +10233,7 @@
 
      BBLAYERS ?= " \
        ##OEROOT##/meta \
-       ##OEROOT##/meta-yocto \
+       ##OEROOT##/meta-poky \
        ##OEROOT##/meta-yocto-bsp \
        ##OEROOT##/meta-mylayer \
        "

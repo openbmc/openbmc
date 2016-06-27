@@ -16,3 +16,9 @@ FILES_${PN}-dev += "\
     ${datadir}/vala/vapi/*.deps \
     ${datadir}/gir-1.0 \
 "
+
+# Remove vapigen.m4 that is bundled with tarballs
+# because it does not yet have our cross-compile fixes
+do_configure_prepend() {
+        rm -f ${S}/m4/vapigen.m4
+}

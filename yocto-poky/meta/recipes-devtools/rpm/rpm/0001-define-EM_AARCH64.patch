@@ -1,0 +1,35 @@
+[PATCH] define EM_AARCH64
+
+Upstream-Status: Submitted [RPM5 maintainer]
+
+EM_AARCH64 maybe not be defined due to old version elf.h, and lead to
+that debugedit can not work on aarch64 elf object files, since there is
+no other dependence, except these two macro, define them to make
+debugedit work on aarch64 elf files.
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ tools/debugedit.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/tools/debugedit.c b/tools/debugedit.c
+index de693ed..d16a641 100644
+--- a/tools/debugedit.c
++++ b/tools/debugedit.c
+@@ -35,6 +35,13 @@
+ 
+ #include <gelf.h>
+ 
++#ifndef EM_AARCH64
++#define EM_AARCH64      183             /* ARM AARCH64 */
++#endif
++#ifndef R_AARCH64_ABS32
++#define R_AARCH64_ABS32 258
++#endif 
++
+ /* some defines taken from the dwarf standard */
+ 
+ #define DW_TAG_compile_unit	0x11
+-- 
+1.9.1
+

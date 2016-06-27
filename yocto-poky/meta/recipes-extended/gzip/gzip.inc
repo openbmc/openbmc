@@ -6,8 +6,10 @@ SECTION = "console/utils"
 # change to GPLv3+ in 2007/07. Previous GPLv2 version is 1.3.12
 
 inherit autotools texinfo
+export DEFS="NO_ASM"
 
 EXTRA_OEMAKE_class-target = "GREP=${base_bindir}/grep"
+EXTRA_OECONF_append_libc-musl = " gl_cv_func_fflush_stdin=yes "
 
 do_install_append () {
 	if [ "${base_bindir}" != "${bindir}" ]; then
@@ -18,6 +20,11 @@ do_install_append () {
 		mv ${D}${bindir}/zcat ${D}${base_bindir}/zcat
 		mv ${D}${bindir}/uncompress ${D}${base_bindir}/uncompress
 	fi
+}
+
+do_install_append_libc-musl () {
+	rm ${D}${libdir}/charset.alias
+	rmdir ${D}${libdir}
 }
 
 inherit update-alternatives

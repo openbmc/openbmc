@@ -9,10 +9,12 @@ def create_socket(url, d):
         socket.close()
 
 def get_proxies(d):
-    import os
-    proxykeys = ['http', 'https', 'ftp', 'ftps', 'no', 'all']
-    proxyvalues = map(lambda key: d.getVar(key+'_proxy', True), proxykeys)
-    return dict(zip(proxykeys, proxyvalues))
+    proxies = {}
+    for key in ['http', 'https', 'ftp', 'ftps', 'no', 'all']:
+        proxy = d.getVar(key + '_proxy', True)
+        if proxy:
+            proxies[key] = proxy
+    return proxies
 
 def get_links_from_url(url, d):
     "Return all the href links found on the web location"

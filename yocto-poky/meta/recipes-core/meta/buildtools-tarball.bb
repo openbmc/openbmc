@@ -23,9 +23,10 @@ TOOLCHAIN_HOST_TASK ?= "\
     nativesdk-make \
     nativesdk-wget \
     nativesdk-ca-certificates \
+    nativesdk-texinfo \
     "
 
-SDK_PACKAGE_ARCHS =+ "buildtools-dummy-${SDKPKGSUFFIX}"
+SDK_PACKAGE_ARCHS += "buildtools-dummy-${SDKPKGSUFFIX}"
 
 TOOLCHAIN_OUTPUTNAME ?= "${SDK_NAME}-buildtools-nativesdk-standalone-${DISTRO_VERSION}"
 
@@ -56,4 +57,16 @@ create_sdk_files_append () {
 	toolchain_create_sdk_version ${SDK_OUTPUT}/${SDKPATH}/version-${SDK_SYS}
 
 	echo 'export GIT_SSL_CAINFO="${SDKPATHNATIVE}${sysconfdir}/ssl/certs/ca-certificates.crt"' >>$script
+
+	if [ "${SDKMACHINE}" = "i686" ]; then
+		echo 'export NO32LIBS="0"' >>$script
+		echo 'echo "$BB_ENV_EXTRAWHITE" | grep -q "NO32LIBS"' >>$script
+		echo '[ $? != 0 ] && export BB_ENV_EXTRAWHITE="NO32LIBS $BB_ENV_EXTRAWHITE"' >>$script
+	fi
 }
+
+# buildtools-tarball doesn't need config site
+TOOLCHAIN_NEED_CONFIGSITE_CACHE = ""
+
+# The recipe doesn't need any default deps
+INHIBIT_DEFAULT_DEPS = "1"

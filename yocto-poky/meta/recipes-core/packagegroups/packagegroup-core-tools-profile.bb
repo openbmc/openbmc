@@ -17,7 +17,7 @@ PROFILE_TOOLS_X_aarch64 = ""
 PROFILE_TOOLS_SYSTEMD = "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd-analyze', '', d)}"
 
 RRECOMMENDS_${PN} = "\
-    perf \
+    ${PERF} \
     trace-cmd \
     blktrace \
     ${PROFILE_TOOLS_X} \
@@ -28,14 +28,18 @@ PROFILETOOLS = "\
     powertop \
     latencytop \
     "
+PERF = "perf"
+PERF_libc-musl = ""
 
 # systemtap needs elfutils which is not fully buildable on uclibc
 # hence we exclude it from uclibc based builds
 SYSTEMTAP = "systemtap"
 SYSTEMTAP_libc-uclibc = ""
+SYSTEMTAP_libc-musl = ""
 SYSTEMTAP_mips = ""
 SYSTEMTAP_mips64 = ""
 SYSTEMTAP_mips64n32 = ""
+SYSTEMTAP_nios2 = ""
 SYSTEMTAP_aarch64 = ""
 
 # lttng-ust uses sched_getcpu() which is not there on uclibc
@@ -46,29 +50,26 @@ SYSTEMTAP_aarch64 = ""
 
 LTTNGUST = "lttng-ust"
 LTTNGUST_libc-uclibc = ""
-LTTNGUST_aarch64 = ""
+LTTNGUST_libc-musl = ""
 
 LTTNGTOOLS = "lttng-tools"
-LTTNGTOOLS_aarch64 = ""
+LTTNGTOOLS_libc-musl = ""
 
 LTTNGMODULES = "lttng-modules"
-LTTNGMODULES_aarch64 = ""
 
 BABELTRACE = "babeltrace"
-BABELTRACE_aarch64 = ""
 
 # valgrind does not work on mips
 
 VALGRIND = "valgrind"
 VALGRIND_libc-uclibc = ""
+VALGRIND_libc-musl = ""
 VALGRIND_mips = ""
 VALGRIND_mips64 = ""
 VALGRIND_mips64n32 = ""
+VALGRIND_nios2 = ""
 VALGRIND_arm = ""
 VALGRIND_aarch64 = ""
-
-#    exmap-console
-#    exmap-server
 
 RDEPENDS_${PN} = "\
     ${PROFILETOOLS} \

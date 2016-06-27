@@ -1,0 +1,400 @@
+# BBMASK contains regular expressions that can be used to tell BitBake to ignore
+# certain recipes.
+#BBMASK = ""
+
+#
+# Parallelism Options
+#
+# These two options control how much parallelism BitBake should use. The first
+# option determines how many tasks bitbake should run in parallel:
+#
+#BB_NUMBER_THREADS ?= "4"
+#
+# Default to setting automatically based on cpu count
+#BB_NUMBER_THREADS ?= "${@oe.utils.cpu_count()}"
+#
+# The second option controls how many processes make should run in parallel when
+# running compile tasks:
+#
+#PARALLEL_MAKE ?= "-j 4"
+#
+# Default to setting automatically based on cpu count
+#PARALLEL_MAKE ?= "-j ${@oe.utils.cpu_count()}"
+#
+# For a quad-core machine, BB_NUMBER_THREADS = "4", PARALLEL_MAKE = "-j 4" would
+# be appropriate for example.
+
+
+# glibc configurability is used to reduce minimal image's size.
+# the all supported glibc options are listed in DISTRO_FEATURES_LIBC
+# and disabled by default. Uncomment and copy the DISTRO_FEATURES_LIBC
+# and DISTRO_FEATURES definitions to local.conf to enable the options.
+#DISTRO_FEATURES_LIBC = "ipv6 libc-backtrace libc-big-macros libc-bsd libc-cxx-tests libc-catgets libc-charsets libc-crypt \
+#               libc-crypt-ufc libc-db-aliases libc-envz libc-fcvt libc-fmtmsg libc-fstab libc-ftraverse \
+#               libc-getlogin libc-idn libc-inet libc-inet-anl libc-libm libc-locales libc-locale-code \
+#               libc-memusage libc-nis libc-nsswitch libc-rcmd libc-rtld-debug libc-spawn libc-streams libc-sunrpc \
+#               libc-utmp libc-utmpx libc-wordexp libc-posix-clang-wchar libc-posix-regexp libc-posix-regexp-glibc \
+#               libc-posix-wchar-io"
+
+#DISTRO_FEATURES = "alsa bluetooth ext2 irda pcmcia usbgadget usbhost wifi nfs zeroconf pci ${DISTRO_FEATURES_LIBC}"
+
+# If you want to get an image based on directfb without x11, Please copy this variable to build/conf/local.conf
+#DISTRO_FEATURES = "alsa argp bluetooth ext2 irda largefile pcmcia usbgadget usbhost wifi xattr nfs zeroconf pci 3g directfb ${DISTRO_FEATURES_LIBC}"
+
+# ENABLE_BINARY_LOCALE_GENERATION controls the generation of binary locale
+# packages at build time using qemu-native. Disabling it (by setting it to 0)
+# will save some build time at the expense of breaking i18n on devices with
+# less than 128MB RAM.
+#ENABLE_BINARY_LOCALE_GENERATION = "1"
+
+# Set GLIBC_GENERATE_LOCALES to the locales you wish to generate should you not
+# wish to perform the time-consuming step of generating all LIBC locales.
+# NOTE: If removing en_US.UTF-8 you will also need to uncomment, and set
+# appropriate value for IMAGE_LINGUAS.
+# WARNING: this may break localisation!
+#GLIBC_GENERATE_LOCALES = "en_GB.UTF-8 en_US.UTF-8"
+#IMAGE_LINGUAS ?= "en-gb"
+
+# The following are used to control options related to debugging.
+#
+# Uncomment this to change the optimization to make debugging easer, at the
+# possible cost of performance.
+# DEBUG_BUILD = "1"
+#
+# Uncomment this to disable the stripping of the installed binaries
+# INHIBIT_PACKAGE_STRIP = "1"
+#
+# Uncomment this to disable the split of the debug information into -dbg files
+# INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
+#
+# When splitting debug information, the following controls the results of the
+# file splitting.
+#
+#  .debug (default):
+#    When splitting the debug information will be placed into
+#    a .debug directory in the same dirname of the binary produced:
+#      /bin/foo -> /bin/.debug/foo
+#
+#  debug-file-directory:
+#    When splitting the debug information will be placed into
+#    a central debug-file-directory, /usr/lib/debug:
+#      /bin/foo -> /usr/lib/debug/bin/foo.debug
+#
+#    Any source code referenced in the debug symbols will be copied
+#    and made available within the /usr/src/debug directory
+#
+#PACKAGE_DEBUG_SPLIT_STYLE = '.debug'
+# PACKAGE_DEBUG_SPLIT_STYLE = 'debug-file-directory'
+
+# Uncomment these to build a package such that you can use gprof to profile it.
+# NOTE: This will only work with 'linux' targets, not
+# 'linux-uclibc', as uClibc doesn't provide the necessary
+# object files.  Also, don't build glibc itself with these
+# flags, or it'll fail to build.
+#
+# PROFILE_OPTIMIZATION = "-pg"
+# SELECTED_OPTIMIZATION = "${PROFILE_OPTIMIZATION}"
+# LDFLAGS =+ "-pg"
+
+# TCMODE controls the characteristics of the generated packages/images by
+# telling poky which toolchain 'profile' to use.
+#
+# The default is "default" which uses the internal toolchain. With
+# additional layers, it is possible to set this to use a precompiled
+# external toolchain. One example is the Sourcery G++ Toolchain, support
+# for which is now in the separate meta-sourcery layer:
+#
+#  http://github.com/MentorEmbedded/meta-sourcery/
+#
+# meta-sourcery can be used as a template for adding support for other
+# external toolchains. See the link above for further details.
+#
+# TCMODE points the system to a file in conf/distro/include/tcmode-${TCMODE}.inc,
+# so for meta-sourcery which has conf/distro/include/tcmode-external-sourcery.inc
+# you would set it as follows:
+#
+# TCMODE ?= "external-sourcery"
+
+# mklibs library size optimization is more useful to smaller images,
+# and less useful for bigger images. Also mklibs library optimization
+# can break the ABI compatibility, so should not be applied to the
+# images which are to be extended or upgraded later.
+#This enabled mklibs library size optimization just for the specified image.
+#MKLIBS_OPTIMIZED_IMAGES ?= "core-image-minimal"
+#This enable mklibs library size optimization will be for all the images.
+#MKLIBS_OPTIMIZED_IMAGES ?= "all"
+
+# Uncomment this if your host distribution provides the help2man tool.
+#ASSUME_PROVIDED += "help2man-native"
+
+# This value is currently used by pseudo to determine if the recipe should
+# build both the 32-bit and 64-bit wrapper libraries on a 64-bit build system.
+#
+# Pseudo will attempt to determine if a 32-bit wrapper is necessary, but
+# it doesn't always guess properly.  If you have 32-bit executables on
+# your 64-bit build system, you likely want to set this to "0",
+# otherwise you could end up with incorrect file attributes on the
+# target filesystem.
+#
+# Default is to not build 32 bit libs on 64 bit systems, uncomment this
+# if you need the 32 bits libs
+#NO32LIBS = "0"
+
+# Uncomment the following lines to enable multilib builds
+#require conf/multilib.conf
+#MULTILIBS = "multilib:lib32"
+#DEFAULTTUNE_virtclass-multilib-lib32 = "x86"
+
+# Set RPM_PREFER_ELF_ARCH to configure preferred ABI when using rpm packaging
+# backend to generate a rootfs, choices are:
+# 1: ELF32 wins
+# 2: ELF64 wins
+# 4: ELF64 N32 wins (for mips64 or mips64el only)
+#RPM_PREFER_ELF_ARCH ?= "2"
+
+# The network based PR service host and port
+# Uncomment the following lines to enable PRservice.
+# Set PRSERV_HOST to 'localhost:0' to automatically
+# start local PRService.
+# Set to other values to use remote PRService.
+#PRSERV_HOST = "localhost:0"
+
+# Additional image generation features
+#
+# The following is a list of classes to import to use in the generation of images
+# currently an example class is image_types_uboot
+# IMAGE_CLASSES = " image_types_uboot"
+
+# The following options will build a companion 'debug filesystem' in addition
+# to the normal deployable filesystem.  This companion system allows a
+# debugger to know the symbols and related sources.  It can be used to
+# debug a remote 'production' system without having to add the debug symbols
+# and sources to remote system.  If IMAGE_FSTYPES_DEBUGFS is not defined, it
+# defaults to IMAGE_FSTYPES.
+#IMAGE_GEN_DEBUGFS = "1"
+#IMAGE_FSTYPES_DEBUGFS = "tar.gz"
+
+# Incremental rpm image generation, the rootfs would be totally removed
+# and re-created in the second generation by default, but with
+# INC_RPM_IMAGE_GEN = "1", the rpm based rootfs would be kept, and will
+# do update(remove/add some pkgs) on it.  NOTE: This is not suggested
+# when you want to create a productive rootfs
+#INC_RPM_IMAGE_GEN = "1"
+
+# This is a list of packages that require a commercial license to ship
+# product. If shipped as part of an image these packages may have
+# implications so they are disabled by default.  To enable them,
+# un-comment the below as appropriate.
+#LICENSE_FLAGS_WHITELIST = "commercial_gst-fluendo-mp3 \
+#                           commercial_gst-openmax \
+#                           commercial_gst-plugins-ugly \
+#                           commercial_lame \
+#                           commercial_libmad \
+#                           commercial_libomxil \
+#                           commercial_mpeg2dec"
+
+
+#
+# Disk space monitor, take action when the disk space or the amount of
+# inode is running low, it is enabled when BB_DISKMON_DIRS is set.
+#
+# Set the directory for the monitor, the format is:
+# "action,directory,minimum_space,minimum_free_inode"
+#
+# The "action" must be set and should be one of:
+# ABORT: Immediately abort
+# STOPTASKS: The new tasks can't be executed any more, will stop the build
+#           when the running tasks have been done.
+# WARN: show warnings (see BB_DISKMON_WARNINTERVAL for more information)
+#
+# The "directory" must be set, any directory is OK.
+#
+# Either "minimum_space" or "minimum_free_inode" (or both of them)
+# should be set, otherwise the monitor would not be enabled,
+# the unit can be G, M, K or none, but do NOT use GB, MB or KB
+# (B is not needed).
+#BB_DISKMON_DIRS = "STOPTASKS,${TMPDIR},1G,100K WARN,${SSTATE_DIR},1G,100K"
+#
+# Set disk space and inode interval (only works when the action is "WARN",
+# the unit can be G, M, or K, but do NOT use the GB, MB or KB
+# (B is not needed), the format is:
+# "disk_space_interval,disk_inode_interval", the default value is
+# "50M,5K" which means that it would warn when the free space is
+# lower than the minimum space(or inode), and would repeat the warning
+# when the disk space reduces 50M (or the amount of inode reduces 5k).
+#BB_DISKMON_WARNINTERVAL = "50M,5K"
+
+# Archive the source and put them to ${DEPLOY_DIR}/sources/.
+#
+#INHERIT += "archiver"
+#
+# The tarball for the patched source will be created by default, and you
+# can configure the archiver as follow:
+#
+# Create archive for:
+# 1) original (or unpacked) source:
+#ARCHIVER_MODE[src] = "original"
+# 2) patched source: (default)
+#ARCHIVER_MODE[src] = "patched"
+# 3) configured source:
+#ARCHIVER_MODE[src] = "configured"
+#
+# 4) the patches between do_unpack and do_patch:
+#ARCHIVER_MODE[diff] = "1"
+# set the files that you'd like to exclude from the diff:
+#ARCHIVER_MODE[diff-exclude] ?= ".pc autom4te.cache patches"
+#
+# 5) the environment data, similar to 'bitbake -e recipe':
+#ARCHIVER_MODE[dumpdata] = "1"
+#
+# 6) the recipe (.bb and .inc):
+#ARCHIVER_MODE[recipe] = "1"
+#
+# 7) Whether output the .src.rpm package:
+#ARCHIVER_MODE[srpm] = "1"
+#
+# 8) Filter the license, the recipe whose license in
+#    COPYLEFT_LICENSE_INCLUDE will be included, and in
+#    COPYLEFT_LICENSE_EXCLUDE will be excluded.
+#COPYLEFT_LICENSE_INCLUDE = 'GPL* LGPL*'
+#COPYLEFT_LICENSE_EXCLUDE = 'CLOSED Proprietary'
+#
+# 9) Config the recipe type that will be archived, the type can be
+#    target, native, nativesdk, cross, crosssdk and cross-canadian,
+#    you can set one or more types. Archive all types by default.
+#COPYLEFT_RECIPE_TYPES = 'target'
+#
+
+# Remove the old image before the new one generated to save disk space
+#RM_OLD_IMAGE = "1"
+
+#
+# GCC/LD FLAGS to enable more secure code generation
+#
+# By including the security_flags include file you enable flags
+# to the compiler and linker that cause them to generate more secure
+# code, this is enabled by default in the poky-lsb distro.
+# This does affect compile speed slightly.
+#
+# Use the following line to enable the security compiler and linker flags to your build
+#require conf/distro/include/security_flags.inc
+
+# Image level user/group configuration.
+# Inherit extrausers to make the setting of EXTRA_USERS_PARAMS effective.
+#INHERIT += "extrausers"
+# User / group settings
+# The settings are sperated by the ; character.
+# Each setting is actually a command. The supported commands are useradd,
+# groupadd, userdel, groupdel, usermod and groupmod.
+#EXTRA_USERS_PARAMS = "\
+#useradd -p '' tester; \
+#groupadd developers; \
+#userdel nobody; \
+#groupdel video; \
+#groupmod -g 1020 developers; \
+#usermod -s /bin/sh tester; \
+#"
+
+# Various packages dynamically add users and groups to the system at package
+# install time.  For programs that do not care what the uid/gid is of the
+# resulting users/groups, the order of the install will determine the final
+# uid/gid.  This can lead to non-deterministic uid/gid values from one build
+# to another.  Use the following settings to specify that all user/group adds
+# should be created based on a static passwd/group file.
+#
+# Note, if you enable or disable the useradd-staticids in a configured system,
+# the TMPDIR may contain incorrect uid/gid values.  Clearing the TMPDIR
+# will correct this condition.
+#
+# By default the system looks in the BBPATH for files/passwd and files/group
+# the default can be overriden by spefying USERADD_UID/GID_TABLES.
+#
+#USERADDEXTENSION = "useradd-staticids"
+#USERADD_UID_TABLES = "files/passwd"
+#USERADD_GID_TABLES = "files/group"
+#
+# In order to prevent generating a system where a dynamicly assigned uid/gid
+# can exist, you should enable the following setting.  This will force the
+# system to error out if the user/group name is not defined in the
+# files/passwd or files/group (or specified replacements.)
+#USERADD_ERROR_DYNAMIC = "1"
+
+# Enabling FORTRAN
+# Note this is not officially supported and is just illustrated here to
+# show an example of how it can be done
+# You'll also need your fortran recipe to depend on libgfortran
+#FORTRAN_forcevariable = ",fortran"
+#RUNTIMETARGET_append_pn-gcc-runtime = " libquadmath"
+
+#
+# Kernel image features
+#
+# The INITRAMFS_IMAGE image variable will cause an additional recipe to
+# be built as a dependency to the what ever rootfs recipe you might be
+# using such as core-image-sato.  The initramfs might be needed for
+# the initial boot of of the target system such as to load kernel
+# modules prior to mounting the root file system.
+#
+# INITRAMFS_IMAGE_BUNDLE variable controls if the image recipe
+# specified by the INITRAMFS_IMAGE will be run through an extra pass
+# through the kernel compilation in order to build a single binary
+# which contains both the kernel image and the initramfs.  The
+# combined binary will be deposited into the tmp/deploy directory.
+# NOTE: You can set INITRAMFS_IMAGE in an image recipe, but
+#       INITRAMFS_IMAGE_BUNDLE can only be set in a conf file.
+#
+#INITRAMFS_IMAGE = "core-image-minimal-initramfs"
+#INITRAMFS_IMAGE_BUNDLE = "1"
+
+#
+# IPK Hierarchical feed
+#
+# In some cases it may be desirable not to have all package files in the same
+# directory. An example would be when package feeds are to be uploaded to a
+# shared webhosting service or transferred to a Windows machine which may have
+# problems with directories containing multiple thousands of files.
+#
+# If the IPK_HIERARCHICAL_FEED variable is set to "1", packages will be split
+# between subdirectories in a similar way to how Debian package feeds are
+# organised. In the hierarchical feed, package files are written to
+# <outdir>/<arch>/<pkg_prefix>/<pkg_subdir>, where pkg_prefix is the first
+# letter of the package file name for non-lib packages or "lib" plus the 4th
+# letter of the package file name for lib packages (eg, 'l' for less, 'libc' for
+# libc6).  pkg_subdir is the root of the package file name, discarding the
+# version and architecture parts and the common suffixes '-dbg', '-dev', '-doc',
+# '-staticdev', '-locale' and '-locale-*' which are listed in
+# meta/conf/bitbake.conf.
+#
+# If IPK_HIERARCHICAL_FEED is unset or set to any other value, the traditional
+# feed layout is used where package files are placed in <outdir>/<arch>/.
+#
+#IPK_HIERARCHICAL_FEED = "1"
+#
+
+# Using RPM4
+#
+# Currently the rootfs_rpm code has a hard depends on rpmresolve:do_populate_sysroot,
+# when using rpm4 the rpmresolve code will not compile due to a missing header file.
+# That dependency needs to be removed when using RPM4, also the PREFERRED_VERSION needs
+# to be set. This example shows how to enable rpm4
+# PREFERRED_VERSION_rpm = "4.11.2"
+# PREFERRED_VERSION_rpm-native = "4.11.2"
+# RPMROOTFSDEPENDS_remove = "rpmresolve-native:do_populate_sysroot"
+
+#
+# Use busybox/mdev for system initialization
+#
+#VIRTUAL-RUNTIME_dev_manager = "busybox-mdev"
+#VIRTUAL-RUNTIME_login_manager = "busybox"
+#VIRTUAL-RUNTIME_init_manager = "busybox"
+#VIRTUAL-RUNTIME_initscripts = "initscripts"
+#VIRTUAL-RUNTIME_keymaps = "keymaps"
+#DISTRO_FEATURES_BACKFILL_CONSIDERED += "sysvinit"
+
+#
+# Use systemd for system initialization
+#
+#DISTRO_FEATURES_append = " systemd"
+#DISTRO_FEATURES_BACKFILL_CONSIDERED += "sysvinit"
+#VIRTUAL-RUNTIME_init_manager = "systemd"
+#VIRTUAL-RUNTIME_initscripts = "systemd-compat-units"

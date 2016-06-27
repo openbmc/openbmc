@@ -17,6 +17,7 @@ the commented AC_CHECK_LIB test in acinclude.m4 is uncommented to make
 sure we link against libatomic_ops.
 
 Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
 
 Upstream-Status: Pending
 Taken from:

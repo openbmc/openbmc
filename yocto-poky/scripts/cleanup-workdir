@@ -194,5 +194,5 @@ if __name__ == '__main__':
     except Exception:
         ret = 2
         import traceback
-        traceback.print_exc(3)
+        traceback.print_exc()
     sys.exit(ret)

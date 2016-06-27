@@ -1,0 +1,17 @@
+Define TESTS variable
+
+Signed-off-by: Tudor Florea <tudor.florea@enea.com>
+Upstream-Status: Pending
+
+diff -ruN a/Makefile.am b/Makefile.am
+--- a/Makefile.am	2015-11-12 20:29:46.778396936 +0100
++++ b/Makefile.am	2015-11-12 20:32:24.342450279 +0100
+@@ -48,7 +48,7 @@
+ dist_bashcompletion_DATA =
+ check_PROGRAMS =
+ dist_check_SCRIPTS =
+-TESTS =
++TESTS = $(check_PROGRAMS)
+ 
+ PATHFILES =
+

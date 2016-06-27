@@ -1,0 +1,105 @@
+Fix a build error when building man.config.5 (a remnant of a long
+ago previous patch). Optimized the manpages Makefile for parallel
+builds. Also, fix compile warnings in a couple other files.
+
+Upstream-Status: Pending
+
+Signed-off-by: Bill Randle <william.c.randle@intel.com>
+
+--- man-1.6g/man/Makefile.in.orig	2016-03-28 17:31:08.723949180 -0700
++++ man-1.6g/man/Makefile.in	2016-03-28 17:46:12.866910386 -0700
+@@ -5,6 +5,13 @@
+ ALL = man.1 whatis.1 apropos.1 man.config.5
+ MAYBE8 = makewhatis
+ 
++SUBDIRS := $(shell echo @languages@)
++
++.PHONY: subdirs $(SUBDIRS)
++
++man.config.man: man.conf.man
++	@cp $< $@
++
+ .SUFFIXES: .man .1 .5 .8
+ 
+ .man.1:
+@@ -19,11 +26,11 @@
+ INSTALL = @INSTALL@ -c -m 644
+ 
+ # Where to put the manual pages.
+-mandir = $(DESTDIR)$(PREFIX)@mandir@$(SLANG)
++mandir := $(DESTDIR)$(PREFIX)@mandir@$(SLANG)
+ 
+ all:	$(ALL)
+ 	for i in $(MAYBE8); \
+-		do if test -f $$i.man; then make -f ../Makefile $$i.8; fi; done
++		do if test -f $$i.man; then $(MAKE) -f ../Makefile $$i.8; fi; done
+ 
+ install: $(ALL)
+ 	mkdir -p $(mandir)/man1 $(mandir)/man5 $(mandir)/man8
+@@ -38,24 +45,27 @@
+ 	rm -f core *.in *.@man1ext@ *.@man5ext@ *.@man8ext@ *~
+ 
+ spotless:
++	rm -f man.config.man
+ 
+ subdirs:
+-	@for i in @languages@; do if test -d $$i; then echo; \
+-		echo "==== Making the `cat $$i.txt` man pages. ===="; \
+-		cd $$i; make -f ../Makefile; cd ..; \
+-		else echo "==== No $$i man pages found. ===="; fi; done
++subdirs: $(SUBDIRS)
++$(SUBDIRS):
++	if test -d $@; then echo; \
++		echo "==== Making the `cat $@.txt` man pages. ===="; \
++		$(MAKE) -C $@ -f ../Makefile all; \
++		else echo "==== No $@ man pages found. ===="; fi
+ 
+ installsubdirs:
+ 	@for i in @languages@; do if test -d $$i; then echo; \
+ 		echo "==== Installing the `cat $$i.txt` man pages. ===="; \
+ 		cd $$i; SLANG=/$$i; if test $$SLANG = /en; then SLANG= ; fi; \
+-		export SLANG; make -f ../Makefile install; cd ..; \
++		export SLANG; $(MAKE) -f ../Makefile install; cd ..; \
+ 		else echo "==== No $$i man pages found. ===="; fi; done
+ 
+ cleansubdirs:
+-	@for i in ??; do cd $$i; make -f ../Makefile clean; cd ..; done
++	@for i in ??; do $(MAKE) -C $$i -f ../Makefile clean; done
+ 	rm -f core *~
+ 
+ spotlesssubdirs:
+-	for i in ??; do cd $$i; make -f ../Makefile spotless; cd ..; done
++	for i in ??; do $(MAKE) -C $$i -f ../Makefile spotless; done
+ 	rm -f Makefile
+
+--- man-1.6g/src/gripes.c.orig	2006-11-21 11:53:44.000000000 -0800
++++ man-1.6g/src/gripes.c	2016-03-30 16:32:31.601103487 -0700
+@@ -7,8 +7,6 @@
+ 
+ extern char *msg[];
+ 
+-static char *mantexts = "man";		/* e.g. /usr/lib/locale/%L/man.cat */
+-
+ #ifdef NONLS
+ 
+ static char *
+@@ -30,6 +28,8 @@
+ #include <nl_types.h>
+ #include "../catopen/catopen.c"
+ 
++static char *mantexts = "man";		/* e.g. /usr/lib/locale/%L/man.cat */
++
+ nl_catd catfd = (nl_catd) -1;
+ int cat_is_open = 0;
+ 
+--- man-1.6g/src/manfile.c.orig	2005-08-20 16:26:06.000000000 -0700
++++ man-1.6g/src/manfile.c	2016-03-29 09:10:21.527841285 -0700
+@@ -299,7 +299,7 @@
+ 	const char *((*tocat)(const char *man_filename, const char *ext,
+ 			      int flags))) {
+      char **sl;
+-     struct manpage *res;
++     struct manpage *res = 0;
+ 
+      standards = (flags & (FHS | FSSTND | DO_HP | DO_IRIX));
+      to_cat_filename = tocat;

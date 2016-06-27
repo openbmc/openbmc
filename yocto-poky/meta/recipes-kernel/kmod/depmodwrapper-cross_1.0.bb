@@ -46,3 +46,5 @@ SYSROOT_PREPROCESS_FUNCS += "depmodwrapper_sysroot_preprocess"
 depmodwrapper_sysroot_preprocess () {
 	sysroot_stage_dir ${D}${bindir_crossscripts} ${SYSROOT_DESTDIR}${bindir_crossscripts}
 }
+
+inherit nopackages

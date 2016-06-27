@@ -6,6 +6,16 @@
 #           Path to a file containing the passphrase of the signing key.
 # PACKAGE_FEED_GPG_NAME
 #           Name of the key to sign with. May be key id or key name.
+# PACKAGE_FEED_GPG_BACKEND
+#           Optional variable for specifying the backend to use for signing.
+#           Currently the only available option is 'local', i.e. local signing
+#           on the build host.
+# PACKAGE_FEED_GPG_SIGNATURE_TYPE
+#           Optional variable for specifying the type of gpg signature, can be:
+#               1. Ascii armored (ASC), default if not set
+#               2. Binary (BIN)
+#           This variable is only available for IPK feeds. It is ignored on
+#           other packaging backends.
 # GPG_BIN
 #           Optional variable for specifying the gpg binary/wrapper to use for
 #           signing.
@@ -15,6 +25,8 @@
 inherit sanity
 
 PACKAGE_FEED_SIGN = '1'
+PACKAGE_FEED_GPG_BACKEND ?= 'local'
+PACKAGE_FEED_GPG_SIGNATURE_TYPE ?= 'ASC'
 
 python () {
     # Check sanity of configuration
@@ -22,10 +34,10 @@ python () {
         if not d.getVar(var, True):
             raise_sanity_error("You need to define %s in the config" % var, d)
 
-    # Set expected location of the public key
-    d.setVar('PACKAGE_FEED_GPG_PUBKEY',
-             os.path.join(d.getVar('STAGING_ETCDIR_NATIVE'),
-                                   'PACKAGE-FEED-GPG-PUBKEY'))
+    sigtype = d.getVar("PACKAGE_FEED_GPG_SIGNATURE_TYPE", True)
+    if sigtype.upper() != "ASC" and sigtype.upper() != "BIN":
+        raise_sanity_error("Bad value for PACKAGE_FEED_GPG_SIGNATURE_TYPE (%s), use either ASC or BIN" % sigtype)
 }
 
-do_package_index[depends] += "signing-keys:do_export_public_keys"
+do_package_index[depends] += "signing-keys:do_deploy"
+do_rootfs[depends] += "signing-keys:do_populate_sysroot"

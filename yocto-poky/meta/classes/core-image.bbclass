@@ -24,7 +24,6 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=4d92cd373abda3937c2bc47fbc49d
 # - nfs-client          - NFS client
 # - ssh-server-dropbear - SSH server (dropbear)
 # - ssh-server-openssh  - SSH server (openssh)
-# - qt4-pkgs            - Qt4/X11 and demo applications
 # - hwcodecs            - Install hardware acceleration codecs
 # - package-management  - installs package management tools and preserves the package manager database
 # - debug-tweaks        - makes an image suitable for development, e.g. allowing passwordless root logins
@@ -46,7 +45,6 @@ FEATURE_PACKAGES_nfs-server = "packagegroup-core-nfs-server"
 FEATURE_PACKAGES_nfs-client = "packagegroup-core-nfs-client"
 FEATURE_PACKAGES_ssh-server-dropbear = "packagegroup-core-ssh-dropbear"
 FEATURE_PACKAGES_ssh-server-openssh = "packagegroup-core-ssh-openssh"
-FEATURE_PACKAGES_qt4-pkgs = "packagegroup-core-qt-demoapps"
 FEATURE_PACKAGES_hwcodecs = "${MACHINE_HWCODECS}"
 
 

@@ -1,0 +1,32 @@
+The tarball has a texi file that doesn't parse with current texinfo, so if it's
+being re-generated the build will fail.  Take a patch from upstream to fix the
+texi.
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From d4c4b8e1a085f92afcec36f6e590c6dfc51d0a1c Mon Sep 17 00:00:00 2001
+From: Bryan Hundven <bryanhundven@gmail.com>
+Date: Mon, 08 Apr 2013 13:23:07 +0000
+Subject: 	* docs/grub-dev.texi: Move @itemize after @subsection to satisfy
+
+	texinfo-5.1.
+---
+(limited to 'docs/grub-dev.texi')
+
+diff --git a/docs/grub-dev.texi b/docs/grub-dev.texi
+index a4a3820..f74c966 100644
+--- a/docs/grub-dev.texi
++++ b/docs/grub-dev.texi
+@@ -1394,8 +1394,8 @@ grub_video_blit_glyph (&glyph, color, 0, 0);
+ 
+ @node Bitmap API
+ @section Bitmap API
+-@itemize
+ @subsection grub_video_bitmap_create
++@itemize
+ @item Prototype:
+ @example
+ grub_err_t grub_video_bitmap_create (struct grub_video_bitmap **bitmap, unsigned int width, unsigned int height, enum grub_video_blit_format blit_format)
+--
+cgit v0.9.0.2

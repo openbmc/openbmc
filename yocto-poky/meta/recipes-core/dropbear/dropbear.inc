@@ -41,9 +41,6 @@ INITSCRIPT_PARAMS = "defaults 10"
 
 SYSTEMD_SERVICE_${PN} = "dropbear.socket"
 
-CFLAGS_prepend = " -I. "
-LD = "${CC}"
-
 SBINCOMMANDS = "dropbear dropbearkey dropbearconvert"
 BINCOMMANDS = "dbclient ssh scp"
 EXTRA_OEMAKE = 'MULTI=1 SCPPROGRESS=1 PROGRAMS="${SBINCOMMANDS} ${BINCOMMANDS}"'

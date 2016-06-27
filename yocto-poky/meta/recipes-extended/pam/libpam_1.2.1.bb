@@ -31,7 +31,10 @@ SRC_URI[sha256sum] = "342b1211c0d3b203a7df2540a5b03a428a087bd8a48c17e49ae268f992
 SRC_URI_append_libc-uclibc = " file://pam-no-innetgr.patch \
                                file://use-utmpx.patch"
 
-SRC_URI_append_libc-musl = " file://pam-no-innetgr.patch"
+SRC_URI_append_libc-musl = " file://pam-no-innetgr.patch \
+                             file://0001-Add-support-for-defining-missing-funcitonality.patch \
+                             file://include_paths_header.patch \
+                           "
 
 DEPENDS = "bison flex flex-native cracklib"
 
@@ -54,10 +57,6 @@ PACKAGECONFIG[audit] = "--enable-audit,--disable-audit,audit,"
 
 PACKAGES += "${PN}-runtime ${PN}-xtests"
 FILES_${PN} = "${base_libdir}/lib*${SOLIBS}"
-FILES_${PN}-dbg += "${base_libdir}/security/.debug \
-                    ${base_libdir}/security/pam_filter/.debug \
-                    ${datadir}/Linux-PAM/xtests/.debug"
-
 FILES_${PN}-dev += "${base_libdir}/security/*.la ${base_libdir}/*.la ${base_libdir}/lib*${SOLIBSDEV}"
 FILES_${PN}-runtime = "${sysconfdir}"
 FILES_${PN}-xtests = "${datadir}/Linux-PAM/xtests"
@@ -169,3 +168,4 @@ CONFFILES_${PN}-runtime += "${sysconfdir}/pam.d/common-auth"
 CONFFILES_${PN}-runtime += "${sysconfdir}/pam.d/common-password"
 CONFFILES_${PN}-runtime += "${sysconfdir}/pam.d/common-session-noninteractive"
 CONFFILES_${PN}-runtime += "${sysconfdir}/pam.d/common-account"
+CONFFILES_${PN}-runtime += "${sysconfdir}/security/limits.conf"

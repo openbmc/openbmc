@@ -332,6 +332,8 @@ python package_do_split_gconvs () {
         bb.build.exec_func("do_prep_locale_tree", d)
 
     utf8_only = int(d.getVar('LOCALE_UTF8_ONLY', True) or 0)
+    utf8_is_default = int(d.getVar('LOCALE_UTF8_IS_DEFAULT', True) or 0)
+
     encodings = {}
     for locale in to_generate:
         charset = supported[locale]
@@ -344,10 +346,11 @@ python package_do_split_gconvs () {
         else:
             base = locale
 
-        # Precompiled locales are kept as is, obeying SUPPORTED, while
-        # others are adjusted, ensuring that the non-suffixed locales
-        # are utf-8, while the suffixed are not.
-        if use_bin == "precompiled":
+        # Non-precompiled locales may be renamed so that the default
+        # (non-suffixed) encoding is always UTF-8, i.e., instead of en_US and
+        # en_US.UTF-8, we have en_US and en_US.ISO-8859-1. This implicitly
+        # contradicts SUPPORTED.
+        if use_bin == "precompiled" or not utf8_is_default:
             output_locale(locale, base, charset)
         else:
             if charset == 'UTF-8':

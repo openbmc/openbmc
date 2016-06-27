@@ -238,7 +238,7 @@
 </dl>
 
 {# Performance section - shown only for executed tasks #}
-{%if task.elapsed_time or task.cpu_usage or task.disk_io %}
+{%if task.elapsed_time or task.cpu_time_user or task.cpu_time_system or task.disk_io %}
     <h2 class="details">Performance</h2>
 {% endif %}
     <dl class="dl-horizontal">
@@ -249,19 +249,26 @@
         </dt>
         <dd>{{task.elapsed_time|format_none_and_zero|floatformat:2}}</dd>
         {% endif %}
-        {% if task.cpu_usage > 0 %}
+        {% if task.cpu_time_user > 0 %}
         <dt>
-            <i class="icon-question-sign get-help" title="The percentage of task CPU utilization"></i>
-            CPU usage
+            <i class="icon-question-sign get-help" title="Total amount of time spent executing in user mode, in seconds. Note that this time can be greater than the task time due to parallel execution."></i>
+            User CPU time (secs)
         </dt>
-        <dd>{{task.cpu_usage|format_none_and_zero|floatformat:2}}%</dd>
+        <dd>{{task.cpu_time_user|format_none_and_zero|floatformat:2}}</dd>
+        {% endif %}
+        {% if task.cpu_time_system > 0 %}
+        <dt>
+            <i class="icon-question-sign get-help" title="Total amount of time spent executing in kernel mode, in seconds. Note that this time can be greater than the task time due to parallel execution."></i>
+            System CPU time (secs)
+        </dt>
+        <dd>{{task.cpu_time_system|format_none_and_zero|floatformat:2}}</dd>
         {% endif %}
         {% if task.disk_io > 0 %}
         <dt>
-            <i class="icon-question-sign get-help" title="Number of miliseconds the task spent doing disk input and output"></i>
-            Disk I/O (ms)
+            <i class="icon-question-sign get-help" title="Number of bytes written to and read from the disk during the task"></i>
+            Disk I/O (bytes)
         </dt>
-        <dd>{{task.disk_io|format_none_and_zero}}</dd>
+        <dd>{{task.disk_io|format_none_and_zero|intcomma}}</dd>
         {% endif %}
     </dl>
 

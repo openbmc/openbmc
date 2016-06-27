@@ -59,7 +59,7 @@ python multilib_virtclass_handler () {
     e.data.setVar("OVERRIDES", e.data.getVar("OVERRIDES", False) + override)
 
     # Expand the WHITELISTs with multilib prefix
-    for whitelist in ["HOSTTOOLS_WHITELIST_GPL-3.0", "WHITELIST_GPL-3.0", "LGPLv2_WHITELIST_GPL-3.0"]:
+    for whitelist in ["WHITELIST_GPL-3.0", "LGPLv2_WHITELIST_GPL-3.0"]:
         pkgs = e.data.getVar(whitelist, True)
         for pkg in pkgs.split():
             pkgs += " " + variant + "-" + pkg

@@ -13,8 +13,23 @@ if [ x$tdir = x ] ; then
    echo "SDK relocate failed, could not create a temporary directory"
    exit 1
 fi
-echo "#!/bin/bash" > $tdir/relocate_sdk.sh
-echo exec ${env_setup_script%/*}/relocate_sdk.py $target_sdk_dir $dl_path $executable_files >> $tdir/relocate_sdk.sh
+cat <<EOF >> $tdir/relocate_sdk.sh
+#!/bin/bash
+for py in python python2 python3
+do
+	PYTHON=\`which \${py} 2>/dev/null\`
+	if [ \$? -eq 0 ]; then
+		break;
+	fi
+done
+
+if [ x\${PYTHON} = "x"  ]; then
+	echo "SDK could not be relocated.  No python found."
+	exit 1
+fi
+\${PYTHON} ${env_setup_script%/*}/relocate_sdk.py $target_sdk_dir $dl_path $executable_files
+EOF
+
 $SUDO_EXEC mv $tdir/relocate_sdk.sh ${env_setup_script%/*}/relocate_sdk.sh
 $SUDO_EXEC chmod 755 ${env_setup_script%/*}/relocate_sdk.sh
 rm -rf $tdir
@@ -32,7 +47,7 @@ for replace in "$target_sdk_dir -maxdepth 1" "$native_sysroot"; do
 	$SUDO_EXEC find $replace -type f
 done | xargs -n100 file | grep ":.*\(ASCII\|script\|source\).*text" | \
     awk -F':' '{printf "\"%s\"\n", $1}' | \
-    grep -v "$target_sdk_dir/environment-setup-*" | \
+    grep -Ev "$target_sdk_dir/(environment-setup-*|relocate_sdk*|${0##*/})" | \
     xargs -n100 $SUDO_EXEC sed -i \
         -e "s:$DEFAULT_INSTALL_DIR:$target_sdk_dir:g" \
         -e "s:^#! */usr/bin/perl.*:#! /usr/bin/env perl:g" \

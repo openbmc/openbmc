@@ -1,0 +1,132 @@
+From 46ec6a52d4cc447cc3ff4a13b2067ecb76c9db2e Mon Sep 17 00:00:00 2001
+From: Behdad Esfahbod <behdad@behdad.org>
+Date: Fri, 26 Jun 2015 17:02:13 -0700
+Subject: [PATCH] Revert changes made to FcConfigAppFontAddDir() recently
+
+In 32ac7c75e8db0135ef37cf86f92d8b9be000c8bb the behavior of
+FcConfigAppFontAddFile/Dir() were changed to return false
+if not fonts were found.  While this is welldefined and useful
+for AddFile(), it's quite problematic for AddDir().  For example,
+if the directory is empty, is that a failure or success?  Worse,
+the false value from AddDir() was being propagated all the way
+to FcInit() returning false now.  This only happened upon memory
+allocation failure before, and some clients assert that FcInit()
+is successful.
+
+With this change, AddDir() is reverted back to what it was.
+AddFont() change (which was actually in fcdir.c) from the original
+commit is left in.
+
+Upstream-Status: backport
+
+Signed-off-by: Li Zhou <li.zhou@windriver.com>
+---
+ doc/fcconfig.fncs |    2 +-
+ src/fccfg.c       |   29 +++++++++++------------------
+ src/fcint.h       |    3 ---
+ src/fcstr.c       |    8 --------
+ 4 files changed, 12 insertions(+), 30 deletions(-)
+
+Index: fontconfig-2.11.94/doc/fcconfig.fncs
+===================================================================
+--- fontconfig-2.11.94.orig/doc/fcconfig.fncs
++++ fontconfig-2.11.94/doc/fcconfig.fncs
+@@ -232,7 +232,7 @@ the current configuration is used.
+ @DESC@
+ Scans the specified directory for fonts, adding each one found to the
+ application-specific set of fonts. Returns FcFalse
+-if the fonts cannot be added (due to allocation failure or no fonts found).
++if the fonts cannot be added (due to allocation failure).
+ Otherwise returns FcTrue. If <parameter>config</parameter> is NULL,
+ the current configuration is used.
+ @@
+Index: fontconfig-2.11.94/src/fccfg.c
+===================================================================
+--- fontconfig-2.11.94.orig/src/fccfg.c
++++ fontconfig-2.11.94/src/fccfg.c
+@@ -368,7 +368,6 @@ FcConfigAddDirList (FcConfig *config, Fc
+     FcStrList	    *dirlist;
+     FcChar8	    *dir;
+     FcCache	    *cache;
+-    FcBool	     ret = FcFalse;
+ 
+     dirlist = FcStrListCreate (dirSet);
+     if (!dirlist)
+@@ -383,10 +382,9 @@ FcConfigAddDirList (FcConfig *config, Fc
+ 	    continue;
+ 	FcConfigAddCache (config, cache, set, dirSet);
+ 	FcDirCacheUnload (cache);
+-	ret = FcTrue;
+     }
+     FcStrListDone (dirlist);
+-    return ret;
++    return FcTrue;
+ }
+ 
+ /*
+@@ -2199,7 +2197,6 @@ FcConfigAppFontAddFile (FcConfig    *con
+     FcStrSet	*subdirs;
+     FcStrList	*sublist;
+     FcChar8	*subdir;
+-    FcBool	 ret = FcFalse;
+ 
+     if (!config)
+     {
+@@ -2229,19 +2226,16 @@ FcConfigAppFontAddFile (FcConfig    *con
+ 	FcStrSetDestroy (subdirs);
+ 	return FcFalse;
+     }
+-    if (subdirs->num == 0)
+-	ret = FcTrue;
+-    else if ((sublist = FcStrListCreate (subdirs)))
++    if ((sublist = FcStrListCreate (subdirs)))
+     {
+ 	while ((subdir = FcStrListNext (sublist)))
+ 	{
+-	    if (FcConfigAppFontAddDir (config, subdir))
+-		ret = FcTrue;
++	    FcConfigAppFontAddDir (config, subdir);
+ 	}
+ 	FcStrListDone (sublist);
+     }
+     FcStrSetDestroy (subdirs);
+-    return ret;
++    return FcTrue;
+ }
+ 
+ FcBool
+@@ -2250,7 +2244,6 @@ FcConfigAppFontAddDir (FcConfig	    *con
+ {
+     FcFontSet	*set;
+     FcStrSet	*dirs;
+-    FcBool	 ret = FcTrue;
+ 
+     if (!config)
+     {
+@@ -2269,8 +2262,8 @@ FcConfigAppFontAddDir (FcConfig	    *con
+ 	set = FcFontSetCreate ();
+ 	if (!set)
+ 	{
+-	    ret = FcFalse;
+-	    goto bail;
++	    FcStrSetDestroy (dirs);
++	    return FcFalse;
+ 	}
+ 	FcConfigSetFonts (config, set, FcSetApplication);
+     }
+@@ -2278,10 +2271,12 @@ FcConfigAppFontAddDir (FcConfig	    *con
+     FcStrSetAddFilename (dirs, dir);
+ 
+     if (!FcConfigAddDirList (config, FcSetApplication, dirs))
+-	ret = FcFalse;
+-bail:
++    {
++	FcStrSetDestroy (dirs);
++	return FcFalse;
++    }
+     FcStrSetDestroy (dirs);
+-    return ret;
++    return FcTrue;
+ }
+ 
+ void

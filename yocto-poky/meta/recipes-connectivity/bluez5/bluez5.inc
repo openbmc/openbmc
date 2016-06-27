@@ -18,10 +18,14 @@ PACKAGECONFIG[experimental] = "--enable-experimental,--disable-experimental,"
 
 SRC_URI = "\
     ${KERNELORG_MIRROR}/linux/bluetooth/bluez-${PV}.tar.xz \
+    file://init \
+    file://run-ptest \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '', 'file://0001-Allow-using-obexd-without-systemd-in-the-user-sessio.patch', d)} \
+    file://0001-tests-add-a-target-for-building-tests-without-runnin.patch \
 "
 S = "${WORKDIR}/bluez-${PV}"
 
-inherit autotools-brokensep pkgconfig systemd
+inherit autotools-brokensep pkgconfig systemd update-rc.d distro_features_check ptest
 
 EXTRA_OECONF = "\
   --enable-tools \
@@ -42,6 +46,9 @@ NOINST_TOOLS = " \
 "
 
 do_install_append() {
+	install -d ${D}${INIT_D_DIR}
+	install -m 0755 ${WORKDIR}/init ${D}${INIT_D_DIR}/bluetooth
+
 	install -d ${D}${sysconfdir}/bluetooth/
 	if [ -f ${S}/profiles/audio/audio.conf ]; then
 	    install -m 0644 ${S}/profiles/audio/audio.conf ${D}/${sysconfdir}/bluetooth/
@@ -52,8 +59,6 @@ do_install_append() {
 	if [ -f ${S}/profiles/input/input.conf ]; then
 	    install -m 0644 ${S}/profiles/input/input.conf ${D}/${sysconfdir}/bluetooth/
 	fi
-
-	install -m 0644 ${S}/src/bluetooth.conf ${D}/${sysconfdir}/dbus-1/system.d/
 
 	# Install desired tools that upstream leaves in build area
         for f in ${NOINST_TOOLS} ; do
@@ -89,16 +94,19 @@ def get_noinst_tools_paths (d, bb, tools):
 
 FILES_${PN}-noinst-tools = "${@get_noinst_tools_paths(d, bb, d.getVar('NOINST_TOOLS', True))}"
 
-FILES_${PN}-dbg += "\
-  ${libexecdir}/bluetooth/.debug \
-  ${libdir}/bluetooth/plugins/.debug \
-  ${libdir}/*/.debug \
-  */udev/.debug \
-  */*/udev/.debug \
-  "
-
 RDEPENDS_${PN}-testtools += "python python-dbus python-pygobject"
 
 SYSTEMD_SERVICE_${PN} = "bluetooth.service"
+INITSCRIPT_PACKAGES = "${PN}"
+INITSCRIPT_NAME_${PN} = "bluetooth"
 
 EXCLUDE_FROM_WORLD = "1"
+
+do_compile_ptest() {
+        oe_runmake buildtests
+}
+
+do_install_ptest() {
+        cp -r ${B}/unit/ ${D}${PTEST_PATH}
+        rm ${D}${PTEST_PATH}/unit/*.c ${D}${PTEST_PATH}/unit/*.o
+}

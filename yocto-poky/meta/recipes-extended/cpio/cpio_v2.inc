@@ -7,7 +7,6 @@ SECTION = "base"
 DEPENDS = "texinfo-native"
 
 SRC_URI = "${GNU_MIRROR}/cpio/cpio-${PV}.tar.gz \
-    file://statdef.patch \
     "
 
 inherit autotools gettext texinfo

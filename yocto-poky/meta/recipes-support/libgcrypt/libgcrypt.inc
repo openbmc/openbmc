@@ -22,8 +22,6 @@ SRC_URI = "ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-${PV}.tar.gz \
 
 BINCONFIG = "${bindir}/libgcrypt-config"
 
-PR = "r1"
-
 inherit autotools texinfo binconfig-disabled pkgconfig
 
 EXTRA_OECONF = "--disable-asm --with-capabilities"

@@ -14,3 +14,5 @@ SRC_URI[sha256sum] = "843532672692f98e9b2d6ae6cc8658da562dfde1606c7f33d9d227a344
 inherit autotools native
 
 S = "${WORKDIR}/desktop-file-utils-${PV}"
+
+EXTRA_OECONF += "ac_cv_prog_EMACS=no"

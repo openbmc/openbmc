@@ -293,7 +293,12 @@ bb.data.getVar(a(), d, False)
     def test_python(self):
         self.d.setVar("FOO", self.pydata)
         self.setEmptyVars(["inexpand", "a", "test2", "test"])
-        self.d.setVarFlags("FOO", {"func": True, "python": True})
+        self.d.setVarFlags("FOO", {
+            "func": True,
+            "python": True,
+            "lineno": 1,
+            "filename": "example.bb",
+        })
 
         deps, values = bb.data.build_dependencies("FOO", set(self.d.keys()), set(), set(), self.d)
 
