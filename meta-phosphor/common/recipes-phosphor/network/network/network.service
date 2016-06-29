@@ -3,6 +3,7 @@ Description=Network DBUS object
 
 [Service]
 ExecStart=/usr/sbin/netman.py
+Environment="PYTHONUNBUFFERED=1"
 
 [Install]
 WantedBy=multi-user.target
