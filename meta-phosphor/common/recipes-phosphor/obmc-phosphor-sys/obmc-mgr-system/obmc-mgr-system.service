@@ -1,10 +1,11 @@
 [Unit]
-Description=Temp placeholder for skeleton function
+Description=OpenBMC system manager
+Requires=obmc-mapper.service
+After=obmc-mapper.service
 
 [Service]
 Restart=always
 ExecStart=/usr/sbin/system_manager.py
-Environment="PYTHONUNBUFFERED=1"
 
 [Install]
 WantedBy=multi-user.target
