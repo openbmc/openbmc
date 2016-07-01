@@ -3,7 +3,6 @@ DESCRIPTION = "Phosphor OpenBMC filesytem mount reference implementation."
 PR = "r1"
 
 inherit obmc-phosphor-license
-inherit obmc-phosphor-initfs
 
 S = "${WORKDIR}"
 SRC_URI += "file://obmc-init.sh"
@@ -22,10 +21,11 @@ do_install() {
         install -m 0755 ${WORKDIR}/obmc-init.sh ${D}/init
         install -m 0755 ${WORKDIR}/obmc-shutdown.sh ${D}/shutdown
         install -m 0755 ${WORKDIR}/obmc-update.sh ${D}/update
-        install -m 0644 ${WORKDIR}/whitelist ${D}/whitelist
+        install -d ${D}/whitelist.d
+        install -m 0644 ${WORKDIR}/whitelist ${D}/whitelist.d/whitelist
         install -d ${D}/dev
         mknod -m 622 ${D}/dev/console c 5 1
 }
 
-FILES_${PN} += " /init /shutdown /update /whitelist /dev "
+FILES_${PN} += " /init /shutdown /update /whitelist.d/whitelist /dev "
 FILES_${PN} += " /init-options /init-download-url "

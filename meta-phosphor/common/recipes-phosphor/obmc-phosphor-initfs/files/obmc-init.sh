@@ -18,7 +18,7 @@ fi
 
 mkdir -p $rodir $rwdir
 
-cp -rp init shutdown update whitelist bin sbin usr lib etc var run/initramfs
+cp -rp init shutdown update whitelist.d bin sbin usr lib etc var run/initramfs
 
 # To start a interactive shell with job control at this point, run
 # getty 38400 ttyS4
@@ -184,6 +184,7 @@ fsckbase=/sbin/fsck.
 fsck=$fsckbase$rwfst
 fsckopts=-a
 optfile=/run/initramfs/init-options
+optbase=/run/initramfs/init-options-base
 urlfile=/run/initramfs/init-download-url
 update=/run/initramfs/update
 
@@ -192,9 +193,16 @@ then
 	cp /${optfile##*/} $optfile
 fi
 
+if test -e /${optbase##*/}
+then
+	cp /${optbase##*/} $optbase
+else
+	touch $optbase
+fi
+
 if test ! -f $optfile
 then
-	cat /proc/cmdline > $optfile
+	cat /proc/cmdline $optbase > $optfile
 	get_fw_env_var openbmcinit >> $optfile
 	get_fw_env_var openbmconce >> $optfile
 fi
