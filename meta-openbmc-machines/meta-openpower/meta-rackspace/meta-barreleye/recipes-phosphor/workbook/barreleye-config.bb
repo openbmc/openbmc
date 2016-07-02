@@ -3,6 +3,6 @@ DESCRIPTION = "Board wiring information for the Barreleye system."
 HOMEPAGE = "http://github.com/openbmc/skeleton"
 PR = "r1"
 
-SRCREV = "cbe32133dadf0945357e2bec67aa7a86ae9f0295"
+SRCREV = "1bbc820f2b595b7a674e52bee1775c877b35b61e"
 inherit config-in-skeleton
 inherit obmc-phosphor-license
