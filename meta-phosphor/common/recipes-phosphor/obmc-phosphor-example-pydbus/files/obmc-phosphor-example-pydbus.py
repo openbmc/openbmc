@@ -86,8 +86,7 @@ if __name__ == '__main__':
 	bus = dbus.SystemBus()
 
 	services = []
-	services.append(dbus.service.BusName(SERVICE_PREFIX + '.PythonService0', bus))
-	services.append(dbus.service.BusName(SERVICE_PREFIX + '.PythonService1', bus))
+	services.append(dbus.service.BusName(SERVICE_PREFIX + '.PythonService', bus))
 
 	objs = []
 	objs.append(SampleObjectOne(bus, BASE_OBJ_PATH + 'path0/PythonObj'))
