@@ -27,9 +27,8 @@ python() {
         path = bb.utils.which(searchpaths, file)
         if os.path.isfile(path):
             d.appendVar('SRC_URI', ' file://' + file)
-            d.appendVar(
-                'FILES_' + bpn, ' ' +
-                d.getVar('systemd_system_unitdir', True) + file)
+            d.appendVar("FILES_%s" %(bpn), " %s/%s" \
+                % (d.getVar('systemd_system_unitdir', True), file))
             d.appendVar('OBMC_SYSTEMD_SERVICES', ' ' + file)
             if file not in (d.getVar('SYSTEMD_SERVICE_' + bpn, True) or "").split():
                 d.appendVar('SYSTEMD_SERVICE_' + bpn, ' ' + file)
