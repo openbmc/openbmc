@@ -79,13 +79,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	/* Take a well-known service name so that clients can find us */
-	r = sd_bus_request_name(bus, "org.openbmc.examples.SDBusService0", 0);
-	if (r < 0) {
-		fprintf(stderr, "Failed to acquire service name: %s\n", strerror(-r));
-		goto finish;
-	}
-
-	r = sd_bus_request_name(bus, "org.openbmc.examples.SDBusService1", 0);
+	r = sd_bus_request_name(bus, "org.openbmc.examples.SDBusService", 0);
 	if (r < 0) {
 		fprintf(stderr, "Failed to acquire service name: %s\n", strerror(-r));
 		goto finish;
