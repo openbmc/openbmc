@@ -5,8 +5,7 @@ inherit kernel-uboot
 KBUILD_HAS_CUIMAGE ?= "no"
 
 python __anonymous () {
-    kerneltype = d.getVar('KERNEL_IMAGETYPE', True)
-    if kerneltype == 'cuImage':
+    if "cuImage" in (d.getVar('KERNEL_IMAGETYPES', True) or "").split():
         depends = d.getVar("DEPENDS", True)
         depends = "%s u-boot-mkimage-native" % depends
         d.setVar("DEPENDS", depends)
@@ -17,7 +16,10 @@ python __anonymous () {
 	# KBUILD_HAS_CUIMAGE == yes. Otherwise, we pack compressed vmlinux into
 	# the cuImage .
 	if d.getVar("KBUILD_HAS_CUIMAGE", True) != 'yes':
-            d.setVar("KERNEL_IMAGETYPE_FOR_MAKE", "zImage")
+	    typeformake = d.getVar("KERNEL_IMAGETYPE_FOR_MAKE", True) or ""
+	    if "cuImage" in typeformake.split():
+	        typeformake = typeformake.replace('cuImage', 'zImage')
+            d.setVar("KERNEL_IMAGETYPE_FOR_MAKE", typeformake)
 }
 
 do_uboot_mkcimage() {
@@ -26,7 +28,7 @@ do_uboot_mkcimage() {
 		dt=""
         fi
 
-	if test "x${KERNEL_IMAGETYPE}" = "xcuImage" ; then
+	if echo "${KERNEL_IMAGETYPES}" | grep -wq "cuImage" ; then
 		if test "x${KBUILD_HAS_CUIMAGE}" != "xyes" ; then
 			uboot_prep_kimage
                         cat linux.bin $dt > linux-dts.bin
