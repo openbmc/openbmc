@@ -36,9 +36,9 @@ if __name__ == '__main__':
 
 	bus = dbus.SystemBus()
 
-	obj0 = bus.get_object(SERVICE_PREFIX + '.PythonService0',
+	obj0 = bus.get_object(SERVICE_PREFIX + '.PythonService',
 		                      BASE_OBJ_PATH + 'path0/PythonObj')
-	obj1 = bus.get_object(SERVICE_PREFIX + '.PythonService1',
+	obj1 = bus.get_object(SERVICE_PREFIX + '.PythonService',
 		                      BASE_OBJ_PATH + 'path1/PythonObj')
 	echo0= dbus.Interface(obj0,
 		    dbus_interface=IFACE_PREFIX + '.Echo')
