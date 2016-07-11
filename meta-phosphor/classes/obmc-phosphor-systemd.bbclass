@@ -7,32 +7,31 @@
 # and these files will be added to the main package if they exist.
 #
 # Alternatively this class can just be inherited and
-# ${BPN}.service will be added to the main package.
+# ${PN}.service will be added to the main package.
 inherit systemd
 
 
 python() {
-    bpn = d.getVar('BPN', True)
+    pn = d.getVar('PN', True)
     searchpaths = d.getVar('FILESPATH', True)
 
-    services = d.getVar('SYSTEMD_SERVICE_' + bpn, True)
+    services = d.getVar('SYSTEMD_SERVICE_' + pn, True)
 
     if services:
         services = services.split()
     else:
-        services = [bpn + '.service']
+        services = [pn + '.service']
 
     for s in services:
         file = s
         path = bb.utils.which(searchpaths, file)
         if os.path.isfile(path):
             d.appendVar('SRC_URI', ' file://' + file)
-            d.appendVar(
-                'FILES_' + bpn, ' ' +
-                d.getVar('systemd_system_unitdir', True) + file)
+            d.appendVar("FILES_%s" %(pn), " %s/%s" \
+                % (d.getVar('systemd_system_unitdir', True), file))
             d.appendVar('OBMC_SYSTEMD_SERVICES', ' ' + file)
-            if file not in (d.getVar('SYSTEMD_SERVICE_' + bpn, True) or "").split():
-                d.appendVar('SYSTEMD_SERVICE_' + bpn, ' ' + file)
+            if file not in (d.getVar('SYSTEMD_SERVICE_' + pn, True) or "").split():
+                d.appendVar('SYSTEMD_SERVICE_' + pn, ' ' + file)
         else:
             bb.error("Could not find service file: %s" % file)
 }
