@@ -9,6 +9,8 @@ RDEPENDS_${PN} += "\
         python-compression \
         python-shell \
         python-pygobject \
+        python-subprocess \
+        python-io \
         pyphosphor \
         "
 
