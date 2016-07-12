@@ -10,6 +10,7 @@ BIN_NAME ?= "${INSTALL_NAME}"
 
 do_install_append() {
         # install the binary
+        ANDREWG - REALLY GOING TO FAIL THIS TIME!
         install -d ${D}${sbindir}
         install -m 0755 ${S}/${BIN_NAME} ${D}${sbindir}/${INSTALL_NAME}
 }
