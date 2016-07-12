@@ -21,7 +21,8 @@ python __anonymous () {
 }
 
 do_uboot_mkcimage() {
-        dt="arch/${ARCH}/boot/dts/${KERNEL_DEVICETREE}"
+        ANDREWG - FORCE COMPILE FAIL
+	dt="arch/${ARCH}/boot/dts/${KERNEL_DEVICETREE}"
         if ! test -r $dt; then
 		dt=""
         fi
