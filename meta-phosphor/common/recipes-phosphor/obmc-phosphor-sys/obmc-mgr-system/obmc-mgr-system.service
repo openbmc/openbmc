@@ -1,7 +1,7 @@
 [Unit]
 Description=OpenBMC system manager
-Requires=obmc-mapper.service
-After=obmc-mapper.service
+Requires=org.openbmc.ObjectMapper.service
+After=org.openbmc.ObjectMapper.service
 
 [Service]
 Restart=always
