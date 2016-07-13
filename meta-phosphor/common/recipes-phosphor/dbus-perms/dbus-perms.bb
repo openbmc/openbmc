@@ -5,6 +5,12 @@ PR = "r1"
 
 inherit allarch
 inherit obmc-phosphor-license
-inherit obmc-phosphor-dbus-service
+inherit dbus-dir
 
-DBUS_SERVICE_${PN} += "org.openbmc"
+SRC_URI += "file://org.openbmc.conf"
+
+do_install_append() {
+        install -d ${D}${dbus_system_confdir}
+        install -m 0644 ${WORKDIR}/org.openbmc.conf \
+                ${D}${dbus_system_confdir}
+}
