@@ -7,6 +7,4 @@ inherit allarch
 inherit obmc-phosphor-license
 inherit obmc-phosphor-dbus-service
 
-DBUS_SERVICES += " \
-        org.openbmc \
-        "
+DBUS_SERVICE_${PN} += "org.openbmc"
