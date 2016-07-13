@@ -1,7 +1,7 @@
 [Unit]
 Description=Phosphor OpenBMC DBus REST daemon
-Requires=obmc-mapper.service
-After=obmc-mapper.service
+Requires=org.openbmc.ObjectMapper.service
+After=org.openbmc.ObjectMapper.service
 
 [Service]
 Restart=always
