@@ -13,6 +13,15 @@
 #    Additionally the class will instantiate obmc-phosphor-systemd
 #    with any SYSTEMD_SERVICE_%s variables translated appropriately.
 #
+#  DBUS_ACTIVATED_SERVICE_${PN} += "org.openbmc.Foo"
+#    A list of services that should have dbus activation configured.
+#    Services that appear here need not be in DBUS_SERVICES_%s.
+#    If used, the search pattern for the systemd unit file is
+#    changed to be dbus-%s.service.  The class will look for a
+#    dbus activation file with the same name with .service appended.
+#    If one is found, it added to the package and used verbatim.
+#    If it is not found, a default one is generated and used.
+
 #  DBUS_USER_${PN}_org.openbmc.Foo = "dbususer"
 #    The user a service should be configured to run as.  If unspecified
 #    no User property is added.
@@ -26,6 +35,8 @@ DBUS_PACKAGES ?= "${PN}"
 
 _INSTALL_DBUS_CONFIGS=""
 _DEFAULT_DBUS_CONFIGS=""
+_INSTALL_DBUS_ACTIVATIONS=""
+_DEFAULT_DBUS_ACTIVATIONS=""
 
 
 python dbus_do_postinst() {
@@ -44,8 +55,22 @@ python dbus_do_postinst() {
             fd.close()
 
 
+    def make_default_dbus_activation(d, service, user):
+        path = d.getVar('D', True)
+        path += d.getVar('dbus_system_servicesdir', True)
+        with open('%s/%s.service' % (path, service), 'w+') as fd:
+            fd.write('[D-BUS Service]\n')
+            fd.write('Name=%s\n' % service)
+            fd.write('Exec=/bin/false\n')
+            fd.write('User=%s\n' % user)
+            fd.write('SystemdService=dbus-%s.service\n' % service)
+            fd.close()
+
+
     for service_user in listvar_to_list(d, '_DEFAULT_DBUS_CONFIGS'):
         make_default_dbus_config(d, *service_user.split(':'))
+    for service_user in listvar_to_list(d, '_DEFAULT_DBUS_ACTIVATIONS'):
+        make_default_dbus_activation(d, *service_user.split(':'))
 }
 
 
@@ -66,19 +91,34 @@ python() {
             % (d.getVar('dbus_system_confdir', True), service))
 
 
-    def add_sd_unit(d, service, pkg):
+    def add_sd_unit(d, prefix, service, pkg):
         set_append(
-            d, 'SYSTEMD_SERVICE_%s' % pkg, '%s.service' % service)
-        set_append(d, '_UNIT_SUBSTITUTIONS_%s.service' % service,
+            d, 'SYSTEMD_SERVICE_%s' % pkg, '%s%s.service' % (
+                prefix, service))
+        set_append(d, '_UNIT_SUBSTITUTIONS_%s%s.service' % (prefix, service),
             'BUSNAME:%s' % service)
 
 
-    def add_sd_user(d, service, pkg):
+    def add_sd_user(d, prefix, service, pkg):
         user = d.getVar(
             'DBUS_USER_%s_%s' % (pkg, service), True)
         if user:
-            set_append(d, 'SYSTEMD_USER_%s_%s.service' % (
-                pkg, service), user)
+            set_append(d, 'SYSTEMD_USER_%s_%s%s.service' % (
+                pkg, prefix, service), user)
+
+
+    def add_dbus_activation(d, service, pkg):
+        path = bb.utils.which(searchpaths, '%s.service' % service)
+        if not os.path.isfile(path):
+            user = d.getVar(
+                'DBUS_USER_%s_%s' % (pkg, service), True) or 'root'
+            set_append(d, '_DEFAULT_DBUS_ACTIVATIONS', '%s:%s' % (
+                service, user))
+        else:
+            set_append(d, 'SRC_URI', 'file://%s.service' % service)
+            set_append(d, '_INSTALL_DBUS_ACTIVATIONS', '%s.service' % service)
+        set_append(d, 'FILES_%s' % pkg, '%s%s.service' \
+            % (d.getVar('dbus_system_servicesdir', True), service))
 
 
     for pkg in listvar_to_list(d, 'DBUS_PACKAGES'):
@@ -86,11 +126,15 @@ python() {
             set_append(d, 'SYSTEMD_PACKAGES', pkg)
 
         services = listvar_to_list(d, 'DBUS_SERVICE_%s' % pkg)
+        auto = listvar_to_list(d, 'DBUS_ACTIVATED_SERVICE_%s' % pkg)
 
-        for service in services:
+        for service in set(services).union(auto):
+            prefix = 'dbus-' if service in auto else ''
             add_dbus_config(d, service, pkg)
-            add_sd_unit(d, service, pkg)
-            add_sd_user(d, service, pkg)
+            add_sd_unit(d, prefix, service, pkg)
+            add_sd_user(d, prefix, service, pkg)
+            if prefix:
+                add_dbus_activation(d, service, pkg)
 }
 
 
@@ -102,6 +146,14 @@ do_install_append() {
         for c in ${_INSTALL_DBUS_CONFIGS}; do
                 install -m 0644 ${WORKDIR}/$c \
                         ${D}${dbus_system_confdir}$c
+        done
+        # install the dbus activation files
+        [ -z "${_INSTALL_DBUS_ACTIVATIONS}" ] && \
+                [ -z "${_DEFAULT_DBUS_ACTIVATIONS}" ] || \
+                install -d ${D}${dbus_system_servicesdir}
+        for s in ${_INSTALL_DBUS_ACTIVATIONS}; do
+                install -m 0644 ${WORKDIR}/$s\
+                        ${D}${dbus_system_servicesdir}$s
         done
 }
 
