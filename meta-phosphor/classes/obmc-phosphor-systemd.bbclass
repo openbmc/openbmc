@@ -21,13 +21,23 @@
 #      VAR:VALUE
 #    where {VAR} is the format string bitbake should look for in the
 #    unit file and VALUE is the value to substitute.
+#
+# SYSTEMD_USER_${PN}_${PN}.service = "foo"
+#    The user for the unit.
 
 
 inherit obmc-phosphor-utils
 inherit systemd
+inherit useradd
 
 _INSTALL_SD_UNITS=""
 SYSTEMD_DEFAULT_TARGET ?= "obmc-standby.target"
+
+# Big ugly hack to prevent useradd.bbclass post-parse sanity checker failure.
+# If there are users to be added, we'll add them in our post-parse.
+# If not...there don't seem to be any ill effects...
+USERADD_PACKAGES ?= " "
+USERADD_PARAM_${PN} ?= ";"
 
 
 def systemd_is_service(unit):
@@ -77,6 +87,30 @@ python() {
             set_append(d, 'SYSTEMD_SUBSTITUTIONS_%s' % unit,
                 '%s:%s' % (x, d.getVar(x, True)))
 
+        set_append(d, 'SYSTEMD_SUBSTITUTIONS_%s' % unit,
+            'USER:%s' % d.getVar('SYSTEMD_USER_%s_%s' % (pkg, unit), True))
+
+
+    def add_sd_user(d, unit, pkg):
+        opts = [
+            '--system',
+            '--home',
+            '/',
+            '--no-create-home',
+            '--shell /sbin/nologin',
+            '--user-group']
+
+        user = d.getVar(
+            'SYSTEMD_USER_%s_%s' % (pkg, unit), True)
+        if user:
+            set_append(
+                d,
+                'USERADD_PARAM_%s' % pkg,
+                '%s' % (' '.join(opts + [user])),
+                ';')
+            if pkg not in d.getVar('USERADD_PACKAGES', True):
+                set_append(d, 'USERADD_PACKAGES', pkg)
+
 
     pn = d.getVar('PN', True)
     if d.getVar('SYSTEMD_SERVICE_%s' % pn, True) is None:
@@ -86,6 +120,7 @@ python() {
         for unit in listvar_to_list(d, 'SYSTEMD_SERVICE_%s' % pkg):
             check_sd_unit(d, unit)
             add_sd_unit(d, unit, pkg)
+            add_sd_user(d, unit, pkg)
 }
 
 
