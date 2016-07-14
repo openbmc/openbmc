@@ -13,11 +13,21 @@
 # INHIBIT_SYSTEMD_RESTART_POLICY_${unit}
 #    Inhibit the warning that is displayed if a service unit without a
 #    restart policy is detected.
+#
+# SYSTEMD_SUBSTITUTIONS_${unit}
+#    Variables in this list will be substituted in the specified unit
+#    file during install (if bitbake finds python {format} strings
+#    in the unit file itself).  List entries take the form:
+#      VAR:VALUE
+#    where {VAR} is the format string bitbake should look for in the
+#    unit file and VALUE is the value to substitute.
+
 
 inherit obmc-phosphor-utils
 inherit systemd
 
 _INSTALL_SD_UNITS=""
+SYSTEMD_DEFAULT_TARGET ?= "obmc-standby.target"
 
 
 def systemd_is_service(unit):
@@ -59,6 +69,14 @@ python() {
             % (d.getVar('systemd_system_unitdir', True), unit))
         set_append(d, '_INSTALL_SD_UNITS', unit)
 
+        for x in [
+                'base_bindir',
+                'bindir',
+                'sbindir',
+                'SYSTEMD_DEFAULT_TARGET' ]:
+            set_append(d, 'SYSTEMD_SUBSTITUTIONS_%s' % unit,
+                '%s:%s' % (x, d.getVar(x, True)))
+
 
     pn = d.getVar('PN', True)
     if d.getVar('SYSTEMD_SERVICE_%s' % pn, True) is None:
@@ -68,6 +86,27 @@ python() {
         for unit in listvar_to_list(d, 'SYSTEMD_SERVICE_%s' % pkg):
             check_sd_unit(d, unit)
             add_sd_unit(d, unit, pkg)
+}
+
+
+python systemd_do_postinst() {
+    for unit in listvar_to_list(d, '_INSTALL_SD_UNITS'):
+        subs = dict([ x.split(':') for x in
+            listvar_to_list(d, 'SYSTEMD_SUBSTITUTIONS_%s' % unit)])
+        if not subs:
+            continue
+
+        path = d.getVar('D', True)
+        path += d.getVar('systemd_system_unitdir', True)
+        path += '/%s' % unit
+        with open(path, 'r') as fd:
+            content = fd.read()
+        with open(path, 'w+') as fd:
+            try:
+                fd.write(content.format(**subs))
+            except KeyError as e:
+                bb.fatal('No substitution found for %s in '
+                    'unit file \'%s\'' % (e, unit))
 }
 
 
@@ -84,3 +123,6 @@ do_install_append() {
                         ${D}${systemd_system_unitdir}/$s
         done
 }
+
+
+do_install[postfuncs] += "systemd_do_postinst"
