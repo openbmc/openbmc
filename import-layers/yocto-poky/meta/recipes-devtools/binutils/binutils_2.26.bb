@@ -13,7 +13,8 @@ EXTRA_OECONF += "--with-sysroot=/ \
 EXTRA_OECONF_class-native = "--enable-targets=all \
                              --enable-64-bit-bfd \
                              --enable-install-libiberty \
-                             --enable-install-libbfd"
+                             --enable-install-libbfd \
+                             --disable-werror"
 
 do_install_class-native () {
 	autotools_do_install
