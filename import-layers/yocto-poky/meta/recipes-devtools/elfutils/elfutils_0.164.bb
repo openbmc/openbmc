@@ -20,6 +20,7 @@ SRC_URI += "\
         file://0001-fix-a-stack-usage-warning.patch \
         file://aarch64_uio.patch \
         file://shadow.patch \
+	file://libebl-Fix-missing-brackets-around-if-statement-body.patch \
 "
 
 # pick the patch from debian
