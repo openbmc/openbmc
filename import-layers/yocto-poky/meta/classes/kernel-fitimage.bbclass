@@ -7,12 +7,17 @@ python __anonymous () {
         depends = "%s u-boot-mkimage-native dtc-native" % depends
         d.setVar("DEPENDS", depends)
 
+        if d.getVar("UBOOT_ARCH", True) == "x86":
+            replacementtype = "bzImage"
+        else:
+            replacementtype = "zImage"
+
 	# Override KERNEL_IMAGETYPE_FOR_MAKE variable, which is internal
 	# to kernel.bbclass . We have to override it, since we pack zImage
 	# (at least for now) into the fitImage .
         typeformake = d.getVar("KERNEL_IMAGETYPE_FOR_MAKE", True) or ""
         if 'fitImage' in typeformake.split():
-            d.setVar('KERNEL_IMAGETYPE_FOR_MAKE', typeformake.replace('fitImage', 'zImage'))
+            d.setVar('KERNEL_IMAGETYPE_FOR_MAKE', typeformake.replace('fitImage', replacementtype))
 
         image = d.getVar('INITRAMFS_IMAGE', True)
         if image:
@@ -138,6 +143,33 @@ EOF
 }
 
 #
+# Emit the fitImage ITS setup section
+#
+# $1 ... .its filename
+# $2 ... Image counter
+# $3 ... Path to setup image
+fitimage_emit_section_setup() {
+
+	setup_csum="sha1"
+
+	cat << EOF >> ${1}
+                setup@${2} {
+                        description = "Linux setup.bin";
+                        data = /incbin/("${3}");
+                        type = "x86_setup";
+                        arch = "${UBOOT_ARCH}";
+                        os = "linux";
+                        compression = "none";
+                        load = <0x00090000>;
+                        entry = <0x00090000>;
+                        hash@1 {
+                                algo = "${setup_csum}";
+                        };
+                };
+EOF
+}
+
+#
 # Emit the fitImage ITS ramdisk section
 #
 # $1 ... .its filename
@@ -171,6 +203,7 @@ EOF
 # $2 ... Linux kernel ID
 # $3 ... DTB image ID
 # $4 ... ramdisk ID
+# $5 ... config ID
 fitimage_emit_section_config() {
 
 	conf_csum="sha1"
@@ -179,24 +212,25 @@ fitimage_emit_section_config() {
 	fi
 
 	# Test if we have any DTBs at all
-	if [ -z "${3}" -a -z "${4}" ] ; then
-		conf_desc="Boot Linux kernel"
-		fdt_line=""
-		ramdisk_line=""
-	elif [ -z "${4}" ]; then
-		conf_desc="Boot Linux kernel with FDT blob"
+	conf_desc="Linux kernel"
+	kernel_line="kernel = \"kernel@${2}\";"
+	fdt_line=""
+	ramdisk_line=""
+
+	if [ -n "${3}" ]; then
+		conf_desc="${conf_desc}, FDT blob"
 		fdt_line="fdt = \"fdt@${3}\";"
-		ramdisk_line=""
-	elif [ -z "${3}" ]; then
-		conf_desc="Boot Linux kernel with ramdisk"
-		fdt_line=""
-		ramdisk_line="ramdisk = \"ramdisk@${4}\";"
-	else
-		conf_desc="Boot Linux kernel with FDT blob, ramdisk"
-		fdt_line="fdt = \"fdt@${3}\";"
+	fi
+
+	if [ -n "${4}" ]; then
+		conf_desc="${conf_desc}, ramdisk"
 		ramdisk_line="ramdisk = \"ramdisk@${4}\";"
 	fi
-	kernel_line="kernel = \"kernel@${2}\";"
+
+	if [ -n "${5}" ]; then
+		conf_desc="${conf_desc}, setup"
+		setup_line="setup = \"setup@${5}\";"
+	fi
 
 	cat << EOF >> ${1}
                 default = "conf@1";
@@ -205,6 +239,7 @@ fitimage_emit_section_config() {
 			${kernel_line}
 			${fdt_line}
 			${ramdisk_line}
+			${setup_line}
                         hash@1 {
                                 algo = "${conf_csum}";
                         };
@@ -212,15 +247,21 @@ EOF
 
 	if [ ! -z "${conf_sign_keyname}" ] ; then
 
-		if [ -z "${3}" -a -z "${4}" ] ; then
-			sign_line="sign-images = \"kernel\";"
-		elif [ -z "${4}" ]; then
-			sign_line="sign-images = \"fdt\", \"kernel\";"
-		elif [ -z "${3}" ]; then
-			sign_line="sign-images = \"ramdisk\", \"kernel\";"
-		else
-			sign_line="sign-images = \"ramdisk\", \"fdt\", \"kernel\";"
+		sign_line="sign-images = \"kernel\""
+
+		if [ -n "${3}" ]; then
+			sign_line="${sign_line}, \"fdt\""
 		fi
+
+		if [ -n "${4}" ]; then
+			sign_line="${sign_line}, \"ramdisk\""
+		fi
+
+		if [ -n "${5}" ]; then
+			sign_line="${sign_line}, \"setup\""
+		fi
+
+		sign_line="${sign_line};"
 
 		cat << EOF >> ${1}
                         signature@1 {
@@ -246,6 +287,7 @@ fitimage_assemble() {
 	kernelcount=1
 	dtbcount=""
 	ramdiskcount=${3}
+	setupcount=""
 	rm -f ${1} arch/${ARCH}/boot/${2}
 
 	fitimage_emit_fit_header ${1}
@@ -279,7 +321,15 @@ fitimage_assemble() {
 	fi
 
 	#
-	# Step 3: Prepare a ramdisk section.
+	# Step 3: Prepare a setup section. (For x86)
+	#
+	if test -e arch/${ARCH}/boot/setup.bin ; then
+		setupcount=1
+		fitimage_emit_section_setup ${1} "${setupcount}" arch/${ARCH}/boot/setup.bin
+	fi
+
+	#
+	# Step 4: Prepare a ramdisk section.
 	#
 	if [ "x${ramdiskcount}" = "x1" ] ; then
 		copy_initramfs
@@ -290,21 +340,23 @@ fitimage_assemble() {
 
 	# Force the first Kernel and DTB in the default config
 	kernelcount=1
-	dtbcount=1
+	if test -n "${dtbcount}"; then
+		dtbcount=1
+	fi
 
 	#
-	# Step 4: Prepare a configurations section
+	# Step 5: Prepare a configurations section
 	#
 	fitimage_emit_section_maint ${1} confstart
 
-	fitimage_emit_section_config ${1} ${kernelcount} ${dtbcount} ${ramdiskcount}
+	fitimage_emit_section_config ${1} "${kernelcount}" "${dtbcount}" "${ramdiskcount}" "${setupcount}"
 
 	fitimage_emit_section_maint ${1} sectend
 
 	fitimage_emit_section_maint ${1} fitend
 
 	#
-	# Step 5: Assemble the image
+	# Step 6: Assemble the image
 	#
 	uboot-mkimage \
 		${@'-D "${UBOOT_MKIMAGE_DTCOPTS}"' if len('${UBOOT_MKIMAGE_DTCOPTS}') else ''} \
@@ -312,7 +364,7 @@ fitimage_assemble() {
 		arch/${ARCH}/boot/${2}
 
 	#
-	# Step 6: Sign the image and add public key to U-Boot dtb
+	# Step 7: Sign the image and add public key to U-Boot dtb
 	#
 	if [ "x${UBOOT_SIGN_ENABLE}" = "x1" ] ; then
 		uboot-mkimage \
