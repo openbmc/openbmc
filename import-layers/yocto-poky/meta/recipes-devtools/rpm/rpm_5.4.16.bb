@@ -116,6 +116,7 @@ SRC_URI += " \
 	   file://rpm-fix-lua-tests-compilation-failure.patch \
 	   file://rpmqv.c-check-_gpg_passphrase-before-ask-for-input.patch \
 	   file://0001-Disable-__sync_add_and_fetch_8-on-nios2.patch \
+	   file://gcc6-stdlib.patch \
 "
 
 # OE specific changes
@@ -344,7 +345,7 @@ EXTRA_OECONF += "--verbose \
 		--program-prefix= \
 		YACC=byacc"
 
-CFLAGS_append = " -DRPM_VENDOR_WINDRIVER -DRPM_VENDOR_POKY -DRPM_VENDOR_OE"
+CFLAGS_append = " -DRPM_VENDOR_WINDRIVER -DRPM_VENDOR_POKY -DRPM_VENDOR_OE -D_GLIBCXX_INCLUDE_NEXT_C_HEADERS"
 
 LDFLAGS_append_libc-uclibc = "-lrt -lpthread"
 
