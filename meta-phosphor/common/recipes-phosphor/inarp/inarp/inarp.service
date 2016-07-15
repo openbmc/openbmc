@@ -3,6 +3,7 @@ Description=Phosphor Inverse ARP daemon
 
 [Service]
 ExecStart=/usr/sbin/inarp
+Restart=always
 
 [Install]
 WantedBy=multi-user.target
