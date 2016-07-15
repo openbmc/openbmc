@@ -64,7 +64,8 @@ do_concat_dtb () {
 	# Concatenate U-Boot w/o DTB & DTB with public key
 	# (cf. kernel-fitimage.bbclass for more details)
 	if [ "x${UBOOT_SIGN_ENABLE}" = "x1" ]; then
-		if [ "x${UBOOT_SUFFIX}" = "ximg" -a -e "${DEPLOYDIR}/${UBOOT_DTB_IMAGE}" ]; then
+		if [ "x${UBOOT_SUFFIX}" = "ximg" -o "x${UBOOT_SUFFIX}" = "xrom" ] && \
+			[ -e "${DEPLOYDIR}/${UBOOT_DTB_IMAGE}" ]; then
 			oe_runmake EXT_DTB=${DEPLOYDIR}/${UBOOT_DTB_IMAGE}
 			install ${S}/${UBOOT_BINARY} ${DEPLOYDIR}/${UBOOT_IMAGE}
 			install ${S}/${UBOOT_BINARY} ${DEPLOY_DIR_IMAGE}/${UBOOT_IMAGE}
