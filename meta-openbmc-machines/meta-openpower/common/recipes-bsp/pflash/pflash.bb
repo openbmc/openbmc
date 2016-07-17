@@ -5,22 +5,14 @@ LICENSE = "Apache-2.0"
 
 SRC_URI += "git://github.com/open-power/skiboot.git"
 
-SRC_URI += "file://0001-Make-links-target-reusable.patch"
-SRC_URI += "file://0002-external-Remove-external-shared-link-targets.patch"
-SRC_URI += "file://0003-external-Fix-pflash-install-target.patch"
-SRC_URI += "file://0004-external-Remove-m64-from-shared-CFLAGS-on-ARM.patch"
-SRC_URI += "file://0005-external-Create-shared-rules.mk.patch"
-SRC_URI += "file://0006-external-Add-dynamically-linked-pflash.patch"
-SRC_URI += "file://0007-external-Fix-ARM-build-failure-with-parallel-make.patch"
-
 LIC_FILES_CHKSUM = "file://${S}/LICENCE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
-SRCREV = "skiboot-5.2.2"
-PV = "5.2.2"
+SRCREV = "skiboot-5.2.4"
+PV = "5.2.4"
 
 S = "${WORKDIR}/git"
 
-EXTRA_OEMAKE = 'CROSS_COMPILE=${TARGET_PREFIX} PFLASH_VERSION=${PV} V=1'
+EXTRA_OEMAKE = 'CROSS_COMPILE=${TARGET_PREFIX} SKIBOOT_VERSION=${PV} PFLASH_VERSION=${PV} V=1'
 
 do_compile () {
         oe_runmake -C external/pflash all LINKAGE=dynamic
