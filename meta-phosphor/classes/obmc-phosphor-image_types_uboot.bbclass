@@ -46,7 +46,7 @@ mk_nor_image() {
 do_generate_flash() {
        INITRD_CTYPE=${INITRAMFS_CTYPE}
        ddir="${DEPLOY_DIR_IMAGE}"
-       kernel="${KERNEL_IMAGETYPE}"
+       kernel="cuImage"
        uboot="u-boot.${UBOOT_SUFFIX}"
        initrd="${INITRD_LINK_NAME}.cpio.${INITRD_CTYPE}"
        uinitrd="${initrd}.u-boot"
