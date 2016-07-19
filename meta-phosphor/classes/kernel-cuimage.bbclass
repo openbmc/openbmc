@@ -39,7 +39,6 @@ do_uboot_mkcimage() {
 			fi
 
 			uboot-mkimage -A ${UBOOT_ARCH} -O linux -T kernel -C "${linux_comp}" -a ${UBOOT_LOADADDRESS} -e $ENTRYPOINT -n "${DISTRO_NAME}/${PV}/${MACHINE}" -d linux-dts.bin arch/${ARCH}/boot/cuImage
-			rm -f linux.bin linux-dts.bin
 		fi
 	fi
 }
