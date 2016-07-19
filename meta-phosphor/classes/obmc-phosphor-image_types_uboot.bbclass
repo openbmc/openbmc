@@ -17,6 +17,8 @@ FLASH_IMAGE_NAME ?= "flash-${MACHINE}-${DATETIME}"
 FLASH_IMAGE_NAME[vardepsexclude] = "DATETIME"
 FLASH_IMAGE_LINK ?= "flash-${MACHINE}"
 
+FLASH_KERNEL_IMAGETYPE ?= "cuImage"
+
 FLASH_UBOOT_OFFSET ?= "0"
 FLASH_KERNEL_OFFSET ?= "512"
 FLASH_INITRD_OFFSET ?= "3072"
@@ -46,7 +48,7 @@ mk_nor_image() {
 do_generate_flash() {
        INITRD_CTYPE=${INITRAMFS_CTYPE}
        ddir="${DEPLOY_DIR_IMAGE}"
-       kernel="${KERNEL_IMAGETYPE}"
+       kernel="${FLASH_KERNEL_IMAGETYPE}"
        uboot="u-boot.${UBOOT_SUFFIX}"
        initrd="${INITRD_LINK_NAME}.cpio.${INITRD_CTYPE}"
        uinitrd="${initrd}.u-boot"
