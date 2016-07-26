@@ -16,9 +16,9 @@ RDEPENDS_${PN} += "libsystemd"
 
 TARGET_CFLAGS += " -fpic -std=gnu++14"
 
-SRC_URI += "git://github.com/openbmc/ipmi-fru-parser"
+SRC_URI += "git://github.com/bradbishop/ipmi-fru-parser"
 
-SRCREV = "a26ed7375261ebcfffa68cf478bcb8f2204c6c92"
+SRCREV = "dcaae3a17c407ad83bae0b58c44085fbc3eb4bc1"
 
 FILES_SOLIBSDEV += "${libdir}/host-ipmid/lib*${SOLIBSDEV}"
 FILES_${PN} += "${libdir}/host-ipmid/lib*${SOLIBS}"
