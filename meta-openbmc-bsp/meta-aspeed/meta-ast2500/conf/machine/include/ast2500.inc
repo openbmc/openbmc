@@ -4,7 +4,7 @@
 
 PREFERRED_PROVIDER_virtual/kernel ?= "linux-obmc"
 
-UBOOT_MACHINE ?= "ast_g5_config"
+UBOOT_MACHINE ?= "ast_g5_ncsi_config"
 UBOOT_ENTRYPOINT ?= "0x80001000"
 UBOOT_LOADADDRESS ?= "0x80001000"
 
