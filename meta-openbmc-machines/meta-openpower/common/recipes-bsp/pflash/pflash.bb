@@ -7,8 +7,8 @@ SRC_URI += "git://github.com/open-power/skiboot.git"
 
 LIC_FILES_CHKSUM = "file://${S}/LICENCE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
-SRCREV = "skiboot-5.2.4"
-PV = "5.2.4"
+SRCREV = "skiboot-5.3.0"
+PV = "5.3.0"
 
 S = "${WORKDIR}/git"
 
