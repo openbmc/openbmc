@@ -1,0 +1,40 @@
+From b9abf36fb4cabdedc68de43b104c5e67e8800920 Mon Sep 17 00:00:00 2001
+From: Patrick Williams <patrick@stwcx.xyz>
+Date: Thu, 28 Jul 2016 06:33:37 -0500
+Subject: [PATCH] pflash: compile fail due to version mismatch.
+
+libflash.so is currently versioned using make_version.sh, which
+appends 'skiboot-' and optionally '-dirty' depending if the
+build is done within a git repository.  There seems to be a parallel
+build problem where 'make_version.sh' can return different results.
+
+Compiling with Yocto I sometimes see:
+
+    arm-openbmc-linux-gnueabi-gcc ... -shared -Wl,-soname,libflash.so
+        -o libflash.so.skiboot-5.2.5 ...
+    arm-openbmc-linux-gnueabi-gcc ...
+        ../shared/libflash.so.skiboot-5.2.5-dirty-da39a3e -lrt -o pflash
+    arm-openbmc-linux-gnueabi-gcc: error:
+        ../shared/libflash.so.skiboot-5.2.5-dirty-da39a3e: No such file or
+        directory
+
+Changed libflash.so versioning to be libflash.so.$(SKIBOOT_VERSION)
+whenever SKIBOOT_VERSION is defined.  This ensures a consistent and
+reasonable library version: libflash.so.5.2.5
+
+Signed-off-by: Patrick Williams <patrick@stwcx.xyz>
+CC: Joel Stanley <joel@jms.id.au>
+---
+ external/shared/rules.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/external/shared/rules.mk b/external/shared/rules.mk
+index a4976a1..59bab2d 100644
+--- a/external/shared/rules.mk
++++ b/external/shared/rules.mk
+@@ -1 +1 @@
+-SHARED_NAME=libflash.so.$(shell ../../make_version.sh)
++SHARED_NAME=libflash.so.$(if $(SKIBOOT_VERSION),$(SKIBOOT_VERSION),$(shell ../../make_version.sh))
+-- 
+2.9.0
+

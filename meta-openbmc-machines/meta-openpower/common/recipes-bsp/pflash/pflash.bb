@@ -4,11 +4,12 @@ HOMEPAGE = "https://github.com/open-power"
 LICENSE = "Apache-2.0"
 
 SRC_URI += "git://github.com/open-power/skiboot.git"
+SRC_URI += "file://0001-pflash-compile-fail-due-to-version-mismatch.patch"
 
 LIC_FILES_CHKSUM = "file://${S}/LICENCE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
-SRCREV = "skiboot-5.2.4"
-PV = "5.2.4"
+SRCREV = "skiboot-5.2.5"
+PV = "5.2.5"
 
 S = "${WORKDIR}/git"
 
