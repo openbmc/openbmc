@@ -17,7 +17,10 @@ TARGET_CFLAGS   += "-fpic"
 RDEPENDS_${PN} += "clear-once"
 RDEPENDS_${PN} += "settings"
 RDEPENDS_${PN} += "network"
-SRC_URI += "git://github.com/openbmc/phosphor-host-ipmid"
+SRC_URI += "git://github.com/openbmc/phosphor-host-ipmid \
+            file://host-ipmid-whitelist.conf \
+            file://ipmi-fru-parser-whitelist.conf \
+            file://openpower-host-ipmi-oem-whitelist.conf"
 
 SRCREV = "87e080b537aff3fd22ec56ef72660937bed38422"
 
@@ -30,4 +33,17 @@ do_install() {
 
         install -m 0755 -d ${D}${includedir}/host-ipmid
         install -m 0644 ${S}/ipmid-api.h ${D}${includedir}/host-ipmid/
+}
+
+def find_cfgs(d):
+    sources=src_patches(d, True)
+    sources_list=[]
+    for s in sources:
+        if s.endswith('.conf'):
+            sources_list.append(s)
+
+    return sources_list
+
+do_configure () {
+        ${S}/generate_whitelist.sh ${@" ".join(find_cfgs(d))}  > ipmiwhitelist.C
 }
