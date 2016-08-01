@@ -1,0 +1,5 @@
+[gerrit]
+host=gerrit.openbmc-project.xyz
+port=29418
+project=openbmc/openbmc.git
+defaultbranch=master
