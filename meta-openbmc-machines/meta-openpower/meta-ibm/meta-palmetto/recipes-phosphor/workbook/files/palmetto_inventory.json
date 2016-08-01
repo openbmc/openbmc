@@ -1,0 +1,176 @@
+{
+   "/system" : {
+      "fru_area" : "PRODUCT",
+      "fru_id" : "53",
+      "fru_name" : "SYS",
+      "is_fru" : "true",
+      "type" : "SYS"
+   },
+   "/system/chassis" : {
+      "fru_area" : "CHASSIS",
+      "fru_id" : "13",
+      "fru_name" : "CHASSIS",
+      "is_fru" : "true",
+      "type" : "NODE"
+   },
+   "/system/chassis/motherboard" : {
+      "fru_area" : "BOARD",
+      "fru_id" : "52",
+      "fru_name" : "MOTHERBOARD",
+      "is_fru" : "false",
+      "type" : "MAIN_PLANAR"
+   },
+   "/system/chassis/motherboard/bmc" : {
+      "is_fru" : "false",
+      "manufacturer" : "ASPEED",
+      "type" : "BMC"
+   },
+   "/system/chassis/motherboard/cpu" : {
+      "fru_area" : "BOARD",
+      "fru_id" : "1",
+      "fru_name" : "CPU0",
+      "is_fru" : "true",
+      "type" : "PROC"
+   },
+   "/system/chassis/motherboard/cpu/core0" : {
+      "is_fru" : "false",
+      "type" : "CORE"
+   },
+   "/system/chassis/motherboard/cpu/core1" : {
+      "is_fru" : "false",
+      "type" : "CORE"
+   },
+   "/system/chassis/motherboard/cpu/core10" : {
+      "is_fru" : "false",
+      "type" : "CORE"
+   },
+   "/system/chassis/motherboard/cpu/core11" : {
+      "is_fru" : "false",
+      "type" : "CORE"
+   },
+   "/system/chassis/motherboard/cpu/core2" : {
+      "is_fru" : "false",
+      "type" : "CORE"
+   },
+   "/system/chassis/motherboard/cpu/core3" : {
+      "is_fru" : "false",
+      "type" : "CORE"
+   },
+   "/system/chassis/motherboard/cpu/core4" : {
+      "is_fru" : "false",
+      "type" : "CORE"
+   },
+   "/system/chassis/motherboard/cpu/core5" : {
+      "is_fru" : "false",
+      "type" : "CORE"
+   },
+   "/system/chassis/motherboard/cpu/core6" : {
+      "is_fru" : "false",
+      "type" : "CORE"
+   },
+   "/system/chassis/motherboard/cpu/core7" : {
+      "is_fru" : "false",
+      "type" : "CORE"
+   },
+   "/system/chassis/motherboard/cpu/core8" : {
+      "is_fru" : "false",
+      "type" : "CORE"
+   },
+   "/system/chassis/motherboard/cpu/core9" : {
+      "is_fru" : "false",
+      "type" : "CORE"
+   },
+   "/system/chassis/motherboard/dimm0" : {
+      "fru_area" : "PRODUCT",
+      "fru_id" : "3",
+      "fru_name" : "DIMM0",
+      "is_fru" : "true",
+      "type" : "DIMM"
+   },
+   "/system/chassis/motherboard/dimm1" : {
+      "fru_area" : "PRODUCT",
+      "fru_id" : "4",
+      "fru_name" : "DIMM1",
+      "is_fru" : "true",
+      "type" : "DIMM"
+   },
+   "/system/chassis/motherboard/dimm2" : {
+      "fru_area" : "PRODUCT",
+      "fru_id" : "5",
+      "fru_name" : "DIMM2",
+      "is_fru" : "true",
+      "type" : "DIMM"
+   },
+   "/system/chassis/motherboard/dimm3" : {
+      "fru_area" : "PRODUCT",
+      "fru_id" : "6",
+      "fru_name" : "DIMM3",
+      "is_fru" : "true",
+      "type" : "DIMM"
+   },
+   "/system/chassis/motherboard/fan0" : {
+      "fru_id" : "16",
+      "fru_name" : "FAN0",
+      "is_fru" : "false",
+      "type" : "FAN"
+   },
+   "/system/chassis/motherboard/fan1" : {
+      "fru_id" : "17",
+      "fru_name" : "FAN1",
+      "is_fru" : "false",
+      "type" : "FAN"
+   },
+   "/system/chassis/motherboard/fan2" : {
+      "fru_id" : "18",
+      "fru_name" : "FAN2",
+      "is_fru" : "false",
+      "type" : "FAN"
+   },
+   "/system/chassis/motherboard/fan3" : {
+      "fru_id" : "19",
+      "fru_name" : "FAN3",
+      "is_fru" : "false",
+      "type" : "FAN"
+   },
+   "/system/chassis/motherboard/fan4" : {
+      "fru_id" : "20",
+      "fru_name" : "FAN4",
+      "is_fru" : "false",
+      "type" : "FAN"
+   },
+   "/system/chassis/motherboard/membuf" : {
+      "fru_area" : "BOARD",
+      "is_fru" : "false",
+      "type" : "MEMBUF"
+   },
+   "/system/chassis/motherboard/pcie0" : {
+      "fru_id" : "7",
+      "fru_name" : "PCIE0",
+      "is_fru" : "true",
+      "presence-gpio" : "SLOT0_PRESENT",
+      "type" : "PCIE_CARD"
+   },
+   "/system/chassis/motherboard/pcie1" : {
+      "fru_id" : "8",
+      "fru_name" : "PCIE1",
+      "is_fru" : "true",
+      "presence-gpio" : "SLOT1_PRESENT",
+      "type" : "PCIE_CARD"
+   },
+   "/system/chassis/motherboard/pcieclock" : {
+      "is_fru" : "false",
+      "type" : "CLOCK"
+   },
+   "/system/chassis/motherboard/refclock" : {
+      "is_fru" : "false",
+      "type" : "CLOCK"
+   },
+   "/system/chassis/motherboard/todclock" : {
+      "is_fru" : "false",
+      "type" : "CLOCK"
+   },
+   "/system/motherboard/apss" : {
+      "is_fru" : "false",
+      "type" : "APSS"
+   }
+}
