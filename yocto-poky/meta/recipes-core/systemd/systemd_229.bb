@@ -185,6 +185,7 @@ EXTRA_OECONF = " --with-rootprefix=${rootprefix} \
                  --with-sysvrcnd-path=${sysconfdir} \
                  --with-firmware-path=/lib/firmware \
                  --with-testdir=${PTEST_PATH} \
+                 --disable-hwdb \
                "
 # per the systemd README, define VALGRIND=1 to run under valgrind
 CFLAGS .= "${@bb.utils.contains('PACKAGECONFIG', 'valgrind', ' -DVALGRIND=1', '', d)}"
