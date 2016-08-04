@@ -156,6 +156,7 @@ EOF
 }
 
 do_assemble_fitimage() {
+	cd ${B}
 	if echo ${KERNEL_IMAGETYPES} | grep -wq "fitImage"; then
 		kernelcount=1
 		dtbcount=""
