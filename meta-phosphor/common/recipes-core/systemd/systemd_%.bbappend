@@ -7,6 +7,8 @@ SRC_URI += "file://obmc-standby.target"
 FILES_${PN} += "${libdir}/systemd/network/default.network"
 FILES_${PN} += "${systemd_system_unitdir}/obmc-standby.target"
 
+EXTRA_OECONF += " --disable-hwdb"
+
 do_install_append() {
         install -m 644 ${WORKDIR}/default.network ${D}${libdir}/systemd/network/
         install -m 644 ${WORKDIR}/obmc-standby.target ${D}${systemd_system_unitdir}
