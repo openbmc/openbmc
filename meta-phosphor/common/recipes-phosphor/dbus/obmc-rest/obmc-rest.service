@@ -2,6 +2,7 @@
 Description=Phosphor OpenBMC DBus REST daemon
 Requires=obmc-mapper.service
 After=obmc-mapper.service
+PartOf=systemd-networkd.service
 
 [Service]
 Restart=always
