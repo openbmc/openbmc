@@ -9,6 +9,9 @@ python() {
         version_id = run_git(d, 'describe --dirty')
         if version_id:
                 d.setVar('VERSION_ID', version_id)
+                versionList = version_id.split('-')
+                version = versionList[0] + "-" + versionList[1]
+                d.setVar('VERSION', version)
 
         build_id = run_git(d, 'describe --abbrev=0')
         if build_id:
