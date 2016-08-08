@@ -1,0 +1,15 @@
+[Unit]
+Description=Stop Power%i
+Wants=obmc-power-stop@%i.target
+Before=obmc-power-stop@%i.target
+After=obmc-power-stop-pre@%i.target
+Wants=mapper-wait@-org-openbmc-control-power%i.service
+After=mapper-wait@-org-openbmc-control-power%i.service
+Conflicts=obmc-chassis-start@%i.target
+
+[Service]
+RemainAfterExit=yes
+ExecStart={sbindir}/mapper call /org/openbmc/control/power%i org.openbmc.control.Power setPowerState i 0
+
+[Install]
+WantedBy=obmc-chassis-stop@%i.target

@@ -1,0 +1,8 @@
+[Unit]
+Description=Turn Off %i LED
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+Restart=no
+ExecStart={sbindir}/mapper call /org/openbmc/control/led/%i org.openbmc.Led setOff

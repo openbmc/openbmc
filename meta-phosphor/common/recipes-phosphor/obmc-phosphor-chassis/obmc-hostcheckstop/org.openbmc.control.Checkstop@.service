@@ -1,0 +1,11 @@
+[Unit]
+Description=Phosphor Host%i Checkstop Monitor
+
+[Service]
+Restart=always
+ExecStart={sbindir}/host_checkstop.exe
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
