@@ -27,6 +27,14 @@
 #
 # SYSTEMD_ENVIRONMENT_FILE_${PN} = "foo"
 #    One or more environment files to be installed.
+#
+# SYSTEMD_TEMPLATE_${PN} = "foo@bar.service"
+#    One or more systemd unit templates to be instantiated and
+#    installed in ${SYSTEMD_DEFAULT_TARGET} if unspecified.
+#
+# SYSTEMD_TARGET_${unit} = "multi-user.target"
+#    An alternate location for installing a template unit
+#    instantiation.
 
 
 inherit obmc-phosphor-utils
@@ -35,6 +43,7 @@ inherit useradd
 
 _INSTALL_SD_UNITS=""
 _INSTALL_ENV_FILES=""
+_INSTALL_TEMPLATES=""
 SYSTEMD_DEFAULT_TARGET ?= "obmc-standby.target"
 envfiledir ?= "${sysconfdir}/default"
 
@@ -128,6 +137,16 @@ python() {
         set_append(d, '_INSTALL_ENV_FILES', name)
 
 
+    def instantiate_template(d, inst, pkg):
+        tgt = d.getVar('SYSTEMD_TARGET_%s' % inst, True)
+        if tgt is None:
+            tgt = d.getVar('SYSTEMD_DEFAULT_TARGET', True)
+
+        set_append(d, 'FILES_%s' % pkg, '%s/%s.wants/%s' \
+            % (d.getVar('systemd_system_unitdir', True), tgt, inst))
+        set_append(d, '_INSTALL_TEMPLATES', '%s:%s' % (inst, tgt))
+
+
     pn = d.getVar('PN', True)
     if d.getVar('SYSTEMD_SERVICE_%s' % pn, True) is None:
         d.setVar('SYSTEMD_SERVICE_%s' % pn, '%s.service' % pn)
@@ -139,6 +158,8 @@ python() {
             add_sd_user(d, unit, pkg)
         for name in listvar_to_list(d, 'SYSTEMD_ENVIRONMENT_FILE_%s' % pkg):
             add_env_file(d, name, pkg)
+        for inst in listvar_to_list(d, 'SYSTEMD_TEMPLATE_%s' % pkg):
+            instantiate_template(d, inst, pkg)
 }
 
 
@@ -174,6 +195,15 @@ do_install_append() {
                         -e 's,@BINDIR@,${bindir},g' \
                         -e 's,@SBINDIR@,${sbindir},g' \
                         ${D}${systemd_system_unitdir}/$s
+        done
+
+        # instantiate templates
+        for t in ${_INSTALL_TEMPLATES}; do
+                target=${t##*:}
+                inst=${t%%:*}
+                install -d ${D}${systemd_system_unitdir}/${target}.wants
+                ln -sf ../${inst/@*\./@.} \
+                        ${D}${systemd_system_unitdir}/${target}.wants/$inst
         done
 
         # install environment files
