@@ -1,0 +1,11 @@
+[Unit]
+Description=Read %I EEPROM
+
+[Service]
+Restart=no
+Type=oneshot
+EnvironmentFile={envfiledir}/%I
+ExecStart={sbindir}/phosphor-read-eeprom --eeprom $SYSFS_PATH --fruid $FRUID
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}

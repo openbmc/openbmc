@@ -1,0 +1,11 @@
+[Unit]
+Description=Stop Watchdog%i
+Conflicts=obmc-chassis-start@%i.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart={sbindir}/mapper call /org/openbmc/watchdog/host%i org.openbmc.Watchdog stop
+
+[Install]
+WantedBy=obmc-chassis-stop@%i.target

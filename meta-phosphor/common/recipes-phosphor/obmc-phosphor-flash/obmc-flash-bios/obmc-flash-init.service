@@ -1,0 +1,11 @@
+[Unit]
+Description=Initialize BIOS Flash
+Wants=obmc-standby-reached.target
+After=obmc-standby-reached.target
+
+[Service]
+Restart=no
+ExecStart={sbindir}/mapper call /org/openbmc/control/flash/bios org.openbmc.Flash init
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}

@@ -1,0 +1,12 @@
+[Unit]
+Description=Phosphor Hwmon Poller
+Wants=mapper-wait@-org-openbmc-sensors.service
+After=mapper-wait@-org-openbmc-sensors.service
+
+[Service]
+Restart=always
+ExecStart={sbindir}/hwmon.py
+Environment="PYTHONUNBUFFERED=1"
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}

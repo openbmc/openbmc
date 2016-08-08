@@ -1,0 +1,11 @@
+[Unit]
+Description=Wait For Standby
+Before=obmc-standby-reached.target
+
+[Service]
+Type=oneshot
+ExecStart={base_bindir}/true
+Restart=no
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
