@@ -25,6 +25,9 @@
 # SYSTEMD_USER_${PN}.service = "foo"
 # SYSTEMD_USER_${unit}.service = "foo"
 #    The user for the unit/package.
+#
+# SYSTEMD_ENVIRONMENT_FILE_${PN} = "foo"
+#    One or more environment files to be installed.
 
 
 inherit obmc-phosphor-utils
@@ -33,6 +36,7 @@ inherit useradd
 
 _INSTALL_SD_UNITS=""
 SYSTEMD_DEFAULT_TARGET ?= "obmc-standby.target"
+envfiledir ?= "${sysconfdir}/default"
 
 # Big ugly hack to prevent useradd.bbclass post-parse sanity checker failure.
 # If there are users to be added, we'll add them in our post-parse.
@@ -90,6 +94,7 @@ python() {
                 'base_bindir',
                 'bindir',
                 'sbindir',
+                'envfiledir',
                 'SYSTEMD_DEFAULT_TARGET' ]:
             set_append(d, 'SYSTEMD_SUBSTITUTIONS_%s' % file,
                 '%s:%s' % (x, d.getVar(x, True)))
@@ -134,6 +139,13 @@ python() {
                 set_append(d, 'USERADD_PACKAGES', pkg)
 
 
+    def add_env_file(d, name, pkg):
+        set_append(d, 'SRC_URI', 'file://%s' % name)
+        set_append(d, 'FILES_%s' % pkg, '%s/%s' \
+            % (d.getVar('envfiledir', True), name))
+        set_append(d, '_INSTALL_ENV_FILES', name)
+
+
     pn = d.getVar('PN', True)
     if d.getVar('SYSTEMD_SERVICE_%s' % pn, True) is None:
         d.setVar('SYSTEMD_SERVICE_%s' % pn, '%s.service' % pn)
@@ -144,6 +156,8 @@ python() {
             check_sd_unit(d, nfo)
             add_sd_unit(d, nfo, pkg)
             add_sd_user(d, nfo['unit'], pkg)
+        for name in listvar_to_list(d, 'SYSTEMD_ENVIRONMENT_FILE_%s' % pkg):
+            add_env_file(d, name, pkg)
 }
 
 
@@ -168,6 +182,29 @@ python systemd_do_postinst() {
                         'file \'%s\'' % (e, f))
 
 
+    def install_envs(d):
+        install_dir = d.getVar('D', True)
+        install_dir += d.getVar('envfiledir', True)
+        searchpaths = d.getVar('FILESPATH', True)
+
+        for f in listvar_to_list(d, '_INSTALL_ENV_FILES'):
+            src = bb.utils.which(searchpaths, f)
+            if not os.path.isfile(src):
+                bb.fatal('Did not find SYSTEMD_ENVIRONMENT_FILE:'
+                    '\'%s\'' % src)
+
+            dest = '%s/%s' % (install_dir, f)
+            parent = os.path.dirname(dest)
+            if not os.path.exists(parent):
+                os.makedirs(parent)
+
+            with open(src, 'r') as fd:
+                content = fd.read()
+            with open(dest, 'w+') as fd:
+                fd.write(content)
+
+
+    install_envs(d)
     make_subs(d)
 }
 
