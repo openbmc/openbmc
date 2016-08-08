@@ -1,0 +1,13 @@
+[Unit]
+Description=Phosphor Power Button%i
+Wants=mapper-wait@-org-openbmc-managers-System.service
+After=mapper-wait@-org-openbmc-managers-System.service
+
+[Service]
+Restart=always
+ExecStart={sbindir}/button_power.exe
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}

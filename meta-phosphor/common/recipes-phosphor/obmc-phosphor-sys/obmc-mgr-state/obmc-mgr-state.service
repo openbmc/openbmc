@@ -1,0 +1,13 @@
+[Unit]
+Description=Restore Last State
+Wants=obmc-mgr-state.target
+After=obmc-mgr-state.target
+
+[Service]
+Restart=no
+Type=oneshot
+ExecStart={sbindir}/discover_system_state.py
+Environment="PYTHONUNBUFFERED=1"
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
