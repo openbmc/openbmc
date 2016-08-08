@@ -1,0 +1,10 @@
+[Unit]
+Description=Startup Hacks
+
+[Service]
+Restart=no
+Type=oneshot
+ExecStart={sbindir}/startup_hacks.sh
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}

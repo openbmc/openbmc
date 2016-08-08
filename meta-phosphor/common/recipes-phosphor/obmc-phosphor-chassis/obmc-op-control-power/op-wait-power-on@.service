@@ -1,0 +1,16 @@
+[Unit]
+Description=Wait for Power%i to turn on
+Before=obmc-power-on@%i.target
+Wants=obmc-power-start@%i.target
+Before=obmc-power-start@%i.target
+Wants=mapper-wait@-org-openbmc-control-power%i.service
+After=mapper-wait@-org-openbmc-control-power%i.service
+Conflicts=obmc-chassis-stop@%i.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart={sbindir}/pgood_wait /org/openbmc/control/power%i on
+
+[Install]
+WantedBy=obmc-chassis-start@%i.target

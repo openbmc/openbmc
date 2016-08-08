@@ -1,0 +1,10 @@
+[Unit]
+Description=Turn On %i LED
+Wants=mapper-wait@-org-openbmc-control-led-%i.service
+After=mapper-wait@-org-openbmc-control-led-%i.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+Restart=no
+ExecStart={sbindir}/mapper call /org/openbmc/control/led/%i org.openbmc.Led setOn
