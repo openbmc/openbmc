@@ -1,0 +1,16 @@
+[Unit]
+Description=Wait for Power%i to turn off
+Before=obmc-power-off@%i.target
+Wants=obmc-power-stop@%i.target
+Before=obmc-power-stop@%i.target
+Wants=mapper-wait@-org-openbmc-control-power%i.service
+After=mapper-wait@-org-openbmc-control-power%i.service
+Conflicts=obmc-chassis-start@%i.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart={sbindir}/pgood_wait /org/openbmc/control/power%i off
+
+[Install]
+WantedBy=obmc-chassis-stop@%i.target

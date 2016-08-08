@@ -1,0 +1,13 @@
+[Unit]
+Description=Phosphor Reset Button%i
+Wants=mapper-wait@-org-openbmc-managers-System.service
+After=mapper-wait@-org-openbmc-managers-System.service
+
+[Service]
+Restart=always
+ExecStart={sbindir}/button_reset.exe
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}

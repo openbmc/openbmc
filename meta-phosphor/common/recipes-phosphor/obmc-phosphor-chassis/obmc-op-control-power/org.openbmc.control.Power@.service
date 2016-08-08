@@ -1,0 +1,14 @@
+[Unit]
+Description=Phosphor Power%i Control
+Wants=mapper-wait@-org-openbmc-managers-System.service
+After=mapper-wait@-org-openbmc-managers-System.service
+
+[Service]
+EnvironmentFile={envfiledir}/obmc/power_control
+Restart=always
+ExecStart={sbindir}/power_control.exe $POLL_INTERVAL $PGOOD_TIMEOUT
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}

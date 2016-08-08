@@ -1,0 +1,15 @@
+[Unit]
+Description=Read %I EEPROM
+Wants=mapper-wait@-org-openbmc-managers-System.service
+After=mapper-wait@-org-openbmc-managers-System.service
+Wants=mapper-wait@-org-openbmc-inventory-%i.service
+After=mapper-wait@-org-openbmc-inventory-%i.service
+
+[Service]
+Restart=no
+Type=oneshot
+EnvironmentFile={envfiledir}/obmc/eeproms/%I
+ExecStart={sbindir}/phosphor-read-eeprom --eeprom $SYSFS_PATH --fruid $FRUID
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
