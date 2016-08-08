@@ -1,0 +1,16 @@
+[Unit]
+Description=Phosphor BMC Code Update
+Wants=mapper-wait@-org-openbmc-managers-Download.service
+After=mapper-wait@-org-openbmc-managers-Download.service
+Wants=mapper-wait@-org-openbmc-control-bmc0.service
+After=mapper-wait@-org-openbmc-control-bmc0.service
+
+[Service]
+Restart=always
+ExecStart={sbindir}/bmc_update.py
+Environment="PYTHONUNBUFFERED=1"
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}

@@ -1,0 +1,11 @@
+[Unit]
+Description=Phosphor BMC%i Control
+
+[Service]
+Restart=always
+ExecStart={sbindir}/control_bmc.exe
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
