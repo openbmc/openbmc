@@ -12,6 +12,7 @@ inherit setuptools
 DEPENDS += "systemd"
 
 DBUS_SERVICE_${PN} += "org.openbmc.ObjectMapper"
+SYSTEMD_SERVICE_${PN} = "mapper-wait@.service mapper-method@.service"
 RDEPENDS_${PN} += " \
         python-xml \
         python-dbus \

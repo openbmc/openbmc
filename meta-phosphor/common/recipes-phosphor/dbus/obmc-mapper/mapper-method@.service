@@ -1,0 +1,9 @@
+[Unit]
+Description=Invoke DBus method %i
+Requires=obmc-mapper.target
+After=obmc-mapper.target
+
+[Service]
+Type=oneshot
+EnvironmentFile={envfiledir}/obmc/%i
+ExecStart={sbindir}/mapper call $OBJECTPATH $INTERFACE $METHOD $PARAMETERS
