@@ -1,5 +1,6 @@
 [Unit]
 Description=Phosphor OpenBMC DBus service management daemon
+Before=obmc-mapper.target
 
 [Service]
 Restart=always

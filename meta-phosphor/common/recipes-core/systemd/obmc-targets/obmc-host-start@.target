@@ -1,0 +1,7 @@
+[Unit]
+Description=Start Host%i
+Wants={SYSTEMD_DEFAULT_TARGET}
+After=obmc-host-start-pre@%i.target
+Conflicts=obmc-chassis-stop@%i.target
+RefuseManualStart=yes
+RefuseManualStop=yes
