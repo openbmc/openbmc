@@ -32,9 +32,12 @@
 #    One or more systemd unit templates to be instantiated and
 #    installed in ${SYSTEMD_DEFAULT_TARGET} if unspecified.
 #
-# SYSTEMD_TARGET_${unit} = "multi-user.target"
-#    An alternate location for installing a template unit
-#    instantiation.
+# SYSTEMD_CONFIG_FILE_${PN} = "foo.conf"
+#    One or more config files to be placed in
+#    SYSTEMD_CONFIG_FILE_TARGET_${config}.d
+#
+# SYSTEMD_TARGET_${file} = "multi-user.target"
+#    An location for installing a template unit or config file.
 
 
 inherit obmc-phosphor-utils
@@ -44,6 +47,7 @@ inherit useradd
 _INSTALL_SD_UNITS=""
 _INSTALL_ENV_FILES=""
 _INSTALL_TEMPLATES=""
+_INSTALL_CONFIG_FILES=""
 SYSTEMD_DEFAULT_TARGET ?= "obmc-standby.target"
 envfiledir ?= "${sysconfdir}/default"
 
@@ -147,6 +151,18 @@ python() {
         set_append(d, '_INSTALL_TEMPLATES', '%s:%s' % (inst, tgt))
 
 
+    def add_config_file(d, config, pkg):
+        tgt = d.getVar('SYSTEMD_TARGET_%s' % config, True)
+        if tgt is None:
+            bb.fatal('SYSTEMD_TARGET_%s is unset - don\'t '
+                'know where to put \'%s\'' % (config, config))
+
+        set_append(d, 'SRC_URI', 'file://%s' % config)
+        set_append(d, 'FILES_%s' % pkg, '%s/%s.d/%s' \
+            % (d.getVar('systemd_system_unitdir', True), tgt, config))
+        set_append(d, '_INSTALL_CONFIG_FILES', '%s:%s' % (config, tgt))
+
+
     pn = d.getVar('PN', True)
     if d.getVar('SYSTEMD_SERVICE_%s' % pn, True) is None:
         d.setVar('SYSTEMD_SERVICE_%s' % pn, '%s.service' % pn)
@@ -160,6 +176,8 @@ python() {
             add_env_file(d, name, pkg)
         for inst in listvar_to_list(d, 'SYSTEMD_TEMPLATE_%s' % pkg):
             instantiate_template(d, inst, pkg)
+        for config in listvar_to_list(d, 'SYSTEMD_CONFIG_FILE_%s' % pkg):
+            add_config_file(d, config, pkg)
 }
 
 
@@ -204,6 +222,15 @@ do_install_append() {
                 install -d ${D}${systemd_system_unitdir}/${target}.wants
                 ln -sf ../${inst/@*\./@.} \
                         ${D}${systemd_system_unitdir}/${target}.wants/$inst
+        done
+
+        # install config files
+        for c in ${_INSTALL_CONFIG_FILES}; do
+                target=${c##*:}
+                file=${c%%:*}
+                install -d ${D}${systemd_system_unitdir}/${target}.d
+                install -m 0644 ${WORKDIR}/$file \
+                        ${D}${systemd_system_unitdir}/${target}.d/$file
         done
 
         # install environment files
