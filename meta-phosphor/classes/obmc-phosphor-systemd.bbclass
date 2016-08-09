@@ -48,7 +48,7 @@ _INSTALL_SD_UNITS=""
 _INSTALL_ENV_FILES=""
 _INSTALL_TEMPLATES=""
 _INSTALL_CONFIG_FILES=""
-SYSTEMD_DEFAULT_TARGET ?= "obmc-standby.target"
+SYSTEMD_DEFAULT_TARGET ?= "multi-user.target"
 envfiledir ?= "${sysconfdir}/default"
 
 # Big ugly hack to prevent useradd.bbclass post-parse sanity checker failure.
