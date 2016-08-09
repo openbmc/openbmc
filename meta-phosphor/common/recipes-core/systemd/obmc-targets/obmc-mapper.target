@@ -1,0 +1,4 @@
+[Unit]
+Description=Phosphor Object Mapper
+RefuseManualStart=yes
+RefuseManualStop=yes

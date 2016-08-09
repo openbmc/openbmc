@@ -1,0 +1,6 @@
+[Unit]
+Description=Chassis%i (Start)
+Wants={SYSTEMD_DEFAULT_TARGET}
+After={SYSTEMD_DEFAULT_TARGET}
+Conflicts=obmc-chassis-stop@%i.target
+RefuseManualStop=yes

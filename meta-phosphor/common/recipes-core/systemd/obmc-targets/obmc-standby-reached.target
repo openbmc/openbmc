@@ -1,0 +1,4 @@
+[Unit]
+Description=Standby - Ready
+RefuseManualStart=yes
+RefuseManualStop=yes
