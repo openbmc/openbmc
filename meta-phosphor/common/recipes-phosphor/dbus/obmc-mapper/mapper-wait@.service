@@ -1,0 +1,8 @@
+[Unit]
+Description=Wait for DBus object %i
+Requires=obmc-mapper.target
+After=obmc-mapper.target
+
+[Service]
+Type=oneshot
+ExecStart={sbindir}/mapper wait --systemd %i
