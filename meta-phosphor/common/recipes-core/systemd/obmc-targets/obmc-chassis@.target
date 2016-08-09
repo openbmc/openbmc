@@ -1,0 +1,4 @@
+[Unit]
+Description=Chassis%i
+After={SYSTEMD_DEFAULT_TARGET}
+Requires={SYSTEMD_DEFAULT_TARGET}
