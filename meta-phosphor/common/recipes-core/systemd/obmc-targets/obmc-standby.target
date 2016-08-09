@@ -1,0 +1,9 @@
+[Unit]
+Description=Phosphor System - Standby
+Requires=multi-user.target
+RefuseManualStart=yes
+RefuseManualStop=yes
+AllowIsolate=yes
+
+[Install]
+WantedBy=multi-user.target
