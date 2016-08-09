@@ -1,0 +1,4 @@
+[Unit]
+Description=Fans Ready
+RefuseManualStart=yes
+RefuseManualStop=yes
