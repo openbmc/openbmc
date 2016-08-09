@@ -12,8 +12,6 @@ EXTRA_OECONF += " --disable-hwdb"
 do_install_append() {
         install -m 644 ${WORKDIR}/default.network ${D}${libdir}/systemd/network/
         install -m 644 ${WORKDIR}/obmc-standby.target ${D}${systemd_system_unitdir}
-        ln -sf ../obmc-standby.target \
-                ${D}${systemd_system_unitdir}/multi-user.target.wants/obmc-standby.target
 
         #TODO Remove after this issue is resolved
         #https://github.com/openbmc/openbmc/issues/152
