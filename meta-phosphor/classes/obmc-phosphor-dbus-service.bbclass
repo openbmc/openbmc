@@ -26,6 +26,19 @@
 #    The user a service should be configured to run as.  If unspecified
 #    no User property is added.
 
+#  DBUS_TEMPLATE_${PN} = "org.openbmc.Foo"
+#    A list of dbus template names.  The class expects a systemd
+#    unit file named "org.openbmc.Foo@.service.  In addition to the
+#    behavior associated with DBUS_SERVICE, a template instance for
+#    the instances described by DBUS_TEMPLATE_INSTANCES is instantiated
+#    and enabled.
+#
+#  DBUS_ACTIVATED_TEMPLATE_${PN} = "org.openbmc.Foo"
+#    Similar to DBUS_ACTIVATED_SERVICE but with a DBus service template.
+#
+#  DBUS_TEMPLATE_INSTANCES_${PN} = "VARIABLE_NAME"
+#    A variable name describing a list of DBus service templates to
+#    instantiate when using DBUS_TEMPLATE or DBUS_ACTIVATED_TEMPLATE
 
 inherit dbus-dir
 inherit obmc-phosphor-utils
@@ -43,13 +56,13 @@ python dbus_do_postinst() {
     def make_default_dbus_config(d, service, user):
         path = d.getVar('D', True)
         path += d.getVar('dbus_system_confdir', True)
-        with open('%s/%s.conf' % (path, service), 'w+') as fd:
+        with open('%s/%s.conf' % (path, service.replace('@','')), 'w+') as fd:
             fd.write('<!DOCTYPE busconfig PUBLIC "-//freedesktop//DTD D-BUS Bus Configuration 1.0//EN"\n')
             fd.write('        "http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd">\n')
             fd.write('<busconfig>\n')
             fd.write('        <policy user="%s">\n' % user)
-            fd.write('                <allow own="%s"/>\n' % service)
-            fd.write('                <allow send_destination="%s"/>\n' % service)
+            fd.write('                <allow own="%s"/>\n' % service.replace('@', '*'))
+            fd.write('                <allow send_destination="%s"/>\n' % service.replace('@', '*'))
             fd.write('        </policy>\n')
             fd.write('</busconfig>\n')
             fd.close()
@@ -58,9 +71,9 @@ python dbus_do_postinst() {
     def make_default_dbus_activation(d, service, user):
         path = d.getVar('D', True)
         path += d.getVar('dbus_system_servicesdir', True)
-        with open('%s/%s.service' % (path, service), 'w+') as fd:
+        with open('%s/%s.service' % (path, service.replace('@', '')), 'w+') as fd:
             fd.write('[D-BUS Service]\n')
-            fd.write('Name=%s\n' % service)
+            fd.write('Name=%s\n' % service.replace('@', ''))
             fd.write('Exec=/bin/false\n')
             fd.write('User=%s\n' % user)
             fd.write('SystemdService=dbus-%s.service\n' % service)
@@ -77,13 +90,13 @@ python dbus_do_postinst() {
 python() {
     searchpaths = d.getVar('FILESPATH', True)
 
-    def add_dbus_config(d, service, pkg):
+    def add_dbus_config(d, service, suffix, pkg):
         path = bb.utils.which(searchpaths, '%s.conf' % service)
         if not os.path.isfile(path):
             user = d.getVar(
                 'DBUS_USER_%s_%s' % (pkg, service), True) or 'root'
-            set_append(d, '_DEFAULT_DBUS_CONFIGS', '%s:%s' % (
-                service, user))
+            set_append(d, '_DEFAULT_DBUS_CONFIGS', '%s%s:%s' % (
+                service, suffix, user))
         else:
             set_append(d, 'SRC_URI', 'file://%s.conf' % service)
             set_append(d, '_INSTALL_DBUS_CONFIGS', '%s.conf' % service)
@@ -91,34 +104,52 @@ python() {
             % (d.getVar('dbus_system_confdir', True), service))
 
 
-    def add_sd_unit(d, prefix, service, pkg):
+    def add_sd_unit(d, prefix, service, suffix, pkg):
+        unit = '%s%s%s.service' % (prefix, service, suffix)
         set_append(
-            d, 'SYSTEMD_SERVICE_%s' % pkg, '%s%s.service' % (
-                prefix, service))
-        set_append(d, 'SYSTEMD_SUBSTITUTIONS_%s%s.service' % (prefix, service),
+            d, 'SYSTEMD_SERVICE_%s' % pkg, unit)
+        set_append(d, 'SYSTEMD_SUBSTITUTIONS_%s' % unit,
             'BUSNAME:%s' % service)
 
 
-    def add_sd_user(d, prefix, service, pkg):
+    def add_sd_user(d, prefix, service, suffix, pkg):
         user = d.getVar(
             'DBUS_USER_%s_%s' % (pkg, service), True)
         if user:
-            set_append(d, 'SYSTEMD_USER_%s_%s%s.service' % (
-                pkg, prefix, service), user)
+            set_append(d, 'SYSTEMD_USER_%s_%s%s%s.service' % (
+                pkg, prefix, service, suffix), user)
 
 
     def add_dbus_activation(d, service, pkg):
+        stripped = service
+        if '@' in stripped:
+            stripped = stripped[:stripped.find('@')]
         path = bb.utils.which(searchpaths, '%s.service' % service)
         if not os.path.isfile(path):
             user = d.getVar(
-                'DBUS_USER_%s_%s' % (pkg, service), True) or 'root'
+                'DBUS_USER_%s_%s' % (pkg, stripped), True) or 'root'
             set_append(d, '_DEFAULT_DBUS_ACTIVATIONS', '%s:%s' % (
                 service, user))
         else:
             set_append(d, 'SRC_URI', 'file://%s.service' % service)
             set_append(d, '_INSTALL_DBUS_ACTIVATIONS', '%s.service' % service)
         set_append(d, 'FILES_%s' % pkg, '%s%s.service' \
-            % (d.getVar('dbus_system_servicesdir', True), service))
+            % (d.getVar('dbus_system_servicesdir', True), service.replace('@', '')))
+
+
+    def add_template_activations(d, template, pkg):
+        var = d.getVar('DBUS_TEMPLATE_INSTANCES_%s' % template, True)
+        count = d.getVar(var, True)
+        for x in range(int(count)):
+            add_dbus_activation(d, '%s@%s' % (template, x), pkg)
+
+
+    def add_template_instances(d, template, pkg):
+        var = d.getVar('DBUS_TEMPLATE_INSTANCES_%s' % template, True)
+        count = d.getVar(var, True)
+        for x in range(int(count)):
+            set_append(d, 'SYSTEMD_TEMPLATE_%s' % pkg,
+                '%s@%s.service' % (template, x))
 
 
     for pkg in listvar_to_list(d, 'DBUS_PACKAGES'):
@@ -127,14 +158,21 @@ python() {
 
         services = listvar_to_list(d, 'DBUS_SERVICE_%s' % pkg)
         auto = listvar_to_list(d, 'DBUS_ACTIVATED_SERVICE_%s' % pkg)
+        templates = listvar_to_list(d, 'DBUS_TEMPLATE_%s' % pkg)
+        auto_templates = listvar_to_list(d, 'DBUS_ACTIVATED_TEMPLATE_%s' % pkg)
 
-        for service in set(services).union(auto):
-            prefix = 'dbus-' if service in auto else ''
-            add_dbus_config(d, service, pkg)
-            add_sd_unit(d, prefix, service, pkg)
-            add_sd_user(d, prefix, service, pkg)
-            if prefix:
+        for service in set(services).union(auto).union(templates).union(auto_templates):
+            prefix = 'dbus-' if service in (auto or auto_templates) else ''
+            suffix = '@' if service in (templates or auto_templates) else ''
+            add_dbus_config(d, service, suffix, pkg)
+            add_sd_unit(d, prefix, service, suffix, pkg)
+            add_sd_user(d, prefix, service, suffix, pkg)
+            if suffix and prefix:
+                add_template_activations(d, service, pkg)
+            if prefix and not suffix:
                 add_dbus_activation(d, service, pkg)
+            if suffix and not prefix:
+                add_template_instances(d, service, pkg)
 }
 
 
