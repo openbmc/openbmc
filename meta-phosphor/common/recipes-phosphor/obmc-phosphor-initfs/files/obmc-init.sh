@@ -18,7 +18,7 @@ fi
 
 mkdir -p $rodir $rwdir
 
-cp -rp init shutdown update whitelist bin sbin usr lib etc var run/initramfs
+cp -rp init shutdown update whitelist.d bin sbin usr lib etc var run/initramfs
 
 # To start a interactive shell with job control at this point, run
 # getty 38400 ttyS4
