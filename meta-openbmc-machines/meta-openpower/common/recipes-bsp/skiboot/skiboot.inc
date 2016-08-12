@@ -25,5 +25,3 @@ do_compile() {
 do_install() {
     oe_runmake -C ${SKIBOOT_SUBDIR} install DESTDIR=${D} PREFIX=/usr
 }
-
-BBCLASSEXTEND = "native nativesdk"
