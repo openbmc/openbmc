@@ -12,5 +12,3 @@ SKELETON_DIR = "libopenbmc_intf"
 do_install() {
         oe_runmake install DESTDIR=${D}
 }
-
-BBCLASSEXTEND = "nativesdk"
