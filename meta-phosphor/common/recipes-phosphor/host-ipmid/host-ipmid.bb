@@ -15,6 +15,7 @@ inherit obmc-phosphor-c-daemon
 TARGET_CFLAGS   += "-fpic"
 
 DEPENDS += "obmc-mapper"
+RDEPENDS_${PN}-dev += "obmc-mapper-dev"
 RDEPENDS_${PN} += "clear-once"
 RDEPENDS_${PN} += "settings"
 RDEPENDS_${PN} += "network"
