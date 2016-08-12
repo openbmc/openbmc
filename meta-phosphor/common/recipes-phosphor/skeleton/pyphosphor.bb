@@ -10,6 +10,6 @@ inherit setuptools
 
 SRC_URI += "git://github.com/openbmc/pyphosphor"
 
-SRCREV = "9df742072de4ead29e821914427956acc2ff5618"
+SRCREV = "0127d51c137dbe8063b81012763550faf5111d87"
 
 S = "${WORKDIR}/git"
