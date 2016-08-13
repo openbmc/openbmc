@@ -11,7 +11,7 @@ RDEPENDS_${PN} += "python-dbus python-pygobject python-pexpect"
 
 SRC_URI += "git://github.com/openbmc/phosphor-networkd"
 
-SRCREV = "448e8d839d37532d2667b9a38bb3aadb6c804e2e"
+SRCREV = "75757c08579200677391f5319aee68cafcae0bf1"
 
 S = "${WORKDIR}/git"
 INSTALL_NAME = "userman.py"
