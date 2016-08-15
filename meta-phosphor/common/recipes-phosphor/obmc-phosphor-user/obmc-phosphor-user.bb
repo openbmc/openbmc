@@ -16,6 +16,12 @@ SRCREV = "75757c08579200677391f5319aee68cafcae0bf1"
 S = "${WORKDIR}/git"
 INSTALL_NAME = "userman.py"
 
+do_compile() {
+    # Since base_do_compile finds a makefile (from networkd) it tries to
+    # compile.  Short-circuit that because we just need to copy a python
+    # file in this package.
+}
+
 do_install() {
 echo "***installing $INSTALL_NAME"
         install -d ${D}/${sbindir}
