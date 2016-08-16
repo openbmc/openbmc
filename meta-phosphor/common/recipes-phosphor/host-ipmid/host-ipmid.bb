@@ -15,6 +15,8 @@ inherit obmc-phosphor-c-daemon
 TARGET_CFLAGS   += "-fpic"
 
 DEPENDS += "obmc-mapper"
+DEPENDS += "host-ipmid-fru-whitelist"
+DEPENDS += "host-ipmid-oem-whitelist"
 RDEPENDS_${PN}-dev += "obmc-mapper-dev"
 RDEPENDS_${PN} += "clear-once"
 RDEPENDS_${PN} += "settings"
@@ -23,6 +25,8 @@ RDEPENDS_${PN} += "libmapper"
 SRC_URI += "git://github.com/openbmc/phosphor-host-ipmid"
 
 SRCREV = "bc40c178bb0b345ed1edf553b94369330003af34"
+WHITELIST_CONF = "${STAGING_ETCDIR_NATIVE}/host-ipmid-conf/*.conf"
+export WHITELIST_CONF += "${S}/host-ipmid-whitelist.conf"
 
 S = "${WORKDIR}/git"
 INSTALL_NAME = "ipmid"
