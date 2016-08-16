@@ -21,10 +21,10 @@
 #    dbus activation file with the same name with .service appended.
 #    If one is found, it added to the package and used verbatim.
 #    If it is not found, a default one is generated and used.
-
-#  DBUS_USER_${PN}_org.openbmc.Foo = "dbususer"
-#    The user a service should be configured to run as.  If unspecified
-#    no User property is added.
+#
+#  DBUS_USER_${PN} = "dbususer"
+#  DBUS_USER_${unit} = "dbususer"
+#    The user a service/pkg should be configured to run as.
 
 
 inherit dbus-dir
@@ -77,11 +77,19 @@ python dbus_do_postinst() {
 python() {
     searchpaths = d.getVar('FILESPATH', True)
 
+    def get_user(d, service, pkg):
+        user = d.getVar(
+            'DBUS_USER_%s' % service, True)
+        if user is None:
+            user = d.getVar(
+                'DBUS_USER_%s' % pkg, True) or 'root'
+        return user
+
+
     def add_dbus_config(d, service, pkg):
         path = bb.utils.which(searchpaths, '%s.conf' % service)
         if not os.path.isfile(path):
-            user = d.getVar(
-                'DBUS_USER_%s_%s' % (pkg, service), True) or 'root'
+            user = get_user(d, service, pkg)
             set_append(d, '_DEFAULT_DBUS_CONFIGS', '%s:%s' % (
                 service, user))
         else:
@@ -100,18 +108,25 @@ python() {
 
 
     def add_sd_user(d, prefix, service, pkg):
+        var = None
         user = d.getVar(
-            'DBUS_USER_%s_%s' % (pkg, service), True)
+            'DBUS_USER_%s' % service, True)
         if user:
-            set_append(d, 'SYSTEMD_USER_%s_%s%s.service' % (
-                pkg, prefix, service), user)
+            var = 'SYSTEMD_USER_%s%s.service' % (prefix, service)
+        else:
+            user = d.getVar(
+                'DBUS_USER_%s' % pkg, True)
+            if user:
+                var = 'SYSTEMD_USER_%s' % pkg
+
+        if var and user not in listvar_to_list(d, var):
+            set_append(d, var, user)
 
 
     def add_dbus_activation(d, service, pkg):
         path = bb.utils.which(searchpaths, '%s.service' % service)
         if not os.path.isfile(path):
-            user = d.getVar(
-                'DBUS_USER_%s_%s' % (pkg, service), True) or 'root'
+            user = get_user(d, service, pkg)
             set_append(d, '_DEFAULT_DBUS_ACTIVATIONS', '%s:%s' % (
                 service, user))
         else:
