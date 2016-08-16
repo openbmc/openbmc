@@ -41,12 +41,42 @@ USERADD_PACKAGES ?= " "
 USERADD_PARAM_${PN} ?= ";"
 
 
-def systemd_is_service(unit):
-    return unit.endswith('.service')
+def SystemdUnit(unit):
+    class Unit(object):
+        def __init__(self, unit):
+            self.unit = unit
 
+        def __getattr__(self, item):
+            if item is 'name':
+                return self.unit
+            if item is 'is_activated':
+                return self.unit.startswith('dbus-')
+            if item is 'is_template':
+                return '@.' in self.unit
+            if item is 'is_instance':
+                return '@' in self.unit and not self.is_template
+            if item in ['is_service', 'is_target']:
+                return self.unit.split('.')[-1] == item
+            if item is 'base':
+                cls = self.unit.split('.')[-1]
+                base = self.unit.replace('dbus-', '')
+                base = base.replace('.%s' % cls, '')
+                if self.is_instance:
+                    base = base.rstrip('@%s' % self.instance)
+                if self.is_template:
+                    base = base.rstrip('@')
+                return base
+            if item is 'instance' and self.is_instance:
+                inst = self.unit.rsplit('@')[-1]
+                return inst.rsplit('.')[0]
+            if item is 'template' and self.is_instance:
+                cls = self.unit.split('.')[-1]
+                return '%s@.%s' % (self.base, cls)
+            if item is 'template' and self.is_template:
+                return '.'.join(self.base.split('@')[:-1])
 
-def systemd_is_template(unit):
-    return '@.' in unit
+            raise AttributeError(item)
+    return Unit(unit)
 
 
 def systemd_parse_unit(d, path):
@@ -60,37 +90,39 @@ def systemd_parse_unit(d, path):
 python() {
     def check_sd_unit(d, unit):
         searchpaths = d.getVar('FILESPATH', True)
-        path = bb.utils.which(searchpaths, '%s' % unit)
+        path = bb.utils.which(searchpaths, '%s' % unit.name)
         if not os.path.isfile(path):
-            bb.fatal('Did not find unit file "%s"' % unit)
+            bb.fatal('Did not find unit file "%s"' % unit.name)
 
         parser = systemd_parse_unit(d, path)
         inhibit = listvar_to_list(d, 'INHIBIT_SYSTEMD_RESTART_POLICY_WARNING')
-        if systemd_is_service(unit) and \
-                not systemd_is_template(unit) and \
-                unit not in inhibit and \
+        if unit.is_service and \
+                not unit.is_template and \
+                unit.name not in inhibit and \
                 not parser.has_option('Service', 'Restart'):
             bb.warn('Systemd unit \'%s\' does not '
-                'have a restart policy defined.' % unit)
+                'have a restart policy defined.' % unit.name)
 
 
     def add_sd_unit(d, unit, pkg):
+        name = unit.name
         unit_dir = d.getVar('systemd_system_unitdir', True)
-        set_append(d, 'SRC_URI', 'file://%s' % unit)
-        set_append(d, 'FILES_%s' % pkg, '%s/%s' % (unit_dir, unit))
-        set_append(d, '_INSTALL_SD_UNITS', unit)
-        set_append(d, '_MAKE_SUBS', '%s' % unit)
+        set_append(d, 'SRC_URI', 'file://%s' % name)
+        set_append(d, 'FILES_%s' % pkg, '%s/%s' % (unit_dir, name))
+        set_append(d, '_INSTALL_SD_UNITS', name)
+        set_append(d, '_MAKE_SUBS', '%s' % name)
 
         for x in [
                 'base_bindir',
                 'bindir',
                 'sbindir',
                 'SYSTEMD_DEFAULT_TARGET' ]:
-            set_append(d, 'SYSTEMD_SUBSTITUTIONS_%s' % unit,
+            set_append(d, 'SYSTEMD_SUBSTITUTIONS_%s' % name,
                 '%s:%s' % (x, d.getVar(x, True)))
 
 
     def add_sd_user(d, unit, pkg):
+        name = unit.name
         opts = [
             '--system',
             '--home',
@@ -99,7 +131,7 @@ python() {
             '--shell /sbin/nologin',
             '--user-group']
 
-        var = 'SYSTEMD_USER_%s' % unit
+        var = 'SYSTEMD_USER_%s' % name
         user = listvar_to_list(d, var)
         if len(user) is 0:
             var = 'SYSTEMD_USER_%s' % pkg
@@ -109,7 +141,7 @@ python() {
                 bb.fatal('Too many users assigned to %s: \'%s\'' % (var, ' '.join(user)))
 
             user = user[0]
-            set_append(d, 'SYSTEMD_SUBSTITUTIONS_%s' % unit,
+            set_append(d, 'SYSTEMD_SUBSTITUTIONS_%s' % name,
                 'USER:%s' % user)
             if user not in d.getVar('USERADD_PARAM_%s' % pkg, True):
                 set_append(
@@ -126,7 +158,14 @@ python() {
         d.setVar('SYSTEMD_SERVICE_%s' % pn, '%s.service' % pn)
 
     for pkg in listvar_to_list(d, 'SYSTEMD_PACKAGES'):
-        for unit in listvar_to_list(d, 'SYSTEMD_SERVICE_%s' % pkg):
+        svc = listvar_to_list(d, 'SYSTEMD_SERVICE_%s' % pkg)
+        svc = [SystemdUnit(x) for x in svc]
+        tmpl = [x.template for x in svc if x.is_instance]
+        tmpl = list(set(tmpl))
+        tmpl = [SystemdUnit(x) for x in tmpl]
+        svc = [x for x in svc if not x.is_instance]
+
+        for unit in tmpl + svc:
             check_sd_unit(d, unit)
             add_sd_unit(d, unit, pkg)
             add_sd_user(d, unit, pkg)
