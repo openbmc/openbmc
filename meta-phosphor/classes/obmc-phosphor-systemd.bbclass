@@ -22,8 +22,9 @@
 #    where {VAR} is the format string bitbake should look for in the
 #    unit file and VALUE is the value to substitute.
 #
-# SYSTEMD_USER_${PN}_${PN}.service = "foo"
-#    The user for the unit.
+# SYSTEMD_USER_${PN}.service = "foo"
+# SYSTEMD_USER_${unit}.service = "foo"
+#    The user for the unit/package.
 
 
 inherit obmc-phosphor-utils
@@ -87,12 +88,6 @@ python() {
             set_append(d, 'SYSTEMD_SUBSTITUTIONS_%s' % unit,
                 '%s:%s' % (x, d.getVar(x, True)))
 
-        user = d.getVar(
-            'SYSTEMD_USER_%s_%s' % (pkg, unit), True)
-        if user:
-            set_append(d, 'SYSTEMD_SUBSTITUTIONS_%s' % unit,
-                'USER:%s' % d.getVar('SYSTEMD_USER_%s_%s' % (pkg, unit), True))
-
 
     def add_sd_user(d, unit, pkg):
         opts = [
@@ -103,14 +98,24 @@ python() {
             '--shell /sbin/nologin',
             '--user-group']
 
-        user = d.getVar(
-            'SYSTEMD_USER_%s_%s' % (pkg, unit), True)
-        if user:
-            set_append(
-                d,
-                'USERADD_PARAM_%s' % pkg,
-                '%s' % (' '.join(opts + [user])),
-                ';')
+        var = 'SYSTEMD_USER_%s' % unit
+        user = listvar_to_list(d, var)
+        if len(user) is 0:
+            var = 'SYSTEMD_USER_%s' % pkg
+            user = listvar_to_list(d, var)
+        if len(user) is not 0:
+            if len(user) is not 1:
+                bb.fatal('Too many users assigned to %s: \'%s\'' % (var, ' '.join(user)))
+
+            user = user[0]
+            set_append(d, 'SYSTEMD_SUBSTITUTIONS_%s' % unit,
+                'USER:%s' % user)
+            if user not in d.getVar('USERADD_PARAM_%s' % pkg, True):
+                set_append(
+                    d,
+                    'USERADD_PARAM_%s' % pkg,
+                    '%s' % (' '.join(opts + [user])),
+                    ';')
             if pkg not in d.getVar('USERADD_PACKAGES', True):
                 set_append(d, 'USERADD_PACKAGES', pkg)
 
