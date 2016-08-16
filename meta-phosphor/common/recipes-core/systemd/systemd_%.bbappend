@@ -3,6 +3,7 @@ PACKAGECONFIG_remove = "machined hibernate ldconfig binfmt backlight quotacheck 
 FILESEXTRAPATHS_append := "${THISDIR}/${PN}:"
 SRC_URI += "file://default.network"
 SRC_URI += "file://obmc-standby.target"
+SRC_URI += "file://0001-Export-message_append_cmdline.patch"
 
 FILES_${PN} += "${libdir}/systemd/network/default.network"
 FILES_${PN} += "${systemd_system_unitdir}/obmc-standby.target"
