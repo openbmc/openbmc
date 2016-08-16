@@ -2,6 +2,7 @@ PACKAGECONFIG_append = " networkd"
 PACKAGECONFIG_remove = "machined hibernate ldconfig binfmt backlight quotacheck localed kdbus ima smack polkit"
 FILESEXTRAPATHS_append := "${THISDIR}/${PN}:"
 SRC_URI += "file://default.network"
+SRC_URI += "file://0001-Export-message_append_cmdline.patch"
 
 RRECOMMENDS_${PN} += "obmc-targets"
 FILES_${PN} += "${libdir}/systemd/network/default.network"
