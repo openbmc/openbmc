@@ -41,12 +41,21 @@ USERADD_PACKAGES ?= " "
 USERADD_PARAM_${PN} ?= ";"
 
 
-def systemd_is_service(unit):
-    return unit.endswith('.service')
-
-
-def systemd_is_template(unit):
-    return '@.' in unit
+def systemd_unit_info(unit):
+    nfo = {}
+    nfo['unit'] = unit
+    nfo['cls'] = unit.split('.')[-1]
+    nfo['base'] = unit.replace('dbus-', '').replace('.%s' % nfo['cls'], '')
+    nfo['is_activated'] = unit.startswith('dbus-')
+    nfo['is_template'] = '@.' in unit
+    nfo['is_instance'] = '@' in unit and '@.' not in unit
+    if nfo['is_template']:
+        nfo['template'] = '.'.join(nfo['base'].split('@')[:-1])
+        nfo['base'] = nfo['base'].rstrip('@')
+    if nfo['is_instance']:
+        nfo['instance'] = '.'.join(nfo['base'].split('@')[-1:])
+        nfo['base'] = nfo['base'].rstrip('@%s' % nfo['instance'])
+    return nfo
 
 
 def systemd_parse_unit(d, path):
@@ -58,39 +67,39 @@ def systemd_parse_unit(d, path):
 
 
 python() {
-    def check_sd_unit(d, unit):
+    def check_sd_unit(d, nfo):
         searchpaths = d.getVar('FILESPATH', True)
-        path = bb.utils.which(searchpaths, '%s' % unit)
+        path = bb.utils.which(searchpaths, '%s' % nfo['unit'])
         if not os.path.isfile(path):
-            bb.fatal('Did not find unit file "%s"' % unit)
+            bb.fatal('Did not find unit file "%s"' % nfo['unit'])
 
         parser = systemd_parse_unit(d, path)
         inhibit = listvar_to_list(d, 'INHIBIT_SYSTEMD_RESTART_POLICY_WARNING')
-        if systemd_is_service(unit) and \
-                not systemd_is_template(unit) and \
-                unit not in inhibit and \
+        if nfo['cls'] == 'service' and \
+                not nfo['is_template'] and \
+                nfo['unit'] not in inhibit and \
                 not parser.has_option('Service', 'Restart'):
             bb.warn('Systemd unit \'%s\' does not '
-                'have a restart policy defined.' % unit)
+                'have a restart policy defined.' % nfo['unit'])
 
 
-    def add_sd_unit(d, unit, pkg):
+    def add_sd_unit(d, nfo, pkg):
         unit_dir = d.getVar('systemd_system_unitdir', True)
-        set_append(d, 'SRC_URI', 'file://%s' % unit)
-        set_append(d, 'FILES_%s' % pkg, '%s/%s' % (unit_dir, unit))
-        set_append(d, '_INSTALL_SD_UNITS', unit)
-        set_append(d, '_MAKE_SUBS', '%s' % unit)
+        set_append(d, 'SRC_URI', 'file://%s' % nfo['unit'])
+        set_append(d, 'FILES_%s' % pkg, '%s/%s' % (unit_dir, nfo['unit']))
+        set_append(d, '_INSTALL_SD_UNITS', nfo['unit'])
+        set_append(d, '_MAKE_SUBS', '%s' % nfo['unit'])
 
         for x in [
                 'base_bindir',
                 'bindir',
                 'sbindir',
                 'SYSTEMD_DEFAULT_TARGET' ]:
-            set_append(d, 'SYSTEMD_SUBSTITUTIONS_%s' % unit,
+            set_append(d, 'SYSTEMD_SUBSTITUTIONS_%s' % nfo['unit'],
                 '%s:%s' % (x, d.getVar(x, True)))
 
 
-    def add_sd_user(d, unit, pkg):
+    def add_sd_user(d, nfo, pkg):
         opts = [
             '--system',
             '--home',
@@ -99,7 +108,7 @@ python() {
             '--shell /sbin/nologin',
             '--user-group']
 
-        var = 'SYSTEMD_USER_%s' % unit
+        var = 'SYSTEMD_USER_%s' % nfo['unit']
         user = listvar_to_list(d, var)
         if len(user) is 0:
             var = 'SYSTEMD_USER_%s' % pkg
@@ -109,7 +118,7 @@ python() {
                 bb.fatal('Too many users assigned to %s: \'%s\'' % (var, ' '.join(user)))
 
             user = user[0]
-            set_append(d, 'SYSTEMD_SUBSTITUTIONS_%s' % unit,
+            set_append(d, 'SYSTEMD_SUBSTITUTIONS_%s' % nfo['unit'],
                 'USER:%s' % user)
             if user not in d.getVar('USERADD_PARAM_%s' % pkg, True):
                 set_append(
@@ -127,9 +136,10 @@ python() {
 
     for pkg in listvar_to_list(d, 'SYSTEMD_PACKAGES'):
         for unit in listvar_to_list(d, 'SYSTEMD_SERVICE_%s' % pkg):
-            check_sd_unit(d, unit)
-            add_sd_unit(d, unit, pkg)
-            add_sd_user(d, unit, pkg)
+            nfo = systemd_unit_info(unit)
+            check_sd_unit(d, nfo)
+            add_sd_unit(d, nfo, pkg)
+            add_sd_user(d, nfo, pkg)
 }
 
 
