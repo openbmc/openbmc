@@ -16,6 +16,8 @@ TARGET_CFLAGS   += "-fpic"
 DEPENDS += "obmc-mapper"
 DEPENDS += "autoconf-archive-native"
 RDEPENDS_${PN}-dev += "obmc-mapper-dev"
+DEPENDS += "host-ipmid-fru-whitelist-native"
+DEPENDS += "host-ipmid-oem-whitelist-native"
 RDEPENDS_${PN} += "clear-once"
 RDEPENDS_${PN} += "settings"
 RDEPENDS_${PN} += "network"
@@ -23,6 +25,8 @@ RDEPENDS_${PN} += "libmapper"
 SRC_URI += "git://github.com/openbmc/phosphor-host-ipmid"
 
 SRCREV = "70aa8d9677b13eb97e71bc758a09e14e37053565"
+WHITELIST_CONF = "${STAGING_ETCDIR_NATIVE}/host-ipmid/*.conf"
+export WHITELIST_CONF += "${S}/host-ipmid-whitelist.conf"
 
 S = "${WORKDIR}/git"
 
