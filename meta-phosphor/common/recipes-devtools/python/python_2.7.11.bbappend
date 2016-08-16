@@ -1,7 +1,7 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 SRC_URI += "file://__init__.email_min.py"
 
-do_install_append() {
+do_install_append_class-target() {
 	dir=${libdir}/python${PYTHON_MAJMIN}/email
         mv ${D}/$dir/__init__.py \
                 ${D}/$dir/email_full.py
