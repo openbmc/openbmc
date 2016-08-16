@@ -15,7 +15,7 @@ python __anonymous () {
 }
 
 # Set this to zero if you don't want ldconfig in the output package
-USE_LDCONFIG ?= "1"
+USE_LDCONFIG ?= "0"
 
 INHIBIT_SYSROOT_STRIP = "1"
 
