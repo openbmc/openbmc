@@ -7,10 +7,10 @@ BBFILES ?= ""
 
 BBLAYERS ?= " \
   ##OEROOT##/meta \
-  ##OEROOT##/meta-yocto \
+  ##OEROOT##/meta-poky \
   ##OEROOT##/meta-phosphor \
   "
 BBLAYERS_NON_REMOVABLE ?= " \
   ##OEROOT##/meta \
-  ##OEROOT##/meta-yocto \
+  ##OEROOT##/meta-poky \
   "
