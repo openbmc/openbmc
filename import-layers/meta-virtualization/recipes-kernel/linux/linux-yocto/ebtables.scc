@@ -1,0 +1,4 @@
+define KFEATURE_DESCRIPTION "Enable ebtables support"
+define KFEATURE_COMPATIBILITY board
+
+kconf non-hardware ebtables.cfg

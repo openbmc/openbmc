@@ -1,0 +1,18 @@
+Disable m4 file test where sources are built from git.
+
+Signed-off-by: Amy Fong <amy.fong@windriver.com>
+---
+ Makefile.am |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -185,7 +185,7 @@
+ # Makefile in datapath/linux, needed to get the list of files to
+ # distribute, requires GNU make extensions.
+ if GNU_MAKE
+-ALL_LOCAL += dist-hook-git
++# ALL_LOCAL += dist-hook-git
+ dist-hook-git: distfiles
+ 	@if test -e $(srcdir)/.git && (git --version) >/dev/null 2>&1; then \
+ 	  (cd datapath && $(MAKE) distfiles);				    \

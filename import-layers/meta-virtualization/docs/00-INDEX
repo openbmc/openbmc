@@ -1,0 +1,12 @@
+This is a brief list of all the files in meta-virtualization/docs and what
+they contain. If you add a documentation file, please list it here in
+alphabetical order as well.
+
+00-INDEX
+        - this file.
+
+00-README
+        - info on the goals of meta-virtualization and this docs subdir
+
+openvswitch.txt
+	- example on how to setup openvswitch with qemu/kvm.

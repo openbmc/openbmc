@@ -1,0 +1,63 @@
+From ad5d9cee87357f9f38f62583119606ef95ba10df Mon Sep 17 00:00:00 2001
+From: Bogdan Purcareata <bogdan.purcareata@freescale.com>
+Date: Fri, 24 May 2013 16:46:00 +0300
+Subject: [PATCH] Fix thread safety in LXC callback handling
+
+Signed-off-by: Bogdan Purcareata <bogdan.purcareata@freescale.com>
+---
+ src/lxc/lxc_process.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/src/lxc/lxc_process.c b/src/lxc/lxc_process.c
+index aaa81a7..0eadc67 100644
+--- a/src/lxc/lxc_process.c
++++ b/src/lxc/lxc_process.c
+@@ -609,8 +609,13 @@ static void virLXCProcessMonitorExitNotify(virLXCMonitorPtr mon ATTRIBUTE_UNUSED
+                                            virLXCProtocolExitStatus status,
+                                            virDomainObjPtr vm)
+ {
++    virLXCDriverPtr driver = lxc_driver;
+     virLXCDomainObjPrivatePtr priv = vm->privateData;
+ 
++    lxcDriverLock(driver);
++    virObjectLock(vm);
++    lxcDriverUnlock(driver);
++
+     switch (status) {
+     case VIR_LXC_PROTOCOL_EXIT_STATUS_SHUTDOWN:
+         priv->stopReason = VIR_DOMAIN_EVENT_STOPPED_SHUTDOWN;
+@@ -628,6 +633,8 @@ static void virLXCProcessMonitorExitNotify(virLXCMonitorPtr mon ATTRIBUTE_UNUSED
+     }
+     VIR_DEBUG("Domain shutoff reason %d (from status %d)",
+               priv->stopReason, status);
++
++    virObjectUnlock(vm);
+ }
+ 
+ /* XXX a little evil */
+@@ -636,12 +643,21 @@ static void virLXCProcessMonitorInitNotify(virLXCMonitorPtr mon ATTRIBUTE_UNUSED
+                                            pid_t initpid,
+                                            virDomainObjPtr vm)
+ {
+-    virLXCDomainObjPrivatePtr priv = vm->privateData;
++    virLXCDriverPtr driver = lxc_driver;
++    virLXCDomainObjPrivatePtr priv;
++
++    lxcDriverLock(driver);
++    virObjectLock(vm);
++    lxcDriverUnlock(driver);
++
++    priv = vm->privateData;
+     priv->initpid = initpid;
+     virDomainAuditInit(vm, initpid);
+ 
+     if (virDomainSaveStatus(lxc_driver->caps, lxc_driver->stateDir, vm) < 0)
+         VIR_WARN("Cannot update XML with PID for LXC %s", vm->def->name);
++
++    virObjectUnlock(vm);
+ }
+ 
+ static virLXCMonitorCallbacks monitorCallbacks = {
+-- 
+1.7.11.7
+

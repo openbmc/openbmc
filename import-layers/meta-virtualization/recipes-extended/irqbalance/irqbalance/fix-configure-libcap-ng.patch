@@ -1,0 +1,24 @@
+Subject: [PATCH] grasp withval for libcap-ng
+
+Upstream-Status: Pending
+
+Signed-off-by: Ming Liu <ming.liu@windriver.com>
+---
+ configure.ac |    5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff -urpN a/configure.ac b/configure.ac
+--- a/configure.ac
++++ b/configure.ac
+@@ -61,7 +61,10 @@ AS_IF(
+ AM_CONDITIONAL([LOCAL_GLIB], [test "x$local_glib2" = "xyes"])
+ 
+ AC_ARG_WITH([libcap-ng],
+-  AS_HELP_STRING([libcap-ng], [Add libcap-ng-support @<:@default=auto@:>@]))
++  [AS_HELP_STRING([libcap-ng], [Add libcap-ng-support @<:@default=auto@:>@])],
++  [libcap_ng=$withval],
++  [libcap_ng=$withval]
++)
+ 
+ AS_IF(
+   [test "x$libcap_ng" != "xno"],

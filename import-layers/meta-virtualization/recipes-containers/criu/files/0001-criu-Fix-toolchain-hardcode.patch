@@ -1,0 +1,46 @@
+From 3d4f112fdb434712eba09239a468842323f1af4c Mon Sep 17 00:00:00 2001
+From: Yang Shi <yang.shi@windriver.com>
+Date: Tue, 26 Aug 2014 14:42:42 -0700
+Subject: [PATCH 1/2] criu: Fix toolchain hardcode
+
+Replace ":=" to "?=" so that the toolchain used by bitbake build system will
+be taken.
+
+Signed-off-by: Yang Shi <yang.shi@windriver.com>
+Signed-off-by: Nam Ninh <nam.ninh@windriver.com>
+---
+ Makefile | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index f1c8784..43252ec 100644
+--- a/Makefile
++++ b/Makefile
+@@ -23,15 +23,15 @@ export VERSION_SO_MAJOR VERSION_SO_MINOR
+ # Common definitions
+ #
+ 
+-FIND		:= find
+-CSCOPE		:= cscope
+-RM		:= rm -f
+-LD		:= $(CROSS_COMPILE)ld
+-CC		:= $(CROSS_COMPILE)gcc
+-NM		:= $(CROSS_COMPILE)nm
+-SH		:= bash
+-MAKE		:= make
+-OBJCOPY		:= $(CROSS_COMPILE)objcopy
++FIND		?= find
++CSCOPE		?= cscope
++RM		?= rm -f
++LD		?= $(CROSS_COMPILE)ld
++CC		?= $(CROSS_COMPILE)gcc
++NM		?= $(CROSS_COMPILE)nm
++SH		?= bash
++MAKE		?= make
++OBJCOPY		?= $(CROSS_COMPILE)objcopy
+ 
+ CFLAGS		+= $(USERCFLAGS)
+ 
+-- 
+2.0.2
+

@@ -1,0 +1,4 @@
+define KFEATURE_DESCRIPTION "Enable in kernel OpenvSwitch module"
+define KFEATURE_COMPATIBILITY board
+
+kconf non-hardware vswitch.cfg

@@ -1,0 +1,4 @@
+define KFEATURE_DESCRIPTION "Enable Features needed by LxC, namespaces, cgroups et.c."
+define KFEATURE_COMPATIBILITY board
+
+kconf non-hardware lxc.cfg
