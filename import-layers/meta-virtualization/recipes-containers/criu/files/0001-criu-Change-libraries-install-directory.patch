@@ -1,0 +1,48 @@
+From cb9933dc34af0b4d52c4584332600114ac65c402 Mon Sep 17 00:00:00 2001
+From: Jianchuan Wang <jianchuan.wang@windriver.com>
+Date: Tue, 4 Aug 2015 17:45:51 +0800
+Subject: [PATCH] criu: Change libraries install directory
+
+Install the libraries into /usr/lib(/usr/lib64)
+
+Signed-off-by: Jianchuan Wang <jianchuan.wang@windriver.com>
+---
+ Makefile     | 2 +-
+ Makefile.inc | 9 ---------
+ 2 files changed, 1 insertion(+), 10 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 7f5c890..6dbc436 100644
+--- a/Makefile
++++ b/Makefile
+@@ -351,7 +351,7 @@ install-man:
+ 
+ install-crit: crit
+ 	$(E) "  INSTALL crit"
+-	$(Q) python scripts/crit-setup.py install --root=$(DESTDIR) --prefix=$(PREFIX)
++	$(Q) python scripts/crit-setup.py install --root=$(DESTDIR) --prefix=$(PREFIX) --install-lib=$(LIBDIR)
+ 
+ .PHONY: install install-man install-crit install-criu
+ 
+diff --git a/Makefile.inc b/Makefile.inc
+index 5496f41..ba70aea 100644
+--- a/Makefile.inc
++++ b/Makefile.inc
+@@ -17,14 +17,5 @@ MANDIR		:= $(PREFIX)/share/man
+ SYSTEMDUNITDIR	:= $(PREFIX)/lib/systemd/system/
+ LOGROTATEDIR	:= $(PREFIX)/etc/logrotate.d/
+ LIBDIR		:= $(PREFIX)/lib
+-# For recent Debian/Ubuntu with multiarch support
+-DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture \
+-			-qDEB_HOST_MULTIARCH 2>/dev/null)
+-ifneq "$(DEB_HOST_MULTIARCH)" ""
+-LIBDIR		:= $(PREFIX)/lib/$(DEB_HOST_MULTIARCH)
+-# For most other systems
+-else ifeq "$(shell uname -m)" "x86_64"
+-LIBDIR		:= $(PREFIX)/lib64
+-endif
+ 
+ INCLUDEDIR	:= $(PREFIX)/include/criu
+-- 
+1.9.1
+

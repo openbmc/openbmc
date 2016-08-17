@@ -1,0 +1,20 @@
+Specify install path for kernel module
+
+Signed-off-by: Amy Fong <amy.fong@windriver.com>
+---
+ datapath/linux/Makefile.main.in |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+--- a/datapath/linux/Makefile.main.in
++++ b/datapath/linux/Makefile.main.in
+@@ -71,8 +71,8 @@
+ 	$(MAKE) -C $(KSRC) M=$(builddir) modules
+ 
+ modules_install:
+-	$(MAKE) -C $(KSRC) M=$(builddir) modules_install
+-	depmod `sed -n 's/#define UTS_RELEASE "\([^"]*\)"/\1/p' $(KSRC)/include/generated/utsrelease.h`
++	$(MAKE) -C $(KSRC) M=$(builddir) modules_install INSTALL_MOD_PATH=${INSTALL_MOD_PATH}
++	# depmod `sed -n 's/#define UTS_RELEASE "\([^"]*\)"/\1/p' $(KSRC)/include/generated/utsrelease.h`
+ endif
+ 
+ # Much of the kernel build system in this file is derived from Intel's

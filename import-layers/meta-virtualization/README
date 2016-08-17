@@ -1,0 +1,53 @@
+meta-virtualization
+===================
+
+This layer provides support for building Xen, KVM, Libvirt, and associated
+packages necessary for constructing OE-based virtualized solutions.
+
+Dependencies
+------------
+This layer depends on:
+
+URI: git://github.com/openembedded/openembedded-core.git
+branch: master
+revision: HEAD
+prio: default
+
+URI: git://github.com/openembedded/meta-openembedded.git
+branch: master
+revision: HEAD
+layers: meta-oe
+	meta-networking
+        meta-filesystems
+        meta-python
+
+URI: git://github.com/errordeveloper/oe-meta-go.git
+branch: master
+revision: HEAD
+
+BBFILE_PRIORITY_openembedded-layer = "4"
+
+Required for Xen XSM policy:
+URI: git://git.yoctoproject.org/meta-selinux
+branch: master
+revision: HEAD
+prio: default
+
+Maintenance
+-----------
+
+Send pull requests, patches, comments or questions to meta-virtualization@yoctoproject.org
+
+Maintainers: Raymond Danks <ray.danks@se-eng.com>
+             Bruce Ashfield <bruce.ashfield@gmail.com>
+
+When sending single patches, please using something like:
+'git send-email -1 --to meta-virtualization@yoctoproject.org --subject-prefix=meta-virtualization][PATCH'
+
+License
+-------
+
+All metadata is MIT licensed unless otherwise stated. Source code included
+in tree for individual recipes is under the LICENSE stated in each recipe
+(.bb file) unless otherwise stated.
+

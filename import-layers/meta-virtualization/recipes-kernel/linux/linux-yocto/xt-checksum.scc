@@ -1,0 +1,4 @@
+define KFEATURE_DESCRIPTION "Add extra iptables modules"
+define KFEATURE_COMPATIBILITY board
+
+kconf non-hardware xt-checksum.cfg

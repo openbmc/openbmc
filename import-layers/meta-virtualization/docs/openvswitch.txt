@@ -1,0 +1,96 @@
+Simple setup for connecting openvswitch to qemu/kvm
+===================================================
+This example brings up openvswitch using a private network.
+
+Preliminary notes
+=================
+1. Make sure to build kernel support for openvswitch as a module.  The
+openvswitch init scripts expect to load a module and upon success
+continue to setup the switch.  If openvswitch is compiled
+statically, the init scripts not load the ovs-vswitchd daemon
+and none of the configured bridges will show up in the interfaces
+table (ifconfig).  You can get around this limiation by running the
+following by hand:
+	# ovs-vswitchd --pidfile --detach
+
+2. Verify that ovs-vswitchd is running before proceeding:
+	# /etc/init.d/openvswitch-switch status
+	ovsdb-server is running with pid 1867
+	ovs-vswitchd is running with pid 1877
+
+3. A kernel and rootfs is required for qemu bring up.
+
+Qemu Setup
+==========
+The host requires a /etc/qemu-ifup script to setup the bridging and tap
+devices.  Qemu will invoke this qemu-ifup script at startup.  Here is
+an example script:
+$ cat /etc/qemu-fup
+	#!/bin/sh
+	# the tap is dynamically assigned and passed into this script
+	# as a parameter
+	TAP=$1
+
+	# Note: if booting over NFS, once the $ETH0 device is added to the bridge,
+	# your host will be unusable.  In that case, setup networking
+	# init scripts appropriately and change the following to work
+	# with it.
+	ETH0="eth1"
+	NETMASK=255.255.255.0
+	IP=192.168.1.1
+	GATEWAY=
+	SWITCH=ovsbr0
+	if [ -n "$TAP" ];then
+		ifconfig $TAP up
+		ifconfig $SWITCH down &>/dev/null
+		ovs-vsctl del-br $SWITCH
+		ovs-vsctl add-br $SWITCH
+		ifconfig $ETH0 0.0.0.0
+		ifconfig $SWITCH $IP up netmask $NETMASK
+		#-- external access not required for this test.
+		#route add default gw $GATEWAY
+		ovs-vsctl add-port $SWITCH $ETH0
+		ovs-vsctl add-port $SWITCH $TAP
+		exit 0
+	else
+		echo "$0: No tap device"
+		exit 1
+	fi
+
+Start Qemu
+==========
+This example will bring up qemu with a tap network interface.
+Note: this command must be run as root due to the networking setup.
+
+	$ qemu-system-x86_64 -nographic -k en-us -m 1024  \
+		-net nic,macaddr=1a:46:0b:ca:bc:7a,model=virtio \
+		-net tap -enable-kvm\
+		-kernel /opt/dpdk-guest-kernel \
+		-append 'root=/dev/vda ro console=ttyS0' \
+		-drive file=/opt/intel-xeon-core-ovp-kvm-preempt-rt-dist.ext3,cache=none,if=virtio
+
+Once the guest OS is up and running, configure the quest network interface:
+	$ ifconfig eth0 192.168.1.10
+
+Ping the bridge:
+	$ ping 192.168.1.1
+
+From the host, view the bridged network:
+$ ovs-vsctl show
+c1212b96-ef49-4a8e-b598-09b05b854dd0
+    Bridge "ovsbr0"
+        Port "tap0"
+            Interface "tap0"
+        Port "eth1"
+            Interface "eth1"
+        Port "ovsbr0"
+            Interface "ovsbr0"
+                type: internal
+
+At this point, openvswitch is up and running.  If you want external
+network access, you need to set a GATEWAY in the qemu-ifup script and
+make sure the external device is part of the bridge.
+
+Note:
+Proper setup will require a /etc/qemu-ifdown script to tear down the
+bridge and interfaces. (not provided here).

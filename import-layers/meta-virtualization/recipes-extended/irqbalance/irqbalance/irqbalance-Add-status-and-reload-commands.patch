@@ -1,0 +1,55 @@
+From dc7366896dd5a5bae82be4b11530bc9fdb7cbcdd Mon Sep 17 00:00:00 2001
+From: Yang Shi <yang.shi@windriver.com>
+Date: Mon, 26 Aug 2013 10:58:02 -0700
+Subject: [PATCH] irqbalance: Add status and reload commands
+
+Add status and reload commands for irqbalanced init script
+
+Signed-off-by: Yang Shi <yang.shi@windriver.com>
+---
+ irqbalance.init |   12 +++++++++---
+ 1 files changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/irqbalance.init b/irqbalance.init
+index d12d62c..f58bf55 100644
+--- a/irqbalance.init
++++ b/irqbalance.init
+@@ -1,6 +1,6 @@
+ #!/bin/sh
+ #
+-# Copyright (c) 2012 Wind River Systems, Inc.
++# Copyright (c) 2013 Wind River Systems, Inc.
+ #
+ ### BEGIN INIT INFO
+ # Provides:             irqbalance
+@@ -11,6 +11,8 @@
+ # Short-Description:    IRQ allocation daemon
+ ### END INIT INFO
+ 
++. /etc/init.d/functions
++
+ case "$1" in
+   start)
+ 	echo -n "Starting irqbalance: "
+@@ -22,12 +24,16 @@ case "$1" in
+ 	start-stop-daemon -K -n irqbalance
+ 	echo "done"
+ 	;;
+-  restart)
++  restart|reload)
+ 	$0 stop
+ 	$0 start
+ 	;;
++  status)
++	status irqbalance
++	echo "done"
++	;;
+   *)
+-	echo "Usage: $0 {start | stop | restart}" >&2
++	echo "Usage: $0 {start | stop | restart | reload | status}" >&2
+ 	exit 1
+ 	;;
+ esac
+-- 
+1.7.5.4
+

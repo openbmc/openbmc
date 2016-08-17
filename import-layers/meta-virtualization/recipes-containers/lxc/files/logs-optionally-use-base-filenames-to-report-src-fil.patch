@@ -1,0 +1,70 @@
+From 4729d0f4c4d1dacd150ddfd7061dda875eb94e34 Mon Sep 17 00:00:00 2001
+Message-Id: <4729d0f4c4d1dacd150ddfd7061dda875eb94e34.1443216870.git.Jim.Somerville@windriver.com>
+From: Jim Somerville <Jim.Somerville@windriver.com>
+Date: Fri, 25 Sep 2015 15:08:17 -0400
+Subject: [PATCH 1/1] logs: optionally use base filenames to report src files
+
+Problem:  Logs are nice in that they report the source file,
+routine, and line number where an issue occurs.  But the
+file is printed as the absolute filename.  Users do not
+need to see a long spew of path directory names where the package
+was built.  It just confuses things.
+
+Solution:  Optionally chop off all leading directories so that just
+the source filename ie. basename is printed.  This is done by
+setting a #ifdef LXC_LOG_USE_BASENAME check in the code.  That
+define is done via the optional --enable-log-src-basename provided
+at configure time.
+
+Using __BASE_FILE__ instead of __FILE__ did not work.  It
+refers to the file name as presented to the compile
+machinery, and that may still be the absolute pathname to
+the file.
+
+Signed-off-by: Jim Somerville <Jim.Somerville@windriver.com>
+---
+ configure.ac  | 9 +++++++++
+ src/lxc/log.h | 5 +++++
+ 2 files changed, 14 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index deba90b..c1ed67b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -357,6 +357,15 @@ AM_COND_IF([ENABLE_PYTHON],
+ 	PKG_CHECK_MODULES([PYTHONDEV], [python3 >= 3.2],[],[AC_MSG_ERROR([You must install python3-dev])])
+ 	AC_DEFINE_UNQUOTED([ENABLE_PYTHON], 1, [Python3 is available])])
+ 
++# Enable basenames in the logs for source files
++AC_ARG_ENABLE([log-src-basename],
++	[AC_HELP_STRING([--enable-log-src-basename], [Use the shorter source file basename in the logs [default=no]])],
++	[], [enable_log_src_basename=no])
++
++if test "x$enable_log_src_basename" = "xyes"; then
++	AC_DEFINE([LXC_LOG_USE_BASENAME], 1, [Enabling shorter src filenames in the logs])
++fi
++
+ # Enable dumping stack traces
+ AC_ARG_ENABLE([mutex-debugging],
+ 	[AC_HELP_STRING([--enable-mutex-debugging], [Makes mutexes to report error and provide stack trace [default=no]])],
+diff --git a/src/lxc/log.h b/src/lxc/log.h
+index 76bd4df..4365977 100644
+--- a/src/lxc/log.h
++++ b/src/lxc/log.h
+@@ -74,8 +74,13 @@ struct lxc_log_locinfo {
+ 	int		line;
+ };
+ 
++#ifdef LXC_LOG_USE_BASENAME
++#define LXC_LOG_LOCINFO_INIT						\
++	{ .file = (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__), .func = __func__, .line = __LINE__	}
++#else
+ #define LXC_LOG_LOCINFO_INIT						\
+ 	{ .file = __FILE__, .func = __func__, .line = __LINE__	}
++#endif
+ 
+ /* brief logging event object */
+ struct lxc_log_event {
+-- 
+1.8.3.2
+

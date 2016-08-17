@@ -1,0 +1,26 @@
+From fe23085d9a40d6d78387d9ce8ddb65785fe8d6e5 Mon Sep 17 00:00:00 2001
+From: Bogdan Purcareata <bogdan.purcareata@freescale.com>
+Date: Thu, 2 Oct 2014 18:31:50 -0400
+Subject: [PATCH] automake: ensure VPATH builds correctly
+
+Signed-off-by: Bogdan Purcareata <bogdan.purcareata@freescale.com>
+---
+ src/tests/Makefile.am |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/tests/Makefile.am b/src/tests/Makefile.am
+index d74c10d..6225f78 100644
+--- a/src/tests/Makefile.am
++++ b/src/tests/Makefile.am
+@@ -66,7 +66,7 @@ buildtest-TESTS: $(TESTS)
+ install-ptest:
+ 	install -d $(TEST_DIR)
+ 	install -D ../lxc/liblxc.so $(TEST_DIR)/../lxc/liblxc.so
+-	install -D ../../config/test-driver $(TEST_DIR)/../../config/test-driver
++	install -D $(top_srcdir)/config/test-driver $(TEST_DIR)/../../config/test-driver
+ 	cp Makefile $(TEST_DIR)
+ 	@(for file in $(TESTS); do install $$file $(TEST_DIR);  done;)
+ 	sed -i 's|^Makefile:|_Makefile:|' $(TEST_DIR)/Makefile
+-- 
+1.7.10.4
+
