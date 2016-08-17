@@ -1,0 +1,38 @@
+From 46e331263eb92e47510e88478b255f226d30245c Mon Sep 17 00:00:00 2001
+From: Keith Holman <Keith.Holman@windriver.com>
+Date: Mon, 18 Aug 2014 15:19:35 -0400
+Subject: [PATCH] protobuf: allow running python scripts from anywhere
+
+The Makefile to generate the examples with Google Protocol Buffers
+generates some scripts for python.  However, these generated scripts
+only work if they are ran in the same directory as the source files.
+This fix generates scripts to execute from anywhere on the system.
+
+Signed-off-by: Keith Holman <Keith.Holman@windriver.com>
+---
+ examples/Makefile | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/examples/Makefile b/examples/Makefile
+index 8dc9083..a993d63 100644
+--- a/examples/Makefile
++++ b/examples/Makefile
+@@ -48,11 +48,13 @@ list_people_java: javac_middleman
+ add_person_python: add_person.py protoc_middleman
+ 	@echo "Writing shortcut script add_person_python..."
+ 	@echo '#! /bin/sh' > add_person_python
+-	@echo './add_person.py "$$@"' >> add_person_python
++	@echo 'SCRIPT_DIR=$$(dirname $$0)' >> add_person_python
++	@echo '$$SCRIPT_DIR/add_person.py "$$@"' >> add_person_python
+ 	@chmod +x add_person_python
+ 
+ list_people_python: list_people.py protoc_middleman
+ 	@echo "Writing shortcut script list_people_python..."
+ 	@echo '#! /bin/sh' > list_people_python
+-	@echo './list_people.py "$$@"' >> list_people_python
++	@echo 'SCRIPT_DIR=$$(dirname $$0)' >> list_people_python
++	@echo '$$SCRIPT_DIR/list_people.py "$$@"' >> list_people_python
+ 	@chmod +x list_people_python
+-- 
+1.9.3
+

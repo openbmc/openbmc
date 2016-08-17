@@ -1,0 +1,32 @@
+#!/bin/bash
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+TEST_FILE="/tmp/test.data"
+
+RETVAL=0
+# Test every writing test application
+for write_exe_full_path in ${DIR}/add_person_*; do
+	if [ -x "${write_exe_full_path}" ]; then
+		write_exe=`basename ${write_exe_full_path}`
+		echo "Generating new test file using ${write_exe}..."
+		${write_exe_full_path} "${TEST_FILE}"
+		RETVAL=$?
+
+		# Test every reading test application
+		for read_exe_full_path in ${DIR}/list_people_*; do
+			read_exe=`basename ${read_exe_full_path}`
+			echo "Test: Write with ${write_exe}; Read with ${read_exe}..."
+			if [ -x "${read_exe_full_path}" ]; then
+				${read_exe_full_path} "${TEST_FILE}"
+				RETVAL=$?
+			fi
+		done
+
+		# Cleanup...
+		if [ -e "${TEST_FILE}" ]; then
+			rm "${TEST_FILE}"
+		fi
+	fi
+done
+
+exit $RETVAL
+

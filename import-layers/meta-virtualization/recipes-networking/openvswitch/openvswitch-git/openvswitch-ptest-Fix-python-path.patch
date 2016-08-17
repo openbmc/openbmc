@@ -1,0 +1,30 @@
+From 2a78bddb865e0d3377f437428ed6825195af0a14 Mon Sep 17 00:00:00 2001
+From: He Zhe <zhe.he@windriver.com>
+Date: Wed, 13 Apr 2016 03:13:01 -0400
+Subject: [PATCH] openvswitch: ptest: Fix python path
+
+For now PYTHON just happens to be the same as TARGET_PYTHON so we get the right
+python binary. This patch sets PYTHON to TARGET_PYTHON since ptest is going to
+be run on target.
+
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ tests/atlocal.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/atlocal.in b/tests/atlocal.in
+index 5815c6c..db2d2c9 100644
+--- a/tests/atlocal.in
++++ b/tests/atlocal.in
+@@ -5,7 +5,7 @@ EGREP='@EGREP@'
+ PERL='@PERL@'
+ 
+ if test x"$PYTHON" = x; then
+-    PYTHON='@PYTHON@'
++    PYTHON='@TARGET_PYTHON@'
+ fi
+ 
+ PYTHONPATH=$abs_top_srcdir/python:$abs_top_builddir/tests:$PYTHONPATH
+-- 
+1.9.1
+

@@ -1,0 +1,4 @@
+#!/bin/sh
+
+make -C src/tests -k check-TESTS
+

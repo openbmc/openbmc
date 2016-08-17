@@ -1,0 +1,113 @@
+Add 'install-ptest' rule.
+Change TESTS_ENVIRONMENT to allow running outside build dir.
+
+Signed-off-by: Mihaela Sendrea <mihaela.sendrea@enea.com>
+Upstream-status: Pending
+
+Index: libvirt-1.2.4/tests/Makefile.am
+===================================================================
+--- libvirt-1.2.4.orig/tests/Makefile.am
++++ libvirt-1.2.4/tests/Makefile.am
+@@ -31,9 +31,11 @@
+ 	-I$(top_srcdir)/src/conf \
+ 	$(GETTEXT_CPPFLAGS)
+ 
++PTEST_DIR ?= $(libdir)/libvirt/ptest
++
+ AM_CFLAGS = \
+-	-Dabs_builddir="\"$(abs_builddir)\"" \
+-	-Dabs_srcdir="\"$(abs_srcdir)\"" \
++	-Dabs_builddir="\"$(PTEST_DIR)/tests\"" \
++	-Dabs_srcdir="\"$(PTEST_DIR)/tests\"" \
+ 	$(LIBXML_CFLAGS) \
+	$(LIBNL_CFLAGS) \
+ 	$(GNUTLS_CFLAGS) \
+@@ -48,7 +50,7 @@
+ 
+ if WITH_DRIVER_MODULES
+ INCLUDES += \
+-	-DTEST_DRIVER_DIR=\"$(top_builddir)/src/.libs\"
++	-DTEST_DRIVER_DIR=\"$(PTEST_DIR)/src/.libs\"
+ endif WITH_DRIVER_MODULES
+ 
+ PROBES_O =
+@@ -409,20 +411,19 @@
+ # Also, BSD sh doesn't like 'a=b b=$$a', so we can't use an
+ # intermediate shell variable, but must do all the expansion in make
+ 
+-lv_abs_top_builddir=$(shell cd '$(top_builddir)' && pwd)
+ path_add = $(subst :,$(PATH_SEPARATOR),\
+-	$(subst !,$(lv_abs_top_builddir)/,!daemon:!tools:!tests))
++	$(subst !,$(PTEST_DIR)/,!daemon:!tools:!tests))
+ 
+ VIR_TEST_EXPENSIVE ?= $(VIR_TEST_EXPENSIVE_DEFAULT)
+ TESTS_ENVIRONMENT =				\
+-  abs_top_builddir=$(lv_abs_top_builddir)	\
+-  abs_top_srcdir=`cd '$(top_srcdir)'; pwd`	\
+-  abs_builddir=$(abs_builddir)			\
+-  abs_srcdir=$(abs_srcdir)			\
+-  CONFIG_HEADER="$(lv_abs_top_builddir)/config.h"	\
++  abs_top_builddir="$(PTEST_DIR)"             \
++  abs_top_srcdir="$(PTEST_DIR)"               \
++  abs_builddir="$(PTEST_DIR)/tests"           \
++  abs_srcdir="$(PTEST_DIR)/tests"             \
++  CONFIG_HEADER="$(PTEST_DIR)/config.h"       \
+   PATH="$(path_add)$(PATH_SEPARATOR)$$PATH"	\
+   SHELL="$(SHELL)"				\
+-  LIBVIRT_DRIVER_DIR="$(lv_abs_top_builddir)/src/.libs" \
++  LIBVIRT_DRIVER_DIR="$(PTEST_DIR)/src/.libs" \
+   LIBVIRT_AUTOSTART=0				\
+   LC_ALL=C					\
+   VIR_TEST_EXPENSIVE=$(VIR_TEST_EXPENSIVE)	\
+@@ -1137,5 +1138,51 @@
+ EXTRA_DIST += objectlocking.ml
+ endif ! WITH_CIL
+ 
++buildtest-TESTS: $(TESTS) $(test_libraries) $(test_helpers)
++
++PTESTS = $(TESTS) $(test_helpers) test-lib.sh schematestutils.sh
++
++install-ptest:
++	list='$(TESTS) $(test_helpers) test-lib.sh schematestutils.sh'
++	install -d $(DEST_DIR)/tools
++	@(if [ -d ../tools/.libs ] ; then cd ../tools/.libs; fi; \
++	install * $(DEST_DIR)/tools)
++	install -d $(DEST_DIR)/src/network
++	cp ../src/network/*.xml $(DEST_DIR)/src/network
++	install -d $(DEST_DIR)/src/cpu
++	cp ../src/cpu/*.xml $(DEST_DIR)/src/cpu
++	install ../src/libvirt_iohelper $(DEST_DIR)/src
++	install -D ../daemon/libvirtd $(DEST_DIR)/daemon/libvirtd
++	install -D ../daemon/libvirtd.conf $(DEST_DIR)/daemon/libvirtd.conf
++	@(if [ -d ../daemon/.libs ] ; then cd ../daemon/.libs; fi; \
++	install * $(DEST_DIR)/daemon)
++	install -d $(DEST_DIR)/src/.libs
++	@(if [ -d ../src/.libs ] ; then cd ../src/.libs; fi; \
++	install * $(DEST_DIR)/src/.libs)
++	install -d $(DEST_DIR)/docs/schemas
++	cp ../docs/schemas/*.rng $(DEST_DIR)/docs/schemas
++	cp -r ../build-aux $(DEST_DIR)
++	install -d $(DEST_DIR)/examples/xml
++	cp -r ../examples/xml/test $(DEST_DIR)/examples/xml
++	install -d $(DEST_DIR)/tests/.libs
++	find . -type d -name "*xml2xml*" -exec cp -r {} $(DEST_DIR)/tests \;
++	find . -type d -name "*data" -exec cp -r {} $(DEST_DIR)/tests \;
++	@(for file in $(PTESTS); do \
++		if [ -f .libs/$$file ]; then \
++			install .libs/$$file $(DEST_DIR)/tests; \
++		else \
++			install $$file $(DEST_DIR)/tests; \
++		fi; \
++	done;)
++	@(if [ -d .libs ]; then install .libs/*.so $(DEST_DIR)/tests/.libs; fi;)
++	cp ../config.h $(DEST_DIR)
++	cp Makefile $(DEST_DIR)/tests
++	sed -i -e 's/^Makefile:/_Makefile:/' $(DEST_DIR)/tests/Makefile
++	cp ../Makefile $(DEST_DIR)
++	sed -i -e 's|^Makefile:|_Makefile:|' $(DEST_DIR)/Makefile
++	sed -i -e 's|$(BUILD_DIR)|$(PTEST_DIR)|g' $(DEST_DIR)/tests/Makefile
++	sed -i -e 's|$(BUILD_DIR)|$(PTEST_DIR)|g' $(DEST_DIR)/Makefile
++	sed -i -e 's|^\(.*\.log:\) \(.*EXEEXT.*\)|\1|g' $(DEST_DIR)/tests/Makefile
++
+ CLEANFILES = *.cov *.gcov .libs/*.gcda .libs/*.gcno *.gcno *.gcda *.cmi *.cmx \
+ 	objectlocking-files.txt

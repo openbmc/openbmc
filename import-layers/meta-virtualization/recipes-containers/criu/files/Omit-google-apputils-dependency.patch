@@ -1,0 +1,25 @@
+From f8b7c90f6da90b67bdd7d5301894c5c28bd9d076 Mon Sep 17 00:00:00 2001
+From: Jianchuan Wang <jianchuan.wang@windriver.com>
+Date: Mon, 10 Aug 2015 11:23:31 +0800
+Subject: [PATCH] Omit google-apputils dependency
+
+Signed-off-by: Jianchuan Wang <jianchuan.wang@windriver.com>
+---
+ python/setup.py | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/python/setup.py b/python/setup.py
+index 2450a77..6f6bffb 100755
+--- a/python/setup.py
++++ b/python/setup.py
+@@ -189,7 +189,6 @@ if __name__ == '__main__':
+           'google.protobuf.text_format'],
+         cmdclass = { 'clean': clean, 'build_py': build_py },
+         install_requires = ['setuptools'],
+-        setup_requires = ['google-apputils'],
+         ext_modules = ext_module_list,
+         url = 'https://developers.google.com/protocol-buffers/',
+         maintainer = maintainer_email,
+-- 
+1.9.1
+

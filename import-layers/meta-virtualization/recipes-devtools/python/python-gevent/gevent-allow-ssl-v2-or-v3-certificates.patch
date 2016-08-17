@@ -1,0 +1,29 @@
+From c2dc97478fcc3757e09d5d2997391960a8351d53 Mon Sep 17 00:00:00 2001
+From: Bruce Ashfield <bruce.ashfield@windriver.com>
+Date: Sun, 29 Mar 2015 22:34:28 -0400
+Subject: [PATCH] gevent: allow ssl v2 or v3 certificates
+
+Work around an issue with python 2.7 not always having SSLv3 available
+by allowing v2 or v3 certificates.
+
+Signed-off-by: Bruce Ashfield <bruce.ashfield@windriver.com>
+---
+ gevent/ssl.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gevent/ssl.py b/gevent/ssl.py
+index ce6434718d1b..93c0d642da5f 100644
+--- a/gevent/ssl.py
++++ b/gevent/ssl.py
+@@ -383,7 +383,7 @@ def wrap_socket(sock, keyfile=None, certfile=None,
+                      ciphers=ciphers)
+ 
+ 
+-def get_server_certificate(addr, ssl_version=PROTOCOL_SSLv3, ca_certs=None):
++def get_server_certificate(addr, ssl_version=PROTOCOL_SSLv23, ca_certs=None):
+     """Retrieve the certificate from the server at the specified address,
+     and return it as a PEM-encoded string.
+     If 'ca_certs' is specified, validate the server cert against it.
+-- 
+1.9.1
+

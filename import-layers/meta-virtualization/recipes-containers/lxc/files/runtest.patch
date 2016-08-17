@@ -1,0 +1,32 @@
+Add install-ptest rule.
+
+Signed-off-by: Mihaela Sendrea <mihaela.sendrea@enea.com>
+Upstream-status: Pending
+
+diff -uNr a/src/tests/Makefile.am b/src/tests/Makefile.am
+--- a/src/tests/Makefile.am	2014-04-07 16:25:59.246238815 +0300
++++ b/src/tests/Makefile.am	2014-04-10 18:09:43.195772467 +0300
+@@ -54,6 +54,23 @@
+ 
+ endif
+ 
++TESTS = lxc-test-containertests lxc-test-locktests \
++        lxc-test-getkeys lxc-test-lxcpath lxc-test-cgpath lxc-test-console \
++        lxc-test-snapshot lxc-test-concurrent lxc-test-may-control \
++        lxc-test-reboot lxc-test-list lxc-test-attach lxc-test-device-add-remove
++
++buildtest-TESTS: $(TESTS)
++
++install-ptest:
++	install -d $(TEST_DIR)
++	install -D ../lxc/liblxc.so $(TEST_DIR)/../lxc/liblxc.so
++	install -D ../../config/test-driver $(TEST_DIR)/../../config/test-driver
++	cp Makefile $(TEST_DIR)
++	@(for file in $(TESTS); do install $$file $(TEST_DIR);  done;)
++	sed -i 's|^Makefile:|_Makefile:|' $(TEST_DIR)/Makefile
++	sed -i 's|^all-am:|_all-am:|' $(TEST_DIR)/Makefile
++	sed -i -e 's|^\(.*\.log:\) \(.*EXEEXT.*\)|\1|g' $(TEST_DIR)/Makefile
++
+ EXTRA_DIST = \
+ 	cgpath.c \
+ 	clonetest.c \

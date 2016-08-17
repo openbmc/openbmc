@@ -1,0 +1,4 @@
+#!/bin/sh
+
+./tests/testsuite --am-fmt -C tests AUTOTEST_PATH=utilities:vswitchd:ovsdb:tests
+

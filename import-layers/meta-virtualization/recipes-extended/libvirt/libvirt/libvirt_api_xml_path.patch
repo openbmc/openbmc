@@ -1,0 +1,85 @@
+Adding support for LIBVIRT_CFLAGS and LIBVIRT_LIBS
+
+Signed-off-by: Amy Fong <amy.fong@windriver.com>
+
+
+Adding a support for LIBVIRT_API_PATH evironment variable, which can
+control where the script should look for the 'libvirt-api.xml' file.
+This allows building libvirt-python against different libvirt than the
+one installed in the system.  This may be used for example in autotest
+or by packagers without the need to install libvirt into the system.
+
+Signed-off-by: Martin Kletzander <mkletzan redhat com>
+[ywei: rebased to 1.3.2]
+Signed-off-by: Yunguo Wei <yunguo.wei@windriver.com>
+---
+ setup.py |   25 ++++++++++++++++++++++---
+ 1 file changed, 22 insertions(+), 3 deletions(-)
+
+Index: libvirt-python-1.2.4/setup.py
+===================================================================
+--- libvirt-python-1.2.4.orig/setup.py
++++ libvirt-python-1.2.4/setup.py
+@@ -40,13 +40,7 @@
+            "libvirt"])
+ 
+ def have_libvirt_lxc():
+-    try:
+-        spawn([get_pkgcfg(),
+-               "--atleast-version=%s" % MIN_LIBVIRT_LXC,
+-             "libvirt"])
+-        return True
+-    except DistutilsExecError:
+-        return False
++    return True
+ 
+ def get_pkgconfig_data(args, mod, required=True):
+     """Run pkg-config to and return content associated with it"""
+@@ -68,7 +62,17 @@
+     """Check with pkg-config that libvirt is present and extract
+     the API XML file paths we need from it"""
+ 
+-    libvirt_api = get_pkgconfig_data(["--variable", "libvirt_api"], "libvirt")
++    libvirt_api = os.getenv("LIBVIRT_API_PATH")
++
++    if libvirt_api:
++        if not libvirt_api.endswith("-api.xml"):
++            raise ValueError("Invalid path '%s' for API XML" % libvirt_api)
++        if not os.path.exists(libvirt_api):
++            raise ValueError("API XML '%s' does not exist, "
++                             "have you built libvirt?" % libvirt_api)
++    else:
++        libvirt_api = get_pkgconfig_data(["--variable", "libvirt_api"],
++                                         "libvirt")
+ 
+     offset = libvirt_api.index("-api.xml")
+     libvirt_qemu_api = libvirt_api[0:offset] + "-qemu-api.xml"
+@@ -88,8 +92,17 @@
+ 
+     c_modules = []
+     py_modules = []
+-    ldflags = get_pkgconfig_data(["--libs-only-L"], "libvirt", False).split()
+-    cflags = get_pkgconfig_data(["--cflags"], "libvirt", False).split()
++    libvirt_cflags = os.getenv("LIBVIRT_CFLAGS")
++    if libvirt_cflags:
++        cflags = libvirt_cflags.split()
++    else:
++        cflags = get_pkgconfig_data(["--cflags"], "libvirt", False).split()
++
++    libvirt_libs = os.getenv("LIBVIRT_LIBS")
++    if libvirt_libs:
++        ldflags = libvirt_libs.split()
++    else:
++        ldflags = get_pkgconfig_data(["--libs-only-L"], "libvirt", False).split()
+ 
+     module = Extension('libvirtmod',
+                        sources = ['libvirt-override.c', 'build/libvirt.c', 'typewrappers.c', 'libvirt-utils.c'],
+@@ -138,7 +151,7 @@
+ class my_build(build):
+ 
+     def run(self):
+-        check_minimum_libvirt_version()
++#       check_minimum_libvirt_version()
+         apis = get_api_xml_files()
+ 
+         self.spawn([sys.executable, "generator.py", "libvirt", apis[0]])

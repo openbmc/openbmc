@@ -1,0 +1,21 @@
+diff -ur a/Makefile b/Makefile
+--- a/Makefile	2015-02-02 22:02:58.651041951 -0500
++++ b/Makefile	2015-02-02 23:08:13.884514003 -0500
+@@ -8,7 +8,7 @@
+ OUT=out/
+ 
+ # Common command definitions
+-export HOSTCC             := $(CC)
++export HOSTCC             ?= $(CC)
+ export CONFIG_SHELL       := sh
+ export KCONFIG_AUTOHEADER := autoconf.h
+ export KCONFIG_CONFIG     := $(CURDIR)/.config
+@@ -22,7 +22,7 @@
+ OBJDUMP=$(CROSS_PREFIX)objdump
+ STRIP=$(CROSS_PREFIX)strip
+ PYTHON=python
+-CPP=cpp
++CPP=$(CROSS_PREFIX)cpp
+ IASL:=iasl
+ LD32BIT_FLAG:=-melf_i386
+ 

@@ -1,0 +1,47 @@
+irqbalance: add basic init script
+
+The upstream irqbalance release package does not contain an
+init script so we create a basic one here.
+
+Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
+---
+Index: irqbalance-0.56/irqbalance.init
+===================================================================
+--- /dev/null
++++ irqbalance-0.56/irqbalance.init
+@@ -0,0 +1,35 @@
++#!/bin/sh
++#
++# Copyright (c) 2012 Wind River Systems, Inc.
++#
++### BEGIN INIT INFO
++# Provides:             irqbalance
++# Required-Start:
++# Required-Stop:
++# Default-Start:        2 3 4 5
++# Default-Stop:         0 1 6
++# Short-Description:    IRQ allocation daemon
++### END INIT INFO
++
++case "$1" in
++  start)
++	echo -n "Starting irqbalance: "
++	start-stop-daemon -S -b -n irqbalance -a /usr/sbin/irqbalance
++	echo "done"
++	;;
++  stop)
++	echo -n "Shutting down irqbalance: "
++	start-stop-daemon -K -n irqbalance
++	echo "done"
++	;;
++  restart)
++	$0 stop
++	$0 start
++	;;
++  *)
++	echo "Usage: $0 {start | stop | restart}" >&2
++	exit 1
++	;;
++esac
++
++exit 0

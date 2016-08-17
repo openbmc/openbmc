@@ -1,0 +1,57 @@
+From 884b6e3724b75cd92766d5386455983e3557a286 Mon Sep 17 00:00:00 2001
+From: Mark Asselstine <mark.asselstine@windriver.com>
+Date: Fri, 2 May 2014 13:45:05 -0400
+Subject: [PATCH] tests: allow separated src and build dirs
+
+Fixup Makefile.am to search for static files back in srcdir.
+
+Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
+---
+ tests/Makefile.am | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 0da514b..b8d7c19 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -1006,22 +1006,22 @@ install-ptest:
+ 	@(if [ -d ../tools/.libs ] ; then cd ../tools/.libs; fi; \
+ 	install * $(DEST_DIR)/tools)
+ 	install -d $(DEST_DIR)/src/network
+-	cp ../src/network/*.xml $(DEST_DIR)/src/network
++	cp $(top_srcdir)/src/network/*.xml $(DEST_DIR)/src/network
+ 	install -d $(DEST_DIR)/src/cpu
+-	cp ../src/cpu/*.xml $(DEST_DIR)/src/cpu
++	cp $(top_srcdir)/src/cpu/*.xml $(DEST_DIR)/src/cpu
+ 	install ../src/libvirt_iohelper $(DEST_DIR)/src
+ 	install -D ../daemon/libvirtd $(DEST_DIR)/daemon/libvirtd
+-	install -D ../daemon/libvirtd.conf $(DEST_DIR)/daemon/libvirtd.conf
++	install -D $(top_srcdir)/daemon/libvirtd.conf $(DEST_DIR)/daemon/libvirtd.conf
+ 	@(if [ -d ../daemon/.libs ] ; then cd ../daemon/.libs; fi; \
+ 	install * $(DEST_DIR)/daemon)
+ 	install -d $(DEST_DIR)/src/.libs
+ 	@(if [ -d ../src/.libs ] ; then cd ../src/.libs; fi; \
+ 	install * $(DEST_DIR)/src/.libs)
+ 	install -d $(DEST_DIR)/docs/schemas
+-	cp ../docs/schemas/*.rng $(DEST_DIR)/docs/schemas
+-	cp -r ../build-aux $(DEST_DIR)
++	cp $(top_srcdir)/docs/schemas/*.rng $(DEST_DIR)/docs/schemas
++	cp -r $(top_srcdir)/build-aux $(DEST_DIR)
+ 	install -d $(DEST_DIR)/examples/xml
+-	cp -r ../examples/xml/test $(DEST_DIR)/examples/xml
++	cp -r $(top_srcdir)/examples/xml/test $(DEST_DIR)/examples/xml
+ 	install -d $(DEST_DIR)/tests/.libs
+ 	find . -type d -name "*xml2xml*" -exec cp -r {} $(DEST_DIR)/tests \;
+ 	find . -type d -name "*data" -exec cp -r {} $(DEST_DIR)/tests \;
+@@ -1029,7 +1029,7 @@ install-ptest:
+ 		if [ -f .libs/$$file ]; then \
+ 			install .libs/$$file $(DEST_DIR)/tests; \
+ 		else \
+-			install $$file $(DEST_DIR)/tests; \
++			install $(srcdir)/$$file $(DEST_DIR)/tests; \
+ 		fi; \
+ 	done;)
+ 	@(if [ -d .libs ]; then install .libs/*.so $(DEST_DIR)/tests/.libs; fi;)
+-- 
+1.8.3.2
+
