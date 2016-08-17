@@ -1,0 +1,39 @@
+From b738724c6ca45ee5fecebed01c7ac91c92446123 Mon Sep 17 00:00:00 2001
+From: Andrei Gherzan <andrei@gherzan.ro>
+Date: Sun, 24 Aug 2014 00:18:05 +0200
+Subject: [PATCH] Remove strip step in Makefile
+
+Build system will strip binaries so remove strip step in Makefile.
+Avoid warnings/errors like:
+WARNING: File '/usr/lib/omxplayer/libavutil.so.51.56.100' from
+omxplayer was already stripped, this will prevent future debugging!
+
+Upstream-Status: Inappropriate [embedded specific]
+Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
+---
+ Makefile.ffmpeg | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile.ffmpeg b/Makefile.ffmpeg
+index 9d66a85..00df197 100644
+--- a/Makefile.ffmpeg
++++ b/Makefile.ffmpeg
+@@ -243,7 +243,8 @@ configure:
+ 			--disable-decoder=xbin \
+ 			--disable-decoder=idf \
+ 			--enable-decoder=opus \
+-			--cross-prefix=$(HOST)-
++			--cross-prefix=$(HOST)- \
++			--disable-stripping
+ 
+ .PHONY : clean
+ clean:
+@@ -256,5 +257,3 @@ checkout:
+ .PHONY : install
+ install:
+ 	cd ffmpeg; make -j9 DESTDIR="$(WORK)/ffmpeg_compiled" install
+-	$(HOST)-strip ffmpeg_compiled/usr/lib/*.so
+-
+-- 
+1.9.3
+
