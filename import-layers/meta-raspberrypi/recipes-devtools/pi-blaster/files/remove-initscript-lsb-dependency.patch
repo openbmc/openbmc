@@ -1,0 +1,77 @@
+Remove dependencies on LSB functions
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Alex Lennon <ajlennon@dynamicdevices.co.uk>
+
+diff -ur git.org/pi-blaster.boot.sh git/pi-blaster.boot.sh
+--- git.org/pi-blaster.boot.sh	2014-05-20 14:49:44.378582168 +0100
++++ git/pi-blaster.boot.sh	2014-05-20 14:51:08.330582386 +0100
+@@ -28,12 +28,12 @@
+ [ -r /etc/default/$NAME ] && . /etc/default/$NAME
+ 
+ # Load the VERBOSE setting and other rcS variables
+-. /lib/init/vars.sh
++#. /lib/init/vars.sh
+ 
+ # Define LSB log_* functions.
+ # Depend on lsb-base (>= 3.2-14) to ensure that this file is present
+ # and status_of_proc is working.
+-. /lib/lsb/init-functions
++#. /lib/lsb/init-functions
+ 
+ #
+ # Function that starts the daemon/service
+@@ -77,48 +77,23 @@
+ 
+ case "$1" in
+   start)
+-	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
++	[ "$VERBOSE" != no ] && echo "Starting $DESC" "$NAME"
+ 	do_start
+-	case "$?" in
+-		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+-		2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+-	esac
+ 	;;
+   stop)
+-	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
++	[ "$VERBOSE" != no ] && echo "Stopping $DESC" "$NAME"
+ 	do_stop
+-	case "$?" in
+-		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+-		2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+-	esac
+-	;;
+-  status)
+-	status_of_proc "$DAEMON" "$NAME" && exit 0 || exit $?
+ 	;;
+   restart|force-reload)
+ 	#
+ 	# If the "reload" option is implemented then remove the
+ 	# 'force-reload' alias
+ 	#
+-	log_daemon_msg "Restarting $DESC" "$NAME"
+ 	do_stop
+-	case "$?" in
+-	  0|1)
+-		do_start
+-		case "$?" in
+-			0) log_end_msg 0 ;;
+-			1) log_end_msg 1 ;; # Old process is still running
+-			*) log_end_msg 1 ;; # Failed to start
+-		esac
+-		;;
+-	  *)
+-		# Failed to stop
+-		log_end_msg 1
+-		;;
+-	esac
++	do_start
+ 	;;
+   *)
+-	echo "Usage: $SCRIPTNAME {start|stop|status|restart|force-reload}" >&2
++	echo "Usage: $SCRIPTNAME {start|stop|restart}" >&2
+ 	exit 3
+ 	;;
+ esac

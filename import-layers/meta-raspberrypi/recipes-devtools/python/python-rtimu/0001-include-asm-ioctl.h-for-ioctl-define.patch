@@ -1,0 +1,33 @@
+From c3aa4af56652b403e304ea5f321acfe289e42922 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 30 Jan 2016 16:07:14 -0800
+Subject: [PATCH] include asm/ioctl.h for ioctl() define
+
+also fixes errors e.g.
+
+../../RTIMULib/RTIMUHal.cpp:208:29: error: '_IOC_SIZEBITS' was not
+declared in this scope
+         return ioctl(m_SPI, SPI_IOC_MESSAGE(1), &wrIOC);
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted
+
+ RTIMULib/RTIMUHal.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/RTIMULib/RTIMUHal.cpp b/RTIMULib/RTIMUHal.cpp
+index f9c3d15..d968326 100644
+--- a/RTIMULib/RTIMUHal.cpp
++++ b/RTIMULib/RTIMUHal.cpp
+@@ -29,6 +29,7 @@
+ #if !defined(WIN32) && !defined(__APPLE__)
+ 
+ #include <linux/spi/spidev.h>
++#include <asm/ioctl.h>
+ 
+ RTIMUHal::RTIMUHal()
+ {
+-- 
+2.7.0
+

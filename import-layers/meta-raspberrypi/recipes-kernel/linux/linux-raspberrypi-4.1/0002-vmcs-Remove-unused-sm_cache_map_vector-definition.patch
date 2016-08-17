@@ -1,0 +1,31 @@
+The code using it also ifdef'ed with 0, anyyd gcc 6
+complains
+
+error: 'sm_cache_map_vector' defined but not used
+
+The code using it also ifdef'ed out
+
+Upstream-status: Denied [https://github.com/raspberrypi/linux/pull/1528]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ drivers/char/broadcom/vc_sm/vmcs_sm.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+--- a/drivers/char/broadcom/vc_sm/vmcs_sm.c
++++ b/drivers/char/broadcom/vc_sm/vmcs_sm.c
+@@ -197,12 +197,14 @@ struct SM_STATE_T {
+ static struct SM_STATE_T *sm_state;
+ static int sm_inited;
+ 
++#if 0
+ static const char *const sm_cache_map_vector[] = {
+ 	"(null)",
+ 	"host",
+ 	"videocore",
+ 	"host+videocore",
+ };
++#endif
+ 
+ /* ---- Private Function Prototypes -------------------------------------- */
+ 
