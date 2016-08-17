@@ -7,7 +7,7 @@ BBFILES ?= ""
 
 BBLAYERS ?= " \
   ##OEROOT##/meta \
-  ##OEROOT##/meta-yocto \
+  ##OEROOT##/meta-poky \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-openbmc-bsp/meta-aspeed \
   ##OEROOT##/meta-openbmc-bsp/meta-aspeed/meta-ast2500 \
@@ -17,7 +17,7 @@ BBLAYERS ?= " \
   "
 BBLAYERS_NON_REMOVABLE ?= " \
   ##OEROOT##/meta \
-  ##OEROOT##/meta-yocto \
+  ##OEROOT##/meta-poky \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-openbmc-bsp/meta-aspeed \
   ##OEROOT##/meta-openbmc-bsp/meta-aspeed/meta-ast2500 \
