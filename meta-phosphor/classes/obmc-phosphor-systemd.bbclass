@@ -14,13 +14,25 @@
 #    Inhibit the warning that is displayed if a service unit without a
 #    restart policy is detected.
 #
-# SYSTEMD_SUBSTITUTIONS_${path-relative-to-system_unitdir}
-#    Variables in this list will be substituted in the specified
-#    file during install (if bitbake finds python {format} strings
-#    in the file itself).  List entries take the form:
-#      VAR:VALUE
-#    where {VAR} is the format string bitbake should look for in the
-#    file and VALUE is the value to substitute.
+# SYSTEMD_SUBSTITUTIONS = "var:val:file"
+#    A specification for making python style {format} string
+#    substitutions where:
+#      var: the format string to search for
+#      val: the value to replace with
+#      file: the file in which to make the substitution
+#
+# SYSTEMD_GENSUBSTITUTIONS = "sub:val:file:listvars..."
+#    A convenience variable for generating substitutions from one or more
+#    lists where:
+#      sub: the variable to substitue
+#      val: the value to substitute with
+#      file: the file to make the substitution in, relative
+#         to ${systemd_system_unitdir}.
+#      listvars: one or more list variable names.
+#
+#    the lists are zipped and simple substitutions (of the current tuple)
+#    are supported in the sub, val and file fields using [%i] where i is the
+#    tuple element to substitute.
 #
 # SYSTEMD_USER_${PN}.service = "foo"
 # SYSTEMD_USER_${unit}.service = "foo"
@@ -105,16 +117,14 @@ python() {
 
 
     def add_default_subs(d, file):
-        set_append(d, '_MAKE_SUBS', '%s' % file)
-
         for x in [
                 'base_bindir',
                 'bindir',
                 'sbindir',
                 'envfiledir',
                 'SYSTEMD_DEFAULT_TARGET' ]:
-            set_append(d, 'SYSTEMD_SUBSTITUTIONS_%s' % file,
-                '%s:%s' % (x, d.getVar(x, True)))
+            set_append(d, 'SYSTEMD_SUBSTITUTIONS',
+                '%s:%s:%s' % (x, d.getVar(x, True), file))
 
 
     def add_sd_unit(d, nfo, pkg):
@@ -144,8 +154,8 @@ python() {
                 bb.fatal('Too many users assigned to %s: \'%s\'' % (var, ' '.join(user)))
 
             user = user[0]
-            set_append(d, 'SYSTEMD_SUBSTITUTIONS_%s' % file,
-                'USER:%s' % user)
+            set_append(d, 'SYSTEMD_SUBSTITUTIONS',
+                'USER:%s:%s' % (user, file))
             if user not in d.getVar('USERADD_PARAM_%s' % pkg, True):
                 set_append(
                     d,
@@ -197,6 +207,36 @@ python() {
         set_append(d, 'SYSTEMD_LINK_%s' % pkg, links)
 
 
+    def gen_subs(d, spec):
+        spec = spec.split(':')
+        varfmt, valfmt, filefmt = spec[:3]
+        listvars = spec[3:]
+        lists = []
+        vars = []
+        vals = []
+        files = []
+
+        for var in listvars:
+            lists.append(listvar_to_list(d, var))
+
+        for tup in zip(*lists):
+            var = varfmt
+            val = valfmt
+	    f = filefmt
+            for i in range(len(tup)):
+                var = var.replace('[%s]' %i, tup[i])
+                val = val.replace('[%s]' %i, tup[i])
+                f = f.replace('[%s]' %i, tup[i])
+            vars.append(var)
+            vals.append(val)
+            files.append(f)
+
+        subs = ' '.join([':'.join(x) for x in
+            zip(vars, vals, files)])
+
+        set_append(d, 'SYSTEMD_SUBSTITUTIONS', subs)
+
+
     pn = d.getVar('PN', True)
     if d.getVar('SYSTEMD_SERVICE_%s' % pn, True) is None:
         d.setVar('SYSTEMD_SERVICE_%s' % pn, '%s.service' % pn)
@@ -204,6 +244,8 @@ python() {
     for pkg in listvar_to_list(d, 'SYSTEMD_PACKAGES'):
         for spec in listvar_to_list(d, 'SYSTEMD_GENLINKS_%s' % pkg):
             gen_links(d, spec, pkg)
+        for spec in listvar_to_list(d, 'SYSTEMD_GENSUBSTITUTIONS'):
+            gen_subs(d, spec)
         for unit in listvar_to_list(d, 'SYSTEMD_SERVICE_%s' % pkg):
             nfo = systemd_unit_info(unit)
             check_sd_unit(d, nfo)
@@ -213,14 +255,20 @@ python() {
             add_env_file(d, name, pkg)
         for spec in listvar_to_list(d, 'SYSTEMD_LINK_%s' % pkg):
             install_link(d, spec, pkg)
+        for spec in listvar_to_list(d, 'SYSTEMD_OVERRIDE_%s' % pkg):
+            add_override(d, spec, pkg)
 }
 
 
 python systemd_do_postinst() {
     def make_subs(d):
-        for f in listvar_to_list(d, '_MAKE_SUBS'):
-            subs = dict([ x.split(':') for x in
-                listvar_to_list(d, 'SYSTEMD_SUBSTITUTIONS_%s' % f)])
+        all_subs = {}
+        for spec in listvar_to_list(d, 'SYSTEMD_SUBSTITUTIONS'):
+            spec, file = spec.rsplit(':', 1)
+            all_subs.setdefault(file, []).append(spec)
+
+        for f, v in all_subs.iteritems():
+            subs = dict([ x.split(':') for x in v])
             if not subs:
                 continue
 
