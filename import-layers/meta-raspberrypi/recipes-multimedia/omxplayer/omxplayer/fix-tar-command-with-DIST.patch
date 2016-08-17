@@ -1,0 +1,21 @@
+Revert the tar command change introduced in:
+https://github.com/popcornmix/omxplayer/commit/201c77973155861e60492e45d35467b19b69c1c4
+
+This fails if DIST is an absolute path. The old command was working just fine.
+
+Upstream-Status: Pending
+
+Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
+Signed-off-by: Jonathan Liu <net147@gmail.com>
+
+Index: git/Makefile
+===================================================================
+--- git.orig/Makefile
++++ git/Makefile
+@@ -71,4 +71,4 @@ dist: omxplayer.bin
+ 	cp COPYING $(DIST)/usr/share/doc/
+ 	cp README.md $(DIST)/usr/share/doc/README
+ 	cp -P ffmpeg_compiled/usr/lib/*.so* $(DIST)/usr/lib/omxplayer/
+-	cd $(DIST); tar -czf ../$(DIST).tgz *
++	tar -czf omxplayer-dist.tar.gz $(DIST)
+\ No newline at end of file

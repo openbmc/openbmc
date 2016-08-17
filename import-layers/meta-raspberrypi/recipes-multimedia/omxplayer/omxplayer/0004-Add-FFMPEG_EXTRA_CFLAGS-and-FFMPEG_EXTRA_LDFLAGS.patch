@@ -1,0 +1,31 @@
+From 100982ee1fc1cb571c7453d14f9acd60e67d4765 Mon Sep 17 00:00:00 2001
+From: Andrei Gherzan <andrei.gherzan@windriver.com>
+Date: Sun, 25 Jan 2015 11:13:51 +0200
+Subject: [PATCH] Add FFMPEG_EXTRA_CFLAGS and FFMPEG_EXTRA_LDFLAGS
+
+In this way we can inject flags to LD and CC using
+--extra-cflags and --extra-ldflags.
+
+Upstream-Status: Inappropriate [embedded specific]
+Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
+---
+ Makefile.ffmpeg | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.ffmpeg b/Makefile.ffmpeg
+index abe4b26..c9d42d7 100644
+--- a/Makefile.ffmpeg
++++ b/Makefile.ffmpeg
+@@ -22,7 +22,8 @@ configure:
+ 	CFLAGS="$(CFLAGS) ${INCLUDES}" \
+ 	LDFLAGS="" \
+   ./configure \
+-			--extra-cflags="-mfpu=vfp -mfloat-abi=$(FLOAT) -mno-apcs-stack-check -mstructure-size-boundary=32 -mno-sched-prolog" \
++			--extra-cflags="-mfpu=vfp -mfloat-abi=$(FLOAT) -mno-apcs-stack-check -mstructure-size-boundary=32 -mno-sched-prolog $(FFMPEG_EXTRA_CFLAGS)" \
++			--extra-ldflags="$(FFMPEG_EXTRA_LDFLAGS)" \
+ 			--enable-cross-compile \
+ 			--enable-shared \
+ 			--disable-static \
+-- 
+2.1.0
+

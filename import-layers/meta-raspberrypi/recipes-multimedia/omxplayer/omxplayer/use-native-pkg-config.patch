@@ -1,0 +1,19 @@
+Force the pkg-config native tool. Strangely ffmpeg prepends cross_prefix
+to the default value which obviously is wrong.
+
+Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
+
+Index: git/Makefile.ffmpeg
+===================================================================
+--- git.orig/Makefile.ffmpeg
++++ git/Makefile.ffmpeg
+@@ -245,7 +245,8 @@ configure:
+ 			--disable-decoder=idf \
+ 			--enable-decoder=opus \
+ 			--cross-prefix=$(HOST)- \
+-			--disable-stripping
++			--disable-stripping \
++			--pkg-config=pkg-config
+ 
+ .PHONY : clean
+ clean:

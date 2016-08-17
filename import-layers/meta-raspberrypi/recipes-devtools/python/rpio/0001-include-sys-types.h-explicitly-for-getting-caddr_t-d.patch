@@ -1,0 +1,30 @@
+From c86bfacc98d58244f532626954ed00d84ecfa82d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 30 Jan 2016 17:12:37 -0800
+Subject: [PATCH] include sys/types.h explicitly for getting caddr_t definition
+
+Helps fixing build on musl where sys/types.h is not included indirectly
+as happening on glibc
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted
+
+ source/c_gpio/c_gpio.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/source/c_gpio/c_gpio.c b/source/c_gpio/c_gpio.c
+index 25a04ca..70df632 100644
+--- a/source/c_gpio/c_gpio.c
++++ b/source/c_gpio/c_gpio.c
+@@ -29,6 +29,7 @@
+ #include <stdint.h>
+ #include <stdlib.h>
+ #include <fcntl.h>
++#include <sys/types.h>
+ #include <sys/mman.h>
+ #include "c_gpio.h"
+ 
+-- 
+2.7.0
+
