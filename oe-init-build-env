@@ -1,1 +1,1 @@
-yocto-poky/oe-init-build-env
+import-layers/yocto-poky/oe-init-build-env

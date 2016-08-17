@@ -1,1 +1,1 @@
-yocto-poky/meta-selftest
+import-layers/yocto-poky/meta-selftest
