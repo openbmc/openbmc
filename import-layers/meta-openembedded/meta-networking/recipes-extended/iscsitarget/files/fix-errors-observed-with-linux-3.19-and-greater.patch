@@ -1,0 +1,198 @@
+Fix build errors with linux kernel v3.19 and above
+
+Below errors came up while building iscsitarget for 
+qemux86-64 (and others) because,
+1. 'struct user_msghdr' is being used for userland-side msghdr instead
+of 'struct msghdr', which is used for kernel-side msghdr in linux v3.19
+and above.
+
+error snippet:
+-- snip --
+| /CGE7_SHDD/project_yocto_1.8/poky/build/tmp/work/qemux86_64-poky-linux/iscsitarget/1.4.20.3+svn502-r0/iscsitarget-1.4.20.3+svn502/kernel/iscsi.c: In function 'cmnd_skip_pdu':
+| /CGE7_SHDD/project_yocto_1.8/poky/build/tmp/work/qemux86_64-poky-linux/iscsitarget/1.4.20.3+svn502-r0/iscsitarget-1.4.20.3+svn502/kernel/iscsi.c:492:16: error: 'struct msghdr' has no member named 'msg_iov'
+|   conn->read_msg.msg_iov = conn->read_iov;
+-- CUT --
+
+Reference:
+https://github.com/torvalds/linux/commit/666547ff591cebdedc4679bf6b1b3f3383a8dea3
+
+2. 'SERVICE_ACTION_IN' has been renamed to SERVICE_ACTION_IN_16 in linux v3.19
+and above.
+
+error snippet:
+-- snip --
+| /CGE7_SHDD/project_yocto_1.8/poky/build/tmp/work/qemux86_64-poky-linux/iscsitarget/1.4.20.3+svn502-r0/iscsitarget-1.4.20.3+svn502/kernel/iscsi.c: In function 'scsi_cmnd_start':
+| /CGE7_SHDD/project_yocto_1.8/poky/build/tmp/work/qemux86_64-poky-linux/iscsitarget/1.4.20.3+svn502-r0/iscsitarget-1.4.20.3+svn502/kernel/iscsi.c:989:7: error: 'SERVICE_ACTION_IN' undeclared (first use in this function)
+|   case SERVICE_ACTION_IN:
+-- CUT --
+
+Reference:
+https://github.com/torvalds/linux/commit/eb846d9f147455e4e5e1863bfb5e31974bb69b7c
+
+3. In linux v3.19 and above, f_dentry member has been removed from 
+'struct file' structure.
+
+error snippet:
+-- snip --
+| /CGE7_SHDD/project_yocto_1.8/poky/build/tmp/work/qemux86_64-poky-linux/iscsitarget/1.4.20.3+svn502-r0/iscsitarget-1.4.20.3+svn502/kernel/conn.c: In function 'iet_socket_bind':
+| /CGE7_SHDD/project_yocto_1.8/poky/build/tmp/work/qemux86_64-poky-linux/iscsitarget/1.4.20.3+svn502-r0/iscsitarget-1.4.20.3+svn502/kernel/conn.c:130:34: error: 'struct file' has no member named 'f_dentry'
+|   conn->sock = SOCKET_I(conn->file->f_dentry->d_inode);
+-- CUT --
+
+new helper function file_inode(file) should be used instead.
+
+References:
+1. https://github.com/torvalds/linux/commit/78d28e651f97866d608d9b41f8ad291e65d47dd5
+2. https://github.com/torvalds/linux/commit/496ad9aa8ef448058e36ca7a787c61f2e63f0f54
+
+Upstream-Status: Pending
+
+Signed-off-by: Jagadeesh Krishnanjanappa <jkrishnanjanappa@mvista.com>
+
+--- iscsitarget-1.4.20.3+svn502_org/kernel/conn.c	2015-08-24 16:13:26.481924679 +0530
++++ iscsitarget-1.4.20.3+svn502/kernel/conn.c	2015-08-24 17:27:06.897653698 +0530
+@@ -127,7 +127,11 @@ static void iet_socket_bind(struct iscsi
+ 
+ 	dprintk(D_GENERIC, "%llu\n", (unsigned long long) session->sid);
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0)
++	conn->sock = SOCKET_I(file_inode(conn->file));
++#else
+ 	conn->sock = SOCKET_I(conn->file->f_dentry->d_inode);
++#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0) */
+ 	conn->sock->sk->sk_user_data = conn;
+ 
+ 	write_lock_bh(&conn->sock->sk->sk_callback_lock);
+--- iscsitarget-1.4.20.3+svn502_org/kernel/file-io.c	2015-08-24 16:13:26.481924679 +0530
++++ iscsitarget-1.4.20.3+svn502/kernel/file-io.c	2015-08-24 17:30:54.390131100 +0530
+@@ -69,7 +69,11 @@ static int fileio_make_request(struct ie
+ static int fileio_sync(struct iet_volume *lu, struct tio *tio)
+ {
+ 	struct fileio_data *p = lu->private;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0)
++	struct inode *inode = file_inode(p->filp);
++#else
+ 	struct inode *inode = p->filp->f_dentry->d_inode;
++#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0) */
+ 	struct address_space *mapping = inode->i_mapping;
+ 	loff_t ppos, count;
+ 	int res;
+@@ -213,7 +217,11 @@ static int fileio_attach(struct iet_volu
+ 		eprintk("%d\n", err);
+ 		goto out;
+ 	}
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0)
++	inode = file_inode(p->filp);
++#else
+ 	inode = p->filp->f_dentry->d_inode;
++#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0) */
+ 
+ 	if (S_ISREG(inode->i_mode))
+ 		;
+--- iscsitarget-1.4.20.3+svn502_org/kernel/iscsi.c	2015-08-24 16:13:26.481924679 +0530
++++ iscsitarget-1.4.20.3+svn502/kernel/iscsi.c	2015-08-24 17:33:50.950490156 +0530
+@@ -986,7 +986,11 @@ static void scsi_cmnd_start(struct iscsi
+ 		set_cmnd_lunit(req);
+ 
+ 	switch (req_hdr->scb[0]) {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0)
++	case SERVICE_ACTION_IN_16:
++#else
+ 	case SERVICE_ACTION_IN:
++#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0) */
+ 		if ((req_hdr->scb[1] & 0x1f) != 0x10)
+ 			goto error;
+ 	case INQUIRY:
+--- iscsitarget-1.4.20.3+svn502_org/kernel/iscsi.h	2015-08-24 16:13:26.481924679 +0530
++++ iscsitarget-1.4.20.3+svn502/kernel/iscsi.h	2015-08-24 17:35:31.354690051 +0530
+@@ -257,7 +257,11 @@ struct iscsi_conn {
+ 	struct timer_list nop_timer;
+ 
+ 	struct iscsi_cmnd *read_cmnd;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0)
++	struct user_msghdr read_msg;
++#else
+ 	struct msghdr read_msg;
++#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0) */
+ 	struct iovec read_iov[ISCSI_CONN_IOV_MAX];
+ 	u32 read_size;
+ 	u32 read_overflow;
+--- iscsitarget-1.4.20.3+svn502_org/kernel/nthread.c	2015-08-24 16:13:26.481924679 +0530
++++ iscsitarget-1.4.20.3+svn502/kernel/nthread.c	2015-08-24 17:41:56.187428925 +0530
+@@ -80,8 +80,11 @@ static int is_data_available(struct iscs
+ 	set_fs(oldfs);
+ 	return (res >= 0) ? avail : res;
+ }
+-
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0)
++static void forward_iov(struct user_msghdr *msg, int len)
++#else
+ static void forward_iov(struct msghdr *msg, int len)
++#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0) */
+ {
+ 	while (msg->msg_iov->iov_len <= len) {
+ 		len -= msg->msg_iov->iov_len;
+@@ -96,7 +99,11 @@ static void forward_iov(struct msghdr *m
+ static int do_recv(struct iscsi_conn *conn, int state)
+ {
+ 	mm_segment_t oldfs;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0)
++	struct user_msghdr msg;
++#else
+ 	struct msghdr msg;
++#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0) */
+ 	struct iovec iov[ISCSI_CONN_IOV_MAX];
+ 	int i, len, res;
+ 
+@@ -461,7 +468,11 @@ static void exit_tx(struct iscsi_conn *c
+ static int tx_ddigest(struct iscsi_cmnd *cmnd, int state)
+ {
+ 	int res, rest = cmnd->conn->write_size;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0)
++	struct user_msghdr msg = {.msg_flags = MSG_NOSIGNAL | MSG_DONTWAIT};
++#else
+ 	struct msghdr msg = {.msg_flags = MSG_NOSIGNAL | MSG_DONTWAIT};
++#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0) */
+ 	struct kvec iov;
+ 
+ 	iov.iov_base = (char *) (&cmnd->ddigest) + (sizeof(u32) - rest);
+--- iscsitarget-1.4.20.3+svn502_org/kernel/target_disk.c	2015-08-24 16:13:26.481924679 +0530
++++ iscsitarget-1.4.20.3+svn502/kernel/target_disk.c	2015-08-24 17:43:42.167625159 +0530
+@@ -606,7 +606,11 @@ static int disk_execute_cmnd(struct iscs
+ 	case REQUEST_SENSE:
+ 		send_data_rsp(cmnd, build_request_sense_response);
+ 		break;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0)
++	case SERVICE_ACTION_IN_16:
++#else
+ 	case SERVICE_ACTION_IN:
++#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0) */	
+ 		send_data_rsp(cmnd, build_service_action_in_response);
+ 		break;
+ 	case READ_6:
+--- iscsitarget-1.4.20.3+svn502_org/kernel/volume.c	2015-08-24 16:13:26.477924674 +0530
++++ iscsitarget-1.4.20.3+svn502/kernel/volume.c	2015-08-24 18:28:15.697074780 +0530
+@@ -398,7 +398,11 @@ int is_volume_reserved(struct iet_volume
+ 		case READ_CAPACITY:
+ 			/* allowed commands when reserved */
+ 			break;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0)			
++		case SERVICE_ACTION_IN_16:
++#else
+ 		case SERVICE_ACTION_IN:
++#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0) */
+ 			if ((scb[1] & 0x1F) == 0x10)
+ 				break;
+ 			/* fall through */
+@@ -465,7 +469,11 @@ int is_volume_reserved(struct iet_volume
+ 		if (excl_access_ro && !registered)
+ 			err = -EBUSY;
+ 		break;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0)
++	case SERVICE_ACTION_IN_16:
++#else
+ 	case SERVICE_ACTION_IN:
++#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0) */
+ 		if ((scb[1] & 0x1F) == 0x10)
+ 			break;
+ 		/* fall through */

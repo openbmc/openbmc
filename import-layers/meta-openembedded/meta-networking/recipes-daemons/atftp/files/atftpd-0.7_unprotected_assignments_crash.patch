@@ -1,0 +1,152 @@
+Avoid assigning thread data outside of mutex lock
+
+Patch originally from OpenSUSE:
+https://build.opensuse.org/package/show?package=atftp&project=openSUSE%3A12.2
+
+Upstream-Status: Pending
+
+Index: git/tftpd_list.c
+===================================================================
+--- git.orig/tftpd_list.c	2012-10-24 21:48:47.000000000 -0700
++++ git/tftpd_list.c	2012-10-24 21:52:04.266205076 -0700
+@@ -49,11 +49,11 @@
+  */
+ int tftpd_list_add(struct thread_data *new)
+ {
+-     struct thread_data *current = thread_data;
++     struct thread_data *current;
+      int ret;
+ 
+      pthread_mutex_lock(&thread_list_mutex);
+-
++     current = thread_data;
+      number_of_thread++;
+      
+      ret = number_of_thread;
+@@ -81,11 +81,13 @@
+  */
+ int tftpd_list_remove(struct thread_data *old)
+ {
+-     struct thread_data *current = thread_data;
++     struct thread_data *current;
+      int ret;
+ 
+      pthread_mutex_lock(&thread_list_mutex);
+ 
++     current = thread_data;
++
+      number_of_thread--;
+      ret = number_of_thread;
+     
+@@ -137,23 +139,26 @@
+                                              struct thread_data *data,
+                                              struct client_info *client)
+ {
+-     struct thread_data *current = thread_data; /* head of the list */
+-     struct tftp_opt *tftp_options = data->tftp_options;
++     struct thread_data *current; /* head of the list */
++     struct tftp_opt *tftp_options;
+      struct client_info *tmp;
+      char options[MAXLEN];
+      char string[MAXLEN];
+      char *index;
+      int len;
+ 
++     /* lock the whole list before walking it */
++     pthread_mutex_lock(&thread_list_mutex);
++
+      *thread = NULL;
+ 
++     current = thread_data;
++     tftp_options = data->tftp_options;
++
+      opt_request_to_string(tftp_options, options, MAXLEN);
+      index = strstr(options, "multicast");
+      len = (int)index - (int)options;
+ 
+-     /* lock the whole list before walking it */
+-     pthread_mutex_lock(&thread_list_mutex);
+-
+      while (current)
+      {
+           if (current != data)
+@@ -214,9 +219,10 @@
+ void tftpd_clientlist_remove(struct thread_data *thread,
+                              struct client_info *client)
+ {
+-     struct client_info *tmp = thread->client_info;
++     struct client_info *tmp;
+ 
+      pthread_mutex_lock(&thread->client_mutex);
++     tmp = thread->client_info;
+      while ((tmp->next != client) && (tmp->next != NULL))
+           tmp = tmp->next;
+      if (tmp->next == NULL)
+@@ -231,9 +237,11 @@
+ void tftpd_clientlist_free(struct thread_data *thread)
+ {
+      struct client_info *tmp;
+-     struct client_info *head = thread->client_info;
++     struct client_info *head;
+ 
+      pthread_mutex_lock(&thread->client_mutex);
++     head = thread->client_info;
++
+      while (head)
+      {
+           tmp = head;
+@@ -250,9 +258,10 @@
+                           struct client_info *client,
+                           struct sockaddr_storage *sock)
+ {
+-     struct client_info *head = thread->client_info;
++     struct client_info *head;
+ 
+      pthread_mutex_lock(&thread->client_mutex);
++     head = thread->client_info;
+ 
+      if (client)
+      {
+@@ -334,10 +343,10 @@
+ 
+ void tftpd_list_kill_threads(void)
+ {
+-     struct thread_data *current = thread_data; /* head of list */
++     struct thread_data *current; /* head of list */
+ 
+      pthread_mutex_lock(&thread_list_mutex);
+-
++     current = thread_data;
+ 
+      while (current != NULL)
+      {
+Index: git/tftpd_mcast.c
+===================================================================
+--- git.orig/tftpd_mcast.c	2012-10-24 21:48:47.000000000 -0700
++++ git/tftpd_mcast.c	2012-10-24 21:49:11.570201582 -0700
+@@ -51,9 +51,11 @@
+  */
+ int tftpd_mcast_get_tid(char **addr, short *port)
+ {
+-     struct tid *current = tid_list;
++     struct tid *current;
+ 
+      pthread_mutex_lock(&mcast_tid_list);
++     current = tid_list;
++
+      /* walk the list for a free tid */
+      while (current != NULL)
+      {
+@@ -74,9 +76,11 @@
+ 
+ int tftpd_mcast_free_tid(char *addr, short port)
+ {
+-     struct tid *current = tid_list;
++     struct tid *current;
+ 
+      pthread_mutex_lock(&mcast_tid_list);
++     current = tid_list;
++
+      while (current != NULL)
+      {
+ 	  if ((current->used == 1) && (current->port == port) &&

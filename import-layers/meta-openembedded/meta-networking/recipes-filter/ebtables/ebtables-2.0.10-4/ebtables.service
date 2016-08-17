@@ -1,0 +1,11 @@
+[Unit]
+Description=Ethernet Bridge Filtering Tables
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=@SBINDIR@/ebtables.common start
+ExecStop=@SBINDIR@/ebtables.common stop
+
+[Install]
+WantedBy=multi-user.target

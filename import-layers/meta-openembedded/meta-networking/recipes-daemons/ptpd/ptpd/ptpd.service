@@ -1,0 +1,10 @@
+[Unit]
+Description=ptpd time precision daemon
+
+[Service]
+Type=forking
+EnvironmentFile=-@SYSCONFDIR@/default/ptpd
+ExecStart=@BINDIR@/ptpd2 $PTPDARGS
+
+[Install]
+WantedBy=multi-user.target

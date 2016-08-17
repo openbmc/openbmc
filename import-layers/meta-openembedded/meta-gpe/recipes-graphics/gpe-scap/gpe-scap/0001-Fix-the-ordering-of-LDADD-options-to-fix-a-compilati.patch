@@ -1,0 +1,28 @@
+From c551dece6768f67b74b508e9c0133320205ef2df Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen@dominion.thruhere.net>
+Date: Mon, 23 May 2011 15:03:29 +0200
+Subject: [PATCH] Fix the ordering of LDADD options to fix a compilation failure.
+
+"invalid DSO for symbol `XUngrabServer' definition "
+
+Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
+---
+ src/Makefile.am |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 2fddc98..45bd850 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -6,7 +6,7 @@ INCLUDES = -DPKGDATADIR=\"$(pkgdatadir)\" \
+ 	   $(GLADE_CFLAGS) \
+        -D_GNU_SOURCE
+ 
+-LIBS = $(GTK_LIBS) $(GLADE_LIBS) $(XSHAPE_LIBS)
++LIBS = -lX11 $(XSHAPE_LIBS) $(GLADE_LIBS) $(GTK_LIBS) 
+ 
+ bin_PROGRAMS = gpe-scap
+ gpe_scap_SOURCES = scr-i18n.h \
+-- 
+1.6.6.1
+

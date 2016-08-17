@@ -1,0 +1,14 @@
+Index: pxaregs-1.14/pxaregs.c
+===================================================================
+--- pxaregs-1.14.orig/pxaregs.c
++++ pxaregs-1.14/pxaregs.c
+@@ -78,6 +78,9 @@ static struct reg_info regs[] = {
+ { "ISAR",      0x403016A0,  0, 0xffffffff, 'x', "I2C Slave Address Register" },
+ { "ISAR_SA",   0x403016A0,  0, 0x0000007f, 'x', "I2C Slave Address" },
+ 
++{ "HW_MCR",    0x41600010,  0, 0xffffffff, 'x', "HWUART Modem Control Register" },
++{ "HW_MSR",    0x41600018,  0, 0xffffffff, 'x', "HWUART Modem Status Register" },
++
+ { "PMCR",      0x40F00000,  0, 0xffffffff, 'x', "Power Manager Control Register (3-23)" },
+ { "PMCR_IDAE", 0x40F00000,  0, 0x00000001, 'd', "PM imprecise data abort abort signal" },
+ 

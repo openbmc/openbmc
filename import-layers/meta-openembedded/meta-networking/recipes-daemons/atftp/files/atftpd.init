@@ -1,0 +1,37 @@
+#! /bin/sh
+#
+# This is an init script for openembedded
+# Copy it to /etc/init.d/atftpd and type
+# > update-rc.d atftpd defaults 60
+#
+
+
+test -f /usr/sbin/atftpd || exit 0
+
+test -d /srv/tftp || mkdir -p /srv/tftp
+
+case "$1" in
+  start)
+    echo -n "Starting tftp daemon: atftpd"
+    start-stop-daemon --start --quiet --exec /usr/sbin/atftpd -- --daemon --port 69
+    echo "."
+    ;;
+  stop)
+    echo -n "Stopping tftp daemon: atftpd"
+    start-stop-daemon --stop --quiet --exec /usr/sbin/atftpd
+    echo "."
+    ;;
+  reload|force-reload)
+    start-stop-daemon --stop --quiet --signal 1 --exec /usr/sbin/atftpd
+    ;;
+  restart)
+    $0 stop
+    sleep 1
+	$0 start
+    ;;
+  *)
+    echo "Usage: /etc/init.d/atftpd {start|stop|reload|restart|force-reload}"
+    exit 1
+esac
+
+exit 0

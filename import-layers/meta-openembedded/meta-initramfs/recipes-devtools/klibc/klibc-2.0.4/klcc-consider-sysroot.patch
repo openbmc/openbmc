@@ -1,0 +1,14 @@
+diff --git a/klcc/klcc.in b/klcc/klcc.in
+index 43d0984..61e9385 100644
+--- a/klcc/klcc.in
++++ b/klcc/klcc.in
+@@ -204,6 +204,9 @@ while ( defined($a = shift(@ARGV)) ) {
+ 	# Libraries
+ 	push(@libs, $a);
+ 	push(@libs, shift(@ARGV)) if ( $2 eq '' );
++    } elsif ( $a =~ /^--([sysroot=])(.*)$/ ) {
++	# Override gcc encoded sysroot
++	push(@ccopt, $a);
+     } else {
+ 	die "$0: unknown option: $a\n";
+     }

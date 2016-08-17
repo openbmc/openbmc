@@ -1,0 +1,44 @@
+From 26ad431e19788898fb4ed19ff91392e8b20f1bab Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Thu, 16 Oct 2014 04:06:55 -0400
+Subject: [PATCH] fix cmd_rsync
+
+Don't break configure if rsync is not installed on host.
+
+rsync is a runtime dependency and this change is only used for
+generating rsnapshot.conf.default. It allows cmd_rsync to use
+default path if options --without-rsync is specfied.
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ configure.ac |    5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index bc9df9e..2a33d29 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -55,7 +55,7 @@ AC_ARG_WITH(rsync,
+ 				AC_MSG_ERROR(rsync not found)
+ 			fi
+ 		else
+-			AC_MSG_ERROR(rsync is required)
++			RSYNC=no
+ 		fi
+ 	]
+ )
+@@ -67,7 +67,8 @@ if test "$RSYNC" = ""; then
+ fi
+ dnl bail out if we can't find it
+ if test "$RSYNC" = "no"; then
+-	AC_MSG_ERROR(rsync is required)
++	RSYNC=${bindir}/rsync
++	AC_SUBST(CMD_RSYNC, "cmd_rsync  $RSYNC")
+ fi
+ 
+ 
+-- 
+1.7.9.5
+

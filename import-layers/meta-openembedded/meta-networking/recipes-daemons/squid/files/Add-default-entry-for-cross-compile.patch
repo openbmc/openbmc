@@ -1,0 +1,31 @@
+From faa212a4e0aaf442ff58fca50770a8fadc1038e3 Mon Sep 17 00:00:00 2001
+Message-Id: <faa212a4e0aaf442ff58fca50770a8fadc1038e3.1382041123.git.Jim.Somerville@windriver.com>
+From: Jim Somerville <Jim.Somerville@windriver.com>
+Date: Thu, 17 Oct 2013 16:17:48 -0400
+Subject: [PATCH 1/1] Add default entry for cross compile
+
+Signed-off-by: Jim Somerville <Jim.Somerville@windriver.com>
+---
+ acinclude/krb5.m4 |    6 +++++-
+ 1 files changed, 5 insertions(+), 1 deletions(-)
+
+diff --git a/acinclude/krb5.m4 b/acinclude/krb5.m4
+index 5d9ac36..7a072a2 100644
+--- a/acinclude/krb5.m4
++++ b/acinclude/krb5.m4
+@@ -82,7 +82,11 @@ main(void)
+ 
+         return 0;
+ }
+-]])], [ squid_cv_broken_heimdal_krb5_h=yes ], [ squid_cv_broken_heimdal_krb5_h=no ])
++]])], [ squid_cv_broken_heimdal_krb5_h=yes ], [ squid_cv_broken_heimdal_krb5_h=no ],
++[
++  dnl Can't test in cross compiled env - so assume good
++  squid_cv_broken_heimdal_krb5_h=no
++])
+     ],
+     [
+      dnl Can't test in cross compiled env - so assume good
+-- 
+1.7.4.1
+

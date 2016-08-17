@@ -1,0 +1,25 @@
+Enable tcp_wrapper.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+---
+ builddefs.h |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/builddefs.h b/builddefs.h
+index e908352..0106d1a 100644
+--- a/builddefs.h
++++ b/builddefs.h
+@@ -1,7 +1,7 @@
+ #ifndef VSF_BUILDDEFS_H
+ #define VSF_BUILDDEFS_H
+ 
+-#undef VSF_BUILD_TCPWRAPPERS
++#define VSF_BUILD_TCPWRAPPERS
+ #define VSF_BUILD_PAM
+ #undef VSF_BUILD_SSL
+ 
+-- 
+1.7.1
+

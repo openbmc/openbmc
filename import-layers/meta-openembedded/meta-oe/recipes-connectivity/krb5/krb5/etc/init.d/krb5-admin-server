@@ -1,0 +1,140 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:             krb5-admin-server
+# Required-Start:       $local_fs $remote_fs $network $syslog
+# Required-Stop:        $local_fs $remote_fs $network $syslog
+# Should-Start:         krb5-kdc
+# Should-Stop:          krb5-kdc
+# Default-Start:        2 3 4 5
+# Default-Stop:         0 1 6
+# Short-Description:    MIT Kerberos KDC administrative daemon
+# Description:          Starts, stops, or restarts the MIT Kerberos KDC
+#                       administrative daemon (kadmind).  This daemon answers
+#                       requests from kadmin clients and allows administrators
+#                       to create, delete, and modify principals in the KDC
+#                       database.
+### END INIT INFO
+
+# Author: Sam Hartman <hartmans@mit.edu>
+# Author: Russ Allbery <rra@debian.org>
+#
+# Based on the /etc/init.d/skeleton template as found in initscripts version
+# 2.86.ds1-15.
+
+# June, 2012: Adopted for yocto <amy.fong@windriver.com>
+
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+DESC="Kerberos administrative servers"
+NAME=kadmind
+DAEMON=/usr/sbin/$NAME
+DAEMON_ARGS=""
+SCRIPTNAME=/etc/init.d/krb5-admin-server
+DEFAULT=/etc/default/krb5-admin-server
+
+# Exit if the package is not installed.
+[ -x "$DAEMON" ] || exit 0
+
+# Read configuration if it is present.
+[ -r "$DEFAULT" ] && . "$DEFAULT"
+
+# Get the setting of VERBOSE and other rcS variables.
+[ -f /etc/default/rcS ] && . /etc/default/rcS
+
+. /etc/init.d/functions
+
+ADMIN_SERVER_LOG=/var/log/kadmind.log
+[ -f $ADMIN_SERVER_LOG ] && (test ! -x /sbin/restorecon \
+    || /sbin/restorecon -F $ADMIN_SERVER_LOG)
+
+# Return
+#   0 if daemon has been started
+#   1 if daemon was already running
+#   2 if daemon could not be started
+do_start()
+{
+    start-stop-daemon --start --quiet --startas $DAEMON --name $NAME --test \
+        > /dev/null || return 1
+    start-stop-daemon --start --quiet --startas $DAEMON --name $NAME \
+        -- $DAEMON_ARGS || return 2
+}
+
+# Return
+#   0 if daemon has been stopped
+#   1 if daemon was already stopped
+#   2 if daemon could not be stopped
+#   other if a failure occurred
+do_stop()
+{
+    start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --name $NAME
+    RETVAL="$?"
+    [ "$RETVAL" = 2 ] && return 2
+    return "$RETVAL"
+}
+
+
+case "$1" in
+  start)
+    if [ "$RUN_KADMIND" = false ] ; then
+        if [ "$VERBOSE" != no ] ; then
+            echo "Not starting $DESC per configuration"
+        fi
+        exit 0
+    fi
+    [ "$VERBOSE" != no ] && echo "Starting $DESC" "$NAME"
+    do_start
+    case "$?" in
+      0|1) [ "$VERBOSE" != no ] && echo 0 ;;
+      2)   [ "$VERBOSE" != no ] && echo 1 ;;
+    esac
+    ;;
+
+  stop)
+    [ "$VERBOSE" != no ] && echo "Stopping $DESC" "$NAME"
+    do_stop
+    case "$?" in
+      0|1) [ "$VERBOSE" != no ] && echo 0 ;;
+      2)   [ "$VERBOSE" != no ] && echo 1 ;;
+    esac
+    ;;
+
+  restart|force-reload)
+    if [ "$RUN_KADMIND" = false ] ; then
+        if [ "$VERBOSE" != no ] ; then
+            echo "Not restarting $DESC per configuration"
+        fi
+        exit 0
+    fi
+    echo "Restarting $DESC" "$NAME"
+    do_stop
+    case "$?" in
+      0|1)
+        do_start
+        case "$?" in
+          0) [ "$VERBOSE" != no ] && echo 0 ;;
+          *) [ "$VERBOSE" != no ] && echo 1 ;;
+        esac
+        ;;
+      *)
+        echo 1
+        ;;
+    esac
+    ;;
+
+  status)
+    pidofproc "$DAEMON" >/dev/null
+    status=$?
+    if [ $status -eq 0 ]; then
+        echo "$NAME is running."
+    else
+        echo "$NAME is not running."
+    fi
+    exit $status
+    ;;
+
+  *)
+    echo "Usage: $SCRIPTNAME {start|stop|restart|force-reload|status}" >&2
+    exit 3
+    ;;
+esac
+
+:

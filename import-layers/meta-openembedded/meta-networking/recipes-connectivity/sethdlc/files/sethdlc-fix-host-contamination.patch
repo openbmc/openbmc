@@ -1,0 +1,42 @@
+From 9a9137c3df5309ac359737d6ebd67fb4ff5f3cf2 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Mon, 24 Nov 2014 22:05:18 -0500
+Subject: [PATCH] sethdlc: fix host contamination
+
+Clean INCLUDES to fix the host contamination errors:
+
+  In file included from /usr/src/linux/include/linux/posix_types.h:47:0,
+  from /usr/src/linux/include/linux/types.h:17,
+  from /usr/src/linux/include/linux/if.h:22,
+  from sethdlc.c:23:
+  /usr/src/linux/include/asm-generic/posix_types.h:91:3: \
+    error: conflicting types for '__kernel_fsid_t'
+  } __kernel_fsid_t;
+  ^
+  .../tmp/sysroots/qemumips/usr/include/asm/posix_types.h:26:3: \
+    note: previous declaration of '__kernel_fsid_t' was here
+  } __kernel_fsid_t;
+  ^
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ Makefile |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 0492f2b..97dec22 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,6 +1,6 @@
+ CC = gcc
+ CFLAGS = -O2 -Wall -W -Wno-long-long -pipe
+-INCLUDES = -I/usr/src/linux/include -I/usr/src/linux-2.6/include
++INCLUDES =
+ 
+ all:		sethdlc
+ 
+-- 
+1.7.9.5
+

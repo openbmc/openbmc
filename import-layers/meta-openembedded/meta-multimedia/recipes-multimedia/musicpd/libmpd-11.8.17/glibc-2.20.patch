@@ -1,0 +1,10 @@
+--- libmpd-11.8.17/src/libmpd-internal.h.orig	2014-09-30 04:08:50.963292427 +0200
++++ libmpd-11.8.17/src/libmpd-internal.h	2014-09-30 04:08:30.595292223 +0200
+@@ -21,6 +21,7 @@
+ #define __MPD_INTERNAL_LIB_
+ 
+ #include "libmpdclient.h"
++#include "config.h"
+ struct _MpdData_real;
+ 
+ typedef struct _MpdData_real {

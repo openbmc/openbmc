@@ -1,0 +1,42 @@
+Add a description to the AC_DEFINE statements so that it appears in config.h and silences a fatal warning.
+
+Upstream-Status:Pending
+Signed-off-by: Matthieu Crapet <Matthieu.Crapet@ingenico.com>
+---
+ configure.in | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index abfe4cd..ce0d380 100644
+--- a/configure.in
++++ b/configure.in
+@@ -168,7 +168,7 @@ if test $has_iconv = 1; then
+ 		iconv_oldstyle=1, iconv_oldstyle=0)
+   if test $iconv_oldstyle = 1; then
+     AC_MSG_RESULT(const char **)
+-    AC_DEFINE(ID3LIB_ICONV_OLDSTYLE)
++    AC_DEFINE(ID3LIB_ICONV_OLDSTYLE,[1],[Old iconv prototype definition in iconv.h])
+     #we'll check out the need of
+     #typecast in the call of iconv_open
+     AC_MSG_CHECKING(whether to typecast in iconv)
+@@ -184,7 +184,7 @@ if test $has_iconv = 1; then
+                    iconv_cast=0, iconv_cast=1)
+     if test $iconv_cast = 1; then
+       AC_MSG_RESULT(yes)
+-      AC_DEFINE(ID3LIB_ICONV_CAST_OK)
++      AC_DEFINE(ID3LIB_ICONV_CAST_OK,[1],[Accepting const char ** in iconv prototype])
+     else
+       AC_MSG_RESULT(no)
+     fi
+@@ -206,7 +206,7 @@ if test $has_iconv = 1; then
+                    iconv_cast=0, iconv_cast=1)
+     if test $iconv_cast = 1; then
+       AC_MSG_RESULT(yes)
+-      AC_DEFINE(ID3LIB_ICONV_CAST_OK)
++      AC_DEFINE(ID3LIB_ICONV_CAST_OK,[1],[Accepting const char ** in iconv prototype])
+     else
+       AC_MSG_RESULT(no)
+     fi
+-- 
+2.0.0
+

@@ -1,0 +1,18 @@
+Author:  Jean-Luc Leger <reiga@dspnet.fr.eu.org>
+Description: fix broken globbing expansion
+Debian-Bug: #603545
+Index: tcsh-6.18.01/tc.str.c
+===================================================================
+--- tcsh-6.18.01.orig/tc.str.c	2012-01-10 13:34:31.000000000 -0800
++++ tcsh-6.18.01/tc.str.c	2013-02-26 13:12:13.429153489 -0800
+@@ -122,8 +122,9 @@
+ #else
+     ret = mbtowc(&tmp, s, n);
+ #endif
+-    if (ret > 0) {
++    if (ret >= 0)
+ 	*pwc = tmp;
++    if (ret >= 0) {
+ #if defined(UTF16_STRINGS) && defined(HAVE_MBRTOWC)
+ 	if (tmp >= 0xd800 && tmp <= 0xdbff) {
+ 	    /* UTF-16 surrogate pair.  Fetch second half and compute

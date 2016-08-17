@@ -1,0 +1,17 @@
+diff -Naur ../tracker-0.10.8/configure.ac tracker-0.10.8//configure.ac
+--- ../tracker-0.10.8/configure.ac	2011-04-08 15:03:30.000000000 +0300
++++ tracker-0.10.8//configure.ac	2011-04-11 13:47:16.625914002 +0300
+@@ -218,7 +218,12 @@
+ 
+ # Needed to generate .gir files,
+ # see http://live.gnome.org/GnomeGoals/AddGObjectIntrospectionSupport
+-GOBJECT_INTROSPECTION_CHECK([0.9.5])
++#GOBJECT_INTROSPECTION_CHECK([0.9.5])
++# Satisfy missing introspection foo
++AM_CONDITIONAL(HAVE_INTROSPECTION, test "0" == "1")
++
++INTROSPECTION_CFLAGS=""
++AC_SUBST(INTROSPECTION_CFLAGS)
+ 
+ # NOTE: dbus and dbus-glib-1 are only used now for libtracker-client
+ # which is deprecated and tracker-writeback which will be refactored

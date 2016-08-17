@@ -1,0 +1,29 @@
+From 180a00634f351a09ceabc5695d8e1acc3e585501 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Fri, 12 Dec 2014 12:00:10 +0100
+Subject: [PATCH] glamo.h: use const for jbt6k74_state_path
+
+* fix build issue with xserver 1.16:
+  glamo-driver.c:501:32: error: assignment discards 'const' qualifier from pointer target type [-Werror]
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ src/glamo.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/glamo.h b/src/glamo.h
+index 5fd5c04..5e072be 100644
+--- a/src/glamo.h
++++ b/src/glamo.h
+@@ -148,7 +148,7 @@ typedef struct {
+ #endif
+ 
+ #ifdef JBT6K74_SET_STATE
+-    char *jbt6k74_state_path;
++    const char *jbt6k74_state_path;
+     char saved_jbt6k74_state[14];
+ #endif
+ 
+-- 
+2.1.3
+

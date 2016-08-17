@@ -1,0 +1,13 @@
+Index: tracker-0.10.17/m4/sqlite-threadsafe.m4
+===================================================================
+--- tracker-0.10.17.orig/m4/sqlite-threadsafe.m4
++++ tracker-0.10.17/m4/sqlite-threadsafe.m4
+@@ -45,7 +45,7 @@ int main ()
+   ]])],
+        [ax_cv_sqlite_threadsafe=yes],
+        [ax_cv_sqlite_threadsafe=no],
+-       [ax_cv_sqlite_threadsafe=no])])
++       [ax_cv_sqlite_threadsafe=yes])])
+ 
+   LIBS="$save_LIBS"
+ ])

@@ -1,0 +1,29 @@
+# Timings for GTA01 VGA and QVGA mode
+
+mode "480x640"
+    # D: 26.000 MHz, H: 43.334 kHz, V: 65.657 Hz
+    geometry 480 640 480 640 16
+    timings 38461 104 8 2 16 8 2
+    accel false
+endmode
+
+mode "vga"
+    # D: 26.000 MHz, H: 43.334 kHz, V: 65.657 Hz
+    geometry 480 640 480 640 16
+    timings 38461 104 8 2 16 8 2
+    accel false
+endmode
+
+mode "240x320"
+    # D: 8.475 MHz, H: 24.635 kHz, V: 75.569 Hz
+    geometry 240 320 240 320 16
+    timings 118000 88 8 2 2 8 2
+    accel false
+endmode
+
+mode "qvga"
+    # D: 8.475 MHz, H: 24.635 kHz, V: 75.569 Hz
+    geometry 240 320 240 320 16
+    timings 118000 88 8 2 2 8 2
+    accel false
+endmode

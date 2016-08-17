@@ -1,0 +1,18 @@
+Upstream-Status: Pending
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+Index: gst-openmax-0.10.1/omx/gstomx.c
+===================================================================
+--- gst-openmax-0.10.1.orig/omx/gstomx.c	2010-09-30 18:00:24.000000000 -0700
++++ gst-openmax-0.10.1/omx/gstomx.c	2011-05-17 23:08:08.794535872 -0700
+@@ -238,7 +238,8 @@
+     const gchar *element_name = gst_structure_nth_field_name (element_table, i);
+     GstStructure *element = get_element_entry (element_name);
+     const gchar *type_name, *parent_type_name;
+-    const gchar *component_name, *component_role, *library_name;
++    const gchar *component_name, *library_name;
++    const gchar __attribute__((__unused__)) *component_role;
+     GType type;
+     gint rank;
+ 

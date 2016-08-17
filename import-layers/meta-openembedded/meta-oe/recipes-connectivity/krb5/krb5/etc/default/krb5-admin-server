@@ -1,0 +1,6 @@
+# Automatically generated.  If you change anything in this file other than the
+# values of RUN_KADMIND or DAEMON_ARGS, first run dpkg-reconfigure
+# krb5-admin-server and disable managing the kadmin configuration with
+# debconf.  Otherwise, changes will be overwritten.
+
+RUN_KADMIND=true

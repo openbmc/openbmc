@@ -1,0 +1,26 @@
+Upstream-Status: Inappropriate
+
+Install the bluez's test scripts
+
+Signed-off-by: Zhong Hongbo <hongbo.zhong@windriver.com>
+diff -Nurd bluez-4.101.orig/Makefile.tools bluez-4.101/Makefile.tools
+--- bluez-4.101.orig/Makefile.tools	2013-11-19 15:49:07.688838000 +0800
++++ bluez-4.101/Makefile.tools	2013-11-19 15:50:09.256837848 +0800
+@@ -227,6 +227,17 @@
+ 		test/service-spp.xml test/service-opp.xml test/service-ftp.xml \
+ 		test/simple-player test/test-nap
+ 
++bluez4_testdir = $(libdir)/bluez4/test/
++dist_bluez4_test_SCRIPTS = test/sap-client test/hsplay test/hsmicro \
++		test/monitor-bluetooth test/list-devices \
++		test/test-discovery test/test-manager test/test-adapter \
++		test/test-device test/test-service test/test-serial \
++		test/test-telephony test/test-network test/simple-agent \
++		test/simple-service test/simple-endpoint test/test-audio \
++		test/test-input test/test-sap-server test/test-oob \
++		test/test-attrib test/test-proximity test/test-thermometer \
++		test/test-serial-proxy test/test-health test/test-health-sink \
++		test/simple-player test/test-nap
+ if HIDD
+ bin_PROGRAMS += compat/hidd
+ 

@@ -1,0 +1,31 @@
+From 323ced03a66e6cd963d8277b66cfcc7dce740be7 Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@cn.fujitsu.com>
+Date: Fri, 17 Jul 2015 01:33:43 -0700
+Subject: [PATCH] fix Xthe build error when python>3.0
+
+Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
+---
+ src/target_python.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/src/target_python.c b/src/target_python.c
+index 90b43a1..2b76c9e 100644
+--- a/src/target_python.c
++++ b/src/target_python.c
+@@ -167,7 +167,12 @@ PyGlobalInitialize(const CMPIBroker* broker, CMPIStatus* st)
+   
+   Py_SetProgramName("cmpi_swig");
+   Py_Initialize();
+-  SWIGEXPORT void SWIG_init(void);
++#if PY_VERSION_HEX >= 0x03000000
++SWIGEXPORT PyObject*
++#else
++  SWIGEXPORT void 
++#endif
++  SWIG_init(void);
+   SWIG_init();
+   cmpiMainPyThreadState = PyGILState_GetThisThreadState();
+   PyEval_ReleaseThread(cmpiMainPyThreadState); 
+-- 
+2.1.0
+

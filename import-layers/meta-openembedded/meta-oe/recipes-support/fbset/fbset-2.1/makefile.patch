@@ -1,0 +1,11 @@
+--- fbset-2.1/Makefile.orig	2006-05-28 04:04:27.412095480 +0200
++++ fbset-2.1/Makefile	2006-05-28 04:14:05.379231120 +0200
+@@ -2,7 +2,7 @@
+ # Linux Frame Buffer Device Configuration
+ #
+ 
+-CC =		gcc -Wall -O2 -I.
++CFLAGS =	-Wall -O2 -I.
+ BISON =		bison -d
+ FLEX =		flex
+ INSTALL =	install

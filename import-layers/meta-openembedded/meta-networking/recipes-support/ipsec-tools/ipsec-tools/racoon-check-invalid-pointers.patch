@@ -1,0 +1,61 @@
+Subject: [PATCH] ipsec-tools: racoon: check several invalid pointers
+
+Upstream-Status: Pending
+
+Add checking for invalid pointers, or it will crash racoon.
+
+Signed-off-by: Ming Liu <ming.liu@windriver.com>
+---
+ ipsec_doi.c    |    5 +++--
+ isakmp_cfg.c   |    7 +++++++
+ isakmp_quick.c |    6 ++++--
+ 3 files changed, 14 insertions(+), 4 deletions(-)
+
+diff -urpN a/src/racoon/ipsec_doi.c b/src/racoon/ipsec_doi.c
+--- a/src/racoon/ipsec_doi.c
++++ b/src/racoon/ipsec_doi.c
+@@ -3374,8 +3374,9 @@ ipsecdoi_chkcmpids( idt, ids, exact )
+ 
+ 	/* handle wildcard IDs */
+ 
+-	if (idt == NULL || ids == NULL)
+-	{
++	if (idt == NULL || ids == NULL ||
++	    idt->v == NULL || idt->l == 0 ||
++	    ids->v == NULL || ids->l == 0) {
+ 		if( !exact )
+ 		{
+ 			plog(LLV_DEBUG, LOCATION, NULL,
+diff -urpN a/src/racoon/isakmp_cfg.c b/src/racoon/isakmp_cfg.c
+--- a/src/racoon/isakmp_cfg.c
++++ b/src/racoon/isakmp_cfg.c
+@@ -1138,6 +1138,13 @@ isakmp_cfg_newiv(iph1, msgid)
+ 		return NULL;
+ 	}
+ 
++	if (iph1->ivm == NULL || iph1->ivm->iv == NULL ||
++	    iph1->ivm->iv->v == NULL || iph1->ivm->iv->l == 0) {
++		plog(LLV_ERROR, LOCATION, NULL,
++		    "isakmp_cfg_newiv called with invalid IV management\n");
++		return NULL;
++	}
++
+ 	if (ics->ivm != NULL)
+ 		oakley_delivm(ics->ivm);
+ 
+diff -urpN a/src/racoon/isakmp_quick.c b/src/racoon/isakmp_quick.c
+--- a/src/racoon/isakmp_quick.c
++++ b/src/racoon/isakmp_quick.c
+@@ -2243,8 +2243,10 @@ get_proposal_r(iph2)
+ 	int error = ISAKMP_INTERNAL_ERROR;
+ 
+ 	/* check the existence of ID payload */
+-	if ((iph2->id_p != NULL && iph2->id == NULL)
+-	 || (iph2->id_p == NULL && iph2->id != NULL)) {
++	if ((iph2->id_p != NULL &&
++	    (iph2->id == NULL || iph2->id->v == NULL || iph2->id->l == 0)) ||
++	    (iph2->id != NULL &&
++	    (iph2->id_p == NULL || iph2->id_p->v == NULL || iph2->id_p->l == 0))) {
+ 		plog(LLV_ERROR, LOCATION, NULL,
+ 			"Both IDs wasn't found in payload.\n");
+ 		return ISAKMP_NTYPE_INVALID_ID_INFORMATION;

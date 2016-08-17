@@ -1,0 +1,30 @@
+From 993882f81fe991b8baf1099392703337cc13fac0 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Wed, 27 Jan 2016 18:40:23 +0100
+Subject: [PATCH] OptionsEfl.cmake: Fix build with newer CMake 3.4
+
+* otherwise it fails with:
+  | CMake Error at Source/cmake/OptionsEfl.cmake:251 (CHECK_INCLUDE_FILES):
+  |   Unknown CMake command "CHECK_INCLUDE_FILES".
+* https://bugs.webkit.org/show_bug.cgi?id=150117
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ Source/cmake/OptionsEfl.cmake | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Source/cmake/OptionsEfl.cmake b/Source/cmake/OptionsEfl.cmake
+index 1aa9002..05216d0 100644
+--- a/Source/cmake/OptionsEfl.cmake
++++ b/Source/cmake/OptionsEfl.cmake
+@@ -253,6 +253,7 @@ if (ENABLE_WEBGL OR WTF_USE_TILED_BACKING_STORE)
+         set(WTF_USE_EGL 1)
+         add_definitions(-DWTF_USE_EGL=1)
+     else ()
++        include(CheckIncludeFiles)
+         CHECK_INCLUDE_FILES("GL/glx.h" OPENGLX_FOUND)
+         add_definitions(-DWTF_USE_GLX=1)
+     endif ()
+-- 
+2.7.0
+

@@ -1,0 +1,34 @@
+From 10bd8094e1d94e5c737791c7f4b6b844f535c120 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Fri, 3 May 2013 10:00:16 +0200
+Subject: [PATCH] linc2/src/Makefile.am: fix build with glib 2.36
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Submitted [1]
+
+[1] https://bugzilla.gnome.org/show_bug.cgi?id=696900
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ linc2/src/Makefile.am |    3 +--
+ 1 files changed, 1 insertions(+), 2 deletions(-)
+
+diff --git a/linc2/src/Makefile.am b/linc2/src/Makefile.am
+index 357a2dd..ba0e347 100644
+--- a/linc2/src/Makefile.am
++++ b/linc2/src/Makefile.am
+@@ -12,8 +12,7 @@ INCLUDES =                         \
+ 	-I$(top_builddir)/linc2/include  \
+ 	-I$(top_srcdir)/linc2/include    \
+ 	$(LINC_CFLAGS)             \
+-	$(WARN_CFLAGS)             \
+-	-DG_DISABLE_DEPRECATED
++	$(WARN_CFLAGS)
+ 
+ if OS_WIN32
+ else
+-- 
+1.7.6.5
+

@@ -1,0 +1,52 @@
+Update permissions of executable files that remove setuid bit and make everyone
+could read.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+diff --git a/Makefile b/Makefile
+index a65b9b6..21d9828 100644
+--- a/Makefile
++++ b/Makefile
+@@ -66,7 +66,7 @@ systemdinstall:	genericinstall
+ 		chmod 0644            $(DESTDIR)$(SYSDPATH)/atopacct.service
+ 		cp atop.cronsystemd   $(DESTDIR)$(CRNPATH)/atop
+ 		cp atop-pm.sh         $(DESTDIR)$(PMPATHD)
+-		chmod 0711            $(DESTDIR)$(PMPATHD)/atop-pm.sh
++		chmod 0755            $(DESTDIR)$(PMPATHD)/atop-pm.sh
+ 		#
+ 		# only when making on target system:
+ 		#
+@@ -91,11 +91,11 @@ sysvinstall:	genericinstall
+ 		#
+ 		if [   -d $(DESTDIR)$(PMPATH1) ]; 			\
+ 		then	cp 45atoppm $(DESTDIR)$(PMPATH1); 		\
+-			chmod 0711  $(DESTDIR)$(PMPATH1)/45atoppm;	\
++			chmod 0755  $(DESTDIR)$(PMPATH1)/45atoppm;	\
+ 		fi
+ 		if [ -d $(DESTDIR)$(PMPATH2) ]; 			\
+ 		then	cp 45atoppm $(DESTDIR)$(PMPATH2);		\
+-			chmod 0711  $(DESTDIR)$(PMPATH2)/45atoppm;	\
++			chmod 0755  $(DESTDIR)$(PMPATH2)/45atoppm;	\
+ 		fi
+ 		#
+ 		#
+@@ -139,7 +139,7 @@ genericinstall:	atop atopacctd
+ 		#
+ 		cp atop   		$(DESTDIR)$(BINPATH)/atop
+ 		chown root		$(DESTDIR)$(BINPATH)/atop
+-		chmod 04711 		$(DESTDIR)$(BINPATH)/atop
++		chmod 0755 		$(DESTDIR)$(BINPATH)/atop
+ 		ln -sf atop             $(DESTDIR)$(BINPATH)/atopsar
+ 		cp atopacctd  		$(DESTDIR)$(SBINPATH)/atopacctd
+ 		chown root		$(DESTDIR)$(SBINPATH)/atopacctd
+@@ -147,7 +147,7 @@ genericinstall:	atop atopacctd
+ 		cp atop   		$(DESTDIR)$(BINPATH)/atop-$(VERS)
+ 		ln -sf atop-$(VERS)     $(DESTDIR)$(BINPATH)/atopsar-$(VERS)
+ 		cp atop.daily    	$(DESTDIR)$(SCRPATH)
+-		chmod 0711 	 	$(DESTDIR)$(SCRPATH)/atop.daily
++		chmod 0755 	 	$(DESTDIR)$(SCRPATH)/atop.daily
+ 		cp man/atop.1    	$(DESTDIR)$(MAN1PATH)
+ 		cp man/atopsar.1 	$(DESTDIR)$(MAN1PATH)
+ 		cp man/atoprc.5  	$(DESTDIR)$(MAN5PATH)

@@ -1,0 +1,26 @@
+Upstream-Status: Pending
+
+automake 1.12 has deprecated use of mkdir_p, and it recommends
+use of MKDIR_P instead. Changed the code to avoid these kind 
+of warning-errors.
+
+| make[1]: _generated/: Command not found
+| make[1]: *** [_generated/__init__.py] Error 127
+| make[1]: Leaving directory `/srv/home/nitin/builds2/build0/tmp/work/i586-poky-linux/telepathy-python-0.15.19-r4/telepathy-python-0.15.19/src'
+| make: *** [all-recursive] Error 1
+
+Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+2012/07/10
+Index: telepathy-python-0.15.19/src/Makefile.am
+===================================================================
+--- telepathy-python-0.15.19.orig/src/Makefile.am
++++ telepathy-python-0.15.19/src/Makefile.am
+@@ -55,7 +55,7 @@ _generated/errors.py: _generated/__init_
+ 	    $(spec_dir)/all.xml
+ 
+ _generated/__init__.py:
+-	$(AM_V_GEN)$(mkdir_p) $(dir $@)
++	$(AM_V_GEN)$(MKDIR_P) $(dir $@)
+ 	@echo "# Placeholder for package" > $@
+ 
+ _generated/%.py: _generated/__init__.py $(tools_dir)/spec-to-python.xsl $(spec_dir)/%.xml

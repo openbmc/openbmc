@@ -1,0 +1,20 @@
+# default: off
+# description:
+# Rexecd is the server for the rexec program. The server provides remote 
+# execution facilities with authentication based on user names and 
+# passwords.
+#
+service exec
+{
+	socket_type	= stream
+	protocol	= tcp
+	flags		= NAMEINARGS
+	wait		= no
+	user		= root
+	group		= root
+	log_on_success	+= USERID
+	log_on_failure	+= USERID
+	server		= @SBINDIR@/tcpd
+	server_args	= @SBINDIR@/in.rexecd
+	disable		= yes
+}

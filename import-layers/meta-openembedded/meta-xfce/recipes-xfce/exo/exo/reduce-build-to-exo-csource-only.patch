@@ -1,0 +1,82 @@
+From e710d8d4a3e3480416826c70d56ea3d2598a77e4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Thu, 28 Mar 2013 23:41:03 +0100
+Subject: [PATCH] reduce build to exo-csource only
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+exo-csource creates c-header files from glade resource output files. When
+building xfce-packages from git instead of tarball this exo-csource-native is
+required.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ Makefile.am  | 10 +---------
+ configure.ac | 20 --------------------
+ 2 files changed, 1 insertion(+), 29 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index ad7c6ce..3acd94a 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,15 +1,7 @@
+ ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
+ 
+ SUBDIRS =								\
+-	exo								\
+-	exo-csource							\
+-	exo-desktop-item-edit						\
+-	exo-helper							\
+-	exo-open							\
+-	docs								\
+-	icons								\
+-	pixmaps								\
+-	po
++	exo-csource
+ 
+ distclean-local:
+ 	rm -rf *.cache *~
+diff --git a/configure.ac b/configure.ac
+index bb9be05..23471d0 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -116,15 +116,6 @@ AC_PROG_CC()
+ AM_PROG_CC_C_O()
+ AC_PROG_INSTALL()
+ IT_PROG_INTLTOOL([intltool_minimum_version], [no-xml])
+-AC_CHECK_PROGS([PERL], [perl5 perl])
+-
+-dnl ***************************************
+-dnl *** Check for required Perl modules ***
+-dnl ***************************************
+-AC_PROG_PERL_MODULES([URI::Escape URI::file URI::URL], [],
+-[
+-  AC_MSG_ERROR([Atleast one of the required Perl modules (URI::Escape, URI::file and URI::URL) was not found on your system])
+-])
+ 
+ dnl ***************************************
+ dnl *** Check for standard header files ***
+@@ -171,17 +162,6 @@ dnl ***********************************
+ dnl *** Check for required packages ***
+ dnl ***********************************
+ XDT_CHECK_PACKAGE([GLIB], [glib-2.0], [2.30.0])
+-XDT_CHECK_PACKAGE([GIO], [gio-2.0], [2.30.0])
+-XDT_CHECK_PACKAGE([GTK], [gtk+-2.0], [2.24.0])
+-XDT_CHECK_PACKAGE([GTHREAD], [gthread-2.0], [2.30.0])
+-XDT_CHECK_PACKAGE([LIBXFCE4UTIL], [libxfce4util-1.0], [4.10.0])
+-XDT_CHECK_PACKAGE([LIBXFCE4UI], [libxfce4ui-1], [4.10.0])
+-XDT_CHECK_OPTIONAL_PACKAGE([GIO_UNIX], [gio-unix-2.0], [2.30.0], [gio-unix], [GIO-Unix features])
+-
+-dnl *********************
+-dnl *** Check for X11 ***
+-dnl *********************
+-XDT_CHECK_LIBX11_REQUIRE()
+ 
+ dnl *************************
+ dnl *** Check for gtk-doc ***
+-- 
+1.9.3
+

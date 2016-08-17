@@ -1,0 +1,24 @@
+on x86 and x86_64 gcc 4.7 complains
+
+sbc/sbc_primitives_mmx.c: In function 'sbc_calc_scalefactors_mmx':
+sbc/sbc_primitives_mmx.c:294:4: warning: asm operand 2 probably doesn't match constraints [enabled by default]
+sbc/sbc_primitives_mmx.c:294:4: error: impossible constraint in 'asm'
+
+This patch is taken from https://bugs.launchpad.net/ubuntu/+source/bluez/+bug/911871
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Pending
+Index: bluez-4.98/sbc/sbc_primitives_mmx.c
+===================================================================
+--- bluez-4.98.orig/sbc/sbc_primitives_mmx.c	2011-12-21 14:53:54.000000000 -0800
++++ bluez-4.98/sbc/sbc_primitives_mmx.c	2012-02-24 10:07:03.422073800 -0800
+@@ -318,7 +318,7 @@
+ 				"movl          %k0, 4(%3)\n"
+ 			: "+r" (blk)
+ 			: "r" (&sb_sample_f[0][ch][sb]),
+-				"i" ((char *) &sb_sample_f[1][0][0] -
++				"r" ((char *) &sb_sample_f[1][0][0] -
+ 					(char *) &sb_sample_f[0][0][0]),
+ 				"r" (&scale_factor[ch][sb]),
+ 				"r" (&consts),

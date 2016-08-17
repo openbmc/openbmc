@@ -1,0 +1,37 @@
+Upstream-Status: Submitted [sourceforge]
+
+From 75d789d0ea9716c9a9ae72f42a2fcfa907cf4a12 Mon Sep 17 00:00:00 2001
+From: Matthieu Crapet <mcrapet@gmail.com>
+Date: Mon, 30 Jun 2014 13:52:25 +0200
+Subject: [PATCH] usage2c.awk: fix wrong basename regexp
+
+Previously not matching with filename argument with absolute path.
+
+Signed-off-by: Matthieu Crapet <mcrapet@gmail.com>
+---
+ usage2c.awk | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/usage2c.awk b/usage2c.awk
+index 94b897a..9aea212 100755
+--- a/usage2c.awk
++++ b/usage2c.awk
+@@ -6,13 +6,13 @@ BEGIN {
+ }
+ 
+ # text in src/foo-bar.txt results in
+-#   static const char foo_text[] = {
++#   static const char foo_bar[] = {
+ #     't', 'h', 'e', ' ', 't', 'e', 'x', 't', ...
+ #   }
+ length(command_name) == 0 {
+     command_name = FILENAME;
+     sub(/\.txt$/, "", command_name);
+-    sub(/^([^\/]+\/)*/, "", command_name);
++    sub(/^.*\//, "", command_name);
+     gsub(/-/, "_", command_name);
+     printf("static const char %s[] = {\n", command_name);
+     progs = 0;
+-- 
+2.0.0
+

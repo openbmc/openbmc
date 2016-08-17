@@ -1,0 +1,10 @@
+[Unit]
+Description=Minidlna Daemon
+After=network.target
+
+[Service]
+Type=notify
+ExecStart=/usr/sbin/minidlnad -f /etc/minidlna.conf
+
+[Install]
+WantedBy=multi-user.target

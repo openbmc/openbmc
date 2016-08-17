@@ -1,0 +1,33 @@
+--- /tmp/configure.ac	2007-05-08 17:29:02.000000000 +0200
++++ pidgin-2.0.0/configure.ac	2007-05-08 17:30:30.325251000 +0200
+@@ -472,7 +472,7 @@
+ 	if test "x$enable_consoleui" = "xyes"; then
+ 		dnl # Some distros put the headers in ncursesw/, some don't
+ 		found_ncurses_h=no
+-		for location in $ac_ncurses_includes $NCURSES_HEADERS /usr/include/ncursesw /usr/include
++		for location in $ac_ncurses_includes $NCURSES_HEADERS 
+ 		do
+ 			f="$location/ncurses.h"
+ 			AC_CHECK_HEADER($f,[
+@@ -1860,10 +1860,6 @@
+ 			KRB4_CFLAGS="$KRB4_CFLAGS -I${kerberos}/include/kerberosIV"
+ 		fi
+ 		KRB4_LDFLAGS="-L${kerberos}/lib"
+-	elif test -d /usr/local/include/kerberosIV ; then
+-		KRB4_CFLAGS="-I/usr/local/include/kerberosIV"
+-	elif test -d /usr/include/kerberosIV ; then
+-		KRB4_CFLAGS="-I/usr/include/kerberosIV"
+ 	fi
+ 	AC_DEFINE(ZEPHYR_USES_KERBEROS, 1, [Define if kerberos should be used in Zephyr.])
+ 
+@@ -1896,10 +1892,6 @@
+ 		ZEPHYR_LDFLAGS="-L${zephyr}/lib"
+ 	elif test -d /usr/athena/include/zephyr ; then
+ 		ZEPHYR_CFLAGS="-I/usr/athena/include"
+-	elif test -d /usr/include/zephyr ; then
+-		ZEPHYR_CFLAGS="-I/usr/include"
+-	elif test -d /usr/local/include/zephyr ; then
+-		ZEPHYR_CFLAGS="-I/usr/local/include"
+ 	fi
+ 	AC_DEFINE(LIBZEPHYR_EXT, 1 , [Define if external libzephyr should be used.])
+ 	AM_CONDITIONAL(EXTERNAL_LIBZEPHYR, test "x$zephyr" != "xno")

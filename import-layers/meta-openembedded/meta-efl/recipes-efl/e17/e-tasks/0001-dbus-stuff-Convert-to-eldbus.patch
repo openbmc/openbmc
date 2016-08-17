@@ -1,0 +1,204 @@
+From 37223289b3d85ea8876e7ba7c9ff97ec428073ba Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Sat, 22 Feb 2014 14:36:38 +0100
+Subject: [PATCH] dbus-stuff: Convert to eldbus
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ configure.ac     |  2 +-
+ src/Makefile.am  |  2 +-
+ src/dbus-stuff.c | 95 ++++++++++++++++++++++++++++++++------------------------
+ src/dbus-stuff.h | 13 ++------
+ src/main.c       |  2 +-
+ 5 files changed, 61 insertions(+), 53 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index b3e4d12..4ace32a 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -15,7 +15,7 @@ AC_HEADER_STDC
+ 
+ AM_PROG_LIBTOOL
+ 
+-PKG_CHECK_MODULES(TASKS, [elementary eina dbus-1 edbus sqlite3])
++PKG_CHECK_MODULES(TASKS, [elementary eina dbus-1 eldbus sqlite3])
+ 
+ AC_OUTPUT([
+ Makefile
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 2143dc9..31d5253 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -8,7 +8,7 @@ AM_CPPFLAGS = \
+ 	$(TASKS_CFLAGS)
+ 
+ AM_CFLAGS =\
+-         $(EDBUS_CFLAGS) \
++         $(ELDBUS_CFLAGS) \
+ 	 -Wall\
+ 	 -g
+ 
+diff --git a/src/dbus-stuff.c b/src/dbus-stuff.c
+index 50809bc..9f02ef3 100644
+--- a/src/dbus-stuff.c
++++ b/src/dbus-stuff.c
+@@ -1,8 +1,7 @@
+ /***************************************************************************
+  *            dbus-stuff.c
+  *
+- *  Copyright  2009  cchandel
+- *  <cchandel@yahoo.com>
++ *  Copyright  2009  cchandel <cchandel@yahoo.com>
+  ****************************************************************************/
+ 
+ /*
+@@ -21,51 +20,67 @@
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
+  */
+ #include "dbus-stuff.h"
+-#include <string.h>
+-#include <E_DBus.h>
+-#include <Elementary.h>
++#include "Eldbus.h"
+ 
+-void occupy_cpu(void)
++void on_usage_cb(void *data EINA_UNUSED, const Eldbus_Message *msg, Eldbus_Pending *pending EINA_UNUSED)
++{
++        const char *errname, *errmsg;
++        if (eldbus_message_error_get(msg, &errname, &errmsg))
++	        fprintf(stderr, "Error: %s %s\n", errname, errmsg);
++}
++
++int ousaged_resource(const char *resource, int used)
+ {	
+-	e_dbus_init();
+-	conn = e_dbus_bus_get(DBUS_BUS_SYSTEM);
+-	
+-	DBusMessage *msg;
+-	msg = dbus_message_new_method_call(
+-		"org.freesmartphone.ousaged",
+-		"/org/freesmartphone/Usage",
+-		"org.freesmartphone.Usage",
+-		"RequestResource"
+-	);
+-	
+-	const char *resource = "CPU";
+-	dbus_message_append_args (msg, DBUS_TYPE_STRING, &resource, DBUS_TYPE_INVALID);
++	eldbus_init();
++	const char *REQUEST = "RequestResource";
++	const char *RELEASE = "ReleaseResource";
++	const int   PREQUEST = 1;
+ 
+-	e_dbus_message_send(conn, msg, dbus_reply_cb, -1, NULL);
+-	dbus_message_unref(msg);
+-}
++        Eldbus_Connection *conn;
++        Eldbus_Object *obj;
++        Eldbus_Proxy *usage;
++        Eldbus_Pending *pending;
++	conn = eldbus_connection_get(ELDBUS_CONNECTION_TYPE_SYSTEM);
++        if (!conn)
++        {
++                fprintf(stderr, "Error: could not get system bus\n");
++                return EXIT_FAILURE;
++        }
+ 
+-void release_cpu(void)
+-{
+-	DBusMessage *msg;
+-	msg = dbus_message_new_method_call(
+-		"org.freesmartphone.ousaged",
+-		"/org/freesmartphone/Usage",
+-		"org.freesmartphone.Usage",
+-		"ReleaseResource"
+-	);
+-	
+-	const char *resource = "CPU";
+-	dbus_message_append_args (msg, DBUS_TYPE_STRING, &resource, DBUS_TYPE_INVALID);
++        obj = eldbus_object_get(conn, "org.freesmartphone.ousaged", "/org/freesmartphone/Usage");
++        if (!obj)
++        {
++                fprintf(stderr, "Error: could not get object\n");
++                return EXIT_FAILURE;
++        }
+ 
+-	e_dbus_message_send(conn, msg, dbus_reply_cb, -1, NULL);
+-	dbus_message_unref(msg);
++        usage = eldbus_proxy_get(obj, "org.freesmartphone.Usage");
++        if (!usage)
++        {
++                fprintf(stderr, "Error: could not get proxy\n");
++                return EXIT_FAILURE;
++        }
++
++        pending = eldbus_proxy_call(usage, used == PREQUEST ? REQUEST : RELEASE, on_usage_cb, NULL, -1, "ss", resource);
++        if (!pending)
++        {
++                fprintf(stderr, "Error: could not call\n");
++                return EXIT_FAILURE;
++        }
++        eldbus_proxy_unref(usage);
++        eldbus_object_unref(obj);
++        eldbus_connection_unref(conn);
++
++        eldbus_shutdown();
++	return EXIT_SUCCESS;
+ }
+ 
+-void dbus_reply_cb(void *data, DBusMessage *replymsg, DBusError *error)
++int request_cpu(void)
+ {
+-	if (dbus_error_is_set(error)) {
+-		printf("Error: %s - %s\n", error->name, error->message);
+-	}
++        return ousaged_resource("CPU", 1);
+ }
+ 
++int release_cpu(void)
++{
++        return ousaged_resource("CPU" , 0);
++}
+diff --git a/src/dbus-stuff.h b/src/dbus-stuff.h
+index 83d4778..a3c72cb 100644
+--- a/src/dbus-stuff.h
++++ b/src/dbus-stuff.h
+@@ -2,8 +2,7 @@
+  *            dbus.h
+  *
+  *  Fri Mar  6 12:32:57 2009
+- *  Copyright  2009  nidhin
+- *  <nidhin@nids-laptop.home>
++ *  Copyright  2009  nidhin <nidhin@nids-laptop.home>
+  ****************************************************************************/
+ 
+ /*
+@@ -22,11 +21,5 @@
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
+  */
+ 
+-#include <E_DBus.h>
+-#include <Elementary.h>
+-
+-void occupy_cpu(void);
+-void release_cpu(void);
+-void dbus_reply_cb(void *data, DBusMessage *replymsg, DBusError *error);
+-
+-E_DBus_Connection *conn;
++int request_cpu(void);
++int release_cpu(void);
+diff --git a/src/main.c b/src/main.c
+index 92d21de..4e4bbe2 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -76,7 +76,7 @@ elm_main(int argc, char **argv)
+ 	//restore state
+ 	restore_state();
+ 
+-	occupy_cpu();
++	request_cpu();
+ 
+ 	elm_run();
+ 	//clean up stuff
+-- 
+1.8.5.3
+

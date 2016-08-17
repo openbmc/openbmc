@@ -1,0 +1,8 @@
+[Unit]
+Description=Login manager for Enlightenment
+
+[Service]
+ExecStart=/usr/sbin/entrance
+
+[Install]
+Alias=display-manager.service

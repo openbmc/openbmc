@@ -1,0 +1,25 @@
+Upstream-status: Unknown
+
+diff --git a/acinclude.m4 b/acinclude.m4
+index 4fd452e..206fcbf 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -2532,12 +2532,9 @@ dnl
+ AC_DEFUN([PHP_SETUP_LIBXML], [
+ AC_CACHE_CHECK([for xml2-config path], ac_cv_php_xml2_config_path,
+ [
+-  for i in $PHP_LIBXML_DIR /usr/local /usr; do
+-    if test -x "$i/bin/xml2-config"; then
+-      ac_cv_php_xml2_config_path="$i/bin/xml2-config"
+-      break
+-    fi
+-  done
++
++      ac_cv_php_xml2_config_path="$PHP_LIBXML_DIR/xml2-config"
++
+ ])
+ 
+   if test -x "$ac_cv_php_xml2_config_path"; then
+-- 
+1.9.3
+

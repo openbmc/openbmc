@@ -1,0 +1,25 @@
+[Unit]
+Description=MariaDB database server
+After=syslog.target
+After=network.target
+
+[Service]
+PIDFile=/var/lib/mysql/mysqld.pid
+Type=simple
+User=mysql
+Group=mysql
+
+# Execute post scripts as root
+PermissionsStartOnly=true
+
+# Start main service
+ExecStart=@BINDIR@/mysqld_safe --basedir=@PREFIX@
+
+# Don't signal startup success before a ping works
+ExecStartPost=@BINDIR@/mysql-systemd-start post
+
+TimeoutSec=300
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

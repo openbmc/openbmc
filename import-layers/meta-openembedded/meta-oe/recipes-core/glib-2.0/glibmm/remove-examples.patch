@@ -1,0 +1,30 @@
+Index: glibmm-2.22.1/Makefile.am
+===================================================================
+--- glibmm-2.22.1.orig/Makefile.am
++++ glibmm-2.22.1/Makefile.am
+@@ -23,12 +23,7 @@ src_subdirs = glib/src gio/src
+ else
+ src_subdirs =
+ endif
+-if ENABLE_DOCUMENTATION
+-doc_subdirs = docs
+-else
+-doc_subdirs =
+-endif
+-SUBDIRS = tools $(src_subdirs) glib/glibmm gio/giomm tests examples $(doc_subdirs)
++SUBDIRS = tools $(src_subdirs) glib/glibmm gio/giomm tests
+ 
+ glibmm_includedir = $(includedir)/$(GLIBMM_MODULE_NAME)
+ glibmm_include_HEADERS = glib/glibmm.h
+Index: glibmm-2.22.1/configure.ac
+===================================================================
+--- glibmm-2.22.1.orig/configure.ac
++++ glibmm-2.22.1/configure.ac
+@@ -136,7 +136,6 @@ AC_CONFIG_FILES([Makefile
+                  gio/src/Makefile
+                  gio/giomm/Makefile
+                  tests/Makefile
+-                 examples/Makefile
+                  docs/Makefile
+                  docs/reference/Doxyfile
+                  MSVC_Net2005/glibmm/glibmm.rc

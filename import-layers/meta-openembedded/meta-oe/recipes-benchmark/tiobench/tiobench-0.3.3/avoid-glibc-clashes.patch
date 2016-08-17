@@ -1,0 +1,57 @@
+From: Otavio Salvador <otavio@ossystems.com.br>
+Subject: [PATCH] Avoid aligned allocation function name clashes
+
+glibc added new methods for aligned allocation and it clashes with the
+local version used by 'tiobench'. To fix it, we prefix the methods
+with '_'.
+
+Upstream-Status: Pending
+
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+---
+ tiotest.c |    8 ++++----
+ 1 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/tiotest.c b/tiotest.c
+index 38f54e7..6b3d0c3 100644
+--- a/tiotest.c
++++ b/tiotest.c
+@@ -31,7 +31,7 @@ static const char* versionStr = "tiotest v0.3.3 (C) 1999-2000 Mika Kuoppala <mik
+ */
+ ArgumentOptions args;
+ 
+-static void * aligned_alloc(ssize_t size)
++static void * _aligned_alloc(ssize_t size)
+ {
+ 	caddr_t a;
+ 	a = mmap((caddr_t )0, size, 
+@@ -41,7 +41,7 @@ static void * aligned_alloc(ssize_t size)
+ 	return a;
+ }
+ 
+-static int aligned_free(caddr_t a, ssize_t size)
++static int _aligned_free(caddr_t a, ssize_t size)
+ {
+ 	return munmap(a, size);
+ }
+@@ -281,7 +281,7 @@ void initialize_test( ThreadTest *d )
+ 		pthread_attr_setscope(&(d->threads[i].thread_attr),
+ 				      PTHREAD_SCOPE_SYSTEM);
+ 
+-		d->threads[i].buffer = aligned_alloc( d->threads[i].blockSize );
++		d->threads[i].buffer = _aligned_alloc( d->threads[i].blockSize );
+ 		if( d->threads[i].buffer == NULL )
+ 		{
+ 			perror("Error allocating memory");
+@@ -383,7 +383,7 @@ void cleanup_test( ThreadTest *d )
+ 	{
+ 		if (!args.rawDrives)
+ 		unlink(d->threads[i].fileName);
+-		aligned_free( d->threads[i].buffer, d->threads[i].blockSize );
++		_aligned_free( d->threads[i].buffer, d->threads[i].blockSize );
+ 		d->threads[i].buffer = 0;
+ 	
+ 		pthread_attr_destroy( &(d->threads[i].thread_attr) );
+-- 
+1.7.7
+

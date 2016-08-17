@@ -1,0 +1,34 @@
+gst-ffmpeg: aacdec: check channel count
+
+Prevent out of array accesses
+
+Found-by: Mateusz "j00ru" Jurczyk and Gynvael Coldwind
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+(cherry picked from commit 96f452ac647dae33c53c242ef3266b65a9beafb6)
+
+Upstream-Status: Backport 
+
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+---
+ libavcodec/aacdec.c |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
+
+diff --git a/libavcodec/aacdec.c b/libavcodec/aacdec.c
+index 239153a..6c17c33 100644
+--- a/gst-libs/ext/libav/libavcodec/aacdec.c
++++ b/gst-libs/ext/libav/libavcodec/aacdec.c
+@@ -914,6 +914,11 @@ static av_cold int aac_decode_init(AVCodecContext *avctx)
+         }
+     }
+ 
++    if (avctx->channels > MAX_CHANNELS) {
++        av_log(avctx, AV_LOG_ERROR, "Too many channels\n");
++        return AVERROR_INVALIDDATA;
++    }
++
+     AAC_INIT_VLC_STATIC( 0, 304);
+     AAC_INIT_VLC_STATIC( 1, 270);
+     AAC_INIT_VLC_STATIC( 2, 550);
+-- 
+1.7.5.4
+

@@ -1,0 +1,76 @@
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Sun, 22 Sep 2013 23:21:01 -0400
+Subject: [PATCH] src/Makefile.am: fix race issue for _gen/gtypes.h and _gen/gtypes-body.h
+
+There might be an error when parallel build:
+
+[snip]
+Traceback (most recent call last):
+  File "/path/to/tools/glib-gtypes-generator.py", line 304, in <module>
+    GTypesGenerator(dom, argv[1], argv[2])()
+  File "/path/to/tools/glib-gtypes-generator.py", line 295, in __call__
+    file_set_contents(self.output + '.h', ''.join(self.header))
+  File "/path/to/tools/libtpcodegen.py", line 42, in file_set_contents
+    os.rename(filename + '.tmp', filename)
+OSError: [Errno 2] No such file or directory
+[snip]
+
+This is a race issue, the _gen/gtypes.h and _gen/gtypes-body.h may
+write(remove/rename) _gen/gtypes.tmp at the same time, then there would
+be the error.
+
+There was a similar bug in telepathy-glib which was already fixed, we use the
+similar patch to fix it.
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ src/Makefile.am |   18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -288,7 +288,11 @@ _gen/interfaces-body.h: _gen/mcd.xml \
+ 		$(tools_dir)/glib-interfaces-body-generator.xsl \
+ 		$< > $@
+ 
+-_gen/gtypes.h _gen/gtypes-body.h: _gen/mcd.xml \
++# do nothing, output as a side-effect
++_gen/gtypes.h: _gen/gtypes-body.h
++	@:
++
++_gen/gtypes-body.h: _gen/mcd.xml \
+ 	$(top_srcdir)/tools/glib-gtypes-generator.py
+ 	$(AM_V_GEN)$(PYTHON) $(top_srcdir)/tools/glib-gtypes-generator.py \
+ 		$< _gen/gtypes mc
+@@ -309,7 +313,11 @@ _gen/%.xml: %.xml $(wildcard $(top_srcdir)/xml/*.xml) Makefile.am
+ 	$(AM_V_GEN)$(XSLTPROC) $(XSLTPROCFLAGS) --xinclude $(tools_dir)/identity.xsl \
+ 		$< > $@
+ 
+-_gen/cli-%-body.h _gen/cli-%.h: _gen/%.xml \
++# do nothing, output as a side-effect
++_gen/cli-%.h: _gen/cli-%-body.h
++	@:
++
++_gen/cli-%-body.h: _gen/%.xml \
+ 	$(tools_dir)/glib-client-gen.py Makefile.am
+ 	$(AM_V_GEN)$(PYTHON) $(tools_dir)/glib-client-gen.py \
+ 		--group=`echo $* | tr x- x_` \
+@@ -317,7 +325,11 @@ _gen/cli-%-body.h _gen/cli-%.h: _gen/%.xml \
+ 		--tp-proxy-api=0.7.6 \
+ 		$< Mc_Cli _gen/cli-$*
+ 
+-_gen/svc-%.c _gen/svc-%.h: _gen/%.xml \
++# do nothing, output as a side-effect
++_gen/svc-%.h: _gen/svc-%.c
++	@:
++
++_gen/svc-%.c: _gen/%.xml \
+ 	$(tools_dir)/glib-ginterface-gen.py Makefile.am
+ 	$(AM_V_GEN)$(PYTHON) $(tools_dir)/glib-ginterface-gen.py \
+ 		--filename=_gen/svc-$* \
+-- 
+1.7.10.4
+

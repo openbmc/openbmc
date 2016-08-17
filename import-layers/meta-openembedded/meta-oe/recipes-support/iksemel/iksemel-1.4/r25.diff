@@ -1,0 +1,32 @@
+Taken from upstream subversion repository:
+
+http://code.google.com/p/iksemel/source/detail?r=25
+
+===================================================================
+---
+ configure.ac |   10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+--- iksemel-1.4.orig/configure.ac
++++ iksemel-1.4/configure.ac
+@@ -43,11 +43,19 @@ AM_CONDITIONAL(DO_POSIX, test "x$defio"
+ dnl Checks for library functions
+ AC_SEARCH_LIBS(recv,socket)
+ AC_CHECK_FUNCS(getopt_long)
+ AC_CHECK_FUNCS(getaddrinfo)
+ 
+-AM_PATH_LIBGNUTLS(,AC_DEFINE(HAVE_GNUTLS,,"Use libgnutls"))
++dnl Check GNU TLS
++PKG_CHECK_MODULES(GNUTLS, gnutls >= 2.0.0, have_gnutls=yes, have_gnutls=no)
++if test "x$have_gnutls" = "xyes"; then
++  LIBGNUTLS_CFLAGS="$GNUTLS_CFLAGS"
++  LIBGNUTLS_LIBS="$GNUTLS_LIBS"
++  AC_SUBST(LIBGNUTLS_CFLAGS)
++  AC_SUBST(LIBGNUTLS_LIBS)
++  AC_DEFINE(HAVE_GNUTLS, 1, [whether to use GnuTSL support.])
++fi
+ 
+ dnl Check -Wall flag of GCC
+ if test "x$GCC" = "xyes"; then
+   if test -z "`echo "$CFLAGS" | grep "\-Wall" 2> /dev/null`" ; then
+     CFLAGS="$CFLAGS -Wall"

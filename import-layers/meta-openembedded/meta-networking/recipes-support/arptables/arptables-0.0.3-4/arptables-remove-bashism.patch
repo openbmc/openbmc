@@ -1,0 +1,37 @@
+From cd312bc0e3686404428878d23b8888cba09a20e1 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Thu, 18 Sep 2014 19:46:58 -0700
+Subject: [PATCH] arptables.sysv: remove bashism
+
+Use "." to replace of "source", and change /bin/bash to /bin/sh, the
+echo $"foo" works well in busybox.
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ arptables.sysv |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arptables.sysv b/arptables.sysv
+index 7a90bd2..7710376 100644
+--- a/arptables.sysv
++++ b/arptables.sysv
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ #
+ # init script for arptables
+ #
+@@ -11,7 +11,7 @@
+ #
+ # config: __SYSCONFIG__/arptables
+ 
+-source /etc/init.d/functions
++. /etc/init.d/functions
+ # source /etc/sysconfig/network
+ 
+ # Check that networking is up.
+-- 
+1.7.9.5
+

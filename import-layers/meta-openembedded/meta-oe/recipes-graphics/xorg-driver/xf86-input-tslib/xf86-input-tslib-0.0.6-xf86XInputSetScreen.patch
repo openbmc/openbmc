@@ -1,0 +1,31 @@
+Fixes crash when a touchscreen event is received with xserver 1.12 and later:
+X: symbol lookup error: /usr/lib/xorg/modules/input/tslib_drv.so: undefined symbol: xf86XInputSetScreen
+
+Upstream-Status: Pending
+
+Taken from Gentoo:
+https://bugs.gentoo.org/show_bug.cgi?id=446432
+
+diff -ur xf86-input-tslib-0.0.6.orig/src/tslib.c xf86-input-tslib-0.0.6/src/tslib.c
+--- xf86-input-tslib-0.0.6.orig/src/tslib.c	2012-12-05 01:12:16.286597071 +0100
++++ xf86-input-tslib-0.0.6/src/tslib.c	2012-12-05 01:11:02.686598595 +0100
+@@ -75,6 +75,19 @@
+ #define COLLECT_INPUT_OPTIONS(pInfo, options) xf86CollectInputOptions((pInfo), (options))
+ #endif
+ 
++#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) > 13
++static void
++xf86XInputSetScreen(InputInfoPtr	pInfo,
++		    int			screen_number,
++		    int			x,
++		    int			y)
++{
++    if (miPointerGetScreen(pInfo->dev) !=
++          screenInfo.screens[screen_number]) {
++	miPointerSetScreen(pInfo->dev, screen_number, x, y);
++    }
++}
++#endif
+ 
+ enum { TSLIB_ROTATE_NONE=0, TSLIB_ROTATE_CW=270, TSLIB_ROTATE_UD=180, TSLIB_ROTATE_CCW=90 };
+ 

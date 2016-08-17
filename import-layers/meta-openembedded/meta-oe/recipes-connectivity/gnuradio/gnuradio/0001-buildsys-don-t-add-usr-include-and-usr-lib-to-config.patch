@@ -1,0 +1,58 @@
+From a130153ae84d8bb5914879cef94df09f06825c10 Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen@dominion.thruhere.net>
+Date: Sat, 18 Jun 2011 11:25:36 +0200
+Subject: [PATCH] buildsys: don't add /usr/include and /usr/lib to configure tests for libusb
+
+Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
+---
+ config/usrp_libusb.m4 |   13 -------------
+ 1 files changed, 0 insertions(+), 13 deletions(-)
+
+diff --git a/config/usrp_libusb.m4 b/config/usrp_libusb.m4
+index cc3410f..b421820 100644
+--- a/config/usrp_libusb.m4
++++ b/config/usrp_libusb.m4
+@@ -117,10 +117,6 @@ AC_DEFUN([USRP_LIBUSB], [
+       dnl configured to find this header.
+       AC_LANG_PUSH(C)
+       save_CPPFLAGS="$CPPFLAGS"
+-      if test x$USB_INCLUDEDIR != x; then
+-        USB_INCLUDES="-I$USB_INCLUDEDIR"
+-        CPPFLAGS="$USB_INCLUDES"
+-      fi
+       AC_MSG_CHECKING([$libusb_name for header $usb_header])
+       AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+         #include "$usb_header"
+@@ -172,9 +168,6 @@ AC_DEFUN([USRP_LIBUSB], [
+             *)
+               AC_LANG_PUSH(C)
+               save_CPPFLAGS="$CPPFLAGS"
+-              if test x$USB_INCLUDEDIR != x; then
+-                CPPFLAGS="$USB_INCLUDES"
+-              fi
+               save_LIBS="$LIBS"
+               LIBS="$USB_LIBS"
+               AC_MSG_CHECKING([$libusb_name for symbol usb_debug in library $usb_lib_name])
+@@ -217,9 +210,6 @@ AC_DEFUN([USRP_LIBUSB], [
+     dnl final error checking, mostly to create #define's
+     AC_LANG_PUSH(C)
+     save_CPPFLAGS="$CPPFLAGS"
+-    if test x$USB_INCLUDEDIR != x; then
+-      CPPFLAGS="$USB_INCLUDES"
+-    fi
+     dnl Check for the header.
+     AC_CHECK_HEADERS([$usb_header], [], [libusbok=no])
+     CPPFLAGS="$save_CPPFLAGS"
+@@ -231,9 +221,6 @@ AC_DEFUN([USRP_LIBUSB], [
+       dnl check for the library (again)
+       AC_LANG_PUSH(C)
+       save_CPPFLAGS="$CPPFLAGS"
+-      if test x$USB_INCLUDEDIR != x; then
+-        CPPFLAGS="$USB_INCLUDES"
+-      fi
+       save_LIBS="$LIBS"
+       LIBS="$USB_LIBS"
+       AC_CHECK_LIB([$usb_lib_name], [$usb_lib_func], [], [
+-- 
+1.6.6.1
+

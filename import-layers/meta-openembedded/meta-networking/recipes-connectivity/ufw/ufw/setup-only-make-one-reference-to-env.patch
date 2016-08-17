@@ -1,0 +1,77 @@
+From be53eea06a5655fdc98f47a73be8277b65bb42ed Mon Sep 17 00:00:00 2001
+From: Joe MacDonald <joe_macdonald@mentor.com>
+Date: Tue, 11 Nov 2014 21:41:14 -0500
+Subject: [PATCH] setup: only make one reference to env
+
+If sys.executable happens to be '/usr/bin/env python' or something
+similar, the setup script will result in 'ufw' getting /usr/bin/env
+repeated on the top line.  This causes an error at runtime.  Perform a
+quick sanity check on sys.executable before doing the substitution.
+
+While we're at it, change the default value of 'exe' to the one we either
+detected or specified on the build line.
+
+Upstream-Status: Inappropriate [ embedded specific ]
+
+Signed-off-by: Joe MacDonald <joe_macdonald@mentor.com>
+---
+ setup.py | 34 ++++++++++++++++++++++++++++------
+ 1 file changed, 28 insertions(+), 6 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index b13d11c..73acdef 100644
+--- a/setup.py
++++ b/setup.py
+@@ -64,7 +64,7 @@ class Install(_install, object):
+         real_sharedir = os.path.join(real_prefix, 'share', 'ufw')
+ 
+         # Update the modules' paths
+-        for file in [ 'common.py' ]:
++        for file in [ 'common.py', 'util.py' ]:
+             print("Updating " + file)
+             subprocess.call(["sed",
+                              "-i",
+@@ -91,6 +91,11 @@ class Install(_install, object):
+                              "s%#SHARE_DIR#%" + real_sharedir + "%g",
+                              os.path.join('staging', file)])
+ 
++            subprocess.call(["sed",
++                             "-i.jjm",
++                             "s%/sbin/iptables%" + iptables_exe + "%g",
++                             os.path.join('staging', file)])
++
+         # Now byte-compile everything
+         super(Install, self).run()
+ 
+@@ -107,12 +112,23 @@ class Install(_install, object):
+         for f in [ script, manpage, manpage_f ]:
+             self.mkpath(os.path.dirname(f))
+ 
++        # if sys.executable == /usr/bin/env python* the result will be the top
++        # of ufw getting:
++        #
++        #  #! /usr/bin/env /usr/bin/env python
++        #
++        # which is not ideal
++        #
+         # update the interpreter to that of the one the user specified for setup
+-        print("Updating staging/ufw to use %s" % (sys.executable))
+-        subprocess.call(["sed",
+-                         "-i",
+-                         "1s%^#.*python.*%#! /usr/bin/env " + sys.executable + "%g",
+-                         'staging/ufw'])
++        print("Updating staging/ufw to use (%s)" % (sys.executable))
++
++        if re.search("(/usr/bin/env)", sys.executable):
++            print("found 'env' in sys.executable (%s)" % (sys.executable))
++            subprocess.call(["sed",
++                             "-i.jjm",
++                             "1s%^#.*python.*%#! " + sys.executable + "%g",
++                             'staging/ufw'])
++
+         self.copy_file('staging/ufw', script)
+         self.copy_file('doc/ufw.8', manpage)
+         self.copy_file('doc/ufw-framework.8', manpage_f)
+-- 
+1.9.1
+

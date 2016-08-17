@@ -1,0 +1,28 @@
+Define SOCI_LIBDIR only if its not passed via environemnt. In OE we
+want to set it per our choice since we use 'lib' for 64bit unless we
+are using multilib
+
+-Khem
+
+Index: soci-3.2.2/CMakeLists.txt
+===================================================================
+--- soci-3.2.2.orig/CMakeLists.txt
++++ soci-3.2.2/CMakeLists.txt
+@@ -69,11 +69,12 @@ include(SociDependencies)
+ ###############################################################################
+ # Installation
+ ###############################################################################
+-
+-if(APPLE OR CMAKE_SIZEOF_VOID_P EQUAL 4)
+-  set(SOCI_LIBDIR "lib")
+-else()
+-  set(SOCI_LIBDIR "lib64")
++if(NOT DEFINED SOCI_LIBDIR)
++  if(APPLE OR CMAKE_SIZEOF_VOID_P EQUAL 4)
++    set(SOCI_LIBDIR "lib")
++  else()
++    set(SOCI_LIBDIR "lib")
++  endif()
+ endif()
+ 
+ set(BINDIR "bin" CACHE PATH "The directory to install binaries into.")

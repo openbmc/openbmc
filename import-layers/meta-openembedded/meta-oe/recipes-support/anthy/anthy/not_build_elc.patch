@@ -1,0 +1,16 @@
+upstream: not applicable
+source: stolen from debian
+
+diff -Naur anthy-7811/src-util.orig/Makefile.am anthy-7811/src-util/Makefile.am
+--- anthy-7811/src-util.orig/Makefile.am	2006-06-18 10:47:55.790000000 +0900
++++ anthy-7811/src-util/Makefile.am	2006-06-18 10:48:23.860000000 +0900
+@@ -6,7 +6,8 @@
+  anthy-isearch.el anthy-azik.el anthy-kyuri.el
+ EXTRA_DIST = $(ELISP_FILES) typetab dic-tool-usage.txt rcsize.rb
+ bin_PROGRAMS = anthy-dic-tool anthy-agent anthy-morphological-analyzer
+-ELCFILES = anthy.elc anthy-dic.elc anthy-azik.elc anthy-conf.elc anthy-isearch.elc anthy-kyuri.elc leim-list.elc
++#ELCFILES = anthy.elc anthy-dic.elc anthy-azik.elc anthy-conf.elc anthy-isearch.elc anthy-kyuri.elc leim-list.elc
++ELCFILES = 
+ if ELISP
+ lisp_LISP = $(ELISP_FILES)
+ endif

@@ -1,0 +1,24 @@
+// Some custom Gate One settings for OpenEmbedded
+{
+    "*": {
+        "gateone": { // These settings apply to all of Gate One
+            "log_file_prefix": "@localstate@/log/gateone.log", // default would be /var/log/gateone/gateone.log
+            "log_file_max_size": 5242880, // 5 megabyte logs for OE by default (default would normally be 100Mb)
+            "log_file_num_backups": 2, // Default is normally 10
+            "origins": ["*"], // Every device has a unique origin
+            "logging": "info",
+            "pid_file": "/run/gateone.pid",
+            "session_dir": "/tmp/gateone",
+            "user_dir": "@localstate@/lib/gateone/users"
+        },
+        "terminal": {
+            // Disabling session logging for embedded devices is a good idea (limited/slow storage)
+            "session_logging": false,
+            "syslog_session_logging": false
+//             "commands": {
+//                 // For some reason this doesn't work (never asks for the password)
+//                 "login": "setsid /bin/login" // Normally this would emulate logging into the host console
+//             }
+        }
+    }
+}

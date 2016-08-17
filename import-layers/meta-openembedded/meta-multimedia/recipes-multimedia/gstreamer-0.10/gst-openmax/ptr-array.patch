@@ -1,0 +1,46 @@
+Rename static functions that use GLib naming conventions as one of them
+(g_ptr_array_insert) has now been added to GLib.
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/omx/gstomx_util.c b/omx/gstomx_util.c
+index 423e441..579dbf5 100644
+--- a/omx/gstomx_util.c
++++ b/omx/gstomx_util.c
+@@ -85,7 +85,7 @@ static gboolean initialized;
+  */
+ 
+ static void
+-g_ptr_array_clear (GPtrArray * array)
++omx_g_ptr_array_clear (GPtrArray * array)
+ {
+   guint index;
+   for (index = 0; index < array->len; index++)
+@@ -93,7 +93,7 @@ g_ptr_array_clear (GPtrArray * array)
+ }
+ 
+ static void
+-g_ptr_array_insert (GPtrArray * array, guint index, gpointer data)
++omx_g_ptr_array_insert (GPtrArray * array, guint index, gpointer data)
+ {
+   if (index + 1 > array->len) {
+     g_ptr_array_set_size (array, index + 1);
+@@ -394,7 +394,7 @@ g_omx_core_unload (GOmxCore * core)
+   }
+ 
+   core_for_each_port (core, g_omx_port_free);
+-  g_ptr_array_clear (core->ports);
++  omx_g_ptr_array_clear (core->ports);
+ }
+ 
+ static inline GOmxPort *
+@@ -418,7 +418,7 @@ g_omx_core_new_port (GOmxCore * core, guint index)
+   }
+ 
+   port = g_omx_port_new (core, index);
+-  g_ptr_array_insert (core->ports, index, port);
++  omx_g_ptr_array_insert (core->ports, index, port);
+ 
+   return port;
+ }

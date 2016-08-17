@@ -1,0 +1,33 @@
+From 528009f5ca0685c95ef27f6c8957160499c0576a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 10 May 2013 10:42:45 -0700
+Subject: [PATCH] Do not strip automatically, this leaves the stripping
+ busines to OE
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/Makefile |    2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index 278324a..5ecd6d5 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -665,12 +665,10 @@ $(LUAJIT_A): $(LJVMCORE_O)
+ $(LUAJIT_SO): $(LJVMCORE_O)
+ 	$(E) "DYNLINK   $@"
+ 	$(Q)$(TARGET_LD) $(TARGET_ASHLDFLAGS) -o $@ $(LJVMCORE_DYNO) $(TARGET_ALIBS)
+-	$(Q)$(TARGET_STRIP) $@
+ 
+ $(LUAJIT_T): $(TARGET_O) $(LUAJIT_O) $(TARGET_DEP)
+ 	$(E) "LINK      $@"
+ 	$(Q)$(TARGET_LD) $(TARGET_ALDFLAGS) -o $@ $(LUAJIT_O) $(TARGET_O) $(TARGET_ALIBS)
+-	$(Q)$(TARGET_STRIP) $@
+ 	$(E) "OK        Successfully built LuaJIT"
+ 
+ ##############################################################################
+-- 
+1.7.9.5
+

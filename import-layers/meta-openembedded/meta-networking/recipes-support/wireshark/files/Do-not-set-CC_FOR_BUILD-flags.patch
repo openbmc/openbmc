@@ -1,0 +1,46 @@
+[PATCH] Do not set CC_FOR_BUILD flags
+
+Upstream-status: Pending
+
+AC_WIRESHARK_COMPILER_FLAGS_CHECK() is checking which options CC is supported,
+and put the supported options into CFLAGS, but it should not put them into 
+CFLAGS_FOR_BUILD. since CC and BUILD_CC can be different, CFLAGS_FOR_BUILD is
+used by BUILD_CC 
+
+BUILD_CC is used to generated host tools, do not use the gcc's optimised options,
+do not effect the running of host tools. so do not set CC_FOR_BUILD flags.
+
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+---
+ acinclude.m4 | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/acinclude.m4 b/acinclude.m4
+index 136fc27..8d3d360 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -1755,10 +1755,6 @@ if test "x$ac_supports_gcc_flags" = "xyes" ; then
+               # just the new option.
+               #
+               CFLAGS="$CFLAGS_saved $GCC_OPTION"
+-              #
+-              # Add it to the flags we use when building build tools.
+-              #
+-              CFLAGS_FOR_BUILD="$CFLAGS_FOR_BUILD $GCC_OPTION"
+             ],
+             [
+               AC_MSG_RESULT(yes)
+@@ -1771,10 +1767,6 @@ if test "x$ac_supports_gcc_flags" = "xyes" ; then
+           # just the new option.
+           #
+           CFLAGS="$CFLAGS_saved $GCC_OPTION"
+-          #
+-          # Add it to the flags we use when building build tools.
+-          #
+-          CFLAGS_FOR_BUILD="$CFLAGS_FOR_BUILD $GCC_OPTION"
+         fi
+       ],
+       [
+-- 
+1.9.1
+

@@ -1,0 +1,41 @@
+From 621d946e56efac2c779b83b1a5c6b645169c4ebd Mon Sep 17 00:00:00 2001
+From: "Brian A. Lloyd" <brian.lloyd@familyhonor.net>
+Date: Wed, 1 Oct 2014 12:35:18 +0300
+Subject: [PATCH] Add config.h include to src/lx_memory.c
+
+The src/lx_memory.c file uses the xf86.h header file.  This file must have
+HAVE_STRNDUP defined before calling it when the building platform has a strndup
+function.  When using config.h, this file doesn't have that define and so fails
+to compile.
+
+The attached patch adds the conditional config.h to this file so it may compile
+on the affected platforms.
+
+The patch is trivial and may be included and used under whatever licensing
+desired.
+
+Closes: Free Desktop Bug #84541
+
+Signed-off-by: Brian A. Lloyd <brian.lloyd@familyhonor.net>
+Upstream-Status: Backport
+---
+ src/lx_memory.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/lx_memory.c b/src/lx_memory.c
+index f26d280..992446f 100644
+--- a/src/lx_memory.c
++++ b/src/lx_memory.c
+@@ -22,6 +22,9 @@
+  * contributors may be used to endorse or promote products derived from this
+  * software without specific prior written permission.
+  */
++#if HAVE_CONFIG_H
++#include "config.h"
++#endif
+ 
+ #include "xf86.h"
+ #include "geode.h"
+-- 
+2.1.1
+

@@ -1,0 +1,19 @@
+* modules/gui/qt4/Makefile.am not B!=S friendly
+* Simple solution to missing directories in ${B}
+
+Upstream status: Pending
+
+Signed-off-by: Tim Orling <TicoTimo@gmail.com>
+
+Index: vlc-2.2.1/modules/gui/qt4/Makefile.am
+===================================================================
+--- vlc-2.2.1.orig/modules/gui/qt4/Makefile.am
++++ vlc-2.2.1/modules/gui/qt4/Makefile.am
+@@ -127,6 +127,7 @@ moc_verbose_0 = @echo "  MOC   " $@;
+ moc_verbose__0 = $(moc_verbose_0)
+ 
+ .hpp.moc.cpp:
++	[ -d $(dir $@) ] || mkdir -p $(dir $@)
+ 	$(moc_verbose)$(MOC) $(MOC_CPPFLAGS) -o $@ $<
+ 
+ # These MOC files depend on the configure settings:

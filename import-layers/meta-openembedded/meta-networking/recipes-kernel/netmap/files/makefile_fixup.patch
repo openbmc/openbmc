@@ -1,0 +1,97 @@
+The makefile assumes building locally.
+
+Upstream Status: Inappropriate [Native]
+
+The configure is not auto-make based
+
+Signed-of-by: Armin Kuster <akuster@mvista.com>
+
+Index: LINUX/netmap.mak.in
+===================================================================
+--- a/LINUX/netmap.mak.in
++++ b/LINUX/netmap.mak.in
+@@ -12,10 +12,9 @@ SRCDIR:=@SRCDIR@
+ # The following commands are needed to build the modules as out-of-tree,
+ # in fact the kernel sources path must be specified.
+ 
+-PWD ?= $(CURDIR)
+ 
+ # Additional compile flags (e.g. header location)
+-EXTRA_CFLAGS := -I$(PWD) -I$(SRCDIR) -I$(SRCDIR)/../sys -I$(SRCDIR)/../sys/dev -DCONFIG_NETMAP
++EXTRA_CFLAGS := -I$(SRCDIR) -I$(SRCDIR)/../sys -I$(SRCDIR)/../sys/dev -DCONFIG_NETMAP
+ EXTRA_CFLAGS += -Wno-unused-but-set-variable
+ EXTRA_CFLAGS += $(foreach s,$(SUBSYS),-DCONFIG_NETMAP_$(shell echo $s|tr a-z- A-Z_))
+ 
+Index: LINUX/configure
+===================================================================
+--- a/LINUX/configure
++++ b/LINUX/configure
+@@ -349,52 +349,6 @@ reset_tests() {
+ 	EOF
+ }
+ 
+-# run_tests: run all accumulated tests and exec the pertinent
+-#   success/failure actions for each one.
+-run_tests() {
+-	local t= 	# prevent -EOF to eat the make TAB
+-	cat > $TMPDIR/Makefile <<-EOF
+-		ifneq (\$(KERNELRELEASE),)
+-		obj-m := $TESTOBJS
+-		else
+-		S_DRIVERS := $(drv print)
+-		all: \$(S_DRIVERS:%=get-%)
+-		$t	\$(MAKE) -C $ksrc M=\$\$PWD $kopts
+-
+-		-include $TOPDIR/drivers.mak
+-	EOF
+-	for d in $(drv print); do
+-		cat >> $TMPDIR/Makefile <<-EOF
+-			get-$d:
+-			$t	[ -z "\$($d-src)" ] || cp -Rp \$($d-src) \$(if \$($d-dst),\$($d-dst),.)
+-			$t	touch get-$d
+-		EOF
+-	done
+-	echo endif >> $TMPDIR/Makefile
+-	{
+-		cat <<-EOF
+-##############################################################################
+-## BEGIN RUNNING TESTS: $(date)
+-##############################################################################
+-## Makefile:
+-		EOF
+-		cat $TMPDIR/Makefile
+-		cat <<-EOF
+-##############################################################################
+-		EOF
+-	} >> config.log
+-	(
+-		cd $TMPDIR
+-		make -k -j $(grep -c processor /proc/cpuinfo)
+-	) >> config.log
+-	eval "$TESTPOSTPROC"
+-	cat >> config.log <<-EOF
+-##############################################################################
+-## END RUNNING TESTS: $(date)
+-##############################################################################
+-	EOF
+-}
+-
+ configh=netmap_linux_config.h
+ # succes/failure actions are expected to write some macros
+ # in netma_linux_config.h. The following functions can be
+@@ -619,7 +573,6 @@ configuration. Please check 'config.log'
+ reset_tests
+ rm -f drivers.mak
+ add_test true broken_buildsystem < /dev/null
+-run_tests
+ 
+ drvname2config() {
+ 	local name=$1
+@@ -1280,7 +1233,6 @@ cat > $configh <<-EOF
+ EOF
+ 
+ # the TESTPOSTPROC script will add macros to $configh
+-run_tests
+ 
+ define DRIVER_SUFFIX \"$drvsuffix\"
+ 

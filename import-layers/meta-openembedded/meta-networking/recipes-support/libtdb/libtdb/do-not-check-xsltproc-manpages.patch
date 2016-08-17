@@ -1,0 +1,15 @@
+Don't check manpages for xsltproc.
+
+Signed-off-by: Bian Naimeng <biannm@cn.fujitsu.com>
+
+--- tdb-1.3.0.orig/wscript	2015-04-22 09:52:32.366000222 +0900
++++ tdb-1.3.0/wscript	2015-04-22 09:51:57.720000205 +0900
+@@ -90,7 +90,7 @@ def configure(conf):
+         not conf.env.disable_tdb_mutex_locking):
+         conf.define('USE_TDB_MUTEX_LOCKING', 1)
+ 
+-    conf.CHECK_XSLTPROC_MANPAGES()
++    conf.find_program('xsltproc', var='XSLTPROC')
+ 
+     if not conf.env.disable_python:
+         # also disable if we don't have the python libs installed

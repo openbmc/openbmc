@@ -1,0 +1,27 @@
+close RequireValidShell check
+
+Upstream-Status: Inappropriate [configuration]
+
+close RequireValidShell check since we like to make /bin/false as shell
+for ftp user
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ sample-configurations/basic.conf |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/sample-configurations/basic.conf b/sample-configurations/basic.conf
+index 314eb79..abcb284 100644
+--- a/sample-configurations/basic.conf
++++ b/sample-configurations/basic.conf
+@@ -53,6 +53,7 @@ AllowOverwrite		on
+   # We want clients to be able to login with "anonymous" as well as "ftp"
+   UserAlias			anonymous ftp
+ 
++  RequireValidShell	 	off
+   # Limit the maximum number of anonymous logins
+   MaxClients			10
+ 
+-- 
+1.7.10.4
+

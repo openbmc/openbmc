@@ -1,0 +1,29 @@
+Always use devmapper for kpartx
+
+Do not try to compute the LIBDM_API_COOKIE make variable
+from host information when cross-compiling.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+diff --git a/kpartx/Makefile b/kpartx/Makefile
+index 2a07334..24bdabc 100644
+--- a/kpartx/Makefile
++++ b/kpartx/Makefile
+@@ -4,13 +4,7 @@
+ #
+ include ../Makefile.inc
+ 
+-CFLAGS += -I. -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
+-
+-LIBDM_API_COOKIE = $(shell grep -Ecs '^[a-z]*[[:space:]]+dm_task_set_cookie' /usr/include/libdevmapper.h)
+-
+-ifneq ($(strip $(LIBDM_API_COOKIE)),0)
+-	CFLAGS += -DLIBDM_API_COOKIE
+-endif
++CFLAGS += -I. -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -DLIBDM_API_COOKIE
+ 
+ LDFLAGS = -ldevmapper
+ OBJS = bsd.o dos.o kpartx.o solaris.o unixware.o dasd.o sun.o \

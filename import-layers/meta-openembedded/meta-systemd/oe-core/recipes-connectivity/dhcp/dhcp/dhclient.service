@@ -1,0 +1,13 @@
+[Unit]
+Description=Dynamic Host Configuration Protocol (DHCP)
+After=syslog.target network.target
+
+[Service]
+Type=forking
+PIDFile=/var/run/dhclient.pid
+EnvironmentFile=-/etc/default/dhcp-client
+ExecStart=/sbin/dhclient -cf /etc/dhcp/dhclient.conf -q -lf /var/lib/dhcp/dhclient.leases $INTERFACES
+
+[Install]
+WantedBy=multi-user.target
+

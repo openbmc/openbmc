@@ -1,0 +1,12 @@
+--- flite-1.3-release/configure.in.old	2008-01-06 02:17:47.000000000 -0600
++++ flite-1.3-release/configure.in	2008-01-06 02:19:56.000000000 -0600
+@@ -220,7 +220,8 @@ dnl allow the user to override the one d
+ dnl
+ AC_ARG_WITH( audio,
+ 	[  --with-audio          with specific audio support (none linux freebsd etc) ],
+-        AUDIODRIVER=$with_audio )
++        [AUDIODRIVER=$with_audio
++         AUDIODEFS=])
+ 
+ if test "x$AUDIODEFS" = x; then
+     case "$AUDIODRIVER" in

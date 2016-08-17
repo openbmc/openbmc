@@ -1,0 +1,49 @@
+Adapt tiobench to OE
+Author: Ludovic Desroches <ludovic.desroches@atmel.com>
+
+Upstream-Status: Inappropriate [not author]
+
+Index: Makefile
+===================================================================
+--- a/Makefile	2011-05-26 07:48:46.341400974 +0200
++++ b/Makefile	2011-05-30 06:32:38.091401358 +0200
+@@ -1,8 +1,9 @@
+ # Makefile for tiotest
+ 
+-CC=gcc
++CC?=gcc
+ #CFLAGS=-O3 -fomit-frame-pointer -Wall
+ CFLAGS=-O2 -Wall
++LDFLAGS?=
+ 
+ #DEFINES=-DUSE_MMAP 
+ #-DUSE_MADVISE
+@@ -14,16 +15,16 @@
+ 
+ #DEFINES=
+ 
+-LINK=gcc
++LINK?=$(CC)
+ EXE=tiotest
+ PROJECT=tiobench
+ # do it once instead of each time referenced
+ VERSION=$(shell egrep "tiotest v[0-9]+.[0-9]+" tiotest.c | cut -d " " -f 7 | sed "s/v//g")
+ DISTNAME=$(PROJECT)-$(VERSION)
+ INSTALL=install
+-PREFIX=/usr/local
++PREFIX?=/usr/local
+ BINDIR=$(PREFIX)/bin
+-DOCDIR=/usr/local/doc/$(DISTNAME)
++DOCDIR=$(PREFIX)/share/doc/$(DISTNAME)
+ 
+ all: $(EXE)
+ 
+@@ -34,7 +35,7 @@
+ 	$(CC) -c $(CFLAGS) $(DEFINES) tiotest.c -o tiotest.o
+ 
+ $(EXE): tiotest.o crc32.o
+-	$(LINK) -o $(EXE) tiotest.o crc32.o -lpthread
++	$(LINK) -o $(EXE) tiotest.o crc32.o -lpthread $(LDFLAGS)
+ 	@echo
+ 	@echo "./tiobench.pl --help for usage options"
+ 	@echo

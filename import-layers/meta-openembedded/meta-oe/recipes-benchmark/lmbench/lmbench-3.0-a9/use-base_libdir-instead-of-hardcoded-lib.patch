@@ -1,0 +1,32 @@
+From 0d09e31970616e09beb7f238c2b59bfc541148fb Mon Sep 17 00:00:00 2001
+From: Ting Liu <b28495@freescale.com>
+Date: Fri, 22 Nov 2013 15:20:08 +0800
+Subject: [PATCH] use base_libdir instead of hardcoded /lib
+
+Upsteam Status: Inappropriate [configuration]
+
+Signed-off-by: Ting Liu <b28495@freescale.com>
+---
+ src/Makefile |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index c7a8c79..c7e4e3c 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -143,10 +143,10 @@ install-target:
+ 	if [ ! -d $(BASE) ]; then mkdir $(BASE); fi
+ 	if [ ! -d $(BASE)/bin ]; then mkdir $(BASE)/bin; fi
+ 	if [ ! -d $(BASE)/include ]; then mkdir $(BASE)/include; fi
+-	if [ ! -d $(BASE)/lib ]; then mkdir $(BASE)/lib; fi
++	if [ ! -d $(BASE)$(base_libdir) ]; then mkdir $(BASE)$(base_libdir); fi
+ 	cp $(EXES) $(BASE)/bin
+ 	cp $(INCS) $(BASE)/include
+-	cp $O/lmbench.a $(BASE)/lib/libmbench.a
++	cp $O/lmbench.a $(BASE)$(base_libdir)
+ 	cd ../doc; env MAKEFLAGS="$(MAKEFLAGS)" make CC="${CC}" OS="${OS}" BASE="$(BASE)" install
+ 
+ 
+-- 
+1.7.5.4
+

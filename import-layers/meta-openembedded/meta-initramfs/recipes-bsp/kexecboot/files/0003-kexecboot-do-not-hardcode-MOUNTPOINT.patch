@@ -1,0 +1,97 @@
+From 800dae0d34f8629a34c638a612166b76dda03e27 Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Sat, 2 Aug 2014 01:13:08 +0200
+Subject: [PATCH 3/4] kexecboot: do not hardcode MOUNTPOINT
+
+Avoid to hardcode it: could be requested as a new configure option.
+
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+---
+ cfgparser.c |  6 +++---
+ kexecboot.c | 18 ++++++++++--------
+ 2 files changed, 13 insertions(+), 11 deletions(-)
+
+diff --git a/cfgparser.c b/cfgparser.c
+index 8f6688c..dec27b1 100644
+--- a/cfgparser.c
++++ b/cfgparser.c
+@@ -141,7 +141,7 @@ static int set_kernel(struct cfgdata_t *cfgdata, char *value)
+ 		return -1;
+ 	}
+ 
+-	strcpy(sc->kernelpath, "/mnt");
++	strcpy(sc->kernelpath, MOUNTPOINT);
+ 	strcat(sc->kernelpath, value);
+ 	return 0;
+ }
+@@ -155,7 +155,7 @@ static int set_icon(struct cfgdata_t *cfgdata, char *value)
+ 
+ 	dispose(sc->iconpath);
+ 	/* Add our mountpoint, since the enduser won't know it */
+-	sc->iconpath = malloc(sizeof(MOUNTPOINT)+strlen(value));
++	sc->iconpath = malloc(strlen(MOUNTPOINT)+strlen(value)+1);
+ 	if (NULL == sc->iconpath) {
+ 		DPRINTF("Can't allocate memory to store iconpath '%s'", value);
+ 		return -1;
+@@ -194,7 +194,7 @@ static int set_initrd(struct cfgdata_t *cfgdata, char *value)
+ 		return -1;
+ 	}
+ 
+-	strcpy(sc->initrd, "/mnt");
++	strcpy(sc->initrd, MOUNTPOINT);
+ 	strcat(sc->initrd, value);
+ 	return 0;
+ }
+diff --git a/kexecboot.c b/kexecboot.c
+index d6657a0..7268d6b 100644
+--- a/kexecboot.c
++++ b/kexecboot.c
+@@ -57,20 +57,22 @@
+ #endif
+ 
+ #ifdef USE_MACHINE_KERNEL
+-/* Machine-dependent kernel patch */
++/* Machine-dependent kernel path */
+ char *machine_kernel = NULL;
+ #endif
+ 
++#define PREPEND_MOUNTPATH(string) MOUNTPOINT""string
++
+ /* NULL-terminated array of kernel search paths
+  * First item should be filled with machine-dependent path */
+ char *default_kernels[] = {
+ #ifdef USE_ZIMAGE
+-	"/mnt/boot/zImage",
+-	"/mnt/zImage",
++	PREPEND_MOUNTPATH("/boot/zImage"),
++	PREPEND_MOUNTPATH("/zImage"),
+ #endif
+ #ifdef USE_UIMAGE
+-	"/mnt/boot/uImage",
+-	"/mnt/uImage",
++	PREPEND_MOUNTPATH("/boot/uImage"),
++	PREPEND_MOUNTPATH("/uImage"),
+ #endif
+ 	NULL
+ };
+@@ -149,14 +151,14 @@ char *get_machine_kernelpath() {
+ 			++tmp;
+ 		}
+ 
+-		/* Prepend "/mnt/boot/zImage-" to hw */
+-		tmp = malloc(strlen(hw) + 17 + 1);	/* strlen("/mnt/boot/zImage-") */
++		/* Prepend  MOUNTPOINT"/boot/zImage-" to hw */
++		tmp = malloc(strlen(PREPEND_MOUNTPATH("/boot/zImage-")) + strlen(hw) + 1);
+ 		if (NULL == tmp) {
+ 			DPRINTF("Can't allocate memory for machine-specific kernel path");
+ 			return NULL;
+ 		}
+ 
+-		strcpy(tmp, "/mnt/boot/zImage-");
++		strcpy(tmp, PREPEND_MOUNTPATH("/boot/zImage-"));
+ 		strcat(tmp, hw);
+ 
+ 		return tmp;
+-- 
+1.9.1
+

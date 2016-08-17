@@ -1,0 +1,12 @@
+--- polkit-gnome-0.105/configure.ac.org	2015-05-04 22:33:03.925977953 -0700
++++ polkit-gnome-0.105/configure.ac	2015-05-04 22:33:16.862288030 -0700
+@@ -120,6 +120,9 @@
+ # Check for required packages
+ # ***************************
+ 
++# check for gtk-doc
++GTK_DOC_CHECK([1.14],[--flavour no-tmpl])
++
+ POLKIT_AGENT_REQUIRED=0.97
+ POLKIT_GOBJECT_REQUIRED=0.97
+ GTK_REQUIRED=3.0.0

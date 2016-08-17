@@ -1,0 +1,30 @@
+#
+# Lock the port
+#
+lock
+
+#
+# We don't need the tunnel server to authenticate itself
+#
+noauth
+
+#
+# Turn off transmission protocols we know won't be used
+#
+nobsdcomp
+nodeflate
+
+#
+# We want MPPE
+# (option naming specific to ppp 2.4.0 with unofficial patch)
+#
+#mppe-40
+mppe-128
+#mppe-stateless
+
+#
+# We want a sane mtu/mru 
+# (ppp 2.4.0 with unofficial patch)
+#
+#mtu 1000
+#mru 1000

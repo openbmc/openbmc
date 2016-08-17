@@ -1,0 +1,58 @@
+Fix the memory leak problem for mutex
+
+Upstream-Status: Pending
+
+Signed-off-by: Xufeng Zhang <xufeng.zhang@windriver.com>
+---
+ lib/logqueue.c               |    1 +
+ modules/affile/affile-dest.c |    2 ++
+ modules/dbparser/dbparser.c  |    1 +
+ 3 files changed, 4 insertions(+), 0 deletions(-)
+
+diff --git a/lib/logqueue.c b/lib/logqueue.c
+index 337a3c1..10edcf0 100644
+--- a/lib/logqueue.c
++++ b/lib/logqueue.c
+@@ -188,6 +188,7 @@ log_queue_init_instance(LogQueue *self, const gchar *persist_name)
+ void
+ log_queue_free_method(LogQueue *self)
+ {
++  g_static_mutex_free(&self->lock);
+   g_free(self->persist_name);
+   g_free(self);
+ }
+diff --git a/modules/affile/affile-dest.c b/modules/affile/affile-dest.c
+index a2bcdad..ce79f6f 100644
+--- a/modules/affile/affile-dest.c
++++ b/modules/affile/affile-dest.c
+@@ -305,6 +305,7 @@ affile_dw_free(LogPipe *s)
+ {
+   AFFileDestWriter *self = (AFFileDestWriter *) s;
+   
++  g_static_mutex_free(&self->lock);
+   log_pipe_unref((LogPipe *) self->writer);
+   self->writer = NULL;
+   g_free(self->filename);
+@@ -687,6 +688,7 @@ affile_dd_free(LogPipe *s)
+   /* NOTE: this must be NULL as deinit has freed it, otherwise we'd have circular references */
+   g_assert(self->single_writer == NULL && self->writer_hash == NULL);
+ 
++  g_static_mutex_free(&self->lock);
+   log_template_unref(self->filename_template);
+   log_writer_options_destroy(&self->writer_options);
+   log_dest_driver_free(s);
+diff --git a/modules/dbparser/dbparser.c b/modules/dbparser/dbparser.c
+index f1248b5..9775701 100644
+--- a/modules/dbparser/dbparser.c
++++ b/modules/dbparser/dbparser.c
+@@ -284,6 +284,7 @@ log_db_parser_free(LogPipe *s)
+ {
+   LogDBParser *self = (LogDBParser *) s;
+ 
++  g_static_mutex_free(&self->lock);
+   if (self->db)
+     pattern_db_free(self->db);
+ 
+-- 
+1.7.1
+

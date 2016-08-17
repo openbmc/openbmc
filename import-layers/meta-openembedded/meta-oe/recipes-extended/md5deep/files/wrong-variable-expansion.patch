@@ -1,0 +1,39 @@
+--- a/configure.ac	2014-08-22 12:22:54.290884351 +0200
++++ b/configure.ac	2014-08-22 12:23:15.822306295 +0200
+@@ -42,18 +42,6 @@
+      ;;		 		     
+ esac
+ 
+-
+-# Bring additional directories where things might be found into our
+-# search path. I don't know why autoconf doesn't do this by default
+-if test x"${mingw}" == "xno" ; then
+-  for spfx in /usr/local /opt/local /sw ; do
+-    echo checking ${spfx}/include
+-    if test -d ${spfx}/include; then
+-        CPPFLAGS="-I${spfx}/include $CPPFLAGS"
+-        LDFLAGS="-L${spfx}/lib $LDFLAGS"
+-    fi
+-  done
+-fi
+ #
+ #
+ ################################################################
+@@ -71,7 +59,7 @@
+ 
+ if test $mingw = "no" ; then
+   # add the warnings we don't want to do on mingw
+-  $WARNINGS_TO_TEST="$WARNINGS_TO_TEST -Wall -Wstrict-prototypes  -Weffc++"
++  WARNINGS_TO_TEST="$WARNINGS_TO_TEST -Wall -Wstrict-prototypes  -Weffc++"
+ fi
+ 
+ for option in $WARNINGS_TO_TEST
+@@ -105,7 +93,7 @@
+ 
+ if test $mingw = "no" ; then
+   # add the warnings we don't want to do on mingw
+-  $WARNINGS_TO_TEST="$WARNINGS_TO_TEST  -Weffc++"
++  WARNINGS_TO_TEST="$WARNINGS_TO_TEST  -Weffc++"
+ fi
+ 
+ for option in $WARNINGS_TO_TEST

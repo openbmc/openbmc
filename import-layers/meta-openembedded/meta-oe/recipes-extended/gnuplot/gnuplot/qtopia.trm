@@ -1,0 +1,483 @@
+/*
+ * $Id: dumb.trm,v 1.16 2004/04/13 17:24:16 broeker Exp $
+ *
+ */
+
+/* GNUPLOT - qtopia.trm */
+
+/*[
+ * Copyright 1991 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
+ *
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
+
+/*
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *   qtopia terminals
+ *
+ * AUTHORS
+ *   Michael Neuroth, 2004-05-16
+ *           INTERNET: michael.neuroth@freenet.de
+ *
+ * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
+ *
+ */
+#include "driver.h"
+
+#define NO_QTOPIA_ENHANCED_SUPPORT
+
+#ifdef TERM_REGISTER
+register_term(qtopia_driver)
+#endif
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void QTOPIA_options __PROTO((void));
+TERM_PUBLIC void QTOPIA_init __PROTO((void));
+TERM_PUBLIC void QTOPIA_graphics __PROTO((void));
+TERM_PUBLIC void QTOPIA_text __PROTO((void));
+TERM_PUBLIC void QTOPIA_reset __PROTO((void));
+TERM_PUBLIC void QTOPIA_linetype __PROTO((int linetype));
+TERM_PUBLIC void QTOPIA_move __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void QTOPIA_point __PROTO((unsigned int x, unsigned int y,
+				     int point));
+TERM_PUBLIC void QTOPIA_vector __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void QTOPIA_put_text __PROTO((unsigned int x, unsigned int y,
+					const char *str));
+TERM_PUBLIC void QTOPIA_arrow __PROTO((unsigned int sx, unsigned int sy,
+				     unsigned int ex, unsigned int ey,
+				     int head));
+
+#define ENHqtopia_put_text NULL
+
+
+#define QTOPIA_XMAX 4096
+#define QTOPIA_YMAX 4096
+
+#ifdef ZAURUS
+#define QTOPIA_VCHAR (QTOPIA_YMAX/25)
+#define QTOPIA_HCHAR (QTOPIA_XMAX/40)
+#define QTOPIA_VTIC (QTOPIA_YMAX/50)
+#define QTOPIA_HTIC (QTOPIA_XMAX/40)
+#else
+#define QTOPIA_VCHAR (QTOPIA_YMAX/25)
+#define QTOPIA_HCHAR (QTOPIA_XMAX/50)
+#define QTOPIA_VTIC (QTOPIA_YMAX/100)
+#define QTOPIA_HTIC (QTOPIA_XMAX/150)
+#endif
+
+#endif /* TERM_PROTO */
+
+#ifdef TERM_BODY
+
+/*#include <winsock2.h>*/
+/* needs: ws2_32.lib */
+#ifndef _MSC_VER
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#endif
+
+#define QTOPIA_MAX_BUFFER		512
+#define QTOPIA_MAX_DELAY_COUNT	20	/* * 100 ms = 2 s */
+
+#ifdef _MSC_VER
+#define QTOPIA_BAD_SOCKET		INVALID_SOCKET		/* -1 */
+#define QTOPIA_BAD_CONNECT		SOCKET_ERROR
+#else
+#define QTOPIA_BAD_SOCKET		-1
+#define QTOPIA_BAD_CONNECT		-1
+#endif
+#define QTOPIA_PORT_NO			5050
+
+static int qtopia_client_socket = QTOPIA_BAD_SOCKET;
+static unsigned short qtopia_port_no = QTOPIA_PORT_NO;
+static char qtopia_host_name[QTOPIA_MAX_BUFFER+1] = { "localhost" };
+
+static int OpenClient __PROTO(( int test));
+static void CloseClient();
+
+static void MySleep( delay )
+int delay;
+{
+#ifdef _MSC_VER
+	Sleep( delay );
+#else
+	usleep( delay );
+#endif
+}
+
+static void InitSockets()
+{
+#ifdef _MSC_VER
+	WORD wVersionRequested;
+	WSADATA wsaData;
+	int err;
+
+	wVersionRequested = MAKEWORD( 2, 2 );
+
+	err = WSAStartup( wVersionRequested, &wsaData );
+#endif
+}
+
+static void ExitSockets()
+{
+#ifdef _MSC_VER
+	WSACleanup();
+#endif
+}
+
+static int CheckForQtplot( count )
+int count;
+{
+	/* test (via sockets) if qtplot is allready running */
+	if( !OpenClient( 1 ) )
+	{
+		/* give qtplot a litle bit time to start... */
+		if( count < QTOPIA_MAX_DELAY_COUNT )
+		{
+			if( count == 0 )
+			{
+#ifdef _MSC_VER
+				system( "start qtplot" );
+#else
+				system( "qtplot&" );
+#endif
+			}
+		
+			MySleep(100);
+
+			return CheckForQtplot( count+1 );
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	else
+	{
+		CloseClient();
+
+		return 1;
+	}
+}
+
+static int OpenClient( test )
+int test;
+{
+    int len;
+    struct sockaddr_in address;
+    int result;
+
+	/*  Create a socket for the client.  */
+
+    qtopia_client_socket = socket(AF_INET, SOCK_STREAM, 0);
+
+	if( qtopia_client_socket != QTOPIA_BAD_SOCKET )
+	{
+		/*  Name the socket, as agreed with the server.  */
+
+		address.sin_family = AF_INET;
+		address.sin_addr.s_addr = inet_addr(/*qtopia_host_name*/"127.0.0.1");	/* localhost */
+		address.sin_port = htons(qtopia_port_no);
+		len = sizeof(address);
+
+		/*  Now connect our socket to the server's socket.  */
+
+		result = connect(qtopia_client_socket, (struct sockaddr *)&address, len);
+		
+		if( result == QTOPIA_BAD_SOCKET )
+		{
+			/* mark this socket as bad */
+
+			close( qtopia_client_socket );
+
+			qtopia_client_socket = QTOPIA_BAD_SOCKET;
+
+			if( !test )
+			{
+				fprintf( gpoutfile, "error connecting to server !\n" );
+			}
+			return 0;	/* something went wrong */
+		}
+	}
+	else
+	{
+		if( !test )
+		{
+			fprintf( gpoutfile, "error creating socket !\n" );
+		}
+		return 0;	/* something went wrong */
+	}
+
+	return 1;	/* everything ist ok ! */
+}
+
+static void CloseClient()
+{
+    close( qtopia_client_socket );
+}
+
+static int IsClientOk()
+{
+	return qtopia_client_socket != QTOPIA_BAD_SOCKET;
+}
+
+static void SendDataToSocket( sLine )
+const char * sLine;
+{
+	if( IsClientOk() )
+	{
+		int send_count;
+
+		send_count = send( qtopia_client_socket, sLine, strlen( sLine ), 0 );
+
+		if( send_count <= 0 )
+		{
+			fprintf( gpoutfile, "error writing to socket str=%s!\n", sLine );
+		}
+		/*
+		else
+		{
+			fprintf( gpoutfile, "wrote %d bytes\n", send_count );
+		}
+		*/
+	}
+	else
+	{
+		/* for testing... */
+		/*fprintf( gpoutfile, sLine );*/
+	}
+}
+
+/* ************************************************** */
+
+enum QTOPIA_id { QTOPIA_PORT, QTOPIA_HOST, QTOPIA_OTHER };
+
+static struct gen_table QTOPIA_opts[] =
+{
+    { "po$rt", QTOPIA_PORT },
+    { "ho$st", QTOPIA_HOST },
+    { NULL, QTOPIA_OTHER }
+};
+
+TERM_PUBLIC void
+QTOPIA_options()
+{
+    /* this is not for the qtopia terminal ! */
+	/*SendDataToSocket( "qtd options\n" );*/
+
+    int x, y;
+    struct value a;
+
+    while (!END_OF_COMMAND) 
+	{
+		switch(lookup_table(&QTOPIA_opts[0],c_token)) 
+		{
+			case QTOPIA_PORT:
+				c_token++;
+				if (END_OF_COMMAND)
+					int_error(c_token, "expecting port number");
+				qtopia_port_no = (int) real(const_express(&a));
+				break;
+			case QTOPIA_HOST:
+				c_token++;
+				if (END_OF_COMMAND)
+					int_error(c_token, "expecting host name");
+				if (isstring(c_token))
+					quote_str( qtopia_host_name, c_token, sizeof(qtopia_host_name) );
+				else
+ 					copy_str( qtopia_host_name, c_token, sizeof(qtopia_host_name) );
+				c_token++;
+				break;
+			case QTOPIA_OTHER:
+			default:
+				break;
+		}
+    }
+
+    sprintf(term_options, "host=%s port=%d",qtopia_host_name,qtopia_port_no);
+}
+
+
+TERM_PUBLIC void
+QTOPIA_init()
+{
+	/* initialize lib (if necassary) */
+	InitSockets();
+	CheckForQtplot( 0 );
+	OpenClient( 0 ); 
+
+	SendDataToSocket( "qtd init\n" );
+}
+
+
+TERM_PUBLIC void
+QTOPIA_graphics()
+{
+	SendDataToSocket( "qtd graphics\n" );
+}
+
+TERM_PUBLIC void
+QTOPIA_text()
+{
+	SendDataToSocket( "qtd text\n" );
+}
+
+
+TERM_PUBLIC void
+QTOPIA_reset()
+{
+	SendDataToSocket( "qtd reset\n" );
+
+	/* give the qtplot a litle bit time to shutdown */
+	MySleep(100);
+
+	CloseClient();
+	ExitSockets();
+}
+
+
+TERM_PUBLIC void
+QTOPIA_linetype(linetype)
+int linetype;
+{
+	char sBuffer[QTOPIA_MAX_BUFFER];
+
+	sprintf( sBuffer, "qtd linetype type=%d\n",linetype );
+
+	SendDataToSocket( sBuffer );
+}
+
+
+TERM_PUBLIC void
+QTOPIA_move(x, y)
+unsigned int x, y;
+{
+	char sBuffer[QTOPIA_MAX_BUFFER];
+
+	sprintf( sBuffer, "qtd move x=%d y=%d\n",x,y );
+
+	SendDataToSocket( sBuffer );
+}
+
+
+TERM_PUBLIC void
+QTOPIA_point(x, y, point)
+unsigned int x, y;
+int point;
+{
+	char sBuffer[QTOPIA_MAX_BUFFER];
+
+	sprintf( sBuffer, "qtd point x=%d y=%d point=%d\n",x,y,point );
+
+	SendDataToSocket( sBuffer );
+}
+
+
+TERM_PUBLIC void
+QTOPIA_vector(_x, _y)
+unsigned int _x, _y;
+{
+	char sBuffer[QTOPIA_MAX_BUFFER];
+
+	sprintf( sBuffer, "qtd vector x=%d y=%d\n",_x,_y );
+
+	SendDataToSocket( sBuffer );
+}
+
+
+TERM_PUBLIC void
+QTOPIA_put_text(x, y, str)
+unsigned int x, y;
+const char *str;
+{
+	char sBuffer[QTOPIA_MAX_BUFFER];
+
+	sprintf( sBuffer, "qtd put_text x=%d y=%d str=%s\n",x,y,str );
+
+	SendDataToSocket( sBuffer );
+}
+
+/* not suported yet ! */
+TERM_PUBLIC void
+QTOPIA_arrow(sx, sy, ex, ey, head)
+    unsigned int sx, sy, ex, ey;
+    int head;		/* ignored */
+{
+	char sBuffer[QTOPIA_MAX_BUFFER];
+
+	sprintf( sBuffer, "qtd arrow sx=%d sy=%d ex=%d ey=%d head=%d\n",sx,sy,ex,ey,head );
+
+	SendDataToSocket( sBuffer );
+}
+
+
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+TERM_TABLE_START(qtopia_driver)
+    "qtopia", "qtopia or Qt",
+    QTOPIA_XMAX, QTOPIA_YMAX, QTOPIA_VCHAR, QTOPIA_HCHAR,
+    QTOPIA_VTIC, QTOPIA_HTIC, QTOPIA_options, QTOPIA_init, QTOPIA_reset,
+    QTOPIA_text, null_scale, QTOPIA_graphics, QTOPIA_move, QTOPIA_vector,
+    QTOPIA_linetype, QTOPIA_put_text, null_text_angle,
+    null_justify_text, QTOPIA_point, /*QTOPIA_arrow*/0, set_font_null,
+    0,				/* pointsize */
+    TERM_CAN_MULTIPLOT,
+    NULL, NULL, NULL, NULL
+#ifdef USE_MOUSE
+    , NULL, NULL, NULL, NULL, NULL
+#endif
+#ifdef PM3D
+    , NULL, NULL, NULL, NULL
+#endif
+TERM_TABLE_END(qtopia_driver)
+
+#undef LAST_TERM
+#define LAST_TERM qtopia_driver
+
+#endif /* TERM_TABLE */
+
+#ifdef TERM_HELP
+START_HELP(qtopia)
+"1 qtopia",
+"?commands set terminal qtopia",
+"?set terminal qtopia",
+"?set term qtopia",
+"?terminal qtopia",
+"?term qtopia",
+"?qtopia",
+" The `qtopia` terminal driver has no additional options.",
+"",
+" Syntax:",
+"       set terminal qtopia",
+""
+END_HELP(qtopia)
+#endif /* TERM_HELP */

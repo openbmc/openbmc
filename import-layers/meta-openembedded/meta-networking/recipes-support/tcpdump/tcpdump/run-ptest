@@ -1,0 +1,5 @@
+#!/bin/sh
+make -k runtest-PTEST | sed -e '/: passed/ s/^/PASS: /g' \
+			-e '/: failed/ s/^/FAIL: /g' \
+			-e 's/: passed//g' \
+			-e 's/: failed//g'

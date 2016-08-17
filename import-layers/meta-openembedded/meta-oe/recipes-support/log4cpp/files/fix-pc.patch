@@ -1,0 +1,20 @@
+diff -Nurd ./log4cpp.orig/configure.in ./log4cpp/configure.in
+--- ./log4cpp.orig/configure.in	2009-09-07 16:57:46.000000000 -0400
++++ ./log4cpp/configure.in	2016-02-23 12:57:11.567240018 -0500
+@@ -130,7 +130,6 @@
+ # ----------------------------------------------------------------------------
+ 
+ AC_CONFIG_LIBCONFIG_IN([log4cpp])
+-AC_CONFIG_PKGCONFIG_IN([log4cpp], [C++ library for flexible logging, modeled after Log4j])
+ 
+ AC_CONFIG_FILES([
+ Makefile
+diff -Nurd ./log4cpp.orig/log4cpp.pc.in ./log4cpp/log4cpp.pc.in
+--- ./log4cpp.orig/log4cpp.pc.in	2004-01-27 05:24:25.000000000 -0500
++++ ./log4cpp/log4cpp.pc.in	2016-02-22 15:06:55.769327491 -0500
+@@ -7,4 +7,4 @@
+ Description: C++ library for flexible logging, modeled after Log4j
+ Version: @VERSION@
+ Libs: -L${libdir} @log4cpp_libs@
+-Cflags: -I${includedir} @log4cpp_cflags@
++Cflags: -I${includedir}

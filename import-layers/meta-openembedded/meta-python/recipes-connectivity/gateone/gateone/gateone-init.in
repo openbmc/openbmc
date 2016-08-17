@@ -1,0 +1,47 @@
+#!/bin/sh -e
+### BEGIN INIT INFO
+# Provides:          gateone
+# Required-Start:    networking
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Gateone HTML5 ssh client
+# Description:       Gateone HTML5 terminal emulator and SSH client.
+### END INIT INFO
+
+. /etc/init.d/functions
+
+NAME=gateone
+DAEMON=@bindir@/gateone
+PIDFILE=/run/gateone.pid
+WORKDIR=@localstate@/lib/gateone
+
+do_start() {
+    cd $WORKDIR
+    @bindir@/python $DAEMON > /dev/null 2>&1 &
+    cd $OLDPWD
+}
+
+do_stop() {
+    kill -TERM `cat $PIDFILE`
+}
+
+case "$1" in
+    start)
+        echo "Starting gateone"
+        do_start
+        ;;
+    stop)
+        echo "Stopping gateone"
+        do_stop
+        ;;
+    restart|force-reload)
+        echo "Restart gateone"
+        do_stop
+        sleep 1
+        do_start
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|force-reload}" >&2
+        exit 1
+        ;;
+esac

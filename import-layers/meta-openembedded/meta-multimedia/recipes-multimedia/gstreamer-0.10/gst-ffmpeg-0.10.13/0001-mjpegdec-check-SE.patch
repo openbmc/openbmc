@@ -1,0 +1,32 @@
+From 1f41cffe1e3e79620f587545bdfcbd7e6e68ed29 Mon Sep 17 00:00:00 2001
+From: Michael Niedermayer <michaelni@gmx.at>
+Date: Sun, 11 Nov 2012 00:01:24 +0100
+Subject: [PATCH] mjpegdec: check SE.
+
+Upstream-Status: Backport
+
+Commit 1f41cffe1e3e79620f587545bdfcbd7e6e68ed29 release/1.1
+
+Found-by: Mateusz "j00ru" Jurczyk and Gynvael Coldwind
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+---
+ libavcodec/mjpegdec.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/libavcodec/mjpegdec.c b/libavcodec/mjpegdec.c
+index 6b5266d..0a71a6f 100644
+--- a/gst-libs/ext/libav/libavcodec/mjpegdec.c
++++ b/gst-libs/ext/libav/libavcodec/mjpegdec.c
+@@ -905,6 +905,11 @@ static int mjpeg_decode_scan_progressive
+     int16_t *quant_matrix = s->quant_matrixes[ s->quant_index[c] ];
+     GetBitContext mb_bitmask_gb;
+ 
++    if (se > 63) {
++        av_log(s->avctx, AV_LOG_ERROR, "SE %d is too large\n", se);
++        return AVERROR_INVALIDDATA;
++    }
++
+     if (mb_bitmask) {
+         init_get_bits(&mb_bitmask_gb, mb_bitmask, s->mb_width*s->mb_height);
+     }
+-- 

@@ -1,0 +1,18 @@
+Fix double reference to this file to work with recent autoconf+automake
+
+RP 1/2/10
+
+Upstream-Status: Inappropriate [configuration]
+
+Index: libtelepathy-0.3.3/src/Makefile.am
+===================================================================
+--- libtelepathy-0.3.3.orig/src/Makefile.am	2010-02-01 13:13:50.869038984 +0000
++++ libtelepathy-0.3.3/src/Makefile.am	2010-02-01 13:14:23.267789456 +0000
+@@ -27,7 +27,6 @@
+     tp-chan-type-text-gen.h \
+     tp-chan-type-tubes-gen.h \
+     tp-conn-iface-aliasing-gen.h \
+-    tp-conn-iface-avatars-gen.h \
+     tp-conn-iface-capabilities-gen.h \
+     tp-conn-iface-contact-info-gen.h \
+     tp-conn-iface-forwarding-gen.h \

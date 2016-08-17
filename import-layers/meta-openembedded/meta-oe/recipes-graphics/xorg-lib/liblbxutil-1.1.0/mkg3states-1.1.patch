@@ -1,0 +1,55 @@
+diff -uNr liblbxutil-1.1.0.orig/configure.ac liblbxutil-1.1.0/configure.ac
+--- liblbxutil-1.1.0.orig/configure.ac	2009-12-04 23:52:04.000000000 +0100
++++ liblbxutil-1.1.0/configure.ac	2009-12-16 10:45:00.000000000 +0100
+@@ -50,4 +50,5 @@
+ 
+ AC_OUTPUT([Makefile
+ 	   src/Makefile
++	   src/image/Makefile
+ 	   lbxutil.pc])
+diff -uNr liblbxutil-1.1.0.orig/src/image/Makefile.am liblbxutil-1.1.0/src/image/Makefile.am
+--- liblbxutil-1.1.0.orig/src/image/Makefile.am	1970-01-01 01:00:00.000000000 +0100
++++ liblbxutil-1.1.0/src/image/Makefile.am	2009-12-16 10:45:00.000000000 +0100
+@@ -0,0 +1,15 @@
++# evil hack
++CFLAGS=$(CFLAGS_FOR_BUILD)
++CPPFLAGS=$(CPPFLAGS_FOR_BUILD)
++LDFLAGS=$(LDFLAGS_FOR_BUILD)
++
++CC=$(CC_FOR_BUILD)
++LIBTOOL = @LIBTOOL@ --tag=CC
++
++noinst_PROGRAMS = mkg3states
++
++mkg3states_SOURCES =				\
++	mkg3states.c
++
++mkg3states_CFLAGS=$(CFLAGS_FOR_BUILD)
++mkg3states_LDFLAGS=$(LDFLAGS_FOR_BUILD)
+diff -uNr liblbxutil-1.1.0.orig/src/Makefile.am liblbxutil-1.1.0/src/Makefile.am
+--- liblbxutil-1.1.0.orig/src/Makefile.am	2009-12-16 10:48:11.000000000 +0100
++++ liblbxutil-1.1.0/src/Makefile.am	2009-12-16 10:46:47.000000000 +0100
+@@ -3,10 +3,7 @@
+ AM_CFLAGS = $(CWARNFLAGS) $(LBXUTIL_CFLAGS)
+ INCLUDES = -I$(top_srcdir)/include
+ 
+-noinst_PROGRAMS = mkg3states
+-
+-mkg3states_SOURCES =				\
+-	$(srcdir)/image/mkg3states.c
++SUBDIRS = image
+ 
+ liblbxutil_la_SOURCES =				\
+ 	$(srcdir)/lbx_zlib/reqstats.h		\
+@@ -38,9 +35,8 @@
+ 
+ $(srcdir)/image/dfaxg42d.c: g3states.h
+ 
+-g3states.h: mkg3states
+-	-rm -f g3states.h
+-	$(AM_V_GEN) ./mkg3states -c > g3states.h_ && mv g3states.h_ g3states.h
++g3states.h: image/mkg3states
++	$(AM_V_GEN) ./image/mkg3states -c > g3states.h_ && mv g3states.h_ g3states.h
+ 
+ liblbxutil_la_LDFLAGS = -version-number 1:0:0 -no-undefined
+ 

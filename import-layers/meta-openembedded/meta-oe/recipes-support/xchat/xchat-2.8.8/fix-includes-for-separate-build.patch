@@ -1,0 +1,78 @@
+diff -ur xchat-2.8.8-orig/plugins/perl/perl.c xchat-2.8.8/plugins/perl/perl.c
+--- xchat-2.8.8-orig/plugins/perl/perl.c	2014-08-30 14:09:05.125116286 -0700
++++ xchat-2.8.8/plugins/perl/perl.c	2014-08-30 14:09:45.281106532 -0700
+@@ -31,7 +31,7 @@
+ #endif
+ 
+ #undef PACKAGE
+-#include "../../config.h"		  /* for #define OLD_PERL */
++#include <config.h>		  /* for #define OLD_PERL */
+ #include "xchat-plugin.h"
+ 
+ static xchat_plugin *ph;		  /* plugin handle */
+diff -ur xchat-2.8.8-orig/src/common/network.c xchat-2.8.8/src/common/network.c
+--- xchat-2.8.8-orig/src/common/network.c	2014-08-30 14:09:05.137116222 -0700
++++ xchat-2.8.8/src/common/network.c	2014-08-30 14:13:52.729116323 -0700
+@@ -24,7 +24,7 @@
+ #include <unistd.h>
+ #include <glib.h>
+ 
+-#include "../../config.h"				  /* grab USE_IPV6 and LOOKUPD defines */
++#include <config.h>				  /* grab USE_IPV6 and LOOKUPD defines */
+ 
+ #define WANTSOCKET
+ #define WANTARPA
+diff -ur xchat-2.8.8-orig/src/common/ssl.c xchat-2.8.8/src/common/ssl.c
+--- xchat-2.8.8-orig/src/common/ssl.c	2014-08-30 14:09:05.137116222 -0700
++++ xchat-2.8.8/src/common/ssl.c	2014-08-30 14:14:08.449133899 -0700
+@@ -23,7 +23,7 @@
+ #include <string.h>				  /* strncpy() */
+ #include "ssl.h"					  /* struct cert_info */
+ #include "inet.h"
+-#include "../../config.h"		  /* HAVE_SNPRINTF */
++#include <config.h>		  /* HAVE_SNPRINTF */
+ 
+ #ifndef HAVE_SNPRINTF
+ #define snprintf g_snprintf
+diff -ur xchat-2.8.8-orig/src/common/util.c xchat-2.8.8/src/common/util.c
+--- xchat-2.8.8-orig/src/common/util.c	2014-08-30 14:09:05.133116243 -0700
++++ xchat-2.8.8/src/common/util.c	2014-08-30 14:10:23.633116070 -0700
+@@ -41,7 +41,7 @@
+ #include "xchatc.h"
+ #include <ctype.h>
+ #include "util.h"
+-#include "../../config.h"
++#include <config.h>
+ 
+ #define WANTSOCKET
+ #include "inet.h"
+diff -ur xchat-2.8.8-orig/src/common/xchat.h xchat-2.8.8/src/common/xchat.h
+--- xchat-2.8.8-orig/src/common/xchat.h	2014-08-30 14:09:05.133116243 -0700
++++ xchat-2.8.8/src/common/xchat.h	2014-08-30 14:13:42.797116472 -0700
+@@ -1,4 +1,4 @@
+-#include "../../config.h"
++#include <config.h>
+ 
+ #include <glib.h>
+ #include <time.h>			/* need time_t */
+diff -ur xchat-2.8.8-orig/src/fe-gtk/fe-gtk.h xchat-2.8.8/src/fe-gtk/fe-gtk.h
+--- xchat-2.8.8-orig/src/fe-gtk/fe-gtk.h	2014-08-30 14:09:05.129116272 -0700
++++ xchat-2.8.8/src/fe-gtk/fe-gtk.h	2014-08-30 14:10:13.309115951 -0700
+@@ -1,4 +1,4 @@
+-#include "../../config.h"
++#include <config.h>
+ 
+ #ifdef WIN32
+ /* If you're compiling this for Windows, your release is un-official
+diff -ur xchat-2.8.8-orig/src/fe-gtk/xtext.c xchat-2.8.8/src/fe-gtk/xtext.c
+--- xchat-2.8.8-orig/src/fe-gtk/xtext.c	2014-08-30 14:09:05.129116272 -0700
++++ xchat-2.8.8/src/fe-gtk/xtext.c	2014-08-30 14:10:00.313138254 -0700
+@@ -51,7 +51,7 @@
+ #include <gtk/gtkwindow.h>
+ 
+ #ifdef XCHAT
+-#include "../../config.h"			/* can define USE_XLIB here */
++#include <config.h>			/* can define USE_XLIB here */
+ #else
+ #define USE_XLIB
+ #endif

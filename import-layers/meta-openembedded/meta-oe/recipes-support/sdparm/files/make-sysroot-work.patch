@@ -1,0 +1,27 @@
+[PATCH] make sysroot work
+
+Upstream-Status: Pending
+
+Add = before the included dir to make sysroot work
+
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+---
+ src/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index c83788c..9f62115 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -32,7 +32,7 @@ sglib_SOURCES =		../lib/sg_lib.c \
+ 			../lib/sg_pt_common.c
+ 
+ if HAVE_SGUTILS
+-INCLUDES = -I/usr/include/scsi
++INCLUDES = -I=@includedir@/scsi
+ sdparm_LDADD = @GETOPT_O_FILES@ @os_libs@ @SGUTILS_LIBS@
+ sdparm_DEPENDENCIES = @GETOPT_O_FILES@
+ else
+-- 
+1.9.1
+

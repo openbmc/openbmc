@@ -1,0 +1,30 @@
+Index: libgnomeprint-2.18.8/libgnomeprint/grammar.y
+===================================================================
+--- libgnomeprint-2.18.8.orig/libgnomeprint/grammar.y
++++ libgnomeprint-2.18.8/libgnomeprint/grammar.y
+@@ -99,7 +99,7 @@ gnome_print_filter_parse_prop (GnomePrin
+ }
+ 
+ static int yylex (void *lvalp);
+-static int yyerror (const char *s);
++static int yyerror (graph_t *g, const char *s);
+ %}
+ 
+ %union {
+@@ -117,6 +117,7 @@ static int yyerror (const char *s);
+ %type <p> pool
+ 
+ %pure_parser
++%parse-param { graph_t *graph }
+ 
+ %start graph
+ %%
+@@ -185,7 +186,7 @@ graph: filter {
+ %%
+ 
+ static int
+-yyerror (const char *s)
++yyerror (graph_t *g, const char *s)
+ {
+ 	return -1;
+ }

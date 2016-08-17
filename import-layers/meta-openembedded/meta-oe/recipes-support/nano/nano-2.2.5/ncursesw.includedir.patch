@@ -1,0 +1,12 @@
+diff -uNr nano-2.2.5.orig//configure.ac nano-2.2.5/configure.ac
+--- nano-2.2.5.orig//configure.ac	2010-08-06 03:00:51.000000000 +0200
++++ nano-2.2.5/configure.ac	2010-08-10 14:11:52.000000000 +0200
+@@ -442,7 +442,7 @@
+     AC_CHECK_HEADERS(ncurses.h)
+ 
+     if test x$enable_utf8 != xno; then
+-	AC_CHECK_LIB(ncursesw, get_wch, [CURSES_LIB="-lncursesw" CPPFLAGS="-I/usr/include/ncursesw $CPPFLAGS" CURSES_LIB_NAME=ncursesw CURSES_LIB_WIDE=yes])
++	AC_CHECK_LIB(ncursesw, get_wch, [CURSES_LIB="-lncursesw" CURSES_LIB_NAME=ncursesw CURSES_LIB_WIDE=yes])
+     fi
+ 
+     if eval "test x$CURSES_LIB_NAME = x"; then

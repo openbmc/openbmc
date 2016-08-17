@@ -1,0 +1,54 @@
+Upstream-Status: Inappropriate [no upstream]
+
+* nfslib should use NVER instead of VER
+* install the missing soname library
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ Makefile.in         |    9 ++++++---
+ 1 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 836ca9b..a589fb8 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -27,7 +27,7 @@ install:	@INSTALL_TARGETS@
+ 
+ static:		liblockfile.a dotlockfile
+ shared:		liblockfile.so dotlockfile
+-nfslib:		nfslock.so.$(VER)
++nfslib:		nfslock.so.$(NVER)
+ 
+ liblockfile.a:	lockfile.o
+ 		$(AR) rv liblockfile.a lockfile.o
+@@ -36,7 +36,7 @@ liblockfile.so: liblockfile.a
+ 		$(CC) -fPIC -shared -Wl,-soname,liblockfile.so.1 \
+ 			-o liblockfile.so lockfile.o $(LDFLAGS) -lc
+ 
+-nfslock.so.$(VER):	nfslock.o
++nfslock.so.$(NVER):	nfslock.o
+ 		$(CC) -fPIC -shared -Wl,-soname,nfslock.so.0 \
+ 			-o nfslock.so.$(NVER) nfslock.o $(LDFLAGS)
+ 
+@@ -59,6 +59,7 @@ install_shared:	shared install_common
+ 		install -m 755 liblockfile.so \
+ 			$(ROOT)$(libdir)/liblockfile.so.$(VER)
+ 		ln -s liblockfile.so.$(VER) $(ROOT)$(libdir)/liblockfile.so
++		ln -s liblockfile.so.$(VER) $(ROOT)$(libdir)/liblockfile.so.1
+ 		if test "$(ROOT)" = ""; then @LDCONFIG@; fi
+ 
+ install_common:
+@@ -72,7 +73,9 @@ install_common:
+ 
+ install_nfslib:	nfslib
+ 		install -d $(ROOT)$(nfslockdir)
+-		install -m 755 nfslock.so.$(VER) $(ROOT)$(nfslockdir)
++		install -m 755 nfslock.so.$(NVER) $(ROOT)$(nfslockdir)
++		ln -sf nfslock.so.$(NVER) $(ROOT)$(libdir)/nfslock.so
++		ln -sf nfslock.so.$(NVER) $(ROOT)$(libdir)/nfslock.so.0
+ 		if test "$(ROOT)" = ""; then @LDCONFIG@; fi
+ 
+ clean:
+-- 
+1.7.9.5
+

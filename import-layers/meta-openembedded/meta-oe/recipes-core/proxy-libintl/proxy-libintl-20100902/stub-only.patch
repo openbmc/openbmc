@@ -1,0 +1,72 @@
+Index: proxy-libintl/src/proxy-libintl/libintl.c
+===================================================================
+--- proxy-libintl.orig/src/proxy-libintl/libintl.c
++++ proxy-libintl/src/proxy-libintl/libintl.c
+@@ -18,9 +18,12 @@
+  */
+ 
+ #ifdef _WIN32
+-#include <windows.h>
++#  include <windows.h>
+ #else
+-#include <dlfcn.h>
++#  include <stddef.h>
++#  if !STUB_ONLY
++#    include <dlfcn.h>
++#  endif
+ typedef void* HMODULE;
+ #endif
+ 
+@@ -65,11 +68,13 @@ static char * (*p_bind_textdomain_codese
+ static int
+ use_intl_dll (HMODULE dll)
+ {
+-#ifdef _WIN32
+-#define LOOKUP(fn) p_##fn = (void *) GetProcAddress (dll, #fn); if (p_##fn == NULL) return 0
+-#else
+-#define LOOKUP(fn) p_##fn = (void *) dlsym (dll, #fn); if (p_##fn == NULL) return 0
+-#endif
++#if !STUB_ONLY
++#  ifdef _WIN32
++#    define LOOKUP(fn) p_##fn = (void *) GetProcAddress (dll, #fn); if (p_##fn == NULL) return 0
++#  else
++#    define LOOKUP(fn) p_##fn = (void *) dlsym (dll, #fn); if (p_##fn == NULL) return 0
++#  endif  /* _WIN32 */
++
+ 
+   LOOKUP (gettext);
+   LOOKUP (dgettext);
+@@ -82,7 +87,7 @@ use_intl_dll (HMODULE dll)
+   LOOKUP (bind_textdomain_codeset);
+   
+ #undef LOOKUP
+-
++#endif  /* !STUB_ONLY */
+   return 1;
+ }
+ 
+@@ -171,13 +176,17 @@ setup (void)
+ 
+   if (!beenhere)
+     {
+-#ifdef _WIN32
+-      HMODULE intl_dll = LoadLibrary ("intl.dll");
+-#elif defined(__APPLE__) && defined(__MACH__)
+-      HMODULE intl_dll = dlopen ("libintl.dylib", RTLD_LAZY);
+-#else
+-      HMODULE intl_dll = dlopen ("libintl.so", RTLD_LAZY);
+-#endif
++#if !STUB_ONLY
++#  ifdef _WIN32
++    HMODULE intl_dll = LoadLibrary ("intl.dll");
++#  elif defined(__APPLE__) && defined(__MACH__)
++    HMODULE intl_dll = dlopen ("libintl.dylib", RTLD_LAZY);
++#  else
++    HMODULE intl_dll = dlopen ("libintl.so", RTLD_LAZY);
++#  endif
++#else  /* !STUB_ONLY */
++    HMODULE intl_dll = NULL;
++#endif  /* STUB_ONLY */
+ 
+       if (intl_dll != NULL &&
+ 	  use_intl_dll (intl_dll))

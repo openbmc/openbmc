@@ -1,0 +1,60 @@
+Upstream: http://www.mail-archive.com/bug-inetutils@gnu.org/msg02103.html
+
+Upstream-Status: Pending
+
+diff -ur inetutils-1.8.orig/ping/ping_common.h inetutils-1.8/ping/ping_common.h
+--- inetutils-1.8.orig/ping/ping_common.h	2010-05-15 20:55:47.000000000 +0930
++++ inetutils-1.8/ping/ping_common.h	2010-12-01 12:19:08.000000000 +1030
+@@ -17,10 +17,14 @@
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see `http://www.gnu.org/licenses/'. */
+ 
++#include <config.h>
++
+ #include <netinet/in_systm.h>
+ #include <netinet/in.h>
+ #include <netinet/ip.h>
++#ifdef HAVE_IPV6
+ #include <netinet/icmp6.h>
++#endif
+ #include <icmp.h>
+ #include <error.h>
+ #include <progname.h>
+@@ -66,13 +70,19 @@
+   (t).tv_usec = ((i)%PING_PRECISION)*(1000000/PING_PRECISION) ;\
+ } while (0)
+ 
++#ifdef HAVE_IPV6
+ /* Not sure about this step*/
+ #define _PING_BUFLEN(p, USE_IPV6) ((USE_IPV6)? ((p)->ping_datalen + sizeof (struct icmp6_hdr)) : \
+ 				   ((p)->ping_datalen + sizeof (icmphdr_t)))
++#else
++#define _PING_BUFLEN(p, USE_IPV6) ((p)->ping_datalen + sizeof (icmphdr_t))
++#endif
+ 
++#ifdef HAVE_IPV6
+ typedef int (*ping_efp6) (int code, void *closure, struct sockaddr_in6 * dest,
+ 			  struct sockaddr_in6 * from, struct icmp6_hdr * icmp,
+ 			  int datalen);
++#endif
+ 
+ typedef int (*ping_efp) (int code,
+ 			 void *closure,
+@@ -81,13 +91,17 @@
+ 			 struct ip * ip, icmphdr_t * icmp, int datalen);
+ 
+ union event {
++#ifdef HAVE_IPV6
+   ping_efp6 handler6;
++#endif
+   ping_efp handler;
+ };
+ 
+ union ping_address {
+   struct sockaddr_in ping_sockaddr;
++#ifdef HAVE_IPV6
+   struct sockaddr_in6 ping_sockaddr6;
++#endif
+ };
+ 
+ typedef struct ping_data PING;

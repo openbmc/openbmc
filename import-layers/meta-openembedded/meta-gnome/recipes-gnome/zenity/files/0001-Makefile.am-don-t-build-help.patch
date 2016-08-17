@@ -1,0 +1,39 @@
+From 17e5606f8c4c8ff26ba18489aad4c484cf8e2949 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Mon, 29 Apr 2013 11:34:27 +0200
+Subject: [PATCH] Makefile.am: don't build help
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+it crashes with:
+
+| warning: failed to load external entity "/usr/share/xml/gnome/xslt/docbook/omf/db2omf.xsl"
+| cannot parse /usr/share/xml/gnome/xslt/docbook/omf/db2omf.xsl
+| make[2]: *** [zenity-bg.omf] Error 1
+| make[2]: Leaving directory `/home/andreas/tmp/oe-core-eglibc/work/armv7a-vfp-neon-angstrom-linux-gnueabi/zenity/2.32.1-r2/zenity-2.32.1/help'
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ Makefile.am |    3 +--
+ 1 files changed, 1 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 03accc1..caec7f0 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,8 +1,7 @@
+ SUBDIRS = \
+ 	src	\
+ 	po	\
+-	data	\
+-	help
++	data
+ 
+ EXTRA_DIST = \
+ 	autogen.sh		\
+-- 
+1.7.6.5
+

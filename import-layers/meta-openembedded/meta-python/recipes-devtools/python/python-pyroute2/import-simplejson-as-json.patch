@@ -1,0 +1,26 @@
+Upstream-Status: Inappropriate [wrong dependency]
+
+Subject: [PATCH] import simplejson as json
+
+At runtime python-pyroute2 tries to import json, but the module is not 
+available, import simplejson as json solve the issue.
+
+Signed-off-by: Fabio Berton <fabio.berton@ossystems.com.br>
+---
+ pyroute2/netlink/rtnl/ifinfmsg.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyroute2/netlink/rtnl/ifinfmsg.py b/pyroute2/netlink/rtnl/ifinfmsg.py
+index 4f14f25..55643eb 100644
+--- a/pyroute2/netlink/rtnl/ifinfmsg.py
++++ b/pyroute2/netlink/rtnl/ifinfmsg.py
+@@ -1,5 +1,5 @@
+ import os
+-import json
++import simplejson as json
+ import errno
+ import select
+ import struct
+-- 
+2.1.4
+

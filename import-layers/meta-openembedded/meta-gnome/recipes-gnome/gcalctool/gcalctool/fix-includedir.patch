@@ -1,0 +1,31 @@
+---
+ Makefile.am           |    2 +-
+ gcalctool/Makefile.am |    2 --
+ 2 files changed, 1 insertion(+), 3 deletions(-)
+
+Index: gcalctool-5.8.17/gcalctool/Makefile.am
+===================================================================
+--- gcalctool-5.8.17.orig/gcalctool/Makefile.am	2005-12-19 15:46:57.000000000 +0000
++++ gcalctool-5.8.17/gcalctool/Makefile.am	2007-05-16 16:03:26.000000000 +0100
+@@ -1,8 +1,6 @@
+ ## Process this file with automake to produce Makefile.in
+ 
+ INCLUDES = \
+-	-I$(includedir) \
+-	-DG_DISABLE_DEPRECATED \
+ 	-DGDK_PIXBUF_DISABLE_DEPRECATED \
+ 	-DGDK_DISABLE_DEPRECATED \
+ 	-DGNOME_DISABLE_DEPRECATED \
+Index: gcalctool-5.8.17/Makefile.am
+===================================================================
+--- gcalctool-5.8.17.orig/Makefile.am	2007-05-16 15:35:44.000000000 +0100
++++ gcalctool-5.8.17/Makefile.am	2007-05-16 16:06:46.000000000 +0100
+@@ -29,7 +29,7 @@ DISTCLEANFILES =                \
+ 	gnome-doc-utils.make	\
+ 	gcalctool.desktop
+ 
+-SUBDIRS = po gcalctool help
++SUBDIRS = po gcalctool
+ 
+ SCHEMAS_FILE = gcalctool.schemas
+ 

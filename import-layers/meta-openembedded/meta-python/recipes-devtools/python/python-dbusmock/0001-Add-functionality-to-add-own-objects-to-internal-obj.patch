@@ -1,0 +1,53 @@
+From eebe0f66435c4d821b0f5f93f69efe17b4a384c2 Mon Sep 17 00:00:00 2001
+From: Simon Busch <simon.busch@lge.com>
+Date: Wed, 9 Apr 2014 13:18:33 +0200
+Subject: [PATCH 1/2] Add functionality to add own objects to internal object
+ list
+
+In some case the tests might want to create dynamically dbus objects which extended
+functionality from own class definitions within templates. In such cases we need to
+register those objects with the internal object manager of dbusmock.
+
+Signed-off-by: Simon Busch <simon.busch@lge.com>
+---
+ dbusmock/__init__.py   |    4 ++--
+ dbusmock/mockobject.py |    8 ++++++++
+ 2 files changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/dbusmock/__init__.py b/dbusmock/__init__.py
+index f799cc7..6718c06 100644
+--- a/dbusmock/__init__.py
++++ b/dbusmock/__init__.py
+@@ -14,8 +14,8 @@ __license__ = 'LGPL 3+'
+ __version__ = '0.10.1'
+ 
+ from dbusmock.mockobject import (DBusMockObject, MOCK_IFACE,
+-                                 OBJECT_MANAGER_IFACE, get_object, get_objects)
++                                 OBJECT_MANAGER_IFACE, get_object, get_objects, add_object)
+ from dbusmock.testcase import DBusTestCase
+ 
+ __all__ = ['DBusMockObject', 'MOCK_IFACE', 'OBJECT_MANAGER_IFACE',
+-           'DBusTestCase', 'get_object', 'get_objects']
++           'DBusTestCase', 'get_object', 'get_objects', 'add_object']
+diff --git a/dbusmock/mockobject.py b/dbusmock/mockobject.py
+index 97b79ce..a98e03d 100644
+--- a/dbusmock/mockobject.py
++++ b/dbusmock/mockobject.py
+@@ -682,6 +682,14 @@ dbus.service._method_lookup = _dbusmock_method_lookup
+ # Helper API for templates
+ #
+ 
++def add_object(path, obj):
++    if path in objects:
++        raise dbus.exceptions.DBusException(
++                'org.freedesktop.DBus.Mock.NameError',
++                'object %s already exists' % path)
++
++    objects[path] = obj
++
+ 
+ def get_objects():
+     '''Return all existing object paths'''
+-- 
+1.7.9.5
+

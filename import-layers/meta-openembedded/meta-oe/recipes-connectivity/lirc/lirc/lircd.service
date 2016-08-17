@@ -1,0 +1,20 @@
+[Unit]
+Description=LIRC Infrared Signal Decoder
+After=network.target
+
+[Service]
+Type=forking
+EnvironmentFile=/etc/lirc/lircd.conf
+PIDFile=/run/lirc/lircd.pid
+ExecStartPre=/bin/mkdir -p /run/lirc
+ExecStartPre=/bin/rm -f /dev/lircd
+ExecStartPre=/bin/rm -f /run/lirc/lircd
+ExecStartPre=/bin/ln -s /run/lirc/lircd /dev/lircd
+
+ExecStart=/usr/sbin/lircd --pidfile=/run/lirc/lircd.pid --device=/dev/lirc0
+
+ExecStopPost=/bin/rm -f /dev/lircd
+ExecStopPost=/bin/rm -fR /run/lirc
+
+[Install]
+WantedBy=multi-user.target

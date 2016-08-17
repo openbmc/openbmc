@@ -1,0 +1,33 @@
+fuse: add aarch64 support
+
+u64/u32 is not defined in sys/types.h, include linux/types.h like
+the kernel version of fuse.h does. Patch sent to upstream mailing list.
+
+Upstream-Status: Submitted
+Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ include/fuse_kernel.h | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/include/fuse_kernel.h b/include/fuse_kernel.h
+index c632b58..e804278 100644
+--- a/include/fuse_kernel.h
++++ b/include/fuse_kernel.h
+@@ -88,12 +88,7 @@
+ #ifndef _LINUX_FUSE_H
+ #define _LINUX_FUSE_H
+ 
+-#include <sys/types.h>
+-#define __u64 uint64_t
+-#define __s64 int64_t
+-#define __u32 uint32_t
+-#define __s32 int32_t
+-#define __u16 uint16_t
++#include <linux/types.h>
+ 
+ /*
+  * Version negotiation:
+-- 
+1.8.1.2
+

@@ -1,0 +1,13 @@
+Index: places/configure.ac
+===================================================================
+--- places.orig/configure.ac	2014-07-17 21:51:01.276574017 +0000
++++ places/configure.ac	2014-07-17 21:52:07.096575810 +0000
+@@ -10,7 +10,7 @@
+ AC_CANONICAL_HOST
+ AC_ISC_POSIX
+ 
+-AM_INIT_AUTOMAKE(1.8)
++AM_INIT_AUTOMAKE([foreign])
+ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+ AM_CONFIG_HEADER(config.h)
+ 

@@ -1,0 +1,25 @@
+From f02ff7383f1cc0c118732352ccbae476c7b3b3ba Mon Sep 17 00:00:00 2001
+From: Mark Asselstine <mark.asselstine@windriver.com>
+Date: Tue, 17 Nov 2015 16:17:00 -0500
+Subject: [PATCH] service: ensure the PID directory is created
+
+Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
+---
+ config/ctdb.service | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/config/ctdb.service b/config/ctdb.service
+index ea37c30..8537105 100644
+--- a/config/ctdb.service
++++ b/config/ctdb.service
+@@ -5,6 +5,7 @@ After=network.target
+ [Service]
+ Type=forking
+ LimitCORE=infinity
++RuntimeDirectory=/run/ctdb
+ PIDFile=/run/ctdb/ctdbd.pid
+ ExecStart=/usr/sbin/ctdbd_wrapper /run/ctdb/ctdbd.pid start
+ ExecStop=/usr/sbin/ctdbd_wrapper /run/ctdb/ctdbd.pid stop
+-- 
+2.1.4
+

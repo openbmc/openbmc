@@ -1,0 +1,35 @@
+From 60516f4798894f958fc53b470e1283318d0f8706 Mon Sep 17 00:00:00 2001
+From: Kerrick Staley <kerrick@kerrickstaley.com>
+Date: Tue, 20 Aug 2013 23:59:29 -0700
+Subject: [PATCH 1/2] parse: make grammar.y work with Bison 3
+
+YYLEX_PARAM is no longer supported in Bison 3.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=706462
+---
+ gst/parse/grammar.y | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gst/parse/grammar.y b/gst/parse/grammar.y
+index 24fc87b..7f9dd16 100644
+--- a/gst/parse/grammar.y
++++ b/gst/parse/grammar.y
+@@ -26,7 +26,6 @@
+  */
+ 
+ #define YYERROR_VERBOSE 1
+-#define YYLEX_PARAM scanner
+ 
+ #define YYENABLE_NLS 0
+ 
+@@ -648,6 +647,7 @@ static int yyerror (void *scanner, graph_t *graph, const char *s);
+ %right '.'
+ %left '!' '='
+ 
++%lex-param { void *scanner }
+ %parse-param { void *scanner }
+ %parse-param { graph_t *graph }
+ %pure-parser
+-- 
+2.7.2
+

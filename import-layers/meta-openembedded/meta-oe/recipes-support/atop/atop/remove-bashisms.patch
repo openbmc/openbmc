@@ -1,0 +1,33 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+diff --git a/atop-pm.sh b/atop-pm.sh
+index 7f41a86..3ff4ab5 100755
+--- a/atop-pm.sh
++++ b/atop-pm.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ case "$1" in
+ 	pre)	/usr/bin/systemctl stop atop
+diff --git a/atop.daily b/atop.daily
+index 24d33bd..f29bd94 100755
+--- a/atop.daily
++++ b/atop.daily
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ CURDAY=`date +%Y%m%d`
+ LOGPATH=/var/log/atop
+@@ -16,7 +16,7 @@ then
+ 
+ 	while ps -p `cat $PIDFILE` > /dev/null
+ 	do
+-		let CNT+=1
++		CNT=$((CNT+1))
+ 
+ 		if [ $CNT -gt 5 ]
+ 		then

@@ -1,0 +1,33 @@
+From 3c5fb3a8691ac711ea93edf8e0b42bffc62b197e Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Tue, 24 Apr 2012 11:52:35 +0200
+Subject: [PATCH 1/4] SConstruct: respect sysroot also in SPLINTOPTS
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+Signed-off-by: Denis 'GNUtoo' Carikli <GNUtoo@no-log.org>
+Signed-off-by: Peter A. Bigot <pab@pabigot.com>
+---
+ SConstruct | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/SConstruct b/SConstruct
+index 14e2f59..f0cafa8 100644
+--- a/SConstruct
++++ b/SConstruct
+@@ -1414,7 +1414,10 @@ def Utility(target, source, action):
+ # Report splint warnings
+ # Note: test_bits.c is unsplintable because of the PRI64 macros.
+ # If you get preprocessor or fatal errors, add +showscan.
+-splintopts = "-I/usr/include/libusb-1.0 +quiet"
++if not env['sysroot']:
++    splintopts = "-I/usr/include/libusb-1.0 +quiet"
++else:
++    splintopts = "-I%s/usr/include/libusb-1.0 +quiet" % env['sysroot']
+ # splint does not know about multi-arch, work around that
+ ma_status, ma = _getstatusoutput('dpkg-architecture -qDEB_HOST_MULTIARCH')
+ if ma_status == 0:
+-- 
+1.8.5.5
+

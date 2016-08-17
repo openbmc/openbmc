@@ -1,0 +1,27 @@
+From f3609c7c0450b4c31e1d4603fcf2cfb1ba46f994 Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Sun, 29 Jun 2014 00:37:28 +0200
+Subject: [PATCH 2/6] common.mk: for klibc $(CC) is klcc
+
+Do not hardcode: assign the value to the variable if it is not already defined.
+
+Upstream-Status: Pending
+
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+---
+ common.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/common.mk b/common.mk
+index ba87377..59c56df 100644
+--- a/common.mk
++++ b/common.mk
+@@ -1,4 +1,4 @@
+-CC := $(CROSS)gcc
++CC ?= $(CROSS)gcc
+ AR := $(CROSS)ar
+ RANLIB := $(CROSS)ranlib
+ 
+-- 
+1.9.1
+

@@ -1,0 +1,44 @@
+From c8a1b669cbff3eee367fd4db3389e337bc4c98ba Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 20 Jan 2016 04:46:26 +0000
+Subject: [PATCH 2/4] use PTHREAD_MUTEX_RECURSIVE instead of
+ PTHREAD_MUTEX_RECURSIVE_NP
+
+PTHREAD_MUTEX_RECURSIVE_NP was used for compatibility with old glibc.
+Although due to the_GNU_SOURCES define the portable,
+PTHREAD_MUTEX_RECURSIVE will be available for Linuxes since at least
+1998. Simplify things giving us compatibility with musl which
+apparently does not provide the non-portable define.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ daemons/lvmetad/lvmetad-core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/daemons/lvmetad/lvmetad-core.c b/daemons/lvmetad/lvmetad-core.c
+index 7af9bde..63707c2 100644
+--- a/daemons/lvmetad/lvmetad-core.c
++++ b/daemons/lvmetad/lvmetad-core.c
+@@ -300,7 +300,7 @@ static struct dm_config_tree *lock_vg(lvmetad_state *s, const char *id) {
+ 	if (!(vg = dm_hash_lookup(s->lock.vg, id))) {
+ 		if (!(vg = malloc(sizeof(pthread_mutex_t))) ||
+ 		    pthread_mutexattr_init(&rec) ||
+-		    pthread_mutexattr_settype(&rec, PTHREAD_MUTEX_RECURSIVE_NP) ||
++		    pthread_mutexattr_settype(&rec, PTHREAD_MUTEX_RECURSIVE) ||
+ 		    pthread_mutex_init(vg, &rec))
+ 			goto bad;
+ 		if (!dm_hash_insert(s->lock.vg, id, vg)) {
+@@ -2890,7 +2890,7 @@ static int init(daemon_state *s)
+ 	ls->log = s->log;
+ 
+ 	pthread_mutexattr_init(&rec);
+-	pthread_mutexattr_settype(&rec, PTHREAD_MUTEX_RECURSIVE_NP);
++	pthread_mutexattr_settype(&rec, PTHREAD_MUTEX_RECURSIVE);
+ 	pthread_mutex_init(&ls->lock.pvid_to_pvmeta, &rec);
+ 	pthread_mutex_init(&ls->lock.vgid_to_metadata, &rec);
+ 	pthread_mutex_init(&ls->lock.pvid_to_vgid, NULL);
+-- 
+2.7.0
+

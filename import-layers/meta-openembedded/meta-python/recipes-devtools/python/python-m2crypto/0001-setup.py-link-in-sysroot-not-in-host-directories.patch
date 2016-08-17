@@ -1,0 +1,36 @@
+From f11b9c71080513f9b867ba8f40613ba2ebc6e960 Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen@dominion.thruhere.net>
+Date: Fri, 29 Mar 2013 15:17:17 +0100
+Subject: [PATCH] setup.py: link in sysroot, not in host directories
+
+Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
+
+Upstream-status: Unknown
+---
+ setup.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+Index: M2Crypto-0.23.0/setup.py
+===================================================================
+--- M2Crypto-0.23.0.orig/setup.py
++++ M2Crypto-0.23.0/setup.py
+@@ -62,7 +62,7 @@ class _M2CryptoBuildExt(build_ext.build_
+             self.openssl = 'c:\\pkg'
+         else:
+             self.libraries = ['ssl', 'crypto']
+-            self.openssl = '/usr'
++            self.openssl = os.environ.get( "STAGING_DIR" )
+ 
+     def finalize_options(self):
+         '''Overloaded build_ext implementation to append custom openssl
+@@ -75,8 +75,8 @@ class _M2CryptoBuildExt(build_ext.build_
+         if _openssl and os.path.isdir(_openssl):
+             self.openssl = _openssl
+ 
+-        self.include_dirs.append(os.path.join(self.openssl, 'include'))
+-        openssl_library_dir = os.path.join(self.openssl, 'lib')
++        self.include_dirs.append(os.environ.get( "STAGING_INCDIR" ))
++        openssl_library_dir = os.environ.get( "STAGING_LIBDIR" )
+ 
+         if platform.system() == "Linux":
+             if _multiarch:  # on Fedora/RHEL it is an empty string

@@ -1,0 +1,32 @@
+From 5413f97290d3126262eb309ecbcf7769509f2a11 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Tue, 10 Nov 2015 00:48:35 -0500
+Subject: [PATCH 6/7] avoid using colon in the checking msg
+
+Upstream-Status: Pending
+
+colon is used as the separator when parse from
+a answers file, the colon here makes it never
+get the right answer.
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ wscript_configure_system_mitkrb5 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/wscript_configure_system_mitkrb5 b/wscript_configure_system_mitkrb5
+index a62d00b..a2d89f0 100644
+--- a/wscript_configure_system_mitkrb5
++++ b/wscript_configure_system_mitkrb5
+@@ -240,7 +240,7 @@ conf.CHECK_CODE('''
+        ''',
+     'HAVE_WRFILE_KEYTAB',
+     headers='krb5.h', lib='krb5', execute=True,
+-    msg="Checking whether the WRFILE:-keytab is supported");
++    msg="Checking whether the WRFILE -keytab is supported");
+ # Check for KRB5_DEPRECATED handling
+ conf.CHECK_CODE('''#define KRB5_DEPRECATED 1
+        #include <krb5.h>''',
+-- 
+1.9.1
+

@@ -1,0 +1,25 @@
+From 28ee994780459c3552d3cbbd6b011d054a41c439 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Sun, 8 Nov 2015 23:33:31 -0500
+Subject: [PATCH] bin/htmltree: fix shebang
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ bin/htmltree | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/bin/htmltree b/bin/htmltree
+index 8bf3db2..f9927e5 100755
+--- a/bin/htmltree
++++ b/bin/htmltree
+@@ -1,4 +1,4 @@
+-#!/usr/bin/perl
++#!/usr/bin/env perl
+ # Time-stamp: "2000-10-02 14:48:15 MDT"
+ #
+ # Parse the given HTML file(s) and dump the parse tree
+-- 
+1.9.1
+

@@ -1,0 +1,134 @@
+Upstream-Status: Backport
+
+Backport from https://github.com/xelerance/xl2tpd/commit/9098f64950eb22cf049058d40f647bafdb822174
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+From 9098f64950eb22cf049058d40f647bafdb822174 Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Wed, 23 Sep 2015 10:41:05 +0800
+Subject: [PATCH] Fix build errors caused by inline function with gcc 5
+
+GCC 5 defaults to -std=gnu11 instead of -std=gnu89. And -std=gnu89
+employs the GNU89 inline semantics, -std=gnu11 uses the C99 inline
+semantics.
+
+For 'inline' fuction, it is NOT exported by C99. So error messages such as:
+
+| control.c:1717: undefined reference to `check_control'
+
+For these functions which is not referred by other compile units, make
+them 'static inline'.
+
+For 'extern inline' function, it fails such as:
+
+| misc.h:68:20: warning: inline function 'swaps' declared but never defined
+|  extern inline void swaps (void *, int);
+|                      ^
+
+Because function swaps() is referred by other compile units, it must be
+exported. The semantics of 'extern inline' are not same between GNU89
+and C99, so remove 'inline' attribute for compatible with GNU89.
+
+Ref:
+https://gcc.gnu.org/gcc-5/porting_to.html
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ control.c | 8 ++++----
+ misc.c    | 2 +-
+ misc.h    | 2 +-
+ network.c | 4 ++--
+ 4 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/control.c b/control.c
+index b2891a9..c4a39b5 100644
+--- a/control.c
++++ b/control.c
+@@ -1140,7 +1140,7 @@ int control_finish (struct tunnel *t, struct call *c)
+     return 0;
+ }
+ 
+-inline int check_control (const struct buffer *buf, struct tunnel *t,
++static inline int check_control (const struct buffer *buf, struct tunnel *t,
+                           struct call *c)
+ {
+     /*
+@@ -1276,7 +1276,7 @@ inline int check_control (const struct buffer *buf, struct tunnel *t,
+     return 0;
+ }
+ 
+-inline int check_payload (struct buffer *buf, struct tunnel *t,
++static inline int check_payload (struct buffer *buf, struct tunnel *t,
+                           struct call *c)
+ {
+     /*
+@@ -1382,7 +1382,7 @@ inline int check_payload (struct buffer *buf, struct tunnel *t,
+ #endif
+     return 0;
+ }
+-inline int expand_payload (struct buffer *buf, struct tunnel *t,
++static inline int expand_payload (struct buffer *buf, struct tunnel *t,
+                            struct call *c)
+ {
+     /*
+@@ -1562,7 +1562,7 @@ void send_zlb (void *data)
+     toss (buf);
+ }
+ 
+-inline int write_packet (struct buffer *buf, struct tunnel *t, struct call *c,
++static inline int write_packet (struct buffer *buf, struct tunnel *t, struct call *c,
+                          int convert)
+ {
+     /*
+diff --git a/misc.c b/misc.c
+index 3092401..af90dbf 100644
+--- a/misc.c
++++ b/misc.c
+@@ -170,7 +170,7 @@ void do_packet_dump (struct buffer *buf)
+     printf ("}\n");
+ }
+ 
+-inline void swaps (void *buf_v, int len)
++void swaps (void *buf_v, int len)
+ {
+ #ifdef __alpha
+     /* Reverse byte order alpha is little endian so lest save a step.
+diff --git a/misc.h b/misc.h
+index aafdc62..caab7a1 100644
+--- a/misc.h
++++ b/misc.h
+@@ -65,7 +65,7 @@ extern void l2tp_log (int level, const char *fmt, ...);
+ extern struct buffer *new_buf (int);
+ extern void udppush_handler (int);
+ extern int addfcs (struct buffer *buf);
+-extern inline void swaps (void *, int);
++extern void swaps (void *, int);
+ extern void do_packet_dump (struct buffer *);
+ extern void status (const char *fmt, ...);
+ extern void status_handler (int signal);
+diff --git a/network.c b/network.c
+index b1268c6..d324a71 100644
+--- a/network.c
++++ b/network.c
+@@ -135,7 +135,7 @@ int init_network (void)
+     return 0;
+ }
+ 
+-inline void extract (void *buf, int *tunnel, int *call)
++static inline void extract (void *buf, int *tunnel, int *call)
+ {
+     /*
+      * Extract the tunnel and call #'s, and fix the order of the 
+@@ -155,7 +155,7 @@ inline void extract (void *buf, int *tunnel, int *call)
+     }
+ }
+ 
+-inline void fix_hdr (void *buf)
++static inline void fix_hdr (void *buf)
+ {
+     /*
+      * Fix the byte order of the header
+-- 
+2.6.1
+

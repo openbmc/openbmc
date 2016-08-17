@@ -1,0 +1,26 @@
+assume zero is valid address
+
+Upstream-Status: Pending
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ thunk.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/thunk.c b/thunk.c
+index 796e88b..6121ea1 100644
+--- a/thunk.c
++++ b/thunk.c
+@@ -141,9 +141,6 @@ int LRMI_init() {
+ 
+ 	mmap_addr = LRMI_common_init(1);
+ 
+-	if (!mmap_addr)
+-		return 0;
+-
+ 	X86EMU_pioFuncs pioFuncs = {
+ 		(&x_inb),
+ 		(&x_inw),
+-- 
+1.9.1
+

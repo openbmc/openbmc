@@ -1,0 +1,18 @@
+Remove host path from include directories
+
+Naturally this breaks cross-compilation if present.
+
+Upstream-Status: Pending
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+
+--- mariadb-5.5.38/storage/tokudb/ft-index/CMakeLists.txt	2014-07-17 14:37:04.529327998 +0100
++++ mariadb-5.5.38/storage/tokudb/ft-index/CMakeLists.txt	2014-07-17 14:43:56.991337895 +0100
+@@ -39,7 +39,6 @@
+ 
+ ## default includes and libraries
+ include_directories(SYSTEM
+-  /usr/local/include
+   ${ZLIB_INCLUDE_DIRS}
+   )
+ 

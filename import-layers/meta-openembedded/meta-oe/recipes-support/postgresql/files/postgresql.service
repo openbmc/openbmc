@@ -1,0 +1,27 @@
+[Unit]
+Description=PostgreSQL database server
+After=network.target
+
+[Service]
+Type=forking
+User=postgres
+Group=postgres
+
+# Port number for server to listen on
+Environment=PGPORT=5432
+
+# Location of database directory
+Environment=PGDATA=/var/lib/postgresql/data
+
+# Disable OOM kill on the postmaster
+OOMScoreAdjust=-17
+
+ExecStart=@BINDIR@/pg_ctl start -D ${PGDATA} -s -o "-p ${PGPORT}" -w -t 300
+ExecStop=@BINDIR@/pg_ctl stop -D ${PGDATA} -s -m fast
+ExecReload=@BINDIR@/pg_ctl reload -D ${PGDATA} -s
+
+# Give a reasonable amount of time for the server to start up/shut down
+TimeoutSec=300
+
+[Install]
+WantedBy=multi-user.target

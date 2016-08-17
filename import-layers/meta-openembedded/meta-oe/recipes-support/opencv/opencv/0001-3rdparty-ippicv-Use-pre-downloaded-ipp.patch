@@ -1,0 +1,28 @@
+From 049f931207631aa54af55a2917318d032b2ef3fa Mon Sep 17 00:00:00 2001
+From: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
+Date: Thu, 31 Mar 2016 00:20:15 +0200
+Subject: [PATCH] 3rdparty/ippicv: Use pre-downloaded ipp
+
+Signed-off-by: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
+---
+ 3rdparty/ippicv/downloader.cmake | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/3rdparty/ippicv/downloader.cmake b/3rdparty/ippicv/downloader.cmake
+index a6016dbe10bc..af4062c8e95e 100644
+--- a/3rdparty/ippicv/downloader.cmake
++++ b/3rdparty/ippicv/downloader.cmake
+@@ -31,8 +31,10 @@ function(_icv_downloader)
+     return() # Not supported
+   endif()
+ 
++  if(NOT DEFINED OPENCV_ICV_PATH)
+   set(OPENCV_ICV_UNPACK_PATH "${CMAKE_CURRENT_LIST_DIR}/unpack")
+   set(OPENCV_ICV_PATH "${OPENCV_ICV_UNPACK_PATH}${OPENCV_ICV_PACKAGE_SUBDIR}")
++  endif()
+ 
+   if(DEFINED OPENCV_ICV_PACKAGE_DOWNLOADED
+        AND OPENCV_ICV_PACKAGE_DOWNLOADED STREQUAL OPENCV_ICV_PACKAGE_HASH
+-- 
+2.8.0.rc3
+

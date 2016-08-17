@@ -1,0 +1,120 @@
+From 79034f969bbd12215d65b4337dfd38a13d02d4ef Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Sat, 13 Sep 2014 20:19:28 -0700
+Subject: [PATCH] autofs.init.in: remove bashism
+
+It can work without the bashism.
+
+Upstream-Status: Pending
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ redhat/autofs.init.in |   12 ++++++------
+ samples/rc.autofs.in  |   10 +++++-----
+ 2 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/redhat/autofs.init.in b/redhat/autofs.init.in
+index 9d008ff..4f1c0d8 100644
+--- a/redhat/autofs.init.in
++++ b/redhat/autofs.init.in
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ #
+ # rc file for automount using a Sun-style "master map".
+ #
+@@ -42,7 +42,7 @@ if [ -r $confdir/autofs ]; then
+ 	. $confdir/autofs
+ fi
+ 
+-function start() {
++start() {
+ 	# Make sure autofs4 module is loaded
+ 	if ! grep -q autofs /proc/filesystems
+ 	then
+@@ -102,7 +102,7 @@ function start() {
+ 	return $RETVAL
+ }
+ 
+-function stop() {
++stop() {
+ 	echo -n $"Stopping $prog: "
+ 	count=0
+ 	while [ -n "`pidof $prog`" -a $count -lt 15 ] ; do
+@@ -125,7 +125,7 @@ function stop() {
+ 	return $RETVAL
+ }
+ 
+-function restart() {
++restart() {
+ 	status autofs > /dev/null 2>&1
+ 	if [ $? -eq 0 ]; then
+ 		stop
+@@ -143,7 +143,7 @@ function restart() {
+ 	start
+ }
+ 
+-function reload() {
++reload() {
+ 	if [ ! -f /var/lock/subsys/autofs ]; then
+ 		echo $"$prog not running"
+ 		RETVAL=1
+@@ -161,7 +161,7 @@ function reload() {
+ 	return $RETVAL
+ }
+ 
+-function usage_message() {
++usage_message() {
+ 	echo $"Usage: $0 {start|forcestart|stop|status|restart|force-reload|forcerestart|reload|condrestart|try-restart|usage}"
+ }
+ 
+diff --git a/samples/rc.autofs.in b/samples/rc.autofs.in
+index 487669f..e96cde1 100644
+--- a/samples/rc.autofs.in
++++ b/samples/rc.autofs.in
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ #
+ # rc file for automount using a Sun-style "master map".
+ #
+@@ -36,7 +36,7 @@ if [ -r $confdir/autofs ]; then
+ 	. $confdir/autofs
+ fi
+ 
+-function start() {
++start() {
+ 	echo -n "Starting $prog: "
+ 
+ 	# Make sure autofs4 module is loaded
+@@ -85,7 +85,7 @@ function start() {
+ 	return $RETVAL
+ }
+ 
+-function stop() {
++stop() {
+ 	echo -n $"Stopping $prog: "
+ 	count=0
+ 	while [ -n "`pidof $prog`" -a $count -lt 15 ] ; do
+@@ -102,7 +102,7 @@ function stop() {
+ 	return $RETVAL
+ }
+ 
+-function restart() {
++restart() {
+ 	stop
+ 	while [ -n "`pidof $prog`" ] ; do
+ 		sleep 5
+@@ -110,7 +110,7 @@ function restart() {
+ 	start
+ }
+ 
+-function reload() {
++reload() {
+ 	pid=`pidof $prog`
+ 	if [ -z $pid ]; then
+ 		echo $"$prog not running"
+-- 
+1.7.9.5
+

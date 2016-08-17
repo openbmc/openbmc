@@ -1,0 +1,28 @@
+Remove unused variable (YELP_HELP_RULES)
+
+Upstream-Status: Pending
+Signed-off-by: Constantin Musca <constantinx.musca@intel.com>
+
+Index: metacity-2.34.13/doc/creating_themes/Makefile.am
+===================================================================
+--- metacity-2.34.13.orig/doc/creating_themes/Makefile.am
++++ metacity-2.34.13/doc/creating_themes/Makefile.am
+@@ -1,6 +1,5 @@
+ ### This part of Makefile.am can be customized by you.
+ 
+-@YELP_HELP_RULES@
+ 
+ # The name of the directory in /usr/share/gnome/help/, 
+ # and the name of the main .xml file:
+Index: metacity-2.34.13/doc/creating_themes/Makefile.in
+===================================================================
+--- metacity-2.34.13.orig/doc/creating_themes/Makefile.in
++++ metacity-2.34.13/doc/creating_themes/Makefile.in
+@@ -455,7 +455,6 @@ uninstall-am:
+ 	mostlyclean-libtool pdf pdf-am ps ps-am uninstall uninstall-am
+ 
+ 
+-@YELP_HELP_RULES@
+ 
+ # Tell versions [3.59,3.63) of GNU make to not export all variables.
+ # Otherwise a system limit (for SysV at least) may be exceeded.

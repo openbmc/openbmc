@@ -1,0 +1,2 @@
+# <type> <owner> <group> <mode> <path> <linksource>
+d radvd root 0755 /var/run/radvd none

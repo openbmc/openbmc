@@ -1,0 +1,84 @@
+From e56767b9caa02e7c41803499c77dc939d5a7f64a Mon Sep 17 00:00:00 2001
+From: Thorsten Glaser <tg@mirbsd.org>
+Date: Fri, 20 Jun 2014 10:56:27 +0000
+Subject: [PATCH 4/6] Restore compatibility to dietlibc, klibc, musl libc after commit 4f1b108
+
+Each C library has their own way to define off_t, and the <features.h>
+header is nonstandard and specific to the GNU libc and those that clone
+it (uClibc). Fefe’s dietlibc uses different flags, and klibc always uses
+a 64-bit off_t (like the BSDs); musl libc cannot be recognised using cpp
+instructions, so we assume 64 bit there (and on unknown C libraries) and
+leave it to the user to submit a follow-up fix if we guess wrong. I also
+added a static assertion to verify the 64 bit guess is correct.
+
+It would be really better using a configure script for this instead.
+
+Fixes:
+|   CC      lib/libmtd.o
+| In file included from ubi-utils/ubiutils-common.c:35:0:
+| ./include/common.h:29:22: fatal error: features.h: No such file or directory
+|  #include <features.h>
+|                       ^
+| compilation terminated.
+
+Upstream-Status: Pending
+
+Signed-off-by: Thorsten Glaser <tg@mirbsd.org>
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+---
+ include/common.h | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/include/common.h b/include/common.h
+index 6895e5c..77f3f7d 100644
+--- a/include/common.h
++++ b/include/common.h
+@@ -26,7 +26,9 @@
+ #include <string.h>
+ #include <fcntl.h>
+ #include <errno.h>
++#if defined(__GLIBC__) || defined(__UCLIBC__)
+ #include <features.h>
++#endif
+ #include <inttypes.h>
+ #include "version.h"
+ 
+@@ -52,6 +54,21 @@ extern "C" {
+ #endif
+ 
+ /* define a print format specifier for off_t */
++#if defined(__KLIBC__)
++/* always 64 bit on klibc */
++#define PRIxoff_t PRIx64
++#define PRIdoff_t PRId64
++#elif defined(__dietlibc__)
++/* depends on compiler flags on dietlibc */
++#if defined(_FILE_OFFSET_BITS) && (_FILE_OFFSET_BITS == 64)
++#define PRIxoff_t PRIx64
++#define PRIdoff_t PRId64
++#else
++#define PRIxoff_t "l"PRIx32
++#define PRIdoff_t "l"PRId32
++#endif
++#elif defined(__GLIBC__) || defined(__UCLIBC__)
++/* depends on compiler flags on glibc and uClibc */
+ #ifdef __USE_FILE_OFFSET64
+ #define PRIxoff_t PRIx64
+ #define PRIdoff_t PRId64
+@@ -59,6 +76,13 @@ extern "C" {
+ #define PRIxoff_t "l"PRIx32
+ #define PRIdoff_t "l"PRId32
+ #endif
++#else
++/* unknown libc or musl */
++#define PRIxoff_t PRIx64
++#define PRIdoff_t PRId64
++/* verify our guess of 64 bit is correct */
++static char __PRIxoff_t_static_assert[sizeof(off_t) == 8 ? 1 : -1];
++#endif
+ 
+ /* Verbose messages */
+ #define bareverbose(verbose, fmt, ...) do {                        \
+-- 
+1.9.1
+

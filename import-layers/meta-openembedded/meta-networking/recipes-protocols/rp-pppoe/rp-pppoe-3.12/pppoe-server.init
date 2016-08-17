@@ -1,0 +1,59 @@
+#! /bin/sh
+
+test -f /usr/sbin/pppoe-server || exit 0
+test -f /etc/default/pppoe-server && . /etc/default/pppoe-server
+
+case $1 in
+  start)
+    OPTIONS=""
+    if [ -n "$MSS" ]; then
+      OPTIONS="$OPTIONS -m $MSS"
+    fi
+    if [ -n "$DEVICES" ]; then
+      for i in $DEVICES; do
+        OPTIONS="$OPTIONS -I $i"
+      done
+    fi
+    if [ -n "$LOCAL_IP" ]; then
+      OPTIONS="$OPTIONS -L $LOCAL_IP"
+    fi
+    if [ -n "$REMOTE_IP" ]; then
+      OPTIONS="$OPTIONS -R $REMOTE_IP"
+    fi
+    if [ -n "$SERVICE_NAME" ]; then
+      OPTIONS="$OPTIONS -S $SERVICE_NAME"
+    fi
+    if [ -n "$MAX_SESSIONS" ]; then
+      OPTIONS="$OPTIONS -N $MAX_SESSIONS"
+    fi
+    if [ -n "$ACCESS_CONCENTRATOR_NAME" ]; then
+      OPTIONS="$OPTIONS -C $ACCESS_CONCENTRATOR_NAME"
+    fi
+    echo -n "Starting PPPoE server: pppoe-server"
+    start-stop-daemon --start --quiet --exec /usr/sbin/pppoe-server -- $OPTIONS
+    echo "."
+    ;;
+  stop)
+    echo -n "Stopping PPPoE server: pppoe-server"
+    start-stop-daemon --stop --quiet --exec /usr/sbin/pppoe-server -- $OPTIONS
+    echo "."
+    ;;
+  status)
+    pid=$(pidof pppoe-server)    	          
+    if [ -n "$pid" ] ; then
+	    echo "Running with pid $pid"
+    else
+	    echo "Not running"
+    fi
+    ;;
+  restart|force-reload)
+    $0 stop
+    $0 start
+    ;;
+  *)
+    echo "Usage: /etc/init.d/pppoe-server {start|stop|restart|force-reload}"
+    exit 1
+    ;;
+esac
+
+exit 0

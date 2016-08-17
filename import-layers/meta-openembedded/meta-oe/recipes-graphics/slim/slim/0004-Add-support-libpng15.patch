@@ -1,0 +1,50 @@
+From c2067e8c16bfb721d339718ae0c99c70a994936b Mon Sep 17 00:00:00 2001
+From: iwamatsu <iwamatsu@7c53e7cc-98ea-0310-8f1f-a0b24da60408>
+Date: Fri, 17 Jun 2011 20:35:07 +0000
+Subject: [PATCH 4/8] Add support libpng15
+
+Signed-off-by: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
+
+git-svn-id: svn://svn.berlios.de/slim/trunk@178 7c53e7cc-98ea-0310-8f1f-a0b24da60408
+---
+ Makefile |    4 ++--
+ png.c    |    6 +++++-
+ 2 files changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index fafa0ef..1202614 100644
+--- a/Makefile
++++ b/Makefile
+@@ -5,9 +5,9 @@
+ #######################################################
+ CXX=/usr/bin/g++
+ CC=/usr/bin/gcc-4.5
+-CFLAGS=-Wall -I. -I/usr/include/freetype2 -I/usr/include/freetype2/config -I/usr/include/libpng12 -I/usr/include
++CFLAGS=-Wall -I. -I/usr/include/freetype2 -I/usr/include/freetype2/config -I/usr/include
+ CXXFLAGS=$(CFLAGS)
+-LDFLAGS=-lXft -lX11 -lfreetype -lXrender -lfontconfig -lpng12 -lz -lm -lcrypt -lXmu -lpng -ljpeg -lrt
++LDFLAGS=-lXft -lX11 -lfreetype -lXrender -lfontconfig -lpng -lz -lm -lcrypt -lXmu -lpng -ljpeg -lrt
+ CUSTOM=-DHAVE_SHADOW
+ ifdef USE_PAM
+ LDFLAGS+= -lpam
+diff --git a/png.c b/png.c
+index 5c086c6..aa0f5e5 100644
+--- a/png.c
++++ b/png.c
+@@ -57,8 +57,12 @@ read_png(const char *filename, int *width, int *height, unsigned char **rgb,
+         png_destroy_read_struct(&png_ptr, (png_infopp) NULL, 
+                                 (png_infopp) NULL);
+     }
+-  
++
++#if PNG_LIBPNG_VER_MAJOR >= 1 && PNG_LIBPNG_VER_MINOR >= 4
++	if (setjmp(png_jmpbuf((data->png_ptr))))
++#else
+     if (setjmp(png_ptr->jmpbuf))
++#endif
+         goto png_destroy;
+   
+     png_init_io(png_ptr, infile);
+-- 
+1.6.6.1
+

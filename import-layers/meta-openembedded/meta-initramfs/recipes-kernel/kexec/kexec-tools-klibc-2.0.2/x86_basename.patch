@@ -1,0 +1,14 @@
+--- a/kexec/arch/i386/x86-linux-setup.c
++++ b/kexec/arch/i386/x86-linux-setup.c
+@@ -280,9 +280,9 @@ static int add_edd_entry(struct x86_linu
+	memset(edd_info, 0, sizeof(struct edd_info));
+ 
+ 	/* extract the device number */
+-	if (sscanf(basename(sysfs_name), "int13_dev%hhx", &devnum) != 1) {
++	if (sscanf(strrchr(sysfs_name,'/') + 1, "int13_dev%hhx", &devnum) != 1) {
+ 		fprintf(stderr, "Invalid format of int13_dev dir "
+-				"entry: %s\n", basename(sysfs_name));
++				"entry: %s\n", strrchr(sysfs_name,'/') + 1);
+ 		return -1;
+ 	}
+ 

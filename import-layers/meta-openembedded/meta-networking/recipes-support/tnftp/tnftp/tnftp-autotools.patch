@@ -1,0 +1,42 @@
+[PATCH] Update configure.ac and Makefile.am to resolve warnings/errors
+
+Upstream-Status: Pending
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ configure.ac          |    2 ++
+ libnetbsd/Makefile.am |    2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index a96d2ab..b3b3069 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -71,9 +71,11 @@ AH_TEMPLATE([WITH_SSL],
+ #
+ # Checks for programs.
+ #
++AM_PROG_AR()
+ AC_PROG_CC()
+ AC_PROG_AWK()
+ AC_PROG_LIBTOOL()
++AM_PROG_CC_C_O()
+ 
+ #
+ # Checks for tool features.
+diff --git a/libnetbsd/Makefile.am b/libnetbsd/Makefile.am
+index 3e5c3ce..39bb12d 100644
+--- a/libnetbsd/Makefile.am
++++ b/libnetbsd/Makefile.am
+@@ -5,7 +5,7 @@ noinst_LTLIBRARIES = libnetbsd.la
+ libnetbsd_la_SOURCES =
+ 
+ 
+-CPPFLAGS = \
++AM_CPPFLAGS = \
+ 	-I$(srcdir) \
+ 	-I$(top_srcdir) \
+ 	-I$(top_builddir)
+-- 
+1.7.10.4
+

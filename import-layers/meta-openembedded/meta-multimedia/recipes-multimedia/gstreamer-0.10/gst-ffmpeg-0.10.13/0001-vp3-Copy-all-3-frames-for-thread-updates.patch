@@ -1,0 +1,32 @@
+gst-ffmpeg: vp3: Copy all 3 frames for thread updates.
+
+This fixes a double release of the current frame on deinit.
+Fixes CVE-2011-3934
+
+Found-by: Mateusz "j00ru" Jurczyk and Gynvael Coldwind
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+
+Upstream-Status: Backport
+
+Signed-off-by: Yue.Tao <yue.tao@windriver.com>
+
+---
+ libavcodec/vp3.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/libavcodec/vp3.c b/libavcodec/vp3.c
+index 738ae9f..b5daafc 100644
+--- a/gst-libs/ext/libav/libavcodec/vp3.c
++++ b/gst-libs/ext/libav/libavcodec/vp3.c
+@@ -1859,7 +1859,7 @@ static int vp3_update_thread_context(AVCodecContext *dst, const AVCodecContext *
+         ||s->width != s1->width
+         ||s->height!= s1->height) {
+         if (s != s1)
+-            copy_fields(s, s1, golden_frame, current_frame);
++            copy_fields(s, s1, golden_frame, keyframe);
+         return -1;
+     }
+ 
+-- 
+1.7.5.4
+

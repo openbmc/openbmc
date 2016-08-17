@@ -1,0 +1,13 @@
+[Unit]
+Description=Openct Middleware framework for smart card terminals
+After=syslog.target network.target
+
+[Service]
+EnvironmentFile=-/etc/sysconfig/openct
+ExecStart=/usr/sbin/openct-control $OPENCT_OPTIONS init 
+ExecStop=/usr/sbin/openct-control $OPENCT_OPTIONS shutdown
+RemainAfterExit=yes
+KillMode=none
+
+[Install]
+WantedBy=multi-user.target

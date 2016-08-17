@@ -1,0 +1,25 @@
+Author: Jamie Strandboge <jamie@canonical.com>
+Description: to improve boot speed when disabled, don't source all of
+ ufw-init-functions (which also sources in other files).
+
+Upstream-Status: Inappropriate [ not author ]
+
+Signed-off-by: Joe MacDonald <joe_macdonald@mentor.com>
+
+Index: ufw-0.31/src/ufw-init
+===================================================================
+--- ufw-0.31.orig/src/ufw-init	2012-03-09 17:07:11.000000000 -0600
++++ ufw-0.31/src/ufw-init	2012-03-17 09:37:51.000000000 -0500
+@@ -18,6 +18,12 @@
+ #
+ set -e
+ 
++# Debian/Ubuntu: small boot speed improvement
++. "#CONFIG_PREFIX#/ufw/ufw.conf"
++if [ "$1" = "start" ] && [ "$2" = "quiet" ] && [ "$ENABLED" = "no" ]; then
++    exit 0
++fi
++
+ if [ -s "#STATE_PREFIX#/ufw-init-functions" ]; then
+     . "#STATE_PREFIX#/ufw-init-functions"
+ else

@@ -1,0 +1,11 @@
+--- php-5.1.6/configure.old	2006-09-12 07:54:14.000000000 -0700
++++ php-5.1.6/configure	2006-09-12 07:54:37.000000000 -0700
+@@ -14715,8 +14715,6 @@
+ 
+ 
+ 
+-  unset ac_cv_func_dlopen
+-  unset ac_cv_func___dlopen
+   unset found
+   
+   echo $ac_n "checking for dlopen""... $ac_c" 1>&6

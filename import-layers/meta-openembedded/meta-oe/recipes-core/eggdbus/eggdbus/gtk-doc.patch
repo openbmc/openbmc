@@ -1,0 +1,34 @@
+Upstream-Status: Inappropriate [configuration] 
+
+Index: eggdbus-0.6/docs/eggdbus/Makefile.am
+===================================================================
+--- eggdbus-0.6.orig/docs/eggdbus/Makefile.am
++++ eggdbus-0.6/docs/eggdbus/Makefile.am
+@@ -87,11 +87,7 @@ HTML_IMAGES = 				\
+ # Extra options to supply to gtkdoc-fixref
+ FIXXREF_OPTIONS=
+ 
+-if ENABLE_GTK_DOC
+-include $(top_srcdir)/gtk-doc.make
+-else
+ CLEANFILES =
+-endif
+ 
+ CLEANFILES +=   *~				\
+ 		eggdbus-scan.*			\
+Index: eggdbus-0.6/docs/tests/Makefile.am
+===================================================================
+--- eggdbus-0.6.orig/docs/tests/Makefile.am
++++ eggdbus-0.6/docs/tests/Makefile.am
+@@ -65,11 +65,7 @@ HTML_IMAGES = 				\
+ # Extra options to supply to gtkdoc-fixref
+ FIXXREF_OPTIONS=
+ 
+-if ENABLE_GTK_DOC
+-include $(top_srcdir)/gtk-doc.make
+-else
+ CLEANFILES =
+-endif
+ 
+ CLEANFILES +=   *~				\
+ 		tests-scan.*			\

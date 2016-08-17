@@ -1,0 +1,61 @@
+--- a/kexec/kexec-elf-rel.c
++++ b/kexec/kexec-elf-rel.c
+@@ -4,7 +4,7 @@
+ #include <stdio.h>
+ #include <errno.h>
+ #include <stdlib.h>
+-#include "elf.h"
++#include "../include/elf.h"
+ #include <boot/elf_boot.h>
+ #include "kexec.h"
+ #include "kexec-elf.h"
+
+--- a/kexec/arch/arm/kexec-elf-rel-arm.c
++++ b/kexec/arch/arm/kexec-elf-rel-arm.c
+@@ -1,5 +1,5 @@
+ #include <stdio.h>
+-#include <elf.h>
++#include "../../../include/elf.h"
+ #include "../../kexec.h"
+ #include "../../kexec-elf.h"
+ 
+
+--- a/kexec/arch/i386/kexec-elf-rel-x86.c
++++ b/kexec/arch/i386/kexec-elf-rel-x86.c
+@@ -1,5 +1,5 @@
+ #include <stdio.h>
+-#include <elf.h>
++#include "../../../include/elf.h"
+ #include "../../kexec.h"
+ #include "../../kexec-elf.h"
+ 
+
+--- a/kexec/arch/ppc/kexec-elf-rel-ppc.c
++++ b/kexec/arch/ppc/kexec-elf-rel-ppc.c
+@@ -1,5 +1,5 @@
+ #include <stdio.h>
+-#include <elf.h>
++#include "../../../include/elf.h"
+ #include "../../kexec.h"
+ #include "../../kexec-elf.h"
+ 
+
+--- a/kexec/arch/ppc64/kexec-elf-rel-ppc64.c
++++ b/kexec/arch/ppc64/kexec-elf-rel-ppc64.c
+@@ -1,5 +1,5 @@
+ #include <stdio.h>
+-#include <elf.h>
++#include "../../../include/elf.h"
+ #include <string.h>
+ #include "../../kexec.h"
+ #include "../../kexec-elf.h"
+
+--- a/kexec/arch/x86_64/kexec-elf-rel-x86_64.c
++++ b/kexec/arch/x86_64/kexec-elf-rel-x86_64.c
+@@ -1,5 +1,5 @@
+ #include <stdio.h>
+-#include <elf.h>
++#include "../../../include/elf.h"
+ #include "../../kexec.h"
+ #include "../../kexec-elf.h"
+ 

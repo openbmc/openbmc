@@ -1,0 +1,104 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+diff -uNr emacs-23.4/Makefile.in emacs-23.4.new/Makefile.in
+--- emacs-23.4/Makefile.in	2012-01-11 13:35:01.000000000 +0100
++++ emacs-23.4.new/Makefile.in	2012-07-31 00:54:07.223590866 +0200
+@@ -336,7 +336,7 @@
+ # all preloaded elisp files, and only then dump the actual src/emacs, which
+ # is not wrong, but is overkill in 99.99% of the cases.
+ src: Makefile FRC
+-	boot=bootstrap-emacs$(EXEEXT);                         \
++	boot=${QEMU} bootstrap-emacs$(EXEEXT);                         \
+ 	if [ ! -x "src/$$boot" ]; then                                     \
+ 	    cd $@; $(MAKE) all $(MFLAGS)                                   \
+ 	      CC='${CC}' CFLAGS='${CFLAGS}' CPPFLAGS='${CPPFLAGS}'         \
+diff -uNr emacs-23.4/leim/Makefile.in emacs-23.4.new/leim/Makefile.in
+--- emacs-23.4/leim/Makefile.in	2012-01-11 13:35:01.000000000 +0100
++++ emacs-23.4.new/leim/Makefile.in	2012-07-31 00:54:07.179590866 +0200
+@@ -51,7 +51,7 @@
+ 
+ # How to run Emacs.
+ RUN-EMACS = EMACSLOADPATH=$(buildlisppath) LC_ALL=C \
+-	${BUILT-EMACS} -batch --no-init-file --no-site-file --multibyte
++	${QEMU} ${BUILT-EMACS} -batch --no-init-file --no-site-file --multibyte
+ 
+ # Subdirectories to be made if ${srcdir} is different from the current
+ # directory.
+diff -uNr emacs-23.4/lib-src/Makefile.in emacs-23.4.new/lib-src/Makefile.in
+--- emacs-23.4/lib-src/Makefile.in	2012-01-11 13:35:01.000000000 +0100
++++ emacs-23.4.new/lib-src/Makefile.in	2012-07-31 00:54:07.180590866 +0200
+@@ -23,7 +23,7 @@
+ SHELL = /bin/sh
+ 
+ # Following ../lisp/Makefile.in.
+-EMACS = ../src/emacs
++EMACS = ${QEMU} ../src/emacs
+ EMACSOPT = -batch --no-site-file --multibyte
+ 
+ # ==================== Things `configure' will edit ====================
+@@ -372,7 +372,7 @@
+    clobbered too.  */
+ test-distrib${EXEEXT}: ${srcdir}/test-distrib.c
+ 	$(CC) ${ALL_CFLAGS} -o test-distrib ${srcdir}/test-distrib.c
+-	./test-distrib ${srcdir}/testfile
++	${QEMU} ./test-distrib ${srcdir}/testfile
+ 
+ /* We need the following in order to create a <getopt.h> when the system
+    does not have one that works with the given compiler.  */
+diff -uNr emacs-23.4/lisp/Makefile.in emacs-23.4.new/lisp/Makefile.in
+--- emacs-23.4/lisp/Makefile.in	2012-01-11 13:35:01.000000000 +0100
++++ emacs-23.4.new/lisp/Makefile.in	2012-07-31 00:54:07.195590866 +0200
+@@ -26,8 +26,7 @@
+ # You can specify a different executable on the make command line,
+ # e.g. "make EMACS=../src/emacs ...".
+ 
+-EMACS = ../src/emacs
+-
++EMACS = "${QEMU} ../src/emacs"
+ # Command line flags for Emacs.  This must include --multibyte,
+ # otherwise some files will not compile.
+ 
+diff -uNr emacs-23.4/src/Makefile.in emacs-23.4.new/src/Makefile.in
+--- emacs-23.4/src/Makefile.in	2012-01-12 11:27:54.000000000 +0100
++++ emacs-23.4.new/src/Makefile.in	2012-07-31 00:55:30.344593847 +0200
+@@ -482,7 +482,7 @@
+    this with the shell''s ``for'' construct.
+    Note that some people do not have '.'  in their paths, so we must
+    use ./prefix-args.  */
+-#define YMF_PASS_LDFLAGS(flags) `./prefix-args -Xlinker flags`
++#define YMF_PASS_LDFLAGS(flags) `${QEMU} ./prefix-args -Xlinker flags`
+ #else
+ #define YMF_PASS_LDFLAGS(flags) flags
+ #endif
+@@ -919,9 +919,9 @@
+    $(GNULIB_VAR) LIB_MATH LIB_STANDARD $(GNULIB_VAR)
+ 
+ #ifdef HAVE_SHM
+-RUN_TEMACS = `/bin/pwd`/temacs -nl
++RUN_TEMACS = ${QEMU} temacs -nl
+ #else
+-RUN_TEMACS = `/bin/pwd`/temacs
++RUN_TEMACS = ${QEMU} temacs
+ #endif
+ 
+ all: emacs${EXEEXT} $(OTHER_FILES)
+@@ -936,7 +936,7 @@
+ 	@: This new Emacs is as functional and more efficient then
+ 	@: bootstrap-emacs, so let us replace it.
+ 	-ln -f emacs${EXEEXT} bootstrap-emacs${EXEEXT}
+-	-./emacs -q -batch -f list-load-path-shadows
++	-${QEMU} ./emacs -q -batch -f list-load-path-shadows
+ #endif /* ! defined (CANNOT_DUMP) */
+ 
+ /* We run make-docfile twice because the command line may get too long
+@@ -954,8 +954,8 @@
+    only in order to reduce the command line length.  --Stef  */
+ ${etc}DOC: ${libsrc}make-docfile${EXEEXT} ${obj} ${lisp} ${SOME_MACHINE_LISP}
+ 	-rm -f ${etc}DOC
+-	${libsrc}make-docfile -d ${srcdir} ${SOME_MACHINE_OBJECTS} ${obj} > ${etc}DOC
+-	${libsrc}make-docfile -a ${etc}DOC -d ${srcdir} ${SOME_MACHINE_LISP} ${shortlisp}
++	${QEMU}${libsrc}make-docfile -d ${srcdir} ${SOME_MACHINE_OBJECTS} ${obj} > ${etc}DOC
++	${QEMU} ${libsrc}make-docfile -a ${etc}DOC -d ${srcdir} ${SOME_MACHINE_LISP} ${shortlisp}
+ 
+ ${libsrc}make-docfile${EXEEXT}:
+ 	cd ${libsrc}; ${MAKE} ${MFLAGS} make-docfile${EXEEXT}

@@ -1,0 +1,22 @@
+--- tk8.5-8.5.8.orig/unix/configure
++++ tk8.5-8.5.8/unix/configure
+@@ -11070,7 +11070,7 @@
+     TCL_STUB_FLAGS="-DUSE_TCL_STUBS"
+ fi
+ 
+-TK_LIBRARY='$(prefix)/lib/tk$(VERSION)'
++test -z "$TK_LIBRARY" && TK_LIBRARY='$(prefix)/lib/tk$(VERSION)'
+ PRIVATE_INCLUDE_DIR='$(includedir)'
+ HTML_DIR='$(DISTDIR)/html'
+ TK_PKG_DIR='tk$(VERSION)'
+--- tk8.5-8.5.8.orig/unix/configure.in
++++ tk8.5-8.5.8/unix/configure.in
+@@ -607,7 +607,7 @@
+     TCL_STUB_FLAGS="-DUSE_TCL_STUBS"
+ fi
+ 
+-TK_LIBRARY='$(prefix)/lib/tk$(VERSION)'
++test -z "$TK_LIBRARY" && TK_LIBRARY='$(prefix)/lib/tk$(VERSION)'
+ PRIVATE_INCLUDE_DIR='$(includedir)'
+ HTML_DIR='$(DISTDIR)/html'
+ TK_PKG_DIR='tk$(VERSION)'

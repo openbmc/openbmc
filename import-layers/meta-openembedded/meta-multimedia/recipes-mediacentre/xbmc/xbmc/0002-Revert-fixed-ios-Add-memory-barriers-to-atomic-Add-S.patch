@@ -1,0 +1,97 @@
+From 7b2a8a7869d257cba35f53f6d877877c29cdac27 Mon Sep 17 00:00:00 2001
+From: Paul Menzel <paulepanter@users.sourceforge.net>
+Date: Sun, 14 Aug 2011 21:53:47 +0200
+Subject: [PATCH 2/4] Revert "fixed:[ios] Add memory barriers to atomic Add/Subtract and Increment/Decrement functions to ensure synchronized accesses."
+
+This reverts commit 9a10c48710df79118e39e9b3bb0a15bf1fe694d1.
+
+The build (OpenEmbedded `angstrom-2010.x` for `MACHINE = "beagleboard") fails with the following error.
+
+        make -C xbmc/threads
+        make[1]: Entering directory `/oe/build-angstrom-next/angstrom-dev/work/armv7a-angstrom-linux-gnueabi/xbmc-10.05-r11+gitr0+9a10c48710df79118e39e9b3bb0a15bf1fe694d1/git/xbmc/threads'
+        CPP     Atomics.o
+        /tmp/ccIzTm3L.s: Assembler messages:
+        /tmp/ccIzTm3L.s:40: Error: garbage following instruction -- `dmb ish'
+        /tmp/ccIzTm3L.s:48: Error: garbage following instruction -- `dmb ish'
+        /tmp/ccIzTm3L.s:76: Error: garbage following instruction -- `dmb ish'
+        /tmp/ccIzTm3L.s:83: Error: garbage following instruction -- `dmb ish'
+        /tmp/ccIzTm3L.s:111: Error: garbage following instruction -- `dmb ish'
+        /tmp/ccIzTm3L.s:118: Error: garbage following instruction -- `dmb ish'
+        /tmp/ccIzTm3L.s:145: Error: garbage following instruction -- `dmb ish'
+        /tmp/ccIzTm3L.s:152: Error: garbage following instruction -- `dmb ish'
+        /tmp/ccIzTm3L.s:180: Error: garbage following instruction -- `dmb ish'
+        /tmp/ccIzTm3L.s:187: Error: garbage following instruction -- `dmb ish'
+        make[1]: *** [Atomics.o] Error 1
+        make[1]: Leaving directory `/oe/build-angstrom-next/angstrom-dev/work/armv7a-angstrom-linux-gnueabi/xbmc-10.05-r11+gitr0+9a10c48710df79118e39e9b3bb0a15bf1fe694d1/git/xbmc/threads'
+        make: *** [xbmc/threads/threads.a] Error 2
+---
+ xbmc/threads/Atomics.cpp |    8 --------
+ 1 files changed, 0 insertions(+), 8 deletions(-)
+
+diff --git a/xbmc/threads/Atomics.cpp b/xbmc/threads/Atomics.cpp
+index 5b09f18..0a98a7e 100644
+--- a/xbmc/threads/Atomics.cpp
++++ b/xbmc/threads/Atomics.cpp
+@@ -194,14 +194,12 @@ long AtomicIncrement(volatile long* pAddr)
+ {
+   register long val;
+   asm volatile (
+-                "dmb      ish            \n" // Memory barrier. Make sure all memory accesses appearing before this complete before any that appear after
+                 "1:                     \n" 
+                 "ldrex   %0, [%1]       \n" // (val = *pAddr)
+                 "add     %0,  #1        \n" // (val += 1)
+                 "strex   r1,  %0, [%1]	\n"
+                 "cmp     r1,   #0       \n"
+                 "bne     1b             \n"
+-                "dmb     ish            \n" // Memory barrier.
+                 : "=&r" (val)
+                 : "r"(pAddr)
+                 : "r1"
+@@ -273,14 +271,12 @@ long AtomicAdd(volatile long* pAddr, long amount)
+ {
+   register long val;
+   asm volatile (
+-                "dmb      ish            \n" // Memory barrier. Make sure all memory accesses appearing before this complete before any that appear after
+                 "1:                     \n" 
+                 "ldrex   %0, [%1]       \n" // (val = *pAddr)
+                 "add     %0,  %2        \n" // (val += amount)
+                 "strex   r1,  %0, [%1]	\n"
+                 "cmp     r1,   #0       \n"
+                 "bne     1b             \n"
+-                "dmb     ish            \n" // Memory barrier.
+                 : "=&r" (val)
+                 : "r"(pAddr), "r"(amount)
+                 : "r1"
+@@ -351,14 +347,12 @@ long AtomicDecrement(volatile long* pAddr)
+ {
+   register long val;
+   asm volatile (
+-                "dmb      ish            \n" // Memory barrier. Make sure all memory accesses appearing before this complete before any that appear after
+                 "1:                     \n" 
+                 "ldrex   %0, [%1]       \n" // (val = *pAddr)
+                 "sub     %0,  #1        \n" // (val -= 1)
+                 "strex   r1,  %0, [%1]	\n"
+                 "cmp     r1,   #0       \n"
+                 "bne     1b             \n"
+-                "dmb     ish            \n" // Memory barrier.
+                 : "=&r" (val)
+                 : "r"(pAddr)
+                 : "r1"
+@@ -431,14 +425,12 @@ long AtomicSubtract(volatile long* pAddr, long amount)
+ {
+   register long val;
+   asm volatile (
+-                "dmb     ish            \n" // Memory barrier. Make sure all memory accesses appearing before this complete before any that appear after
+                 "1:                     \n" 
+                 "ldrex   %0, [%1]       \n" // (val = *pAddr)
+                 "sub     %0,  %2        \n" // (val -= amount)
+                 "strex   r1,  %0, [%1]	\n"
+                 "cmp     r1,   #0       \n"
+                 "bne     1b             \n"
+-                "dmb     ish            \n" // Memory barrier.
+                 : "=&r" (val)
+                 : "r"(pAddr), "r"(amount)
+                 : "r1"
+-- 
+1.7.2.5
+

@@ -1,0 +1,12 @@
+[Unit]
+Description=tracker-store
+After=syslog.target local-fs.target dbus.service
+Requires=dbus.service tracker-dbus.service
+BindTo=tracker-dbus.service
+
+[Service]
+EnvironmentFile=-/tmp/tracker.env
+ExecStart=@LIBEXECDIR@/tracker-store
+
+[Install]
+WantedBy=multi-user.target

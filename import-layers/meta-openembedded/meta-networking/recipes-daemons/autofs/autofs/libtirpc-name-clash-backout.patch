@@ -1,0 +1,28 @@
+---
+ lib/rpc_subs.c |   10 ----------
+ 1 file changed, 10 deletions(-)
+
+diff --git a/lib/rpc_subs.c b/lib/rpc_subs.c
+index 5d6ead0..c7177f2 100644
+--- a/lib/rpc_subs.c
++++ b/lib/rpc_subs.c
+@@ -34,16 +34,6 @@
+ #include <poll.h>
+ 
+ #ifdef WITH_LIBTIRPC
+-#undef auth_destroy
+-#define auth_destroy(auth)                                              \
+-                do {                                                    \
+-                        int refs;                                       \
+-                        if ((refs = auth_put((auth))) == 0)             \
+-                                ((*((auth)->ah_ops->ah_destroy))(auth));\
+-                } while (0)
+-#endif
+-
+-#ifdef WITH_LIBTIRPC
+ const rpcprog_t rpcb_prog = RPCBPROG;
+ const rpcvers_t rpcb_version = RPCBVERS;
+ #else
+-- 
+1.7.10.4
+

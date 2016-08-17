@@ -1,0 +1,35 @@
+From c4bc44c3abf69f26e4c2b7684f4da4670a51f993 Mon Sep 17 00:00:00 2001
+From: Prabhu Sundararaj <prabhu.sundararaj@freescale.com>
+Date: Tue, 5 Nov 2013 11:03:04 -0600
+Subject: [PATCH] to make compilable
+
+Upstream Status: Inappropriate [workaround]
+
+Signed-off-by: Prabhu Sundararaj <prabhu.sundararaj@freescale.com>
+---
+ src/composite-test-simple-blur.cc | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/composite-test-simple-blur.cc b/src/composite-test-simple-blur.cc
+index 170ad64..d7f77cf 100644
+--- a/src/composite-test-simple-blur.cc
++++ b/src/composite-test-simple-blur.cc
+@@ -347,6 +347,7 @@ CompositeTestSimpleBlur::CompositeTestSimpleBlur() :
+ 
+ CompositeTestSimpleBlur::~CompositeTestSimpleBlur()
+ {
++#if 0
+     for (BlurWindowMapType::iterator winIt = priv_->windowMap.begin();
+          winIt != priv_->windowMap.end();
+          winIt++)
+@@ -354,6 +355,7 @@ CompositeTestSimpleBlur::~CompositeTestSimpleBlur()
+         RenderWindowBlur* ro = winIt->second;
+         delete ro;
+     }
++#endif
+     delete priv_;
+ }
+ 
+-- 
+1.8.1.2
+

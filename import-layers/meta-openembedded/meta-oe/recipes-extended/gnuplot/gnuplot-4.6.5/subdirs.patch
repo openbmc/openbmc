@@ -1,0 +1,11 @@
+--- /tmp/Makefile.am	2007-08-23 13:10:15.560659023 +0200
++++ gnuplot-4.2.0/Makefile.am	2007-08-23 13:10:34.961764629 +0200
+@@ -1,7 +1,7 @@
+ ## Process this file with automake to produce Makefile.in -*-Makefile-*-
+ AUTOMAKE_OPTIONS = foreign 1.2h
+ 
+-SUBDIRS = config m4 term src docs $(LISPDIR) man demo tutorial share
++SUBDIRS = config m4 term src  $(LISPDIR) man share
+ 
+ EXTRA_DIST = BUGS CodeStyle Copyright FAQ GNUmakefile INSTALL INSTALL.gnu \
+ Makefile.maint PATCHLEVEL PGPKEYS PORTING README README.1ST README.exp \

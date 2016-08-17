@@ -1,0 +1,24 @@
+                <!-- If you have the reiseplaner maps installed, set enabled="yes" in the next line and set the path correctly -->
+                <mapset enabled="no">
+                        <map type="mg" enabled="yes" data="/opt/reiseplaner/travel/DE.map"/>
+                        <map type="mg" enabled="yes" data="/opt/reiseplaner/travel/DE.map/smp1.smp"/>
+                        <map type="mg" enabled="yes" data="/opt/reiseplaner/travel/DE.map/smp2.smp"/>
+                        <map type="mg" enabled="yes" data="/opt/reiseplaner/travel/DE.map/smp3.smp"/>
+                        <map type="mg" enabled="yes" data="/opt/reiseplaner/travel/DE.map/smp4.smp"/>
+                        <map type="mg" enabled="yes" data="/opt/reiseplaner/travel/DE.map/smp5.smp"/>
+                </mapset>
+
+                <!-- If you dont want to use the sample map, either set enabled="no" in the next line or remove the xml file from the maps directory -->
+                <mapset enabled="no">
+                        <xi:include href="$NAVIT_SHAREDIR/maps/*.xml"/>
+                </mapset>
+
+                <!-- Mapset template for openstreetmaps -->
+                <mapset enabled="yes">
+                        <map type="binfile" enabled="yes" data="/media/mmc2/MapsNavit/osm_europe.bin"/>
+                </mapset>
+
+                <!-- Mapset template for garmin maps -->
+                <mapset enabled="no">
+                        <map type="garmin" enabled="yes" data="/path/to/img" debug="4"/>
+                </mapset>

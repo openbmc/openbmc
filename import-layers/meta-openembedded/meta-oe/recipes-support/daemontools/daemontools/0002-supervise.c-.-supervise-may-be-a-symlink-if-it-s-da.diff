@@ -1,0 +1,47 @@
+From 7ee585cab1d5b68f804a5601a66ae87799c8a7c3 Mon Sep 17 00:00:00 2001
+From: Gerrit Pape <pape@smarden.org>
+Date: Sun, 24 Feb 2008 10:54:26 +0000
+Subject: [PATCH] supervise.c: ./supervise may be a symlink, if it's dangling, create link target
+
+---
+ daemontools-0.76/src/supervise.c |   17 ++++++++++++++++-
+ 1 files changed, 16 insertions(+), 1 deletions(-)
+
+diff --git daemontools-0.76.orig/src/supervise.c daemontools-0.76/src/supervise.c
+index 2482ad2..f43cabf 100644
+--- daemontools-0.76.orig/src/supervise.c
++++ daemontools-0.76/src/supervise.c
+@@ -208,6 +208,8 @@ void doit(void)
+ int main(int argc,char **argv)
+ {
+   struct stat st;
++  int r;
++  char buf[256];
+ 
+   dir = argv[1];
+   if (!dir || argv[2])
+@@ -232,7 +234,20 @@ int main(int argc,char **argv)
+     if (errno != error_noent)
+       strerr_die4sys(111,FATAL,"unable to stat ",dir,"/down: ");
+ 
+-  mkdir("supervise",0700);
++  if (mkdir("supervise",0700) == -1) {
++    if ((r = readlink("supervise", buf, 256)) != -1) {
++      if (r == 256) {
++        errno = EOVERFLOW;
++        strerr_die1sys(111,"unable to readlink ./supervise: ");
++      }
++      buf[r] = 0;
++      mkdir(buf, 0700);
++    }
++    else {
++      if ((errno != ENOENT) && (errno != EINVAL))
++        strerr_die1sys(111, "unable to readlink ./supervise: ");
++    }
++  }
+   fdlock = open_append("supervise/lock");
+   if ((fdlock == -1) || (lock_exnb(fdlock) == -1))
+     strerr_die4sys(111,FATAL,"unable to acquire ",dir,"/supervise/lock: ");
+-- 
+1.5.4.2
+

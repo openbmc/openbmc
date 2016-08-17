@@ -1,0 +1,9 @@
+#!/bin/sh
+make regress1
+make regress2
+if  numademo -t -e 10M; then
+	echo "PASS: numademo"
+else
+	echo "FAIL: numademo"
+fi
+

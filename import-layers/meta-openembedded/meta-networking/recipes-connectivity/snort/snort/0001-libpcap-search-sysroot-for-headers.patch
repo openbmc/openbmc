@@ -1,0 +1,31 @@
+From 4d7ebe3ed6cee72bc7db98bd408d22c10ef5dd82 Mon Sep 17 00:00:00 2001
+From: Joe MacDonald <joe@deserted.net>
+Date: Wed, 20 Nov 2013 16:06:07 -0500
+Subject: [PATCH] libpcap: search sysroot for headers
+
+Configure hard-coded host header paths when building with libpcap.  Point
+the search path at the sysroot instead.
+
+Upstream-Status: Pending
+
+Signed-off-by: Joe MacDonald <joe@deserted.net>
+---
+ configure.in |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.in b/configure.in
+index e52bb6c..8ded35d 100644
+--- a/configure.in
++++ b/configure.in
+@@ -78,7 +78,7 @@ case "$host" in
+     linux="yes"
+     AC_DEFINE([LINUX],[1],[Define if Linux])
+     AC_SUBST(extra_incl)
+-    extra_incl="-I/usr/include/pcap"
++    extra_incl="-I=/usr/include/pcap"
+     ;;
+   *-hpux10*|*-hpux11*)
+     AC_DEFINE([HPUX],[1],[Define if HP-UX 10 or 11])
+-- 
+1.7.10.4
+

@@ -1,0 +1,18 @@
+Description: Fix FTBFS with gcc-4.7
+ Small header include change. This is borderlinde cosmetic, but still needed
+ to prevent the FTBFS.
+Author: Paul Tagliamonte <paultag@ubuntu.com>
+Origin: vendor
+Bug-Debian: http://bugs.debian.org/667418
+Last-Update: 2012-04-13
+
+--- wvstreams-4.6.1.orig/utils/wvuid.cc
++++ wvstreams-4.6.1/utils/wvuid.cc
+@@ -33,6 +33,7 @@ wvuid_t wvgetuid()
+ 
+ #else // not WIN32
+ 
++#include <unistd.h>
+ 
+ WvString wv_username_from_uid(wvuid_t uid)
+ {

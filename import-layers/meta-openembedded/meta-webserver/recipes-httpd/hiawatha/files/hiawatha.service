@@ -1,0 +1,16 @@
+[Unit]
+Description=Hiawatha Web Server
+After=network.target remote-fs.target nss-lookup.target
+
+[Service]
+Type=simple
+SyslogIdentifier=hiawatha
+ExecStartPre=/usr/sbin/hiawatha -k ; /usr/sbin/wigwam
+ExecStart= /usr/sbin/hiawatha -d
+TimeoutSec=10
+#(doesn't like this setting. Can't find files) PrivateTmp=true
+LimitNOFILE=infinity
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE CAP_CHOWN CAP_DAC_OVERRIDE CAP_FOWNER CAP_FSETID CAP_SETGID CAP_SETUID 
+
+[Install]
+WantedBy=multi-user.target

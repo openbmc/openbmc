@@ -1,0 +1,42 @@
+From c582338ef4f33b3dc07a2636340d55b9fb530650 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Wed, 17 Feb 2016 00:15:44 +0100
+Subject: [PATCH] clock-time: make change of system's timezone change time for
+ DEFAULT_TIMEZONE
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+clock_time->timezone is set in clock_time_init so the condition
+
+'clock_time->timezone != NULL
+
+is matching always.
+
+Tested by selecting seconds displayed (-> quick update) and changing timezone.
+
+Upstream-Status: Submitted [1]
+
+[1] https://bugzilla.xfce.org/show_bug.cgi?id=12453
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ plugins/clock/clock-time.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/plugins/clock/clock-time.c b/plugins/clock/clock-time.c
+index b015b13..4459b85 100644
+--- a/plugins/clock/clock-time.c
++++ b/plugins/clock/clock-time.c
+@@ -198,7 +198,7 @@ clock_time_get_time (ClockTime *clock_time)
+ 
+   panel_return_val_if_fail (XFCE_IS_CLOCK_TIME (clock_time), NULL);
+ 
+-  if (clock_time->timezone != NULL)
++  if (g_strcmp0 (clock_time->timezone_name, DEFAULT_TIMEZONE) != 0)
+     date_time = g_date_time_new_now (clock_time->timezone);
+   else
+     date_time = g_date_time_new_now_local ();
+-- 
+2.5.0
+

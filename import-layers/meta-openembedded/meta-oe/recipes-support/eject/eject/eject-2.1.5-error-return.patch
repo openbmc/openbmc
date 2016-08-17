@@ -1,0 +1,12 @@
+Upstream-Status: Inappropriate [the upstream is no longer active]
+
+--- eject/eject.c.orig	2013-09-11 18:08:36.000000000 +0800
++++ eject/eject.c	2013-09-11 18:09:05.000000000 +0800
+@@ -207,7 +207,6 @@
+ "If omitted, name defaults to `%s'.\n"
+ "By default tries -r, -s, -f, and -q in order until success.\n"),
+ 			DEFAULTDEVICE);
+-  exit(1);
+ }
+ 
+ 

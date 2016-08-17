@@ -1,0 +1,31 @@
+From 92d72789c811b0d55f624a8bac5ccc4412f5996e Mon Sep 17 00:00:00 2001
+From: Ken Murchison <murch@andrew.cmu.edu>
+Date: Thu, 20 Dec 2012 18:14:50 -0500
+Subject: [PATCH] sasl.h: #include <stddef.h> for size_t on NetBSD
+
+This patch was imported from git://git.cyrusimap.org/cyrus-sasl
+commit 67a188693796a14e3a76ac603104807fbbfddfc4
+
+Upstream-Status: Backport
+
+Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
+---
+ include/sasl.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/include/sasl.h b/include/sasl.h
+index fef4d51..8b8a63f 100755
+--- a/include/sasl.h
++++ b/include/sasl.h
+@@ -121,6 +121,8 @@
+ #ifndef SASL_H
+ #define SASL_H 1
+ 
++#include <stddef.h>  /* For size_t */
++
+ /* Keep in sync with win32/common.mak */
+ #define SASL_VERSION_MAJOR 2
+ #define SASL_VERSION_MINOR 1
+-- 
+1.8.3.2
+

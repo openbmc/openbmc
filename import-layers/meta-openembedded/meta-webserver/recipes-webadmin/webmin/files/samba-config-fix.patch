@@ -1,0 +1,32 @@
+Upstream-status: Inappropriate [configuration]
+
+Signed-off-by: Zhai Edwin <edwin.zhai@intel.com>
+
+Index: webmin-1.570/samba/config-generic-linux
+===================================================================
+--- webmin-1.570.orig/samba/config-generic-linux	2011-10-25 20:11:35.000000000 +0800
++++ webmin-1.570/samba/config-generic-linux	2011-10-25 20:15:41.000000000 +0800
+@@ -1,15 +1,15 @@
+ list_printers_command=lpc status | grep "[A-z0-9]:" | sed -e 's/://g'
+-smb_passwd=/usr/local/samba/private/smbpasswd
++smb_passwd=/usr/bin/smbpasswd
+ text_lists=0
+ dont_convert=-499
+-name_server=/usr/local/samba/bin/nmbd
+-smb_conf=/usr/local/samba/lib/smb.conf
+-samba_server=/usr/local/samba/bin/smbd
++name_server=/usr/sbin/nmbd
++smb_conf=/etc/samba/smb.conf
++samba_server=/usr/sbin/smbd
+ run_from_inetd=0
+-samba_password_program=/usr/local/samba/bin/smbpasswd
+-samba_status_program=/usr/local/samba/bin/smbstatus
++samba_password_program=/usr/bin/smbpasswd
++samba_status_program=/usr/bin/smbstatus
+ swat_path=/usr/local/samba/bin/swat
+ sort_mode=0
+ smbgroupedit=/usr/local/samba/bin/smbgroupedit
+-pdbedit=/usr/local/samba/bin/pdbedit
+-net=/usr/local/samba/bin/net
++pdbedit=/usr/bin/pdbedit
++net=/usr/bin/net

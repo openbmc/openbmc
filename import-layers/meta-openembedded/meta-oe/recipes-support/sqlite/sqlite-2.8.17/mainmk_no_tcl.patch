@@ -1,0 +1,20 @@
+diff -bur sqlite-2.8.17~orig/main.mk sqlite-2.8.17/main.mk
+--- sqlite-2.8.17~orig/main.mk	2006-02-13 04:09:33.000000000 -0600
++++ sqlite-2.8.17/main.mk	2006-02-13 04:15:42.000000000 -0600
+@@ -58,7 +58,7 @@
+          expr.o func.o hash.o insert.o \
+          main.o opcodes.o os.o pager.o parse.o pragma.o printf.o random.o \
+          select.o table.o tokenize.o trigger.o update.o util.o \
+-         vacuum.o vdbe.o vdbeaux.o where.o tclsqlite.o
++         vacuum.o vdbe.o vdbeaux.o where.o
+ 
+ # All of the source code files.
+ #
+@@ -91,7 +91,6 @@
+   $(TOP)/src/sqlite.h.in \
+   $(TOP)/src/sqliteInt.h \
+   $(TOP)/src/table.c \
+-  $(TOP)/src/tclsqlite.c \
+   $(TOP)/src/tokenize.c \
+   $(TOP)/src/trigger.c \
+   $(TOP)/src/update.c \

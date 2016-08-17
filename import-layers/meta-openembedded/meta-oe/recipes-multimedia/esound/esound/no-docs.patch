@@ -1,0 +1,11 @@
+Index: esound-0.2.36/Makefile.am
+===================================================================
+--- esound-0.2.36.orig/Makefile.am
++++ esound-0.2.36/Makefile.am
+@@ -1,5 +1,5 @@
+ 
+-SUBDIRS = docs
++SUBDIRS = 
+ 
+ ACLOCAL_FLAGS = -I m4
+ 

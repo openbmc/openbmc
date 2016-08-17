@@ -1,0 +1,23 @@
+polkit: No system-auth in OE-Core, we can use common-* in place of it.
+
+Upstream-Status:Inappropriate [configuration]
+
+Signed-off-by: Xiaofeng Yan <xiaofeng.yan@windriver.com>
+
+--- a/configure.ac	2011-03-04 02:26:20.000000000 +0800
++++ b/configure.ac.new	2011-07-18 10:14:12.516818852 +0800
+@@ -350,10 +350,10 @@
+     PAM_FILE_INCLUDE_PASSWORD=system
+     PAM_FILE_INCLUDE_SESSION=system
+ else
+-   PAM_FILE_INCLUDE_AUTH=system-auth
+-   PAM_FILE_INCLUDE_ACCOUNT=system-auth
+-   PAM_FILE_INCLUDE_PASSWORD=system-auth
+-   PAM_FILE_INCLUDE_SESSION=system-auth
++   PAM_FILE_INCLUDE_AUTH=common-auth
++   PAM_FILE_INCLUDE_ACCOUNT=common-account
++   PAM_FILE_INCLUDE_PASSWORD=common-password
++   PAM_FILE_INCLUDE_SESSION=common-session
+ fi
+ 
+ AC_SUBST(PAM_FILE_INCLUDE_AUTH)

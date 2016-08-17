@@ -1,0 +1,92 @@
+From e3c6eb8776f659eb9e6eeccf90d785eff18ecf74 Mon Sep 17 00:00:00 2001
+From: Otavio Salvador <otavio@ossystems.com.br>
+Date: Mon, 15 Feb 2016 18:00:05 -0200
+Subject: [PATCH] Use 'tcsh' shell
+Organization: O.S. Systems Software LTDA.
+
+Upstream-Status: Pending
+
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+---
+ Scripts/dta | 2 +-
+ Scripts/dtc | 2 +-
+ Scripts/dtf | 2 +-
+ Scripts/dtr | 2 +-
+ Scripts/dts | 2 +-
+ Scripts/dtt | 2 +-
+ Scripts/dtw | 2 +-
+ 7 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/Scripts/dta b/Scripts/dta
+index ebc7072..4f90247 100755
+--- a/Scripts/dta
++++ b/Scripts/dta
+@@ -1,4 +1,4 @@
+-#!/bin/csh
++#!/bin/tcsh
+ #
+ #	Script file to test asynchronous communication lines.
+ #
+diff --git a/Scripts/dtc b/Scripts/dtc
+index da69c2e..89d48c2 100755
+--- a/Scripts/dtc
++++ b/Scripts/dtc
+@@ -1,4 +1,4 @@
+-#!/bin/csh
++#!/bin/tcsh
+ #	%Z%%M% %I% %E%
+ #
+ #	Date:	August 7, 1990
+diff --git a/Scripts/dtf b/Scripts/dtf
+index 9f8cd87..321d261 100755
+--- a/Scripts/dtf
++++ b/Scripts/dtf
+@@ -1,4 +1,4 @@
+-#! /bin/csh
++#! /bin/tcsh
+ #
+ #	Script file to gather floppy disk performance data.
+ #
+diff --git a/Scripts/dtr b/Scripts/dtr
+index ddb7947..1ff5a0b 100755
+--- a/Scripts/dtr
++++ b/Scripts/dtr
+@@ -1,4 +1,4 @@
+-#!/bin/csh
++#!/bin/tcsh
+ #	%Z%%M% %I% %E%
+ #
+ #	Date:	August 21, 1990
+diff --git a/Scripts/dts b/Scripts/dts
+index 6b8a167..42d2312 100755
+--- a/Scripts/dts
++++ b/Scripts/dts
+@@ -1,4 +1,4 @@
+-#!/bin/csh
++#!/bin/tcsh
+ #	%Z%%M% %I% %E%
+ #
+ #	Date:	August 7, 1990
+diff --git a/Scripts/dtt b/Scripts/dtt
+index 36cc6bd..df19d2f 100755
+--- a/Scripts/dtt
++++ b/Scripts/dtt
+@@ -1,4 +1,4 @@
+-#! /bin/csh
++#! /bin/tcsh
+ #	%Z%%M% %I% %E%
+ #
+ #	Date:	August 7, 1990
+diff --git a/Scripts/dtw b/Scripts/dtw
+index 8a4ac39..c58e304 100755
+--- a/Scripts/dtw
++++ b/Scripts/dtw
+@@ -1,4 +1,4 @@
+-#!/bin/csh
++#!/bin/tcsh
+ #	%Z%%M% %I% %E%
+ #
+ #	Date:	August 21, 1990
+-- 
+2.1.4
+

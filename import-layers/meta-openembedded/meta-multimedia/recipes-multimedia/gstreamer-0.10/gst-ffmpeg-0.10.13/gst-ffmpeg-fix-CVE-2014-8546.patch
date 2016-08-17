@@ -1,0 +1,35 @@
+From e7e5114c506957f40aafd794e06de1a7e341e9d5 Mon Sep 17 00:00:00 2001
+From: Michael Niedermayer <michaelni@gmx.at>
+Date: Fri, 3 Oct 2014 19:33:01 +0200
+Subject: [PATCH] avcodec/cinepak: fix integer underflow
+
+(Upstream commit e7e5114c506957f40aafd794e06de1a7e341e9d5)
+
+Fixes out of array access
+Fixes: asan_heap-oob_4da0ba_6_asan_heap-oob_4da0ba_241_cvid_crash.avi
+
+Upstream-status: Backport
+
+Found-by: Mateusz "j00ru" Jurczyk and Gynvael Coldwind
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+---
+ libavcodec/cinepak.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libavcodec/cinepak.c b/libavcodec/cinepak.c
+index 4746289..f651c48 100644
+--- a/gst-libs/ext/libav/libavcodec/cinepak.c
++++ b/gst-libs/ext/libav/libavcodec/cinepak.c
+@@ -125,7 +125,7 @@ static int cinepak_decode_vectors (CinepakContext *s, cvid_strip *strip,
+     const uint8_t   *eod = (data + size);
+     uint32_t         flag, mask;
+     cvid_codebook   *codebook;
+-    unsigned int     x, y;
++    int             x, y;
+     uint32_t         iy[4];
+     uint32_t         iu[2];
+     uint32_t         iv[2];
+-- 
+1.7.9.5
+

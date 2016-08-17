@@ -1,0 +1,26 @@
+logwriter: Don't allocate a new buffer if fails to consume current item
+
+Upstream-Status: Pending
+
+Signed-off-by: Xufeng Zhang <xufeng.zhang@windriver.com>
+---
+--- a/lib/logwriter.c
++++ b/lib/logwriter.c
+@@ -1010,7 +1010,7 @@
+         {
+           status = log_proto_client_post(proto, (guchar *) self->line_buffer->str, self->line_buffer->len, &consumed);
+ 
+-          if (consumed)
++          if (consumed && status != LPS_ERROR)
+             log_writer_realloc_line_buffer(self);
+ 
+           if (status == LPS_ERROR)
+@@ -1028,7 +1028,7 @@
+                     NULL);
+           consumed = TRUE;
+         }
+-      if (consumed)
++      if (consumed && status != LPS_ERROR)
+         {
+           if (lm->flags & LF_LOCAL)
+             step_sequence_number(&self->seq_num);

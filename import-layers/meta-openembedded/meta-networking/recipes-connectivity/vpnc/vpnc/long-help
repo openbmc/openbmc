@@ -1,0 +1,168 @@
+Usage: vpnc [--version] [--print-config] [--help] [--long-help] [options] [config files]
+
+Options:
+  --gateway <ip/hostname>
+      IP/name of your IPSec gateway
+  conf-variable: IPSec gateway <ip/hostname>
+
+  --id <ASCII string>
+      your group name
+  conf-variable: IPSec ID <ASCII string>
+
+  (configfile only option) 
+      your group password (cleartext)
+  conf-variable: IPSec secret <ASCII string>
+
+  (configfile only option) 
+      your group password (obfuscated)
+  conf-variable: IPSec obfuscated secret <hex string>
+
+  --username <ASCII string>
+      your username
+  conf-variable: Xauth username <ASCII string>
+
+  (configfile only option) 
+      your password (cleartext)
+  conf-variable: Xauth password <ASCII string>
+
+  (configfile only option) 
+      your password (obfuscated)
+  conf-variable: Xauth obfuscated password <hex string>
+
+  --domain <ASCII string>
+      (NT-) Domain name for authentication
+  conf-variable: Domain <ASCII string>
+
+  --xauth-inter 
+      enable interactive extended authentication (for challenge response auth)
+  conf-variable: Xauth interactive
+
+  --vendor <cisco/netscreen>
+      vendor of your IPSec gateway
+    Default: cisco
+  conf-variable: Vendor <cisco/netscreen>
+
+  --natt-mode <natt/none/force-natt/cisco-udp>
+      Which NAT-Traversal Method to use:
+       * natt -- NAT-T as defined in RFC3947
+       * none -- disable use of any NAT-T method
+       * force-natt -- always use NAT-T encapsulation even
+                       without presence of a NAT device
+                       (useful if the OS captures all ESP traffic)
+       * cisco-udp -- Cisco proprietary UDP encapsulation, commonly over Port 10000
+      Note: cisco-tcp encapsulation is not yet supported
+    Default: natt
+  conf-variable: NAT Traversal Mode <natt/none/force-natt/cisco-udp>
+
+  --script <command>
+      command is executed using system() to configure the interface,
+      routing and so on. Device name, IP, etc. are passed using enviroment
+      variables, see README. This script is executed right after ISAKMP is
+      done, but before tunneling is enabled. It is called when vpnc
+      terminates, too
+    Default: /etc/vpnc/vpnc-script
+  conf-variable: Script <command>
+
+  --dh <dh1/dh2/dh5>
+      name of the IKE DH Group
+    Default: dh2
+  conf-variable: IKE DH Group <dh1/dh2/dh5>
+
+  --pfs <nopfs/dh1/dh2/dh5/server>
+      Diffie-Hellman group to use for PFS
+    Default: server
+  conf-variable: Perfect Forward Secrecy <nopfs/dh1/dh2/dh5/server>
+
+  --enable-1des 
+      enables weak single DES encryption
+  conf-variable: Enable Single DES
+
+  --enable-no-encryption 
+      enables using no encryption for data traffic (key exchanged must be encrypted)
+  conf-variable: Enable no encryption
+
+  --application-version <ASCII string>
+      Application Version to report. Note: Default string is generated at runtime.
+    Default: Cisco Systems VPN Client 0.5.3-394:Linux
+  conf-variable: Application version <ASCII string>
+
+  --ifname <ASCII string>
+      visible name of the TUN/TAP interface
+  conf-variable: Interface name <ASCII string>
+
+  --ifmode <tun/tap>
+      mode of TUN/TAP interface:
+       * tun: virtual point to point interface (default)
+       * tap: virtual ethernet interface
+    Default: tun
+  conf-variable: Interface mode <tun/tap>
+
+  --debug <0/1/2/3/99>
+      Show verbose debug messages
+       *  0: Do not print debug information.
+       *  1: Print minimal debug information.
+       *  2: Show statemachine and packet/payload type information.
+       *  3: Dump everything exluding authentication data.
+       * 99: Dump everything INCLUDING AUTHENTICATION data (e.g. PASSWORDS).
+  conf-variable: Debug <0/1/2/3/99>
+
+  --no-detach 
+      Don't detach from the console after login
+  conf-variable: No Detach
+
+  --pid-file <filename>
+      store the pid of background process in <filename>
+    Default: /var/run/vpnc/pid
+  conf-variable: Pidfile <filename>
+
+  --local-addr <ip/hostname>
+      local IP to use for ISAKMP / ESP / ... (0.0.0.0 == automatically assign)
+    Default: 0.0.0.0
+  conf-variable: Local Addr <ip/hostname>
+
+  --local-port <0-65535>
+      local ISAKMP port number to use (0 == use random port)
+    Default: 500
+  conf-variable: Local Port <0-65535>
+
+  --udp-port <0-65535>
+      Local UDP port number to use (0 == use random port).
+      This is only relevant if cisco-udp nat-traversal is used.
+      This is the _local_ port, the remote udp port is discovered automatically.
+      It is especially not the cisco-tcp port.
+    Default: 10000
+  conf-variable: Cisco UDP Encapsulation Port <0-65535>
+
+  --dpd-idle <0,10-86400>
+      Send DPD packet after not receiving anything for <idle> seconds.
+      Use 0 to disable DPD completely (both ways).
+    Default: 300
+  conf-variable: DPD idle timeout (our side) <0,10-86400>
+
+  --non-inter 
+      Don't ask anything, exit on missing options
+  conf-variable: Noninteractive
+
+  --auth-mode <psk/cert/hybrid>
+      Authentication mode:
+       * psk:    pre-shared key (default)
+       * cert:   server + client certificate (not implemented yet)
+       * hybrid: server certificate + xauth (if built with openssl support)
+    Default: psk
+  conf-variable: IKE Authmode <psk/cert/hybrid>
+
+  --ca-file <filename>
+      filename and path to the CA-PEM-File
+  conf-variable: CA-File <filename>
+
+  --ca-dir <directory>
+      path of the trusted CA-Directory
+    Default: /etc/ssl/certs
+  conf-variable: CA-Dir <directory>
+
+  --target-network <target network/netmask>
+      Target network in dotted decimal or CIDR notation
+    Default: 0.0.0.0/0.0.0.0
+  conf-variable: IPSEC target network <target network/netmask>
+
+Report bugs to vpnc@unix-ag.uni-kl.de

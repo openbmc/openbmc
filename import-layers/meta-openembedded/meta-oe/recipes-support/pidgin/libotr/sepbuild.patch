@@ -1,0 +1,16 @@
+Fix builds with ${B} != ${S}
+
+Upstream-Status: Pending
+
+RP 2014/7/17
+
+Index: libotr-4.0.0/toolkit/Makefile.am
+===================================================================
+--- libotr-4.0.0.orig/toolkit/Makefile.am	2014-07-16 18:09:59.777858022 +0000
++++ libotr-4.0.0/toolkit/Makefile.am	2014-07-17 06:28:51.359066155 +0000
+@@ -1,4 +1,4 @@
+-INCLUDES = -I../src @LIBGCRYPT_CFLAGS@
++INCLUDES = -I$(top_srcdir)/src @LIBGCRYPT_CFLAGS@
+ 
+ noinst_HEADERS = aes.h ctrmode.h parse.h sesskeys.h readotr.h sha1hmac.h
+ 

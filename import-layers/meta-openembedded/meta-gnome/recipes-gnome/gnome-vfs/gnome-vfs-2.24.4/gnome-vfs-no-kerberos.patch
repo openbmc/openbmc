@@ -1,0 +1,53 @@
+Upstream-Status: Inappropriate [configuration]
+
+removes kerberos completely to avoid conflicts with installed kerberos
+--- configure.in.orig	2007-01-05 19:42:26.418541610 +0200
++++ configure.in	2007-01-05 19:42:56.604261797 +0200
+@@ -436,47 +436,6 @@
+ ])
+ AM_CONDITIONAL(HAVE_CDDA, test $have_cdda = yes)
+ AC_SUBST(CDDA_LIBS)
+-
+-dnl GSSAPI
+-dnl Check for Kerberos installation
+-have_gssapi=no
+-AC_PATH_PROG([KRB5_CONFIG], krb5-config, none, $PATH:/usr/kerberos/bin)
+-					   
+-if test "x$KRB5_CONFIG" != "xnone"; then
+-   GSSAPI_LIBS="`${KRB5_CONFIG} --libs gssapi`"
+-   GSSAPI_CFLAGS="`${KRB5_CONFIG} --cflags gssapi`"
+-   
+-   saved_CPPFLAGS="$CPPFLAGS"
+-   saved_LIBS="$LIBS"
+-   LIBS="$LIBS $GSSAPI_LIBS"
+-   CPPFLAGS="$CPPFLAGS $GSSAPI_CFLAGS"
+-   # MIT and Heimdal put gssapi.h in different places
+-   AC_CHECK_HEADERS(gssapi/gssapi.h gssapi.h, [
+-       AC_CHECK_FUNCS(gss_init_sec_context, [
+-           AC_MSG_NOTICE([GSSAPI authentication support enabled])
+-           AC_DEFINE(HAVE_GSSAPI, 1, [Define if GSSAPI support is enabled])
+-           AC_CHECK_HEADERS(gssapi/gssapi_generic.h)
+-		 have_gssapi=yes
+-	 
+-       # MIT Kerberos lacks GSS_C_NT_HOSTBASED_SERVICE
+-       AC_CHECK_DECL([GSS_C_NT_HOSTBASED_SERVICE],,
+-          [AC_DEFINE([GSS_C_NT_HOSTBASED_SERVICE], gss_nt_service_name, 
+-             [Define if GSS_C_NT_HOSTBASED_SERVICE is not defined otherwise])
+-		], [
+-		    #ifdef HAVE_GSSAPI_GSSAPI_H
+-		    #include <gssapi/gssapi.h>
+-		    #else	   
+-		    #include <gssapi.h>
+-		    #endif
+-		])
+-	  ])
+-     break
+-   ])
+-   LIBS="$saved_LIBS" 
+-   CPPFLAGS="$saved_CPPFLAGS" 
+-fi   
+-AC_SUBST(GSSAPI_LIBS)
+-AC_SUBST(GSSAPI_CFLAGS)
+ 	   
+ dnl ******************************
+ dnl http-method (neon checks)

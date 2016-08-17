@@ -1,0 +1,33 @@
+unnecessary to check libpcap
+
+Upstream-Status: Pending
+
+since the check of libpcap did not consider the cross-compile, lead to the
+below error:
+	This autoconf log indicates errors, it looked at host include and/or
+	library paths while determining system capabilities.
+
+In fact, the libpcap has been added into the tcpdump's DEPENDS, not need to
+check if libpcap existed.
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ configure.in |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.in b/configure.in
+index 06fade1..9125de7 100644
+--- a/configure.in
++++ b/configure.in
+@@ -567,7 +567,7 @@ AC_SEARCH_LIBS(getrpcbynumber, nsl,
+ dnl AC_CHECK_LIB(z, uncompress)
+ dnl AC_CHECK_HEADERS(zlib.h)
+ 
+-AC_LBL_LIBPCAP(V_PCAPDEP, V_INCLS)
++#AC_LBL_LIBPCAP(V_PCAPDEP, V_INCLS)
+ 
+ #
+ # Check for these after AC_LBL_LIBPCAP, so we link with the appropriate
+-- 
+1.7.9.5
+

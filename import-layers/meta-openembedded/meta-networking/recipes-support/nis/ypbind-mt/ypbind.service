@@ -1,0 +1,14 @@
+[Unit]
+Description=YP Bind
+Requires=domainname.service
+After=domainname.service network.target
+Before=systemd-user-sessions.service
+
+[Service]
+Type=forking
+PIDFile=/var/run/ypbind.pid
+ExecStart=/usr/sbin/ypbind
+
+[Install]
+WantedBy=multi-user.target
+

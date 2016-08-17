@@ -1,0 +1,12 @@
+Index: gpm-1.99.7/src/daemon/processconn.c
+===================================================================
+--- gpm-1.99.7.orig/src/daemon/processconn.c	2010-09-29 17:36:18.571782951 +0400
++++ gpm-1.99.7/src/daemon/processconn.c	2010-09-29 17:42:44.659991758 +0400
+@@ -20,6 +20,7 @@
+  *
+  ********/
+ 
++#define _GNU_SOURCE
+ #include <sys/socket.h>         /* accept */
+ #include <stdlib.h>             /* malloc */
+ #include <unistd.h>             /* close */

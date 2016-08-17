@@ -1,0 +1,17 @@
+Upstream-Status: Pending
+
+Fix EOF not declared issue, following is the error log.
+fcgio.cpp:70:72: error: 'EOF' was not declared in this scope
+              if (FCGX_PutStr(pbase(), plen, this->fcgx) != plen) return EOF;
+
+Signed-off-by: Yang Haibo <b40869@freescale.com>
+--- fcgi-ori/libfcgi/fcgio.cpp 2014-07-28 18:01:00.000000000 +0800
++++ fcgi-2.4.0/libfcgi/fcgio.cpp       2014-07-28 18:01:22.000000000 +0800
+@@ -22,6 +22,7 @@
+ #define DLLAPI  __declspec(dllexport)
+ #endif
+
++#include <stdio.h>
+ #include <limits.h>
+ #include "fcgio.h"
+

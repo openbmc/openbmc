@@ -1,0 +1,87 @@
+From c4e6bd9378645d577e9d9f85da85f1438afe7c50 Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Sun, 29 Jun 2014 00:32:29 +0200
+Subject: [PATCH 1/6] Makefile: build ubi-utils only
+
+We build all the static ubi-utils but actually only ubiattach is needed in
+a minimalistic initramfs for the mount of ubi volumes.
+
+More fixes are needed in order to build the full mtd-utils.
+The first issue is:
+
+| mkfs.jffs2.c:64:20: fatal error: libgen.h: No such file or directory
+|  #include <libgen.h>
+
+Removing the include then the second error is:
+
+| mkfs.jffs2.c:1570:22: error: '_SC_PAGESIZE' undeclared
+| (first use in this function)
+|   page_size = sysconf(_SC_PAGESIZE);
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+---
+ Makefile | 24 ++----------------------
+ 1 file changed, 2 insertions(+), 22 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index eade234..2275865 100644
+--- a/Makefile
++++ b/Makefile
+@@ -16,28 +16,13 @@ endif
+ 
+ TESTS = tests
+ 
+-MTD_BINS = \
+-	ftl_format flash_erase nanddump doc_loadbios \
+-	ftl_check mkfs.jffs2 flash_lock flash_unlock \
+-	flash_otp_info flash_otp_dump flash_otp_lock flash_otp_write \
+-	mtd_debug flashcp nandwrite nandtest \
+-	jffs2dump \
+-	nftldump nftl_format docfdisk \
+-	rfddump rfdformat \
+-	serve_image recv_image \
+-	sumtool jffs2reader
+ UBI_BINS = \
+ 	ubiupdatevol ubimkvol ubirmvol ubicrc32 ubinfo ubiattach \
+ 	ubidetach ubinize ubiformat ubirename mtdinfo ubirsvol ubiblock
+ 
+-BINS = $(MTD_BINS)
+-BINS += mkfs.ubifs/mkfs.ubifs
+-BINS += $(addprefix ubi-utils/,$(UBI_BINS))
+-SCRIPTS = flash_eraseall
++BINS = $(addprefix ubi-utils/,$(UBI_BINS))
+ 
+ TARGETS = $(BINS)
+-TARGETS += lib/libmtd.a
+-TARGETS += ubi-utils/libubi.a
+ 
+ OBJDEPS = $(BUILDDIR)/include/version.h
+ 
+@@ -61,12 +46,9 @@ endif
+ 	rm -f $(BUILDDIR)/include/version.h
+ 	$(MAKE) -C $(TESTS) clean
+ 
+-install:: $(addprefix $(BUILDDIR)/,${BINS}) ${SCRIPTS}
++install:: $(addprefix $(BUILDDIR)/,${BINS})
+ 	mkdir -p ${DESTDIR}/${SBINDIR}
+ 	install -m 0755 $^ ${DESTDIR}/${SBINDIR}/
+-	mkdir -p ${DESTDIR}/${MANDIR}/man1
+-	install -m 0644 mkfs.jffs2.1 ${DESTDIR}/${MANDIR}/man1/
+-	-gzip -9f ${DESTDIR}/${MANDIR}/man1/*.1
+ 
+ tests::
+ 	$(MAKE) -C $(TESTS)
+@@ -91,8 +73,6 @@ LDLIBS_mkfs.jffs2  = -lz $(LZOLDLIBS)
+ LDFLAGS_jffs2reader = $(ZLIBLDFLAGS) $(LZOLDFLAGS)
+ LDLIBS_jffs2reader  = -lz $(LZOLDLIBS)
+ 
+-$(foreach v,$(MTD_BINS),$(eval $(call mkdep,,$(v))))
+-
+ #
+ # Common libmtd
+ #
+-- 
+1.9.1
+

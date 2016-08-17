@@ -1,0 +1,10 @@
+[Unit]
+Description=Advanced TFTP Server
+After=syslog.target network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/sbin/atftpd --daemon --port 69
+
+[Install]
+WantedBy=multi-user.target

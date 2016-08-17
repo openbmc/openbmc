@@ -1,0 +1,11 @@
+--- opensaf-4.5.0.orig/Makefile.am	2014-12-31 14:45:54.088797989 +0800
++++ opensaf-4.5.0/Makefile.am	2014-12-31 14:45:08.328796688 +0800
+@@ -219,7 +219,7 @@ install-data-local:
+ 	$(mkinstalldirs) $(DESTDIR)$(pkgpiddir)
+ 	$(mkinstalldirs) $(DESTDIR)$(lockdir)
+ 	$(mkinstalldirs) $(DESTDIR)$(pkglocalstatedir)
+-	cp -R samples/ $(DESTDIR)$(pkgdatadir)
++	cp -R $(srcdir)/samples/ $(DESTDIR)$(pkgdatadir)
+ 
+ install-data-hook:
+ 	@for i in $$(grep -lr -e 'xxLIBDIRxx' -e 'xxLOGDIRxx' -e 'xxCLCCLIDIRxx' $(DESTDIR)$(pkgimmxml_svcdir)/*.xml) ; do \

@@ -1,0 +1,16 @@
+
+#
+# Patch managed by http://www.mn-logistik.de/unsupported/pxa250/patcher
+#
+
+--- tools/mconsole/Makefile~fix-ldflags	2003-02-08 05:10:08.000000000 +0100
++++ tools/mconsole/Makefile	2004-04-01 15:37:37.000000000 +0200
+@@ -7,7 +7,7 @@
+ all : $(BIN)
+ 
+ $(BIN) : $(OBJS)
+-	$(CC) $(CFLAGS) -o $(BIN) $(OBJS) -lreadline -lncurses
++	$(CC) $(CFLAGS) -o $(BIN) $(OBJS) $(LDFLAGS) -lreadline -lncurses
+ 
+ clean : 
+ 	rm -f $(BIN) $(OBJS) *~

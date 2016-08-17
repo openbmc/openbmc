@@ -1,0 +1,13 @@
+--- a/configure.in.orig	2014-05-10 14:35:39.859147385 +0000
++++ b/configure.in	2014-05-10 14:36:20.282925184 +0000
+@@ -554,8 +554,8 @@
+ 	dnl make sure package configurator (xft-config or pkg-config
+ 	dnl says that xft is present.
+ 	    found_xft=yes
+-	    XFT_CFLAGS=`pkg-config --cflags xft 2>/dev/null` || found_xft="no"
+-	    XFT_LIBS=`pkg-config --libs xft 2>/dev/null` || found_xft="no"
++	    XFT_CFLAGS=`pkg-config --cflags xft fontconfig 2>/dev/null` || found_xft="no"
++	    XFT_LIBS=`pkg-config --libs xft fontconfig 2>/dev/null` || found_xft="no"
+ 	AC_MSG_RESULT([$found_xft])
+ 	dnl make sure that compiling against Xft header file doesn't bomb
+ 	if test "$found_xft" = "yes" ; then

@@ -1,0 +1,76 @@
+#!/usr/bin/perl -w
+#
+# update_slim_wmlist, based on:
+# update_wdm_wmlist, (c) 1998 Marcelo Magallón <mmagallo@debian.org>
+# rewriten to use the x-window-manager alternative
+# modified to also use the x-session-manager alternative by Arthur Korn
+# Copyright 2000 Wichert Akkerman <wakkerma@debian.org>
+# Modified to use the freedesktop.org .desktop like kdm and gdm
+#
+# This script will read the list of installed window managers from
+# the freedesktop .desktop files in <etc>/X11/sessions/:<etc>/dm/Sessions/:
+# <share>/xsessions/
+# and update the sessions line in /etc/slim.conf.
+# BEWARE: It doesn't ask any questions about this. It just does it. It
+# takes an optional list of window managers.
+
+use strict;
+use File::DesktopEntry;
+
+my $wm_list='';
+my %desktop_files;
+
+unless (@ARGV) {
+    #my @wm_list = ('default');
+    my @wm_list;
+    foreach my $dir ('/etc/X11/sessions/','/etc/dm/Sessions/','/usr/share/xsessions/') {
+	    next unless (opendir DIR, $dir);
+	    my @files;
+	    @files = grep { /\.desktop$/ && -r "$dir/$_" } readdir(DIR);
+	    foreach my $file (@files) {
+		   push @{$desktop_files{$file}}, "$dir/$file";
+	    }
+    }
+    DESKTOP: foreach my $desktop_file (keys(%desktop_files)) {
+	    foreach my $file (@{$desktop_files{$desktop_file}}) {
+		    my $entry = File::DesktopEntry->new_from_file($file);
+		    next DESKTOP if (defined($entry->get_value('Hidden'))
+			and $entry->get_value('Hidden') eq 'true');
+		    if ($entry->get_value('Name') =~ /^gnome$/i) {
+			    push (@wm_list, 'gnome');
+		    }
+		    elsif ($entry->get_value('Name') =~ /^kde$/i) {
+			    push (@wm_list, 'kde');
+		    }
+		    elsif (defined($entry->get_value('Exec'))) {
+			    push (@wm_list, $entry->get_value('Exec'));
+		    }
+		    else { # not found, go to next file
+			    next;
+		    }
+		    # found, proceed to next destop file
+		    next DESKTOP;
+	    }
+    }
+   $wm_list = join (',', sort @wm_list) . ',custom';
+} else {
+    $wm_list = join (',', sort @ARGV);
+}
+
+open (SLIM_CONFIG_FILE, '</etc/slim.conf')
+    or die "Can't open /etc/slim.conf for reading: $!";
+open (NEW_SLIM_CONFIG_FILE, '>/etc/slim.conf.new')
+    or die "Can't open /etc/slim.conf.new for writing: $!";
+
+while (<SLIM_CONFIG_FILE>) {
+    s|^(sessions\s*).*|$1$wm_list|;
+    print NEW_SLIM_CONFIG_FILE;
+}
+
+close(SLIM_CONFIG_FILE);
+close(NEW_SLIM_CONFIG_FILE);
+
+rename '/etc/slim.conf.new', '/etc/slim.conf'
+    or die "Can't rename /etc/slim.conf.new: $!";
+
+exit 0;

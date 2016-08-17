@@ -1,0 +1,2 @@
+# <type> <owner> <group> <mode> <path> <linksource>
+d squid squid 0755 /var/run/squid none

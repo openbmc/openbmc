@@ -1,0 +1,25 @@
+From 6f04699d5d417122b67e8118fd1955c769f17e76 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Tue, 2 Sep 2014 00:11:05 -0700
+Subject: [PATCH] ajaxterm/ajaxterm/qweb.py: fix hardcode of python2.3
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ ajaxterm/ajaxterm/qweb.py |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ajaxterm/ajaxterm/qweb.py b/ajaxterm/ajaxterm/qweb.py
+index 20c5092..c658a6b 100644
+--- a/ajaxterm/ajaxterm/qweb.py
++++ b/ajaxterm/ajaxterm/qweb.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python2.3
++#!/usr/bin/env python
+ #
+ # vim:set et ts=4 fdc=0 fdn=2 fdl=0:
+ #
+-- 
+1.7.9.5
+

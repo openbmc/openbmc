@@ -1,0 +1,100 @@
+#!/bin/sh
+#
+# skeleton        example file to build /etc/init.d/ scripts.
+#                This file should be used to construct scripts for /etc/init.d.
+#
+#                Written by Miquel van Smoorenburg <miquels@cistron.nl>.
+#                Modified for Debian GNU/Linux
+#                by Ian Murdock <imurdock@gnu.ai.mit.edu>.
+#
+# Version:        @(#)skeleton  1.8  03-Mar-1998  miquels@cistron.nl
+#
+
+### BEGIN INIT INFO
+# Provides:          hddtemp
+# Required-Start:    $remote_fs $syslog $network
+# Required-Stop:     $remote_fs $syslog $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: disk temperature monitoring daemon
+# Description:       hddtemp is a disk temperature monitoring daemon
+### END INIT INFO
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+NAME=hddtemp
+DAEMON=/usr/sbin/$NAME
+DESC="disk temperature monitoring daemon"
+
+DISKS="/dev/hd[a-z] /dev/hd[a-z][a-z]"
+DISKS="$DISKS /dev/sd[a-z] /dev/sd[a-z][a-z]"
+DISKS="$DISKS /dev/sr[a-z] /dev/sr[a-z][a-z]"
+INTERFACE="0.0.0.0"
+PORT="7634"
+SEPARATOR="|"
+RUN_SYSLOG="0"
+
+# Reads config file (will override defaults above)
+[ -r /etc/default/hddtemp ] && . /etc/default/hddtemp
+
+if [ -n "$RUN_SYSLOG" ] && [ "$RUN_SYSLOG" != "0" ] ; then
+  SYSLOG_ARG="-S $RUN_SYSLOG"
+fi
+
+if [ "$RUN_DAEMON" = "true" ] || [ "$RUN_DAEMON" = "yes" ] ; then
+  DAEMON_ARG="-d -l $INTERFACE -p $PORT -s $SEPARATOR"
+fi
+
+[ -x "$DAEMON" ] || exit 0
+
+. /lib/lsb/init-functions
+
+case "$1" in
+  start)
+    # master switch
+    if [ -n "$DAEMON_ARG" ] || [ -n "$SYSLOG_ARG" ] ; then
+      log_daemon_msg "Starting $DESC" "$NAME:"
+      CDROMS_LIST=$(sed -ne 's/^drive name:\t\+\(.*\)$/ \/dev\/\1/p' /proc/sys/dev/cdrom/info 2>/dev/null) || :
+      CDROMS_LIST="$CDROMS_LIST $(grep -sl '^ide-scsi ' /proc/ide/hd*/driver | awk -F / '{ print "/dev/"$4 }')"
+      for disk in $DISKS ; do
+        echo $CDROMS_LIST | grep -wq $disk && continue
+        echo $DISKS_NOPROBE | grep -wq $disk && continue
+        if $DAEMON -wn $OPTIONS $disk 2>/dev/null | grep -q '^[0-9]\+$' ; then
+          DISKS_LIST="$DISKS_LIST $disk";
+        fi
+      done
+      if [ -n "$DISKS_LIST" ] || [ -n "$DISKS_NOPROBE" ] ; then
+        start-stop-daemon --start --quiet --exec $DAEMON -- $DAEMON_ARG $SYSLOG_ARG $OPTIONS $DISKS_NOPROBE $DISKS_LIST
+        ret=$?
+        log_progress_msg "$DISKS_NOPROBE$DISKS_LIST"
+        log_end_msg $ret
+      else
+        log_progress_msg "no disks with monitoring capability were found."
+        log_end_msg 0
+      fi
+    fi
+    ;;
+  stop)
+    # master switch
+    if [ "$RUN_DAEMON" = "true" ] || [ "$RUN_DAEMON" = "yes" ] || [ "$RUN_SYSLOG" != "0" ] ; then
+      log_daemon_msg "Stopping $DESC" "$NAME"
+      start-stop-daemon --stop --oknodo --exec $DAEMON --retry 30
+      log_end_msg $?
+    fi
+    ;;
+  force-reload|reload)
+    exit 3
+    ;;
+  restart)
+    $0 stop && $0 start
+    ;;
+  status)
+    status_of_proc $DAEMON $NAME
+    exit $?
+    ;;
+  *)
+    echo "Usage: /etc/init.d/$NAME {start|stop|restart|status}" >&2
+    exit 1
+    ;;
+esac
+
+exit 0

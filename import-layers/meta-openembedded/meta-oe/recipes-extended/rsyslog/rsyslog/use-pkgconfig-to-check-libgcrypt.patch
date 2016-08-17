@@ -1,0 +1,48 @@
+From 5c3ba79177f7d1763db33c4358af2af60ff214b7 Mon Sep 17 00:00:00 2001
+From: Roy Li <rongqing.li@windriver.com> 
+Date: Wed, 18 Jun 2014 13:46:52 +0800
+Subject: [PATCH] use pkgconfig to check libgcrypt
+
+Upstream-status: Inappropriate [configuration]
+
+libgcrypt does no longer provide libgcrypt-config, and provide
+*.pc, so we should use pkgconfig to check
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ configure.ac |   19 +------------------
+ 1 file changed, 1 insertion(+), 18 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 017116e..1b880f8 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -784,24 +784,7 @@ AC_ARG_ENABLE(libgcrypt,
+         [enable_libgcrypt=yes]
+ )
+ if test "x$enable_libgcrypt" = "xyes"; then
+-        AC_CHECK_PROG(
+-      	    [HAVE_LIBGCRYPT_CONFIG],
+-            [libgcrypt-config],
+-            [yes],,,
+-            )
+-        if test "x${HAVE_LIBGCRYPT_CONFIG}" != "xyes"; then
+-           AC_MSG_FAILURE([libgcrypt-config not found in PATH])
+-        fi
+-        AC_CHECK_LIB(
+-		[gcrypt],
+-        	[gcry_cipher_open],
+-        	[LIBGCRYPT_CFLAGS="`libgcrypt-config --cflags`"
+-        	LIBGCRYPT_LIBS="`libgcrypt-config --libs`"
+-        	],
+-        	[AC_MSG_FAILURE([libgcrypt is missing])],
+-        	[`libgcrypt-config --libs --cflags`]
+-        	)
+-	AC_DEFINE([ENABLE_LIBGCRYPT], [1], [Indicator that LIBGCRYPT is present])
++	PKG_CHECK_MODULES(LIBGCRYPT, libgcrypt)
+ fi
+ AM_CONDITIONAL(ENABLE_LIBGCRYPT, test x$enable_libgcrypt = xyes)
+ AC_SUBST(LIBGCRYPT_CFLAGS)
+-- 
+1.7.9.5
+

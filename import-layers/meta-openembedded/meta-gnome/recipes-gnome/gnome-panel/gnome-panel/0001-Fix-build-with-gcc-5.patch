@@ -1,0 +1,35 @@
+From 20810fcf329c6e0b48b8e7602565ccc70c7ce62b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 10 May 2015 02:10:59 -0700
+Subject: [PATCH] Fix build with gcc 5
+
+cc1: error: ../../gnome-panel/libpanel-applets-private: No such file or
+directory [-Werror=missing-include-dirs]
+cc1: error: ../../gnome-panel/libpanel-applets-private: No such file or
+directory [-Werror=missing-include-dirs]
+cc1: error: ../../gnome-panel/libpanel-applets-private: No such file or
+directory [-Werror=missing-include-dirs]
+cc1: some warnings being treated as errors
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ gnome-panel/libpanel-applet-private/Makefile.am | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/gnome-panel/libpanel-applet-private/Makefile.am b/gnome-panel/libpanel-applet-private/Makefile.am
+index f12dee8..d556f12 100644
+--- a/gnome-panel/libpanel-applet-private/Makefile.am
++++ b/gnome-panel/libpanel-applet-private/Makefile.am
+@@ -8,7 +8,6 @@ AM_CPPFLAGS =							\
+ 	-I$(srcdir)						\
+ 	-I$(top_srcdir)/gnome-panel				\
+ 	-I$(top_builddir)/gnome-panel				\
+-	-I$(top_builddir)/gnome-panel/libpanel-applets-private	\
+ 	-I$(top_builddir)/gnome-panel/libpanel-util		\
+ 	-DDATADIR=\""$(datadir)"\"				\
+ 	-DPANEL_APPLETS_DIR=\"$(appletsdir)\"			\
+-- 
+2.1.4
+

@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN" "http://standards.freedesktop.org/menu-spec/menu-1.0.dtd">
+<Menu>
+  <Name>Applications</Name>
+  <!--   <Directory>Applications.directory</Directory> -->
+
+  <!-- Read standard .directory and .desktop file locations -->
+  <DefaultAppDirs>/usr/share/applications</DefaultAppDirs>
+  <DefaultDirectoryDirs/>
+
+  <Menu>
+    <Name>Office</Name>
+    <Directory>Office.directory</Directory>
+    <Include>
+      <And>
+        <Category>Office</Category>
+      </And>
+    </Include>
+  </Menu>
+  
+  <Menu>
+    <Name>Multimedia</Name>
+    <Directory>Multimedia.directory</Directory>
+    <Include>
+      <And>
+        <Category>AudioVideo</Category>
+      </And>
+    </Include>
+  </Menu>
+
+  <Menu>
+    <Name>Graphics</Name>
+    <Directory>Graphics.directory</Directory>
+    <Include>
+      <And>
+        <Category>Graphics</Category>
+      </And>
+    </Include>
+  </Menu>
+
+  <Menu>
+    <Name>Games</Name>
+    <Directory>Games.directory</Directory>
+    <Include>
+      <And>
+        <Or>
+         <Category>Game</Category>
+         <Category>Games</Category>
+        </Or>
+      </And>
+    </Include>
+  </Menu>
+
+  <Menu>
+    <Name>Internet</Name>
+    <Directory>Internet.directory</Directory>
+    <Include>
+      <And>
+        <Or>
+         <Category>Internet</Category>
+         <Category>Network</Category>
+        </Or>
+      </And>
+    </Include>
+  </Menu>
+
+  <Menu>
+    <Name>Settings</Name>
+    <Directory>Settings.directory</Directory>
+    <Include>
+      <And>
+        <Or>
+          <Category>SystemSettings</Category>
+          <Category>Settings</Category>
+        </Or>
+        <Not>
+          <Category>System</Category>
+        </Not>
+      </And>
+    </Include>
+  </Menu>
+
+  <Menu>
+    <Name>Accessories</Name>
+    <Directory>Accessories.directory</Directory>
+    <Include>
+      <And>
+        <Or>
+          <Category>Applications</Category>
+          <Category>Utility</Category>
+        </Or>
+        <Not>
+          <Category>System</Category>
+          <Category>Office</Category>
+          <Category>Internet</Category>
+          <Category>AudioVideo</Category>
+          <Category>Graphics</Category>
+          <Category>Games</Category>
+        </Not>
+      </And>
+    </Include>
+  </Menu>
+  
+</Menu>
+

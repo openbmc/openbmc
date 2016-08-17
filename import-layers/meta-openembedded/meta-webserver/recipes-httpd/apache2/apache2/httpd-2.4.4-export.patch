@@ -1,0 +1,22 @@
+
+There is no need to "suck in" the apr/apr-util symbols when using
+a shared libapr{,util}, it just bloats the symbol table; so don't.
+
+Upstream-HEAD: needed
+Upstream-2.0: omit
+Upstream-Status: Pending
+
+Note: EXPORT_DIRS change is conditional on using shared apr
+
+--- httpd-2.4.4/server/Makefile.in.export
++++ httpd-2.4.4/server/Makefile.in
+@@ -57,9 +57,6 @@ export_files:
+ 	( for dir in $(EXPORT_DIRS); do \
+ 	      ls $$dir/*.h ; \
+ 	  done; \
+-	  for dir in $(EXPORT_DIRS_APR); do \
+-	      ls $$dir/ap[ru].h $$dir/ap[ru]_*.h 2>/dev/null; \
+-	  done; \
+ 	) | sed -e s,//,/,g | sort -u > $@
+ 
+ exports.c: export_files

@@ -1,0 +1,50 @@
+configure.ac: add option --enable-thread-tls to manage thread ssl support
+
+Add option --enable-thread-tls to manage the including of thread
+local storage, so we could explicitly disable it.
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.ac | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 474e094..cedca54 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -120,6 +120,9 @@ AC_ARG_ENABLE(memtrace,
+ AC_ARG_ENABLE(ssl,
+               [  --enable-ssl        Enable SSL support.],,enable_ssl="auto")
+ 
++AC_ARG_ENABLE(thread-tls,
++              [  --enable-thread-tls        Enable Thread Transport Layer Security support.],,enable_thread_tls="no")
++
+ AC_ARG_ENABLE(dynamic-linking,
+               [  --enable-dynamic-linking        Link everything dynamically.],,enable_dynamic_linking="auto")
+ 
+@@ -381,12 +384,14 @@ dnl ***************************************************************************
+ dnl Is the __thread keyword available?
+ dnl ***************************************************************************
+ 
+-AC_LINK_IFELSE([AC_LANG_PROGRAM(
+-[[#include <pthread.h>
+-__thread int a;
+-]],
+-[a=0;])],
+-[ac_cv_have_tls=yes; AC_DEFINE_UNQUOTED(HAVE_THREAD_KEYWORD, 1, "Whether Transport Layer Security is supported by the system")])
++if test "x$enable_thread_tls" != "xno"; then
++    AC_LINK_IFELSE([AC_LANG_PROGRAM(
++    [[#include <pthread.h>
++    __thread int a;
++    ]],
++    [a=0;])],
++    [ac_cv_have_tls=yes; AC_DEFINE_UNQUOTED(HAVE_THREAD_KEYWORD, 1, "Whether Transport Layer Security is supported by the system")])
++fi
+ 
+ dnl ***************************************************************************
+ dnl How to do static linking?
+-- 
+1.9.1
+

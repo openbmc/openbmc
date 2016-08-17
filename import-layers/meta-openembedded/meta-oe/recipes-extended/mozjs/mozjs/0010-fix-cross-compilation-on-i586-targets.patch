@@ -1,0 +1,46 @@
+From a452138a1dd274bfad381a701729783360dc86fb Mon Sep 17 00:00:00 2001
+From: Maciej Borzecki <maciej.borzecki@open-rnd.pl>
+Date: Tue, 5 Jan 2016 22:04:17 +0100
+Subject: [PATCH] fix cross compilation on i586 targets
+
+Remove offending -Wl,-rpath-link that may cause host libraries to be picked
+during linking. The patch applies a fix to configure.in. So as not to
+regenerate configure, similar fix is applied there.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Maciej Borzecki <maciej.borzecki@open-rnd.pl>
+---
+ js/src/configure    | 2 +-
+ js/src/configure.in | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/js/src/configure b/js/src/configure
+index d019b0fdba44233596541de94307010d85a8e32e..5aa40f757a3dbb7d6887175046f44212c15c2eac 100755
+--- a/js/src/configure
++++ b/js/src/configure
+@@ -5555,7 +5555,7 @@ TARGET_MD_ARCH=unix
+ DIRENT_INO=d_ino
+ MOZ_USER_DIR=".mozilla"
+ 
+-MOZ_FIX_LINK_PATHS='-Wl,-rpath-link,$(LIBXUL_DIST)/bin -Wl,-rpath-link,$(prefix)/lib'
++MOZ_FIX_LINK_PATHS='-Wl,-rpath-link,$(LIBXUL_DIST)/bin'
+ 
+ MOZ_COMPONENT_NSPR_LIBS='-L$(LIBXUL_DIST)/bin $(NSPR_LIBS)'
+ 
+diff --git a/js/src/configure.in b/js/src/configure.in
+index 0673aca12f6d83035549ade2a4a83906bf91f0f0..39b22724f9535ac1a6dba04658c91e4ef667fc47 100644
+--- a/js/src/configure.in
++++ b/js/src/configure.in
+@@ -919,7 +919,7 @@ TARGET_MD_ARCH=unix
+ DIRENT_INO=d_ino
+ MOZ_USER_DIR=".mozilla"
+ 
+-MOZ_FIX_LINK_PATHS='-Wl,-rpath-link,$(LIBXUL_DIST)/bin -Wl,-rpath-link,$(prefix)/lib'
++MOZ_FIX_LINK_PATHS='-Wl,-rpath-link,$(LIBXUL_DIST)/bin'
+ 
+ MOZ_COMPONENT_NSPR_LIBS='-L$(LIBXUL_DIST)/bin $(NSPR_LIBS)'
+ 
+-- 
+2.5.0
+

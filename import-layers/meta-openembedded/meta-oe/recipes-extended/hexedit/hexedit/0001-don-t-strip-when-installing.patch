@@ -1,0 +1,30 @@
+From cc67246ca6839e5b3f6a286f10ed24c225b77a5e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Eric=20B=C3=A9nard?= <eric@eukrea.com>
+Date: Thu, 4 Jul 2013 12:34:32 +0200
+Subject: [PATCH] don't strip when installing
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Eric Bénard <eric@eukrea.com>
+
+Upstream-Status: Inappropriate [configuration]
+---
+ Makefile.in |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 159463e..735cc72 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -42,6 +42,6 @@ distclean: clean
+ 
+ install: $(PRODUCT)
+ 	$(INSTALL) -d -m 755 $(DESTDIR)$(bindir)
+-	$(INSTALL) -s -m 755 $(PRODUCT) $(DESTDIR)$(bindir)
++	$(INSTALL) -m 755 $(PRODUCT) $(DESTDIR)$(bindir)
+ 	$(INSTALL) -d -m 755 $(DESTDIR)$(mandir)/man1
+ 	$(INSTALL) -m 644 $(PRODUCT).1 $(DESTDIR)$(mandir)/man1
+-- 
+1.7.10.4
+

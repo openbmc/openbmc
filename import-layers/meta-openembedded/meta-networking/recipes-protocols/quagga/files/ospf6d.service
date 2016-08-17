@@ -1,0 +1,16 @@
+[Unit]
+Description=OSPF routing daemon for IPv6
+BindTo=zebra.service
+After=zebra.service
+ConditionPathExists=@SYSCONFDIR@/quagga/ospf6d.conf
+
+[Service]
+Type=forking
+EnvironmentFile=-@SYSCONFDIR@/default/quagga
+PIDFile=@localstatedir@/run/quagga/ospf6d.pid
+ExecStart=@SBINDIR@/ospf6d -d $ospf6d_options -f @SYSCONFDIR@/quagga/ospf6d.conf
+ExecStopPost=@base_bindir@/rm -rf @localstatedir@/run/quagga/ospf6d.pid
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target

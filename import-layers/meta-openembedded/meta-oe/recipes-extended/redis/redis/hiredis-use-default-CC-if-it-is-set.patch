@@ -1,0 +1,30 @@
+From dc745a33f3875cc72d41bd34ed490b352e546352 Mon Sep 17 00:00:00 2001
+From: Venture Research <tech@ventureresearch.com>
+Date: Fri, 8 Feb 2013 17:39:52 -0600
+Subject: [PATCH] hiredis: use default CC if it is set
+
+Instead of trying to automagically figure out CC, which breaks with OE
+as CC has spaces in it, just skip it if one was already passed in.
+
+Signed-off-by: Venture Research <tech@ventureresearch.com>
+
+Update to work with 3.0.x
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+---
+ deps/hiredis/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: deps/hiredis/Makefile
+===================================================================
+--- a/deps/hiredis/Makefile
++++ b/deps/hiredis/Makefile
+@@ -24,7 +24,7 @@ endef
+ export REDIS_TEST_CONFIG
+ 
+ # Fallback to gcc when $CC is not in $PATH.
+-CC:=$(shell sh -c 'type $(CC) >/dev/null 2>/dev/null && echo $(CC) || echo gcc')
++CC?=$(shell sh -c 'type $(CC) >/dev/null 2>/dev/null && echo $(CC) || echo gcc')
+ OPTIMIZATION?=-O3
+ WARNINGS=-Wall -W -Wstrict-prototypes -Wwrite-strings
+ DEBUG?= -g -ggdb

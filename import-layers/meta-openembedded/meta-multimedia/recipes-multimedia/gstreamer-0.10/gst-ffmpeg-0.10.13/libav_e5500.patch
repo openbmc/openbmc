@@ -1,0 +1,19 @@
+libav: Add configs for ppc e5500
+
+Upstream-Status: Pending
+
+Signed-off-by: Jesse Zhang <sen.zhang@windriver.com>
+
+--- gst-ffmpeg-0.10.13/gst-libs/ext/libav/configure	2013-06-20 05:18:36.073104964 -0400
++++ gst-ffmpeg-0.10.13/gst-libs/ext/libav/configure	2013-06-20 05:18:38.269104150 -0400
+@@ -2222,6 +2222,10 @@
+             cpuflags="-mcpu=8540 -mhard-float"
+             disable altivec
+         ;;
++        e5500)
++            cpuflags="-mcpu=e5500 -mhard-float"
++            disable altivec
++        ;;
+     esac
+ 
+ elif enabled x86; then

@@ -1,0 +1,92 @@
+Uptream-Status: Pending
+
+Signed-off-by: Zongchun Yu <Zongchun.Yu@freescale.com>
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -402,7 +402,6 @@
+ 
+ dnl 0.9.6 (which is still thinks it is 0.9.5 due to a bug) introduces an important
+ dnl fix for OSX.  See: http://tcpreplay.synfin.net/trac/ticket/167
+-libpcap_version_096=no
+ AC_RUN_IFELSE(AC_LANG_PROGRAM([[
+ #include <string.h>
+ #include <stdlib.h>
+@@ -419,11 +418,12 @@
+             exit(0);
+ 
+     exit(1);
+-]]), [
+-    libpcap_version_096=yes
+-])
++]]),
++ [libpcap_version_096=yes],
++ [libpcap_version_096=no],
++ [libpcap_version_096=yes]
++)
+ 
+-libpcap_ver8=no
+ AC_RUN_IFELSE(AC_LANG_PROGRAM([[
+ #include <string.h>
+ #include <stdlib.h>
+@@ -444,13 +444,12 @@
+         exit(0);
+ 
+     exit(1);
+-]]), [
+-    libpcap_ver8=yes
+-], [
+-    libpcap_ver8=no
+-])
++]]),
++ [libpcap_ver8=yes],
++ [libpcap_ver8=no],
++ [libpcap_ver8=yes]
++)
+ 
+-libpcap_ver7=no
+ AC_RUN_IFELSE(AC_LANG_PROGRAM([[
+ #include <string.h>
+ #include <stdlib.h>
+@@ -469,11 +468,11 @@
+             exit(0);
+ 
+     exit(1);
+-]]), [
+-    libpcap_ver7=yes
+-], [
+-    libpcap_ver7=no
+-])
++]]),
++ [libpcap_ver7=yes],
++ [libpcap_ver7=no],
++ [libpcap_ver7=yes]
++)
+ 
+ if test x$libpcap_ver8 = xyes ; then
+     AC_MSG_RESULT(>= 0.8.0)
+@@ -761,8 +760,8 @@
+ 
+ have_bpf=no
+ dnl Check for BSD's BPF
+-AC_MSG_CHECKING(for BPF device sending support)
+-AC_TRY_RUN([
++AC_CACHE_CHECK([for BPF device sending support], ac_cv_have_bpf,
++[AC_TRY_RUN([
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <sys/types.h>
+@@ -796,8 +795,11 @@
+             [Do we have BPF device support?])
+     AC_MSG_RESULT(yes)
+     have_bpf=yes
+-],[
+-    AC_MSG_RESULT(no)
++],
++[AC_MSG_RESULT(no)],
++[AC_MSG_ERROR([cross-compiling,
++  presetting ac_cv_have_bpf=(yes|no) will help])]
++)
+ ])
+ 
+ 

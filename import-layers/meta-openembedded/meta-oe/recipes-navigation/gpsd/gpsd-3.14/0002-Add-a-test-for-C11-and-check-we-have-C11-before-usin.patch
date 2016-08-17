@@ -1,0 +1,57 @@
+From 99444b3d2c4a4f7fd7128e60461005780d0c5c83 Mon Sep 17 00:00:00 2001
+From: "Gary E. Miller" <gem@rellim.com>
+Date: Sun, 15 Mar 2015 12:05:15 -0700
+Subject: [PATCH 2/3] Add a test for C11 and check we have C11 before using
+ stdatomic.h
+
+---
+ SConstruct | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/SConstruct b/SConstruct
+index 566c14a..faa8651 100644
+--- a/SConstruct
++++ b/SConstruct
+@@ -473,6 +473,20 @@ def CheckCompilerDefines(context, define):
+     context.Result(ret)
+     return ret
+ 
++# Check if this compiler is C11 or better
++def CheckC11(context):
++    context.Message( 'Checking if compiler is C11 ...' )
++    ret = context.TryLink("""
++	#if (__STDC_VERSION__ < 201112L) 
++        #error Not C11
++        #endif
++        int main(int argc, char **argv) {
++            return 0;
++        }
++    """,'.c')
++    context.Result(ret)
++    return ret
++
+ def GetLoadPath(context):
+     context.Message("Getting system load path ...")
+ 
+@@ -491,6 +505,7 @@ else:
+                                              'CheckXsltproc' : CheckXsltproc,
+                                              'CheckCompilerOption' : CheckCompilerOption,
+                                              'CheckCompilerDefines' : CheckCompilerDefines,
++                                             'CheckC11' : CheckC11,
+                                              'CheckHeaderDefines' : CheckHeaderDefines})
+ 
+ 
+@@ -633,7 +648,9 @@ else:
+         announce("You do not have kernel CANbus available.")
+         env["nmea2000"] = False
+ 
+-    if not config.CheckCompilerDefines("__STDC_NO_ATOMICS__") and config.CheckHeader("stdatomic.h"):
++    # check for C11 or better, and __STDC__NO_ATOMICS__ is no defined
++    # before looking for stdatomic.h
++    if not config.CheckC11() and  not config.CheckCompilerDefines("__STDC_NO_ATOMICS__") and config.CheckHeader("stdatomic.h"):
+         confdefs.append("#define HAVE_STDATOMIC_H 1\n")
+     else:
+ 	confdefs.append("/* #undef HAVE_STDATOMIC_H */\n")
+-- 
+2.1.0
+

@@ -1,0 +1,28 @@
+configure.ac: don't use xml-config if --with-libxml-prefix is specified to configure
+
+Same behavior for xslt-config.
+
+diff --git a/configure.ac b/configure.ac
+index ed04e0c..39d5d4c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -40,7 +40,8 @@ AC_ARG_PROGRAM          dnl Transforming Program Names When Installing
+ AC_PROG_SED
+ AC_PROG_AWK
+ 
+-XSTAR_LIB_CHECK([LIBXML], [xml2-config])
++AS_IF([test "x$LIBXML_PREFIX" = x],
++      [XSTAR_LIB_CHECK([LIBXML], [xml2-config])])
+ 
+ AS_IF([test "x$LIBXML_SRCDIR" != x],
+       [LIBXML_INCDIR="$LIBXML_SRCDIR/include"])
+@@ -56,7 +57,8 @@ AS_IF([test "x$STATIC_LIBS" != xno],
+ [LIBXML_LDFLAGS="-L$LIBXML_LIBDIR"]
+ 
+ 
+-XSTAR_LIB_CHECK([LIBXSLT], [xslt-config])
++AS_IF([test "x$LIBXSLT_PREFIX" = x],
++      [XSTAR_LIB_CHECK([LIBXSLT], [xslt-config])])
+ 
+ AS_IF([test "x$LIBXSLT_SRCDIR" != x],
+       [XSLTPROC_PATH="$LIBXSLT_SRCDIR/xsltproc:$PATH"

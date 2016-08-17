@@ -1,0 +1,20 @@
+fix the compile error do to perl update
+
+Upstream-status: Inappropriate
+
+
+Signed-of-by: Armin Kuster <akuster808@gmail.com>
+
+Index: src/config/milestone.pl
+===================================================================
+--- src.orig/config/milestone.pl
++++ src/config/milestone.pl
+@@ -55,7 +55,7 @@ $MILESTONE_FILE  = "$TOPSRCDIR/config/mi
+ #
+ my $milestone = Moz::Milestone::getOfficialMilestone($MILESTONE_FILE);
+ 
+-if (defined(@TEMPLATE_FILE)) {
++if (@TEMPLATE_FILE) {
+   my $TFILE;
+ 
+   foreach $TFILE (@TEMPLATE_FILE) {

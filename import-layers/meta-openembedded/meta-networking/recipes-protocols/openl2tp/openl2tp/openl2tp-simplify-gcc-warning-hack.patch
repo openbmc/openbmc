@@ -1,0 +1,41 @@
+From 460549a3de27f8dd8371b6d6fc1f69d8bffa102b Mon Sep 17 00:00:00 2001
+From: Joe MacDonald <joe_macdonald@mentor.com>
+Date: Tue, 6 Jan 2015 11:23:21 -0500
+Subject: [PATCH] openl2tp: simplify gcc warning hack
+
+The hack to work around the gcc warning causes problems with some modern
+gcc configurations.  Since the redef behaviour is essentially correct
+everywhere and since the hack is still required on 32-bit builders, leave
+it in place but remove the #if guard since it is only there to ensure that
+the l2tp_private.h file is updated if the rpc source file is changed and
+the two get out of sync.
+
+Upstream-status: pending
+
+Signed-off-by: Joe MacDonald <joe_macdonald@mentor.com>
+---
+ l2tp_private.h | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/l2tp_private.h b/l2tp_private.h
+index f3c1af7..cca6806 100644
+--- a/l2tp_private.h
++++ b/l2tp_private.h
+@@ -89,14 +89,8 @@
+  * So we redefine the constant with UL suffix to avoid the gcc warning.
+  * Is there some C preprocessor magic that could avoid having to do this?
+  */
+-#if L2TP_API_TUNNEL_FLAG_MTU != 2147483648
+-#error Constant L2TP_API_TUNNEL_FLAG_MTU changed. Update local definition here.
+-#endif
+ #undef L2TP_API_TUNNEL_FLAG_MTU
+ #define L2TP_API_TUNNEL_FLAG_MTU 2147483648UL
+-#if L2TP_API_SESSION_FLAG_NO_PPP != 2147483648
+-#error Constant L2TP_API_SESSION_FLAG_NO_PPP changed. Update local definition here.
+-#endif
+ #undef L2TP_API_SESSION_FLAG_NO_PPP
+ #define L2TP_API_SESSION_FLAG_NO_PPP 2147483648UL
+ 
+-- 
+1.9.1
+

@@ -1,0 +1,90 @@
+From 365020c5c0823c91a8011e34597f970a7cfb4fb3 Mon Sep 17 00:00:00 2001
+From: Tusa Viktor <tusavik@gmail.com>
+Date: Wed, 23 Apr 2014 17:10:58 +0000
+Subject: [PATCH] logwriter: still free the unconsumed item during reloading
+ configuration
+
+Upstream-Status: Backport
+
+Otherwise we have no chance to free this stuff.
+
+Reported-by: Xufeng Zhang <xufeng.zhang@windriver.com>
+Signed-off-by: Tusa Viktor <tusavik@gmail.com>
+Signed-off-by: Gergely Nagy <algernon@madhouse-project.org>
+---
+ lib/logproto/logproto-client.h      |    2 +-
+ lib/logproto/logproto-text-client.c |   11 +++++++++++
+ lib/logwriter.c                     |    9 +++++++--
+ 3 files changed, 19 insertions(+), 3 deletions(-)
+
+diff --git a/lib/logproto/logproto-client.h b/lib/logproto/logproto-client.h
+index 254ecf9..5adc917 100644
+--- a/lib/logproto/logproto-client.h
++++ b/lib/logproto/logproto-client.h
+@@ -47,7 +47,6 @@ void log_proto_client_options_defaults(LogProtoClientOptions *options);
+ void log_proto_client_options_init(LogProtoClientOptions *options, GlobalConfig *cfg);
+ void log_proto_client_options_destroy(LogProtoClientOptions *options);
+ 
+-
+ struct _LogProtoClient
+ {
+   LogProtoStatus status;
+@@ -107,6 +106,7 @@ log_proto_client_reset_error(LogProtoClient *s)
+ gboolean log_proto_client_validate_options(LogProtoClient *self);
+ void log_proto_client_init(LogProtoClient *s, LogTransport *transport, const LogProtoClientOptions *options);
+ void log_proto_client_free(LogProtoClient *s);
++void log_proto_client_free_method(LogProtoClient *s);
+ 
+ #define DEFINE_LOG_PROTO_CLIENT(prefix) \
+   static gpointer                                                       \
+diff --git a/lib/logproto/logproto-text-client.c b/lib/logproto/logproto-text-client.c
+index 3248759..a5100f3 100644
+--- a/lib/logproto/logproto-text-client.c
++++ b/lib/logproto/logproto-text-client.c
+@@ -146,12 +146,23 @@ log_proto_text_client_post(LogProtoClient *s, guchar *msg, gsize msg_len, gboole
+ }
+ 
+ void
++log_proto_text_client_free(LogProtoClient *s)
++{
++  LogProtoTextClient *self = (LogProtoTextClient *)s;
++  if (self->partial_free)
++    self->partial_free(self->partial);
++  self->partial = NULL;
++  log_proto_client_free_method(s);
++};
++
++void
+ log_proto_text_client_init(LogProtoTextClient *self, LogTransport *transport, const LogProtoClientOptions *options)
+ {
+   log_proto_client_init(&self->super, transport, options);
+   self->super.prepare = log_proto_text_client_prepare;
+   self->super.flush = log_proto_text_client_flush;
+   self->super.post = log_proto_text_client_post;
++  self->super.free_fn = log_proto_text_client_free;
+   self->super.transport = transport;
+   self->next_state = -1;
+ }
+diff --git a/lib/logwriter.c b/lib/logwriter.c
+index 3292e31..470bcdb 100644
+--- a/lib/logwriter.c
++++ b/lib/logwriter.c
+@@ -1063,8 +1063,13 @@ log_writer_flush(LogWriter *self, LogWriterFlushMode flush_mode)
+         }
+       else
+         {
+-          /* push back to the queue */
+-          log_queue_push_head(self->queue, lm, &path_options);
++          if (flush_mode == LW_FLUSH_QUEUE)
++            log_msg_unref(lm);
++          else
++            {
++              /* push back to the queue */
++              log_queue_push_head(self->queue, lm, &path_options);
++            }
+           msg_set_context(NULL);
+           log_msg_refcache_stop();
+           break;
+-- 
+1.7.10.4
+

@@ -1,0 +1,16 @@
+--- a/configure.in.orig	2014-05-10 15:57:18.146362110 +0200
++++ b/configure.in	2014-05-10 15:59:27.859358845 +0200
+@@ -498,10 +498,13 @@
+ AC_SUBST(FRIBIDI_CFLAGS)
+ AC_SUBST(FRIBIDI_LIBS)
+ 
++AC_ARG_ENABLE(imlib2, [  --disable-imlib2  disable imlib2 support], imlib2=$enableval;imlib2_reason="configure parameter", imlib2=yes)
++if test x"${imlib2}" = "xyes"; then
+ PKG_CHECK_MODULES(IMLIB2, [imlib2], [imlib2_pkgconfig=yes], [imlib2_pkgconfig=no])
+ if test "x$imlib2_pkgconfig" = "xyes"; then
+    AC_DEFINE(HAVE_IMLIB2, 1, [Define to 1 if you have imlib2])
+ fi
++fi
+ AC_SUBST(IMLIB2_CFLAGS)
+ AC_SUBST(IMLIB2_LIBS)
+ 

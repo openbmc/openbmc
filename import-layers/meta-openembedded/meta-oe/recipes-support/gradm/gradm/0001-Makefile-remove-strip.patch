@@ -1,0 +1,61 @@
+From fbf7b9e5a8e2978acd5b0a7a8311912a080ee9b9 Mon Sep 17 00:00:00 2001
+From: Qian Lei <qianl.fnst@cn.fujitsu.com>
+Date: Thu, 18 Dec 2014 11:09:01 +0800
+Subject: [PATCH] Makefile: remove strip
+
+Avoid QA error by removing strip from Makefile
+
+[...]
+ERROR: QA Issue: File '/sbin/gradm' from gradm was already stripped,
+this will prevent future debugging! [already-stripped]
+ERROR: QA Issue: File '/sbin/grlearn' from gradm was already stripped,
+this will prevent future debugging! [already-stripped]
+[...]
+
+Upstream-Status: Pending
+
+Signed-off-by: Qian Lei <qianl.fnst@cn.fujitsu.com>
+
+---
+ Makefile | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 6c33fee..3570a4e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -24,7 +24,6 @@ MKNOD=/bin/mknod
+ #CC=/usr/bin/diet /usr/bin/gcc
+ CC=/usr/bin/gcc
+ FIND=/usr/bin/find
+-STRIP=/usr/bin/strip
+ LIBS := $(shell if [ "`uname -m`" != "sparc64" -a "`uname -m`" != "x86_64" ]; then echo "-lfl" ; else echo "" ; fi)
+ OPT_FLAGS := -O2
+ # for older versions of grsecurity, comment the above line and uncomment the below:
+@@ -140,15 +139,12 @@ install: $(GRADM_BIN) gradm.8 policy grlearn
+ 	@mkdir -p $(DESTDIR)/sbin
+ 	@echo "Installing gradm..."
+ 	@$(INSTALL) -m 0755 $(GRADM_BIN) $(DESTDIR)/sbin
+-	@$(STRIP) $(DESTDIR)/sbin/$(GRADM_BIN)
+ 	@if [ -f $(GRADM_PAM) ] ; then \
+ 		echo "Installing gradm_pam..." ; \
+		$(INSTALL) -m 4755 $(GRADM_PAM) $(DESTDIR)/sbin ; \
+-		$(STRIP) $(DESTDIR)/sbin/$(GRADM_PAM) ; \
+ 	fi
+ 	@echo "Installing grlearn..."
+ 	@$(INSTALL) -m 0700 grlearn $(DESTDIR)/sbin
+-	@$(STRIP) $(DESTDIR)/sbin/grlearn
+ 	@mkdir -p -m 700 $(DESTDIR)$(GRSEC_DIR)
+ 	@if [ ! -f $(DESTDIR)$(GRSEC_DIR)/policy ] ; then \
+ 		if [ -f $(DESTDIR)$(GRSEC_DIR)/acl ] ; then \
+@@ -168,6 +164,7 @@ install: $(GRADM_BIN) gradm.8 policy grlearn
+ 			$(MKNOD) -m 0622 $(DESTDIR)/dev/grsec c 1 13 ; \
+ 		fi \
+ 	fi
++	@mkdir -p $(DESTDIR)/etc/udev/rules.d
+ 	@if [ -d $(DESTDIR)/etc/udev/rules.d ] ; then \
+ 		echo "ACTION!=\"add|change\", GOTO=\"permissions_end\"" > $(DESTDIR)/etc/udev/rules.d/80-grsec.rules ; \
+ 		echo "KERNEL==\"grsec\",          MODE=\"0622\"" >> $(DESTDIR)/etc/udev/rules.d/80-grsec.rules ; \
+-- 
+1.8.3.1
+

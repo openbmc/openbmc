@@ -1,0 +1,18 @@
+Use build_cc to compile the programs to run on build host
+helps with cross compiling
+
+Upstream-Status: Inappropriate [Cross-compiled OE specific]
+
+diff --git a/src/common/mathvariants/Makefile.am b/src/common/mathvariants/Makefile.am
+index 636ccf0..ed9921d 100644
+--- a/src/common/mathvariants/Makefile.am
++++ b/src/common/mathvariants/Makefile.am
+@@ -52,7 +52,7 @@ XSLTPROC = xsltproc
+ %.cc : %_gen.cc $(srcdir)/variant.top $(srcdir)/variant.bot
+ 	cat $(srcdir)/variant.top >$@
+ 	$(XSLTPROC) --novalid --param temp "false()" $(srcdir)/extract.xsl $(<:%_gen.cc=$(srcdir)/xml/%.xml) >>$@
+-	$(CXX) -o $(@:%.cc=%) -I$(top_builddir)/auto $<
++	$(BUILD_CXX) -o $(@:%.cc=%) -I$(top_builddir)/auto $<
+ 	echo "Char32 " >>$@
+ 	basename map_variant_$@ .cc | tr "-" "_" >>$@
+ 	echo "(Char32 ch)" >>$@

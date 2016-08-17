@@ -1,0 +1,47 @@
+From da172fd6234b3b2b487ab36d63da72758829cb1d Mon Sep 17 00:00:00 2001
+From: iwamatsu <iwamatsu@7c53e7cc-98ea-0310-8f1f-a0b24da60408>
+Date: Fri, 17 Jun 2011 20:35:15 +0000
+Subject: [PATCH 7/8] Fix tty slowness
+
+Signed-off-by: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
+
+git-svn-id: svn://svn.berlios.de/slim/trunk@181 7c53e7cc-98ea-0310-8f1f-a0b24da60408
+---
+ app.cpp |   10 ++++++----
+ 1 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/app.cpp b/app.cpp
+index 7177363..44ab099 100644
+--- a/app.cpp
++++ b/app.cpp
+@@ -278,21 +278,23 @@ void App::Run() {
+         signal(SIGALRM, AlarmSignal);
+ 
+ #ifndef XNEST_DEBUG
+-        OpenLog();
+-        
+         if (!force_nodaemon && cfg->getOption("daemon") == "yes") {
+             daemonmode = true;
+         }
+ 
+         // Daemonize
+         if (daemonmode) {
+-            if (daemon(0, 1) == -1) {
++            if (daemon(0, 0) == -1) {
+                 cerr << APPNAME << ": " << strerror(errno) << endl;
+                 exit(ERR_EXIT);
+             }
+-            UpdatePid();
+         }
+ 
++        OpenLog();
++
++        if (daemonmode)
++            UpdatePid();
++
+         CreateServerAuth();
+         StartServer();
+         alarm(2);
+-- 
+1.6.6.1
+

@@ -1,0 +1,31 @@
+From 9d7ce869607d123cd9837890d71f940c5ced3393 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Mon, 29 Feb 2016 07:58:20 +0100
+Subject: [PATCH] doc/Makefile.am: do not preserve file flags when copying
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Inappropriate [cross specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ doc/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/doc/Makefile.am b/doc/Makefile.am
+index 8815476..3237499 100644
+--- a/doc/Makefile.am
++++ b/doc/Makefile.am
+@@ -22,7 +22,7 @@ htmldir += $(pkgdatadir)/html
+ html_DATA += $(static_pages) html/index.html
+ 
+ install-data-hook:
+-	cp -pR html/* $(DESTDIR)$(htmldir)
++	cp -R html/* $(DESTDIR)$(htmldir)
+ 
+ # Automake's "distcheck" is sensitive to having files left over
+ # after "make uninstall", so we have to clean up the install hook.
+-- 
+2.5.0
+

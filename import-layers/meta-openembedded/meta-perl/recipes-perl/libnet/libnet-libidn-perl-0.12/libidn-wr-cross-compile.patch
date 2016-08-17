@@ -1,0 +1,49 @@
+perl-Net-LibIDN: cross-compile
+
+Upstream-Status: Pending
+
+Add support for cross-compile allowing the compiler binary to be
+specified into the perl Makefile instead of using the default 'gcc'.
+
+Signed-off-by: Greg Moffatt <greg.moffatt@windriver.com>
+---
+
+--- perl-Net-LibIDN-0.12.orig/Makefile.PL	2009-02-26 07:09:45.000000000 -0500
++++ perl-Net-LibIDN-0.12/Makefile.PL	2010-10-19 09:34:22.811173965 -0400
+@@ -9,6 +9,7 @@
+ my $options;
+ my $testno=1;
+ my %MakeParams = InitMakeParams();
++my $compiler;
+ 
+ WriteMakefile(%MakeParams);
+ 
+@@ -44,7 +45,8 @@
+ 	(
+ 		"with-libidn=s" => \$libdir,
+ 		"with-libidn-inc=s" => \$incdir,
+-		"disable-tld" => \$disable_tld
++		"disable-tld" => \$disable_tld,
++		"compiler=s" => \$compiler
+ 	);
+ 
+ 	if ($libdir)
+@@ -165,12 +167,17 @@
+ 		return 0;
+ 	}
+ 
+-	foreach my $cc (qw/cc gcc/)
++	foreach my $cc ($compiler, qw/cc gcc/)
+ 	{
+ 		unlink($test);
+ 		system "$cc $cflags -o $test $test.c $ldflags";
+ 		next if ($? >> 8);
+ 
++		if ($compiler == $cc)
++		{
++			return 1;
++		}
++
+ 		if (open(FILE, "./$test|"))
+ 		{
+ 			my $match;

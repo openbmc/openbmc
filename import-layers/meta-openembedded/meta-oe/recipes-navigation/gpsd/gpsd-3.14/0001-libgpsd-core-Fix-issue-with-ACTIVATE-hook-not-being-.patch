@@ -1,0 +1,35 @@
+From 6ff099b1ba8de74df9ddeb61e3825264b96ef692 Mon Sep 17 00:00:00 2001
+From: Moritz Fischer <moritz.fischer@ettus.com>
+Date: Tue, 22 Dec 2015 19:38:31 -0800
+Subject: [PATCH] libgpsd-core: Fix issue with ACTIVATE hook not being called.
+
+In the current system session->mode seemed to ignore the
+O_OPTIMIZE flag, leading to the ACTIVATE hook being ignored.
+
+Another way to fix this would be to keep the session->mode
+condition pull up the check for O_CONTINUE.
+
+Upstream-Status: Backported
+This patch is in upstream git
+
+Signed-off-by: Moritz Fischer <moritz.fischer@ettus.com>
+---
+ libgpsd_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libgpsd_core.c b/libgpsd_core.c
+index 31fec2a..a84e85f 100644
+--- a/libgpsd_core.c
++++ b/libgpsd_core.c
+@@ -543,7 +543,7 @@ int gpsd_open(struct gps_device_t *session)
+ int gpsd_activate(struct gps_device_t *session, const int mode)
+ /* acquire a connection to the GPS device */
+ {
+-    if (session->mode == O_OPTIMIZE)
++    if (mode == O_OPTIMIZE)
+ 	gpsd_run_device_hook(&session->context->errout,
+ 			     session->gpsdata.dev.path, "ACTIVATE");
+     session->gpsdata.gps_fd = gpsd_open(session);
+-- 
+2.4.3
+

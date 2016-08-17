@@ -1,0 +1,38 @@
+From 7b259580800e259d232229dc89f97058b56e2fe8 Mon Sep 17 00:00:00 2001
+From: "Hongjun.Yang" <hongjun.yang@windriver.com>
+Date: Wed, 22 Oct 2014 10:02:48 +0800
+Subject: [PATCH] Add ptest for tcpdump
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongjun.Yang <hongjun.yang@windriver.com>
+---
+ Makefile.in | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 8c35a45..4fb8ae6 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -428,9 +428,17 @@ distclean:
+ 	    tests/failure-outputs.txt
+ 	rm -rf autom4te.cache tests/DIFF tests/NEW
+ 
+-check: tcpdump
++buildtest-TESTS: tcpdump
++
++runtest-PTEST:
+ 	(cd tests && ./TESTrun.sh)
+ 
++install-ptest:
++	cp -r tests			$(DESTDIR) 
++	cp -r config.h			$(DESTDIR)
++	install -m 0755 Makefile 	$(DESTDIR)
++	ln -sf /usr/sbin/tcpdump	$(DESTDIR)/tcpdump
++
+ tags: $(TAGFILES)
+ 	ctags -wtd $(TAGFILES)
+ 
+-- 
+1.9.1
+

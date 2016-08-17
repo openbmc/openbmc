@@ -1,0 +1,29 @@
+From ac1953d04f3f26d6aa5d8f53a9397d3ba0e96fa3 Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen@circuitco.com>
+Date: Fri, 11 May 2012 15:23:02 +0000
+Subject: [PATCH] ide: use 'node' as interpreter for sketches instead of
+ argv[0]
+
+This enables running scripts with node 0.6.x instead of 0.4.x
+
+Signed-off-by: root <root@beaglebone.(none)>
+---
+ server/cloud9/ide.js |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/server/cloud9/ide.js b/server/cloud9/ide.js
+index ce782f5..6c4e0f7 100644
+--- a/server/cloud9/ide.js
++++ b/server/cloud9/ide.js
+@@ -53,7 +53,7 @@ var Ide = module.exports = function(options, httpServer, exts, socket) {
+     };
+ 
+     this.$users = {};
+-    this.nodeCmd = process.argv[0];
++    this.nodeCmd = "node";
+ 
+     var davOptions = {
+         node: this.options.mountDir,
+-- 
+1.7.7
+

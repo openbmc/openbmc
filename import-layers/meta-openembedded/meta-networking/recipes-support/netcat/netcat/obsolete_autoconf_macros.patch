@@ -1,0 +1,32 @@
+Replace obsoleted AM_CONFIG_HEADER flagged by autoconf 2.69
+locale.h check was picked from old gettext macros but with new aclocal
+it picks the right 0.18 gettext.m4 and does not get the check
+therefore we explicitly add it to configure.ac
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: netcat-0.7.1/configure.ac
+===================================================================
+--- netcat-0.7.1.orig/configure.ac	2013-01-18 01:30:01.928069739 -0800
++++ netcat-0.7.1/configure.ac	2013-01-18 01:32:50.568073009 -0800
+@@ -26,8 +26,7 @@
+ AC_PREREQ(2.53)
+ 
+ dnl without this order in this file, automake will be confused!
+-AM_CONFIG_HEADER(config.h)
+-
++AC_CONFIG_HEADERS(config.h)
+ dnl check for programs.  first the c compiler.
+ AC_PROG_CC
+ AC_PROG_CPP
+@@ -56,7 +55,7 @@
+ AC_LBL_LIBRARY_NET
+ 
+ dnl Fortunately we have Solaris...
+-AC_CHECK_HEADERS(sys/sockio.h)
++AC_CHECK_HEADERS(sys/sockio.h locale.h)
+ 
+ AC_CHECK_FUNCS(srandom random)
+ if test $ac_cv_func_srandom = no; then

@@ -1,0 +1,11 @@
+[Unit]
+Description=Network Time Service (one-shot ntpdate mode)
+Before=ntpd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/ntpdate-sync silent
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

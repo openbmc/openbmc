@@ -1,0 +1,43 @@
+From f1813af4c154fb1d3950abbdf678c3a5a67222fc Mon Sep 17 00:00:00 2001
+From: Li xin <lixin.fnst@cn.fujitsu.com>
+Date: Thu, 25 Jun 2015 11:44:27 +0900
+Subject: [PATCH] plmcd: error fix
+
+ld: cannot find -lsystemd-daemon
+collect2: error: ld returned 1 exit status
+
+Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
+---
+ contrib/plmc/plmcd/Makefile.am | 2 +-
+ contrib/plmc/plmcd/Makefile.in | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/contrib/plmc/plmcd/Makefile.am b/contrib/plmc/plmcd/Makefile.am
+index 8d847f2..dd7913a 100644
+--- a/contrib/plmc/plmcd/Makefile.am
++++ b/contrib/plmc/plmcd/Makefile.am
+@@ -32,7 +32,7 @@ plmcd_SOURCES = \
+ plmcd_LDFLAGS = -lpthread
+ 
+ if ENABLE_SYSTEMD
+-plmcd_LDFLAGS += -lsystemd-daemon
++plmcd_LDFLAGS += -lsystemd
+ endif
+ 
+ plmcd_LDADD = \
+diff --git a/contrib/plmc/plmcd/Makefile.in b/contrib/plmc/plmcd/Makefile.in
+index 0185dc4..e40513a 100644
+--- a/contrib/plmc/plmcd/Makefile.in
++++ b/contrib/plmc/plmcd/Makefile.in
+@@ -106,7 +106,7 @@ build_triplet = @build@
+ host_triplet = @host@
+ target_triplet = @target@
+ sbin_PROGRAMS = plmcd$(EXEEXT)
+-@ENABLE_SYSTEMD_TRUE@am__append_1 = -lsystemd-daemon
++@ENABLE_SYSTEMD_TRUE@am__append_1 = -lsystemd
+ subdir = plmcd
+ ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
+ am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+-- 
+1.8.4.2
+

@@ -1,0 +1,25 @@
+From d3e7651e2f2492dd1031d09a99713644b604cab5 Mon Sep 17 00:00:00 2001
+From: Gerrit Pape <pape@smarden.org>
+Date: Wed, 12 Dec 2007 13:44:15 +0000
+Subject: [PATCH] error.h: '#include <errno.h>' instead of 'extern int errno;'
+
+---
+ daemontools-0.76/src/error.h |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git daemontools-0.76.orig/src/error.h daemontools-0.76/src/error.h
+index 086fb55..f7e8273 100644
+--- daemontools-0.76.orig/src/error.h
++++ daemontools-0.76/src/error.h
+@@ -3,7 +3,7 @@
+ #ifndef ERROR_H
+ #define ERROR_H
+ 
+-extern int errno;
++#include <errno.h>
+ 
+ extern int error_intr;
+ extern int error_nomem;
+-- 
+1.5.4.2
+

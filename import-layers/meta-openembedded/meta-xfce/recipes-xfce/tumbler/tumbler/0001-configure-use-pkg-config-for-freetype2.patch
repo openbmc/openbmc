@@ -1,0 +1,45 @@
+From f5c283b1251ad005da7342e654cd2ec5ae9e5fb2 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Fri, 26 Sep 2014 13:44:36 +0200
+Subject: [PATCH] configure: use pkg-config for freetype2
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ acinclude.m4 | 16 +---------------
+ 1 file changed, 1 insertion(+), 15 deletions(-)
+
+diff --git a/acinclude.m4 b/acinclude.m4
+index 66e79d1..4c70b00 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -52,21 +52,7 @@ if test x"$ac_tumbler_font_thumbnailer" = x"yes"; then
+   PKG_CHECK_MODULES([GDK_PIXBUF], [gdk-pixbuf-2.0 >= 2.14], 
+   [
+     dnl Check for FreeType 2.x
+-    FREETYPE_LIBS=""
+-    FREETYPE_CFLAGS=""
+-    AC_PATH_PROG([FREETYPE_CONFIG], [freetype-config], [no])
+-    if test x"$FREETYPE_CONFIG" != x"no"; then
+-      AC_MSG_CHECKING([FREETYPE_CFLAGS])
+-      FREETYPE_CFLAGS="`$FREETYPE_CONFIG --cflags`"
+-      AC_MSG_RESULT([$FREETYPE_CFLAGS])
+-    
+-      AC_MSG_CHECKING([FREETYPE_LIBS])
+-      FREETYPE_LIBS="`$FREETYPE_CONFIG --libs`"
+-      AC_MSG_RESULT([$FREETYPE_LIBS])
+-    else
+-      dnl We can only build the font thumbnailer if FreeType 2.x is available
+-      ac_tumbler_font_thumbnailer=no
+-    fi
++    PKG_CHECK_MODULES(FREETYPE, freetype2, , [ac_tumbler_font_thumbnailer=no])
+     AC_SUBST([FREETYPE_CFLAGS])
+     AC_SUBST([FREETYPE_LIBS])
+   ], [ac_tumbler_font_thumbnailer=no])
+-- 
+1.8.3.1
+

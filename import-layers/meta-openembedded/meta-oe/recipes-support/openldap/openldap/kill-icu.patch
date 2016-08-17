@@ -1,0 +1,30 @@
+From: Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>
+
+slapd depends on ICU if it was built first.
+
+Upstream-status: inappropiate [embedded specific]
+---
+ configure.in |    8 --------
+ 1 file changed, 8 deletions(-)
+
+--- openldap-2.4.23.orig/configure.in
++++ openldap-2.4.23/configure.in
+@@ -2045,18 +2045,10 @@ if test $ol_enable_ndb != no ; then
+ 		SLAPD_LIBS="$SLAPD_LIBS \$(SLAPD_NDB_LIBS)"
+ 	fi
+ fi
+ 
+ dnl ----------------------------------------------------------------
+-dnl International Components for Unicode
+-OL_ICU
+-if test "$ol_icu" = no ; then
+-	AC_MSG_WARN([ICU not available])
+-else
+-	ICU_LIBS="$ol_icu"
+-fi
+-dnl ----------------------------------------------------------------
+ dnl
+ dnl Check for Cyrus SASL
+ dnl
+ WITH_SASL=no
+ ol_link_sasl=no

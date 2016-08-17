@@ -1,0 +1,24 @@
+Upstream-Status: Inappropriate [disable feature]
+
+--- liboil-0.3.9/liboil/liboilfunction.c.old	2006-09-18 13:03:20.000000000 +0100
++++ liboil-0.3.9/liboil/liboilfunction.c	2006-09-18 13:04:10.000000000 +0100
+@@ -345,7 +345,9 @@
+     return;
+   }
+ 
+-  test = oil_test_new (klass);
++  klass->chosen_impl = klass->reference_impl;
++  klass->func = klass->reference_impl->func;
++/*  test = oil_test_new (klass);
+   if (test == NULL) {
+     OIL_ERROR ("failed to test function class %s", klass->name);
+     return;
+@@ -385,7 +387,7 @@
+   klass->chosen_impl = min_impl;
+   klass->func = min_impl->func;
+ 
+-  oil_test_free (test);
++  oil_test_free (test);*/
+ }
+ 
+ static void

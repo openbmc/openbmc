@@ -1,0 +1,29 @@
+From 5038c49c0b61e057dec44c932f02c4bf99cee96e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Mon, 3 Sep 2012 10:02:51 +0200
+Subject: [PATCH] lxdm.conf.in: blacklist root for release images
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ data/lxdm.conf.in |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/data/lxdm.conf.in b/data/lxdm.conf.in
+index defc082..759e6e5 100644
+--- a/data/lxdm.conf.in
++++ b/data/lxdm.conf.in
+@@ -58,5 +58,5 @@ disable=0
+ white=
+ 
+ ## blacklist user
+-black=
++black=root
+ 
+-- 
+1.7.4.4
+

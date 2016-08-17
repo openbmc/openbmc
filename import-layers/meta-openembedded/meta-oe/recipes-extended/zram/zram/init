@@ -1,0 +1,85 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides: zram
+# Required-Start:
+# Required-Stop:
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: Increased Performance In Linux With zRam (Virtual Swap Compressed in RAM)
+# Description: Adapted from systemd scripts at https://github.com/mystilleef/FedoraZram
+# Included as part of antix-goodies package by anticapitalista <antiX@operamail.com>
+# This script was written by tradetaxfree and is found at http://crunchbanglinux.org/forums/topic/15344/zram-a-good-idea/
+# Copy this script (as root) from /usr/local/bin to /etc/init.d and then #update-rc.d zram defaults
+# After booting verify the module is loaded with: lsmod | grep zram
+### END INIT INFO
+set -e
+
+start() {
+    # get the number of CPUs
+    num_cpus=$(grep -c processor /proc/cpuinfo)
+    # if something goes wrong, assume we have 1
+    [ "$num_cpus" != 0 ] || num_cpus=1
+
+    # set decremented number of CPUs
+    last_cpu=$((num_cpus - 1))
+
+    #default Factor % = 90 change this value here or create /etc/default/zram
+    FACTOR=90
+    #& put the above single line in /etc/default/zram with the value you want
+    [ -f /etc/default/zram ] && . /etc/default/zram || true
+    factor=$FACTOR # percentage
+
+    # get the amount of memory in the machine
+    memtotal=$(grep MemTotal /proc/meminfo | awk ' { print $2 } ')
+    mem_by_cpu=$(($memtotal/$num_cpus*$factor/100*1024))
+
+    # load dependency modules
+    modprobe zram zram_num_devices=$num_cpus
+    echo "zram devices probed successfully"
+
+    # initialize the devices
+    for i in $(seq 0 $last_cpu); do
+    	echo 1 > /sys/block/zram$i/reset
+    	echo $mem_by_cpu > /sys/block/zram$i/disksize
+    	# Creating swap filesystems
+    	mkswap /dev/zram$i
+    	# Switch the swaps on
+    	swapon -p 100 /dev/zram$i
+    done
+}
+
+stop() {
+    # get the number of CPUs
+    num_cpus=$(grep -c processor /proc/cpuinfo)
+
+    # set decremented number of CPUs
+    last_cpu=$((num_cpus - 1))
+
+    # Switching off swap
+    for i in $(seq 0 $last_cpu); do
+    	if [ "$(grep /dev/zram$i /proc/swaps)" != "" ]; then
+    		swapoff /dev/zram$i
+    		sleep 1
+    	fi
+    done
+    sleep 1
+    rmmod zram
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        stop
+        sleep 3
+        start
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        RETVAL=1
+esac
+exit $RETVAL

@@ -1,0 +1,12 @@
+Index: goffice-0.7.14/configure.in
+===================================================================
+--- goffice-0.7.14.orig/configure.in	2009-11-14 19:14:37.106109501 +0100
++++ goffice-0.7.14/configure.in	2009-11-14 19:19:40.907333188 +0100
+@@ -66,6 +66,7 @@
+ 
+ AC_ISC_POSIX
+ AC_PROG_CC
++AC_PROG_CC_C99
+ AC_PROG_YACC
+ AM_PROG_LEX
+ AC_PROG_LN_S

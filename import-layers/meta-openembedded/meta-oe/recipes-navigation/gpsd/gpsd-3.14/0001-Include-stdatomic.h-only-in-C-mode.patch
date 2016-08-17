@@ -1,0 +1,43 @@
+From 79f6d9133378325d70a92e66f7352c1becefbb88 Mon Sep 17 00:00:00 2001
+From: Gleb Smirnoff <glebius@FreeBSD.org>
+Date: Sat, 16 May 2015 02:47:28 +0300
+Subject: [PATCH] Include <stdatomic.h> only in C mode.
+
+Upstream-Status: Backport from 3.15
+
+Without this build with gcc-5.2 fails with:
+| arm-oe-linux-gnueabi-g++ -march=armv4t -mthumb -mthumb-interwork -mtune=arm920t --sysroot=/OE/build/shr-core/tmp-glibc/sysroots/om-gta02 -o clock_gettime-qt.os -c -O2 -pipe -g -feliminate-unused-debug-types --sysroot=/OE/build/shr-core/tmp-glibc/sysroots/om-gta02 -Wextra -Wall -Wno-uninitialized -Wno-missing-field-initializers -Wcast-align -Wmissing-declarations -Wpointer-arith -Wreturn-type -pthread -Wmissing-declarations -g -O0 -pthread -fPIC -DUSE_QT -DQT_SHARED -I/OE/build/shr-core/tmp-glibc/sysroots/om-gta02/usr/include/dbus-1.0 -I/OE/build/shr-core/tmp-glibc/sysroots/om-gta02/usr/lib/dbus-1.0/include -I/OE/build/shr-core/tmp-glibc/sysroots/om-gta02/usr/include/qt4/QtNetwork -I/OE/build/shr-core/tmp-glibc/sysroots/om-gta02/usr/include/qt4 -I/OE/build/shr-core/tmp-glibc/sysroots/om-gta02/usr/include/qt4/QtCore clock_gettime.c
+| In file included from compiler.h:50:0,
+|                  from clock_gettime.c:10:
+| /OE/build/shr-core/tmp-glibc/sysroots/x86_64-linux/usr/lib/arm-oe-linux-gnueabi/gcc/arm-oe-linux-gnueabi/5.2.0/include/stdatomic.h:40:9: error: '_Atomic' does not name a type
+|  typedef _Atomic _Bool atomic_bool;
+|          ^
+....
+
+More info:
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=60932
+
+Signed-off-by: Gary E. Miller <gem@rellim.com>
+---
+ compiler.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/compiler.h b/compiler.h
+index 837c935..03430c0 100644
+--- a/compiler.h
++++ b/compiler.h
+@@ -66,9 +66,9 @@
+     } while (0)
+ 
+ #ifdef HAVE_STDATOMIC_H
+-#ifndef __COVERITY__	/* Coverity is confused by a GNU typedef */
++#if !defined(__COVERITY__) && !defined(__cplusplus)
+ #include <stdatomic.h>
+-#endif /* __COVERITY__ */
++#endif /* __COVERITY__ || __cplusplus */
+ #endif /* HAVE_STDATOMIC_H */
+ 
+ #ifdef HAVE_OSATOMIC_H
+-- 
+2.5.1
+

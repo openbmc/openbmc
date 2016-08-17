@@ -1,0 +1,33 @@
+Upstream-status: BackPort [http://pkgs.fedoraproject.org/cgit/bridge-utils.git/diff/bridge-utils-1.5-fix-error-message-for-incorrect-command.patch?id=b0d10717fd7cebf5d85eed3f941b409fa0384f08]
+
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+
+From c7ed0996ef58b497d3d30be802ab5ae6c37099b5 Mon Sep 17 00:00:00 2001
+From: Stephen Hemminger <shemminger@vyatta.com>
+Date: Tue, 3 May 2011 09:49:57 -0700
+Subject: [PATCH 2/3] Fix error message for incorrect command
+
+Debian bug 406907
+Error message was refering to incorrect command argument.
+
+Signed-off-by: Petr Sabata <contyk@redhat.com>
+---
+ brctl/brctl.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/brctl/brctl.c b/brctl/brctl.c
+index 454b8dd..46ca352 100644
+--- a/brctl/brctl.c
++++ b/brctl/brctl.c
+@@ -69,7 +69,7 @@ int main(int argc, char *const* argv)
+ 	argc -= optind;
+ 	argv += optind;
+ 	if ((cmd = command_lookup(*argv)) == NULL) {
+-		fprintf(stderr, "never heard of command [%s]\n", argv[1]);
++		fprintf(stderr, "never heard of command [%s]\n", *argv);
+ 		goto help;
+ 	}
+ 	
+-- 
+1.7.5.2
+

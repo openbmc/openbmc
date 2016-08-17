@@ -1,0 +1,24 @@
+Author: Franz Pletz <fpletz@franz-pletz.org>
+Description: Don't die on unknown LS_COLORS values
+Removing the patch causes a segfault when dircolors is set by coreutils' dircolors.
+Debian-Bug: #592089
+
+--- a/tw.color.c
++++ b/tw.color.c
+@@ -239,13 +239,10 @@ parseLS_COLORS(const Char *value)
+ 		    if ((Char)variables[i].variable[0] == (v[0] & CHAR) &&
+ 			(Char)variables[i].variable[1] == (v[1] & CHAR))
+ 			break;
+-		if (i < nvariables) {
+-		    v += 3;
++		v += 3;
++		if (i < nvariables)
+ 		    getstring(&c, &v, &variables[i].color, ':');
+-		    continue;
+-		}
+-		else
+-		    stderror(ERR_BADCOLORVAR, v[0], v[1]);
++		continue;
+ 	    }
+ 	    break;
+ 	}

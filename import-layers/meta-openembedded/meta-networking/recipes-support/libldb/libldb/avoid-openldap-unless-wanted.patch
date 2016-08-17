@@ -1,0 +1,13 @@
+--- a/wscript	2015-11-18 12:43:33.000000000 +0100
++++ b/wscript	2015-11-18 12:46:25.000000000 +0100
+@@ -58,9 +58,7 @@
+     if conf.env.standalone_ldb:
+         conf.CHECK_XSLTPROC_MANPAGES()
+ 
+-        # we need this for the ldap backend
+-        if conf.CHECK_FUNCS_IN('ber_flush ldap_open ldap_initialize', 'lber ldap', headers='lber.h ldap.h'):
+-            conf.env.ENABLE_LDAP_BACKEND = True
++        conf.env.ENABLE_LDAP_BACKEND = False
+ 
+         # we don't want any libraries or modules to rely on runtime
+         # resolution of symbols

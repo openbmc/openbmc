@@ -1,0 +1,21 @@
+The original use of AC_ARG_WITH is buggy and causes expat support
+to be *disabled* if "--with-expat" is passed to configure.
+
+Upstream status: pending
+
+Index: log4c-1.2.4/configure.in
+===================================================================
+--- log4c-1.2.4.orig/configure.in
++++ log4c-1.2.4/configure.in
+@@ -217,9 +217,9 @@ AC_ARG_WITH(expat,
+                     have any effect and Log4C uses some bundled yacc/lex code
+                     for parsing it's configuration file.
+                     ]),
+-                    with_expat=no,
++                    [],
+                     with_expat=yes)
+-if test x$with_expat = xyes ; then
++if test x$with_expat != xno ; then
+  use_expat=yes
+  AM_PATH_EXPAT(1.95.1)
+ fi

@@ -1,0 +1,17 @@
+From http://sources.gentoo.org/cgi-bin/viewvc.cgi/gentoo-x86/net-nds/openldap/files/
+
+Upstream-status: Unknown
+
+--
+
+--- openldap-2.4.28/configure.in.orig	2012-02-11 22:40:36.004360795 +0000
++++ openldap-2.4.28/configure.in	2012-02-11 22:40:13.410986851 +0000
+@@ -1214,7 +1214,7 @@
+ 				ol_with_tls=gnutls
+ 				ol_link_tls=yes
+ 
+-				TLS_LIBS="-lgnutls"
++				TLS_LIBS="-lgnutls -lgcrypt"
+ 
+ 				AC_DEFINE(HAVE_GNUTLS, 1, 
+ 					[define if you have GNUtls])

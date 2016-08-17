@@ -1,0 +1,24 @@
+From: Javier Viguera <javier.viguera@digi.com>
+Date: Wed, 26 Nov 2014 09:24:44 +0100
+Subject: [PATCH] xserver-common: disable TCP connections
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Javier Viguera <javier.viguera@digi.com>
+---
+ X11/xserver-common | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/X11/xserver-common b/X11/xserver-common
+index 017e5aee1ab0..4dc48c412741 100644
+--- a/X11/xserver-common
++++ b/X11/xserver-common
+@@ -44,7 +44,7 @@ SCREEN_SIZE=`fallback_screen_arg`
+ export USER=root
+ export XSERVER_DEFAULT_ORIENTATION=normal
+ 
+-ARGS="-br -pn $INPUT_EXTRA_ARGS"
++ARGS="-br -pn -nolisten tcp $INPUT_EXTRA_ARGS"
+ DPI="100"
+ MOUSE=""
+ KDRIVEARGS=""

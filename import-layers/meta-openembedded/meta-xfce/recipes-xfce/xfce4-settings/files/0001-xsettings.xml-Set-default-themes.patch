@@ -1,0 +1,33 @@
+From 2218ba8a21e9f5715b652c6416c2ddb552686b14 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Sun, 20 May 2012 15:22:09 +0200
+Subject: [PATCH] xsettings.xml: Set default themes
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstram status:  Inappropriate [configuration]
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ xfsettingsd/xsettings.xml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xfsettingsd/xsettings.xml b/xfsettingsd/xsettings.xml
+index 65ba1ee..9efb3cd 100644
+--- a/xfsettingsd/xsettings.xml
++++ b/xfsettingsd/xsettings.xml
+@@ -1,8 +1,8 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <channel name="xsettings" version="1.0">
+   <property name="Net" type="empty">
+-    <property name="ThemeName" type="empty"/>
+-    <property name="IconThemeName" type="empty"/>
++    <property name="ThemeName" type="string" value="Xfce"/>
++    <property name="IconThemeName" type="string" value="Adwaita"/>
+     <property name="DoubleClickTime" type="int" value="400"/>
+     <property name="DoubleClickDistance" type="int" value="5"/>
+     <property name="DndDragThreshold" type="int" value="8"/>
+-- 
+2.1.0
+

@@ -1,0 +1,20 @@
+--- a/init.d/Makefile.am	2014-01-02 18:55:53.000000000 +0100
++++ b/init.d/Makefile.am	2014-08-11 10:59:40.000000000 +0200
+@@ -34,11 +34,11 @@
+ 	$(do_subst) < $(srcdir)/$(src_tmpl) > haveged.service;
+ 
+ install-data-hook:
+-if ENABLE_SYSTEMD_LOOKUP
+-	install -p -m644 haveged.service `pkg-config --variable=systemdsystemunitdir systemd`/haveged.service;
+-else
+-	install -p -m644 haveged.service ($unit_dir)/haveged.service;
+-endif
+-	systemctl enable haveged.service;
++#if ENABLE_SYSTEMD_LOOKUP
++#	install -p -m644 haveged.service `pkg-config --variable=systemdsystemunitdir systemd`/haveged.service;
++#else
++#	install -p -m644 haveged.service ($unit_dir)/haveged.service;
++#endif
++#	systemctl enable haveged.service;
+ 
+ endif

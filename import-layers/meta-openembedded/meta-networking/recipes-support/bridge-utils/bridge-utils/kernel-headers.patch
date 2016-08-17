@@ -1,0 +1,22 @@
+include missing kernel header
+
+Fixes errors like
+
+| /b/kraj/jlinux-next/poky/build/tmp-eglibc/sysroots/re-64b/usr/include/linux/if_bridge.h:172:20: error: field 'ip6' has incomplete type
+| In file included from ../libbridge/libbridge.h:24:0,
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+
+Index: bridge-utils-1.5/libbridge/libbridge.h
+===================================================================
+--- bridge-utils-1.5.orig/libbridge/libbridge.h	2011-03-28 17:52:54.000000000 -0700
++++ bridge-utils-1.5/libbridge/libbridge.h	2013-03-04 21:16:25.781188309 -0800
+@@ -20,6 +20,7 @@
+ #define _LIBBRIDGE_H
+ 
+ #include <sys/socket.h>
++#include <linux/in6.h>
+ #include <linux/if.h>
+ #include <linux/if_bridge.h>
+ 

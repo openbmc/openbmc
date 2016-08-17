@@ -1,0 +1,39 @@
+From 94094cc4ee7ae585da3e5e7e83e7d82b5d6de656 Mon Sep 17 00:00:00 2001
+From: Alexander Stein <alexander.stein@systec-electronic.com>
+Date: Wed, 14 Nov 2012 12:13:06 +0100
+Subject: [PATCH] Use strcmp instead of sizeof on char* string
+
+This bug was detected by the clang warning:
+libsocketcan.c:384:16: warning: argument to 'sizeof' in 'strncmp' call
+is the same expression as the source; did you mean to provide an
+explicit length? [-Wsizeof-pointer-memaccess]
+sizeof(name)) != 0)
+~~~~~~~^~~~~~
+
+Signed-off-by: Alexander Stein <alexander.stein@systec-electronic.com>
+Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+---
+Upstream-Status: Backport
+
+ src/libsocketcan.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/src/libsocketcan.c b/src/libsocketcan.c
+index fedcbdc..841c2ed 100644
+--- a/src/libsocketcan.c
++++ b/src/libsocketcan.c
+@@ -379,9 +379,8 @@ static int do_get_nl_link(int fd, __u8 acquire, const char *name, void *res)
+ 				nl_msg->nlmsg_len - NLMSG_LENGTH(sizeof(struct ifaddrmsg));
+ 			parse_rtattr(tb, IFLA_MAX, IFLA_RTA(ifi), len);
+ 
+-			if (strncmp
+-			    ((char *)RTA_DATA(tb[IFLA_IFNAME]), name,
+-			     sizeof(name)) != 0)
++			if (strcmp
++			    ((char *)RTA_DATA(tb[IFLA_IFNAME]), name) != 0)
+ 				continue;
+ 
+ 			if (tb[IFLA_LINKINFO])
+-- 
+1.8.3.1
+

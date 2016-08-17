@@ -1,0 +1,15 @@
+This layer depends on:
+
+URI: git://github.com/openembedded/oe-core.git
+branch: krogoth
+revision: HEAD
+
+Send pull requests to openembedded-devel@lists.openembedded.org with '[meta-oe][krogoth]' in the subject'
+
+When sending single patches, please use something like:
+'git send-email -M -1 --to openembedded-devel@lists.openembedded.org --subject-prefix=meta-oe][krogoth][PATCH'
+
+You are encouraged to fork the mirror on github https://github.com/openembedded/meta-oe/ to share your patches, this is preferred for patch sets consisting of more than one patch. Other services like gitorious, repo.or.cz or self hosted setups are of course accepted as well, 'git fetch <remote>' works the same on all of them. We recommend github because it is free, easy to use, has been proven to be reliable and has a really good web GUI.
+
+krogoth Branch Maintainer:
+Armin Kuster <akuster808@gmail.com>

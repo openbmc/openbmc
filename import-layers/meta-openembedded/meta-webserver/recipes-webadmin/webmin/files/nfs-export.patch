@@ -1,0 +1,39 @@
+commit e48f61d2f6df32a518bcb84db8c6eacfe5435c32
+Author: Yu Ke <ke.yu@intel.com>
+Date:   Fri Oct 28 14:40:51 2011 +0800
+
+NFS export: fix syntax issue
+
+fix two syntax issue in /etc/exports:
+1. if it is exported to everyone, should use "*", e.g. "/export  *(xxx)"
+2. explicitly specify subtree_check or no_subtree_check, required by latest nfs-utils
+
+Upstream-Status: Pending
+
+Signed-off-by: Yu Ke <ke.yu@intel.com>
+
+diff --git a/exports/save_export.cgi b/exports/save_export.cgi
+index 3bc2f97..3e60298 100755
+--- a/exports/save_export.cgi
++++ b/exports/save_export.cgi
+@@ -40,7 +40,7 @@ else {
+ 			&error(&text('save_enetmask', $in{'netmask'}));
+ 		$exp{'host'} = $in{'network'}."/".$in{'netmask'};
+ 		}
+-	elsif ($in{'mode'} == 3) { $exp{'host'} = ""; }
++	elsif ($in{'mode'} == 3) { $exp{'host'} = "*"; }
+ 	else {
+ 		$in{'host'} =~ /\*/ || &to_ipaddress($in{'host'}) ||
+ 			&error(&text('save_ehost', $in{'host'}));
+@@ -70,6 +70,11 @@ else {
+ 
+ 	delete($opts{'no_subtree_check'}); delete($opts{'subtree_check'});
+ 	$opts{'no_subtree_check'} = "" if ($in{'no_subtree_check'});
++	if ($in{'no_subtree_check'}) {
++		$opts{'no_subtree_check'} = "";
++	} else {
++		$opts{'subtree_check'} = "";
++	}
+ 
+ 	delete($opts{'nohide'}); delete($opts{'hide'});
+ 	$opts{'nohide'} = "" if ($in{'nohide'});

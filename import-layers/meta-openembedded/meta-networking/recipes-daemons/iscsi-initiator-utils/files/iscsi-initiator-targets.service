@@ -1,0 +1,15 @@
+[Unit]
+Description=Open-iSCSI initiator (i.e. client) target bindings
+After=iscsi-initiator.service
+Requires=iscsi-initiator.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/default/iscsi-initiator
+ExecStart=/usr/sbin/iscsiadm -m node --loginall=automatic $OPTS_ISCSIADM
+ExecStop=/usr/sbin/iscsiadm -m node --logoutall=all $OPTS_ISCSIADM
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+

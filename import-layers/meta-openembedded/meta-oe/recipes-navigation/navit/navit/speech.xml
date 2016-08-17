@@ -1,0 +1,8 @@
+                <!-- Navit provides speech output in text format.
+                         If you have a speech synthesizer like festival lite installed, you can get turn by turn directions out of navit. Please set the "cps"-value to how many characters your tts engine approximately speaks per second.
+                         The default is text output to the shell -->
+                <!-- <speech type="cmdline" data="echo 'Fix the speech tag in navit.xml to let navit say:' '%s'" cps="15"/> -->
+                <!-- <speech type="cmdline" data="espeak -s 150 -v czech '%s' &amp;"/> -->
+                <!-- <speech type="cmdline" data="flite -t '%s'"/> -->
+                <!-- <speech type="cmdline" data="/usr/local/bin/say.sh '%s'"/> -->
+                <speech type="cmdline" data="espeak '%s' &amp;"/>

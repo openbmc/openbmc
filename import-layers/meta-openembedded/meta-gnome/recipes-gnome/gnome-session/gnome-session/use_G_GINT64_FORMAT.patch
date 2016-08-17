@@ -1,0 +1,61 @@
+This patch fixes the build errors when building gnome-session for 64bit target using gcc 4.8
+
+| gs-idle-monitor.c: In function 'handle_alarm_notify_event':
+| gs-idle-monitor.c:196:9: error: format '%lld' expects argument of type 'long long int', but argument 5 has type 'gint64' [-Werror=format=]
+|          g_debug ("Watch %d fired, idle time = %lld",
+|          ^
+| gs-idle-monitor.c: In function '_xsync_alarm_set':
+| gs-idle-monitor.c:453:17: error: format '%lld' expects argument of type 'long long int', but argument 4 has type 'gint64' [-Werror=format=]
+|                  g_debug ("GSIdleMonitor: updating alarm for positive transition wait=%lld",
+|                  ^
+| gs-idle-monitor.c:457:17: error: format '%lld' expects argument of type 'long long int', but argument 4 has type 'gint64' [-Werror=format=]
+|                  g_debug ("GSIdleMonitor: creating new alarm for positive transition wait=%lld",
+|                  ^
+| gs-idle-monitor.c:464:17: error: format '%lld' expects argument of type 'long long int', but argument 4 has type 'gint64' [-Werror=format=]
+|                  g_debug ("GSIdleMonitor: updating alarm for negative transition wait=%lld",
+|                  ^
+| gs-idle-monitor.c:468:17: error: format '%lld' expects argument of type 'long long int', but argument 4 has type 'gint64' [-Werror=format=]
+
+Upstream-Status: Unknown
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Index: gnome-session-2.32.1/gnome-session/gs-idle-monitor.c
+===================================================================
+--- gnome-session-2.32.1.orig/gnome-session/gs-idle-monitor.c	2010-11-17 03:17:04.000000000 -0800
++++ gnome-session-2.32.1/gnome-session/gs-idle-monitor.c	2013-06-11 23:33:12.239960082 -0700
+@@ -193,7 +193,7 @@
+                 return;
+         }
+ 
+-        g_debug ("Watch %d fired, idle time = %lld",
++        g_debug ("Watch %d fired, idle time = %" G_GINT64_FORMAT "",
+                  watch->id,
+                  _xsyncvalue_to_int64 (alarm_event->counter_value));
+ 
+@@ -450,22 +450,22 @@
+ 
+         attr.trigger.test_type = XSyncPositiveTransition;
+         if (watch->xalarm_positive != None) {
+-                g_debug ("GSIdleMonitor: updating alarm for positive transition wait=%lld",
++                g_debug ("GSIdleMonitor: updating alarm for positive transition wait=%" G_GINT64_FORMAT "",
+                          _xsyncvalue_to_int64 (attr.trigger.wait_value));
+                 XSyncChangeAlarm (GDK_DISPLAY (), watch->xalarm_positive, flags, &attr);
+         } else {
+-                g_debug ("GSIdleMonitor: creating new alarm for positive transition wait=%lld",
++                g_debug ("GSIdleMonitor: creating new alarm for positive transition wait=%" G_GINT64_FORMAT "",
+                          _xsyncvalue_to_int64 (attr.trigger.wait_value));
+                 watch->xalarm_positive = XSyncCreateAlarm (GDK_DISPLAY (), flags, &attr);
+         }
+ 
+         attr.trigger.test_type = XSyncNegativeTransition;
+         if (watch->xalarm_negative != None) {
+-                g_debug ("GSIdleMonitor: updating alarm for negative transition wait=%lld",
++                g_debug ("GSIdleMonitor: updating alarm for negative transition wait=%" G_GINT64_FORMAT "",
+                          _xsyncvalue_to_int64 (attr.trigger.wait_value));
+                 XSyncChangeAlarm (GDK_DISPLAY (), watch->xalarm_negative, flags, &attr);
+         } else {
+-                g_debug ("GSIdleMonitor: creating new alarm for negative transition wait=%lld",
++                g_debug ("GSIdleMonitor: creating new alarm for negative transition wait=%" G_GINT64_FORMAT "",
+                          _xsyncvalue_to_int64 (attr.trigger.wait_value));
+                 watch->xalarm_negative = XSyncCreateAlarm (GDK_DISPLAY (), flags, &attr);
+         }

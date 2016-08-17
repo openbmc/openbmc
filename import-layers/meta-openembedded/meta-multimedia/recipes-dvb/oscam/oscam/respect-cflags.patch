@@ -1,0 +1,38 @@
+Upstream-Status: Backport
+http://www.streamboard.tv/oscam/changeset/10068
+http://www.streamboard.tv/oscam/changeset/10070
+
+Index: /CMakeLists.txt
+===================================================================
+--- a/CMakeLists.txt	(revision 10067)
++++ b/CMakeLists.txt	(revision 10068)
+@@ -625,8 +625,8 @@
+     list(GET GCC_VERSION_COMPONENTS 0 GCC_MINOR)
+     add_definitions ("-W -Wall ")
+-    set (CMAKE_C_FLAGS "-Wall -O2")
+-	set (CMAKE_CXX_FLAGS "-Wall -O2")
+-    set (CMAKE_C_FLAGS_DEBUG "-O0 -ggdb")
+-    set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb")
++    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O2")
++	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2")
++    set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0 -ggdb")
++    set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -ggdb")
+ endif (CMAKE_COMPILER_IS_GNUCC)
+ # some optimisations
+Index: /csctapi/CMakeLists.txt
+===================================================================
+--- a/csctapi/CMakeLists.txt	(revision 10069)
++++ b/csctapi/CMakeLists.txt	(revision 10070)
+@@ -6,8 +6,8 @@
+     list(GET GCC_VERSION_COMPONENTS 0 GCC_MINOR)
+     add_definitions ("-W -Wall ")
+-    set (CMAKE_C_FLAGS "-Wall -O2")
+-	set (CMAKE_CXX_FLAGS "-Wall -O2")
+-    set (CMAKE_C_FLAGS_DEBUG "-O0 -ggdb")
+-    set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb")
++    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O2")
++	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2")
++    set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0 -ggdb")
++    set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -ggdb")
+ endif (CMAKE_COMPILER_IS_GNUCC)
+ # Mac extra removes to avoid ranlib warnings in some situations

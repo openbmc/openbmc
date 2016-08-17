@@ -1,0 +1,51 @@
+Upstream-Status:Inappropriate [embedded specific]
+
+fix the below error:
+checking for DAQ_VERDICT_RETRY... configure:
+configure: error: cannot run test program while cross compiling
+
+
+--- a/configure.in    2015-10-28 10:45:18.174487395 +0800
++++ b/configure.in    2015-10-28 10:45:47.586485951 +0800
+@@ -734,23 +734,23 @@
+ #        [DAQ version supports flow ID in header.])
+ #fi
+
+-AC_MSG_CHECKING([for DAQ_VERDICT_RETRY])
+-AC_RUN_IFELSE(
+-[AC_LANG_PROGRAM(
+-[[
+-#include <daq.h>
+-]],
+-[[
+-   DAQ_Verdict verdict;
+-   verdict = DAQ_VERDICT_RETRY;
+-]])],
+-[have_daq_verdict_retry="yes"],
+-[have_daq_verdict_retry="no"])
+-AC_MSG_RESULT($have_daq_verdict_retry)
+-if test "x$have_daq_verdict_retry" = "xyes"; then
+-    AC_DEFINE([HAVE_DAQ_VERDICT_RETRY],[1],
+-        [DAQ version supports DAQ_VERDICT_RETRY in DAQ_Verdict.])
+-fi
++#AC_MSG_CHECKING([for DAQ_VERDICT_RETRY])
++#AC_RUN_IFELSE(
++#[AC_LANG_PROGRAM(
++#[[
++##include <daq.h>
++#]],
++#[[
++#   DAQ_Verdict verdict;
++#   verdict = DAQ_VERDICT_RETRY;
++#]])],
++have_daq_verdict_retry="yes"
++#[have_daq_verdict_retry="no"])
++#AC_MSG_RESULT($have_daq_verdict_retry)
++#if test "x$have_daq_verdict_retry" = "xyes"; then
++#    AC_DEFINE([HAVE_DAQ_VERDICT_RETRY],[1],
++#        [DAQ version supports DAQ_VERDICT_RETRY in DAQ_Verdict.])
++#fi
+
+ # any sparc platform has to have this one defined.
+ AC_MSG_CHECKING(for sparc)
+

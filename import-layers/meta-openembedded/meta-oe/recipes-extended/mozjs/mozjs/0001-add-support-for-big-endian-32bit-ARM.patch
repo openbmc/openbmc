@@ -1,0 +1,26 @@
+From 07830cbc409f8e998fa839275470031fc83d6eb6 Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen.kooi@linaro.org>
+Date: Thu, 21 Apr 2016 14:10:54 +0200
+Subject: [PATCH] add support for big endian 32bit ARM
+
+Signed-off-by: Koen Kooi <koen.kooi@linaro.org>
+---
+ mfbt/double-conversion/utils.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mfbt/double-conversion/utils.h b/mfbt/double-conversion/utils.h
+index fe26dab..78a19cb 100644
+--- a/mfbt/double-conversion/utils.h
++++ b/mfbt/double-conversion/utils.h
+@@ -58,7 +58,7 @@
+     defined(__mips__) || defined(__powerpc__) || \
+     defined(__sparc__) || defined(__sparc) || defined(__s390__) || \
+     defined(__SH4__) || defined(__alpha__) || \
+-    defined(__aarch64__) || \
++    defined(__aarch64__) || defined(__ARMEB__) || \
+     defined(_MIPS_ARCH_MIPS32R2)
+ #define DOUBLE_CONVERSION_CORRECT_DOUBLE_OPERATIONS 1
+ #elif defined(_M_IX86) || defined(__i386__) || defined(__i386)
+-- 
+2.4.3
+

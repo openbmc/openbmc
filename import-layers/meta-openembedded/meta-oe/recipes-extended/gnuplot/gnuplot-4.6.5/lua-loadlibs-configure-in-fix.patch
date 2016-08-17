@@ -1,0 +1,16 @@
+Index: gnuplot-4.6.5/configure.in
+===================================================================
+--- gnuplot-4.6.5.orig/configure.in
++++ gnuplot-4.6.5/configure.in
+@@ -690,6 +690,11 @@ if test "${with_lua}" = yes ; then
+   fi
+ 
+   if test "$with_lua" != no; then
++    dnl check for dlopen/dl to fix loadlibs link failure
++    AC_CHECK_FUNC([dlopen], [],
++      AC_CHECK_LIB([dl], [dlopen], DLOPEN_LIBS="-ldl"))
++    AC_SUBST(DLOPEN_LIBS)
++    LUA_LIBS="$LUA_LIBS $DLOPEN_LIBS"
+     TERMLIBS="$TERMLIBS $LUA_LIBS"
+     CPPFLAGS="$CPPFLAGS $LUA_CFLAGS"
+   else

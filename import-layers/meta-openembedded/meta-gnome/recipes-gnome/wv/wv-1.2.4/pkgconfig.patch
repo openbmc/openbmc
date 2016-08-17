@@ -1,0 +1,13 @@
+Index: wv-1.2.0/wv-1.0.pc.in
+===================================================================
+--- wv-1.2.0.orig/wv-1.0.pc.in	2008-03-19 22:25:18.000000000 +0000
++++ wv-1.2.0/wv-1.0.pc.in	2008-03-19 22:26:32.000000000 +0000
+@@ -6,5 +6,6 @@
+ Name: wvWare
+ Description: Word Document Filter library and utilities
+ Version: @VERSION@
+-Libs: -L${libdir} -lwv @WMF_LIBS@ @XML_LIBS@ @GLIB_LIBS@ @GSF_LIBS@ @PNG_LIBS@ @ZLIB_LIBS@ @LIBS@ -lm
+-Cflags: -I${includedir}/wv @GSF_CFLAGS@
++Requires: libgsf-1
++Libs: -L${libdir} -lwv @WMF_LIBS@ @XML_LIBS@ @PNG_LIBS@ @ZLIB_LIBS@ @LIBS@ -lm
++Cflags: -I${includedir}/wv

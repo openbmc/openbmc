@@ -1,0 +1,25 @@
+[PATCH] force STRIP to emtpy
+
+otherwise the generate file will be stripped
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ Makefile.rules |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.rules b/Makefile.rules
+index 710a2c9..e4334db 100644
+--- a/Makefile.rules
++++ b/Makefile.rules
+@@ -31,7 +31,7 @@ LDFLAGS   ?= -s
+ endif
+ 
+ ifdef DONTSTRIP
+-STRIP     ?= :
++STRIP     = :
+ else
+ STRIP     ?= strip --strip-debug
+ endif
+-- 
+1.7.10.4
+

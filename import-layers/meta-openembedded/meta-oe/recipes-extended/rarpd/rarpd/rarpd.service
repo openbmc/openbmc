@@ -1,0 +1,14 @@
+[Unit]
+Description=Reverse Address Resolution Protocol Requests Server
+Requires=network.target
+After=syslog.target network.target
+
+[Service]
+Type=forking
+EnvironmentFile=-/etc/sysconfig/rarpd
+ExecStart=/usr/sbin/rarpd $OPTIONS $INTERFACE
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target
+

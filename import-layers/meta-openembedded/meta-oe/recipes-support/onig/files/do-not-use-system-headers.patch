@@ -1,0 +1,44 @@
+Author: Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>
+
+When build on host with older eglibc (Ubuntu 12.04) build fails with:
+
+/tmp/OE/build/tmp-eglibc/sysroots/genericarmv8/usr/include/bits/predefs.h:23:3: error: #error "Never use <bits/predefs.h> directly; include <stdc-predef.h> instead."
+
+Signed-off-by: Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>
+
+Upstream-Status: Inappropriate [embedded specific]
+
+---
+ Makefile.am        |    2 +-
+ sample/Makefile.am |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+--- onig-5.9.3.orig/Makefile.am
++++ onig-5.9.3/Makefile.am
+@@ -4,11 +4,11 @@ sampledir = $(top_srcdir)/sample
+ libname = libonig.la
+
+ ACLOCAL_AMFLAGS = -I m4
+ #AM_CFLAGS = -DNOT_RUBY
+ AM_CFLAGS =
+-INCLUDES  = -I$(top_srcdir) -I$(includedir)
++INCLUDES  = -I$(top_srcdir)
+
+ SUBDIRS = . sample
+
+ include_HEADERS = oniguruma.h oniggnu.h onigposix.h
+ lib_LTLIBRARIES = $(libname)
+--- onig-5.9.3.orig/sample/Makefile.am
++++ onig-5.9.3/sample/Makefile.am
+@@ -1,10 +1,10 @@
+ noinst_PROGRAMS = encode listcap names posix simple sql syntax crnl
+
+ libname = $(top_builddir)/libonig.la
+ LDADD   = $(libname)
+-INCLUDES  = -I$(top_srcdir) -I$(includedir)
++INCLUDES  = -I$(top_srcdir)
+
+ encode_SOURCES  = encode.c
+ listcap_SOURCES = listcap.c
+ names_SOURCES   = names.c
+ posix_SOURCES   = posix.c

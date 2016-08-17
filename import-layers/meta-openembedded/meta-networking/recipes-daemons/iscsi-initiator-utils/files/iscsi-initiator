@@ -1,0 +1,4 @@
+# default command line settings for open-iscsi's iscsid
+
+OPTS_ISCSID=""
+OPTS_ISCSIADM=""

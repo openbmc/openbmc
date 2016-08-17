@@ -1,0 +1,12 @@
+Index: libetpan-0.57/configure.ac
+===================================================================
+--- libetpan-0.57.orig/configure.ac	2008-10-08 19:54:20.000000000 +0000
++++ libetpan-0.57/configure.ac	2008-11-11 16:34:33.000000000 +0000
+@@ -106,6 +106,7 @@
+ 
+ # Check the C compiler.
+ AC_PROG_CC
++AC_PROG_CXX
+ 
+ # Compiler flags.
+ AC_ARG_ENABLE(debug,   [  --enable-debug          setup flags (gcc) for debugging (default=no)],

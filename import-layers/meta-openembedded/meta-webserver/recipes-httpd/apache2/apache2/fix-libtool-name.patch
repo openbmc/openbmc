@@ -1,0 +1,55 @@
+Fix build scripts to use correct libtool filename
+
+Upstream-Status: Inappropriate [configuration]
+
+---
+ httpd-2.4.2/build/config_vars.sh.in |    2 +-
+ httpd-2.4.2/configure               |    2 +-
+ httpd-2.4.2/configure.in            |    2 +-
+ httpd-2.4.2/support/apxs.in         |    2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+--- a/build/config_vars.sh.in
++++ b/build/config_vars.sh.in
+@@ -35,7 +35,7 @@ else
+    APU_CONFIG=@APU_CONFIG@
+ fi
+ 
+-APR_LIBTOOL="`${APR_CONFIG} --apr-libtool`"
++APR_LIBTOOL="`${APR_CONFIG} --apr-libtool | sed -e s,libtool,${host_alias}-libtool,`"
+ APR_INCLUDEDIR="`${APR_CONFIG} --includedir`"
+ test -n "@APU_CONFIG@" && APU_INCLUDEDIR="`${APU_CONFIG} --includedir`"
+ 
+--- a/configure
++++ b/configure
+@@ -6205,7 +6205,7 @@ case $host in
+       if test "x$LTFLAGS" = "x"; then
+           LTFLAGS='--silent'
+       fi
+-      my_libtool=`$apr_config --apr-libtool`
++      my_libtool=`$apr_config --apr-libtool | sed -e s,libtool,${host_alias}-libtool,`
+       LIBTOOL="$my_libtool \$(LTFLAGS)"
+       libtoolversion=`$my_libtool --version`
+       case $libtoolversion in
+--- a/configure.in
++++ b/configure.in
+@@ -264,7 +264,7 @@ case $host in
+       if test "x$LTFLAGS" = "x"; then
+           LTFLAGS='--silent'
+       fi
+-      my_libtool=`$apr_config --apr-libtool`
++      my_libtool=`$apr_config --apr-libtool | sed -e s,libtool,${host_alias}-libtool,`
+       LIBTOOL="$my_libtool \$(LTFLAGS)"
+       libtoolversion=`$my_libtool --version`
+       case $libtoolversion in
+--- a/support/apxs.in
++++ b/support/apxs.in
+@@ -352,7 +352,7 @@ if ($apr_major_version < 2) {
+     }
+ }
+ 
+-my $libtool = `$apr_config --apr-libtool`;
++my $libtool = `$apr_config --apr-libtool| sed -e s,libtool,${host_alias}-libtool,`;
+ chomp($libtool);
+ 
+ my $apr_includedir = `$apr_config --includes`;

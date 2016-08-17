@@ -1,0 +1,15 @@
+[Unit]
+Description=tracker DBus session bus handler
+Before=tracker-store.service
+After=dbus.service
+Requires=dbus.service
+BindTo=tracker-store.service
+
+[Service]
+Type=forking
+EnvironmentFile=-/tmp/tracker.env
+ExecStartPre=@BASE_BINDIR@/rm -rf /tmp/tracker.env
+ExecStart=/bin/sh -c 'echo "DBUS_SESSION_BUS_ADDRESS=`dbus-daemon --fork --session --print-address`" > /tmp/tracker.env'
+
+[Install]
+WantedBy=multi-user.target

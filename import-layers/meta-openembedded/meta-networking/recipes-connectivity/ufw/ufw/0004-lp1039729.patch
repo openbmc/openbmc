@@ -1,0 +1,40 @@
+Origin: r803, r804
+Description: Don't call get_netfilter_capabilities() with ipv6 if ipv6 is
+ disabled.
+Bug-Ubuntu: https://launchpad.net/ufw/bugs/1039729
+
+Upstream-Status: Inappropriate [ not author ]
+
+Signed-off-by: Joe MacDonald <joe_macdonald@mentor.com>
+
+Index: ufw-0.33/src/backend.py
+===================================================================
+--- ufw-0.33.orig/src/backend.py	2012-12-04 09:21:57.000000000 -0600
++++ ufw-0.33/src/backend.py	2012-12-04 09:22:40.000000000 -0600
+@@ -98,15 +98,17 @@
+             else:
+                 self.caps['limit']['4'] = False
+ 
+-            # v6
+-            try:
+-                nf_caps = ufw.util.get_netfilter_capabilities(self.ip6tables)
+-            except OSError as e:
+-                error("initcaps\n%s" % e)
+-            if 'recent-set' in nf_caps and 'recent-update' in nf_caps:
+-                self.caps['limit']['6'] = True
+-            else:
+-                self.caps['limit']['6'] = False
++            # v6 (skip capabilities check for ipv6 if ipv6 is disabled in ufw
++            # because the system may not have ipv6 support (LP: #1039729)
++            if self.use_ipv6():
++                try:
++                    nf_caps = ufw.util.get_netfilter_capabilities(self.ip6tables)
++                except OSError as e:
++                    error("initcaps\n%s" % e)
++                if 'recent-set' in nf_caps and 'recent-update' in nf_caps:
++                    self.caps['limit']['6'] = True
++                else:
++                    self.caps['limit']['6'] = False
+ 
+     def is_enabled(self):
+         '''Is firewall configured as enabled'''

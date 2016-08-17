@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# polkit installed?
+if [ $(which pkexec) ]; then
+	pkexec --disable-internal-agent "%sbindir%/gparted" "$@"
+else
+	%sbindir%/gparted "$@"
+fi
+
+

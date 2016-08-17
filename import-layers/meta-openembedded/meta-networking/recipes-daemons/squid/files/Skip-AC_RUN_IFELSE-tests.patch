@@ -1,0 +1,64 @@
+Subject: [PATCH] Skip AC_RUN_IFELSE tests
+
+Upstream-Status: Inappropriate [cross compiling specific]
+
+Such tests are not supported in a cross compile
+environment.  Choose sane defaults.
+
+Signed-off-by: Jim Somerville <Jim.Somerville@windriver.com>
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ acinclude/krb5.m4       |   10 +++++++++-
+ acinclude/lib-checks.m4 |    8 ++++++--
+ 2 files changed, 15 insertions(+), 3 deletions(-)
+
+diff --git a/acinclude/krb5.m4 b/acinclude/krb5.m4
+index 946bea8..7a072a2 100644
+--- a/acinclude/krb5.m4
++++ b/acinclude/krb5.m4
+@@ -82,7 +82,15 @@ main(void)
+ 
+         return 0;
+ }
+-]])], [ squid_cv_broken_heimdal_krb5_h=yes ], [ squid_cv_broken_heimdal_krb5_h=no ])
++]])], [ squid_cv_broken_heimdal_krb5_h=yes ], [ squid_cv_broken_heimdal_krb5_h=no ],
++[
++  dnl Can't test in cross compiled env - so assume good
++  squid_cv_broken_heimdal_krb5_h=no
++])
++    ],
++    [
++     dnl Can't test in cross compiled env - so assume good
++     squid_cv_broken_heimdal_krb5_h=no
+     ])
+   ])
+ ]) dnl SQUID_CHECK_KRB5_HEIMDAL_BROKEN_KRB5_H
+diff --git a/acinclude/lib-checks.m4 b/acinclude/lib-checks.m4
+index 2bf98ee..50dba9b 100644
+--- a/acinclude/lib-checks.m4
++++ b/acinclude/lib-checks.m4
+@@ -128,7 +128,9 @@ AC_DEFUN([SQUID_CHECK_OPENSSL_GETCERTIFICATE_WORKS],[
+    AC_DEFINE(SQUID_SSLGETCERTIFICATE_BUGGY, 1)
+    AC_MSG_RESULT([yes])
+   ],
+-  [])
++  [
++   AC_MSG_RESULT([skipped - can't test in cross-compiled env])
++  ])
+ 
+   AC_MSG_CHECKING(whether the workaround for SSL_get_certificate works)
+   AC_RUN_IFELSE([
+@@ -154,7 +156,9 @@ AC_DEFUN([SQUID_CHECK_OPENSSL_GETCERTIFICATE_WORKS],[
+   [
+    AC_MSG_RESULT([no])
+   ],
+-[])
++[
++   AC_MSG_RESULT([skipped - can't test in cross-compiled env])
++])
+ 
+ SQUID_STATE_ROLLBACK(check_SSL_get_certificate)
+ ])
+-- 
+1.7.1
+

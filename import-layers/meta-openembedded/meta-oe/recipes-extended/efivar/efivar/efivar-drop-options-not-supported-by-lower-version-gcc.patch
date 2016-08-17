@@ -1,0 +1,71 @@
+gcc options '-Wmaybe-uninitialized' and '-std=gnu11' are not recognized by gcc
+whose version is lower than 4.6, such as on Ubuntu 12.04. Drop them for backward
+compatible.
+
+Upstream-Status: Pending
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+diff --git a/Make.defaults b/Make.defaults
+index cc2baa9..118ae56 100644
+--- a/Make.defaults
++++ b/Make.defaults
+@@ -10,10 +10,9 @@ CFLAGS	?= -O2 -g
+ 
+ ARCH = $(shell uname -m)
+ clang_cflags =
+-gcc_cflags = -Wmaybe-uninitialized
+ cflags	:= $(CFLAGS) \
+ 	-Werror -Wall -Wsign-compare -Wstrict-aliasing \
+-	-std=gnu11 -fshort-wchar -fPIC \
++	-fshort-wchar -fPIC \
+ 	-fvisibility=hidden \
+ 	-D_GNU_SOURCE -I${TOPDIR}/src/include/efivar/ \
+ 	$(if $(filter $(CC),clang),$(clang_cflags),) \
+diff --git a/src/guid.h b/src/guid.h
+index 9542ee1..0817991 100644
+--- a/src/guid.h
++++ b/src/guid.h
+@@ -31,7 +31,8 @@ static inline int
+ real_isspace(char c)
+ {
+ 	char spaces[] = " \f\n\r\t\v";
+-	for (int i = 0; spaces[i] != '\0'; i++)
++	int i;
++	for (i = 0; spaces[i] != '\0'; i++)
+ 		if (c == spaces[i])
+ 			return 1;
+ 	return 0;
+@@ -59,7 +60,8 @@ check_sanity(const char *text, size_t len)
+ static inline int
+ check_segment_sanity(const char *text, size_t len)
+ {
+-	for(unsigned int i = 0; i < len; i++) {
++	unsigned int i;
++	for(i = 0; i < len; i++) {
+ 		if (text[i] >= '0' && text[i] <= '9')
+ 			continue;
+ 		/* "| 0x20" is tolower() without having to worry about
+diff --git a/src/makeguids.c b/src/makeguids.c
+index e9acf15..7e16cb2 100644
+--- a/src/makeguids.c
++++ b/src/makeguids.c
+@@ -150,7 +150,8 @@ main(int argc, char *argv[])
+ 
+ 	fprintf(header, "#ifndef EFIVAR_GUIDS_H\n#define EFIVAR_GUIDS_H 1\n\n");
+ 
+-	for (unsigned int i = 0; i < line-1; i++) {
++	unsigned int i, j;
++	for (i = 0; i < line-1; i++) {
+ 		if (!strcmp(outbuf[i].symbol, "efi_guid_zero"))
+ 			fprintf(symout, "\t.globl %s\n"
+ 					"\t.data\n"
+@@ -176,7 +177,7 @@ main(int argc, char *argv[])
+ 			fprintf(symout, "efi_guid_empty:\n");
+ 
+ 		uint8_t *guid_data = (uint8_t *) &outbuf[i].guid;
+-		for (unsigned int j = 0; j < sizeof (efi_guid_t); j++)
++		for (j = 0; j < sizeof (efi_guid_t); j++)
+ 			fprintf(symout,"\t.byte 0x%02x\n", guid_data[j]);
+ 
+ 		fprintf(symout, "%s_end:\n", outbuf[i].symbol);

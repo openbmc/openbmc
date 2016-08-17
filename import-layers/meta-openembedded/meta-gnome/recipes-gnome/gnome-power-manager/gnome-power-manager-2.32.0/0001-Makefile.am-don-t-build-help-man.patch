@@ -1,0 +1,37 @@
+From 3ed15a3c6ae4ab94c7e3af306644bb5d7f3fd1fa Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Mon, 29 Apr 2013 13:08:10 +0200
+Subject: [PATCH] Makefile.am: don't build help/man
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+help crashes with:
+
+| xsltproc -o gnome-power-manager-C.omf --stringparam db2omf.basename gnome-power-manager --stringparam db2omf.format 'docbook' --stringparam db2omf.dtd "-//OASIS//DTD DocBook XML V4.3//EN" --stringparam db2omf.lang C --stringparam db2omf.omf_dir "/usr/share/omf" --stringparam db2omf.help_dir "/usr/share/gnome/help" --stringparam db2omf.omf_in "/home/jenkins/oe/shr-core-branches/shr-core/tmp-eglibc/work/armv5te-oe-linux-gnueabi/gnome-power-manager/2.32.0-r2/gnome-power-manager-2.32.0/help/gnome-power-manager.omf.in"  /home/jenkins/oe/shr-core-branches/shr-core/tmp-eglibc/sysroots/qemuarm`/home/jenkins/oe/shr-core-branches/shr-core/tmp-eglibc/sysroots/x86_64-linux/usr/bin/pkg-config --variable db2omf gnome-doc-utils` C/gnome-power-manager.xml || { rm -f "gnome-power-manager-C.omf"; exit 1; }
+| unable to parse fr/gnome-power-manager.xml
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ Makefile.am |    2 --
+ 1 files changed, 0 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 005b8a0..5b9e318 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -5,9 +5,7 @@ SUBDIRS = 						\
+ 	src						\
+ 	po						\
+ 	docs						\
+-	man						\
+ 	data						\
+-	help						\
+ 	policy						\
+ 	tools
+ 
+-- 
+1.7.6.5
+

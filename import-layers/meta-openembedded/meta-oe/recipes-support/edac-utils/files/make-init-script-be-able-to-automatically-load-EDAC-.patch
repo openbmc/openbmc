@@ -1,0 +1,98 @@
+make init script be able to automatically load EDAC module.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+---
+ src/etc/edac.init.in |   49 +++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 47 insertions(+), 2 deletions(-)
+
+diff --git a/src/etc/edac.init.in b/src/etc/edac.init.in
+index 7a51da9..5b568c4 100644
+--- a/src/etc/edac.init.in
++++ b/src/etc/edac.init.in
+@@ -42,7 +42,6 @@ for dir in "$sysconfdir/default" "$sysconfdir/sysconfig"; do
+   [ -f "$dir/$SERVICE" ] && . "$dir/$SERVICE"
+ done
+ 
+-
+ ###############################################################################
+ 
+ service_start ()
+@@ -52,6 +51,46 @@ service_start ()
+ # Assume that if EDAC_DRIVER is not set, then EDAC is configured
+ #  automatically, thus return successfully, but don't do anything.
+ #
++    if [ ! -f /etc/edac/edac-driver ]; then
++         [ -d /sys/bus/edac/devices/mc/mc0 ] && \
++         echo `lsmod | grep _edac | cut -d" " -f1` > /etc/edac/edac-driver
++    fi
++
++    [ -f /etc/edac/edac-driver ] && EDAC_DRIVER=`cat /etc/edac/edac-driver`
++
++    if [ -z "$EDAC_DRIVER" ]; then
++
++        DRIVER_PATH=/lib/modules/`uname -r`/kernel/drivers/edac
++        oldpath=`pwd`
++        if [ -d $DRIVER_PATH ]; then
++
++            cd $DRIVER_PATH
++
++            for i in $(/bin/ls | /usr/bin/cut -d. -f1) ; do
++                /sbin/modprobe $i 2>/dev/null
++                if [ -d /sys/bus/edac/devices/mc/mc0 ]; then
++                    echo $i> /etc/edac/edac-driver
++                    EDAC_DRIVER=$i
++                    break
++                fi
++                /sbin/modprobe -r $i 2>/dev/null
++            done
++
++            cd "$oldpath"
++
++
++            if [ -z "$EDAC_DRIVER" ]; then
++                echo "This board may not support EDAC, or EDAC module may not be compiled in"
++                exit
++            fi
++
++        else
++            echo "This board may not support EDAC, or EDAC module may not be compiled in"
++            exit
++        fi
++
++    fi
++
+   if [ -n "$EDAC_DRIVER" ]; then
+      echo -n "Starting ${SERVICE}: "
+      modprobe $EDAC_DRIVER
+@@ -76,12 +115,15 @@ service_start ()
+ service_stop ()
+ {
+   echo -n "Disabling ${SERVICE}: "
++
++  [ -f /etc/edac/edac-driver ] && EDAC_DRIVER=`cat /etc/edac/edac-driver`
++
+   if [ -n "$EDAC_DRIVER" ]; then
+     modprobe -r $EDAC_DRIVER
+     STATUS=$?
+     [ $STATUS -eq 0 ] && echo success || echo failure
+   else
+-    echo "Not supported for this configuration."
++    echo "Not supported for this configuration, or EDAC Module is not loaded."
+     STATUS=6
+   fi
+ }
+@@ -92,6 +134,9 @@ service_status ()
+ {
+ # Print the current status of the service.  Required by LSB.
+ #
++  [ -f /etc/edac/edac-driver ] && EDAC_DRIVER=`cat /etc/edac/edac-driver`
++  [ -z "$EDAC_DRIVER" ] && STATUS=1 && exit
++
+   edac-ctl --status
+   STATUS=0
+ }
+-- 
+1.7.10.4
+

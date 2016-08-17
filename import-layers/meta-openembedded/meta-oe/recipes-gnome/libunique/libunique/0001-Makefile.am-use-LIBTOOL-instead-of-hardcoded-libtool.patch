@@ -1,0 +1,27 @@
+From f39bcd5af79aa3efe2cecb2212793c5b596890a8 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 18 Feb 2016 17:40:45 +0200
+Subject: [PATCH] Makefile.am: use $(LIBTOOL) instead of hardcoded libtool name
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ unique/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/unique/Makefile.am b/unique/Makefile.am
+index 6475a87..734f431 100644
+--- a/unique/Makefile.am
++++ b/unique/Makefile.am
+@@ -114,7 +114,7 @@ Unique-1.0.gir: $(INTROSPECTION_SCANNER) libunique-1.0.la
+ 		--include=GObject-2.0 \
+ 		--include=Gtk-2.0 \
+ 		--library=libunique-1.0.la \
+-		--libtool="$(top_builddir)/libtool" \
++		--libtool="$(LIBTOOL)" \
+ 		--pkg gobject-2.0 \
+ 		--pkg gtk+-2.0 \
+ 		--output $@ \
+-- 
+2.7.0
+

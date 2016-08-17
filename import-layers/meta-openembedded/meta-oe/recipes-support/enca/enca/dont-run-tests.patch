@@ -1,0 +1,13 @@
+Index: enca-1.9/Makefile.am
+===================================================================
+--- enca-1.9.orig/Makefile.am	2005-11-24 11:21:32.000000000 +0100
++++ enca-1.9/Makefile.am	2006-04-11 11:14:21.832502904 +0200
+@@ -2,7 +2,7 @@
+ if MAINTAINER_MODE
+ SUBDIRS = tools data script lib src devel-docs test
+ else
+-SUBDIRS = tools script lib src devel-docs test
++SUBDIRS = tools script lib src devel-docs
+ endif
+ man_MANS = man/enca.1
+ 

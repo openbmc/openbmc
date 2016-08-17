@@ -1,0 +1,22 @@
+# PPPoE Server options
+
+# Maximum segment size, not used for in kernel PPPoE
+#MSS=1412
+
+# Device(s) - Space seperated list of devices to listen on
+#DEVICES="eth1"
+
+# Local IP
+#LOCAL_IP=10.0.0.1
+
+# Starting remote IP
+#REMOTE_IP=10.67.15.1
+
+# Service name
+#SERVICE_NAME="acme"
+
+# Maximum number of sessions, default is 16
+#MAX_SESSIONS=64
+
+# Access concentrator name, default is the hostname
+#ACCESS_CONCENTRATOR_NAME="pppoe-rtr-1"

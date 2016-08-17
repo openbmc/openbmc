@@ -1,0 +1,37 @@
+From 6aad913ddd5cdb473db9fa21a5e8ecec58de172b Mon Sep 17 00:00:00 2001
+From: iwamatsu <iwamatsu@7c53e7cc-98ea-0310-8f1f-a0b24da60408>
+Date: Wed, 12 Jan 2011 04:41:02 +0000
+Subject: [PATCH 3/8] Fix build failure with ld --as-needed.
+
+Signed-off-by: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
+
+git-svn-id: svn://svn.berlios.de/slim/trunk@177 7c53e7cc-98ea-0310-8f1f-a0b24da60408
+---
+ Makefile |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 1219de4..fafa0ef 100644
+--- a/Makefile
++++ b/Makefile
+@@ -4,7 +4,7 @@
+ # to fit into your operating system / distribution
+ #######################################################
+ CXX=/usr/bin/g++
+-CC=/usr/bin/gcc
++CC=/usr/bin/gcc-4.5
+ CFLAGS=-Wall -I. -I/usr/include/freetype2 -I/usr/include/freetype2/config -I/usr/include/libpng12 -I/usr/include
+ CXXFLAGS=$(CFLAGS)
+ LDFLAGS=-lXft -lX11 -lfreetype -lXrender -lfontconfig -lpng12 -lz -lm -lcrypt -lXmu -lpng -ljpeg -lrt
+@@ -33,7 +33,7 @@ endif
+ all: slim
+ 
+ slim: $(OBJECTS)
+-	$(CXX) $(LDFLAGS) $(OBJECTS) -o $(NAME)
++	$(CXX) $(OBJECTS) $(LDFLAGS) -o $(NAME)
+ 
+ .cpp.o:
+ 	$(CXX) $(CXXFLAGS) $(DEFINES) $(CUSTOM) -c $< -o $@
+-- 
+1.6.6.1
+

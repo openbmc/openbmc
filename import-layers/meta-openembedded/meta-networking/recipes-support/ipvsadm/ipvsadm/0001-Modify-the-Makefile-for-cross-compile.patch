@@ -1,0 +1,97 @@
+From 58292175115bae7a4c3600d3022e59ea57213025 Mon Sep 17 00:00:00 2001
+From: Jianchuan Wang <jianchuan.wang@windriver.com>
+Date: Mon, 12 Jan 2015 15:53:23 +0800
+Subject: [PATCH] Modify the Makefile for cross compile.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Jianchuan Wang <jianchuan.wang@windriver.com>
+---
+ Makefile         | 23 ++++++-----------------
+ libipvs/Makefile |  3 +--
+ 2 files changed, 7 insertions(+), 19 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index e4e03cc..461c021 100644
+--- a/Makefile
++++ b/Makefile
+@@ -35,10 +35,9 @@ ARCH		= $(shell uname -m)
+ RPMSOURCEDIR	= $(shell rpm --eval '%_sourcedir')
+ RPMSPECDIR	= $(shell rpm --eval '%_specdir')
+ 
+-CC		= gcc
+ INCLUDE		=
+ SBIN		= $(BUILD_ROOT)/sbin
+-MANDIR		= usr/man
++MANDIR		= usr/share/man
+ MAN		= $(BUILD_ROOT)/$(MANDIR)/man8
+ INIT		= $(BUILD_ROOT)/etc/rc.d/init.d
+ MKDIR		= mkdir
+@@ -62,17 +61,7 @@ RPMBUILD = $(shell				\
+ 		echo "/bin/rpm";		\
+ 	fi )
+ 
+-ifeq (,$(FORCE_GETOPT))
+-LIB_SEARCH = /lib64 /usr/lib64 /usr/local/lib64 /lib /usr/lib /usr/local/lib
+-POPT_LIB = $(shell for i in $(LIB_SEARCH); do \
+-  if [ -f $$i/libpopt.a ]; then \
+-    if nm $$i/libpopt.a | fgrep -q poptGetContext; then \
+-	echo "-lpopt"; \
+-	break; \
+-    fi; \
+-  fi; \
+-done)
+-endif
++POPT_LIB = -lpopt
+ 
+ ifneq (,$(POPT_LIB))
+ POPT_DEFINE = -DHAVE_POPT
+@@ -81,7 +70,7 @@ endif
+ OBJS		= ipvsadm.o config_stream.o dynamic_array.o
+ LIBS		= $(POPT_LIB)
+ ifneq (0,$(HAVE_NL))
+-LIBS		+= -lnl
++LIBS		+= -lnl-3 -lnl-genl-3
+ endif
+ DEFINES		= -DVERSION=\"$(VERSION)\" -DSCHEDULERS=\"$(SCHEDULERS)\" \
+ 		  -DPE_LIST=\"$(PE_LIST)\" $(POPT_DEFINE)
+@@ -91,13 +80,13 @@ DEFINES		+= $(shell if [ ! -f ../ip_vs.h ]; then	\
+ 
+ .PHONY	= all clean install dist distclean rpm rpms
+ 
+-all:            libs ipvsadm
++all: ipvsadm
+ 
+ libs:
+ 		make -C libipvs
+ 
+-ipvsadm:	$(OBJS) $(STATIC_LIBS)
+-		$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
++ipvsadm:	$(OBJS) libs
++		$(CC) $(CFLAGS) -o $@ $(OBJS) $(STATIC_LIBS) $(LIBS)
+ 
+ install:        all
+ 		if [ ! -d $(SBIN) ]; then $(MKDIR) -p $(SBIN); fi
+diff --git a/libipvs/Makefile b/libipvs/Makefile
+index a527a7f..b7300ec 100644
+--- a/libipvs/Makefile
++++ b/libipvs/Makefile
+@@ -1,6 +1,5 @@
+ # Makefile for libipvs
+ 
+-CC		= gcc
+ CFLAGS		= -Wall -Wunused -Wstrict-prototypes -g -fPIC
+ ifneq (0,$(HAVE_NL))
+ CFLAGS		+= -DLIBIPVS_USE_NL
+@@ -18,7 +17,7 @@ SHARED_LIB	= libipvs.so
+ all:		$(STATIC_LIB) $(SHARED_LIB)
+ 
+ $(STATIC_LIB):	libipvs.o ip_vs_nl_policy.o
+-		ar rv $@ $^
++		$(AR) rv $@ $^
+ 
+ $(SHARED_LIB):	libipvs.o ip_vs_nl_policy.o
+ 		$(CC) -shared -Wl,-soname,$@ -o $@ $^
+-- 
+1.9.1
+

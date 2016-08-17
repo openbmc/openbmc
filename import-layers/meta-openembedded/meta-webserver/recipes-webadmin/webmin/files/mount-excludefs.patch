@@ -1,0 +1,25 @@
+Add excludefs config option to mount module
+
+Adds a configuration option (currently hidden) to allow the distro to
+hide certain filesystems from the mount module within Webmin (e.g. /dev)
+since these shouldn't be modified from the web interface.
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+
+Upstream-status: Pending
+
+--- webmin-1.570.orig/mount/index.cgi
++++ webmin-1.570/mount/index.cgi
+@@ -33,10 +33,12 @@ elsif ($config{'sort_mode'} == 1) {
+ 	}
+ 
+ # Build visible filesystems list
++@excludefs = split(/,/, $config{excludefs});
+ foreach $m (@all) {
+ 	@minfo = @$m;
+ 	$p = &simplify_mount_path($minfo[0], $minfo[2]);
+ 	next if ($ignore{$minfo[2]});
++	next if (grep {$_ eq $minfo[2]} @excludefs);
+ 	@mmodes = &mount_modes($minfo[2], $minfo[0], $minfo[1]);
+ 	$canedit = $can_edit{$minfo[2]} && !$mmodes[4] &&
+             	   &can_edit_fs(@minfo);

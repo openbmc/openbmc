@@ -1,0 +1,5 @@
+# Automatically generated.  Only the value of DAEMON_ARGS will be preserved.
+# If you change anything in this file other than DAEMON_ARGS, first run
+# dpkg-reconfigure krb5-kdc and disable managing the KDC configuration with
+# debconf.  Otherwise, changes will be overwritten.
+

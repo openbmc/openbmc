@@ -1,0 +1,37 @@
+uclibc has langinfo.h but it does not define _NL_TIME_FIRST_WEEKDAY
+therefore we introduce a check in configure for the this define
+and then we make sure that we use it when it really exists
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Pending
+
+Index: git/configure.ac
+===================================================================
+--- git.orig/configure.ac	2011-07-18 10:34:15.000000000 -0700
++++ git/configure.ac	2011-07-18 10:54:26.403798188 -0700
+@@ -98,6 +98,8 @@
+ 		src/libgtkdatesview.pc
+ ])
+ 
++AC_CHECK_DECLS([_NL_TIME_FIRST_WEEKDAY],[],[],[[#include <langinfo.h>]])
++
+ AC_OUTPUT
+ 
+ echo " "
+Index: git/src/dates_view.c
+===================================================================
+--- git.orig/src/dates_view.c	2011-07-18 10:34:15.000000000 -0700
++++ git/src/dates_view.c	2011-07-18 10:58:46.093798136 -0700
+@@ -1505,7 +1505,11 @@
+ 	priv->days = 1;
+ 	priv->months = 0;
+ 	priv->months_in_row = 4;
++#if HAVE_DECL__NL_TIME_FIRST_WEEKDAY
+ 	priv->week_start = *nl_langinfo (_NL_TIME_FIRST_WEEKDAY) - 1;
++#else
++	priv->week_start = 0;
++#endif
+ 	priv->dragbox = TRUE;
+ 	priv->single_click = TRUE;
+ 	priv->double_click = FALSE;

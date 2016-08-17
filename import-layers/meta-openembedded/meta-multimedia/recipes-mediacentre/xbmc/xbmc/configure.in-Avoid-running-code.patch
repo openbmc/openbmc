@@ -1,0 +1,32 @@
+From cfd851660a594801a591e80dc820c65cb7bd7836 Mon Sep 17 00:00:00 2001
+From: Otavio Salvador <otavio@ossystems.com.br>
+Date: Sat, 6 Oct 2012 06:40:03 -0300
+Subject: [PATCH] configure.in: Avoid running code or we break cross-compile
+
+Upstream-Status: Backport [similar change done for 12.0]
+
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+---
+ configure.in |    6 +-----
+ 1 files changed, 1 insertions(+), 5 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index ef94683..d7efcb0 100755
+--- a/configure.in
++++ b/configure.in
+@@ -1246,11 +1246,7 @@ if test "$use_external_ffmpeg" = "yes"; then
+   AC_DEFINE([USE_EXTERNAL_FFMPEG], [1], [Whether to use external FFmpeg libraries.])
+ 
+   # Disable vdpau support if external libavcodec doesn't have it
+-  AC_RUN_IFELSE(
+-    AC_LANG_PROGRAM([[#include <libavcodec/avcodec.h>]],
+-      [[avcodec_register_all();
+-        AVCodec *codec = avcodec_find_decoder_by_name("vc1_vdpau");
+-        return (codec) ? 0 : 1;]]),,
++  AC_CHECK_LIB([avcodec], [ff_vdpau_vc1_decode_picture],,
+     [if test "x$use_vdpau" = "xyes"; then
+       AC_MSG_ERROR($ffmpeg_vdpau_not_supported)
+     else
+-- 
+1.7.2.5
+

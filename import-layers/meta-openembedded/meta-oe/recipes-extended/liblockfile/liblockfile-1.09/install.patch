@@ -1,0 +1,48 @@
+
+#
+# Patch managed by http://www.mn-logistik.de/unsupported/pxa250/patcher
+#
+
+--- liblockfile-1.05/Makefile.in~install
++++ liblockfile-1.05/Makefile.in
+@@ -20,6 +20,7 @@
+ includedir	= @includedir@
+ 
+ MAILGROUP	= @MAILGROUP@
++INSTGRP		= $(if $(MAILGROUP),-g $(MAILGROUP))
+ 
+ all:		@TARGETS@
+ install:	@INSTALL_TARGETS@
+@@ -50,25 +51,27 @@
+ 		$(CC) $(CFLAGS) -c lockfile.c -o xlockfile.o
+ 
+ install_static:	static install_common
++		install -d $(ROOT)$(libdir)
+ 		install -m 644 liblockfile.a $(ROOT)$(libdir)
+ 
+ install_shared:	shared install_common
++		install -d $(ROOT)$(libdir)
+ 		install -m 755 liblockfile.so \
+ 			$(ROOT)$(libdir)/liblockfile.so.$(VER)
+ 		ln -s liblockfile.so.$(VER) $(ROOT)$(libdir)/liblockfile.so
+ 		if test "$(ROOT)" = ""; then @LDCONFIG@; fi
+ 
+ install_common:
++		install -d $(ROOT)$(includedir)
+ 		install -m 644 lockfile.h maillock.h $(ROOT)$(includedir)
+-		if [ "$(MAILGROUP)" != "" ]; then\
+-		  install -g $(MAILGROUP) -m 2755 dotlockfile $(ROOT)$(bindir);\
+-		else \
+-		  install -g root -m 755 dotlockfile $(ROOT)$(bindir); \
+-		fi
++		install -d $(ROOT)$(bindir)
++		install -m 755 $(INSTGRP) dotlockfile $(ROOT)$(bindir)
++		install -d $(ROOT)$(mandir)/man1 $(ROOT)$(mandir)/man3
+ 		install -m 644 *.1 $(ROOT)$(mandir)/man1
+ 		install -m 644 *.3 $(ROOT)$(mandir)/man3
+ 
+ install_nfslib:	nfslib
++		install -d $(ROOT)$(nfslockdir)
+ 		install -m 755 nfslock.so.$(VER) $(ROOT)$(nfslockdir)
+ 		if test "$(ROOT)" = ""; then @LDCONFIG@; fi
+ 

@@ -1,0 +1,10 @@
+--- crash-5.1.8/Makefile.orig	2011-12-27 11:21:58.220652105 +0900
++++ crash-5.1.8/Makefile	2011-12-27 11:22:29.563651593 +0900
+@@ -285,6 +285,7 @@
+ 
+ library: make_build_data ${OBJECT_FILES}
+ 	ar -rs ${PROGRAM}lib.a ${OBJECT_FILES}
++	${RANLIB} ${PROGRAM}lib.a 
+ 
+ gdb: force
+ 	rm -f ${GDB_OFILES}

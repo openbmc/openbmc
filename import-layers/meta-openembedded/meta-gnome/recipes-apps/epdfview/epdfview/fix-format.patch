@@ -1,0 +1,19 @@
+Imported from Debian 0.1.8-3
+
+Upstream-Status: Pending
+
+diff --git a/src/gtk/MainView.cxx b/src/gtk/MainView.cxx
+index b983bff..f87de28 100644
+--- a/src/gtk/MainView.cxx
++++ b/src/gtk/MainView.cxx
+@@ -634,8 +634,9 @@ MainView::showErrorMessage (const gchar *title, const gchar *body)
+             GTK_DIALOG_DESTROY_WITH_PARENT,
+             GTK_MESSAGE_ERROR,
+             GTK_BUTTONS_OK,
++            "%s",
+             title);
+-    gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG(errorDialog),
++    gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG(errorDialog), "%s",
+                                               body);
+     gtk_dialog_run (GTK_DIALOG (errorDialog));
+     gtk_widget_destroy (errorDialog);

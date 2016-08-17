@@ -1,0 +1,12 @@
+Upstream-Status: pending
+
+--- gpm-1.99.7.orig/src/daemon/open_console.c	2008-07-24 12:33:05.000000000 +0200
++++ gpm-1.99.7/src/daemon/open_console.c	2013-01-10 12:39:47.975461947 +0100
+@@ -23,6 +23,7 @@
+ #include <fcntl.h>              /* open and co.  */
+ #include <sys/stat.h>           /* stat() */
+ #include <sys/ioctl.h>          /* ioctl() */
++#include <sys/types.h>          /* major() */
+ 
+ /* Linux specific (to be outsourced in gpm2 */
+ #include <linux/serial.h>       /* for serial console check */

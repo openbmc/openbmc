@@ -1,0 +1,13 @@
+#! /bin/sh
+case "$1" in
+  start)
+	echo "Starting to install database for mariadb"
+	/usr/bin/mysql-systemd-start pre
+        echo "done."
+	;;
+  *)
+	echo "Usage: /etc/init.d/install_db start"
+	exit 1
+esac
+
+exit 0

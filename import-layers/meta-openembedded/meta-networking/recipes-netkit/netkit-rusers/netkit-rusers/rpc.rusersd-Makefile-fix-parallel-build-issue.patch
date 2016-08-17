@@ -1,0 +1,30 @@
+From c23cc112a480f90950de5cf1de09b1a7e732bf21 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Mon, 15 Dec 2014 18:31:13 -0800
+Subject: [PATCH] rpc.rusersd/Makefile: fix parallel build issue
+
+Fixed:
+rusers.x: No such file or directory
+Makefile:44: recipe for target 'rusers_xdr.c' failed
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ rpc.rusersd/Makefile |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/rpc.rusersd/Makefile b/rpc.rusersd/Makefile
+index 792f528..65a424a 100644
+--- a/rpc.rusersd/Makefile
++++ b/rpc.rusersd/Makefile
+@@ -40,5 +40,5 @@ rusers.x:
+ rusers.h: $(RUSERSX) rusers.x
+ 	$(RPCGEN) -h -o rusers.h rusers.x
+ 
+-rusers_xdr.c: $(RUSERSX)
++rusers_xdr.c: $(RUSERSX) rusers.x
+ 	$(RPCGEN) -c -C -o rusers_xdr.c rusers.x
+-- 
+1.7.9.5
+

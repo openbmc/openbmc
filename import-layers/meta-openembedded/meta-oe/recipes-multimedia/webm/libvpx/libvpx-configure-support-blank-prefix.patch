@@ -1,0 +1,43 @@
+Upstream: not yet
+
+Fix configure to accept "--prefix=" (a blank prefix).
+
+--- libvpx-0.9.1/build/make/configure.sh.orig	2010-06-17 09:08:56.000000000 -0400
++++ libvpx-0.9.1/build/make/configure.sh	2010-09-23 14:27:48.000000000 -0400
+@@ -444,6 +444,8 @@
+         ;;
+         --prefix=*)
+         prefix="${optval}"
++        # Distinguish between "prefix not set" and "prefix set to ''"
++        prefixset=1
+         ;;
+         --libdir=*)
+         libdir="${optval}"
+@@ -587,13 +587,23 @@ process_cmdline() {
+ }
+ 
+ post_process_common_cmdline() {
+-  prefix="${prefix:-/usr/local}"
++  if [ "$prefixset" != "1" ]
++  then
++      prefix=/usr/local
++  fi
++
++  # Strip trailing slash
+   prefix="${prefix%/}"
++
+   libdir="${libdir:-${prefix}/lib}"
+   libdir="${libdir%/}"
+-  if [ "${libdir#${prefix}}" = "${libdir}" ]; then
+-    die "Libdir ${libdir} must be a subdirectory of ${prefix}"
+-  fi
++
++  case "$libdir" in
++      "${prefix}/"*) ;;
++      *)
++          die "Libdir ${libdir} must be a subdirectory of ${prefix}"
++          ;;
++  esac
+ }
+ 
+ post_process_cmdline() {

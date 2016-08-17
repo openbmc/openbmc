@@ -1,0 +1,12 @@
+[Unit]
+Description=tracker-miner-fs
+After=syslog.target local-fs.target udev.service dbus.service tracker-store.service
+Requires=tracker-store.service
+
+[Service]
+Environment=HOME=/home/root
+EnvironmentFile=-/tmp/tracker.env
+ExecStart=@LIBEXECDIR@/tracker-miner-fs
+
+[Install]
+WantedBy=multi-user.target

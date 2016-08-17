@@ -1,0 +1,34 @@
+Use pkg-config instead of ${PYTHON}-config to find python
+
+diff -uNr pidgin-2.10.12.orig/configure.ac pidgin-2.10.12/configure.ac
+--- pidgin-2.10.12.orig/configure.ac	2016-01-01 00:19:40.000000000 +0100
++++ pidgin-2.10.12/configure.ac	2016-05-05 16:55:13.258945925 +0200
+@@ -1585,20 +1585,15 @@
+ dnl Check for Python headers (currently useful only for libgnt)
+ dnl (Thanks to XChat)
+ if test "x$enable_consoleui" = "xyes" -a ! -z "$PYTHON" -a x"$PYTHON" != x"no" ; then
+-	AC_MSG_CHECKING(for Python compile flags)
+-	if test -f ${PYTHON}-config; then
+-		PY_CFLAGS=`${PYTHON}-config --includes`
+-		PY_LIBS=`${PYTHON}-config --libs`
+-		AC_DEFINE(USE_PYTHON, [1], [Define if python headers are available.])
+-		AC_MSG_RESULT(ok)
+-	else
+-		AC_MSG_RESULT([Cannot find ${PYTHON}-config])
+-		PY_CFLAGS=""
+-		PY_LIBS=""
+-	fi
++        AC_MSG_CHECKING(for Python compile flags)
++        PKG_CHECK_MODULES(PY, python, [
++                AC_SUBST(PY_CFLAGS)
++                AC_SUBST(PY_LIBS)
++        ], [
++                AC_MSG_RESULT(no)
++                AC_MSG_ERROR([Can't find python])
++        ])
+ fi
+-AC_SUBST(PY_CFLAGS)
+-AC_SUBST(PY_LIBS)
+ 
+ dnl #######################################################################
+ dnl # Check for Mono support

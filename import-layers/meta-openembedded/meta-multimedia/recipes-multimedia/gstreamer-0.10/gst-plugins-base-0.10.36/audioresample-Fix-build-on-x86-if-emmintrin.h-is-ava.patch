@@ -1,0 +1,37 @@
+audioresample: Fix build on x86 if emmintrin.h is available but can't be used
+
+On x86, EMMINTRIN is defined but not usable without SSE so check for
+__SSE__ and __SSE2__ as well.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=670690
+
+Upstream-Status: Backport
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ gst/audioresample/resample.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gst/audioresample/resample.c b/gst/audioresample/resample.c
+index 98d006c..481fa01 100644
+--- a/gst/audioresample/resample.c
++++ b/gst/audioresample/resample.c
+@@ -77,13 +77,13 @@
+ #define EXPORT G_GNUC_INTERNAL
+ 
+ #ifdef _USE_SSE
+-#ifndef HAVE_XMMINTRIN_H
++#if !defined(__SSE__) || !defined(HAVE_XMMINTRIN_H)
+ #undef _USE_SSE
+ #endif
+ #endif
+ 
+ #ifdef _USE_SSE2
+-#ifndef HAVE_EMMINTRIN_H
++#if !defined(__SSE2__) || !defined(HAVE_EMMINTRIN_H)
+ #undef _USE_SSE2
+ #endif
+ #endif
+-- 
+1.7.1
+

@@ -1,0 +1,138 @@
+From 27910ea19260b7f7a3f9c0465addd1dea80cf3bd Mon Sep 17 00:00:00 2001
+From: Li Xin <lixin.fnst@cn.fujitsu.com>
+Date: Thu, 8 Oct 2015 15:11:17 +0900
+Subject: [PATCH] src: Fix error in cross-compile
+
+The errors are like this:
+tcptable.h:26:25: fatal error: linux/if_tr.h: No such file or directory
+ld: cannot find -ltextbox
+
+Upstream-Status: pending
+
+Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
+---
+ src/Makefile     | 2 +-
+ src/hostmon.c    | 2 +-
+ src/install.sh   | 4 ++--
+ src/othptab.c    | 2 +-
+ src/packet.c     | 2 +-
+ src/tcptable.h   | 2 +-
+ src/tr.c         | 2 +-
+ support/Makefile | 3 +--
+ 8 files changed, 9 insertions(+), 10 deletions(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index 2043c2d..0f77bea 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -39,7 +39,7 @@ LDOPTS		= #-static
+ # you may want to change this to point to your ncurses include directory
+ # if the ncurses include files are not in the default location.
+ 
+-INCLUDEDIR	= -I/usr/include/ncurses -I../support
++INCLUDEDIR	=  -I../support
+ 
+ # You can uncomment this one to disable the backspace key in input fields.
+ # This means you must use the Del key or Ctrl+H combination to erase the
+diff --git a/src/hostmon.c b/src/hostmon.c
+index 14df2c8..6571562 100644
+--- a/src/hostmon.c
++++ b/src/hostmon.c
+@@ -31,7 +31,7 @@ details.
+ #include <linux/if_packet.h>
+ #include <linux/if_ether.h>
+ #include <linux/if_fddi.h>
+-#include <linux/if_tr.h>
++#include <netinet/if_tr.h>
+ #include <net/if_arp.h>
+ #include <stdlib.h>
+ #include <time.h>
+diff --git a/src/install.sh b/src/install.sh
+index d2fd360..36d3516 100755
+--- a/src/install.sh
++++ b/src/install.sh
+@@ -23,9 +23,9 @@ echo
+ echo "*** Installing executable programs and preparing work directories"
+ echo
+ echo ">>> Installing iptraf in $TARGET"
+-$INSTALL -m 0700 -o root -g root -s iptraf $TARGET
++$INSTALL -m 0700 -o root -g root  iptraf $TARGET
+ echo ">>> Installing rvnamed in $TARGET"
+-$INSTALL -m 0700 -o root -g root -s rvnamed $TARGET
++$INSTALL -m 0700 -o root -g root  rvnamed $TARGET
+ 
+ if [ ! -d $WORKDIR ]; then
+     echo ">>> Creating IPTraf work directory $WORKDIR"
+diff --git a/src/othptab.c b/src/othptab.c
+index 97771d1..a8bb536 100644
+--- a/src/othptab.c
++++ b/src/othptab.c
+@@ -18,7 +18,7 @@ details.
+ 
+ #include <asm/types.h>
+ #include <linux/if_ether.h>
+-#include <linux/if_tr.h>
++#include <netinet/if_tr.h>
+ #include <linux/if_fddi.h>
+ #include <winops.h>
+ #include "arphdr.h"
+diff --git a/src/packet.c b/src/packet.c
+index 33fdf2a..1e2b81b 100644
+--- a/src/packet.c
++++ b/src/packet.c
+@@ -36,7 +36,7 @@ details.
+ #include <linux/if_packet.h>
+ #include <linux/if_ether.h>
+ #include <linux/if_fddi.h>
+-#include <linux/if_tr.h>
++#include <netinet/if_tr.h>
+ #include <linux/isdn.h>
+ #include <linux/sockios.h>
+ #include <msgboxes.h>
+diff --git a/src/tcptable.h b/src/tcptable.h
+index 3e17793..d1380b5 100644
+--- a/src/tcptable.h
++++ b/src/tcptable.h
+@@ -23,7 +23,7 @@
+ #include <linux/if_packet.h>
+ #include <linux/if_ether.h>
+ #include <linux/if_fddi.h>
+-#include <linux/if_tr.h>
++#include <netinet/if_tr.h>
+ #include <net/if.h>
+ #include <netinet/ip.h>
+ #include <netinet/udp.h>
+diff --git a/src/tr.c b/src/tr.c
+index 40c9e63..11f8045 100644
+--- a/src/tr.c
++++ b/src/tr.c
+@@ -7,7 +7,7 @@
+  */
+ 
+ #include <asm/types.h>
+-#include <linux/if_tr.h>
++#include <netinet/if_tr.h>
+ #include <netinet/in.h>
+ 
+ unsigned int get_tr_ip_offset(unsigned char *pkt)
+diff --git a/support/Makefile b/support/Makefile
+index 114bfc3..c962c09 100644
+--- a/support/Makefile
++++ b/support/Makefile
+@@ -1,4 +1,3 @@
+-INCLUDEDIR		= -I/usr/include/ncurses
+ 
+ OBJS			= input.o menurt.o listbox.o winops.o labels.o \
+ 				msgboxes.o txbox.o
+@@ -12,7 +11,7 @@ libtextbox.a: $(OBJS)
+ #	gcc -shared -o libtextbox.so $(OBJS)
+ 
+ %.o: %.c *.h
+-	gcc -O2 -g -Wall -fPIC $(INCLUDEDIR) -c -o $*.o $<
++	${CC} -O2 -g -Wall -fPIC  -c -o $*.o $<
+ 
+ clean:
+ 	rm -rf *.o *~ libtextbox.a libtextbox.so
+-- 
+1.8.4.2
+

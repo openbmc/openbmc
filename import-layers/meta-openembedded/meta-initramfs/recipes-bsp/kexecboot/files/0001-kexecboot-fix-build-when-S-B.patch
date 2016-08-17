@@ -1,0 +1,61 @@
+From 8519d61a7097498b0ee93fb8dc8262286825f3e5 Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Thu, 1 May 2014 23:58:51 +0200
+Subject: [PATCH 1/4] kexecboot: fix build when S != B
+
+* fatal error: ../config.h: No such file or directory
+
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+---
+ machine/zaurus.c | 2 +-
+ res/theme-gui.h  | 2 +-
+ res/theme-tui.h  | 4 ++--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/machine/zaurus.c b/machine/zaurus.c
+index ea21047..83be13b 100644
+--- a/machine/zaurus.c
++++ b/machine/zaurus.c
+@@ -25,7 +25,7 @@
+  *
+  */
+ 
+-#include "../config.h"
++#include "config.h"
+ 
+ #ifdef USE_ZAURUS
+ 
+diff --git a/res/theme-gui.h b/res/theme-gui.h
+index f8fef7f..79bed39 100644
+--- a/res/theme-gui.h
++++ b/res/theme-gui.h
+@@ -15,7 +15,7 @@
+  *
+  */
+ 
+-#include "../config.h"
++#include "config.h"
+ 
+ #ifdef USE_ICONS
+ /** Icons **/
+diff --git a/res/theme-tui.h b/res/theme-tui.h
+index 94e7693..909be56 100644
+--- a/res/theme-tui.h
++++ b/res/theme-tui.h
+@@ -15,11 +15,11 @@
+  *
+  */
+ 
+-#include "../config.h"
++#include "config.h"
+ 
+ #ifdef USE_TEXTUI
+ /** TEXT UI colors **/
+-#include "../termseq.h"
++#include "termseq.h"
+ 
+ /* Background color pair */
+ #define TUI_CLR_BG		TERM_CSI TERM_BG_BLACK ";" TERM_FG_WHITE TERM_SGR
+-- 
+1.9.1
+

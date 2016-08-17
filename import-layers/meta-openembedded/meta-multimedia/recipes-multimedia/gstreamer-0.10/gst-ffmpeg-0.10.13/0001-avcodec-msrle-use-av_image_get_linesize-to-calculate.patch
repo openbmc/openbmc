@@ -1,0 +1,50 @@
+From 573d5fdedae72bf59d8c0b0766fdee171063d36f Mon Sep 17 00:00:00 2001
+From: Michael Niedermayer <michaelni@gmx.at>
+Date: Sun, 16 Feb 2014 23:08:52 +0100
+Subject: [PATCH] avcodec/msrle: use av_image_get_linesize() to calculate the
+ linesize
+
+Upstream-Status: Backport
+
+Commit 573d5fdedae72bf59d8c0b0766fdee171063d36f release/0.9
+
+Fixes out of array access
+Fixes: 14a74a0a2dc67ede543f0e35d834fbbe-asan_heap-oob_49572c_556_cov_215466444_44_001_engine_room.mov
+Found-by: Mateusz "j00ru" Jurczyk and Gynvael Coldwind
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+(cherry picked from commit c919e1ca2ecfc47d796382973ba0e48b8f6f92a2)
+
+Conflicts:
+
+	libavcodec/msrle.c
+(cherry picked from commit bc1c8ec5e65098fd2ccd8456f667151dfc9cda42)
+
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+---
+ libavcodec/msrle.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
+
+diff --git a/libavcodec/msrle.c b/libavcodec/msrle.c
+index 30159bb..c39ae7b 100644
+--- a/gst-libs/ext/libav/libavcodec/msrle.c
++++ b/gst-libs/ext/libav/libavcodec/msrle.c
+@@ -35,6 +35,7 @@
+ #include "avcodec.h"
+ #include "dsputil.h"
+ #include "msrledec.h"
++#include "libavutil/imgutils.h"
+ 
+ typedef struct MsrleContext {
+     AVCodecContext *avctx;
+@@ -107,7 +108,7 @@ static int msrle_decode_frame(AVCodecContext *avctx,
+ 
+     /* FIXME how to correctly detect RLE ??? */
+     if (avctx->height * istride == avpkt->size) { /* assume uncompressed */
+-        int linesize = avctx->width * avctx->bits_per_coded_sample / 8;
++        int linesize = av_image_get_linesize(avctx->pix_fmt, avctx->width, 0);
+         uint8_t *ptr = s->frame.data[0];
+         uint8_t *buf = avpkt->data + (avctx->height-1)*istride;
+         int i, j;
+-- 
+1.7.5.4
+

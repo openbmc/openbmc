@@ -1,0 +1,34 @@
+From efc8a4e717ba919c869c2da1c7de2d08bc976926 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 24 Feb 2016 18:48:07 +0000
+Subject: [PATCH] Makefile: Change order of link flags
+
+This helps in injectcting LDFLAGS from env to take effect
+as it appears last on cmdline now
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ Makefile | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index ba2bfbb..6d13e68 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,3 +1,9 @@
+-CFLAGS=-O2 -Wall -Wextra -g -Wno-sign-compare -Wno-pointer-sign
+-CC=gcc
++CFLAGS?=-O2 -Wall -Wextra -g -Wno-sign-compare -Wno-pointer-sign
++CC?=gcc
+ all: serialcheck
++serialcheck : serialcheck.o
++	$(CC) -o serialcheck serialcheck.o $(CFLAGS) $(LDFLAGS)
++
++%.o : %.c
++	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
++
+-- 
+1.9.1
+

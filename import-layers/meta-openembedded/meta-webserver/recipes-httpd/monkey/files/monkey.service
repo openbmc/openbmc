@@ -1,0 +1,12 @@
+[Unit]
+Description=Monkey HTTP Server
+After=network.target remote-fs.target
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/monkey --daemon
+PIDFile=/var/run/monkey.pid.2001
+TimeoutSec=10
+
+[Install]
+WantedBy=multi-user.target

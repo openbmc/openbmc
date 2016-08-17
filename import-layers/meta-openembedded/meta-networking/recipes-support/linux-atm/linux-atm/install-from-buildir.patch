@@ -1,0 +1,19 @@
+install binaries from builddir not srcdir.
+
+Signed-off-by: Bian Naimeng <biannm@cn.fujitsu.com>
+
+--- linux-atm-2.5.2.orig/src/extra/Makefile.am	2010-12-21 05:07:22.000000000 +0800
++++ linux-atm-2.5.2/src/extra/Makefile.am	2014-12-22 10:56:04.458563269 +0800
+@@ -9,9 +9,9 @@ CLEANFILES = pca200e.bin pca200e_ecd.bin
+ 
+ install-exec-hook:
+ 	$(MKDIR_P) $(DESTDIR)/lib/firmware
+-	$(INSTALL_DATA) $(srcdir)/pca200e.bin $(DESTDIR)/lib/firmware
+-	$(INSTALL_DATA) $(srcdir)/pca200e_ecd.bin2 $(DESTDIR)/lib/firmware
+-	$(INSTALL_DATA) $(srcdir)/sba200e_ecd.bin2 $(DESTDIR)/lib/firmware
++	$(INSTALL_DATA) $(builddir)/pca200e.bin $(DESTDIR)/lib/firmware
++	$(INSTALL_DATA) $(builddir)/pca200e_ecd.bin2 $(DESTDIR)/lib/firmware
++	$(INSTALL_DATA) $(builddir)/sba200e_ecd.bin2 $(DESTDIR)/lib/firmware
+ 
+ %.bin %.bin2: %.data
+ 	objcopy -Iihex $< -Obinary $@.gz

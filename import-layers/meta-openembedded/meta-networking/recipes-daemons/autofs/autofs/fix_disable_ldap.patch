@@ -1,0 +1,42 @@
+autofs: fails to compile with openldap disabled
+
+As of 5.0.6, it appears that changes were introduced so that 
+if you compile with openldap disabled and openldap headers are not
+available, then autofs fails to build.
+
+Upstream-Status: Pending
+
+Signed-off-by: Amy Fong <amy.fong@windriver.com>
+--
+ lookup_ldap.h |    4 ++++
+ 1 file changed, 4 insertions(+)
+
+---
+ include/lookup_ldap.h |    4 ++++
+ 1 file changed, 4 insertions(+)
+
+--- a/include/lookup_ldap.h
++++ b/include/lookup_ldap.h
+@@ -1,7 +1,9 @@
+ #ifndef LOOKUP_LDAP_H
+ #define LOOKUP_LDAP_H
+ 
++#ifdef WITH_LDAP
+ #include <ldap.h>
++#endif
+ 
+ #ifdef WITH_SASL
+ #include <openssl/ssl.h>
+@@ -109,10 +111,12 @@
+ 
+ #define LDAP_AUTH_USESIMPLE	0x0008
+ 
++#ifdef WITH_LDAP
+ /* lookup_ldap.c */
+ LDAP *init_ldap_connection(unsigned logopt, const char *uri, struct lookup_context *ctxt);
+ int unbind_ldap_connection(unsigned logopt, LDAP *ldap, struct lookup_context *ctxt);
+ int authtype_requires_creds(const char *authtype);
++#endif
+ 
+ #ifdef WITH_SASL
+ /* cyrus-sasl.c */

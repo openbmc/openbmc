@@ -1,0 +1,29 @@
+Don't pick up version string from parent git repository
+
+If the collectd source is extracted from a tarball underneath a
+directory structure that includes another git repository, that
+repository will be picked up by "git describe" which is not
+desirable. Check whether collectd itself is a git repository and just
+use the default version if not.
+
+Upstream-Status: Pending
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+
+diff --git a/version-gen.sh b/version-gen.sh
+index b09be8e..2671066 100755
+--- a/version-gen.sh
++++ b/version-gen.sh
+@@ -2,8 +2,10 @@
+ 
+ DEFAULT_VERSION="5.5.0.git"
+ 
+-VERSION="`git describe 2> /dev/null | grep collectd | sed -e 's/^collectd-//'`"
+-
++VERSION=""
++if test -d .git ; then
++	VERSION="`git describe 2> /dev/null | grep collectd | sed -e 's/^collectd-//'`"
++fi
+ if test -z "$VERSION"; then
+ 	VERSION="$DEFAULT_VERSION"
+ fi

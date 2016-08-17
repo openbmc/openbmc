@@ -1,0 +1,30 @@
+From: Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>
+Description: Allow to build TBB for ARM cores older than ARMv7a
+
+| ../../include/tbb/machine/gcc_armv7.h:39:2: error: #error Threading
+Building Blocks ARM port requires an ARMv7-a architecture.
+| make[1]: *** [concurrent_hash_map.o] Error 1
+
+https://bugs.launchpad.net/linaro-oe/+bug/1167144
+
+Upstream-status: pending
+
+---
+ include/tbb/tbb_machine.h |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- tbb41_20130314oss.orig/include/tbb/tbb_machine.h
++++ tbb41_20130314oss/include/tbb/tbb_machine.h
+@@ -237,11 +237,11 @@ template<> struct atomic_selector<8> {
+         #include "machine/linux_intel64.h"
+     #elif __ia64__
+         #include "machine/linux_ia64.h"
+     #elif __powerpc__
+         #include "machine/mac_ppc.h"
+-    #elif __arm__
++    #elif __ARM_ARCH_7A__
+         #include "machine/gcc_armv7.h"
+     #elif __TBB_GCC_BUILTIN_ATOMICS_PRESENT
+         #include "machine/gcc_generic.h"
+     #endif
+     #include "machine/linux_common.h"

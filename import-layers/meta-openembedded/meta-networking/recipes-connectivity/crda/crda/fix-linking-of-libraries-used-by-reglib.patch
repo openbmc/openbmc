@@ -1,0 +1,50 @@
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Sat, 23 Aug 2014 12:26:37 -0700
+Subject: Fix linking of libraries used by libreg
+
+The math and crypto libraries are called by and need to be linked to
+libreg.so, not to the executables.
+
+Upstream-Status: Backport [http://www.spinics.net/lists/linux-wireless/msg126027.html]
+
+Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+Signed-off-by: Joe MacDonald <joe_macdonald@mentor.com>
+
+--- a/Makefile
++++ b/Makefile
+@@ -30,7 +30,7 @@ CFLAGS += -std=gnu99 -Wall -Werror -peda
+ CFLAGS += -Wall -g
+ LDLIBREG += -lreg
+ LDLIBS += $(LDLIBREG)
+-LDLIBS += -lm
++LIBREGLDLIBS += -lm
+ LIBREG += libreg.so
+ LDFLAGS += -L ./
+ 
+@@ -40,7 +40,7 @@ all_noverify: $(LIBREG) crda intersect r
+ 
+ ifeq ($(USE_OPENSSL),1)
+ CFLAGS += -DUSE_OPENSSL -DPUBKEY_DIR=\"$(RUNTIME_PUBKEY_DIR)\" `pkg-config --cflags openssl`
+-LDLIBS += `pkg-config --libs openssl`
++LIBREGLDLIBS += `pkg-config --libs openssl`
+ 
+ ifeq ($(RUNTIME_PUBKEY_ONLY),1)
+ CFLAGS += -DRUNTIME_PUBKEY_ONLY
+@@ -51,7 +51,7 @@ endif
+ 
+ else
+ CFLAGS += -DUSE_GCRYPT
+-LDLIBS += -lgcrypt
++LIBREGLDLIBS += -lgcrypt
+ 
+ $(LIBREG): keys-gcrypt.c
+ 
+@@ -121,7 +121,7 @@ keys-%.c: utils/key2pub.py $(wildcard $(
+ 
+ $(LIBREG): regdb.h reglib.h reglib.c
+ 	$(NQ) '  CC  ' $@
+-	$(Q)$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ -shared -Wl,-soname,$(LIBREG) $^
++	$(Q)$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ -shared -Wl,-soname,$(LIBREG) $^ $(LIBREGLDLIBS)
+ 
+ install-libreg-headers:
+ 	$(NQ) '  INSTALL  libreg-headers'

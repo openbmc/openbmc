@@ -1,0 +1,14 @@
+[Unit]
+Description=Babel routing daemon
+BindTo=zebra.service
+After=zebra.service
+ConditionPathExists=@SYSCONFDIR@/quagga/babeld.conf
+
+[Service]
+Type=forking
+EnvironmentFile=-@SYSCONFDIR@/default/quagga
+ExecStart=@SBINDIR@/babeld -d $babeld_options -f /etc/quagga/babeld.conf
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target

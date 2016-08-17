@@ -1,0 +1,81 @@
+gst-ffmpeg: avcodec/rpza: Perform pointer advance and checks before
+ using the pointers
+
+Fixes out of array accesses
+Fixes Ticket2850
+
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+(cherry picked from commit 3819db745da2ac7fb3faacb116788c32f4753f34)
+
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+
+Upstream-Status: Backport 
+
+Singed-off-by: Yue Tao <yue.tao@windriver.com>
+
+---
+ libavcodec/rpza.c |    8 ++++----
+ 1 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/libavcodec/rpza.c b/libavcodec/rpza.c
+index 635b406..f291a95 100644
+--- a/gst-libs/ext/libav/libavcodec/rpza.c
++++ b/gst-libs/ext/libav/libavcodec/rpza.c
+@@ -83,7 +83,7 @@ static void rpza_decode_stream(RpzaContext *s)
+     unsigned short *pixels = (unsigned short *)s->frame.data[0];
+ 
+     int row_ptr = 0;
+-    int pixel_ptr = 0;
++    int pixel_ptr = -4;
+     int block_ptr;
+     int pixel_x, pixel_y;
+     int total_blocks;
+@@ -139,6 +139,7 @@ static void rpza_decode_stream(RpzaContext *s)
+             colorA = AV_RB16 (&s->buf[stream_ptr]);
+             stream_ptr += 2;
+             while (n_blocks--) {
++                ADVANCE_BLOCK()
+                 block_ptr = row_ptr + pixel_ptr;
+                 for (pixel_y = 0; pixel_y < 4; pixel_y++) {
+                     for (pixel_x = 0; pixel_x < 4; pixel_x++){
+@@ -147,7 +148,6 @@ static void rpza_decode_stream(RpzaContext *s)
+                     }
+                     block_ptr += row_inc;
+                 }
+-                ADVANCE_BLOCK();
+             }
+             break;
+ 
+@@ -184,6 +184,7 @@ static void rpza_decode_stream(RpzaContext *s)
+             color4[2] |= ((21 * ta + 11 * tb) >> 5);
+ 
+             while (n_blocks--) {
++                ADVANCE_BLOCK();
+                 block_ptr = row_ptr + pixel_ptr;
+                 for (pixel_y = 0; pixel_y < 4; pixel_y++) {
+                     index = s->buf[stream_ptr++];
+@@ -194,12 +195,12 @@ static void rpza_decode_stream(RpzaContext *s)
+                     }
+                     block_ptr += row_inc;
+                 }
+-                ADVANCE_BLOCK();
+             }
+             break;
+ 
+         /* Fill block with 16 colors */
+         case 0x00:
++            ADVANCE_BLOCK();
+             block_ptr = row_ptr + pixel_ptr;
+             for (pixel_y = 0; pixel_y < 4; pixel_y++) {
+                 for (pixel_x = 0; pixel_x < 4; pixel_x++){
+@@ -213,7 +214,6 @@ static void rpza_decode_stream(RpzaContext *s)
+                 }
+                 block_ptr += row_inc;
+             }
+-            ADVANCE_BLOCK();
+             break;
+ 
+         /* Unknown opcode */
+-- 
+1.7.5.4
+

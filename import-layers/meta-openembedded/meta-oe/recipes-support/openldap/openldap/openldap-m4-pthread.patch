@@ -1,0 +1,20 @@
+--- openldap-2.3.11/build/openldap.m4.orig	2005-11-11 00:11:18.604322590 -0800
++++ openldap-2.3.11/build/openldap.m4	2005-11-11 00:26:21.621145856 -0800
+@@ -788,7 +788,7 @@ AC_DEFUN([OL_PTHREAD_TEST_FUNCTION],[[
+ ]])
+ 
+ AC_DEFUN([OL_PTHREAD_TEST_PROGRAM],
+-AC_LANG_SOURCE([OL_PTHREAD_TEST_INCLUDES
++[AC_LANG_SOURCE([[OL_PTHREAD_TEST_INCLUDES
+ 
+ int main(argc, argv)
+ 	int argc;
+@@ -796,7 +796,7 @@ int main(argc, argv)
+ {
+ OL_PTHREAD_TEST_FUNCTION
+ }
+-]))
++]])])
+ dnl --------------------------------------------------------------------
+ AC_DEFUN([OL_PTHREAD_TRY], [# Pthread try link: $1 ($2)
+ if test "$ol_link_threads" = no ; then

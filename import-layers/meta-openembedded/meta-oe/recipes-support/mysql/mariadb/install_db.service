@@ -1,0 +1,17 @@
+#
+# Simple install MySQL database service file
+# It shoulb be done before mysqld.service
+
+[Unit]
+Description=Install MySQL Community Server Database
+After=network.target
+After=syslog.target
+Before=mysqld.service
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=@BINDIR@/mysql-systemd-start pre
+

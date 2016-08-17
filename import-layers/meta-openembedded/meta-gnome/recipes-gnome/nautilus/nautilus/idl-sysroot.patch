@@ -1,0 +1,7 @@
+Index: nautilus-2.24.2/add-include-prefix
+===================================================================
+--- nautilus-2.24.2.orig/add-include-prefix	2008-10-06 17:22:21.000000000 +0000
++++ nautilus-2.24.2/add-include-prefix	2009-04-09 16:00:05.000000000 +0000
+@@ -1 +1 @@
+-sed -e 's/^/ /' -e 's/  */ /g' -e 's/ / -I /g' -e 's/ -I $//'
++sed -e 's:^: :' -e 's:  *: :g' -e 's: : -I '"$SYSROOT"':g' -e 's: -I '"$SYSROOT"'$::'

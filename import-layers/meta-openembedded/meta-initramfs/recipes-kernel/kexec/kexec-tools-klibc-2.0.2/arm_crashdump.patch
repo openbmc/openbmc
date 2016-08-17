@@ -1,0 +1,12 @@
+--- a/kexec/arch/arm/crashdump-arm.c
++++ b/kexec/arch/arm/crashdump-arm.c
+@@ -20,7 +20,7 @@
+  * along with this program; if not, write to the Free Software
+  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  */
+-#include <elf.h>
++#include "../../../include/elf.h"
+ #include <errno.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+

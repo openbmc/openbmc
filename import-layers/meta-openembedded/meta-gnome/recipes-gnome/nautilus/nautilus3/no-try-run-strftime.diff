@@ -1,0 +1,41 @@
+From dc9c8cf2676c8c91ea0ae250cfedf863352f3ccd Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen@dominion.thruhere.net>
+Date: Fri, 24 Jun 2011 20:24:08 +0200
+Subject: [PATCH] hack out check that tries to run generated binaries
+
+Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
+---
+ configure.in |   17 +----------------
+ 1 files changed, 1 insertions(+), 16 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index c3aa371..1d3ecdc 100644
+--- a/configure.in
++++ b/configure.in
+@@ -251,22 +251,7 @@ AC_SUBST(WARNING_CFLAGS)
+ 
+ dnl ===========================================================================
+ 
+-dnl strftime checks
+-
+-AC_TRY_RUN([#include <time.h>
+-                int main ()
+-                {
+-                  char buf[100];
+-                  struct tm tm = {0};
+-                  tm.tm_year = 99;
+-                  if (strftime(buf, 100, "%EY", &tm) == 4 &&
+-		      strcmp (buf, "1999")==0)
+-                    return 0;
+-                  return 1;
+-                }
+-            ],
+-	    AC_DEFINE(HAVE_STRFTIME_EXTENSION, 1, [Define if strftime supports %E and %O modifiers.])
+-            )
++AC_DEFINE(HAVE_STRFTIME_EXTENSION, 1, [Define if strftime supports %E and %O modifiers.])
+ 
+ dnl ==========================================================================
+ 	
+-- 
+1.6.6.1
+

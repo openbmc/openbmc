@@ -1,0 +1,17 @@
+Port from Fedora20
+
+Upstream-Status: Pending
+Signed-off-by: Qian Lei <qianl.fnst@cn.fujitsu.com>
+
+diff -up cmpi-bindings-0.9.5/swig/python/CMakeLists.txt.old cmpi-bindings-0.9.5/swig/python/CMakeLists.txt
+--- cmpi-bindings-0.9.5/swig/python/CMakeLists.txt.old	2013-08-06 15:57:03.576285764 +0200
++++ cmpi-bindings-0.9.5/swig/python/CMakeLists.txt	2013-08-06 15:57:14.891345941 +0200
+@@ -9,7 +9,7 @@ SET (BUILD_SHARED_LIBS ON)
+ 
+ FIND_PACKAGE(PythonInterp REQUIRED)
+ 
+-EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "from sys import stdout; from distutils import sysconfig; stdout.write(sysconfig.get_python_lib())" OUTPUT_VARIABLE PYTHON_LIB_DIR)
++EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "from sys import stdout; from distutils import sysconfig; stdout.write(sysconfig.get_python_lib(1))" OUTPUT_VARIABLE PYTHON_LIB_DIR)
+ 
+ IF (NOT PYTHON_SITE_DIR)
+   SET (PYTHON_SITE_DIR ${PYTHON_LIB_DIR})

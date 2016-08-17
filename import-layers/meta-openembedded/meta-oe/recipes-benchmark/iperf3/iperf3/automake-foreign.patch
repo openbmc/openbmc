@@ -1,0 +1,17 @@
+Pass the 'foreign' option to automake to enable iperf3 to build.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Chunrong Guo <b40290@freescale.com>
+
+--- a/configure.ac	2015-10-19 02:49:30.471867352 -0500
++++ b/configure.ac	2015-10-19 02:46:36.207873572 -0500
+@@ -33,7 +33,7 @@
+ 
+ 
+ # Initialize the automake system
+-AM_INIT_AUTOMAKE
++AM_INIT_AUTOMAKE([foreign])
+ AM_MAINTAINER_MODE
+ AM_CONFIG_HEADER(src/iperf_config.h)
+ 

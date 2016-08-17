@@ -1,0 +1,92 @@
+From 4a89ddffbb14d747adbe3365ace4db87de52ba39 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Mon, 16 Sep 2013 16:08:28 +0200
+Subject: [PATCH] build gtk- and gtk3-version for canberra_gtk_play
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ src/Makefile.am |   25 +++++++++++++++----------
+ 1 files changed, 15 insertions(+), 10 deletions(-)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 56ed96d..fc72e1f 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -319,9 +319,6 @@ endif
+ 
+ if HAVE_GTK_ANY
+ 
+-bin_PROGRAMS += \
+-	canberra-gtk-play
+-
+ include_HEADERS += \
+ 	canberra-gtk.h
+ 
+@@ -329,6 +326,9 @@ endif
+ 
+ if HAVE_GTK3
+ 
++bin_PROGRAMS += \
++	canberra-gtk3-play
++
+ lib_LTLIBRARIES += \
+ 	libcanberra-gtk3.la
+ 
+@@ -367,6 +367,9 @@ endif
+ 
+ if HAVE_GTK
+ 
++bin_PROGRAMS += \
++	canberra-gtk-play
++
+ lib_LTLIBRARIES += \
+ 	libcanberra-gtk.la
+ 
+@@ -399,14 +402,17 @@ endif
+ 
+ if HAVE_GTK3
+ 
+-canberra_gtk_play_LDADD = \
++canberra_gtk3_play_LDADD = \
+ 	$(GTK3_LIBS) \
+ 	libcanberra.la \
+ 	libcanberra-gtk3.la
+-canberra_gtk_play_CFLAGS = \
++canberra_gtk3_play_CFLAGS = \
+ 	$(GTK3_CFLAGS)
+ 
+-else
++canberra_gtk3_play_SOURCES = \
++	canberra-gtk-play.c
++
++endif
+ if HAVE_GTK
+ 
+ canberra_gtk_play_LDADD = \
+@@ -416,7 +422,9 @@ canberra_gtk_play_LDADD = \
+ canberra_gtk_play_CFLAGS = \
+ 	$(GTK_CFLAGS)
+ 
+-endif
++canberra_gtk_play_SOURCES = \
++	canberra-gtk-play.c
++
+ endif
+ 
+ if HAVE_GTK_ANY
+@@ -424,9 +432,6 @@ if HAVE_GTK_ANY
+ dist_gsdgtkmodules_DATA = \
+ 	canberra-gtk-module.desktop
+ 
+-canberra_gtk_play_SOURCES = \
+-	canberra-gtk-play.c
+-
+ EXTRA_DIST += \
+ 	libcanberra-login-sound.desktop.in \
+ 	libcanberra-ready-sound.desktop.in \
+-- 
+1.7.6.5
+

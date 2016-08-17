@@ -1,0 +1,29 @@
+From f485e878bc8bb0e381a38a30009308c82fa8d672 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Thu, 16 Aug 2012 08:18:56 +0200
+Subject: [PATCH] fix build with KMS disabled
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ src/glamo.h |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/src/glamo.h b/src/glamo.h
+index d4a2f19..5fd5c04 100644
+--- a/src/glamo.h
++++ b/src/glamo.h
+@@ -37,8 +37,11 @@
+ #include "xf86.h"
+ #include "exa.h"
+ #include <linux/fb.h>
++
++#ifdef HAVE_KMS
+ #include <libdrm/drm.h>
+ #include <libdrm/glamo_bo.h>
++#endif
+ 
+ #define GLAMO_REG_BASE(c)		((c)->attr.address[0])
+ #define GLAMO_REG_SIZE(c)		(0x2400)
+-- 
+1.7.8.6
+

@@ -1,0 +1,45 @@
+#
+Wireshark - Notes
+
+URL: http://www.wireshark.org/
+User Guide: http://www.wireshark.org/docs/wsug_html_chunked/
+Secruity advisories: http://www.wireshark.org/security/
+
+Wireshark is slowly moving away from gtk and towards QT as their graphical stack.
+Currently gtk is supported with this release and I plan on integrating QT. 
+
+
+
+Adding the wireshark to your build
+========================================
+
+via local.conf
+IMAGE_INSTALL_append = " wireshark"
+
+Adding the wireshark to your graphical build
+========================================
+via local.conf
+IMAGE_INSTALL_append = " wireshark"
+
+and one of:
+
+EXTRA_IMAGE_FEATURES += "x11-base"
+
+or use the "core-image-x11"
+
+
+Maintenance
+-----------
+
+Send patches, comments or questions to openembedded-devel@lists.openembedded.org
+
+When sending single patches, please use something like:
+
+   git send-email -1 -M \
+       --to openembedded-devel@lists.openembedded.org \
+       --cc akuster@mvista.com \
+       --subject-prefix=meta-networking][PATCH
+
+Maintainer:    Armin Kuster <akuster@mvista.com>
+
+

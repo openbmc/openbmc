@@ -1,0 +1,17 @@
+Upstream-Status: Pending
+
+Import this patch from meta-linaro.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+--- efibootmgr-0.5.4.orig/Makefile
++++ efibootmgr-0.5.4/Makefile
+@@ -11,6 +11,8 @@
+   CFLAGS = $(EXTRA_CFLAGS) -DEFIBOOTMGR_VERSION=\"$(RELEASE_MAJOR).$(RELEASE_MINOR).$(RELEASE_SUBLEVEL)$(RELEASE_EXTRALEVEL)\" \
+ 	    -Wall -g -D_FILE_OFFSET_BITS=64
+ 
++  LDFLAGS += -lz
++
+   MODULES := src
+ 
+   BINDIR := /usr/sbin

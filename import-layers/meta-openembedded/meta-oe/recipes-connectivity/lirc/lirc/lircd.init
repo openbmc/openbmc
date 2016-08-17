@@ -1,0 +1,40 @@
+#! /bin/sh
+#
+# This is an init script for Familiar
+# Copy it to /etc/init.d/lircd and type
+# > update-rc.d lircd defaults 20
+#
+
+
+test -f /usr/sbin/lircd || exit 0
+test -f /etc/lircd.conf || exit 0
+
+case "$1" in
+  start)
+    echo -n "Starting lirc daemon: lircd"
+    start-stop-daemon --start --quiet --exec /usr/sbin/lircd -- --device=/dev/lirc0
+    echo "."
+    ;;
+  stop)
+    echo -n "Stopping lirc daemon: lircd"
+    start-stop-daemon --stop --quiet --exec /usr/sbin/lircd
+    echo "."
+    ;;
+  reload|force-reload)
+    start-stop-daemon --stop --quiet --signal 1 --exec /usr/sbin/lircd
+    ;;
+  restart)
+    echo -n "Stopping lirc daemon: lircd"
+    start-stop-daemon --stop --quiet --exec /usr/sbin/lircd
+    sleep 1
+    echo -n "Starting lirc daemon: lircd"
+    start-stop-daemon --start --quiet --exec /usr/sbin/lircd -- --device=/dev/lirc0
+    echo "."
+    ;;
+  *)
+    echo "Usage: /etc/init.d/lircd {start|stop|reload|restart|force-reload}"
+    exit 1
+esac
+
+exit 0
+

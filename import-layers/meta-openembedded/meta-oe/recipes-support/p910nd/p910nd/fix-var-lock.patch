@@ -1,0 +1,30 @@
+Use /var/lock instead of /var/lock/subsys
+
+Upstream-Status: Inappropriate [configuration]
+
+Index: p910nd/p910nd.8
+===================================================================
+--- p910nd.orig/p910nd.8	2011-11-14 22:41:41.904615879 +0100
++++ p910nd/p910nd.8	2011-11-14 22:49:52.299047607 +0100
+@@ -83,7 +83,7 @@
+ .SH "SEE ALSO"
+ printcap(5), hosts_access(5)
+ .SH FILES
+-/var/run/p9100d.pid, /var/lock/subsys/p9100d, /etc/hosts.allow, /etc/hosts.deny
++/var/run/p9100d.pid, /var/lock/p9100d, /etc/hosts.allow, /etc/hosts.deny
+ .SH COPYRIGHT
+ .I p910nd
+ is under the GNU Public License Version 2
+Index: p910nd/p910nd.c
+===================================================================
+--- p910nd.orig/p910nd.c	2011-11-14 22:47:41.986401420 +0100
++++ p910nd/p910nd.c	2011-11-14 22:49:27.274923524 +0100
+@@ -122,7 +122,7 @@
+ #ifdef		LOCKFILE_DIR
+ #define		LOCKFILE	LOCKFILE_DIR "/p910%cd"
+ #else
+-#define		LOCKFILE	"/var/lock/subsys/p910%cd"
++#define		LOCKFILE	"/var/lock/p910%cd"
+ #endif
+ #ifndef		PRINTERFILE
+ #define         PRINTERFILE     "/dev/lp%c"

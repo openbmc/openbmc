@@ -1,0 +1,166 @@
+From 869e52a9055c72970fed036a1510f676e6ce0824 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 13 Jun 2013 01:24:19 -0700
+Subject: [PATCH] Don't call deprecated glib functions and use the new gthread
+ API.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Inappropriate[version Unmaintained Upstream]
+---
+ client/pk-console.c                              |    3 ++-
+ client/pk-generate-pack.c                        |    3 ++-
+ client/pk-monitor.c                              |    3 ++-
+ contrib/command-not-found/PackageKit.sh          |    2 +-
+ contrib/command-not-found/pk-command-not-found.c |    4 ++--
+ contrib/debuginfo-install/pk-debuginfo-install.c |    4 ++--
+ src/pk-backend.c                                 |    7 +++++++
+ src/pk-main.c                                    |    4 ++--
+ 10 files changed, 20 insertions(+), 10 deletions(-)
+
+diff --git a/client/pk-console.c b/client/pk-console.c
+index de927e1..2435f27 100644
+--- a/client/pk-console.c
++++ b/client/pk-console.c
+@@ -1264,11 +1264,12 @@ main (int argc, char *argv[])
+ 	bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
+ 	bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+ 	textdomain (GETTEXT_PACKAGE);
+-
++#if !GLIB_CHECK_VERSION(2,32,0)
+ 	if (! g_thread_supported ())
+ 		g_thread_init (NULL);
+ 	g_type_init ();
+ 	dbus_g_thread_init ();
++#endif
+ 
+ 	/* do stuff on ctrl-c */
+ 	signal (SIGINT, pk_console_sigint_cb);
+diff --git a/client/pk-generate-pack.c b/client/pk-generate-pack.c
+index 0b2b40f..20d7e8d 100644
+--- a/client/pk-generate-pack.c
++++ b/client/pk-generate-pack.c
+@@ -251,12 +251,13 @@ main (int argc, char *argv[])
+ 	bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
+ 	bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+ 	textdomain (GETTEXT_PACKAGE);
+-
++#if !GLIB_CHECK_VERSION(2,32,0)
+ 	if (! g_thread_supported ())
+ 		g_thread_init (NULL);
+ 
+ 	g_type_init ();
+ 	dbus_g_thread_init ();
++#endif
+ 
+ 	/* do stuff on ctrl-c */
+ 	signal (SIGINT, pk_generate_pack_sigint_cb);
+diff --git a/client/pk-monitor.c b/client/pk-monitor.c
+index f230f7a..d43007f 100644
+--- a/client/pk-monitor.c
++++ b/client/pk-monitor.c
+@@ -285,11 +285,12 @@ main (int argc, char *argv[])
+ 	bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
+ 	bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+ 	textdomain (GETTEXT_PACKAGE);
+-
++#if !GLIB_CHECK_VERSION(2,32,0)
+ 	if (! g_thread_supported ())
+ 		g_thread_init (NULL);
+ 	g_type_init ();
+ 	dbus_g_thread_init ();
++#endif
+ 
+ 	context = g_option_context_new (NULL);
+ 	/* TRANSLATORS: this is a program that monitors PackageKit */
+diff --git a/contrib/command-not-found/PackageKit.sh b/contrib/command-not-found/PackageKit.sh
+index d08989c..d708fff 100644
+--- a/contrib/command-not-found/PackageKit.sh
++++ b/contrib/command-not-found/PackageKit.sh
+@@ -18,7 +18,7 @@ command_not_found_handle () {
+ 
+ 	# run the command, or just print a warning
+ 	if [ $runcnf -eq 1 ]; then
+-		/home/hughsie/.root/libexec/pk-command-not-found $1
++		/usr/lib/packagekit/pk-command-not-found $1
+ 		retval=$?
+ 	else
+ 		echo "bash: $1: command not found"
+diff --git a/contrib/command-not-found/pk-command-not-found.c b/contrib/command-not-found/pk-command-not-found.c
+index 70679c0..9f81ce4 100644
+--- a/contrib/command-not-found/pk-command-not-found.c
++++ b/contrib/command-not-found/pk-command-not-found.c
+@@ -659,12 +659,12 @@ main (int argc, char *argv[])
+ 	bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
+ 	bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+ 	textdomain (GETTEXT_PACKAGE);
+-
++#if !GLIB_CHECK_VERSION(2,32,0)
+ 	if (! g_thread_supported ())
+ 		g_thread_init (NULL);
+ 	dbus_g_thread_init ();
+ 	g_type_init ();
+-
++#endif
+ 	context = g_option_context_new (NULL);
+ 	/* TRANSLATORS: tool that gets called when the command is not found */
+ 	g_option_context_set_summary (context, _("PackageKit Command Not Found"));
+diff --git a/contrib/debuginfo-install/pk-debuginfo-install.c b/contrib/debuginfo-install/pk-debuginfo-install.c
+index c12aca5..b0e1e7c 100644
+--- a/contrib/debuginfo-install/pk-debuginfo-install.c
++++ b/contrib/debuginfo-install/pk-debuginfo-install.c
+@@ -532,11 +532,11 @@ main (int argc, char *argv[])
+ 	bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
+ 	bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+ 	textdomain (GETTEXT_PACKAGE);
+-
++#if !GLIB_CHECK_VERSION(2,32,0)
+ 	if (! g_thread_supported ())
+ 		g_thread_init (NULL);
+ 	g_type_init ();
+-
++#endif
+ 	context = g_option_context_new (NULL);
+ 	/* TRANSLATORS: tool that gets called when the command is not found */
+ 	g_option_context_set_summary (context, _("PackageKit Debuginfo Installer"));
+diff --git a/src/pk-backend.c b/src/pk-backend.c
+index 5216b63..5b83ae4 100644
+--- a/src/pk-backend.c
++++ b/src/pk-backend.c
+@@ -2103,7 +2103,14 @@ pk_backend_thread_create (PkBackend *backend, PkBackendThreadFunc func)
+ 		egg_warning ("already has thread");
+ 		return FALSE;
+ 	}
++#if !GLIB_CHECK_VERSION(2,32,0)
+ 	backend->priv->thread = g_thread_create ((GThreadFunc) func, backend, FALSE, NULL);
++#else
++	backend->priv->thread = g_thread_try_new ("daemon thread", (GThreadFunc) func, backend, NULL);
++	if (backend->priv->thread != NULL) {
++		g_thread_unref(backend->priv->thread);
++	}
++#endif
+ 	if (backend->priv->thread == NULL) {
+ 		egg_warning ("failed to create thread");
+ 		return FALSE;
+diff --git a/src/pk-main.c b/src/pk-main.c
+index 4c758cd..8fa2482 100644
+--- a/src/pk-main.c
++++ b/src/pk-main.c
+@@ -219,12 +219,12 @@ main (int argc, char *argv[])
+ 	bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
+ 	bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+ 	textdomain (GETTEXT_PACKAGE);
+-
++#if !GLIB_CHECK_VERSION(2,32,0)
+ 	if (! g_thread_supported ())
+ 		g_thread_init (NULL);
+ 	dbus_g_thread_init ();
+ 	g_type_init ();
+-
++#endif
+ 	/* TRANSLATORS: describing the service that is running */
+ 	context = g_option_context_new (_("PackageKit service"));
+ 	g_option_context_add_main_entries (context, options, NULL);
+-- 
+1.7.9.5
+

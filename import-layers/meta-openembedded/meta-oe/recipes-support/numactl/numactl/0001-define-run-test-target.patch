@@ -1,0 +1,32 @@
+rename test target as run-test
+
+Upstream-Statue: Pending
+
+test target not only compile the test files, but also run them, which is
+not suitable for cross-compile environment, so rename it as run-test.
+
+and define test target to compile the test files.
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ Makefile.am | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index b6db339..de176c4 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -124,7 +124,9 @@ regress2: $(check_PROGRAMS)
+ test_numademo: numademo
+ 	./numademo -t -e 10M
+ 
+-test: all $(check_PROGRAMS) regress1 regress2 test_numademo
++test: all $(check_PROGRAMS)
++
++run-test: all $(check_PROGRAMS) regress1 regress2 test_numademo
+ 
+ TESTS_ENVIRONMENT = builddir='$(builddir)'; export builddir;
+ 
+-- 
+1.9.1
+

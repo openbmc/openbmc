@@ -1,0 +1,25 @@
+Patch was imported from the OpenEmbedded git server
+(git://git.openembedded.org/openembedded)
+as of commit id 676cbb54d42c89a4832871064cfcb7ee2ad372ee
+
+klcc-cross: Add patch to use /usr/bin/env perl
+Certain configurations (such as autobuilders) may build in very
+deep paths (that are longer than the #! mechanism allows) which
+makes it unsafe to use the direct path for perl.  In our case we know
+that /usr/bin/env perl will always return ours (if it has been built).
+
+Signed-off-by: Tom Rini <tom_rini@mentor.com>
+
+Index: klibc-1.5.20/klcc/makeklcc.pl
+===================================================================
+--- a/klcc/makeklcc.pl
++++ b/klcc/makeklcc.pl
+@@ -26,7 +26,7 @@ sub pathsearch($) {
+     return undef;
+ }
+ 
+-print "#!${perlpath}\n";
++print "#!/usr/bin/env perl\n";
+ 
+ open(KLIBCCONF, "< $klibcconf\0")
+     or die "$0: cannot open $klibcconf: $!\n";

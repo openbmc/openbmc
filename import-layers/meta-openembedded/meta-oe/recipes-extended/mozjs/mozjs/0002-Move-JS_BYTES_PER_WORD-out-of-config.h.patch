@@ -1,0 +1,75 @@
+From d4a15ad82292ff6d772dcc631df98754d20be31b Mon Sep 17 00:00:00 2001
+From: Colin Walters <walters@verbum.org>
+Date: Tue, 18 Mar 2014 11:46:05 -0400
+Subject: [PATCH 2/5] Move JS_BYTES_PER_WORD out of config.h
+
+Instead define it in terms of the already extant GNU C extension
+__SIZEOF_POINTER__.  This avoids multiarch conflicts when 32 and 64
+bit packages of js are co-installed.
+---
+
+Upstream-status: Pending
+
+ js/src/configure.in   |  9 ---------
+ js/src/js-config.h.in |  1 -
+ js/src/jstypes.h      | 12 ++++++++++++
+ 3 files changed, 12 insertions(+), 10 deletions(-)
+
+diff --git a/js/src/configure.in b/js/src/configure.in
+index 15605b2..64c7606 100644
+--- a/js/src/configure.in
++++ b/js/src/configure.in
+@@ -2345,15 +2345,6 @@ else
+   AC_MSG_RESULT(no)
+ fi
+ 
+-MOZ_SIZE_OF_TYPE(JS_BYTES_PER_WORD, void*, 4 8)
+-if test "$moz_cv_size_of_JS_BYTES_PER_WORD" -eq "4"; then
+-  AC_DEFINE(JS_BITS_PER_WORD_LOG2, 5)
+-elif test "$moz_cv_size_of_JS_BYTES_PER_WORD" -eq "8"; then
+-  AC_DEFINE(JS_BITS_PER_WORD_LOG2, 6)
+-else
+-  AC_MSG_ERROR([Unexpected JS_BYTES_PER_WORD])
+-fi
+-
+ MOZ_ALIGN_OF_TYPE(JS_ALIGN_OF_POINTER, void*, 2 4 8 16)
+ MOZ_SIZE_OF_TYPE(JS_BYTES_PER_DOUBLE, double, 6 8 10 12 14)
+ 
+diff --git a/js/src/js-config.h.in b/js/src/js-config.h.in
+index 6889e00..4775420 100644
+--- a/js/src/js-config.h.in
++++ b/js/src/js-config.h.in
+@@ -56,7 +56,6 @@
+ #undef JS_INT32_TYPE
+ #undef JS_INT64_TYPE
+ #undef JS_INTPTR_TYPE
+-#undef JS_BYTES_PER_WORD
+ 
+ /* Some mozilla code uses JS-friend APIs that depend on JS_METHODJIT being
+    correct. */
+diff --git a/js/src/jstypes.h b/js/src/jstypes.h
+index d0cf183..3e7928f 100644
+--- a/js/src/jstypes.h
++++ b/js/src/jstypes.h
+@@ -24,6 +24,18 @@
+ #include "mozilla/Util.h"
+ 
+ #include "js-config.h"
++#ifndef JS_BYTES_PER_WORD
++#define JS_BYTES_PER_WORD __SIZEOF_POINTER__
++#endif
++#ifndef JS_BITS_PER_WORD_LOG2
++#if JS_BYTES_PER_WORD == 8
++#define JS_BITS_PER_WORD_LOG2 6
++#elif JS_BYTES_PER_WORD == 4
++#define JS_BITS_PER_WORD_LOG2 5
++#else
++#error Unhandled JS_BYTES_PER_WORD
++#endif 
++#endif
+ 
+ /***********************************************************************
+ ** MACROS:      JS_EXTERN_API
+-- 
+1.9.3
+

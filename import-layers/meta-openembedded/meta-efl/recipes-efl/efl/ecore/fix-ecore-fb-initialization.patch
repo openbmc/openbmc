@@ -1,0 +1,41 @@
+From 657571197c9d369e12ae31b6777a1929fe3680ef Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Sat, 29 Oct 2011 00:16:55 +0200
+Subject: [PATCH] ecore-fb: fix ts init
+
+Upstream-Status: Pending
+
+The whole ecore-fb init logic is somewhat flawed; with this patch we
+get at least a working touchscreen w/ tslib again.
+
+Signed-off-by: Michael 'Mickey' Lauer <mlauer@vanille-media.de>
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ ecore/src/lib/ecore_fb/ecore_fb.c |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
+
+diff --git a/src/lib/ecore_fb/ecore_fb.c b/src/lib/ecore_fb/ecore_fb.c
+index 5b2b84b..a1904b3 100644
+--- a/src/lib/ecore_fb/ecore_fb.c
++++ b/src/lib/ecore_fb/ecore_fb.c
+@@ -46,6 +46,9 @@ ecore_fb_init(const char *name __UNUSED__)
+    if (!ecore_fb_vt_init())
+       return --_ecore_fb_init_count;
+ 
++   if (!ecore_fb_ts_init())
++      return --_ecore_fb_init_count;
++
+    if (!oldhand)
+      {
+         oldhand = signal(SIGINT, nosigint);
+@@ -77,6 +80,7 @@ ecore_fb_shutdown(void)
+         oldhand = NULL;
+      }
+    
++   ecore_fb_ts_shutdown();
+    ecore_fb_vt_shutdown();
+ 
+    return _ecore_fb_init_count;
+-- 
+1.7.8.6
+

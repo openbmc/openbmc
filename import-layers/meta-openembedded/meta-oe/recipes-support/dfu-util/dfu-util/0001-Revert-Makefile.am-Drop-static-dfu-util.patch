@@ -1,0 +1,68 @@
+From c2aab3b9ae1febcb6b4c6561a59df1930a57b394 Mon Sep 17 00:00:00 2001
+From: Martin JaMa Jansa <Martin.Jansa@gmail.com>
+Date: Thu, 11 Aug 2011 11:19:52 +0200
+Subject: [PATCH] Revert "Makefile.am: Drop static dfu-util"
+
+This reverts commit fe0426ddc04f503d148c5e5f931f16b8f674f071.
+
+Signed-off-by: Martin JaMa Jansa <Martin.Jansa@gmail.com>
+---
+ configure.ac    |  2 +-
+ src/Makefile.am | 22 +++++++++++++++++++++-
+ 2 files changed, 22 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index f5a43b8..6a3757e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -21,7 +21,7 @@ AS_IF([test x$native_libusb = xno], [
+         AC_MSG_ERROR([*** Required libusb-1.0 >= 1.0.0 not installed ***]))
+ ])
+ 
+-LIBS="$LIBS $USB_LIBS"
++LIBS="$LIBS $USB_LIBS -lpthread"
+ CFLAGS="$CFLAGS $USB_CFLAGS"
+ 
+ # Checks for header files.
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 70179c4..e8736ee 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -1,6 +1,6 @@
+ AM_CFLAGS = -Wall -Wextra
+ 
+-bin_PROGRAMS = dfu-util dfu-suffix dfu-prefix
++bin_PROGRAMS = dfu-util dfu-util_static dfu-suffix dfu-prefix
+ dfu_util_SOURCES = main.c \
+ 		portable.h \
+ 		dfu_load.c \
+@@ -19,6 +19,26 @@ dfu_util_SOURCES = main.c \
+ 		quirks.c \
+ 		quirks.h
+ 
++dfu_util_static_SOURCES = main.c \
++		portable.h \
++		dfu_load.c \
++		dfu_load.h \
++		dfu_util.c \
++		dfu_util.h \
++		dfuse.c \
++		dfuse.h \
++		dfuse_mem.c \
++		dfuse_mem.h \
++		dfu.c \
++		dfu.h \
++		usb_dfu.h \
++		dfu_file.c \
++		dfu_file.h \
++		quirks.c \
++		quirks.h
++
++dfu_util_static_LDFLAGS = -static
++
+ dfu_suffix_SOURCES = suffix.c \
+ 		dfu_file.h \
+ 		dfu_file.c
+-- 
+2.7.2
+

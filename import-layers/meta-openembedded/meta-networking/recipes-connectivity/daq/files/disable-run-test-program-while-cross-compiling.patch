@@ -1,0 +1,31 @@
+Upstream-Status:Inappropriate [embedded specific]
+
+fix the below error:
+configure: error: cannot run test program while cross compiling
+
+Signed-off-by: Chunrong Guo <B40290@freescale.com>
+
+--- a/m4/sf.m4old    2015-10-28 10:21:20.270557986 +0800
++++ a/m4/sf.m4       2015-10-28 10:23:22.726551974 +0800
+@@ -135,20 +135,7 @@
+         echo
+         exit 1
+     fi
+-    AC_CACHE_CHECK([for libpcap version >= $1], [daq_cv_libpcap_version_1x], [
+-    AC_RUN_IFELSE(
+-    [AC_LANG_PROGRAM(
+-    [[
+-    #include <pcap.h>
+-    #include <string.h>
+-    extern char pcap_version[];
+-    ]],
+-    [[
+-        if (strcmp(pcap_version, $1) < 0)
+-            return 1;
+-    ]])],
+-    [daq_cv_libpcap_version_1x="yes"],
+-    [daq_cv_libpcap_version_1x="no"])])
++    AC_CACHE_CHECK([for libpcap version >= $1], [daq_cv_libpcap_version_1x])
+     if test "x$daq_cv_libpcap_version_1x" = "xno"; then
+         echo
+         echo "    ERROR!  Libpcap library version >= $1  not found."

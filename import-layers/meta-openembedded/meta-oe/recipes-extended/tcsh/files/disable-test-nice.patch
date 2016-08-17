@@ -1,0 +1,23 @@
+Author: Lucas Nussbaum <lucas@debian.org>
+Description: disable test that fails on the buildd with
+  "setpriority: Permission denied".
+--- a/tests/commands.at
++++ b/tests/commands.at
+@@ -888,17 +888,6 @@ TCSH_UNTESTED([migrate])
+ TCSH_UNTESTED([newgrp])
+ 
+ 
+-AT_SETUP([nice])
+-
+-# Nothing really tested
+-AT_CHECK([tcsh -f -c 'nice set var=1; echo $?var'], ,
+-[0
+-])
+-
+-
+-AT_CLEANUP
+-
+-
+ AT_SETUP([nohup])
+ 
+ AT_DATA([nohup.csh],

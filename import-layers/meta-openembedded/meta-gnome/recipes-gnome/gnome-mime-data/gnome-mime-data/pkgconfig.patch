@@ -1,0 +1,14 @@
+Upstream-Status: Inappropriate [configuration]
+
+Index: gnome-mime-data-2.18.0/Makefile.am
+===================================================================
+--- gnome-mime-data-2.18.0.orig/Makefile.am	2009-06-11 17:27:48.000000000 +0100
++++ gnome-mime-data-2.18.0/Makefile.am	2009-06-11 17:27:59.000000000 +0100
+@@ -1,6 +1,6 @@
+ SUBDIRS = man po
+ 
+-pkgconfigdir = $(datadir)/pkgconfig
++pkgconfigdir = $(libdir)/pkgconfig
+ pkgconfig_DATA = gnome-mime-data-2.0.pc
+ 
+ NULL=

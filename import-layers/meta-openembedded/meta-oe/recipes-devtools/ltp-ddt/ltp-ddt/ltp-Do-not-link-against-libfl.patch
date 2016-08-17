@@ -1,0 +1,31 @@
+From 5bda9c0af56869c6ff2c25d38ea087179c946bc6 Mon Sep 17 00:00:00 2001
+From: Chong Lu <Chong.Lu@windriver.com>
+Date: Tue, 11 Mar 2014 14:47:22 +0800
+Subject: [PATCH] ltp: Don't link against libfl
+
+We have already defined yywrap function in scan.l file. After this, we no longer need to
+link against libfl and so no longer get errors about undefined references to yylex.
+
+Upstream-status: Pending
+
+Signed-off-by: Chong Lu <Chong.Lu@windriver.com>
+---
+ pan/Makefile |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pan/Makefile b/pan/Makefile
+index 4cc6466..a4b575b 100644
+--- a/pan/Makefile
++++ b/pan/Makefile
+@@ -31,7 +31,7 @@ CPPFLAGS		+= -Wno-error
+ 
+ CPPFLAGS		+= -I$(abs_srcdir)
+ 
+-LDLIBS			+= -lm $(LEXLIB)
++LDLIBS			+= -lm
+ 
+ LFLAGS			+= -l
+ 
+-- 
+1.7.9.5
+
