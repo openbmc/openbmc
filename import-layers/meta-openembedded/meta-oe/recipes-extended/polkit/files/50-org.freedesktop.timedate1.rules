@@ -1,0 +1,8 @@
+/* give group 'datetime' rights to change settings */
+/* based upon http://lists.freedesktop.org/archives/systemd-devel/2013-March/009576.html */
+
+polkit.addRule(function(action, subject) {
+  if (action.id.indexOf("org.freedesktop.timedate1.") == 0 && subject.isInGroup("datetime")) {
+    return polkit.Result.YES;
+  }
+});

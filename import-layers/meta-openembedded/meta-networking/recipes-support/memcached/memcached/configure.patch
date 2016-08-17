@@ -1,0 +1,13 @@
+Index: memcached-1.4.17/configure.ac
+===================================================================
+--- memcached-1.4.17.orig/configure.ac	2013-12-20 21:44:49.000000000 +0000
++++ memcached-1.4.17/configure.ac	2014-07-18 07:17:00.593499483 +0000
+@@ -4,7 +4,7 @@
+ AC_INIT(memcached, VERSION_NUMBER, memcached@googlegroups.com)
+ AC_CANONICAL_SYSTEM
+ AC_CONFIG_SRCDIR(memcached.c)
+-AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
++AM_INIT_AUTOMAKE([foreign])
+ AM_CONFIG_HEADER(config.h)
+ 
+ AC_PROG_CC

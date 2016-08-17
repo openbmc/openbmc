@@ -1,0 +1,23 @@
+squahes below warning
+  warning: #warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+
+Seen with glibc 2.20
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+Index: ipsec-tools-0.8.2/src/include-glibc/glibc-bugs.h
+===================================================================
+--- ipsec-tools-0.8.2.orig/src/include-glibc/glibc-bugs.h	2006-09-09 09:22:08.000000000 -0700
++++ ipsec-tools-0.8.2/src/include-glibc/glibc-bugs.h	2014-09-03 22:27:22.551563888 -0700
+@@ -4,7 +4,11 @@
+ #define __GLIBC_BUGS_H__ 1
+ 
+ #define _XOPEN_SOURCE 500
++/* Legacy feature macro.*/
+ #define _BSD_SOURCE
++/* New feature macro that provides everything _BSD_SOURCE and
++ * _SVID_SOURCE provided and possibly more.  */
++#define _DEFAULT_SOURCE
+ 
+ #include <features.h>
+ #include <sys/types.h>

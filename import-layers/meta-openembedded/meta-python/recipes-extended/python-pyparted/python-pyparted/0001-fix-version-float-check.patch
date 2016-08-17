@@ -1,0 +1,26 @@
+check_mod_version breaks if module version is of x.y.z form
+use a regex to help cast x.y.z version to a float
+
+Upstream-Status: Pending
+
+Index: git/setup.py
+===================================================================
+--- git.orig/setup.py
++++ git/setup.py
+@@ -25,6 +25,7 @@ import glob
+ import os
+ import platform
+ import sys
++import re
+ from distutils.ccompiler import new_compiler
+ from distutils.errors import CompileError
+ from distutils.errors import LinkError
+@@ -51,6 +52,8 @@ def pkgconfig(*packages, **kwargs):
+ 
+ def check_mod_version(module, version):
+     modversion = subprocess.check_output(["pkg-config", "--modversion", module])
++    match = re.search('([0-9]+\.[0-9]+)', modversion)
++    modversion = match.group(0)
+     if not float(modversion) >= float(version):
+         sys.stderr.write("*** Minimum required %s version: %s, found: %s\n" % (module, version, modversion,))
+         sys.exit(1)

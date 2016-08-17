@@ -1,0 +1,45 @@
+From ccb01de8096a32d86d47b0d92ec3416c57ee4d25 Mon Sep 17 00:00:00 2001
+From: Bruce Ashfield <bruce.ashfield@windriver.com>
+Date: Thu, 22 Aug 2013 12:15:54 -0400
+Subject: [PATCH] v4l2_calls: define V4L2_CID_HCENTER and V4L2_CID_VCENTER
+
+kernel commit 24b9f5017 [[media] V4L: Remove deprecated image centering controls]
+removed the definitions of V4L2_CID_HCENTER and V4L2_CID_VCENTER after three
+years of depreciation.
+
+The ioctl values are still free, and the case statement which processess them
+in v4l2 userspace falls through to the proper replacement. So in the short
+term, we can explicitly define them using the old absolute values, and everything
+will work.
+
+Signed-off-by: Bruce Ashfield <bruce.ashfield@windriver.com>
+---
+ sys/v4l2/v4l2_calls.c |    9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/sys/v4l2/v4l2_calls.c b/sys/v4l2/v4l2_calls.c
+index 309bfb6..3c64544 100644
+--- a/sys/v4l2/v4l2_calls.c
++++ b/sys/v4l2/v4l2_calls.c
+@@ -54,11 +54,16 @@
+ #include "gst/gst-i18n-plugin.h"
+ 
+ /* Those are ioctl calls */
++
++/* V4L2_CID_HCENTER has been removed from the mainline kernel, but
++   the ioctl space is still present. Since these values fall through
++   to their replacement, it is safe (in the short term) to re-use the
++    old values explictily */
+ #ifndef V4L2_CID_HCENTER
+-#define V4L2_CID_HCENTER V4L2_CID_HCENTER_DEPRECATED
++#define V4L2_CID_HCENTER V4L2_CID_BASE+22
+ #endif
+ #ifndef V4L2_CID_VCENTER
+-#define V4L2_CID_VCENTER V4L2_CID_VCENTER_DEPRECATED
++#define V4L2_CID_VCENTER V4L2_CID_BASE+23
+ #endif
+ 
+ GST_DEBUG_CATEGORY_EXTERN (v4l2_debug);
+-- 
+1.7.10.4
+

@@ -1,0 +1,31 @@
+From 3db6782de1de7ca4f1bb9ee7652c4f2808e57539 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Thu, 10 Jan 2013 12:24:33 +0800
+Subject: [PATCH] fbset 2.1 fix makefile dep modes.tab.c
+
+Upstream-Status: Inappropriate [no upstream]
+
+fix the error in parallel build:
+make: *** No rule to make target `modes.tab.h', needed by `lex.yy.o'.  Stop. 
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ Makefile |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 61536c1..09183e5 100644
+--- a/Makefile
++++ b/Makefile
+@@ -15,7 +15,7 @@ fbset:		fbset.o modes.tab.o lex.yy.o
+ 
+ fbset.o:	fbset.c fbset.h fb.h
+ modes.tab.o:	modes.tab.c fbset.h fb.h
+-lex.yy.o:	lex.yy.c fbset.h modes.tab.h
++lex.yy.o:	lex.yy.c fbset.h modes.tab.c
+ 
+ lex.yy.c:	modes.l
+ 		$(FLEX) modes.l
+-- 
+1.7.4.1
+

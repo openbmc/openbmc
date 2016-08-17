@@ -1,0 +1,26 @@
+From d23b13bd959204824070433d954c5dfbfc421bb7 Mon Sep 17 00:00:00 2001
+From: Li xin <lixin.fnst@cn.fujitsu.com>
+Date: Tue, 18 Nov 2014 18:05:27 +0900
+Subject: [PATCH 2/5] Makefile : modify compile parameters
+
+Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 19966b4..86a8169 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,7 +1,7 @@
+ CC=gcc
+ CFLAGS=-O2 -Wall -g $(DEFINES)
+ 
+-OBJ=rarpd.o ethernet.o
++OBJ=rarpd.o
+ 
+ all: rarpd
+ 
+-- 
+1.8.4.2
+

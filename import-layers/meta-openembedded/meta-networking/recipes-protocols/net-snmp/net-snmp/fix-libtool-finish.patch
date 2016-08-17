@@ -1,0 +1,25 @@
+LIB_LDCONFIG_CMD failed since it is using a host dir $(libdir)
+which is /usr/lib64 does not exist on host when compile 64bit
+image.
+
+In fact, configuring dynamic linker run-time bindings is meaningless
+at this step,  If it is needed, Poky would write ldconfig scripts to
+rpm-postinst for each recipe while do_package, in package.bbclass.
+
+Upstream-Status: Inappropriate [cross compile specific]
+
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+---
+diff --git a/Makefile.top b/Makefile.top
+index 862fb94..ed7dcfc 100644
+--- a/Makefile.top
++++ b/Makefile.top
+@@ -86,7 +86,7 @@ LIBREVISION = 2
+ LIB_LD_CMD      = $(LIBTOOL) --mode=link $(LINKCC) $(CFLAGS) -rpath $(libdir) -version-info $(LIBCURRENT):$(LIBREVISION):$(LIBAGE) -o
+ LIB_EXTENSION   = la
+ LIB_VERSION     =
+-LIB_LDCONFIG_CMD = $(LIBTOOL) --mode=finish $(INSTALL_PREFIX)$(libdir)
++LIB_LDCONFIG_CMD = echo "do not ldconfig\n"
+ LINK		= $(LIBTOOL) --mode=link $(LINKCC)
+ # RANLIB 	= @RANLIB@
+ RANLIB		= :

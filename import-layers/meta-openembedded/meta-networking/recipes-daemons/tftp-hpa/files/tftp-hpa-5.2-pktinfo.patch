@@ -1,0 +1,29 @@
+Patch originally from Fedora
+
+http://pkgs.fedoraproject.org/cgit/tftp.git/
+
+Upstream-Status: Pending
+
+diff -up tftp-hpa-5.2/tftpd/recvfrom.c.test tftp-hpa-5.2/tftpd/recvfrom.c
+--- tftp-hpa-5.2/tftpd/recvfrom.c.test	2011-12-11 23:13:52.000000000 +0100
++++ tftp-hpa-5.2/tftpd/recvfrom.c	2012-01-04 10:05:17.852042256 +0100
+@@ -149,16 +149,16 @@ myrecvfrom(int s, void *buf, int len, un
+ 
+     /* Try to enable getting the return address */
+ #ifdef IP_RECVDSTADDR
+-    if (from->sa_family == AF_INET)
++    if (from->sa_family == AF_INET || !from->sa_family)
+         setsockopt(s, IPPROTO_IP, IP_RECVDSTADDR, &on, sizeof(on));
+ #endif
+ #ifdef IP_PKTINFO
+-    if (from->sa_family == AF_INET)
++    if (from->sa_family == AF_INET || !from->sa_family)
+         setsockopt(s, IPPROTO_IP, IP_PKTINFO, &on, sizeof(on));
+ #endif
+ #ifdef HAVE_IPV6
+ #ifdef IPV6_RECVPKTINFO
+-    if (from->sa_family == AF_INET6)
++    if (from->sa_family == AF_INET6 || !from->sa_family)
+         setsockopt(s, IPPROTO_IPV6, IPV6_RECVPKTINFO, &on, sizeof(on));
+ #endif
+ #endif

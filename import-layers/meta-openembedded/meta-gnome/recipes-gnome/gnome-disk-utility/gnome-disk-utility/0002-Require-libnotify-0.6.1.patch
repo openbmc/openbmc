@@ -1,0 +1,49 @@
+From f8dea8dd411cba10a54ec083c3d5c9d641ec36c0 Mon Sep 17 00:00:00 2001
+From: William Jon McCann <jmccann@redhat.com>
+Date: Tue, 12 Oct 2010 00:12:49 -0400
+Subject: [PATCH] Require libnotify 0.6.1
+
+https://bugzilla.gnome.org/show_bug.cgi?id=631940
+
+Upstream-Status: Backport [1]
+
+[1] https://git.gnome.org/browse/gnome-disk-utility/commit/?id=f8dea8dd411cba10a54ec083c3d5c9d641ec36c0
+
+Signed-off-by: David Zeuthen <davidz@redhat.com>
+---
+ configure.ac                         | 2 +-
+ src/notification/notification-main.c | 5 +----
+ 2 files changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index c61212e..3790fcf 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -128,7 +128,7 @@ DBUS_GLIB_REQUIRED=0.74
+ GNOME_KEYRING_REQUIRED=2.22
+ GTK2_REQUIRED=2.20.0
+ UNIQUE_REQUIRED=1.0
+-LIBNOTIFY_REQUIRED=0.3.0
++LIBNOTIFY_REQUIRED=0.6.1
+ NAUTILUS_REQUIRED=2.24.0
+ AVAHI_UI_REQUIRED=0.6.25
+ 
+diff --git a/src/notification/notification-main.c b/src/notification/notification-main.c
+index 18e9672..b6a713f 100644
+--- a/src/notification/notification-main.c
++++ b/src/notification/notification-main.c
+@@ -535,10 +535,7 @@ update_status_icon (NotificationData *data)
+                     _("A hard disk may be failing"),
+                     /* Translators: This is used as the text of the notification*/
+                     _("One or more hard disks report health problems. Click the icon to get more information."),
+-                    "gtk-dialog-warning",
+-                    NULL);
+-                notify_notification_attach_to_status_icon (data->ata_smart_notification,
+-                                                           data->status_icon);
++                    "gtk-dialog-warning");
+                 notify_notification_set_urgency (data->ata_smart_notification, NOTIFY_URGENCY_CRITICAL);
+                 notify_notification_set_timeout (data->ata_smart_notification, NOTIFY_EXPIRES_NEVER);
+                 show_notification (data);
+-- 
+2.1.0
+

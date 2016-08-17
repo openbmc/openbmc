@@ -1,0 +1,13 @@
+Author: Franz Pletz <fpletz@franz-pletz.org>
+Description: Update manpage.
+--- a/tcsh.man
++++ b/tcsh.man
+@@ -578,7 +578,7 @@ Repeating \fIdabbrev-expand\fR without a
+ changes to the next previous word etc., skipping identical matches
+ much like \fIhistory-search-backward\fR does.
+ .TP 8
+-.B delete-char \fR(not bound)
++.B delete-char \fR(bound to `Del' if using the standard \fI/etc/csh.cshrc\fR)
+ Deletes the character under the cursor.
+ See also \fIdelete-char-or-list-or-eof\fR.
+ .TP 8

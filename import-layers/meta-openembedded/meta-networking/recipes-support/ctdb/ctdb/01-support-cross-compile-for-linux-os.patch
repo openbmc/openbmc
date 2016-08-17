@@ -1,0 +1,24 @@
+support cross-compile for linux-os.
+
+Signed-off-by: Bian Naimeng <biannm@cn.fujitsu.com>
+
+diff -Nurp ctdb-2.5.1.orig/configure ctdb-2.5.1/configure
+--- ctdb-2.5.1.orig/configure	2015-05-07 16:24:28.545000238 +0900
++++ ctdb-2.5.1/configure	2015-05-07 16:28:20.894000244 +0900
+@@ -10692,10 +10692,16 @@ if test x"$libreplace_cv_HAVE_GETADDRINF
+ 	# see bug 5910, use our replacements if we detect
+ 	# a broken system.
+ 	if test "$cross_compiling" = yes; then :
++		case "$target_os" in
++		*linux*)
++			;;
++		*)
+   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+ $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+ as_fn_error $? "cannot run test program while cross compiling
+ See \`config.log' for more details" "$LINENO" 5; }
++			;;
++		esac
+ else
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */

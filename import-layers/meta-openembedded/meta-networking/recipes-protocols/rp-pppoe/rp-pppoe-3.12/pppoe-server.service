@@ -1,0 +1,11 @@
+[Unit]
+Description=PPPOE Service
+After=network.target
+
+[Service]
+Type=forking
+EnvironmentFile=-@SYSCONFDIR@/default/pppoe-server
+ExecStart=@SBINDIR@/pppoe-server
+
+[Install]
+WantedBy=multi-user.target

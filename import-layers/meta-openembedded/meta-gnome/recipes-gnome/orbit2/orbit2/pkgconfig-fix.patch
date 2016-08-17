@@ -1,0 +1,12 @@
+diff -urN ORBit2-2.14.12.orig/ORBit-2.0.pc.in ORBit2-2.14.12/ORBit-2.0.pc.in
+--- ORBit2-2.14.12.orig/ORBit-2.0.pc.in	2008-01-29 13:45:22.000000000 +0100
++++ ORBit2-2.14.12/ORBit-2.0.pc.in	2008-09-23 20:13:07.000000000 +0200
+@@ -2,7 +2,7 @@
+ exec_prefix=@exec_prefix@
+ libdir=@libdir@
+ includedir=@includedir@
+-orbit_idl=@bindir@/orbit-idl-2@EXEEXT@
++orbit_idl=@exec_prefix@/bin/orbit-idl-2@EXEEXT@
+ 
+ 
+ Name: ORBit-2.0

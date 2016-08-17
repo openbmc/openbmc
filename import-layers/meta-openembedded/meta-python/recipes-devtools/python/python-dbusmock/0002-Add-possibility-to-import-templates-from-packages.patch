@@ -1,0 +1,29 @@
+From ff1dffd5673bcd2cbd9554ad62476d108dbc18af Mon Sep 17 00:00:00 2001
+From: Simon Busch <simon.busch@lge.com>
+Date: Wed, 9 Apr 2014 13:20:33 +0200
+Subject: [PATCH 2/2] Add possibility to import templates from packages
+
+Does not have any unit tests yet.
+
+Signed-off-by: Simon Busch <simon.busch@lge.com>
+---
+ dbusmock/mockobject.py |    3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/dbusmock/mockobject.py b/dbusmock/mockobject.py
+index a98e03d..9530c2a 100644
+--- a/dbusmock/mockobject.py
++++ b/dbusmock/mockobject.py
+@@ -49,6 +49,9 @@ def load_module(name):
+ 
+         return module
+ 
++    if '.' in name:
++        return importlib.import_module(name)
++
+     return importlib.import_module('dbusmock.templates.' + name)
+ 
+ 
+-- 
+1.7.9.5
+

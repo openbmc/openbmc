@@ -1,0 +1,93 @@
+From 190650e1cd5700cd6950ead3fcb17ebcec192a2e Mon Sep 17 00:00:00 2001
+From: Li xin <lixin.fnst@cn.fujitsu.com>
+Date: Fri, 19 Jun 2015 17:14:58 +0900
+Subject: [PATCH] Change fixed postconf to a variable for cross-compiling
+
+Upstreamstatus: Inappropriate [embedded specific]
+
+Signed-off-by: Yao Zhao <yao.zhao@windriver.com>
+---
+ postfix-install | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/postfix-install b/postfix-install
+index 1662c3d..d11fa12 100644
+--- a/postfix-install
++++ b/postfix-install
+@@ -226,8 +226,8 @@ test -z "$non_interactive" -a ! -t 0 && {
+     exit 1
+ }
+ 
+-test -x bin/postconf || {
+-    echo $0: Error: no bin/postconf file. Did you forget to run \"make\"? 1>&2
++test -x "$POSTCONF" || {
++    echo $0: Error: no $POSTCONF file. Did you forget to run \"make\"? 1>&2
+     exit 1
+ }
+ 
+@@ -248,7 +248,7 @@ do
+     case "$junk" in
+     *MAIL_VERSION*) 
+ 	case "$mail_version" in
+-	"") mail_version="`bin/postconf -dhx mail_version`" || exit 1
++	"") mail_version="`$POSTCONF -dhx mail_version`" || exit 1
+ 	esac
+ 	val=`echo "$junk" | sed 's/MAIL_VERSION$/'"$mail_version/g"` || exit 1
+ 	case "$val" in
+@@ -434,7 +434,7 @@ template files main.cf.proto and master.cf.proto."
+ 
+ : ${install_root=/}
+ : ${tempdir=`pwd`}
+-: ${config_directory=`bin/postconf -c conf -h -d config_directory`}
++: ${config_directory=`$POSTCONF -c conf -h -d config_directory`}
+ 
+ # Find out the location of installed configuration files.
+ 
+@@ -500,7 +500,7 @@ test -f $CONFIG_DIRECTORY/main.cf && {
+ 	case "$junk" in
+ 	"") eval unset $name;;
+ 	esac
+-	eval : \${$name=\`bin/postconf -c $CONFIG_DIRECTORY -hx $name\`} ||
++	eval : \${$name=\`$POSTCONF -c $CONFIG_DIRECTORY -hx $name\`} ||
+ 	    exit 1
+     done
+ }
+@@ -513,7 +513,7 @@ do
+     case "$junk" in
+     "") eval unset $name;;
+     esac
+-    eval : \${$name=\`bin/postconf -c conf -d -hx $name\`} || exit 1
++    eval : \${$name=\`$POSTCONF -c conf -d -hx $name\`} || exit 1
+ done
+ 
+ # Override settings manually.
+@@ -639,6 +639,8 @@ README_DIRECTORY=$install_root$readme_directory
+ SHLIB_DIRECTORY=$install_root$shlib_directory
+ META_DIRECTORY=$install_root$meta_directory
+ 
++test "x$POSTCONF" != "x" || POSTCONF="bin/postconf"
++
+ # Avoid repeated tests for existence of these; default permissions suffice.
+ 
+ test -d $DAEMON_DIRECTORY || mkdir -p $DAEMON_DIRECTORY || exit 1
+@@ -810,7 +812,7 @@ IFS="$BACKUP_IFS"
+ # the wrong place when Postfix is being upgraded.
+ 
+ case "$mail_version" in
+-"") mail_version="`bin/postconf -dhx mail_version`" || exit 1
++"") mail_version="`$POSTCONF -dhx mail_version`" || exit 1
+ esac
+ 
+ # Undo MAIL_VERSION expansion at the end of a parameter value. If
+@@ -830,7 +832,7 @@ do
+     esac
+ done
+ 
+-bin/postconf -c $CONFIG_DIRECTORY -e \
++"$POSTCONF" -c $CONFIG_DIRECTORY -e \
+     "daemon_directory = $daemon_directory" \
+     "data_directory = $data_directory" \
+     "command_directory = $command_directory" \
+-- 
+1.8.4.2
+

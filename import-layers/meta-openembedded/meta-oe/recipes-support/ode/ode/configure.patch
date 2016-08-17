@@ -1,0 +1,13 @@
+Index: ode-0.13/libccd/configure.ac
+===================================================================
+--- ode-0.13.orig/libccd/configure.ac	2013-08-19 17:48:03.000000000 +0000
++++ ode-0.13/libccd/configure.ac	2014-07-17 22:04:16.580595690 +0000
+@@ -5,7 +5,7 @@
+ AC_INIT([libccd], [1.0], [danfis@danfis.cz])
+ AC_CONFIG_SRCDIR([src/ccd.c])
+ AC_CONFIG_HEADERS([src/config.h])
+-AM_INIT_AUTOMAKE
++AM_INIT_AUTOMAKE([foreign])
+ 
+ # Checks for programs.
+ AC_PROG_CXX

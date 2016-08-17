@@ -1,0 +1,116 @@
+
+#
+# Patch managed by http://www.holgerschurig.de/patcher.html
+#
+
+--- t1lib-5.0.2/Makefile.in~libtool
++++ t1lib-5.0.2/Makefile.in
+@@ -18,7 +18,8 @@
+ # Last modified:       2001-04-01
+ #
+ 
+-SHELL     = /bin/sh
++SHELL     = @SHELL@
++LIBTOOL   = @LIBTOOL@
+ CC        = @CC@
+ CPP       = @CPP@
+ CFLAGS    = @CFLAGS@
+@@ -150,7 +151,7 @@
+ 	$(RM) examples/Makefile
+ 	$(RM) xglyph/Makefile
+ 	$(RM) doc/Makefile
+-	$(RM) libtool
++	$(RM) $(LIBTOOL)
+ 
+ 
+ # The following two targets are for building and cleaning the python-
+--- t1lib-5.0.2/examples/Makefile.in~libtool
++++ t1lib-5.0.2/examples/Makefile.in
+@@ -14,9 +14,10 @@
+ # Last modified:       2001-04-01
+ #
+ 
++top_builddir = @top_builddir@
+ 
+-LIBTOOL   = ../libtool
+-SHELL     = /bin/sh
++LIBTOOL   = @LIBTOOL@
++SHELL     = @SHELL@
+ CC        = @CC@
+ CPP       = @CPP@
+ CFLAGS    = @CFLAGS@
+--- t1lib-5.0.2/lib/Makefile.in~libtool
++++ t1lib-5.0.2/lib/Makefile.in
+@@ -15,8 +15,10 @@
+ #
+ # Contributions by H.Kakugawa to use libtool!
+ 
+-LIBTOOL   = ../libtool
+-SHELL     = /bin/sh
++top_builddir = @top_builddir@
++
++LIBTOOL   = @LIBTOOL@
++SHELL     = @SHELL@
+ CC        = @CC@
+ CPP       = @CPP@
+ CFLAGS    = @CFLAGS@
+--- t1lib-5.0.2/lib/t1lib/Makefile.in~libtool
++++ t1lib-5.0.2/lib/t1lib/Makefile.in
+@@ -14,8 +14,10 @@
+ #
+ # Modified by H.Kakugawa to use libtool
+ 
+-LIBTOOL   = ../../libtool
+-SHELL     = /bin/sh
++top_builddir = @top_builddir@
++
++LIBTOOL   = @LIBTOOL@
++SHELL     = @SHELL@
+ CC        = @CC@
+ CPP       = @CPP@
+ CFLAGS    = @CFLAGS@
+--- t1lib-5.0.2/lib/type1/Makefile.in~libtool
++++ t1lib-5.0.2/lib/type1/Makefile.in
+@@ -14,8 +14,10 @@
+ #
+ # Modified by H.Kakugawa to use libtool
+ 
+-LIBTOOL   = ../../libtool
+-SHELL     = /bin/sh
++top_builddir = @top_builddir@
++
++LIBTOOL   = @LIBTOOL@
++SHELL     = @SHELL@
+ CC        = @CC@
+ CPP       = @CPP@
+ CFLAGS    = @CFLAGS@
+--- t1lib-5.0.2/type1afm/Makefile.in~libtool
++++ t1lib-5.0.2/type1afm/Makefile.in
+@@ -15,8 +15,10 @@
+ #
+ # Modified by H.Kakugawa to use libtool
+ 
+-LIBTOOL   = ../libtool
+-SHELL     = /bin/sh
++top_builddir = @top_builddir@
++
++LIBTOOL   = @LIBTOOL@
++SHELL     = @SHELL@
+ CC        = @CC@
+ CPP       = @CPP@
+ CFLAGS    = @CFLAGS@
+--- t1lib-5.0.2/xglyph/Makefile.in~libtool
++++ t1lib-5.0.2/xglyph/Makefile.in
+@@ -15,8 +15,10 @@
+ #
+ # Modified by H.Kakugawa to use libtool
+ 
+-LIBTOOL   = ../libtool
+-SHELL     = /bin/sh
++top_builddir = @top_builddir@
++
++LIBTOOL   = @LIBTOOL@
++SHELL     = @SHELL@
+ CC        = @CC@
+ CPP       = @CPP@
+ CFLAGS    = @CFLAGS@

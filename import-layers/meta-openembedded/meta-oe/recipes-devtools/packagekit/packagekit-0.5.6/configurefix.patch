@@ -1,0 +1,13 @@
+Index: PackageKit-0.6.0/configure.ac
+===================================================================
+--- PackageKit-0.6.0.orig/configure.ac	2010-01-04 16:32:18.000000000 +0000
++++ PackageKit-0.6.0/configure.ac	2010-01-29 11:33:48.000000000 +0000
+@@ -90,7 +90,7 @@
+ 							enable_strict=$default_strict)
+ if test x$enable_strict != xno; then
+ 	if test "$GCC" = "yes"; then
+-		WARNINGFLAGS_CPP="$WARNINGFLAGS_CPP -Werror"
++		:
+ 	fi
+ fi
+ 

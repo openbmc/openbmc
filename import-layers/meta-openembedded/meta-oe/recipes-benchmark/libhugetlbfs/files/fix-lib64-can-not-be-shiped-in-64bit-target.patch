@@ -1,0 +1,75 @@
+Upstream-Status: Inappropriate [oe-core specific]
+
+
+fix the below error:
+  ERROR: QA Issue: libhugetlbfs: Files/directories were installed but not shipped
+  /usr/lib64
+  /usr/lib64/libhugetlbfs.so
+  /usr/lib64/libhugetlbfs.a
+  /usr/lib64/libhugetlbfs_privutils.so
+  /usr/lib64/perl5
+  /usr/lib64/perl5/TLBC
+  /usr/lib64/perl5/TLBC/PerfCollect.pm
+  /usr/lib64/perl5/TLBC/Report.pm
+  /usr/lib64/perl5/TLBC/DataCollect.pm
+  /usr/lib64/perl5/TLBC/OpCollect.pm
+$<50>ERROR: QA run found fatal errors. Please consider fixing them.
+
+
+Signed-off-by: Guo Chunrong <B40290@freescale.com>
+
+--- a/Makefile	2013-09-23 02:28:57.340566998 -0500
++++ b/Makefile	2013-09-23 02:31:05.344569896 -0500
+@@ -33,7 +33,6 @@
+ CPPFLAGS += -D__LIBHUGETLBFS__ -DPPC_NO_SEGMENTS
+ 
+ ARCH = $(shell uname -m | sed -e s/i.86/i386/)
+-CC = gcc
+ 
+ CUSTOM_LDSCRIPTS = yes
+ 
+@@ -59,9 +58,9 @@
+ CUSTOM_LDSCRIPTS = no
+ else
+ ifeq ($(ARCH),aarch64)
+-CC64 = gcc
++CC64 = $(CC)
+ ELF64 = aarch64elf
+-TMPLIB64 = lib64
++TMPLIB64 = lib
+ CUSTOM_LDSCRIPTS = no
+ else
+ ifeq ($(ARCH),i386)
+@@ -72,7 +71,7 @@
+ ifeq ($(ARCH),x86_64)
+ CC64 = $(CC) -m64
+ ELF64 = elf_x86_64
+-TMPLIB64 = lib64
++TMPLIB64 = lib
+ TMPLIB32 = lib
+ ifneq ($(BUILDTYPE),NATIVEONLY)
+ CC32 = $(CC) -m32
+@@ -172,11 +171,23 @@
+ BINDIR = $(PREFIX)/share/libhugetlbfs
+ EXEDIR = $(PREFIX)/bin
+ DOCDIR = $(PREFIX)/share/doc/libhugetlbfs
++
+ ifdef CC32
+ PMDIR = $(PREFIX)/lib/perl5/TLBC
++endif
++
++ifdef CC64
++ifeq ($(ARCH),x86_64)
++PMDIR = $(PREFIX)/lib/perl5/TLBC
++else
++ifeq ($(ARCH),aarch64)
++PMDIR = $(PREFIX)/lib/perl5/TLBC
+ else
+ PMDIR = $(PREFIX)/lib64/perl5/TLBC
+ endif
++endif
++endif
++
+ MANDIR1 = $(PREFIX)/share/man/man1
+ MANDIR3 = $(PREFIX)/share/man/man3
+ MANDIR7 = $(PREFIX)/share/man/man7

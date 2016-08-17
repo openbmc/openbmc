@@ -1,0 +1,71 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:        rwhod
+# Required-Start:  $network $remote_fs $syslog
+# Required-Stop:   $network $remote_fs $syslog
+# Default-Start:   2 3 4 5
+# Default-Stop:    0 1 6
+# Short-Description: Server for rwho and ruptime services
+### END INIT INFO
+
+PATH=/sbin:/bin:/usr/bin:/usr/sbin
+
+DAEMON=/usr/sbin/rwhod
+PIDFILE=/var/run/rwhod.pid
+CONF_FILE="/etc/default/rwhod"
+DESC="Who daemon "
+# default options. Change them in /etc/default/rwhod
+RWHOD_OPTIONS="-b"
+
+# rwhod	init.d script for ntpdc from ntp.isc.org
+test -f $DAEMON || exit 0
+
+# Source function library.
+. /etc/init.d/functions
+
+[ -r $CONF_FILE ] && . $CONF_FILE
+
+startdaemon(){
+	echo -n "Starting $DESC" " rwhod "
+	start-stop-daemon --start --quiet --oknodo --pidfile $PIDFILE --exec $DAEMON -- $RWHOD_OPTIONS
+	echo "done"
+}
+stopdaemon(){
+	echo -n "Stopping $DESC" " rwhod "
+	start-stop-daemon --stop --quiet --oknodo --exec $DAEMON
+	echo "done"
+}
+
+case "$1" in
+  start)
+	startdaemon
+	;;
+  stop)
+	stopdaemon
+	;;
+  force-reload)
+	stopdaemon
+	startdaemon
+	;;
+  restart)
+	stopdaemon
+	sleep 1
+	startdaemon
+	;;
+  reload)
+	stopdaemon
+	sleep 1
+	startdaemon
+	;;
+  status)
+	status /usr/sbin/rwhod;
+	exit $?
+	;;
+  *)
+	echo "Usage: rwhod { start | stop | status | restart | reload }" >&2
+	exit 1
+	;;
+esac
+
+exit 0

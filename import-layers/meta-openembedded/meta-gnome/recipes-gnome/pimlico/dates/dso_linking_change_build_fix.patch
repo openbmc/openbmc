@@ -1,0 +1,44 @@
+after gcc linking has changed, all the libraries must be explicitely specified 
+This patch avoids these linking errors:
+
+
+| make[2]: Entering directory `/disk0/pokybuild/build1/tmp/work/i586-poky-linux/dates-0.4.11+git0+514185dc1f6588085fda41eb59898b93d0487dd4-r2/git/src'^M
+...
+| /disk0/pokybuild/build1/tmp/sysroots/x86_64-linux/usr/libexec/i586-poky-linux/gcc/i586-poky-linux/4.5.1/ld: e: invalid DSO for symbol `pow@@GLIBC_2.0' definition^M
+| /disk0/pokybuild/build1/tmp/sysroots/i586-poky-linux/usr/lib/libm.so: could not read symbols: Bad value^M
+| collect2: ld returned 1 exit status^M
+| make[2]: *** [dates] Error 1
+
+
+
+| /disk0/pokybuild/build1/tmp/sysroots/x86_64-linux/usr/libexec/i586-poky-linux/gcc/i586-poky-linux/4.5.1/ld: z: invalid DSO for symbol `pango_layout_get_extents' definition
+| /disk0/pokybuild/build1/tmp/sysroots/i586-poky-linux/usr/lib/libpango-1.0.so: could not read symbols: Bad value
+| collect2: ld returned 1 exit status
+| make[2]: *** [dates] Error 1
+
+
+Nitin A Kamble <nitin.a.kamble@intel.com>
+Date: 2011/01/11
+
+Update:
+This is identified as a libtool issue. While creating the libgtkdatesview.la 
+file, libtool should have added these needed libraries in there.
+ A bug has been created for this issue: 
+   http://bugzilla.pokylinux.org/show_bug.cgi?id=664
+Nitin A Kamble <nitin.a.kamble@intel.com>
+Date: 2011/01/19
+
+Upstream-Status: Pending
+
+Index: git/src/Makefile.am
+===================================================================
+--- git.orig/src/Makefile.am
++++ git/src/Makefile.am
+@@ -34,6 +34,6 @@ dates_SOURCES = $(platform) 	\
+ 	gconf-bridge.h		\
+ 	gconf-bridge.c
+ 
+-dates_LDADD = $(DATES_LIBS) $(OWL_LIBS) libgtkdatesview.la
++dates_LDADD = $(DATES_LIBS) $(OWL_LIBS) libgtkdatesview.la -lm -lpango-1.0
+ 
+ MAINTAINERCLEANFILES = config.h.in Makefile.in

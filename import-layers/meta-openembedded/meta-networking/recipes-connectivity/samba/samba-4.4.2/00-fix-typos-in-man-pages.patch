@@ -1,0 +1,108 @@
+From 1573638212a9733a44939a4d38a226f38dca36f1 Mon Sep 17 00:00:00 2001
+From: Michele Baldessari <michele@acksyn.org>
+Date: Tue, 9 Jul 2013 23:23:33 +0200
+Subject: [PATCH] Fix typos in man-pages
+
+Fix some typos in the man-pages.
+
+Signed-off-by: Michele Baldessari <michele@acksyn.org>
+Reviewed-by: Simo Sorce <idra@samba.org>
+
+Autobuild-User(master): Simo Sorce <idra@samba.org>
+Autobuild-Date(master): Wed Jul 10 16:45:07 CEST 2013 on sn-devel-104
+---
+ docs-xml/manpages/dbwrap_tool.1.xml              | 2 +-
+ docs-xml/manpages/idmap_autorid.8.xml            | 2 +-
+ docs-xml/manpages/net.8.xml                      | 2 +-
+ docs-xml/manpages/pdbedit.8.xml                  | 2 +-
+ docs-xml/manpages/samba.7.xml                    | 2 +-
+ docs-xml/manpages/smbclient.1.xml                | 2 +-
+ docs-xml/manpages/smbpasswd.5.xml                | 2 +-
+ docs-xml/manpages/vfs_smb_traffic_analyzer.8.xml | 2 +-
+ 8 files changed, 8 insertions(+), 8 deletions(-)
+
+Index: samba-4.1.11/docs-xml/manpages/smbstatus.1.xml
+===================================================================
+--- samba-4.1.11.orig/docs-xml/manpages/smbstatus.1.xml
++++ samba-4.1.11/docs-xml/manpages/smbstatus.1.xml
+@@ -137,6 +137,13 @@
+ 		</listitem>
+ 		</varlistentry>
+ 
++		<varlistentry>
++		<term>-n|--numeric</term>
++		<listitem><para>causes smbstatus to display numeric UIDs and GIDs instead of
++				resolving them to names.</para>
++		</listitem>
++		</varlistentry>
++
+ 	</variablelist>
+ </refsect1>
+ 
+Index: samba-4.1.11/docs-xml/manpages/sharesec.1.xml
+===================================================================
+--- samba-4.1.11.orig/docs-xml/manpages/sharesec.1.xml
++++ samba-4.1.11/docs-xml/manpages/sharesec.1.xml
+@@ -129,6 +129,13 @@
+ 		</para></listitem>
+ 		</varlistentry>
+ 
++		<varlistentry>
++		<term>-S|--setsddl=STRING</term>
++		<listitem><para>
++		Set security descriptor by providing ACL in SDDL format.
++		</para></listitem>
++		</varlistentry>
++
+ 		&stdarg.help;
+ 		&stdarg.server.debug;
+ 		&popt.common.samba;
+Index: samba-4.1.11/docs-xml/build/DTD/samba.entities
+===================================================================
+--- samba-4.1.11.orig/docs-xml/build/DTD/samba.entities
++++ samba-4.1.11/docs-xml/build/DTD/samba.entities
+@@ -270,6 +270,44 @@ file.
+ &popt.common.samba;
+ '>
+ 
++<!ENTITY stdarg.signing '
++<varlistentry>
++<term>-S|--signing on|off|required</term>
++<listitem><para>Set the client signing state.
++</para></listitem>
++</varlistentry>
++'>
++
++<!ENTITY stdarg.machinepass '
++<varlistentry>
++<term>-P|--machine-pass</term>
++<listitem><para>Use stored machine account password.
++</para></listitem>
++</varlistentry>
++'>
++
++<!ENTITY stdarg.encrypt '
++<varlistentry>
++<term>-e|--encrypt</term>
++<listitem><para>
++This command line parameter requires the remote
++server support the UNIX extensions or that the SMB3 protocol has been selected.
++Requests that the connection be encrypted. Negotiates SMB encryption using either
++SMB3 or POSIX extensions via GSSAPI. Uses the given credentials for
++the encryption negotiation (either kerberos or NTLMv1/v2 if given
++domain/username/password triple. Fails the connection if encryption
++cannot be negotiated.
++</para></listitem>
++</varlistentry>
++'>
++
++<!ENTITY stdarg.pwnthash '
++<varlistentry>
++<term>--pw-nt-hash</term>
++<listitem><para>The supplied password is the NT hash.
++</para></listitem>
++</varlistentry>
++'>
+ 
+ <!ENTITY stdarg.resolve.order '
+ <varlistentry>

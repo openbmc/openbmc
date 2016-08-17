@@ -1,0 +1,16 @@
+Index: pidgin-2.5.0/libpurple/protocols/irc/irc.h
+===================================================================
+--- pidgin-2.5.0.orig/libpurple/protocols/irc/irc.h	2008-08-19 01:53:38.000000000 +0000
++++ pidgin-2.5.0/libpurple/protocols/irc/irc.h	2008-08-27 11:15:58.000000000 +0000
+@@ -36,9 +36,9 @@
+ 
+ #define IRC_DEFAULT_CHARSET "UTF-8"
+ #define IRC_DEFAULT_AUTODETECT FALSE
+-#define IRC_DEFAULT_ALIAS "purple"
++#define IRC_DEFAULT_ALIAS "OE-user"
+ 
+-#define IRC_DEFAULT_QUIT "Leaving."
++#define IRC_DEFAULT_QUIT "Powered by OE: www.openembedded.org"
+ 
+ #define IRC_INITIAL_BUFSIZE 1024
+ 

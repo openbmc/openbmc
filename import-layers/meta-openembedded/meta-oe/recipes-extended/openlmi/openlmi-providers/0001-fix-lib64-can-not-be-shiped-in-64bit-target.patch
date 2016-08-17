@@ -1,0 +1,31 @@
+From 7cecfa95f033b33a1c3260c214b2d0e5e81b4fd3 Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@cn.fujitsu.com>
+Date: Mon, 3 Aug 2015 02:05:56 +0900
+Subject: [PATCH] fix lib64 can not be shiped in 64bit target
+
+Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
+---
+ CMakeLists.txt | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 48ae206..3ead9c6 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -21,13 +21,6 @@ else(HAS_STACK_PROTECTOR_STRONG)
+     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fstack-protector")
+ endif()
+ 
+-# Set LIB_SUFFIX to 64 on 64bit architectures
+-if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+-    set(LIB_SUFFIX "")
+-else(CMAKE_SIZEOF_VOID_P EQUAL 4)
+-    SET(LIB_SUFFIX 64)
+-endif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+-
+ if(NOT SYSCONF_INSTALL_DIR)
+     set(SYSCONF_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/etc)
+ endif(NOT SYSCONF_INSTALL_DIR)
+-- 
+1.8.4.2
+

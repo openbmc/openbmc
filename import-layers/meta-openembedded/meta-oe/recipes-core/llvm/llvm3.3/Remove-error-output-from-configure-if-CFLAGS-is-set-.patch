@@ -1,0 +1,52 @@
+From d4bf7a3853dab12c11cbfc8088fd76f548a8d017 Mon Sep 17 00:00:00 2001
+From: Patrik Hagglund <patrik.h.hagglund@ericsson.com>
+Date: Tue, 24 Sep 2013 11:38:45 +0000
+Subject: [PATCH] Remove error output from configure if CFLAGS is set (r174313).
+
+This fixes PR16724.
+
+git-svn-id: https://llvm.org/svn/llvm-project/llvm/trunk@191289 91177308-0d34-0410-b5e6-96231b3b80d8
+
+https://github.com/llvm-mirror/llvm/commit/d4bf7a3853dab12c11cbfc8088fd76f548a8d017
+
+Upstream-Status: Backport
+
+Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+---
+ autoconf/configure.ac | 4 ++--
+ configure             | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/autoconf/configure.ac b/autoconf/configure.ac
+index f9c365c..45f2fe4 100644
+--- a/autoconf/configure.ac
++++ b/autoconf/configure.ac
+@@ -61,8 +61,8 @@ fi
+ 
+ dnl Default to empty (i.e. assigning the null string to) CFLAGS and CXXFLAGS,
+ dnl instead of the autoconf default (for example, '-g -O2' for CC=gcc).
+-${CFLAGS=}
+-${CXXFLAGS=}
++: ${CFLAGS=}
++: ${CXXFLAGS=}
+ 
+ dnl We need to check for the compiler up here to avoid anything else
+ dnl starting with a different one.
+diff --git a/configure b/configure
+index f3a6594..9090cda 100755
+--- a/configure
++++ b/configure
+@@ -1992,8 +1992,8 @@ echo "$as_me: error: Already configured in ${srcdir}" >&2;}
+   fi
+ fi
+ 
+-${CFLAGS=}
+-${CXXFLAGS=}
++: ${CFLAGS=}
++: ${CXXFLAGS=}
+ 
+ ac_ext=c
+ ac_cpp='$CPP $CPPFLAGS'
+-- 
+1.9.1
+

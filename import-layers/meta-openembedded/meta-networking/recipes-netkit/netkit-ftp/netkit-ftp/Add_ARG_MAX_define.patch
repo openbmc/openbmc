@@ -1,0 +1,28 @@
+This adds ARG_MAX define to be _SC_ARG_MAX
+
+Upstream-Status: Inappropriate.
+Most distros have their own verion for this fix.
+
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: netkit-ftp-0.17/ftp/glob.c
+===================================================================
+--- netkit-ftp-0.17.orig/ftp/glob.c
++++ netkit-ftp-0.17/ftp/glob.c
+@@ -50,6 +50,7 @@ char glob_rcsid[] =
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <unistd.h>
+ 
+ #include "ftp_var.h"  /* for protos only */
+ #include "glob.h"
+@@ -57,6 +58,9 @@ char glob_rcsid[] =
+ #define	QUOTE 0200
+ #define	TRIM 0177
+ #define	eq(a,b)		(strcmp(a, b)==0)
++#ifndef ARG_MAX
++#define ARG_MAX (sysconf(_SC_ARG_MAX))
++#endif
+ #define	GAVSIZ		(ARG_MAX/6)
+ #define	isdir(d)	((d.st_mode & S_IFMT) == S_IFDIR)

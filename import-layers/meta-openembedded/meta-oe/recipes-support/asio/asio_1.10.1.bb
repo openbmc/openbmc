@@ -1,0 +1,6 @@
+require asio.inc
+
+LIC_FILES_CHKSUM = "file://COPYING;md5=113f800aa522d9e38c3309c98ec53ade"
+
+SRC_URI[md5sum] = "4d508c9947404fee40945375b8a5fd32"
+SRC_URI[sha256sum] = "820a5dad3c56a4f3e937f2b9ae059ab2696c6058345d71b7a8b072a0f2fcbd99"

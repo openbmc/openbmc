@@ -1,0 +1,31 @@
+[PATCH] tcpdump: cross-compiling not check dlpi.
+
+For cross-compiling on Linux platforms, we do not need to check libdlpi 
+since it is only placed on Solaris.
+Also, checking libdlpi in native /lib would cause do_qa_configure fail.
+
+Upstream-Status: Pending.
+
+Signed-off-by: Xin Ouyang <Xin.Ouyang@windriver.com>
+---
+ configure.in |    4 +++-
+ 1 files changed, 3 insertions(+), 1 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index 7f9591c..ca277c0 100644
+--- a/configure.in
++++ b/configure.in
+@@ -716,7 +716,9 @@ don't.])
+ fi
+ 
+ # libdlpi is needed for Solaris 11 and later.
+-AC_CHECK_LIB(dlpi, dlpi_walk, LIBS="$LIBS -ldlpi" LDFLAGS="-L/lib $LDFLAGS", ,-L/lib)
++if test "$cross_compiling" != yes; then
++	AC_CHECK_LIB(dlpi, dlpi_walk, LIBS="$LIBS -ldlpi" LDFLAGS="-L/lib $LDFLAGS", ,-L/lib)
++fi
+ 
+ dnl portability macros for getaddrinfo/getnameinfo
+ dnl
+-- 
+1.7.5.4
+

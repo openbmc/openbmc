@@ -1,0 +1,37 @@
+
+Bump up the core size limit if CoreDumpDirectory is
+configured.
+
+Upstream-Status: Pending 
+
+Note: upstreaming was discussed but there are competing desires;
+	there are portability oddities here too.
+
+--- httpd-2.4.1/server/core.c.corelimit
++++ httpd-2.4.1/server/core.c
+@@ -4433,6 +4433,25 @@ static int core_post_config(apr_pool_t *
+     }
+     apr_pool_cleanup_register(pconf, NULL, ap_mpm_end_gen_helper,
+                               apr_pool_cleanup_null);
++
++#ifdef RLIMIT_CORE
++    if (ap_coredumpdir_configured) {
++        struct rlimit lim;
++
++        if (getrlimit(RLIMIT_CORE, &lim) == 0 && lim.rlim_cur == 0) {
++            lim.rlim_cur = lim.rlim_max;
++            if (setrlimit(RLIMIT_CORE, &lim) == 0) {
++                ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
++                             "core dump file size limit raised to %lu bytes",
++                             lim.rlim_cur);
++            } else {
++                ap_log_error(APLOG_MARK, APLOG_NOTICE, errno, NULL,
++                             "core dump file size is zero, setrlimit failed");
++            }
++        }
++    }
++#endif
++
+     return OK;
+ }
+ 

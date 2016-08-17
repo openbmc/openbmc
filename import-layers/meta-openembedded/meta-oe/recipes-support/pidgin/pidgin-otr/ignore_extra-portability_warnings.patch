@@ -1,0 +1,19 @@
+pidgin-otr: Silence no-extra-portability warnings
+
+Make it build with OE, was not building with warning turned on
+
+Upstream-Status: Pending
+
+Signed-off-by: Jakob Drexel <jake42@rommel.stw.uni-erlangen.de>
+
+--- a/configure.ac	2012-09-01 17:03:19.000000000 +0200
++++ b/configure.ac	2014-01-12 21:59:24.920300215 +0100
+@@ -4,7 +4,7 @@
+ 
+ AM_CONFIG_HEADER(config.h)
+ 
+-AM_INIT_AUTOMAKE([-Wall -Werror])
++AM_INIT_AUTOMAKE([-Wall -Werror -Wno-extra-portability])
+ 
+ AC_PROG_CC
+ 

@@ -1,0 +1,75 @@
+1. test_bit was used to return true boolean value, if
+   BIO_UPTODATE bit of bio->bi_flags is set. But the same
+   job can be done by checking bio->bi_error, implemented in
+   linux kernel 4.3 and above. If bio->bi_error is set, then 
+   it denotes error.
+
+Ref: https://github.com/torvalds/linux/commit/4246a0b63bd8f56a1469b12eafeb875b1041a451
+
+It solves below build error:
+-- snip --
+iscsitarget-1.4.20.3+svn502/kernel/block-io.c:40:19: error: 'BIO_UPTODATE' undeclared (first use in this function)
+   error = test_bit(BIO_UPTODATE, &bio->bi_flags) ? error : -EIO;
+-- CUT --
+
+2. bio can always be filled to a maximum value of BIO_MAX_PAGES, 
+   so no need to check for min value for linux kernel 4.3 and above.
+
+Ref: https://github.com/torvalds/linux/commit/b54ffb73cadcdcff9cc1ae0e11f502407e3e2e4c
+
+It solves below build error:
+-- snip --
+iscsitarget-1.4.20.3+svn502/kernel/block-io.c:80:15: error: implicit declaration of function 'bio_get_nr_vecs' [-Werror=implicit-function-declaration]
+    max_pages = bio_get_nr_vecs(bio_data->bdev);
+-- CUT --
+
+Upstream-Status: Pending
+
+Signed-off-by: Jagadeesh Krishnanjanappa <jkrishnanjanappa@mvista.com>
+
+diff -Naurp iscsitarget-1.4.20.3+svn502_org/kernel/block-io.c iscsitarget-1.4.20.3+svn502/kernel/block-io.c
+--- iscsitarget-1.4.20.3+svn502_org/kernel/block-io.c	2016-04-01 09:07:12.891810059 +0530
++++ iscsitarget-1.4.20.3+svn502/kernel/block-io.c	2016-04-01 09:15:59.076469313 +0530
+@@ -33,7 +33,11 @@ static void blockio_bio_endio(struct bio
+ {
+ 	struct tio_work *tio_work = bio->bi_private;
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0)
++	error = bio->bi_error ? -EIO : error;
++#else
+ 	error = test_bit(BIO_UPTODATE, &bio->bi_flags) ? error : -EIO;
++#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0) */	
+ 
+ 	if (error)
+ 		atomic_set(&tio_work->error, error);
+@@ -61,6 +65,10 @@ blockio_make_request(struct iet_volume *
+ 	u32 size = tio->size;
+ 	u32 tio_index = 0;
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0)
++	int err = 0;
++	loff_t ppos = tio->offset;	
++#else	
+ 	int max_pages = 1;
+ 	int err = 0;
+ 
+@@ -69,6 +77,7 @@ blockio_make_request(struct iet_volume *
+ 	/* Calculate max_pages for bio_alloc (memory saver) */
+ 	if (bdev_q)
+ 		max_pages = bio_get_nr_vecs(bio_data->bdev);
++#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0) */
+ 
+ 	tio_work = kzalloc(sizeof (*tio_work), GFP_KERNEL);
+ 	if (!tio_work)
+@@ -80,7 +89,11 @@ blockio_make_request(struct iet_volume *
+ 
+ 	/* Main processing loop, allocate and fill all bios */
+ 	while (size && tio_index < tio->pg_cnt) {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0)
++		bio = bio_alloc(GFP_KERNEL, BIO_MAX_PAGES);
++#else    		
+ 		bio = bio_alloc(GFP_KERNEL, min(max_pages, BIO_MAX_PAGES));
++#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0) */		
+ 		if (!bio) {
+ 			err = -ENOMEM;
+ 			goto out;

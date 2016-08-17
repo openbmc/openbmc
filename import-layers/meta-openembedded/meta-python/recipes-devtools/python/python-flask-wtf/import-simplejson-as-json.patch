@@ -1,0 +1,28 @@
+Upstream-Status: Inappropriate [configuration]
+
+Subject: [PATCH] import simplejson as json
+
+At runtime python-Flask-WTF tries to import json, but the module is not 
+available, import simplejson as json solve the issue.
+
+Signed-off-by: Fabio Berton <fabio.berton@ossystems.com.br>
+---
+ flask_wtf/recaptcha/validators.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/flask_wtf/recaptcha/validators.py b/flask_wtf/recaptcha/validators.py
+index bcff23d..4a244bb 100644
+--- a/flask_wtf/recaptcha/validators.py
++++ b/flask_wtf/recaptcha/validators.py
+@@ -8,7 +8,7 @@ from flask import request, current_app
+ from wtforms import ValidationError
+ from werkzeug import url_encode
+ from .._compat import to_bytes, to_unicode
+-import json
++import simplejson as json
+ 
+ RECAPTCHA_VERIFY_SERVER = 'https://www.google.com/recaptcha/api/siteverify'
+ RECAPTCHA_ERROR_CODES = {
+-- 
+2.1.4
+

@@ -1,0 +1,28 @@
+syslog-ng: fix wrong ownership issue
+
+Upstream-Status: Pending
+
+The ownership of build user is preserved for some target files, fixed it by
+adding --no-same-owner option to tar when extracting files. 
+
+Signed-off-by: Ming Liu <ming.liu@windriver.com>
+---
+ scl/Makefile.am |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/scl/Makefile.am b/scl/Makefile.am
+index 57fad5d..2a29ca5 100644
+--- a/scl/Makefile.am
++++ b/scl/Makefile.am
+@@ -14,7 +14,7 @@ scl-install-data-local:
+ 		fi; \
+ 	done
+ 	$(mkinstalldirs) $(DESTDIR)/$(scldir)
+-	(cd $(srcdir)/scl; tar cf - $(SCL_SUBDIRS)) | (cd $(DESTDIR)/$(scldir) && tar xf -)
++	(cd $(srcdir)/scl; tar cf - $(SCL_SUBDIRS)) | (cd $(DESTDIR)/$(scldir) && tar xf - --no-same-owner)
+ 	chmod -R u+rwX $(DESTDIR)/$(scldir)
+ 
+ scl-uninstall-local:
+-- 
+1.7.1
+

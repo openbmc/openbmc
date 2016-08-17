@@ -1,0 +1,26 @@
+From 3541649b711a773aa2e42ac80d9b4c1b36fce23f Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Thu, 27 Mar 2014 00:08:54 +0100
+Subject: [PATCH] configure: don't disable ASS support when explicitly enabled
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure b/configure
+index 60fd308..2f7df3b 100755
+--- a/configure
++++ b/configure
+@@ -4346,7 +4346,7 @@ fi
+ 
+ 
+ echocheck "SSA/ASS support"
+-if test "$_ass" = auto ; then
++if test "$_ass" = auto -o "$_ass" = yes ; then
+     if pkg_config_add libass ; then
+         _ass=yes
+         def_ass='#define CONFIG_ASS 1'
+-- 
+1.9.1
+

@@ -1,0 +1,15 @@
+Index: libsexy-0.1.11/libsexy.pc.in
+===================================================================
+--- libsexy-0.1.11.orig/libsexy.pc.in	2005-11-10 10:21:18.000000000 +0000
++++ libsexy-0.1.11/libsexy.pc.in	2008-03-05 14:36:39.000000000 +0000
+@@ -6,7 +6,8 @@
+ Name: libsexy
+ Description: Doing naughty things to good widgets
+ Version: @VERSION@
+-Libs: -L${libdir} -lsexy @PACKAGE_LIBS@
+-Cflags: -I${includedir} @PACKAGE_CFLAGS@
+ 
++Requires: pango glib-2.0 gtk+-2.0 libxml-2.0
++Libs: -L${libdir} -lsexy 
++Cflags: -I${includedir}
+ 

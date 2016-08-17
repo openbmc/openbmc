@@ -1,0 +1,20 @@
+Index: autofs-5.0.7/samples/auto.net
+===================================================================
+--- autofs-5.0.7.orig/samples/auto.net	2012-07-24 23:05:26.000000000 -0700
++++ autofs-5.0.7/samples/auto.net	2012-10-28 10:44:25.035991715 -0700
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ # This file must be executable to work! chmod 755!
+ 
+Index: autofs-5.0.7/samples/auto.smb
+===================================================================
+--- autofs-5.0.7.orig/samples/auto.smb	2012-07-24 23:05:26.000000000 -0700
++++ autofs-5.0.7/samples/auto.smb	2012-10-28 10:44:25.035991715 -0700
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ # This file must be executable to work! chmod 755!
+ 

@@ -1,0 +1,45 @@
+From a84c16fdc606f22b993f870b1cea56dd060a35e6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Thu, 22 Oct 2015 16:55:30 +0200
+Subject: [PATCH 2/2] epdf_poppler_postscript.cpp: fix build for poppler API
+ change
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Poppler API was changed in [1]. The patch not only shows the change but also
+inspires how to fix.
+
+[1] http://cgit.freedesktop.org/poppler/poppler/commit/?id=9caf7525409d699c16896653528486451123b485
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ src/lib/poppler/epdf_poppler_postscript.cpp | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/src/lib/poppler/epdf_poppler_postscript.cpp b/src/lib/poppler/epdf_poppler_postscript.cpp
+index 0c2836b..656193b 100644
+--- a/src/lib/poppler/epdf_poppler_postscript.cpp
++++ b/src/lib/poppler/epdf_poppler_postscript.cpp
+@@ -82,11 +82,14 @@ epdf_postscript_print (const Epdf_Postscript *postscript)
+ 
+   // FIXME: fix postscript title
+ #ifdef HAVE_POPPLER_0_20
++  std::vector<int> pages;
++  for (int i = postscript->first_page; i <= postscript->last_page; ++i) {
++    pages.push_back(i);
++  }
+   PSOutputDev ps_dev(postscript->filename,
+                      postscript->pdfdoc,
+                      (char *)"PS title",
+-                     postscript->first_page,
+-                     postscript->last_page,
++                     pages,
+                      psModePS,
+                      (int)postscript->width,
+                      (int)postscript->height,
+-- 
+2.1.0
+

@@ -1,0 +1,118 @@
+Origin: r795, r796
+Description: move netfilter capabilities checking into initcaps(), and call
+ initcaps() only when we need it.
+Bug-Ubuntu: https://launchpad.net/bugs/1044361
+
+Upstream-Status: Inappropriate [ not author ]
+
+Signed-off-by: Joe MacDonald <joe_macdonald@mentor.com>
+
+Index: ufw-0.33/src/backend_iptables.py
+===================================================================
+--- ufw-0.33.orig/src/backend_iptables.py	2012-09-23 09:58:34.000000000 -0500
++++ ufw-0.33/src/backend_iptables.py	2012-09-23 09:58:36.000000000 -0500
+@@ -160,6 +160,9 @@
+             out += "> " + _("Checking raw ip6tables\n")
+             return out
+ 
++        # Initialize the capabilities database
++        self.initcaps()
++
+         args = ['-n', '-v', '-x', '-L']
+         items = []
+         items6 = []
+@@ -470,6 +473,9 @@
+         if self.dryrun:
+             return False
+ 
++        # Initialize the capabilities database
++        self.initcaps()
++
+         prefix = "ufw"
+         exe = self.iptables
+         if v6:
+@@ -684,6 +690,9 @@
+         except Exception:
+             raise
+ 
++        # Initialize the capabilities database
++        self.initcaps()
++
+         chain_prefix = "ufw"
+         rules = self.rules
+         if v6:
+@@ -830,6 +839,10 @@
+         * updating user rules file
+         * reloading the user rules file if rule is modified
+         '''
++
++        # Initialize the capabilities database
++        self.initcaps()
++
+         rstr = ""
+ 
+         if rule.v6:
+@@ -1073,6 +1086,9 @@
+         if self.dryrun:
+             return
+ 
++        # Initialize the capabilities database
++        self.initcaps()
++
+         rules_t = []
+         try:
+             rules_t = self._get_logging_rules(level)
+Index: ufw-0.33/src/backend.py
+===================================================================
+--- ufw-0.33.orig/src/backend.py	2012-09-23 09:58:34.000000000 -0500
++++ ufw-0.33/src/backend.py	2012-09-23 09:59:03.000000000 -0500
+@@ -21,7 +21,7 @@
+ import stat
+ import sys
+ import ufw.util
+-from ufw.util import warn, debug
++from ufw.util import error, warn, debug
+ from ufw.common import UFWError, config_dir, iptables_dir, UFWRule
+ import ufw.applications
+ 
+@@ -68,6 +68,17 @@
+             err_msg = _("Couldn't determine iptables version")
+             raise UFWError(err_msg)
+ 
++        # Initialize via initcaps only when we need it (LP: #1044361)
++        self.caps = None
++
++    def initcaps(self):
++        '''Initialize the capabilities database. This needs to be called
++           before accessing the database.'''
++
++        # Only initialize if not initialized already
++        if self.caps != None:
++            return
++
+         self.caps = {}
+         self.caps['limit'] = {}
+ 
+@@ -78,14 +89,20 @@
+         # Try to get capabilities from the running system if root
+         if self.do_checks and os.getuid() == 0 and not self.dryrun:
+             # v4
+-            nf_caps = ufw.util.get_netfilter_capabilities(self.iptables)
++            try:
++                nf_caps = ufw.util.get_netfilter_capabilities(self.iptables)
++            except OSError as e:
++                error("initcaps\n%s" % e)
+             if 'recent-set' in nf_caps and 'recent-update' in nf_caps:
+                 self.caps['limit']['4'] = True
+             else:
+                 self.caps['limit']['4'] = False
+ 
+             # v6
+-            nf_caps = ufw.util.get_netfilter_capabilities(self.ip6tables)
++            try:
++                nf_caps = ufw.util.get_netfilter_capabilities(self.ip6tables)
++            except OSError as e:
++                error("initcaps\n%s" % e)
+             if 'recent-set' in nf_caps and 'recent-update' in nf_caps:
+                 self.caps['limit']['6'] = True
+             else:

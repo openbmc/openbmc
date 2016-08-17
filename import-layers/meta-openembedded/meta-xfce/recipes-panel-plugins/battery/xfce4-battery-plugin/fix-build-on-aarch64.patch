@@ -1,0 +1,34 @@
+Upstream-Status: Backport from 
+
+http://git.xfce.org/panel-plugins/xfce4-battery-plugin/commit/?id=0f6926479728ca784a20b63d7c146a91e37d98fb
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+From 0f6926479728ca784a20b63d7c146a91e37d98fb Mon Sep 17 00:00:00 2001
+From: Landry Breuil <landry@xfce.org>
+Date: Thu, 19 Mar 2015 20:42:24 +0100
+Subject: Fix build on aarch64 (bug #11724)
+
+
+diff --git a/panel-plugin/libacpi.c b/panel-plugin/libacpi.c
+index 530194d..efb5c9c 100644
+--- a/panel-plugin/libacpi.c
++++ b/panel-plugin/libacpi.c
+@@ -29,6 +29,7 @@
+ #include <sys/types.h>
+ #include <dirent.h>
+ #include <glob.h>
++#include <unistd.h>
+ 
+ #ifdef __FreeBSD__
+ #include <fcntl.h>
+@@ -52,7 +53,6 @@ static int      acpifd;
+ #include <sys/sysctl.h>
+ #include <err.h>
+ #include <errno.h>
+-#include <unistd.h>
+ 
+ #endif
+ 
+-- 
+cgit v0.10.1

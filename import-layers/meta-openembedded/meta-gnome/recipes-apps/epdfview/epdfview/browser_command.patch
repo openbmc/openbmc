@@ -1,0 +1,17 @@
+Imported from Debian 0.1.8-3
+
+Upstream-Status: Pending
+
+diff --git a/src/Config.cxx b/src/Config.cxx
+index 28f37ab..bc58819 100644
+--- a/src/Config.cxx
++++ b/src/Config.cxx
+@@ -22,7 +22,7 @@
+ using namespace ePDFView;
+ 
+ // Constants
+-static const gchar *DEFAULT_EXTERNAL_BROWSER_COMMAND_LINE = "firefox %s";
++static const gchar *DEFAULT_EXTERNAL_BROWSER_COMMAND_LINE = "x-www-browser %s";
+ static const gchar *DEFAULT_OPEN_FILE_FOLDER = NULL;
+ static const gchar *DEFAULT_SAVE_FILE_FOLDER = NULL;
+ static const gboolean DEFAULT_SHOW_STATUSBAR = TRUE;

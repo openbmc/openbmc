@@ -1,0 +1,30 @@
+gst-ffmpeg: qdm2: check array index before use, fix out of array
+ accesses
+
+Upstream-Status: Backport 
+
+Found-by: Mateusz "j00ru" Jurczyk and Gynvael Coldwind
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+---
+ libavcodec/qdm2.c |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
+
+diff --git a/libavcodec/qdm2.c b/libavcodec/qdm2.c
+index 4cf4b2f..1dfb8d5 100644
+--- a/gst-libs/ext/libav/libavcodec/qdm2.c
++++ b/gst-libs/ext/libav/libavcodec/qdm2.c
+@@ -1257,6 +1257,11 @@ static void qdm2_decode_super_block (QDM2Context *q)
+     for (i = 0; packet_bytes > 0; i++) {
+         int j;
+ 
++        if (i>=FF_ARRAY_ELEMS(q->sub_packet_list_A)) {
++            SAMPLES_NEEDED_2("too many packet bytes");
++            return;
++        }
++
+         q->sub_packet_list_A[i].next = NULL;
+ 
+         if (i > 0) {
+-- 
+1.7.5.4
+

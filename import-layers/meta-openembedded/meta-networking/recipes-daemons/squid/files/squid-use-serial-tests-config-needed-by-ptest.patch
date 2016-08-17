@@ -1,0 +1,31 @@
+From 2192fdbc90b0ff2d5408e8763df200620870deea Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Mon, 13 Oct 2014 01:32:37 -0700
+Subject: [PATCH] squid: use serial-tests config needed by ptest
+
+ptest needs buildtest-TESTS and runtest-TESTS targets.
+serial-tests is required to generate those targets.
+
+Upstream-Status: Inappropriate [default automake behavior incompatible with ptest]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ configure.ac |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 6f7171f..ab9b93e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3,7 +3,7 @@ AC_PREREQ(2.61)
+ AC_CONFIG_HEADERS([include/autoconf.h])
+ AC_CONFIG_AUX_DIR(cfgaux)
+ AC_CONFIG_SRCDIR([src/main.cc])
+-AM_INIT_AUTOMAKE([tar-ustar nostdinc])
++AM_INIT_AUTOMAKE([tar-ustar nostdinc serial-tests])
+ AC_REVISION($Revision$)dnl
+ AC_PREFIX_DEFAULT(/usr/local/squid)
+ AM_MAINTAINER_MODE
+-- 
+1.7.1
+

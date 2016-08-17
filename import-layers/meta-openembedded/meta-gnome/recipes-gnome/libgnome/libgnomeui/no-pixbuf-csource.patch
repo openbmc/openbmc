@@ -1,0 +1,11 @@
+--- libgnomeui-2.6.1.1/configure.in.old	2004-08-04 00:28:43.582266664 +0100
++++ libgnomeui-2.6.1.1/configure.in	2004-08-04 00:29:27.496590672 +0100
+@@ -235,7 +235,7 @@
+ 
+ dnl This is installed from GTK+ 2.0's gdk-pixbuf
+ AC_PATH_PROG(GDK_PIXBUF_CSOURCE, gdk-pixbuf-csource)
+-test -z "$GDK_PIXBUF_CSOURCE" && AC_MSG_ERROR([
++test -z "$GDK_PIXBUF_CSOURCE" && AC_MSG_WARN([
+ *** You need the gdk-pixbuf-csource tool which is installed
+ *** from GTK+ 2.0's gdk-pixbuf.
+ ***

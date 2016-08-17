@@ -1,0 +1,26 @@
+From 764171866b84e0198b67538f63022abde3e628ad Mon Sep 17 00:00:00 2001
+From: Qian Lei <qianl.fnst@cn.fujitsu.com>
+Date: Fri, 16 Jan 2015 14:15:25 +0800
+Subject: [PATCH] fix error
+
+Signed-off-by: Qian Lei <qianl.fnst@cn.fujitsu.com>
+---
+ cmake/modules/OpenLMIMacros.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cmake/modules/OpenLMIMacros.cmake b/cmake/modules/OpenLMIMacros.cmake
+index d55f983..dbc32ec 100644
+--- a/cmake/modules/OpenLMIMacros.cmake
++++ b/cmake/modules/OpenLMIMacros.cmake
+@@ -89,7 +89,7 @@ macro(konkretcmpi_generate MOFS CIM_PROVIDERS CIM_HEADERS CIM_CLASSES)
+         endforeach(CLASS ${CIM_CLASS_NAMES})
+ 
+         # Generate headers for CIM classes
+-        set(ENV{KONKRET_SCHEMA_DIR} "/usr/share/mof/cim-current")
++        set(ENV{KONKRET_SCHEMA_DIR} "$ENV{CMAKE_INSTALL_DATDIR}/mof/cim-current")
+         execute_process(COMMAND ${KONKRETCMPI_KONKRET}
+                                 ${KONKRET_MOF_FILES}
+                                 ${GENERATE_PROVIDERS}
+-- 
+1.8.3.1
+

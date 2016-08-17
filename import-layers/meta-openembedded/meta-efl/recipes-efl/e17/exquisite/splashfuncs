@@ -1,0 +1,29 @@
+status() {
+  if type splash-write >/dev/null 2>&1; then
+    (TMPDIR="/mnt/.splash" EXQUISITE_IPC="$TMPDIR/exquisite" splash-write "$1" || true) &
+  fi
+}
+
+status_position() {
+  status "PROGRESS $1"
+}
+
+status_title() {
+  status "TITLE $1"
+}
+
+status_text() {
+  if test -n "$1"; then
+    status "MSG $1"
+  else
+    status "CLEAR"
+  fi
+}
+
+status_pulse() {
+  status "PULSATE"
+}
+
+status_tick() {
+  status "TICK"
+}

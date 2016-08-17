@@ -1,0 +1,6 @@
+<plugins>
+	<plugin path="$NAVIT_LIBDIR/*/${NAVIT_LIBPREFIX}lib*.so" ondemand="yes"/>
+	<plugin path="$NAVIT_LIBDIR/autoload/${NAVIT_LIBPREFIX}lib*.so"/>
+	<plugin path="$NAVIT_LIBDIR/*/${NAVIT_LIBPREFIX}libbinding_dbus.so" active="yes"/>
+	<plugin path="$NAVIT_LIBDIR/*/${NAVIT_LIBPREFIX}libgraphics_null.so" active="no"/>
+</plugins>

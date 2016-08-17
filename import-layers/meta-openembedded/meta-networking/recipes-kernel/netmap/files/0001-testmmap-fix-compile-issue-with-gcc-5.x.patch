@@ -1,0 +1,33 @@
+Upstream-Status: Pending
+
+From c81bf54d6eb870286662a11d3b4a994717c47696 Mon Sep 17 00:00:00 2001
+From: Armin Kuster <akuster808@gmail.com>
+Date: Tue, 8 Sep 2015 05:36:27 -0700
+Subject: [PATCH] testmmap: fix compile issue with gcc 5.x
+
+this fixes:
+examples/testmmap.c:540:10: error: format '%ld' expects argument of type 'long int', but argument 3 has type 'ssize_t {aka const int}' [-Werror=format=]
+|    printf("ring_ofs[%d] %ld\n", i, nifp->ring_ofs[i]);
+|           ^
+
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+---
+ examples/testmmap.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/examples/testmmap.c b/examples/testmmap.c
+index d7f6acc..934489a 100644
+--- a/examples/testmmap.c
++++ b/examples/testmmap.c
+@@ -537,7 +537,7 @@ do_if()
+ 	for (i = 0; i < 5; i++)
+ 		printf("spare1[%d]  %u\n", i, nifp->ni_spare1[i]);
+ 	for (i = 0; i < (nifp->ni_tx_rings + nifp->ni_rx_rings + 2); i++)
+-		printf("ring_ofs[%d] %ld\n", i, nifp->ring_ofs[i]);
++		printf("ring_ofs[%d] %zd\n", i, nifp->ring_ofs[i]);
+ }
+ 
+ struct netmap_ring *
+-- 
+2.3.5
+

@@ -1,0 +1,146 @@
+#!/bin/bash
+#
+# multipathd	Starts the multipath daemon
+#
+# chkconfig: - 06 87
+# description: Manages device-mapper multipath devices
+
+### BEGIN INIT INFO
+# Provides: multipathd
+# Required-Start:
+# Required-Stop:
+# Default-Start:
+# Default-Stop:
+# Short-Description: Control multipathd
+# Description: This service monitors and manages
+#              device-mapper multipath devices
+### END INIT INFO
+
+DAEMON=/sbin/multipathd
+prog=`basename $DAEMON`
+initdir=/etc/init.d
+lockdir=/var/lock/subsys
+sysconfig=/etc/sysconfig
+syspath=/sys/block
+
+RETVAL=0
+
+teardown_slaves()
+{
+pushd $1 > /dev/null
+if [ -d "slaves" ]; then
+for slave in slaves/*;
+do
+	if [ "$slave" = "slaves/*" ]; then
+		read dev <  $1/dev
+		tablename=`dmsetup table --target multipath | sed -n "s/\(.*\): .* $dev .*/\1/p"`
+		if ! [ -z $tablename ]; then
+			echo "Root is on a multipathed device, multipathd can not be stopped"
+			exit 1
+		fi
+	else
+		local_slave=`readlink -f $slave`;
+		teardown_slaves $local_slave;
+	fi
+	done
+
+else
+		read dev <  $1/dev
+		tablename=`dmsetup table --target multipath | sed -n "s/\(.*\): .* $dev .*/\1/p"`
+		if ! [ -z $tablename ]; then
+			echo "Root is on a multipathed device, multipathd can not be stopped"
+			exit 1
+		fi
+fi
+popd > /dev/null
+}
+
+#
+# See how we were called.
+#
+
+start() {
+	test -x $DAEMON || exit 5
+	echo -n $"Starting $prog daemon: "
+	start-stop-daemon --start --quiet --exec $DAEMON
+	RETVAL=$?
+	[ $RETVAL -eq 0 ] && touch $lockdir/$prog
+	echo
+}
+
+force_stop() {
+	echo -n $"Stopping $prog daemon: "
+	killall $DAEMON
+	RETVAL=$?
+	[ $RETVAL -eq 0 ] && rm -f $lockdir/$prog
+	echo
+}
+
+stop() {
+        root_dev=$(awk '{ if ($1 !~ /^[ \t]*#/ && $2 == "/") { print $1; }}' /etc/mtab)
+	dm_num=`dmsetup info -c --noheadings -o minor $root_dev 2> /dev/null`
+	if [ $? -eq 0 ]; then
+		root_dm_device="dm-$dm_num"
+		[ -d $syspath/$root_dm_device ] && teardown_slaves $syspath/$root_dm_device
+	fi
+
+	force_stop
+}
+
+restart() {
+	stop
+	start
+}
+
+force_restart() {
+	force_stop
+	start
+}
+
+reload() {
+	echo -n "Reloading $prog: "
+	trap "" SIGHUP
+	killall $DAEMON -s SIGHUP -v
+	RETVAL=$?
+	echo
+}	
+
+case "$1" in
+start)
+	start
+	;;
+stop)
+	stop
+	;;
+force-stop)
+	force_stop
+	;;
+force-reload|reload)
+	reload
+	;;
+restart)
+	restart
+	;;
+force-restart)
+	force_restart
+	;;
+condrestart|try-restart)
+	if [ -f $lockdir/$prog ]; then
+	    restart
+	fi
+	;;
+status)
+    if pidof -o %PPID $DAEMON > /dev/null; then
+        echo "Running"
+        RETVAL=0
+    else
+        echo "Not running"
+        RETVAL=1
+    fi
+	;;
+*)
+	echo $"Usage: $0 {start|stop|force-stop|status|restart|force-restart|condrestart|reload}"
+	RETVAL=2
+esac
+
+exit $RETVAL

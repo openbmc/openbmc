@@ -1,0 +1,45 @@
+make sure it can be compiled for cross target
+
+1. never try to compile target binary by native gcc
+2. target's chkshsgr doesn't work on native.
+3. it's wrong to do target tests on native.
+
+Signed-off-by: Bian Naimeng <biannm@cn.fujitsu.com>
+
+diff -Nurp daemontools-0.76.orig/src/conf-cc daemontools-0.76/src/conf-cc
+--- daemontools-0.76.orig/src/conf-cc	2001-07-13 00:49:49.000000000 +0800
++++ daemontools-0.76/src/conf-cc	2014-11-26 09:34:38.828812162 +0800
+@@ -1,3 +1,3 @@
+-gcc -O2 -Wimplicit -Wunused -Wcomment -Wchar-subscripts -Wuninitialized -Wshadow -Wcast-qual -Wcast-align -Wwrite-strings
++${CC} -O2 -Wimplicit -Wunused -Wcomment -Wchar-subscripts -Wuninitialized -Wshadow -Wcast-qual -Wcast-align -Wwrite-strings
+ 
+ This will be used to compile .c files.
+diff -Nurp daemontools-0.76.orig/src/conf-ld daemontools-0.76/src/conf-ld
+--- daemontools-0.76.orig/src/conf-ld	2001-07-13 00:49:49.000000000 +0800
++++ daemontools-0.76/src/conf-ld	2014-11-26 09:34:49.880811730 +0800
+@@ -1,3 +1,3 @@
+-gcc -s
++${CC}
+ 
+ This will be used to link .o files into an executable.
+diff -Nurp daemontools-0.76.orig/src/Makefile daemontools-0.76/src/Makefile
+--- daemontools-0.76.orig/src/Makefile	2001-07-13 00:49:49.000000000 +0800
++++ daemontools-0.76/src/Makefile	2014-11-26 09:38:47.120802459 +0800
+@@ -165,7 +165,7 @@ hassgprm.h: choose compile hassgprm.h1 h
+ 
+ hasshsgr.h: chkshsgr choose compile hasshsgr.h1 hasshsgr.h2 load \
+ tryshsgr.c warn-shsgr
+-	./chkshsgr || ( cat warn-shsgr; exit 1 )
++	chkshsgr || ( cat warn-shsgr; exit 1 )
+ 	./choose clr tryshsgr hasshsgr.h1 hasshsgr.h2 > hasshsgr.h
+ 
+ haswaitp.h: choose compile haswaitp.h1 haswaitp.h2 load trywaitp.c
+@@ -265,7 +265,7 @@ readproctitle.o: compile error.h readpro
+ rts: envdir envuidgid fghack matchtest multilog pgrphack \
+ readproctitle rts.tests setlock setuidgid softlimit supervise svc \
+ svok svscan svscanboot svstat tai64n tai64nlocal
+-	env - /bin/sh rts.tests 2>&1 | cat -v > rts
++	echo "Warning: We can not run test on cross target."
+ 
+ scan_ulong.o: compile scan.h scan_ulong.c
+ 	./compile scan_ulong.c

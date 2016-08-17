@@ -1,0 +1,27 @@
+Implement the sub-command status.
+
+Upstream-Status: Pending
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+diff --git a/atop.init b/atop.init
+index 108bdc5..9f89fad 100755
+--- a/atop.init
++++ b/atop.init
+@@ -18,6 +18,8 @@
+ # Check existance of binaries 
+ [ -f /usr/bin/atop ] || exit 0
+ 
++[ -f /etc/init.d/functions ] && . /etc/init.d/functions
++
+ PIDFILE=/var/run/atop.pid
+ RETVAL=0
+ 
+@@ -63,6 +65,7 @@ case "$1" in
+ 	;;
+ 
+   status)
++	status atop
+ 	;;
+ 
+   reload)

@@ -1,0 +1,18 @@
+---
+ configure.ac |    1 +
+ 1 file changed, 1 insertion(+)
+
+--- git.orig/configure.ac
++++ git/configure.ac
+@@ -24,10 +24,11 @@ LT_INIT([win32-dll])
+ LT_PROG_RC
+ 
+ # Checks for programs.
+ AC_PROG_CC
+ AC_PROG_CC_C99
++AM_PROG_AR
+ 
+ # Enable automake silent build rules.
+ m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
+ 
+ # Checks for native Windows.

@@ -1,0 +1,27 @@
+Upstream-Status: Submitted [similar patch by other author, bugzilla]
+Bugtracker-URL: https://bugzilla.gnome.org/show_bug.cgi?id=663600
+
+Prepend PKG_CONFIG_SYSROOT to includedir, so configure doesn't
+search for gstconfig.h in /usr/include.
+
+Signed-off-by: Andreas Oberritter <obi@opendreambox.org>
+---
+ configure.ac |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 1901bcf..460fb0a 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -435,7 +435,7 @@ AG_GST_CHECK_PLUGIN(volume)
+ dnl check for gstreamer core features (subsystems)
+ dnl FIXME: this assumes srcdir == builddir for uninstalled setups
+ GST_CONFIGPATH=`$PKG_CONFIG --variable=includedir gstreamer-0.10`"/gst/gstconfig.h"
+-AG_GST_PARSE_SUBSYSTEM_DISABLES($GST_CONFIGPATH)
++AG_GST_PARSE_SUBSYSTEM_DISABLES($PKG_CONFIG_SYSROOT_DIR$GST_CONFIGPATH)
+ AM_CONDITIONAL(USE_XML, test $GST_DISABLE_XML != "1")
+ 
+ dnl disable plug-ins that require libxml2's HTML support if it is not available
+-- 
+1.7.5.4
+

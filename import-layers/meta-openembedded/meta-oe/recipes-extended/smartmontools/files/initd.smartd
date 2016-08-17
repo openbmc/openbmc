@@ -1,0 +1,112 @@
+#! /bin/sh
+
+# smartmontools init file for smartd
+# Copyright (C) 2002-8 Bruce Allen <smartmontools-support@lists.sourceforge.net>
+# $Id: smartd.initd.in 3360 2011-06-06 19:25:36Z chrfranke $
+
+# For RedHat and cousins:
+# chkconfig: - 60 60
+# description: Self Monitoring and Reporting Technology (SMART) Daemon
+# processname: smartd 
+
+# For SuSE and cousins
+### BEGIN INIT INFO
+# Provides:                   smartd
+# Required-Start:             $syslog $remote_fs
+# Should-Start:               sendmail
+# Required-Stop:              $syslog $remote_fs
+# Should-Stop:                sendmail
+# Default-Start:              2 3 4 5
+# Default-Stop:               0 1 6
+# Short-Description:          Monitors disk and tape health via S.M.A.R.T.
+# Description:                Start S.M.A.R.T. disk and tape monitor.
+### END INIT INFO
+
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 2, or (at your option) any later
+# version. 
+# You should have received a copy of the GNU General Public License (for
+# example COPYING); if not, write to the Free Software Foundation, Inc., 675
+# Mass Ave, Cambridge, MA 02139, USA.
+# This code was originally developed as a Senior Thesis by Michael Cornwell
+# at the Concurrent Systems Laboratory (now part of the Storage Systems
+# Research Center), Jack Baskin School of Engineering, University of
+# California, Santa Cruz. http://ssrc.soe.ucsc.edu/.
+
+# Uncomment the line below to pass options to smartd on startup. 
+# Note that distribution specific configuration files like
+# /etc/{default,sysconfig}/smartmontools might override these
+#smartd_opts="--interval=1800"
+
+SMARTD_BIN=/usr/sbin/smartd
+SMARTDPID=/var/run/smartd.pid
+[ -x $SMARTD_BIN ] || exit 0
+RET=0
+
+# source configuration file
+[ -r /etc/default/rcS ] && . /etc/default/rcS
+[ -r /etc/default/smartmontools ] && . /etc/default/smartmontools
+
+smartd_opts="--pidfile $SMARTDPID $smartd_opts"
+
+case "$1" in
+	start)
+		if [ "$start_smartd" != "yes" ]; then
+			[ "$VERBOSE" != "no" ] && echo "Not starting S.M.A.R.T. daemon smartd, disabled via /etc/default/smartmontools"
+			exit 0
+		fi
+		echo -n "Starting S.M.A.R.T. daemon: smartd"
+		if start-stop-daemon --start --quiet --pidfile $SMARTDPID \
+			--exec $SMARTD_BIN -- $smartd_opts; then
+			echo "."
+		else
+			echo " (failed)"
+			RET=1
+		fi
+		;;
+	stop)
+		echo -n "Stopping S.M.A.R.T. daemon: smartd"
+		start-stop-daemon --stop --quiet --oknodo --pidfile $SMARTDPID
+		echo "."
+		;;
+	restart)
+		$0 stop
+		$0 start
+		;;
+	force-reload)
+		$0 reload || $0 restart
+		;;
+	reload)
+		echo -n "Reload S.M.A.R.T. daemon: smartd"
+		if start-stop-daemon --stop --quiet --signal 1 \
+			--pidfile $SMARTDPID; then
+			echo "."
+		else
+			echo " (failed)"
+			RET=1
+		fi
+		;;
+	report)
+		echo -n "Checking SMART devices now"
+		if start-stop-daemon --stop --quiet --signal 10 \
+			--pidfile $SMARTDPID; then
+			echo "."
+		else
+			echo " (failed)"
+			RET=1
+		fi
+		;;
+	status)
+		if pidof $SMARTD_BIN >/dev/null; then
+			echo "$SMARTD_BIN is running."
+		else
+			echo "$SMARTD_BIN is not running."
+			RET=1
+		fi
+		;;
+	*)
+		echo "Usage: $0 {start|stop|restart|force-reload|reload|report|status}"
+		exit 1
+esac
+exit $RET

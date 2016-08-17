@@ -1,0 +1,135 @@
+#! /bin/sh
+#
+### BEGIN INIT INFO
+# Provides:       radvd
+# Required-Start: $remote_fs $named $syslog
+# Required-Stop:  $remote_fs $named $syslog
+# Default-Start:  3 5
+# Default-Stop:   0 1 2 6
+# Description:    router advertisement daemon
+### END INIT INFO
+
+# Source function library.
+. /etc/init.d/functions
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/usr/sbin/radvd
+NAME=radvd
+DESC=radvd
+CONFIG=/etc/radvd.conf
+SAVED_SETTINGS=/var/run/radvd/saved-settings
+PIDFILE=/var/run/radvd/radvd.pid
+OPTIONS="-u radvd -p $PIDFILE"
+
+test -x $DAEMON || exit 0
+
+set -e
+
+# Check for IPv6 support in kernel
+if test \! -e /proc/sys/net/ipv6; then
+  echo "IPv6 support must be enabled in the kernel for $DESC to work."
+  exit
+fi
+
+save_settings()
+{
+    local file=$1
+    
+    rm -f $file
+    for if_conf in /proc/sys/net/ipv6/conf/*; do
+	echo -e "$if_conf/forwarding\t `cat $if_conf/forwarding`" >> $file
+    done
+    return 0
+}
+
+restore_settings()
+{
+    file=$1
+    
+    if [ ! -f $file ]; then
+	echo "$0: warning: cannot restore settings"
+	return
+    fi
+    
+    ( 
+	while read f value; do
+	    if [ -w $f ]; then
+		echo $value > $f
+	    fi
+	done
+    ) < $file
+}
+
+chkconfig() {
+    if [ ! -e $CONFIG -o ! -s $CONFIG ]; then
+        echo ""
+	echo "* $CONFIG does not exist or is empty." 
+	echo "* See /usr/share/doc/radvd/radvd.conf.example for a simple"
+	echo "* configuration suitable for most systems, and radvd.conf(5)"
+	echo "* for configuration file syntax. radvd will *not* be started."
+	exit 0
+    fi
+}
+
+case "$1" in
+  start)
+	echo -n "Starting $DESC: "
+	chkconfig
+	save_settings $SAVED_SETTINGS
+	
+        # We must enable IPv6 forwarding for radvd to work
+	echo 1 > /proc/sys/net/ipv6/conf/all/forwarding
+
+	# Check for stale pidfile; radvd won't start if one is lying around
+	if [ -f $PIDFILE ] && ! ps `cat  $PIDFILE` > /dev/null; then
+	  rm -f $PIDFILE
+	fi
+	if ! start-stop-daemon --oknodo --start --pidfile $PIDFILE \
+		--exec $DAEMON -- $OPTIONS; then
+	  echo "failed." && exit 1
+	fi
+	echo "$NAME."
+	;;
+  stop)
+	echo -n "Stopping $DESC: "
+	if ! [ -f $PIDFILE ] ; then
+		echo "not running."
+		exit 0
+	fi
+	start-stop-daemon --oknodo --stop --pidfile $PIDFILE \
+		--exec $DAEMON
+	restore_settings $SAVED_SETTINGS
+	rm -f $SAVED_SETTINGS
+	echo "$NAME."
+	;;
+  status)
+	status $DAEMON;
+	exit $?
+	;;
+  reload|force-reload)
+	echo "Reloading $DESC configuration files."
+	start-stop-daemon --stop --signal HUP --quiet --pidfile \
+	    $PIDFILE --exec $DAEMON
+	;;
+  restart)
+	chkconfig
+	echo -n "Restarting $DESC: "
+	if ! start-stop-daemon --stop --quiet --pidfile \
+		$PIDFILE --exec $DAEMON; then
+	  # stop failed, so we were not running
+	  save_settings $SAVED_SETTINGS
+	  echo 1 > /proc/sys/net/ipv6/conf/all/forwarding
+	fi
+	sleep 1
+	start-stop-daemon --start --quiet --pidfile \
+		$PIDFILE --exec $DAEMON -- $OPTIONS
+	echo "$NAME."
+	;;
+  *)
+	N=/etc/init.d/$NAME
+	echo "Usage: $N {start|stop|status|restart|reload|force-reload}" >&2
+	exit 1
+	;;
+esac
+
+exit 0

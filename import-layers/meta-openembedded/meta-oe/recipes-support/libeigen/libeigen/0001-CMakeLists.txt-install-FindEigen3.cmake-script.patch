@@ -1,0 +1,28 @@
+From fd8bc66efac1059c1068f804746b01b90177c333 Mon Sep 17 00:00:00 2001
+From: Lukas Bulwahn <lukas.bulwahn@oss.bmw-carit.de>
+Date: Sun, 18 Oct 2015 16:52:25 +0200
+Subject: [PATCH] CMakeLists.txt: install FindEigen3.cmake script
+
+Upstream-Status: Pending
+
+Signed-off-by: Lukas Bulwahn <lukas.bulwahn@oss.bmw-carit.de>
+---
+ CMakeLists.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 76a11b9..ec6c6ea 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -342,6 +342,8 @@ if(EIGEN_BUILD_PKGCONFIG)
+         )
+ endif(EIGEN_BUILD_PKGCONFIG)
+ 
++install(FILES "${PROJECT_SOURCE_DIR}/cmake/FindEigen3.cmake" DESTINATION "${CMAKE_INSTALL_PREFIX}/share/cmake/Modules")
++
+ add_subdirectory(Eigen)
+ 
+ add_subdirectory(doc EXCLUDE_FROM_ALL)
+-- 
+1.9.3
+

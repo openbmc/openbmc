@@ -1,0 +1,60 @@
+#!/bin/sh
+#
+### BEGIN INIT INFO
+# Provides: xserver
+# Required-Start: $local_fs $remote_fs dbus
+# Required-Stop: $local_fs $remote_fs
+# Default-Start:     5
+# Default-Stop:      0 1 2 3 6
+### END INIT INFO
+
+
+. /etc/init.d/functions
+
+for x in $(cat /proc/cmdline); do
+        case $x in
+        x11=false)
+		echo "X Server disabled" 
+		exit 0;
+                ;;
+        esac
+done
+
+case "$1" in
+  start)
+    # We don't want this script to block the rest of the boot process
+    if [ "$2" != "background" ]; then
+      $0 $1 background &
+    else
+       # work around from /etc/X11/Xinit
+       export USER=root
+       export HOME=/home/root
+       if [ ! -d $HOME ] && [ -d /root ]; then
+         HOME=/root
+       fi
+
+       . /etc/profile
+
+       echo "Starting Xserver"
+       . /etc/X11/xserver-common
+       xinit /etc/X11/Xsession -- `which $XSERVER` $ARGS >/var/log/Xsession.log 2>&1
+    fi 
+  ;;
+
+  stop)
+        echo "Stopping XServer"
+        killproc xinit
+  ;;
+
+  restart)
+	$0 stop
+        sleep 1
+        $0 start
+  ;;
+
+  *)
+        echo "usage: $0 { start | stop | restart }"
+  ;;
+esac
+
+exit 0

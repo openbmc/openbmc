@@ -1,0 +1,36 @@
+From: "Mike Holmes" <mike.holmes@linaro.org>
+Date: Thu, 30 October 2014 16:21:03 -0500
+Subject: [PATCH] fixup-install-docdir
+
+The default configuration macros for CUnit install the documentation and
+header files in locations not consistent with the OE filesystem layout.
+So here we specify new locations which are consistent with OE filesystems.
+
+Upstream-Status: Inappropriate - configuration for OE build environment
+
+Signed-off-by: Mike Holmes <mike.holmes@linaro.org>
+Signed-off-by: Gary S. Robertson <gary.robertson@linaro.org>
+---
+
+diff -uNr a/doc/headers/Makefile.am b/doc/headers/Makefile.am
+--- a/doc/headers/Makefile.am	2014-10-30 22:06:29.704574162 +0100
++++ b/doc/headers/Makefile.am	2014-10-30 22:07:43.578524791 +0100
+@@ -1,6 +1,6 @@
+ ## Process this file with automake to produce Makefile.in
+ 
+-dochdrdir = $(prefix)/doc/@PACKAGE@/headers
++dochdrdir = $(docdir)/headers
+ 
+ INCLUDE_FILES = \
+ 	Automated.h \
+diff -uNr a/doc/Makefile.am b/doc/Makefile.am
+--- a/doc/Makefile.am	2014-10-30 22:06:29.704574162 +0100
++++ b/doc/Makefile.am	2014-10-30 22:07:01.461412166 +0100
+@@ -1,7 +1,5 @@
+ ## Process this file with automake to produce Makefile.in
+ 
+-docdir = $(prefix)/doc/@PACKAGE@
+-
+ doc_DATA = \
+ 	CUnit_doc.css \
+ 	error_handling.html \

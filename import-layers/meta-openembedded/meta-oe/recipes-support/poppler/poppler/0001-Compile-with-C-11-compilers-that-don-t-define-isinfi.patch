@@ -1,0 +1,39 @@
+From a8e3399487258e53df0fd4a79c570c8d71188bed Mon Sep 17 00:00:00 2001
+From: Takahiro Hashimoto <kenya888.en@gmail.com>
+Date: Wed, 27 Apr 2016 00:16:52 +0200
+Subject: [PATCH] Compile with C++11 compilers that don't define isinfinite
+
+Bug #94761
+---
+ poppler/SplashOutputDev.cc | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/poppler/SplashOutputDev.cc b/poppler/SplashOutputDev.cc
+index 13d090c..0e50702 100644
+--- a/poppler/SplashOutputDev.cc
++++ b/poppler/SplashOutputDev.cc
+@@ -36,6 +36,7 @@
+ // Copyright (C) 2014 Richard PALO <richard@netbsd.org>
+ // Copyright (C) 2015 Tamas Szekeres <szekerest@gmail.com>
+ // Copyright (C) 2015 Kenji Uno <ku@digitaldolphins.jp>
++// Copyright (C) 2016 Takahiro Hashimoto <kenya888.en@gmail.com>
+ //
+ // To see a description of the changes please see the Changelog file that
+ // came with your tarball or type make ChangeLog if you are building from git
+@@ -94,6 +95,13 @@ extern "C" int unlink(char *filename);
+ #endif
+ #endif
+ 
++#if __cplusplus > 199711L
++#include <cmath>
++#ifndef isfinite
++#define isfinite(x) std::isfinite(x)
++#endif
++#endif
++
+ static inline void convertGfxColor(SplashColorPtr dest,
+                                    SplashColorMode colorMode,
+                                    GfxColorSpace *colorSpace,
+-- 
+2.8.2
+

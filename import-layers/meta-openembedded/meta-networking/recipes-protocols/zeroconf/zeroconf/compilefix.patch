@@ -1,0 +1,19 @@
+| zeroconf.c: In function 'main':
+| zeroconf.c:145: error: 'PATH_MAX' undeclared (first use in this function)
+
+RP - 4/9/09
+
+Upstream-Status: Pending
+
+Index: zeroconf-0.9/zeroconf.c
+===================================================================
+--- zeroconf-0.9.orig/zeroconf.c	2009-09-04 10:05:25.000000000 +0100
++++ zeroconf-0.9/zeroconf.c	2009-09-04 10:05:42.000000000 +0100
+@@ -33,6 +33,7 @@
+ #include <net/if_arp.h>
+ #include <sys/time.h>
+ #include <signal.h>
++#include <limits.h>
+ 
+ #include "delay.h"
+ 

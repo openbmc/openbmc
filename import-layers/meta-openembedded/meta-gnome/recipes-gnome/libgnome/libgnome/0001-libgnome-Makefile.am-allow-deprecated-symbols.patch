@@ -1,0 +1,35 @@
+From ce1cd20fceea7dbcc5b983d94de771461eccf7cf Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Mon, 29 Apr 2013 14:17:13 +0200
+Subject: [PATCH] libgnome/Makefile.am: allow deprecated symbols
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+fixes:
+
+| gnome-program.c: In function 'gnome_program_init_common':
+| gnome-program.c:2067:2: error: implicit declaration of function 'g_atexit' [-Werror=implicit-function-declaration]
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ libgnome/Makefile.am |    1 -
+ 1 files changed, 0 insertions(+), 1 deletions(-)
+
+diff --git a/libgnome/Makefile.am b/libgnome/Makefile.am
+index 9c8cd3e..aa01f6c 100644
+--- a/libgnome/Makefile.am
++++ b/libgnome/Makefile.am
+@@ -17,7 +17,6 @@ INCLUDES = \
+ 	-I$(srcdir)/..						\
+ 	$(WARN_CFLAGS)						\
+ 	$(LIBGNOME_CFLAGS)					\
+-	-DG_DISABLE_DEPRECATED					\
+ 	-DLIBGNOME_PREFIX=\""$(prefix)"\"			\
+ 	-DLIBGNOME_LIBDIR=\""$(libdir)"\"			\
+ 	-DLIBGNOME_DATADIR=\""$(datadir)"\"			\
+-- 
+1.7.6.5
+

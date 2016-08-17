@@ -1,0 +1,16 @@
+Index: libetpan-0.57/rules.mk
+===================================================================
+--- libetpan-0.57.orig/rules.mk
++++ libetpan-0.57/rules.mk
+@@ -134,9 +134,9 @@ prepare-am: prepare-local
+ 	         if test -e ../../$(subdir)/$${hdr}; then \
+ 	           echo "$(LN_S) -f ../../$(subdir)/$${hdr} ."; \
+ 	           $(LN_S) -f ../../$(subdir)/$${hdr} .; \
+              else \
+-	           echo "$(LN_S) -f ../../$(subdir)/$(srcdir)/$${hdr} ."; \
+-	           $(LN_S) -f ../../$(subdir)/$(srcdir)/$${hdr} .; \
++	           echo "$(LN_S) -f $(srcdir)/$${hdr} ."; \
++	           $(LN_S) -f $(srcdir)/$${hdr} .; \
+              fi; \
+            fi; \
+ 	     done; \

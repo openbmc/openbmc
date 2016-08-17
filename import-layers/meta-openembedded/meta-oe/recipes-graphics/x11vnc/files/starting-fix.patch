@@ -1,0 +1,25 @@
+"-gui" & "-rfbport" require "wish" installed, or else x11vnc fails to start.
+Removing these 2 parameters makes x11vnc works well on poky sato image.
+
+Add also -skip_lockkeys option to ignore all Caps_Lock, Shift_Lock, Num_Lock,
+Scroll_Lock keysyms received from viewers, in order to leave the lock state on
+the server side unchanged. Yet, the keys will appear correctly.
+
+Signed-off-by: Zhai Edwin <edwin.zhai@intel.com>
+Signed-off-by: Laurentiu Palcu <laurentiu.palcu@intel.com>
+
+Upstream-Status: Inappropriate [configuration]
+
+Index: x11vnc-0.9.12/x11vnc/x11vnc.desktop
+===================================================================
+--- x11vnc-0.9.12.orig/x11vnc/x11vnc.desktop	2011-03-03 10:33:18.000000000 +0800
++++ x11vnc-0.9.12/x11vnc/x11vnc.desktop	2011-03-03 10:35:20.000000000 +0800
+@@ -1,7 +1,7 @@
+ [Desktop Entry]
+ Name=X11VNC Server
+ Comment=Share this desktop by VNC
+-Exec=x11vnc -gui tray=setpass -rfbport PROMPT -bg -o %%HOME/.x11vnc.log.%%VNCDISPLAY
++Exec=x11vnc -bg -rfbport 5900 -skip_lockkeys -o %%HOME/.x11vnc.log.%%VNCDISPLAY
+ Icon=computer
+ Terminal=false
+ Type=Application

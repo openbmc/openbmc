@@ -1,0 +1,58 @@
+gst-ffmpeg: qdm2dec: fix buffer overflow. Fixes NGS00144
+
+This also adds a few lines of code from master that are needed for this fix.
+
+Thanks to Phillip for suggestions to improve the patch.
+Found-by: Phillip Langlois
+
+Upstream-Status: Backport 
+
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+---
+ libavcodec/qdm2.c |    9 +++++++--
+ 1 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/libavcodec/qdm2.c b/libavcodec/qdm2.c
+index 3aa9e5b..e000df8 100644
+--- a/gst-libs/ext/libav/libavcodec/qdm2.c
++++ b/gst-libs/ext/libav/libavcodec/qdm2.c
+@@ -76,6 +76,7 @@ do { \
+ #define SAMPLES_NEEDED_2(why) \
+      av_log (NULL,AV_LOG_INFO,"This file triggers some missing code. Please contact the developers.\nPosition: %s\n",why);
+ 
++#define QDM2_MAX_FRAME_SIZE 512
+ 
+ typedef int8_t sb_int8_array[2][30][64];
+ 
+@@ -168,7 +169,7 @@ typedef struct {
+     /// I/O data
+     const uint8_t *compressed_data;
+     int compressed_size;
+-    float output_buffer[1024];
++    float output_buffer[QDM2_MAX_FRAME_SIZE * MPA_MAX_CHANNELS * 2];
+ 
+     /// Synthesis filter
+     MPADSPContext mpadsp;
+@@ -1819,6 +1820,9 @@ static av_cold int qdm2_decode_init(AVCodecContext *avctx)
+     s->group_order = av_log2(s->group_size) + 1;
+     s->frame_size = s->group_size / 16; // 16 iterations per super block
+ 
++    if (s->frame_size > QDM2_MAX_FRAME_SIZE)
++        return AVERROR_INVALIDDATA;
++
+     s->sub_sampling = s->fft_order - 7;
+     s->frequency_range = 255 / (1 << (2 - s->sub_sampling));
+ 
+@@ -1887,6 +1891,9 @@ static int qdm2_decode (QDM2Context *q, const uint8_t *in, int16_t *out)
+     int ch, i;
+     const int frame_size = (q->frame_size * q->channels);
+ 
++    if((unsigned)frame_size > FF_ARRAY_ELEMS(q->output_buffer)/2)
++        return -1;
++
+     /* select input buffer */
+     q->compressed_data = in;
+     q->compressed_size = q->checksum_size;
+-- 
+1.7.5.4
+

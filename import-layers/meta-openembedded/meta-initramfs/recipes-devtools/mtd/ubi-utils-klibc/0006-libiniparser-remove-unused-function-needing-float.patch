@@ -1,0 +1,85 @@
+From 72a04a9b9ed33c889d2e2b86f306c5be9f6cde35 Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Sun, 29 Jun 2014 00:44:57 +0200
+Subject: [PATCH 6/6] libiniparser: remove unused function needing float
+
+Fixes:
+|   LD      ubi-utils/ubiformat
+| .../git/ubi-utils/libiniparser.a(libiniparser.o): In function
+| `  LD      ubi-utils/ubirename
+| iniparser_getdouble':
+| .../git/ubi-utils/libiniparser.c:336: undefined reference to `atof'
+
+Grep doesn't reveal any occurrence of iniparser_getdouble(), using atof() so
+remove it: floating-point is not supported in klibc
+
+Upstream-Status: Pending
+
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+---
+ ubi-utils/include/libiniparser.h | 15 ---------------
+ ubi-utils/libiniparser.c         | 22 ----------------------
+ 2 files changed, 37 deletions(-)
+
+diff --git a/ubi-utils/include/libiniparser.h b/ubi-utils/include/libiniparser.h
+index be3c667..abd77aa 100644
+--- a/ubi-utils/include/libiniparser.h
++++ b/ubi-utils/include/libiniparser.h
+@@ -158,21 +158,6 @@ int iniparser_getint(dictionary * d, const char * key, int notfound);
+ 
+ /*-------------------------------------------------------------------------*/
+ /**
+-  @brief    Get the string associated to a key, convert to a double
+-  @param    d Dictionary to search
+-  @param    key Key string to look for
+-  @param    notfound Value to return in case of error
+-  @return   double
+-
+-  This function queries a dictionary for a key. A key as read from an
+-  ini file is given as "section:key". If the key cannot be found,
+-  the notfound value is returned.
+- */
+-/*--------------------------------------------------------------------------*/
+-double iniparser_getdouble(dictionary * d, char * key, double notfound);
+-
+-/*-------------------------------------------------------------------------*/
+-/**
+   @brief    Get the string associated to a key, convert to a boolean
+   @param    d Dictionary to search
+   @param    key Key string to look for
+diff --git a/ubi-utils/libiniparser.c b/ubi-utils/libiniparser.c
+index 898f57f..ba70c08 100644
+--- a/ubi-utils/libiniparser.c
++++ b/ubi-utils/libiniparser.c
+@@ -316,28 +316,6 @@ int iniparser_getint(dictionary * d, const char * key, int notfound)
+ 
+ /*-------------------------------------------------------------------------*/
+ /**
+-  @brief    Get the string associated to a key, convert to a double
+-  @param    d Dictionary to search
+-  @param    key Key string to look for
+-  @param    notfound Value to return in case of error
+-  @return   double
+-
+-  This function queries a dictionary for a key. A key as read from an
+-  ini file is given as "section:key". If the key cannot be found,
+-  the notfound value is returned.
+- */
+-/*--------------------------------------------------------------------------*/
+-double iniparser_getdouble(dictionary * d, char * key, double notfound)
+-{
+-    char    *   str ;
+-
+-    str = iniparser_getstring(d, key, INI_INVALID_KEY);
+-    if (str==INI_INVALID_KEY) return notfound ;
+-    return atof(str);
+-}
+-
+-/*-------------------------------------------------------------------------*/
+-/**
+   @brief    Get the string associated to a key, convert to a boolean
+   @param    d Dictionary to search
+   @param    key Key string to look for
+-- 
+1.9.1
+

@@ -1,0 +1,11 @@
+--- a/configure.in	2014-08-18 01:25:43.911597023 -0700
++++ b/configure.in	2014-08-18 01:26:27.763786629 -0700
+@@ -8,7 +8,7 @@
+ AC_CONFIG_HEADERS([config.h])
+ AC_CONFIG_SRCDIR([configure.in])
+ 
+-AM_INIT_AUTOMAKE([1.9 dist-bzip2 subdir-objects no-define])
++AM_INIT_AUTOMAKE([1.9 foreign dist-bzip2 subdir-objects no-define])
+ 
+ AM_MAINTAINER_MODE
+ AC_PROG_CC

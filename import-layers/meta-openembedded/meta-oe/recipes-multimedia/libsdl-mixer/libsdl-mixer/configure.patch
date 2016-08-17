@@ -1,0 +1,21 @@
+diff -Nurd SDL_mixer-1.2.12/configure.in SDL_mixer-1.2.12/configure.in
+--- SDL_mixer-1.2.12/configure.in	2012-01-16 00:01:05.000000000 +0200
++++ SDL_mixer-1.2.12/configure.in	2012-12-15 04:08:04.627871456 +0200
+@@ -1,6 +1,5 @@
+ dnl Process this file with autoconf to produce a configure script.
+ AC_INIT(README)
+-AC_CONFIG_AUX_DIR(build-scripts)
+ 
+ dnl Set various version strings - taken gratefully from the GTk sources
+ 
+@@ -40,10 +39,6 @@
+ AC_SUBST(LT_REVISION)
+ AC_SUBST(LT_AGE)
+ 
+-dnl Detect the canonical build and host environments
+-AC_CONFIG_AUX_DIRS($srcdir/build-scripts)
+-dnl AC_CANONICAL_HOST
+-
+ dnl Check for tools
+ AC_PROG_LIBTOOL
+ AC_PROG_CC

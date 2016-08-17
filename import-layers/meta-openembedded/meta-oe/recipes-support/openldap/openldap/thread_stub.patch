@@ -1,0 +1,20 @@
+openldap: set pointer
+
+When the function ldap_pvt_thread_pool_getkey() succeeds, it
+must set the value of *data since the caller may try to use it.
+
+Upstream-Status: pending
+
+Signed-off-by: Joe Slater <jslater@windriver.com>
+
+
+--- a/libraries/libldap_r/thr_stub.c
++++ b/libraries/libldap_r/thr_stub.c
+@@ -217,6 +217,7 @@ ldap_pvt_thread_pool_unidle ( ldap_pvt_t
+ int ldap_pvt_thread_pool_getkey (
+ 	void *ctx, void *key, void **data, ldap_pvt_thread_pool_keyfree_t **kfree )
+ {
++	if (data) *data = NULL;  /* avoid problems with uninitialized *data */
+ 	return(0);
+ }
+ 

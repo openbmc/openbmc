@@ -1,0 +1,51 @@
+From 2cac35086c9e103fa98960c546d5017e7363803a Mon Sep 17 00:00:00 2001
+From: Michael Niedermayer <michaelni@gmx.at>
+Date: Fri, 25 Jan 2013 06:11:59 +0100
+Subject: [PATCH] vqavideo: check chunk sizes before reading chunks
+
+Upstream-Status: Backport
+
+Commit 2cac35086c9e103fa98960c546d5017e7363803a release/0.7
+
+Fixes out of array writes
+
+Found-by: Mateusz "j00ru" Jurczyk and Gynvael Coldwind
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+(cherry picked from commit ab6c9332bfa1e20127a16392a0b85a4aa4840889)
+
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+---
+ libavcodec/vqavideo.c |   10 ++++++++++
+ 1 files changed, 10 insertions(+), 0 deletions(-)
+
+diff --git a/libavcodec/vqavideo.c b/libavcodec/vqavideo.c
+index d1eab5b..6e1ce6c 100644
+--- a/gst-libs/ext/libav/libavcodec/vqavideo.c
++++ b/gst-libs/ext/libav/libavcodec/vqavideo.c
+@@ -527,6 +527,11 @@ static void vqa_decode_chunk(VqaContext *s)
+         chunk_size = AV_RB32(&s->buf[cbp0_chunk + 4]);
+         cbp0_chunk += CHUNK_PREAMBLE_SIZE;
+ 
++        if (chunk_size > MAX_CODEBOOK_SIZE - s->next_codebook_buffer_index) {
++            av_log(s->avctx, AV_LOG_ERROR, "cbp0 chunk too large (0x%X bytes)\n", chunk_size);
++            return AVERROR_INVALIDDATA;
++        }
++
+         /* accumulate partial codebook */
+         memcpy(&s->next_codebook_buffer[s->next_codebook_buffer_index],
+             &s->buf[cbp0_chunk], chunk_size);
+@@ -550,6 +555,11 @@ static void vqa_decode_chunk(VqaContext *s)
+         chunk_size = AV_RB32(&s->buf[cbpz_chunk + 4]);
+         cbpz_chunk += CHUNK_PREAMBLE_SIZE;
+ 
++        if (chunk_size > MAX_CODEBOOK_SIZE - s->next_codebook_buffer_index) {
++            av_log(s->avctx, AV_LOG_ERROR, "cbpz chunk too large (0x%X bytes)\n", chunk_size);
++            return AVERROR_INVALIDDATA;
++        }
++
+         /* accumulate partial codebook */
+         memcpy(&s->next_codebook_buffer[s->next_codebook_buffer_index],
+             &s->buf[cbpz_chunk], chunk_size);
+-- 
+1.7.5.4
+

@@ -1,0 +1,29 @@
+This fixes the dependency checks inside of setup.py since things like
+'import numpy' won't work with bitbake.
+
+diff --git a/setup.py b/setup.py
+index 2f13821..e6d6ed0 100644
+--- a/setup.py
++++ b/setup.py
+@@ -113,12 +113,6 @@ if 1:
+     baseline_images = [chop_package(f) for f in baseline_images]
+     package_data['matplotlib'].extend(baseline_images)
+ 
+-if not check_for_numpy():
+-    sys.exit(1)
+-
+-if not check_for_freetype():
+-    sys.exit(1)
+-
+ build_ft2font(ext_modules, packages)
+ build_ttconv(ext_modules, packages)
+ build_contour(ext_modules, packages)
+@@ -129,7 +123,7 @@ build_tri(ext_modules, packages)
+ 
+ print_raw("")
+ print_raw("OPTIONAL BACKEND DEPENDENCIES")
+-has_libpng = check_for_libpng()
++has_libpng = True
+ 
+ if has_libpng and options['build_agg']:
+     build_agg(ext_modules, packages)

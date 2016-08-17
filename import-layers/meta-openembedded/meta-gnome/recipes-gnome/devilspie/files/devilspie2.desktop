@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+Name=Devilspie2
+Exec=devilspie2 -f /etc/devilspie2
+

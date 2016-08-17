@@ -1,0 +1,22 @@
+diff -uri fbreader-0.12.1.orig/fbreader/Makefile fbreader-0.12.1/fbreader/Makefile
+--- fbreader-0.12.1.orig/fbreader/Makefile	2009-12-13 09:03:11.000000000 +0100
++++ fbreader-0.12.1/fbreader/Makefile	2009-12-14 17:18:47.548638783 +0100
+@@ -37,7 +37,6 @@
+ 	@install $(TARGET) $(DESTDIR)$(BINDIR)/FBReader
+ 	@install -d $(FBSHAREDIR)
+ 	@install -d $(FBSHAREDIR)/help
+-	@./scripts/install_help.sh $(VARIANT) $(FBSHAREDIR)/help
+ 	@install -d $(FBSHAREDIR)/network
+ 	@install -m 0644 $(wildcard data/network/*.xml) $(FBSHAREDIR)/network
+ 	@install -d $(FBSHAREDIR)/network/certificates
+@@ -58,8 +57,8 @@
+ 	@install -d $(FBSHAREDIR)/resources
+ 	@install -m 0644 $(wildcard data/resources/*.xml) $(FBSHAREDIR)/resources
+ 	@install -d $(DESTDIR)$(APPIMAGEDIR_REAL)
+-	@install -m 0644 $(wildcard data/icons/toolbar/$(VARIANT)/*.*) $(DESTDIR)$(APPIMAGEDIR_REAL)
+-	@install -m 0644 $(wildcard data/icons/filetree/$(VARIANT)/*.*) $(DESTDIR)$(APPIMAGEDIR_REAL)
++	@install -m 0644 $(wildcard data/icons/toolbar/$(TARGET_ARCH)/*.*) $(DESTDIR)$(APPIMAGEDIR_REAL)
++	@install -m 0644 $(wildcard data/icons/filetree/$(TARGET_ARCH)/*.*) $(DESTDIR)$(APPIMAGEDIR_REAL)
+ 	@install -m 0644 $(wildcard data/icons/booktree/new/*.*) $(DESTDIR)$(APPIMAGEDIR_REAL)
+ 	@make -C $(TARGET_ARCH) RESOLUTION=$(RESOLUTION) install
+ 

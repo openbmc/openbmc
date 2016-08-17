@@ -1,0 +1,43 @@
+--- a/configure.ac	2007-12-02 10:37:06.000000000 -0200
++++ b/configure.ac	2008-06-05 17:21:42.000000000 -0300
+@@ -127,22 +127,24 @@
+ dnl ***************************************
+ dnl *** Check for strftime() extensions ***
+ dnl ***************************************
+-AC_TRY_RUN([
+-  #include <string.h>
+-  #include <time.h>
+-  int
+-  main (int argc, char **argv)
+-  {
+-    struct tm tm;
+-    char      buffer[16];
+-    tm.tm_year = 81;
+-    if (strftime (buffer, 16, "%EY", &tm) == 4 && strcmp (buffer, "1981") == 0)
+-      return 0;
+-    return 1;
+-  }
+-], [
+-  AC_DEFINE([HAVE_STRFTIME_EXTENSION], 1, [Define if strftime supports %E and %O modifiers.])
+-])
++dnl grrrr...  this doesn't work for cross compiling, define it for OE
++AC_DEFINE([HAVE_STRFTIME_EXTENSION], 1, [Define if strftime supports %E and %O modifiers.])
++dnl AC_TRY_RUN([
++dnl   #include <string.h>
++dnl   #include <time.h>
++dnl   int
++dnl   main (int argc, char **argv)
++dnl   {
++dnl     struct tm tm;
++dnl     char      buffer[16];
++dnl     tm.tm_year = 81;
++dnl     if (strftime (buffer, 16, "%EY", &tm) == 4 && strcmp (buffer, "1981") == 0)
++dnl       return 0;
++dnl     return 1;
++dnl   }
++dnl ], [
++dnl   AC_DEFINE([HAVE_STRFTIME_EXTENSION], 1, [Define if strftime supports %E and %O modifiers.])
++dnl ])
+ 
+ dnl ******************************
+ dnl *** Check for i18n support ***

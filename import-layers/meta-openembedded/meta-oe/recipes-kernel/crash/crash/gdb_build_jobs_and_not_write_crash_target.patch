@@ -1,0 +1,26 @@
+This enables parallel building (multiple jobs in gdb) by reading the
+value from GDB_MAKE_JOBS.
+
+Signed-off-by: Amy Fong <amy.fong@windriver.com>
+
+Upstream-Status: Pending
+
+Don't write ${TARGET} to crash.target which causes rebuild fails.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+--
+diff --git a/Makefile b/Makefile
+index 27a1d47..bcf2d2f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -232,8 +232,8 @@ gdb_merge: force
+ 	@if [ ! -f ${GDB}/config.status ]; then \
+ 	  (cd ${GDB}; ./configure --host=${GDB_TARGET} --build=${GDB_HOST} --with-separate-debug-dir=/usr/lib/debug \
+ 	    --with-bugurl="" --with-expat=no --with-python=no; \
+-	  make --no-print-directory CRASH_TARGET=${TARGET}; echo ${TARGET} > crash.target) \
+-	else make --no-print-directory rebuild; fi
++	  make --no-print-directory CRASH_TARGET=${TARGET} ${GDB_MAKE_JOBS}; ) \
++	else make --no-print-directory ${GDB_MAKE_JOBS} rebuild; fi
+ 	@if [ ! -f ${PROGRAM} ]; then \
+ 	  echo; echo "${PROGRAM} build failed"; \
+ 	  echo; exit 1; fi

@@ -1,0 +1,11 @@
+[Unit]
+Description=Router advertisement daemon for IPv6
+After=network.target
+ConditionPathExists=@SYSCONFDIR@/radvd.conf
+
+[Service]
+EnvironmentFile=-@SYSCONFDIR@/default/radvd
+ExecStart=@SBINDIR@/radvd -n $OPTIONS
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,47 @@
+json-c-0.12 unlike 0.11 doesn't install json -> json-c symlink in include
+
+* Resolved in Version 7.6.4 [v7.6-stable] 2014-09-12
+  https://github.com/rsyslog/rsyslog/blob/v7-stable/ChangeLog
+* permits to build against json-c 0.12
+  Unfortunately, json-c had an ABI breakage, so this is necessary. Note
+  that versions prior to 0.12 had security issues (CVE-2013-6370,
+  CVE-2013-6371) and so it is desirable to link against the new version.
+  Thanks to Thomas D. for the patch. Note that at least some distros
+  have fixed the security issue in older versions of json-c, so this
+  seems to apply mostly when building from sources.
+
+Upstream-Status: Backport
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
+diff --git a/plugins/ommongodb/ommongodb.c b/plugins/ommongodb/ommongodb.c
+index 41c0d76..682c40e 100644
+--- a/plugins/ommongodb/ommongodb.c
++++ b/plugins/ommongodb/ommongodb.c
+@@ -33,9 +33,9 @@
+ #include <stdint.h>
+ #include <time.h>
+ #include <mongo.h>
+-#include <json.h>
++#include <json-c/json.h>
+ /* For struct json_object_iter, should not be necessary in future versions */
+-#include <json_object_private.h>
++#include <json-c/json_object_private.h>
+ 
+ #include "rsyslog.h"
+ #include "conf.h"
+diff --git a/runtime/msg.c b/runtime/msg.c
+index d04ce7b..b367e1f 100644
+--- a/runtime/msg.c
++++ b/runtime/msg.c
+@@ -41,9 +41,9 @@
+ #endif
+ #include <netdb.h>
+ #include <libestr.h>
+-#include <json.h>
++#include <json-c/json.h>
+ /* For struct json_object_iter, should not be necessary in future versions */
+-#include <json_object_private.h>
++#include <json-c/json_object_private.h>
+ #if HAVE_MALLOC_H
+ #  include <malloc.h>
+ #endif

@@ -1,0 +1,29 @@
+From 9b0b322d86c7b2d2cddaa62f7dab4aa669739a48 Mon Sep 17 00:00:00 2001
+From: Matthieu Crapet <Matthieu.Crapet@ingenico.com>
+Date: Wed, 19 Mar 2014 13:18:21 +0100
+Subject: [PATCH] Upstream-Status: Pending
+
+b2ba should be built by BUILD_CC in cross environment
+This is only used when configured with --enable-hardcoded-font
+
+Signed-off-by: Matthieu Crapet <Matthieu.Crapet@ingenico.com>
+---
+ src/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index a1d4330..a8150b9 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -63,7 +63,7 @@ help-acm.cpp: fim.h
+ 	$(ECHO) '//#endif' >> $@
+ 
+ b2ba:
+-	$(CC) -o b2ba b2ba.c
++	$(BUILD_CC) -o b2ba b2ba.c
+ 
+ if FIM_WANT_CUSTOM_HARDCODED_CONSOLEFONT
+ default_font_byte_array.h: $(FIM_CUSTOM_HARDCODED_CONSOLEFONT) b2ba
+-- 
+1.8.5.4
+

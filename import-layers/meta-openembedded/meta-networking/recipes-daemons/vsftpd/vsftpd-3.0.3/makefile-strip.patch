@@ -1,0 +1,17 @@
+Disable stripping at link time
+
+Upstream-Status: Inappropriate [config]
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+
+diff --git a/Makefile b/Makefile
+--- a/Makefile
++++ b/Makefile
+@@ -9,7 +9,6 @@ CFLAGS	=	-O2 -fPIE -fstack-protector --param=ssp-buffer-size=4 \
+ 	#-pedantic -Wconversion
+ 
+ LIBS	=	-lssl -lcrypto -lnsl -lresolv
+-LINK	=	-Wl,-s
+ LDFLAGS	=	-fPIE -pie -Wl,-z,relro -Wl,-z,now
+ 
+ OBJS	=	main.o utility.o prelogin.o ftpcmdio.o postlogin.o privsock.o \

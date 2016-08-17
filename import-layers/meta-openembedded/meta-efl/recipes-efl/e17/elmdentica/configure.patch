@@ -1,0 +1,13 @@
+Index: elmdentica/configure.ac
+===================================================================
+--- elmdentica.orig/configure.ac	2014-07-17 21:46:14.712566207 +0000
++++ elmdentica/configure.ac	2014-07-17 21:51:34.960574935 +0000
+@@ -3,7 +3,7 @@
+ AM_CONFIG_HEADER(config.h)
+ AC_CONFIG_MACRO_DIR([m4])
+ 
+-AM_INIT_AUTOMAKE
++AM_INIT_AUTOMAKE([foreign])
+ 
+ AC_PROG_CC
+ AC_GNU_SOURCE

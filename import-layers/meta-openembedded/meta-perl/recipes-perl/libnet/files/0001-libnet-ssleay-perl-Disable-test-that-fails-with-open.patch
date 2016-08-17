@@ -1,0 +1,70 @@
+From e7a2d3a57fd51f0d4d5b3fcb6669b1876d4b18d2 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 10 Nov 2015 01:23:18 -0500
+Subject: [PATCH 1/2] libnet-ssleay-perl: Disable test that fails with
+ openssl-1.0.2b or above
+
+Run testsuits:
+t/local/33_x509_create_cert............NOK 39/123
+not ok 39 - PEM_get_string_PrivateKey+passwd+enc_alg
+|   Failed test 'PEM_get_string_PrivateKey+passwd+enc_alg'
+|   at t/local/33_x509_create_cert.t line 104.
+|                   undef
+|     doesn't match '(?^:-----BEGIN (ENCRYPTED|RSA) PRIVATE KEY-----)'
+
+This is due to the following change in OpenSSL:
+(git://git.openssl.org/openssl.git)
+......
+4d9dc0c269be87b92da188df1fbd8bfee4700eb3 is the first bad commit
+commit 4d9dc0c269be87b92da188df1fbd8bfee4700eb3
+Author: Dr. Stephen Henson <steve@openssl.org>
+Date: Thu May 28 15:44:20 2015 +0100
+
+check for error when creating PKCS#8 structure
+
+Reviewed-by: Rich Salz <rsalz@openssl.org>
+(cherry picked from commit 2849707fa65d2803e6d1c1603fdd3fd1fdc4c6cc)
+......
+
+Upstream-Status: Backport from upstream latest 1.72:
+http://www.cpan.org/authors/id/M/MI/MIKEM/Net-SSLeay-1.72.tar.gz
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ t/local/33_x509_create_cert.t | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/t/local/33_x509_create_cert.t b/t/local/33_x509_create_cert.t
+index 2f2c013..3e653ce 100755
+--- a/t/local/33_x509_create_cert.t
++++ b/t/local/33_x509_create_cert.t
+@@ -2,7 +2,7 @@
+ 
+ use strict;
+ use warnings;
+-use Test::More tests => 123;
++use Test::More tests => 121;
+ use Net::SSLeay qw/MBSTRING_ASC MBSTRING_UTF8 EVP_PK_RSA EVP_PKT_SIGN EVP_PKT_ENC/;
+ use File::Spec;
+ use utf8;
+@@ -99,10 +99,13 @@ is(Net::SSLeay::X509_NAME_cmp($ca_issuer, $ca_subject), 0, "X509_NAME_cmp");
+   }
+   ok(my $alg1 = Net::SSLeay::EVP_get_cipherbyname("DES-EDE3-CBC"), "EVP_get_cipherbyname");
+   like(my $key_pem3 = Net::SSLeay::PEM_get_string_PrivateKey($pk,"password",$alg1), qr/-----BEGIN (ENCRYPTED|RSA) PRIVATE KEY-----/, "PEM_get_string_PrivateKey+passwd+enc_alg");
+-  
+-  ok(my $alg2 = Net::SSLeay::EVP_get_cipherbyname("DES-EDE3-OFB"), "EVP_get_cipherbyname");
+-  like(my $key_pem4 = Net::SSLeay::PEM_get_string_PrivateKey($pk,"password",$alg2), qr/-----BEGIN (ENCRYPTED|RSA) PRIVATE KEY-----/, "PEM_get_string_PrivateKey+passwd+enc_alg");
+-  
++
++# DES-EDE3-OFB has no ASN1 support, detected by changes to do_pk8pkey as of openssl 1.0.1n
++# https://git.openssl.org/?p=openssl.git;a=commit;h=4d9dc0c269be87b92da188df1fbd8bfee4700eb3
++# this test now fails
++#  ok(my $alg2 = Net::SSLeay::EVP_get_cipherbyname("DES-EDE3-OFB"), "EVP_get_cipherbyname");
++#  like(my $key_pem4 = Net::SSLeay::PEM_get_string_PrivateKey($pk,"password",$alg2), qr/-----BEGIN (ENCRYPTED|RSA) PRIVATE KEY-----/, "PEM_get_string_PrivateKey+passwd+enc_alg");
++
+   is(Net::SSLeay::X509_NAME_print_ex($name), "O=Company Name,C=UK,CN=Common name text X509", "X509_NAME_print_ex");  
+ 
+   # 2014-06-06: Sigh, some versions of openssl have this patch, which afffects the results of this test:
+-- 
+1.9.1
+

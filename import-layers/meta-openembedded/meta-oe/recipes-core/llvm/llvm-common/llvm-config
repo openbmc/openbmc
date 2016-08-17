@@ -1,0 +1,10 @@
+#!/bin/sh
+# Wrapper script for real llvm-config. Simply calls
+
+if [ $WANT_LLVM_RELEASE ]; then
+	exec `dirname $0`/${TARGET_PREFIX}llvm-config$WANT_LLVM_RELEASE ${@}
+else
+  echo "The variable WANT_LLVM_RELEASE is not defined and exported"
+	echo "by your build recipe. Go figure."
+  exit 1
+fi

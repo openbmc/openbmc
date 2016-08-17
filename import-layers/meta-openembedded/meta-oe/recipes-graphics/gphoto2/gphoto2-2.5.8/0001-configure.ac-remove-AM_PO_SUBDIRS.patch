@@ -1,0 +1,26 @@
+From 60b6d5c95ca3632e02031ac04fb5486dd209011c Mon Sep 17 00:00:00 2001
+From: Andreas Baak <andreas.baak@gmail.com>
+Date: Sun, 12 Jul 2015 01:02:15 -0700
+Subject: [PATCH] configure.ac remove AM_PO_SUBDIRS
+
+This is done twice together with oe autotools.bbclass.
+
+---
+ configure.ac | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index bb5b795..93fbaf2 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -64,7 +64,6 @@ GP_GETTEXT_HACK([],[Lutz Müller and others],[${MAIL_GPHOTO_TRANSLATION}])
+ ALL_LINGUAS="az cs da de en_GB es eu fi fr hu id is it ja nl pa pl pt_BR ro ru rw sk sr sv uk vi zh_CN zh_TW"
+ AM_GNU_GETTEXT_VERSION([0.14.1])
+ AM_GNU_GETTEXT([external])
+-AM_PO_SUBDIRS()
+ AM_ICONV()
+ GP_GETTEXT_FLAGS()
+ 
+-- 
+1.9.1
+

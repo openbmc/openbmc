@@ -1,0 +1,33 @@
+gst-ffmpeg: h264: skip error concealment when SPS and slices are
+ mismatching
+
+Fixes out of array accesses
+
+Found-by: Mateusz "j00ru" Jurczyk and Gynvael Coldwind
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+(cherry picked from commit 695af8eed642ff0104834495652d1ee784a4c14d)
+
+Upstream-Status: Backport
+
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+---
+ libavcodec/h264.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/libavcodec/h264.c b/libavcodec/h264.c
+index da144db..0aab4e7 100644
+--- a/gst-libs/ext/libav/libavcodec/h264.c
++++ b/gst-libs/ext/libav/libavcodec/h264.c
+@@ -2351,7 +2351,7 @@ static int field_end(H264Context *h, int in_setup)
+      * past end by one (callers fault) and resync_mb_y != 0
+      * causes problems for the first MB line, too.
+      */
+-    if (!FIELD_PICTURE)
++    if (!FIELD_PICTURE && h->current_slice && !h->sps.new)
+         ff_er_frame_end(s);
+ 
+     ff_MPV_frame_end(s);
+-- 
+1.7.5.4
+

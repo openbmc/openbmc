@@ -1,0 +1,30 @@
+From e0884eadf6a15e93142131b695f48776f9a0ac31 Mon Sep 17 00:00:00 2001
+From: Michael Niedermayer <michaelni@gmx.at>
+Date: Sat, 10 Nov 2012 17:14:04 +0100
+Subject: [PATCH] alac: fix nb_samples < order case
+
+Upstream-Status: Backport
+
+Commit e0884eadf6a15e93142131b695f48776f9a0ac31 release/1.0
+
+Found-by: Mateusz "j00ru" Jurczyk and Gynvael Coldwind
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+(cherry picked from commit fd4f4923cce6a2cbf4f48640b4ac706e614a1594)
+---
+ libavcodec/alac.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libavcodec/alac.c b/libavcodec/alac.c
+index 9cd1737..e8e844a 100644
+--- a/gst-libs/ext/libav/libavcodec/alac.c
++++ b/gst-libs/ext/libav/libavcodec/alac.c
+@@ -278,7 +278,7 @@ static void predictor_decompress_fir_ada
+ 
+     /* read warm-up samples */
+     if (predictor_coef_num > 0)
+-        for (i = 0; i < predictor_coef_num; i++) {
++        for (i = 0; i < predictor_coef_num && i < output_size; i++) {
+             int32_t val;
+ 
+             val = buffer_out[i] + error_buffer[i+1];
+-- 

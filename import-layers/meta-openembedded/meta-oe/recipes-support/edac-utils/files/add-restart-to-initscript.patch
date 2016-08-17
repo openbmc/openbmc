@@ -1,0 +1,33 @@
+From 3ade837f64de0cfe2aed5bc52f7919760f350531 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Fri, 7 Mar 2014 00:57:12 -0500
+Subject: [PATCH] edac: add restart to initscript
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ src/etc/edac.init.in |    6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/etc/edac.init.in b/src/etc/edac.init.in
+index adf76ee..007a519 100644
+--- a/src/etc/edac.init.in
++++ b/src/etc/edac.init.in
+@@ -155,8 +155,12 @@ case "$1" in
+   status)
+     service_status
+     ;;
++  restart)
++    service_stop
++    service_start
++    ;;
+   *)
+-    COMMANDS="start|stop|status"
++    COMMANDS="start|stop|status|restart"
+     echo "Usage: $0 {${COMMANDS}}"
+     exit 2
+     ;;
+-- 
+1.7.9.5
+

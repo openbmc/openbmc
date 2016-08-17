@@ -1,0 +1,28 @@
+From 9a950b14b9f7767d83e5faac2e1e8203c500e2c2 Mon Sep 17 00:00:00 2001
+From: Rod Whitby <rod@whitby.id.au>
+Date: Tue, 25 Oct 2011 18:43:50 -0500
+Subject: [PATCH] memtester: Added patch to Makefile to change no-longer-supported 'head -1' syntax to 'head -n 1'.
+
+Signed-off-by: Joel A Fernandes <joelagnel@ti.com>
+---
+ Makefile |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index a271bf5..6bccff3 100644
+--- a/Makefile
++++ b/Makefile
+@@ -32,8 +32,8 @@ install: all
+ auto-ccld.sh: \
+ conf-cc conf-ld warn-auto.sh
+ 	( cat warn-auto.sh; \
+-	echo CC=\'`head -1 conf-cc`\'; \
+-	echo LD=\'`head -1 conf-ld`\' \
++	echo CC=\'`head -n 1 conf-cc`\'; \
++	echo LD=\'`head -n 1 conf-ld`\' \
+ 	) > auto-ccld.sh
+ 
+ compile: \
+-- 
+1.7.0.4
+

@@ -1,0 +1,87 @@
+From b666debffec1fcbb19ef377635a53b9a58bca8a4 Mon Sep 17 00:00:00 2001
+From: Michael Niedermayer <michaelni@gmx.at>
+Date: Tue, 29 Jan 2013 18:29:41 +0100
+Subject: [PATCH] huffyuvdec: Check init_vlc() return codes.
+
+Upstream-Status: Backport
+
+Commit b666debffec1fcbb19ef377635a53b9a58bca8a4 release/1.0
+
+Prevents out of array writes
+
+Found-by: Mateusz "j00ru" Jurczyk and Gynvael Coldwind
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+(cherry picked from commit f67a0d115254461649470452058fa3c28c0df294)
+
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+---
+ libavcodec/huffyuv.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/libavcodec/huffyuv.c b/libavcodec/huffyuv.c
+index 58da789..993e524 100644
+--- a/gst-libs/ext/libav/libavcodec/huffyuv.c
++++ b/gst-libs/ext/libav/libavcodec/huffyuv.c
+@@ -33,6 +33,7 @@
+ #include "put_bits.h"
+ #include "dsputil.h"
+ #include "thread.h"
++#include "libavutil/avassert.h"
+ 
+ #define VLC_BITS 11
+ 
+@@ -287,6 +287,7 @@ static void generate_joint_tables(HYuvCo
+                     int len1 = s->len[p][u];
+                     if (len1 > limit || !len1)
+                         continue;
++                    av_assert0(i < (1 << VLC_BITS));
+                     len[i] = len0 + len1;
+                     bits[i] = (s->bits[0][y] << len1) + s->bits[p][u];
+                     symbols[i] = (y<<8) + u;
+@@ -320,6 +321,7 @@ static void generate_joint_tables(HYuvCo
+                     int len2 = s->len[2][r&255];
+                     if (len2 > limit1 || !len2)
+                         continue;
++                    av_assert0(i < (1 << VLC_BITS));
+                     len[i] = len0 + len1 + len2;
+                     bits[i] = (code << len2) + s->bits[2][r&255];
+                     if(s->decorrelate){
+@@ -343,6 +345,7 @@ static void generate_joint_tables(HYuvCo
+ static int read_huffman_tables(HYuvContext *s, const uint8_t *src, int length){
+     GetBitContext gb;
+     int i;
++    int ret;
+ 
+     init_get_bits(&gb, src, length*8);
+ 
+@@ -353,7 +356,9 @@ static int read_huffman_tables(HYuvConte
+             return -1;
+         }
+         free_vlc(&s->vlc[i]);
+-        init_vlc(&s->vlc[i], VLC_BITS, 256, s->len[i], 1, 1, s->bits[i], 4, 4, 0);
++        if ((ret = init_vlc(&s->vlc[i], VLC_BITS, 256, s->len[i], 1, 1,
++                           s->bits[i], 4, 4, 0)) < 0)
++            return ret;
+     }
+ 
+     generate_joint_tables(s);
+@@ -365,6 +370,7 @@ static int read_old_huffman_tables(HYuvC
+ #if 1
+     GetBitContext gb;
+     int i;
++    int ret;
+ 
+     init_get_bits(&gb, classic_shift_luma, sizeof(classic_shift_luma)*8);
+     if(read_len_table(s->len[0], &gb)<0)
+@@ -385,7 +391,9 @@ static int read_old_huffman_tables(HYuvC
+ 
+     for(i=0; i<3; i++){
+         free_vlc(&s->vlc[i]);
+-        init_vlc(&s->vlc[i], VLC_BITS, 256, s->len[i], 1, 1, s->bits[i], 4, 4, 0);
++        if ((ret = init_vlc(&s->vlc[i], VLC_BITS, 256, s->len[i], 1, 1,
++                            s->bits[i], 4, 4, 0)) < 0)
++            return ret;
+     }
+ 
+     generate_joint_tables(s);
+-- 

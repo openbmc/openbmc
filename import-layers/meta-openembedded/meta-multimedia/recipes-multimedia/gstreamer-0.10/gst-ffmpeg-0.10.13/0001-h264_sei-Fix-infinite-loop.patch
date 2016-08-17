@@ -1,0 +1,39 @@
+gst-ffmpeg: h264_sei: Fix infinite loop.
+
+Fixsot yet fixed parts of CVE-2011-3946.
+
+Found-by: Mateusz "j00ru" Jurczyk and Gynvael Coldwind
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+
+Upstream-Status: Backport 
+
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+
+---
+ libavcodec/h264_sei.c |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
+
+
+diff --git a/libavcodec/h264_sei.c b/libavcodec/h264_sei.c
+index 374e53d..80d70e5 100644
+--- a/gst-libs/ext/libav/libavcodec/h264_sei.c
++++ b/gst-libs/ext/libav/libavcodec/h264_sei.c
+@@ -169,11 +169,15 @@ int ff_h264_decode_sei(H264Context *h){
+ 
+         type=0;
+         do{
++            if (get_bits_left(&s->gb) < 8)
++                return -1;
+             type+= show_bits(&s->gb, 8);
+         }while(get_bits(&s->gb, 8) == 255);
+ 
+         size=0;
+         do{
++            if (get_bits_left(&s->gb) < 8)
++                return -1;
+             size+= show_bits(&s->gb, 8);
+         }while(get_bits(&s->gb, 8) == 255);
+ 
+-- 
+1.7.5.4
+

@@ -1,0 +1,29 @@
+Modifies export-check.pl to use look for $ENV{'NM'} before
+defaulting to using 'nm'
+
+Upstream-Status: Pending
+
+Signed-off-by: Amy Fong <amy.fong@windriver.com>
+---
+
+ export-check.pl |    7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+Index: src/util/export-check.pl
+===================================================================
+--- src.orig/util/export-check.pl
++++ src/util/export-check.pl
+@@ -38,7 +38,12 @@
+ my($exfile, $libfile) = @ARGV;
+ 
+ @missing = ();
+-open NM, "nm -Dg --defined-only $libfile |" || die "can't run nm on $libfile: $!";
++if (defined($ENV{'NM'})) {
++	$nm = $ENV{'NM'};
++} else {
++	$nm = "nm";
++}
++open NM, "$nm -Dg --defined-only $libfile |" || die "can't run nm on $libfile: $!";
+ open EXPORT, "< $exfile" || die "can't read $exfile: $!";
+ 
+ @export = <EXPORT>;

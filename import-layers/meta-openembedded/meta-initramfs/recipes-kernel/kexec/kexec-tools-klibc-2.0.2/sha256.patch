@@ -1,0 +1,13 @@
+--- a/util_lib/include/sha256.h
++++ b/util_lib/include/sha256.h
+@@ -1,7 +1,8 @@
+ #ifndef SHA256_H
+ #define SHA256_H
+ 
+-#include <sys/types.h>
++//#include <sys/types.h>
++#include <stddef.h>
+ #include <stdint.h>
+ 
+ typedef struct
+

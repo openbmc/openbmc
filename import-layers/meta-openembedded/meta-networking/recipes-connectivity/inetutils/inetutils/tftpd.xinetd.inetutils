@@ -1,0 +1,19 @@
+# default: off
+# description:
+# Tftpd is a server which supports the Internet Trivial File Transfer
+# Pro-tocol (RFC 783). The TFTP server operates at the port indicated
+# in the tftp service description; see services(5).
+#
+service tftp
+{
+        disable         = yes
+        socket_type     = dgram
+        protocol        = udp
+        flags           = IPv6
+        wait            = yes
+        user            = root
+        group           = root
+        server          = @SBINDIR@/in.tftpd
+        server_args     = /tftpboot
+}
+

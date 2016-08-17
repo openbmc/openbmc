@@ -1,0 +1,29 @@
+From d6c184880ee2e09fd68c0ae217173832cee5afc1 Mon Sep 17 00:00:00 2001
+From: Michael Niedermayer <michaelni@gmx.at>
+Date: Sun, 18 Nov 2012 16:29:04 +0100
+Subject: [PATCH] h264: correct ref count check and limit, fix out of array
+ accesses.
+
+Upstream-Status: Backport
+
+Found-by: Mateusz "j00ru" Jurczyk and Gynvael Coldwind
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+---
+ libavcodec/h264.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libavcodec/h264.c b/libavcodec/h264.c
+index da43f1e..32cede5 100644
+--- a/gst-libs/ext/libav/libavcodec/h264.c
++++ b/gst-libs/ext/libav/libavcodec/h264.c
+@@ -2870,6 +2870,9 @@ static int decode_slice_header(H264Conte
+             h->ref_count[0]= get_ue_golomb(&s->gb) + 1;
+             if(h->slice_type_nos==AV_PICTURE_TYPE_B)
+                 h->ref_count[1]= get_ue_golomb(&s->gb) + 1;
++            else
++                // full range is spec-ok in this case, even for frames
++                h->ref_count[1] = 1;
+ 
+             if(h->ref_count[0]-1 > 32-1 || h->ref_count[1]-1 > 32-1){
+                 av_log(h->s.avctx, AV_LOG_ERROR, "reference overflow\n");
+-- 

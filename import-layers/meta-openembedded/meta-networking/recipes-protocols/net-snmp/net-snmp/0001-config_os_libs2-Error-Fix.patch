@@ -1,0 +1,31 @@
+From e24fcd140f3f6dd18fd836b197c6d4bb773e50e7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Rafa=C3=ABl=20Carr=C3=A9?= <funman@videolan.org>
+Date: Wed, 4 Nov 2015 16:49:30 +0100
+Subject: [PATCH] config_os_libs2: Error Fix
+
+ERROR: This autoconf log indicates errors, it looked at host include
+and/or library paths while determining system capabilities.
+---
+ configure.d/config_os_libs2 | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.d/config_os_libs2 b/configure.d/config_os_libs2
+index 47491e2..e3647f9 100644
+--- a/configure.d/config_os_libs2
++++ b/configure.d/config_os_libs2
+@@ -226,10 +226,10 @@ if test "x$with_nl" != "xno"; then
+     case $target_os in
+     linux*) # Check for libnl (linux)
+         netsnmp_save_CPPFLAGS="$CPPFLAGS"
+-        CPPFLAGS="-I/usr/include/libnl3 $CPPFLAGS"
++        CPPFLAGS="$CPPFLAGS"
+         NETSNMP_SEARCH_LIBS(nl_connect, nl-3,
+             [AC_CHECK_HEADERS(netlink/netlink.h)
+-            EXTERNAL_MIBGROUP_INCLUDES="$EXTERNAL_MIBGROUP_INCLUDES -I/usr/include/libnl3"],
++            EXTERNAL_MIBGROUP_INCLUDES="$EXTERNAL_MIBGROUP_INCLUDES"],
+             [CPPFLAGS="$netsnmp_save_CPPFLAGS"], [], [], [LMIBLIBS])
+         if test "x$ac_cv_header_netlink_netlink_h" != xyes; then
+             NETSNMP_SEARCH_LIBS(nl_connect, nl, [
+-- 
+2.5.0
+

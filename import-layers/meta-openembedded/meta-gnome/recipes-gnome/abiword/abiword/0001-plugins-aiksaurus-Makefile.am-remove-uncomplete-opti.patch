@@ -1,0 +1,39 @@
+From c646159ce817506131b58fdab1cdc1cd6364df7a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Sun, 7 Feb 2016 21:45:20 +0100
+Subject: [PATCH] plugins/aiksaurus/Makefile.am: remove uncomplete options
+ WITH_BUILTIN_AIKSAURUS_GTK
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+* with gtk2 we won't use it
+* it is missing in configure.ac causing
+
+| plugins/aiksaurus/Makefile.am:5: error: WITH_BUILTIN_AIKSAURUS_GTK does not appear in AM_CONDITIONAL
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ plugins/aiksaurus/Makefile.am | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/plugins/aiksaurus/Makefile.am b/plugins/aiksaurus/Makefile.am
+index d402c58..1034e2a 100644
+--- a/plugins/aiksaurus/Makefile.am
++++ b/plugins/aiksaurus/Makefile.am
+@@ -2,10 +2,6 @@ SUBDIRS =
+ 
+ if TOOLKIT_GTK
+ 
+-if WITH_BUILTIN_AIKSAURUS_GTK
+-SUBDIRS += aiksaurusgtk3
+-platform_lib = aiksaurusgtk3/libAiksaurusGtk3.la
+-endif
+ 
+ endif
+ 
+-- 
+2.5.0
+

@@ -1,0 +1,90 @@
+Auto-detect disks if none specified
+
+Refer to:
+https://bugzilla.redhat.com/show_bug.cgi?id=717479
+
+diff -up hddtemp-0.3-beta15/doc/hddtemp.8~ hddtemp-0.3-beta15/doc/hddtemp.8
+--- hddtemp-0.3-beta15/doc/hddtemp.8~	2011-08-18 00:36:05.689001470 +0300
++++ hddtemp-0.3-beta15/doc/hddtemp.8	2011-08-18 00:44:46.753006253 +0300
+@@ -19,7 +19,7 @@
+ hddtemp \- Utility to monitor hard drive temperature
+ .SH SYNOPSIS
+ .B hddtemp
+-.RI [ options ] " [type:]disk" ...
++.RI [ options ] " [[type:]disk]" ...
+ .SH "DESCRIPTION"
+ .PP
+ .B hddtemp 
+@@ -35,7 +35,8 @@ You can specify one or more device drive
+ with a
+ .B type
+ like PATA, SATA or SCSI to force hddtemp too use one of these type
+-(because detection can fail).
++(because detection can fail). If no paths are specified, autodetection of
++installed drives is attempted.
+ 
+ 
+ .SH "OPTIONS"
+diff -up hddtemp-0.3-beta15/src/hddtemp.c~ hddtemp-0.3-beta15/src/hddtemp.c
+--- hddtemp-0.3-beta15/src/hddtemp.c~	2011-08-18 00:36:05.638996861 +0300
++++ hddtemp-0.3-beta15/src/hddtemp.c	2011-08-18 00:35:55.485060798 +0300
+@@ -54,6 +54,7 @@
+ #include <linux/hdreg.h>
+ #include <ctype.h>
+ #include <assert.h>
++#include <glob.h>
+ 
+ // Application specific includes
+ #include "ata.h"
+@@ -255,6 +256,7 @@ int main(int argc, char* argv[]) {
+   int 		ret = 0;
+   int           show_db;
+   struct        disk * ldisks;
++  glob_t        diskglob;
+ 
+   backtrace_sigsegv();
+   backtrace_sigill();
+@@ -419,11 +421,6 @@ int main(int argc, char* argv[]) {
+      exit(0);
+   }
+   
+-  if(argc - optind <= 0) {
+-    fprintf(stderr, _("Too few arguments: you must specify one drive, at least.\n"));
+-    exit(1);
+-  }
+-
+   if(debug) {
+     /*    argc = optind + 1;*/
+     quiet = 1;
+@@ -434,6 +431,23 @@ int main(int argc, char* argv[]) {
+     exit(1);
+   }
+ 
++  memset(&diskglob, 0, sizeof(glob_t));
++  if(argc - optind <= 0) {
++    if(glob("/dev/[hs]d[a-z]", 0, NULL, &diskglob) == 0) {
++      argc = diskglob.gl_pathc;
++      argv = diskglob.gl_pathv;
++      optind = 0;
++    } else {
++      argc = 0;
++    }
++  }
++
++  if(argc - optind <= 0) {
++    globfree(&diskglob);
++    fprintf(stderr, _("Too few arguments: you must specify one drive, at least.\n"));
++    exit(1);
++  }
++
+   init_bus_types();
+ 
+   /* collect disks informations */
+@@ -527,6 +541,7 @@ int main(int argc, char* argv[]) {
+   else {
+     do_direct_mode(ldisks);
+   }
++  globfree(&diskglob);
+ 
+   return ret;
+ }

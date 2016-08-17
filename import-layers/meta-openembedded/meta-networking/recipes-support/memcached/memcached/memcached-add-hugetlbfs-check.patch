@@ -1,0 +1,32 @@
+memcached: add knob to detect whether hugetlbfs are checked
+
+Add knob to detect whether hugetlbfs are checked or not.
+
+Upstream-Status: Pending
+
+Signed-off-by: Chong Lu <Chong.Lu@windriver.com>
+---
+ configure.ac | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 7f22f21..21691b9 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -314,7 +314,12 @@ fi
+ dnl ----------------------------------------------------------------------------
+ 
+ AC_SEARCH_LIBS(umem_cache_create, umem)
+-AC_SEARCH_LIBS(gethugepagesizes, hugetlbfs)
++AC_ARG_ENABLE(hugetlbfs,
++  [AS_HELP_STRING([--enable-hugetlbfs],[Enable hugetlbfs])])
++
++if test "x$enable_hugetlbfs" = "xyes"; then
++  AC_SEARCH_LIBS(gethugepagesizes, hugetlbfs)
++fi
+ 
+ AC_HEADER_STDBOOL
+ AH_BOTTOM([#if HAVE_STDBOOL_H
+-- 
+1.8.3.4
+

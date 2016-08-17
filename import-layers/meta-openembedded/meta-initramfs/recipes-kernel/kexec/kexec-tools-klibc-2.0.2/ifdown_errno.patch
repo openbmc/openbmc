@@ -1,0 +1,11 @@
+--- a/kexec/ifdown.c
++++ b/kexec/ifdown.c
+@@ -14,7 +14,7 @@
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
+ #include <sys/time.h>
+-#include <sys/errno.h>
++#include <errno.h>
+ 
+ #include <net/if.h>
+ #include <netinet/in.h>

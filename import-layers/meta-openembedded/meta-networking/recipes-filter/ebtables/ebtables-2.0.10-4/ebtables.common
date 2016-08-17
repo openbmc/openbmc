@@ -1,0 +1,163 @@
+#!/bin/sh
+
+[ -x /sbin/ebtables ] || exit 1
+
+EBTABLES_DUMPFILE_STEM=/etc/ebtables/dump
+
+RETVAL=0
+prog="ebtables"
+desc="Ethernet bridge filtering"
+umask 0077
+
+#default configuration
+EBTABLES_MODULES_UNLOAD="yes"
+EBTABLES_LOAD_ON_START="no"
+EBTABLES_SAVE_ON_STOP="no"
+EBTABLES_SAVE_ON_RESTART="no"
+EBTABLES_SAVE_COUNTER="no"
+EBTABLES_BACKUP_SUFFIX="~"
+
+config=/etc/default/$prog
+[ -f "$config" ] && . "$config"
+
+function get_supported_tables() {
+	EBTABLES_SUPPORTED_TABLES=
+	/sbin/ebtables -t filter -L 2>&1 1>/dev/null | grep -q permission
+	if [ $? -eq 0 ]; then
+		echo "Error: insufficient privileges to access the ebtables rulesets."
+		exit 1
+	fi
+	for table in filter nat broute; do
+		/sbin/ebtables -t $table -L &> /dev/null
+		if [ $? -eq 0 ]; then
+			EBTABLES_SUPPORTED_TABLES="${EBTABLES_SUPPORTED_TABLES} $table"
+		fi
+	done
+}
+
+function load() {
+	RETVAL=0
+	get_supported_tables
+	echo -n "Restoring ebtables rulesets: "
+	for table in $EBTABLES_SUPPORTED_TABLES; do
+		echo -n "$table "
+		if [ -s ${EBTABLES_DUMPFILE_STEM}.$table ]; then
+			/sbin/ebtables -t $table --atomic-file ${EBTABLES_DUMPFILE_STEM}.$table --atomic-commit
+			RET=$?
+			if [ $RET -ne 0 ]; then
+				echo -n "(failed) "
+				RETVAL=$RET
+			fi
+		else
+			echo -n "(no saved state) "
+		fi
+	done
+	if [ -z "$EBTABLES_SUPPORTED_TABLES" ]; then
+		echo -n "no kernel support. "
+	else
+		echo -n "done. "
+	fi
+	if [ $RETVAL -eq 0 ]; then
+		echo "ok"
+	else
+		echo "fail"
+	fi
+}
+
+function clear() {
+	RETVAL=0
+	get_supported_tables
+	echo -n "Clearing ebtables rulesets: "
+	for table in $EBTABLES_SUPPORTED_TABLES; do
+		echo -n "$table "
+		/sbin/ebtables -t $table --init-table
+	done
+
+	if [ "$EBTABLES_MODULES_UNLOAD" = "yes" ]; then
+		for mod in $(grep -E '^(ebt|ebtable)_' /proc/modules | cut -d' ' -f1) ebtables; do
+			rmmod $mod 2> /dev/null
+		done
+	fi
+	if [ -z "$EBTABLES_SUPPORTED_TABLES" ]; then
+		echo -n "no kernel support. "
+	else
+		echo -n "done. "
+	fi
+	if [ $RETVAL -eq 0 ]; then
+		echo "ok"
+	else
+		echo "fail"
+	fi
+}
+
+function save() {
+	RETVAL=0
+	get_supported_tables
+	echo -n "Saving ebtables rulesets: "
+	for table in $EBTABLES_SUPPORTED_TABLES; do
+		echo -n "$table "
+		[ -n "$EBTABLES_BACKUP_SUFFIX" ] && [ -s ${EBTABLES_DUMPFILE_STEM}.$table ] && \
+		  mv ${EBTABLES_DUMPFILE_STEM}.$table ${EBTABLES_DUMPFILE_STEM}.$table$EBTABLES_BACKUP_SUFFIX
+		/sbin/ebtables -t $table --atomic-file ${EBTABLES_DUMPFILE_STEM}.$table --atomic-save
+		RET=$?
+		if [ $RET -ne 0 ]; then
+			echo -n "(failed) "
+			RETVAL=$RET
+		else
+			if [ "$EBTABLES_SAVE_COUNTER" = "no" ]; then
+				/sbin/ebtables -t $table --atomic-file ${EBTABLES_DUMPFILE_STEM}.$table -Z
+			fi
+		fi
+	done
+	if [ -z "$EBTABLES_SUPPORTED_TABLES" ]; then
+		echo -n "no kernel support. "
+	else
+		echo -n "done. "
+	fi
+	if [ $RETVAL -eq 0 ]; then
+		echo "ok"
+	else
+		echo "fail"
+	fi
+}
+
+case "$1" in
+  start)
+	[ "$EBTABLES_LOAD_ON_START" = "yes" ] && load
+	;;
+  stop)
+	[ "$EBTABLES_SAVE_ON_STOP" = "yes" ] && save
+	clear
+	;;
+  restart|reload|force-reload)
+	[ "$EBTABLES_SAVE_ON_RESTART" = "yes" ] && save
+	clear
+	[ "$EBTABLES_LOAD_ON_START" = "yes" ] && load
+	;;
+  load)
+	load
+	;;
+  save)
+	save
+	;;
+  status)
+	get_supported_tables
+	if [ -z "$EBTABLES_SUPPORTED_TABLES" ]; then
+		echo "No kernel support for ebtables."
+		RETVAL=1
+	else
+		echo -n "Ebtables support available, number of installed rules: "
+		for table in $EBTABLES_SUPPORTED_TABLES; do
+			COUNT=$(( $(/sbin/ebtables -t $table -L | sed -e "/^Bridge chain/! d" -e "s/^.*entries: //" -e "s/,.*$/ +/") 0 ))
+			echo -n "$table($COUNT) "
+		done
+		echo ok
+		RETVAL=0
+	fi
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart|reload|force-reload|load|save|status}" >&2
+	RETVAL=1
+esac
+
+exit $RETVAL

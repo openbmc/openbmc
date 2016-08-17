@@ -1,0 +1,58 @@
+From 7274bbadd398a69b8babf47431f80d35e0228c42 Mon Sep 17 00:00:00 2001
+From: Adrian Freihofer <adrian.freihofer@gmail.com>
+Date: Mon, 18 Jan 2016 08:53:26 +0100
+Subject: [PATCH] Fix nm-version-macro includes
+
+nm-version-macros.h cannot be found since include directive has
+been changed from " to <. This breaks for example gnome-panel
+build:
+/usr/include/NetworkManager/NetworkManager.h:31:31:
+fatal error: nm-version-macros.h: No such file or directory.
+---
+ libnm-core/nm-version.h     | 2 +-
+ libnm-util/NetworkManager.h | 2 +-
+ libnm-util/nm-version.h     | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/libnm-core/nm-version.h b/libnm-core/nm-version.h
+index 730330a..d751bc1 100644
+--- a/libnm-core/nm-version.h
++++ b/libnm-core/nm-version.h
+@@ -23,7 +23,7 @@
+ 
+ #include <glib.h>
+ 
+-#include <nm-version-macros.h>
++#include "nm-version-macros.h"
+ 
+ /* Deprecation / Availability macros */
+ 
+diff --git a/libnm-util/NetworkManager.h b/libnm-util/NetworkManager.h
+index d83e4ab..3a964fc 100644
+--- a/libnm-util/NetworkManager.h
++++ b/libnm-util/NetworkManager.h
+@@ -28,7 +28,7 @@
+ 
+ /* This header must not include glib or libnm. */
+ 
+-#include <nm-version-macros.h>
++#include "nm-version-macros.h"
+ 
+ /*
+  * dbus services details
+diff --git a/libnm-util/nm-version.h b/libnm-util/nm-version.h
+index 63895dd..41101a4 100644
+--- a/libnm-util/nm-version.h
++++ b/libnm-util/nm-version.h
+@@ -23,7 +23,7 @@
+ 
+ #include <glib.h>
+ 
+-#include <nm-version-macros.h>
++#include "nm-version-macros.h"
+ 
+ /* Deprecation / Availability macros */
+ 
+-- 
+2.5.0
+

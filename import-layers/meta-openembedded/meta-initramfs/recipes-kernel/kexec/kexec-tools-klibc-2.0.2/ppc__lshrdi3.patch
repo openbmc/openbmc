@@ -1,0 +1,18 @@
+--- a/purgatory/arch/ppc/crt.S
++++ b/purgatory/arch/ppc/crt.S
+@@ -249,6 +249,7 @@
+  *
+  */
+ 
++/* already defined in misc.S
+ _GLOBAL(__lshrdi3)
+ 	subfic	6,5,32
+ 	srw	4,4,5	# LSW = count > 31 ? 0 : LSW >> count
+@@ -259,5 +260,7 @@
+ 	srw	3,3,5	# MSW = MSW >> count
+ 	or	4,4,7	# LSW |= t2
+ 	blr
++*/
++
+ #endif
+ #endif

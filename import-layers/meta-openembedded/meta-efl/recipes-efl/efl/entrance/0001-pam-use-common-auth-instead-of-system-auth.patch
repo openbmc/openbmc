@@ -1,0 +1,26 @@
+From 14396c52a2556b1ab778a310a318ec19c2829735 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Thu, 24 Nov 2011 13:25:33 +0100
+Subject: [PATCH] pam: use common-auth instead of system-auth
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ PROTO/entrance/data/entrance |    8 ++++----
+ 1 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/data/entrance b/data/entrance
+index 872c83d..2b98c3a 100644
+--- a/data/entrance
++++ b/data/entrance
+@@ -1,4 +1,4 @@
+-auth	include		system-auth
+-account	include		system-auth
+-password	include		system-auth
+-session	include		system-auth
++auth	include		common-auth
++account	include		common-account
++password	include		common-password
++session	include		common-session
+-- 
+1.7.8.6
+

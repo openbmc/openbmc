@@ -1,0 +1,22 @@
+commit 44cbabd8a42bc2a436562ed33fb8c89fa6b75b6e
+Author: Chris Patterson <pattersonc@ainfosec.com>
+Date:   Fri Dec 18 08:31:48 2015 -0500
+
+    strongswan-swanctl.service.in: match install used by strongswan.service
+    
+    Signed-off-by: Chris Patterson <pattersonc@ainfosec.com>
+
+Upstream-Status: Submitted
+https://github.com/strongswan/strongswan/pull/25
+
+diff --git a/init/systemd-swanctl/strongswan-swanctl.service.in b/init/systemd-swanctl/strongswan-swanctl.service.in
+index 818d352..944101f 100644
+--- a/init/systemd-swanctl/strongswan-swanctl.service.in
++++ b/init/systemd-swanctl/strongswan-swanctl.service.in
+@@ -7,3 +7,6 @@ Type=notify
+ ExecStart=@SBINDIR@/charon-systemd
+ ExecStartPost=@SBINDIR@/swanctl --load-all --noprompt
+ ExecReload=@SBINDIR@/swanctl --reload
++
++[Install]
++WantedBy=multi-user.target

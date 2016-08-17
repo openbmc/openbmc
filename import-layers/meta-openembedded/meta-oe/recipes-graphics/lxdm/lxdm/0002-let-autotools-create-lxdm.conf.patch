@@ -1,0 +1,35 @@
+From 0ea0329f2c19a43acdc8444fa89e233ba617973d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Mon, 6 Oct 2014 13:06:24 +0200
+Subject: [PATCH] let autotools create lxdm.conf
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+in out of tree builds lxdm.conf is empty
+
+Upstream-Status: submitted [1]
+
+[1] http://sourceforge.net/p/lxde/mailman/message/32901417/
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ data/lxdm.conf.in | 2 +-
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/data/lxdm.conf.in b/data/lxdm.conf.in
+index d93f280..6206262 100644
+--- a/data/lxdm.conf.in
++++ b/data/lxdm.conf.in
+@@ -19,7 +19,7 @@
+ # skip_password=1
+ 
+ ## greeter used to welcome the user
+-greeter=@FULL_LIBEXECDIR@/lxdm-greeter-gtk
++greeter=@libexecdir@/lxdm-greeter-gtk
+ 
+ [server]
+ ## arg used to start xserver, not fully function
+-- 
+1.8.3.1
+

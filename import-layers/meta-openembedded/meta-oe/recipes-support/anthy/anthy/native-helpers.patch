@@ -1,0 +1,50 @@
+upstream: not applicable
+author: pH5
+comment: Stage the native anthy helpers mkfiledic, mkdepgraph, mkworddic, 
+comment: calctrans and proccorpus.
+
+--- anthy-7811/mkanthydic/Makefile.am~	2006-05-13 18:28:35.000000000 +0900
++++ anthy-7811/mkanthydic/Makefile.am	2006-06-18 10:56:25.770000000 +0900
+@@ -3,7 +3,7 @@
+ CLEANFILES = anthy.dic
+ INCLUDES = -I$(top_srcdir)/include -DSRCDIR=\"$(srcdir)\"
+ 
+-noinst_PROGRAMS = mkfiledic
++bin_PROGRAMS = mkfiledic
+ mkfiledic_SOURCES = mkfiledic.c
+ mkfiledic_LDADD = ../src-diclib/libdiclib.la
+ 
+--- anthy-7811/depgraph/Makefile.am~	2006-06-02 00:20:54.000000000 +0900
++++ anthy-7811/depgraph/Makefile.am	2006-06-18 10:57:19.420000000 +0900
+@@ -9,7 +9,7 @@
+ EXTRA_DIST = indepword.txt $(DEPWORDS)
+ 
+ # Generate the dictionary
+-noinst_PROGRAMS = mkdepgraph
++bin_PROGRAMS = mkdepgraph
+ mkdepgraph_SOURCES = mkdepgraph.c
+ mkdepgraph_LDADD =  ../src-main/libanthy.la ../src-worddic/libanthydic.la
+ 
+--- anthy-7811/mkworddic/Makefile.am~	2006-05-13 18:29:07.000000000 +0900
++++ anthy-7811/mkworddic/Makefile.am	2006-06-18 11:21:56.300000000 +0900
+@@ -16,7 +16,8 @@
+  udict dict.args.in
+ 
+ # Generate the dictionary
+-noinst_PROGRAMS = mkworddic
++#noinst_PROGRAMS = mkworddic
++bin_PROGRAMS = mkworddic
+ mkworddic_SOURCES = mkdic.c writewords.c mkudic.c calcfreq.c mkdic.h
+ mkworddic_LDADD = ../src-worddic/libanthydic.la
+
+--- anthy-9100e.orig/calctrans/Makefile.am	2008-05-08 15:04:13.000000000 +0200
++++ anthy-9100e/calctrans/Makefile.am	2008-05-08 15:04:24.000000000 +0200
+@@ -3,7 +3,7 @@
+  corpus.3.txt corpus.4.txt corpus.5.txt\
+  corpus_info weak_words
+ 
+-noinst_PROGRAMS = calctrans proccorpus
++bin_PROGRAMS = calctrans proccorpus
+ INCLUDES = -I$(top_srcdir)/
+ 
+ calctrans_SOURCES = calctrans.c input_set.c input_set.h corpus.c

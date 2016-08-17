@@ -1,0 +1,133 @@
+From 751505501e0db31cf766ec0ae95a6968b4d1eb93 Mon Sep 17 00:00:00 2001
+From: Alban Browaeys <prahal@yahoo.com>
+Date: Wed, 5 Sep 2012 02:58:26 +0000
+Subject: [PATCH] always use position as percent and define a 1 seconds
+ tolerance.
+
+Fix "reverb" effect: ie loop between setting the slider to match
+the position and handling slider to position (seek).
+---
+ data/themes/default.edc |  8 +++-----
+ src/bin/win.c           | 28 ++++++++++++++++++++++------
+ 2 files changed, 25 insertions(+), 11 deletions(-)
+
+diff --git a/data/themes/default.edc b/data/themes/default.edc
+index ebf8ba4..7a906b1 100644
+--- a/data/themes/default.edc
++++ b/data/themes/default.edc
+@@ -186,7 +186,6 @@ collections {
+    group {
+       name: "nowplaying";
+       script {
+-         public cur_length;
+          public mute;
+ 
+          public get_time_str(Float:time, time_str[6])
+@@ -201,16 +200,15 @@ collections {
+                new Float:position = getfarg(2);
+                new Float:length = getfarg(3);
+                if (length > 0)
+-                  external_param_set_float(PART:"progress.slider", "value", position / length * 100);
++                  external_param_set_float(PART:"progress.slider", "value", position * 100);
+                else
+                   external_param_set_float(PART:"progress.slider", "value", 0);
+ 
+                new time_str[6];
+-               get_time_str(position, time_str);
++               get_time_str(position * length, time_str);
+                set_text(PART:"ejy.text.current_time", time_str);
+                get_time_str(length, time_str);
+                set_text(PART:"ejy.text.total_time", time_str);
+-               set_float(cur_length, length);
+             } else if (type == MSG_INT && id == MSG_SHUFFLE) {
+                external_param_set_bool(PART:"buttons.shuffle", "state", getarg(2));
+             } else if (type == MSG_INT && id == MSG_LOOP) {
+@@ -689,7 +687,7 @@ collections {
+             source: "progress.slider";
+             signal: "changed";
+             script {
+-               send_message(MSG_FLOAT, MSG_POSITION, (external_param_get_float(PART:"progress.slider", "value") * get_float(cur_length) / 100));
++               send_message(MSG_FLOAT, MSG_POSITION, (external_param_get_float(PART:"progress.slider", "value") / 100));
+             }
+          }
+          program {
+diff --git a/src/bin/win.c b/src/bin/win.c
+index 2f65953..428e268 100644
+--- a/src/bin/win.c
++++ b/src/bin/win.c
+@@ -194,8 +194,8 @@ _win_play_eval(Win *w)
+ {
+    Edje_Message_Float_Set *mf;
+ 
+-   w->play.position = emotion_object_position_get(w->emotion);
+    w->play.length = emotion_object_play_length_get(w->emotion);
++   w->play.position = emotion_object_position_get(w->emotion) / w->play.length;
+ 
+    if ((w->song) && (w->song->length != (int)w->play.length))
+       db_song_length_set(w->db, w->song, w->play.length);
+@@ -542,8 +542,14 @@ _win_edje_msg(void *data, Evas_Object *o __UNUSED__, Edje_Message_Type type, int
+          else
+            {
+               Edje_Message_Float *m = msg;
++
++              if ((((m->val - w->play.position) * w->play.length) < 1.0)
++                  && (((w->play.position - m->val) * w->play.length) < 1.0))
++                  return;
++
+               w->play.position = m->val;
+-              emotion_object_position_set(w->emotion, w->play.position);
++              emotion_object_position_set(w->emotion, w->play.position
++                                                            * w->play.length);
+               ecore_event_add(ENJOY_EVENT_POSITION_CHANGE, NULL, NULL, NULL);
+            }
+         break;
+@@ -617,16 +623,21 @@ enjoy_control_seek(uint64_t position)
+ {
+    Win *w = &_win;
+    double seek_to;
++   double new_pos = w->play.length / ((double)position / 1e6);
+ 
+    if (!w->db) return;
+-   seek_to = w->play.position + w->play.length / ((double)position / 1e6);
++
++   if ((((new_pos - w->play.position) * w->play.length) < 1.0)
++       && (((w->play.position - new_pos) * w->play.length) < 1.0)) return;
++
++   seek_to = w->play.position + new_pos;
+    if (seek_to <= 0.0)
+      seek_to = 0.0;
+    else if (seek_to >= 1.0)
+      seek_to = 1.0;
+ 
+    w->play.position = seek_to;
+-   emotion_object_position_set(w->emotion, w->play.position);
++   emotion_object_position_set(w->emotion, w->play.position * w->play.length);
+    ecore_event_add(ENJOY_EVENT_POSITION_CHANGE, NULL, NULL, NULL);
+ }
+ 
+@@ -692,15 +703,20 @@ EAPI void
+ enjoy_position_set(int32_t position)
+ {
+    Win *w = &_win;
++   double new_pos = w->play.length / ((double)position / 1e6);
+ 
+    if (!w->db) return;
+-   w->play.position = w->play.length / ((double)position / 1e6);
++
++   if ((((new_pos - w->play.position) * w->play.length) < 1.0)
++       && (((w->play.position - new_pos) * w->play.length) < 1.0)) return;
++
++   w->play.position = new_pos;
+    if (w->play.position < 0.0)
+      w->play.position = 0.0;
+    else if (w->play.position > 1.0)
+      w->play.position = 1.0;
+ 
+-   emotion_object_position_set(w->emotion, w->play.position);
++   emotion_object_position_set(w->emotion, w->play.position * w->play.length);
+    ecore_event_add(ENJOY_EVENT_POSITION_CHANGE, NULL, NULL, NULL);
+ }
+ 
+-- 
+1.8.5.2
+

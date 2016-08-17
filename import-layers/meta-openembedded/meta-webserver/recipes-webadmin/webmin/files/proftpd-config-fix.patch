@@ -1,0 +1,18 @@
+Upstream-status: Inappropriate [configuration]
+
+Signed-off-by: Zhai Edwin <edwin.zhai@intel.com>
+
+Index: webmin-1.570/proftpd/config
+===================================================================
+--- webmin-1.570.orig/proftpd/config	2011-10-25 20:18:37.000000000 +0800
++++ webmin-1.570/proftpd/config	2011-10-25 20:21:13.000000000 +0800
+@@ -1,6 +1,6 @@
+-proftpd_path=/usr/local/sbin/proftpd
+-proftpd_conf=/usr/local/etc/proftpd.conf
+-pid_file=/usr/local/var/proftpd.pid
++proftpd_path=/usr/sbin/proftpd
++proftpd_conf=/etc/proftpd.conf
++pid_file=/var/proftpd.pid
+ ftpusers=/etc/ftpusers
+ test_config=1
+ test_always=0

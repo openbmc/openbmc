@@ -1,0 +1,75 @@
+From 90c6a53a885dd5c66992309e0af98ac554f1bb97 Mon Sep 17 00:00:00 2001
+From: Cory Benfield <lukasaoz@gmail.com>
+Date: Mon, 14 Dec 2015 08:35:20 +0000
+Subject: [PATCH] Remove SSLv2 bindings.
+
+This commit removes bindings that allow users to set SSLv2 handshake
+methods. These are regarded as unnecessary and out-of-date: see #2527.
+This commit does leave in a few options that refer to SSLv2 in order to
+avoid breaking deployments that rely on them, and in order to allow
+users to continue to request that SSLv2 not be enabled at all in their
+OpenSSL.
+
+Upstream-Status: Backport
+
+This fixes the compile issue after updating to openssl 1.0.2h
+Signed-off-by: Armin Kuster <akuster@mvista.com>
+
+---
+ src/_cffi_src/openssl/ssl.py                            | 17 +----------------
+ .../hazmat/bindings/openssl/_conditional.py             |  6 ------
+ 2 files changed, 1 insertion(+), 22 deletions(-)
+
+Index: cryptography-1.1/src/_cffi_src/openssl/ssl.py
+===================================================================
+--- cryptography-1.1.orig/src/_cffi_src/openssl/ssl.py
++++ cryptography-1.1/src/_cffi_src/openssl/ssl.py
+@@ -292,15 +292,6 @@ unsigned long SSL_CTX_add_extra_chain_ce
+ 
+ /*  methods */
+ 
+-/* SSLv2 support is compiled out of some versions of OpenSSL.  These will
+- * get special support when we generate the bindings so that if they are
+- * available they will be wrapped, but if they are not they won't cause
+- * problems (like link errors).
+- */
+-const SSL_METHOD *SSLv2_method(void);
+-const SSL_METHOD *SSLv2_server_method(void);
+-const SSL_METHOD *SSLv2_client_method(void);
+-
+ /*
+  * TLSv1_1 and TLSv1_2 are recent additions.  Only sufficiently new versions of
+  * OpenSSL support them.
+@@ -429,14 +420,8 @@ const long SSL_OP_LEGACY_SERVER_CONNECT
+ #else
+ static const long Cryptography_HAS_SECURE_RENEGOTIATION = 1;
+ #endif
+-#ifdef OPENSSL_NO_SSL2
++
+ static const long Cryptography_HAS_SSL2 = 0;
+-SSL_METHOD* (*SSLv2_method)(void) = NULL;
+-SSL_METHOD* (*SSLv2_client_method)(void) = NULL;
+-SSL_METHOD* (*SSLv2_server_method)(void) = NULL;
+-#else
+-static const long Cryptography_HAS_SSL2 = 1;
+-#endif
+ 
+ #ifdef OPENSSL_NO_SSL3_METHOD
+ static const long Cryptography_HAS_SSL3_METHOD = 0;
+Index: cryptography-1.1/src/cryptography/hazmat/bindings/openssl/_conditional.py
+===================================================================
+--- cryptography-1.1.orig/src/cryptography/hazmat/bindings/openssl/_conditional.py
++++ cryptography-1.1/src/cryptography/hazmat/bindings/openssl/_conditional.py
+@@ -274,12 +274,6 @@ CONDITIONAL_NAMES = {
+         "TLSv1_2_client_method",
+     ],
+ 
+-    "Cryptography_HAS_SSL2": [
+-        "SSLv2_method",
+-        "SSLv2_client_method",
+-        "SSLv2_server_method",
+-    ],
+-
+     "Cryptography_HAS_SSL3_METHOD": [
+         "SSLv3_method",
+         "SSLv3_client_method",

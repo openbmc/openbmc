@@ -1,0 +1,32 @@
+From e188d5fd3e3c0e40c3e35729fd8b81b138191a75 Mon Sep 17 00:00:00 2001
+From: iwamatsu <iwamatsu@7c53e7cc-98ea-0310-8f1f-a0b24da60408>
+Date: Fri, 17 Jun 2011 20:35:13 +0000
+Subject: [PATCH 6/8] Remove localhost from Authenticator of pam
+
+http://bugs.gentoo.org/346037
+https://developer.berlios.de/bugs/?func=detailbug&bug_id=17757&group_id=2663
+http://sources.gentoo.org/cgi-bin/viewvc.cgi/gentoo-x86/x11-misc/slim/files/346037-stop_setting_host_for_pam_ck_connector_so.patch?view=log
+
+Signed-off-by: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
+
+git-svn-id: svn://svn.berlios.de/slim/trunk@180 7c53e7cc-98ea-0310-8f1f-a0b24da60408
+---
+ app.cpp |    2 --
+ 1 files changed, 0 insertions(+), 2 deletions(-)
+
+diff --git a/app.cpp b/app.cpp
+index c80a73e..7177363 100644
+--- a/app.cpp
++++ b/app.cpp
+@@ -236,8 +236,6 @@ void App::Run() {
+         pam.start("slim");
+         pam.set_item(PAM::Authenticator::TTY, DisplayName);
+         pam.set_item(PAM::Authenticator::Requestor, "root");
+-        pam.set_item(PAM::Authenticator::Host, "localhost");
+-
+     }
+     catch(PAM::Exception& e){
+         cerr << APPNAME << ": " << e << endl;
+-- 
+1.6.6.1
+

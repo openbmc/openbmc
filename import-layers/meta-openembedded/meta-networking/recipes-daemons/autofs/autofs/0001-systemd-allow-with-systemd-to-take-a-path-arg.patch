@@ -1,0 +1,47 @@
+From 40971911d653bf53de295d7462c643e4073916b9 Mon Sep 17 00:00:00 2001
+From: Joe MacDonald <joe@deserted.net>
+Date: Fri, 1 Nov 2013 12:47:18 -0400
+Subject: [PATCH] systemd: allow --with-systemd to take a path arg
+
+If building for a cross-compile environment with systemd it is convenient
+to be able to specify a systemd path for the target that may not be the
+same as that on the host.
+
+Upstream-status: Submitted [http://www.spinics.net/lists/autofs/msg00740.html]
+
+Signed-off-by: Joe MacDonald <joe@deserted.net>
+---
+ aclocal.m4 |   10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/aclocal.m4 b/aclocal.m4
+index 3e6f223..105e3e9 100644
+--- a/aclocal.m4
++++ b/aclocal.m4
+@@ -229,8 +229,10 @@ dnl Check the location of the systemd unit files directory
+ dnl --------------------------------------------------------------------------
+ AC_DEFUN([AF_WITH_SYSTEMD],
+ [AC_ARG_WITH(systemd,
+-[  --with-systemd         install systemd unit file if systemd unit directory
+-			  is found on system],
++[  --with-systemd@<:@=systemddir@:>@  install systemd unit file.  If 'yes'
++			  probe the system for unit directory.
++			  If a path is specified, assume that
++			  is a valid install path.],
+ [if test "$withval" = yes; then
+   if test -z "$systemddir"; then
+     AC_MSG_CHECKING([location of the systemd unit files directory])
+@@ -247,6 +249,10 @@ AC_DEFUN([AF_WITH_SYSTEMD],
+   else
+     AC_MSG_RESULT(not found)
+   fi
++else
++ if test "$withval" != no; then
++  systemddir=$withval
++ fi
+ fi])
+ ])
+ 
+-- 
+1.7.10.4
+

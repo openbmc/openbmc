@@ -1,0 +1,62 @@
+#!/bin/sh
+#
+#
+# Written by Miquel van Smoorenburg <miquels@cistron.nl>.
+# Modified for Debian GNU/Linux by Ian Murdock <imurdock@gnu.org>.
+# Modified for Debian by Christoph Lameter <clameter@debian.org>
+# Modified for openembedded by Bruno Randolf <bruno.randolf@4g-systems.biz>
+
+### BEGIN INIT INFO
+# Provides:             netperf
+# Required-Start:       $remote_fs $local_fs $time
+# Required-Stop:        $remote_fs $local_fs $time
+# Should-Start:         $network $named
+# Should-Stop:          $network $named
+# Default-Start:        2 3 4 5
+# Default-Stop:         0 1 6
+# Short-Description:    network benchmark
+### END INIT INFO
+
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+DAEMON=/usr/sbin/netserver
+
+test -f $DAEMON || exit 0
+
+case "$1" in
+  start)
+    echo -n "Starting network benchmark server: netserver"
+    start-stop-daemon -S -x $DAEMON > /dev/null 2>&1 
+    echo "."
+    ;;
+  stop)
+    echo -n "Stopping network benchmark server: netserver"
+    start-stop-daemon -K -x $DAEMON
+    echo "."
+    ;;
+  #reload)
+    #
+    # If the daemon can reload its config files on the fly
+    # for example by sending it SIGHUP, do it here.
+    #
+    # If the daemon responds to changes in its config file
+    # directly anyway, make this a do-nothing entry.
+    #
+    # start-stop-daemon --stop --signal 1 --verbose --exec $DAEMON
+    # ;;
+  restart|force-reload)
+    #
+    # If the "reload" option is implemented, move the "force-reload"
+    # option to the "reload" entry above. If not, "force-reload" is
+    # just the same as "restart".
+    #
+    start-stop-daemon -K -x $DAEMON
+    sleep 1
+    start-stop-daemon -S -x $DAEMON
+    ;;
+  *)
+    echo "Usage: /etc/init.d/netperf {start|stop|restart|force-reload}"
+    exit 1
+    ;;
+esac
+
+exit 0

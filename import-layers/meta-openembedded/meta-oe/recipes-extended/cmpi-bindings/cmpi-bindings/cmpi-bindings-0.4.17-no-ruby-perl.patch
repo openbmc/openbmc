@@ -1,0 +1,47 @@
+From 7dd01e33f9dac75f177113de9a8ff458d4263a11 Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@cn.fujitsu.com>
+Date: Mon, 24 Aug 2015 11:00:13 +0900
+Subject: [PATCH] cmpi-bindings-0.4.17 no ruby perl
+
+Port from Fedora20
+
+Upstream-Status: Pending
+Signed-off-by: Qian Lei <qianl.fnst@cn.fujitsu.com>
+---
+ swig/CMakeLists.txt | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/swig/CMakeLists.txt b/swig/CMakeLists.txt
+index 8b5555c..c2655b9 100644
+--- a/swig/CMakeLists.txt
++++ b/swig/CMakeLists.txt
+@@ -15,15 +15,15 @@ IF (PYTHON_LIBRARY)
+   ENDIF (PYTHON_LINK_LIBS)
+ ENDIF (PYTHON_LIBRARY)
+ 
+-FIND_PACKAGE(Perl)
+-IF (PERL_EXECUTABLE)
+-  MESSAGE(STATUS "Building Perl...")
+-  ADD_SUBDIRECTORY(perl)
+-ENDIF (PERL_EXECUTABLE)
++#FIND_PACKAGE(Perl)
++#IF (PERL_EXECUTABLE)
++#  MESSAGE(STATUS "Building Perl...")
++#  ADD_SUBDIRECTORY(perl)
++#ENDIF (PERL_EXECUTABLE)
+ 
+-FIND_PACKAGE(Ruby)
+-IF (RUBY_LIBRARY AND RUBY_INCLUDE_PATH)
+-  MESSAGE(STATUS "Building Ruby...")
+-  ADD_SUBDIRECTORY(ruby)
+-  OPTION( BUILD_RUBY_GEM "Build Ruby GEM" YES )
+-ENDIF (RUBY_LIBRARY AND RUBY_INCLUDE_PATH)
++#FIND_PACKAGE(Ruby)
++#IF (RUBY_LIBRARY AND RUBY_INCLUDE_PATH)
++#  MESSAGE(STATUS "Building Ruby...")
++#  ADD_SUBDIRECTORY(ruby)
++#  OPTION( BUILD_RUBY_GEM "Build Ruby GEM" YES )
++#ENDIF (RUBY_LIBRARY AND RUBY_INCLUDE_PATH)
+-- 
+1.8.4.2
+

@@ -1,0 +1,42 @@
+From d91dbb42dc3b6073720027f68827acd0abee6d75 Mon Sep 17 00:00:00 2001
+From: Kjartan Maraas <kmaraas@gnome.org>
+Date: Tue, 14 May 2013 13:29:53 +0200
+Subject: [PATCH] Use AM_CPPFLAGS instead of INCLUDES and fix problem using
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Backport [1]
+
+[1] https://git.gnome.org/browse/ORBit2/commit/test/everything/Makefile.am?id=d91dbb42dc3b6073720027f68827acd0abee6d75
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ test/everything/Makefile.am | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/test/everything/Makefile.am b/test/everything/Makefile.am
+index 32beb36..cb4b1d6 100644
+--- a/test/everything/Makefile.am
++++ b/test/everything/Makefile.am
+@@ -10,7 +10,7 @@ EVERYTHING_IDLOUT =          \
+ 	$(EVERYTHING_BUILT)  \
+ 	everything-imodule.c
+ 
+-INCLUDES =                                 \
++AM_CPPFLAGS =                              \
+ 	-I$(top_srcdir)/include            \
+ 	-I$(top_builddir)/include          \
+ 	-I$(top_builddir)/src              \
+@@ -78,7 +78,7 @@ include $(top_srcdir)/Makefile.shared
+ BUILT_SOURCES = ${EVERYTHING_BUILT} everything-imodule.c
+ CLEANFILES = ${BUILT_SOURCES} iorfile
+ 
+-TESTS = $(srcdir)/test.sh
++TESTS = $(top_builddir)/test/everything/test.sh
+ 
+ EXTRA_DIST = $(IDL_FILES) test.sh $(included_src)
+ 
+-- 
+1.8.3.1
+

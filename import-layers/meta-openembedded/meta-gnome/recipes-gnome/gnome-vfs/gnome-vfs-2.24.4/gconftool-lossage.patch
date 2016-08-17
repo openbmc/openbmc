@@ -1,0 +1,13 @@
+Upstream-Status: Inappropriate [configuration]
+
+--- gnome-vfs-2.6.0/configure.in~	2004-03-22 12:36:23.000000000 +0000
++++ gnome-vfs-2.6.0/configure.in	2004-06-07 16:04:34.000000000 +0100
+@@ -154,7 +154,7 @@
+ AC_PATH_PROG(GCONFTOOL, gconftool-2, no)
+ 
+ if test x"$GCONFTOOL" = xno; then
+-  AC_MSG_ERROR([gconftool-2 executable not found in your path - should be installed with GConf])
++  AC_MSG_WARN([gconftool-2 executable not found in your path - should be installed with GConf])
+ fi
+ 
+ AM_GCONF_SOURCE_2

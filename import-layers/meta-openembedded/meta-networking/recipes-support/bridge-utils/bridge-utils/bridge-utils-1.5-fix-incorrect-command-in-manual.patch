@@ -1,0 +1,33 @@
+Upstream-status: BackPort [http://pkgs.fedoraproject.org/cgit/bridge-utils.git/diff/bridge-utils-1.5-fix-incorrect-command-in-manual.patch?id=b0d10717fd7cebf5d85eed3f941b409fa0384f08]
+
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+
+From 8ef7b77562b636efcbd8b759eb324d6c069200f2 Mon Sep 17 00:00:00 2001
+From: Stephen Hemminger <shemminger@vyatta.com>
+Date: Tue, 3 May 2011 09:48:40 -0700
+Subject: [PATCH 1/3] Fix incorrect command in manual
+
+Command is "setageing" not "setageingtime"; fix man page.
+Debian bug report.
+
+Signed-off-by: Petr Sabata <contyk@redhat.com>
+---
+ doc/brctl.8 |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/doc/brctl.8 b/doc/brctl.8
+index d904047..771f323 100644
+--- a/doc/brctl.8
++++ b/doc/brctl.8
+@@ -89,7 +89,7 @@ data. Machines can move to other ports, network cards can be replaced
+ .B brctl showmacs <brname>
+ shows a list of learned MAC addresses for this bridge.
+ 
+-.B brctl setageingtime <brname> <time>
++.B brctl setageing <brname> <time>
+ sets the ethernet (MAC) address ageing time, in seconds. After <time>
+ seconds of not having seen a frame coming from a certain address, the
+ bridge will time out (delete) that address from the Forwarding
+-- 
+1.7.5.2
+

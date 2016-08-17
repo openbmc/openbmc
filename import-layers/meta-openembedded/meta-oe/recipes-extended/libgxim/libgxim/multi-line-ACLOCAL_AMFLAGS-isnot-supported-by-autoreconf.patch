@@ -1,0 +1,21 @@
+multi-line ACLOCAL_AMFLAGS isn't supported by autoreconf.
+It will cause configure error as follow.
+
+   aclocal: error: non-option arguments are not accepted: '\'.
+
+Signed-off-by: Bian Naimeng <biannm@cn.fujitsu.com>
+
+diff -Nurp libgxim-0.5.0.orig/Makefile.am libgxim-0.5.0/Makefile.am
+--- libgxim-0.5.0.orig/Makefile.am	2012-12-13 15:48:09.000000000 +0800
++++ libgxim-0.5.0/Makefile.am	2014-12-19 11:05:50.727209821 +0800
+@@ -2,9 +2,7 @@ NULL =
+ AUTOMAKE_OPTIONS = dist-bzip2
+ SUBDIRS = libgxim m4macros po tests docs
+ 
+-ACLOCAL_AMFLAGS =			\
+-	-I m4macros			\
+-	$(NULL)
++ACLOCAL_AMFLAGS = -I m4macros $(NULL)
+ 
+ CONFIGURE_DEPENDENCIES =		\
+ 	requires			\

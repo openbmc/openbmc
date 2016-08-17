@@ -1,0 +1,40 @@
+From da4170b61bb41eff0af170d1d77bfd90f9ebe5dd Mon Sep 17 00:00:00 2001
+From: Denis 'GNUtoo' Carikli <GNUtoo@no-log.org>
+Date: Fri, 20 Jan 2012 11:34:42 +0100
+Subject: [PATCH] Fix installation of the icons when RESOLUTION is set
+
+When resolution is set, the following code(in fbreader/Makefile) is executed:
+  VARIANT = $(TARGET_ARCH)
+  ifneq "$(RESOLUTION)" ""
+    VARIANT = $(TARGET_ARCH)_$(RESOLUTION)
+  endif
+
+This fix is based on a patch from the openembedded project,
+  which can be found here:
+    http://cgit.openembedded.org/openembedded/tree/recipes/fbreader/fbreader-0.12.1/Makefile.patch
+
+Signed-off-by: Denis 'GNUtoo' Carikli <GNUtoo@no-log.org>
+---
+ Submitted trough github to git://github.com/geometer/FBReader.git as a pull request
+
+ fbreader/Makefile |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/fbreader/Makefile b/fbreader/Makefile
+index bfa9242..03e6cc3 100644
+--- a/fbreader/Makefile
++++ b/fbreader/Makefile
+@@ -60,8 +60,8 @@ do_install:
+ 	@install -d $(FBSHAREDIR)/resources
+ 	@install -m 0644 $(wildcard data/resources/*.xml) $(FBSHAREDIR)/resources
+ 	@install -d $(DESTDIR)$(APPIMAGEDIR_REAL)
+-	@install -m 0644 $(wildcard data/icons/toolbar/$(VARIANT)/*.*) $(DESTDIR)$(APPIMAGEDIR_REAL)
+-	@install -m 0644 $(wildcard data/icons/filetree/$(VARIANT)/*.*) $(DESTDIR)$(APPIMAGEDIR_REAL)
++	@install -m 0644 $(wildcard data/icons/toolbar/$(TARGET_ARCH)/*.*) $(DESTDIR)$(APPIMAGEDIR_REAL)
++	@install -m 0644 $(wildcard data/icons/filetree/$(TARGET_ARCH)/*.*) $(DESTDIR)$(APPIMAGEDIR_REAL)
+ 	@install -m 0644 $(wildcard data/icons/booktree/new/*.*) $(DESTDIR)$(APPIMAGEDIR_REAL)
+ 	@make -C $(TARGET_ARCH) RESOLUTION=$(RESOLUTION) install
+ 
+-- 
+1.7.4.1
+

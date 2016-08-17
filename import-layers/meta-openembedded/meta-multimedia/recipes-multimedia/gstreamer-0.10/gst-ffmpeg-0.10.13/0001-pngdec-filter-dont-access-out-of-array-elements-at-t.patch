@@ -1,0 +1,44 @@
+gst-ffmpeg: pngdec/filter: dont access out of array elements at the end
+
+Found-by: Mateusz "j00ru" Jurczyk and Gynvael Coldwind
+
+Upstream-Status: Backport 
+
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+---
+ libavcodec/pngdec.c |   12 ++++--------
+ 1 files changed, 4 insertions(+), 8 deletions(-)
+
+diff --git a/libavcodec/pngdec.c b/libavcodec/pngdec.c
+index 97c0ad1..193e35e 100644
+--- a/gst-libs/ext/libav/libavcodec/pngdec.c
++++ b/gst-libs/ext/libav/libavcodec/pngdec.c
+@@ -190,7 +190,7 @@ void ff_add_png_paeth_prediction(uint8_t *dst, uint8_t *src, uint8_t *top, int w
+     if(bpp >= 2) g = dst[1];\
+     if(bpp >= 3) b = dst[2];\
+     if(bpp >= 4) a = dst[3];\
+-    for(; i < size; i+=bpp) {\
++    for(; i <= size - bpp; i+=bpp) {\
+         dst[i+0] = r = op(r, src[i+0], last[i+0]);\
+         if(bpp == 1) continue;\
+         dst[i+1] = g = op(g, src[i+1], last[i+1]);\
+@@ -206,13 +206,9 @@ void ff_add_png_paeth_prediction(uint8_t *dst, uint8_t *src, uint8_t *top, int w
+     else if(bpp == 2) UNROLL1(2, op)\
+     else if(bpp == 3) UNROLL1(3, op)\
+     else if(bpp == 4) UNROLL1(4, op)\
+-    else {\
+-        for (; i < size; i += bpp) {\
+-            int j;\
+-            for (j = 0; j < bpp; j++)\
+-                dst[i+j] = op(dst[i+j-bpp], src[i+j], last[i+j]);\
+-        }\
+-    }
++    for (; i < size; i++) {\
++        dst[i] = op(dst[i-bpp], src[i], last[i]);\
++    }\
+ 
+ /* NOTE: 'dst' can be equal to 'last' */
+ static void png_filter_row(PNGDSPContext *dsp, uint8_t *dst, int filter_type,
+-- 
+1.7.5.4
+

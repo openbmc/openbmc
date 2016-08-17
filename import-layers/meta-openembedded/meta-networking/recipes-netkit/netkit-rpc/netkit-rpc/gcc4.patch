@@ -1,0 +1,39 @@
+This fixes an issue when building with gcc 4.x
+
+https://github.com/openembedded/openembedded/tree/master/recipes/netkit-rpc/netkit-rpc
+
+Upstream-status: Backported
+
+Signed-off-By: Armin Kuster <akuster808@gmail.com>
+
+--- netkit-rpc-0.17/rpcgen/rpc_cout.c~gcc4
++++ netkit-rpc-0.17/rpcgen/rpc_cout.c
+@@ -101,8 +101,6 @@
+ 	case DEF_TYPEDEF:
+ 		emit_typedef(def);
+ 		break;
+-	default:
+-	  /* can't happen */
+ 	}
+ 	print_trailer();
+ }
+@@ -664,9 +662,6 @@
+ 	   decl->name,decl->array_max);
+   emit_single_in_line(decl,flag,REL_VECTOR);
+     f_print(fout,"\t\t   }\n\t\t };\n");
+-
+-  default:
+-    /* ?... do nothing I guess */
+   }
+ }
+ 
+--- netkit-rpc-0.17/rpcgen/rpc_hout.c~gcc4
++++ netkit-rpc-0.17/rpcgen/rpc_hout.c
+@@ -106,8 +106,6 @@
+ 		f_print(fout, "\n");
+ 		pprogramdef(def);
+ 		break;
+-	  default:
+-	    /* ?... shouldn't happen I guess */
+ 	}
+ }

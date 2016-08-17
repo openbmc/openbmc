@@ -1,0 +1,26 @@
+[PATCH] disable to make ntf.8 man
+
+Upstream-Status: Pending
+
+$DB2MAN do not support the xinclude parameter whether it is
+docbook2x-man or other, so disable to make ntf.8 man
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ doc/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/doc/Makefile.am b/doc/Makefile.am
+index a92de7f..537c36b 100644
+--- a/doc/Makefile.am
++++ b/doc/Makefile.am
+@@ -1,5 +1,5 @@
+ if BUILD_MAN
+-man_MANS = nft.8
++#man_MANS = nft.8
+ endif
+ 
+ if BUILD_PDF
+-- 
+1.9.1
+

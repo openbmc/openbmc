@@ -1,0 +1,37 @@
+Upstream-Status: Backport
+
+https://sourceware.org/git/?p=binutils-gdb.git;h=0d8a6ab
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+From 0d8a6ab7d39d28fb1557e2a62e9e4b336341ab34 Mon Sep 17 00:00:00 2001
+From: Aaro Koskinen <aaro.koskinen@iki.fi>
+Date: Mon, 17 Feb 2014 17:12:59 -0500
+Subject: [PATCH] sim: ppc: drop $(LIBS) from psim dependency
+
+When cross-compiling GDB for PPC, there's a prerequisite "-lz" for psim
+that results in a build failure. With such prerequisite, GNU Make will
+try to search the library from build machine's /usr/lib which is wrong.
+On 64-bit Linux build machines the compilation will fail because of this.
+
+URL: https://sourceware.org/bugzilla/show_bug.cgi?id=12202
+---
+ sim/ppc/Makefile.in | 2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/gdb-7.6/sim/ppc/Makefile.in b/gdb-7.6/sim/ppc/Makefile.in
+index b811f6f..740bdb0 100644
+--- a/gdb-7.6/sim/ppc/Makefile.in
++++ b/gdb-7.6/sim/ppc/Makefile.in
+@@ -552,7 +552,7 @@ PACKAGE_SRC = @sim_pk_src@
+ PACKAGE_OBJ = @sim_pk_obj@
+ 
+ 
+-psim: $(TARGETLIB) main.o $(LIBIBERTY_LIB) $(BFD_LIB) $(LIBS) $(LIBINTL_DEP)
++psim: $(TARGETLIB) main.o $(LIBIBERTY_LIB) $(BFD_LIB) $(LIBINTL_DEP)
+ 	$(CC) $(CFLAGS) $(SIM_CFLAGS) $(LDFLAGS) -o psim$(EXEEXT) main.o $(TARGETLIB) $(BFD_LIB) $(LIBINTL) $(LIBIBERTY_LIB) $(LIBS)
+ 
+ run: psim
+-- 
+1.9.4
+

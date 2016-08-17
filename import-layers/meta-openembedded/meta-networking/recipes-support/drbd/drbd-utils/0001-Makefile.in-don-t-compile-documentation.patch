@@ -1,0 +1,38 @@
+From feccf89f08a455460668cf286151662e4c1557b3 Mon Sep 17 00:00:00 2001
+From: Li xin <lixin.fnst@cn.fujitsu.com>
+Date: Thu, 20 Aug 2015 15:32:30 +0900
+Subject: [PATCH] Makefile.in: don't compile documentation
+
+The documentation file is not suitable for cross-compile,
+Errors will occur:
+| /bin/sh: ../../user/v9/drbdsetup: /lib/ld-linux-x86-64.so.2: bad ELF interpreter: No such file or directory
+| ../../user/v9/drbdsetup xml-help disk-options > drbdsetup_xml-help_disk-options.xml
+| /bin/sh: ../../user/v9/drbdsetup: /lib/ld-linux-x86-64.so.2: bad ELF interpreter: No such file or directory
+| /bin/sh: ../../user/v9/drbdsetup: /lib/ld-linux-x86-64.so.2: bad ELF interpreter: No such file or directory
+| make[1]: *** [drbdsetup_xml-help_new-resource.xml] Error 126
+
+so we do not compile it.
+
+Upstream-Status: pending
+
+Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
+---
+ Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 5365a2c..d5967d8 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -45,7 +45,7 @@ WITH_84_SUPPORT = @WITH_84_SUPPORT@
+ # and not in e.g. dash. I'm too lazy to fix it to be compatible.
+ SHELL=/bin/bash
+ 
+-SUBDIRS     = user/shared user/v9 user/v84 user/v83 scripts documentation/v83 documentation/v84 documentation/v9
++SUBDIRS     = user/shared user/v9 user/v84 user/v83 scripts
+ 
+ REL_VERSION := $(shell $(SED) -ne '/^AC_INIT/{s/^[^,]*, *\([^,]*\) *,.*/\1/;p;q}' configure.ac)
+ ifdef FORCE
+-- 
+1.8.4.2
+

@@ -1,0 +1,32 @@
+Upstream-status: Unknown
+
+diff --git a/acinclude.m4 b/acinclude.m4
+index a6c0d84..df11abd 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -2452,7 +2452,8 @@ AC_DEFUN([PHP_SETUP_ICONV], [
+   dnl Check libc first if no path is provided in --with-iconv
+   dnl
+ 
+-  if test "$PHP_ICONV" = "yes"; then
++  dnl must check against no, not against yes as PHP_ICONV can also include a path, which implies yes
++  if test "$PHP_ICONV" != "no"; then
+     dnl Reset LIBS temporarily as it may have already been included
+     dnl -liconv in.
+     LIBS_save="$LIBS"
+diff --git a/ext/iconv/config.m4 b/ext/iconv/config.m4
+index d673b0a..1fbef13 100644
+--- a/ext/iconv/config.m4
++++ b/ext/iconv/config.m4
+@@ -15,7 +15,7 @@ if test "$PHP_ICONV" != "no"; then
+ 
+   if test "$iconv_avail" != "no"; then
+     if test -z "$ICONV_DIR"; then
+-      for i in /usr/local /usr; do
++      for i in $PHP_ICONV /usr/local /usr; do
+         if test -f "$i/include/iconv.h" || test -f "$i/include/giconv.h"; then
+           PHP_ICONV_PREFIX="$i"
+           break
+-- 
+1.9.3
+

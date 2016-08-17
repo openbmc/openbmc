@@ -1,0 +1,54 @@
+From b6296958d5516a735053ee4140e85e2b3a896182 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Sun, 30 Jan 2011 00:27:57 +0100
+Subject: [PATCH] waker: remove old ecore_string_init and ecore_string_shutdown
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ src/bin/waker_main.c |    2 --
+ src/bin/waker_tool.c |    2 --
+ 2 files changed, 0 insertions(+), 4 deletions(-)
+
+diff --git a/src/bin/waker_main.c b/src/bin/waker_main.c
+index b229cf0..dd54b31 100644
+--- a/src/bin/waker_main.c
++++ b/src/bin/waker_main.c
+@@ -568,7 +568,6 @@ main(int argc, char **argv)
+    E_DBus_Connection *c;
+    
+    ecore_init();
+-   ecore_string_init();
+    ecore_app_args_set(argc, (const char **)argv);
+    e_dbus_init();
+    
+@@ -586,7 +585,6 @@ main(int argc, char **argv)
+     
+    e_dbus_connection_close(c);
+    e_dbus_shutdown();
+-   ecore_string_shutdown();
+    ecore_shutdown();
+    
+    return 0;
+diff --git a/src/bin/waker_tool.c b/src/bin/waker_tool.c
+index 3344fd2..52515c9 100644
+--- a/src/bin/waker_tool.c
++++ b/src/bin/waker_tool.c
+@@ -93,7 +93,6 @@ main(int argc, char **argv)
+      }
+    
+    ecore_init();
+-   ecore_string_init();
+    ecore_app_args_set(argc, (const char **)argv);
+    e_dbus_init();
+    
+@@ -301,7 +300,6 @@ main(int argc, char **argv)
+    
+    e_dbus_connection_close(c);
+    e_dbus_shutdown();
+-   ecore_string_shutdown();
+    ecore_shutdown();
+    
+    return 0;
+-- 
+1.7.4.rc3
+

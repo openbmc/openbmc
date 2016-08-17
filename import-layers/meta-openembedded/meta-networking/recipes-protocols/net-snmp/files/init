@@ -1,0 +1,66 @@
+#! /bin/sh
+# /etc/init.d/snmpd: start snmp daemon.
+
+. /etc/init.d/functions
+
+test -x /usr/sbin/snmpd || exit 0
+test -x /usr/sbin/snmptrapd || exit 0
+
+# Defaults
+export MIBDIRS=/usr/share/snmp/mibs
+SNMPDRUN=yes
+SNMPDOPTS='-Lsd -Lf /dev/null -p /var/run/snmpd.pid'
+TRAPDRUN=no
+TRAPDOPTS='-Lsd -p /var/run/snmptrapd.pid'
+PIDFILE=/var/run/snmpd.pid
+SPIDFILE=/var/run/snmptrapd.pid
+
+# Reads config file if exists (will override defaults above)
+[ -r /etc/default/snmpd ] && . /etc/default/snmpd
+
+case "$1" in
+  start)
+    echo -n "Starting network management services:"
+    if [ "$SNMPDRUN" = "yes" -a -f /etc/snmp/snmpd.conf -a ! -f "$PIDFILE" ]; then
+	start-stop-daemon -o --start --quiet --name snmpd --pidfile "$PIDFILE" \
+		--exec /usr/sbin/snmpd -- $SNMPDOPTS
+	echo -n " snmpd"
+    fi
+    if [ "$TRAPDRUN" = "yes" -a -f /etc/snmp/snmptrapd.conf -a ! -f "$SPIDFILE" ]; then
+	start-stop-daemon -o --start --quiet --name snmptrapd  --pidfile "$SPIDFILE" \
+		 --exec /usr/sbin/snmptrapd -- $TRAPDOPTS
+	echo -n " snmptrapd"
+    fi
+    echo "."
+
+    test ! -x /sbin/restorecon || /sbin/restorecon -FR /var/lib/net-snmp
+    ;;
+  stop)
+    echo -n "Stopping network management services:"
+    if [ -f  "$PIDFILE" ] ; then
+	start-stop-daemon -o --stop  --quiet --pidfile $PIDFILE --name snmpd
+    fi
+    echo -n " snmpd"
+    if [ -f "$SPIDFILE" ] ; then
+	start-stop-daemon -o --stop  --quiet --pidfile $SPIDFILE --name snmptrapd
+	rm -rf $SPIDFILE
+    fi
+    echo -n " snmptrapd"
+    echo "."
+    ;;
+  status)
+    status /usr/sbin/snmpd;
+    exit $?
+    ;;
+  restart|reload|force-reload)
+    $0 stop
+    # Allow the daemons time to exit completely.
+    sleep 2
+    $0 start
+    ;;
+  *)
+    echo "Usage: /etc/init.d/snmpd {start|stop|status|restart|reload|force-reload}"
+    exit 1
+esac
+
+exit 0

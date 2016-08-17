@@ -1,0 +1,89 @@
+From d91161eb163c16408202a91b4325a3381ab33752 Mon Sep 17 00:00:00 2001
+From: Li xin <lixin.fnst@cn.fujitsu.com>
+Date: Tue, 18 Nov 2014 17:55:31 +0900
+Subject: [PATCH 1/5] rarpd.8 : add man file
+
+Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
+---
+ rarpd.8 | 69 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 69 insertions(+)
+ create mode 100644 rarpd.8
+
+diff --git a/rarpd.8 b/rarpd.8
+new file mode 100644
+index 0000000..ce7bd70
+--- /dev/null
++++ b/rarpd.8
+@@ -0,0 +1,69 @@
++.TH RARP 8 "7 April 2000" "rarpd" "Linux Programmer's Manual"
++.SH NAME
++rarpd \- Reverse Address Resolution Protocol (RARP) daemon
++.SH SYNOPSIS
++.B "rarpd [-aAvde] [-b bootdir ] [ interface ]"
++.SH DESCRIPTION
++.B Rarpd
++is a daemon which responds to RARP requests.
++RARP is used by some machines at boot time to discover their IP address.
++They provide their Ethernet address and
++.B rarpd
++responds with their IP address if it finds it in the ethers database
++(either
++.I /etc/ethers
++file or NIS+ lookup) and using DNS lookup if ethers database
++contains a hostname and not an IP address.
++By default
++.B rarpd
++also checks if a bootable image with a name starting with the IP address
++in hexadecimal uppercase letters is present in the TFTP boot directory
++(usually
++.I /tftpboot
++) before it decides to respond to the RARP request.
++.SH OPTIONS
++.TP
++.B \-a
++Do not bind to the interface.
++.TP
++.B \-A
++Respond to ARP as well as RARP requests.
++.TP
++.B \-v
++Tell the user what is going on by being verbose.
++.TP
++.B \-d
++Debugging mode. Do not detach from the tty.
++.TP
++.B \-e
++Skip the check for bootable image in the TFTP boot directory. If not
++present, then even if the Ethernet address is present in
++the ethers database but the bootable image for the resolved IP does not exist,
++.B rarpd
++will not respond to the request.
++.TP
++.B "\-b bootdir"
++Use
++.I bootdir
++instead of the default
++.I /tftpboot
++as the TFTP boot directory for bootable image checks.
++.SH OBSOLETES
++This
++.B rarpd
++obsoletes kernel
++.B rarp
++daemon present in Linux kernels up to 2.2 which was controlled by the
++rarp(8) command.
++.SH FILES
++.I /etc/ethers,
++.br
++.I /etc/nsswitch.conf,
++.br
++.I /tftpboot
++.SH SEE ALSO
++ethers(5)
++.SH AUTHORS
++Alexey Kuznetsov, <kuznet@ms2.inr.ac.ru>
++.br
++Jakub Jelinek, <jakub@redhat.com>
+-- 
+1.8.4.2
+

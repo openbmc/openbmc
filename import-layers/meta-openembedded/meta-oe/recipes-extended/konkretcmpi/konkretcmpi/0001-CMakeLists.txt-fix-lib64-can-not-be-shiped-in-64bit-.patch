@@ -1,0 +1,31 @@
+From d97ac2bf2ed9c84ffd65ff10989068b202e09fdf Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@cn.fujitsu.com>
+Date: Mon, 3 Aug 2015 00:29:54 +0900
+Subject: [PATCH] CMakeLists.txt: fix lib64 can not be shiped in 64bit target
+
+Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
+---
+ CMakeLists.txt | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index be544d1..14696e4 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -11,13 +11,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_P
+ 
+ find_package(CMPI)
+ 
+-# Set LIB_SUFFIX to 64 on 64bit architectures
+-if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+-    set(LIB_SUFFIX "")
+-else(CMAKE_SIZEOF_VOID_P EQUAL 4)
+-    set(LIB_SUFFIX 64)
+-endif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+-
+ option(WITH_PYTHON "Build experimental Python bindings" OFF)
+ 
+ add_subdirectory(cmake)
+-- 
+1.8.4.2
+

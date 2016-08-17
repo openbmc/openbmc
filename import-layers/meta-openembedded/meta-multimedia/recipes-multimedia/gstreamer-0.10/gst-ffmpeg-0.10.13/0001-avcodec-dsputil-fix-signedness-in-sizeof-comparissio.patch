@@ -1,0 +1,40 @@
+From a99aff4e4bbef8e64b51f267cd1769214e1b4e80 Mon Sep 17 00:00:00 2001
+From: Michael Niedermayer <michaelni@gmx.at>
+Date: Fri, 30 Aug 2013 23:40:47 +0200
+Subject: [PATCH] avcodec/dsputil: fix signedness in sizeof() comparissions
+
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+(cherry picked from commit 454a11a1c9c686c78aa97954306fb63453299760)
+
+Upstream-Status: Backport
+
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+---
+ libavcodec/dsputil.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libavcodec/dsputil.c b/libavcodec/dsputil.c
+index 53dc2eb..6264832 100644
+--- a/gst-libs/ext/libav/libavcodec/dsputil.c
++++ b/gst-libs/ext/libav/libavcodec/dsputil.c
+@@ -1912,7 +1912,7 @@ void ff_set_cmp(DSPContext* c, me_cmp_func *cmp, int type){
+ 
+ static void add_bytes_c(uint8_t *dst, uint8_t *src, int w){
+     long i;
+-    for(i=0; i<=w-sizeof(long); i+=sizeof(long)){
++    for(i=0; i<=w-(int)sizeof(long); i+=sizeof(long)){
+         long a = *(long*)(src+i);
+         long b = *(long*)(dst+i);
+         *(long*)(dst+i) = ((a&pb_7f) + (b&pb_7f)) ^ ((a^b)&pb_80);
+@@ -1937,7 +1937,7 @@ static void diff_bytes_c(uint8_t *dst, uint8_t *src1, uint8_t *src2, int w){
+         }
+     }else
+ #endif
+-    for(i=0; i<=w-sizeof(long); i+=sizeof(long)){
++    for(i=0; i<=w-(int)sizeof(long); i+=sizeof(long)){
+         long a = *(long*)(src1+i);
+         long b = *(long*)(src2+i);
+         *(long*)(dst+i) = ((a|pb_80) - (b&pb_7f)) ^ ((a^b^pb_80)&pb_80);
+-- 
+1.7.5.4
+

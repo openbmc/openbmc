@@ -1,0 +1,96 @@
+$MaxMessageSize doesn't work if before $IncludeConfig diag-common.conf, then
+test cases fall into infinite loop with error message:
+
+8062.511110729:4902c480: error: message received is larger than max msg size, we split it
+8062.511152265:4902c480: discarding zero-sized message
+
+Update configure to fix it.
+
+Upstream-Status: pending
+
+Kai Kang <kai.kang@windriver.com>
+---
+diff -Nru rsyslog-7.4.4/tests/testsuites/complex1.conf rsyslog-7.4.4.new/tests/testsuites/complex1.conf
+--- rsyslog-7.4.4/tests/testsuites/complex1.conf	2013-08-31 00:30:41.000000000 +0800
++++ rsyslog-7.4.4.new/tests/testsuites/complex1.conf	2013-12-18 14:28:10.644004184 +0800
+@@ -1,7 +1,7 @@
+ # complex test case with multiple actions in gzip mode
+ # rgerhards, 2009-05-22
+-$MaxMessageSize 10k
+ $IncludeConfig diag-common.conf
++$MaxMessageSize 10k
+ 
+ $MainMsgQueueTimeoutEnqueue 5000
+ 
+diff -Nru rsyslog-7.4.4/tests/testsuites/gzipwr_large.conf rsyslog-7.4.4.new/tests/testsuites/gzipwr_large.conf
+--- rsyslog-7.4.4/tests/testsuites/gzipwr_large.conf	2012-04-04 14:29:55.000000000 +0800
++++ rsyslog-7.4.4.new/tests/testsuites/gzipwr_large.conf	2013-12-18 14:28:10.645004186 +0800
+@@ -1,7 +1,7 @@
+ # simple async writing test
+ # rgerhards, 2010-03-09
+-$MaxMessageSize 10k
+ $IncludeConfig diag-common.conf
++$MaxMessageSize 10k
+ 
+ $ModLoad ../plugins/imtcp/.libs/imtcp
+ $MainMsgQueueTimeoutShutdown 10000
+diff -Nru rsyslog-7.4.4/tests/testsuites/gzipwr_large_dynfile.conf rsyslog-7.4.4.new/tests/testsuites/gzipwr_large_dynfile.conf
+--- rsyslog-7.4.4/tests/testsuites/gzipwr_large_dynfile.conf	2012-04-04 14:29:55.000000000 +0800
++++ rsyslog-7.4.4.new/tests/testsuites/gzipwr_large_dynfile.conf	2013-12-18 14:28:10.645004186 +0800
+@@ -1,7 +1,7 @@
+ # simple async writing test
+ # rgerhards, 2010-03-09
+-$MaxMessageSize 10k
+ $IncludeConfig diag-common.conf
++$MaxMessageSize 10k
+ 
+ $ModLoad ../plugins/imtcp/.libs/imtcp
+ $MainMsgQueueTimeoutShutdown 10000
+diff -Nru rsyslog-7.4.4/tests/testsuites/imptcp_conndrop.conf rsyslog-7.4.4.new/tests/testsuites/imptcp_conndrop.conf
+--- rsyslog-7.4.4/tests/testsuites/imptcp_conndrop.conf	2013-08-31 00:30:41.000000000 +0800
++++ rsyslog-7.4.4.new/tests/testsuites/imptcp_conndrop.conf	2013-12-18 14:28:10.646004189 +0800
+@@ -1,7 +1,7 @@
+ # simple async writing test
+ # rgerhards, 2010-03-09
+-$MaxMessageSize 10k
+ $IncludeConfig diag-common.conf
++$MaxMessageSize 10k
+ 
+ $ModLoad ../plugins/imptcp/.libs/imptcp
+ $MainMsgQueueTimeoutShutdown 10000
+diff -Nru rsyslog-7.4.4/tests/testsuites/imptcp_large.conf rsyslog-7.4.4.new/tests/testsuites/imptcp_large.conf
+--- rsyslog-7.4.4/tests/testsuites/imptcp_large.conf	2013-08-31 00:30:41.000000000 +0800
++++ rsyslog-7.4.4.new/tests/testsuites/imptcp_large.conf	2013-12-18 14:28:10.646004189 +0800
+@@ -1,7 +1,7 @@
+ # simple async writing test
+ # rgerhards, 2010-03-09
+-$MaxMessageSize 10k
+ $IncludeConfig diag-common.conf
++$MaxMessageSize 10k
+ 
+ $ModLoad ../plugins/imptcp/.libs/imptcp
+ $MainMsgQueueTimeoutShutdown 10000
+diff -Nru rsyslog-7.4.4/tests/testsuites/imtcp_conndrop.conf rsyslog-7.4.4.new/tests/testsuites/imtcp_conndrop.conf
+--- rsyslog-7.4.4/tests/testsuites/imtcp_conndrop.conf	2013-07-19 20:59:03.000000000 +0800
++++ rsyslog-7.4.4.new/tests/testsuites/imtcp_conndrop.conf	2013-12-18 14:28:10.646004189 +0800
+@@ -1,7 +1,7 @@
+ # simple async writing test
+ # rgerhards, 2010-03-09
+-$MaxMessageSize 10k
+ $IncludeConfig diag-common.conf
++$MaxMessageSize 10k
+ 
+ $ModLoad ../plugins/imtcp/.libs/imtcp
+ $MainMsgQueueTimeoutShutdown 10000
+diff -Nru rsyslog-7.4.4/tests/testsuites/wr_large.conf rsyslog-7.4.4.new/tests/testsuites/wr_large.conf
+--- rsyslog-7.4.4/tests/testsuites/wr_large.conf	2012-04-04 14:29:55.000000000 +0800
++++ rsyslog-7.4.4.new/tests/testsuites/wr_large.conf	2013-12-18 14:28:10.647004190 +0800
+@@ -1,7 +1,7 @@
+ # simple async writing test
+ # rgerhards, 2010-03-09
+-$MaxMessageSize 10k
+ $IncludeConfig diag-common.conf
++$MaxMessageSize 10k
+ 
+ $ModLoad ../plugins/imtcp/.libs/imtcp
+ $MainMsgQueueTimeoutShutdown 10000

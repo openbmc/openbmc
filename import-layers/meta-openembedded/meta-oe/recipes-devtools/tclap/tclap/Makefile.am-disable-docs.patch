@@ -1,0 +1,31 @@
+From c209ed0e7ffca32fe3714bad9cc54bdb00c286bb Mon Sep 17 00:00:00 2001
+From: Ting Liu <b28495@freescale.com>
+Date: Mon, 15 Apr 2013 16:28:37 +0800
+Subject: [PATCH] Makefile.am: disable docs
+
+Upstream-Status: Inappropriate [OE specific]
+
+docs need some generating tool (for example, doxygen) from host which may
+be not available. Disable it to avoid build issue.
+
+Signed-off-by: Ting Liu <b28495@freescale.com>
+---
+ Makefile.am |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 0a6ebc9..6b42f41 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,7 +1,7 @@
+ 
+ ACLOCAL_AMFLAGS = -I config
+ 
+-SUBDIRS = include examples docs tests msc config
++SUBDIRS = include examples tests msc config
+ 
+ pkgconfigdir = $(libdir)/pkgconfig
+ pkgconfig_DATA = $(PACKAGE).pc
+-- 
+1.7.5
+

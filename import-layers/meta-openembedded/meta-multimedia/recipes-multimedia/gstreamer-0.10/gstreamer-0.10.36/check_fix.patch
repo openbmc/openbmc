@@ -1,0 +1,19 @@
+# gstreamer: Fix a problem with configure if check has already been built
+# Richard Purdie <rpurdie@linux.intel.com>
+
+Upstream-Status: Inappropriate [configuration]
+
+diff -urN gstreamer-0.10.29-orig/configure.ac gstreamer-0.10.29/configure.ac
+--- gstreamer-0.10.29-orig/configure.ac	2010-06-26 12:49:27.774930773 +0800
++++ gstreamer-0.10.29/configure.ac	2010-06-26 12:51:12.899200233 +0800
+@@ -543,8 +543,10 @@
+       *) BUILD_CHECK=yes ;;
+     esac
+ ])
++
+ dnl bit of a misnomer, but keep the conditional named like this so we don't
+ dnl have to change too much elsewhere
++HAVE_CHECK=no
+ AM_CONDITIONAL(HAVE_CHECK, test "x$BUILD_CHECK" = "xyes")
+ 
+ dnl configure the desired buffer alignment

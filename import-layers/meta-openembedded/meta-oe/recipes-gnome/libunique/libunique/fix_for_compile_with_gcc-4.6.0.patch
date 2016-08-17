@@ -1,0 +1,36 @@
+Upstream-Status: Pending
+
+Fix Following compilation errors with gcc 4.6.0
+
+Nitin A Kamble <nitin.a.kamble@intel.com> 2011/05/10
+
+| uniquebackend-dbus.c: In function 'unique_backend_dbus_request_name':
+| uniquebackend-dbus.c:87:22: error: variable 'backend_dbus' set but not used [-Werror=unused-but-set-variable]
+| uniquebackend-dbus.c: In function 'unique_backend_dbus_send_message':
+| uniquebackend-dbus.c:189:12: error: variable 'res' set but not used [-Werror=unused-but-set-variable]
+| cc1: all warnings being treated as errors
+| 
+| make[5]: *** [libunique_dbus_la-uniquebackend-dbus.lo] Error 1
+
+Index: libunique-1.1.6/unique/dbus/uniquebackend-dbus.c
+===================================================================
+--- libunique-1.1.6.orig/unique/dbus/uniquebackend-dbus.c
++++ libunique-1.1.6/unique/dbus/uniquebackend-dbus.c
+@@ -84,7 +84,7 @@ unique_backend_dbus_register_proxy (Uniq
+ static gboolean
+ unique_backend_dbus_request_name (UniqueBackend *backend)
+ {
+-  UniqueBackendDBus *backend_dbus;
++  UniqueBackendDBus __attribute__((__unused__)) *backend_dbus;
+   const gchar *name;
+   DBusGConnection *connection;
+   DBusGProxy *proxy;
+@@ -186,7 +186,7 @@ unique_backend_dbus_send_message (Unique
+   GValueArray *data;
+   gchar *cmd;
+   gchar *resp;
+-  gboolean res;
++  gboolean __attribute__((__unused__)) res;
+   GError *error;
+   UniqueResponse response;
+ 

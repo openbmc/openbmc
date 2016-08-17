@@ -1,0 +1,75 @@
+Description: Loading autofs module is #ifdef'ed in the source, so
+ there is no need to check for /proc (which is only used
+ to load module) or modprobe.  Both modprobe and /proc
+ are always in the fixed location so there's no need to
+ check for these to start with.
+
+Upstream-Status: Backport [1]
+[1] http://www.spinics.net/lists/autofs/msg00139.html
+
+diff -urpN a/configure.in b/configure.in
+--- a/configure.in	2013-01-15 11:30:22.000000000 +0800
++++ b/configure.in	2013-01-15 11:31:45.000000000 +0800
+@@ -34,11 +34,6 @@ AC_MSG_CHECKING([for binaries in])
+ AC_MSG_RESULT([$searchpath])
+ 
+ #
+-# Make sure we have "/proc"
+-#
+-AF_LINUX_PROCFS()
+-
+-#
+ # Location of init.d directory?
+ #
+ AF_INIT_D()
+@@ -142,7 +137,6 @@ AF_PATH_INCLUDE(UMOUNT, umount, /bin/umo
+ AF_PATH_INCLUDE(E2FSCK, fsck.ext2 e2fsck, , $searchpath)
+ AF_PATH_INCLUDE(E3FSCK, fsck.ext3 e3fsck, , $searchpath)
+ AF_PATH_INCLUDE(E4FSCK, fsck.ext4 e4fsck, , $searchpath)
+-AF_PATH_INCLUDE(MODPROBE, modprobe, , $searchpath)
+ 
+ AF_CHECK_PROG(LEX, flex lex, , $searchpath)
+ AF_CHECK_PROG(YACC, bison, , $searchpath)
+diff -urpN a/daemon/module.c b/daemon/module.c
+--- a/daemon/module.c	2013-01-15 11:30:49.000000000 +0800
++++ b/daemon/module.c	2013-01-15 11:32:00.000000000 +0800
+@@ -18,6 +18,8 @@
+ #include <stdlib.h>
+ #include "automount.h"
+ 
++#if 0
++/* see comment in daemon/automount.c around load_autofs4_module() call */
+ int load_autofs4_module(void)
+ {
+ 	FILE *fp;
+@@ -52,6 +54,7 @@ int load_autofs4_module(void)
+ 
+ 	return 1;
+ }
++#endif
+ 
+ struct lookup_mod *open_lookup(const char *name, const char *err_prefix,
+ 			       const char *mapfmt, int argc, const char *const *argv)
+diff -urpN a/include/automount.h b/include/automount.h
+--- a/include/automount.h	2013-01-15 11:31:10.000000000 +0800
++++ b/include/automount.h	2013-01-15 11:32:06.000000000 +0800
+@@ -50,16 +50,11 @@
+ #error Failed to locate umount(8)!
+ #endif
+ 
+-#ifndef HAVE_MODPROBE
+-#error Failed to locate modprobe(8)!
+-#endif
+-
+-#ifndef HAVE_LINUX_PROCFS
+-#error Failed to verify existence of procfs filesystem!
+-#endif
+-
++#if 0
++/* see comment in daemon/automount.c around load_autofs4_module() call */
+ #define FS_MODULE_NAME  "autofs4"
+ int load_autofs4_module(void);
++#endif
+ 
+ /* The -s (sloppy) option to mount is good, if we have it... */
+ 

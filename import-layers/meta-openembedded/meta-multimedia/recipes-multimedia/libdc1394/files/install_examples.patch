@@ -1,0 +1,14 @@
+Index: libdc1394/examples/Makefile.am
+===================================================================
+--- libdc1394.orig/examples/Makefile.am	2012-06-30 17:50:46.000000000 -0700
++++ libdc1394/examples/Makefile.am	2012-06-30 19:02:13.822646430 -0700
+@@ -36,8 +36,7 @@
+ AM_LDFLAGS = -framework CoreFoundation -framework Carbon
+ endif
+ 
+-noinst_PROGRAMS = $(A)
+-bin_PROGRAMS = $(B)
++bin_PROGRAMS = $(A) $(B)
+ 
+ LDADD = ../dc1394/libdc1394.la
+ 

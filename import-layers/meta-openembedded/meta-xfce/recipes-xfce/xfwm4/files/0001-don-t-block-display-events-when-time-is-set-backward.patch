@@ -1,0 +1,33 @@
+From e87977696f03b0c9f72884f8e3e3ec3248dfd80a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Tue, 18 Jun 2013 12:46:42 +0200
+Subject: [PATCH] don't block display events when time is set backwards
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Submitted [1]
+
+[1] https://bugzilla.xfce.org/show_bug.cgi?id=10184
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ src/display.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/src/display.c b/src/display.c
+index 00318d5..651bc7a 100644
+--- a/src/display.c
++++ b/src/display.c
+@@ -733,7 +733,7 @@ myDisplayUpdateCurrentTime (DisplayInfo *display, XEvent *ev)
+             break;
+     }
+ 
+-    if ((timestamp != (guint32) CurrentTime) && TIMESTAMP_IS_BEFORE(display->current_time, timestamp))
++    if ((timestamp != (guint32) CurrentTime) /*&& TIMESTAMP_IS_BEFORE(display->current_time, timestamp)*/)
+     {
+         display->current_time = timestamp;
+     }
+-- 
+1.7.6.5
+

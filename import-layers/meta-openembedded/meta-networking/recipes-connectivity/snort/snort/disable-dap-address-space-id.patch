@@ -1,0 +1,52 @@
+Upstream-Status:Inappropriate [embedded specific]
+
+fix the below error:
+checking for dap address space id... configure: 
+configure: error: cannot run test program while cross compiling
+
+
+Signed-off-by: Chunrong Guo <B40290@freescale.com>
+
+--- a/configure.in	2013-08-23 00:06:37.239361932 -0500
++++ b/configure.in	2013-08-23 00:07:32.860266534 -0500
+@@ -679,23 +679,23 @@
+ 
+ AC_CHECK_FUNCS([daq_hup_apply] [daq_acquire_with_meta])
+ 
+-AC_MSG_CHECKING([for daq address space ID])
+-AC_RUN_IFELSE(
+-[AC_LANG_PROGRAM(
+-[[
+-#include <daq.h>
+-]],
+-[[
+-   DAQ_PktHdr_t hdr;
+-   hdr.address_space_id = 0;
+-]])],
+-[have_daq_address_space_id="yes"],
+-[have_daq_address_space_id="no"])
+-AC_MSG_RESULT($have_daq_address_space_id)
+-if test "x$have_daq_address_space_id" = "xyes"; then
+-    AC_DEFINE([HAVE_DAQ_ADDRESS_SPACE_ID],[1],
+-        [DAQ version supports address space ID in header.])
+-fi
++#AC_MSG_CHECKING([for daq address space ID])
++#AC_RUN_IFELSE(
++#[AC_LANG_PROGRAM(
++#[[
++##include <daq.h>
++#]],
++#[[
++#   DAQ_PktHdr_t hdr;
++#   hdr.address_space_id = 0;
++#]])],
++have_daq_address_space_id="yes"
++#[have_daq_address_space_id="no"])
++#AC_MSG_RESULT($have_daq_address_space_id)
++#if test "x$have_daq_address_space_id" = "xyes"; then
++#    AC_DEFINE([HAVE_DAQ_ADDRESS_SPACE_ID],[1],
++#        [DAQ version supports address space ID in header.])
++#fi
+ 
+ # any sparc platform has to have this one defined.
+ AC_MSG_CHECKING(for sparc)

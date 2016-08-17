@@ -1,0 +1,3 @@
+The files in this directory are cross answers files
+used by waf-samba.bbclass, please see waf-samba.bbclass
+for details about how they are used.

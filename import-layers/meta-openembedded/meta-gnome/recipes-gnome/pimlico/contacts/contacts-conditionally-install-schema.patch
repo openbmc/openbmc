@@ -1,0 +1,37 @@
+Install schema should respect to GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL
+
+If GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL is set, the schema should not
+be installed.
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+
+Upstream-Status: Pending
+---
+ data/Makefile.am |    7 ++++---
+ 1 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/data/Makefile.am b/data/Makefile.am
+index f790823..b6fd643 100644
+--- a/data/Makefile.am
++++ b/data/Makefile.am
+@@ -14,13 +14,14 @@ dist_man1_MANS = contacts.1
+ 
+ if HAVE_GCONF
+ install-data-local:
+-	GCONF_CONFIG_SOURCE=$(GCONF_SCHEMA_CONFIG_SOURCE) \
++	if [ "$(GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL)" != "1" ]; then \
++		GCONF_CONFIG_SOURCE=$(GCONF_SCHEMA_CONFIG_SOURCE) \
+ 		$(GCONFTOOL) --makefile-install-rule $(schema_DATA) || \
+ 		(echo ;\
+ 		echo "*****************************************************"; \
+ 		echo "Installation of schemas failed, install them manually"; \
+-		echo "*****************************************************";)
+-		@true
++		echo "*****************************************************";); \
++	fi
+ endif
+ 
+ CLEANFILES = $(desktop_DATA)
+-- 
+1.7.7.6
+

@@ -1,0 +1,78 @@
+# Hack in support for an "exclude" config option for the init module, so
+# we can hide certain system services that shouldn't really be configurable
+# via the web interface
+#
+# Upstream-status: Pending
+#
+# Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+# Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ init/index.cgi   | 27 ++++++++++++++-------------
+ init/init-lib.pl |  5 +++--
+ 2 files changed, 17 insertions(+), 15 deletions(-)
+
+diff --git a/init/index.cgi b/init/index.cgi
+index d48b793..30dafd4 100755
+--- a/init/index.cgi
++++ b/init/index.cgi
+@@ -45,19 +45,20 @@ elsif ($init_mode eq "init" && $access{'bootup'}) {
+ 					     : "$config{'init_dir'}/$ac[0]");
+ 		}
+ 	@runlevels = &list_runlevels();
+-	foreach $r (@runlevels) {
+-		foreach $w ("S", "K") {
+-			foreach $a (&runlevel_actions($r, $w)) {
+-				@ac = split(/\s+/, $a);
+-				if (!$nodemap{$ac[2]}) {
+-					push(@acts, $ac[1]);
+-					push(@actsl,
+-					     "1+$r+$ac[0]+$ac[1]+$ac[2]+$w");
+-					push(@actsf, "$config{'init_base'}/rc$r.d/$w$ac[0]$ac[1]");
+-					}
+-				}
+-			}
+-		}
++	# Assume there won't be any of these broken actions
++	#foreach $r (@runlevels) {
++	#	foreach $w ("S", "K") {
++	#		foreach $a (&runlevel_actions($r, $w)) {
++	#			@ac = split(/\s+/, $a);
++	#			if (!$nodemap{$ac[2]}) {
++	#				push(@acts, $ac[1]);
++	#				push(@actsl,
++	#				     "1+$r+$ac[0]+$ac[1]+$ac[2]+$w");
++	#				push(@actsf, "$config{'init_base'}/rc$r.d/$w$ac[0]$ac[1]");
++	#				}
++	#			}
++	#		}
++	#	}
+ 
+ 	# For each action, look at /etc/rc*.d/* files to see if it is 
+ 	# started at boot
+diff --git a/init/init-lib.pl b/init/init-lib.pl
+index ead21ed..b41794b 100755
+--- a/init/init-lib.pl
++++ b/init/init-lib.pl
+@@ -119,8 +119,9 @@ List boot time action names from init.d, such as httpd and cron.
+ =cut
+ sub list_actions
+ {
+-local($dir, $f, @stbuf, @rv);
++local($dir, $f, @stbuf, @rv, @exclude);
+ $dir = $config{init_dir};
++@exclude = split(/,/, $config{exclude});
+ opendir(DIR, $dir);
+ foreach $f (sort { lc($a) cmp lc($b) } readdir(DIR)) {
+ 	if ($f eq "." || $f eq ".." || $f =~ /\.bak$/ || $f eq "functions" ||
+@@ -128,7 +129,7 @@ foreach $f (sort { lc($a) cmp lc($b) } readdir(DIR)) {
+ 	    -d "$dir/$f" || $f =~ /\.swp$/ || $f eq "skeleton" ||
+ 	    $f =~ /\.lock$/ || $f =~ /\.dpkg-(old|dist)$/ ||
+ 	    $f =~ /^\.depend\./ || $f eq '.legacy-bootordering' ||
+-	    $f =~ /^mandrake/) { next; }
++	    $f =~ /^mandrake/ || grep {$_ eq $f} @exclude ) { next; }
+ 	if (@stbuf = stat("$dir/$f")) {
+ 		push(@rv, "$f $stbuf[1]");
+ 		}
+--
+2.0.0
+

@@ -1,0 +1,45 @@
+From d090638ff983e509162d5e3b62aa4918de4aa5fa Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Tue, 24 Apr 2012 16:24:35 +0200
+Subject: [PATCH 2/4] SConstruct: remove rpath
+
+* even with correct prefix (without DESTDIR) included it's redundant
+  WARNING: QA Issue: libgps:
+  /work/armv4t-oe-linux-gnueabi/gpsd/gpsd-3.5-r0/packages-split/libgps/usr/lib/libgps.so.20.0
+  contains probably-redundant RPATH /usr/lib
+* and with prefix from scons.bbclass it's invalid
+  WARNING: QA Issue: package libgps contains bad RPATH
+  /OE/shr-core/tmp-eglibc/work/armv4t-oe-linux-gnueabi/gpsd/gpsd-3.5-r0/image/usr/lib
+  in file
+  /OE/shr-core/tmp-eglibc/work/armv4t-oe-linux-gnueabi/gpsd/gpsd-3.5-r0/packages-split/libgps/usr/lib/libgps.so.20.0
+
+Upstream-Status: Inapppropriate [embedded specific]
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+Signed-off-by: Denis 'GNUtoo' Carikli <GNUtoo@no-log.org>
+Signed-off-by: Peter A. Bigot <pab@pabigot.com>
+---
+ SConstruct | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/SConstruct b/SConstruct
+index f0cafa8..ff46713 100644
+--- a/SConstruct
++++ b/SConstruct
+@@ -1340,8 +1340,11 @@ if qt_env:
+     binaryinstall.append(LibraryInstall(qt_env, installdir('libdir'), compiled_qgpsmmlib))
+ 
+ if env["shared"] and env["chrpath"]:
+-    env.AddPostAction(binaryinstall, '$CHRPATH -r "%s" "$TARGET"' \
+-                      % (installdir('libdir', False), ))
++    if not env['sysroot']:
++        env.AddPostAction(binaryinstall, '$CHRPATH -r "%s" "$TARGET"' \
++                          % (installdir('libdir', False), ))
++    else:
++        env.AddPostAction(binaryinstall, '$CHRPATH -d "$TARGET"')
+ 
+ if not env['debug'] and not env['profiling'] and env['strip']:
+     env.AddPostAction(binaryinstall, '$STRIP $TARGET')
+-- 
+1.8.5.5
+

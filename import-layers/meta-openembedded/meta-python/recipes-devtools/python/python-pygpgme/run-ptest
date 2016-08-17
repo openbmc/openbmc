@@ -1,0 +1,3 @@
+#!/bin/sh
+
+GPG_AGENT_INFO= python test_all.py -v

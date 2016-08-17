@@ -1,0 +1,55 @@
+vsftpd: change default value of secure_chroot_dir
+
+Upstream-Status: Pending
+
+Change secure_chroot_dir pointing to a volatile directory.
+
+Signed-off-by: Ming Liu <ming.liu@windriver.com>
+---
+ INSTALL       |    6 +++---
+ tunables.c    |    2 +-
+ vsftpd.conf.5 |    2 +-
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+diff -urpN a/INSTALL b/INSTALL
+--- a/INSTALL	2013-09-13 10:23:57.504972397 +0800
++++ b/INSTALL	2013-09-13 10:25:25.664971779 +0800
+@@ -27,11 +27,11 @@ user in case it does not already exist. 
+ [root@localhost root]# useradd nobody
+ useradd: user nobody exists
+ 
+-2b) vsftpd needs the (empty) directory /usr/share/empty in the default
++2b) vsftpd needs the (empty) directory /var/run/vsftpd/empty in the default
+ configuration. Add this directory in case it does not already exist. e.g.:
+ 
+-[root@localhost root]# mkdir /usr/share/empty/
+-mkdir: cannot create directory `/usr/share/empty': File exists
++[root@localhost root]# mkdir /var/run/vsftpd/empty/
++mkdir: cannot create directory `/var/run/vsftpd/empty': File exists
+ 
+ 2c) For anonymous FTP, you will need the user "ftp" to exist, and have a
+ valid home directory (which is NOT owned or writable by the user "ftp").
+diff -urpN a/tunables.c b/tunables.c
+--- a/tunables.c	2013-09-13 10:26:29.554972817 +0800
++++ b/tunables.c	2013-09-13 10:27:18.104972210 +0800
+@@ -254,7 +254,7 @@ tunables_load_defaults()
+   /* -rw------- */
+   tunable_chown_upload_mode = 0600;
+ 
+-  install_str_setting("/usr/share/empty", &tunable_secure_chroot_dir);
++  install_str_setting("/var/run/vsftpd/empty", &tunable_secure_chroot_dir);
+   install_str_setting("ftp", &tunable_ftp_username);
+   install_str_setting("root", &tunable_chown_username);
+   install_str_setting("/var/log/xferlog", &tunable_xferlog_file);
+diff -urpN a/vsftpd.conf.5 b/vsftpd.conf.5
+--- a/vsftpd.conf.5	2013-09-13 10:09:33.774972462 +0800
++++ b/vsftpd.conf.5	2013-09-13 10:10:41.914971989 +0800
+@@ -969,7 +969,7 @@ This option should be the name of a dire
+ directory should not be writable by the ftp user. This directory is used
+ as a secure chroot() jail at times vsftpd does not require filesystem access.
+ 
+-Default: /usr/share/empty
++Default: /var/run/vsftpd/empty
+ .TP
+ .B ssl_ciphers
+ This option can be used to select which SSL ciphers vsftpd will allow for

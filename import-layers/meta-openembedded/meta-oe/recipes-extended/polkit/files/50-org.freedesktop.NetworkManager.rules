@@ -1,0 +1,8 @@
+/* give group 'network' rights to change settings */
+/* taken from https://wiki.archlinux.org/index.php/NetworkManager#Set_up_PolicyKit_permissions */
+
+polkit.addRule(function(action, subject) {
+  if (action.id.indexOf("org.freedesktop.NetworkManager.") == 0 && subject.isInGroup("network")) {
+    return polkit.Result.YES;
+  }
+});

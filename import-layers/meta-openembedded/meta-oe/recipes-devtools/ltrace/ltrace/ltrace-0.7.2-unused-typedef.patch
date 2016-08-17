@@ -1,0 +1,49 @@
+diff --git a/value.c b/value.c
+index d18db17..b98298e 100644
+--- a/value.c
++++ b/value.c
+@@ -1,6 +1,6 @@
+ /*
+  * This file is part of ltrace.
+- * Copyright (C) 2011,2012 Petr Machata, Red Hat Inc.
++ * Copyright (C) 2011,2012,2013 Petr Machata, Red Hat Inc.
+  *
+  * This program is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU General Public License as
+@@ -282,9 +282,9 @@ value_init_deref(struct value *ret_val, struct value *valp)
+ 	if (value_extract_word(valp, &l, NULL) < 0)
+ 		return -1;
+ 
+-	/* We need "long" to be long enough to hold platform
++	/* We need "long" to be long enough to hold target
+ 	 * pointers.  */
+-	typedef char assert__long_enough_long[-(sizeof(l) < sizeof(void *))];
++	assert(sizeof(l) >= sizeof(arch_addr_t));
+ 
+ 	value_common_init(ret_val, valp->inferior, valp,
+ 			  valp->type->u.ptr_info.info, 0);
+diff --git a/lens_default.c b/lens_default.c
+index ed3d0e1..5d00814 100644
+--- a/lens_default.c
++++ b/lens_default.c
+@@ -1,6 +1,6 @@
+ /*
+  * This file is part of ltrace.
+- * Copyright (C) 2011,2012 Petr Machata, Red Hat Inc.
++ * Copyright (C) 2011,2012,2013 Petr Machata, Red Hat Inc.
+  * Copyright (C) 1998,2004,2007,2008,2009 Juan Cespedes
+  * Copyright (C) 2006 Ian Wienand
+  * Copyright (C) 2006 Steve Fink
+@@ -342,9 +342,9 @@ format_array(FILE *stream, struct value *value, struct value_dict *arguments,
+ 	     struct expr_node *length, size_t maxlen, int before,
+ 	     const char *open, const char *close, const char *delim)
+ {
+-	/* We need "long" to be long enough to cover the whole address
+-	 * space.  */
+-	typedef char assert__long_enough_long[-(sizeof(long) < sizeof(void *))];
++	/* We need "long" to be long enough to cover the whole target
++	 * address space.  */
++	assert(sizeof(long) >= sizeof(arch_addr_t));
+ 	long l;
+ 	if (expr_eval_word(length, value, arguments, &l) < 0)
+ 		return -1;

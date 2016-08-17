@@ -1,0 +1,23 @@
+Index: proxy-libintl-20080418-r6/src/proxy-libintl/Makefile
+===================================================================
+--- proxy-libintl-20080418-r6.orig/src/proxy-libintl/Makefile	2010-07-25 08:40:22.893620001 -0700
++++ proxy-libintl-20080418-r6/src/proxy-libintl/Makefile	2010-07-25 10:51:29.573620000 -0700
+@@ -6,16 +6,13 @@ CFLAGS = -Wall -I ../../include
+ 
+ all : ../../lib/libintl.so ../../lib/intl.lib
+ 
+-../../lib/libintl.so : libintl.o
+-	$(CC) -shared -o $@ libintl.o
++../../lib/libintl.so : libintl.c
++	$(CC) $(CFLAGS) -shared -Wl,-soname -Wl,libintl.so -o $@ $<
+ 
+ ../../lib/intl.lib : ../../lib/libintl.so
+ 	cp ../../lib/libintl.so $@
+ 	$(STRIP) --strip-unneeded $@
+ 
+-libintl.o : libintl.c
+-	$(CC) $(CFLAGS) -c libintl.c
+-
+ clean :
+ 	rm -f *.o ../../lib/libintl.so ../../$(ZIPFILE)
+ 

@@ -1,0 +1,38 @@
+Fix configure error in large file checks on 64-bit architectures
+
+ configure:17888: checking for native large file support
+ configure:17891: error: in `/home/jenkins/oe/shr-core-branches/shr-core/tmp-eglibc/work/core2-64-oe-linux/libimobiledevice/1.1.4-r0/libimobiledevice-1.1.4':
+ configure:17893: error: cannot run test program while cross compiling
+
+configure.ac was using AC_SYS_LARGEFILE macro as is typical, but then
+there was an extra runtime check added beyond that:
+check if off_t is 8 bytes (64 bits) long.
+If that runtime check passed, _FILE_OFFSET_BITS was defined as 64.
+
+Runtime checks need to go away for cross compiling, and luckily this extra
+check was not serving any useful purpose. Note that off_t was *already*
+64 bits, *without* setting _FILE_OFFSET_BITS, which makes _FILE_OFFSET_BITS
+unneeded for large file support. 
+
+If AC_SYS_LARGEFILE macro sets ac_cv_sys_file_offset_bits=no,
+just leave _FILE_OFFSET_BITS undefined!
+
+--- libimobiledevice-1.1.4/configure.ac.old	2015-07-15 01:38:50.900143927 -0700
++++ libimobiledevice-1.1.4/configure.ac	2015-07-15 01:39:13.300144430 -0700
+@@ -174,16 +174,6 @@
+ if test "$enable_largefile" != no; then
+     if test "$ac_cv_sys_file_offset_bits" != 'no'; then
+ 	LFS_CFLAGS="$LFS_CFLAGS -D_FILE_OFFSET_BITS=$ac_cv_sys_file_offset_bits"
+-    else
+-	AC_MSG_CHECKING(for native large file support)
+-	AC_RUN_IFELSE([AC_LANG_SOURCE([#include <unistd.h>
+-	  int main (int argc, char **argv)
+-	  {
+-	      exit(!(sizeof(off_t) == 8));
+-	  }])],
+-	[ac_cv_sys_file_offset_bits=64; AC_DEFINE(_FILE_OFFSET_BITS,64)
+-	 AC_MSG_RESULT(yes)],
+-	[AC_MSG_RESULT(no)])
+     fi
+     if test "$ac_cv_sys_large_files" != 'no'; then
+ 	LFS_CFLAGS="$LFS_CFLAGS -D_LARGE_FILES=1"

@@ -1,0 +1,28 @@
+From d2549d3ef08536be6d141524e3382fef07fea8bf Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Tue, 30 Apr 2013 19:48:27 +0200
+Subject: [PATCH] Makefile.am: do not build help
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ Makefile.am |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 89f7ee4..31e11ab 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,4 +1,4 @@
+-SUBDIRS = src po help
++SUBDIRS = src po
+ 
+ NULL =
+ 
+-- 
+1.7.6.5
+

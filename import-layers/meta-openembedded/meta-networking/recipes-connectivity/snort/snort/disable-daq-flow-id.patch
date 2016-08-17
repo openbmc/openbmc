@@ -1,0 +1,50 @@
+Upstream-Status:Inappropriate [embedded specific]
+
+fix the below error:
+checking for daq flow ID... configure:
+configure: error: cannot run test program while cross compiling
+
+
+--- a/configure.in    2015-10-28 10:36:42.918512690 +0800
++++ b/configure.in    2015-10-28 10:37:36.738510048 +0800
+@@ -716,23 +716,23 @@
+ #        [DAQ version supports address space ID in header.])
+ #fi
+
+-AC_MSG_CHECKING([for daq flow ID])
+-AC_RUN_IFELSE(
+-[AC_LANG_PROGRAM(
+-[[
+-#include <daq.h>
+-]],
+-[[
+-   DAQ_PktHdr_t hdr;
+-   hdr.flow_id = 0;
+-]])],
+-[have_daq_flow_id="yes"],
+-[have_daq_flow_id="no"])
+-AC_MSG_RESULT($have_daq_flow_id)
+-if test "x$have_daq_flow_id" = "xyes"; then
+-    AC_DEFINE([HAVE_DAQ_FLOW_ID],[1],
+-        [DAQ version supports flow ID in header.])
+-fi
++#AC_MSG_CHECKING([for daq flow ID])
++#AC_RUN_IFELSE(
++#[AC_LANG_PROGRAM(
++#[[
++##include <daq.h>
++#]],
++#[[
++#   DAQ_PktHdr_t hdr;
++#   hdr.flow_id = 0;
++#]])],
++have_daq_flow_id="yes"
++#[have_daq_flow_id="no"])
++#AC_MSG_RESULT($have_daq_flow_id)
++#if test "x$have_daq_flow_id" = "xyes"; then
++#    AC_DEFINE([HAVE_DAQ_FLOW_ID],[1],
++#        [DAQ version supports flow ID in header.])
++#fi
+
+ AC_MSG_CHECKING([for DAQ_VERDICT_RETRY])
+ AC_RUN_IFELSE(

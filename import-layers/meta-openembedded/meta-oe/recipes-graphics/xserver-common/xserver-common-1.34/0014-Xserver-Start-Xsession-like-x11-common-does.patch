@@ -1,0 +1,26 @@
+From 8171f89944969a081be1ac193b2a59016e39a345 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Tue, 29 Oct 2013 17:07:21 +0100
+Subject: [PATCH 14/14] Xserver: Start Xsession like x11-common does
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ X11/Xserver | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/X11/Xserver b/X11/Xserver
+index 559f059..4b88637 100755
+--- a/X11/Xserver
++++ b/X11/Xserver
+@@ -4,6 +4,6 @@
+ . /etc/X11/xserver-common
+ 
+ echo "tslib: $TSLIB_TSDEVICE"
+-echo "exec $XSERVER $ARGS -dpi $DPI $*"
+-exec $XSERVER $ARGS -dpi $DPI $*
++echo "exec xinit /etc/X11/Xsession -- $BINDIR/$XSERVER $ARGS -dpi $DPI $*"
+ 
++exec xinit /etc/X11/Xsession -- $BINDIR/$XSERVER $ARGS -dpi $DPI $*
+-- 
+1.8.4.2
+

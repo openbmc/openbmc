@@ -1,0 +1,11 @@
+[Unit]
+Description=Simple Network Time Service Client
+After=network.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/etc/default/sntp
+ExecStart=/usr/sbin/sntp -s $NTPSERVER
+
+[Install]
+WantedBy=multi-user.target

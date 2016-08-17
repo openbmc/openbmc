@@ -1,0 +1,44 @@
+Always use devmapper
+
+Do not try to compute several _API_ make variables
+from host information when cross-compiling.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+diff --git a/libmultipath/Makefile b/libmultipath/Makefile
+index e5b06b3..efd6cf6 100644
+--- a/libmultipath/Makefile
++++ b/libmultipath/Makefile
+@@ -17,23 +17,18 @@ OBJS = memory.o parser.o vector.o devmapper.o \
+        log.o configure.o structs_vec.o sysfs.o prio.o checkers.o \
+        lock.o waiter.o file.o wwids.o
+ 
+-LIBDM_API_FLUSH = $(shell grep -Ecs '^[a-z]*[[:space:]]+dm_task_no_flush' /usr/include/libdevmapper.h)
+ 
+-ifneq ($(strip $(LIBDM_API_FLUSH)),0)
++#ifneq ($(strip $(LIBDM_API_FLUSH)),0)
+ 	CFLAGS += -DLIBDM_API_FLUSH -D_GNU_SOURCE
+-endif
++#endif
+ 
+-LIBDM_API_COOKIE = $(shell grep -Ecs '^[a-z]*[[:space:]]+dm_task_set_cookie' /usr/include/libdevmapper.h)
+-
+-ifneq ($(strip $(LIBDM_API_COOKIE)),0)
++#ifneq ($(strip $(LIBDM_API_COOKIE)),0)
+ 	CFLAGS += -DLIBDM_API_COOKIE
+-endif
+-
+-LIBUDEV_API_RECVBUF = $(shell grep -Ecs '^[a-z]*[[:space:]]+udev_monitor_set_resolve_buffer_size' /usr/include/libudev.h)
++#endif
+ 
+-ifneq ($(strip $(LIBUDEV_API_RECVBUF)),0)
++#ifneq ($(strip $(LIBUDEV_API_RECVBUF)),0)
+ 	CFLAGS += -DLIBUDEV_API_RECVBUF
+-endif
++#endif
+ 
+ 
+ all: $(LIBS)

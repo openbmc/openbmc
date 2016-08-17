@@ -1,0 +1,48 @@
+diff -Nurp libesmtp-1.0.6.org/crammd5/Makefile.am libesmtp-1.0.6/crammd5/Makefile.am
+--- libesmtp-1.0.6.org/crammd5/Makefile.am	2010-08-08 23:45:57.000000000 +0800
++++ libesmtp-1.0.6/crammd5/Makefile.am	2014-11-17 11:17:21.663624295 +0800
+@@ -2,7 +2,7 @@
+ 
+ libdir = @plugindir@
+ 
+-INCLUDES = -I@srcdir@
++INCLUDES = -I@srcdir@ -I@srcdir@/../
+ AM_CFLAGS = @CFLAGS@ @EXTRA_CFLAGS@
+ 
+ lib_LTLIBRARIES = sasl-cram-md5.la
+diff -Nurp libesmtp-1.0.6.org/login/Makefile.am libesmtp-1.0.6/login/Makefile.am
+--- libesmtp-1.0.6.org/login/Makefile.am	2010-08-08 23:45:56.000000000 +0800
++++ libesmtp-1.0.6/login/Makefile.am	2014-11-17 11:17:54.339623018 +0800
+@@ -2,7 +2,7 @@
+ 
+ libdir = @plugindir@
+ 
+-INCLUDES = -I@srcdir@
++INCLUDES = -I@srcdir@ -I@srcdir@/../
+ 
+ lib_LTLIBRARIES = sasl-login.la
+ AM_CFLAGS = @CFLAGS@ @EXTRA_CFLAGS@
+diff -Nurp libesmtp-1.0.6.org/ntlm/Makefile.am libesmtp-1.0.6/ntlm/Makefile.am
+--- libesmtp-1.0.6.org/ntlm/Makefile.am	2010-08-08 23:45:56.000000000 +0800
++++ libesmtp-1.0.6/ntlm/Makefile.am	2014-11-17 11:18:10.551622385 +0800
+@@ -2,7 +2,7 @@
+ 
+ libdir = @plugindir@
+ 
+-INCLUDES = -I@srcdir@
++INCLUDES = -I@srcdir@ -I@srcdir@/../
+ AM_CFLAGS = @CFLAGS@ @EXTRA_CFLAGS@
+ 
+ lib_LTLIBRARIES = sasl-ntlm.la
+diff -Nurp libesmtp-1.0.6.org/plain/Makefile.am libesmtp-1.0.6/plain/Makefile.am
+--- libesmtp-1.0.6.org/plain/Makefile.am	2010-08-08 23:45:54.000000000 +0800
++++ libesmtp-1.0.6/plain/Makefile.am	2014-11-17 11:18:33.355621494 +0800
+@@ -2,7 +2,7 @@
+ 
+ libdir = @plugindir@
+ 
+-INCLUDES = -I@srcdir@
++INCLUDES = -I@srcdir@ -I@srcdir@/../
+ AM_CFLAGS = @CFLAGS@ @EXTRA_CFLAGS@
+ 
+ lib_LTLIBRARIES = sasl-plain.la

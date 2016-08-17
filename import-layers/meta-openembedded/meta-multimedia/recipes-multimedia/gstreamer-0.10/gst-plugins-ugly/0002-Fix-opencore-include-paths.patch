@@ -1,0 +1,58 @@
+From e634bc6420826f760f6519a9f134c6a4d3412ef8 Mon Sep 17 00:00:00 2001
+From: Carlos Rafael Giani <dv@pseudoterminal.org>
+Date: Mon, 19 Oct 2015 15:26:24 +0200
+Subject: [PATCH] Fix opencore include paths
+
+Upstream-Status: Inappropriate [no upstream - GStreamer 0.10 is no longer being maintained]
+
+Signed-off-by: Carlos Rafael Giani <dv@pseudoterminal.org>
+---
+ ext/amrnb/amrnbdec.h    | 2 +-
+ ext/amrnb/amrnbenc.h    | 2 +-
+ ext/amrwbdec/amrwbdec.h | 4 ++--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/ext/amrnb/amrnbdec.h b/ext/amrnb/amrnbdec.h
+index 1e81839..01b7154 100644
+--- a/ext/amrnb/amrnbdec.h
++++ b/ext/amrnb/amrnbdec.h
+@@ -22,7 +22,7 @@
+ 
+ #include <gst/gst.h>
+ #include <gst/audio/gstaudiodecoder.h>
+-#include <interf_dec.h>
++#include <opencore-amrnb/interf_dec.h>
+ 
+ G_BEGIN_DECLS
+ 
+diff --git a/ext/amrnb/amrnbenc.h b/ext/amrnb/amrnbenc.h
+index 7f673ac..5be39b5 100644
+--- a/ext/amrnb/amrnbenc.h
++++ b/ext/amrnb/amrnbenc.h
+@@ -21,7 +21,7 @@
+ #define __GST_AMRNBENC_H__
+ 
+ #include <gst/gst.h>
+-#include <interf_enc.h>
++#include <opencore-amrnb/interf_enc.h>
+ #include <gst/audio/gstaudioencoder.h>
+ 
+ G_BEGIN_DECLS
+diff --git a/ext/amrwbdec/amrwbdec.h b/ext/amrwbdec/amrwbdec.h
+index c3528fc..f27c6d2 100644
+--- a/ext/amrwbdec/amrwbdec.h
++++ b/ext/amrwbdec/amrwbdec.h
+@@ -22,8 +22,8 @@
+ 
+ #include <gst/gst.h>
+ #include <gst/audio/gstaudiodecoder.h>
+-#include <dec_if.h>
+-#include <if_rom.h>
++#include <opencore-amrwb/dec_if.h>
++#include <opencore-amrwb/if_rom.h>
+ 
+ G_BEGIN_DECLS
+ 
+-- 
+1.9.1
+

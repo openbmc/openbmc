@@ -1,0 +1,67 @@
+From 53368d3f4adc09dd84234a9af31771bcd8ca2757 Mon Sep 17 00:00:00 2001
+From: Sven Ebenfeld <sven.ebenfeld@gmail.com>
+Date: Fri, 15 Jan 2016 22:41:28 +0100
+Subject: [PATCH] Tell scons to use build settings from environment variables
+
+Signed-off-by: Sven Ebenfeld <sven.ebenfeld@gmail.com>
+---
+ SConstruct                | 8 ++++++--
+ src/mongo/util/SConscript | 2 ++
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/SConstruct b/SConstruct
+index 5082a4b..3370f70 100644
+--- a/SConstruct
++++ b/SConstruct
+@@ -507,6 +507,7 @@ def variable_arch_converter(val):
+         'amd64':  'x86_64',
+         'emt64':   'x86_64',
+         'x86':    'i386',
++        'aarch64': 'arm64',
+     }
+     val = val.lower()
+ 
+@@ -568,7 +569,8 @@ env_vars.Add('ARFLAGS',
+     converter=variable_shlex_converter)
+ 
+ env_vars.Add('CC',
+-    help='Select the C compiler to use')
++    help='Select the C compiler to use',
++    default=os.getenv('CC'))
+ 
+ env_vars.Add('CCFLAGS',
+     help='Sets flags for the C and C++ compiler',
+@@ -588,7 +590,8 @@ env_vars.Add('CPPPATH',
+     converter=variable_shlex_converter)
+ 
+ env_vars.Add('CXX',
+-    help='Select the C++ compiler to use')
++    help='Select the C++ compiler to use',
++    default=os.getenv('CXX'))
+ 
+ env_vars.Add('CXXFLAGS',
+     help='Sets flags for the C++ compiler',
+@@ -818,6 +821,7 @@ envDict = dict(BUILD_ROOT=buildDir,
+                )
+ 
+ env = Environment(variables=env_vars, **envDict)
++env.PrependENVPath('PATH', os.getenv('PATH'))
+ del envDict
+ 
+ env.AddMethod(env_os_is_wrapper, 'TargetOSIs')
+diff --git a/src/mongo/util/SConscript b/src/mongo/util/SConscript
+index 6add602..8d05a62 100644
+--- a/src/mongo/util/SConscript
++++ b/src/mongo/util/SConscript
+@@ -251,6 +251,8 @@ if get_option('allocator') == 'tcmalloc':
+                 'MONGO_HAVE_GPERFTOOLS_GET_THREAD_CACHE_SIZE'
+             ]
+         )
++    if not use_system_version_of_library('valgrind'):
++        tcmspEnv.InjectThirdPartyIncludePaths('valgrind')
+ 
+     tcmspEnv.Library(
+         target='tcmalloc_set_parameter',
+-- 
+1.9.1
+

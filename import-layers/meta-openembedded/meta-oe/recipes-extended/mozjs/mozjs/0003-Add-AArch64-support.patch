@@ -1,0 +1,76 @@
+From 15e710e331d36eb279852b5cd1ba37a9a6005217 Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen.kooi@linaro.org>
+Date: Mon, 2 Mar 2015 19:08:22 +0800
+Subject: [PATCH 3/5] Add AArch64 support
+
+---
+Upstream-status: Pending
+
+ js/src/assembler/jit/ExecutableAllocator.h | 6 ++++++
+ js/src/assembler/wtf/Platform.h            | 4 ++++
+ js/src/configure.in                        | 4 ++++
+ mfbt/double-conversion/utils.h             | 1 +
+ 4 files changed, 15 insertions(+)
+
+diff --git a/js/src/assembler/jit/ExecutableAllocator.h b/js/src/assembler/jit/ExecutableAllocator.h
+index c071c33..90764c3 100644
+--- a/js/src/assembler/jit/ExecutableAllocator.h
++++ b/js/src/assembler/jit/ExecutableAllocator.h
+@@ -382,6 +382,12 @@ public:
+     {
+         reprotectRegion(start, size, Executable);
+     }
++#elif WTF_CPU_AARCH64 && WTF_PLATFORM_LINUX
++    static void cacheFlush(void* code, size_t size)
++    {
++        intptr_t end = reinterpret_cast<intptr_t>(code) + size;
++        __builtin___clear_cache(reinterpret_cast<char*>(code), reinterpret_cast<char*>(end));
++    }
+ #else
+     static void makeWritable(void*, size_t) {}
+     static void makeExecutable(void*, size_t) {}
+diff --git a/js/src/assembler/wtf/Platform.h b/js/src/assembler/wtf/Platform.h
+index 0c84896..e8763a7 100644
+--- a/js/src/assembler/wtf/Platform.h
++++ b/js/src/assembler/wtf/Platform.h
+@@ -325,6 +325,10 @@
+ #define WTF_THUMB_ARCH_VERSION 0
+ #endif
+ 
++/* CPU(AArch64) - 64-bit ARM */
++#if defined(__aarch64__)
++#define WTF_CPU_AARCH64 1
++#endif
+ 
+ /* WTF_CPU_ARMV5_OR_LOWER - ARM instruction set v5 or earlier */
+ /* On ARMv5 and below the natural alignment is required. 
+diff --git a/js/src/configure.in b/js/src/configure.in
+index 64c7606..0673aca 100644
+--- a/js/src/configure.in
++++ b/js/src/configure.in
+@@ -1121,6 +1121,10 @@ arm*)
+     CPU_ARCH=arm
+     ;;
+ 
++aarch64)
++    CPU_ARCH=aarch64
++    ;;
++
+ mips|mipsel)
+     CPU_ARCH="mips"
+     ;;
+diff --git a/mfbt/double-conversion/utils.h b/mfbt/double-conversion/utils.h
+index 0eec2d9..fe26dab 100644
+--- a/mfbt/double-conversion/utils.h
++++ b/mfbt/double-conversion/utils.h
+@@ -58,6 +58,7 @@
+     defined(__mips__) || defined(__powerpc__) || \
+     defined(__sparc__) || defined(__sparc) || defined(__s390__) || \
+     defined(__SH4__) || defined(__alpha__) || \
++    defined(__aarch64__) || \
+     defined(_MIPS_ARCH_MIPS32R2)
+ #define DOUBLE_CONVERSION_CORRECT_DOUBLE_OPERATIONS 1
+ #elif defined(_M_IX86) || defined(__i386__) || defined(__i386)
+-- 
+1.9.3
+

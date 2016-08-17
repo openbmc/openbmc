@@ -1,0 +1,24 @@
+libvncserver: replace LIBVNCSERVER_WORDS_BIGENDIAN with WORDS_BIGENDIAN
+
+since macro AC_C_BIGENDIAN is used in autoconf and WORDS_BIGENDIAN is
+automatically set for different arch, it is better to use WORDS_BIGENDIAN
+instead of LIBVNCSERVER_WORDS_BIGENDIAN, which cuase issue in mips.
+
+Signed-off-by: Yu Ke <ke.yu@intel.com>
+
+Upstream-Status: Pending
+
+diff --git a/libvncserver/main.c b/libvncserver/main.c
+index b6bd930..8bbb7bf 100644
+--- a/libvncserver/main.c
++++ b/libvncserver/main.c
+@@ -47,7 +47,7 @@ static MUTEX(extMutex);
+ 
+ static int rfbEnableLogging=1;
+ 
+-#ifdef LIBVNCSERVER_WORDS_BIGENDIAN
++#ifdef WORDS_BIGENDIAN
+ char rfbEndianTest = (1==0);
+ #else
+ char rfbEndianTest = (1==1);
+

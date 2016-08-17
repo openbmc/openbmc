@@ -1,0 +1,119 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:
+# Required-Start:
+# Required-Stop:
+# Default-Start:
+# Default-Stop:
+# Short-Description: Starts and stops the iSCSI initiator services and logins to default targets
+### END INIT INFO
+#set -x
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/usr/sbin/iscsid
+ADM=/usr/sbin/iscsiadm
+PIDFILE=/var/run/iscsid.pid
+
+[ -x "$DAEMON" ] || exit 0
+
+if [ ! -d /sys/class/ ]; then
+  echo "Failure:" "iSCSI requires a mounted sysfs, not started."
+  exit 1
+fi
+
+nodestartup_re='s/^node\.conn\[0]\.startup[ 	]*=[ 	]*//p'
+
+RETVAL=0
+
+start() {
+	echo "Starting iSCSI initiator service" "iscsid"
+	modprobe -q iscsi_tcp 2>/dev/null || :
+	modprobe -q ib_iser 2>/dev/null || :
+	if [ ! -f /etc/iscsi/initiatorname.iscsi ]; then
+		INITIATORNAME=$(iscsi-iname)
+		cat >/etc/iscsi/initiatorname.iscsi <<EOF
+## DO NOT EDIT OR REMOVE THIS FILE!
+## If you remove this file, the iSCSI daemon will not start.
+## If you change the InitiatorName, existing access control lists
+## may reject this initiator.  The InitiatorName must be unique
+## for each iSCSI initiator.  Do NOT duplicate iSCSI InitiatorNames.
+InitiatorName=$INITIATORNAME
+EOF
+	fi
+	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON
+	RETVAL=$?
+	starttargets
+}
+
+starttargets() {
+	echo "Setting up iSCSI targets"
+	$ADM -m node --loginall=automatic
+}
+
+stoptargets() {
+	echo "Disconnecting iSCSI targets"
+	sync
+	$ADM -m node --logoutall=all
+	RETVAL=$?
+	#if RETVAL is 21, means no active sessions, consider ok
+	if [ "$RETVAL" = "21" ]; then
+		RETVAL=0
+	fi
+}
+
+stop() {
+	stoptargets
+	if [ $RETVAL -ne 0 ]; then
+		echo "Failure:" "Could not stop all targets, try again later"
+		return $RETVAL
+	fi
+
+	echo "Stopping iSCSI initiator service"
+	start-stop-daemon --stop --quiet --pidfile $PIDFILE --exec $DAEMON
+	rm -f $PIDFILE
+	status=0
+	modprobe -r ib_iser 2>/dev/null
+	if [ "$?" -ne "0" -a "$?" -ne "1" ]; then
+		status=1
+	fi
+	modprobe -r iscsi_tcp 2>/dev/null
+	if [ "$?" -ne "0" -a "$?" -ne "1" ]; then
+		status=1
+	fi
+}
+
+restart() {
+	stop
+	if [ $RETVAL -ne 0 ]; then
+		echo "Failure:" "Stopping iSCSI initiator service failed, not starting"
+		return $RETVAL
+	fi
+	start
+}
+
+restarttargets() {
+	stoptargets
+	if [ $RETVAL -ne 0 ]; then
+		echo "Failure:" "Could not stop all targets, try again later"
+		return $RETVAL
+	fi
+	starttargets
+}
+
+status() {
+	#XXX FIXME: what to do here?
+	#status iscsid
+	# list active sessions
+	echo Current active iSCSI sessions:
+	$ADM -m session
+}
+
+case "$1" in
+	start|starttargets|stop|stoptargets|restart|restarttargets|status)
+		$1
+		;;
+	*)
+		echo "Usage: $0 {start|stop|restart|status}"
+		exit 1
+		;;
+esac
+exit $RETVAL

@@ -1,0 +1,47 @@
+Disable building manpages so that make install doesn't fail due to lack of help2man
+
+Upstream-Status: Inappropriate [config]
+
+Signed-off-by: Matthieu Crapet <Matthieu.Crapet@ingenico.com>
+---
+ configure.ac    | 3 ---
+ doc/Makefile.am | 5 -----
+ 2 files changed, 8 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index ee7eca0..1f0d924 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -134,9 +134,6 @@ dnl check that the required tools are available to generate documentation
+ if test "$HAS_MAKEINFO" != "yes" ; then
+ 	AC_MSG_ERROR([Please install makeinfo before installing])
+ fi
+-if test "$HAS_HELP2MAN" != "yes" ; then
+-	AC_MSG_ERROR([Please install help2man])
+-fi
+ 
+ dnl Checking for log10 function in math - I would like to remove this
+ AC_CHECK_LIB(m, log10)
+diff --git a/doc/Makefile.am b/doc/Makefile.am
+index 60662f6..0ae0013 100644
+--- a/doc/Makefile.am
++++ b/doc/Makefile.am
+@@ -1,15 +1,10 @@
+ info_TEXINFOS = cgdb.texi
+ cgdb_TEXINFOS = gpl.texi
+ 
+-dist_man_MANS = cgdb.1
+ EXTRA_DIST = cgdb.txt
+ 
+ dist_pkgdata_DATA = cgdb.txt
+ 
+-# generate the man page using help2man.
+-cgdb.1:
+-	help2man --output=$(top_srcdir)/doc/cgdb.1 $(top_builddir)/cgdb/cgdb$(EXEEXT)
+-
+ cgdb.txt: cgdb.texi $(srcdir)/version.texi $(cgdb_TEXINFOS)
+ TEXTS = cgdb.txt
+ text-am: $(TEXTS)
+-- 
+1.9.1
+

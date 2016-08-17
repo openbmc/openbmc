@@ -1,0 +1,38 @@
+Use proper method to include freetype headers
+
+FreeType wants to use these special macros to include its APIs
+so be it.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+
+Index: libgnomeprint-2.18.7/libgnomeprint/gnome-font-face.c
+===================================================================
+--- libgnomeprint-2.18.7.orig/libgnomeprint/gnome-font-face.c
++++ libgnomeprint-2.18.7/libgnomeprint/gnome-font-face.c
+@@ -36,7 +36,9 @@
+ #include <stdarg.h>
+ #include <locale.h>
+ 
+-#include <freetype/ftoutln.h>
++#include <ft2build.h>
++#include FT_FREETYPE_H
++
+ 
+ #include <libgnomeprint/gnome-print-private.h>
+ #include <libgnomeprint/gnome-font-private.h>
+Index: libgnomeprint-2.18.7/libgnomeprint/gnome-rfont.c
+===================================================================
+--- libgnomeprint-2.18.7.orig/libgnomeprint/gnome-rfont.c
++++ libgnomeprint-2.18.7/libgnomeprint/gnome-rfont.c
+@@ -28,8 +28,8 @@
+ 
+ #include <ft2build.h>
+ #include FT_FREETYPE_H
+-#include <freetype/ftglyph.h>
+-#include <freetype/ftbbox.h>
++#include FT_GLYPH_H
++#include FT_BBOX_H
+ #include <libart_lgpl/art_misc.h>
+ #include <libart_lgpl/art_affine.h>
+ #include <libart_lgpl/art_vpath.h>

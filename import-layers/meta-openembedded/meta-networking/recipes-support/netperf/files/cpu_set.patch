@@ -1,0 +1,30 @@
+Subject: [PATCH] netperf: fix CPU_SETSIZE to build with eglibc
+
+Upstream-Status: Pending
+
+Signed-off-by: Xin Ouyang <Xin.Ouyang@windriver.com>
+---
+ src/netlib.c |    7 ++++++-
+ 1 files changed, 6 insertions(+), 1 deletions(-)
+
+diff --git a/src/netlib.c b/src/netlib.c
+index 206e002..e33aae6 100644
+--- a/src/netlib.c
++++ b/src/netlib.c
+@@ -2265,7 +2265,12 @@ bind_to_specific_processor(int processor_affinity, int use_cpu_map)
+      fall-back on what we had before, which is to use just the size of
+      an unsigned long. raj 2006-09-14 */
+ 
+-#if defined(__CPU_SETSIZE)
++#if defined(CPU_SETSIZE)
++#define NETPERF_CPU_SETSIZE CPU_SETSIZE
++#define NETPERF_CPU_SET(cpu, cpusetp)  CPU_SET(cpu, cpusetp)
++#define NETPERF_CPU_ZERO(cpusetp)      CPU_ZERO (cpusetp)
++  typedef cpu_set_t netperf_cpu_set_t;
++#elif defined(__CPU_SETSIZE)
+ #define NETPERF_CPU_SETSIZE __CPU_SETSIZE
+ #if defined(__CPU_SET_S)
+ #define NETPERF_CPU_SET(cpu, cpusetp)  __CPU_SET_S(cpu, sizeof (cpu_set_t), cpusetp)
+-- 
+1.7.1.1
+

@@ -1,0 +1,62 @@
+#! /bin/sh
+#
+# This is an init script for openembedded
+# Copy it to /etc/init.d/syslog-ng and type
+# > update-rc.d syslog-ng defaults 5
+#
+
+# Source function library
+. /etc/init.d/functions
+
+syslog_ng=/usr/sbin/syslog-ng
+test -x "$syslog_ng" || exit 0
+
+PIDFILE=/var/run/syslog-ng/syslog-ng.pid
+
+create_xconsole() {
+  test -e /dev/xconsole || mknod -m 640 /dev/xconsole p
+  test -x /sbin/restorecon && /sbin/restorecon /dev/xconsole
+}
+
+RETVAL=0
+
+case "$1" in
+  start)
+    [ "${VERBOSE}" != "no" ] && echo -n "Starting syslog-ng:"
+    create_xconsole
+    start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $syslog_ng
+    [ "${VERBOSE}" != "no" ] && echo "."
+    ;;
+  stop)
+    [ "${VERBOSE}" != "no" ] && echo -n "Stopping syslog-ng:"
+    start-stop-daemon --stop --quiet --pidfile $PIDFILE
+    [ "${VERBOSE}" != "no" ] && echo "."
+    ;;
+  reload|force-reload)
+    start-stop-daemon --stop --quiet --signal 1 --exec $syslog_ng
+    ;;
+  restart)
+    echo "Stopping syslog-ng:"
+    start-stop-daemon --stop --quiet --pidfile $PIDFILE
+    echo -n "Waiting for syslog-ng to die off"
+    for i in 1 2 3 ;
+    do
+        sleep 1
+        echo -n "."
+    done
+    echo ""
+    echo -n "Starting syslog-ng:"
+    create_xconsole
+    start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $syslog_ng
+    echo "."
+    ;;
+  status)
+    status $syslog_ng
+    RETVAL=$?
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|reload|restart|force-reload|status}"
+    exit 1
+esac
+
+exit $RETVAL

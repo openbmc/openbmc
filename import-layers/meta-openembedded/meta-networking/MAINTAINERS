@@ -1,0 +1,38 @@
+This file contains a list of maintainers for the meta-networking layer.
+
+Please submit any patches against meta-networking to the OpenEmbedded
+development mailing list (openembedded-devel@lists.openembedded.org) with
+'[meta-networking][krogoth]' in the subject.
+
+When sending single patches, please use something like:
+
+   git send-email -1 -M \
+        --to openembedded-devel@lists.openembedded.org \
+        --subject-prefix=meta-networking][krogoth][PATCH
+
+krogoth Branch Maintainer:
+Armin Kuster <akuster808@gmail.com>
+
+You may also contact the maintainers directly.
+
+Descriptions of section entries:
+
+        M: Mail patches to: FullName <address@domain>
+        F: Files and directories with wildcard patterns.
+           A trailing slash includes all files and subdirectory files.
+           F: recipes-devtools/    all files in and below recipes-devtools
+           F: recipes-selinux/*    all files in recipes-selinux, but not below
+           One pattern per line.  Multiple F: lines acceptable.
+
+Please keep this list in alphabetical order.
+
+Maintainers List (try to look for most precise areas first)
+
+COMMON
+M:      Joe MacDonald <joe_macdonald@mentor.com>
+F:      conf
+F:      recipes-*
+
+NETKIT
+M:      Armin Kuster <akuster808@gmail.com>
+F:      recipes-netkit

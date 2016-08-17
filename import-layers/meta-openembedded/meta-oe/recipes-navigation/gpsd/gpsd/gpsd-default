@@ -1,0 +1,5 @@
+# If you must specify a non-NMEA driver, uncomment and modify the next line
+GPSD_SOCKET="/var/run/gpsd.sock"
+GPSD_OPTIONS="" 
+GPS_DEVICES=""
+

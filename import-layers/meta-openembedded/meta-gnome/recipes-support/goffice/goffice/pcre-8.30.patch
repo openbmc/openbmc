@@ -1,0 +1,19 @@
+Taken from http://trac.macports.org/ticket/34812
+
+Fixes abiword build failing with:
+/usr/lib/libgoffice-0.8.so: undefined reference to `pcre_info'
+
+Upstream-Status: pending
+
+http://www.linuxfromscratch.org/blfs/view/cvs/x/goffice.html
+--- a/goffice/utils/regutf8.c.orig	2009-09-05 18:52:09.000000000 -0500
++++ b/goffice/utils/regutf8.c	2012-06-09 18:04:29.000000000 -0500
+@@ -155,7 +155,7 @@
+ 		default: return GO_REG_BADPAT;
+ 		}
+ 	} else {
+-		gor->re_nsub = pcre_info (r, NULL, NULL);
++		gor->re_nsub = pcre_fullinfo (r, NULL, 0, NULL);
+ 		gor->nosub = (cflags & GO_REG_NOSUB) != 0;
+ 		return 0;
+ 	}

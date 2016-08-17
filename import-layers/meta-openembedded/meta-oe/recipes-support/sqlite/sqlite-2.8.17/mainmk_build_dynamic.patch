@@ -1,0 +1,32 @@
+diff -urN sqlite-2.8.17.orig/main.mk sqlite-2.8.17/main.mk
+--- sqlite-2.8.17.orig/main.mk	2005-04-23 22:43:23.000000000 +0000
++++ sqlite-2.8.17/main.mk	2009-04-02 20:10:36.000000000 +0000
+@@ -139,7 +139,7 @@
+ # This is the default Makefile target.  The objects listed here
+ # are what get build when you type just "make" with no arguments.
+ #
+-all:	sqlite.h config.h libsqlite.a sqlite$(EXE)
++all:   sqlite.h config.h libsqlite.so sqlite$(EXE)
+ 
+ # Generate the file "last_change" which contains the date of change
+ # of the most recently modified source code file
+@@ -148,13 +148,12 @@
+ 	cat $(SRC) | grep '$$Id: ' | sort +4 | tail -1 \
+           | awk '{print $$5,$$6}' >last_change
+ 
+-libsqlite.a:	$(LIBOBJ)
+-	$(AR) libsqlite.a $(LIBOBJ)
+-	$(RANLIB) libsqlite.a
+-
+-sqlite$(EXE):	$(TOP)/src/shell.c libsqlite.a sqlite.h
+-	$(TCCX) $(READLINE_FLAGS) -o sqlite$(EXE) $(TOP)/src/shell.c \
+-		libsqlite.a $(LIBREADLINE) $(THREADLIB)
++libsqlite.so:	$(LIBOBJ)
++	$(CC) $(LDFLAGS) -shared -o libsqlite.so -Wl,-soname,libsqlite.so.0 $(LIBOBJ)
++
++sqlite$(EXE):	$(TOP)/src/shell.c libsqlite.so sqlite.h
++	$(TCCX) $(LDFLAGS) $(READLINE_FLAGS) -o sqlite$(EXE) $(TOP)/src/shell.c \
++		-lsqlite $(LIBREADLINE) $(THREADLIB)
+ 
+ sqlite_analyzer$(EXE):	$(TOP)/src/tclsqlite.c libsqlite.a $(TESTSRC) \
+ 			$(TOP)/tool/spaceanal.tcl

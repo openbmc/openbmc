@@ -1,0 +1,108 @@
+From c2782a6ca968190e221c25b0890600ba8cd43798 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 23 Oct 2015 00:23:15 -0700
+Subject: [PATCH] libsinsp: Port to build with lua >= 5.2
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ userspace/libsinsp/chisel.cpp | 40 +++++++++++++++++++++++++++++-----------
+ 1 file changed, 29 insertions(+), 11 deletions(-)
+
+diff --git a/userspace/libsinsp/chisel.cpp b/userspace/libsinsp/chisel.cpp
+index 3cfbd8d..2db9348 100644
+--- a/userspace/libsinsp/chisel.cpp
++++ b/userspace/libsinsp/chisel.cpp
+@@ -94,7 +94,7 @@ void lua_stackdump(lua_State *L)
+ // Lua callbacks
+ ///////////////////////////////////////////////////////////////////////////////
+ #ifdef HAS_LUA_CHISELS
+-const static struct luaL_reg ll_sysdig [] = 
++const static struct luaL_Reg ll_sysdig [] =
+ {
+ 	{"set_filter", &lua_cbacks::set_global_filter},
+ 	{"set_snaplen", &lua_cbacks::set_snaplen},
+@@ -120,7 +120,7 @@ const static struct luaL_reg ll_sysdig [] =
+ 	{NULL,NULL}
+ };
+ 
+-const static struct luaL_reg ll_chisel [] = 
++const static struct luaL_Reg ll_chisel [] =
+ {
+ 	{"request_field", &lua_cbacks::request_field},
+ 	{"set_filter", &lua_cbacks::set_filter},
+@@ -131,7 +131,7 @@ const static struct luaL_reg ll_chisel [] =
+ 	{NULL,NULL}
+ };
+ 
+-const static struct luaL_reg ll_evt [] = 
++const static struct luaL_Reg ll_evt [] =
+ {
+ 	{"field", &lua_cbacks::field},
+ 	{"get_num", &lua_cbacks::get_num},
+@@ -853,10 +853,28 @@ bool sinsp_chisel::parse_view_info(lua_State *ls, OUT chisel_desc* cd)
+ 
+ 
+ #ifdef HAS_LUA_CHISELS
++static void chisel_lua_registerlib(lua_State *L, const char *libname,
++				const luaL_Reg *l, int ind)
++{
++#if LUA_VERSION_NUM >= 502
++	if (libname)
++	{
++		lua_newtable(L);
++		luaL_setfuncs(L, l, ind);
++		lua_pushvalue(L, -1);
++		lua_setglobal(L, libname);
++	}
++	else
++		luaL_setfuncs(L, l, ind);
++#else
++	luaL_register(L, libname, l);
++#endif
++}
++
+ // Initializes a lua chisel
+ bool sinsp_chisel::init_lua_chisel(chisel_desc &cd, string const &fpath)
+ {
+-	lua_State* ls = lua_open();
++	lua_State* ls = luaL_newstate();
+ 	if(ls == NULL)
+ 	{
+ 		return false;
+@@ -867,9 +885,9 @@ bool sinsp_chisel::init_lua_chisel(chisel_desc &cd, string const &fpath)
+ 	//
+ 	// Load our own lua libs
+ 	//
+-	luaL_openlib(ls, "sysdig", ll_sysdig, 0);
+-	luaL_openlib(ls, "chisel", ll_chisel, 0);
+-	luaL_openlib(ls, "evt", ll_evt, 0);
++	chisel_lua_registerlib(ls, "sysdig", ll_sysdig, 0);
++	chisel_lua_registerlib(ls, "chisel", ll_chisel, 0);
++	chisel_lua_registerlib(ls, "evt", ll_evt, 0);
+ 
+ 	//
+ 	// Add our chisel paths to package.path
+@@ -1111,16 +1129,16 @@ void sinsp_chisel::load(string cmdstr)
+ 	//
+ 	// Open the script
+ 	//
+-	m_ls = lua_open();
++	m_ls = luaL_newstate();
+  
+ 	luaL_openlibs(m_ls);
+ 
+ 	//
+ 	// Load our own lua libs
+ 	//
+-	luaL_openlib(m_ls, "sysdig", ll_sysdig, 0);
+-	luaL_openlib(m_ls, "chisel", ll_chisel, 0);
+-	luaL_openlib(m_ls, "evt", ll_evt, 0);
++	chisel_lua_registerlib(m_ls, "sysdig", ll_sysdig, 0);
++	chisel_lua_registerlib(m_ls, "chisel", ll_chisel, 0);
++	chisel_lua_registerlib(m_ls, "evt", ll_evt, 0);
+ 
+ 	//
+ 	// Add our chisel paths to package.path
+-- 
+2.6.2
+

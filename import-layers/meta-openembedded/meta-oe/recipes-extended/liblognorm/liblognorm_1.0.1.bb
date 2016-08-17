@@ -1,0 +1,5 @@
+require ${BPN}.inc
+
+SRC_URI[md5sum] = "7b9a826542af9686127110deab09d7a1"
+SRC_URI[sha256sum] = "1f6cdfd901a8f6a97a3cb74bc6107c6746b3e9381f7889e4cd866a488e0c59a5"
+LIC_FILES_CHKSUM = "file://COPYING;md5=ca016db57e008528dace002188c73dad"

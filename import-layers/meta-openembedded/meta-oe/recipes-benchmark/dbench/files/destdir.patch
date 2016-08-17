@@ -1,0 +1,28 @@
+Append $(DESTDIR) to all $(bindir), $(datadir) and $(mandir). Got 
+this patch from OE commit id 709c4d66e0b107ca606941b988bad717c0b45d9b
+
+Upstream-Status: Inappropriate [not author]
+
+Index: dbench-3.04/Makefile.in
+===================================================================
+--- dbench-3.04.orig/Makefile.in	2006-09-17 20:21:07.000000000 +0200
++++ dbench-3.04/Makefile.in	2006-09-17 20:21:36.000000000 +0200
+@@ -32,12 +32,12 @@
+ 
+ # Careful here: don't install client.txt over itself.
+ install: all
+-	${INSTALLCMD} -d $(bindir) $(datadir) $(mandir)
+-	${INSTALLCMD} dbench tbench tbench_srv $(bindir)
+-	${INSTALLCMD} client.txt $(datadir)
+-	${INSTALLCMD} -m644 dbench.1 $(mandir)
+-	ln -sf dbench.1 $(mandir)/tbench.1
+-	ln -sf dbench.1 $(mandir)/tbench_srv.1
++	${INSTALLCMD} -d $(DESTDIR)$(bindir) $(DESTDIR)$(datadir) $(DESTDIR)$(mandir)
++	${INSTALLCMD} dbench tbench tbench_srv $(DESTDIR)$(bindir)
++	${INSTALLCMD} @top_srcdir@/client.txt $(DESTDIR)$(datadir)
++	${INSTALLCMD} -m644 @top_srcdir@/dbench.1 $(DESTDIR)$(mandir)
++	ln -sf dbench.1 $(DESTDIR)$(mandir)/tbench.1
++	ln -sf dbench.1 $(DESTDIR)$(mandir)/tbench_srv.1
+ 
+ clean:
+ 	rm -f *.o *~ dbench tbench tbench_srv

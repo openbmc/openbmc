@@ -1,0 +1,59 @@
+From 71956de46feef962dc0645af4c81ae074ca3b818 Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@cn.fujitsu.com>
+Date: Wed, 19 Aug 2015 13:52:57 +0900
+Subject: [PATCH] configure.in: Error fix.
+
+the error is: conftest.c:9:28: fatal error: ac_nonexistent.h:
+No such file or directory #include <ac_nonexistent.h>
+
+Upstream-Status: pending
+
+Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
+---
+ src/configure.in | 30 ------------------------------
+ 1 file changed, 30 deletions(-)
+
+diff --git a/src/configure.in b/src/configure.in
+index 0b23df5..31c7fbc 100644
+--- a/src/configure.in
++++ b/src/configure.in
+@@ -193,36 +193,6 @@ if test "$GCC" = yes; then
+ 	CFLAGS="$CFLAGS -fno-strict-aliasing -Wall -Wstrict-prototypes"
+ fi
+ 
+-dnl Figure out packing order of structures
+-AC_CACHE_CHECK([packing order of bit fields],rpppoe_cv_pack_bitfields,[
+-if test "${rpppoe_cv_pack_bitfields+set}" != set ; then
+-AC_TRY_RUN([
+-union foo {
+-    struct bar {
+-	unsigned int ver:4;
+-	unsigned int type:4;
+-    } bb;
+-    unsigned char baz;
+-};
+-
+-int
+-main(void)
+-{
+-    union foo x;
+-    x.bb.ver = 1;
+-    x.bb.type = 2;
+-    if (x.baz == 0x21) {
+-	return 1;
+-    } else if (x.baz == 0x12) {
+-	return 0;
+-    } else {
+-	return 2;
+-    }
+-}], rpppoe_cv_pack_bitfields=normal, rpppoe_cv_pack_bitfields=rev,
+-$ECHO "no defaults for cross-compiling"; exit 1)
+-fi
+-])
+-
+ if test "$rpppoe_cv_pack_bitfields" = "rev" ; then
+ 	AC_MSG_RESULT(reversed)
+ 	AC_DEFINE([PACK_BITFIELDS_REVERSED], [], [Reversed bitfields])
+-- 
+1.8.4.2
+

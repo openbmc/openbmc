@@ -1,0 +1,29 @@
+From 17e5a28667f667859c48bee25e575a072d39ee1b Mon Sep 17 00:00:00 2001
+Message-Id: <17e5a28667f667859c48bee25e575a072d39ee1b.1381956170.git.Jim.Somerville@windriver.com>
+From: Jim Somerville <Jim.Somerville@windriver.com>
+Date: Wed, 16 Oct 2013 16:41:03 -0400
+Subject: [PATCH 1/1] Set up for cross compilation
+
+Set the host compiler to BUILD_CXX so
+proper cross compilation can occur.
+
+Signed-off-by: Jim Somerville <Jim.Somerville@windriver.com>
+---
+ configure.ac |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index c2d3033..dda9ed9 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -19,6 +19,7 @@ m4_include([acinclude/lib-checks.m4])
+ m4_include([acinclude/ax_cxx_compile_stdcxx_0x.m4])
+ m4_include([acinclude/ax_cxx_0x_types.m4])
+ 
++HOSTCXX="$BUILD_CXX"
+ PRESET_CFLAGS="$CFLAGS"
+ PRESET_CXXFLAGS="$CXXFLAGS"
+ PRESET_LDFLAGS="$LDFLAGS"
+-- 
+1.7.4.1
+

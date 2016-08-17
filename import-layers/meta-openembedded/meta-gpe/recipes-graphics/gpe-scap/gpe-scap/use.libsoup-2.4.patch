@@ -1,0 +1,42 @@
+diff -uNr gpe-scap-1.4.orig/configure.ac gpe-scap-1.4/configure.ac
+--- gpe-scap-1.4.orig/configure.ac	2009-03-05 18:53:53.000000000 +0100
++++ gpe-scap-1.4/configure.ac	2012-05-06 10:18:29.348308322 +0200
+@@ -24,7 +24,7 @@
+ AC_SUBST(LDFLAGS)
+ 
+ dnl libraries
+-GTK_MODULES="gtk+-2.0 >= 2.6.0 gthread-2.0 libsoup-2.2"
++GTK_MODULES="gtk+-2.0 >= 2.6.0 gthread-2.0 libsoup-2.4"
+ PKG_CHECK_MODULES(GTK, $GTK_MODULES)
+ AC_SUBST(GTK_CFLAGS)
+ AC_SUBST(GTK_LIBS)
+diff -uNr gpe-scap-1.4.orig/src/scr-shot-common.c gpe-scap-1.4/src/scr-shot-common.c
+--- gpe-scap-1.4.orig/src/scr-shot-common.c	2009-03-05 12:13:20.000000000 +0100
++++ gpe-scap-1.4/src/scr-shot-common.c	2012-05-06 10:30:52.299371576 +0200
+@@ -182,12 +182,12 @@
+   /* create session and message */
+   session = soup_session_sync_new ();
+   message = soup_message_new ("POST", url);
+-  soup_message_add_header (message->request_headers, "User-Agent", "gpe-scap/" VERSION);
+-  soup_message_add_header (message->request_headers, "Accept",
++  soup_message_headers_append (message->request_headers, "User-Agent", "gpe-scap/" VERSION);
++  soup_message_headers_append (message->request_headers, "Accept",
+ 			   "text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5");
+-/*  soup_message_add_header (message->request_headers, "Accept-Charset", "Accept-Charset=ISO-8859-1,utf-8;q=0.7,*;q=0.7");
+-  soup_message_add_header (message->request_headers, "Keep-Alive", "100");
+-  soup_message_add_header (message->request_headers, "Connection", "keep-alive");
++/*  soup_message_headers_append (message->request_headers, "Accept-Charset", "Accept-Charset=ISO-8859-1,utf-8;q=0.7,*;q=0.7");
++  soup_message_headers_append (message->request_headers, "Keep-Alive", "100");
++  soup_message_headers_append (message->request_headers, "Connection", "keep-alive");
+   soup_message_wire	add_header (message->request_headers, "Accept-Encoding", "gzip,deflate");
+ */
+   /* build message body */
+@@ -207,7 +207,7 @@
+   memcpy (body + strlen (cmd) + len, tail, strlen (tail));
+ 
+   soup_message_set_request (message, "multipart/form-data; boundary="SEP,
+-                            SOUP_BUFFER_SYSTEM_OWNED, body, content_len);
++                            SOUP_MEMORY_TAKE, body, content_len);
+ 
+   soup_session_send_message (session, message);
+ 

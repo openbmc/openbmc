@@ -1,0 +1,31 @@
+From 253eafc8c8da83fc2b1a99a9e43824efc6105c7a Mon Sep 17 00:00:00 2001
+From: Manuel Bachmann <manuel.bachmann@iot.bzh>
+Date: Sun, 4 Oct 2015 10:44:49 +0200
+Subject: [PATCH] winpr-makecert: Build with install RPATH
+
+As we are installing "winpr-makecert" manually, we do want
+to refer to the library in DESTDIR, not the one resting in
+the build tree.
+
+Signed-off-by: Manuel Bachmann <manuel.bachmann@iot.bzh>
+---
+ winpr/tools/makecert/cli/CMakeLists.txt | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/winpr/tools/makecert/cli/CMakeLists.txt b/winpr/tools/makecert/cli/CMakeLists.txt
+index 17954c4..90c446b 100644
+--- a/winpr/tools/makecert/cli/CMakeLists.txt
++++ b/winpr/tools/makecert/cli/CMakeLists.txt
+@@ -45,5 +45,9 @@ set(${MODULE_PREFIX}_LIBS winpr-makecert-tool)
+ 
+ target_link_libraries(${MODULE_NAME} ${${MODULE_PREFIX}_LIBS})
+ 
++set_target_properties(${MODULE_NAME} PROPERTIES 
++	BUILD_WITH_INSTALL_RPATH 1)
++
+ set_property(TARGET ${MODULE_NAME} PROPERTY FOLDER "WinPR/Tools")
+ 
++
+-- 
+1.8.3.1
+

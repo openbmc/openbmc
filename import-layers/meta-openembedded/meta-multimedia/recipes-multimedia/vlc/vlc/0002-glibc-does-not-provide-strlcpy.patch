@@ -1,0 +1,17 @@
+Index: vlc-2.1.2/src/input/subtitles.c
+===================================================================
+--- vlc-2.1.2.orig/src/input/subtitles.c
++++ vlc-2.1.2/src/input/subtitles.c
+@@ -44,6 +44,12 @@
+ #include "input_internal.h"
+ 
+ /**
++ * Drepper's alternative 
++ * http://en.wikibooks.org/wiki/C_Programming/C_Reference/nonstandard/strlcpy
++ */
++#define strlcpy(dst, src, n) *((char* ) mempcpy(dst, src, n)) = '\0'
++
++/**
+  * We are not going to autodetect more subtitle files than this.
+  */
+ #define MAX_SUBTITLE_FILES 128

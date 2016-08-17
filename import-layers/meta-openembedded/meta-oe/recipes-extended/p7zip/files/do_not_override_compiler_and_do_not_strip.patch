@@ -1,0 +1,31 @@
+do not override compiler and do not strip
+
+The default makefile sets the compiler to g++ or gcc. This leads to a wrong architecture when cross-compiling.
+Remove the hardcoded compiler and just append the flags to CXX and CC.
+
+Upstream-Status: Pending
+Signed-off-by: Raphael Freudiger <raphael.freudiger@siemens.com>
+Reviewed-By: Pascal Bach <pascal.bach@siemens.com>
+
+Index: p7zip_9.20.1/makefile.machine
+=====================================================================
+--- p7zip_9.20.1/makefile.machine	2011-03-13 12:54:57.000000000 +0100
++++ p7zip_9.20.1/makefile.machine	2015-02-03 08:39:44.427696944 +0100
+@@ -4,14 +4,14 @@
+ 
+ OPTFLAGS=-O
+ 
+-ALLFLAGS=${OPTFLAGS} -pipe -s \
++ALLFLAGS=${OPTFLAGS} -pipe \
+     	-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE \
+ 	-DNDEBUG -D_REENTRANT -DENV_UNIX \
+ 	-D_7ZIP_LARGE_PAGES \
+ 	$(LOCAL_FLAGS)
+ 
+-CXX=g++ $(ALLFLAGS)
+-CC=gcc $(ALLFLAGS)
++CXX+=$(ALLFLAGS)
++CC+=$(ALLFLAGS)
+ CC_SHARED=-fPIC
+ LINK_SHARED=-fPIC -shared
+ 

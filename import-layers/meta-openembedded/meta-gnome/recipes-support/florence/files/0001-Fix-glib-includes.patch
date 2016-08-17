@@ -1,0 +1,33 @@
+From c8419ef05ff92ffa3de2e626eb6acd5d2df3baa1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Tue, 15 May 2012 13:40:05 +0200
+Subject: [PATCH] Fix glib includes
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Upstream-Status: unknown
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ src/trace.c |    5 +----
+ 1 files changed, 1 insertions(+), 4 deletions(-)
+
+diff --git a/src/trace.c b/src/trace.c
+index 5ea5c13..774c56d 100644
+--- a/src/trace.c
++++ b/src/trace.c
+@@ -21,10 +21,7 @@
+ 
+ #include "trace.h"
+ #include "system.h"
+-#include <glib/gprintf.h>
+-#include <glib/gutils.h>
+-#include <glib/gslist.h>
+-#include <glib/gstrfuncs.h>
++#include <glib.h>
+ #include <stdio.h>
+ #include <stdarg.h>
+ 
+-- 
+1.7.6.5
+

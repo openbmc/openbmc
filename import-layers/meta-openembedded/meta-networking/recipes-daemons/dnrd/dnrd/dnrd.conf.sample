@@ -1,0 +1,21 @@
+# options to dnrd
+
+# example: two default dns servers and dns servers for exampledomain.com. The
+# latter are load balanced (-b)
+#
+#
+
+# DNRD_OPTS="
+# -s XXX.XXX.XX.XXX
+# -s XXX.XXX.XX.XXX
+# -b
+# -s XXX.XXX.XX.XXX:exampledomain.com
+# -s XXX.XXX.XX.XXX:exampledomain.com"
+
+# example: dnrd user
+#
+
+# DNRD_USER="user"
+#
+
+

@@ -1,0 +1,54 @@
+From 37737527725e465833be649101c4a6f8352c5d5e Mon Sep 17 00:00:00 2001
+From: Tyler Hall <tylerwhall@gmail.com>
+Date: Tue, 7 Feb 2012 18:50:05 -0500
+Subject: Fix out-of-tree build
+
+Use automatic variables for prerequisites when copying man pages and
+include a makefile relative to $(srcdir).
+
+Backported to 2.0.2-klibc
+
+Signed-off-by: Tyler Hall <tylerwhall@gmail.com>
+Signed-off-by: Simon Horman <horms@verge.net.au>
+
+diff --git a/kdump/Makefile b/kdump/Makefile
+index 1e2b72c..5dfa928 100644
+--- a/kdump/Makefile
++++ b/kdump/Makefile
+@@ -22,7 +22,7 @@ $(KDUMP): $(KDUMP_OBJS)
+ 
+ $(KDUMP_MANPAGE): kdump/kdump.8
+ 	$(MKDIR) -p     $(MANDIR)/man8
+-	cp kdump/kdump.8 $(KDUMP_MANPAGE)
++	cp $^ $(KDUMP_MANPAGE)
+ echo::
+ 	@echo "KDUMP_SRCS $(KDUMP_SRCS)"
+ 	@echo "KDUMP_DEPS $(KDUMP_DEPS)"
+diff --git a/kexec/Makefile b/kexec/Makefile
+index 2137cab..8c815b5 100644
+--- a/kexec/Makefile
++++ b/kexec/Makefile
+@@ -82,7 +82,7 @@ $(KEXEC): CPPFLAGS+=-I$(srcdir)/kexec/arch/$(ARCH)/include
+ 
+ $(KEXEC_MANPAGE): kexec/kexec.8
+ 	@$(MKDIR) -p     $(MANDIR)/man8
+-	cp kexec/kexec.8 $(KEXEC_MANPAGE)
++	cp $^ $(KEXEC_MANPAGE)
+ echo::
+ 	@echo "KEXEC_SRCS $(KEXEC_SRCS)"
+ 	@echo "KEXEC_DEPS $(KEXEC_DEPS)"
+diff --git a/kexec/arch/ppc/Makefile b/kexec/arch/ppc/Makefile
+index 3dba7cf..41242a5 100644
+--- a/kexec/arch/ppc/Makefile
++++ b/kexec/arch/ppc/Makefile
+@@ -1,7 +1,7 @@
+ #
+ # kexec ppc (linux booting linux)
+ #
+-include kexec/arch/ppc/libfdt/Makefile.libfdt
++include $(srcdir)/kexec/arch/ppc/libfdt/Makefile.libfdt
+ 
+ ppc_KEXEC_SRCS =  kexec/arch/ppc/kexec-ppc.c
+ ppc_KEXEC_SRCS += kexec/arch/ppc/kexec-elf-ppc.c
+
+

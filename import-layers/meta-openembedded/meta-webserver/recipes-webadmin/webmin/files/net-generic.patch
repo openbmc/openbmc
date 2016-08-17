@@ -1,0 +1,21 @@
+# Add support for configuring network interfaces on a generic linux system
+#
+# Upstream-status: Not appropriate [config]
+#
+# Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+--- webmin-1.570.orig/net/module.info
++++ webmin-1.570/net/module.info
+@@ -11,7 +11,7 @@ desc_ko_KR.UTF-8=ë„¤íŠ¸ì›Œí¬ êµ¬ì„±
+ name=Networking
+ desc_tr=Ağ Yapılandırması
+ desc_de=Netzwerkkonfiguration
+-os_support=solaris coherent-linux redhat-linux/5.0-* mandrake-linux united-linux suse-linux/6.0-* open-linux unixware turbo-linux/4.0 freebsd/3.2-* openbsd debian-linux/2.2-* cobalt-linux/2.2-* msc-linux gentoo-linux macos/1.5-* trustix-linux slackware-linux/8.0-* openmamba-linux cygwin windows pardus-linux
++os_support=generic-linux solaris coherent-linux redhat-linux/5.0-* mandrake-linux united-linux suse-linux/6.0-* open-linux unixware turbo-linux/4.0 freebsd/3.2-* openbsd debian-linux/2.2-* cobalt-linux/2.2-* msc-linux gentoo-linux macos/1.5-* trustix-linux slackware-linux/8.0-* openmamba-linux cygwin windows pardus-linux
+ desc_sk=Konfigurácia siete
+ desc_zh_CN=ÍøÂçÅäÖÃ
+ risk=low medium high
+--- /dev/null
++++ webmin-1.570/net/generic-linux-lib.pl
+@@ -0,0 +1,2 @@
++do 'linux-lib.pl';
++

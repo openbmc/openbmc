@@ -1,0 +1,19 @@
+# Begin /etc/pam.d/slim
+
+auth       required     pam_shells.so
+auth       include      common-auth
+auth       optional     pam_securetty.so
+auth       optional     pam_gnome_keyring.so
+
+account    required     pam_nologin.so
+account    include      common-account
+
+password   include      common-password
+
+session    include      common-session
+session    required     pam_mkhomedir.so skel=/etc/skel/ umask=0022
+session    optional     pam_lastlog.so nowtmp
+session    optional     pam_mail.so dir=/var/mail standard
+session    optional     pam_gnome_keyring.so  auto_start
+
+# End /etc/pam.d/slim

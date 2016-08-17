@@ -1,0 +1,89 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          gdm
+# Should-Start:      console-screen acpid dbus hal network-manager
+# Required-Start:    $local_fs $remote_fs
+# Required-Stop:     $local_fs $remote_fs
+# Default-Start:     5
+# Default-Stop:      0 1 2 3 6
+# Short-Description: GNOME Display Manager
+# Description:       Debian init script for the GNOME Display Manager
+### END INIT INFO
+#
+# Author:       Ryan Murray <rmurray@debian.org>
+#
+set -e
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/usr/sbin/gdm
+
+test -x $DAEMON || exit 0
+
+if [ -r /etc/default/locale ]; then
+  . /etc/default/locale
+  export LANG LANGUAGE
+fi
+
+# To start gdm even if it is not the default display manager, change
+# HEED_DEFAULT_DISPLAY_MANAGER to "false."
+HEED_DEFAULT_DISPLAY_MANAGER=true
+DEFAULT_DISPLAY_MANAGER_FILE=/etc/X11/default-display-manager
+
+case "$1" in
+  start)
+	# make needed directories in volatile
+
+	if [ -e /var/log/gdm ] ; then 
+		rm -rf /var/log/gdm
+	fi
+
+	mkdir -m 01770 /var/log/gdm
+	chown gdm:gdm /var/log/gdm
+
+	if [ -e /tmp/.ICE-unix ] ; then 
+		rm -rf /tmp/.ICE-unix
+	fi
+
+	mkdir -m 01777 /tmp/.ICE-unix
+	chown root:root /tmp/.ICE-unix
+
+        CONFIGURED_DAEMON=$(basename "$(cat $DEFAULT_DISPLAY_MANAGER_FILE 2> /dev/null)")
+        if grep -wqs text /proc/cmdline; then
+            echo "Not starting GNOME Display Manager (gdm); found 'text' in kernel commandline."
+        elif [ -e "$DEFAULT_DISPLAY_MANAGER_FILE" ] && \
+           [ "$HEED_DEFAULT_DISPLAY_MANAGER" = "true" ] && \
+           [ "$CONFIGURED_DAEMON" != gdm ] ; then
+                echo "Not starting GNOME Display Manager; it is not the default display manager"
+        else
+                echo "Starting GNOME Display Manager" "gdm"
+                start-stop-daemon --start -b --exec $DAEMON 
+        fi
+  ;;
+  stop)
+        echo "Stopping GNOME Display Manager" "gdm"
+        set +e
+        start-stop-daemon --stop --quiet --pidfile /var/run/gdm.pid \
+                --name gdm --retry 5
+        set -e
+  ;;
+  reload)
+        echo "Scheduling reload of GNOME Display Manager configuration" "gdm"
+        set +e
+        start-stop-daemon --stop --signal USR1 --quiet --pidfile \
+                /var/run/gdm.pid --name gdm
+        set -e
+  ;;
+  status)
+        status_of_proc -p "$PIDFILE" "$DAEMON" gdm && exit 0 || exit $?
+  ;;
+  restart|force-reload)
+        $0 stop
+        $0 start
+  ;;
+  *)
+        echo "Usage: /etc/init.d/gdm {start|stop|restart|reload|force-reload|status}"
+        exit 1
+  ;;
+esac
+
+exit 0

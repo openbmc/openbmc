@@ -1,0 +1,9 @@
+[Unit]
+Description=Vsftpd ftp daemon
+After=network.target
+
+[Service]
+ExecStart=@SBINDIR@/vsftpd
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,40 @@
+From a629b051f4e5462150c77b95574bbc7a33bc9666 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Mon, 31 Dec 2012 16:35:29 +0100
+Subject: [PATCH] configure.ac: hard code path to iceauth
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+workaround AC_PATH_PROG which was meant to find programs required at build-time
+not at run-time.
+
+Upstream-Status: Inappropriate [config]
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ configure.ac |    8 +-------
+ 1 files changed, 1 insertions(+), 7 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 3cf3510..505e744 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -111,13 +111,7 @@ XDT_FEATURE_DEBUG([xfsm_debug_default])
+ dnl Check for linker optimizations
+ XDT_FEATURE_LINKER_OPTS()
+ 
+-dnl Check for iceauth
+-AC_PATH_PROG([ICEAUTH], [iceauth])
+-if test x"$ICEAUTH" != x""; then
+-  AC_DEFINE_UNQUOTED([ICEAUTH_CMD], ["$ICEAUTH"], [path to iceauth])
+-else
+-  AC_MSG_ERROR([iceauth missing, please check your X11 installation])
+-fi
++AC_DEFINE_UNQUOTED([ICEAUTH_CMD], ["$bindir/iceauth"], [path to iceauth])
+ 
+ dnl Find a location for the session desktop file
+ AC_MSG_CHECKING([what xsession-prefix to use])
+-- 
+1.7.4.4
+

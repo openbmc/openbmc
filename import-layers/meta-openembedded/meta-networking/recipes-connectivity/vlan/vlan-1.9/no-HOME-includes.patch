@@ -1,0 +1,22 @@
+From: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Subject: vlan: do not include ${HOME}/linux/include dir
+
+~/linux/include dir may exist and so will be added to include path
+in front of sanitized kernel headers in OE chroot. Drop this include
+option.
+
+Upstream-Status: not-applicable
+
+Index: vlan/MakeInclude
+===================================================================
+--- vlan.orig/MakeInclude
++++ vlan/MakeInclude
+@@ -16,7 +16,7 @@ ifeq "${PLATFORM}" ""
+ endif
+ 
+ ## You may need to change this linux/include part.
+-CCFLAGS = -g -D_GNU_SOURCE -Wall -I${HOME}/linux/include
++CCFLAGS = -g -D_GNU_SOURCE -Wall
+ LDLIBS = # -lm #-lnsl # -lsocket
+ 
+ ARM_TC_BIN = ${HOME}/Intrinsyc/bin

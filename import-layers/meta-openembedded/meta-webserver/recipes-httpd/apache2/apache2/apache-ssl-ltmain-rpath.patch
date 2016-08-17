@@ -1,0 +1,84 @@
+ build/ltmain.sh | 32 +++++++++++++++++++++++++++-----
+ 1 file changed, 27 insertions(+), 5 deletions(-)
+
+diff --git a/build/ltmain.sh b/build/ltmain.sh
+index 5eca4ae..805b461 100644
+--- a/build/ltmain.sh
++++ b/build/ltmain.sh
+@@ -6944,7 +6944,7 @@ func_mode_link ()
+ 	dir=$func_resolve_sysroot_result
+ 	# We need an absolute path.
+ 	case $dir in
+-	[\\/]* | [A-Za-z]:[\\/]*) ;;
++	=* | [\\/]* | [A-Za-z]:[\\/]*) ;;
+ 	*)
+ 	  absdir=`cd "$dir" && pwd`
+ 	  test -z "$absdir" && \
+@@ -8137,7 +8137,7 @@ func_mode_link ()
+ 	    $ECHO "*** $linklib is not portable!"
+ 	  fi
+ 	  if test lib = "$linkmode" &&
+-	     test yes = "$hardcode_into_libs"; then
++	     test "x$wrs_use_rpaths" = "xyes" && test "$hardcode_into_libs" = yes; then
+ 	    # Hardcode the library path.
+ 	    # Skip directories that are in the system default run-time
+ 	    # search path.
+@@ -8404,7 +8404,7 @@ func_mode_link ()
+ 
+ 	if test lib = "$linkmode"; then
+ 	  if test -n "$dependency_libs" &&
+-	     { test yes != "$hardcode_into_libs" ||
++              { test yes != "$hardcode_into_libs" || test "x$wrs_use_rpaths" != "xyes" ||
+ 	       test yes = "$build_old_libs" ||
+ 	       test yes = "$link_static"; }; then
+ 	    # Extract -R from dependency_libs
+@@ -9025,7 +9025,8 @@ func_mode_link ()
+ 	  *) func_append finalize_rpath " $libdir" ;;
+ 	  esac
+ 	done
+-	if test yes != "$hardcode_into_libs" || test yes = "$build_old_libs"; then
++        if test yes != "$hardcode_into_libs"  || test "x$wrs_use_rpaths" != "xyes" ||
++           test yes = "$build_old_libs"; then
+ 	  dependency_libs="$temp_xrpath $dependency_libs"
+ 	fi
+       fi
+@@ -9473,7 +9474,7 @@ EOF
+ 	case $archive_cmds in
+ 	  *\$LD\ *) wl= ;;
+         esac
+-	if test yes = "$hardcode_into_libs"; then
++	if test yes = "$hardcode_into_libs" && test "x$wrs_use_rpaths" = "xyes"; then
+ 	  # Hardcode the library paths
+ 	  hardcode_libdirs=
+ 	  dep_rpath=
+@@ -10211,6 +10212,27 @@ EOF
+       # Now hardcode the library paths
+       rpath=
+       hardcode_libdirs=
++
++      # short circuit putting rpaths in executables
++      #
++      if test "x$wrs_use_rpaths" != "xyes" ; then
++        flag=
++        for libdir in $compile_rpath; do
++          case $(echo $libdir | ${SED} 's,/[/]*,/,g') in
++            /usr/lib/* | /usr/lib32/* | /usr/lib64/* ) flag="$flag $libdir" ;;
++          esac
++        done
++        compile_rpath="$flag"
++
++        flag=
++        for libdir in $finalize_rpath; do
++          case $(echo $libdir | ${SED} 's,/[/]*,/,g') in
++            /usr/lib/* | /usr/lib32/* | /usr/lib64/* ) flag="$flag $libdir" ;;
++          esac
++        done
++        finalize_rpath="$flag"
++      fi
++
+       for libdir in $compile_rpath $finalize_rpath; do
+ 	if test -n "$hardcode_libdir_flag_spec"; then
+ 	  if test -n "$hardcode_libdir_separator"; then
+-- 
+1.9.1
+

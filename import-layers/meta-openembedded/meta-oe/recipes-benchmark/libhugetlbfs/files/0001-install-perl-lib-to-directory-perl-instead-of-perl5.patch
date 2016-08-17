@@ -1,0 +1,39 @@
+Upstream-Status: Inappropriate [oe-core specific]
+
+libhugetlbfs depends on perl, and perl installs a directory 'perl'
+and make a symlink 'perl5' to it. So just install perl libs in
+libhugetlbfs to directory 'perl' instead of 'perl5'. This can avoid
+the following error:
+| CalledProcessError: Command 'tar -cf - -C .../perl/5.14.3-r1/sysroot-destdir
+| -ps . | tar -xf - -C .../tmp/sysroots/t4240qds'
+| returned non-zero exit status 2 with output
+| tar: ./usr/lib/perl5: Cannot create symlink to `perl': File exists
+| tar: Exiting with failure status due to previous errors
+
+
+Signed-off-by: Ting Liu <b28495@freescale.com>
+
+--- a/Makefileold	2013-10-11 23:07:31.759421318 -0500
++++ b/Makefile	2013-10-11 23:08:01.935571122 -0500
+@@ -173,17 +173,17 @@
+ DOCDIR = $(PREFIX)/share/doc/libhugetlbfs
+ 
+ ifdef CC32
+-PMDIR = $(PREFIX)/lib/perl5/TLBC
++PMDIR = $(PREFIX)/lib/perl/TLBC
+ endif
+ 
+ ifdef CC64
+ ifeq ($(ARCH),x86_64)
+-PMDIR = $(PREFIX)/lib/perl5/TLBC
++PMDIR = $(PREFIX)/lib/perl/TLBC
+ else
+ ifeq ($(ARCH),aarch64)
+-PMDIR = $(PREFIX)/lib/perl5/TLBC
++PMDIR = $(PREFIX)/lib/perl/TLBC
+ else
+-PMDIR = $(PREFIX)/lib64/perl5/TLBC
++PMDIR = $(PREFIX)/lib64/perl/TLBC
+ endif
+ endif
+ endif

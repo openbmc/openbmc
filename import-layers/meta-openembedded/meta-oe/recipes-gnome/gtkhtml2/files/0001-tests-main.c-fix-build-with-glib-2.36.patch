@@ -1,0 +1,32 @@
+From 4b17eed4b8588569d11ec4bd2b6fa3c063830e6e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Thu, 16 May 2013 18:44:50 +0200
+Subject: [PATCH] tests/main.c: fix build with glib 2.36
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: project seems dead
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ tests/main.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
+
+diff --git a/tests/main.c b/tests/main.c
+index 61cce82..18165ed 100644
+--- a/tests/main.c
++++ b/tests/main.c
+@@ -30,7 +30,9 @@ main (gint argc, gchar **argv)
+ {
+ 	GtkWidget *browser;
+ 
++#if !GLIB_CHECK_VERSION (2, 36, 0)
+ 	g_thread_init(NULL);
++#endif
+ 
+ 	gtk_init (&argc, &argv);
+ 
+-- 
+1.7.6.5
+

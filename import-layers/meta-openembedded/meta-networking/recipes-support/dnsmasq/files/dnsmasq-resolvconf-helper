@@ -1,0 +1,62 @@
+#!/bin/bash
+#
+# Borrowing heavily from the dnsmasq initscript's version of support for
+# resolvconf, intended for use in systemd-only configurations.
+#
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/usr/sbin/dnsmasq
+NAME=dnsmasq
+
+# Most configuration options in /etc/default/dnsmasq are deprecated
+# but still honoured.
+if [ -r /etc/default/$NAME ]; then
+   . /etc/default/$NAME
+fi
+
+start_resolvconf()
+{
+   # If interface "lo" is explicitly disabled in /etc/default/dnsmasq
+   # Then dnsmasq won't be providing local DNS, so don't add it to
+   # the resolvconf server set.
+   for interface in $DNSMASQ_EXCEPT
+   do
+      [ $interface = lo ] && return
+   done
+
+   if [ -x /sbin/resolvconf ] ; then
+      echo "nameserver 127.0.0.1" |
+      /sbin/resolvconf -a lo.$NAME
+   fi
+   return 0
+}
+
+stop_resolvconf()
+{
+   if [ -x /sbin/resolvconf ] ; then
+      /sbin/resolvconf -d lo.$NAME
+   fi
+   return 0
+}
+
+case "$1" in
+   start)
+      start_resolvconf
+      exit 0
+      ;;
+   stop)
+      stop_resolvconf
+      exit 0
+      ;;
+   restart)
+      stop_resolvconf
+      start_resolvconf
+      exit 0
+      ;;
+   *)
+      echo "Usage: /etc/init.d/$NAME {start|stop|restart}" >&2
+      exit 3
+      ;;
+esac
+
+exit 0
+

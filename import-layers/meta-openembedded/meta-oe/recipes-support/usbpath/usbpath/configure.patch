@@ -1,0 +1,11 @@
+Index: usbpath/configure.ac
+===================================================================
+--- usbpath.orig/configure.ac	2014-07-17 20:40:26.000000000 +0000
++++ usbpath/configure.ac	2014-07-18 07:01:40.933474420 +0000
+@@ -1,5 +1,5 @@
+ AC_INIT([usbpath],[0.1])
+-AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
++AM_INIT_AUTOMAKE([foreign])
+ 
+ AC_PROG_CC
+ AC_PROG_RANLIB

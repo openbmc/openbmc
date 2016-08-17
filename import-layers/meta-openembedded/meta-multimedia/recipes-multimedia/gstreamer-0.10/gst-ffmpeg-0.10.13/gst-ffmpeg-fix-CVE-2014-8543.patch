@@ -1,0 +1,35 @@
+From 8b0e96e1f21b761ca15dbb470cd619a1ebf86c3e Mon Sep 17 00:00:00 2001
+From: Michael Niedermayer <michaelni@gmx.at>
+Date: Fri, 3 Oct 2014 14:45:04 +0200
+Subject: [PATCH] avcodec/mmvideo: Bounds check 2nd line of HHV Intra blocks
+
+(Upstream commit 8b0e96e1f21b761ca15dbb470cd619a1ebf86c3e)
+
+Fixes out of array access
+Fixes: asan_heap-oob_4da4f3_8_asan_heap-oob_4da4f3_419_scene1a.mm
+
+Upstream-Status: Backport
+
+Found-by: Mateusz "j00ru" Jurczyk and Gynvael Coldwind
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+---
+ libavcodec/mmvideo.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libavcodec/mmvideo.c b/libavcodec/mmvideo.c
+index 026d463..9ff6393 100644
+--- a/gst-libs/ext/libav/libavcodec/mmvideo.c
++++ b/gst-libs/ext/libav/libavcodec/mmvideo.c
+@@ -104,7 +104,7 @@ static void mm_decode_intra(MmContext * s, int half_horiz, int half_vert, const
+ 
+         if (color) {
+             memset(s->frame.data[0] + y*s->frame.linesize[0] + x, color, run_length);
+-            if (half_vert)
++            if (half_vert && y + half_vert < s->avctx->height)
+                 memset(s->frame.data[0] + (y+1)*s->frame.linesize[0] + x, color, run_length);
+         }
+         x+= run_length;
+-- 
+1.7.9.5
+

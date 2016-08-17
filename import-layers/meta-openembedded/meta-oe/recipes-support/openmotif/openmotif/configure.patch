@@ -1,0 +1,15 @@
+--- a/configure.ac~	2009-10-27 14:10:23.000000000 -0200
++++ b/configure.ac	2011-05-31 10:51:00.207232036 -0300
+@@ -3,12 +3,6 @@
+ AC_CONFIG_SRCDIR([lib/Xm/Form.c])
+ AC_PREREQ(2.52)
+ AC_CONFIG_AUX_DIR(.)
+-AC_CHECK_FILE(/usr/X/include/X11/X.h,
+-  AC_PREFIX_DEFAULT(/usr/X),
+-  AC_PREFIX_DEFAULT(/usr))
+-AC_CHECK_FILE(/usr/X11R6/include/X11/X.h,
+-  AC_PREFIX_DEFAULT(/usr/X11R6),
+-  AC_PREFIX_DEFAULT(/usr))
+ 
+ dnl AM_MAINTAINER_MODE
+ AC_CANONICAL_TARGET

@@ -1,0 +1,47 @@
+example21.cpp: remove deprecated code
+
+The deprecated code was no longer used, so remove it to avoid
+compiling failure with -Werror=unused-function
+...
+| example21.cpp:51:8: error: 'size_t {anonymous}::readData(char*,
+size_t, size_t)' defined but not used [-Werror=unused-function]
+|  size_t readData(char *buffer, size_t size, size_t nitems)
+...
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ examples/example21.cpp | 17 -----------------
+ 1 file changed, 17 deletions(-)
+
+diff --git a/examples/example21.cpp b/examples/example21.cpp
+--- a/examples/example21.cpp
++++ b/examples/example21.cpp
+@@ -39,23 +39,6 @@
+ #include <curlpp/Options.hpp>
+ #include <curlpp/Exception.hpp>
+  
+-/*
+-   anonymous namespace to prevent name clash in case other examples using the same global entities
+-   would be compiled in the same project
+-*/
+-namespace
+-{
+-
+-char *data = NULL;
+-
+-size_t readData(char *buffer, size_t size, size_t nitems)
+-{
+-  strncpy(buffer, data, size * nitems);
+-  return size * nitems;
+-}
+-
+-} // namespace
+-
+ int main(int argc, char *argv[])
+ {
+   if(argc != 3) {
+-- 
+1.9.1
+

@@ -1,0 +1,33 @@
+From 738a9857be9c92ad2f70be88ccee238e3154a936 Mon Sep 17 00:00:00 2001
+From: Joe MacDonald <joe.macdonald@windriver.com>
+Date: Wed, 2 Oct 2013 14:20:37 -0400
+Subject: [PATCH] racoon/pfkey: avoid potential null-pointer dereference
+
+Building with -Werror=maybe-uninitialized revealed that 'remote' from
+pk_recvmigrate() could be used with uninitialized data in
+migrate_sp_ike_addresses().  Ensure it is always at a minimum assigned
+NULL.
+
+Upstream-Status: Pending
+
+Signed-off-by: Joe MacDonald <joe.macdonald@windriver.com>
+---
+ src/racoon/pfkey.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/racoon/pfkey.c b/src/racoon/pfkey.c
+index d00b166..e0dc1db 100644
+--- a/src/racoon/pfkey.c
++++ b/src/racoon/pfkey.c
+@@ -3352,7 +3352,7 @@ pk_recvmigrate(mhp)
+ 	struct sockaddr *old_saddr, *new_saddr;
+ 	struct sockaddr *old_daddr, *new_daddr;
+ 	struct sockaddr *old_local, *old_remote;
+-	struct sockaddr *local, *remote;
++	struct sockaddr *local, *remote = NULL;
+ 	struct sadb_x_kmaddress *kmaddr;
+ 	struct sadb_x_policy *xpl;
+ 	struct sadb_x_ipsecrequest *xisr_list;
+-- 
+1.7.9.5
+

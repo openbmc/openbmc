@@ -1,0 +1,29 @@
+Recent opencv API changes break upstream filter and example.
+Make opencv explicitly configurable.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Tim Orling <TicoTimo@gmail.com>
+
+Index: vlc-2.1.4/configure.ac
+===================================================================
+--- vlc-2.1.4.orig/configure.ac
++++ vlc-2.1.4/configure.ac
+@@ -1693,7 +1693,16 @@ PKG_ENABLE_MODULES_VLC([BLURAY], [libblu
+ dnl
+ dnl  OpenCV wrapper and example filters
+ dnl
+-PKG_ENABLE_MODULES_VLC([OPENCV], [opencv_example opencv_wrapper], [opencv > 2.0], (OpenCV (computer vision) filter), [auto])
++AC_ARG_ENABLE(opencv,
++  [AS_HELP_STRING([--disable-opencv],
++    [disable OpenCV computer vision filter and example (default auto)])])
++if test "${enable_opencv}" != "no"
++then
++    PKG_ENABLE_MODULES_VLC([OPENCV], 
++                           [opencv_example opencv_wrapper], 
++                           [opencv > 2.0], 
++                           (OpenCV (computer vision) filter), [auto])
++fi
+ 
+ 
+ dnl

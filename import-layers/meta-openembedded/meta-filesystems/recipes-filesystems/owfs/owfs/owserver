@@ -1,0 +1,59 @@
+#!/bin/sh
+
+PATH=/sbin:/bin:/usr/bin
+
+DAEMON="owserver"
+
+test -f /usr/bin/${DAEMON} || exit 0
+
+if test -f /etc/default/${DAEMON} ; then
+. /etc/default/${DAEMON}
+else
+:
+fi
+
+if [ "$START_OWSERVER" != "yes" ] 
+then  
+	exit 0
+fi
+
+startdaemon(){
+	echo -n "Starting ${DAEMON}: "
+	start-stop-daemon --start -x /usr/bin/${DAEMON} --  ${CMDLINE} --pid_file /var/run/${DAEMON}.pid
+	echo "done"
+}
+
+stopdaemon(){
+	echo -n "Stopping ${DAEMON}: "
+	start-stop-daemon --stop -p /var/run/${DAEMON}.pid
+        echo "done"
+}
+										
+
+
+case "$1" in
+  start)
+	startdaemon
+	;;
+  stop)
+	stopdaemon
+	;;
+  force-reload)
+	stopdaemon
+	startdaemon
+	;;
+  restart)
+	stopdaemon
+	startdaemon
+	;;
+  reload)
+	stopdaemon
+	startdaemon
+	;;
+  *)
+	echo "Usage: ${DAEMON} { start | stop | restart | reload }" >&2
+	exit 1
+	;;
+esac
+																						
+exit 0

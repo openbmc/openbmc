@@ -1,0 +1,36 @@
+From f3c39fd2a4b5f53338b5f821788c63858bf860cf Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@cn.fujitsu.com>
+Date: Sun, 2 Aug 2015 22:08:43 +0900
+Subject: [PATCH] to fix lib64 can not be shiped in 64bit target
+
+To fix the warning as following:
+WARNING: QA Issue: konkretcmpi: Files/directories were installed but not shipped in any package:
+  /usr/lib64
+  /usr/lib64/libkonkret.so
+  /usr/lib64/libkonkret.so.0.0.1
+  /usr/lib64/libkonkret.so.0
+  /usr/lib64/libkonkretmof.so.0.0.1
+  /usr/lib64/libkonkretmof.so
+  ...
+
+Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
+---
+ cmake/modules/FindKonkretCMPI.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cmake/modules/FindKonkretCMPI.cmake b/cmake/modules/FindKonkretCMPI.cmake
+index b888cfd..097caed 100644
+--- a/cmake/modules/FindKonkretCMPI.cmake
++++ b/cmake/modules/FindKonkretCMPI.cmake
+@@ -9,7 +9,7 @@ find_path(KONKRETCMPI_INCLUDE_DIR
+ find_library(KONKRETCMPI_LIBRARY
+     NAMES konkret
+     HINTS $ENV{KONKRETCMPI_LIB_DIR}
+-    PATH_SUFFIXES lib64 lib
++    PATH_SUFFIXES lib lib64
+     PATHS /usr /usr/local
+ )
+ 
+-- 
+1.8.4.2
+

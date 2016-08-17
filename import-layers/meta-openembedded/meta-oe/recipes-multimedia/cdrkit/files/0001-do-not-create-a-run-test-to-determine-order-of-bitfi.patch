@@ -1,0 +1,53 @@
+From a702cd1bb5eba5a05d1098862b5b863a3f6dd558 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Thu, 10 Sep 2015 09:39:13 +0200
+Subject: [PATCH] do not create a run test to determine order of bitfields
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+taken from [1]
+
+Upstream-Status: Inappropriate [cross compile specific]
+
+[1] http://cgit.openembedded.org/openembedded/tree/recipes/cdrkit/cdrkit/xconfig.patch
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ include/CMakeLists.txt | 2 --
+ include/xconfig.h.in   | 6 +++++-
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/include/CMakeLists.txt b/include/CMakeLists.txt
+index 99a69fd..e5ba8a7 100644
+--- a/include/CMakeLists.txt
++++ b/include/CMakeLists.txt
+@@ -35,8 +35,6 @@ endif(VA_LIST_IS_ARRAY)
+ INCLUDE(TestBigEndian)
+ TEST_BIG_ENDIAN(WORDS_BIGENDIAN)
+ 
+-TRY_RUN(BITFIELDS_HTOL TEST_DUMMY ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/test_BITFIELDS_HTOL.c)
+-
+ INCLUDE(CheckIncludeFiles)
+ 
+ #SET(CMAKE_REQUIRED_INCLUDES "/usr/include;/usr/local/include")
+diff --git a/include/xconfig.h.in b/include/xconfig.h.in
+index c130600..476c00b 100644
+--- a/include/xconfig.h.in
++++ b/include/xconfig.h.in
+@@ -233,7 +233,11 @@
+ /* If using network byte order             */
+ #cmakedefine WORDS_BIGENDIAN
+ /* If high bits come first in structures   */
+-#cmakedefine BITFIELDS_HTOL
++#ifdef WORDS_BIGENDIAN
++#define BITFIELDS_HTOL
++#else
++#define BITFIELDS_LTOH
++#endif
+ #define	HAVE_C_BIGENDIAN	/* Flag that WORDS_BIGENDIAN test was done */
+ #define	HAVE_C_BITFIELDS	/* Flag that BITFIELDS_HTOL test was done  */
+ 
+-- 
+2.1.0
+

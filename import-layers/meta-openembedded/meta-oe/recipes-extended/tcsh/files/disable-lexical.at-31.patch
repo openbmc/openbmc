@@ -1,0 +1,30 @@
+--- a/tests/lexical.at
++++ b/tests/lexical.at
+@@ -27,27 +27,6 @@ AT_CHECK([tcsh -f oneword.csh], ,
+ 
+ AT_CLEANUP
+ 
+-
+-AT_SETUP([Comments])
+-
+-AT_CHECK([echo 'echo OK@%:@comment' | tcsh -f], , [OK
+-])
+-
+-AT_CHECK([tcsh -f -c 'echo @%:@no comment'], ,
+-[@%:@no comment
+-])
+-
+-AT_DATA([comment2.csh],
+-[[echo testing...@%:@\
+-OK
+-]])
+-AT_CHECK([tcsh -f comment2.csh], ,
+-[testing... OK
+-])
+-
+-AT_CLEANUP
+-
+-
+ AT_SETUP([Escaping special characters])
+ 
+ AT_DATA([nosplit.csh],

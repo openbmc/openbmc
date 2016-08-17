@@ -1,0 +1,32 @@
+From 3b3c6e6376babcd9a0b0db312b0e1e3bb3ab833e Mon Sep 17 00:00:00 2001
+From: Sven Ebenfeld <sven.ebenfeld@vaillant.de>
+Date: Wed, 26 Nov 2014 10:36:44 +0100
+Subject: [PATCH] Remove AC_CHECK_FILE for cross compilation
+
+---
+ configure.ac | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 0111e72..8c286d4 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -20,14 +20,9 @@ AC_DEFINE([F2FS_MINOR_VERSION], m4_bpatsubst(f2fs_tools_version,
+ 				[\([0-9]*\).\([0-9]*\)\(\w\|\W\)*], [\2]),
+ 				[Minor version for f2fs-tools])
+ 
+-AC_CHECK_FILE(.git,
+-	AC_DEFINE([F2FS_TOOLS_DATE],
+-		"m4_bpatsubst(f2fs_tools_gitdate,
+-		[\([0-9-]*\)\(\w\|\W\)*], [\1])",
+-		[f2fs-tools date based on Git commits]),
+ 	AC_DEFINE([F2FS_TOOLS_DATE],
+ 		"f2fs_tools_date",
+-		[f2fs-tools date based on Source releases]))
++		[f2fs-tools date based on Source releases])
+ 
+ AC_CONFIG_SRCDIR([config.h.in])
+ AC_CONFIG_HEADER([config.h])
+-- 
+1.8.1.rc3
+

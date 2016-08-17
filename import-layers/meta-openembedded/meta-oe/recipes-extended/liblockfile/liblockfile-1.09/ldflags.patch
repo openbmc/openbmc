@@ -1,0 +1,21 @@
+
+#
+# Patch managed by http://www.mn-logistik.de/unsupported/pxa250/patcher
+#
+
+--- liblockfile-1.05/Makefile.in~ldflags
++++ liblockfile-1.05/Makefile.in
+@@ -34,11 +34,11 @@
+ 
+ liblockfile.so: liblockfile.a
+ 		$(CC) -fPIC -shared -Wl,-soname,liblockfile.so.1 \
+-			-o liblockfile.so lockfile.o -lc
++			-o liblockfile.so lockfile.o $(LDFLAGS) -lc
+ 
+ nfslock.so.$(VER):	nfslock.o
+ 		$(CC) -fPIC -shared -Wl,-soname,nfslock.so.0 \
+-			-o nfslock.so.$(NVER) nfslock.o
++			-o nfslock.so.$(NVER) nfslock.o $(LDFLAGS)
+ 
+ dotlockfile:	dotlockfile.o xlockfile.o
+ 		$(CC) $(LDFLAGS) -o dotlockfile dotlockfile.o xlockfile.o

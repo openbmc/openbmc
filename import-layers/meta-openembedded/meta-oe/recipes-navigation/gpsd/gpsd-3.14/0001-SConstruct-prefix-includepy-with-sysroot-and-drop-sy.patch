@@ -1,0 +1,75 @@
+From 1e2cea8945bc2183fbe1a012dcd633a352125952 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Tue, 24 Apr 2012 18:45:14 +0200
+Subject: [PATCH] SConstruct: prefix includepy with sysroot and drop sysroot
+ from python_lib_dir
+
+* without PYTHONPATH, distutil's sysconfig returns INCLUDEPY without sysroot prefix
+  and with PYTHONPATH from OE it's pointing to native python dir
+
+    $ export PYTHONPATH=/OE/shr-core/tmp-eglibc/sysroots/om-gta02/usr/lib/python2.7/
+    $ python
+    Python 2.7.2 (default, Apr 18 2012, 09:19:59)
+    [GCC 4.6.2] on linux2
+    Type "help", "copyright", "credits" or "license" for more information.
+    >>> from distutils import sysconfig
+    >>> sysconfig.get_config_vars('INCLUDEPY')
+    ['/OE/shr-core/tmp-eglibc/sysroots/x86_64-linux/usr/include/python2.7']
+    >>>
+    $ unset PYTHONPATH
+    $ python
+    Python 2.7.2 (default, Apr 18 2012, 09:19:59)
+    [GCC 4.6.2] on linux2
+    Type "help", "copyright", "credits" or "license" for more information.
+    >>> from distutils import sysconfig
+    >>> sysconfig.get_config_vars('INCLUDEPY')
+    ['/python2.7']
+    >>> import sysconfig
+    >>> sysconfig.get_config_vars('INCLUDEPY')
+    ['/OE/shr-core/tmp-eglibc/sysroots/x86_64-linux/usr/include/python2.7']
+* python_lib_dir = python_lib_dir.replace(env['sysroot'], '')
+  returns path to target sysroot
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+Signed-off-by: Peter A. Bigot <pab@pabigot.com>
+---
+ SConstruct | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/SConstruct b/SConstruct
+index 6c93311..cde8b3d 100644
+--- a/SConstruct
++++ b/SConstruct
+@@ -1148,6 +1148,12 @@ else:
+         basecflags += ' -coverage'
+         ldflags += ' -coverage'
+         ldshared += ' -coverage'
++
++    if env['sysroot']:
++        print "Prefixing includepy '%s' with sysroot prefix" % includepy
++        includepy = os.path.normpath("%s/%s/%s/%s" % (env['sysroot'], env['prefix'], env['includedir'], includepy))
++        print "'%s'" % includepy
++
+     # in case CC/CXX was set to the scan-build wrapper,
+     # ensure that we build the python modules with scan-build, too
+     if env['CC'] is None or env['CC'].find('scan-build') < 0:
+@@ -1408,11 +1414,14 @@ if not env['python']:
+     python_install = []
+ else:
+     python_lib_dir = env['python_libdir']
++    python_lib_dir = python_lib_dir.replace(env['sysroot'], '')
+     python_module_dir = python_lib_dir + os.sep + 'gps'
+     python_extensions_install = python_env.Install( DESTDIR + python_module_dir,
+                                                     python_built_extensions)
+     if not env['debug'] and not env['profiling'] and not env['nostrip'] and not sys.platform.startswith('darwin'):
+         python_env.AddPostAction(python_extensions_install, '$STRIP $TARGET')
++    env.AddPostAction(python_extensions_install, '$CHRPATH -r "%s" "$TARGET"' \
++                     % (python_lib_dir, ))
+ 
+     python_modules_install = python_env.Install( DESTDIR + python_module_dir,
+                                                 python_modules)
+-- 
+2.1.0
+

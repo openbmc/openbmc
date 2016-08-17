@@ -1,0 +1,32 @@
+Origin: r816
+Description: add check for -m rt --rt-type 0
+Bug-Ubuntu: https://launchpad.net/bugs/1191197
+Forwarded: yes
+
+Upstream-Status: Inappropriate [ not author ]
+
+Signed-off-by: Joe MacDonald <joe_macdonald@mentor.com>
+
+Index: ufw-0.33/tests/check-requirements
+===================================================================
+--- ufw-0.33.orig/tests/check-requirements	2012-08-17 16:12:49.000000000 -0500
++++ ufw-0.33/tests/check-requirements	2013-06-15 07:47:00.000000000 -0500
+@@ -3,7 +3,7 @@
+ # check-requirements: verify all the required iptables functionality is
+ # available
+ #
+-# Copyright 2008-2012 Canonical Ltd.
++# Copyright 2008-2013 Canonical Ltd.
+ #
+ #    This program is free software: you can redistribute it and/or modify
+ #    it under the terms of the GNU General Public License version 3,
+@@ -218,6 +218,9 @@
+             echo -n "icmpv6 with hl ($j): "
+             runcmd $exe -A $c -p icmpv6 --icmpv6-type $j -m hl --hl-eq 255 -j ACCEPT
+         done
++
++        echo -n "ipv6 rt: "
++        runcmd $exe -A $c -m rt --rt-type 0 -j ACCEPT
+     fi
+ 
+     echo ""

@@ -1,0 +1,25 @@
+Fix hardcoded libdir.
+
+Upstream-Status: Pending 
+
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+---
+ plugins/Makefile.am |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/plugins/Makefile.am b/plugins/Makefile.am
+index b00915f..25262a1 100644
+--- a/plugins/Makefile.am
++++ b/plugins/Makefile.am
+@@ -62,7 +62,7 @@ plugindir = @plugindir@
+ 
+ common_sources = plugin_common.c plugin_common.h
+ 
+-sasldir = $(prefix)/lib/sasl2
++sasldir = $(libdir)/sasl2
+ sasl_LTLIBRARIES = @SASL_MECHS@
+ EXTRA_LTLIBRARIES = libplain.la libanonymous.la libkerberos4.la libcrammd5.la \
+ 	libgs2.la libgssapiv2.la libdigestmd5.la liblogin.la libsrp.la libotp.la \
+-- 
+1.7.4.1
+

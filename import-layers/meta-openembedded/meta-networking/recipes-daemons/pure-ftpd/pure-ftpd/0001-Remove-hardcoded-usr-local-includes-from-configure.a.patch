@@ -1,0 +1,39 @@
+From 1bafadf2502334a3e972ff667061469316d0d2ca Mon Sep 17 00:00:00 2001
+From: Tudor Florea <tudor.florea@enea.com>
+Date: Tue, 4 Aug 2015 02:46:39 +0200
+Subject: [PATCH] Remove hardcoded /usr/local includes from configure.ac
+
+Upstream-Status: Inappropriate [config]
+
+Signed-off-by: Yauhen Kharuzhy <yauhen.kharuzhy@promwad.com>
+Signed-off-by: Tudor Florea <tudor.florea@enea.com>
+---
+ configure.ac | 12 ------------
+ 1 file changed, 12 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 6c78e8c..851d45d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -100,18 +100,6 @@ AC_ARG_VAR(PYTHON,local path to the python interpreter)
+ python_possible_path="/usr/bin:/usr/local/bin:/bin:/opt/python/bin:/opt/python/usr/bin:/opt/python/usr/local/bin"
+ AC_PATH_PROG(PYTHON,python,/usr/bin/env python,$python_possible_path)
+ 
+-if test -d /usr/local/include; then
+-  CPPFLAGS="$CPPFLAGS -I/usr/local/include"
+-fi
+-
+-if test -d /usr/kerberos/include; then
+-  CPPFLAGS="$CPPFLAGS -I/usr/kerberos/include"
+-fi
+-
+-if test -d /usr/local/lib; then
+-  LDFLAGS="$LDFLAGS -L/usr/local/lib"
+-fi
+-
+ CPPFLAGS="$CPPFLAGS -D_FORTIFY_SOURCE=2"
+ 
+ dnl Checks for header files
+-- 
+1.9.1
+

@@ -1,0 +1,93 @@
+xfsprogs: drop configure check for aio
+
+It's unused and breaks compilation with uclibc.
+
+Upstream-Status: Pending
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.ac         |  6 +++---
+ m4/Makefile          |  1 -
+ m4/package_aiodev.m4 | 36 ------------------------------------
+ 3 files changed, 3 insertions(+), 40 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index b968977..4e2a263 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -47,6 +47,9 @@ AC_ARG_ENABLE(lib64,
+ 	enable_lib64=yes)
+ AC_SUBST(enable_lib64)
+ 
++librt="-lrt"
++AC_SUBST(librt)
++
+ #
+ # If the user specified a libdir ending in lib64 do not append another
+ # 64 to the library names.
+@@ -92,9 +95,6 @@ AC_PACKAGE_GLOBALS(xfsprogs)
+ AC_PACKAGE_UTILITIES(xfsprogs)
+ AC_MULTILIB($enable_lib64)
+ 
+-AC_PACKAGE_NEED_AIO_H
+-AC_PACKAGE_NEED_LIO_LISTIO
+-
+ AC_PACKAGE_NEED_UUID_H
+ AC_PACKAGE_NEED_UUIDCOMPARE
+ 
+diff --git a/m4/Makefile b/m4/Makefile
+index 654a4fb..d282f0a 100644
+--- a/m4/Makefile
++++ b/m4/Makefile
+@@ -14,7 +14,6 @@ CONFIGURE = \
+ 
+ LSRCFILES = \
+ 	manual_format.m4 \
+-	package_aiodev.m4 \
+ 	package_blkid.m4 \
+ 	package_globals.m4 \
+ 	package_libcdev.m4 \
+diff --git a/m4/package_aiodev.m4 b/m4/package_aiodev.m4
+index 490d9c8..8b13789 100644
+--- a/m4/package_aiodev.m4
++++ b/m4/package_aiodev.m4
+@@ -1,37 +1 @@
+-#
+-# Check if we have a libaio.h installed
+-#
+-AC_DEFUN([AC_PACKAGE_WANT_AIO],
+-  [ AC_CHECK_HEADERS(libaio.h, [ have_aio=true ], [ have_aio=false ])
+-    AC_SUBST(have_aio)
+-  ])
+-
+-#
+-# Check if we have an aio.h installed
+-#
+-AC_DEFUN([AC_PACKAGE_NEED_AIO_H],
+-  [ AC_CHECK_HEADERS(aio.h)
+-    if test $ac_cv_header_aio_h = no; then
+-	echo
+-	echo 'FATAL ERROR: could not find a valid <aio.h> header.'
+-	exit 1
+-    fi
+-  ])
+-
+-#
+-# Check if we have the lio_listio routine in either libc/librt
+-#
+-AC_DEFUN([AC_PACKAGE_NEED_LIO_LISTIO],
+-  [ AC_CHECK_FUNCS(lio_listio)
+-    if test $ac_cv_func_lio_listio = yes; then
+-	librt=""
+-    else
+-	AC_CHECK_LIB(rt, lio_listio,, [
+-	    echo
+-	    echo 'FATAL ERROR: could not find a library with lio_listio.'
+-	    exit 1],[-lpthread])
+-	librt="-lrt"
+-    fi
+-    AC_SUBST(librt)
+-  ])
+ 
+-- 
+1.8.1.2
+

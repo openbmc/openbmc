@@ -1,0 +1,52 @@
+
+The patch is ported from sato-icon-theme.
+
+pkg-config will only search the target sysroot and we want the native script. This 
+patch adds an option to allow the path to the tool to be specified.
+
+Upstream-Status: Pending
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ configure.in |   26 ++++++++++++++++----------
+ 1 file changed, 16 insertions(+), 10 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index 5f7a18c..e8fc31e 100644
+--- a/configure.in
++++ b/configure.in
+@@ -74,16 +74,22 @@ AC_ARG_ENABLE([icon-mapping],
+ ICONMAP="true"
+ if test "x$enable_mapping" != "xno"; then
+    UTILS_REQUIRED=0.8.7
+-
+-   AC_MSG_CHECKING([icon-naming-utils >= $UTILS_REQUIRED])
+-   PKG_CHECK_EXISTS(icon-naming-utils >= $UTILS_REQUIRED, have_utils=yes, have_utils=no)
+-   if test "x$have_utils" = "xyes"; then
+-      UTILS_PATH="`$PKG_CONFIG --variable=program_path icon-naming-utils`"
+-      ICONMAP="$UTILS_PATH/icon-name-mapping"
+-      AC_MSG_RESULT([yes])
+-   else
+-	AC_MSG_RESULT([no])
+-   	AC_MSG_ERROR([icon-naming-utils >= $UTILS_REQUIRED is required to build and install gnome-themes])
++   PKG_PROG_PKG_CONFIG()
++   AC_ARG_WITH(iconmap,
++   	    AC_HELP_STRING([--with-iconmap=<dir>], [The location of the icon-name-mapping script to use]),
++   	    ICONMAP=$withval, ICONMAP="")
++   if test "x$ICONMAP" = "x"; then
++      AC_MSG_CHECKING([icon-naming-utils >= $UTILS_REQUIRED])
++      PKG_CHECK_EXISTS(icon-naming-utils >= $UTILS_REQUIRED, have_utils=yes, have_utils=no)
++      if test "x$have_utils" = "xyes"; then
++         UTILS_PATH="`$PKG_CONFIG --variable=program_path icon-naming-utils`"
++         ICONMAP="$UTILS_PATH/icon-name-mapping"
++
++         AC_MSG_RESULT([yes])
++      else
++         AC_MSG_RESULT([no])
++         AC_MSG_ERROR([icon-naming-utils >= $UTILS_REQUIRED is required to build and install gnome-themes"])
++      fi
+    fi
+ fi
+ AC_SUBST(ICONMAP)
+-- 
+1.7.9.5
+

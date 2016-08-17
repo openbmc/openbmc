@@ -1,0 +1,20 @@
+Origin: r797
+Description: src/backend_iptables.py: fix misplaced parenthesis
+
+Upstream-Status: Inappropriate [ not author ]
+
+Signed-off-by: Joe MacDonald <joe_macdonald@mentor.com>
+
+Index: ufw-0.33/src/backend_iptables.py
+===================================================================
+--- ufw-0.33.orig/src/backend_iptables.py	2012-09-24 08:51:13.000000000 -0500
++++ ufw-0.33/src/backend_iptables.py	2012-09-24 08:52:00.000000000 -0500
+@@ -1075,7 +1075,7 @@
+             exe = self.ip6tables
+         (rc, out) = cmd([exe] + args)
+         if rc != 0:
+-            err_msg = _("Could not perform '%s'") % (args)
++            err_msg = _("Could not perform '%s'" % (args))
+             if fail_ok:
+                 debug("FAILOK: " + err_msg)
+             else:

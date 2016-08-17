@@ -1,0 +1,17 @@
+https://www.gaia-gis.it/fossil/libspatialite/tktview?name=abeeaad448
+
+Upstream-Status: Submitted [rpm5-devel@rpm5.org]
+
+Index: libspatialite-4.2.0/configure.ac
+===================================================================
+--- libspatialite-4.2.0.orig/configure.ac
++++ libspatialite-4.2.0/configure.ac
+@@ -260,7 +260,7 @@ if test x"$enable_geos" != "xno"; then
+   fi
+   # Extract the linker and include flags
+   GEOS_LDFLAGS=`$GEOSCONFIG --ldflags`
+-  GEOS_CFLAGS=-I`$GEOSCONFIG --includes`
++  GEOS_CFLAGS=`$GEOSCONFIG --cflags`
+   AC_SUBST([GEOS_LDFLAGS])
+   AC_SUBST([GEOS_CFLAGS])	
+   # Ensure that we can parse geos_c.h

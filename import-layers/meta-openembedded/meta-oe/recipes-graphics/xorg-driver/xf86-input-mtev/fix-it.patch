@@ -1,0 +1,153 @@
+diff --git a/src/multitouch.c b/src/multitouch.c
+index c55d742..4a8192d 100644
+--- a/src/multitouch.c
++++ b/src/multitouch.c
+@@ -114,7 +114,7 @@ static int init_properties(DeviceIntPtr dev)
+ 	return Success;
+ }
+ 
+-static int device_init(DeviceIntPtr dev, LocalDevicePtr local)
++static int device_init(DeviceIntPtr dev, InputInfoPtr local)
+ {
+ 	struct mtev_mtouch *mt = local->private;
+ 	Atom atom;
+@@ -222,7 +222,7 @@ static int device_init(DeviceIntPtr dev, LocalDevicePtr local)
+ 			xf86InitValuatorAxisStruct(dev, val, axes_labels[val],
+ 						   min,
+ 						   max,
+-						   1, 0, 1);
++						   1, 0, 1,Absolute);
+ 			xf86InitValuatorDefaults(dev, val);
+ 		}
+ 	}
+@@ -232,7 +232,7 @@ static int device_init(DeviceIntPtr dev, LocalDevicePtr local)
+ 	return Success;
+ }
+ 
+-static int device_on(LocalDevicePtr local)
++static int device_on(InputInfoPtr local)
+ {
+ 	struct mtev_mtouch *mt = local->private;
+ 	local->fd = xf86OpenSerial(local->options);
+@@ -248,7 +248,7 @@ static int device_on(LocalDevicePtr local)
+ 	return Success;
+ }
+ 
+-static int device_off(LocalDevicePtr local)
++static int device_off(InputInfoPtr local)
+ {
+ 	struct mtev_mtouch *mt = local->private;
+ 	xf86RemoveEnabledDevice(local);
+@@ -259,12 +259,12 @@ static int device_off(LocalDevicePtr local)
+ 	return Success;
+ }
+ 
+-static int device_close(LocalDevicePtr local)
++static int device_close(InputInfoPtr local)
+ {
+ 	return Success;
+ }
+ 
+-static void process_state(LocalDevicePtr local,
++static void process_state(InputInfoPtr local,
+ 			  const struct mtev_mtouch *mt)
+ {
+ 
+@@ -321,22 +321,22 @@ static void process_state(LocalDevicePtr local,
+ 	}
+ 
+ 	/* Some x-clients assume they get motion events before button down */
++	xf86Msg(X_INFO,"down %d|pdown %d\n", down, pdown);
+ 	if (down)
+ 		xf86PostMotionEventP(local->dev, TRUE,
+ 				     0, down * MT_AXIS_PER_FINGER, valuators);
+-
+ 	if(down && pdown == 0)
+ 		xf86PostButtonEventP(local->dev, TRUE,
+ 				     1, 1,
+ 				     0, down * MT_AXIS_PER_FINGER, valuators);
+-	else if (down == 0 && pdown)
+-		xf86PostButtonEvent(local->dev, TRUE, 1, 0, 0, 0);
+-
++	else if (down == 0 && pdown){
++		xf86PostButtonEvent(local->dev, TRUE, 1, 1, 0, 0);
++	}
+ 	pdown = !!down;
+ }
+ 
+ /* called for each full received packet from the touchpad */
+-static void read_input(LocalDevicePtr local)
++static void read_input(InputInfoPtr local)
+ {
+ 	struct mtev_mtouch *mt = local->private;
+ 	while (mtouch_read_synchronized_event(mt, local->fd)) {
+@@ -346,7 +346,7 @@ static void read_input(LocalDevicePtr local)
+ 
+ static Bool device_control(DeviceIntPtr dev, int mode)
+ {
+-	LocalDevicePtr local = dev->public.devicePrivate;
++	InputInfoPtr local = dev->public.devicePrivate;
+ 	switch (mode) {
+ 	case DEVICE_INIT:
+ 		xf86Msg(X_INFO, "device control: init\n");
+@@ -366,39 +366,29 @@ static Bool device_control(DeviceIntPtr dev, int mode)
+ 	}
+ }
+ 
+-static InputInfoPtr preinit(InputDriverPtr drv, IDevPtr dev, int flags)
++static InputInfoPtr preinit(InputDriverPtr drv, InputInfoPtr pInfo, int flags)
+ {
+ 	struct mtev_mtouch *mt;
+-	InputInfoPtr local = xf86AllocateInput(drv, 0);
+-	if (!local)
+-		goto error;
++	int rc;
++
+ 	mt = calloc(1, sizeof(struct mtev_mtouch));
++
+ 	if (!mt)
+ 		goto error;
+ 
+-	local->name = dev->identifier;
+-	local->type_name = XI_TOUCHSCREEN;
+-	local->device_control = device_control;
+-	local->read_input = read_input;
+-	local->private = mt;
+-	local->flags = XI86_POINTER_CAPABLE |
+-		XI86_SEND_DRAG_EVENTS;
+-
+-	local->conf_idev = dev;
+-
+-	xf86CollectInputOptions(local, NULL, NULL);
+-	//xf86OptionListReport(local->options);
+-	xf86ProcessCommonOptions(local, local->options);
++	pInfo->private = mt;
++	pInfo->type_name = "UNKNOWN";
++	pInfo->device_control = device_control;
++	pInfo->read_input = read_input;
+ 
++	mt->swap_xy = xf86SetBoolOption(pInfo->options, "SwapAxes", FALSE);
++	mt->invert_x = xf86SetBoolOption(pInfo->options, "InvertX", FALSE);
++	mt->invert_y = xf86SetBoolOption(pInfo->options, "InvertY", FALSE);
+ 
+-	mt->swap_xy = xf86SetBoolOption(local->options, "SwapAxes", FALSE);
+-	mt->invert_x = xf86SetBoolOption(local->options, "InvertX", FALSE);
+-	mt->invert_y = xf86SetBoolOption(local->options, "InvertY", FALSE);
+-
+-	local->flags |= XI86_CONFIGURED;
++	return Success;
+ 
+ error:
+-	return local;
++	return !Success;
+ }
+ 
+ static void uninit(InputDriverPtr drv, InputInfoPtr local, int flags)
+@@ -415,7 +405,6 @@ static InputDriverRec MTEV = {
+ 	.PreInit = preinit,
+ 	.UnInit = uninit,
+ 	.module = NULL,
+-	.refCount = 0
+ };
+ 
+ static XF86ModuleVersionInfo VERSION = {

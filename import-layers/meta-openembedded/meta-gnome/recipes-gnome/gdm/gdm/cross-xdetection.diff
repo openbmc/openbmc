@@ -1,0 +1,96 @@
+From 60084e7e973634971c9643f2459e5d3e248ee3f1 Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen@dominion.thruhere.net>
+Date: Thu, 9 Jun 2011 18:12:45 +0200
+Subject: [PATCH] build-sys: hardcode x paths to fix crosscompiling
+
+Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
+---
+ configure.ac |   72 ++++-----------------------------------------------------
+ 1 files changed, 5 insertions(+), 67 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index eeaf3dc..841efe0 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1101,73 +1101,11 @@ dnl ---------------------------------------------------------------------------
+ dnl - Check for X Server location
+ dnl ---------------------------------------------------------------------------
+ 
+-# First check with "! -h" for /usr/X11R6 and /usr/X11 since they often
+-# symlink to each other, and configure should use the more stable
+-# location (the real directory) if possible.
+-#
+-# On Solaris, the /usr/bin/Xserver script is used to decide whether to
+-# use Xsun or Xorg, so this is used on Solaris.
+-#
+-# When testing for /usr/X11R6, first check with "! -h" for /usr/X11R6
+-# and /usr/X11 since they often symlink to each other, and configure
+-# should use the more stable location (the real directory) if possible.
+-#
+-if test -x /usr/X11/bin/Xserver; then
+-   X_PATH="/usr/X11/bin"
+-   X_SERVER_PATH="/usr/X11/bin"
+-   X_SERVER="/usr/X11/bin/Xserver"
+-   X_CONFIG_OPTIONS="-audit 0"
+-elif test ! -h /usr/X11R6 -a -x /usr/X11R6/bin/X; then
+-   X_PATH="/usr/X11R6/bin"
+-   X_SERVER_PATH="/usr/X11R6/bin"
+-   X_SERVER="/usr/X11R6/bin/X"
+-   X_CONFIG_OPTIONS="-audit 0"
+-elif test ! -h /usr/X11 -a -x /usr/X11/bin/X; then
+-   X_PATH="/usr/X11/bin"
+-   X_SERVER_PATH="/usr/X11/bin"
+-   X_SERVER="/usr/X11/bin/X"
+-   X_CONFIG_OPTIONS="-audit 0"
+-elif test -x /usr/X11R6/bin/X; then
+-   X_PATH="/usr/X11R6/bin"
+-   X_SERVER_PATH="/usr/X11R6/bin"
+-   X_SERVER="/usr/X11R6/bin/X"
+-   X_CONFIG_OPTIONS="-audit 0"
+-elif test -x /usr/bin/Xorg; then
+-   X_PATH="/usr/bin"
+-   X_SERVER_PATH="/usr/bin"
+-   X_SERVER="/usr/bin/Xorg"
+-   X_CONFIG_OPTIONS="-audit 0"
+-elif test -x /usr/X11/bin/X; then
+-   X_PATH="/usr/X11/bin"
+-   X_SERVER_PATH="/usr/X11/bin"
+-   X_SERVER="/usr/X11/bin/X"
+-   X_CONFIG_OPTIONS="-audit 0"
+-elif test -x /usr/openwin/bin/Xsun; then
+-   # Do not add /usr/openwin/bin here because on Solaris you need
+-   # /usr/openwin/bin in your PATH even if you are using the Xorg
+-   # Xserver.  We add this to the path below.
+-   X_PATH="/usr/openwin/bin"
+-   X_SERVER_PATH="/usr/openwin/bin"
+-   X_SERVER="/usr/openwin/bin/Xsun"
+-   X_CONFIG_OPTIONS="-audit 0 -nobanner"
+-elif test -x /opt/X11R6/bin/X; then
+-   X_PATH="/opt/X11R6/bin"
+-   X_SERVER_PATH="/opt/X11R6/bin"
+-   X_SERVER="/opt/X11R6/bin/X"
+-   X_CONFIG_OPTIONS="-audit 0"
+-elif test -x /usr/bin/X; then
+-   X_PATH="/usr/bin"
+-   X_SERVER_PATH="/usr/bin"
+-   X_SERVER="/usr/bin/X"
+-   X_CONFIG_OPTIONS="-audit 0"
+-else
+-   # what to do, what to do, this is wrong, but this just sets the
+-   # defaults, perhaps this user is cross compiling or some such
+-   X_PATH="/usr/bin/X11:/usr/X11R6/bin:/opt/X11R6/bin"
+-   X_SERVER_PATH="/usr/bin"
+-   X_SERVER="/usr/bin/X"
+-   X_CONFIG_OPTIONS="-audit 0"
+-fi
++# We hardcode the X paths since we know where it will be in the OE univers
++X_PATH="/usr/bin"
++X_SERVER_PATH="/usr/bin"
++X_SERVER="/usr/bin/X"
++X_CONFIG_OPTIONS="-audit 0"
+ 
+ dnl ---------------------------------------------------------------------------
+ dnl - Check for Xnest / Xephyr support
+-- 
+1.6.6.1
+

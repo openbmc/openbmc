@@ -1,0 +1,32 @@
+From 7eba4c98c6953fa6ea76c1620d19524bcfa3a576 Mon Sep 17 00:00:00 2001
+From: Kevin Strasser <kevin.strasser@linux.intel.com>
+Date: Wed, 1 Aug 2012 11:51:26 -0700
+Subject: [PATCH] nfs export: remove nfsd check
+
+nfsd runs as a kernel process and does not have a pid. This means
+that the command assigned to apply_cmd will never be executed when
+the user tries to apply changes to nfs exports.
+
+Upstream-Status: Inappropriate [config]
+
+Signed-off-by: Kevin Strasser <kevin.strasser@linux.intel.com>
+---
+ exports/exports-lib.pl |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/exports/exports-lib.pl b/exports/exports-lib.pl
+index 22891c0..1c67494 100755
+--- a/exports/exports-lib.pl
++++ b/exports/exports-lib.pl
+@@ -273,7 +273,7 @@ return !&has_command("rpc.nfsd") && !&has_command("nfsd") &&
+ sub restart_mountd
+ {
+ # Try exportfs -r first
+-if ($config{'apply_cmd'} && &find_byname("nfsd") && &find_byname("mountd")) {
++if ($config{'apply_cmd'} && &find_byname("mountd")) {
+ 	my $out = &backquote_logged("$config{'apply_cmd'} 2>&1 </dev/null");
+ 	if (!$? && $out !~ /invalid|error|failed/i) {
+ 		# Looks like it worked!
+-- 
+1.7.9.5
+

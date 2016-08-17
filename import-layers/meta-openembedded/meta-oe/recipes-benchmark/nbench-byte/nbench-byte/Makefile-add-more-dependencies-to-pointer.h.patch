@@ -1,0 +1,23 @@
+Makefile: add more dependencies to pointer.h
+
+Upstream-Status: Inappropriate [no upstream]
+
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 915866d..edd9ea2 100644
+--- a/Makefile
++++ b/Makefile
+@@ -122,7 +122,7 @@ emfloat.o: emfloat.h emfloat.c nmglobal.h pointer.h Makefile
+ pointer.h: Makefile
+ 	touch pointer.h ;
+ 
+-misc.o: misc.h misc.c Makefile
++misc.o: misc.h misc.c nmglobal.h pointer.h Makefile
+ 	$(CC) $(MACHINE) $(DEFINES) $(CFLAGS)\
+ 		-c misc.c
+ 
+

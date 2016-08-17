@@ -1,0 +1,145 @@
+gst-ffmpeg: h264: set parameters from SPS whenever it changes
+    
+Fixes a crash in the fuzzed sample sample_varPAR.avi_s26638 with
+alternating bit depths.
+
+Upstream-Status: Backport
+
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+
+diff --git a/gst-libs/ext/libav/libavcodec/h264.c.old b/gst-libs/ext/libav/libavcodec/h264.c
+index 3621f41..718906a 100644
+--- a/gst-libs/ext/libav/libavcodec/h264.c.old
++++ b/gst-libs/ext/libav/libavcodec/h264.c
+@@ -2491,6 +2491,34 @@ int ff_h264_get_profile(SPS *sps)
+     return profile;
+ }
+ 
++static int h264_set_parameter_from_sps(H264Context *h)
++{
++    MpegEncContext *s = &h->s;
++    AVCodecContext * avctx= s->avctx;
++
++    if (s->flags& CODEC_FLAG_LOW_DELAY ||
++        (h->sps.bitstream_restriction_flag && !h->sps.num_reorder_frames))
++        s->low_delay=1;
++
++    if(avctx->has_b_frames < 2)
++        avctx->has_b_frames= !s->low_delay;
++
++    if (avctx->bits_per_raw_sample != h->sps.bit_depth_luma) {
++        if (h->sps.bit_depth_luma >= 8 && h->sps.bit_depth_luma <= 10) {
++            avctx->bits_per_raw_sample = h->sps.bit_depth_luma;
++            h->pixel_shift = h->sps.bit_depth_luma > 8;
++
++            ff_h264dsp_init(&h->h264dsp, h->sps.bit_depth_luma);
++            ff_h264_pred_init(&h->hpc, s->codec_id, h->sps.bit_depth_luma);
++            dsputil_init(&s->dsp, s->avctx);
++        } else {
++            av_log(avctx, AV_LOG_DEBUG, "Unsupported bit depth: %d\n", h->sps.bit_depth_luma);
++            return -1;
++        }
++    }
++    return 0;
++}
++
+ /**
+  * decodes a slice header.
+  * This will also call MPV_common_init() and frame_start() as needed.
+@@ -2505,7 +2533,7 @@ static int decode_slice_header(H264Context *h, H264Context *h0){
+     MpegEncContext * const s0 = &h0->s;
+     unsigned int first_mb_in_slice;
+     unsigned int pps_id;
+-    int num_ref_idx_active_override_flag;
++    int num_ref_idx_active_override_flag, ret;
+     unsigned int slice_type, tmp, i, j;
+     int default_ref_list_done = 0;
+     int last_pic_structure;
+@@ -2569,7 +2597,17 @@ static int decode_slice_header(H264Context *h, H264Context *h0){
+         av_log(h->s.avctx, AV_LOG_ERROR, "non-existing SPS %u referenced\n", h->pps.sps_id);
+         return -1;
+     }
+-    h->sps = *h0->sps_buffers[h->pps.sps_id];
++
++    if (h->pps.sps_id != h->current_sps_id ||
++        h0->sps_buffers[h->pps.sps_id]->new) {
++        h0->sps_buffers[h->pps.sps_id]->new = 0;
++
++        h->current_sps_id = h->pps.sps_id;
++        h->sps            = *h0->sps_buffers[h->pps.sps_id];
++
++        if ((ret = h264_set_parameter_from_sps(h)) < 0)
++            return ret;
++    }
+ 
+     s->avctx->profile = ff_h264_get_profile(&h->sps);
+     s->avctx->level   = h->sps.level_idc;
+@@ -3811,26 +3811,8 @@ static int decode_nal_units(H264Context *h, const uint8_t *buf, int buf_size){
+         case NAL_SPS:
+             init_get_bits(&s->gb, ptr, bit_length);
+             ff_h264_decode_seq_parameter_set(h);
+-
+-            if (s->flags& CODEC_FLAG_LOW_DELAY ||
+-                (h->sps.bitstream_restriction_flag && !h->sps.num_reorder_frames))
+-                s->low_delay=1;
+-
+-            if(avctx->has_b_frames < 2)
+-                avctx->has_b_frames= !s->low_delay;
+-
+-            if (avctx->bits_per_raw_sample != h->sps.bit_depth_luma) {
+-                if (h->sps.bit_depth_luma >= 8 && h->sps.bit_depth_luma <= 10) {
+-                    avctx->bits_per_raw_sample = h->sps.bit_depth_luma;
+-                    h->pixel_shift = h->sps.bit_depth_luma > 8;
+-
+-                    ff_h264dsp_init(&h->h264dsp, h->sps.bit_depth_luma);
+-                    ff_h264_pred_init(&h->hpc, s->codec_id, h->sps.bit_depth_luma);
+-                    dsputil_init(&s->dsp, s->avctx);
+-                } else {
+-                    av_log(avctx, AV_LOG_DEBUG, "Unsupported bit depth: %d\n", h->sps.bit_depth_luma);
+-                    return -1;
+-                }
++            if (h264_set_parameter_from_sps(h) < 0) {
++                return -1;
+             }
+             break;
+         case NAL_PPS:
+diff --git a/gst-libs/ext/libav/libavcodec/h264.h.old b/gst-libs/ext/libav/libavcodec/h264.h
+index e3cc815..b77ad98 100644
+--- a/gst-libs/ext/libav/libavcodec/h264.h.old
++++ b/gst-libs/ext/libav/libavcodec/h264.h
+@@ -202,6 +202,7 @@ typedef struct SPS{
+     int bit_depth_chroma;              ///< bit_depth_chroma_minus8 + 8
+     int residual_color_transform_flag; ///< residual_colour_transform_flag
+     int constraint_set_flags;          ///< constraint_set[0-3]_flag
++    int new;                              ///< flag to keep track if the decoder context needs re-init due to changed SPS
+ }SPS;
+ 
+ /**
+@@ -333,6 +334,7 @@ typedef struct H264Context{
+     int emu_edge_width;
+     int emu_edge_height;
+ 
++    unsigned current_sps_id; ///< id of the current SPS
+     SPS sps; ///< current sps
+ 
+     /**
+diff --git a/gst-libs/ext/libav/libavcodec/h264_ps.c.old b/gst-libs/ext/libav/libavcodec/h264_ps.c
+index 7491807..0929098 100644
+--- a/gst-libs/ext/libav/libavcodec/h264_ps.c.old
++++ b/gst-libs/ext/libav/libavcodec/h264_ps.c
+@@ -438,10 +438,13 @@ int ff_h264_decode_seq_parameter_set(H264Context *h){
+                sps->timing_info_present_flag ? sps->time_scale : 0
+                );
+     }
++    sps->new = 1;
+ 
+     av_free(h->sps_buffers[sps_id]);
+-    h->sps_buffers[sps_id]= sps;
+-    h->sps = *sps;
++    h->sps_buffers[sps_id] = sps;
++    h->sps                 = *sps;
++    h->current_sps_id      = sps_id;
++
+     return 0;
+ fail:
+     av_free(sps);

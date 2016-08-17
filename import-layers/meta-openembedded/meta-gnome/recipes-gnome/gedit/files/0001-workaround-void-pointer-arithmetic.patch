@@ -1,0 +1,57 @@
+From 8e0cbfac142d38320dd02416601e14c65585cd17 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Sat, 9 Mar 2013 12:47:06 +0100
+Subject: [PATCH] workaround void pointer arithmetic
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+fixes errors like:
+error: pointer of type 'void *' used in arithmetic [-Werror=pointer-arith]
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ gedit/gedit-document-input-stream.c   |    4 ++--
+ gedit/gedit-smart-charset-converter.c |    2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/gedit/gedit-document-input-stream.c b/gedit/gedit-document-input-stream.c
+index 5a1f961..38316e7 100644
+--- a/gedit/gedit-document-input-stream.c
++++ b/gedit/gedit-document-input-stream.c
+@@ -426,7 +426,7 @@ gedit_document_input_stream_read (GInputStream  *stream,
+ 
+ 	do
+ 	{
+-		n = read_line (dstream, buffer + read, space_left);
++		n = read_line (dstream, ((char*)buffer) + read, space_left);
+ 		read += n;
+ 		space_left -= n;
+ 	} while (space_left > 0 && n != 0 && dstream->priv->bytes_partial == 0);
+@@ -451,7 +451,7 @@ gedit_document_input_stream_read (GInputStream  *stream,
+ 
+ 			newline = get_new_line (dstream);
+ 
+-			memcpy (buffer + read, newline, newline_size);
++			memcpy (((char*)buffer) + read, newline, newline_size);
+ 
+ 			read += newline_size;
+ 			dstream->priv->newline_added = TRUE;
+diff --git a/gedit/gedit-smart-charset-converter.c b/gedit/gedit-smart-charset-converter.c
+index e32b0b1..6745ce3 100644
+--- a/gedit/gedit-smart-charset-converter.c
++++ b/gedit/gedit-smart-charset-converter.c
+@@ -153,7 +153,7 @@ try_convert (GCharsetConverter *converter,
+ 	do
+ 	{
+ 		res = g_converter_convert (G_CONVERTER (converter),
+-		                           inbuf + nread,
++		                           ((const char*)inbuf) + nread,
+ 		                           inbuf_size - nread,
+ 		                           out + nwritten,
+ 		                           out_size - nwritten,
+-- 
+1.7.4.4
+

@@ -1,0 +1,12 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+--- hplip-3.11.10/setup.py.orig	2011-10-02 14:06:19.000000000 +1100
++++ hplip-3.11.10/setup.py	2012-02-29 08:21:39.167999938 +1100
+@@ -573,6 +573,7 @@
+ 
+             log.debug("Restarting CUPS...")
+             status, output = utils.run(restart_cups())
++            time.sleep(3)
+             log.debug("Restart CUPS returned: exit=%d output=%s" % (status, output))
+ 
+             cups.setPasswordPrompt("You do not have permission to add a printer.")

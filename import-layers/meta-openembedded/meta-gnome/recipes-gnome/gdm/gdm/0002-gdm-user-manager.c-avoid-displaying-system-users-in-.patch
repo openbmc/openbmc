@@ -1,0 +1,34 @@
+From 43e59f3deadb3914a1cc931ae18d4023874cdeca Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Fri, 26 Apr 2013 17:15:48 +0200
+Subject: [PATCH] gdm-user-manager.c: avoid displaying system users in
+ greeter's list
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+yocto environment system users have UID below 1000
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ gui/simple-greeter/gdm-user-manager.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/gui/simple-greeter/gdm-user-manager.c b/gui/simple-greeter/gdm-user-manager.c
+index c631989..f18e478 100644
+--- a/gui/simple-greeter/gdm-user-manager.c
++++ b/gui/simple-greeter/gdm-user-manager.c
+@@ -63,7 +63,7 @@
+ #ifdef __sun
+ #define FALLBACK_MINIMAL_UID     100
+ #else
+-#define FALLBACK_MINIMAL_UID     500
++#define FALLBACK_MINIMAL_UID     1000
+ #endif
+ 
+ #ifndef _PATH_SHELLS
+-- 
+1.7.4.4
+

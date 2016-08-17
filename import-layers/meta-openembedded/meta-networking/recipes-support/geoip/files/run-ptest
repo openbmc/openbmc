@@ -1,0 +1,11 @@
+#!/bin/sh
+pdir=`dirname $0`
+cd ${pdir}/tests
+for i in ./benchmark ./test-geoip-city ; do
+	${i} 1>/dev/null 2>&1;
+	if [ $? == 0 ]; then
+		echo PASS: $i;
+	else
+		echo FAIL: $i;
+	fi;
+done

@@ -1,0 +1,117 @@
+#!/bin/sh
+DAEMON=/usr/bin/dnsmasq
+NAME=dnsmasq
+DESC="DNS forwarder and DHCP server"
+ARGS="-7 /etc/dnsmasq.d"
+
+test -f $DAEMON || exit 0
+
+set -e
+
+if [ -r /etc/default/$NAME ]
+then
+	. /etc/default/$NAME
+fi
+
+DNSMASQ_CONF="/etc/dnsmasq.conf"
+test "/etc/dnsmasq.d/*" != '/etc/dnsmasq.d/*' && DNSMASQ_CONF="${DNSMASQ_CONF} /etc/dnsmasq.d/*"
+
+test -z "${PIDFILE}" && PIFILE="/run/dnsmasq.pid"
+
+if [ -z "$IGNORE_RESOLVCONF" ]
+then
+	egrep -h -q '^no-resolv' ${DNSMASQ_CONF} && IGNORE_RESOLVCONF="yes"
+fi
+
+# RESOLV_CONF:
+# If the resolvconf package is installed then use the resolv conf file
+# that it provides as the default.  Otherwise use /etc/resolv.conf as
+# the default.
+#
+# If IGNORE_RESOLVCONF is set in /etc/default/dnsmasq or an explicit
+# filename is set there then this inhibits the use of the resolvconf-provided
+# information.
+#
+# Note that if the resolvconf package is installed it is not possible to
+# override it just by configuration in /etc/dnsmasq.conf, it is necessary
+# to set IGNORE_RESOLVCONF=yes in /etc/default/dnsmasq.
+
+test -z "$RESOLV_CONF" -a "$IGNORE_RESOLVCONF" != "yes" -a -x /sbin/resolvconf && \
+	RESOLV_CONF=/run/dnsmasq/resolv.conf
+
+start_resolvconf()
+{
+        if [ "$IGNORE_RESOLVCONF" != "yes" -a -x /sbin/resolvconf ]
+	then
+		echo "nameserver 127.0.0.1" | /sbin/resolvconf -a lo.$NAME
+	fi
+	:
+}
+
+stop_resolvconf()
+{
+	if [ "$IGNORE_RESOLVCONF" != "yes" -a -x /sbin/resolvconf ]
+	then
+		/sbin/resolvconf -d lo.$NAME
+	fi
+	:
+}
+
+case "$1" in
+    start)
+        echo -n "starting $DESC: $NAME... "
+	test -d /var/lib/misc/ || mkdir /var/lib/misc/
+	start-stop-daemon -S -x $DAEMON -- $ARGS \
+		${RESOLV_CONF:+ -r $RESOLV_CONF} \
+		${PIDFILE:+ -x $PIDFILE}
+	test $? -eq 0 && start_resolvconf
+	echo "done."
+	;;
+    stop)
+        echo -n "stopping $DESC: $NAME... "
+	stop_resolvconf
+	start-stop-daemon -K -x $DAEMON
+	echo "done."
+	;;
+    status)
+	echo -n "dnsmasq "
+	start-stop-daemon -q -K -t -x $DAEMON
+	RET=$?
+	if [ "$RET" = "0" ]; then
+		PID=`cat ${PIDFILE}`
+		echo "($PID) is running"
+	else
+		echo "is not running"
+		exit $RET
+	fi
+	;;
+    restart)
+        echo "restarting $DESC: $NAME... "
+ 	$0 stop
+	$0 start
+	echo "done."
+	;;
+    reload)
+    	echo -n "reloading $DESC: $NAME... "
+    	killall -HUP $(basename ${DAEMON})
+	echo "done."
+	;;
+    systemd-start-resolvconf)
+	start_resolvconf
+	;;
+    systemd-stop-resolvconf)
+	stop_resolvconf
+	;;
+    systemd-exec)
+	test -d /var/lib/misc/ || mkdir /var/lib/misc/
+	exec $DAEMON --keep-in-foreground $ARGS \
+		${RESOLV_CONF:+ -r $RESOLV_CONF} \
+		${PIDFILE:+ -x $PIDFILE}
+	;;
+    *)
+	echo "Usage: $0 {start|stop|status|restart|reload}"
+	exit 1
+	;;
+esac
+
+exit 0

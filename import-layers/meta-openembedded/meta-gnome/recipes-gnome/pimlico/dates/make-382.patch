@@ -1,0 +1,18 @@
+Make 3.82 is offended by the use of spaces instead of tabs. This has been fixed
+in upstream git.
+
+JL - 15/12/10
+
+Upstream-Status: Accepted
+
+Index: git/Makefile.am
+===================================================================
+--- git.orig/Makefile.am
++++ git/Makefile.am
+@@ -7,5 +7,5 @@ DISTCLEANFILES = intltool-extract intlto
+ MAINTAINERCLEANFILES = $(DISTCLEANFILES) aclocal.m4 compile config.guess config.sub configure depcomp install-sh ltmain.sh Makefile.in missing
+ 
+ snapshot:
+-        $(MAKE) dist distdir=$(PACKAGE)-snap`date +"%Y%m%d"`
++	$(MAKE) dist distdir=$(PACKAGE)-snap`date +"%Y%m%d"`
+ 

@@ -1,0 +1,48 @@
+From 040ade8bb86a771fa4e71b41d2080254830ca9f3 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Sat, 16 Mar 2013 17:44:37 +0100
+Subject: [PATCH] glamo*driver: remove references to mibstore
+
+* fix build with xserver-1.14
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ src/glamo-driver.c     | 2 --
+ src/glamo-kms-driver.c | 1 -
+ 2 files changed, 3 deletions(-)
+
+diff --git a/src/glamo-driver.c b/src/glamo-driver.c
+index 10b7762..22f57d7 100644
+--- a/src/glamo-driver.c
++++ b/src/glamo-driver.c
+@@ -14,7 +14,6 @@
+ #include "xf86_OSproc.h"
+ 
+ #include "mipointer.h"
+-#include "mibstore.h"
+ #include "micmap.h"
+ #include "colormapst.h"
+ #include "xf86cmap.h"
+@@ -612,7 +611,6 @@ GlamoScreenInit(SCREEN_INIT_ARGS_DECL)
+     }
+ 
+     xf86SetBlackWhitePixels(pScreen);
+-    miInitializeBackingStore(pScreen);
+     xf86SetBackingStore(pScreen);
+ 
+     /* software cursor */
+diff --git a/src/glamo-kms-driver.c b/src/glamo-kms-driver.c
+index c5c7a00..f192398 100644
+--- a/src/glamo-kms-driver.c
++++ b/src/glamo-kms-driver.c
+@@ -415,7 +415,6 @@ Bool GlamoKMSScreenInit(int scrnIndex, ScreenPtr pScreen, int argc,
+ 
+ 	GlamoKMSExaInit(pScrn);
+ 
+-	miInitializeBackingStore(pScreen);
+ 	xf86SetBackingStore(pScreen);
+ 	xf86SetSilkenMouse(pScreen);
+ 	miDCInitialize(pScreen, xf86GetPointerScreenFuncs());
+-- 
+1.8.1.5
+

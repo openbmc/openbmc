@@ -1,0 +1,36 @@
+From da3929a96d9c74e11bf37d128890e18fcb745365 Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@cn.fujitsu.com>
+Date: Mon, 26 Jan 2015 08:53:19 +0900
+Subject: [PATCH] mozjs17.0.0: fix the compile bug of powerpc
+
+To fix the bug as following
+
+error: cannot convert '__va_list_tag**' to '__va_list_tag (*)[1]' for
+argument '5' to 'JSBool TryArgumentFormatter(JSContext*, const char**,
+JSBool, jsval**, __va_list_tag (*)[1])'
+
+Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
+---
+ jscpucfg.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/jscpucfg.h b/jscpucfg.h
+index dfb1c14..8683491 100644
+--- a/jscpucfg.h
++++ b/jscpucfg.h
+@@ -47,6 +47,12 @@
+ #elif defined(JS_HAVE_ENDIAN_H)
+ # include <endian.h>
+ 
++#if defined(_POWER) || defined(__powerpc__) || \
++    defined(__ppc__)
++# define HAVE_VA_LIST_AS_ARRAY 1
++# endif
++
++
+ # if defined(__BYTE_ORDER)
+ #  if __BYTE_ORDER == __LITTLE_ENDIAN
+ #   define IS_LITTLE_ENDIAN 1
+-- 
+1.8.4.2
+

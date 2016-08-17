@@ -1,0 +1,26 @@
+diff --git a/setup.py b/setup.py
+index 62df445..1fdbdeb 100755
+--- a/setup.py
++++ b/setup.py
+@@ -213,12 +213,6 @@ def settings_from_prefix(prefix=None, bundle_libzmq_dylib=False):
+                 pass
+                 # unused rpath args for OS X:
+                 # settings['extra_link_args'] = ['-Wl,-rpath','-Wl,$ORIGIN/..']
+-            else:
+-                settings['runtime_library_dirs'] += ['$ORIGIN/..']
+-        elif sys.platform != 'darwin':
+-            settings['runtime_library_dirs'] += [
+-                os.path.abspath(x) for x in settings['library_dirs']
+-            ]
+     
+     return settings
+ 
+@@ -592,8 +586,6 @@ class Configure(build_ext):
+                 pass
+                 # unused rpath args for OS X:
+                 # settings['extra_link_args'] = ['-Wl,-rpath','-Wl,$ORIGIN/../zmq']
+-            else:
+-                settings['runtime_library_dirs'] = [ os.path.abspath(pjoin('.', 'zmq')) ]
+         
+         line()
+         info("Configure: Autodetecting ZMQ settings...")

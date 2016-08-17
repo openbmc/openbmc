@@ -1,0 +1,230 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides: httpd
+# Required-Start: $local_fs $remote_fs $network $named
+# Required-Stop: $local_fs $remote_fs $network
+# Should-Start: distcache
+# Short-Description: start and stop Apache HTTP Server
+# Description: The Apache HTTP Server is an extensible server
+#  implementing the current HTTP standards.
+### END INIT INFO
+
+ARGS="-D SSL -D PHP5 -k start"
+NAME=apache2
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+DAEMON=/usr/sbin/httpd
+SUEXEC=/usr/lib/apache/suexec
+PIDFILE=/run/httpd.pid
+CONF=/etc/apache2/httpd.conf
+APACHECTL=/usr/sbin/apachectl 
+
+trap "" 1
+export LANG=C
+export PATH
+
+test -f $DAEMON || exit 0
+test -f $APACHECTL || exit 0
+
+# ensure we don't leak environment vars into apachectl
+APACHECTL="env -i LANG=${LANG} PATH=${PATH} $APACHECTL"
+
+apache_conftest() {
+    if $($APACHECTL configtest > /dev/null 2>&1 ); then
+        return 0
+    else
+        return 1
+    fi
+}
+
+apache_wait_start() {
+    local STATUS=$1
+
+    if [ $STATUS != 0 ] ; then
+        return $STATUS
+    fi
+
+    local i=0
+    while : ; do
+            PIDTMP=$(pidof $DAEMON | tr ' ' '\n' | grep -w $(cat $PIDFILE))
+            if [ -n "${PIDTMP:-}" ] && kill -0 "${PIDTMP:-}" 2> /dev/null; then
+                    return $STATUS
+            fi
+
+            if [ $i = "20" ] ; then
+                    return 2
+            fi
+
+            sleep 1
+            i=$(($i+1))
+    done
+}
+
+apache_wait_stop() {
+    local STATUS=$1
+
+    if [ $STATUS != 0 ] ; then
+        return $STATUS
+    fi
+
+    PIDTMP=$(pidof $DAEMON | tr ' ' '\n' | grep -w $(cat $PIDFILE))
+    if [ -n "${PIDTMP:-}" ] && kill -0 "${PIDTMP:-}" 2> /dev/null; then
+            local i=0
+            while kill -0 "${PIDTMP:-}" 2> /dev/null;  do
+                    if [ $i = '60' ]; then
+                            STATUS=2
+                            break
+                    fi
+                    sleep 1
+                    i=$(($i+1))
+            done
+            return $STATUS
+    else
+        return $STATUS
+    fi
+}
+
+#
+# Function that starts the daemon/service
+#
+do_start()
+{
+    # Return
+    #   0 if daemon has been started
+    #   1 if daemon was already running
+    #   2 if daemon could not be started
+
+    if [ -e $PIDFILE ] && pidof $DAEMON | tr ' ' '\n' | grep -w $(cat $PIDFILE) > /dev/null 2>&1 ; then
+            return 1
+    fi
+
+    if apache_conftest ; then
+            $APACHECTL start
+            apache_wait_start $?
+            return $?
+    else
+            return 2
+    fi
+}
+
+#
+# Function that stops the daemon/service
+#
+do_stop()
+{
+    # Return
+    #   0 if daemon has been stopped
+    #   1 if daemon was already stopped
+    #   2 if daemon could not be stopped
+    #   other if a failure occurred
+
+        local AP_RET=0
+
+        if pidof $DAEMON > /dev/null 2>&1 ; then
+                if [ -e $PIDFILE ] && pidof $DAEMON | tr ' ' '\n' | grep -w $(cat $PIDFILE) > /dev/null 2>&1 ; then
+                        AP_RET=2
+                else
+                        AP_RET=1
+                fi
+        else
+            AP_RET=0
+        fi
+
+        # AP_RET is:
+        # 0 if Apache (whichever) is not running
+        # 1 if Apache (whichever) is running
+        # 2 if Apache from the PIDFILE is running
+
+        if [ $AP_RET = 0 ] ; then
+                return 1
+        fi
+
+        if [ $AP_RET = 2 ] && apache_conftest ; then
+                $APACHECTL stop
+                apache_wait_stop $?
+                return $?
+        else
+                if [ $AP_RET = 2 ]; then
+                        kill $(pidof $DAEMON | tr ' ' '\n' | grep -w $(cat $PIDFILE))
+                        apache_wait_stop $?
+                        return $?
+                elif [ $AP_RET = 1 ] ; then
+                        return 2
+                fi
+        fi
+
+}
+
+case "$1" in
+  start)
+    echo -n "Starting web server: $NAME"
+    do_start
+    case $? in
+        0|1)
+            echo .
+            exit 0
+            ;;
+        2)
+            echo failed
+            exit 1
+            ;;
+    esac
+    ;;
+
+  stop)
+    echo -n "Stopping web server: $NAME"
+    do_stop
+    case $? in
+        0|1)
+            echo .
+            exit 0
+            ;;
+        2)
+            echo failed
+            exit 1
+            ;;
+    esac
+    ;;
+
+  reload)
+    echo -n "Reloading $NAME configuration"
+    kill -HUP `cat $PIDFILE`
+    ;;
+
+  reload-modules)
+    echo -n "Reloading $NAME modules"
+    $APACHECTL restart
+    ;;
+
+  restart)
+    echo "Restarting web server: $NAME"
+    do_stop
+    case "$?" in
+        0|1)
+            do_start
+            exit $?
+            ;;
+        *)
+            # Failed to stop
+            exit 1
+            ;;
+    esac
+    ;;
+
+  force-reload)
+    $0 reload-modules
+    exit $?
+    ;;
+
+  *)
+    echo "Usage: /etc/init.d/$NAME {start|stop|reload|reload-modules|force-reload|restart}"
+    exit 1
+    ;;
+esac
+
+if [ $? = 0 ]; then
+	echo .
+	exit 0
+else
+	echo failed
+	exit 1
+fi

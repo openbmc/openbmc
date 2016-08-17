@@ -1,0 +1,30 @@
+From fe65ac8face3c88d9d4e12811f44e63ad72c59ae Mon Sep 17 00:00:00 2001
+From: Bian Naimeng <biannm@cn.fujitsu.com>
+Date: Thu, 18 Jun 2015 12:25:25 +0900
+Subject: [PATCH] fix build warning
+
+  NOTE: Executing RunQueue Tasks
+  WARNING: QA Issue: Symlink /lib/libmpathpersist.so in multipath-tools-dev points to TMPDIR [symlink-to-sysroot]
+  NOTE: Tasks Summary: Attempted 1604 tasks of which 1591 didn't need to be rerun and all succeeded.
+
+Signed-off-by: Bian Naimeng <biannm@cn.fujitsu.com>
+---
+ libmpathpersist/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libmpathpersist/Makefile b/libmpathpersist/Makefile
+index c4ec1c5..62022eb 100644
+--- a/libmpathpersist/Makefile
++++ b/libmpathpersist/Makefile
+@@ -32,7 +32,7 @@ install: $(LIBS)
+ 	$(INSTALL_PROGRAM) -m 755 -d $(DESTDIR)$(man3dir)
+ 	$(INSTALL_PROGRAM) -m 755 -d $(DESTDIR)/usr/include/
+ 	$(INSTALL_PROGRAM) -m 755 -d $(DESTDIR)/usr/share/doc/mpathpersist/
+-	ln -sf $(DESTDIR)$(syslibdir)/$(LIBS) $(DESTDIR)$(syslibdir)/$(DEVLIB)
++	ln -sf $(syslibdir)/$(LIBS) $(DESTDIR)$(syslibdir)/$(DEVLIB)
+ 	install -m 644 mpath_persistent_reserve_in.3.gz $(DESTDIR)$(man3dir)	
+ 	install -m 644 mpath_persistent_reserve_out.3.gz $(DESTDIR)$(man3dir)	
+ 	install -m 644 mpath_persist.h $(DESTDIR)/usr/include/
+-- 
+1.8.4.2
+

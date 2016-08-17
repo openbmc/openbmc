@@ -1,0 +1,45 @@
+Disable OS version check in status screen
+
+The code is not able to accurately detect the correct distro/version at
+the moment.
+
+Upstream-status: Inappropriate
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+
+diff --git a/webmin/webmin-lib.pl b/webmin/webmin-lib.pl
+index 57a37f7..838b944 100755
+--- a/webmin/webmin-lib.pl
++++ b/webmin/webmin-lib.pl
+@@ -1059,18 +1059,19 @@ my %miniserv;
+ &load_theme_library();	# So that UI functions work
+ 
+ # Need OS upgrade
+-my %realos = &detect_operating_system(undef, 1);
+-if (($realos{'os_version'} ne $gconfig{'os_version'} ||
+-     $realos{'os_type'} ne $gconfig{'os_type'}) &&
+-    $realos{'os_version'} && $realos{'os_type'} &&
+-    &foreign_available("webmin")) {
+-	push(@notifs, 
+-		&ui_form_start("$gconfig{'webprefix'}/webmin/fix_os.cgi").
+-		&text('os_incorrect', $realos{'real_os_type'},
+-				    $realos{'real_os_version'})."<p>\n".
+-		&ui_form_end([ [ undef, $text{'os_fix'} ] ])
+-		);
+-	}
++# Disabled for now as os-chooser.pl does not work on our system
++#my %realos = &detect_operating_system(undef, 1);
++#if (($realos{'os_version'} ne $gconfig{'os_version'} ||
++#     $realos{'os_type'} ne $gconfig{'os_type'}) &&
++#    $realos{'os_version'} && $realos{'os_type'} &&
++#    &foreign_available("webmin")) {
++#	push(@notifs, 
++#		&ui_form_start("$gconfig{'webprefix'}/webmin/fix_os.cgi").
++#		&text('os_incorrect', $realos{'real_os_type'},
++#				    $realos{'real_os_version'})."<p>\n".
++#		&ui_form_end([ [ undef, $text{'os_fix'} ] ])
++#		);
++#	}
+ 
+ # Password close to expiry
+ my $warn_days = $config{'warn_days'};

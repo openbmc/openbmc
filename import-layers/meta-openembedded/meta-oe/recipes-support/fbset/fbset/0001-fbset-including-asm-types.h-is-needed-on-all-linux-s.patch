@@ -1,0 +1,34 @@
+From 06edd88833da93361d5408b880fbb890df332497 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 19 Jan 2016 01:55:47 +0000
+Subject: [PATCH] fbset: including asm/types.h is needed on all linux systems
+
+including asm/types.h is needed to get Linux typedef's like
+__s32 and so on which are independent of C library therefore this
+define should not be guarded by __GLIBC__ but by __linux__
+
+Helps to compile it on musl systems
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ fbset.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fbset.h b/fbset.h
+index 9b1d2ac..0d8def8 100644
+--- a/fbset.h
++++ b/fbset.h
+@@ -15,7 +15,7 @@
+ #include <stdio.h>
+ #include <sys/types.h>
+ 
+-#ifdef __GLIBC__
++#ifdef __linux__
+ #include <asm/types.h>
+ #endif
+ 
+-- 
+2.7.0
+

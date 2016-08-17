@@ -1,0 +1,21 @@
+Upstream-Status: Pending
+
+fix following race issue when do parallel install
+| mkdir: cannot create directory `/home/mypc/workspace/poky/build_p4080ds_release/tmp/work/ppce500mc-fsl_networking-linux/apache2/2.4.3-r1/image/usr/share/apache2': File exists
+...
+| mkdir: cannot create directory `/home/mypc/workspace/poky/build_p4080ds_release/tmp/work/ppce500mc-fsl_networking-linux/apache2/2.4.3-r1/image/usr/share/apache2': File exists
+| make[1]: *** [install-man] Error 1
+| make[1]: *** Waiting for unfinished jobs....
+
+-Signed-off-by: Zhenhua Luo <zhenhua.luo@freescale.com>
+--- httpd-2.4.3/build/mkdir.sh.orig	2013-01-25 03:47:21.565255420 -0600
++++ httpd-2.4.3/build/mkdir.sh	2013-01-25 03:46:17.833051230 -0600
+@@ -39,7 +39,7 @@
+         esac
+         if test ! -d "$pathcomp"; then
+             echo "mkdir $pathcomp" 1>&2
+-            mkdir "$pathcomp" || errstatus=$?
++            mkdir -p "$pathcomp" || errstatus=$?
+         fi
+         pathcomp="$pathcomp/"
+     done

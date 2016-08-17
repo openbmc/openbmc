@@ -1,0 +1,75 @@
+From d94f2d3f96db529383b22f2dc294847190d1bfbe Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 10 Nov 2015 02:11:30 -0500
+Subject: [PATCH 2/2] Recent 1.0.2 betas have dropped the SSLv3_method
+ function. This patch leaves out the function on newer versions, much the same
+ as the SSLv2 deprecation is handled. It also fixes the ALPN test, which was
+ incorrectly failing on OpenSSL due to the LibreSSL check (earlier versions
+ bailed out before that line). Signed-off-by: Patch from Tom Molesworth
+
+Upstream-Status: Backport from upstream 1.67
+http://www.cpan.org/authors/id/M/MI/MIKEM/Net-SSLeay-1.67.tar.gz
+https://rt.cpan.org/Public/Bug/Display.html?id=101484
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ SSLeay.xs                 | 12 ++++++++++++
+ t/local/41_alpn_support.t |  2 +-
+ 2 files changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/SSLeay.xs b/SSLeay.xs
+index c31396d..1fd4fab 100644
+--- a/SSLeay.xs
++++ b/SSLeay.xs
+@@ -1409,6 +1409,9 @@ SSL_CTX_v2_new()
+ #endif
+ #endif
+ 
++#ifndef OPENSSL_NO_SSL3
++#if OPENSSL_VERSION_NUMBER < 0x10002000L
++
+ SSL_CTX *
+ SSL_CTX_v3_new()
+      CODE:
+@@ -1416,6 +1419,9 @@ SSL_CTX_v3_new()
+      OUTPUT:
+      RETVAL
+ 
++#endif
++#endif
++
+ SSL_CTX *
+ SSL_CTX_v23_new()
+      CODE:
+@@ -3758,9 +3764,15 @@ SSLv2_method()
+ #endif
+ #endif
+ 
++#ifndef OPENSSL_NO_SSL3
++#if OPENSSL_VERSION_NUMBER < 0x10002000L
++
+ const SSL_METHOD *
+ SSLv3_method()
+ 
++#endif
++#endif
++
+ const SSL_METHOD *
+ TLSv1_method()
+ 
+diff --git a/t/local/41_alpn_support.t b/t/local/41_alpn_support.t
+index ba984b5..87a0214 100644
+--- a/t/local/41_alpn_support.t
++++ b/t/local/41_alpn_support.t
+@@ -11,7 +11,7 @@ use Config;
+ 
+ BEGIN {
+   plan skip_all => "openssl 1.0.2 required" unless Net::SSLeay::SSLeay >= 0x10002000;
+-  plan skip_all => "libressl not supported" if &Net::SSLeay::LIBRESSL_VERSION_NUMBER;
++  plan skip_all => "libressl not supported" if defined &Net::SSLeay::LIBRESSL_VERSION_NUMBER;
+   plan skip_all => "fork() not supported on $^O" unless $Config{d_fork};
+ }
+ 
+-- 
+1.9.1
+

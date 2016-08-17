@@ -1,0 +1,101 @@
+From 8587e35af52f7773f62361be2e72ddf286a59185 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Tue, 15 May 2012 13:02:02 +0200
+Subject: [PATCH] Fix glib includes
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Upstream-Status: unknown
+
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ src/interface.h       |    2 +-
+ src/load-graph.h      |    2 +-
+ src/lsof.h            |    2 +-
+ src/openfiles.h       |    2 +-
+ src/procman_gnomesu.h |    2 +-
+ src/util.cpp          |    2 +-
+ 6 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/src/interface.h b/src/interface.h
+index 4bda35a..b26b670 100644
+--- a/src/interface.h
++++ b/src/interface.h
+@@ -20,7 +20,7 @@
+ #ifndef _PROCMAN_INTERFACE_H_
+ #define _PROCMAN_INTERFACE_H_
+ 
+-#include <glib/gtypes.h>
++#include <glib.h>
+ #include <gtk/gtk.h>
+ #include "procman.h"
+ 
+diff --git a/src/load-graph.h b/src/load-graph.h
+index 6111c78..6e7a599 100644
+--- a/src/load-graph.h
++++ b/src/load-graph.h
+@@ -1,7 +1,7 @@
+ #ifndef _PROCMAN_LOAD_GRAPH_H_
+ #define _PROCMAN_LOAD_GRAPH_H_
+ 
+-#include <glib/gtypes.h>
++#include <glib.h>
+ #include <glibtop/cpu.h>
+ 
+ enum
+diff --git a/src/lsof.h b/src/lsof.h
+index ad7f111..da420e2 100644
+--- a/src/lsof.h
++++ b/src/lsof.h
+@@ -1,7 +1,7 @@
+ #ifndef H_PROCMAN_LSOF_1161179202
+ #define H_PROCMAN_LSOF_1161179202
+ 
+-#include <glib/gmacros.h>
++#include <glib.h>
+ #include "procman.h"
+ 
+ void procman_lsof(ProcData *data);
+diff --git a/src/openfiles.h b/src/openfiles.h
+index 38b1cc8..a8b7b05 100644
+--- a/src/openfiles.h
++++ b/src/openfiles.h
+@@ -1,7 +1,7 @@
+ #ifndef _OPENFILES_H_
+ #define _OPENFILES_H_
+ 
+-#include <glib/gtypes.h>
++#include <glib.h>
+ 
+ #include "procman.h"
+ 
+diff --git a/src/procman_gnomesu.h b/src/procman_gnomesu.h
+index fec2650..474ca9a 100644
+--- a/src/procman_gnomesu.h
++++ b/src/procman_gnomesu.h
+@@ -1,7 +1,7 @@
+ #ifndef H_GNOME_SYSTEM_MONITOR_GNOMESU_H_1132171917
+ #define H_GNOME_SYSTEM_MONITOR_GNOMESU_H_1132171917
+ 
+-#include <glib/gtypes.h>
++#include <glib.h>
+ 
+ gboolean
+ procman_gnomesu_create_root_password_dialog(const char * message);
+diff --git a/src/util.cpp b/src/util.cpp
+index 9b1c9f5..90073fe 100644
+--- a/src/util.cpp
++++ b/src/util.cpp
+@@ -1,7 +1,7 @@
+ #include <config.h>
+ 
+ #include <glib/gi18n.h>
+-#include <glib/gstring.h>
++#include <glib.h>
+ #include <gtk/gtk.h>
+ 
+ #include <glibtop/proctime.h>
+-- 
+1.7.6.5
+

@@ -1,0 +1,14 @@
+# This patch ensures that the install operations which strip
+# programs and libraries (LTINSTALL) work in a cross build
+# environment.
+--- openldap-2.2.24/.pc/install-strip.patch/build/top.mk	2005-01-20 09:00:55.000000000 -0800
++++ openldap-2.2.24/build/top.mk	2005-04-16 13:48:20.536710376 -0700
+@@ -116,7 +116,7 @@
+ LTLINK_MOD = $(LIBTOOL) $(LTONLY_MOD) --mode=link \
+ 	$(CC) $(LT_CFLAGS) $(LDFLAGS) $(LTFLAGS_MOD)
+ 
+-LTINSTALL = $(LIBTOOL) --mode=install $(INSTALL) 
++LTINSTALL = STRIPPROG="" $(LIBTOOL) --mode=install $(top_srcdir)/contrib/ldapc++/install-sh -c
+ LTFINISH = $(LIBTOOL) --mode=finish
+ 
+ # Misc UNIX commands used in build environment

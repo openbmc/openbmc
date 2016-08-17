@@ -1,0 +1,92 @@
+fuse: Fix linking issues with gold linker
+
+fuse has problems when linking with gold since it uses version
+scripts in a way thats so perticular to bfd ld
+
+/home/kraj/work/angstrom/build/tmp-angstrom_2010_x-eglibc/sysroots/x86_64-linux/usr/libexec/armv5te-angstrom-linux-gnueabi/gcc/arm-angstro
+error: symbol __fuse_exited has undefined version
+| collect2: ld returned 1 exit status
+| make[1]: *** [libfuse.la] Error 1
+| make[1]: *** Waiting for unfinished jobs....
+
+For more details
+
+http://blog.flameeyes.eu/2011/06/01/gold-readiness-obstacle-2-base-versioning
+http://sources.redhat.com/bugzilla/show_bug.cgi?id=10861
+http://comments.gmane.org/gmane.comp.file-systems.fuse.devel/9524
+http://www.airs.com/blog/archives/300
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ lib/fuse.c             | 10 +++++-----
+ lib/fuse_mt.c          |  2 +-
+ lib/fuse_versionscript |  3 +++
+ lib/helper.c           |  6 +++---
+ 4 files changed, 12 insertions(+), 9 deletions(-)
+
+diff --git a/lib/fuse.c b/lib/fuse.c
+index 067d0dc..6d27711 100644
+--- a/lib/fuse.c
++++ b/lib/fuse.c
+@@ -4873,11 +4873,11 @@ struct fuse *fuse_new_compat1(int fd, int flags,
+ 				      11);
+ }
+ 
+-FUSE_SYMVER(".symver fuse_exited,__fuse_exited@");
+-FUSE_SYMVER(".symver fuse_process_cmd,__fuse_process_cmd@");
+-FUSE_SYMVER(".symver fuse_read_cmd,__fuse_read_cmd@");
+-FUSE_SYMVER(".symver fuse_set_getcontext_func,__fuse_set_getcontext_func@");
+-FUSE_SYMVER(".symver fuse_new_compat2,fuse_new@");
++FUSE_SYMVER(".symver fuse_exited,__fuse_exited@FUSE_UNVERSIONED");
++FUSE_SYMVER(".symver fuse_process_cmd,__fuse_process_cmd@FUSE_UNVERSIONED");
++FUSE_SYMVER(".symver fuse_read_cmd,__fuse_read_cmd@FUSE_UNVERSIONED");
++FUSE_SYMVER(".symver fuse_set_getcontext_func,__fuse_set_getcontext_func@FUSE_UNVERSIONED");
++FUSE_SYMVER(".symver fuse_new_compat2,fuse_new@FUSE_UNVERSIONED");
+ FUSE_SYMVER(".symver fuse_new_compat22,fuse_new@FUSE_2.2");
+ 
+ #endif /* __FreeBSD__ || __NetBSD__  */
+diff --git a/lib/fuse_mt.c b/lib/fuse_mt.c
+index f6dbe71..fd5ac23 100644
+--- a/lib/fuse_mt.c
++++ b/lib/fuse_mt.c
+@@ -119,4 +119,4 @@ int fuse_loop_mt(struct fuse *f)
+ 	return res;
+ }
+ 
+-FUSE_SYMVER(".symver fuse_loop_mt_proc,__fuse_loop_mt@");
++FUSE_SYMVER(".symver fuse_loop_mt_proc,__fuse_loop_mt@FUSE_UNVERSIONED");
+diff --git a/lib/fuse_versionscript b/lib/fuse_versionscript
+index 8d91887..de16ab2 100644
+--- a/lib/fuse_versionscript
++++ b/lib/fuse_versionscript
+@@ -1,3 +1,6 @@
++FUSE_UNVERSIONED {
++};
++
+ FUSE_2.2 {
+ 	global:
+ 		fuse_destroy;
+diff --git a/lib/helper.c b/lib/helper.c
+index b644012..c5349bf 100644
+--- a/lib/helper.c
++++ b/lib/helper.c
+@@ -436,10 +436,10 @@ int fuse_mount_compat1(const char *mountpoint, const char *args[])
+ 	return fuse_mount_compat22(mountpoint, NULL);
+ }
+ 
+-FUSE_SYMVER(".symver fuse_setup_compat2,__fuse_setup@");
++FUSE_SYMVER(".symver fuse_setup_compat2,__fuse_setup@FUSE_UNVERSIONED");
+ FUSE_SYMVER(".symver fuse_setup_compat22,fuse_setup@FUSE_2.2");
+-FUSE_SYMVER(".symver fuse_teardown,__fuse_teardown@");
+-FUSE_SYMVER(".symver fuse_main_compat2,fuse_main@");
++FUSE_SYMVER(".symver fuse_teardown,__fuse_teardown@FUSE_UNVERSIONED");
++FUSE_SYMVER(".symver fuse_main_compat2,fuse_main@FUSE_UNVERSIONED");
+ FUSE_SYMVER(".symver fuse_main_real_compat22,fuse_main_real@FUSE_2.2");
+ 
+ #endif /* __FreeBSD__ || __NetBSD__ */
+-- 
+1.8.1.2
+

@@ -1,0 +1,292 @@
+Upstream-Status: Inappropriate
+
+This patch lets you build Ice with OpenEmbedded. I doubt you could do
+a regular build after applying this patch.
+
+From bc622ce74fa03a935278d21736a5a251466e1798 Mon Sep 17 00:00:00 2001
+From: Tom Rondeau <tom@trondeau.com>
+Date: Wed, 16 Apr 2014 14:34:51 -0400
+Subject: [PATCH] Modify Makefiles for cross compile
+
+---
+ config/Make.common.rules           |   20 +++++++------
+ cpp/Makefile                       |    9 +++---
+ cpp/config/Make.rules              |   32 ++++++++++++--------
+ cpp/config/Make.rules.Linux        |   18 ++---------
+ cpp/src/IceStorm/FreezeDB/Makefile |    2 +-
+ py/config/Make.rules               |   58 +++++++++++++++++++-----------------
+ 6 files changed, 70 insertions(+), 69 deletions(-)
+
+diff --git a/config/Make.common.rules b/config/Make.common.rules
+index d7b1d59..a3fb17e 100644
+--- a/config/Make.common.rules
++++ b/config/Make.common.rules
+@@ -65,9 +65,9 @@ ifeq ($(UNAME),Linux)
+       #
+       # Some Linux distributions like Debian/Ubuntu don't use /usr/lib64.
+       #
+-      ifeq ($(shell test -d /usr/lib64 && echo 0),0)
+-          lp64suffix	= 64
+-      endif
++      #ifeq ($(shell test -d /usr/lib64 && echo 0),0)
++      #    lp64suffix	= 64
++      #endif
+       ifeq ($(LP64),)
+           LP64      	= yes
+       endif
+@@ -244,12 +244,13 @@ else
+     slicedir = $(ice_dir)/slice
+ endif
+ 
+-ifeq ($(prefix), /usr)
+-    install_slicedir = /usr/share/Ice-$(VERSION)/slice
+-else
+-    install_slicedir = $(prefix)/slice
+-endif
++#ifeq ($(prefix), /usr)
++#    install_slicedir = /usr/share/Ice-$(VERSION)/slice
++#else
++#    install_slicedir = $(prefix)/slice
++#endif
+ 
++install_slicedir = $(prefix)/slice
+ #
+ # Set environment variables for the Slice translator.
+ #
+@@ -265,7 +266,8 @@ ifneq ($(ice_dir), /usr)
+     endif
+ 
+     ifeq ($(UNAME),Linux)
+-        export LD_LIBRARY_PATH := $(ice_lib_dir):$(LD_LIBRARY_PATH)
++        #export LD_LIBRARY_PATH := $(ice_lib_dir):$(LD_LIBRARY_PATH)
++        export LD_LIBRARY_PATH := $(ICE_HOME)/lib:$(LD_LIBRARY_PATH)
+     endif
+ 
+     ifeq ($(UNAME),SunOS)
+diff --git a/cpp/Makefile b/cpp/Makefile
+index a68f113..1f44f57 100644
+--- a/cpp/Makefile
++++ b/cpp/Makefile
+@@ -11,11 +11,12 @@ top_srcdir	= .
+ 
+ include $(top_srcdir)/config/Make.rules
+ 
+-SUBDIRS		= config src include test
++#SUBDIRS		= config src include test
++SUBDIRS		= config src include
+ 
+-ifeq ($(shell uname | grep MINGW),)
+-SUBDIRS		:= $(SUBDIRS) demo
+-endif
++#ifeq ($(shell uname | grep MINGW),)
++#SUBDIRS		:= $(SUBDIRS) demo
++#endif
+ 
+ INSTALL_SUBDIRS	= $(install_bindir) $(install_libdir) $(install_includedir) \
+ 	$(install_configdir) $(install_mandir)
+diff --git a/cpp/config/Make.rules b/cpp/config/Make.rules
+index 37461ae..197c5e8 100644
+--- a/cpp/config/Make.rules
++++ b/cpp/config/Make.rules
+@@ -175,11 +175,12 @@ headerdir		= $(top_srcdir)/include
+ # includedir is not handled the same as bindir and libdir
+ # because it is used in the .depend files
+ #
+-ifdef ice_src_dist
+-    includedir		= $(top_srcdir)/include
+-else
+-    includedir		= $(ice_dir)/include
+-endif
++#ifdef ice_src_dist
++#    includedir		= $(top_srcdir)/include
++#else
++#    includedir		= $(ice_dir)/include
++#endif
++includedir		= $(top_srcdir)/include
+ 
+ #
+ # Platform specific definitions
+@@ -277,14 +278,17 @@ ICECPPFLAGS		= -I$(slicedir)
+ SLICE2CPPFLAGS		= $(ICECPPFLAGS)
+ 
+ ifeq ($(ice_dir), /usr) 
+-    LDFLAGS		= $(LDPLATFORMFLAGS) $(CXXFLAGS)
++    LDFLAGS		+= $(LDPLATFORMFLAGS) $(CXXFLAGS)
+ else
+     CPPFLAGS	+= -I$(includedir)
+-    ifdef ice_src_dist
+-	LDFLAGS	= $(LDPLATFORMFLAGS) $(CXXFLAGS) -L$(libdir)
+-    else
+-	LDFLAGS	= $(LDPLATFORMFLAGS) $(CXXFLAGS) -L$(ice_dir)/$(libsubdir)$(cpp11suffix)
+-    endif
++# We must always build using the libraries in the source tree, the host's are obviously
++# not what we want for the target
++    LDFLAGS	+= $(LDPLATFORMFLAGS) $(CXXFLAGS) -L$(libdir) $(call rpathlink,$(libdir))
++#    ifdef ice_src_dist
++#        LDFLAGS	= $(LDPLATFORMFLAGS) $(CXXFLAGS) -L$(libdir)
++#    else
++#	LDFLAGS	= $(LDPLATFORMFLAGS) $(CXXFLAGS) -L$(ice_dir)/$(libsubdir)$(cpp11suffix)
++#    endif
+ endif
+ 
+ ifeq ($(FLEX_NOLINE),yes)
+@@ -313,8 +317,10 @@ endif
+ 
+ ifdef ice_src_dist
+     SLICEPARSERLIB	= $(libdir)/$(call mklibfilename,Slice,$(VERSION))
+-    SLICE2CPP		= $(bindir)/slice2cpp
+-    SLICE2FREEZE	= $(bindir)/slice2freeze
++#    SLICE2CPP		= $(bindir)/slice2cpp
++#    SLICE2FREEZE	= $(bindir)/slice2freeze
++    SLICE2CPP		= $(ICE_HOME)/bin/slice2cpp
++    SLICE2FREEZE	= $(ICE_HOME)/bin/slice2freeze
+ else
+     SLICEPARSERLIB	= $(ice_dir)/$(libsubdir)$(cpp11suffix)/$(call mklibfilename,Slice,$(VERSION))
+     SLICE2CPP		= $(ice_dir)/$(binsubdir)$(cpp11suffix)/slice2cpp
+diff --git a/cpp/config/Make.rules.Linux b/cpp/config/Make.rules.Linux
+index 5d5717c..8363c6e 100644
+--- a/cpp/config/Make.rules.Linux
++++ b/cpp/config/Make.rules.Linux
+@@ -31,7 +31,7 @@ ifeq ($(CXX),c++)
+    CXX			= g++
+ endif
+ 
+-ifeq ($(CXX),g++)
++#ifeq ($(CXX),g++)
+ 
+     ifneq ($(SUSE_i586),)
+         CXXARCHFLAGS	+= -march=i586
+@@ -71,14 +71,6 @@ ifeq ($(CXX),g++)
+       CXXARCHFLAGS	+= -mtune=v8 -pipe -Wno-deprecated -DICE_USE_MUTEX_SHARED
+    endif
+ 
+-   ifeq ($(MACHINE),x86_64)
+-      ifeq ($(LP64),yes)
+-         CXXARCHFLAGS	+= -m64
+-      else
+-         CXXARCHFLAGS	+= -m32
+-      endif
+-   endif
+-
+    CXXFLAGS		= $(CXXARCHFLAGS) -Wall -Werror -pthread
+ 
+    ifneq ($(GENPIC),no)
+@@ -102,15 +94,11 @@ ifeq ($(CXX),g++)
+ 
+    rpathlink            = -Wl,-rpath-link,$(1) 
+ 
+-   ifneq ($(embedded_runpath_prefix),)
+-      LDPLATFORMFLAGS      = -Wl,--enable-new-dtags -Wl,-rpath,$(runpath_libdir)
+-   else
+-      LDPLATFORMFLAGS      = -Wl,--enable-new-dtags
+-   endif
++   LDPLATFORMFLAGS      = -Wl,--enable-new-dtags -Wl,-rpath,../../../lib
+ 
+    LDPLATFORMFLAGS	+= -rdynamic
+ 
+-endif
++#endif
+ 
+ ifeq ($(CXX),icpc)
+    $(warning ===================================================================) 
+diff --git a/cpp/src/IceStorm/FreezeDB/Makefile b/cpp/src/IceStorm/FreezeDB/Makefile
+index 7c844b7..cf15cb1 100644
+--- a/cpp/src/IceStorm/FreezeDB/Makefile
++++ b/cpp/src/IceStorm/FreezeDB/Makefile
+@@ -66,7 +66,7 @@ $(libdir)/$(LIBNAME): $(libdir)/$(SONAME)
+ 
+ $(MIGRATE): $(MOBJS)
+ 	rm -f $@
+-	$(CXX) $(LDFLAGS) -o $@ $(MOBJS) $(DB_RPATH_LINK) -lIceStormService -lIceStorm -lFreeze $(LIBS)
++	$(CXX) $(LDFLAGS) -o $@ $(MOBJS) $(DB_RPATH_LINK) -lIceStormService -lIceStorm -lFreeze $(LIBS) -ldb_cxx
+ 
+ # The slice2freeze rules are structured like this to avoid issues with
+ # parallel make.
+diff --git a/py/config/Make.rules b/py/config/Make.rules
+index 43ce01b..1349342 100644
+--- a/py/config/Make.rules
++++ b/py/config/Make.rules
+@@ -92,21 +92,23 @@ ifeq ($(shell test -f $(top_srcdir)/config/Make.rules.$(UNAME) && echo 0),0)
+     include $(top_srcdir)/config/Make.rules.$(UNAME)
+ else
+     include $(top_srcdir)/../cpp/config/Make.rules.$(UNAME)
+-endif 
++endif
+ 
+ libdir                  = $(top_srcdir)/python
+-ifneq ($(prefix), /usr)
+-install_pythondir       = $(prefix)/python
+-install_libdir          = $(prefix)/python
+-else
+-    ifeq ($(shell test -d $(prefix)/$(libsubdir)/$(PYTHON_VERSION)/dist-packages && echo 0),0)
+-        install_pythondir       = $(prefix)/$(libsubdir)/$(PYTHON_VERSION)/dist-packages
+-        install_libdir          = $(prefix)/$(libsubdir)/$(PYTHON_VERSION)/dist-packages
+-    else
+-        install_pythondir       = $(prefix)/$(libsubdir)/$(PYTHON_VERSION)/site-packages
+-        install_libdir          = $(prefix)/$(libsubdir)/$(PYTHON_VERSION)/site-packages
+-    endif
+-endif
++#ifneq ($(prefix), /usr)
++#install_pythondir       = $(prefix)/python
++#install_libdir          = $(prefix)/python
++#else
++#    ifeq ($(shell test -d $(prefix)/$(libsubdir)/$(PYTHON_VERSION)/dist-packages && echo 0),0)
++#        install_pythondir       = $(prefix)/$(libsubdir)/$(PYTHON_VERSION)/dist-packages
++#        install_libdir          = $(prefix)/$(libsubdir)/$(PYTHON_VERSION)/dist-packages
++#    else
++#        install_pythondir       = $(prefix)/$(libsubdir)/$(PYTHON_VERSION)/site-packages
++#        install_libdir          = $(prefix)/$(libsubdir)/$(PYTHON_VERSION)/site-packages
++#    endif
++#endif
++install_pythondir       = $(prefix)/$(libsubdir)/$(PYTHON_VERSION)/site-packages
++install_libdir          = $(prefix)/$(libsubdir)/$(PYTHON_VERSION)/site-packages
+ 
+ ifeq ($(UNAME),SunOS)
+    ifeq ($(LP64),yes)
+@@ -115,19 +117,21 @@ ifeq ($(UNAME),SunOS)
+    endif
+ endif
+ 
+-ifdef ice_src_dist
+-    ifeq ($(ice_cpp_dir), $(ice_dir)/cpp)
+-        ICE_LIB_DIR = -L$(ice_cpp_dir)/lib
+-    else
+-        ICE_LIB_DIR = -L$(ice_cpp_dir)/$(libsubdir)
+-    endif
+-    ICE_LIB_DIR = -L$(ice_cpp_dir)/lib
+-    ICE_FLAGS 	= -I$(ice_cpp_dir)/include
+-endif
+-ifdef ice_bin_dist
+-    ICE_LIB_DIR = -L$(ice_dir)/$(libsubdir)
+-    ICE_FLAGS	= -I$(ice_dir)/include
+-endif
++#ifdef ice_src_dist
++#    ifeq ($(ice_cpp_dir), $(ice_dir)/cpp)
++#        ICE_LIB_DIR = -L$(ice_cpp_dir)/lib
++#    else
++#        ICE_LIB_DIR = -L$(ice_cpp_dir)/$(libsubdir)
++#    endif
++#    ICE_LIB_DIR = -L$(ice_cpp_dir)/lib
++#    ICE_FLAGS 	= -I$(ice_cpp_dir)/include
++#endif
++#ifdef ice_bin_dist
++#    ICE_LIB_DIR = -L$(ice_dir)/$(libsubdir)
++#    ICE_FLAGS	= -I$(ice_dir)/include
++#endif
++ICE_LIB_DIR = -L$(top_srcdir)/../cpp/lib
++ICE_FLAGS = -I$(ice_cpp_dir)/include
+ ICE_LIBS = $(ICE_LIB_DIR) -lIce -lSlice -lIceUtil
+ 
+ ifneq ($(embedded_runpath_prefix),)
+@@ -137,7 +141,7 @@ endif
+ CPPFLAGS		=
+ ICECPPFLAGS		= -I$(slicedir)
+ SLICE2PYFLAGS		= $(ICECPPFLAGS)
+-LDFLAGS			= $(LDPLATFORMFLAGS) $(CXXFLAGS) -L$(libdir)
++LDFLAGS			+= $(LDPLATFORMFLAGS) $(CXXFLAGS) -L$(libdir)
+ 
+ ifdef ice_src_dist
+     ifeq ($(ice_cpp_dir), $(ice_dir)/cpp)
+-- 
+1.7.9.5
+

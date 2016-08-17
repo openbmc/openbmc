@@ -1,0 +1,18 @@
+No need to link with libfl.
+
+Upstream-Status: Pending
+Signed-off-by: Jacob Kroon <jacob.kroon@mikrodidakt.se>
+
+Index: ccid-1.4.8/src/Makefile.am
+===================================================================
+--- ccid-1.4.8.orig/src/Makefile.am
++++ ccid-1.4.8/src/Makefile.am
+@@ -53,7 +53,7 @@ PROVIDED_BY_PCSC = debug.c
+ endif
+ 
+ libccid_la_SOURCES = $(COMMON) $(USB) $(TOKEN_PARSER) $(PROVIDED_BY_PCSC) $(T1)
+-libccid_la_LIBADD = $(LEXLIB) $(LIBUSB_LIBS) $(PTHREAD_LIBS)
++libccid_la_LIBADD = $(LIBUSB_LIBS) $(PTHREAD_LIBS)
+ libccid_la_CFLAGS = $(PCSC_CFLAGS) $(LIBUSB_CFLAGS) $(PTHREAD_CFLAGS) \
+ 	$(SYMBOL_VISIBILITY) -D$(CCID_VERSION) -DSIMCLIST_NO_DUMPRESTORE
+ libccid_la_LDFLAGS = -avoid-version

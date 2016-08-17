@@ -1,0 +1,11 @@
+--- libetpan-0.57/configure.ac~	2009-09-21 23:31:42.000000000 +0200
++++ libetpan-0.57/configure.ac	2009-09-21 23:31:42.000000000 +0200
+@@ -457,7 +457,7 @@
+       LDFLAGS="-$flag $LDFLAGS"
+       AC_TRY_LINK([], [pthread_create();], 
+                       [pthflag=yes; checkpthread=no], 
+-                      [pthflag=no; LDFLAGS="$OLDCFLAGS"])
++                      [pthflag=no; LDFLAGS="$OLDFLAGS"])
+       AC_MSG_RESULT($pthflag)
+     fi
+   done

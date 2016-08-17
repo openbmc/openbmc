@@ -1,0 +1,44 @@
+From 9c42920c2b635a399bd1f93833efdeb1696f17ee Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen.kooi@linaro.org>
+Date: Mon, 2 Mar 2015 19:09:57 +0800
+Subject: [PATCH 5/5] aarch64-64k-page
+
+---
+Upstream-status: Pending
+
+ js/src/gc/Heap.h     | 2 +-
+ js/src/gc/Memory.cpp | 3 +++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/js/src/gc/Heap.h b/js/src/gc/Heap.h
+index 1cfd269..f4dbcda 100644
+--- a/js/src/gc/Heap.h
++++ b/js/src/gc/Heap.h
+@@ -113,7 +113,7 @@ struct Cell
+ #if defined(SOLARIS) && (defined(__sparc) || defined(__sparcv9))
+ const size_t PageShift = 13;
+ const size_t ArenaShift = PageShift;
+-#elif defined(__powerpc__)
++#elif defined(__powerpc__) || defined(__aarch64__)
+ const size_t PageShift = 16;
+ const size_t ArenaShift = 12;
+ #else
+diff --git a/js/src/gc/Memory.cpp b/js/src/gc/Memory.cpp
+index 5b386a2..e5ad018 100644
+--- a/js/src/gc/Memory.cpp
++++ b/js/src/gc/Memory.cpp
+@@ -302,8 +302,11 @@ GetPageFaultCount()
+ void
+ InitMemorySubsystem()
+ {
++    /* aarch64 may have 64KB or 4KB pages */
++#ifndef __aarch64__
+     if (size_t(sysconf(_SC_PAGESIZE)) != PageSize)
+         MOZ_CRASH();
++#endif
+ }
+ 
+ void *
+-- 
+1.9.3
+

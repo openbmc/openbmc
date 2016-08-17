@@ -1,0 +1,13 @@
+Author: Franz Pletz <fpletz@franz-pletz.org>
+Description: Enable NODOT
+--- a/config_f.h
++++ b/config_f.h
+@@ -98,7 +98,7 @@
+ /*
+  * NODOT	Don't put "." in the default path, for security reasons
+  */
+-#undef NODOT
++#define NODOT
+ 
+ /*
+  * AUTOLOGOUT	tries to determine if it should set autologout depending

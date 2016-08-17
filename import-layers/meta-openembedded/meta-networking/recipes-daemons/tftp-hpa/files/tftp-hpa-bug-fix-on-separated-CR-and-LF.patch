@@ -1,0 +1,38 @@
+From 6ed1eb8829dee351b54e183bc42c007cb306aaa5 Mon Sep 17 00:00:00 2001
+From: Zhang Xiao <xiao.zhang@windriver.com>
+Date: Wed, 11 Jun 2014 14:01:16 +0800
+Subject: [PATCH] tftp-hpa: bug fix on separated CR and LF
+
+In ascii mode, if the CR and LF was separated into different transfer
+blocks, LF will be just dropped instead of replacing the previous CR.
+Add a checking on the first character to fix it.
+
+Upstream-Status: pending
+
+Signed-off-by: Zhang Xiao <xiao.zhang@windriver.com>
+---
+ common/tftpsubs.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/common/tftpsubs.c b/common/tftpsubs.c
+index b4d4ffe..b4ea3f2 100644
+--- a/common/tftpsubs.c
++++ b/common/tftpsubs.c
+@@ -207,6 +207,14 @@ int write_behind(FILE * file, int convert)
+     p = buf;
+     ct = count;
+     count = 0;
++
++    /* Check the first character together with prevchar */
++    c = *p;
++    if ((prevchar == '\r') && (c == '\n')) {
++        lseek(fileno(file), -1, SEEK_CUR);
++        count++;
++    }
++
+     while (ct--) {              /* loop over the buffer */
+         c = *p++;               /* pick up a character */
+         if (prevchar == '\r') { /* if prev char was cr */
+-- 
+1.8.5.2.233.g932f7e4
+

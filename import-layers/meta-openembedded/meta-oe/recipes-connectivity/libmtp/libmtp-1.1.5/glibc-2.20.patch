@@ -1,0 +1,36 @@
+
+Include config.h so we get the defines available for subsequent
+include files
+
+Fixes errors like
+
+| In file included from /home/ubuntu/work/upstream/openembedded-core/build/tmp-glibc/sysroots/beaglebone/usr/include/string.h:634:0,
+|                  from /home/ubuntu/work/upstream/openembedded-core/build/tmp-glibc/work/cortexa8t2hf-vfp-neon-oe-linux-gnueabi/libmtp/1.1.5-r0/libmtp-1.1.5/src/util.c:36:
+| /home/ubuntu/work/upstream/openembedded-core/build/tmp-glibc/work/cortexa8t2hf-vfp-neon-oe-linux-gnueabi/libmtp/1.1.5-r0/libmtp-1.1.5/src/util.h:29:7: error: expected identifier or '(' before '__extension
+__'
+|  char *strndup (const char *s, size_t n);
+|        ^
+| /home/ubuntu/work/upstream/openembedded-core/build/tmp-glibc/work/cortexa8t2hf-vfp-neon-oe-linux-gnueabi/libmtp/1.1.5-r0/libmtp-1.1.5/src/util.c:111:7: error: expected identifier or '(' before '__extensio
+n__'
+|  char *strndup (const char *s, size_t n)
+|        ^
+| make[2]: *** [libmtp_la-util.lo] Error 1
+
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Pending
+
+Index: libmtp-1.1.5/src/util.c
+===================================================================
+--- libmtp-1.1.5.orig/src/util.c	2011-01-10 05:37:21.000000000 -0800
++++ libmtp-1.1.5/src/util.c	2014-09-03 23:50:44.703563888 -0700
+@@ -22,6 +22,8 @@
+  * Boston, MA 02111-1307, USA.
+  */
+ 
++#include "config.h"
++
+ /* MSVC does not have these */
+ #ifndef _MSC_VER
+ #include <sys/time.h>

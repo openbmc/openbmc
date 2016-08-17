@@ -1,0 +1,38 @@
+From 72ad76841d87e857428693d812a961935284ac62 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Thu, 12 Feb 2015 15:57:47 +0100
+Subject: [PATCH] configure-ac: do not check for freetype-config
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+freetype-config is not allowed in our environment - see also binconfig-disabled
+
+Upstream-Status: inappropriate [OE specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ configure.ac | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 26812b6..abec714 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -647,13 +647,6 @@ if test "x$fontconfig_ok" = xno; then
+ fi
+ 
+ 
+-AC_PATH_PROG(FREETYPE_CONFIG, freetype-config, no)
+-if test "x$FREETYPE_CONFIG" != "xno" ; then
+-  AC_MSG_CHECKING([for freetype libraries])
+-  FREETYPE_LIBS=`$FREETYPE_CONFIG --libs`
+-  AC_MSG_RESULT($FREETYPE_LIBS)
+-fi
+-AC_SUBST(FREETYPE_LIBS)
+ 
+ 
+ ##########################################
+-- 
+1.9.3
+

@@ -1,0 +1,22 @@
+Causes locale file to be installed in /usr/locale instead of /usr/share/locale
+
+Apply the same fix as in evolution-data-server:
+https://git.gnome.org/browse/evolution-data-server/commit/configure.ac?id=ec46c763e9342f604b7228c660623d271dfeb101
+
+Upstream-Status: Pending
+
+diff -uNr gnome-themes-2.32.1.orig/configure.in gnome-themes-2.32.1/configure.in
+--- gnome-themes-2.32.1.orig/configure.in	2015-09-18 15:01:25.152055729 +0200
++++ gnome-themes-2.32.1/configure.in	2015-09-18 15:09:03.312072156 +0200
+@@ -19,11 +19,6 @@
+ 
+ AM_GLIB_GNU_GETTEXT
+ 
+-# AM_GLIB_GNU_GETTEXT above subst. $DATADIRNAME
+-# this is the directory where the *.{mo,gmo} files are installed
+-localedir='${prefix}/${DATADIRNAME}/locale'
+-AC_SUBST(localedir)
+-
+ # Workaround to make aclocal get the right flags
+ AC_SUBST(ACLOCAL_AMFLAGS, "\${ACLOCAL_FLAGS}")
+ 

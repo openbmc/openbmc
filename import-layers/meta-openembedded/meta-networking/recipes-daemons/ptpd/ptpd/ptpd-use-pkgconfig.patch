@@ -1,0 +1,35 @@
+From 4c850b92a1cf8cfa19677c66bcde2edfab1a4490 Mon Sep 17 00:00:00 2001
+From: Joe MacDonald <joe_macdonald@mentor.com>
+Date: Tue, 24 Feb 2015 23:02:14 -0500
+Subject: [PATCH] ptpd: use pkgconfig
+
+Yocto uses pkg-config for libpcap, rather than pcap-config, so use that
+instead as the source for libs and cflags.
+
+Upstream-status: Inappropriate [ embedded specific ]
+
+Signed-off-by: Joe MacDonald <joe_macdonald@mentor.com>
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index dc9541f..288f547 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -112,10 +112,10 @@ case "$try_pcap" in
+  yes)
+     case "$PATH_PCAP_CONFIG" in
+      /*)
+-	PCAP_LIBS=`$PATH_PCAP_CONFIG --libs`
++	PCAP_LIBS=`$PATH_PCAP_CONFIG --libs libpcap`
+ 	AC_SUBST([PCAP_LIBS])
+ 	# Separate CPPFLAGS and CFLAGS
+-	foo=`$PATH_PCAP_CONFIG --cflags`
++	foo=`$PATH_PCAP_CONFIG --cflags libpcap`
+ 	PCAP_CPPFLAGS=
+ 	PCAP_CFLAGS=
+ 	for i in $foo; do
+-- 
+1.9.1
+

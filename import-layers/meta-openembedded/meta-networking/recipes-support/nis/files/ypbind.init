@@ -1,0 +1,107 @@
+#! /bin/sh
+# Copyright (c) 2004 Author: Thorsten Kukuk <kukuk@suse.de>
+#
+# /etc/init.d/ypbind
+#
+#   and symbolic its link
+#
+# /usr/sbin/rcypbind
+#
+# System startup script for the ypbind daemon
+#
+### BEGIN INIT INFO
+# Provides: ypbind
+# Required-Start: $remote_fs $portmap
+# Should-Start: ypserv slpd
+# Required-Stop: portmap
+# Default-Start: 3 5
+# Default-Stop: 0 1 2 6
+# Short-Description: Start ypbind (necessary for a NIS client)
+# Description: ypbind finds the server for NIS domains and maintains
+#	the NIS binding information.
+### END INIT INFO
+
+# Need to use status function
+. /etc/init.d/functions
+
+YPBIND_BIN=/usr/sbin/ypbind
+pidfile=/var/run/ypbind.pid
+YPDOMAINNAME_bin=/usr/bin/ypdomainname
+
+[ -f /etc/default/ypbind ] && . /etc/default/ypbind
+
+case "$1" in
+    start)
+	echo -n "Starting ypbind"
+	## If the domainname is not set, skip starting of ypbind
+	## and return with "program not configured"
+        $YPDOMAINNAME_bin >/dev/null 2>&1
+        if [ $? -ne 0 -o -z "`$YPDOMAINNAME_bin 2>/dev/null`" ]; then
+           if [ -f /etc/defaultdomain ]; then
+             XDOMAINNAME=`cat /etc/defaultdomain`
+             $YPDOMAINNAME_bin "$XDOMAINNAME"
+	   fi
+           $YPDOMAINNAME_bin >/dev/null 2>&1
+           if [ $? -ne 0 -o -z "`$YPDOMAINNAME_bin 2>/dev/null`" ]; then
+	     # Tell the user this has skipped
+	     echo -n " . . . . . . . . . . No domainname set"
+             # service is not configured
+	     exit 1
+           fi
+        fi
+
+	## If we don't have a /etc/yp.conf file, skip starting of
+        ## ypbind and return with "program not configured"
+        ## if you add the -broadcast Option later, comment this out.
+	if [ ! -f /etc/yp.conf -a "$YPBIND_BROADCAST" != "yes" ] ; then
+	  # Tell the user this has skipped
+	  echo -n " . . . . . . . . . . ${attn}/etc/yp.conf not found${norm}"
+          # service is not configured
+	  exit 1
+        fi
+
+	# evaluate the OPTIONS for ypbind-mt
+	OPTIONS=""
+	test "$YPBIND_LOCAL_ONLY" = "yes" && OPTIONS="-local-only $OPTIONS"
+	test "$YPBIND_BROADCAST" = "yes" && OPTIONS="-broadcast $OPTIONS"
+	test "$YPBIND_BROKEN_SERVER" = "yes" && OPTIONS="-broken-server $OPTIONS"
+
+	start-stop-daemon --start --quiet --pidfile $pidfile --exec $YPBIND_BIN -- $YPBIND_OPTIONS $OPTIONS
+        if [ $? -eq 0 ]; then
+            notfound=1
+            for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
+                ypwhich >/dev/null 2>&1 && { notfound=0 ; break; };
+                echo -n " ."
+                sleep 1;
+            done
+            if [ $notfound -eq 1 ]; then
+                echo -n " ${warn}No NIS server found${norm}";
+	    fi
+        else
+            exit 1
+        fi
+	;;
+    stop)
+	echo -n "Shutting down ypbind"
+	start-stop-daemon --stop --quiet --pidfile $pidfile
+	# Remove static data, else glibc will continue to use NIS
+        rm -f /var/yp/binding/* /var/run/ypbind.pid
+	;;
+    restart)
+	$0 stop
+	sleep 1
+	$0 start
+	;;
+    reload | force-reload)
+	echo -n "Reload service ypbind"
+	start-stop-daemon --stop --quiet --signal 1 --pidfile $pidfile
+	;;
+    status)
+	echo -n "Checking for ypbind: "
+	status $YPBIND_BIN
+	;;
+    *)
+	echo "Usage: $0 {start|stop|status|try-restart|restart|force-reload|reload|probe}"
+	exit 1
+	;;
+esac

@@ -1,0 +1,31 @@
+When WORKDIR is included in some other git checkout, version.sh calls git rev-parse
+and it returns some description from that upper git checkout even when rfkill is
+being built from release tarball.
+
+When returned description doesn't match with expected v0.4, version.sh exits
+without creating version.c
+    # on git builds check that the version number above
+    # is correct...
+    [ "${descr%%-*}" = "v$VERSION" ] || exit 2
+
+and build fails a bit later:
+    | NOTE: make -j 32 -e MAKEFLAGS=
+    |  CC   rfkill.o
+    |  GEN  version.c
+    | make: *** [version.c] Error 2
+    | make: *** Waiting for unfinished jobs....
+    | ERROR: oe_runmake failed
+
+Don't try git rev-parse, if there isn't .git in ${S}.
+
+--- a/version.sh	2013-11-15 03:43:12.587744366 -0800
++++ b/version.sh	2013-11-15 03:42:40.699743320 -0800
+@@ -12,7 +12,7 @@
+ 
+ if test "x$SUFFIX" != 'x'; then
+ 	v="$VERSION$SUFFIX"
+-elif head=`git rev-parse --verify HEAD 2>/dev/null`; then
++elif test -d .git && head=`git rev-parse --verify HEAD 2>/dev/null`; then
+ 	git update-index --refresh --unmerged > /dev/null
+ 	descr=$(git describe 2>/dev/null || echo "v$VERSION")
+ 

@@ -1,0 +1,44 @@
+--- a/kexec/kexec-syscall.h
++++ b/kexec/kexec-syscall.h
+@@ -2,7 +2,7 @@
+ #define KEXEC_SYSCALL_H
+ 
+ #define __LIBRARY__
+-#include <syscall.h>
++/*#include <syscall.h>*/
+ #include <sys/syscall.h>
+ #include <unistd.h>
+ 
+@@ -23,6 +23,7 @@
+ #define LINUX_REBOOT_CMD_KEXEC		0x45584543
+ 
+ #ifndef __NR_kexec_load
++/*
+ #ifdef __i386__
+ #define __NR_kexec_load		283
+ #endif
+@@ -61,19 +62,21 @@
+ #ifndef __NR_kexec_load
+ #error Unknown processor architecture.  Needs a kexec_load syscall number.
+ #endif
++*/
+ #endif /*ifndef __NR_kexec_load*/
+ 
+ struct kexec_segment;
+-
++/*
+ static inline long kexec_load(void *entry, unsigned long nr_segments,
+ 			struct kexec_segment *segments, unsigned long flags)
+ {
+ 	return (long) syscall(__NR_kexec_load, entry, nr_segments, segments, flags);
+ }
+-
++*/
+ static inline long kexec_reboot(void)
+ {
+-	return (long) syscall(__NR_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, LINUX_REBOOT_CMD_KEXEC, 0);
++	//return (long) syscall(__NR_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, LINUX_REBOOT_CMD_KEXEC, 0);
++	return __reboot(LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, LINUX_REBOOT_CMD_KEXEC, 0);
+ }
+ 
+ 

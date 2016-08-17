@@ -1,0 +1,79 @@
+[PATCH] avoid gcc optimize-away the loops
+
+Upstream-Status: pending
+
+Change expression used in do_integer_mul and do_uint64_mul
+benchmarks so GCC doesn't optimize-away the loops, other
+things are same:
+-               TEN(r *= s;); r -= t;
++               i = 0;
++               while ( i++ < 10)
++                       r *= s;
++               r -= t;
+
+and TEN is macro:
+	#define TEN(a) a a a a a a a a a a
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ src/lat_ops.c | 30 +++++++++++++++++++++++++-----
+ 1 file changed, 25 insertions(+), 5 deletions(-)
+
+diff --git a/src/lat_ops.c b/src/lat_ops.c
+index d343ff3..457072b 100644
+--- a/src/lat_ops.c
++++ b/src/lat_ops.c
+@@ -126,11 +126,23 @@ do_integer_mul(iter_t iterations, void* cookie)
+ 	struct _state *pState = (struct _state*)cookie;
+ 	register int r = pState->N + 37431;
+ 	register int s = pState->N + 4;
+-	register int t = r * s * s * s * s * s * s * s * s * s * s - r;
++	register int t = r;
++	int i = 0;
++
++	while ( i++ < 10)
++		t *= s;
++	t -= r;
+ 
+ 	while (iterations-- > 0) {
+-		TEN(r *= s;); r -= t;
+-		TEN(r *= s;); r -= t;
++		i = 0;
++		while ( i++ < 10)
++			r *= s;
++		r -= t;
++
++		i = 0;
++		while ( i++ < 10)
++			r *= s;
++		r -= t;
+ 	}
+ 	use_int(r);
+ }
+@@ -207,13 +219,21 @@ do_int64_mul(iter_t iterations, void* cookie)
+ 	register int64 r = (int64)pState->N + 37420;
+ 	register int64 s = (int64)pState->N + 4;
+ 	register int64 t;
++	int i = 0;
+ 
+ 	r += (int64)(pState->N + 6)<<32;
+ 	t = r * s * s * s * s * s * s * s * s * s * s - r;
+ 
+ 	while (iterations-- > 0) {
+-		TEN(r *= s;); r -= t;
+-		TEN(r *= s;); r -= t;
++		i = 0;
++		while ( i++ < 10)
++			r *= s;
++		r -= t;
++
++		i = 0;
++		while ( i++ < 10)
++			r *= s;
++		r -= t;
+ 	}
+ 	use_int((int)r);
+ }
+-- 
+2.8.1
+

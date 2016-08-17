@@ -1,0 +1,27 @@
+From 52003e6b52b1417c1a0e57243d83349addcdacf6 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Wed, 11 Apr 2012 14:40:44 +0200
+Subject: [PATCH 10/12] xserver-common: add support for nexus S alias herring
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ X11/xserver-common |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/X11/xserver-common b/X11/xserver-common
+index 86ed17f..5c9a6eb 100644
+--- a/X11/xserver-common
++++ b/X11/xserver-common
+@@ -126,6 +126,9 @@ else
+         "htc_tornado")
+             ARGS="$ARGS -hide-cursor"
+             DPI="100" ;;
++        "herring")
++            DPI="235"
++            ARGS="$ARGS -dpi ${DPI} -nocursor";;
+         "generic_omap1510/1610/1710")
+             ARGS="$ARGS -screen ${SCREEN_SIZE}"
+             DPI="225" ;;
+-- 
+1.7.8.5
+

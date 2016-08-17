@@ -1,0 +1,41 @@
+From 31362e4c0d02b4a2b952ad0dd32acfb573c442f3 Mon Sep 17 00:00:00 2001
+From: Li xin <lixin.fnst@cn.fujitsu.com>
+Date: Fri, 28 Nov 2014 07:17:40 +0900
+Subject: [PATCH 2/2] WARNING Fix and modify "CFLAGS"
+
+WARNING: QA Issue: File '/usr/sbin/in.telnetd' from netkit-telnet was 
+already stripped, this will prevent future debugging! [already-stripped]
+
+Upstream-Status: pending
+
+Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
+---
+ telnetd/Makefile | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/telnetd/Makefile b/telnetd/Makefile
+index 72650b4..a4cf9fa 100644
+--- a/telnetd/Makefile
++++ b/telnetd/Makefile
+@@ -9,7 +9,8 @@ include ../MRULES
+ # take out -DPARANOID_TTYS.
+ 
+ CFLAGS += '-DISSUE_FILE="/etc/issue.net"' -DPARANOID_TTYS \
+-	   -DNO_REVOKE -DKLUDGELINEMODE -DDIAGNOSTICS
++	   -DNO_REVOKE -DKLUDGELINEMODE -DDIAGNOSTICS \
++	   -DLOGIN_WRAPPER=\"/${libdir}/telnetlogin\"
+ # LIBS += $(LIBTERMCAP)
+ 
+ OBJS = telnetd.o state.o termstat.o slc.o sys_term.o utility.o \
+@@ -27,7 +28,7 @@ $(OBJS): defs.h ext.h pathnames.h telnetd.h logwtmp.h logout.h setproctitle.h
+ telnetd.o: ../version.h
+ 
+ install: telnetd
+-	install -s -m$(DAEMONMODE) telnetd $(INSTALLROOT)$(SBINDIR)/in.telnetd
++	install -m$(DAEMONMODE) telnetd $(INSTALLROOT)$(SBINDIR)/in.telnetd
+ 	install -m$(MANMODE) issue.net.5 $(INSTALLROOT)$(MANDIR)/man5/
+ 	install -m$(MANMODE) telnetd.8 $(INSTALLROOT)$(MANDIR)/man8/in.telnetd.8
+ 	ln -sf in.telnetd.8 $(INSTALLROOT)$(MANDIR)/man8/telnetd.8
+-- 
+1.8.4.2
+

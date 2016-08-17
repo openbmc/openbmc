@@ -1,0 +1,29 @@
+Avoid CMAKE_MODULE_PATH being overwritten
+
+OE-Core's setting of CMAKE_MODULE_PATH stomps on MariaDB's value unless
+we set it after setting the project name.
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+
+Upstream-Status: Inappropriate [working around OE-Core bug]
+
+--- mariadb/CMakeLists.txt	2014-07-17 11:01:07.676353047 +0100
++++ mariadb/CMakeLists.txt	2014-07-17 11:01:31.299353107 +0100
+@@ -28,8 +28,6 @@
+ 
+ MESSAGE(STATUS "Running cmake version ${CMAKE_VERSION}")
+ 
+-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
+-
+ # Distinguish between community and non-community builds, with the
+ # default being a community build. This does not impact the feature
+ # set that will be compiled in; it's merely provided as a hint to
+@@ -77,6 +75,8 @@
+ ENDIF()
+ PROJECT(${MYSQL_PROJECT_NAME})
+ 
++SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
++
+ IF(BUILD_CONFIG)
+   INCLUDE(
+   ${CMAKE_SOURCE_DIR}/cmake/build_configurations/${BUILD_CONFIG}.cmake)

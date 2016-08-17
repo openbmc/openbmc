@@ -1,0 +1,18 @@
+gtk+ is required by linnotify. So make sure gtk be linked before libnotify
+
+Signed-off-by: Bian Naimeng <biannm@cn.fujitsu.com>
+
+diff -Nurp imsettings-1.6.7.orig/configure.ac imsettings-1.6.7/configure.ac
+--- imsettings-1.6.7.orig/configure.ac	2013-11-26 16:09:09.000000000 +0800
++++ imsettings-1.6.7/configure.ac	2014-12-30 11:27:44.370003209 +0800
+@@ -93,8 +93,8 @@ PKG_CHECK_MODULES(LIBNOTIFY, libnotify,
+ 		has_old_libnotify=yes
+ 		PKG_CHECK_MODULES(GTK, gtk+-2.0 >= $GTK_REQUIRED)
+ 		AC_DEFINE(HAS_OLD_LIBNOTIFY,, [Using older libnotify])
+-		IMDAEMON_CFLAGS="$GTK_CFLAGS $LIBNOTIFY_OLD_CFLAGS"
+-		IMDAEMON_LIBS="$GTK_LIBS $LIBNOTIFY_OLD_LIBS"],[
++		IMDAEMON_CFLAGS="$LIBNOTIFY_OLD_CFLAGS $GTK_CFLAGS"
++		IMDAEMON_LIBS="$LIBNOTIFY_OLD_LIBS $GTK_LIBS"],[
+ 		has_old_libnotify=no
+ 		IMDAEMON_CFLAGS="$LIBNOTIFY_CFLAGS"
+ 		IMDAEMON_LIBS="$LIBNOTIFY_LIBS"])

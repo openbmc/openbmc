@@ -1,0 +1,18 @@
+fix the compile error of powerpc64
+ 
+Upstream-status: Accepted
+
+ fix the following error
+ |error: 'jsuword' does not name a type
+
+
+--- a/js/src/jsval.hold	2015-04-24 01:15:06.692970731 -0500
++++ b/js/src/jsval.h	2015-04-24 01:15:41.792969478 -0500
+@@ -304,7 +304,6 @@
+             int32_t        i32;
+             uint32_t       u32;
+             JSWhyMagic     why;
+-            jsuword        word;
+         } payload;
+     } s;
+     double asDouble;

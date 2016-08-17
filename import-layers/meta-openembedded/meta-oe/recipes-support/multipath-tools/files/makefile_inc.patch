@@ -1,0 +1,39 @@
+multipath-tools: modify Makefile.inc for cross-compilation
+
+Do not look for systemd info on the host, and allow us to pass in CFLAGS
+using the OPTFLAGS variable.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+Update for version 0.5.0-144-g770e6d0
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+--- a/Makefile.inc
++++ b/Makefile.inc
+@@ -21,12 +21,6 @@ ifndef LIB
+ 	endif
+ endif
+ 
+-ifndef SYSTEMD
+-	ifeq ($(shell systemctl --version > /dev/null 2>&1 && echo 1), 1)
+-		SYSTEMD = $(shell systemctl --version 2> /dev/null |  sed -n 's/systemd \([0-9]*\)/\1/p')
+-	endif
+-endif
+-
+ ifndef SYSTEMDPATH
+ 	SYSTEMDPATH=usr/lib
+ endif
+@@ -53,7 +47,10 @@ ifndef RPM_OPT_FLAGS
+ 	RPM_OPT_FLAGS = -O2 -g -pipe -Wformat-security -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4
+ endif
+ 
++ifndef OPTFLAGS
+ OPTFLAGS     = $(RPM_OPT_FLAGS) -Wunused -Wstrict-prototypes
++endif
++
+ CFLAGS	     = $(OPTFLAGS) -fPIC -DLIB_STRING=\"${LIB}\"
+ SHARED_FLAGS = -shared
+ 

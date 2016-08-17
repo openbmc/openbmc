@@ -1,0 +1,29 @@
+From eebe1f27f4b27b05eb4b9b55f9df1124acf4d092 Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen@dominion.thruhere.net>
+Date: Fri, 1 Aug 2014 12:25:24 +0200
+Subject: [PATCH] configure: use 'foreign' mode to avoid errors with missing
+ NEWS/AUTHORS/etc
+
+Upstream-status: Pending
+
+Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 3d7eef6..1784bdd 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -41,7 +41,7 @@ VERSION=$WV_VERSION
+ PACKAGE=wv
+ 
+ dnl Initialize automake stuff
+-AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
++AM_INIT_AUTOMAKE([foreign])
+ 
+ # Specify a configuration file
+ AM_CONFIG_HEADER(config.h)
+-- 
+1.9.0
+

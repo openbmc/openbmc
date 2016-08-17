@@ -1,0 +1,10 @@
+prefix=/usr
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: Lua
+Description: Lua language engine
+Version: @VERSION@
+Requires:
+Libs: -L${libdir} -llua -lm -ldl
+Cflags: -I${includedir}

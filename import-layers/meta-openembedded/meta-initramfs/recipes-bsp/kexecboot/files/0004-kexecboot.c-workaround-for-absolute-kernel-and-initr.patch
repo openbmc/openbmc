@@ -1,0 +1,135 @@
+From de9a6284df8add6ec03e1d9981d0b6d0595bbc69 Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Mon, 10 Nov 2014 23:37:23 +0100
+Subject: [PATCH 4/4] kexecboot.c: workaround for absolute kernel and initrd
+ symlinks
+
+Add MOUNTPOINT prefix if the kernel/initrd symlinks start with '/'.
+Do nothing if the path is a relative symbolic link or not a symlink.
+
+Fix following situation:
+
+root@mizar:/var/tmp# ls -al boot/
+total 2076
+drwxr-xr-x 2 root root    4096 lug  5 01:38 .
+drwxrwxrwt 4 root root    4096 lug  5 12:26 ..
+-rw-r--r-- 1 root root     831 lug  5 01:24 boot.cfg
+-rw-r--r-- 1 root root    1322 lug  5 01:24 icon.xpm
+lrwxrwxrwx 1 root root      34 lug  5 12:26 zImage ->
+/boot/zImage-3.14.5-yocto-standard
+-rw-r--r-- 1 root root 2106832 lug  5 01:20 zImage-3.14.5-yocto-standard
+
+Cannot open `/mnt/boot/zImage': No such file or directory
+Nothing has been loaded!
+
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+---
+ kexecboot.c | 53 ++++++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 44 insertions(+), 9 deletions(-)
+
+diff --git a/kexecboot.c b/kexecboot.c
+index 7268d6b..8a7a7d2 100644
+--- a/kexecboot.c
++++ b/kexecboot.c
+@@ -208,11 +208,16 @@ void start_kernel(struct params_t *params, int choice)
+ 	const char *load_argv[] = { NULL, "-l", NULL, NULL, NULL, NULL };
+ 	const char *exec_argv[] = { NULL, "-e", NULL, NULL};
+ 
+-	char *cmdline_arg = NULL, *initrd_arg = NULL;
++	char *cmdline_arg = NULL, *initrd_arg = NULL, *kernel_arg = NULL;
+ 	int n, idx, u;
+ 	struct stat sinfo;
+ 	struct boot_item_t *item;
+ 
++	/* buffer for readlink (could be truncated) */
++	char buf[512];
++	int len;
++
++
+ 	item = params->bootcfg->list[choice];
+ 
+ 	exec_argv[0] = kexec_path;
+@@ -306,10 +311,17 @@ void start_kernel(struct params_t *params, int choice)
+ 		}
+ 	}
+ 
++	/* Mount boot device */
++	if ( -1 == mount(mount_dev, mount_point, mount_fstype,
++			MS_RDONLY, NULL) ) {
++		perror("Can't mount boot device");
++		exit(-1);
++	}
++
+ 	/* fill '--initrd' option */
+ 	if (item->initrd) {
+ 		/* allocate space */
+-		n = sizeof(str_initrd_start) + strlen(item->initrd);
++		n = sizeof(str_initrd_start) + strlen(item->initrd) + 1 + sizeof(mount_point) + sizeof(buf);
+ 
+ 		initrd_arg = (char *)malloc(n);
+ 		if (NULL == initrd_arg) {
+@@ -317,24 +329,46 @@ void start_kernel(struct params_t *params, int choice)
+ 		} else {
+ 			strcpy(initrd_arg, str_initrd_start);	/* --initrd= */
+ 			strcat(initrd_arg, item->initrd);
++
++			if ((len = readlink(item->initrd, buf, sizeof(buf)-1)) != -1) {
++				buf[len] = '\0';
++				/* Fix absolute symlinks: prepend MOUNTPOINT */
++				if (buf[0] == '/') {
++					strcpy(initrd_arg, str_initrd_start);	/* --initrd= */
++					strcat(initrd_arg, mount_point);
++					strcat(initrd_arg, buf);
++				}
++			}
+ 			load_argv[idx] = initrd_arg;
+ 			++idx;
+ 		}
+ 	}
+ 
+ 	/* Append kernelpath as last arg of kexec */
+-	load_argv[idx] = item->kernelpath;
++		/* allocate space */
++		n = strlen(item->kernelpath) + 1 + sizeof(mount_point) + sizeof(buf);
++
++		kernel_arg = (char *)malloc(n);
++		if (NULL == kernel_arg) {
++			perror("Can't allocate memory for kernel_arg");
++		} else {
++			strcpy(kernel_arg, item->kernelpath);
++
++			if ((len = readlink(item->kernelpath, buf, sizeof(buf)-1)) != -1) {
++				buf[len] = '\0';
++				/* Fix absolute symlinks: prepend MOUNTPOINT */
++				if (buf[0] == '/') {
++					strcpy(kernel_arg, mount_point);
++					strcat(kernel_arg, buf);
++				}
++			}
++			load_argv[idx] = kernel_arg;
++		}
+ 
+ 	DPRINTF("load_argv: %s, %s, %s, %s, %s", load_argv[0],
+ 			load_argv[1], load_argv[2],
+ 			load_argv[3], load_argv[4]);
+ 
+-	/* Mount boot device */
+-	if ( -1 == mount(mount_dev, mount_point, mount_fstype,
+-			MS_RDONLY, NULL) ) {
+-		perror("Can't mount boot device");
+-		exit(-1);
+-	}
+ 
+ 	/* Load kernel */
+ 	n = fexecw(kexec_path, (char *const *)load_argv, envp);
+@@ -347,6 +381,7 @@ void start_kernel(struct params_t *params, int choice)
+ 
+ 	dispose(cmdline_arg);
+ 	dispose(initrd_arg);
++	dispose(kernel_arg);
+ 
+ 	/* Check /proc/sys/net presence */
+ 	if ( -1 == stat("/proc/sys/net", &sinfo) ) {
+-- 
+1.9.1
+

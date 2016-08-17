@@ -1,0 +1,23 @@
+uname can not get version of kernel correctly while cross compile
+
+Signed-off-by: Bian Naimeng <biannm@cn.fujitsu.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 523899b..4e6ae0d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -924,7 +924,7 @@ AC_MSG_RESULT([$ARCH ($host_os)])
+ if test "x$ARCH" = "xlinux"; then
+ 	AC_MSG_CHECKING([for the linux kernel version])
+ 
+-	kernel=`uname -r`
++	kernel="${KERNEL_VERSION}"
+ 
+ 	case "${kernel}" in
+ 		2.6.*)
+-- 
+1.8.3.1
+

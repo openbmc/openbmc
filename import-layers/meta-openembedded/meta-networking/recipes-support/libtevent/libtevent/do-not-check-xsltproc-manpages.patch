@@ -1,0 +1,16 @@
+Don't check manpages for xsltproc.
+
+Signed-off-by: Bian Naimeng <biannm@cn.fujitsu.com>
+
+diff -Nurp tevent-0.9.21.orig/lib/talloc/wscript tevent-0.9.21/lib/talloc/wscript
+--- tevent-0.9.21.orig/lib/talloc/wscript	2013-09-08 21:24:14.000000000 +0900
++++ tevent-0.9.21/lib/talloc/wscript	2015-04-24 16:28:04.085000230 +0900
+@@ -55,7 +55,7 @@ def configure(conf):
+     if conf.env.standalone_talloc:
+         conf.env.TALLOC_COMPAT1 = Options.options.TALLOC_COMPAT1
+ 
+-    conf.CHECK_XSLTPROC_MANPAGES()
++    conf.find_program('xsltproc', var='XSLTPROC')
+ 
+     if not conf.env.disable_python:
+         # also disable if we don't have the python libs installed

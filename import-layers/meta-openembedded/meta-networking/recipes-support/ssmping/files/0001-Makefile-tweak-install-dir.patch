@@ -1,0 +1,35 @@
+From 693cfce5431e191a3955fd56fa822927d92c9e43 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 7 Nov 2014 14:27:00 +0800
+Subject: [PATCH] Makefile: tweak install dir
+
+For oe-core, the man doc should be installed to /usr/share/man
+rather than /usr/locale/man.
+
+Upstream-Status: inappropriate (oe specific)
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ Makefile | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index b5d12f8..9b2663c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -14,9 +14,9 @@ install: ssmping asmping ssmpingd mcfirst
+ 	install -D asmping $(DESTDIR)$(PREFIX)/bin/asmping
+ 	install -D ssmpingd $(DESTDIR)$(PREFIX)/bin/ssmpingd
+ 	install -D mcfirst $(DESTDIR)$(PREFIX)/bin/mcfirst
+-	install -D ssmping.1 $(DESTDIR)$(PREFIX)/man/man1/ssmping.1
+-	install -D asmping.1 $(DESTDIR)$(PREFIX)/man/man1/asmping.1
+-	install -D mcfirst.1 $(DESTDIR)$(PREFIX)/man/man1/mcfirst.1
++	install -D ssmping.1 $(DESTDIR)$(PREFIX)/share/man/man1/ssmping.1
++	install -D asmping.1 $(DESTDIR)$(PREFIX)/share/man/man1/asmping.1
++	install -D mcfirst.1 $(DESTDIR)$(PREFIX)/share/man/man1/mcfirst.1
+ 
+ clean:
+ 	rm -f $(OBJ) joinch.o joingrp.o ssmping asmping ssmpingd mcfirst
+-- 
+1.9.1
+

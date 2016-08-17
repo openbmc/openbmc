@@ -1,0 +1,30 @@
+From e018d055603389b22cbc3bd68b1525f3048ebee7 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 20 Jan 2016 04:50:26 +0000
+Subject: [PATCH 3/4] Guard use of mallinfo() with __GLIBC__
+
+This API is glibc-only
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ lib/mm/memlock.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/mm/memlock.c b/lib/mm/memlock.c
+index 969f1d7..405a7c0 100644
+--- a/lib/mm/memlock.c
++++ b/lib/mm/memlock.c
+@@ -145,7 +145,7 @@ static void _touch_memory(void *mem, size_t size)
+ 
+ static void _allocate_memory(void)
+ {
+-#ifndef VALGRIND_POOL
++#if !defined(VALGRIND_POOL) && defined(__GLIBC__)
+ 	void *stack_mem;
+ 	struct rlimit limit;
+ 	int i, area = 0, missing = _size_malloc_tmp, max_areas = 32, hblks;
+-- 
+2.7.0
+

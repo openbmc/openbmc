@@ -1,0 +1,74 @@
+From 7dde5bc75a1d96be9510ce1e98d28f9d33520919 Mon Sep 17 00:00:00 2001
+From: David Zeuthen <davidz@redhat.com>
+Date: Fri, 8 Jul 2011 11:03:52 -0400
+Subject: [PATCH] Add support for DeviceAutomountHint
+
+Based on the patch in https://bugzilla.gnome.org/show_bug.cgi?id=653184
+
+Upstream-Status: Applied [1]
+
+[1] https://mail.gnome.org/archives/commits-list/2011-July/msg03207.html
+
+Signed-off-by: David Zeuthen <davidz@redhat.com>
+---
+ src/gdu/gdu-device.c |   10 ++++++++++
+ src/gdu/gdu-device.h |    1 +
+ 2 files changed, 11 insertions(+), 0 deletions(-)
+
+diff --git a/src/gdu/gdu-device.c b/src/gdu/gdu-device.c
+index 6a5afad..4be39cf 100644
+--- a/src/gdu/gdu-device.c
++++ b/src/gdu/gdu-device.c
+@@ -82,6 +82,7 @@ typedef struct
+   gboolean device_presentation_nopolicy;
+   char *device_presentation_name;
+   char *device_presentation_icon_name;
++  char *device_automount_hint;
+   guint64 device_size;
+   guint64 device_block_size;
+ 
+@@ -279,6 +280,8 @@ collect_props (const char *key,
+     props->device_presentation_name = g_strdup (g_value_get_string (value));
+   else if (strcmp (key, "DevicePresentationIconName") == 0)
+     props->device_presentation_icon_name = g_strdup (g_value_get_string (value));
++  else if (strcmp (key, "DeviceAutomountHint") == 0)
++    props->device_automount_hint = g_strdup (g_value_get_string (value));
+   else if (strcmp (key, "DeviceSize") == 0)
+     props->device_size = g_value_get_uint64 (value);
+   else if (strcmp (key, "DeviceBlockSize") == 0)
+@@ -549,6 +552,7 @@ device_properties_free (DeviceProperties *props)
+   g_strfreev (props->device_mount_paths);
+   g_free (props->device_presentation_name);
+   g_free (props->device_presentation_icon_name);
++  g_free (props->device_automount_hint);
+   g_free (props->job_id);
+   g_free (props->id_usage);
+   g_free (props->id_type);
+@@ -1294,6 +1298,12 @@ gdu_device_drive_get_media_compatibility (GduDevice *device)
+ }
+ 
+ const char *
++gdu_device_get_automount_hint (GduDevice *device)
++{
++        return device->priv->props->device_automount_hint;
++}
++
++const char *
+ gdu_device_drive_get_media (GduDevice *device)
+ {
+         return device->priv->props->drive_media;
+diff --git a/src/gdu/gdu-device.h b/src/gdu/gdu-device.h
+index 4c1302b..8cfd7a9 100644
+--- a/src/gdu/gdu-device.h
++++ b/src/gdu/gdu-device.h
+@@ -143,6 +143,7 @@ const char *gdu_device_drive_get_wwn (GduDevice *device);
+ const char *gdu_device_drive_get_connection_interface (GduDevice *device);
+ guint64 gdu_device_drive_get_connection_speed (GduDevice *device);
+ char **gdu_device_drive_get_media_compatibility (GduDevice *device);
++const gchar *gdu_device_get_automount_hint(GduDevice *device);
+ const char *gdu_device_drive_get_media (GduDevice *device);
+ gboolean gdu_device_drive_get_is_media_ejectable (GduDevice *device);
+ gboolean gdu_device_drive_get_requires_eject (GduDevice *device);
+-- 
+1.7.6.5
+

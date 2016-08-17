@@ -1,0 +1,13 @@
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -106,8 +106,8 @@
+ 
+ MAN_PAGES:= kexec/kexec.8
+ MAN_PAGES+= kdump/kdump.8
+-BINARIES_i386:=  $(SBINDIR)/kexec $(PKGLIBDIR)/kexec_test
+-BINARIES_x86_64:=$(SBINDIR)/kexec $(PKGLIBDIR)/kexec_test
++BINARIES_i386:=  $(SBINDIR)/kexec
++BINARIES_x86_64:=$(SBINDIR)/kexec
+ BINARIES:=$(SBINDIR)/kexec $(SBINDIR)/kdump $(BINARIES_$(ARCH))
+ 
+ TARGETS:=$(BINARIES) $(MAN_PAGES)

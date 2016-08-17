@@ -1,0 +1,11 @@
+--- uim-1.1.0/scm/Makefile.am~	2006-06-09 10:46:12.000000000 +0900
++++ uim-1.1.0/scm/Makefile.am	2006-06-19 23:00:15.620000000 +0900
+@@ -58,7 +58,7 @@
+   module_names += "scim"
+ endif
+ 
+-UIM_MODULE_MANAGER = $(top_builddir)/uim/uim-module-manager
++UIM_MODULE_MANAGER = uim-module-manager
+ UIM_MODULE_MANAGER_ENV = \
+         LIBUIM_SCM_FILES=$(abs_srcdir) \
+         LIBUIM_PLUGIN_LIB_DIR=$(abs_top_builddir)/uim/.libs

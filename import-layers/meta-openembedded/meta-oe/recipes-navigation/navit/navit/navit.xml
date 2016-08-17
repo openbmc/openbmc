@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config SYSTEM "navit.dtd">
+<config xmlns:xi="http://www.w3.org/2001/XInclude">
+	<xi:include href="/usr/share/navit/plugins.xml"/>
+	<xi:include href="/usr/share/navit/navit.default.xml" xpointer="xpointer(/config/debug)"/>
+
+	<navit center="4808 N 1134 E" zoom="256" tracking="1" orientation="-1" recent_dest="10" drag_bitmap="1">
+		<graphics type="gtk_drawing_area"/>
+		<gui type="gtk" enabled="no" menubar="1" toolbar="1" statusbar="1"/>
+		<xi:include href="/usr/share/navit/navit.default.xml" xpointer="xpointer(/config/navit/gui[@type='internal'])"/>
+		<!-- or comment gtk version above and try:
+		opkg install navit-graphics-qt
+		opkg install navit-gui-qml
+		<graphics type="qt_qpainter"/>
+		<gui type="qml" enabled="yes" menubar="1" toolbar="1" statusbar="1"/>
+		-->
+		<xi:include href="/usr/share/navit/osd.xml"/>
+		<log enabled="no" type="textfile_debug" data="debug_%Y%m%d-%i.txt" flush_size="1000" flush_time="30"/>
+		<vehicle name="Local GPS" profilename="car" enabled="yes" active="1" source="gpsd://localhost" gpsd_query="w+xj">
+			<!-- <log type="gpx" attr_types="position_time_iso8601,position_direction,position_speed,profilename,position_radius" data="track_%Y%m%d-%i.gpx" flush_size="1000" flush_time="30"/> -->
+		</vehicle>
+
+		<vehicle name="Demo" profilename="car" enabled="no" active="yes" source="demo://"/>
+
+		<!-- For the cumulative displacement filter to be enabled, set cdf_histsize="x" here, with x being an integer somewhere around 4 -->
+		<tracking cdf_histsize="0"/>
+
+		<xi:include href="/usr/share/navit/navit.default.xml" xpointer="xpointer(/config/navit/vehicleprofile[@name='car'])"/>
+		<xi:include href="/usr/share/navit/navit.default.xml" xpointer="xpointer(/config/navit/vehicleprofile[@name='bike'])"/>
+		<xi:include href="/usr/share/navit/navit.default.xml" xpointer="xpointer(/config/navit/vehicleprofile[@name='pedestrian'])"/>
+		<xi:include href="/usr/share/navit/navit.default.xml" xpointer="xpointer(/config/navit/vehicleprofile[@name='horse'])"/>
+
+		<route destination_distance="50"/>
+
+		<xi:include href="/usr/share/navit/navit.default.xml" xpointer="xpointer(/config/navit/navigation)"/>
+
+		<xi:include href="/usr/share/navit/speech.xml"/>
+		<xi:include href="/usr/share/navit/maps.xml"/>
+
+		<xi:include href="/usr/share/navit/navit.default.xml" xpointer="xpointer(/config/navit/layout[@name='Car'])"/>
+		<xi:include href="/usr/share/navit/navit.default.xml" xpointer="xpointer(/config/navit/layout[@name='Car-dark'])"/>
+		<xi:include href="/usr/share/navit/navit.default.xml" xpointer="xpointer(/config/navit/layout[@name='Bike'])"/>
+		<xi:include href="/usr/share/navit/navit.default.xml" xpointer="xpointer(/config/navit/layout[@name='T@H'])"/>
+	</navit>
+</config>

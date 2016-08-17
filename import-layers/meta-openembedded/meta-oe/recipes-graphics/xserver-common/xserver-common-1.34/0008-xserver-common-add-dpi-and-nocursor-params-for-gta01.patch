@@ -1,0 +1,40 @@
+From 0ee7bf87e0c83abc79de3a99dfa3c87dd5c5b229 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Wed, 11 Apr 2012 14:37:29 +0200
+Subject: [PATCH 08/12] xserver-common: add dpi and nocursor params for gta01
+ and gta02
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ X11/xserver-common |    8 ++++++--
+ 1 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/X11/xserver-common b/X11/xserver-common
+index de92bb7..f76fa5f 100644
+--- a/X11/xserver-common
++++ b/X11/xserver-common
+@@ -133,15 +133,19 @@ else
+             ARGS="$ARGS -screen ${SCREEN_SIZE}"
+             DPI="225" ;;
+         "gta01" )
+-            DPI="285"
++            DPI="280"
+             if [ "$XSERVER" != "Xorg" ] ; then
+                 ARGS="$ARGS -screen 480x640"
++            else
++                ARGS="$ARGS -dpi ${DPI} -nocursor"
+             fi
+             ;;
+         "gta02")
+-            DPI="285"
++            DPI="280"
+             if [ "$XSERVER" != "Xorg" ] ; then
+                 ARGS="$ARGS -screen ${SCREEN_SIZE}"
++            else
++                ARGS="$ARGS -dpi ${DPI} -nocursor"
+             fi
+             ;;
+         "motorola_ezx_platform")
+-- 
+1.7.8.5
+

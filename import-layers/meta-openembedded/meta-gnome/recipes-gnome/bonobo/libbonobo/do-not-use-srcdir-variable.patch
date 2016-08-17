@@ -1,0 +1,24 @@
+| tests/Makefile.am:55: error: using '$(srcdir)' in TESTS is currently broken: '$(srcdir)/te
+st-properties.sh'
+| tests/test-activation/Makefile.am:76: warning: 'INCLUDES' is the old name for 'AM_CPPFLAGS
+' (or '*_CPPFLAGS')
+| utils/Makefile.am:9: warning: 'INCLUDES' is the old name for 'AM_CPPFLAGS' (or '*_CPPFLAGS
+')
+| autoreconf: automake failed with exit status: 1
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Not Submitted
+
+Index: libbonobo-2.32.1/tests/Makefile.am
+===================================================================
+--- libbonobo-2.32.1.orig/tests/Makefile.am	2010-08-29 04:56:00.000000000 -0700
++++ libbonobo-2.32.1/tests/Makefile.am	2014-04-25 15:38:22.024744384 -0700
+@@ -55,7 +55,7 @@
+ 	MODELS_DIR="$(srcdir)/models"
+ 
+ TESTS = test-moniker$(EXEEXT) test-event-source$(EXEEXT) test-object$(EXEEXT) \
+-	test-stream-mem$(EXEEXT) $(srcdir)/test-properties.sh test-storage-mem$(EXEEXT) \
++	test-stream-mem$(EXEEXT) test-properties.sh test-storage-mem$(EXEEXT) \
+ 	test-main-loop$(EXEEXT)
+ 
+ # TESTS += test-generic-factory.sh

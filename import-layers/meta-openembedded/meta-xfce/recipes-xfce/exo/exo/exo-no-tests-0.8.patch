@@ -1,0 +1,31 @@
+From 5f1e19860d89647488bdd32a02fb332f69434405 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Fri, 18 May 2012 21:13:00 +0200
+Subject: [PATCH] Do not run tests at build time
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Upstream-Status: Not-Applicable
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ Makefile.am |    3 +--
+ 1 files changed, 1 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 0ab3853..3e72391 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -8,8 +8,7 @@ SUBDIRS =								\
+ 	docs								\
+ 	icons								\
+ 	pixmaps								\
+-	po								\
+-	tests
++	po
+ 
+ AUTOMAKE_OPTIONS =							\
+ 	1.9								\
+-- 
+1.7.4.4
+

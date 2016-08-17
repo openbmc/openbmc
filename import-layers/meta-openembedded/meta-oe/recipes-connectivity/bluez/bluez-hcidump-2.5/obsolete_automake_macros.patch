@@ -1,0 +1,14 @@
+Upstream-Status: Pending [package obsolete/not maintained by upstream]
+
+Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
+diff -Nurd bluez-hcidump-2.5/configure.ac bluez-hcidump-2.5/configure.ac
+--- bluez-hcidump-2.5/configure.ac	2012-11-30 10:29:41.000000000 +0200
++++ bluez-hcidump-2.5/configure.ac	2013-01-12 10:02:10.609511463 +0200
+@@ -2,7 +2,7 @@
+ AC_INIT(bluez-hcidump, 2.5)
+
+ AM_INIT_AUTOMAKE([foreign subdir-objects])
+-AM_CONFIG_HEADER(config.h)
++AC_CONFIG_HEADERS(config.h)
+
+ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])

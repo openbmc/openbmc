@@ -1,0 +1,64 @@
+#!/bin/sh
+#
+### BEGIN INIT INFO
+# Provides: watchquagga
+# Required-Start: $local_fs $network $remote_fs $syslog
+# Required-Stop: $local_fs $network $remote_fs $syslog
+# Default-Start:  2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: start and stop the Quagga watchdog
+### END INIT INFO
+
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+
+# Load configuration
+test -f /etc/default/watchquagga && . /etc/default/watchquagga
+
+# Check that there are daemons to be monitored.
+[ -z "$watch_daemons" ] && exit 0
+
+pidfile="/var/run/quagga/watchquagga.pid"
+
+case "$1" in
+    start)
+	echo -n "Starting quagga watchdog daemon: watchquagga"
+	start-stop-daemon --start \
+		--pidfile $pidfile \
+		--exec /usr/sbin/watchquagga \
+		-- -d $watch_options $watch_daemons
+	echo "."
+    	;;
+	
+    stop)
+	echo -n "Stopping quagga watchdog daemon: watchquagga"
+	start-stop-daemon --stop --quiet \
+		--pidfile $pidfile
+	echo "."
+	;;
+
+    status)
+	echo -n "watchquagga "
+	res=1
+	[ -e $pidfile ] && kill -0 `cat $pidfile` 2> /dev/null
+	if [ $? -eq 0 ]; then
+	    echo "(pid `cat $pidfile`) is running..."
+	    res=0
+	else
+	    echo "is stopped..."
+	fi
+	exit $res
+	;;
+
+    restart|force-reload)
+	$0 stop $2
+	sleep 1
+	$0 start $2
+	;;
+
+    *)
+	echo "Usage: /etc/init.d/watchquagga {start|stop|restart|force-reload}"
+	exit 1
+	;;
+esac
+
+exit 0

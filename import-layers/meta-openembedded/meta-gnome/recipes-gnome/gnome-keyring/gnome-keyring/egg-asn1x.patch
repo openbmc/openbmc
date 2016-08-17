@@ -1,0 +1,55 @@
+Fixed build error with gcc 4.8
+
+Errors like below
+
+egg-asn1x.c: In function 'anode_encode_build':
+egg-asn1x.c:1280:7: warning: variable 'type' set but not used [-Wunused-but-set-variable]
+egg-asn1x.c: In function 'traverse_and_prepare':
+egg-asn1x.c:3354:3: warning: passing argument 1 of 'egg_asn1x_create' from incompatible pointer type [enabled by default]
+In file included from egg-asn1x.c:50:0:
+egg-asn1x.h:38:8: note: expected 'const struct static_struct_asn *' but argument is of type 'const struct asn1_static_node *'
+egg-asn1x.c: At top level:
+egg-asn1x.c:3509:1: error: conflicting types for 'egg_asn1x_create'
+In file included from egg-asn1x.c:50:0:
+egg-asn1x.h:38:8: note: previous declaration of 'egg_asn1x_create' was here
+egg-asn1x.c:3572:1: error: conflicting types for 'egg_asn1x_create_quark'
+In file included from egg-asn1x.c:50:0:
+egg-asn1x.h:41:8: note: previous declaration of 'egg_asn1x_create_quark' was here
+egg-asn1x.c:3579:1: error: conflicting types for 'egg_asn1x_create_and_decode'
+In file included from egg-asn1x.c:50:0:
+egg-asn1x.h:44:8: note: previous declaration of 'egg_asn1x_create_and_decode' was here
+make[4]: *** [libegg_la-egg-asn1x.lo] Error 1
+
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Pending
+Index: gnome-keyring-2.32.1/egg/egg-asn1x.h
+===================================================================
+--- gnome-keyring-2.32.1.orig/egg/egg-asn1x.h	2010-10-18 19:11:38.000000000 -0700
++++ gnome-keyring-2.32.1/egg/egg-asn1x.h	2013-06-11 15:15:00.675399263 -0700
+@@ -25,6 +25,7 @@
+ #define EGG_ASN1X_H_
+ 
+ #include <glib.h>
++#include <libtasn1.h>
+ 
+ #ifndef HAVE_EGG_ALLOCATOR
+ typedef void* (*EggAllocator) (void* p, gsize);
+@@ -35,13 +36,13 @@
+ 
+ struct static_struct_asn;
+ 
+-GNode*              egg_asn1x_create                 (const struct static_struct_asn *defs,
++GNode*              egg_asn1x_create                 (const ASN1_ARRAY_TYPE *defs,
+                                                       const gchar *type);
+ 
+-GNode*              egg_asn1x_create_quark           (const struct static_struct_asn *defs,
++GNode*              egg_asn1x_create_quark           (const ASN1_ARRAY_TYPE *defs,
+                                                       GQuark type);
+ 
+-GNode*              egg_asn1x_create_and_decode      (const struct static_struct_asn *defs,
++GNode*              egg_asn1x_create_and_decode      (const ASN1_ARRAY_TYPE *defs,
+                                                       const gchar *type,
+                                                       gconstpointer data,
+                                                       gsize n_data);

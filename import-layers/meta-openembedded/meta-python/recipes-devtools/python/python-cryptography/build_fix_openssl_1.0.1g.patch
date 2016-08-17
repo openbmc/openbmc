@@ -1,0 +1,28 @@
+build issue do to openssl 1.0.1g upgrade
+
+BIO *BIO_new_mem_buf(void *, int);
+      ^
+In file included from /home/jenkins/oe/world/shr-core/tmp-glibc/sysroots/qemuarm/usr/include/openssl/asn1.h:65:0,
+from build/temp.linux-x86_64-2.7/_openssl.c:413:
+
+
+Upstream-Status: Pending
+
+seems to be a known issue
+https://github.com/pyca/cryptography/issues/2750
+
+Signed-off-by: Armin Kuster <akuster@mvista.com>
+
+Index: src/_cffi_src/openssl/bio.py
+===================================================================
+--- a/src/_cffi_src/openssl/bio.py
++++ b/src/_cffi_src/openssl/bio.py
+@@ -99,7 +99,7 @@ BIO *BIO_pop(BIO *);
+ BIO *BIO_next(BIO *);
+ BIO *BIO_find_type(BIO *, int);
+ BIO_METHOD *BIO_s_mem(void);
+-BIO *BIO_new_mem_buf(void *, int);
++BIO *BIO_new_mem_buf(const void *, int);
+ BIO_METHOD *BIO_s_file(void);
+ BIO *BIO_new_file(const char *, const char *);
+ BIO *BIO_new_fp(FILE *, int);

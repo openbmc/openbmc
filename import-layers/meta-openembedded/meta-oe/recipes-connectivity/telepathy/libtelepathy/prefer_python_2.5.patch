@@ -1,0 +1,15 @@
+Upstream-Status: Inappropriate [configuration]
+
+Index: libtelepathy-0.3.1/configure.ac
+===================================================================
+--- libtelepathy-0.3.1.orig/configure.ac	2007-11-22 19:05:56.000000000 +0000
++++ libtelepathy-0.3.1/configure.ac	2008-01-04 12:07:28.000000000 +0000
+@@ -51,7 +51,7 @@
+   AC_MSG_ERROR([xsltproc (from the libxslt source package) is required])
+ fi
+ 
+-AC_CHECK_PROGS([PYTHON], [python2.3 python2.4 python2.5 python])
++AC_CHECK_PROGS([PYTHON], [python2.5 python2.4 python2.3 python])
+ if test -z "$PYTHON"; then
+   AC_MSG_ERROR([Python is required to compile this package])
+ fi

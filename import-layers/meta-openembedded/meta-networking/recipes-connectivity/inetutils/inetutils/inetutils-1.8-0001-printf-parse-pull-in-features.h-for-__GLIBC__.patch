@@ -1,0 +1,29 @@
+From 552a7d64ad4a7188a9b7cd89933ae7caf7ebfe90 Mon Sep 17 00:00:00 2001
+From: Mike Frysinger <vapier at gentoo.org>
+Date: Thu, 18 Nov 2010 16:59:14 -0500
+Subject: [PATCH gnulib] printf-parse: pull in features.h for __GLIBC__
+
+Upstream-Status: Pending
+
+Signed-off-by: Mike Frysinger <vapier at gentoo.org>
+---
+ lib/printf-parse.h |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/lib/printf-parse.h b/lib/printf-parse.h
+index 67a4a2a..3bd6152 100644
+--- a/lib/printf-parse.h
++++ b/lib/printf-parse.h
+@@ -25,6 +25,9 @@
+ 
+ #include "printf-args.h"
+ 
++#ifdef HAVE_FEATURES_H
++# include <features.h>	/* for __GLIBC__ */
++#endif
+ 
+ /* Flags */
+ #define FLAG_GROUP       1      /* ' flag */
+-- 
+1.7.3.2
+

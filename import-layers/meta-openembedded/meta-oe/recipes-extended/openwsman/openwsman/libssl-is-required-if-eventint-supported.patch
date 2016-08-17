@@ -1,0 +1,17 @@
+libssl is required by wsman_client_transport if ENABLE_EVENTING_SUPPORT enabled.
+
+Signed-off-by: Bian Naimeng <biannm@cn.fujitsu.com>
+
+diff -Nurp openwsman-2.4.12.orig/src/lib/CMakeLists.txt openwsman-2.4.12/src/lib/CMakeLists.txt
+--- openwsman-2.4.12.orig/src/lib/CMakeLists.txt	2014-10-28 23:04:47.000000000 +0800
++++ openwsman-2.4.12/src/lib/CMakeLists.txt	2014-12-31 11:09:20.340428523 +0800
+@@ -56,6 +56,9 @@ TARGET_LINK_LIBRARIES( ${WSMAN_CLIENT_TR
+ SET_TARGET_PROPERTIES( ${WSMAN_CLIENT_TRANSPORT_PKG} PROPERTIES VERSION 1.0.0 SOVERSION 1)
+ INSTALL(TARGETS ${WSMAN_CLIENT_TRANSPORT_PKG} DESTINATION ${LIB_INSTALL_DIR})
+ 
++IF( ENABLE_EVENTING_SUPPORT )
++TARGET_LINK_LIBRARIES( ${WSMAN_CLIENT_TRANSPORT_PKG} ${OPENSSL_LIBRARIES} )
++ENDIF( ENABLE_EVENTING_SUPPORT )
+ 
+ ############### wsman_client ###############
+ 

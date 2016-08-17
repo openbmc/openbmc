@@ -1,0 +1,14 @@
+Index: hplip-3.12.6/configure.in
+===================================================================
+--- hplip-3.12.6.orig/configure.in	2014-07-16 20:03:51.310044196 +0000
++++ hplip-3.12.6/configure.in	2014-07-18 07:53:31.589559192 +0000
+@@ -27,8 +27,7 @@
+ 
+ #AC_PREREQ(2.59)
+ AC_INIT([HP Linux Imaging and Printing], [3.12.6], [3.12.6], [hplip])
+-#AM_INIT_AUTOMAKE([1.9 foreign])
+-AM_INIT_AUTOMAKE
++AM_INIT_AUTOMAKE([1.9 foreign])
+ AC_DISABLE_STATIC
+ 
+ # Checks for programs.

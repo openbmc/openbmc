@@ -1,0 +1,28 @@
+From 2918196ba782dfa4401bdca917ad4de1910505e0 Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@cn.fujitsu.com>
+Date: Fri, 21 Aug 2015 15:58:42 +0900
+Subject: [PATCH] fix bug for cross compile
+
+Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 9be879c..9249bfd 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1208,8 +1208,8 @@ AC_HELP_STRING([--with-libedit[=DIR], Enable libedit support
+ if test "x$use_libedit" != "xno"; then
+     saved_CPPFLAGS=$CPPFLAGS
+     saved_LDFLAGS=$LDFLAGS
+-    CPPFLAGS="${CPPFLAGS} -I$libedit_path/include"
+-    LDFLAGS="${LDFLAGS} -L$libedit_path/lib"
++    CPPFLAGS="${CPPFLAGS} "
++    LDFLAGS="${LDFLAGS} "
+     AC_CHECK_LIB(curses, tgetent, LIBEDIT_LIBS="-lcurses",
+         [AC_CHECK_LIB(ncurses, tgetent, LIBEDIT_LIBS="-lncurses",
+             AC_MSG_WARN("libedit needs libcurses or libncurses. disabled...")
+-- 
+1.8.4.2
+

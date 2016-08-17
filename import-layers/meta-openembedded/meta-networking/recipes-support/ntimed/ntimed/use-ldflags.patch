@@ -1,0 +1,16 @@
+Obey LDFLAGS.
+
+Signed-off-by: Christopher Larson <kergoth@gmail.com>
+Upstream-Status: Pending
+
+--- Ntimed.orig/configure	2015-05-30 11:57:59.927796993 -0700
++++ Ntimed/configure	2015-05-30 11:58:26.143948894 -0700
+@@ -142,7 +142,7 @@
+ 
+ 	echo
+ 	echo "ntimed-client:	${l}"
+-	echo "	\${CC} \${CFLAGS} -o ntimed-client ${l} -lm"
++	echo "	\${CC} \${CFLAGS} -o ntimed-client ${l} \${LDFLAGS} -lm"
+ 	echo
+ 	echo "clean:"
+ 	echo "	rm -f ${l} ntimed-client"

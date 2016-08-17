@@ -1,0 +1,70 @@
+The local function eaccess conflicts with a glibc function of the same name.
+Rename the function so that this can be build under glibc 2.4, and older
+revisions, without any problems.
+
+--- liblockfile-1.06/dotlockfile.c	2006/07/10 03:17:40	1.1
++++ liblockfile-1.06/dotlockfile.c	2006/07/10 03:18:26
+@@ -42,7 +42,7 @@
+ extern int optind;
+ #endif
+ 
+-extern int eaccess(char *, gid_t, struct stat *);
++extern int xeaccess(char *, gid_t, struct stat *);
+ 
+ /*
+  *	Sleep for an amout of time while regulary checking if
+@@ -252,14 +252,14 @@
+ 		return L_ERROR;
+ 	}
+ 	gid = getgid();
+-	if (eaccess(dir, gid, &st) < 0) {
++	if (xeaccess(dir, gid, &st) < 0) {
+ 		if (errno == ENOENT) {
+ enoent:
+ 			if (!quiet) fprintf(stderr,
+ 				"dotlockfile: %s: no such directory\n", dir);
+ 			return L_TMPLOCK;
+ 		}
+-		if ((r = eaccess(dir, getegid(), &st) < 0) && errno == ENOENT)
++		if ((r = xeaccess(dir, getegid(), &st) < 0) && errno == ENOENT)
+ 			goto enoent;
+ 		if (r < 0 || !ismaillock(lockfile, pwd->pw_name)) {
+ 			if (!quiet) fprintf(stderr,
+@@ -272,7 +272,7 @@
+ 	/*
+ 	 *	Now we should be able to chdir() to the lock directory.
+ 	 *	When we stat("."), it should be the same as at the
+-	 *	eaccess() check or someone played symlink() games on us.
++	 *	xeaccess() check or someone played symlink() games on us.
+ 	 */
+ 	if (chdir(dir) < 0 || stat(".", &st2) < 0) {
+ 		if (!quiet) fprintf(stderr,
+--- liblockfile-1.06/lockfile.c	2006/07/10 03:17:40	1.1
++++ liblockfile-1.06/lockfile.c	2006/07/10 03:18:26
+@@ -54,7 +54,7 @@
+ #ifdef LIB
+ static
+ #endif
+-int eaccess(char *fn, gid_t gid, struct stat *st)
++int xeaccess(char *fn, gid_t gid, struct stat *st)
+ {
+ 	struct stat	tmp;
+ 	uid_t		uid = geteuid();
+@@ -96,7 +96,7 @@
+ 		*p = 0;
+ 	else
+ 		strcpy(dir, ".");
+-	if (eaccess(dir, egid, NULL) >= 0) {
++	if (xeaccess(dir, egid, NULL) >= 0) {
+ 		free(dir);
+ 		return 0;
+ 	}
+@@ -111,7 +111,7 @@
+ 			return 0;
+ 		mailgid = st.st_gid;
+ 	}
+-	ret = eaccess(dir, mailgid, NULL) >= 0;
++	ret = xeaccess(dir, mailgid, NULL) >= 0;
+ 	free (dir);
+ 	return ret;
+ }

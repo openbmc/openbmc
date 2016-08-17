@@ -1,0 +1,29 @@
+From c85bf7cc5c1e1780d215f6fe233e3ed4597c72ed Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Mon, 21 Sep 2015 06:54:28 +0000
+Subject: [PATCH] Makefile.am: create ouput directory for desktop file
+
+Upstream-Status: Submitted [1]
+
+[1]: http://bug-attachment.xfce.org/attachment.cgi?id=6460
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ Makefile.am | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Makefile.am b/Makefile.am
+index a22fc20..2ef0e54 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -122,6 +122,7 @@ app_desktop_DATA = $(app_desktop_in_files:.desktop.in=.desktop)
+ 
+ src/xfce4-screenshooter.desktop.in: src/xfce4-screenshooter.desktop.in.in
+ 	$(AM_V_GEN) ( \
++		$(MKDIR_P) $(dir $@); \
+ 		sed -e "s^@PLUGIN_PATH@^$(libexecdir)/applications^" \
+ 			$< > $@ \
+ 	)
+-- 
+2.0.1
+

@@ -1,0 +1,23 @@
+From: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Subject: fix screenshot po/ building
+Upstream-Status: Pending
+
+Somehow configure doesn't substitute @MKINSTALLDIRS@ by default anymore,
+however this substitution is required for po/Makefile
+
+Fix that by calling AM_MKINSTALLDIRS from configure.ac
+
+Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+Index: E-MODULES-EXTRA/screenshot/configure.ac
+===================================================================
+--- E-MODULES-EXTRA.orig/screenshot/configure.ac	2011-08-17 15:49:22.000000000 +0400
++++ E-MODULES-EXTRA/screenshot/configure.ac	2011-08-17 15:49:34.000000000 +0400
+@@ -24,6 +24,7 @@
+ define([AC_LIBTOOL_LANG_F77_CONFIG], [:])dnl
+ AC_PROG_LIBTOOL
+ 
++AM_MKINSTALLDIRS
+ m4_ifdef([AM_GNU_GETTEXT_VERSION], [
+ AM_GNU_GETTEXT_VERSION([0.14])
+ ])

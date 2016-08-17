@@ -1,0 +1,73 @@
+#!/bin/sh
+#
+# postgresql-setup      Initialization operation for PostgreSQL
+
+# For SELinux we need to use 'runuser' not 'su'
+if [ -x /sbin/runuser ]
+then
+    SU=runuser
+else
+    SU=su
+fi
+
+PGENGINE=/usr/bin
+PGDATA=/var/lib/postgresql/data
+PGLOG=/var/lib/postgresql/pgstartup.log
+script_result=0
+
+initdb(){
+    if [ -f "$PGDATA/PG_VERSION" ]
+    then
+	echo -n "Data directory is not empty!"
+	echo -n " [FAILED] "
+	echo
+	script_result=1
+    else
+	echo -n "Initializing database: "
+	if [ ! -e "$PGDATA" -a ! -h "$PGDATA" ]
+	then
+		mkdir -p "$PGDATA" || exit 1
+		chown postgres:postgres "$PGDATA"
+		chmod go-rwx "$PGDATA"
+	fi
+	# Clean up SELinux tagging for PGDATA
+	[ -x /sbin/restorecon ] && /sbin/restorecon "$PGDATA"
+
+	# Make sure the startup-time log file is OK, too
+	if [ ! -e "$PGLOG" -a ! -h "$PGLOG" ]
+	then
+		touch "$PGLOG" || exit 1
+		chown postgres:postgres "$PGLOG"
+		chmod go-rwx "$PGLOG"
+		[ -x /sbin/restorecon ] && /sbin/restorecon "$PGLOG"
+	fi
+
+	# Initialize the database
+	$SU -l postgres -c "$PGENGINE/initdb --pgdata='$PGDATA' --auth='ident'" >> "$PGLOG" 2>&1 < /dev/null
+
+	# Create directory for postmaster log
+	mkdir "$PGDATA/pg_log"
+	chown postgres:postgres "$PGDATA/pg_log"
+	chmod go-rwx "$PGDATA/pg_log"
+
+	if [ -f "$PGDATA/PG_VERSION" ]
+	then
+	    echo -n " [ OK ] "
+	else
+	    echo -n " [FAILED] "
+	    script_result=1
+	fi
+	echo
+    fi
+}
+
+case "$1" in
+  initdb)
+	initdb
+	;;
+  *)
+	echo "Usage: $0 initdb"
+	exit 2
+esac
+
+exit $script_result

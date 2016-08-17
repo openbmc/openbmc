@@ -1,0 +1,63 @@
+From 9a2d6315ff206b2a47100dfd85afe3af56576995 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Thu, 10 Dec 2015 04:20:51 -0500
+Subject: [PATCH] Add config option without-valgrind
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ lib/replace/wscript | 4 +++-
+ source3/wscript     | 5 ++++-
+ wscript             | 4 ++++
+ 3 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/lib/replace/wscript b/lib/replace/wscript
+index f0040b1..aca73af 100644
+--- a/lib/replace/wscript
++++ b/lib/replace/wscript
+@@ -101,7 +101,9 @@ struct foo bar = { .y = 'X', .x = 1 };
+ 
+     conf.CHECK_CODE('', headers='rpc/rpc.h rpcsvc/yp_prot.h', define='HAVE_RPCSVC_YP_PROT_H')
+ 
+-    conf.CHECK_HEADERS('valgrind.h valgrind/valgrind.h valgrind/memcheck.h')
++    if not Options.options.disable_valgrind:
++        conf.CHECK_HEADERS('valgrind.h valgrind/valgrind.h valgrind/memcheck.h')
++
+     conf.CHECK_HEADERS('nss_common.h nsswitch.h ns_api.h')
+     conf.CHECK_HEADERS('sys/extattr.h sys/ea.h sys/proplist.h sys/cdefs.h')
+     conf.CHECK_HEADERS('utmp.h utmpx.h lastlog.h malloc.h')
+diff --git a/source3/wscript b/source3/wscript
+index bac3dd5..a5c51ea 100644
+--- a/source3/wscript
++++ b/source3/wscript
+@@ -1016,7 +1016,10 @@ syscall(SYS_setgroups32, 0, NULL);
+             Logs.warn("--with-dnsupdate=yes but gssapi support not sufficient")
+         else:
+             conf.DEFINE('WITH_DNS_UPDATES', 1)
+-    conf.CHECK_HEADERS('valgrind.h valgrind/valgrind.h valgrind/memcheck.h')
++
++    if not Options.options.disable_valgrind:
++        conf.CHECK_HEADERS('valgrind.h valgrind/valgrind.h valgrind/memcheck.h')
++
+     if Options.options.developer:
+         if conf.CONFIG_SET('HAVE_VALGRIND_H') or conf.CONFIG_SET('HAVE_VALGRIND_VALGRIND_H'):
+             conf.DEFINE('VALGRIND', '1')
+diff --git a/wscript b/wscript
+index 7679c0f..681ac17 100644
+--- a/wscript
++++ b/wscript
+@@ -72,6 +72,10 @@ def set_options(opt):
+                    help=("Disable systemd integration"),
+                    action='store_false', dest='enable_systemd')
+ 
++    opt.add_option('--without-valgrind',
++                   help=("Disable use of the valgrind headers"),
++                   action="store_true", dest='disable_valgrind', default=False)
++
+     gr = opt.option_group('developer options')
+ 
+     opt.tool_options('python') # options for disabling pyc or pyo compilation
+-- 
+1.9.1
+

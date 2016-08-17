@@ -1,0 +1,137 @@
+From 679e33bfe74d713240fdd930602b993b937dce39 Mon Sep 17 00:00:00 2001
+From: Li xin <lixin.fnst@cn.fujitsu.com>
+Date: Fri, 23 Jan 2015 03:30:47 +0900
+Subject: [PATCH] modify acinclude.m4 and configure.in
+
+this patch is from Debian to fix build errors.
+"acinclude.m4:34: error: automatic de-ANSI-fication
+support has been removed"
+
+Upstream-Status: pending
+
+Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
+---
+ acinclude.m4 | 79 ------------------------------------------------------------
+ configure.in | 12 +++++++++
+ 2 files changed, 12 insertions(+), 79 deletions(-)
+
+diff --git a/acinclude.m4 b/acinclude.m4
+index e9e5500..d467fb5 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -30,82 +30,3 @@ AC_SUBST($1)
+ ## ------------------------------- ##
+ ## Check for function prototypes.  ##
+ ## ------------------------------- ##
+-
+-AC_DEFUN(fp_C_PROTOTYPES,
+-[AC_REQUIRE([AM_PROG_CC_STDC])
+-AC_MSG_CHECKING([for function prototypes])
+-if test "$ac_cv_prog_cc_stdc" != no; then
+-  AC_MSG_RESULT(yes)
+-  AC_DEFINE(PROTOTYPES)
+-  U= ANSI2KNR=
+-else
+-  AC_MSG_RESULT(no)
+-  U=_ ANSI2KNR=./ansi2knr
+-fi
+-AC_SUBST(U)dnl
+-AC_SUBST(ANSI2KNR)dnl
+-])
+-
+-## ----------------------------------------- ##
+-## ANSIfy the C compiler whenever possible.  ##
+-## ----------------------------------------- ##
+-
+-# @defmac AC_PROG_CC_STDC
+-# @maindex PROG_CC_STDC
+-# @ovindex CC
+-# If the C compiler in not in ANSI C mode by default, try to add an option
+-# to output variable @code{CC} to make it so.  This macro tries various
+-# options that select ANSI C on some system or another.  It considers the
+-# compiler to be in ANSI C mode if it defines @code{__STDC__} to 1 and
+-# handles function prototypes correctly.
+-#
+-# If you use this macro, you should check after calling it whether the C
+-# compiler has been set to accept ANSI C; if not, the shell variable
+-# @code{ac_cv_prog_cc_stdc} is set to @samp{no}.  If you wrote your source
+-# code in ANSI C, you can make an un-ANSIfied copy of it by using the
+-# program @code{ansi2knr}, which comes with Ghostscript.
+-# @end defmac
+-
+-AC_DEFUN(fp_PROG_CC_STDC,
+-[AC_MSG_CHECKING(for ${CC-cc} option to accept ANSI C)
+-AC_CACHE_VAL(ac_cv_prog_cc_stdc,
+-[ac_cv_prog_cc_stdc=no
+-ac_save_CFLAGS="$CFLAGS"
+-# Don't try gcc -ansi; that turns off useful extensions and
+-# breaks some systems' header files.
+-# AIX			-qlanglvl=ansi
+-# Ultrix and OSF/1	-std1
+-# HP-UX			-Aa -D_HPUX_SOURCE
+-# SVR4			-Xc
+-for ac_arg in "" -qlanglvl=ansi -std1 "-Aa -D_HPUX_SOURCE" -Xc
+-do
+-  CFLAGS="$ac_save_CFLAGS $ac_arg"
+-  AC_TRY_COMPILE(
+-[#if !defined(__STDC__) || __STDC__ != 1
+-choke me
+-#endif
+-], [int test (int i, double x);
+-struct s1 {int (*f) (int a);};
+-struct s2 {int (*f) (double a);};],
+-[ac_cv_prog_cc_stdc="$ac_arg"; break])
+-done
+-CFLAGS="$ac_save_CFLAGS"
+-])
+-AC_MSG_RESULT($ac_cv_prog_cc_stdc)
+-case "x$ac_cv_prog_cc_stdc" in
+-  x|xno) ;;
+-  *) CC="$CC $ac_cv_prog_cc_stdc" ;;
+-esac
+-])
+-
+-## --------------------------------------------------------- ##
+-## Use AC_PROG_INSTALL, supplementing it with INSTALL_SCRIPT ##
+-## substitution.                                             ##
+-## --------------------------------------------------------- ##
+-
+-AC_DEFUN(fp_PROG_INSTALL,
+-[AC_PROG_INSTALL
+-test -z "$INSTALL_SCRIPT" && INSTALL_SCRIPT='${INSTALL} -m 755'
+-AC_SUBST(INSTALL_SCRIPT)dnl
+-])
+-
+diff --git a/configure.in b/configure.in
+index 6b25ed5..a6a7f5b 100644
+--- a/configure.in
++++ b/configure.in
+@@ -103,6 +103,12 @@ nana_DEFINE(DI_MAKE_VALID_BREAKPOINT,(exprn),
+   sparc-*-*|i?86-*-*)
+     DI_MAKE_VALID_BREAKPOINT='asm("nop")'
+     ;;
++  arm*-*-*|frv-*-*|mips*-*-*)
++    DI_MAKE_VALID_BREAKPOINT='asm("nop")'
++    ;;
++  sh*-*-*)
++    DI_MAKE_VALID_BREAKPOINT='asm("nop\n\tnop\n\t")'
++    ;;
+   esac
+ ])
+ 
+@@ -113,6 +119,12 @@ nana_DEFINE(DL_MAKE_VALID_BREAKPOINT,(),
+   sparc-*-*|i?86-*-*)
+     DL_MAKE_VALID_BREAKPOINT='asm("nop")'
+     ;;
++  arm*-*-*|frv-*-*|mips*-*-*)
++    DL_MAKE_VALID_BREAKPOINT='asm("nop")'
++    ;;
++  sh*-*-*)
++    DL_MAKE_VALID_BREAKPOINT='asm("nop\n\tnop\n\t")'
++    ;;
+   esac
+ ])
+ 
+-- 
+1.8.4.2
+

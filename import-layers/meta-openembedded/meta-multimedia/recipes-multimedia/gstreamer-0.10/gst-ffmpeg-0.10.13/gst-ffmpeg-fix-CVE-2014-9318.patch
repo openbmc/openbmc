@@ -1,0 +1,37 @@
+From 0d3a3b9f8907625b361420d48fe05716859620ff Mon Sep 17 00:00:00 2001
+From: Michael Niedermayer <michaelni@gmx.at>
+Date: Wed, 26 Nov 2014 18:56:39 +0100
+Subject: [PATCH] avcodec/rawdec: Check the return code of
+ avpicture_get_size()
+
+(Upstream commit 1d3a3b9f8907625b361420d48fe05716859620ff)
+
+Fixes out of array access
+Fixes: asan_heap-oob_22388d0_3435_cov_3297128910_small_roll5_FlashCine1.cine
+Found-by: Mateusz "j00ru" Jurczyk and Gynvael Coldwind
+
+Upstream-Status: Backport
+
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+---
+ libavcodec/rawdec.c |    3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/libavcodec/rawdec.c b/libavcodec/rawdec.c
+index 28792a1..647dfa9 100644
+--- a/gst-libs/ext/libav/libavcodec/rawdec.c
++++ b/gst-libs/ext/libav/libavcodec/rawdec.c
+@@ -87,6 +87,9 @@ static av_cold int raw_init_decoder(AVCodecContext *avctx)
+ 
+     ff_set_systematic_pal2(context->palette, avctx->pix_fmt);
+     context->length = avpicture_get_size(avctx->pix_fmt, avctx->width, avctx->height);
++    if (context->length < 0)
++        return context->length;
++
+     if((avctx->bits_per_coded_sample == 4 || avctx->bits_per_coded_sample == 2) &&
+        avctx->pix_fmt==PIX_FMT_PAL8 &&
+        (!avctx->codec_tag || avctx->codec_tag == MKTAG('r','a','w',' '))){
+-- 
+1.7.9.5
+

@@ -1,0 +1,30 @@
+From d8067ceacbf54e79c9c6b68675332c09eaa0b55d Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Mon, 8 Apr 2013 14:29:51 +0800
+Subject: [PATCH] pthread-check
+
+Enable pthreads support when cross-compiling
+
+Upstream-Status: Inapproprate [config]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ TSRM/threads.m4 |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/TSRM/threads.m4 b/TSRM/threads.m4
+index 38494ce..15d9454 100644
+--- a/TSRM/threads.m4
++++ b/TSRM/threads.m4
+@@ -86,7 +86,7 @@ int main() {
+   pthreads_working=no
+   ], [
+   dnl For cross compiling running this test is of no use. NetWare supports pthreads
+-  pthreads_working=no
++  pthreads_working=yes
+   case $host_alias in
+   *netware*)
+     pthreads_working=yes
+-- 
+1.7.4.1
+

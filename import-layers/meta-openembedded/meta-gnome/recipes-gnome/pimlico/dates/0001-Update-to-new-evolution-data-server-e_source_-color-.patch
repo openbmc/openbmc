@@ -1,0 +1,72 @@
+From a8ddfc4b91f2ab3d955fe528ddb98ce2c5545795 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Sun, 4 Aug 2013 13:44:50 +0200
+Subject: [PATCH] Update to new evolution-data-server e_source_*color APIs
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ src/dates_gtk.c  | 6 +++---
+ src/dates_main.c | 2 +-
+ src/dates_view.c | 6 +++++-
+ 3 files changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/src/dates_gtk.c b/src/dates_gtk.c
+index 78e71bb..ac539d2 100644
+--- a/src/dates_gtk.c
++++ b/src/dates_gtk.c
+@@ -1072,7 +1072,7 @@ calendar_do_new_dialog (GtkWindow *parent, DatesData *d)
+ #endif
+ 
+ 			/* Set the colour */
+-			e_source_set_color (source, new_colour);
++			e_source_set_color_spec (source, new_colour);
+ 
+ 			/* Set the group for the source */
+ 			e_source_set_group (source, group);
+@@ -1335,7 +1335,7 @@ calendar_do_edit_dialog (GtkWindow *parent, ESource *source, DatesData *d)
+ 	gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+ 
+ 	/* Get the colour from the the source */
+-	e_source_get_color (source, &raw_colour);
++	raw_colour = e_source_peek_color_spec (source);
+ 
+ 	/* Munge this into something usable */
+ 	colour.red = (guint16)(((raw_colour & 0xff0000) >> 16) << 8);
+@@ -1459,7 +1459,7 @@ calendar_do_edit_dialog (GtkWindow *parent, ESource *source, DatesData *d)
+ 			new_colour <<= 8;
+ #endif
+ 			/* Update the colour */
+-			e_source_set_color (source, new_colour);
++			e_source_set_color_spec (source, new_colour);
+ 
+ 			/* And the name */
+ 			e_source_set_name (source, (gtk_entry_get_text (GTK_ENTRY (name_entry))));
+diff --git a/src/dates_main.c b/src/dates_main.c
+index ce05fe8..7273c63 100644
+--- a/src/dates_main.c
++++ b/src/dates_main.c
+@@ -112,7 +112,7 @@ dates_load_calendars (DatesData *d)
+ 		system_source = e_source_new (_("Personal"), "system");
+ 
+ 		/* Default Evolution colour */
+-		e_source_set_color (system_source, 0xBECEDD);
++		e_source_set_color_spec (system_source, 0xBECEDD);
+ 
+ 		/* Set the group for the source and put it in the group */
+ 		e_source_set_group (system_source, local_group);
+diff --git a/src/dates_view.c b/src/dates_view.c
+index d65db2f..f8efb9c 100644
+--- a/src/dates_view.c
++++ b/src/dates_view.c
+@@ -4876,7 +4880,7 @@ dates_view_add_calendar (DatesView *view, ECal *ecal)
+ 	cal->text_gc = gdk_gc_new (
+ 		GDK_DRAWABLE (priv->main->window));
+ 
+-	if (e_source_get_color (source, &colour)) {
++	if (colour = e_source_peek_color_spec (source)) {
+ 		GdkColor gcolour, dgcolour, tgcolour;
+ 		gcolour.red = ((colour & 0xFF0000) >> 16) * 0x101;
+ 		gcolour.green = ((colour & 0xFF00) >> 8)  * 0x101;
+-- 
+1.8.3.2
+

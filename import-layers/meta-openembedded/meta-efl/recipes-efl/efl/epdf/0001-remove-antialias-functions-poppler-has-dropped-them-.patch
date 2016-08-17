@@ -1,0 +1,132 @@
+From 6691ac5fcbac0e766d4410ae649a13957ae85289 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Thu, 22 Oct 2015 16:27:52 +0200
+Subject: [PATCH 1/2] remove antialias functions - poppler has dropped them in
+ the API
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The functions removed were not used.
+
+Upstream-Status: pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ src/lib/epdf_main.h                   | 45 -----------------------------------
+ src/lib/mupdf/epdf_mupdf_main.c       | 18 --------------
+ src/lib/poppler/epdf_poppler_main.cpp | 21 ----------------
+ 3 files changed, 84 deletions(-)
+
+diff --git a/src/lib/epdf_main.h b/src/lib/epdf_main.h
+index 54a57ca..0a79bad 100644
+--- a/src/lib/epdf_main.h
++++ b/src/lib/epdf_main.h
+@@ -29,49 +29,4 @@ EAPI int epdf_shutdown();
+  */
+ EAPI const char *epdf_backend_version_get (void);
+ 
+-/**
+- * @brief Return the state of fonts antialiasing in Poppler
+- *
+- * @return EINA_TRUE if fonts antialiasing enabled, EINA_FALSE otherwise.
+- *
+- * Return EINA_TRUE if the state of fonts antialiasing is enabled in
+- * Poppler, EINA_FALSE otherwise.
+- *
+- * @ingroup Epdf_Main
+- */
+-EAPI Eina_Bool epdf_fonts_antialias_get (void);
+-
+-/**
+- * @brief Sets fonts antialiasing mode in Poppler
+- *
+- * @param on EINA_TRUE to enable fonts antialiasing, EINA_FALSE to disable
+- *
+- * Set @p on to EINA_TRUE to enable fonts antialiasing in Poppler,
+- * EINA_FALSE to disable it.
+- */
+-EAPI void epdf_fonts_antialias_set (Eina_Bool on);
+-
+-/**
+- * @brief Return the state of lines antialiasing in Poppler
+- *
+- * @return EINA_TRUE if lines antialiasing enabled, EINA_FALSE otherwise.
+- *
+- * Return EINA_TRUE if the state of lines antialiasing is enabled in
+- * Poppler, EINA_FALSE otherwise.
+- *
+- * @ingroup Epdf_Main
+- */
+-EAPI Eina_Bool epdf_lines_antialias_get (void);
+-
+-/**
+- * @brief Sets lines antialiasing mode in Poppler
+- *
+- * @param on EINA_TRUE to enable lines antialiasing, EINA_FALSE to disable
+- *
+- * Set @p on to EINA_TRUE to enable lines antialiasing in Poppler,
+- * EINA_FALSE to disable it.
+- */
+-EAPI void epdf_lines_antialias_set (Eina_Bool on);
+-
+-
+ #endif /* __EPDF_MAIN_H__ */
+diff --git a/src/lib/mupdf/epdf_mupdf_main.c b/src/lib/mupdf/epdf_mupdf_main.c
+index 17bb830..27c6de2 100644
+--- a/src/lib/mupdf/epdf_mupdf_main.c
++++ b/src/lib/mupdf/epdf_mupdf_main.c
+@@ -37,21 +37,3 @@ epdf_backend_version_get (void)
+ {
+    return "0.5";
+ }
+-
+-Eina_Bool epdf_fonts_antialias_get(void)
+-{
+-   return EINA_TRUE;
+-}
+-
+-void epdf_fonts_antialias_set(Eina_Bool on)
+-{
+-}
+-
+-Eina_Bool epdf_lines_antialias_get(void)
+-{
+-   return EINA_TRUE;
+-}
+-
+-void epdf_lines_antialias_set(Eina_Bool on)
+-{
+-}
+diff --git a/src/lib/poppler/epdf_poppler_main.cpp b/src/lib/poppler/epdf_poppler_main.cpp
+index 9841987..9efdbe8 100644
+--- a/src/lib/poppler/epdf_poppler_main.cpp
++++ b/src/lib/poppler/epdf_poppler_main.cpp
+@@ -46,24 +46,3 @@ epdf_backend_version_get (void)
+ {
+   return POPPLER_VERSION;
+ }
+-
+-Eina_Bool epdf_fonts_antialias_get (void)
+-{
+-  return globalParams->getAntialias();
+-}
+-
+-void epdf_fonts_antialias_set (Eina_Bool on)
+-{
+-  /* Nice API */
+-  globalParams->setAntialias((char*)(on ? "yes" : "no"));
+-}
+-
+-Eina_Bool epdf_lines_antialias_get (void)
+-{
+-    return globalParams->getVectorAntialias();
+-}
+-
+-void epdf_lines_antialias_set (Eina_Bool on)
+-{
+-    globalParams->setVectorAntialias((char*)(on ? "yes" : "no"));
+-}
+-- 
+2.1.0
+
