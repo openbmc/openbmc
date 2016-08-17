@@ -28,6 +28,12 @@
 #
 # SYSTEMD_ENVIRONMENT_FILE_${PN} = "foo"
 #    One or more environment files to be installed.
+#
+# SYSTEMD_LINK_${PN} = "tgt:name"
+#    A specification for installing arbitrary links in
+#    the ${systemd_system_unitdir} namespace, where:
+#      tgt: the link target
+#      name: the link name, relative to ${systemd_system_unitdir}
 
 
 inherit obmc-phosphor-utils
@@ -168,6 +174,14 @@ python() {
         set_append(d, '_INSTALL_ENV_FILES', name)
 
 
+    def install_link(d, spec, pkg):
+        tgt, dest = spec.split(':')
+
+        set_append(d, 'FILES_%s' % pkg, '%s/%s' \
+            % (d.getVar('systemd_system_unitdir', True), dest))
+        set_append(d, '_INSTALL_LINKS', spec)
+
+
     pn = d.getVar('PN', True)
     if d.getVar('SYSTEMD_SERVICE_%s' % pn, True) is None:
         d.setVar('SYSTEMD_SERVICE_%s' % pn, '%s.service' % pn)
@@ -186,6 +200,8 @@ python() {
             add_sd_user(d, unit.name, pkg)
         for name in listvar_to_list(d, 'SYSTEMD_ENVIRONMENT_FILE_%s' % pkg):
             add_env_file(d, name, pkg)
+        for spec in listvar_to_list(d, 'SYSTEMD_LINK_%s' % pkg):
+            install_link(d, spec, pkg)
 }
 
 
@@ -232,6 +248,20 @@ python systemd_do_postinst() {
                 fd.write(content)
 
 
+    def install_links(d):
+        install_dir = d.getVar('D', True)
+        install_dir += d.getVar('systemd_system_unitdir', True)
+
+        for spec in listvar_to_list(d, '_INSTALL_LINKS'):
+            tgt, dest = spec.split(':')
+            dest = os.path.join(install_dir, dest)
+            parent = os.path.dirname(dest)
+            if not os.path.exists(parent):
+                os.makedirs(parent)
+            os.symlink(tgt, dest)
+
+
+    install_links(d)
     install_envs(d)
     make_subs(d)
 }
