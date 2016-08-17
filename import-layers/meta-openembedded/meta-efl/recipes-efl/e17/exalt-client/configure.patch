@@ -1,0 +1,28 @@
+Index: exalt-client/configure.ac
+===================================================================
+--- exalt-client.orig/configure.ac	2014-07-17 21:46:14.712566207 +0000
++++ exalt-client/configure.ac	2014-07-17 21:47:56.880568991 +0000
+@@ -10,7 +10,7 @@
+ AC_CANONICAL_HOST
+ AC_ISC_POSIX
+ 
+-AM_INIT_AUTOMAKE(1.8)
++AM_INIT_AUTOMAKE([foreign])
+ AM_CONFIG_HEADER(config.h)
+ 
+ AC_PROG_CC
+@@ -29,7 +29,6 @@
+ 
+ m4_ifdef([AM_GNU_GETTEXT], [
+ AM_GNU_GETTEXT([external])
+-po_makefile_in=po/Makefile.in
+ AM_CONDITIONAL([HAVE_PO], [true])
+ ],[
+ AM_CONDITIONAL([HAVE_PO], [false])
+@@ -101,6 +100,5 @@
+ src/Makefile
+ module.desktop
+ e_modules-exalt-client.spec
+-$po_makefile_in
+ ], [
+ ])

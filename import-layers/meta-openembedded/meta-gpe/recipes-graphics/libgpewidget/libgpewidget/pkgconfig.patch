@@ -1,0 +1,11 @@
+--- configure.ac.orig	2006-02-04 17:37:55.000000000 +0100
++++ configure.ac	2006-02-06 00:56:28.000000000 +0100
+@@ -36,7 +36,7 @@
+ 	ENABLE_CAIRO=$enableval
+ ],
+ [
+-       	PKG_CHECK_EXISTS(cairo, [ENABLE_CAIRO=yes], [ENABLE_CAIRO=no])
++       	PKG_CHECK_MODULES(cairo, [ENABLE_CAIRO=yes], [ENABLE_CAIRO=no])
+ ])
+ 
+ ENABLE_HILDON=false

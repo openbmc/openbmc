@@ -1,0 +1,17 @@
+Uptream-Status: Pending
+
+Signed-off-by: Zongchun Yu <Zongchun.Yu@freescale.com>
+
+Index: tcpreplay-3.4.4/configure.ac
+===================================================================
+--- tcpreplay-3.4.4.orig/configure.ac
++++ tcpreplay-3.4.4/configure.ac
+@@ -389,7 +389,7 @@ CFLAGS="$CFLAGS -I$LPCAPINCDIR"
+ AC_SEARCH_LIBS([pcap_close], [pcap],
+     LPCAPLIB="$LIBS",
+     AC_ERROR([Unable to link libpcap in ${foundpcap}]),
+-    -lnl)
++    -lnl-3)
+ 
+ AC_SUBST(LPCAPINC)
+ AC_SUBST(LPCAPLIB)

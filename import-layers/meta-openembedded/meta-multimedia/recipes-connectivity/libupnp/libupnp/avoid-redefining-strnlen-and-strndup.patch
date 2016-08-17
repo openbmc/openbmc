@@ -1,0 +1,47 @@
+From 22fba4f2765f92cd592a58e1fe5c450b187e30e1 Mon Sep 17 00:00:00 2001
+From: Andre McCurdy <armccurdy@gmail.com>
+Date: Wed, 3 Jun 2015 21:39:03 -0700
+Subject: [PATCH] avoid redefining strnlen() and strndup()
+
+Rely on string.h definitions instead. Workaround for compiler errors such as:
+
+  | i686-rdk-linux-libtool: compile:  i686-rdk-linux-gcc -m32 -march=atom -mtune=atom -fschedule-insns -fsched-pressure -msse3 -mfpmath=sse --sysroot=/home/andre/build/tmp/sysroots/7401 -DHAVE_CONFIG_H -I. -I/home/andre/build/tmp/work/core2-32-rdk-linux/libupnp/1.6.19-r0/libupnp-1.6.19/upnp -I.. -I../upnp/inc -I/home/andre/build/tmp/work/core2-32-rdk-linux/libupnp/1.6.19-r0/libupnp-1.6.19/upnp/inc -I/home/andre/build/tmp/work/core2-32-rdk-linux/libupnp/1.6.19-r0/libupnp-1.6.19/threadutil/inc -I/home/andre/build/tmp/work/core2-32-rdk-linux/libupnp/1.6.19-r0/libupnp-1.6.19/ixml/inc -I/home/andre/build/tmp/work/core2-32-rdk-linux/libupnp/1.6.19-r0/libupnp-1.6.19/upnp/src/inc -pthread -O2 -pipe -g -feliminate-unused-debug-types -Os -Wall -c /home/andre/build/tmp/work/core2-32-rdk-linux/libupnp/1.6.19-r0/libupnp-1.6.19/upnp/src/gena/gena_callback2.c -o src/gena/libupnp_la-gena_callback2.o >/dev/null 2>&1
+  | In file included from /home/andre/build/tmp/sysroots/7401/usr/include/string.h:634:0,
+  |                  from /home/andre/build/tmp/work/core2-32-rdk-linux/libupnp/1.6.19-r0/libupnp-1.6.19/upnp/src/api/UpnpString.c:23:
+  | /home/andre/build/tmp/work/core2-32-rdk-linux/libupnp/1.6.19-r0/libupnp-1.6.19/upnp/src/api/UpnpString.c:47:15: error: expected identifier or '(' before '__extension__'
+  |   extern char *strndup(__const char *__string, size_t __n);
+  |                ^
+  | make[3]: *** [src/api/libupnp_la-UpnpString.lo] Error 1
+
+Upstream-Status: Pending
+
+Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+---
+ upnp/src/api/UpnpString.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/upnp/src/api/UpnpString.c b/upnp/src/api/UpnpString.c
+index 41c9898..2fa09d7 100644
+--- a/upnp/src/api/UpnpString.c
++++ b/upnp/src/api/UpnpString.c
+@@ -32,7 +32,7 @@
+ 	/* VC has strnlen which is already included but with (potentially) different linkage */
+ 	/* strnlen() is a GNU extension. */
+ 	#if HAVE_STRNLEN
+-		extern size_t strnlen(const char *s, size_t maxlen);
++//		extern size_t strnlen(const char *s, size_t maxlen);
+ 	#else /* HAVE_STRNLEN */
+ 		static size_t strnlen(const char *s, size_t n)
+ 		{
+@@ -44,7 +44,7 @@
+ 
+ /* strndup() is a GNU extension. */
+ #if HAVE_STRNDUP && !defined(WIN32)
+-	extern char *strndup(__const char *__string, size_t __n);
++//	extern char *strndup(__const char *__string, size_t __n);
+ #else /* HAVE_STRNDUP && !defined(WIN32) */
+ 	static char *strndup(const char *__string, size_t __n)
+ 	{
+-- 
+1.9.1
+

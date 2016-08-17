@@ -1,0 +1,16 @@
+[Unit]
+Description=Postfix Mail Transport Agent
+After=syslog.target network.target
+Conflicts=sendmail.service exim.service
+
+[Service]
+Type=forking
+PIDFile=@LOCALSTATEDIR@/spool/postfix/pid/master.pid
+ExecStartPre=-@SBINDIR@/check_hostname.sh
+ExecStartPre=-@LIBEXECDIR@/aliasesdb
+ExecStart=@SBINDIR@/postfix start
+ExecReload=@SBINDIR@/postfix reload
+ExecStop=@SBINDIR@/postfix stop
+
+[Install]
+WantedBy=multi-user.target

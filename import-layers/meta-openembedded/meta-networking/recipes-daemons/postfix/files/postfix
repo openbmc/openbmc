@@ -1,0 +1,94 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides: postfix MTA
+# Default-Start: 2345
+# Default-Stop: 016
+# Short-Description: start and stop postfix
+# Description: Postfix is a Mail Transport Agent, which is the program
+#              that moves mail from one machine to another.
+### END INIT INFO
+
+success() {
+        echo " Successful"
+        exit 0
+}
+
+fail() {
+        echo " Failed"
+        exit 1
+
+}
+
+check_return () {
+        local ret="$1"
+
+        if [ "$ret" = "0" ]; then
+          success
+        else
+          fail
+        fi
+}
+
+PIDFile=/var/spool/postfix/pid/master.pid
+case "$1" in
+
+        start)
+        echo -n "Starting Postfix..."
+        if [ ! -e /etc/aliases.db ]; then
+          # The alias database is necessary for postfix to work correctly.
+          echo "Creating aliases database ..."
+          newaliases
+        fi
+        if ! postfix status >/dev/null 2>&1; then
+          /usr/sbin/check_hostname.sh
+          postfix start
+          check_return $?
+        else
+          success
+        fi
+        ;;
+
+        stop)
+        echo -n  "Stopping Postfix..."
+        if postfix status >/dev/null 2>&1; then
+          postfix stop
+          check_return $?
+        else
+          success
+        fi
+        ;;
+
+        reload)
+        echo -n "Reloading Postfix..."
+        if postfix status >/dev/null 2>&1; then
+          postfix reload
+          check_return $?
+        else
+          postfix start
+          check_return $?
+        fi
+        ;;
+
+        restart)
+        $0 stop
+        sleep 1
+        $0 start
+        ;;
+
+        status)
+        if postfix status >/dev/null 2>&1; then
+          pid=`sed -e 's/\s//g' $PIDFile`
+          echo "The Postfix mail system is running (PID: $pid)"
+          exit 0
+        else
+          echo "The Postfix mail system is not running"
+          exit 1
+        fi
+        ;;
+
+        *)
+        echo "Usage: $0 {start|stop|status|reload|restart}"
+        exit 1
+        ;;
+esac
+

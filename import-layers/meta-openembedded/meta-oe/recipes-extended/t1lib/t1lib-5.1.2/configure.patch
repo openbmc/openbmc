@@ -1,0 +1,128 @@
+
+#
+# Patch managed by http://www.holgerschurig.de/patcher.html
+#
+
+--- t1lib-5.0.2/configure.in~configure.patch
++++ t1lib-5.0.2/configure.in
+@@ -75,9 +75,9 @@
+ T1LIB_VERSIONSTRING=\"MACRO_T1LIB_IDENTIFIER\"
+ 
+ 
+-dnl We use this file by Andreas Zeller to check for libXaw
+-builtin(include, ac-tools/ice_find_athena.m4)
+-builtin(include, ac-tools/aclocal.m4)
++#dnl We use this file by Andreas Zeller to check for libXaw
++#builtin(include, ac-tools/ice_find_athena.m4)
++#builtin(include, ac-tools/aclocal.m4)
+ 
+ dnl We want these before the checks, so the checks can modify their values.
+ test -z "$LDLIBS" && LDLIBS=-lm   AC_SUBST(LDLIBS)
+@@ -161,6 +161,7 @@
+ 
+ dnl **** Check for underscore on external symbols ****
+ 
++AH_TEMPLATE([NEED_UNDERSCORE_PREFIX], [Define if external symbols need an underscore prefix])
+ AC_CACHE_CHECK("whether external symbols need an underscore prefix",
+                ac_cv_c_extern_prefix,
+ [saved_libs=$LIBS
+@@ -178,68 +179,48 @@
+   AC_DEFINE(NEED_UNDERSCORE_PREFIX)
+ fi
+ 
+-dnl **** Check which ANSI integer type is 16 bit 
++dnl **** Check which ANSI integer type is 16 bit
++T1_AA_TYPE16=""
++for type in short int; do
++	if test x"`eval echo \\$ac_cv_sizeof_$type`" = "x2"; then
++		T1_AA_TYPE16="-DT1_AA_TYPE16=$type"
++		T1_INT16="$type"
++		break
++	fi
++done
+ 
+-AC_CACHE_CHECK( "which ANSI integer type is 16 bit", ac_16bit_type,
+-		AC_TRY_RUN([
+-int main(void) {
+-  if (sizeof(short)==2)
+-    return(0);
+-  else if (sizeof(int)==2)
+-    return(1);
+-  else
+-    return(2);
+-}], ac_16bit_type="short", ac_16bit_type="int", ac_16bit_type=))
+-if test "$ac_16bit_type" = "short"
+-then
+-  T1_AA_TYPE16="-DT1_AA_TYPE16=short"
+-  T1_INT16="short"
+-else
+-  T1_AA_TYPE16="-DT1_AA_TYPE16=int"
+-  T1_INT16="int"
++if test x"$T1_AA_TYPE16" = "x"; then
++	AC_MSG_ERROR("Unable to determine which integer type is 16 bit.")
+ fi
+ 
+-
+ dnl **** Check which ANSI integer type is 32 bit 
++T1_AA_TYPE32=""
++for type in int long; do
++	if test x"`eval echo \\$ac_cv_sizeof_$type`" = "x4"; then
++		T1_AA_TYPE32="-DT1_AA_TYPE32=$type"
++		T1_INT32="$type"
++		break
++	fi
++done
+ 
+-AC_CACHE_CHECK( "which ANSI integer type is 32 bit", ac_32bit_type,
+-		AC_TRY_RUN([
+-int main(void) {
+-  if (sizeof(int)==4)
+-    return(0);
+-  else if (sizeof(long)==4)
+-    return(1);
+-  else
+-    return(2);
+-}], ac_32bit_type="int", ac_32bit_type="long", ac_32bit_type=))
+-if test "$ac_32bit_type" = "int"
+-then
+-  T1_AA_TYPE32="-DT1_AA_TYPE32=int"
+-  T1_INT32="int"
+-else
+-  T1_AA_TYPE32="-DT1_AA_TYPE32=long"
+-  T1_INT32="long"
++if test x"$T1_AA_TYPE32" = "x"; then
++	AC_MSG_ERROR("Unable to determine which integer type is 32 bit.")
+ fi
+ 
+-
+ dnl **** Check which ANSI integer type is 64 bit 
++T1_AA_TYPE64=""
++for type in long long_long; do
++	if test x"`eval echo \\$ac_cv_sizeof_$type`" = "x8"; then
++		AC_MSG_WARN("$type is 64 bit")
++		T1_AA_TYPE64="-DT1_AA_TYPE64=\"`echo $type|tr '_' ' '`\""
++		break
++	fi
++done
+ 
+-AC_CACHE_CHECK( "which ANSI integer type is 64 bit", ac_64bit_type,
+-		AC_TRY_RUN([
+-int main(void) {
+-  if (sizeof(long)==8)
+-    return(0);
+-  else
+-    return(1);
+-}], ac_64bit_type="long", ac_64bit_type="<none>"))
+-if test "$ac_64bit_type" = "long"
+-then
+-  T1_AA_TYPE64="-DT1_AA_TYPE64=long"
+-else
+-  T1_AA_TYPE64=
++if test x"$T1_AA_TYPE64" = "x"; then
++	AC_MSG_ERROR("Unable to determine which integer type is 64 bit.")
+ fi
+ 
+-
+ CFLAGS="${CFLAGS} -DT1LIB_IDENT=\"\\\"${T1LIB_IDENTIFIER}\\\"\" -DGLOBAL_CONFIG_DIR=\"\\\"${T1LIB_DATA_DIR}\\\"\""
+ 
+ dnl **** Check for functions and header files ****

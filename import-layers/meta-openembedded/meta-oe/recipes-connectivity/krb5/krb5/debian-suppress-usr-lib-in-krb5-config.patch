@@ -1,0 +1,48 @@
+Subject: [PATCH] debian: suppress /usr/lib in krb5-config
+
+Upstream-Status: Pending
+
+Handel multi-arch suppressions
+
+The patch is from debian.
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ src/build-tools/krb5-config.in |   14 +++++++++-----
+ 1 files changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/src/build-tools/krb5-config.in b/src/build-tools/krb5-config.in
+index f6184da..637bad7 100755
+--- a/src/build-tools/krb5-config.in
++++ b/src/build-tools/krb5-config.in
+@@ -138,6 +138,7 @@ if test -n "$do_help"; then
+     echo "        [--defktname]     Show built-in default keytab name"
+     echo "        [--defcktname]    Show built-in default client keytab name"
+     echo "        [--cflags]        Compile time CFLAGS"
++    echo "        [--deps]          Include dependent libraries"
+     echo "        [--libs]          List libraries required to link [LIBRARIES]"
+     echo "Libraries:"
+     echo "        krb5              Kerberos 5 application"
+@@ -209,11 +210,14 @@ fi
+ 
+ if test -n "$do_libs"; then
+     # Assumes /usr/lib is the standard library directory everywhere...
+-    if test "$libdir" = /usr/lib; then
+-	libdirarg=
+-    else
+-	libdirarg="-L$libdir"
+-    fi
++    case $libdir in
++	/usr/lib*)
++	    libdirarg=
++	    ;;
++	*)
++	    libdirarg="-L$libdir"
++	    ;;
++    esac
+     # Ugly gross hack for our build tree
+     lib_flags=`echo $CC_LINK | sed -e 's/\$(CC)//' \
+ 	    -e 's/\$(PURE)//' \
+-- 
+1.7.1
+

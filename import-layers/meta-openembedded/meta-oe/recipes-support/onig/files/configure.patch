@@ -1,0 +1,13 @@
+Index: onig-5.9.3/configure.in
+===================================================================
+--- onig-5.9.3.orig/configure.in	2012-10-26 07:06:14.000000000 +0000
++++ onig-5.9.3/configure.in	2014-07-18 08:02:52.701574484 +0000
+@@ -3,7 +3,7 @@
+ 
+ AC_CONFIG_MACRO_DIR([m4])
+ 
+-AM_INIT_AUTOMAKE
++AM_INIT_AUTOMAKE([foreign])
+ AC_CONFIG_HEADER(config.h)
+ 
+ 

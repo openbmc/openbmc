@@ -1,0 +1,36 @@
+From 74ff5e1cf8ef83dabcf6e6b92f87d6761f7f4d51 Mon Sep 17 00:00:00 2001
+From: Li xin <lixin.fnst@cn.fujitsu.com>
+Date: Tue, 7 Jul 2015 11:34:36 +0900
+Subject: [PATCH] multipathd.service: Error fix
+
+Failed to start Device-Mapper Multipath Device Controller.
+
+Upstream-Status: pending
+
+Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
+---
+ multipathd/multipathd.service | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/multipathd/multipathd.service b/multipathd/multipathd.service
+index be3ba3f..b8d3ecd 100644
+--- a/multipathd/multipathd.service
++++ b/multipathd/multipathd.service
+@@ -6,11 +6,12 @@ DefaultDependencies=no
+ Conflicts=shutdown.target
+ 
+ [Service]
+-Type=notify
++Type=forking
+ NotifyAccess=main
+ LimitCORE=infinity
++PIDFile=/var/run/multipathd.pid
+ ExecStartPre=/sbin/modprobe dm-multipath
+-ExecStart=/sbin/multipathd -d -s
++ExecStart=/sbin/multipathd
+ ExecReload=/sbin/multipathd reconfigure
+ 
+ [Install]
+-- 
+1.8.4.2
+

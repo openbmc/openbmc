@@ -1,0 +1,46 @@
+From e6caaf6e80b9c80dc2b860b471a8f05e825f6dfa Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Thu, 14 Aug 2014 01:00:21 +0200
+Subject: [PATCH 1/3] OptionsCommon.cmake: don't mix CXX_FLAGS into C_FLAGS
+
+* it was added in https://bugs.webkit.org/show_bug.cgi?id=130261
+* causes build failures in udis86 which explicitly asks for gcc but then
+  gets g++ flags from CMAKE_CXX_FLAGS.
+
+cc1: error: command line option '-fvisibility-inlines-hidden' is valid
+for C++/ObjC++ but not for C [-Werror]
+cc1: error: command line option '-fpermissive' is valid for C++/ObjC++
+but not for C [-Werror]
+cc1: all warnings being treated as errors
+Source/JavaScriptCore/CMakeFiles/JavaScriptCore.dir/build.make:11182:
+recipe for target
+'Source/JavaScriptCore/CMakeFiles/JavaScriptCore.dir/disassembler/udis86/udis86.c.o'
+failed
+make[2]: ***
+[Source/JavaScriptCore/CMakeFiles/JavaScriptCore.dir/disassembler/udis86/udis86.c.o]
+Error 1
+make[2]: *** Waiting for unfinished jobs....
+make[2]: Leaving directory
+'/OE/build/oe-core/tmp-eglibc/work/core2-64-oe-linux/webkit-efl/1_1.10.0+1.11.0-beta1-r0/build'
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ Source/cmake/OptionsCommon.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Source/cmake/OptionsCommon.cmake b/Source/cmake/OptionsCommon.cmake
+index e304a99..045c614 100644
+--- a/Source/cmake/OptionsCommon.cmake
++++ b/Source/cmake/OptionsCommon.cmake
+@@ -25,7 +25,7 @@ endif ()
+ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+ 
+ if (CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+-    set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions -fno-strict-aliasing")
++    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-exceptions -fno-strict-aliasing")
+     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fno-exceptions -fno-strict-aliasing -fno-rtti")
+ endif ()
+ 
+-- 
+2.1.3
+

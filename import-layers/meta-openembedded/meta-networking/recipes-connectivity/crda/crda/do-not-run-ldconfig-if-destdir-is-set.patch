@@ -1,0 +1,21 @@
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Sat, 23 Aug 2014 12:27:34 -0700
+Subject: crda: Do not run ldconfig if DESTDIR is set
+
+Upstream-Status: Backport [http://www.spinics.net/lists/linux-wireless/msg126028.html]
+
+Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+Signed-off-by: Joe MacDonald <joe_macdonald@mentor.com>
+
+--- a/Makefile
++++ b/Makefile
+@@ -132,7 +132,9 @@ install-libreg:
+ 	$(NQ) '  INSTALL  libreg'
+ 	$(Q)mkdir -p $(DESTDIR)/$(LIBDIR)
+ 	$(Q)cp $(LIBREG) $(DESTDIR)/$(LIBDIR)/
++ifndef DESTDIR
+ 	$(Q)ldconfig
++endif
+ 
+ %.o: %.c regdb.h $(LIBREG)
+ 	$(NQ) '  CC  ' $@

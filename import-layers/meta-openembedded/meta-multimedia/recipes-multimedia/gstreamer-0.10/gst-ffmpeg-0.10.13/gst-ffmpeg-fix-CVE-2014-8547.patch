@@ -1,0 +1,59 @@
+From 8f1457864be8fb9653643519dea1c6492f1dde57 Mon Sep 17 00:00:00 2001
+From: Michael Niedermayer <michaelni@gmx.at>
+Date: Fri, 3 Oct 2014 20:15:52 +0200
+Subject: [PATCH] avcodec/gifdec: factorize interleave end handling out
+
+(Upstream commit 8f1457864be8fb9653643519dea1c6492f1dde57)
+
+also change it to a loop
+Fixes out of array access
+Fixes: asan_heap-oob_ca5410_8_asan_heap-oob_ca5410_97_ID_LSD_Size_Less_Then_Data_Inter_3.gif
+
+Upstream-Status: Backport
+
+Found-by: Mateusz "j00ru" Jurczyk and Gynvael Coldwind
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+---
+ libavcodec/gifdec.c |   15 +++++----------
+ 1 file changed, 5 insertions(+), 10 deletions(-)
+
+diff --git a/libavcodec/gifdec.c b/libavcodec/gifdec.c
+index dee48f5..90de38b 100644
+--- a/gst-libs/ext/libav/libavcodec/gifdec.c
++++ b/gst-libs/ext/libav/libavcodec/gifdec.c
+@@ -271,26 +271,21 @@ static int gif_read_image(GifState *s, AVFrame *frame)
+             case 1:
+                 y1 += 8;
+                 ptr += linesize * 8;
+-                if (y1 >= height) {
+-                    y1 = pass ? 2 : 4;
+-                    ptr = ptr1 + linesize * y1;
+-                    pass++;
+-                }
+                 break;
+             case 2:
+                 y1 += 4;
+                 ptr += linesize * 4;
+-                if (y1 >= height) {
+-                    y1 = 1;
+-                    ptr = ptr1 + linesize;
+-                    pass++;
+-                }
+                 break;
+             case 3:
+                 y1 += 2;
+                 ptr += linesize * 2;
+                 break;
+             }
++            while (y1 >= height) {
++                y1 = 4 >> pass;
++                ptr = ptr1 + linesize * y1;
++                pass++;
++            }
+         } else {
+             ptr += linesize;
+         }
+-- 
+1.7.9.5
+

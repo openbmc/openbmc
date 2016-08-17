@@ -1,0 +1,17 @@
+This layer depends on:
+
+URI: git://github.com/openembedded/oe-core.git
+branch: krogoth
+revision: HEAD
+
+URI: git://github.com/openembedded/meta-oe.git
+branch: krogoth
+revision: HEAD
+
+Send pull requests to openembedded-devel@lists.openembedded.org with '[meta-gpe][krogoth]' in the subject'
+
+When sending single patches, please using something like:
+'git send-email -M -1 --to openembedded-devel@lists.openembedded.org --subject-prefix=meta-gpe][krogoth][PATCH'
+
+krogoth Branch Maintainer:
+Armin Kuster <akuster808@gmail.com>

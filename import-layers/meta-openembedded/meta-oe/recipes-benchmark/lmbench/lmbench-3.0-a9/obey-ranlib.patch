@@ -1,0 +1,30 @@
+In some cases the host may have too old of a ranlib to work.  Since it's
+not exactly a great idea to not be using the cross ranlib anyhow, fix the
+Makefile so we can override ranlib and then override it
+
+Upstream-Status: Inappropriate [build system specific change]
+---
+ src/Makefile |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+Index: lmbench-3.0-a9/src/Makefile
+===================================================================
+--- lmbench-3.0-a9.orig/src/Makefile
++++ lmbench-3.0-a9/src/Makefile
+@@ -38,6 +38,7 @@ CC=`../scripts/compiler`
+ MAKE=`../scripts/make`
+ AR=ar
+ ARCREATE=cr
++RANLIB=ranlib
+ 
+ # base of installation location
+ BASE=/usr/local
+@@ -217,7 +218,7 @@ $O/lmbench : ../scripts/lmbench version.
+ $O/lmbench.a: $(LIBOBJS)
+ 	/bin/rm -f $O/lmbench.a
+ 	$(AR) $(ARCREATE) $O/lmbench.a $(LIBOBJS)
+-	-ranlib $O/lmbench.a
++	-$(RANLIB) $O/lmbench.a
+ 
+ $O/lib_timing.o : lib_timing.c $(INCS)
+ 	$(COMPILE) -c lib_timing.c -o $O/lib_timing.o

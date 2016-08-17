@@ -1,0 +1,30 @@
+Disable defaulting of GCRYPT_LDFLAGS to -L/usr/lib
+
+Prevents "unsafe for cross compilation" warnings that cause
+do_qa_configure to fail.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+
+Index: collectd-5.4.1/configure.ac
+===================================================================
+--- collectd-5.4.1.orig/configure.ac	2014-09-03 01:20:22.062084244 -0700
++++ collectd-5.4.1/configure.ac	2014-09-03 01:20:22.058084244 -0700
+@@ -1867,11 +1867,11 @@
+ 		GCRYPT_CPPFLAGS=`"$with_libgcrypt_config" --cflags 2>/dev/null`
+ 	fi
+ 
+-	if test "x$GCRYPT_LDFLAGS" = "x"
+-	then
+-		gcrypt_exec_prefix=`"$with_libgcrypt_config" --exec-prefix 2>/dev/null`
+-		GCRYPT_LDFLAGS="-L$gcrypt_exec_prefix/lib"
+-	fi
++#	if test "x$GCRYPT_LDFLAGS" = "x"
++#	then
++#		gcrypt_exec_prefix=`"$with_libgcrypt_config" --exec-prefix 2>/dev/null`
++#		GCRYPT_LDFLAGS="-L$gcrypt_exec_prefix/lib"
++#	fi
+ 
+ 	if test "x$GCRYPT_LIBS" = "x"
+ 	then

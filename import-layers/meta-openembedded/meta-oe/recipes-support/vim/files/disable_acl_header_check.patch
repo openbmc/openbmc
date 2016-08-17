@@ -1,0 +1,27 @@
+Upstream-Status: pending
+
+Don't check 'sys/acl.h' if acl support disabled for vim/vim-tiny.
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+================================================
+diff --git a/src/configure.in b/src/configure.in
+index fb965e5..d734064 100644
+--- a/src/configure.in
++++ b/src/configure.in
+@@ -2511,7 +2511,7 @@ AC_CHECK_HEADERS(stdarg.h stdint.h stdlib.h string.h \
+ 	sys/systeminfo.h locale.h sys/stream.h termios.h \
+ 	libc.h sys/statfs.h poll.h sys/poll.h pwd.h \
+ 	utime.h sys/param.h libintl.h libgen.h \
+-	util/debug.h util/msg18n.h frame.h sys/acl.h \
++	util/debug.h util/msg18n.h frame.h \
+ 	sys/access.h sys/sysinfo.h wchar.h wctype.h)
+ 
+ dnl sys/ptem.h depends on sys/stream.h on Solaris
+@@ -3112,6 +3112,7 @@ AC_ARG_ENABLE(acl,
+ 	, [enable_acl="yes"])
+ if test "$enable_acl" = "yes"; then
+ AC_MSG_RESULT(no)
++AC_CHECK_HEADERS(sys/acl.h)
+ AC_CHECK_LIB(posix1e, acl_get_file, [LIBS="$LIBS -lposix1e"],
+ 	AC_CHECK_LIB(acl, acl_get_file, [LIBS="$LIBS -lacl"
+ 		  AC_CHECK_LIB(attr, fgetxattr, LIBS="$LIBS -lattr",,)],,),)

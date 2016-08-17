@@ -1,0 +1,62 @@
+[PATCH] fix the YACC rule to fix a building failure
+
+Upstream-Statu: Pending
+
+The original rule will create the header file twice, one is that the header
+file as the object file is created, other time is when create the C source file.
+since YACC always has "-d" parameter.
+
+This lead to a race when compile amd_tok.o, the header file maybe rewritten.
+  |----------------------
+  |amd_tok.l:359:10: error: 'RBRACKET' undeclared (first use in this function)
+  |  ")" { return RBRACKET; }
+  |          ^
+  |../Makefile.rules:64: recipe for target 'amd_tok.o' failed
+  |----------------------
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ lib/Makefile     | 6 ++++--
+ modules/Makefile | 3 ++-
+ 2 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/lib/Makefile b/lib/Makefile
+index 4798a4b..c40cf86 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -57,7 +57,8 @@ mount_xdr.o: mount_xdr.c
+ master_tok.c: master_tok.l
+ 	$(LEX) -o$@ -Pmaster_ $?
+ 
+-master_parse.tab.c master_parse.tab.h: master_parse.y
++master_parse.tab.h: master_parse.tab.c
++master_parse.tab.c: master_parse.y
+ 	$(YACC) -v -d -p master_ -b master_parse $?
+ 
+ master_tok.o: master_tok.c master_parse.tab.h
+@@ -67,7 +68,8 @@ master_parse.tab.o: master_parse.tab.c master_parse.tab.h
+ nss_tok.c: nss_tok.l
+ 	$(LEX) -o$@ -Pnss_ $?
+ 
+-nss_parse.tab.c nss_parse.tab.h: nss_parse.y
++nss_parse.tab.h: nss_parse.tab.c
++nss_parse.tab.c: nss_parse.y
+ 	$(YACC) -v -d -p nss_ -b nss_parse $?
+ 
+ nss_tok.o: nss_tok.c nss_parse.tab.h
+diff --git a/modules/Makefile b/modules/Makefile
+index 237b70b..71415d0 100644
+--- a/modules/Makefile
++++ b/modules/Makefile
+@@ -103,7 +103,8 @@ amd_tok.c: amd_tok.l
+ 
+ amd_tok.o: amd_tok.c amd_parse.tab.h
+ 
+-amd_parse.tab.c amd_parse.tab.h: amd_parse.y
++amd_parse.tab.h: amd_parse.tab.c
++amd_parse.tab.c: amd_parse.y
+ 	$(YACC) -v -d -p amd_ -b amd_parse $?
+ 
+ amd_parse.tab.o: amd_parse.tab.c amd_parse.tab.h
+-- 
+1.9.1
+

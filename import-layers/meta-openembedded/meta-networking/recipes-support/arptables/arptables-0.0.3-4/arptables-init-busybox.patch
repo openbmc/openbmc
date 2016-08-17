@@ -1,0 +1,77 @@
+Index: arptables-v0.0.3-4/arptables.sysv
+===================================================================
+--- arptables-v0.0.3-4.orig/arptables.sysv	2010-03-22 16:28:03.000000000 +0300
++++ arptables-v0.0.3-4/arptables.sysv	2010-03-22 16:27:51.000000000 +0300
+@@ -12,10 +12,10 @@
+ # config: __SYSCONFIG__/arptables
+ 
+ source /etc/init.d/functions
+-source /etc/sysconfig/network
++# source /etc/sysconfig/network
+ 
+ # Check that networking is up.
+-[ ${NETWORKING} = "no" ] && exit 0
++# [ ${NETWORKING} = "no" ] && exit 0
+ 
+ [ -x __EXEC_PATH__/arptables ] || exit 1
+ [ -x __EXEC_PATH__/arptables-save ] || exit 1
+@@ -28,32 +28,30 @@
+ desc="Arp filtering"
+ 
+ start() {
+-	echo -n $"Starting $desc ($prog): "
++	echo -n "Starting $desc ($prog): "
+ 	__EXEC_PATH__/arptables-restore < __SYSCONFIG__/arptables || RETVAL=1
+ 
+ 	if [ $RETVAL -eq 0 ]; then
+-		success "$prog startup"
+-		rm -f /var/lock/subsys/$prog
++		echo "$prog ok"
++		touch /var/lock/subsys/$prog
+ 	else
+-		failure "$prog startup"
++		echo "$prog failed"
+ 	fi
+ 
+-	echo
+ 	return $RETVAL
+ }
+ 
+ stop() {
+-	echo -n $"Stopping $desc ($prog): "
++	echo -n "Stopping $desc ($prog): "
+ 	__EXEC_PATH__/arptables-restore < /dev/null || RETVAL=1
+ 
+ 	if [ $RETVAL -eq 0 ]; then
+-		success "$prog shutdown"
+-		rm -f %{_localstatedir}/lock/subsys/$prog
++		echo "$prog stopped"
++		rm -f /var/lock/subsys/$prog
+ 	else
+-		failure "$prog shutdown"
++		echo "$prog failed to stop"
+ 	fi
+ 
+-	echo
+ 	return $RETVAL
+ }
+ 
+@@ -63,15 +61,14 @@
+ }
+ 
+ save() {
+-	echo -n $"Saving $desc ($prog): "
++	echo -n "Saving $desc ($prog): "
+ 	__EXEC_PATH__/arptables-save > __SYSCONFIG__/arptables || RETVAL=1
+ 
+ 	if [ $RETVAL -eq 0 ]; then
+-		success "$prog saved"
++		echo "$prog saved"
+ 	else
+-		failure "$prog saved"
++		echo "$prog is not saved"
+ 	fi
+-	echo
+ }
+ 
+ case "$1" in

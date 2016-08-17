@@ -1,0 +1,11 @@
+--- http-2.0.54/server/Makefile.in-old	2005-12-20 13:26:56.000000000 -0500
++++ http-2.0.54/server/Makefile.in	2005-12-20 13:27:22.000000000 -0500
+@@ -27,7 +27,7 @@
+ 	$(LINK) $(EXTRA_LDFLAGS) $(gen_test_char_OBJECTS) $(EXTRA_LIBS)
+ 
+ test_char.h: gen_test_char
+-	./gen_test_char > test_char.h
++	gen_test_char > test_char.h
+ 
+ util.lo: test_char.h
+ 

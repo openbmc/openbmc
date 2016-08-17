@@ -1,0 +1,18 @@
+
+#
+# Patch managed by http://www.mn-logistik.de/unsupported/pxa250/patcher
+#
+
+Index: gpm-1.99.7/Makefile.in
+===================================================================
+--- gpm-1.99.7.orig/Makefile.in	2008-07-24 03:36:35.000000000 -0700
++++ gpm-1.99.7/Makefile.in	2010-06-22 18:28:45.269507001 -0700
+@@ -19,7 +19,7 @@
+ # user-overridable flags, but it's also all the implicit rule looks at.
+ # missing ?
+ 
+-SUBDIRS = src doc contrib gpm2
++SUBDIRS = src
+ 
+ 
+ ### simple, but effective rules

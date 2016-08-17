@@ -1,0 +1,75 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+fix the below error:
+checking for INADDR_NONE... configure:
+configure: error: cannot run test program while cross compiling
+
+Signed-off-by: Chunrong Guo <B40290@freescale.com>
+
+
+--- a/configure.in	2013-08-21 03:56:17.197414789 -0500
++++ b/configure.in	2013-08-21 23:19:05.298553560 -0500
+@@ -281,25 +281,7 @@
+ AC_CHECK_TYPES([boolean])
+ 
+ # In case INADDR_NONE is not defined (like on Solaris)
+-have_inaddr_none="no"
+-AC_MSG_CHECKING([for INADDR_NONE])
+-AC_RUN_IFELSE(
+-[AC_LANG_PROGRAM(
+-[[
+-#include <sys/types.h>
+-#include <netinet/in.h>
+-#include <arpa/inet.h>
+-]],
+-[[
+-	if (inet_addr("10,5,2") == INADDR_NONE);
+-    return 0;
+-]])],
+-[have_inaddr_none="yes"],
+-[have_inaddr_none="no"])
+-AC_MSG_RESULT($have_inaddr_none)
+-if test "x$have_inaddr_none" = "xno"; then
+-	AC_DEFINE([INADDR_NONE],[-1],[For INADDR_NONE definition])
+-fi
++have_inaddr_none="yes"
+ 
+ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+ #include <stdio.h>
+@@ -397,21 +379,21 @@
+   fi
+ fi
+ 
+-AC_MSG_CHECKING([for pcap_lex_destroy])
+-AC_RUN_IFELSE(
+-[AC_LANG_PROGRAM(
+-[[
+-#include <pcap.h>
+-]],
+-[[
+-   pcap_lex_destroy();
+-]])],
+-[have_pcap_lex_destroy="yes"],
+-[have_pcap_lex_destroy="no"])
+-AC_MSG_RESULT($have_pcap_lex_destroy)
+-if test "x$have_pcap_lex_destroy" = "xyes"; then
+-    AC_DEFINE([HAVE_PCAP_LEX_DESTROY],[1],[Can cleanup lex buffer stack created by pcap bpf filter])
+-fi
++#AC_MSG_CHECKING([for pcap_lex_destroy])
++#AC_RUN_IFELSE(
++#[AC_LANG_PROGRAM(
++#[[
++##include <pcap.h>
++#]],
++#[[
++#   pcap_lex_destroy();
++#]])],
++have_pcap_lex_destroy="yes"
++#[have_pcap_lex_destroy="no"])
++#AC_MSG_RESULT($have_pcap_lex_destroy)
++#if test "x$have_pcap_lex_destroy" = "xyes"; then
++#    AC_DEFINE([HAVE_PCAP_LEX_DESTROY],[1],[Can cleanup lex buffer stack created by pcap bpf filter])
++#fi
+ 
+ AC_MSG_CHECKING([for pcap_lib_version])
+ AC_LINK_IFELSE(

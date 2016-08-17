@@ -1,0 +1,12 @@
+[Unit]
+Description=Open-iSCSI initiator (i.e. client) service
+After=syslog.target
+
+[Service]
+EnvironmentFile=/etc/default/iscsi-initiator
+ExecStartPre=/sbin/modprobe iscsi_tcp
+ExecStart=/usr/sbin/iscsid -f $OPTS_ISCSID
+
+[Install]
+WantedBy=multi-user.target
+

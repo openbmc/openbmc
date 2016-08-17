@@ -1,0 +1,31 @@
+From 708e59caaf1c0c271a96a4d1fe46b122aff45e34 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Mon, 27 Aug 2012 09:16:29 +0200
+Subject: [PATCH] libxfce4kbd-private/xfce4-keyboard-shortcuts.xml: fix xfwm4
+ crash on first start
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Pending
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ libxfce4kbd-private/xfce4-keyboard-shortcuts.xml |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
+
+diff --git a/libxfce4kbd-private/xfce4-keyboard-shortcuts.xml b/libxfce4kbd-private/xfce4-keyboard-shortcuts.xml
+index 723a10d..e6502f3 100644
+--- a/libxfce4kbd-private/xfce4-keyboard-shortcuts.xml
++++ b/libxfce4kbd-private/xfce4-keyboard-shortcuts.xml
+@@ -66,4 +66,8 @@
+       <property name="&lt;Control&gt;F12" type="string" value="workspace_12_key"/>
+     </property>
+   </property>
++  <property name="providers" type="array">
++    <value type="string" value="commands"/>
++    <value type="string" value="xfwm4"/>
++  </property>
+ </channel>
+-- 
+1.7.6.5
+

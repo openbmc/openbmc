@@ -1,0 +1,38 @@
+Upstream-Status: Inappropriate [packaging]
+
+
+Index: curl-7.20.0/libcurl.pc.in
+===================================================================
+--- curl-7.20.0.orig/libcurl.pc.in	2009-11-17 18:11:07.000000000 +0000
++++ curl-7.20.0/libcurl.pc.in	2010-03-25 12:13:26.814051066 +0000
+@@ -35,6 +35,7 @@
+ URL: http://curl.haxx.se/
+ Description: Library to transfer files with ftp, http, etc.
+ Version: @CURLVERSION@
+-Libs: -L${libdir} -lcurl @LIBS@
+-Libs.private: @LIBCURL_LIBS@ @LIBS@
++Requires.private: @GNUTLS_REQUIRED@
++Libs: -L${libdir} -lcurl
++Libs.private: -ldl -lz
+ Cflags: -I${includedir}
+Index: curl-7.20.0/configure.ac
+===================================================================
+--- curl-7.20.0.orig/configure.ac	2010-02-04 21:41:46.000000000 +0000
++++ curl-7.20.0/configure.ac	2010-03-25 12:12:18.673129001 +0000
+@@ -1668,6 +1668,7 @@
+        AC_SUBST(USE_GNUTLS, [1])
+        GNUTLS_ENABLED=1
+        USE_GNUTLS="yes"
++       GNUTLS_REQUIRED="gnutls"
+        curl_ssl_msg="enabled (GnuTLS)"
+        ],
+        [
+@@ -1696,6 +1697,8 @@
+ 
+ fi dnl OPENSSL != 1
+ 
++AC_SUBST(GNUTLS_REQUIRED)
++
+ dnl ----------------------------------------------------
+ dnl NSS. Only check if GnuTLS and OpenSSL are not enabled
+ dnl ----------------------------------------------------

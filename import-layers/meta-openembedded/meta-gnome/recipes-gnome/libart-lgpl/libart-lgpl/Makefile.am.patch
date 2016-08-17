@@ -1,0 +1,17 @@
+Upstream-Status: Inappropriate [configuration]
+
+Index: libart_lgpl-2.3.21/Makefile.am
+===================================================================
+--- libart_lgpl-2.3.21.orig/Makefile.am	2009-04-18 05:29:25.000000000 -0700
++++ libart_lgpl-2.3.21/Makefile.am	2010-11-23 23:12:32.445450075 -0800
+@@ -7,8 +7,8 @@
+ 
+ BUILT_SOURCES = art_config.h
+ 
+-art_config.h:
+-	./gen_art_config.sh > art_config.h
++#art_config.h:
++#	./gen_art_config.sh > art_config.h
+ 
+ EXTRA_DIST = 			\
+ 	libart.def		\

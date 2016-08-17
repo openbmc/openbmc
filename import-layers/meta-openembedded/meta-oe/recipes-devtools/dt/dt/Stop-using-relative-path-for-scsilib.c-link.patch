@@ -1,0 +1,29 @@
+From 4cf7e16fe9b773e2e7763d4b773854eefe2aa9ab Mon Sep 17 00:00:00 2001
+From: Otavio Salvador <otavio@ossystems.com.br>
+Date: Tue, 12 Jan 2016 09:59:55 -0200
+Subject: [PATCH] Stop using relative path for scsilib.c link
+Organization: O.S. Systems Software LTDA.
+
+Upstream-Status: Pending
+
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+---
+ Makefile.linux | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.linux b/Makefile.linux
+index 78333ff..e210564 100644
+--- a/Makefile.linux
++++ b/Makefile.linux
+@@ -129,7 +129,7 @@ scsilib.c:
+ 	    echo "Please specify OS={aix,linux,hpux,solaris,windows}"; \
+ 	    exit 1; \
+ 	fi; \
+-	ln -sf ../scsilib-$(OS).c scsilib.c
++	ln -sf scsilib-$(OS).c scsilib.c
+ 
+ print:;
+ 		@$(PRINTER) $(PRINTFLAGS) $(ALL_CFILES)
+-- 
+2.1.4
+

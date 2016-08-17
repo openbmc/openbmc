@@ -1,0 +1,81 @@
+From bd5773947af5ca80ca546ad5625818fc912bdd60 Mon Sep 17 00:00:00 2001
+From: "Roy.Li" <rongqing.li@windriver.com>
+Date: Thu, 22 Aug 2013 08:56:09 +0800
+Subject: [PATCH] tftp-hpa: add error check for disk filled up
+
+Upstream-status: Pending [Sent to http://www.syslinux.org/archives/2013-August/020765.html]
+
+Add error check when the write-buffer is finally flushed to the file,
+the caller can detect if the disk filled up (or had an i/o error) and
+return a NOSAPCE nak to the other side.
+
+Signed-off-by: Ming Liu <ming.liu@windriver.com>
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+---
+ common/tftpsubs.c |    8 +++++---
+ tftpd/tftpd.c     |   12 ++++++++++--
+ 2 files changed, 15 insertions(+), 5 deletions(-)
+
+diff --git a/common/tftpsubs.c b/common/tftpsubs.c
+index 8c999f6..b4d4ffe 100644
+--- a/common/tftpsubs.c
++++ b/common/tftpsubs.c
+@@ -206,20 +206,22 @@ int write_behind(FILE * file, int convert)
+ 
+     p = buf;
+     ct = count;
++    count = 0;
+     while (ct--) {              /* loop over the buffer */
+         c = *p++;               /* pick up a character */
+         if (prevchar == '\r') { /* if prev char was cr */
+             if (c == '\n')      /* if have cr,lf then just */
+-                fseek(file, -1, 1);     /* smash lf on top of the cr */
++                count = count - 1;
+             else if (c == '\0') /* if have cr,nul then */
+                 goto skipit;    /* just skip over the putc */
+             /* else just fall through and allow it */
+         }
+-        putc(c, file);
++        buf[count] = c;
++        count ++;
+       skipit:
+         prevchar = c;
+     }
+-    return count;
++    return write(fileno(file), buf, count);
+ }
+ 
+ /* When an error has occurred, it is possible that the two sides
+diff --git a/tftpd/tftpd.c b/tftpd/tftpd.c
+index 1873e70..c2adbda 100644
+--- a/tftpd/tftpd.c
++++ b/tftpd/tftpd.c
+@@ -1681,7 +1681,11 @@ static void tftp_recvfile(const struct formats *pf, struct tftphdr *oap, int oac
+             syslog(LOG_WARNING, "tftpd: write(ack): %m");
+             goto abort;
+         }
+-        write_behind(file, pf->f_convert);
++        if(write_behind(file, pf->f_convert) < 0) {
++            nak(ENOSPACE, NULL);
++            (void)fclose(file);
++            goto abort;
++        }
+         for (;;) {
+             n = recv_time(peer, dp, PKTSIZE, 0, &r_timeout);
+             if (n < 0) {        /* really? */
+@@ -1712,7 +1716,11 @@ static void tftp_recvfile(const struct formats *pf, struct tftphdr *oap, int oac
+             goto abort;
+         }
+     } while (size == segsize);
+-    write_behind(file, pf->f_convert);
++    if(write_behind(file, pf->f_convert) < 0) {
++        nak(ENOSPACE, NULL);
++        (void)fclose(file);
++        goto abort;
++    }
+     (void)fclose(file);         /* close data file */
+ 
+     ap->th_opcode = htons((u_short) ACK);       /* send the "final" ack */
+-- 
+1.7.10.4
+

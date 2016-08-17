@@ -1,0 +1,109 @@
+#!/bin/sh
+#
+#   Snort Startup Script modified for OpenEmbedded
+#
+
+# Script variables
+
+LAN_INTERFACE="$2"
+RETURN_VAL=0
+BINARY=/usr/bin/snort
+PATH=/bin:/usr/bin
+PID=/var/run/snort_${LAN_INTERFACE}_ids.pid
+DEL_PID=$PID
+LOGDIR="/var/log/snort"
+DATE=`/bin/date +%Y%m%d`
+CONFIG_FILE=/etc/snort/snort.conf
+PROG=snort
+USER=root
+GROUP=root
+
+if [ ! -x "$BINARY" ]; then
+    echo "ERROR: $BINARY not found."
+    exit 1
+fi
+
+if [ ! -r "$CONFIG_FILE" ]; then
+    echo "ERROR: $CONFIG_FILE not found."
+    exit 1
+fi
+
+start()
+{
+
+    [ -n "$LAN_INTERFACE" ] || return 0
+    # Check if log diratory is present. Otherwise, create it.
+    if [ ! -d $LOGDIR/$DATE ]; then
+        mkdir -d $LOGDIR/$DATE
+        /bin/chown -R $USER:$USER $LOGDIR/$DATE
+    /bin/chmod -R 700 $LOGDIR/$DATE
+    fi
+
+    /bin/echo "Starting $PROG: "
+    # Snort parameters
+    # -D Run Snort in background (daemon) mode
+    # -i <if> Listen on interface <if>
+    # -u <uname> Run snort uid as <uname> user (or uid)
+    # -g <gname> Run snort uid as <gname> group (or gid)
+    # -c Load configuration file
+    # -N Turn off logging (alerts still work) (removed to enable logging) :)
+    # -l Log to directory
+    # -t Chroots process to directory after initialization
+    # -R <id> Include 'id' in snort_intf<id>.pid file name
+
+    $BINARY -D -i $LAN_INTERFACE -u $USER -g $GROUP -c $CONFIG_FILE -l $LOGDIR/$DATE -t $LOGDIR/$DATE -R _ids
+    /bin/echo "$PROG startup complete."
+    return $RETURN_VAL
+}
+
+stop()
+{
+    if [ -s $PID ]; then
+        /bin/echo "Stopping $PROG with PID `cat $PID`: "
+        kill -TERM `cat $PID` 2>/dev/null
+        RETURN_VAL=$?
+        /bin/echo "$PROG shutdown complete."
+        [ -e $DEL_PID ] && rm -f $DEL_PID
+    [ -e $DEL_PID.lck ] && rm -f $DEL_PID.lck
+    else
+        /bin/echo "ERROR: PID in $PID file not found."
+        RETURN_VAL=1
+    fi
+    return $RETURN_VAL
+}
+
+status() {
+        if [ -s $PID ]; then
+                echo "$PROG is running as pid `cat $PID`:"
+        else
+                echo "$PROG is not running."
+        fi
+}
+
+restart()
+{
+    stop
+    start
+    RETURN_VAL=$?
+    return $RETURN_VAL
+}
+
+case "$1" in
+ start)
+       start
+    ;;
+ stop)
+       stop
+    ;;
+ status)
+       status
+    ;;
+ restart|reload)
+       restart
+    ;;
+ *)
+    /bin/echo "Usage: $0 {start|stop|status|restart|reload}"
+    RETURN_VAL=1
+esac
+
+exit $RETURN_VAL

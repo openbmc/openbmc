@@ -1,0 +1,11 @@
+--- sylpheed-2.7.1.orig/libsylph/defs.h	2009-06-10 09:55:46.000000000 +0200
++++ sylpheed-2.7.1/libsylph/defs.h	2012-05-06 08:28:27.514746256 +0200
+@@ -24,8 +24,6 @@
+ #  include "config.h"
+ #endif
+ 
+-#include <glibconfig.h>
+-
+ #ifdef G_OS_WIN32
+ #  include <glib/gwin32.h>
+ #endif

@@ -1,0 +1,35 @@
+From a076d76b8e8862bd641cd991190e82cfd478cc66 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Wed, 20 Aug 2014 00:52:03 +0200
+Subject: [PATCH 3/3] FEBlendNEON.h: fix missing semicolon
+
+* Otherwise fails with:
+In file included from ewebkit/Source/WebCore/platform/graphics/filters/FEBlend.cpp:29:0:
+ewebkit/Source/WebCore/platform/graphics/cpu/arm/filters/FEBlendNEON.h: In member function 'virtual void WebCore::FEBlend::platformApplySoftware()':
+ewebkit/Source/WebCore/platform/graphics/cpu/arm/filters/FEBlendNEON.h:130:5: error: expected primary-expression before '}' token
+     }
+     ^
+ewebkit/Source/WebCore/platform/graphics/cpu/arm/filters/FEBlendNEON.h:130:5: error: return-statement with a value, in function returning 'void' [-fpermissive]
+ewebkit/Source/WebCore/platform/graphics/cpu/arm/filters/FEBlendNEON.h:130:5: error: expected ';' before '}' token
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ Source/WebCore/platform/graphics/cpu/arm/filters/FEBlendNEON.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Source/WebCore/platform/graphics/cpu/arm/filters/FEBlendNEON.h b/Source/WebCore/platform/graphics/cpu/arm/filters/FEBlendNEON.h
+index 1c50765..f4b6f46 100644
+--- a/Source/WebCore/platform/graphics/cpu/arm/filters/FEBlendNEON.h
++++ b/Source/WebCore/platform/graphics/cpu/arm/filters/FEBlendNEON.h
+@@ -126,7 +126,7 @@ void FEBlend::platformApplySoftware()
+ 
+     if (pixelArrayLength >= 8) {
+         platformApplyNEON(srcPixelArrayA->data(), srcPixelArrayB->data(), dstPixelArray->data(), pixelArrayLength);
+-        return
++        return;
+     }
+     // If there is just one pixel we expand it to two.
+     ASSERT(pixelArrayLength > 0);
+-- 
+2.1.3
+

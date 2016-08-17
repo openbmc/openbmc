@@ -1,0 +1,27 @@
+From 38c97e590fde19213f6ba31e72d1c227db869427 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Sun, 31 Aug 2014 22:28:38 -0700
+Subject: [PATCH] aoe-stat.in: no bashism
+
+The checkbashisms shows there is no bashism, so use /bin/sh.
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ aoe-stat.in |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/aoe-stat.in b/aoe-stat.in
+index 50e6ac6..0c1d6f5 100755
+--- a/aoe-stat.in
++++ b/aoe-stat.in
+@@ -1,4 +1,4 @@
+-#! /bin/bash
++#! /bin/sh
+ # aoe-stat - collate and present information about AoE storage
+ # Copyright 2012, CORAID, Inc., and licensed under GPL v.2.
+ 
+-- 
+1.7.9.5
+

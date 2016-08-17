@@ -1,0 +1,19 @@
+Upstream-Status: Inappropriate [config]
+
+XXX: need to work out a better fix.
+
+Signed-off-by: Dexuan Cui <dexuan.cui@intel.com>
+
+diff -Nru webmin-1.570.orig//net/net-lib.pl webmin-1.570/net/net-lib.pl
+--- webmin-1.570.orig//net/net-lib.pl	2011-10-03 09:01:48.000000000 +0800
++++ webmin-1.570/net/net-lib.pl	2011-10-28 13:52:56.138873664 +0800
+@@ -21,7 +21,8 @@
+ 	do "$gconfig{'os_type'}-9.1-ALL-lib.pl";
+ 	}
+ else {
+-	do "$gconfig{'os_type'}-lib.pl";
++	#do "$gconfig{'os_type'}-lib.pl";
++	do "debian-linux-lib.pl";
+ 	}
+ 
+ # list_hosts()

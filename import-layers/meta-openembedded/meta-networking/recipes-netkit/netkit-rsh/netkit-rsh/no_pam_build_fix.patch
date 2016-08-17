@@ -1,0 +1,39 @@
+netkit-rsh:
+Allow to build with no PAM enabled.
+
+Upstream-Status: Inappropriate [ no upstream maintaner ]
+
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: netkit-rsh-0.17/rshd/rshd.c
+===================================================================
+--- netkit-rsh-0.17.orig/rshd/rshd.c
++++ netkit-rsh-0.17/rshd/rshd.c
+@@ -110,9 +110,11 @@ extern	char	**environ;
+ static void error(const char *fmt, ...);
+ static void doit(struct sockaddr *fromp, socklen_t fromlen);
+ static char *getstr(char *, size_t, const char *);
++#ifdef USE_PAM
+ static int err_conv(
+ 	int, const struct pam_message **, struct pam_response **, void *
+ );
++#endif /* USE_PAM */
+ 
+ extern int _check_rhosts_file;
+ 
+@@ -256,6 +258,7 @@ static void stderr_parent(int sock, int
+ }
+ 
+ 
++#ifdef USE_PAM
+ static int err_conv(
+ 	int num_msg, const struct pam_message **msg,
+ 	struct pam_response **resp, void *appdata_ptr
+@@ -266,6 +269,7 @@ static int err_conv(
+ 	(void) appdata_ptr;
+ 	return PAM_CONV_ERR;
+ }
++#endif
+ 
+ static struct passwd *doauth(const char *remuser, 
+ 			     const char *hostname, 

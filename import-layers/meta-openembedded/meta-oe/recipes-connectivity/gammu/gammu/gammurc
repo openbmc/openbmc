@@ -1,0 +1,173 @@
+; This is a sample ~/.gammurc file.
+; In Unix/Linux  copy it into your home directory and name it .gammurc
+;                or into /etc and name it gammurc
+; In Win32       copy it into directory with Gammu.exe and name gammurc
+; More about parameters later
+; Anything behind ; or # is comment.
+; -----------------------------------------------------------------------------
+
+[gammu]
+
+device = /dev/ttyUSB0
+connection = at115200
+; Do not use model configuration unless you really need it
+;model = 6110
+;synchronizetime = yes
+;logfile = gammulog
+;logformat = textall
+;use_locking = yes
+;gammuloc = locfile
+;startinfo = yes
+;gammucoding = utf8
+;usephonedb = yes
+
+;[gammu1]
+
+;device = com8:
+;model = 6110
+;connection = fbusblue
+;synchronizetime = yes
+;logfile = gammulog
+;logformat = textall
+;use_locking = yes
+;gammuloc = locfile
+;startinfo = yes
+;gammucoding = utf8
+
+; Step 1. Please find required Connection parameter and look into assigned 
+; with it device type. With some Connection you must set concrete model
+
+; ================================================================ cables =====
+; New Nokia protocol for FBUS/DAU9P
+;    Connection "fbus", device type serial
+; New Nokia protocol for DLR3/DLR3P
+;    Connection "fbusdlr3"/"dlr3", device type serial 
+; New Nokia protocol for DKU2 (and phone with USB converter on phone mainboard
+;                              like 6230)
+;    Connection "dku2phonet"/"dku2", device type dku2 on Windows
+;    Connection "fbususb" on Linux
+; New Nokia protocol for DKU5 (and phone without USB converter on phone
+;                              mainboard like 5100)
+;    Connection "dku5fbus"/"dku5", device type dku5
+; New Nokia protocol for PL2303 USB cable (and phone without USB converter
+;                                          on phone mainboard like 5100)
+;    Connection "fbuspl2303", device type usb
+; Old Nokia protocol for MBUS/DAU9P
+;    Connection "mbus", device type serial
+; Variants: 
+; You can modify a bit behaviour of connection using additional flags
+; specified just after connection name like connection-variant.
+; If you're using ARK3116 cable (or any other which does not like dtr 
+; handling), you might need -nodtr variant of connection, eg. dlr3-nodtr.
+; If cable you use is not powered over DTR/RTS, try using -nopower variant of 
+; connection, eg. fbus-nopower.
+; -----------------------------------------------------------------------------
+; AT commands for DLR3, DKU5 or other AT compatible cable (8 bits, None
+; parity, no flow control, 1 stop bit). Used with Nokia, Alcatel, Siemens, etc.
+;    Connection "at19200"/"at115200"/.., device type serial
+; AT commands for DKU2 cable
+;    Connection "dku2at", device type dku2
+; ============================================================== infrared =====
+; Nokia protocol for infrared with Nokia 6110/6130/6150
+;    Connection "fbusirda"/"infrared", device type serial
+; Nokia protocol for infrared with other Nokia models
+;    Connection "irdaphonet"/"irda", device type irda
+; -----------------------------------------------------------------------------
+; AT commands for infrared. Used with Nokia, Alcatel, Siemens, etc.
+;    Connection "irdaat", device type irda
+; -----------------------------------------------------------------------------
+; OBEX for infrared
+;    Connection "irdaobex", device type irda.
+; ============================================================= Bluetooth =====
+; Nokia protocol with serial device set in BT stack (WidComm, other) from
+; adequate service and Nokia 6210
+;    Connection "fbusblue", device type serial
+; Nokia protocol with serial device set in BT stack (WidComm, other) from
+; adequate service and other Nokia models
+;    Connection "phonetblue", device type serial
+; -----------------------------------------------------------------------------
+; Nokia protocol for Bluetooth stack with Nokia 6210
+;    Connection "bluerffbus", device type BT
+; Nokia protocol for Bluetooth stack with DCT4 Nokia models, which don't inform
+; about services correctly (6310, 6310i with firmware lower than 5.50, 8910,..)
+;    Connection "bluerfphonet", device type BT
+; Nokia protocol for Bluetooth stack with other DCT4 Nokia models
+;    Connection "bluephonet", device type BT
+; -----------------------------------------------------------------------------
+; AT commands for Bluetooth stack and 6210 / DCT4 Nokia models, which don't
+; inform about BT services correctly (6310, 6310i with firmware lower 
+; than 5.50, 8910,..)
+;    Connection "bluerfat", device type BT
+; AT commands for Bluetooth stack with other phones (Siemens, other Nokia,etc.)
+;    Connection "blueat", device type BT
+; -----------------------------------------------------------------------------
+; OBEX for Bluetooth stack with DCT4 Nokia models, which don't inform about
+; BT services correctly (6310, 6310i with firmware lower than 5.50, 8910,...)
+;    Connection "bluerfobex", device type BT
+; OBEX for Bluetooth stack with other phones (Siemens, other Nokia, etc.)
+;    Connection "blueobex", device type BT.
+; -----------------------------------------------------------------------------
+;    Connection "bluerfgnapbus", device type BT, model "gnap"
+;    Connection "irdagnapbus", device type irda, model "gnap"
+
+; Step2. According to device type from Step1 and used OS set Port parameter
+
+; -----------------------------------------------------------------------------
+; Port type | "Port" parameter in Windows/DOS | "Port" parameter in Linux/Unix
+; ----------|---------------------------------|--------------------------------
+; serial    | "com*:"                         | "/dev/ttyS*"
+;           | (example "com1:")               | (example "/dev/ttyS1")
+;           |                                 | or "/dev/tts/**" (with DevFS)
+;           |                                 | virtual serial ports like
+;           |                                 | "/dev/ircomm*" or "/dev/rfcomm*"
+; ----------|---------------------------------|--------------------------------
+; irda      | ignored (can be empty)          | ignored (can be empty)
+; ----------|---------------------------------|--------------------------------
+; BT        | Bluetooth device address (example "00:11:22:33:44:55").
+;           | Optionally you can also include channel after slash
+;           | (example "00:11:22:33:44:55/12"). Can be also empty.
+; ----------|---------------------------------|--------------------------------
+; dku2      | ignored (can be empty)          | /dev/ttyUSB* or /dev/ttyACM*
+; ----------|---------------------------------|--------------------------------
+; dku5      | ignored (can be empty)          | connection with it not possible
+; ----------|---------------------------------|--------------------------------
+; usb       | connection with it not possible | "/dev/ttyUSB*"
+
+; Step3. Set other config parameters
+
+; -----------------------------------------------------------------------------
+; Parameter name  | Description
+; ----------------|------------------------------------------------------------
+; Model           | Should not be used unless you have a good reason to do so.
+;                 | If Gammu doesn't recognize your phone model, put it here. 
+;                 | Example values: "6110", "6150", "6210", "8210"
+; SynchronizeTime | if you want to set time from computer to phone during
+;                 | starting connection. Do not rather use this option when
+;                 | when to reset phone during connection (in some phones need
+;                 | to set time again after restart)
+; GammuLoc        | name of localisation file
+; StartInfo       | this option allow to set, that you want (setting "yes")
+;                 | to see message on the phone screen or phone should enable
+;                 | light for a moment during starting connection. Phone
+;                 | WON'T beep during starting connection with this option.
+; GammuCoding     | forces using specified codepage (in win32 - for example
+;                 | "1250" will force CP1250) or UTF8 (in Linux - "utf8")
+; ----------------|------------------------------------------------------------
+; Logfile         | Use, when want to have logfile from communication.
+; Logformat       | What debug info and format should be used:
+;                 |   "nothing" - no debug level (default)
+;                 |   "text"    - transmission dump in text format
+;                 |   "textall" - all possible info in text format
+;                 |   "errors"  - errors in text format
+;                 |   "binary"  - transmission dump in binary format
+; ----------------|------------------------------------------------------------
+; Features        | Custom features for phone. This can be used as override
+;                 | when values coded in common/gsmphones.c are bad or
+;                 | missing. Consult include/gammu-info.h for possible values
+;                 | (all Feature values without leading F_ prefix).
+;                 | Please report correct values to Gammu authors.
+; ----------------|------------------------------------------------------------
+; Use_Locking     | under Unix/Linux use "yes", if want to lock used device
+;                 | to prevent using it by other applications. In win32 ignored
+
+; vim: et ts=4 sw=4 sts=4 tw=78 spell spelllang=en_us

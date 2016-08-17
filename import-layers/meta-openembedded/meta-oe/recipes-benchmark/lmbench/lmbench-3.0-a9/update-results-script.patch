@@ -1,0 +1,160 @@
+Now that we have our binaries in /usr/bin rather than the normal
+lmbench hierarchy we need to update the scripts as well to behave well here.
+
+Upstream-Status: Inappropriate [This is related to the OE-specific behavior
+of installing into /usr/bin, etc, rather than dumping everything into 
+/usr/share/lmbench or similar]
+
+Index: lmbench-3.0-a9/scripts/results
+===================================================================
+--- lmbench-3.0-a9.orig/scripts/results
++++ lmbench-3.0-a9/scripts/results
+@@ -8,11 +8,11 @@ RESULTS=results/$OS
+ BASE=../$RESULTS/`uname -n`
+ EXT=0
+ 
+-if [ ! -f "../bin/$OS/$CONFIG" ]
++if [ ! -f "$CONFIG" ]
+ then	echo "No config file?"
+ 	exit 1
+ fi
+-. ../bin/$OS/$CONFIG
++. $CONFIG
+ 
+ if [ ! -d ../$RESULTS ]
+ then	mkdir -p ../$RESULTS
+@@ -23,11 +23,9 @@ do      EXT=`expr $EXT + 1`
+ 	RESULTS=$BASE.$EXT
+ done
+ 
+-cd ../bin/$OS 
+-PATH=.:${PATH}; export PATH
+ export SYNC_MAX
+ export OUTPUT
+-lmbench $CONFIG 2>../${RESULTS}
++lmbench $CONFIG 2>${RESULTS}
+ 
+ if [ X$MAIL = Xyes ]
+ then	echo Mailing results
+Index: lmbench-3.0-a9/scripts/config-run
+===================================================================
+--- lmbench-3.0-a9.orig/scripts/config-run
++++ lmbench-3.0-a9/scripts/config-run
+@@ -132,20 +132,20 @@ export LMBENCH_SCHED
+ ############################################################################
+ echo $L; echo "";
+ echo "Hang on, we are calculating your timing granularity."
+-../bin/$OS/msleep 250
+-ENOUGH=`../bin/$OS/enough`
++msleep 250
++ENOUGH=`enough`
+ export ENOUGH 
+ echo "OK, it looks like you can time stuff down to $ENOUGH usec resolution."
+ echo ""
+ echo "Hang on, we are calculating your timing overhead."
+-../bin/$OS/msleep 250
+-TIMING_O=`../bin/$OS/timing_o`
++msleep 250
++TIMING_O=`timing_o`
+ export TIMING_O
+ echo "OK, it looks like your gettimeofday() costs $TIMING_O usecs."
+ echo ""
+ echo "Hang on, we are calculating your loop overhead."
+-../bin/$OS/msleep 250
+-LOOP_O=`../bin/$OS/loop_o`
++msleep 250
++LOOP_O=`loop_o`
+ export LOOP_O
+ echo "OK, it looks like your benchmark loop costs $LOOP_O usecs."
+ echo ""
+@@ -177,7 +177,7 @@ then
+ fi
+ if [ X$MB = X ]
+ then	$ECHON "Probing system for available memory: $ECHOC"
+-	MB=`../bin/$OS/memsize 4096`
++	MB=`memsize 4096`
+ fi
+ TOTAL_MEM=$MB
+ MB=`echo \( $MB \* 7 \) / 10 | bc 2>/dev/null`
+@@ -205,9 +205,9 @@ fi
+ # Certain machines tend to barf when you try and bcopy 8MB.
+ # Figure out how much we can use.
+ echo "Checking to see if you have $MB MB; please wait for a moment..."
+-MB=`../bin/$OS/memsize $MB`
+-MB=`../bin/$OS/memsize $MB`
+-MB=`../bin/$OS/memsize $MB`
++MB=`memsize $MB`
++MB=`memsize $MB`
++MB=`memsize $MB`
+ if [ `expr $SYNC_MAX \* $MB` -gt `expr $TOTAL_MEM` ]
+ then
+ 	MB=`expr $TOTAL_MEM / $SYNC_MAX`
+@@ -223,8 +223,8 @@ then	echo Warning: you have only ${MB}MB
+ fi
+ 
+ echo "Hang on, we are calculating your cache line size."
+-../bin/$OS/msleep 250
+-LINE_SIZE=`../bin/$OS/lm_line -M ${MB}M`
++msleep 250
++LINE_SIZE=`lm_line -M ${MB}M`
+ export LINE_SIZE
+ echo "OK, it looks like your cache line is $LINE_SIZE bytes."
+ echo ""
+@@ -479,7 +479,7 @@ EOF
+ 	then	
+ 		for i in $disks
+ 		do	if [ -r $i ]
+-			then	../bin/$OS/flushdisk $i
++			then	flushdisk $i
+ 				if [ $? -eq 1 ]
+ 				then	echo "Must be root to run disk benchmarks."
+ 					echo "Root is needed to flush the buffer cache"
+@@ -584,7 +584,7 @@ fi
+ echo $L
+ echo ""
+ echo "Calculating mhz, please wait for a moment..."
+-MHZ=`../bin/$OS/mhz`
++MHZ=`mhz`
+ cat<<EOF
+ I think your CPU mhz is 
+ 
+@@ -689,9 +689,9 @@ esac
+ 
+ INFO=`../scripts/info`
+ if [ $MAIL = yes ]
+-then	if [ ! -f ../bin/$OS/$INFO ]
+-	then	cp ../scripts/info-template ../bin/$OS/$INFO
+-		chmod +w ../bin/$OS/$INFO
++then	if [ ! -f $INFO ]
++	then	cp ../scripts/info-template $INFO
++		chmod +w $INFO
+ 		REUSE=no
+ 	else	
+ 		REUSE=view
+@@ -705,7 +705,7 @@ then	if [ ! -f ../bin/$OS/$INFO ]
+ 				;;
+ 			[Vv]*)	REUSE=view
+ 				echo $L
+-				more ../bin/$OS/$INFO
++				more $INFO
+ 				echo $L
+ 				;;
+ 	    		*)	REUSE=yes
+@@ -733,7 +733,7 @@ EOF
+ 		then	EDITOR=$TMP
+ 		fi
+ 		if [ X$EDITOR != "none" ]
+-		then	$EDITOR ../bin/$OS/`../scripts/info`
++		then	$EDITOR `../scripts/info`
+ 		fi
+ 	fi
+ fi
+@@ -750,7 +750,7 @@ EOF
+ 
+ VERSION=`../scripts/version`
+ 
+-C=../bin/$OS/`../scripts/config`
++C=`../scripts/config`
+ echo DISKS=\"$DISKS\" > $C
+ echo DISK_DESC=\"$DISK_DESC\" >> $C
+ echo OUTPUT=$OUTPUT >> $C

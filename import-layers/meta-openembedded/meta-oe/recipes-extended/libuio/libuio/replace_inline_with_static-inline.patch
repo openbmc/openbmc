@@ -1,0 +1,121 @@
+By default, gcc-5 uses C99 inline semantics, this semantics doesn't 
+generate externally visible function for inline functions. This results in 
+below error, when an another translation unit (TU) tries to link with the 
+inline function,
+
+-- snip --
+| lsuio.o: In function `main':
+| <...>/libuio/0.2.1-r0/git/tools/lsuio.c:85: undefined reference to `uio_mmap'
+| collect2: error: ld returned 1 exit status
+| make[2]: *** [lsuio] Error 1
+-- CUT --
+
+To solve this error and make libuio to compile with both 4.x and 5.x,
+
+1. We can remove 'uio_mmap' inline function definition in uio_mmap.c, and move
+   that definition into uio_helper.h file (which is included by lsuio.c) and 
+   replace inline with "static inline". Similarly it can be done to other 
+   uio_single_munmap and uio_munmap inline functions
+
+2. Add 'extern' keyword in front of inline functions declaration, to make 
+   inlined function as externally visible function, and to link with other TUs.
+
+Going with option 1.
+
+Upstream-Status: Pending
+
+Signed-off-by: Jagadeesh Krishnanjanappa <jkrishnanjanappa@mvista.com>
+
+--- git_org/src/uio_helper.h	2015-10-20 02:37:04.183075855 -0400
++++ git/src/uio_helper.h	2015-10-20 03:34:24.659970136 -0400
+@@ -61,11 +61,11 @@ struct uio_info_t {
+ 
+ /* function prototypes */
+ 
+-inline char* uio_lib_name(void);
+-inline char* uio_lib_version(void);
+-inline int uio_lib_ifcurrent(void);
+-inline int uio_lib_ifrevision(void);
+-inline int uio_lib_ifage(void);
++static inline char* uio_lib_name(void);
++static inline char* uio_lib_version(void);
++static inline int uio_lib_ifcurrent(void);
++static inline int uio_lib_ifrevision(void);
++static inline int uio_lib_ifage(void);
+ 
+ int uio_get_mem_size(struct uio_info_t* info, int map_num);
+ int uio_get_mem_addr(struct uio_info_t* info, int map_num);
+@@ -76,10 +76,30 @@ int uio_get_all_info(struct uio_info_t* 
+ int uio_get_device_attributes(struct uio_info_t* info);
+ 
+ void* uio_single_mmap(struct uio_info_t* info, int map_num, int fd);
+-inline void uio_mmap(struct uio_info_t* info, int fd);
+ 
+-inline void uio_single_munmap(struct uio_info_t* info, int map_num);
+-inline void uio_munmap(struct uio_info_t* info);
++static inline void uio_mmap(struct uio_info_t* info, int fd);
++static inline void uio_mmap(struct uio_info_t* info, int fd)
++{
++        int map_num;
++        if (!fd) return;
++        for (map_num= 0; map_num < MAX_UIO_MAPS; map_num++)
++                uio_single_mmap(info, map_num, fd);
++}
++
++static inline void uio_single_munmap(struct uio_info_t* info, int map_num);
++static inline void uio_single_munmap(struct uio_info_t* info, int map_num)
++{
++        munmap(info->maps[map_num].internal_addr, info->maps[map_num].size);
++        info->maps[map_num].mmap_result = UIO_MMAP_NOT_DONE;
++}
++
++static inline void uio_munmap(struct uio_info_t* info);
++static inline void uio_munmap(struct uio_info_t* info)
++{
++        int i;
++        for (i = 0; i < MAX_UIO_MAPS; i++)
++                uio_single_munmap(info, i);
++}
+ 
+ void uio_free_dev_attrs(struct uio_info_t* info);
+ void uio_free_info(struct uio_info_t* info);
+--- git_org/src/uio_mmap.c	2015-10-20 02:37:04.183075855 -0400
++++ git/src/uio_mmap.c	2015-10-20 03:34:45.060003208 -0400
+@@ -22,11 +22,3 @@
+ #include <stdlib.h>
+ 
+ #include "uio_helper.h"
+-
+-inline void uio_mmap(struct uio_info_t* info, int fd)
+-{
+-	int map_num;
+-	if (!fd) return;
+-	for (map_num= 0; map_num < MAX_UIO_MAPS; map_num++)
+-		uio_single_mmap(info, map_num, fd);
+-}
+--- git_org/src/uio_munmap.c	2015-10-20 02:37:04.183075855 -0400
++++ git/src/uio_munmap.c	2015-10-20 03:34:59.636026835 -0400
+@@ -22,10 +22,3 @@
+ #include <stdlib.h>
+ 
+ #include "uio_helper.h"
+-
+-inline void uio_munmap(struct uio_info_t* info)
+-{
+-	int i;
+-	for (i = 0; i < MAX_UIO_MAPS; i++)
+-		uio_single_munmap(info, i);
+-}
+\ No newline at end of file
+--- git_org/src/uio_single_munmap.c	2015-10-20 02:37:04.183075855 -0400
++++ git/src/uio_single_munmap.c	2015-10-20 03:52:55.005763023 -0400
+@@ -24,9 +24,3 @@
+ #include <sys/mman.h>
+ 
+ #include "uio_helper.h"
+-
+-inline void uio_single_munmap(struct uio_info_t* info, int map_num)
+-{
+-	munmap(info->maps[map_num].internal_addr, info->maps[map_num].size);
+-	info->maps[map_num].mmap_result = UIO_MMAP_NOT_DONE;
+-}

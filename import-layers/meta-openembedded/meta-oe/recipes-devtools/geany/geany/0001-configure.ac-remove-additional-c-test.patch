@@ -1,0 +1,47 @@
+From e62d5b59262ec7ffe07931790712c7e247377795 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Thu, 21 Feb 2013 09:31:31 +0100
+Subject: [PATCH] configure.ac remove additional c++ test
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+For openembedded cross-builds CXX can contain something like:
+
+arm-oe-linux-gnueabi-g++  -march=armv5te  -marm -mthumb-interwork --sysroot=/home/jenkins/oe/shr-core-branches/shr-core/tmp-eglibc/sysroots/qemuarm
+
+This ends up in
+
+configure:5582: error: No C++ compiler found. Please install a C++ compiler.
+
+Anyway if [1] is still valid, the combination of AC_PROG_CC and AC_PROG_CXX
+should thow an error message.
+
+[1] http://lists.gnu.org/archive/html/bug-autoconf/2010-05/msg00001.html
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ configure.ac |    5 -----
+ 1 files changed, 0 insertions(+), 5 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index c37312a..742bf35 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -26,11 +26,6 @@ AC_USE_SYSTEM_EXTENSIONS
+ AC_PROG_CC
+ 
+ AC_PROG_CXX
+-# check for C++ compiler explicitly and fail if none is found, do this check
+-# after AC_PROG_CXX has set the CXX environment variable
+-if ! which $CXX >/dev/null 2>&1; then
+-	AC_MSG_ERROR([No C++ compiler found. Please install a C++ compiler.])
+-fi
+ 
+ AC_PROG_INSTALL
+ AC_PROG_LN_S
+-- 
+1.7.6.5
+

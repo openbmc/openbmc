@@ -1,0 +1,55 @@
+From d4b25ce723812faf78d8ee038b7cbed00cbba682 Mon Sep 17 00:00:00 2001
+From: Rodrigo Caimi <caimi@datacom.ind.br>
+Date: Tue, 7 Oct 2014 15:37:10 -0300
+Subject: [PATCH] CMakeLists, gtest.pc.in: Add pkg-config support to gtest
+ 1.7.0
+
+Signed-off-by: Rodrigo Caimi <caimi@datacom.ind.br>
+---
+ CMakeLists.txt | 6 ++++++
+ gtest.pc.in    | 9 +++++++++
+ 2 files changed, 15 insertions(+)
+ create mode 100644 gtest.pc.in
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 281c4c2..e4354a8 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -29,6 +29,9 @@ if (COMMAND pre_project_set_up_hermetic_build)
+   pre_project_set_up_hermetic_build()
+ endif()
+ 
++# pkg-config support
++configure_file("gtest.pc.in" "gtest.pc" @ONLY)
++
+ ########################################################################
+ #
+ # Project-wide settings
+@@ -75,6 +78,9 @@ target_link_libraries(gtest_main gtest)
+ 
+ install(TARGETS gtest DESTINATION lib)
+ install(TARGETS gtest_main DESTINATION lib)
++install(FILES "${CMAKE_CURRENT_BINARY_DIR}/gtest.pc"
++    DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig/"
++)
+ 
+ ########################################################################
+ #
+diff --git a/gtest.pc.in b/gtest.pc.in
+new file mode 100644
+index 0000000..57b1049
+--- /dev/null
++++ b/gtest.pc.in
+@@ -0,0 +1,9 @@
++Name: libgtest
++Version: 1.7.0
++Description: Google's framework for writing C++ tests on a variety of platforms
++
++prefix=@CMAKE_INSTALL_PREFIX@
++includedir=${prefix}/include
++libdir=${prefix}/lib
++Cflags:-I${includedir}/gtest
++Libs: -L${libdir} -lgtest -lgtest_main
+-- 
+1.9.1
+

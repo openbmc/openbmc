@@ -1,0 +1,21 @@
+diff --git a/gst-libs/ext/libav/configure b/gst-libs/ext/libav/configure
+index 8473069..4f74952 100755
+--- a/gst-libs/ext/libav/configure
++++ b/gst-libs/ext/libav/configure
+Fix gst-ffmpeg build issues for libav on e500mc (fsl-p4080)
+
+Upstream-Status: Backport
+
+Signed-off-by: Yao Zhao <yao.zhao@windriver.com>
+
+@@ -2210,6 +2210,10 @@ elif enabled ppc; then
+             cpuflags="-mcpu=cell"
+             enable ldbrx
+         ;;
++        e500mc)
++            cpuflags="-mcpu=e500mc"
++            disable altivec
++        ;;
+         e500v2)
+             cpuflags="-mcpu=8548 -mhard-float -mfloat-gprs=double"
+             disable altivec

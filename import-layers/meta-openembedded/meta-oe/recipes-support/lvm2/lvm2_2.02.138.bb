@@ -1,0 +1,4 @@
+require lvm2.inc
+
+SRC_URI[md5sum] = "c660e02ad4586a1d297b6befbe85556d"
+SRC_URI[sha256sum] = "93878a4ba4f70d9f2d0d919eb85bc51652a58776b5428ec8e7e32769d332f596"

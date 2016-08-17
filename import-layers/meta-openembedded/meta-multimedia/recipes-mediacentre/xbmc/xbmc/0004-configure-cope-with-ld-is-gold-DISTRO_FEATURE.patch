@@ -1,0 +1,43 @@
+From fd8f73826240aae543a41a2bfeea0056e2fe594d Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen@dominion.thruhere.net>
+Date: Mon, 11 Mar 2013 11:04:29 +0100
+Subject: [PATCH] configure: cope with ld-is-gold DISTRO_FEATURE
+
+Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
+---
+
+Upstream-Stature: backport
+
+ configure.in |   12 +++++++-----
+ 1 files changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index ef94683..c8b459b 100755
+--- a/configure.in
++++ b/configure.in
+@@ -18,9 +18,14 @@ tolower(){
+ # check for library basenames
+ AC_DEFUN([XB_FIND_SONAME],
+ [
++  #set -x
+   if [[ "$host_vendor" != "apple" ]]; then
+     AC_MSG_CHECKING([for lib$2 soname])
+     $1_FILENAME=$($CC -nostdlib -o /dev/null $LDFLAGS -l$2 -Wl,-M 2>/dev/null | grep "^LOAD.*$2" | awk '{V=2; print $V}')
++    if [[ -z $$1_FILENAME ]]; then
++      #try gold linker syntax
++      $1_FILENAME=$($CC -nostdlib -o /dev/null $LDFLAGS -l$2 -Wl,-t 3>&1 1>&2 2>&3 | grep "$2")
++    fi
+     if [[ ! -z $$1_FILENAME ]]; then
+       $1_SONAME=$(objdump -p $$1_FILENAME | grep "SONAME.*$2" | awk '{V=2; print $V}')
+     fi
+@@ -55,6 +60,7 @@ AC_DEFUN([XB_FIND_SONAME],
+     AC_MSG_RESULT([$$1_SONAME])
+     AC_SUBST($1_SONAME)
+   fi
++  #set +x
+ ])
+ 
+ # Function to push and pop libs and includes for a command
+-- 
+1.7.7.6
+

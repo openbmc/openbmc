@@ -1,0 +1,28 @@
+Upstream-Status: Pending
+
+Subject: ospf6d: check ospf6 before using it in ospf6_clean
+
+The ospf6 variable might be 'NULL' causing segment fault error.
+Check it before referencing it.
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ ospf6d/ospf6d.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/ospf6d/ospf6d.c b/ospf6d/ospf6d.c
+index 3cdd5c1..e3bf1af 100644
+--- a/ospf6d/ospf6d.c
++++ b/ospf6d/ospf6d.c
+@@ -1892,6 +1892,8 @@ ospf6_init (void)
+ void
+ ospf6_clean (void)
+ {
++  if (ospf6 == NULL)
++    return;
+   if (ospf6->route_table)
+     ospf6_route_remove_all (ospf6->route_table);
+   if (ospf6->brouter_table)
+-- 
+1.9.1
+

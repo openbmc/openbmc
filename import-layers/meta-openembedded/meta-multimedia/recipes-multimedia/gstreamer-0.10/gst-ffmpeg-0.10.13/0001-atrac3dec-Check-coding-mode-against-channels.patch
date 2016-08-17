@@ -1,0 +1,37 @@
+From 2502914c5f8eb77659d7c0868396862557a63245 Mon Sep 17 00:00:00 2001
+From: Michael Niedermayer <michaelni@gmx.at>
+Date: Fri, 9 Nov 2012 13:26:20 +0100
+Subject: [PATCH] atrac3dec: Check coding mode against channels.
+
+Upstream-Status: Backport
+
+Commit 2502914c5f8eb77659d7c0868396862557a63245 release/1.0
+
+Found-by: Mateusz "j00ru" Jurczyk and Gynvael Coldwind
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+(cherry picked from commit 13451f5520ce6b0afde861b2285dda659f8d4fb4)
+
+Conflicts:
+
+	libavcodec/atrac3.c
+---
+ libavcodec/atrac3.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/libavcodec/atrac3.c b/libavcodec/atrac3.c
+index 7d076be..1da4c78 100644
+--- a/gst-libs/ext/libav/libavcodec/atrac3.c
++++ b/gst-libs/ext/libav/libavcodec/atrac3.c
+@@ -955,6 +955,11 @@ static av_cold int atrac3_decode_init(AVCodecContext *avctx)
+     }
+     /* Check the extradata. */
+ 
++    if (q->codingMode == JOINT_STEREO && avctx->channels < 2) {
++        av_log(avctx, AV_LOG_ERROR, "Invalid coding mode\n");
++        return AVERROR_INVALIDDATA;
++    }
++
+     if (q->atrac3version != 4) {
+         av_log(avctx,AV_LOG_ERROR,"Version %d != 4.\n",q->atrac3version);
+         return AVERROR_INVALIDDATA;
+-- 

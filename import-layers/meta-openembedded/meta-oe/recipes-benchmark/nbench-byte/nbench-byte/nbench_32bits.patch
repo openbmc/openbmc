@@ -1,0 +1,46 @@
+From 81f4043a6787060029ef20eed21cdcf3e50337df Mon Sep 17 00:00:00 2001
+From: Chase Maupin <Chase.Maupin@ti.com>
+Date: Tue, 28 Feb 2012 14:58:35 -0600
+Subject: [PATCH] nbench: modify Makefile for 32bit
+
+* Patch taken from OE classic git repository as of commit id
+  ad42bf9065928b2902d7d9534709d3ccea7ec956 and was added by:
+    * Marcin Juszkiewicz <marcin@juszkiewicz.com.pl>
+* Notes from original patch were:
+
+BYTE Magazine's native benchmarks (also called BYTEmark) designed to
+expose the capabilities of a system's CPU, FPU and memory system.
+
+http://www.tux.org/~mayer/linux/
+
+Recipe from old Atmel overlay.
+
+Upstream-Status: Inappropriate [no upstream]
+
+Signed-off-by: Chase Maupin <chase.maupin@ti.com>
+---
+ Makefile |    8 ++------
+ 1 files changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 5045c77..915866d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -119,12 +119,8 @@ emfloat.o: emfloat.h emfloat.c nmglobal.h pointer.h Makefile
+ 	$(CC) $(MACHINE) $(DEFINES) $(CFLAGS)\
+ 		-c emfloat.c
+ 
+-pointer.h: pointer Makefile
+-	$(CC) $(MACHINE) $(DEFINES) $(CFLAGS)\
+-		-o pointer pointer.c
+-	rm -f pointer.h
+-	if [ "4" = `./pointer` ] ; then touch pointer.h ;\
+-	else echo "#define LONG64" >pointer.h ; fi
++pointer.h: Makefile
++	touch pointer.h ;
+ 
+ misc.o: misc.h misc.c Makefile
+ 	$(CC) $(MACHINE) $(DEFINES) $(CFLAGS)\
+-- 
+1.7.0.4
+

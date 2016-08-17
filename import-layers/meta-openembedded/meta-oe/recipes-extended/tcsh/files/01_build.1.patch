@@ -1,0 +1,16 @@
+Author: Franz Pletz <fpletz@franz-pletz.org>
+Description: Original comment: Fix build
+Not sure why we have this patch. Let's keep it for compatibility.
+--- a/pathnames.h
++++ b/pathnames.h
+@@ -92,6 +92,10 @@
+ # define _PATH_TCSHELL		"/local/bin/tcsh"	/* use ram disk */
+ #endif /* _MINIX && !_PATH_TCSHELL */
+ 
++#ifndef _PATH_TCSHELL
++# define _PATH_TCSHELL		"/bin/tcsh"		/* Debian */
++#endif /* !_PATH_TCSHELL */
++
+ #if defined(__EMX__) && !defined(_PATH_DEVNULL)
+ # define _PATH_DEVNULL		"nul"
+ #endif /* __EMX__ && !_PATH_DEVNULL */

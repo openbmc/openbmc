@@ -1,0 +1,47 @@
+From e273e0ebc753645555909bcc4874c72458b17891 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Fri, 17 Jan 2014 03:17:44 -0500
+Subject: [PATCH] Make.rules: filter-out the patches from subdirs
+
+The $(subdirs) contains all the dirs under the ${B}, and this one:
+
+do_unpack[cleandirs] = "${S}/patches"
+
+will create a "patches" dir, then there will be compile errors, filter
+out the patches will fix the problem.
+
+Note: poky doesn't have this problem since it separates the ${S} and
+${B}
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ Make.rules |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Make.rules b/Make.rules
+index b077cd5..0bfce2d 100644
+--- a/Make.rules
++++ b/Make.rules
+@@ -97,7 +97,7 @@ endif
+ subdirs := $(filter-out $(SKIPDIRS), $(subdirs))
+ endif
+ 
+-install install-%: subdirs := $(filter-out $(SKIPINSTALL), $(subdirs))
++install install-%: subdirs := $(filter-out $(SKIPINSTALL) patches, $(subdirs))
+ 
+ 
+ override MAKE += srcdir=$(srcdir) subdirs="$(subdirs)" shared=$(shared)
+@@ -106,7 +106,7 @@ override MAKE += srcdir=$(srcdir) subdirs="$(subdirs)" shared=$(shared)
+ INCLUDEDIRS := $(filter $(INCLUDEDIRS), $(subdirs))
+ LIBDIRS := $(filter $(LIBDIRS), $(subdirs))
+ MODDIRS := $(filter $(MODDIRS), $(subdirs))
+-EXEDIRS := $(filter-out $(INCLUDEDIRS) $(LIBDIRS) $(MODDIRS), $(subdirs))
++EXEDIRS := $(filter-out $(INCLUDEDIRS) $(LIBDIRS) $(MODDIRS) patches, $(subdirs))
+ MODUSERS := $(filter $(MODUSERS), $(subdirs))
+ SBINUSERS := $(filter $(SBINUSERS), $(subdirs))
+ 
+-- 
+1.7.10.4
+

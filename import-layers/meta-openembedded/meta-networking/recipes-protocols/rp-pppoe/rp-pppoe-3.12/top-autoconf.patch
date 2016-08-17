@@ -1,0 +1,27 @@
+The autoconf stuff is all in a subdirectory, which is rather annoying
+as OE expects patches to be applied and autoconf stuff to be done in
+S. This adds enough autoconf at the top level to allow it to be
+called there - all it does is run a sub autoconf stuff in the src
+directory.
+
+Upstream-Status: Inappropriate [build system specific change]
+
+Index: rp-pppoe-3.8/Makefile.am
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ rp-pppoe-3.8/Makefile.am	2007-06-08 15:58:16.000000000 +1000
+@@ -0,0 +1,5 @@
++PACKAGE = rp-pppoe
++VERSION = 3.8
++
++dnl AM_CFLAGS = -Wall -DDEBUG
++SUBDIRS = src
+Index: rp-pppoe-3.8/configure.in
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ rp-pppoe-3.8/configure.in	2007-06-08 15:58:16.000000000 +1000
+@@ -0,0 +1,4 @@
++AC_INIT(src/pppoe.c)
++AM_INIT_AUTOMAKE([rp-pppoe], [3.8])
++AC_CONFIG_SUBDIRS(src)
++AC_OUTPUT(Makefile)

@@ -1,0 +1,54 @@
+From 6bbde84a2197c97e49d9e64118a979728209e436 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Wed, 23 Sep 2015 23:21:42 +0200
+Subject: [PATCH] Makefile.am: avoid race when creating autostart directories
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+fixes:
+
+| make: creating data/xsession/openbox-gnome-session
+| make: creating data/xsession/openbox-session
+| make: creating data/xsession/openbox-kde-session
+| make: creating data/autostart/openbox-autostart
+| make: creating doc/openbox.1
+| make: creating data/autostart/autostart
+| make: creating doc/openbox-session.1
+| make: creating doc/openbox-gnome-session.1
+| make: creating doc/openbox-kde-session.1
+| make: creating doc/obxprop.1
+| mkdir: cannot create directory './data/autostart': File exists
+| Makefile:4329: recipe for target 'data/autostart/autostart' failed
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ Makefile.am | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index f25bf8e..306e77d 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -505,14 +505,12 @@ edit = $(SED) \
+ 
+ data/autostart/autostart: $(top_srcdir)/data/autostart/autostart.in Makefile
+ 	@echo make: creating $@
+-	@test -d $(shell dirname $(top_builddir)/$@) || \
+-	  mkdir $(shell dirname $(top_builddir)/$@)
++	mkdir -p $(shell dirname $(top_builddir)/$@)
+ 	@$(edit) $< >$(top_builddir)/$@
+ 
+ data/autostart/openbox-autostart: $(top_srcdir)/data/autostart/openbox-autostart.in Makefile
+ 	@echo make: creating $@
+-	@test -d $(shell dirname $(top_builddir)/$@) || \
+-	  mkdir $(shell dirname $(top_builddir)/$@)
++	mkdir -p $(shell dirname $(top_builddir)/$@)
+ 	@$(edit) $< >$(top_builddir)/$@
+ 
+ %.desktop: %.desktop.in Makefile
+-- 
+2.1.0
+

@@ -1,0 +1,35 @@
+From 815e861721a9c43efddb78521147145ebc7569ca Mon Sep 17 00:00:00 2001
+From: Zhiquan Li <zhiquan.li@windriver.com>
+Date: Fri, 13 Nov 2015 17:40:24 +0800
+Subject: [PATCH] fix do_package failed since snort 2.9.7.0
+
+Remove redundant '/' as a workround for below error:
+/lib/rpm/bin/debugedit: canonicalization unexpectedly shrank by one character
+
+It's a rpm debugedit bug:
+* http://sourceforge.net/p/snort/mailman/message/34130268/
+* https://bugzilla.redhat.com/show_bug.cgi?id=304121
+
+Upstream-Status:Inappropriate [embedded specific]
+
+Signed-off-by: Zhiquan Li <zhiquan.li@windriver.com>
+---
+ src/snort.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/snort.h b/src/snort.h
+index 8308e57..499d157 100644
+--- a/src/snort.h
++++ b/src/snort.h
+@@ -39,7 +39,7 @@
+ #include "sfdaq.h"
+ #include "sf_types.h"
+ #include "sfutil/sflsq.h"
+-#include "sfutil//sfActionQueue.h"
++#include "sfutil/sfActionQueue.h"
+ #include "profiler.h"
+ #include "rules.h"
+ #include "treenodes.h"
+--
+1.9.1
+

@@ -1,0 +1,84 @@
+From 45b97b474ce2d0ad56828db11edde8562bb47a43 Mon Sep 17 00:00:00 2001
+From: Li xin <lixin.fnst@cn.fujitsu.com>
+Date: Tue, 2 Dec 2014 02:33:53 +0900
+Subject: [PATCH] Modify configure.in and etc/Makefile.am
+
+this patch is from Fedora to fix error:
+"conftest.c:26:9: error: unknown type name 'not'"
+
+Upstream-Status: pending
+
+Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
+---
+ configure.in             | 6 +++++-
+ etc/Makefile.am          | 9 ++++++---
+ etc/radiusclient.conf.in | 2 +-
+ 3 files changed, 12 insertions(+), 5 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index 812f640..3a8af99 100644
+--- a/configure.in
++++ b/configure.in
+@@ -29,6 +29,9 @@ AC_SUBST(LIBVERSION)
+ pkgsysconfdir=${sysconfdir}/$PACKAGE
+ AC_SUBST(pkgsysconfdir)
+ 
++pkgdatadir=${datadir}/$PACKAGE
++AC_SUBST(pkgdatadir)
++
+ AC_PROG_LIBTOOL
+ 
+ AC_PROG_CC
+@@ -118,7 +121,8 @@ then
+ 	],
+ 	AC_MSG_RESULT(yes)
+ 	AC_DEFINE(HAVE_STRUCT_UTSNAME_DOMAINNAME),
+-	AC_MSG_RESULT(no)
++	AC_MSG_RESULT(no),
++	AC_MSG_RESULT(assume no),
+ 	)
+ fi
+ 
+diff --git a/etc/Makefile.am b/etc/Makefile.am
+index 39b6975..a3c403f 100644
+--- a/etc/Makefile.am
++++ b/etc/Makefile.am
+@@ -14,9 +14,11 @@ CLEANFILES = *~ radiusclient.conf
+ 
+ sbindir = @sbindir@
+ pkgsysconfdir = @pkgsysconfdir@
+-pkgsysconf_DATA = issue port-id-map radiusclient.conf \
+-	dictionary dictionary.ascend dictionary.compat dictionary.merit \
+-	dictionary.sip
++pkgsysconf_DATA = issue port-id-map radiusclient.conf
++
++pkgdatadir = @pkgdatadir@
++pkgdata_DATA = dictionary dictionary.ascend dictionary.compat \
++	dictionary.merit dictionary.sip
+ 
+ EXTRA_DIST = issue port-id-map dictionary dictionary.ascend \
+ 	dictionary.compat dictionary.merit servers radiusclient.conf.in \
+@@ -25,6 +27,7 @@ EXTRA_DIST = issue port-id-map dictionary dictionary.ascend \
+ radiusclient.conf: radiusclient.conf.in
+ 	sed -e 's|@sbin''dir@|$(sbindir)|g' \
+ 	    -e 's|@pkgsysconf''dir@|$(pkgsysconfdir)|g' \
++	    -e 's|@pkgdata''dir@|$(pkgdatadir)|g' \
+ 	    <$(srcdir)/radiusclient.conf.in >radiusclient.conf
+ 
+ install-data-local: servers
+diff --git a/etc/radiusclient.conf.in b/etc/radiusclient.conf.in
+index 948bc2f..aac9973 100644
+--- a/etc/radiusclient.conf.in
++++ b/etc/radiusclient.conf.in
+@@ -47,7 +47,7 @@ servers		@pkgsysconfdir@/servers
+ 
+ # dictionary of allowed attributes and values
+ # just like in the normal RADIUS distributions
+-dictionary 	@pkgsysconfdir@/dictionary
++dictionary 	@pkgdatadir@/dictionary
+ 
+ # program to call for a RADIUS authenticated login
+ login_radius	@sbindir@/login.radius
+-- 
+1.8.4.2
+

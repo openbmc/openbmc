@@ -1,0 +1,37 @@
+gst-ffmpeg: error_concealment: Check that the picture is not in a half
+
+Fixes state becoming inconsistent
+Fixes a null pointer dereference
+
+Found-by: Mateusz "j00ru" Jurczyk and Gynvael Coldwind
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+(cherry picked from commit 23318a57358358e7a4dc551e830e4503f0638cfe)
+
+Upstream-Status: Backport 
+
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+
+---
+ libavcodec/error_resilience.c |    6 ++++++
+ 1 files changed, 6 insertions(+), 0 deletions(-)
+
+diff --git a/libavcodec/error_resilience.c b/libavcodec/error_resilience.c
+index 01f7424..2b6bc42 100644
+--- a/gst-libs/ext/libav/libavcodec/error_resilience.c
++++ b/gst-libs/ext/libav/libavcodec/error_resilience.c
+@@ -793,6 +793,12 @@ void ff_er_frame_end(MpegEncContext *s){
+        s->picture_structure != PICT_FRAME || // we dont support ER of field pictures yet, though it should not crash if enabled
+        s->error_count==3*s->mb_width*(s->avctx->skip_top + s->avctx->skip_bottom)) return;
+ 
++    if (   s->picture_structure == PICT_FRAME
++        && s->current_picture.linesize[0] != s->current_picture_ptr->linesize[0]) {
++        av_log(s->avctx, AV_LOG_ERROR, "Error concealment not possible, frame not fully initialized\n");
++        return;
++    }
++
+     if(s->current_picture.motion_val[0] == NULL){
+         av_log(s->avctx, AV_LOG_ERROR, "Warning MVs not available\n");
+ 
+-- 
+1.7.5.4
+

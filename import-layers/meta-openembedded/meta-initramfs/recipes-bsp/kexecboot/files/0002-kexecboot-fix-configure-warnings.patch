@@ -1,0 +1,33 @@
+From b8938acc3f1ab35273fa9a2fa7728050ef72ff65 Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Fri, 2 May 2014 00:19:24 +0200
+Subject: [PATCH 2/4] kexecboot: fix configure warnings
+
+Makefile.am:5: warning: source file 'fstype/fstype.c' is in a subdirectory,
+Makefile.am:5: but option 'subdir-objects' is disabled
+automake: warning: possible forward-incompatibility.
+...
+Makefile.am:5: warning: source file 'machine/zaurus.c' is in a subdirectory,
+...
+
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 0ca4b81..66ec54e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1,7 +1,7 @@
+ AC_PREREQ(2.53)
+ AC_INIT([kexecboot], [0.6], [kexecboot-devel@linuxtogo.org])
+ AC_CANONICAL_HOST
+-AM_INIT_AUTOMAKE([-Wall foreign])
++AM_INIT_AUTOMAKE([-Wall foreign] [subdir-objects])
+ AC_CONFIG_SRCDIR(kexecboot.c)
+ AC_CONFIG_HEADERS(config.h)
+ AM_MAINTAINER_MODE
+-- 
+1.9.1
+

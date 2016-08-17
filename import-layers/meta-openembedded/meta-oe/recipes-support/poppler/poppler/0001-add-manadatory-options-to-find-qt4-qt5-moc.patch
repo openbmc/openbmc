@@ -1,0 +1,91 @@
+From 91b6275f0e91c25beb040b4ef9484053ae305d86 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Tue, 26 May 2015 12:45:47 +0200
+Subject: [PATCH] add manadatory options to find qt4/qt5 moc
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ configure.ac | 55 ++++++++-----------------------------------------------
+ 1 file changed, 8 insertions(+), 47 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 67599c0..40fa596 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -622,25 +622,10 @@ AC_SUBST(POPPLER_QT4_LIBS)
+ AC_SUBST(POPPLER_QT4_TEST_LIBS)
+ 
+ if test x$enable_poppler_qt4 = xyes; then
+-  AC_CHECK_TOOL(MOCQT4, moc)
+-  AC_MSG_CHECKING([for Qt4 moc])
+-  mocversion=`$MOCQT4 -v 2>&1`
+-  mocversiongrep=`echo $mocversion | grep "Qt 4"`
+-  if test x"$mocversiongrep" != x"$mocversion"; then
+-    AC_MSG_RESULT([no])
+-    # moc was not the qt4 one, try with moc-qt4
+-    AC_CHECK_TOOL(MOCQT42, moc-qt4)
+-    AC_MSG_CHECKING([for Qt4 moc-qt4])
+-    mocversion=`$MOCQT42 -v 2>&1`
+-    mocversiongrep=`echo $mocversion | grep "Qt 4"`
+-    if test x"$mocversiongrep" != x"$mocversion"; then
+-      # no valid moc found
+-      enable_poppler_qt4=no;
+-      MOCQT4="not found"
+-    else
+-      MOCQT4=$MOCQT42
+-    fi
+-  fi
++  AC_ARG_WITH([moc-qt4],
++              AS_HELP_STRING([--with-moc-qt4], [Set location of qt4 moc]),
++              [MOCQT4=$withval]
++  )
+   AC_SUBST(MOCQT4)
+   AC_MSG_RESULT([$MOCQT4])
+ fi
+@@ -679,34 +664,10 @@ AC_SUBST(POPPLER_QT5_LIBS)
+ AC_SUBST(POPPLER_QT5_TEST_LIBS)
+ 
+ if test x$enable_poppler_qt5 = xyes; then
+-  AC_CHECK_TOOL(MOCQT5, moc)
+-  AC_MSG_CHECKING([for Qt5 moc])
+-  mocversion=`$MOCQT5 -v 2>&1`
+-  mocversiongrep=`echo $mocversion | grep "Qt 5\|moc 5"`
+-  if test x"$mocversiongrep" != x"$mocversion"; then
+-    AC_MSG_RESULT([no])
+-    # moc was not the qt5 one, try with moc-qt5
+-    AC_CHECK_TOOL(MOCQT52, moc-qt5)
+-    AC_MSG_CHECKING([for Qt5 moc-qt5])
+-    mocversion=`$MOCQT52 -v 2>&1`
+-    mocversiongrep=`echo $mocversion | grep "Qt 5\|moc-qt5 5\|moc 5"`
+-    if test x"$mocversiongrep" != x"$mocversion"; then
+-      AC_CHECK_TOOL(QTCHOOSER, qtchooser)
+-      AC_MSG_CHECKING([for qtchooser])
+-      qt5tooldir=`QT_SELECT=qt5 qtchooser -print-env | grep QTTOOLDIR | cut -d '=' -f 2 | cut -d \" -f 2`
+-      mocversion=`$qt5tooldir/moc -v 2>&1`
+-      mocversiongrep=`echo $mocversion | grep "Qt 5\|moc 5"`
+-      if test x"$mocversiongrep" != x"$mocversion"; then
+-        # no valid moc found
+-        enable_poppler_qt5=no;
+-        MOCQT5="not found"
+-      else
+-        MOCQT5=$qt5tooldir/moc
+-      fi
+-    else
+-      MOCQT5=$MOCQT52
+-    fi
+-  fi
++  AC_ARG_WITH([moc-qt5],
++              AS_HELP_STRING([--with-moc-qt5], [Set location of qt5 moc]),
++              [MOCQT5=$withval]
++  )
+   AC_SUBST(MOCQT5)
+   AC_MSG_RESULT([$MOCQT5])
+ fi
+-- 
+1.9.3
+

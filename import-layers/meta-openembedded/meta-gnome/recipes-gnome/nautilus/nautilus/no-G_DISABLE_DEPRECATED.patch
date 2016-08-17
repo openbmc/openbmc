@@ -1,0 +1,44 @@
+From e7233d98c114b03c7c8b96d1f41770452da14aa7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmx.de>
+Date: Mon, 17 Oct 2011 00:59:01 +0200
+Subject: [PATCH] nautilus build fails for newer glib versions
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+build with glib-2.0 v2.30.0 run into errors for at least G_CONST_RETURN missing
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmx.de>
+---
+ configure.in    |    2 +-
+ eel/Makefile.am |    1 -
+ 2 files changed, 1 insertions(+), 2 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index 97e171e..859a097 100644
+--- a/configure.in
++++ b/configure.in
+@@ -342,7 +342,7 @@ AC_SUBST(CORE_CFLAGS)
+ CORE_LIBS="`$PKG_CONFIG --libs $CORE_MODULES` $x_libs"
+ AC_SUBST(CORE_LIBS)
+ 
+-DISABLE_DEPRECATED_CFLAGS="-DG_DISABLE_DEPRECATED -DGDK_PIXBUF_DISABLE_DEPRECATED"
++DISABLE_DEPRECATED_CFLAGS="-DGDK_PIXBUF_DISABLE_DEPRECATED"
+ AC_SUBST(DISABLE_DEPRECATED_CFLAGS)
+ 
+ dnl Multimedia keys
+diff --git a/eel/Makefile.am b/eel/Makefile.am
+index b1fe356..c1d56cd 100644
+--- a/eel/Makefile.am
++++ b/eel/Makefile.am
+@@ -10,7 +10,6 @@ INCLUDES =						\
+ 	-DDATADIR=\""$(datadir)"\"			\
+ 	-DSOURCE_DATADIR=\""$(top_srcdir)/data"\"	\
+ 	-DGNOMELOCALEDIR=\""$(prefix)/${DATADIRNAME}/locale"\"	\
+-	-DG_DISABLE_DEPRECATED				\
+ 	-DGDK_PIXBUF_DISABLE_DEPRECATED			\
+ 	-DGMENU_I_KNOW_THIS_IS_UNSTABLE			\
+ 	$(NULL)
+-- 
+1.7.4.4
+

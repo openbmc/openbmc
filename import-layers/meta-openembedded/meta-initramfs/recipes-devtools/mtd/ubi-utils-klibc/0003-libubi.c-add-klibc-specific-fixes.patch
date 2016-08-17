@@ -1,0 +1,76 @@
+From 72a39bb3290a79e76b0dbf59eef83ea2d9b577a1 Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Sun, 29 Jun 2014 00:40:15 +0200
+Subject: [PATCH 3/6] libubi.c: add klibc specific fixes for ioctl
+
+First issue is that ioctl() in klibc doesn't expect a constant as arg3.
+Second issue is that arg3 in klibc ioctl() implementation is not optional.
+
+Fixes:
+
+| ubi-utils/libubi.c: In function 'do_attach':
+| ubi-utils/libubi.c:698:8: warning: passing argument 3 of 'ioctl' discards
+| 'const' qualifier from pointer target type
+|   ret = ioctl(fd, UBI_IOCATT, r);
+|         ^
+| In file included from ubi-utils/libubi.c:32:0:
+| .../lib/klibc/include/sys/ioctl.h:15:14: note: expected 'void *' but argument
+| is of type 'const struct ubi_attach_req *'
+|  __extern int ioctl(int, int, void *);
+|               ^
+
+| ubi-utils/libubi.c: In function 'ubi_vol_block_create':
+| ubi-utils/libubi.c:1118:9: error: too few arguments to function 'ioctl'
+|   return ioctl(fd, UBI_IOCVOLCRBLK);
+|          ^
+| In file included from ubi-utils/libubi.c:32:0:
+| .../lib/klibc/include/sys/ioctl.h:15:14: note: declared here
+|  __extern int ioctl(int, int, void *);
+|               ^
+| ubi-utils/libubi.c: In function 'ubi_vol_block_remove':
+| ubi-utils/libubi.c:1123:9: error: too few arguments to function 'ioctl'
+|   return ioctl(fd, UBI_IOCVOLRMBLK);
+|          ^
+| In file included from ubi-utils/libubi.c:32:0:
+| .../usr/lib/klibc/include/sys/ioctl.h:15:14: note: declared here
+|  __extern int ioctl(int, int, void *);
+|               ^
+
+Upstream-Status: Inappropriate [klibc specific]
+
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+---
+ ubi-utils/libubi.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/ubi-utils/libubi.c b/ubi-utils/libubi.c
+index 1e08b7d..491e525 100644
+--- a/ubi-utils/libubi.c
++++ b/ubi-utils/libubi.c
+@@ -687,7 +687,7 @@ void libubi_close(libubi_t desc)
+  * success and %-1 in case of failure. @r->ubi_num contains newly created UBI
+  * device number.
+  */
+-static int do_attach(const char *node, const struct ubi_attach_req *r)
++static int do_attach(const char *node, struct ubi_attach_req *r)
+ {
+ 	int fd, ret;
+ 
+@@ -1115,12 +1115,12 @@ int ubi_rsvol(libubi_t desc, const char *node, int vol_id, long long bytes)
+ 
+ int ubi_vol_block_create(int fd)
+ {
+-	return ioctl(fd, UBI_IOCVOLCRBLK);
++	return ioctl(fd, UBI_IOCVOLCRBLK, NULL);
+ }
+ 
+ int ubi_vol_block_remove(int fd)
+ {
+-	return ioctl(fd, UBI_IOCVOLRMBLK);
++	return ioctl(fd, UBI_IOCVOLRMBLK, NULL);
+ }
+ 
+ int ubi_update_start(libubi_t desc, int fd, long long bytes)
+-- 
+1.9.1
+

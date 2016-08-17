@@ -1,0 +1,28 @@
+[PATCH] define the collectd dependence
+
+Upstream-Status: Pending
+
+libavltree.la libcommon.la libheap.la are created dynamically, and in LDADD,
+but not in DEPENDENCIES
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ src/daemon/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/daemon/Makefile.am b/src/daemon/Makefile.am
+index 10860ec..7f826e3 100644
+--- a/src/daemon/Makefile.am
++++ b/src/daemon/Makefile.am
+@@ -49,7 +49,7 @@ collectd_CPPFLAGS =  $(AM_CPPFLAGS) $(LTDLINCL)
+ collectd_CFLAGS = $(AM_CFLAGS)
+ collectd_LDFLAGS = -export-dynamic
+ collectd_LDADD = libavltree.la libcommon.la libheap.la -lm
+-collectd_DEPENDENCIES =
++collectd_DEPENDENCIES = libavltree.la libcommon.la libheap.la
+ 
+ # Link to these libraries..
+ if BUILD_WITH_LIBRT
+-- 
+1.9.1
+

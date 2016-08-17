@@ -1,0 +1,34 @@
+Signed-off-by: Jun Zhu <R01007@freescale.com>
+
+Upstream-Status:  Not applicable
+
+diff -Nru obexftp-0.23/apps.orig/obexftpd.c obexftp-0.23/apps/obexftpd.c
+--- obexftp-0.23/apps.orig/obexftpd.c	2013-11-08 10:42:20.816631583 +0800
++++ obexftp-0.23/apps/obexftpd.c	2013-11-08 10:44:18.628634893 +0800
+@@ -639,7 +639,7 @@
+ 	struct stat statbuf;
+ 	//char *namebuf = NULL;
+ 
+-	fprintf(stderr, "put_done>>>\n");
++	//fprintf(stderr, "put_done>>>\n");
+ 	while(OBEX_ObjectGetNextHeader(handle, object, &hi, &hv, &hlen))	{
+ 		switch(hi)	{
+ 		case OBEX_HDR_BODY:
+@@ -671,7 +671,7 @@
+ 		}
+ 	}
+ 	if(!body)	{
+-		printf("Got a PUT without a body\n");
++		//printf("Got a PUT without a body\n");
+ 		OBEX_ObjectSetRsp(object, OBEX_RSP_CONTINUE, OBEX_RSP_SUCCESS);
+ 	}
+ 	if(!name)	{
+@@ -807,7 +807,7 @@
+ 			
+ 		switch(obex_cmd) {
+ 		case OBEX_CMD_PUT:
+-			fprintf(stderr, "obex_ev_progress: obex_cmd_put\n");
++			//fprintf(stderr, "obex_ev_progress: obex_cmd_put\n");
+ 			put_done(handle, obj, 0);
+ 			break;
+ 		default:

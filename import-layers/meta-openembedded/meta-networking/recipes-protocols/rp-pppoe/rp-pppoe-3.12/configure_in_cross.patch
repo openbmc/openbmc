@@ -1,0 +1,156 @@
+From cab02076afb808a43c6ff3d7b1c64e71f5a1b397 Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@cn.fujitsu.com>
+Date: Wed, 19 Aug 2015 12:17:03 +0900
+Subject: [PATCH] configure in cross
+
+Update the configure script to cross-compiling with OE.  This hard-codes
+a few target paths, reworks a few tests to be more friendly for cross
+and drops other tests.
+
+Upstream-Status: Inappropriate [build system specific changes]
+
+---
+ src/configure.in | 66 ++++++++++++++------------------------------------------
+ 1 file changed, 16 insertions(+), 50 deletions(-)
+
+diff --git a/src/configure.in b/src/configure.in
+index e194295..82d64d6 100644
+--- a/src/configure.in
++++ b/src/configure.in
+@@ -5,6 +5,13 @@ AC_INIT(pppoe.c)
+ dnl pppd directory for kernel-mode PPPoE
+ PPPD_DIR=ppp-2.4.1.pppoe2
+ 
++dnl hard code some paths
++PPPD=/usr/sbin/pppd
++ID=/usr/bin/id
++ECHO=/bin/echo
++AC_ARG_VAR(PPPD)
++AC_ARG_VAR(ID)
++
+ AC_CONFIG_HEADER(config.h)
+ 
+ AC_PREFIX_DEFAULT(/usr)
+@@ -45,7 +52,7 @@ ac_cv_struct_sockaddr_ll=no)
+ AC_MSG_RESULT($ac_cv_struct_sockaddr_ll)
+ 
+ if test "$ac_cv_struct_sockaddr_ll" = yes ; then
+-AC_DEFINE(HAVE_STRUCT_SOCKADDR_LL)
++AC_DEFINE([HAVE_STRUCT_SOCKADDR_LL], [], [Have struct SOCKADDR_LL])
+ fi
+ 
+ dnl Check for N_HDLC line discipline
+@@ -56,7 +63,7 @@ AC_TRY_COMPILE([#include <linux/termios.h>],
+ 	ac_cv_n_hdlc=no)
+ AC_MSG_RESULT($ac_cv_n_hdlc)
+ if test "$ac_cv_n_hdlc" = yes ; then
+-AC_DEFINE(HAVE_N_HDLC)
++AC_DEFINE([HAVE_N_HDLC], [], [Have N_HDLC])
+ fi
+ 
+ AC_ARG_ENABLE(plugin, [  --enable-plugin=pppd_src_path   build pppd plugin], ac_cv_pluginpath=$enableval, ac_cv_pluginpath=no)
+@@ -104,7 +111,7 @@ PPPD_INCDIR=""
+ if test "$ac_cv_header_linux_if_pppox_h" = yes ; then
+ 	if test "$ac_cv_pluginpath" != no ; then
+ 		LINUX_KERNELMODE_PLUGIN=rp-pppoe.so
+-		AC_DEFINE(HAVE_LINUX_KERNEL_PPPOE)
++		AC_DEFINE([HAVE_LINUX_KERNEL_PPPOE], [], [Have kernel PPPoE])
+ 		PPPD_INCDIR=$ac_cv_pluginpath
+ 	fi
+ fi
+@@ -114,7 +121,7 @@ if test "$PPPD_INCDIR" = "" ; then
+ fi
+ 
+ if test "$ac_cv_debugging" = "yes" ; then
+-   AC_DEFINE(DEBUGGING_ENABLED)
++   AC_DEFINE([DEBUGGING_ENABLED], [], [Debugging enabled])
+ fi
+ 
+ AC_SUBST(LINUX_KERNELMODE_PLUGIN)
+@@ -140,15 +147,8 @@ AC_CHECK_SIZEOF(unsigned short)
+ AC_CHECK_SIZEOF(unsigned int)
+ AC_CHECK_SIZEOF(unsigned long)
+ 
+-dnl Check for location of pppd
+-AC_PATH_PROG(PPPD, pppd, NOTFOUND, $PATH:/sbin:/usr/sbin:/usr/local/sbin)
+-AC_PATH_PROG(ECHO, echo, echo)
+-
+-dnl Check for setsid (probably Linux-specific)
+-AC_PATH_PROG(SETSID, setsid, "", $PATH:/sbin:/usr/sbin:/usr/local/sbin)
+-
+ dnl Check for an "id" which accepts "-u" option -- hack for Solaris.
+-AC_PATH_PROG(ID, id, "", /usr/xpg4/bin:$PATH)
++dnl AC_PATH_PROG(ID, id, "", /usr/xpg4/bin:$PATH)
+ 
+ dnl Check for Linux-specific kernel support for PPPoE
+ AC_MSG_CHECKING(for Linux 2.4.X kernel-mode PPPoE support)
+@@ -193,44 +193,8 @@ if test "$GCC" = yes; then
+ 	CFLAGS="$CFLAGS -fno-strict-aliasing -Wall -Wstrict-prototypes"
+ fi
+ 
+-dnl If we couldn't find pppd, die
+-if test "$PPPD" = "NOTFOUND"; then
+-        AC_MSG_WARN([*** Oops!  I couldn't find pppd, the PPP daemon anywhere.])
+-	AC_MSG_WARN([*** You must install pppd, version 2.3.10 or later.])
+-	AC_MSG_WARN([*** I will keep going, but it may not work.])
+-	PPPD=pppd
+-fi
+-
+-dnl Figure out pppd version.  2.3.7 to 2.3.9 -- issue warning.  Less than
+-dnl 2.3.7 -- stop
+-
+-PPPD_VERSION=`$PPPD --version 2>&1 | awk ' /version/ {print $NF}'`
+-
+-case "$PPPD_VERSION" in
+-1.*|2.0.*|2.1.*|2.2.*|2.3.0|2.3.1|2.3.2|2.3.3|2.3.4|2.3.5|2.3.6)
+-	AC_MSG_WARN([*** Oops! Your version of pppd is $PPPD_VERSION, which is too old.])
+-	AC_MSG_WARN([*** You need at least 2.3.7 (2.3.10 or newer recommended.])
+-	AC_MSG_WARN([*** I will keep going, but it may not work.])
+-	;;
+-
+-2.3.7|2.3.8|2.3.9)
+-	AC_MSG_WARN([*** Warning.  Your version of pppd is $PPPD_VERSION.  You will])
+-	AC_MSG_WARN([*** not be able to use connect-on-demand.  Upgrade to pppd])
+-	AC_MSG_WARN([*** 2.3.10 or newer if you need connect-on-demand.])
+-	;;
+-
+-2*|3*|4*|5*|6*|7*|8*|9*)
+-	;;
+-
+-*)
+-	AC_MSG_WARN([*** Oops.  I cannot figure out what version of pppd you have.])
+-	AC_MSG_WARN([*** All I got back was '$PPPD_VERSION'])
+-	AC_MSG_WARN([*** I will keep going, but it may not work.])
+-	;;
+-esac
+-
+ dnl Figure out packing order of structures
+-AC_MSG_CHECKING([packing order of bit fields])
++AC_CACHE_CHECK([packing order of bit fields],rpppoe_cv_pack_bitfields,[
+ if test "${rpppoe_cv_pack_bitfields+set}" != set ; then
+ AC_TRY_RUN([
+ union foo {
+@@ -257,10 +221,11 @@ main(void)
+ }], rpppoe_cv_pack_bitfields=normal, rpppoe_cv_pack_bitfields=rev,
+ $ECHO "no defaults for cross-compiling"; exit 0)
+ fi
++])
+ 
+ if test "$rpppoe_cv_pack_bitfields" = "rev" ; then
+ 	AC_MSG_RESULT(reversed)
+-	AC_DEFINE(PACK_BITFIELDS_REVERSED)
++	AC_DEFINE([PACK_BITFIELDS_REVERSED], [], [Reversed bitfields])
+ else
+ 	AC_MSG_RESULT(normal)
+ fi
+@@ -324,6 +289,7 @@ AC_SUBST(PPPOE_SERVER_DEPS)
+ AC_SUBST(RDYNAMIC)
+ AC_SUBST(LIBEVENT)
+ AC_SUBST(ECHO)
++AC_SUBST(HAVE_STRUCT_SOCKADDR_LL)
+ AC_SUBST(LDFLAGS)
+ 
+ datadir_evaluated=`eval echo $datadir`
+-- 
+1.8.4.2
+

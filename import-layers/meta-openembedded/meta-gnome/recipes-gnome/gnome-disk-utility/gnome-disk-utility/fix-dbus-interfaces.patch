@@ -1,0 +1,34 @@
+Index: gnome-disk-utility-2.32.0/src/gdu/Makefile.am
+===================================================================
+--- gnome-disk-utility-2.32.0.orig/src/gdu/Makefile.am	2011-08-20 01:59:16.000000000 +0400
++++ gnome-disk-utility-2.32.0/src/gdu/Makefile.am	2011-08-20 02:08:18.000000000 +0400
+@@ -14,20 +14,20 @@
+ gdu-marshal.c: gdu-marshal.list
+	echo "#include \"gdu-marshal.h\"" > $@ && glib-genmarshal $< --prefix=gdu_marshal --body >> $@
+
+-udisks-daemon-glue.h: /usr/share/dbus-1/interfaces/org.freedesktop.UDisks.xml Makefile.am
+-	dbus-binding-tool --prefix=devkit_disks_daemon --mode=glib-client --output=udisks-daemon-glue.h /usr/share/dbus-1/interfaces/org.freedesktop.UDisks.xml
++udisks-daemon-glue.h: $(PKG_CONFIG_SYSROOT_DIR)/usr/share/dbus-1/interfaces/org.freedesktop.UDisks.xml Makefile.am
++	dbus-binding-tool --prefix=devkit_disks_daemon --mode=glib-client --output=udisks-daemon-glue.h $(PKG_CONFIG_SYSROOT_DIR)/usr/share/dbus-1/interfaces/org.freedesktop.UDisks.xml
+
+-udisks-device-glue.h: /usr/share/dbus-1/interfaces/org.freedesktop.UDisks.Device.xml Makefile.am
+-	dbus-binding-tool --prefix=devkit_disks_daemon --mode=glib-client --output=udisks-device-glue.h /usr/share/dbus-1/interfaces/org.freedesktop.UDisks.Device.xml
++udisks-device-glue.h: $(PKG_CONFIG_SYSROOT_DIR)/usr/share/dbus-1/interfaces/org.freedesktop.UDisks.Device.xml Makefile.am
++	dbus-binding-tool --prefix=devkit_disks_daemon --mode=glib-client --output=udisks-device-glue.h $(PKG_CONFIG_SYSROOT_DIR)/usr/share/dbus-1/interfaces/org.freedesktop.UDisks.Device.xml
+
+-udisks-adapter-glue.h: /usr/share/dbus-1/interfaces/org.freedesktop.UDisks.Adapter.xml Makefile.am
+-	dbus-binding-tool --prefix=devkit_disks_daemon --mode=glib-client --output=udisks-adapter-glue.h /usr/share/dbus-1/interfaces/org.freedesktop.UDisks.Adapter.xml
++udisks-adapter-glue.h: $(PKG_CONFIG_SYSROOT_DIR)/usr/share/dbus-1/interfaces/org.freedesktop.UDisks.Adapter.xml Makefile.am
++	dbus-binding-tool --prefix=devkit_disks_daemon --mode=glib-client --output=udisks-adapter-glue.h $(PKG_CONFIG_SYSROOT_DIR)/usr/share/dbus-1/interfaces/org.freedesktop.UDisks.Adapter.xml
+
+-udisks-expander-glue.h: /usr/share/dbus-1/interfaces/org.freedesktop.UDisks.Expander.xml Makefile.am
+-	dbus-binding-tool --prefix=devkit_disks_daemon --mode=glib-client --output=udisks-expander-glue.h /usr/share/dbus-1/interfaces/org.freedesktop.UDisks.Expander.xml
++udisks-expander-glue.h: $(PKG_CONFIG_SYSROOT_DIR)/usr/share/dbus-1/interfaces/org.freedesktop.UDisks.Expander.xml Makefile.am
++	dbus-binding-tool --prefix=devkit_disks_daemon --mode=glib-client --output=udisks-expander-glue.h $(PKG_CONFIG_SYSROOT_DIR)/usr/share/dbus-1/interfaces/org.freedesktop.UDisks.Expander.xml
+
+-udisks-port-glue.h: /usr/share/dbus-1/interfaces/org.freedesktop.UDisks.Port.xml Makefile.am
+-	dbus-binding-tool --prefix=devkit_disks_daemon --mode=glib-client --output=udisks-port-glue.h /usr/share/dbus-1/interfaces/org.freedesktop.UDisks.Port.xml
++udisks-port-glue.h: $(PKG_CONFIG_SYSROOT_DIR)/usr/share/dbus-1/interfaces/org.freedesktop.UDisks.Port.xml Makefile.am
++	dbus-binding-tool --prefix=devkit_disks_daemon --mode=glib-client --output=udisks-port-glue.h $(PKG_CONFIG_SYSROOT_DIR)/usr/share/dbus-1/interfaces/org.freedesktop.UDisks.Port.xml
+
+ lib_LTLIBRARIES=libgdu.la

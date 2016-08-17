@@ -1,0 +1,37 @@
+Add udevdir/udevrulesdir options
+
+Upstream-Status: Inappropriate [configuration]
+Signed-off-by: Constantin Musca <constantinx.musca@intel.com>
+
+Index: bluez-4.101/Makefile.am
+===================================================================
+--- bluez-4.101.orig/Makefile.am
++++ bluez-4.101/Makefile.am
+@@ -395,7 +395,7 @@ EXTRA_DIST += audio/bluetooth.conf
+ include Makefile.tools
+ 
+ if DATAFILES
+-rulesdir = @UDEV_DIR@/rules.d
++rulesdir = @UDEV_RULES_DIR@
+ 
+ udev_files =
+ 
+Index: bluez-4.101/configure.ac
+===================================================================
+--- bluez-4.101.orig/configure.ac
++++ bluez-4.101/configure.ac
+@@ -61,4 +61,14 @@ if (test -n "${path_systemdunit}"); then
+ fi
+ AM_CONDITIONAL(SYSTEMD, test -n "${path_systemdunit}")
+ 
++AC_ARG_WITH([udevdir],
++    AS_HELP_STRING([--with-udevdir=DIR], [udev directory]),
++    [], [with_udevdir=/lib/udev/])
++AC_SUBST([UDEV_DIR], [$with_udevdir])
++
++AC_ARG_WITH([udevrulesdir],
++    AS_HELP_STRING([--with-udevrulesdir=DIR], [udev rules directory]),
++    [], [with_udevrulesdir=/lib/udev/rules.d])
++AC_SUBST([UDEV_RULES_DIR], [$with_udevrulesdir])
++
+ AC_OUTPUT(Makefile doc/version.xml src/bluetoothd.8 src/bluetooth.service bluez.pc)

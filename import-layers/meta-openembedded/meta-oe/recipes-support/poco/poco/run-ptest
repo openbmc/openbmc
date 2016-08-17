@@ -1,0 +1,9 @@
+#!/bin/sh
+while read runner; do
+  pushd . >/dev/null
+  cd bin
+  echo Testing $runner
+  ./$runner-testrunner -all
+  popd >/dev/null
+done < testrunners
+

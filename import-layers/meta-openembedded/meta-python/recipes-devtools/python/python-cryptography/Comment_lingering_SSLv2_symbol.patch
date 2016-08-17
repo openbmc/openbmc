@@ -1,0 +1,24 @@
+From f326e4a97cce6b9479560ce0c65ad18d54393f96 Mon Sep 17 00:00:00 2001
+From: Cory Benfield <lukasaoz@gmail.com>
+Date: Mon, 14 Dec 2015 15:37:46 +0000
+Subject: [PATCH] Comment lingering SSLv2 symbol.
+
+---
+ src/_cffi_src/openssl/ssl.py | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+Index: cryptography-1.1/src/_cffi_src/openssl/ssl.py
+===================================================================
+--- cryptography-1.1.orig/src/_cffi_src/openssl/ssl.py
++++ cryptography-1.1/src/_cffi_src/openssl/ssl.py
+@@ -421,6 +421,10 @@ const long SSL_OP_LEGACY_SERVER_CONNECT
+ static const long Cryptography_HAS_SECURE_RENEGOTIATION = 1;
+ #endif
+ 
++/* Cryptography now compiles out all SSLv2 bindings. This exists to allow
++ * clients that use it to check for SSLv2 support to keep functioning as
++ * expected.
++ */
+ static const long Cryptography_HAS_SSL2 = 0;
+ 
+ #ifdef OPENSSL_NO_SSL3_METHOD

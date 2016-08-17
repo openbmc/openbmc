@@ -1,0 +1,43 @@
+Imported from Debian 0.1.8-3
+
+Upstream-Status: Pending
+
+Index: trunk/src/PDFDocument.cxx
+===================================================================
+--- trunk/src/PDFDocument.cxx	(revision 361)
++++ trunk/src/PDFDocument.cxx	(revision 367)
+@@ -21,4 +21,5 @@
+ #include <poppler.h>
+ #include <unistd.h>
++#include <algorithm>
+ #include "epdfview.h"
+ 
+@@ -33,4 +34,22 @@
+ static PageMode convertPageMode (gint pageMode);
+ static gchar *getAbsoluteFileName (const gchar *fileName);
++
++namespace
++{
++    void
++    convert_bgra_to_rgba (guint8 *data, int width, int height)
++    {
++        using std::swap;
++
++        for (int y = 0; y < height; y++)
++        {
++            for (int x = 0; x < width; x++)
++            {
++                swap(data[0], data[2]);
++                data += 4;
++            }
++        }
++    }
++}
+ 
+ ///
+@@ -651,4 +670,5 @@
+         cairo_destroy(context);
+         cairo_surface_destroy (surface);
++        convert_bgra_to_rgba(renderedPage->getData (), width, height);
+ #else // !HAVE_POPPLER_0_17_0
+         // Create the pixbuf from the data and render to it.

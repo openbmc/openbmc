@@ -1,0 +1,42 @@
+The contrib directory now contains its own Makefile which is
+used during installation. It was required to pass DESTDIR through
+when it gets called from the base Makefile.
+
+Upstream-Status: Pending
+
+Signed-off-by: Kevin Strasser <kevin.strasser@linux.intel.com>
+---
+ Makefile.in         |    2 +-
+ contrib/Makefile.in |    6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 5b2e683..ee72fe1 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -120,7 +120,7 @@ install-modules: $(DESTDIR)$(libexecdir) $(DESTDIR)$(sysconfdir)
+ 	test -z "$(SHARED_MODULE_OBJS)" -a -z "$(SHARED_MODULE_DIRS)" -a -z "$(STATIC_MODULE_DIRS)" || (cd modules/ && $(MAKE) install)
+ 
+ install-utils: $(DESTDIR)$(sbindir) $(DESTDIR)$(bindir)
+-	cd contrib/ && $(MAKE) install-utils
++	cd contrib/ && $(MAKE) DESTDIR=${DESTDIR} install-utils
+ 	$(INSTALL_BIN)  ftpcount $(DESTDIR)$(bindir)/ftpcount
+ 	$(INSTALL_BIN)  ftpdctl  $(DESTDIR)$(bindir)/ftpdctl
+ 	$(INSTALL_SBIN) ftpscrub $(DESTDIR)$(sbindir)/ftpscrub
+diff --git a/contrib/Makefile.in b/contrib/Makefile.in
+index 5bcc038..51d248c 100644
+--- a/contrib/Makefile.in
++++ b/contrib/Makefile.in
+@@ -18,6 +18,6 @@ Makefile: Makefile.in ../config.status
+ 	cd ../ && ./config.status
+ 
+ install-utils:
+-	$(INSTALL) -o $(INSTALL_USER) -g $(INSTALL_GROUP) -m 0755 ftpasswd $(DESTDIR)$(bindir)/ftpasswd
+-	$(INSTALL) -o $(INSTALL_USER) -g $(INSTALL_GROUP) -m 0755 ftpmail $(DESTDIR)$(bindir)/ftpmail
+-	$(INSTALL) -o $(INSTALL_USER) -g $(INSTALL_GROUP) -m 0755 ftpquota $(DESTDIR)$(bindir)/ftpquota
++	$(INSTALL) -m 0755 ftpasswd $(DESTDIR)$(bindir)/ftpasswd
++	$(INSTALL) -m 0755 ftpmail $(DESTDIR)$(bindir)/ftpmail
++	$(INSTALL) -m 0755 ftpquota $(DESTDIR)$(bindir)/ftpquota
+-- 
+1.7.9.5
+

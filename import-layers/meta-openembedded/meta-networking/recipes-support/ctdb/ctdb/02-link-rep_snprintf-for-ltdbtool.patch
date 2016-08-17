@@ -1,0 +1,16 @@
+link rep_snprintf from lib/replace/snprintf.o for ltdbtool
+
+Signed-off-by: Bian Naimeng <biannm@cn.fujitsu.com>
+
+diff -Nurp ctdb-2.5.1.orig/Makefile.in ctdb-2.5.1/Makefile.in
+--- ctdb-2.5.1.orig/Makefile.in	2015-05-07 16:43:39.276000236 +0900
++++ ctdb-2.5.1/Makefile.in	2015-05-07 16:44:09.627000237 +0900
+@@ -170,7 +170,7 @@ bin/ctdb: $(CTDB_CLIENT_OBJ) tools/ctdb.
+ 	@echo Linking $@
+ 	$(WRAPPER) $(CC) $(CFLAGS) -o $@ tools/ctdb.o tools/ctdb_vacuum.o $(CTDB_CLIENT_OBJ) $(LIB_FLAGS)
+ 
+-bin/ltdbtool: tools/ltdbtool.o $(TDB_OBJ)
++bin/ltdbtool: tools/ltdbtool.o $(TDB_OBJ) lib/replace/snprintf.o
+ 	@echo Linking $@
+ 	$(WRAPPER) $(CC) $(CFLAGS) -o $@ $+ $(TDB_LIBS) $(LIB_FLAGS)
+ 

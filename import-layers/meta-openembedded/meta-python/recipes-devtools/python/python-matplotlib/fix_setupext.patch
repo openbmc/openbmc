@@ -1,0 +1,40 @@
+This fixes the numpy import problem in setupext.py using a hard-coded path.
+
+Index: matplotlib-1.1.0/setupext.py
+===================================================================
+--- matplotlib-1.1.0.orig/setupext.py
++++ matplotlib-1.1.0/setupext.py
+@@ -122,8 +122,8 @@ numpy_inc_dirs = []
+ # matplotlib build options, which can be altered using setup.cfg
+ options = {'display_status': True,
+            'verbose': False,
+-           'provide_pytz': 'auto',
+-           'provide_dateutil': 'auto',
++           'provide_pytz': False,
++           'provide_dateutil': False,
+            'build_agg': True,
+            'build_gtk': 'auto',
+            'build_gtkagg': 'auto',
+@@ -176,10 +176,7 @@ if os.path.exists(setup_cfg):
+     except: pass
+ 
+ # For get_base_flags:
+-if options['basedirlist']:
+-    basedirlist = options['basedirlist'].split()
+-else:
+-    basedirlist = basedir[sys.platform]
++basedirlist = [os.environ['STAGING_LIBDIR']]
+ print("basedirlist is: %s" % basedirlist)
+ 
+ if options['display_status']:
+@@ -555,8 +552,8 @@ def check_for_numpy():
+ 
+ def add_numpy_flags(module):
+     "Add the modules flags to build extensions which use numpy"
+-    import numpy
+-    module.include_dirs.append(numpy.get_include())
++    # Hard-coded path for OE since I know this is where numpy's include dir will be
++    module.include_dirs.append(os.path.join(os.environ['STAGING_LIBDIR'], 'python2.7/site-packages/numpy/core/include/'))
+ 
+ def add_png_flags(module):
+     try_pkgconfig(module, 'libpng', 'png')

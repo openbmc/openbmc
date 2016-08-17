@@ -1,0 +1,36 @@
+From 391e0fc6c90ced6656b74f50f3a487b6dc76ea63 Mon Sep 17 00:00:00 2001
+From: Michael Niedermayer <michaelni@gmx.at>
+Date: Thu, 29 Nov 2012 15:18:17 +0100
+Subject: [PATCH] roqvideodec: check dimensions validity
+
+Upstream-Status: Backport
+
+Commit 391e0fc6c90ced6656b74f50f3a487b6dc76ea63 release/0.7
+
+Found-by: Mateusz "j00ru" Jurczyk and Gynvael Coldwind
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+(cherry picked from commit 3ae610451170cd5a28b33950006ff0bd23036845)
+
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+---
+ libavcodec/roqvideodec.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/libavcodec/roqvideodec.c b/libavcodec/roqvideodec.c
+index f0977f6..4e34231 100644
+--- a/gst-libs/ext/libav/libavcodec/roqvideodec.c
++++ b/gst-libs/ext/libav/libavcodec/roqvideodec.c
+@@ -157,6 +157,12 @@ static av_cold int roq_decode_init(AVCodecContext *avctx)
+     RoqContext *s = avctx->priv_data;
+ 
+     s->avctx = avctx;
++
++    if (avctx->width%16 || avctx->height%16) {
++         av_log_ask_for_sample(avctx, "dimensions not being a multiple of 16 are unsupported\n");
++         return AVERROR_PATCHWELCOME;
++    }
++
+     s->width = avctx->width;
+     s->height = avctx->height;
+     avcodec_get_frame_defaults(&s->frames[0]);
+-- 

@@ -1,0 +1,36 @@
+From fc2bd592ad17d1c2a2a989750e69dfaedc28c633 Mon Sep 17 00:00:00 2001
+From: Qian Lei <qianl.fnst@cn.fujitsu.com>
+Date: Fri, 9 Jan 2015 10:40:29 +0800
+Subject: [PATCH] Fix macro error
+
+compile error when build on almost all architectures.
+
+Upstream-Status: Pending
+Signed-off-by: Qian Lei <qianl.fnst@cn.fujitsu.com>
+---
+ iface.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/iface.c b/iface.c
+index 5951d81..27793f0 100644
+--- a/iface.c
++++ b/iface.c
+@@ -43,7 +43,14 @@
+        __result; }))
+ #endif
+ 
+-#define	UTEMPTER_DEFAULT_PATHNAME	LIBEXECDIR "/utempter/utempter"
++#ifdef  LIBEXECDIR
++#  define CAT_PATH(DIR1,DIR2)           DIR1##DIR2
++#  define RAW_UTEMPTER_PATH             CAT_PATH(LIBEXECDIR,/utempter/utempter)
++#else
++#  define RAW_UTEMPTER_PATH             /usr/lib/libtempter/utempter/utempter
++#endif
++#define STR_PATH(RAW_STR)               #RAW_STR
++#define UTEMPTER_DEFAULT_PATHNAME       STR_PATH(RAW_UTEMPTER_PATH)
+ 
+ static const char *utempter_pathname;
+ static int saved_fd = -1;
+-- 
+1.8.3.1
+

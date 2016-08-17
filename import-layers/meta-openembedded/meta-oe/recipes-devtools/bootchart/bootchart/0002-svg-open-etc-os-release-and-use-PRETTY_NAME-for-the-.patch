@@ -1,0 +1,39 @@
+From e3adb4c312c6ba3491b7c173559efac7a53e5abc Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen@dominion.thruhere.net>
+Date: Sun, 20 May 2012 22:12:29 +0200
+Subject: [PATCH 2/2] svg: open /etc/os-release and use PRETTY_NAME for the
+ 'Build' name
+
+Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
+---
+
+Upstream-Status: Submitted
+
+ svg.c |   11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/svg.c b/svg.c
+index 53724b2..c675d84 100644
+--- a/svg.c
++++ b/svg.c
+@@ -194,6 +194,17 @@ void svg_title(void)
+ 		fclose(f);
+ 	}
+ 
++	f = fopen("/etc/os-release", "r");
++	if(f) {
++		while (fgets(buf, 255, f)) {
++			if (strstr(buf, "PRETTY_NAME=")) {
++				strncpy(build, &buf[12], 255);
++				break;
++			}
++		}
++		fclose(f);
++	}
++
+ 	svg("<text class=\"t1\" x=\"0\" y=\"30\">Bootchart for %s - %s</text>\n",
+ 	    uts.nodename, date);
+ 	svg("<text class=\"t2\" x=\"20\" y=\"50\">System: %s %s %s %s</text>\n",
+-- 
+1.7.10
+

@@ -1,0 +1,35 @@
+From 14d51cbefef19737e7ab2b6818ee1d3bdb248d12 Mon Sep 17 00:00:00 2001
+From: Jeremy Stashluk <jstashluk@dekaresearch.com>
+Date: Wed, 6 Feb 2013 09:59:48 -0500
+Subject: [PATCH] conditional gl framebuffer undefined use
+
+The OpenGL extension GL_ARB_framebuffer_object defines the macro
+GL_FRAMEBUFFER_UNDEFINED. The macro will only need to map to an error
+string if the extension provides functions that might return the macro.
+
+Upstream-Status: Pending
+
+Signed-off-by: Jeremy Stashluk <jstashluk@dekaresearch.com>
+---
+ gst-libs/gst/gl/gstgldisplay.c |    2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/gst-libs/gst/gl/gstgldisplay.c b/gst-libs/gst/gl/gstgldisplay.c
+index 3ed0b71..64c6c2c 100644
+--- a/gst-libs/gst/gl/gstgldisplay.c
++++ b/gst-libs/gst/gl/gstgldisplay.c
+@@ -2177,9 +2177,11 @@ gst_gl_display_check_framebuffer_status (void)
+       GST_ERROR ("GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS");
+       break;
+ 
++#if defined(GL_ARB_framebuffer_object)
+     case GL_FRAMEBUFFER_UNDEFINED:
+       GST_ERROR ("GL_FRAMEBUFFER_UNDEFINED");
+       break;
++#endif
+ 
+     default:
+       GST_ERROR ("General FBO error");
+-- 
+1.7.9.5
+

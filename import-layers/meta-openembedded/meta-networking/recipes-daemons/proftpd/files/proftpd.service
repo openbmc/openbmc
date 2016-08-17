@@ -1,0 +1,7 @@
+[Unit]
+Description=proftpd Daemon
+
+[Service]
+Type=forking
+ExecStart=-@SBINDIR@/proftpd -c @SYSCONFDIR@/proftpd.conf
+StandardError=syslog

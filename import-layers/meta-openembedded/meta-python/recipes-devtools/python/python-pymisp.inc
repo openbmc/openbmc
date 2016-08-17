@@ -1,0 +1,10 @@
+DESCRIPTION = "Python API for MISP"
+HOMEPAGE = "https://github.com/MISP/PyMISP"
+LICENSE = "BSD-2-Clause"
+LIC_FILES_CHKSUM = "file://PKG-INFO;md5=c0a3e801b740ef31d1f5ddfe76bca538"
+PR = "r0"
+
+SRC_URI[md5sum] = "398408388902c108e3b378152b6c1d24"
+SRC_URI[sha256sum] = "d70e74c528f040f5ff8137337f1758aeb63a5966b58b297f2171f53cb9df033e"
+
+RDEPENDS_${PN} += " ${PYTHON_PN}-requests"

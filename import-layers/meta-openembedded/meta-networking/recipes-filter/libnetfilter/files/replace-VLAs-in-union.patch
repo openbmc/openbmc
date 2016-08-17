@@ -1,0 +1,89 @@
+VLAs in structs and unions (non-PODs) is unsupported in non-gcc compilers
+therefore convert it to not use VLAs instead use fixed arrays
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+Index: libnetfilter_conntrack-1.0.4/src/conntrack/api.c
+===================================================================
+--- libnetfilter_conntrack-1.0.4.orig/src/conntrack/api.c
++++ libnetfilter_conntrack-1.0.4/src/conntrack/api.c
+@@ -954,16 +954,15 @@ int nfct_query(struct nfct_handle *h,
+ 	       const enum nf_conntrack_query qt,
+ 	       const void *data)
+ {
+-	size_t size = 4096;	/* enough for now */
+ 	union {
+-		char buffer[size];
++		char buffer[4096];
+ 		struct nfnlhdr req;
+ 	} u;
+ 
+ 	assert(h != NULL);
+ 	assert(data != NULL);
+ 
+-	if (__build_query_ct(h->nfnlssh_ct, qt, data, &u.req, size) == -1)
++	if (__build_query_ct(h->nfnlssh_ct, qt, data, &u.req, 4096) == -1)
+ 		return -1;
+ 
+ 	return nfnl_query(h->nfnlh, &u.req.nlh);
+@@ -986,16 +985,15 @@ int nfct_send(struct nfct_handle *h,
+ 	      const enum nf_conntrack_query qt,
+ 	      const void *data)
+ {
+-	size_t size = 4096;	/* enough for now */
+ 	union {
+-		char buffer[size];
++		char buffer[4096];
+ 		struct nfnlhdr req;
+ 	} u;
+ 
+ 	assert(h != NULL);
+ 	assert(data != NULL);
+ 
+-	if (__build_query_ct(h->nfnlssh_ct, qt, data, &u.req, size) == -1)
++	if (__build_query_ct(h->nfnlssh_ct, qt, data, &u.req, 4096) == -1)
+ 		return -1;
+ 
+ 	return nfnl_send(h->nfnlh, &u.req.nlh);
+Index: libnetfilter_conntrack-1.0.4/src/expect/api.c
+===================================================================
+--- libnetfilter_conntrack-1.0.4.orig/src/expect/api.c
++++ libnetfilter_conntrack-1.0.4/src/expect/api.c
+@@ -669,16 +669,15 @@ int nfexp_query(struct nfct_handle *h,
+ 	        const enum nf_conntrack_query qt,
+ 	        const void *data)
+ {
+-	size_t size = 4096;	/* enough for now */
+ 	union {
+-		char buffer[size];
++		char buffer[4096];
+ 		struct nfnlhdr req;
+ 	} u;
+ 
+ 	assert(h != NULL);
+ 	assert(data != NULL);
+ 
+-	if (__build_query_exp(h->nfnlssh_exp, qt, data, &u.req, size) == -1)
++	if (__build_query_exp(h->nfnlssh_exp, qt, data, &u.req, 4096) == -1)
+ 		return -1;
+ 
+ 	return nfnl_query(h->nfnlh, &u.req.nlh);
+@@ -701,16 +700,15 @@ int nfexp_send(struct nfct_handle *h,
+ 	       const enum nf_conntrack_query qt,
+ 	       const void *data)
+ {
+-	size_t size = 4096;	/* enough for now */
+ 	union {
+-		char buffer[size];
++		char buffer[4096];
+ 		struct nfnlhdr req;
+ 	} u;
+ 
+ 	assert(h != NULL);
+ 	assert(data != NULL);
+ 
+-	if (__build_query_exp(h->nfnlssh_exp, qt, data, &u.req, size) == -1)
++	if (__build_query_exp(h->nfnlssh_exp, qt, data, &u.req, 4096) == -1)
+ 		return -1;
+ 
+ 	return nfnl_send(h->nfnlh, &u.req.nlh);

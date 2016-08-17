@@ -1,0 +1,28 @@
+From eb7590cc2cdd5c35403af4567d8524e017010f1c Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen@dominion.thruhere.net>
+Date: Sat, 11 May 2013 07:58:17 +0200
+Subject: [PATCH] configure: remove check for x86.h, we don't build get-edid
+
+Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
+
+Upstream-status: Inappropriate [OE specific]
+---
+ configure.in | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index ac85a21..f53e904 100644
+--- a/configure.in
++++ b/configure.in
+@@ -8,8 +8,6 @@ dnl Checks for programs
+ 
+ AC_PROG_CC
+ 
+-AC_CHECK_HEADER([libx86.h], [], [AC_MSG_ERROR([libx86.h not found])])
+-
+ dnl Simple, huh?
+ 
+ AC_OUTPUT([Makefile])
+-- 
+1.8.1.4
+

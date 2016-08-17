@@ -1,0 +1,90 @@
+From 003c9feaae6ed5c173edcea51193e49bc94ac39a Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen.kooi@linaro.org>
+Date: Tue, 17 Jun 2014 09:53:00 +0200
+Subject: [PATCH 3/8] acinclude: use pkgconfig for libxml2 config
+
+Signed-off-by: Koen Kooi <koen.kooi@linaro.org>
+Upstream-Status: pending
+---
+ acinclude.m4 | 63 ++++++++++++++++++++++--------------------------------------
+ 1 file changed, 23 insertions(+), 40 deletions(-)
+
+diff --git a/acinclude.m4 b/acinclude.m4
+index 206fcbf..a6c0d84 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -2530,48 +2530,31 @@ dnl
+ dnl Common setup macro for libxml
+ dnl
+ AC_DEFUN([PHP_SETUP_LIBXML], [
+-AC_CACHE_CHECK([for xml2-config path], ac_cv_php_xml2_config_path,
+-[
+-
+-      ac_cv_php_xml2_config_path="$PHP_LIBXML_DIR/xml2-config"
+-
++PKG_CHECK_MODULES([LIBXML], [libxml-2.0 > 2.6.11], [
++  PHP_EVAL_LIBLINE($LIBXML_LIBS, $1)
++  PHP_EVAL_INCLINE($LIBXML_CFLAGS)
++
++  dnl Check that build works with given libs
++  AC_CACHE_CHECK(whether libxml build works, php_cv_libxml_build_works, [
++    PHP_TEST_BUILD(xmlInitParser,
++    [
++      php_cv_libxml_build_works=yes
++      AC_MSG_RESULT(yes)
++    ], [
++      AC_MSG_RESULT(no)
++      AC_MSG_ERROR([build test failed.  Please check the config.log for details.])
++    ], [
++      [$]$1
++    ])
++  ])
++  if test "$php_cv_libxml_build_works" = "yes"; then
++    AC_DEFINE(HAVE_LIBXML, 1, [ ])
++  fi
++  $2
++], [
++  AC_MSG_ERROR([$LIBXML_PKG_ERRORS])
+ ])
+ 
+-  if test -x "$ac_cv_php_xml2_config_path"; then
+-    XML2_CONFIG="$ac_cv_php_xml2_config_path"
+-    libxml_full_version=`$XML2_CONFIG --version`
+-    ac_IFS=$IFS
+-    IFS="."
+-    set $libxml_full_version
+-    IFS=$ac_IFS
+-    LIBXML_VERSION=`expr [$]1 \* 1000000 + [$]2 \* 1000 + [$]3`
+-    if test "$LIBXML_VERSION" -ge "2006011"; then
+-      LIBXML_LIBS=`$XML2_CONFIG --libs`
+-      LIBXML_INCS=`$XML2_CONFIG --cflags`
+-      PHP_EVAL_LIBLINE($LIBXML_LIBS, $1)
+-      PHP_EVAL_INCLINE($LIBXML_INCS)
+-
+-      dnl Check that build works with given libs
+-      AC_CACHE_CHECK(whether libxml build works, php_cv_libxml_build_works, [
+-        PHP_TEST_BUILD(xmlInitParser,
+-        [
+-          php_cv_libxml_build_works=yes
+-        ], [
+-          AC_MSG_RESULT(no)
+-          AC_MSG_ERROR([build test failed.  Please check the config.log for details.])
+-        ], [
+-          [$]$1
+-        ])
+-      ])
+-      if test "$php_cv_libxml_build_works" = "yes"; then
+-        AC_DEFINE(HAVE_LIBXML, 1, [ ])
+-      fi
+-      $2
+-    else
+-      AC_MSG_ERROR([libxml2 version 2.6.11 or greater required.])
+-    fi
+-ifelse([$3],[],,[else $3])
+-  fi
+ ])
+ 
+ dnl -------------------------------------------------------------------------
+-- 
+1.9.3
+

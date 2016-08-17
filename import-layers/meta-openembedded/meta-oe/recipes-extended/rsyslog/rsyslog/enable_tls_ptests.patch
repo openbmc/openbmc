@@ -1,0 +1,28 @@
+Enable tls ptest
+
+Signed-off-by: Tudor Florea <tudor.florea@enea.com>
+Upstream-Status: Pending
+
+--- rsyslog-7.4.4/tests/Makefile.am.orig	2013-08-30 18:30:41.000000000 +0200
++++ rsyslog-7.4.4/tests/Makefile.am	2015-10-01 09:38:45.176289031 +0200
+@@ -118,15 +118,13 @@
+ endif
+ 
+ if ENABLE_GNUTLS
+-# TODO: re-enable in newer version
+-#TESTS +=  \
+-	#sndrcv_tls_anon.sh \
+-	#sndrcv_tls_anon_rebind.sh \
+-	#imtcp-tls-basic.sh
++TESTS +=  \
++	 imtcp-tls-basic.sh \
++	 imtcp_conndrop_tls.sh
+ if HAVE_VALGRIND
+ TESTS += imtcp-tls-basic-vg.sh \
+-	 imtcp_conndrop_tls-vg.sh 
+-	 manytcp-too-few-tls-vg.sh 
++	 imtcp_conndrop_tls-vg.sh \
++	 manytcp-too-few-tls.sh
+ endif
+ endif
+

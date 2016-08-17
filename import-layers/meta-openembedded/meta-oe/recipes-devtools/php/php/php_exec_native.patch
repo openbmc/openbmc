@@ -1,0 +1,18 @@
+Upstream-status: Inappriate
+
+diff --git a/sapi/cli/config.m4 b/sapi/cli/config.m4
+index cdfa1f7..0fe11e3 100644
+--- a/sapi/cli/config.m4
++++ b/sapi/cli/config.m4
+@@ -36,7 +36,7 @@ if test "$PHP_CLI" != "no"; then
+   esac
+ 
+   dnl Set executable for tests
+-  PHP_EXECUTABLE="\$(top_builddir)/\$(SAPI_CLI_PATH)"
++  PHP_EXECUTABLE="${PHP_NATIVE_DIR}/php"
+   PHP_SUBST(PHP_EXECUTABLE)
+ 
+   dnl Expose to Makefile
+-- 
+1.9.3
+

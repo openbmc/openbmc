@@ -1,0 +1,30 @@
+Upstream-Status: Backport
+Signed-off-by: Peter A. Bigot <pab@pabigot.com>
+
+From 57170b311f1468330f4a9961dc0b3ac45f97bc13 Mon Sep 17 00:00:00 2001
+From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Date: Sat, 30 Jun 2012 00:39:05 -0300
+Subject: [PATCH] network: fix network Connect() method parameters
+
+---
+ network/connection.c |    4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/network/connection.c b/network/connection.c
+index 544ec3a..59423a9 100644
+--- a/network/connection.c
++++ b/network/connection.c
+@@ -554,7 +554,9 @@ static void path_unregister(void *data)
+ 
+ static const GDBusMethodTable connection_methods[] = {
+ 	{ GDBUS_ASYNC_METHOD("Connect",
+-			NULL, NULL, connection_connect) },
++				GDBUS_ARGS({"uuid", "s"}),
++				GDBUS_ARGS({"interface", "s"}),
++				connection_connect) },
+ 	{ GDBUS_METHOD("Disconnect",
+ 			NULL, NULL, connection_disconnect) },
+ 	{ GDBUS_METHOD("GetProperties",
+-- 
+1.7.9.5
+

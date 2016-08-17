@@ -1,0 +1,30 @@
+ libmemcached/backtrace.cc |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+--- libmemcached-1.0.15.orig/libmemcached/backtrace.cc
++++ libmemcached-1.0.15/libmemcached/backtrace.cc
+@@ -75,10 +75,11 @@ void custom_backtrace(void)
+     {
+       for (int x= 0; x < stack_frames; x++) 
+       {
+         bool was_demangled= false;
+ 
++#if USE_DEMANGLE == 1
+         if (USE_DEMANGLE)
+         {
+ #ifdef HAVE_DLFCN_H
+           Dl_info dlinfo;
+           if (dladdr(backtrace_buffer[x], &dlinfo))
+@@ -107,11 +108,11 @@ void custom_backtrace(void)
+                       dlinfo.dli_fname);
+             }
+           }
+ #endif
+         }
+-
++#endif
+         if (was_demangled == false)
+         {
+           fprintf(stderr, "?%d  %p in %s\n", x, backtrace_buffer[x], symbollist[x]);
+         }
+       }

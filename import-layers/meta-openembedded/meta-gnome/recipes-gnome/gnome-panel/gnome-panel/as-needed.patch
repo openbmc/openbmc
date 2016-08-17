@@ -1,0 +1,36 @@
+From c65f1ae3472cfd4cd96fd376b7bbd95fba5eef0a Mon Sep 17 00:00:00 2001
+From: Vincent Untz <vuntz@gnome.org>
+Date: Fri, 27 May 2011 17:00:14 +0000
+Subject: build: Fix build with --as-needed
+
+upstream-status: backport
+
+---
+diff --git a/applets/notification_area/Makefile.am b/applets/notification_area/Makefile.am
+index 0afc6c5..9734536 100644
+--- a/applets/notification_area/Makefile.am
++++ b/applets/notification_area/Makefile.am
+@@ -29,17 +29,17 @@ libtray_la_SOURCES =		\
+ NOTIFICATION_AREA_SOURCES = main.c main.h
+ 
+ NOTIFICATION_AREA_LDADD =				\
++	libtray.la					\
+ 	../../libpanel-applet/libpanel-applet-4.la	\
+ 	$(X_LIBS)					\
+ 	$(NOTIFICATION_AREA_LIBS)			\
+-	$(LIBPANEL_APPLET_LIBS)				\
+-	libtray.la
++	$(LIBPANEL_APPLET_LIBS)
+ 
+ testtray_SOURCES = testtray.c
+ testtray_LDADD =			\
++	libtray.la			\
+ 	$(X_LIBS)			\
+-	$(NOTIFICATION_AREA_LIBS)	\
+-	libtray.la
++	$(NOTIFICATION_AREA_LIBS)
+ 
+ if NOTIFICATION_AREA_INPROCESS
+ APPLET_IN_PROCESS = true
+--
+cgit v0.9

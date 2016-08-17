@@ -1,0 +1,16 @@
+Remove CC and CFLAGS values, we set these ourselves
+
+Upstream-Status: Inappropriate [config]
+
+diff -urN vblade-19.old//makefile vblade-19//makefile
+--- vblade-19.old//makefile	2008-10-08 22:07:40.000000000 +0100
++++ vblade-19//makefile	2008-11-18 19:07:51.700365029 +0000
+@@ -9,8 +9,6 @@
+ mandir = ${sharedir}/man
+ 
+ O=aoe.o bpf.o ${PLATFORM}.o ata.o
+-CFLAGS += -Wall -g -O2
+-CC = gcc
+ 
+ vblade: $O
+ 	${CC} -o vblade $O

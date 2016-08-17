@@ -1,0 +1,20 @@
+fix parallel compiling problem
+
+without specifying libee_convert_DEPENDENCIES = libee.la, libee_convert
+can't find libee.la when linking as libee is not generated yet.
+ 
+Upstream-Status: pending
+
+Signed-off-by: Yao Zhao <yao.zhao@windriver.com>
+---
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 08aaa9e..f0c78f7 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -46,5 +46,6 @@ libee_la_LDFLAGS = -version-info 0:0:0
+ libee_convert_SOURCES = convert.c
+ libee_convert_CPPFLAGS =  -I$(top_srcdir) $(LIBEE_CFLAGS) $(LIBESTR_CFLAGS) $(LIBXML2_CFLAGS)
+ libee_convert_LDADD = $(LIBEE_LIBS) $(LIBXML2_LIBS) $(LIBESTR_LIBS)
++libee_convert_DEPENDENCIES = libee.la
+ 
+ include_HEADERS = 

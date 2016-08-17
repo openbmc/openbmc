@@ -1,0 +1,34 @@
+index gst-rtsp_0.10.8/bindings/python/Makefile.am
+--- gst-rtsp_0.10.8.orig/bindings/python/Makefile.am
++++ gst-rtsp_0.10.8/bindings/python/Makefile.am
+@@ -14,7 +14,7 @@ defs_DATA = $(DEFS)
+ defsdir = $(pkgdatadir)/$(GST_MAJORMINOR)/defs
+ OVERRIDES = rtspserver.override
+
+-INCLUDES = -I$(top_srcdir) -I$(srcdir) $(PYTHON_INCLUDES)
++AM_CPPFLAGS = -I$(top_srcdir) -I$(srcdir) $(PYTHON_INCLUDES)
+
+ rtspserver_la_CFLAGS = -I$(top_srcdir)/src \
+         $(PYGOBJECT_CFLAGS) $(GST_PLUGINS_BASE_CFLAGS) $(GST_CFLAGS)
+index gst-rtsp_0.10.8/examples/Makefile.am
+--- gst-rtsp_0.10.8.orig/examples/Makefile.am
++++ gst-rtsp_0.10.8/examples/Makefile.am
+@@ -1,6 +1,6 @@
+ noinst_PROGRAMS = test-video test-ogg test-mp4 test-readme test-launch test-sdp test-uri test-auth
+
+-INCLUDES = -I$(top_srcdir) -I$(srcdir)
++AM_CPPFLAGS = -I$(top_srcdir) -I$(srcdir)
+
+ AM_CFLAGS = $(GST_PLUGINS_BASE_CFLAGS) $(GST_CFLAGS)
+ AM_LDFLAGS = \
+index gst-rtsp_0.10.8/tests/Makefile.am
+--- gst-rtsp_0.10.8.orig/tests/Makefile.am
++++ gst-rtsp_0.10.8/tests/Makefile.am
+@@ -1,6 +1,6 @@
+ noinst_PROGRAMS = test-cleanup
+
+-INCLUDES = -I$(top_srcdir) -I$(srcdir)
++AM_CPPFLAGS = -I$(top_srcdir) -I$(srcdir)
+
+ AM_CFLAGS = $(GST_PLUGINS_BASE_CFLAGS) $(GST_CFLAGS)
+ AM_LDFLAGS = \

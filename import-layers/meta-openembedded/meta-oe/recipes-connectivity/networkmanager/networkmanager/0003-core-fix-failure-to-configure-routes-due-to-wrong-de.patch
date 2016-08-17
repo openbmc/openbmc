@@ -1,0 +1,54 @@
+From 11aa07ed939193e85516c287a57dee1837242972 Mon Sep 17 00:00:00 2001
+From: Thomas Haller <thaller@redhat.com>
+Date: Mon, 4 Jan 2016 18:54:26 +0100
+Subject: [PATCH 1/7] core: fix failure to configure routes due to wrong
+ device-route for IPv4 peer-addresses
+
+As in the case of a OpenVPN connection, we might add an address like:
+  10.8.0.58/32 ptp 10.8.0.57
+
+In this case, kernel would automatically add a device-route like:
+  10.8.0.57/32 via 0.0.0.0 dev 32 metric 0 mss 0 src rtprot-kernel scope link pref-src 10.8.0.58
+
+nm_ip4_config_commit() checks all IP addresses to figure out
+the present device-routes. Then the routes are synced by NMRouteManager.
+Due to a bug, we would not consider the peer-address, but the local-address
+and configure a route 10.8.0.58/32, instead of 10.8.0.57/32.
+
+That stays mostly unnoticed, because usually the peer and the local-address are
+in the same subnet, so that there is no difference (/32 is an example of the
+peer-address being in a different subnet).
+
+It also seems that due to a bug fixed by df4e5357521 this issue didn't surface.
+Probably because we would not notice the 10.8.0.57/32 right away and thus
+nm_route_manager_ip4_route_sync() would not wrongly delete it.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=759892
+
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=809195
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=809494
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=809526
+https://bugs.archlinux.org/task/47535
+https://bugzilla.redhat.com/show_bug.cgi?id=1294309
+https://mail.gnome.org/archives/networkmanager-list/2015-December/msg00059.html
+---
+ src/nm-ip4-config.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/nm-ip4-config.c b/src/nm-ip4-config.c
+index f625d35..61e29af 100644
+--- a/src/nm-ip4-config.c
++++ b/src/nm-ip4-config.c
+@@ -298,7 +298,8 @@ nm_ip4_config_commit (const NMIP4Config *config, int ifindex, gboolean routes_fu
+ 
+ 				route.ifindex = ifindex;
+ 				route.source = NM_IP_CONFIG_SOURCE_KERNEL;
+-				route.network = nm_utils_ip4_address_clear_host_address (addr->address, addr->plen);
++				route.network = nm_utils_ip4_address_clear_host_address (addr->peer_address ? : addr->address,
++				                                                         addr->plen);
+ 				route.plen = addr->plen;
+ 				route.pref_src = addr->address;
+ 				route.metric = default_route_metric;
+-- 
+2.5.0
+

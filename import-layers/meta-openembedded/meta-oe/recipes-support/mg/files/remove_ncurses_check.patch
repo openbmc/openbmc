@@ -1,0 +1,36 @@
+diff -uwr mg-20110905/configure mg-20110905-changed/configure
+--- mg-20110905/configure	2011-09-05 13:36:16.000000000 -0500
++++ mg-20110905-changed/configure	2014-08-14 10:46:14.168715425 -0500
+@@ -163,32 +163,6 @@
+     echo 'Fails.'
+ fi
+ 
+-
+-if [ ! -r /usr/include/term.h ]; then
+-    note 'term.h'
+-    if [ -r /usr/include/ncurses/term.h ]; then
+-	echo "Found in /usr/include/ncurses"
+-	extraflags="$extraflags -I/usr/include/ncurses"
+-    else
+-	for i in pkg local; do
+-	    if [ -r /usr/$i/include/term.h ]; then
+-		echo "Found in /usr/$i/include"
+-		extralibs="$extralibs -L/usr/$i/lib"
+-		extraflags="$extraflags -I/usr/$i/include"
+-		break
+-	    else
+-		false
+-	    fi
+-	done ||
+-	{
+-	    echo 'Not found!' >&2
+-	    echo 'Do you have the ncurses devel package installed?' >&2
+-	    echo 'If you know where term.h is, please email the author!' >&2
+-	    exit 1
+-	}
+-    fi
+-fi
+-
+ note 'base and dirname'
+ if gcc_defines "__GLIBC__" || gcc_defines "__CYGWIN__" ; then
+     echo 'Not present, adding.'

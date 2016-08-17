@@ -1,0 +1,10 @@
+--- Xsp/xsp.pc.in~	2009-01-07 13:06:07.000000000 +0100
++++ Xsp/xsp.pc.in	2009-01-07 13:06:07.000000000 +0100
+@@ -6,5 +6,5 @@
+ Name: Xsp
+ Description: X Sputnik Library
+ Version: @PACKAGE_VERSION@
+-Cflags: -I${includedir}  @XSP_CFLAGS@ @X_CFLAGS@
+-Libs: -L${libdir} -lXsp @XSP_LIBS@ @X_LIBS@
++Cflags: -I${includedir}
++Libs: -L${libdir} -lXsp -lX11

@@ -1,0 +1,28 @@
+From 0aef43c9cd1656413cf2eb3dc7c19b355ee7ed52 Mon Sep 17 00:00:00 2001
+From: Carlos Rafael Giani <dv@pseudoterminal.org>
+Date: Sun, 1 Jun 2014 14:45:49 +0200
+Subject: [PATCH] Fix incorrect message type
+
+Upstream-Status: Pending
+
+Signed-off-by: Carlos Rafael Giani <dv@pseudoterminal.org>
+---
+ src/bin/e_desk.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/bin/e_desk.c b/src/bin/e_desk.c
+index b156e19..77d7520 100644
+--- a/src/bin/e_desk.c
++++ b/src/bin/e_desk.c
+@@ -221,7 +221,7 @@ e_desk_show(E_Desk *desk)
+    E_Event_Desk_Show *ev;
+    E_Event_Desk_Before_Show *eev;
+    E_Event_Desk_After_Show *eeev;
+-   Edje_Message_Float_Set *msg;
++   Edje_Message_Int_Set *msg;
+    Eina_List *l;
+    E_Shelf *es;
+    int was_zone = 0, x, y, dx = 0, dy = 0;
+-- 
+1.8.3.2
+

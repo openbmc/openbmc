@@ -1,0 +1,27 @@
+From: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Subject: Disable scrollkeeper-config not found message
+Upstream-Status: Not-Applicable
+
+If scrollkeeper-config isn't found, configure fails with an error.
+Fix that by commenting out the check.
+
+Signed-Off-By: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+
+
+Index: gnome-disk-utility-2.32.0/configure.ac
+===================================================================
+--- gnome-disk-utility-2.32.0.orig/configure.ac	2010-09-15 19:07:25.000000000 +0400
++++ gnome-disk-utility-2.32.0/configure.ac	2011-08-20 01:29:48.000000000 +0400
+@@ -188,9 +188,9 @@
+ # *************
+
+ AC_PATH_PROG(SCROLLKEEPER_CONFIG, scrollkeeper-config,no)
+-if test x$SCROLLKEEPER_CONFIG = xno; then
+-  AC_MSG_ERROR(Couldn't find scrollkeeper-config, please install the scrollkeeper package)
+-fi
++dnl if test x$SCROLLKEEPER_CONFIG = xno; then
++dnl  AC_MSG_ERROR([Couldn't find scrollkeeper-config, please install the scrollkeeper package])
++dnl fi
+
+ # ********************
+ # Internationalization

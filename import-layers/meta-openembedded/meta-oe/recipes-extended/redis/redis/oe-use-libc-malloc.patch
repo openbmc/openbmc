@@ -1,0 +1,34 @@
+From f8861d2129b9e18bba137705bfa38c6bd9be1790 Mon Sep 17 00:00:00 2001
+From: Venture Research <tech@ventureresearch.com>
+Date: Wed, 6 Feb 2013 20:51:02 -0600
+Subject: [PATCH] hack to force use of libc malloc
+
+Hack to force libc usage as it seems the option to pass it in has been
+removed in favor of magic.
+
+Note that this of course doesn't allow tcmalloc and jemalloc, however 
+jemalloc wasn't building correctly.
+
+Signed-off-by: Venture Research <tech@ventureresearch.com>
+
+Update to work with 3.0.x
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+---
+ src/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: src/Makefile
+===================================================================
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -13,7 +13,8 @@
+ # Just use 'make dep', but this is only needed by developers.
+ 
+ release_hdr := $(shell sh -c './mkreleasehdr.sh')
+-uname_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
++# use fake uname option to force use of generic libc
++uname_S := "USE_LIBC_MALLOC"
+ OPTIMIZATION?=-O2
+ DEPENDENCY_TARGETS=hiredis linenoise lua
+ 

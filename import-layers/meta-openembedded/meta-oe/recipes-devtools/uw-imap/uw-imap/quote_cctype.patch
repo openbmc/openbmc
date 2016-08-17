@@ -1,0 +1,12 @@
+diff -urN imap-2007.orig/Makefile imap-2007/Makefile
+--- imap-2007.orig/Makefile	2007-12-20 23:11:10.000000000 +0100
++++ imap-2007/Makefile	2008-03-19 14:08:47.000000000 +0100
+@@ -690,7 +690,7 @@
+ 	@$(SH) -c '(test $(BUILDTYPE) = rebuild -o $(BUILDTYPE) = `$(CAT) OSTYPE`) || (echo Already built for `$(CAT) OSTYPE` -- you must do \"make clean\" first && exit 1)'
+ 	@echo Rebuilding c-client for `$(CAT) OSTYPE`...
+ 	@$(TOUCH) SPECIALS
+-	$(CD) c-client;$(MAKE) all CC=`$(CAT) CCTYPE` \
++	$(CD) c-client;$(MAKE) all CC="`$(CAT) CCTYPE`" \
+ 	 CFLAGS="`$(CAT) CFLAGS`" `$(CAT) SPECIALS`
+ 
+ rebuildclean:

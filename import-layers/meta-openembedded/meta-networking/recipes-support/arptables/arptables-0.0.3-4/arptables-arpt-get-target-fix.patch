@@ -1,0 +1,30 @@
+arptables: fix the redefinition of 'arpt_get_target'
+
+Upstream-Status: Pending
+
+This function is already defined as a static inline function in
+include/linux/netfilter_arp/arp_tables.h, once GCC uses -O0, the
+inline will not work, and the redefinition error will happen
+
+Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+
+diff --git a/libarptc/libarptc_incl.c b/libarptc/libarptc_incl.c
+index 35736db..addd3f9 100644
+--- a/libarptc/libarptc_incl.c
++++ b/libarptc/libarptc_incl.c
+@@ -11,14 +11,6 @@
+ /* (C)1999 Paul ``Rusty'' Russell - Placed under the GNU GPL (See
+    COPYING for details). */
+ 
+-#ifndef __OPTIMIZE__
+-STRUCT_ENTRY_TARGET *
+-GET_TARGET(STRUCT_ENTRY *e)
+-{
+-	return (void *)e + e->target_offset;
+-}
+-#endif
+-
+ static int sockfd = -1;
+ static void *arptc_fn = NULL;
+ 

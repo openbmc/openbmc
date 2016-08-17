@@ -1,0 +1,49 @@
+From a6e5813d2f8402bf3a311c8bcda02623bfb76882 Mon Sep 17 00:00:00 2001
+From: Carlos Hernandez <ceh@ti.com>
+Date: Tue, 24 Feb 2015 16:00:34 -0500
+Subject: [PATCH 2/2] Restore original loopback config
+
+If loopback option is enabled, disable it at the end of the test.
+
+Signed-off-by: Carlos Hernandez <ceh@ti.com>
+Upstream-status: Pending
+---
+ serialcheck.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/serialcheck.c b/serialcheck.c
+index 4100c37..06470f7 100644
+--- a/serialcheck.c
++++ b/serialcheck.c
+@@ -427,6 +427,7 @@ int main(int argc, char *argv[])
+	unsigned char *data;
+	unsigned int open_mode;
+	off_t data_len;
++	unsigned int mcr;
+
+	argp_parse(&argp, argc, argv, 0, NULL, &opts);
+	if (!opts.file_trans)
+@@ -496,8 +497,6 @@ int main(int argc, char *argv[])
+	}
+
+	if (opts.loopback) {
+-		unsigned int mcr;
+-
+		ret = ioctl(fd, TIOCMGET, &mcr);
+		if (ret < 0)
+			die("mcr get failed: %m\n");
+@@ -535,6 +534,12 @@ int main(int argc, char *argv[])
+	ret = tcsetattr(fd, TCSAFLUSH, &old_term);
+	if (ret)
+		printf("tcsetattr() of old ones failed: %m\n");
++	if (opts.loopback) {
++		mcr &= ~(TIOCM_LOOP);
++		ret = ioctl(fd, TIOCMSET, &mcr);
++	}
++	if (ret)
++		printf("disabling loopback failed: %m\n");
+
+	close(fd);
+	return status;
+--
+1.9.1

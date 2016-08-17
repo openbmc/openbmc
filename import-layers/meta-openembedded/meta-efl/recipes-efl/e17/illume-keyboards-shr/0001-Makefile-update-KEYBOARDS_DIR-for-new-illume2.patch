@@ -1,0 +1,23 @@
+From 9316e3973c44b981e73b953b2861060c6902de47 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Mon, 23 Aug 2010 12:54:05 +0200
+Subject: [PATCH] Makefile: update KEYBOARDS_DIR for new illume2
+
+---
+ Makefile |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 46e9420..3d8757c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,5 +1,5 @@
+ 
+-INSTBASE = /usr/lib/enlightenment/modules/illume/keyboards
++INSTBASE = /usr/lib/enlightenment/modules/illume-keyboard/keyboards
+ 
+ FILES-arabic = Arabic.kbd Arabic.png
+ FILES-persian = Persian.kbd Persian.png
+-- 
+1.7.2
+

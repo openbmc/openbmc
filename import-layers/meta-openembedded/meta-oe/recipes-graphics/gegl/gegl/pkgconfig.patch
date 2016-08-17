@@ -1,0 +1,21 @@
+Index: gegl-0.2.0/configure.ac
+===================================================================
+--- gegl-0.2.0.orig/configure.ac	2012-04-02 21:56:49.000000000 +0000
++++ gegl-0.2.0/configure.ac	2014-07-17 21:34:15.312546602 +0000
+@@ -765,15 +765,7 @@
+ 
+ have_sdl="no"
+ if test "x$with_sdl" != "xno"; then
+-  AC_PATH_PROG(SDL_CONFIG, sdl-config, no)
+-  if test "$SDL_CONFIG" = "no"; then
+-    have_sdl="no  (SDL library not found)"
+-    AC_MSG_RESULT([*** Check for SDL library failed.])
+-  else
+-    have_sdl="yes"
+-    SDL_CFLAGS=`$SDL_CONFIG --cflags`
+-    SDL_LIBS=`$SDL_CONFIG --libs`
+-  fi
++  PKG_CHECK_MODULES([SDL], [sdl], [have_sdl="yes"], [have_sdl="no  (SDL library not found)"])
+ fi
+ 
+ AM_CONDITIONAL(HAVE_SDL, test "$have_sdl" = "yes")

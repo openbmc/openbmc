@@ -1,0 +1,36 @@
+From 35f14bd5aba2ed6cee258e11eab42c408afc04d0 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 4 Nov 2015 02:29:05 -0500
+Subject: [PATCH] Makefile: support cross compile for linux
+
+Upstream-Status: Pending
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ Makefile | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 17d9758..9e74cdf 100644
+--- a/Makefile
++++ b/Makefile
+@@ -41,7 +41,7 @@
+ # Linux 2.0.x
+ #
+ 
+-CC_LINUX=gcc
++CC_LINUX=$(CC)
+ CCO_LINUX=-Wall -DHAVE_DEV_URANDOM -DHAVE_OSYNC -DHAVE_STRCASECMP -DHAVE_RANDOM -DWEAK_RC6 -DSYNC_WAITS_FOR_SYNC -DFIND_DEVICE_SIZE_BY_BLKGETSIZE -DSIXTYFOUR -D__USE_LARGEFILE -D_FILE_OFFSET_BITS=64
+ # default should be to turn off debugging and to turn on optimization.
+ #CCO_LINUX+=-O9 -pipe -fomit-frame-pointer -finline-functions -funroll-loops -fstrength-reduce
+@@ -185,6 +185,7 @@ clean	:
+ 		rm -f wipe $(OBJECTS) wipe.tr-asc.1 version.h
+ 
+ install:
+-	install -m755 -o root -g root wipe $(DESTDIR)/usr/bin
++	[ -e $(DESTDIR)$(bindir) ] || mkdir -p $(DESTDIR)$(bindir)
++	install -m755 -o root -g root wipe $(DESTDIR)$(bindir)
+ 
+ .PHONY: always clean install
+-- 
+1.9.1
+

@@ -1,0 +1,29 @@
+From a93a86c2ff1ca5eb35615f4e1568409ff342aa7f Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Wed, 11 Apr 2012 14:29:41 +0200
+Subject: [PATCH 03/12] add 89xdgautostart Xsession.d script
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ X11/Xsession.d/89xdgautostart |    9 +++++++++
+ 1 files changed, 9 insertions(+), 0 deletions(-)
+ create mode 100644 X11/Xsession.d/89xdgautostart
+
+diff --git a/X11/Xsession.d/89xdgautostart b/X11/Xsession.d/89xdgautostart
+new file mode 100644
+index 0000000..9886f9f
+--- /dev/null
++++ b/X11/Xsession.d/89xdgautostart
+@@ -0,0 +1,9 @@
++#!/bin/sh
++
++XDGAUTOSTART=/etc/xdg/autostart
++if [ -d $XDGAUTOSTART ] ; then
++    for SCRIPT in $XDGAUTOSTART/*; do
++        CMD=`grep ^Exec= $SCRIPT | cut -d '=' -f 2`
++        $CMD &
++    done
++fi
+-- 
+1.7.8.5
+

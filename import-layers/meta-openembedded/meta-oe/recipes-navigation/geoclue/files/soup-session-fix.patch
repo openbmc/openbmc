@@ -1,0 +1,30 @@
+Upstream-Status: Upstream-Status: Inappropriate [poky 9.0 has older libsoup]
+
+Signed-off-by: Felipe F. Tonello <eu@felipetonello.com>
+
+diff --git a/src/gclue-ipclient.c b/src/gclue-ipclient.c
+index 09add30..1771d5c 100644
+--- a/src/gclue-ipclient.c
++++ b/src/gclue-ipclient.c
+@@ -83,7 +83,7 @@ gclue_ipclient_init (GClueIpclient *ipclient)
+ {
+         ipclient->priv = G_TYPE_INSTANCE_GET_PRIVATE ((ipclient), GCLUE_TYPE_IPCLIENT, GClueIpclientPrivate);
+ 
+-        ipclient->priv->soup_session = soup_session_new ();
++        ipclient->priv->soup_session = soup_session_sync_new ();
+ }
+ 
+ /**
+diff --git a/src/geoip-server/geoip-update.c b/src/geoip-server/geoip-update.c
+index 6cce7b2..ef672ba 100644
+--- a/src/geoip-server/geoip-update.c
++++ b/src/geoip-server/geoip-update.c
+@@ -214,7 +214,7 @@ main (int argc, char **argv)
+                         path = GEOIP_DATABASE_PATH;
+         }
+ 
+-        session = soup_session_new ();
++        session = soup_session_sync_new ();
+ 
+         for (i = 0; i < G_N_ELEMENTS (db_info_map); i++) {
+                 SoupMessage *msg = NULL;

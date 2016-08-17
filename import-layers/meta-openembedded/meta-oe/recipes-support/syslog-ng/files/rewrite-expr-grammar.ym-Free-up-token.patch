@@ -1,0 +1,17 @@
+rewrite-expr-grammar.ym: Free up token.
+
+Upsteam-Status: Backport
+
+Reported-by: Xufeng Zhang <xufeng.zhang@windriver.com>
+Signed-off-by: Viktor Tusa <tusavik@gmail.com>
+---
+--- a/lib/rewrite/rewrite-expr-grammar.ym
++++ b/lib/rewrite/rewrite-expr-grammar.ym
+@@ -78,6 +78,7 @@
+ 
+ 	    $$ = log_template_new(configuration, $1);
+ 	    CHECK_ERROR(log_template_compile($$, $1, &error), @1, "Error compiling template (%s)", error->message);
++            free($1);
+ 	  }
+ 	;
+ 

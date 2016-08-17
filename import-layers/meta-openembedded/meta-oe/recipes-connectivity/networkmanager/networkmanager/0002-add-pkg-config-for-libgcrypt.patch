@@ -1,0 +1,41 @@
+From a9261fee4a41045c42e0d292237cee532e11982c Mon Sep 17 00:00:00 2001
+From: Adrian <adrian.freihofer@gmail.com>
+Date: Thu, 27 Nov 2014 15:43:26 +0100
+Subject: [PATCH] add pkg config for libgcrypt
+
+---
+ configure.ac | 18 +++++++-----------
+ 1 file changed, 7 insertions(+), 11 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 94b0758..654a015 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -480,17 +480,13 @@ if test x"$ac_crypto" = xnss; then
+   with_nss=yes
+ elif test x"$ac_crypto" = xgnutls; then
+   PKG_CHECK_MODULES(GNUTLS, [gnutls >= 1.2])
+-  AC_PATH_PROG(LIBGCRYPT_CONFIG, libgcrypt-config, no)
+-  if test x"$LIBGCRYPT_CONFIG" = xno; then
+-    AC_MSG_ERROR([gnutls explicitly requested but gcrypt not found on system])
+-  else
+-    AC_DEFINE(HAVE_GNUTLS, 1, [Define if you have libgnutls])
+-    LIBGCRYPT_CFLAGS=`$LIBGCRYPT_CONFIG --cflags`
+-    LIBGCRYPT_LIBS=`$LIBGCRYPT_CONFIG --libs`
+-    AC_SUBST(LIBGCRYPT_CFLAGS)
+-    AC_SUBST(LIBGCRYPT_LIBS)
+-    with_gnutls=yes
+-  fi
++  AC_DEFINE(HAVE_GNUTLS, 1, [Define if you have libgnutls])
++  PKG_CHECK_MODULES(LIBGCRYPT, [libgcrypt >= 1.1.42], [
++      AC_DEFINE(HAVE_GCRYPT, 1, [Define if gcrypt library is available.])
++      with_gnutls=yes
++    ], [
++      AC_MSG_ERROR([gnutls explicitly requested but gcrypt not found on system])
++    ])
+ else
+   AC_MSG_ERROR([Please choose either 'nss' or 'gnutls' for certificate and crypto operations])
+ fi
+-- 
+1.9.1
+

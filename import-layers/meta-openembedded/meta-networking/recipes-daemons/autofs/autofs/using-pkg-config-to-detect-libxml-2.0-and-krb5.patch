@@ -1,0 +1,39 @@
+using pkg-config to detect libxml-2.0 and krb5
+
+Upstream-status: Pending
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ configure.in |   16 ++++++++++++++--
+ 2 files changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index 392d122..a3028aa 100644
+--- a/configure.in
++++ b/configure.in
+@@ -162,8 +162,20 @@ if test x$enable_sloppy_mount = xyes; then
+ fi
+ 
+ # LDAP SASL auth needs libxml and Kerberos
+-AF_CHECK_LIBXML()
+-AF_CHECK_KRB5()
++PKG_CHECK_MODULES(XML, [libxml-2.0],HAVE_LIBXML=1,HAVE_LIBXML=0)
++AC_SUBST([HAVE_LIBXML])
++XML_FLAGS=$XML_CFLAGS
++
++PKG_CHECK_MODULES(KRB5, [krb5],HAVE_KRB5=1,HAVE_KRB5=0)
++AC_SUBST([HAVE_KRB5])
++if test "x$HAVE_KRB5" = "x1"; then
++  SAVE_CFLAGS=$CFLAGS
++  SAVE_LIBS=$LIBS
++  CFLAGS="$CFLAGS $KRB5_FLAGS"
++  LIBS="$LIBS $KRB5_LIBS"
++
++  AC_CHECK_FUNCS([krb5_principal_get_realm])
++fi
+ 
+ AC_SEARCH_LIBS([versionsort],[])
+ if test "$ac_cv_search_versionsort" = "no"; then
+-- 
+1.7.10.4
+

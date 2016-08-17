@@ -1,0 +1,32 @@
+From ed7f4802222234eef192aa3f74bc92268f338f97 Mon Sep 17 00:00:00 2001
+From: Sebastian Droege <sebastian.droege@collabora.co.uk>
+Date: Tue, 6 Mar 2012 12:28:02 +0100
+Subject: [PATCH] baseparse: Fix 'self-comparison always evaluates to true'
+
+This was really a bug.
+
+Commit is ed7f4802222234eef192aa3f74bc92268f338f97 in 0.10 branch
+
+Upstream Status:  Backported
+
+Signed-off-by: Sebastian Droege <sebastian.droege@collabora.co.uk>
+---
+ libs/gst/base/gstbaseparse.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libs/gst/base/gstbaseparse.c b/libs/gst/base/gstbaseparse.c
+index 851ec1d..108ee89 100644
+--- a/libs/gst/base/gstbaseparse.c
++++ b/libs/gst/base/gstbaseparse.c
+@@ -3899,7 +3899,7 @@ gst_base_parse_handle_seek (GstBaseParse * parse, GstEvent * event)
+        seek event (in bytes) to upstream. Segment / flush handling happens
+        in corresponding src event handlers */
+     GST_DEBUG_OBJECT (parse, "seek in PUSH mode");
+-    if (seekstop >= 0 && seekpos <= seekpos)
++    if (seekstop >= 0 && seekstop <= seekpos)
+       seekstop = seekpos;
+     new_event = gst_event_new_seek (rate, GST_FORMAT_BYTES, flags,
+         GST_SEEK_TYPE_SET, seekpos, stop_type, seekstop);
+-- 
+1.7.9.5
+

@@ -1,0 +1,32 @@
+From 884d4c9bbd2dc147d614a5fabc25dbea7a71cd48 Mon Sep 17 00:00:00 2001
+From: Andreas Baak <andreas.baak@gmail.com>
+Date: Sun, 12 Jul 2015 02:13:58 -0700
+Subject: [PATCH] Look for popt with GP_CHECK_LIBRARY function
+
+The previously used proprietary function GP_CHECK_POPT
+defined in /.m4m/gp-check-opt.m4 is not ready for cross
+compilation since it looks for the library and headers
+in the host system. Yocto reports the following error:
+"QA Issue: gphoto2: The compile log indicates that host
+include and/or library paths were used."
+Using the GP_CHECK_LIBRARY function fixes this problem
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 93fbaf2..6d661f0 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -285,7 +285,7 @@ GP_CONFIG_MSG([Text preview support],[$aa_msg])
+ dnl ---------------------------------------------------------------------------
+ dnl popt.h: Simplifies handling of command-line options enormously.
+ dnl ---------------------------------------------------------------------------
+-GP_CHECK_POPT([mandatory])
++GP_CHECK_LIBRARY([POPT], [popt], [], [popt.h], [], [], [mandatory])
+ 
+ 
+ dnl ---------------------------------------------------------------------------
+-- 
+1.9.1
+

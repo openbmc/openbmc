@@ -1,0 +1,50 @@
+From 290703a5d21f34ea5ec23efc815a9f4df241e7e8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 23 Oct 2015 00:33:32 -0700
+Subject: [PATCH] Fix build with musl, backtrace() APIs are glibc specific
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ userspace/libsinsp/utils.cpp | 4 +++-
+ userspace/libsinsp/utils.h   | 2 +-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/userspace/libsinsp/utils.cpp b/userspace/libsinsp/utils.cpp
+index 8f23f9c..c496a57 100644
+--- a/userspace/libsinsp/utils.cpp
++++ b/userspace/libsinsp/utils.cpp
+@@ -21,7 +21,9 @@ along with sysdig.  If not, see <http://www.gnu.org/licenses/>.
+ #include <limits.h>
+ #include <stdlib.h>
+ #include <sys/time.h>
++#ifdef __GLIBC__
+ #include <execinfo.h>
++#endif
+ #include <unistd.h>
+ #include <sys/time.h>
+ #include <netdb.h>
+@@ -741,7 +743,7 @@ uint64_t sinsp_utils::get_current_time_ns()
+     return tv.tv_sec * (uint64_t) 1000000000 + tv.tv_usec * 1000;
+ }
+ 
+-#ifndef _WIN32
++#if defined(_WIN32) && defined(__GLIBC__)
+ void sinsp_utils::bt(void)
+ {
+ 	static const char start[] = "BACKTRACE ------------";
+diff --git a/userspace/libsinsp/utils.h b/userspace/libsinsp/utils.h
+index 600d00b..4ab4650 100644
+--- a/userspace/libsinsp/utils.h
++++ b/userspace/libsinsp/utils.h
+@@ -79,7 +79,7 @@ public:
+ 
+ 	static uint64_t get_current_time_ns();
+ 
+-#ifndef _WIN32
++#if not defined(_WIN32) && defined(__GLIBC__)
+ 	//
+ 	// Print the call stack
+ 	//
+-- 
+2.6.2
+

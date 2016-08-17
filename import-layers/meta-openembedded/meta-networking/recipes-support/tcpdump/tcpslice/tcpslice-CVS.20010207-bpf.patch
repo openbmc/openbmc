@@ -1,0 +1,15 @@
+Upstream-Status: Pending [from tcpdump-4.1.1-1.fc14.src.rpm]
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+diff -ur tcpdump-3.8.1/tcpslice/tcpslice.c tcpdump-3.8.1.new/tcpslice/tcpslice.c
+--- tcpslice/tcpslice.c	2004-01-15 17:35:53.000000000 +0100
++++ tcpslice/tcpslice.c	2004-01-15 16:12:57.000000000 +0100
+@@ -35,7 +35,7 @@
+ #include <sys/file.h>
+ #include <sys/stat.h>
+ 
+-#include <net/bpf.h>
++/* #include <net/bpf.h> */
+ 
+ #include <ctype.h>
+ #ifdef HAVE_FCNTL_H

@@ -1,0 +1,37 @@
+#! /bin/sh
+#
+# This is an init script for Familiar
+# Copy it to /etc/init.d/lircexecd and type
+# > update-rc.d lircexecd defaults 20
+# It must be started after lircd (and it does alphabetically :-)
+# irexec reads /etc/lircrc by default
+
+
+test -f /usr/bin/irexec || exit 0
+test -f /etc/lircrc || exit 0
+
+case "$1" in
+  start)
+    echo -n "Starting lircexec daemon: irexec"
+    start-stop-daemon --start --quiet --exec /usr/bin/irexec -- --daemon
+    echo "."
+    ;;
+  stop)
+    echo -n "Stopping lircexec daemon: irexec"
+    start-stop-daemon --stop --quiet --exec /usr/bin/irexec
+    echo "."
+    ;;
+  restart|force-restart)
+    echo -n "Stopping lircexec daemon: irexec"
+    start-stop-daemon --stop --quiet --exec /usr/bin/irexec
+    sleep 1
+    echo -n "Starting lircexec daemon: irexec"
+    start-stop-daemon --start --quiet --exec /usr/bin/irexec -- --daemon
+    echo "."
+    ;;
+  *)
+    echo "Usage: /etc/init.d/lircexec {start|stop|reload|restart|force-restart}"
+    exit 1
+esac
+
+exit 0

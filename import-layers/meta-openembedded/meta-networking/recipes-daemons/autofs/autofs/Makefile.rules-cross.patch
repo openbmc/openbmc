@@ -1,0 +1,23 @@
+Index: autofs-5.0.7/Makefile.rules
+===================================================================
+--- autofs-5.0.7.orig/Makefile.rules	2012-07-24 23:05:26.000000000 -0700
++++ autofs-5.0.7/Makefile.rules	2012-10-26 09:23:40.270204270 -0700
+@@ -34,14 +34,14 @@
+ else
+ CFLAGS    ?= -O2 -Wall
+ LDFLAGS   = -s
+-STRIP     = strip --strip-debug
++STRIP     = ${TARGET_PREFIX}strip --strip-debug
+ endif
+ endif
+ 
+-CC        = gcc
+-CXX       = g++
++CC        ?= ${TARGET_PREFIX}gcc
++CXX       ?= ${TARGET_PREFIX}g++
+ CXXFLAGS  = $(CFLAGS)
+-LD        = ld
++LD        ?= ${TARGET_PREFIX}ld
+ SOLDFLAGS = -shared
+ 
+ CFLAGS += -D_REENTRANT -D_FILE_OFFSET_BITS=64

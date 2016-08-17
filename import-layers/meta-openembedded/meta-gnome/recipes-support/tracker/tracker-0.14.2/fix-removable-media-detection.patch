@@ -1,0 +1,30 @@
+Index: tracker-0.14.2/src/libtracker-miner/tracker-storage.c
+===================================================================
+--- tracker-0.14.2.orig/src/libtracker-miner/tracker-storage.c	2011-08-03 13:53:16.000000000 +0100
++++ tracker-0.14.2/src/libtracker-miner/tracker-storage.c	2012-09-10 08:25:18.322215126 +0100
+@@ -20,6 +20,7 @@
+ #include "config.h"
+ 
+ #include <string.h>
++#include <sys/stat.h>
+ 
+ #include <gio/gio.h>
+ #include <gio/gunixmounts.h>
+@@ -646,6 +647,17 @@
+ 				gchar *content_type;
+ 				gboolean is_multimedia;
+ 				gboolean is_blank;
++                                struct stat st;
++
++                                /*
++                                 * Consider all files under /media to be
++                                 * removable unless the file .this-is-root is
++                                 * present.
++                                 */
++                                if (!strncmp (mount_path, "/media/",
++                                              strlen ("/media/")) &&
++                                    stat ("/media/.this-is-root", &st))
++                                  is_removable = TRUE;
+ 
+ 				content_type = mount_guess_content_type (mount, &is_optical, &is_multimedia, &is_blank);
+ 

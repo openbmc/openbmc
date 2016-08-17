@@ -1,0 +1,16 @@
+Fix detection of IrDA failing with B!=S
+
+Upstream-Status: Pending
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+
+--- a/acinclude.m4	2014-05-24 14:05:41.757796816 +0100
++++ b/acinclude.m4	2014-05-24 14:03:06.556795536 +0100
+@@ -54,6 +54,7 @@
+ ])
+ 
+ AC_DEFUN([AC_PATH_IRDA_LINUX], [
++	CPPFLAGS="${CPPFLAGS} -I${srcdir}"
+ 	AC_CACHE_CHECK([for IrDA support], irda_found, [
+ 		AC_TRY_COMPILE([
+ 				#include <sys/socket.h>

@@ -1,0 +1,28 @@
+[PATCH] return 0 if distance_table is NULL
+
+Upstream-Status: Pending
+
+read_distance_table() maybe return 0, but distance_table is not set,
+if distance_table is used, and will lead to SEGFAULT
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ distance.c |    2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/distance.c b/distance.c
+index 4a26972..c6ca021 100755
+--- a/distance.c
++++ b/distance.c
+@@ -113,6 +113,8 @@ int numa_distance(int a, int b)
+ 		int err = read_distance_table();
+ 		if (err < 0)
+ 			return 0;
++		if (!distance_table)
++			return 0;
+ 	}
+ 	return distance_table[a * distance_numnodes + b];
+ }
+-- 
+1.7.10.4
+

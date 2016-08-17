@@ -1,0 +1,45 @@
+From 6fa8a4a9bb64ff34328aae46acd600f8502b2c05 Mon Sep 17 00:00:00 2001
+From: Jean-Baptiste Kempf <jb@videolan.org>
+Date: Mon, 31 Aug 2015 09:07:39 +0200
+Subject: [PATCH] SWSCALE: fix compilation with 4.x
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+(cherry picked from commit 2b23857c68622edda76b72b74aeb3d943ee277c9)
+Signed-off-by: Rafaël Carré <funman@videolan.org>
+---
+ modules/video_chroma/swscale.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/modules/video_chroma/swscale.c b/modules/video_chroma/swscale.c
+index 4e0ecf1..26d0d6f 100644
+--- a/modules/video_chroma/swscale.c
++++ b/modules/video_chroma/swscale.c
+@@ -36,6 +36,7 @@
+ #include <vlc_cpu.h>
+ 
+ #include <libswscale/swscale.h>
++#include <libswscale/version.h>
+ 
+ #ifdef __APPLE__
+ # include <TargetConditionals.h>
+@@ -235,6 +236,7 @@ static int GetSwsCpuMask(void)
+ {
+     int i_sws_cpu = 0;
+ 
++#if LIBSWSCALE_VERSION_MAJOR < 4
+ #if defined(__i386__) || defined(__x86_64__)
+     if( vlc_CPU_MMX() )
+         i_sws_cpu |= SWS_CPU_CAPS_MMX;
+@@ -248,6 +250,7 @@ static int GetSwsCpuMask(void)
+     if( vlc_CPU_ALTIVEC() )
+         i_sws_cpu |= SWS_CPU_CAPS_ALTIVEC;
+ #endif
++#endif
+ 
+     return i_sws_cpu;
+ }
+-- 
+2.5.0
+

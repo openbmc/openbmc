@@ -1,0 +1,8 @@
+#!/bin/sh
+update_slim_wmlist
+if [ "x$1" = "x-nodaemon" ]; then
+  shift
+  exec slim "$@"
+else
+  slim -d "$@"
+fi

@@ -1,0 +1,12 @@
+Upstream-Status: Inappropriate [configuration]
+
+diff --git a/docs/Makefile.am b/docs/Makefile.am
+index f5375f5..c306f23 100644
+--- a/docs/Makefile.am
++++ b/docs/Makefile.am
+@@ -1,4 +1,4 @@
+-SUBDIRS = reference tutorial
++SUBDIRS = reference
+ 
+ EXTRA_DIST = \
+ 	COPYING \

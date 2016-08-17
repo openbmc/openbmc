@@ -1,0 +1,56 @@
+From 45661183a7c78d8c4f75adcf53c6ddd663dc8b2d Mon Sep 17 00:00:00 2001
+From: Mario Domenech Goulart <mario@ossystems.com.br>
+Date: Mon, 20 Oct 2014 17:12:58 -0200
+Subject: [PATCH] CMakeLists, gmock.pc.in: Add pkg-config support
+Organization: O.S. Systems Software LTDA.
+
+Signed-off-by: Mario Domenech Goulart <mario@ossystems.com.br>
+---
+ CMakeLists.txt | 7 ++++++-
+ gmock.pc.in    | 9 +++++++++
+ 2 files changed, 15 insertions(+), 1 deletion(-)
+ create mode 100644 gmock.pc.in
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 90e797a..98fd824 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -27,6 +27,9 @@ if (COMMAND pre_project_set_up_hermetic_build)
+   pre_project_set_up_hermetic_build()
+ endif()
+ 
++# pkg-config support
++configure_file("gmock.pc.in" "gmock.pc" @ONLY)
++
+ ########################################################################
+ #
+ # Project-wide settings
+@@ -87,7 +90,9 @@ cxx_library(gmock_main
+ 
+ install(TARGETS gmock DESTINATION lib)
+ install(TARGETS gmock_main DESTINATION lib)
+-
++install(FILES "${CMAKE_CURRENT_BINARY_DIR}/gmock.pc"
++    DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig/"
++)  
+ ########################################################################
+ #
+ # Google Mock's own tests.
+diff --git a/gmock.pc.in b/gmock.pc.in
+new file mode 100644
+index 0000000..08ad8d2
+--- /dev/null
++++ b/gmock.pc.in
+@@ -0,0 +1,9 @@
++Name: libgmock
++Version: 1.7.0
++Description: Google's framework for writing C++ tests on a variety of platforms
++ 
++prefix=@CMAKE_INSTALL_PREFIX@
++includedir=${prefix}/include
++libdir=${prefix}/lib
++Cflags:-I${includedir}/gmock
++Libs: -L${libdir} -lgmock -lgmock_main
+-- 
+1.9.1
+

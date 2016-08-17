@@ -1,0 +1,16 @@
+
+#
+# Patch managed by http://www.holgerschurig.de/patcher.html
+#
+
+--- openobex-1.2/apps/Makefile.am~disable-cable-test
++++ openobex-1.2/apps/Makefile.am
+@@ -6,7 +6,7 @@
+ 	obex_io.c obex_io.h \
+ 	obex_put_common.c obex_put_common.h
+ 
+-bin_PROGRAMS = irxfer obex_tcp irobex_palm3 obex_test
++bin_PROGRAMS = irxfer obex_tcp irobex_palm3
+ 
+ obex_test_SOURCES = \
+ 	obex_test.c obex_test.h \

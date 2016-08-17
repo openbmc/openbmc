@@ -1,0 +1,158 @@
+From 34969cde1dcb7740b4a7c3b6e3d04d481e5980b5 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Tue, 31 Jul 2012 17:26:27 +0100
+Subject: [PATCH] build: Fix parallel build problems with enum generation
+
+This is a backport from a patch against master.
+
+Upstream-Status: Submitted [https://bugzilla.gnome.org/show_bug.cgi?id=680925]
+---
+ extensions/file_tools/Makefile.am    |   10 ++++------
+ extensions/importer/Makefile.am      |   10 ++++------
+ extensions/pixbuf_savers/Makefile.am |   10 ++++------
+ gthumb/Makefile.am                   |   10 ++++------
+ 4 files changed, 16 insertions(+), 24 deletions(-)
+
+diff --git a/extensions/file_tools/Makefile.am b/extensions/file_tools/Makefile.am
+index 7785eff..d70a8a5 100644
+--- a/extensions/file_tools/Makefile.am
++++ b/extensions/file_tools/Makefile.am
+@@ -24,17 +24,16 @@ HEADER_FILES = 				\
+ 	gth-file-tool-undo.h		\
+ 	preferences.h
+ 
+-enum-types.h: $(HEADER_FILES) $(GLIB_MKENUMS)
++enum-types.h: $(HEADER_FILES)
+ 	$(AM_V_GEN)( $(GLIB_MKENUMS) \
+ 		--fhead "#ifndef ENUM_TYPES_H\n#define ENUM_TYPES_H\n\n#include <glib-object.h>\n\nG_BEGIN_DECLS\n" \
+ 		--fprod "/* enumerations from \"@filename@\" */\n" \
+ 		--vhead "GType @enum_name@_get_type (void);\n#define GTH_TYPE_@ENUMSHORT@ (@enum_name@_get_type())\n" \
+ 		--ftail "G_END_DECLS\n\n#endif /* ENUM_TYPES_H */" \
+ 		$^> xgen-$(@F) \
+-	&& (cmp -s xgen-$(@F) enum-types.h || cp xgen-$(@F) enum-types.h ) \
+-	&& rm -f xgen-$(@F) )
++	&& mv -f xgen-$(@F) enum-types.h )
+ 
+-enum-types.c: $(HEADER_FILES) enum-types.h
++enum-types.c: $(HEADER_FILES)
+ 	$(AM_V_GEN)( $(GLIB_MKENUMS) \
+ 		--fhead "#include <glib-object.h>\n" \
+ 		--fprod "\n/* enumerations from \"@filename@\" */\n#include \"@filename@\"" \
+@@ -42,8 +41,7 @@ enum-types.c: $(HEADER_FILES) enum-types.h
+ 		--vprod "      { @VALUENAME@, \"@VALUENAME@\", \"@valuenick@\" }," \
+ 		--vtail "      { 0, NULL, NULL }\n    };\n    etype = g_@type@_register_static (\"@EnumName@\", values);\n  }\n  return etype;\n}\n" \
+ 		$^> xgen-$(@F) \
+-	&& (cmp -s xgen-$(@F) enum-types.c || cp xgen-$(@F) enum-types.c ) \
+-	&& rm -f xgen-$(@F) )
++	&& mv -f xgen-$(@F) enum-types.c )
+ 
+ libfile_tools_la_SOURCES = 		\
+ 	$(ENUM_TYPES)			\
+diff --git a/extensions/importer/Makefile.am b/extensions/importer/Makefile.am
+index 29e7f2c..07c1eba 100644
+--- a/extensions/importer/Makefile.am
++++ b/extensions/importer/Makefile.am
+@@ -14,17 +14,16 @@ HEADER_FILES = 					\
+ 	preferences.h				\
+ 	utils.h
+ 
+-gth-import-enum-types.h: $(HEADER_FILES) $(GLIB_MKENUMS)
++gth-import-enum-types.h: $(HEADER_FILES)
+ 	$(AM_V_GEN)( $(GLIB_MKENUMS) \
+ 		--fhead "#ifndef ENUM_TYPES_H\n#define ENUM_TYPES_H\n\n#include <glib-object.h>\n\nG_BEGIN_DECLS\n" \
+ 		--fprod "/* enumerations from \"@filename@\" */\n" \
+ 		--vhead "GType @enum_name@_get_type (void);\n#define GTH_TYPE_@ENUMSHORT@ (@enum_name@_get_type())\n" \
+ 		--ftail "G_END_DECLS\n\n#endif /* ENUM_TYPES_H */" \
+ 		$^> xgen-$(@F) \
+-	&& (cmp -s xgen-$(@F) gth-import-enum-types.h || cp xgen-$(@F) gth-import-enum-types.h ) \
+-	&& rm -f xgen-$(@F) )
++	&& mv -f xgen-$(@F) gth-import-enum-types.h )
+ 
+-gth-import-enum-types.c: $(HEADER_FILES) gth-import-enum-types.h
++gth-import-enum-types.c: $(HEADER_FILES)
+ 	$(AM_V_GEN)( $(GLIB_MKENUMS) \
+ 		--fhead "#include <glib-object.h>\n" \
+ 		--fprod "\n/* enumerations from \"@filename@\" */\n#include \"@filename@\"" \
+@@ -32,8 +31,7 @@ gth-import-enum-types.c: $(HEADER_FILES) gth-import-enum-types.h
+ 		--vprod "      { @VALUENAME@, \"@VALUENAME@\", \"@valuenick@\" }," \
+ 		--vtail "      { 0, NULL, NULL }\n    };\n    etype = g_@type@_register_static (\"@EnumName@\", values);\n  }\n  return etype;\n}\n" \
+ 		$^> xgen-$(@F) \
+-	&& (cmp -s xgen-$(@F) gth-import-enum-types.c || cp xgen-$(@F) gth-import-enum-types.c ) \
+-	&& rm -f xgen-$(@F) )
++	&& mv -f xgen-$(@F) gth-import-enum-types.c )
+ 
+ libimporter_la_SOURCES = 			\
+ 	$(ENUM_TYPES)				\
+diff --git a/extensions/pixbuf_savers/Makefile.am b/extensions/pixbuf_savers/Makefile.am
+index bfe9f34..4764c32 100644
+--- a/extensions/pixbuf_savers/Makefile.am
++++ b/extensions/pixbuf_savers/Makefile.am
+@@ -10,17 +10,16 @@ ENUM_TYPES =				\
+ HEADER_FILES = 				\
+ 	preferences.h
+ 
+-enum-types.h: $(HEADER_FILES) $(GLIB_MKENUMS)
++enum-types.h: $(HEADER_FILES)
+ 	$(AM_V_GEN)( $(GLIB_MKENUMS) \
+ 		--fhead "#ifndef ENUM_TYPES_H\n#define ENUM_TYPES_H\n\n#include <glib-object.h>\n\nG_BEGIN_DECLS\n" \
+ 		--fprod "/* enumerations from \"@filename@\" */\n" \
+ 		--vhead "GType @enum_name@_get_type (void);\n#define GTH_TYPE_@ENUMSHORT@ (@enum_name@_get_type())\n" \
+ 		--ftail "G_END_DECLS\n\n#endif /* ENUM_TYPES_H */" \
+ 		$^> xgen-$(@F) \
+-	&& (cmp -s xgen-$(@F) enum-types.h || cp xgen-$(@F) enum-types.h ) \
+-	&& rm -f xgen-$(@F) )
++	&& mv -f xgen-$(@F) enum-types.h )
+ 
+-enum-types.c: $(HEADER_FILES) enum-types.h
++enum-types.c: $(HEADER_FILES)
+ 	$(AM_V_GEN)( $(GLIB_MKENUMS) \
+ 		--fhead "#include <glib-object.h>\n" \
+ 		--fprod "\n/* enumerations from \"@filename@\" */\n#include \"@filename@\"" \
+@@ -28,8 +27,7 @@ enum-types.c: $(HEADER_FILES) enum-types.h
+ 		--vprod "      { @VALUENAME@, \"@VALUENAME@\", \"@valuenick@\" }," \
+ 		--vtail "      { 0, NULL, NULL }\n    };\n    etype = g_@type@_register_static (\"@EnumName@\", values);\n  }\n  return etype;\n}\n" \
+ 		$^> xgen-$(@F) \
+-	&& (cmp -s xgen-$(@F) enum-types.c || cp xgen-$(@F) enum-types.c ) \
+-	&& rm -f xgen-$(@F) )
++	&& mv -f xgen-$(@F) enum-types.c )
+ 
+ libpixbuf_savers_la_SOURCES = 	\
+ 	$(ENUM_TYPES)		\
+diff --git a/gthumb/Makefile.am b/gthumb/Makefile.am
+index e9e385e..2f14e03 100644
+--- a/gthumb/Makefile.am
++++ b/gthumb/Makefile.am
+@@ -296,17 +296,16 @@ gthumb_CFLAGS =							\
+ 	-DGTHUMB_EXTENSIONS_DIR=\"$(extensions_dir)\"		\
+ 	$(NULL)
+ 
+-gth-enum-types.h: $(PUBLIC_HEADER_FILES) $(GLIB_MKENUMS)
++gth-enum-types.h: $(PUBLIC_HEADER_FILES)
+ 	$(AM_V_GEN)( $(GLIB_MKENUMS) \
+ 		--fhead "#ifndef GTH_ENUM_TYPES_H\n#define GTH_ENUM_TYPES_H\n\n#include <glib-object.h>\n\nG_BEGIN_DECLS\n" \
+ 		--fprod "/* enumerations from \"@filename@\" */\n" \
+ 		--vhead "GType @enum_name@_get_type (void);\n#define GTH_TYPE_@ENUMSHORT@ (@enum_name@_get_type())\n" \
+ 		--ftail "G_END_DECLS\n\n#endif /* GTH_ENUM_TYPES_H */" \
+ 		$^> xgen-$(@F) \
+-	&& (cmp -s xgen-$(@F) gth-enum-types.h || cp xgen-$(@F) gth-enum-types.h ) \
+-	&& rm -f xgen-$(@F) )
++	&& mv -f xgen-$(@F) gth-enum-types.h )
+ 
+-gth-enum-types.c: $(PUBLIC_HEADER_FILES) gth-enum-types.h
++gth-enum-types.c: $(PUBLIC_HEADER_FILES)
+ 	$(AM_V_GEN)( $(GLIB_MKENUMS) \
+ 		--fhead "#include <glib-object.h>\n" \
+ 		--fprod "\n/* enumerations from \"@filename@\" */\n#include \"@filename@\"" \
+@@ -314,8 +313,7 @@ gth-enum-types.c: $(PUBLIC_HEADER_FILES) gth-enum-types.h
+ 		--vprod "      { @VALUENAME@, \"@VALUENAME@\", \"@valuenick@\" }," \
+ 		--vtail "      { 0, NULL, NULL }\n    };\n    etype = g_@type@_register_static (\"@EnumName@\", values);\n  }\n  return etype;\n}\n" \
+ 		$^> xgen-$(@F) \
+-	&& (cmp -s xgen-$(@F) gth-enum-types.c || cp xgen-$(@F) gth-enum-types.c ) \
+-	&& rm -f xgen-$(@F) )
++	&& mv -f xgen-$(@F) gth-enum-types.c )
+ 
+ gth-marshal.h: gth-marshal.list $(GLIB_GENMARSHAL)
+ 	$(AM_V_GEN)( $(GLIB_GENMARSHAL) $(srcdir)/gth-marshal.list --header --prefix=gth_marshal > $@ )
+-- 
+1.7.10.4
+

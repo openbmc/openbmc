@@ -1,0 +1,29 @@
+From 990234af84a5399017d1c4fe03c5c756a8e51e23 Mon Sep 17 00:00:00 2001
+From: Hongjun Yang <Hongjun.Yang@windriver.com>
+Date: Tue, 20 Aug 2013 09:41:43 +0800
+Subject: [PATCH] fix cross compiling issue
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongjun.Yang <hongjun.yang@windriver.com>
+
+---
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure b/configure
+index 6ee98e0..8067f54 100755
+--- a/configure
++++ b/configure
+@@ -26965,7 +26965,7 @@ fi
+ if test "$cross_compiling" = yes; then :
+   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+ $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+-as_fn_error $? "cannot run test program while cross compiling
++$as_echo "cannot run test program while cross compiling
+ See \`config.log' for more details" "$LINENO" 5; }
+ else
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+-- 
+1.8.1.4
+

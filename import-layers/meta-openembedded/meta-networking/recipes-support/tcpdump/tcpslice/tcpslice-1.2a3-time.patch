@@ -1,0 +1,75 @@
+Upstream-Status: Pending [from tcpdump-4.1.1-1.fc14.src.rpm]
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+
+--- tcpslice-1.2a3.orig/search.c	2000-09-10 10:52:40.000000000 +0200
++++ tcpslice-1.2a3/search.c	2006-07-28 14:56:55.000000000 +0200
+@@ -53,7 +53,7 @@
+ /* Size of a packet header in bytes; easier than typing the sizeof() all
+  * the time ...
+  */
+-#define PACKET_HDR_LEN (sizeof( struct pcap_pkthdr ))
++#define PACKET_HDR_LEN (sizeof( struct pcap_sf_pkthdr ))
+ 
+ extern int snaplen;
+ 
+@@ -111,16 +111,24 @@
+ static void
+ extract_header( pcap_t *p, u_char *buf, struct pcap_pkthdr *hdr )
+ 	{
+-	memcpy((char *) hdr, (char *) buf, sizeof(struct pcap_pkthdr));
++	struct pcap_sf_pkthdr hdri;
++
++	memcpy((char *) &hdri, (char *) buf, sizeof(struct pcap_sf_pkthdr));
+ 
+ 	if ( pcap_is_swapped( p ) )
+ 		{
+-		hdr->ts.tv_sec = SWAPLONG(hdr->ts.tv_sec);
+-		hdr->ts.tv_usec = SWAPLONG(hdr->ts.tv_usec);
+-		hdr->len = SWAPLONG(hdr->len);
+-		hdr->caplen = SWAPLONG(hdr->caplen);
++		hdr->ts.tv_sec = SWAPLONG(hdri.ts.tv_sec);
++		hdr->ts.tv_usec = SWAPLONG(hdri.ts.tv_usec);
++		hdr->len = SWAPLONG(hdri.len);
++		hdr->caplen = SWAPLONG(hdri.caplen);
++		}
++	else
++		{
++		hdr->ts.tv_sec = hdri.ts.tv_sec;
++		hdr->ts.tv_usec = hdri.ts.tv_usec;
++		hdr->len = hdri.len;
++		hdr->caplen = hdri.caplen;
+ 		}
+-
+ 	/*
+ 	 * From bpf/libpcap/savefile.c:
+ 	 *
+--- tcpslice-1.2a3.orig/tcpslice.h	1995-11-02 00:40:53.000000000 +0100
++++ tcpslice-1.2a3/tcpslice.h	2006-07-28 14:56:55.000000000 +0200
+@@ -20,6 +20,26 @@
+  */
+ 
+ 
++#include <time.h>
++/* #include <net/bpf.h> */
++
++/*
++ * This is a timeval as stored in disk in a dumpfile.
++ * It has to use the same types everywhere, independent of the actual
++ * `struct timeval'
++ */
++
++struct pcap_timeval {
++    bpf_int32 tv_sec;           /* seconds */
++    bpf_int32 tv_usec;          /* microseconds */
++};
++
++struct pcap_sf_pkthdr {
++    struct pcap_timeval ts;     /* time stamp */
++    bpf_u_int32 caplen;         /* length of portion present */
++    bpf_u_int32 len;            /* length this packet (off wire) */
++};
++
+ time_t	gwtm2secs( struct tm *tm );
+ 
+ int	sf_find_end( struct pcap *p, struct timeval *first_timestamp,

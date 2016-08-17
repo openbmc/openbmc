@@ -1,0 +1,65 @@
+diff -Nru webmin-1.570.bak/mediatomb/index.cgi webmin-1.570/mediatomb/index.cgi
+--- webmin-1.570.bak/mediatomb/index.cgi	1969-12-31 16:00:00.000000000 -0800
++++ webmin-1.570/mediatomb/index.cgi	2011-10-26 10:00:05.992522036 -0700
+@@ -0,0 +1,13 @@
++#!/usr/bin/perl
++# index.cgi
++# Display MediaTomb option categories
++
++require './mediatomb-lib.pl';
++
++ui_print_header(undef, $text{'index_title'}, "", undef, 1, 1);
++
++
++$ipaddress = &get_my_address();
++print &text('index_desc', $ipaddress),"<p>\n";
++
++ui_print_footer("/", $text{'index'});
+diff -Nru webmin-1.570.bak/mediatomb/lang/en webmin-1.570/mediatomb/lang/en
+--- webmin-1.570.bak/mediatomb/lang/en	1969-12-31 16:00:00.000000000 -0800
++++ webmin-1.570/mediatomb/lang/en	2011-10-26 10:01:13.340522186 -0700
+@@ -0,0 +1,2 @@
++index_title=MediaTomb
++index_desc=MediaTomb is an open source (GPL) UPnP MediaServer with a nice web user interface. You can access it via <a href='http://$1:49153'>here</a>.
+diff -Nru webmin-1.570.bak/mediatomb/mediatomb-lib.pl webmin-1.570/mediatomb/mediatomb-lib.pl
+--- webmin-1.570.bak/mediatomb/mediatomb-lib.pl	1969-12-31 16:00:00.000000000 -0800
++++ webmin-1.570/mediatomb/mediatomb-lib.pl	2011-10-26 10:01:34.692522079 -0700
+@@ -0,0 +1,31 @@
++#!/usr/bin/perl
++# mediatomb-lib.pl
++# Common functions for the MediaTomb module
++
++BEGIN { push(@INC, ".."); };
++use WebminCore;
++&init_config();
++
++sub get_my_address
++{
++my $myip;
++if (&foreign_check("net")) {
++        # Try to get ethernet interface
++        &foreign_require("net", "net-lib.pl");
++        my @act = &net::active_interfaces();
++        my @ifaces = grep { &net::iface_type($_->{'fullname'}) =~ /ether/i }
++                          @act;
++        @ifaces = ( $act[0] ) if (!@ifaces && @act);
++        if (@ifaces) {
++                return wantarray ? ( map { $_->{'address'} } @ifaces )
++                                 : $ifaces[0]->{'address'};
++                }
++        }
++$myip = &to_ipaddress(&get_system_hostname());
++if ($myip) {
++        # Can resolve hostname .. use that
++        return wantarray ? ( $myip ) : $myip;
++        }
++return wantarray ? ( ) : undef;
++}
++
+diff -Nru webmin-1.570.bak/mediatomb/module.info webmin-1.570/mediatomb/module.info
+--- webmin-1.570.bak/mediatomb/module.info	1969-12-31 16:00:00.000000000 -0800
++++ webmin-1.570/mediatomb/module.info	2011-10-26 09:59:50.428528369 -0700
+@@ -0,0 +1,3 @@
++desc=MediaTomb
++category=others
++longdesc=MediaTomb access module

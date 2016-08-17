@@ -1,0 +1,279 @@
+* luaL_checkint and luaL_optint were deprecated in lua 5.3
+* replacement functions are luaL_checkinteger and luaL_optinteger
+
+Upstream-status: Pending
+
+Signed-off-by: Tim Orling <TicoTimo@gmail.com>
+
+Index: vlc-2.2.1/modules/lua/demux.c
+===================================================================
+--- vlc-2.2.1.orig/modules/lua/demux.c
++++ vlc-2.2.1/modules/lua/demux.c
+@@ -52,7 +52,7 @@ struct demux_sys_t
+ static int vlclua_demux_peek( lua_State *L )
+ {
+     demux_t *p_demux = (demux_t *)vlclua_get_this( L );
+-    int n = luaL_checkint( L, 1 );
++    int n = luaL_checkinteger( L, 1 );
+     const uint8_t *p_peek;
+ 
+     int i_peek = stream_Peek( p_demux->s, &p_peek, n );
+@@ -67,7 +67,7 @@ static int vlclua_demux_read( lua_State
+ {
+     demux_t *p_demux = (demux_t *)vlclua_get_this( L );
+     const uint8_t *p_read;
+-    int n = luaL_checkint( L, 1 );
++    int n = luaL_checkinteger( L, 1 );
+     int i_read = stream_Peek( p_demux->s, &p_read, n );
+ 
+     if( i_read > 0 )
+Index: vlc-2.2.1/modules/lua/libs/configuration.c
+===================================================================
+--- vlc-2.2.1.orig/modules/lua/libs/configuration.c
++++ vlc-2.2.1/modules/lua/libs/configuration.c
+@@ -84,7 +84,7 @@ static int vlclua_config_set( lua_State
+             break;
+ 
+         case VLC_VAR_INTEGER:
+-            config_PutInt( p_this, psz_name, luaL_checkint( L, 2 ) );
++            config_PutInt( p_this, psz_name, luaL_checkinteger( L, 2 ) );
+             break;
+ 
+         case VLC_VAR_BOOL:
+Index: vlc-2.2.1/modules/lua/libs/net.c
+===================================================================
+--- vlc-2.2.1.orig/modules/lua/libs/net.c
++++ vlc-2.2.1/modules/lua/libs/net.c
+@@ -202,7 +202,7 @@ static int vlclua_net_listen_tcp( lua_St
+ {
+     vlc_object_t *p_this = vlclua_get_this( L );
+     const char *psz_host = luaL_checkstring( L, 1 );
+-    int i_port = luaL_checkint( L, 2 );
++    int i_port = luaL_checkinteger( L, 2 );
+     int *pi_fd = net_ListenTCP( p_this, psz_host, i_port );
+     if( pi_fd == NULL )
+         return luaL_error( L, "Cannot listen on %s:%d", psz_host, i_port );
+@@ -274,7 +274,7 @@ static int vlclua_net_connect_tcp( lua_S
+ {
+     vlc_object_t *p_this = vlclua_get_this( L );
+     const char *psz_host = luaL_checkstring( L, 1 );
+-    int i_port = luaL_checkint( L, 2 );
++    int i_port = luaL_checkinteger( L, 2 );
+     int i_fd = net_Connect( p_this, psz_host, i_port, SOCK_STREAM, IPPROTO_TCP );
+     lua_pushinteger( L, vlclua_fd_map_safe( L, i_fd ) );
+     return 1;
+@@ -282,26 +282,26 @@ static int vlclua_net_connect_tcp( lua_S
+ 
+ static int vlclua_net_close( lua_State *L )
+ {
+-    int i_fd = luaL_checkint( L, 1 );
++    int i_fd = luaL_checkinteger( L, 1 );
+     vlclua_fd_unmap_safe( L, i_fd );
+     return 0;
+ }
+ 
+ static int vlclua_net_send( lua_State *L )
+ {
+-    int fd = vlclua_fd_get( L, luaL_checkint( L, 1 ) );
++    int fd = vlclua_fd_get( L, luaL_checkinteger( L, 1 ) );
+     size_t i_len;
+     const char *psz_buffer = luaL_checklstring( L, 2, &i_len );
+ 
+-    i_len = luaL_optint( L, 3, i_len );
++    i_len = luaL_optinteger( L, 3, i_len );
+     lua_pushinteger( L, (fd != -1) ? send( fd, psz_buffer, i_len, 0 ) : -1 );
+     return 1;
+ }
+ 
+ static int vlclua_net_recv( lua_State *L )
+ {
+-    int fd = vlclua_fd_get( L, luaL_checkint( L, 1 ) );
+-    size_t i_len = luaL_optint( L, 2, 1 );
++    int fd = vlclua_fd_get( L, luaL_checkinteger( L, 1 ) );
++    size_t i_len = luaL_optinteger( L, 2, 1 );
+     char psz_buffer[i_len];
+ 
+     ssize_t i_ret = (fd != -1) ? recv( fd, psz_buffer, i_len, 0 ) : -1;
+@@ -382,19 +382,19 @@ static int vlclua_fd_open( lua_State *L
+ #ifndef _WIN32
+ static int vlclua_fd_write( lua_State *L )
+ {
+-    int fd = vlclua_fd_get( L, luaL_checkint( L, 1 ) );
++    int fd = vlclua_fd_get( L, luaL_checkinteger( L, 1 ) );
+     size_t i_len;
+     const char *psz_buffer = luaL_checklstring( L, 2, &i_len );
+ 
+-    i_len = luaL_optint( L, 3, i_len );
++    i_len = luaL_optinteger( L, 3, i_len );
+     lua_pushinteger( L, (fd != -1) ? write( fd, psz_buffer, i_len ) : -1 );
+     return 1;
+ }
+ 
+ static int vlclua_fd_read( lua_State *L )
+ {
+-    int fd = vlclua_fd_get( L, luaL_checkint( L, 1 ) );
+-    size_t i_len = luaL_optint( L, 2, 1 );
++    int fd = vlclua_fd_get( L, luaL_checkinteger( L, 1 ) );
++    size_t i_len = luaL_optinteger( L, 2, 1 );
+     char psz_buffer[i_len];
+ 
+     ssize_t i_ret = (fd != -1) ? read( fd, psz_buffer, i_len ) : -1;
+Index: vlc-2.2.1/modules/lua/libs/osd.c
+===================================================================
+--- vlc-2.2.1.orig/modules/lua/libs/osd.c
++++ vlc-2.2.1/modules/lua/libs/osd.c
+@@ -67,7 +67,7 @@ static int vlclua_osd_icon( lua_State *L
+ {
+     const char *psz_icon = luaL_checkstring( L, 1 );
+     int i_icon = vlc_osd_icon_from_string( psz_icon );
+-    int i_chan = luaL_optint( L, 2, SPU_DEFAULT_CHANNEL );
++    int i_chan = luaL_optinteger( L, 2, SPU_DEFAULT_CHANNEL );
+     if( !i_icon )
+         return luaL_error( L, "\"%s\" is not a valid osd icon.", psz_icon );
+ 
+@@ -114,9 +114,9 @@ static int vlc_osd_position_from_string(
+ static int vlclua_osd_message( lua_State *L )
+ {
+     const char *psz_message = luaL_checkstring( L, 1 );
+-    int i_chan = luaL_optint( L, 2, SPU_DEFAULT_CHANNEL );
++    int i_chan = luaL_optinteger( L, 2, SPU_DEFAULT_CHANNEL );
+     const char *psz_position = luaL_optstring( L, 3, "top-right" );
+-    mtime_t duration = luaL_optint( L, 4, 1000000 );
++    mtime_t duration = luaL_optinteger( L, 4, 1000000 );
+ 
+     input_thread_t *p_input = vlclua_get_input_internal( L );
+     if( p_input )
+@@ -154,10 +154,10 @@ static int vlc_osd_slider_type_from_stri
+ 
+ static int vlclua_osd_slider( lua_State *L )
+ {
+-    int i_position = luaL_checkint( L, 1 );
++    int i_position = luaL_checkinteger( L, 1 );
+     const char *psz_type = luaL_checkstring( L, 2 );
+     int i_type = vlc_osd_slider_type_from_string( psz_type );
+-    int i_chan = luaL_optint( L, 3, SPU_DEFAULT_CHANNEL );
++    int i_chan = luaL_optinteger( L, 3, SPU_DEFAULT_CHANNEL );
+     if( !i_type )
+         return luaL_error( L, "\"%s\" is not a valid slider type.",
+                            psz_type );
+@@ -198,7 +198,7 @@ static int vlclua_spu_channel_register(
+ 
+ static int vlclua_spu_channel_clear( lua_State *L )
+ {
+-    int i_chan = luaL_checkint( L, 1 );
++    int i_chan = luaL_checkinteger( L, 1 );
+     input_thread_t *p_input = vlclua_get_input_internal( L );
+     if( !p_input )
+         return luaL_error( L, "Unable to find input." );
+Index: vlc-2.2.1/modules/lua/libs/playlist.c
+===================================================================
+--- vlc-2.2.1.orig/modules/lua/libs/playlist.c
++++ vlc-2.2.1/modules/lua/libs/playlist.c
+@@ -69,7 +69,7 @@ static int vlclua_playlist_next( lua_Sta
+ 
+ static int vlclua_playlist_skip( lua_State * L )
+ {
+-    int i_skip = luaL_checkint( L, 1 );
++    int i_skip = luaL_checkinteger( L, 1 );
+     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
+     playlist_Skip( p_playlist, i_skip );
+     return 0;
+@@ -127,7 +127,7 @@ static int vlclua_playlist_random( lua_S
+ 
+ static int vlclua_playlist_gotoitem( lua_State * L )
+ {
+-    int i_id = luaL_checkint( L, 1 );
++    int i_id = luaL_checkinteger( L, 1 );
+     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
+     PL_LOCK;
+     int i_ret = playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
+@@ -139,7 +139,7 @@ static int vlclua_playlist_gotoitem( lua
+ 
+ static int vlclua_playlist_delete( lua_State * L )
+ {
+-    int i_id = luaL_checkint( L, 1 );
++    int i_id = luaL_checkinteger( L, 1 );
+     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
+     PL_LOCK;
+     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id );
+@@ -155,8 +155,8 @@ static int vlclua_playlist_delete( lua_S
+ 
+ static int vlclua_playlist_move( lua_State * L )
+ {
+-    int i_item = luaL_checkint( L, 1 );
+-    int i_target = luaL_checkint( L, 2 );
++    int i_item = luaL_checkinteger( L, 1 );
++    int i_target = luaL_checkinteger( L, 2 );
+     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
+     PL_LOCK;
+     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_item );
+Index: vlc-2.2.1/modules/lua/libs/stream.c
+===================================================================
+--- vlc-2.2.1.orig/modules/lua/libs/stream.c
++++ vlc-2.2.1/modules/lua/libs/stream.c
+@@ -101,7 +101,7 @@ static int vlclua_stream_read( lua_State
+ {
+     int i_read;
+     stream_t **pp_stream = (stream_t **)luaL_checkudata( L, 1, "stream" );
+-    int n = luaL_checkint( L, 2 );
++    int n = luaL_checkinteger( L, 2 );
+     uint8_t *p_read = malloc( n );
+     if( !p_read ) return vlclua_error( L );
+ 
+Index: vlc-2.2.1/modules/lua/libs/variables.c
+===================================================================
+--- vlc-2.2.1.orig/modules/lua/libs/variables.c
++++ vlc-2.2.1/modules/lua/libs/variables.c
+@@ -103,7 +103,7 @@ static int vlclua_tovalue( lua_State *L,
+             val->b_bool = luaL_checkboolean( L, -1 );
+             break;
+         case VLC_VAR_INTEGER:
+-            val->i_int = luaL_checkint( L, -1 );
++            val->i_int = luaL_checkinteger( L, -1 );
+             break;
+         case VLC_VAR_STRING:
+             val->psz_string = (char*)luaL_checkstring( L, -1 ); /* XXX: Beware, this only stays valid as long as (L,-1) stays in the stack */
+Index: vlc-2.2.1/modules/lua/libs/volume.c
+===================================================================
+--- vlc-2.2.1.orig/modules/lua/libs/volume.c
++++ vlc-2.2.1/modules/lua/libs/volume.c
+@@ -48,7 +48,7 @@
+ static int vlclua_volume_set( lua_State *L )
+ {
+     playlist_t *p_this = vlclua_get_playlist_internal( L );
+-    int i_volume = luaL_checkint( L, 1 );
++    int i_volume = luaL_checkinteger( L, 1 );
+     if( i_volume < 0 )
+         i_volume = 0;
+     int i_ret = playlist_VolumeSet( p_this, i_volume/(float)AOUT_VOLUME_DEFAULT );
+@@ -68,7 +68,7 @@ static int vlclua_volume_up( lua_State *
+     playlist_t *p_this = vlclua_get_playlist_internal( L );
+     float volume;
+ 
+-    playlist_VolumeUp( p_this, luaL_optint( L, 1, 1 ), &volume );
++    playlist_VolumeUp( p_this, luaL_optinteger( L, 1, 1 ), &volume );
+     lua_pushnumber( L, lroundf(volume * AOUT_VOLUME_DEFAULT) );
+     return 1;
+ }
+@@ -78,7 +78,7 @@ static int vlclua_volume_down( lua_State
+     playlist_t *p_this = vlclua_get_playlist_internal( L );
+     float volume;
+ 
+-    playlist_VolumeDown( p_this, luaL_optint( L, 1, 1 ), &volume );
++    playlist_VolumeDown( p_this, luaL_optinteger( L, 1, 1 ), &volume );
+     lua_pushnumber( L, lroundf(volume * AOUT_VOLUME_DEFAULT) );
+     return 1;
+ }
+Index: vlc-2.2.1/modules/lua/libs/win.c
+===================================================================
+--- vlc-2.2.1.orig/modules/lua/libs/win.c
++++ vlc-2.2.1/modules/lua/libs/win.c
+@@ -123,7 +123,7 @@ static int vlclua_console_init( lua_Stat
+ 
+ static int vlclua_console_wait( lua_State *L )
+ {
+-    int i_timeout = luaL_optint( L, 1, 0 );
++    int i_timeout = luaL_optinteger( L, 1, 0 );
+     DWORD status = WaitForSingleObject( GetConsole( L ), i_timeout );
+     lua_pushboolean( L, status == WAIT_OBJECT_0 );
+     return 1;

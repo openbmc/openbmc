@@ -1,0 +1,20 @@
+--- a/lib/replace/wscript	2015-11-13 16:04:04.000000000 +0100
++++ b/lib/replace/wscript	2015-11-13 16:23:20.000000000 +0100
+@@ -636,8 +636,6 @@
+     if not bld.CONFIG_SET('HAVE_INET_ATON'):     REPLACE_SOURCE += ' inet_aton.c'
+     if not bld.CONFIG_SET('HAVE_INET_NTOP'):     REPLACE_SOURCE += ' inet_ntop.c'
+     if not bld.CONFIG_SET('HAVE_INET_PTON'):     REPLACE_SOURCE += ' inet_pton.c'
+-    if not bld.CONFIG_SET('HAVE_GETXATTR') or bld.CONFIG_SET('XATTR_ADDITIONAL_OPTIONS'):
+-                                                 REPLACE_SOURCE += ' xattr.c'
+ 
+     bld.SAMBA_LIBRARY('replace',
+                       source=REPLACE_SOURCE,
+@@ -648,7 +646,7 @@
+                       # at the moment:
+                       # hide_symbols=bld.BUILTIN_LIBRARY('replace'),
+                       private_library=True,
+-                      deps='crypt dl nsl socket rt attr' + extra_libs)
++                      deps='crypt dl nsl socket rt ' + extra_libs)
+ 
+     bld.SAMBA_SUBSYSTEM('replace-test',
+                       source='''test/testsuite.c test/strptime.c

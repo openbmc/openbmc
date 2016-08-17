@@ -1,0 +1,110 @@
+Avoid namepspace collision with encrypt function from libc
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Index: bluez-4.101/test/l2test.c
+===================================================================
+--- bluez-4.101.orig/test/l2test.c
++++ bluez-4.101/test/l2test.c
+@@ -107,7 +107,7 @@ static char *filename = NULL;
+ static int rfcmode = 0;
+ static int master = 0;
+ static int auth = 0;
+-static int encrypt = 0;
++static int encryption_request = 0;
+ static int secure = 0;
+ static int socktype = SOCK_SEQPACKET;
+ static int linger = 0;
+@@ -340,7 +340,7 @@ static int do_connect(char *svr)
+ 		opt |= L2CAP_LM_MASTER;
+ 	if (auth)
+ 		opt |= L2CAP_LM_AUTH;
+-	if (encrypt)
++	if (encryption_request)
+ 		opt |= L2CAP_LM_ENCRYPT;
+ 	if (secure)
+ 		opt |= L2CAP_LM_SECURE;
+@@ -475,7 +475,7 @@ static void do_listen(void (*handler)(in
+ 		opt |= L2CAP_LM_MASTER;
+ 	if (auth)
+ 		opt |= L2CAP_LM_AUTH;
+-	if (encrypt)
++	if (encryption_request)
+ 		opt |= L2CAP_LM_ENCRYPT;
+ 	if (secure)
+ 		opt |= L2CAP_LM_SECURE;
+@@ -1407,7 +1407,7 @@ int main(int argc, char *argv[])
+ 			break;
+ 
+ 		case 'E':
+-			encrypt = 1;
++			encryption_request = 1;
+ 			break;
+ 
+ 		case 'S':
+Index: bluez-4.101/test/rctest.c
+===================================================================
+--- bluez-4.101.orig/test/rctest.c
++++ bluez-4.101/test/rctest.c
+@@ -79,7 +79,7 @@ static char *filename = NULL;
+ 
+ static int master = 0;
+ static int auth = 0;
+-static int encrypt = 0;
++static int encryption_request = 0;
+ static int secure = 0;
+ static int socktype = SOCK_STREAM;
+ static int linger = 0;
+@@ -200,7 +200,7 @@ static int do_connect(const char *svr)
+ 		opt |= RFCOMM_LM_MASTER;
+ 	if (auth)
+ 		opt |= RFCOMM_LM_AUTH;
+-	if (encrypt)
++	if (encryption_request)
+ 		opt |= RFCOMM_LM_ENCRYPT;
+ 	if (secure)
+ 		opt |= RFCOMM_LM_SECURE;
+@@ -291,7 +291,7 @@ static void do_listen(void (*handler)(in
+ 		opt |= RFCOMM_LM_MASTER;
+ 	if (auth)
+ 		opt |= RFCOMM_LM_AUTH;
+-	if (encrypt)
++	if (encryption_request)
+ 		opt |= RFCOMM_LM_ENCRYPT;
+ 	if (secure)
+ 		opt |= RFCOMM_LM_SECURE;
+@@ -701,7 +701,7 @@ int main(int argc, char *argv[])
+ 			break;
+ 
+ 		case 'E':
+-			encrypt = 1;
++			encryption_request = 1;
+ 			break;
+ 
+ 		case 'S':
+Index: bluez-4.101/src/textfile.h
+===================================================================
+--- bluez-4.101.orig/src/textfile.h
++++ bluez-4.101/src/textfile.h
+@@ -24,6 +24,8 @@
+ #ifndef __TEXTFILE_H
+ #define __TEXTFILE_H
+ 
++#include <sys/types.h>
++
+ int create_dirs(const char *filename, const mode_t mode);
+ int create_file(const char *filename, const mode_t mode);
+ int create_name(char *buf, size_t size, const char *path,
+Index: bluez-4.101/test/attest.c
+===================================================================
+--- bluez-4.101.orig/test/attest.c
++++ bluez-4.101/test/attest.c
+@@ -34,6 +34,7 @@
+ #include <termios.h>
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
++#include <sys/select.h>
+ 
+ #include <bluetooth/bluetooth.h>
+ #include <bluetooth/rfcomm.h>

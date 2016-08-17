@@ -1,0 +1,60 @@
+From e198f0a87660a048164ca0e16d18517d0aee846e Mon Sep 17 00:00:00 2001
+From: Andre McCurdy <armccurdy@gmail.com>
+Date: Tue, 9 Jun 2015 12:20:45 -0700
+Subject: [PATCH] Fix builds when using separate source and build directories.
+
+Upstream-Status: Pending
+
+Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+---
+ configure.ac           | 8 ++++----
+ ixml/Makefile.am       | 2 +-
+ threadutil/Makefile.am | 2 +-
+ 3 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index e2c3f47..11d5e22 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -714,8 +714,8 @@ AC_OUTPUT
+ #
+ # Files copied for windows compilation.
+ #
+-echo "configure: copying \"autoconfig.h\"          to \"build/inc/autoconfig.h\""
+-cp autoconfig.h build/inc/autoconfig.h
+-echo "configure: copying \"upnp/inc/upnpconfig.h\" to \"build/inc/upnpconfig.h\""
+-cp upnp/inc/upnpconfig.h build/inc/upnpconfig.h
++echo "configure: copying \"autoconfig.h\"          to \"\$srcdir/build/inc/autoconfig.h\""
++cp autoconfig.h $srcdir/build/inc/autoconfig.h
++echo "configure: copying \"upnp/inc/upnpconfig.h\" to \"\$srcdir/build/inc/upnpconfig.h\""
++cp upnp/inc/upnpconfig.h $srcdir/build/inc/upnpconfig.h
+ 
+diff --git a/ixml/Makefile.am b/ixml/Makefile.am
+index 49da766..0e9ab2c 100644
+--- a/ixml/Makefile.am
++++ b/ixml/Makefile.am
+@@ -7,7 +7,7 @@
+ 
+ SUBDIRS 		= doc
+ 
+-AM_CPPFLAGS		= -I$(srcdir)/inc -I$(srcdir)/src/inc
++AM_CPPFLAGS		= -I$(top_srcdir)/upnp/inc -I$(srcdir)/inc -I$(srcdir)/src/inc
+ AM_CFLAGS		= 
+ 
+ LDADD			= libixml.la
+diff --git a/threadutil/Makefile.am b/threadutil/Makefile.am
+index a4ed325..42d0726 100644
+--- a/threadutil/Makefile.am
++++ b/threadutil/Makefile.am
+@@ -4,7 +4,7 @@
+ # (C) Copyright 2005 Remi Turboult <r3mi@users.sourceforge.net>
+ #
+ 
+-AM_CPPFLAGS		= -I$(srcdir)/inc -I$(srcdir)/src/inc
++AM_CPPFLAGS		= -I$(top_srcdir)/upnp/inc -I$(srcdir)/inc -I$(srcdir)/src/inc
+ 
+ if ENABLE_DEBUG
+     AM_CPPFLAGS		+= -DDEBUG -DSTATS
+-- 
+1.9.1
+

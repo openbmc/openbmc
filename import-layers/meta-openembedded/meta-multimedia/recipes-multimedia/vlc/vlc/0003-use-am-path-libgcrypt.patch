@@ -1,0 +1,46 @@
+* The upstream tests for libgcrypt are awkward and not working.
+  - Requires libgcrypt-config, which seems broken?
+* AM_PATH_LIBGCRYPT exists for a reason, why not use it? KISS.
+* Upstream abandoned AM_PATH_LIBGCRYPT in the past...newer automake ok?
+
+Upstream status: Pending
+
+Index: vlc-2.2.1/configure.ac
+===================================================================
+--- vlc-2.2.1.orig/configure.ac
++++ vlc-2.2.1/configure.ac
+@@ -4017,25 +4017,19 @@ PKG_ENABLE_MODULES_VLC([LIBXML2], [xml],
+ dnl
+ dnl libgcrypt
+ dnl
++GCRYPT_LIBVER=1
++GCRYPT_REQ=1.1.94
+ AC_ARG_ENABLE(libgcrypt,
+   [  --disable-libgcrypt     gcrypt support (default enabled)])
+ AS_IF([test "${enable_libgcrypt}" != "no"], [
+-  AC_CHECK_DECL([GCRYCTL_SET_THREAD_CBS], [
+-    libgcrypt-config --version >/dev/null || \
+-        AC_MSG_ERROR([gcrypt.h present but libgcrypt-config could not be found])
+-    AC_CHECK_LIB(gcrypt, gcry_control, [
+-      have_libgcrypt="yes"
+-      GCRYPT_CFLAGS="`libgcrypt-config --cflags`"
+-      GCRYPT_LIBS="`libgcrypt-config --libs`"
+-    ], [
+-      AC_MSG_ERROR([libgcrypt not found. Install libgcrypt or pass --disable-libgcrypt.])
+-    ], [`libgcrypt-config --libs`])
+-  ], [
+-    AC_MSG_ERROR([libgcrypt version 1.1.94 or higher not found. Install libgcrypt or pass --disable-libgcrypt.])
+-  ], [#include <gcrypt.h>]
+-  )
++      AM_PATH_LIBGCRYPT($GCRYPT_LIBVER:$GCRYPT_REQ,
++      [
++          GCRYPT_CFLAGS="$LIBGCRYPT_CFLAGS"
++          GCRYPT_LIBS="$LIBGCRYPT_LIBS"
++      ],[
++          AC_MSG_ERROR([libgcrypt version 1.1.94 or higher not found. Install libgcrypt or use --disable-libgcrypt. Have a nice day.])
++      ])
+ ])
+-
+ AC_SUBST(GCRYPT_CFLAGS)
+ AC_SUBST(GCRYPT_LIBS)
+ AM_CONDITIONAL([HAVE_GCRYPT], [test "${have_libgcrypt}" = "yes"])

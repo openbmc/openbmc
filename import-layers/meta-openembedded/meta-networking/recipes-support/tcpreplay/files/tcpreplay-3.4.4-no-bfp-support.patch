@@ -1,0 +1,15 @@
+Uptream-Status: Pending
+
+Signed-off-by: Zongchun Yu <Zongchun.Yu@freescale.com>
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -758,6 +758,8 @@
+     AC_MSG_RESULT(no)
+ ])
+ 
++ac_cv_have_bpf=no
++
+ have_bpf=no
+ dnl Check for BSD's BPF
+ AC_CACHE_CHECK([for BPF device sending support], ac_cv_have_bpf,

@@ -1,0 +1,25 @@
+Author: Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>
+
+Upstream-Status: unsuitable
+---
+ build/linux.gcc.inc |    5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+--- tbb41_20121003oss.orig/build/linux.gcc.inc
++++ tbb41_20121003oss/build/linux.gcc.inc
+@@ -40,12 +40,13 @@ DYLIB_KEY = -shared
+ EXPORT_KEY = -Wl,--version-script,
+ LIBDL = -ldl
+ 
+ TBB_NOSTRICT = 1
+ 
+-CPLUS = g++
+-CONLY = gcc
++CPLUS = $(CXX)
++CONLY = $(CC)
++CPLUS_FLAGS = $(CXXFLAGS)
+ LIB_LINK_FLAGS = $(DYLIB_KEY) -Wl,-soname=$(BUILDING_LIBRARY)
+ LIBS += -lpthread -lrt
+ LINK_FLAGS = -Wl,-rpath-link=.
+ C_FLAGS = $(CPLUS_FLAGS)
+ # gcc 4.4 and higher support -std=c++0x

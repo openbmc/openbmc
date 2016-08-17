@@ -1,0 +1,13 @@
+--- a/kexec/crashdump-elf.c
++++ b/kexec/crashdump-elf.c
+@@ -47,7 +47,8 @@
+	if (xen_present())
+		nr_cpus = xen_get_nr_phys_cpus();
+	else
+-		nr_cpus = sysconf(_SC_NPROCESSORS_CONF);
++		/*nr_cpus = sysconf(_SC_NPROCESSORS_CONF);*/
++		nr_cpus = 1;
+ 
+	if (nr_cpus < 0) {
+		return -1;
+

@@ -1,0 +1,38 @@
+openldap: assume /dev/urandom exists
+
+When we are cross-compiling, we want to assume
+that /dev/urandom exists.  We could change the source
+code to look for it, but this is the easy way out.
+
+Upstream-Status: pending
+
+Signed-off-by: Joe Slater <jslater@windriver.com>
+
+
+--- a/configure.in
++++ b/configure.in
+@@ -2142,8 +2142,8 @@ fi
+ 
+ dnl ----------------------------------------------------------------
+ dnl Check for entropy sources
++dev=no
+ if test $cross_compiling != yes && test "$ac_cv_mingw32" != yes ; then
+-	dev=no
+ 	if test -r /dev/urandom ; then
+ 		dev="/dev/urandom";
+ 	elif test -r /idev/urandom ; then
+@@ -2156,9 +2156,11 @@ if test $cross_compiling != yes && test 
+ 		dev="/idev/random";
+ 	fi
+ 
+-	if test $dev != no ; then
+-		AC_DEFINE_UNQUOTED(URANDOM_DEVICE,"$dev",[set to urandom device])
+-	fi
++elif test $cross_compiling == yes ; then
++	dev="/dev/urandom";
++fi
++if test $dev != no ; then
++	AC_DEFINE_UNQUOTED(URANDOM_DEVICE,"$dev",[set to urandom device])
+ fi
+ 
+ dnl ----------------------------------------------------------------

@@ -1,0 +1,57 @@
+From 809f00a6ef0224b41b2e1207194c8da3cd3e3c7e Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Thu, 18 Dec 2014 17:23:37 +0800
+Subject: [PATCH] adduser: add -M option for useradd when --no-create-home is specified
+
+The useradd (from package passwd) in debian based system sets -M (--no-create-home) by default,
+but the one we are using (from package shadow) sets -m (--create-home) by default, so we
+need to explicitly add -M option for useradd call when --no-create-home is specified for adduser.
+
+Upstream-Status: Pending
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ adduser |   20 ++++++++++++++++----
+ 1 files changed, 16 insertions(+), 4 deletions(-)
+
+diff --git a/adduser b/adduser
+index c3bd8b0..9a07f9f 100755
+--- a/adduser
++++ b/adduser
+@@ -434,8 +434,14 @@ if ($action eq "addsysuser") {
+     $shell = $special_shell || '/bin/false';
+     $undouser = $new_name;
+     my $useradd = &which('useradd');
+-    &systemcall($useradd, '-d', $home_dir, '-g', $ingroup_name, '-s',
+-		$shell, '-u', $new_uid, $new_name);
++    if ($no_create_home) {
++        &systemcall($useradd, '-d', $home_dir, '-g', $ingroup_name, '-s',
++		    $shell, '-u', $new_uid, '-M', $new_name);
++    }
++    else {
++        &systemcall($useradd, '-d', $home_dir, '-g', $ingroup_name, '-s',
++                    $shell, '-u', $new_uid, $new_name);
++    }
+     if(!$disabled_login) {
+         my $usermod = &which('usermod');
+         &systemcall($usermod, '-p', '*', $new_name);
+@@ -524,8 +530,14 @@ if ($action eq "adduser") {
+ 	$shell = $special_shell || $config{"dshell"};
+     $undouser = $new_name;
+     my $useradd = &which('useradd');
+-    &systemcall($useradd, '-d', $home_dir, '-g', $ingroup_name, '-s',
+-		$shell, '-u', $new_uid, $new_name);
++    if ($no_create_home) {
++        &systemcall($useradd, '-d', $home_dir, '-g', $ingroup_name, '-s',
++	    	    $shell, '-u', $new_uid, '-M', $new_name);
++    }
++    else {
++        &systemcall($useradd, '-d', $home_dir, '-g', $ingroup_name, '-s',
++	    	    $shell, '-u', $new_uid, $new_name);
++    }
+     &invalidate_nscd();
+ 
+     create_homedir (1); # copy skeleton data
+-- 
+1.7.1
+

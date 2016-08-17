@@ -1,0 +1,28 @@
+From 2182c423c6cd235c052e6c420203f24ec9bcd6ab Mon Sep 17 00:00:00 2001
+From: Lu Chong <Chong.Lu@windriver.com>
+Date: Wed, 30 Oct 2013 15:27:00 +0800
+Subject: [PATCH] fuse: fix the return value of "--help" option
+
+Upstream-Status: Pending
+
+Signed-off-by: Lu Chong <Chong.Lu@windriver.com>
+---
+ util/fusermount.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/util/fusermount.c b/util/fusermount.c
+index b2e87d9..70d7c75 100644
+--- a/util/fusermount.c
++++ b/util/fusermount.c
+@@ -1168,7 +1168,7 @@ static void usage(void)
+ 		" -q		    quiet\n"
+ 		" -z		    lazy unmount\n",
+ 		progname);
+-	exit(1);
++	exit(0);
+ }
+ 
+ static void show_version(void)
+-- 
+1.7.9.5
+

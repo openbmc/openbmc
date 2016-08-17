@@ -1,0 +1,20 @@
+# Author: echo <fei.geng@windriver.com>
+# Date: April 28 2009
+# Summary:Fix perl install directory to /usr/bin
+#
+# Upstream-Status: Inappropriate [configuration]
+
+--- a/configure.in
++++ b/configure.in
+@@ -638,10 +638,7 @@
+ AC_DEFINE_UNQUOTED(APACHE_MPM_DIR, "$MPM_DIR",
+ 	[Location of the source for the current MPM])
+ 
+-perlbin=`$ac_aux_dir/PrintPath perl`
+-if test "x$perlbin" = "x"; then
+-    perlbin="/replace/with/path/to/perl/interpreter"
+-fi
++perlbin='/usr/bin/perl'
+ AC_SUBST(perlbin)
+ 
+ dnl If we are running on BSD/OS, we need to use the BSD .include syntax.

@@ -1,0 +1,30 @@
+From 36fd2aa23e712f05f0cce4a1be3453fcf405d026 Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Tue, 15 Sep 2015 16:28:18 +0300
+Subject: [PATCH] Remove pkg-config check for gnome-icon-theme
+
+Theme is not required for building, and the icons are provided by
+adwaita-icon-theme anyway
+
+Upstream-Status: Inappropriate [Fixed in current versions]
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ configure.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.in b/configure.in
+index 3600823..42262f2 100644
+--- a/configure.in
++++ b/configure.in
+@@ -37,7 +37,7 @@ LIBXML_REQUIRED=2.0
+ RSVG_REQUIRED=2.12
+ DBUS_REQUIRED=0.7
+ 
+-PKG_CHECK_MODULES(PROCMAN, glib-2.0 >= $GLIB_REQUIRED gconf-2.0 >= $GCONF_REQUIRED libgtop-2.0 >= $LIBGTOP_REQUIRED libwnck-1.0 >= $LIBWNCK_REQUIRED gtk+-2.0 >= $GTK_REQUIRED gnome-icon-theme >= $GNOME_ICON_THEME_REQUIRED gtkmm-2.4 >= $GTKMM_REQUIRED libxml-2.0 >= $LIBXML_REQUIRED librsvg-2.0 >= $RSVG_REQUIRED glibmm-2.4 >= $GLIBMM_REQUIRED giomm-2.4 >= $GIOMM_REQUIRED dbus-glib-1 >= $DBUS_REQUIRED)
++PKG_CHECK_MODULES(PROCMAN, glib-2.0 >= $GLIB_REQUIRED gconf-2.0 >= $GCONF_REQUIRED libgtop-2.0 >= $LIBGTOP_REQUIRED libwnck-1.0 >= $LIBWNCK_REQUIRED gtk+-2.0 >= $GTK_REQUIRED gtkmm-2.4 >= $GTKMM_REQUIRED libxml-2.0 >= $LIBXML_REQUIRED librsvg-2.0 >= $RSVG_REQUIRED glibmm-2.4 >= $GLIBMM_REQUIRED giomm-2.4 >= $GIOMM_REQUIRED dbus-glib-1 >= $DBUS_REQUIRED)
+ 
+ 
+ AC_ARG_ENABLE(more-warnings,
+-- 
+2.1.4
+

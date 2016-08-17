@@ -1,0 +1,19 @@
+Kept to help with debugging
+
+Upstream-Status: Pending
+
+Signed-off-by: Morgan Little <morgan.little@windriver.com>
+
+--- eject-2.1.1/eject.c.tn	2005-08-24 11:27:42.000000000 +0200
++++ eject-2.1.1/eject.c	2005-08-24 11:33:05.000000000 +0200
+@@ -638,7 +638,9 @@
+ 	unsigned char sense_buffer[32];
+ 
+ 	if ((ioctl(fd, SG_GET_VERSION_NUM, &k) < 0) || (k < 30000)) {
+-	  printf("not an sg device, or old sg driver\n");
++	  if (v_option) {
++		  printf(_("not an sg device, or old sg driver\n"));
++	  }
+ 	  return 0;
+ 	}
+ 

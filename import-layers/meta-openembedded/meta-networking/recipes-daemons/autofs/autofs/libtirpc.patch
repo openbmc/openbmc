@@ -1,0 +1,26 @@
+Index: autofs-5.0.7/aclocal.m4
+===================================================================
+--- autofs-5.0.7.orig/aclocal.m4	2012-10-28 13:17:45.504237027 -0700
++++ autofs-5.0.7/aclocal.m4	2012-10-28 13:20:50.108242739 -0700
+@@ -403,7 +403,7 @@
+ # save current flags
+ af_check_libtirpc_save_cflags="$CFLAGS"
+ af_check_libtirpc_save_ldflags="$LDFLAGS"
+-CFLAGS="$CFLAGS -I/usr/include/tirpc"
++CFLAGS="$CFLAGS -I=/usr/include/tirpc"
+ LDFLAGS="$LDFLAGS -ltirpc"
+ 
+ AC_TRY_LINK(
+Index: autofs-5.0.7/Makefile.rules
+===================================================================
+--- autofs-5.0.7.orig/Makefile.rules	2012-10-28 13:17:45.308237022 -0700
++++ autofs-5.0.7/Makefile.rules	2012-10-28 13:21:25.720242803 -0700
+@@ -48,7 +48,7 @@
+ LIBS += -lpthread
+ 
+ ifdef TIRPCLIB
+-CFLAGS += -I/usr/include/tirpc
++CFLAGS += -I=/usr/include/tirpc
+ LIBS += $(TIRPCLIB)
+ endif
+ 

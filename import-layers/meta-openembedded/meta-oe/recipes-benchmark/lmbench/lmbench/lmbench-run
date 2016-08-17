@@ -1,0 +1,23 @@
+#!/bin/sh
+# Wrapper script for lmbench written for the 
+# Debian GNU/Linux distribution by 
+# Javier Fernandez-Sanguino.
+# Distributed under the GPL
+SHAREDIR=/usr/share/lmbench/
+BINDIR=/usr/lib/lmbench/
+SCRIPTSDIR=$SHAREDIR/scripts
+RESULTSDIR=$SHAREDIR/results
+CONFIG=/var/lib/lmbench/config/`$SCRIPTSDIR/config`
+runuid=`id -u`
+
+[ $runuid -gt 0 ] && {
+	echo "You must run this as the root user"
+	exit 0
+}
+cd $SCRIPTSDIR 
+[ ! -f $CONFIG ] && ./config-run
+./results
+
+echo "Benchmark run finished...."
+echo "Remember you can find the results of the benchmark "
+echo "under $RESULTSDIR"

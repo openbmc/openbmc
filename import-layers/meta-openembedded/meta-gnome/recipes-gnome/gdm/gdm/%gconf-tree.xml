@@ -1,0 +1,492 @@
+<?xml version="1.0"?>
+<gconf>
+        <dir name="desktop">
+                <dir name="gnome">
+                        <dir name="url-handlers">
+                                <dir name="ymsgr">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="xmpp">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="webcal">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="uvox">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="trash">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="sip">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="rtsp">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="rtp">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="pnm">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="note">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="net">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="msnim">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="mmsh">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="mms">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="man">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="mailto">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="lastfm">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="itpc">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="itms">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="irc">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="info">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="icyx">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="icy">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="icq">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="https">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="http">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="h323">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="ghelp">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="gg">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="ftp">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="file">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="feed">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="cdda">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="callto">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="aim">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                                <dir name="about">
+                                        <entry name="command" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                        </dir>
+                        <dir name="lockdown">
+                                <entry name="disable_url_handlers" mtime="1227173197" type="bool" value="true">
+                                </entry>
+                                <entry name="disable_save_to_disk" mtime="1227173197" type="bool" value="true">
+                                </entry>
+                                <entry name="disable_print_setup" mtime="1227173197" type="bool" value="true">
+                                </entry>
+                                <entry name="disable_printing" mtime="1227173197" type="bool" value="true">
+                                </entry>
+                                <entry name="disable_lock_screen" mtime="1227173197" type="bool" value="true">
+                                </entry>
+                                <entry name="disable_command_line" mtime="1227173197" type="bool" value="true">
+                                </entry>
+                        </dir>
+                        <dir name="applications">
+                                <dir name="terminal">
+                                        <entry name="exec" mtime="1227173197" type="string">
+                                                <stringvalue>/bin/true</stringvalue>
+                                        </entry>
+                                </dir>
+                        </dir>
+                        <dir name="accessibility">
+                                <dir name="keyboard">
+                                        <entry name="enable" mtime="1227173197" type="bool" value="true">
+                                        </entry>
+                                </dir>
+                        </dir>
+                </dir>
+        </dir>
+        <dir name="apps">
+                <dir name="gnome_settings_daemon">
+                        <dir name="keybindings">
+                                <entry name="www" mtime="1227173197" type="string">
+                                        <stringvalue></stringvalue>
+                                </entry>
+                                <entry name="stop" mtime="1227173197" type="string">
+                                        <stringvalue></stringvalue>
+                                </entry>
+                                <entry name="sleep" mtime="1227173197" type="string">
+                                        <stringvalue></stringvalue>
+                                </entry>
+                                <entry name="search" mtime="1227173197" type="string">
+                                        <stringvalue></stringvalue>
+                                </entry>
+                                <entry name="screensaver" mtime="1227173197" type="string">
+                                        <stringvalue></stringvalue>
+                                </entry>
+                                <entry name="previous" mtime="1227173197" type="string">
+                                        <stringvalue></stringvalue>
+                                </entry>
+                                <entry name="power" mtime="1227173197" type="string">
+                                        <stringvalue></stringvalue>
+                                </entry>
+                                <entry name="play" mtime="1227173197" type="string">
+                                        <stringvalue></stringvalue>
+                                </entry>
+                                <entry name="pause" mtime="1227173197" type="string">
+                                        <stringvalue></stringvalue>
+                                </entry>
+                                <entry name="next" mtime="1227173197" type="string">
+                                        <stringvalue></stringvalue>
+                                </entry>
+                                <entry name="media" mtime="1227173197" type="string">
+                                        <stringvalue></stringvalue>
+                                </entry>
+                                <entry name="home" mtime="1227173197" type="string">
+                                        <stringvalue></stringvalue>
+                                </entry>
+                                <entry name="help" mtime="1227173197" type="string">
+                                        <stringvalue></stringvalue>
+                                </entry>
+                                <entry name="email" mtime="1227173197" type="string">
+                                        <stringvalue></stringvalue>
+                                </entry>
+                                <entry name="calculator" mtime="1227173197" type="string">
+                                        <stringvalue></stringvalue>
+                                </entry>
+                                <entry name="eject" mtime="1227173197" type="string">
+                                        <stringvalue></stringvalue>
+                                </entry>
+                        </dir>
+                </dir>
+                <dir name="metacity">
+                        <dir name="keybinding_commands">
+                                <entry name="command_window_screenshot" mtime="1227173197" type="string">
+                                        <stringvalue>/bin/true</stringvalue>
+                                </entry>
+                                <entry name="command_screenshot" mtime="1227173197" type="string">
+                                        <stringvalue>gdm-screenshot</stringvalue>
+                                </entry>
+                        </dir>
+                        <dir name="global_keybindings">
+                                <entry name="switch_to_workspace_up" mtime="1227173197" type="string">
+                                        <stringvalue>disabled</stringvalue>
+                                </entry>
+                                <entry name="switch_to_workspace_right" mtime="1227173197" type="string">
+                                        <stringvalue>disabled</stringvalue>
+                                </entry>
+                                <entry name="switch_to_workspace_left" mtime="1227173197" type="string">
+                                        <stringvalue>disabled</stringvalue>
+                                </entry>
+                                <entry name="switch_to_workspace_down" mtime="1227173197" type="string">
+                                        <stringvalue>disabled</stringvalue>
+                                </entry>
+                                <entry name="switch_group" mtime="1227173197" type="string">
+                                        <stringvalue>disabled</stringvalue>
+                                </entry>
+                                <entry name="show_desktop" mtime="1227173197" type="string">
+                                        <stringvalue>disabled</stringvalue>
+                                </entry>
+                                <entry name="run_command_window_screenshot" mtime="1227173197" type="string">
+                                        <stringvalue>disabled</stringvalue>
+                                </entry>
+                                <entry name="run_command_screenshot" mtime="1227173197" type="string">
+                                        <stringvalue>Print</stringvalue>
+                                </entry>
+                                <entry name="panel_run_dialog" mtime="1227173197" type="string">
+                                        <stringvalue>disabled</stringvalue>
+                                </entry>
+                                <entry name="panel_main_menu" mtime="1227173197" type="string">
+                                        <stringvalue>disabled</stringvalue>
+                                </entry>
+                        </dir>
+                        <dir name="general">
+                                <entry name="num_workspaces" mtime="1227173197" type="int" value="1">
+                                </entry>
+                        </dir>
+                </dir>
+                <dir name="compiz">
+                        <dir name="general">
+                                <dir name="allscreens">
+                                        <dir name="options">
+                                                <entry name="run_command11_key" mtime="1227173197" type="string">
+                                                        <stringvalue>Disabled</stringvalue>
+                                                </entry>
+                                                <entry name="run_command11_button" mtime="1227173197" type="string">
+                                                        <stringvalue>Disabled</stringvalue>
+                                                </entry>
+                                                <entry name="run_command10_key" mtime="1227173197" type="string">
+                                                        <stringvalue>Disabled</stringvalue>
+                                                </entry>
+                                                <entry name="run_command10_button" mtime="1227173197" type="string">
+                                                        <stringvalue>Disabled</stringvalue>
+                                                </entry>
+                                                <entry name="run_command8_key" mtime="1227173197" type="string">
+                                                        <stringvalue>Disabled</stringvalue>
+                                                </entry>
+                                                <entry name="run_command8_button" mtime="1227173197" type="string">
+                                                        <stringvalue>Disabled</stringvalue>
+                                                </entry>
+                                                <entry name="run_command7_key" mtime="1227173197" type="string">
+                                                        <stringvalue>Disabled</stringvalue>
+                                                </entry>
+                                                <entry name="run_command7_button" mtime="1227173197" type="string">
+                                                        <stringvalue>Disabled</stringvalue>
+                                                </entry>
+                                                <entry name="run_command6_key" mtime="1227173197" type="string">
+                                                        <stringvalue>Disabled</stringvalue>
+                                                </entry>
+                                                <entry name="run_command6_button" mtime="1227173197" type="string">
+                                                        <stringvalue>Disabled</stringvalue>
+                                                </entry>
+                                                <entry name="run_command5_key" mtime="1227173197" type="string">
+                                                        <stringvalue>Disabled</stringvalue>
+                                                </entry>
+                                                <entry name="run_command5_button" mtime="1227173197" type="string">
+                                                        <stringvalue>Disabled</stringvalue>
+                                                </entry>
+                                                <entry name="run_command4_key" mtime="1227173197" type="string">
+                                                        <stringvalue>Disabled</stringvalue>
+                                                </entry>
+                                                <entry name="run_command4_button" mtime="1227173197" type="string">
+                                                        <stringvalue>Disabled</stringvalue>
+                                                </entry>
+                                                <entry name="run_command3_key" mtime="1227173197" type="string">
+                                                        <stringvalue>Disabled</stringvalue>
+                                                </entry>
+                                                <entry name="run_command3_button" mtime="1227173197" type="string">
+                                                        <stringvalue>Disabled</stringvalue>
+                                                </entry>
+                                                <entry name="run_command2_key" mtime="1227173197" type="string">
+                                                        <stringvalue>Disabled</stringvalue>
+                                                </entry>
+                                                <entry name="run_command2_button" mtime="1227173197" type="string">
+                                                        <stringvalue>Disabled</stringvalue>
+                                                </entry>
+                                                <entry name="run_command1_key" mtime="1227173197" type="string">
+                                                        <stringvalue>Disabled</stringvalue>
+                                                </entry>
+                                                <entry name="run_command1_button" mtime="1227173197" type="string">
+                                                        <stringvalue>Disabled</stringvalue>
+                                                </entry>
+                                                <entry name="run_command0_key" mtime="1227173197" type="string">
+                                                        <stringvalue>Disabled</stringvalue>
+                                                </entry>
+                                                <entry name="run_command0_button" mtime="1227173197" type="string">
+                                                        <stringvalue>Disabled</stringvalue>
+                                                </entry>
+                                                <entry name="run_key" mtime="1227173197" type="string">
+                                                        <stringvalue>Disabled</stringvalue>
+                                                </entry>
+                                                <entry name="run_button" mtime="1227173197" type="string">
+                                                        <stringvalue>Disabled</stringvalue>
+                                                </entry>
+                                                <entry name="main_menu_key" mtime="1227173197" type="string">
+                                                        <stringvalue>Disabled</stringvalue>
+                                                </entry>
+                                                <entry name="main_menu_button" mtime="1227173197" type="string">
+                                                        <stringvalue>Disabled</stringvalue>
+                                                </entry>
+                                                <entry name="command_window_screenshot" mtime="1227173197" type="string">
+                                                        <stringvalue></stringvalue>
+                                                </entry>
+                                                <entry name="command11" mtime="1227173197" type="string">
+                                                        <stringvalue></stringvalue>
+                                                </entry>
+                                                <entry name="command10" mtime="1227173197" type="string">
+                                                        <stringvalue></stringvalue>
+                                                </entry>
+                                                <entry name="command9" mtime="1227173197" type="string">
+                                                        <stringvalue></stringvalue>
+                                                </entry>
+                                                <entry name="command8" mtime="1227173197" type="string">
+                                                        <stringvalue></stringvalue>
+                                                </entry>
+                                                <entry name="command7" mtime="1227173197" type="string">
+                                                        <stringvalue></stringvalue>
+                                                </entry>
+                                                <entry name="command6" mtime="1227173197" type="string">
+                                                        <stringvalue></stringvalue>
+                                                </entry>
+                                                <entry name="command5" mtime="1227173197" type="string">
+                                                        <stringvalue></stringvalue>
+                                                </entry>
+                                                <entry name="command4" mtime="1227173197" type="string">
+                                                        <stringvalue></stringvalue>
+                                                </entry>
+                                                <entry name="command3" mtime="1227173197" type="string">
+                                                        <stringvalue></stringvalue>
+                                                </entry>
+                                                <entry name="command2" mtime="1227173197" type="string">
+                                                        <stringvalue></stringvalue>
+                                                </entry>
+                                                <entry name="command1" mtime="1227173197" type="string">
+                                                        <stringvalue></stringvalue>
+                                                </entry>
+                                                <entry name="command0" mtime="1227173197" type="string">
+                                                        <stringvalue></stringvalue>
+                                                </entry>
+                                                <entry name="command_terminal" mtime="1227173197" type="string">
+                                                        <stringvalue></stringvalue>
+                                                </entry>
+                                                <entry name="command_screenshot" mtime="1227173197" type="string">
+                                                        <stringvalue>gdm-screenshot</stringvalue>
+                                                </entry>
+                                                <entry name="active_plugins" mtime="1227173197" type="list" ltype="string">
+                                                        <li type="string">
+                                                                <stringvalue>cube</stringvalue>
+                                                        </li>
+                                                        <li type="string">
+                                                                <stringvalue>decoration</stringvalue>
+                                                        </li>
+                                                        <li type="string">
+                                                                <stringvalue>gconf</stringvalue>
+                                                        </li>
+                                                        <li type="string">
+                                                                <stringvalue>glib</stringvalue>
+                                                        </li>
+                                                        <li type="string">
+                                                                <stringvalue>move</stringvalue>
+                                                        </li>
+                                                        <li type="string">
+                                                                <stringvalue>place</stringvalue>
+                                                        </li>
+                                                        <li type="string">
+                                                                <stringvalue>resize</stringvalue>
+                                                        </li>
+                                                        <li type="string">
+                                                                <stringvalue>screenshot</stringvalue>
+                                                        </li>
+                                                        <li type="string">
+                                                                <stringvalue>wobbly</stringvalue>
+                                                        </li>
+                                                </entry>
+                                        </dir>
+                                </dir>
+                        </dir>
+                </dir>
+                <dir name="gnome-power-manager">
+                        <dir name="ui">
+                                <entry name="show_context_menu" mtime="1227173197" type="bool" value="false">
+                                </entry>
+                        </dir>
+                </dir>
+                <dir name="gnome-screensaver">
+                        <entry name="power_management_delay" mtime="1227173197" type="int" value="30">
+                        </entry>
+                </dir>
+                <dir name="nautilus">
+                        <dir name="preferences">
+                                <entry name="show_desktop" mtime="1227173197" type="bool" value="false">
+                                </entry>
+                        </dir>
+                </dir>
+        </dir>
+</gconf>

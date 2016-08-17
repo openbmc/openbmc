@@ -1,0 +1,96 @@
+#!/bin/sh
+# Stolen from the debian kdm setup, aren't I sneaky
+# Plus a lot of fun stuff added
+#  -George
+
+PATH="/usr/bin:$PATH"
+OLD_IFS=$IFS
+
+gdmwhich () {
+  COMMAND="$1"
+  OUTPUT=
+  IFS=:
+  for dir in $PATH
+  do
+    if test -x "$dir/$COMMAND" ; then
+      if test "x$OUTPUT" = "x" ; then
+        OUTPUT="$dir/$COMMAND"
+      fi
+    fi
+  done
+  IFS=$OLD_IFS
+  echo "$OUTPUT"
+}
+
+sysresources=/etc/X11/Xresources
+
+# merge in defaults
+if [ -f "$sysresources" ]; then
+    xrdb -merge "$sysresources"
+fi
+
+sysmodmap=/etc/X11/Xmodmap
+
+XMODMAP=`gdmwhich xmodmap`
+if [ "x$XMODMAP" != "x" ] ; then
+  if [ "x$GDM_PARENT_DISPLAY" = "x" ]; then
+    if [ -f $sysmodmap ]; then
+      $XMODMAP $sysmodmap
+    fi
+  else
+    ( DISPLAY=$GDM_PARENT_DISPLAY XAUTHORITY=$GDM_PARENT_XAUTHORITY $XMODMAP -pke ) | $XMODMAP -
+  fi
+
+  #
+  # Switch Sun's Alt and Meta mod mappings
+  #
+
+  UNAME=`gdmwhich uname`
+  PROCESSOR=`$UNAME -p`
+  if [ "x$PROCESSOR" = "xsparc" ]; then
+    if $XMODMAP | /usr/bin/grep mod4 | /usr/bin/grep Alt > /dev/null 2>/dev/null
+    then
+      $XMODMAP -e "clear Mod1" \
+               -e "clear Mod4" \
+               -e "add Mod1 = Alt_L" \
+               -e "add Mod1 = Alt_R" \
+               -e "add Mod4 = Meta_L" \
+               -e "add Mod4 = Meta_R"
+    fi
+  fi
+fi
+
+SETXKBMAP=`gdmwhich setxkbmap`
+if [ "x$SETXKBMAP" != "x" ] ; then
+  # FIXME: is this all right?  Is this completely on crack?
+  # What this does is move the xkb configuration from the GDM_PARENT_DISPLAY
+  # FIXME: This should be done in code.  Or there must be an easier way ...
+  if [ -n "$GDM_PARENT_DISPLAY" ]; then
+    XKBSETUP=`( DISPLAY=$GDM_PARENT_DISPLAY XAUTHORITY=$GDM_PARENT_XAUTHORITY $SETXKBMAP -v )`
+    if [ -n "$XKBSETUP" ]; then
+      XKBKEYMAP=`echo "$XKBSETUP" | grep '^keymap' | awk '{ print $2 }'`
+      XKBTYPES=`echo "$XKBSETUP" | grep '^types' | awk '{ print $2 }'`
+      XKBCOMPAT=`echo "$XKBSETUP" | grep '^compat' | awk '{ print $2 }'`
+      XKBSYMBOLS=`echo "$XKBSETUP" | grep '^symbols' | awk '{ print $2 }'`
+      XKBGEOMETRY=`echo "$XKBSETUP" | grep '^geometry' | awk '{ print $2 }'`
+      if [ -n "$XKBKEYMAP" ]; then
+        $SETXKBMAP -keymap "$XKBKEYMAP"
+      elif [ -n "$XKBTYPES" -a -n "$XKBCOMPAT" -a -n "$XKBSYMBOLS" -a -n "$XKBGEOMETRY" ]; then
+        $SETXKBMAP -types "$XKBTYPES" -compat "$XKBCOMPAT" -symbols "$XKBSYMBOLS" -geometry "$XKBGEOMETRY"
+      elif [ -n "$XKBTYPES" -a -n "$XKBCOMPAT" -a -n "$XKBSYMBOLS" ]; then
+        $SETXKBMAP -types "$XKBTYPES" -compat "$XKBCOMPAT" -symbols "$XKBSYMBOLS"
+      elif [ -n "$XKBSYMBOLS" ]; then
+        $SETXKBMAP -symbols "$XKBSYMBOLS"
+      fi
+    fi
+  fi
+fi
+
+# FIXME: the housekeeping below really should be moved to the postinst of packages that require it
+# brute force approach for now
+update-desktop-database
+glib-compile-schemas /usr/share/glib-2.0/schemas/
+
+#x11vnc  -q -bg -display :0 -forever -avahi -xkb
+
+exit 0

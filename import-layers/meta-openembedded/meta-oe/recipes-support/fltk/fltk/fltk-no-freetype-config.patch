@@ -1,0 +1,20 @@
+--- a/configure.in.orig	2015-11-26 14:30:17.893426966 +0800
++++ b/configure.in	2015-11-26 14:33:00.285424099 +0800
+@@ -969,12 +969,12 @@ case $host_os_gui in
+         AC_ARG_ENABLE(xft, [  --enable-xft            turn on Xft support [[default=yes]]])
+ 
+ 	if test x$enable_xft != xno; then
+-            AC_PATH_PROG(FTCONFIG,freetype-config)
++            AC_PATH_PROG(PKGCONFIG,pkg-config)
+ 
+-	    if test "x$FTCONFIG" != x; then
+-	        CPPFLAGS="`$FTCONFIG --cflags` $CPPFLAGS"
+-	        CFLAGS="`$FTCONFIG --cflags` $CFLAGS"
+-	        CXXFLAGS="`$FTCONFIG --cflags` $CXXFLAGS"
++	    if test "x$PKGCONFIG" != x; then
++	        CPPFLAGS="`$PKGCONFIG --cflags xft` $CPPFLAGS"
++	        CFLAGS="`$PKGCONFIG --cflags xft` $CFLAGS"
++	        CXXFLAGS="`$PKGCONFIG --cflags xft` $CXXFLAGS"
+ 
+ 	        AC_CHECK_LIB(fontconfig, FcPatternCreate)
+ 		AC_CHECK_HEADER(X11/Xft/Xft.h,

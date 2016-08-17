@@ -1,0 +1,27 @@
+--- a/kexec/arch/i386/x86-linux-setup.c
++++ b/kexec/arch/i386/x86-linux-setup.c
+@@ -176,6 +176,8 @@ static int file_scanf(const char *dir, c
+ 	FILE *fp;
+ 	int retno;
+ 	char filename[PATH_MAX];
++	long line_size = MAX_LINE;
++	char *line;
+ 
+ 	snprintf(filename, PATH_MAX, "%s/%s", dir, file);
+ 	filename[PATH_MAX-1] = 0;
+@@ -186,7 +188,14 @@ static int file_scanf(const char *dir, c
+ 	}
+ 
+ 	va_start(argptr, scanf_line);
+-	retno = vfscanf(fp, scanf_line, argptr);
++
++	line = xmalloc(sizeof(line) * line_size);
++	while(fgets(line, sizeof(line), fp) != NULL ) {
++		line_size += MAX_LINE;
++		line = xrealloc(line,line_size);
++	}
++	retno = vsscanf(line, scanf_line, argptr);
++
+ 	va_end(argptr);
+ 
+ 	fclose(fp);

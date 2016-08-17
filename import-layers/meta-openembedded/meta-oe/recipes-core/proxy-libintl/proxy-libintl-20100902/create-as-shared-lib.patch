@@ -1,0 +1,31 @@
+--- a/src/proxy-libintl/Makefile.org	2009-09-12 23:19:04.989421607 -0700
++++ a/src/proxy-libintl/Makefile	2009-09-12 23:21:14.100640001 -0700
+@@ -4,20 +4,20 @@ ZIPFILE = proxy-libintl-$(TIMESTAMP).zip
+ CC = gcc
+ CFLAGS = -Wall -I ../../include
+ 
+-all : ../../lib/libintl.a ../../lib/intl.lib
++all : ../../lib/libintl.so ../../lib/intl.lib
+ 
+-../../lib/libintl.a : libintl.o
+-	ar rc $@ libintl.o
++../../lib/libintl.so : libintl.o
++	$(CC) -shared -o $@ libintl.o
+ 
+-../../lib/intl.lib : ../../lib/libintl.a
+-	cp ../../lib/libintl.a $@
+-	strip --strip-unneeded $@
++../../lib/intl.lib : ../../lib/libintl.so
++	cp ../../lib/libintl.so $@
++	$(STRIP) --strip-unneeded $@
+ 
+ libintl.o : libintl.c
+ 	$(CC) $(CFLAGS) -c libintl.c
+ 
+ clean :
+-	rm -f *.o ../../lib/libintl.a ../../$(ZIPFILE)
++	rm -f *.o ../../lib/libintl.so ../../$(ZIPFILE)
+ 
+ dist : clean all
+-	cd ../..; zip $(ZIPFILE) include/libintl.h lib/{libintl.a,intl.lib} src/proxy-libintl/{README.txt,COPYING.LIB.txt,Makefile,libintl.[ch]}; manifestify $(ZIPFILE)
++	cd ../..; zip $(ZIPFILE) include/libintl.h lib/{libintl.so,intl.lib} src/proxy-libintl/{README.txt,COPYING.LIB.txt,Makefile,libintl.[ch]}; manifestify $(ZIPFILE)

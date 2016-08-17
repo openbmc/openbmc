@@ -1,0 +1,26 @@
+From 674c50ee54fd7cd304e8b3c4b33d3ff1272ed191 Mon Sep 17 00:00:00 2001
+From: "Gary E. Miller" <gem@rellim.com>
+Date: Sun, 15 Mar 2015 12:17:51 -0700
+Subject: [PATCH 3/3] Whoops, check for C11, not for not C11 in stdatomic.h
+ test.
+
+---
+ SConstruct | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/SConstruct b/SConstruct
+index faa8651..f4ea145 100644
+--- a/SConstruct
++++ b/SConstruct
+@@ -650,7 +650,7 @@ else:
+ 
+     # check for C11 or better, and __STDC__NO_ATOMICS__ is no defined
+     # before looking for stdatomic.h
+-    if not config.CheckC11() and  not config.CheckCompilerDefines("__STDC_NO_ATOMICS__") and config.CheckHeader("stdatomic.h"):
++    if config.CheckC11() and  not config.CheckCompilerDefines("__STDC_NO_ATOMICS__") and config.CheckHeader("stdatomic.h"):
+         confdefs.append("#define HAVE_STDATOMIC_H 1\n")
+     else:
+ 	confdefs.append("/* #undef HAVE_STDATOMIC_H */\n")
+-- 
+2.1.0
+

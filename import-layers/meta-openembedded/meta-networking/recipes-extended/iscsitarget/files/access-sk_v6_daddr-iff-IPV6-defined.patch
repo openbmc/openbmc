@@ -1,0 +1,28 @@
+The element skc_v6_daddr (in struct sock_common) is defined in 
+kernel source only when CONFIG_IPV6 is enabled. Hence, access 
+sk_v6_daddr element (i.e __sk_common.skc_v6_daddr) only when CONFIG_IPV6 
+is defined; to fix below error in world build:
+
+-- snip --
+/home/jenkins/oe/world/shr-core/tmp-glibc/work-shared/qemux86/kernel-source/include/net/sock.h:330:33: error: 'struct sock_common' has no member named 'skc_v6_daddr'
+-- CUT --
+
+Upstream-Status: Pending
+
+Signed-off-by: Jagadeesh Krishnanjanappa <jkrishnanjanappa@mvista.com>
+
+--- iscsitarget-1.4.20.3+svn502_org/kernel/conn.c	2015-12-29 21:57:50.547932217 -0800
++++ iscsitarget-1.4.20.3+svn502/kernel/conn.c	2015-12-29 22:47:25.254657627 -0800
+@@ -46,10 +46,12 @@ void conn_info_show(struct seq_file *seq
+ 			snprintf(buf, sizeof(buf),
+ 				 "%pI4", &inet_sk(sk)->inet_daddr);
+ 			break;
++#if defined(CONFIG_IPV6)
+ 		case AF_INET6:
+ 			snprintf(buf, sizeof(buf), "[%pI6]",
+ 				 &(sk)->sk_v6_daddr);
+ 			break;
++#endif /* defined(CONFIG_IPV6) */
+ 		default:
+ 			break;
+ 		}

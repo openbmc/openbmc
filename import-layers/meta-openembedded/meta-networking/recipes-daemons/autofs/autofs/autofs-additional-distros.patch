@@ -1,0 +1,12 @@
+--- autofs-4.1.4/samples/rc.autofs.in~	2005-04-11 06:30:54.000000000 -0500
++++ autofs-4.1.4/samples/rc.autofs.in	2007-04-07 13:18:44.000000000 -0500
+@@ -43,6 +43,9 @@
+ 	system=debian
+ elif [ -f /etc/redhat-release ]; then
+ 	system=redhat
++elif [ -f /etc/issue ] && grep -q "^SlugOS\|Yocto" /etc/issue ; then
++	# SlugOS and Yocto behave like Debian, at least for autofs purposes.
++	system=debian
+ else
+ 	echo "$0: Unknown system, please port and contact autofs@linux.kernel.org" 1>&2
+ 	exit 1

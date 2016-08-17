@@ -1,0 +1,41 @@
+From 4ee15a8a69b84526ece1180a288a37db077bcd9b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 27 Feb 2015 21:55:36 +0000
+Subject: [PATCH] Revert "media-ctl: Don't install libmediactl and
+ libv4l2subdev"
+
+This reverts commit 0911dce53b08b0df3066be2c75f67e8a314d8729.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Conflicts:
+	utils/media-ctl/Makefile.am
+---
+ utils/media-ctl/Makefile.am | 11 +++--------
+ 1 file changed, 3 insertions(+), 8 deletions(-)
+
+diff --git a/utils/media-ctl/Makefile.am b/utils/media-ctl/Makefile.am
+index a3931fb..fe1fea5 100644
+--- a/utils/media-ctl/Makefile.am
++++ b/utils/media-ctl/Makefile.am
+@@ -1,14 +1,9 @@
+-noinst_LTLIBRARIES = libmediactl.la libv4l2subdev.la
+-
++lib_LTLIBRARIES = libmediactl.la libv4l2subdev.la
+ libmediactl_la_SOURCES = libmediactl.c mediactl-priv.h
+-libmediactl_la_CFLAGS = -static $(LIBUDEV_CFLAGS)
+-libmediactl_la_LDFLAGS = -static $(LIBUDEV_LIBS)
+-
++libmediactl_la_CFLAGS = $(LIBUDEV_CFLAGS)
++libmediactl_la_LDFLAGS = $(LIBUDEV_LIBS)
+ libv4l2subdev_la_SOURCES = libv4l2subdev.c
+ libv4l2subdev_la_LIBADD = libmediactl.la
+-libv4l2subdev_la_CFLAGS = -static
+-libv4l2subdev_la_LDFLAGS = -static
+-
+ mediactl_includedir=$(includedir)/mediactl
+ noinst_HEADERS = mediactl.h v4l2subdev.h
+ 
+-- 
+2.1.4
+

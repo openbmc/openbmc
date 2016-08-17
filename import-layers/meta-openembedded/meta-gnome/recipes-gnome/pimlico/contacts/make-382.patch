@@ -1,0 +1,16 @@
+Fix for stricter parser in make 3.82. This fix has been pushed to upstream git.
+
+JL - 15/12/10
+
+Upstream-Status: Accepted
+
+Index: git/Makefile.am
+===================================================================
+--- git.orig/Makefile.am
++++ git/Makefile.am
+@@ -11,4 +11,4 @@ DISTCLEANFILES = $(INTLTOOL_BUILT)
+ MAINTAINERCLEANFILES = aclocal.m4 compile config.guess config.sub configure depcomp $(INTLTOOL_BUILT:=.in) install-sh ltmain.sh mkinstalldirs Makefile.in missing
+ 
+ snapshot:
+-        $(MAKE) dist distdir=$(PACKAGE)-snap`date +"%Y%m%d"`
++	$(MAKE) dist distdir=$(PACKAGE)-snap`date +"%Y%m%d"`

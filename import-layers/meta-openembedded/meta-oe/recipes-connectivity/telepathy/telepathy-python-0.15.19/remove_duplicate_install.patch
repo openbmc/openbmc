@@ -1,0 +1,26 @@
+commit f6c67662145de889055a86a6b3b12c70a45fc8d5
+Author: Dongxiao Xu <dongxiao.xu@intel.com>
+Date:   Wed Sep 7 16:02:20 2011 +0800
+
+    Avoid duplicated installation of errors.py
+    
+    newer version of autotools don't seem to like listing files to install
+    twice. Remove one errors.py from the installation list.
+    
+    Signed-off-by: Dongxiao Xu <dongxiao.xu@intel.com>
+    
+    Upstream-Status: Inappropirate [upstream inactive]
+    
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 5c27dfe..7536e43 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -11,7 +11,7 @@ telepathy_PYTHON = \
+ 
+ # telepathy._generated.* auto-generated modules
+ spec_dir = $(top_srcdir)/spec
+-spec_files := $(patsubst $(spec_dir)%.xml,_generated%.py,$(wildcard $(spec_dir)/*.xml))
++spec_files := $(filter-out _generated/errors.py, $(patsubst $(spec_dir)%.xml,_generated%.py,$(wildcard $(spec_dir)/*.xml)))
+ 
+ BUILT_SOURCES = \
+ 	_generated/interfaces.py \

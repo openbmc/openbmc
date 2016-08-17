@@ -1,0 +1,32 @@
+From 0218e5ebf38f94d58b908fca451ba3789efa8899 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Fri, 20 Sep 2013 23:09:25 +0200
+Subject: [PATCH] main-status-icon.c remove deprecated g_type_init
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+this file was auto created by valac and xfce-vala when creating tarball. So
+
+Upstream-Status: Inappropriate [other]
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ src/main-status-icon.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/main-status-icon.c b/src/main-status-icon.c
+index c6d73f8..f7db773 100644
+--- a/src/main-status-icon.c
++++ b/src/main-status-icon.c
+@@ -290,7 +290,6 @@ gint _vala_main (char** args, int args_length1) {
+ 
+ 
+ int main (int argc, char ** argv) {
+-	g_type_init ();
+ 	return _vala_main (argv, argc);
+ }
+ 
+-- 
+1.8.3.1
+

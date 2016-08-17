@@ -1,0 +1,84 @@
+From de5f0a535d6ea1932d2c7de53bd33510c8682ee7 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Mon, 22 Feb 2016 16:34:03 +0200
+Subject: [PATCH] configure.in: drop introspection macros, replace them with a
+ standard one
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ configure.in | 57 +--------------------------------------------------------
+ 1 file changed, 1 insertion(+), 56 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index 8e1aa37..3086503 100644
+--- a/configure.in
++++ b/configure.in
+@@ -934,63 +934,8 @@ AC_SUBST(MONO_CFLAGS)
+ AC_SUBST(MONO_LIBS)
+ ])
+ 
+-# GObject Introspection
+-GIR_REQ=1.0.0
+-AC_ARG_ENABLE(introspection,
+-          AS_HELP_STRING([--enable-introspection[=@<:@no/auto/yes@:>@]],
+-                         [Enable introspection for this build]),, 
+-                         [enable_introspection=no])
+-
+-AC_MSG_CHECKING([for gobject-introspection])
+-
+-dnl presence/version checking
+-AS_CASE([$enable_introspection],
+-[no], [
+-    found_introspection="no (disabled, use --enable-introspection to enable)"
+-],
+-[yes],[
+-    PKG_CHECK_EXISTS([gobject-introspection-1.0],,
+-                     AC_MSG_ERROR([gobject-introspection-1.0 is not installed]))
+-    PKG_CHECK_EXISTS([gobject-introspection-1.0 >= $GIR_REQ],
+-                     found_introspection=yes,
+-                     AC_MSG_ERROR([You need to have gobject-introspection >= $1 installed to build AC_PACKAGE_NAME]))
+-],
+-[auto],[
+-    PKG_CHECK_EXISTS([gobject-introspection-1.0 >= $GIR_REQ], found_introspection=yes, found_introspection=no)
+-dnl Canonicalize enable_introspection
+-enable_introspection=$found_introspection
+-],
+-[	
+-    AC_MSG_ERROR([invalid argument passed to --enable-introspection, should be one of @<:@no/auto/yes@:>@])
+-])
++GOBJECT_INTROSPECTION_CHECK([1.46.0])
+ 
+-AC_MSG_RESULT([$found_introspection])
+-
+-INTROSPECTION_SCANNER=
+-INTROSPECTION_COMPILER=
+-INTROSPECTION_GENERATE=
+-INTROSPECTION_GIRDIR=
+-INTROSPECTION_TYPELIBDIR=
+-if test "x$found_introspection" = "xyes"; then
+-   INTROSPECTION_SCANNER=`$PKG_CONFIG --variable=g_ir_scanner gobject-introspection-1.0`
+-   INTROSPECTION_COMPILER=`$PKG_CONFIG --variable=g_ir_compiler gobject-introspection-1.0`
+-   INTROSPECTION_GENERATE=`$PKG_CONFIG --variable=g_ir_generate gobject-introspection-1.0`
+-   INTROSPECTION_GIRDIR=`$PKG_CONFIG --variable=girdir gobject-introspection-1.0`
+-   INTROSPECTION_TYPELIBDIR="$($PKG_CONFIG --variable=typelibdir gobject-introspection-1.0)"
+-   INTROSPECTION_CFLAGS=`$PKG_CONFIG --cflags gobject-introspection-1.0`
+-   INTROSPECTION_LIBS=`$PKG_CONFIG --libs gobject-introspection-1.0`
+-   INTROSPECTION_MAKEFILE=`$PKG_CONFIG --variable=datadir gobject-introspection-1.0`/gobject-introspection-1.0/Makefile.introspection
+-fi
+-AC_SUBST(INTROSPECTION_SCANNER)
+-AC_SUBST(INTROSPECTION_COMPILER)
+-AC_SUBST(INTROSPECTION_GENERATE)
+-AC_SUBST(INTROSPECTION_GIRDIR)
+-AC_SUBST(INTROSPECTION_TYPELIBDIR)
+-AC_SUBST(INTROSPECTION_CFLAGS)
+-AC_SUBST(INTROSPECTION_LIBS)
+-AC_SUBST(INTROSPECTION_MAKEFILE)
+-
+-AM_CONDITIONAL(HAVE_INTROSPECTION, test "x$found_introspection" = "xyes")
+ dnl we need to change the install directories for distcheck
+ AC_ARG_WITH([gir-dir],
+ 	AS_HELP_STRING(
+-- 
+2.7.0
+

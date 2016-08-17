@@ -1,0 +1,28 @@
+Upstream-Status: Inappropriate [configuration]
+
+Index: eggdbus-0.6/src/eggdbus/Makefile.am
+===================================================================
+--- eggdbus-0.6.orig/src/eggdbus/Makefile.am
++++ eggdbus-0.6/src/eggdbus/Makefile.am
+@@ -130,7 +130,7 @@ BUILT_SOURCES =								\
+ 	$(NULL)
+ 
+ eggdbus-built-sources.stamp : eggdbus-binding-tool Makefile.am org.freedesktop.DBus.xml org.freedesktop.DBus.Peer.xml org.freedesktop.DBus.Properties.xml org.freedesktop.DBus.Introspectable.xml eggdbus-glib-genmarshal
+-	EGG_DBUS_GENMARSHAL=$(top_builddir)/src/eggdbus/eggdbus-glib-genmarshal $(top_builddir)/src/eggdbus/eggdbus-binding-tool							\
++	EGG_DBUS_GENMARSHAL=eggdbus-glib-genmarshal eggdbus-binding-tool							\
+ 		--namespace EggDBus									\
+ 		--dbus-namespace org.freedesktop.DBus							\
+ 		--interfaces-only									\
+Index: eggdbus-0.6/src/tests/Makefile.am
+===================================================================
+--- eggdbus-0.6.orig/src/tests/Makefile.am
++++ eggdbus-0.6/src/tests/Makefile.am
+@@ -25,7 +25,7 @@ BUILT_SOURCES = 							\
+ 	$(NULL)
+ 
+ test-built-sources.stamp : Makefile.am $(top_builddir)/src/eggdbus/eggdbus-binding-tool com.example.Frob.xml com.example.Tweak.xml com.example.Twiddle.xml
+-	EGG_DBUS_GENMARSHAL=$(top_builddir)/src/eggdbus/eggdbus-glib-genmarshal $(top_builddir)/src/eggdbus/eggdbus-binding-tool									\
++	EGG_DBUS_GENMARSHAL=eggdbus-glib-genmarshal eggdbus-binding-tool									\
+ 	  --namespace       "Test"										\
+ 	  --dbus-namespace  "com.example"									\
+ 	  --include-header  testtypes.h										\

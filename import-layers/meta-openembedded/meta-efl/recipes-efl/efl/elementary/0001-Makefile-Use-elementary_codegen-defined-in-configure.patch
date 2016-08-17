@@ -1,0 +1,29 @@
+From 75d104d105aa03dd9d446fa7d84fa95e0f566cf9 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Sat, 11 Jan 2014 12:55:59 +0100
+Subject: [PATCH] Makefile: Use elementary_codegen defined in configure
+
+* using binaries from top_buildir doesn't work when cross-compiling elementary
+  where we need to pass native binaries in configure params
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ src/examples/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/examples/Makefile.am b/src/examples/Makefile.am
+index fc35c75..1e10b0b 100644
+--- a/src/examples/Makefile.am
++++ b/src/examples/Makefile.am
+@@ -29,7 +29,7 @@ LDADD = \
+ @ELEMENTARY_X_LIBS@ \
+ $(top_builddir)/src/lib/libelementary.la
+ 
+-ELEMENTARY_CODEGEN = $(top_builddir)/src/bin/@ELEMENTARY_CODEGEN_PRG@
++ELEMENTARY_CODEGEN = @elementary_codegen@
+ ELEMENTARY_CODEGEN_FLAGS = --prefix=codegen_example
+ 
+ SRCS = \
+-- 
+1.9.0
+

@@ -1,0 +1,11 @@
+Index: git/configure.in
+===================================================================
+--- git.orig/configure.in	2014-06-18 16:06:16.040721349 +0000
++++ git/configure.in	2014-07-18 07:49:17.085552256 +0000
+@@ -1,5 +1,5 @@
+ AC_INIT([SMBNetFS],[0.5.3а])
+-AM_INIT_AUTOMAKE
++AM_INIT_AUTOMAKE([foreign])
+ AC_CONFIG_HEADERS([src/config.h])
+ AC_PROG_CC
+ 

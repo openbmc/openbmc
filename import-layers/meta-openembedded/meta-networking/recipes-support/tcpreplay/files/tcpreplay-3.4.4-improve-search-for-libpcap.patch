@@ -1,0 +1,33 @@
+tcpreplay: improve search for libpcap
+
+Add a test which will find libpcap if $testdir/.. is a sysroot.
+
+Upstream-Status: Pending
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -350,14 +350,20 @@ for testdir in $trypcapdir /usr/local /o
+     if test -f "${testdir}/include/pcap.h" -a $foundpcap = no ; then
+         LPCAPINC="${testdir}/include/pcap.h"
+         LPCAPINCDIR="${testdir}/include"
++        # If testdir/.. is a sysroot, then sDir should point to where the libraries are.
++        sDir=$(readlink -m ${testdir}/../${libdir})
+         if test $dynamic_link = yes; then
+-            if test -f "${testdir}/lib64/libpcap${shrext_cmds}" ; then
++            if test -f "${sDir}/libpcap${shrext_cmds}" ; then
++                LPCAPLIB="-L${sDir} -lpcap"
++            elif test -f "${testdir}/lib64/libpcap${shrext_cmds}" ; then
+                 LPCAPLIB="-L${testdir}/lib64 -lpcap"
+             elif test -f "${testdir}/lib/libpcap${shrext_cmds}" ; then
+                 LPCAPLIB="-L${testdir}/lib -lpcap"
+             else
+                 AC_ERROR([Unable to find libpcap in ${testdir}])
+             fi
++        elif test -f "${sDir}/libpcap.${libext}" ; then
++            LPCAPLIB="${sDir}/libpcap.${libext}"
+         elif test -f "${testdir}/lib64/libpcap.${libext}" ; then
+             LPCAPLIB="${testdir}/lib64/libpcap.${libext}"
+         elif test -f "${testdir}/lib/libpcap.${libext}" ; then

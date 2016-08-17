@@ -1,0 +1,35 @@
+From f5398b49cc6fd7a53562aae2abbac0d9c656559c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Wed, 15 May 2013 14:17:49 +0200
+Subject: [garcon] xfce-applications.menu: don't bloat settings menu by
+ entries found in settings manager
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Submitted [1]
+
+[1] https://bugzilla.xfce.org/show_bug.cgi?id=10092
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ data/xfce/xfce-applications.menu |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/data/xfce/xfce-applications.menu b/data/xfce/xfce-applications.menu
+index dc3056b..c2aa0bb 100644
+--- a/data/xfce/xfce-applications.menu
++++ b/data/xfce/xfce-applications.menu
+@@ -34,6 +34,9 @@
+         <Include>
+             <Category>Settings</Category>
+         </Include>
++        <Exclude>
++            <Category>X-XFCE-SettingsDialog</Category>
++        </Exclude>
+ 
+         <Layout>
+             <Filename>xfce-settings-manager.desktop</Filename>
+-- 
+1.7.6.5
+

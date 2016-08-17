@@ -1,0 +1,39 @@
+From 2c73b588b9018cb59c666eae3a15fa1af42c56be Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Sun, 4 Aug 2013 10:57:08 +0200
+Subject: [PATCH 4/5] configure: Fix libical pkg-config trying to use host
+ paths
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ calendar/libecal/libecal.pc.in | 2 +-
+ configure.ac                   | 3 ++-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/calendar/libecal/libecal.pc.in b/calendar/libecal/libecal.pc.in
+index fc6b359..d3435bb 100644
+--- a/calendar/libecal/libecal.pc.in
++++ b/calendar/libecal/libecal.pc.in
+@@ -12,4 +12,4 @@ Description: Client library for evolution calendars
+ Version: @VERSION@
+ Requires: libical >= @LIBICAL_REQUIRED@ libedataserver-1.2 gio-2.0
+ Libs: -L${libdir} -lecal-1.2
+-Cflags: -I${privincludedir} @LIBICAL_EXTRA_CFLAGS@
++Cflags: -I${privincludedir}
+diff --git a/configure.ac b/configure.ac
+index 1c802ff..f1d4ce8 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1351,7 +1351,8 @@ dnl to differentiate between <libical/ical.h> and <ical.h>
+ dnl We have fixed all our instances to use <libical/ical.h>. Until the .pc from
+ dnl libical is fixed, we have to work-around the buggy CFlags.
+ dnl *****
+-	LIBICAL_EXTRA_CFLAGS=" -I`$PKG_CONFIG --variable=includedir libical` "
++	m4_pattern_allow([^PKG_CONFIG_SYSROOT_DIR$])
++	LIBICAL_EXTRA_CFLAGS=" -I$PKG_CONFIG_SYSROOT_DIR`$PKG_CONFIG --variable=includedir libical` "
+ 	LIBICAL_EXTRA_LIBS=""
+ 	AC_SUBST(LIBICAL_EXTRA_CFLAGS)
+ 	AC_SUBST(LIBICAL_EXTRA_LIBS)
+-- 
+1.8.3.2
+

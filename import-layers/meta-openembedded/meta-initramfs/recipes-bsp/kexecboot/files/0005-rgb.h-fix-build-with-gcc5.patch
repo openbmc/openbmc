@@ -1,0 +1,35 @@
+From b2c4fc69868a4831ec798ad98f5e7fce200cf0e3 Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Thu, 24 Sep 2015 00:02:48 +0200
+Subject: [PATCH] rgb.h: fix build with gcc 5 (C99 inline semantic)
+
+Building with gcc 5.2 we trigger the following error:
+
+rgb.h:55:1: warning: inline function 'rgba2comp' declared but never defined
+|  rgba2comp(kx_rgba rgba, kx_ccomp *red, kx_ccomp *green,
+|  ^
+
+https://gcc.gnu.org/gcc-5/porting_to.html
+
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+---
+ rgb.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/rgb.h b/rgb.h
+index 0ba987a..4f64622 100644
+--- a/rgb.h
++++ b/rgb.h
+@@ -51,8 +51,7 @@ typedef struct {
+ } kx_named_color;
+ 
+ /* Convert RGBA uint32 to red/green/blue/alpha components */
+-inline void
+-rgba2comp(kx_rgba rgba, kx_ccomp *red, kx_ccomp *green,
++void rgba2comp(kx_rgba rgba, kx_ccomp *red, kx_ccomp *green,
+ 		kx_ccomp *blue, kx_ccomp *alpha);
+ 
+ /* Convert hex rgb color to rgba color */
+-- 
+1.9.1
+

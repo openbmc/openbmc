@@ -1,0 +1,131 @@
+#!/bin/sh
+#
+### BEGIN INIT INFO
+# Provides: owcimomd
+# Required-Start: $network
+# Required-Stop: $network
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6 
+# Short-Description: OpenWBEM CIMOM Daemon
+# Description: owcimomd
+#       Start/Stop the OpenWBEM CIMOM Daemon
+### END INIT INFO
+#
+#
+# chkconfig: 2345 36 64
+# description: OpenWBEM CIMOM Daemon
+# processname: owcimomd
+
+NAME=owcimomd
+DAEMON=/usr/sbin/$NAME
+OPTIONS=
+PIDFILE=/var/run/$NAME.pid
+
+if [ $EUID != 0 ]; then
+ echo "This script must be run as root."
+ exit 1;
+fi
+
+if [ "$DESCRIPTIVE" = "" ]; then
+ DESCRIPTIVE="OpenWBEM CIMOM Daemon"
+fi
+
+lockfile=${SVIlock:-/var/lock/subsys/$NAME}
+
+[ -x $DAEMON ] || exit 0
+
+# See how we were called.
+. /etc/init.d/functions
+
+start() {
+    if [ ! -f "/etc/openwbem/serverkey.pem" ]; then
+        if [ -f "/etc/ssl/servercerts/servercert.pem" \
+                -a -f "/etc/ssl/servercerts/serverkey.pem" ]; then
+            echo "Using common server certificate /etc/ssl/servercerts/servercert.pem"
+            ln -s /etc/ssl/servercerts/server{cert,key}.pem /etc/openwbem/
+        else
+            echo "Generating OpenWBEM server public certificate and private key"
+            FQDN=`hostname --fqdn`
+            if [ "x${FQDN}" = "x" ]; then
+                FQDN=localhost.localdomain
+            fi
+cat << EOF | sh /etc/openwbem/owgencert > /dev/null 2>&1
+--
+SomeState
+SomeCity
+SomeOrganization
+SomeOrganizationalUnit
+${FQDN}
+root@${FQDN}
+EOF
+        fi
+    fi
+
+    # Start daemons.
+    echo -n "Starting the $DESCRIPTIVE"
+    daemon $DAEMON $OPTIONS > /dev/null 2>&1 
+    RETVAL=$?
+
+    if [ $RETVAL -eq 0 ]; then
+        touch $lockfile
+        success
+    fi
+
+    echo
+    return $RETVAL
+}
+
+stop() {
+    # Stop daemons.
+    echo -n "Shutting down $DESCRIPTIVE"
+    killproc $DAEMON
+    RETVAL=$?
+
+    if [ $RETVAL -eq 0 ]; then
+        rm -f $lockfile
+        success
+    else
+        failure
+    fi
+    echo
+    return $RETVAL
+}
+
+restart() {
+    stop
+    start
+}
+
+case "$1" in
+    start)
+    start
+    ;;
+
+    stop)
+    stop
+    ;;
+
+    restart|force-reload)
+    restart
+    ;;
+
+    reload)
+    echo -n "Reload service $DESCRIPTIVE"
+    killproc -p $PIDFILE  -HUP $DAEMON
+    RETVAL=$?
+    echo
+    exit $RETVAL
+    ;;
+
+    status)
+    echo -n "Checking for service $DESCRIPTIVE"
+    status $DAEMON
+    RETVAL=$?
+    exit $RETVAL
+    ;;
+
+    *)
+    echo "Usage: $0 {restart|start|stop|reload|force-reload|status}"
+esac
+
+exit $RETVAL

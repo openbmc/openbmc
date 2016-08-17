@@ -1,0 +1,5 @@
+
+require radvd.inc
+
+SRC_URI[md5sum] = "57fc6021f6a5e5472e455937685472a3"
+SRC_URI[sha256sum] = "80ad60b15689e9591a5af393a57a1d93304deeff2e46482f0fd98046c00622f8"

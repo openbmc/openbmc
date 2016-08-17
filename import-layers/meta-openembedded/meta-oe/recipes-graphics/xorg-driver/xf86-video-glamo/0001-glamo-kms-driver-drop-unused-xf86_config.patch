@@ -1,0 +1,35 @@
+From 963c221aa01be2ea99d39578d91e4aa08ec3ab0a Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Mon, 23 May 2011 14:29:38 +0200
+Subject: [PATCH] glamo-kms-driver: drop unused xf86_config
+
+* gcc-4.6 doesn't like unused variables which are only set and never read
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ src/glamo-kms-driver.c |    2 --
+ 1 files changed, 0 insertions(+), 2 deletions(-)
+
+diff --git a/src/glamo-kms-driver.c b/src/glamo-kms-driver.c
+index ce87caa..c5c7a00 100644
+--- a/src/glamo-kms-driver.c
++++ b/src/glamo-kms-driver.c
+@@ -208,7 +208,6 @@ static const xf86CrtcConfigFuncsRec crtc_config_funcs = {
+ 
+ Bool GlamoKMSPreInit(ScrnInfoPtr pScrn, int flags)
+ {
+-	xf86CrtcConfigPtr xf86_config;
+ 	GlamoPtr pGlamo;
+ 	rgb defaultWeight = { 0, 0, 0 };
+ 	int max_width, max_height;
+@@ -254,7 +253,6 @@ Bool GlamoKMSPreInit(ScrnInfoPtr pScrn, int flags)
+ 
+ 	/* Allocate an xf86CrtcConfig */
+ 	xf86CrtcConfigInit(pScrn, &crtc_config_funcs);
+-	xf86_config = XF86_CRTC_CONFIG_PTR(pScrn);
+ 
+ 	max_width = 480;
+ 	max_height = 640;
+-- 
+1.7.5.rc3
+

@@ -1,0 +1,12 @@
+[Unit]
+Description=Collectd
+After=local-fs.target network.target
+Requires=local-fs.target network.target
+
+[Service]
+ExecStart=@SBINDIR@/collectd -C /etc/collectd.conf -f
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,30 @@
+From db764080e54f8f998c28ef8dab78da8b8d1d1420 Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen@dominion.thruhere.net>
+Date: Fri, 11 Feb 2011 10:35:40 +0100
+Subject: [PATCH] rfkill makefile: don't use -t, the OE install wrapper dislikes it
+
+Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
+---
+ Makefile |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 8d6c700..3652690 100644
+--- a/Makefile
++++ b/Makefile
+@@ -53,10 +53,10 @@ check:
+ install: rfkill rfkill.8.gz
+ 	@$(NQ) ' INST rfkill'
+ 	$(Q)$(MKDIR) $(DESTDIR)$(SBINDIR)
+-	$(Q)$(INSTALL) -m 755 -t $(DESTDIR)$(SBINDIR) rfkill
++	$(Q)$(INSTALL) -m 755 rfkill $(DESTDIR)$(SBINDIR) 
+ 	@$(NQ) ' INST rfkill.8'
+ 	$(Q)$(MKDIR) $(DESTDIR)$(MANDIR)/man8/
+-	$(Q)$(INSTALL) -m 644 -t $(DESTDIR)$(MANDIR)/man8/ rfkill.8.gz
++	$(Q)$(INSTALL) -m 644 rfkill.8.gz $(DESTDIR)$(MANDIR)/man8/
+ 
+ clean:
+ 	$(Q)rm -f rfkill *.o *~ *.gz version.c *-stamp
+-- 
+1.6.6.1
+

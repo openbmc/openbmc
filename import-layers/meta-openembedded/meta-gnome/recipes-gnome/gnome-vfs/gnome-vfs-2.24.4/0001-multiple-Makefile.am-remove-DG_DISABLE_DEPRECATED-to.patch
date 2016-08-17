@@ -1,0 +1,77 @@
+From 536e9b57cada4a9f92e073fdf01cdf1def435b6b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Tue, 7 May 2013 14:56:06 +0200
+Subject: [PATCH] multiple Makefile.am: remove -DG_DISABLE_DEPRECATED to fix
+ build with glib-2.36
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ daemon/Makefile.am      |    1 -
+ libgnomevfs/Makefile.am |    1 -
+ 2 files changed, 0 insertions(+), 2 deletions(-)
+
+Index: gnome-vfs-2.24.4/daemon/Makefile.am
+===================================================================
+--- gnome-vfs-2.24.4.orig/daemon/Makefile.am	2013-10-17 16:39:39.081024798 -0700
++++ gnome-vfs-2.24.4/daemon/Makefile.am	2013-10-17 16:39:39.213024794 -0700
+@@ -8,7 +8,6 @@
+ 	-D_LARGEFILE64_SOURCE                   \
+ 	-D_POSIX_PTHREAD_SEMANTICS		\
+ 	-D_REENTRANT				\
+-	-DG_DISABLE_DEPRECATED			\
+ 	-DGNOME_VFS_PREFIX=\"$(prefix)\"	\
+ 	-DGNOME_VFS_DATADIR=\"$(datadir)\"	\
+ 	-DGNOME_VFS_LIBDIR=\"$(libdir)\"	\
+Index: gnome-vfs-2.24.4/libgnomevfs/Makefile.am
+===================================================================
+--- gnome-vfs-2.24.4.orig/libgnomevfs/Makefile.am	2013-10-17 16:39:39.081024798 -0700
++++ gnome-vfs-2.24.4/libgnomevfs/Makefile.am	2013-10-17 16:39:39.213024794 -0700
+@@ -19,7 +19,6 @@
+ 	-D_LARGEFILE64_SOURCE                   \
+ 	-D_POSIX_PTHREAD_SEMANTICS		\
+ 	-D_REENTRANT				\
+-	-DG_DISABLE_DEPRECATED			\
+ 	-DGNOME_VFS_PREFIX=\"$(prefix)\"	\
+ 	-DGNOME_VFS_BINDIR=\"$(bindir)\"	\
+ 	-DGNOME_VFS_DATADIR=\"$(datadir)\"	\
+Index: gnome-vfs-2.24.4/modules/Makefile.am
+===================================================================
+--- gnome-vfs-2.24.4.orig/modules/Makefile.am	2013-10-17 16:39:39.081024798 -0700
++++ gnome-vfs-2.24.4/modules/Makefile.am	2013-10-17 16:39:39.213024794 -0700
+@@ -18,7 +18,6 @@
+ 	-D_POSIX_PTHREAD_SEMANTICS		\
+ 	-D_REENTRANT				\
+ 	-DSSH_PROGRAM=\"$(SSH_PROGRAM)\"	\
+-	-DG_DISABLE_DEPRECATED			\
+ 	-DGNOME_VFS_PREFIX=\"$(prefix)\"	\
+ 	-DGNOME_VFS_DATADIR=\"$(datadir)\"	\
+ 	-DGNOME_VFS_LIBDIR=\"$(libdir)\"	\
+Index: gnome-vfs-2.24.4/programs/Makefile.am
+===================================================================
+--- gnome-vfs-2.24.4.orig/programs/Makefile.am	2013-10-17 16:39:39.081024798 -0700
++++ gnome-vfs-2.24.4/programs/Makefile.am	2013-10-17 16:39:39.213024794 -0700
+@@ -4,8 +4,7 @@
+ 	-I$(top_srcdir)				\
+ 	-I$(top_builddir)			\
+ 	$(TEST_CFLAGS)				\
+-	$(VFS_CFLAGS)				\
+-	-DG_DISABLE_DEPRECATED
++	$(VFS_CFLAGS)
+ 
+ libraries =						\
+ 	$(top_builddir)/libgnomevfs/libgnomevfs-2.la	\
+Index: gnome-vfs-2.24.4/test/Makefile.am
+===================================================================
+--- gnome-vfs-2.24.4.orig/test/Makefile.am	2010-02-09 04:16:14.000000000 -0800
++++ gnome-vfs-2.24.4/test/Makefile.am	2013-10-17 16:42:49.109019172 -0700
+@@ -6,7 +6,6 @@
+ 	-I$(top_builddir)/libgnomevfs           \
+ 	$(TEST_CFLAGS)				\
+ 	$(VFS_CFLAGS)				\
+-	-DG_DISABLE_DEPRECATED			\
+ 	-DMODULES_PATH=\"$(libdir)/vfs/modules\"
+ 
+ if OS_WIN32

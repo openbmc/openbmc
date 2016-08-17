@@ -1,0 +1,114 @@
+From 5b859b6e7c82f49d967c25398a8e75b61af9bcc0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 12 Jun 2013 20:58:51 -0700
+Subject: [PATCH] g_type_init() is deprecated for glib >= 2.35.0
+
+Call it for old versions.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Pending
+---
+ examples/list-known-gps-devices.c |    4 ++--
+ examples/simple-gps-dbus.c        |    3 ++-
+ examples/simple-gps-gypsy.c       |    4 ++--
+ examples/simple-gps-satellites.c  |    4 ++--
+ gypsy/gypsy-marshal.c             |    2 +-
+ src/main.c                        |    4 ++--
+ 6 files changed, 11 insertions(+), 10 deletions(-)
+
+diff --git a/examples/list-known-gps-devices.c b/examples/list-known-gps-devices.c
+index c7c4059..0a8b04b 100644
+--- a/examples/list-known-gps-devices.c
++++ b/examples/list-known-gps-devices.c
+@@ -20,9 +20,9 @@ main (int argc,
+     GError *error = NULL;
+     GPtrArray *known_devices;
+     int i;
+-
++#if !GLIB_CHECK_VERSION(2,35,0)
+     g_type_init ();
+-
++#endif
+     discovery = gypsy_discovery_new ();
+     known_devices = gypsy_discovery_list_devices (discovery, &error);
+ 
+diff --git a/examples/simple-gps-dbus.c b/examples/simple-gps-dbus.c
+index f7044e6..76b18aa 100644
+--- a/examples/simple-gps-dbus.c
++++ b/examples/simple-gps-dbus.c
+@@ -121,8 +121,9 @@ main (int    argc,
+ 	DBusConnection *conn;
+ 	DBusError error;
+ 	GMainLoop *mainloop;
+-
++#if !GLIB_CHECK_VERSION(2,35,0)
+ 	g_type_init ();
++#endif
+ 	conn = get_connection ();
+ 
+ 	dbus_error_init (&error);
+diff --git a/examples/simple-gps-gypsy.c b/examples/simple-gps-gypsy.c
+index 0b6b7a6..86033d9 100644
+--- a/examples/simple-gps-gypsy.c
++++ b/examples/simple-gps-gypsy.c
+@@ -67,9 +67,9 @@ main (int    argc,
+ 		g_print ("Usage: %s device\n", argv[0]);
+ 		return 0;
+ 	}
+-
++#if !GLIB_CHECK_VERSION(2,35,0) 
+ 	g_type_init ();
+-
++#endif
+ 	control = gypsy_control_get_default ();
+ 	path = gypsy_control_create (control, argv[1], &error);
+ 	if (path == NULL) {
+diff --git a/examples/simple-gps-satellites.c b/examples/simple-gps-satellites.c
+index 140c98f..9a3f95a 100644
+--- a/examples/simple-gps-satellites.c
++++ b/examples/simple-gps-satellites.c
+@@ -42,9 +42,9 @@ main (int    argc,
+ 		g_print ("Usage: %s device\n", argv[0]);
+ 		return 0;
+ 	}
+-
++#if !GLIB_CHECK_VERSION(2,35,0)
+ 	g_type_init ();
+-
++#endif
+ 	control = gypsy_control_get_default ();
+ 	path = gypsy_control_create (control, argv[1], &error);
+ 	if (path == NULL) {
+diff --git a/gypsy/gypsy-marshal.c b/gypsy/gypsy-marshal.c
+index 6964644..9ac0095 100644
+--- a/gypsy/gypsy-marshal.c
++++ b/gypsy/gypsy-marshal.c
+@@ -5,7 +5,7 @@
+ 
+ #ifdef G_ENABLE_DEBUG
+ #define g_marshal_value_peek_boolean(v)  g_value_get_boolean (v)
+-#define g_marshal_value_peek_char(v)     g_value_get_char (v)
++#define g_marshal_value_peek_char(v)     g_value_get_schar (v)
+ #define g_marshal_value_peek_uchar(v)    g_value_get_uchar (v)
+ #define g_marshal_value_peek_int(v)      g_value_get_int (v)
+ #define g_marshal_value_peek_uint(v)     g_value_get_uint (v)
+diff --git a/src/main.c b/src/main.c
+index 3e8a794..ec980e5 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -187,9 +187,9 @@ main (int    argc,
+ 	g_option_context_free (context);
+ 
+ 	umask (022);
+-
++#if !GLIB_CHECK_VERSION(2,35,0)
+ 	g_type_init ();
+-
++#endif
+ 	mainloop = g_main_loop_new (NULL, FALSE);
+ 
+ 	conn = dbus_g_bus_get (DBUS_BUS_SYSTEM, &error);
+-- 
+1.7.9.5
+

@@ -1,0 +1,63 @@
+From 2686213259b15df9cf1d969c5a14d62f14cfbaae Mon Sep 17 00:00:00 2001
+From: Jianchuan Wang <jianchuan.wang@windriver.com>
+Date: Thu, 8 Jan 2015 17:37:11 +0800
+Subject: [PATCH 2/2] Replace nl_handle to nl_sock.
+
+The nl_handle was replace with nl_sock in the libnl-3.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Jianchuan Wang <jianchuan.wang@windriver.com>
+---
+ libipvs/libipvs.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/libipvs/libipvs.c b/libipvs/libipvs.c
+index a157e18..21a9bfa 100644
+--- a/libipvs/libipvs.c
++++ b/libipvs/libipvs.c
+@@ -32,7 +32,7 @@ static void* ipvs_func = NULL;
+ struct ip_vs_getinfo ipvs_info;
+ 
+ #ifdef LIBIPVS_USE_NL
+-static struct nl_handle *sock = NULL;
++static struct nl_sock *sock = NULL;
+ static int family, try_nl = 1;
+ #endif
+ 
+@@ -73,7 +73,7 @@ int ipvs_nl_send_message(struct nl_msg *msg, nl_recvmsg_msg_cb_t func, void *arg
+ {
+ 	int err = EINVAL;
+ 
+-	sock = nl_handle_alloc();
++	sock = nl_socket_alloc();
+ 	if (!sock) {
+ 		nlmsg_free(msg);
+ 		return -1;
+@@ -88,7 +88,7 @@ int ipvs_nl_send_message(struct nl_msg *msg, nl_recvmsg_msg_cb_t func, void *arg
+ 
+ 	/* To test connections and set the family */
+ 	if (msg == NULL) {
+-		nl_handle_destroy(sock);
++		nl_socket_free(sock);
+ 		sock = NULL;
+ 		return 0;
+ 	}
+@@ -104,12 +104,12 @@ int ipvs_nl_send_message(struct nl_msg *msg, nl_recvmsg_msg_cb_t func, void *arg
+ 
+ 	nlmsg_free(msg);
+ 
+-	nl_handle_destroy(sock);
++	nl_socket_free(sock);
+ 
+ 	return 0;
+ 
+ fail_genl:
+-	nl_handle_destroy(sock);
++	nl_socket_free(sock);
+ 	sock = NULL;
+ 	nlmsg_free(msg);
+ 	errno = err;
+-- 
+1.8.3.1
+

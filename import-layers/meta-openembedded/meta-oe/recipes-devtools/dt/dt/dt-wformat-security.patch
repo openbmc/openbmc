@@ -1,0 +1,48 @@
+Patch from http://pkgs.fedoraproject.org/git/rpms/dt.git
+
+Upstream-Status: Pending
+
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+
+diff -rupN dt.v18.32.old/dt.c dt.v18.32/dt.c
+--- dt.v18.32.old/dt.c	2014-08-18 14:45:53.242351115 +0200
++++ dt.v18.32/dt.c	2014-08-18 15:11:36.367719880 +0200
+@@ -4378,7 +4378,7 @@ report_error(
+ 	    (void)sprintf(dip->di_msg_buffer, "(%d): '%s', errno = %d - %s\n",
+ 			  dip->di_process_id, error_info, errno, emsg);
+ 	}
+-	syslog(LOG_ERR, dip->di_msg_buffer);
++	syslog(LOG_ERR, "%s", dip->di_msg_buffer);
+     }
+ #endif /* defined(SYSLOG) */
+ 
+diff -rupN dt.v18.32.old/dtutil.c dt.v18.32/dtutil.c
+--- dt.v18.32.old/dtutil.c	2014-08-18 14:45:53.354350779 +0200
++++ dt.v18.32/dtutil.c	2014-08-18 15:13:53.835307311 +0200
+@@ -5180,7 +5180,7 @@ ReportDeviceInfo (
+ 	    bp += Sprintf(bp,
+ 			  "(%d) Device name: %s\n",
+ 			   dip->di_process_id, dip->di_dname);
+-	    syslog(LOG_ERR, dip->di_msg_buffer);
++	    syslog(LOG_ERR, "%s", dip->di_msg_buffer);
+ 	    bp = dip->di_msg_buffer;
+ # if defined(SCSI)
+ 	    if (dip->di_serial_number) {
+@@ -5193,7 +5193,7 @@ ReportDeviceInfo (
+ 			      dip->di_process_id, dip->di_device_id);
+ 	    }
+ # endif /* defined(SCSI) */
+-	    syslog(LOG_ERR, dip->di_msg_buffer);
++	    syslog(LOG_ERR, "%s", dip->di_msg_buffer);
+ 	    bp = dip->di_msg_buffer;
+ 	    bp += Sprintf(bp,
+ 		  "(%d) Relative block number where the error occurred is " LUF ","
+@@ -5203,7 +5203,7 @@ ReportDeviceInfo (
+   	    } else {
+                 bp += Sprintf(bp, "\n");
+             }
+-	    syslog(LOG_ERR, dip->di_msg_buffer);
++	    syslog(LOG_ERR, "%s", dip->di_msg_buffer);
+ 	}
+ #endif /* defined(SYSLOG) */
+ 

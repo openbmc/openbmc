@@ -1,0 +1,17 @@
+# QEMU versatilepb machine, qemuarm in OE
+
+mode "vga" "640x480"
+    geometry 640 480 640 480 16
+endmode
+
+mode "vga-portrait" "480x640"
+    geometry 480 640 480 640 16
+endmode
+
+mode "qvga" "320x240"
+    geometry 320 240 320 240 16
+endmode
+
+mode "qvga-portrait" "240x320"
+    geometry 240 320 240 320 16
+endmode

@@ -1,0 +1,40 @@
+From 14c22398f8370e33a798360ed0dad513af8f1470 Mon Sep 17 00:00:00 2001
+From: AlbrechtS <AlbrechtS@ea41ed52-d2ee-0310-a9c1-e6b18d33e121>
+Date: Sun, 15 Mar 2015 19:32:33 +0000
+Subject: [PATCH] Fix 'boolean' issue with jpeg-9 library compatibility (STR
+ #2920).
+
+According to comments in STR #2920 and my own tests this is also
+compatible with older jpeg libraries (at least jpeg-8).
+
+Upstream-Status: Backport
+
+---
+ src/Fl_JPEG_Image.cxx |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/Fl_JPEG_Image.cxx b/src/Fl_JPEG_Image.cxx
+index 47120a7..6cebe88 100644
+--- a/src/Fl_JPEG_Image.cxx
++++ b/src/Fl_JPEG_Image.cxx
+@@ -155,7 +155,7 @@ Fl_JPEG_Image::Fl_JPEG_Image(const char *filename)	// I - File to load
+   
+   jpeg_create_decompress(&dinfo);
+   jpeg_stdio_src(&dinfo, fp);
+-  jpeg_read_header(&dinfo, 1);
++  jpeg_read_header(&dinfo, TRUE);
+   
+   dinfo.quantize_colors      = (boolean)FALSE;
+   dinfo.out_color_space      = JCS_RGB;
+@@ -337,7 +337,7 @@ Fl_JPEG_Image::Fl_JPEG_Image(const char *name, const unsigned char *data)
+   
+   jpeg_create_decompress(&dinfo);
+   jpeg_mem_src(&dinfo, data);
+-  jpeg_read_header(&dinfo, 1);
++  jpeg_read_header(&dinfo, TRUE);
+   
+   dinfo.quantize_colors      = (boolean)FALSE;
+   dinfo.out_color_space      = JCS_RGB;
+-- 
+1.7.9.5
+

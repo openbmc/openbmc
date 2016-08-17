@@ -1,0 +1,52 @@
+From 760ccbb2fb046621a2aeaecabb2b1ef9aa280cf1 Mon Sep 17 00:00:00 2001
+From: Yulong Pei <Yulong.pei@windriver.com>
+Date: Thu, 1 Sep 2011 01:03:14 +0800
+Subject: [PATCH] replace lynx to curl in apachectl script
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Yulong Pei <Yulong.pei@windriver.com>
+---
+ support/apachectl.in |   14 ++++++++++----
+ 1 files changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/support/apachectl.in b/support/apachectl.in
+index d4dff38..109ea13 100644
+--- a/support/apachectl.in
++++ b/support/apachectl.in
+@@ -51,11 +51,11 @@ fi
+ # a command that outputs a formatted text version of the HTML at the
+ # url given on the command line.  Designed for lynx, however other
+ # programs may work.  
+-LYNX="@LYNX_PATH@ -dump"
++CURL="/usr/bin/curl"
+ #
+ # the URL to your server's mod_status status page.  If you do not
+ # have one, then status and fullstatus will not work.
+-STATUSURL="http://localhost:@PORT@/server-status"
++STATUSURL="http://localhost:@PORT@/"
+ #
+ # Set this variable to a command that increases the maximum
+ # number of file descriptors allowed per child process. This is
+@@ -91,10 +91,16 @@ configtest)
+     ERROR=$?
+     ;;
+ status)
+-    $LYNX $STATUSURL | awk ' /process$/ { print; exit } { print } '
++    $CURL -s $STATUSURL | grep -o "It works!"
++    if [ $? != 0 ] ; then
++        echo The httpd server does not work!
++    fi
+     ;;
+ fullstatus)
+-    $LYNX $STATUSURL
++    $CURL -s $STATUSURL | grep -o "It works!"
++    if [ $? != 0 ] ; then
++        echo The httpd server does not work!
++    fi
+     ;;
+ *)
+     $HTTPD $ARGV
+-- 
+1.6.4
+

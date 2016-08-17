@@ -1,0 +1,32 @@
+#!/bin/sh
+DAEMON=/usr/sbin/cherokee
+CONFIG=/etc/cherokee/cherokee.conf
+PIDFILE=/var/run/cherokee.pid
+NAME="cherokee"
+DESC="Cherokee http server"
+
+test -r /etc/default/cherokee && . /etc/default/cherokee
+test -x "$DAEMON" || exit 0
+test ! -r "$CONFIG" && exit 0
+        
+case "$1" in
+  start)
+    echo "Starting $DESC: "
+    start-stop-daemon --oknodo -S -x $DAEMON -- -d -C $CONFIG
+    ;;
+
+  stop)
+    echo "Stopping $DESC:"
+    start-stop-daemon -K -p $PIDFILE
+    ;;
+
+  restart)
+    $0 stop >/dev/null 2>&1
+    $0 start
+    ;;
+
+  *)
+    echo "Usage: $0 {start|stop|restart}"
+    exit 0
+    ;;
+esac

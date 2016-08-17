@@ -1,0 +1,34 @@
+Make netcat_flag_count() return positive value
+
+C language has 3 distinct char types:
+         char
+         unsigned char
+         signed char
+A char has the same range of values as signed char on X86,
+but same as unsigned char on PPC which made netcat_flag_count
+return a negative value, now we force variable c as signed char
+to make netcat_flag_count return positive value.
+
+Upstream-Status: Pending
+
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+---
+ src/flagset.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/src/flagset.c b/src/flagset.c
+index 442b634..54ac898 100644
+--- a/src/flagset.c
++++ b/src/flagset.c
+@@ -134,7 +134,7 @@ unsigned short netcat_flag_next(unsigned short port)
+ 
+ int netcat_flag_count(void)
+ {
+-  register char c;
++  register signed char c;
+   register int i;
+   int ret = 0;
+ 
+-- 
+1.7.5.4
+

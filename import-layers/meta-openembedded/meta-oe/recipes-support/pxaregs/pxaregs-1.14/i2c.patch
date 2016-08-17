@@ -1,0 +1,15 @@
+Index: pxaregs-1.14/pxaregs.c
+===================================================================
+--- pxaregs-1.14.orig/pxaregs.c
++++ pxaregs-1.14/pxaregs.c
+@@ -21,10 +21,6 @@
+ #include <fcntl.h>
+ #include <ctype.h>
+ 
+-#include <linux/i2c.h>
+-#include <linux/i2c-dev.h>
+-
+-
+ // fd for /dev/mem
+ static int fd = -1;
+ 

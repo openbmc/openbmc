@@ -1,0 +1,38 @@
+Verify the validity of the pointer before delete it
+
+Otherwise, we got a crash at logqueue-fifo.c:344
+  344 iv_list_del(&node->list);
+
+Upstream-Status: Pending
+
+Signed-off-by: Xufeng Zhang <xufeng.zhang@windriver.com>
+---
+--- a/lib/logqueue-fifo.c
++++ b/lib/logqueue-fifo.c
+@@ -339,15 +339,18 @@
+       *msg = node->msg;
+       path_options->ack_needed = node->ack_needed;
+       self->qoverflow_output_len--;
+-      if (!push_to_backlog)
++      if ((&node->list) && (&node->list)->next && (&node->list)->prev)
+         {
+-          iv_list_del(&node->list);
+-          log_msg_free_queue_node(node);
+-        }
+-      else
+-        {
+-          iv_list_del_init(&node->list);
+-        }
++          if (!push_to_backlog)
++            {
++              iv_list_del(&node->list);
++              log_msg_free_queue_node(node);
++            }
++          else
++            {
++              iv_list_del_init(&node->list);
++            }
++        }
+     }
+   else
+     {

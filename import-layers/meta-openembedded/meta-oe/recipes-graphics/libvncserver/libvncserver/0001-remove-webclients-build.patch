@@ -1,0 +1,28 @@
+diff --git a/Makefile.am b/Makefile.am
+index 5c2a94d..f98038a 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,7 +1,7 @@
+ ACLOCAL_AMFLAGS = -I m4
+ 
+-SUBDIRS=libvncserver examples libvncclient webclients client_examples test
+-DIST_SUBDIRS=libvncserver examples libvncclient webclients client_examples test
++SUBDIRS=libvncserver examples libvncclient client_examples test
++DIST_SUBDIRS=libvncserver examples libvncclient client_examples test
+ EXTRA_DIST = CMakeLists.txt rfb/rfbint.h.cmake rfb/rfbconfig.h.cmake
+ 
+ bin_SCRIPTS = libvncserver-config
+diff --git a/configure.ac b/configure.ac
+index ca9f3b3..9b464cf 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -600,9 +600,6 @@ AC_CONFIG_FILES([Makefile
+ 	libvncserver/Makefile
+ 	examples/Makefile
+ 	examples/android/Makefile
+-	webclients/Makefile
+-	webclients/java-applet/Makefile
+-	webclients/java-applet/ssl/Makefile
+ 	libvncclient/Makefile
+ 	client_examples/Makefile
+ 	test/Makefile

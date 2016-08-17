@@ -1,0 +1,39 @@
+[PATCH] fix the empty file writting
+
+Upstream-Status: pending
+
+With the feature that checking the disk filled up, the return
+value of function write_behind was checked and used to detect
+the disk status. While for empty file, without data being
+written, this function will return -1 thus the disk filled up
+error was miss-raised.
+
+make write_behind to return 0 if written file is empty, to fix
+the this bug.
+
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+---
+ common/tftpsubs.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/common/tftpsubs.c b/common/tftpsubs.c
+index b4ea3f2..9f6cafc 100644
+--- a/common/tftpsubs.c
++++ b/common/tftpsubs.c
+@@ -198,9 +198,12 @@ int write_behind(FILE * file, int convert)
+     nextone = !nextone;         /* incr for next time */
+     buf = dp->th_data;
+ 
+-    if (count <= 0)
++    if (count < 0)
+         return -1;              /* nak logic? */
+ 
++    if (count == 0)
++        return 0;
++
+     if (convert == 0)
+         return write(fileno(file), buf, count);
+ 
+-- 
+1.9.1
+

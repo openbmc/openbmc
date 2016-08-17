@@ -1,0 +1,103 @@
+From 0128c5a9eeee0d3fc0deb9129dd20eb79338c8f4 Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen.kooi@linaro.org>
+Date: Mon, 2 Mar 2015 19:08:59 +0800
+Subject: [PATCH 4/5] mozbug746112-no-decommit-on-large-pages
+
+---
+Upstream-status: Pending
+
+ js/src/gc/Heap.h | 15 ++++++++++-----
+ js/src/jsgc.cpp  | 15 ++++++++++++---
+ 2 files changed, 22 insertions(+), 8 deletions(-)
+
+diff --git a/js/src/gc/Heap.h b/js/src/gc/Heap.h
+index b8f8c78..1cfd269 100644
+--- a/js/src/gc/Heap.h
++++ b/js/src/gc/Heap.h
+@@ -103,26 +103,31 @@ struct Cell
+ };
+ 
+ /*
+- * Page size is 4096 by default, except for SPARC, where it is 8192.
++ * Page size must be static to support our arena pointer optimizations, so we
++ * are forced to support each platform with non-4096 pages as a special case.
++ * Note: The freelist supports a maximum arena shift of 15.
+  * Note: Do not use JS_CPU_SPARC here, this header is used outside JS.
+  * Bug 692267: Move page size definition to gc/Memory.h and include it
+  *             directly once jsgc.h is no longer an installed header.
+  */
+ #if defined(SOLARIS) && (defined(__sparc) || defined(__sparcv9))
+ const size_t PageShift = 13;
++const size_t ArenaShift = PageShift;
++#elif defined(__powerpc__)
++const size_t PageShift = 16;
++const size_t ArenaShift = 12;
+ #else
+ const size_t PageShift = 12;
++const size_t ArenaShift = PageShift;
+ #endif
+ const size_t PageSize = size_t(1) << PageShift;
++const size_t ArenaSize = size_t(1) << ArenaShift;
++const size_t ArenaMask = ArenaSize - 1;
+ 
+ const size_t ChunkShift = 20;
+ const size_t ChunkSize = size_t(1) << ChunkShift;
+ const size_t ChunkMask = ChunkSize - 1;
+ 
+-const size_t ArenaShift = PageShift;
+-const size_t ArenaSize = PageSize;
+-const size_t ArenaMask = ArenaSize - 1;
+-
+ /*
+  * This is the maximum number of arenas we allow in the FreeCommitted state
+  * before we trigger a GC_SHRINK to release free arenas to the OS.
+diff --git a/js/src/jsgc.cpp b/js/src/jsgc.cpp
+index b3caf05..a258d2d 100644
+--- a/js/src/jsgc.cpp
++++ b/js/src/jsgc.cpp
+@@ -251,6 +251,13 @@ static const int BackgroundPhaseLength[] = {
+     sizeof(BackgroundPhaseStrings) / sizeof(AllocKind)
+ };
+ 
++/* Unused memory decommiting requires the arena size match the page size. */
++static bool
++DecommitEnabled()
++{
++    return PageSize == ArenaSize;
++}
++
+ #ifdef DEBUG
+ void
+ ArenaHeader::checkSynchronizedWithFreeList() const
+@@ -742,7 +749,8 @@ Chunk::fetchNextDecommittedArena()
+     decommittedArenas.unset(offset);
+ 
+     Arena *arena = &arenas[offset];
+-    MarkPagesInUse(arena, ArenaSize);
++    if (DecommitEnabled())
++        MarkPagesInUse(arena, ArenaSize);
+     arena->aheader.setAsNotAllocated();
+ 
+     return &arena->aheader;
+@@ -2731,7 +2739,7 @@ DecommitArenasFromAvailableList(JSRuntime *rt, Chunk **availableListHeadp)
+                 chunk->removeFromAvailableList();
+ 
+             size_t arenaIndex = Chunk::arenaIndex(aheader->arenaAddress());
+-            bool ok;
++            bool ok = true;
+             {
+                 /*
+                  * If the main thread waits for the decommit to finish, skip
+@@ -2741,7 +2749,8 @@ DecommitArenasFromAvailableList(JSRuntime *rt, Chunk **availableListHeadp)
+                 Maybe<AutoUnlockGC> maybeUnlock;
+                 if (!rt->isHeapBusy())
+                     maybeUnlock.construct(rt);
+-                ok = MarkPagesUnused(aheader->getArena(), ArenaSize);
++                if (DecommitEnabled())
++                    ok = MarkPagesUnused(aheader->getArena(), ArenaSize);
+             }
+ 
+             if (ok) {
+-- 
+1.9.3
+

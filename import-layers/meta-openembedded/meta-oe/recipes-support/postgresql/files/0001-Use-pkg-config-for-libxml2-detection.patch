@@ -1,0 +1,43 @@
+From d52e330be895bb8c5f0fb3e2884766acbd942a85 Mon Sep 17 00:00:00 2001
+From: Philip Balister <philip@balister.org>
+Date: Tue, 1 Jul 2014 09:40:44 -0400
+Subject: [PATCH] Use pkg-config for libxml2 detection.
+
+Upstream-Status: Inappropriate [configuration]
+
+xml2-config does not work. Use pkgconfig to set CPPFLAGS and LIBS.
+
+Signed-off-by: Philip Balister <philip@balister.org>
+---
+ configure.in | 15 ++-------------
+ 1 file changed, 2 insertions(+), 13 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index f8bf466..1f4fabf 100644
+--- a/configure.in
++++ b/configure.in
+@@ -734,19 +734,8 @@ PGAC_ARG_BOOL(with, libxml, no, [build with XML support],
+               [AC_DEFINE([USE_LIBXML], 1, [Define to 1 to build with XML support. (--with-libxml)])])
+ 
+ if test "$with_libxml" = yes ; then
+-  AC_CHECK_PROGS(XML2_CONFIG, xml2-config)
+-  if test -n "$XML2_CONFIG"; then
+-    for pgac_option in `$XML2_CONFIG --cflags`; do
+-      case $pgac_option in
+-        -I*|-D*) CPPFLAGS="$CPPFLAGS $pgac_option";;
+-      esac
+-    done
+-    for pgac_option in `$XML2_CONFIG --libs`; do
+-      case $pgac_option in
+-        -L*) LDFLAGS="$LDFLAGS $pgac_option";;
+-      esac
+-    done
+-  fi
++  CPPFLAGS="$CPPFLAGS `pkg-config --short-errors --print-errors --cflags "libxml-2.0" 2>&1`"
++  LIBS="`pkg-config --short-errors --print-errors --libs "libxml-2.0" 2>&1` $LIBS"
+ fi
+ 
+ AC_SUBST(with_libxml)
+-- 
+1.8.3.1
+

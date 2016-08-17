@@ -1,0 +1,67 @@
+Get linux kernel version from Makefile of kernel source
+
+We get below messages while building iscsitarget,
+
+-- snip --
+x86_64-poky-linux-gcc: error:
+/CGE7_SHDD/project_yocto_1.8/poky/build/tmp/work-shared/qemux86-64/kernel-source/include/linux/version.h:
+No such file or directory
+x86_64-poky-linux-gcc: fatal error: no input files
+compilation terminated.
+/bin/sh: line 0: [: too many arguments
+/bin/sh: line 0: [: too many arguments
+/bin/sh: line 0: [: too many arguments
+/bin/sh: line 0: [: too many arguments
+/bin/sh: line 0: [: too many arguments
+/bin/sh: line 0: [: too many arguments
+/bin/sh: line 0: [: too many arguments
+/bin/sh: line 0: [: too many arguments
+/bin/sh: line 0: [: too many arguments
+/bin/sh: line 0: [: too many arguments
+/bin/sh: line 0: [: too many arguments
+/bin/sh: line 0: [: too many arguments
+-- CUT --
+
+These messages are due to absence of include/linux/version.h file in 
+kernel source directory and failed to compute linux kernel version.
+So, use kernel source Makefile ( i.e $(KSRC)/Makefile) to find out 
+actual kernel version.
+
+Upstream-Status: Pending
+
+Signed-off-by: Jagadeesh Krishnanjanappa <jkrishnanjanappa@mvista.com>
+
+--- iscsitarget-1.4.20.3+svn499_org/Makefile	2014-01-27 00:00:45.000000000 +0530
++++ iscsitarget-1.4.20.3+svn499/Makefile	2015-07-23 10:44:47.013600285 +0530
+@@ -18,27 +18,11 @@ ifeq ($(KSRC),)
+ endif
+ 
+ 
+-ifneq ($(wildcard $(KSRC)/include/generated/utsrelease.h),)
+-	VERSION_FILE := $(KSRC)/include/generated/utsrelease.h
+-else
+-  ifneq ($(wildcard $(KSRC)/include/linux/utsrelease.h),)
+-	  VERSION_FILE := $(KSRC)/include/linux/utsrelease.h
+-  else
+-	  VERSION_FILE := $(KSRC)/include/linux/version.h
+-  endif
+-endif
+-
+-KVER := $(shell $(CC) $(CFLAGS) $(LDFLAGS) -E -dM $(VERSION_FILE) | \
+-	grep UTS_RELEASE | awk '{ print $$3 }' | sed 's/\"//g')
+-
+ KMOD := /lib/modules/$(KVER)/extra
+-
+-KMAJ := $(shell echo $(KVER) | \
+-	sed -e 's/^\([0-9][0-9]*\)\.[0-9][0-9]*\.[0-9][0-9]*.*/\1/')
+-KMIN := $(shell echo $(KVER) | \
+-	sed -e 's/^[0-9][0-9]*\.\([0-9][0-9]*\)\.[0-9][0-9]*.*/\1/')
+-KREV := $(shell echo $(KVER) | \
+-	sed -e 's/^[0-9][0-9]*\.[0-9][0-9]*\.\([0-9][0-9]*\).*/\1/')
++KMAJ := $(shell cat $(KSRC)/Makefile | grep ^VERSION | gawk -F " " '{ print $$NF }')
++KMIN := $(shell cat $(KSRC)/Makefile | grep ^PATCHLEVEL | gawk -F " " '{ print $$NF }')
++KREV := $(shell cat $(KSRC)/Makefile | grep ^SUBLEVEL | gawk -F " " '{ print $$NF }')
++KVER := ${KMAJ}.${KMIN}.${KREV}
+ 
+ kver_eq = $(shell [ $(KMAJ) -eq $(1) -a $(KMIN) -eq $(2) -a $(KREV) -eq $(3) ] && \
+ 	echo 1 || echo 0)

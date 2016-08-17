@@ -1,0 +1,17 @@
+# Default for zeroconf
+
+# disable zeroconf
+# If you want to disable zeroconf completely, uncomment the following line
+# this may be useful if you are debugging zeroconf or starting it manually
+#DISABLE=yes
+
+# black-listed interfaces
+# Interfaces which you never wish to have zeroconf run on should
+# be listed here. e.g. "eth2 wlan1" in a space seperated string
+IFBLACKLIST=""
+
+# fallback only
+# If you would only like a link-local address if you were unable to
+# obtain an address via DHCP then uncomment the following line
+#FALLBACK=yes
+

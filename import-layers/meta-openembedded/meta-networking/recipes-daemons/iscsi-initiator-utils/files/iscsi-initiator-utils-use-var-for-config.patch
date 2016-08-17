@@ -1,0 +1,240 @@
+iscsi-initiator-utils to use var for config
+
+Upstream-status: Backport
+This patch is from fedora.
+
+Use /var/lib/iscsi/ instead of /etc/iscsi/ for holding
+state files.
+
+Signed-off-by: Yao Zhao <yao.zhao@windriver.com>
+Signed-off-by: Vu Tran <vu.tran@windriver.com>
+
+diff --git a/README b/README
+index 7364b2d..5e8bff8 100644
+--- a/README
++++ b/README
+@@ -164,10 +164,10 @@ available on all Linux installations.
+ 
+ The database contains two tables:
+ 
+-- Discovery table (/etc/iscsi/send_targets);
+-- Node table (/etc/iscsi/nodes).
++- Discovery table (/var/lib/iscsi/send_targets);
++- Node table (/var/lib/iscsi/nodes).
+ 
+-The regular place for iSCSI database files: /etc/iscsi/nodes
++The regular place for iSCSI database files: /var/lib/iscsi/nodes
+ 
+ The iscsiadm utility is a command-line tool to manage (update, delete,
+ insert, query) the persistent database.
+@@ -444,7 +444,7 @@ a scsi_host per HBA port).
+ To manage both types of initiator stacks, iscsiadm uses the interface (iface)
+ structure. For each HBA port or for software iscsi for each network
+ device (ethX) or NIC, that you wish to bind sessions to you must create
+-a iface config /etc/iscsi/ifaces.
++a iface config /var/lib/iscsi/ifaces.
+ 
+ Prep:
+ 
+@@ -478,29 +478,29 @@ Running:
+ iface0 qla4xxx,00:c0:dd:08:63:e8,20.15.0.7,default,iqn.2005-06.com.redhat:madmax
+ iface1 qla4xxx,00:c0:dd:08:63:ea,20.15.0.9,default,iqn.2005-06.com.redhat:madmax
+ 
+-Will report iface configurations that are setup in /etc/iscsi/ifaces.
++Will report iface configurations that are setup in /var/lib/iscsi/ifaces.
+ The format is:
+ 
+ iface_name transport_name,hwaddress,ipaddress,net_ifacename,initiatorname
+ 
+ For software iscsi, you can create the iface configs by hand, but it is
+ reccomended that you use iscsiadm's iface mode. There is a iface.example in
+-/etc/iscsi/ifaces which can be used as a template for the daring.
++/var/lib/iscsi/ifaces which can be used as a template for the daring.
+ 
+ For each network object you wish to bind a session to you must create
+-a seperate iface config in /etc/iscsi/ifaces and each iface config file
++a seperate iface config in /var/lib/iscsi/ifaces and each iface config file
+ must have a unique name which is less than or equal to 64 characters.
+ 
+ Example:
+ 
+ If you have NIC1 with MAC address 00:0F:1F:92:6B:BF and NIC2 with
+ MAC address 00:C0:DD:08:63:E7 and you wanted to do software iscsi over
+-TCP/IP. Then in /etc/iscsi/ifaces/iface0 you would enter:
++TCP/IP. Then in /var/lib/iscsi/ifaces/iface0 you would enter:
+ 
+ iface.transport_name = tcp
+ iface.hwaddress = 00:0F:1F:92:6B:BF
+ 
+-and in /etc/iscsi/ifaces/iface1 you would enter:
++and in /var/lib/iscsi/ifaces/iface1 you would enter:
+ 
+ iface.transport_name = tcp
+ iface.hwaddress = 00:C0:DD:08:63:E7
+@@ -550,7 +550,7 @@ cxgb3i.00:07:43:05:97:07 cxgb3i,00:07:43:05:97:07,<empty>,<empty>,<empty>
+ qla4xxx.00:0e:1e:04:8b:2e qla4xxx,00:0e:1e:04:8b:2e,<empty>,<empty>,<empty>
+ 
+ 
+-Will report iface configurations that are setup in /etc/iscsi/ifaces.
++Will report iface configurations that are setup in /var/lib/iscsi/ifaces.
+ The format is:
+ 
+ iface_name transport_name,hwaddress,ipaddress,net_ifacename,initiatorname
+@@ -636,7 +636,7 @@ need a seperate network connection to the target for discovery purposes.
+ *This will be fixed in the next version of open-iscsi*
+ 
+ For compatibility reasons, when you run iscsiadm to do discovery, it
+-will check for interfaces in /etc/iscsi/iscsi/ifaces that are using
++will check for interfaces in /var/lib/iscsi/iscsi/ifaces that are using
+ tcp for the iface.transport and it will bind the portals that are discovered
+ so that they will be logged in through those ifaces. This behavior can also
+ be overriden by passing in the interfaces you want to use. For the case
+@@ -654,7 +654,7 @@ we do not bind a session to a iface, then you can use the special iface
+ 
+ iscsiadm -m discoverydb -t st -p ip:port -I default --discover -P 1
+ 
+-And if you did not define any interfaces in /etc/iscsi/ifaces and do
++And if you did not define any interfaces in /var/lib/iscsi/ifaces and do
+ not pass anything into iscsiadm, running iscsiadm will do the default
+ behavior, where we allow the network subsystem to decide which
+ device to use.
+@@ -696,7 +696,7 @@ To now log into targets it is the same as with sofware iscsi. See section
+ 
+ 	    ./iscsiadm -m discoverydb -t st -p 192.168.1.1:3260 --discover
+ 
+-	This will search /etc/iscsi/send_targets for a record with the
++	This will search /var/lib/iscsi/send_targets for a record with the
+ 	ID [portal = 192.168.1.1:3260 and type = sendtargets. If found it
+ 	will perform discovery using the settings stored in the record.
+ 	If a record does not exist, it will be created using the iscsid.conf
+@@ -705,7 +705,7 @@ To now log into targets it is the same as with sofware iscsi. See section
+ 	The argument to -p may also be a hostname instead of an address.
+ 	    ./iscsiadm -m discoverydb -t st -p smoehost --discover
+ 
+-	For the ifaces, iscsiadm will first search /etc/iscsi/ifaces for
++	For the ifaces, iscsiadm will first search /var/lib/iscsi/ifaces for
+ 	interfaces using software iscsi. If any are found then nodes found
+ 	during discovery will be setup so that they can logged in through
+ 	those interfaces. To specify a specific iface, pass the
+@@ -761,7 +761,7 @@ To now log into targets it is the same as with sofware iscsi. See section
+ 	This command will perform discovery, but not manipulate the node DB.
+ 
+   - SendTargets iSCSI Discovery with a specific interface. If you
+-	wish to only use a subset of the interfaces in /etc/iscsi/ifaces
++	wish to only use a subset of the interfaces in /var/lib/iscsi/ifaces
+ 	then you can pass them in during discovery:
+ 
+ 	     ./iscsiadm -m discoverydb -t sendtargets -p 192.168.1.1:3260 \
+@@ -1072,8 +1072,8 @@ where targetname is the name of the target and ip_address:port is the address
+ and port of the portal. tpgt, is the portal group tag of
+ the portal, and is not used in iscsiadm commands except for static
+ record creation. And iface name is the name of the iscsi interface
+-defined in /etc/iscsi/ifaces. If no interface was defined in
+-/etc/iscsi/ifaces or passed in, the default behavior is used.
++defined in /var/lib/iscsi/ifaces. If no interface was defined in
++/var/lib/iscsi/ifaces or passed in, the default behavior is used.
+ Default here is iscsi_tcp/tcp to be used over which ever NIC the
+ network layer decides is best.
+ 
+@@ -1188,7 +1188,7 @@ If set, iscsid will perform discovery to the address every
+ discovery.isns.discoveryd_poll_inval or
+ discovery.sendtargets.discoveryd_poll_inval seconds,
+ and it will log into any portals found from the discovery source using
+-the ifaces in /etc/iscsi/ifaces.
++the ifaces in /var/lib/iscsi/ifaces.
+ 
+ Note that for iSNS the poll_interval does not have to be set. If not set,
+ iscsid will only perform rediscovery when it gets a SCN from the server.
+diff --git a/doc/iscsiadm.8 b/doc/iscsiadm.8
+index 7c209f6..e94cca0 100644
+--- a/doc/iscsiadm.8
++++ b/doc/iscsiadm.8
+@@ -89,7 +89,7 @@ This option is only valid for ping submode.
+ .TP
+ \fB\-I\fR, \fB\-\-interface=\fI[iface]\fR
+ The interface argument specifies the iSCSI interface to use for the operation.
+-iSCSI interfaces (iface) are defined in /etc/iscsi/ifaces. For hardware
++iSCSI interfaces (iface) are defined in /var/lib/iscsi/ifaces. For hardware
+ iSCSI (qla4xxx) the iface config must have the hardware address
+ (iface.hwaddress = port's MAC address)
+ and the driver/transport_name (iface.transport_name). The iface's name is
+@@ -166,7 +166,7 @@ If no other options are specified: for \fIdiscoverydb\fR and \fInode\fR, all
+ of their respective records are displayed; for \fIsession\fR, all active
+ sessions and connections are displayed; for \fIfw\fR, all boot firmware
+ values are displayed; for \fIhost\fR, all iSCSI hosts are displayed; and
+-for \fIiface\fR, all ifaces setup in /etc/iscsi/ifaces are displayed.
++for \fIiface\fR, all ifaces setup in /var/lib/iscsi/ifaces are displayed.
+ 
+ .TP
+ \fB\-n\fR, \fB\-\-name=\fIname\fR
+@@ -535,10 +535,10 @@ The configuration file read by \fBiscsid\fR and \fBiscsiadm\fR on startup.
+ The file containing the iSCSI InitiatorName and InitiatorAlias read by
+ \fBiscsid\fR and \fBiscsiadm\fR on startup.
+ .TP
+-/etc/iscsi/nodes/
++/var/lib/iscsi/nodes/
+ This directory contains the nodes with their targets.
+ .TP
+-/etc/iscsi/send_targets
++/var/lib/iscsi/send_targets
+ This directory contains the portals.
+ 
+ .SH "SEE ALSO"
+diff --git a/usr/idbm.c b/usr/idbm.c
+index 4d30aa9..316e54f 100644
+--- a/usr/idbm.c
++++ b/usr/idbm.c
+@@ -2468,9 +2468,9 @@ free_info:
+ int idbm_init(idbm_get_config_file_fn *fn)
+ {
+ 	/* make sure root db dir is there */
+-	if (access(ISCSI_CONFIG_ROOT, F_OK) != 0) {
+-		if (mkdir(ISCSI_CONFIG_ROOT, 0660) != 0) {
+-			log_error("Could not make %s %d\n", ISCSI_CONFIG_ROOT,
++	if (access(ISCSIVAR, F_OK) != 0) {
++		if (mkdir(ISCSIVAR, 0660) != 0) {
++			log_error("Could not make %s %d\n", ISCSIVAR,
+ 				   errno);
+ 			return errno;
+ 		}
+diff --git a/usr/idbm.h b/usr/idbm.h
+index 245f046..f45e86e 100644
+--- a/usr/idbm.h
++++ b/usr/idbm.h
+@@ -28,12 +28,16 @@
+ #include "config.h"
+ #include "list.h"
+ 
+-#define NODE_CONFIG_DIR		ISCSI_CONFIG_ROOT"nodes"
+-#define SLP_CONFIG_DIR		ISCSI_CONFIG_ROOT"slp"
+-#define ISNS_CONFIG_DIR		ISCSI_CONFIG_ROOT"isns"
+-#define STATIC_CONFIG_DIR	ISCSI_CONFIG_ROOT"static"
+-#define FW_CONFIG_DIR		ISCSI_CONFIG_ROOT"fw"
+-#define ST_CONFIG_DIR		ISCSI_CONFIG_ROOT"send_targets"
++#define ISCSIVAR			"/var/lib/iscsi/"
++
++#define NODE_CONFIG_DIR    ISCSIVAR"nodes"
++#define SLP_CONFIG_DIR     ISCSIVAR"slp"
++#define ISNS_CONFIG_DIR    ISCSIVAR"isns"
++#define STATIC_CONFIG_DIR  ISCSIVAR"static"
++#define FW_CONFIG_DIR      ISCSIVAR"fw"
++#define ST_CONFIG_DIR      ISCSIVAR"send_targets"
++
++
+ #define ST_CONFIG_NAME		"st_config"
+ #define ISNS_CONFIG_NAME	"isns_config"
+ 
+diff --git a/usr/iface.h b/usr/iface.h
+index 01f7074..2c6ef72 100644
+--- a/usr/iface.h
++++ b/usr/iface.h
+@@ -20,7 +20,8 @@
+ #ifndef ISCSI_IFACE_H
+ #define ISCSI_IFACE_H
+ 
+-#define IFACE_CONFIG_DIR	ISCSI_CONFIG_ROOT"ifaces"
++#include "idbm.h"
++#define IFACE_CONFIG_DIR	ISCSIVAR"ifaces"
+ 
+ struct iface_rec;
+ struct list_head;

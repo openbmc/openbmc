@@ -1,0 +1,32 @@
+include unistd.h to get ssize_t definitions
+
+Fixes errors like
+
+| In file included from plugins/mas.c:36:0:
+| ./src/obex.h:39:1: error: unknown type name 'ssize_t'
+| ./src/obex.h:49:1: error: unknown type name 'ssize_t'
+| ./src/obex.h:50:1: error: unknown type name 'ssize_t'
+| In file included from plugins/mas.c:38:0:
+| ./src/mimetype.h:36:2: error: expected specifier-qualifier-list before 'ssize_t'
+| In file included from plugins/mas.c:39:0:
+| plugins/filesystem.h:24:1: error: unknown type name 'ssize_t'
+| plugins/mas.c:550:1: error: unknown type name 'ssize_t'
+| plugins/mas.c:557:1: error: unknown type name 'ssize_t'
+| plugins/mas.c: In function 'any_read':
+| plugins/mas.c:560:2: error: unknown type name 'ssize_t'
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Index: obexd-0.44/plugins/mas.c
+===================================================================
+--- obexd-0.44.orig/plugins/mas.c	2012-01-11 14:53:53.000000000 -0800
++++ obexd-0.44/plugins/mas.c	2013-01-08 12:51:12.681882174 -0800
+@@ -29,6 +29,7 @@
+ #include <glib.h>
+ #include <fcntl.h>
+ #include <inttypes.h>
++#include <unistd.h>
+ 
+ #include "obexd.h"
+ #include "plugin.h"

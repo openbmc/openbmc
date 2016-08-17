@@ -1,0 +1,41 @@
+Patch by Chris Waters sets path which are normally point to a directory
+with Tk sources to a subdirectory of /usr/include/tcl8.4 (debian/rules
+puts private Tk headers there).
+
+--- tk8.5-8.5.8.orig/unix/tkConfig.sh.in
++++ tk8.5-8.5.8/unix/tkConfig.sh.in
+@@ -55,7 +55,7 @@
+ 
+ # String to pass to linker to pick up the Tk library from its
+ # build directory.
+-TK_BUILD_LIB_SPEC='@TK_BUILD_LIB_SPEC@'
++TK_BUILD_LIB_SPEC='@TK_LIB_SPEC@'
+ 
+ # String to pass to linker to pick up the Tk library from its
+ # installed directory.
+@@ -71,7 +71,7 @@
+ # different place than the directory containing the source files, this
+ # points to the location of the sources, not the location where Tk was
+ # compiled.
+-TK_SRC_DIR='@TK_SRC_DIR@'
++TK_SRC_DIR='@includedir@/tk-private'
+ 
+ # Needed if you want to make a 'fat' shared library library
+ # containing tk objects or link a different wish.
+@@ -86,14 +86,14 @@
+ 
+ # String to pass to linker to pick up the Tk stub library from its
+ # build directory.
+-TK_BUILD_STUB_LIB_SPEC='@TK_BUILD_STUB_LIB_SPEC@'
++TK_BUILD_STUB_LIB_SPEC='@TK_STUB_LIB_SPEC@'
+ 
+ # String to pass to linker to pick up the Tk stub library from its
+ # installed directory.
+ TK_STUB_LIB_SPEC='@TK_STUB_LIB_SPEC@'
+ 
+ # Path to the Tk stub library in the build directory.
+-TK_BUILD_STUB_LIB_PATH='@TK_BUILD_STUB_LIB_PATH@'
++TK_BUILD_STUB_LIB_PATH='@TK_STUB_LIB_PATH@'
+ 
+ # Path to the Tk stub library in the install directory.
+ TK_STUB_LIB_PATH='@TK_STUB_LIB_PATH@'

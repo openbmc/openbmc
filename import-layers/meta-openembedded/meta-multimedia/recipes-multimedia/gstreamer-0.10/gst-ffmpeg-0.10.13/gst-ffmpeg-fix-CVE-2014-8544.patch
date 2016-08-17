@@ -1,0 +1,56 @@
+From e1c0cfaa419aa5d320540d5a1b3f8fd9b82ab7e5 Mon Sep 17 00:00:00 2001
+From: Michael Niedermayer <michaelni@gmx.at>
+Date: Fri, 3 Oct 2014 16:08:32 +0200
+Subject: [PATCH] avcodec/tiff: more completely check bpp/bppcount
+
+(Upstream commit e1c0cfaa419aa5d320540d5a1b3f8fd9b82ab7e5)
+
+Fixes pixel format selection
+Fixes out of array accesses
+Fixes: asan_heap-oob_1766029_6_asan_heap-oob_20aa045_332_cov_1823216757_m2-d1d366d7965db766c19a66c7a2ccbb6b.tif
+
+Upstream-Status: Backport
+
+Found-by: Mateusz "j00ru" Jurczyk and Gynvael Coldwind
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+---
+ libavcodec/tiff.c |   13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/libavcodec/tiff.c b/libavcodec/tiff.c
+index 6e2096f..0870e31 100644
+--- a/gst-libs/ext/libav/libavcodec/tiff.c
++++ b/gst-libs/ext/libav/libavcodec/tiff.c
+@@ -324,11 +324,11 @@ static int tiff_decode_tag(TiffContext *s, const uint8_t *start, const uint8_t *
+         s->height = value;
+         break;
+     case TIFF_BPP:
+-        s->bppcount = count;
+-        if(count > 4){
+-            av_log(s->avctx, AV_LOG_ERROR, "This format is not supported (bpp=%d, %d components)\n", s->bpp, count);
++        if(count > 4U){
++            av_log(s->avctx, AV_LOG_ERROR, "This format is not supported (bpp=%d, %d components)\n", value, count);
+             return -1;
+         }
++        s->bppcount = count;
+         if(count == 1) s->bpp = value;
+         else{
+             switch(type){
+@@ -344,6 +344,13 @@ static int tiff_decode_tag(TiffContext *s, const uint8_t *start, const uint8_t *
+                 s->bpp = -1;
+             }
+         }
++        if (s->bpp > 64U) {
++            av_log(s->avctx, AV_LOG_ERROR,
++                   "This format is not supported (bpp=%d, %d components)\n",
++                   s->bpp, count);
++            s->bpp = 0;
++            return AVERROR_INVALIDDATA;
++        }
+         break;
+     case TIFF_SAMPLES_PER_PIXEL:
+         if (count != 1) {
+-- 
+1.7.9.5
+

@@ -1,0 +1,49 @@
+From 8d40b4c286e005e82fa50b66fbbbde22b7e65e15 Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen@dominion.thruhere.net>
+Date: Sun, 20 May 2012 21:35:34 +0200
+Subject: [PATCH 1/2] svg: add rudimentary support for ARM cpuinfo
+
+On ARM /proc/cpuinfo looks like this:
+
+root@beagleboneA3-0428:~# cat /proc/cpuinfo
+Processor	: ARMv7 Processor rev 2 (v7l)
+BogoMIPS	: 498.89
+Features	: swp half thumb fastmult vfp edsp thumbee neon vfpv3 tls
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU variant	: 0x3
+CPU part	: 0xc08
+CPU revision	: 2
+
+Hardware	: am335xevm
+Revision	: 0000
+Serial		: 0000000000000000
+
+So no real way to get the actual SoC name, TI AM3359, but a lot better than 'Unknown'
+
+Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
+---
+
+Upstream-Status: submitted
+
+ svg.c |    4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/svg.c b/svg.c
+index 80e0292..53724b2 100644
+--- a/svg.c
++++ b/svg.c
+@@ -178,6 +178,10 @@ void svg_title(void)
+ 				strncpy(cpu, &buf[13], 255);
+ 				break;
+ 			}
++			if (strstr(buf, "Processor")) {
++				strncpy(cpu, &buf[12], 255);
++				break;
++			}
+ 		}
+ 		fclose(f);
+ 	}
+-- 
+1.7.10
+

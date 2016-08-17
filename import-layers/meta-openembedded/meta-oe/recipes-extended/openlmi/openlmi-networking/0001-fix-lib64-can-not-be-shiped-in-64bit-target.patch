@@ -1,0 +1,31 @@
+From 336bb5a031077461ec6b2e5438738bf100f0dd2f Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@cn.fujitsu.com>
+Date: Mon, 3 Aug 2015 02:37:46 +0900
+Subject: [PATCH] fix lib64 can not be shiped in 64bit target
+
+Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
+---
+ CMakeLists.txt | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 1ba3cd3..2411745 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -35,13 +35,6 @@ if (DEBUG)
+     add_definitions("-DDEBUG_ENABLED")
+ endif (DEBUG)
+ 
+-# Set LIB_SUFFIX to 64 on 64bit architectures
+-if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+-    set(LIB_SUFFIX "")
+-else(CMAKE_SIZEOF_VOID_P EQUAL 4)
+-    SET(LIB_SUFFIX 64)
+-endif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+-
+ # Find OpenLMIMacros when installed in other prefix than /usr (e.g. /usr/local)
+ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_INSTALL_PREFIX})
+ include(OpenLMIMacros RESULT_VARIABLE LMIMACROS)
+-- 
+1.8.4.2
+

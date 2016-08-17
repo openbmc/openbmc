@@ -1,0 +1,32 @@
+From 043e1a9ec83a59671ef8c4cad679dbf781e5ef98 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Sun, 29 Nov 2015 23:37:06 -0800
+Subject: [PATCH] configure: use BUILD_CC for ccdv
+
+ccdv is intended to be invoked from Makefiles only,
+it doesn't work for the cross compiling, so compile
+it with $BUILD_CC and corresponding CFLAGS.
+
+Upstream-Status: Inappropriate [cross compile specific]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure b/configure
+index 2f0fae0..a7e9112 100755
+--- a/configure
++++ b/configure
+@@ -11286,7 +11286,7 @@ panic:
+ }	/* main */
+ /* eof ccdv.c */
+ EOF
+-		${CC-cc} $DEFS $CPPFLAGS $CFLAGS "ccdv.c" -o "ccdv" >/dev/null 2>&1
++		${BUILD_CC} $DEFS ${BUILD_CPPFLAGS} ${BUILD_CFLAGS} "ccdv.c" -o "ccdv" >/dev/null 2>&1
+ 	rm -f ccdv.c ccdv.o ccdv.c.gz.uu ccdv.c.gz
+ 	strip ./ccdv >/dev/null 2>&1
+ 	./ccdv >/dev/null 2>&1
+-- 
+2.3.5
+

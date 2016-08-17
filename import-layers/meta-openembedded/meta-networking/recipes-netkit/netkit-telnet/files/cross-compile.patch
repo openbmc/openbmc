@@ -1,0 +1,48 @@
+To support the cross-compile
+
+Upstream-Status: Pending
+
+make the configure to support the cross-compile, by only to compile the
+target, and not to run it
+
+Roy Li <rongqing.li@windriver.com>
+Index: netkit-telnet-0.17/configure
+===================================================================
+--- netkit-telnet-0.17.orig/configure	2008-11-23 22:01:26.000000000 +0100
++++ netkit-telnet-0.17/configure	2008-11-23 22:05:00.000000000 +0100
+@@ -94,7 +94,7 @@
+     echo -n 'Checking if C compiler works... '
+     if (
+           $CC __conftest.c -o __conftest || exit 1
+-          ./__conftest || exit 1
++          # Idiots belong shot! ./__conftest || exit 1
+        ) >/dev/null 2>&1; then
+          echo 'yes'
+      else
+@@ -141,7 +141,7 @@
+     echo -n 'Checking if C++ compiler works... '
+     if (
+           $CXX __conftest.cc -o __conftest || exit 1
+-          ./__conftest || exit 1
++          # Iditios belong shot! ./__conftest || exit 1
+        ) >/dev/null 2>&1; then
+          echo 'yes'
+      else
+@@ -284,7 +284,7 @@
+ else
+     if (
+           $CXX $CXXFLAGS -D__USE_BSD_SIGNAL __conftest.cc  -o __conftest || exit 1
+-          ./__conftest || exit 1
++          # running still does not work./__conftest || exit 1
+        ) >/dev/null 2>&1; then
+         echo '-D__USE_BSD_SIGNAL'
+         CFLAGS="$CFLAGS -D__USE_BSD_SIGNAL"
+@@ -501,7 +501,7 @@
+ EOF
+ if (
+       $CXX $CXXFLAGS  __conftest.cc $LIBBSD -o __conftest || exit 1
+-      ./__conftest || exit 1
++      # argh! morons!./__conftest || exit 1
+    ) >/dev/null 2>&1; then
+     echo 'ok'
+ else

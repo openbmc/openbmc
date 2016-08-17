@@ -1,0 +1,29 @@
+From 8204c2a1968f757599c5ebec9a85efaacb0e522a Mon Sep 17 00:00:00 2001
+From: Beniamino Galvani <bgalvani@redhat.com>
+Date: Mon, 4 Jan 2016 14:18:02 +0100
+Subject: [PATCH 2/7] ppp-manager: clear @ppp_watch_id upon pppd termination
+
+Set @ppp_watch_id to zero upon pppd termination, otherwise the call to
+g_source_remove(priv->ppp_watch_id) in dispose() could trigger a failed
+assertion.
+
+(cherry picked from commit 5f93f0101538db39efe0f9ea2316e63bff953bf0)
+---
+ src/ppp-manager/nm-ppp-manager.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/ppp-manager/nm-ppp-manager.c b/src/ppp-manager/nm-ppp-manager.c
+index d27b262..85ca9c5 100644
+--- a/src/ppp-manager/nm-ppp-manager.c
++++ b/src/ppp-manager/nm-ppp-manager.c
+@@ -828,6 +828,7 @@ ppp_watch_cb (GPid pid, gint status, gpointer user_data)
+ 
+ 	nm_log_dbg (LOGD_PPP, "pppd pid %d cleaned up", priv->pid);
+ 	priv->pid = 0;
++	priv->ppp_watch_id = 0;
+ 	g_signal_emit (manager, signals[STATE_CHANGED], 0, NM_PPP_STATUS_DEAD);
+ }
+ 
+-- 
+2.5.0
+

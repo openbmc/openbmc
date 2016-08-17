@@ -1,0 +1,11 @@
+Index: rp-pppoe-3.8/configure.in
+===================================================================
+--- rp-pppoe-3.8.orig/configure.in	2014-07-16 19:31:33.549991388 +0000
++++ rp-pppoe-3.8/configure.in	2014-07-17 22:01:18.116590827 +0000
+@@ -1,4 +1,4 @@
+-AC_INIT(src/pppoe.c)
+-AM_INIT_AUTOMAKE([rp-pppoe], [3.8])
++AC_INIT([rp-pppoe], [3.8])
++AM_INIT_AUTOMAKE([foreign])
+ AC_CONFIG_SUBDIRS(src)
+ AC_OUTPUT(Makefile)

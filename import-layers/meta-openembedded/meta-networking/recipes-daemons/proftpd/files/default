@@ -1,0 +1,9 @@
+# Defaults for proftpd initscript
+
+# Master system-wide proftpd switch. The initscript
+# will not run if it is not set to yes.
+RUN="yes"
+
+# Default options.
+# For more exhaustive logging, try "-d 3".
+OPTIONS=""

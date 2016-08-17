@@ -1,0 +1,77 @@
+From ac95e89749a01618f98b554a98e78d7c988bfc10 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Tue, 27 Nov 2012 08:46:51 +0100
+Subject: [PATCH 5/5] soup: adapt to new libxml2 API from 2.9.0
+
+* for more info see
+  https://mail.gnome.org/archives/xml/2012-August/msg00005.html
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ calendar/backends/caldav/e-cal-backend-caldav.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/calendar/backends/caldav/e-cal-backend-caldav.c b/calendar/backends/caldav/e-cal-backend-caldav.c
+index 12f8f22..5555a3e 100644
+--- a/calendar/backends/caldav/e-cal-backend-caldav.c
++++ b/calendar/backends/caldav/e-cal-backend-caldav.c
+@@ -1172,8 +1172,13 @@ check_calendar_changed_on_server (ECalBackendCalDAV *cbdav)
+ 	soup_message_set_request (message,
+ 				  "application/xml",
+ 				  SOUP_MEMORY_COPY,
++#ifdef LIBXML2_NEW_BUFFER
++				  (gchar *) xmlOutputBufferGetContent(buf),
++				  xmlOutputBufferGetSize(buf));
++#else
+ 				  (gchar *) buf->buffer->content,
+ 				  buf->buffer->use);
++#endif
+ 
+ 	/* Send the request now */
+ 	send_and_handle_redirection (priv->session, message, NULL);
+@@ -1321,8 +1326,13 @@ caldav_server_list_objects (ECalBackendCalDAV *cbdav,
+ 	soup_message_set_request (message,
+ 				  "application/xml",
+ 				  SOUP_MEMORY_COPY,
++#ifdef LIBXML2_NEW_BUFFER
++				  (gchar *) xmlOutputBufferGetContent(buf),
++				  xmlOutputBufferGetSize(buf));
++#else
+ 				  (gchar *) buf->buffer->content,
+ 				  buf->buffer->use);
++#endif
+ 
+ 	/* Send the request now */
+ 	send_and_handle_redirection (priv->session, message, NULL);
+@@ -1715,8 +1725,14 @@ caldav_receive_schedule_outbox_url (ECalBackendCalDAV *cbdav)
+ 	soup_message_set_request (message,
+ 				  "application/xml",
+ 				  SOUP_MEMORY_COPY,
++#ifdef LIBXML2_NEW_BUFFER
++				  (gchar *) xmlOutputBufferGetContent(buf),
++				  xmlOutputBufferGetSize(buf));
++#else
+ 				  (gchar *) buf->buffer->content,
+ 				  buf->buffer->use);
++#endif
++
+ 
+ 	/* Send the request now */
+ 	send_and_handle_redirection (priv->session, message, NULL);
+@@ -1765,8 +1781,13 @@ caldav_receive_schedule_outbox_url (ECalBackendCalDAV *cbdav)
+ 		soup_message_set_request (message,
+ 				  "application/xml",
+ 				  SOUP_MEMORY_COPY,
++#ifdef LIBXML2_NEW_BUFFER
++				  (gchar *) xmlOutputBufferGetContent(buf),
++				  xmlOutputBufferGetSize(buf));
++#else
+ 				  (gchar *) buf->buffer->content,
+ 				  buf->buffer->use);
++#endif
+ 
+ 		/* Send the request now */
+ 		send_and_handle_redirection (priv->session, message, NULL);
+-- 
+1.8.3.2
+

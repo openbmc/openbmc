@@ -1,0 +1,13 @@
+---
+ configure.ac |    1 +
+ 1 file changed, 1 insertion(+)
+
+--- git.orig/configure.ac
++++ git/configure.ac
+@@ -7,5 +7,6 @@ AC_PROG_CC
+ AC_CONFIG_HEADERS([config.h])
+ AC_CONFIG_FILES([Makefile lib/Makefile tools/Makefile])
+ PKG_CHECK_MODULES([FTDI], [libftdi >= 0.13])
+ AC_OUTPUT
+ AM_PROG_CC_C_O
++AM_PROG_AR

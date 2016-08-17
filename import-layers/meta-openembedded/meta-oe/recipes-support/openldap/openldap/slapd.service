@@ -1,0 +1,10 @@
+[Unit]
+Description=Standalone LDAP Daemon
+After=syslog.target network.target
+
+[Service]
+Type=forking
+ExecStart=@SBINDIR@/slapd
+
+[Install]
+WantedBy=multi-user.target

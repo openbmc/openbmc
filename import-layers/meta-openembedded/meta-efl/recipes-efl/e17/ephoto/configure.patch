@@ -1,0 +1,13 @@
+Index: ephoto/configure.ac
+===================================================================
+--- ephoto.orig/configure.ac	2014-07-17 21:48:51.028570467 +0000
++++ ephoto/configure.ac	2014-07-17 21:52:56.120577146 +0000
+@@ -27,7 +27,7 @@
+ AC_CANONICAL_HOST
+ AC_ISC_POSIX
+ 
+-AM_INIT_AUTOMAKE(1.6 dist-bzip2)
++AM_INIT_AUTOMAKE([dist-bzip2 foreign])
+ AM_CONFIG_HEADER(src/bin/config.h)
+ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+ 

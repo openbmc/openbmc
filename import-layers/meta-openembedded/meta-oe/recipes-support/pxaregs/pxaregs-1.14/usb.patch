@@ -1,0 +1,17 @@
+Index: pxaregs-1.14/pxaregs.c
+===================================================================
+--- pxaregs-1.14.orig/pxaregs.c
++++ pxaregs-1.14/pxaregs.c
+@@ -78,6 +78,12 @@ static struct reg_info regs[] = {
+ { "ISAR",      0x403016A0,  0, 0xffffffff, 'x', "I2C Slave Address Register" },
+ { "ISAR_SA",   0x403016A0,  0, 0x0000007f, 'x', "I2C Slave Address" },
+ 
++{ "UP2OCR",    0x40600020,  0, 0xffffffff, 'x', "USB Port 2 Output Control Register" },
++{ "UP2OCR_SEOS", 0x40600020, 24, 7, 'x', "USB Port 2 Single-Ended Output Select" },
++{ "UP2OCR_HXOE", 0x40600020, 17, 1, 'x', "USB Port 2 Tranceiver OE" },
++{ "UP2OCR_HXS",  0x40600020, 16, 1, 'x', "USB Port 2 Tranceiver Output Select" },
++{ "UP2OCR_IDON", 0x40600020, 10, 1, 'x', "OTG ID Read Enable" },
++
+ { "HW_MCR",    0x41600010,  0, 0xffffffff, 'x', "HWUART Modem Control Register" },
+ { "HW_MSR",    0x41600018,  0, 0xffffffff, 'x', "HWUART Modem Status Register" },
+ 

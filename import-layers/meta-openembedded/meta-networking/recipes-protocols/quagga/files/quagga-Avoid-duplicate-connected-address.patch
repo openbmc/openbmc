@@ -1,0 +1,54 @@
+quagga: Avoid duplicate connected address adding to the list
+
+commit 27ba970b9("quagga/ripd: Fix two bugs after received SIGHUP signal")
+introduces an regression: ifp->connected list is cleaned up when ripd is
+restarting, however, for interface addresses which are not specified in
+ripd configuration file, they are never to be added into ifp->connected
+again, this will lead to some abnormal behavior for route advertising.
+
+Instead of cleaning up the ifp->connected list to avoid duplicated
+connected address being added into this list, we can check this
+condition during interface address adding process and return early
+when an identical address has already been added.
+
+Upstream-Status: Pending
+
+Signed-off-by: Hu Yadi <Yadi.hu@windriver.com>
+Signed-off-by: Xufeng Zhang <xufeng.zhang@windriver.com>
+Signed-off-by: Joe MacDonald <joe@deserted.net>
+---
+--- a/lib/if.c
++++ b/lib/if.c
+@@ -738,6 +738,16 @@ connected_add_by_prefix (struct interfac
+                          struct prefix *destination)
+ {
+   struct connected *ifc;
++  struct listnode *cnode;
++  struct connected *c;
++  int ret = 0;
++
++  for (ALL_LIST_ELEMENTS_RO (ifp->connected, cnode, c))
++    {
++      ret = connected_same_prefix (p, (c->address));
++      if(ret == 1)
++        return NULL;
++    }
+ 
+   /* Allocate new connected address. */
+   ifc = connected_new ();
+--- a/ripd/rip_interface.c
++++ b/ripd/rip_interface.c
+@@ -516,13 +516,6 @@ rip_interface_clean (void)
+ 	  thread_cancel (ri->t_wakeup);
+ 	  ri->t_wakeup = NULL;
+ 	}
+-
+-      for (conn_node = listhead (ifp->connected); conn_node; conn_node = next)
+-        {
+-          ifc = listgetdata (conn_node);
+-          next = conn_node->next;
+-          listnode_delete (ifp->connected, ifc);
+-        }
+     }
+ }
+ 

@@ -1,0 +1,12 @@
+Index: goffice-0.7.14/configure.in
+===================================================================
+--- goffice-0.7.14.orig/configure.in
++++ goffice-0.7.14/configure.in
+@@ -71,7 +71,6 @@ AC_PROG_YACC
+ AM_PROG_LEX
+ AC_PROG_LN_S
+ AM_PROG_LIBTOOL
+-DOLT
+ AC_STDC_HEADERS
+ AC_SYS_LARGEFILE
+ 

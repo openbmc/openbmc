@@ -1,0 +1,17 @@
+Upstream-Status: Pending
+
+remove m4_esyscmd function
+
+Signed-off-by: Chunrong Guo <b40290@freescale.com>
+--- inetutils-1.9.1/configure.ac	2012-01-06 22:05:05.000000000 +0800
++++ inetutils-1.9.1/configure.ac	2012-11-12 14:01:11.732957019 +0800
+@@ -20,8 +20,7 @@
+ 
+ AC_PREREQ(2.59)
+ 
+-AC_INIT([GNU inetutils],
+- m4_esyscmd([build-aux/git-version-gen .tarball-version 's/inetutils-/v/;s/_/./g']),
++AC_INIT([GNU inetutils],[1.9.4],
+  [bug-inetutils@gnu.org])
+ 
+ AC_CONFIG_SRCDIR([src/inetd.c])

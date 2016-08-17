@@ -1,0 +1,21 @@
+--- a/purgatory/Makefile
++++ b/purgatory/Makefile
+@@ -47,7 +47,7 @@
+ $(PURGATORY): CC=$(TARGET_CC)
+ $(PURGATORY): CFLAGS+=$(PURGATORY_EXTRA_CFLAGS) \
+		      $($(ARCH)_PURGATORY_EXTRA_CFLAGS) \
+-		      -Os -fno-builtin -ffreestanding
++		      -Os -fno-builtin -ffreestanding -nostdinc
+ 
+ $(PURGATORY): CPPFLAGS=$($(ARCH)_PURGATORY_EXTRA_CFLAGS) \
+			-I$(srcdir)/purgatory/include \
+@@ -61,7 +61,8 @@
+ 
+ $(PURGATORY): $(PURGATORY_OBJS)
+	$(MKDIR) -p $(@D)
+-	$(CC) $(LDFLAGS) -o $@ $^
++#	$(CC) $(LDFLAGS) -o $@ $^
++	$(LD) $(LDFLAGS) -o $@ $^
+ 
+ #	$(LD) $(LDFLAGS) $(EXTRA_LDFLAGS) --no-undefined -e purgatory_start -r -o $@ $(PURGATORY_OBJS) $(UTIL_LIB)
+

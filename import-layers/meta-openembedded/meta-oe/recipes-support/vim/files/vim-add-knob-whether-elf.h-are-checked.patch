@@ -1,0 +1,38 @@
+vim: add knob whether elf.h are checked
+
+Previously, it still was checked when there was no elf library in sysroots directory.
+Add knob to decide whether elf.h are checked or not.
+
+Upstream-status: Pending
+
+Signed-off-by: Chong Lu <Chong.Lu@windriver.com>
+---
+ src/configure.in |    7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/src/configure.in b/src/configure.in
+index d734064..f504fa6 100644
+--- a/src/configure.in
++++ b/src/configure.in
+@@ -2483,11 +2483,18 @@ AC_TRY_COMPILE([#include <stdio.h>], [int x __attribute__((unused));],
+ 	AC_MSG_RESULT(no))
+ 
+ dnl Checks for header files.
++AC_MSG_CHECKING(whether or not to look for elf.h)
++AC_ARG_ENABLE(elf-check,
++        [  --enable-elf-check      If elfutils, check for elf.h [default=no]],
++        , enable_elf_check="no")
++AC_MSG_RESULT($enable_elf_check)
++if test "x$enable_elf_check" != "xno"; then
+ AC_CHECK_HEADER(elf.h, HAS_ELF=1)
+ dnl AC_CHECK_HEADER(dwarf.h, SVR4=1)
+ if test "$HAS_ELF" = 1; then
+   AC_CHECK_LIB(elf, main)
+ fi
++fi
+ 
+ AC_HEADER_DIRENT
+ 
+-- 
+1.7.9.5
+

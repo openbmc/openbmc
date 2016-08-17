@@ -1,0 +1,34 @@
+Avoid using keyword restrict as variable name which causes error with gcc 5.x:
+
+| hugeutils.c: In function '__lh_hugetlbfs_setup_env':
+| hugeutils.c:304:40: error: expected identifier or '(' before 'restrict'
+|    char *p, *tok, *exe, buf[MAX_EXE+1], restrict[MAX_EXE];
+|                                         ^
+
+Upstream-Status: Pending
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+diff --git a/hugeutils.c b/hugeutils.c
+index 53a7fbd..b9d7001 100644
+--- a/hugeutils.c
++++ b/hugeutils.c
+@@ -301,14 +301,14 @@ void hugetlbfs_setup_env()
+ 
+ 	env = getenv("HUGETLB_RESTRICT_EXE");
+ 	if (env) {
+-		char *p, *tok, *exe, buf[MAX_EXE+1], restrict[MAX_EXE];
++		char *p, *tok, *exe, buf[MAX_EXE+1], restricted[MAX_EXE];
+ 		int found = 0;
+ 
+ 		exe = get_exe_name(buf, sizeof buf);
+ 		DEBUG("Found HUGETLB_RESTRICT_EXE, this exe is \"%s\"\n", exe);
+-		strncpy(restrict, env, sizeof restrict);
+-		restrict[sizeof(restrict)-1] = 0;
+-		for (p = restrict; (tok = strtok(p, ":")) != NULL; p = NULL) {
++		strncpy(restricted, env, sizeof restricted);
++		restricted[sizeof(restricted)-1] = 0;
++		for (p = restricted; (tok = strtok(p, ":")) != NULL; p = NULL) {
+ 			DEBUG("  ...check exe match for \"%s\"\n",  tok);
+ 			if (strcmp(tok, exe) == 0) {
+ 				found = 1;

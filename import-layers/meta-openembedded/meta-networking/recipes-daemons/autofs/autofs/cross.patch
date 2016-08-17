@@ -1,0 +1,44 @@
+Index: autofs-5.0.7/aclocal.m4
+===================================================================
+--- autofs-5.0.7.orig/aclocal.m4	2012-10-28 04:45:07.000000000 -0700
++++ autofs-5.0.7/aclocal.m4	2012-10-28 10:47:53.263996910 -0700
+@@ -7,6 +7,8 @@
+ AC_DEFUN(AF_PATH_INCLUDE,
+ [AC_PATH_PROGS($1,$2,$3,$4)
+ if test -n "$$1"; then
++  AH_TEMPLATE([HAVE_$1], [Have $2])
++  AH_TEMPLATE([PATH_$1], [Have $2])
+   AC_DEFINE(HAVE_$1,1,[define if you have $1])
+   AC_DEFINE_UNQUOTED(PATH_$1, "$$1", [define if you have $1])
+   HAVE_$1=1
+Index: autofs-5.0.7/configure.in
+===================================================================
+--- autofs-5.0.7.orig/configure.in	2012-10-28 04:45:06.000000000 -0700
++++ autofs-5.0.7/configure.in	2012-10-28 10:50:07.580000628 -0700
+@@ -301,13 +301,15 @@
+ cat > pietest.c <<EOF
+ int main(void) { return 0; }
+ EOF
++AF_tmp_ldflags="$LDFLAGS"
++AF_tmp_cflags="$CFLAGS"
+ CFLAGS=-fPIE
+ LDFLAGS=-pie
+ DAEMON_CFLAGS=
+ DAEMON_LDFLAGS=
+ AC_MSG_CHECKING([whether gcc -fPIE works])
+-AC_RUN_IFELSE([AC_LANG_PROGRAM([[]], [[int main(void) {return 0;}]])],
+-	      [gcc_supports_pie=yes], [gcc_supports_pie=no], [gcc_supports_pie=no])
++AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[int main(void) {return 0;}]])],
++	       [gcc_supports_pie=yes], [gcc_supports_pie=no], [gcc_supports_pie=no])
+ AC_MSG_RESULT([$gcc_supports_pie])
+ if test $gcc_supports_pie = yes ; then
+ 	DAEMON_CFLAGS="-fPIE"
+@@ -316,6 +318,8 @@
+ rm -f pietest.c
+ AC_SUBST(DAEMON_CFLAGS)
+ AC_SUBST(DAEMON_LDFLAGS)
++CFLAGS="${AF_tmp_cflags}"
++LDFLAGS="${AF_tmp_ldflags}"
+ 
+ #
+ # Enable ability to access value in external env variable

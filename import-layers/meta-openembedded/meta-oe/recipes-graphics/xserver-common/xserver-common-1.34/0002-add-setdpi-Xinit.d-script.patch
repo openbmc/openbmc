@@ -1,0 +1,112 @@
+From 3d1a1a8273112668927a6c6bb3e361e896f5b229 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Wed, 11 Apr 2012 14:28:45 +0200
+Subject: [PATCH 02/12] add setdpi Xinit.d script
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ X11/Xinit.d/50setdpi |   92 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 92 insertions(+), 0 deletions(-)
+ create mode 100644 X11/Xinit.d/50setdpi
+
+diff --git a/X11/Xinit.d/50setdpi b/X11/Xinit.d/50setdpi
+new file mode 100644
+index 0000000..04a2edd
+--- /dev/null
++++ b/X11/Xinit.d/50setdpi
+@@ -0,0 +1,92 @@
++#! /bin/sh
++#
++# Copyright Matthias Hentges <devel@hentges.net> (c) 2006
++# License: GPL (see http://www.gnu.org/licenses/gpl.txt for a copy of the license)
++#
++# Filename: setDPI.sh
++# Date: 09-Apr-06
++
++# This script configures Xft.dpi dependent on your screens DPI. This insures that the same font-size
++# setting of 7 can be used on all machines.
++
++
++XDEFAULTS="/etc/X11/Xdefaults"
++
++
++
++set_dpi() {
++	
++	CURRENT_SETTING="`cat ${XDEFAULTS} | sed -n "/Xft.dpi\:/s/.*\:\(.*\)/\1/p" | sed -n "s/\ //p"`"	
++
++	if test "$CURRENT_SETTING" != "$1"
++	then
++		echo "Using Xft.dpi of $SET_SCREEN_DPI for your $SCREEN_DPI DPI screen"
++		
++		if grep -q "Xft.dpi" "$XDEFAULTS"
++		then
++			cat "${XDEFAULTS}" | sed "s/^Xft.dpi\:.*/Xft.dpi\: $SET_SCREEN_DPI/" > "${XDEFAULTS}_"
++			mv "${XDEFAULTS}_" "${XDEFAULTS}"
++		else
++			echo -e "Xft.dpi: $SET_SCREEN_DPI\n" >> "$XDEFAULTS"
++		fi
++	else
++		echo "Your $SCREEN_DPI DPI screen is already configured."
++	fi
++}
++
++set_rxvt_font() {
++
++	CURRENT_SETTING="`cat ${XDEFAULTS} | sed  -n "/Rxvt\*font/s/\(.*\pixelsize=\)\(.*\)/\2/p"`"
++
++	if test "$1" -gt 100
++	then
++	
++		# Configure the rxvt font-size for your screen here:
++		test "$1" -gt 180 -a "$1" -lt "221" && RXVT_FONT_SIZE=16
++		
++		if test -z "$RXVT_FONT_SIZE"
++		then
++			echo "WARNING: No rxvt font-size configured for a $SCREEN_DPI DPI screen!"
++			echo "Defaulting to size 9"
++			RXVT_FONT_SIZE=9
++		fi
++		
++		if test "$CURRENT_SETTING" != "$RXVT_FONT_SIZE"
++		then
++			echo "Using a rxvt font-size of $RXVT_FONT_SIZE"
++			cat ${XDEFAULTS} | sed "/Rxvt\*font/s/\(.*\pixelsize\)\(=*.*\)/\1=$RXVT_FONT_SIZE/" > ${XDEFAULTS}_
++			mv ${XDEFAULTS}_ ${XDEFAULTS}
++		else
++			echo "The rxvt font-size is already configured"
++		fi 
++	fi
++}
++
++if test -z "$DISPLAY"
++then
++	echo "DISPLAY is not set, aborting..."
++	exit 0
++fi
++
++SCREEN_DPI="`/usr/bin/xdpyinfo | grep "dots per inch" | awk '{print $2}'| sed -n "s/\(.*\)x\(.*\)/\2/p"`"
++
++if test -z "$SCREEN_DPI"
++then
++	echo "WARNING: Couldn't read your screens DPI, defaulting to 100"
++	SCREEN_DPI=100
++fi
++
++# Configure your screen here:
++test "$SCREEN_DPI" -gt 180 -a "$SCREEN_DPI" -lt "221" && SET_SCREEN_DPI=160
++test "$SCREEN_DPI" -gt 90 -a "$SCREEN_DPI" -lt "121" && SET_SCREEN_DPI=100
++
++
++if test -z "$SET_SCREEN_DPI"
++then
++	echo "WARNING: No default configuration found for your $SCREEN_DPI DPI screen!"
++	echo "Using 100 DPI"
++	SET_SCREEN_DPI=100
++fi
++
++set_dpi "$SET_SCREEN_DPI"
++set_rxvt_font "$SCREEN_DPI"
+-- 
+1.7.8.5
+

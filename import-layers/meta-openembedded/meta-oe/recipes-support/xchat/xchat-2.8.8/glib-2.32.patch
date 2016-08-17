@@ -1,0 +1,44 @@
+--- xchat-2.8.8.orig/src/common/xchat.h	2009-08-16 11:40:16.000000000 +0200
++++ xchat-2.8.8/src/common/xchat.h	2012-05-06 08:30:16.125755497 +0200
+@@ -1,10 +1,6 @@
+ #include "../../config.h"
+ 
+-#include <glib/gslist.h>
+-#include <glib/glist.h>
+-#include <glib/gutils.h>
+-#include <glib/giochannel.h>
+-#include <glib/gstrfuncs.h>
++#include <glib.h>
+ #include <time.h>			/* need time_t */
+ 
+ #ifndef XCHAT_H
+--- xchat-2.8.8.orig/src/common/servlist.c	2010-05-16 09:24:26.000000000 +0200
++++ xchat-2.8.8/src/common/servlist.c	2012-05-06 08:30:45.681758019 +0200
+@@ -24,7 +24,6 @@
+ #include <unistd.h>
+ 
+ #include "xchat.h"
+-#include <glib/ghash.h>
+ 
+ #include "cfgfiles.h"
+ #include "fe.h"
+--- xchat-2.8.8.orig/src/common/util.c	2009-08-16 11:40:16.000000000 +0200
++++ xchat-2.8.8/src/common/util.c	2012-05-06 08:31:10.389760122 +0200
+@@ -39,7 +39,6 @@
+ #include <errno.h>
+ #include "xchat.h"
+ #include "xchatc.h"
+-#include <glib/gmarkup.h>
+ #include <ctype.h>
+ #include "util.h"
+ #include "../../config.h"
+--- xchat-2.8.8.orig/src/common/text.c	2010-05-30 04:14:41.000000000 +0200
++++ xchat-2.8.8/src/common/text.c	2012-05-06 08:31:22.300761137 +0200
+@@ -28,7 +28,6 @@
+ #include <sys/mman.h>
+ 
+ #include "xchat.h"
+-#include <glib/ghash.h>
+ #include "cfgfiles.h"
+ #include "chanopt.h"
+ #include "plugin.h"

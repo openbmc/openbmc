@@ -1,0 +1,29 @@
+Subject: [PATCH] aufs-util: add tool concept to Makefile for cross compiling
+ purpose
+
+In a cross compilation environment, c2sh, c2tmac and ver need to be created first.
+Add a tools target to Makefile to allow for this.
+
+Upstream-Status: Pending
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ Makefile |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 2f905ad..49c3cd5 100644
+--- a/Makefile
++++ b/Makefile
+@@ -85,7 +85,7 @@ aufs.5: aufs.in.5 c2tmac
+ 	chmod a-w $@
+ 
+ c2sh c2tmac ver: CC = ${HOSTCC}
+-.INTERMEDIATE: c2sh c2tmac ver
++tools: c2sh c2tmac ver
+ 
+ Install = install -o root -g root -p
+ install_sbin: File = auibusy auplink mount.aufs umount.aufs
+-- 
+1.7.9.5
+

@@ -1,0 +1,69 @@
+From 12770701856a05b6b3cd706f708f8e9a4e8a1336 Mon Sep 17 00:00:00 2001
+From: Michael Niedermayer <michaelni@gmx.at>
+Date: Thu, 13 Feb 2014 13:59:51 +0100
+Subject: [PATCH] avformat/mpegtsenc: Check data array size in
+ mpegts_write_pmt()
+
+Upstream-Status: Backport
+
+COmmit 12770701856a05b6b3cd706f708f8e9a4e8a1336 release/0.11
+
+Prevents out of array writes
+
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+(cherry picked from commit 842b6c14bcfc1c5da1a2d288fd65386eb8c158ad)
+
+Conflicts:
+
+	libavformat/mpegtsenc.c
+(cherry picked from commit e87de3f50b765134588d0b048c32ed4b8acc16fb)
+
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+---
+ libavformat/mpegtsenc.c |    9 +++++++--
+ 1 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/libavformat/mpegtsenc.c b/libavformat/mpegtsenc.c
+index 793e205..a12d19f 100644
+--- a/gst-libs/ext/libav/libavformat/mpegtsenc.c
++++ b/gst-libs/ext/libav/libavformat/mpegtsenc.c
+@@ -240,7 +240,7 @@ static void mpegts_write_pat(AVFormatContext *s)
+                           data, q - data);
+ }
+ 
+-static void mpegts_write_pmt(AVFormatContext *s, MpegTSService *service)
++static int mpegts_write_pmt(AVFormatContext *s, MpegTSService *service)
+ {
+     //    MpegTSWrite *ts = s->priv_data;
+     uint8_t data[1012], *q, *desc_length_ptr, *program_info_length_ptr;
+@@ -293,6 +293,10 @@ static void mpegts_write_pmt(AVFormatContext *s, MpegTSService *service)
+             stream_type = STREAM_TYPE_PRIVATE_DATA;
+             break;
+         }
++
++        if (q - data > sizeof(data) - 32)
++            return AVERROR(EINVAL);
++
+         *q++ = stream_type;
+         put16(&q, 0xe000 | ts_st->pid);
+         desc_length_ptr = q;
+@@ -324,7 +328,7 @@ static void mpegts_write_pmt(AVFormatContext *s, MpegTSService *service)
+                 len_ptr = q++;
+                 *len_ptr = 0;
+ 
+-                for (p = lang->value; next && *len_ptr < 255 / 4 * 4; p = next + 1) {
++                for (p = lang->value; next && *len_ptr < 255 / 4 * 4 && q - data < sizeof(data) - 4; p = next + 1) {
+                     next = strchr(p, ',');
+                     if (strlen(p) != 3 && (!next || next != p + 3))
+                         continue; /* not a 3-letter code */
+@@ -386,6 +390,7 @@ static void mpegts_write_pmt(AVFormatContext *s, MpegTSService *service)
+     }
+     mpegts_write_section1(&service->pmt, PMT_TID, service->sid, 0, 0, 0,
+                           data, q - data);
++    return 0;
+ }
+ 
+ /* NOTE: str == NULL is accepted for an empty string */
+-- 
+1.7.5.4
+

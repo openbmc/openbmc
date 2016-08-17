@@ -1,0 +1,58 @@
+Subject: [PATCH] netperf: fix vfork/fork
+
+Upstream-Status: Pending
+
+Signed-off-by: Xin Ouyang <Xin.Ouyang@windriver.com>
+---
+ src/netserver.c |   12 ++++++++++--
+ 1 files changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/src/netserver.c b/src/netserver.c
+index 379a106..f6a8b09 100644
+--- a/src/netserver.c
++++ b/src/netserver.c
+@@ -1020,7 +1020,7 @@ process_requests()
+ void
+ spawn_child() {
+ 
+-#if defined(HAVE_FORK)
++#if defined(HAVE_FORK) || defined(HAVE_VFORK)
+ 
+   if (debug) {
+     fprintf(where,
+@@ -1038,7 +1038,11 @@ spawn_child() {
+ 
+   signal(SIGCLD,SIG_IGN);
+ 
++#if defined(HAVE_FORK)
+   switch (fork()) {
++#else
++  switch (vfork()) {
++#endif
+   case -1:
+     fprintf(where,
+ 	    "%s: fork() error %s (errno %d)\n",
+@@ -1405,7 +1409,7 @@ scan_netserver_args(int argc, char *argv[]) {
+ 
+ void
+ daemonize() {
+-#if defined(HAVE_FORK)
++#if defined(HAVE_FORK) || defined(HAVE_VFORK)
+ 
+   if (debug) {
+     fprintf(where,
+@@ -1419,7 +1423,11 @@ daemonize() {
+   fflush(stdout);
+   fflush(stderr);
+ 
++#if defined(HAVE_FORK)
+   switch (fork()) {
++#else
++  switch (vfork()) {
++#endif
+   case -1:
+     fprintf(stderr,
+ 	    "%s: fork() error %s (errno %d)\n",
+-- 
+1.7.1.1
+

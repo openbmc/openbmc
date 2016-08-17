@@ -1,0 +1,11 @@
+diff -uNr libgpewidget-0.117.orig/gpehelp.c libgpewidget-0.117/gpehelp.c
+--- libgpewidget-0.117.orig/gpehelp.c	2006-10-12 12:20:33.000000000 +0200
++++ libgpewidget-0.117/gpehelp.c	2012-04-30 07:45:57.813293792 +0200
+@@ -33,7 +33,6 @@
+ #include <gdk-pixbuf/gdk-pixbuf.h>
+ #include <gdk/gdk.h>
+ #include <glib.h>
+-#include <glib/gkeyfile.h>
+ 
+ 
+ /* helper function definitions*/

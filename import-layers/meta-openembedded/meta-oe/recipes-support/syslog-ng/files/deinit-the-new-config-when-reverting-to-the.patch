@@ -1,0 +1,36 @@
+From 86842df8bff5c97e44fc55d2fb7fc6c10f56ab84 Mon Sep 17 00:00:00 2001
+From: Gergely Nagy <algernon@balabit.hu>
+Date: Fri, 13 Dec 2013 13:46:15 +0100
+Subject: [PATCH] mainloop: Deinit the new config when reverting to the old one
+
+Upstream-Status: Backport
+
+When reloading, and the new config fails, deinit it before initializing
+the old config. This is so that conflicting things do not remain held by
+the half-initialized new config, while the old tries to take it
+over. (It also removed a couple of memory leaks, most likely.)
+
+The reason we can do this, is because cfg_tree_stop() (called by
+cfg_deinit()) goes over all the known nodes, and log_pipe_deinit() is
+also smart enough to not deinit a node that has not been inited before.
+
+Signed-off-by: Gergely Nagy <algernon@balabit.hu>
+---
+ lib/mainloop.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lib/mainloop.c b/lib/mainloop.c
+index 34655fa..e6fbb59 100644
+--- a/lib/mainloop.c
++++ b/lib/mainloop.c
+@@ -510,6 +510,7 @@ main_loop_reload_config_apply(void)
+     {
+       msg_error("Error initializing new configuration, reverting to old config", NULL);
+       cfg_persist_config_move(main_loop_new_config, main_loop_old_config);
++      cfg_deinit(main_loop_new_config);
+       if (!cfg_init(main_loop_old_config))
+         {
+           /* hmm. hmmm, error reinitializing old configuration, we're hosed.
+-- 
+1.8.4.1
+

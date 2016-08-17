@@ -1,0 +1,39 @@
+From 2f4cdf70cf92d3a9503d8ff045ba277db40bb4e7 Mon Sep 17 00:00:00 2001
+From: Joe MacDonald <joe_macdonald@mentor.com>
+Date: Monday, 13 Apr 2015 14:12:37 -0400
+Subject: [PATCH] ipvsadm: remove dependency on bash
+
+The save/restore scripts are very simple and don't depend on any BASH
+features at all, so switch the interpreter to /bin/sh.
+
+Upstream-Status: Pending
+
+Signed-off-by: Joe MacDonald <joe_macdonald@mentor.com>
+---
+ ipvsadm-restore | 2 +-
+ ipvsadm-save    | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/ipvsadm-restore b/ipvsadm-restore
+index f24e1b3..a9fa8bc 100644
+--- a/ipvsadm-restore
++++ b/ipvsadm-restore
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ #      ipvsadm-restore - Restore IPVS rules
+ #
+ #      A very simple wrapper to restore IPVS rules
+diff --git a/ipvsadm-save b/ipvsadm-save
+index f4d399e..af51638 100644
+--- a/ipvsadm-save
++++ b/ipvsadm-save
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ #      ipvsadm-save - Save IPVS rules
+ #
+ #      A very simple wrapper to save IPVS rules
+-- 
+1.9.1
+

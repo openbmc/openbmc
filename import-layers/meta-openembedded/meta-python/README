@@ -1,0 +1,51 @@
+meta-python
+================================
+
+Introduction
+-------------------------
+
+This layer is intended to be the home of python modules for OpenEmbedded.
+Modules in this layer need to be independent of openembedded-core and
+meta-openembedded/meta-oe. Because of this, modules required by 'gateone'
+and 'anki' are not included and remain in:
+        meta-openembedded/meta-oe/recipes-devtools/python.
+
+Dependencies
+-------------------------
+
+The meta-python layer depends on:
+
+	URI: git://git.openembedded.org/openembedded-core
+	layers: meta
+	branch: krogoth 
+	revision: HEAD
+
+	URI: git://git.openembedded.org/meta-openembedded
+	layers: meta-oe
+	branch:  krogoth
+	revision: HEAD
+
+Please follow the recommended setup procedures of your OE distribution.
+For Angstrom that is:
+        http://www.angstrom-distribution.org/building-angstrom,
+other distros should have similar online resources.
+
+Contributing
+-------------------------
+
+The meta-openembedded mailinglist
+(openembedded-devel@lists.openembedded.org) is used for questions,
+comments and patch review. It is subscriber only, so please register
+before posting.
+
+Send pull requests to openembedded-devel@lists.openembedded.org with
+'[meta-python][krogoth]' in the subject.
+
+When sending single patches, please use something like: 
+'git send-email -M -1 --to=openembedded-devel@lists.openembedded.org --subject-prefix=meta-python][krogoth][PATCH'
+
+Maintenance
+-------------------------
+
+krogoth Branch Maintainer:
+Armin Kuster <akuster808@gmail.com>

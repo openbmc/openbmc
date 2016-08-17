@@ -1,0 +1,50 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## debian_defaultconfig.dpatch by  <hesso@pool.math.tu-berlin.de>
+##
+## DP: Debian enhancements to the ebtables "sysconfig" default settings.
+
+@DPATCH@
+
+--- ebtables-2.0.8.1.orig/ebtables-config
++++ ebtables-2.0.8.1/ebtables-config
+@@ -1,17 +1,3 @@
+-# Save (and possibly restore) in text format.
+-#   Value: yes|no,  default: yes
+-# Save the firewall rules in text format to __SYSCONFIG__/ebtables
+-# If EBTABLES_BINARY_FORMAT="no" then restoring the firewall rules
+-# is done using this text format.
+-EBTABLES_TEXT_FORMAT="yes"
+-
+-# Save (and restore) in binary format.
+-#   Value: yes|no,  default: yes
+-# Save (and restore) the firewall rules in binary format to (and from)
+-# __SYSCONFIG__/ebtables.<chain>. Enabling this option will make
+-# firewall initialisation a lot faster.
+-EBTABLES_BINARY_FORMAT="yes"
+-
+ # Unload modules on restart and stop
+ #   Value: yes|no,  default: yes
+ # This option has to be 'yes' to get to a sane state for a firewall
+@@ -19,6 +5,12 @@
+ # modules.
+ EBTABLES_MODULES_UNLOAD="yes"
+ 
++# Load firewall rules on system startup.
++#   Value: yes|no,  default: no
++# Restores the ebtables rulesets from the last saved state when the
++# system boots up.
++EBTABLES_LOAD_ON_START="no"
++
+ # Save current firewall rules on stop.
+ #   Value: yes|no,  default: no
+ # Saves all firewall rules if firewall gets stopped
+@@ -35,3 +27,9 @@
+ # Save rule counters when saving a kernel table to a file. If the
+ # rule counters were saved, they will be restored when restoring the table.
+ EBTABLES_SAVE_COUNTER="no"
++
++# Backup suffix for ruleset save files.
++#   Value: <string>,  default: "~"
++# Keep one backup level of saved rules.
++# Set this variable to the empty string to disable backups.
++EBTABLES_BACKUP_SUFFIX="~"

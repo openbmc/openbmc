@@ -1,0 +1,80 @@
+# This is a sample Gammu SMSD configuration file. It's required for gammu-smsd,
+# see gammu-smsdrc(5) for documentation.
+
+# Gammu configuration, this section is like section "gammu" in "gammurc" file,
+# see gammurc(5) for documentation.
+[gammu]
+device = /dev/ttyUSB0
+model = at115200
+#connection = dlr3
+#synchronizetime = yes
+#logfile = gammulog # this is not used at all in SMSD mode
+#logformat = textall
+#use_locking = yes
+#gammuloc = gammu.us
+#startinfo = yes
+
+# When uncomment this section and insert numbers here, smsd will process
+# incoming sms only from numbers written here (incoming sms from all other
+# numbers will be deleted)
+#[include_numbers]
+#number1 = 1234
+
+# When uncomment this section and insert numbers here, smsd will process
+# incoming sms from all numbers not written here (incoming sms from numbers
+# written here will be deleted). This is "black" list.
+# Note: after using "include_numbers" section this one will be ignored
+#[exclude_numbers]
+#number1 = 1234
+
+# General SMSD settings, see gammu-smsdrc(5) for detailed description.
+[smsd]
+# SMSD service to use, one of FILES, MYSQL, PGSQL, DBI
+service = files
+# PIN for SIM card
+PIN = 0000
+# File (or stderr, syslog, eventlog) where information will be logged
+logfile = smsdlog
+# Amount of information being logged, each bit mean one level
+debuglevel = 0
+# Configuration for using more phones on same database
+#phoneid = MyPhone1
+# Script to be executed when new message has been received
+#runonreceive = /some/script
+# Commication frequency settings
+commtimeout = 30
+sendtimeout = 30
+#receivefrequency = 0
+
+# Phone communication settings
+#checksecurity = 1
+#resetfrequency = 0
+
+# Delivery report configuration
+#deliveryreport = no
+#deliveryreportdelay = 10
+
+# Ignoring broken SMSC
+#skipsmscnumber = +48602123456
+
+# Database backends congfiguration
+user = gammu
+password = gammupassword
+pc = localhost
+# pc can also contain port or socket path after colon (eg. localhost:/path/to/socket)
+database = sms
+
+# DBI configuration
+driver = sqlite
+# driverspath = /usr/lib/dbd/
+# Database directory for sqlite
+# dbdir = /var/lib/smsd
+
+# Files backend configuration
+inboxpath = /var/spool/sms/inbox/
+outboxpath = /var/spool/sms/outbox/
+sentsmspath = /var/spool/sms/sent/
+errorsmspath = /var/spool/sms/error/
+inboxformat = detail
+transmitformat = auto
+outboxformat = detail

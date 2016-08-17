@@ -1,0 +1,28 @@
+Description: Fix FTBFS caused by freetype headers path change.
+Author: Gilles Filippini <pini@debian.org>
+Bug-Debian: http://bugs.debian.org/733378
+Index: navit/navit/font/freetype/font_freetype.c
+===================================================================
+--- navit.orig/navit/font/freetype/font_freetype.c	2013-09-23 10:43:32.000000000 +0200
++++ navit/navit/font/freetype/font_freetype.c	2013-12-30 19:54:45.000000000 +0100
+@@ -32,7 +32,7 @@
+ #if USE_FRIBIDI
+ #include <fribidi.h>
+ #endif
+-#include <freetype/ftglyph.h>
++#include <ftglyph.h>
+ #include "point.h"
+ #include "graphics.h"
+ #include "debug.h"
+diff -uNr navit.orig/navit/graphics/sdl/graphics_sdl.c navit/navit/graphics/sdl/graphics_sdl.c
+--- navit.orig/navit/graphics/sdl/graphics_sdl.c	2012-06-22 14:16:01.000000000 +0200
++++ navit/navit/graphics/sdl/graphics_sdl.c	2014-01-01 22:31:10.892948164 +0100
+@@ -84,7 +84,7 @@
+ #else
+ #include <ft2build.h>
+ #include FT_FREETYPE_H
+-#include <freetype/ftglyph.h>
++#include <ftglyph.h>
+ #endif
+ #include <event.h>
+ 

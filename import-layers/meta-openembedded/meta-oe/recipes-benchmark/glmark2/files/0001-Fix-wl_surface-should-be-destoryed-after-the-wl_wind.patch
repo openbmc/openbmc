@@ -1,0 +1,34 @@
+From 9c74ec83e2929b1d5ab65d5137b6ba42edeb332d Mon Sep 17 00:00:00 2001
+From: Yong Gan <b45748@freescale.com>
+Date: Tue, 27 Oct 2015 18:15:20 +0800
+Subject: [PATCH] Fix: wl_surface should be destoryed after the wl_window
+ destroyed.
+
+Upstream-Status: Submitted [https://github.com/glmark2/glmark2/issues/12]
+
+Signed-off-by: Yong Gan <b45748@freescale.com>
+
+---
+ src/native-state-wayland.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/native-state-wayland.cpp b/src/native-state-wayland.cpp
+index 41fc743..cdcdf34 100644
+--- a/src/native-state-wayland.cpp
++++ b/src/native-state-wayland.cpp
+@@ -56,10 +56,10 @@ NativeStateWayland::~NativeStateWayland()
+             wl_shell_surface_destroy(window_->shell_surface);
+         if (window_->opaque_reqion)
+             wl_region_destroy(window_->opaque_reqion);
+-        if (window_->surface)
+-            wl_surface_destroy(window_->surface);
+         if (window_->native)
+             wl_egl_window_destroy(window_->native);
++        if (window_->surface)
++            wl_surface_destroy(window_->surface);
+         delete window_;
+     }
+ 
+-- 
+1.9.1
+

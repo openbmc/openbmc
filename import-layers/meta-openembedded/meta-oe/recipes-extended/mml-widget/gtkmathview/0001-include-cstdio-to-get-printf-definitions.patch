@@ -1,0 +1,28 @@
+From c92890c5e18bb6ee23bdb14074bacf306dd9428f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 5 May 2015 20:35:01 -0700
+Subject: [PATCH] include cstdio to get printf definitions
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/engine/boxml/BoxMLHOVElement.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/engine/boxml/BoxMLHOVElement.cc b/src/engine/boxml/BoxMLHOVElement.cc
+index 1a2812c..96c9eea 100644
+--- a/src/engine/boxml/BoxMLHOVElement.cc
++++ b/src/engine/boxml/BoxMLHOVElement.cc
+@@ -21,7 +21,7 @@
+ // <http://www.gnu.org/licenses/>.
+ 
+ #include <config.h>
+-
++#include <cstdio>
+ #include "BoxMLAttributeSignatures.hh"
+ #include "BoxMLHOVElement.hh"
+ #include "BoxMLHElement.hh"
+-- 
+2.1.4
+

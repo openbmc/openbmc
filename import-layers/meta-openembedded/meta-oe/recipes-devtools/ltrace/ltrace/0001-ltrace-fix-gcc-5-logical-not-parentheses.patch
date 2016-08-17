@@ -1,0 +1,38 @@
+From 876fe5680d77800426f8c4c5680a235732d722e6 Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Mon, 24 Aug 2015 17:37:54 +0800
+Subject: [PATCH] ltrace: fix gcc 5 logical not parentheses
+
+Upstream-Status: Pending
+
+Build ltrace with gcc 5.2, it fails with:
+
+error: logical not is only applied to the left hand side of comparison
+[-Werror=logical-not-parentheses]
+   if (!need_data(data, offset, SIZE / 8) < 0)  \
+                                             ^
+
+Function need_data just return 0 on success and -1 if fail. So it is ok
+to just test if (need_data(data, offset, SIZE / 8) < 0).
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ ltrace-elf.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ltrace-elf.c b/ltrace-elf.c
+index c571d2a..7fe830f 100644
+--- a/ltrace-elf.c
++++ b/ltrace-elf.c
+@@ -218,7 +218,7 @@ need_data(Elf_Data *data, GElf_Xword offset, GElf_Xword size)
+ 	int								\
+ 	NAME(Elf_Data *data, GElf_Xword offset, uint##SIZE##_t *retp)	\
+ 	{								\
+-		if (!need_data(data, offset, SIZE / 8) < 0)		\
++		if (need_data(data, offset, SIZE / 8) < 0)		\
+ 			return -1;					\
+ 									\
+ 		if (data->d_buf == NULL) /* NODATA section */ {		\
+-- 
+1.9.1
+

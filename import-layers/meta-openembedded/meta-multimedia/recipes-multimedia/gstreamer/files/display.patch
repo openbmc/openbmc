@@ -1,0 +1,60 @@
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From 3e46d2e501da68d929bb5f26900a292a5fc04a1f Mon Sep 17 00:00:00 2001
+From: Stefan Westerfeld <stefan@space.twc.de>
+Date: Mon, 23 Apr 2012 03:10:22 +0200
+Subject: [PATCH] Fix time display updates (broken by introduction of quiet
+ mode).
+
+---
+ src/gst123.cc |    1 +
+ src/msg.cc    |    7 +++++++
+ src/msg.h     |    1 +
+ 3 files changed, 9 insertions(+)
+
+diff --git a/src/gst123.cc b/src/gst123.cc
+index 20e91e5..ce5876d 100644
+--- a/src/gst123.cc
++++ b/src/gst123.cc
+@@ -640,6 +640,7 @@ cb_print_position (gpointer *data)
+       else
+         blanks += "         ";
+       Msg::print ("%s%s\r", status.c_str(), blanks.c_str());
++      Msg::flush();
+     }
+ 
+   /* call me again */
+diff --git a/src/msg.cc b/src/msg.cc
+index 547cd90..33cada2 100644
+--- a/src/msg.cc
++++ b/src/msg.cc
+@@ -41,6 +41,13 @@ print (const char *format, ...)
+     }
+ }
+ 
++void
++flush()
++{
++  if (!Options::the().quiet)
++    fflush (stdout);
++}
++
+ }
+ 
+ }
+diff --git a/src/msg.h b/src/msg.h
+index e0ced24..5bebac0 100644
+--- a/src/msg.h
++++ b/src/msg.h
+@@ -27,6 +27,7 @@ namespace Msg
+ {
+ 
+ void print (const char *format, ...);
++void flush();
+ 
+ }
+ 
+-- 
+1.7.9.5
+

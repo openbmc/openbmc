@@ -1,0 +1,14 @@
+Author: Lucas Nussbaum <lucas@debian.org>
+Description: do not strip binary
+ Stripping should be handled by dh_strip instead, so DEB_BUILD_OPTIONS=nostrip works.
+ Closes: #438109, #411607
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -596,7 +596,6 @@ install: tcsh$(EXEEXT)
+ 	-mkdir -p ${DESTBIN}
+ 	-mv -f ${DESTBIN}/tcsh$(EXEEXT)  ${DESTBIN}/tcsh.old
+ 	cp tcsh$(EXEEXT) ${DESTBIN}/tcsh$(EXEEXT)
+-	-strip ${DESTBIN}/tcsh$(EXEEXT)
+ 	chmod 755 ${DESTBIN}/tcsh$(EXEEXT)
+ 
+ install.man: tcsh.man

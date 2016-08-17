@@ -1,0 +1,12 @@
+[Unit]
+Description=NIS Domainname
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/nisdomainname
+ExecStart=/usr/bin/domainname $NISDOMAINNAME
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target
+

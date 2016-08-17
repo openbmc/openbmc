@@ -1,0 +1,97 @@
+From 37b227cff78fd4c652651662dafd71537280824e Mon Sep 17 00:00:00 2001
+From: Nitin A Kamble <nitin.a.kamble@intel.com>
+Date: Sun, 4 Aug 2013 09:16:59 +0200
+Subject: [PATCH 3/5] Disable Werror for automake
+
+Avoid these warning-errors
+
+automake: warnings are treated as errors
+Makefile.am:15: warning: '%'-style pattern rules are a GNU make extension
+Makefile.am:21: warning: pkgconfig_DATA:-$(API_VERSION: non-POSIX variable name
+addressbook/backends/file/Makefile.am: installing './depcomp'
+addressbook/libebook/Makefile.am:55: warning: '%'-style pattern rules are a GNU make extension
+addressbook/libebook/Makefile.am:65: warning: '%'-style pattern rules are a GNU make extension
+addressbook/libebook/Makefile.am:66: warning: subst -,_,$*: non-POSIX variable name
+addressbook/libebook/Makefile.am:66: (probably a GNU make extension)
+addressbook/libebook/Makefile.am:72: warning: pkgconfig_DATA:-$(API_VERSION: non-POSIX variable name
+addressbook/libedata-book/Makefile.am:2: warning: '%'-style pattern rules are a GNU make extension
+addressbook/libedata-book/Makefile.am:3: warning: subst -,_,$*: non-POSIX variable name
+addressbook/libedata-book/Makefile.am:3: (probably a GNU make extension)
+glib-gen.mak:9: warning: '%'-style pattern rules are a GNU make extension
+addressbook/libedata-book/Makefile.am:5:   'glib-gen.mak' included from here
+glib-gen.mak:13: warning: '%'-style pattern rules are a GNU make extension
+addressbook/libedata-book/Makefile.am:5:   'glib-gen.mak' included from here
+glib-gen.mak:18: warning: '%'-style pattern rules are a GNU make extension
+addressbook/libedata-book/Makefile.am:5:   'glib-gen.mak' included from here
+glib-gen.mak:26: warning: '%'-style pattern rules are a GNU make extension
+addressbook/libedata-book/Makefile.am:5:   'glib-gen.mak' included from here
+glib-gen.mak:38: warning: '%'-style pattern rules are a GNU make extension
+addressbook/libedata-book/Makefile.am:5:   'glib-gen.mak' included from here
+glib-gen.mak:41: warning: '%'-style pattern rules are a GNU make extension
+addressbook/libedata-book/Makefile.am:5:   'glib-gen.mak' included from here
+addressbook/libedata-book/Makefile.am:86: warning: '%'-style pattern rules are a GNU make extension
+addressbook/libedata-book/Makefile.am:101: warning: pkgconfig_DATA:-$(API_VERSION: non-POSIX variable name
+calendar/backends/weather/Makefile.am:44: warning: '%'-style pattern rules are a GNU make extension
+calendar/libecal/Makefile.am:53: warning: '%'-style pattern rules are a GNU make extension
+calendar/libecal/Makefile.am:61: warning: '%'-style pattern rules are a GNU make extension
+calendar/libecal/Makefile.am:62: warning: subst -,_,$*: non-POSIX variable name
+calendar/libecal/Makefile.am:62: (probably a GNU make extension) calendar/libecal/Makefile.am:68: warning: pkgconfig_DATA:-$(API_VERSION: non-POSIX variable name
+calendar/libedata-cal/Makefile.am:5: warning: '%'-style pattern rules are a GNU make extension
+calendar/libedata-cal/Makefile.am:6: warning: subst -,_,$*: non-POSIX variable name
+calendar/libedata-cal/Makefile.am:6: (probably a GNU make extension)
+glib-gen.mak:9: warning: '%'-style pattern rules are a GNU make extension
+calendar/libedata-cal/Makefile.am:8:   'glib-gen.mak' included from here
+glib-gen.mak:13: warning: '%'-style pattern rules are a GNU make extension
+calendar/libedata-cal/Makefile.am:8:   'glib-gen.mak' included from here
+glib-gen.mak:18: warning: '%'-style pattern rules are a GNU make extension
+calendar/libedata-cal/Makefile.am:8:   'glib-gen.mak' included from here
+glib-gen.mak:26: warning: '%'-style pattern rules are a GNU make extension
+calendar/libedata-cal/Makefile.am:8:   'glib-gen.mak' included from here
+glib-gen.mak:38: warning: '%'-style pattern rules are a GNU make extension
+calendar/libedata-cal/Makefile.am:8:   'glib-gen.mak' included from here
+glib-gen.mak:41: warning: '%'-style pattern rules are a GNU make extension
+calendar/libedata-cal/Makefile.am:8:   'glib-gen.mak' included from here
+calendar/libedata-cal/Makefile.am:71: warning: '%'-style pattern rules are a GNU make extension
+calendar/libedata-cal/Makefile.am:86: warning: pkgconfig_DATA:-$(API_VERSION: non-POSIX variable name
+camel/Makefile.am:17: warning: '%'-style pattern rules are a GNU make extension
+libebackend/Makefile.am:35: warning: '%'-style pattern rules are a GNU make extension
+libebackend/Makefile.am:41: warning: pkgconfig_DATA:-$(API_VERSION: non-POSIX variable name
+libedataserver/Makefile.am:91: warning: '%'-style pattern rules are a GNU make extension
+libedataserver/Makefile.am:97: warning: pkgconfig_DATA:-$(API_VERSION: non-POSIX variable name
+libedataserverui/Makefile.am:108: warning: '%'-style pattern rules are a GNU make extension
+libedataserverui/Makefile.am:118: warning: pkgconfig_DATA:-$(API_VERSION: non-POSIX variable name
+servers/google/libgdata-google/Makefile.am:27: warning: '%'-style pattern rules are a GNU make extension
+servers/google/libgdata-google/Makefile.am:33: warning: pkgconfig_DATA:-$(API_VERSION: non-POSIX variable name
+servers/google/libgdata/Makefile.am:31: warning: '%'-style pattern rules are a GNU make extension
+servers/google/libgdata/Makefile.am:37: warning: pkgconfig_DATA:-$(API_VERSION: non-POSIX variable name
+servers/groupwise/Makefile.am:85: warning: '%'-style pattern rules are a GNU make extension
+servers/groupwise/Makefile.am:91: warning: pkgconfig_DATA:-$(API_VERSION: non-POSIX variable name
+autoreconf: automake failed with exit status: 1
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
+Conflicts:
+	configure.ac
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 49d7506..1c802ff 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -21,7 +21,7 @@ m4_define([api_version], [1.2])
+ dnl Autoconf / Automake Initialization
+ AC_PREREQ(2.62)
+ AC_INIT([evolution-data-server],[eds_version],[http://bugzilla.gnome.org/enter_bug.cgi?product=Evolution-Data-Server])
+-AM_INIT_AUTOMAKE([gnu 1.10 tar-ustar dist-xz no-dist-gzip -Wall -Wno-portability -Werror foreign])
++AM_INIT_AUTOMAKE([gnu 1.10 tar-ustar dist-xz no-dist-gzip -Wall -Wno-portability foreign])
+ AC_CONFIG_MACRO_DIR([m4])
+ AC_CONFIG_SRCDIR(README)
+ AC_CONFIG_HEADERS(config.h)
+-- 
+1.8.3.2
+

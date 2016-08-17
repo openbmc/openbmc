@@ -1,0 +1,36 @@
+From 2d5fa307827a7b32af4f7b2ae0604f943e3a6e99 Mon Sep 17 00:00:00 2001
+From: John Lindgren <john.lindgren@aol.com>
+Date: Tue, 21 Aug 2012 19:33:45 -0400
+Subject: [PATCH] Allow timer period to be set at 250ms resolution.  Patch
+ from Miguel Guedes.  Closes: #9102.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Applied [1]
+
+[1] http://git.xfce.org/panel-plugins/xfce4-genmon-plugin/commit/?id=2d5fa307827a7b32af4f7b2ae0604f943e3a6e99
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ panel-plugin/config_gui.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/panel-plugin/config_gui.c b/panel-plugin/config_gui.c
+index a4c891d..90e55c1 100644
+--- a/panel-plugin/config_gui.c
++++ b/panel-plugin/config_gui.c
+@@ -106,8 +106,8 @@ int genmon_CreateConfigGUI (GtkWidget *vbox1,
+     gtk_widget_show (alignment1);
+     gtk_container_add (GTK_CONTAINER (eventbox1), alignment1);
+ 
+-    wSc_Period_adj = gtk_adjustment_new (15, 1, 60*60*24, 1, 1, 0);
+-    wSc_Period = gtk_spin_button_new (GTK_ADJUSTMENT (wSc_Period_adj), 1, 0);
++    wSc_Period_adj = gtk_adjustment_new (15, .25, 60*60*24, .25, 1, 0);
++    wSc_Period = gtk_spin_button_new (GTK_ADJUSTMENT (wSc_Period_adj), .25, 2);
+     gtk_widget_show (wSc_Period);
+     gtk_container_add (GTK_CONTAINER (alignment1), wSc_Period);
+     gtk_tooltips_set_tip (tooltips, wSc_Period,
+-- 
+1.7.6.5
+

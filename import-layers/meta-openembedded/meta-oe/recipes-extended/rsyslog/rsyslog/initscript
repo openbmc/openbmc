@@ -1,0 +1,118 @@
+#! /bin/sh
+#
+# This is an init script for openembedded
+# Copy it to /etc/init.d/rsyslog and type
+# > update-rc.d rsyslog defaults 5
+#
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+NAME=rsyslog
+RSYSLOGD=rsyslogd
+RSYSLOGD_BIN=/usr/sbin/rsyslogd
+RSYSLOGD_OPTIONS=""
+RSYSLOGD_PIDFILE=/var/run/rsyslogd.pid
+SCRIPTNAME=/etc/init.d/$NAME
+# Exit if the package is not installed
+[ -x "$RSYSLOGD_BIN" ] || exit 0
+# Read configuration variable file if it is present
+[ -r /etc/default/$NAME ] && . /etc/default/$NAME
+#
+# Function that starts the daemon/service
+#
+do_start()
+{
+        DAEMON=$1
+        DAEMON_ARGS=$2
+        PIDFILE=$3
+        # Return
+        #   0 if daemon has been started
+        #   1 if daemon could not be started
+        #   if daemon had already been started, start-stop-daemon will return 1
+        #   so add -o/--oknodo(if nothing is done, exit 0)
+        start-stop-daemon -S --quiet --pidfile $PIDFILE --exec $DAEMON \
+                             --oknodo -- $DAEMON_ARGS || return 1
+}
+#
+# Function that stops the daemon/service
+#
+do_stop()
+{
+        NAME=$1
+        PIDFILE=$2
+        # Return
+        #   0 if daemon has been stopped
+        #   1 if daemon was already stopped
+        #   2 if daemon could not be stopped
+        #   other if a failure occurred
+        # QUIT/TERM/INT should work here, but they don't ????? 
+        start-stop-daemon -K --quiet --signal KILL --pidfile $PIDFILE --name $NAME
+        RETVAL="$?"
+        rm -f $PIDFILE
+        return "$RETVAL"
+}
+#
+# Function that sends a SIGHUP to the daemon/service
+#
+do_reload() {
+        NAME=$1
+        PIDFILE=$2
+        start-stop-daemon -K --signal HUP --quiet --pidfile $PIDFILE --name $NAME
+        return 0
+}
+
+do_status() {
+        NAME=$1
+        PIDFILE=$2
+        # -t: test only but not stop
+        start-stop-daemon -K -t --quiet --pidfile $PIDFILE --name $NAME
+        # exit with status 0 if process is found
+        if [ "$?" = "0" ]; then
+                return 0
+        else
+                return 1
+        fi
+}
+
+case "$1" in
+  start)
+        echo -n "starting $RSYSLOGD ... "
+        do_start "$RSYSLOGD_BIN" "$RSYSLOGD_OPTIONS" "$RSYSLOGD_PIDFILE"
+        case "$?" in
+                0) echo "done" ;;
+                1) echo "failed" ;;
+        esac
+        ;;
+  stop)
+        echo -n "stopping $RSYSLOGD ... "
+        do_stop "$RSYSLOGD" "$RSYSLOGD_PIDFILE"
+        case "$?" in
+                0|1) echo "done" ;;
+                2) echo "failed" ;;
+        esac
+        ;;
+  reload|force-reload)
+        echo -n "reloading $RSYSLOGD ... "
+        do_reload "$RSYSLOGD" "$RSYSLOGD_PIDFILE"
+        echo "done"
+        ;;
+  restart)
+        $0 stop
+        $0 start
+        ;;
+  status)
+        echo -n "status $RSYSLOGD ... "
+        do_status "$RSYSLOGD" "$RSYSLOGD_PIDFILE"
+        if [ "$?" = "0" ]; then
+                echo "running"
+                exit 0        
+        else
+                echo "stopped"
+                exit 1        
+        fi
+        ;;
+  *)
+        echo "Usage: $SCRIPTNAME {start|stop|status|restart|reload|force-reload}" >&2
+        exit 3
+        ;;
+esac
+exit 0

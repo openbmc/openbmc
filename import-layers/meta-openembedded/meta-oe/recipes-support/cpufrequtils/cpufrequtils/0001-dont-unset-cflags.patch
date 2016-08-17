@@ -1,0 +1,30 @@
+--- git.old/Makefile	2012-04-17 13:29:46.280435340 +0200
++++ git/Makefile	2012-04-17 13:31:13.664433470 +0200
+@@ -77,17 +77,7 @@ INSTALL_PROGRAM = ${INSTALL}
+ INSTALL_DATA  = ${INSTALL} -m 644
+ INSTALL_SCRIPT = ${INSTALL_PROGRAM}
+ 
+-# If you are running a cross compiler, you may want to set this
+-# to something more interesting, like "arm-linux-".  If you want
+-# to compile vs uClibc, that can be done here as well.
+-CROSS = #/usr/i386-linux-uclibc/usr/bin/i386-uclibc-
+-CC = $(CROSS)gcc
+-LD = $(CROSS)gcc
+-AR = $(CROSS)ar
+-STRIP = $(CROSS)strip
+-RANLIB = $(CROSS)ranlib
+-HOSTCC = gcc
+-
++HOSTCC = $(BUILD_CC)
+ 
+ # Now we set up the build system
+ #
+@@ -95,7 +85,7 @@ HOSTCC = gcc
+ # set up PWD so that older versions of make will work with our build.
+ PWD = $(shell pwd)
+ 
+-export CROSS CC AR STRIP RANLIB CFLAGS LDFLAGS LIB_OBJS
++export CFLAGS LDFLAGS LIB_OBJS
+ 
+ # check if compiler option is supported
+ cc-supports = ${shell if $(CC) ${1} -S -o /dev/null -xc /dev/null > /dev/null 2>&1; then echo "$(1)"; fi;}

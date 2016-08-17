@@ -1,0 +1,25 @@
+Apparently somewhere along the line HAVE_LOCALE_H was changed to
+HAVE_LC_MESSAGES.  Adjust netcat to match.
+
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: netcat-0.7.1/src/intl.h
+===================================================================
+--- netcat-0.7.1.orig/src/intl.h
++++ netcat-0.7.1/src/intl.h
+@@ -25,11 +25,11 @@
+ #ifdef ENABLE_NLS
+ #include <libintl.h>
+ 
+-#ifdef HAVE_LOCALE_H
++#if defined(HAVE_LC_MESSAGES) || defined(HAVE_LOCALE_H)
+ #include <locale.h>
+ #else
+ #error You must have locale.h in your system
+-#endif	/* HAVE_LOCALE_H */
++#endif	/* HAVE_LC_MESSAGES || HAVE_LOCALE_H */
+ 
+ /* Our dear (and very common) gettext macros */
+ #define _(String) gettext(String)

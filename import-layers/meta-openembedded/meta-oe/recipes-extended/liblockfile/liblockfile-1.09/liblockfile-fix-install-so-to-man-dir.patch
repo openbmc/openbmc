@@ -1,0 +1,20 @@
+Upstream-Status: Inappropriate [no upstream]
+
+The extend so file is rename from nfslock.so.$(VER) to nfslock.so.$(NVER). That
+causes file nfslock.so.0.1 is installed into manual directory. Fix it.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+diff --git a/Makefile.in b/Makefile.in
+index a589fb8..46a57e8 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -68,7 +68,7 @@ install_common:
+ 		install -d $(ROOT)$(bindir)
+ 		install -m 755 $(INSTGRP) dotlockfile $(ROOT)$(bindir)
+ 		install -d $(ROOT)$(mandir)/man1 $(ROOT)$(mandir)/man3
+-		install -m 644 *.1 $(ROOT)$(mandir)/man1
++		install -m 644 dotlockfile.1 $(ROOT)$(mandir)/man1
+ 		install -m 644 *.3 $(ROOT)$(mandir)/man3
+ 
+ install_nfslib:	nfslib

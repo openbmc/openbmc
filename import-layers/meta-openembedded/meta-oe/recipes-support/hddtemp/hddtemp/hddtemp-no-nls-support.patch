@@ -1,0 +1,66 @@
+diff -ru hddtemp-0.3-beta15.orig/configure.in hddtemp-0.3-beta15/configure.in
+--- hddtemp-0.3-beta15.orig/configure.in	2005-10-17 20:14:19.000000000 +0100
++++ hddtemp-0.3-beta15/configure.in	2008-06-27 00:00:46.000000000 +0100
+@@ -17,6 +17,7 @@
+ # append the host alias to the tools for cross compiling
+ AC_HEADER_STDC
+ AC_CHECK_HEADERS(fcntl.h)
++AC_CHECK_HEADERS(iconv.h)
+ AC_CHECK_HEADERS(netinet/in.h)
+ AC_CHECK_TYPE(in_addr_t, ,[AC_DEFINE_UNQUOTED([in_addr_t], [uint32_t], [Define to 'uint32_t' if <netinet/in.h> does not define.])], [#include <netinet/in.h>])
+ 
+@@ -29,6 +30,8 @@
+ AM_GNU_GETTEXT
+ #AM_GNU_GETTEXT([external])
+ 
++AC_CHECK_FUNCS([bindtextdomain textdomain iconv])
++
+ dnl reasonable guesses for where stuff is installed
+ dnl if we don't do that now, the config.h will use ${prefix}
+ dnl for DEFAULT_DATABASE_PATH.
+diff -ru hddtemp-0.3-beta15.orig/src/hddtemp.c hddtemp-0.3-beta15/src/hddtemp.c
+--- hddtemp-0.3-beta15.orig/src/hddtemp.c	2006-04-19 03:37:35.000000000 +0100
++++ hddtemp-0.3-beta15/src/hddtemp.c	2008-06-26 23:59:40.000000000 +0100
+@@ -276,8 +276,12 @@
+   backtrace_sigbus();
+ 
+   setlocale (LC_ALL, "");
++#ifdef HAVE_BINDTEXTDOMAIN
+   bindtextdomain (PACKAGE, LOCALEDIR);
++#endif
++#ifdef HAVE_TEXTDOMAIN
+   textdomain (PACKAGE);
++#endif
+   
+   show_db = debug = numeric = quiet = wakeup = af_hint = syslog_interval = 0;
+   unit = DEFAULT;
+diff -ru hddtemp-0.3-beta15.orig/src/utf8.c hddtemp-0.3-beta15/src/utf8.c
+--- hddtemp-0.3-beta15.orig/src/utf8.c	2006-04-19 03:37:02.000000000 +0100
++++ hddtemp-0.3-beta15/src/utf8.c	2008-06-27 00:02:15.000000000 +0100
+@@ -23,7 +23,9 @@
+ 
+ // Standard includes
+ #include <stdlib.h>
++#ifdef HAVE_ICONV_H
+ #include <iconv.h>
++#endif
+ #include <langinfo.h>
+ #include <locale.h>
+ #include <string.h>
+@@ -34,6 +36,7 @@
+ 
+ static char *iconv_from_utf8_to_locale(const char *string, const char* fallback_string)
+ {
++#ifdef HAVE_ICONV
+   const size_t buffer_inc = 80;	// Increment buffer size in 80 bytes step
+   const char *charset;
+   iconv_t cd;
+@@ -93,6 +96,8 @@
+   if (dest_buffer != NULL)
+     free(dest_buffer);  		// free buffer
+   free(src_buffer);			// free string
++#endif
++
+   return strdup(fallback_string); 	// and return fallback string
+ }
+ 

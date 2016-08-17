@@ -1,0 +1,14 @@
+Author: Lucas Nussbaum <lucas@debian.org>
+Description: disable syntactically incorrect test
+--- a/tests/lexical.at
++++ b/tests/lexical.at
+@@ -172,9 +172,6 @@
+ AT_DATA([nohist.csh],
+ [echo ! space !	tab != "!(" newline !
+ ])
+-AT_CHECK([tcsh -f nohist.csh], ,
+-[[! space ! tab != !( newline !
+-]])
+ 
+ AT_CLEANUP
+ 

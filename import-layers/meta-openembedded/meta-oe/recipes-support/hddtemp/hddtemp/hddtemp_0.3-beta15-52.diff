@@ -1,0 +1,2256 @@
+Megapatch from debian
+
+Original URL: http://ftp.debian.org/debian/pool/main/h/hddtemp/hddtemp_0.3-beta15-52.diff.gz
+
+Filtered with:
+  filterdiff -p1 -x README -x 'debian/*'
+
+
+Upstream-Status: unmaintained
+
+--- hddtemp-0.3-beta15.orig/doc/hddtemp.8
++++ hddtemp-0.3-beta15/doc/hddtemp.8
+@@ -58,6 +58,10 @@
+ .B \-f, \-\-file=\fIfile\fI
+ Specify the database file to use.
+ .TP
++.B \-F, \-\-foreground
++Don't fork into the background even in daemon mode.  This is useful
++when running under a process supervisor.
++.TP
+ .B \-l, \-\-listen=\fIaddr\fR
+ Listen on a specific address.  \fIaddr\fR is a string containing a
+ host name or a numeric host address string.  The numeric host address
+@@ -80,6 +84,9 @@
+ .B \-q, \-\-quiet
+ Don't check if the drive is supported.
+ .TP
++.B \-u, \-\-unit=\fIC|F\fR
++Force output temperature either in Celsius or Fahrenheit.
++.TP
+ .B \-v, \-\-version
+ Display hddtemp version number.
+ .TP
+@@ -96,7 +103,7 @@
+ .SH "DRIVE DATABASE"
+ If you know your drive has a temperature sensor but it is being
+ reported unsupported, tell me which model and which manufacturer it
+-is, and/or just add a new entry in /usr/share/misc/hddtemp.db.  Each
++is, and/or just add a new entry in /etc/hddtemp.db.  Each
+ line of hddtemp.db is either a comment, a blank line or a line
+ containing:
+ .TP
+@@ -112,7 +119,7 @@
+ Feedback is welcome (see the REPORT section below).
+ 
+ .SH "TCP/IP DAEMON MODE"
+-Exemple of type forcing:
++Example of type forcing:
+ .PP
+ # hddtemp SATA:/dev/sda PATA:/dev/hda
+ .PP
+@@ -120,7 +127,7 @@
+ .B hddtemp
+ in daemon mode, start it like this:
+ .PP
+-# hddtemp -d /dev/hd[abcd]
++# hddtemp \-d /dev/hd[abcd]
+ .PP
+ .PP
+ and use
+@@ -165,8 +172,8 @@
+ investigation they do not.  But fields 194 (which is the standard
+ field for temperature) and 231 are good candidates.
+ .PP
+-Then, you can send me a report with outputs from `hddtemp --debug ...',
+-`smartctl' or `hdparm -i ...', and/or add an entry in hddtemp.db
++Then, you can send me a report with outputs from `hddtemp \-\-debug ...',
++`smartctl' or `hdparm \-i ...', and/or add an entry in hddtemp.db
+ yourself.
+ 
+ .SH "BUGS"
+@@ -183,5 +190,5 @@
+ .PP
+ Emmanuel Varagnat (hddtemp@guzu.net).
+ .PP
+-This manual page was originaly written by Aurelien Jarno <aurel32@debian.org>,
++This manual page was originally written by Aurelien Jarno <aurel32@debian.org>,
+ for the Debian GNU/Linux system (but may be used by others).
+--- hddtemp-0.3-beta15.orig/po/fr.po
++++ hddtemp-0.3-beta15/po/fr.po
+@@ -7,9 +7,9 @@
+ msgid ""
+ msgstr ""
+ "Project-Id-Version: fr\n"
+-"Report-Msgid-Bugs-To: hddtemp@guzu.net\n"
+-"POT-Creation-Date: 2005-02-25 22:43+0100\n"
+-"PO-Revision-Date: 2003-06-03 00:58GMT+1\n"
++"Report-Msgid-Bugs-To: \n"
++"POT-Creation-Date: 2006-06-29 16:24+0200\n"
++"PO-Revision-Date: 2011-08-30 16:38+0200\n"
+ "Last-Translator: Aurelien Jarno <aurelien@aurel32.net>\n"
+ "Language-Team: FRANCAIS <fr@li.org>\n"
+ "MIME-Version: 1.0\n"
+@@ -17,23 +17,7 @@
+ "Content-Transfer-Encoding: 8bit\n"
+ "X-Generator: KBabel 1.0.1\n"
+ 
+-#: src/hddtemp.c:112
+-#, c-format
+-msgid ""
+-"\n"
+-"Regexp%s| Value | Description\n"
+-"------%s---------------------\n"
+-msgstr ""
+-"\n"
+-"Regexp%s| Valeur | Description\n"
+-"------%s----------------------\n"
+-
+-#: src/hddtemp.c:118
+-#, c-format
+-msgid "%s%s| %5d | %s\n"
+-msgstr "%s%s|  %5d | %s\n"
+-
+-#: src/hddtemp.c:161
++#: src/hddtemp.c:156
+ #, c-format
+ msgid ""
+ "\n"
+@@ -46,7 +30,7 @@
+ "ModËle: %s\n"
+ "\n"
+ 
+-#: src/hddtemp.c:188
++#: src/hddtemp.c:189
+ #, c-format
+ msgid ""
+ "WARNING: Drive %s doesn't seem to have a temperature sensor.\n"
+@@ -60,75 +44,60 @@
+ "net).\n"
+ "ATTENTION : Voir les options --help, --debug et --drivebase.\n"
+ 
+-#: src/hddtemp.c:192
++#: src/hddtemp.c:197
+ #, c-format
+ msgid "%s: %s:  no sensor\n"
+ msgstr "%s: %s :  pas de capteur\n"
+ 
+-#: src/hddtemp.c:197
+-#, c-format
+-msgid ""
+-"WARNING: Drive %s doesn't appear in the database of supported drives\n"
+-"WARNING: But using a common value, it reports something.\n"
+-"WARNING: Note that the temperature shown could be wrong.\n"
+-"WARNING: See --help, --debug and --drivebase options.\n"
+-"WARNING: And don't forget you can add your drive to hddtemp.db\n"
+-msgstr ""
+-"ATTENTION : Le lecteur %s n'apparait pas dans la base de donnÈes des "
+-"lecteurs supportÈs\n"
+-"ATTENTION : Mais en utilisant une valeur courante, il renvoie quelque "
+-"chose.\n"
+-"ATTENTION : Notez que la tempÈrature renvoyÈe peut Ítre erronÈe.\n"
+-"ATTENTION : Voir les options --help, --debug et --drivebase.\n"
+-"ATTENTION : Et n'oubliez pas d'ajouter votre lecteur au fichier hddtemp.db\n"
+-
+-#: src/hddtemp.c:202
++#: src/hddtemp.c:211
+ #, c-format
+ msgid "%s: %s:  %d%sC or %sF\n"
+ msgstr "%s: %s :  %d%sC ou %sF\n"
+ 
+-#: src/hddtemp.c:214
++#: src/hddtemp.c:235
+ #, c-format
+ msgid "%s: %s: drive is sleeping\n"
+ msgstr "%s: %s : le lecteur est en veille\n"
+ 
+-#: src/hddtemp.c:217
++#: src/hddtemp.c:242
+ #, c-format
+-msgid "%s: %s:  known drive, but it doesn't have a temperature sensor.\n"
++msgid "%s: %s:  drive supported, but it doesn't have a temperature sensor.\n"
+ msgstr ""
+ "%s: %s:  lecteur connu, mais il ne possËde pas de capteur de tempÈrature.\n"
+ 
+-#: src/hddtemp.c:220
++#: src/hddtemp.c:246
+ #, c-format
+ msgid "ERROR: %s: %s: unknown returned status\n"
+ msgstr "ERREUR : %s : %s : status inconnu\n"
+ 
+-#: src/hddtemp.c:235
++#: src/hddtemp.c:261
+ #, c-format
+ msgid ""
+ "\n"
+ "If one of the field value seems to match the temperature, be sure to read\n"
+-"the hddtemp man page before sending me a report (section REPORT). Thanks.\n"
++"the hddtemp man page before sending a report (section REPORT). Thanks.\n"
+ msgstr ""
+ 
+-#: src/hddtemp.c:308
++#: src/hddtemp.c:338
+ #, c-format
+ msgid "ERROR: invalid separator.\n"
+ msgstr "ERREUR : sÈparateur invalide.\n"
+ 
+-#: src/hddtemp.c:319
++#: src/hddtemp.c:349
+ #, c-format
+ msgid "ERROR: invalid port number.\n"
+ msgstr "ERREUR : numÈro de port invalide.\n"
+ 
+-#: src/hddtemp.c:329
+-#, fuzzy, c-format
++#: src/hddtemp.c:371
++#, c-format
+ msgid ""
+-" Usage: hddtemp [OPTIONS] DISK1 [DISK2]...\n"
++" Usage: hddtemp [OPTIONS] [TYPE:]DISK1 [[TYPE:]DISK2]...\n"
+ "\n"
+ "   hddtemp displays the temperature of drives supplied in argument.\n"
+ "   Drives must support S.M.A.R.T.\n"
+ "\n"
++"  TYPE could be SATA, PATA or SCSI. If omitted hddtemp will try to guess.\n"
++"\n"
+ "  -b   --drivebase   :  display database file content that allow hddtemp to\n"
+ "                        recognize supported drives.\n"
+ "  -D   --debug       :  display various S.M.A.R.T. fields and their values.\n"
+@@ -138,6 +107,7 @@
+ "  -d   --daemon      :  run hddtemp in TCP/IP daemon mode (port %d by "
+ "default.)\n"
+ "  -f   --file=FILE   :  specify database file to use.\n"
++"  -F   --foreground  :  don't daemonize, stay in foreground.\n"
+ "  -l   --listen=addr :  listen on a specific interface (in TCP/IP daemon "
+ "mode).\n"
+ "  -n   --numeric     :  print only the temperature.\n"
+@@ -145,6 +115,8 @@
+ "  -s   --separator=C :  separator to use between fields (in TCP/IP daemon "
+ "mode).\n"
+ "  -S   --syslog=s    :  log temperature to syslog every s seconds.\n"
++"  -u   --unit=[C|F]  :  force output temperature either in Celsius or "
++"Fahrenheit.\n"
+ "  -q   --quiet       :  do not check if the drive is supported.\n"
+ "  -v   --version     :  display hddtemp version number.\n"
+ "  -w   --wake-up     :  wake-up the drive if need.\n"
+@@ -153,11 +125,14 @@
+ "\n"
+ "Report bugs or new drives to <hddtemp@guzu.net>.\n"
+ msgstr ""
+-" Utilisation: hddtemp [OPTIONS] DISQUE1 [DISQUE2]...\n"
++" Utilisation: hddtemp [OPTIONS] [TYPE:]DISQUE1 [[TYPE:]DISQUE2]...\n"
+ "\n"
+ "   hddtemp affiche la tempÈrature des lecteurs passÈs en argument.\n"
+ "   Les lecteurs doivent avoir le support S.M.A.R.T.\n"
+ "\n"
++"  TYPE peut Ítre SATA, PATA ou SCSI. Si le type est omis, hddtemp essaiera\n"
++"  de le deviner.\n"
++"\n"
+ "  -b   --drivebase   :  affiche le contenu du fichier de base de donnÈe "
+ "qui \n"
+ "                        permet ‡ hddtemp de reconnaÓtre les lecteurs "
+@@ -172,6 +147,7 @@
+ "dÈfaut).\n"
+ "  -f   --file=FILE   :  specifie le fichier ‡ utiliser comme base de "
+ "donnÈes.\n"
++"  -F   --foreground  :  ne pas dÈmoniser, rester au premier plan.\n"
+ "  -l   --listen=addr :  Ècoute sur une interface spÈcifique (en mode dÈmon "
+ "TCP/IP).\n"
+ "  -n   --numeric     :  affiche seulement la tempÈrature.\n"
+@@ -180,6 +156,8 @@
+ "dÈmon TCP/IP).\n"
+ "  -S   --syslog=s    :  enregistre la tempÈrature dans syslog tous les s "
+ "secondes.\n"
++"  -u   --unit=[C|F]  :  affiche la tempÈrature en degrÈs Celsius ou "
++"Fahrenheit.\n"
+ "  -q   --quiet       :  ne vÈrifie pas si le lecteur est supportÈ.\n"
+ "  -v   --version     :  affiche la version de hddtemp.\n"
+ "  -w   --wake-up     :  rÈveiller le lecteur si nÈcessaire.\n"
+@@ -188,62 +166,95 @@
+ "\n"
+ "Report bugs or new drives to <hddtemp@guzu.net>.\n"
+ 
+-#: src/hddtemp.c:522
++#: src/hddtemp.c:402
+ #, c-format
+ msgid "hddtemp version %s\n"
+ msgstr "hddtemp version %s\n"
+ 
+-#: src/hddtemp.c:547
++#: src/hddtemp.c:418
+ #, c-format
+ msgid "ERROR: invalid interval.\n"
+ msgstr "ERREUR : intervalle invalide.\n"
+ 
+-#: src/hddtemp.c:547
++#: src/hddtemp.c:438
++#, c-format
+ msgid "Too few arguments: you must specify one drive, at least.\n"
+ msgstr "Trop peu d'arguments : vous devez spÈcifier au moins un lecteur.\n"
+ 
+-#: src/hddtemp.c:557
++#: src/hddtemp.c:448
++#, c-format
+ msgid "ERROR: can't use --debug and --daemon or --syslog options together.\n"
+ msgstr ""
+ "ERREUR: impossible d'utiliser les options --debug et --daemon ou --syslog en "
+ "mÍme temps.\n"
+ 
+-#: src/hddtemp.c:583
++#: src/hddtemp.c:505
+ #, c-format
+ msgid "ERROR: %s: can't determine bus type (or this bus type is unknown)\n"
+ msgstr ""
+ "ERREUR: %s: impossible de dÈterminer le type de bus (ou ce type de bus est "
+ "inconnu)\n"
+ 
+-#: src/ata.c:66 src/scsi.c:68
++#: src/ata.c:66 src/scsi.c:64
+ msgid "unknown"
+ msgstr "inconnu"
+ 
+-#: src/ata.c:98
++#: src/ata.c:85 src/ata.c:104 src/scsi.c:91
+ #, c-format
+-msgid "field(%d)\t = %d\n"
+-msgstr "champ(%d)\t = %d\n"
+-
+-#: src/ata.c:167
+ msgid "S.M.A.R.T. not available"
+ msgstr "S.M.A.R.T. non disponible"
+ 
+-#: src/db.c:180
++#: src/db.c:115
++#, c-format
++msgid ""
++"\n"
++"Regexp%s| Value | Description\n"
++"------%s---------------------\n"
++msgstr ""
++"\n"
++"Regexp%s| Valeur | Description\n"
++"------%s----------------------\n"
++
++#: src/db.c:121
++#, c-format
++msgid "%s%s| %5d | %s\n"
++msgstr "%s%s|  %5d | %s\n"
++
++#: src/db.c:236
+ #, c-format
+ msgid "hddtemp: can't open %1$s: %2$s\n"
+ msgstr "hddtemp: ne peut ouvrir %1$s: %2$s\n"
+ 
+-#: src/db.c:194
++#: src/db.c:250
+ #, c-format
+ msgid "ERROR: syntax error at line %1$d in %2$s\n"
+ msgstr "ERREUR: erreur de syntaxe ‡ la ligne %1$d: %2$s\n"
+ 
+-#: src/db.c:201
++#: src/db.c:257
+ #, c-format
+ msgid "  ERROR: line exceed %1$d characters in %2$s.\n"
+ msgstr "  ERREUR: ligne exÈcdant %1$d caractËres dans %2$s.\n"
+ 
+-#: src/scsi.c:112 src/scsi.c:130
++#: src/scsi.c:111 src/scsi.c:129
+ #, c-format
+ msgid "log sense failed : %s"
+ msgstr "echec de 'log sense' : %s "
++
++#~ msgid ""
++#~ "WARNING: Drive %s doesn't appear in the database of supported drives\n"
++#~ "WARNING: But using a common value, it reports something.\n"
++#~ "WARNING: Note that the temperature shown could be wrong.\n"
++#~ "WARNING: See --help, --debug and --drivebase options.\n"
++#~ "WARNING: And don't forget you can add your drive to hddtemp.db\n"
++#~ msgstr ""
++#~ "ATTENTION : Le lecteur %s n'apparait pas dans la base de donnÈes des "
++#~ "lecteurs supportÈs\n"
++#~ "ATTENTION : Mais en utilisant une valeur courante, il renvoie quelque "
++#~ "chose.\n"
++#~ "ATTENTION : Notez que la tempÈrature renvoyÈe peut Ítre erronÈe.\n"
++#~ "ATTENTION : Voir les options --help, --debug et --drivebase.\n"
++#~ "ATTENTION : Et n'oubliez pas d'ajouter votre lecteur au fichier hddtemp."
++#~ "db\n"
++
++#~ msgid "field(%d)\t = %d\n"
++#~ msgstr "champ(%d)\t = %d\n"
+--- hddtemp-0.3-beta15.orig/po/ru.po
++++ hddtemp-0.3-beta15/po/ru.po
+@@ -6,8 +6,8 @@
+ msgid ""
+ msgstr ""
+ "Project-Id-Version: hddtemp 0.3-beta3\n"
+-"Report-Msgid-Bugs-To: hddtemp@guzu.net\n"
+-"POT-Creation-Date: 2005-02-25 22:43+0100\n"
++"Report-Msgid-Bugs-To: \n"
++"POT-Creation-Date: 2006-06-29 16:24+0200\n"
+ "PO-Revision-Date: 2003-03-08 16:42+0300\n"
+ "Last-Translator: Michael Shigorin <mike@altlinux.ru>\n"
+ "Language-Team: Russian <ru@li.org>\n"
+@@ -15,23 +15,7 @@
+ "Content-Type: text/plain; charset=koi8-r\n"
+ "Content-Transfer-Encoding: 8bit\n"
+ 
+-#: src/hddtemp.c:112
+-#, c-format
+-msgid ""
+-"\n"
+-"Regexp%s| Value | Description\n"
+-"------%s---------------------\n"
+-msgstr ""
+-"\n"
+-"Ú≈«‹À”%s| ˙Œ¡ﬁ. | Ô–…”¡Œ…≈   \n"
+-"------%s---------------------\n"
+-
+-#: src/hddtemp.c:118
+-#, c-format
+-msgid "%s%s| %5d | %s\n"
+-msgstr ""
+-
+-#: src/hddtemp.c:161
++#: src/hddtemp.c:156
+ #, c-format
+ msgid ""
+ "\n"
+@@ -40,7 +24,7 @@
+ "\n"
+ msgstr ""
+ 
+-#: src/hddtemp.c:188
++#: src/hddtemp.c:189
+ #, c-format
+ msgid ""
+ "WARNING: Drive %s doesn't seem to have a temperature sensor.\n"
+@@ -53,72 +37,59 @@
+ "˜ÓÈÌ·ÓÈÂ: Â”Ã… ◊Ÿ ‘œﬁŒœ ⁄Œ¡≈‘≈, ﬁ‘œ ƒ¡‘ﬁ…À ≈”‘ÿ, Œ¡–…€…‘≈ hddtemp@guzu.net\n"
+ "˜ÓÈÌ·ÓÈÂ: (”Õ. œ–√…… --help, --debug … --drivebase).\n"
+ 
+-#: src/hddtemp.c:192
++#: src/hddtemp.c:197
+ #, c-format
+ msgid "%s: %s:  no sensor\n"
+ msgstr "%s: %s:  Œ≈‘ ƒ¡‘ﬁ…À¡\n"
+ 
+-#: src/hddtemp.c:197
+-#, c-format
+-msgid ""
+-"WARNING: Drive %s doesn't appear in the database of supported drives\n"
+-"WARNING: But using a common value, it reports something.\n"
+-"WARNING: Note that the temperature shown could be wrong.\n"
+-"WARNING: See --help, --debug and --drivebase options.\n"
+-"WARNING: And don't forget you can add your drive to hddtemp.db\n"
+-msgstr ""
+-"˜ÓÈÌ·ÓÈÂ: ‰…”À %s Œ≈ ◊ÀÃ¿ﬁ≈Œ ◊ ¬¡⁄’ ƒ¡ŒŒŸ» –œƒƒ≈“÷…◊¡≈ÕŸ» –“…◊œƒœ◊.\n"
+-"˜ÓÈÌ·ÓÈÂ: Óœ ” …”–œÃÿ⁄œ◊¡Œ…≈Õ “¡”–“œ”‘“¡Œ≈ŒŒŸ» –¡“¡Õ≈‘“œ◊ œŒ ﬁ‘œ-‘œ ◊Ÿƒ¡≈‘.\n"
+-"˜ÓÈÌ·ÓÈÂ: ˙¡Õ≈‘ÿ‘≈, ﬁ‘œ –œÀ¡⁄¡ŒŒ¡— ‘≈Õ–≈“¡‘’“¡ Õœ÷≈‘ ‘¡Àœ◊œ  Œ≈ —◊Ã—‘ÿ”—.\n"
+-"˜ÓÈÌ·ÓÈÂ: ÛÕ. œ–√…… --help, --debug … --drivebase.\n"
+-"˜ÓÈÌ·ÓÈÂ: È Œ≈ ⁄¡¬’ƒÿ‘≈, ﬁ‘œ Õœ÷Œœ ƒœ¬¡◊…‘ÿ –“…◊œƒ ◊ hddtemp.db\n"
+-
+-#: src/hddtemp.c:202
++#: src/hddtemp.c:211
+ #, c-format
+ msgid "%s: %s:  %d%sC or %sF\n"
+ msgstr "%s: %s:  %d%sC …Ã… %sF\n"
+ 
+-#: src/hddtemp.c:214
++#: src/hddtemp.c:235
+ #, c-format
+ msgid "%s: %s: drive is sleeping\n"
+ msgstr "%s: %s:  Œ≈‘ ƒ¡‘ﬁ…À¡\n"
+ 
+-#: src/hddtemp.c:217
+-#, c-format
+-msgid "%s: %s:  known drive, but it doesn't have a temperature sensor.\n"
++#: src/hddtemp.c:242
++#, fuzzy, c-format
++msgid "%s: %s:  drive supported, but it doesn't have a temperature sensor.\n"
+ msgstr "%s: %s:  …⁄◊≈”‘ŒŸ  ƒ…”À, Œ≈ ”œƒ≈“÷¡›…  ƒ¡‘ﬁ…À¡ ‘≈Õ–≈“¡‘’“Ÿ.\n"
+ 
+-#: src/hddtemp.c:220
++#: src/hddtemp.c:246
+ #, c-format
+ msgid "ERROR: %s: %s: unknown returned status\n"
+ msgstr "Ô˚È‚Î·: %s: %s: Œ≈…⁄◊≈”‘ŒŸ  ”‘¡‘’” ◊œ⁄◊“¡‘¡\n"
+ 
+-#: src/hddtemp.c:235
++#: src/hddtemp.c:261
+ #, c-format
+ msgid ""
+ "\n"
+ "If one of the field value seems to match the temperature, be sure to read\n"
+-"the hddtemp man page before sending me a report (section REPORT). Thanks.\n"
++"the hddtemp man page before sending a report (section REPORT). Thanks.\n"
+ msgstr ""
+ 
+-#: src/hddtemp.c:308
++#: src/hddtemp.c:338
+ #, c-format
+ msgid "ERROR: invalid separator.\n"
+ msgstr "Ô˚È‚Î·: Œ≈◊≈“ŒŸ  “¡⁄ƒ≈Ã…‘≈Ãÿ.\n"
+ 
+-#: src/hddtemp.c:319
++#: src/hddtemp.c:349
+ #, c-format
+ msgid "ERROR: invalid port number.\n"
+ msgstr "Ô˝È‚Î·: Œ≈◊≈“ŒŸ  ŒœÕ≈“ –œ“‘¡.\n"
+ 
+-#: src/hddtemp.c:329
++#: src/hddtemp.c:371
+ #, fuzzy, c-format
+ msgid ""
+-" Usage: hddtemp [OPTIONS] DISK1 [DISK2]...\n"
++" Usage: hddtemp [OPTIONS] [TYPE:]DISK1 [[TYPE:]DISK2]...\n"
+ "\n"
+ "   hddtemp displays the temperature of drives supplied in argument.\n"
+ "   Drives must support S.M.A.R.T.\n"
+ "\n"
++"  TYPE could be SATA, PATA or SCSI. If omitted hddtemp will try to guess.\n"
++"\n"
+ "  -b   --drivebase   :  display database file content that allow hddtemp to\n"
+ "                        recognize supported drives.\n"
+ "  -D   --debug       :  display various S.M.A.R.T. fields and their values.\n"
+@@ -128,6 +99,7 @@
+ "  -d   --daemon      :  run hddtemp in TCP/IP daemon mode (port %d by "
+ "default.)\n"
+ "  -f   --file=FILE   :  specify database file to use.\n"
++"  -F   --foreground  :  don't daemonize, stay in foreground.\n"
+ "  -l   --listen=addr :  listen on a specific interface (in TCP/IP daemon "
+ "mode).\n"
+ "  -n   --numeric     :  print only the temperature.\n"
+@@ -135,6 +107,8 @@
+ "  -s   --separator=C :  separator to use between fields (in TCP/IP daemon "
+ "mode).\n"
+ "  -S   --syslog=s    :  log temperature to syslog every s seconds.\n"
++"  -u   --unit=[C|F]  :  force output temperature either in Celsius or "
++"Fahrenheit.\n"
+ "  -q   --quiet       :  do not check if the drive is supported.\n"
+ "  -v   --version     :  display hddtemp version number.\n"
+ "  -w   --wake-up     :  wake-up the drive if need.\n"
+@@ -168,59 +142,90 @@
+ "\n"
+ "Ûœœ¬›≈Œ…— œ¬ œ€…¬À¡» … ƒ¡ŒŒŸ≈ ƒÃ— ƒ…”Àœ◊ œ‘–“¡◊Ã— ‘≈ Œ¡ <hddtemp@guzu.net>.\n"
+ 
+-#: src/hddtemp.c:522
++#: src/hddtemp.c:402
+ #, c-format
+ msgid "hddtemp version %s\n"
+ msgstr "˜≈“”…— hddtemp: %s\n"
+ 
+-#: src/hddtemp.c:547
++#: src/hddtemp.c:418
+ #, fuzzy, c-format
+ msgid "ERROR: invalid interval.\n"
+ msgstr "Ô˚È‚Î·: Œ≈◊≈“ŒŸ  “¡⁄ƒ≈Ã…‘≈Ãÿ.\n"
+ 
+-#: src/hddtemp.c:547
++#: src/hddtemp.c:438
++#, c-format
+ msgid "Too few arguments: you must specify one drive, at least.\n"
+ msgstr ""
+ 
+-#: src/hddtemp.c:557
+-#, fuzzy
++#: src/hddtemp.c:448
++#, fuzzy, c-format
+ msgid "ERROR: can't use --debug and --daemon or --syslog options together.\n"
+ msgstr "Ô˚È‚Î·: œƒŒœ◊“≈Õ≈ŒŒœ≈ …”–œÃÿ⁄œ◊¡Œ…≈ --debug … --daemon Œ≈ƒœ–’”‘…Õœ.\n"
+ 
+-#: src/hddtemp.c:583
++#: src/hddtemp.c:505
+ #, c-format
+ msgid "ERROR: %s: can't determine bus type (or this bus type is unknown)\n"
+ msgstr "Ô˚È‚Î·: %s: Œ≈◊œ⁄Õœ÷Œœ œ–“≈ƒ≈Ã…‘ÿ ‘…– €…ŒŸ\n"
+ 
+-#: src/ata.c:66 src/scsi.c:68
++#: src/ata.c:66 src/scsi.c:64
+ msgid "unknown"
+ msgstr "Œ≈…⁄◊."
+ 
+-#: src/ata.c:98
++#: src/ata.c:85 src/ata.c:104 src/scsi.c:91
+ #, c-format
+-msgid "field(%d)\t = %d\n"
+-msgstr "–œÃ≈(%d)\t = %d\n"
+-
+-#: src/ata.c:167
+ msgid "S.M.A.R.T. not available"
+ msgstr "S.M.A.R.T. Œ≈ƒœ”‘’–≈Œ"
+ 
+-#: src/db.c:180
++#: src/db.c:115
++#, c-format
++msgid ""
++"\n"
++"Regexp%s| Value | Description\n"
++"------%s---------------------\n"
++msgstr ""
++"\n"
++"Ú≈«‹À”%s| ˙Œ¡ﬁ. | Ô–…”¡Œ…≈   \n"
++"------%s---------------------\n"
++
++#: src/db.c:121
++#, c-format
++msgid "%s%s| %5d | %s\n"
++msgstr ""
++
++#: src/db.c:236
+ #, c-format
+ msgid "hddtemp: can't open %1$s: %2$s\n"
+ msgstr "hddtemp: Œ≈ Õœ«’ œ‘À“Ÿ‘ÿ %1$s: %2$s\n"
+ 
+-#: src/db.c:194
++#: src/db.c:250
+ #, c-format
+ msgid "ERROR: syntax error at line %1$d in %2$s\n"
+ msgstr "Û…Œ‘¡À”…ﬁ≈”À¡— Ô˚È‚Î· ◊ ”‘“œÀ≈ %1$d ∆¡ Ã¡ %2$s\n"
+ 
+-#: src/db.c:201
++#: src/db.c:257
+ #, c-format
+ msgid "  ERROR: line exceed %1$d characters in %2$s.\n"
+ msgstr "Ô˚È‚Î·: ”‘“œÀ¡ ƒÃ…ŒŒ≈≈ %1$d ”…Õ◊œÃœ◊ ◊ %2$s.\n"
+ 
+-#: src/scsi.c:112 src/scsi.c:130
++#: src/scsi.c:111 src/scsi.c:129
+ #, c-format
+ msgid "log sense failed : %s"
+ msgstr ""
++
++#~ msgid ""
++#~ "WARNING: Drive %s doesn't appear in the database of supported drives\n"
++#~ "WARNING: But using a common value, it reports something.\n"
++#~ "WARNING: Note that the temperature shown could be wrong.\n"
++#~ "WARNING: See --help, --debug and --drivebase options.\n"
++#~ "WARNING: And don't forget you can add your drive to hddtemp.db\n"
++#~ msgstr ""
++#~ "˜ÓÈÌ·ÓÈÂ: ‰…”À %s Œ≈ ◊ÀÃ¿ﬁ≈Œ ◊ ¬¡⁄’ ƒ¡ŒŒŸ» –œƒƒ≈“÷…◊¡≈ÕŸ» –“…◊œƒœ◊.\n"
++#~ "˜ÓÈÌ·ÓÈÂ: Óœ ” …”–œÃÿ⁄œ◊¡Œ…≈Õ “¡”–“œ”‘“¡Œ≈ŒŒŸ» –¡“¡Õ≈‘“œ◊ œŒ ﬁ‘œ-‘œ "
++#~ "◊Ÿƒ¡≈‘.\n"
++#~ "˜ÓÈÌ·ÓÈÂ: ˙¡Õ≈‘ÿ‘≈, ﬁ‘œ –œÀ¡⁄¡ŒŒ¡— ‘≈Õ–≈“¡‘’“¡ Õœ÷≈‘ ‘¡Àœ◊œ  Œ≈ "
++#~ "—◊Ã—‘ÿ”—.\n"
++#~ "˜ÓÈÌ·ÓÈÂ: ÛÕ. œ–√…… --help, --debug … --drivebase.\n"
++#~ "˜ÓÈÌ·ÓÈÂ: È Œ≈ ⁄¡¬’ƒÿ‘≈, ﬁ‘œ Õœ÷Œœ ƒœ¬¡◊…‘ÿ –“…◊œƒ ◊ hddtemp.db\n"
++
++#~ msgid "field(%d)\t = %d\n"
++#~ msgstr "–œÃ≈(%d)\t = %d\n"
+--- hddtemp-0.3-beta15.orig/po/sv.po
++++ hddtemp-0.3-beta15/po/sv.po
+@@ -6,8 +6,8 @@
+ msgid ""
+ msgstr ""
+ "Project-Id-Version: hddtemp 0.3-beta14-4\n"
+-"Report-Msgid-Bugs-To: hddtemp@guzu.net\n"
+-"POT-Creation-Date: 2005-02-25 22:43+0100\n"
++"Report-Msgid-Bugs-To: \n"
++"POT-Creation-Date: 2006-06-29 16:24+0200\n"
+ "PO-Revision-Date: 2005-11-02 19:03+0100\n"
+ "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
+ "Language-Team: Swedish <sv@li.org>\n"
+@@ -17,23 +17,7 @@
+ "X-Poedit-Language: swe\n"
+ "X-Poedit-Country: swe\n"
+ 
+-#: src/hddtemp.c:112
+-#, c-format
+-msgid ""
+-"\n"
+-"Regexp%s| Value | Description\n"
+-"------%s---------------------\n"
+-msgstr ""
+-"\n"
+-"Regexp%s| V‰rde | Beskrivning\n"
+-"------%s---------------------\n"
+-
+-#: src/hddtemp.c:118
+-#, c-format
+-msgid "%s%s| %5d | %s\n"
+-msgstr "%s%s| %5d | %s\n"
+-
+-#: src/hddtemp.c:161
++#: src/hddtemp.c:156
+ #, c-format
+ msgid ""
+ "\n"
+@@ -46,7 +30,7 @@
+ "Modell: %s\n"
+ "\n"
+ 
+-#: src/hddtemp.c:188
++#: src/hddtemp.c:189
+ #, c-format
+ msgid ""
+ "WARNING: Drive %s doesn't seem to have a temperature sensor.\n"
+@@ -60,76 +44,63 @@
+ "net).\n"
+ "VARNING: Se --help, --debug och --drivebase flaggorna.\n"
+ 
+-#: src/hddtemp.c:192
++#: src/hddtemp.c:197
+ #, c-format
+ msgid "%s: %s:  no sensor\n"
+ msgstr "%s: %s:  ingen sensor\n"
+ 
+-#: src/hddtemp.c:197
+-#, c-format
+-msgid ""
+-"WARNING: Drive %s doesn't appear in the database of supported drives\n"
+-"WARNING: But using a common value, it reports something.\n"
+-"WARNING: Note that the temperature shown could be wrong.\n"
+-"WARNING: See --help, --debug and --drivebase options.\n"
+-"WARNING: And don't forget you can add your drive to hddtemp.db\n"
+-msgstr ""
+-"VARNING: Disken %s verkar inte finnas i databasen ˆver diskar som stˆds\n"
+-"VARNING: Men anv‰nder man ett vanligt v‰rde rapporterar den nÂgot.\n"
+-"VARNING: Notera att temperaturen som visas kan vara felaktig.\n"
+-"VARNING: Se --help, --debug och --drivebase flaggorna.\n"
+-"VARNING: Och glˆm inte att du kan l‰gga till din disk till hddtemp.db\n"
+-
+-#: src/hddtemp.c:202
++#: src/hddtemp.c:211
+ #, c-format
+ msgid "%s: %s:  %d%sC or %sF\n"
+ msgstr "%s: %s:  %d%sC eller %sF\n"
+ 
+-#: src/hddtemp.c:214
++#: src/hddtemp.c:235
+ #, c-format
+ msgid "%s: %s: drive is sleeping\n"
+ msgstr "%s: %s: disken sover\n"
+ 
+-#: src/hddtemp.c:217
+-#, c-format
+-msgid "%s: %s:  known drive, but it doesn't have a temperature sensor.\n"
++#: src/hddtemp.c:242
++#, fuzzy, c-format
++msgid "%s: %s:  drive supported, but it doesn't have a temperature sensor.\n"
+ msgstr "%s: %s:  k‰nd disk men den har ingen temperatursensor.\n"
+ 
+-#: src/hddtemp.c:220
++#: src/hddtemp.c:246
+ #, c-format
+ msgid "ERROR: %s: %s: unknown returned status\n"
+ msgstr "FEL: %s: %s: ok‰nd returnerad status\n"
+ 
+-#: src/hddtemp.c:235
+-#, c-format
++#: src/hddtemp.c:261
++#, fuzzy, c-format
+ msgid ""
+ "\n"
+ "If one of the field value seems to match the temperature, be sure to read\n"
+-"the hddtemp man page before sending me a report (section REPORT). Thanks.\n"
++"the hddtemp man page before sending a report (section REPORT). Thanks.\n"
+ msgstr ""
+ "\n"
+ "Om ett av f‰ltv‰rdena verkar matcha temperaturen, var s‰ker pÂ att du\n"
+ "l‰st manualsidan fˆr hddtemp fˆre du skickar en rapport till mig (sektionen\n"
+ "REPORT). Tack.\n"
+ 
+-#: src/hddtemp.c:308
++#: src/hddtemp.c:338
+ #, c-format
+ msgid "ERROR: invalid separator.\n"
+ msgstr "FEL: ogiltig separator.\n"
+ 
+-#: src/hddtemp.c:319
++#: src/hddtemp.c:349
+ #, c-format
+ msgid "ERROR: invalid port number.\n"
+ msgstr "FEL: ogiltigt portnummer.\n"
+ 
+-#: src/hddtemp.c:329
+-#, c-format
++#: src/hddtemp.c:371
++#, fuzzy, c-format
+ msgid ""
+-" Usage: hddtemp [OPTIONS] DISK1 [DISK2]...\n"
++" Usage: hddtemp [OPTIONS] [TYPE:]DISK1 [[TYPE:]DISK2]...\n"
+ "\n"
+ "   hddtemp displays the temperature of drives supplied in argument.\n"
+ "   Drives must support S.M.A.R.T.\n"
+ "\n"
++"  TYPE could be SATA, PATA or SCSI. If omitted hddtemp will try to guess.\n"
++"\n"
+ "  -b   --drivebase   :  display database file content that allow hddtemp to\n"
+ "                        recognize supported drives.\n"
+ "  -D   --debug       :  display various S.M.A.R.T. fields and their values.\n"
+@@ -139,6 +110,7 @@
+ "  -d   --daemon      :  run hddtemp in TCP/IP daemon mode (port %d by "
+ "default.)\n"
+ "  -f   --file=FILE   :  specify database file to use.\n"
++"  -F   --foreground  :  don't daemonize, stay in foreground.\n"
+ "  -l   --listen=addr :  listen on a specific interface (in TCP/IP daemon "
+ "mode).\n"
+ "  -n   --numeric     :  print only the temperature.\n"
+@@ -146,6 +118,8 @@
+ "  -s   --separator=C :  separator to use between fields (in TCP/IP daemon "
+ "mode).\n"
+ "  -S   --syslog=s    :  log temperature to syslog every s seconds.\n"
++"  -u   --unit=[C|F]  :  force output temperature either in Celsius or "
++"Fahrenheit.\n"
+ "  -q   --quiet       :  do not check if the drive is supported.\n"
+ "  -v   --version     :  display hddtemp version number.\n"
+ "  -w   --wake-up     :  wake-up the drive if need.\n"
+@@ -184,61 +158,91 @@
+ "\n"
+ "Rapportera buggar eller nya hÂrddiskar till <hddtemp@guzu.net>.\n"
+ 
+-#: src/hddtemp.c:522
++#: src/hddtemp.c:402
+ #, c-format
+ msgid "hddtemp version %s\n"
+ msgstr "hddtemp version %s\n"
+ 
+-#: src/hddtemp.c:547
++#: src/hddtemp.c:418
+ #, c-format
+ msgid "ERROR: invalid interval.\n"
+ msgstr "FEL: ogiltigt intervall.\n"
+ 
+-#: src/hddtemp.c:547
++#: src/hddtemp.c:438
++#, c-format
+ msgid "Too few arguments: you must specify one drive, at least.\n"
+ msgstr "Fˆr fÂ argument: du mÂste specificera Âtminstone en disk.\n"
+ 
+-#: src/hddtemp.c:557
++#: src/hddtemp.c:448
++#, c-format
+ msgid "ERROR: can't use --debug and --daemon or --syslog options together.\n"
+ msgstr ""
+ "FEL: kan inte anv‰nda --debug och --daemon eller --syslog flaggorna "
+ "tillsammans.\n"
+ 
+-#: src/hddtemp.c:583
++#: src/hddtemp.c:505
+ #, c-format
+ msgid "ERROR: %s: can't determine bus type (or this bus type is unknown)\n"
+ msgstr ""
+ "FEL: %s: kan inte fastst‰lla busstyp (eller sÂ ‰r denna busstyp ok‰nd)\n"
+ 
+-#: src/ata.c:66 src/scsi.c:68
++#: src/ata.c:66 src/scsi.c:64
+ msgid "unknown"
+ msgstr "ok‰nd"
+ 
+-#: src/ata.c:98
++#: src/ata.c:85 src/ata.c:104 src/scsi.c:91
+ #, c-format
+-msgid "field(%d)\t = %d\n"
+-msgstr "f‰lt(%d)\t = %d\n"
+-
+-#: src/ata.c:167
+ msgid "S.M.A.R.T. not available"
+ msgstr "S.M.A.R.T. ‰r inte tillg‰nglig"
+ 
+-#: src/db.c:180
++#: src/db.c:115
++#, c-format
++msgid ""
++"\n"
++"Regexp%s| Value | Description\n"
++"------%s---------------------\n"
++msgstr ""
++"\n"
++"Regexp%s| V‰rde | Beskrivning\n"
++"------%s---------------------\n"
++
++#: src/db.c:121
++#, c-format
++msgid "%s%s| %5d | %s\n"
++msgstr "%s%s| %5d | %s\n"
++
++#: src/db.c:236
+ #, c-format
+ msgid "hddtemp: can't open %1$s: %2$s\n"
+ msgstr "hddtemp: kan inte ˆppna %1$s: %2$s\n"
+ 
+-#: src/db.c:194
++#: src/db.c:250
+ #, c-format
+ msgid "ERROR: syntax error at line %1$d in %2$s\n"
+ msgstr "FEL: syntaxfel pÂ rad %1$d i %2$s\n"
+ 
+-#: src/db.c:201
++#: src/db.c:257
+ #, c-format
+ msgid "  ERROR: line exceed %1$d characters in %2$s.\n"
+ msgstr " FEL: raden ˆverstiger %1$d tecken i %2$s.\n"
+ 
+-#: src/scsi.c:112 src/scsi.c:130
++#: src/scsi.c:111 src/scsi.c:129
+ #, c-format
+ msgid "log sense failed : %s"
+ msgstr "igenk‰nning av logg misslyckades : %s"
++
++#~ msgid ""
++#~ "WARNING: Drive %s doesn't appear in the database of supported drives\n"
++#~ "WARNING: But using a common value, it reports something.\n"
++#~ "WARNING: Note that the temperature shown could be wrong.\n"
++#~ "WARNING: See --help, --debug and --drivebase options.\n"
++#~ "WARNING: And don't forget you can add your drive to hddtemp.db\n"
++#~ msgstr ""
++#~ "VARNING: Disken %s verkar inte finnas i databasen ˆver diskar som stˆds\n"
++#~ "VARNING: Men anv‰nder man ett vanligt v‰rde rapporterar den nÂgot.\n"
++#~ "VARNING: Notera att temperaturen som visas kan vara felaktig.\n"
++#~ "VARNING: Se --help, --debug och --drivebase flaggorna.\n"
++#~ "VARNING: Och glˆm inte att du kan l‰gga till din disk till hddtemp.db\n"
++
++#~ msgid "field(%d)\t = %d\n"
++#~ msgstr "f‰lt(%d)\t = %d\n"
+--- hddtemp-0.3-beta15.orig/po/pt.po
++++ hddtemp-0.3-beta15/po/pt.po
+@@ -7,7 +7,7 @@
+ msgstr ""
+ "Project-Id-Version: hddtemp 0.3-beta14\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2005-02-25 22:43+0100\n"
++"POT-Creation-Date: 2006-06-29 16:24+0200\n"
+ "PO-Revision-Date: 2006-03-29 23:22+0000\n"
+ "Last-Translator: Miguel Figueiredo <elmig@debianp.org>\n"
+ "Language-Team: Portuguese <traduz@debianpt.org>\n"
+@@ -15,23 +15,7 @@
+ "Content-Type: text/plain; charset=UTF-8\n"
+ "Content-Transfer-Encoding: 8bit\n"
+ 
+-#: src/hddtemp.c:112
+-#, c-format
+-msgid ""
+-"\n"
+-"Regexp%s| Value | Description\n"
+-"------%s---------------------\n"
+-msgstr ""
+-"\n"
+-"Regexp%s| Valor | Descri√ß√£o\n"
+-"------%s-------------------\n"
+-
+-#: src/hddtemp.c:118
+-#, c-format
+-msgid "%s%s| %5d | %s\n"
+-msgstr "%s%s| %5d | %s\n"
+-
+-#: src/hddtemp.c:161
++#: src/hddtemp.c:156
+ #, c-format
+ msgid ""
+ "\n"
+@@ -44,7 +28,7 @@
+ "Modelo: %s\n"
+ "\n"
+ 
+-#: src/hddtemp.c:188
++#: src/hddtemp.c:189
+ #, c-format
+ msgid ""
+ "WARNING: Drive %s doesn't seem to have a temperature sensor.\n"
+@@ -54,79 +38,68 @@
+ msgstr ""
+ "AVISO: O disco %s n√£o parece ter um sensor de temperatura.\n"
+ "AVISO: Isto n√£o significa que n√£o tem nenhum.\n"
+-"AVISO: Se tem a certeza que tem um, por favor contacte-me (hddtemp@guzu.net).\n"
++"AVISO: Se tem a certeza que tem um, por favor contacte-me (hddtemp@guzu."
++"net).\n"
+ "AVISO: Veja as op√ß√µes --help, --debug e --drivebase.\n"
+ 
+-#: src/hddtemp.c:192
++#: src/hddtemp.c:197
+ #, c-format
+ msgid "%s: %s:  no sensor\n"
+ msgstr "%s: %s: sem sensor\n"
+ 
+-#: src/hddtemp.c:197
+-#, c-format
+-msgid ""
+-"WARNING: Drive %s doesn't appear in the database of supported drives\n"
+-"WARNING: But using a common value, it reports something.\n"
+-"WARNING: Note that the temperature shown could be wrong.\n"
+-"WARNING: See --help, --debug and --drivebase options.\n"
+-"WARNING: And don't forget you can add your drive to hddtemp.db\n"
+-msgstr ""
+-"AVISO: O disco %s n√£o parece estar na base de dados de discos suportados\n"
+-"AVISO: Mas ao utilizar um valor usual, relata alguma coisa.\n"
+-"AVISO: Note que a temperatura mostrada pode estar errada.\n"
+-"AVISO: Veja as op√ß√µes --help, --debug e --frivebase.\n"
+-"AVISO: E n√£o se esque√ßa de adicionar o seu disco a hddtemp.db\n"
+-
+-#: src/hddtemp.c:202
++#: src/hddtemp.c:211
+ #, c-format
+ msgid "%s: %s:  %d%sC or %sF\n"
+ msgstr "%s: %s: %d%sC ou %sF\n"
+ 
+-#: src/hddtemp.c:214
++#: src/hddtemp.c:235
+ #, c-format
+ msgid "%s: %s: drive is sleeping\n"
+ msgstr "%s: %s: o disco est√° adormecido\n"
+ 
+-#: src/hddtemp.c:217
+-#, c-format
+-msgid "%s: %s:  known drive, but it doesn't have a temperature sensor.\n"
++#: src/hddtemp.c:242
++#, fuzzy, c-format
++msgid "%s: %s:  drive supported, but it doesn't have a temperature sensor.\n"
+ msgstr "%s: %s: disco conhecido, mas n√£o tem um sensor de temperatura.\n"
+ 
+-#: src/hddtemp.c:220
++#: src/hddtemp.c:246
+ #, c-format
+ msgid "ERROR: %s: %s: unknown returned status\n"
+ msgstr "ERRO: %s: %s: estado devolvido desconhecido\n"
+ 
+-#: src/hddtemp.c:235
+-#, c-format
++#: src/hddtemp.c:261
++#, fuzzy, c-format
+ msgid ""
+ "\n"
+ "If one of the field value seems to match the temperature, be sure to read\n"
+-"the hddtemp man page before sending me a report (section REPORT). Thanks.\n"
++"the hddtemp man page before sending a report (section REPORT). Thanks.\n"
+ msgstr ""
+ "\n"
+-"Se um dos campos de valores parecer coincidir com a temperatura, assegure-se\n"
++"Se um dos campos de valores parecer coincidir com a temperatura, assegure-"
++"se\n"
+ "que l√™ a p√°gina do manual hddtemp antes de me enviar um relat√≥rio (sec√ß√£o\n"
+ "REPORT). Obrigado.\n"
+ 
+-#: src/hddtemp.c:308
++#: src/hddtemp.c:338
+ #, c-format
+ msgid "ERROR: invalid separator.\n"
+ msgstr "ERRO: separador inv√°lido.\n"
+ 
+-#: src/hddtemp.c:319
++#: src/hddtemp.c:349
+ #, c-format
+ msgid "ERROR: invalid port number.\n"
+ msgstr "ERRO: n√∫mero de port inv√°lido\n"
+ 
+-#: src/hddtemp.c:329
+-#, c-format
++#: src/hddtemp.c:371
++#, fuzzy, c-format
+ msgid ""
+-" Usage: hddtemp [OPTIONS] DISK1 [DISK2]...\n"
++" Usage: hddtemp [OPTIONS] [TYPE:]DISK1 [[TYPE:]DISK2]...\n"
+ "\n"
+ "   hddtemp displays the temperature of drives supplied in argument.\n"
+ "   Drives must support S.M.A.R.T.\n"
+ "\n"
++"  TYPE could be SATA, PATA or SCSI. If omitted hddtemp will try to guess.\n"
++"\n"
+ "  -b   --drivebase   :  display database file content that allow hddtemp to\n"
+ "                        recognize supported drives.\n"
+ "  -D   --debug       :  display various S.M.A.R.T. fields and their values.\n"
+@@ -136,6 +109,7 @@
+ "  -d   --daemon      :  run hddtemp in TCP/IP daemon mode (port %d by "
+ "default.)\n"
+ "  -f   --file=FILE   :  specify database file to use.\n"
++"  -F   --foreground  :  don't daemonize, stay in foreground.\n"
+ "  -l   --listen=addr :  listen on a specific interface (in TCP/IP daemon "
+ "mode).\n"
+ "  -n   --numeric     :  print only the temperature.\n"
+@@ -143,6 +117,8 @@
+ "  -s   --separator=C :  separator to use between fields (in TCP/IP daemon "
+ "mode).\n"
+ "  -S   --syslog=s    :  log temperature to syslog every s seconds.\n"
++"  -u   --unit=[C|F]  :  force output temperature either in Celsius or "
++"Fahrenheit.\n"
+ "  -q   --quiet       :  do not check if the drive is supported.\n"
+ "  -v   --version     :  display hddtemp version number.\n"
+ "  -w   --wake-up     :  wake-up the drive if need.\n"
+@@ -156,19 +132,23 @@
+ "   hddtemp mostra a temperatura dos discos indicados no argumento.\n"
+ "   Os discos t√™m de suportar S.M.A.R.T.\n"
+ "\n"
+-"  -b	 --drivebase   :  mostrar o conte√∫do do ficheiro de base de dados que\n"
++"  -b\t --drivebase   :  mostrar o conte√∫do do ficheiro de base de dados que\n"
+ "                        permite ao hddtemp reconhecer os discos suportados.\n"
+-"  -D	 --debug       :  mostrar v√°rios campos S.M.A.R.T. e os seus valores.\n"
+-"                        √ötil para encontrar um valor que pare√ßa coincidir com "
+-"                        a temperatura e/ou para me enviar um relat√≥rio.\n"
++"  -D\t --debug       :  mostrar v√°rios campos S.M.A.R.T. e os seus valores.\n"
++"                        √ötil para encontrar um valor que pare√ßa coincidir "
++"com                         a temperatura e/ou para me enviar um relat√≥rio.\n"
+ "                        (feito para cada disco indicado).\n"
+-"  -d   --daemon      :  correr o hddtemp no modo daemon TCP/IP\n (porto %d por omiss√£o.)\n"
++"  -d   --daemon      :  correr o hddtemp no modo daemon TCP/IP\n"
++" (porto %d por omiss√£o.)\n"
+ "  -f   --file=FILE   :  especificar o ficheiro de base de dados a utilizar.\n"
+-"  -l   --listen=addr :  escutar um interface espec√≠fico (no modo daemon TCP/IP).\n"
++"  -l   --listen=addr :  escutar um interface espec√≠fico (no modo daemon TCP/"
++"IP).\n"
+ "  -n   --numeric     :  escrever apenas a temperatura.\n"
+ "  -p   --port=#      :  port para escutar (no modo daemon TCP/IP).\n"
+-"  -s   --separator=C :  separador a utilizar entre campos (no modo daemon TCP/IP).\n"
+-"  -S   --syslog=s    :  registar a temperatura para o syslog a cada s segundos.\n"
++"  -s   --separator=C :  separador a utilizar entre campos (no modo daemon "
++"TCP/IP).\n"
++"  -S   --syslog=s    :  registar a temperatura para o syslog a cada s "
++"segundos.\n"
+ "  -q   --quiet       :  n√£o verificar se o disco √© suportado.\n"
+ "  -v   --version     :  mostrar o n√∫mero da vers√£o do hddtemp.\n"
+ "  -w   --wake-up     :  acordar o disco se necess√°rio.\n"
+@@ -177,58 +157,93 @@
+ "\n"
+ "Relatar bugs ou novos discos para <hddtemp@guzu.net>.\n"
+ 
+-#: src/hddtemp.c:522
++#: src/hddtemp.c:402
+ #, c-format
+ msgid "hddtemp version %s\n"
+ msgstr "hddtemp vers√£o %s\n"
+ 
+-#: src/hddtemp.c:547
++#: src/hddtemp.c:418
+ #, c-format
+ msgid "ERROR: invalid interval.\n"
+ msgstr "ERRO: intervalo inv√°lido.\n"
+ 
+-#: src/hddtemp.c:547
++#: src/hddtemp.c:438
++#, c-format
+ msgid "Too few arguments: you must specify one drive, at least.\n"
+-msgstr "N√∫mero de argumentos insuficiente: tem de especificar pelo menos um disco.\n"
++msgstr ""
++"N√∫mero de argumentos insuficiente: tem de especificar pelo menos um disco.\n"
+ 
+-#: src/hddtemp.c:557
++#: src/hddtemp.c:448
++#, c-format
+ msgid "ERROR: can't use --debug and --daemon or --syslog options together.\n"
+-msgstr "ERRO: n√£o pode utilizar em conjunto as op√ß√µes --debug e --daemon ou --syslog.\n"
++msgstr ""
++"ERRO: n√£o pode utilizar em conjunto as op√ß√µes --debug e --daemon ou --"
++"syslog.\n"
+ 
+-#: src/hddtemp.c:583
++#: src/hddtemp.c:505
+ #, c-format
+ msgid "ERROR: %s: can't determine bus type (or this bus type is unknown)\n"
+-msgstr "ERRO: %s: n√£o √© poss√≠vel determinar o tipo do bus (ou este tipo de bus √© desconhecido)\n"
++msgstr ""
++"ERRO: %s: n√£o √© poss√≠vel determinar o tipo do bus (ou este tipo de bus √© "
++"desconhecido)\n"
+ 
+-#: src/ata.c:66 src/scsi.c:68
++#: src/ata.c:66 src/scsi.c:64
+ msgid "unknown"
+ msgstr "desconhecido"
+ 
+-#: src/ata.c:98
++#: src/ata.c:85 src/ata.c:104 src/scsi.c:91
+ #, c-format
+-msgid "field(%d)\t = %d\n"
+-msgstr "campo(%d)\t = %d\n"
+-
+-#: src/ata.c:167
+ msgid "S.M.A.R.T. not available"
+ msgstr "S.M.A.R.T. n√£o est√° dispon√≠vel"
+ 
+-#: src/db.c:180
++#: src/db.c:115
++#, c-format
++msgid ""
++"\n"
++"Regexp%s| Value | Description\n"
++"------%s---------------------\n"
++msgstr ""
++"\n"
++"Regexp%s| Valor | Descri√ß√£o\n"
++"------%s-------------------\n"
++
++#: src/db.c:121
++#, c-format
++msgid "%s%s| %5d | %s\n"
++msgstr "%s%s| %5d | %s\n"
++
++#: src/db.c:236
+ #, c-format
+ msgid "hddtemp: can't open %1$s: %2$s\n"
+ msgstr "hddtemp: n√£o pode abrir %1$s: %2$s\n"
+ 
+-#: src/db.c:194
++#: src/db.c:250
+ #, c-format
+ msgid "ERROR: syntax error at line %1$d in %2$s\n"
+ msgstr "ERRO: erro de sintaxe na linha %1$d em %2$s\n"
+ 
+-#: src/db.c:201
++#: src/db.c:257
+ #, c-format
+ msgid "  ERROR: line exceed %1$d characters in %2$s.\n"
+ msgstr "  ERRO: a linha execedeu %1$d caracteres em %2$s.\n"
+ 
+-#: src/scsi.c:112 src/scsi.c:130
++#: src/scsi.c:111 src/scsi.c:129
+ #, c-format
+ msgid "log sense failed : %s"
+ msgstr "detec√ß√£o de log falhou: %s"
++
++#~ msgid ""
++#~ "WARNING: Drive %s doesn't appear in the database of supported drives\n"
++#~ "WARNING: But using a common value, it reports something.\n"
++#~ "WARNING: Note that the temperature shown could be wrong.\n"
++#~ "WARNING: See --help, --debug and --drivebase options.\n"
++#~ "WARNING: And don't forget you can add your drive to hddtemp.db\n"
++#~ msgstr ""
++#~ "AVISO: O disco %s n√£o parece estar na base de dados de discos suportados\n"
++#~ "AVISO: Mas ao utilizar um valor usual, relata alguma coisa.\n"
++#~ "AVISO: Note que a temperatura mostrada pode estar errada.\n"
++#~ "AVISO: Veja as op√ß√µes --help, --debug e --frivebase.\n"
++#~ "AVISO: E n√£o se esque√ßa de adicionar o seu disco a hddtemp.db\n"
++
++#~ msgid "field(%d)\t = %d\n"
++#~ msgstr "campo(%d)\t = %d\n"
+--- hddtemp-0.3-beta15.orig/po/de.po
++++ hddtemp-0.3-beta15/po/de.po
+@@ -0,0 +1,250 @@
++# German translation of hddtemp.
++# Copyright (C) 2008 Free Software Foundation, Inc.
++# This file is distributed under the same license as the hddtemp package.
++# Vinzenz Vietzke <vinz@v1nz.org>, 2008.
++# ,
++#
++#
++msgid ""
++msgstr ""
++"Project-Id-Version: hddtemp 0.3-beta15-44\n"
++"Report-Msgid-Bugs-To: hddtemp@packages.debian.org\n"
++"POT-Creation-Date: 2006-06-29 16:24+0200\n"
++"PO-Revision-Date: 2011-08-30 16:40+0200\n"
++"Last-Translator: Vinzenz Vietzke <vinz@v1nz.org>\n"
++"Language-Team: <debian-l10n-german@lists.debian.org>\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=UTF-8\n"
++"Content-Transfer-Encoding: 8bit"
++
++#: src/hddtemp.c:156
++#, c-format
++msgid ""
++"\n"
++"================= hddtemp %s ==================\n"
++"Model: %s\n"
++"\n"
++msgstr ""
++"\n"
++"================= hddtemp %s ==================\n"
++"Modell: %s\n"
++"\n"
++
++#: src/hddtemp.c:189
++#, c-format
++msgid ""
++"WARNING: Drive %s doesn't seem to have a temperature sensor.\n"
++"WARNING: This doesn't mean it hasn't got one.\n"
++"WARNING: If you are sure it has one, please contact me (hddtemp@guzu."
++"net).\n"
++"WARNING: See --help, --debug and --drivebase options.\n"
++msgstr ""
++"WARNUNG: Laufwerk %s scheint keinen Temperatur-Sensor zu haben.\n"
++"WARNUNG: Das bedeutet nicht, dass es keinen besitzt.\n"
++"WARNUNG: Falls Sie sicher sind, dass es einen besitzt, kontaktieren Sie "
++"mich bitte (hddtemp@guzu.net).\n"
++"WARNUNG: Siehe Optionen --help, --debug und --drivebase.\n"
++
++#: src/hddtemp.c:197
++#, c-format
++msgid "%s: %s:  no sensor\n"
++msgstr "%s: %s: kein Sensor\n"
++
++#: src/hddtemp.c:211
++#, c-format
++msgid "%s: %s:  %d%sC or %sF\n"
++msgstr "%s: %s:  %d%s¬∞C oder %s¬∞F\n"
++
++#: src/hddtemp.c:235
++#, c-format
++msgid "%s: %s: drive is sleeping\n"
++msgstr "%s: %s: Laufwerk schl√§ft\n"
++
++#: src/hddtemp.c:242
++#, c-format
++msgid "%s: %s:  drive supported, but it doesn't have a temperature sensor.\n"
++msgstr ""
++"%s: %s:  Laufwerk unterst√ºtzt, aber es hat keinen Temperatur-Sensor.\n"
++
++#: src/hddtemp.c:246
++#, c-format
++msgid "ERROR: %s: %s: unknown returned status\n"
++msgstr "FEHLER: %s: %s: zur√ºckgegebener Status unbekannt\n"
++
++#: src/hddtemp.c:261
++#, c-format
++msgid ""
++"\n"
++"If one of the field value seems to match the temperature, be sure to read\n"
++"the hddtemp man page before sending a report (section REPORT). Thanks.\n"
++msgstr ""
++"\n"
++"Falls einer der Feldwerte der Temperatur zu entsprechen scheint, stellen "
++"Sie\n"
++"sicher, die hddtemp-Handbuchseite gelesen zu haben, bevor Sie einen "
++"Bericht\n"
++"senden (Abschnitt BERICHT). Danke.\n"
++
++#: src/hddtemp.c:338
++#, c-format
++msgid "ERROR: invalid separator.\n"
++msgstr "FEHLER: ung√ºltiges Trennzeichen.\n"
++
++#: src/hddtemp.c:349
++#, c-format
++msgid "ERROR: invalid port number.\n"
++msgstr "FEHLER: ung√ºltige Portnummer.\n"
++
++#: src/hddtemp.c:371
++#, c-format
++msgid ""
++" Usage: hddtemp [OPTIONS] [TYPE:]DISK1 [[TYPE:]DISK2]...\n"
++"\n"
++"   hddtemp displays the temperature of drives supplied in argument.\n"
++"   Drives must support S.M.A.R.T.\n"
++"\n"
++"  TYPE could be SATA, PATA or SCSI. If omitted hddtemp will try to guess.\n"
++"\n"
++"  -b   --drivebase   :  display database file content that allow hddtemp "
++"to\n"
++"                        recognize supported drives.\n"
++"  -D   --debug       :  display various S.M.A.R.T. fields and their "
++"values.\n"
++"                        Useful to find a value that seems to match the\n"
++"                        temperature and/or to send me a report.\n"
++"                        (done for every drive supplied).\n"
++"  -d   --daemon      :  run hddtemp in TCP/IP daemon mode (port %d by "
++"default.)\n"
++"  -f   --file=FILE   :  specify database file to use.\n"
++"  -F   --foreground  :  don't daemonize, stay in foreground.\n"
++"  -l   --listen=addr :  listen on a specific interface (in TCP/IP daemon "
++"mode).\n"
++"  -n   --numeric     :  print only the temperature.\n"
++"  -p   --port=#      :  port to listen to (in TCP/IP daemon mode).\n"
++"  -s   --separator=C :  separator to use between fields (in TCP/IP daemon "
++"mode).\n"
++"  -S   --syslog=s    :  log temperature to syslog every s seconds.\n"
++"  -u   --unit=[C|F]  :  force output temperature either in Celsius or "
++"Fahrenheit.\n"
++"  -q   --quiet       :  do not check if the drive is supported.\n"
++"  -v   --version     :  display hddtemp version number.\n"
++"  -w   --wake-up     :  wake-up the drive if need.\n"
++"  -4                 :  listen on IPv4 sockets only.\n"
++"  -6                 :  listen on IPv6 sockets only.\n"
++"\n"
++"Report bugs or new drives to <hddtemp@guzu.net>.\n"
++msgstr ""
++" Verwendung: hddtemp [OPTIONEN] [TYP:]LAUFWERK1 [[TYP:]LAUFWERK2]...\n"
++"\n"
++"  hddtemp zeigt die Temperatur der via Argument angegeben Laufwerke.\n"
++"  Laufwerke m√ºssen S.M.A.R.T. unterst√ºtzen.\n"
++"\n"
++"  TYP kann SATA, PATA oder SCSI sein. Falls ausgelassen, wird hddtemp \n"
++"  versuchen, diesen zu erraten.\n"
++"\n"
++"  -b   --drivebase   :  Datenbank-Datei-Inhalt anzeigen, der hddtemp "
++"erlaubt\n"
++"                        unterst√ºtzte Laufwerke zu erkennen.\n"
++"  -D   --debug       :  verschiedene S.M.A.R.T.-Felder und deren Werte "
++"anzeigen.\n"
++"                       N√ºtzlich, um Werte zu finden, die der Temperatur "
++"entsprechen\n"
++"                       und/oder um mir einen Bericht zu senden.\n"
++"                       (bereits erledigt f√ºr jedes bereitgestellte "
++"Laufwerk).\n"
++"  -d   --daemon      :  hddtemp im TCP/IP-Daemon-Modus ausf√ºhren "
++"(Standardm√§√üig Port %d)\n"
++"  -f   --file=DATEI  :  zu verwendende Datenbank-Datei festlegen.\n"
++"  -F   --foreground  :  nicht daemonisieren, im Vordergrund bleiben.\n"
++"  -l   --listen=addr :  auf einer bestimmten Schnittstelle auf Anfragen "
++"warten (im TCP/IP-Daemon-Modus).\n"
++"  -n   --numeric     :  nur die Temperatur ausgeben.\n"
++"  -p   --port=#      :  Port, auf dem auf Anfragen gewartet werden soll "
++"(im TCP/IP-Daemon-Modus).\n"
++"  -s   --separator=C :  Trennzeichen zur Verwendung zwischen Feldern (im "
++"TCP/IP-Daemon-Modus).\n"
++"  -S   --syslog=s    :  Temperatur alle s Sekunden in das syslog "
++"eintragen.\n"
++"  -u   --unit=[C|F]  :  Ausgabe der Temperatur entweder in Celsius oder "
++"Fahrenheit erzwingen.\n"
++"  -q   --quiet       :  nicht pr√ºfen, ob das Laufwerk unterst√ºtzt wird.\n"
++"  -v   --version     :  Versionsnummer von hddtemp anzeigen.\n"
++"  -w   --wake-up     :  Laufwerk bei Bedarf aufwecken.\n"
++"  -4                 :  nur auf IPv4-Sockets auf Anfragen warten.\n"
++"  -6                 :  nur auf IPv6-Sockets auf Anfragen warten.\n"
++"\n"
++"Fehler oder neue Laufwerke an <hddtemp@guzu.net> melden.\n"
++
++#: src/hddtemp.c:402
++#, c-format
++msgid "hddtemp version %s\n"
++msgstr "hddtemp Version %s\n"
++
++#: src/hddtemp.c:418
++#, c-format
++msgid "ERROR: invalid interval.\n"
++msgstr "FEHLER: ung√ºltiges Intervall.\n"
++
++#: src/hddtemp.c:438
++#, c-format
++msgid "Too few arguments: you must specify one drive, at least.\n"
++msgstr "Zu wenige Argumente: Sie m√ºssen mindestens ein Laufwerk angeben.\n"
++
++#: src/hddtemp.c:448
++#, c-format
++msgid "ERROR: can't use --debug and --daemon or --syslog options together.\n"
++msgstr ""
++"FEHLER: kann Optionen --debug und --daemon oder --syslog nicht zusammen "
++"verwenden.\n"
++
++#: src/hddtemp.c:505
++#, c-format
++msgid "ERROR: %s: can't determine bus type (or this bus type is unknown)\n"
++msgstr ""
++"FEHLER: %s: kann Bus-Typ nicht ermitteln (oder dieser Bus-Typ ist "
++"unbekannt)\n"
++
++#: src/ata.c:66 src/scsi.c:64
++msgid "unknown"
++msgstr "unbekannt"
++
++#: src/ata.c:85 src/ata.c:104 src/scsi.c:91
++#, c-format
++msgid "S.M.A.R.T. not available"
++msgstr "S.M.A.R.T. nicht verf√ºgbar"
++
++#: src/db.c:115
++#, c-format
++msgid ""
++"\n"
++"Regexp%s| Value | Description\n"
++"------%s---------------------\n"
++msgstr ""
++"\n"
++"Regexp%s| Wert | Beschreibung\n"
++"------%s---------------------\n"
++
++#: src/db.c:121
++#, c-format
++msgid "%s%s| %5d | %s\n"
++msgstr "%s%s| %5d | %s\n"
++
++#: src/db.c:236
++#, c-format
++msgid "hddtemp: can't open %1$s: %2$s\n"
++msgstr "hddtemp: kann %1$s nicht √∂ffnen: %2$s\n"
++
++#: src/db.c:250
++#, c-format
++msgid "ERROR: syntax error at line %1$d in %2$s\n"
++msgstr "FEHLER: Syntaxfehler in Zeile %1$d in %2$s\n"
++
++#: src/db.c:257
++#, c-format
++msgid "  ERROR: line exceed %1$d characters in %2$s.\n"
++msgstr "  FEHLER: Zeile √ºberschreitet %1$d Zeichen in %2$s.\n"
++
++#: src/scsi.c:111 src/scsi.c:129
++#, c-format
++msgid "log sense failed : %s"
++msgstr "Protokoll-Erkennung fehlgeschlagen : %s"
+--- hddtemp-0.3-beta15.orig/po/LINGUAS
++++ hddtemp-0.3-beta15/po/LINGUAS
+@@ -1,2 +1,2 @@
+ # Set of available languages.
+-fr pt ru sv 
++de fr pt ru sv 
+--- hddtemp-0.3-beta15.orig/po/hddtemp.pot
++++ hddtemp-0.3-beta15/po/hddtemp.pot
+@@ -1,35 +1,22 @@
+-
+-# Copyright (C) 2006 Free Software Foundation, Inc.
+-# This file is distributed under the same license as the 'hddtemp' package.
+-# Emmanuel VARAGNAT <hddtemp@guzu.net>, 2006.
++# SOME DESCRIPTIVE TITLE.
++# Copyright (C) YEAR Free Software Foundation, Inc.
++# This file is distributed under the same license as the PACKAGE package.
++# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+ #
+ #, fuzzy
+ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+-"Report-Msgid-Bugs-To: hddtemp@guzu.net\n"
+-"POT-Creation-Date: 2005-02-25 22:43+0100\n"
++"Report-Msgid-Bugs-To: \n"
++"POT-Creation-Date: 2006-06-29 16:24+0200\n"
+ "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+-"Last-Translator: Emmanuel Varagnat <hddtemp@guzu.net>\n"
++"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+ "Language-Team: LANGUAGE <LL@li.org>\n"
+ "MIME-Version: 1.0\n"
+ "Content-Type: text/plain; charset=CHARSET\n"
+ "Content-Transfer-Encoding: 8bit\n"
+ 
+-#: src/hddtemp.c:112
+-#, c-format
+-msgid ""
+-"\n"
+-"Regexp%s| Value | Description\n"
+-"------%s---------------------\n"
+-msgstr ""
+-
+-#: src/hddtemp.c:118
+-#, c-format
+-msgid "%s%s| %5d | %s\n"
+-msgstr ""
+-
+-#: src/hddtemp.c:161
++#: src/hddtemp.c:156
+ #, c-format
+ msgid ""
+ "\n"
+@@ -38,7 +25,7 @@
+ "\n"
+ msgstr ""
+ 
+-#: src/hddtemp.c:188
++#: src/hddtemp.c:189
+ #, c-format
+ msgid ""
+ "WARNING: Drive %s doesn't seem to have a temperature sensor.\n"
+@@ -47,67 +34,59 @@
+ "WARNING: See --help, --debug and --drivebase options.\n"
+ msgstr ""
+ 
+-#: src/hddtemp.c:192
+-#, c-format
+-msgid "%s: %s:  no sensor\n"
+-msgstr ""
+-
+ #: src/hddtemp.c:197
+ #, c-format
+-msgid ""
+-"WARNING: Drive %s doesn't appear in the database of supported drives\n"
+-"WARNING: But using a common value, it reports something.\n"
+-"WARNING: Note that the temperature shown could be wrong.\n"
+-"WARNING: See --help, --debug and --drivebase options.\n"
+-"WARNING: And don't forget you can add your drive to hddtemp.db\n"
++msgid "%s: %s:  no sensor\n"
+ msgstr ""
+ 
+-#: src/hddtemp.c:202
++#: src/hddtemp.c:211
+ #, c-format
+ msgid "%s: %s:  %d%sC or %sF\n"
+ msgstr ""
+ 
+-#: src/hddtemp.c:214
++#: src/hddtemp.c:235
+ #, c-format
+ msgid "%s: %s: drive is sleeping\n"
+ msgstr ""
+ 
+-#: src/hddtemp.c:217
++#: src/hddtemp.c:242
+ #, c-format
+-msgid "%s: %s:  known drive, but it doesn't have a temperature sensor.\n"
++msgid "%s: %s:  drive supported, but it doesn't have a temperature sensor.\n"
+ msgstr ""
+ 
+-#: src/hddtemp.c:220
++#: src/hddtemp.c:246
+ #, c-format
+ msgid "ERROR: %s: %s: unknown returned status\n"
+ msgstr ""
+ 
+-#: src/hddtemp.c:235
++#: src/hddtemp.c:261
+ #, c-format
+ msgid ""
+ "\n"
+ "If one of the field value seems to match the temperature, be sure to read\n"
+-"the hddtemp man page before sending me a report (section REPORT). Thanks.\n"
++"the hddtemp man page before sending a report (section REPORT). Thanks.\n"
+ msgstr ""
+ 
+-#: src/hddtemp.c:308
++#: src/hddtemp.c:338
+ #, c-format
+ msgid "ERROR: invalid separator.\n"
+ msgstr ""
+ 
+-#: src/hddtemp.c:319
++#: src/hddtemp.c:349
+ #, c-format
+ msgid "ERROR: invalid port number.\n"
+ msgstr ""
+ 
+-#: src/hddtemp.c:329
++#: src/hddtemp.c:371
+ #, c-format
+ msgid ""
+-" Usage: hddtemp [OPTIONS] DISK1 [DISK2]...\n"
++" Usage: hddtemp [OPTIONS] [TYPE:]DISK1 [[TYPE:]DISK2]...\n"
+ "\n"
+ "   hddtemp displays the temperature of drives supplied in argument.\n"
+ "   Drives must support S.M.A.R.T.\n"
+ "\n"
++"  TYPE could be SATA, PATA or SCSI. If omitted hddtemp will try to guess.\n"
++"\n"
+ "  -b   --drivebase   :  display database file content that allow hddtemp to\n"
+ "                        recognize supported drives.\n"
+ "  -D   --debug       :  display various S.M.A.R.T. fields and their values.\n"
+@@ -117,6 +96,7 @@
+ "  -d   --daemon      :  run hddtemp in TCP/IP daemon mode (port %d by "
+ "default.)\n"
+ "  -f   --file=FILE   :  specify database file to use.\n"
++"  -F   --foreground  :  don't daemonize, stay in foreground.\n"
+ "  -l   --listen=addr :  listen on a specific interface (in TCP/IP daemon "
+ "mode).\n"
+ "  -n   --numeric     :  print only the temperature.\n"
+@@ -124,6 +104,8 @@
+ "  -s   --separator=C :  separator to use between fields (in TCP/IP daemon "
+ "mode).\n"
+ "  -S   --syslog=s    :  log temperature to syslog every s seconds.\n"
++"  -u   --unit=[C|F]  :  force output temperature either in Celsius or "
++"Fahrenheit.\n"
+ "  -q   --quiet       :  do not check if the drive is supported.\n"
+ "  -v   --version     :  display hddtemp version number.\n"
+ "  -w   --wake-up     :  wake-up the drive if need.\n"
+@@ -133,58 +115,69 @@
+ "Report bugs or new drives to <hddtemp@guzu.net>.\n"
+ msgstr ""
+ 
+-#: src/hddtemp.c:522
++#: src/hddtemp.c:402
+ #, c-format
+ msgid "hddtemp version %s\n"
+ msgstr ""
+ 
+-#: src/hddtemp.c:547
++#: src/hddtemp.c:418
+ #, c-format
+ msgid "ERROR: invalid interval.\n"
+ msgstr ""
+ 
+-#: src/hddtemp.c:547
++#: src/hddtemp.c:438
++#, c-format
+ msgid "Too few arguments: you must specify one drive, at least.\n"
+ msgstr ""
+ 
+-#: src/hddtemp.c:557
++#: src/hddtemp.c:448
++#, c-format
+ msgid "ERROR: can't use --debug and --daemon or --syslog options together.\n"
+ msgstr ""
+ 
+-#: src/hddtemp.c:583
++#: src/hddtemp.c:505
+ #, c-format
+ msgid "ERROR: %s: can't determine bus type (or this bus type is unknown)\n"
+ msgstr ""
+ 
+-#: src/ata.c:66 src/scsi.c:68
++#: src/ata.c:66 src/scsi.c:64
+ msgid "unknown"
+ msgstr ""
+ 
+-#: src/ata.c:98
++#: src/ata.c:85 src/ata.c:104 src/scsi.c:91
+ #, c-format
+-msgid "field(%d)\t = %d\n"
++msgid "S.M.A.R.T. not available"
+ msgstr ""
+ 
+-#: src/ata.c:167
+-msgid "S.M.A.R.T. not available"
++#: src/db.c:115
++#, c-format
++msgid ""
++"\n"
++"Regexp%s| Value | Description\n"
++"------%s---------------------\n"
++msgstr ""
++
++#: src/db.c:121
++#, c-format
++msgid "%s%s| %5d | %s\n"
+ msgstr ""
+ 
+-#: src/db.c:180
++#: src/db.c:236
+ #, c-format
+ msgid "hddtemp: can't open %1$s: %2$s\n"
+ msgstr ""
+ 
+-#: src/db.c:194
++#: src/db.c:250
+ #, c-format
+ msgid "ERROR: syntax error at line %1$d in %2$s\n"
+ msgstr ""
+ 
+-#: src/db.c:201
++#: src/db.c:257
+ #, c-format
+ msgid "  ERROR: line exceed %1$d characters in %2$s.\n"
+ msgstr ""
+ 
+-#: src/scsi.c:112 src/scsi.c:130
++#: src/scsi.c:111 src/scsi.c:129
+ #, c-format
+ msgid "log sense failed : %s"
+ msgstr ""
+--- hddtemp-0.3-beta15.orig/src/sata.c
++++ hddtemp-0.3-beta15/src/sata.c
+@@ -118,11 +118,22 @@
+   int              i;
+   u16 *            p;
+ 
+-  if(dsk->db_entry && dsk->db_entry->attribute_id == 0) {
++  if(dsk->db_entry->attribute_id == 0) {
+     close(dsk->fd);
+     dsk->fd = -1;
+     return GETTEMP_NOSENSOR;
+   }
++
++  switch(ata_get_powermode(dsk->fd)) {
++  case PWM_STANDBY:
++  case PWM_SLEEPING:
++    if (!wakeup)
++      return GETTEMP_DRIVE_SLEEP;
++  case PWM_UNKNOWN:
++  case PWM_ACTIVE: /* active or idle */
++  default:
++    break;
++  }
+   
+   /* get SMART values */
+   if(sata_enable_smart(dsk->fd) != 0) {
+@@ -154,24 +165,15 @@
+   }
+ 
+   /* temperature */
+-  if(dsk->db_entry && dsk->db_entry->attribute_id > 0)
+-    field = sata_search_temperature(values, dsk->db_entry->attribute_id);
+-  else
+-    field = sata_search_temperature(values, DEFAULT_ATTRIBUTE_ID);
++  field = sata_search_temperature(values, dsk->db_entry->attribute_id);
+ 
+   if(field)
+     dsk->value = *(field+3);
+ 
+   if(dsk->db_entry && dsk->value != -1)
+     return GETTEMP_KNOWN;
+-  else {
+-    if(dsk->value != -1) {
+-      return GETTEMP_GUESS;
+-    }
+-    else {
+-      return GETTEMP_UNKNOWN;
+-    }
+-  }
++  else
++    return GETTEMP_UNKNOWN;
+ 
+   /* never reached */
+ }
+--- hddtemp-0.3-beta15.orig/src/satacmds.c
++++ hddtemp-0.3-beta15/src/satacmds.c
+@@ -39,7 +39,7 @@
+ #include <sys/ioctl.h>
+ #include <scsi/sg.h>
+ #include <linux/hdreg.h>
+-#include <netinet/in.h>
++#include <byteswap.h>
+ 
+ // Application specific includes
+ #include "satacmds.h"
+@@ -80,8 +80,8 @@
+ 
+   ret = scsi_SG_IO(device, cdb, sizeof(cdb), buffer, cmd[3] * 512, sense, sizeof(sense), dxfer_direction);
+  
+-  /* Verify SATA magics */
+-  if (sense[0] != 0x72 || sense[7] != 0x0e || sense[9] != 0x0e || sense[10] != 0x00)
++  /* Verify SATA magic */
++  if (sense[0] != 0x72)
+     return 1;		  
+   else 
+     return ret;
+@@ -95,10 +95,10 @@
+   p = s;
+   end = &s[bytecount & ~1]; /* bytecount must be even */
+ 
+-  /* convert from big-endian to host byte order */
++  /* convert from big-endian to string order */
+   for (p = end ; p != s;) {
+     unsigned short *pp = (unsigned short *) (p -= 2);
+-    *pp = ntohs(*pp);
++    *pp = bswap_16(*pp);
+   }
+ 
+   /* strip leading blanks */
+--- hddtemp-0.3-beta15.orig/src/backtrace.c
++++ hddtemp-0.3-beta15/src/backtrace.c
+@@ -16,9 +16,10 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#define _GNU_SOURCE
+ #include <features.h>
+ 
+-#if defined(__i386__) && defined(__GLIBC__)
++#if (defined(__i386__) || defined(__x86_64__)) && defined(__GLIBC__)
+ 
+ #include <execinfo.h>
+ 
+@@ -31,8 +32,12 @@
+ #include <bits/sigcontext.h>
+ #include <sys/param.h>
+ 
+-#define __USE_GNU
+ #include <ucontext.h>
++#if defined(__i386__)
++#  define REG_IP REG_EIP
++#elif defined(__x86_64__)
++#  define REG_IP REG_RIP
++#endif
+ 
+ #define MAX_BTSIZE 64
+ 
+@@ -42,7 +47,6 @@
+   static char **messages = NULL;
+   static size_t btsize = 0;
+   static size_t i;
+-  static unsigned int old_eip, old_ebp;
+   static char *strerr = "???";
+   static FILE *fstrm;
+ 
+@@ -61,10 +65,10 @@
+       SIC_CASE(SEGV_MAPERR);
+       SIC_CASE(SEGV_ACCERR);
+     }
+-    fprintf(fstrm, "=== SEGFAULT (%s) : invalid access to %p, in 0x%08x\n",
++    fprintf(fstrm, "=== SEGFAULT (%s) : invalid access to %p, in %p\n",
+ 	    strerr,
+ 	    ist->si_addr,
+-	    puc->uc_mcontext.gregs[REG_EIP]);
++	    (void*)puc->uc_mcontext.gregs[REG_IP]);
+     break;
+   case SIGILL:
+     switch(ist->si_code) {
+@@ -77,10 +81,10 @@
+       SIC_CASE(ILL_COPROC);
+       SIC_CASE(ILL_BADSTK);
+     }
+-    fprintf(fstrm, "=== ILLEGAL INSTR (%s) : invalid access to %p, in 0x%08x\n",
++    fprintf(fstrm, "=== ILLEGAL INSTR (%s) : invalid access to %p, in %p\n",
+ 	    strerr,
+ 	    ist->si_addr,
+-	    puc->uc_mcontext.gregs[REG_EIP]);
++	    (void*)puc->uc_mcontext.gregs[REG_IP]);
+     break;
+   case SIGBUS:
+     switch(ist->si_code) {
+@@ -88,10 +92,10 @@
+       SIC_CASE(BUS_ADRERR);
+       SIC_CASE(BUS_OBJERR);
+     }
+-    fprintf(fstrm, "=== BUS ERROR (%p) : invalid access to %p, in 0x%08x\n",
++    fprintf(fstrm, "=== BUS ERROR (%p) : invalid access to %p, in %p\n",
+ 	    strerr,
+ 	    ist->si_addr,
+-	    puc->uc_mcontext.gregs[REG_EIP]);
++	    (void*)puc->uc_mcontext.gregs[REG_IP]);
+     break;
+   }
+   fflush(fstrm);
+@@ -101,7 +105,7 @@
+   /*
+     old_eip = *(unsigned int*)((void*)&n-4);
+     old_ebp = *(unsigned int*)((void*)&n-8);
+-    *(unsigned int*)((void*)&n-4) = puc->uc_mcontext.gregs[REG_EIP];
++    *(unsigned int*)((void*)&n-4) = puc->uc_mcontext.gregs[REG_IP];
+     *(unsigned int*)((void*)&n-8) = puc->uc_mcontext.gregs[REG_EBP];    
+     
+     btsize = backtrace(btinfo, MAX_BTSIZE);
+@@ -111,14 +115,14 @@
+   */
+   
+   btsize = backtrace(btinfo, MAX_BTSIZE);
+-  btinfo[1] = (void*) puc->uc_mcontext.gregs[REG_EIP];
++  btinfo[1] = (void*) puc->uc_mcontext.gregs[REG_IP];
+ 
+   messages = backtrace_symbols(btinfo, btsize);
+ 
+   for(i = 1;
+       i < btsize;
+       i++)
+-    fprintf(fstrm, "[%d] #%d: %s\n", getpid(), i, messages[i]);
++    fprintf(fstrm, "[%d] #%zu: %s\n", getpid(), i, messages[i]);
+   fflush(fstrm);
+   fclose(fstrm);
+ 
+--- hddtemp-0.3-beta15.orig/src/daemon.c
++++ hddtemp-0.3-beta15/src/daemon.c
+@@ -163,19 +163,16 @@
+ 
+     switch(dsk->ret) {
+     case GETTEMP_NOT_APPLICABLE:
+-      n = snprintf(msg, sizeof(msg), "%s%c%s%c%s%c%c",
++      n = snprintf(msg, sizeof(msg), "%s%c%s%cNA%c*",
+                    dsk->drive, separator,
+                    dsk->model, separator,
+-                   "NA",       separator,
+-                   '*');
++                   separator);
+       break;
+-    case GETTEMP_GUESS:
+     case GETTEMP_UNKNOWN:
+-      n = snprintf(msg, sizeof(msg), "%s%c%s%c%s%c%c",
++      n = snprintf(msg, sizeof(msg), "%s%c%s%cUNK%c*",
+                    dsk->drive, separator,
+-                   dsk->model, separator,
+-                   "UNK",     separator,
+-                   '*');
++                   dsk->model, separator, 
++		   separator);
+       break;
+     case GETTEMP_KNOWN:
+       n = snprintf(msg, sizeof(msg), "%s%c%s%c%d%c%c",
+@@ -185,26 +182,23 @@
+                    get_unit(dsk));
+       break;
+     case GETTEMP_NOSENSOR:
+-      n = snprintf(msg, sizeof(msg), "%s%c%s%c%s%c%c",
++      n = snprintf(msg, sizeof(msg), "%s%c%s%cNOS%c*",
+                    dsk->drive, separator,
+                    dsk->model, separator,
+-                   "NOS",      separator,
+-                   '*');
++                   separator);
+       break;
+     case GETTEMP_DRIVE_SLEEP:
+-      n = snprintf(msg, sizeof(msg), "%s%c%s%c%s%c%c",
++      n = snprintf(msg, sizeof(msg), "%s%c%s%cSLP%c*",
+                    dsk->drive, separator,
+                    dsk->model, separator,
+-                   "SLP",      separator,
+-                   '*');
++                   separator);
+       break;
+     case GETTEMP_ERROR:
+     default:
+-      n = snprintf(msg, sizeof(msg), "%s%c%s%c%s%c%c",
++      n = snprintf(msg, sizeof(msg), "%s%c%s%cERR%c*",
+                    dsk->drive,                        separator,
+                    (dsk->model) ? dsk->model : "???", separator,
+-                   "ERR",                             separator,
+-                   '*');
++                   separator);
+       break;
+     }
+     write(cfd,&separator, 1);
+@@ -222,14 +216,11 @@
+   for(dsk = ldisks; dsk; dsk = dsk->next) {
+     switch(dsk->ret) {
+     case GETTEMP_KNOWN:
+-    case GETTEMP_GUESS:
+-      value_to_unit(dsk);
+-
+       syslog(LOG_INFO, "%s: %s: %d %c", 
+              dsk->drive,
+ 	     dsk->model,
+-	     dsk->value,
+-	     dsk->db_entry->unit);
++	     value_to_unit(dsk),
++	     get_unit(dsk));
+       break;
+     case GETTEMP_DRIVE_SLEEP:
+       syslog(LOG_WARNING, _("%s: %s: drive is sleeping"), 
+@@ -270,28 +261,30 @@
+   fd_set             deffds;
+   time_t             next_time;
+ 
+-  switch(fork()) {
+-  case -1:
+-    perror("fork");
+-    exit(2);
+-    break;
+-  case 0:
+-    break;
+-  default:
+-    exit(0);
+-  }
+-  
+-  setsid();
+-  
+-  switch(fork()) {
+-  case -1:
+-    perror("fork");
+-    exit(2);
+-    break;
+-  case 0:
+-    break;
+-  default:
+-    exit(0);
++if (!foreground) {
++    switch(fork()) {
++    case -1:
++      perror("fork");
++      exit(2);
++      break;
++    case 0:
++      break;
++    default:
++      exit(0);
++    }
++
++    setsid();
++
++    switch(fork()) {
++    case -1:
++      perror("fork");
++      exit(2);
++      break;
++    case 0:
++      break;
++    default:
++      exit(0);
++    }
+   }
+   chdir("/");
+   umask(0);
+--- hddtemp-0.3-beta15.orig/src/hddtemp.c
++++ hddtemp-0.3-beta15/src/hddtemp.c
+@@ -75,7 +75,7 @@
+ char               separator = SEPARATOR;
+ 
+ struct bustype *   bus[BUS_TYPE_MAX];
+-int                tcp_daemon, debug, quiet, numeric, wakeup, af_hint;
++int                tcp_daemon, debug, quiet, numeric, wakeup, foreground, af_hint;
+ 
+ static enum { DEFAULT, CELSIUS, FAHRENHEIT } unit;
+ 
+@@ -194,23 +194,7 @@
+     if (numeric && quiet)
+       printf("0\n");      
+     else
+-      printf(_("%s: %s:  no sensor\n"), dsk->drive, dsk->model);
+-
+-    break;
+-  case GETTEMP_GUESS:
+-
+-    if(!quiet)
+-      fprintf(stderr,
+-	      _("WARNING: Drive %s doesn't appear in the database of supported drives\n"
+-		"WARNING: But using a common value, it reports something.\n"
+-		"WARNING: Note that the temperature shown could be wrong.\n"
+-		"WARNING: See --help, --debug and --drivebase options.\n"
+-		"WARNING: And don't forget you can add your drive to hddtemp.db\n"), dsk->drive);
+-
+-    if (! numeric)
+-      printf(_("%s: %s:  %d%sC or %sF\n"), dsk->drive, dsk->model, dsk->value, degree, degree);
+-    else
+-      printf("%d\n", value_to_unit(dsk));
++      fprintf(stderr, _("%s: %s:  no sensor\n"), dsk->drive, dsk->model);
+ 
+     break;
+   case GETTEMP_KNOWN:
+@@ -232,14 +216,14 @@
+     if (numeric && quiet)
+       printf("0\n");      
+     else
+-      printf(_("%s: %s: drive is sleeping\n"), dsk->drive, dsk->model);
++      fprintf(stderr, _("%s: %s: drive is sleeping\n"), dsk->drive, dsk->model);
+ 
+     break;
+   case GETTEMP_NOSENSOR:
+     if (numeric && quiet)
+       printf("0\n");      
+     else
+-      printf(_("%s: %s:  drive supported, but it doesn't have a temperature sensor.\n"), dsk->drive, dsk->model);
++      fprintf(stderr, _("%s: %s:  drive supported, but it doesn't have a temperature sensor.\n"), dsk->drive, dsk->model);
+       
+     break;
+   default:
+@@ -268,8 +252,9 @@
+ 
+ int main(int argc, char* argv[]) {
+   int           i, c, lindex = 0, db_loaded = 0;
++  int 		ret = 0;
+   int           show_db;
+-  struct disk * ldisks;
++  struct        disk * ldisks;
+ 
+   backtrace_sigsegv();
+   backtrace_sigill();
+@@ -279,7 +264,7 @@
+   bindtextdomain (PACKAGE, LOCALEDIR);
+   textdomain (PACKAGE);
+   
+-  show_db = debug = numeric = quiet = wakeup = af_hint = syslog_interval = 0;
++  show_db = debug = numeric = quiet = wakeup = af_hint = syslog_interval = foreground = 0;
+   unit = DEFAULT;
+   portnum = PORT_NUMBER;
+   listen_addr = NULL;
+@@ -294,6 +279,7 @@
+       {"drivebase",  0, NULL, 'b'},
+       {"debug",      0, NULL, 'D'},
+       {"file",       1, NULL, 'f'},
++      {"foreground", 0, NULL, 'F'},
+       {"listen",     1, NULL, 'l'},
+       {"version",    0, NULL, 'v'},
+       {"port",       1, NULL, 'p'},
+@@ -305,7 +291,7 @@
+       {0, 0, 0, 0}
+     };
+  
+-    c = getopt_long (argc, argv, "bDdf:l:hp:qs:u:vnw46S:", long_options, &lindex);
++    c = getopt_long (argc, argv, "bDdf:l:hp:qs:u:vnw46FS:", long_options, &lindex);
+     if (c == -1)
+       break;
+     
+@@ -382,12 +368,13 @@
+ 		 "                        (done for every drive supplied).\n"
+ 		 "  -d   --daemon      :  run hddtemp in TCP/IP daemon mode (port %d by default.)\n"
+ 		 "  -f   --file=FILE   :  specify database file to use.\n"
++		 "  -F   --foreground  :  don't daemonize, stay in foreground.\n"
+ 		 "  -l   --listen=addr :  listen on a specific interface (in TCP/IP daemon mode).\n"
+                  "  -n   --numeric     :  print only the temperature.\n"
+ 		 "  -p   --port=#      :  port to listen to (in TCP/IP daemon mode).\n"
+ 		 "  -s   --separator=C :  separator to use between fields (in TCP/IP daemon mode).\n"
+ 		 "  -S   --syslog=s    :  log temperature to syslog every s seconds.\n"
+-                 "  -u   --unit=[C|F]  :  force output temperature either in Celius or Fahrenheit.\n"
++                 "  -u   --unit=[C|F]  :  force output temperature either in Celsius or Fahrenheit.\n"
+ 		 "  -q   --quiet       :  do not check if the drive is supported.\n"
+ 		 "  -v   --version     :  display hddtemp version number.\n"
+ 		 "  -w   --wake-up     :  wake-up the drive if need.\n"
+@@ -418,6 +405,9 @@
+ 	  }
+         }
+ 	break;
++      case 'F':
++        foreground = 1;
++	break;
+       default:
+ 	exit(1);
+       }
+@@ -489,6 +479,7 @@
+     if( (dsk->fd = open(dsk->drive, O_RDONLY | O_NONBLOCK)) < 0) {
+       snprintf(dsk->errormsg, MAX_ERRORMSG_SIZE, "open: %s\n", strerror(errno));
+       dsk->type = ERROR;
++      ret = 1;
+       continue;
+     }
+ 
+@@ -501,6 +492,7 @@
+ 
+       ldisks = dsk->next;
+       free(dsk);
++      ret = 1;
+       continue;
+     }
+ 
+@@ -514,11 +506,17 @@
+ 	db_loaded = 1;
+       }      
+ 
++      dsk->db_entry = (struct harddrive_entry *)malloc(sizeof(struct harddrive_entry));
+       dbe = is_a_supported_drive(dsk->model);
+-      if(dbe) {
+-	dsk->db_entry = (struct harddrive_entry *)malloc(sizeof(struct harddrive_entry));
++      if(dbe)
+ 	memcpy(dsk->db_entry, dbe, sizeof(struct harddrive_entry));
+-      }	
++      else {
++        dsk->db_entry->regexp       = "";
++        dsk->db_entry->description  = "";
++        dsk->db_entry->attribute_id = DEFAULT_ATTRIBUTE_ID;
++        dsk->db_entry->unit         = 'C';
++        dsk->db_entry->next         = NULL;
++      }
+     }
+   }
+ 
+@@ -530,5 +528,5 @@
+     do_direct_mode(ldisks);
+   }
+ 
+-  return 0;
++  return ret;
+ }
+--- hddtemp-0.3-beta15.orig/src/ata.c
++++ hddtemp-0.3-beta15/src/ata.c
+@@ -75,7 +75,7 @@
+   int              i;
+   u16 *            p;
+ 
+-  if(dsk->db_entry && dsk->db_entry->attribute_id == 0) {
++  if(dsk->db_entry->attribute_id == 0) {
+     close(dsk->fd);
+     dsk->fd = -1;
+     return GETTEMP_NOSENSOR;
+@@ -140,24 +140,15 @@
+   */
+ 
+   /* temperature */
+-  if(dsk->db_entry && dsk->db_entry->attribute_id > 0)
+-    field = ata_search_temperature(values, dsk->db_entry->attribute_id);
+-  else
+-    field = ata_search_temperature(values, DEFAULT_ATTRIBUTE_ID);
++  field = ata_search_temperature(values, dsk->db_entry->attribute_id);
+ 
+   if(field)
+     dsk->value = *(field+3);
+ 
+-  if(dsk->db_entry && dsk->value != -1)
++  if(dsk->value != -1)
+     return GETTEMP_KNOWN;
+-  else {
+-    if(dsk->value != -1) {
+-      return GETTEMP_GUESS;
+-    }
+-    else {
+-      return GETTEMP_UNKNOWN;
+-    }
+-  }
++  else
++    return GETTEMP_UNKNOWN;
+ 
+   /* never reached */
+ }
+--- hddtemp-0.3-beta15.orig/src/hddtemp.h
++++ hddtemp-0.3-beta15/src/hddtemp.h
+@@ -39,8 +39,6 @@
+   GETTEMP_ERROR,            /* Error */
+   GETTEMP_NOT_APPLICABLE,   /* */
+   GETTEMP_UNKNOWN,          /* Drive is not in database */
+-  GETTEMP_GUESS,            /* Not in database, but something was guessed, user must
+-			       check that the temperature returned is correct */
+   GETTEMP_KNOWN,            /* Drive appear in database */
+   GETTEMP_NOSENSOR,         /* Drive appear in database but is known to have no sensor */
+   GETTEMP_DRIVE_SLEEP       /* Drive is sleeping */
+@@ -78,7 +76,7 @@
+ 
+ extern struct bustype *   bus[BUS_TYPE_MAX];
+ extern char               errormsg[MAX_ERRORMSG_SIZE];
+-extern int                tcp_daemon, debug, quiet, wakeup, af_hint;
++extern int                tcp_daemon, debug, quiet, wakeup, af_hint, foreground;
+ extern char               separator;
+ extern long               portnum, syslog_interval;
+ extern char *             listen_addr;
+--- hddtemp-0.3-beta15.orig/src/scsicmds.c
++++ hddtemp-0.3-beta15/src/scsicmds.c
+@@ -147,6 +147,7 @@
+     return 1;
+   else {
+     scsi_fixstring(buffer + 8, 24);
++    buffer[32] = 0;
+     return 0;
+   }
+ }

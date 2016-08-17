@@ -1,0 +1,27 @@
+Fix the memory leak problem when HAVE_ENVIRON is defined
+
+Upstream-Status: Pending
+
+Signed-off-by: Xufeng Zhang <xufeng.zhang@windriver.com>
+---
+--- a/lib/gprocess.c
++++ b/lib/gprocess.c
+@@ -1421,6 +1421,18 @@
+ void
+ g_process_finish(void)
+ {
++#ifdef HAVE_ENVIRON
++  int i = 0;
++
++  while (environ[i]) {
++    g_free(environ[i]);
++    ++i;
++  }
++  if (environ)
++    g_free(environ);
++  if (process_opts.argv_orig)
++    free(process_opts.argv_orig);
++#endif
+   g_process_remove_pidfile();
+ }
+ 

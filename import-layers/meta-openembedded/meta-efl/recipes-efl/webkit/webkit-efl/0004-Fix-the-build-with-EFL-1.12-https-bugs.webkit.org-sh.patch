@@ -1,0 +1,146 @@
+From baebc004111289ef658c78a42f8332f3dceef41e Mon Sep 17 00:00:00 2001
+From: "ryuan.choi@navercorp.com" <ryuan.choi@navercorp.com>
+Date: Thu, 13 Nov 2014 07:07:16 +0000
+Subject: [PATCH 4/4] Fix the build with EFL 1.12
+ https://bugs.webkit.org/show_bug.cgi?id=138245
+
+Reviewed by Gyuyoung Kim.
+
+Source/WebKit2:
+
+* UIProcess/API/efl/EwkView.cpp:
+First, modified to use Evas_GL raw pointer instead of UniquePtrEfl because
+Evas_GL.h can't be included in UniquePtrEfl.h
+It should be moved into EvasGLContext because WebKit/EFL use only one Evas_GL.
+Second, provided the version of GLES in Evas_GL_Config not to break build with
+EFL 1.12
+(EwkView::EwkView):
+(EwkView::~EwkView):
+(EwkView::displayTimerFired):
+(EwkView::createGLSurface):
+* UIProcess/API/efl/EwkView.h:
+
+Source/WTF:
+
+* wtf/efl/UniquePtrEfl.h:
+Removed Evas_GL.h from UniquePtrEfl.h, which is commonly included, because
+it should not be included with official GL headers.
+
+git-svn-id: http://svn.webkit.org/repository/webkit/trunk@176066 268f45cc-cd09-0410-ab3c-d52691b4dbfc
+---
+ Source/WTF/wtf/efl/UniquePtrEfl.h            |  2 --
+ Source/WebKit2/UIProcess/API/efl/EwkView.cpp | 24 ++++++++++++++++--------
+ Source/WebKit2/UIProcess/API/efl/EwkView.h   |  3 ++-
+ 3 files changed, 18 insertions(+), 11 deletions(-)
+
+diff --git a/Source/WTF/wtf/efl/UniquePtrEfl.h b/Source/WTF/wtf/efl/UniquePtrEfl.h
+index ba0110a..038d3fb 100644
+--- a/Source/WTF/wtf/efl/UniquePtrEfl.h
++++ b/Source/WTF/wtf/efl/UniquePtrEfl.h
+@@ -33,7 +33,6 @@
+ #include <Ecore_IMF.h>
+ #include <Eina.h>
+ #include <Evas.h>
+-#include <Evas_GL.h>
+ 
+ namespace WTF {
+ 
+@@ -51,7 +50,6 @@ using EflUniquePtr = std::unique_ptr<T, EflPtrDeleter<T>>;
+     macro(Eina_Hash, eina_hash_free) \
+     macro(Eina_Module, eina_module_free) \
+     macro(Evas_Object, evas_object_del) \
+-    macro(Evas_GL, evas_gl_free)
+ 
+ #define WTF_DEFINE_EFLPTR_DELETER(typeName, deleterFunc) \
+     template<> struct EflPtrDeleter<typeName> \
+diff --git a/Source/WebKit2/UIProcess/API/efl/EwkView.cpp b/Source/WebKit2/UIProcess/API/efl/EwkView.cpp
+index 50d34ed..6ff3394 100755
+--- a/Source/WebKit2/UIProcess/API/efl/EwkView.cpp
++++ b/Source/WebKit2/UIProcess/API/efl/EwkView.cpp
+@@ -299,9 +299,11 @@ EwkView::EwkView(WKViewRef view, Evas_Object* evasObject)
+ 
+     // FIXME: Remove when possible.
+     static_cast<WebViewEfl*>(webView())->setEwkView(this);
+-    m_evasGL = EflUniquePtr<Evas_GL>(evas_gl_new(evas_object_evas_get(m_evasObject)));
++
++    // FIXME: Consider it to move into EvasGLContext.
++    m_evasGL = evas_gl_new(evas_object_evas_get(m_evasObject));
+     if (m_evasGL)
+-        m_evasGLContext = EvasGLContext::create(m_evasGL.get());
++        m_evasGLContext = EvasGLContext::create(m_evasGL);
+ 
+     if (!m_evasGLContext) {
+         WARN("Failed to create Evas_GL, falling back to software mode.");
+@@ -333,6 +335,9 @@ EwkView::~EwkView()
+ {
+     ASSERT(wkPageToEvasObjectMap().get(wkPage()) == m_evasObject);
+     wkPageToEvasObjectMap().remove(wkPage());
++
++    if (m_evasGL)
++        evas_gl_free(m_evasGL);
+ }
+ 
+ EwkView* EwkView::create(WKViewRef webView, Evas* canvas, Evas_Smart* smart)
+@@ -587,7 +592,7 @@ void EwkView::displayTimerFired(Timer<EwkView>*)
+         return;
+     }
+ 
+-    evas_gl_make_current(m_evasGL.get(), m_evasGLSurface->surface(), m_evasGLContext->context());
++    evas_gl_make_current(m_evasGL, m_evasGLSurface->surface(), m_evasGLContext->context());
+ 
+     WKViewPaintToCurrentGLContext(wkView());
+ 
+@@ -828,21 +833,24 @@ bool EwkView::createGLSurface()
+         EVAS_GL_DEPTH_BIT_8,
+         EVAS_GL_STENCIL_NONE,
+         EVAS_GL_OPTIONS_NONE,
+-        EVAS_GL_MULTISAMPLE_NONE
++        EVAS_GL_MULTISAMPLE_NONE,
++#if defined(EVAS_GL_API_VERSION) && EVAS_GL_API_VERSION >= 2
++        EVAS_GL_GLES_2_X
++#endif
+     };
+ 
+     // Recreate to current size: Replaces if non-null, and frees existing surface after (OwnPtr).
+-    m_evasGLSurface = EvasGLSurface::create(m_evasGL.get(), &evasGLConfig, deviceSize());
++    m_evasGLSurface = EvasGLSurface::create(m_evasGL, &evasGLConfig, deviceSize());
+     if (!m_evasGLSurface)
+         return false;
+ 
+     Evas_Native_Surface nativeSurface;
+-    evas_gl_native_surface_get(m_evasGL.get(), m_evasGLSurface->surface(), &nativeSurface);
++    evas_gl_native_surface_get(m_evasGL, m_evasGLSurface->surface(), &nativeSurface);
+     evas_object_image_native_surface_set(smartData()->image, &nativeSurface);
+ 
+-    evas_gl_make_current(m_evasGL.get(), m_evasGLSurface->surface(), m_evasGLContext->context());
++    evas_gl_make_current(m_evasGL, m_evasGLSurface->surface(), m_evasGLContext->context());
+ 
+-    Evas_GL_API* gl = evas_gl_api_get(m_evasGL.get());
++    Evas_GL_API* gl = evas_gl_api_get(m_evasGL);
+ 
+     WKPoint boundsEnd = WKViewUserViewportToScene(wkView(), WKPointMake(deviceSize().width(), deviceSize().height()));
+     gl->glViewport(0, 0, boundsEnd.x, boundsEnd.y);
+diff --git a/Source/WebKit2/UIProcess/API/efl/EwkView.h b/Source/WebKit2/UIProcess/API/efl/EwkView.h
+index 1c482cf..68dab87 100644
+--- a/Source/WebKit2/UIProcess/API/efl/EwkView.h
++++ b/Source/WebKit2/UIProcess/API/efl/EwkView.h
+@@ -39,6 +39,7 @@
+ #endif
+ 
+ typedef struct _cairo_surface cairo_surface_t;
++typedef struct _Evas_GL Evas_GL;
+ 
+ namespace WebKit {
+ class ContextMenuClientEfl;
+@@ -241,7 +242,7 @@ private:
+     Evas_Object* m_evasObject;
+     RefPtr<EwkContext> m_context;
+     RefPtr<EwkPageGroup> m_pageGroup;
+-    EflUniquePtr<Evas_GL> m_evasGL;
++    Evas_GL* m_evasGL;
+     std::unique_ptr<WebCore::EvasGLContext> m_evasGLContext;
+     std::unique_ptr<WebCore::EvasGLSurface> m_evasGLSurface;
+     bool m_pendingSurfaceResize;
+-- 
+2.1.3
+

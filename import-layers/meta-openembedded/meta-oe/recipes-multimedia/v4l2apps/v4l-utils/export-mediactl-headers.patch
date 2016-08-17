@@ -1,0 +1,15 @@
+Index: v4l-utils-1.6.2/utils/media-ctl/Makefile.am
+===================================================================
+--- v4l-utils-1.6.2.orig/utils/media-ctl/Makefile.am
++++ v4l-utils-1.6.2/utils/media-ctl/Makefile.am
+@@ -4,8 +4,8 @@ libmediactl_la_CFLAGS = $(LIBUDEV_CFLAGS
+ libmediactl_la_LDFLAGS = $(LIBUDEV_LIBS)
+ libv4l2subdev_la_SOURCES = libv4l2subdev.c
+ libv4l2subdev_la_LIBADD = libmediactl.la
+-mediactl_includedir=$(includedir)/mediactl
+-noinst_HEADERS = mediactl.h v4l2subdev.h
++otherincludedir = $(includedir)/mediactl
++otherinclude_HEADERS = mediactl.h v4l2subdev.h
+ 
+ pkgconfig_DATA = libmediactl.pc
+ bin_PROGRAMS = media-ctl

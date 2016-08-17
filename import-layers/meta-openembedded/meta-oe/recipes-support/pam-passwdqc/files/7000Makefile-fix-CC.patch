@@ -1,0 +1,11 @@
+--- pam_passwdqc-1.0.5/Makefile.orig	2012-10-02 20:53:55.443592886 +0900
++++ pam_passwdqc-1.0.5/Makefile	2012-10-02 20:54:19.076108001 +0900
+@@ -2,7 +2,7 @@
+ # Copyright (c) 2000-2003,2005 by Solar Designer.  See LICENSE.
+ #
+ 
+-CC = gcc
++#CC = gcc
+ LD = $(CC)
+ RM = rm -f
+ MKDIR = mkdir -p

@@ -1,0 +1,18 @@
+Make sure libdir (SODIR) is created when running parallel make.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
+
+Index: git/librtmp/Makefile
+===================================================================
+--- git.orig/librtmp/Makefile
++++ git/librtmp/Makefile
+@@ -107,6 +107,7 @@ install_base:	librtmp.a librtmp.pc
+ 	cp librtmp.3 $(MANDIR)/man3
+ 
+ install_so:	librtmp.$(SO_EXT)
++	-mkdir -p $(SODIR)
+ 	cp librtmp.$(SO_EXT) $(SODIR)
+ 	cd $(SODIR); ln -sf librtmp.$(SO_EXT) librtmp.$(SOX)
+ 

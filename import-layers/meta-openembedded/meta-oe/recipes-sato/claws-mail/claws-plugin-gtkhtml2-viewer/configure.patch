@@ -1,0 +1,52 @@
+Index: gtkhtml2_viewer-0.31/configure.ac
+===================================================================
+--- gtkhtml2_viewer-0.31.orig/configure.ac	2011-08-27 08:08:55.000000000 +0000
++++ gtkhtml2_viewer-0.31/configure.ac	2014-07-18 07:28:42.769518618 +0000
+@@ -1,33 +1,27 @@
+ AC_PREREQ(2.60)
+-AC_INIT(src/gtkhtml2_viewer.c)
++
++dnl plugin version
++m4_define([plugin_major_version],[0])
++m4_define([plugin_minor_version],[31])
++m4_define([plugin_micro_version],[0])
++m4_define([plugin_version], [plugin_major_version.plugin_minor_version.plugin_micro_version])
++
++AC_INIT(gtkhml2_viewer, plugin_version)
++AC_CONFIG_SRCDIR(src/gtkhtml2_viewer.c)
+ AC_CONFIG_AUX_DIR(config)
+ AM_MAINTAINER_MODE
+ 
+ PACKAGE=gtkhtml2_viewer
+ 
+-dnl plugin version
+-MAJOR_VERSION=0
+-MINOR_VERSION=31
+-MICRO_VERSION=0
++MAJOR_VERSION=plugin_major_version
++MINOR_VERSION=plugin_minor_version
++MICRO_VERSION=plugin_micro_version
+ EXTRA_VERSION=0
+-
+-if test \( $EXTRA_VERSION -eq 0 \); then
+-    if test \( $MICRO_VERSION -eq 0 \); then
+-        VERSION=${MAJOR_VERSION}.${MINOR_VERSION} 
+-    else
+-		VERSION=${MAJOR_VERSION}.${MINOR_VERSION}.${MICRO_VERSION}
+-    fi
+-else
+-    if test \( $MICRO_VERSION -eq 0 \); then
+-        VERSION=${MAJOR_VERSION}.${MINOR_VERSION}cvs${EXTRA_VERSION}
+-    else
+-		VERSION=${MAJOR_VERSION}.${MINOR_VERSION}.${MICRO_VERSION}cvs${EXTRA_VERSION}
+-    fi
+-fi
++VERSION=plugin_version
+ 
+ AC_CANONICAL_SYSTEM
+ 
+-AM_INIT_AUTOMAKE($PACKAGE, $VERSION, no-define)
++AM_INIT_AUTOMAKE([foreign no-define])
+ AC_CONFIG_HEADERS(config.h)
+ AC_DEFINE_UNQUOTED(PLUGINVERSION, "$VERSION", [plugin version])
+ 

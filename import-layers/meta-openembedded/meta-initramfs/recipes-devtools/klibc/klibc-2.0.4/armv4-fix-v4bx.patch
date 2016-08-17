@@ -1,0 +1,15 @@
+Status: not applicable upstream, in OE/Yocto we use $(FIX_V4BX)
+which is "" in case of armv5 or thumbs.
+
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+
+--- a/usr/klibc/arch/arm/MCONFIG	2013-01-09 01:12:02.000000000 +0100
++++ b/usr/klibc/arch/arm/MCONFIG	2013-01-08 23:45:59.000000000 +0100
+@@ -29,6 +29,7 @@
+ KLIBCSHAREDFLAGS = -Ttext 0x01800200
+ ifeq ($(CONFIG_AEABI),y)
+ KLIBCREQFLAGS += -mabi=aapcs-linux -mno-thumb-interwork
++KLIBCLDFLAGS += $(FIX_ARMV4_EABI_BX)
+ else
+ KLIBCREQFLAGS += -mabi=apcs-gnu -mno-thumb-interwork
+ endif

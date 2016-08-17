@@ -1,0 +1,12 @@
+[Unit]
+Description=Enable zram compressed in-memory swap.
+After=multi-user.target
+
+[Service]
+RemainAfterExit=yes
+ExecStart=/usr/bin/zram-load.sh --load
+ExecStop=/usr/bin/zram-load.sh --unload
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target

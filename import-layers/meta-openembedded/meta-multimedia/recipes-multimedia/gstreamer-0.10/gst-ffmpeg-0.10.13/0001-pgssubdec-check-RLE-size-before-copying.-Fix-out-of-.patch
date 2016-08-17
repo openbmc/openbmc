@@ -1,0 +1,34 @@
+From 28bf685bfc6d0c744369cdf367f61a78d80d0b01 Mon Sep 17 00:00:00 2001
+From: Michael Niedermayer <michaelni@gmx.at>
+Date: Thu, 15 Nov 2012 16:41:28 +0100
+Subject: [PATCH] pgssubdec: check RLE size before copying. Fix out of array
+ accesses
+
+Upstream-Status: Backport
+
+Commit 28bf685bfc6d0c744369cdf367f61a78d80d0b01 release/1.1
+
+Found-by: Mateusz "j00ru" Jurczyk and Gynvael Coldwind
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+(cherry picked from commit c0d68be555f5858703383040e04fcd6529777061)
+---
+ libavcodec/pgssubdec.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/libavcodec/pgssubdec.c b/libavcodec/pgssubdec.c
+index 728f178..26a3c2a 100644
+--- a/gst-libs/ext/libav/libavcodec/pgssubdec.c
++++ b/gst-libs/ext/libav/libavcodec/pgssubdec.c
+@@ -202,6 +202,11 @@ static int parse_picture_segment(AVCodec
+         return -1;
+     }
+ 
++    if (buf_size > rle_bitmap_len) {
++        av_log(avctx, AV_LOG_ERROR, "too much RLE data\n");
++        return AVERROR_INVALIDDATA;
++    }
++
+     ctx->picture.w = width;
+     ctx->picture.h = height;
+ 
+-- 

@@ -1,0 +1,45 @@
+From cbcb848e6d4f4e8c4aa11c80f1f3dbb7fb2d397e Mon Sep 17 00:00:00 2001
+From: Beniamino Galvani <bgalvani@redhat.com>
+Date: Mon, 4 Jan 2016 14:22:01 +0100
+Subject: [PATCH 3/7] device: update @ip_iface only if IP interface exists
+
+If @ip_ifindex is zero, the IP interface has disappeared and
+there's no point in updating @ip_iface.
+
+Actually, unconditionally updating @ip_iface is dangerous because it
+breaks the assumption used by other functions (as
+nm_device_get_ip_ifindex()) that a non-NULL @ip_iface implies a valid
+@ip_ifindex. This was causing the scary failure:
+
+  devices/nm-device.c:666:get_ip_iface_identifier: assertion failed: (ifindex)
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1268617
+(cherry picked from commit ed536998f9530698ff3082fc5587dbeb7d3a594f)
+---
+ src/devices/nm-device.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/src/devices/nm-device.c b/src/devices/nm-device.c
+index bb39ca5..4413e92 100644
+--- a/src/devices/nm-device.c
++++ b/src/devices/nm-device.c
+@@ -1526,12 +1526,13 @@ device_ip_link_changed (NMDevice *self)
+ {
+ 	NMDevicePrivate *priv = NM_DEVICE_GET_PRIVATE (self);
+ 	const NMPlatformLink *pllink;
+-	int ip_ifindex;
+ 
+ 	priv->device_ip_link_changed_id = 0;
+ 
+-	ip_ifindex = nm_device_get_ip_ifindex (self);
+-	pllink = nm_platform_link_get (NM_PLATFORM_GET, ip_ifindex);
++	if (!priv->ip_ifindex)
++		return G_SOURCE_REMOVE;
++
++	pllink = nm_platform_link_get (NM_PLATFORM_GET, priv->ip_ifindex);
+ 	if (!pllink)
+ 		return G_SOURCE_REMOVE;
+ 
+-- 
+2.5.0
+

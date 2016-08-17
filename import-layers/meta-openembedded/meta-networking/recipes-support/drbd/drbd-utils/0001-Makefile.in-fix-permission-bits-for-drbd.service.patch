@@ -1,0 +1,25 @@
+Upstream-Status: Pending
+
+Subject:  Makefile.in: fix permission bits for drbd.service
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ scripts/Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/Makefile.in b/scripts/Makefile.in
+index 402b93b..4a45407 100644
+--- a/scripts/Makefile.in
++++ b/scripts/Makefile.in
+@@ -65,7 +65,7 @@ endif
+ # yes, debian apparently allows installing both types from the same package
+ ifneq ($(initscripttype),sysv)		# "systemd" or "both"
+ 	install -d $(DESTDIR)$(systemdunitdir)
+-	install -m 755 drbd.service $(DESTDIR)$(systemdunitdir)/
++	install -m 644 drbd.service $(DESTDIR)$(systemdunitdir)/
+ 	install -d $(DESTDIR)/lib/drbd/
+ 	install -m 755 drbd $(DESTDIR)/lib/drbd/
+ 	install -d $(DESTDIR)$(tmpfilesdir)/
+-- 
+1.9.1
+

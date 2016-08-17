@@ -1,0 +1,32 @@
+Put gdb source tarball in SRC_URI and don't fetch and extract it during
+do_compile.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+diff --git a/Makefile b/Makefile
+index bb0a34e..5eb7604 100644
+--- a/Makefile
++++ b/Makefile
+@@ -226,7 +226,7 @@ all: make_configure
+ #	@make --no-print-directory extensions
+ 
+ gdb_merge: force
+-	@if [ ! -f ${GDB}/README ]; then \
++	@if [ ! -f ${GDB}/${GDB}.patch ]; then \
+ 	  make --no-print-directory gdb_unzip; fi
+ 	@echo "${LDFLAGS} -lz -ldl -rdynamic" > ${GDB}/gdb/mergelibs
+ 	@echo "../../${PROGRAM} ../../${PROGRAM}lib.a" > ${GDB}/gdb/mergeobj
+@@ -253,11 +253,6 @@ gdb_unzip:
+ 	@rm -f gdb.files
+ 	@for FILE in ${GDB_FILES} dummy; do\
+ 	  echo $$FILE >> gdb.files; done
+-	@if [ ! -f ${GDB}.tar.gz ] && [ ! -f /usr/bin/wget ]; then \
+-	  echo /usr/bin/wget is required to download ${GDB}.tar.gz; echo; exit 1; fi
+-	@if [ ! -f ${GDB}.tar.gz ] && [ -f /usr/bin/wget ]; then \
+-	  wget http://ftp.gnu.org/gnu/gdb/${GDB}.tar.gz; fi
+-	@tar --exclude-from gdb.files -xvzmf ${GDB}.tar.gz
+ 	@make --no-print-directory gdb_patch
+ 
+ gdb_patch:

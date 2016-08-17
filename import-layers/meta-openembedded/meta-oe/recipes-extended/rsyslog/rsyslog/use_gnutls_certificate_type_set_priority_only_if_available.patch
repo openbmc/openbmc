@@ -1,0 +1,79 @@
+From 21674039db99d1067e9df4df04d965297d62c6af Mon Sep 17 00:00:00 2001
+From: Rainer Gerhards <rgerhards@adiscon.com>
+Date: Mon, 18 May 2015 09:36:02 +0200
+Subject: [PATCH] use gnutls_certificate_type_set_priority() only if available
+
+The gnutls_certificate_type_set_priority function is deprecated
+and not available in recent GnuTLS versions. However, there is no
+doc how to properly replace it with gnutls_priority_set_direct.
+A lot of folks have simply removed it, when they also called
+gnutls_set_default_priority. This is what we now also do. If
+this causes problems or someone has an idea of how to replace
+the deprecated function in a better way, please let us know!
+In any case, we use it as long as it is available and let
+not insult us by the deprecation warnings.
+
+Upstream-Status: Backport
+Signed-off-by: Tudor Florea  <tudor.florea@enea.com>
+
+---
+ configure.ac       |  1 +
+ runtime/nsd_gtls.c | 18 ++++++++++++++++--
+ 2 files changed, 17 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 56835fb..1c2be01 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -765,6 +765,7 @@ if test "x$enable_gnutls" = "xyes"; then
+ 	AC_DEFINE([ENABLE_GNUTLS], [1], [Indicator that GnuTLS is present])
+         AC_CHECK_LIB(gnutls, gnutls_global_init)
+ 	AC_CHECK_FUNCS(gnutls_certificate_set_retrieve_function,,)
++	AC_CHECK_FUNCS(gnutls_certificate_type_set_priority,,)
+ fi
+ AM_CONDITIONAL(ENABLE_GNUTLS, test x$enable_gnutls = xyes)
+ 
+diff --git a/runtime/nsd_gtls.c b/runtime/nsd_gtls.c
+index e127834..4b6aab1 100644
+--- a/runtime/nsd_gtls.c
++++ b/runtime/nsd_gtls.c
+@@ -1658,8 +1658,9 @@ Connect(nsd_t *pNsd, int family, uchar *port, uchar *host)
+ 	nsd_gtls_t *pThis = (nsd_gtls_t*) pNsd;
+ 	int sock;
+ 	int gnuRet;
+-	/* TODO: later? static const int cert_type_priority[3] = { GNUTLS_CRT_X509, GNUTLS_CRT_OPENPGP, 0 };*/
++#	if HAVE_GNUTLS_CERTIFICATE_TYPE_SET_PRIORITY
+ 	static const int cert_type_priority[2] = { GNUTLS_CRT_X509, 0 };
++#	endif
+ 	DEFiRet;
+ 
+ 	ISOBJ_TYPE_assert(pThis, nsd_gtls);
+@@ -1688,14 +1689,27 @@ Connect(nsd_t *pNsd, int family, uchar *port, uchar *host)
+ 		gnutls_certificate_set_retrieve_function(xcred, gtlsClientCertCallback);
+ #		else
+ 		gnutls_certificate_client_set_retrieve_function(xcred, gtlsClientCertCallback);
+-#	endif
++#		endif
+ 	} else if(iRet != RS_RET_CERTLESS) {
+ 		FINALIZE; /* we have an error case! */
+ 	}
+ 
+ 	/* Use default priorities */
+ 	CHKgnutls(gnutls_set_default_priority(pThis->sess));
++#	if HAVE_GNUTLS_CERTIFICATE_TYPE_SET_PRIORITY
++	/* The gnutls_certificate_type_set_priority function is deprecated
++	 * and not available in recent GnuTLS versions. However, there is no
++	 * doc how to properly replace it with gnutls_priority_set_direct.
++	 * A lot of folks have simply removed it, when they also called
++	 * gnutls_set_default_priority. This is what we now also do. If
++	 * this causes problems or someone has an idea of how to replace
++	 * the deprecated function in a better way, please let us know!
++	 * In any case, we use it as long as it is available and let
++	 * not insult us by the deprecation warnings.
++	 * 2015-05-18 rgerhards
++	 */
+ 	CHKgnutls(gnutls_certificate_type_set_priority(pThis->sess, cert_type_priority));
++#	endif
+ 
+ 	/* put the x509 credentials to the current session */
+ 	CHKgnutls(gnutls_credentials_set(pThis->sess, GNUTLS_CRD_CERTIFICATE, xcred));

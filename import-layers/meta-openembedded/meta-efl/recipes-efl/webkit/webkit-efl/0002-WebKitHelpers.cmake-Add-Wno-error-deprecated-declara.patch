@@ -1,0 +1,45 @@
+From de93951f89e851b6689718022eebb4b8b1d14c06 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Mon, 13 Jan 2014 17:21:25 +0100
+Subject: [PATCH 2/3] WebKitHelpers.cmake: Add
+ -Wno-error=deprecated-declarations -Wno-error=cast-align
+ -Wno-error=type-limits
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ Source/cmake/WebKitHelpers.cmake | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/Source/cmake/WebKitHelpers.cmake b/Source/cmake/WebKitHelpers.cmake
+index 227b9ee..ae52ef6 100644
+--- a/Source/cmake/WebKitHelpers.cmake
++++ b/Source/cmake/WebKitHelpers.cmake
+@@ -40,6 +40,25 @@ macro(WEBKIT_SET_EXTRA_COMPILER_FLAGS _target)
+             # FIXME: When we use -fno-tree-dce to support the jsCStack branch merge, build error occurs due to the uninitialization. Temporarily we set
+             # uninitialized as build warning in order to support the jsCStack merge. https://bugs.webkit.org/show_bug.cgi?id=127777.
+             set(OLD_COMPILE_FLAGS "-Werror -Wno-error=unused-parameter -Wno-error=uninitialized -Wno-error=literal-suffix ${OLD_COMPILE_FLAGS}")
++            # libsoup-2.4/libsoup/soup-proxy-uri-resolver.h:13:84: error: 'GType soup_proxy_uri_resolver_get_type()' is deprecated (declared at /OE/build/oe-core/tmp-eglibc/sysroots/qemux86-64/usr/include/libsoup-2.4/libsoup/soup-proxy-uri-resolver.h:48) [-Werror=deprecated-declarations]
++            set(OLD_COMPILE_FLAGS "-Wno-error=deprecated-declarations ${OLD_COMPILE_FLAGS}")
++            # webkit-efl/1_1.10.0+1.11.0-beta1-r0/ewebkit/Source/WTF/wtf/text/StringImpl.h:742:87: error: cast from 'uint8_t* {aka unsigned char*}' to 'WTF::StringImpl**' increases required alignment of target type [-Werror=cast-align]
++            set(OLD_COMPILE_FLAGS "-Wno-error=cast-align ${OLD_COMPILE_FLAGS}")
++            # webkit-efl/1_1.10.0+1.11.0-beta1-r0/ewebkit/Source/WebKit2/Shared/linux/WebMemorySamplerLinux.cpp:70:16: error: comparison is always false due to limited range of data type [-Werror=type-limits]
++            set(OLD_COMPILE_FLAGS "-Wno-error=type-limits ${OLD_COMPILE_FLAGS}")
++            # webkit-efl/1_1.11.0-r0/ewebkit/Source/WebKit2/UIProcess/API/efl/EwkView.cpp:832:5: error: missing initializer for member '_Evas_GL_Config::gles_version' [-Werror=missing-field-initializers]
++            # this one is new with efl-1.12
++            set(OLD_COMPILE_FLAGS "-Wno-error=missing-field-initializers ${OLD_COMPILE_FLAGS}")
++            # webkit-efl/1_1.11.0-r0/ewebkit/Source/WTF/wtf/dtoa/bignum.cc:105:10: error: assuming signed overflow does not occur when assuming that (X + c) < X is always false [-Werror=strict-overflow]
++            # this one is new with gcc-5.2
++            set(OLD_COMPILE_FLAGS "-Wno-error=strict-overflow ${OLD_COMPILE_FLAGS}")
++            # webkit-efl/1_1.11.0-r0/ewebkit/Source/WTF/wtf/SaturatedArithmetic.h:46:26: error: suggest parentheses around operand of '!' or change '&' to '&&' or '!' to '~' [-Werror=parentheses]
++            # this one is new with gcc-5.2
++            set(OLD_COMPILE_FLAGS "-Wno-error=parentheses ${OLD_COMPILE_FLAGS}")
++            # webkit-efl/1_1.11.0-r0/ewebkit/Source/WebCore/loader/cache/CachedScript.cpp:103:108: error: logical not is only applied to the left hand side of comparison [-Werror=logical-not-parentheses]
++            # this one is new with gcc-5.2
++            set(OLD_COMPILE_FLAGS "-Wno-error=logical-not-parentheses ${OLD_COMPILE_FLAGS}")
++
+         endif ()
+ 
+         set_target_properties(${_target} PROPERTIES
+-- 
+2.1.3
+

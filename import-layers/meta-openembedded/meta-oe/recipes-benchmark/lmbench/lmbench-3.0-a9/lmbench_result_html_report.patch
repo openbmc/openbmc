@@ -1,0 +1,61 @@
+lmbench: Fix "make html" graph failure
+
+The html-list perl script cannot parse the first line of the result
+files about the lmbench version.
+
+Additional fixes are to make the result's html pages easier to understand.
+
+Signed-off-by: Lin Yu <lin.yu@windriver.com>
+Signed-off-by: Fupan Li <fupan.li@windriver.com>
+
+Reworded patch description.
+
+Upstream-status: inappropriate [ configuration ]
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+diff --git a/results/Makefile b/results/Makefile
+index 0935376..1ef9a15 100644
+--- a/results/Makefile
++++ b/results/Makefile
+@@ -186,6 +186,7 @@ paper:
+ # scratch makes you want a Ghz machine.
+ html: dirs
+ 	-make clean
++	make ps
+ 	#$(SCRIPTS)bghtml $(BG)
+ 	$(SCRIPTS)html-list $(LIST)
+ 	$(MK) LIST="$(LIST)" summary > HTML/summary.out 2> HTML/summary.errs
+diff --git a/scripts/html-list b/scripts/html-list
+index 9850461..6383115 100755
+--- a/scripts/html-list
++++ b/scripts/html-list
+@@ -14,7 +14,7 @@ open(H, ">HTML/specific.html");
+ print H <<EOF;
+ <title>LMBENCH System Results</title>
+ <h1>LMBENCH System Results</h1>
+-<h2><a href=summary>Summary of results</a></h2>
++<h2><a href=summary.out>Summary of results</a></h2>
+ <hr>
+ EOF
+
+@@ -47,7 +47,7 @@ foreach $os (@os) {
+ 		open(F, $file);
+ 		$_ = <F>;
+ 		close(F);
+-		next unless /lmbench1.[01]/;
++		next unless /lmbench[0-9]+.[01]/;
+ 		chop;
+ 		$title = $_;
+ 		#s/.lmbench1.? results for //;
+@@ -103,10 +103,7 @@ EOF
+ 				    if $i < $#os;
+ 				print S<<EOF;
+ <h4>$title</h4>
+-<a href=../$doc{$what}>Information on this benchmark</a> (Not up to date)
+ <p><IMG SRC="${what}${scale}$N.gif">\n<p>
+-<a href=../lmbench.html>
+-<img align=middle src="../gifs/arrows/b_arrow.gif">LMBENCH table of contents</a>
+ <a href=specific.html>
+ <img align=middle src=\"../gifs/graph.gif\">System results table of contents</a>
+ <p>

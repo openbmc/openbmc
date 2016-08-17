@@ -1,0 +1,19 @@
+#!/bin/sh
+
+cd test
+lua -e"_U=true" all.lua > lua-test.tmp
+
+echo "--- test output ---"
+cat lua-test.tmp
+echo ""
+echo ""
+echo "--- ptest result ---"
+
+grep "final OK \!\!\!" lua-test.tmp > /dev/null
+if [ $? -eq 0 ]; then
+   echo "PASS: lua"
+else
+   echo "FAIL: lua"
+fi
+
+rm -f lua-test.tmp

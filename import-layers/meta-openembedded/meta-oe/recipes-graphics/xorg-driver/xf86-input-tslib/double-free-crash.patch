@@ -1,0 +1,20 @@
+xorg-server-1.7.3/hw/xfree86/common/xf86Helper.c contains this code
+causing a double free crash on chvt or exit:
+
+    /* This should *really* be handled in drv->UnInit(dev) call instead, but
+     * if the driver forgets about it make sure we free it or at least crash
+     * with flying colors */
+    if (pInp->private)
+	xfree(pInp->private);
+Index: xf86-input-tslib-0.0.6/src/tslib.c
+===================================================================
+--- xf86-input-tslib-0.0.6.orig/src/tslib.c
++++ xf86-input-tslib-0.0.6/src/tslib.c
+@@ -435,6 +435,7 @@ xf86TslibUninit(InputDriverPtr drv, Inpu
+ 	xf86TslibControlProc(pInfo->dev, DEVICE_OFF);
+ 	ts_close(priv->ts);
+ 	xfree(pInfo->private);
++	pInfo->private = NULL;
+ 	xf86DeleteInput(pInfo, 0);
+ }
+ 

@@ -1,0 +1,32 @@
+gst-ffmpeg: smackerdec: Check that the last indexes are within the
+ table.
+
+Fixes CVE-2011-3944
+
+Upstream-Status: Backport 
+
+Found-by: Mateusz "j00ru" Jurczyk and Gynvael Coldwind
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+---
+ libavcodec/smacker.c |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
+
+diff --git a/libavcodec/smacker.c b/libavcodec/smacker.c
+index 30f99b4..2a8bae8 100644
+--- a/gst-libs/ext/libav/libavcodec/smacker.c
++++ b/gst-libs/ext/libav/libavcodec/smacker.c
+@@ -259,6 +259,11 @@ static int smacker_decode_header_tree(SmackVContext *smk, GetBitContext *gb, int
+     if(ctx.last[0] == -1) ctx.last[0] = huff.current++;
+     if(ctx.last[1] == -1) ctx.last[1] = huff.current++;
+     if(ctx.last[2] == -1) ctx.last[2] = huff.current++;
++    if(huff.current > huff.length){
++        ctx.last[0] = ctx.last[1] = ctx.last[2] = 1;
++        av_log(smk->avctx, AV_LOG_ERROR, "bigtree damaged\n");
++        return -1;
++    }
+ 
+     *recodes = huff.values;
+ 
+-- 
+1.7.5.4
+

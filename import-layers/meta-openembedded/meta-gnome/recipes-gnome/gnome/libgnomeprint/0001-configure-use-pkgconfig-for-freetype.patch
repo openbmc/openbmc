@@ -1,0 +1,37 @@
+From ed31fd89f4c77d89390774d29427898a85b25ab1 Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen@dominion.thruhere.net>
+Date: Fri, 1 Aug 2014 13:58:36 +0200
+Subject: [PATCH] configure: use pkgconfig for freetype
+
+Upstream-status: Pending
+Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
+---
+ configure.in | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index 729278d..e569429 100644
+--- a/configure.in
++++ b/configure.in
+@@ -164,13 +164,11 @@ dnl Checking for freetype2
+ dnl =================================
+ FREETYPE_LIBS=
+ FREETYPE_CFLAGS=
+-AC_PATH_PROG(FREETYPE_CONFIG, freetype-config, no)
+-if test "x$FREETYPE_CONFIG" = "xno" ; then
+-	AC_MSG_ERROR(You need FreeType2 (freetype-devel v 2.x package) for this version of libgnomeprint)
+-else
+-	FREETYPE_CFLAGS=`$FREETYPE_CONFIG --cflags`
+-	FREETYPE_LIBS=`$FREETYPE_CONFIG --libs`
+-fi
++PKG_CHECK_MODULES(FREETYPE2, freetype2, 
++    FREETYPE_CFLAGS="$CFLAGS $FREETYPE2_CFLAGS"
++    FREETYPE_LIBS="$LIBS $FREETYPE2_LIBS",
++    AC_MSG_ERROR([*** Unable to find FreeType2 library (http://www.freetype.org/)])
++)
+ 
+ libgnomeprint_save_ldflags=$LDFLAGS
+ LDFLAGS="$LDFLAGS $FREETYPE_LIBS"
+-- 
+1.9.0
+

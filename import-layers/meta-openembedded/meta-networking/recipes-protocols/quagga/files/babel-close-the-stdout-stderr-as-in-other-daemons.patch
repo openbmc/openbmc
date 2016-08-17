@@ -1,0 +1,50 @@
+From ba71f768e6dbb1f2ac72ed3bd880bff75a48d345 Mon Sep 17 00:00:00 2001
+From: Roy Li <rongqing.li@windriver.com>
+Date: Wed, 19 Feb 2014 14:13:40 +0800
+Subject: [PATCH] babeld: close stdout once the background daemon is created
+
+Upstream-Status: pending
+
+Once babald becomes a background daemon, it should not output information to
+stdout, so need to close stdout.
+
+In fact, other daemons close their stdout when they run into background, like
+ospfd, isisd and bgpd, by calling daemon() which is in lib/daemon.c
+
+Closing the stdout can fix a tee hang issue { #/usr/sbin/babeld -d |tee tmp }
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ babeld/util.c |   10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/babeld/util.c b/babeld/util.c
+index 011f382..76203bc 100644
+--- a/babeld/util.c
++++ b/babeld/util.c
+@@ -425,7 +425,7 @@ uchar_to_in6addr(struct in6_addr *dest, const unsigned char *src)
+ int
+ daemonise()
+ {
+-    int rc;
++    int rc, fd;
+ 
+     fflush(stdout);
+     fflush(stderr);
+@@ -441,5 +441,13 @@ daemonise()
+     if(rc < 0)
+         return -1;
+ 
++    fd = open("/dev/null", O_RDWR, 0);
++    if (fd != -1)
++    {
++        dup2(fd, STDOUT_FILENO);
++        if (fd > 2)
++            close(fd);
++    }
++
+     return 1;
+ }
+-- 
+1.7.10.4
+

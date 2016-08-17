@@ -1,0 +1,27 @@
+From 611c9fe719c5aa264a2ad2eb920cf4522ae2ddec Mon Sep 17 00:00:00 2001
+From: Ting Liu <b28495@freescale.com>
+Date: Tue, 12 Jun 2012 14:26:16 -0400
+Subject: [PATCH] discard use of dnl in Makefile.am
+
+Since Makefile.am is not processed by m4, but by automake, 'dnl' does
+not introduce a comment.
+
+Signed-off-by: Ting Liu <b28495@freescale.com>
+---
+ Makefile.am |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index eff6977..3091c33 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,5 +1,5 @@
+ PACKAGE = rp-pppoe
+ VERSION = 3.8
+ 
+-dnl AM_CFLAGS = -Wall -DDEBUG
++##dnl AM_CFLAGS = -Wall -DDEBUG
+ SUBDIRS = src
+-- 
+1.7.6.5
+

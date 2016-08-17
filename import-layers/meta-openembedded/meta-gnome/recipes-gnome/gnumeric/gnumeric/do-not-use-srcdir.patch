@@ -1,0 +1,15 @@
+Index: gnumeric-1.12.0/test/Makefile.am
+===================================================================
+--- gnumeric-1.12.0.orig/test/Makefile.am	2011-05-17 17:54:24.000000000 -0700
++++ gnumeric-1.12.0/test/Makefile.am	2013-10-17 20:28:19.920618596 -0700
+@@ -25,7 +25,9 @@
+ #
+ # 90xx: Misc stuff.
+ 
+-TESTS = $(sort $(wildcard $(srcdir)/t[0-9][0-9][0-9][0-9]-*.pl))
++TESTS_EXTENSIONS=.pl
++TESTS = @auto_find_tests@
++
+ SUPPS = common.supp commondots.supp gui.supp t8003-valgrind-pdf.supp
+ 
+ import-db:

@@ -1,0 +1,484 @@
+From 1b70b7a798eeeec554ab5aa9fcfff96a22e91774 Mon Sep 17 00:00:00 2001
+From: Gustavo Sverzut Barbieri <barbieri@profusion.mobi>
+Date: Thu, 26 May 2011 17:30:04 -0300
+Subject: [PATCH] Allow disabling atasmart, lvm2 and devicemapper support.
+
+https://bugs.freedesktop.org/show_bug.cgi?id=37647
+
+diff --git a/configure.ac b/configure.ac
+index 62cc35d..b664135 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -155,13 +155,33 @@ PKG_CHECK_MODULES(POLKIT_GOBJECT_1, [polkit-gobject-1 >= 0.97])
+ AC_SUBST(POLKIT_GOBJECT_1_CFLAGS)
+ AC_SUBST(POLKIT_GOBJECT_1_LIBS)
+ 
+-PKG_CHECK_MODULES(LIBPARTED, [libparted >= 1.8.8])
+-AC_SUBST(LIBPARTED_CFLAGS)
+-AC_SUBST(LIBPARTED_LIBS)
+-
+-PKG_CHECK_MODULES(DEVMAPPER, [devmapper >= 1.02])
+-AC_SUBST(DEVMAPPER_CFLAGS)
+-AC_SUBST(DEVMAPPER_LIBS)
++have_parted=no
++AC_ARG_ENABLE(parted, AS_HELP_STRING([--disable-parted], [disable disk partitioning]))
++if test "x$enable_parted" != "xno"; then
++  PKG_CHECK_MODULES(LIBPARTED, [libparted >= 1.8.8],
++                    [AC_DEFINE(USE_PARTED, 1, [Define if parted should be used]) have_parted=yes],
++                    have_parted=no)
++  AC_SUBST(LIBPARTED_CFLAGS)
++  AC_SUBST(LIBPARTED_LIBS)
++  if test "x$have_parted" = xno -a "x$enable_parted" = xyes; then
++    AC_MSG_ERROR([parted support requested but libraries not found])
++  fi
++fi
++AM_CONDITIONAL(HAVE_PARTED, [test "$have_parted" = "yes"])
++
++have_devmapper=no
++AC_ARG_ENABLE(devmapper, AS_HELP_STRING([--disable-devmapper], [disable device mapper support]))
++if test "x$enable_devmapper" != "xno"; then
++  PKG_CHECK_MODULES(DEVMAPPER, [devmapper >= 1.02],
++                    [AC_DEFINE(HAVE_DEVMAPPER, 1, [Define if device mapper is available]) have_devmapper=yes],
++                    have_devmapper=no)
++  AC_SUBST(DEVMAPPER_CFLAGS)
++  AC_SUBST(DEVMAPPER_LIBS)
++  if test "x$have_devmapper" = xno -a "x$enable_devmapper" = xyes; then
++    AC_MSG_ERROR([devmapper support requested but libraries not found])
++  fi
++fi
++AM_CONDITIONAL(HAVE_DEVMAPPER, [test "$have_devmapper" = "yes"])
+ 
+ have_lvm2=no
+ AC_ARG_ENABLE(lvm2, AS_HELP_STRING([--disable-lvm2], [disable LVM2 support]))
+@@ -185,9 +205,19 @@ if test "x$enable_dmmp" != "xno"; then
+ fi
+ AM_CONDITIONAL(HAVE_DMMP, [test "$have_dmmp" = "yes"])
+ 
+-PKG_CHECK_MODULES(LIBATASMART, [libatasmart >= 0.14])
+-AC_SUBST(LIBATASMART_CFLAGS)
+-AC_SUBST(LIBATASMART_LIBS)
++have_libatasmart=no
++AC_ARG_ENABLE(libatasmart, AS_HELP_STRING([--disable-libatasmart], [disable libatasmart support]))
++if test "x$enable_libatasmart" != "xno"; then
++  PKG_CHECK_MODULES(LIBATASMART, [libatasmart >= 0.14],
++                    [AC_DEFINE(HAVE_LIBATASMART, 1, [Define if libatasmart is available]) have_libatasmart=yes],
++                    have_libatasmart=no)
++  AC_SUBST(LIBATASMART_CFLAGS)
++  AC_SUBST(LIBATASMART_LIBS)
++  if test "x$have_libatasmart" = xno -a "x$enable_libatasmart" = xyes; then
++    AC_MSG_ERROR([libatasmart support requested but libraries not found])
++  fi
++fi
++AM_CONDITIONAL(HAVE_LIBATASMART, [test "$have_libatasmart" = "yes"])
+ 
+ PKG_CHECK_MODULES(LIBUDEV, [libudev >= 143])
+ AC_SUBST(LIBUDEV_CFLAGS)
+@@ -267,9 +297,12 @@ echo "
+         cppflags:                   ${CPPFLAGS}
+         xsltproc:                   ${XSLTPROC}
+ 
++        Parted support:             ${have_parted}
++        Device Mapper support:      ${have_devmapper}
+         LVM2 support:               ${have_lvm2}
+         dm-multipath:               ${have_dmmp}
+         Remote Access:              ${remote_access}
++        libatasmart support:        ${have_libatasmart}
+ 
+         Maintainer mode:            ${USE_MAINTAINER_MODE}
+         Profiling:                  ${enable_profiling}
+diff --git a/src/adapter-private.h b/src/adapter-private.h
+index 3409e21..ef584e3 100644
+--- a/src/adapter-private.h
++++ b/src/adapter-private.h
+@@ -23,7 +23,6 @@
+ 
+ #include <dbus/dbus-glib.h>
+ #include <gudev/gudev.h>
+-#include <atasmart.h>
+ 
+ #include "types.h"
+ 
+diff --git a/src/adapter.c b/src/adapter.c
+index b85a0ef..802420b 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -30,7 +30,6 @@
+ #include <dbus/dbus-glib.h>
+ #include <dbus/dbus-glib-lowlevel.h>
+ #include <gudev/gudev.h>
+-#include <atasmart.h>
+ 
+ #include "daemon.h"
+ #include "adapter.h"
+diff --git a/src/daemon.c b/src/daemon.c
+index 6072502..d043cb0 100644
+--- a/src/daemon.c
++++ b/src/daemon.c
+@@ -1745,6 +1745,7 @@ mdstat_changed_event (GIOChannel *channel,
+   return TRUE;
+ }
+ 
++#ifdef HAVE_LIBATASMART
+ static gboolean
+ refresh_ata_smart_data (Daemon *daemon)
+ {
+@@ -1773,6 +1774,7 @@ refresh_ata_smart_data (Daemon *daemon)
+ 
+   return FALSE;
+ }
++#endif
+ 
+ static gboolean
+ register_disks_daemon (Daemon *daemon)
+@@ -1984,12 +1986,14 @@ daemon_new (void)
+   mount_file_clean_stale (l);
+   g_list_free (l);
+ 
++#ifdef HAVE_LIBATASMART
+   /* set up timer for refreshing ATA SMART data - we don't want to refresh immediately because
+    * when adding a device we also do this...
+    */
+   daemon->priv->ata_smart_refresh_timer_id = g_timeout_add_seconds (ATA_SMART_REFRESH_INTERVAL_SECONDS,
+                                                                     (GSourceFunc) refresh_ata_smart_data,
+                                                                     daemon);
++#endif
+ 
+   PROFILE ("daemon_new(): end");
+   return daemon;
+diff --git a/src/device-private.c b/src/device-private.c
+index 22a0d35..fb96525 100644
+--- a/src/device-private.c
++++ b/src/device-private.c
+@@ -1378,7 +1378,7 @@ device_set_drive_ata_smart_time_collected (Device *device,
+ 
+ void
+ device_set_drive_ata_smart_status (Device *device,
+-                                   SkSmartOverall value)
++                                   guint value)
+ {
+   if (G_UNLIKELY (device->priv->drive_ata_smart_status != value))
+     {
+diff --git a/src/device-private.h b/src/device-private.h
+index a6db7f2..71473a6 100644
+--- a/src/device-private.h
++++ b/src/device-private.h
+@@ -23,7 +23,6 @@
+ 
+ #include <dbus/dbus-glib.h>
+ #include <gudev/gudev.h>
+-#include <atasmart.h>
+ 
+ #include "types.h"
+ 
+@@ -224,7 +223,7 @@ struct DevicePrivate
+ 
+   gboolean drive_ata_smart_is_available;
+   guint64 drive_ata_smart_time_collected;
+-  SkSmartOverall drive_ata_smart_status;
++  guint drive_ata_smart_status;
+   void *drive_ata_smart_blob;
+   gsize drive_ata_smart_blob_size;
+ 
+@@ -391,7 +390,7 @@ void device_set_holders_objpath (Device *device, GStrv value);
+ 
+ void device_set_drive_ata_smart_is_available (Device *device, gboolean value);
+ void device_set_drive_ata_smart_time_collected (Device *device, guint64 value);
+-void device_set_drive_ata_smart_status (Device *device, SkSmartOverall value);
++void device_set_drive_ata_smart_status (Device *device, guint value);
+ void device_set_drive_ata_smart_blob_steal (Device *device, gchar *blob, gsize blob_size);
+ 
+ G_END_DECLS
+diff --git a/src/device.c b/src/device.c
+index 6a34940..7a5a4a9 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -50,7 +50,9 @@
+ #include <dbus/dbus-glib.h>
+ #include <dbus/dbus-glib-lowlevel.h>
+ #include <gudev/gudev.h>
++#ifdef HAVE_LIBATASMART
+ #include <atasmart.h>
++#endif
+ 
+ #include "daemon.h"
+ #include "device.h"
+@@ -659,10 +661,14 @@ get_property (GObject *object,
+     case PROP_DRIVE_ATA_SMART_STATUS:
+       {
+         const gchar *status;
+-        if (device->priv->drive_ata_smart_status == (SkSmartOverall) - 1)
++#ifdef HAVE_LIBATASMART
++        if (device->priv->drive_ata_smart_status == (guint) - 1)
+           status = "";
+         else
+           status = sk_smart_overall_to_string (device->priv->drive_ata_smart_status);
++#else
++        status = "";
++#endif
+         g_value_set_string (value, status);
+       }
+       break;
+@@ -5114,6 +5120,7 @@ device_new (Daemon *daemon,
+       goto out;
+     }
+ 
++#ifdef HAVE_LIBATASMART
+   /* if just added, update the smart data if applicable */
+   if (device->priv->drive_ata_smart_is_available)
+     {
+@@ -5121,6 +5128,7 @@ device_new (Daemon *daemon,
+       gchar *ata_smart_refresh_data_options[] = { NULL };
+       device_drive_ata_smart_refresh_data (device, ata_smart_refresh_data_options, NULL);
+     }
++#endif
+ 
+   PROFILE ("device_new(native_path=%s): end", native_path);
+  out:
+@@ -9794,16 +9802,18 @@ drive_ata_smart_refresh_data_completed_cb (DBusGMethodInvocation *context,
+                                            const char *stdout,
+                                            gpointer user_data)
+ {
++#ifdef HAVE_LIBATASMART
+   gint rc;
+-  SkDisk *d;
++  SkDisk *d = NULL;
++  SkSmartOverall overall;
+   gchar *blob;
+   gsize blob_size;
+   time_t time_collected;
+-  SkSmartOverall overall;
++#endif
+ 
+   PROFILE ("drive_ata_smart_refresh_data_completed_cb(device=%s) start", device->priv->native_path);
+ 
+-  d = NULL;
++#ifdef HAVE_LIBATASMART
+   blob = NULL;
+ 
+   if (job_was_cancelled || stdout == NULL)
+@@ -9907,6 +9917,11 @@ drive_ata_smart_refresh_data_completed_cb (DBusGMethodInvocation *context,
+   g_free (blob);
+   if (d != NULL)
+     sk_disk_free (d);
++
++#else
++  throw_error (context, ERROR_FAILED, "libatasmart support disabled");
++#endif
++
+   PROFILE ("drive_ata_smart_refresh_data_completed_cb(device=%s) end", device->priv->native_path);
+ }
+ 
+diff --git a/src/expander-private.h b/src/expander-private.h
+index ef4f440..98a8300 100644
+--- a/src/expander-private.h
++++ b/src/expander-private.h
+@@ -23,7 +23,6 @@
+ 
+ #include <dbus/dbus-glib.h>
+ #include <gudev/gudev.h>
+-#include <atasmart.h>
+ 
+ #include "types.h"
+ 
+diff --git a/src/expander.c b/src/expander.c
+index 734ec0a..e799f13 100644
+--- a/src/expander.c
++++ b/src/expander.c
+@@ -34,7 +34,6 @@
+ #include <dbus/dbus-glib.h>
+ #include <dbus/dbus-glib-lowlevel.h>
+ #include <gudev/gudev.h>
+-#include <atasmart.h>
+ #include <stdlib.h>
+ 
+ #include "daemon.h"
+diff --git a/src/helpers/Makefile.am b/src/helpers/Makefile.am
+index 4b863c0..d3ec4e9 100644
+--- a/src/helpers/Makefile.am
++++ b/src/helpers/Makefile.am
+@@ -19,15 +19,9 @@ INCLUDES = \
+ 
+ libexec_PROGRAMS = 					\
+ 	udisks-helper-mkfs                    		\
+-	udisks-helper-delete-partition        		\
+-	udisks-helper-create-partition        		\
+-	udisks-helper-modify-partition        		\
+-	udisks-helper-create-partition-table		\
+ 	udisks-helper-change-filesystem-label 		\
+ 	udisks-helper-linux-md-remove-component		\
+ 	udisks-helper-fstab-mounter			\
+-	udisks-helper-ata-smart-collect			\
+-	udisks-helper-ata-smart-selftest		\
+ 	udisks-helper-drive-detach			\
+ 	udisks-helper-drive-poll			\
+ 	udisks-helper-linux-md-check			\
+@@ -48,6 +42,13 @@ udisks_helper_mkfs_SOURCES = job-shared.h job-mkfs.c
+ udisks_helper_mkfs_CPPFLAGS = $(AM_CPPFLAGS)
+ udisks_helper_mkfs_LDADD = $(GLIB_LIBS)
+ 
++if HAVE_PARTED
++libexec_PROGRAMS +=                                     \
++	udisks-helper-delete-partition        		\
++	udisks-helper-create-partition        		\
++	udisks-helper-modify-partition        		\
++	udisks-helper-create-partition-table
++
+ udisks_helper_delete_partition_SOURCES = job-shared.h job-delete-partition.c
+ udisks_helper_delete_partition_CPPFLAGS = $(AM_CPPFLAGS)
+ udisks_helper_delete_partition_LDADD = $(GLIB_LIBS) libpartutil.la
+@@ -63,11 +64,17 @@ udisks_helper_modify_partition_LDADD = $(GLIB_LIBS) libpartutil.la
+ udisks_helper_create_partition_table_SOURCES = job-shared.h job-create-partition-table.c
+ udisks_helper_create_partition_table_CPPFLAGS = $(AM_CPPFLAGS)
+ udisks_helper_create_partition_table_LDADD = $(GLIB_LIBS) libpartutil.la
++endif
+ 
+ udisks_helper_change_filesystem_label_SOURCES = job-shared.h job-change-filesystem-label.c
+ udisks_helper_change_filesystem_label_CPPFLAGS = $(AM_CPPFLAGS)
+ udisks_helper_change_filesystem_label_LDADD = $(GLIB_LIBS)
+ 
++if HAVE_LIBATASMART
++libexec_PROGRAMS +=                                     \
++	udisks-helper-ata-smart-collect			\
++	udisks-helper-ata-smart-selftest
++
+ udisks_helper_ata_smart_selftest_SOURCES = job-shared.h job-ata-smart-selftest.c
+ udisks_helper_ata_smart_selftest_CPPFLAGS = $(AM_CPPFLAGS) $(LIBATASMART_CFLAGS) $(GLIB_CFLAGS)
+ udisks_helper_ata_smart_selftest_LDADD = $(LIBATASMART_LIBS) $(GLIB_LIBS)
+@@ -75,6 +82,7 @@ udisks_helper_ata_smart_selftest_LDADD = $(LIBATASMART_LIBS) $(GLIB_LIBS)
+ udisks_helper_ata_smart_collect_SOURCES = job-ata-smart-collect.c
+ udisks_helper_ata_smart_collect_CPPFLAGS = $(AM_CPPFLAGS) $(LIBATASMART_CFLAGS) $(GLIB_CFLAGS)
+ udisks_helper_ata_smart_collect_LDADD = $(LIBATASMART_LIBS) $(GLIB_LIBS)
++endif
+ 
+ udisks_helper_linux_md_remove_component_SOURCES = job-shared.h job-linux-md-remove-component.c
+ udisks_helper_linux_md_remove_component_CPPFLAGS = $(AM_CPPFLAGS)
+diff --git a/src/helpers/partutil.c b/src/helpers/partutil.c
+index 72a8fe3..8893a39 100644
+--- a/src/helpers/partutil.c
++++ b/src/helpers/partutil.c
+@@ -62,7 +62,6 @@ DEBUG (const gchar *format,
+ #  include <config.h>
+ #endif
+ 
+-#define USE_PARTED
+ #ifdef USE_PARTED
+ #include <parted/parted.h>
+ #endif
+@@ -928,6 +927,7 @@ part_table_parse_apple (int fd,
+   return p;
+ }
+ 
++#ifdef USE_PARTED
+ static PartitionTable *
+ part_table_load_from_disk_from_file (char *device_file)
+ {
+@@ -948,6 +948,7 @@ part_table_load_from_disk_from_file (char *device_file)
+  out:
+   return ret;
+ }
++#endif
+ 
+ PartitionTable *
+ part_table_load_from_disk (int fd)
+diff --git a/src/port-private.h b/src/port-private.h
+index cc48376..a91532f 100644
+--- a/src/port-private.h
++++ b/src/port-private.h
+@@ -23,7 +23,6 @@
+ 
+ #include <dbus/dbus-glib.h>
+ #include <gudev/gudev.h>
+-#include <atasmart.h>
+ 
+ #include "types.h"
+ 
+diff --git a/src/probers/Makefile.am b/src/probers/Makefile.am
+index 06bb566..01c693b 100644
+--- a/src/probers/Makefile.am
++++ b/src/probers/Makefile.am
+@@ -22,8 +22,6 @@ INCLUDES = \
+ 
+ udevhelperdir = $(slashlibdir)/udev
+ udevhelper_PROGRAMS =	udisks-part-id 			\
+-			udisks-dm-export 		\
+-		      	udisks-probe-ata-smart 		\
+ 			udisks-probe-sas-expander 	\
+ 			$(NULL)
+ 
+@@ -35,17 +33,23 @@ udisks_part_id_SOURCES = part-id.c
+ udisks_part_id_CPPFLAGS = $(AM_CPPFLAGS) $(LIBUDEV_CFLAGS)
+ udisks_part_id_LDADD = $(GLIB_LIBS) $(LIBUDEV_LIBS) $(top_builddir)/src/helpers/libpartutil.la
+ 
++if HAVE_DEVMAPPER
++udevhelper_PROGRAMS += udisks-dm-export
+ udisks_dm_export_SOURCES = udisks-dm-export.c
+ udisks_dm_export_CPPFLAGS = $(AM_CPPFLAGS) $(DEVMAPPER_CFLAGS) $(GLIB_CFLAGS)
+ udisks_dm_export_LDADD = $(DEVMAPPER_LIBS) $(GLIB_LIBS)
++endif
+ 
+ udisks_lvm_pv_export_SOURCES = udisks-lvm-pv-export.c
+ udisks_lvm_pv_export_CPPFLAGS = $(AM_CPPFLAGS) $(DEVMAPPER_CFLAGS) $(LVM2_CFLAGS) $(GLIB_CFLAGS)
+ udisks_lvm_pv_export_LDADD = $(DEVMAPPER_LIBS) $(LVM2_LIBS) $(GLIB_LIBS)
+ 
++if HAVE_LIBATASMART
++udevhelper_PROGRAMS += udisks-probe-ata-smart
+ udisks_probe_ata_smart_SOURCES = udisks-probe-ata-smart.c
+ udisks_probe_ata_smart_CPPFLAGS = $(AM_CPPFLAGS) $(LIBATASMART_CFLAGS)
+ udisks_probe_ata_smart_LDADD = $(LIBATASMART_LIBS)
++endif
+ 
+ udisks_probe_sas_expander_SOURCES = udisks-probe-sas-expander.c
+ udisks_probe_sas_expander_CPPFLAGS = $(AM_CPPFLAGS) $(GLIB_CFLAGS)
+diff --git a/tools/udisks.c b/tools/udisks.c
+index 6fbd6a6..e0c4fbb 100644
+--- a/tools/udisks.c
++++ b/tools/udisks.c
+@@ -43,7 +43,9 @@
+ #include <dbus/dbus-glib.h>
+ #include <dbus/dbus-glib-lowlevel.h>
+ 
++#ifdef HAVE_LIBATASMART
+ #include <atasmart.h>
++#endif
+ 
+ #include "udisks-daemon-glue.h"
+ #include "udisks-device-glue.h"
+@@ -979,6 +981,7 @@ end_highlight (void)
+     g_print ("\x1B[0m");
+ }
+ 
++#ifdef HAVE_LIBATASMART
+ static const gchar *
+ ata_smart_status_to_desc (const gchar *status,
+                           gboolean *out_highlight)
+@@ -1159,6 +1162,7 @@ print_ata_smart_attr (SkDisk *d,
+   g_free (threshold_str);
+   g_free (pretty);
+ }
++#endif
+ 
+ static void
+ do_show_info (const char *object_path)
+@@ -1440,7 +1444,7 @@ do_show_info (const char *object_path)
+         g_print ("    if speed:                  %" G_GINT64_FORMAT " bits/s\n", props->drive_connection_speed);
+ 
+       /* ------------------------------------------------------------------------------------------------- */
+-
++#ifdef HAVE_LIBATASMART
+       if (!props->drive_ata_smart_is_available)
+         {
+           g_print ("    ATA SMART:                 not available\n");
+@@ -1493,7 +1497,9 @@ do_show_info (const char *object_path)
+             }
+ 
+         }
+-
++#else
++          g_print ("    ATA SMART:                 not supported\n");
++#endif
+       /* ------------------------------------------------------------------------------------------------- */
+ 
+     }
+-- 
+1.7.5.rc3
+

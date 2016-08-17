@@ -1,0 +1,39 @@
+From 2b9ed06850410d70371b31de5f131e484ba1c851 Mon Sep 17 00:00:00 2001
+From: Lu Chong <Chong.Lu@windriver.com>
+Date: Thu, 17 Oct 2013 16:06:04 +0800
+Subject: [PATCH] fix mime-construct --help return value
+
+Upstream-Status: Pending
+
+Signed-off-by: Lu Chong <Chong.Lu@windriver.com>
+
+---
+ mime-construct |    5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/mime-construct b/mime-construct
+index cad7d0e..707ed19 100755
+--- a/mime-construct
++++ b/mime-construct
+@@ -39,7 +39,7 @@ usage: $Me switch...
+ 
+   Global settings:
+     --debug		turn debugging on
+-    --help		show this and then die
++    --help		show this
+     --output		don\'t mail, output to stdout (loses bcc info)
+     --subpart		generate subpart rather than whole message (turns
+     	    	    	on --output, changes other semantics a bit)
+@@ -150,7 +150,8 @@ sub xwarn {
+ 
+ sub usage {
+     xwarn @_ if @_;
+-    die $Usage;
++    print $Usage;
++    exit 0;
+ }
+ 
+ sub init {
+-- 
+1.7.9.5
+

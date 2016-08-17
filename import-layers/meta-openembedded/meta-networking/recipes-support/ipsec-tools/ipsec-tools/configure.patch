@@ -1,0 +1,13 @@
+Index: ipsec-tools-0.8.1/configure.ac
+===================================================================
+--- ipsec-tools-0.8.1.orig/configure.ac	2013-01-08 12:43:29.000000000 +0000
++++ ipsec-tools-0.8.1/configure.ac	2014-07-18 07:51:30.045555880 +0000
+@@ -6,7 +6,7 @@
+ AC_CONFIG_SRCDIR([configure.ac])
+ AC_CONFIG_HEADERS(config.h)
+ 
+-AM_INIT_AUTOMAKE(dist-bzip2)
++AM_INIT_AUTOMAKE([foreign dist-bzip2])
+ 
+ AC_ENABLE_SHARED(no)
+ 

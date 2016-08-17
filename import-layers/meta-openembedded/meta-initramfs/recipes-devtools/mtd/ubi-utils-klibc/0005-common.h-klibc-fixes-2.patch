@@ -1,0 +1,61 @@
+From 8318852ef4f768bed31072aa7b57e11adc1f639c Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Sun, 29 Jun 2014 00:44:03 +0200
+Subject: [PATCH 5/6] common.h: more workarounds for klibc compatibility
+
+Patch is addressing two issues:
+* First,  Klibc doesn't have rpmatch().
+* Second, Klibc lacks getline()
+
+Fixes:
+|   LD      ubi-utils/ubiformat
+| .../git/ubi-utils/ubiformat.o: In function `prompt':
+| .../git/./include/common.h:157: undefined reference to `getline'
+| .../git/./include/common.h:164: undefined reference to `rpmatch'
+| .../git/./include/common.h:157: undefined reference to `getline'
+| .../git/./include/common.h:164: undefined reference to `rpmatch'
+
+Upstream-Status: Pending
+
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+---
+ include/common.h | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/include/common.h b/include/common.h
+index 77f3f7d..2cbee0f 100644
+--- a/include/common.h
++++ b/include/common.h
+@@ -126,7 +126,7 @@ static char __PRIxoff_t_static_assert[sizeof(off_t) == 8 ? 1 : -1];
+ 	fprintf(stderr, "%s: warning!: " fmt "\n", PROGRAM_NAME, ##__VA_ARGS__); \
+ } while(0)
+ 
+-#if defined(__UCLIBC__)
++#if defined(__UCLIBC__) || defined(__KLIBC__)
+ /* uClibc versions before 0.9.34 don't have rpmatch() */
+ #if __UCLIBC_MAJOR__ == 0 && \
+ 		(__UCLIBC_MINOR__ < 9 || \
+@@ -146,15 +146,17 @@ static inline int __rpmatch(const char *resp)
+  */
+ static inline bool prompt(const char *msg, bool def)
+ {
+-	char *line = NULL;
+-	size_t len;
++	char *line;
+ 	bool ret = def;
+ 
++	const int sizeof_line = 2;
++	line = malloc(sizeof_line);
++
+ 	do {
+ 		normsg_cont("%s (%c/%c) ", msg, def ? 'Y' : 'y', def ? 'n' : 'N');
+ 		fflush(stdout);
+ 
+-		while (getline(&line, &len, stdin) == -1) {
++		while (fgets(line, sizeof_line, stdin) == NULL) {
+ 			printf("failed to read prompt; assuming '%s'\n",
+ 				def ? "yes" : "no");
+ 			break;
+-- 
+1.9.1
+

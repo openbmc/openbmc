@@ -1,0 +1,26 @@
+#!/bin/sh
+#
+# init script for the Ethernet Bridge filter tables
+#
+# Written by Dag Wieers <dag@wieers.com>
+# Modified by Rok Papez <rok.papez@arnes.si>
+#	     Bart De Schuymer <bdschuym@pandora.be>
+# Adapted to Debian by Jan Christoph Nordholz <hesso@pool.math.tu-berlin.de>
+# Adapted to OpenEmbedded by Roman I Khimov <khimov@altell.ru>
+#
+# chkconfig: - 15 85
+# description: Ethernet Bridge filtering tables
+#
+### BEGIN INIT INFO
+# Provides:		ebtables
+# Required-Start:	
+# Required-Stop:	
+# Should-Start:		$local_fs
+# Should-Stop:		$local_fs
+# Default-Start:	S
+# Default-Stop:		0 6
+# Short-Description:	ebtables ruleset management
+# Description:		Saves and restores the state of the ebtables rulesets.
+### END INIT INFO
+
+/usr/sbin/ebtables.common $1

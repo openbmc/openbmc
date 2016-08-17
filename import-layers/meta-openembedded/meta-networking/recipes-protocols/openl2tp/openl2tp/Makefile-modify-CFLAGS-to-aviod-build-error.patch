@@ -1,0 +1,106 @@
+From 152486fa3c36c3b99d17d5b553cf87ef412fae8e Mon Sep 17 00:00:00 2001
+From: Li xin <lixin.fnst@cn.fujitsu.com>
+Date: Mon, 1 Dec 2014 01:53:41 +0900
+Subject: [PATCH] Makefile:modify CFLAGS to aviod build error.
+
+Upstream-Status: pending
+
+Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
+---
+ Makefile         | 22 +++++++++++-----------
+ plugins/Makefile |  6 +++---
+ 2 files changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 4aaa448..baa7882 100644
+--- a/Makefile
++++ b/Makefile
+@@ -152,10 +152,10 @@ LIBS.dmalloc=		-ldmalloc
+ export USE_DMALLOC
+ endif
+ 
+-CPPFLAGS=		$(CPPFLAGS.l2tptest) $(CPPFLAGS-y)
+-CFLAGS=			-I. -Iusl -Icli -isystem include \
+-				-MMD -Wall -Werror -Wno-strict-aliasing \
+-				$(CPPFLAGS) $(CPPFLAGS.dmalloc) \
++ADD_CPPFLAGS=		$(CPPFLAGS.l2tptest) $(CPPFLAGS-y)
++ADD_CFLAGS=			-I. -Iusl -Icli -isystem include \
++				-MMD -Wall -Wno-strict-aliasing \
++				$(ADD_CPPFLAGS) $(CPPFLAGS.dmalloc) \
+ 				-DSYS_LIBDIR=$(SYS_LIBDIR)
+ LDFLAGS.l2tpd=		-Wl,-E -L. -Lusl -lusl -ldl $(LIBS.dmalloc) -lc
+ LDFLAGS.l2tpconfig=	-Lcli -lcli -lreadline $(LIBS.dmalloc) $(READLINE_LDFLAGS) -lc
+@@ -170,10 +170,10 @@ CFLAGS.optimize=	$(OPT_CFLAGS)
+ endif
+ export CFLAGS.optimize
+ 
+-CFLAGS+=		$(CFLAGS.optimize)
++ADD_CFLAGS+=		$(CFLAGS.optimize)
+ 
+ ifeq ($(L2TP_USE_ASYNC_RPC),y)
+-CPPFLAGS+=		-DL2TP_ASYNC_RPC
++ADD_CPPFLAGS+=		-DL2TP_ASYNC_RPC
+ endif
+ 
+ ifeq ($(L2TP_FEATURE_RPC_MANAGEMENT),y)
+@@ -220,13 +220,13 @@ endif
+ 
+ # Compile without -Wall because rpcgen-generated code is full of warnings.
+ %_xdr.o:		%_xdr.c
+-			$(CC) -I. -MMD -w $(CFLAGS.optimize) -c $(CPPFLAGS) $<
++			$(CC) -I. -MMD -w $(CFLAGS.optimize) -c $(ADD_CPPFLAGS) $<
+ 
+ %_client.o:		%_client.c
+-			$(CC) -I. -MMD -w $(CFLAGS.optimize) -c $(CPPFLAGS) $<
++			$(CC) -I. -MMD -w $(CFLAGS.optimize) -c $(ADD_CPPFLAGS) $<
+ 
+ %_server.o:		%_server.c
+-			$(CC) -I. -MMD -w $(CFLAGS.optimize) -c $(CPPFLAGS) $<
++			$(CC) -I. -MMD -w $(CFLAGS.optimize) -c $(ADD_CPPFLAGS) $<
+ 
+ %_xdr.c:		%.x
+ 			-$(RM) $@
+@@ -272,7 +272,7 @@ l2tpconfig:		$(L2TPCONFIG_SRCS.o)
+ 			$(CC) -o $@ $^ $(LDFLAGS.l2tpconfig)
+ 
+ %.o:	%.c
+-			$(CC) -c $(CFLAGS) $< -o $@
++			$(CC) -c $(CFLAGS) $(ADD_CFLAGS) $< -o $@
+ 
+ l2tp_options.h:	FORCE
+ 	@rm -f $@.tmp
+@@ -325,7 +325,7 @@ install:		install-all
+ install-all:		all install-daemon install-app
+ 
+ install-daemon:
+-			@for d in $(filter-out usl,$(SUBDIRS)); do $(MAKE) -C $$d $(MFLAGS) EXTRA_CFLAGS="$(CPPFLAGS)" install; if [ $$? -ne 0 ]; then exit 1; fi; done
++			@for d in $(filter-out usl,$(SUBDIRS)); do $(MAKE) -C $$d $(MFLAGS) EXTRA_CFLAGS="$(CPPFLAGS) $(ADD_CPPFLAGS)" install; if [ $$? -ne 0 ]; then exit 1; fi; done
+ 			$(INSTALL) -d $(DESTDIR)/usr/sbin
+ 			$(INSTALL) openl2tpd $(DESTDIR)/usr/sbin
+ 
+diff --git a/plugins/Makefile b/plugins/Makefile
+index 5be996d..6810236 100644
+--- a/plugins/Makefile
++++ b/plugins/Makefile
+@@ -1,7 +1,7 @@
+-CFLAGS	:= $(CFLAGS.optimize) -MMD -Wall \
++ADD_CFLAGS	:= $(CFLAGS.optimize) -MMD -Wall \
+ 	-isystem ../include \
+ 	-I. -I.. -I../usl -fPIC $(EXTRA_CFLAGS)
+-LDFLAGS	:= -shared
++ADD_LDFLAGS	:= -shared
+ 
+ PLUGINS.c:=	ppp_unix.c ppp_null.c ipsec.c event_sock.c
+ 
+@@ -21,7 +21,7 @@ clean:
+ 		$(RM) $(PLUGINS.so) $(wildcard *.o) $(wildcard *.d) $(SRC.generated)
+ 
+ %.so: %.c
+-		$(CC) -o $@ $(LDFLAGS) $(CFLAGS) $<
++		$(CC) -o $@ $(LDFLAGS) $(ADD_LDFLAGS) $(CFLAGS) $(ADD_CFLAGS) $<
+ 
+ install:	all
+ 		$(INSTALL) -d $(DESTDIR)$(SYS_LIBDIR)/openl2tp
+-- 
+1.8.4.2
+

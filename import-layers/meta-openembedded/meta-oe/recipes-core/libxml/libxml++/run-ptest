@@ -1,0 +1,3 @@
+#!/bin/sh
+cd examples
+make -k check-TESTS

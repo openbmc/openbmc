@@ -1,0 +1,104 @@
+From a00a7097b85567ae6eb7a00b3ce7ef021841203c Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Thu, 24 Sep 2015 18:03:52 +0200
+Subject: [PATCH 5/5] Fix the build with cmake 3
+
+* the same issue as in GTK port:
+  https://bugs.webkit.org/show_bug.cgi?id=141796
+  http://trac.webkit.org/changeset/180502
+
+* otherwise linking fails with couple undefined symbols
+| CMakeFiles/WebKit2.dir/PluginProcess/unix/PluginProcessMainUnix.cpp.o: In function `WebKit::webkitXError(_XDisplay*, XErrorEvent*)':
+| ewebkit/Source/WebKit2/PluginProcess/unix/PluginProcessMainUnix.cpp:63: undefined reference to `XGetErrorText'
+| CMakeFiles/WebKit2.dir/PluginProcess/unix/PluginProcessMainUnix.cpp.o: In function `WebKit::PluginProcessMain::parseCommandLine(int, char**)':
+| ewebkit/Source/WebKit2/PluginProcess/unix/PluginProcessMainUnix.cpp:102: undefined reference to `XSetErrorHandler'
+| ewebkit/Source/WebKit2/PluginProcess/unix/PluginProcessMainUnix.cpp:102: undefined reference to `XSetErrorHandler'
+| CMakeFiles/WebKit2.dir/WebProcess/efl/WebProcessMainEfl.cpp.o: In function `WebKit::WebProcessMain::platformInitialize()':
+| ewebkit/Source/WebKit2/WebProcess/efl/WebProcessMainEfl.cpp:67: undefined reference to `XSetExtensionErrorHandler'
+| ewebkit/Source/WebKit2/WebProcess/efl/WebProcessMainEfl.cpp:67: undefined reference to `XSetExtensionErrorHandler'
+| CMakeFiles/WebKit2.dir/WebProcess/Plugins/Netscape/x11/NetscapePluginX11.cpp.o: In function `WebKit::NetscapePlugin::platformPostInitializeWindowed(bool, unsigned long)':
+| ewebkit/Source/WebKit2/WebProcess/Plugins/Netscape/x11/NetscapePluginX11.cpp:170: undefined reference to `XFlush'
+| CMakeFiles/WebKit2.dir/WebProcess/Plugins/Netscape/x11/NetscapePluginX11.cpp.o: In function `WebKit::NetscapePlugin::platformPostInitializeWindowless()':
+| ewebkit/Source/WebKit2/WebProcess/Plugins/Netscape/x11/NetscapePluginX11.cpp:195: undefined reference to `XGetVisualInfo'
+| ewebkit/Source/WebKit2/WebProcess/Plugins/Netscape/x11/NetscapePluginX11.cpp:199: undefined reference to `XFree'
+| ewebkit/Source/WebKit2/WebProcess/Plugins/Netscape/x11/NetscapePluginX11.cpp:202: undefined reference to `XCreateColormap'
+| CMakeFiles/WebKit2.dir/WebProcess/Plugins/Netscape/x11/NetscapePluginX11.cpp.o: In function `WebKit::NetscapePlugin::platformDestroy()':
+| ewebkit/Source/WebKit2/WebProcess/Plugins/Netscape/x11/NetscapePluginX11.cpp:251: undefined reference to `XFreeColormap'
+| ewebkit/Source/WebKit2/WebProcess/Plugins/Netscape/x11/NetscapePluginX11.cpp:255: undefined reference to `XFreePixmap'
+| CMakeFiles/WebKit2.dir/WebProcess/Plugins/Netscape/x11/NetscapePluginX11.cpp.o: In function `WebKit::NetscapePlugin::platformGeometryDidChange()':
+| ewebkit/Source/WebKit2/WebProcess/Plugins/Netscape/x11/NetscapePluginX11.cpp:293: undefined reference to `XCreatePixmap'
+| ewebkit/Source/WebKit2/WebProcess/Plugins/Netscape/x11/NetscapePluginX11.cpp:286: undefined reference to `XFreePixmap'
+| ewebkit/Source/WebKit2/WebProcess/Plugins/Netscape/x11/NetscapePluginX11.cpp:295: undefined reference to `XSync'
+| CMakeFiles/WebKit2.dir/WebProcess/Plugins/Netscape/x11/NetscapePluginX11.cpp.o: In function `WebKit::NetscapePlugin::platformPaint(WebCore::GraphicsContext*, WebCore::IntRect const&, bool)':
+| ewebkit/Source/WebKit2/WebProcess/Plugins/Netscape/x11/NetscapePluginX11.cpp:343: undefined reference to `XSync'
+| collect2: error: ld returned 1 exit status
+| Source/WebKit2/CMakeFiles/WebKit2.dir/build.make:16145: recipe for target 'lib/libewebkit2.so.1.11.0' failed
+| make[2]: *** [lib/libewebkit2.so.1.11.0] Error 1
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ Source/WebCore/PlatformEfl.cmake         | 1 +
+ Source/WebKit2/PlatformEfl.cmake         | 3 +++
+ Source/cmake/OptionsEfl.cmake            | 1 +
+ Tools/WebKitTestRunner/PlatformEfl.cmake | 1 +
+ 4 files changed, 6 insertions(+)
+
+diff --git a/Source/WebCore/PlatformEfl.cmake b/Source/WebCore/PlatformEfl.cmake
+index 41ffc15..63b7861 100644
+--- a/Source/WebCore/PlatformEfl.cmake
++++ b/Source/WebCore/PlatformEfl.cmake
+@@ -404,6 +404,7 @@ if (WTF_USE_3D_GRAPHICS)
+         )
+     endif ()
+ 
++    find_package(X11 REQUIRED)
+     list(APPEND WebCore_LIBRARIES
+         ${X11_X11_LIB}
+     )
+diff --git a/Source/WebKit2/PlatformEfl.cmake b/Source/WebKit2/PlatformEfl.cmake
+index 8c66d1b..d96f0bd 100644
+--- a/Source/WebKit2/PlatformEfl.cmake
++++ b/Source/WebKit2/PlatformEfl.cmake
+@@ -331,12 +331,15 @@ if (ENABLE_SECCOMP_FILTERS)
+ endif ()
+ 
+ if (ENABLE_ECORE_X)
++    find_package(X11 REQUIRED)
+     list(APPEND WebProcess_LIBRARIES
+         ${ECORE_X_LIBRARIES}
+         ${X11_Xext_LIB}
+     )
+     list(APPEND WebKit2_LIBRARIES
+         ${ECORE_X_LIBRARIES}
++        ${X11_X11_LIB}
++        ${X11_Xext_LIB}
+     )
+ endif ()
+ 
+diff --git a/Source/cmake/OptionsEfl.cmake b/Source/cmake/OptionsEfl.cmake
+index 8585f19..1aa9002 100644
+--- a/Source/cmake/OptionsEfl.cmake
++++ b/Source/cmake/OptionsEfl.cmake
+@@ -181,6 +181,7 @@ endif ()
+ 
+ if (WTF_OS_UNIX)
+     set(ENABLE_X11_TARGET ON)
++    find_package(X11 REQUIRED)
+     add_definitions(-DXP_UNIX)
+ endif (WTF_OS_UNIX)
+ 
+diff --git a/Tools/WebKitTestRunner/PlatformEfl.cmake b/Tools/WebKitTestRunner/PlatformEfl.cmake
+index 1873279..a905f2a 100644
+--- a/Tools/WebKitTestRunner/PlatformEfl.cmake
++++ b/Tools/WebKitTestRunner/PlatformEfl.cmake
+@@ -53,6 +53,7 @@ list(APPEND WebKitTestRunnerInjectedBundle_LIBRARIES
+ )
+ 
+ if (ENABLE_ECORE_X)
++    find_package(X11 REQUIRED)
+     list(APPEND WebKitTestRunner_INCLUDE_DIRECTORIES
+         ${ECORE_X_INCLUDE_DIRS}
+     )
+-- 
+2.6.0
+

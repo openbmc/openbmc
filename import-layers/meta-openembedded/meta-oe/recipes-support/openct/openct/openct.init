@@ -1,0 +1,89 @@
+#!/bin/sh
+#
+# openct       This shell script takes care of starting and stopping OpenCT.
+#
+# chkconfig:   2345 24 89
+# description: OpenCT is a middleware framework for smart card terminals.
+#
+# processname: ifdhandler
+# config:      /etc/openct.conf
+
+### BEGIN INIT INFO
+# Provides: openct
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Should-Start: $syslog $network
+# Should-Stop: $syslog $network
+# Short-Description: Middleware framework for smart card terminals
+# Description: This starts/stops the OpenCT middleware framework support
+#              for smart card terminals.
+### END INIT INFO
+
+. /etc/init.d/functions
+
+exec="/usr/sbin/openct-control"
+prog=openct
+proc=ifdhandler
+
+OPENCT_OPTIONS=
+[ -e /etc/sysconfig/$prog ] && . /etc/sysconfig/$prog
+
+lockfile=/var/lock/subsys/$prog
+
+start() {
+    retval=0
+    if ! status $proc >/dev/null 2>&1 ; then
+        action $"Initializing OpenCT smart card terminals: " \
+            $exec $OPENCT_OPTIONS init
+        retval=$?
+        [ $retval -eq 0 ] && touch $lockfile
+    fi
+    return $retval
+}
+
+stop() {
+    if status $proc >/dev/null 2>&1 ; then
+        action $"Stopping OpenCT smart card terminals: " \
+            $exec $OPENCT_OPTIONS shutdown
+    fi
+    retval=$?
+    if [ $retval -eq 0 ] ; then
+        rm -f /var/run/openct/status
+        rm -f $lockfile
+    fi
+    return $retval
+}
+
+restart() {
+    stop
+    start
+}
+
+oct_status() {
+    status $proc
+    retval=$?
+    if [ -e /var/run/openct/status ] ; then
+        $exec $OPENCT_OPTIONS status
+        [ -e /var/run/openct/status ] && \
+            echo $"Waiting for reader attach/detach events..."
+    fi
+    return $retval
+}
+
+case "$1" in
+    start|stop|restart)
+        $1
+        ;;
+    reload|force-reload)
+        restart
+        ;;
+    status)
+        oct_status
+        ;;
+    try-restart|condrestart)
+  	[ ! -f $lockfile ] || restart
+	;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart|try-restart|reload|force-reload}"
+        exit 2
+esac

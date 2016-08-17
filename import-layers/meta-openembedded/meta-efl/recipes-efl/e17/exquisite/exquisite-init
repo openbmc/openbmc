@@ -1,0 +1,40 @@
+#!/bin/sh
+
+for x in $(cat /proc/cmdline); do
+  case $x in
+    splash=false)
+      echo "Splash Disabled"
+      exit 0;
+      ;;
+  esac
+done
+
+. /etc/init.d/functions
+
+### Default config here - gets overriden later
+THEME="-t default"
+FPS="-fps 30"
+### Override config - if there is a config file - load it.
+if test -f /etc/exquisite/config; then
+  . /etc/exquisite/config
+fi
+
+args=''
+case `machine_id` in
+  "hp_ipaq_h3100"|"hp_ipaq_h3800")
+     args='-rot 90' ;;
+  "hp_ipaq_3600"|"hp_ipaq_3700"|"hp_ipaq_h3900"|"htc_universal"|*collie|*poodle|*akita|*spitz|*borzoi)
+     args='-rot 270' ;;
+esac
+args=$args" $FPS $THEME"
+
+export EXDIR=/mnt/.splash
+export EXQUISITE_IPC=$EXDIR/exquisite
+mount tmpfs -t tmpfs $EXDIR -o,size=40k
+exquisite -fb -fs $args &
+
+exquisite-write -wait 120
+exquisite-write "PULSATE"
+setterm -blank 0
+setterm -powersave off
+setterm -powerdown 0

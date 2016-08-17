@@ -1,0 +1,13 @@
+Index: cpu/configure.ac
+===================================================================
+--- cpu.orig/configure.ac	2014-07-17 20:39:48.000000000 +0000
++++ cpu/configure.ac	2014-07-17 21:39:55.320555868 +0000
+@@ -10,7 +10,7 @@
+ AC_CANONICAL_HOST
+ AC_ISC_POSIX
+ 
+-AM_INIT_AUTOMAKE(1.6)
++AM_INIT_AUTOMAKE([foreign])
+ AM_CONFIG_HEADER(config.h)
+ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+ 

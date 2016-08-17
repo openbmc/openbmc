@@ -1,0 +1,14 @@
+--- python-ldap-2.3.9/setup.cfg.orig    2009-08-13 11:07:23.000000000 +0200
++++ python-ldap-2.3.9/setup.cfg 2009-08-13 11:07:37.000000000 +0200
+@@ -1,9 +1,9 @@
+ [_ldap]
+ extra_objects = 
+ extra_compile_args = 
+-libs = ldap_r lber sasl2 ssl crypto
++libs = ldap_r lber ssl crypto
+ library_dirs = /opt/openldap-RE24/lib
+-include_dirs = /opt/openldap-RE24/include /usr/include/sasl
++include_dirs = /opt/openldap-RE24/include
+
+ [egg_info]
+ tag_build =  

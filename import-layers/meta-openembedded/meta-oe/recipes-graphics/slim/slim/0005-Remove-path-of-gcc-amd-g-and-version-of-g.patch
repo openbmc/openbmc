@@ -1,0 +1,30 @@
+From 4f69eb1aa85fbb395a0474b1f376505fab81ee22 Mon Sep 17 00:00:00 2001
+From: iwamatsu <iwamatsu@7c53e7cc-98ea-0310-8f1f-a0b24da60408>
+Date: Fri, 17 Jun 2011 20:35:10 +0000
+Subject: [PATCH 5/8] Remove path of gcc amd g++, and version of g++
+
+Signed-off-by: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
+
+git-svn-id: svn://svn.berlios.de/slim/trunk@179 7c53e7cc-98ea-0310-8f1f-a0b24da60408
+---
+ Makefile |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 1202614..5c5fde1 100644
+--- a/Makefile
++++ b/Makefile
+@@ -3,8 +3,8 @@
+ # Edit the following section to adjust the options
+ # to fit into your operating system / distribution
+ #######################################################
+-CXX=/usr/bin/g++
+-CC=/usr/bin/gcc-4.5
++CXX=g++
++CC=gcc
+ CFLAGS=-Wall -I. -I/usr/include/freetype2 -I/usr/include/freetype2/config -I/usr/include
+ CXXFLAGS=$(CFLAGS)
+ LDFLAGS=-lXft -lX11 -lfreetype -lXrender -lfontconfig -lpng -lz -lm -lcrypt -lXmu -lpng -ljpeg -lrt
+-- 
+1.6.6.1
+

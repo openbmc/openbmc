@@ -1,0 +1,19 @@
+Index: smstools3/scripts/sms3
+===================================================================
+--- smstools3.orig/scripts/sms3	2010-05-04 11:21:44.000000000 +0200
++++ smstools3/scripts/sms3	2015-02-22 20:05:51.615074469 +0100
+@@ -24,11 +24,11 @@
+ # Logfile can also be defined in here:
+ LOGFILE="/var/log/smsd.log"
+ 
+-DAEMON=/usr/local/bin/smsd
++DAEMON=/usr/bin/smsd
+ # A program which turns power off for couple of seconds:
+-RESETMODEMS=/usr/local/bin/smsd_resetmodems
++RESETMODEMS=/usr/bin/smsd_resetmodems
+ NAME=smsd
+-PSOPT="-e"
++PSOPT=""
+ ECHO=echo
+ case `uname` in
+   *BSD|Darwin)

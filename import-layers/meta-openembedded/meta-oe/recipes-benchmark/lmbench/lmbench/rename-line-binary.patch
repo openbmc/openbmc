@@ -1,0 +1,19 @@
+Both lmbench and util-linux-ng packages provide own /usr/bin/line binaries.
+Even though the binaries name is the same, their functionality is different.
+This patch renames lmbench's line binary as lm_line to avoid conflicts with
+util-linux-ng.  script/config-run is also modified (patch) to call lm_line
+instead of line.
+
+Upstream-Status: Inappropriate [build system specific change]
+
+--- patches/scripts/config-run	2006-11-26 15:11:04.000000000 -0500
++++ patches/scripts/config-run	2011-04-01 09:35:50.000000000 -0400
+@@ -224,7 +224,7 @@ fi
+ 
+ echo "Hang on, we are calculating your cache line size."
+ ../bin/$OS/msleep 250
+-LINE_SIZE=`../bin/$OS/line -M ${MB}M`
++LINE_SIZE=`../bin/$OS/lm_line -M ${MB}M`
+ export LINE_SIZE
+ echo "OK, it looks like your cache line is $LINE_SIZE bytes."
+ echo ""

@@ -1,0 +1,20 @@
+digitemp: allow override of CC and CFLAGS vars
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+
+--- a/Makefile	2008-08-28 21:37:00.000000000 +0000
++++ b/Makefile	2011-11-24 22:22:39.882511272 +0000
+@@ -11,8 +11,9 @@
+ 
+ VERSION = 3.6.0
+ 
+-CC	= gcc
+-CFLAGS	= -I./src -I./userial -O2 -Wall # -g
++CC	?= gcc
++CFLAGS	?=  -O2 -Wall # -g
++CFLAGS += -I./src -I./userial
+ 
+ OBJS		=	src/digitemp.o src/device_name.o src/ds2438.o
+ HDRS		= 	src/digitemp.h src/device_name.h

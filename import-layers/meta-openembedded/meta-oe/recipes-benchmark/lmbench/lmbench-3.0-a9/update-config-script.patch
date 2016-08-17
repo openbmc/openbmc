@@ -1,0 +1,12 @@
+Upstream-Status: Pending
+Index: lmbench-3.0-a9/scripts/config
+===================================================================
+--- lmbench-3.0-a9/scripts/config	2000-01-31 18:29:31.000000000 -0600
++++ lmbench-3.0-a9/scripts/config	2013-03-01 00:19:41.032984315 -0600
+@@ -3,5 +3,5 @@
+ UNAME=`uname -n 2>/dev/null`
+ if [ X$UNAME = X ]
+ then	echo CONFIG
+-else	echo CONFIG.$UNAME
++else	echo ../scripts/CONFIG.$UNAME
+ fi

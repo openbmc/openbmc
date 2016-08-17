@@ -1,0 +1,25 @@
+
+#
+# Patch managed by http://www.mn-logistik.de/unsupported/pxa250/patcher
+#
+
+--- liblockfile-1.05/./configure.in~configure
++++ liblockfile-1.05/./configure.in
+@@ -1,4 +1,5 @@
+-AC_INIT(lockfile.c)
++AC_INIT
++AC_CONFIG_SRCDIR([lockfile.c])
+ AC_CONFIG_HEADER(autoconf.h)
+ AC_REVISION($Revision: 1.0 $)dnl
+ 
+@@ -111,7 +112,8 @@
+ AC_SUBST(INSTALL_TARGETS)
+ AC_SUBST(nfslockdir)
+ 
+-AC_OUTPUT(\
++AC_CONFIG_FILES([\
+ 	./Makefile \
+ 	./maillock.h \
+-)
++])
++AC_OUTPUT

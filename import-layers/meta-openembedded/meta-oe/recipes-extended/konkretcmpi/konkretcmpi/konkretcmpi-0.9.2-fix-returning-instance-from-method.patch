@@ -1,0 +1,38 @@
+Port from Fedora20
+
+    | commit aca6c7f910ffe9930b5789969f0adfadd668bb46
+    | Author: Michal Minar <miminar@redhat.com>
+    | Date:   Fri Jun 20 10:50:45 2014 +0200
+    | 
+    |     Fix returning instance as an output argument from method
+    |     
+    |     Submitted By: Radek Novacek <rnovacek@redhat.com>
+
+Upstream-Status: Pending
+Signed-off-by: Qian Lei <qianl.fnst@cn.fujitsu.com>
+
+diff --git a/src/program/main.cpp b/src/program/main.cpp
+index 885dc12..9e7108a 100644
+--- a/src/program/main.cpp
++++ b/src/program/main.cpp
+@@ -506,7 +506,11 @@ static void gen_feature_decls(
+ 
+             // Add sig entry [type][length][name][zero-terminator]
+ 
+-            KTag tag = _ktag(pd->data_type, pd->array_index, key, false, false);
++            KTag tag;
++            if (pd->qualifiers->has_key("EmbeddedInstance"))
++                tag = _ktag(TOK_INSTANCE, pd->array_index, key, false, false);
++            else
++                tag = _ktag(pd->data_type, pd->array_index, key, false, false);
+             pack_tag(sig, tag);
+             pack_name(sig, pd->name);
+             count++;
+@@ -640,6 +644,7 @@ static void gen_param(FILE* os, MOF_Parameter* p, vector<unsigned char>& sig)
+         const char* ktn = _ktype_name(p->data_type);
+ 
+         if (p->qualifiers->has_key("EmbeddedInstance")) {
++            tag = _ktag(TOK_INSTANCE, p->array_index, false, in, out);
+             if (p->array_index)
+                 put(os, "    KInstanceA $0;\n", p->name, NULL);
+             else

@@ -1,0 +1,263 @@
+From b49c8e6e66801406520d1bff791c66dff7b1cddb Mon Sep 17 00:00:00 2001
+From: Li xin <lixin.fnst@cn.fujitsu.com>
+Date: Tue, 18 Nov 2014 18:10:20 +0900
+Subject: [PATCH 3/5] rarpd.c : bug fix
+
+Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
+---
+ rarpd.c | 98 +++++++++++++++++++++++++++++++++++++----------------------------
+ 1 file changed, 56 insertions(+), 42 deletions(-)
+
+diff --git a/rarpd.c b/rarpd.c
+index 335d2d2..d45300e 100644
+--- a/rarpd.c
++++ b/rarpd.c
+@@ -7,9 +7,11 @@
+  *		2 of the License, or (at your option) any later version.
+  *
+  * Authors:	Alexey Kuznetsov, <kuznet@ms2.inr.ac.ru>
++ *		Jakub Jelinek, <jakub@redhat.com>
+  */
+ 
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <syslog.h>
+ #include <dirent.h>
+ #include <malloc.h>
+@@ -26,6 +28,8 @@
+ #include <net/if.h>
+ #include <net/if_arp.h>
+ #include <netinet/in.h>
++#include <netinet/ether.h>
++#include <asm/types.h>
+ #include <linux/if_packet.h>
+ #include <linux/filter.h>
+ 
+@@ -39,27 +43,26 @@ int only_ethers;
+ int all_ifaces;
+ int listen_arp;
+ char *ifname;
+-char *tftp_dir = "/etc/tftpboot";
++char *tftp_dir = "/tftpboot";
+ 
+-extern int ether_ntohost(char *name, unsigned char *ea);
+ void usage(void) __attribute__((noreturn));
+ 
+-struct iflink
++struct rarpiflink
+ {
+-	struct iflink	*next;
+-	int	       	index;
+-	int		hatype;
+-	unsigned char	lladdr[16];
+-	unsigned char	name[IFNAMSIZ];
+-	struct ifaddr 	*ifa_list;
++	struct rarpiflink	*next;
++	int	       		index;
++	int			hatype;
++	unsigned char		lladdr[16];
++	unsigned char		name[IFNAMSIZ];
++	struct rarpifaddr 	*ifa_list;
+ } *ifl_list;
+ 
+-struct ifaddr
++struct rarpifaddr
+ {
+-	struct ifaddr 	*next;
+-	__u32		prefix;
+-	__u32		mask;
+-	__u32		local;
++	struct rarpifaddr 	*next;
++	__u32			prefix;
++	__u32			mask;
++	__u32			local;
+ };
+ 
+ struct rarp_map
+@@ -87,8 +90,8 @@ void load_if()
+ {
+ 	int fd;
+ 	struct ifreq *ifrp, *ifend;
+-	struct iflink *ifl;
+-	struct ifaddr *ifa;
++	struct rarpiflink *ifl;
++	struct rarpifaddr *ifa;
+ 	struct ifconf ifc;
+ 	struct ifreq ibuf[256];
+ 
+@@ -144,7 +147,7 @@ void load_if()
+ 				continue;
+ 			}
+ 
+-			ifl = (struct iflink*)malloc(sizeof(*ifl));
++			ifl = (struct rarpiflink*)malloc(sizeof(*ifl));
+ 			if (ifl == NULL)
+ 				continue;
+ 			memset(ifl, 0, sizeof(*ifl));
+@@ -154,6 +157,7 @@ void load_if()
+ 			ifl->hatype = ifrp->ifr_hwaddr.sa_family;
+ 			memcpy(ifl->lladdr, ifrp->ifr_hwaddr.sa_data, 14);
+ 			strncpy(ifl->name, ifrp->ifr_name, IFNAMSIZ);
++			ifl->name[IFNAMSIZ-1] = 0;
+ 			p = strchr(ifl->name, ':');
+ 			if (p)
+ 				*p = 0;
+@@ -179,7 +183,7 @@ void load_if()
+ 		if (ifa == NULL) {
+ 			if (mask == 0 || prefix == 0)
+ 				continue;
+-			ifa = (struct ifaddr*)malloc(sizeof(*ifa));
++			ifa = (struct rarpifaddr*)malloc(sizeof(*ifa));
+ 			memset(ifa, 0, sizeof(*ifa));
+ 			ifa->local = addr;
+ 			ifa->prefix = prefix;
+@@ -207,6 +211,7 @@ void load_if()
+ 			}
+ 		}
+ 	}
++	close(fd);
+ }
+ 
+ void configure()
+@@ -225,20 +230,21 @@ int bootable(__u32 addr)
+ 	d = opendir(tftp_dir);
+ 	if (d == NULL) {
+ 		syslog(LOG_ERR, "opendir: %m");
+-		return 0;
++		goto done_bootable;
+ 	}
+ 	while ((dent = readdir(d)) != NULL) {
+ 		if (strncmp(dent->d_name, name, 8) == 0)
+ 			break;
+ 	}
++done_bootable:
+ 	closedir(d);
+ 	return dent != NULL;
+ }
+ 
+-struct ifaddr *select_ipaddr(int ifindex, __u32 *sel_addr, __u32 **alist)
++struct rarpifaddr *select_ipaddr(int ifindex, __u32 *sel_addr, __u32 **alist)
+ {
+-	struct iflink *ifl;
+-	struct ifaddr *ifa;
++	struct rarpiflink *ifl;
++	struct rarpifaddr *ifa;
+ 	int retry = 0;
+ 	int i;
+ 
+@@ -294,7 +300,7 @@ struct rarp_map *rarp_lookup(int ifindex, int hatype,
+ 
+ 	if (r == NULL) {
+ 		if (hatype == ARPHRD_ETHER && halen == 6) {
+-			struct ifaddr *ifa;
++			struct rarpifaddr *ifa;
+ 			struct hostent *hp;
+ 			char ename[256];
+ 			static struct rarp_map emap = {
+@@ -304,7 +310,7 @@ struct rarp_map *rarp_lookup(int ifindex, int hatype,
+ 				6,
+ 			};
+ 
+-			if (ether_ntohost(ename, lladdr) != 0 ||
++			if (ether_ntohost(ename, (struct ether_addr *)lladdr) != 0 ||
+ 			    (hp = gethostbyname(ename)) == NULL) {
+ 				if (verbose)
+ 					syslog(LOG_INFO, "not found in /etc/ethers");
+@@ -345,7 +351,7 @@ static int load_arp_bpflet(int fd)
+ 
+ int put_mylladdr(unsigned char **ptr_p, int ifindex, int alen)
+ {
+-	struct iflink *ifl;
++	struct rarpiflink *ifl;
+ 
+ 	for (ifl=ifl_list; ifl; ifl = ifl->next)
+ 		if (ifl->index == ifindex)
+@@ -362,8 +368,8 @@ int put_mylladdr(unsigned char **ptr_p, int ifindex, int alen)
+ int put_myipaddr(unsigned char **ptr_p, int ifindex, __u32 hisipaddr)
+ {
+ 	__u32 laddr = 0;
+-	struct iflink *ifl;
+-	struct ifaddr *ifa;
++	struct rarpiflink *ifl;
++	struct rarpifaddr *ifa;
+ 
+ 	for (ifl=ifl_list; ifl; ifl = ifl->next)
+ 		if (ifl->index == ifindex)
+@@ -388,7 +394,7 @@ void arp_advise(int ifindex, unsigned char *lladdr, int lllen, __u32 ipaddr)
+ 	int fd;
+ 	struct arpreq req;
+ 	struct sockaddr_in *sin;
+-	struct iflink *ifl;
++	struct rarpiflink *ifl;
+ 
+ 	for (ifl=ifl_list; ifl; ifl = ifl->next)
+ 		if (ifl->index == ifindex)
+@@ -421,6 +427,10 @@ void serve_it(int fd)
+ 	struct rarp_map *rmap;
+ 	unsigned char *ptr;
+ 	int n;
++	int i;
++	char tmpbuf[16*3];
++	char tmpname[IFNAMSIZ];
++	struct rarpiflink *ifl;
+ 
+ 	n = recvfrom(fd, buf, sizeof(buf), MSG_DONTWAIT, (struct sockaddr*)&sll, &sll_len);
+ 	if (n<0) {
+@@ -447,21 +457,23 @@ void serve_it(int fd)
+ 	if (a->ar_op != htons(ARPOP_RREQUEST))
+ 		return;
+ 
+-	if (verbose) {
+-		int i;
+-		char tmpbuf[16*3];
+-		char *ptr = tmpbuf;
+-		for (i=0; i<sll.sll_halen; i++) {
+-			if (i) {
+-				sprintf(ptr, ":%02x", sll.sll_addr[i]);
+-				ptr++;
+-			} else
+-				sprintf(ptr, "%02x", sll.sll_addr[i]);
+-			ptr += 2;
+-		}
+-		syslog(LOG_INFO, "RARP request from %s on if%d", tmpbuf, sll.sll_ifindex);
++	ptr = tmpbuf;
++        snprintf(tmpbuf, 2, "%02x", sll.sll_addr[0]);
++	for (ptr=tmpbuf+2, i=1; i<sll.sll_halen; i++) {
++		snprintf(ptr, 3, ":%02x", sll.sll_addr[i]);
++		ptr += 3;
+ 	}
+ 
++	for (ifl=ifl_list; ifl; ifl = ifl->next)
++		if (ifl->index == sll.sll_ifindex)
++			break;
++	if (ifl) {
++		strncpy(tmpname, ifl->name, IFNAMSIZ);
++		tmpname[IFNAMSIZ-1] = 0;
++	} else
++		sprintf(tmpname, "if%d", sll.sll_ifindex);
++	syslog(LOG_INFO, "RARP request from %s on %s", tmpbuf, tmpname);
++
+ 	/* Sanity checks */
+ 
+ 	/* 1. IP only -> pln==4 */
+@@ -526,6 +538,8 @@ void serve_it(int fd)
+ 	ptr += rmap->lladdr_len;
+ 	memcpy(ptr, &rmap->ipaddr, 4);
+ 	ptr += 4;
++	syslog(LOG_INFO, "RARP response to %s %s on %s", tmpbuf,
++	       inet_ntoa(*(struct in_addr *)&rmap->ipaddr), tmpname);
+ 
+ 	/* Update our ARP cache. Probably, this guy
+ 	   will not able to make ARP (if it is broken)
+@@ -613,7 +627,7 @@ int main(int argc, char **argv)
+         if (ifname) {
+ 		struct ifreq ifr;
+ 		memset(&ifr, 0, sizeof(ifr));
+-		strncpy(ifr.ifr_name, ifname, IFNAMSIZ);
++		strncpy(ifr.ifr_name, ifname, IFNAMSIZ-1);
+ 		if (ioctl(pset[0].fd, SIOCGIFINDEX, &ifr)) {
+ 			perror("ioctl(SIOCGIFINDEX)");
+ 			usage();
+-- 
+1.8.4.2
+

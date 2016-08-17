@@ -1,0 +1,49 @@
+From acff719983aa1294148dc4a367c48957f5510eff Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Fri, 17 May 2013 18:25:56 +0200
+Subject: [PATCH] src/procman.cpp: include main gtkmm.h
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+after update of gtkmm build failed with:
+
+In file included from /home/Superandy/tmp/oe-core-eglibc/sysroots/overo/usr/include/gtkmm-2.4/gtkmm/main.h:33:0,
+                 from procman.cpp:26:
+/home/Superandy/tmp/oe-core-eglibc/sysroots/overo/usr/include/gdkmm-2.4/gdkmm/types.h:92:7: error: 'Value' is not a template
+/home/Superandy/tmp/oe-core-eglibc/sysroots/overo/usr/include/gdkmm-2.4/gdkmm/types.h:92:54: error: expected template-name before '<' token
+/home/Superandy/tmp/oe-core-eglibc/sysroots/overo/usr/include/gdkmm-2.4/gdkmm/types.h:92:54: error: expected '{' before '<' token
+/home/Superandy/tmp/oe-core-eglibc/sysroots/overo/usr/include/gdkmm-2.4/gdkmm/types.h:92:54: error: expected unqualified-id before '<' token
+/home/Superandy/tmp/oe-core-eglibc/sysroots/overo/usr/include/gdkmm-2.4/gdkmm/types.h:174:7: error: 'Value' is not a template
+/home/Superandy/tmp/oe-core-eglibc/sysroots/overo/usr/include/gdkmm-2.4/gdkmm/types.h:174:30: error: 'Glib::Value' is not a template type
+/home/Superandy/tmp/oe-core-eglibc/sysroots/overo/usr/include/gdkmm-2.4/gdkmm/types.h:174:58: error: expected template-name before '<' token
+/home/Superandy/tmp/oe-core-eglibc/sysroots/overo/usr/include/gdkmm-2.4/gdkmm/types.h:207:7: error: 'Value' is not a template
+/home/Superandy/tmp/oe-core-eglibc/sysroots/overo/usr/include/gdkmm-2.4/gdkmm/types.h:207:24: error: 'Glib::Value' is not a template type
+/home/Superandy/tmp/oe-core-eglibc/sysroots/overo/usr/include/gdkmm-2.4/gdkmm/types.h:207:51: error: expected template-name before '<' token
+/home/Superandy/tmp/oe-core-eglibc/sysroots/overo/usr/include/gdkmm-2.4/gdkmm/types.h:274:7: error: 'Value' is not a template
+/home/Superandy/tmp/oe-core-eglibc/sysroots/overo/usr/include/gdkmm-2.4/gdkmm/types.h:274:32: error: 'Glib::Value' is not a template type
+<...>
+
+Upstream-Status: Backport
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ src/procman.cpp |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/src/procman.cpp b/src/procman.cpp
+index b5c0d0a..d9b4b3f 100644
+--- a/src/procman.cpp
++++ b/src/procman.cpp
+@@ -23,7 +23,7 @@
+ 
+ #include <locale.h>
+ 
+-#include <gtkmm/main.h>
++#include <gtkmm.h>
+ #include <giomm/volumemonitor.h>
+ #include <giomm/init.h>
+ #include <glib.h>
+-- 
+1.7.4.4
+

@@ -1,0 +1,8 @@
+diff --git iperf-2.0.5/man/Makefile.am iperf-2.0.5/man/Makefile.am
+ index ed97bc6..728873f 100644
+--- iperf-2.0.5/man/Makefile.am
++++ iperf-2.0.5/man/Makefile.am
+@@ -1,2 +1 @@
+-man_MANS = iperf.1
+-dist_man_MANS = $(man_MANS)
++dist_man_MANS = iperf.1

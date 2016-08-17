@@ -1,0 +1,30 @@
+make rexec support ipv6
+
+Upstream-status: Pending
+
+rexec equals rexec_af(... ,AF_INET) which only support ipv4,
+use rexec_af(..., AF_UNSPEC) to support both ipv6 and ipv4.
+
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+---
+ rexec/rexec.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/rexec/rexec.c b/rexec/rexec.c
+index 0913c02..9c8f769 100644
+--- a/rexec/rexec.c
++++ b/rexec/rexec.c
+@@ -214,8 +214,8 @@ int main(int argc, char *argv[])
+     passwd = getpass("Password: ");
+   }
+ 
+-  if ( (sock = rexec(&host, port_exec, user_name, passwd, command, 
+-		     p_to_aux_sock)) < 0 )
++  if ( (sock = rexec_af(&host, port_exec, user_name, passwd, command, 
++		     p_to_aux_sock, AF_UNSPEC)) < 0 )
+  {
+     fprintf(stderr,"%s: Error in rexec system call: ",argv[0]);
+     perror(NULL);
+-- 
+1.7.4.1
+

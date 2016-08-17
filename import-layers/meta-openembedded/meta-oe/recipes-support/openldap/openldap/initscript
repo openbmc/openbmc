@@ -1,0 +1,35 @@
+#! /bin/sh
+#
+# This is an init script for openembedded
+# Copy it to /etc/init.d/openldap and type
+# > update-rc.d openldap defaults 60
+#
+
+# Source function library.
+. /etc/init.d/functions
+
+slapd=/usr/sbin/slapd
+test -x "$slapd" || exit 0
+
+
+case "$1" in
+  start)
+    echo -n "Starting OpenLDAP: "
+    start-stop-daemon --start --quiet --exec $slapd
+    echo "."
+    ;;
+  stop)
+    echo -n "Stopping OpenLDAP: "
+    start-stop-daemon --stop --quiet --pidfile /var/run/slapd.pid
+    echo "."
+    ;;
+  status)
+    status $slapd;
+    exit $?
+    ;;
+  *)
+    echo "Usage: /etc/init.d/openldap {start|stop|status}"
+    exit 1
+esac
+
+exit 0

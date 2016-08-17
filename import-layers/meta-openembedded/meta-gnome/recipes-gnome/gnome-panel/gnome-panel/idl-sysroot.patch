@@ -1,0 +1,22 @@
+--- /tmp/Makefile.am	2009-10-26 16:53:20.000000000 +0100
++++ gnome-panel-2.28.0/gnome-panel/Makefile.am	2009-10-26 16:53:51.000000000 +0100
+@@ -43,7 +43,7 @@
+ 	$(NULL)
+ 
+ $(CORBA_SRCLIST): $(top_srcdir)/idl/GNOME_Panel.idl $(ORBIT_IDL)
+-	$(AM_V_GEN)$(ORBIT_IDL) -I $(BONOBO_IDLDIR) -I $(BONOBO_ACT_IDLDIR) $(top_srcdir)/idl/GNOME_Panel.idl
++	$(AM_V_GEN)$(ORBIT_IDL) -I $(SYSROOT)$(BONOBO_IDLDIR) -I $(SYSROOT)$(BONOBO_ACT_IDLDIR) $(top_srcdir)/idl/GNOME_Panel.idl
+ 
+ BUILT_SOURCES = \
+ 	$(CORBA_SRCLIST)	\
+--- /tmp/Makefile.am	2009-10-26 16:54:17.000000000 +0100
++++ gnome-panel-2.28.0/libpanel-applet/Makefile.am	2009-10-26 16:54:34.000000000 +0100
+@@ -45,7 +45,7 @@
+ 	GNOME_Panel.h
+ 
+ $(CORBA_SRCLIST): $(top_srcdir)/idl/GNOME_Panel.idl $(ORBIT_IDL)
+-	$(AM_V_GEN)$(ORBIT_IDL) -I $(BONOBO_IDLDIR) -I $(BONOBO_ACT_IDLDIR) $(top_srcdir)/idl/GNOME_Panel.idl
++	$(AM_V_GEN)$(ORBIT_IDL) -I $(SYSROOT)$(BONOBO_IDLDIR) -I $(SYSROOT)$(BONOBO_ACT_IDLDIR) $(top_srcdir)/idl/GNOME_Panel.idl
+ 
+ noinst_PROGRAMS = test-bonobo-applet
+ 
