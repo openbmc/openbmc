@@ -1,0 +1,48 @@
+From d469c188df476285815046d9b5fba820d9a5536f Mon Sep 17 00:00:00 2001
+From: Sergey Solomin <sergey.solomin@us.ibm.com>
+Date: Wed, 17 Aug 2016 17:52:12 -0500
+Subject: [PATCH 1/1] 4 byte read support 466
+
+---
+ tools/i2cdump.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/tools/i2cdump.c b/tools/i2cdump.c
+index a7bba72..7b0ec72 100644
+--- a/tools/i2cdump.c
++++ b/tools/i2cdump.c
+@@ -46,6 +46,7 @@ static void help(void)
+ 		"    s (SMBus block)\n"
+ 		"    i (I2C block)\n"
+ 		"    c (consecutive byte)\n"
++		"    d (4 consecutive bytes)\n"
+ 		"    Append p for SMBus PEC\n");
+ }
+ 
+@@ -181,7 +182,7 @@ int main(int argc, char *argv[])
+ 	} else if (!strncmp(argv[flags+3], "s", 1)) {
+ 		size = I2C_SMBUS_BLOCK_DATA;
+ 		pec = argv[flags+3][1] == 'p';
+-	} else if (!strncmp(argv[flags+3], "c", 1)) {
++	} else if ((!strncmp(argv[flags+3], "c", 1)) || (!strncmp(argv[flags+3], "d", 1))) {
+ 		size = I2C_SMBUS_BYTE;
+ 		pec = argv[flags+3][1] == 'p';
+ 	} else if (!strcmp(argv[flags+3], "i"))
+@@ -313,6 +314,14 @@ int main(int argc, char *argv[])
+ 		}
+ 	}
+ 
++	/* handle mode 'd' (4 byte read), then exit */
++	if (!strncmp (argv[flags + 3], "d", 1)) {
++		printf ("%02x %02x %02x %02x\n", i2c_smbus_read_byte (file),
++			i2c_smbus_read_byte (file), i2c_smbus_read_byte (file),
++			 i2c_smbus_read_byte (file));
++		exit(0);
++	}
++
+ 	/* See Winbond w83781d data sheet for bank details */
+ 	if (bank && size != I2C_SMBUS_BLOCK_DATA) {
+ 		res = i2c_smbus_read_byte_data(file, bankreg);
+-- 
+1.8.2.2
+
