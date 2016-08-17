@@ -103,8 +103,8 @@ python() {
         set_append(
             d, 'SYSTEMD_SERVICE_%s' % pkg, '%s%s.service' % (
                 prefix, service))
-        set_append(d, 'SYSTEMD_SUBSTITUTIONS_%s%s.service' % (prefix, service),
-            'BUSNAME:%s' % service)
+        set_append(d, 'SYSTEMD_SUBSTITUTIONS',
+            'BUSNAME:%s:%s%s.service' % (service, prefix, service))
 
 
     def add_sd_user(d, prefix, service, pkg):
