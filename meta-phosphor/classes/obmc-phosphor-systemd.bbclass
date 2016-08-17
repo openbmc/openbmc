@@ -14,13 +14,12 @@
 #    Inhibit the warning that is displayed if a service unit without a
 #    restart policy is detected.
 #
-# SYSTEMD_SUBSTITUTIONS_${path-relative-to-system_unitdir}
-#    Variables in this list will be substituted in the specified
-#    file during install (if bitbake finds python {format} strings
-#    in the file itself).  List entries take the form:
-#      VAR:VALUE
-#    where {VAR} is the format string bitbake should look for in the
-#    file and VALUE is the value to substitute.
+# SYSTEMD_SUBSTITUTIONS = "var:val:file"
+#    A specification for making python style {format} string
+#    substitutions where:
+#      var: the format string to search for
+#      val: the value to replace with
+#      file: the file in which to make the substitution
 #
 # SYSTEMD_USER_${PN}.service = "foo"
 # SYSTEMD_USER_${unit}.service = "foo"
@@ -115,16 +114,14 @@ python() {
 
 
     def add_default_subs(d, file):
-        set_append(d, '_MAKE_SUBS', '%s' % file)
-
         for x in [
                 'base_bindir',
                 'bindir',
                 'sbindir',
                 'envfiledir',
                 'SYSTEMD_DEFAULT_TARGET' ]:
-            set_append(d, 'SYSTEMD_SUBSTITUTIONS_%s' % file,
-                '%s:%s' % (x, d.getVar(x, True)))
+            set_append(d, 'SYSTEMD_SUBSTITUTIONS',
+                '%s:%s:%s' % (x, d.getVar(x, True), file))
 
 
     def add_sd_unit(d, unit, pkg):
@@ -155,8 +152,8 @@ python() {
                 bb.fatal('Too many users assigned to %s: \'%s\'' % (var, ' '.join(user)))
 
             user = user[0]
-            set_append(d, 'SYSTEMD_SUBSTITUTIONS_%s' % file,
-                'USER:%s' % user)
+            set_append(d, 'SYSTEMD_SUBSTITUTIONS',
+                'USER:%s:%s' % (user, file))
             if user not in d.getVar('USERADD_PARAM_%s' % pkg, True):
                 set_append(
                     d,
@@ -207,9 +204,13 @@ python() {
 
 python systemd_do_postinst() {
     def make_subs(d):
-        for f in listvar_to_list(d, '_MAKE_SUBS'):
-            subs = dict([ x.split(':') for x in
-                listvar_to_list(d, 'SYSTEMD_SUBSTITUTIONS_%s' % f)])
+        all_subs = {}
+        for spec in listvar_to_list(d, 'SYSTEMD_SUBSTITUTIONS'):
+            spec, file = spec.rsplit(':', 1)
+            all_subs.setdefault(file, []).append(spec)
+
+        for f, v in all_subs.iteritems():
+            subs = dict([ x.split(':') for x in v])
             if not subs:
                 continue
 
