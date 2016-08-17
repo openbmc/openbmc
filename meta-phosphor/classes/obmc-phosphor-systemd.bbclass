@@ -14,13 +14,13 @@
 #    Inhibit the warning that is displayed if a service unit without a
 #    restart policy is detected.
 #
-# SYSTEMD_SUBSTITUTIONS_${unit}
-#    Variables in this list will be substituted in the specified unit
+# SYSTEMD_SUBSTITUTIONS_${path-relative-to-system_unitdir}
+#    Variables in this list will be substituted in the specified
 #    file during install (if bitbake finds python {format} strings
-#    in the unit file itself).  List entries take the form:
+#    in the file itself).  List entries take the form:
 #      VAR:VALUE
 #    where {VAR} is the format string bitbake should look for in the
-#    unit file and VALUE is the value to substitute.
+#    file and VALUE is the value to substitute.
 #
 # SYSTEMD_USER_${PN}.service = "foo"
 # SYSTEMD_USER_${unit}.service = "foo"
@@ -75,10 +75,11 @@ python() {
 
 
     def add_sd_unit(d, unit, pkg):
+        unit_dir = d.getVar('systemd_system_unitdir', True)
         set_append(d, 'SRC_URI', 'file://%s' % unit)
-        set_append(d, 'FILES_%s' % pkg, '%s/%s' \
-            % (d.getVar('systemd_system_unitdir', True), unit))
+        set_append(d, 'FILES_%s' % pkg, '%s/%s' % (unit_dir, unit))
         set_append(d, '_INSTALL_SD_UNITS', unit)
+        set_append(d, '_MAKE_SUBS', '%s' % unit)
 
         for x in [
                 'base_bindir',
@@ -133,15 +134,15 @@ python() {
 
 
 python systemd_do_postinst() {
-    for unit in listvar_to_list(d, '_INSTALL_SD_UNITS'):
+    for f in listvar_to_list(d, '_MAKE_SUBS'):
         subs = dict([ x.split(':') for x in
-            listvar_to_list(d, 'SYSTEMD_SUBSTITUTIONS_%s' % unit)])
+            listvar_to_list(d, 'SYSTEMD_SUBSTITUTIONS_%s' % f)])
         if not subs:
             continue
 
         path = d.getVar('D', True)
         path += d.getVar('systemd_system_unitdir', True)
-        path += '/%s' % unit
+        path += '/%s' % f
         with open(path, 'r') as fd:
             content = fd.read()
         with open(path, 'w+') as fd:
@@ -149,7 +150,7 @@ python systemd_do_postinst() {
                 fd.write(content.format(**subs))
             except KeyError as e:
                 bb.fatal('No substitution found for %s in '
-                    'unit file \'%s\'' % (e, unit))
+                    'file \'%s\'' % (e, f))
 }
 
 
