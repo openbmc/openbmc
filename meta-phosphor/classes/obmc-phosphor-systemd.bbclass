@@ -83,23 +83,27 @@ python() {
                 'have a restart policy defined.' % nfo['unit'])
 
 
-    def add_sd_unit(d, nfo, pkg):
-        unit_dir = d.getVar('systemd_system_unitdir', True)
-        set_append(d, 'SRC_URI', 'file://%s' % nfo['unit'])
-        set_append(d, 'FILES_%s' % pkg, '%s/%s' % (unit_dir, nfo['unit']))
-        set_append(d, '_INSTALL_SD_UNITS', nfo['unit'])
-        set_append(d, '_MAKE_SUBS', '%s' % nfo['unit'])
+    def add_default_subs(d, file):
+        set_append(d, '_MAKE_SUBS', '%s' % file)
 
         for x in [
                 'base_bindir',
                 'bindir',
                 'sbindir',
                 'SYSTEMD_DEFAULT_TARGET' ]:
-            set_append(d, 'SYSTEMD_SUBSTITUTIONS_%s' % nfo['unit'],
+            set_append(d, 'SYSTEMD_SUBSTITUTIONS_%s' % file,
                 '%s:%s' % (x, d.getVar(x, True)))
 
 
-    def add_sd_user(d, nfo, pkg):
+    def add_sd_unit(d, nfo, pkg):
+        unit_dir = d.getVar('systemd_system_unitdir', True)
+        set_append(d, 'SRC_URI', 'file://%s' % nfo['unit'])
+        set_append(d, 'FILES_%s' % pkg, '%s/%s' % (unit_dir, nfo['unit']))
+        set_append(d, '_INSTALL_SD_UNITS', nfo['unit'])
+        add_default_subs(d, nfo['unit'])
+
+
+    def add_sd_user(d, file, pkg):
         opts = [
             '--system',
             '--home',
@@ -108,7 +112,7 @@ python() {
             '--shell /sbin/nologin',
             '--user-group']
 
-        var = 'SYSTEMD_USER_%s' % nfo['unit']
+        var = 'SYSTEMD_USER_%s' % file
         user = listvar_to_list(d, var)
         if len(user) is 0:
             var = 'SYSTEMD_USER_%s' % pkg
@@ -119,7 +123,7 @@ python() {
 
             user = user[0]
             unit_dir = d.getVar('systemd_system_unitdir', True)
-            set_append(d, 'SYSTEMD_SUBSTITUTIONS_%s' % nfo['unit'],
+            set_append(d, 'SYSTEMD_SUBSTITUTIONS_%s' % file,
                 'USER:%s' % user)
             if user not in d.getVar('USERADD_PARAM_%s' % pkg, True):
                 set_append(
@@ -140,28 +144,32 @@ python() {
             nfo = systemd_unit_info(unit)
             check_sd_unit(d, nfo)
             add_sd_unit(d, nfo, pkg)
-            add_sd_user(d, nfo, pkg)
+            add_sd_user(d, nfo['unit'], pkg)
 }
 
 
 python systemd_do_postinst() {
-    for f in listvar_to_list(d, '_MAKE_SUBS'):
-        subs = dict([ x.split(':') for x in
-            listvar_to_list(d, 'SYSTEMD_SUBSTITUTIONS_%s' % f)])
-        if not subs:
-            continue
+    def make_subs(d):
+        for f in listvar_to_list(d, '_MAKE_SUBS'):
+            subs = dict([ x.split(':') for x in
+                listvar_to_list(d, 'SYSTEMD_SUBSTITUTIONS_%s' % f)])
+            if not subs:
+                continue
 
-        path = d.getVar('D', True)
-        path += d.getVar('systemd_system_unitdir', True)
-        path += '/%s' % f
-        with open(path, 'r') as fd:
-            content = fd.read()
-        with open(path, 'w+') as fd:
-            try:
-                fd.write(content.format(**subs))
-            except KeyError as e:
-                bb.fatal('No substitution found for %s in '
-                    'file \'%s\'' % (e, f))
+            path = d.getVar('D', True)
+            path += d.getVar('systemd_system_unitdir', True)
+            path += '/%s' % f
+            with open(path, 'r') as fd:
+                content = fd.read()
+            with open(path, 'w+') as fd:
+                try:
+                    fd.write(content.format(**subs))
+                except KeyError as e:
+                    bb.fatal('No substitution found for %s in '
+                        'file \'%s\'' % (e, f))
+
+
+    make_subs(d)
 }
 
 
