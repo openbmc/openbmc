@@ -3,7 +3,7 @@ DESCRIPTION = "OpenBMC system manager."
 PR = "r1"
 
 inherit skeleton-python
-inherit obmc-phosphor-systemd
+inherit obmc-phosphor-dbus-service
 
 VIRTUAL-RUNTIME_skeleton_workbook ?= ""
 
@@ -25,3 +25,6 @@ do_compile_append() {
 do_install_append() {
 	oe_runmake -C ../hacks install DESTDIR=${D}
 }
+
+DBUS_SERVICE_${PN} += "org.openbmc.managers.System.service"
+SYSTEMD_SERVICE_${PN} += "startup-hacks.service"
