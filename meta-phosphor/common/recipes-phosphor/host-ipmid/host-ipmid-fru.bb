@@ -18,7 +18,7 @@ TARGET_CFLAGS += " -fpic -std=gnu++14"
 
 SRC_URI += "git://github.com/openbmc/ipmi-fru-parser"
 
-SRCREV = "de6a37983420f5067327b46bbfbefa3601c449aa"
+SRCREV = "867da9714222e5d6babdad930d7238486e4698ca"
 
 FILES_SOLIBSDEV += "${libdir}/host-ipmid/lib*${SOLIBSDEV}"
 FILES_${PN} += "${libdir}/host-ipmid/lib*${SOLIBS}"
