@@ -3,6 +3,7 @@ DESCRIPTION = "OpenBMC fan control."
 PR = "r1"
 
 inherit skeleton-python
+inherit obmc-phosphor-dbus-service
 
 RDEPENDS_${PN} += "\
         python-dbus \
@@ -10,3 +11,5 @@ RDEPENDS_${PN} += "\
         pyphosphor \
         "
 SKELETON_DIR = "pyfanctl"
+DBUS_SERVICE_${PN} += "org.openbmc.control.Fans.service"
+SYSTEMD_SERVICE_${PN} += "obmc-max-fans.service"
