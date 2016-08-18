@@ -6,4 +6,7 @@
 /etc/group
 /etc/shadow
 /etc/gshadow
+/etc/default/busybox-syslog
+/var/cache/obmc/
+/var/lib/obmc/
 /var/lib/obmc/events
