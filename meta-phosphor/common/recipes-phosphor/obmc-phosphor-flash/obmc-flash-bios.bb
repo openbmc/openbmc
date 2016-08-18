@@ -5,5 +5,8 @@ and updating."
 PR = "r1"
 
 inherit skeleton-gdbus
+inherit obmc-phosphor-dbus-service
 
 SKELETON_DIR = "flashbios"
+DBUS_SERVICE_${PN} += "org.openbmc.control.Flash.service"
+SYSTEMD_SERVICE_${PN} += "obmc-flash-init.service"

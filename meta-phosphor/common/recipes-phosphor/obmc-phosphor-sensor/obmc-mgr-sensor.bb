@@ -3,6 +3,7 @@ DESCRIPTION = "OpenBMC sensor manager."
 PR = "r1"
 
 inherit skeleton-python
+inherit obmc-phosphor-dbus-service
 
 VIRTUAL-RUNTIME_skeleton_workbook ?= ""
 
@@ -15,3 +16,4 @@ RDEPENDS_${PN} += "\
         "
 
 SKELETON_DIR = "pysensormgr"
+DBUS_SERVICE_${PN} += "org.openbmc.Sensors.service"
