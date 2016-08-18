@@ -3,6 +3,7 @@ DESCRIPTION = "An example implementation for the org.openbmc.managers.Download D
 PR = "r1"
 
 inherit skeleton-python
+inherit obmc-phosphor-dbus-service
 
 RDEPENDS_${PN} += "\
         python-dbus \
@@ -12,3 +13,4 @@ RDEPENDS_${PN} += "\
         "
 
 SKELETON_DIR = "pydownloadmgr"
+DBUS_SERVICE_${PN} += "org.openbmc.managers.Download.service"
