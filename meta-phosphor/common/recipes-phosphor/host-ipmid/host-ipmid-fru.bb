@@ -6,6 +6,7 @@ PR = "r1"
 RRECOMMENDS_${PN} = "virtual/obmc-phosphor-host-ipmi-hw"
 
 inherit obmc-phosphor-license
+inherit obmc-phosphor-systemd
 
 DEPENDS += " \
         systemd \
@@ -16,6 +17,7 @@ RDEPENDS_${PN} += "libsystemd"
 
 TARGET_CXXFLAGS += " -fpic -std=gnu++14"
 TARGET_CFLAGS += " -fpic"
+SYSTEMD_SERVICE_${PN} += "obmc-read-eeprom@.service"
 
 SRC_URI += "git://github.com/openbmc/ipmi-fru-parser"
 
