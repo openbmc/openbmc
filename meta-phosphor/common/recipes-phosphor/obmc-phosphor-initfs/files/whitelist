@@ -6,4 +6,6 @@
 /etc/group
 /etc/shadow
 /etc/gshadow
+/var/cache/obmc/
+/var/lib/obmc/
 /var/lib/obmc/events
