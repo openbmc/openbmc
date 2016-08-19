@@ -17,11 +17,7 @@ VIRTUAL-RUNTIME_obmc-phosphor-chassis-ctl = " \
 VIRTUAL-RUNTIME_obmc-phosphor-flash-ctl = " \
        obmc-phosphor-example-pydbus \
        "
-VIRTUAL-RUNTIME_obmc-phosphor-ipmi-parsers = " \
-        host-ipmid-oem \
-        host-ipmid-fru \
-        host-ipmid-tool \
-       "
+
 PREFERRED_PROVIDER_virtual/obmc-phosphor-host-ipmi-hw = "host-ipmi-hw-example"
 PREFERRED_PROVIDER_virtual/obmc-phosphor-chassis-mgmt = "obmc-phosphor-chassisd"
 PREFERRED_PROVIDER_virtual/obmc-phosphor-event-mgmt = "obmc-phosphor-event"

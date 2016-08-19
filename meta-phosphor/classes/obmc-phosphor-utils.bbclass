@@ -27,3 +27,10 @@ def set_append(d, var, val, sep=' '):
 
 def listvar_to_list(d, list_var, sep=' '):
     return filter(bool, (d.getVar(list_var, True) or '').split(sep))
+
+def append_suffix(val, suffix):
+    words = val.split(' ')
+    newval = []
+    for w in words:
+        newval.append(w + suffix)
+    return ' '.join(newval)

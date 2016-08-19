@@ -5,9 +5,6 @@ PR = "r1"
 
 RRECOMMENDS_${PN} += "virtual/obmc-phosphor-host-ipmi-hw"
 
-RRECOMMENDS_${PN} += "${VIRTUAL-RUNTIME_obmc-phosphor-ipmi-parsers}"
-
-
 inherit obmc-phosphor-license
 inherit obmc-phosphor-sdbus-service
 inherit obmc-phosphor-c-daemon
@@ -15,12 +12,12 @@ inherit obmc-phosphor-c-daemon
 TARGET_CFLAGS   += "-fpic"
 
 DEPENDS += "obmc-mapper"
-DEPENDS += "host-ipmid-fru-whitelist-native"
-DEPENDS += "host-ipmid-oem-whitelist-native"
+DEPENDS += "packagegroup-obmc-ipmid-whitelists-native"
 RDEPENDS_${PN} += "clear-once"
 RDEPENDS_${PN} += "settings"
 RDEPENDS_${PN} += "network"
 RDEPENDS_${PN} += "libmapper"
+RDEPENDS_${PN} += "packagegroup-obmc-ipmid-providers"
 SRC_URI += "git://github.com/openbmc/phosphor-host-ipmid"
 
 SRCREV = "bc40c178bb0b345ed1edf553b94369330003af34"
