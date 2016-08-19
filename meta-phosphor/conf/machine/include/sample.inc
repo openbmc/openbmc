@@ -5,11 +5,6 @@ OBMC_MACHINE_FEATURES += "\
         obmc-phosphor-flash-mgmt \
         "
 
-VIRTUAL-RUNTIME_obmc-phosphor-ipmi-parsers = " \
-        host-ipmid-oem \
-        host-ipmid-fru \
-        host-ipmid-tool \
-       "
 PREFERRED_PROVIDER_virtual/obmc-host-ipmi-hw = "host-ipmi-hw-example"
 PREFERRED_PROVIDER_virtual/obmc-chassis-mgmt = "obmc-phosphor-chassisd"
 PREFERRED_PROVIDER_virtual/obmc-event-mgmt = "obmc-phosphor-event"
