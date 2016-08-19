@@ -57,6 +57,26 @@
 #    The lists are zipped and simple substitutions (of the current tuple)
 #    are supported in the tgt and name fields using [%i] where i is the
 #    tuple element to substitute.
+#
+# SYSTEMD_OVERRIDE_${PN} = "src:dest"
+#    A specification for installing unit overrides where:
+#      src: the override file template
+#      dest: the override install location, relative to ${systemd_system_unitdir}
+#
+#    Typically SYSTEMD_SUBSTITUTIONS is used to deploy a range
+#    of overrides from a single template file.  To simply install
+#    a single override use "foo.conf:my-service.d/foo.conf"
+#
+# SYSTEMD_GENOVERRIDES_${PN} = "src:dest:listvars..."
+#    A convenience variable for generating override files from one or more
+#    lists where:
+#      src: a template override file
+#      dest: the target of the override relative to ${systemd_system_unitdir}
+#      listvars: one or more list variable names.
+#
+#    The lists are zipped and simple substitutions (of the current tuple)
+#    are supported in the src and dest fields using [%i] where i is the
+#    tuple element to substitute.
 
 
 inherit obmc-phosphor-utils
@@ -237,6 +257,41 @@ python() {
         set_append(d, 'SYSTEMD_SUBSTITUTIONS', subs)
 
 
+    def add_override(d, spec, pkg):
+        tmpl, dest = spec.split(':')
+        set_append(d, '_INSTALL_OVERRIDES', '%s' % spec)
+        unit_dir = d.getVar('systemd_system_unitdir', True)
+        set_append(d, 'FILES_%s' % pkg, '%s/%s' % (unit_dir, dest))
+        add_default_subs(d, '%s' % dest)
+        add_sd_user(d, '%s' % dest, pkg)
+
+
+    def gen_overrides(d, spec, pkg):
+        spec = spec.split(':')
+        srcfmt, destfmt = spec[:2]
+        listvars = spec[2:]
+        lists = []
+        sources = []
+        tgts = []
+
+        for var in listvars:
+            lists.append(listvar_to_list(d, var))
+
+        for tup in zip(*lists):
+            src = srcfmt
+            dest = destfmt
+            for i in range(len(tup)):
+                src = src.replace('[%s]' %i, tup[i])
+                dest = dest.replace('[%s]' %i, tup[i])
+            sources.append(src)
+            tgts.append(dest)
+
+        overrides = ' '.join([':'.join(x) for x in
+            zip(sources, tgts)])
+
+        set_append(d, 'SYSTEMD_OVERRIDE_%s' % pkg, overrides)
+
+
     pn = d.getVar('PN', True)
     if d.getVar('SYSTEMD_SERVICE_%s' % pn, True) is None:
         d.setVar('SYSTEMD_SERVICE_%s' % pn, '%s.service' % pn)
@@ -246,6 +301,8 @@ python() {
             gen_links(d, spec, pkg)
         for spec in listvar_to_list(d, 'SYSTEMD_GENSUBSTITUTIONS'):
             gen_subs(d, spec)
+        for spec in listvar_to_list(d, 'SYSTEMD_GENOVERRIDES_%s' % pkg):
+            gen_overrides(d, spec, pkg)
         for unit in listvar_to_list(d, 'SYSTEMD_SERVICE_%s' % pkg):
             nfo = systemd_unit_info(unit)
             check_sd_unit(d, nfo)
@@ -320,8 +377,32 @@ python systemd_do_postinst() {
             os.symlink(tgt, dest)
 
 
+    def install_overrides(d):
+        install_dir = d.getVar('D', True)
+        install_dir += d.getVar('systemd_system_unitdir', True)
+        searchpaths = d.getVar('FILESPATH', True)
+
+        for spec in listvar_to_list(d, '_INSTALL_OVERRIDES'):
+            tmpl, dest = spec.split(':')
+            source = bb.utils.which(searchpaths, tmpl)
+            if not os.path.isfile(source):
+                bb.fatal('Did not find SYSTEMD_OVERRIDE '
+                    'template: \'%s\'' % source)
+
+            dest = '%s/%s' % (install_dir, dest)
+            parent = os.path.dirname(dest)
+            if not os.path.exists(parent):
+                os.makedirs(parent)
+
+            with open(source, 'r') as fd:
+                content = fd.read()
+            with open('%s' % dest, 'w+') as fd:
+                fd.write(content)
+
+
     install_links(d)
     install_envs(d)
+    install_overrides(d)
     make_subs(d)
 }
 
