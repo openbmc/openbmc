@@ -33,6 +33,15 @@
 #    the ${systemd_system_unitdir} namespace, where:
 #      tgt: the link target
 #      name: the link name, relative to ${systemd_system_unitdir}
+#
+# SYSTEMD_OVERRIDE_${PN} = "src:dest"
+#    A specification for installing unit overrides where:
+#      src: the override file template
+#      dest: the override install location, relative to ${systemd_system_unitdir}
+#
+#    Typically SYSTEMD_SUBSTITUTIONS is used to deploy a range
+#    of overrides from a single template file.  To simply install
+#    a single override use "foo.conf:my-service.d/foo.conf"
 
 
 inherit obmc-phosphor-utils
@@ -179,6 +188,15 @@ python() {
         set_append(d, '_INSTALL_LINKS', spec)
 
 
+    def add_override(d, spec, pkg):
+        tmpl, dest = spec.split(':')
+        set_append(d, '_INSTALL_OVERRIDES', '%s' % spec)
+        unit_dir = d.getVar('systemd_system_unitdir', True)
+        set_append(d, 'FILES_%s' % pkg, '%s/%s' % (unit_dir, dest))
+        add_default_subs(d, '%s' % dest)
+        add_sd_user(d, '%s' % dest, pkg)
+
+
     pn = d.getVar('PN', True)
     if d.getVar('SYSTEMD_SERVICE_%s' % pn, True) is None:
         d.setVar('SYSTEMD_SERVICE_%s' % pn, '%s.service' % pn)
@@ -199,6 +217,8 @@ python() {
             add_env_file(d, name, pkg)
         for spec in listvar_to_list(d, 'SYSTEMD_LINK_%s' % pkg):
             install_link(d, spec, pkg)
+        for spec in listvar_to_list(d, 'SYSTEMD_OVERRIDE_%s' % pkg):
+            add_override(d, spec, pkg)
 }
 
 
@@ -262,8 +282,32 @@ python systemd_do_postinst() {
             os.symlink(tgt, dest)
 
 
+    def install_overrides(d):
+        install_dir = d.getVar('D', True)
+        install_dir += d.getVar('systemd_system_unitdir', True)
+        searchpaths = d.getVar('FILESPATH', True)
+
+        for spec in listvar_to_list(d, '_INSTALL_OVERRIDES'):
+            tmpl, dest = spec.split(':')
+            source = bb.utils.which(searchpaths, tmpl)
+            if not os.path.isfile(source):
+                bb.fatal('Did not find SYSTEMD_OVERRIDE '
+                    'template: \'%s\'' % source)
+
+            dest = os.path.join(install_dir, dest)
+            parent = os.path.dirname(dest)
+            if not os.path.exists(parent):
+                os.makedirs(parent)
+
+            with open(source, 'r') as fd:
+                content = fd.read()
+            with open('%s' % dest, 'w+') as fd:
+                fd.write(content)
+
+
     install_links(d)
     install_envs(d)
+    install_overrides(d)
     make_subs(d)
 }
 
