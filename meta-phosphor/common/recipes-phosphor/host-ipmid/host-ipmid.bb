@@ -5,7 +5,7 @@ PR = "r1"
 
 RRECOMMENDS_${PN} += "virtual-obmc-host-ipmi-hw"
 
-RRECOMMENDS_${PN} += "${VIRTUAL-RUNTIME_obmc-phosphor-ipmi-parsers}"
+RRECOMMENDS_${PN} += "packagegroup-obmc-ipmid-providers-libs"
 
 inherit autotools pkgconfig
 inherit obmc-phosphor-license

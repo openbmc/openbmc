@@ -7,10 +7,6 @@ OBMC_MACHINE_FEATURES += "\
         openpower-pflash \
         "
 
-VIRTUAL-RUNTIME_obmc-phosphor-ipmi-parsers = " \
-        host-ipmid-oem \
-        host-ipmid-fru \
-       "
 VIRTUAL-RUNTIME_skeleton_workbook = "${MACHINE}-config"
 
 PREFERRED_PROVIDER_virtual/obmc-host-ipmi-hw = "btbridged"
