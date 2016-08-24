@@ -1,0 +1,25 @@
+--- Python-2.7.11.orig/Lib/json/encoder.py	2016-08-24 14:39:20.186041330 -0500
++++ Python-2.7.11/Lib/json/encoder.py	2016-08-24 14:43:20.446045460 -0500
+@@ -28,7 +28,7 @@ for i in range(0x20):
+     #ESCAPE_DCT.setdefault(chr(i), '\\u%04x' % (i,))
+ 
+ INFINITY = float('inf')
+-FLOAT_REPR = repr
++FLOAT_REPR = str
+ 
+ def encode_basestring(s):
+     """Return a JSON representation of a Python string
+
+--- Python-2.7.11.orig/Modules/_json.c	2016-08-24 14:39:15.518041250 -0500
++++ Python-2.7.11/Modules/_json.c	2016-08-24 16:05:26.402130137 -0500
+@@ -1957,8 +1957,8 @@ encoder_encode_float(PyEncoderObject *s,
+             return PyString_FromString("NaN");
+         }
+     }
+-    /* Use a better float format here? */
+-    return PyObject_Repr(obj);
++    /* Use str to match integer types */
++    return PyObject_Str(obj);
+ }
+ 
+ static PyObject *
