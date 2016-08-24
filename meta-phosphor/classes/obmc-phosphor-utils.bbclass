@@ -27,3 +27,18 @@ def set_append(d, var, val, sep=' '):
 
 def listvar_to_list(d, list_var, sep=' '):
     return filter(bool, (d.getVar(list_var, True) or '').split(sep))
+
+
+def compose_list_zip(d, fmt, *a, **kw):
+    sep = kw.get('sep') or ' '
+    lists = [listvar_to_list(d, x) for x in a]
+    lst = []
+
+    for tup in zip(*lists):
+        val = fmt
+        for i in range(len(tup)):
+            val = val.replace('[%s]' %i, tup[i])
+
+        lst.append(val)
+
+    return sep.join(lst)
