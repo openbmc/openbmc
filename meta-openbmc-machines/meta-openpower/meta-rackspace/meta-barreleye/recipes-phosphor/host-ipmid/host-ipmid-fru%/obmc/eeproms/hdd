@@ -1,0 +1,2 @@
+EEPROM=/sys/bus/i2c/devices/6-0055/eeprom
+FRUID=66
