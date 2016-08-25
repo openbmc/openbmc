@@ -5,6 +5,7 @@ PR = "r1"
 S = "${WORKDIR}/git"
 
 inherit obmc-phosphor-license
+inherit obmc-xmlpatch
 inherit native
 
 PHOSPHOR_MRW_URI ?= "http://missing-mrw-uri"
