@@ -8,6 +8,7 @@
 # - obmc-phosphor-flash-mgmt          - Phosphor OpenBMC flash management
 # - obmc-phosphor-event-mgmt          - Phosphor OpenBMC event management
 # - obmc-phosphor-user-mgmt           - Phosphor OpenBMC user management
+# - obmc-phosphor-settings-mgmt       - Phosphor OpenBMC settings management
 # - obmc-phosphor-system-mgmt         - Phosphor OpenBMC system management
 
 inherit core-image
@@ -19,6 +20,7 @@ FEATURE_PACKAGES_obmc-phosphor-sensor-mgmt ?= "packagegroup-obmc-phosphor-apps-s
 FEATURE_PACKAGES_obmc-phosphor-flash-mgmt ?= "packagegroup-obmc-phosphor-apps-flash-mgmt"
 FEATURE_PACKAGES_obmc-phosphor-event-mgmt ?= "packagegroup-obmc-phosphor-apps-event-mgmt"
 FEATURE_PACKAGES_obmc-phosphor-user-mgmt ?= "packagegroup-obmc-phosphor-apps-user-mgmt"
+FEATURE_PACKAGES_obmc-phosphor-settings-mgmt ?= "packagegroup-obmc-phosphor-apps-settings-mgmt"
 FEATURE_PACKAGES_obmc-phosphor-system-mgmt ?= "packagegroup-obmc-phosphor-apps-system-mgmt"
 
 # Install entire Phosphor application stack by default
@@ -29,6 +31,7 @@ IMAGE_FEATURES += " \
         obmc-phosphor-flash-mgmt \
         obmc-phosphor-event-mgmt \
         obmc-phosphor-user-mgmt \
+        obmc-phosphor-settings-mgmt \
         obmc-phosphor-system-mgmt \
         ssh-server-dropbear \
         "
