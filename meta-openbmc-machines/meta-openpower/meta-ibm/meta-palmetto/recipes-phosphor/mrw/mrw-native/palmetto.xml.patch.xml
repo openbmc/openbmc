@@ -1,0 +1,467 @@
+<patches>
+
+<targetFile>palmetto.xml</targetFile>
+
+<!-- Add in the 5 fan and connector instances -->
+<targetInstance xpath="/">
+	<id>fanconn-0</id>
+	<type>connector-card-generic</type>
+	<library_target>false</library_target>
+	<instance_name>fanconn</instance_name>
+	<position>0</position>
+	<child_id>fan-0</child_id>
+	<attribute>
+		<id>CLASS</id>
+		<default>CONNECTOR</default>
+	</attribute>
+	<attribute>
+		<id>LOCATION_CODE</id>
+		<default></default>
+	</attribute>
+	<attribute>
+		<id>MODEL</id>
+		<default></default>
+	</attribute>
+	<attribute>
+		<id>MRW_TYPE</id>
+		<default>NA</default>
+	</attribute>
+	<attribute>
+		<id>POSITION</id>
+		<default>0</default>
+	</attribute>
+	<attribute>
+		<id>RESOURCE_IS_CRITICAL</id>
+		<default>0</default>
+	</attribute>
+	<attribute>
+		<id>TYPE</id>
+		<default>NA</default>
+	</attribute>
+</targetInstance>
+<targetInstance xpath="/">
+	<id>fan-0</id>
+	<type>card-fan</type>
+	<library_target>false</library_target>
+	<instance_name>fan</instance_name>
+	<position>0</position>
+	<attribute>
+		<id>CLASS</id>
+		<default>CARD</default>
+	</attribute>
+	<attribute>
+		<id>FRU_ID</id>
+		<default></default>
+	</attribute>
+	<attribute>
+		<id>FRU_NAME</id>
+		<default>FAN</default>
+	</attribute>
+	<attribute>
+		<id>LOCATION_CODE</id>
+		<default></default>
+	</attribute>
+	<attribute>
+		<id>MODEL</id>
+		<default></default>
+	</attribute>
+	<attribute>
+		<id>MRW_TYPE</id>
+		<default>NA</default>
+	</attribute>
+	<attribute>
+		<id>POSITION</id>
+		<default>0</default>
+	</attribute>
+	<attribute>
+		<id>RESOURCE_IS_CRITICAL</id>
+		<default>0</default>
+	</attribute>
+	<attribute>
+		<id>TYPE</id>
+		<default>FAN</default>
+	</attribute>
+</targetInstance>
+<targetInstance xpath="/">
+	<id>fanconn-1</id>
+	<type>connector-card-generic</type>
+	<library_target>false</library_target>
+	<instance_name>fanconn</instance_name>
+	<position>1</position>
+	<child_id>fan-1</child_id>
+	<attribute>
+		<id>CLASS</id>
+		<default>CONNECTOR</default>
+	</attribute>
+	<attribute>
+		<id>LOCATION_CODE</id>
+		<default></default>
+	</attribute>
+	<attribute>
+		<id>MODEL</id>
+		<default></default>
+	</attribute>
+	<attribute>
+		<id>MRW_TYPE</id>
+		<default>NA</default>
+	</attribute>
+	<attribute>
+		<id>POSITION</id>
+		<default>1</default>
+	</attribute>
+	<attribute>
+		<id>RESOURCE_IS_CRITICAL</id>
+		<default>0</default>
+	</attribute>
+	<attribute>
+		<id>TYPE</id>
+		<default>NA</default>
+	</attribute>
+</targetInstance>
+<targetInstance xpath="/">
+	<id>fan-1</id>
+	<type>card-fan</type>
+	<library_target>false</library_target>
+	<instance_name>fan</instance_name>
+	<position>1</position>
+	<attribute>
+		<id>CLASS</id>
+		<default>CARD</default>
+	</attribute>
+	<attribute>
+		<id>FRU_ID</id>
+		<default></default>
+	</attribute>
+	<attribute>
+		<id>FRU_NAME</id>
+		<default>FAN</default>
+	</attribute>
+	<attribute>
+		<id>LOCATION_CODE</id>
+		<default></default>
+	</attribute>
+	<attribute>
+		<id>MODEL</id>
+		<default></default>
+	</attribute>
+	<attribute>
+		<id>MRW_TYPE</id>
+		<default>NA</default>
+	</attribute>
+	<attribute>
+		<id>POSITION</id>
+		<default>1</default>
+	</attribute>
+	<attribute>
+		<id>RESOURCE_IS_CRITICAL</id>
+		<default>0</default>
+	</attribute>
+	<attribute>
+		<id>TYPE</id>
+		<default>FAN</default>
+	</attribute>
+</targetInstance>
+<targetInstance xpath="/">
+	<id>fanconn-2</id>
+	<type>connector-card-generic</type>
+	<library_target>false</library_target>
+	<instance_name>fanconn</instance_name>
+	<position>2</position>
+	<child_id>fan-2</child_id>
+	<attribute>
+		<id>CLASS</id>
+		<default>CONNECTOR</default>
+	</attribute>
+	<attribute>
+		<id>LOCATION_CODE</id>
+		<default></default>
+	</attribute>
+	<attribute>
+		<id>MODEL</id>
+		<default></default>
+	</attribute>
+	<attribute>
+		<id>MRW_TYPE</id>
+		<default>NA</default>
+	</attribute>
+	<attribute>
+		<id>POSITION</id>
+		<default>2</default>
+	</attribute>
+	<attribute>
+		<id>RESOURCE_IS_CRITICAL</id>
+		<default>0</default>
+	</attribute>
+	<attribute>
+		<id>TYPE</id>
+		<default>NA</default>
+	</attribute>
+</targetInstance>
+<targetInstance xpath="/">
+	<id>fan-2</id>
+	<type>card-fan</type>
+	<library_target>false</library_target>
+	<instance_name>fan</instance_name>
+	<position>2</position>
+	<attribute>
+		<id>CLASS</id>
+		<default>CARD</default>
+	</attribute>
+	<attribute>
+		<id>FRU_ID</id>
+		<default></default>
+	</attribute>
+	<attribute>
+		<id>FRU_NAME</id>
+		<default>FAN</default>
+	</attribute>
+	<attribute>
+		<id>LOCATION_CODE</id>
+		<default></default>
+	</attribute>
+	<attribute>
+		<id>MODEL</id>
+		<default></default>
+	</attribute>
+	<attribute>
+		<id>MRW_TYPE</id>
+		<default>NA</default>
+	</attribute>
+	<attribute>
+		<id>POSITION</id>
+		<default>2</default>
+	</attribute>
+	<attribute>
+		<id>RESOURCE_IS_CRITICAL</id>
+		<default>0</default>
+	</attribute>
+	<attribute>
+		<id>TYPE</id>
+		<default>FAN</default>
+	</attribute>
+</targetInstance>
+<targetInstance xpath="/">
+	<id>fanconn-3</id>
+	<type>connector-card-generic</type>
+	<library_target>false</library_target>
+	<instance_name>fanconn</instance_name>
+	<position>3</position>
+	<child_id>fan-3</child_id>
+	<attribute>
+		<id>CLASS</id>
+		<default>CONNECTOR</default>
+	</attribute>
+	<attribute>
+		<id>LOCATION_CODE</id>
+		<default></default>
+	</attribute>
+	<attribute>
+		<id>MODEL</id>
+		<default></default>
+	</attribute>
+	<attribute>
+		<id>MRW_TYPE</id>
+		<default>NA</default>
+	</attribute>
+	<attribute>
+		<id>POSITION</id>
+		<default>3</default>
+	</attribute>
+	<attribute>
+		<id>RESOURCE_IS_CRITICAL</id>
+		<default>0</default>
+	</attribute>
+	<attribute>
+		<id>TYPE</id>
+		<default>NA</default>
+	</attribute>
+</targetInstance>
+<targetInstance xpath="/">
+	<id>fan-3</id>
+	<type>card-fan</type>
+	<library_target>false</library_target>
+	<instance_name>fan</instance_name>
+	<position>3</position>
+	<attribute>
+		<id>CLASS</id>
+		<default>CARD</default>
+	</attribute>
+	<attribute>
+		<id>FRU_ID</id>
+		<default></default>
+	</attribute>
+	<attribute>
+		<id>FRU_NAME</id>
+		<default>FAN</default>
+	</attribute>
+	<attribute>
+		<id>LOCATION_CODE</id>
+		<default></default>
+	</attribute>
+	<attribute>
+		<id>MODEL</id>
+		<default></default>
+	</attribute>
+	<attribute>
+		<id>MRW_TYPE</id>
+		<default>NA</default>
+	</attribute>
+	<attribute>
+		<id>POSITION</id>
+		<default>3</default>
+	</attribute>
+	<attribute>
+		<id>RESOURCE_IS_CRITICAL</id>
+		<default>0</default>
+	</attribute>
+	<attribute>
+		<id>TYPE</id>
+		<default>FAN</default>
+	</attribute>
+</targetInstance>
+<targetInstance xpath="/">
+	<id>fanconn-4</id>
+	<type>connector-card-generic</type>
+	<library_target>false</library_target>
+	<instance_name>fanconn</instance_name>
+	<position>4</position>
+	<child_id>fan-4</child_id>
+	<attribute>
+		<id>CLASS</id>
+		<default>CONNECTOR</default>
+	</attribute>
+	<attribute>
+		<id>LOCATION_CODE</id>
+		<default></default>
+	</attribute>
+	<attribute>
+		<id>MODEL</id>
+		<default></default>
+	</attribute>
+	<attribute>
+		<id>MRW_TYPE</id>
+		<default>NA</default>
+	</attribute>
+	<attribute>
+		<id>POSITION</id>
+		<default>4</default>
+	</attribute>
+	<attribute>
+		<id>RESOURCE_IS_CRITICAL</id>
+		<default>0</default>
+	</attribute>
+	<attribute>
+		<id>TYPE</id>
+		<default>NA</default>
+	</attribute>
+</targetInstance>
+<targetInstance xpath="/">
+	<id>fan-4</id>
+	<type>card-fan</type>
+	<library_target>false</library_target>
+	<instance_name>fan</instance_name>
+	<position>4</position>
+	<attribute>
+		<id>CLASS</id>
+		<default>CARD</default>
+	</attribute>
+	<attribute>
+		<id>FRU_ID</id>
+		<default></default>
+	</attribute>
+	<attribute>
+		<id>FRU_NAME</id>
+		<default>FAN</default>
+	</attribute>
+	<attribute>
+		<id>LOCATION_CODE</id>
+		<default></default>
+	</attribute>
+	<attribute>
+		<id>MODEL</id>
+		<default></default>
+	</attribute>
+	<attribute>
+		<id>MRW_TYPE</id>
+		<default>NA</default>
+	</attribute>
+	<attribute>
+		<id>POSITION</id>
+		<default>4</default>
+	</attribute>
+	<attribute>
+		<id>RESOURCE_IS_CRITICAL</id>
+		<default>0</default>
+	</attribute>
+	<attribute>
+		<id>TYPE</id>
+		<default>FAN</default>
+	</attribute>
+</targetInstance>
+
+<!-- place the fan connectors on the motherboard -->
+<targetInstance type="add-child" xpath="targetInstance[id='motherboard-0']">
+	<child_id>fanconn-0</child_id>
+	<child_id>fanconn-1</child_id>
+	<child_id>fanconn-2</child_id>
+	<child_id>fanconn-3</child_id>
+	<child_id>fanconn-4</child_id>
+</targetInstance>
+
+<!-- Add in the motherboard FRU name -->
+<attribute type="add" xpath="targetInstance[id='motherboard-0']">
+    <id>FRU_NAME</id>
+    <default>MOTHERBOARD</default>
+</attribute>
+
+<!-- add in some new types -->
+<enumerationType type="add-child" xpath="enumerationType[id='TYPE']">
+    <enumerator>
+        <name>FAN</name>
+        <value>35</value>
+    </enumerator>
+    <enumerator>
+        <name>PCIE_CARD</name>
+        <value>36</value>
+    </enumerator>
+</enumerationType>
+
+
+
+<!--fix up the other enums that come at the end of the list-->
+<enumerationType type="replace-child" key="name" xpath="enumerationType[id='TYPE']">
+    <enumerator>
+        <name>TEST_FAIL</name>
+        <value>37</value>
+    </enumerator>
+    <enumerator>
+        <name>LAST_IN_RANGE</name>
+        <value>38</value>
+    </enumerator>
+</enumerationType>
+
+<!-- Fix the PCIE card's type -->
+<attribute type="replace" xpath="targetInstance[id='pciecard_x8-0']/attribute[id='TYPE']">
+    <id>TYPE</id>
+    <default>PCIE_CARD</default>
+</attribute>
+
+<!-- Add the card's FRU name -->
+<attribute type="add" xpath="targetInstance[id='pciecard_x8-0']">
+    <id>FRU_NAME</id>
+    <default>PCIE_CARD</default>
+</attribute>
+
+<!-- Fix the PCIE card's type -->
+<attribute type="replace" xpath="targetInstance[id='pciecard_x16-0']/attribute[id='TYPE']">
+    <id>TYPE</id>
+    <default>PCIE_CARD</default>
+</attribute>
+
+<!-- Add the card's FRU name -->
+<attribute type="add" xpath="targetInstance[id='pciecard_x16-0']">
+    <id>FRU_NAME</id>
+    <default>PCIE_CARD</default>
+</attribute>
+
+</patches>
