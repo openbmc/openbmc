@@ -5,18 +5,14 @@ PR = "r1"
 
 inherit obmc-phosphor-license
 inherit obmc-phosphor-systemd
+inherit obmc-phosphor-settings-mgmt
+inherit setuptools
 
 RDEPENDS_${PN} += "python-dbus python-pygobject"
 
-SRC_URI += "git://github.com/openbmc/phosphor-settingsd"
+SRC_URI += "git:////esw/san2/anoo/github/anoo1/phosphor-settingsd;branch=0824_pysetup"
 
-SRCREV = "6710772692f3bedecea498a6a40e683aab6b0d3f"
+SRCREV = "22ca1b71c20007c04c8ddbb2a6c3a2497ffaeb40"
 
 S = "${WORKDIR}/git"
-
-do_install() {
-        install -d ${D}/${sbindir}
-        install ${S}/settings_file.py ${D}/${sbindir}
-        install ${S}/settings_manager.py ${D}/${sbindir}
-}
 
