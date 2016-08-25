@@ -20,6 +20,7 @@ PACKAGES = " \
         ${@mf_enabled("obmc-phosphor-flash-mgmt", "packagegroup-obmc-phosphor-apps-flash-mgmt", d)} \
         ${@df_enabled("obmc-phosphor-event-mgmt", "packagegroup-obmc-phosphor-apps-event-mgmt", d)} \
         ${@df_enabled("obmc-phosphor-user-mgmt", "packagegroup-obmc-phosphor-apps-user-mgmt", d)} \
+        ${@df_enabled("obmc-settings-mgmt", "packagegroup-obmc-apps-settings-mgmt", d)} \
         ${@df_enabled("obmc-phosphor-system-mgmt", "packagegroup-obmc-phosphor-apps-system-mgmt", d)} \
         "
 
@@ -74,8 +75,14 @@ RDEPENDS_packagegroup-obmc-phosphor-apps-user-mgmt = " \
                 virtual/obmc-phosphor-user-mgmt \
         ", d)}"
 
+SUMMARY_packagegroup-obmc-apps-settings-mgmt = "Settings management support"
+RDEPENDS_packagegroup-obmc-apps-settings-mgmt = " \
+        ${@df_enabled("obmc-settings-mgmt", " \
+                virtual-obmc-settings-mgmt \
+        ", d)}"
+
 SUMMARY_packagegroup-obmc-phosphor-apps-system-mgmt = "System management support"
 RDEPENDS_packagegroup-obmc-phosphor-apps-system-mgmt = " \
         ${@df_enabled("obmc-phosphor-system-mgmt", " \
-                virtual/obmc-phosphor-system-mgmt \
+                virtual-obmc-phosphor-system-mgmt \
         ", d)}"
