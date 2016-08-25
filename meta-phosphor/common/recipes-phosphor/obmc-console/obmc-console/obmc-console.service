@@ -2,7 +2,7 @@
 Description=OpenBMC console daemon
 
 [Service]
-ExecStart=/usr/sbin/obmc-console-server
+ExecStart=/usr/sbin/obmc-console-server ttyS0
 Restart=always
 
 [Install]
