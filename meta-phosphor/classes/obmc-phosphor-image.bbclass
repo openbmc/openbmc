@@ -8,6 +8,7 @@
 # - obmc-phosphor-flash-mgmt          - Phosphor OpenBMC flash management
 # - obmc-phosphor-event-mgmt          - Phosphor OpenBMC event management
 # - obmc-phosphor-user-mgmt           - Phosphor OpenBMC user management
+# - obmc-phosphor-settings-mgmt       - Phosphor OpenBMC settings management
 # - obmc-phosphor-system-mgmt         - Phosphor OpenBMC system management
 # - obmc-host-ipmi                    - OpenBMC Host IPMI
 
@@ -21,6 +22,7 @@ FEATURE_PACKAGES_obmc-sensor-mgmt ?= "${@cf_enabled('obmc-phosphor-sensor-mgmt',
 FEATURE_PACKAGES_obmc-flash-mgmt ?= "${@cf_enabled('obmc-phosphor-flash-mgmt', 'virtual-obmc-flash-mgmt', d)}"
 FEATURE_PACKAGES_obmc-event-mgmt ?= "${@df_enabled('obmc-phosphor-event-mgmt', 'virtual-obmc-event-mgmt', d)}"
 FEATURE_PACKAGES_obmc-user-mgmt ?= "${@df_enabled('obmc-phosphor-user-mgmt', 'virtual-obmc-user-mgmt', d)}"
+FEATURE_PACKAGES_obmc-settings-mgmt ?= "${@df_enabled('obmc-phosphor-settings-mgmt', 'virtual-obmc-settings-mgmt', d)}"
 FEATURE_PACKAGES_obmc-system-mgmt ?= "${@df_enabled('obmc-phosphor-system-mgmt', 'virtual-obmc-system-mgmt', d)}"
 FEATURE_PACKAGES_obmc-host-ipmi ?= "${@cf_enabled('obmc-host-ipmi', 'virtual-obmc-host-ipmi-hw', d)}"
 
@@ -32,6 +34,7 @@ IMAGE_FEATURES += " \
         obmc-flash-mgmt \
         obmc-event-mgmt \
         obmc-user-mgmt \
+        obmc-settings-mgmt \
         obmc-system-mgmt \
         obmc-host-ipmi \
         ssh-server-dropbear \
