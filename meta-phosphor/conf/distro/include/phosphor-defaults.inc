@@ -9,3 +9,4 @@ OBMC_BMC_INSTANCES ?= "0"
 OBMC_FAN_INSTANCES ?= ""
 
 PREFERRED_PROVIDER_virtual/obmc-wsgihost ?= "phosphor-gevent"
+PREFERRED_PROVIDER_virtual/obmc-settings-mgmt ?= "obmc-phosphor-settings"
