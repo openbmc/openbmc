@@ -1,5 +1,5 @@
 [Unit]
-Description=Phosphor OpenBMC sensor management daemon
+Description=Phosphor Sensor Manager
 
 [Service]
 Restart=always

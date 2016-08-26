@@ -1,5 +1,5 @@
 [Unit]
-Description=DNS update handler
+Description=Phosphor DNS Settings Cache Manager
 Requires=network.service
 After=network.service
 

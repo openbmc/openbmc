@@ -1,5 +1,5 @@
 [Unit]
-Description=Phosphor OpenBMC QEMU application example
+Description=Phosphor SDBus Application Example
 
 [Service]
 Restart=always

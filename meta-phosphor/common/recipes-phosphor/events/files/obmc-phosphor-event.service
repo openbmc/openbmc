@@ -1,5 +1,5 @@
 [Unit]
-Description=Phosphor OpenBMC event management daemon
+Description=Phosphor Event Manager
 
 [Service]
 EnvironmentFile=-/etc/default/eventd/eventd.conf

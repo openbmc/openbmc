@@ -1,5 +1,5 @@
 [Unit]
-Description=Settings DBUS Object
+Description=Phosphor Settings Manager
 
 [Service]
 ExecStart={sbindir}/settings_manager.py
