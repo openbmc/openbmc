@@ -1,5 +1,5 @@
 [Unit]
-Description=Phosphor OpenBMC DBus service management daemon
+Description=Phosphor DBus Service Manager
 Before=obmc-mapper.target
 
 [Service]

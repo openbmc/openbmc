@@ -1,5 +1,5 @@
 [Unit]
-Description=Phosphor Inverse ARP daemon
+Description=Phosphor Inverse ARP
 
 [Service]
 ExecStart={sbindir}/inarp

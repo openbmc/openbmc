@@ -1,5 +1,5 @@
 [Unit]
-Description=Phosphor OpenBMC IPMI daemon
+Description=Phosphor Host IPMI
 Wants=clear-once.service
 After=clear-once.service
 

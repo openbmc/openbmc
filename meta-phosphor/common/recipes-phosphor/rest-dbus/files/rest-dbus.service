@@ -1,5 +1,5 @@
 [Unit]
-Description=DBUS introspecting REST server.
+Description=Phosphor DBUS Browser
 
 [Service]
 Restart=always
