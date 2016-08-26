@@ -3,7 +3,7 @@ Description=Phosphor OpenBMC flash management daemon
 
 [Service]
 Restart=always
-ExecStart=/usr/sbin/obmc-phosphor-flashd
+ExecStart={sbindir}/obmc-phosphor-flashd
 
 [Install]
-WantedBy=multi-user.target
+WantedBy={SYSTEMD_DEFAULT_TARGET}

@@ -2,8 +2,8 @@
 Description=OpenBMC console daemon
 
 [Service]
-ExecStart=/usr/sbin/obmc-console-server ttyS0
+ExecStart={sbindir}/obmc-console-server ttyS0
 Restart=always
 
 [Install]
-WantedBy=multi-user.target
+WantedBy={SYSTEMD_DEFAULT_TARGET}

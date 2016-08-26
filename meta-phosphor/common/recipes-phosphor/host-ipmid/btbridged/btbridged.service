@@ -3,7 +3,7 @@ Description=Phosphor OpenBMC BT to DBUS
 
 [Service]
 Restart=always
-ExecStart=/usr/sbin/btbridged
+ExecStart={sbindir}/btbridged
 
 [Install]
-WantedBy=multi-user.target
+WantedBy={SYSTEMD_DEFAULT_TARGET}
