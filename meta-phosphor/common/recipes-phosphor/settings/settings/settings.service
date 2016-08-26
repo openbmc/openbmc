@@ -2,9 +2,9 @@
 Description=Settings DBUS Object
 
 [Service]
-ExecStart=/usr/sbin/settings_manager.py
+ExecStart={sbindir}/settings_manager.py
 Environment="PYTHONUNBUFFERED=1"
 Restart=always
 
 [Install]
-WantedBy=multi-user.target
+WantedBy={SYSTEMD_DEFAULT_TARGET}

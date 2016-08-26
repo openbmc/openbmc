@@ -4,8 +4,8 @@ Requires=network.service
 After=network.service
 
 [Service]
-ExecStart=/usr/sbin/netman_watch_dns /run/systemd/netif/state
+ExecStart={sbindir}/netman_watch_dns /run/systemd/netif/state
 Restart=always
 
 [Install]
-WantedBy=multi-user.target
+WantedBy={SYSTEMD_DEFAULT_TARGET}

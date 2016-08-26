@@ -3,7 +3,7 @@ Description=Phosphor OpenBMC system management daemon
 
 [Service]
 Restart=always
-ExecStart=/usr/sbin/obmc-phosphor-sysd
+ExecStart={sbindir}/obmc-phosphor-sysd
 
 [Install]
-WantedBy=multi-user.target
+WantedBy={SYSTEMD_DEFAULT_TARGET}

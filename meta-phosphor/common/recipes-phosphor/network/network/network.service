@@ -2,9 +2,9 @@
 Description=Network DBUS object
 
 [Service]
-ExecStart=/usr/sbin/netman.py
+ExecStart={sbindir}/netman.py
 Environment="PYTHONUNBUFFERED=1"
 Restart=always
 
 [Install]
-WantedBy=multi-user.target
+WantedBy={SYSTEMD_DEFAULT_TARGET}

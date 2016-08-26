@@ -4,7 +4,7 @@ Description=Phosphor OpenBMC event management daemon
 [Service]
 EnvironmentFile=-/etc/default/eventd/eventd.conf
 Restart=always
-ExecStart=/usr/sbin/obmc-phosphor-eventd $OPTIONS
+ExecStart={sbindir}/obmc-phosphor-eventd $OPTIONS
 
 [Install]
-WantedBy=multi-user.target
+WantedBy={SYSTEMD_DEFAULT_TARGET}
