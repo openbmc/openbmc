@@ -7,10 +7,12 @@ inherit skeleton-python
 VIRTUAL-RUNTIME_skeleton_workbook ?= ""
 
 RDEPENDS_${PN} += "\
+        python-argparse \
         python-dbus \
         python-json \
         python-pickle \
         python-pygobject \
+        python-subprocess \
         pyphosphor \
         ${VIRTUAL-RUNTIME_skeleton_workbook} \
         "
