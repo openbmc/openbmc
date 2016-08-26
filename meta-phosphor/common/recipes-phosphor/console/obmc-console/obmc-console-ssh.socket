@@ -1,5 +1,5 @@
 [Unit]
-Description=OpenBMC console ssh server socket
+Description=Phosphor Host Console SSH Per-Connection socket
 Conflicts=obmc-console-ssh.service
 Requires=obmc-console.service
 

@@ -1,5 +1,5 @@
 [Unit]
-Description=Phosphor OpenBMC user management daemon
+Description=Phosphor User Manager
 
 [Service]
 ExecStart={sbindir}/obmc-phosphor-userd

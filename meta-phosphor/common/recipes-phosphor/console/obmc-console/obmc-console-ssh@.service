@@ -1,5 +1,5 @@
 [Unit]
-Description=OBMC console SSH Per-Connection Server
+Description=Phosphor Host Console SSH Per-Connection
 Wants=obmc-console.service
 
 [Service]

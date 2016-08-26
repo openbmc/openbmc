@@ -1,5 +1,5 @@
 [Unit]
-Description=OpenBMC console daemon
+Description=Phosphor Console Muxer
 
 [Service]
 ExecStart={sbindir}/obmc-console-server ttyS0
