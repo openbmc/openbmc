@@ -5,10 +5,10 @@ Before=obmc-mapper.target
 [Service]
 Restart=always
 Type=dbus
-ExecStart=/usr/sbin/phosphor-mapper
+ExecStart={sbindir}/phosphor-mapper
 BusName=org.openbmc.ObjectMapper
 TimeoutStartSec=300
 Environment="PYTHONUNBUFFERED=1"
 
 [Install]
-WantedBy=multi-user.target
+WantedBy={SYSTEMD_DEFAULT_TARGET}
