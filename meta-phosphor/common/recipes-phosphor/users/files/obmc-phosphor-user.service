@@ -2,9 +2,9 @@
 Description=Phosphor OpenBMC user management daemon
 
 [Service]
-ExecStart=/usr/sbin/obmc-phosphor-userd
+ExecStart={sbindir}/obmc-phosphor-userd
 Environment="PYTHONUNBUFFERED=1"
 Restart=always
 
 [Install]
-WantedBy=multi-user.target
+WantedBy={SYSTEMD_DEFAULT_TARGET}

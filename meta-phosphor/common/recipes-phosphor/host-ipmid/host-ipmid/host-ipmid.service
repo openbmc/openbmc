@@ -5,7 +5,7 @@ After=clear-once.service
 
 [Service]
 Restart=always
-ExecStart=/usr/sbin/ipmid
+ExecStart={sbindir}/ipmid
 
 [Install]
-WantedBy=multi-user.target
+WantedBy={SYSTEMD_DEFAULT_TARGET}
