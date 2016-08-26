@@ -1,5 +1,5 @@
 [Unit]
-Description=Network DBUS object
+Description=Phosphor Network
 
 [Service]
 ExecStart={sbindir}/netman.py

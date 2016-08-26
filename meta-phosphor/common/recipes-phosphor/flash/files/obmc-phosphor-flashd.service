@@ -1,5 +1,5 @@
 [Unit]
-Description=Phosphor OpenBMC flash management daemon
+Description=Phosphor Flash Control
 
 [Service]
 Restart=always

@@ -1,5 +1,5 @@
 [Unit]
-Description=Phosphor OpenBMC fan management daemon
+Description=Phosphor Fan Control
 
 [Service]
 Restart=always

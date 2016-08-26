@@ -1,5 +1,5 @@
 [Unit]
-Description=Phosphor OpenBMC chassis management daemon
+Description=Phosphor Chassis Control
 
 [Service]
 Restart=always

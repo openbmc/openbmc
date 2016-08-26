@@ -1,5 +1,5 @@
 [Unit]
-Description=Phosphor OpenBMC BT to DBUS
+Description=Phosphor BT
 
 [Service]
 Restart=always

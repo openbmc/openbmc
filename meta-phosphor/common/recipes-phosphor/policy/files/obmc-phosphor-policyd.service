@@ -1,5 +1,5 @@
 [Unit]
-Description=Phosphor OpenBMC policy management daemon
+Description=Phosphor Policy Manager
 
 [Service]
 Restart=always

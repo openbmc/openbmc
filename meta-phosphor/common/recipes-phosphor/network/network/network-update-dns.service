@@ -1,5 +1,5 @@
 [Unit]
-Description=DNS update handler
+Description=Phosphor DNS Updater
 Requires=network.service
 After=network.service
 
