@@ -13,6 +13,8 @@ PACKAGE_BEFORE_PN = " \
         ${PN}-ns \
         ${PN}-utils-ns \
         ${PN}-dbus-ns \
+        ${PN}-wsgi-ns \
+        ${PN}-wsgi-apps-ns \
         ${PN}-utils \
         ${PN}-dbus \
         "
@@ -20,6 +22,8 @@ PACKAGE_BEFORE_PN = " \
 RDEPENDS_${PN}-utils-ns += "${PN}-ns"
 RDEPENDS_${PN}-dbus-ns += "${PN}-ns"
 RDEPENDS_${PN}-utils += "${PN}-utils-ns"
+RDEPENDS_${PN}-wsgi-apps-ns += "${PN}-wsgi-ns"
+RDEPENDS_${PN}-wsgi-ns += "${PN}-ns"
 RDEPENDS_${PN}-dbus += " \
         ${PN}-dbus-ns \
         python-dbus \
@@ -37,12 +41,14 @@ RDEPENDS_${PN} += " \
 FILES_${PN}-ns = "${PYTHON_SITEPACKAGES_DIR}/obmc/__init__.py*"
 FILES_${PN}-utils-ns = "${PYTHON_SITEPACKAGES_DIR}/obmc/utils/__init__.py*"
 FILES_${PN}-dbus-ns = "${PYTHON_SITEPACKAGES_DIR}/obmc/dbuslib/__init__.py*"
+FILES_${PN}-wsgi-ns = "${PYTHON_SITEPACKAGES_DIR}/obmc/wsgi/__init__.py*"
+FILES_${PN}-wsgi-apps-ns = "${PYTHON_SITEPACKAGES_DIR}/obmc/wsgi/apps/__init__.py*"
 
 FILES_${PN}-utils = "${PYTHON_SITEPACKAGES_DIR}/obmc/utils"
 FILES_${PN}-dbus = "${PYTHON_SITEPACKAGES_DIR}/obmc/dbuslib"
 
-SRC_URI += "git://github.com/openbmc/pyphosphor"
+SRC_URI += "git://github.com/bradbishop/pyphosphor;branch=gevent"
 
-SRCREV = "ecf8bd8f38d93fda3d08df771709bd5289a480e9"
+SRCREV = "654526d526eb7083d1194b509404ffa7bb54915b"
 
 S = "${WORKDIR}/git"
