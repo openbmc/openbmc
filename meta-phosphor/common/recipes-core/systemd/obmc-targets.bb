@@ -9,6 +9,7 @@ inherit allarch
 
 SYSTEMD_SERVICE_${PN} = " \
         obmc-mapper.target \
+        obmc-webserver-pre.target \
         obmc-fans-ready.target \
         obmc-fan-control.target \
         obmc-standby.target \
