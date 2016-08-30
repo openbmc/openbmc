@@ -26,7 +26,7 @@ PACKAGES = " \
 
 SUMMARY_packagegroup-obmc-phosphor-apps-extras = "Extra features"
 RDEPENDS_packagegroup-obmc-phosphor-apps-extras = " \
-	obmc-rest \
+	phosphor-rest \
         host-ipmid \
         "
 
