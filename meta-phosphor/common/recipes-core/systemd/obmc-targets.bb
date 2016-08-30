@@ -21,6 +21,7 @@ HOST_LINK_FMT = "${HOST_FMT}:obmc-host-{0}@{1}.target"
 
 SYSTEMD_SERVICE_${PN} += " \
         obmc-mapper.target \
+        obmc-webserver-pre.target \
         obmc-fans-ready.target \
         obmc-fan-control.target \
         obmc-standby.target \
