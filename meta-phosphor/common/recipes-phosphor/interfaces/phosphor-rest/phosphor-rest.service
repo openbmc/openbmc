@@ -1,0 +1,13 @@
+[Unit]
+Description=Phosphor DBus REST
+Requires=obmc-mapper.target
+After=obmc-mapper.target
+PartOf=systemd-networkd.service
+
+[Service]
+Restart=always
+ExecStart={sbindir}/obmc-rest
+Environment="PYTHONUNBUFFERED=1"
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
