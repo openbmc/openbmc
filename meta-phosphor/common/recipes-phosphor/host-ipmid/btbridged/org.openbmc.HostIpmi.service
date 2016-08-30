@@ -4,6 +4,8 @@ Description=Phosphor BT
 [Service]
 Restart=always
 ExecStart={sbindir}/btbridged
+Type=dbus
+BusName={BUSNAME}
 
 [Install]
 WantedBy={SYSTEMD_DEFAULT_TARGET}
