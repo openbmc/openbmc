@@ -21,8 +21,8 @@ RDEPENDS_${PN} += " \
         pyphosphor-utils \
         pyphosphor-dbus \
         "
-SRC_URI += "git://github.com/openbmc/phosphor-rest-server"
+SRC_URI += "git://github.com/bradbishop/phosphor-rest-server;branch=gevent"
 
-SRCREV = "b41507f3b9c9a79ccd0ef6f48ac839b306a604b7"
+SRCREV = "803c6f1be7f589043c817a2b00fac5b0af93d200"
 
 S = "${WORKDIR}/git"
