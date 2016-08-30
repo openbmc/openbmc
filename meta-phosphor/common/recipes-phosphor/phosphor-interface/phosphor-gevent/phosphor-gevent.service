@@ -1,0 +1,10 @@
+[Unit]
+Description=Phosphor Webserver
+PartOf=systemd-networkd.service
+After=phosphor-gevent.socket
+
+[Service]
+Restart=always
+ExecStart={sbindir}/phosphor-gevent $APPLICATION
+Environment="PYTHONUNBUFFERED=1"
+EnvironmentFile={envfiledir}/obmc/wsgi_app
