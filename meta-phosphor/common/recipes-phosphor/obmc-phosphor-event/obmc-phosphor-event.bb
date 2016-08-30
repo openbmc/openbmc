@@ -9,7 +9,8 @@ inherit obmc-phosphor-event-mgmt
 inherit obmc-phosphor-sdbus-service
 inherit obmc-phosphor-c-daemon
 
-TARGET_CPPFLAGS += "-std=c++11 -fpic"
+TARGET_CXXFLAGS += " -std=c++11 -fpic"
+TARGET_CFLAGS += " -fpic"
 
 SRC_URI += "git://github.com/openbmc/phosphor-event"
 SRC_URI += "file://eventd.conf"
