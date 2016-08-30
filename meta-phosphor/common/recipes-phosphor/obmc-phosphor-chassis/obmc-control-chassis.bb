@@ -9,7 +9,7 @@ RDEPENDS_${PN} += "\
         python-dbus \
         python-pygobject \
         python-netclient \
-        pyphosphor \
+        pyphosphor-dbus \
         "
 
 SKELETON_DIR = "pychassisctl"
