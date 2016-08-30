@@ -2,12 +2,15 @@ SUMMARY = "Phosphor OpenBMC BT to DBUS"
 DESCRIPTION = "Phosphor OpenBMC BT to DBUS."
 PR = "r1"
 
-inherit obmc-phosphor-sdbus-service
+inherit obmc-phosphor-dbus-service
 inherit obmc-phosphor-c-daemon
 
-SYSTEMD_SERVICE_${PN} = "btbridged.service"
+DBUS_SERVICE_${PN} = "org.openbmc.HostIpmi.service"
 
 inherit obmc-phosphor-host-ipmi-hw
+
+DEPENDS += "systemd"
+RDEPENDS_${PN} += "libsystemd"
 
 S = "${WORKDIR}/git"
 SRC_URI += "git://github.com/openbmc/btbridge"
