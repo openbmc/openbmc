@@ -7,6 +7,6 @@ inherit skeleton-python
 RDEPENDS_${PN} += "\
         python-dbus \
         python-pygobject \
-        pyphosphor \
+        pyphosphor-dbus \
         "
 SKELETON_DIR = "pyfanctl"

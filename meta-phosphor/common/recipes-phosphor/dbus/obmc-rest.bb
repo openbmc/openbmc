@@ -18,7 +18,8 @@ RDEPENDS_${PN} += " \
         python-bottle \
         python-spwd \
         python-netserver \
-        pyphosphor \
+        pyphosphor-utils \
+        pyphosphor-dbus \
         "
 SRC_URI += "git://github.com/openbmc/phosphor-rest-server"
 

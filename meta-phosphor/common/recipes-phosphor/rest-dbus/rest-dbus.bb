@@ -13,7 +13,7 @@ RDEPENDS_${PN} += " \
         python-json \
         python-dbus \
         python-xml \
-        pyphosphor \
+        pyphosphor-dbus \
         "
 
 SYSTEMD_SERVICE_${PN} += "rest-dbus.service rest-dbus.socket"

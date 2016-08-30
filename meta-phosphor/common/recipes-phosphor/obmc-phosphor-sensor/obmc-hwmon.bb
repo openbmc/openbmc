@@ -11,7 +11,7 @@ RDEPENDS_${PN} += "\
         python-json \
         python-shell \
         python-pygobject \
-        pyphosphor \
+        pyphosphor-dbus \
         ${VIRTUAL-RUNTIME_skeleton_workbook} \
         "
 
