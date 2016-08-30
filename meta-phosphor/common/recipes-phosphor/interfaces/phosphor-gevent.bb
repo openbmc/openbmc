@@ -13,10 +13,12 @@ PROVIDES += "virtual/obmc-wsgihost"
 RPROVIDES_${PN} += "virtual-obmc-wsgihost"
 
 RDEPENDS_${PN} += " \
-        python-rocket \
+        python-gevent \
         "
 SRC_URI += "git://github.com/openbmc/phosphor-rest-server"
 
 SRCREV = "7bc6d8d39daebe3529c4c31a8caa0288dfb0ecd5"
 
-S = "${WORKDIR}/git/servers/rocket"
+S = "${WORKDIR}/git/servers/gevent"
+
+SYSTEMD_SERVICE_${PN} += "${PN}.service ${PN}.socket"
