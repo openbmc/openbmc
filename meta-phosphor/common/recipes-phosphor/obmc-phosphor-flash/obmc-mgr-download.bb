@@ -9,7 +9,7 @@ RDEPENDS_${PN} += "\
         python-dbus \
         python-pygobject \
         python-subprocess \
-        pyphosphor \
+        pyphosphor-dbus \
         "
 
 SKELETON_DIR = "pydownloadmgr"
