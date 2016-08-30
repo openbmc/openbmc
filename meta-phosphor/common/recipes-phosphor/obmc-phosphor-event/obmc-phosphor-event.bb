@@ -14,7 +14,7 @@ TARGET_CPPFLAGS += "-std=c++11 -fpic"
 SRC_URI += "git://github.com/openbmc/phosphor-event"
 SRC_URI += "file://eventd.conf"
 
-SRCREV = "4dad23916e69d55d692eca7389d67eb023c5ca66"
+SRCREV = "69c3d20957a54db7eaf286b4e258ad21b9bc2fd6"
 
 RDEPENDS_${PN} += "libsystemd"
 DEPENDS += "systemd"
