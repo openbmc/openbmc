@@ -12,7 +12,7 @@ RDEPENDS_${PN} += "\
         python-pygobject \
         python-subprocess \
         python-io \
-        pyphosphor \
+        pyphosphor-dbus \
         "
 
 SKELETON_DIR = "pyflashbmc"

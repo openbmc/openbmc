@@ -8,7 +8,7 @@ inherit obmc-phosphor-dbus-service
 RDEPENDS_${PN} += "\
         python-dbus \
         python-pygobject \
-        pyphosphor \
+        pyphosphor-dbus \
         "
 SKELETON_DIR = "pyfanctl"
 DBUS_SERVICE_${PN} += "org.openbmc.control.Fans.service"

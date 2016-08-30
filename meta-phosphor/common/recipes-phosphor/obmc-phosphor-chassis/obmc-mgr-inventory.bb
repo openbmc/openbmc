@@ -14,7 +14,7 @@ RDEPENDS_${PN} += "\
         python-pickle \
         python-pygobject \
         python-subprocess \
-        pyphosphor \
+        pyphosphor-dbus \
         ${VIRTUAL-RUNTIME_skeleton_workbook} \
         "
 
