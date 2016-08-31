@@ -14,7 +14,7 @@ SRC_URI += "file://${PN}.conf \
 	    file://obmc-console-ssh.socket \
 	    file://obmc-console-ssh@.service"
 
-SRCREV = "6221ce9483f9431061223f635a4dbd82e44dc75b"
+SRCREV = "87e344cd6bd848f886e226c8d58ffe4da77ce4bc"
 
 FILES_${PN} += "${systemd_unitdir}/system/obmc-console-ssh@.service \
 		${systemd_unitdir}/system/obmc-console-ssh.socket"
