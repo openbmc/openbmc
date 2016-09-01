@@ -4,4 +4,6 @@ PR = "r1"
 
 inherit skeleton-gdbus
 
+DEPENDS += "obmc-mapper systemd"
+
 SKELETON_DIR = "op-pwrctl"
