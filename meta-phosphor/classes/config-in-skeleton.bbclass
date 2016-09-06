@@ -6,7 +6,7 @@ inherit setuptools
 inherit pythonnative
 
 DEPENDS += "python"
-SRC_URI += "git://github.com/openbmc/skeleton;subpath=configs"
+SRC_URI += "git://github.com/openbmc/skeleton;branch=openbmc-v1.0-stable;subpath=configs"
 S = "${WORKDIR}/configs"
 
 python() {
