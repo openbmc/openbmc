@@ -6,6 +6,8 @@ After=clear-once.service
 [Service]
 Restart=always
 ExecStart={sbindir}/ipmid
+Type=dbus
+BusName={BUSNAME}
 
 [Install]
 WantedBy={SYSTEMD_DEFAULT_TARGET}
