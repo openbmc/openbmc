@@ -5,6 +5,8 @@ Description=Phosphor User Manager
 ExecStart={sbindir}/obmc-phosphor-userd
 Environment="PYTHONUNBUFFERED=1"
 Restart=always
+Type=dbus
+BusName={BUSNAME}
 
 [Install]
 WantedBy={SYSTEMD_DEFAULT_TARGET}
