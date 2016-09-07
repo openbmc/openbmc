@@ -7,7 +7,8 @@ inherit obmc-phosphor-c-daemon
 
 DBUS_SERVICE_${PN} = "org.openbmc.HostIpmi.service"
 
-inherit obmc-phosphor-host-ipmi-hw
+PROVIDES += "virtual/obmc-host-ipmi-hw"
+RPROVIDES_${PN} += "virtual-obmc-host-ipmi-hw"
 
 DEPENDS += "systemd"
 RDEPENDS_${PN} += "libsystemd"

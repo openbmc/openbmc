@@ -5,9 +5,11 @@ PR = "r1"
 
 
 inherit obmc-phosphor-license
-inherit obmc-phosphor-event-mgmt
 inherit obmc-phosphor-dbus-service
 inherit obmc-phosphor-c-daemon
+
+PROVIDES += "virtual/obmc-event-mgmt"
+RPROVIDES_${PN} += "virtual-obmc-event-mgmt"
 
 TARGET_CXXFLAGS += " -std=c++11 -fpic"
 TARGET_CFLAGS += " -fpic"

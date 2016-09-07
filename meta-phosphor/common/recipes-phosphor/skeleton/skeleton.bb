@@ -6,11 +6,16 @@ PR = "r1"
 inherit packagegroup
 inherit obmc-phosphor-license
 
-inherit obmc-phosphor-chassis-mgmt
-inherit obmc-phosphor-fan-mgmt
-inherit obmc-phosphor-flash-mgmt
-inherit obmc-phosphor-sensor-mgmt
-inherit obmc-phosphor-system-mgmt
+PROVIDES += "virtual/obmc-chassis-mgmt"
+RPROVIDES_${PN} += "virtual-obmc-chassis-mgmt"
+PROVIDES += "virtual/obmc-fan-mgmt"
+RPROVIDES_${PN} += "virtual-obmc-fan-mgmt"
+PROVIDES += "virtual/obmc-flash-mgmt"
+RPROVIDES_${PN} += "virtual-obmc-flash-mgmt"
+PROVIDES += "virtual/obmc-sensor-mgmt"
+RPROVIDES_${PN} += "virtual-obmc-sensor-mgmt"
+PROVIDES += "virtual/obmc-system-mgmt"
+RPROVIDES_${PN} += "virtual-obmc-system-mgmt"
 
 RDEPENDS_${PN} += " \
         obmc-button-power \
