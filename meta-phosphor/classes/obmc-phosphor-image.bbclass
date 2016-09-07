@@ -12,24 +12,25 @@
 
 inherit core-image
 inherit obmc-phosphor-license
+inherit obmc-phosphor-utils
 
-FEATURE_PACKAGES_obmc-phosphor-fan-mgmt ?= "packagegroup-obmc-phosphor-apps-fan-mgmt"
-FEATURE_PACKAGES_obmc-phosphor-chassis-mgmt ?= "packagegroup-obmc-phosphor-apps-chassis-mgmt"
-FEATURE_PACKAGES_obmc-phosphor-sensor-mgmt ?= "packagegroup-obmc-phosphor-apps-sensor-mgmt"
-FEATURE_PACKAGES_obmc-phosphor-flash-mgmt ?= "packagegroup-obmc-phosphor-apps-flash-mgmt"
-FEATURE_PACKAGES_obmc-phosphor-event-mgmt ?= "packagegroup-obmc-phosphor-apps-event-mgmt"
-FEATURE_PACKAGES_obmc-phosphor-user-mgmt ?= "packagegroup-obmc-phosphor-apps-user-mgmt"
-FEATURE_PACKAGES_obmc-phosphor-system-mgmt ?= "packagegroup-obmc-phosphor-apps-system-mgmt"
+FEATURE_PACKAGES_obmc-fan-mgmt ?= "${@cf_enabled('obmc-phosphor-fan-mgmt', 'virtual-obmc-fan-mgmt', d)}"
+FEATURE_PACKAGES_obmc-chassis-mgmt ?= "${@cf_enabled('obmc-phosphor-chassis-mgmt', 'virtual-obmc-chassis-mgmt', d)}"
+FEATURE_PACKAGES_obmc-sensor-mgmt ?= "${@cf_enabled('obmc-phosphor-sensor-mgmt', 'virtual-obmc-sensor-mgmt', d)}"
+FEATURE_PACKAGES_obmc-flash-mgmt ?= "${@cf_enabled('obmc-phosphor-flash-mgmt', 'virtual-obmc-flash-mgmt', d)}"
+FEATURE_PACKAGES_obmc-event-mgmt ?= "${@df_enabled('obmc-phosphor-event-mgmt', 'virtual-obmc-event-mgmt', d)}"
+FEATURE_PACKAGES_obmc-user-mgmt ?= "${@df_enabled('obmc-phosphor-user-mgmt', 'virtual-obmc-user-mgmt', d)}"
+FEATURE_PACKAGES_obmc-system-mgmt ?= "${@df_enabled('obmc-phosphor-system-mgmt', 'virtual-obmc-system-mgmt', d)}"
 
 # Install entire Phosphor application stack by default
 IMAGE_FEATURES += " \
-        obmc-phosphor-fan-mgmt \
-        obmc-phosphor-chassis-mgmt \
-        obmc-phosphor-sensor-mgmt \
-        obmc-phosphor-flash-mgmt \
-        obmc-phosphor-event-mgmt \
-        obmc-phosphor-user-mgmt \
-        obmc-phosphor-system-mgmt \
+        obmc-fan-mgmt \
+        obmc-chassis-mgmt \
+        obmc-sensor-mgmt \
+        obmc-flash-mgmt \
+        obmc-event-mgmt \
+        obmc-user-mgmt \
+        obmc-system-mgmt \
         ssh-server-dropbear \
         "
 
