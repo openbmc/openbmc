@@ -7,7 +7,6 @@
 # - obmc-phosphor-sensor-mgmt         - Phosphor OpenBMC sensor management
 # - obmc-phosphor-flash-mgmt          - Phosphor OpenBMC flash management
 # - obmc-phosphor-event-mgmt          - Phosphor OpenBMC event management
-# - obmc-phosphor-policy-mgmt         - Phosphor OpenBMC policy management
 # - obmc-phosphor-user-mgmt           - Phosphor OpenBMC user management
 # - obmc-phosphor-system-mgmt         - Phosphor OpenBMC system management
 
@@ -19,7 +18,6 @@ FEATURE_PACKAGES_obmc-phosphor-chassis-mgmt ?= "packagegroup-obmc-phosphor-apps-
 FEATURE_PACKAGES_obmc-phosphor-sensor-mgmt ?= "packagegroup-obmc-phosphor-apps-sensor-mgmt"
 FEATURE_PACKAGES_obmc-phosphor-flash-mgmt ?= "packagegroup-obmc-phosphor-apps-flash-mgmt"
 FEATURE_PACKAGES_obmc-phosphor-event-mgmt ?= "packagegroup-obmc-phosphor-apps-event-mgmt"
-FEATURE_PACKAGES_obmc-phosphor-policy-mgmt ?= "packagegroup-obmc-phosphor-apps-policy-mgmt"
 FEATURE_PACKAGES_obmc-phosphor-user-mgmt ?= "packagegroup-obmc-phosphor-apps-user-mgmt"
 FEATURE_PACKAGES_obmc-phosphor-system-mgmt ?= "packagegroup-obmc-phosphor-apps-system-mgmt"
 
@@ -30,7 +28,6 @@ IMAGE_FEATURES += " \
         obmc-phosphor-sensor-mgmt \
         obmc-phosphor-flash-mgmt \
         obmc-phosphor-event-mgmt \
-        obmc-phosphor-policy-mgmt \
         obmc-phosphor-user-mgmt \
         obmc-phosphor-system-mgmt \
         ssh-server-dropbear \

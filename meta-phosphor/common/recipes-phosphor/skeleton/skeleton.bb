@@ -9,7 +9,6 @@ inherit obmc-phosphor-license
 inherit obmc-phosphor-chassis-mgmt
 inherit obmc-phosphor-fan-mgmt
 inherit obmc-phosphor-flash-mgmt
-inherit obmc-phosphor-policy-mgmt
 inherit obmc-phosphor-sensor-mgmt
 inherit obmc-phosphor-system-mgmt
 
