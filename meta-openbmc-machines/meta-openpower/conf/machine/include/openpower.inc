@@ -7,18 +7,6 @@ OBMC_MACHINE_FEATURES += "\
         openpower-pflash \
         "
 
-VIRTUAL-RUNTIME_obmc-phosphor-fan-ctl = " \
-       skeleton \
-       "
-VIRTUAL-RUNTIME_obmc-phosphor-sensor-ctl = " \
-       skeleton \
-       "
-VIRTUAL-RUNTIME_obmc-phosphor-chassis-ctl = " \
-       skeleton \
-       "
-VIRTUAL-RUNTIME_obmc-phosphor-flash-ctl = " \
-       skeleton \
-       "
 VIRTUAL-RUNTIME_obmc-phosphor-ipmi-parsers = " \
         host-ipmid-oem \
         host-ipmid-fru \
