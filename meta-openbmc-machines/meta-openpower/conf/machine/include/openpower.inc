@@ -10,8 +10,8 @@ OBMC_MACHINE_FEATURES += "\
 VIRTUAL-RUNTIME_skeleton_workbook = "${MACHINE}-config"
 
 PREFERRED_PROVIDER_virtual/obmc-host-ipmi-hw = "btbridged"
-PREFERRED_PROVIDER_virtual/obmc-chassis-mgmt = "skeleton"
-PREFERRED_PROVIDER_virtual/obmc-fan-mgmt = "skeleton"
-PREFERRED_PROVIDER_virtual/obmc-flash-mgmt = "skeleton"
-PREFERRED_PROVIDER_virtual/obmc-sensor-mgmt = "skeleton"
-PREFERRED_PROVIDER_virtual/obmc-system-mgmt = "skeleton"
+PREFERRED_PROVIDER_virtual/obmc-chassis-mgmt = "packagegroup-op-apps"
+PREFERRED_PROVIDER_virtual/obmc-fan-mgmt = "packagegroup-op-apps"
+PREFERRED_PROVIDER_virtual/obmc-flash-mgmt = "packagegroup-op-apps"
+PREFERRED_PROVIDER_virtual/obmc-sensor-mgmt = "packagegroup-op-apps"
+PREFERRED_PROVIDER_virtual/obmc-system-mgmt = "packagegroup-op-apps"
