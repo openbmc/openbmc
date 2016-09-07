@@ -4,7 +4,9 @@ PR = "r1"
 
 RDEPENDS_${PN} += "python-subprocess python-dbus python-pygobject"
 
-inherit obmc-phosphor-host-ipmi-hw
 inherit skeleton-python
+
+PROVIDES += "virtual/obmc-host-ipmi-hw"
+RPROVIDES_${PN} += "virtual-obmc-host-ipmi-hw"
 
 SKELETON_DIR = "pyipmitest"

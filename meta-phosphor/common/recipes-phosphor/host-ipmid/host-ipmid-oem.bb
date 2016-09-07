@@ -3,7 +3,7 @@ DESCRIPTION = "Phosphor OpenBMC IPMI OEM commands for OpenPOWER based systems"
 HOMEPAGE = "https://github.com/openbmc/openpower-host-ipmi-oem"
 PR = "r1"
 
-RRECOMMENDS_${PN} = "virtual/obmc-phosphor-host-ipmi-hw"
+RRECOMMENDS_${PN} = "virtual-obmc-host-ipmi-hw"
 
 inherit obmc-phosphor-license
 
