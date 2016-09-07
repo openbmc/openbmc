@@ -5,11 +5,6 @@ inherit packagegroup
 inherit obmc-phosphor-utils
 inherit obmc-phosphor-license
 
-VIRTUAL-RUNTIME_obmc-phosphor-fan-ctl ?= "virtual/obmc-phosphor-fan-ctl"
-VIRTUAL-RUNTIME_obmc-phosphor-sensor-ctl ?= "virtual/obmc-phosphor-sensor-ctl"
-VIRTUAL-RUNTIME_obmc-phosphor-chassis-ctl ?= "virtual/obmc-phosphor-chassis-ctl"
-VIRTUAL-RUNTIME_obmc-phosphor-flash-ctl ?= "virtual/obmc-phosphor-flash-ctl"
-
 PROVIDES = "${PACKAGES}"
 PACKAGES = " \
         packagegroup-obmc-phosphor-apps-extras \
@@ -38,28 +33,24 @@ SUMMARY_packagegroup-obmc-phosphor-apps-fan-mgmt = "Fan management support"
 RDEPENDS_packagegroup-obmc-phosphor-apps-fan-mgmt = \
         "${@cf_enabled("obmc-phosphor-fan-mgmt", " \
                 virtual-obmc-fan-mgmt \
-                ${VIRTUAL-RUNTIME_obmc-phosphor-fan-ctl} \
         ", d)}"
 
 SUMMARY_packagegroup-obmc-phosphor-apps-chassis-mgmt = "Chassis management support"
 RDEPENDS_packagegroup-obmc-phosphor-apps-chassis-mgmt = "\
         ${@cf_enabled("obmc-phosphor-chassis-mgmt", " \
                 virtual-obmc-chassis-mgmt \
-                ${VIRTUAL-RUNTIME_obmc-phosphor-chassis-ctl} \
         ", d)}"
 
 SUMMARY_packagegroup-obmc-phosphor-apps-sensor-mgmt = "Sensor management support"
 RDEPENDS_packagegroup-obmc-phosphor-apps-sensor-mgmt = "\
         ${@cf_enabled("obmc-phosphor-sensor-mgmt", " \
                 virtual-obmc-sensor-mgmt \
-                ${VIRTUAL-RUNTIME_obmc-phosphor-sensor-ctl} \
         ", d)}"
 
 SUMMARY_packagegroup-obmc-phosphor-apps-flash-mgmt = "Flash management support"
 RDEPENDS_packagegroup-obmc-phosphor-apps-flash-mgmt = "\
         ${@cf_enabled("obmc-phosphor-flash-mgmt", " \
                 virtual-obmc-flash-mgmt \
-                ${VIRTUAL-RUNTIME_obmc-phosphor-flash-ctl} \
         ", d)}"
 
 SUMMARY_packagegroup-obmc-phosphor-apps-event-mgmt = "Event management support"
