@@ -1,9 +1,0 @@
-[Unit]
-Description=Phosphor OpenBMC policy management daemon
-
-[Service]
-Restart=always
-ExecStart=/usr/sbin/obmc-phosphor-policyd
-
-[Install]
-WantedBy=multi-user.target
