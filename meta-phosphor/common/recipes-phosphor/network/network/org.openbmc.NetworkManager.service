@@ -5,6 +5,8 @@ Description=Phosphor Network Manager
 ExecStart={sbindir}/netman.py
 Environment="PYTHONUNBUFFERED=1"
 Restart=always
+Type=dbus
+BusName={BUSNAME}
 
 [Install]
 WantedBy={SYSTEMD_DEFAULT_TARGET}

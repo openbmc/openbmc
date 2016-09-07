@@ -1,7 +1,7 @@
 [Unit]
 Description=Phosphor DNS Settings Cache Manager
-Requires=network.service
-After=network.service
+Wants=mapper-wait@-org-openbmc-NetworkManager-Interface.service
+After=mapper-wait@-org-openbmc-NetworkManager-Interface.service
 
 [Service]
 ExecStart={sbindir}/netman_watch_dns /run/systemd/netif/state
