@@ -9,6 +9,7 @@ DBUS_SERVICE_${PN} = "org.openbmc.HostIpmi.service"
 
 PROVIDES += "virtual/obmc-host-ipmi-hw"
 RPROVIDES_${PN} += "virtual-obmc-host-ipmi-hw"
+RRECOMMENDS_${PN} += "host-ipmid"
 
 DEPENDS += "systemd"
 RDEPENDS_${PN} += "libsystemd"

@@ -4,8 +4,6 @@ HOMEPAGE = "https://github.com/openbmc/ipmitool"
 PR = "r1"
 
 
-RRECOMMENDS_${PN} = "virtual-obmc-host-ipmi-hw"
-
 inherit obmc-phosphor-license
 
 DEPENDS += "systemd    \
@@ -14,6 +12,7 @@ DEPENDS += "systemd    \
 
 RDEPENDS_${PN} += "libsystemd \
                    libcrypto \
+                   virtual-obmc-host-ipmi-hw \
                    "
 
 
