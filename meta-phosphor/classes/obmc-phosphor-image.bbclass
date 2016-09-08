@@ -9,6 +9,7 @@
 # - obmc-phosphor-event-mgmt          - Phosphor OpenBMC event management
 # - obmc-phosphor-user-mgmt           - Phosphor OpenBMC user management
 # - obmc-phosphor-system-mgmt         - Phosphor OpenBMC system management
+# - obmc-host-ipmi                    - OpenBMC Host IPMI
 
 inherit core-image
 inherit obmc-phosphor-license
@@ -21,6 +22,7 @@ FEATURE_PACKAGES_obmc-flash-mgmt ?= "${@cf_enabled('obmc-phosphor-flash-mgmt', '
 FEATURE_PACKAGES_obmc-event-mgmt ?= "${@df_enabled('obmc-phosphor-event-mgmt', 'virtual-obmc-event-mgmt', d)}"
 FEATURE_PACKAGES_obmc-user-mgmt ?= "${@df_enabled('obmc-phosphor-user-mgmt', 'virtual-obmc-user-mgmt', d)}"
 FEATURE_PACKAGES_obmc-system-mgmt ?= "${@df_enabled('obmc-phosphor-system-mgmt', 'virtual-obmc-system-mgmt', d)}"
+FEATURE_PACKAGES_obmc-host-ipmi ?= "${@cf_enabled('obmc-host-ipmi', 'virtual-obmc-host-ipmi-hw', d)}"
 
 # Install entire Phosphor application stack by default
 IMAGE_FEATURES += " \
@@ -31,6 +33,7 @@ IMAGE_FEATURES += " \
         obmc-event-mgmt \
         obmc-user-mgmt \
         obmc-system-mgmt \
+        obmc-host-ipmi \
         ssh-server-dropbear \
         "
 

@@ -3,6 +3,7 @@ OBMC_MACHINE_FEATURES += "\
         obmc-phosphor-chassis-mgmt \
         obmc-phosphor-sensor-mgmt \
         obmc-phosphor-flash-mgmt \
+        obmc-host-ipmi \
         "
 
 PREFERRED_PROVIDER_virtual/obmc-host-ipmi-hw = "host-ipmi-hw-example"
