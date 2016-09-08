@@ -3,8 +3,6 @@ DESCRIPTION = "Phosphor OpenBMC WriteFRU for  OpenPOWER based systems"
 HOMEPAGE = "https://github.com/openbmc/ipmi-fru-parser"
 PR = "r1"
 
-RRECOMMENDS_${PN} = "virtual-obmc-host-ipmi-hw"
-
 inherit obmc-phosphor-license
 inherit obmc-phosphor-systemd
 
