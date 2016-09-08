@@ -1,15 +1,19 @@
-From c2f1b1115f6a7f814a05622a33984f5a4797fede Mon Sep 17 00:00:00 2001
-From: Brad Bishop <bradleyb@fuzziesquirrel.com>
-Date: Wed, 15 Jun 2016 21:16:43 -0400
+From 1a39b8312eb2991aac3f657033db7e54da6342ee Mon Sep 17 00:00:00 2001
+From: Yi Li <adamliyi@msn.com>
+Date: Wed, 31 Aug 2016 17:56:46 +0800
 Subject: [PATCH] Add power control support for the Garrison system
 
-Signed-off-by: Brad Bishop <bradleyb@fuzziesquirrel.com>
----
- op-pwrctl/power_control_obj.c | 70 +++++++++++++++++++++++++++++--------------
- 1 file changed, 48 insertions(+), 22 deletions(-)
+Add fix for openbmc/openbmc#315
 
-diff --git a/op-pwrctl/power_control_obj.c b/op-pwrctl/power_control_obj.c
-index 85a8cff..f6bc996 100644
+Change-Id: I4a6ddb77c32c170833c4c4dd54f7b59440149f88
+Signed-off-by: Brad Bishop <bradleyb@fuzziesquirrel.com>
+Signed-off-by: Yi Li <adamliyi@msn.com>
+---
+ op-pwrctl/power_control_obj.c | 128 +++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 108 insertions(+), 20 deletions(-)
+
+diff --git a/power_control_obj.c b/power_control_obj.c
+index dfc7fa9..2f0d124 100644
 --- a/power_control_obj.c
 +++ b/power_control_obj.c
 @@ -17,11 +17,15 @@ static const gchar* instance_name = "power0";
@@ -33,7 +37,7 @@ index 85a8cff..f6bc996 100644
  
  static GDBusObjectManagerServer *manager = NULL;
  
-@@ -67,27 +71,36 @@ poll_pgood(gpointer user_data)
+@@ -67,26 +71,44 @@ poll_pgood(gpointer user_data)
  			{
  				control_power_emit_power_lost(control_power);
  				control_emit_goto_system_state(control,"HOST_POWERED_OFF");
@@ -52,12 +56,7 @@ index 85a8cff..f6bc996 100644
  				control_emit_goto_system_state(control,"HOST_POWERED_ON");
 -				rc = gpio_open(&pcie_reset);
 -				rc = gpio_write(&pcie_reset,1);
--				gpio_close(&pcie_reset);
--
--				rc = gpio_open(&usb_reset);
--				rc = gpio_write(&usb_reset,1);
--				gpio_close(&usb_reset);
- 			}
++			}
 +
 +			gpio_open(&cm1_oe_r_n);
 +			gpio_write(&cm1_oe_r_n, !gpio);
@@ -71,21 +70,32 @@ index 85a8cff..f6bc996 100644
 +			gpio_write(&bmc_cfam_reset_n_r, gpio);
 +			gpio_close(&bmc_cfam_reset_n_r);
 +
-+			gpio_open(&pcie_reset);
-+			gpio_write(&pcie_reset, gpio);
-+			gpio_close(&pcie_reset);
++			/*
++			 * Reset PCIE devices as usual when powering off.
++			 * When powering on, hold PCIE reset until
++			 * the processor can forward clocks and control reset.
++			 * This is specific to Firestone and Garrison.
++			 */
++			if(gpio==0)
++			{
++				gpio_open(&pcie_reset);
++				gpio_write(&pcie_reset, gpio);
+ 				gpio_close(&pcie_reset);
+ 
+-				rc = gpio_open(&usb_reset);
+-				rc = gpio_write(&usb_reset,1);
+-				gpio_close(&usb_reset);
++				gpio_open(&cp0_devices_reset_n);
++				gpio_write(&cp0_devices_reset_n, gpio);
++				gpio_close(&cp0_devices_reset_n);
 +
-+			gpio_open(&cp0_devices_reset_n);
-+			gpio_write(&cp0_devices_reset_n, gpio);
-+			gpio_close(&cp0_devices_reset_n);
-+
-+			gpio_open(&cp1_devices_reset_n);
-+			gpio_write(&cp1_devices_reset_n, gpio);
-+			gpio_close(&cp1_devices_reset_n);
++				gpio_open(&cp1_devices_reset_n);
++				gpio_write(&cp1_devices_reset_n, gpio);
++				gpio_close(&cp1_devices_reset_n);
+ 			}
  		}
  	} else {
- 		printf("ERROR PowerControl: GPIO read error (gpio=%s,rc=%d)\n",pgood.name,rc);
-@@ -138,11 +151,13 @@ on_set_power_state(ControlPower *pwr,
+@@ -138,11 +160,13 @@ on_set_power_state(ControlPower *pwr,
  			} else {
  				control_emit_goto_system_state(control,"HOST_POWERING_OFF");
  			}
@@ -100,7 +110,74 @@ index 85a8cff..f6bc996 100644
  			control_power_set_state(pwr,state);
  		} while(0);
  		if(error != GPIO_OK)
-@@ -230,10 +245,21 @@ on_bus_acquired(GDBusConnection *connection,
+@@ -175,6 +199,48 @@ on_get_power_state(ControlPower *pwr,
+ 	return TRUE;
+ }
+ 
++/* Handler for BootProgress signal from BootProgress sensor */
++static void
++on_boot_progress(GDBusConnection *connection,
++		const gchar *sender_name,
++		const gchar *object_path,
++		const gchar *interface_name,
++		const gchar *signal_name,
++		GVariant *parameters,
++		gpointer user_data)
++{
++	gchar *boot_progress;
++	int rc;
++	uint8_t gpio;
++
++	if(!parameters)
++		return;
++
++	g_variant_get(parameters,"(s)",&boot_progress);
++	if(strcmp(boot_progress,"FW Progress, Memory Init") == 0)
++	{
++		rc = gpio_open(&pgood);
++		rc = gpio_read(&pgood,&gpio);
++		gpio_close(&pgood);
++		if(rc != GPIO_OK || gpio != 1)
++			return;
++
++		printf("FW Progress: Memory Init - Releasing PCIE reset\n");
++		//Releasing PCIE reset
++		gpio_open(&pcie_reset);
++		gpio_write(&pcie_reset, 1);
++		gpio_close(&pcie_reset);
++
++		gpio_open(&cp0_devices_reset_n);
++		gpio_write(&cp0_devices_reset_n, 1);
++		gpio_close(&cp0_devices_reset_n);
++
++		gpio_open(&cp1_devices_reset_n);
++		gpio_write(&cp1_devices_reset_n, 1);
++		gpio_close(&cp1_devices_reset_n);
++	}
++}
++
+ static void
+ on_bus_acquired(GDBusConnection *connection,
+ 		const gchar *name,
+@@ -217,6 +283,17 @@ on_bus_acquired(GDBusConnection *connection,
+ 			G_CALLBACK(on_init),
+ 			object); /* user_data */
+ 
++	/* Listen for BootProgress signal from BootProgress sensor */
++	g_dbus_connection_signal_subscribe(connection,
++			NULL, /* service */
++			NULL, /* interface_name */
++			"BootProgress", /* member: name of the signal */
++			"/org/openbmc/sensors/host/BootProgress", /* obj path */
++			NULL, /* arg0 */
++			G_DBUS_SIGNAL_FLAGS_NONE,
++			(GDBusSignalCallback) on_boot_progress,
++			object, /* user data */
++			NULL );
+ 
+ 	/* Export the object (@manager takes its own reference to @object) */
+ 	g_dbus_object_manager_server_set_connection(manager, connection);
+@@ -230,10 +307,21 @@ on_bus_acquired(GDBusConnection *connection,
  		if(rc != GPIO_OK) { break; }
  		rc = gpio_init(connection,&pgood);
  		if(rc != GPIO_OK) { break; }
@@ -124,5 +201,5 @@ index 85a8cff..f6bc996 100644
  		uint8_t gpio;
  		rc = gpio_open(&pgood);
 -- 
-2.1.4
+1.9.1
 
