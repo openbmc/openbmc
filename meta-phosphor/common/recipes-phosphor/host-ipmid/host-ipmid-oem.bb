@@ -8,8 +8,8 @@ RRECOMMENDS_${PN} = "virtual-obmc-host-ipmi-hw"
 inherit obmc-phosphor-license
 
 DEPENDS += "systemd    \
-		 	host-ipmid \
-		 	"
+            host-ipmid \
+            "
 TARGET_CFLAGS += "-fpic"
 
 

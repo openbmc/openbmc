@@ -9,11 +9,11 @@ RRECOMMENDS_${PN} = "virtual-obmc-host-ipmi-hw"
 inherit obmc-phosphor-license
 
 DEPENDS += "systemd    \
-		 	host-ipmid \
-		 	"
+            host-ipmid \
+            "
 
-RDEPENDS_${PN} += "libsystemd	\
-                   libcrypto	\
+RDEPENDS_${PN} += "libsystemd \
+                   libcrypto \
                    "
 
 
@@ -26,12 +26,12 @@ S = "${WORKDIR}/git"
 
 
 do_compile() {
-	${S}/bootstrap --enable-intf-dbus
-	${S}/configure --host x86_64
-	make
+        ${S}/bootstrap --enable-intf-dbus
+        ${S}/configure --host x86_64
+        make
 }
 
 do_install() {  
-	install -m 0755 -d ${D}${sbindir}
-	install -m 0755 ${S}/src/ipmitool ${D}${sbindir}
+        install -m 0755 -d ${D}${sbindir}
+        install -m 0755 ${S}/src/ipmitool ${D}${sbindir}
 }
