@@ -8,8 +8,8 @@ RRECOMMENDS_${PN} = "virtual-obmc-host-ipmi-hw"
 inherit obmc-phosphor-license
 
 DEPENDS += "systemd    \
-		 	host-ipmid \
-		 	"
+            host-ipmid \
+            "
 TARGET_CFLAGS += "-fpic"
 
 
@@ -26,7 +26,7 @@ FILES_${PN}-dbg += "${libdir}/host-ipmid/.debug"
 
 S = "${WORKDIR}/git"
 
-do_install() {  
+do_install() {
         install -m 0755 -d ${D}${libdir}/host-ipmid
         install -m 0755 ${S}/*.so ${D}${libdir}/host-ipmid/
 }
