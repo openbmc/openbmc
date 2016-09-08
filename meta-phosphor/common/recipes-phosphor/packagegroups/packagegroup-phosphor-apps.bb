@@ -14,7 +14,6 @@ PACKAGES = " \
 SUMMARY_${PN}-extras = "Extra features"
 RDEPENDS_${PN}-extras = " \
 	phosphor-rest \
-        host-ipmid \
         "
 
 SUMMARY_${PN}-extrasdev = "Development features"
