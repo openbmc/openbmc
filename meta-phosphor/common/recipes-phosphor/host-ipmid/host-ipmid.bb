@@ -13,6 +13,7 @@ TARGET_CFLAGS   += "-fpic"
 
 DEPENDS += "obmc-mapper"
 DEPENDS += "autoconf-archive-native"
+DEPENDS += "gtest"
 RDEPENDS_${PN}-dev += "obmc-mapper-dev"
 RDEPENDS_${PN} += "clear-once"
 RDEPENDS_${PN} += "settings"
