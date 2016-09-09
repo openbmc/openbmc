@@ -22,7 +22,7 @@ RDEPENDS_${PN} += "network"
 RDEPENDS_${PN} += "libmapper"
 SRC_URI += "git://github.com/openbmc/phosphor-host-ipmid"
 
-SRCREV = "37af73315c3e1ff504db466b10e6269cc56dcc6c"
+SRCREV = "70aa8d9677b13eb97e71bc758a09e14e37053565"
 
 S = "${WORKDIR}/git"
 
