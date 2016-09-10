@@ -13,7 +13,11 @@ inherit allarch
 inherit setuptools
 
 S = "${WORKDIR}/${SRCNAME}-${PV}"
-RDEPENDS_${PN} += "python-email-utils"
+RDEPENDS_${PN} += " \
+        python-email-utils \
+        python-json \
+        python-netserver \
+        "
 
 PROVIDES += "${PN}-app"
 PACKAGES += "${PN}-app"

@@ -18,6 +18,7 @@ RDEPENDS_${PN} += "\
         python-wsgiref-util \
         python-wsgiref-headers \
         python-email-utils \
-	"
+        python-netserver \
+        "
 
 BBCLASSEXTEND = "nativesdk"
