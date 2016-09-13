@@ -5,7 +5,7 @@ PR = "r1"
 inherit skeleton-python
 inherit obmc-phosphor-dbus-service
 
-VIRTUAL-RUNTIME_skeleton_workbook ?= ""
+RRECOMMENDS_${PN} += "virtual-obmc-inventory-data"
 
 RDEPENDS_${PN} += "\
         python-argparse \

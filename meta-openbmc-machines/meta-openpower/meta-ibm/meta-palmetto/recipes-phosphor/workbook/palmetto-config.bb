@@ -3,4 +3,6 @@ DESCRIPTION = "Board wiring information for the Palmetto system."
 PR = "r1"
 
 inherit config-in-skeleton
-RRECOMMENDS_${PN} += "virtual-system-inventory-data"
+
+PROVIDES_remove = "virtual/obmc-inventory-data"
+RPROVIDES_${PN}_remove = "virtual-obmc-inventory-data"
