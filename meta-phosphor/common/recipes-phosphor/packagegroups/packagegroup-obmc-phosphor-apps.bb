@@ -9,10 +9,10 @@ PROVIDES = "${PACKAGES}"
 PACKAGES = " \
         packagegroup-obmc-phosphor-apps-extras \
         packagegroup-obmc-phosphor-apps-extrasdev \
-        ${@mf_enabled("obmc-phosphor-fan-mgmt", "packagegroup-obmc-phosphor-apps-fan-mgmt", d)} \
-        ${@mf_enabled("obmc-phosphor-chassis-mgmt", "packagegroup-obmc-phosphor-apps-chassis-mgmt", d)} \
-        ${@mf_enabled("obmc-phosphor-sensor-mgmt", "packagegroup-obmc-phosphor-apps-sensor-mgmt", d)} \
-        ${@mf_enabled("obmc-phosphor-flash-mgmt", "packagegroup-obmc-phosphor-apps-flash-mgmt", d)} \
+        ${@cf_enabled("obmc-phosphor-fan-mgmt", "packagegroup-obmc-phosphor-apps-fan-mgmt", d)} \
+        ${@cf_enabled("obmc-phosphor-chassis-mgmt", "packagegroup-obmc-phosphor-apps-chassis-mgmt", d)} \
+        ${@cf_enabled("obmc-phosphor-sensor-mgmt", "packagegroup-obmc-phosphor-apps-sensor-mgmt", d)} \
+        ${@cf_enabled("obmc-phosphor-flash-mgmt", "packagegroup-obmc-phosphor-apps-flash-mgmt", d)} \
         ${@df_enabled("obmc-phosphor-event-mgmt", "packagegroup-obmc-phosphor-apps-event-mgmt", d)} \
         ${@df_enabled("obmc-phosphor-user-mgmt", "packagegroup-obmc-phosphor-apps-user-mgmt", d)} \
         ${@df_enabled("obmc-phosphor-system-mgmt", "packagegroup-obmc-phosphor-apps-system-mgmt", d)} \
