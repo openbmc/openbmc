@@ -4,7 +4,8 @@ PR = "r1"
 
 S = "${WORKDIR}/git"
 
-RPROVIDES_${PN} = "virtual-system-inventory-data"
+PROVIDES += "virtual/obmc-inventory-data"
+RPROVIDES_${PN} += "virtual-obmc-inventory-data"
 
 inherit allarch
 inherit obmc-phosphor-license
