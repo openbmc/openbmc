@@ -10,7 +10,11 @@ inherit obmc-phosphor-dbus-service
 PROVIDES += "virtual/obmc-user-mgmt"
 RPROVIDES_${PN} += "virtual-obmc-user-mgmt"
 
-RDEPENDS_${PN} += "python-dbus python-pygobject python-pexpect"
+RDEPENDS_${PN} += " \
+        python-dbus \
+        python-pygobject \
+        python-subprocess \
+        python-pexpect"
 
 SRC_URI += "git://github.com/openbmc/phosphor-networkd"
 
