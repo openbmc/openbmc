@@ -3,7 +3,6 @@ OBMC_MACHINE_FEATURES += "\
         obmc-phosphor-chassis-mgmt \
         obmc-phosphor-sensor-mgmt \
         obmc-phosphor-flash-mgmt \
-        obmc-phosphor-event-mgmt \
         obmc-host-ipmi \
         openpower-pflash \
         "
