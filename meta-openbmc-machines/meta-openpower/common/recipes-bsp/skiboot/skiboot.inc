@@ -1,7 +1,7 @@
 HOMEPAGE = "https://github.com/open-power"
 LICENSE = "Apache-2.0"
 
-SRC_URI += "git://github.com/open-power/skiboot.git"
+SRC_URI += "git://github.com/open-power/skiboot.git;nobranch=1"
 SRC_URI += "file://0001-external-Use-more-standard-PREFIX-vs-prefix.patch"
 SRC_URI += "file://0002-external-Utilize-DESTDIR-in-shared-makefile.patch"
 
@@ -9,8 +9,8 @@ FILESEXTRAPATHS_append := "${THISDIR}/skiboot:"
 
 LIC_FILES_CHKSUM = "file://${S}/LICENCE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
-SRCREV = "skiboot-5.3.0"
-PV = "5.3.0"
+SRCREV = "skiboot-5.3.5"
+PV = "5.3.5"
 
 S = "${WORKDIR}/git"
 
