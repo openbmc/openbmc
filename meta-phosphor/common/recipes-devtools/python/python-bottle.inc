@@ -20,10 +20,10 @@ RDEPENDS_${PN} += " \
         "
 
 PROVIDES += "${PN}-app"
-PACKAGES += "${PN}-app"
+PACKAGE_BEFORE_PN += "${PN}-app"
 
 SUMMARY_${PN}-app = "${SRCNAME} app"
 RDEPENDS_${PN}-app = "${PN}"
-FILES_${PN}-app = "${bindir}/bottle.py"
+FILES_${PN}-app = "${bindir}/bottle.py*"
 
 BBCLASSEXTEND = "nativesdk"
