@@ -8,11 +8,12 @@ inherit obmc-phosphor-license
 inherit native
 inherit perlnative
 inherit cpan-base
+inherit mrw-rev
 
 DEPENDS += "libxml-simple-perl-native json-perl-native"
 
-SRC_URI += "git://github.com/open-power/serverwiz.git;subpath=scripts"
-SRCREV = "04f15f37e9ab6c09412a0abcffb87e9aefcc5368"
+SRC_URI += "${MRW_API_SRC_URI}"
+SRCREV = "${MRW_API_SRCREV}"
 
 do_install() {
     install -d ${PERLLIBDIRS_class-native}/perl/site_perl/${PERLVERSION}/mrw
