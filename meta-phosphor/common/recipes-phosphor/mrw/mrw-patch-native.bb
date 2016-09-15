@@ -6,11 +6,12 @@ S = "${WORKDIR}/git"
 
 inherit obmc-phosphor-license
 inherit native
+inherit mrw-rev
 
 DEPENDS += "python-native python-lxml-native"
 
-SRC_URI += "git://github.com/openbmc/phosphor-mrw-tools"
-SRCREV = "7a68567af7bf121143ef135152a39723518b6e06"
+SRC_URI += "${MRW_PATCH_SRC_URI}"
+SRCREV = "${MRW_PATCH_SRCREV}"
 
 do_install() {
     install -d ${bindir}/obmc-mrw
