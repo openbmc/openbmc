@@ -1,10 +1,13 @@
 [Unit]
 Description=Phosphor Settings Manager
+Before=mapper-wait@-org-openbmc-settings-host0.service
 
 [Service]
 ExecStart={sbindir}/settings_manager.py
 Environment="PYTHONUNBUFFERED=1"
 Restart=always
+Type=dbus
+BusName={BUSNAME}
 
 [Install]
 WantedBy={SYSTEMD_DEFAULT_TARGET}
