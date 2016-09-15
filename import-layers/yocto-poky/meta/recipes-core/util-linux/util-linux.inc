@@ -45,7 +45,7 @@ SHARED_EXTRA_OECONF = "--disable-use-tty-group \
                        --disable-vipw --disable-newgrp --disable-chfn-chsh \
                        --enable-write --enable-mount \
                        --enable-libuuid --enable-libblkid --enable-fsck \
-                       --disable-minix --without-udev \
+                       --disable-minix --disable-bfs --without-udev \
                        usrsbin_execdir='${sbindir}' \
 "
 
