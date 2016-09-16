@@ -10,4 +10,6 @@ UBOOT_MACHINE ?= "ast_g4_ncsi_config"
 UBOOT_ENTRYPOINT ?= "0x40001000"
 UBOOT_LOADADDRESS ?= "0x40001000"
 
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "udev-aspeed-vuart"
+
 require conf/machine/include/tune-arm926ejs.inc
