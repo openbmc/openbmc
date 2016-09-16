@@ -1,8 +1,10 @@
 [Unit]
 Description=Phosphor Console Muxer
+BindsTo=dev-ttyVUART0.device
+After=dev-ttyVUART0.device
 
 [Service]
-ExecStart={sbindir}/obmc-console-server ttyS0
+ExecStart=/bin/sh -c 'realpath /dev/ttyVUART0 | xargs basename | xargs {sbindir}/obmc-console-server'
 Restart=always
 
 [Install]
