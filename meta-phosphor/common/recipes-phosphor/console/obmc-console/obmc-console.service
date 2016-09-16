@@ -1,8 +1,9 @@
 [Unit]
 Description=Phosphor Console Muxer
+ConditionPathExists=/dev/ttyVUART0
 
 [Service]
-ExecStart={sbindir}/obmc-console-server ttyS0
+ExecStart={sbindir}/obmc-console-server ttyVUART0
 Restart=always
 
 [Install]
