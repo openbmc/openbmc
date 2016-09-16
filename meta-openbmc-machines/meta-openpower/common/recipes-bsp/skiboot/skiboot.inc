@@ -4,6 +4,7 @@ LICENSE = "Apache-2.0"
 SRC_URI += "git://github.com/open-power/skiboot.git;nobranch=1"
 SRC_URI += "file://0001-external-Use-more-standard-PREFIX-vs-prefix.patch"
 SRC_URI += "file://0002-external-Utilize-DESTDIR-in-shared-makefile.patch"
+SRC_URI += "file://0003-gard-Fix-Makefile-race-condition.patch"
 
 FILESEXTRAPATHS_append := "${THISDIR}/skiboot:"
 
