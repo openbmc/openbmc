@@ -1,0 +1,179 @@
+//mss: hardcode (could get from XML if necessary)
+/dts-v1/;
+
+//mss:  hardcode based on BMC type for now
+//      maybe eventually build contents from MRW too
+#include "aspeed-g4.dtsi"
+
+//mss: hardcode
+#include <dt-bindings/gpio/aspeed-gpio.h>
+
+/ {
+    //mss: Get from machine name
+	model = "Palmetto BMC";
+
+    //mss: Could either build based on system and chip manufacturers and models
+    //     make a 'compatible' attribute in the MRW
+	compatible = "tyan,palmetto-bmc", "aspeed,ast2400";
+
+    //mss:  How would someone know this is needed?
+	aliases {
+		serial4 = &uart5;
+	};
+
+    //mss:  Add a 'chosen' complex attribute that contains stdout-path and bootargs
+    //      attributes
+	chosen {
+		stdout-path = &uart5;
+		bootargs = "console=ttyS4,115200 earlyprintk";
+	};
+
+    //mss:  Add memory complex attribute that contains base address and size
+	memory {
+		reg = <0x40000000 0x10000000>;
+	};
+
+        //mss:  GPIO LEDs are be modeled as connections in the MRW, with one
+        //      endpoint being the BMC and another an LED part.  The LED part
+        //      would have function and active-state attributes.
+        leds {
+                compatible = "gpio-leds";
+
+                heartbeat {
+                        gpios = <&gpio ASPEED_GPIO(R, 4) GPIO_ACTIVE_LOW>;
+                };
+
+                power {
+                        gpios = <&gpio ASPEED_GPIO(R, 5) GPIO_ACTIVE_LOW>;
+                };
+
+                identify {
+                        gpios = <&gpio ASPEED_GPIO(A, 2) GPIO_ACTIVE_LOW>;
+                };
+        };
+
+
+    //mss: Could model the ahb unit in the MRW hierarchy, with the 
+    //     bmc_pnor and host_pnor child units.  Or could just have as an attribute
+    //     in the bmc_pnor/host_pnor units, like parent-unit = ahb
+	ahb {
+        //mss: model as a subunit of the BMC, with all the necessary attributes
+		bmc_pnor: fmc@1e620000 {
+			reg = < 0x1e620000 0x94
+				0x20000000 0x02000000 >;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			compatible = "aspeed,ast2400-fmc";
+			flash@0 {
+				reg = < 0 >;
+				compatible = "jedec,spi-nor" ;
+
+//mss: hardcode, though could also get from attributes
+#include "aspeed-bmc-opp-flash-layout.dtsi"
+			};
+		};
+
+        //mss: model as a subunit of the BMC, with all the necessary attributes
+		host_pnor: spi@1e630000 {
+			reg = < 0x1e630000 0x18
+				0x30000000 0x02000000 >;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			compatible = "aspeed,ast2400-smc";
+			flash {
+				reg = < 0 >;
+				compatible = "jedec,spi-nor" ;
+				label = "pnor";
+			};
+		};
+	};
+};
+
+//mss:  Not sure yet how to handle this... especially if these names
+//      are tied to something in code
+&pinctrl {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flbusy_default &pinctrl_flwp_default
+
+			&pinctrl_vgahs_default &pinctrl_vgavs_default
+			&pinctrl_ddcclk_default &pinctrl_ddcdat_default
+
+			&pinctrl_pwm1_default &pinctrl_pwm2_default
+			&pinctrl_pwm3_default &pinctrl_pwm4_default
+			&pinctrl_pwm5_default &pinctrl_pwm6_default
+			&pinctrl_pwm7_default
+
+			&pinctrl_bmcint_default &pinctrl_flack_default>;
+};
+
+&mac0 {
+	status = "okay";
+
+    //mss:  add boolean MRW NCSI attribute, convert to use-ncsi
+    //unsure how to add the pinctlr sections I've seen in firestone
+	use-ncsi;
+
+    //mss: add MRW attribute
+	no-hw-checksum;
+};
+
+
+//mss: Enable uart that MRW shows is in use
+&uart5 {
+	status = "okay";
+};
+
+//mss:  I2C buses are modeled in the MRW.  The slave part XML would contain the 
+//      'compatible' attribute, and any other attributes the binding requires.  
+//      The I2C address is saved in the reg property
+//      If no devices are found on the bus, would leave status = "disabled"
+//
+//      If there are no device drivers for a certain chip, I assume it can still
+//      be listed here.
+&i2c0 {
+	status = "okay";
+
+	eeprom@50 {
+		compatible = "atmel,24c256";
+		reg = <0x50>;
+		pagesize = <64>;
+	};
+
+	rtc@68 {
+		compatible = "dallas,ds3231";
+		reg = <0x68>;
+		// interrupts = <GPIOF0>
+	};
+};
+
+
+
+//mss: The MRW would have a way to define GPIO initializions, much
+//     like the FSP does today.
+&gpio {
+	pin_func_mode0 {
+		gpio-hog;
+		gpios = <ASPEED_GPIO(C, 4) GPIO_ACTIVE_HIGH>;
+		output-low;
+		line-name = "func_mode0";
+	};
+
+	pin_func_mode1 {
+		gpio-hog;
+		gpios = <ASPEED_GPIO(C, 5)  GPIO_ACTIVE_HIGH>;
+		output-low;
+		line-name = "func_mode1";
+	};
+
+	pin_func_mode2 {
+		gpio-hog;
+		gpios = <ASPEED_GPIO(C, 6) GPIO_ACTIVE_HIGH>;
+		output-low;
+		line-name = "func_mode2";
+	};
+};
+
+//mss:  always "okay"?
+&vuart {
+	status = "okay";
+};
