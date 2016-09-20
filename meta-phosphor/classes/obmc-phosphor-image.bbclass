@@ -44,6 +44,7 @@ CORE_IMAGE_EXTRA_INSTALL_append = " bash \
         screen \
         inarp \
         obmc-console \
+        pam-plugin-access \
         ${OBMC_IMAGE_EXTRA_INSTALL} \
         "
 
