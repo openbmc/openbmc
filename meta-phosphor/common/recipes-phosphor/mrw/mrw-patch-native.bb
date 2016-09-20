@@ -13,6 +13,6 @@ SRC_URI += "git://github.com/openbmc/phosphor-mrw-tools"
 SRCREV = "7a68567af7bf121143ef135152a39723518b6e06"
 
 do_install() {
-    install -d ${bindir}/obmc-mrw
-    install -m 0755 patchxml.py ${bindir}/obmc-mrw
+    install -d ${D}${bindir}/obmc-mrw
+    install -m 0755 patchxml.py ${D}${bindir}/obmc-mrw
 }

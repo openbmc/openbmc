@@ -13,7 +13,7 @@ SRC_URI += "${PHOSPHOR_MRW_URI}"
 SRCREV = "${PHOSPHOR_MRW_REV}"
 
 do_install() {
-    install -d ${datadir}/obmc-mrw
-    install -m 0644 ${MACHINE}.xml ${datadir}/obmc-mrw
+    install -d ${D}${datadir}/obmc-mrw
+    install -m 0644 ${MACHINE}.xml ${D}${datadir}/obmc-mrw
 }
 
