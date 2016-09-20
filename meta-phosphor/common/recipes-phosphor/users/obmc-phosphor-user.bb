@@ -18,7 +18,7 @@ RDEPENDS_${PN} += " \
 
 SRC_URI += "git://github.com/openbmc/phosphor-networkd"
 
-SRCREV = "92a5d1ec6ac1fe77e515e62c64f3ea01497fb63a"
+SRCREV = "c8d216a1ec0935a7149720c5bc1d6514c5d933bc"
 
 S = "${WORKDIR}/git"
 INSTALL_NAME = "userman.py"
