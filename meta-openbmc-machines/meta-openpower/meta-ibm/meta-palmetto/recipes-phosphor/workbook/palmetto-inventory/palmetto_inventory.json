@@ -15,55 +15,55 @@
       "is_fru" : 0,
       "fru_type" : "BMC"
    },
-   "<inventory_root>/system/chassis/motherboard/cpu" : {
+   "<inventory_root>/system/chassis/motherboard/cpu0" : {
       "is_fru" : 1,
       "fru_type" : "CPU"
    },
-   "<inventory_root>/system/chassis/motherboard/cpu/core0" : {
+   "<inventory_root>/system/chassis/motherboard/cpu0/core0" : {
       "is_fru" : 0,
       "fru_type" : "CORE"
    },
-   "<inventory_root>/system/chassis/motherboard/cpu/core1" : {
+   "<inventory_root>/system/chassis/motherboard/cpu0/core1" : {
       "is_fru" : 0,
       "fru_type" : "CORE"
    },
-   "<inventory_root>/system/chassis/motherboard/cpu/core10" : {
+   "<inventory_root>/system/chassis/motherboard/cpu0/core10" : {
       "is_fru" : 0,
       "fru_type" : "CORE"
    },
-   "<inventory_root>/system/chassis/motherboard/cpu/core11" : {
+   "<inventory_root>/system/chassis/motherboard/cpu0/core11" : {
       "is_fru" : 0,
       "fru_type" : "CORE"
    },
-   "<inventory_root>/system/chassis/motherboard/cpu/core2" : {
+   "<inventory_root>/system/chassis/motherboard/cpu0/core2" : {
       "is_fru" : 0,
       "fru_type" : "CORE"
    },
-   "<inventory_root>/system/chassis/motherboard/cpu/core3" : {
+   "<inventory_root>/system/chassis/motherboard/cpu0/core3" : {
       "is_fru" : 0,
       "fru_type" : "CORE"
    },
-   "<inventory_root>/system/chassis/motherboard/cpu/core4" : {
+   "<inventory_root>/system/chassis/motherboard/cpu0/core4" : {
       "is_fru" : 0,
       "fru_type" : "CORE"
    },
-   "<inventory_root>/system/chassis/motherboard/cpu/core5" : {
+   "<inventory_root>/system/chassis/motherboard/cpu0/core5" : {
       "is_fru" : 0,
       "fru_type" : "CORE"
    },
-   "<inventory_root>/system/chassis/motherboard/cpu/core6" : {
+   "<inventory_root>/system/chassis/motherboard/cpu0/core6" : {
       "is_fru" : 0,
       "fru_type" : "CORE"
    },
-   "<inventory_root>/system/chassis/motherboard/cpu/core7" : {
+   "<inventory_root>/system/chassis/motherboard/cpu0/core7" : {
       "is_fru" : 0,
       "fru_type" : "CORE"
    },
-   "<inventory_root>/system/chassis/motherboard/cpu/core8" : {
+   "<inventory_root>/system/chassis/motherboard/cpu0/core8" : {
       "is_fru" : 0,
       "fru_type" : "CORE"
    },
-   "<inventory_root>/system/chassis/motherboard/cpu/core9" : {
+   "<inventory_root>/system/chassis/motherboard/cpu0/core9" : {
       "is_fru" : 0,
       "fru_type" : "CORE"
    },
@@ -103,7 +103,7 @@
       "is_fru" : 0,
       "fru_type" : "FAN"
    },
-   "<inventory_root>/system/chassis/motherboard/membuf" : {
+   "<inventory_root>/system/chassis/motherboard/membuf0" : {
       "is_fru" : 0,
       "fru_type" : "MEMBUF"
    },
