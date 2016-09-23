@@ -10,8 +10,8 @@ Signed-off-by: Brad Bishop <bradleyb@fuzziesquirrel.com>
 
 diff --git a/op-pwrctl/power_control_obj.c b/op-pwrctl/power_control_obj.c
 index 85a8cff..f6bc996 100644
---- a/git/op-pwrctl/power_control_obj.c
-+++ b/git/op-pwrctl/power_control_obj.c
+--- a/power_control_obj.c
++++ b/power_control_obj.c
 @@ -17,11 +17,15 @@ static const gchar* instance_name = "power0";
  static const gchar* dbus_name = "org.openbmc.control.Power";
  
