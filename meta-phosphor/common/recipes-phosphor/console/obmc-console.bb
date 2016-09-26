@@ -9,6 +9,8 @@ inherit autotools
 
 TARGET_CFLAGS   += "-fpic -O2"
 
+DEPENDS += "autoconf-archive-native"
+
 SRC_URI += "git://github.com/openbmc/obmc-console"
 SRC_URI += "file://${PN}.conf"
 
