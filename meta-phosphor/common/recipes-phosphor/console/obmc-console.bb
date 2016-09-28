@@ -14,7 +14,7 @@ DEPENDS += "autoconf-archive-native"
 SRC_URI += "git://github.com/openbmc/obmc-console"
 SRC_URI += "file://${PN}.conf"
 
-SRCREV = "87e344cd6bd848f886e226c8d58ffe4da77ce4bc"
+SRCREV = "44580de4e2170c8ee06dbf401315d3acfcf52b22"
 
 SYSTEMD_SERVICE_${PN} = " \
         ${PN}.service \
