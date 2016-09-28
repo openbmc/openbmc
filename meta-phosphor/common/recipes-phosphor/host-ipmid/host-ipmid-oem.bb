@@ -3,28 +3,18 @@ DESCRIPTION = "Phosphor OpenBMC IPMI OEM commands for OpenPOWER based systems"
 HOMEPAGE = "https://github.com/openbmc/openpower-host-ipmi-oem"
 PR = "r1"
 
+inherit autotools pkgconfig
 inherit obmc-phosphor-license
 
-DEPENDS += "systemd    \
-            host-ipmid \
-            "
+DEPENDS += "host-ipmid"
+DEPENDS += "autoconf-archive-native"
+
 TARGET_CFLAGS += "-fpic"
 
-
-RDEPENDS_${PN} += "libsystemd"
-
-
-
 SRC_URI += "git://github.com/openbmc/openpower-host-ipmi-oem"
-
-SRCREV = "e74fc6bb9221663b1875332944b2f383e39d9a12"
-
-FILES_${PN} += "${libdir}/host-ipmid/*.so"
-FILES_${PN}-dbg += "${libdir}/host-ipmid/.debug"
+SRCREV = "afcd083ec0abddaf4efa51030a2ecc1189b90f28"
 
 S = "${WORKDIR}/git"
 
-do_install() {
-        install -m 0755 -d ${D}${libdir}/host-ipmid
-        install -m 0755 ${S}/*.so ${D}${libdir}/host-ipmid/
-}
+FILES_${PN}_append = " ${libdir}/host-ipmid/lib*${SOLIBS}"
+FILES_${PN}-dev_append = " ${libdir}/host-ipmid/lib*${SOLIBSDEV} ${libdir}/host-ipmid/*.la"
