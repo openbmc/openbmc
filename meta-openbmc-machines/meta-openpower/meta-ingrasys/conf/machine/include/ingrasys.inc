@@ -1,1 +1,1 @@
-require conf/machine/include/sample.inc
+require conf/machine/include/openpower.inc
