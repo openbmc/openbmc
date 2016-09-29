@@ -14,7 +14,7 @@ RPROVIDES_${PN} += "virtual-obmc-settings-mgmt"
 
 SRC_URI += "git://github.com/openbmc/phosphor-settingsd"
 
-SRCREV = "54be910bd0af885217adc7dfcd95b7db9a13886d"
+SRCREV = "172aa218bb4d52b9893c33f079d534e639b43559"
 
 S = "${WORKDIR}/git"
 
