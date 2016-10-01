@@ -1,0 +1,543 @@
+-- Logs begin at Thu 2016-09-29 20:09:13 UTC, end at Thu 2016-09-29 20:10:37 UTC. --
+Sep 29 20:09:13 palmetto systemd-journald[474]: Runtime journal (/run/log/journal/) is 1.5M, max 12.4M, 10.8M free.
+Sep 29 20:09:13 palmetto kernel: Booting Linux on physical CPU 0x0
+Sep 29 20:09:13 palmetto kernel: Linux version 4.4.16-openbmc-4.4-20160804-1 (bradleyb@habcap11p1) (gcc version 4.9.3 (GCC) ) #1 Tue Aug 16 16:46:09 CDT 2016
+Sep 29 20:09:13 palmetto kernel: CPU: ARM926EJ-S [41069265] revision 5 (ARMv5TEJ), cr=0005317f
+Sep 29 20:09:13 palmetto kernel: CPU: VIVT data cache, VIVT instruction cache
+Sep 29 20:09:13 palmetto kernel: Machine model: Palmetto BMC
+Sep 29 20:09:13 palmetto kernel: Memory policy: Data cache writeback
+Sep 29 20:09:13 palmetto kernel: SOC Rev: 02010303
+Sep 29 20:09:13 palmetto kernel: On node 0 totalpages: 65536
+Sep 29 20:09:13 palmetto kernel: free_area_init_node: node 0, pgdat c052b14c, node_mem_map cfdf9000
+Sep 29 20:09:13 palmetto kernel:   Normal zone: 512 pages used for memmap
+Sep 29 20:09:13 palmetto kernel:   Normal zone: 0 pages reserved
+Sep 29 20:09:13 palmetto kernel:   Normal zone: 65536 pages, LIFO batch:15
+Sep 29 20:09:13 palmetto kernel: pcpu-alloc: s0 r0 d32768 u32768 alloc=1*32768
+Sep 29 20:09:13 palmetto kernel: pcpu-alloc: [0] 0 
+Sep 29 20:09:13 palmetto kernel: Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 65024
+Sep 29 20:09:13 palmetto kernel: Kernel command line: console=ttyS4,38400n8 root=/dev/ram rw
+Sep 29 20:09:13 palmetto kernel: PID hash table entries: 1024 (order: 0, 4096 bytes)
+Sep 29 20:09:13 palmetto kernel: Dentry cache hash table entries: 32768 (order: 5, 131072 bytes)
+Sep 29 20:09:13 palmetto kernel: Inode-cache hash table entries: 16384 (order: 4, 65536 bytes)
+Sep 29 20:09:13 palmetto kernel: Memory: 243364K/262144K available (3642K kernel code, 174K rwdata, 1292K rodata, 184K init, 109K bss, 18780K reserved, 0K cma-reserved)
+Sep 29 20:09:13 palmetto kernel: Virtual kernel memory layout:
+                                     vector  : 0xffff0000 - 0xffff1000   (   4 kB)
+                                     fixmap  : 0xffc00000 - 0xfff00000   (3072 kB)
+                                     vmalloc : 0xd0800000 - 0xff800000   ( 752 MB)
+                                     lowmem  : 0xc0000000 - 0xd0000000   ( 256 MB)
+                                     modules : 0xbf000000 - 0xc0000000   (  16 MB)
+                                       .text : 0xc0008000 - 0xc04d9d24   (4936 kB)
+                                       .init : 0xc04da000 - 0xc0508000   ( 184 kB)
+                                       .data : 0xc0508000 - 0xc0533988   ( 175 kB)
+                                        .bss : 0xc0533988 - 0xc054ed94   ( 110 kB)
+Sep 29 20:09:13 palmetto kernel: NR_IRQS:16 nr_irqs:16 16
+Sep 29 20:09:13 palmetto kernel: Aspeed VIC Initiallized
+Sep 29 20:09:13 palmetto kernel: clocksource: moxart_timer: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 39817925974 ns
+Sep 29 20:09:13 palmetto kernel: sched_clock: 32 bits at 100 Hz, resolution 10000000ns, wraps every 21474836475000000ns
+Sep 29 20:09:13 palmetto kernel: Calibrating delay loop... 190.87 BogoMIPS (lpj=954368)
+Sep 29 20:09:13 palmetto kernel: pid_max: default: 32768 minimum: 301
+Sep 29 20:09:13 palmetto kernel: Mount-cache hash table entries: 1024 (order: 0, 4096 bytes)
+Sep 29 20:09:13 palmetto kernel: Mountpoint-cache hash table entries: 1024 (order: 0, 4096 bytes)
+Sep 29 20:09:13 palmetto kernel: CPU: Testing write buffer coherency: ok
+Sep 29 20:09:13 palmetto kernel: Setting up static identity map for 0x40008400 - 0x40008458
+Sep 29 20:09:13 palmetto kernel: devtmpfs: initialized
+Sep 29 20:09:13 palmetto kernel: clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604462750000 ns
+Sep 29 20:09:13 palmetto kernel: NET: Registered protocol family 16
+Sep 29 20:09:13 palmetto kernel: DMA: preallocated 256 KiB pool for atomic coherent allocations
+Sep 29 20:09:13 palmetto kernel: SCSI subsystem initialized
+Sep 29 20:09:13 palmetto kernel: usbcore: registered new interface driver usbfs
+Sep 29 20:09:13 palmetto kernel: usbcore: registered new interface driver hub
+Sep 29 20:09:13 palmetto kernel: usbcore: registered new device driver usb
+Sep 29 20:09:13 palmetto kernel: clocksource: Switched to clocksource moxart_timer
+Sep 29 20:09:13 palmetto kernel: NET: Registered protocol family 2
+Sep 29 20:09:13 palmetto kernel: TCP established hash table entries: 2048 (order: 1, 8192 bytes)
+Sep 29 20:09:13 palmetto kernel: TCP bind hash table entries: 2048 (order: 1, 8192 bytes)
+Sep 29 20:09:13 palmetto kernel: TCP: Hash tables configured (established 2048 bind 2048)
+Sep 29 20:09:13 palmetto kernel: UDP hash table entries: 256 (order: 0, 4096 bytes)
+Sep 29 20:09:13 palmetto kernel: UDP-Lite hash table entries: 256 (order: 0, 4096 bytes)
+Sep 29 20:09:13 palmetto kernel: NET: Registered protocol family 1
+Sep 29 20:09:13 palmetto kernel: RPC: Registered named UNIX socket transport module.
+Sep 29 20:09:13 palmetto kernel: RPC: Registered udp transport module.
+Sep 29 20:09:13 palmetto kernel: RPC: Registered tcp transport module.
+Sep 29 20:09:13 palmetto kernel: RPC: Registered tcp NFSv4.1 backchannel transport module.
+Sep 29 20:09:13 palmetto kernel: Trying to unpack rootfs image as initramfs...
+Sep 29 20:09:13 palmetto kernel: Freeing initrd memory: 11012K (c0800000 - c12c1000)
+Sep 29 20:09:13 palmetto kernel: futex hash table entries: 256 (order: -1, 3072 bytes)
+Sep 29 20:09:13 palmetto kernel: squashfs: version 4.0 (2009/01/31) Phillip Lougher
+Sep 29 20:09:13 palmetto kernel: jffs2: version 2.2. (NAND) (SUMMARY)  © 2001-2006 Red Hat, Inc.
+Sep 29 20:09:13 palmetto kernel: io scheduler noop registered (default)
+Sep 29 20:09:13 palmetto kernel: Serial: 8250/16550 driver, 6 ports, IRQ sharing enabled
+Sep 29 20:09:13 palmetto kernel: 1e783000.serial: ttyS0 at MMIO 0x1e783000 (irq = 23, base_baud = 115200) is a 16550A
+Sep 29 20:09:13 palmetto kernel: 1e78d000.serial: ttyS1 at MMIO 0x1e78d000 (irq = 24, base_baud = 115200) is a 16550A
+Sep 29 20:09:13 palmetto kernel: 1e78e000.serial: ttyS2 at MMIO 0x1e78e000 (irq = 25, base_baud = 115200) is a 16550A
+Sep 29 20:09:13 palmetto kernel: 1e78f000.serial: ttyS3 at MMIO 0x1e78f000 (irq = 26, base_baud = 115200) is a 16550A
+Sep 29 20:09:13 palmetto kernel: console [ttyS4] disabled
+Sep 29 20:09:13 palmetto kernel: 1e784000.serial: ttyS4 at MMIO 0x1e784000 (irq = 27, base_baud = 115200) is a 16550A
+Sep 29 20:09:13 palmetto kernel: console [ttyS4] enabled
+Sep 29 20:09:13 palmetto kernel: 1e787000.vuart: ttyS5 at MMIO 0x1e787000 (irq = 18, base_baud = 115200) is a 16550A
+Sep 29 20:09:13 palmetto kernel: brd: module loaded
+Sep 29 20:09:13 palmetto kernel: loop: module loaded
+Sep 29 20:09:13 palmetto kernel: bt-host 1e789140.ibt: Found bt host device
+Sep 29 20:09:13 palmetto kernel: bt-host 1e789140.ibt: Using IRQ 18
+Sep 29 20:09:13 palmetto kernel: platform 1e620000.fmc:flash@0: mx25l25635e (32768 Kbytes)
+Sep 29 20:09:13 palmetto kernel: 6 ofpart partitions found on MTD device bmc
+Sep 29 20:09:13 palmetto kernel: Creating 6 MTD partitions on "bmc":
+Sep 29 20:09:13 palmetto kernel: 0x000000000000-0x000000060000 : "u-boot"
+Sep 29 20:09:13 palmetto kernel: 0x000000060000-0x000000080000 : "u-boot-env"
+Sep 29 20:09:13 palmetto kernel: 0x000000080000-0x000000300000 : "kernel"
+Sep 29 20:09:13 palmetto kernel: 0x000000300000-0x0000004c0000 : "initramfs"
+Sep 29 20:09:13 palmetto kernel: 0x0000004c0000-0x000001c00000 : "rofs"
+Sep 29 20:09:13 palmetto kernel: 0x000001c00000-0x000002000000 : "rwfs"
+Sep 29 20:09:13 palmetto kernel: platform 1e630000.spi:flash: mx25l25635e (32768 Kbytes)
+Sep 29 20:09:13 palmetto kernel: ftgmac100 1e660000.ethernet: Using NCSI interface
+Sep 29 20:09:13 palmetto kernel: ftgmac100 1e660000.ethernet: Read MAC address from chip 42:83:82:95:3a:bd
+Sep 29 20:09:13 palmetto kernel: ftmac100: Loading version 0.2 ...
+Sep 29 20:09:13 palmetto kernel: ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
+Sep 29 20:09:13 palmetto kernel: ohci_hcd: USB 1.1 'Open' Host Controller (OHCI) Driver
+Sep 29 20:09:13 palmetto kernel: usbcore: registered new interface driver cdc_acm
+Sep 29 20:09:13 palmetto kernel: cdc_acm: USB Abstract Control Model driver for USB modems and ISDN adapters
+Sep 29 20:09:13 palmetto kernel: usbcore: registered new interface driver usb-storage
+Sep 29 20:09:13 palmetto kernel: usbcore: registered new interface driver usbserial
+Sep 29 20:09:13 palmetto kernel: usbcore: registered new interface driver usbserial_generic
+Sep 29 20:09:13 palmetto kernel: usbserial: USB Serial support registered for generic
+Sep 29 20:09:13 palmetto kernel: mousedev: PS/2 mouse device common for all mice
+Sep 29 20:09:13 palmetto kernel: i2c /dev entries driver
+Sep 29 20:09:13 palmetto kernel: i2c_aspeed 1e78a000.i2c: i2c controller registered, irq 19
+Sep 29 20:09:13 palmetto kernel: at24 0-0050: 32768 byte 24c256 EEPROM, writable, 64 bytes/write
+Sep 29 20:09:13 palmetto kernel: rtc-ds1307 0-0068: rtc core: registered ds3231 as rtc0
+Sep 29 20:09:13 palmetto kernel: i2c_aspeed i2c-0: i2c bus 0 registered, irq 220
+Sep 29 20:09:13 palmetto kernel: i2c_aspeed i2c-1: i2c bus 1 registered, irq 221
+Sep 29 20:09:13 palmetto kernel: i2c_aspeed i2c-2: i2c bus 2 registered, irq 222
+Sep 29 20:09:13 palmetto kernel: i2c_aspeed i2c-3: i2c bus 3 registered, irq 223
+Sep 29 20:09:13 palmetto kernel: i2c_aspeed i2c-4: i2c bus 4 registered, irq 224
+Sep 29 20:09:14 palmetto kernel: i2c_aspeed i2c-5: i2c bus 5 registered, irq 225
+Sep 29 20:09:14 palmetto kernel: i2c_aspeed i2c-6: i2c bus 6 registered, irq 226
+Sep 29 20:09:14 palmetto kernel: i2c_aspeed i2c-7: i2c bus 7 registered, irq 227
+Sep 29 20:09:14 palmetto kernel: i2c_aspeed i2c-8: i2c bus 8 registered, irq 228
+Sep 29 20:09:14 palmetto kernel: occ-i2c 3-0050: occ i2c driver ready: i2c addr@0x50
+Sep 29 20:09:14 palmetto kernel: aspeed_wdt 1e785000.wdt: rate 48000000, max timeout 5, timeout 5
+Sep 29 20:09:14 palmetto kernel: usbcore: registered new interface driver usbhid
+Sep 29 20:09:14 palmetto kernel: usbhid: USB HID core driver
+Sep 29 20:09:14 palmetto kernel: ip_tables: (C) 2000-2006 Netfilter Core Team
+Sep 29 20:09:14 palmetto kernel: NET: Registered protocol family 17
+Sep 29 20:09:14 palmetto kernel: rtc-ds1307 0-0068: setting system clock to 2016-09-29 20:09:11 UTC (1475179751)
+Sep 29 20:09:14 palmetto kernel: Freeing unused kernel memory: 184K (c04da000 - c0508000)
+Sep 29 20:09:14 palmetto kernel: random: systemd urandom read with 54 bits of entropy available
+Sep 29 20:09:14 palmetto systemd[1]: systemd 229 running in system mode. (+PAM -AUDIT -SELINUX -IMA -APPARMOR -SMACK +SYSVINIT -UTMP -LIBCRYPTSETUP -GCRYPT -GNUTLS +ACL +XZ -LZ4 -SECCOMP +BLKID -ELFUTILS +KMOD -IDN)
+Sep 29 20:09:14 palmetto systemd[1]: Detected architecture arm.
+Sep 29 20:09:14 palmetto systemd[1]: Set hostname to <palmetto>.
+Sep 29 20:09:14 palmetto systemd[1]: Initializing machine ID from random generator.
+Sep 29 20:09:14 palmetto systemd[1]: Listening on Network Service Netlink Socket.
+Sep 29 20:09:14 palmetto systemd[1]: Started Dispatch Password Requests to Console Directory Watch.
+Sep 29 20:09:14 palmetto systemd[1]: Listening on Journal Socket.
+Sep 29 20:09:14 palmetto systemd[1]: Created slice System Slice.
+Sep 29 20:09:14 palmetto systemd[1]: Created slice system-org.openbmc.control.Power.slice.
+Sep 29 20:09:14 palmetto systemd[1]: Created slice system-org.openbmc.control.Chassis.slice.
+Sep 29 20:09:14 palmetto systemd[1]: Created slice system-org.openbmc.buttons.Power.slice.
+Sep 29 20:09:14 palmetto systemd[1]: Created slice system-org.openbmc.watchdog.Host.slice.
+Sep 29 20:09:14 palmetto systemd[1]: Mounting Debug File System...
+Sep 29 20:09:14 palmetto systemd[1]: Listening on Journal Socket (/dev/log).
+Sep 29 20:09:14 palmetto systemd[1]: Created slice system-org.openbmc.control.Checkstop.slice.
+Sep 29 20:09:14 palmetto systemd[1]: Reached target Swap.
+Sep 29 20:09:14 palmetto systemd[1]: Started Forward Password Requests to Wall Directory Watch.
+Sep 29 20:09:14 palmetto systemd[1]: Reached target Remote File Systems.
+Sep 29 20:09:14 palmetto systemd[1]: Reached target Paths.
+Sep 29 20:09:14 palmetto systemd[1]: Created slice system-getty.slice.
+Sep 29 20:09:14 palmetto systemd[1]: Mounting Temporary Directory...
+Sep 29 20:09:14 palmetto systemd[1]: Starting Apply Kernel Variables...
+Sep 29 20:09:14 palmetto systemd[1]: Listening on /dev/initctl Compatibility Named Pipe.
+Sep 29 20:09:14 palmetto systemd[1]: Listening on Syslog Socket.
+Sep 29 20:09:14 palmetto systemd[1]: Starting Journal Service...
+Sep 29 20:09:14 palmetto systemd[1]: Listening on udev Kernel Socket.
+Sep 29 20:09:14 palmetto systemd[1]: Created slice system-obmc\x2dled\x2dstart.slice.
+Sep 29 20:09:14 palmetto systemd[1]: Reached target Slices.
+Sep 29 20:09:14 palmetto systemd[1]: Created slice system-org.openbmc.control.Bmc.slice.
+Sep 29 20:09:14 palmetto systemd[1]: Listening on udev Control Socket.
+Sep 29 20:09:14 palmetto systemd[1]: Starting udev Coldplug all Devices...
+Sep 29 20:09:14 palmetto systemd[1]: Mounting Configuration File System...
+Sep 29 20:09:14 palmetto systemd[1]: Created slice system-serial\x2dgetty.slice.
+Sep 29 20:09:14 palmetto systemd[1]: Created slice system-mapper\x2dwait.slice.
+Sep 29 20:09:14 palmetto systemd[1]: Starting Remount Root and Kernel File Systems...
+Sep 29 20:09:14 palmetto systemd[1]: Created slice system-org.openbmc.control.Host.slice.
+Sep 29 20:09:14 palmetto systemd[1]: Mounted Configuration File System.
+Sep 29 20:09:14 palmetto systemd[1]: Mounted Debug File System.
+Sep 29 20:09:14 palmetto systemd[1]: Mounted Temporary Directory.
+Sep 29 20:09:14 palmetto systemd[1]: Started Apply Kernel Variables.
+Sep 29 20:09:14 palmetto systemd[1]: Started Remount Root and Kernel File Systems.
+Sep 29 20:09:14 palmetto systemd-journald[474]: Journal started
+Sep 29 20:09:14 palmetto systemd-sysctl[472]: Couldn't write '16' to 'kernel/sysrq', ignoring: No such file or directory
+Sep 29 20:09:14 palmetto systemd-sysctl[472]: Couldn't write 'fq_codel' to 'net/core/default_qdisc', ignoring: No such file or directory
+Sep 29 20:09:14 palmetto systemd[1]: Started Journal Service.
+Sep 29 20:09:15 palmetto systemd[1]: Starting Create System Users...
+Sep 29 20:09:15 palmetto systemd[1]: Starting Flush Journal to Persistent Storage...
+Sep 29 20:09:15 palmetto systemd-sysusers[620]: Creating group wheel with gid 994.
+Sep 29 20:09:15 palmetto systemd-sysusers[620]: Creating group nobody with gid 993.
+Sep 29 20:09:15 palmetto systemd-sysusers[620]: Creating group systemd-network with gid 992.
+Sep 29 20:09:15 palmetto systemd-sysusers[620]: Creating user systemd-network (systemd Network Management) with uid 992 and gid 992.
+Sep 29 20:09:15 palmetto systemd[1]: Started udev Coldplug all Devices.
+Sep 29 20:09:15 palmetto systemd[1]: Started Create System Users.
+Sep 29 20:09:15 palmetto systemd[1]: Started Flush Journal to Persistent Storage.
+Sep 29 20:09:15 palmetto systemd[1]: Starting Create Static Device Nodes in /dev...
+Sep 29 20:09:16 palmetto systemd[1]: Started Create Static Device Nodes in /dev.
+Sep 29 20:09:16 palmetto systemd[1]: Reached target Local File Systems (Pre).
+Sep 29 20:09:16 palmetto systemd[1]: Mounting /var/volatile...
+Sep 29 20:09:16 palmetto systemd[1]: Starting udev Kernel Device Manager...
+Sep 29 20:09:16 palmetto systemd[1]: Mounted /var/volatile.
+Sep 29 20:09:16 palmetto systemd[1]: Started udev Kernel Device Manager.
+Sep 29 20:09:16 palmetto systemd[1]: Reached target Local File Systems.
+Sep 29 20:09:16 palmetto systemd[1]: Starting Rebuild Journal Catalog...
+Sep 29 20:09:16 palmetto systemd[1]: Starting Create Volatile Files and Directories...
+Sep 29 20:09:16 palmetto systemd[1]: Starting Load/Save Random Seed...
+Sep 29 20:09:16 palmetto systemd[1]: Started Rebuild Journal Catalog.
+Sep 29 20:09:16 palmetto systemd[1]: Starting Update is Completed...
+Sep 29 20:09:17 palmetto systemd[1]: Started Load/Save Random Seed.
+Sep 29 20:09:17 palmetto systemd[1]: Started Update is Completed.
+Sep 29 20:09:17 palmetto systemd-tmpfiles[809]: "/var/tmp" already exists and is not a directory.
+Sep 29 20:09:17 palmetto systemd-tmpfiles[809]: "/var/log" already exists and is not a directory.
+Sep 29 20:09:17 palmetto systemd[1]: Started Create Volatile Files and Directories.
+Sep 29 20:09:18 palmetto systemd[1]: Found device /dev/ttyS0.
+Sep 29 20:09:18 palmetto systemd[1]: Found device /dev/ttyS4.
+Sep 29 20:09:19 palmetto systemd[1]: Found device /dev/ttyVUART0.
+Sep 29 20:09:19 palmetto systemd[1]: Starting Network Time Synchronization...
+Sep 29 20:09:19 palmetto systemd[1]: Started Network Time Synchronization.
+Sep 29 20:09:19 palmetto systemd[1]: Reached target System Time Synchronized.
+Sep 29 20:09:19 palmetto systemd[1]: Reached target System Initialization.
+Sep 29 20:09:19 palmetto systemd[1]: Listening on D-Bus System Message Bus Socket.
+Sep 29 20:09:19 palmetto systemd[1]: Listening on dropbear.socket.
+Sep 29 20:09:19 palmetto systemd[1]: Listening on Phosphor DBUS Browser socket.
+Sep 29 20:09:19 palmetto systemd[1]: Listening on Phosphor Webserver socket.
+Sep 29 20:09:19 palmetto systemd[1]: Listening on Phosphor Host Console SSH Per-Connection socket.
+Sep 29 20:09:19 palmetto systemd[1]: Reached target Sockets.
+Sep 29 20:09:19 palmetto systemd[1]: Reached target Basic System.
+Sep 29 20:09:19 palmetto systemd[1]: Starting Phosphor Settings Manager...
+Sep 29 20:09:19 palmetto systemd[1]: Starting Phosphor Event Manager...
+Sep 29 20:09:19 palmetto systemd[1]: Starting Phosphor Watchdog0...
+Sep 29 20:09:19 palmetto systemd[1]: Starting Permit User Sessions...
+Sep 29 20:09:20 palmetto systemd[1]: Starting Phosphor Network Manager...
+Sep 29 20:09:20 palmetto phosphor-eventd[830]: 0
+Sep 29 20:09:20 palmetto systemd[1]: Starting Phosphor DBus Service Discovery Manager...
+Sep 29 20:09:20 palmetto systemd[1]: Started Phosphor Console Muxer.
+Sep 29 20:09:20 palmetto systemd[1]: Starting Phosphor Chassis0 Control...
+Sep 29 20:09:20 palmetto systemd[1]: Started Kernel Logging Service.
+Sep 29 20:09:20 palmetto systemd[1]: Started Phosphor Inverse ARP.
+Sep 29 20:09:20 palmetto systemd[1]: Starting Phosphor Inventory Manager...
+Sep 29 20:09:20 palmetto kernel[839]: klogd started: BusyBox v1.24.1 (2016-09-01 06:18:00 CDT)
+Sep 29 20:09:20 palmetto systemd[1]: Starting Phosphor LED Management Daemon...
+Sep 29 20:09:20 palmetto kernel[839]: Booting Linux on physical CPU 0x0
+Sep 29 20:09:20 palmetto systemd[1]: Started System Logging Service.
+Sep 29 20:09:20 palmetto kernel[839]: Linux version 4.4.16-openbmc-4.4-20160804-1 (bradleyb@habcap11p1) (gcc version 4.9.3 (GCC) ) #1 Tue Aug 16 16:46:09 CDT 2016
+Sep 29 20:09:20 palmetto systemd[1]: Starting Phosphor Bulk Transfer DBus Bridge...
+Sep 29 20:09:20 palmetto kernel[839]: CPU: ARM926EJ-S [41069265] revision 5 (ARMv5TEJ), cr=0005317f
+Sep 29 20:09:20 palmetto systemd[1]: Starting Clear one time boot overrides...
+Sep 29 20:09:20 palmetto kernel[839]: CPU: VIVT data cache, VIVT instruction cache
+Sep 29 20:09:20 palmetto systemd[1]: Starting Startup Hacks...
+Sep 29 20:09:20 palmetto kernel[839]: Machine model: Palmetto BMC
+Sep 29 20:09:20 palmetto kernel[839]: Memory policy: Data cache writeback
+Sep 29 20:09:20 palmetto kernel[839]: SOC Rev: 02010303
+Sep 29 20:09:21 palmetto fw_setenv[851]: Cannot access MTD device /run/fw_env: No such file or directory
+Sep 29 20:09:21 palmetto fw_setenv[851]: Error: environment not initialized
+Sep 29 20:09:20 palmetto systemd[1]: Starting Phosphor User Manager...
+Sep 29 20:09:20 palmetto kernel[839]: On node 0 totalpages: 65536
+Sep 29 20:09:20 palmetto systemd[1]: Started Daily Cleanup of Temporary Directories.
+Sep 29 20:09:20 palmetto kernel[839]: free_area_init_node: node 0, pgdat c052b14c, node_mem_map cfdf9000
+Sep 29 20:09:20 palmetto systemd[1]: Reached target Timers.
+Sep 29 20:09:20 palmetto inarp[840]: adding interface: lo, [00:00:00:00:00:00]
+Sep 29 20:09:21 palmetto systemd[1]: Starting Phosphor BMC0 Control...
+Sep 29 20:09:20 palmetto inarp[840]: adding interface: eth0, [42:83:82:95:3a:bd]
+Sep 29 20:09:21 palmetto systemd[1]: Starting Phosphor Download Manager...
+Sep 29 20:09:20 palmetto kernel[839]:   Normal zone: 512 pages used for memmap
+Sep 29 20:09:21 palmetto systemd[1]: Starting Phosphor Sensor Manager...
+Sep 29 20:09:20 palmetto kernel[839]:   Normal zone: 0 pages reserved
+Sep 29 20:09:21 palmetto systemd[1]: Starting Phosphor Host0 Checkstop Monitor...
+Sep 29 20:09:20 palmetto kernel[839]:   Normal zone: 65536 pages, LIFO batch:15
+Sep 29 20:09:21 palmetto systemd[1]: Started D-Bus System Message Bus.
+Sep 29 20:09:20 palmetto kernel[839]: pcpu-alloc: s0 r0 d32768 u32768 alloc=1*32768
+Sep 29 20:09:20 palmetto kernel[839]: pcpu-alloc: [0] 0
+Sep 29 20:09:20 palmetto kernel[839]: Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 65024
+Sep 29 20:09:20 palmetto kernel[839]: Kernel command line: console=ttyS4,38400n8 root=/dev/ram rw
+Sep 29 20:09:20 palmetto kernel[839]: PID hash table entries: 1024 (order: 0, 4096 bytes)
+Sep 29 20:09:20 palmetto kernel[839]: Dentry cache hash table entries: 32768 (order: 5, 131072 bytes)
+Sep 29 20:09:20 palmetto kernel[839]: Inode-cache hash table entries: 16384 (order: 4, 65536 bytes)
+Sep 29 20:09:20 palmetto kernel[839]: Memory: 243364K/262144K available (3642K kernel code, 174K rwdata, 1292K rodata, 184K init, 109K bss, 18780K reserved, 0K cma-reserved)
+Sep 29 20:09:20 palmetto kernel[839]: Virtual kernel memory layout:
+Sep 29 20:09:20 palmetto kernel[839]:     vector  : 0xffff0000 - 0xffff1000   (   4 kB)
+Sep 29 20:09:20 palmetto kernel[839]:     fixmap  : 0xffc00000 - 0xfff00000   (3072 kB)
+Sep 29 20:09:20 palmetto kernel[839]:     vmalloc : 0xd0800000 - 0xff800000   ( 752 MB)
+Sep 29 20:09:20 palmetto kernel[839]:     lowmem  : 0xc0000000 - 0xd0000000   ( 256 MB)
+Sep 29 20:09:20 palmetto kernel[839]:     modules : 0xbf000000 - 0xc0000000   (  16 MB)
+Sep 29 20:09:20 palmetto kernel[839]:       .text : 0xc0008000 - 0xc04d9d24   (4936 kB)
+Sep 29 20:09:20 palmetto kernel[839]:       .init : 0xc04da000 - 0xc0508000   ( 184 kB)
+Sep 29 20:09:20 palmetto kernel[839]:       .data : 0xc0508000 - 0xc0533988   ( 175 kB)
+Sep 29 20:09:20 palmetto kernel[839]:        .bss : 0xc0533988 - 0xc054ed94   ( 110 kB)
+Sep 29 20:09:20 palmetto kernel[839]: NR_IRQS:16 nr_irqs:16 16
+Sep 29 20:09:20 palmetto kernel[839]: Aspeed VIC Initiallized
+Sep 29 20:09:20 palmetto kernel[839]: clocksource: moxart_timer: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 39817925974 ns
+Sep 29 20:09:20 palmetto kernel[839]: sched_clock: 32 bits at 100 Hz, resolution 10000000ns, wraps every 21474836475000000ns
+Sep 29 20:09:20 palmetto kernel[839]: Calibrating delay loop... 190.87 BogoMIPS (lpj=954368)
+Sep 29 20:09:20 palmetto kernel[839]: pid_max: default: 32768 minimum: 301
+Sep 29 20:09:20 palmetto kernel[839]: Mount-cache hash table entries: 1024 (order: 0, 4096 bytes)
+Sep 29 20:09:20 palmetto kernel[839]: Mountpoint-cache hash table entries: 1024 (order: 0, 4096 bytes)
+Sep 29 20:09:20 palmetto kernel[839]: CPU: Testing write buffer coherency: ok
+Sep 29 20:09:20 palmetto kernel[839]: Setting up static identity map for 0x40008400 - 0x40008458
+Sep 29 20:09:20 palmetto kernel[839]: devtmpfs: initialized
+Sep 29 20:09:20 palmetto kernel[839]: clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604462750000 ns
+Sep 29 20:09:20 palmetto kernel[839]: NET: Registered protocol family 16
+Sep 29 20:09:20 palmetto kernel[839]: DMA: preallocated 256 KiB pool for atomic coherent allocations
+Sep 29 20:09:20 palmetto kernel[839]: SCSI subsystem initialized
+Sep 29 20:09:20 palmetto kernel[839]: usbcore: registered new interface driver usbfs
+Sep 29 20:09:20 palmetto kernel[839]: usbcore: registered new interface driver hub
+Sep 29 20:09:20 palmetto kernel[839]: usbcore: registered new device driver usb
+Sep 29 20:09:20 palmetto kernel[839]: clocksource: Switched to clocksource moxart_timer
+Sep 29 20:09:20 palmetto kernel[839]: NET: Registered protocol family 2
+Sep 29 20:09:20 palmetto kernel[839]: TCP established hash table entries: 2048 (order: 1, 8192 bytes)
+Sep 29 20:09:20 palmetto kernel[839]: TCP bind hash table entries: 2048 (order: 1, 8192 bytes)
+Sep 29 20:09:20 palmetto kernel[839]: TCP: Hash tables configured (established 2048 bind 2048)
+Sep 29 20:09:20 palmetto kernel[839]: UDP hash table entries: 256 (order: 0, 4096 bytes)
+Sep 29 20:09:20 palmetto kernel[839]: UDP-Lite hash table entries: 256 (order: 0, 4096 bytes)
+Sep 29 20:09:20 palmetto kernel[839]: NET: Registered protocol family 1
+Sep 29 20:09:20 palmetto kernel[839]: RPC: Registered named UNIX socket transport module.
+Sep 29 20:09:20 palmetto kernel[839]: RPC: Registered udp transport module.
+Sep 29 20:09:20 palmetto kernel[839]: RPC: Registered tcp transport module.
+Sep 29 20:09:20 palmetto kernel[839]: RPC: Registered tcp NFSv4.1 backchannel transport module.
+Sep 29 20:09:20 palmetto kernel[839]: Trying to unpack rootfs image as initramfs...
+Sep 29 20:09:20 palmetto kernel[839]: Freeing initrd memory: 11012K (c0800000 - c12c1000)
+Sep 29 20:09:20 palmetto kernel[839]: futex hash table entries: 256 (order: -1, 3072 bytes)
+Sep 29 20:09:20 palmetto kernel[839]: squashfs: version 4.0 (2009/01/31) Phillip Lougher
+Sep 29 20:09:20 palmetto kernel[839]: jffs2: version 2.2. (NAND) (SUMMARY)  © 2001-2006 Red Hat, Inc.
+Sep 29 20:09:20 palmetto kernel[839]: io scheduler noop registered (default)
+Sep 29 20:09:20 palmetto kernel[839]: Serial: 8250/16550 driver, 6 ports, IRQ sharing enabled
+Sep 29 20:09:20 palmetto kernel[839]: 1e783000.serial: ttyS0 at MMIO 0x1e783000 (irq = 23, base_baud = 115200) is a 16550A
+Sep 29 20:09:24 palmetto systemd[1]: Started Phosphor LED Management Daemon.
+Sep 29 20:09:20 palmetto kernel[839]: 1e78d000.serial: ttyS1 at MMIO 0x1e78d000 (irq = 24, base_baud = 115200) is a 16550A
+Sep 29 20:09:24 palmetto systemd[1]: Started Phosphor Event Manager.
+Sep 29 20:09:20 palmetto kernel[839]: 1e78e000.serial: ttyS2 at MMIO 0x1e78e000 (irq = 25, base_baud = 115200) is a 16550A
+Sep 29 20:09:24 palmetto systemd[1]: Started Phosphor Bulk Transfer DBus Bridge.
+Sep 29 20:09:20 palmetto kernel[839]: 1e78f000.serial: ttyS3 at MMIO 0x1e78f000 (irq = 26, base_baud = 115200) is a 16550A
+Sep 29 20:09:24 palmetto systemd[1]: Started Phosphor Host0 Checkstop Monitor.
+Sep 29 20:09:20 palmetto kernel[839]: console [ttyS4] disabled
+Sep 29 20:09:24 palmetto systemd[1]: Started Phosphor BMC0 Control.
+Sep 29 20:09:20 palmetto kernel[839]: 1e784000.serial: ttyS4 at MMIO 0x1e784000 (irq = 27, base_baud = 115200) is a 16550A
+Sep 29 20:09:24 palmetto systemd[1]: Started Phosphor Watchdog0.
+Sep 29 20:09:20 palmetto kernel[839]: console [ttyS4] enabled
+Sep 29 20:09:24 palmetto systemd[1]: Starting Network Service...
+Sep 29 20:09:20 palmetto kernel[839]: 1e787000.vuart: ttyS5 at MMIO 0x1e787000 (irq = 18, base_baud = 115200) is a 16550A
+Sep 29 20:09:25 palmetto systemd[1]: Started Permit User Sessions.
+Sep 29 20:09:20 palmetto kernel[839]: brd: module loaded
+Sep 29 20:09:25 palmetto systemd[1]: clear-once.service: Main process exited, code=exited, status=1/FAILURE
+Sep 29 20:09:20 palmetto kernel[839]: loop: module loaded
+Sep 29 20:09:25 palmetto systemd[1]: Failed to start Clear one time boot overrides.
+Sep 29 20:09:20 palmetto kernel[839]: bt-host 1e789140.ibt: Found bt host device
+Sep 29 20:09:25 palmetto systemd[1]: clear-once.service: Unit entered failed state.
+Sep 29 20:09:20 palmetto kernel[839]: bt-host 1e789140.ibt: Using IRQ 18
+Sep 29 20:09:25 palmetto systemd[1]: clear-once.service: Failed with result 'exit-code'.
+Sep 29 20:09:20 palmetto kernel[839]: platform 1e620000.fmc:flash@0: mx25l25635e (32768 Kbytes)
+Sep 29 20:09:20 palmetto kernel[839]: 6 ofpart partitions found on MTD device bmc
+Sep 29 20:09:20 palmetto kernel[839]: Creating 6 MTD partitions on "bmc":
+Sep 29 20:09:25 palmetto systemd-networkd[868]: Enumeration completed
+Sep 29 20:09:20 palmetto kernel[839]: 0x000000000000-0x000000060000 : "u-boot"
+Sep 29 20:09:25 palmetto systemd-networkd[868]: eth0: Gained carrier
+Sep 29 20:09:20 palmetto kernel[839]: 0x000000060000-0x000000080000 : "u-boot-env"
+Sep 29 20:09:25 palmetto systemd-timesyncd[827]: Network configuration changed, trying to establish connection.
+Sep 29 20:09:20 palmetto kernel[839]: 0x000000080000-0x000000300000 : "kernel"
+Sep 29 20:09:26 palmetto systemd[1]: Started Network Service.
+Sep 29 20:09:20 palmetto kernel[839]: 0x000000300000-0x0000004c0000 : "initramfs"
+Sep 29 20:09:20 palmetto kernel[839]: 0x0000004c0000-0x000001c00000 : "rofs"
+Sep 29 20:09:20 palmetto kernel[839]: 0x000001c00000-0x000002000000 : "rwfs"
+Sep 29 20:09:20 palmetto kernel[839]: platform 1e630000.spi:flash: mx25l25635e (32768 Kbytes)
+Sep 29 20:09:20 palmetto kernel[839]: ftgmac100 1e660000.ethernet: Using NCSI interface
+Sep 29 20:09:20 palmetto kernel[839]: ftgmac100 1e660000.ethernet: Read MAC address from chip 42:83:82:95:3a:bd
+Sep 29 20:09:20 palmetto kernel[839]: ftmac100: Loading version 0.2 ...
+Sep 29 20:09:20 palmetto kernel[839]: ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
+Sep 29 20:09:20 palmetto kernel[839]: ohci_hcd: USB 1.1 'Open' Host Controller (OHCI) Driver
+Sep 29 20:09:20 palmetto kernel[839]: usbcore: registered new interface driver cdc_acm
+Sep 29 20:09:20 palmetto kernel[839]: cdc_acm: USB Abstract Control Model driver for USB modems and ISDN adapters
+Sep 29 20:09:20 palmetto kernel[839]: usbcore: registered new interface driver usb-storage
+Sep 29 20:09:20 palmetto kernel[839]: usbcore: registered new interface driver usbserial
+Sep 29 20:09:20 palmetto kernel[839]: usbcore: registered new interface driver usbserial_generic
+Sep 29 20:09:20 palmetto kernel[839]: usbserial: USB Serial support registered for generic
+Sep 29 20:09:20 palmetto kernel[839]: mousedev: PS/2 mouse device common for all mice
+Sep 29 20:09:20 palmetto kernel[839]: i2c /dev entries driver
+Sep 29 20:09:20 palmetto kernel[839]: i2c_aspeed 1e78a000.i2c: i2c controller registered, irq 19
+Sep 29 20:09:20 palmetto kernel[839]: at24 0-0050: 32768 byte 24c256 EEPROM, writable, 64 bytes/write
+Sep 29 20:09:20 palmetto kernel[839]: rtc-ds1307 0-0068: rtc core: registered ds3231 as rtc0
+Sep 29 20:09:20 palmetto kernel[839]: i2c_aspeed i2c-0: i2c bus 0 registered, irq 220
+Sep 29 20:09:20 palmetto kernel[839]: i2c_aspeed i2c-1: i2c bus 1 registered, irq 221
+Sep 29 20:09:20 palmetto kernel[839]: i2c_aspeed i2c-2: i2c bus 2 registered, irq 222
+Sep 29 20:09:20 palmetto kernel[839]: i2c_aspeed i2c-3: i2c bus 3 registered, irq 223
+Sep 29 20:09:20 palmetto kernel[839]: i2c_aspeed i2c-4: i2c bus 4 registered, irq 224
+Sep 29 20:09:20 palmetto kernel[839]: i2c_aspeed i2c-5: i2c bus 5 registered, irq 225
+Sep 29 20:09:20 palmetto kernel[839]: i2c_aspeed i2c-6: i2c bus 6 registered, irq 226
+Sep 29 20:09:20 palmetto kernel[839]: i2c_aspeed i2c-7: i2c bus 7 registered, irq 227
+Sep 29 20:09:20 palmetto kernel[839]: i2c_aspeed i2c-8: i2c bus 8 registered, irq 228
+Sep 29 20:09:20 palmetto kernel[839]: occ-i2c 3-0050: occ i2c driver ready: i2c addr@0x50
+Sep 29 20:09:20 palmetto kernel[839]: aspeed_wdt 1e785000.wdt: rate 48000000, max timeout 5, timeout 5
+Sep 29 20:09:20 palmetto kernel[839]: usbcore: registered new interface driver usbhid
+Sep 29 20:09:20 palmetto kernel[839]: usbhid: USB HID core driver
+Sep 29 20:09:20 palmetto kernel[839]: ip_tables: (C) 2000-2006 Netfilter Core Team
+Sep 29 20:09:20 palmetto kernel[839]: NET: Registered protocol family 17
+Sep 29 20:09:20 palmetto kernel[839]: rtc-ds1307 0-0068: setting system clock to 2016-09-29 20:09:11 UTC (1475179751)
+Sep 29 20:09:20 palmetto kernel[839]: Freeing unused kernel memory: 184K (c04da000 - c0508000)
+Sep 29 20:09:27 palmetto systemd[1]: Stopped Serial Getty on ttyS0.
+Sep 29 20:09:20 palmetto kernel[839]: random: systemd urandom read with 54 bits of entropy available
+Sep 29 20:09:27 palmetto systemd[1]: Reached target Network.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: systemd 229 running in system mode. (+PAM -AUDIT -SELINUX -IMA -APPARMOR -SMACK +SYSVINIT -UTMP -LIBCRYPTSETUP -GCRYPT -GNUTLS +ACL +XZ -LZ4 -SECCOMP +BLKID -ELFUTILS +KMOD -IDN)
+Sep 29 20:09:28 palmetto systemd[1]: Starting Phosphor Inband IPMI...
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Detected architecture arm.
+Sep 29 20:09:28 palmetto systemd[1]: Started Serial Getty on ttyS4.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Set hostname to <palmetto>.
+Sep 29 20:09:28 palmetto systemd[1]: Reached target Login Prompts.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Initializing machine ID from random generator.
+Sep 29 20:09:28 palmetto systemd[1]: Reached target Multi-User System.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Listening on Network Service Netlink Socket.
+Sep 29 20:09:28 palmetto systemd[1]: Started Phosphor Inband IPMI.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Started Dispatch Password Requests to Console Directory Watch.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Listening on Journal Socket.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Created slice System Slice.
+Sep 29 20:09:28 palmetto ipmid[869]: Failed to get HOST busname: No route to host
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Created slice system-org.openbmc.control.Power.slice.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Created slice system-org.openbmc.control.Chassis.slice.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Created slice system-org.openbmc.buttons.Power.slice.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Created slice system-org.openbmc.watchdog.Host.slice.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Mounting Debug File System...
+Sep 29 20:09:28 palmetto kernel: ftgmac100: NCSI interface up
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Listening on Journal Socket (/dev/log).
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Created slice system-org.openbmc.control.Checkstop.slice.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Reached target Swap.
+Sep 29 20:09:29 palmetto systemd[1]: Started Startup Hacks.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Started Forward Password Requests to Wall Directory Watch.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Reached target Remote File Systems.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Reached target Paths.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Created slice system-getty.slice.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Mounting Temporary Directory...
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Starting Apply Kernel Variables...
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Listening on /dev/initctl Compatibility Named Pipe.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Listening on Syslog Socket.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Starting Journal Service...
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Listening on udev Kernel Socket.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Created slice system-obmc\x2dled\x2dstart.slice.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Reached target Slices.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Created slice system-org.openbmc.control.Bmc.slice.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Listening on udev Control Socket.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Starting udev Coldplug all Devices...
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Mounting Configuration File System...
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Created slice system-serial\x2dgetty.slice.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Created slice system-mapper\x2dwait.slice.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Starting Remount Root and Kernel File Systems...
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Created slice system-org.openbmc.control.Host.slice.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Mounted Configuration File System.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Mounted Debug File System.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Mounted Temporary Directory.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Started Apply Kernel Variables.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Started Remount Root and Kernel File Systems.
+Sep 29 20:09:20 palmetto kernel[839]: systemd[1]: Started Journal Service.
+Sep 29 20:09:20 palmetto kernel[839]: systemd-journald[474]: Received request to flush runtime journal from PID 1
+Sep 29 20:09:25 palmetto inarp[840]: updating interface: eth0, [42:83:82:95:3a:bd]
+Sep 29 20:09:28 palmetto kernel[839]: ftgmac100: NCSI interface up
+Sep 29 20:09:46 palmetto settings_manager.py[829]: Running HostSettingsService
+Sep 29 20:09:46 palmetto chassis_control.py[837]: Running ChassisControlService
+Sep 29 20:09:46 palmetto systemd[1]: Started Phosphor Settings Manager.
+Sep 29 20:09:46 palmetto systemd[1]: Started Phosphor Chassis0 Control.
+Sep 29 20:09:46 palmetto phosphor-mapper[834]: ObjectMapper startup complete.  Discovery in progress...
+Sep 29 20:09:46 palmetto sensor_manager2.py[858]: Deleting OCC device
+Sep 29 20:09:47 palmetto download_manager.py[856]: Running Download Manager
+Sep 29 20:09:47 palmetto systemd[1]: Started Phosphor Download Manager.
+Sep 29 20:09:47 palmetto sensor_manager2.py[858]: Starting sensor manager
+Sep 29 20:09:47 palmetto systemd[1]: Started Phosphor Sensor Manager.
+Sep 29 20:09:47 palmetto login[870]: PAM unable to dlopen(/lib/security/pam_systemd.so): /lib/security/pam_systemd.so: cannot open shared object file: No such file or directory
+Sep 29 20:09:47 palmetto login[870]: PAM adding faulty module: /lib/security/pam_systemd.so
+Sep 29 20:09:47 palmetto inventory_items.py[842]: Caching: /org/openbmc/inventory/system/chassis/motherboard/bmc
+Sep 29 20:09:48 palmetto systemd[1]: Started Phosphor User Manager.
+Sep 29 20:09:48 palmetto obmc-phosphor-userd[853]: Started
+Sep 29 20:09:48 palmetto systemd[1]: Started Phosphor Network Manager.
+Sep 29 20:09:48 palmetto systemd[1]: Started Phosphor Inventory Manager.
+Sep 29 20:09:48 palmetto netman.py[833]: Started
+Sep 29 20:09:48 palmetto inventory_items.py[842]: Running Inventory Manager
+Sep 29 20:09:49 palmetto login[870]: pam_lastlog(login:session): file /var/log/lastlog created
+Sep 29 20:09:49 palmetto login[870]: pam_unix(login:session): session opened for user root by LOGIN(uid=0)
+Sep 29 20:09:49 palmetto login[874]: ROOT LOGIN  on '/dev/ttyS4'
+Sep 29 20:09:51 palmetto kernel: random: nonblocking pool is initialized
+Sep 29 20:09:51 palmetto kernel[839]: random: nonblocking pool is initialized
+Sep 29 20:09:52 palmetto phosphor-mapper[834]: ObjectMapper discovery complete
+Sep 29 20:09:52 palmetto systemd[1]: Started Phosphor DBus Service Discovery Manager.
+Sep 29 20:09:52 palmetto systemd[1]: Reached target Phosphor Object Mapper.
+Sep 29 20:09:52 palmetto systemd[1]: Starting Phoshpor System Manager...
+Sep 29 20:09:52 palmetto systemd[1]: Starting Wait for /org/openbmc/managers/Download...
+Sep 29 20:09:52 palmetto systemd[1]: Reached target Webserver (pre).
+Sep 29 20:09:52 palmetto systemd[1]: Starting Wait for /org/openbmc/NetworkManager/Interface...
+Sep 29 20:09:52 palmetto systemd[1]: Starting Wait for /org/openbmc/control/flash/bios...
+Sep 29 20:09:52 palmetto systemd[1]: Starting Wait for /org/openbmc/control/bmc0...
+Sep 29 20:09:52 palmetto systemd[1]: Starting Wait for /org/openbmc/settings/host0...
+Sep 29 20:09:52 palmetto systemd[1]: Starting Wait for /org/openbmc/sensors...
+Sep 29 20:09:52 palmetto systemd[1]: Starting Wait for /org/openbmc/control/power0...
+Sep 29 20:09:52 palmetto systemd[1]: Starting Wait for /org/openbmc/control/led/identify...
+Sep 29 20:09:52 palmetto systemd[1]: Starting Wait for /org/openbmc/managers/System...
+Sep 29 20:09:52 palmetto systemd[1]: Starting Wait for /org/openbmc/control/chassis0...
+Sep 29 20:09:57 palmetto system_manager.py[877]: Running System State: BASE_APPS
+Sep 29 20:09:57 palmetto system_manager.py[877]: SystemManager Init Done
+Sep 29 20:09:57 palmetto system_manager.py[877]: Running SystemManager
+Sep 29 20:09:57 palmetto systemd[1]: Started Phoshpor System Manager.
+Sep 29 20:10:21 palmetto phosphor-mapper[834]: Warning: Introspection failure: service `:1.11` did not reply to method call on /
+Sep 29 20:10:21 palmetto systemd[1]: Started Wait for /org/openbmc/control/chassis0.
+Sep 29 20:10:22 palmetto systemd[1]: Started Wait for /org/openbmc/settings/host0.
+Sep 29 20:10:22 palmetto systemd[1]: Started Wait for /org/openbmc/control/bmc0.
+Sep 29 20:10:22 palmetto systemd[1]: Started Wait for /org/openbmc/sensors.
+Sep 29 20:10:22 palmetto systemd[1]: Started Wait for /org/openbmc/managers/Download.
+Sep 29 20:10:22 palmetto systemd[1]: Started Wait for /org/openbmc/NetworkManager/Interface.
+Sep 29 20:10:22 palmetto systemd[1]: Started Wait for /org/openbmc/control/led/identify.
+Sep 29 20:10:23 palmetto systemd[1]: Started Wait for /org/openbmc/managers/System.
+Sep 29 20:10:23 palmetto system_manager.py[877]: SystemManager Goto System State: BMC_STARTING
+Sep 29 20:10:23 palmetto system_manager.py[877]: Running System State: BMC_STARTING
+Sep 29 20:10:24 palmetto systemd[1]: Starting Phosphor Power Button0...
+Sep 29 20:10:24 palmetto systemd[1]: Starting Phosphor Power0 Control...
+Sep 29 20:10:24 palmetto systemd[1]: Starting OpenPOWER Host0 Control...
+Sep 29 20:10:24 palmetto systemd[1]: Starting Turn On identify LED...
+Sep 29 20:10:24 palmetto systemd[1]: Started Phosphor DNS Settings Cache Manager.
+Sep 29 20:10:24 palmetto systemd[1]: Starting Phosphor BIOS Code Update...
+Sep 29 20:10:24 palmetto systemd[1]: Started Phosphor Hwmon Poller.
+Sep 29 20:10:24 palmetto systemd[1]: Starting Phosphor BMC Code Update...
+Sep 29 20:10:25 palmetto systemd[1]: Started Turn On identify LED.
+Sep 29 20:10:25 palmetto system_manager.py[877]: New object: /org/openbmc/control/host0 (:1.29)
+Sep 29 20:10:25 palmetto system_manager.py[877]: New object: /org/openbmc/control/power0 (:1.30)
+Sep 29 20:10:26 palmetto systemd[1]: Started Wait for /org/openbmc/control/power0.
+Sep 29 20:10:26 palmetto button_power.exe[896]: GPIO Lookup:  POWER_BUTTON = 352,both
+Sep 29 20:10:26 palmetto system_manager.py[877]: New object: /org/openbmc/control/flash/bios (:1.32)
+Sep 29 20:10:26 palmetto system_manager.py[877]: SystemManager Goto System State: BMC_READY
+Sep 29 20:10:26 palmetto system_manager.py[877]: Running System State: BMC_READY
+Sep 29 20:10:26 palmetto systemd[1]: Started Wait for /org/openbmc/control/flash/bios.
+Sep 29 20:10:26 palmetto systemd[1]: Started Phosphor BIOS Code Update.
+Sep 29 20:10:26 palmetto control_host.exe[898]: GPIO Lookup:  FSI_DATA = 325,out
+Sep 29 20:10:27 palmetto power_control.exe[897]: GPIO Lookup:  POWER_PIN = 353,out
+Sep 29 20:10:27 palmetto systemd[1]: Started Phosphor Power Button0.
+Sep 29 20:10:27 palmetto control_host.exe[898]: GPIO Lookup:  FSI_CLK = 324,out
+Sep 29 20:10:27 palmetto power_control.exe[897]: GPIO Lookup:  PGOOD = 343,in
+Sep 29 20:10:27 palmetto control_host.exe[898]: GPIO Lookup:  FSI_ENABLE = 344,out
+Sep 29 20:10:27 palmetto power_control.exe[897]: GPIO Lookup:  PCIE_RESET = 333,out
+Sep 29 20:10:28 palmetto control_host.exe[898]: GPIO Lookup:  CRONUS_SEL = 326,out
+Sep 29 20:10:28 palmetto power_control.exe[897]: GPIO Lookup:  USB_RESET = 334,out
+Sep 29 20:10:28 palmetto control_host.exe[898]: GPIO Lookup:  BMC_THROTTLE = 395,out
+Sep 29 20:10:28 palmetto systemd[1]: Started Phosphor Power0 Control.
+Sep 29 20:10:28 palmetto systemd[1]: Started Initialize BIOS Flash.
+Sep 29 20:10:28 palmetto systemd[1]: Reached target Restore Last State.
+Sep 29 20:10:28 palmetto systemd[1]: Starting Restore Last State...
+Sep 29 20:10:29 palmetto control_host.exe[898]: GPIO Lookup:  IDBTN = 455,out
+Sep 29 20:10:28 palmetto systemd[1]: Started OpenPOWER Host0 Control.
+Sep 29 20:10:33 palmetto discover_system_state.py[944]: Last System State:0Power Policy:RESTORE_LAST_STATE
+Sep 29 20:10:33 palmetto systemd[1]: Started Restore Last State.
+Sep 29 20:10:35 palmetto flash_bios.exe[902]: Starting flasher: bios,,/org/openbmc/control/flash/bios,
+Sep 29 20:10:35 palmetto flash_bios.exe[902]: flasher: , BMC = 0, address = 0x0
+Sep 29 20:10:36 palmetto flash_bios.exe[902]: Setting up BIOS flash
+Sep 29 20:10:36 palmetto flash_bios.exe[902]: Flash tuned
+Sep 29 20:10:36 palmetto phosphor-mapper[834]: Warning: Introspection failure: service `:1.35` did not reply to method call on /
+Sep 29 20:10:37 palmetto flash_bios.exe[902]: Starting flasher: bios,,/org/openbmc/control/flash/bios,
+Sep 29 20:10:37 palmetto flash_bios.exe[902]: flasher: , BMC = 0, address = 0x0
+Sep 29 20:10:37 palmetto flash_bios.exe[902]: Setting up BIOS flash
+Sep 29 20:10:37 palmetto flash_bios.exe[902]: Flash tuned
+Sep 29 20:10:37 palmetto hwmon.py[903]: HWMON add: /org/openbmc/sensors/temperature/ambient : /sys/class/hwmon/hwmon0/temp1_input
+Sep 29 20:10:37 palmetto sensor_manager2.py[858]: Register: HwmonSensor : /org/openbmc/sensors/temperature/ambient
+Sep 29 20:10:37 palmetto bmc_update.py[906]: Running Bmc Flash Control
+Sep 29 20:10:37 palmetto systemd[1]: Started Phosphor BMC Code Update.
+Sep 29 20:10:37 palmetto systemd[1]: Reached target Phosphor System - Standby.
+Sep 29 20:10:37 palmetto systemd[1]: Startup finished in 34.938s (kernel) + 1min 26.263s (userspace) = 2min 1.201s.
+Sep 29 20:10:37 palmetto hwmon.py[903]: Setting: units = C
+Sep 29 20:10:37 palmetto hwmon.py[903]: Setting: scale = -3
+Sep 29 20:10:37 palmetto hwmon.py[903]: Starting HWMON sensors
