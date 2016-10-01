@@ -1,0 +1,11 @@
+[Unit]
+Description=Phosphor Console Muxer listening on device /dev/%I
+BindsTo=dev-ttyVUART0.device
+After=dev-ttyVUART0.device
+
+[Service]
+ExecStart={sbindir}/obmc-console-server %i
+Restart=always
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
