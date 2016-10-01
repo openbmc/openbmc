@@ -8,6 +8,7 @@ LIC_FILES_CHKSUM = "file://${WORKDIR}/git/LICENSE;md5=fa818a259cbed7ce8bc2a22d35
 inherit allarch
 inherit obmc-phosphor-systemd
 inherit setuptools
+inherit obmc-phosphor-discovery-service
 
 RRECOMMENDS_${PN} += "virtual-obmc-wsgihost"
 
@@ -29,3 +30,4 @@ S = "${WORKDIR}/git/module"
 SYSTEMD_SERVICE_${PN} = ""
 SYSTEMD_OVERRIDE_${PN} += "rest-dbus.conf:obmc-mapper.target.d/rest-dbus.conf"
 SYSTEMD_ENVIRONMENT_FILE_${PN} += "obmc/wsgi_app"
+REGISTERED_SERVICES_${PN} += "phosphor_rest:tcp:443"
