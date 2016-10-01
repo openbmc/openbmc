@@ -1,6 +1,6 @@
 [Unit]
 Description=Phosphor Host Console SSH Per-Connection
-Wants=obmc-console.service
+Wants=obmc-console@{OBMC_CONSOLE_HOST_TTY}.service
 
 [Service]
 Environment="DROPBEAR_RSAKEY_DIR=/etc/dropbear"
