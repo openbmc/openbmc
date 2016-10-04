@@ -13,7 +13,7 @@ inherit obmc-phosphor-license
 DEPENDS += "mrw-native mrw-api-native"
 
 SRC_URI += "git://github.com/openbmc/phosphor-mrw-tools"
-SRCREV = "1e3881219bca043fbb1cd65445a62ee2afc1e0c6"
+SRCREV = "9596f9a92c7ddd83face8bb9cd5540a4633c2bc6"
 
 FILES_${PN} += "${datadir}/inventory"
 
