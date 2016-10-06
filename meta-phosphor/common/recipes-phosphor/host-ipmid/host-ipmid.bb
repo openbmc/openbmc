@@ -11,9 +11,9 @@ inherit obmc-phosphor-sdbus-service
 
 TARGET_CFLAGS   += "-fpic"
 
-DEPENDS += "obmc-mapper"
+DEPENDS += "phosphor-mapper"
 DEPENDS += "autoconf-archive-native"
-RDEPENDS_${PN}-dev += "obmc-mapper-dev"
+RDEPENDS_${PN}-dev += "phosphor-mapper-dev"
 RDEPENDS_${PN} += "clear-once"
 RDEPENDS_${PN} += "network"
 RDEPENDS_${PN} += "libmapper"
