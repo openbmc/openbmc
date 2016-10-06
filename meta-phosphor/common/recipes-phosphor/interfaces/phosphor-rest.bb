@@ -15,7 +15,7 @@ RRECOMMENDS_${PN} += "virtual-obmc-wsgihost"
 RDEPENDS_${PN} += " \
         python-xml \
         python-dbus \
-        obmc-mapper \
+        phosphor-mapper \
         python-bottle \
         python-spwd \
         pyphosphor-utils \

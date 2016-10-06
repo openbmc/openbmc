@@ -5,9 +5,7 @@ PR = "r1"
 inherit skeleton-gdbus
 inherit obmc-phosphor-dbus-service
 
-DEPENDS += "obmc-mapper systemd"
-
-DEPENDS += "obmc-mapper systemd"
+DEPENDS += "phosphor-mapper systemd"
 
 SKELETON_DIR = "op-pwrctl"
 
