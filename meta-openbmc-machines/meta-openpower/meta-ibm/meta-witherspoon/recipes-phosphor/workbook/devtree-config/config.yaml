@@ -1,0 +1,34 @@
+#Device tree include files, which can be
+#included in different parts of the tree.
+#Optional.
+includes:
+  pre-root-node:
+   - aspeed-g5.dtsi
+   - dt-bindings/gpio/aspeed-gpio.h
+  root-node:
+   - aspeed-bmc-opp-spi-flash-legacy.dtsi
+  post-root-node:
+  bmc-flash:
+   - aspeed-bmc-opp-flash-layout.dtsi
+
+#The BMC's memory base address and size.
+#Required.
+memory:
+  base: 0x80000000
+  size: 0x40000000
+
+#Values for the chosen node.
+#Required.
+chosen:
+  stdout-path: uart5
+  bootargs: console=ttyS4,115200 earlyprintk
+
+#Values for the aliases node.
+#Optional.
+aliases:
+  serial4: uart5
+
+#The number that should be added to the MRW's
+#I2C bus number to get the device tree's number.
+#Optional.
+i2c-bus-adjust: -1
