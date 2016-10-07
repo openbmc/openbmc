@@ -1,0 +1,23 @@
+includes:
+  pre-root-node:
+   - aspeed-g5.dtsi
+   - dt-bindings/gpio/aspeed-gpio.h
+  root-node:
+   - spi-flash-legacy.dtsi
+  post-root-node:
+  bmc-flash:
+   - aspeed-bmc-opp-flash-layout.dtsi
+
+memory:
+  base: 0x80000000
+  size: 0x40000000
+
+chosen:
+  stdout-path: uart5
+  bootargs: console=ttyS4,115200 earlyprintk
+
+aliases:
+  serial0: vuart
+  serial1: uart1
+  serial2: uart2
+  serial4: uart5
