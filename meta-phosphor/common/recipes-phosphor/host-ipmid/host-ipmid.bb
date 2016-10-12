@@ -20,7 +20,7 @@ RDEPENDS_${PN} += "libmapper"
 RRECOMMENDS_${PN} += "virtual-obmc-settings-mgmt"
 SRC_URI += "git://github.com/openbmc/phosphor-host-ipmid"
 
-SRCREV = "5600345375dc537216ccb13de06036798bcc9de0"
+SRCREV = "30be0f700ed7259c8b20c50e4fc84ef696d98483"
 
 S = "${WORKDIR}/git"
 
