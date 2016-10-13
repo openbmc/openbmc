@@ -21,5 +21,4 @@ IMAGE_CLASSES += "obmc-phosphor-image_types_uboot"
 
 INITRAMFS_CTYPE ?= "lzma"
 INITRAMFS_FSTYPES += "cpio.${INITRAMFS_CTYPE}"
-
-
+INITRAMFS_IMAGE ?= "core-image-minimal-initramfs"
