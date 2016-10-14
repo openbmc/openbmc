@@ -1,0 +1,101 @@
+From f6d311978915cc1e3eba8a118716a6864309d731 Mon Sep 17 00:00:00 2001
+From: "Edward A. James" <eajames@us.ibm.com>
+Date: Fri, 14 Oct 2016 15:33:40 -0500
+Subject: [PATCH] systemd: Make pam compile shared library
+
+- make pam independant of logind
+- remove bus-util.c from libshared as it's already in libsystemd-internal
+
+Signed-off-by: Edward A. James <eajames@us.ibm.com>
+---
+ Makefile.am | 60 ++++++++++++++++++++++++++++--------------------------------
+ 1 file changed, 28 insertions(+), 32 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index afb6b31..6dd92e7 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1025,7 +1025,6 @@ libshared_la_SOURCES = \
+ 	src/shared/import-util.h \
+ 	src/shared/sysctl-util.c \
+ 	src/shared/sysctl-util.h \
+-	src/shared/bus-util.c \
+ 	src/shared/bus-util.h \
+ 	src/shared/logs-show.c \
+ 	src/shared/logs-show.h \
+@@ -5579,37 +5578,6 @@ tests += \
+ 	test-login-tables \
+ 	test-login-shared
+ 
+-if HAVE_PAM
+-pam_systemd_la_SOURCES = \
+-	src/login/pam_systemd.sym \
+-	src/login/pam_systemd.c
+-
+-pam_systemd_la_CFLAGS = \
+-	$(AM_CFLAGS) \
+-	$(PAM_CFLAGS)
+-
+-pam_systemd_la_LDFLAGS = \
+-	$(AM_LDFLAGS) \
+-	-module \
+-	-export-dynamic \
+-	-avoid-version \
+-	-shared \
+-	-Wl,--version-script=$(top_srcdir)/src/login/pam_systemd.sym
+-
+-pam_systemd_la_LIBADD = \
+-	libshared.la \
+-	$(PAM_LIBS)
+-
+-pamlib_LTLIBRARIES = \
+-	pam_systemd.la
+-
+-dist_pamconf_DATA = \
+-	src/login/systemd-user
+-
+-EXTRA_DIST += \
+-	src/login/systemd-user.m4
+-endif
+-
+ nodist_systemunit_DATA += \
+ 	units/systemd-logind.service
+ 
+@@ -5666,6 +5634,34 @@ EXTRA_DIST += \
+ 
+ # ------------------------------------------------------------------------------
+ if HAVE_PAM
++pam_systemd_la_SOURCES = \
++	src/login/pam_systemd.sym \
++	src/login/pam_systemd.c
++
++pam_systemd_la_CFLAGS = \
++	$(AM_CFLAGS) \
++	$(PAM_CFLAGS)
++
++pam_systemd_la_LDFLAGS = \
++	$(AM_LDFLAGS) \
++	-module \
++	-export-dynamic \
++	-avoid-version \
++	-shared \
++	-Wl,--version-script=$(top_srcdir)/src/login/pam_systemd.sym
++
++pam_systemd_la_LIBADD = \
++	libshared.la \
++	$(PAM_LIBS)
++
++pamlib_LTLIBRARIES = \
++	pam_systemd.la
++
++dist_pamconf_DATA = \
++	src/login/systemd-user
++
++EXTRA_DIST += \
++	src/login/systemd-user.m4
+ 
+ systemd_user_sessions_SOURCES = \
+ 	src/user-sessions/user-sessions.c
+-- 
+1.9.1
+

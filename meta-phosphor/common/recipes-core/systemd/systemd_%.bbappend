@@ -7,6 +7,7 @@ PACKAGECONFIG_remove = "machined hibernate ldconfig binfmt backlight localed \
 FILESEXTRAPATHS_append := "${THISDIR}/${PN}:"
 SRC_URI += "file://default.network"
 SRC_URI += "file://0001-Export-message_append_cmdline.patch"
+SRC_URI += "file://0002-systemd-Make-pam-compile-shared-library.patch"
 
 RRECOMMENDS_${PN} += "obmc-targets"
 FILES_${PN} += "${libdir}/systemd/network/default.network"
