@@ -1,0 +1,39 @@
+From b7058856f7bf23f48e705971900a78bdcd05d36f Mon Sep 17 00:00:00 2001
+From: Brendan Higgins <brendanhiggins@google.com>
+Date: Wed, 12 Oct 2016 15:56:59 -0700
+Subject: [PATCH 1/2] Added GOOGLE_GLOG_DLL_DECL compiler error fix
+
+There is a known bug for some compilers that causes glog to fail to
+compile with the error:
+
+In file included from src/demangle.cc:38:0:
+src/demangle.h:80:27: error: expected initializer before 'Demangle'
+bool GOOGLE_GLOG_DLL_DECL Demangle(const char mangled, char *out, int out_size);
+
+This offers a temporary workaround by leaving GOOGLE_GLOG_DLL_DECL
+undefined when not on Windows. See https://github.com/google/glog/issues/52
+for more information.
+---
+ src/config.h.in | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/src/config.h.in b/src/config.h.in
+index 8190f23..f4cb605 100644
+--- a/src/config.h.in
++++ b/src/config.h.in
+@@ -178,3 +178,12 @@
+ 
+ /* Puts following code inside the Google namespace */
+ #undef _START_GOOGLE_NAMESPACE_
++
++// Annoying stuff for windows -- makes sure clients can import these functions
++#ifndef GOOGLE_GLOG_DLL_DECL
++#if defined(WIN32) && !defined(__CYGWIN_)
++#define GOOGLE_GLOG_DLL_DECL __declspec(dllimport)
++#else
++#define GOOGLE_GLOG_DLL_DECL
++#endif
++#endif
+-- 
+2.8.0.rc3.226.g39d4020
+

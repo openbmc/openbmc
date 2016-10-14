@@ -1,0 +1,98 @@
+From 92fcaeef91e836b9055d2d04d5a4eb41bcfdcf36 Mon Sep 17 00:00:00 2001
+From: Brendan Higgins <brendanhiggins@google.com>
+Date: Thu, 13 Oct 2016 18:15:04 -0700
+Subject: [PATCH 2/2] Added support for symbolize to extract symbols using
+ execinfo
+
+A lot of libc symbols cannot be extracted from the object files using
+the existing method; however, glibc's execinfo can via
+backtrace_symbols. This is not ideal in cases where malloc should not be
+called, but is fine in the case that stacktrace_generic is being used as
+it uses execinfo anyway.
+---
+ src/symbolize.cc | 48 +++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 43 insertions(+), 5 deletions(-)
+
+diff --git a/src/symbolize.cc b/src/symbolize.cc
+index b25f747..bf06861 100644
+--- a/src/symbolize.cc
++++ b/src/symbolize.cc
+@@ -61,6 +61,10 @@
+ #include "symbolize.h"
+ #include "demangle.h"
+ 
++#ifdef HAVE_EXECINFO_H
++#include <execinfo.h>
++#endif
++
+ _START_GOOGLE_NAMESPACE_
+ 
+ // We don't use assert() since it's not guaranteed to be
+@@ -715,6 +719,35 @@ void SafeAppendHexNumber(uint64_t value, char* dest, int dest_size) {
+   SafeAppendString(itoa_r(value, buf, sizeof(buf), 16, 0), dest, dest_size);
+ }
+ 
++static ATTRIBUTE_NOINLINE void GetFormattedFileNameAndOffset(
++    uint64_t pc,
++    uint64_t base_address,
++    char* out,
++    int out_size) {
++  out[out_size - 1] = '\0';  // Making sure |out| is always null-terminated.
++  SafeAppendString("+0x", out, out_size);
++  SafeAppendHexNumber(pc - base_address, out, out_size);
++  SafeAppendString(")", out, out_size);
++}
++
++#ifdef HAVE_EXECINFO_H
++
++static ATTRIBUTE_NOINLINE bool GetSymbolFromBacktrace(void* pc, char* out,
++                                                      int out_size) {
++  char** backtrace_strings = backtrace_symbols(&pc, 1);
++  char* file_and_symbol = backtrace_strings[0];
++  for (int i = 0; file_and_symbol[i] != '\0'; i++) {
++    if (file_and_symbol[i] == ' ') {
++      file_and_symbol[i] = '\0';
++      break;
++    }
++  }
++  SafeAppendString(file_and_symbol, out, out_size);
++  free(backtrace_strings);
++}
++
++#endif
++
+ // The implementation of our symbolization routine.  If it
+ // successfully finds the symbol containing "pc" and obtains the
+ // symbol name, returns true and write the symbol name to "out".
+@@ -754,10 +787,7 @@ static ATTRIBUTE_NOINLINE bool SymbolizeAndDemangle(void *pc, char *out,
+       // object file was not opened successfully.  This is still considered
+       // success because the object file name and offset are known and tools
+       // like asan_symbolize.py can be used for the symbolization.
+-      out[out_size - 1] = '\0';  // Making sure |out| is always null-terminated.
+-      SafeAppendString("+0x", out, out_size);
+-      SafeAppendHexNumber(pc0 - base_address, out, out_size);
+-      SafeAppendString(")", out, out_size);
++      GetFormattedFileNameAndOffset(pc0, base_address, out, out_size);
+       return true;
+     }
+     // Failed to determine the object file containing PC.  Bail out.
+@@ -783,7 +813,15 @@ static ATTRIBUTE_NOINLINE bool SymbolizeAndDemangle(void *pc, char *out,
+   }
+   if (!GetSymbolFromObjectFile(wrapped_object_fd.get(), pc0,
+                                out, out_size, start_address)) {
+-    return false;
++#ifdef HAVE_EXECINFO_H
++    // Backtrace does not produce a demangled symbol, but it is nicer than just
++    // a file.
++    if (GetSymbolFromBacktrace(pc, out, out_size)) {
++      return true;
++    }
++#endif
++    GetFormattedFileNameAndOffset(pc0, base_address, out, out_size);
++    return true;
+   }
+ 
+   // Symbolization succeeded.  Now we try to demangle the symbol.
+-- 
+2.8.0.rc3.226.g39d4020
+
