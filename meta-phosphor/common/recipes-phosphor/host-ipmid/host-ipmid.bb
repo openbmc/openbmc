@@ -11,10 +11,12 @@ inherit obmc-phosphor-sdbus-service
 
 TARGET_CFLAGS   += "-fpic"
 
+DEPENDS += "glog"
 DEPENDS += "phosphor-mapper"
 DEPENDS += "autoconf-archive-native"
 RDEPENDS_${PN}-dev += "phosphor-mapper-dev"
 RDEPENDS_${PN} += "clear-once"
+RDEPENDS_${PN} += "glog"
 RDEPENDS_${PN} += "network"
 RDEPENDS_${PN} += "libmapper"
 RRECOMMENDS_${PN} += "virtual-obmc-settings-mgmt"
