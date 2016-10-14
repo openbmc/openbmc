@@ -54,6 +54,7 @@ SRC_URI = "git://github.com/systemd/systemd.git;protocol=git \
            file://0021-include-missing.h-for-getting-secure_getenv-definiti.patch \
            file://0022-socket-util-don-t-fail-if-libc-doesn-t-support-IDN.patch \
            file://0023-build-sys-fix-build-with-libgrcypt-disabled.patch \
+           file://0024-systemd-Make-pam-compile-shared-library.patch \
 "
 SRC_URI_append_libc-uclibc = "\
            file://0002-units-Prefer-getty-to-agetty-in-console-setup-system.patch \
