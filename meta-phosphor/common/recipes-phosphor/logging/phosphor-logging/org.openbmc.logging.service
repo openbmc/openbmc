@@ -1,0 +1,11 @@
+[Unit]
+Description=Phosphor Settings Manager
+
+[Service]
+ExecStart={sbindir}/log_manager
+Restart=always
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
