@@ -11,7 +11,7 @@ TARGET_CFLAGS   += "-fpic -O2"
 RDEPENDS_${PN} += "network"
 SRC_URI += "git://github.com/openbmc/inarp"
 
-SRCREV = "04d1f97f2e6e471d63c7d56dce7bd8472eb8fbfb"
+SRCREV = "2af0b2d9787e4fbb41f3714c182e8ea5f433e8bb"
 
 S = "${WORKDIR}/git"
 INSTALL_NAME = "inarp"
