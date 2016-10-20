@@ -19,7 +19,7 @@ SYSTEMD_SERVICE_${PN} += "obmc-read-eeprom@.service"
 
 SRC_URI += "git://github.com/openbmc/ipmi-fru-parser"
 
-SRCREV = "155c34fbb61071f5b51240c4a50b49391e0877c1"
+SRCREV = "ce3490e71f9f91bd20dbb9ac037079de4a3580a8"
 
 FILES_SOLIBSDEV += "${libdir}/host-ipmid/lib*${SOLIBSDEV}"
 FILES_${PN} += "${libdir}/host-ipmid/lib*${SOLIBS}"
