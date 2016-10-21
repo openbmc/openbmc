@@ -221,17 +221,6 @@ BB_DISKMON_DIRS = "\
 #file://.* file:///some/local/dir/sstate/PATH"
 
 
-#
-# Qemu configuration
-#
-# By default qemu will build with a builtin VNC server where graphical output can be
-# seen. The two lines below enable the SDL backend too. This assumes there is a
-# libsdl library available on your build system.
-PACKAGECONFIG_append_pn-qemu-native = " sdl"
-PACKAGECONFIG_append_pn-nativesdk-qemu = " sdl"
-ASSUME_PROVIDED += "libsdl-native"
-
-
 # CONF_VERSION is increased each time build/conf/ changes incompatibly and is used to
 # track the version of this file when it was generated. This can safely be ignored if
 # this doesn't mean anything to you.
