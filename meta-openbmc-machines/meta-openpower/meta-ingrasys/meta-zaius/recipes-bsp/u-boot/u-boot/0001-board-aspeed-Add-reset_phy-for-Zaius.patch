@@ -1,0 +1,60 @@
+From 3cd9aa92ab8ddd230cf6a9a68a27a18705b6f57c Mon Sep 17 00:00:00 2001
+From: Xo Wang <xow@google.com>
+Date: Thu, 20 Oct 2016 16:26:29 -0700
+Subject: [PATCH 1/2] board/aspeed: Add reset_phy() for Zaius
+
+The Broadcom PHY for the Zaius BMC requires a hard reset after RGMII
+clocks are enabled. Add reset_phy() implementation and configure it to
+be called.
+
+Signed-off-by: Xo Wang <xow@google.com>
+---
+ board/aspeed/ast-g5/ast-g5.c | 19 +++++++++++++++++++
+ include/configs/ast-common.h |  3 +++
+ 2 files changed, 22 insertions(+)
+
+diff --git a/board/aspeed/ast-g5/ast-g5.c b/board/aspeed/ast-g5/ast-g5.c
+index da79d7b..433ad18 100644
+--- a/board/aspeed/ast-g5/ast-g5.c
++++ b/board/aspeed/ast-g5/ast-g5.c
+@@ -33,6 +33,25 @@ int dram_init(void)
+ 	return 0;
+ }
+ 
++void reset_phy(void)
++{
++	unsigned long reg;
++	/* D3 in GPIOA/B/C/D direction and data registers */
++	unsigned long phy_reset_mask = BIT(27);
++
++	/* Assert MAC2 PHY hardware reset */
++	/* Set pin low */
++	reg = readl(AST_GPIO_BASE | 0x00);
++	writel(reg & ~phy_reset_mask, AST_GPIO_BASE | 0x00);
++	/* Enable pin for output */
++	reg = readl(AST_GPIO_BASE | 0x04);
++	writel(reg | phy_reset_mask, AST_GPIO_BASE | 0x04);
++	udelay(3);
++	/* Set pin high */
++	reg = readl(AST_GPIO_BASE | 0x00);
++	writel(reg | phy_reset_mask, AST_GPIO_BASE | 0x00);
++}
++
+ #ifdef CONFIG_FTGMAC100
+ int board_eth_init(bd_t *bd)
+ {
+diff --git a/include/configs/ast-common.h b/include/configs/ast-common.h
+index b39ea33..3566f73 100644
+--- a/include/configs/ast-common.h
++++ b/include/configs/ast-common.h
+@@ -104,4 +104,7 @@
+ 	"spi_dma=yes\0" \
+ 	""
+ 
++/* Call reset_phy() */
++#define CONFIG_RESET_PHY_R	1
++
+ #endif	/* __AST_COMMON_CONFIG_H */
+-- 
+2.8.0.rc3.226.g39d4020
+
