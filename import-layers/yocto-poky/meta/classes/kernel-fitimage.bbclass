@@ -140,6 +140,15 @@ EOF
 fitimage_emit_section_ramdisk() {
 
 	ramdisk_csum="sha1"
+	ramdisk_loadline=""
+	ramdisk_entryline=""
+
+	if [ -n "${UBOOT_RD_LOADADDRESS}" ]; then
+		ramdisk_loadline="load = <${UBOOT_RD_LOADADDRESS}>;"
+	fi
+	if [ -n "${UBOOT_RD_ENTRYPOINT}" ]; then
+		ramdisk_entryline="entry = <${UBOOT_RD_ENTRYPOINT}>;"
+	fi
 
 	cat << EOF >> ${1}
                 ramdisk@${2} {
@@ -149,8 +158,8 @@ fitimage_emit_section_ramdisk() {
                         arch = "${UBOOT_ARCH}";
                         os = "linux";
                         compression = "none";
-                        load = <${UBOOT_RD_LOADADDRESS}>;
-                        entry = <${UBOOT_RD_ENTRYPOINT}>;
+                        ${ramdisk_loadline}
+                        ${ramdisk_entryline}
                         hash@1 {
                                 algo = "${ramdisk_csum}";
                         };
