@@ -10,7 +10,9 @@ inherit obmc-phosphor-dbus-service
 DBUS_SERVICE_${PN} += "org.openbmc.NetworkManager.service"
 SYSTEMD_SERVICE_${PN} += "network-update-dns.service"
 
+DEPENDS += "systemd"
 DEPENDS += "autoconf-archive-native"
+RDEPENDS_${PN} += "libsystemd"
 RDEPENDS_${PN} += "python-dbus python-pygobject python-ipy"
 
 SRC_URI += "git://github.com/openbmc/phosphor-networkd"
