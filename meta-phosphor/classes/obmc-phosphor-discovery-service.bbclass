@@ -19,7 +19,7 @@ python() {
     for pkg in listvar_to_list(d, 'DISCOVERY_SVC_PACKAGES'):
         for service in listvar_to_list(d, 'REGISTERED_SERVICES_%s' % pkg):
             if avahi_enabled:
-                set_append(d, 'RRECOMMENDS_%s' % pkg, 'avahi-daemon')
+                set_append(d, 'RRECOMMENDS_%s' % pkg, 'avahi-daemon avahi-autoipd')
                 svc_name, svc_type, svc_port = service.split(':')
                 set_append(d, 'FILES_%s' % pkg, os.path.join(
                     syscnfdir,

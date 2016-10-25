@@ -1,0 +1,14 @@
+[Unit]
+Description=Avahi Zero conf
+Wants=mapper-wait@-org-openbmc-NetworkManager-Interface.service
+After=mapper-wait@-org-openbmc-NetworkManager-Interface.service
+
+[Service]
+ExecStart={sbindir}/start_avahi_autoipd.py
+Environment="PYTHONUNBUFFERED=1"
+Restart=always
+
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
+
