@@ -7,4 +7,5 @@ inherit obmc-phosphor-license
 RDEPENDS_${PN} = " \
     strace \
     ldd \
+    iotools \
     "
