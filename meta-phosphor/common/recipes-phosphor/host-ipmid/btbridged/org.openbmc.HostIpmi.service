@@ -1,5 +1,5 @@
 [Unit]
-Description=Phosphor Bulk Transfer DBus Bridge
+Description=Phosphor IPMI BT DBus Bridge
 
 [Service]
 Restart=always
