@@ -187,8 +187,6 @@ fitimage_emit_section_ramdisk() {
                         arch = "${UBOOT_ARCH}";
                         os = "linux";
                         compression = "none";
-                        load = <${UBOOT_RD_LOADADDRESS}>;
-                        entry = <${UBOOT_RD_ENTRYPOINT}>;
                         hash@1 {
                                 algo = "${ramdisk_csum}";
                         };
