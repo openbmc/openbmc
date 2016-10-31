@@ -10,8 +10,8 @@ inherit mrw-rev
 
 DEPENDS += "python-native python-lxml-native"
 
-SRC_URI += "${MRW_PATCH_SRC_URI}"
-SRCREV = "${MRW_PATCH_SRCREV}"
+SRC_URI += "${MRW_TOOLS_SRC_URI}"
+SRCREV = "${MRW_TOOLS_SRCREV}"
 
 do_install() {
     install -d ${D}${bindir}/obmc-mrw
