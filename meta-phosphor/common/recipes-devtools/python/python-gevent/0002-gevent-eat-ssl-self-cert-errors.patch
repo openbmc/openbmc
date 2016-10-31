@@ -1,0 +1,13 @@
+--- a/gevent/ssl.py	2016-11-02 13:17:37.917401795 -0500
++++ b/gevent/newssl.py	2016-11-02 13:17:23.085401962 -0500
+@@ -334,6 +334,8 @@ class SSLSocket(socket):
+                         raise
+                     sys.exc_clear()
+                     self._wait(self._write_event, timeout_exc=_SSLErrorHandshakeTimeout)
++                elif ex.reason in ['SSLV3_ALERT_CERTIFICATE_EXPIRED', 'TLSV1_ALERT_UNKNOWN_CA']:
++                    return None
+                 else:
+                     raise
+
+     def connect(self, addr):
+         """Connects to remote ADDR, and then wraps the connection in
