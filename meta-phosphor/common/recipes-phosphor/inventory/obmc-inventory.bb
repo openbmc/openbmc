@@ -9,11 +9,12 @@ RPROVIDES_${PN} += "virtual-obmc-inventory-data"
 
 inherit allarch
 inherit obmc-phosphor-license
+inherit mrw-rev
 
 DEPENDS += "mrw-native mrw-api-native"
 
-SRC_URI += "git://github.com/openbmc/phosphor-mrw-tools"
-SRCREV = "7b48acdb83f17a046bd042b29734a2cce5e03372"
+SRC_URI += "${MRW_PATCH_SRC_URI}"
+SRCREV = "${MRW_PATCH_SRCREV}"
 
 FILES_${PN} += "${datadir}/inventory"
 
