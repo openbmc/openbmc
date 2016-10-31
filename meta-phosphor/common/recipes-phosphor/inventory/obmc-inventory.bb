@@ -13,8 +13,8 @@ inherit mrw-rev
 
 DEPENDS += "mrw-native mrw-api-native"
 
-SRC_URI += "${MRW_PATCH_SRC_URI}"
-SRCREV = "${MRW_PATCH_SRCREV}"
+SRC_URI += "${MRW_TOOLS_SRC_URI}"
+SRCREV = "${MRW_TOOLS_SRCREV}"
 
 FILES_${PN} += "${datadir}/inventory"
 
