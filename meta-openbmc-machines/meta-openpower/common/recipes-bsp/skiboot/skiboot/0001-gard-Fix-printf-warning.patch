@@ -1,0 +1,44 @@
+From a3e9e1d52cba7f32089f85fe16bb7cbc66b6b322 Mon Sep 17 00:00:00 2001
+From: Joel Stanley <joel@jms.id.au>
+Date: Mon, 31 Oct 2016 15:58:49 +1030
+Subject: [PATCH] gard: Fix printf warning
+To: skiboot@lists.ozlabs.org
+Cc: Cyril Bur <cyril.bur@au1.ibm.com>
+
+With a modern GCC targetting ARM 32-bit:
+
+ gard.c: In function 'main':
+ gard.c:652:19: error: format '%lu' expects argument of type 'long
+ unsigned int', but argument 4 has type 'uint64_t {aka long long
+ unsigned int}' [-Werror=format=]
+    fprintf(stderr, "MTD device bigger than %i: size:%lu\n",
+
+Signed-off-by: Joel Stanley <joel@jms.id.au>
+---
+ external/gard/gard.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/external/gard/gard.c b/external/gard/gard.c
+index 7ec52d80db40..4b26a3b8876d 100644
+--- a/external/gard/gard.c
++++ b/external/gard/gard.c
+@@ -24,6 +24,7 @@
+ #include <sys/stat.h>
+ #include <dirent.h>
+ #include <limits.h>
++#include <inttypes.h>
+ 
+ #include <ccan/array_size/array_size.h>
+ 
+@@ -649,7 +650,7 @@ int main(int argc, char **argv)
+ 		goto out;
+ 
+ 	if (bl_size > UINT_MAX) {
+-		fprintf(stderr, "MTD device bigger than %i: size:%lu\n",
++		fprintf(stderr, "MTD device bigger than %i: size: %" PRIu64 "\n",
+ 			UINT_MAX, bl_size);
+ 		rc = EXIT_FAILURE;
+ 		goto out;
+-- 
+2.9.3
+
