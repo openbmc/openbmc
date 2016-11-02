@@ -11,16 +11,16 @@ inherit setuptools
 
 DEPENDS += "systemd"
 
-DBUS_SERVICE_${PN} += "org.openbmc.ObjectMapper.service"
+DBUS_SERVICE_${PN} += "xyz.openbmc_project.ObjectMapper.service"
 SYSTEMD_SERVICE_${PN} = "mapper-wait@.service"
 RDEPENDS_${PN} += " \
         python-xml \
         python-dbus \
         python-pygobject \
         "
-SRC_URI += "git://github.com/openbmc/phosphor-objmgr"
+SRC_URI += "git://github.com/bradbishop/phosphor-objmgr"
 
-SRCREV = "a562704d9b9c3f77deb1b957d0f586f7f5b9ca3e"
+SRCREV = "0a71262374dbcdaa015e637dd951450f6c2be8c5"
 
 S = "${WORKDIR}/git"
 
