@@ -1,0 +1,14 @@
+[Unit]
+Description=Turn VCS on
+Wants=mapper-wait@-vcs_workaround%i.service
+After=mapper-wait@-vcs_workaround%i.service
+
+[Service]
+Restart=always
+ExecStart={bindir}/vcs_on.sh
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
+

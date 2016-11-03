@@ -1,0 +1,14 @@
+[Unit]
+Description=Use pdbg to send putcfam command to have SBE start IPL
+Wants=mapper-wait@-vcs_on%i.service
+After=mapper-wait@-vcs_on%i.service
+
+[Service]
+Restart=always
+ExecStart={bindir}/start_host.sh
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
+

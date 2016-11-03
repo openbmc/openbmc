@@ -1,0 +1,13 @@
+[Unit]
+Description=Disable VCS before Witherspoon power on
+Wants=mapper-wait@-org-openbmc-control-power%i.service
+Before=mapper-wait@-org-openbmc-control-power%i.service
+
+[Service]
+Restart=always
+ExecStart={bindir}/vcs_off.sh
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}

@@ -1,0 +1,14 @@
+[Unit]
+Description=Use pdbg to send putcfam commands to SBE to run workaround
+Wants=mapper-wait@-org-openbmc-control-power%i.service
+After=mapper-wait@-org-openbmc-control-power%i.service
+
+[Service]
+Restart=always
+ExecStart={bindir}/vcs_workaround.sh
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
+
