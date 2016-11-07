@@ -1,1 +1,1 @@
-SUBSYSTEM=="tty", DRIVERS=="aspeed-vuart",ATTRS{lpc_address}=="0x3f8", SYMLINK+="ttyVUART0", TAG+="systemd"
+SUBSYSTEM=="tty", DRIVERS=="aspeed-vuart", ATTRS{iomem_base}=="0x1e787000", SYMLINK+="ttyVUART0", TAG+="systemd"
