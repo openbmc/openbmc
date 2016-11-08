@@ -49,6 +49,7 @@ CORE_IMAGE_EXTRA_INSTALL_append = " bash \
         obmc-console \
         pam-plugin-access \
         ${OBMC_IMAGE_EXTRA_INSTALL} \
+        rsync \
         "
 
 OBMC_IMAGE_EXTRA_INSTALL ?= ""
