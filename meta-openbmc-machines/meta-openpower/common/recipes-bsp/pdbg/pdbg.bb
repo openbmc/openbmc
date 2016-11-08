@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://${S}/COPYING;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
 SRC_URI += "git://github.com/open-power/pdbg.git"
 
-SRCREV = "e622883810266bcbc09ab5e1bae6a137dcda74c7"
+SRCREV = "749351433237295a86afcf451b947bc6621b946f"
 PV = "git${SRCREV}"
 
 S = "${WORKDIR}/git"
