@@ -1,0 +1,15 @@
+[Unit]
+Description=Phosphor Time Manager daemon
+Requires=network.service
+After=network.service
+Requires=settings.service
+After=settings.service
+
+[Service]
+Restart=always
+ExecStart={sbindir}/timemanager
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
