@@ -1,0 +1,13 @@
+[Unit]
+Description=Phosphor Time Manager daemon
+Requires=network.service
+After=network.service
+Requires=settings.service
+After=settings.service
+
+[Service]
+Restart=always
+ExecStart=/usr/sbin/timemanager
+
+[Install]
+WantedBy=multi-user.target
