@@ -15,7 +15,7 @@ DEPENDS += "autoconf-archive-native"
 SRC_URI += "git://github.com/openbmc/obmc-console"
 SRC_URI += "file://${PN}.conf"
 
-SRCREV = "cfc9a89aae080d89d3184e75d5ba6c4edd02d071"
+SRCREV = "45ad76763c79b7925b3ddfe94f46519c1f0726ac"
 
 REGISTERED_SERVICES_${PN} += "obmc_console:tcp:2200"
 OBMC_CONSOLE_HOST_TTY ?= "ttyVUART0"
