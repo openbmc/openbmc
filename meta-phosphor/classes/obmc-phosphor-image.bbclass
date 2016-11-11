@@ -56,6 +56,8 @@ CORE_IMAGE_EXTRA_INSTALL_append = " bash \
 
 OBMC_IMAGE_EXTRA_INSTALL ?= ""
 
+TOOLCHAIN_HOST_TASK_append = " nativesdk-sdbusplus"
+
 def image_overlay_enabled(d, ifEnabledStr):
         if d.getVar('OBMC_PHOSPHOR_IMAGE_OVERLAY', True) != "1":
             return ""
