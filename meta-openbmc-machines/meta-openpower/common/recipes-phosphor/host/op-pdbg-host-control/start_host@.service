@@ -1,0 +1,13 @@
+[Unit]
+Description=Use pdbg to send putcfam command to start IPL
+Wants=vcs_on@.service
+After=vcs_on@.service
+Conflicts=obmc-chassis-stop@%i.target
+
+[Service]
+ExecStart={bindir}/start_host.sh
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=obmc-chassis-start@%i.target
