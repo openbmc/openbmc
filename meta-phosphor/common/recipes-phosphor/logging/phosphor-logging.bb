@@ -4,7 +4,7 @@ HOMEPAGE = "https://github.com/openbmc/phosphor-logging"
 PR = "r1"
 
 inherit autotools pkgconfig
-inherit pythonnative
+inherit obmc-phosphor-python-autotools
 inherit obmc-phosphor-license
 inherit obmc-phosphor-dbus-service
 
@@ -21,4 +21,3 @@ SRC_URI += "git://github.com/openbmc/phosphor-logging"
 SRCREV = "d311bc8d781caab241233465ad276c15a97bade5"
 
 S = "${WORKDIR}/git"
-
