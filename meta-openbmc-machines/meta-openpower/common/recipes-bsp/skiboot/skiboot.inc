@@ -3,14 +3,14 @@ LICENSE = "Apache-2.0"
 
 SRC_URI += "git://github.com/open-power/skiboot.git;nobranch=1"
 SRC_URI += "file://0001-external-Use-more-standard-PREFIX-vs-prefix.patch"
-SRC_URI += "file://0002-external-common-Teach-ARM-code-to-erase-mtd-chips.patch"
+SRC_URI += "file://0002-arch_flash_arm-Don-t-assume-mtd-partitions-are-short.patch"
 
 FILESEXTRAPATHS_append := "${THISDIR}/skiboot:"
 
 LIC_FILES_CHKSUM = "file://${S}/LICENCE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
-SRCREV = "skiboot-5.4.0-rc3"
-PV = "5.4.0-rc3"
+SRCREV = "skiboot-5.4.0"
+PV = "5.4.0"
 
 S = "${WORKDIR}/git"
 
