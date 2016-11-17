@@ -67,3 +67,4 @@ IMAGE_FSTYPES += "${@image_overlay_enabled(d, "overlay")}"
 inherit ${@image_overlay_enabled(d, "image-overlay")}
 
 do_image_complete[depends] += "obmc-phosphor-debug-tarball:do_image_complete"
+
