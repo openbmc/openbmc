@@ -1,0 +1,13 @@
+[Unit]
+Description=Turn VCS on
+Wants=vcs_workaround@.service
+After=vcs_workaround@.service
+Conflicts=obmc-chassis-stop@%i.target
+
+[Service]
+ExecStart={bindir}/vcs_on.sh
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=obmc-chassis-start@%i.target
