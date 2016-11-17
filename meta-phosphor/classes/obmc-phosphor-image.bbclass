@@ -56,6 +56,8 @@ CORE_IMAGE_EXTRA_INSTALL_append = " bash \
         ${OBMC_IMAGE_EXTRA_INSTALL} \
         "
 
+CORE_IMAGE_EXTRA_INSTALL_append = "${@bb.utils.contains('DISTRO_FEATURES', 'slp', 'slpd-lite', '', d)}"
+
 OBMC_IMAGE_EXTRA_INSTALL ?= ""
 
 def image_overlay_enabled(d, ifEnabledStr):
