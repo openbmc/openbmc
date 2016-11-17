@@ -1,0 +1,11 @@
+[Unit]
+Description=Lightweight SLP Server
+
+After=network.target
+
+[Service]
+ExecStart={sbindir}/slpd
+Restart=always
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
