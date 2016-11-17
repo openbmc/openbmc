@@ -4,7 +4,9 @@ DISCOVERY_SVC_PACKAGES ?= "${PN}"
 python() {
     avahi_enabled = bb.utils.contains(
             'DISTRO_FEATURES', 'avahi', 'true', 'false', d)
-    slp_enabled = False # later
+    slp_enabled = bb.utils.contains(
+            'DISTRO_FEATURES', 'slpd-lite', 'true', 'false', d)
+
 
     if not avahi_enabled and slp_enabled:
         return
@@ -17,6 +19,12 @@ python() {
         'services'))
 
     for pkg in listvar_to_list(d, 'DISCOVERY_SVC_PACKAGES'):
+
+        if slp_enabled:
+            set_append(d, 'FILES_%s' % pkg, os.path.join(
+                syscnfdir,
+                'slpd-lite.conf'))
+
         for service in listvar_to_list(d, 'REGISTERED_SERVICES_%s' % pkg):
             if avahi_enabled:
                 set_append(d, 'RRECOMMENDS_%s' % pkg, 'avahi-daemon')
@@ -31,7 +39,8 @@ python() {
 python discovery_services_postinstall() {
     avahi_enabled = bb.utils.contains(
             'DISTRO_FEATURES', 'avahi', 'true', 'false', d)
-    slp_enabled = False # later
+    slp_enabled = bb.utils.contains(
+            'DISTRO_FEATURES', 'slpd-lite', 'true', 'false', d)
 
     if not avahi_enabled and slp_enabled:
         return
@@ -56,16 +65,32 @@ python discovery_services_postinstall() {
             fd.write('        </service>\n')
             fd.write('</service-group>\n')
 
+
+    def register_service_slp(d, service_name, service_type, service_port):
+
+        conf_file = os.path.join(
+            d.getVar('D', True),
+            d.getVar('sysconfdir', True).lstrip('/'),
+            'slpd-lite.conf')
+
+        with open(conf_file, 'a+') as fd:
+            svc = service_name + " " + service_type + " " + str(service_port)
+            fd.write(svc)
+            fd.write('\n')
+
+
     def register_services(d,pkg):
         for service in listvar_to_list(d, 'REGISTERED_SERVICES_%s' % pkg):
             svc_info = service.split(":")
             try:
                 svc_name, svc_type, svc_port = svc_info
-                svc_type = "_" + svc_name + "._" + svc_type
             except:
                 continue
             if avahi_enabled:
+                svc_type = "_" + svc_name + "._" + svc_type
                 register_service_avahi(d, svc_name, svc_type, svc_port)
+            if slp_enabled:
+                register_service_slp(d, svc_name, svc_type, svc_port)
 
     for pkg in listvar_to_list(d, 'DISCOVERY_SVC_PACKAGES'):
         register_services(d, pkg)
