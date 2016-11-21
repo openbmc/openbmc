@@ -1,0 +1,28 @@
+
+#DEVPATH = /devices/platform/ahb/ahb:apb/1e78a000.i2c/i2c-5/i2c-5/5-0010/hwmon/hwmon5
+
+SUBSYSTEM=="hwmon", DEVPATH=="*i2c-3/3-0052/*", ACTION == "add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="phosphor-hwmon@%E{DEVPATH}.service", ENV{ENVFILE}+="/etc/hwmon-max31785-3-52.conf"
+SUBSYSTEM=="hwmon", DEVPATH=="*i2c-3/3-0077/*", ACTION == "add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="phosphor-hwmon@%E{DEVPATH}.service", ENV{ENVFILE}+="/etc/hwmon-bmp280-3-77.conf"
+SUBSYSTEM=="hwmon", DEVPATH=="*i2c-3/3-0060/*", ACTION == "add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="phosphor-hwmon@%E{DEVPATH}.service", ENV{ENVFILE}+="/etc/hwmon-pca9552-3-60.conf"
+SUBSYSTEM=="hwmon", DEVPATH=="*i2c-9/9-004a/*", ACTION == "add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="phosphor-hwmon@%E{DEVPATH}.service", ENV{ENVFILE}+="/etc/hwmon-tmp275-9-4a.conf"
+SUBSYSTEM=="hwmon", DEVPATH=="*i2c-11/11-0060/*", ACTION == "add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="phosphor-hwmon@%E{DEVPATH}.service", ENV{ENVFILE}+="/etc/hwmon-pca9552-11-60.conf"
+SUBSYSTEM=="hwmon", DEVPATH=="*i2c-11/11-0064/*", ACTION == "add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="phosphor-hwmon@%E{DEVPATH}.service", ENV{ENVFILE}+="/etc/hwmon-ucd90160-11-64.conf"
+SUBSYSTEM=="hwmon", DEVPATH=="*i2c-11/11-0032/*", ACTION == "add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="phosphor-hwmon@%E{DEVPATH}.service", ENV{ENVFILE}+="/etc/hwmon-rx8900ce-11-32.conf"
+SUBSYSTEM=="hwmon", DEVPATH=="*i2c-11/11-0051/*", ACTION == "add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="phosphor-hwmon@%E{DEVPATH}.service", ENV{ENVFILE}+="/etc/hwmon-seeprom-11-51.conf"
+SUBSYSTEM=="hwmon", DEVPATH=="*i2c-5/5-004c/*", ACTION == "add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="phosphor-hwmon@%E{DEVPATH}.service", ENV{ENVFILE}+="/etc/hwmon-tmp423a-5-4c.conf"
+SUBSYSTEM=="hwmon", DEVPATH=="*i2c-4/4-004c/*", ACTION == "add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="phosphor-hwmon@%E{DEVPATH}.service", ENV{ENVFILE}+="/etc/hwmon-tmp423a-4-4c.conf"
+
+#OR
+
+#%k = hwmon5
+#/sys/class/hwmon5 is a link to /sys/devices/platform/ahb/ahb:apb/1e78a000.i2c/i2c-5/i2c-5/5-0010/hwmon/hwmon5
+SUBSYSTEM=="hwmon", DEVPATH=="*i2c-3/3-0052/*", ACTION == "add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="phosphor-hwmon@/class/hwmon/%k.service", ENV{ENVFILE}+="/etc/hwmon-max31785-3-52.conf"
+SUBSYSTEM=="hwmon", DEVPATH=="*i2c-3/3-0077/*", ACTION == "add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="phosphor-hwmon@/class/hwmon/%k.service", ENV{ENVFILE}+="/etc/hwmon-bmp280-3-77.conf"
+SUBSYSTEM=="hwmon", DEVPATH=="*i2c-3/3-0060/*", ACTION == "add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="phosphor-hwmon@/class/hwmon/%k.service", ENV{ENVFILE}+="/etc/hwmon-pca9552-3-60.conf"
+SUBSYSTEM=="hwmon", DEVPATH=="*i2c-9/9-004a/*", ACTION == "add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="phosphor-hwmon@/class/hwmon/%k.service", ENV{ENVFILE}+="/etc/hwmon-tmp275-9-4a.conf"
+SUBSYSTEM=="hwmon", DEVPATH=="*i2c-11/11-0060/*", ACTION == "add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="phosphor-hwmon@/class/hwmon/%k.service", ENV{ENVFILE}+="/etc/hwmon-pca9552-11-60.conf"
+SUBSYSTEM=="hwmon", DEVPATH=="*i2c-11/11-0064/*", ACTION == "add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="phosphor-hwmon@/class/hwmon/%k.service", ENV{ENVFILE}+="/etc/hwmon-ucd90160-11-64.conf"
+SUBSYSTEM=="hwmon", DEVPATH=="*i2c-11/11-0032/*", ACTION == "add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="phosphor-hwmon@/class/hwmon/%k.service", ENV{ENVFILE}+="/etc/hwmon-rx8900ce-11-32.conf"
+SUBSYSTEM=="hwmon", DEVPATH=="*i2c-11/11-0051/*", ACTION == "add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="phosphor-hwmon@/class/hwmon/%k.service", ENV{ENVFILE}+="/etc/hwmon-seeprom-11-51.conf"
+SUBSYSTEM=="hwmon", DEVPATH=="*i2c-5/5-004c/*", ACTION == "add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="phosphor-hwmon@/class/hwmon/%k.service", ENV{ENVFILE}+="/etc/hwmon-tmp423a-5-4c.conf"
+SUBSYSTEM=="hwmon", DEVPATH=="*i2c-4/4-004c/*", ACTION == "add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="phosphor-hwmon@/class/hwmon/%k.service", ENV{ENVFILE}+="/etc/hwmon-tmp423a-4-4c.conf"
