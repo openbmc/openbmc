@@ -11,11 +11,13 @@ SRC_URI += "file://0002-systemd-Make-pam-compile-shared-library.patch"
 
 RRECOMMENDS_${PN} += "obmc-targets"
 FILES_${PN} += "${libdir}/systemd/network/default.network"
+FILES_${PN} += "${libdir}/systemd/system.conf"
 
 EXTRA_OECONF += " --disable-hwdb"
 
 do_install_append() {
         install -m 644 ${WORKDIR}/default.network ${D}${libdir}/systemd/network/
+        install -m 644 ${WORKDIR}/system.conf ${D}${libdir}/systemd/
 
         #TODO Remove after this issue is resolved
         #https://github.com/openbmc/openbmc/issues/152
