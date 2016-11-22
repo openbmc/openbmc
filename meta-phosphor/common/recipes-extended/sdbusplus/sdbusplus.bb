@@ -6,9 +6,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
 inherit autotools pkgconfig
-inherit pythonnative
-
-FILES_${PN} += "${PYTHON_SITEPACKAGES_DIR}"
+inherit obmc-phosphor-python-autotools
 
 DEPENDS += "autoconf-archive-native"
 RDEPENDS_${PN} += " \
@@ -27,10 +25,5 @@ S = "${WORKDIR}/git"
 
 PACKAGECONFIG_remove_class-native = "libsdbusplus"
 PACKAGECONFIG_remove_class-nativesdk = "libsdbusplus"
-
-export BUILD_SYS
-export HOST_SYS
-export STAGING_INCDIR
-export STAGING_LIBDIR
 
 BBCLASSEXTEND += "native nativesdk"
