@@ -18,7 +18,7 @@ RDEPENDS_${PN} += " \
         "
 
 SRC_URI += "git://github.com/openbmc/sdbusplus"
-SRCREV = "aa71a3ed5dc2d128223ff3dc5f0c04474be40803"
+SRCREV = "abd10b0875ff5842d6fad240cfa7cee8217dcacf"
 
 PACKAGECONFIG ??= "libsdbusplus"
 PACKAGECONFIG[libsdbusplus] = "--enable-libsdbusplus,--disable-libsdbusplus,systemd,libsystemd"
