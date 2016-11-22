@@ -1,1 +1,1 @@
-RRECOMMENDS_${PN}_append = " gtest"
+RRECOMMENDS_${PN}_append = " gtest sdbusplus"
