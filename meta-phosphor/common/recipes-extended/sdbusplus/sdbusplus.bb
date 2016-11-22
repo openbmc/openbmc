@@ -10,7 +10,7 @@ inherit pythonnative
 
 FILES_${PN} += "${PYTHON_SITEPACKAGES_DIR}"
 
-DEPENDS += "autoconf-archive-native"
+DEPENDS += "autoconf-archive-native python"
 RDEPENDS_${PN} += " \
         python-inflection \
         python-mako \
