@@ -246,4 +246,5 @@ EXTRA_USERS_PARAMS = " \
 
 # Package exclusions - Exclude packages included by default in the common image
 IMAGE_INSTALL_remove = "packagegroup-obmc-phosphor-apps-extrasdev"
+MACHINE_FEATURES_BACKFILL_CONSIDERED = "qemu-usermode"
 
