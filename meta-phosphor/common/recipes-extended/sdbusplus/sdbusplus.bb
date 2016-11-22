@@ -23,6 +23,11 @@ PACKAGECONFIG[libsdbusplus] = "--enable-libsdbusplus,--disable-libsdbusplus,syst
 
 S = "${WORKDIR}/git"
 
+PROVIDES_prepend = "sdbus++ "
+PACKAGES_prepend = "sdbus++ "
+FILES_sdbus++_append = " ${bindir}/sdbus++"
+OBMC_PHOSPHOR_PYTHON_AUTOTOOLS_PACKAGE = "sdbus++"
+
 PACKAGECONFIG_remove_class-native = "libsdbusplus"
 PACKAGECONFIG_remove_class-nativesdk = "libsdbusplus"
 
