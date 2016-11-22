@@ -22,4 +22,5 @@ IMAGE_CLASSES += "obmc-phosphor-image_types_uboot"
 INITRAMFS_CTYPE ?= "lzma"
 INITRAMFS_FSTYPES += "cpio.${INITRAMFS_CTYPE}"
 
+MACHINE_FEATURES_BACKFILL_CONSIDERED = "qemu-usermode"
 
