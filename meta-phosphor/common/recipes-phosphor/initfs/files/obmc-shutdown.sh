@@ -77,7 +77,7 @@ then
 fi
 
 
-echo "Execute ${1-reboot} -f if all unounted ok, or exec /init"
+echo "Execute ${1-reboot} -f if all unmounted ok, or exec /init"
 
 export PS1=shutdown-sh#\ 
 exec /bin/sh
