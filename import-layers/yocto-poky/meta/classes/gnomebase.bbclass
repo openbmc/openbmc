@@ -6,8 +6,6 @@ SECTION ?= "x11/gnome"
 GNOMEBN ?= "${BPN}"
 SRC_URI = "${GNOME_MIRROR}/${GNOMEBN}/${@gnome_verdir("${PV}")}/${GNOMEBN}-${PV}.tar.${GNOME_COMPRESS_TYPE};name=archive"
 
-DEPENDS += "gnome-common-native"
-
 FILES_${PN} += "${datadir}/application-registry  \
                 ${datadir}/mime-info \
                 ${datadir}/mime/packages \
@@ -27,4 +25,3 @@ do_install_append() {
 	rm -rf ${D}${localstatedir}/scrollkeeper/*
 	rm -f ${D}${datadir}/applications/*.cache
 }
-
