@@ -27,6 +27,7 @@ FEATURE_PACKAGES_obmc-settings-mgmt ?= "${@df_enabled('obmc-settings-mgmt', 'vir
 FEATURE_PACKAGES_obmc-system-mgmt ?= "${@df_enabled('obmc-phosphor-system-mgmt', 'virtual-obmc-system-mgmt', d)}"
 FEATURE_PACKAGES_obmc-host-ipmi ?= "${@cf_enabled('obmc-host-ipmi', 'virtual-obmc-host-ipmi-hw', d)}"
 FEATURE_PACKAGES_obmc-logging-mgmt ?= "${@cf_enabled('obmc-logging-mgmt', 'virtual-obmc-logging-mgmt', d)}"
+FEATURE_PACKAGES_obmc-host-ctl ?= "${@cf_enabled('obmc-host-ctl', 'virtual-obmc-host-ctl', d)}"
 
 # Install entire Phosphor application stack by default
 IMAGE_FEATURES += " \
@@ -40,6 +41,7 @@ IMAGE_FEATURES += " \
         obmc-system-mgmt \
         obmc-host-ipmi \
         obmc-logging-mgmt \
+        obmc-host-ctl \
         ssh-server-dropbear \
         "
 

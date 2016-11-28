@@ -5,7 +5,7 @@ After=vcs_on@.service
 Conflicts=obmc-chassis-stop@%i.target
 
 [Service]
-ExecStart={bindir}/start_host.sh
+ExecStart={bindir}/start_host.sh {MACHINE}
 Type=oneshot
 RemainAfterExit=yes
 
