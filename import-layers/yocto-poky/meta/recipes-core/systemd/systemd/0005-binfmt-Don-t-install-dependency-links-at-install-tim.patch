@@ -1,7 +1,7 @@
-From 3436b12d40bf4f4ab7e3e16600e5f6c35a470da4 Mon Sep 17 00:00:00 2001
+From 74450f0dbad2f8478c26eeaa46d4e4a987858f45 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 20 Feb 2015 05:03:44 +0000
-Subject: [PATCH 05/36] binfmt: Don't install dependency links at install time
+Subject: [PATCH 05/19] binfmt: Don't install dependency links at install time
  for the binfmt services
 
 use [Install] blocks so that they get created when the service is enabled
@@ -24,10 +24,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  3 files changed, 8 insertions(+), 4 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index 03341fc..629740f 100644
+index 50da458..29ed1dd 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -4387,10 +4387,6 @@ INSTALL_DIRS += \
+@@ -4635,10 +4635,6 @@ INSTALL_DIRS += \
  	$(prefix)/lib/binfmt.d \
  	$(sysconfdir)/binfmt.d
  
@@ -70,5 +70,5 @@ index d53073e..8c57ee0 100644
 +[Install]
 +WantedBy=sysinit.target
 -- 
-1.8.3.1
+2.10.2
 

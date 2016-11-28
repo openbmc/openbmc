@@ -1,7 +1,7 @@
-From 2b2450f6b7197bff4637c0283e8784500471d083 Mon Sep 17 00:00:00 2001
+From 3f6f45578b828e414f50c6822375073e7174236a Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 14 Dec 2015 00:50:01 +0000
-Subject: [PATCH 11/36] nss-mymachines: Build conditionally when
+Subject: [PATCH 11/19] nss-mymachines: Build conditionally when
  HAVE_MYHOSTNAME is set
 
 Fixes build failures when building with --disable-myhostname
@@ -14,10 +14,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 2 insertions(+)
 
 diff --git a/Makefile.am b/Makefile.am
-index 82b6553..b3f3343 100644
+index 02f4017..420e0e0 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -4876,6 +4876,7 @@ SYSTEM_UNIT_ALIASES += \
+@@ -5146,6 +5146,7 @@ SYSTEM_UNIT_ALIASES += \
  BUSNAMES_TARGET_WANTS += \
  	org.freedesktop.machine1.busname
  
@@ -25,7 +25,7 @@ index 82b6553..b3f3343 100644
  libnss_mymachines_la_SOURCES = \
  	src/nss-mymachines/nss-mymachines.sym \
  	src/nss-mymachines/nss-mymachines.c
-@@ -4896,6 +4897,7 @@ lib_LTLIBRARIES += \
+@@ -5167,6 +5168,7 @@ rootlib_LTLIBRARIES += \
  	libnss_mymachines.la
  
  endif
@@ -34,5 +34,5 @@ index 82b6553..b3f3343 100644
  polkitpolicy_in_files += \
  	src/machine/org.freedesktop.machine1.policy.in
 -- 
-1.8.3.1
+2.10.2
 

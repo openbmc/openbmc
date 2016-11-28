@@ -1,31 +1,22 @@
-From fa5e137fbd2fb081ae897575377d718ee8cb6349 Mon Sep 17 00:00:00 2001
+From a3482c91642cf568b3ac27fa6c0cb3c6b30669b7 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
-Date: Sun, 20 Dec 2015 04:20:28 +0000
-Subject: [PATCH 07/36] use lnr wrapper instead of looking for --relative
+Date: Wed, 9 Nov 2016 19:32:14 -0800
+Subject: [PATCH 07/19] use lnr wrapper instead of looking for --relative
  option for ln
 
 Upstream-Status: Inappropriate [OE-Specific]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- Makefile.am  | 6 +++---
+ Makefile.am  | 2 +-
  configure.ac | 2 --
- 2 files changed, 3 insertions(+), 5 deletions(-)
+ 2 files changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index 629740f..82b6553 100644
+index 29ed1dd..02f4017 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -243,7 +243,7 @@ define move-to-rootlibdir
- 		$(MKDIR_P) $(DESTDIR)$(rootlibdir) && \
- 		so_img_name=$$(readlink $(DESTDIR)$(libdir)/$$libname) && \
- 		rm -f $(DESTDIR)$(libdir)/$$libname && \
--		$(LN_S) --relative -f $(DESTDIR)$(rootlibdir)/$$so_img_name $(DESTDIR)$(libdir)/$$libname && \
-+		lnr $(DESTDIR)$(rootlibdir)/$$so_img_name $(DESTDIR)$(libdir)/$$libname && \
- 		mv $(DESTDIR)$(libdir)/$$libname.* $(DESTDIR)$(rootlibdir); \
- 	fi
- endef
-@@ -317,7 +317,7 @@ define install-relative-aliases
+@@ -320,7 +320,7 @@ define install-relative-aliases
  	while [ -n "$$1" ]; do \
  		$(MKDIR_P) `dirname $(DESTDIR)$$dir/$$2` && \
  		rm -f $(DESTDIR)$$dir/$$2 && \
@@ -34,20 +25,11 @@ index 629740f..82b6553 100644
  		shift 2 || exit $$?; \
  	done
  endef
-@@ -2781,7 +2781,7 @@ systemd_dbus1_generator_LDADD = \
- dbus1-generator-install-hook:
- 	$(AM_V_at)$(MKDIR_P) $(DESTDIR)$(usergeneratordir)
- 	$(AM_V_RM)rm -f $(DESTDIR)$(usergeneratordir)/systemd-dbus1-generator
--	$(AM_V_LN)$(LN_S) --relative -f $(DESTDIR)$(systemgeneratordir)/systemd-dbus1-generator $(DESTDIR)$(usergeneratordir)/systemd-dbus1-generator
-+	$(AM_V_LN)lnr $(DESTDIR)$(systemgeneratordir)/systemd-dbus1-generator $(DESTDIR)$(usergeneratordir)/systemd-dbus1-generator
- 
- dbus1-generator-uninstall-hook:
- 	rm -f $(DESTDIR)$(usergeneratordir)/systemd-dbus1-generator
 diff --git a/configure.ac b/configure.ac
-index 0239fd0..c5ab9d0 100644
+index 7c4b5a2..b10c952 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -110,8 +110,6 @@ AC_PATH_PROG([SULOGIN], [sulogin], [/usr/sbin/sulogin], [$PATH:/usr/sbin:/sbin])
+@@ -108,8 +108,6 @@ AC_PATH_PROG([SULOGIN], [sulogin], [/usr/sbin/sulogin], [$PATH:/usr/sbin:/sbin])
  AC_PATH_PROG([MOUNT_PATH], [mount], [/usr/bin/mount], [$PATH:/usr/sbin:/sbin])
  AC_PATH_PROG([UMOUNT_PATH], [umount], [/usr/bin/umount], [$PATH:/usr/sbin:/sbin])
  
@@ -57,5 +39,5 @@ index 0239fd0..c5ab9d0 100644
  
  AC_CHECK_FUNCS_ONCE(mkostemp execvpe posix_fallocate)
 -- 
-1.8.3.1
+2.10.2
 

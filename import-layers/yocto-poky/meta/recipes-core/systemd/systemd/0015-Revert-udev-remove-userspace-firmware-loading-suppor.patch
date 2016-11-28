@@ -1,4 +1,7 @@
-Subject: [PATCH 17/36] Revert "udev: remove userspace firmware loading
+From 4d28d9a7d8d69fb429955d770e53e7a81640da24 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 9 Nov 2016 20:45:23 -0800
+Subject: [PATCH 15/19] Revert "udev: remove userspace firmware loading
  support"
 
 This reverts commit be2ea723b1d023b3d385d3b791ee4607cbfb20ca.
@@ -10,21 +13,21 @@ Signed-off-by: Jonathan Liu <net147@gmail.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  Makefile.am                      |  12 +++
- README                           |   4 +-
+ README                           |   6 +-
  TODO                             |   1 +
- configure.ac                     |  22 ++++++
+ configure.ac                     |  18 +++++
  src/udev/udev-builtin-firmware.c | 154 +++++++++++++++++++++++++++++++++++++++
  src/udev/udev-builtin.c          |   3 +
  src/udev/udev.h                  |   6 ++
  src/udev/udevd.c                 |  13 ++++
- 8 files changed, 213 insertions(+), 2 deletions(-)
+ 8 files changed, 210 insertions(+), 3 deletions(-)
  create mode 100644 src/udev/udev-builtin-firmware.c
 
 diff --git a/Makefile.am b/Makefile.am
-index 305099a..e774976 100644
+index 3010b01..229492a 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -3706,6 +3706,18 @@ libudev_core_la_LIBADD = \
+@@ -3791,6 +3791,18 @@ libudev_core_la_LIBADD = \
  	$(BLKID_LIBS) \
  	$(KMOD_LIBS)
  
@@ -44,10 +47,17 @@ index 305099a..e774976 100644
  libudev_core_la_SOURCES += \
  	src/udev/udev-builtin-kmod.c
 diff --git a/README b/README
-index ca8993c..87f3297 100644
+index 9f5bc93..f60ae11 100644
 --- a/README
 +++ b/README
-@@ -56,8 +56,8 @@ REQUIREMENTS:
+@@ -50,14 +50,14 @@ REQUIREMENTS:
+           CONFIG_PROC_FS
+           CONFIG_FHANDLE (libudev, mount and bind mount handling)
+ 
+-        udev will fail to work with the legacy sysfs layout:
++        Udev will fail to work with the legacy sysfs layout:
+           CONFIG_SYSFS_DEPRECATED=n
+ 
          Legacy hotplug slows down the system and confuses udev:
            CONFIG_UEVENT_HELPER_PATH=""
  
@@ -59,10 +69,10 @@ index ca8993c..87f3297 100644
  
          Some udev rules and virtualization detection relies on it:
 diff --git a/TODO b/TODO
-index fac9ccf..2645582 100644
+index baaac94..1ab1691 100644
 --- a/TODO
 +++ b/TODO
-@@ -642,6 +642,7 @@ Features:
+@@ -658,6 +658,7 @@ Features:
  * initialize the hostname from the fs label of /, if /etc/hostname does not exist?
  
  * udev:
@@ -71,13 +81,13 @@ index fac9ccf..2645582 100644
    - kill scsi_id
    - add trigger --subsystem-match=usb/usb_device device
 diff --git a/configure.ac b/configure.ac
-index 329861a..af85405 100644
+index dfc0bd3..1de0066 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1361,6 +1361,25 @@ AC_ARG_ENABLE(hwdb, [AC_HELP_STRING([--disable-hwdb], [disable hardware database
+@@ -1394,6 +1394,23 @@ AM_CONDITIONAL(HAVE_MYHOSTNAME, [test "$have_myhostname" = "yes"])
+ AC_ARG_ENABLE(hwdb, [AC_HELP_STRING([--disable-hwdb], [disable hardware database support])],
+        enable_hwdb=$enableval, enable_hwdb=yes)
  AM_CONDITIONAL(ENABLE_HWDB, [test x$enable_hwdb = xyes])
- 
- # ------------------------------------------------------------------------------
 +AC_ARG_WITH(firmware-path,
 +       AS_HELP_STRING([--with-firmware-path=DIR[[[:DIR[...]]]]],
 +          [Firmware search path (default="")]),
@@ -93,19 +103,15 @@ index 329861a..af85405 100644
 +done
 +IFS=$OLD_IFS
 +AC_SUBST(FIRMWARE_PATH)
-+AS_IF([test "x${FIRMWARE_PATH}" != "x"], [ AC_DEFINE(HAVE_FIRMWARE, 1, [Define if FIRMWARE is availabe]) ])
++AS_IF([test "x${FIRMWARE_PATH}" != "x"], [ AC_DEFINE(HAVE_FIRMWARE, 1, [Define if FIRMWARE is available]) ])
 +AM_CONDITIONAL(ENABLE_FIRMWARE, [test "x${FIRMWARE_PATH}" != "x"])
-+
-+# ------------------------------------------------------------------------------
+ 
+ # ------------------------------------------------------------------------------
  have_manpages=no
- AC_ARG_ENABLE(manpages, AS_HELP_STRING([--disable-manpages], [disable manpages]))
- AC_PATH_PROG([XSLTPROC], [xsltproc])
-@@ -1656,6 +1675,9 @@ AC_MSG_RESULT([
+@@ -1698,6 +1715,7 @@ AC_MSG_RESULT([
          SysV init scripts:                 ${SYSTEM_SYSVINIT_PATH}
          SysV rc?.d directories:            ${SYSTEM_SYSVRCND_PATH}
          Build Python:                      ${PYTHON}
-+        Installation Python:               ${PYTHON_BINARY}
-+        sphinx binary:                     ${SPHINX_BUILD}
 +        firmware path:                     ${FIRMWARE_PATH}
          PAM modules dir:                   ${with_pamlibdir}
          PAM configuration dir:             ${with_pamconfdir}
@@ -309,7 +315,7 @@ index 8433e8d..d32366d 100644
  extern const struct udev_builtin udev_builtin_input_id;
  extern const struct udev_builtin udev_builtin_keyboard;
 diff --git a/src/udev/udevd.c b/src/udev/udevd.c
-index e9dd2f4..0abc28e 100644
+index d336ee0..81e5dc5 100644
 --- a/src/udev/udevd.c
 +++ b/src/udev/udevd.c
 @@ -125,6 +125,9 @@ struct event {
@@ -322,7 +328,7 @@ index e9dd2f4..0abc28e 100644
  };
  
  static inline struct event *node_to_event(struct udev_list_node *node) {
-@@ -614,6 +617,10 @@ static int event_queue_insert(Manager *manager, struct udev_device *dev) {
+@@ -613,6 +616,10 @@ static int event_queue_insert(Manager *manager, struct udev_device *dev) {
          event->devnum = udev_device_get_devnum(dev);
          event->is_block = streq("block", udev_device_get_subsystem(dev));
          event->ifindex = udev_device_get_ifindex(dev);
@@ -333,7 +339,7 @@ index e9dd2f4..0abc28e 100644
  
          log_debug("seq %llu queued, '%s' '%s'", udev_device_get_seqnum(dev),
               udev_device_get_action(dev), udev_device_get_subsystem(dev));
-@@ -699,6 +706,12 @@ static bool is_devpath_busy(Manager *manager, struct event *event) {
+@@ -698,6 +705,12 @@ static bool is_devpath_busy(Manager *manager, struct event *event) {
                          return true;
                  }
  
@@ -347,5 +353,5 @@ index e9dd2f4..0abc28e 100644
                  if (event->devpath[common] == '/') {
                          event->delaying_seqnum = loop_event->seqnum;
 -- 
-2.8.3
+2.10.2
 

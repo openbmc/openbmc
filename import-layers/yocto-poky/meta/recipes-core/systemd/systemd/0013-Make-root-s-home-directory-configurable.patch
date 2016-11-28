@@ -1,4 +1,7 @@
-Subject: [PATCH 14/36] Make root's home directory configurable
+From 79e64a07840e0d97d66e46111f1c086bf83981b7 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 9 Nov 2016 20:35:30 -0800
+Subject: [PATCH 13/19] Make root's home directory configurable
 
 OpenEmbedded has a configurable home directory for root. Allow
 systemd to be built using its idea of what root's home directory
@@ -11,23 +14,20 @@ https://github.com/systemd/systemd/issues/541
 
 Signed-off-by: Dan McGregor <dan.mcgregor@usask.ca>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
-
 ---
- Makefile.am                       | 2 ++
- configure.ac                      | 7 +++++++
- src/basic/user-util.c             | 4 ++--
- src/core/namespace.c              | 2 +-
- src/nspawn/nspawn.c               | 4 ++--
- units/console-shell.service.m4.in | 4 ++--
- units/emergency.service.in        | 4 ++--
- units/rescue.service.in           | 4 ++--
- 8 files changed, 20 insertions(+), 11 deletions(-)
+ Makefile.am                | 2 ++
+ configure.ac               | 7 +++++++
+ src/basic/user-util.c      | 4 ++--
+ src/nspawn/nspawn.c        | 4 ++--
+ units/emergency.service.in | 4 ++--
+ units/rescue.service.in    | 4 ++--
+ 6 files changed, 17 insertions(+), 8 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index 305099a..88c1250 100644
+index 420e0e0..3010b01 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -206,6 +206,7 @@ AM_CPPFLAGS = \
+@@ -213,6 +213,7 @@ AM_CPPFLAGS = \
  	-DLIBDIR=\"$(libdir)\" \
  	-DROOTLIBDIR=\"$(rootlibdir)\" \
  	-DROOTLIBEXECDIR=\"$(rootlibexecdir)\" \
@@ -35,8 +35,8 @@ index 305099a..88c1250 100644
  	-DTEST_DIR=\"$(abs_top_srcdir)/test\" \
  	-I $(top_srcdir)/src \
  	-I $(top_builddir)/src/basic \
-@@ -5863,6 +5864,7 @@ EXTRA_DIST += \
- substitutions = \
+@@ -6057,6 +6058,7 @@ substitutions = \
+        '|rootlibdir=$(rootlibdir)|' \
         '|rootlibexecdir=$(rootlibexecdir)|' \
         '|rootbindir=$(rootbindir)|' \
 +       '|roothomedir=$(roothomedir)|' \
@@ -44,10 +44,10 @@ index 305099a..88c1250 100644
         '|SYSTEMCTL=$(rootbindir)/systemctl|' \
         '|SYSTEMD_NOTIFY=$(rootbindir)/systemd-notify|' \
 diff --git a/configure.ac b/configure.ac
-index 329861a..01764f5 100644
+index b10c952..dfc0bd3 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1478,6 +1478,11 @@ AC_ARG_WITH([rootlibdir],
+@@ -1513,6 +1513,11 @@ AC_ARG_WITH([rootlibdir],
          [with_rootlibdir=${libdir}])
  AX_NORMALIZE_PATH([with_rootlibdir])
  
@@ -59,7 +59,7 @@ index 329861a..01764f5 100644
  AC_ARG_WITH([pamlibdir],
          AS_HELP_STRING([--with-pamlibdir=DIR], [Directory for PAM modules]),
          [],
-@@ -1562,6 +1567,7 @@ AC_SUBST([pamlibdir], [$with_pamlibdir])
+@@ -1598,6 +1603,7 @@ AC_SUBST([pamlibdir], [$with_pamlibdir])
  AC_SUBST([pamconfdir], [$with_pamconfdir])
  AC_SUBST([rootprefix], [$with_rootprefix])
  AC_SUBST([rootlibdir], [$with_rootlibdir])
@@ -67,7 +67,7 @@ index 329861a..01764f5 100644
  
  AC_CONFIG_FILES([
          Makefile
-@@ -1653,6 +1659,7 @@ AC_MSG_RESULT([
+@@ -1688,6 +1694,7 @@ AC_MSG_RESULT([
          includedir:                        ${includedir}
          lib dir:                           ${libdir}
          rootlib dir:                       ${with_rootlibdir}
@@ -76,10 +76,10 @@ index 329861a..01764f5 100644
          SysV rc?.d directories:            ${SYSTEM_SYSVRCND_PATH}
          Build Python:                      ${PYTHON}
 diff --git a/src/basic/user-util.c b/src/basic/user-util.c
-index f65ca3e..da1101a 100644
+index 938533d..3f9fdc4 100644
 --- a/src/basic/user-util.c
 +++ b/src/basic/user-util.c
-@@ -123,7 +123,7 @@ int get_user_creds(
+@@ -127,7 +127,7 @@ int get_user_creds(
                          *gid = 0;
  
                  if (home)
@@ -88,7 +88,7 @@ index f65ca3e..da1101a 100644
  
                  if (shell)
                          *shell = "/bin/sh";
-@@ -354,7 +354,7 @@ int get_home_dir(char **_h) {
+@@ -387,7 +387,7 @@ int get_home_dir(char **_h) {
          /* Hardcode home directory for root to avoid NSS */
          u = getuid();
          if (u == 0) {
@@ -97,24 +97,11 @@ index f65ca3e..da1101a 100644
                  if (!h)
                          return -ENOMEM;
  
-diff --git a/src/core/namespace.c b/src/core/namespace.c
-index 203d122..45c0d11 100644
---- a/src/core/namespace.c
-+++ b/src/core/namespace.c
-@@ -415,7 +415,7 @@ int setup_namespace(
-                         home_dir = strjoina("-", home_dir);
-                         run_user_dir = prefix_roota(root_directory, "/run/user");
-                         run_user_dir = strjoina("-", run_user_dir);
--                        root_dir = prefix_roota(root_directory, "/root");
-+                        root_dir = prefix_roota(root_directory, ROOTHOMEDIR);
-                         root_dir = strjoina("-", root_dir);
- 
-                         r = append_mounts(&m, STRV_MAKE(home_dir, run_user_dir, root_dir),
 diff --git a/src/nspawn/nspawn.c b/src/nspawn/nspawn.c
-index 8ec0584..51df00b 100644
+index 19b47cd..e42bf19 100644
 --- a/src/nspawn/nspawn.c
 +++ b/src/nspawn/nspawn.c
-@@ -2739,7 +2739,7 @@ static int inner_child(
+@@ -2798,7 +2798,7 @@ static int inner_child(
          if (envp[n_env])
                  n_env++;
  
@@ -123,7 +110,7 @@ index 8ec0584..51df00b 100644
              (asprintf((char**)(envp + n_env++), "USER=%s", arg_user ? arg_user : "root") < 0) ||
              (asprintf((char**)(envp + n_env++), "LOGNAME=%s", arg_user ? arg_user : "root") < 0))
                  return log_oom();
-@@ -2816,7 +2816,7 @@ static int inner_child(
+@@ -2882,7 +2882,7 @@ static int inner_child(
          else {
                  if (!arg_chdir)
                          /* If we cannot change the directory, we'll end up in /, that is expected. */
@@ -132,23 +119,8 @@ index 8ec0584..51df00b 100644
  
                  execle("/bin/bash", "-bash", NULL, env_use);
                  execle("/bin/sh", "-sh", NULL, env_use);
-diff --git a/units/console-shell.service.m4.in b/units/console-shell.service.m4.in
-index a345ec2..3caae7d 100644
---- a/units/console-shell.service.m4.in
-+++ b/units/console-shell.service.m4.in
-@@ -15,8 +15,8 @@ After=rc-local.service
- Before=getty.target
- 
- [Service]
--Environment=HOME=/root
--WorkingDirectory=-/root
-+Environment=HOME=@roothomedir@
-+WorkingDirectory=-@roothomedir@
- ExecStart=-@SULOGIN@
- ExecStopPost=-@SYSTEMCTL@ poweroff
- Type=idle
 diff --git a/units/emergency.service.in b/units/emergency.service.in
-index 0de16f2..4826062 100644
+index da68eb8..e25f879 100644
 --- a/units/emergency.service.in
 +++ b/units/emergency.service.in
 @@ -15,8 +15,8 @@ Conflicts=syslog.socket
@@ -160,10 +132,10 @@ index 0de16f2..4826062 100644
 +Environment=HOME=@roothomedir@
 +WorkingDirectory=-@roothomedir@
  ExecStartPre=-/bin/plymouth --wait quit
- ExecStartPre=-/bin/echo -e 'Welcome to emergency mode! After logging in, type "journalctl -xb" to view\\nsystem logs, "systemctl reboot" to reboot, "systemctl default" or ^D to\\ntry again to boot into default mode.'
+ ExecStartPre=-/bin/echo -e 'You are in emergency mode. After logging in, type "journalctl -xb" to view\\nsystem logs, "systemctl reboot" to reboot, "systemctl default" or ^D to\\ntry again to boot into default mode.'
  ExecStart=-/bin/sh -c "@SULOGIN@; @SYSTEMCTL@ --job-mode=fail --no-block default"
 diff --git a/units/rescue.service.in b/units/rescue.service.in
-index 92553f6..590ae17 100644
+index 5feff69..a83439e 100644
 --- a/units/rescue.service.in
 +++ b/units/rescue.service.in
 @@ -14,8 +14,8 @@ After=sysinit.target plymouth-start.service
@@ -174,9 +146,9 @@ index 92553f6..590ae17 100644
 -WorkingDirectory=-/root
 +Environment=HOME=@roothomedir@
 +WorkingDirectory=-@roothomedir@
- ExecStartPre=-/bin/plymouth quit
- ExecStartPre=-/bin/echo -e 'Welcome to rescue mode! After logging in, type "journalctl -xb" to view\\nsystem logs, "systemctl reboot" to reboot, "systemctl default" or ^D to\\nboot into default mode.'
+ ExecStartPre=-/bin/plymouth --wait quit
+ ExecStartPre=-/bin/echo -e 'You are in rescue mode. After logging in, type "journalctl -xb" to view\\nsystem logs, "systemctl reboot" to reboot, "systemctl default" or ^D to\\nboot into default mode.'
  ExecStart=-/bin/sh -c "@SULOGIN@; @SYSTEMCTL@ --job-mode=fail --no-block default"
 -- 
-2.8.3
+2.10.2
 
