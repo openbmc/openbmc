@@ -1,7 +1,7 @@
-From bb6f1d8a000b337280541afde7cccdcfe03cdeb1 Mon Sep 17 00:00:00 2001
+From 82d837b76618a773485b96e38b7b91083a7437e8 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 20 Feb 2015 05:05:45 +0000
-Subject: [PATCH 06/36] configure: Check for additional features that uclibc
+Subject: [PATCH 06/19] configure: Check for additional features that uclibc
  doesnt support
 
 This helps in supporting uclibc which does not have all features that
@@ -15,10 +15,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 18 insertions(+)
 
 diff --git a/configure.ac b/configure.ac
-index f51533c..0239fd0 100644
+index 7f6b3b9..7c4b5a2 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -112,6 +112,24 @@ AC_PATH_PROG([UMOUNT_PATH], [umount], [/usr/bin/umount], [$PATH:/usr/sbin:/sbin]
+@@ -110,6 +110,24 @@ AC_PATH_PROG([UMOUNT_PATH], [umount], [/usr/bin/umount], [$PATH:/usr/sbin:/sbin]
  
  AS_IF([! ln --relative --help > /dev/null 2>&1], [AC_MSG_ERROR([*** ln doesn't support --relative ***])])
  
@@ -44,5 +44,5 @@ index f51533c..0239fd0 100644
  
  AC_CHECK_TOOL(OBJCOPY, objcopy)
 -- 
-1.8.3.1
+2.10.2
 
