@@ -41,7 +41,6 @@ RDEPENDS_${PN}-chassis = " \
         obmc-op-control-power \
         obmc-pcie-detect \
         obmc-watchdog \
-        obmc-op-control-host \
         obmc-control-led \
         "
 
