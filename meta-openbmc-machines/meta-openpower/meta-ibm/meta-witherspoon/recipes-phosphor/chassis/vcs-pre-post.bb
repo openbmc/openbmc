@@ -1,0 +1,43 @@
+SUMMARY = "Witherspoon P9 power on"
+DESCRIPTION = "Witherspoon power on workaround"
+PR = "r1"
+
+inherit obmc-phosphor-systemd
+inherit obmc-phosphor-license
+
+RDEPENDS_${PN} += "i2c-tools"
+
+PROVIDES += 'virtual/p9-vcs-workaround'
+RPROVIDES_${PN} += 'virtual-p9-vcs-workaround'
+
+S = "${WORKDIR}"
+SRC_URI += "file://vcs_off.sh \
+            file://vcs_on.sh \
+            file://ucd_disable_vcs.sh"
+
+do_install() {
+        install -d ${D}${bindir}
+        install -m 0755 ${WORKDIR}/vcs_off.sh ${D}${bindir}/vcs_off.sh
+        install -m 0755 ${WORKDIR}/vcs_on.sh ${D}${bindir}/vcs_on.sh
+        install -m 0755 ${WORKDIR}/ucd_disable_vcs.sh \
+                        ${D}${bindir}/ucd_disable_vcs.sh
+}
+
+TMPL_OFF = "vcs_off@.service"
+TMPL_ON = "vcs_on@.service"
+TMPL_UCD = "ucd_disable_vcs@.service"
+INSTFMT_OFF = "vcs_off@{0}.service"
+INSTFMT_ON = "vcs_on@{0}.service"
+INSTFMT_UCD = "ucd_disable_vcs@{0}.service"
+TGTFMT = "obmc-chassis-start@{0}.target"
+FMT_OFF = "../${TMPL_OFF}:${TGTFMT}.wants/${INSTFMT_OFF}"
+FMT_ON = "../${TMPL_ON}:${TGTFMT}.wants/${INSTFMT_ON}"
+FMT_UCD = "../${TMPL_UCD}:${TGTFMT}.wants/${INSTFMT_UCD}"
+
+SYSTEMD_SERVICE_${PN} += "${TMPL_OFF}"
+SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_OFF', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_SERVICE_${PN} += "${TMPL_ON}"
+SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_ON', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_SERVICE_${PN} += "${TMPL_UCD}"
+SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_UCD', 'OBMC_CHASSIS_INSTANCES')}"
+
