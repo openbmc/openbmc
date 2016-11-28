@@ -5,6 +5,9 @@ PR = "r1"
 inherit skeleton-gdbus
 inherit obmc-phosphor-dbus-service
 
+PROVIDES += "virtual/obmc-host-ctl"
+RPROVIDES_${PN} += "virtual-obmc-host-ctl"
+
 SKELETON_DIR = "op-hostctl"
 
 FMT = "org.openbmc.control.Host@{0}.service"
