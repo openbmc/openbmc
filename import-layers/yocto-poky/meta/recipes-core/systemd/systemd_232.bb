@@ -24,18 +24,14 @@ SRC_URI += " \
            file://0009-util-bypass-unimplemented-_SC_PHYS_PAGES-system-conf.patch \
            file://0010-implment-systemd-sysv-install-for-OE.patch \
            file://0011-nss-mymachines-Build-conditionally-when-HAVE_MYHOSTN.patch \
-           file://0012-rules-whitelist-hd-devices.patch \
-           file://0013-sysv-generator-add-support-for-executing-scripts-und.patch \
-           file://0014-Make-root-s-home-directory-configurable.patch \
-           file://0015-systemd-user-avoid-using-system-auth.patch \
-           file://0016-Revert-rules-remove-firmware-loading-rules.patch \
-           file://0017-Revert-udev-remove-userspace-firmware-loading-suppor.patch \
-           file://0018-make-test-dir-configurable.patch \
-           file://0019-remove-duplicate-include-uchar.h.patch \
-           file://0020-check-for-uchar.h-in-configure.patch \
-           file://0021-include-missing.h-for-getting-secure_getenv-definiti.patch \
-           file://0022-socket-util-don-t-fail-if-libc-doesn-t-support-IDN.patch \
-           file://udev-re-enable-mount-propagation-for-udevd.patch \
+           file://0012-rules-whitelist-hd-devices.patch \   
+           file://0013-Make-root-s-home-directory-configurable.patch \
+           file://0014-Revert-rules-remove-firmware-loading-rules.patch \
+           file://0015-Revert-udev-remove-userspace-firmware-loading-suppor.patch \
+           file://0016-make-test-dir-configurable.patch \
+           file://0017-remove-duplicate-include-uchar.h.patch \
+           file://0018-check-for-uchar.h-in-configure.patch \
+           file://0019-socket-util-don-t-fail-if-libc-doesn-t-support-IDN.patch \
 "
 SRC_URI_append_libc-uclibc = "\
            file://0002-units-Prefer-getty-to-agetty-in-console-setup-system.patch \
@@ -60,7 +56,6 @@ PACKAGECONFIG ??= "xz \
                    timedated \
                    timesyncd \
                    localed \
-                   kdbus \
                    ima \
                    smack \
                    logind \
@@ -95,7 +90,6 @@ PACKAGECONFIG[timedated] = "--enable-timedated,--disable-timedated"
 PACKAGECONFIG[timesyncd] = "--enable-timesyncd,--disable-timesyncd"
 PACKAGECONFIG[localed] = "--enable-localed,--disable-localed"
 PACKAGECONFIG[efi] = "--enable-efi,--disable-efi"
-PACKAGECONFIG[kdbus] = "--enable-kdbus,--disable-kdbus"
 PACKAGECONFIG[ima] = "--enable-ima,--disable-ima"
 PACKAGECONFIG[smack] = "--enable-smack,--disable-smack"
 # libseccomp is found in meta-security
@@ -281,7 +275,7 @@ python populate_packages_prepend (){
     systemdlibdir = d.getVar("rootlibdir", True)
     do_split_packages(d, systemdlibdir, '^lib(.*)\.so\.*', 'lib%s', 'Systemd %s library', extra_depends='', allow_links=True)
 }
-PACKAGES_DYNAMIC += "^lib(udev|systemd).*"
+PACKAGES_DYNAMIC += "^lib(udev|systemd|nss).*"
 
 PACKAGES =+ "\
     ${PN}-gui \
@@ -490,6 +484,7 @@ RRECOMMENDS_${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'serial-getty-genera
                       os-release \
 "
 
+INSANE_SKIP_${PN} += "dev-so"
 INSANE_SKIP_${PN}-doc += " libdir"
 
 PACKAGES =+ "udev udev-hwdb"

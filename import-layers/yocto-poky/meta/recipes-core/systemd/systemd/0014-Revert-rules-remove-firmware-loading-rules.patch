@@ -1,7 +1,7 @@
-From 7311ecc745c17d6ed9fd9cf43039648483a87605 Mon Sep 17 00:00:00 2001
+From 0f47cfcb16e8e40a90a9221f9995f8cd8a915c22 Mon Sep 17 00:00:00 2001
 From: Jonathan Liu <net147@gmail.com>
 Date: Thu, 19 Mar 2015 15:01:29 +1100
-Subject: [PATCH 16/36] Revert "rules: remove firmware loading rules"
+Subject: [PATCH 14/19] Revert "rules: remove firmware loading rules"
 
 This reverts commit 70e7d754ddb356fb1a2942b262f8cee9650e2a19.
 Userspace firmware loading support is needed for Linux < 3.7.
@@ -24,5 +24,5 @@ index 0000000..f0ae684
 +
 +SUBSYSTEM=="firmware", ACTION=="add", RUN{builtin}="firmware"
 -- 
-1.8.3.1
+2.10.2
 

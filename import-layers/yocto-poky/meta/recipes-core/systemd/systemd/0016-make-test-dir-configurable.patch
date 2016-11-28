@@ -1,4 +1,7 @@
-Subject: [PATCH 18/36] make test dir configurable
+From 218bbc555a37f9373fbb7f03c744eb65109d3470 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 9 Nov 2016 20:47:37 -0800
+Subject: [PATCH 16/19] make test dir configurable
 
 Upstream-Status: Pending
 
@@ -6,17 +9,17 @@ test maybe be run on target in cross-compile environment, and test dir
 is not the compilation dir, so make it configurable
 
 Signed-off-by: Roy Li <rongqing.li@windriver.com>
-
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  Makefile.am  | 2 +-
  configure.ac | 7 +++++++
  2 files changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index a94636a..dbd3386 100644
+index 229492a..e997d82 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -207,7 +207,7 @@ AM_CPPFLAGS = \
+@@ -214,7 +214,7 @@ AM_CPPFLAGS = \
  	-DROOTLIBDIR=\"$(rootlibdir)\" \
  	-DROOTLIBEXECDIR=\"$(rootlibexecdir)\" \
  	-DROOTHOMEDIR=\"$(roothomedir)\" \
@@ -26,10 +29,10 @@ index a94636a..dbd3386 100644
  	-I $(top_builddir)/src/basic \
  	-I $(top_srcdir)/src/basic \
 diff --git a/configure.ac b/configure.ac
-index 45aae8a..c53fae2 100644
+index 1de0066..b12e320 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1518,6 +1518,11 @@ AC_ARG_WITH([roothomedir],
+@@ -1535,6 +1535,11 @@ AC_ARG_WITH([roothomedir],
          [],
          [with_roothomedir=/root])
  
@@ -41,7 +44,7 @@ index 45aae8a..c53fae2 100644
  AC_ARG_WITH([pamlibdir],
          AS_HELP_STRING([--with-pamlibdir=DIR], [Directory for PAM modules]),
          [],
-@@ -1603,6 +1608,7 @@ AC_SUBST([pamconfdir], [$with_pamconfdir])
+@@ -1621,6 +1626,7 @@ AC_SUBST([pamconfdir], [$with_pamconfdir])
  AC_SUBST([rootprefix], [$with_rootprefix])
  AC_SUBST([rootlibdir], [$with_rootlibdir])
  AC_SUBST([roothomedir], [$with_roothomedir])
@@ -49,7 +52,7 @@ index 45aae8a..c53fae2 100644
  
  AC_CONFIG_FILES([
          Makefile
-@@ -1695,6 +1701,7 @@ AC_MSG_RESULT([
+@@ -1712,6 +1718,7 @@ AC_MSG_RESULT([
          lib dir:                           ${libdir}
          rootlib dir:                       ${with_rootlibdir}
          root home dir:                     ${with_roothomedir}
@@ -58,5 +61,5 @@ index 45aae8a..c53fae2 100644
          SysV rc?.d directories:            ${SYSTEM_SYSVRCND_PATH}
          Build Python:                      ${PYTHON}
 -- 
-2.8.3
+2.10.2
 

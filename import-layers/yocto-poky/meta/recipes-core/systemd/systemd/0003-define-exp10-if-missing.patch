@@ -1,4 +1,7 @@
-Subject: [PATCH 03/36] define exp10 if missing
+From b383c286f58184575216b2bf6f185ba2ad648956 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 9 Nov 2016 19:25:45 -0800
+Subject: [PATCH 03/19] define exp10 if missing
 
 Inspired by: http://peter.korsgaard.com/patches/alsa-utils/alsamixer-fix-build-on-uClibc-exp10.patch
 
@@ -8,16 +11,15 @@ Upstream-Status: Pending
 
 Signed-off-by: Samuel Martin <s.martin49@gmail.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
-
 ---
  src/basic/missing.h | 5 +++++
  1 file changed, 5 insertions(+)
 
 diff --git a/src/basic/missing.h b/src/basic/missing.h
-index 651e414..fafa233 100644
+index 4c013be..4a3fd9c 100644
 --- a/src/basic/missing.h
 +++ b/src/basic/missing.h
-@@ -1013,4 +1013,9 @@ typedef int32_t key_serial_t;
+@@ -1078,4 +1078,9 @@ typedef int32_t key_serial_t;
  
  #endif
  
@@ -28,5 +30,5 @@ index 651e414..fafa233 100644
 +
  #include "missing_syscall.h"
 -- 
-2.8.3
+2.10.2
 
