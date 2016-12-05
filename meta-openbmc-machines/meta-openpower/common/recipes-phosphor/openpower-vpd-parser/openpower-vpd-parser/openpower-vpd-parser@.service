@@ -1,0 +1,12 @@
+[Unit]
+Description=Read OpenPOWER-format VPD from EEPROM
+Wants=mapper-wait@-org-openbmc-inventory-%i.service
+After=mapper-wait@-org-openbmc-inventory-%i.service
+
+[Service]
+Restart=no
+Type=oneshot
+ExecStart={sbindir}/openpower-read-vpd --vpd boxelder1z.vpd --fru bmc,ethernet --object /bmc/planar,/bmc/planar/ethernet
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
