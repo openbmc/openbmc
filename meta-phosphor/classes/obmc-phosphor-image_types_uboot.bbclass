@@ -1,16 +1,5 @@
 inherit image_types_uboot
 
-# oe_mkimage() was defined in image_types_uboot. Howver, it does not consider
-# the image load address and entry point. Override it here.
-
-oe_mkimage () {
-       mkimage -A ${UBOOT_ARCH} -O linux -T ramdisk -C $2 -n ${IMAGE_BASENAME} \
-              -a ${INITRD_IMAGE_LOADADDRESS} -e ${INITRD_IMAGE_ENTRYPOINT} \
-              -d ${DEPLOY_DIR_IMAGE}/$1 ${DEPLOY_DIR_IMAGE}/$1.u-boot
-}
-
-INITRD_IMAGE_ENTRYPOINT ?= "0x42000000"
-INITRD_IMAGE_LOADADDRESS ?= "${INITRD_IMAGE_ENTRYPOINT}"
 INITRD_LINK_NAME = "${INITRD_IMAGE}-${MACHINE}${INITRAMFS_FSTYPE}"
 
 FLASH_IMAGE_NAME ?= "flash-${MACHINE}-${DATETIME}"
