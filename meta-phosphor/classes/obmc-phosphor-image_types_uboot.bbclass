@@ -66,11 +66,12 @@ do_generate_flash() {
        if [ ! -f $ddir/$initrd ]; then
               bbfatal "initrd file ${ddir}/${initrd} does not exist"
        fi
+       if [ ! -f $ddir/$uinitrd ]; then
+              bbfatal "uinitrd file ${ddir}/${uinitrd} does not exist"
+       fi
        if [ ! -f $ddir/$rootfs ]; then
               bbfatal "Rootfs file ${ddir}/${rootfs} does not exist"
        fi
-
-       oe_mkimage  "${initrd}" "${INITRD_CTYPE}" || bbfatal "oe_mkimage initrd"
 
        mk_nor_image ${ddir}/${rwfs} ${RWFS_SIZE}
        if [ "${OVERLAY_BASETYPE}" != jffs2 ]; then
