@@ -229,13 +229,6 @@ index 21619fd8cd8d..5c689613e5bd 100644
 +		line-name = "H2";
 +	};
 +
-+	pin_gpio_h6 {
-+		gpio-hog;
-+		gpios = <ASPEED_GPIO(H, 6) GPIO_ACTIVE_HIGH>;
-+		output-high;
-+		line-name = "H6";
-+	};
-+
 +	pin_gpio_h7 {
 +		gpio-hog;
 +		gpios = <ASPEED_GPIO(H, 7) GPIO_ACTIVE_HIGH>;
