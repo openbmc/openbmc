@@ -20,7 +20,7 @@ OBMC_IMAGE_EXTRA_INSTALL_append = " u-boot-fw-utils"
 IMAGE_CLASSES += "obmc-phosphor-image_types_uboot"
 
 INITRAMFS_CTYPE ?= "lzma"
-INITRAMFS_FSTYPES += "cpio.${INITRAMFS_CTYPE}"
+INITRAMFS_FSTYPES += "cpio.${INITRAMFS_CTYPE} cpio.${INITRAMFS_CTYPE}.u-boot"
 
 MACHINE_FEATURES_BACKFILL_CONSIDERED = "qemu-usermode"
 
