@@ -1,11 +1,13 @@
-From 5362492a7546230866dc4a45269bb3dae65306cb Mon Sep 17 00:00:00 2001
+From 942989f444381f2542f5e45a9f13e3e8a624884a Mon Sep 17 00:00:00 2001
 From: Andrew Jeffery <andrew@aj.id.au>
-Date: Fri, 2 Sep 2016 12:22:41 +0930
-Subject: [PATCH] work-around: aspeed-bmc-opp-palmetto: Add GPIO hogs to
- devicetree
+Date: Fri, 18 Nov 2016 18:42:21 +1030
+Subject: [PATCH] aspeed-bmc-opp-palmetto: Add GPIO hogs to devicetree
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-This is a work-in-progress patch that attempts to emulate the GPIO
-state originally written by the mach-aspeed board file.
+This is a work-around that attempts to emulate the GPIO state originally
+written by the mach-aspeed board file.
 
 It isn't entirely analogous: Whilst values might be set in the GPIO
 data/direction registers, this doesn't mean the GPIO IP was in control
@@ -104,15 +106,17 @@ desired.
 [3] https://github.com/openbmc/openbmc/issues/513#issuecomment-244414523
 
 Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
+[Joel: don't hog h6, fsi-master-gpio needs it]
+Signed-off-by: Joel Stanley <joel@jms.id.au>
 ---
- arch/arm/boot/dts/aspeed-bmc-opp-palmetto.dts | 127 ++++++++++++++++++++++++++
- 1 file changed, 127 insertions(+)
+ arch/arm/boot/dts/aspeed-bmc-opp-palmetto.dts | 120 ++++++++++++++++++++++++++
+ 1 file changed, 120 insertions(+)
 
 diff --git a/arch/arm/boot/dts/aspeed-bmc-opp-palmetto.dts b/arch/arm/boot/dts/aspeed-bmc-opp-palmetto.dts
-index 21619fd8cd8d..5c689613e5bd 100644
+index 133c7740b79e..036cf4776d86 100644
 --- a/arch/arm/boot/dts/aspeed-bmc-opp-palmetto.dts
 +++ b/arch/arm/boot/dts/aspeed-bmc-opp-palmetto.dts
-@@ -167,6 +167,133 @@
+@@ -172,6 +172,126 @@
  		output-low;
  		line-name = "func_mode2";
  	};
@@ -229,13 +233,6 @@ index 21619fd8cd8d..5c689613e5bd 100644
 +		line-name = "H2";
 +	};
 +
-+	pin_gpio_h6 {
-+		gpio-hog;
-+		gpios = <ASPEED_GPIO(H, 6) GPIO_ACTIVE_HIGH>;
-+		output-high;
-+		line-name = "H6";
-+	};
-+
 +	pin_gpio_h7 {
 +		gpio-hog;
 +		gpios = <ASPEED_GPIO(H, 7) GPIO_ACTIVE_HIGH>;
@@ -247,5 +244,5 @@ index 21619fd8cd8d..5c689613e5bd 100644
  
  &vuart {
 -- 
-2.7.4
+2.11.0
 
