@@ -1,7 +1,7 @@
 PACKAGES = " "
 EXCLUDE_FROM_WORLD = "1"
 
-INITRD_IMAGE ?= "core-image-minimal-initramfs"
+INITRD_IMAGE ?= "obmc-phosphor-initramfs"
 INITRD ?= "${DEPLOY_DIR_IMAGE}/${INITRD_IMAGE}-${MACHINE}.cpio.${INITRD_CTYPE}${uboot}"
 
 IMAGE_BASETYPE ?= "squashfs-xz"
