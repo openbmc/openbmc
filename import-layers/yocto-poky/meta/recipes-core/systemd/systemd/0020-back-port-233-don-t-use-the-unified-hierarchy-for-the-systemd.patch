@@ -1,0 +1,51 @@
+This is a direct backport from systemd-233's stream to fix lxc/docker.
+
+% lxc-start -n container -F
+lxc-start: cgfsng.c: parse_hierarchies: 825 Failed to find current cgroup for controller 'name=systemd'
+lxc-start: cgfsng.c: all_controllers_found: 431 no systemd controller mountpoint found
+lxc-start: start.c: lxc_spawn: 1082 failed initializing cgroup support
+lxc-start: start.c: __lxc_start: 1332 failed to spawn 'container'
+lxc-start: lxc_start.c: main: 344 The container failed to start.
+lxc-start: lxc_start.c: main: 348 Additional information can be obtained by setting the --logfile and --logpriority options.
+
+## begin backport ##
+
+From 843d5baf6aad6c53fc00ea8d95d83209a4f92de1 Mon Sep 17 00:00:00 2001
+From: Martin Pitt <martin.pitt@ubuntu.com>
+Date: Thu, 10 Nov 2016 05:33:13 +0100
+Subject: [PATCH] core: don't use the unified hierarchy for the systemd cgroup
+ yet (#4628)
+
+Too many things don't get along with the unified hierarchy yet:
+
+ * https://github.com/opencontainers/runc/issues/1175
+ * https://github.com/docker/docker/issues/28109
+ * https://github.com/lxc/lxc/issues/1280
+
+So revert the default to the legacy hierarchy for now. Developers of the above
+software can opt into the unified hierarchy with
+"systemd.legacy_systemd_cgroup_controller=0".
+---
+ src/basic/cgroup-util.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/basic/cgroup-util.c b/src/basic/cgroup-util.c
+index 5e73753..dc13025 100644
+--- a/src/basic/cgroup-util.c
++++ b/src/basic/cgroup-util.c
+@@ -2423,10 +2423,10 @@ bool cg_is_unified_systemd_controller_wanted(void) {
+ 
+                 r = get_proc_cmdline_key("systemd.legacy_systemd_cgroup_controller=", &value);
+                 if (r < 0)
+-                        return true;
++                        return false;
+ 
+                 if (r == 0)
+-                        wanted = true;
++                        wanted = false;
+                 else
+                         wanted = parse_boolean(value) <= 0;
+         }
+-- 
+2.10.1
+
