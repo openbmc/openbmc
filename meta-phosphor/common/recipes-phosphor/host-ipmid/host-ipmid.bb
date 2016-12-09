@@ -18,6 +18,7 @@ RDEPENDS_${PN} += "clear-once"
 RDEPENDS_${PN} += "settings"
 RDEPENDS_${PN} += "network"
 SRC_URI += "git://github.com/openbmc/phosphor-host-ipmid"
+SRC_URI += "file://0001_get_bt_interface_capabilities.patch"
 
 SRCREV = "87e080b537aff3fd22ec56ef72660937bed38422"
 
