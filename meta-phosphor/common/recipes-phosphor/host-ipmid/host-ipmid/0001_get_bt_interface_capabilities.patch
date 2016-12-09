@@ -1,0 +1,34 @@
+From 264fe4fc754d7dfbc2440d6a2690e000ce4aeac4 Mon Sep 17 00:00:00 2001
+From: Adriana Kobylak <anoo@us.ibm.com>
+Date: Fri, 9 Dec 2016 14:00:13 -0600
+Subject: [PATCH] ipmid: Fix Get BT Interface Capabilities response
+
+Per the IPMI 2.0 spec, the input buffer size must be maximum
+buffer size minus one byte so that when the caller makes an
+IPMI call, there is space for the length byte in the request.
+
+Fixes: openbmc/openbmc#847
+
+Signed-off-by: Adriana Kobylak <anoo@us.ibm.com>
+---
+ apphandler.C | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/apphandler.C b/apphandler.C
+index b8cc0aa..28b7b71 100644
+--- a/apphandler.C
++++ b/apphandler.C
+@@ -300,7 +300,9 @@ ipmi_ret_t ipmi_app_get_bt_capabilities(ipmi_netfn_t netfn, ipmi_cmd_t cmd,
+     // Status code.
+     ipmi_ret_t rc = IPMI_CC_OK;
+ 
+-    uint8_t str[] = {0x01, MAX_IPMI_BUFFER, MAX_IPMI_BUFFER, 0x0A, 0x01};
++    // Per IPMI 2.0 spec, the input buffer size must be the max minus one
++    // to make space for the length byte to be sent with the request.
++    uint8_t str[] = {0x01, MAX_IPMI_BUFFER-1, MAX_IPMI_BUFFER, 0x0A, 0x01};
+ 
+     // Data length
+     *data_len = sizeof(str);
+-- 
+1.8.2.2
+
