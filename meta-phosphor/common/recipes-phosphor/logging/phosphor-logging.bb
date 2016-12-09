@@ -14,6 +14,7 @@ DEPENDS += "autoconf-archive-native"
 DEPENDS += "systemd"
 DEPENDS += "python-mako-native"
 DEPENDS += "python-pyyaml-native"
+DEPENDS += "sdbusplus sdbusplus-native"
 PROVIDES += "virtual/obmc-logging-mgmt"
 RPROVIDES_${PN} += "virtual-obmc-logging-mgmt"
 
