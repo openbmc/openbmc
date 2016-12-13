@@ -1,6 +1,24 @@
-#!/bin/sh
+#!/bin/sh -e
+# Apply fixes over FSI to POWER9 hosts. Required before VCS rail on.
 
-putcfam pu 0900 31 1 1 -ib   # put the CFAM/FSI slave into async mode
-putcfam pu 2810 15 1 0       # Unfence PLL controls
-putcfam pu 281A  1 1 f       # Assert Perv chiplet endpoint reset, just in case
-putcfam pu 281A 31 1 f       # Enable Nest PLL
+PDBG=${PDBG:-pdbg}
+# Argument [device]: if provided, pass to pdbg as "-d [device]"
+DEVICE_OPT=${1:+-d $1}
+
+putcfam()
+{
+    $PDBG -b fsi $DEVICE_OPT putcfam $1 $2 $3
+}
+
+# P9 dd1 required workaround needed before powering VCS rails
+p9_dd1_vcs_workaround()
+{
+    putcfam 0x2810 0x00000000 0x00010000 &&  # Unfence PLL controls
+    putcfam 0x281A 0x40000000 0x40000000 &&  # Assert Perv chiplet endpoint reset, just in case
+    putcfam 0x281A 0x00000001 0x00000001     # Enable Nest PLL
+}
+
+# Put the CFAM/FSI slave into async mode
+putcfam 0x900 1
+
+p9_dd1_vcs_workaround
