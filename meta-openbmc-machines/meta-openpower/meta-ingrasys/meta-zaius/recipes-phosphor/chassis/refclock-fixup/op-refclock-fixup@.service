@@ -4,6 +4,7 @@ Wants=obmc-host-start-pre@%i.target
 Before=obmc-host-start-pre@%i.target
 Wants=obmc-power-on@%i.target
 After=obmc-power-on@%i.target
+Before=vcs_workaround@%i.service
 Conflicts=obmc-chassis-stop@%i.target
 
 [Service]
