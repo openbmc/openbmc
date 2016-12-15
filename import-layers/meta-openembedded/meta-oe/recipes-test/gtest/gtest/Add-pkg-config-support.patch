@@ -1,0 +1,106 @@
+From ec9256bb704e94f41407fc8ace6a580491430196 Mon Sep 17 00:00:00 2001
+From: Andre McCurdy <armccurdy@gmail.com>
+Date: Thu, 15 Dec 2016 04:35:41 -0800
+Subject: [PATCH] Add pkg-config support
+
+Signed-off-by: Mario Domenech Goulart <mario@ossystems.com.br>
+Signed-off-by: Rodrigo Caimi <caimi@datacom.ind.br>
+Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+---
+ googlemock/CMakeLists.txt | 9 +++++++--
+ googlemock/gmock.pc.in    | 9 +++++++++
+ googletest/CMakeLists.txt | 9 +++++++--
+ googletest/gtest.pc.in    | 9 +++++++++
+ 4 files changed, 32 insertions(+), 4 deletions(-)
+ create mode 100644 googlemock/gmock.pc.in
+ create mode 100644 googletest/gtest.pc.in
+
+diff --git a/googlemock/CMakeLists.txt b/googlemock/CMakeLists.txt
+index beb259a..f17e2d7 100644
+--- a/googlemock/CMakeLists.txt
++++ b/googlemock/CMakeLists.txt
+@@ -27,6 +27,9 @@ if (COMMAND pre_project_set_up_hermetic_build)
+   pre_project_set_up_hermetic_build()
+ endif()
+ 
++# pkg-config support
++configure_file("gmock.pc.in" "gmock.pc" @ONLY)
++
+ ########################################################################
+ #
+ # Project-wide settings
+@@ -104,9 +107,11 @@ endif()
+ #
+ # Install rules
+ install(TARGETS gmock gmock_main
+-  DESTINATION lib)
++  DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ install(DIRECTORY ${gmock_SOURCE_DIR}/include/gmock
+-  DESTINATION include)
++  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
++install(FILES "${CMAKE_CURRENT_BINARY_DIR}/gmock.pc"
++  DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig/")
+ 
+ ########################################################################
+ #
+diff --git a/googlemock/gmock.pc.in b/googlemock/gmock.pc.in
+new file mode 100644
+index 0000000..04bc0b4
+--- /dev/null
++++ b/googlemock/gmock.pc.in
+@@ -0,0 +1,9 @@
++Name: libgmock
++Version: 1.8.0
++Description: Google's framework for writing C++ tests on a variety of platforms
++
++prefix=@CMAKE_INSTALL_PREFIX@
++includedir=@CMAKE_INSTALL_INCLUDEDIR@
++libdir=@CMAKE_INSTALL_LIBDIR@
++Cflags:-I${includedir}/gmock
++Libs: -L${libdir} -lgmock -lgmock_main
+diff --git a/googletest/CMakeLists.txt b/googletest/CMakeLists.txt
+index 621d0f0..58aaf54 100644
+--- a/googletest/CMakeLists.txt
++++ b/googletest/CMakeLists.txt
+@@ -34,6 +34,9 @@ if (COMMAND pre_project_set_up_hermetic_build)
+   pre_project_set_up_hermetic_build()
+ endif()
+ 
++# pkg-config support
++configure_file("gtest.pc.in" "gtest.pc" @ONLY)
++
+ ########################################################################
+ #
+ # Project-wide settings
+@@ -103,9 +106,11 @@ endif()
+ #
+ # Install rules
+ install(TARGETS gtest gtest_main
+-  DESTINATION lib)
++  DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ install(DIRECTORY ${gtest_SOURCE_DIR}/include/gtest
+-  DESTINATION include)
++  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
++install(FILES "${CMAKE_CURRENT_BINARY_DIR}/gtest.pc"
++  DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig/")
+ 
+ ########################################################################
+ #
+diff --git a/googletest/gtest.pc.in b/googletest/gtest.pc.in
+new file mode 100644
+index 0000000..fb95152
+--- /dev/null
++++ b/googletest/gtest.pc.in
+@@ -0,0 +1,9 @@
++Name: libgtest
++Version: 1.8.0
++Description: Google's framework for writing C++ tests on a variety of platforms
++
++prefix=@CMAKE_INSTALL_PREFIX@
++includedir=@CMAKE_INSTALL_INCLUDEDIR@
++libdir=@CMAKE_INSTALL_LIBDIR@
++Cflags:-I${includedir}/gtest
++Libs: -L${libdir} -lgtest -lgtest_main
+-- 
+1.9.1
+
