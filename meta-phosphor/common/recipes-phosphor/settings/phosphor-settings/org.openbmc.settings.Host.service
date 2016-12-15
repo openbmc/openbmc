@@ -1,8 +1,8 @@
 [Unit]
 Description=Phosphor Settings Manager
 Before=mapper-wait@-org-openbmc-settings-host0.service
-Wants=mapper-wait@-org-openbmc-control-host0.service
-After=mapper-wait@-org-openbmc-control-host0.service
+Wants=obmc-mapper.target
+After=obmc-mapper.target
 
 [Service]
 ExecStart={sbindir}/settings_manager.py
