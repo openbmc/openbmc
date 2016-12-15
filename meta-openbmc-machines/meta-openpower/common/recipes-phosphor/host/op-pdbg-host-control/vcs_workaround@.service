@@ -1,5 +1,7 @@
 [Unit]
-Description=Use pdbg to send putcfam commands to SBE to run workaround
+Description=Run VCS workaround on host%i
+Wants=obmc-host-start-pre@%i.target
+Before=obmc-host-start-pre@%i.target
 Wants=obmc-power-on@%i.target
 After=obmc-power-on@%i.target
 Conflicts=obmc-chassis-stop@%i.target
