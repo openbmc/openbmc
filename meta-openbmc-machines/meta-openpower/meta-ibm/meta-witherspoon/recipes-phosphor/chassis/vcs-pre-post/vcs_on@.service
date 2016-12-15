@@ -1,7 +1,9 @@
 [Unit]
 Description=Turn VCS on
-Wants=vcs_workaround@.service
-After=vcs_workaround@.service
+Wants=vcs_workaround@%i.service
+After=vcs_workaround@%i.service
+Wants=obmc-host-start-pre@%i.target
+Before=obmc-host-start-pre@%i.target
 Conflicts=obmc-chassis-stop@%i.target
 
 [Service]
