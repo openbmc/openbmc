@@ -7,4 +7,6 @@ inherit obmc-phosphor-license
 RDEPENDS_${PN} = " \
     strace \
     ldd \
+    ethtool \
+    mii-diag
     "
