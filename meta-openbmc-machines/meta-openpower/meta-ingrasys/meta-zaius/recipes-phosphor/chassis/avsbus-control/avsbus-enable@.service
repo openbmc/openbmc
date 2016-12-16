@@ -1,0 +1,13 @@
+[Unit]
+Description=Enable AVSBus on VRMs
+Wants=obmc-host-start-pre@%i.target
+Before=obmc-host-start-pre@%i.target
+Conflicts=obmc-chassis-stop@%i.target
+
+[Service]
+ExecStart={bindir}/zaius_avsbus.sh enable
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=obmc-chassis-start@%i.target

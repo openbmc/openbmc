@@ -1,0 +1,13 @@
+[Unit]
+Description=Disable AVSBus on VRMs
+Wants=obmc-power-stop-pre@%i.target
+Before=obmc-power-stop-pre@%i.target
+Conflicts=obmc-chassis-start@%i.target
+
+[Service]
+ExecStart={bindir}/zaius_avsbus.sh disable
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=obmc-chassis-stop@%i.target
