@@ -1,1 +1,410 @@
-# This file is a stub.
+- FRUID: 1
+  Instances:
+    - Instance: /system/chassis/motherboard/cpu/core0
+      Interfaces:
+        - Interface: xyz.openbmc_project.Inventory.Item
+          Properties:
+            - Property: Present
+              DefaultValue: True
+
+        - Interface: xyz.openbmc_project.Inventory.Replaceable
+          Properties:
+            - Property: FieldReplaceable
+              DefaultValue: False
+
+    - Instance: /system/chassis/motherboard/cpu/core1
+      Interfaces:
+        - Interface: xyz.openbmc_project.Inventory.Item
+          Properties:
+            - Property: Present
+              DefaultValue: True
+
+        - Interface: xyz.openbmc_project.Inventory.Replaceable
+          Properties:
+            - Property: FieldReplaceable
+              DefaultValue: False
+
+    - Instance: /system/chassis/motherboard/cpu/core2
+      Interfaces:
+        - Interface: xyz.openbmc_project.Inventory.Item
+          Properties:
+            - Property: Present
+              DefaultValue: True
+
+        - Interface: xyz.openbmc_project.Inventory.Replaceable
+          Properties:
+            - Property: FieldReplaceable
+              DefaultValue: False
+
+    - Instance: /system/chassis/motherboard/cpu/core3
+      Interfaces:
+        - Interface: xyz.openbmc_project.Inventory.Item
+          Properties:
+            - Property: Present
+              DefaultValue: True
+
+        - Interface: xyz.openbmc_project.Inventory.Replaceable
+          Properties:
+            - Property: FieldReplaceable
+              DefaultValue: False
+
+    - Instance: /system/chassis/motherboard/cpu/core4
+      Interfaces:
+        - Interface: xyz.openbmc_project.Inventory.Item
+          Properties:
+            - Property: Present
+              DefaultValue: True
+
+        - Interface: xyz.openbmc_project.Inventory.Replaceable
+          Properties:
+            - Property: FieldReplaceable
+              DefaultValue: False
+
+    - Instance: /system/chassis/motherboard/cpu/core5
+      Interfaces:
+        - Interface: xyz.openbmc_project.Inventory.Item
+          Properties:
+            - Property: Present
+              DefaultValue: True
+
+        - Interface: xyz.openbmc_project.Inventory.Replaceable
+          Properties:
+            - Property: FieldReplaceable
+              DefaultValue: False
+
+    - Instance: /system/chassis/motherboard/cpu/core6
+      Interfaces:
+        - Interface: xyz.openbmc_project.Inventory.Item
+          Properties:
+            - Property: Present
+              DefaultValue: True
+
+        - Interface: xyz.openbmc_project.Inventory.Replaceable
+          Properties:
+            - Property: FieldReplaceable
+              DefaultValue: False
+
+    - Instance: /system/chassis/motherboard/cpu/core7
+      Interfaces:
+        - Interface: xyz.openbmc_project.Inventory.Item
+          Properties:
+            - Property: Present
+              DefaultValue: True
+
+        - Interface: xyz.openbmc_project.Inventory.Replaceable
+          Properties:
+            - Property: FieldReplaceable
+              DefaultValue: False
+
+    - Instance: /system/chassis/motherboard/cpu/core8
+      Interfaces:
+        - Interface: xyz.openbmc_project.Inventory.Item
+          Properties:
+            - Property: Present
+              DefaultValue: True
+
+        - Interface: xyz.openbmc_project.Inventory.Replaceable
+          Properties:
+            - Property: FieldReplaceable
+              DefaultValue: False
+
+    - Instance: /system/chassis/motherboard/cpu/core9
+      Interfaces:
+        - Interface: xyz.openbmc_project.Inventory.Item
+          Properties:
+            - Property: Present
+              DefaultValue: True
+
+        - Interface: xyz.openbmc_project.Inventory.Replaceable
+          Properties:
+            - Property: FieldReplaceable
+              DefaultValue: False
+
+    - Instance: /system/chassis/motherboard/cpu/core10
+      Interfaces:
+        - Interface: xyz.openbmc_project.Inventory.Item
+          Properties:
+            - Property: Present
+              DefaultValue: True
+
+        - Interface: xyz.openbmc_project.Inventory.Replaceable
+          Properties:
+            - Property: FieldReplaceable
+              DefaultValue: False
+
+    - Instance: /system/chassis/motherboard/cpu/core11
+      Interfaces:
+        - Interface: xyz.openbmc_project.Inventory.Item
+          Properties:
+            - Property: Present
+              DefaultValue: True
+
+        - Interface: xyz.openbmc_project.Inventory.Replaceable
+          Properties:
+            - Property: FieldReplaceable
+              DefaultValue: False
+
+    - Instance: /system/chassis/motherboard/cpu
+      Interfaces:
+        - Interface: xyz.openbmc_project.Inventory.Item
+          Properties:
+            - Property: Present
+              DefaultValue: True
+
+        - Interface: xyz.openbmc_project.Inventory.Replaceable
+          Properties:
+            - Property: FieldReplaceable
+              DefaultValue: False
+
+        - Interface: xyz.openbmc_project.Inventory.Asset
+          Properties:
+            - Property: PartNumber
+              Section: BOARD
+              VpdPropertyName: Board Part Number
+            - Property: SerialNumber
+              Section: BOARD
+              VpdPropertyName: Board Serial Number
+            - Property: Manufacturer
+              Section: BOARD
+              VpdPropertyName: Board Manufacturer
+            - Property: BuildDate
+              Section: BOARD
+              VpdPropertyName: Mfg. Date
+
+- FRUID: 2
+  Instances:
+    - Instance: /system/chassis
+      Interfaces:
+        - Interface: xyz.openbmc_project.Inventory.Item
+          Properties:
+            - Property: Present
+              DefaultValue: True
+
+        - Interface: xyz.openbmc_project.Inventory.Replaceable
+          Properties:
+            - Property: FieldReplaceable
+              DefaultValue: False
+
+        - Interface: xyz.openbmc_project.Inventory.Asset
+          Properties:
+            - Property: PartNumber
+              Section: BOARD
+              VpdPropertyName: Board Part Number
+            - Property: SerialNumber
+              Section: BOARD
+              VpdPropertyName: Board Serial Number
+
+    - Instance: /system/chassis/motherboard/membuf
+      Interfaces:
+        - Interface: xyz.openbmc_project.Inventory.Item
+          Properties:
+            - Property: Present
+              DefaultValue: True
+
+        - Interface: xyz.openbmc_project.Inventory.Replaceable
+          Properties:
+            - Property: FieldReplaceable
+              DefaultValue: False
+
+        - Interface: xyz.openbmc_project.Inventory.Asset
+          Properties:
+            - Property: PartNumber
+              Section: BOARD
+              VpdPropertyName: Board Part Number
+            - Property: SerialNumber
+              Section: BOARD
+              VpdPropertyName: Board Serial Number
+            - Property: Manufacturer
+              Section: BOARD
+              VpdPropertyName: Board Manufacturer
+            - Property: BuildDate
+              Section: BOARD
+
+- FRUID: 3
+  Instances:
+    - Instance: /system/chassis/motherboard/dimm0
+      Interfaces:
+        - Interface: xyz.openbmc_project.Inventory.Item
+          Properties:
+            - Property: Present
+              DefaultValue: True
+
+        - Interface: xyz.openbmc_project.Inventory.Replaceable
+          Properties:
+            - Property: FieldReplaceable
+              DefaultValue: False
+
+        - Interface: xyz.openbmc_project.Inventory.Asset
+          Properties:
+            - Property: PartNumber
+              Section: PRODUCT
+              VpdPropertyName: Board Part Number
+            - Property: SerialNumber
+              Section: PRODUCT
+              VpdPropertyName: Board Serial Number
+            - Property: Manufacturer
+              Section: PRODUCT
+              VpdPropertyName: Board Manufacturer
+
+        - Interface: xyz.openbmc_project.Inventory.Revision
+          Properties:
+            - Property: Version
+              Section: PRODUCT
+              VpdPropertyName: Product Version
+
+- FRUID: 4
+  Instances:
+    - Instance: /system/chassis/motherboard/dimm1
+      Interfaces:
+        - Interface: xyz.openbmc_project.Inventory.Item
+          Properties:
+            - Property: Present
+              DefaultValue: True
+
+        - Interface: xyz.openbmc_project.Inventory.Replaceable
+          Properties:
+            - Property: FieldReplaceable
+              DefaultValue: False
+
+        - Interface: xyz.openbmc_project.Inventory.Asset
+          Properties:
+            - Property: PartNumber
+              Section: PRODUCT
+              VpdPropertyName: Board Part Number
+            - Property: SerialNumber
+              Section: PRODUCT
+              VpdPropertyName: Board Serial Number
+            - Property: Manufacturer
+              Section: PRODUCT
+              VpdPropertyName: Board Manufacturer
+
+        - Interface: xyz.openbmc_project.Inventory.Revision
+          Properties:
+            - Property: Version
+              Section: PRODUCT
+              VpdPropertyName: Product Version
+
+- FRUID: 5
+  Instances:
+    - Instance: /system/chassis/motherboard/dimm2
+      Interfaces:
+        - Interface: xyz.openbmc_project.Inventory.Item
+          Properties:
+            - Property: Present
+              DefaultValue: True
+
+        - Interface: xyz.openbmc_project.Inventory.Replaceable
+          Properties:
+            - Property: FieldReplaceable
+              DefaultValue: False
+
+        - Interface: xyz.openbmc_project.Inventory.Asset
+          Properties:
+            - Property: PartNumber
+              Section: PRODUCT
+              VpdPropertyName: Board Part Number
+            - Property: SerialNumber
+              Section: PRODUCT
+              VpdPropertyName: Board Serial Number
+            - Property: Manufacturer
+              Section: PRODUCT
+              VpdPropertyName: Board Manufacturer
+
+        - Interface: xyz.openbmc_project.Inventory.Revision
+          Properties:
+            - Property: Version
+              Section: PRODUCT
+              VpdPropertyName: Product Version
+
+- FRUID: 6
+  Instances:
+    - Instance: /system/chassis/motherboard/dimm3
+      Interfaces:
+        - Interface: xyz.openbmc_project.Inventory.Item
+          Properties:
+            - Property: Present
+              DefaultValue: True
+
+        - Interface: xyz.openbmc_project.Inventory.Replaceable
+          Properties:
+            - Property: FieldReplaceable
+              DefaultValue: False
+
+        - Interface: xyz.openbmc_project.Inventory.Asset
+          Properties:
+            - Property: PartNumber
+              Section: PRODUCT
+              VpdPropertyName: Board Part Number
+            - Property: SerialNumber
+              Section: PRODUCT
+              VpdPropertyName: Board Serial Number
+            - Property: Manufacturer
+              Section: PRODUCT
+              VpdPropertyName: Board Manufacturer
+
+        - Interface: xyz.openbmc_project.Inventory.Revision
+          Properties:
+            - Property: Version
+              Section: PRODUCT
+              VpdPropertyName: Product Version
+
+- FRUID: 14
+  Instances:
+    - Instance: /system/chassis/motherboard
+      Interfaces:
+        - Interface: xyz.openbmc_project.Inventory.Item
+          Properties:
+            - Property: Present
+              DefaultValue: True
+
+        - Interface: xyz.openbmc_project.Inventory.Replaceable
+          Properties:
+            - Property: FieldReplaceable
+              DefaultValue: False
+
+        - Interface: xyz.openbmc_project.Inventory.Asset
+          Properties:
+            - Property: PartNumber
+              Section: BOARD
+              VpdPropertyName: Board Part Number
+            - Property: SerialNumber
+              Section: BOARD
+              VpdPropertyName: Board Serial Number
+            - Property: Manufacturer
+              Section: BOARD
+              VpdPropertyName: Board Manufacturer
+            - Property: BuildDate
+              Section: BOARD
+              VpdPropertyName: Mfg. Date
+
+- FRUID: 15
+  Instances:
+    - Instance: /system
+      Interfaces:
+        - Interface: xyz.openbmc_project.Inventory.Item
+          Properties:
+            - Property: Present
+              DefaultValue: True
+
+        - Interface: xyz.openbmc_project.Inventory.Replaceable
+          Properties:
+            - Property: FieldReplaceable
+              DefaultValue: False
+
+        - Interface: xyz.openbmc_project.Inventory.Asset
+          Properties:
+            - Property: PartNumber
+              Section: PRODUCT
+              VpdPropertyName: Board Part Number
+            - Property: SerialNumber
+              Section: PRODUCT
+              VpdPropertyName: Board Serial Number
+            - Property: Manufacturer
+              Section: PRODUCT
+              VpdPropertyName: Board Manufacturer
+
+        - Interface: xyz.openbmc_project.Inventory.Revision
+          Properties:
+            - Property: Version
+              Section: PRODUCT
+              VpdPropertyName: Product Version
