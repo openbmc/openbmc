@@ -1,0 +1,446 @@
+- FRUID: 1
+  Deviceinstances:
+    - Instance: core0
+      ObjectPath: /system/chassis/motherboard/cpu/core0
+      type: CORE
+      Properties:
+        - Property: Present
+          Interface: xyz.openbmc_project.Inventory.Item
+          ObjectPath: /system/chassis/motherboard/cpu/core0
+          DefaultValue: True
+        - Property: FieldReplaceable
+          Interface: xyz.openbmc_project.Inventory.Replaceable
+          ObjectPath: /system/chassis/motherboard/cpu/core0
+          DefaultValue: False
+    - Instance: core1
+      ObjectPath: /system/chassis/motherboard/cpu/core1
+      type: CORE
+      Properties:
+        - Property: Present
+          Interface: xyz.openbmc_project.Inventory/Item
+          ObjectPath: /system/chassis/motherboard/cpu/core1
+          DefaultValue: True
+        - Property: FieldReplaceable
+          Interface: xyz.openbmc_project.Inventory/Replaceable
+          ObjectPath: /system/chassis/motherboard/cpu/core1
+          DefaultValue: False
+    - Instance: core2
+      ObjectPath: /system/chassis/motherboard/cpu/core2
+      type: CORE
+      Properties:
+        - Property: Present
+          Interface: xyz.openbmc_project.Inventory/Item
+          ObjectPath: /system/chassis/motherboard/cpu/core2
+          DefaultValue: True
+        - Property: FieldReplaceable
+          Interface: xyz.openbmc_project.Inventory/Replaceable
+          ObjectPath: /system/chassis/motherboard/cpu/core2
+          DefaultValue: False
+    - Instance: core3
+      ObjectPath: /system/chassis/motherboard/cpu/core3
+      type: CORE
+      Properties:
+        - Property: Present
+          Interface: xyz.openbmc_project.Inventory/Item
+          ObjectPath: /system/chassis/motherboard/cpu/core3
+          DefaultValue: True
+        - Property: FieldReplaceable
+          Interface: xyz.openbmc_project.Inventory/Replaceable
+          ObjectPath: /system/chassis/motherboard/cpu/core3
+          DefaultValue: False
+    - Instance: core4
+      ObjectPath: /system/chassis/motherboard/cpu/core4
+      type: CORE
+      Properties:
+        - Property: Present
+          Interface: xyz.openbmc_project.Inventory/Item
+          ObjectPath: /system/chassis/motherboard/cpu/core4
+          DefaultValue: True
+        - Property: FieldReplaceable
+          Interface: xyz.openbmc_project.Inventory/Replaceable
+          ObjectPath: /system/chassis/motherboard/cpu/core4
+          DefaultValue: False
+    - Instance: core5
+      ObjectPath: /system/chassis/motherboard/cpu/core5
+      type: CORE
+      Properties:
+        - Property: Present
+          Interface: xyz.openbmc_project.Inventory/Item
+          ObjectPath: /system/chassis/motherboard/cpu/core5
+          DefaultValue: True
+        - Property: FieldReplaceable
+          Interface: xyz.openbmc_project.Inventory/Replaceable
+          ObjectPath: /system/chassis/motherboard/cpu/core5
+          DefaultValue: False
+    - Instance: core6
+      ObjectPath: /system/chassis/motherboard/cpu/core6
+      type: CORE
+      Properties:
+        - Property: Present
+          Interface: xyz.openbmc_project.Inventory/Item
+          ObjectPath: /system/chassis/motherboard/cpu/core6
+          DefaultValue: True
+        - Property: FieldReplaceable
+          Interface: xyz.openbmc_project.Inventory/Replaceable
+          ObjectPath: /system/chassis/motherboard/cpu/core6
+          DefaultValue: False
+    - Instance: core7
+      ObjectPath: /system/chassis/motherboard/cpu/core7
+      type: CORE
+      Properties:
+        - Property: Present
+          Interface: xyz.openbmc_project.Inventory/Item
+          ObjectPath: /system/chassis/motherboard/cpu/core7
+          DefaultValue: True
+        - Property: FieldReplaceable
+          Interface: xyz.openbmc_project.Inventory/Replaceable
+          ObjectPath: /system/chassis/motherboard/cpu/core7
+          DefaultValue: False
+    - Instance: core8
+      ObjectPath: /system/chassis/motherboard/cpu/core8
+      type: CORE
+      Properties:
+        - Property: Present
+          Interface: xyz.openbmc_project.Inventory/Item
+          ObjectPath: /system/chassis/motherboard/cpu/core8
+          DefaultValue: True
+        - Property: FieldReplaceable
+          Interface: xyz.openbmc_project.Inventory/Replaceable
+          ObjectPath: /system/chassis/motherboard/cpu/core8
+          DefaultValue: False
+    - Instance: core9
+      ObjectPath: /system/chassis/motherboard/cpu/core9
+      type: CORE
+      Properties:
+        - Property: Present
+          Interface: xyz.openbmc_project.Inventory/Item
+          ObjectPath: /system/chassis/motherboard/cpu/core9
+          DefaultValue: True
+        - Property: FieldReplaceable
+          Interface: xyz.openbmc_project.Inventory/Replaceable
+          ObjectPath: /system/chassis/motherboard/cpu/core9
+          DefaultValue: False
+    - Instance: core10
+      ObjectPath: /system/chassis/motherboard/cpu/core10
+      type: CORE
+      Properties:
+        - Property: Present
+          Interface: xyz.openbmc_project.Inventory/Item
+          ObjectPath: /system/chassis/motherboard/cpu/core10
+          DefaultValue: True
+        - Property: FieldReplaceable
+          Interface: xyz.openbmc_project.Inventory/Replaceable
+          ObjectPath: /system/chassis/motherboard/cpu/core10
+          DefaultValue: False
+    - Instance: core11
+      ObjectPath: /system/chassis/motherboard/cpu/core11
+      type: CORE
+      Properties:
+        - Property: Present
+          Interface: xyz.openbmc_project.Inventory/Item
+          ObjectPath: /system/chassis/motherboard/cpu/core11
+          DefaultValue: True
+        - Property: FieldReplaceable
+          Interface: xyz.openbmc_project.Inventory/Replaceable
+          ObjectPath: /system/chassis/motherboard/cpu/core11
+          DefaultValue: False
+  FRUInfo:
+     FRUType: cpu
+     ObjectPath: /system/chassis/motherboard/cpu
+  Properties: 
+    - Property: PartNumber
+      Interface: xyz.openbmc_project.Inventory/Asset
+      ObjectPath: /system/chassis/motherboard/cpu
+      Section: BOARD
+      VpdPropertyName: Board Part Number
+    - Property: SerialNumber
+      Interface: xyz.openbmc_project.Inventory/Asset
+      ObjectPath: /system/chassis/motherboard/cpu
+      Section: BOARD
+      VpdPropertyName: Board Serial Number
+    - Property: Manufacturer
+      Interface: xyz.openbmc_project.Inventory/Asset
+      ObjectPath: /system/chassis/motherboard/cpu
+      Section: BOARD
+      VpdPropertyName: Board Manufacturer
+    - Property: BuildDate
+      Interface: xyz.openbmc_project.Inventory/Asset
+      ObjectPath: /system/chassis/motherboard/cpu
+      Section: BOARD
+      VpdPropertyName: Mfg. Date
+    - Property: FieldReplaceable
+      Interface: xyz.openbmc_project.Inventory/Replaceable
+      ObjectPath: /system/chassis/motherboard/cpu
+      DefaultValue: True
+    - Property: Present
+      Interface: xyz.openbmc_project.Inventory/Item
+      ObjectPath: /system/chassis/motherboard/cpu
+      DefaultValue: True
+
+ 
+- FRUID: 2
+  Deviceinstances:
+    - Instance: chassis
+      ObjectPath: /system/chassis
+      type: CHASSIS
+      Properties:
+        - Property: PartNumber
+          Interface: xyz.openbmc_project.Inventory/Asset
+          ObjectPath: /system/chassis
+          Section: CHASSIS
+          VpdPropertyName: Chassis Part Number 
+        - Property: SerialNumber
+          Interface: xyz.openbmc_project.Inventory/Asset
+          ObjectPath: /system/chassis
+          Section: CHASSIS
+          VpdPropertyName: Chassis Serial Number
+        - Property: Present
+          Interface: xyz.openbmc_project.Inventory/Item
+          ObjectPath: /system/chassis
+          DefaultValue: True
+        - Property: FieldReplaceable
+          Interface: xyz.openbmc_project.Inventory/Replaceable
+          ObjectPath: /system/chassis
+          DefaultValue: False
+  FRUInfo:
+     FRUType: MEMBUFF
+     ObjectPath: /system/chassis/motherboard/membuf
+  Properties:
+    - Property: PartNumber
+      Interface: xyz.openbmc_project.Inventory/Asset
+      ObjectPath: /system/chassis/motherboard/membuf
+      Section: BOARD
+      VpdPropertyName: Board Part Number
+    - Property: SerialNumber
+      Interface: xyz.openbmc_project.Inventory/Asset
+      ObjectPath: /system/chassis/motherboard/membuf
+      Section: BOARD
+      VpdPropertyName: Board Serial Number
+    - Property: Manufacturer
+      Interface: xyz.openbmc_project.Inventory/Asset
+      ObjectPath: /system/chassis/motherboard/membuf
+      Section: BOARD
+      VpdPropertyName: Board Manufacturer
+    - Property: BuildDate
+      Interface: xyz.openbmc_project.Inventory/Asset
+      ObjectPath: /system/chassis/motherboard/membuf
+      Section: BOARD
+      VpdPropertyName: Mfg. Date
+    - Property: FieldReplaceable
+      Interface: xyz.openbmc_project.Inventory/Replaceable
+      ObjectPath: /system/chassis/motherboard/membuf
+      DefaultValue: True
+    - Property: Present
+      Interface: xyz.openbmc_project.Inventory/Item
+      ObjectPath: /system/chassis/motherboard/membuf
+      DefaultValue: True
+
+
+- FRUID: 3
+  Deviceinstances:
+  FRUInfo:
+     FRUType: DIMM
+     ObjectPath: /system/chassis/motherboard/dimm0
+  Properties:
+    - Property: PartNumber
+      Interface: xyz.openbmc_project.Inventory/Asset
+      ObjectPath: /system/chassis/motherboard/dimm0
+      Section: PRODUCT
+      VpdPropertyName: Product Part Number
+    - Property: SerialNumber
+      Interface: xyz.openbmc_project.Inventory/Asset
+      ObjectPath: /system/chassis/motherboard/dimm0
+    - Property: Manufacturer
+      Interface: xyz.openbmc_project.Inventory/Asset
+      ObjectPath: /system/chassis/motherboard/dimm0
+      Section: PRODUCT
+      VpdPropertyName: Manufacturer Name
+    - Property: Version
+      Interface: xyz.openbmc_project.Inventory/Revision
+      ObjectPath: /system/chassis/motherboard/dimm0
+      Section: PRODUCT
+      VpdPropertyName: Product Version
+    - Property: FieldReplaceable
+      Interface: xyz.openbmc_project.Inventory/Replaceable
+      ObjectPath: /system/chassis/motherboard/dimm0
+      DefaultValue: True
+    - Property: Present
+      Interface: xyz.openbmc_project.Inventory/Item
+      ObjectPath: /system/chassis/motherboard/dimm0
+      DefaultValue: True
+      
+- FRUID: 4
+  Deviceinstances:
+  FRUInfo:
+     FRUType: DIMM
+     ObjectPath: /system/chassis/motherboard/dimm1
+  Properties:
+    - Property: PartNumber
+      Interface: xyz.openbmc_project.Inventory/Asset
+      ObjectPath: /system/chassis/motherboard/dimm1
+      Section: PRODUCT
+      VpdPropertyName: Product Part Number 
+    - Property: SerialNumber
+      Interface: xyz.openbmc_project.Inventory/Asset
+      ObjectPath: /system/chassis/motherboard/dimm1
+      Section: PRODUCT
+      VpdPropertyName: Product Serial Number
+    - Property: Manufacturer
+      Interface: xyz.openbmc_project.Inventory/Asset
+      ObjectPath: /system/chassis/motherboard/dimm1
+      Section: PRODUCT
+      VpdPropertyName: Manufacturer Name
+    - Property: Version
+      Interface: xyz.openbmc_project.Inventory/Revision
+      ObjectPath: /system/chassis/motherboard/dimm1
+      Section: PRODUCT
+      VpdPropertyName: Product Version
+    - Property: FieldReplaceable
+      Interface: xyz.openbmc_project.Inventory/Replaceable
+      ObjectPath: /system/chassis/motherboard/dimm1
+      DefaultValue: True
+    - Property: Present
+      Interface: xyz.openbmc_project.Inventory/Item
+      ObjectPath: /system/chassis/motherboard/dimm1
+      DefaultValue: True
+
+- FRUID: 5
+  Deviceinstances:
+  FRUInfo:
+     FRUType: DIMM
+     ObjectPath: /system/chassis/motherboard/dimm2
+  Properties:
+    - Property: PartNumber
+      Interface: xyz.openbmc_project.Inventory/Asset
+      ObjectPath: /system/chassis/motherboard/dimm2
+      Section: PRODUCT
+      VpdPropertyName: Product Part Number
+    - Property: SerialNumber
+      Interface: xyz.openbmc_project.Inventory/Asset
+      ObjectPath: /system/chassis/motherboard/dimm2
+      Section: PRODUCT
+      VpdPropertyName: Product Serial Number
+    - Property: Manufacturer
+      Interface: xyz.openbmc_project.Inventory/Asset
+      ObjectPath: /system/chassis/motherboard/dimm2
+      Section: PRODUCT
+      VpdPropertyName: Manufacturer Name
+    - Property: Version
+      Interface: xyz.openbmc_project.Inventory/Revision
+      ObjectPath: /system/chassis/motherboard/dimm2
+      Section: PRODUCT
+      VpdPropertyName: Product Version
+    - Property: FieldReplaceable
+      Interface: xyz.openbmc_project.Inventory/Replaceable
+      ObjectPath: /system/chassis/motherboard/dimm2
+      DefaultValue: True
+    - Property: Present
+      Interface: xyz.openbmc_project.Inventory/Item
+      ObjectPath: /system/chassis/motherboard/dimm2
+      DefaultValue: True
+
+- FRUID: 6
+  Deviceinstances:
+  FRUInfo:
+     FRUType: DIMM
+     ObjectPath: /system/chassis/motherboard/dimm3
+  Properties:
+    - Property: PartNumber
+      Interface: xyz.openbmc_project.Inventory/Asset
+      ObjectPath: /system/chassis/motherboard/dimm3
+      Section: PRODUCT
+      VpdPropertyName: Product Part Number
+    - Property: SerialNumber
+      Interface: xyz.openbmc_project.Inventory/Asset
+      ObjectPath: /system/chassis/motherboard/dimm3
+      Section: PRODUCT
+      VpdPropertyName: Product Serial Number
+    - Property: Manufacturer
+      Interface: xyz.openbmc_project.Inventory/Asset
+      ObjectPath: /system/chassis/motherboard/dimm3
+      Section: PRODUCT
+      VpdPropertyName: Manufacturer Name
+    - Property: Version
+      Interface: xyz.openbmc_project.Inventory/Revision
+      ObjectPath: /system/chassis/motherboard/dimm3
+      Section: PRODUCT
+      VpdPropertyName: Product Version
+    - Property: FieldReplaceable
+      Interface: xyz.openbmc_project.Inventory/Replaceable
+      ObjectPath: /system/chassis/motherboard/dimm3
+      DefaultValue: True
+    - Property: Present
+      Interface: xyz.openbmc_project.Inventory/Item
+      ObjectPath: /system/chassis/motherboard/dimm3
+      DefaultValue: True
+
+- FRUID: 14
+  Deviceinstances:
+  FRUInfo:
+     FRUType: MAIN_PLANAR
+     ObjectPath: /system/chassis/motherboard
+  Properties:
+    - Property: PartNumber
+      Interface: xyz.openbmc_project.Inventory/Asset
+      ObjectPath: /system/chassis/motherboard
+      Section: BOARD
+      VpdPropertyName: Board Part Number
+    - Property: SerialNumber
+      Interface: xyz.openbmc_project.Inventory/Asset
+      ObjectPath: /system/chassis/motherboard
+      Section: BOARD
+      VpdPropertyName: Board Serial Number
+    - Property: Manufacturer
+      Interface: xyz.openbmc_project.Inventory/Asset
+      ObjectPath: /system/chassis/motherboard
+      Section: BOARD
+      VpdPropertyName: Board Manufacturer
+    - Property: BuildDate
+      Interface: xyz.openbmc_project.Inventory/Asset
+      ObjectPath: /system/chassis/motherboard
+      Section: BOARD
+      VpdPropertyName: Mfg. Date
+    - Property: FieldReplaceable
+      Interface: xyz.openbmc_project.Inventory/Replaceable
+      ObjectPath: /system/chassis/motherboard
+      DefaultValue: True
+    - Property: Present
+      Interface: xyz.openbmc_project.Inventory/Item
+      ObjectPath: /system/chassis/motherboard
+      DefaultValue: True
+
+- FRUID: 15
+  Deviceinstances:
+  FRUInfo:
+     FRUType: system
+     ObjectPath: /system
+  Properties:
+    - Property: PartNumber
+      Interface: xyz.openbmc_project.Inventory/Asset
+      ObjectPath: /system
+      Section: PRODUCT
+      VpdPropertyName: Product Part Number
+    - Property: SerialNumber
+      Interface: xyz.openbmc_project.Inventory/Asset
+      ObjectPath: /system
+      Section: PRODUCT
+      VpdPropertyName: Product Serial Number
+    - Property: Manufacturer
+      Interface: xyz.openbmc_project.Inventory/Asset
+      ObjectPath: /system
+      Section: PRODUCT
+      VpdPropertyName: Manufacturer Name
+    - Property: Version
+      Interface: xyz.openbmc_project.Inventory/Revision
+      ObjectPath: /system
+      Section: PRODUCT
+      VpdPropertyName: Product Version
+    - Property: FieldReplaceable
+      Interface: xyz.openbmc_project.Inventory/Replaceable
+      ObjectPath: /system/chassis/motherboard
+      DefaultValue: True
+    - Property: Present
+      Interface: xyz.openbmc_project.Inventory/Item
+      ObjectPath: /system/chassis/motherboard
+      DefaultValue: True
+
