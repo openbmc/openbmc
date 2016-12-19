@@ -4,9 +4,9 @@ LIC_FILES_CHKSUM = "file://Licenses/README;md5=a2c678cfd4a4d97135585cad908541c6"
 SECTION = "bootloader"
 DEPENDS = "mtd-utils"
 
-SRCREV = "f9b2a49f57c153c7358f9769234c0cefdf4de8d4"
+SRCREV = "aa7a90f2ff1e807e057c6dbb0d0c579174c75acc"
 UBRANCH = "v2016.07-aspeed-openbmc"
-SRC_URI = "git://git@github.com/openbmc/u-boot.git;branch=${UBRANCH};protocol=https"
+SRC_URI = "git://git@github.com/shenki/u-boot.git;branch=${UBRANCH};protocol=https"
 
 PV = "v2016.07+git${SRCPV}"
 
