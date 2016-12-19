@@ -35,7 +35,7 @@ ON_TMPL = "op-wait-power-on@.service"
 ON_INSTFMT = "op-wait-power-on@{0}.service"
 ON_FMT = "../${ON_TMPL}:${START_TGTFMT}.wants/${ON_INSTFMT}"
 
-OFF_TMPL = "op-wait-ppower-off@.service"
+OFF_TMPL = "op-wait-power-off@.service"
 OFF_INSTFMT = "op-wait-power-off@{0}.service"
 OFF_FMT = "../${OFF_TMPL}:${STOP_TGTFMT}.wants/${OFF_INSTFMT}"
 
