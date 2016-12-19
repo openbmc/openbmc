@@ -1,0 +1,5 @@
+[Unit]
+Description=Power%i Host Off
+Wants={SYSTEMD_DEFAULT_TARGET}
+RefuseManualStart=yes
+RefuseManualStop=yes
