@@ -63,4 +63,5 @@ SUMMARY_${PN}-system = "OpenPOWER System"
 RDEPENDS_${PN}-system = " \
         obmc-mgr-system \
         obmc-mgr-state \
+        op-soft-poweroff \
         "
