@@ -24,15 +24,19 @@ do_install() {
 }
 
 TMPL_OFF = "vcs_off@.service"
+TMPL_OFF_PO = "vcs_off_poweroff@.service"
 TMPL_ON = "vcs_on@.service"
 TMPL_UCD = "ucd_disable_vcs@.service"
 INSTFMT_OFF = "vcs_off@{0}.service"
+INSTFMT_OFF_PO = "vcs_off_poweroff@{0}.service"
 INSTFMT_ON = "vcs_on@{0}.service"
 INSTFMT_UCD = "ucd_disable_vcs@{0}.service"
 TGTFMT = "obmc-chassis-start@{0}.target"
+TGTFMT_STOP= "obmc-chassis-stop@{0}.target"
 FMT_OFF = "../${TMPL_OFF}:${TGTFMT}.wants/${INSTFMT_OFF}"
 FMT_ON = "../${TMPL_ON}:${TGTFMT}.wants/${INSTFMT_ON}"
 FMT_UCD = "../${TMPL_UCD}:${TGTFMT}.wants/${INSTFMT_UCD}"
+FMT_OFF_PO = "../${TMPL_OFF_PO}:${TGTFMT_STOP}.wants/${INSTFMT_OFF_PO}"
 
 SYSTEMD_SERVICE_${PN} += "${TMPL_OFF}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_OFF', 'OBMC_CHASSIS_INSTANCES')}"
@@ -40,4 +44,6 @@ SYSTEMD_SERVICE_${PN} += "${TMPL_ON}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_ON', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_SERVICE_${PN} += "${TMPL_UCD}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_UCD', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_SERVICE_${PN} += "${TMPL_OFF_PO}"
+SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_OFF_PO', 'OBMC_CHASSIS_INSTANCES')}"
 

@@ -1,0 +1,13 @@
+[Unit]
+Description=Disable VCS on a power off
+Wants=op-wait-power-off@%i.service
+After=op-wait-power-off@%i.service
+Conflicts=obmc-chassis-start@%i.target
+
+[Service]
+ExecStart={bindir}/vcs_off.sh
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=obmc-chassis-stop@%i.target
