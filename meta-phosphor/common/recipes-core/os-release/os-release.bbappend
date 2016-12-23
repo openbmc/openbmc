@@ -20,4 +20,4 @@ python() {
 
 OS_RELEASE_FIELDS_append = " BUILD_ID"
 do_compile[nostamp] = "1"
-do_compile_remove[vardeps] = "BUILD_ID VERSION VERSION_ID"
+do_compile[vardepsexclude] = "BUILD_ID VERSION VERSION_ID NAME PRETTY_NAME"
