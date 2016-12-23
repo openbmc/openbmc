@@ -5,6 +5,7 @@ Wants=obmc-console@{OBMC_CONSOLE_HOST_TTY}.service
 [Socket]
 ListenStream=2200
 Accept=yes
+ReusePort=true
 
 [Install]
 WantedBy=sockets.target
