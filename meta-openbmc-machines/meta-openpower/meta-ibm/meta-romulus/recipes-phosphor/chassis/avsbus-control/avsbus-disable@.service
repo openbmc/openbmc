@@ -1,0 +1,14 @@
+[Unit]
+Description=Disable the AVS bus on the VRMs
+Wants=avsbus-workaround@%i.service
+After=avsbus-workaround@%i.service
+Before=vrm-control@%i.service
+Conflicts=obmc-chassis-stop@%i.target
+
+[Service]
+ExecStart={bindir}/avsbus-disable.sh
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=obmc-chassis-start@%i.target
