@@ -9,8 +9,6 @@ inherit autotools pkgconfig
 inherit obmc-phosphor-license
 inherit obmc-phosphor-sdbus-service
 
-TARGET_CFLAGS   += "-fpic"
-
 DEPENDS += "phosphor-mapper"
 DEPENDS += "autoconf-archive-native"
 RDEPENDS_${PN}-dev += "phosphor-mapper-dev"
