@@ -1,0 +1,15 @@
+[Unit]
+Description=Run VCS workaround on host%i
+Wants=obmc-host-start-pre@%i.target
+Before=obmc-host-start-pre@%i.target
+Wants=avsbus-enable@%i.service
+After=avsbus-enable@%i.service
+Conflicts=obmc-chassis-stop@%i.target
+
+[Service]
+ExecStart={bindir}/vcs_workaround.sh {MACHINE}
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=obmc-chassis-start@%i.target
