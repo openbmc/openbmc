@@ -1,0 +1,12 @@
+[Unit]
+Description=Soft power off of the host
+
+[Service]
+Restart=no
+Type=oneshot
+RemainAfterExit=yes
+ExecStart={sbindir}/mapper call /org/openbmc/HostServices org.openbmc.HostServices SoftPowerOff
+Environment="PYTHONUNBUFFERED=1"
+
+[Install]
+WantedBy=obmc-stop-host@%i.target
