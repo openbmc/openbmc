@@ -3,5 +3,6 @@ Description=Host%i (Started)
 Wants={SYSTEMD_DEFAULT_TARGET}
 After=obmc-host-start@%i.target
 Conflicts=obmc-chassis-stop@%i.target
+Conflicts=obmc-stop-host@%i.target
 RefuseManualStart=yes
 RefuseManualStop=yes
