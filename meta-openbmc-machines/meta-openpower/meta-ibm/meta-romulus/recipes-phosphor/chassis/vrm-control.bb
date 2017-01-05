@@ -8,10 +8,12 @@ inherit obmc-phosphor-license
 RDEPENDS_${PN} += "i2c-tools bash"
 
 S = "${WORKDIR}"
-SRC_URI += "file://vrm-control.sh"
+SRC_URI += "file://vrm-control.sh \
+            file://vrm.sh"
 
 do_install() {
         install -d ${D}${bindir}
+        install -m 0755 ${WORKDIR}/vrm.sh ${D}${bindir}/vrm.sh
         install -m 0755 ${WORKDIR}/vrm-control.sh ${D}${bindir}/vrm-control.sh
 }
 
