@@ -1,6 +1,6 @@
 #!/bin/bash
 # #########################################################
-# Script to run on BMC to read/set vrm voltages
+# Script to run on Romulus BMC to read/set vrm voltages
 
 
 # #########################################################
@@ -84,14 +84,14 @@ fi
 
 if [ -e $1 ]
 then
-  $0 vdda vcsa vdna vioa vddra vddb vcsb vdnb viob vddrb
+  $0 vdda vcsa vdna vioa vddb vcsb vdnb viob
   exit
 fi
 
 if [ $1 == "-h" ]
 then
   echo "  Usage: vrm [<rail>=[value] [<rail>=[value]] ...]"
-  echo "    rail: vdda vcsa vdna vioa vddra vddb vcsb vdnb viob vddrb"
+  echo "    rail: vdda vcsa vdna vioa vddb vcsb vdnb viob"
   echo "    value: volts"
   echo
   echo "    e.g., vrm vioa=1.0 viob=1.0"
@@ -107,7 +107,6 @@ do
   val=`echo ${param}= | cut -d'=' -f 2`
   echo -n "$rail"
   case "$rail" in
-  # FIXME: What's the addresses for Romulus?
     vdda)
       rw_vc 4 0x70 2 0 $val
       ;;
@@ -131,12 +130,6 @@ do
       ;;
     viob)
       rw_vc 5 0x73 2 1 $val
-      ;;
-    vddra)
-      rw_vc 4 0x72 2 1 $val  # This is wrong
-      ;;
-    vddrb)
-      rw_vc 5 0x72 2 1 $val  # This is wrong
       ;;
     *)
       echo "	non-existant"
