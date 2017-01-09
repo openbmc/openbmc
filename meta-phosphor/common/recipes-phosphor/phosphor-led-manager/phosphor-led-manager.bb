@@ -16,6 +16,7 @@ DEPENDS += "systemd"
 RDEPENDS_${PN} += "libsystemd"
 PROVIDES += "virtual/obmc-led-group-mgmt"
 RPROVIDES_${PN} += "virtual-obmc-led-group-mgmt"
+RRECOMMENDS_${PN} += "virtual-obmc-led-controller"
 
 SRC_URI += "git://github.com/openbmc/phosphor-led-manager"
 SRCREV = "447d0c8e89f3dbd6cafcfb81134a1551984a5ddd"
