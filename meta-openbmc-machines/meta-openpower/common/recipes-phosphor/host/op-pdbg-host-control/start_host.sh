@@ -7,7 +7,7 @@ DEVICE_OPT=${1:+-d $1}
 
 putcfam()
 {
-    $PDBG -b fsi $DEVICE_OPT putcfam $1 $2 $3
+    $PDBG -p0 -b fsi $DEVICE_OPT putcfam $1 $2 $3
 }
 
 putcfam 0x283f 0x20000000             # Write scratch register 8
