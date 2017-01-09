@@ -5,8 +5,8 @@
 MACHINE_EXTRA_RRECOMMENDS = " kernel-modules"
 EXTRA_IMAGEDEPENDS += "u-boot"
 
-KERNEL_CLASSES ?= "kernel-uimage kernel-cuimage kernel-fitimage"
-KERNEL_IMAGETYPES ?= "cuImage fitImage"
+KERNEL_CLASSES ?= "kernel-fitimage"
+KERNEL_IMAGETYPES ?= "fitImage"
 KERNEL_EXTRA_ARGS += "LOADADDR=${UBOOT_ENTRYPOINT}"
 
 UBOOT_SUFFIX ?= "bin"
