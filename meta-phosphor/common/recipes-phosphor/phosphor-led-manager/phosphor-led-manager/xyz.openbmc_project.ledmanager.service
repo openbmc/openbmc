@@ -1,0 +1,12 @@
+[Unit]
+Description=Phosphor LED Group Management Daemon
+Before=mapper-wait@-xyz-openbmc_project-ledmanager-groups.service
+
+[Service]
+Restart=always
+ExecStart={sbindir}/phosphor-ledmanager
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
