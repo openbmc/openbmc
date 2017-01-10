@@ -12,6 +12,7 @@
 # - obmc-phosphor-system-mgmt         - Phosphor OpenBMC system management
 # - obmc-host-ipmi                    - OpenBMC Host IPMI
 # - obmc-logging                      - OpenBMC logging management
+# - obmc-state-mgmt                   - OpenBMC state management
 
 inherit core-image
 inherit obmc-phosphor-license
@@ -28,6 +29,7 @@ FEATURE_PACKAGES_obmc-system-mgmt ?= "${@df_enabled('obmc-phosphor-system-mgmt',
 FEATURE_PACKAGES_obmc-host-ipmi ?= "${@cf_enabled('obmc-host-ipmi', 'virtual-obmc-host-ipmi-hw', d)}"
 FEATURE_PACKAGES_obmc-logging-mgmt ?= "${@cf_enabled('obmc-logging-mgmt', 'virtual-obmc-logging-mgmt', d)}"
 FEATURE_PACKAGES_obmc-host-ctl ?= "${@cf_enabled('obmc-host-ctl', 'virtual-obmc-host-ctl', d)}"
+FEATURE_PACKAGES_obmc-state-mgmt ?= "${@cf_enabled('obmc-state-mgmt', 'virtual-obmc-state-mgmt', d)}"
 
 # Install entire Phosphor application stack by default
 IMAGE_FEATURES += " \
@@ -43,6 +45,7 @@ IMAGE_FEATURES += " \
         obmc-logging-mgmt \
         obmc-host-ctl \
         ssh-server-dropbear \
+        obmc-state-mgmt \
         "
 
 CORE_IMAGE_EXTRA_INSTALL_append = " bash \
