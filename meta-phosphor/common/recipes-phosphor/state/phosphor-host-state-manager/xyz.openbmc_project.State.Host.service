@@ -1,0 +1,14 @@
+[Unit]
+Description=Phosphor Host State Manager
+Wants=mapper-wait@-org-openbmc-managers-System.service
+After=mapper-wait@-org-openbmc-managers-System.service
+Before=mapper-wait@-xyz-openbmc_project-state-host.service
+
+[Service]
+ExecStart={sbindir}/phosphor-host-state-manager
+Restart=always
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
