@@ -464,4 +464,10 @@
     <default>PCIE_CARD</default>
 </attribute>
 
+<!-- new parser requires FABRIC_GROUP_ID, though it's unused by the BMC -->
+<attribute type="replace" xpath="targetInstance[id='proc_socket-0']/attribute[id='FABRIC_NODE_ID']">
+    <id>FABRIC_GROUP_ID</id>
+    <default>0</default>
+</attribute>
+
 </patches>
