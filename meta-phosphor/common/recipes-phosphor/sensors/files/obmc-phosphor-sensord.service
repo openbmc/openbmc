@@ -1,9 +1,0 @@
-[Unit]
-Description=Phosphor Sensor Manager
-
-[Service]
-Restart=always
-ExecStart={sbindir}/obmc-phosphor-sensord
-
-[Install]
-WantedBy={SYSTEMD_DEFAULT_TARGET}
