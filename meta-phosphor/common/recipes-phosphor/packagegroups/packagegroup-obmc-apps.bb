@@ -10,6 +10,7 @@ PACKAGES = " \
         ${PN}-extras \
         ${PN}-extrasdev \
         ${PN}-inventory \
+        ${PN}-sensors \
         "
 
 SUMMARY_${PN}-extras = "Extra features"
@@ -25,4 +26,9 @@ RDEPENDS_${PN}-extrasdev = " \
 SUMMARY_${PN}-inventory = "Inventory support"
 RDEPENDS_${PN}-inventory = " \
         phosphor-inventory-manager \
+        "
+
+SUMMARY_${PN}-sensors = "Sensor support"
+RDEPENDS_${PN}-sensors = " \
+        virtual-obmc-sensors-hwmon \
         "
