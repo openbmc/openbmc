@@ -44,7 +44,7 @@ RDEPENDS_${PN}-chassis = " \
         obmc-control-led \
         "
 
-SUMMARY_${PN}-sensors = "OpenPOWER Fans"
+SUMMARY_${PN}-fans = "OpenPOWER Fans"
 RDEPENDS_${PN}-fans = " \
         obmc-hwmon \
         obmc-control-fan \
