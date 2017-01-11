@@ -13,7 +13,7 @@ PROVIDES += "virtual/obmc-event-mgmt"
 RPROVIDES_${PN} += "virtual-obmc-event-mgmt"
 
 SRC_URI += "git://github.com/openbmc/phosphor-event"
-SRCREV = "acdc2a909e7464111b259fb94509dcf8dab7c626"
+SRCREV = "37fd9a65c57285b3220bade9234bf6c66bb11ede"
 
 DBUS_SERVICE_${PN} = "org.openbmc.records.events.service"
 SYSTEMD_ENVIRONMENT_FILE_${PN} += "obmc/eventd/eventd.conf"
