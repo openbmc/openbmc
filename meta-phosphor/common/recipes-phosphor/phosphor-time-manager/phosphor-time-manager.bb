@@ -11,7 +11,7 @@ inherit obmc-phosphor-dbus-service
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "phosphor-mapper"
 DEPENDS += "systemd"
-RDEPENDS_${PN} += "phosphor-settings"
+RDEPENDS_${PN} += "virtual-obmc-settings-mgmt"
 RDEPENDS_${PN} += "network"
 RDEPENDS_${PN} += "libmapper"
 RDEPENDS_${PN} += "libsystemd"
