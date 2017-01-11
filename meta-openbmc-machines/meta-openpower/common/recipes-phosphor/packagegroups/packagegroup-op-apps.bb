@@ -6,7 +6,6 @@ inherit obmc-phosphor-license
 
 PROVIDES = "${PACKAGES}"
 PACKAGES = " \
-        ${PN}-sensors \
         ${PN}-chassis \
         ${PN}-fans \
         ${PN}-flash \
@@ -19,17 +18,10 @@ PROVIDES += "virtual/obmc-fan-mgmt"
 PROVIDES += "virtual/obmc-flash-mgmt"
 PROVIDES += "virtual/obmc-system-mgmt"
 
-RPROVIDES_${PN}-sensors += "virtual-obmc-sensor-mgmt"
 RPROVIDES_${PN}-chassis += "virtual-obmc-chassis-mgmt"
 RPROVIDES_${PN}-fans += "virtual-obmc-fan-mgmt"
 RPROVIDES_${PN}-flash += "virtual-obmc-flash-mgmt"
 RPROVIDES_${PN}-system += "virtual-obmc-system-mgmt"
-
-SUMMARY_${PN}-sensors = "OpenPOWER Sensors"
-RDEPENDS_${PN}-sensors = " \
-        obmc-hwmon \
-        obmc-mgr-sensor \
-        "
 
 SUMMARY_${PN}-chassis = "OpenPOWER Chassis"
 RDEPENDS_${PN}-chassis = " \
