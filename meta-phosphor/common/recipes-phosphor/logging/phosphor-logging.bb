@@ -8,7 +8,7 @@ inherit pythonnative
 inherit obmc-phosphor-license
 inherit obmc-phosphor-dbus-service
 
-DBUS_SERVICE_${PN} += "xyz.openbmc_project.Logging.service"
+DBUS_SERVICE_${PN} += "xyz.openbmc_project.Logging.Internal.Manager.service"
 
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "systemd"
