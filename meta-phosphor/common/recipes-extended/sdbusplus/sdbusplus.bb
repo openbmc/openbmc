@@ -9,7 +9,7 @@ inherit autotools pkgconfig
 inherit obmc-phosphor-python-autotools
 
 DEPENDS += "autoconf-archive-native"
-RDEPENDS_${PN} += " \
+RDEPENDS_sdbus++ += " \
         python-inflection \
         python-mako \
         python-pyyaml \
