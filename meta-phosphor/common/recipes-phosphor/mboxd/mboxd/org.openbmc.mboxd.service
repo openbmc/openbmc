@@ -1,0 +1,13 @@
+[Unit]
+Description=Phosphor MBOX Daemon
+
+[Service]
+Restart=always
+ExecStart={sbindir}/mboxd
+Type=dbus
+BusName={BUSNAME}
+Wants=dev-aspeed-mbox.device
+After=dev-aspeed-mbox.device
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
