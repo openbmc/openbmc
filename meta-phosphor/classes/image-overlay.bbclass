@@ -1,9 +1,6 @@
 PACKAGES = " "
 EXCLUDE_FROM_WORLD = "1"
 
-INITRD_IMAGE ?= "obmc-phosphor-initramfs"
-INITRD_LINK_NAME = "${INITRD_IMAGE}-${MACHINE}${INITRAMFS_FSTYPE}"
-
 IMAGE_BASETYPE ?= "squashfs-xz"
 OVERLAY_BASETYPE ?= "jffs2"
 
@@ -18,11 +15,10 @@ FLASH_IMAGE_NAME ?= "flash-${MACHINE}-${DATETIME}"
 FLASH_IMAGE_NAME[vardepsexclude] = "DATETIME"
 FLASH_IMAGE_LINK ?= "flash-${MACHINE}"
 
-FLASH_KERNEL_IMAGETYPE ?= "fitImage"
+FLASH_KERNEL_IMAGE ?= "fitImage-${INITRAMFS_IMAGE}-${MACHINE}.bin"
 
 FLASH_UBOOT_OFFSET ?= "0"
 FLASH_KERNEL_OFFSET ?= "512"
-FLASH_INITRD_OFFSET ?= "3072"
 FLASH_ROFS_OFFSET ?= "4864"
 FLASH_RWFS_OFFSET ?= "28672"
 RWFS_SIZE ?= "4096"
@@ -45,11 +41,9 @@ mk_nor_image() {
 }
 
 do_generate_flash() {
-       INITRD_CTYPE=${INITRAMFS_CTYPE}
        ddir="${DEPLOY_DIR_IMAGE}"
-       kernel="${FLASH_KERNEL_IMAGETYPE}"
+       kernel="${FLASH_KERNEL_IMAGE}"
        uboot="u-boot.${UBOOT_SUFFIX}"
-       uinitrd="${INITRD_LINK_NAME}.cpio.${INITRD_CTYPE}.u-boot"
        rootfs="${IMAGE_LINK_NAME}.${IMAGE_BASETYPE}"
        rwfs="rwfs.${OVERLAY_BASETYPE}"
 
@@ -58,9 +52,6 @@ do_generate_flash() {
        fi
        if [ ! -f $ddir/$uboot ]; then
               bbfatal "U-boot file ${ddir}/${uboot} does not exist"
-       fi
-       if [ ! -f $ddir/$uinitrd ]; then
-              bbfatal "uinitrd file ${ddir}/${uinitrd} does not exist"
        fi
        if [ ! -f $ddir/$rootfs ]; then
               bbfatal "Rootfs file ${ddir}/${rootfs} does not exist"
@@ -77,7 +68,6 @@ do_generate_flash() {
        mk_nor_image ${dst} ${FLASH_SIZE}
        dd if=${ddir}/${uboot} of=${dst} bs=1k conv=notrunc seek=${FLASH_UBOOT_OFFSET}
        dd if=${ddir}/${kernel} of=${dst} bs=1k conv=notrunc seek=${FLASH_KERNEL_OFFSET}
-       dd if=${ddir}/${uinitrd} of=${dst} bs=1k conv=notrunc seek=${FLASH_INITRD_OFFSET}
        dd if=${ddir}/${rootfs} of=${dst} bs=1k conv=notrunc seek=${FLASH_ROFS_OFFSET}
        dd if=${ddir}/${rwfs} of=${dst} bs=1k conv=notrunc seek=${FLASH_RWFS_OFFSET}
        dstlink="${ddir}/${FLASH_IMAGE_LINK}"
@@ -87,16 +77,14 @@ do_generate_flash() {
        ln -sf ${FLASH_IMAGE_NAME} ${ddir}/image-bmc
        ln -sf ${uboot} ${ddir}/image-u-boot
        ln -sf ${kernel} ${ddir}/image-kernel
-       ln -sf ${uinitrd} ${ddir}/image-initramfs
        ln -sf ${rootfs} ${ddir}/image-rofs
        ln -sf ${rwfs} ${ddir}/image-rwfs
 
        tar -h -cvf ${ddir}/${MACHINE}-${DATETIME}.all.tar -C ${ddir} image-bmc
-       tar -h -cvf ${ddir}/${MACHINE}-${DATETIME}.tar -C ${ddir} image-u-boot image-kernel image-initramfs image-rofs image-rwfs
+       tar -h -cvf ${ddir}/${MACHINE}-${DATETIME}.tar -C ${ddir} image-u-boot image-kernel image-rofs image-rwfs
 }
 do_generate_flash[vardepsexclude] = "DATETIME"
 
-do_generate_flash[depends] += "${INITRD_IMAGE}:do_image_complete"
 do_generate_flash[depends] += "${PN}:do_image_complete"
 do_generate_flash[depends] += "u-boot:do_populate_sysroot"
 
