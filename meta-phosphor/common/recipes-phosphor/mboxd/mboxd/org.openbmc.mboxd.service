@@ -1,0 +1,11 @@
+[Unit]
+Description=Phosphor IPMI MBOX Daemon
+
+[Service]
+Restart=always
+ExecStart={sbindir}/mboxd
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
