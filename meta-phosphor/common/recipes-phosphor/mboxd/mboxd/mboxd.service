@@ -1,0 +1,11 @@
+[Unit]
+Description=Phosphor MBOX Daemon
+
+[Service]
+Restart=always
+ExecStart={sbindir}/mboxd --flash {FLASH_SIZE}
+Wants=dev-aspeed-mbox.device
+After=dev-aspeed-mbox.device
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
