@@ -19,3 +19,6 @@ PREFERRED_PROVIDER_virtual/obmc-sensor-mgmt ?= "obmc-phosphor-sensord"
 PREFERRED_PROVIDER_virtual/obmc-system-mgmt ?= "obmc-phosphor-sysd"
 PREFERRED_PROVIDER_virtual/obmc-settings-mgmt ?= "phosphor-settings"
 PREFERRED_PROVIDER_virtual/obmc-logging-mgmt ?= "phosphor-logging"
+
+OBMC_DBUS_PATH_ROOT ?= "/xyz/openbmc_project"
+OBMC_DBUS_IFACE_ROOT ?= "xyz.openbmc_project"
