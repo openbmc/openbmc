@@ -1,4 +1,4 @@
-SUMMARY = "Phosphor OpenBMC - Applications"
+SUMMARY = "OpenBMC - Applications"
 PR = "r1"
 
 inherit packagegroup
@@ -13,7 +13,7 @@ PACKAGES = " \
 
 SUMMARY_${PN}-extras = "Extra features"
 RDEPENDS_${PN}-extras = " \
-	phosphor-rest \
+        phosphor-rest \
         "
 
 SUMMARY_${PN}-extrasdev = "Development features"
