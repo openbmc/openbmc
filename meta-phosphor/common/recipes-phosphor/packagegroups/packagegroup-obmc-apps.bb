@@ -24,4 +24,5 @@ RDEPENDS_${PN}-extrasdev = " \
 
 SUMMARY_${PN}-inventory = "Inventory support"
 RDEPENDS_${PN}-inventory = " \
+        phosphor-inventory-manager \
         "
