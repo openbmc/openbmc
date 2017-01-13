@@ -46,8 +46,8 @@ IMAGE_FEATURES += " \
         "
 
 CORE_IMAGE_EXTRA_INSTALL_append = " bash \
-        packagegroup-phosphor-apps-extras \
-        packagegroup-phosphor-apps-extrasdev \
+        packagegroup-obmc-apps-extras \
+        packagegroup-obmc-apps-extrasdev \
         i2c-tools \
         screen \
         inarp \
