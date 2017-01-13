@@ -12,6 +12,7 @@
 # - obmc-phosphor-system-mgmt         - Phosphor OpenBMC system management
 # - obmc-host-ipmi                    - OpenBMC Host IPMI
 # - obmc-logging                      - OpenBMC logging management
+# - obmc-inventory                    - OpenBMC inventory support
 
 inherit core-image
 inherit obmc-phosphor-license
@@ -28,6 +29,7 @@ FEATURE_PACKAGES_obmc-system-mgmt ?= "${@df_enabled('obmc-phosphor-system-mgmt',
 FEATURE_PACKAGES_obmc-host-ipmi ?= "${@cf_enabled('obmc-host-ipmi', 'virtual-obmc-host-ipmi-hw', d)}"
 FEATURE_PACKAGES_obmc-logging-mgmt ?= "${@df_enabled('obmc-logging-mgmt', 'virtual-obmc-logging-mgmt', d)}"
 FEATURE_PACKAGES_obmc-host-ctl ?= "${@cf_enabled('obmc-host-ctl', 'virtual-obmc-host-ctl', d)}"
+FEATURE_PACKAGES_obmc-inventory ?= "packagegroup-obmc-apps-inventory"
 
 # Install entire Phosphor application stack by default
 IMAGE_FEATURES += " \
@@ -42,6 +44,7 @@ IMAGE_FEATURES += " \
         obmc-host-ipmi \
         obmc-logging-mgmt \
         obmc-host-ctl \
+        obmc-inventory \
         ssh-server-dropbear \
         "
 
