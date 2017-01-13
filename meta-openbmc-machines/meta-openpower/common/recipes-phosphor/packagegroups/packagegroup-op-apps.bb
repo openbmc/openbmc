@@ -37,7 +37,6 @@ RDEPENDS_${PN}-chassis = " \
         obmc-button-reset \
         obmc-control-chassis \
         obmc-hostcheckstop \
-        obmc-mgr-inventory \
         obmc-op-control-power \
         obmc-pcie-detect \
         obmc-watchdog \
