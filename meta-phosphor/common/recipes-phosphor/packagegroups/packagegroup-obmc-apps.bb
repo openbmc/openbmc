@@ -9,6 +9,7 @@ PROVIDES = "${PACKAGES}"
 PACKAGES = " \
         ${PN}-extras \
         ${PN}-extrasdev \
+        ${PN}-inventory \
         "
 
 SUMMARY_${PN}-extras = "Extra features"
@@ -19,4 +20,8 @@ RDEPENDS_${PN}-extras = " \
 SUMMARY_${PN}-extrasdev = "Development features"
 RDEPENDS_${PN}-extrasdev = " \
         rest-dbus \
+        "
+
+SUMMARY_${PN}-inventory = "Inventory support"
+RDEPENDS_${PN}-inventory = " \
         "
