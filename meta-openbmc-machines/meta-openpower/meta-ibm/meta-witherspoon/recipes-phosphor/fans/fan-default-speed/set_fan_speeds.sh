@@ -7,6 +7,12 @@ else
   RPM=$1
 fi
 
+path="/sys/bus/i2c/drivers/max31785"
+if [ -e $path ]
+then
+    echo 3-0052 > $path/unbind
+fi
+
 for fan in `seq 0 3`; do
     i2cset -y 3 0x52 0x00 $fan b
     i2cset -y 3 0x52 0x3A 0xD0 b
@@ -17,3 +23,8 @@ for fan in `seq 0 3`; do
     i2cset -y 3 0x52 0xF6 0x00 0x00 i
     i2cset -y 3 0x52 0x3B $RPM w
 done
+if [ -e $path ]
+
+then
+    echo 3-0052 > $path/bind
+fi
