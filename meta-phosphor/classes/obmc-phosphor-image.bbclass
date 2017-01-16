@@ -31,6 +31,7 @@ FEATURE_PACKAGES_obmc-host-ctl ?= "${@cf_enabled('obmc-host-ctl', 'virtual-obmc-
 FEATURE_PACKAGES_obmc-host-ipmi ?= "${@cf_enabled('obmc-host-ipmi', 'virtual-obmc-host-ipmi-hw', d)}"
 FEATURE_PACKAGES_obmc-host-state-mgmt ?= "${@cf_enabled('obmc-host-state-mgmt', 'virtual-obmc-host-state-mgmt', d)}"
 FEATURE_PACKAGES_obmc-logging-mgmt ?= "${@df_enabled('obmc-logging-mgmt', 'virtual-obmc-logging-mgmt', d)}"
+FEATURE_PACKAGES_obmc-net-ipmi ?= "${@df_enabled('obmc-net-ipmi', 'virtual-obmc-net-ipmi', d)}"
 FEATURE_PACKAGES_obmc-sensor-mgmt ?= "${@cf_enabled('obmc-phosphor-sensor-mgmt', 'virtual-obmc-sensor-mgmt', d)}"
 FEATURE_PACKAGES_obmc-settings-mgmt ?= "${@df_enabled('obmc-settings-mgmt', 'virtual-obmc-settings-mgmt', d)}"
 FEATURE_PACKAGES_obmc-system-mgmt ?= "${@df_enabled('obmc-phosphor-system-mgmt', 'virtual-obmc-system-mgmt', d)}"
@@ -48,6 +49,7 @@ IMAGE_FEATURES += " \
         obmc-host-ipmi \
         obmc-host-state-mgmt \
         obmc-logging-mgmt \
+        obmc-net-ipmi \
         obmc-sensor-mgmt \
         obmc-settings-mgmt \
         obmc-system-mgmt \
