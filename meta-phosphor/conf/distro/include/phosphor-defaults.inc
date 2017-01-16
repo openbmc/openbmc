@@ -21,6 +21,7 @@ PREFERRED_PROVIDER_virtual/obmc-settings-mgmt ?= "phosphor-settings"
 PREFERRED_PROVIDER_virtual/obmc-logging-mgmt ?= "phosphor-logging"
 PREFERRED_PROVIDER_virtual/obmc-host-state-mgmt ?= "phosphor-state-manager"
 PREFERRED_PROVIDER_virtual/obmc-chassis-state-mgmt ?= "phosphor-state-manager"
+PREFERRED_PROVIDER_virtual/obmc-net-ipmi ?= "phosphor-net-ipmid"
 
 OBMC_DBUS_PATH_ROOT ?= "/xyz/openbmc_project"
 OBMC_DBUS_IFACE_ROOT ?= "xyz.openbmc_project"
