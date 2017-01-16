@@ -24,3 +24,4 @@ PREFERRED_PROVIDER_virtual/obmc-chassis-state-mgmt ?= "phosphor-state-manager"
 
 OBMC_DBUS_PATH_ROOT ?= "/xyz/openbmc_project"
 OBMC_DBUS_IFACE_ROOT ?= "xyz.openbmc_project"
+PREFERRED_PROVIDER_virtual/obmc-net-ipmi ?= "phosphor-net-ipmid"
