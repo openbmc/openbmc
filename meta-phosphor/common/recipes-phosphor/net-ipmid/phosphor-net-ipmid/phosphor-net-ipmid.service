@@ -1,0 +1,9 @@
+[Unit]
+Description=Network IPMI daemon
+
+[Service]
+ExecStart={sbindir}/netipmid
+Restart=always
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
