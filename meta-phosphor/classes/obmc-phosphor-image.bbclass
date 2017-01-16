@@ -34,6 +34,7 @@ FEATURE_PACKAGES_obmc-host-ctl ?= "${@cf_enabled('obmc-host-ctl', 'virtual-obmc-
 FEATURE_PACKAGES_obmc-host-state-mgmt ?= "${@cf_enabled('obmc-host-state-mgmt', 'virtual-obmc-host-state-mgmt', d)}"
 FEATURE_PACKAGES_obmc-chassis-state-mgmt ?= "${@cf_enabled('obmc-chassis-state-mgmt', 'virtual-obmc-chassis-state-mgmt', d)}"
 FEATURE_PACKAGES_obmc-bmc-state-mgmt ?= "${@cf_enabled('obmc-bmc-state-mgmt', 'virtual-obmc-bmc-state-mgmt', d)}"
+FEATURE_PACKAGES_obmc-net-ipmi ?= "${@df_enabled('obmc-net-ipmi', 'virtual-obmc-net-ipmi', d)}"
 
 # Install entire Phosphor application stack by default
 IMAGE_FEATURES += " \
@@ -52,6 +53,7 @@ IMAGE_FEATURES += " \
         obmc-host-state-mgmt \
         obmc-chassis-state-mgmt \
         obmc-bmc-state-mgmt \
+        obmc-net-ipmi \
         "
 
 CORE_IMAGE_EXTRA_INSTALL_append = " bash \
