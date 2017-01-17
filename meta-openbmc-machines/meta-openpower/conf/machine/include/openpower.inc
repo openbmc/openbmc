@@ -7,6 +7,7 @@ OBMC_MACHINE_FEATURES += "\
         obmc-host-ctl \
         openpower-pflash \
         obmc-host-state-mgmt \
+        obmc-chassis-state-mgmt \
         "
 
 VIRTUAL-RUNTIME_skeleton_workbook = "${MACHINE}-config"
