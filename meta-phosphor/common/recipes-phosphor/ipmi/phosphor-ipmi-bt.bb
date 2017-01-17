@@ -11,7 +11,7 @@ DBUS_SERVICE_${PN} = "org.openbmc.HostIpmi.service"
 
 PROVIDES += "virtual/obmc-host-ipmi-hw"
 RPROVIDES_${PN} += "virtual-obmc-host-ipmi-hw"
-RRECOMMENDS_${PN} += "host-ipmid"
+RRECOMMENDS_${PN} += "phosphor-ipmi-host"
 
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "systemd"

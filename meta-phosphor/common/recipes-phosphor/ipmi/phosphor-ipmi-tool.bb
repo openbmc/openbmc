@@ -7,7 +7,7 @@ PR = "r1"
 inherit obmc-phosphor-license
 
 DEPENDS += "systemd    \
-            host-ipmid \
+            phosphor-ipmi-host \
             "
 
 RDEPENDS_${PN} += "libsystemd \
