@@ -22,5 +22,14 @@ PREFERRED_PROVIDER_virtual/obmc-logging-mgmt ?= "phosphor-logging"
 PREFERRED_PROVIDER_virtual/obmc-host-state-mgmt ?= "phosphor-state-manager"
 PREFERRED_PROVIDER_virtual/obmc-chassis-state-mgmt ?= "phosphor-state-manager"
 
+# virtual/phosphor-ipmi-fru-config
+#
+# The phosphor-ipmi-fru application is data-driven and requires an input
+# mapping of IPMI inventory metadata to DBus objects interfaces and properties.
+# This virtual is a native recipe that provides that mapping by installing
+# configuration files in the format and native sysroot location expected by
+# the phosphor-ipmi-fru build process in the native sysroot.
+PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-config ?= "phosphor-ipmi-fru-config-example-native"
+
 OBMC_DBUS_PATH_ROOT ?= "/xyz/openbmc_project"
 OBMC_DBUS_IFACE_ROOT ?= "xyz.openbmc_project"

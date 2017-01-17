@@ -8,6 +8,7 @@ inherit obmc-phosphor-systemd
 require ${PN}.inc
 
 DEPENDS += " \
+        virtual/phosphor-ipmi-fru-config \
         systemd \
         phosphor-ipmi-host \
         phosphor-mapper \
