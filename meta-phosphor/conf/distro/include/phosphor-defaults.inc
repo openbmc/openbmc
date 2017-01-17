@@ -19,3 +19,12 @@ PREFERRED_PROVIDER_virtual/obmc-sensor-mgmt ?= "obmc-phosphor-sensord"
 PREFERRED_PROVIDER_virtual/obmc-system-mgmt ?= "obmc-phosphor-sysd"
 PREFERRED_PROVIDER_virtual/obmc-settings-mgmt ?= "phosphor-settings"
 PREFERRED_PROVIDER_virtual/obmc-logging-mgmt ?= "phosphor-logging"
+
+# virtual/phosphor-ipmi-fru-config
+#
+# The phosphor-ipmi-fru application is data-driven and requires an input
+# mapping of IPMI inventory metadata to DBus objects interfaces and properties.
+# This virtual is a native recipe that provides that mapping by installing
+# configuration files in the format and native sysroot location expected by
+# the phosphor-ipmi-fru build process in the native sysroot.
+PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-config ?= "phosphor-ipmi-fru-config-example-native"
