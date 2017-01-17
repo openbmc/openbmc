@@ -13,6 +13,7 @@
 # - obmc-host-ipmi                    - OpenBMC Host IPMI
 # - obmc-logging                      - OpenBMC logging management
 # - obmc-host-state-mgmt              - OpenBMC Host State Management
+# - obmc-chassis-state-mgmt           - OpenBMC Chassis State Management
 
 inherit core-image
 inherit obmc-phosphor-license
@@ -30,6 +31,7 @@ FEATURE_PACKAGES_obmc-host-ipmi ?= "${@cf_enabled('obmc-host-ipmi', 'virtual-obm
 FEATURE_PACKAGES_obmc-logging-mgmt ?= "${@df_enabled('obmc-logging-mgmt', 'virtual-obmc-logging-mgmt', d)}"
 FEATURE_PACKAGES_obmc-host-ctl ?= "${@cf_enabled('obmc-host-ctl', 'virtual-obmc-host-ctl', d)}"
 FEATURE_PACKAGES_obmc-host-state-mgmt ?= "${@cf_enabled('obmc-host-state-mgmt', 'virtual-obmc-host-state-mgmt', d)}"
+FEATURE_PACKAGES_obmc-chassis-state-mgmt ?= "${@cf_enabled('obmc-chassis-state-mgmt', 'virtual-obmc-chassis-state-mgmt', d)}"
 
 # Install entire Phosphor application stack by default
 IMAGE_FEATURES += " \
@@ -46,6 +48,7 @@ IMAGE_FEATURES += " \
         obmc-host-ctl \
         ssh-server-dropbear \
         obmc-host-state-mgmt \
+        obmc-chassis-state-mgmt \
         "
 
 CORE_IMAGE_EXTRA_INSTALL_append = " bash \
