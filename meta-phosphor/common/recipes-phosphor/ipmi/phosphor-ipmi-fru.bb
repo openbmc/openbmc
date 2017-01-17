@@ -9,7 +9,7 @@ inherit obmc-phosphor-systemd
 
 DEPENDS += " \
         systemd \
-        host-ipmid \
+        phosphor-ipmi-host \
         phosphor-mapper \
         autoconf-archive-native \
         "

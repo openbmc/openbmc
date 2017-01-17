@@ -6,7 +6,7 @@ PR = "r1"
 inherit autotools pkgconfig
 inherit obmc-phosphor-license
 
-DEPENDS += "host-ipmid"
+DEPENDS += "phosphor-ipmi-host"
 DEPENDS += "autoconf-archive-native"
 
 TARGET_CFLAGS += "-fpic"

@@ -3,7 +3,7 @@ DESCRIPTION = "Phosphor OpenBMC host IPMI to DBUS example implementation."
 PR = "r1"
 
 RDEPENDS_${PN} += "python-subprocess python-dbus python-pygobject"
-RRECOMMENDS_${PN} += "host-ipmid"
+RRECOMMENDS_${PN} += "phosphor-ipmi-host"
 
 inherit skeleton-python
 
