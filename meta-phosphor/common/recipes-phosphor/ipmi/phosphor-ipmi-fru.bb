@@ -3,7 +3,6 @@ DESCRIPTION = "A Phosphor IPMI plugin that updates inventory."
 PR = "r1"
 
 inherit autotools pkgconfig
-inherit obmc-phosphor-license
 inherit obmc-phosphor-systemd
 
 require ${PN}.inc
