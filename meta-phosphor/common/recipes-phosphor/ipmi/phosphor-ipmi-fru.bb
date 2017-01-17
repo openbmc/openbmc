@@ -1,5 +1,5 @@
-SUMMARY = "Phosphor OpenBMC WriteFRU for OpenPOWER systems"
-DESCRIPTION = "Phosphor OpenBMC WriteFRU for  OpenPOWER based systems"
+SUMMARY = "Phosphor IPMI Inventory Plugin"
+DESCRIPTION = "A Phosphor IPMI plugin that updates inventory."
 HOMEPAGE = "https://github.com/openbmc/ipmi-fru-parser"
 PR = "r1"
 
