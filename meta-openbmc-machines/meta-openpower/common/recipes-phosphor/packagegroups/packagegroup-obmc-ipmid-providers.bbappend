@@ -1,1 +1,1 @@
-RDEPENDS_${PN}-libs += "host-ipmid-oem"
+RDEPENDS_${PN}-libs += "openpower-ipmi-oem"
