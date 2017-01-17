@@ -9,5 +9,5 @@ PACKAGES = "${PN}-libs"
 
 SUMMARY_${PN}-libs = "Extra providers for ipmid."
 RDEPENDS_${PN}-libs = " \
-        host-ipmid-fru \
+        phosphor-ipmi-fru \
         "
