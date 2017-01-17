@@ -1,5 +1,5 @@
-SUMMARY = "Phosphor OpenBMC OEM Commands for OpenPOWER systems"
-DESCRIPTION = "Phosphor OpenBMC IPMI OEM commands for OpenPOWER based systems"
+SUMMARY = "Phosphor IPMI plugin for OpenPOWER OEM Commands"
+DESCRIPTION = "Phosphor IPMI plugin for OpenPOWER OEM Commands"
 HOMEPAGE = "https://github.com/openbmc/openpower-host-ipmi-oem"
 PR = "r1"
 
