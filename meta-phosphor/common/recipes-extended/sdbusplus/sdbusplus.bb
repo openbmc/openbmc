@@ -15,6 +15,21 @@ RDEPENDS_sdbus++ += " \
         python-pyyaml \
         "
 
+# sdbus++ has a handful of runtime dependencies on other python packages.
+# Bitbake doesn't do anything with RDEPENDS in native context because
+# native context doesn't have packages.
+#
+# While technically sdbus++ doesn't require its runtime dependencies to be
+# installed to build, work around the above native context behavior
+# by adding a build dependency so that clients don't have to DEPEND
+# on sdbus++ runtime dependencies manually.
+
+DEPENDS_append_class-native = " \
+        python-inflection-native \
+        python-mako-native \
+        python-pyyaml-native \
+        "
+
 SRC_URI += "git://github.com/openbmc/sdbusplus"
 SRCREV = "b6dcf97fdf0d9c673812942f5b4e8b2691ceb5a3"
 
