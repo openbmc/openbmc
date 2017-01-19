@@ -5,7 +5,7 @@ After=dev-%i.device
 
 [Service]
 # TODO: openbmc/obmc-console#5 - Restore this to 'obmc-console-server ttyVUART0'
-ExecStart=/bin/sh -c 'realpath /dev/%i | xargs basename | xargs {sbindir}/obmc-console-server'
+ExecStart=/bin/sh -c 'realpath /dev/%i | xargs basename | xargs {sbindir}/obmc-console-server --config {sysconfdir}/obmc-console.conf'
 Restart=always
 
 [Install]
