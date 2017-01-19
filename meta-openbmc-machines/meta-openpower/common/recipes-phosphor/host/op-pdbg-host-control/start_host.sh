@@ -7,8 +7,12 @@ DEVICE_OPT=${1:+-d $1}
 
 putcfam()
 {
-    $PDBG -p0 -b fsi $DEVICE_OPT putcfam $1 $2 $3
+    $PDBG $1 -b fsi $DEVICE_OPT putcfam $2 $3 $4
 }
 
-putcfam 0x283f 0x20000000             # Write scratch register 8
-putcfam 0x2801 0x80000000 0x80000000  # Set SBE start bit to start IPL
+#Clock mux select override
+#Can maybe be removed in DD2
+putcfam -a 0x2918 0x0000000C 0x0000000C
+
+putcfam -p0 0x283f 0x20000000             # Write scratch register 8
+putcfam -p0 0x2801 0x80000000 0x80000000  # Set SBE start bit to start IPL
