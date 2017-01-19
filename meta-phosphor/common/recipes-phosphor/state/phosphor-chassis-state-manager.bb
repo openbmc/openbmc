@@ -21,6 +21,6 @@ PROVIDES += "virtual/obmc-chassis-state-mgmt"
 RPROVIDES_${PN} += "virtual-obmc-chassis-state-mgmt"
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager"
-SRCREV = "794baed325213d39d75e5f8c3374177891ef70ec"
+SRCREV = "6e0b50936735faac96db2f20fe84ffd0733750a9"
 
 S = "${WORKDIR}/git"
