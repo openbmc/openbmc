@@ -128,6 +128,7 @@ python() {
                 'bindir',
                 'sbindir',
                 'envfiledir',
+                'sysconfdir',
                 'SYSTEMD_DEFAULT_TARGET' ]:
             set_append(d, 'SYSTEMD_SUBSTITUTIONS',
                 '%s:%s:%s' % (x, d.getVar(x, True), file))
