@@ -1,2 +1,2 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/linux-obmc:"
-SRC_URI += "file://zaius.cfg"
+FILESEXTRAPATHS_prepend_zaius := "${THISDIR}/${PN}:"
+SRC_URI_append_zaius = " file://zaius.cfg"
