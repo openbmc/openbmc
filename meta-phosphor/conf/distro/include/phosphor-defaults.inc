@@ -21,6 +21,7 @@ PREFERRED_PROVIDER_virtual/obmc-settings-mgmt ?= "phosphor-settings"
 PREFERRED_PROVIDER_virtual/obmc-logging-mgmt ?= "phosphor-logging"
 PREFERRED_PROVIDER_virtual/obmc-host-state-mgmt ?= "phosphor-state-manager"
 PREFERRED_PROVIDER_virtual/obmc-chassis-state-mgmt ?= "phosphor-state-manager"
+PREFERRED_PROVIDER_virtual/obmc-bmc-state-mgmt ?= "phosphor-state-manager"
 
 # virtual/phosphor-ipmi-fru-config
 #
