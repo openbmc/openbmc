@@ -140,6 +140,7 @@ EOF
 fitimage_emit_section_ramdisk() {
 
 	ramdisk_csum="sha1"
+	ramdisk_ctype="none"
 	ramdisk_loadline=""
 	ramdisk_entryline=""
 
@@ -150,14 +151,32 @@ fitimage_emit_section_ramdisk() {
 		ramdisk_entryline="entry = <${UBOOT_RD_ENTRYPOINT}>;"
 	fi
 
+	case $3 in
+		*.gz)
+			ramdisk_ctype="gzip"
+			;;
+		*.bz2)
+			ramdisk_ctype="bzip2"
+			;;
+		*.lzma)
+			ramdisk_ctype="lzma"
+			;;
+		*.lzo)
+			ramdisk_ctype="lzo"
+			;;
+		*.lz4)
+			ramdisk_ctype="lz4"
+			;;
+	esac
+
 	cat << EOF >> ${1}
                 ramdisk@${2} {
-                        description = "ramdisk image";
+                        description = "${INITRAMFS_IMAGE}";
                         data = /incbin/("${3}");
                         type = "ramdisk";
                         arch = "${UBOOT_ARCH}";
                         os = "linux";
-                        compression = "none";
+                        compression = "${ramdisk_ctype}";
                         ${ramdisk_loadline}
                         ${ramdisk_entryline}
                         hash@1 {
@@ -258,8 +277,15 @@ fitimage_assemble() {
 	# Step 3: Prepare a ramdisk section.
 	#
 	if [ "x${ramdiskcount}" = "x1" ] ; then
-		copy_initramfs
-		fitimage_emit_section_ramdisk ${1} "${ramdiskcount}" usr/${INITRAMFS_IMAGE}-${MACHINE}.cpio
+		# Find and use the first initramfs image archive type we find
+		for img in cpio.lz4 cpio.lzo cpio.lzma cpio.xz cpio.gz cpio; do
+			initramfs_path="${DEPLOY_DIR_IMAGE}/${INITRAMFS_IMAGE}-${MACHINE}.${img}"
+			echo "Using $initramfs_path"
+			if [ -e "${initramfs_path}" ]; then
+				fitimage_emit_section_ramdisk ${1} "${ramdiskcount}" "${initramfs_path}"
+				break
+			fi
+		done
 	fi
 
 	fitimage_emit_section_maint ${1} sectend
