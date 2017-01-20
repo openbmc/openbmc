@@ -29,3 +29,11 @@ do_install_append() {
     install -d ${D}/lib/udev/rules.d
     install -m 0644 ${WORKDIR}/99-aspeed-mbox.rules ${D}/lib/udev/rules.d
 }
+
+TMPL = "mboxd-reload@.service"
+TGTFMT = "obmc-chassis-stop@{0}.target"
+INSTFMT = "mboxd-reload@{0}.service"
+FMT = "../${TMPL}:${TGTFMT}.wants/${INSTFMT}"
+
+SYSTEMD_SERVICE_${PN} += "mboxd-reload@.service"
+SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT', 'OBMC_CHASSIS_INSTANCES')}"
