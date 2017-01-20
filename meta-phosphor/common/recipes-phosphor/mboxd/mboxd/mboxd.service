@@ -3,7 +3,7 @@ Description=Phosphor MBOX Daemon
 
 [Service]
 Restart=always
-ExecStart={sbindir}/mboxd --flash {FLASH_SIZE}
+ExecStart={sbindir}/mboxd --flash {FLASH_SIZE} --verbose
 Wants=dev-aspeed-mbox.device
 After=dev-aspeed-mbox.device
 
