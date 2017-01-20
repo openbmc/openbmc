@@ -1,0 +1,33 @@
+From 8f6ee172bf6d0a347696ecfb000eeb686245db90 Mon Sep 17 00:00:00 2001
+From: Patrick Williams <patrick@stwcx.xyz>
+Date: Thu, 19 Jan 2017 21:27:51 -0600
+Subject: [PATCH] Temporarily disable watchdog support
+
+Hostboot does not support IPMI on P9 systems yet, so they do
+not send the watchdog updates.  Disable the watchdog until
+they support.
+
+Change-Id: I03e5dca06f1eecfb24b35161f81190c23bf39b7f
+Signed-off-by: Patrick Williams <patrick@stwcx.xyz>
+---
+ chassis_control.py | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/chassis_control.py b/chassis_control.py
+index 3637d82..f475ecd 100644
+--- a/chassis_control.py
++++ b/chassis_control.py
+@@ -199,9 +199,7 @@ class ChassisControlObject(DbusProperties, DbusObjectManager):
+         self.softReboot()
+ 
+     def host_watchdog_signal_handler(self):
+-        print "Watchdog Error, Hard Rebooting"
+-        self.Set(DBUS_NAME, "reboot", 1)
+-        self.powerOff()
++        print "Watchdog Error, ignoring due to Hostboot not supporting IPMI."
+ 
+     def emergency_shutdown_signal_handler(self, message):
+         print "Emergency Shutdown!"
+-- 
+2.10.2
+
