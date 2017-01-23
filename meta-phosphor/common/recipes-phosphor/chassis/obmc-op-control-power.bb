@@ -22,12 +22,12 @@ SYSTEMD_SERVICE_${PN} += " \
 SYSTEMD_ENVIRONMENT_FILE_${PN} += "obmc/power_control"
 
 START_TMPL = "op-power-start@.service"
-START_TGTFMT = "obmc-chassis-start@{1}.target"
+START_TGTFMT = "obmc-power-chassis-on@{1}.target"
 START_INSTFMT = "op-power-start@{0}.service"
 START_FMT = "../${START_TMPL}:${START_TGTFMT}.wants/${START_INSTFMT}"
 
 STOP_TMPL = "op-power-stop@.service"
-STOP_TGTFMT = "obmc-chassis-stop@{1}.target"
+STOP_TGTFMT = "obmc-power-chassis-off@{1}.target"
 STOP_INSTFMT = "op-power-stop@{0}.service"
 STOP_FMT = "../${STOP_TMPL}:${STOP_TGTFMT}.wants/${STOP_INSTFMT}"
 
@@ -43,3 +43,17 @@ SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'START_FMT', 'OBMC_POWER_INSTANCES
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'STOP_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'ON_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'OFF_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
+
+# TODO - Will delete this next block of code in later commit once everything
+#        moved over to new targets
+START_TGTFMT_TBDEL = "obmc-chassis-start@{1}.target"
+STOP_TGTFMT_TBDEL = "obmc-chassis-stop@{1}.target"
+START_FMT_TBDEL = "../${START_TMPL}:${START_TGTFMT_TBDEL}.wants/${START_INSTFMT}"
+STOP_FMT_TBDEL = "../${STOP_TMPL}:${STOP_TGTFMT_TBDEL}.wants/${STOP_INSTFMT}"
+ON_FMT_TBDEL = "../${ON_TMPL}:${START_TGTFMT_TBDEL}.wants/${ON_INSTFMT}"
+OFF_FMT_TBDEL = "../${OFF_TMPL}:${STOP_TGTFMT_TBDEL}.wants/${OFF_INSTFMT}"
+
+SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'START_FMT_TBDEL', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'STOP_FMT_TBDEL', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'ON_FMT_TBDEL', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'OFF_FMT_TBDEL', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
