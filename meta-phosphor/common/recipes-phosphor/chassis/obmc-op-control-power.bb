@@ -22,12 +22,12 @@ SYSTEMD_SERVICE_${PN} += " \
 SYSTEMD_ENVIRONMENT_FILE_${PN} += "obmc/power_control"
 
 START_TMPL = "op-power-start@.service"
-START_TGTFMT = "obmc-chassis-start@{1}.target"
+START_TGTFMT = "obmc-power-chassis-on@{1}.target"
 START_INSTFMT = "op-power-start@{0}.service"
 START_FMT = "../${START_TMPL}:${START_TGTFMT}.wants/${START_INSTFMT}"
 
 STOP_TMPL = "op-power-stop@.service"
-STOP_TGTFMT = "obmc-chassis-stop@{1}.target"
+STOP_TGTFMT = "obmc-power-chassis-off@{1}.target"
 STOP_INSTFMT = "op-power-stop@{0}.service"
 STOP_FMT = "../${STOP_TMPL}:${STOP_TGTFMT}.wants/${STOP_INSTFMT}"
 
