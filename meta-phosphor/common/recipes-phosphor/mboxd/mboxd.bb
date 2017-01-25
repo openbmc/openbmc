@@ -14,6 +14,7 @@ S = "${WORKDIR}/git"
 SRC_URI += "git://github.com/openbmc/mboxbridge.git;protocol=https"
 
 SRC_URI += "file://99-aspeed-mbox.rules"
+SRC_URI += "file://99-aspeed-lpc-ctrl.rules"
 SRC_URI += "file://aspeed-lpc-ctrl-h.patch"
 
 SRCREV="8cb799c2d6c2675959e80f2a7b88610aa4f4817a"
@@ -28,6 +29,7 @@ CFLAGS_append = "-I include"
 do_install_append() {
     install -d ${D}/lib/udev/rules.d
     install -m 0644 ${WORKDIR}/99-aspeed-mbox.rules ${D}/lib/udev/rules.d
+    install -m 0644 ${WORKDIR}/99-aspeed-lpc-ctrl.rules ${D}/lib/udev/rules.d
 }
 
 TMPL = "mboxd-reload@.service"
