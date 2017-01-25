@@ -11,7 +11,7 @@ DEPENDS += "autoconf-archive-native"
 
 S = "${WORKDIR}/git"
 
-SRC_URI += "git://github.com/openbmc/mboxbridge.git;protocol=https"
+SRC_URI += "git://github.com/openbmc/mboxbridge.git"
 
 SRC_URI += "file://99-aspeed-mbox.rules"
 SRC_URI += "file://99-aspeed-lpc-ctrl.rules"
