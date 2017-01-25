@@ -1,1 +1,1 @@
-SUBSYSTEM=="mailbox", TAG+="systemd"
+SUBSYSTEM=="misc", KERNEL=="aspeed-mbox", TAG+="systemd"
