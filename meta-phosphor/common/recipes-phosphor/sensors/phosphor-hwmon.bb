@@ -25,6 +25,6 @@ S = "${WORKDIR}/git"
 
 do_install_append() {
 
-	install -d ${D}/${base_libdir}/udev/rules.d/
-	install ${WORKDIR}/70-hwmon.rules ${D}/${base_libdir}/udev/rules.d/
+        install -d ${D}/${base_libdir}/udev/rules.d/
+        install ${WORKDIR}/70-hwmon.rules ${D}/${base_libdir}/udev/rules.d/
 }
