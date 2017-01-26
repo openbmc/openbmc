@@ -19,6 +19,9 @@ DEPENDS += " \
         "
 RDEPENDS_${PN} += "sdbusplus"
 
+PROVIDES += "virtual/obmc-inventory-manager"
+RPROVIDES_${PN} += "virtual-obmc-inventory-manager"
+
 OBMC_INVENTORY_PATH="${OBMC_DBUS_PATH_ROOT}/Inventory"
 OBMC_INVENTORY_MGR_IFACE="${OBMC_DBUS_IFACE_ROOT}.Inventory.Manager"
 

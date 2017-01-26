@@ -14,6 +14,9 @@ DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbusplus sdbusplus-native"
 RDEPENDS_${PN} += "libsystemd"
 
+PROVIDES += "virtual/obmc-leds-manager"
+RPROVIDES_${PN} += "virtual-obmc-leds-manager"
+
 SRC_URI += "git://github.com/openbmc/phosphor-led-manager"
 SRCREV = "ed4907342897301ab96cbf2c617cafd78caf25a1"
 S = "${WORKDIR}/git"
