@@ -15,6 +15,8 @@ DEPENDS += "sdbusplus"
 RDEPENDS_${PN} += "\
         libsystemd \
         "
+PROVIDES += "virtual/obmc-sensors-hwmon"
+RPROVIDES_${PN} += "virtual-obmc-sensors-hwmon"
 
 SRC_URI += "git://github.com/openbmc/phosphor-hwmon"
 SRC_URI += "file://70-hwmon.rules"
