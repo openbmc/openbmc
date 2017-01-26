@@ -39,21 +39,21 @@ OFF_TMPL = "op-wait-power-off@.service"
 OFF_INSTFMT = "op-wait-power-off@{0}.service"
 OFF_FMT = "../${OFF_TMPL}:${STOP_TGTFMT}.wants/${OFF_INSTFMT}"
 
+# Build up wants relationship for START_TGTFMT and STOP_TGTFMT
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'START_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'STOP_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'ON_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'OFF_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
 
-# TODO - Will delete this next block of code in later commit once everything
-#        moved over to new targets
-START_TGTFMT_TBDEL = "obmc-chassis-start@{1}.target"
-STOP_TGTFMT_TBDEL = "obmc-chassis-stop@{1}.target"
-START_FMT_TBDEL = "../${START_TMPL}:${START_TGTFMT_TBDEL}.wants/${START_INSTFMT}"
-STOP_FMT_TBDEL = "../${STOP_TMPL}:${STOP_TGTFMT_TBDEL}.wants/${STOP_INSTFMT}"
-ON_FMT_TBDEL = "../${ON_TMPL}:${START_TGTFMT_TBDEL}.wants/${ON_INSTFMT}"
-OFF_FMT_TBDEL = "../${OFF_TMPL}:${STOP_TGTFMT_TBDEL}.wants/${OFF_INSTFMT}"
+# Now show that the main control target wants these power targets
+START_TMPL_CTRL = "obmc-power-chassis-on@.target"
+START_TGTFMT_CTRL = "obmc-chassis-start@{1}.target"
+START_INSTFMT_CTRL = "obmc-power-chassis-on@{0}.target"
+START_FMT_CTRL = "../${START_TMPL_CTRL}:${START_TGTFMT_CTRL}.wants/${START_INSTFMT_CTRL}"
+SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'START_FMT_CTRL', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
 
-SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'START_FMT_TBDEL', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
-SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'STOP_FMT_TBDEL', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
-SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'ON_FMT_TBDEL', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
-SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'OFF_FMT_TBDEL', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
+STOP_TMPL_CTRL = "obmc-power-chassis-off@.target"
+STOP_TGTFMT_CTRL = "obmc-chassis-stop@{1}.target"
+STOP_INSTFMT_CTRL = "obmc-power-chassis-off@{0}.target"
+STOP_FMT_CTRL = "../${STOP_TMPL_CTRL}:${STOP_TGTFMT_CTRL}.wants/${STOP_INSTFMT_CTRL}"
+SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'STOP_FMT_CTRL', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"

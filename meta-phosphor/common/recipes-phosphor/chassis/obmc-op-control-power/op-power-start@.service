@@ -6,7 +6,7 @@ After=obmc-power-start-pre@%i.target
 After=obmc-fan-control.target
 Wants=mapper-wait@-org-openbmc-control-power%i.service
 After=mapper-wait@-org-openbmc-control-power%i.service
-Conflicts=obmc-chassis-stop@%i.target
+Conflicts=obmc-power-chassis-off@%i.target
 
 [Service]
 RemainAfterExit=yes
