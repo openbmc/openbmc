@@ -34,7 +34,6 @@ PREFERRED_PROVIDER_virtual/obmc-leds-manager ?= "phosphor-led-manager"
 PREFERRED_PROVIDER_virtual/obmc-leds-sysfs?= "phosphor-led-sysfs"
 
 PREFERRED_PROVIDER_virtual/obmc-logging-mgmt ?= "phosphor-logging"
-PREFERRED_PROVIDER_virtual/obmc-sensor-mgmt ?= "obmc-phosphor-sensord"
 
 # virtual/obmc-sensors-hwmon
 #
