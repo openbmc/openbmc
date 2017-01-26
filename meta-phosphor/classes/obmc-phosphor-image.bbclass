@@ -14,7 +14,6 @@
 # - obmc-inventory                    - OpenBMC inventory support
 # - obmc-leds                         - OpenBMC LED support
 # - obmc-logging-mgmt                 - OpenBMC logging management
-# - obmc-sensor-mgmt                  - OpenBMC sensor management
 # - obmc-sensors                      - OpenBMC sensor support
 # - obmc-settings-mgmt                - OpenBMC settings management
 # - obmc-system-mgmt                  - OpenBMC system management
@@ -37,7 +36,6 @@ FEATURE_PACKAGES_obmc-inventory ?= "packagegroup-obmc-apps-inventory"
 FEATURE_PACKAGES_obmc-leds ?= "packagegroup-obmc-apps-leds"
 FEATURE_PACKAGES_obmc-logging-mgmt ?= "${@df_enabled(d, 'obmc-logging-mgmt', 'virtual-obmc-logging-mgmt')}"
 FEATURE_PACKAGES_obmc-net-ipmi ?= "${@df_enabled(d, 'obmc-net-ipmi', 'virtual-obmc-net-ipmi')}"
-FEATURE_PACKAGES_obmc-sensor-mgmt ?= "${@cf_enabled(d, 'obmc-phosphor-sensor-mgmt', 'virtual-obmc-sensor-mgmt')}"
 FEATURE_PACKAGES_obmc-sensors ?= "packagegroup-obmc-apps-sensors"
 FEATURE_PACKAGES_obmc-settings-mgmt ?= "${@df_enabled(d, 'obmc-settings-mgmt', 'virtual-obmc-settings-mgmt')}"
 FEATURE_PACKAGES_obmc-system-mgmt ?= "${@df_enabled(d, 'obmc-phosphor-system-mgmt', 'virtual-obmc-system-mgmt')}"
@@ -58,7 +56,6 @@ IMAGE_FEATURES += " \
         obmc-leds \
         obmc-logging-mgmt \
         obmc-net-ipmi \
-        obmc-sensor-mgmt \
         obmc-sensors \
         obmc-settings-mgmt \
         obmc-system-mgmt \
