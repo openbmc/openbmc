@@ -2,53 +2,54 @@
 
 # Additional IMAGE_FEATURES available with Phosphor OpenBMC:
 #
-# - obmc-phosphor-fan-mgmt            - Phosphor OpenBMC fan management
-# - obmc-phosphor-chassis-mgmt        - Phosphor OpenBMC chassis management
-# - obmc-phosphor-sensor-mgmt         - Phosphor OpenBMC sensor management
-# - obmc-phosphor-flash-mgmt          - Phosphor OpenBMC flash management
-# - obmc-phosphor-event-mgmt          - Phosphor OpenBMC event management
-# - obmc-phosphor-user-mgmt           - Phosphor OpenBMC user management
+# - obmc-chassis-mgmt                 - OpenBMC chassis management
+# - obmc-chassis-state-mgmt           - OpenBMC chassis state management
+# - obmc-event-mgmt                   - OpenBMC event management
+# - obmc-fan-mgmt                     - OpenBMC fan management
+# - obmc-flash-mgmt                   - OpenBMC flash management
+# - obmc-host-ctl                     - OpenBMC host control
+# - obmc-host-ipmi                    - OpenBMC host IPMI
+# - obmc-host-state-mgmt              - OpenBMC host state management
+# - obmc-logging-mgmt                 - OpenBMC logging management
+# - obmc-sensor-mgmt                  - OpenBMC sensor management
 # - obmc-settings-mgmt                - OpenBMC settings management
-# - obmc-phosphor-system-mgmt         - Phosphor OpenBMC system management
-# - obmc-host-ipmi                    - OpenBMC Host IPMI
-# - obmc-logging                      - OpenBMC logging management
-# - obmc-host-state-mgmt              - OpenBMC Host State Management
-# - obmc-chassis-state-mgmt           - OpenBMC Chassis State Management
+# - obmc-system-mgmt                  - OpenBMC system management
+# - obmc-user-mgmt                    - OpenBMC user management
 
 inherit core-image
 inherit obmc-phosphor-license
 inherit obmc-phosphor-utils
 
-FEATURE_PACKAGES_obmc-fan-mgmt ?= "${@cf_enabled('obmc-phosphor-fan-mgmt', 'virtual-obmc-fan-mgmt', d)}"
 FEATURE_PACKAGES_obmc-chassis-mgmt ?= "${@cf_enabled('obmc-phosphor-chassis-mgmt', 'virtual-obmc-chassis-mgmt', d)}"
-FEATURE_PACKAGES_obmc-sensor-mgmt ?= "${@cf_enabled('obmc-phosphor-sensor-mgmt', 'virtual-obmc-sensor-mgmt', d)}"
-FEATURE_PACKAGES_obmc-flash-mgmt ?= "${@cf_enabled('obmc-phosphor-flash-mgmt', 'virtual-obmc-flash-mgmt', d)}"
+FEATURE_PACKAGES_obmc-chassis-state-mgmt ?= "${@cf_enabled('obmc-chassis-state-mgmt', 'virtual-obmc-chassis-state-mgmt', d)}"
 FEATURE_PACKAGES_obmc-event-mgmt ?= "${@df_enabled('obmc-phosphor-event-mgmt', 'virtual-obmc-event-mgmt', d)}"
-FEATURE_PACKAGES_obmc-user-mgmt ?= "${@df_enabled('obmc-phosphor-user-mgmt', 'virtual-obmc-user-mgmt', d)}"
+FEATURE_PACKAGES_obmc-fan-mgmt ?= "${@cf_enabled('obmc-phosphor-fan-mgmt', 'virtual-obmc-fan-mgmt', d)}"
+FEATURE_PACKAGES_obmc-flash-mgmt ?= "${@cf_enabled('obmc-phosphor-flash-mgmt', 'virtual-obmc-flash-mgmt', d)}"
+FEATURE_PACKAGES_obmc-host-ctl ?= "${@cf_enabled('obmc-host-ctl', 'virtual-obmc-host-ctl', d)}"
+FEATURE_PACKAGES_obmc-host-ipmi ?= "${@cf_enabled('obmc-host-ipmi', 'virtual-obmc-host-ipmi-hw', d)}"
+FEATURE_PACKAGES_obmc-host-state-mgmt ?= "${@cf_enabled('obmc-host-state-mgmt', 'virtual-obmc-host-state-mgmt', d)}"
+FEATURE_PACKAGES_obmc-logging-mgmt ?= "${@df_enabled('obmc-logging-mgmt', 'virtual-obmc-logging-mgmt', d)}"
+FEATURE_PACKAGES_obmc-sensor-mgmt ?= "${@cf_enabled('obmc-phosphor-sensor-mgmt', 'virtual-obmc-sensor-mgmt', d)}"
 FEATURE_PACKAGES_obmc-settings-mgmt ?= "${@df_enabled('obmc-settings-mgmt', 'virtual-obmc-settings-mgmt', d)}"
 FEATURE_PACKAGES_obmc-system-mgmt ?= "${@df_enabled('obmc-phosphor-system-mgmt', 'virtual-obmc-system-mgmt', d)}"
-FEATURE_PACKAGES_obmc-host-ipmi ?= "${@cf_enabled('obmc-host-ipmi', 'virtual-obmc-host-ipmi-hw', d)}"
-FEATURE_PACKAGES_obmc-logging-mgmt ?= "${@df_enabled('obmc-logging-mgmt', 'virtual-obmc-logging-mgmt', d)}"
-FEATURE_PACKAGES_obmc-host-ctl ?= "${@cf_enabled('obmc-host-ctl', 'virtual-obmc-host-ctl', d)}"
-FEATURE_PACKAGES_obmc-host-state-mgmt ?= "${@cf_enabled('obmc-host-state-mgmt', 'virtual-obmc-host-state-mgmt', d)}"
-FEATURE_PACKAGES_obmc-chassis-state-mgmt ?= "${@cf_enabled('obmc-chassis-state-mgmt', 'virtual-obmc-chassis-state-mgmt', d)}"
+FEATURE_PACKAGES_obmc-user-mgmt ?= "${@df_enabled('obmc-phosphor-user-mgmt', 'virtual-obmc-user-mgmt', d)}"
 
 # Install entire Phosphor application stack by default
 IMAGE_FEATURES += " \
-        obmc-fan-mgmt \
         obmc-chassis-mgmt \
-        obmc-sensor-mgmt \
-        obmc-flash-mgmt \
+        obmc-chassis-state-mgmt \
         obmc-event-mgmt \
-        obmc-user-mgmt \
+        obmc-fan-mgmt \
+        obmc-flash-mgmt \
+        obmc-host-ctl \
+        obmc-host-ipmi \
+        obmc-host-state-mgmt \
+        obmc-logging-mgmt \
+        obmc-sensor-mgmt \
         obmc-settings-mgmt \
         obmc-system-mgmt \
-        obmc-host-ipmi \
-        obmc-logging-mgmt \
-        obmc-host-ctl \
+        obmc-user-mgmt \
         ssh-server-dropbear \
-        obmc-host-state-mgmt \
-        obmc-chassis-state-mgmt \
         "
 
 CORE_IMAGE_EXTRA_INSTALL_append = " bash \
