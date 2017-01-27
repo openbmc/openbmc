@@ -7,24 +7,36 @@ ucd_bus="0"
 ucd_addr="0x64"
 ucd_path="/sys/bus/i2c/drivers/ucd9000"
 ucd_driver="${ucd_bus}-00${ucd_addr#0x}"
+ucd_retries="5"
+
+retry()
+{
+    local i=0
+    until [ $i -ge $ucd_retries ]; do
+        i=$((i+1))
+        retry_output=`$@` && break
+    done
+    local ret=$?
+    if [ $i -eq $ucd_retries ]; then exit $ret; fi
+}
 
 # Usage: ucd_get address
 # Result stored in $ucd_reg
 ucd_get()
 {
-    ucd_reg=`i2cget -y $ucd_bus $ucd_addr $1 b`
+    retry i2cget -y $ucd_bus $ucd_addr $1 b
+    ucd_reg=$retry_output
 }
 
 # Usage: ucd_get address value
 ucd_set()
 {
-    i2cset -y $ucd_bus $ucd_addr $1 $2 b
+    retry i2cset -y $ucd_bus $ucd_addr $1 $2 b
 }
 
 unbind_ucd()
 {
-    if [ -e $ucd_path/$ucd_driver ]
-    then
+    if [ -e $ucd_path/$ucd_driver ]; then
         echo -e "\tUnbinding UCD driver $ucd_driver"
         echo $ucd_driver > $ucd_path/unbind
     else
@@ -34,10 +46,13 @@ unbind_ucd()
 
 rebind_ucd()
 {
-    if [ -e $ucd_path ]
-    then
+    if [ -e $ucd_path ]; then
         echo -e "\tBinding UCD driver $ucd_driver"
-        echo $ucd_driver > $ucd_path/bind
+        local i=0
+        until [ -d $ucd_path/$ucd_driver ] || [ $i -ge $ucd_retries ]; do
+            i=$((i+1))
+            echo $ucd_driver > $ucd_path/bind
+        done
     fi
 }
 
@@ -71,13 +86,10 @@ vcs_get()
 }
 
 
-if [ "$1" == "on" ]
-then
+if [ "$1" == "on" ]; then
     echo Turning on VCS
     vcs_set_gpios 0x7
-
-elif [ "$1" == "off" ]
-then
+elif [ "$1" == "off" ]; then
     echo Turning off VCS
     vcs_set_gpios 0x3
 else
