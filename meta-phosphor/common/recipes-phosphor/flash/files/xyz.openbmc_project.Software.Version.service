@@ -1,0 +1,13 @@
+[Unit]
+Description=Phosphor Version Software Manager
+After=mapper-wait@-org-openbmc-managers-System.service
+Before=mapper-wait@-xyz-openbmc_project-Software-Version.service
+
+[Service]
+ExecStart={sbindir}/phosphor-version-software-manager
+Restart=always
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
