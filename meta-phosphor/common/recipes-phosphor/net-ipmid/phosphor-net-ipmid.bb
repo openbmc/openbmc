@@ -21,4 +21,7 @@ SRCREV = "f744494864ef9292f8746922a5bf4bbe164d6430"
 
 S = "${WORKDIR}/git"
 
-SYSTEMD_SERVICE_${PN} = "${PN}.service"
+SYSTEMD_SERVICE_${PN} = " \
+        ${PN}.service \
+        ${PN}.socket \
+        "
