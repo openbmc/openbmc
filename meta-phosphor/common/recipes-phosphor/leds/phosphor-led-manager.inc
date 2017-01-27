@@ -1,5 +1,5 @@
 HOMEPAGE = "http://github.com/openbmc/phosphor-led-manager"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
-SRC_URI += "git:///home/OpenBmc/phosphor-led-manager"
-SRCREV = "3289e8f01c5086de0a4f48a768715a223734c00d"
+SRC_URI += "git://github.com/openbmc/phosphor-led-manager"
+SRCREV = "a35237633ac89d6b9932dbdb68e1a50072f9e8b2"
