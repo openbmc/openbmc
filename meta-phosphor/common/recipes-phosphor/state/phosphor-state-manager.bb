@@ -39,6 +39,6 @@ FILES_${PN}-chassis = "${sbindir}/phosphor-chassis-state-manager"
 DBUS_SERVICE_${PN}-chassis += "xyz.openbmc_project.State.Chassis.service"
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager"
-SRCREV = "6e0b50936735faac96db2f20fe84ffd0733750a9"
+SRCREV = "d613b8166a3c3dc652badf8d8c52e74492941f28"
 
 S = "${WORKDIR}/git"
