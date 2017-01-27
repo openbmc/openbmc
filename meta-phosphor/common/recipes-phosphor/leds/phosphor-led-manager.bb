@@ -14,7 +14,7 @@ DEPENDS += "sdbusplus sdbusplus-native"
 RDEPENDS_${PN} += "libsystemd"
 
 SRC_URI += "git://github.com/openbmc/phosphor-led-manager"
-SRCREV = "ed4907342897301ab96cbf2c617cafd78caf25a1"
+SRCREV = "a35237633ac89d6b9932dbdb68e1a50072f9e8b2"
 S = "${WORKDIR}/git"
 
 DBUS_SERVICE_${PN} += "xyz.openbmc_project.ledmanager.service"
