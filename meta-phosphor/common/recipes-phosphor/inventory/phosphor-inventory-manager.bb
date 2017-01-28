@@ -7,6 +7,7 @@ PR = "r1"
 inherit autotools \
         pkgconfig \
         pythonnative \
+        phosphor-inventory-manager \
         obmc-phosphor-dbus-service
 
 require phosphor-inventory-manager.inc
@@ -27,7 +28,7 @@ DBUS_SERVICE_${PN} = "${OBMC_INVENTORY_MGR_IFACE}.service"
 S = "${WORKDIR}/git"
 
 EXTRA_OECONF = " \
-        YAML_PATH=${STAGING_DATADIR_NATIVE}/${PN} \
+        YAML_PATH=${STAGING_DIR_NATIVE}${base_datadir} \
         BUSNAME=${OBMC_INVENTORY_MGR_IFACE} \
         INVENTORY_ROOT=${OBMC_INVENTORY_PATH} \
         IFACE=${OBMC_INVENTORY_MGR_IFACE} \
