@@ -16,7 +16,7 @@ CHASSIS_POWER_TARGETS = "on off"
 # Track all host synchronization point target
 HOST_SYNCH_TARGETS = "start-pre start started stop-pre stop stopped"
 # Track all host action targets
-HOST_ACTION_TARGETS = "stop"
+HOST_ACTION_TARGETS = "stop quiesce"
 
 CHASSIS_FMT = "obmc-chassis-{0}@.target"
 SYNCH_POWER_FMT = "obmc-power-{0}@.target"
