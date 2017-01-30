@@ -25,10 +25,11 @@ inherit obmc-phosphor-dbus-service
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-logging"
+DEPENDS += "phosphor-dbus-interfaces"
 
-RDEPENDS_${PN}-host += "libsystemd"
-RDEPENDS_${PN}-chassis += "libsystemd"
-RDEPENDS_${PN}-bmc += "libsystemd"
+RDEPENDS_${PN}-host += "libsystemd phosphor-dbus-interfaces"
+RDEPENDS_${PN}-chassis += "libsystemd phosphor-dbus-interfaces"
+RDEPENDS_${PN}-bmc += "libsystemd phosphor-dbus-interfaces"
 
 PROVIDES += "virtual/obmc-host-state-mgmt"
 RPROVIDES_${PN}-host += "virtual-obmc-host-state-mgmt"
