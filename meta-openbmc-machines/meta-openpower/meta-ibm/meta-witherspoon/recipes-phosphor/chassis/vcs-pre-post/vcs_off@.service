@@ -2,7 +2,7 @@
 Description=Disable VCS before Witherspoon power on
 Wants=obmc-power-start-pre@%i.target
 Before=obmc-power-start-pre@%i.target
-Conflicts=obmc-chassis-stop@%i.target
+Conflicts=obmc-power-chassis-off@%i.target
 
 [Service]
 ExecStart={bindir}/vcs_off.sh
@@ -10,4 +10,4 @@ Type=oneshot
 RemainAfterExit=yes
 
 [Install]
-WantedBy=obmc-chassis-start@%i.target
+WantedBy=obmc-power-chassis-on@%i.target
