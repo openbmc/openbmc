@@ -9,7 +9,7 @@ DEPENDS += "mrw-native mrw-perl-tools-native"
 
 # Generate a YAML files based on MRW input
 do_install_append() {
-    USE_MRW="${@cf_enabled('obmc-mrw', 'yes', d)}"
+    USE_MRW="${@cf_enabled(d, 'obmc-mrw', 'yes')}"
     DEST=${STAGING_DATADIR_NATIVE}/phosphor-led-manager
 
     if [ "${USE_MRW}" = "yes" ]; then
