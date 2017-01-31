@@ -3,18 +3,18 @@
 inherit utils
 
 
-def df_enabled(feature, value, d):
-    return base_contains("DISTRO_FEATURES", feature, value, "", d)
+def df_enabled(d, feature, truevalue, falsevalue=""):
+    return base_contains("DISTRO_FEATURES", feature, truevalue, falsevalue, d)
 
 
-def mf_enabled(feature, value, d):
-    return base_contains("MACHINE_FEATURES", feature, value, "", d)
+def mf_enabled(d, feature, truevalue, falsevalue=""):
+    return base_contains("MACHINE_FEATURES", feature, truevalue, falsevalue, d)
 
 
-def cf_enabled(feature, value, d):
-    return value if df_enabled(feature, value, d) \
-        and mf_enabled(feature, value, d) \
-            else ""
+def cf_enabled(d, feature, truevalue, falsevalue=""):
+    return truevalue if df_enabled(d, feature, truevalue) \
+        and mf_enabled(d, feature, truevalue) \
+            else falsevalue
 
 
 def set_append(d, var, val, sep=' '):

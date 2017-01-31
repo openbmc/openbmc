@@ -14,5 +14,5 @@ def get_depends(d):
     else:
         return "${PHOSPHOR_LED_MANAGER_CONFIG}"
 
-USE_MRW = "${@cf_enabled('obmc-mrw', 'yes', d)}"
+USE_MRW = "${@cf_enabled(d, 'obmc-mrw', 'yes')}"
 DEPENDS += "${@get_depends(d)}"
