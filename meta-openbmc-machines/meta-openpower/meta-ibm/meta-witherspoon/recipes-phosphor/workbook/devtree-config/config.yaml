@@ -14,10 +14,19 @@ memory:
   base: 0x80000000
   size: 0x40000000
 
+#Enables the mapping of the host SPI flash into memory
+#and the LPC mailbox to allow host access to that data.
+#Required for most P9 OpenPower systems.
+lpc-host-spi-flash-mailbox:
+  #The address range to map the flash into
+  bmc-address-range:
+    base: 0x94000000
+    size: 0x04000000 #64MB
+
 #Values for the chosen node.
 #Required.
 chosen:
-  stdout-path: uart5
+  stdout-path: (alias)uart5
   bootargs: console=ttyS4,115200 earlyprintk
 
 #Values for the aliases node.
