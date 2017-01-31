@@ -26,6 +26,7 @@ DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-logging"
 DEPENDS += "phosphor-dbus-interfaces"
+RDEPENDS_${PN} += "sdbusplus"
 
 RDEPENDS_${PN}-host += "libsystemd phosphor-dbus-interfaces"
 RDEPENDS_${PN}-chassis += "libsystemd phosphor-dbus-interfaces"
@@ -47,6 +48,6 @@ FILES_${PN}-bmc = "${sbindir}/phosphor-bmc-state-manager"
 DBUS_SERVICE_${PN}-bmc += "xyz.openbmc_project.State.BMC.service"
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager"
-SRCREV = "9792414f6bdc925f2785355bdf456b54d46a0b90"
+SRCREV = "20a4887fa02492d854ea131ffd5775512196e975"
 
 S = "${WORKDIR}/git"
