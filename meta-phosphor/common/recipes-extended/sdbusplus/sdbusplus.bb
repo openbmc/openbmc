@@ -45,6 +45,5 @@ PYTHON_AUTOTOOLS_PACKAGE = "sdbus++"
 
 PACKAGECONFIG_remove_class-native = "libsdbusplus"
 PACKAGECONFIG_remove_class-nativesdk = "libsdbusplus"
-ALLOW_EMPTY_${PN} = "1"
 
 BBCLASSEXTEND += "native nativesdk"

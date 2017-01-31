@@ -26,6 +26,7 @@ DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-logging"
 DEPENDS += "phosphor-dbus-interfaces"
+RDEPENDS_${PN} += "sdbusplus"
 
 RDEPENDS_${PN}-host += "libsystemd phosphor-dbus-interfaces"
 RDEPENDS_${PN}-chassis += "libsystemd phosphor-dbus-interfaces"
