@@ -14,7 +14,7 @@ DEPENDS += "autoconf-archive-native"
 TARGET_CFLAGS += "-fpic"
 
 SRC_URI += "git://github.com/openbmc/openpower-host-ipmi-oem"
-SRCREV = "70dbc5871c6da23f7f14046ce9d356600992f6a8"
+SRCREV = "cbfd6ec40ab2f61498599f7f34cae2e9b51c4970"
 
 HOSTIPMI_PROVIDER_LIBRARY += "liboemhandler.so"
 
