@@ -25,6 +25,7 @@ inherit obmc-phosphor-dbus-service
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-logging"
+RDEPENDS_${PN} += "sdbusplus"
 
 RDEPENDS_${PN}-host += "libsystemd"
 RDEPENDS_${PN}-chassis += "libsystemd"
