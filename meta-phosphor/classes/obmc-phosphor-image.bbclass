@@ -21,21 +21,21 @@ inherit core-image
 inherit obmc-phosphor-license
 inherit obmc-phosphor-utils
 
-FEATURE_PACKAGES_obmc-bmc-state-mgmt ?= "${@cf_enabled('obmc-bmc-state-mgmt', 'virtual-obmc-bmc-state-mgmt', d)}"
-FEATURE_PACKAGES_obmc-chassis-mgmt ?= "${@cf_enabled('obmc-phosphor-chassis-mgmt', 'virtual-obmc-chassis-mgmt', d)}"
-FEATURE_PACKAGES_obmc-chassis-state-mgmt ?= "${@cf_enabled('obmc-chassis-state-mgmt', 'virtual-obmc-chassis-state-mgmt', d)}"
-FEATURE_PACKAGES_obmc-event-mgmt ?= "${@df_enabled('obmc-phosphor-event-mgmt', 'virtual-obmc-event-mgmt', d)}"
-FEATURE_PACKAGES_obmc-fan-mgmt ?= "${@cf_enabled('obmc-phosphor-fan-mgmt', 'virtual-obmc-fan-mgmt', d)}"
-FEATURE_PACKAGES_obmc-flash-mgmt ?= "${@cf_enabled('obmc-phosphor-flash-mgmt', 'virtual-obmc-flash-mgmt', d)}"
-FEATURE_PACKAGES_obmc-host-ctl ?= "${@cf_enabled('obmc-host-ctl', 'virtual-obmc-host-ctl', d)}"
-FEATURE_PACKAGES_obmc-host-ipmi ?= "${@cf_enabled('obmc-host-ipmi', 'virtual-obmc-host-ipmi-hw', d)}"
-FEATURE_PACKAGES_obmc-host-state-mgmt ?= "${@cf_enabled('obmc-host-state-mgmt', 'virtual-obmc-host-state-mgmt', d)}"
-FEATURE_PACKAGES_obmc-logging-mgmt ?= "${@df_enabled('obmc-logging-mgmt', 'virtual-obmc-logging-mgmt', d)}"
-FEATURE_PACKAGES_obmc-net-ipmi ?= "${@df_enabled('obmc-net-ipmi', 'virtual-obmc-net-ipmi', d)}"
-FEATURE_PACKAGES_obmc-sensor-mgmt ?= "${@cf_enabled('obmc-phosphor-sensor-mgmt', 'virtual-obmc-sensor-mgmt', d)}"
-FEATURE_PACKAGES_obmc-settings-mgmt ?= "${@df_enabled('obmc-settings-mgmt', 'virtual-obmc-settings-mgmt', d)}"
-FEATURE_PACKAGES_obmc-system-mgmt ?= "${@df_enabled('obmc-phosphor-system-mgmt', 'virtual-obmc-system-mgmt', d)}"
-FEATURE_PACKAGES_obmc-user-mgmt ?= "${@df_enabled('obmc-phosphor-user-mgmt', 'virtual-obmc-user-mgmt', d)}"
+FEATURE_PACKAGES_obmc-bmc-state-mgmt ?= "${@cf_enabled(d, 'obmc-bmc-state-mgmt', 'virtual-obmc-bmc-state-mgmt')}"
+FEATURE_PACKAGES_obmc-chassis-mgmt ?= "${@cf_enabled(d, 'obmc-phosphor-chassis-mgmt', 'virtual-obmc-chassis-mgmt')}"
+FEATURE_PACKAGES_obmc-chassis-state-mgmt ?= "${@cf_enabled(d, 'obmc-chassis-state-mgmt', 'virtual-obmc-chassis-state-mgmt')}"
+FEATURE_PACKAGES_obmc-event-mgmt ?= "${@df_enabled(d, 'obmc-phosphor-event-mgmt', 'virtual-obmc-event-mgmt')}"
+FEATURE_PACKAGES_obmc-fan-mgmt ?= "${@cf_enabled(d, 'obmc-phosphor-fan-mgmt', 'virtual-obmc-fan-mgmt')}"
+FEATURE_PACKAGES_obmc-flash-mgmt ?= "${@cf_enabled(d, 'obmc-phosphor-flash-mgmt', 'virtual-obmc-flash-mgmt')}"
+FEATURE_PACKAGES_obmc-host-ctl ?= "${@cf_enabled(d, 'obmc-host-ctl', 'virtual-obmc-host-ctl')}"
+FEATURE_PACKAGES_obmc-host-ipmi ?= "${@cf_enabled(d, 'obmc-host-ipmi', 'virtual-obmc-host-ipmi-hw')}"
+FEATURE_PACKAGES_obmc-host-state-mgmt ?= "${@cf_enabled(d, 'obmc-host-state-mgmt', 'virtual-obmc-host-state-mgmt')}"
+FEATURE_PACKAGES_obmc-logging-mgmt ?= "${@df_enabled(d, 'obmc-logging-mgmt', 'virtual-obmc-logging-mgmt')}"
+FEATURE_PACKAGES_obmc-net-ipmi ?= "${@df_enabled(d, 'obmc-net-ipmi', 'virtual-obmc-net-ipmi')}"
+FEATURE_PACKAGES_obmc-sensor-mgmt ?= "${@cf_enabled(d, 'obmc-phosphor-sensor-mgmt', 'virtual-obmc-sensor-mgmt')}"
+FEATURE_PACKAGES_obmc-settings-mgmt ?= "${@df_enabled(d, 'obmc-settings-mgmt', 'virtual-obmc-settings-mgmt')}"
+FEATURE_PACKAGES_obmc-system-mgmt ?= "${@df_enabled(d, 'obmc-phosphor-system-mgmt', 'virtual-obmc-system-mgmt')}"
+FEATURE_PACKAGES_obmc-user-mgmt ?= "${@df_enabled(d, 'obmc-phosphor-user-mgmt', 'virtual-obmc-user-mgmt')}"
 
 # Install entire Phosphor application stack by default
 IMAGE_FEATURES += " \
@@ -66,6 +66,7 @@ CORE_IMAGE_EXTRA_INSTALL_append = " bash \
         obmc-console \
         pam-plugin-access \
         ${OBMC_IMAGE_EXTRA_INSTALL} \
+        ffdc \
         "
 
 OBMC_IMAGE_EXTRA_INSTALL ?= ""
