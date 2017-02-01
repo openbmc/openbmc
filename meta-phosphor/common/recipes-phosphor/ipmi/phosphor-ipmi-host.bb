@@ -8,6 +8,7 @@ RRECOMMENDS_${PN} += "packagegroup-obmc-ipmid-providers-libs"
 inherit autotools pkgconfig
 inherit obmc-phosphor-license
 inherit obmc-phosphor-sdbus-service
+inherit obmc-phosphor-ipmiprovider-symlink
 
 DEPENDS += "phosphor-mapper"
 DEPENDS += "autoconf-archive-native"
@@ -23,8 +24,16 @@ SRCREV = "a640b775491bff926ac759ffd6e13ec2bcc80d26"
 
 S = "${WORKDIR}/git"
 
+HOSTIPMI_PROVIDER_LIBRARY += "libapphandler.so"
+HOSTIPMI_PROVIDER_LIBRARY += "libhostservice.so"
+HOSTIPMI_PROVIDER_LIBRARY += "libsysintfcmds.so"
+
+NETIPMI_PROVIDER_LIBRARY += "libapphandler.so"
+
+FILES_${PN}_append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
 FILES_${PN}_append = " ${libdir}/host-ipmid/lib*${SOLIBS}"
-FILES_${PN}-dev_append = " ${libdir}/host-ipmid/lib*${SOLIBSDEV} ${libdir}/host-ipmid/*.la"
+FILES_${PN}_append = " ${libdir}/net-ipmid/lib*${SOLIBS}"
+FILES_${PN}-dev_append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV} ${libdir}/ipmid-providers/*.la"
 
 DBUS_SERVICE_${PN} += "org.openbmc.HostServices.service"
 
