@@ -15,7 +15,8 @@ PROC:
   xyz.openbmc_project.Inventory.Item:
     PrettyName:
       IPMIFruSection: Board
-      IPMIFruProperty: "Product Name"
+      IPMIFruProperty: "Name"
+    Present:
 
 SYS:
   xyz.openbmc_project.Inventory.Decorator.Asset:
@@ -34,7 +35,8 @@ SYS:
   xyz.openbmc_project.Inventory.Item:
     PrettyName:
       IPMIFruSection: Product
-      IPMIFruProperty: "Product Name"
+      IPMIFruProperty: "Name"
+    Present:
   xyz.openbmc_project.Inventory.Revision:
     Version:
       IPMIFruSection: Product
@@ -57,7 +59,8 @@ DIMM:
   xyz.openbmc_project.Inventory.Item:
     PrettyName:
       IPMIFruSection: Product
-      IPMIFruProperty: "Product Name"
+      IPMIFruProperty: "Name"
+    Present:
   xyz.openbmc_project.Inventory.Revision:
     Version:
       IPMIFruSection: Product
@@ -80,4 +83,5 @@ MEMBUFF:
   xyz.openbmc_project.Inventory.Item:
     PrettyName:
       IPMIFruSection: Board
-      IPMIFruProperty: "Product Name"
+      IPMIFruProperty: "Name"
+    Present:
