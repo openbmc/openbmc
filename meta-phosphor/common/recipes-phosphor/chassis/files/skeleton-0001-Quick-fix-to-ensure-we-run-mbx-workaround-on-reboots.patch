@@ -1,0 +1,39 @@
+From 15d14532aa66108716d5ffb6bd8222277f9451ab Mon Sep 17 00:00:00 2001
+From: Andrew Geissler <andrewg@us.ibm.com>
+Date: Fri, 27 Jan 2017 16:29:28 -0600
+Subject: [PATCH] Quick fix to ensure we run mbx workaround on reboots
+
+See openbmc/openbmc#1045 for more details
+
+Change-Id: I55ce69a7cb05bc4274bc4af70cee5d387492f76e
+Signed-off-by: Andrew Geissler <andrewg@us.ibm.com>
+---
+ chassis_control.py | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/chassis_control.py b/chassis_control.py
+index 3637d82..eae7875 100644
+--- a/chassis_control.py
++++ b/chassis_control.py
+@@ -4,6 +4,7 @@ import gobject
+ import dbus
+ import dbus.service
+ import dbus.mainloop.glib
++import time
+ from obmc.dbuslib.bindings import get_dbus, DbusProperties, DbusObjectManager
+ 
+ DBUS_NAME = 'org.openbmc.control.Chassis'
+@@ -181,6 +182,10 @@ class ChassisControlObject(DbusProperties, DbusObjectManager):
+ 
+         if (state_name == "HOST_POWERED_OFF" and self.Get(DBUS_NAME,
+                                                           "reboot") == 1):
++            # TODO - Hack to give time for mbx to reload during
++            #        power off phase of a reboot
++            print "Sleeping to give mbx time to reload"
++            time.sleep(10)
+             self.powerOn()
+ 
+     def power_button_signal_handler(self):
+-- 
+2.11.0
+
