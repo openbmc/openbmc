@@ -4,6 +4,7 @@ PR = "r1"
 
 inherit autotools pkgconfig
 inherit obmc-phosphor-systemd
+inherit obmc-phosphor-ipmiprovider-symlink
 
 require ${PN}.inc
 
@@ -21,5 +22,8 @@ SYSTEMD_SERVICE_${PN} += "obmc-read-eeprom@.service"
 
 S = "${WORKDIR}/git"
 
+HOSTIPMI_PROVIDER_LIBRARY += "libstrgfnhandler.so"
+
+FILES_${PN}_append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
 FILES_${PN}_append = " ${libdir}/host-ipmid/lib*${SOLIBS}"
-FILES_${PN}-dev_append = " ${libdir}/host-ipmid/lib*${SOLIBSDEV} ${libdir}/host-ipmid/*.la"
+FILES_${PN}-dev_append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV} ${libdir}/ipmid-providers/*.la"
