@@ -66,6 +66,7 @@ CORE_IMAGE_EXTRA_INSTALL_append = " bash \
         obmc-console \
         pam-plugin-access \
         ${OBMC_IMAGE_EXTRA_INSTALL} \
+        ffdc \
         "
 
 OBMC_IMAGE_EXTRA_INSTALL ?= ""
