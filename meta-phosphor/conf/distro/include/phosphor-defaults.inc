@@ -16,9 +16,34 @@ PREFERRED_PROVIDER_virtual/obmc-fan-mgmt ?= "obmc-phosphor-fand"
 PREFERRED_PROVIDER_virtual/obmc-flash-mgmt ?= "obmc-phosphor-flashd"
 PREFERRED_PROVIDER_virtual/obmc-host-ipmi-hw ?= "phosphor-ipmi-hw-example"
 PREFERRED_PROVIDER_virtual/obmc-host-state-mgmt ?= "phosphor-state-manager"
+
+# obmc-inventory-manager
+#
+# Provides an implementation of the xyz.openbmc_project.Inventory.Manager
+# interface.
+VIRTUAL-RUNTIME_obmc-inventory-manager ?= "phosphor-inventory-manager"
+
+# obmc-led-manager
+#
+# Provides an implementation of the xyz.openbmc_project.ledmanager interface.
+VIRTUAL-RUNTIME_obmc-leds-manager ?= "phosphor-led-manager"
+
+# obmc-led-sysfs
+#
+# Provides an implementation of xyz.openbmc_project.Led.Physical for
+# Linux kernel LED subsystem LEDs.
+VIRTUAL-RUNTIME_obmc-leds-sysfs ?= "phosphor-led-sysfs"
+
 PREFERRED_PROVIDER_virtual/obmc-logging-mgmt ?= "phosphor-logging"
 PREFERRED_PROVIDER_virtual/obmc-net-ipmi ?= "phosphor-net-ipmid"
 PREFERRED_PROVIDER_virtual/obmc-sensor-mgmt ?= "obmc-phosphor-sensord"
+
+# obmc-sensors-hwmon
+#
+# Provides an implementation of xyz.openbmc_project.Sensor.Value
+# for hwmon sensors.
+VIRTUAL-RUNTIME_obmc-sensors-hwmon ?= "phosphor-hwmon"
+
 PREFERRED_PROVIDER_virtual/obmc-settings-mgmt ?= "phosphor-settings"
 PREFERRED_PROVIDER_virtual/obmc-system-mgmt ?= "obmc-phosphor-sysd"
 PREFERRED_PROVIDER_virtual/obmc-user-mgmt ?= "obmc-phosphor-user"
