@@ -1,6 +1,6 @@
 [Unit]
 Description=Phosphor LED Group Management Daemon
-Before=mapper-wait@-xyz-openbmc_project-ledmanager-groups.service
+Before=mapper-wait@-xyz-openbmc_project-LedManager-Groups.service
 
 [Service]
 Restart=always
