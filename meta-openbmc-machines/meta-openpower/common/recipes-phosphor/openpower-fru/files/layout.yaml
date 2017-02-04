@@ -1,0 +1,11 @@
+BMC:
+    xyz.openbmc_project.Inventory.Decorator.Asset:
+        PartNumber: VINI,PN
+        SerialNumber: VINI,SN
+        Manufacturer: OPFR,VN
+    xyz.openbmc_project.Inventory.Item:
+        PrettyName: VINI,DR
+
+ETHERNET:
+    xyz.openbmc_project.Inventory.Item.NetworkInterface:
+        MACAddress: VINI,B1
