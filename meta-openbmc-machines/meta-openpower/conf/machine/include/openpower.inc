@@ -21,3 +21,5 @@ PREFERRED_PROVIDER_virtual/obmc-host-ctl ?= "obmc-op-control-host"
 PREFERRED_PROVIDER_virtual/obmc-inventory-data ?= "${VIRTUAL-RUNTIME_skeleton_workbook}"
 PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-hostfw-config ?= "hostboot-inventory-config-native"
 PREFERRED_PROVIDER_virtual/openpower-fru-vpd-layout ?= "openpower-fru-vpd-layout-native"
+PREFERRED_PROVIDER_virtual/openpower-fru-inventory ?= \
+    "${@cf_enabled(d, 'obmc-mrw', 'openpower-fru-inventory-mrw-native', 'openpower-fru-inventory-example-native')}"
