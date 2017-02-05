@@ -1,6 +1,7 @@
 KBRANCH ?= "dev-4.7"
 LINUX_VERSION ?= "4.7"
 
-SRCREV="377390c2e15a42b9f273b2633143521d0de526f8"
+KSRC ?= "git://github.com/shenki/linux;protocol=git;branch=${KBRANCH}"
+SRCREV="517d997328ab0d56b1fccb9e58cd5cd71090a8f3"
 
 require linux-obmc.inc
