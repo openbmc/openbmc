@@ -1,0 +1,11 @@
+[Unit]
+Description=Read OpenPOWER-format VPD from EEPROM
+ConditionFileNotEmpty={envfiledir}/obmc/inventory
+Wants=mapper-wait@-xyz-openbmc_project-Inventory-Manager.service
+After=mapper-wait@-xyz-openbmc_project-Inventory-Manager.service
+
+[Service]
+Restart=no
+Type=oneshot
+EnvironmentFile={envfiledir}/obmc/inventory
+ExecStart={sbindir}/openpower-read-vpd --vpd=$EEPROM --fru=$FRUS --object=$PATHS
