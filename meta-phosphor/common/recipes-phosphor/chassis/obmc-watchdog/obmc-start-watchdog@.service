@@ -13,4 +13,4 @@ ExecStart={sbindir}/mapper call /org/openbmc/watchdog/host%i org.openbmc.Watchdo
 ExecStart={sbindir}/mapper call /org/openbmc/watchdog/host%i org.openbmc.Watchdog start
 
 [Install]
-WantedBy=obmc-chassis-start@%i.target
+RequiredBy=obmc-chassis-start@%i.target

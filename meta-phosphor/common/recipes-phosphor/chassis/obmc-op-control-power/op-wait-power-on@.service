@@ -13,4 +13,4 @@ RemainAfterExit=yes
 ExecStart={sbindir}/pgood_wait /org/openbmc/control/power%i on
 
 [Install]
-WantedBy=obmc-chassis-start@%i.target
+RequiredBy=obmc-power-chassis-on@%i.target
