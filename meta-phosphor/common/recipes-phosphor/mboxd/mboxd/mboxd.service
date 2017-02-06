@@ -1,9 +1,10 @@
 [Unit]
 Description=Phosphor MBOX Daemon
-Wants=dev-aspeed-mbox.device
-After=dev-aspeed-mbox.device
-Wants=dev-aspeed-lpc-ctrl.device
-After=dev-aspeed-lpc-ctrl.device
+Wants=dev-aspeed\x2dlpc\x2dctrl.device
+After=dev-aspeed\x2dlpc\x2dctrl.device
+Wants=dev-aspeed\x2dmbox.device
+After=dev-aspeed\x2dmbox.device
+
 
 [Service]
 Restart=always
