@@ -16,4 +16,4 @@ RemainAfterExit=yes
 ExecStart={sbindir}/mapper call /org/openbmc/control/host%i org.openbmc.control.Host boot
 
 [Install]
-WantedBy=obmc-chassis-start@%i.target
+RequiredBy=obmc-chassis-start@%i.target
