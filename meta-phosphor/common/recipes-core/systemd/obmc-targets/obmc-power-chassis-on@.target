@@ -6,3 +6,5 @@ Wants=mapper-wait@-xyz-openbmc_project-state-chassis%i.service
 After=mapper-wait@-xyz-openbmc_project-state-chassis%i.service
 Conflicts=obmc-power-chassis-off@%i.target
 RefuseManualStop=yes
+OnFailure=obmc-power-chassis-off@%i.target
+OnFailureJobMode=flush
