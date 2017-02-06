@@ -5,3 +5,5 @@ Wants={SYSTEMD_DEFAULT_TARGET}
 Conflicts=obmc-power-chassis-on@%i.target
 RefuseManualStart=yes
 RefuseManualStop=yes
+OnFailure=obmc-quiesce-system@%i.target
+OnFailureJobMode=flush
