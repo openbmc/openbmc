@@ -2,3 +2,4 @@
 Description=Fans Ready
 RefuseManualStart=yes
 RefuseManualStop=yes
+OnFailure=obmc-quiesce-system@%i.target
