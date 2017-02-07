@@ -1,6 +1,8 @@
 [Unit]
 Description=Power%i Host Off
-Wants={SYSTEMD_DEFAULT_TARGET}
+Requires={SYSTEMD_DEFAULT_TARGET}
+Requires=op-stop-host@%i.service
+After=op-stop-host@%i.service
 RefuseManualStop=yes
 OnFailure=obmc-quiesce-system@%i.target
 OnFailureJobMode=flush
