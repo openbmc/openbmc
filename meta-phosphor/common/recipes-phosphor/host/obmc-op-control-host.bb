@@ -17,6 +17,6 @@ SYSTEMD_SERVICE_${PN} = "op-start-host@.service"
 START_TMPL = "op-start-host@.service"
 START_TGTFMT = "obmc-chassis-start@{1}.target"
 START_INSTFMT = "obmc-start-host@{0}.service"
-START_FMT = "../${START_TMPL}:${START_TGTFMT}.wants/${START_INSTFMT}"
+START_FMT = "../${START_TMPL}:${START_TGTFMT}.requires/${START_INSTFMT}"
 
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'START_FMT', 'OBMC_HOST_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"

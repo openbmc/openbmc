@@ -14,7 +14,7 @@ SRC_URI += "file://set_fan_speeds.sh"
 TMPL = "fan-default-speed@.service"
 INSTFMT = "fan-default-speed@{0}.service"
 TGTFMT = "obmc-chassis-start@{0}.target"
-FMT = "../${TMPL}:${TGTFMT}.wants/${INSTFMT}"
+FMT = "../${TMPL}:${TGTFMT}.requires/${INSTFMT}"
 
 SYSTEMD_SERVICE_${PN} += "${TMPL}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT', 'OBMC_CHASSIS_INSTANCES')}"
