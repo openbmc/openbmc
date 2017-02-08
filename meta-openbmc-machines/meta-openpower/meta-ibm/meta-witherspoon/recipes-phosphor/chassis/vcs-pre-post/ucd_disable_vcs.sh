@@ -27,7 +27,13 @@ i2cset -y 11 0x64 0x00 0x0F i
 i2cset -y 11 0x64 0x02 0x1A i
 
 # re-bind ucd driver
-if [ -e $ucdpath ]
-then
-  echo $ucd > $ucdpath/bind
+ucd_retries="5"
+if [ -e $ucdpath ]; then
+  i=0
+  until [ $i -ge $ucd_retries ] || [ -e $ucdpath/$ucd ]; do
+    i=$((i+1))
+    echo $ucd > $ucdpath/bind || ret=$?
+  done
+  if [ ! -e $ucdpath/$ucd ]; then exit $ret; fi
 fi
+
