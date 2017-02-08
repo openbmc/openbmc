@@ -22,7 +22,7 @@ do_install() {
 TMPL = "vcs_workaround@.service"
 INSTFMT = "vcs_workaround@{0}.service"
 TGTFMT = "obmc-power-chassis-on@{0}.target"
-FMT = "../${TMPL}:${TGTFMT}.wants/${INSTFMT}"
+FMT = "../${TMPL}:${TGTFMT}.requires/${INSTFMT}"
 
 SYSTEMD_SERVICE_${PN} += "${TMPL}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT', 'OBMC_CHASSIS_INSTANCES')}"
