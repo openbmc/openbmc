@@ -2,7 +2,7 @@ SUMMARY = "Phosphor LED Group Management Daemon"
 DESCRIPTION = "Daemon to cater to triggering actions on LED groups"
 PR = "r1"
 
-inherit autotools pkgconfig
+inherit autotools pkgconfig pythonnative
 inherit obmc-phosphor-dbus-service
 require ${PN}.inc
 
