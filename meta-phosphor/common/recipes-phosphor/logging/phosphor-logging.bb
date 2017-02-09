@@ -25,3 +25,6 @@ SRCREV = "f542ba8271617afa73117a6a194572719760d734"
 
 S = "${WORKDIR}/git"
 
+EXTRA_OECONF = " \
+        YAML_DIR=${STAGING_DIR_NATIVE}${yaml_dir} \
+        "
