@@ -14,4 +14,4 @@ DEPENDS += "sdbusplus sdbus++-native"
 RDEPENDS_${PN} += "libsystemd"
 
 SRC_URI += "git://github.com/openbmc/phosphor-dbus-interfaces"
-SRCREV = "5d4f2379695f7c28549b107f325e0b0cd43d83b1"
+SRCREV = "06e5b23a3671f44c04c7f7cce83def5ff68c86b9"
