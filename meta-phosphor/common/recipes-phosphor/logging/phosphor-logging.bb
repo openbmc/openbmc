@@ -25,3 +25,6 @@ SRCREV = "331ef90f04f0d79705170ea48204e01f5bff2681"
 
 S = "${WORKDIR}/git"
 
+EXTRA_OECONF = " \
+        YAML_DIR=${STAGING_DIR_NATIVE}${yaml_dir}/xyz/openbmc_project/Error/ \
+        "
