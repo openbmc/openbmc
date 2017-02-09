@@ -11,9 +11,10 @@ PROVIDES += "virtual/phosphor-ipmi-fru-inventory"
 S = "${WORKDIR}/git"
 
 do_install() {
-        DEST=${D}${inventory_datadir}
+        # TODO: install this to inventory_datadir
+        # after ipmi-fru-parser untangles the host
+        # firmware config from the machine inventory.
+        DEST=${D}${config_datadir}
         install -d ${DEST}
-
-        # TODO: copy example inventory yaml to ${DEST}/config.yaml
-        # install example-inventory.yaml ${DEST}/config.yaml
+        install scripts/example.yaml ${DEST}/config.yaml
 }
