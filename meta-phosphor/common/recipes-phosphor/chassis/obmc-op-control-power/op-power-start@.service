@@ -10,6 +10,7 @@ Conflicts=obmc-power-chassis-off@%i.target
 
 [Service]
 RemainAfterExit=yes
+Type=oneshot
 ExecStart={sbindir}/mapper call /org/openbmc/control/power%i org.openbmc.control.Power setPowerState i 1
 
 [Install]
