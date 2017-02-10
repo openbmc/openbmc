@@ -4,6 +4,7 @@ PR = "r1"
 
 inherit autotools pkgconfig
 inherit obmc-phosphor-dbus-service
+inherit obmc-phosphor-python-autotools
 require ${PN}.inc
 
 DEPENDS += "python-pyyaml-native"
