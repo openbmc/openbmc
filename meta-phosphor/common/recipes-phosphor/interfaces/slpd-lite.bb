@@ -14,6 +14,6 @@ DEPENDS += "autoconf-archive-native"
 
 SRC_URI += "git://github.com/openbmc/slpd-lite"
 
-SRCREV = "70b8527104281ffd927c087480fbe1168a75fe93"
+SRCREV = "5e008877701dabbc67e2ff070ac9e4998d78d8fc"
 
 S = "${WORKDIR}/git"
