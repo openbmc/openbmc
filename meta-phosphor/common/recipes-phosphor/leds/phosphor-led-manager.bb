@@ -6,10 +6,12 @@ inherit autotools pkgconfig pythonnative
 inherit obmc-phosphor-dbus-service
 require ${PN}.inc
 
+PROVIDES += "phosphor-led-manager"
+
 DEPENDS += "python-pyyaml-native"
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbusplus sdbusplus-native"
-DEPENDS += "${PN}-config"
+DEPENDS += "virtual/${PN}-config"
 RDEPENDS_${PN} += "libsystemd"
 
 S = "${WORKDIR}/git"

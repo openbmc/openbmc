@@ -1,9 +1,9 @@
-SUMMARY = "Phosphor LED Group Management with example data"
+SUMMARY = "Phosphor LED Group Management for Palmetto"
 PR = "r1"
 
 inherit native
 inherit obmc-phosphor-utils
-require phosphor-led-manager.inc
+require obmc-phosphor-license
 
 PROVIDES += "virtual/phosphor-led-manager-config"
 
