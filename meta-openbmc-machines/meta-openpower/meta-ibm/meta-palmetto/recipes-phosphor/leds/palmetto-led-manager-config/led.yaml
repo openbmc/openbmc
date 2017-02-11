@@ -1,0 +1,15 @@
+beep:
+    beep:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+heartbeat:
+    heartbeat:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+identify:
+    identify:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
