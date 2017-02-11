@@ -1,0 +1,30 @@
+PowerFault:
+    power:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+PowerIdentify:
+    power:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+HeartbeatFault:
+    heartbeat:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+HeartbeatIdentify:
+    heartbeat:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+IdentifyFault:
+    identify:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+IdentifyId:
+    identify:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
