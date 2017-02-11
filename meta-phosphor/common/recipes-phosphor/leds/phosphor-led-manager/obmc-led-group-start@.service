@@ -1,0 +1,10 @@
+[Unit]
+Description=Assert %i LED
+Wants=mapper-wait@-xyz-openbmc_project-led-groups-%i.service
+After=mapper-wait@-xyz-openbmc_project-led-groups-%i.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+Restart=no
+ExecStart={sbindir}/mapper call /xyz/openbmc_project/led/groups/%i org.freedesktop.DBus.Properties Set ssv xyz.openbmc_project.Led.Group Asserted b true
