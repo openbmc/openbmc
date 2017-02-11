@@ -5,6 +5,7 @@ inherit native
 inherit obmc-phosphor-utils
 inherit obmc-phosphor-license
 
+PROVIDES += "virtual/phosphor-led-manager-config-native"
 DEPENDS += "mrw-native mrw-perl-tools-native"
 
 # Generate a YAML files based on MRW input
