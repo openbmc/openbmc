@@ -15,30 +15,26 @@ PROC:
   xyz.openbmc_project.Inventory.Item:
     PrettyName:
       IPMIFruSection: Board
-      IPMIFruProperty: "Product Name"
+      IPMIFruProperty: "Name"
 
 SYS:
   xyz.openbmc_project.Inventory.Decorator.Asset:
     BuildDate:
-      IPMIFruSection: Product
+      IPMIFruSection: Board
       IPMIFruProperty: "Mfg Date"
     Manufacturer:
-      IPMIFruSection: Product
+      IPMIFruSection: Board
       IPMIFruProperty: "Manufacturer"
     PartNumber:
-      IPMIFruSection: Product
+      IPMIFruSection: Board
       IPMIFruProperty: "Part Number"
     SerialNumber:
-      IPMIFruSection: Product
+      IPMIFruSection: Board
       IPMIFruProperty: "Serial Number"
   xyz.openbmc_project.Inventory.Item:
     PrettyName:
-      IPMIFruSection: Product
-      IPMIFruProperty: "Product Name"
-  xyz.openbmc_project.Inventory.Revision:
-    Version:
-      IPMIFruSection: Product
-      IPMIFruProperty: "Version"
+      IPMIFruSection: Board
+      IPMIFruProperty: "Name"
 
 DIMM:
   xyz.openbmc_project.Inventory.Decorator.Asset:
@@ -54,11 +50,14 @@ DIMM:
     SerialNumber:
       IPMIFruSection: Product
       IPMIFruProperty: "Serial Number"
+    Model:
+      IPMIFruSection: Product
+      IPMIFruProperty: "Model Number"
   xyz.openbmc_project.Inventory.Item:
     PrettyName:
       IPMIFruSection: Product
-      IPMIFruProperty: "Product Name"
-  xyz.openbmc_project.Inventory.Revision:
+      IPMIFruProperty: "Name"
+  xyz.openbmc_project.Inventory.Decorator.Revision:
     Version:
       IPMIFruSection: Product
       IPMIFruProperty: "Version"
@@ -80,4 +79,4 @@ MEMBUFF:
   xyz.openbmc_project.Inventory.Item:
     PrettyName:
       IPMIFruSection: Board
-      IPMIFruProperty: "Product Name"
+      IPMIFruProperty: "Name"
