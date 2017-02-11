@@ -9,11 +9,12 @@ require ${PN}.inc
 DEPENDS += "python-pyyaml-native"
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbusplus sdbusplus-native"
-DEPENDS += "${PN}-config"
+DEPENDS += "virtual/${PN}-config"
 RDEPENDS_${PN} += "libsystemd"
 
 S = "${WORKDIR}/git"
 
 DBUS_SERVICE_${PN} += "xyz.openbmc_project.LED.GroupManager.service"
+SYSTEMD_SERVICE_${PN} += "obmc-led-group-start@.service obmc-led-group-stop@.service"
 
 EXTRA_OECONF = "YAML_PATH=${STAGING_DATADIR_NATIVE}/${PN}"

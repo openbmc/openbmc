@@ -1,0 +1,30 @@
+Power:
+    power:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+HeartBeat:
+    heartbeat:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+BmcBoot:
+    identify:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+EnclosureIdentify:
+    identify:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+PowerBlinkTest:
+    power:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+HeartBeatBlinkTest:
+    heartbeat:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
