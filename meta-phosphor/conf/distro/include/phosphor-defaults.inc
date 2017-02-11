@@ -80,5 +80,13 @@ PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-inventory ?= \
 PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-properties ?= \
     "${@cf_enabled(d, 'obmc-mrw', 'phosphor-ipmi-fru-properties-mrw-native', 'phosphor-ipmi-fru-properties-example-native')}"
 
+# The phosphor-led-manager application is data-driven and requires an input
+# yaml of LED group and members.
+# This virtual is a native recipe that provides that mapping by installing
+# configuration files in the format and native sysroot location expected by
+# the phosphor-led-manager build process in the native sysroot.
+PREFERRED_PROVIDER_virtual/phosphor-led-manager-config ?= \
+    "${@cf_enabled(d, 'obmc-mrw', 'phosphor-led-manager-config-mrw-native', 'phosphor-led-manager-config-example-native')}"
+
 OBMC_DBUS_PATH_ROOT ?= "/xyz/openbmc_project"
 OBMC_DBUS_IFACE_ROOT ?= "xyz.openbmc_project"
