@@ -1,0 +1,30 @@
+BmcBoot:
+    beep:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+HostBoot:
+    identify:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+EnclosureIdentify:
+    identify:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+HeartBeat:
+    heartbeat:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+BeepIdentifyTest:
+    beep:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+HeartBeatIdentifyTest:
+    heartbeat:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
