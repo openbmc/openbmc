@@ -51,8 +51,9 @@ rebind_ucd()
         local i=0
         until [ -d $ucd_path/$ucd_driver ] || [ $i -ge $ucd_retries ]; do
             i=$((i+1))
-            echo $ucd_driver > $ucd_path/bind
+            echo $ucd_driver > $ucd_path/bind || ret=$?
         done
+        if [ ! -d $ucd_path/$ucd_driver ]; then exit $ret; fi
     fi
 }
 
