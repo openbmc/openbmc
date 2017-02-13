@@ -48,3 +48,7 @@ bmc-flash-config:
      DTSI_INCLUDE: aspeed-bmc-opp-flash-layout.dtsi
   chip-select-1:
     label: alt
+
+#If OpenFSI device tree support should be enabled.
+#true or false
+enable-openfsi: true
