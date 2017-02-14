@@ -11,18 +11,26 @@ PROVIDES += 'virtual/p9-vcs-workaround'
 RPROVIDES_${PN} += 'virtual-p9-vcs-workaround'
 
 S = "${WORKDIR}"
-SRC_URI += "file://cpld_trigger.sh"
+SRC_URI += "file://cpld_trigger.sh \
+            file://cpld_reset.sh"
 
 do_install() {
         install -d ${D}${bindir}
         install -m 0755 ${WORKDIR}/cpld_trigger.sh ${D}${bindir}/cpld_trigger.sh
+        install -m 0755 ${WORKDIR}/cpld_reset.sh ${D}${bindir}/cpld_reset.sh
 }
 
 TMPL = "cpld_trigger@.service"
+TMPL_RESET = "cpld_reset@.service"
 INSTFMT = "cpld_trigger@{0}.service"
+INSTFMT_RESET = "cpld_reset@{0}.service"
 TGTFMT = "obmc-power-chassis-on@{0}.target"
+TGTFMT_RESET = "obmc-power-chassis-off@{0}.target"
 FMT = "../${TMPL}:${TGTFMT}.wants/${INSTFMT}"
+FMT_RESET = "../${TMPL_RESET}:${TGTFMT_RESET}.wants/${INSTFMT_RESET}"
 
 SYSTEMD_SERVICE_${PN} += "${TMPL}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT', 'OBMC_CHASSIS_INSTANCES')}"
 
+SYSTEMD_SERVICE_${PN} += "${TMPL_RESET}"
+SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_RESET', 'OBMC_CHASSIS_INSTANCES')}"
