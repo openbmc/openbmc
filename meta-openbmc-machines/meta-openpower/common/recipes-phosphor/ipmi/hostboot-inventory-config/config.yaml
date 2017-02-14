@@ -16,6 +16,11 @@ PROC:
     PrettyName:
       IPMIFruSection: Board
       IPMIFruProperty: "Name"
+  xyz.openbmc_project.Inventory.Decorator.Revision:
+    Version:
+      IPMIFruSection: Board
+      IPMIFruProperty: "Custom Field 2"
+      IPMIFruValueFormat: "key:value"
 
 SYS:
   xyz.openbmc_project.Inventory.Decorator.Asset:
@@ -35,7 +40,6 @@ SYS:
     PrettyName:
       IPMIFruSection: Board
       IPMIFruProperty: "Name"
-
 DIMM:
   xyz.openbmc_project.Inventory.Decorator.Asset:
     BuildDate:
