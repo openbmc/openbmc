@@ -14,11 +14,12 @@ require phosphor-inventory-manager.inc
 
 DEPENDS += " \
         ${PN}-config-native \
+        phosphor-dbus-interfaces \
         sdbusplus \
         sdbusplus-native \
         autoconf-archive-native \
         "
-RDEPENDS_${PN} += "sdbusplus"
+RDEPENDS_${PN} += "sdbusplus phosphor-dbus-interfaces"
 
 OBMC_INVENTORY_PATH="${OBMC_DBUS_PATH_ROOT}/Inventory"
 OBMC_INVENTORY_MGR_IFACE="${OBMC_DBUS_IFACE_ROOT}.Inventory.Manager"
