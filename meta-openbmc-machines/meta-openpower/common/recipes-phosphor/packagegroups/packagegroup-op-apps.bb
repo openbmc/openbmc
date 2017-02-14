@@ -42,6 +42,7 @@ RDEPENDS_${PN}-chassis = " \
         obmc-pcie-detect \
         obmc-watchdog \
         obmc-control-led \
+        phosphor-openpower-fru \
         "
 
 SUMMARY_${PN}-fans = "OpenPOWER Fans"
