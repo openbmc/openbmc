@@ -3,7 +3,7 @@ Description=Perform AVS bus workaround on VRMs
 Wants=obmc-power-start-pre@%i.target
 Before=obmc-power-start-pre@%i.target
 Before=avsbus-disable@%i.service
-Conflicts=obmc-chassis-stop@%i.target
+Conflicts=obmc-power-chassis-off@%i.target
 
 [Service]
 ExecStart={bindir}/avsbus-workaround.sh
@@ -11,4 +11,4 @@ Type=oneshot
 RemainAfterExit=yes
 
 [Install]
-WantedBy=obmc-chassis-start@%i.target
+WantedBy=obmc-power-chassis-on@%i.target
