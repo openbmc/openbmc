@@ -19,7 +19,7 @@ do_install() {
 
 TMPL = "vrm-control@.service"
 INSTFMT = "vrm-control@{0}.service"
-TGTFMT = "obmc-chassis-start@{0}.target"
+TGTFMT = "obmc-power-chassis-on@{0}.target"
 FMT = "../${TMPL}:${TGTFMT}.wants/${INSTFMT}"
 
 SYSTEMD_SERVICE_${PN} += "${TMPL}"
