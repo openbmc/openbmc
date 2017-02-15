@@ -9,6 +9,8 @@ inherit obmc-phosphor-systemd
 
 require ${PN}.inc
 
+SRC_URI += "file://70-op-vpd.rules"
+
 DEPENDS += " \
         virtual/openpower-fru-vpd-layout \
         virtual/openpower-fru-inventory \
@@ -35,4 +37,7 @@ do_install_append() {
         DEST=${D}${inventory_envdir}
         install -d ${DEST}
         install ${SRC}/inventory ${DEST}
+
+        install -d ${D}/${base_libdir}/udev/rules.d/
+        install ${WORKDIR}/70-op-vpd.rules ${D}/${base_libdir}/udev/rules.d/
 }
