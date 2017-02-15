@@ -9,6 +9,7 @@ inherit autotools \
         pythonnative \
         phosphor-dbus-interfaces \
         phosphor-inventory-manager \
+        obmc-dbus \
         obmc-phosphor-dbus-service
 
 require phosphor-inventory-manager.inc
@@ -28,17 +29,17 @@ RDEPENDS_${PN} += " \
         phosphor-logging \
         "
 
-OBMC_INVENTORY_PATH="${OBMC_DBUS_PATH_ROOT}/Inventory"
-OBMC_INVENTORY_MGR_IFACE="${OBMC_DBUS_IFACE_ROOT}.Inventory.Manager"
-
-DBUS_SERVICE_${PN} = "${OBMC_INVENTORY_MGR_IFACE}.service"
+DBUS_SERVICE_${PN} = "${obmc_inventory_manager_iface}.service"
 
 S = "${WORKDIR}/git"
 
 EXTRA_OECONF = " \
         YAML_PATH=${STAGING_DIR_NATIVE}${base_datadir} \
-        BUSNAME=${OBMC_INVENTORY_MGR_IFACE} \
-        INVENTORY_ROOT=${OBMC_INVENTORY_PATH} \
-        IFACE=${OBMC_INVENTORY_MGR_IFACE} \
+        BUSNAME=${obmc_inventory_manager_iface} \
+        INVENTORY_ROOT=${obmc_inventory_root} \
+        IFACE=${obmc_inventory_manager_iface} \
         IFACES_PATH=${STAGING_DIR_NATIVE}${yaml_dir} \
+        MAPPER_PATH=${obmc_mapper_path} \
+        MAPPER_BUSNAME=${obmc_mapper_busname} \
+        MAPPER_IFACE=${obmc_mapper_query_iface} \
         "
