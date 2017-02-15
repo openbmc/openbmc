@@ -5,6 +5,7 @@ PR = "r1"
 inherit autotools pkgconfig
 inherit openpower-fru-vpd
 inherit pythonnative
+inherit obmc-phosphor-systemd
 
 require ${PN}.inc
 
@@ -18,6 +19,10 @@ DEPENDS += " \
         phosphor-logging \
         autoconf-archive-native \
         "
+
+RDEPENDS_${PN} += "libsystemd"
+
+SYSTEMD_SERVICE_${PN} += "xyz.openbmc_project.OpenPOWER.Vpd.Parser@.service"
 
 S = "${WORKDIR}/git"
 
