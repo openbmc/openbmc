@@ -1,0 +1,1 @@
+SUBSYSTEM=="i2c", ENV{OF_NAME}=="eeprom", ACTION=="add", ENV{SYSTEMD_WANTS}+="xyz.openbmc_project.OpenPOWER.Vpd.Parser@sys$devpath/eeprom"
