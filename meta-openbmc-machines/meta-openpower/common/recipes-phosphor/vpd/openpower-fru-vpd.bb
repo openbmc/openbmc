@@ -20,6 +20,10 @@ DEPENDS += " \
         autoconf-archive-native \
         "
 
+RDEPENDS_${PN} += "libsystemd"
+
+SYSTEMD_SERVICE_${PN} += "op-vpd-parser.service"
+
 S = "${WORKDIR}/git"
 
 EXTRA_OECONF = "FRU_YAML=${STAGING_DIR_NATIVE}${vpdlayout_datadir}/layout.yaml"
