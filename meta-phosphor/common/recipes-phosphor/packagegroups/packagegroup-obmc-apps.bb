@@ -12,6 +12,7 @@ PACKAGES = " \
         ${PN}-inventory \
         ${PN}-leds \
         ${PN}-sensors \
+        ${PN}-software \
         "
 
 SUMMARY_${PN}-extras = "Extra features"
@@ -36,4 +37,9 @@ RDEPENDS_${PN}-leds = " \
 SUMMARY_${PN}-sensors = "Sensor applications"
 RDEPENDS_${PN}-sensors = " \
         ${VIRTUAL-RUNTIME_obmc-sensors-hwmon} \
+        "
+
+SUMMARY_${PN}-software = "Software applications"
+RDEPENDS_${PN}-software = " \
+        ${VIRTUAL-RUNTIME_obmc-bmc-code-mgr} \
         "

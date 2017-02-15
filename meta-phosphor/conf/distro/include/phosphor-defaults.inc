@@ -34,6 +34,12 @@ VIRTUAL-RUNTIME_obmc-leds-manager ?= "phosphor-led-manager"
 # Linux kernel LED subsystem LEDs.
 VIRTUAL-RUNTIME_obmc-leds-sysfs ?= "phosphor-led-sysfs"
 
+# obmc-bmc-code-mgr
+#
+# Provides an implementation of the xyz.openbmc_project.Software.BMC.Version
+# interface.
+VIRTUAL-RUNTIME_obmc-bmc-code-mgr ?= "phosphor-software-manager-version"
+
 PREFERRED_PROVIDER_virtual/obmc-logging-mgmt ?= "phosphor-logging"
 PREFERRED_PROVIDER_virtual/obmc-net-ipmi ?= "phosphor-net-ipmid"
 
