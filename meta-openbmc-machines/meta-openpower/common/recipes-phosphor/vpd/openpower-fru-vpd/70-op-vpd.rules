@@ -1,0 +1,1 @@
+SUBSYSTEM=="i2c", ENV{OF_NAME}=="eeprom", ACTION=="add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="op-vpd-parser"
