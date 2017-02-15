@@ -16,6 +16,7 @@
 # - obmc-logging-mgmt                 - OpenBMC logging management
 # - obmc-sensors                      - OpenBMC sensor support
 # - obmc-settings-mgmt                - OpenBMC settings management
+# - obmc-software-mgmt                - OpenBMC software management
 # - obmc-system-mgmt                  - OpenBMC system management
 # - obmc-user-mgmt                    - OpenBMC user management
 
@@ -38,6 +39,7 @@ FEATURE_PACKAGES_obmc-logging-mgmt ?= "${@df_enabled(d, 'obmc-logging-mgmt', 'vi
 FEATURE_PACKAGES_obmc-net-ipmi ?= "${@df_enabled(d, 'obmc-net-ipmi', 'virtual-obmc-net-ipmi')}"
 FEATURE_PACKAGES_obmc-sensors ?= "packagegroup-obmc-apps-sensors"
 FEATURE_PACKAGES_obmc-settings-mgmt ?= "${@df_enabled(d, 'obmc-settings-mgmt', 'virtual-obmc-settings-mgmt')}"
+FEATURE_PACKAGES_obmc-software-mgmt ?= "packagegroup-obmc-apps-software"
 FEATURE_PACKAGES_obmc-system-mgmt ?= "${@df_enabled(d, 'obmc-phosphor-system-mgmt', 'virtual-obmc-system-mgmt')}"
 FEATURE_PACKAGES_obmc-user-mgmt ?= "${@df_enabled(d, 'obmc-phosphor-user-mgmt', 'virtual-obmc-user-mgmt')}"
 
@@ -58,6 +60,7 @@ IMAGE_FEATURES += " \
         obmc-net-ipmi \
         obmc-sensors \
         obmc-settings-mgmt \
+        obmc-software-mgmt \
         obmc-system-mgmt \
         obmc-user-mgmt \
         ssh-server-dropbear \
