@@ -2,8 +2,6 @@
 Description=Enable the AVS bus on VRMs
 Wants=vrm-control@%i.service
 After=vrm-control@%i.service
-Wants=obmc-power-start-pre@%i.target
-Before=obmc-power-start-pre@%i.target
 Conflicts=obmc-power-chassis-off@%i.target
 
 [Service]
