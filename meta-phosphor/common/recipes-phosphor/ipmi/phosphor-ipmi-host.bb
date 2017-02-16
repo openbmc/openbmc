@@ -20,7 +20,7 @@ RDEPENDS_${PN} += "phosphor-time-manager"
 RRECOMMENDS_${PN} += "virtual-obmc-settings-mgmt"
 SRC_URI += "git://github.com/openbmc/phosphor-host-ipmid"
 
-SRCREV = "8485aa119e8809c7da059a6ff137aefe6c4680fb"
+SRCREV = "513d68e11cf6d392e847d39c743ce54ccaa0ebf7"
 
 S = "${WORKDIR}/git"
 
