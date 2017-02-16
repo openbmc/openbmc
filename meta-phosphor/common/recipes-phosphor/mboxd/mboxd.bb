@@ -17,7 +17,7 @@ SRC_URI += "file://99-aspeed-mbox.rules"
 SRC_URI += "file://99-aspeed-lpc-ctrl.rules"
 SRC_URI += "file://aspeed-lpc-ctrl-h.patch"
 
-SRCREV="f0409b99d08d1b15329c714f2b9683645f08de10"
+SRCREV="9dd93cfa7309ed5fd97c47a302dc1e2d227b526e"
 
 MBOXD_FLASH_SIZE ??= "32M"
 SYSTEMD_SUBSTITUTIONS += "FLASH_SIZE:${MBOXD_FLASH_SIZE}:${PN}.service"
