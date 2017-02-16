@@ -14,6 +14,7 @@ DEPENDS += " \
         virtual/phosphor-ipmi-fru-hostfw-config\
         virtual/phosphor-ipmi-fru-inventory \
         systemd \
+        sdbusplus \
         python-mako-native \
         python-pyyaml-native \
         phosphor-ipmi-host \
@@ -21,7 +22,9 @@ DEPENDS += " \
         autoconf-archive-native \
         "
 
-RDEPENDS_${PN} += "libsystemd"
+RDEPENDS_${PN} += " \
+        sdbusplus \
+        "
 
 SYSTEMD_SERVICE_${PN} += "obmc-read-eeprom@.service"
 
