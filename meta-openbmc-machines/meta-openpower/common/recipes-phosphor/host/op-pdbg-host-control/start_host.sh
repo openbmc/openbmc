@@ -2,12 +2,10 @@
 # Starts POWER9 IPL (boot)
 
 PDBG=${PDBG:-pdbg}
-# Argument [device]: if provided, pass to pdbg as "-d [device]"
-DEVICE_OPT=${1:+-d $1}
 
 putcfam()
 {
-    $PDBG $1 -b fsi $DEVICE_OPT putcfam $2 $3 $4
+    $PDBG $1 putcfam $2 $3 $4
 }
 
 #Clock mux select override
