@@ -7,7 +7,7 @@ DEVICE_OPT=${1:+-d $1}
 
 putcfam()
 {
-    $PDBG $1 -b fsi $DEVICE_OPT putcfam $2 $3 $4
+    $PDBG $1 $DEVICE_OPT putcfam $2 $3 $4
 }
 
 #Clock mux select override

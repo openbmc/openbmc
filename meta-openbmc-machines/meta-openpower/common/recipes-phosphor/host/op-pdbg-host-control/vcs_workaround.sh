@@ -7,7 +7,7 @@ DEVICE_OPT=${1:+-d $1}
 
 putcfam()
 {
-    $PDBG -b fsi $DEVICE_OPT $1 putcfam $2 $3 $4
+    $PDBG $DEVICE_OPT $1 putcfam $2 $3 $4
 }
 
 # P9 dd1 required workaround needed before powering VCS rails
