@@ -32,6 +32,8 @@ RDEPENDS_${PN}-chassis = " \
         obmc-pcie-detect \
         obmc-watchdog \
         "
+#Pull in obmc-fsi-scan on all P9 OpenPOWER systems
+RDEPENDS_${PN}-chassis += "${@mf_enabled(d, 'p9-vcs-workaround', 'obmc-fsi-scan')}"
 
 SUMMARY_${PN}-fans = "OpenPOWER Fans"
 RDEPENDS_${PN}-fans = " \
