@@ -2,12 +2,10 @@
 # Apply fixes over FSI to POWER9 hosts. Required before VCS rail on.
 
 PDBG=${PDBG:-pdbg}
-# Argument [device]: if provided, pass to pdbg as "-d [device]"
-DEVICE_OPT=${1:+-d $1}
 
 putcfam()
 {
-    $PDBG -b fsi $DEVICE_OPT $1 putcfam $2 $3 $4
+    $PDBG $1 putcfam $2 $3 $4
 }
 
 # P9 dd1 required workaround needed before powering VCS rails
