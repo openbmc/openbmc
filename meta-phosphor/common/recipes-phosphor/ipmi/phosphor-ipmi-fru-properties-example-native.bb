@@ -1,13 +1,13 @@
-SUMMARY = "FRU properties config for openpower-vpd-parser"
+SUMMARY = "FRU properties config for ipmi-fru-parser"
 PR = "r1"
 
 inherit native
 inherit obmc-phosphor-license
-inherit openpower-fru-vpd
+inherit phosphor-ipmi-fru
 
-SRC_URI += "file://out.yaml"
+SRC_URI += "file://example.yaml"
 
-PROVIDES += "virtual/openpower-fru-properties"
+PROVIDES += "virtual/phosphor-ipmi-fru-properties"
 
 S = "${WORKDIR}"
 
@@ -18,5 +18,5 @@ do_install() {
 
         DEST=${D}${properties_datadir}
         install -d ${DEST}
-        install out.yaml ${DEST}
+        install example.yaml ${DEST}
 }

@@ -1,0 +1,23 @@
+PROC:
+    xyz.openbmc_project.Inventory.Decorator.Replaceable:
+        FieldReplaceable: 'false'
+    xyz.openbmc_project.Inventory.Decorator.Cacheable:
+        Cached: 'false'
+    xyz.openbmc_project.Inventory.Item:
+        Present: 'true'
+
+DIMM:
+    xyz.openbmc_project.Inventory.Decorator.Replaceable:
+        FieldReplaceable: 'false'
+    xyz.openbmc_project.Inventory.Decorator.Cacheable:
+        Cached: 'false'
+    xyz.openbmc_project.Inventory.Item:
+        Present: 'true'
+
+SYS:
+    xyz.openbmc_project.Inventory.Decorator.Replaceable:
+        FieldReplaceable: 'false'
+    xyz.openbmc_project.Inventory.Decorator.Cacheable:
+        Cached: 'false'
+    xyz.openbmc_project.Inventory.Item:
+        Present: 'true'
