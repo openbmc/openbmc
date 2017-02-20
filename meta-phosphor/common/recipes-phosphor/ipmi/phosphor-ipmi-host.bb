@@ -13,6 +13,7 @@ inherit obmc-phosphor-ipmiprovider-symlink
 DEPENDS += "phosphor-logging"
 DEPENDS += "phosphor-mapper"
 DEPENDS += "autoconf-archive-native"
+DEPENDS += "packagegroup-obmc-ipmid-providers"
 RDEPENDS_${PN}-dev += "phosphor-logging"
 RDEPENDS_${PN}-dev += "phosphor-mapper-dev"
 RDEPENDS_${PN} += "clear-once"
@@ -23,6 +24,15 @@ RRECOMMENDS_${PN} += "virtual-obmc-settings-mgmt"
 SRC_URI += "git://github.com/openbmc/phosphor-host-ipmid"
 
 SRCREV = "513d68e11cf6d392e847d39c743ce54ccaa0ebf7"
+
+# Setup IPMI Whitelist Conf files
+WHITELIST_CONF = " \
+        ${STAGING_ETCDIR_NATIVE}/phosphor-ipmi-host/*.conf \
+        ${S}/host-ipmid-whitelist.conf \
+        "
+EXTRA_OECONF = " \
+        WHITELIST_CONF="${WHITELIST_CONF}" \
+        "
 
 S = "${WORKDIR}/git"
 
