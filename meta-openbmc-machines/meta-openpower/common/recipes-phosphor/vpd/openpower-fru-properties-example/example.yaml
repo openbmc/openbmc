@@ -1,0 +1,6 @@
+/system/chassis/motherboard/boxelder/bmc:
+    xyz.openbmc_project.Inventory.Decorator.Replaceable:
+        FieldReplaceable: 'false'
+/system/chassis/motherboard/boxelder/bmc/ethernet:
+    xyz.openbmc_project.Inventory.Decorator.Replaceable:
+        FieldReplaceable: 'false'
