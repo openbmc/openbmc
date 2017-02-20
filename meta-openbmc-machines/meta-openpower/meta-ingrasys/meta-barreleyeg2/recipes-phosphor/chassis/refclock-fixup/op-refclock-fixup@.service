@@ -1,0 +1,17 @@
+[Unit]
+Description=Fix up Zaius host refclock
+Wants=obmc-host-start-pre@%i.target
+Before=obmc-host-start-pre@%i.target
+Wants=obmc-power-on@%i.target
+After=obmc-power-on@%i.target
+Before=vcs_workaround@%i.service
+Conflicts=obmc-chassis-stop@%i.target
+
+[Service]
+Restart=no
+Type=oneshot
+RemainAfterExit=yes
+ExecStart={sbindir}/fix_zaius_refclock.sh
+
+[Install]
+WantedBy=obmc-chassis-start@%i.target
