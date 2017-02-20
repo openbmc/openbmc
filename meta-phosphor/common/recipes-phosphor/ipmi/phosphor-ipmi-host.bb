@@ -22,6 +22,9 @@ SRC_URI += "git://github.com/openbmc/phosphor-host-ipmid"
 
 SRCREV = "8485aa119e8809c7da059a6ff137aefe6c4680fb"
 
+WHITELIST_CONF = "${STAGING_ETCDIR_NATIVE}/phosphor-ipmi-host/*.conf"
+export WHITELIST_CONF += "${S}/host-ipmid-whitelist.conf"
+
 S = "${WORKDIR}/git"
 
 HOSTIPMI_PROVIDER_LIBRARY += "libapphandler.so"
