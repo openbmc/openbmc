@@ -1,0 +1,11 @@
+BMC:
+    xyz.openbmc_project.Inventory.Decorator.Replaceable:
+        FieldReplaceable: 'false'
+    xyz.openbmc_project.Inventory.Item:
+        Present: 'true'
+
+ETHERNET:
+    xyz.openbmc_project.Inventory.Decorator.Replaceable:
+        FieldReplaceable: 'false'
+    xyz.openbmc_project.Inventory.Item:
+        Present: 'true'
