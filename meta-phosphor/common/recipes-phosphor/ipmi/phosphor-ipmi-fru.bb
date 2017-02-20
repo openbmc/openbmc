@@ -13,6 +13,7 @@ require ${PN}.inc
 DEPENDS += " \
         virtual/phosphor-ipmi-fru-hostfw-config\
         virtual/phosphor-ipmi-fru-inventory \
+        virtual/phosphor-ipmi-fru-properties \
         systemd \
         sdbusplus \
         python-mako-native \
@@ -43,4 +44,7 @@ FILES_${PN}-dev_append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV} ${libdir}/
 # EXTRA_OECONF += "HOSTFW_YAML=${hostfw_datadir}/config.yaml"
 #
 # For now the generator requires them to already be combined so we have:
-EXTRA_OECONF = "YAML_GEN=${STAGING_DIR_NATIVE}${config_datadir}/config.yaml"
+EXTRA_OECONF = " \
+             YAML_GEN=${STAGING_DIR_NATIVE}${config_datadir}/config.yaml \
+             PROP_YAML=${STAGING_DIR_NATIVE}${properties_datadir}/out.yaml \
+             "
