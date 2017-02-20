@@ -42,3 +42,11 @@ def compose_list_zip(d, fmtvar, *listvars, **kw):
     lists = [listvar_to_list(d, x) for x in listvars]
     lst = [fmt.format(*x) for x in zip(*lists)]
     return (kw.get('sep') or ' ').join(lst)
+
+
+def append_suffix(val, suffix):
+    words = val.split(' ')
+    newval = []
+    for w in words:
+        newval.append(w + suffix)
+    return ' '.join(newval)
