@@ -23,3 +23,5 @@ PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-hostfw-config ?= "hostboot-inventor
 PREFERRED_PROVIDER_virtual/openpower-fru-vpd-layout ?= "openpower-fru-vpd-layout-native"
 PREFERRED_PROVIDER_virtual/openpower-fru-inventory ?= \
     "${@cf_enabled(d, 'obmc-mrw', 'openpower-fru-inventory-mrw-native', 'openpower-fru-inventory-example-native')}"
+PREFERRED_PROVIDER_virtual/openpower-fru-properties ?= \
+    "${@cf_enabled(d, 'obmc-mrw', 'openpower-fru-properties-mrw-native', 'openpower-fru-properties-example-native')}"

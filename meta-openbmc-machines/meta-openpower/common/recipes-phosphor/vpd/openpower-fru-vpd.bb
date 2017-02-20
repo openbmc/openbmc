@@ -14,6 +14,7 @@ SRC_URI += "file://70-op-vpd.rules"
 DEPENDS += " \
         virtual/openpower-fru-vpd-layout \
         virtual/openpower-fru-inventory \
+        virtual/openpower-fru-properties \
         python-mako-native \
         python-pyyaml-native \
         autoconf-archive-native \
@@ -29,7 +30,10 @@ SYSTEMD_SERVICE_${PN} += "op-vpd-parser.service"
 
 S = "${WORKDIR}/git"
 
-EXTRA_OECONF = "FRU_YAML=${STAGING_DIR_NATIVE}${vpdlayout_datadir}/layout.yaml"
+EXTRA_OECONF = " \
+             FRU_YAML=${STAGING_DIR_NATIVE}${vpdlayout_datadir}/layout.yaml \
+             PROP_YAML=${STAGING_DIR_NATIVE}${properties_datadir}/out.yaml \
+             "
 
 do_install_append() {
         SRC=${STAGING_DATADIR_NATIVE}${inventory_datadir_name}
