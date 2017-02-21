@@ -1,33 +1,31 @@
-From 8f6ee172bf6d0a347696ecfb000eeb686245db90 Mon Sep 17 00:00:00 2001
-From: Patrick Williams <patrick@stwcx.xyz>
-Date: Thu, 19 Jan 2017 21:27:51 -0600
-Subject: [PATCH] Temporarily disable watchdog support
+From a850cab934be49a08d467403a03ed1d6d76794f2 Mon Sep 17 00:00:00 2001
+From: Michael Tritz <mtritz@us.ibm.com>
+Date: Tue, 21 Feb 2017 10:22:59 -0600
+Subject: [PATCH] Disable watchdog - communication issues with host
 
-Hostboot does not support IPMI on P9 systems yet, so they do
-not send the watchdog updates.  Disable the watchdog until
-they support.
+This patch will temporarily disable watchdog
+errors from doing anything meaningful until
+Hostboot supports IPMI.
 
-Change-Id: I03e5dca06f1eecfb24b35161f81190c23bf39b7f
-Signed-off-by: Patrick Williams <patrick@stwcx.xyz>
+Change-Id: I6afdc3b4c7bb2733f1e4469f5e45b2ea956d42c6
+Signed-off-by: Michael Tritz <mtritz@us.ibm.com>
 ---
- chassis_control.py | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ chassis_control.py | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/chassis_control.py b/chassis_control.py
-index 3637d82..f475ecd 100644
+index faf7d1d..2ec9bd2 100644
 --- a/chassis_control.py
 +++ b/chassis_control.py
-@@ -199,9 +199,7 @@ class ChassisControlObject(DbusProperties, DbusObjectManager):
+@@ -207,8 +207,7 @@ class ChassisControlObject(DbusProperties, DbusObjectManager):
          self.softReboot()
- 
+
      def host_watchdog_signal_handler(self):
--        print "Watchdog Error, Hard Rebooting"
--        self.Set(DBUS_NAME, "reboot", 1)
--        self.powerOff()
-+        print "Watchdog Error, ignoring due to Hostboot not supporting IPMI."
- 
+-        print "Watchdog Error, Going to quiesce"
+-        self.quiesce()
++        print "Watchdog Error, ignoring due to Hostboot not supporting IPMI"
+
      def emergency_shutdown_signal_handler(self, message):
          print "Emergency Shutdown!"
--- 
-2.10.2
-
+--
+2.10.1 (Apple Git-78)
