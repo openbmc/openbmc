@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://${S}/COPYING;md5=3b83ef96387f14655fc854ddc3c6bd57"
 SRC_URI += "git://github.com/open-power/pdbg.git"
 SRC_URI += "file://0001-CFAM-reg-0x2918-access-hack.patch"
 
-SRCREV = "6df751700763f9fa6649b15fc5859b11dec0e99e"
+SRCREV = "bcdad17c283f2242700a01625e20bfe98bca2c2e"
 PV = "git${SRCREV}"
 
 S = "${WORKDIR}/git"
