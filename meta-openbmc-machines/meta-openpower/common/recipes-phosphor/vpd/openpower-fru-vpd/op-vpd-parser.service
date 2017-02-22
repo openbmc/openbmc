@@ -8,4 +8,4 @@ After=mapper-wait@-xyz-openbmc_project-Inventory-Manager.service
 Restart=no
 Type=oneshot
 EnvironmentFile={envfiledir}/obmc/inventory
-ExecStart={sbindir}/openpower-read-vpd --vpd=$EEPROM --fru=$FRUS --object=$PATHS
+ExecStart={sbindir}/openpower-read-vpd --vpd $EEPROM --fru $FRUS --object $PATHS
