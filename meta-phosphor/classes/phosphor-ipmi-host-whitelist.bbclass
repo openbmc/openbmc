@@ -21,6 +21,7 @@ python phosphor_ipmi_host_whitelist_postinstall() {
 
         # Copy the conf file into install directory
         bb.utils.copyfile(path, install_file)
+        bb.warn(install_file)
 
     install_whitelist(d)
 }
