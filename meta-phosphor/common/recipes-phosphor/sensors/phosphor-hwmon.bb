@@ -26,7 +26,7 @@ RDEPENDS_${PN} += "\
 SRC_URI += "git://github.com/openbmc/phosphor-hwmon"
 SRC_URI += "file://70-hwmon.rules"
 
-SRCREV = "bf86e72ebc4b33264ac0d8d6c8f0383f76b44e0f"
+SRCREV = "2260efb11630f8663e69a75a1be96493b629e7b2"
 
 S = "${WORKDIR}/git"
 
