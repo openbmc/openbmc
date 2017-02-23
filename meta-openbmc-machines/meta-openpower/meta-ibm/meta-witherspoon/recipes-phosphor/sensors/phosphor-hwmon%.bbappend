@@ -1,1 +1,0 @@
-inherit phosphor-hwmon-mrw
