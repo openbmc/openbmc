@@ -54,6 +54,13 @@ PREFERRED_PROVIDER_virtual/obmc-system-mgmt ?= "obmc-phosphor-sysd"
 PREFERRED_PROVIDER_virtual/obmc-user-mgmt ?= "obmc-phosphor-user"
 PREFERRED_PROVIDER_virtual/obmc-wsgihost ?= "phosphor-gevent"
 
+# phosphor-hwmon-config
+#
+# The phosphor-hwmon package can have its configuration generated
+# automatically if the MRW feature is enabled.
+VIRTUAL-RUNTIME_phosphor-hwmon-config ?= \
+    "${@cf_enabled(d, 'obmc-mrw', 'phosphor-hwmon-config-mrw')}"
+
 # virtual/phosphor-ipmi-fru-hostfw-config
 #
 # The phosphor-ipmi-fru application is data-driven and requires an input
