@@ -1,5 +1,9 @@
-#Common code to generate the hwmon conf files from the MRW.
-#Can be pulled in on a per system basis.
+SUMMARY = "Phosphor hwmon configuration generator"
+DESCRIPTION = "Generate phosphor-hwmon configuration from an MRW."
+PR = "r1"
+
+inherit obmc-phosphor-license
+inherit allarch
 
 DEPENDS += "mrw-perl-tools-native mrw-native"
 

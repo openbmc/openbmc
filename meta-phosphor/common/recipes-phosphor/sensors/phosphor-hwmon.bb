@@ -23,6 +23,8 @@ RDEPENDS_${PN} += "\
         phosphor-logging \
         "
 
+RRECOMMENDS_${PN} += "${VIRTUAL-RUNTIME_phosphor-hwmon-config}"
+
 SRC_URI += "git://github.com/openbmc/phosphor-hwmon"
 SRC_URI += "file://70-hwmon.rules"
 
