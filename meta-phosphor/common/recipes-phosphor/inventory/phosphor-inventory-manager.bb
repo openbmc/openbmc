@@ -28,7 +28,7 @@ RDEPENDS_${PN} += " \
         phosphor-logging \
         "
 
-OBMC_INVENTORY_PATH="${OBMC_DBUS_PATH_ROOT}/Inventory"
+OBMC_INVENTORY_PATH="${OBMC_DBUS_PATH_ROOT}/inventory"
 OBMC_INVENTORY_MGR_IFACE="${OBMC_DBUS_IFACE_ROOT}.Inventory.Manager"
 
 DBUS_SERVICE_${PN} = "${OBMC_INVENTORY_MGR_IFACE}.service"
