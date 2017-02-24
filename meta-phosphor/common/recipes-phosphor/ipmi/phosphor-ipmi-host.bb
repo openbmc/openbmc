@@ -27,7 +27,7 @@ SRCREV = "51cb8eef48ffc2bbe165cb276a38c391b4185704"
 
 # Setup IPMI Whitelist Conf files
 WHITELIST_CONF = " \
-        ${STAGING_ETCDIR_NATIVE}/phosphor-ipmi-host/*.conf \
+        ${STAGING_DATADIR_NATIVE}/phosphor-ipmi-host/*.conf \
         ${S}/host-ipmid-whitelist.conf \
         "
 EXTRA_OECONF = " \

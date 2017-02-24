@@ -2,7 +2,7 @@
 # packages
 
 WHITELIST ?= "${PN}.conf"
-INSTALLDIR = "${sysconfdir}/phosphor-ipmi-host/"
+INSTALLDIR = "${D}${datadir}/phosphor-ipmi-host/"
 
 python phosphor_ipmi_host_whitelist_postinstall() {
     def install_whitelist(d):
@@ -24,4 +24,4 @@ python phosphor_ipmi_host_whitelist_postinstall() {
 
     install_whitelist(d)
 }
-do_populate_sysroot[postfuncs] += "phosphor_ipmi_host_whitelist_postinstall"
+do_install[postfuncs] += "phosphor_ipmi_host_whitelist_postinstall"
