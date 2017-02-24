@@ -32,7 +32,9 @@ do_configure() {
 }
 
 do_compile () {
-    . ${CONFIG_SITE}
+    for CONFIG_SITE_ITEM in $CONFIG_SITE; do
+        . $CONFIG_SITE_ITEM
+    done
     if [ X"$ac_cv_uint" = X"yes" ]; then
         CFLAGS="${CFLAGS} -DHAVE_uint"
     fi

@@ -52,7 +52,7 @@ Dependencies
 This layer depends on:
 
   URI: git://git.openembedded.org/openembedded-core
-  branch: krogoth 
+  branch: morty
   revision: HEAD
   prio: default
 
@@ -75,12 +75,12 @@ Maintenance
 -----------
 
 Send patches / pull requests to openembedded-devel@lists.openembedded.org with
-'[meta-perl][krogoth]' in the subject.
+'[meta-perl]' in the subject.
 
 When sending single patches, please using something like:
-'git send-email -M -1 --to openembedded-devel@lists.openembedded.org --subject-prefix=meta-perl][krogoth][PATCH'
+'git send-email -M -1 --to openembedded-devel@lists.openembedded.org --subject-prefix=meta-perl][morty][PATCH'
 
-krogoth Branch Maintainer:
+morty branch maintainer(s):
 Armin Kuster <akuster808@gmail.com>
 
 License

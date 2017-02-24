@@ -7,10 +7,8 @@ DESCRIPTION = "scsirastools were designed to add to the Serviceability of \
 HOMEPAGE = "http://scsirastools.sourceforge.net/"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://COPYING;md5=687ea108478d26152ae46eb29d9d1545"
-PR = "r0"
 
-SRC_URI = "http://prdownloads.sourceforge.net/scsirastools/scsirastools-${PV}.tar.gz \
-	  "
+SRC_URI = "http://prdownloads.sourceforge.net/scsirastools/scsirastools-${PV}.tar.gz"
 SRC_URI[md5sum] = "2d775111b62e2dfc1960a722f5fda211"
 SRC_URI[sha256sum] = "38d2c6c9b04a2c594e528927b950754f94c0522718d17c78e6589ba778339bf8"
 

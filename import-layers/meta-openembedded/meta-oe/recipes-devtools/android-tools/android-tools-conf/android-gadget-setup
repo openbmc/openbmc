@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# TODO enable the lines below once we have support for getprop
+# retrieve the product info from Android
+# manufacturer=$(getprop ro.product.manufacturer Android)
+# model=$(getprop ro.product.model Android)
+# serial=$(getprop ro.serialno 0123456789ABCDEF)
+
+manufacturer="$(cat /system/build.prop | grep -o 'ro.product.manufacturer=.*' | cut -d'=' -f 2)"
+model="$(cat /system/build.prop | grep -o 'ro.product.model=.*' | cut -d'=' -f 2)"
+# get the device serial number from /proc/cmdline directly(since we have no getprop on
+# GNU/Linux)
+serial="$(cat /proc/cmdline | sed 's/.*androidboot.serialno=//' | sed 's/ .*//')"
+
+echo $serial > /sys/class/android_usb/android0/iSerial
+echo $manufacturer > /sys/class/android_usb/android0/iManufacturer
+echo $model > /sys/class/android_usb/android0/iProduct
+
+echo "0" > /sys/class/android_usb/android0/enable
+echo "18d1" > /sys/class/android_usbid_usb/android0/idVendor
+echo "D002" > /sys/class/android_usb/android0/idProduct
+echo "adb" > /sys/class/android_usb/android0/functions
+echo "1" >  /sys/class/android_usb/android0/enable
+
+sleep 4

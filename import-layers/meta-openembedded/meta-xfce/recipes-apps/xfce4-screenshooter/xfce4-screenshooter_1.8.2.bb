@@ -13,7 +13,7 @@ SRC_URI[md5sum] = "3a32ecc5566453a58f6a4ddd70649444"
 SRC_URI[sha256sum] = "9dce2ddfaa87f703e870e29bae13f3fc82a1b3f06b44f8386640e45a135f5f69"
 
 do_compile_prepend() {
-	mkdir -p lib
+    mkdir -p lib
 }
 
 FILES_${PN} += " \

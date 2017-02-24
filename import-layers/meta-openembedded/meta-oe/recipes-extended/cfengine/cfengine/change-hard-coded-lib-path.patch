@@ -1,0 +1,28 @@
+Upstream-Status: Inappropriate [configuration]
+
+projlibdir use a hard coded lib path, this will cause error when build a 64bit
+target. So change it to suitable path.
+
+Signed-off-by: Song.Li <Song.Li@windriver.com>
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 38e2b9c..bc6b996 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -188,7 +188,7 @@ AS_IF([test x"$enable_fhs" = xyes], [
+   fi
+ 
+   sbindir='${exec_prefix}/bin' # /var/cfengine/bin despite being sbin_?
+-  projlibdir='${exec_prefix}/lib'
++  projlibdir='${libdir}'
+   mandir='${exec_prefix}/share/man'
+ ])
+ 
+-- 
+1.7.1
+

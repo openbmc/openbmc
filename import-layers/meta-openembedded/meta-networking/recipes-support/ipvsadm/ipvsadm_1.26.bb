@@ -19,6 +19,7 @@ SRC_URI = "http://www.linuxvirtualserver.org/software/kernel-2.6/${BP}.tar.gz \
         file://0001-Modify-the-Makefile-for-cross-compile.patch \
         file://0002-Replace-nl_handle-to-nl_sock.patch \
         file://0003-ipvsadm-remove-dependency-on-bash.patch \
+        file://makefile-add-ldflags.patch \
 "
 
 SRC_URI[md5sum] = "eac3ba3f62cd4dea2da353aeddd353a8"

@@ -4,7 +4,6 @@ SECTION = "otherosfs"
 LICENSE = "GPLv3 & LGPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
-DEPENDS = "samba"
 PV = "6.4"
 
 SRCREV = "487f46da737291877867cbd3acb40fea087d3863"
@@ -18,7 +17,8 @@ PACKAGECONFIG[cap] = "--with-libcap,--without-libcap,libcap"
 PACKAGECONFIG[cifscreds] = "--enable-cifscreds,--disable-cifscreds,keyutils"
 # when enabled, it creates ${sbindir}/cifs.upcall and --ignore-fail-on-non-empty in do_install_append is needed
 PACKAGECONFIG[cifsupcall] = "--enable-cifsupcall,--disable-cifsupcall,krb5 libtalloc keyutils"
-PACKAGECONFIG[cifsidmap] = "--enable-cifsidmap,--disable-cifsidmap, keyutils"
+PACKAGECONFIG[cifsidmap] = "--enable-cifsidmap,--disable-cifsidmap,keyutils samba"
+PACKAGECONFIG[cifsacl] = "--enable-cifsacl,--disable-cifsacl,samba"
 PACKAGECONFIG[pam] = "--enable-pam --with-pamdir=${base_libdir}/security,--disable-pam,libpam keyutils"
 
 inherit autotools pkgconfig

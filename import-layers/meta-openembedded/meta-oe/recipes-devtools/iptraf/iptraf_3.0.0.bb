@@ -20,7 +20,11 @@ RDEPENDS_${PN} = "ncurses"
 EXTRA_OEMAKE = "-e MAKEFLAGS="
 
 do_compile() {
-    oe_runmake -C src all  
+    oe_runmake -C src all
+}
+
+do_install_append() {
+    rm -r ${D}/${localstatedir}/run
 }
 
 do_install() {
@@ -29,7 +33,7 @@ do_install() {
         TARGET=${D}${bindir} \
         WORKDIR=${D}${localstatedir}/local/iptraf \
         LOGDIR=${D}${localstatedir}/log/iptraf \
-        LOCKDIR=${D}${localstatedir}/run/iptraf 
+        LOCKDIR=${D}${localstatedir}/run/iptraf
 }
 
 FILES_${PN} += "${bindir} ${localstatedir} /run"

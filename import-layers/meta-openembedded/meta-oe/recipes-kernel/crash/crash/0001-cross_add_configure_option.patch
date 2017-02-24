@@ -11,13 +11,13 @@ diff --git a/Makefile b/Makefile
 index 9c44633..39bebd0 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -229,7 +229,7 @@ gdb_merge: force
+@@ -232,7 +232,7 @@ gdb_merge: force
  	@echo "../../${PROGRAM} ../../${PROGRAM}lib.a" > ${GDB}/gdb/mergeobj
  	@rm -f ${PROGRAM}
  	@if [ ! -f ${GDB}/config.status ]; then \
 -	  (cd ${GDB}; ./configure ${GDB_CONF_FLAGS} --with-separate-debug-dir=/usr/lib/debug \
 +	  (cd ${GDB}; ./configure --host=${GDB_TARGET} --build=${GDB_HOST} --with-separate-debug-dir=/usr/lib/debug \
- 	    --with-bugurl="" --with-expat=no --with-python=no; \
+ 	    --with-bugurl="" --with-expat=no --with-python=no --disable-sim; \
  	  make --no-print-directory CRASH_TARGET=${TARGET}; echo ${TARGET} > crash.target) \
  	else make --no-print-directory rebuild; fi
 @@ -277,7 +277,7 @@ force:

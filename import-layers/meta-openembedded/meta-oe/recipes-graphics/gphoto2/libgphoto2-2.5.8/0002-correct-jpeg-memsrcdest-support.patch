@@ -1,0 +1,54 @@
+--- libgphoto2-2.5.8/camlibs/ax203/jpeg_memsrcdest.h.orig	2016-06-15 09:03:20.625774684 -0400
++++ libgphoto2-2.5.8/camlibs/ax203/jpeg_memsrcdest.h	2016-06-15 09:03:47.049774148 -0400
+@@ -1,5 +1,7 @@
+ #include <jpeglib.h>
+ 
++#if JPEG_LIB_VERSION < 80 && !defined(MEM_SRCDST_SUPPORTED)
++
+ void
+ jpeg_mem_src (j_decompress_ptr cinfo, unsigned char * buffer,
+ 	unsigned long bufsize);
+@@ -7,3 +9,5 @@
+ void
+ jpeg_mem_dest (j_compress_ptr cinfo, unsigned char ** outbuffer,
+ 	unsigned long * outsize);
++
++#endif
+--- libgphoto2-2.5.8/camlibs/ax203/jpeg_memsrcdest.c.orig	2016-06-15 09:03:58.689773913 -0400
++++ libgphoto2-2.5.8/camlibs/ax203/jpeg_memsrcdest.c	2016-06-15 09:04:17.769773526 -0400
+@@ -26,7 +26,7 @@
+ 
+ /* libjpeg8 and later come with their own (API compatible) memory source
+    and dest */
+-#if JPEG_LIB_VERSION < 80
++#if JPEG_LIB_VERSION < 80  && !defined(MEM_SRCDST_SUPPORTED)
+ 
+ /* Expanded data source object for memory input */
+ 
+--- libgphoto2-2.5.8/camlibs/jl2005c/jpeg_memsrcdest.h.orig	2016-06-15 09:05:01.893772632 -0400
++++ libgphoto2-2.5.8/camlibs/jl2005c/jpeg_memsrcdest.h	2016-06-15 09:05:17.433772318 -0400
+@@ -1,5 +1,7 @@
+ #include <jpeglib.h>
+ 
++#if JPEG_LIB_VERSION < 80 && !defined(MEM_SRCDST_SUPPORTED)
++
+ void
+ jpeg_mem_src (j_decompress_ptr cinfo, unsigned char * buffer,
+ 	unsigned long bufsize);
+@@ -7,3 +9,5 @@
+ void
+ jpeg_mem_dest (j_compress_ptr cinfo, unsigned char ** outbuffer,
+ 	unsigned long * outsize);
++
++#endif
+--- libgphoto2-2.5.8/camlibs/jl2005c/jpeg_memsrcdest.c.orig	2016-06-15 09:04:42.641773022 -0400
++++ libgphoto2-2.5.8/camlibs/jl2005c/jpeg_memsrcdest.c	2016-06-15 09:04:48.657772901 -0400
+@@ -26,7 +26,7 @@
+ 
+ /* libjpeg8 and later come with their own (API compatible) memory source
+    and dest */
+-#if JPEG_LIB_VERSION < 80
++#if JPEG_LIB_VERSION < 80  && !defined(MEM_SRCDST_SUPPORTED)
+ 
+ /* Expanded data source object for memory input */
+ 

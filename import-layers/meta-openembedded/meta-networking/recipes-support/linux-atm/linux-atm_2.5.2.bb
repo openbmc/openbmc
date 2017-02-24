@@ -9,7 +9,9 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 SRC_URI = "http://nchc.dl.sourceforge.net/project/${BPN}/${BPN}/${PV}/${BPN}-${PV}.tar.gz \
            file://link-with-ldflags.patch \
-           file://install-from-buildir.patch"
+           file://install-from-buildir.patch \
+           file://0001-fix-compile-error-with-linux-kernel-v4.8.patch \
+"
 
 SRC_URI[md5sum] = "d49499368c3cf15f73a05d9bce8824a8"
 SRC_URI[sha256sum] = "9645481a2b16476b59220aa2d6bc5bc41043f291326c9b37581018fbd16dd53a"

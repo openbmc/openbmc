@@ -12,7 +12,8 @@ SRC_URI = "http://ftp.heanet.ie/mirrors/ubuntu/pool/universe/i/${BPN}/${BPN}_${P
            file://use-kernel-makefile-to-get-kernel-version.patch \
            file://fix-errors-observed-with-linux-3.19-and-greater.patch \
            file://access-sk_v6_daddr-iff-IPV6-defined.patch \
-           file://build_with_updated_bio_struct_of_linux_v4.3_and_above.patch"
+           file://build_with_updated_bio_struct_of_linux_v4.3_and_above.patch \
+           file://build_with_updated_interfaces_of_linux_v4.8_and_above.patch"
 
 SRC_URI[md5sum] = "ef9bc823bbabd3c772208c00d5f2d089"
 SRC_URI[sha256sum] = "d3196ccb78a43266dce28587bfe30d8ab4db7566d7bce96057dfbb84100babb5"
@@ -26,7 +27,8 @@ do_configure[noexec] = "1"
 do_make_scripts[depends] += "virtual/kernel:do_shared_workdir"
 
 do_compile() {
-    oe_runmake KSRC=${STAGING_KERNEL_DIR} LDFLAGS='' V=1
+    oe_runmake KSRC=${STAGING_KERNEL_DIR} LDFLAGS='' V=1 kernel
+    oe_runmake KSRC=${STAGING_KERNEL_DIR} usr
 }
 
 do_install() {
@@ -34,12 +36,12 @@ do_install() {
     install -d ${D}/lib/modules/${KERNEL_VERSION}/kernel/iscsi
     install -m 0644 kernel/iscsi_trgt.ko \
     ${D}/lib/modules/${KERNEL_VERSION}/kernel/iscsi/iscsi_trgt.ko
-    
+
     # Userspace utilities
     install -d ${D}${sbindir}
     install -m 0755 usr/ietd ${D}${sbindir}/ietd
     install -m 0755 usr/ietadm ${D}${sbindir}/ietadm
-    
+
     # Config files, init scripts
     mkdir -p ${D}${sysconfdir}/iet
     install -m 0644 etc/ietd.conf ${D}/${sysconfdir}/iet/ietd.conf

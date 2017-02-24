@@ -1,0 +1,37 @@
+Upstream-Status: Pending
+
+Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
+diff -Nurd gtk-engines-2.20.2/configure.ac gtk-engines-2.20.2/configure.ac
+--- gtk-engines-2.20.2/configure.ac	2010-10-01 15:42:37.000000000 +0300
++++ gtk-engines-2.20.2/configure.ac	2013-08-20 02:50:27.930510565 +0300
+@@ -166,6 +166,9 @@
+
+ AC_SUBST(DEVELOPMENT_CFLAGS)
+
++AC_SUBST([exported_symbols_tests], [[$(EXPORTED_SYMBOLS_TESTS)]])
++AC_SUBST([torture_test_tests], [[$(TORTURE_TEST_TESTS)]])
++
+ AM_CONFIG_HEADER([engines/support/config.h])
+
+ AC_CONFIG_FILES([
+diff -Nurd gtk-engines-2.20.2/test/Makefile.am gtk-engines-2.20.2/test/Makefile.am
+--- gtk-engines-2.20.2/test/Makefile.am	2010-09-19 18:18:21.000000000 +0300
++++ gtk-engines-2.20.2/test/Makefile.am	2013-08-20 02:50:36.842510865 +0300
+@@ -66,7 +66,7 @@
+ # Prefix with exported_
+ EXPORTED_SYMBOLS_TESTS = $(patsubst %,exported_%,$(BUILD_ENGINES))
+
+-TESTS += $(EXPORTED_SYMBOLS_TESTS)
++TESTS += @exported_symbols_tests@
+
+
+ #############################################################
+@@ -88,7 +88,7 @@
+ TORTURE_TEST_TESTS = torture_buildin $(patsubst %,torture_%,$(TORTURE_TEST_ENGINES))
+
+ # Add TORTURE_TEST_ENGINES to list of tests
+-TESTS += $(TORTURE_TEST_TESTS)
++TESTS += @torture_test_tests@
+
+ # Possible other tests:
+ #  - An extensive theme switch tests that loads/unloads the engine

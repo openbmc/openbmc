@@ -52,8 +52,6 @@ BUILD_OPTIMIZATION = "${FULL_OPTIMIZATION}"
 EXTRA_OECONF_append_armv7a = "--cpu=cortex-a8"
 
 # for python modules
-export HOST_SYS
-export BUILD_SYS
 export STAGING_LIBDIR
 export STAGING_INCDIR
 export PYTHON_DIR

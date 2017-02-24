@@ -28,12 +28,12 @@ TESTDIR = "tests"
 # We presume the tests we are going to install so just build them directly.
 #
 do_compile_ptest() {
-	oe_runmake -C ${TESTDIR} genfile ezapi1
+    oe_runmake -C ${TESTDIR} genfile ezapi1
 }
 
 do_install_ptest() {
-	install -d ${D}${PTEST_PATH}
-	install -m 0755 ${B}/${TESTDIR}/genfile ${D}${PTEST_PATH}
-	install -m 0755 ${B}/${TESTDIR}/.libs/ezapi1 ${D}${PTEST_PATH}
-	install -m 0755 ${WORKDIR}/ezapi1.sh ${D}${PTEST_PATH}
+    install -d ${D}${PTEST_PATH}
+    install -m 0755 ${B}/${TESTDIR}/genfile ${D}${PTEST_PATH}
+    install -m 0755 ${B}/${TESTDIR}/.libs/ezapi1 ${D}${PTEST_PATH}
+    install -m 0755 ${WORKDIR}/ezapi1.sh ${D}${PTEST_PATH}
 }

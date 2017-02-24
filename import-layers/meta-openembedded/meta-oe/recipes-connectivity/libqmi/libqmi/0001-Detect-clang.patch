@@ -1,0 +1,84 @@
+From 4cfb728804157e8f3c69e11ba4df449d8f76388f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 20 Oct 2016 04:42:26 +0000
+Subject: [PATCH] Detect clang
+
+Check for clang compiler since we need to disable
+unused-function warning for clang, at same time
+pass werror when checking for compiler options if
+werror is enabled so spurious options do not get
+enabled. Only the ones that are supported by given
+compiler are accepted.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+---
+ m4/compiler-warnings.m4 | 29 +++++++++++++++++++++++++----
+ 1 file changed, 25 insertions(+), 4 deletions(-)
+
+diff --git a/m4/compiler-warnings.m4 b/m4/compiler-warnings.m4
+index de4a8b0..e4ba718 100644
+--- a/m4/compiler-warnings.m4
++++ b/m4/compiler-warnings.m4
+@@ -2,10 +2,30 @@ AC_DEFUN([LIBQMI_COMPILER_WARNINGS],
+ [AC_ARG_ENABLE(more-warnings,
+ 	AS_HELP_STRING([--enable-more-warnings], [Possible values: no/yes/error]),
+ 	set_more_warnings="$enableval",set_more_warnings=error)
++
++# Clang throws a lot of warnings when it does not understand a flag. Disable
++# this warning for now so other warnings are visible.
++AC_MSG_CHECKING([if compiling with clang])
++AC_COMPILE_IFELSE([AC_LANG_PROGRAM([], [[
++#ifndef __clang__
++	not clang
++#endif
++	]])],
++	[CLANG=yes],
++	[CLANG=no]
++)
++AC_MSG_RESULT([$CLANG])
++AS_IF([test "x$CLANG" = "xyes"], [CLANG_FLAGS=-Wno-error=unused-function])
++CFLAGS="$CFLAGS $CLANG_FLAGS"
++LDFLAGS="$LDFLAGS $CLANG_FLAGS"
++
+ AC_MSG_CHECKING(for more warnings)
+ if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
+ 	AC_MSG_RESULT(yes)
+ 	CFLAGS="-Wall -std=gnu89 $CFLAGS"
++	if test "x$set_more_warnings" = xerror; then
++		WERROR="-Werror"
++	fi
+ 
+ 	for option in -Wmissing-declarations -Wmissing-prototypes \
+ 		      -Wdeclaration-after-statement -Wstrict-prototypes \
+@@ -17,22 +37,23 @@ if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
+ 		      -Wmissing-include-dirs -Waggregate-return \
+ 		      -Wformat-security; do
+ 		SAVE_CFLAGS="$CFLAGS"
+-		CFLAGS="$CFLAGS $option"
++		CFLAGS="$CFLAGS $option $WERROR"
+ 		AC_MSG_CHECKING([whether gcc understands $option])
+ 		AC_TRY_COMPILE([], [],
+ 			has_option=yes,
+ 			has_option=no,)
+ 		if test $has_option = no; then
+ 			CFLAGS="$SAVE_CFLAGS"
++		else
++			CFLAGS="$SAVE_CFLAGS $option"
+ 		fi
+ 		AC_MSG_RESULT($has_option)
+ 		unset has_option
+ 		unset SAVE_CFLAGS
+ 	done
++	CFLAGS="$CFLAGS $WERROR"
+ 	unset option
+-	if test "x$set_more_warnings" = xerror; then
+-		CFLAGS="$CFLAGS -Werror"
+-	fi
++	unset WERROR
+ else
+ 	AC_MSG_RESULT(no)
+ fi
+-- 
+1.9.1
+

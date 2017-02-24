@@ -1,0 +1,27 @@
+From b3da0d8677b7e8467367a303c18551c56ed20e15 Mon Sep 17 00:00:00 2001
+From: Philip Balister <philip@balister.org>
+Date: Tue, 12 Apr 2016 17:30:15 -0400
+Subject: [PATCH] Forcibly disable check for Qt5.
+
+Signed-off-by: Philip Balister <philip@balister.org>
+---
+ build/cmake/DefineOptions.cmake | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/build/cmake/DefineOptions.cmake b/build/cmake/DefineOptions.cmake
+index 62e240f..f8b4493 100644
+--- a/build/cmake/DefineOptions.cmake
++++ b/build/cmake/DefineOptions.cmake
+@@ -52,9 +52,6 @@ CMAKE_DEPENDENT_OPTION(WITH_LIBEVENT "Build with libevent support" ON
+ find_package(Qt4 QUIET COMPONENTS QtCore QtNetwork)
+ CMAKE_DEPENDENT_OPTION(WITH_QT4 "Build with Qt4 support" ON
+                        "QT4_FOUND" OFF)
+-find_package(Qt5 QUIET COMPONENTS Core Network)
+-CMAKE_DEPENDENT_OPTION(WITH_QT5 "Build with Qt5 support" ON
+-                       "Qt5_FOUND" OFF)
+ if(${WITH_QT4} AND ${WITH_QT5} AND ${CMAKE_MAJOR_VERSION} LESS 3)
+   # cmake < 3.0.0 causes conflict when building both Qt4 and Qt5
+   set(WITH_QT4 OFF)
+-- 
+2.5.5
+

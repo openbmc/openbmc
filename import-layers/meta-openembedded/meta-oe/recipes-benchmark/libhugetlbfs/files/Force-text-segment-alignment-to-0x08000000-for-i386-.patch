@@ -1,0 +1,92 @@
+From 3c6f8d0e3c0694f79244ec6ad5ad9ba3ca26bc0a Mon Sep 17 00:00:00 2001
+From: Yang Shi <yang.shi@linaro.org>
+Date: Mon, 7 Dec 2015 14:12:13 -0800
+Subject: [PATCH] Force text segment alignment to 0x08000000 for i386 with gold
+ linker
+
+Upstream-Status: Backport
+
+When build libhugetlbfs tests with gold linker for i386, the below error occurs:
+
+i586-oe-linux-gcc  -m32 -march=i586 -Wl,-O1 -Wl,--hash-style=gnu
+-Wl,--as-needed
+--sysroot=/home/jenkins/oe/world/shr-core/tmp-glibc/sysroots/qemux86 -I..
+-O2
+-Wall -g -o obj32/linkhuge_rw.o -c linkhuge_rw.c
+| i586-oe-linux-gcc  -m32 -march=i586 -Wl,-O1 -Wl,--hash-style=gnu
+-Wl,--as-needed
+--sysroot=/home/jenkins/oe/world/shr-core/tmp-glibc/sysroots/qemux86
+-B./obj32
+-Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed -Wl,-z,noexecstack -ldl
+-L../obj32
+-o obj32/linkhuge_rw -Wl,--no-as-needed -lpthread -ldl -lhugetlbfs_privutils
+-Wl,--hugetlbfs-align obj32/linkhuge_rw.o obj32/testutils.o
+| i586-oe-linux-ld: internal error in do_write, at
+/home/jenkins/oe/world/shr-core/tmp-glibc/work/x86_64-oe-linux/binutils-cross-i586/2.25-r0/git/gold/output.cc:464
+| collect2: error: ld returned 1 exit status
+
+But, it works well with GNU linker. --hugetlbfs-align flag passes
+"-zcommon-page-size=$SLICE_SIZE -zmax-page-size=$SLICE_SIZE", that are supported by gold linker too.
+But, it looks gold linker deal with them in a different way from gnu linker for i586.
+
+The readelf shows the below result with GNU linker:
+
+Elf file type is EXEC (Executable file)
+Entry point 0x8048fbd
+There are 8 program headers, starting at offset 52
+
+Program Headers:
+  Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align
+  PHDR           0x000034 0x08000034 0x08000034 0x00100 0x00100 R E 0x4
+  INTERP         0x048134 0x08048134 0x08048134 0x00013 0x00013 R   0x1
+      [Requesting program interpreter: /lib/ld-linux.so.2]
+  LOAD           0x000000 0x08000000 0x08000000 0x5a5bc 0x5a5bc R E 0x400000
+  LOAD           0x05a5bc 0x0845a5bc 0x0845a5bc 0x1028c 0x202cc RW 0x400000
+  DYNAMIC        0x05a5d0 0x0845a5d0 0x0845a5d0 0x000e8 0x000e8 RW  0x4
+  NOTE           0x048148 0x08048148 0x08048148 0x00044 0x00044 R   0x4
+  GNU_EH_FRAME   0x059e5c 0x08059e5c 0x08059e5c 0x0009c 0x0009c R   0x4
+  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RW  0x10
+
+"--relax" linker option doesn't solve this problem.
+Forced textsegment alignment to 0x08000000 with gold linker, the build will pass and
+readelf shows the same result with GNU linker:
+
+Elf file type is EXEC (Executable file)
+Entry point 0x8048fbd
+There are 8 program headers, starting at offset 52
+
+Program Headers:
+  Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align
+  PHDR           0x000034 0x08000034 0x08000034 0x00100 0x00100 R E 0x4
+  INTERP         0x048134 0x08048134 0x08048134 0x00013 0x00013 R   0x1
+      [Requesting program interpreter: /lib/ld-linux.so.2]
+  LOAD           0x000000 0x08000000 0x08000000 0x5a5bc 0x5a5bc R E 0x400000
+  LOAD           0x05a5bc 0x0845a5bc 0x0845a5bc 0x1028c 0x202cc RW 0x400000
+  DYNAMIC        0x05a5d0 0x0845a5d0 0x0845a5d0 0x000e8 0x000e8 RW  0x4
+  NOTE           0x048148 0x08048148 0x08048148 0x00044 0x00044 R   0x4
+  GNU_EH_FRAME   0x059e5c 0x08059e5c 0x08059e5c 0x0009c 0x0009c R   0x4
+  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RW  0x10
+
+The fix just have impact on hugelink_rw test case, which needs --hugetlbfs-align flag.
+
+Signed-off-by: Yang Shi <yang.shi@linaro.org>
+Signed-off-by: Eric B Munson <emunson@mgebm.net>
+---
+ ld.hugetlbfs | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/ld.hugetlbfs b/ld.hugetlbfs
+index 4417442..32bc6fb 100755
+--- a/ld.hugetlbfs
++++ b/ld.hugetlbfs
+@@ -98,6 +98,7 @@ if [ "$HTLB_ALIGN" == "slice" ]; then
+ 	# otherwise it will be NULL.
+ 	case "$EMU" in
+ 	armelf*_linux_eabi)	HTLBOPTS="$HTLBOPTS -Ttext-segment=$SLICE_SIZE" ;;
++	elf_i386)		HTLBOPTS="$HTLBOPTS -Ttext-segment=0x08000000" ;;
+ 	esac
+ fi
+ 
+-- 
+2.0.2
+

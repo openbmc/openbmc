@@ -1,0 +1,92 @@
+From 665f68a863b4ac2e21b0a994dce7e2720c03aa9d Mon Sep 17 00:00:00 2001
+From: Fabio Berton <fabio.berton@ossystems.com.br>
+Date: Wed, 5 Oct 2016 11:02:18 -0300
+Subject: [PATCH 3/3] Fix mixer
+Organization: O.S. Systems Software LTDA.
+
+Patch from:
+https://git.backbone.ws/portage/overlay/commit/7a069112054fbb5dc94a857e9c020a38cb1c6fde
+
+Upstream-Status: Pending
+
+Signed-off-by: Fabio Berton <fabio.berton@ossystems.com.br>
+---
+ ctl_equal.c    | 9 ++++++---
+ ladspa_utils.c | 6 ++++--
+ pcm_equal.c    | 6 ++++--
+ 3 files changed, 14 insertions(+), 7 deletions(-)
+
+diff --git a/ctl_equal.c b/ctl_equal.c
+index afba793..dd90e88 100644
+--- a/ctl_equal.c
++++ b/ctl_equal.c
+@@ -263,7 +263,8 @@ SND_CTL_PLUGIN_DEFINE_FUNC(equal)
+ 	for(i = 0; i < equal->num_input_controls; i++) {
+ 		if(equal->control_data->control[i].type == LADSPA_CNTRL_INPUT) {
+ 			index = equal->control_data->control[i].index;
+-			if(equal->klass->PortDescriptors[index] !=
++			if((equal->klass->PortDescriptors[index] & 
++					(LADSPA_PORT_INPUT | LADSPA_PORT_CONTROL)) !=
+ 					(LADSPA_PORT_INPUT | LADSPA_PORT_CONTROL)) {
+ 				SNDERR("Problem with control file %s, %d.", controls, index);
+ 				return -1;
+@@ -284,12 +285,14 @@ SND_CTL_PLUGIN_DEFINE_FUNC(equal)
+ 	}
+ 
+ 	/* Make sure that the control file makes sense */
+-	if(equal->klass->PortDescriptors[equal->control_data->input_index] !=
++	if((equal->klass->PortDescriptors[equal->control_data->input_index] & 
++			(LADSPA_PORT_INPUT | LADSPA_PORT_AUDIO))!=
+ 			(LADSPA_PORT_INPUT | LADSPA_PORT_AUDIO)) {
+ 		SNDERR("Problem with control file %s.", controls);
+ 		return -1;
+ 	}
+-	if(equal->klass->PortDescriptors[equal->control_data->output_index] !=
++	if((equal->klass->PortDescriptors[equal->control_data->output_index] & 
++			(LADSPA_PORT_OUTPUT | LADSPA_PORT_AUDIO))!=
+ 			(LADSPA_PORT_OUTPUT | LADSPA_PORT_AUDIO)) {
+ 		SNDERR("Problem with control file %s.", controls);
+ 		return -1;
+diff --git a/ladspa_utils.c b/ladspa_utils.c
+index 7b596da..0c00800 100644
+--- a/ladspa_utils.c
++++ b/ladspa_utils.c
+@@ -354,10 +354,12 @@ LADSPA_Control * LADSPAcontrolMMAP(const LADSPA_Descriptor *psDescriptor,
+ 						default_controls->control[index].type = LADSPA_CNTRL_OUTPUT;
+ 					}
+ 					index++;
+-				} else if(psDescriptor->PortDescriptors[i] ==
++				} else if((psDescriptor->PortDescriptors[i] &
++						(LADSPA_PORT_INPUT | LADSPA_PORT_AUDIO)) ==
+ 						(LADSPA_PORT_INPUT | LADSPA_PORT_AUDIO)) {
+ 					default_controls->input_index = i;
+-				} else if(psDescriptor->PortDescriptors[i] ==
++				} else if((psDescriptor->PortDescriptors[i] & 
++						(LADSPA_PORT_OUTPUT | LADSPA_PORT_AUDIO)) ==
+ 						(LADSPA_PORT_OUTPUT | LADSPA_PORT_AUDIO)) {
+ 					default_controls->output_index = i;
+ 				}
+diff --git a/pcm_equal.c b/pcm_equal.c
+index b0b4265..8d98371 100644
+--- a/pcm_equal.c
++++ b/pcm_equal.c
+@@ -231,12 +231,14 @@ SND_PCM_PLUGIN_DEFINE_FUNC(equal)
+ 	}
+ 
+ 	/* Make sure that the control file makes sense */
+-	if(equal->klass->PortDescriptors[equal->control_data->input_index] !=
++	if((equal->klass->PortDescriptors[equal->control_data->input_index] &   
++			(LADSPA_PORT_INPUT | LADSPA_PORT_AUDIO)) !=
+ 			(LADSPA_PORT_INPUT | LADSPA_PORT_AUDIO)) {
+ 		SNDERR("Problem with control file %s.", controls);
+ 		return -1;
+ 	}
+-	if(equal->klass->PortDescriptors[equal->control_data->output_index] !=
++	if((equal->klass->PortDescriptors[equal->control_data->output_index] & 
++			(LADSPA_PORT_OUTPUT | LADSPA_PORT_AUDIO)) !=
+ 			(LADSPA_PORT_OUTPUT | LADSPA_PORT_AUDIO)) {
+ 		SNDERR("Problem with control file %s.", controls);
+ 		return -1;
+-- 
+2.1.4
+

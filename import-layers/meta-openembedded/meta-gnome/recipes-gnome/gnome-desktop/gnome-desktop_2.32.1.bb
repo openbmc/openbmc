@@ -12,12 +12,13 @@ SRC_URI[archive.md5sum] = "5c80d628a240eb9d9ff78913b31f2f67"
 SRC_URI[archive.sha256sum] = "55cbecf67efe1fa1e57ac966520a7c46d799c8ba3c652a1219f60cafccb3739d"
 GNOME_COMPRESS_TYPE="bz2"
 
-DEPENDS += "gconf libxrandr virtual/libx11 gtk+ glib-2.0 gnome-doc-utils startup-notification"
+DEPENDS += "gconf libxrandr virtual/libx11 gtk+ glib-2.0 gnome-doc-utils startup-notification intltool-native"
 
 EXTRA_OECONF = "--disable-scrollkeeper --disable-desktop-docs --disable-gnome-about"
 
 do_configure_prepend () {
     sed -i -e s:^#!@PYTHON@:#!${bindir}/python: ${S}/gnome-about/gnome-about.in
+    rm -f ${S}/m4/gnome-doc-utils.m4
 }
 
 PACKAGES =+ "libgnome-desktop"

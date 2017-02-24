@@ -6,7 +6,7 @@ Upstream-Status: Pending
 diff -uraN nginx-1.0.11.orig/auto/feature nginx-1.0.11/auto/feature
 --- nginx-1.0.11.orig/auto/feature	2011-05-11 06:50:19.000000000 -0500
 +++ nginx-1.0.11/auto/feature	2011-12-27 13:56:42.323370040 -0600
-@@ -48,12 +48,20 @@
+@@ -49,12 +49,20 @@
  
  if [ -x $NGX_AUTOTEST ]; then
  
@@ -29,7 +29,7 @@ diff -uraN nginx-1.0.11.orig/auto/feature nginx-1.0.11/auto/feature
                  ngx_found=yes
  
                  if test -n "$ngx_feature_name"; then
-@@ -67,17 +75,27 @@
+@@ -68,17 +75,27 @@
  
          value)
              # /bin/sh is used to intercept "Killed" or "Abort trap" messages
@@ -61,7 +61,7 @@ diff -uraN nginx-1.0.11.orig/auto/feature nginx-1.0.11/auto/feature
              else
                  echo " found but is not working"
              fi
-@@ -85,7 +103,7 @@
+@@ -86,7 +105,7 @@
  
          bug)
              # /bin/sh is used to intercept "Killed" or "Abort trap" messages
@@ -73,8 +73,8 @@ diff -uraN nginx-1.0.11.orig/auto/feature nginx-1.0.11/auto/feature
 diff -uraN nginx-1.0.11.orig/auto/options nginx-1.0.11/auto/options
 --- nginx-1.0.11.orig/auto/options	2011-12-14 07:34:16.000000000 -0600
 +++ nginx-1.0.11/auto/options	2011-12-27 13:56:42.323370040 -0600
-@@ -289,6 +289,18 @@
-         --test-build-rtsig)              NGX_TEST_BUILD_RTSIG=YES   ;;
+@@ -353,6 +353,18 @@
+         --test-build-epoll)              NGX_TEST_BUILD_EPOLL=YES   ;;
          --test-build-solaris-sendfilev)  NGX_TEST_BUILD_SOLARIS_SENDFILEV=YES ;;
  
 +        # cross compile support
@@ -92,7 +92,7 @@ diff -uraN nginx-1.0.11.orig/auto/options nginx-1.0.11/auto/options
          *)
              echo "$0: error: invalid option \"$option\""
              exit 1
-@@ -434,6 +446,17 @@
+@@ -533,6 +445,17 @@
  
    --with-debug                       enable debug logging
  
@@ -110,7 +110,7 @@ diff -uraN nginx-1.0.11.orig/auto/options nginx-1.0.11/auto/options
  END
  
      exit 1
-@@ -455,6 +478,8 @@
+@@ -554,6 +577,8 @@
  
  if [ ".$NGX_PLATFORM" = ".win32" ]; then
      NGX_WINE=$WINE
@@ -137,14 +137,14 @@ diff -uraN nginx-1.0.11.orig/auto/types/sizeof nginx-1.0.11/auto/types/sizeof
  
  #include <sys/types.h>
  #include <sys/time.h>
-@@ -33,20 +36,20 @@
+@@ -33,15 +36,16 @@
  END
  
  
 -ngx_test="$CC $CC_TEST_FLAGS $CC_AUX_FLAGS \
 -          -o $NGX_AUTOTEST $NGX_AUTOTEST.c $NGX_LD_OPT $ngx_feature_libs"
 +    ngx_test="$CC $CC_TEST_FLAGS $CC_AUX_FLAGS \
-+	      -o $NGX_AUTOTEST $NGX_AUTOTEST.c $NGX_LD_OPT $ngx_feature_libs"
++              -o $NGX_AUTOTEST $NGX_AUTOTEST.c $NGX_LD_OPT $ngx_feature_libs"
  
 -eval "$ngx_test >> $NGX_AUTOCONF_ERR 2>&1"
 +    eval "$ngx_test >> $NGX_AUTOCONF_ERR 2>&1"
@@ -153,20 +153,13 @@ diff -uraN nginx-1.0.11.orig/auto/types/sizeof nginx-1.0.11/auto/types/sizeof
 -if [ -x $NGX_AUTOTEST ]; then
 -    ngx_size=`$NGX_AUTOTEST`
 -    echo " $ngx_size bytes"
--fi
 +    if [ -x $NGX_AUTOTEST ]; then
-+	ngx_size=`$NGX_AUTOTEST`
-+	echo " $ngx_size bytes"
++        ngx_size=`$NGX_AUTOTEST`
++        echo " $ngx_size bytes"
 +    fi
+ fi
  
  
--rm -rf $NGX_AUTOTEST*
--
-+    rm -rf $NGX_AUTOTEST*
-+fi
- 
- case $ngx_size in
-     4)
 diff -uraN nginx-1.0.11.orig/auto/unix nginx-1.0.11/auto/unix
 --- nginx-1.0.11.orig/auto/unix	2011-12-14 07:34:16.000000000 -0600
 +++ nginx-1.0.11/auto/unix	2011-12-27 13:56:42.327370060 -0600

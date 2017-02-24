@@ -1,19 +1,21 @@
 DESCRIPTION = "Evas generic loaders"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=a87563ed30add2b0e3460272d3138a00"
-DEPENDS = "eina poppler librsvg cairo"
+DEPENDS = "eina librsvg cairo"
 
 inherit efl
 
 SRCNAME = "evas_generic_loaders"
 
 EXTRA_OECONF = " \
-    --enable-poppler \
     --enable-svg \
     --disable-gstreamer \
     --disable-libraw \
     --disable-spectre \
 "
+
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[poppler] = "--enable-poppler,--disable-poppler,poppler"
 
 PACKAGESPLITFUNCS_prepend = "split_evas_loader_packages "
 

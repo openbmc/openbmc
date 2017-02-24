@@ -1,0 +1,16 @@
+[Unit]
+Description=Arp filtering arptables
+After=network.target
+Requires=network.target
+
+[Service]
+Type=oneshot
+ExecStartPre=/bin/sh -c "mkdir -p /etc/sysconfig; if [ ! -f /etc/sysconfig/arptables ]; then /usr/sbin/arptables-save > /etc/sysconfig/arptables; fi"
+ExecStart=/bin/sh -c "/usr/sbin/arptables-restore < /etc/sysconfig/arptables"
+ExecStartPost=/bin/sh -c "touch /var/lock/subsys/arptables"
+RemainAfterExit=yes
+ExecStop=/bin/sh -c "/usr/sbin/arptables-restore < /dev/null"
+ExecStopPost=/bin/sh -c "rm -f /var/lock/subsys/arptables"
+
+[Install]
+WantedBy=multi-user.target

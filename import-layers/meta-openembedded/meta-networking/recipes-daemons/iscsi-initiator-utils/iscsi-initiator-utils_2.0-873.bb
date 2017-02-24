@@ -21,6 +21,7 @@ SRC_URI = "http://www.open-iscsi.org/bits/open-iscsi-${PV}.tar.gz \
            file://iscsi-initiator \
            file://iscsi-initiator.service \
            file://iscsi-initiator-targets.service \
+           file://set_initiatorname \
 "
 SRC_URI[md5sum] = "8b8316d7c9469149a6cc6234478347f7"
 SRC_URI[sha256sum] = "7dd9f2f97da417560349a8da44ea4fcfe98bfd5ef284240a2cc4ff8e88ac7cd9"
@@ -82,6 +83,8 @@ do_install () {
         install -m 0644 ${WORKDIR}/iscsi-initiator.service \
                         ${WORKDIR}/iscsi-initiator-targets.service \
                         ${D}${systemd_unitdir}/system/
+	install -d ${D}${nonarch_libdir}/iscsi
+	install -m 0755 ${WORKDIR}/set_initiatorname ${D}${nonarch_libdir}/iscsi
     else
         install -d ${D}/etc/default/volatiles
         install -m 0644 ${WORKDIR}/99_iscsi-initiator-utils ${D}/etc/default/volatiles
@@ -89,25 +92,17 @@ do_install () {
 }
 
 pkg_postinst_${PN}() {
-    #default there is no initiatorname.iscsi installed
-    #but it is needed or iscsid will fail
-
-    #will run only when postinst on target
-    if [ "x$D" != "x" ]; then
-        exit 1
-    fi
-    if [ ! -f ${sysconfdir}/iscsi/initiatorname.iscsi ]; then
-        echo "InitiatorName=$(${sbindir}/iscsi-iname)" > \
-        ${sysconfdir}/iscsi/initiatorname.iscsi
-    fi
-
-    if [ -e /etc/init.d/populate-volatile.sh ]; then
-        /etc/init.d/populate-volatile.sh update
-    elif command -v systemd-tmpfiles >/dev/null; then
-        systemd-tmpfiles --create ${sysconfdir}/tmpfiles.d/iscsi.conf
+    if [ "x$D" = "x" ]; then
+	if [ -e /etc/init.d/populate-volatile.sh ]; then
+            /etc/init.d/populate-volatile.sh update
+	elif command -v systemd-tmpfiles >/dev/null; then
+            systemd-tmpfiles --create ${sysconfdir}/tmpfiles.d/iscsi.conf
+	fi
     fi
 }
 
 SYSTEMD_SERVICE = " iscsi-initiator.service iscsi-initiator-targets.service "
 INITSCRIPT_NAME = "iscsid"
 INITSCRIPT_PARAMS = "start 30 1 2 3 4 5 . stop 70 0 1 2 3 4 5 6 ."
+
+FILES_${PN} += "${nonarch_libdir}/iscsi"

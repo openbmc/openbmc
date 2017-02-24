@@ -1,0 +1,45 @@
+From 37cc924363515c8c309944c455bcbba7ddcc8eda Mon Sep 17 00:00:00 2001
+From: Mingli Yu <Mingli.Yu@windriver.com>
+Date: Tue, 6 Sep 2016 17:17:44 +0800
+Subject: [PATCH] vsftpd: allow sysinfo() in the seccomp sandbox
+
+Upstream-Status: Pending
+
+* Allow sysinfo() in the seccomp sandbox otherwise
+  comes below OOPS: priv_sock_get_cmd as the syscall
+  sysinfo() not allowed
+
+tnftp 192.168.1.1
+Connected to 192.168.1.1.
+220 (vsFTPd 3.0.3)
+Name (192.168.1.1:root): anonymous
+331 Please specify the password.
+Password:
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp> prompt
+Interactive mode off.
+ftp> mget small*
+OOPS: priv_sock_get_cmd
+
+Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
+---
+ seccompsandbox.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/seccompsandbox.c b/seccompsandbox.c
+index 2c350a9..67d9ca5 100644
+--- a/seccompsandbox.c
++++ b/seccompsandbox.c
+@@ -409,6 +409,7 @@ seccomp_sandbox_setup_postlogin(const struct vsf_session* p_sess)
+   allow_nr(__NR_getcwd);
+   allow_nr(__NR_chdir);
+   allow_nr(__NR_getdents);
++  allow_nr(__NR_sysinfo);
+   /* Misc */
+   allow_nr(__NR_umask);
+ 
+-- 
+2.8.1
+

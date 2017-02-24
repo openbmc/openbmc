@@ -20,6 +20,6 @@ LIC_FILES_CHKSUM = "\
 file://COPYING;md5=2d5025d4aa3495befef8f17206a5b0a1"
 
 EXTRA_OECONF = " --disable-static --disable-rebuilds"
-DEPENDS += "gtk+ glib-2.0 ruby-native"
+DEPENDS += "gtk+ glib-2.0 ruby-native intltool-native"
 
 inherit autotools pkgconfig gettext

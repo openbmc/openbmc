@@ -1,0 +1,41 @@
+From 5e5350d730f85957a42c6d846d347d080e7dd996 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 23 Oct 2015 12:40:34 +0300
+Subject: [PATCH] configure.ac: add sysroot path to GI_DATADIR; don't set
+ introspection scanner and compiler paths
+
+Upstream-Status: Pending [review on oe-core maillist]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ configure.ac | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 2c0cfbd..cfcb3bf 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -194,7 +194,7 @@ PKG_CHECK_MODULES(GI,
+     gobject-introspection-1.0 >= introspection_required_version
+ )
+ 
+-GI_DATADIR=$($PKG_CONFIG --variable=gidatadir gobject-introspection-1.0)
++GI_DATADIR=$PKG_CONFIG_SYSROOT_DIR$($PKG_CONFIG --variable=gidatadir gobject-introspection-1.0)
+ AC_SUBST(GI_DATADIR)
+ 
+ if test "$enable_cairo" != no; then
+@@ -219,12 +219,6 @@ AC_ARG_WITH(common,
+     with_common=yes)
+ AM_CONDITIONAL(WITH_COMMON, test "$with_common" = "yes")
+ 
+-INTROSPECTION_SCANNER=`$PKG_CONFIG --variable=g_ir_scanner gobject-introspection-1.0`
+-INTROSPECTION_COMPILER=`$PKG_CONFIG --variable=g_ir_compiler gobject-introspection-1.0`
+-
+-AC_SUBST(INTROSPECTION_SCANNER)
+-AC_SUBST(INTROSPECTION_COMPILER)
+-
+ # compiler warnings, errors, required cflags, and code coverage support
+ GNOME_COMPILE_WARNINGS([maximum])
+ AC_MSG_CHECKING(for Gnome code coverage support)
+-- 
+2.1.4
+

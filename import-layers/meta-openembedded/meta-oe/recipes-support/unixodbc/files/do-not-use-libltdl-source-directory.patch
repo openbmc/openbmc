@@ -1,0 +1,43 @@
+Subject: [PATCH] do not use libltdl source directory
+
+Don't use the included libltdl, use the one provided
+by our libtool instead.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Song.Li <Song.Li@windriver.com>
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ Makefile.am  | 1 -
+ configure.ac | 2 --
+ 2 files changed, 3 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index e881cca..1321802 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -5,7 +5,6 @@ SUBDIRS = \
+ 	log \
+ 	lst \
+ 	ini \
+-    libltdl \
+ 	odbcinst \
+ 	DriverManager \
+ 	exe \
+diff --git a/configure.ac b/configure.ac
+index 218502f..d50b7af 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -136,9 +136,7 @@ dnl AC_CONFIG_MACRO_DIR([libltdl/m4])
+ dnl LT_CONFIG_LTDL_DIR([libltdl])
+ dnl LTDL_INIT
+ 
+-LT_CONFIG_LTDL_DIR([libltdl])
+ LT_INIT([dlopen])
+-LTDL_INIT([convenience])
+ 
+ dnl Substitute INCLTDL and LIBLTDL in the Makefiles
+ AC_SUBST(LTDLINCL)
+-- 
+2.8.1
+

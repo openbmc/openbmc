@@ -34,7 +34,7 @@ do_configure() {
 
 do_install_append () {
     install -d ${D}/${sysconfdir}/init.d
-    install -m 0755 ${WORKDIR}/system-tools-backends ${D}/${sysconfdir}/init.d/    
+    install -m 0755 ${WORKDIR}/system-tools-backends ${D}/${sysconfdir}/init.d/
 }
 
 INITSCRIPT_NAME = "system-tools-backends"

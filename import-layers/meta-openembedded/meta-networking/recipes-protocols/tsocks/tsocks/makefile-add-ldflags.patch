@@ -1,0 +1,19 @@
+Add LDFLAGS variable to Makefile.in, make sure the extra linker flags can be passed.
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+
+diff --git a/Makefile.in b/Makefile.in
+index cad6706..0ed55c5 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -50,7 +50,7 @@ ${SAVE}: ${SAVE}.c
+ 	${SHCC} ${CFLAGS} ${INCLUDES} -static -o ${SAVE} ${SAVE}.c
+ 
+ ${SHLIB}: ${OBJS} ${COMMON}.o ${PARSER}.o
+-	${SHCC} ${CFLAGS} ${INCLUDES} -nostdlib -shared -o ${SHLIB} ${OBJS} ${COMMON}.o ${PARSER}.o ${DYNLIB_FLAGS} ${SPECIALLIBS} ${LIBS}
++	${SHCC} ${CFLAGS} ${LDFLAGS} ${INCLUDES} -nostdlib -shared -o ${SHLIB} ${OBJS} ${COMMON}.o ${PARSER}.o ${DYNLIB_FLAGS} ${SPECIALLIBS} ${LIBS}
+ 	ln -sf ${SHLIB} ${LIB_NAME}.so
+ 
+ %.so: %.c

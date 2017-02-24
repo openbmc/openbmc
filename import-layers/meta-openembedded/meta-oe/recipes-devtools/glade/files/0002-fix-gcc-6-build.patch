@@ -1,0 +1,39 @@
+From 5aa3d2abb905fa8594f6c6572a87809da54c9342 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Mon, 5 Sep 2016 11:25:27 +0200
+Subject: [PATCH] fix gcc-6 build
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ gladeui/glade-editor-property.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/gladeui/glade-editor-property.c b/gladeui/glade-editor-property.c
+index a0c1039..5e9ac38 100644
+--- a/gladeui/glade-editor-property.c
++++ b/gladeui/glade-editor-property.c
+@@ -2703,6 +2703,8 @@ glade_eprop_object_view (gboolean             radio)
+ }
+ 
+ 
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+ static gchar *
+ glade_eprop_object_dialog_title (GladeEditorProperty *eprop)
+ {
+@@ -2731,6 +2733,7 @@ glade_eprop_object_dialog_title (GladeEditorProperty *eprop)
+ 	return g_strdup_printf (format, g_type_name 
+ 				(eprop->klass->pspec->value_type));
+ }
++#pragma GCC diagnostic pop
+ 
+ 
+ gboolean
+-- 
+2.5.5
+

@@ -47,5 +47,5 @@ do_install_append() {
 }
 
 do_compile_ptest() {
-	oe_runmake buildtest-TESTS
+    oe_runmake buildtest-TESTS
 }

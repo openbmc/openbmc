@@ -1,4 +1,4 @@
-# (c) Copyright 2012  Hewlett-Packard Development Company, L.P. 
+# (c) Copyright 2012  Hewlett-Packard Development Company, L.P.
 
 SUMMARY = "a simple, small, minimal, C++ XML parser"
 HOMEPAGE = "http://www.sourceforge.net/projects/tinyxml"

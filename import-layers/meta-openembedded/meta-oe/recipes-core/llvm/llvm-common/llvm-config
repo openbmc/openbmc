@@ -4,7 +4,8 @@
 if [ $WANT_LLVM_RELEASE ]; then
 	exec `dirname $0`/${TARGET_PREFIX}llvm-config$WANT_LLVM_RELEASE ${@}
 else
-  echo "The variable WANT_LLVM_RELEASE is not defined and exported"
-	echo "by your build recipe. Go figure."
-  exit 1
+	echo "To use llvm-common WANT_LLVM_RELEASE needs to be exported."
+	echo "For example if this is being called through a recipe:"
+	echo "export WANT_LLVM_RELEASE=\"3.3\""
+	exit 1
 fi

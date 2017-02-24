@@ -17,8 +17,8 @@ inherit distro_features_check
 ANY_OF_DISTRO_FEATURES = "${GTK2DISTROFEATURES}"
 
 do_install() {
-	install -d ${D}${bindir}
-	install -m 0755 torturer ${D}${bindir}
+    install -d ${D}${bindir}
+    install -m 0755 torturer ${D}${bindir}
 }
 
 # http://errors.yoctoproject.org/Errors/Details/35132/

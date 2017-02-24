@@ -61,7 +61,7 @@ EXTRA_OECONF = "--with-kernel-headers=${STAGING_INCDIR} \
                 --enable-dpd \
                 --enable-natt=yes \
                 --sysconfdir=${sysconfdir}/racoon \
-                ${@base_contains('DISTRO_FEATURES', 'ipv6', '--enable-ipv6=yes', '', d)}"
+                ${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', '--enable-ipv6=yes', '', d)}"
 
 # See http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=530527
 CFLAGS += "-fno-strict-aliasing"

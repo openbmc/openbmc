@@ -16,6 +16,7 @@ SRC_URI = " \
     file://defconfig \
     file://init \
     file://hostapd.service \
+    file://0001-WPS-Reject-a-Credential-with-invalid-passphrase.patch \
 "
 
 S = "${WORKDIR}/hostapd-${PV}"

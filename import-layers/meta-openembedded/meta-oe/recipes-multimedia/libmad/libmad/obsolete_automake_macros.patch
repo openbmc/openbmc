@@ -1,0 +1,14 @@
+Upstream-Status: Submitted [https://sourceforge.net/tracker/?group_id=12349&atid=112349]
+
+Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
+diff -Nurd libmad-0.15.1b/configure.ac libmad-0.15.1b/configure.ac
+--- libmad-0.15.1b/configure.ac	2004-01-23 11:41:32.000000000 +0200
++++ libmad-0.15.1b/configure.ac	2013-01-03 08:28:23.718693697 +0200
+@@ -28,7 +28,7 @@
+
+ AM_INIT_AUTOMAKE
+
+-AM_CONFIG_HEADER([config.h])
++AC_CONFIG_HEADERS([config.h])
+
+ dnl System type.

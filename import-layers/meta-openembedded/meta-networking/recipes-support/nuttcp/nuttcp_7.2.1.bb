@@ -20,10 +20,10 @@ SRC_URI[sha256sum] = "c6e33810ccce67260f8d5d627f60e429d44f532365c58ed5673d035e2a
 S = "${WORKDIR}"
 
 do_compile () {
-	${CC} ${CFLAGS} -o nuttcp nuttcp-${PV}.c
+    ${CC} ${CFLAGS} ${LDFLAGS} -o nuttcp nuttcp-${PV}.c
 }
 
 do_install () {
-	install -d ${D}${bindir}
-	install -m 0755 nuttcp ${D}${bindir}
+    install -d ${D}${bindir}
+    install -m 0755 nuttcp ${D}${bindir}
 }

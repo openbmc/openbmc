@@ -1,0 +1,19 @@
+Add LDFLAGS variable to Makefile, make sure the extra linker flags can be passed.
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+
+diff --git a/Makefile b/Makefile
+index 461c021..8bc9cde 100644
+--- a/Makefile
++++ b/Makefile
+@@ -86,7 +86,7 @@ libs:
+ 		make -C libipvs
+ 
+ ipvsadm:	$(OBJS) libs
+-		$(CC) $(CFLAGS) -o $@ $(OBJS) $(STATIC_LIBS) $(LIBS)
++		$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(STATIC_LIBS) $(LIBS)
+ 
+ install:        all
+ 		if [ ! -d $(SBIN) ]; then $(MKDIR) -p $(SBIN); fi

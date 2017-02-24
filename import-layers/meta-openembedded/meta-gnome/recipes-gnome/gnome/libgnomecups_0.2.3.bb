@@ -21,3 +21,5 @@ SRC_URI += "\
 SRC_URI[archive.md5sum] = "dc4920c15c9f886f73ea74fbff0ae48b"
 SRC_URI[archive.sha256sum] = "e130e80942b386de19a288a4c194ff3dbe9140315b31e982058c8bffbb6a1d29"
 GNOME_COMPRESS_TYPE="bz2"
+
+PNBLACKLIST[libgnomecups] ?= "Depends on broken libgnomeui"

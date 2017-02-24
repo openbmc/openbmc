@@ -1,0 +1,26 @@
+From 2a7236d2a7bb9c3d3c3f44ebf59404bf7134fcb3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andr=C3=A9=20Draszik?= <adraszik@tycoint.com>
+Date: Tue, 12 Apr 2016 11:37:28 +0100
+Subject: [PATCH] configure.ac: don't override passed cflags
+
+We are controlling debug and optimiser flags from OE
+---
+ configure.ac | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 5c02450..3cf9fcd 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -147,8 +147,6 @@ dnl **********************************************************************
+ 
+ CARES_CHECK_COMPILER
+ CARES_SET_COMPILER_BASIC_OPTS
+-CARES_SET_COMPILER_DEBUG_OPTS
+-CARES_SET_COMPILER_OPTIMIZE_OPTS
+ CARES_SET_COMPILER_WARNING_OPTS
+ 
+ if test "$compiler_id" = "INTEL_UNIX_C"; then
+-- 
+2.8.0.rc3
+

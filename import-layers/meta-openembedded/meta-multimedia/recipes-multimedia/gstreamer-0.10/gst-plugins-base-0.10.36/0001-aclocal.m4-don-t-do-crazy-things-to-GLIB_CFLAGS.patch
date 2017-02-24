@@ -1,0 +1,32 @@
+From 5478eafecf618cd8e742cc1b96d688a2c7ce5a79 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Sun, 2 Oct 2016 21:49:33 +0200
+Subject: [PATCH] gst-glib2.m4: don't do crazy things to GLIB_CFLAGS
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+we are definitely not one of those poor souls mentioned
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ common/m4/gst-glib2.m4 | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/common/m4/gst-glib2.m4 b/common/m4/gst-glib2.m4
+index b01f02f..4569ae5 100644
+--- a/common/m4/gst-glib2.m4
++++ b/common/m4/gst-glib2.m4
+@@ -69,7 +69,6 @@ AC_DEFUN([AG_GST_GLIB_CHECK],
+   fi
+ 
+   dnl for the poor souls who for example have glib in /usr/local
+-  AS_SCRUB_INCLUDE(GLIB_CFLAGS)
+ 
+   AC_SUBST(GLIB_EXTRA_CFLAGS)
+ ])
+-- 
+2.5.5
+

@@ -1,0 +1,26 @@
+[PATCH] do not use the hardcode libdir
+
+Upstream-status: Pending
+
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 9b88d4c..df5ad7a 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -140,7 +140,7 @@ if test "$with_libpq" != yes; then
+ 	if test -d "$with_libpq"; then
+ 		PATH="$PATH:$with_libpq/bin"
+ 		CPPFLAGS="$CPPFLAGS -I$with_libpq/include"
+-		LDFLAGS="$LDFLAGS -L$with_libpq/lib"
++		LDFLAGS="$LDFLAGS -L$with_libpq/${base_libdir}"
+ 	else
+ 		if test -x "$with_libpq"; then
+ 			PG_CONFIG=$with_libpq
+-- 
+2.8.1
+

@@ -24,8 +24,9 @@ DEPENDS  = "openldap virtual/libiconv"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 SRC_URI = "http://jaist.dl.sourceforge.net/project/zabbix/ZABBIX%20Latest%20Stable/${PV}/${BPN}-${PV}.tar.gz \
-           file://0001-Fix-configure.ac.patch \
-           file://zabbix-agent.service"
+    file://0001-Fix-configure.ac.patch \
+    file://zabbix-agent.service \
+"
 
 SRC_URI[md5sum] = "9f8aeb11d8415585f41c3f2f22566b78"
 SRC_URI[sha256sum] = "d2c47b8f5b9b91f18010d54c45de55845d979014a8b3fe4bef64e0b08f8b00da"
@@ -39,21 +40,23 @@ SYSTEMD_AUTO_ENABLE = "enable"
 USERADD_PACKAGES = "${PN}"
 GROUPADD_PARAM_${PN} = "-r zabbix"
 USERADD_PARAM_${PN} = "-r -g zabbix -d /var/lib/zabbix \
-                       -s /sbin/nologin -c \"Zabbix Monitoring System\" zabbix"
+    -s /sbin/nologin -c \"Zabbix Monitoring System\" zabbix \
+"
 
 KERNEL_VERSION = "${@get_kernelversion_headers('${STAGING_KERNEL_DIR}')}"
 
-EXTRA_OECONF = '--enable-dependency-tracking \
-	        --enable-agent \
-	        --enable-ipv6 \
-	        --with-net-snmp \
-	        --with-ldap=${STAGING_EXECPREFIXDIR} \
-	        --with-jabber \
-	        --with-unixodbc \
-	        --with-ssh2 \
-	        --with-sqlite3 \
-	        '
-CFLAGS_append += "-lldap -llber"
+EXTRA_OECONF = " \
+    --enable-dependency-tracking \
+    --enable-agent \
+    --enable-ipv6 \
+    --with-net-snmp \
+    --with-ldap=${STAGING_EXECPREFIXDIR} \
+    --with-jabber \
+    --with-unixodbc \
+    --with-ssh2 \
+    --with-sqlite3 \
+"
+CFLAGS_append = " -lldap -llber"
 
 do_configure_prepend() {
     export KERNEL_VERSION="${KERNEL_VERSION}"
@@ -62,7 +65,7 @@ do_configure_prepend() {
 do_install_append() {
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -d ${D}${systemd_unitdir}/system
-	install -m 0644 ${WORKDIR}/zabbix-agent.service ${D}${systemd_unitdir}/system/
+        install -m 0644 ${WORKDIR}/zabbix-agent.service ${D}${systemd_unitdir}/system/
         sed -i -e 's#@SBINDIR@#${sbindir}#g' ${D}${systemd_unitdir}/system/zabbix-agent.service
     fi
 }

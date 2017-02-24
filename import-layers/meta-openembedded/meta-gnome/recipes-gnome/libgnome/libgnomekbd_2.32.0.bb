@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://COPYING.LIB;md5=6e29c688d912da12b66b73e32b03d812"
 
 SECTION = "x11/gnome/libs"
 
-DEPENDS = "gconf gtk+ glib-2.0 libxklavier"
+DEPENDS = "gconf gtk+ glib-2.0 libxklavier intltool-native"
 
 inherit gnome
 

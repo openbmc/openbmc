@@ -1,0 +1,71 @@
+From 42ec9bd51e60aa38fe6e78f644e742d6989b6683 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 19 Oct 2016 00:25:23 +0000
+Subject: [PATCH 3/3] remove duplicate const qualifiers
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ bitbang_spi.c  | 12 ++++++------
+ dummyflasher.c |  2 +-
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/bitbang_spi.c b/bitbang_spi.c
+index 11d2de1..508cf45 100644
+--- a/bitbang_spi.c
++++ b/bitbang_spi.c
+@@ -26,33 +26,33 @@
+ #include "spi.h"
+ 
+ /* Note that CS# is active low, so val=0 means the chip is active. */
+-static void bitbang_spi_set_cs(const const struct bitbang_spi_master *master, int val)
++static void bitbang_spi_set_cs(const struct bitbang_spi_master *master, int val)
+ {
+ 	master->set_cs(val);
+ }
+ 
+-static void bitbang_spi_set_sck(const const struct bitbang_spi_master *master, int val)
++static void bitbang_spi_set_sck(const struct bitbang_spi_master *master, int val)
+ {
+ 	master->set_sck(val);
+ }
+ 
+-static void bitbang_spi_set_mosi(const const struct bitbang_spi_master *master, int val)
++static void bitbang_spi_set_mosi(const struct bitbang_spi_master *master, int val)
+ {
+ 	master->set_mosi(val);
+ }
+ 
+-static int bitbang_spi_get_miso(const const struct bitbang_spi_master *master)
++static int bitbang_spi_get_miso(const struct bitbang_spi_master *master)
+ {
+ 	return master->get_miso();
+ }
+ 
+-static void bitbang_spi_request_bus(const const struct bitbang_spi_master *master)
++static void bitbang_spi_request_bus(const struct bitbang_spi_master *master)
+ {
+ 	if (master->request_bus)
+ 		master->request_bus();
+ }
+ 
+-static void bitbang_spi_release_bus(const const struct bitbang_spi_master *master)
++static void bitbang_spi_release_bus(const struct bitbang_spi_master *master)
+ {
+ 	if (master->release_bus)
+ 		master->release_bus();
+diff --git a/dummyflasher.c b/dummyflasher.c
+index 66d0df0..d0de41c 100644
+--- a/dummyflasher.c
++++ b/dummyflasher.c
+@@ -66,7 +66,7 @@ int spi_ignorelist_size = 0;
+ static uint8_t emu_status = 0;
+ 
+ /* A legit complete SFDP table based on the MX25L6436E (rev. 1.8) datasheet. */
+-static const uint8_t const sfdp_table[] = {
++static const uint8_t sfdp_table[] = {
+ 	0x53, 0x46, 0x44, 0x50, // @0x00: SFDP signature
+ 	0x00, 0x01, 0x01, 0xFF, // @0x04: revision 1.0, 2 headers
+ 	0x00, 0x00, 0x01, 0x09, // @0x08: JEDEC SFDP header rev. 1.0, 9 DW long
+-- 
+1.9.1
+

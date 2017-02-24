@@ -50,8 +50,6 @@ PACKAGECONFIG[v4l] = "-DWITH_V4L=ON,-DWITH_V4L=OFF,v4l-utils,"
 
 inherit distutils-base pkgconfig cmake
 
-export BUILD_SYS
-export HOST_SYS
 export PYTHON_CSPEC="-I${STAGING_INCDIR}/${PYTHON_DIR}"
 export PYTHON="${STAGING_BINDIR_NATIVE}/python"
 
@@ -71,7 +69,7 @@ python populate_packages_prepend () {
     metapkg =  pn + '-dev'
     d.setVar('ALLOW_EMPTY_' + metapkg, "1")
     blacklist = [ metapkg ]
-    metapkg_rdepends = [ ] 
+    metapkg_rdepends = [ ]
     packages = d.getVar('PACKAGES', 1).split()
     for pkg in packages[1:]:
         if not pkg in blacklist and not pkg in metapkg_rdepends and pkg.endswith('-dev'):

@@ -4,7 +4,7 @@ SECTION = "gpe/libs"
 LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://COPYING.LIB;md5=d8045f3b8f929c1cb29a1e3fd737b499"
 
-DEPENDS = "gtk+ cairo libxinerama libxcomposite libxrender" 
+DEPENDS = "gtk+ cairo libxinerama libxcomposite libxrender"
 PR = "r5"
 
 inherit gpe pkgconfig autotools gtk-doc
@@ -17,7 +17,7 @@ SRC_URI[sha256sum] = "f96d30c09b0395ea4e146730fd52d9ea303b619bb139051d9f12d3f868
 
 GPE_TARBALL_SUFFIX = "bz2"
 
-EXTRA_OECONF = "--enable-cairo"
+EXTRA_OECONF = "--enable-cairo --disable-gtk-doc"
 LDFLAGS += " -L${STAGING_LIBDIR}"
 
 PACKAGES =+ "${PN}-bin"

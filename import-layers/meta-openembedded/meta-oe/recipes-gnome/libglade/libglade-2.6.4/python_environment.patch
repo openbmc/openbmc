@@ -1,0 +1,14 @@
+Using @PYTHON@ for this path would result in the build system python being 
+referred to. Instead we want to locate python from the environment.
+
+Upstream-Status: Inappropriate [configuration]
+
+diff -ruN libglade-2.6.4-orig//libglade-convert.in libglade-2.6.4/libglade-convert.in
+--- libglade-2.6.4-orig//libglade-convert.in	2011-09-22 10:18:28.991164003 +0800
++++ libglade-2.6.4/libglade-convert.in	2011-09-22 10:18:55.431164003 +0800
+@@ -1,4 +1,4 @@
+-#!@PYTHON@
++#!/usr/bin/env python
+ # -*- mode: python -*-
+ 
+ # yes, this requires python 2.x and an XML parser module (eg. PyExpat)

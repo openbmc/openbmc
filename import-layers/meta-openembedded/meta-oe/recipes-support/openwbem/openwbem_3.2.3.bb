@@ -61,7 +61,7 @@ do_install() {
     install -d ${D}/etc/openwbem/openwbem.conf.d
     install -d ${D}/var/adm/fillup-templates
     install -m 644 etc/sysconfig/daemons/owcimomd ${D}/var/adm/fillup-templates/sysconfig.owcimomd
-    
+
     # fix up hardcoded paths
     sed -i -e 's,/usr/sbin/,${sbindir}/,' ${WORKDIR}/owcimomd.service
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
@@ -110,3 +110,6 @@ FILES_${PN}-dev = " \
     ${includedir} \
     ${datadir}/aclocal/openwbem.m4 \
 "
+
+# http://errors.yoctoproject.org/Errors/Details/68630/
+PNBLACKLIST[openwbem] ?= "BROKEN: fails to build with gcc-6"

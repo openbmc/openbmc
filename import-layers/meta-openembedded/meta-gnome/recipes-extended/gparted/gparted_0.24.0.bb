@@ -13,7 +13,7 @@ SRC_URI = " \
 SRC_URI[md5sum] = "b8480274c68876acff5965d4346710e7"
 SRC_URI[sha256sum] = "02398ab33894a59b0bd8707e598c46d8bb56f1413cd54de48eed61e2920ecd60"
 
-DEPENDS = "glib-2.0 gtkmm parted gnome-doc-utils-native"
+DEPENDS = "glib-2.0 gtkmm parted gnome-doc-utils intltool-native"
 
 do_install_append() {
     # Add a script which checks if polkit is installed.

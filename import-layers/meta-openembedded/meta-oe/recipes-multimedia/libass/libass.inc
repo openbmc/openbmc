@@ -1,5 +1,5 @@
 DESCRIPTION = "libass is a portable subtitle renderer for the ASS/SSA (Advanced Substation Alpha/Substation Alpha) subtitle format. It is mostly compatible with VSFilter."
-HOMEPAGE = "http://code.google.com/p/libass/"
+HOMEPAGE = "https://github.com/libass/libass"
 SECTION = "libs/multimedia"
 
 LICENSE = "ISC"
@@ -7,9 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=8ae98663bac55afe5d989919d296f28a"
 
 DEPENDS = "enca fontconfig freetype libpng fribidi"
 
-INC_PR = "r1"
-
-SRC_URI = "http://${BPN}.googlecode.com/files/${BP}.tar.gz"
+SRC_URI = "https://github.com/libass/libass/releases/download/${PV}/libass-${PV}.tar.xz"
 
 inherit autotools pkgconfig
 
@@ -17,9 +15,11 @@ PACKAGECONFIG ??= ""
 PACKAGECONFIG[harfbuzz] = "--enable-harfbuzz,--disable-harfbuzz,harfbuzz"
 
 EXTRA_OECONF = " \
-    --enable-enca \
     --enable-fontconfig \
 "
+
+# Disable compiling with ASM for x86 to avoid textrel
+EXTRA_OECONF_append_x86 = " --disable-asm"
 
 PACKAGES =+ "${PN}-tests"
 

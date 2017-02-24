@@ -41,7 +41,7 @@ oe_runconf_prepend() {
 }
 
 #do_compile_prepend () {
-#	mv ${WORKDIR}/gstregistrybinary.[ch] ${S}/gst/
+#    mv ${WORKDIR}/gstregistrybinary.[ch] ${S}/gst/
 #}
 
 RRECOMMENDS_${PN}_qemux86    += "kernel-module-snd-ens1370 kernel-module-snd-rawmidi"

@@ -24,6 +24,8 @@ SRC_URI[sha256sum] = "4b216f5200490f8d2a9bf1b3fcd9a8b20834c95249bf13b9170c82e1fc
 
 RDEPENDS_${PN} += "gstreamer1.0-plugins-good"
 
+EXTRA_OECONF = "--disable-gtk-doc"
+
 PACKAGECONFIG ??= "notify"
 PACKAGECONFIG[clutter] = "--enable-clutter, --disable-clutter, clutter"
 PACKAGECONFIG[notify] = "--enable-notify-plugin, --disable-notify-plugin, libnotify"

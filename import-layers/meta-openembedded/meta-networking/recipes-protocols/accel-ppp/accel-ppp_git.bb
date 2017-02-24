@@ -40,3 +40,6 @@ do_install_prepend() {
                $cmlist
     done
 }
+
+# http://errors.yoctoproject.org/Errors/Details/81003/
+PNBLACKLIST[accel-ppp] ?= "BROKEN: fails to build with new binutils-2.27"

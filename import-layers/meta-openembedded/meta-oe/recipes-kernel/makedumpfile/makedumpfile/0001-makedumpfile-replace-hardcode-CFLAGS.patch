@@ -1,0 +1,134 @@
+From 3c2f4ff583a156a7ed2fa0cc002a413c391d063d Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Thu, 21 Jul 2016 18:06:21 +0800
+Subject: [PATCH] makedumpfile: replace hardcode CFLAGS
+
+* Create alias for target such as powerpc as powerpc32
+* Remove hardcode CFLAGS
+* Add CFLAGS_COMMON to instead of CFLAGS so can flexibly
+  customize CFLAGS and not hardcode the CFLAGS as previously
+* Forcibly to link dynamic library as the poky build
+  system doesn't build static library by default
+
+Upstream-Status: Inappropriate[oe specific]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ Makefile | 46 +++++++++++++++++++++++-----------------------
+ 1 file changed, 23 insertions(+), 23 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 7dde3e4..c5286ac 100644
+--- a/Makefile
++++ b/Makefile
+@@ -8,13 +8,6 @@ ifeq ($(strip $CC),)
+ CC	= gcc
+ endif
+ 
+-CFLAGS = -g -O2 -Wall -D_FILE_OFFSET_BITS=64 \
+-	  -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE \
+-	  -DVERSION='"$(VERSION)"' -DRELEASE_DATE='"$(DATE)"'
+-CFLAGS_ARCH	= -g -O2 -Wall -D_FILE_OFFSET_BITS=64 \
+-		    -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
+-# LDFLAGS = -L/usr/local/lib -I/usr/local/include
+-
+ HOST_ARCH := $(shell uname -m)
+ # Use TARGET as the target architecture if specified.
+ # Defaults to uname -m
+@@ -22,29 +15,36 @@ ifeq ($(strip($TARGET)),)
+ TARGET := $(HOST_ARCH)
+ endif
+ 
+-ARCH := $(shell echo ${TARGET}  | sed -e s/i.86/x86/ -e s/sun4u/sparc64/ \
+-			       -e s/arm.*/arm/ -e s/sa110/arm/ \
+-			       -e s/s390x/s390/ -e s/parisc64/parisc/ \
+-			       -e s/ppc64/powerpc64/ -e s/ppc/powerpc32/)
++ARCH := $(shell echo __${TARGET}__  | sed -e s/i.86/x86/ -e s/sun4u/sparc64/ \
++		       -e s/arm.*/arm/ -e s/sa110/arm/ \
++		       -e s/s390x/s390/ -e s/parisc64/parisc/ \
++		       -e s/ppc64/powerpc64/ -e s/ppc/powerpc32/ \
++		       -e s/_powerpc_/_powerpc32_/)
+ 
+ CROSS :=
+ ifneq ($(TARGET), $(HOST_ARCH))
+ CROSS := -U__$(HOST_ARCH)__
+ endif
+ 
+-CFLAGS += -D__$(ARCH)__ $(CROSS)
+-CFLAGS_ARCH += -D__$(ARCH)__ $(CROSS)
++CFLAGS_ARCH += -D$(ARCH) $(CROSS)
+ 
+-ifeq ($(ARCH), powerpc64)
+-CFLAGS += -m64
++ifeq ($(ARCH), __powerpc64__)
+ CFLAGS_ARCH += -m64
+ endif
+ 
+-ifeq ($(ARCH), powerpc32)
+-CFLAGS += -m32
++ifeq ($(ARCH), __powerpc32__)
+ CFLAGS_ARCH += -m32
+ endif
+ 
++CFLAGS_ARCH += $(CFLAGS) \
++		-D_FILE_OFFSET_BITS=64 \
++		-D_LARGEFILE_SOURCE \
++		-D_LARGEFILE64_SOURCE
++
++CFLAGS_COMMON = $(CFLAGS_ARCH) \
++		-DVERSION='"$(VERSION)"' \
++		-DRELEASE_DATE='"$(DATE)"'
++
+ SRC_BASE = makedumpfile.c makedumpfile.h diskdump_mod.h sadump_mod.h sadump_info.h
+ SRC_PART = print_info.c dwarf_info.c elf_info.c erase_info.c sadump_info.c cache.c
+ OBJ_PART=$(patsubst %.c,%.o,$(SRC_PART))
+@@ -54,17 +54,17 @@ OBJ_ARCH=$(patsubst %.c,%.o,$(SRC_ARCH))
+ 
+ LIBS = -ldw -lbz2 -lebl -ldl -lelf -lz
+ ifneq ($(LINKTYPE), dynamic)
+-LIBS := -static $(LIBS)
++LIBS := $(LIBS)
+ endif
+ 
+ ifeq ($(USELZO), on)
+ LIBS := -llzo2 $(LIBS)
+-CFLAGS += -DUSELZO
++CFLAGS_COMMON += -DUSELZO
+ endif
+ 
+ ifeq ($(USESNAPPY), on)
+ LIBS := -lsnappy $(LIBS)
+-CFLAGS += -DUSESNAPPY
++CFLAGS_COMMON += -DUSESNAPPY
+ endif
+ 
+ LIBS := -lpthread $(LIBS)
+@@ -72,14 +72,14 @@ LIBS := -lpthread $(LIBS)
+ all: makedumpfile
+ 
+ $(OBJ_PART): $(SRC_PART)
+-	$(CC) $(CFLAGS) -c -o ./$@ $(VPATH)$(@:.o=.c)
++	$(CC) $(CFLAGS_COMMON) -c -o ./$@ $(VPATH)$(@:.o=.c)
+ 
+ $(OBJ_ARCH): $(SRC_ARCH)
+ 	@mkdir -p $(@D)
+ 	$(CC) $(CFLAGS_ARCH) -c -o ./$@ $(VPATH)$(@:.o=.c)
+ 
+ makedumpfile: $(SRC_BASE) $(OBJ_PART) $(OBJ_ARCH)
+-	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJ_PART) $(OBJ_ARCH) -rdynamic -o $@ $< $(LIBS)
++	$(CC) $(CFLAGS_COMMON) $(LDFLAGS) $(OBJ_PART) $(OBJ_ARCH) -rdynamic -o $@ $< $(LIBS)
+ 	echo .TH MAKEDUMPFILE 8 \"$(DATE)\" \"makedumpfile v$(VERSION)\" \"Linux System Administrator\'s Manual\" > temp.8
+ 	grep -v "^.TH MAKEDUMPFILE 8" $(VPATH)makedumpfile.8 >> temp.8
+ 	mv temp.8 makedumpfile.8
+@@ -90,7 +90,7 @@ makedumpfile: $(SRC_BASE) $(OBJ_PART) $(OBJ_ARCH)
+ 	gzip -c ./makedumpfile.conf.5 > ./makedumpfile.conf.5.gz
+ 
+ eppic_makedumpfile.so: extension_eppic.c
+-	$(CC) $(CFLAGS) $(LDFLAGS) -shared -rdynamic -o $@ extension_eppic.c -fPIC -leppic -ltinfo
++	$(CC) $(CFLAGS_COMMON) $(LDFLAGS) -shared -rdynamic -o $@ extension_eppic.c -fPIC -leppic -ltinfo
+ 
+ clean:
+ 	rm -f $(OBJ) $(OBJ_PART) $(OBJ_ARCH) makedumpfile makedumpfile.8.gz makedumpfile.conf.5.gz
+-- 
+2.8.1
+

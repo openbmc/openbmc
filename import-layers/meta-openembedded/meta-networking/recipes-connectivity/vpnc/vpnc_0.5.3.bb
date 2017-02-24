@@ -18,7 +18,7 @@ do_configure_append () {
 }
 
 do_install () {
-    sed -i s:m600:m\ 600:g Makefile    
+    sed -i s:m600:m\ 600:g Makefile
     oe_runmake 'DESTDIR=${D}' 'PREFIX=/usr' install
     rm -f ${D}${sysconfdir}/vpnc/vpnc.conf #This file is useless
     install ${WORKDIR}/default.conf ${D}${sysconfdir}/vpnc/default.conf

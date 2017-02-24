@@ -1,0 +1,42 @@
+From c0b77aeb2127da821ae1c03c2f98aaf4db65277d Mon Sep 17 00:00:00 2001
+From: Carlos Rafael Giani <dv@pseudoterminal.org>
+Date: Sat, 10 Sep 2016 21:15:18 +0200
+Subject: [PATCH] Fix missing shared object LDFLAGS
+
+Upstream-Status: Inappropriate (the upstream project is dead)
+
+Signed-off-by: Carlos Rafael Giani <dv@pseudoterminal.org>
+---
+ interface/Makefile.in | 2 +-
+ paranoia/Makefile.in  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/interface/Makefile.in b/interface/Makefile.in
+index 40c6098..020bf2a 100644
+--- a/interface/Makefile.in
++++ b/interface/Makefile.in
+@@ -46,7 +46,7 @@ libcdda_interface.a: 	$(OFILES)
+ 	$(RANLIB) libcdda_interface.a
+ 
+ libcdda_interface.so: 	$(OFILES)	
+-	$(CC) -fpic -shared -o libcdda_interface.so.0.$(VERSION) -Wl,-soname -Wl,libcdda_interface.so.0 $(OFILES) $(LIBS)
++	$(CC) -fpic -shared -o libcdda_interface.so.0.$(VERSION) -Wl,-soname -Wl,libcdda_interface.so.0 $(LDFLAGS) $(OFILES) $(LIBS)
+ 	[ -e libcdda_interface.so.0 ] || ln -s libcdda_interface.so.0.$(VERSION) libcdda_interface.so.0
+ 	[ -e libcdda_interface.so ] || ln -s libcdda_interface.so.0.$(VERSION) libcdda_interface.so
+ 
+diff --git a/paranoia/Makefile.in b/paranoia/Makefile.in
+index 89d0328..ffb4e70 100644
+--- a/paranoia/Makefile.in
++++ b/paranoia/Makefile.in
+@@ -44,7 +44,7 @@ libcdda_paranoia.a: 	$(OFILES)
+ 	$(RANLIB) libcdda_paranoia.a
+ 
+ libcdda_paranoia.so: 	$(OFILES)	
+-	$(CC) -fpic -shared -o libcdda_paranoia.so.0.$(VERSION) -Wl,-soname -Wl,libcdda_paranoia.so.0 $(OFILES) -L ../interface -lcdda_interface
++	$(CC) -fpic -shared -o libcdda_paranoia.so.0.$(VERSION) -Wl,-soname -Wl,libcdda_paranoia.so.0 $(LDFLAGS) $(OFILES) -L ../interface -lcdda_interface
+ 	[ -e libcdda_paranoia.so.0 ] || ln -s libcdda_paranoia.so.0.$(VERSION) libcdda_paranoia.so.0
+ 	[ -e libcdda_paranoia.so ] || ln -s libcdda_paranoia.so.0.$(VERSION) libcdda_paranoia.so
+ 
+-- 
+2.7.4
+

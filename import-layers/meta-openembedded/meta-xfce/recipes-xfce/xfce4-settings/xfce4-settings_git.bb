@@ -4,7 +4,9 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 DEPENDS = "exo exo-native garcon gtk+ libxfce4util libxfce4ui xfconf dbus-glib libxi virtual/libx11 xrandr libxcursor libxklavier upower"
 
-inherit xfce xfce-git
+inherit xfce xfce-git distro_features_check
+
+REQUIRED_DISTRO_FEATURES = "x11"
 
 # schnitzeltony git repo is the mainline repo
 # + datetime-setter - sent to mainline but strange response
@@ -17,7 +19,7 @@ SRC_URI = " \
 SRCREV = "c6683cb2cff489c16c2c7b5eab4017bb461f07f1"
 S = "${WORKDIR}/git"
 PV = "4.12.0+git${SRCPV}"
- 
+
 EXTRA_OECONF += "--enable-maintainer-mode --disable-debug"
 
 PACKAGECONFIG ??= " \

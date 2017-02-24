@@ -20,7 +20,7 @@ SRC_URI = "http://downloads.sourceforge.net/sblim/${BP}.tar.bz2 \
            file://sblim-sfcb-1.4.8-default-ecdh-curve-name.patch \
            file://sblim-sfcb-1.4.9-fix-ftbfs.patch \
            file://sfcb.service"
-           
+
 SRC_URI[md5sum] = "28021cdabc73690a94f4f9d57254ce30"
 SRC_URI[sha256sum] = "634a67b2f7ac3b386a79160eb44413d618e33e4e7fc74ae68b0240484af149dd"
 
@@ -58,7 +58,7 @@ do_install() {
     install -d ${D}${sysconfdir}/init.d
     mv ${D}${sysconfdir}/init.d/sfcb ${D}${sysconfdir}/init.d/sblim-sfcb
     sed -i -e 's/\/var\/lock\/subsys\/sfcb/\/var\/lock\/subsys\/sblim-sfcb/g' ${D}${sysconfdir}/init.d/sblim-sfcb
-    
+
     rm -rf ${D}${libdir}/sfcb/*.la
 }
 

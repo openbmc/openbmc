@@ -6,7 +6,12 @@ DEPENDS = "virtual/libgl virtual/egl virtual/libgles1 virtual/libgles2 \
            virtual/libx11 libxcomposite pixman libxrender libpng12"
 
 SRC_URI = "https://launchpad.net/glcompbench/trunk/${PV}/+download/${BPN}-${PV}.tar.gz \
-           file://glbench-compile-fix.patch"
+           file://glbench-compile-fix.patch \
+           file://Fix-configure-for-sqrt-check.patch \
+           file://Fix_space_issues.patch \
+           file://Fix_auto_ptr_deprecated.patch \
+           file://0001-build-Specify-std-c-11-on-cmdline.patch \
+"
 
 SRC_URI[md5sum] = "c939d9156fe940960098f38707fea827"
 SRC_URI[sha256sum] = "b04b738cec06c6786ceafa86e4735fd8b971c078265754854ef356b0379542ee"

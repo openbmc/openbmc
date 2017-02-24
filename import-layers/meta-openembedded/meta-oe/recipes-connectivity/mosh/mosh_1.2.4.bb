@@ -25,11 +25,11 @@ PACKAGE_BEFORE_PN += "${PN}-server"
 FILES_${PN}-server = "${bindir}/mosh-server"
 
 NEEDED_PERL_MODULES = "\
-	perl-module-socket \
-	perl-module-getopt-long \
-	perl-module-errno \
-	perl-module-io-socket-inet \
-	perl-module-posix \
+    perl-module-socket \
+    perl-module-getopt-long \
+    perl-module-errno \
+    perl-module-io-socket-inet \
+    perl-module-posix \
 "
 
 # mosh uses SSH to authenticate and the client uses OpenSSH-specific features
