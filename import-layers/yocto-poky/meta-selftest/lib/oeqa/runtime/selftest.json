@@ -1,0 +1,6 @@
+{
+    "test_install_package": {
+        "pkg": "socat",
+        "rm": true
+    }
+}

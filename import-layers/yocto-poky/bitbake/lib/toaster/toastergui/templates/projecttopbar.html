@@ -16,63 +16,64 @@
   });
 </script>
 
-<div class="alert alert-success lead" id="project-created-notification" style="margin-top:15px; display:none">
-  <button type="button" class="close" data-dismiss="alert">×</button>
-  Your project <strong>{{project.name}}</strong> has been created. You can now <a href="{% url 'projectmachines' project.id %}">select your target machine</a> and <a href="{% url 'projectimagerecipes' project.id %}">choose image recipes</a> to build.
-</div>
+<div class="col-md-12">
+  <div class="alert alert-success alert-dismissible change-notification" id="project-created-notification" style="display:none">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+		<p>Your project <strong>{{project.name}}</strong> has been created. You can now <a class="alert-link" href="{% url 'projectmachines' project.id %}">select your target machine</a> and <a class="alert-link" href="{% url 'projectimagerecipes' project.id %}">choose image recipes</a> to build.</p>
+  </div>
+  <!-- project name -->
+  <div class="page-header">
+    <h1 id="project-name-container">
+      <span class="project-name">{{project.name}}</span>
 
-<!-- project name -->
-<div class="page-header">
-  <h1 id="project-name-container">
-    <span id="project-name">{{project.name}}</span>
+      <span class="glyphicon glyphicon-edit" id="project-change-form-toggle"></i>
 
-    <i class="icon-pencil" data-original-title="" id="project-change-form-toggle" title=""></i>
+      {% if project.is_default %}
+      <span class="glyphicon glyphicon-question-sign get-help" title="This project shows information about the builds you start from the command line while Toaster is running"></span>
+      {% endif %}
+    </h1>
+    <form id="project-name-change-form" class="form-inline" style="display: none;">
+      <div class="form-group">
+        <input class="form-control input-lg" type="text" id="project-name-change-input" autocomplete="off" value="{{project.name}}">
+      </div>
+      <button id="project-name-change-btn" class="btn btn-default btn-lg" type="button">Save</button>
+      <a href="#" id="project-name-change-cancel" class="btn btn-lg btn-link">Cancel</a>
+    </form>
+  </div>
 
-    {% if project.is_default %}
-        <i class="icon-question-sign get-help heading-help" title="" data-original-title="This project shows information about the builds you start from the command line while Toaster is running"></i>
-    {% endif %}
-  </h1>
-  <form id="project-name-change-form" style="margin-bottom: 0px; display: none;">
-    <div class="input-append">
-      <input class="huge input-xxlarge" type="text" id="project-name-change-input" autocomplete="off" value="{{project.name}}">
-        <button id="project-name-change-btn" class="btn btn-large" type="button">Save</button>
-        <a href="#" id="project-name-change-cancel" class="btn btn-large btn-link">Cancel</a>
-    </div>
-  </form>
-</div>
-
-{% if not project.is_default %}
+  {% if not project.is_default %}
   <div id="project-topbar">
-    <ul class="nav nav-pills">
+    <ul class="nav nav-tabs">
       <li id="topbar-configuration-tab">
-        <a href="{% url 'project' project.id %}">
-          Configuration
-        </a>
+      <a href="{% url 'project' project.id %}">
+        Configuration
+      </a>
       </li>
       <li>
-        <a href="{% url 'projectbuilds' project.id %}">
-          Builds ({{project.get_number_of_builds}})
-        </a>
+      <a href="{% url 'projectbuilds' project.id %}">
+        Builds ({{project.get_number_of_builds}})
+      </a>
       </li>
       <li>
-        <a href="{% url 'importlayer' project.id %}">
-          Import layer
-        </a>
+      <a href="{% url 'importlayer' project.id %}">
+        Import layer
+      </a>
       </li>
       <li>
-        <a href="{% url 'newcustomimage' project.id %}">
-          New custom image
-        </a>
+      <a href="{% url 'newcustomimage' project.id %}">
+        New custom image
+      </a>
       </li>
       <li class="pull-right">
-        <form class="form-inline" style="margin-bottom:0px;">
-          <i class="icon-question-sign get-help heading-help" data-placement="left" title="" data-original-title="Type the name of one or more recipes you want to build, separated by a space. You can also specify a task by appending a colon and a task name to the recipe name, like so: <code>busybox:clean</code>"></i>
-          <div class="input-append">
-            <input id="build-input" type="text" class="input-xlarge input-lg build-target-input" placeholder="Type the recipe you want to build" autocomplete="off" disabled>
-            <button id="build-button" class="btn btn-primary btn-large build-button" data-project-id="{{project.id}}" disabled>Build</button>
+        <form class="form-inline">
+          <div class="form-group">
+            <span class="glyphicon glyphicon-question-sign get-help" data-placement="left" title="Type the name of one or more recipes you want to build, separated by a space. You can also specify a task by appending a colon and a task name to the recipe name, like so: <code>busybox:clean</code>"></span>
+            <input id="build-input" type="text" class="form-control input-lg" placeholder="Type the recipe you want to build" autocomplete="off" disabled>
           </div>
+          <button id="build-button" class="btn btn-primary btn-lg" data-project-id="{{project.id}}" disabled>Build</button>
         </form>
       </li>
     </ul>
   </div>
-{% endif %}
+  {% endif %}
+</div>

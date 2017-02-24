@@ -113,7 +113,7 @@ fi
 #fi
 
 SERVER1="\
-	http://${SERVER_NAME}/pub/lsb/base/${LSB_RELEASE}/binary"
+	http://${SERVER_NAME}/pub/lsb/base/released-all/binary"	
 SERVER2="\
 	http://${SERVER_NAME}/pub/lsb/test_suites/released-all/binary/runtime"
 SERVER3="\
@@ -429,7 +429,6 @@ cat > /etc/rpm/sysinfo/Dirnames << EOF
 /opt/lsb/test/desktop/freetype
 /opt/lsb/test/desktop/gtkvts
 /opt/lsb/test/desktop/libpng
-/opt/lsb/test/desktop/qt3
 /opt/lsb/test/desktop/xft
 /opt/lsb/test/desktop/xml
 /opt/lsb/test/desktop/xrender

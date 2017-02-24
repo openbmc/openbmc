@@ -1,0 +1,32 @@
+From 8f91385dbd5e7c14b36ecbd8a01ca82c709f6d77 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 24 Jun 2016 18:19:29 +0000
+Subject: [PATCH] Include linux/param.h for EXEC_PAGESIZE definition
+
+Musl does not include linux/param.h whereas glibc
+does, so it fails to build on musl.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted
+
+ src/watchdog.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/watchdog.c b/src/watchdog.c
+index acf6450..486384a 100644
+--- a/src/watchdog.c
++++ b/src/watchdog.c
+@@ -26,6 +26,9 @@
+ #include <sys/param.h>		/* For EXEC_PAGESIZE */
+ #include <linux/oom.h>
+ #include <linux/watchdog.h>
++#ifdef __linux__
++#include <linux/param.h>
++#endif
+ #include <string.h>
+ 
+ #include <libgen.h>
+-- 
+1.8.3.1
+

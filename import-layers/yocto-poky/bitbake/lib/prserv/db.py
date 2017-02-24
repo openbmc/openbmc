@@ -260,7 +260,7 @@ class PRData(object):
         self.connection.close()
 
     def __getitem__(self,tblname):
-        if not isinstance(tblname, basestring):
+        if not isinstance(tblname, str):
             raise TypeError("tblname argument must be a string, not '%s'" %
                             type(tblname))
         if tblname in self._tables:

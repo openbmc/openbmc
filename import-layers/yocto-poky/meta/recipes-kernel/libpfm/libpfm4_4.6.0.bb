@@ -14,6 +14,7 @@ COMPATIBLE_HOST = "powerpc64"
 
 SRC_URI = "http://downloads.sourceforge.net/project/perfmon2/${BPN}/libpfm-${PV}.tar.gz \
            file://0001-Makefile-Add-LDFLAGS-variable-to-SLDFLAGS.patch \
+           file://fix-misleading-indentation-error.patch \
           "
 
 SRC_URI[md5sum] = "5077b9022440e4951d96f2d0e73bd487"

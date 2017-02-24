@@ -10,11 +10,11 @@
 import os.path
 import sys
 
-import pyshlex
+import bb.pysh.pyshlex as pyshlex
 tokens = pyshlex.tokens
 
 from ply import yacc
-import sherrors
+import bb.pysh.sherrors as sherrors
     
 class IORedirect:
     def __init__(self, op, filename, io_number=None):

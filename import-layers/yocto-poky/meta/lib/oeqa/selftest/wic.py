@@ -49,7 +49,7 @@ class Wic(oeSelfTest):
         # setUpClass being unavailable.
         if not Wic.image_is_ready:
             bitbake('syslinux syslinux-native parted-native gptfdisk-native '
-                    'dosfstools-native mtools-native')
+                    'dosfstools-native mtools-native bmap-tools-native')
             bitbake('core-image-minimal')
             Wic.image_is_ready = True
 
@@ -276,3 +276,26 @@ class Wic(oeSelfTest):
             status, output = qemu.run_serial(command)
             self.assertEqual(1, status, 'Failed to run command "%s": %s' % (command, output))
             self.assertEqual(output, '/dev/root /\r\n/dev/vda3 /mnt')
+
+    def test_bmap(self):
+        """Test generation of .bmap file"""
+        image = "directdisk"
+        status = runCmd("wic create %s -e core-image-minimal --bmap" % image).status
+        self.assertEqual(0, status)
+        self.assertEqual(1, len(glob(self.resultdir + "%s-*direct" % image)))
+        self.assertEqual(1, len(glob(self.resultdir + "%s-*direct.bmap" % image)))
+
+    def test_systemd_bootdisk(self):
+        """Test creation of systemd-bootdisk image"""
+        image = "systemd-bootdisk"
+        self.assertEqual(0, runCmd("wic create %s -e core-image-minimal" \
+                                   % image).status)
+        self.assertEqual(1, len(glob(self.resultdir + "%s-*direct" % image)))
+
+    def test_sdimage_bootpart(self):
+        """Test creation of sdimage-bootpart image"""
+        image = "sdimage-bootpart"
+        self.write_config('IMAGE_BOOT_FILES = "bzImage"\n')
+        self.assertEqual(0, runCmd("wic create %s -e core-image-minimal" \
+                                   % image).status)
+        self.assertEqual(1, len(glob(self.resultdir + "%s-*direct" % image)))

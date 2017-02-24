@@ -3,7 +3,6 @@
 #
 
 SUMMARY = "Testing tools/applications"
-LICENSE = "MIT"
 
 PR = "r2"
 
@@ -18,7 +17,6 @@ KEXECTOOLS_nios2 ?= ""
 
 X11GLTOOLS = "\
     mesa-demos \
-    piglit \
     "
 
 3GTOOLS = "\
@@ -27,7 +25,7 @@ X11GLTOOLS = "\
 
 X11TOOLS = "\
     fstests \
-    gst-player-bin \
+    gst-player \
     x11perf \
     xrestop \
     xwininfo \
@@ -37,8 +35,6 @@ X11TOOLS = "\
 
 RDEPENDS_${PN} = "\
     blktool \
-    tslib-calibrate \
-    tslib-tests \
     lrzsz \
     ${KEXECTOOLS} \
     alsa-utils-amixer \

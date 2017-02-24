@@ -57,7 +57,7 @@ class SystemdBasicTests(SystemdTest):
         self.systemctl('--version')
 
     @testcase(551)
-    @skipUnlessPassed('test_system_basic')
+    @skipUnlessPassed('test_systemd_basic')
     def test_systemd_list(self):
         self.systemctl('list-unit-files')
 
@@ -153,7 +153,7 @@ class SystemdJournalTests(SystemdTest):
             if check_match: break
         # put the startup time in the test log
         if check_match:
-            print "%s" % check_match
+            print("%s" % check_match)
         else:
             self.skipTest("Error at obtaining the boot time from journalctl")
         boot_time_sec = 0
@@ -174,5 +174,5 @@ class SystemdJournalTests(SystemdTest):
             self.skipTest("Error when parsing time from boot string")
         #Assert the target boot time against systemd's unit start timeout
         if boot_time_sec > systemd_TimeoutStartSec:
-            print "Target boot time %s exceeds systemd's TimeoutStartSec %s"\
-                    %(boot_time_sec, systemd_TimeoutStartSec)
+            print("Target boot time %s exceeds systemd's TimeoutStartSec %s"\
+                    %(boot_time_sec, systemd_TimeoutStartSec))

@@ -77,31 +77,22 @@ variable value corresponding to the device is given in brackets.
                       ===============================
 
 
-Intel x86 based PCs and devices (genericx86)
-==========================================
+Intel x86 based PCs and devices (genericx86*)
+=============================================
 
-The genericx86 MACHINE is tested on the following platforms:
+The genericx86 and genericx86-64 MACHINE are tested on the following platforms:
 
 Intel Xeon/Core i-Series:
-  + Intel Romley Server: Sandy Bridge Xeon processor, C600 PCH (Patsburg), (Canoe Pass CRB)
-  + Intel Romley Server: Ivy Bridge Xeon processor, C600 PCH (Patsburg), (Intel SDP S2R3)
-  + Intel Crystal Forest Server: Sandy Bridge Xeon processor, DH89xx PCH (Cave Creek), (Stargo CRB)
-  + Intel Chief River Mobile: Ivy Bridge Mobile processor, QM77 PCH (Panther Point-M), (Emerald Lake II CRB, Sabino Canyon CRB)
-  + Intel Huron River Mobile: Sandy Bridge processor, QM67 PCH (Cougar Point), (Emerald Lake CRB, EVOC EC7-1817LNAR board)
-  + Intel Calpella Platform: Core i7 processor, QM57 PCH (Ibex Peak-M), (Red Fort CRB, Emerson MATXM CORE-411-B)
-  + Intel Nehalem/Westmere-EP Server: Xeon 56xx/55xx processors, 5520 chipset, ICH10R IOH (82801), (Hanlan Creek CRB)
-  + Intel Nehalem Workstation: Xeon 56xx/55xx processors, System SC5650SCWS (Greencity CRB)
-  + Intel Picket Post Server: Xeon 56xx/55xx processors (Jasper Forest), 3420 chipset (Ibex Peak), (Osage CRB)
-  + Intel Storage Platform: Sandy Bridge Xeon processor, C600 PCH (Patsburg), (Oak Creek Canyon CRB)
-  + Intel Shark Bay Client Platform: Haswell processor, LynxPoint PCH, (Walnut Canyon CRB, Lava Canyon CRB, Basking Ridge CRB, Flathead Creek CRB)
-  + Intel Shark Bay Ultrabook Platform: Haswell ULT processor, Lynx Point-LP PCH, (WhiteTip Mountain 1 CRB)
+  + Intel NUC5 Series - ix-52xx Series SOC (Broadwell)
+  + Intel NUC6 Series - ix-62xx Series SOC (Skylake)
+  + Intel Shumway Xeon Server
 
 Intel Atom platforms:
-  + Intel embedded Menlow: Intel Atom Z510/530 CPU, System Controller Hub US15W (Portwell NANO-8044)
-  + Intel Luna Pier: Intel Atom N4xx/D5xx series CPU (aka: Pineview-D & -M), 82801HM I/O Hub (ICH8M), (Advantech AIMB-212, Moon Creek CRB)
-  + Intel Queens Bay platform: Intel Atom E6xx CPU (aka: Tunnel Creek), Topcliff EG20T I/O Hub (Emerson NITX-315, Crown Bay CRB, Minnow Board)
-  + Intel Fish River Island platform: Intel Atom E6xx CPU (aka: Tunnel Creek), Topcliff EG20T I/O Hub (Kontron KM2M806)
-  + Intel Cedar Trail platform: Intel Atom N2000 & D2000 series CPU (aka: Cedarview), NM10 Express Chipset (Norco kit BIS-6630, Cedar Rock CRB)
+  + MinnowBoard MAX - E3825 SOC (Bay Trail)
+  + MinnowBoard MAX - Turbot (ADI Engineering) - E3826 SOC (Bay Trail)
+    - These boards can be either 32bot or 64bit modes depending on firmware
+    - See minnowboard.org for details 
+  + Intel Braswell SOC
 
 and is likely to work on many unlisted Atom/Core/Xeon based devices. The MACHINE
 type supports ethernet, wifi, sound, and Intel/vesa graphics by default in
@@ -136,53 +127,14 @@ USB Device:
      device, but the idea is to force BIOS to read the Cylinder/Head/Sector
      geometry from the device.
 
-  2. Without such an option, the BIOS generally boots the device in USB-ZIP
-     mode. To write an image to a USB device that will be bootable in
-     USB-ZIP mode, carry out the following actions:
+  2. Use a ".wic" image with an EFI partition
 
-     a. Determine the geometry of your USB device using fdisk:
+     a) With a default grub-efi bootloader:
+     # dd if=core-image-minimal-genericx86-64.wic of=/dev/sdb
 
-     # fdisk /dev/sdb
-     Command (m for help): p
-
-     Disk /dev/sdb: 4011 MB, 4011491328 bytes
-     124 heads, 62 sectors/track, 1019 cylinders, total 7834944 sectors
-     ...
-
-     Command (m for help): q
-
-     b. Configure the USB device for USB-ZIP mode:
-     
-     # mkdiskimage -4 /dev/sdb 1019 124 62
-
-     Where 1019, 124 and 62 are the cylinder, head and sectors/track counts
-     as reported by fdisk (substitute the values reported for your device).
-     When the operation has finished and the access LED (if any) on the
-     device stops flashing, remove and reinsert the device to allow the
-     kernel to detect the new partition layout.
-
-     c. Copy the contents of the image to the USB-ZIP mode device:
-
-     # mkdir /tmp/image
-     # mkdir /tmp/usbkey
-     # mount -o loop core-image-minimal-genericx86.hddimg  /tmp/image
-     # mount /dev/sdb4 /tmp/usbkey
-     # cp -rf /tmp/image/* /tmp/usbkey
-
-     d. Install the syslinux boot loader:
-
-     # syslinux /dev/sdb4
-
-     e. Unmount everything:
-
-     # umount /tmp/image
-     # umount /tmp/usbkey
-
-  Install the boot device in the target board and configure the BIOS to boot
-  from it.
-
-  For more details on the USB-ZIP scenario, see the syslinux documentation:
-  http://git.kernel.org/?p=boot/syslinux/syslinux.git;a=blob_plain;f=doc/usbkey.txt;hb=HEAD
+     b) Use systemd-boot instead
+     - Build an image with EFI_PROVIDER="systemd-boot" then use the above
+       dd command to write the image to a USB stick.
 
 
 Texas Instruments Beaglebone (beaglebone)
@@ -208,59 +160,17 @@ this, issue the following commands from the u-boot prompt:
 To further tailor these instructions for your board, please refer to the
 documentation at http://www.beagleboard.org/bone and http://www.beagleboard.org/black
 
-From a Linux system with access to the image files perform the following steps
-as root, replacing mmcblk0* with the SD card device on your machine (such as sdc
-if used via a usb card reader):
+From a Linux system with access to the image files perform the following steps:
 
-  1. Partition and format an SD card:
-     # fdisk -lu /dev/mmcblk0
+  1. Build an image. For example:
 
-     Disk /dev/mmcblk0: 3951 MB, 3951034368 bytes
-     255 heads, 63 sectors/track, 480 cylinders, total 7716864 sectors
-     Units = sectors of 1 * 512 = 512 bytes
+     $ bitbake core-image-minimal
 
-             Device Boot      Start         End      Blocks  Id System
-     /dev/mmcblk0p1   *          63      144584       72261   c Win95 FAT32 (LBA)
-     /dev/mmcblk0p2          144585      465884      160650  83 Linux
+  2. Use the "dd" utility to write the image to the SD card. For example:
 
-     # mkfs.vfat -F 16 -n "boot" /dev/mmcblk0p1
-     # mke2fs -j -L "root" /dev/mmcblk0p2
+     # dd core-image-minimal-beaglebone.wic of=/dev/sdb
 
-  The following assumes the SD card partitions 1 and 2 are mounted at
-  /media/boot and /media/root respectively. Removing the card and reinserting
-  it will do just that on most modern Linux desktop environments.
-
-  The files referenced below are made available after the build in
-  build/tmp/deploy/images.
-
-  2. Install the boot loaders
-     # cp MLO-beaglebone /media/boot/MLO
-     # cp u-boot-beaglebone.img /media/boot/u-boot.img
-
-  3. Install the root filesystem
-     # tar x -C /media/root -f core-image-$IMAGE_TYPE-beaglebone.tar.bz2
-
-  4. If using core-image-base or core-image-sato images, the SD card is ready
-     and rootfs already contains the kernel, modules and device tree (DTB)
-     files necessary to be booted with U-boot's default configuration, so
-     skip directly to step 8.
-     For core-image-minimal, proceed through next steps.
-
-  5. If using core-image-minimal rootfs, install the modules
-     # tar x -C /media/root -f modules-beaglebone.tgz
-
-  6. If using core-image-minimal rootfs, install the kernel zImage into /boot
-     directory of rootfs
-     # cp zImage-beaglebone.bin /media/root/boot/zImage
-
-  7. If using core-image-minimal rootfs, also install device tree (DTB) files
-     into /boot directory of rootfs
-     # cp zImage-am335x-bone.dtb /media/root/boot/am335x-bone.dtb
-     # cp zImage-am335x-boneblack.dtb /media/root/boot/am335x-boneblack.dtb
-
-  8. Unmount the SD partitions, insert the SD card into the Beaglebone, and
-     boot the Beaglebone
-
+  3. Insert the SD card into the Beaglebone and boot the board.
 
 Freescale MPC8315E-RDB (mpc8315e-rdb)
 =====================================
@@ -391,75 +301,25 @@ Load the kernel, and boot the system as follows:
  => tftp tftp $loadaddr vmlinux
  => bootoctlinux $loadaddr coremask=0x3 root=/dev/nfs rw nfsroot=<nfsroot ip>:<rootfs path> ip=<board ip>:<server ip>:<gateway ip>:<netmask>:edgerouter:eth0:off mtdparts=phys_mapped_flash:512k(boot0),512k(boot1),64k@3072k(eeprom)
 
---- Booting from USB root ---
+--- Booting from USB disk ---
 
 To boot from the USB disk, you either need to remove it from the edgerouter
 box and populate it from another computer, or use a previously booted NFS
 image and populate from the edgerouter itself.
 
-Type 1: Mounted USB disk
-------------------------
-
-To boot from the USB disk there are two available partitions on the factory
-USB storage. The rest of this guide assumes that these partitions are left
-intact. If you change the partition scheme, you must update your boot method
-appropriately.
-
-The standard partitions are:
-
-  - 1: vfat partition containing factory kernels
-  - 2: ext3 partition for the root filesystem.
-
-You can place the kernel on either partition 1, or partition 2, but the roofs
-must go on partition 2 (due to its size).
-
-Note: If you place the kernel on the ext3 partition, you must re-create the
-      ext3 filesystem, since the factory u-boot can only handle 128 byte inodes and
-      cannot read the partition otherwise.
+Type 1: Use partitioned image
+-----------------------------
 
 Steps:
 
  1. Remove the USB disk from the edgerouter and insert it into a computer
     that has access to your build artifacts.
 
- 2. Copy the kernel image to the USB storage (assuming discovered as 'sdb' on
-    the development machine):
+ 2. Flash the image.
 
-    2a) if booting from vfat
- 
-        # mount /dev/sdb1 /mnt
-        # cp tmp/deploy/images/edgerouter/vmlinux /mnt
-        # umount /mnt
+    # dd core-image-minimal-edgerouter.wic of=/dev/sdb
 
-    2b) if booting from ext3
-
-        # mkfs.ext3 -I 128 /dev/sdb2
-        # mount /dev/sdb2 /mnt
-        # mkdir /mnt/boot
-        # cp tmp/deploy/images/edgerouter/vmlinux /mnt/boot
-        # umount /mnt
-
- 3. Extract the rootfs to the USB storage ext3 partition
-
-        # mount /dev/sdb2 /mnt
-        # tar -xvjpf core-image-minimal-XXX.tar.bz2 -C /mnt
-        # umount /mnt
-
- 4. Reboot the board and press a key on the terminal when prompted to get to the U-Boot
-    command line:
-
- 5. Load the kernel and boot:
-
-    5a) vfat boot
-
-         => fatload usb 0:1 $loadaddr vmlinux
-
-    5b) ext3 boot
-
-         => ext2load usb 0:2 $loadaddr boot/vmlinux
- 
-    => bootoctlinux $loadaddr coremask=0x3 root=/dev/sda2 rw rootwait mtdparts=phys_mapped_flash:512k(boot0),512k(boot1),64k@3072k(eeprom)
- 
+ 3. Insert USB disk into the edgerouter and boot it.
 
 Type 2: NFS
 -----------

@@ -7,11 +7,10 @@ LICENSE_FLAGS = "commercial"
 
 DEPENDS = "gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-bad"
 
-inherit autotools pkgconfig gettext
+inherit autotools pkgconfig gettext gtk-doc upstream-version-is-even
 
 acpaths = "-I ${S}/common/m4 -I ${S}/m4"
 
-PR = "r1"
 
 GSTREAMER_1_0_OMX_TARGET ?= "bellagio"
 GSTREAMER_1_0_OMX_CORE_NAME ?= "${libdir}/libomxil-bellagio.so.0"

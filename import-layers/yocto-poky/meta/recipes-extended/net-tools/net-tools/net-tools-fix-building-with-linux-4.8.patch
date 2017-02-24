@@ -1,0 +1,52 @@
+From 4d56645ea144a34f7cdd3e3ede6452d81fbae251 Mon Sep 17 00:00:00 2001
+From: Randy MacLeod <Randy.MacLeod@windriver.com>
+Date: Sat, 8 Oct 2016 14:42:54 +0800
+Subject: [PATCH] iptunnel.c: include linux/ip.h to fix building with linux-4.8
+
+Fix a build error when using the linux-4.8 headers that results in:
+
+In file included from
+.../sysroots/qemuarm64/usr/include/linux/if_tunnel.h:6:0,
+                  from iptunnel.c:39:
+.../qemuarm64/usr/include/linux/ip.h:85:8: error: redefinition of
+'struct iphdr'
+  struct iphdr {
+         ^~~~~
+In file included from iptunnel.c:29:0:
+.../qemuarm64/usr/include/netinet/ip.h:44:8: note: originally defined here
+  struct iphdr
+         ^~~~~
+
+Upstream-Status: Submitted [1]
+
+[1] https://sourceforge.net/p/net-tools/mailman/message/35413022/
+
+Signed-off-by: Randy MacLeod <Randy.MacLeod@windriver.com>
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ iptunnel.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/iptunnel.c b/iptunnel.c
+index 4943d83..acfcbc7 100644
+--- a/iptunnel.c
++++ b/iptunnel.c
+@@ -26,7 +26,6 @@
+ #include <sys/socket.h>
+ #include <sys/ioctl.h>
+ #include <netinet/in.h>
+-#include <netinet/ip.h>
+ #include <arpa/inet.h>
+ #if defined(__GLIBC__) && (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 1))
+ #include <net/if.h>
+@@ -36,6 +35,7 @@
+ #include <linux/if_arp.h>
+ #endif
+ #include <linux/types.h>
++#include <linux/ip.h>
+ #include <linux/if_tunnel.h>
+ 
+ #include "config.h"
+-- 
+2.8.3
+

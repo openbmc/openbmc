@@ -10,9 +10,11 @@ Upstream-Status: Inappropriate [embedded specific]
 
 Author: jbowler@nslu2-linux.org
 
---- db-5.1.19/src/dbinc/mutex_int.h.orig	2011-01-05 19:21:42.181805366 -0600
-+++ db-5.1.19/src/dbinc/mutex_int.h	2011-01-05 19:24:53.141853117 -0600
-@@ -474,6 +474,25 @@
+Index: db-6.0.30/src/dbinc/mutex_int.h
+===================================================================
+--- db-6.0.30.orig/src/dbinc/mutex_int.h
++++ db-6.0.30/src/dbinc/mutex_int.h
+@@ -474,6 +474,25 @@ typedef unsigned char tsl_t;
  
  #ifdef LOAD_ACTUAL_MUTEX_CODE
  /* gcc/arm: 0 is clear, 1 is set. */
@@ -38,7 +40,7 @@ Author: jbowler@nslu2-linux.org
  #define	MUTEX_SET(tsl) ({						\
  	int __r;							\
  	__asm__ volatile(						\
-@@ -484,6 +503,7 @@
+@@ -484,6 +503,7 @@ typedef unsigned char tsl_t;
  	    );								\
  	__r & 1;							\
  })

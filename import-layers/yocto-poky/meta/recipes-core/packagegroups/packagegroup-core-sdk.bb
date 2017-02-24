@@ -3,7 +3,6 @@
 #
 
 SUMMARY = "Software development tools"
-LICENSE = "MIT"
 PR = "r9"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
@@ -30,6 +29,7 @@ RDEPENDS_packagegroup-core-sdk = "\
 SANITIZERS = "libasan-dev libubsan-dev"
 SANITIZERS_aarch64 = ""
 SANITIZERS_mips = ""
+SANITIZERS_mipsel = ""
 SANITIZERS_mips64 = ""
 SANITIZERS_mips64n32 = ""
 SANITIZERS_nios2 = ""

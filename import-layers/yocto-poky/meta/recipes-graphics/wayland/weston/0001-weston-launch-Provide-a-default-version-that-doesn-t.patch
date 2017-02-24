@@ -1,0 +1,173 @@
+From d02226b3d5872b184c1d50c7f4706ac9467ffb81 Mon Sep 17 00:00:00 2001
+From: Tom Hochstein <tom.hochstein@nxp.com>
+Date: Fri, 15 Jul 2016 11:00:15 +0300
+Subject: [PATCH] weston-launch: Provide a default version that doesn't require
+ PAM
+
+weston-launch requires PAM for starting weston as a non-root user.
+
+Since starting weston as root is a valid use case by itself, if
+PAM is not available, provide a default version of weston-launch
+without non-root-user support.
+
+Upstream-Status: Pending
+
+Signed-off-by: Tom Hochstein <tom.hochstein@nxp.com>
+---
+ configure.ac        |  9 +++++++--
+ src/weston-launch.c | 20 ++++++++++++++++++++
+ 2 files changed, 27 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 32fdde7..240966f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -416,13 +416,17 @@ AC_ARG_ENABLE(resize-optimization,
+ AS_IF([test "x$enable_resize_optimization" = "xyes"],
+       [AC_DEFINE([USE_RESIZE_POOL], [1], [Use resize memory pool as a performance optimization])])
+ 
++AC_ARG_WITH(pam,
++            AS_HELP_STRING([--with-pam], [Use PAM]),
++            [use_pam=$withval], [use_pam=yes])
+ AC_ARG_ENABLE(weston-launch, [  --enable-weston-launch],, enable_weston_launch=yes)
+ AM_CONDITIONAL(BUILD_WESTON_LAUNCH, test x$enable_weston_launch == xyes)
+-if test x$enable_weston_launch == xyes; then
++if test x$enable_weston_launch = xyes -a x$use_pam = xyes; then
+   WESTON_SEARCH_LIBS([PAM], [pam], [pam_open_session], [have_pam=yes], [have_pam=no])
+   if test x$have_pam == xno; then
+-    AC_ERROR([weston-launch requires pam])
++    AC_ERROR([PAM support is explicitly requested, but libpam couldn't be found])
+   fi
++  AC_DEFINE([HAVE_PAM], [1], [Define if PAM is available])
+ fi
+ 
+ AM_CONDITIONAL(HAVE_PANGO, test "x$have_pango" = "xyes")
+@@ -673,6 +677,7 @@ AC_MSG_RESULT([
+ 	Enable developer documentation	${enable_devdocs}
+ 
+ 	weston-launch utility		${enable_weston_launch}
++	PAM support			${use_pam}
+ 	systemd-login support		${have_systemd_login}
+ 	systemd notify support		${enable_systemd_notify}
+ 
+diff --git a/src/weston-launch.c b/src/weston-launch.c
+index b8b2ba0..a865061 100644
+--- a/src/weston-launch.c
++++ b/src/weston-launch.c
+@@ -51,7 +51,9 @@
+ 
+ #include <pwd.h>
+ #include <grp.h>
++#ifdef HAVE_PAM
+ #include <security/pam_appl.h>
++#endif
+ 
+ #ifdef HAVE_SYSTEMD_LOGIN
+ #include <systemd/sd-login.h>
+@@ -93,8 +95,10 @@ drmSetMaster(int drm_fd)
+ #endif
+ 
+ struct weston_launch {
++#ifdef HAVE_PAM
+ 	struct pam_conv pc;
+ 	pam_handle_t *ph;
++#endif
+ 	int tty;
+ 	int ttynr;
+ 	int sock[2];
+@@ -181,6 +185,7 @@ weston_launch_allowed(struct weston_launch *wl)
+ 	return false;
+ }
+ 
++#ifdef HAVE_PAM
+ static int
+ pam_conversation_fn(int msg_count,
+ 		    const struct pam_message **messages,
+@@ -221,6 +226,7 @@ setup_pam(struct weston_launch *wl)
+ 
+ 	return 0;
+ }
++#endif
+ 
+ static int
+ setup_launcher_socket(struct weston_launch *wl)
+@@ -414,6 +420,7 @@ quit(struct weston_launch *wl, int status)
+ 	close(wl->signalfd);
+ 	close(wl->sock[0]);
+ 
++#ifdef HAVE_PAM
+ 	if (wl->new_user) {
+ 		err = pam_close_session(wl->ph, 0);
+ 		if (err)
+@@ -421,6 +428,7 @@ quit(struct weston_launch *wl, int status)
+ 				err, pam_strerror(wl->ph, err));
+ 		pam_end(wl->ph, err);
+ 	}
++#endif
+ 
+ 	if (ioctl(wl->tty, KDSKBMUTE, 0) &&
+ 	    ioctl(wl->tty, KDSKBMODE, wl->kb_mode))
+@@ -600,6 +608,7 @@ setup_session(struct weston_launch *wl)
+ 	setenv("HOME", wl->pw->pw_dir, 1);
+ 	setenv("SHELL", wl->pw->pw_shell, 1);
+ 
++#ifdef HAVE_PAM
+ 	env = pam_getenvlist(wl->ph);
+ 	if (env) {
+ 		for (i = 0; env[i]; ++i) {
+@@ -608,6 +617,7 @@ setup_session(struct weston_launch *wl)
+ 		}
+ 		free(env);
+ 	}
++#endif
+ }
+ 
+ static void
+@@ -665,7 +675,9 @@ static void
+ help(const char *name)
+ {
+ 	fprintf(stderr, "Usage: %s [args...] [-- [weston args..]]\n", name);
++#ifdef HAVE_PAM
+ 	fprintf(stderr, "  -u, --user      Start session as specified username\n");
++#endif
+ 	fprintf(stderr, "  -t, --tty       Start session on alternative tty\n");
+ 	fprintf(stderr, "  -v, --verbose   Be verbose\n");
+ 	fprintf(stderr, "  -h, --help      Display this help message\n");
+@@ -678,7 +690,9 @@ main(int argc, char *argv[])
+ 	int i, c;
+ 	char *tty = NULL;
+ 	struct option opts[] = {
++#ifdef HAVE_PAM
+ 		{ "user",    required_argument, NULL, 'u' },
++#endif
+ 		{ "tty",     required_argument, NULL, 't' },
+ 		{ "verbose", no_argument,       NULL, 'v' },
+ 		{ "help",    no_argument,       NULL, 'h' },
+@@ -690,9 +704,13 @@ main(int argc, char *argv[])
+ 	while ((c = getopt_long(argc, argv, "u:t::vh", opts, &i)) != -1) {
+ 		switch (c) {
+ 		case 'u':
++#ifdef HAVE_PAM
+ 			wl.new_user = optarg;
+ 			if (getuid() != 0)
+ 				error(1, 0, "Permission denied. -u allowed for root only");
++#else
++			error(1, 0, "-u is unsupported in this weston-launch build");
++#endif
+ 			break;
+ 		case 't':
+ 			tty = optarg;
+@@ -730,8 +748,10 @@ main(int argc, char *argv[])
+ 	if (setup_tty(&wl, tty) < 0)
+ 		exit(EXIT_FAILURE);
+ 
++#ifdef HAVE_PAM
+ 	if (wl.new_user && setup_pam(&wl) < 0)
+ 		exit(EXIT_FAILURE);
++#endif
+ 
+ 	if (setup_launcher_socket(&wl) < 0)
+ 		exit(EXIT_FAILURE);
+-- 
+2.1.4
+

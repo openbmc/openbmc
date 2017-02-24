@@ -1,0 +1,34 @@
+From e427748f3bb5d37e78dc8d70a558c373aa8ababb Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Mon, 19 Sep 2016 22:06:28 -0700
+Subject: [PATCH] util/perlpath.pl: make it work when cwd is not in @INC
+
+Fixed when building on Debian-testing:
+| Can't locate find.pl in @INC (@INC contains: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.22.2 /usr/local/share/perl/5.22.2 /usr/lib/x86_64-linux-gnu/perl5/5.22 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl/5.22 /usr/share/perl/5.22 /usr/local/lib/site_perl /usr/lib/x86_64-linux-gnu/perl-base) at perlpath.pl line 7.
+
+The find.pl is added by oe-core, so once openssl/find.pl is removed,
+then this patch can be dropped.
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ util/perlpath.pl | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/util/perlpath.pl b/util/perlpath.pl
+index a1f236b..5599892 100755
+--- a/util/perlpath.pl
++++ b/util/perlpath.pl
+@@ -4,6 +4,8 @@
+ # line in all scripts that rely on perl.
+ #
+ 
++BEGIN { unshift @INC, "."; }
++
+ require "find.pl";
+ 
+ $#ARGV == 0 || print STDERR "usage: perlpath newpath  (eg /usr/bin)\n";
+-- 
+2.9.0
+

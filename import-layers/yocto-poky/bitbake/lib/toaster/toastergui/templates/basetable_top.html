@@ -159,66 +159,83 @@
     </script>
 
 <!-- control header -->
-<div class="navbar">
-    <div class="navbar-inner">
-        <form class="navbar-search input-append pull-left span6" id="searchform">
-            <input id="search" name="search" type="text" placeholder="Search {%if object_search_display %}{{object_search_display}}{%else%}{{objectname}}{%endif%}" value="{%if request.GET.search %}{{request.GET.search}}{% endif %}"/>{% if request.GET.search %}<a href="javascript:$('#search').val('');searchform.submit()" class="add-on btn" tabindex="-1"><i class="icon-remove"></i></a>{%endif%}
-            <input type="hidden" name="orderby" value="{{request.GET.orderby}}">
-            <input type="hidden" name="page" value="1">
-            <button class="btn" id="search-button" type="submit" value="Search">Search</button>
-        </form>
-        <div class="pull-right">
-{% if tablecols %}
-            <div class="btn-group">
-                <button id="edit-columns-button" class="btn dropdown-toggle" data-toggle="dropdown">Edit columns
-                    <span class="caret"></span>
-                </button>
+<div class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#table-chrome-collapse-variablehistory" aria-expanded="false">
+        <span class="sr-only">Toggle table options</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="collapse navbar-collapse" id="table-chrome-collapse-variablehistory">
+      <form class="navbar-form navbar-left" id="searchform">
+        <div class="form-group">
+          <div class="btn-group">
+            <input class="form-control" id="search" name="search" type="text" placeholder="Search {%if object_search_display %}{{object_search_display}}{%else%}{{objectname}}{%endif%}" value="{%if request.GET.search %}{{request.GET.search}}{% endif %}"/>
+            {% if request.GET.search %}<a href="javascript:$('#search').val('');searchform.submit()" tabindex="-1"><span class="remove-search-btn-variables glyphicon glyphicon-remove-circle"></span></a>{%endif%}
+          </div>
+        </div>
+        <input type="hidden" name="orderby" value="{{request.GET.orderby}}">
+        <input type="hidden" name="page" value="1">
+        <button class="btn btn-default" id="search-button" type="submit" value="Search">Search</button>
+      </form>
+      <form class="navbar-form navbar-right">
+        <div class="form-group">
+          <label>Show rows:</label>
+          <select class="pagesize form-control">
+            {% with "10 25 50 100 150" as list%}
+            {% for i in list.split %}
+            <option value="{{i}}">{{i}}</option>
+            {% endfor %}
+            {% endwith %}
+          </select>
+        </div>
+      </form>
+
+      <div class="btn-group navbar-right">
+				{% if tablecols %}
+					<button id="edit-columns-button" class="btn btn-default navbar-btn dropdown-toggle" data-toggle="dropdown">Edit columns
+						<span class="caret"></span>
+					</button>
 <!--
 	{{tablecols|sortcols}}
 -->
-                <ul id='editcol' class="dropdown-menu">
-                  {% for i in tablecols|sortcols %}
-                    <li>
-                        <label {% if not i.clclass %} class="checkbox muted" {%else%} class="checkbox" {%endif%}>
-                            <input type="checkbox" class="chbxtoggle"
-                                   {% if i.clclass %}
+        <ul id="editcol" class="dropdown-menu editcol">
+          {% for i in tablecols|sortcols %}
+          <li>
+            <div class="checkbox">
+              <label {% if not i.clclass %} class="muted" {%endif%}>
+                <input type="checkbox" class="chbxtoggle"
+                                       {% if i.clclass %}
                                        id="{{i.clclass}}"
                                        value="ct{{i.name}}"
                                        {% if not i.hidden %}
-                                           checked="checked"
+                                       checked="checked"
                                        {%endif%}
                                        onclick="showhideTableColumn(
-                                           $(this).attr('id'),
-                                           $(this).is(':checked'),
-                                           {% if i.ordericon %}
-                                              '{{i.orderkey}}'
-                                           {% else %}
-                                              undefined
-                                           {% endif %}
+                                       $(this).attr('id'),
+                                       $(this).is(':checked'),
+                                       {% if i.ordericon %}
+                                       '{{i.orderkey}}'
+                                       {% else %}
+                                       undefined
+                                       {% endif %}
                                        )"
-                                   {%else%}
+                                       {%else%}
                                        checked disabled
-                                   {% endif %}/>   {{i.name}}
-                        </label>
-                    </li>
-                  {% endfor %}
-                </ul>
+                                       {% endif %}/>{{i.name}}
+              </label>
             </div>
-{% endif %}
-            <div style="display:inline">
-                <span class="divider-vertical"></span>
-                <span class="help-inline" style="padding-top:5px;">Show rows:</span>
-                <select style="margin-top:5px;margin-bottom:0px;" class="pagesize">
-                  {% with "10 25 50 100 150" as list%}
-                    {% for i in list.split %}
-                        <option value="{{i}}">{{i}}</option>
-                    {% endfor %}
-                  {% endwith %}
-                </select>
-           </div>
-        </div>
-    </div> <!-- navbar-inner -->
-</div>
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+    </div> <!-- navbar-collapse -->
+	</div> <!-- container-fluid -->
+</div> <!-- navbar-default -->
 
 <!-- the actual rows of the table -->
     <table class="table table-bordered table-hover tablesorter" id="otable">
@@ -226,11 +243,11 @@
         <!-- Table header row; generated from "tablecols" entry in the context dict -->
         <tr>
             {% for tc in tablecols %}<th class="{%if tc.dclass%}{{tc.dclass}}{%endif%} {% if tc.clclass %}{{tc.clclass}}{% endif %}">
-                {%if tc.qhelp%}<i class="icon-question-sign get-help" title="{{tc.qhelp}}"></i>{%endif%}
-                {%if tc.orderfield%}<a {%if tc.ordericon%} class="sorted" {%endif%}href="javascript:reload_params({'page': 1, 'orderby' : '{{tc.orderfield}}' })">{{tc.name}}</a>{%else%}<span class="muted">{{tc.name}}</span>{%endif%}
+                {%if tc.qhelp%}<span class="glyphicon glyphicon-question-sign get-help" title="{{tc.qhelp}}"></span>{%endif%}
+                {%if tc.orderfield%}<a {%if tc.ordericon%} class="sorted" {%endif%}href="javascript:reload_params({'page': 1, 'orderby' : '{{tc.orderfield}}' })">{{tc.name}}</a>{%else%}<span class="text-muted">{{tc.name}}</span>{%endif%}
                 {%if tc.ordericon%} <i class="icon-caret-{{tc.ordericon}}"></i>{%endif%}
                 {%if tc.filter%}<div class="btn-group pull-right">
-                    <a href="#filter_{{tc.filter.class}}" role="button" class="btn btn-mini {%if request.GET.filter%}{{tc.filter.options|filtered_icon:request.GET.filter}} {%endif%}" {%if request.GET.filter and tc.filter.options|filtered_tooltip:request.GET.filter %} title="<p>{{tc.filter.options|filtered_tooltip:request.GET.filter}}</p><p><a class='btn btn-small btn-primary' href=javascript:reload_params({'filter':''})>Show all {% if filter_search_display %}{{filter_search_display}}{% else %}{{objectname}}{% endif %}</a></p>" {%endif%} data-toggle="modal"> <i class="icon-filter filtered"></i> </a>
+                    <a href="#filter_{{tc.filter.class}}" role="button" class="btn btn-xs {%if request.GET.filter%}{{tc.filter.options|filtered_icon:request.GET.filter}} {%endif%}" {%if request.GET.filter and tc.filter.options|filtered_tooltip:request.GET.filter %} title="<p>{{tc.filter.options|filtered_tooltip:request.GET.filter}}</p><p><a class='btn btn-sm btn-primary' href=javascript:reload_params({'filter':''})>Show all {% if filter_search_display %}{{filter_search_display}}{% else %}{{objectname}}{% endif %}</a></p>" {%endif%} data-toggle="modal"> <span class="glyphicon glyphicon-filter filtered"></span> </a>
                 </div>{%endif%}
             </th>{% endfor %}
         </tr>

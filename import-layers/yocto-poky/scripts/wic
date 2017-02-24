@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # ex:ts=4:sw=4:sts=4:et
 # -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 #
@@ -28,7 +28,6 @@
 # AUTHORS
 # Tom Zanussi <tom.zanussi (at] linux.intel.com>
 #
-
 __version__ = "0.2.0"
 
 # Python Standard Library modules
@@ -114,6 +113,7 @@ def wic_create_subcommand(args, usage_str):
     parser.add_option("-c", "--compress-with", choices=("gzip", "bzip2", "xz"),
                       dest='compressor',
                       help="compress image with specified compressor")
+    parser.add_option("-m", "--bmap", action="store_true", help="generate .bmap")
     parser.add_option("-v", "--vars", dest='vars_dir',
                       help="directory with <image>.env files that store "
                            "bitbake variables")
@@ -140,8 +140,8 @@ def wic_create_subcommand(args, usage_str):
             if not val:
                 missed.append(opt)
         if missed:
-            print "The following build artifacts are not specified:"
-            print "  " + ", ".join(missed)
+            print("The following build artifacts are not specified:")
+            print("  " + ", ".join(missed))
             sys.exit(1)
 
     if options.image_name:
@@ -153,12 +153,12 @@ def wic_create_subcommand(args, usage_str):
         BB_VARS.vars_dir = options.vars_dir
 
     if options.build_check:
-        print "Checking basic build environment..."
+        print("Checking basic build environment...")
         if not engine.verify_build_env():
-            print "Couldn't verify build environment, exiting\n"
+            print("Couldn't verify build environment, exiting\n")
             sys.exit(1)
         else:
-            print "Done.\n"
+            print("Done.\n")
 
     bootimg_dir = ""
 
@@ -168,7 +168,7 @@ def wic_create_subcommand(args, usage_str):
             if options.debug:
                 argv.append("--debug")
 
-            print "Building rootfs...\n"
+            print("Building rootfs...\n")
             if bitbake_main(BitBakeConfigParameters(argv),
                             cookerdata.CookerConfiguration()):
                 sys.exit(1)
@@ -179,7 +179,7 @@ def wic_create_subcommand(args, usage_str):
                                          options.image_name)
     else:
         if options.build_rootfs:
-            print "Image name is not specified, exiting. (Use -e/--image-name to specify it)\n"
+            print("Image name is not specified, exiting. (Use -e/--image-name to specify it)\n")
             sys.exit(1)
 
     wks_file = args[0]
@@ -187,9 +187,9 @@ def wic_create_subcommand(args, usage_str):
     if not wks_file.endswith(".wks"):
         wks_file = engine.find_canned_image(scripts_path, wks_file)
         if not wks_file:
-            print "No image named %s found, exiting.  (Use 'wic list images' "\
+            print("No image named %s found, exiting.  (Use 'wic list images' "\
                   "to list available images, or specify a fully-qualified OE "\
-                  "kickstart (.wks) filename)\n" % args[0]
+                  "kickstart (.wks) filename)\n" % args[0])
             sys.exit(1)
 
     image_output_dir = ""
@@ -204,16 +204,16 @@ def wic_create_subcommand(args, usage_str):
         kernel_dir = options.kernel_dir
         native_sysroot = options.native_sysroot
         if rootfs_dir and not os.path.isdir(rootfs_dir):
-            print "--roofs-dir (-r) not found, exiting\n"
+            print("--roofs-dir (-r) not found, exiting\n")
             sys.exit(1)
         if not os.path.isdir(bootimg_dir):
-            print "--bootimg-dir (-b) not found, exiting\n"
+            print("--bootimg-dir (-b) not found, exiting\n")
             sys.exit(1)
         if not os.path.isdir(kernel_dir):
-            print "--kernel-dir (-k) not found, exiting\n"
+            print("--kernel-dir (-k) not found, exiting\n")
             sys.exit(1)
         if not os.path.isdir(native_sysroot):
-            print "--native-sysroot (-n) not found, exiting\n"
+            print("--native-sysroot (-n) not found, exiting\n")
             sys.exit(1)
     else:
         not_found = not_found_dir = ""
@@ -226,12 +226,12 @@ def wic_create_subcommand(args, usage_str):
         if not_found:
             if not not_found_dir:
                 not_found_dir = "Completely missing artifact - wrong image (.wks) used?"
-            print "Build artifacts not found, exiting."
-            print "  (Please check that the build artifacts for the machine"
-            print "   selected in local.conf actually exist and that they"
-            print "   are the correct artifacts for the image (.wks file)).\n"
-            print "The artifact that couldn't be found was %s:\n  %s" % \
-                (not_found, not_found_dir)
+            print("Build artifacts not found, exiting.")
+            print("  (Please check that the build artifacts for the machine")
+            print("   selected in local.conf actually exist and that they")
+            print("   are the correct artifacts for the image (.wks file)).\n")
+            print("The artifact that couldn't be found was %s:\n  %s" % \
+                (not_found, not_found_dir))
             sys.exit(1)
 
     krootfs_dir = options.rootfs_dir
@@ -241,10 +241,10 @@ def wic_create_subcommand(args, usage_str):
 
     rootfs_dir = rootfs_dir_to_args(krootfs_dir)
 
-    print "Creating image(s)...\n"
+    print("Creating image(s)...\n")
     engine.wic_create(wks_file, rootfs_dir, bootimg_dir, kernel_dir,
                       native_sysroot, scripts_path, image_output_dir,
-                      options.compressor, options.debug)
+                      options.compressor, options.bmap, options.debug)
 
 
 def wic_list_subcommand(args, usage_str):
@@ -294,7 +294,7 @@ subcommands = {
 
 
 def start_logging(loglevel):
-    logging.basicConfig(filname='wic.log', filemode='w', level=loglevel)
+    logging.basicConfig(filename='wic.log', filemode='w', level=loglevel)
 
 
 def main(argv):
@@ -318,6 +318,6 @@ if __name__ == "__main__":
     try:
         sys.exit(main(sys.argv[1:]))
     except WicError as err:
-        print >> sys.stderr, "ERROR:", err
+        print("ERROR:", err, file=sys.stderr)
         sys.exit(1)
 

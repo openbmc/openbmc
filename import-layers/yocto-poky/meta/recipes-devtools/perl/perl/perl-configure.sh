@@ -15,7 +15,7 @@ echo sh Configure -des \
         -Dprefix=/usr \
         -Dvendorprefix=/usr \
         -Dsiteprefix=/usr \
-        -Dotherlibdirs=/usr/lib/perl5/5.12.3 \
+        -Dotherlibdirs=/usr/lib/perl5/5.22.1 \
         -Duseshrplib \
         -Dusethreads \
         -Duseithreads \

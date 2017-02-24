@@ -132,7 +132,26 @@ python do_ar_original() {
 
     ar_outdir = d.getVar('ARCHIVER_OUTDIR', True)
     bb.note('Archiving the original source...')
-    fetch = bb.fetch2.Fetch([], d)
+    urls = d.getVar("SRC_URI", True).split()
+    # destsuffix (git fetcher) and subdir (everything else) are allowed to be
+    # absolute paths (for example, destsuffix=${S}/foobar).
+    # That messes with unpacking inside our tmpdir below, because the fetchers
+    # will then unpack in that directory and completely ignore the tmpdir.
+    # That breaks parallel tasks relying on ${S}, like do_compile.
+    #
+    # To solve this, we remove these parameters from all URLs.
+    # We do this even for relative paths because it makes the content of the
+    # archives more useful (no extra paths that are only used during
+    # compilation).
+    for i, url in enumerate(urls):
+        decoded = bb.fetch2.decodeurl(url)
+        for param in ('destsuffix', 'subdir'):
+            if param in decoded[5]:
+                del decoded[5][param]
+        encoded = bb.fetch2.encodeurl(decoded)
+        urls[i] = encoded
+    fetch = bb.fetch2.Fetch(urls, d)
+    tarball_suffix = {}
     for url in fetch.urls:
         local = fetch.localpath(url).rstrip("/");
         if os.path.isfile(local):
@@ -140,7 +159,21 @@ python do_ar_original() {
         elif os.path.isdir(local):
             tmpdir = tempfile.mkdtemp(dir=d.getVar('ARCHIVER_WORKDIR', True))
             fetch.unpack(tmpdir, (url,))
-            create_tarball(d, tmpdir + '/.', '', ar_outdir)
+            # To handle recipes with more than one source, we add the "name"
+            # URL parameter as suffix. We treat it as an error when
+            # there's more than one URL without a name, or a name gets reused.
+            # This is an additional safety net, in practice the name has
+            # to be set when using the git fetcher, otherwise SRCREV cannot
+            # be set separately for each URL.
+            params = bb.fetch2.decodeurl(url)[5]
+            name = params.get('name', '')
+            if name in tarball_suffix:
+                if not name:
+                    bb.fatal("Cannot determine archive names for original source because 'name' URL parameter is unset in more than one URL. Add it to at least one of these: %s %s" % (tarball_suffix[name], url))
+                else:
+                    bb.fatal("Cannot determine archive names for original source because 'name=' URL parameter '%s' is used twice. Make it unique in: %s %s" % (tarball_suffix[name], url))
+            tarball_suffix[name] = url
+            create_tarball(d, tmpdir + '/.', name, ar_outdir)
 
     # Emit patch series files for 'original'
     bb.note('Writing patch series files...')
@@ -270,9 +303,10 @@ python do_unpack_and_patch() {
         return
     ar_outdir = d.getVar('ARCHIVER_OUTDIR', True)
     ar_workdir = d.getVar('ARCHIVER_WORKDIR', True)
+    pn = d.getVar('PN', True)
 
     # The kernel class functions require it to be on work-shared, so we dont change WORKDIR
-    if not bb.data.inherits_class('kernel-yocto', d):
+    if not (bb.data.inherits_class('kernel-yocto', d) or pn.startswith('gcc-source')):
         # Change the WORKDIR to make do_unpack do_patch run in another dir.
         d.setVar('WORKDIR', ar_workdir)
 
@@ -290,7 +324,7 @@ python do_unpack_and_patch() {
         oe.path.copytree(src, src_orig)
 
     # Make sure gcc and kernel sources are patched only once
-    if not ((d.getVar('SRC_URI', True) == "" or bb.data.inherits_class('kernel-yocto', d))):
+    if not (d.getVar('SRC_URI', True) == "" or (bb.data.inherits_class('kernel-yocto', d) or pn.startswith('gcc-source'))):
         bb.build.exec_func('do_patch', d)
 
     # Create the patches

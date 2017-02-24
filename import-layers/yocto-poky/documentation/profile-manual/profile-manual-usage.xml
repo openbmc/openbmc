@@ -60,8 +60,11 @@
 
         <para>
             In particular, you'll get the most mileage out of perf if you
-            profile an image built with INHIBIT_PACKAGE_STRIP = "1" in your
-            local.conf.
+            profile an image built with the following in your
+            <filename>local.conf</filename> file:
+            <literallayout class='monospaced'>
+     <ulink url='&YOCTO_DOCS_REF_URL;#var-INHIBIT_PACKAGE_STRIP'>INHIBIT_PACKAGE_STRIP</ulink> = "1"
+            </literallayout>
         </para>
 
         <para>
@@ -355,10 +358,10 @@
             </para>
 
             <para>
-                One way around that is to put the following in your local.conf
-                when you build the image:
+                One way around that is to put the following in your
+                <filename>local.conf</filename> file when you build the image:
                 <literallayout class='monospaced'>
-     INHIBIT_PACKAGE_STRIP = "1"
+     <ulink url='&YOCTO_DOCS_REF_URL;#var-INHIBIT_PACKAGE_STRIP'>INHIBIT_PACKAGE_STRIP</ulink> = "1"
                 </literallayout>
                 However, we already have an image with the binaries stripped,
                 so what can we do to get perf to resolve the symbols? Basically

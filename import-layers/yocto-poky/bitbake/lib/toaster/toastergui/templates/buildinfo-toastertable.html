@@ -1,0 +1,25 @@
+{% extends "basebuildpage.html" %}
+
+{% load projecttags %}
+
+{% block title %} {{title}} - {{build.target_set.all|dictsort:"target"|join:", "}} {{build.machine}} - {{build.project.name}} - Toaster {% endblock %}
+{% block localbreadcrumb %}
+<li>{{title}}</li>
+{% endblock %}
+
+{% block nav-packages %}
+{% endblock %}
+
+{% block buildinfomain %}
+<div class="col-md-10">
+{# xhr_table_url is just the current url so leave it blank #}
+{% with xhr_table_url='' %}
+  <div class="page-header build-data">
+     <h1>
+       {{title}} (<span class="table-count-{{table_name}}">0</span>) </h2>
+     </h1>
+  </div>
+  {% include "toastertable.html" %}
+{% endwith %}
+</div>
+{% endblock %}

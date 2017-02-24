@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # OpenEmbedded Development tool
 #
@@ -22,7 +22,7 @@ import os
 import argparse
 import glob
 import re
-import ConfigParser
+import configparser
 import subprocess
 import logging
 
@@ -51,12 +51,12 @@ class ConfigHandler(object):
 
     def __init__(self, filename):
         self.config_file = filename
-        self.config_obj = ConfigParser.SafeConfigParser()
+        self.config_obj = configparser.SafeConfigParser()
 
     def get(self, section, option, default=None):
         try:
             ret = self.config_obj.get(section, option)
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             if default != None:
                 ret = default
             else:
@@ -85,6 +85,11 @@ class ConfigHandler(object):
         self.config_obj.set('General', 'workspace_path', self.workspace_path)
         with open(self.config_file, 'w') as f:
             self.config_obj.write(f)
+
+    def set(self, section, option, value):
+        if not self.config_obj.has_section(section):
+            self.config_obj.add_section(section)
+        self.config_obj.set(section, option, value)
 
 class Context:
     def __init__(self, **kwargs):
@@ -174,13 +179,16 @@ def _create_workspace(workspacedir, config, basepath):
         # Add a README file
         with open(os.path.join(workspacedir, 'README'), 'w') as f:
             f.write('This layer was created by the OpenEmbedded devtool utility in order to\n')
-            f.write('contain recipes and bbappends. In most instances you should use the\n')
+            f.write('contain recipes and bbappends that are currently being worked on. The idea\n')
+            f.write('is that the contents is temporary - once you have finished working on a\n')
+            f.write('recipe you use the appropriate method to move the files you have been\n')
+            f.write('working on to a proper layer. In most instances you should use the\n')
             f.write('devtool utility to manage files within it rather than modifying files\n')
             f.write('directly (although recipes added with "devtool add" will often need\n')
             f.write('direct modification.)\n')
-            f.write('\nIf you no longer need to use devtool you can remove the path to this\n')
-            f.write('workspace layer from your conf/bblayers.conf file (and then delete the\n')
-            f.write('layer, if you wish).\n')
+            f.write('\nIf you no longer need to use devtool or the workspace layer\'s contents\n')
+            f.write('you can remove the path to this workspace layer from your conf/bblayers.conf\n')
+            f.write('file (and then delete the layer, if you wish).\n')
             f.write('\nNote that by default, if devtool fetches and unpacks source code, it\n')
             f.write('will place it in a subdirectory of a "sources" subdirectory of the\n')
             f.write('layer. If you prefer it to be elsewhere you can specify the source\n')
@@ -281,18 +289,17 @@ def main():
 
     if global_args.bbpath is None:
         tinfoil = setup_tinfoil(config_only=True, basepath=basepath)
-        global_args.bbpath = tinfoil.config_data.getVar('BBPATH', True)
-    else:
-        tinfoil = None
+        try:
+            global_args.bbpath = tinfoil.config_data.getVar('BBPATH', True)
+        finally:
+            tinfoil.shutdown()
 
     for path in [scripts_path] + global_args.bbpath.split(':'):
         pluginpath = os.path.join(path, 'lib', 'devtool')
         scriptutils.load_plugins(logger, plugins, pluginpath)
 
-    if tinfoil:
-        tinfoil.shutdown()
-
     subparsers = parser.add_subparsers(dest="subparser_name", title='subcommands', metavar='<subcommand>')
+    subparsers.required = True
 
     subparsers.add_subparser_group('sdk', 'SDK maintenance', -2)
     subparsers.add_subparser_group('advanced', 'Advanced', -1)
@@ -325,7 +332,7 @@ def main():
     except DevtoolError as err:
         if str(err):
             logger.error(str(err))
-        ret = 1
+        ret = err.exitcode
     except argparse_oe.ArgumentUsageError as ae:
         parser.error_subcommand(ae.message, ae.subcommand)
 

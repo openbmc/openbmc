@@ -17,7 +17,7 @@ class BuildSystem(object):
     def __init__(self, context, d):
         self.d = d
         self.context = context
-        self.layerdirs = d.getVar('BBLAYERS', True).split()
+        self.layerdirs = [os.path.abspath(pth) for pth in d.getVar('BBLAYERS', True).split()]
         self.layers_exclude = (d.getVar('SDK_LAYERS_EXCLUDE', True) or "").split()
 
     def copy_bitbake_and_layers(self, destdir, workspace_name=None):
@@ -26,7 +26,7 @@ class BuildSystem(object):
         bb.utils.mkdirhier(destdir)
         layers = list(self.layerdirs)
 
-        corebase = self.d.getVar('COREBASE', True)
+        corebase = os.path.abspath(self.d.getVar('COREBASE', True))
         layers.append(corebase)
 
         # Exclude layers
@@ -124,7 +124,7 @@ class BuildSystem(object):
 def generate_locked_sigs(sigfile, d):
     bb.utils.mkdirhier(os.path.dirname(sigfile))
     depd = d.getVar('BB_TASKDEPDATA', False)
-    tasks = ['%s.%s' % (v[2], v[1]) for v in depd.itervalues()]
+    tasks = ['%s.%s' % (v[2], v[1]) for v in depd.values()]
     bb.parse.siggen.dump_lockedsigs(sigfile, tasks)
 
 def prune_lockedsigs(excluded_tasks, excluded_targets, lockedsigs, pruned_output):
@@ -145,7 +145,7 @@ def prune_lockedsigs(excluded_tasks, excluded_targets, lockedsigs, pruned_output
                     invalue = True
                     f.write(line)
 
-def merge_lockedsigs(copy_tasks, lockedsigs_main, lockedsigs_extra, merged_output, copy_output):
+def merge_lockedsigs(copy_tasks, lockedsigs_main, lockedsigs_extra, merged_output, copy_output=None):
     merged = {}
     arch_order = []
     with open(lockedsigs_main, 'r') as f:
@@ -195,23 +195,46 @@ def merge_lockedsigs(copy_tasks, lockedsigs_main, lockedsigs_extra, merged_outpu
                     fulltypes.append(typename)
             f.write('SIGGEN_LOCKEDSIGS_TYPES = "%s"\n' % ' '.join(fulltypes))
 
-    write_sigs_file(copy_output, tocopy.keys(), tocopy)
+    if copy_output:
+        write_sigs_file(copy_output, list(tocopy.keys()), tocopy)
     if merged_output:
         write_sigs_file(merged_output, arch_order, merged)
 
-def create_locked_sstate_cache(lockedsigs, input_sstate_cache, output_sstate_cache, d, fixedlsbstring=""):
+def create_locked_sstate_cache(lockedsigs, input_sstate_cache, output_sstate_cache, d, fixedlsbstring="", filterfile=None):
+    import shutil
     bb.note('Generating sstate-cache...')
 
     nativelsbstring = d.getVar('NATIVELSBSTRING', True)
-    bb.process.run("gen-lockedsig-cache %s %s %s %s" % (lockedsigs, input_sstate_cache, output_sstate_cache, nativelsbstring))
-    if fixedlsbstring:
+    bb.process.run("gen-lockedsig-cache %s %s %s %s %s" % (lockedsigs, input_sstate_cache, output_sstate_cache, nativelsbstring, filterfile or ''))
+    if fixedlsbstring and nativelsbstring != fixedlsbstring:
         nativedir = output_sstate_cache + '/' + nativelsbstring
         if os.path.isdir(nativedir):
             destdir = os.path.join(output_sstate_cache, fixedlsbstring)
-            bb.utils.mkdirhier(destdir)
+            for root, _, files in os.walk(nativedir):
+                for fn in files:
+                    src = os.path.join(root, fn)
+                    dest = os.path.join(destdir, os.path.relpath(src, nativedir))
+                    if os.path.exists(dest):
+                        # Already exists, and it'll be the same file, so just delete it
+                        os.unlink(src)
+                    else:
+                        bb.utils.mkdirhier(os.path.dirname(dest))
+                        shutil.move(src, dest)
 
-            dirlist = os.listdir(nativedir)
-            for i in dirlist:
-                src = os.path.join(nativedir, i)
-                dest = os.path.join(destdir, i)
-                os.rename(src, dest)
+def check_sstate_task_list(d, targets, filteroutfile, cmdprefix='', cwd=None, logfile=None):
+    import subprocess
+
+    bb.note('Generating sstate task list...')
+
+    if not cwd:
+        cwd = os.getcwd()
+    if logfile:
+        logparam = '-l %s' % logfile
+    else:
+        logparam = ''
+    cmd = "%sBB_SETSCENE_ENFORCE=1 PSEUDO_DISABLED=1 oe-check-sstate %s -s -o %s %s" % (cmdprefix, targets, filteroutfile, logparam)
+    env = dict(d.getVar('BB_ORIGENV', False))
+    env.pop('BUILDDIR', '')
+    pathitems = env['PATH'].split(':')
+    env['PATH'] = ':'.join([item for item in pathitems if not item.endswith('/bitbake/bin')])
+    bb.process.run(cmd, stderr=subprocess.STDOUT, env=env, cwd=cwd, executable='/bin/bash')

@@ -1,0 +1,79 @@
+From ae6a01ba204b480bda6a5b4431be3d22e53a7006 Mon Sep 17 00:00:00 2001
+From: Tanu Kaskinen <tanuk@iki.fi>
+Date: Fri, 23 Oct 2015 13:37:11 +0300
+Subject: [PATCH 5/5] alsa: set availability for (some) unavailable profiles
+
+The alsa card hasn't so far set any availability for profiles. That
+caused an issue with some HDMI hardware: the sound card has two HDMI
+outputs, but only the second of them is actually usable. The
+unavailable port is marked as unavailable and the available port is
+marked as available, but this information isn't propagated to the
+profile availability. Without profile availability information, the
+initial profile policy picks the unavailable one, since it has a
+higher priority value.
+
+This patch adds simple logic for marking some profiles unavailable:
+if the profile only contains unavailable ports, the profile is
+unavailable too. This can be improved in the future so that if a
+profile contains sinks or sources that only contain unavailable ports,
+the profile should be marked as unavailable. Implementing that
+requires adding more information about the sinks and sources to
+pa_card_profile, however.
+
+BugLink: https://bugzilla.yoctoproject.org/show_bug.cgi?id=8448
+
+Upstream-Status: Accepted [expected in 10.0]
+
+Signed-off-by: Tanu Kaskinen <tanuk@iki.fi>
+---
+ src/modules/alsa/module-alsa-card.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
+
+diff --git a/src/modules/alsa/module-alsa-card.c b/src/modules/alsa/module-alsa-card.c
+index 1976230..323e08a 100644
+--- a/src/modules/alsa/module-alsa-card.c
++++ b/src/modules/alsa/module-alsa-card.c
+@@ -366,6 +366,7 @@ static int report_jack_state(snd_mixer_elem_t *melem, unsigned int mask) {
+     void *state;
+     pa_alsa_jack *jack;
+     struct temp_port_avail *tp, *tports;
++    pa_card_profile *profile;
+ 
+     pa_assert(u);
+ 
+@@ -426,6 +427,32 @@ static int report_jack_state(snd_mixer_elem_t *melem, unsigned int mask) {
+         if (tp->avail == PA_AVAILABLE_NO)
+            pa_device_port_set_available(tp->port, tp->avail);
+ 
++    /* Update profile availabilities. The logic could be improved; for now we
++     * only set obviously unavailable profiles (those that contain only
++     * unavailable ports) to PA_AVAILABLE_NO and all others to
++     * PA_AVAILABLE_UNKNOWN. */
++    PA_HASHMAP_FOREACH(profile, u->card->profiles, state) {
++        pa_device_port *port;
++        void *state2;
++        pa_available_t available = PA_AVAILABLE_NO;
++
++        /* Don't touch the "off" profile. */
++        if (profile->n_sources == 0 && profile->n_sinks == 0)
++            continue;
++
++        PA_HASHMAP_FOREACH(port, u->card->ports, state2) {
++            if (!pa_hashmap_get(port->profiles, profile->name))
++                continue;
++
++            if (port->available != PA_AVAILABLE_NO) {
++                available = PA_AVAILABLE_UNKNOWN;
++                break;
++            }
++        }
++
++        pa_card_profile_set_available(profile, available);
++    }
++
+     pa_xfree(tports);
+     return 0;
+ }
+-- 
+2.8.1
+

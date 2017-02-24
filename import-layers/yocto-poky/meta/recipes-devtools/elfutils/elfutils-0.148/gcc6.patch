@@ -1,0 +1,23 @@
+Fix warnings found with gcc6
+
+| ../../elfutils-0.148/libdw/dwarf_siblingof.c: In function 'dwarf_siblingof':
+| ../../elfutils-0.148/libdw/dwarf_siblingof.c:69:6: error: nonnull argument 'result' compared to NULL [-Werror=nonnull-compare]
+|    if (result == NULL)
+|       ^
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Inappropriate [ unmaintained ]
+Index: elfutils-0.148/libdw/dwarf_siblingof.c
+===================================================================
+--- elfutils-0.148.orig/libdw/dwarf_siblingof.c
++++ elfutils-0.148/libdw/dwarf_siblingof.c
+@@ -66,9 +66,6 @@ dwarf_siblingof (die, result)
+   if (die == NULL)
+     return -1;
+ 
+-  if (result == NULL)
+-    return -1;
+-
+   if (result != die)
+     result->addr = NULL;
+ 

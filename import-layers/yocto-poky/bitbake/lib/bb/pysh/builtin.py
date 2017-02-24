@@ -527,7 +527,7 @@ def utility_sed(name, args, interp, env, stdin, stdout, stderr, debugflags):
         print interp.log(' '.join([name, str(args), interp['PWD']]) + '\n')
         
     # Scan pattern arguments and append a space if necessary
-    for i in xrange(len(args)):
+    for i in range(len(args)):
         if not RE_SED.search(args[i]):
             continue
         args[i] = args[i] + ' '

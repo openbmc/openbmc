@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os
 import sys
@@ -15,15 +15,27 @@ def mkdir(d):
 
 if len(sys.argv) < 5:
     print("Incorrect number of arguments specified")
-    print("syntax: gen-lockedsig-cache <locked-sigs.inc> <input-cachedir> <output-cachedir> <nativelsbstring>")
+    print("syntax: gen-lockedsig-cache <locked-sigs.inc> <input-cachedir> <output-cachedir> <nativelsbstring> [filterfile]")
     sys.exit(1)
+
+filterlist = []
+if len(sys.argv) > 5:
+    print('Reading filter file %s' % sys.argv[5])
+    with open(sys.argv[5]) as f:
+        for l in f.readlines():
+            if ":" in l:
+                filterlist.append(l.rstrip())
 
 print('Reading %s' % sys.argv[1])
 sigs = []
 with open(sys.argv[1]) as f:
     for l in f.readlines():
         if ":" in l:
-            sigs.append(l.split(":")[2].split()[0])
+            task, sig = l.split()[0].rsplit(':', 1)
+            if filterlist and not task in filterlist:
+                print('Filtering out %s' % task)
+            else:
+                sigs.append(sig)
 
 print('Gathering file list')
 files = set()
@@ -45,13 +57,14 @@ for f in files:
     destdir = os.path.dirname(dst)
     mkdir(destdir)
 
+    src = os.path.realpath(f)
     if os.path.exists(dst):
         os.remove(dst)
-    if (os.stat(f).st_dev == os.stat(destdir).st_dev):
+    if (os.stat(src).st_dev == os.stat(destdir).st_dev):
         print('linking')
-        os.link(f, dst)
+        os.link(src, dst)
     else:
         print('copying')
-        shutil.copyfile(f, dst)
+        shutil.copyfile(src, dst)
 
 print('Done!')

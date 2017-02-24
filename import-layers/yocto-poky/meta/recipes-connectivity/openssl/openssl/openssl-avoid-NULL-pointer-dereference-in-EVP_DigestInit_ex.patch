@@ -8,16 +8,16 @@ http://www.mail-archive.com/openssl-dev@openssl.org/msg32860.html
 
 Signed-off-by: Xufeng Zhang <xufeng.zhang@windriver.com>
 ---
-Index: openssl-1.0.2/crypto/evp/digest.c
+Index: openssl-1.0.2h/crypto/evp/digest.c
 ===================================================================
---- openssl-1.0.2.orig/crypto/evp/digest.c
-+++ openssl-1.0.2/crypto/evp/digest.c
-@@ -208,7 +208,7 @@ int EVP_DigestInit_ex(EVP_MD_CTX *ctx, c
-         return 0;
+--- openssl-1.0.2h.orig/crypto/evp/digest.c
++++ openssl-1.0.2h/crypto/evp/digest.c
+@@ -211,7 +211,7 @@ int EVP_DigestInit_ex(EVP_MD_CTX *ctx, c
+         type = ctx->digest;
      }
  #endif
 -    if (ctx->digest != type) {
 +    if (type && (ctx->digest != type)) {
-         if (ctx->digest && ctx->digest->ctx_size)
+         if (ctx->digest && ctx->digest->ctx_size) {
              OPENSSL_free(ctx->md_data);
-         ctx->digest = type;
+             ctx->md_data = NULL;

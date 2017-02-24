@@ -25,14 +25,22 @@ Upstream-Status: Pending
 
 Signed-off-by: Krishnanjanappa, Jagadeesh <jagadeesh.krishnanjanappa@caviumnetworks.com>
 
-diff -Naurp dpkg-1.17.21_org/triplettable dpkg-1.17.21/triplettable
---- dpkg-1.17.21_org/triplettable	2015-04-08 17:08:52.370759171 +0530
-+++ dpkg-1.17.21/triplettable	2015-04-08 17:09:12.406752081 +0530
-@@ -9,6 +9,7 @@ musleabihf-linux-arm	musl-linux-armhf
- musl-linux-<cpu>	musl-linux-<cpu>
- gnueabihf-linux-arm	armhf
+---
+ triplettable | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/triplettable b/triplettable
+index abe4726..1e9c247 100644
+--- a/triplettable
++++ b/triplettable
+@@ -11,6 +11,7 @@ gnueabihf-linux-arm	armhf
  gnueabi-linux-arm	armel
+ gnuabin32-linux-mips64r6el	mipsn32r6el
+ gnuabin32-linux-mips64r6	mipsn32r6
 +gnueabi-linux-armeb	armeb
  gnuabin32-linux-mips64el	mipsn32el
  gnuabin32-linux-mips64	mipsn32
- gnuabi64-linux-mips64el	mips64el
+ gnuabi64-linux-mips64r6el	mips64r6el
+-- 
+2.1.4
+

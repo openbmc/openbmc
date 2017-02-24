@@ -19,14 +19,14 @@ Upstream-Status: Inappropriate
 
 Signed-off-by: Zheng Junling <zhengjunling@huawei.com>
 ---
- configure | 60 ++++++------------------------------------------------------
- 1 file changed, 6 insertions(+), 54 deletions(-)
+ configure |   72 +++++---------------------------------------------------------
+ 1 file changed, 6 insertions(+), 66 deletions(-)
 
 diff --git a/configure b/configure
-index 7a96256..91632f3 100755
+index fa395ff..7fa769c 100755
 --- a/configure
 +++ b/configure
-@@ -7909,6 +7909,7 @@ $as_echo_n "checking for the iconv library and header files ... " >&6; }
+@@ -8259,6 +8259,7 @@ $as_echo_n "checking for the iconv library and header files ... " >&6; }
  	 /usr/include/iconv,/usr/lib \
  	 /usr/iconv/include,/usr/iconv/lib \
  	 /usr/include,/usr/lib \
@@ -34,7 +34,7 @@ index 7a96256..91632f3 100755
  	 /opt/include/iconv,/opt/lib \
  	 /opt/iconv/include,/opt/iconv/lib \
  	 /opt/include,/opt/lib"
-@@ -7939,14 +7940,14 @@ $as_echo_n "checking for the iconv library and header files ... " >&6; }
+@@ -8289,14 +8290,14 @@ $as_echo_n "checking for the iconv library and header files ... " >&6; }
          xincdir=`echo $include_and_lib | tr ',' ' ' | awk '{print $1}'`
  	xlibdir=`echo $include_and_lib | tr ',' ' ' | awk '{print $2}'`
  	found=0
@@ -53,7 +53,7 @@ index 7a96256..91632f3 100755
  	      jd_with_iconv_library="yes"
  	      found=1
  	      break
-@@ -7972,56 +7973,7 @@ $as_echo "yes: $jd_iconv_library_dir and $jd_iconv_include_dir" >&6; }
+@@ -8201,68 +8201,7 @@ $as_echo "yes: $jd_iconv_library_dir and $jd_iconv_include_dir" >&6; }
      then
        ICONV_LIB=""
      else
@@ -82,7 +82,7 @@ index 7a96256..91632f3 100755
 -      fi
 -    fi
 -  ;;
--  *osf*|*openbsd*)
+-  *osf*|*openbsd*|*freebsd*)
 -    if test "X$GCC" = Xyes
 -    then
 -      RPATH="-Wl,-rpath,"
@@ -103,7 +103,19 @@ index 7a96256..91632f3 100755
 -      RPATH="$RPATH$jd_iconv_library_dir"
 -    fi
 -  else
--    RPATH="$RPATH:$jd_iconv_library_dir"
+-    _already_there=0
+-    for X in `echo $RPATH | sed 's/:/ /g'`
+-    do
+-      if test "$X" = "$jd_iconv_library_dir"
+-      then
+-        _already_there=1
+-	break
+-      fi
+-    done
+-    if test $_already_there = 0
+-    then
+-      RPATH="$RPATH:$jd_iconv_library_dir"
+-    fi
 -  fi
 -fi
 -
@@ -111,6 +123,3 @@ index 7a96256..91632f3 100755
      fi
  
      ICONV_INC=-I$jd_iconv_include_dir
--- 
-1.8.3.4
-

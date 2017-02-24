@@ -8,39 +8,6 @@ finish_enabled() {
 
 finish_run() {
 	if [ -n "$ROOTFS_DIR" ]; then
-		if [ -n "$bootparam_rootdelay" ]; then
-			debug "Sleeping for $rootdelay second(s) to wait root to settle..."
-			sleep $bootparam_rootdelay
-		fi
-
-		if [ -n "$bootparam_root" ]; then
-			debug "No e2fs compatible filesystem has been mounted, mounting $bootparam_root..."
-
-			if [ "`echo ${bootparam_root} | cut -c1-5`" = "UUID=" ]; then
-				root_uuid=`echo $bootparam_root | cut -c6-`
-				bootparam_root="/dev/disk/by-uuid/$root_uuid"
-			fi
-
-			if [ -e "$bootparam_root" ]; then
-				flags=""
-				if [ -n "$bootparam_ro" ]; then
-					if [  -n "$bootparam_rootflags" ]; then
-						bootparam_rootflags="$bootparam_rootflags,"
-					fi
-					bootparam_rootflags="${bootparam_rootflags}ro"
-				fi
-				if [ -n "$bootparam_rootflags" ]; then
-					flags="$flags -o$bootparam_rootflags"
-				fi
-				if [ -n "$bootparam_rootfstype" ]; then
-					flags="$flags -t$bootparam_rootfstype"
-				fi
-				mount $flags $bootparam_root $ROOTFS_DIR
-			else
-				msg "root '$bootparam_root' doesn't exist."
-			fi
-		fi
-
 		if [ ! -d $ROOTFS_DIR/dev ]; then
 			fatal "ERROR: There's no '/dev' on rootfs."
 		fi

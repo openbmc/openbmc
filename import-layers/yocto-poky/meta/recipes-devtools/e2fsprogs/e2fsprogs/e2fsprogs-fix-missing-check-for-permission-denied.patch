@@ -1,0 +1,32 @@
+Subject: [PATCH] Fix missing check for permission denied.
+
+If the path to "ROOT_SYSCONFDIR/mke2fs.conf" has a permission denied problem,
+then the get_dirlist() call will return EACCES. But the code in profile_init
+will treat that as a fatal error and all executions will fail with:
+      Couldn't init profile successfully (error: 13).
+
+Upstream-Status: Pending
+
+Written-by: Henrik Wallin <henrik.b.wallin@ericsson.com>
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ lib/support/profile.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/support/profile.c b/lib/support/profile.c
+index 51a3314..1c1039f 100644
+--- a/lib/support/profile.c
++++ b/lib/support/profile.c
+@@ -335,7 +335,7 @@ profile_init(const char **files, profile_t *ret_profile)
+ 				*last = new_file;
+ 				last = &new_file->next;
+ 			}
+-		} else if ((retval != ENOTDIR) &&
++		} else if ((retval != ENOTDIR) && (retval != EACCES) &&
+ 			   strcmp(*fs, default_filename))
+ 			goto errout;
+ 
+-- 
+2.7.4
+

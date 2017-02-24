@@ -1,7 +1,7 @@
-From acbee4edacb80b5eeaff2480712fe98e56443997 Mon Sep 17 00:00:00 2001
+From fddd7178915968acf680814411b8b3cb137d0587 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 19 Jan 2016 18:18:52 -0800
-Subject: [PATCH] include sys/types.h for mode_t
+Subject: [PATCH 01/10] include sys/types.h for mode_t
 
 mode_t is used in target.h, so we need to include sys/types.h to get the
 defintion
@@ -14,10 +14,10 @@ Upstream-Status: Pending
  1 file changed, 1 insertion(+)
 
 diff --git a/gdb/gdbserver/target.h b/gdb/gdbserver/target.h
-index 9a40867..aaecab9 100644
+index 5af2051..f42c510 100644
 --- a/gdb/gdbserver/target.h
 +++ b/gdb/gdbserver/target.h
-@@ -27,6 +27,7 @@
+@@ -28,6 +28,7 @@
  #include "target/waitstatus.h"
  #include "mem-break.h"
  #include "btrace-common.h"
@@ -26,5 +26,5 @@ index 9a40867..aaecab9 100644
  struct emit_ops;
  struct buffer;
 -- 
-2.7.0
+2.8.2
 

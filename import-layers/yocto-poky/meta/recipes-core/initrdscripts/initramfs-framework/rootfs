@@ -1,0 +1,62 @@
+#!/bin/sh
+# Copyright (C) 2011 O.S. Systems Software LTDA.
+# Licensed on MIT
+
+rootfs_enabled() {
+	return 0
+}
+
+rootfs_run() {
+        if [ -z "$ROOTFS_DIR" ]; then
+		return
+        fi
+	C=0
+	delay=${bootparam_rootdelay:-1}
+	timeout=${bootparam_roottimeout:-5}
+	while [ ! -d $ROOTFS_DIR/dev ]; do
+		if [ $(( $C * $delay )) -gt $timeout ]; then
+			fatal "root '$bootparam_root' doesn't exist or does not contain a /dev."
+		fi
+
+		if [ -n "$bootparam_root" ]; then
+			debug "No e2fs compatible filesystem has been mounted, mounting $bootparam_root..."
+
+			if [ "`echo ${bootparam_root} | cut -c1-5`" = "UUID=" ]; then
+				root_uuid=`echo $bootparam_root | cut -c6-`
+				bootparam_root="/dev/disk/by-uuid/$root_uuid"
+			fi
+
+			if [ "`echo ${bootparam_root} | cut -c1-9`" = "PARTUUID=" ]; then
+				root_uuid=`echo $bootparam_root | cut -c10-`
+				bootparam_root="/dev/disk/by-partuuid/$root_uuid"
+			fi
+
+			if [ -e "$bootparam_root" ]; then
+				flags=""
+				if [ -n "$bootparam_ro" ] && ! echo "$bootparam_rootflags" | grep -w -q "ro"; then
+					if [  -n "$bootparam_rootflags" ]; then
+						bootparam_rootflags="$bootparam_rootflags,"
+					fi
+					bootparam_rootflags="${bootparam_rootflags}ro"
+				fi
+				if [ -n "$bootparam_rootflags" ]; then
+					flags="$flags -o$bootparam_rootflags"
+				fi
+				if [ -n "$bootparam_rootfstype" ]; then
+					flags="$flags -t$bootparam_rootfstype"
+				fi
+				mount $flags $bootparam_root $ROOTFS_DIR
+				if [ -d $ROOTFS_DIR/dev ]; then
+					break
+				else
+					# It is unlikely to change, but keep trying anyway.
+					# Perhaps we pick a different device next time.
+					umount $ROOTFS_DIR
+					fi
+				fi
+		fi
+		debug "Sleeping for $delay second(s) to wait root to settle..."
+		sleep $delay
+		C=$(( $C + 1 ))
+	done
+}

@@ -20,16 +20,17 @@ from oeqa.utils.dump import HostDumper
 
 import logging
 logger = logging.getLogger("BitBake.QemuRunner")
+logger.addHandler(logging.StreamHandler())
 
 # Get Unicode non printable control chars
-control_range = range(0,32)+range(127,160)
-control_chars = [unichr(x) for x in control_range
-                if unichr(x) not in string.printable]
+control_range = list(range(0,32))+list(range(127,160))
+control_chars = [chr(x) for x in control_range
+                if chr(x) not in string.printable]
 re_control_char = re.compile('[%s]' % re.escape("".join(control_chars)))
 
 class QemuRunner:
 
-    def __init__(self, machine, rootfs, display, tmpdir, deploy_dir_image, logfile, boottime, dump_dir, dump_host_cmds):
+    def __init__(self, machine, rootfs, display, tmpdir, deploy_dir_image, logfile, boottime, dump_dir, dump_host_cmds, use_kvm):
 
         # Popen object for runqemu
         self.runqemu = None
@@ -49,6 +50,7 @@ class QemuRunner:
         self.boottime = boottime
         self.logged = False
         self.thread = None
+        self.use_kvm = use_kvm
 
         self.runqemutime = 60
         self.host_dumper = HostDumper(dump_host_cmds, dump_dir)
@@ -71,7 +73,8 @@ class QemuRunner:
         if self.logfile:
             # It is needed to sanitize the data received from qemu
             # because is possible to have control characters
-            msg = re_control_char.sub('', unicode(msg, 'utf-8'))
+            msg = msg.decode("utf-8")
+            msg = re_control_char.sub('', msg)
             with codecs.open(self.logfile, "a", encoding="utf-8") as f:
                 f.write("%s" % msg)
 
@@ -79,7 +82,7 @@ class QemuRunner:
         import fcntl
         fl = fcntl.fcntl(o, fcntl.F_GETFL)
         fcntl.fcntl(o, fcntl.F_SETFL, fl | os.O_NONBLOCK)
-        return os.read(o.fileno(), 1000000)
+        return os.read(o.fileno(), 1000000).decode("utf-8")
 
 
     def handleSIGCHLD(self, signum, frame):
@@ -91,7 +94,7 @@ class QemuRunner:
                 self._dump_host()
                 raise SystemExit
 
-    def start(self, qemuparams = None, get_ip = True):
+    def start(self, qemuparams = None, get_ip = True, extra_bootparams = None):
         if self.display:
             os.environ["DISPLAY"] = self.display
             # Set this flag so that Qemu doesn't do any grabs as SDL grabs
@@ -114,12 +117,16 @@ class QemuRunner:
         try:
             threadsock, threadport = self.create_socket()
             self.server_socket, self.serverport = self.create_socket()
-        except socket.error, msg:
+        except socket.error as msg:
             logger.error("Failed to create listening socket: %s" % msg[1])
             return False
 
 
-        self.qemuparams = 'bootparams="console=tty1 console=ttyS0,115200n8 printk.time=1" qemuparams="-serial tcp:127.0.0.1:{}"'.format(threadport)
+        bootparams = 'console=tty1 console=ttyS0,115200n8 printk.time=1'
+        if extra_bootparams:
+            bootparams = bootparams + ' ' + extra_bootparams
+
+        self.qemuparams = 'bootparams="{0}" qemuparams="-serial tcp:127.0.0.1:{1}"'.format(bootparams, threadport)
         if not self.display:
             self.qemuparams = 'nographic ' + self.qemuparams
         if qemuparams:
@@ -128,7 +135,15 @@ class QemuRunner:
         self.origchldhandler = signal.getsignal(signal.SIGCHLD)
         signal.signal(signal.SIGCHLD, self.handleSIGCHLD)
 
-        launch_cmd = 'runqemu tcpserial=%s %s %s %s' % (self.serverport, self.machine, self.rootfs, self.qemuparams)
+        launch_cmd = 'runqemu snapshot '
+        if self.use_kvm:
+            logger.info('Using kvm for runqemu')
+            launch_cmd += 'kvm '
+        else:
+            logger.info('Not using kvm for runqemu')
+        launch_cmd += 'tcpserial=%s %s %s %s' % (self.serverport, self.machine, self.rootfs, self.qemuparams)
+        logger.info('launchcmd=%s'%(launch_cmd))
+
         # FIXME: We pass in stdin=subprocess.PIPE here to work around stty
         # blocking at the end of the runqemu script when using this within
         # oe-selftest (this makes stty error out immediately). There ought
@@ -137,12 +152,12 @@ class QemuRunner:
         output = self.runqemu.stdout
 
         #
-        # We need the preexec_fn above so that all runqemu processes can easily be killed 
+        # We need the preexec_fn above so that all runqemu processes can easily be killed
         # (by killing their process group). This presents a problem if this controlling
-        # process itself is killed however since those processes don't notice the death 
+        # process itself is killed however since those processes don't notice the death
         # of the parent and merrily continue on.
         #
-        # Rather than hack runqemu to deal with this, we add something here instead. 
+        # Rather than hack runqemu to deal with this, we add something here instead.
         # Basically we fork off another process which holds an open pipe to the parent
         # and also is setpgrp. If/when the pipe sees EOF from the parent dieing, it kills
         # the process group. This is like pctrl's PDEATHSIG but for a process group
@@ -192,7 +207,7 @@ class QemuRunner:
                     else:
                         self.ip = ips[0]
                         self.server_ip = ips[1]
-                except IndexError, ValueError:
+                except (IndexError, ValueError):
                     logger.info("Couldn't get ip from qemu process arguments! Here is the qemu command line used:\n%s\nand output from runqemu:\n%s" % (cmdline, self.getOutput(output)))
                     self._dump_host()
                     self.stop()
@@ -219,6 +234,7 @@ class QemuRunner:
             stopread = False
             qemusock = None
             bootlog = ''
+            data = b''
             while time.time() < endtime and not stopread:
                 sread, swrite, serror = select.select(socklist, [], [], 5)
                 for sock in sread:
@@ -229,14 +245,19 @@ class QemuRunner:
                         socklist.remove(self.server_socket)
                         logger.info("Connection from %s:%s" % addr)
                     else:
-                        data = sock.recv(1024)
+                        data = data + sock.recv(1024)
                         if data:
-                            bootlog += data
-                            if re.search(".* login:", bootlog):
-                                self.server_socket = qemusock
-                                stopread = True
-                                reachedlogin = True
-                                logger.info("Reached login banner")
+                            try:
+                                data = data.decode("utf-8", errors="surrogateescape")
+                                bootlog += data
+                                data = b''
+                                if re.search(".* login:", bootlog):
+                                    self.server_socket = qemusock
+                                    stopread = True
+                                    reachedlogin = True
+                                    logger.info("Reached login banner")
+                            except UnicodeDecodeError:
+                                continue
                         else:
                             socklist.remove(sock)
                             sock.close()
@@ -277,13 +298,14 @@ class QemuRunner:
         if hasattr(self, "origchldhandler"):
             signal.signal(signal.SIGCHLD, self.origchldhandler)
         if self.runqemu:
-            os.kill(self.monitorpid, signal.SIGKILL)
-            logger.info("Sending SIGTERM to runqemu")
-            try:
-                os.killpg(os.getpgid(self.runqemu.pid), signal.SIGTERM)
-            except OSError as e:
-                if e.errno != errno.ESRCH:
-                    raise
+            if hasattr(self, "monitorpid"):
+                os.kill(self.monitorpid, signal.SIGKILL)
+                logger.info("Sending SIGTERM to runqemu")
+                try:
+                    os.killpg(os.getpgid(self.runqemu.pid), signal.SIGTERM)
+                except OSError as e:
+                    if e.errno != errno.ESRCH:
+                        raise
             endtime = time.time() + self.runqemutime
             while self.runqemu.poll() is None and time.time() < endtime:
                 time.sleep(1)
@@ -325,7 +347,7 @@ class QemuRunner:
         # Walk the process tree from the process specified looking for a qemu-system. Return its [pid'cmd]
         #
         ps = subprocess.Popen(['ps', 'axww', '-o', 'pid,ppid,command'], stdout=subprocess.PIPE).communicate()[0]
-        processes = ps.split('\n')
+        processes = ps.decode("utf-8").split('\n')
         nfields = len(processes[0].split()) - 1
         pids = {}
         commands = {}
@@ -354,9 +376,9 @@ class QemuRunner:
                 if p not in parents:
                     parents.append(p)
                     newparents = next
-        #print "Children matching %s:" % str(parents)
+        #print("Children matching %s:" % str(parents))
         for p in parents:
-            # Need to be careful here since runqemu-internal runs "ldd qemu-system-xxxx"
+            # Need to be careful here since runqemu runs "ldd qemu-system-xxxx"
             # Also, old versions of ldd (2.11) run "LD_XXXX qemu-system-xxxx"
             basecmd = commands[p].split()[0]
             basecmd = os.path.basename(basecmd)
@@ -370,14 +392,14 @@ class QemuRunner:
 
         data = ''
         status = 0
-        self.server_socket.sendall(command)
+        self.server_socket.sendall(command.encode('utf-8'))
         keepreading = True
         while keepreading:
             sread, _, _ = select.select([self.server_socket],[],[],5)
             if sread:
                 answer = self.server_socket.recv(1024)
                 if answer:
-                    data += answer
+                    data += answer.decode('utf-8')
                     # Search the prompt to stop
                     if re.search("[a-zA-Z0-9]+@[a-zA-Z0-9\-]+:~#", data):
                         keepreading = False
@@ -442,7 +464,7 @@ class LoggingThread(threading.Thread):
     def stop(self):
         self.logger.info("Stopping logging thread")
         if self.running:
-            os.write(self.writepipe, "stop")
+            os.write(self.writepipe, bytes("stop", "utf-8"))
 
     def teardown(self):
         self.logger.info("Tearing down logging thread")

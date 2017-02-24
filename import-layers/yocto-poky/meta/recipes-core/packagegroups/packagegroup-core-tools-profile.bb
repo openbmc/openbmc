@@ -3,7 +3,6 @@
 #
 
 SUMMARY = "Profiling tools"
-LICENSE = "MIT"
 
 PR = "r3"
 
@@ -12,8 +11,9 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 inherit packagegroup
 
 PROFILE_TOOLS_X = "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'sysprof', '', d)}"
-# sysprof doesn't support aarch64
+# sysprof doesn't support aarch64 and nios2
 PROFILE_TOOLS_X_aarch64 = ""
+PROFILE_TOOLS_X_nios2 = ""
 PROFILE_TOOLS_SYSTEMD = "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd-analyze', '', d)}"
 
 RRECOMMENDS_${PN} = "\
@@ -37,6 +37,7 @@ SYSTEMTAP = "systemtap"
 SYSTEMTAP_libc-uclibc = ""
 SYSTEMTAP_libc-musl = ""
 SYSTEMTAP_mips = ""
+SYSTEMTAP_mipsel = ""
 SYSTEMTAP_mips64 = ""
 SYSTEMTAP_mips64n32 = ""
 SYSTEMTAP_nios2 = ""
@@ -59,16 +60,19 @@ LTTNGMODULES = "lttng-modules"
 
 BABELTRACE = "babeltrace"
 
-# valgrind does not work on mips
+# valgrind does not work on the following configurations/architectures
 
 VALGRIND = "valgrind"
 VALGRIND_libc-uclibc = ""
 VALGRIND_libc-musl = ""
 VALGRIND_mips = ""
+VALGRIND_mipsel = ""
 VALGRIND_mips64 = ""
 VALGRIND_mips64n32 = ""
 VALGRIND_nios2 = ""
-VALGRIND_arm = ""
+VALGRIND_armv4 = ""
+VALGRIND_armv5 = ""
+VALGRIND_armv6 = ""
 VALGRIND_aarch64 = ""
 
 RDEPENDS_${PN} = "\

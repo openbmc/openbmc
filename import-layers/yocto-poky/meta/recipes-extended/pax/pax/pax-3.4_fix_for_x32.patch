@@ -9,7 +9,7 @@ Date:   Tue Dec 6 10:34:53 2011 -0800
     size of off_t to see if file offset is 64bit.  This patch adds
     AC_CHECK_SIZEOF(off_t) and checks SIZEOF_OFF_T == 8.
 
-Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com> 2011/12/06
+Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com> 2011/12/06
 
 Index: pax-3.4/configure.in
 ===================================================================

@@ -27,6 +27,7 @@ import glob
 
 from wic import msger
 from wic.pluginbase import SourcePlugin
+from wic.utils.misc import get_custom_config
 from wic.utils.oe.misc import exec_cmd, exec_native_cmd, get_bitbake_var
 
 class IsoImagePlugin(SourcePlugin):
@@ -59,7 +60,7 @@ class IsoImagePlugin(SourcePlugin):
         """
         Create loader-specific (syslinux) config
         """
-        splash = os.path.join(cr_workdir, "/ISO/boot/splash.jpg")
+        splash = os.path.join(cr_workdir, "ISO/boot/splash.jpg")
         if os.path.exists(splash):
             splashline = "menu background splash.jpg"
         else:
@@ -94,33 +95,43 @@ class IsoImagePlugin(SourcePlugin):
         """
         Create loader-specific (grub-efi) config
         """
-        splash = os.path.join(cr_workdir, "/EFI/boot/splash.jpg")
-        if os.path.exists(splash):
-            splashline = "menu background splash.jpg"
+        configfile = creator.ks.bootloader.configfile
+        if configfile:
+            grubefi_conf = get_custom_config(configfile)
+            if grubefi_conf:
+                msger.debug("Using custom configuration file "
+                        "%s for grub.cfg" % configfile)
+            else:
+                msger.error("configfile is specified but failed to "
+                        "get it from %s." % configfile)
         else:
-            splashline = ""
+            splash = os.path.join(cr_workdir, "EFI/boot/splash.jpg")
+            if os.path.exists(splash):
+                splashline = "menu background splash.jpg"
+            else:
+                splashline = ""
 
-        bootloader = creator.ks.bootloader
+            bootloader = creator.ks.bootloader
 
-        grubefi_conf = ""
-        grubefi_conf += "serial --unit=0 --speed=115200 --word=8 "
-        grubefi_conf += "--parity=no --stop=1\n"
-        grubefi_conf += "default=boot\n"
-        grubefi_conf += "timeout=%s\n" % (bootloader.timeout or 10)
-        grubefi_conf += "\n"
-        grubefi_conf += "search --set=root --label %s " % part.label
-        grubefi_conf += "\n"
-        grubefi_conf += "menuentry 'boot'{\n"
+            grubefi_conf = ""
+            grubefi_conf += "serial --unit=0 --speed=115200 --word=8 "
+            grubefi_conf += "--parity=no --stop=1\n"
+            grubefi_conf += "default=boot\n"
+            grubefi_conf += "timeout=%s\n" % (bootloader.timeout or 10)
+            grubefi_conf += "\n"
+            grubefi_conf += "search --set=root --label %s " % part.label
+            grubefi_conf += "\n"
+            grubefi_conf += "menuentry 'boot'{\n"
 
-        kernel = "/bzImage"
+            kernel = "/bzImage"
 
-        grubefi_conf += "linux %s rootwait %s\n" \
-            % (kernel, bootloader.append)
-        grubefi_conf += "initrd /initrd \n"
-        grubefi_conf += "}\n"
+            grubefi_conf += "linux %s rootwait %s\n" \
+                            % (kernel, bootloader.append)
+            grubefi_conf += "initrd /initrd \n"
+            grubefi_conf += "}\n"
 
-        if splashline:
-            grubefi_conf += "%s\n" % splashline
+            if splashline:
+                grubefi_conf += "%s\n" % splashline
 
         msger.debug("Writing grubefi config %s/EFI/BOOT/grub.cfg" \
                         % cr_workdir)
@@ -429,12 +440,6 @@ class IsoImagePlugin(SourcePlugin):
             msg = "Added 100 extra blocks to %s to get to %d total blocks" \
                     % (part.mountpoint, blocks)
             msger.debug(msg)
-
-            # Ensure total sectors is an integral number of sectors per
-            # track or mcopy will complain. Sectors are 512 bytes, and we
-            # generate images with 32 sectors per track. This calculation is
-            # done in blocks, thus the mod by 16 instead of 32.
-            blocks += (16 - (blocks % 16))
 
             # dosfs image for EFI boot
             bootimg = "%s/efi.img" % isodir

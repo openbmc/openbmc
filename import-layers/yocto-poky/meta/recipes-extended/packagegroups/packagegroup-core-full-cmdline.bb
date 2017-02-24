@@ -5,7 +5,6 @@
 SUMMARY = "Standard full-featured Linux system"
 DESCRIPTION = "Package group bringing in packages needed for a more traditional full-featured Linux system"
 PR = "r6"
-LICENSE = "MIT"
 
 inherit packagegroup
 
@@ -144,7 +143,6 @@ RDEPENDS_packagegroup-core-full-cmdline-sys-services = "\
     cronie \
     dbus \
     dbus-glib \
-    python-dbus \
     elfutils \
     gzip \
     less \

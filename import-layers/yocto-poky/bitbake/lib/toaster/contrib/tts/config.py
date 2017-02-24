@@ -74,7 +74,7 @@ BACKLOGFILE = os.path.join(os.path.dirname(__file__), "backlog.txt")
 # task states
 def enum(*sequential, **named):
     enums = dict(zip(sequential, range(len(sequential))), **named)
-    reverse = dict((value, key) for key, value in enums.iteritems())
+    reverse = dict((value, key) for key, value in enums.items())
     enums['reverse_mapping'] = reverse
     return type('Enum', (), enums)
 

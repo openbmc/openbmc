@@ -4,6 +4,9 @@ IMAGE_PKGTYPE ?= "tar"
 
 python do_package_tar () {
     import subprocess
+
+    oldcwd = os.getcwd()
+
     workdir = d.getVar('WORKDIR', True)
     if not workdir:
         bb.error("WORKDIR not defined, unable to package")
@@ -49,6 +52,8 @@ python do_package_tar () {
         ret = subprocess.call(args + [tarfn] + dlist)
         if ret != 0:
             bb.error("Creation of tar %s failed." % tarfn)
+
+    os.chdir(oldcwd)
 }
 
 python () {

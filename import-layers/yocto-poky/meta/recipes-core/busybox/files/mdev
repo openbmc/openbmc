@@ -1,10 +1,12 @@
 #!/bin/sh
-
+mount -t proc proc /proc
+mount -t sysfs sysfs /sys
 mount -t tmpfs tmpfs /dev  -o size=64k,mode=0755
 mkdir /dev/pts /dev/shm
 chmod 777 /dev/shm
 mount -t devpts devpts /dev/pts
 touch /dev/mdev.seq
+#sysctl -w kernel.hotplug=/sbin/mdev
 echo "/sbin/mdev" > /proc/sys/kernel/hotplug
 mdev -s
 

@@ -1,0 +1,83 @@
+Upstream-Status: Backport
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+From feca6d2e55d992bbe176ee8faa734c105eb1b2e1 Mon Sep 17 00:00:00 2001
+From: Theodore Ts'o <tytso@mit.edu>
+Date: Tue, 29 Mar 2016 20:48:05 -0400
+Subject: [PATCH] Use NGROUPS_MAX instead of NGROUPS
+
+NGRROUPS_MAX is what is defined by SuSv3; NGROUPS is not guaranteed by
+any standard, but is just an ancient BSD'ism.  Since Android's bionic
+libc has the former but not the latter, let's use NGROUPS_MAX instead.
+
+Signed-off-by: Theodore Ts'o <tytso@mit.edu>
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ quota.c    | 5 +++--
+ quotaops.c | 5 +++--
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/quota.c b/quota.c
+index 049dac4..e195ead 100644
+--- a/quota.c
++++ b/quota.c
+@@ -48,6 +48,7 @@
+ #include <errno.h>
+ #include <string.h>
+ #include <unistd.h>
++#include <limits.h>
+ #ifdef RPC
+ #include <rpc/rpc.h>
+ #include "rquota.h"
+@@ -296,7 +297,7 @@ static int showquotas(int type, qid_t id, int mntcnt, char **mnt)
+ int main(int argc, char **argv)
+ {
+ 	int ngroups;
+-	gid_t gidset[NGROUPS], *gidsetp;
++	gid_t gidset[NGROUPS_MAX], *gidsetp;
+ 	int i, ret;
+ 	struct option long_opts[] = {
+ 		{ "help", 0, NULL, 'h' },
+@@ -405,7 +406,7 @@ int main(int argc, char **argv)
+ 			ret |= showquotas(USRQUOTA, getuid(), argc, argv);
+ 		if (flags & FL_GROUP) {
+ 			ngroups = sysconf(_SC_NGROUPS_MAX);
+-			if (ngroups > NGROUPS) {
++			if (ngroups > NGROUPS_MAX) {
+ 				gidsetp = malloc(ngroups * sizeof(gid_t));
+ 				if (!gidsetp)
+ 					die(1, _("Gid set allocation (%d): %s\n"), ngroups, strerror(errno));
+diff --git a/quotaops.c b/quotaops.c
+index 136aec3..590dc1b 100644
+--- a/quotaops.c
++++ b/quotaops.c
+@@ -51,6 +51,7 @@
+ #include <unistd.h>
+ #include <time.h>
+ #include <ctype.h>
++#include <limits.h>
+ 
+ #if defined(RPC)
+ #include "rquota.h"
+@@ -97,7 +98,7 @@ struct dquot *getprivs(qid_t id, struct quota_handle **handles, int quiet)
+ #if defined(BSD_BEHAVIOUR)
+ 	int j, ngroups;
+ 	uid_t euid;
+-	gid_t gidset[NGROUPS], *gidsetp;
++	gid_t gidset[NGROUPS_MAX], *gidsetp;
+ #endif
+ 
+ 	for (i = 0; handles[i]; i++) {
+@@ -115,7 +116,7 @@ struct dquot *getprivs(qid_t id, struct quota_handle **handles, int quiet)
+ 				if (geteuid() == 0)
+ 					break;
+ 				ngroups = sysconf(_SC_NGROUPS_MAX);
+-				if (ngroups > NGROUPS) {
++				if (ngroups > NGROUPS_MAX) {
+ 					gidsetp = malloc(ngroups * sizeof(gid_t));
+ 					if (!gidsetp) {
+ 						gid2group(id, name);
+-- 
+2.6.1
+

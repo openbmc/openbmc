@@ -23,6 +23,7 @@ SRC_URI = "http://www.valgrind.org/downloads/valgrind-${PV}.tar.bz2 \
            file://0001-Remove-tests-that-fail-to-build-on-some-PPC32-config.patch \
            file://use-appropriate-march-mcpu-mfpu-for-ARM-test-apps.patch \
            file://avoid-neon-for-targets-which-don-t-support-it.patch \
+           file://gcc5-port.patch \
 "
 SRC_URI_append_libc-musl = "\
            file://0001-fix-build-for-musl-targets.patch \
@@ -36,6 +37,10 @@ COMPATIBLE_HOST = '(i.86|x86_64|arm|aarch64|mips|powerpc|powerpc64).*-linux'
 COMPATIBLE_HOST_armv4 = 'null'
 COMPATIBLE_HOST_armv5 = 'null'
 COMPATIBLE_HOST_armv6 = 'null'
+
+# valgrind doesn't like mips soft float
+COMPATIBLE_HOST_mips = "${@bb.utils.contains("TARGET_FPU", "soft", "null", ".*-linux", d)}"
+COMPATIBLE_HOST_mipsel = "${@bb.utils.contains("TARGET_FPU", "soft", "null", ".*-linux", d)}"
 
 inherit autotools ptest
 
@@ -68,9 +73,9 @@ RRECOMMENDS_${PN} += "${TCLIBC}-dbg"
 RDEPENDS_${PN}-ptest += " sed perl perl-module-file-glob"
 RDEPENDS_${PN}-ptest_append_libc-glibc = " glibc-utils"
 
-# One of the tests contains a bogus interpreter path on purpose, and QA
-# check complains about it
-INSANE_SKIP_${PN}-ptest += "file-rdeps"
+# One of the tests contains a bogus interpreter path on purpose.
+# Skip file dependency check
+SKIP_FILEDEPS_${PN}-ptest = '1'
 
 do_compile_ptest() {
     oe_runmake check

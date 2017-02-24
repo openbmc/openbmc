@@ -1,4 +1,4 @@
-From 1cb5647f76dc8cd7bacbce2a64fac9e6c2dc3b16 Mon Sep 17 00:00:00 2001
+From babec3a50dd710d26b72f6c6d43bd79b04e954a6 Mon Sep 17 00:00:00 2001
 From: Tanu Kaskinen <tanu.kaskinen@linux.intel.com>
 Date: Tue, 28 Apr 2015 14:32:43 +0300
 Subject: [PATCH] client-conf: Add allow-autospawn-for-root
@@ -24,10 +24,10 @@ Signed-off-by: Tanu Kaskinen <tanu.kaskinen@linux.intel.com>
  5 files changed, 13 insertions(+), 1 deletion(-)
 
 diff --git a/man/pulse-client.conf.5.xml.in b/man/pulse-client.conf.5.xml.in
-index 1002dbe..0058490 100644
+index b88898c..e737c96 100644
 --- a/man/pulse-client.conf.5.xml.in
 +++ b/man/pulse-client.conf.5.xml.in
-@@ -71,6 +71,15 @@ License along with PulseAudio; if not, see <http://www.gnu.org/licenses/>.
+@@ -82,6 +82,15 @@ License along with PulseAudio; if not, see <http://www.gnu.org/licenses/>.
      </option>
  
      <option>
@@ -44,7 +44,7 @@ index 1002dbe..0058490 100644
        run when autospawning. Defaults to a path configured at compile
        time.</p>
 diff --git a/src/pulse/client-conf.c b/src/pulse/client-conf.c
-index 83331f8..0474583 100644
+index a3c9486..9f68ee5 100644
 --- a/src/pulse/client-conf.c
 +++ b/src/pulse/client-conf.c
 @@ -138,6 +138,7 @@ void pa_client_conf_load(pa_client_conf *c, bool load_from_x11, bool load_from_e
@@ -56,13 +56,13 @@ index 83331f8..0474583 100644
          { "disable-shm",            pa_config_parse_bool,     &c->disable_shm, NULL },
          { "enable-shm",             pa_config_parse_not_bool, &c->disable_shm, NULL },
 diff --git a/src/pulse/client-conf.h b/src/pulse/client-conf.h
-index eac705a..131393a 100644
+index 7691ec7..19db7ed 100644
 --- a/src/pulse/client-conf.h
 +++ b/src/pulse/client-conf.h
 @@ -38,6 +38,7 @@ typedef struct pa_client_conf {
      char *cookie_file_from_application;
      char *cookie_file_from_client_conf;
-     bool autospawn, disable_shm, auto_connect_localhost, auto_connect_display;
+     bool autospawn, disable_shm, disable_memfd, auto_connect_localhost, auto_connect_display;
 +    bool allow_autospawn_for_root;
      size_t shm_size;
  } pa_client_conf;
@@ -80,10 +80,10 @@ index 26b7790..69830ef 100644
  ; extra-arguments = --log-target=syslog
  
 diff --git a/src/pulse/context.c b/src/pulse/context.c
-index 4bc445f..d6c3f6d 100644
+index 69be5f4..d6e13e8 100644
 --- a/src/pulse/context.c
 +++ b/src/pulse/context.c
-@@ -976,7 +976,7 @@ int pa_context_connect(
+@@ -1027,7 +1027,7 @@ int pa_context_connect(
      if (!(flags & PA_CONTEXT_NOAUTOSPAWN) && c->conf->autospawn) {
  
  #ifdef HAVE_GETUID
@@ -93,5 +93,5 @@ index 4bc445f..d6c3f6d 100644
          else {
              c->do_autospawn = true;
 -- 
-1.9.3
+2.8.1
 

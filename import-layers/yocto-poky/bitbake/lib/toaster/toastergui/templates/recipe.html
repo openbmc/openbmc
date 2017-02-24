@@ -12,35 +12,43 @@
 
 <!-- Begin container -->
 
-<div class="row span11">
-    <div class="page-header">
+<div class="row">
+  <div class="col-md-12">
+    <div class="page-header build-data">
         <h1>{{object.name}}_{{object.version}}</h1>
     </div>
+  </div>
 </div>
 
-<div class="row span7 tabbable">
-    <ul class="nav nav-pills">
+<div class="row">
+  <div class="col-md-8 tabbable">
+    <ul class="nav nav-tabs">
         <li class="{{tab_states.1}}">
             <a href="#information" data-toggle="tab">
-                <i class="icon-question-sign get-help" title="Build-related information about the recipe"></i>
+                <span class="glyphicon glyphicon-question-sign get-help" title="Build-related
+                    information about the recipe"></span>
                 Recipe details
             </a>
         </li>
         <li>
              <a href="{% url "recipe_packages" build.pk object.id %}">
-                <i class="icon-question-sign get-help" title="The packaged output resulting from building the recipe"></i>
+                <span class="glyphicon glyphicon-question-sign get-help" title="The packaged
+                    output resulting from building the recipe"></span>
                 Packages ({{package_count}})
             </a>
         </li>
         <li class="{{tab_states.3}}">
             <a href="#dependencies" data-toggle="tab">
-                <i class="icon-question-sign get-help" title="The recipe build-time dependencies (i.e. other recipes)"></i>
+                <span class="glyphicon glyphicon-question-sign get-help" title="The recipe
+                    build-time dependencies (i.e. other recipes)"></span>
                 Build dependencies ({{object.r_dependencies_recipe.all.count}})
             </a>
         </li>
         <li class="{{tab_states.4}}">
             <a href="#brought-in-by" data-toggle="tab">
-                <i class="icon-question-sign get-help" title="The recipe build-time reverse dependencies (i.e. the recipes that depend on this recipe)"></i>
+                <span class="glyphicon glyphicon-question-sign get-help" title="The recipe
+                    build-time reverse dependencies (i.e. the recipes that
+                depend on this recipe)"></span>
                 Reverse build dependencies ({{object.r_dependencies_depends.all.count}})
             </a>
         </li>
@@ -49,34 +57,55 @@
         <div class="tab-pane {{tab_states.1}}" id="information">
             <dl class="dl-horizontal">
                 <dt>
-                    <i class="icon-question-sign get-help" title="The name of the layer providing the recipe"></i>
+                    <span class="glyphicon glyphicon-question-sign get-help" title="The name of
+                        the layer providing the recipe"></span>
                     Layer
                 </dt>
                 <dd>{{layer.name}}</dd>
 
                 <dt>
-                    <i class="icon-question-sign get-help" title="Path to the recipe .bb file"></i>
+                    <span class="glyphicon glyphicon-question-sign get-help" title="Path to the
+                        recipe .bb file"></span>
                     Recipe file
                 </dt>
                 <dd><code>{{object.file_path}} {% if object.pathflags %}<i>({{object.pathflags}})</i>{% endif %}</code></dd>
-                {% if layer_version.branch %}
                 <dt>
-                    <i class="icon-question-sign get-help" title="The Git branch of the layer providing the recipe"></i>
+                    <span class="glyphicon glyphicon-question-sign get-help"
+                        title="The Git branch of the layer providing the
+                    recipe"></span>
                     Layer branch
                 </dt>
+                {% if layer_version.layer.local_source_dir %}
+                <dd>
+		  <span class="text-muted">Not applicable</span>
+		  <span class="glyphicon glyphicon-question-sign get-help" title="The source
+                  code of {{layer_version.layer.name}} is not in a git repository
+                  so there is no branch associated with it"></span>
+                </dd>
+                {% else %}
                 <dd>{{layer_version.branch}}</dd>
-                {% endif %}
+		{% endif %}
                 <dt>
-                    <i class="icon-question-sign get-help" title="The Git commit of the layer providing the recipe"></i>
+                    <span class="glyphicon glyphicon-question-sign get-help" title="The Git
+                        commit of the layer providing the recipe"></span>
                     Layer commit
                 </dt>
+                {% if layer_version.layer.local_source_dir %}
+		<dd>
+		  <span class="text-muted">Not applicable</span>
+		  <span class="glyphicon glyphicon-question-sign get-help" title="The source
+                  code of {{layer_version.layer.name}} is not in a git repository
+                  so there is no commit associated with it"></span>
+		</dd>
+                {% else %}
                 <dd class="iscommit">{{layer_version.commit}}</dd>
+		{% endif %}
                 {% if object.provides_set.all %}
                 <dt>
-                    <i class="icon-question-sign get-help"
+                    <span class="glyphicon glyphicon-question-sign get-help"
                      title="A list of aliases by which a particular recipe can be known. The additional aliases are
                            synonyms for the recipe and can be useful satisfying dependencies of other recipes during
-                           the build"></i>
+                           the build"></span>
                     PROVIDES
                 </dt>
                  <dd><code>{% for provider in object.provides_set.all %}{{ provider.name }}&nbsp;{% endfor %}</code></dd>
@@ -89,30 +118,45 @@
                 <strong>{{object.name}}_{{object.version}}</strong> does not have any tasks in this build.
             </div>
             {% else %}
+            <div class="table-responsive">
             <table class="table table-bordered table-hover">
                 <thead>
-		  <tr>
+                  <tr>
                     <th>
-                        <i class="icon-question-sign get-help" title="The running sequence of each task in the build"></i>
+                        <span class="glyphicon glyphicon-question-sign
+                            get-help" title="The running sequence of each task
+                            in the build"></span>
                         Order
                     </th>
                     <th>
-                        <i class="icon-question-sign get-help" title="The name of the task"></i>
+                        <span class="glyphicon glyphicon-question-sign get-help" title="The name
+                            of the task"></span>
                         Task
                     </th>
                     <th>
-                        <i class="icon-question-sign get-help" title="This value tells you if a task had to run (executed) in order to generate the task output, or if the output was provided by another task and therefore the task didn't need to run (not executed)"></i>
+                        <span class="glyphicon glyphicon-question-sign get-help" title="This
+                            value tells you if a task had to run (executed) in
+                        order to generate the task output, or if the output was
+                    provided by another task and therefore the task didn't need
+                to run (not executed)"></span>
                         Executed
                     </th>
                     <th>
-                        <i class="icon-question-sign get-help" title="This column tells you if 'executed' tasks succeeded or failed. The column also tells you why 'not executed' tasks did not need to run"></i>
+                        <span class="glyphicon glyphicon-question-sign get-help" title="This
+                            column tells you if 'executed' tasks succeeded or
+                            failed. The column also tells you why 'not executed'
+                            tasks did not need to run"></span>
                         Outcome
                     </th>
                     <th>
-                        <i class="icon-question-sign get-help" title="This column tells you if a task tried to restore output from the <code>sstate-cache</code> directory or mirrors, and reports the result: Succeeded, Failed or File not in cache"></i>
+                        <span class="glyphicon glyphicon-question-sign get-help" title="This
+                            column tells you if a task tried to restore output
+                            from the <code>sstate-cache</code> directory or
+                            mirrors, and reports the result: Succeeded, Failed or File
+                            not in cache"></span>
                         Cache attempt
                     </th>
-		  </tr>
+                  </tr>
                 </thead>
                 <tbody>
 
@@ -120,26 +164,30 @@
 
                     <tr {{ task|task_color }} >
 
-                    <td><a {{ task|task_color }} href="{% url "task" build.pk task.pk %}">{{task.order}}</a></td>
+                    <td>{{task.order}}</td>
                     <td>
-                        <a {{ task|task_color }} href="{% url "task" build.pk task.pk %}">{{task.task_name}}</a>
-                        {% if task.get_description %}<i class="icon-question-sign get-help hover-help" title="" data-original-title="{{task.get_description}}"></i> {% endif %}
+                        <a href="{% url "task" build.pk task.pk %}">{{task.task_name}}</a>
+                        {% if task.get_description %}<span class="glyphicon
+                            glyphicon-question-sign get-help hover-help"
+                            title="{{task.get_description}}"></span> 
+                        {% endif %}
                     </td>
 
-                    <td><a {{ task|task_color }} href="{% url "task" build.pk task.pk %}">{{task.get_executed_display}}</a></td>
+                    <td>{{task.get_executed_display}}</td>
 
-                    <td>
-                        <a {{ task|task_color }} href="{% url "task" build.pk task.pk %}">{{task.get_outcome_display}} </a>
+                    <td>{{task.get_outcome_display}} 
                         {% if task.outcome = task.OUTCOME_FAILED %}
                             <a href="{% url 'build_artifact' build.pk "tasklogfile" task.pk %}">
-                                <i class="icon-download-alt" title="Download task log file"></i>
+                                <span class="glyphicon glyphicon-download-alt
+                                    get-help" title="Download task log
+                                file"></span>
                             </a>
                         {% endif %}
                         <i class="icon-question-sign get-help hover-help" title="{{task.get_outcome_help}}"></i>
                     </td>
                     <td>
                         {% ifnotequal task.sstate_result task.SSTATE_NA %}
-                        <a {{ task|task_color }} href="{% url "task" build.pk task.pk %}">{{task.get_sstate_result_display}}</a>
+                            {{task.get_sstate_result_display}}
                         {% endifnotequal %}
                     </td>
 
@@ -148,6 +196,7 @@
                     {% endfor %}
                 </tbody>
             </table>
+            </div>
             {% endif %}
         </div>
         <div class="tab-pane {{tab_states.3}}" id="dependencies">
@@ -174,13 +223,13 @@
                     <tr>
                         <td><a href="{% url "recipe" build.pk rr.depends_on.pk %}">{{rr.depends_on.name}}</a>
                             {% if rr.via %}
-                                <span class="muted">satisfied via {{rr.via.name}}</span>
-                                <i class="icon-question-sign get-help hover-help"
+                            <span class="text-muted">satisfied via <code class="text-muted">{{rr.via.name}}</code></span>
+                                <span class="glyphicon glyphicon-question-sign get-help hover-help"
                                  title="This dependency is satisfied by the PROVIDES value
-                                       {{rr.via.name}} in the {{rr.depends_on.name}} recipe"></i>
+                                 <code>{{rr.via.name}}</code> in the <code>{{rr.depends_on.name}}</code> recipe"></span>
                             {% endif %}
                         </td>
-                        <td><a href="{% url "recipe" build.pk rr.depends_on.pk %}">{{rr.depends_on.version}}</a></td>
+                        <td>{{rr.depends_on.version}}</td>
                     </tr>
                     {% endfor %}
 
@@ -213,13 +262,13 @@
                     <tr>
                         <td><a href="{% url "recipe" build.pk rr.recipe.pk %}">{{rr.recipe.name}}</a>
                         {% if rr.via %}
-                            <span class="muted"> satisfied via {{rr.via.name}}</span>
-                            <i class="icon-question-sign get-help hover-help"
+                        <span class="text-muted"> satisfied via <code class="text-muted">{{rr.via.name}}</code></span>
+                            <span class="glyphicon glyphicon-question-sign get-help hover-help"
                              title="This dependency is satisfied by the PROVIDES value
-                            {{rr.via.name}} in the {{rr.depends_on.name}} recipe"></i>
+                             <code>{{rr.via.name}}</code> in the <code>{{rr.depends_on.name}}</code> recipe"></i>
                         {% endif %}
                         </td>
-                        <td><a href="{% url "recipe" build.pk rr.recipe.pk %}">{{rr.recipe.version}}</a></td>
+                        <td>{{rr.recipe.version}}</td>
                     </tr>
                     {% endfor %}
 
@@ -231,7 +280,8 @@
     </div>
 </div>
 
-<div class="row span4 well">
+<div class="col-md-4">
+  <div class="well">
     <h2>About {{object.name}}</h2>
     <dl class="item-info">
         {% if object.summary %}
@@ -253,7 +303,7 @@
         {% if object.section %}
             <dt>
             Section
-            <i class="icon-question-sign get-help" title="The section in which recipes should be categorized"></i>
+            <span class="glyphicon glyphicon-question-sign get-help" title="The section in which recipes should be categorized"></span>
             </dt>
             <dd>{{object.section}}</dd>
         {% endif %}
@@ -262,6 +312,9 @@
             <dd>{{object.license}}</dd>
         {% endif %}
     </dl>
+  </div>
 </div>
+
+</div> <!-- end row -->
 
 {% endblock %}

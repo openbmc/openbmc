@@ -1,0 +1,1460 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
+[<!ENTITY % poky SYSTEM "../poky.ent"> %poky; ] >
+
+<chapter id='sdk-working-projects'>
+
+    <title>Using the SDK Toolchain Directly</title>
+
+    <para>
+        You can use the SDK toolchain directly with Makefile,
+        Autotools, and <trademark class='trade'>Eclipse</trademark> based
+        projects.
+        This chapter covers information specific to each of these types of
+        projects.
+    </para>
+
+    <section id='autotools-based-projects'>
+        <title>Autotools-Based Projects</title>
+
+        <para>
+            Once you have a suitable cross-toolchain installed, it is very easy
+            to develop a project outside of the OpenEmbedded build system.
+            This section presents a simple "Helloworld" example that shows how
+            to set up, compile, and run the project.
+        </para>
+
+        <section id='creating-and-running-a-project-based-on-gnu-autotools'>
+            <title>Creating and Running a Project Based on GNU Autotools</title>
+
+            <para>
+                Follow these steps to create a simple Autotools-based project:
+                <orderedlist>
+                    <listitem><para>
+                        <emphasis>Create your directory:</emphasis>
+                        Create a clean directory for your project and then make
+                        that directory your working location:
+                        <literallayout class='monospaced'>
+     $ mkdir $HOME/helloworld
+     $ cd $HOME/helloworld
+                        </literallayout>
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Populate the directory:</emphasis>
+                        Create <filename>hello.c</filename>,
+                        <filename>Makefile.am</filename>,
+                        and <filename>configure.ac</filename> files as follows:
+                        <itemizedlist>
+                            <listitem><para>
+                                For <filename>hello.c</filename>, include
+                                these lines:
+                                <literallayout class='monospaced'>
+     #include &lt;stdio.h&gt;
+
+     main()
+        {
+           printf("Hello World!\n");
+        }
+                                </literallayout>
+                                </para></listitem>
+                            <listitem><para>
+                                For <filename>Makefile.am</filename>,
+                                include these lines:
+                                <literallayout class='monospaced'>
+     bin_PROGRAMS = hello
+     hello_SOURCES = hello.c
+                                </literallayout>
+                                </para></listitem>
+                            <listitem><para>
+                                For <filename>configure.in</filename>,
+                                include these lines:
+                                <literallayout class='monospaced'>
+     AC_INIT(hello,0.1)
+     AM_INIT_AUTOMAKE([foreign])
+     AC_PROG_CC
+     AC_PROG_INSTALL
+     AC_OUTPUT(Makefile)
+                                </literallayout>
+                                </para></listitem>
+                        </itemizedlist>
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Source the cross-toolchain
+                        environment setup file:</emphasis>
+                        As described earlier in the manual, installing the
+                        cross-toolchain creates a cross-toolchain
+                        environment setup script in the directory that the SDK
+                        was installed.
+                        Before you can use the tools to develop your project,
+                        you must source this setup script.
+                        The script begins with the string "environment-setup"
+                        and contains the machine architecture, which is
+                        followed by the string "poky-linux".
+                        Here is an example that sources a script from the
+                        default SDK installation directory that uses the
+                        32-bit Intel x86 Architecture and the
+                        &DISTRO_NAME; Yocto Project release:
+                        <literallayout class='monospaced'>
+     $ source /opt/poky/&DISTRO;/environment-setup-i586-poky-linux
+                        </literallayout>
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Generate the local aclocal.m4
+                        files and create the configure script:</emphasis>
+                        The following GNU Autotools generate the local
+                        <filename>aclocal.m4</filename> files and create the
+                        configure script:
+                        <literallayout class='monospaced'>
+     $ aclocal
+     $ autoconf
+                        </literallayout>
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Generate files needed by GNU coding
+                        standards:</emphasis>
+                        GNU coding standards require certain files in order
+                        for the project to be compliant.
+                        This command creates those files:
+                        <literallayout class='monospaced'>
+     $ touch NEWS README AUTHORS ChangeLog
+                        </literallayout>
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Generate the configure file:</emphasis>
+                        This command generates the
+                        <filename>configure</filename>:
+                        <literallayout class='monospaced'>
+     $ automake -a
+                        </literallayout>
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Cross-compile the project:</emphasis>
+                        This command compiles the project using the
+                        cross-compiler.
+                        The
+                        <ulink url='&YOCTO_DOCS_REF_URL;#var-CONFIGURE_FLAGS'><filename>CONFIGURE_FLAGS</filename></ulink>
+                        environment variable provides the minimal arguments for
+                        GNU configure:
+                        <literallayout class='monospaced'>
+     $ ./configure ${CONFIGURE_FLAGS}
+                        </literallayout>
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Make and install the project:</emphasis>
+                        These two commands generate and install the project
+                        into the destination directory:
+                        <literallayout class='monospaced'>
+     $ make
+     $ make install DESTDIR=./tmp
+                        </literallayout>
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Verify the installation:</emphasis>
+                        This command is a simple way to verify the installation
+                        of your project.
+                        Running the command prints the architecture on which
+                        the binary file can run.
+                        This architecture should be the same architecture that
+                        the installed cross-toolchain supports.
+                        <literallayout class='monospaced'>
+     $ file ./tmp/usr/local/bin/hello
+                        </literallayout>
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Execute your project:</emphasis>
+                        To execute the project in the shell, simply enter
+                        the name.
+                        You could also copy the binary to the actual target
+                        hardware and run the project there as well:
+                        <literallayout class='monospaced'>
+     $ ./hello
+                        </literallayout>
+                        As expected, the project displays the "Hello World!"
+                        message.
+                        </para></listitem>
+                </orderedlist>
+            </para>
+        </section>
+
+        <section id='passing-host-options'>
+            <title>Passing Host Options</title>
+
+            <para>
+                For an Autotools-based project, you can use the cross-toolchain
+                by just passing the appropriate host option to
+                <filename>configure.sh</filename>.
+                The host option you use is derived from the name of the
+                environment setup script found in the directory in which you
+                installed the cross-toolchain.
+                For example, the host option for an ARM-based target that uses
+                the GNU EABI is <filename>armv5te-poky-linux-gnueabi</filename>.
+                You will notice that the name of the script is
+                <filename>environment-setup-armv5te-poky-linux-gnueabi</filename>.
+                Thus, the following command works to update your project and
+                rebuild it using the appropriate cross-toolchain tools:
+                <literallayout class='monospaced'>
+     $ ./configure --host=armv5te-poky-linux-gnueabi \
+        --with-libtool-sysroot=<replaceable>sysroot_dir</replaceable>
+                </literallayout>
+                <note>
+                    If the <filename>configure</filename> script results in
+                    problems recognizing the
+                    <filename>--with-libtool-sysroot=</filename><replaceable>sysroot-dir</replaceable>
+                    option, regenerate the script to enable the support by
+                    doing the following and then run the script again:
+                    <literallayout class='monospaced'>
+     $ libtoolize --automake
+     $ aclocal -I ${OECORE_TARGET_SYSROOT}/usr/share/aclocal [-I <replaceable>dir_containing_your_project-specific_m4_macros</replaceable>]
+     $ autoconf
+     $ autoheader
+     $ automake -a
+                    </literallayout>
+                </note>
+            </para>
+        </section>
+    </section>
+
+    <section id='makefile-based-projects'>
+        <title>Makefile-Based Projects</title>
+
+        <para>
+            For Makefile-based projects, the cross-toolchain environment
+            variables established by running the cross-toolchain environment
+            setup script are subject to general <filename>make</filename>
+            rules.
+        </para>
+
+        <para>
+            To illustrate this, consider the following four cross-toolchain
+            environment variables:
+            <literallayout class='monospaced'>
+     <ulink url='&YOCTO_DOCS_REF_URL;#var-CC'>CC</ulink>=i586-poky-linux-gcc -m32 -march=i586 --sysroot=/opt/poky/&DISTRO;/sysroots/i586-poky-linux
+     <ulink url='&YOCTO_DOCS_REF_URL;#var-LD'>LD</ulink>=i586-poky-linux-ld --sysroot=/opt/poky/&DISTRO;/sysroots/i586-poky-linux
+     <ulink url='&YOCTO_DOCS_REF_URL;#var-CFLAGS'>CFLAGS</ulink>=-O2 -pipe -g -feliminate-unused-debug-types
+     <ulink url='&YOCTO_DOCS_REF_URL;#var-CXXFLAGS'>CXXFLAGS</ulink>=-O2 -pipe -g -feliminate-unused-debug-types
+            </literallayout>
+            Now, consider the following three cases:
+            <itemizedlist>
+                <listitem><para>
+                    <emphasis>Case 1 - No Variables Set in the
+                    <filename>Makefile</filename>:</emphasis>
+                    Because these variables are not specifically set in the
+                    <filename>Makefile</filename>, the variables retain their
+                    values based on the environment.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>Case 2 - Variables Set in the
+                    <filename>Makefile</filename>:</emphasis>
+                    Specifically setting variables in the
+                    <filename>Makefile</filename> during the build results in
+                    the environment settings of the variables being
+                    overwritten.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>Case 3 - Variables Set when the
+                    <filename>Makefile</filename> is Executed from the
+                    Command Line:</emphasis>
+                    Executing the <filename>Makefile</filename> from the
+                    command-line results in the variables being overwritten
+                    with command-line content regardless of what is being set
+                    in the <filename>Makefile</filename>.
+                    In this case, environment variables are not considered
+                    unless you use the "-e" flag during the build:
+                    <literallayout class='monospaced'>
+     $ make -e <replaceable>file</replaceable>
+                    </literallayout>
+                    If you use this flag, then the environment values of the
+                    variables override any variables specifically set in the
+                    <filename>Makefile</filename>.
+                    </para></listitem>
+            </itemizedlist>
+            <note>
+                For the list of variables set up by the cross-toolchain
+                environment setup script, see the
+                "<link linkend='sdk-running-the-sdk-environment-setup-script'>Running the SDK Environment Setup Script</link>"
+                section.
+            </note>
+        </para>
+    </section>
+
+    <section id='sdk-developing-applications-using-eclipse'>
+        <title>Developing Applications Using <trademark class='trade'>Eclipse</trademark></title>
+
+        <para>
+            If you are familiar with the popular Eclipse IDE, you can use an
+            Eclipse Yocto Plug-in to allow you to develop, deploy, and test your
+            application all from within Eclipse.
+            This section describes general workflow using the SDK and Eclipse
+            and how to configure and set up Eclipse.
+        </para>
+
+        <section id='workflow-using-eclipse'>
+            <title>Workflow Using <trademark class='trade'>Eclipse</trademark></title>
+
+            <para>
+                The following figure and supporting list summarize the
+                application development general workflow that employs both the
+                SDK Eclipse.
+            </para>
+
+            <para>
+                <imagedata fileref="figures/sdk-eclipse-dev-flow.png"
+                    width="7in" depth="7in" align="center" scale="100" />
+            </para>
+
+            <para>
+                <orderedlist>
+                    <listitem><para>
+                        <emphasis>Prepare the host system for the Yocto
+                        Project</emphasis>:
+                        See
+                        "<ulink url='&YOCTO_DOCS_REF_URL;#detailed-supported-distros'>Supported Linux Distributions</ulink>"
+                        and
+                        "<ulink url='&YOCTO_DOCS_REF_URL;#required-packages-for-the-host-development-system'>Required Packages for the Host Development System</ulink>"
+                        sections both in the Yocto Project Reference Manual for
+                        requirements.
+                        In particular, be sure your host system has the
+                        <filename>xterm</filename> package installed.
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Secure the Yocto Project kernel target
+                        image</emphasis>:
+                        You must have a target kernel image that has been built
+                        using the OpenEmbedded build system.</para>
+                        <para>Depending on whether the Yocto Project has a
+                        pre-built image that matches your target architecture
+                        and where you are going to run the image while you
+                        develop your application (QEMU or real hardware), the
+                        area from which you get the image differs.
+                        <itemizedlist>
+                            <listitem><para>
+                                Download the image from
+                                <ulink url='&YOCTO_MACHINES_DL_URL;'><filename>machines</filename></ulink>
+                                if your target architecture is supported and
+                                you are going to develop and test your
+                                application on actual hardware.
+                                </para></listitem>
+                            <listitem><para>
+                                Download the image from
+                                <ulink url='&YOCTO_QEMU_DL_URL;'>
+                                <filename>machines/qemu</filename></ulink> if
+                                your target architecture is supported and you
+                                are going to develop and test your application
+                                using the QEMU emulator.
+                                </para></listitem>
+                            <listitem><para>
+                                Build your image if you cannot find a pre-built
+                                image that matches your target architecture.
+                                If your target architecture is similar to a
+                                supported architecture, you can modify the
+                                kernel image before you build it.
+                                See the
+                                "<ulink url='&YOCTO_DOCS_DEV_URL;#patching-the-kernel'>Patching the Kernel</ulink>"
+                                section in the Yocto Project Development
+                                manual for an example.
+                                </para></listitem>
+                        </itemizedlist>
+                        </para></listitem>
+                    <listitem>
+                        <para><emphasis>Install the SDK</emphasis>:
+                        The SDK provides a target-specific cross-development
+                        toolchain, the root filesystem, the QEMU emulator, and
+                        other tools that can help you develop your application.
+                        For information on how to install the SDK, see the
+                        "<link linkend='sdk-installing-the-sdk'>Installing the SDK</link>"
+                        section.
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Secure the target root filesystem
+                        and the Cross-development toolchain</emphasis>:
+                        You need to find and download the appropriate root
+                        filesystem and the cross-development toolchain.</para>
+                        <para>You can find the tarballs for the root filesystem
+                        in the same area used for the kernel image.
+                        Depending on the type of image you are running, the
+                        root filesystem you need differs.
+                        For example, if you are developing an application that
+                        runs on an image that supports Sato, you need to get a
+                        root filesystem that supports Sato.</para>
+                        <para>You can find the cross-development toolchains at
+                        <ulink url='&YOCTO_TOOLCHAIN_DL_URL;'><filename>toolchains</filename></ulink>.
+                        Be sure to get the correct toolchain for your
+                        development host and your target architecture.
+                        See the "<link linkend='sdk-locating-pre-built-sdk-installers'>Locating Pre-Built SDK Installers</link>"
+                        section for information and the
+                        "<link linkend='sdk-installing-the-sdk'>Installing the SDK</link>"
+                        section for installation information.
+                        <note>
+                            As an alternative to downloading an SDK, you can
+                            build the SDK installer.
+                            For information on building the installer, see the
+                            "<link linkend='sdk-building-an-sdk-installer'>Building an SDK Installer</link>"
+                            section.
+                            Another helpful resource for building an installer
+                            is the
+                            <ulink url='https://wiki.yoctoproject.org/wiki/TipsAndTricks/RunningEclipseAgainstBuiltImage'>Cookbook guide to Making an Eclipse Debug Capable Image</ulink>
+                            wiki page.
+                        </note>
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Create and build your application</emphasis>:
+                        At this point, you need to have source files for your
+                        application.
+                        Once you have the files, you can use the Eclipse IDE
+                        to import them and build the project.
+                        If you are not using Eclipse, you need to use the
+                        cross-development tools you have installed to create
+                        the image.</para></listitem>
+                    <listitem><para>
+                        <emphasis>Deploy the image with the
+                        application</emphasis>:
+                        Using the Eclipse IDE, you can deploy your image to the
+                        hardware or to QEMU through the project's preferences.
+                        You can also use Eclipse to load and test your image
+                        under QEMU.
+                        See the
+                        "<ulink url='&YOCTO_DOCS_DEV_URL;#dev-manual-qemu'>Using the Quick EMUlator (QEMU)</ulink>"
+                        chapter in the Yocto Project Development Manual
+                        for information on using QEMU.
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Test and debug the application</emphasis>:
+                        Once your application is deployed, you need to test it.
+                        Within the Eclipse IDE, you can use the debugging
+                        environment along with supported performance enhancing
+                        <ulink url='http://www.eclipse.org/linuxtools/'>Linux Tools</ulink>.
+                        </para></listitem>
+                </orderedlist>
+            </para>
+        </section>
+
+        <section id='adt-eclipse'>
+            <title>Working Within Eclipse</title>
+
+            <para>
+                The Eclipse IDE is a popular development environment and it
+                fully supports development using the Yocto Project.
+            </para>
+
+            <para>
+                When you install and configure the Eclipse Yocto Project
+                Plug-in into the Eclipse IDE, you maximize your Yocto
+                Project experience.
+                Installing and configuring the Plug-in results in an
+                environment that has extensions specifically designed to let
+                you more easily develop software.
+                These extensions allow for cross-compilation, deployment, and
+                execution of your output into a QEMU emulation session as well
+                as actual target hardware.
+                You can also perform cross-debugging and profiling.
+                The environment also supports performance enhancing
+                <ulink url='http://www.eclipse.org/linuxtools/'>tools</ulink>
+                that allow you to perform remote profiling, tracing,
+                collection of power data, collection of latency data, and
+                collection of performance data.
+                <note>
+                    This release of the Yocto Project supports both the Neon
+                    and Mars versions of the Eclipse IDE.
+                    This section provides information on how to use the Neon
+                    release with the Yocto Project.
+                    For information on how to use the Mars version of Eclipse
+                    with the Yocto Project, see
+                    "<link linkend='sdk-appendix-mars'>Appendix C</link>.
+                </note>
+            </para>
+
+            <section id='neon-setting-up-the-eclipse-ide'>
+                <title>Setting Up the Neon Version of the Eclipse IDE</title>
+
+                <para>
+                    To develop within the Eclipse IDE, you need to do the
+                    following:
+                    <orderedlist>
+                        <listitem><para>
+                            Install the Neon version of the Eclipse IDE.
+                            </para></listitem>
+                        <listitem><para>
+                            Configure the Eclipse IDE.
+                            </para></listitem>
+                        <listitem><para>
+                            Install the Eclipse Yocto Plug-in.
+                            </para></listitem>
+                        <listitem><para>
+                            Configure the Eclipse Yocto Plug-in.
+                            </para></listitem>
+                    </orderedlist>
+                    <note>
+                        Do not install Eclipse from your distribution's package
+                        repository.
+                        Be sure to install Eclipse from the official Eclipse
+                        download site as directed in the next section.
+                    </note>
+                </para>
+
+                <section id='neon-installing-eclipse-ide'>
+                    <title>Installing the Neon Eclipse IDE</title>
+
+                    <para>
+                        Follow these steps to locate, install, and configure
+                        Neon Eclipse:
+                        <orderedlist>
+                            <listitem><para>
+                                <emphasis>Locate the Neon Download:</emphasis>
+                                Open a browser and go to
+                                <ulink url='http://www.eclipse.org/mars/'>http://www.eclipse.org/neon/</ulink>.
+                                </para></listitem>
+                            <listitem><para>
+                                <emphasis>Download the Tarball:</emphasis>
+                                Click through the "Download" buttons to
+                                download the file.
+                                </para></listitem>
+                            <listitem><para>
+                                <emphasis>Unpack the Tarball:</emphasis>
+                                Move to a clean directory and unpack the
+                                tarball.
+                                Here is an example:
+                                <literallayout class='monospaced'>
+     $ cd ~
+     $ tar -xzvf ~/Downloads/eclipse-inst-linux64.tar.gz
+                                </literallayout>
+                                Everything unpacks into a folder named
+                                "eclipse-installer".
+                                </para></listitem>
+                            <listitem><para>
+                                <emphasis>Launch the Installer:</emphasis>
+                                Use the following commands to launch the
+                                installer:
+                                <literallayout class='monospaced'>
+     $ cd ~/eclipse-installer
+     $ ./eclipse-inst
+                                </literallayout>
+                                </para></listitem>
+                            <listitem><para>
+                                <emphasis>Select Your IDE:</emphasis>
+                                From the list, select the "Eclipse IDE for
+                                C/C++ Developers".
+                                </para></listitem>
+                            <listitem><para>
+                                <emphasis>Install the Software:</emphasis>
+                                Accept the default "cpp-neon" directory and
+                                click "Install".
+                                Accept any license agreements and approve any
+                                certificates.
+                                </para></listitem>
+                            <listitem><para>
+                                <emphasis>Launch Neon:</emphasis>
+                                Click the "Launch" button and accept the
+                                default "workspace".
+                                </para></listitem>
+                        </orderedlist>
+                    </para>
+                </section>
+
+                <section id='neon-configuring-the-mars-eclipse-ide'>
+                    <title>Configuring the Neon Eclipse IDE</title>
+
+                    <para>
+                        Follow these steps to configure the Neon Eclipse IDE.
+                        <note>
+                            Depending on how you installed Eclipse and what
+                            you have already done, some of the options will
+                            not appear.
+                            If you cannot find an option as directed by the
+                            manual, it has already been installed.
+                        </note>
+                        <orderedlist>
+                            <listitem><para>
+                                Be sure Eclipse is running and you are in your
+                                workbench.
+                                </para></listitem>
+                            <listitem><para>
+                                Select "Install New Software" from the "Help"
+                                pull-down menu.
+                                </para></listitem>
+                            <listitem><para>
+                                Select
+                                "Neon - http://download.eclipse.org/releases/neon"
+                                from the "Work with:" pull-down menu.
+                                </para></listitem>
+                            <listitem><para>
+                                Expand the box next to "Linux Tools" and select
+                                the following:
+                                <literallayout class='monospaced'>
+     C/C++ Remote (Over TCF/TE) Run/Debug Launcher
+     TM Terminal
+                                </literallayout>
+                                </para></listitem>
+                            <listitem><para>
+                                Expand the box next to "Mobile and Device
+                                Development" and select the following
+                                boxes:
+                                <literallayout class='monospaced'>
+     C/C++ Remote (Over TCF/TE) Run/Debug Launcher
+     Remote System Explorer User Actions
+     TM Terminal
+     TCF Remote System Explorer add-in
+     TCF Target Explorer
+                                </literallayout>
+                                </para></listitem>
+                            <listitem><para>
+                                Expand the box next to "Programming Languages"
+                                and select the following box:
+                                <literallayout class='monospaced'>
+     C/C++ Development Tools SDK
+                                </literallayout>
+                                </para></listitem>
+                            <listitem><para>
+                                Complete the installation by clicking through
+                                appropriate "Next" and "Finish" buttons.
+                                </para></listitem>
+                        </orderedlist>
+                    </para>
+                </section>
+
+                <section id='neon-installing-the-eclipse-yocto-plug-in'>
+                    <title>Installing or Accessing the Neon Eclipse Yocto Plug-in</title>
+
+                    <para>
+                        You can install the Eclipse Yocto Plug-in into the
+                        Eclipse IDE one of two ways:  use the Yocto Project's
+                        Eclipse Update site to install the pre-built plug-in
+                        or build and install the plug-in from the latest
+                        source code.
+                    </para>
+
+                    <section id='neon-new-software'>
+                        <title>Installing the Pre-built Plug-in from the Yocto Project Eclipse Update Site</title>
+
+                        <para>
+                            To install the Neon Eclipse Yocto Plug-in from the
+                            update site, follow these steps:
+                            <orderedlist>
+                                <listitem><para>
+                                    Start up the Eclipse IDE.
+                                    </para></listitem>
+                                <listitem><para>
+                                    In Eclipse, select "Install New
+                                    Software" from the "Help" menu.
+                                    </para></listitem>
+                                <listitem><para>
+                                    Click "Add..." in the "Work with:" area.
+                                    </para></listitem>
+                                <listitem><para>
+                                    Enter
+                                    <filename>&ECLIPSE_DL_PLUGIN_URL;/neon</filename>
+                                    in the URL field and provide a meaningful
+                                    name in the "Name" field.
+                                    </para></listitem>
+                                <listitem><para>
+                                    Click "OK" to have the entry added
+                                    to the "Work with:" drop-down list.
+                                    </para></listitem>
+                                <listitem><para>
+                                    Select the entry for the plug-in
+                                    from the "Work with:" drop-down list.
+                                    </para></listitem>
+                                <listitem><para>
+                                    Check the boxes next to the following:
+                                    <literallayout class='monospaced'>
+     Yocto Project SDK Plug-in
+     Yocto Project Documentation plug-in
+                                    </literallayout>
+                                    </para></listitem>
+                                <listitem><para>
+                                    Complete the remaining software
+                                    installation steps and then restart the
+                                    Eclipse IDE to finish the installation of
+                                    the plug-in.
+                                    <note>
+                                        You can click "OK" when prompted about
+                                        installing software that contains
+                                        unsigned content.
+                                    </note>
+                                    </para></listitem>
+                            </orderedlist>
+                        </para>
+                    </section>
+
+                    <section id='neon-zip-file-method'>
+                        <title>Installing the Plug-in Using the Latest Source Code</title>
+
+                        <para>
+                            To install the Neon Eclipse Yocto Plug-in from the
+                            latest source code, follow these steps:
+                            <orderedlist>
+                                <listitem><para>
+                                    Be sure your development system
+                                    has JDK 1.8+
+                                    </para></listitem>
+                                <listitem><para>
+                                    Install X11-related packages:
+                                    <literallayout class='monospaced'>
+     $ sudo apt-get install xauth
+                                    </literallayout>
+                                    </para></listitem>
+                                <listitem><para>
+                                    In a new terminal shell, create a
+                                    Git repository with:
+                                    <literallayout class='monospaced'>
+     $ cd ~
+     $ git clone git://git.yoctoproject.org/eclipse-poky
+                                    </literallayout>
+                                    </para></listitem>
+                                <listitem><para>
+                                    Use Git to create the correct tag:
+                                    <literallayout class='monospaced'>
+     $ cd ~/eclipse-poky
+     $ git checkout neon/yocto-&DISTRO;
+                                    </literallayout>
+                                    This creates a local tag named
+                                    <filename>neon/yocto-&DISTRO;</filename>
+                                    based on the branch
+                                    <filename>origin/neon-master</filename>.
+                                    You are put into a detached HEAD state,
+                                    which is fine since you are only going to
+                                    be building and not developing.
+                                    </para></listitem>
+                                <listitem><para>
+                                    Change to the <filename>scripts</filename>
+                                    directory within the Git repository:
+                                    <literallayout class='monospaced'>
+     $ cd scripts
+                                    </literallayout>
+                                    </para></listitem>
+                                <listitem><para>
+                                    Set up the local build environment
+                                    by running the setup script:
+                                    <literallayout class='monospaced'>
+     $ ./setup.sh
+                                    </literallayout>
+                                    When the script finishes execution,
+                                    it prompts you with instructions on how to
+                                    run the <filename>build.sh</filename>
+                                    script, which is also in the
+                                    <filename>scripts</filename> directory of
+                                    the Git repository created earlier.
+                                    </para></listitem>
+                                <listitem><para>
+                                    Run the <filename>build.sh</filename>
+                                    script as directed.
+                                    Be sure to provide the tag name,
+                                    documentation branch, and a release name.
+                                    </para>
+                                    <para>
+                                    Following is an example:
+                                    <literallayout class='monospaced'>
+     $ ECLIPSE_HOME=/home/scottrif/eclipse-poky/scripts/eclipse ./build.sh -l neon/yocto-&DISTRO; master yocto-&DISTRO; 2>&amp;1 | tee build.log
+                                    </literallayout>
+                                    The previous example command adds the tag
+                                    you need for
+                                    <filename>mars/yocto-&DISTRO;</filename>
+                                    to <filename>HEAD</filename>, then tells
+                                    the build script to use the local (-l) Git
+                                    checkout for the build.
+                                    After running the script, the file
+                                    <filename>org.yocto.sdk-</filename><replaceable>release</replaceable><filename>-</filename><replaceable>date</replaceable><filename>-archive.zip</filename>
+                                    is in the current directory.
+                                    </para></listitem>
+                                <listitem><para>
+                                    If necessary, start the Eclipse IDE
+                                    and be sure you are in the Workbench.
+                                    </para></listitem>
+                                <listitem><para>
+                                    Select "Install New Software" from
+                                    the "Help" pull-down menu.
+                                    </para></listitem>
+                                <listitem><para>
+                                    Click "Add".
+                                    </para></listitem>
+                                <listitem><para>
+                                    Provide anything you want in the
+                                    "Name" field.
+                                    </para></listitem>
+                                <listitem><para>
+                                    Click "Archive" and browse to the
+                                    ZIP file you built earlier.
+                                    This ZIP file should not be "unzipped", and
+                                    must be the
+                                    <filename>*archive.zip</filename> file
+                                    created by running the
+                                    <filename>build.sh</filename> script.
+                                    </para></listitem>
+                                <listitem><para>
+                                    Click the "OK" button.
+                                    </para></listitem>
+                                <listitem><para>
+                                    Check the boxes that appear in
+                                    the installation window to install the
+                                    following:
+                                    <literallayout class='monospaced'>
+     Yocto Project SDK Plug-in
+     Yocto Project Documentation plug-in
+                                    </literallayout>
+                                    </para></listitem>
+                                <listitem><para>
+                                    Finish the installation by clicking
+                                    through the appropriate buttons.
+                                    You can click "OK" when prompted about
+                                    installing software that contains unsigned
+                                    content.
+                                    </para></listitem>
+                                <listitem><para>
+                                    Restart the Eclipse IDE if necessary.
+                                    </para></listitem>
+                            </orderedlist>
+                        </para>
+
+                        <para>
+                            At this point you should be able to configure the
+                            Eclipse Yocto Plug-in as described in the
+                            "<link linkend='mars-configuring-the-eclipse-yocto-plug-in'>Configuring the Neon Eclipse Yocto Plug-in</link>"
+                            section.
+                        </para>
+                    </section>
+                </section>
+
+                <section id='neon-configuring-the-eclipse-yocto-plug-in'>
+                    <title>Configuring the Neon Eclipse Yocto Plug-in</title>
+
+                    <para>
+                        Configuring the Neon Eclipse Yocto Plug-in involves
+                        setting the Cross Compiler options and the Target
+                        options.
+                        The configurations you choose become the default
+                        settings for all projects.
+                        You do have opportunities to change them later when
+                        you configure the project (see the following section).
+                    </para>
+
+                    <para>
+                        To start, you need to do the following from within the
+                        Eclipse IDE:
+                        <itemizedlist>
+                            <listitem><para>
+                                Choose "Preferences" from the "Window" menu to
+                                display the Preferences Dialog.
+                                </para></listitem>
+                            <listitem><para>
+                                Click "Yocto Project SDK" to display
+                                the configuration screen.
+                                </para></listitem>
+                        </itemizedlist>
+                        The following sub-sections describe how to configure
+                        the plug-in.
+                        <note>
+                            Throughout the descriptions, a start-to-finish
+                            example for preparing a QEMU image for use with
+                            Eclipse is referenced as the "wiki" and is linked
+                            to the example on the
+                            <ulink url='https://wiki.yoctoproject.org/wiki/TipsAndTricks/RunningEclipseAgainstBuiltImage'> Cookbook guide to Making an Eclipse Debug Capable Image</ulink>
+                            wiki page.
+                        </note>
+                    </para>
+
+                    <section id='neon-configuring-the-cross-compiler-options'>
+                        <title>Configuring the Cross-Compiler Options</title>
+
+                        <para>
+                            Cross Compiler options enable Eclipse to use your
+                            specific cross compiler toolchain.
+                            To configure these options, you must select
+                            the type of toolchain, point to the toolchain,
+                            specify the sysroot location, and select the target
+                            architecture.
+                            <itemizedlist>
+                                <listitem><para>
+                                    <emphasis>Selecting the Toolchain
+                                    Type:</emphasis>
+                                    Choose between
+                                    <filename>Standalone pre-built toolchain</filename>
+                                    and
+                                    <filename>Build system derived toolchain</filename>
+                                    for Cross Compiler Options.
+                                    <itemizedlist>
+                                        <listitem><para>
+                                            <emphasis>
+                                            <filename>Standalone Pre-built Toolchain:</filename>
+                                            </emphasis>
+                                            Select this type when you are using
+                                            a stand-alone cross-toolchain.
+                                            For example, suppose you are an
+                                            application developer and do not
+                                            need to build a target image.
+                                            Instead, you just want to use an
+                                            architecture-specific toolchain on
+                                            an existing kernel and target root
+                                            filesystem.
+                                            In other words, you have downloaded
+                                            and installed a pre-built toolchain
+                                            for an existing image.
+                                            </para></listitem>
+                                        <listitem><para>
+                                            <emphasis>
+                                            <filename>Build System Derived Toolchain:</filename>
+                                            </emphasis>
+                                            Select this type if you built the
+                                            toolchain as part of the
+                                            <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>.
+                                            When you select
+                                            <filename>Build system derived toolchain</filename>,
+                                            you are using the toolchain built
+                                            and bundled inside the Build
+                                            Directory.
+                                            For example, suppose you created a
+                                            suitable image using the steps in the
+                                            <ulink url='https://wiki.yoctoproject.org/wiki/TipsAndTricks/RunningEclipseAgainstBuiltImage'>wiki</ulink>.
+                                            In this situation, you would select
+                                            the
+                                            <filename>Build system derived toolchain</filename>.
+                                            </para></listitem>
+                                    </itemizedlist>
+                                    </para></listitem>
+                                <listitem><para>
+                                    <emphasis>Specify the Toolchain Root
+                                    Location:</emphasis>
+                                    If you are using a stand-alone pre-built
+                                    toolchain, you should be pointing to where
+                                    it is installed (e.g.
+                                    <filename>/opt/poky/&DISTRO;</filename>).
+                                    See the
+                                    "<link linkend='sdk-installing-the-sdk'>Installing the SDK</link>"
+                                    section for information about how the SDK is
+                                    installed.</para>
+                                    <para>If you are using a build system
+                                    derived toolchain, the path you provide for
+                                    the
+                                    <filename>Toolchain Root Location</filename>
+                                    field is the
+                                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>
+                                    from which you run the
+                                    <filename>bitbake</filename> command (e.g
+                                    <filename>/home/scottrif/poky/build</filename>).
+                                    </para>
+                                    <para>For more information, see the
+                                    "<link linkend='sdk-building-an-sdk-installer'>Building an SDK Installer</link>"
+                                    section.
+                                    </para></listitem>
+                                <listitem><para>
+                                    <emphasis>Specify Sysroot Location:
+                                    </emphasis>
+                                    This location is where the root filesystem
+                                    for the target hardware resides.
+                                    </para>
+                                    <para>This location depends on where you
+                                    separately extracted and installed the
+                                    target filesystem.
+                                    As an example, suppose you prepared an
+                                    image using the steps in the
+                                    <ulink url='https://wiki.yoctoproject.org/wiki/TipsAndTricks/RunningEclipseAgainstBuiltImage'>wiki</ulink>.
+                                    If so, the
+                                    <filename>MY_QEMU_ROOTFS</filename>
+                                    directory is found in the
+                                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>
+                                    and you would browse to and select that
+                                    directory (e.g.
+                                    <filename>/home/scottrif/poky/build/MY_QEMU_ROOTFS</filename>).
+                                    </para>
+                                    <para>For more information on how to
+                                    install the toolchain and on how to extract
+                                    and install the sysroot filesystem, see the
+                                    "<link linkend='sdk-building-an-sdk-installer'>Building an SDK Installer</link>"
+                                    section.
+                                    </para></listitem>
+                                <listitem><para>
+                                    <emphasis>Select the Target Architecture:
+                                    </emphasis>
+                                    The target architecture is the type of
+                                    hardware you are going to use or emulate.
+                                    Use the pull-down
+                                    <filename>Target Architecture</filename>
+                                    menu to make your selection.
+                                    The pull-down menu should have the
+                                    supported architectures.
+                                    If the architecture you need is not listed
+                                    in the menu, you will need to build the
+                                    image.
+                                    See the
+                                    "<ulink url='&YOCTO_DOCS_QS_URL;#qs-building-images'>Building Images</ulink>"
+                                    section of the Yocto Project Quick Start
+                                    for more information.
+                                    You can also see the
+                                    <ulink url='https://wiki.yoctoproject.org/wiki/TipsAndTricks/RunningEclipseAgainstBuiltImage'>wiki</ulink>.
+                                    </para></listitem>
+                            </itemizedlist>
+                        </para>
+                    </section>
+
+                    <section id='neon-configuring-the-target-options'>
+                        <title>Configuring the Target Options</title>
+
+                        <para>
+                            You can choose to emulate hardware using the QEMU
+                            emulator, or you can choose to run your image on
+                            actual hardware.
+                            <itemizedlist>
+                                <listitem><para>
+                                    <emphasis>QEMU:</emphasis>
+                                    Select this option if you will be using the
+                                    QEMU emulator.
+                                    If you are using the emulator, you also
+                                    need to locate the kernel and specify any
+                                    custom options.</para>
+                                    <para>If you selected the
+                                    <filename>Build system derived toolchain</filename>,
+                                    the target kernel you built will be located
+                                    in the
+                                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>
+                                    in
+                                    <filename>tmp/deploy/images/<replaceable>machine</replaceable></filename>
+                                    directory.
+                                    As an example, suppose you performed the
+                                    steps in the
+                                    <ulink url='https://wiki.yoctoproject.org/wiki/TipsAndTricks/RunningEclipseAgainstBuiltImage'>wiki</ulink>.
+                                    In this case, you specify your Build
+                                    Directory path followed by the image (e.g.
+                                    <filename>/home/scottrif/poky/build/tmp/deploy/images/qemux86/bzImage-qemux86.bin</filename>).
+                                    </para>
+                                    <para>If you selected the standalone
+                                    pre-built toolchain, the pre-built image
+                                    you downloaded is located in the directory
+                                    you specified when you downloaded the
+                                    image.</para>
+                                    <para>Most custom options are for advanced
+                                    QEMU users to further customize their QEMU
+                                    instance.
+                                    These options are specified between paired
+                                    angled brackets.
+                                    Some options must be specified outside the
+                                    brackets.
+                                    In particular, the options
+                                    <filename>serial</filename>,
+                                    <filename>nographic</filename>, and
+                                    <filename>kvm</filename> must all be
+                                    outside the brackets.
+                                    Use the <filename>man qemu</filename>
+                                    command to get help on all the options and
+                                    their use.
+                                    The following is an example:
+                                   <literallayout class='monospaced'>
+    serial ‘&lt;-m 256 -full-screen&gt;’
+                                    </literallayout></para>
+                                    <para>
+                                    Regardless of the mode, Sysroot is already
+                                    defined as part of the Cross-Compiler
+                                    Options configuration in the
+                                    <filename>Sysroot Location:</filename>
+                                    field.
+                                    </para></listitem>
+                                <listitem><para>
+                                    <emphasis>External HW:</emphasis>
+                                    Select this option if you will be using
+                                    actual hardware.</para></listitem>
+                            </itemizedlist>
+                        </para>
+
+                        <para>
+                            Click the "Apply" and "OK" to save your plug-in
+                            configurations.
+                        </para>
+                    </section>
+                </section>
+            </section>
+
+            <section id='neon-creating-the-project'>
+                <title>Creating the Project</title>
+
+                <para>
+                    You can create two types of projects:  Autotools-based, or
+                    Makefile-based.
+                    This section describes how to create Autotools-based
+                    projects from within the Eclipse IDE.
+                    For information on creating Makefile-based projects in a
+                    terminal window, see the
+                    "<link linkend='makefile-based-projects'>Makefile-Based Projects</link>"
+                    section.
+                    <note>
+                        Do not use special characters in project names
+                        (e.g. spaces, underscores, etc.).  Doing so can
+                        cause configuration to fail.
+                    </note>
+                </para>
+
+                <para>
+                    To create a project based on a Yocto template and then
+                    display the source code, follow these steps:
+                    <orderedlist>
+                        <listitem><para>
+                            Select "C Project" from the "File -> New" menu.
+                            </para></listitem>
+                        <listitem><para>
+                            Expand
+                            <filename>Yocto Project SDK Autotools Project</filename>.
+                            </para></listitem>
+                        <listitem><para>
+                            Select <filename>Hello World ANSI C Autotools Projects</filename>.
+                            This is an Autotools-based project based on a Yocto
+                            template.
+                            </para></listitem>
+                        <listitem><para>
+                            Put a name in the
+                            <filename>Project name:</filename> field.
+                            Do not use hyphens as part of the name
+                            (e.g. <filename>hello</filename>).
+                            </para></listitem>
+                        <listitem><para>
+                            Click "Next".
+                            </para></listitem>
+                        <listitem><para>
+                            Add appropriate information in the various fields.
+                            </para></listitem>
+                        <listitem><para>
+                            Click "Finish".
+                            </para></listitem>
+                        <listitem><para>
+                            If the "open perspective" prompt appears,
+                            click "Yes" so that you in the C/C++ perspective.
+                            </para></listitem>
+                        <listitem><para>The left-hand navigation pane shows
+                            your project.
+                            You can display your source by double clicking the
+                            project's source file.
+                            </para></listitem>
+                    </orderedlist>
+                </para>
+            </section>
+
+            <section id='neon-configuring-the-cross-toolchains'>
+                <title>Configuring the Cross-Toolchains</title>
+
+                <para>
+                    The earlier section,
+                    "<link linkend='neon-configuring-the-eclipse-yocto-plug-in'>Configuring the Neon Eclipse Yocto Plug-in</link>",
+                    sets up the default project configurations.
+                    You can override these settings for a given project by
+                    following these steps:
+                    <orderedlist>
+                        <listitem><para>
+                            Select "Yocto Project Settings" from
+                            the "Project -> Properties" menu.
+                            This selection brings up the Yocto Project Settings
+                            Dialog and allows you to make changes specific to
+                            an individual project.</para>
+                            <para>By default, the Cross Compiler Options and
+                            Target Options for a project are inherited from
+                            settings you provided using the Preferences Dialog
+                            as described earlier in the
+                            "<link linkend='neon-configuring-the-eclipse-yocto-plug-in'>Configuring the Neon Eclipse Yocto Plug-in</link>"
+                            section.
+                            The Yocto Project Settings Dialog allows you to
+                            override those default settings for a given
+                            project.
+                            </para></listitem>
+                        <listitem><para>
+                            Make or verify your configurations for the
+                            project and click "OK".
+                            </para></listitem>
+                        <listitem><para>
+                            Right-click in the navigation pane and
+                            select "Reconfigure Project" from the pop-up menu.
+                            This selection reconfigures the project by running
+                            <filename>autogen.sh</filename> in the workspace
+                            for your project.
+                            The script also runs
+                            <filename>libtoolize</filename>,
+                            <filename>aclocal</filename>,
+                            <filename>autoconf</filename>,
+                            <filename>autoheader</filename>,
+                            <filename>automake --a</filename>, and
+                            <filename>./configure</filename>.
+                            Click on the "Console" tab beneath your source code
+                            to see the results of reconfiguring your project.
+                            </para></listitem>
+                    </orderedlist>
+                </para>
+            </section>
+
+            <section id='neon-building-the-project'>
+                <title>Building the Project</title>
+
+                <para>
+                    To build the project select "Build All" from the
+                    "Project" menu.
+                    The console should update and you can note the
+                    cross-compiler you are using.
+                    <note>
+                        When building "Yocto Project SDK Autotools" projects,
+                        the Eclipse IDE might display error messages for
+                        Functions/Symbols/Types that cannot be "resolved",
+                        even when the related include file is listed at the
+                        project navigator and when the project is able to
+                        build.
+                        For these cases only, it is recommended to add a new
+                        linked folder to the appropriate sysroot.
+                        Use these steps to add the linked folder:
+                        <orderedlist>
+                            <listitem><para>
+                                Select the project.
+                                </para></listitem>
+                            <listitem><para>
+                                Select "Folder" from the
+                                <filename>File > New</filename> menu.
+                                </para></listitem>
+                            <listitem><para>
+                                In the "New Folder" Dialog, select "Link to
+                                alternate location (linked folder)".
+                                </para></listitem>
+                            <listitem><para>
+                                Click "Browse" to navigate to the include
+                                folder inside the same sysroot location
+                                selected in the Yocto Project
+                                configuration preferences.
+                                </para></listitem>
+                            <listitem><para>
+                                Click "OK".
+                                </para></listitem>
+                            <listitem><para>
+                                Click "Finish" to save the linked folder.
+                                </para></listitem>
+                        </orderedlist>
+                    </note>
+                </para>
+            </section>
+
+            <section id='neon-starting-qemu-in-user-space-nfs-mode'>
+                <title>Starting QEMU in User-Space NFS Mode</title>
+
+                <para>
+                    To start the QEMU emulator from within Eclipse, follow
+                    these steps:
+                    <note>
+                        See the
+                        "<ulink url='&YOCTO_DOCS_DEV_URL;#dev-manual-qemu'>Using the Quick EMUlator (QEMU)</ulink>"
+                        chapter in the Yocto Project Development Manual
+                        for more information on using QEMU.
+                    </note>
+                    <orderedlist>
+                        <listitem><para>Expose and select "External Tools
+                            Configurations ..." from the "Run -> External
+                            Tools" menu.
+                            </para></listitem>
+                        <listitem><para>
+                            Locate and select your image in the navigation
+                            panel to the left
+                            (e.g. <filename>qemu_i586-poky-linux</filename>).
+                            </para></listitem>
+                        <listitem><para>
+                            Click "Run" to launch QEMU.
+                            <note>
+                                The host on which you are running QEMU must
+                                have the <filename>rpcbind</filename> utility
+                                running to be able to make RPC calls on a
+                                server on that machine.
+                                If QEMU does not invoke and you receive error
+                                messages involving
+                                <filename>rpcbind</filename>, follow the
+                                suggestions to get the service running.
+                                As an example, on a new Ubuntu 16.04 LTS
+                                installation, you must do the following in
+                                order to get QEMU to launch:
+                                <literallayout class='monospaced'>
+     $ sudo apt-get install rpcbind
+                                </literallayout>
+                                After installing <filename>rpcbind</filename>,
+                                you need to edit the
+                                <filename>/etc/init.d/rpcbind</filename> file
+                                to include the following line:
+                                <literallayout class='monospaced'>
+     OPTIONS="-i -w"
+                                </literallayout>
+                                After modifying the file, you need to start the
+                                service:
+                                <literallayout class='monospaced'>
+     $ sudo service portmap restart
+                                </literallayout>
+                            </note>
+                            </para></listitem>
+                        <listitem><para>
+                            If needed, enter your host root password in
+                            the shell window at the prompt.
+                            This sets up a <filename>Tap 0</filename>
+                            connection needed for running in user-space NFS
+                            mode.
+                            </para></listitem>
+                        <listitem><para>
+                            Wait for QEMU to launch.
+                            </para></listitem>
+                        <listitem><para>
+                            Once QEMU launches, you can begin operating
+                            within that environment.
+                            One useful task at this point would be to determine
+                            the IP Address for the user-space NFS by using the
+                            <filename>ifconfig</filename> command.
+                            The IP address of the QEMU machine appears in the
+                            xterm window.
+                            You can use this address to help you see which
+                            particular
+                            IP address the instance of QEMU is using.
+                            </para></listitem>
+                    </orderedlist>
+                </para>
+            </section>
+
+            <section id='neon-deploying-and-debugging-the-application'>
+                <title>Deploying and Debugging the Application</title>
+
+                <para>
+                    Once the QEMU emulator is running the image, you can deploy
+                    your application using the Eclipse IDE and then use
+                    the emulator to perform debugging.
+                    Follow these steps to deploy the application.
+                    <note>
+                        Currently, Eclipse does not support SSH port
+                        forwarding.
+                        Consequently, if you need to run or debug a remote
+                        application using the host display, you must create a
+                        tunneling connection from outside Eclipse and keep
+                        that connection alive during your work.
+                        For example, in a new terminal, run the following:
+                        <literallayout class='monospaced'>
+     $ ssh -XY <replaceable>user_name</replaceable>@<replaceable>remote_host_ip</replaceable>
+                        </literallayout>
+                        Using the above form, here is an example:
+                        <literallayout class='monospaced'>
+     $ ssh -XY root@192.168.7.2
+                        </literallayout>
+                        After running the command, add the command to be
+                        executed in Eclipse's run configuration before the
+                        application as follows:
+                        <literallayout class='monospaced'>
+     export DISPLAY=:10.0
+                        </literallayout>
+                        Be sure to not destroy the connection during your QEMU
+                        session (i.e. do not
+                        exit out of or close that shell).
+                    </note>
+                    <orderedlist>
+                        <listitem><para>
+                            Select "Debug Configurations..." from the
+                            "Run" menu.
+                            </para></listitem>
+                        <listitem><para>
+                            In the left area, expand
+                            <filename>C/C++Remote Application</filename>.
+                            </para></listitem>
+                        <listitem><para>
+                            Locate your project and select it to bring
+                            up a new tabbed view in the Debug Configurations
+                            Dialog.
+                            </para></listitem>
+                        <listitem><para>
+                            Click on the "Debugger" tab to see the
+                            cross-tool debugger you are using.
+                            Be sure to change to the debugger perspective in
+                            Eclipse.
+                            </para></listitem>
+                        <listitem><para>
+                            Click on the "Main" tab.
+                            </para></listitem>
+                        <listitem><para>
+                            Create a new connection to the QEMU instance
+                            by clicking on "new".</para></listitem>
+                        <listitem><para>Select <filename>SSH</filename>, which
+                            means Secure Socket Shell and then click "OK".
+                            Optionally, you can select an TCF connection
+                            instead.
+                            </para></listitem>
+                        <listitem><para>
+                            Clear out the "Connection name" field and
+                            enter any name you want for the connection.
+                            </para></listitem>
+                        <listitem><para>
+                            Put the IP address for the connection in
+                            the "Host" field.
+                            For QEMU, the default is
+                            <filename>192.168.7.2</filename>.
+                            However, if a previous QEMU session did not exit
+                            cleanly, the IP address increments (e.g.
+                            <filename>192.168.7.3</filename>).
+                            <note>
+                                You can find the IP address for the current
+                                QEMU session by looking in the xterm that
+                                opens when you launch QEMU.
+                            </note>
+                            </para></listitem>
+                        <listitem><para>
+                            Enter <filename>root</filename>, which
+                            is the default for QEMU, for the "User" field.
+                            Be sure to leave the password field empty.
+                            </para></listitem>
+                        <listitem><para>
+                            Click "Finish" to close the New Connections Dialog.
+                            </para></listitem>
+                        <listitem><para>
+                            If necessary, use the drop-down menu now in the
+                            "Connection" field and pick the IP Address you
+                            entered.
+                             </para></listitem>
+                        <listitem><para>
+                            Assuming you are connecting as the root
+                            user, which is the default for QEMU x86-64 SDK
+                            images provided by the Yocto Project, in the
+                            "Remote Absolute File Path for C/C++ Application"
+                            field, browse to
+                            <filename>/home/root/</filename><replaceable>ProjectName</replaceable>
+                            (e.g. <filename>/home/root/hello</filename>).
+                            You could also browse to any other path you have
+                            write access to on the target such as
+                            <filename>/usr/bin</filename>.
+                            This location is where your application will be
+                            located on the QEMU system.
+                            If you fail to browse to and specify an appropriate
+                            location, QEMU will not understand what to remotely
+                            launch.
+                            Eclipse is helpful in that it auto fills your
+                            application name for you assuming you browsed to a
+                            directory.
+                            <note>
+                                If you are prompted to provide a username and
+                                to optionally set a password, be sure you
+                                provide "root" as the username and you leave
+                                the password field blank.
+                            </note>
+                            </para></listitem>
+                        <listitem><para>
+                            Be sure you change to the "Debug" perspective in
+                            Eclipse.
+                            </para></listitem>
+                        <listitem><para>
+                            Click "Debug"
+                            </para></listitem>
+                        <listitem><para>
+                            Accept the debug perspective.
+                            </para></listitem>
+                    </orderedlist>
+                </para>
+            </section>
+
+            <section id='neon-using-Linuxtools'>
+                <title>Using Linuxtools</title>
+
+                <para>
+                    As mentioned earlier in the manual, performance tools exist
+                    (Linuxtools) that enhance your development experience.
+                    These tools are aids in developing and debugging
+                    applications and images.
+                    You can run these tools from within the Eclipse IDE through
+                    the "Linuxtools" menu.
+                </para>
+
+                <para>
+                    For information on how to configure and use these tools,
+                    see
+                    <ulink url='http://www.eclipse.org/linuxtools/'>http://www.eclipse.org/linuxtools/</ulink>.
+                </para>
+            </section>
+        </section>
+    </section>
+</chapter>
+<!--
+vim: expandtab tw=80 ts=4
+-->

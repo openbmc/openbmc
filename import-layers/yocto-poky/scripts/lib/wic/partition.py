@@ -26,7 +26,6 @@
 
 import os
 import tempfile
-import uuid
 
 from wic.utils.oe.misc import msger, parse_sourceparams
 from wic.utils.oe.misc import exec_cmd, exec_native_cmd
@@ -38,7 +37,7 @@ partition_methods = {
     "do_configure_partition":None,
 }
 
-class Partition(object):
+class Partition():
 
     def __init__(self, args, lineno):
         self.args = args
@@ -57,10 +56,9 @@ class Partition(object):
         self.size = args.size
         self.source = args.source
         self.sourceparams = args.sourceparams
+        self.system_id = args.system_id
         self.use_uuid = args.use_uuid
         self.uuid = args.uuid
-        if args.use_uuid and not self.uuid:
-            self.uuid = str(uuid.uuid4())
 
         self.lineno = lineno
         self.source_file = ""
@@ -219,9 +217,7 @@ class Partition(object):
         msger.debug("Added %d extra blocks to %s to get to %d total blocks" % \
                     (extra_blocks, self.mountpoint, rootfs_size))
 
-        dd_cmd = "dd if=/dev/zero of=%s bs=1024 seek=%d count=0 bs=1k" % \
-            (rootfs, rootfs_size)
-        exec_cmd(dd_cmd)
+        exec_cmd("truncate %s -s %d" % (rootfs, rootfs_size * 1024))
 
         extra_imagecmd = "-i 8192"
 
@@ -254,9 +250,7 @@ class Partition(object):
         msger.debug("Added %d extra blocks to %s to get to %d total blocks" % \
                     (extra_blocks, self.mountpoint, rootfs_size))
 
-        dd_cmd = "dd if=/dev/zero of=%s bs=1024 seek=%d count=0 bs=1k" % \
-            (rootfs, rootfs_size)
-        exec_cmd(dd_cmd)
+        exec_cmd("truncate %s -s %d" % (rootfs, rootfs_size * 1024))
 
         label_str = ""
         if self.label:
@@ -283,14 +277,6 @@ class Partition(object):
 
         msger.debug("Added %d extra blocks to %s to get to %d total blocks" % \
                     (extra_blocks, self.mountpoint, blocks))
-
-        # Ensure total sectors is an integral number of sectors per
-        # track or mcopy will complain. Sectors are 512 bytes, and we
-        # generate images with 32 sectors per track. This calculation
-        # is done in blocks, thus the mod by 16 instead of 32. Apply
-        # sector count fix only when needed.
-        if blocks % 16 != 0:
-            blocks += (16 - (blocks % 16))
 
         label_str = "-n boot"
         if self.label:
@@ -319,9 +305,7 @@ class Partition(object):
         """
         Prepare an empty ext2/3/4 partition.
         """
-        dd_cmd = "dd if=/dev/zero of=%s bs=1k seek=%d count=0" % \
-            (rootfs, self.size)
-        exec_cmd(dd_cmd)
+        exec_cmd("truncate %s -s %d" % (rootfs, self.size * 1024))
 
         extra_imagecmd = "-i 8192"
 
@@ -338,9 +322,7 @@ class Partition(object):
         """
         Prepare an empty btrfs partition.
         """
-        dd_cmd = "dd if=/dev/zero of=%s bs=1k seek=%d count=0" % \
-            (rootfs, self.size)
-        exec_cmd(dd_cmd)
+        exec_cmd("truncate %s -s %d" % (rootfs, self.size * 1024))
 
         label_str = ""
         if self.label:
@@ -401,9 +383,7 @@ class Partition(object):
         """
         path = "%s/fs.%s" % (cr_workdir, self.fstype)
 
-        dd_cmd = "dd if=/dev/zero of=%s bs=1k seek=%d count=0" % \
-            (path, self.size)
-        exec_cmd(dd_cmd)
+        exec_cmd("truncate %s -s %d" % (path, self.size * 1024))
 
         import uuid
         label_str = ""

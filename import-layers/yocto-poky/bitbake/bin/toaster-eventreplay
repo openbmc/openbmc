@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # ex:ts=4:sw=4:sts=4:et
 # -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 #
@@ -21,154 +21,106 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+"""
+This command takes a filename as a single parameter. The filename is read
+as a build eventlog, and the ToasterUI is used to process events in the file
+and log data in the database
+"""
 
-# This command takes a filename as a single parameter. The filename is read
-# as a build eventlog, and the ToasterUI is used to process events in the file
-# and log data in the database
-
-from __future__ import print_function
 import os
-import sys, logging
+import sys
+import json
+import pickle
+import codecs
+
+from collections import namedtuple
 
 # mangle syspath to allow easy import of modules
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                                'lib'))
-
+from os.path import join, dirname, abspath
+sys.path.insert(0, join(dirname(dirname(abspath(__file__))), 'lib'))
 
 import bb.cooker
 from bb.ui import toasterui
-import sys
-import logging
 
-import json, pickle
+class EventPlayer:
+    """Emulate a connection to a bitbake server."""
 
+    def __init__(self, eventfile, variables):
+        self.eventfile = eventfile
+        self.variables = variables
+        self.eventmask = []
 
-class FileReadEventsServerConnection():
-    """  Emulates a connection to a bitbake server that feeds
-        events coming actually read from a saved log file.
-    """
+    def waitEvent(self, _timeout):
+        """Read event from the file."""
+        line = self.eventfile.readline().strip()
+        if not line:
+            return
+        try:
+            event_str = json.loads(line)['vars'].encode('utf-8')
+            event = pickle.loads(codecs.decode(event_str, 'base64'))
+            event_name = "%s.%s" % (event.__module__, event.__class__.__name__)
+            if event_name not in self.eventmask:
+                return
+            return event
+        except ValueError as err:
+            print("Failed loading ", line)
+            raise err
 
-    class MockConnection():
-        """ fill-in for the proxy to the server. we just return generic data
+    def runCommand(self, command_line):
+        """Emulate running a command on the server."""
+        name = command_line[0]
+
+        if name == "getVariable":
+            var_name = command_line[1]
+            variable = self.variables.get(var_name)
+            if variable:
+                return variable['v'], None
+            return None, "Missing variable %s" % var_name
+
+        elif name == "getAllKeysWithFlags":
+            dump = {}
+            flaglist = command_line[1]
+            for key, val in self.variables.items():
+                try:
+                    if not key.startswith("__"):
+                        dump[key] = {
+                            'v': val['v'],
+                            'history' : val['history'],
+                        }
+                        for flag in flaglist:
+                            dump[key][flag] = val[flag]
+                except Exception as err:
+                    print(err)
+            return (dump, None)
+
+        elif name == 'setEventMask':
+            self.eventmask = command_line[-1]
+            return True, None
+
+        else:
+            raise Exception("Command %s not implemented" % command_line[0])
+
+    def getEventHandle(self):
         """
-        def __init__(self, sc):
-            self._sc = sc
+        This method is called by toasterui.
+        The return value is passed to self.runCommand but not used there.
+        """
+        pass
 
-        def runCommand(self, commandArray):
-            """ emulates running a command on the server; only read-only commands are accepted """
-            command_name = commandArray[0]
+def main(argv):
+    with open(argv[-1]) as eventfile:
+        # load variables from the first line
+        variables = json.loads(eventfile.readline().strip())['allvariables']
 
-            if command_name == "getVariable":
-                if commandArray[1] in self._sc._variables:
-                    return (self._sc._variables[commandArray[1]]['v'], None)
-                return (None, "Missing variable")
+        params = namedtuple('ConfigParams', ['observe_only'])(True)
+        player = EventPlayer(eventfile, variables)
 
-            elif command_name == "getAllKeysWithFlags":
-                dump = {}
-                flaglist = commandArray[1]
-                for k in self._sc._variables.keys():
-                    try:
-                        if not k.startswith("__"):
-                            v = self._sc._variables[k]['v']
-                            dump[k] = {
-                                'v' : v ,
-                                'history' : self._sc._variables[k]['history'],
-                            }
-                            for d in flaglist:
-                                dump[k][d] = self._sc._variables[k][d]
-                    except Exception as e:
-                        print(e)
-                return (dump, None)
-            else:
-                raise Exception("Command %s not implemented" % commandArray[0])
-
-        def terminateServer(self):
-            """ do not do anything """
-            pass
-
-
-
-    class EventReader():
-        def __init__(self, sc):
-            self._sc = sc
-            self.firstraise = 0
-
-        def _create_event(self, line):
-            def _import_class(name):
-                assert len(name) > 0
-                assert "." in name, name
-
-                components = name.strip().split(".")
-                modulename = ".".join(components[:-1])
-                moduleklass = components[-1]
-
-                module = __import__(modulename, fromlist=[str(moduleklass)])
-                return getattr(module, moduleklass)
-
-            # we build a toaster event out of current event log line
-            try:
-                event_data = json.loads(line.strip())
-                event_class = _import_class(event_data['class'])
-                event_object = pickle.loads(json.loads(event_data['vars']))
-            except ValueError as e:
-                print("Failed loading ", line)
-                raise e
-
-            if not isinstance(event_object, event_class):
-                raise Exception("Error loading objects %s class %s ", event_object, event_class)
-
-            return event_object
-
-        def waitEvent(self, timeout):
-
-            nextline = self._sc._eventfile.readline()
-            if len(nextline) == 0:
-                # the build data ended, while toasterui still waits for events.
-                # this happens when the server was abruptly stopped, so we simulate this
-                self.firstraise += 1
-                if self.firstraise == 1:
-                    raise KeyboardInterrupt()
-                else:
-                    return None
-            else:
-                self._sc.lineno += 1
-            return self._create_event(nextline)
-
-
-    def _readVariables(self, variableline):
-        self._variables = json.loads(variableline.strip())['allvariables']
-
-
-    def __init__(self, file_name):
-        self.connection = FileReadEventsServerConnection.MockConnection(self)
-        self._eventfile = open(file_name, "r")
-
-        # we expect to have the variable dump at the start of the file
-        self.lineno = 1
-        self._readVariables(self._eventfile.readline())
-
-        self.events = FileReadEventsServerConnection.EventReader(self)
-
-
-
-
-
-class MockConfigParameters():
-    """ stand-in for cookerdata.ConfigParameters; as we don't really config a cooker, this
-        serves just to supply needed interfaces for the toaster ui to work """
-    def __init__(self):
-        self.observe_only = True            # we can only read files
-
+        return toasterui.main(player, player, params)
 
 # run toaster ui on our mock bitbake class
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: %s event.log " % sys.argv[0])
+    if len(sys.argv) != 2:
+        print("Usage: %s <event file>" % os.path.basename(sys.argv[0]))
         sys.exit(1)
 
-    file_name = sys.argv[-1]
-    mock_connection = FileReadEventsServerConnection(file_name)
-    configParams = MockConfigParameters()
-
-    # run the main program and set exit code to the returned value
-    sys.exit(toasterui.main(mock_connection.connection, mock_connection.events, configParams))
+    sys.exit(main(sys.argv))

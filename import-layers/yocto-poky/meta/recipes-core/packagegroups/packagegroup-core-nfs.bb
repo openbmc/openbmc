@@ -3,7 +3,6 @@
 #
 
 SUMMARY = "NFS package groups"
-LICENSE = "MIT"
 PR = "r2"
 
 inherit packagegroup

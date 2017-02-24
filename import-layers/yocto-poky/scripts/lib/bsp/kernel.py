@@ -29,11 +29,10 @@
 import sys
 import os
 import shutil
-from tags import *
+from .tags import *
 import glob
 import subprocess
-from engine import create_context
-
+from .engine import create_context
 
 def find_bblayers():
     """
@@ -42,7 +41,7 @@ def find_bblayers():
     try:
         builddir = os.environ["BUILDDIR"]
     except KeyError:
-        print "BUILDDIR not found, exiting. (Did you forget to source oe-init-build-env?)"
+        print("BUILDDIR not found, exiting. (Did you forget to source oe-init-build-env?)")
         sys.exit(1)
     bblayers_conf = os.path.join(builddir, "conf/bblayers.conf")
 
@@ -50,10 +49,10 @@ def find_bblayers():
 
     bitbake_env_cmd = "bitbake -e"
     bitbake_env_lines = subprocess.Popen(bitbake_env_cmd, shell=True,
-                                         stdout=subprocess.PIPE).stdout.read()
+                                         stdout=subprocess.PIPE).stdout.read().decode('utf-8')
 
     if not bitbake_env_lines:
-        print "Couldn't get '%s' output, exiting." % bitbake_env_cmd
+        print("Couldn't get '%s' output, exiting." % bitbake_env_cmd)
         sys.exit(1)
 
     for line in bitbake_env_lines.split('\n'):
@@ -62,8 +61,7 @@ def find_bblayers():
             break
 
     if not bblayers:
-        print "Couldn't find BBLAYERS in %s output, exiting." % \
-            bitbake_env_cmd
+        print("Couldn't find BBLAYERS in %s output, exiting." % bitbake_env_cmd)
         sys.exit(1)
 
     raw_layers = bblayers.split()
@@ -110,8 +108,8 @@ def find_bsp_layer(machine):
         if layer.endswith(machine):
             return layer
 
-    print "Unable to find the BSP layer for machine %s." % machine
-    print "Please make sure it is listed in bblayers.conf"
+    print("Unable to find the BSP layer for machine %s." % machine)
+    print("Please make sure it is listed in bblayers.conf")
     sys.exit(1)
 
 
@@ -190,8 +188,8 @@ def yocto_kernel_config_list(scripts_path, machine):
     """
     config_items = read_config_items(scripts_path, machine)
 
-    print "The current set of machine-specific kernel config items for %s is:" % machine
-    print gen_choices_str(config_items)
+    print("The current set of machine-specific kernel config items for %s is:" % machine)
+    print(gen_choices_str(config_items))
 
 
 def yocto_kernel_config_rm(scripts_path, machine):
@@ -202,9 +200,9 @@ def yocto_kernel_config_rm(scripts_path, machine):
     """
     config_items = read_config_items(scripts_path, machine)
 
-    print "Specify the kernel config items to remove:"
-    input = raw_input(gen_choices_str(config_items))
-    rm_choices = input.split()
+    print("Specify the kernel config items to remove:")
+    inp = input(gen_choices_str(config_items))
+    rm_choices = inp.split()
     rm_choices.sort()
 
     removed = []
@@ -213,18 +211,18 @@ def yocto_kernel_config_rm(scripts_path, machine):
         try:
             idx = int(choice) - 1
         except ValueError:
-            print "Invalid choice (%s), exiting" % choice
+            print("Invalid choice (%s), exiting" % choice)
             sys.exit(1)
         if idx < 0 or idx >= len(config_items):
-            print "Invalid choice (%d), exiting" % (idx + 1)
+            print("Invalid choice (%d), exiting" % (idx + 1))
             sys.exit(1)
         removed.append(config_items.pop(idx))
 
     write_config_items(scripts_path, machine, config_items)
 
-    print "Removed items:"
+    print("Removed items:")
     for r in removed:
-        print "\t%s" % r
+        print("\t%s" % r)
 
 
 def yocto_kernel_config_add(scripts_path, machine, config_items):
@@ -239,7 +237,7 @@ def yocto_kernel_config_add(scripts_path, machine, config_items):
 
     for item in config_items:
         if not item.startswith("CONFIG") or (not "=y" in item and not "=m" in item):
-            print "Invalid config item (%s), exiting" % item
+            print("Invalid config item (%s), exiting" % item)
             sys.exit(1)
         if item not in cur_items and item not in new_items:
             new_items.append(item)
@@ -249,16 +247,16 @@ def yocto_kernel_config_add(scripts_path, machine, config_items):
     if len(new_items) > 0:
         cur_items.extend(new_items)
         write_config_items(scripts_path, machine, cur_items)
-        print "Added item%s:" % ("" if len(new_items)==1 else "s")
+        print("Added item%s:" % ("" if len(new_items)==1 else "s"))
         for n in new_items:
-            print "\t%s" % n
+            print("\t%s" % n)
 
     if len(dup_items) > 0:
         output="The following item%s already exist%s in the current configuration, ignoring %s:" % \
             (("","s", "it") if len(dup_items)==1 else ("s", "", "them" ))
-        print output
+        print(output)
         for n in dup_items:
-            print "\t%s" % n
+            print("\t%s" % n)
 
 def find_current_kernel(bsp_layer, machine):
     """
@@ -347,8 +345,8 @@ def yocto_kernel_patch_list(scripts_path, machine):
     """
     patches = read_patch_items(scripts_path, machine)
 
-    print "The current set of machine-specific patches for %s is:" % machine
-    print gen_choices_str(patches)
+    print("The current set of machine-specific patches for %s is:" % machine)
+    print(gen_choices_str(patches))
 
 
 def yocto_kernel_patch_rm(scripts_path, machine):
@@ -358,26 +356,26 @@ def yocto_kernel_patch_rm(scripts_path, machine):
     """
     patches = read_patch_items(scripts_path, machine)
 
-    print "Specify the patches to remove:"
-    input = raw_input(gen_choices_str(patches))
-    rm_choices = input.split()
+    print("Specify the patches to remove:")
+    inp = input(gen_choices_str(patches))
+    rm_choices = inp.split()
     rm_choices.sort()
 
     removed = []
 
     filesdir = find_filesdir(scripts_path, machine)
     if not filesdir:
-        print "Couldn't rm patch(es) since we couldn't find a 'files' dir"
+        print("Couldn't rm patch(es) since we couldn't find a 'files' dir")
         sys.exit(1)
 
     for choice in reversed(rm_choices):
         try:
             idx = int(choice) - 1
         except ValueError:
-            print "Invalid choice (%s), exiting" % choice
+            print("Invalid choice (%s), exiting" % choice)
             sys.exit(1)
         if idx < 0 or idx >= len(patches):
-            print "Invalid choice (%d), exiting" % (idx + 1)
+            print("Invalid choice (%d), exiting" % (idx + 1))
             sys.exit(1)
         filesdir_patch = os.path.join(filesdir, patches[idx])
         if os.path.isfile(filesdir_patch):
@@ -387,9 +385,9 @@ def yocto_kernel_patch_rm(scripts_path, machine):
 
     write_patch_items(scripts_path, machine, patches)
 
-    print "Removed patches:"
+    print("Removed patches:")
     for r in removed:
-        print "\t%s" % r
+        print("\t%s" % r)
 
 
 def yocto_kernel_patch_add(scripts_path, machine, patches):
@@ -401,19 +399,19 @@ def yocto_kernel_patch_add(scripts_path, machine, patches):
 
     for patch in patches:
         if os.path.basename(patch) in existing_patches:
-            print "Couldn't add patch (%s) since it's already been added" % os.path.basename(patch)
+            print("Couldn't add patch (%s) since it's already been added" % os.path.basename(patch))
             sys.exit(1)
 
     filesdir = find_filesdir(scripts_path, machine)
     if not filesdir:
-        print "Couldn't add patch (%s) since we couldn't find a 'files' dir to add it to" % os.path.basename(patch)
+        print("Couldn't add patch (%s) since we couldn't find a 'files' dir to add it to" % os.path.basename(patch))
         sys.exit(1)
 
     new_patches = []
 
     for patch in patches:
         if not os.path.isfile(patch):
-            print "Couldn't find patch (%s), exiting" % patch
+            print("Couldn't find patch (%s), exiting" % patch)
             sys.exit(1)
         basename = os.path.basename(patch)
         filesdir_patch = os.path.join(filesdir, basename)
@@ -424,9 +422,9 @@ def yocto_kernel_patch_add(scripts_path, machine, patches):
     cur_items.extend(new_patches)
     write_patch_items(scripts_path, machine, cur_items)
 
-    print "Added patches:"
+    print("Added patches:")
     for n in new_patches:
-        print "\t%s" % n
+        print("\t%s" % n)
 
 
 def inc_pr(line):
@@ -461,7 +459,7 @@ def kernel_contents_changed(scripts_path, machine):
 
     kernel = find_current_kernel(layer, machine)
     if not kernel:
-        print "Couldn't determine the kernel for this BSP, exiting."
+        print("Couldn't determine the kernel for this BSP, exiting.")
         sys.exit(1)
 
     kernel_bbfile = os.path.join(layer, "recipes-kernel/linux/" + kernel + ".bbappend")
@@ -597,8 +595,8 @@ def yocto_kernel_feature_list(scripts_path, machine):
     """
     features = read_features(scripts_path, machine)
 
-    print "The current set of machine-specific features for %s is:" % machine
-    print gen_choices_str(features)
+    print("The current set of machine-specific features for %s is:" % machine)
+    print(gen_choices_str(features))
 
 
 def yocto_kernel_feature_rm(scripts_path, machine):
@@ -609,9 +607,9 @@ def yocto_kernel_feature_rm(scripts_path, machine):
     """
     features = read_features(scripts_path, machine)
 
-    print "Specify the features to remove:"
-    input = raw_input(gen_choices_str(features))
-    rm_choices = input.split()
+    print("Specify the features to remove:")
+    inp = input(gen_choices_str(features))
+    rm_choices = inp.split()
     rm_choices.sort()
 
     removed = []
@@ -620,18 +618,18 @@ def yocto_kernel_feature_rm(scripts_path, machine):
         try:
             idx = int(choice) - 1
         except ValueError:
-            print "Invalid choice (%s), exiting" % choice
+            print("Invalid choice (%s), exiting" % choice)
             sys.exit(1)
         if idx < 0 or idx >= len(features):
-            print "Invalid choice (%d), exiting" % (idx + 1)
+            print("Invalid choice (%d), exiting" % (idx + 1))
             sys.exit(1)
         removed.append(features.pop(idx))
 
     write_features(scripts_path, machine, features)
 
-    print "Removed features:"
+    print("Removed features:")
     for r in removed:
-        print "\t%s" % r
+        print("\t%s" % r)
 
 
 def yocto_kernel_feature_add(scripts_path, machine, features):
@@ -643,7 +641,7 @@ def yocto_kernel_feature_add(scripts_path, machine, features):
 
     for item in features:
         if not item.endswith(".scc"):
-            print "Invalid feature (%s), exiting" % item
+            print("Invalid feature (%s), exiting" % item)
             sys.exit(1)
         new_items.append(item)
 
@@ -652,9 +650,9 @@ def yocto_kernel_feature_add(scripts_path, machine, features):
 
     write_features(scripts_path, machine, cur_items)
 
-    print "Added features:"
+    print("Added features:")
     for n in new_items:
-        print "\t%s" % n
+        print("\t%s" % n)
 
 
 def find_feature_url(git_url):
@@ -714,7 +712,7 @@ def print_feature_descs(layer, feature_dir):
                                         feature_dir + "/" + file)
                 f = open(fullpath)
                 feature_desc = find_feature_desc(f.readlines())
-                print feature_dir + "/" + file + ": " + feature_desc
+                print(feature_dir + "/" + file + ": " + feature_desc)
 
 
 def yocto_kernel_available_features_list(scripts_path, machine):
@@ -725,7 +723,7 @@ def yocto_kernel_available_features_list(scripts_path, machine):
     layer = find_bsp_layer(machine)
     kernel = find_current_kernel(layer, machine)
     if not kernel:
-        print "Couldn't determine the kernel for this BSP, exiting."
+        print("Couldn't determine the kernel for this BSP, exiting.")
         sys.exit(1)
 
     context = create_context(machine, "arch", scripts_path)
@@ -735,9 +733,9 @@ def yocto_kernel_available_features_list(scripts_path, machine):
     feature_url = find_feature_url(giturl)
 
     feature_cmd = "wget -q -O - " + feature_url
-    tmp = subprocess.Popen(feature_cmd, shell=True, stdout=subprocess.PIPE).stdout.read()
+    tmp = subprocess.Popen(feature_cmd, shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8')
 
-    print "The current set of kernel features available to %s is:\n" % machine
+    print("The current set of kernel features available to %s is:\n" % machine)
 
     if tmp:
         tmpline = tmp.split("\n")
@@ -754,9 +752,9 @@ def yocto_kernel_available_features_list(scripts_path, machine):
                 feature_type = feature_def[0].strip()
                 feature = feature_def[1].strip()
                 desc = get_feature_desc(giturl, feature)
-                print "%s: %s" % (feature, desc)
+                print("%s: %s" % (feature, desc))
 
-    print "[local]"
+    print("[local]")
 
     print_feature_descs(layer, "cfg")
     print_feature_descs(layer, "features")
@@ -786,7 +784,7 @@ def get_feature_desc(git_url, feature):
     """
     feature_desc_url = find_feature_desc_url(git_url, feature)
     feature_desc_cmd = "wget -q -O - " + feature_desc_url
-    tmp = subprocess.Popen(feature_desc_cmd, shell=True, stdout=subprocess.PIPE).stdout.read()
+    tmp = subprocess.Popen(feature_desc_cmd, shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8')
 
     return find_feature_desc(tmp.split("\n"))
 
@@ -800,7 +798,7 @@ def yocto_kernel_feature_describe(scripts_path, machine, feature):
 
     kernel = find_current_kernel(layer, machine)
     if not kernel:
-        print "Couldn't determine the kernel for this BSP, exiting."
+        print("Couldn't determine the kernel for this BSP, exiting.")
         sys.exit(1)
 
     context = create_context(machine, "arch", scripts_path)
@@ -810,7 +808,7 @@ def yocto_kernel_feature_describe(scripts_path, machine, feature):
 
     desc = get_feature_desc(giturl, feature)
 
-    print desc
+    print(desc)
 
 
 def check_feature_name(feature_name):
@@ -818,11 +816,11 @@ def check_feature_name(feature_name):
     Sanity-check the feature name for create/destroy.  Return False if not OK.
     """
     if not feature_name.endswith(".scc"):
-        print "Invalid feature name (must end with .scc) [%s], exiting" % feature_name
+        print("Invalid feature name (must end with .scc) [%s], exiting" % feature_name)
         return False
 
     if "/" in feature_name:
-        print "Invalid feature name (don't specify directory) [%s], exiting" % feature_name
+        print("Invalid feature name (don't specify directory) [%s], exiting" % feature_name)
         return False
 
     return True
@@ -836,11 +834,11 @@ def check_create_input(feature_items):
         return False
 
     if feature_items[1].endswith(".patch") or feature_items[1].startswith("CONFIG_"):
-        print "Missing description and/or compatibilty [%s], exiting" % feature_items[1]
+        print("Missing description and/or compatibilty [%s], exiting" % feature_items[1])
         return False
 
     if feature_items[2].endswith(".patch") or feature_items[2].startswith("CONFIG_"):
-        print "Missing description and/or compatibility [%s], exiting" % feature_items[1]
+        print("Missing description and/or compatibility [%s], exiting" % feature_items[1])
         return False
 
     return True
@@ -868,7 +866,7 @@ def yocto_kernel_feature_create(scripts_path, machine, feature_items):
             if ("=y" in item or "=m" in item):
                 cfg_items.append(item)
         else:
-            print "Invalid feature item (must be .patch or CONFIG_*) [%s], exiting" % item
+            print("Invalid feature item (must be .patch or CONFIG_*) [%s], exiting" % item)
             sys.exit(1)
 
     feature_dirname = "cfg"
@@ -877,7 +875,7 @@ def yocto_kernel_feature_create(scripts_path, machine, feature_items):
 
     filesdir = find_filesdir(scripts_path, machine)
     if not filesdir:
-        print "Couldn't add feature (%s), no 'files' dir found" % feature
+        print("Couldn't add feature (%s), no 'files' dir found" % feature)
         sys.exit(1)
 
     featdir = os.path.join(filesdir, feature_dirname)
@@ -886,7 +884,7 @@ def yocto_kernel_feature_create(scripts_path, machine, feature_items):
 
     for patch in patches:
         if not os.path.isfile(patch):
-            print "Couldn't find patch (%s), exiting" % patch
+            print("Couldn't find patch (%s), exiting" % patch)
             sys.exit(1)
         basename = os.path.basename(patch)
         featdir_patch = os.path.join(featdir, basename)
@@ -910,8 +908,8 @@ def yocto_kernel_feature_create(scripts_path, machine, feature_items):
     new_feature_file.write("kconf non-hardware " + feature_basename + ".cfg\n")
     new_feature_file.close()
 
-    print "Added feature:"
-    print "\t%s" % feature_dirname + "/" + feature
+    print("Added feature:")
+    print("\t%s" % feature_dirname + "/" + feature)
 
 
 def feature_in_use(scripts_path, machine, feature):
@@ -949,18 +947,18 @@ def yocto_kernel_feature_destroy(scripts_path, machine, feature):
 
     if feature_in_use(scripts_path, machine, "features/" + feature) or \
             feature_in_use(scripts_path, machine, "cfg/" + feature):
-        print "Feature %s is in use (use 'feature rm' to un-use it first), exiting" % feature
+        print("Feature %s is in use (use 'feature rm' to un-use it first), exiting" % feature)
         sys.exit(1)
 
     filesdir = find_filesdir(scripts_path, machine)
     if not filesdir:
-        print "Couldn't destroy feature (%s), no 'files' dir found" % feature
+        print("Couldn't destroy feature (%s), no 'files' dir found" % feature)
         sys.exit(1)
 
     feature_dirname = "features"
     featdir = os.path.join(filesdir, feature_dirname)
     if not os.path.exists(featdir):
-        print "Couldn't find feature directory (%s)" % feature_dirname
+        print("Couldn't find feature directory (%s)" % feature_dirname)
         sys.exit(1)
 
     feature_fqn = os.path.join(featdir, feature)
@@ -968,11 +966,11 @@ def yocto_kernel_feature_destroy(scripts_path, machine, feature):
         feature_dirname = "cfg"
         featdir = os.path.join(filesdir, feature_dirname)
         if not os.path.exists(featdir):
-            print "Couldn't find feature directory (%s)" % feature_dirname
+            print("Couldn't find feature directory (%s)" % feature_dirname)
             sys.exit(1)
         feature_fqn = os.path.join(featdir, feature_filename)
         if not os.path.exists(feature_fqn):
-            print "Couldn't find feature (%s)" % feature
+            print("Couldn't find feature (%s)" % feature)
             sys.exit(1)
 
     f = open(feature_fqn, "r")
@@ -989,8 +987,8 @@ def yocto_kernel_feature_destroy(scripts_path, machine, feature):
 
     feature_remove(scripts_path, machine, feature)
 
-    print "Removed feature:"
-    print "\t%s" % feature_dirname + "/" + feature
+    print("Removed feature:")
+    print("\t%s" % feature_dirname + "/" + feature)
 
 
 def base_branches(context):
@@ -999,10 +997,10 @@ def base_branches(context):
     """
     giturl = find_giturl(context)
 
-    print "Getting branches from remote repo %s..." % giturl
+    print("Getting branches from remote repo %s..." % giturl)
 
     gitcmd = "git ls-remote %s *heads* 2>&1" % (giturl)
-    tmp = subprocess.Popen(gitcmd, shell=True, stdout=subprocess.PIPE).stdout.read()
+    tmp = subprocess.Popen(gitcmd, shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8')
 
     branches = []
 
@@ -1029,10 +1027,10 @@ def all_branches(context):
     """
     giturl = find_giturl(context)
 
-    print "Getting branches from remote repo %s..." % giturl
+    print("Getting branches from remote repo %s..." % giturl)
 
     gitcmd = "git ls-remote %s *heads* 2>&1" % (giturl)
-    tmp = subprocess.Popen(gitcmd, shell=True, stdout=subprocess.PIPE).stdout.read()
+    tmp = subprocess.Popen(gitcmd, shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8')
 
     branches = []
 

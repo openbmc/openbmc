@@ -30,6 +30,7 @@ SYSLINUX_SERIAL_TTY ?= "console=ttyS0,115200"
 SYSLINUX_PROMPT ?= "0"
 SYSLINUX_TIMEOUT ?= "50"
 AUTO_SYSLINUXMENU ?= "1"
+SYSLINUX_ALLOWOPTIONS ?= "1"
 SYSLINUX_ROOT ?= "${ROOT}"
 SYSLINUX_CFG_VM  ?= "${S}/syslinux_vm.cfg"
 SYSLINUX_CFG_LIVE ?= "${S}/syslinux_live.cfg"
@@ -71,7 +72,7 @@ syslinux_hddimg_populate() {
 }
 
 syslinux_hddimg_install() {
-	syslinux ${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.hddimg
+	syslinux ${IMGDEPLOYDIR}/${IMAGE_NAME}.hddimg
 }
 
 syslinux_hdddirect_install() {
@@ -99,12 +100,12 @@ python build_syslinux_cfg () {
 
     cfile = d.getVar('SYSLINUX_CFG', True)
     if not cfile:
-        raise bb.build.FuncFailed('Unable to read SYSLINUX_CFG')
+        bb.fatal('Unable to read SYSLINUX_CFG')
 
     try:
-        cfgfile = file(cfile, 'w')
+        cfgfile = open(cfile, 'w')
     except OSError:
-        raise bb.build.funcFailed('Unable to open %s' % (cfile))
+        bb.fatal('Unable to open %s' % cfile)
 
     cfgfile.write('# Automatically created by OE\n')
 
@@ -114,7 +115,12 @@ python build_syslinux_cfg () {
         for opt in opts.split(';'):
             cfgfile.write('%s\n' % opt)
 
-    cfgfile.write('ALLOWOPTIONS 1\n');
+    allowoptions = d.getVar('SYSLINUX_ALLOWOPTIONS', True)
+    if allowoptions:
+        cfgfile.write('ALLOWOPTIONS %s\n' % allowoptions)
+    else:
+        cfgfile.write('ALLOWOPTIONS 1\n')
+
     syslinux_default_console = d.getVar('SYSLINUX_DEFAULT_CONSOLE', True)
     syslinux_serial_tty = d.getVar('SYSLINUX_SERIAL_TTY', True)
     syslinux_serial = d.getVar('SYSLINUX_SERIAL', True)
@@ -154,7 +160,7 @@ python build_syslinux_cfg () {
 
         overrides = localdata.getVar('OVERRIDES', True)
         if not overrides:
-            raise bb.build.FuncFailed('OVERRIDES not defined')
+            bb.fatal('OVERRIDES not defined')
 
         localdata.setVar('OVERRIDES', label + ':' + overrides)
         bb.data.update_data(localdata)
@@ -166,7 +172,7 @@ python build_syslinux_cfg () {
 
         root= d.getVar('SYSLINUX_ROOT', True)
         if not root:
-            raise bb.build.FuncFailed('SYSLINUX_ROOT not defined')
+            bb.fatal('SYSLINUX_ROOT not defined')
 
         for btype in btypes:
             cfgfile.write('LABEL %s%s\nKERNEL /vmlinuz\n' % (btype[0], label))
@@ -190,3 +196,4 @@ python build_syslinux_cfg () {
 
     cfgfile.close()
 }
+build_syslinux_cfg[dirs] = "${S}"
