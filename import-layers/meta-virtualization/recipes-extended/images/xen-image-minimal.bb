@@ -20,6 +20,14 @@ LICENSE = "MIT"
 
 inherit core-image
 
+do_check_xen_state() {
+    if [ "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' yes', 'no', d)}" = "no" ]; then
+        die "DISTRO_FEATURES does not contain 'xen'"
+    fi
+}
+
+addtask check_xen_state before do_rootfs
+
 syslinux_iso_populate_append() {
 	install -m 0444 ${STAGING_DATADIR}/syslinux/libcom32.c32 ${ISODIR}${ISOLINUXDIR}
 	install -m 0444 ${STAGING_DATADIR}/syslinux/mboot.c32 ${ISODIR}${ISOLINUXDIR}
