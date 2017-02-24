@@ -8,6 +8,7 @@ SECTION = "libs"
 
 SRC_URI = "https://github.com/${BPN}/${BPN}/releases/download/v${PV}/${BP}.tar.gz \
            file://Remove-cmake-check-for-Perl.patch \
+           file://0001-CMakeLists.txt-libical.pc.in-fix-iculibs-remove-full.patch \
            "
 DEPENDS = "icu"
 
@@ -15,13 +16,6 @@ SRC_URI[md5sum] = "6bf8e5f5a3ba88baf390d0134e05d76e"
 SRC_URI[sha256sum] = "654c11f759c19237be39f6ad401d917e5a05f36f1736385ed958e60cf21456da"
 UPSTREAM_CHECK_URI = "https://github.com/libical/libical/releases"
 
-inherit cmake
+inherit cmake pkgconfig
 
 FILES_${PN}-dev += "${libdir}/cmake/*"
-
-#
-# Turn specific library paths in the pkgconfig file into standard library entries
-#
-do_install_append () {
-	sed -i -e "s#${STAGING_LIBDIR}/lib\([a-z0-9]*\)\.so#-l\1#g" ${D}${libdir}/pkgconfig/libical.pc
-}

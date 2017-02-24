@@ -15,10 +15,10 @@ Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
  Makefile.in |    2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Makefile.in b/Makefile.in
-index e451f70..0a42375 100644
---- a/Makefile.in
-+++ b/Makefile.in
+Index: db-6.0.30/dist/Makefile.in
+===================================================================
+--- db-6.0.30.orig/dist/Makefile.in
++++ db-6.0.30/dist/Makefile.in
 @@ -863,7 +863,7 @@ $(libdb_version): $(C_OBJS)
  	$(LN) -s $(libdb_version) $(libdb)
  

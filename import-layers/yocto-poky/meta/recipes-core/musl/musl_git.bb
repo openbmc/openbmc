@@ -3,9 +3,9 @@
 
 require musl.inc
 
-SRCREV = "5978eb703ce0e64dd778a88c1ffffb76fe5e2202"
+SRCREV = "39494a273eaa6b714e0fa0c59ce7a1f5fbc80a1e"
 
-PV = "1.1.14+git${SRCPV}"
+PV = "1.1.15+git${SRCPV}"
 
 # mirror is at git://github.com/kraj/musl.git
 
@@ -25,8 +25,6 @@ DEPENDS = "virtual/${TARGET_PREFIX}binutils \
           "
 
 export CROSS_COMPILE="${TARGET_PREFIX}"
-
-EXTRA_OEMAKE = ""
 
 LDFLAGS += "-Wl,-soname,libc.so"
 
@@ -52,6 +50,10 @@ do_install() {
 
 	install -d ${D}${bindir}
 	ln -s ../../${libdir}/libc.so ${D}${bindir}/ldd
+	for l in crypt dl m pthread resolv rt util xnet
+	do
+		ln -s libc.so ${D}${libdir}/lib$l.so
+	done
 }
 
 RDEPENDS_${PN}-dev += "linux-libc-headers-dev bsd-headers-dev"

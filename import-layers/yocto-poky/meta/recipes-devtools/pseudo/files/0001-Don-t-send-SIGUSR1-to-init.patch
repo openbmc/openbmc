@@ -1,0 +1,48 @@
+From befc6dbd6469d428c9e0830dbe51bdf7ac39d9ae Mon Sep 17 00:00:00 2001
+From: Seebs <seebs@seebs.net>
+Date: Thu, 22 Sep 2016 14:35:04 -0500
+Subject: [PATCH] Don't send SIGUSR1 to init.
+
+If the parent exits due to child process being slow, getppid() will return
+1, and we'll send SIGUSR1 to init, which can break things like dumbinit
+which aren't adequately protected against non-root processes sending them
+signals.
+
+Signed-off-by: Seebs <seebs@seebs.net>
+
+Upstream-Status: Backport (commit befc6dbd6469d428c9e0830dbe51bdf7ac39d9ae)
+
+[YOCTO #10324]
+
+This resolves an issue where a docker container running builds would die
+due to it's 'mini init' being signaled by pseudo.
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+---
+ pseudo_server.c | 11 ++++++++---
+
+diff --git a/pseudo_server.c b/pseudo_server.c
+index 65102dd..8731d20 100644
+--- a/pseudo_server.c
++++ b/pseudo_server.c
+@@ -358,9 +358,14 @@ pseudo_server_start(int daemonize) {
+ 	signal(SIGTERM, quit_now);
+ 	/* tell parent process to stop waiting */
+ 	if (daemonize) {
+-		pseudo_diag("Setup complete, sending SIGUSR1 to pid %d.\n",
+-			getppid());
+-		kill(getppid(), SIGUSR1);
++		pid_t ppid = getppid();
++		if (ppid == 1) {
++			pseudo_diag("Setup complete, but parent is init, not sending SIGUSR1.\n");
++		} else {
++			pseudo_diag("Setup complete, sending SIGUSR1 to pid %d.\n",
++				ppid);
++			kill(ppid, SIGUSR1);
++		}
+ 	}
+ 	pseudo_server_loop();
+ 	return 0;
+-- 
+2.5.5
+

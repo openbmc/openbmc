@@ -28,22 +28,16 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-
 import os
+import sys
 import logging
+import pickle
 from collections import defaultdict
 import bb.utils
 
 logger = logging.getLogger("BitBake.Cache")
 
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
-    logger.info("Importing cPickle failed. "
-                "Falling back to a very slow implementation.")
-
-__cache_version__ = "149"
+__cache_version__ = "150"
 
 def getCacheFile(path, filename, data_hash):
     return os.path.join(path, filename + "." + data_hash)
@@ -80,7 +74,7 @@ class RecipeInfoCommon(object):
         out_dict = dict((var, metadata.getVarFlag(var, flag, True))
                     for var in varlist)
         if squash:
-            return dict((k,v) for (k,v) in out_dict.iteritems() if v)
+            return dict((k,v) for (k,v) in out_dict.items() if v)
         else:
             return out_dict
 
@@ -240,7 +234,7 @@ class CoreRecipeInfo(RecipeInfoCommon):
         cachedata.universe_target.append(self.pn)
 
         cachedata.hashfn[fn] = self.hashfilename
-        for task, taskhash in self.basetaskhashes.iteritems():
+        for task, taskhash in self.basetaskhashes.items():
             identifier = '%s.%s' % (fn, task)
             cachedata.basetaskhash[identifier] = taskhash
 
@@ -250,14 +244,136 @@ class CoreRecipeInfo(RecipeInfoCommon):
         cachedata.fakerootdirs[fn] = self.fakerootdirs
         cachedata.extradepsfunc[fn] = self.extradepsfunc
 
+def virtualfn2realfn(virtualfn):
+    """
+    Convert a virtual file name to a real one + the associated subclass keyword
+    """
+    mc = ""
+    if virtualfn.startswith('multiconfig:'):
+        elems = virtualfn.split(':')
+        mc = elems[1]
+        virtualfn = ":".join(elems[2:])
+
+    fn = virtualfn
+    cls = ""
+    if virtualfn.startswith('virtual:'):
+        elems = virtualfn.split(':')
+        cls = ":".join(elems[1:-1])
+        fn = elems[-1]
+
+    return (fn, cls, mc)
+
+def realfn2virtual(realfn, cls, mc):
+    """
+    Convert a real filename + the associated subclass keyword to a virtual filename
+    """
+    if cls:
+        realfn = "virtual:" + cls + ":" + realfn
+    if mc:
+        realfn = "multiconfig:" + mc + ":" + realfn
+    return realfn
+
+def variant2virtual(realfn, variant):
+    """
+    Convert a real filename + the associated subclass keyword to a virtual filename
+    """
+    if variant == "":
+        return realfn
+    if variant.startswith("multiconfig:"):
+        elems = variant.split(":")
+        if elems[2]:
+            return "multiconfig:" + elems[1] + ":virtual:" + ":".join(elems[2:]) + ":" + realfn
+        return "multiconfig:" + elems[1] + ":" + realfn
+    return "virtual:" + variant + ":" + realfn
+
+def parse_recipe(bb_data, bbfile, appends, mc=''):
+    """
+    Parse a recipe
+    """
+
+    chdir_back = False
+
+    bb_data.setVar("__BBMULTICONFIG", mc)
+
+    # expand tmpdir to include this topdir
+    bb_data.setVar('TMPDIR', bb_data.getVar('TMPDIR', True) or "")
+    bbfile_loc = os.path.abspath(os.path.dirname(bbfile))
+    oldpath = os.path.abspath(os.getcwd())
+    bb.parse.cached_mtime_noerror(bbfile_loc)
+
+    # The ConfHandler first looks if there is a TOPDIR and if not
+    # then it would call getcwd().
+    # Previously, we chdir()ed to bbfile_loc, called the handler
+    # and finally chdir()ed back, a couple of thousand times. We now
+    # just fill in TOPDIR to point to bbfile_loc if there is no TOPDIR yet.
+    if not bb_data.getVar('TOPDIR', False):
+        chdir_back = True
+        bb_data.setVar('TOPDIR', bbfile_loc)
+    try:
+        if appends:
+            bb_data.setVar('__BBAPPEND', " ".join(appends))
+        bb_data = bb.parse.handle(bbfile, bb_data)
+        if chdir_back:
+            os.chdir(oldpath)
+        return bb_data
+    except:
+        if chdir_back:
+            os.chdir(oldpath)
+        raise
 
 
-class Cache(object):
+
+class NoCache(object):
+
+    def __init__(self, databuilder):
+        self.databuilder = databuilder
+        self.data = databuilder.data
+
+    def loadDataFull(self, virtualfn, appends):
+        """
+        Return a complete set of data for fn.
+        To do this, we need to parse the file.
+        """
+        logger.debug(1, "Parsing %s (full)" % virtualfn)
+        (fn, virtual, mc) = virtualfn2realfn(virtualfn)
+        bb_data = self.load_bbfile(virtualfn, appends, virtonly=True)
+        return bb_data[virtual]
+
+    def load_bbfile(self, bbfile, appends, virtonly = False):
+        """
+        Load and parse one .bb build file
+        Return the data and whether parsing resulted in the file being skipped
+        """
+
+        if virtonly:
+            (bbfile, virtual, mc) = virtualfn2realfn(bbfile)
+            bb_data = self.databuilder.mcdata[mc].createCopy()
+            bb_data.setVar("__ONLYFINALISE", virtual or "default")
+            datastores = parse_recipe(bb_data, bbfile, appends, mc)
+            return datastores
+
+        bb_data = self.data.createCopy()
+        datastores = parse_recipe(bb_data, bbfile, appends)
+
+        for mc in self.databuilder.mcdata:
+            if not mc:
+                continue
+            bb_data = self.databuilder.mcdata[mc].createCopy()
+            newstores = parse_recipe(bb_data, bbfile, appends, mc)
+            for ns in newstores:
+                datastores["multiconfig:%s:%s" % (mc, ns)] = newstores[ns]
+
+        return datastores
+
+class Cache(NoCache):
     """
     BitBake Cache implementation
     """
 
-    def __init__(self, data, data_hash, caches_array):
+    def __init__(self, databuilder, data_hash, caches_array):
+        super().__init__(databuilder)
+        data = databuilder.data
+
         # Pass caches_array information into Cache Constructor
         # It will be used later for deciding whether we 
         # need extra cache file dump/load support 
@@ -266,7 +382,6 @@ class Cache(object):
         self.clean = set()
         self.checked = set()
         self.depends_cache = {}
-        self.data = None
         self.data_fn = None
         self.cacheclean = True
         self.data_hash = data_hash
@@ -286,72 +401,74 @@ class Cache(object):
         cache_ok = True
         if self.caches_array:
             for cache_class in self.caches_array:
-                if type(cache_class) is type and issubclass(cache_class, RecipeInfoCommon):
-                    cachefile = getCacheFile(self.cachedir, cache_class.cachefile, self.data_hash)
-                    cache_ok = cache_ok and os.path.exists(cachefile)
-                    cache_class.init_cacheData(self)
+                cachefile = getCacheFile(self.cachedir, cache_class.cachefile, self.data_hash)
+                cache_ok = cache_ok and os.path.exists(cachefile)
+                cache_class.init_cacheData(self)
         if cache_ok:
             self.load_cachefile()
         elif os.path.isfile(self.cachefile):
             logger.info("Out of date cache found, rebuilding...")
 
     def load_cachefile(self):
-        # Firstly, using core cache file information for
-        # valid checking
-        with open(self.cachefile, "rb") as cachefile:
-            pickled = pickle.Unpickler(cachefile)
-            try:
-                cache_ver = pickled.load()
-                bitbake_ver = pickled.load()
-            except Exception:
-                logger.info('Invalid cache, rebuilding...')
-                return
-
-            if cache_ver != __cache_version__:
-                logger.info('Cache version mismatch, rebuilding...')
-                return
-            elif bitbake_ver != bb.__version__:
-                logger.info('Bitbake version mismatch, rebuilding...')
-                return
-
-
         cachesize = 0
         previous_progress = 0
         previous_percent = 0
 
         # Calculate the correct cachesize of all those cache files
         for cache_class in self.caches_array:
-            if type(cache_class) is type and issubclass(cache_class, RecipeInfoCommon):
-                cachefile = getCacheFile(self.cachedir, cache_class.cachefile, self.data_hash)
-                with open(cachefile, "rb") as cachefile:
-                    cachesize += os.fstat(cachefile.fileno()).st_size
+            cachefile = getCacheFile(self.cachedir, cache_class.cachefile, self.data_hash)
+            with open(cachefile, "rb") as cachefile:
+                cachesize += os.fstat(cachefile.fileno()).st_size
 
         bb.event.fire(bb.event.CacheLoadStarted(cachesize), self.data)
         
         for cache_class in self.caches_array:
-            if type(cache_class) is type and issubclass(cache_class, RecipeInfoCommon):
-                cachefile = getCacheFile(self.cachedir, cache_class.cachefile, self.data_hash)
-                with open(cachefile, "rb") as cachefile:
-                    pickled = pickle.Unpickler(cachefile)                    
-                    while cachefile:
-                        try:
-                            key = pickled.load()
-                            value = pickled.load()
-                        except Exception:
-                            break
-                        if self.depends_cache.has_key(key):
-                            self.depends_cache[key].append(value)
-                        else:
-                            self.depends_cache[key] = [value]
-                        # only fire events on even percentage boundaries
-                        current_progress = cachefile.tell() + previous_progress
-                        current_percent = 100 * current_progress / cachesize
-                        if current_percent > previous_percent:
-                            previous_percent = current_percent
-                            bb.event.fire(bb.event.CacheLoadProgress(current_progress, cachesize),
-                                          self.data)
+            cachefile = getCacheFile(self.cachedir, cache_class.cachefile, self.data_hash)
+            with open(cachefile, "rb") as cachefile:
+                pickled = pickle.Unpickler(cachefile)
+                # Check cache version information
+                try:
+                    cache_ver = pickled.load()
+                    bitbake_ver = pickled.load()
+                except Exception:
+                    logger.info('Invalid cache, rebuilding...')
+                    return
 
-                    previous_progress += current_progress
+                if cache_ver != __cache_version__:
+                    logger.info('Cache version mismatch, rebuilding...')
+                    return
+                elif bitbake_ver != bb.__version__:
+                     logger.info('Bitbake version mismatch, rebuilding...')
+                     return
+
+                # Load the rest of the cache file
+                current_progress = 0
+                while cachefile:
+                    try:
+                        key = pickled.load()
+                        value = pickled.load()
+                    except Exception:
+                        break
+                    if not isinstance(key, str):
+                        bb.warn("%s from extras cache is not a string?" % key)
+                        break
+                    if not isinstance(value, RecipeInfoCommon):
+                        bb.warn("%s from extras cache is not a RecipeInfoCommon class?" % value)
+                        break
+
+                    if key in self.depends_cache:
+                        self.depends_cache[key].append(value)
+                    else:
+                        self.depends_cache[key] = [value]
+                    # only fire events on even percentage boundaries
+                    current_progress = cachefile.tell() + previous_progress
+                    current_percent = 100 * current_progress / cachesize
+                    if current_percent > previous_percent:
+                        previous_percent = current_percent
+                        bb.event.fire(bb.event.CacheLoadProgress(current_progress, cachesize),
+                                      self.data)
+
+                previous_progress += current_progress
 
         # Note: depends cache number is corresponding to the parsing file numbers.
         # The same file has several caches, still regarded as one item in the cache
@@ -359,69 +476,33 @@ class Cache(object):
                                                   len(self.depends_cache)),
                       self.data)
 
-    
-    @staticmethod
-    def virtualfn2realfn(virtualfn):
-        """
-        Convert a virtual file name to a real one + the associated subclass keyword
-        """
-
-        fn = virtualfn
-        cls = ""
-        if virtualfn.startswith('virtual:'):
-            elems = virtualfn.split(':')
-            cls = ":".join(elems[1:-1])
-            fn = elems[-1]
-        return (fn, cls)
-
-    @staticmethod
-    def realfn2virtual(realfn, cls):
-        """
-        Convert a real filename + the associated subclass keyword to a virtual filename
-        """
-        if cls == "":
-            return realfn
-        return "virtual:" + cls + ":" + realfn
-
-    @classmethod
-    def loadDataFull(cls, virtualfn, appends, cfgData):
-        """
-        Return a complete set of data for fn.
-        To do this, we need to parse the file.
-        """
-
-        (fn, virtual) = cls.virtualfn2realfn(virtualfn)
-
-        logger.debug(1, "Parsing %s (full)", fn)
-
-        cfgData.setVar("__ONLYFINALISE", virtual or "default")
-        bb_data = cls.load_bbfile(fn, appends, cfgData)
-        return bb_data[virtual]
-
-    @classmethod
-    def parse(cls, filename, appends, configdata, caches_array):
+    def parse(self, filename, appends):
         """Parse the specified filename, returning the recipe information"""
+        logger.debug(1, "Parsing %s", filename)
         infos = []
-        datastores = cls.load_bbfile(filename, appends, configdata)
+        datastores = self.load_bbfile(filename, appends)
         depends = []
-        for variant, data in sorted(datastores.iteritems(),
+        variants = []
+        # Process the "real" fn last so we can store variants list
+        for variant, data in sorted(datastores.items(),
                                     key=lambda i: i[0],
                                     reverse=True):
-            virtualfn = cls.realfn2virtual(filename, variant)
+            virtualfn = variant2virtual(filename, variant)
+            variants.append(variant)
             depends = depends + (data.getVar("__depends", False) or [])
             if depends and not variant:
                 data.setVar("__depends", depends)
-
+            if virtualfn == filename:
+                data.setVar("__VARIANTS", " ".join(variants))
             info_array = []
-            for cache_class in caches_array:
-                if type(cache_class) is type and issubclass(cache_class, RecipeInfoCommon):
-                    info = cache_class(filename, data)
-                    info_array.append(info)
+            for cache_class in self.caches_array:
+                info = cache_class(filename, data)
+                info_array.append(info)
             infos.append((virtualfn, info_array))
 
         return infos
 
-    def load(self, filename, appends, configdata):
+    def load(self, filename, appends):
         """Obtain the recipe information for the specified filename,
         using cached values if available, otherwise parsing.
 
@@ -435,21 +516,20 @@ class Cache(object):
             # info_array item is a list of [CoreRecipeInfo, XXXRecipeInfo]
             info_array = self.depends_cache[filename]
             for variant in info_array[0].variants:
-                virtualfn = self.realfn2virtual(filename, variant)
+                virtualfn = variant2virtual(filename, variant)
                 infos.append((virtualfn, self.depends_cache[virtualfn]))
         else:
-            logger.debug(1, "Parsing %s", filename)
             return self.parse(filename, appends, configdata, self.caches_array)
 
         return cached, infos
 
-    def loadData(self, fn, appends, cfgData, cacheData):
+    def loadData(self, fn, appends, cacheData):
         """Load the recipe info for the specified filename,
         parsing and adding to the cache if necessary, and adding
         the recipe information to the supplied CacheData instance."""
         skipped, virtuals = 0, 0
 
-        cached, infos = self.load(fn, appends, cfgData)
+        cached, infos = self.load(fn, appends)
         for virtualfn, info_array in infos:
             if info_array[0].skipped:
                 logger.debug(1, "Skipping %s: %s", virtualfn, info_array[0].skipreason)
@@ -557,16 +637,19 @@ class Cache(object):
 
         invalid = False
         for cls in info_array[0].variants:
-            virtualfn = self.realfn2virtual(fn, cls)
+            virtualfn = variant2virtual(fn, cls)
             self.clean.add(virtualfn)
             if virtualfn not in self.depends_cache:
                 logger.debug(2, "Cache: %s is not cached", virtualfn)
+                invalid = True
+            elif len(self.depends_cache[virtualfn]) != len(self.caches_array):
+                logger.debug(2, "Cache: Extra caches missing for %s?" % virtualfn)
                 invalid = True
 
         # If any one of the variants is not present, mark as invalid for all
         if invalid:
             for cls in info_array[0].variants:
-                virtualfn = self.realfn2virtual(fn, cls)
+                virtualfn = variant2virtual(fn, cls)
                 if virtualfn in self.clean:
                     logger.debug(2, "Cache: Removing %s from cache", virtualfn)
                     self.clean.remove(virtualfn)
@@ -603,30 +686,19 @@ class Cache(object):
             logger.debug(2, "Cache is clean, not saving.")
             return
 
-        file_dict = {}
-        pickler_dict = {}
         for cache_class in self.caches_array:
-            if type(cache_class) is type and issubclass(cache_class, RecipeInfoCommon):
-                cache_class_name = cache_class.__name__
-                cachefile = getCacheFile(self.cachedir, cache_class.cachefile, self.data_hash)
-                file_dict[cache_class_name] = open(cachefile, "wb")
-                pickler_dict[cache_class_name] =  pickle.Pickler(file_dict[cache_class_name], pickle.HIGHEST_PROTOCOL)
-                   
-        pickler_dict['CoreRecipeInfo'].dump(__cache_version__)
-        pickler_dict['CoreRecipeInfo'].dump(bb.__version__)
+            cache_class_name = cache_class.__name__
+            cachefile = getCacheFile(self.cachedir, cache_class.cachefile, self.data_hash)
+            with open(cachefile, "wb") as f:
+                p = pickle.Pickler(f, pickle.HIGHEST_PROTOCOL)
+                p.dump(__cache_version__)
+                p.dump(bb.__version__)
 
-        try:
-            for key, info_array in self.depends_cache.iteritems():
-                for info in info_array:
-                    if isinstance(info, RecipeInfoCommon):
-                        cache_class_name = info.__class__.__name__
-                        pickler_dict[cache_class_name].dump(key)
-                        pickler_dict[cache_class_name].dump(info)
-        finally:
-            for cache_class in self.caches_array:
-                if type(cache_class) is type and issubclass(cache_class, RecipeInfoCommon):
-                    cache_class_name = cache_class.__name__
-                    file_dict[cache_class_name].close()
+                for key, info_array in self.depends_cache.items():
+                    for info in info_array:
+                        if isinstance(info, RecipeInfoCommon) and info.__class__.__name__ == cache_class_name:
+                            p.dump(key)
+                            p.dump(info)
 
         del self.depends_cache
 
@@ -654,49 +726,12 @@ class Cache(object):
         Save data we need into the cache
         """
 
-        realfn = self.virtualfn2realfn(file_name)[0]
+        realfn = virtualfn2realfn(file_name)[0]
 
         info_array = []
         for cache_class in self.caches_array:
-            if type(cache_class) is type and issubclass(cache_class, RecipeInfoCommon):
-                info_array.append(cache_class(realfn, data))
+            info_array.append(cache_class(realfn, data))
         self.add_info(file_name, info_array, cacheData, parsed)
-
-    @staticmethod
-    def load_bbfile(bbfile, appends, config):
-        """
-        Load and parse one .bb build file
-        Return the data and whether parsing resulted in the file being skipped
-        """
-        chdir_back = False
-
-        from bb import parse
-
-        # expand tmpdir to include this topdir
-        config.setVar('TMPDIR', config.getVar('TMPDIR', True) or "")
-        bbfile_loc = os.path.abspath(os.path.dirname(bbfile))
-        oldpath = os.path.abspath(os.getcwd())
-        parse.cached_mtime_noerror(bbfile_loc)
-        bb_data = config.createCopy()
-        # The ConfHandler first looks if there is a TOPDIR and if not
-        # then it would call getcwd().
-        # Previously, we chdir()ed to bbfile_loc, called the handler
-        # and finally chdir()ed back, a couple of thousand times. We now
-        # just fill in TOPDIR to point to bbfile_loc if there is no TOPDIR yet.
-        if not bb_data.getVar('TOPDIR', False):
-            chdir_back = True
-            bb_data.setVar('TOPDIR', bbfile_loc)
-        try:
-            if appends:
-                bb_data.setVar('__BBAPPEND', " ".join(appends))
-            bb_data = parse.handle(bbfile, bb_data)
-            if chdir_back:
-                os.chdir(oldpath)
-            return bb_data
-        except:
-            if chdir_back:
-                os.chdir(oldpath)
-            raise
 
 
 def init(cooker):
@@ -727,8 +762,9 @@ class CacheData(object):
     def __init__(self, caches_array):
         self.caches_array = caches_array
         for cache_class in self.caches_array:
-            if type(cache_class) is type and issubclass(cache_class, RecipeInfoCommon):
-                cache_class.init_cacheData(self)        
+            if not issubclass(cache_class, RecipeInfoCommon):
+                bb.error("Extra cache data class %s should subclass RecipeInfoCommon class" % cache_class)
+            cache_class.init_cacheData(self)
 
         # Direct cache variables
         self.task_queues = {}

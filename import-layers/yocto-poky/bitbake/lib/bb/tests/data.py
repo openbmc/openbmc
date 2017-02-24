@@ -147,14 +147,14 @@ class DataExpansions(unittest.TestCase):
         self.assertEqual(self.d.getVar("foo", False), None)
 
     def test_keys(self):
-        keys = self.d.keys()
-        self.assertEqual(keys, ['value_of_foo', 'foo', 'bar'])
+        keys = list(self.d.keys())
+        self.assertCountEqual(keys, ['value_of_foo', 'foo', 'bar'])
 
     def test_keys_deletion(self):
         newd = bb.data.createCopy(self.d)
         newd.delVar("bar")
-        keys = newd.keys()
-        self.assertEqual(keys, ['value_of_foo', 'foo'])
+        keys = list(newd.keys())
+        self.assertCountEqual(keys, ['value_of_foo', 'foo'])
 
 class TestNestedExpansions(unittest.TestCase):
     def setUp(self):
@@ -334,7 +334,7 @@ class TestOverrides(unittest.TestCase):
         self.d.setVar("TEST2_bar", "testvalue2")
         bb.data.update_data(self.d)
         self.assertEqual(self.d.getVar("TEST2", True), "testvalue2")
-        self.assertItemsEqual(self.d.keys(), ['TEST', 'TEST2', 'OVERRIDES', 'TEST2_bar'])
+        self.assertCountEqual(list(self.d.keys()), ['TEST', 'TEST2', 'OVERRIDES', 'TEST2_bar'])
 
     def test_multiple_override(self):
         self.d.setVar("TEST_bar", "testvalue2")
@@ -342,7 +342,7 @@ class TestOverrides(unittest.TestCase):
         self.d.setVar("TEST_foo", "testvalue4")
         bb.data.update_data(self.d)
         self.assertEqual(self.d.getVar("TEST", True), "testvalue3")
-        self.assertItemsEqual(self.d.keys(), ['TEST', 'TEST_foo', 'OVERRIDES', 'TEST_bar', 'TEST_local'])
+        self.assertCountEqual(list(self.d.keys()), ['TEST', 'TEST_foo', 'OVERRIDES', 'TEST_bar', 'TEST_local'])
 
     def test_multiple_combined_overrides(self):
         self.d.setVar("TEST_local_foo_bar", "testvalue3")

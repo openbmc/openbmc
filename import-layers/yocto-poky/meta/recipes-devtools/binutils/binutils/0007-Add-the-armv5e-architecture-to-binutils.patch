@@ -1,7 +1,7 @@
-From 4ff9dbe13f38e4fea24fbcc9879cf7352c0561ff Mon Sep 17 00:00:00 2001
+From 9475aee8a702aa531737ec12dfd928d52951bc84 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:37:10 +0000
-Subject: [PATCH 07/14] Add the armv5e architecture to binutils
+Subject: [PATCH 07/13] Add the armv5e architecture to binutils
 
 Binutils has a comment that indicates it is supposed to match gcc for
 all of the support "-march=" settings, but it was lacking the armv5e setting.
@@ -19,10 +19,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/gas/config/tc-arm.c b/gas/config/tc-arm.c
-index 3bd4bc9..5d99921 100644
+index 73d0531..4b9e32f 100644
 --- a/gas/config/tc-arm.c
 +++ b/gas/config/tc-arm.c
-@@ -24791,6 +24791,7 @@ static const struct arm_arch_option_table arm_archs[] =
+@@ -25421,6 +25421,7 @@ static const struct arm_arch_option_table arm_archs[] =
    ARM_ARCH_OPT ("armv4t",	ARM_ARCH_V4T,	 FPU_ARCH_FPA),
    ARM_ARCH_OPT ("armv4txm",	ARM_ARCH_V4TxM,	 FPU_ARCH_FPA),
    ARM_ARCH_OPT ("armv5",	ARM_ARCH_V5,	 FPU_ARCH_VFP),
@@ -31,5 +31,5 @@ index 3bd4bc9..5d99921 100644
    ARM_ARCH_OPT ("armv5txm",	ARM_ARCH_V5TxM,	 FPU_ARCH_VFP),
    ARM_ARCH_OPT ("armv5te",	ARM_ARCH_V5TE,	 FPU_ARCH_VFP),
 -- 
-2.7.1
+2.9.0
 

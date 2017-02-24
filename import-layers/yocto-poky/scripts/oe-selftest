@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Copyright (c) 2013 Intel Corporation
 #
@@ -34,6 +34,8 @@ import subprocess
 import time as t
 import re
 import fnmatch
+import collections
+import imp
 
 sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)) + '/lib')
 import scriptpath
@@ -46,8 +48,19 @@ import oeqa.utils.ftools as ftools
 from oeqa.utils.commands import runCmd, get_bb_var, get_test_layer
 from oeqa.selftest.base import oeSelfTest, get_available_machines
 
+try:
+    import xmlrunner
+    from xmlrunner.result import _XMLTestResult as TestResult
+    from xmlrunner import XMLTestRunner as _TestRunner
+except ImportError:
+    # use the base runner instead
+    from unittest import TextTestResult as TestResult
+    from unittest import TextTestRunner as _TestRunner
+
+log_prefix = "oe-selftest-" + t.strftime("%Y%m%d-%H%M%S")
+
 def logger_create():
-    log_file = "oe-selftest-" + t.strftime("%Y-%m-%d_%H:%M:%S") + ".log"
+    log_file = log_prefix + ".log"
     if os.path.exists("oe-selftest.log"): os.remove("oe-selftest.log")
     os.symlink(log_file, "oe-selftest.log")
 
@@ -211,7 +224,7 @@ def get_tests_from_module(tmod):
     try:
         import importlib
         modlib = importlib.import_module(tmod)
-        for mod in vars(modlib).values():
+        for mod in list(vars(modlib).values()):
             if isinstance(mod, type(oeSelfTest)) and issubclass(mod, oeSelfTest) and mod is not oeSelfTest:
                 for test in dir(mod):
                     if test.startswith('test_') and hasattr(vars(mod)[test], '__call__'):
@@ -220,12 +233,12 @@ def get_tests_from_module(tmod):
                         try:
                             tid = vars(mod)[test].test_case
                         except:
-                            print 'DEBUG: tc id missing for ' + str(test)
+                            print('DEBUG: tc id missing for ' + str(test))
                             tid = None
                         try:
                             ttag = vars(mod)[test].tag__feature
                         except:
-                            # print 'DEBUG: feature tag missing for ' + str(test)
+                            # print('DEBUG: feature tag missing for ' + str(test))
                             ttag = None
 
                         # NOTE: for some reason lstrip() doesn't work for mod.__module__
@@ -260,16 +273,22 @@ def get_testsuite_by(criteria, keyword):
         result = []
         remaining = values[:]
         for key in keyword:
+            found = False
             if key in remaining:
                 # Regular matching of exact item
                 result.append(key)
                 remaining.remove(key)
+                found = True
             else:
                 # Wildcard matching
                 pattern = re.compile(fnmatch.translate(r"%s" % key))
                 added = [x for x in remaining if pattern.match(x)]
-                result.extend(added)
-                remaining = [x for x in remaining if x not in added]
+                if added:
+                    result.extend(added)
+                    remaining = [x for x in remaining if x not in added]
+                    found = True
+            if not found:
+                log.error("Failed to find test: %s" % key)
 
         return result
 
@@ -320,17 +339,17 @@ def list_testsuite_by(criteria, keyword):
 
     ts = sorted([ (tc.tcid, tc.tctag, tc.tcname, tc.tcclass, tc.tcmodule) for tc in get_testsuite_by(criteria, keyword) ])
 
-    print '%-4s\t%-20s\t%-60s\t%-25s\t%-20s' % ('id', 'tag', 'name', 'class', 'module')
-    print '_' * 150
+    print('%-4s\t%-20s\t%-60s\t%-25s\t%-20s' % ('id', 'tag', 'name', 'class', 'module'))
+    print('_' * 150)
     for t in ts:
         if isinstance(t[1], (tuple, list)):
-            print '%-4s\t%-20s\t%-60s\t%-25s\t%-20s' % (t[0], ', '.join(t[1]), t[2], t[3], t[4])
+            print('%-4s\t%-20s\t%-60s\t%-25s\t%-20s' % (t[0], ', '.join(t[1]), t[2], t[3], t[4]))
         else:
-            print '%-4s\t%-20s\t%-60s\t%-25s\t%-20s' % t
-    print '_' * 150
-    print 'Filtering by:\t %s' % criteria
-    print 'Looking for:\t %s' % ', '.join(str(x) for x in keyword)
-    print 'Total found:\t %s' % len(ts)
+            print('%-4s\t%-20s\t%-60s\t%-25s\t%-20s' % t)
+    print('_' * 150)
+    print('Filtering by:\t %s' % criteria)
+    print('Looking for:\t %s' % ', '.join(str(x) for x in keyword))
+    print('Total found:\t %s' % len(ts))
 
 
 def list_tests():
@@ -338,16 +357,15 @@ def list_tests():
 
     ts = get_all_tests()
 
-    print '%-4s\t%-20s\t%-60s\t%-25s\t%-20s' % ('id', 'tag', 'name', 'class', 'module')
-    print '_' * 150
+    print('%-4s\t%-10s\t%-50s' % ('id', 'tag', 'test'))
+    print('_' * 80)
     for t in ts:
         if isinstance(t.tctag, (tuple, list)):
-            print '%-4s\t%-20s\t%-60s\t%-25s\t%-20s' % (t.tcid, ', '.join(t.tctag), t.tcname, t.tcclass, t.tcmodule)
+            print('%-4s\t%-10s\t%-50s' % (t.tcid, ', '.join(t.tctag), '.'.join([t.tcmodule, t.tcclass, t.tcname])))
         else:
-            print '%-4s\t%-20s\t%-60s\t%-25s\t%-20s' % (t.tcid, t.tctag, t.tcname, t.tcclass, t.tcmodule)
-    print '_' * 150
-    print 'Total found:\t %s' % len(ts)
-
+            print('%-4s\t%-10s\t%-50s' % (t.tcid, t.tctag, '.'.join([t.tcmodule, t.tcclass, t.tcname])))
+    print('_' * 80)
+    print('Total found:\t %s' % len(ts))
 
 def list_tags():
     # Get all tags set to test cases
@@ -362,7 +380,7 @@ def list_tags():
         else:
             tags.add(tc.tctag)
 
-    print 'Tags:\t%s' % ', '.join(str(x) for x in tags)
+    print('Tags:\t%s' % ', '.join(str(x) for x in tags))
 
 def coverage_setup(coverage_source, coverage_include, coverage_omit):
     """ Set up the coverage measurement for the testcases to be run """
@@ -370,7 +388,7 @@ def coverage_setup(coverage_source, coverage_include, coverage_omit):
     import subprocess
     builddir = os.environ.get("BUILDDIR")
     pokydir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-    curcommit= subprocess.check_output(["git", "--git-dir", os.path.join(pokydir, ".git"), "rev-parse", "HEAD"])
+    curcommit= subprocess.check_output(["git", "--git-dir", os.path.join(pokydir, ".git"), "rev-parse", "HEAD"]).decode('utf-8')
     coveragerc = "%s/.coveragerc" % builddir
     data_file = "%s/.coverage." % builddir
     data_file += datetime.datetime.now().strftime('%Y%m%dT%H%M%S')
@@ -415,7 +433,7 @@ def coverage_report():
         # Coverage under version 4 uses coverage.coverage
         from coverage import coverage as Coverage
 
-    import cStringIO as StringIO
+    import io as StringIO
     from coverage.misc import CoverageException
 
     cov_output = StringIO.StringIO()
@@ -443,22 +461,24 @@ def main():
     bbpath = get_bb_var('BBPATH').split(':')
     layer_libdirs = [p for p in (os.path.join(l, 'lib') for l in bbpath) if os.path.exists(p)]
     sys.path.extend(layer_libdirs)
-    reload(oeqa.selftest)
+    imp.reload(oeqa.selftest)
 
     if args.run_tests_by and len(args.run_tests_by) >= 2:
         valid_options = ['name', 'class', 'module', 'id', 'tag']
         if args.run_tests_by[0] not in valid_options:
-            print '--run-tests-by %s not a valid option. Choose one of <name|class|module|id|tag>.' % args.run_tests_by[0]
+            print('--run-tests-by %s not a valid option. Choose one of <name|class|module|id|tag>.' % args.run_tests_by[0])
             return 1
         else:
             criteria = args.run_tests_by[0]
             keyword = args.run_tests_by[1:]
             ts = sorted([ tc.fullpath for tc in get_testsuite_by(criteria, keyword) ])
+        if not ts:
+            return 1
 
     if args.list_tests_by and len(args.list_tests_by) >= 2:
         valid_options = ['name', 'class', 'module', 'id', 'tag']
         if args.list_tests_by[0] not in valid_options:
-            print '--list-tests-by %s not a valid option. Choose one of <name|class|module|id|tag>.' % args.list_tests_by[0]
+            print('--list-tests-by %s not a valid option. Choose one of <name|class|module|id|tag>.' % args.list_tests_by[0])
             return 1
         else:
             criteria = args.list_tests_by[0]
@@ -482,7 +502,7 @@ def main():
             info = ''
             if module.startswith('_'):
                 info = ' (hidden)'
-            print module + info
+            print(module + info)
             if args.list_allclasses:
                 try:
                     import importlib
@@ -490,13 +510,13 @@ def main():
                     for v in vars(modlib):
                         t = vars(modlib)[v]
                         if isinstance(t, type(oeSelfTest)) and issubclass(t, oeSelfTest) and t!=oeSelfTest:
-                            print " --", v
+                            print(" --", v)
                             for method in dir(t):
-                                if method.startswith("test_") and callable(vars(t)[method]):
-                                    print " --  --", method
+                                if method.startswith("test_") and isinstance(vars(t)[method], collections.Callable):
+                                    print(" --  --", method)
 
                 except (AttributeError, ImportError) as e:
-                    print e
+                    print(e)
                     pass
 
     if args.run_tests or args.run_all_tests or args.run_tests_by:
@@ -511,7 +531,8 @@ def main():
         suite = unittest.TestSuite()
         loader = unittest.TestLoader()
         loader.sortTestMethodsUsing = None
-        runner = unittest.TextTestRunner(verbosity=2, resultclass=buildResultClass(args))
+        runner = TestRunner(verbosity=2,
+                resultclass=buildResultClass(args))
         # we need to do this here, otherwise just loading the tests
         # will take 2 minutes (bitbake -e calls)
         oeSelfTest.testlayer_path = get_test_layer()
@@ -552,7 +573,7 @@ def buildResultClass(args):
     """Build a Result Class to use in the testcase execution"""
     import site
 
-    class StampedResult(unittest.TextTestResult):
+    class StampedResult(TestResult):
         """
         Custom TestResult that prints the time when a test starts.  As oe-selftest
         can take a long time (ie a few hours) to run, timestamps help us understand
@@ -584,6 +605,10 @@ def buildResultClass(args):
                 if self.coverage_installed:
                     log.info("Coverage is enabled")
 
+                    major_version = int(coverage.version.__version__[0])
+                    if major_version < 4:
+                        log.error("python coverage %s installed. Require version 4 or greater." % coverage.version.__version__)
+                        self.stop()
                     # In case the user has not set the variable COVERAGE_PROCESS_START,
                     # create a default one and export it. The COVERAGE_PROCESS_START
                     # value indicates where the coverage configuration file resides
@@ -622,6 +647,21 @@ def buildResultClass(args):
 
     return StampedResult
 
+class TestRunner(_TestRunner):
+    """Test runner class aware of exporting tests."""
+    def __init__(self, *args, **kwargs):
+        try:
+            exportdir = os.path.join(os.getcwd(), log_prefix)
+            kwargsx = dict(**kwargs)
+            # argument specific to XMLTestRunner, if adding a new runner then
+            # also add logic to use other runner's args.
+            kwargsx['output'] = exportdir
+            kwargsx['descriptions'] = False
+            # done for the case where telling the runner where to export
+            super(TestRunner, self).__init__(*args, **kwargsx)
+        except TypeError:
+            log.info("test runner init'ed like unittest")
+            super(TestRunner, self).__init__(*args, **kwargs)
 
 if __name__ == "__main__":
     try:

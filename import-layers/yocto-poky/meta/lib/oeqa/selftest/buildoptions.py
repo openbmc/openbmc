@@ -30,22 +30,6 @@ class ImageOptionsTests(oeSelfTest):
         incremental_removed = re.search("NOTE: load old install solution for incremental install\nNOTE: creating new install solution for incremental install(\n.*)*NOTE: incremental removed:.*openssh-sshd-.*", log_data_removed)
         self.assertTrue(incremental_removed, msg = "Match failed in:\n%s" % log_data_removed)
 
-    @testcase(925)
-    def test_rm_old_image(self):
-        bitbake("core-image-minimal")
-        deploydir = get_bb_var("DEPLOY_DIR_IMAGE", target="core-image-minimal")
-        imagename = get_bb_var("IMAGE_LINK_NAME", target="core-image-minimal")
-        deploydir_files = os.listdir(deploydir)
-        track_original_files = []
-        for image_file in deploydir_files:
-            if imagename in image_file and os.path.islink(os.path.join(deploydir, image_file)):
-                track_original_files.append(os.path.realpath(os.path.join(deploydir, image_file)))
-        self.write_config("RM_OLD_IMAGE = \"1\"")
-        bitbake("-C rootfs core-image-minimal")
-        deploydir_files = os.listdir(deploydir)
-        remaining_not_expected = [path for path in track_original_files if os.path.basename(path) in deploydir_files]
-        self.assertFalse(remaining_not_expected, msg="\nThe following image files were not removed: %s" % ', '.join(map(str, remaining_not_expected)))
-
     @testcase(286)
     def test_ccache_tool(self):
         bitbake("ccache-native")
@@ -89,8 +73,9 @@ class SanityOptionsTest(oeSelfTest):
     def test_options_warnqa_errorqa_switch(self):
         bitbake("xcursor-transparent-theme -ccleansstate")
 
+        self.write_config("INHERIT_remove = \"report-error\"")
         if "packages-list" not in get_bb_var("ERROR_QA"):
-            self.write_config("ERROR_QA_append = \" packages-list\"")
+            self.append_config("ERROR_QA_append = \" packages-list\"")
 
         self.write_recipeinc('xcursor-transparent-theme', 'PACKAGES += \"${PN}-dbg\"')
         res = bitbake("xcursor-transparent-theme", ignore_status=True)
@@ -198,78 +183,6 @@ class BuildhistoryTests(BuildhistoryBase):
         error = "ERROR:.*QA Issue: Package version for package %s went backwards which would break package feeds from (.*-r1.* to .*-r0.*)" % target
         self.run_buildhistory_operation(target, target_config="PR = \"r1\"", change_bh_location=True)
         self.run_buildhistory_operation(target, target_config="PR = \"r0\"", change_bh_location=False, expect_error=True, error_regex=error)
-
-    @testcase(1386)
-    def test_buildhistory_does_not_change_signatures(self):
-        """
-        Summary:     Ensure that buildhistory does not change signatures
-        Expected:    Only 'do_rootfs' task should be rerun
-        Product:     oe-core
-        Author:      Daniel Istrate <daniel.alexandrux.istrate@intel.com>
-        AutomatedBy: Daniel Istrate <daniel.alexandrux.istrate@intel.com>
-        """
-
-        tmpdir1_name = 'tmpsig1'
-        tmpdir2_name = 'tmpsig2'
-        builddir = os.environ.get('BUILDDIR')
-        tmpdir1 = os.path.join(builddir, tmpdir1_name)
-        tmpdir2 = os.path.join(builddir, tmpdir2_name)
-
-        self.track_for_cleanup(tmpdir1)
-        self.track_for_cleanup(tmpdir2)
-
-        features = 'TMPDIR = "%s"\n' % tmpdir1
-        self.write_config(features)
-        bitbake('core-image-minimal -S none -c rootfs')
-
-        features = 'TMPDIR = "%s"\n' % tmpdir2
-        features += 'INHERIT += "buildhistory"\n'
-        self.write_config(features)
-        bitbake('core-image-minimal -S none -c rootfs')
-
-        def get_files(d):
-            f = []
-            for root, dirs, files in os.walk(d):
-                for name in files:
-                    f.append(os.path.join(root, name))
-            return f
-
-        files1 = get_files(tmpdir1 + '/stamps')
-        files2 = get_files(tmpdir2 + '/stamps')
-        files2 = [x.replace(tmpdir2_name, tmpdir1_name) for x in files2]
-
-        f1 = set(files1)
-        f2 = set(files2)
-        sigdiff = f1 - f2
-
-        self.assertEqual(len(sigdiff), 1, 'Expected 1 signature differences. Out: %s' % list(sigdiff))
-
-        unexpected_diff = []
-
-        # No new signatures should appear apart from do_rootfs
-        found_do_rootfs_flag = False
-
-        for sig in sigdiff:
-            if 'do_rootfs' in sig:
-                found_do_rootfs_flag = True
-            else:
-                unexpected_diff.append(sig)
-
-        self.assertTrue(found_do_rootfs_flag, 'Task do_rootfs did not rerun.')
-        self.assertFalse(unexpected_diff, 'Found unexpected signature differences. Out: %s' % unexpected_diff)
-
-
-class BuildImagesTest(oeSelfTest):
-    @testcase(563)
-    def test_directfb(self):
-        """
-        This method is used to test the build of directfb image for arm arch.
-        In essence we build a coreimagedirectfb and test the exitcode of bitbake that in case of success is 0.
-        """
-        self.add_command_to_tearDown('cleanup-workdir')
-        self.write_config("DISTRO_FEATURES_remove = \"x11\"\nDISTRO_FEATURES_append = \" directfb\"\nMACHINE ??= \"qemuarm\"")
-        res = bitbake("core-image-directfb", ignore_status=True)
-        self.assertEqual(res.status, 0, "\ncoreimagedirectfb failed to build. Please check logs for further details.\nbitbake output %s" % res.output)
 
 class ArchiverTest(oeSelfTest):
     @testcase(926)

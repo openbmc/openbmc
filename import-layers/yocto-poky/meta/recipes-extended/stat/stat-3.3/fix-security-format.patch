@@ -1,0 +1,68 @@
+stat: Fixing security formatting issues
+
+Fix security formatting issues related to printf without NULL argument 
+
+stat.c: In function 'print_human_access':
+stat.c:292:13: error: format not a string literal and no format arguments [-Werror=format-security]
+     printf (access);
+             ^
+stat.c: In function 'print_human_time':
+stat.c:299:57: error: format not a string literal and no format arguments [-Werror=format-security]
+   if (strftime(str, 40, "%c", localtime(t)) > 0) printf(str);
+                                                         ^
+stat.c: In function 'print_it':
+stat.c:613:6: error: format not a string literal and no format arguments [-Werror=format-security]
+      printf(b);
+      ^
+stat.c:642:6: error: format not a string literal and no format arguments [-Werror=format-security]
+      printf(b);
+      ^
+
+[YOCTO #9550]
+[https://bugzilla.yoctoproject.org/show_bug.cgi?id=9550]
+
+Upstream-Status: Pending
+
+Signed-off-by: Edwin Plauchu <edwin.plauchu.camacho@intel.com>
+
+diff --git a/stat.c b/stat.c
+index 1ed07a9..2be6f62 100644
+--- a/stat.c
++++ b/stat.c
+@@ -289,15 +289,15 @@ void print_human_access(struct stat *statbuf)
+     default:
+       access[0] = '?';
+     }
+-    printf (access);
++    fputs(access,stdout);
+ }
+ 
+ void print_human_time(time_t *t)
+ {
+   char str[40];
+   
+-  if (strftime(str, 40, "%c", localtime(t)) > 0) printf(str);
+-  else printf("Cannot calculate human readable time, sorry");
++  if (strftime(str, 40, "%c", localtime(t)) > 0) fputs(str,stdout);
++  else fputs("Cannot calculate human readable time, sorry",stdout);
+ }
+ 
+ /* print statfs info */
+@@ -610,7 +610,7 @@ void print_it(char *masterformat, char *filename,
+ 	{
+ 	    strcpy (pformat, "%");
+ 	    *m++ = '\0';
+-	    printf(b);
++	    fputs(b,stdout);
+ 
+ 	    /* copy all format specifiers to our format string */
+ 	    while (isdigit(*m) || strchr("#0-+. I", *m))
+@@ -639,7 +639,7 @@ void print_it(char *masterformat, char *filename,
+ 	}
+ 	else
+ 	{
+-	    printf(b);
++	    fputs(b,stdout);
+ 	    b = NULL;
+ 	}
+     }

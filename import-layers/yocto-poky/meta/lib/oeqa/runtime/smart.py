@@ -1,5 +1,7 @@
 import unittest
 import re
+import oe
+import subprocess
 from oeqa.oetest import oeRuntimeTest, skipModule
 from oeqa.utils.decorators import *
 from oeqa.utils.httpserver import HTTPService
@@ -7,7 +9,7 @@ from oeqa.utils.httpserver import HTTPService
 def setUpModule():
     if not oeRuntimeTest.hasFeature("package-management"):
         skipModule("Image doesn't have package management feature")
-    if not oeRuntimeTest.hasPackage("smart"):
+    if not oeRuntimeTest.hasPackage("smartpm"):
         skipModule("Image doesn't have smart installed")
     if "package_rpm" != oeRuntimeTest.tc.d.getVar("PACKAGE_CLASSES", True).split()[0]:
         skipModule("Rpm is not the primary package manager")
@@ -53,9 +55,50 @@ class SmartBasicTest(SmartTest):
 class SmartRepoTest(SmartTest):
 
     @classmethod
+    def create_index(self, arg):
+        index_cmd = arg
+        try:
+            bb.note("Executing '%s' ..." % index_cmd)
+            result = subprocess.check_output(index_cmd, stderr=subprocess.STDOUT, shell=True).decode("utf-8")
+        except subprocess.CalledProcessError as e:
+            return("Index creation command '%s' failed with return code %d:\n%s" %
+                    (e.cmd, e.returncode, e.output.decode("utf-8")))
+        if result:
+            bb.note(result)
+        return None
+
+    @classmethod
     def setUpClass(self):
         self.repolist = []
-        self.repo_server = HTTPService(oeRuntimeTest.tc.d.getVar('DEPLOY_DIR', True), oeRuntimeTest.tc.target.server_ip)
+
+        # Index RPMs
+        rpm_createrepo = bb.utils.which(os.getenv('PATH'), "createrepo")
+        index_cmds = []
+        rpm_dirs_found = False
+        archs = (oeRuntimeTest.tc.d.getVar('ALL_MULTILIB_PACKAGE_ARCHS', True) or "").replace('-', '_').split()
+        for arch in archs:
+            rpm_dir = os.path.join(oeRuntimeTest.tc.d.getVar('DEPLOY_DIR_RPM', True), arch)
+            idx_path = os.path.join(oeRuntimeTest.tc.d.getVar('WORKDIR', True), 'rpm', arch)
+            db_path = os.path.join(oeRuntimeTest.tc.d.getVar('WORKDIR', True), 'rpmdb', arch)
+            if not os.path.isdir(rpm_dir):
+                continue
+            if os.path.exists(db_path):
+                bb.utils.remove(dbpath, True)
+            lockfilename = oeRuntimeTest.tc.d.getVar('DEPLOY_DIR_RPM', True) + "/rpm.lock"
+            lf = bb.utils.lockfile(lockfilename, False)
+            oe.path.copyhardlinktree(rpm_dir, idx_path)
+            # Full indexes overload a 256MB image so reduce the number of rpms
+            # in the feed. Filter to p* since we use the psplash packages and
+            # this leaves some allarch and machine arch packages too.
+            bb.utils.remove(idx_path + "*/[a-oq-z]*.rpm")
+            bb.utils.unlockfile(lf)
+            index_cmds.append("%s --dbpath %s --update -q %s" % (rpm_createrepo, db_path, idx_path))
+            rpm_dirs_found = True
+         # Create repodata¬
+        result = oe.utils.multiprocess_exec(index_cmds, self.create_index)
+        if result:
+            bb.fatal('%s' % ('\n'.join(result)))
+        self.repo_server = HTTPService(oeRuntimeTest.tc.d.getVar('WORKDIR', True), oeRuntimeTest.tc.target.server_ip)
         self.repo_server.start()
 
     @classmethod

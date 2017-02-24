@@ -45,7 +45,7 @@
 """
 
 
-from __future__ import division
+
 import logging
 import os, sys, itertools, time, subprocess
 
@@ -55,7 +55,7 @@ except ImportError:
     sys.exit("FATAL: The ncurses ui could not load the required curses python module.")
 
 import bb
-import xmlrpclib
+import xmlrpc.client
 from bb import ui
 from bb.ui import uihelper
 
@@ -252,7 +252,7 @@ class NCursesUI:
             elif ret != True:
                 print("Couldn't get default commandlind! %s" % ret)
                 return
-        except xmlrpclib.Fault as x:
+        except xmlrpc.client.Fault as x:
             print("XMLRPC Fault getting commandline:\n %s" % x)
             return
 
@@ -331,7 +331,7 @@ class NCursesUI:
                     taw.setText(0, 0, "")
                     if activetasks:
                         taw.appendText("Active Tasks:\n")
-                        for task in activetasks.itervalues():
+                        for task in activetasks.values():
                             taw.appendText(task["title"] + '\n')
                     if failedtasks:
                         taw.appendText("Failed Tasks:\n")

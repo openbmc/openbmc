@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Copyright (c) 2011, Intel Corporation.
 # All rights reserved.
@@ -28,16 +28,14 @@ import sys
 import getopt
 import os
 from subprocess import *
-from string import join
-
 
 def usage():
     prog = os.path.basename(sys.argv[0])
-    print 'Usage: %s [OPTION]...' % (prog)
-    print '  -d,                 display an additional level of drivers detail'
-    print '  -h, --help          display this help and exit'
-    print ''
-    print 'Run %s from the top-level Linux kernel build directory.' % (prog)
+    print('Usage: %s [OPTION]...' % prog)
+    print('  -d,                 display an additional level of drivers detail')
+    print('  -h, --help          display this help and exit')
+    print('')
+    print('Run %s from the top-level Linux kernel build directory.' % prog)
 
 
 class Sizes:
@@ -55,8 +53,8 @@ class Sizes:
             self.text = self.data = self.bss = self.total = 0
 
     def show(self, indent=""):
-        print "%-32s %10d | %10d %10d %10d" % \
-              (indent+self.title, self.total, self.text, self.data, self.bss)
+        print("%-32s %10d | %10d %10d %10d" % \
+              (indent+self.title, self.total, self.text, self.data, self.bss))
 
 
 class Report:
@@ -66,7 +64,7 @@ class Report:
 
         p = Popen("ls " + path + "/*.o | grep -v built-in.o",
                   shell=True, stdout=PIPE, stderr=PIPE)
-        glob = join(p.communicate()[0].splitlines())
+        glob = ' '.join(p.communicate()[0].splitlines())
         oreport = Report(glob, path + "/*.o")
         oreport.sizes.title = path + "/*.o"
         r.parts.append(oreport)
@@ -101,22 +99,22 @@ class Report:
 
     def show(self, indent=""):
         rule = str.ljust(indent, 80, '-')
-        print "%-32s %10s | %10s %10s %10s" % \
-              (indent+self.title, "total", "text", "data", "bss")
-        print rule
+        print("%-32s %10s | %10s %10s %10s" % \
+              (indent+self.title, "total", "text", "data", "bss"))
+        print(rule)
         self.sizes.show(indent)
-        print rule
+        print(rule)
         for p in self.parts:
             if p.sizes.total > 0:
                 p.sizes.show(indent)
-        print rule
-        print "%-32s %10d | %10d %10d %10d" % \
+        print(rule)
+        print("%-32s %10d | %10d %10d %10d" % \
               (indent+"sum", self.totals["total"], self.totals["text"],
-               self.totals["data"], self.totals["bss"])
-        print "%-32s %10d | %10d %10d %10d" % \
+               self.totals["data"], self.totals["bss"]))
+        print("%-32s %10d | %10d %10d %10d" % \
               (indent+"delta", self.deltas["total"], self.deltas["text"],
-               self.deltas["data"], self.deltas["bss"])
-        print "\n"
+               self.deltas["data"], self.deltas["bss"]))
+        print("\n")
 
     def __cmp__(this, that):
         if that is None:
@@ -133,8 +131,8 @@ class Report:
 def main():
     try:
         opts, args = getopt.getopt(sys.argv[1:], "dh", ["help"])
-    except getopt.GetoptError, err:
-        print '%s' % str(err)
+    except getopt.GetoptError as err:
+        print('%s' % str(err))
         usage()
         sys.exit(2)
 

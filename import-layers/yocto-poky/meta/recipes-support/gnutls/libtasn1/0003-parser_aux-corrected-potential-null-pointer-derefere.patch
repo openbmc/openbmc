@@ -1,0 +1,73 @@
+From c8903aa27dc9de1d9efeed9d1f7894f1019548f7 Mon Sep 17 00:00:00 2001
+From: Nikos Mavrogiannopoulos <nmav@redhat.com>
+Date: Tue, 26 Jul 2016 08:49:15 +0200
+Subject: [PATCH 3/4] parser_aux: corrected potential null pointer dereferences
+
+---
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+ lib/parser_aux.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/lib/parser_aux.c b/lib/parser_aux.c
+index 2285b20..12ee16f 100644
+--- a/lib/parser_aux.c
++++ b/lib/parser_aux.c
+@@ -637,7 +637,7 @@ _asn1_change_integer_value (asn1_node node)
+ 		      p = NULL;
+ 		      break;
+ 		    }
+-		  if (p->right)
++		  if (p && p->right)
+ 		    {
+ 		      p = p->right;
+ 		      break;
+@@ -753,7 +753,7 @@ _asn1_expand_object_id (asn1_node node)
+ 
+       if (move == RIGHT)
+ 	{
+-	  if (p->right)
++	  if (p && p->right)
+ 	    p = p->right;
+ 	  else
+ 	    move = UP;
+@@ -828,7 +828,7 @@ _asn1_expand_object_id (asn1_node node)
+ 
+       if (move == RIGHT)
+ 	{
+-	  if (p->right)
++	  if (p && p->right)
+ 	    p = p->right;
+ 	  else
+ 	    move = UP;
+@@ -898,7 +898,7 @@ _asn1_type_set_config (asn1_node node)
+ 
+       if (move == RIGHT)
+ 	{
+-	  if (p->right)
++	  if (p && p->right)
+ 	    p = p->right;
+ 	  else
+ 	    move = UP;
+@@ -1007,7 +1007,7 @@ _asn1_check_identifier (asn1_node node)
+ 		  p = NULL;
+ 		  break;
+ 		}
+-	      if (p->right)
++	      if (p && p->right)
+ 		{
+ 		  p = p->right;
+ 		  break;
+@@ -1067,7 +1067,7 @@ _asn1_set_default_tag (asn1_node node)
+ 		  p = NULL;
+ 		  break;
+ 		}
+-	      if (p->right)
++	      if (p && p->right)
+ 		{
+ 		  p = p->right;
+ 		  break;
+-- 
+1.9.1
+

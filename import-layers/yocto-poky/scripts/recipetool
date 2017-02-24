@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Recipe creation tool
 #
@@ -60,6 +60,7 @@ def main():
     parser.add_argument('-h', '--help', action='help', default=argparse.SUPPRESS,
                         help='show this help message and exit')
     subparsers = parser.add_subparsers(title='subcommands', metavar='<subcommand>')
+    subparsers.required = True
 
     if global_args.debug:
         logger.setLevel(logging.DEBUG)
@@ -76,37 +77,40 @@ def main():
     scriptutils.logger_setup_color(logger, global_args.color)
 
     tinfoil = tinfoil_init(False)
-    for path in ([scripts_path] +
-                 tinfoil.config_data.getVar('BBPATH', True).split(':')):
-        pluginpath = os.path.join(path, 'lib', 'recipetool')
-        scriptutils.load_plugins(logger, plugins, pluginpath)
-
-    registered = False
-    for plugin in plugins:
-        if hasattr(plugin, 'register_commands'):
-            registered = True
-            plugin.register_commands(subparsers)
-        elif hasattr(plugin, 'register_command'):
-            # Legacy function name
-            registered = True
-            plugin.register_command(subparsers)
-        if hasattr(plugin, 'tinfoil_init'):
-            plugin.tinfoil_init(tinfoil)
-
-    if not registered:
-        logger.error("No commands registered - missing plugins?")
-        sys.exit(1)
-
-    args = parser.parse_args(unparsed_args, namespace=global_args)
-
     try:
-        if getattr(args, 'parserecipes', False):
-            tinfoil.config_data.disableTracking()
-            tinfoil.parseRecipes()
-            tinfoil.config_data.enableTracking()
-        ret = args.func(args)
-    except bb.BBHandledException:
-        ret = 1
+        for path in ([scripts_path] +
+                    tinfoil.config_data.getVar('BBPATH', True).split(':')):
+            pluginpath = os.path.join(path, 'lib', 'recipetool')
+            scriptutils.load_plugins(logger, plugins, pluginpath)
+
+        registered = False
+        for plugin in plugins:
+            if hasattr(plugin, 'register_commands'):
+                registered = True
+                plugin.register_commands(subparsers)
+            elif hasattr(plugin, 'register_command'):
+                # Legacy function name
+                registered = True
+                plugin.register_command(subparsers)
+            if hasattr(plugin, 'tinfoil_init'):
+                plugin.tinfoil_init(tinfoil)
+
+        if not registered:
+            logger.error("No commands registered - missing plugins?")
+            sys.exit(1)
+
+        args = parser.parse_args(unparsed_args, namespace=global_args)
+
+        try:
+            if getattr(args, 'parserecipes', False):
+                tinfoil.config_data.disableTracking()
+                tinfoil.parseRecipes()
+                tinfoil.config_data.enableTracking()
+            ret = args.func(args)
+        except bb.BBHandledException:
+            ret = 1
+    finally:
+        tinfoil.shutdown()
 
     return ret
 

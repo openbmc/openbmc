@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Media Player
 Comment=Basic media player
-Icon=audio-player
+Icon=multimedia-player
 TryExec=gtk-play
 Exec=gtk-play
 StartupNotify=true

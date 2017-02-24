@@ -18,9 +18,10 @@ LICENSE = "GPLv2"
 # But you have some kernel headers you need for some driver? That is fine
 # but get them from STAGING_KERNEL_DIR where the kernel installs itself.
 # This will make the package using them machine specific but this is much
-# better than having a machine specific C library. This does mean your 
-# recipe needs a DEPENDS += "virtual/kernel" but again, that is fine and
-# makes total sense.
+# better than having a machine specific C library. This does mean your
+# recipe needs a
+#    do_configure[depends] += "virtual/kernel:do_shared_workdir"
+# but again, that is fine and makes total sense.
 #
 # There can also be a case where your kernel extremely old and you want
 # an older libc ABI for that old kernel. The headers installed by this
@@ -49,8 +50,7 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/kernel/v${HEADER_FETCH_VER}/linux-${PV}.tar
 
 S = "${WORKDIR}/linux-${PV}"
 
-# For the kernel, we don't want the '-e MAKEFLAGS=' in EXTRA_OEMAKE.
-EXTRA_OEMAKE = ""
+EXTRA_OEMAKE = " HOSTCC="${BUILD_CC}" HOSTCPP="${BUILD_CPP}""
 
 do_configure() {
 	oe_runmake allnoconfig

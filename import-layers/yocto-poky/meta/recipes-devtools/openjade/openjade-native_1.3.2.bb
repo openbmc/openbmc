@@ -44,10 +44,10 @@ CONFIGUREOPTS := "${@d.getVar('CONFIGUREOPTS', True).replace('--datadir=${datadi
 oe_runconf[vardepsexclude] += "CONFIGUREOPTS"
 
 CFLAGS =+ "-I${S}/include"
+CXXFLAGS += "-fno-tree-dse"
 
 SSTATEPOSTINSTFUNCS += "openjade_sstate_postinst"
 SYSROOT_PREPROCESS_FUNCS += "openjade_sysroot_preprocess"
-CLEANFUNCS += "openjade_sstate_clean"
 
 # configure.in needs to be reloacted to trigger reautoconf
 do_extraunpack () {
@@ -103,19 +103,19 @@ openjade_sstate_postinst() {
 		${SYSROOT_DESTDIR}${bindir_crossscripts}/install-catalog-openjade \
 			--add ${sysconfdir}/sgml/sgml-docbook.cat \
 			${sysconfdir}/sgml/openjade-${PV}.cat
+		cat << EOF > ${SSTATE_INST_POSTRM}
+#!/bin/sh
+# Ensure that the catalog file sgml-docbook.cat is properly
+# updated when the package is removed from sstate cache.
+files="${sysconfdir}/sgml/sgml-docbook.bak ${sysconfdir}/sgml/sgml-docbook.cat"
+for f in \$files; do
+	[ ! -f \$f ] || sed -i '/\/sgml\/openjade-${PV}.cat/d' \$f
+done
+EOF
 	fi
 }
 
 openjade_sysroot_preprocess () {
     install -d ${SYSROOT_DESTDIR}${bindir_crossscripts}/
     install -m 755 ${STAGING_BINDIR_NATIVE}/install-catalog ${SYSROOT_DESTDIR}${bindir_crossscripts}/install-catalog-openjade
-}
-
-openjade_sstate_clean () {
-	# Ensure that the catalog file sgml-docbook.cat is properly
-	# updated when the package is removed from sstate cache.
-	files="${sysconfdir}/sgml/sgml-docbook.bak ${sysconfdir}/sgml/sgml-docbook.cat"
-	for f in $files; do
-		[ ! -f $f ] || sed -i '/\/sgml\/openjade-${PV}.cat/d' $f
-	done
 }

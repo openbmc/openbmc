@@ -1,0 +1,49 @@
+Subject: revert inconsistent ls quoting
+
+This is a revert of upstream commit 109b9220cead6e979d22d16327c4d9f8350431cc.
+
+Bug-Debian: https://bugs.debian.org/813164
+
+Upstream-Status: Submitted
+
+Originally-by: Adam Borowski <kilobyte@angband.pl>
+[PG: patch from https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=813164#78 ]
+Signed-off-by: Paul Gortmaker <paul.gortmaker@windriver.com>
+
+---
+
+--- coreutils-8.25.orig/NEWS
++++ coreutils-8.25/NEWS
+@@ -71,9 +71,6 @@ GNU coreutils NEWS
+   df now prefers sources towards the root of a device when
+   eliding duplicate bind mounted entries.
+ 
+-  ls now quotes file names unambiguously and appropriate for use in a shell,
+-  when outputting to a terminal.
+-
+   join, sort, uniq with --zero-terminated, now treat '\n' as a field delimiter.
+ 
+ ** Improvements
+--- coreutils-8.25.orig/doc/coreutils.texi
++++ coreutils-8.25/doc/coreutils.texi
+@@ -7750,8 +7750,8 @@ this"} in the default C locale.  This lo
+ 
+ You can specify the default value of the @option{--quoting-style} option
+ with the environment variable @env{QUOTING_STYLE}@.  If that environment
+-variable is not set, the default value is @samp{shell-escape} when the
+-output is a terminal, and @samp{literal} otherwise.
++variable is not set, the default value is @samp{literal}, but this
++default may change to @samp{shell} in a future version of this package.
+ 
+ @item --show-control-chars
+ @opindex --show-control-chars
+--- coreutils-8.25.orig/src/ls.c
++++ coreutils-8.25/src/ls.c
+@@ -1581,7 +1581,6 @@ decode_switches (int argc, char **argv)
+       if (isatty (STDOUT_FILENO))
+         {
+           format = many_per_line;
+-          set_quoting_style (NULL, shell_escape_quoting_style);
+           /* See description of qmark_funny_chars, above.  */
+           qmark_funny_chars = true;
+         }

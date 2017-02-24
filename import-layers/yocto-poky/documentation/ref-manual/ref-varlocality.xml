@@ -176,16 +176,18 @@
             <para>
                 This section lists variables that define extra build information for recipes.
                 <itemizedlist>
+                    <listitem><para><filename><link linkend='var-DEFAULT_PREFERENCE'>DEFAULT_PREFERENCE
+                        </link></filename></para></listitem>
                     <listitem><para><filename><link linkend='var-EXTRA_OECMAKE'>EXTRA_OECMAKE</link>
                         </filename></para></listitem>
                     <listitem><para><filename><link linkend='var-EXTRA_OECONF'>EXTRA_OECONF</link>
                         </filename></para></listitem>
                     <listitem><para><filename><link linkend='var-EXTRA_OEMAKE'>EXTRA_OEMAKE</link>
                         </filename></para></listitem>
+                    <listitem><para><filename><link linkend='var-PACKAGECONFIG_CONFARGS'>PACKAGECONFIG_CONFARGS</link>
+                        </filename></para></listitem>
                     <listitem><para><filename><link linkend='var-PACKAGES'>PACKAGES</link></filename>
                         </para></listitem>
-                    <listitem><para><filename><link linkend='var-DEFAULT_PREFERENCE'>DEFAULT_PREFERENCE
-                        </link></filename></para></listitem>
                 </itemizedlist>
             </para>
         </section>

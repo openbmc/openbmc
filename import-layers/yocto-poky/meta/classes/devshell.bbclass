@@ -65,9 +65,6 @@ def devpyshell(d):
         os.dup2(m, sys.stdout.fileno())
         os.dup2(m, sys.stderr.fileno())
 
-        sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
-        sys.stdin = os.fdopen(sys.stdin.fileno(), 'r', 0)
-
         bb.utils.nonblockingfd(sys.stdout)
         bb.utils.nonblockingfd(sys.stderr)
         bb.utils.nonblockingfd(sys.stdin)
@@ -93,6 +90,7 @@ def devpyshell(d):
             else:
                 prompt = ps1
             sys.stdout.write(prompt)
+            sys.stdout.flush()
 
         # Restore Ctrl+C since bitbake masks this
         def signal_handler(signal, frame):
@@ -114,6 +112,7 @@ def devpyshell(d):
                         continue
                 except EOFError as e:
                     sys.stdout.write("\n")
+                    sys.stdout.flush()
                 except (OSError, IOError) as e:
                     if e.errno == 11:
                         continue

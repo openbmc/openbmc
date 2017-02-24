@@ -8,7 +8,6 @@ PV = "1.4.7+git${SRCPV}"
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>^\d+(\.(?!99)\d+)+)"
 
 SRC_URI = "git://github.com/clutter-project/mx.git;branch=mx-1.4 \
-	   file://fix-build-dir.patch \
 	   file://fix-test-includes.patch \
 	  "
 S = "${WORKDIR}/git"

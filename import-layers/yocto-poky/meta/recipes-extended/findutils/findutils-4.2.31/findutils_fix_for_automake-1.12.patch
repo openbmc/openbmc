@@ -6,7 +6,7 @@ this patch avoids these kinds of errors:
 
 | configure.in:75: error: automatic de-ANSI-fication support has been removed
 
-Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
 2012/05/04
 
 Index: findutils-4.2.31/configure.in

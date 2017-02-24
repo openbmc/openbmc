@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=94caec5a51ef55ef711ee4e8b1c69e29"
 PE = "1"
 PR = "r5"
 
-SRC_URI = "ftp://ftp.info-zip.org/pub/infozip/src/unzip60.tgz \
+SRC_URI = "${SOURCEFORGE_MIRROR}/infozip/UnZip%206.x%20%28latest%29/UnZip%206.0/unzip60.tar.gz \
 	file://avoid-strip.patch \
 	file://define-ldflags.patch \
 	file://06-unzip60-alt-iconv-utf8_CVE-2015-1315.patch \
@@ -16,6 +16,7 @@ SRC_URI = "ftp://ftp.info-zip.org/pub/infozip/src/unzip60.tgz \
 	file://11-cve-2014-8141-getzip64data.patch \
 	file://CVE-2015-7696.patch \
 	file://CVE-2015-7697.patch \
+        file://fix-security-format.patch \
 "
 
 SRC_URI[md5sum] = "62b490407489521db863b523a7f86375"

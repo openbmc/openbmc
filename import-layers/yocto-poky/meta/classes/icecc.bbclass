@@ -47,7 +47,8 @@ def get_cross_kernel_cc(bb,d):
 
     # evaluate the expression by the shell if necessary
     if '`' in kernel_cc or '$(' in kernel_cc:
-        kernel_cc = os.popen("echo %s" % kernel_cc).read()[:-1]
+        import subprocess
+        kernel_cc = subprocess.check_output("echo %s" % kernel_cc, shell=True).decode("utf-8")[:-1]
 
     kernel_cc = d.expand(kernel_cc)
     kernel_cc = kernel_cc.replace('ccache', '').strip()
@@ -220,9 +221,14 @@ def icecc_get_and_check_tool(bb, d, tool):
     # PATH or icecc-create-env script will silently create an invalid
     # compiler environment package.
     t = icecc_get_tool(bb, d, tool)
-    if t and os.popen("readlink -f %s" % t).read()[:-1] == get_icecc(d):
-        bb.error("%s is a symlink to %s in PATH and this prevents icecc from working" % (t, get_icecc(d)))
-        return ""
+    if t:
+        import subprocess
+        link_path = subprocess.check_output("readlink -f %s" % t, shell=True).decode("utf-8")[:-1]
+        if link_path == get_icecc(d):
+            bb.error("%s is a symlink to %s in PATH and this prevents icecc from working" % (t, get_icecc(d)))
+            return ""
+        else:
+            return t
     else:
         return t
 

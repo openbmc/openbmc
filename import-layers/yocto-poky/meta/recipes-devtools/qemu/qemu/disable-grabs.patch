@@ -29,9 +29,9 @@ index 39a42d6..9b8abe5 100644
 --- a/ui/sdl.c
 +++ b/ui/sdl.c
 @@ -59,6 +59,10 @@ static SDL_Cursor *guest_sprite = NULL;
- static SDL_PixelFormat host_format;
  static int scaling_active = 0;
  static Notifier mouse_mode_notifier;
+ static int idle_counter;
 +#ifndef True
 +#define True 1
 +#endif
@@ -40,7 +40,7 @@ index 39a42d6..9b8abe5 100644
  static void sdl_update(DisplayChangeListener *dcl,
                         int x, int y, int w, int h)
 @@ -384,14 +388,16 @@ static void sdl_grab_start(void)
-             SDL_WarpMouse(guest_x, guest_y);
+             }
      } else
          sdl_hide_cursor();
 -    SDL_WM_GrabInput(SDL_GRAB_ON);

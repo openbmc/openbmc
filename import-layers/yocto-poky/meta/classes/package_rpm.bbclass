@@ -58,12 +58,12 @@ def write_rpm_perfiledata(srcname, d):
     try:
         dependsfile = open(outdepends, 'w')
     except OSError:
-        raise bb.build.FuncFailed("unable to open spec file for writing.")
+        bb.fatal("unable to open spec file for writing")
 
     dump_filerdeps('RDEPENDS', dependsfile, d)
 
     dependsfile.close()
-    os.chmod(outdepends, 0755)
+    os.chmod(outdepends, 0o755)
 
     # OE-core / RPM Provides
     outprovides = workdir + "/" + srcname + ".provides"
@@ -71,12 +71,12 @@ def write_rpm_perfiledata(srcname, d):
     try:
         providesfile = open(outprovides, 'w')
     except OSError:
-        raise bb.build.FuncFailed("unable to open spec file for writing.")
+        bb.fatal("unable to open spec file for writing")
 
     dump_filerdeps('RPROVIDES', providesfile, d)
 
     providesfile.close()
-    os.chmod(outprovides, 0755)
+    os.chmod(outprovides, 0o755)
 
     return (outdepends, outprovides)
 
@@ -617,7 +617,7 @@ python write_specfile () {
     try:
         specfile = open(outspecfile, 'w')
     except OSError:
-        raise bb.build.FuncFailed("unable to open spec file for writing.")
+        bb.fatal("unable to open spec file for writing")
 
     # RPMSPEC_PREAMBLE is a way to add arbitrary text to the top
     # of the generated spec file
@@ -702,7 +702,7 @@ python do_package_rpm () {
     pkgarch = d.expand('${PACKAGE_ARCH_EXTEND}${HOST_VENDOR}-${HOST_OS}')
     magicfile = d.expand('${STAGING_DIR_NATIVE}${datadir_native}/misc/magic.mgc')
     bb.utils.mkdirhier(pkgwritedir)
-    os.chmod(pkgwritedir, 0755)
+    os.chmod(pkgwritedir, 0o755)
 
     cmd = rpmbuild
     cmd = cmd + " --nodeps --short-circuit --target " + pkgarch + " --buildroot " + pkgd

@@ -4,33 +4,39 @@
 
 {% block pagecontent %}
 
-  <div class="page-header top-air">
-    <h1 data-role="page-title"></h1>
-  </div>
+<div class="row">
+  <div class="col-md-12">
 
-  {% url 'projects' as xhr_table_url %}
-  {% include 'toastertable.html' %}
+    <div class="page-header">
+      <h1 data-role="page-title"></h1>
+    </div>
 
-  <script>
-    $(document).ready(function () {
-      var tableElt = $("#{{table_name}}");
-      var titleElt = $("[data-role='page-title']");
+    {% url 'projects' as xhr_table_url %}
+    {% include 'toastertable.html' %}
 
-      tableElt.on("table-done", function (e, total, tableParams) {
-        var title = "All projects";
+    <script>
+$(document).ready(function () {
+    var tableElt = $("#{{table_name}}");
+    var titleElt = $("[data-role='page-title']");
 
-        if (tableParams.search || tableParams.filter) {
-          if (total === 0) {
-            title = "No projects found";
-          }
-          else if (total > 0) {
-            title = total + " project" + (total > 1 ? 's' : '') + " found";
-          }
-        }
+    tableElt.on("table-done", function (e, total, tableParams) {
+      var title = "All projects";
 
-        titleElt.text(title);
+      if (tableParams.search || tableParams.filter) {
+      if (total === 0) {
+      title = "No projects found";
+      }
+      else if (total > 0) {
+      title = total + " project" + (total > 1 ? 's' : '') + " found";
+      }
+      }
+
+      titleElt.text(title);
       });
     });
-  </script>
+    </script>
+
+  </div>
+</div>
 
 {% endblock %}

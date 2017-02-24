@@ -19,7 +19,4 @@ BBCLASSEXTEND = "native"
 SRC_URI[md5sum] = "23756dab809f9ec5011bb27fb2c3c7d6"
 SRC_URI[sha256sum] = "aa7ebdb0715106dd255082f2310dbaa2cd7e225957c2a77d719720c7cc92b921"
 
-SYSROOT_PREPROCESS_FUNCS += "fontutil_sysroot_preprocess"
-fontutil_sysroot_preprocess () {
-	sysroot_stage_dir ${D}${datadir}/fonts/ ${SYSROOT_DESTDIR}${datadir}/fonts/
-}
+SYSROOT_DIRS_BLACKLIST_remove = "${datadir}/fonts"

@@ -20,6 +20,7 @@ SRC_URI = "${GNU_MIRROR}/bash/bash-${PV}.tar.gz;name=tarball \
            file://test-output.patch \
            file://run-ptest \
            file://dont-include-target-CFLAGS-in-host-LDFLAGS.patch \
+           file://string-format.patch \
           "
 
 SRC_URI[tarball.md5sum] = "338dcf975a93640bb3eaa843ca42e3f8"

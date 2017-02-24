@@ -1,0 +1,31 @@
+Fixes to allow diffutils to build with gcc v6.
+
+RP
+2016/5/25
+
+Index: diffutils-2.8.1/lib/posix/regex.h
+===================================================================
+--- diffutils-2.8.1.orig/lib/posix/regex.h
++++ diffutils-2.8.1/lib/posix/regex.h
+@@ -529,7 +529,9 @@ extern int re_exec _RE_ARGS ((const char
+ /* For now unconditionally define __restrict_arr to expand to nothing.
+    Ideally we would have a test for the compiler which allows defining
+    it to restrict.  */
++#ifndef __restrict_arr
+ #define __restrict_arr
++#endif
+ 
+ /* POSIX compatibility.  */
+ extern int regcomp _RE_ARGS ((regex_t *__restrict __preg,
+Index: diffutils-2.8.1/src/diff.c
+===================================================================
+--- diffutils-2.8.1.orig/src/diff.c
++++ diffutils-2.8.1/src/diff.c
+@@ -71,6 +71,7 @@ static void usage (void);
+ static bool recursive;
+ 
+ /* In context diffs, show previous lines that match these regexps.  */
++struct re_pattern_buffer function_regexp;
+ static struct regexp_list function_regexp_list;
+ 
+ /* Ignore changes affecting only lines that match these regexps.  */

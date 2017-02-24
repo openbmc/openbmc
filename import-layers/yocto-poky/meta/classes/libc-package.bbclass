@@ -47,15 +47,6 @@ python __anonymous () {
 
 OVERRIDES_append = ":${TARGET_ARCH}-${TARGET_OS}"
 
-do_configure_prepend() {
-        if [ -e ${S}/elf/ldd.bash.in ]; then
-                sed -e "s#@BASH@#/bin/sh#" -i ${S}/elf/ldd.bash.in
-        fi
-}
-
-
-
-# indentation removed on purpose
 locale_base_postinst() {
 #!/bin/sh
 
@@ -63,33 +54,14 @@ if [ "x$D" != "x" ]; then
 	exit 1
 fi
 
-rm -rf ${TMP_LOCALE}
-mkdir -p ${TMP_LOCALE}
-if [ -f ${localedir}/locale-archive ]; then
-        cp ${localedir}/locale-archive ${TMP_LOCALE}/
-fi
-localedef --inputfile=${datadir}/i18n/locales/%s --charmap=%s --prefix=/tmp/locale %s
-mkdir -p ${localedir}/
-mv ${TMP_LOCALE}/locale-archive ${localedir}/
-rm -rf ${TMP_LOCALE}
+localedef --inputfile=${datadir}/i18n/locales/%s --charmap=%s %s
 }
 
-# indentation removed on purpose
 locale_base_postrm() {
 #!/bin/sh
-
-rm -rf ${TMP_LOCALE}
-mkdir -p ${TMP_LOCALE}
-if [ -f ${localedir}/locale-archive ]; then
-	cp ${localedir}/locale-archive ${TMP_LOCALE}/
-fi
-localedef --delete-from-archive --inputfile=${datadir}/locales/%s --charmap=%s --prefix=/tmp/locale %s
-mv ${TMP_LOCALE}/locale-archive ${localedir}/
-rm -rf ${TMP_LOCALE}
+localedef --delete-from-archive --inputfile=${datadir}/locales/%s --charmap=%s %s
 }
 
-
-TMP_LOCALE="/tmp/locale${localedir}"
 LOCALETREESRC ?= "${PKGD}"
 
 do_prep_locale_tree() {
@@ -150,6 +122,7 @@ python package_do_split_gconvs () {
         c_re = re.compile('^copy "(.*)"')
         i_re = re.compile('^include "(\w+)".*')
         for l in f.readlines():
+            l = l.decode("latin-1")
             m = c_re.match(l) or i_re.match(l)
             if m:
                 dp = legitimize_package_name('%s%s-gconv-%s' % (mlprefix, bpn, m.group(1)))
@@ -171,6 +144,7 @@ python package_do_split_gconvs () {
         c_re = re.compile('^copy "(.*)"')
         i_re = re.compile('^include "(\w+)".*')
         for l in f.readlines():
+            l = l.decode("latin-1")
             m = c_re.match(l) or i_re.match(l)
             if m:
                 dp = legitimize_package_name('%s%s-charmap-%s' % (mlprefix, bpn, m.group(1)))
@@ -191,6 +165,7 @@ python package_do_split_gconvs () {
         c_re = re.compile('^copy "(.*)"')
         i_re = re.compile('^include "(\w+)".*')
         for l in f.readlines():
+            l = l.decode("latin-1")
             m = c_re.match(l) or i_re.match(l)
             if m:
                 dp = legitimize_package_name(mlprefix+bpn+'-localedata-%s' % m.group(1))
@@ -223,7 +198,7 @@ python package_do_split_gconvs () {
     # GLIBC_GENERATE_LOCALES var specifies which locales to be generated. empty or "all" means all locales
     to_generate = d.getVar('GLIBC_GENERATE_LOCALES', True)
     if not to_generate or to_generate == 'all':
-        to_generate = supported.keys()
+        to_generate = sorted(supported.keys())
     else:
         to_generate = to_generate.split()
         for locale in to_generate:
@@ -274,9 +249,13 @@ python package_do_split_gconvs () {
                 "powerpc": " --uint32-align=4 --big-endian ",    \
                 "powerpc64": " --uint32-align=4 --big-endian ",  \
                 "mips":    " --uint32-align=4 --big-endian ",    \
+                "mipsisa32r6":    " --uint32-align=4 --big-endian ",    \
                 "mips64":  " --uint32-align=4 --big-endian ",    \
+                "mipsisa64r6":  " --uint32-align=4 --big-endian ",    \
                 "mipsel":  " --uint32-align=4 --little-endian ", \
+                "mipsisa32r6el":  " --uint32-align=4 --little-endian ", \
                 "mips64el":" --uint32-align=4 --little-endian ", \
+                "mipsisa64r6el":" --uint32-align=4 --little-endian ", \
                 "i586":    " --uint32-align=4 --little-endian ", \
                 "i686":    " --uint32-align=4 --little-endian ", \
                 "x86_64":  " --uint32-align=4 --little-endian "  }
@@ -285,9 +264,9 @@ python package_do_split_gconvs () {
                 localedef_opts = locale_arch_options[target_arch]
             else:
                 bb.error("locale_arch_options not found for target_arch=" + target_arch)
-                raise bb.build.FuncFailed("unknown arch:" + target_arch + " for locale_arch_options")
+                bb.fatal("unknown arch:" + target_arch + " for locale_arch_options")
 
-            localedef_opts += " --force --old-style --no-archive --prefix=%s \
+            localedef_opts += " --force  --no-archive --prefix=%s \
                 --inputfile=%s/%s/i18n/locales/%s --charmap=%s %s/%s" \
                 % (treedir, treedir, datadir, locale, encoding, outputpath, name)
 
@@ -295,7 +274,7 @@ python package_do_split_gconvs () {
                 (path, i18npath, gconvpath, localedef_opts)
         else: # earlier slower qemu way 
             qemu = qemu_target_binary(d) 
-            localedef_opts = "--force --old-style --no-archive --prefix=%s \
+            localedef_opts = "--force --no-archive --prefix=%s \
                 --inputfile=%s/i18n/locales/%s --charmap=%s %s" \
                 % (treedir, datadir, locale, encoding, name)
 
@@ -388,4 +367,3 @@ python package_do_split_gconvs () {
 python populate_packages_prepend () {
     bb.build.exec_func('package_do_split_gconvs', d)
 }
-

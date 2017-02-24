@@ -1,33 +1,19 @@
 
 function mrbSectionInit(ctx){
-
-  var projectBuilds;
-
-  if (ctx.mrbType === 'project')
-    projectBuilds = true;
-
-  $(".cancel-build-btn").click(function(e){
+  $('#latest-builds').on('click', '.cancel-build-btn', function(e){
+    e.stopImmediatePropagation();
     e.preventDefault();
 
     var url = $(this).data('request-url');
     var buildReqIds = $(this).data('buildrequest-id');
-    var banner = $(this).parents(".alert");
 
-    banner.find(".progress-info").fadeOut().promise().done(function(){
-      $("#cancelling-msg-" + buildReqIds).show();
-      console.log("cancel build");
-      libtoaster.cancelABuild(url, buildReqIds, function(){
-        if (projectBuilds == false){
-          /* the all builds page is not 'self updating' like thei
-           * project Builds
-           */
-          window.location.reload();
-        }
-      }, null);
-    });
+    libtoaster.cancelABuild(url, buildReqIds, function () {
+      window.location.reload();
+    }, null);
   });
 
-  $(".run-again-btn").click(function(e){
+  $('#latest-builds').on('click', '.rebuild-btn', function(e){
+    e.stopImmediatePropagation();
     e.preventDefault();
 
     var url = $(this).data('request-url');
@@ -38,58 +24,112 @@ function mrbSectionInit(ctx){
     }, null);
   });
 
+  // cached version of buildData, so we can determine whether a build has
+  // changed since it was last fetched, and update the DOM appropriately
+  var buildData = {};
 
-  var progressTimer;
+  // returns the cached version of this build, or {} is there isn't a cached one
+  function getCached(build) {
+    return buildData[build.id] || {};
+  }
 
-  if (projectBuilds === true){
-    progressTimer = window.setInterval(function() {
-      libtoaster.getProjectInfo(libtoaster.ctx.projectPageUrl,
-        function(prjInfo){
-          /* These two are needed because a build can be 100% and still
-           * in progress due to the fact that the % done is updated at the
-           * start of a task so it can be doing the last task at 100%
-           */
-          var inProgress = 0;
-          var allPercentDone = 0;
-          if (prjInfo.builds.length === 0)
-            return
+  // returns true if a build's state changed to "Succeeded", "Failed"
+  // or "Cancelled" from some other value
+  function buildFinished(build) {
+    var cached = getCached(build);
+    return cached.state &&
+      cached.state !== build.state &&
+      (build.state == 'Succeeded' || build.state == 'Failed' ||
+       build.state == 'Cancelled');
+  }
 
-          for (var i in prjInfo.builds){
-            var build = prjInfo.builds[i];
+  // returns true if the state changed
+  function stateChanged(build) {
+    var cached = getCached(build);
+    return (cached.state !== build.state);
+  }
 
-            if (build.outcome === "In Progress" ||
-               $(".progress .bar").length > 0){
-              /* Update the build progress */
-              var percentDone;
+  // returns true if the tasks_complete_percentage changed
+  function tasksProgressChanged(build) {
+    var cached = getCached(build);
+    return (cached.tasks_complete_percentage !== build.tasks_complete_percentage);
+  }
 
-              if (build.outcome !== "In Progress"){
-                /* We have to ignore the value when it's Succeeded because it
-                *   goes back to 0
-                */
-                percentDone = 100;
-              } else {
-                percentDone = build.percentDone;
-                inProgress++;
-              }
+  // returns true if the number of recipes parsed/to parse changed
+  function recipeProgressChanged(build) {
+    var cached = getCached(build);
+    return (cached.recipes_parsed_percentage !== build.recipes_parsed_percentage);
+  }
 
-              $("#build-pc-done-" + build.id).text(percentDone);
-              $("#build-pc-done-title-" + build.id).attr("title", percentDone);
-              $("#build-pc-done-bar-" + build.id).css("width",
-                String(percentDone) + "%");
+  function refreshMostRecentBuilds(){
+    libtoaster.getMostRecentBuilds(
+      libtoaster.ctx.mostRecentBuildsUrl,
 
-              allPercentDone += percentDone;
-            }
+      // success callback
+      function (data) {
+        var build;
+        var tmpl;
+        var container;
+        var selector;
+        var colourClass;
+        var elements;
+
+        for (var i = 0; i < data.length; i++) {
+          build = data[i];
+
+          if (buildFinished(build)) {
+            // a build finished: reload the whole page so that the build
+            // shows up in the builds table
+            window.location.reload();
+          }
+          else if (stateChanged(build)) {
+            // update the whole template
+            build.warnings_pluralise = (build.warnings !== 1 ? 's' : '');
+            build.errors_pluralise = (build.errors !== 1 ? 's' : '');
+
+            tmpl = $.templates("#build-template");
+
+            html = $(tmpl.render(build));
+
+            selector = '[data-latest-build-result="' + build.id + '"] ' +
+              '[data-role="build-status-container"]';
+            container = $(selector);
+
+            // initialize bootstrap tooltips in the new HTML
+            html.find('span.glyphicon-question-sign').tooltip();
+
+            container.html(html);
+          }
+          else if (tasksProgressChanged(build)) {
+            // update the task progress text
+            selector = '#build-pc-done-' + build.id;
+            $(selector).html(build.tasks_complete_percentage);
+
+            // update the task progress bar
+            selector = '#build-pc-done-bar-' + build.id;
+            $(selector).width(build.tasks_complete_percentage + '%');
+          }
+          else if (recipeProgressChanged(build)) {
+            // update the recipe progress text
+            selector = '#recipes-parsed-percentage-' + build.id;
+            $(selector).html(build.recipes_parsed_percentage);
+
+            // update the recipe progress bar
+            selector = '#recipes-parsed-percentage-bar-' + build.id;
+            $(selector).width(build.recipes_parsed_percentage + '%');
           }
 
-          if (allPercentDone === (100 * prjInfo.builds.length) && !inProgress)
-            window.location.reload();
+          buildData[build.id] = build;
+        }
+      },
 
-          /* Our progress bar is not still showing so shutdown the polling. */
-          if ($(".progress .bar").length === 0)
-            window.clearInterval(progressTimer);
-
-      });
-    }, 1500);
+      // fail callback
+      function (data) {
+        console.error(data);
+      }
+    );
   }
-}
 
+  window.setInterval(refreshMostRecentBuilds, 1500);
+  refreshMostRecentBuilds();
+}

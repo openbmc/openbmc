@@ -12,6 +12,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=3610bb17683a0089ed64055416b2ae1b"
 SRC_URI = "ftp://sourceware.org/pub/libffi/${BP}.tar.gz \
            file://not-win32.patch \
 	   file://0001-mips-Use-compiler-internal-define-for-linux.patch \
+           file://0001-mips-fix-MIPS-softfloat-build-issue.patch \
 	   "
 
 SRC_URI[md5sum] = "83b89587607e3eb65c70d361f13bab43"
@@ -22,5 +23,9 @@ EXTRA_OECONF += "--disable-builddir"
 inherit autotools texinfo
 
 FILES_${PN}-dev += "${libdir}/libffi-${PV}"
+
+# Doesn't compile in MIPS16e mode due to use of hand-written
+# assembly
+MIPS_INSTRUCTION_SET = "mips"
 
 BBCLASSEXTEND = "native nativesdk"

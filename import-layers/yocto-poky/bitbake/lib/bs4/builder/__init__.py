@@ -80,9 +80,12 @@ builder_registry = TreeBuilderRegistry()
 class TreeBuilder(object):
     """Turn a document into a Beautiful Soup object tree."""
 
+    NAME = "[Unknown tree builder]"
+    ALTERNATE_NAMES = []
     features = []
 
     is_xml = False
+    picklable = False
     preserve_whitespace_tags = set()
     empty_element_tags = None # A tag will be considered an empty-element
                               # tag when and only when it has no contents.
@@ -153,13 +156,13 @@ class TreeBuilder(object):
             universal = self.cdata_list_attributes.get('*', [])
             tag_specific = self.cdata_list_attributes.get(
                 tag_name.lower(), None)
-            for attr in attrs.keys():
+            for attr in list(attrs.keys()):
                 if attr in universal or (tag_specific and attr in tag_specific):
                     # We have a "class"-type attribute whose string
                     # value is a whitespace-separated list of
                     # values. Split it into a list.
                     value = attrs[attr]
-                    if isinstance(value, basestring):
+                    if isinstance(value, str):
                         values = whitespace_re.split(value)
                     else:
                         # html5lib sometimes calls setAttributes twice

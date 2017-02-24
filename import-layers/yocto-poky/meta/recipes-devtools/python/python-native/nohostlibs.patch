@@ -2,8 +2,8 @@ Upstream-Status: Inappropriate [embedded specific]
 
 2014/12/15
 Rebased for python-2.7.9
-Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
-Signed-Off-By: Alejandro Hernandez <alejandro.hernandez@linux.intel.com>
+Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
+Signed-off-by: Alejandro Hernandez <alejandro.hernandez@linux.intel.com>
 
 Index: Python-2.7.9/setup.py
 ===================================================================

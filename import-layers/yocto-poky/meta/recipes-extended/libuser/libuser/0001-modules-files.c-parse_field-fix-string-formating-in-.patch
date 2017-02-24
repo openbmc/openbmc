@@ -1,0 +1,34 @@
+From a4857911ece5ebfcdef42aee4c070eb216f39597 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?An=C3=ADbal=20Lim=C3=B3n?= <anibal.limon@linux.intel.com>
+Date: Fri, 13 May 2016 11:40:13 -0500
+Subject: [PATCH] modules/files.c: parse_field fix string formating in
+ g_warnings
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+[YOCTO #9547]
+
+Signed-off-by: Aníbal Limón <anibal.limon@linux.intel.com>
+
+Upstream-Status: Pending
+---
+ modules/files.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/files.c b/modules/files.c
+index 4ef0a57..35eafc9 100644
+--- a/modules/files.c
++++ b/modules/files.c
+@@ -534,7 +534,7 @@ parse_field(const struct format_specifier *format, GValue *value,
+ 						 string, &err);
+ 	if (ret == FALSE) {
+ 		g_assert(err != NULL);
+-		g_warning(lu_strerror(err));
++		g_warning(lu_strerror(err), NULL);
+ 		lu_error_free(&err);
+ 	}
+ 	return ret;
+-- 
+2.1.4
+

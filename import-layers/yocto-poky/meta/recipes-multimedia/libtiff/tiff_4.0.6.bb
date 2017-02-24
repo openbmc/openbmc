@@ -1,10 +1,15 @@
 SUMMARY = "Provides support for the Tag Image File Format (TIFF)"
 LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=34da3db46fab7501992f9615d7e158cf"
-HOMEPAGE = "http://www.remotesensing.org/libtiff/"
 
-SRC_URI = "ftp://ftp.remotesensing.org/pub/libtiff/tiff-${PV}.tar.gz \
+SRC_URI = "http://download.osgeo.org/libtiff/tiff-${PV}.tar.gz \
            file://libtool2.patch \
+           file://CVE-2015-8665_8683.patch \
+           file://CVE-2015-8781.patch \
+           file://CVE-2015-8784.patch \
+           file://CVE-2016-3186.patch \
+           file://CVE-2016-5321.patch \
+           file://CVE-2016-5323.patch \
           "
 
 SRC_URI[md5sum] = "d1d2e940dea0b5ad435f21f03d96dd72"

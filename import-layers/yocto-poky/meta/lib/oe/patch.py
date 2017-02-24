@@ -117,43 +117,50 @@ class PatchSet(object):
                 return None
             return os.sep.join(filesplit[striplevel:])
 
-        copiedmode = False
-        filelist = []
-        with open(patchfile) as f:
-            for line in f:
-                if line.startswith('--- '):
-                    patchpth = patchedpath(line)
-                    if not patchpth:
-                        break
-                    if copiedmode:
-                        addedfile = patchpth
-                    else:
-                        removedfile = patchpth
-                elif line.startswith('+++ '):
-                    addedfile = patchedpath(line)
-                    if not addedfile:
-                        break
-                elif line.startswith('*** '):
-                    copiedmode = True
-                    removedfile = patchedpath(line)
-                    if not removedfile:
-                        break
-                else:
-                    removedfile = None
-                    addedfile = None
+        for encoding in ['utf-8', 'latin-1']:
+            try:
+                copiedmode = False
+                filelist = []
+                with open(patchfile) as f:
+                    for line in f:
+                        if line.startswith('--- '):
+                            patchpth = patchedpath(line)
+                            if not patchpth:
+                                break
+                            if copiedmode:
+                                addedfile = patchpth
+                            else:
+                                removedfile = patchpth
+                        elif line.startswith('+++ '):
+                            addedfile = patchedpath(line)
+                            if not addedfile:
+                                break
+                        elif line.startswith('*** '):
+                            copiedmode = True
+                            removedfile = patchedpath(line)
+                            if not removedfile:
+                                break
+                        else:
+                            removedfile = None
+                            addedfile = None
 
-                if addedfile and removedfile:
-                    if removedfile == '/dev/null':
-                        mode = 'A'
-                    elif addedfile == '/dev/null':
-                        mode = 'D'
-                    else:
-                        mode = 'M'
-                    if srcdir:
-                        fullpath = os.path.abspath(os.path.join(srcdir, addedfile))
-                    else:
-                        fullpath = addedfile
-                    filelist.append((fullpath, mode))
+                        if addedfile and removedfile:
+                            if removedfile == '/dev/null':
+                                mode = 'A'
+                            elif addedfile == '/dev/null':
+                                mode = 'D'
+                            else:
+                                mode = 'M'
+                            if srcdir:
+                                fullpath = os.path.abspath(os.path.join(srcdir, addedfile))
+                            else:
+                                fullpath = addedfile
+                            filelist.append((fullpath, mode))
+            except UnicodeDecodeError:
+                continue
+            break
+        else:
+            raise PatchError('Unable to decode %s' % patchfile)
 
         return filelist
 
@@ -274,30 +281,43 @@ class GitApplyTree(PatchTree):
 
     def __init__(self, dir, d):
         PatchTree.__init__(self, dir, d)
+        self.commituser = d.getVar('PATCH_GIT_USER_NAME', True)
+        self.commitemail = d.getVar('PATCH_GIT_USER_EMAIL', True)
 
     @staticmethod
     def extractPatchHeader(patchfile):
         """
         Extract just the header lines from the top of a patch file
         """
-        lines = []
-        with open(patchfile, 'r') as f:
-            for line in f.readlines():
-                if line.startswith('Index: ') or line.startswith('diff -') or line.startswith('---'):
-                    break
-                lines.append(line)
+        for encoding in ['utf-8', 'latin-1']:
+            lines = []
+            try:
+                with open(patchfile, 'r', encoding=encoding) as f:
+                    for line in f:
+                        if line.startswith('Index: ') or line.startswith('diff -') or line.startswith('---'):
+                            break
+                        lines.append(line)
+            except UnicodeDecodeError:
+                continue
+            break
+        else:
+            raise PatchError('Unable to find a character encoding to decode %s' % patchfile)
         return lines
 
     @staticmethod
     def decodeAuthor(line):
         from email.header import decode_header
         authorval = line.split(':', 1)[1].strip().replace('"', '')
-        return decode_header(authorval)[0][0]
+        result =  decode_header(authorval)[0][0]
+        if hasattr(result, 'decode'):
+            result = result.decode('utf-8')
+        return result
 
     @staticmethod
     def interpretPatchHeader(headerlines):
         import re
         author_re = re.compile('[\S ]+ <\S+@\S+\.\S+>')
+        from_commit_re = re.compile('^From [a-z0-9]{40} .*')
         outlines = []
         author = None
         date = None
@@ -327,11 +347,39 @@ class GitApplyTree(PatchTree):
                 # git is fussy about author formatting i.e. it must be Name <email@domain>
                 if author_re.match(authorval):
                     author = authorval
+            elif from_commit_re.match(line):
+                # We don't want the From <commit> line - if it's present it will break rebasing
+                continue
             outlines.append(line)
+
+        if not subject:
+            firstline = None
+            for line in headerlines:
+                line = line.strip()
+                if firstline:
+                    if line:
+                        # Second line is not blank, the first line probably isn't usable
+                        firstline = None
+                    break
+                elif line:
+                    firstline = line
+            if firstline and not firstline.startswith(('#', 'Index:', 'Upstream-Status:')) and len(firstline) < 100:
+                subject = firstline
+
         return outlines, author, date, subject
 
     @staticmethod
-    def prepareCommit(patchfile):
+    def gitCommandUserOptions(cmd, commituser=None, commitemail=None, d=None):
+        if d:
+            commituser = d.getVar('PATCH_GIT_USER_NAME', True)
+            commitemail = d.getVar('PATCH_GIT_USER_EMAIL', True)
+        if commituser:
+            cmd += ['-c', 'user.name="%s"' % commituser]
+        if commitemail:
+            cmd += ['-c', 'user.email="%s"' % commitemail]
+
+    @staticmethod
+    def prepareCommit(patchfile, commituser=None, commitemail=None):
         """
         Prepare a git commit command line based on the header from a patch file
         (typically this is useful for patches that cannot be applied with "git am" due to formatting)
@@ -340,21 +388,24 @@ class GitApplyTree(PatchTree):
         # Process patch header and extract useful information
         lines = GitApplyTree.extractPatchHeader(patchfile)
         outlines, author, date, subject = GitApplyTree.interpretPatchHeader(lines)
-        if not author or not subject:
+        if not author or not subject or not date:
             try:
-                shellcmd = ["git", "log", "--format=email", "--diff-filter=A", "--", patchfile]
+                shellcmd = ["git", "log", "--format=email", "--follow", "--diff-filter=A", "--", patchfile]
                 out = runcmd(["sh", "-c", " ".join(shellcmd)], os.path.dirname(patchfile))
             except CmdError:
                 out = None
             if out:
                 _, newauthor, newdate, newsubject = GitApplyTree.interpretPatchHeader(out.splitlines())
-                if not author or not date:
-                    # These really need to go together
+                if not author:
+                    # If we're setting the author then the date should be set as well
                     author = newauthor
+                    date = newdate
+                elif not date:
+                    # If we don't do this we'll get the current date, at least this will be closer
                     date = newdate
                 if not subject:
                     subject = newsubject
-        if subject:
+        if subject and outlines and not outlines[0].strip() == subject:
             outlines.insert(0, '%s\n\n' % subject.strip())
 
         # Write out commit message to a file
@@ -363,7 +414,9 @@ class GitApplyTree(PatchTree):
             for line in outlines:
                 tf.write(line)
         # Prepare git command
-        cmd = ["git", "commit", "-F", tmpfile]
+        cmd = ["git"]
+        GitApplyTree.gitCommandUserOptions(cmd, commituser, commitemail)
+        cmd += ["commit", "-F", tmpfile]
         # git doesn't like plain email addresses as authors
         if author and '<' in author:
             cmd.append('--author="%s"' % author)
@@ -384,16 +437,24 @@ class GitApplyTree(PatchTree):
             out = runcmd(["sh", "-c", " ".join(shellcmd)], tree)
             if out:
                 for srcfile in out.split():
-                    patchlines = []
-                    outfile = None
-                    with open(srcfile, 'r') as f:
-                        for line in f:
-                            if line.startswith(GitApplyTree.patch_line_prefix):
-                                outfile = line.split()[-1].strip()
-                                continue
-                            if line.startswith(GitApplyTree.ignore_commit_prefix):
-                                continue
-                            patchlines.append(line)
+                    for encoding in ['utf-8', 'latin-1']:
+                        patchlines = []
+                        outfile = None
+                        try:
+                            with open(srcfile, 'r', encoding=encoding) as f:
+                                for line in f:
+                                    if line.startswith(GitApplyTree.patch_line_prefix):
+                                        outfile = line.split()[-1].strip()
+                                        continue
+                                    if line.startswith(GitApplyTree.ignore_commit_prefix):
+                                        continue
+                                    patchlines.append(line)
+                        except UnicodeDecodeError:
+                            continue
+                        break
+                    else:
+                        raise PatchError('Unable to find a character encoding to decode %s' % srcfile)
+
                     if not outfile:
                         outfile = os.path.basename(srcfile)
                     with open(os.path.join(outdir, outfile), 'w') as of:
@@ -434,12 +495,14 @@ class GitApplyTree(PatchTree):
             # change other places which read it back
             f.write('echo >> $1\n')
             f.write('echo "%s: $PATCHFILE" >> $1\n' % GitApplyTree.patch_line_prefix)
-        os.chmod(commithook, 0755)
+        os.chmod(commithook, 0o755)
         shutil.copy2(commithook, applyhook)
         try:
             patchfilevar = 'PATCHFILE="%s"' % os.path.basename(patch['file'])
             try:
-                shellcmd = [patchfilevar, "git", "--work-tree=%s" % reporoot, "am", "-3", "--keep-cr", "-p%s" % patch['strippath']]
+                shellcmd = [patchfilevar, "git", "--work-tree=%s" % reporoot]
+                self.gitCommandUserOptions(shellcmd, self.commituser, self.commitemail)
+                shellcmd += ["am", "-3", "--keep-cr", "-p%s" % patch['strippath']]
                 return _applypatchhelper(shellcmd, patch, force, reverse, run)
             except CmdError:
                 # Need to abort the git am, or we'll still be within it at the end
@@ -469,7 +532,7 @@ class GitApplyTree(PatchTree):
                 shellcmd = ["git", "reset", "HEAD", self.patchdir]
                 output += runcmd(["sh", "-c", " ".join(shellcmd)], self.dir)
                 # Commit the result
-                (tmpfile, shellcmd) = self.prepareCommit(patch['file'])
+                (tmpfile, shellcmd) = self.prepareCommit(patch['file'], self.commituser, self.commitemail)
                 try:
                     shellcmd.insert(0, patchfilevar)
                     output += runcmd(["sh", "-c", " ".join(shellcmd)], self.dir)
@@ -672,7 +735,7 @@ class UserResolver(Resolver):
                 f.write("echo 'Run \"quilt refresh\" when patch is corrected, press CTRL+D to exit.'\n")
                 f.write("echo ''\n")
                 f.write(" ".join(patchcmd) + "\n")
-            os.chmod(rcfile, 0775)
+            os.chmod(rcfile, 0o775)
 
             self.terminal("bash --rcfile " + rcfile, 'Patch Rejects: Please fix patch rejects manually', self.patchset.d)
 

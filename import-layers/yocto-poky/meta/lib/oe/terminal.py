@@ -25,9 +25,7 @@ class Registry(oe.classutils.ClassRegistry):
         return bool(cls.command)
 
 
-class Terminal(Popen):
-    __metaclass__ = Registry
-
+class Terminal(Popen, metaclass=Registry):
     def __init__(self, sh_cmd, title=None, env=None, d=None):
         fmt_sh_cmd = self.format_command(sh_cmd, title)
         try:
@@ -41,7 +39,7 @@ class Terminal(Popen):
 
     def format_command(self, sh_cmd, title):
         fmt = {'title': title or 'Terminal', 'command': sh_cmd}
-        if isinstance(self.command, basestring):
+        if isinstance(self.command, str):
             return shlex.split(self.command.format(**fmt))
         else:
             return [element.format(**fmt) for element in self.command]
@@ -53,7 +51,7 @@ class XTerminal(Terminal):
             raise UnsupportedTerminal(self.name)
 
 class Gnome(XTerminal):
-    command = 'gnome-terminal -t "{title}" --disable-factory -x {command}'
+    command = 'gnome-terminal -t "{title}" -x {command}'
     priority = 2
 
     def __init__(self, sh_cmd, title=None, env=None, d=None):
@@ -63,12 +61,28 @@ class Gnome(XTerminal):
         # Once fixed on the gnome-terminal project, this should be removed.
         if os.getenv('LC_ALL'): os.putenv('LC_ALL','')
 
-        # Check version
-        vernum = check_terminal_version("gnome-terminal")
-        if vernum and LooseVersion(vernum) >= '3.10':
-            logger.debug(1, 'Gnome-Terminal 3.10 or later does not support --disable-factory')
-            self.command = 'gnome-terminal -t "{title}" -x {command}'
-        XTerminal.__init__(self, sh_cmd, title, env, d)
+        # We need to know when the command completes but gnome-terminal gives us no way 
+        # to do this. We therefore write the pid to a file using a "phonehome" wrapper
+        # script, then monitor the pid until it exits. Thanks gnome!
+        import tempfile
+        pidfile = tempfile.NamedTemporaryFile(delete = False).name
+        try:
+            sh_cmd = "oe-gnome-terminal-phonehome " + pidfile + " " + sh_cmd
+            XTerminal.__init__(self, sh_cmd, title, env, d)
+            while os.stat(pidfile).st_size <= 0:
+                continue
+            with open(pidfile, "r") as f:
+                pid = int(f.readline())
+        finally:
+            os.unlink(pidfile)
+
+        import time
+        while True:
+            try:
+                os.kill(pid, 0)
+                time.sleep(0.1)
+            except OSError:
+               return
 
 class Mate(XTerminal):
     command = 'mate-terminal -t "{title}" -x {command}'
@@ -248,7 +262,7 @@ def check_terminal_version(terminalName):
         newenv["LANG"] = "C"
         p = sub.Popen(['sh', '-c', cmdversion], stdout=sub.PIPE, stderr=sub.PIPE, env=newenv)
         out, err = p.communicate()
-        ver_info = out.rstrip().split('\n')
+        ver_info = out.decode().rstrip().split('\n')
     except OSError as exc:
         import errno
         if exc.errno == errno.ENOENT:

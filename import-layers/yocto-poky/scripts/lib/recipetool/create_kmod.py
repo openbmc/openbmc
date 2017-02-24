@@ -53,7 +53,7 @@ class KernelModuleRecipeHandler(RecipeHandler):
                             break
                 else:
                     continue
-                with open(cfile, 'r') as f:
+                with open(cfile, 'r', errors='surrogateescape') as f:
                     for line in f:
                         if module_inc_re.match(line.strip()):
                             is_module = True
@@ -73,7 +73,7 @@ class KernelModuleRecipeHandler(RecipeHandler):
             in_install = False
             in_compile = False
             install_target = None
-            with open(makefile, 'r') as f:
+            with open(makefile, 'r', errors='surrogateescape') as f:
                 for line in f:
                     if line.startswith('install:'):
                         if not install_lines:

@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=4d92cd373abda3937c2bc47fbc49d
 DEPENDS = "virtual/libc gdb-cross-${TARGET_ARCH} qemu-native qemu-helper-native unfs3-native"
 PR = "r3"
 
-inherit meta toolchain-scripts
+inherit meta toolchain-scripts nopackages
 
 do_populate_ide_support () {
   toolchain_create_tree_env_script

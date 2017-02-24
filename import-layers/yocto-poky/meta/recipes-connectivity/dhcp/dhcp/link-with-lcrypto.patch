@@ -5,14 +5,20 @@ From 4.2.0 final release, -lcrypto check was removed and we compile static libra
 from bind that are linked to libcrypto. This is why i added a patch in order to add
 -lcrypto to LIBS.
 
-Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
 Upstream-Status: Pending
+Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
 
-Index: dhcp-4.2.3-P2-r0/dhcp-4.2.3-P2/configure.ac
-===================================================================
---- dhcp-4.2.3-P2.orig/configure.ac	2012-02-02 18:04:20.843023196 +0200
-+++ dhcp-4.2.3-P2/configure.ac	2012-02-02 17:58:16.000000000 +0200
-@@ -456,6 +456,10 @@
+Rebase to 4.3.4
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.ac | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 097b0c3..726c88e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -584,6 +584,10 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[void foo() __attribute__((noreturn));
  # Look for optional headers.
  AC_CHECK_HEADERS(sys/socket.h net/if_dl.h net/if6.h regex.h)
  
@@ -23,3 +29,6 @@ Index: dhcp-4.2.3-P2-r0/dhcp-4.2.3-P2/configure.ac
  # Solaris needs some libraries for functions
  AC_SEARCH_LIBS(socket, [socket])
  AC_SEARCH_LIBS(inet_ntoa, [nsl])
+-- 
+2.8.1
+

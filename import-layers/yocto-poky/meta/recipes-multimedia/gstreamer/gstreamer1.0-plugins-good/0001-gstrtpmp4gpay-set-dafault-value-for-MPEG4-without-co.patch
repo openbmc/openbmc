@@ -17,7 +17,7 @@ diff --git a/gst/rtp/gstrtpmp4gpay.c b/gst/rtp/gstrtpmp4gpay.c
 index 7913d9a..1749d39 100644
 --- a/gst/rtp/gstrtpmp4gpay.c
 +++ b/gst/rtp/gstrtpmp4gpay.c
-@@ -390,6 +390,7 @@ gst_rtp_mp4g_pay_setcaps (GstRTPBasePayload * payload, GstCaps * caps)
+@@ -391,6 +391,7 @@ gst_rtp_mp4g_pay_setcaps (GstRTPBasePayload * payload, GstCaps * caps)
    const GValue *codec_data;
    const gchar *media_type = NULL;
    gboolean res;
@@ -25,7 +25,7 @@ index 7913d9a..1749d39 100644
  
    rtpmp4gpay = GST_RTP_MP4G_PAY (payload);
  
-@@ -400,7 +401,6 @@ gst_rtp_mp4g_pay_setcaps (GstRTPBasePayload * payload, GstCaps * caps)
+@@ -401,7 +402,6 @@ gst_rtp_mp4g_pay_setcaps (GstRTPBasePayload * payload, GstCaps * caps)
      GST_LOG_OBJECT (rtpmp4gpay, "got codec_data");
      if (G_VALUE_TYPE (codec_data) == GST_TYPE_BUFFER) {
        GstBuffer *buffer;
@@ -33,7 +33,7 @@ index 7913d9a..1749d39 100644
  
        buffer = gst_value_get_buffer (codec_data);
        GST_LOG_OBJECT (rtpmp4gpay, "configuring codec_data");
-@@ -426,6 +426,23 @@ gst_rtp_mp4g_pay_setcaps (GstRTPBasePayload * payload, GstCaps * caps)
+@@ -427,6 +427,23 @@ gst_rtp_mp4g_pay_setcaps (GstRTPBasePayload * payload, GstCaps * caps)
  
        rtpmp4gpay->config = gst_buffer_copy (buffer);
      }

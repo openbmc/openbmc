@@ -29,7 +29,7 @@ def emit_terminal_func(command, envdata, d):
         bb.data.emit_func(cmd_func, script, envdata)
         script.write(cmd_func)
         script.write("\n")
-    os.chmod(runfile, 0755)
+    os.chmod(runfile, 0o755)
 
     return runfile
 

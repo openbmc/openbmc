@@ -16,8 +16,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with pybootchartgui. If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import print_function
-
 import sys
 import os
 import optparse
@@ -149,9 +147,7 @@ def main(argv=None):
 					for time in res[4]:
 						if time is not None:
 							# output as ms
-							print(time * 10, file=f)
-						else:
-							print(file=f)
+							f.write(time * 10)
 				finally:
 					f.close()
 			filename = _get_filename(options.output)

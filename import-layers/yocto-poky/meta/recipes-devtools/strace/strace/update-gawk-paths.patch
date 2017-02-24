@@ -12,19 +12,20 @@ Upstream-Status: Inappropriate [configuration]
 
 Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
 ---
- mpers.awk                 | 2 +-
- tests/caps.awk            | 2 +-
- tests/match.awk           | 2 +-
- tests/net-yy-accept.awk   | 2 +-
- tests/net-yy-connect.awk  | 2 +-
- tests/sigaction.awk       | 2 +-
- tests/uid.awk             | 2 +-
- tests/unix-yy-accept.awk  | 2 +-
- tests/unix-yy-connect.awk | 2 +-
- 9 files changed, 9 insertions(+), 9 deletions(-)
+ mpers.awk                | 2 +-
+ tests-m32/caps.awk       | 2 +-
+ tests-m32/match.awk      | 2 +-
+ tests-m32/sigaction.awk  | 2 +-
+ tests-mx32/caps.awk      | 2 +-
+ tests-mx32/match.awk     | 2 +-
+ tests-mx32/sigaction.awk | 2 +-
+ tests/caps.awk           | 2 +-
+ tests/match.awk          | 2 +-
+ tests/sigaction.awk      | 2 +-
+ 10 files changed, 10 insertions(+), 10 deletions(-)
 
 diff --git a/mpers.awk b/mpers.awk
-index 73bf0b0..50e6c16 100644
+index 99248c5..ff10520 100644
 --- a/mpers.awk
 +++ b/mpers.awk
 @@ -1,4 +1,4 @@
@@ -32,17 +33,77 @@ index 73bf0b0..50e6c16 100644
 +#!/usr/bin/gawk
  #
  # Copyright (c) 2015 Elvira Khabirova <lineprinter0@gmail.com>
- # Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
-diff --git a/tests/caps.awk b/tests/caps.awk
-index bad8b0f..845f37c 100644
---- a/tests/caps.awk
-+++ b/tests/caps.awk
+ # Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
+diff --git a/tests-m32/caps.awk b/tests-m32/caps.awk
+index 67003ac..a66f1f0 100644
+--- a/tests-m32/caps.awk
++++ b/tests-m32/caps.awk
+@@ -1,4 +1,4 @@
+-#!/bin/gawk
++#!/usr/bin/gawk
+ #
+ # This file is part of caps strace test.
+ #
+diff --git a/tests-m32/match.awk b/tests-m32/match.awk
+index abfbae9..f2740bf 100644
+--- a/tests-m32/match.awk
++++ b/tests-m32/match.awk
 @@ -1,4 +1,4 @@
 -#!/bin/gawk
 +#!/usr/bin/gawk
  #
  # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
  # All rights reserved.
+diff --git a/tests-m32/sigaction.awk b/tests-m32/sigaction.awk
+index 5c6b6d0..3e14464 100644
+--- a/tests-m32/sigaction.awk
++++ b/tests-m32/sigaction.awk
+@@ -1,4 +1,4 @@
+-#!/bin/gawk
++#!/usr/bin/gawk
+ #
+ # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
+ # All rights reserved.
+diff --git a/tests-mx32/caps.awk b/tests-mx32/caps.awk
+index 67003ac..a66f1f0 100644
+--- a/tests-mx32/caps.awk
++++ b/tests-mx32/caps.awk
+@@ -1,4 +1,4 @@
+-#!/bin/gawk
++#!/usr/bin/gawk
+ #
+ # This file is part of caps strace test.
+ #
+diff --git a/tests-mx32/match.awk b/tests-mx32/match.awk
+index abfbae9..f2740bf 100644
+--- a/tests-mx32/match.awk
++++ b/tests-mx32/match.awk
+@@ -1,4 +1,4 @@
+-#!/bin/gawk
++#!/usr/bin/gawk
+ #
+ # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
+ # All rights reserved.
+diff --git a/tests-mx32/sigaction.awk b/tests-mx32/sigaction.awk
+index 5c6b6d0..3e14464 100644
+--- a/tests-mx32/sigaction.awk
++++ b/tests-mx32/sigaction.awk
+@@ -1,4 +1,4 @@
+-#!/bin/gawk
++#!/usr/bin/gawk
+ #
+ # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
+ # All rights reserved.
+diff --git a/tests/caps.awk b/tests/caps.awk
+index 67003ac..a66f1f0 100644
+--- a/tests/caps.awk
++++ b/tests/caps.awk
+@@ -1,4 +1,4 @@
+-#!/bin/gawk
++#!/usr/bin/gawk
+ #
+ # This file is part of caps strace test.
+ #
 diff --git a/tests/match.awk b/tests/match.awk
 index abfbae9..f2740bf 100644
 --- a/tests/match.awk
@@ -53,26 +114,6 @@ index abfbae9..f2740bf 100644
  #
  # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
  # All rights reserved.
-diff --git a/tests/net-yy-accept.awk b/tests/net-yy-accept.awk
-index fed3e30..e916ab0 100644
---- a/tests/net-yy-accept.awk
-+++ b/tests/net-yy-accept.awk
-@@ -1,4 +1,4 @@
--#!/bin/gawk
-+#!/usr/bin/gawk
- #
- # Copyright (c) 2014 Masatake YAMATO <yamato@redhat.com>
- # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
-diff --git a/tests/net-yy-connect.awk b/tests/net-yy-connect.awk
-index f4dcf91..b3cec8c 100644
---- a/tests/net-yy-connect.awk
-+++ b/tests/net-yy-connect.awk
-@@ -1,4 +1,4 @@
--#!/bin/gawk
-+#!/usr/bin/gawk
- #
- # Copyright (c) 2014 Masatake YAMATO <yamato@redhat.com>
- # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
 diff --git a/tests/sigaction.awk b/tests/sigaction.awk
 index 5c6b6d0..3e14464 100644
 --- a/tests/sigaction.awk
@@ -83,36 +124,3 @@ index 5c6b6d0..3e14464 100644
  #
  # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
  # All rights reserved.
-diff --git a/tests/uid.awk b/tests/uid.awk
-index a56c5be..67b0749 100644
---- a/tests/uid.awk
-+++ b/tests/uid.awk
-@@ -1,4 +1,4 @@
--#!/bin/gawk
-+#!/usr/bin/gawk
- #
- # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
- # All rights reserved.
-diff --git a/tests/unix-yy-accept.awk b/tests/unix-yy-accept.awk
-index 4ed60e4..2a9d9c0 100644
---- a/tests/unix-yy-accept.awk
-+++ b/tests/unix-yy-accept.awk
-@@ -1,4 +1,4 @@
--#!/bin/gawk
-+#!/usr/bin/gawk
- #
- # Copyright (c) 2014 Masatake YAMATO <yamato@redhat.com>
- # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
-diff --git a/tests/unix-yy-connect.awk b/tests/unix-yy-connect.awk
-index 262bf2e..c809dfa 100644
---- a/tests/unix-yy-connect.awk
-+++ b/tests/unix-yy-connect.awk
-@@ -1,4 +1,4 @@
--#!/bin/gawk
-+#!/usr/bin/gawk
- #
- # Copyright (c) 2014 Masatake YAMATO <yamato@redhat.com>
- # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
--- 
-1.9.1
-

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # ex:ts=4:sw=4:sts=4:et
 # -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 #
@@ -30,120 +30,128 @@
 # Tom Zanussi <tom.zanussi (at] intel.com>
 #
 
-__version__ = "0.1.0"
-
 import os
 import sys
-import optparse
+import argparse
 import logging
 
-scripts_path = os.path.abspath(os.path.dirname(os.path.abspath(sys.argv[0])))
-lib_path = scripts_path + '/lib'
-sys.path = sys.path + [lib_path]
+scripts_path = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0, scripts_path + '/lib')
+import argparse_oe
 
 from bsp.help import *
 from bsp.engine import *
 
 
-def yocto_bsp_create_subcommand(args, usage_str):
+def do_create_bsp(args):
     """
     Command-line handling for BSP creation.  The real work is done by
     bsp.engine.yocto_bsp_create()
     """
-    parser = optparse.OptionParser(usage = usage_str)
-
-    parser.add_option("-o", "--outdir", dest = "outdir", action = "store",
-                      help = "name of BSP dir to create")
-    parser.add_option("-i", "--infile", dest = "properties_file", action = "store",
-                      help = "name of file containing the values for BSP properties as a JSON file")
-    parser.add_option("-c", "--codedump", dest = "codedump", action = "store_true",
-                      default = False, help = "dump the generated code to bspgen.out")
-    parser.add_option("-s", "--skip-git-check", dest = "git_check", action = "store_false",
-                      default = True, help = "skip the git connectivity check")
-    (options, args) = parser.parse_args(args)
-
-    if len(args) != 2:
-        logging.error("Wrong number of arguments, exiting\n")
-        parser.print_help()
-        sys.exit(1)
-
-    machine = args[0]
-    karch = args[1]
-
-    if options.outdir:
-        bsp_output_dir = options.outdir
+    if args.outdir:
+        bsp_output_dir = args.outdir
     else:
-        bsp_output_dir = "meta-" + machine
+        bsp_output_dir = "meta-" + args.bspname
 
-    if options.git_check and not options.properties_file:
-        print "Checking basic git connectivity..."
+    if args.git_check and not args.properties_file:
+        print("Checking basic git connectivity...")
         if not verify_git_repo(GIT_CHECK_URI):
-            print "Couldn't verify git connectivity, exiting\n"
-            print "Details: couldn't access %s" % GIT_CHECK_URI
-            print "         (this most likely indicates a network connectivity problem or"
-            print "         a misconfigured git intallation)"
+            print("Couldn't verify git connectivity, exiting\n")
+            print("Details: couldn't access %s" % GIT_CHECK_URI)
+            print("         (this most likely indicates a network connectivity problem or")
+            print("         a misconfigured git intallation)")
             sys.exit(1)
         else:
-            print "Done.\n"
+            print("Done.\n")
 
-    yocto_bsp_create(machine, karch, scripts_path, bsp_output_dir, options.codedump, options.properties_file)
+    yocto_bsp_create(args.bspname, args.karch, scripts_path, bsp_output_dir, args.codedump, args.properties_file)
 
 
-def yocto_bsp_list_subcommand(args, usage_str):
+def do_list_bsp(args):
     """
     Command-line handling for listing available BSP properties and
     values.  The real work is done by bsp.engine.yocto_bsp_list()
     """
-    parser = optparse.OptionParser(usage = usage_str)
+    yocto_bsp_list(args, scripts_path)
 
-    parser.add_option("-o", "--outfile", action = "store", dest = "properties_file",
-                      help = "dump the possible values for BSP properties to a JSON file")
+def do_help_bsp(args):
+    """
+    Command-line help tool
+    """
+    help_text = command_help.get(args.subcommand)
+    pager = subprocess.Popen('less', stdin=subprocess.PIPE)
+    pager.communicate(bytes(help_text,'UTF-8'))
 
-    (options, args) = parser.parse_args(args)
-
-    if not yocto_bsp_list(args, scripts_path, options.properties_file):
-        logging.error("Bad list arguments, exiting\n")
-        parser.print_help()
-        sys.exit(1)
-
-
-subcommands = {
-    "create": [yocto_bsp_create_subcommand,
-               yocto_bsp_create_usage,
-               yocto_bsp_create_help],
-    "list":   [yocto_bsp_list_subcommand,
-               yocto_bsp_list_usage,
-               yocto_bsp_list_help],
+command_help = {
+    "create": yocto_bsp_create_help,
+    "list":  yocto_bsp_list_help
 }
 
 
 def start_logging(loglevel):
-    logging.basicConfig(filname = 'yocto-bsp.log', filemode = 'w', level=loglevel)
+    logging.basicConfig(filename = 'yocto-bsp.log', filemode = 'w', level=loglevel)
 
 
 def main():
-    parser = optparse.OptionParser(version = "yocto-bsp version %s" % __version__,
-                                   usage = yocto_bsp_usage)
+    parser = argparse_oe.ArgumentParser(description='Create a customized Yocto BSP layer.',
+                      epilog="See '%(prog)s help <subcommand>' for more information on a specific command.")
 
-    parser.disable_interspersed_args()
-    parser.add_option("-D", "--debug", dest = "debug", action = "store_true",
+    parser.add_argument("-D", "--debug", action = "store_true",
                       default = False, help = "output debug information")
+    subparsers = parser.add_subparsers(title='subcommands', metavar='<subcommand>')
+    subparsers.required = True
 
-    (options, args) = parser.parse_args()
+    create_parser = subparsers.add_parser('create', help='Create a new Yocto BSP',
+                                          description='Create a new Yocto BSP')
+    create_parser.add_argument('bspname', metavar='bsp-name', help='name for the new BSP')
+    create_parser.add_argument('karch', help='kernel architecture')
+    create_parser.add_argument("-o", "--outdir", help = "name of BSP dir to create")
+    create_parser.add_argument("-i", "--infile", dest = "properties_file",
+                      help = "name of file containing the values for BSP properties as a JSON file")
+    create_parser.add_argument("-c", "--codedump", action = "store_true", default = False,
+                      help = "dump the generated code to bspgen.out")
+    create_parser.add_argument("-s", "--skip-git-check", dest = "git_check", action = "store_false",
+                      default = True, help = "skip the git connectivity check")
+    create_parser.set_defaults(func=do_create_bsp)
+
+
+    list_parser = subparsers.add_parser('list', help='List available values for options and BSP properties')
+    list_parser.add_argument('karch', help='kernel architecture')
+    prop_group = list_parser.add_mutually_exclusive_group()
+    prop_group.add_argument("--properties", action = "store_true", default = False,
+                      help = "list all properties for the kernel architecture")
+    prop_group.add_argument("--property", help = "list available values for the property")
+    list_parser.add_argument("-o", "--outfile", dest = "properties_file",
+                      help = "dump the possible values for BSP properties to a JSON file")
+
+    list_parser.set_defaults(func=do_list_bsp)
+
+    help_parser = subparsers.add_parser('help',
+                      description='This command displays detailed help for the specified subcommand.')
+    help_parser.add_argument('subcommand', nargs='?')
+    help_parser.set_defaults(func=do_help_bsp)
+
+    args = parser.parse_args()
 
     loglevel = logging.INFO
-    if options.debug:
+    if args.debug:
         loglevel = logging.DEBUG
     start_logging(loglevel)
 
-    if len(args):
-        if args[0] == "help":
-            if len(args) == 1:
-                parser.print_help()
-                sys.exit()
+    if args._subparser_name == "list":
+        if not args.karch == "karch" and not args.properties and not args.property:
+            print ("yocto-bsp list: error: one of the arguments --properties --property is required")
+            list_parser.print_help()
 
-    invoke_subcommand(args, parser, yocto_bsp_help_usage, subcommands)
+    if args._subparser_name == "help":
+        if not args.subcommand:
+            parser.print_help()
+            return 0
+        elif not command_help.get(args.subcommand):
+            print ("yocto-bsp help: No manual entry for %s" % args.subcommand)
+            return 1
 
+    return args.func(args)
 
 if __name__ == "__main__":
     try:
@@ -153,4 +161,3 @@ if __name__ == "__main__":
         import traceback
         traceback.print_exc()
     sys.exit(ret)
-

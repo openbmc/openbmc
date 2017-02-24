@@ -133,7 +133,7 @@ def run_shell_cmd(command, cwd=None):
             err = "command: %s \n%s" % (command, out)
         else:
             err = "command: %s \n%s" % (command, err)
-        config.logger.warn("_shellcmd: error \n%s\n%s", out, err)
+        config.logger.warning("_shellcmd: error \n%s\n%s", out, err)
         raise ShellCmdException(err)
     else:
         #config.logger.debug("localhostbecontroller: shellcmd success\n%s" % out)

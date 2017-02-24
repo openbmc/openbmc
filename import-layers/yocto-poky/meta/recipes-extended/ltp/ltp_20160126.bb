@@ -62,6 +62,7 @@ SRC_URI = "git://github.com/linux-test-project/ltp.git \
            file://0033-shmat1-Cover-GNU-specific-code-under-__USE_GNU.patch \
            file://0034-periodic_output.patch \
            file://0035-fix-test_proc_kill-hang.patch \
+           file://0001-testcases-network-nfsv4-acl-acl1.c-Security-fix-on-s.patch \
            "
 
 S = "${WORKDIR}/git"
@@ -90,6 +91,14 @@ do_compile_prepend () {
 do_install(){
     install -d ${D}/opt/ltp/
     oe_runmake DESTDIR=${D} SKIP_IDCHECK=1 install
+
+    # fixup not deploy STPfailure_report.pl to avoid confusing about it fails to run
+    # as it lacks dependency on some perl moudle such as LWP::Simple
+    # And this script previously works as a tool for analyzing failures from LTP
+    # runs on the OSDL's Scaleable Test Platform (STP) and it mainly accesses
+    # http://khack.osdl.org to retrieve ltp test results run on
+    # OSDL's Scaleable Test Platform, but now http://khack.osdl.org unaccessible
+    rm -rf ${D}/opt/ltp/bin/STPfailure_report.pl
 
     # Copy POSIX test suite into ${D}/opt/ltp/testcases by manual
     cp -r testcases/open_posix_testsuite ${D}/opt/ltp/testcases

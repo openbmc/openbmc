@@ -12,6 +12,7 @@ LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 SRC_URI = "ftp://ftp.gnu.org/gnu/grub/grub-${PV}.tar.gz \
+           file://grub-module-explicitly-keeps-symbole-.module_license.patch \
            file://grub-2.00-fpmath-sse-387-fix.patch \
            file://check-if-liblzma-is-disabled.patch \
            file://fix-issue-with-flex-2.5.37.patch \
@@ -30,9 +31,10 @@ SRC_URI = "ftp://ftp.gnu.org/gnu/grub/grub-${PV}.tar.gz \
            file://0001-Fix-CVE-2015-8370-Grub2-user-pass-vulnerability.patch \
            file://0001-Remove-direct-_llseek-code-and-require-long-filesyst.patch \
            file://fix-texinfo.patch \
+           file://0001-grub-core-gettext-gettext.c-main_context-secondary_c.patch \
             "
 
-DEPENDS = "flex-native bison-native"
+DEPENDS = "flex-native bison-native autogen-native"
 
 SRC_URI[md5sum] = "e927540b6eda8b024fb0391eeaa4091c"
 SRC_URI[sha256sum] = "65b39a0558f8c802209c574f4d02ca263a804e8a564bc6caf1cd0fd3b3cc11e3"
@@ -59,11 +61,10 @@ do_configure_prepend() {
 	# for its own purposes. Remove the OE versions from the environment to
 	# avoid conflicts.
 	unset TARGET_CPPFLAGS TARGET_CFLAGS TARGET_CXXFLAGS TARGET_LDFLAGS
+	( cd ${S}
+	${S}/autogen.sh )
 }
 
 # grub and grub-efi's sysroot/${datadir}/grub/grub-mkconfig_lib are
 # conflicted, remove it since no one uses it.
-SYSROOT_PREPROCESS_FUNCS_class-target += "remove_sysroot_mkconfig_lib"
-remove_sysroot_mkconfig_lib() {
-    rm -r "${SYSROOT_DESTDIR}${datadir}/grub/grub-mkconfig_lib"
-}
+SYSROOT_DIRS_BLACKLIST += "${datadir}/grub/grub-mkconfig_lib"

@@ -6,22 +6,20 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=2d5025d4aa3495befef8f17206a5b0a1 \
 
 require avahi.inc
 
-inherit python-dir pythonnative distro_features_check
-ANY_OF_DISTRO_FEATURES = "${GTK2DISTROFEATURES}"
+inherit distro_features_check
+ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 
-PACKAGECONFIG ??= "dbus python"
-PACKAGECONFIG[python] = "--enable-python,--disable-python,python-native python"
-
+SRC_URI += "file://0001-configure.ac-install-GtkBuilder-interface-files-for-.patch"
 SRC_URI[md5sum] = "22b5e705d3eabb31d26f2e1e7b074013"
 SRC_URI[sha256sum] = "d54991185d514a0aba54ebeb408d7575b60f5818a772e28fa0e18b98bc1db454"
 
-DEPENDS += "avahi gtk+ libglade"
+DEPENDS += "avahi"
 
-AVAHI_GTK = "--enable-gtk --disable-gtk3 --disable-pygtk"
+AVAHI_GTK = "gtk3"
 
 S = "${WORKDIR}/avahi-${PV}"
 
-PACKAGES = "${PN} ${PN}-utils ${PN}-dbg ${PN}-dev ${PN}-staticdev ${PN}-doc python-avahi avahi-discover"
+PACKAGES = "${PN} ${PN}-utils ${PN}-dbg ${PN}-dev ${PN}-staticdev ${PN}-doc avahi-discover"
 
 FILES_${PN} = "${libdir}/libavahi-ui*.so.*"
 FILES_${PN}-dev += "${libdir}/libavahi-ui${SOLIBSDEV}"
@@ -29,14 +27,10 @@ FILES_${PN}-staticdev += "${libdir}/libavahi-ui.a"
 
 FILES_${PN}-utils = "${bindir}/b* ${datadir}/applications/b*"
 
-FILES_python-avahi = "${PYTHON_SITEPACKAGES_DIR}/avahi ${PYTHON_SITEPACKAGES_DIR}/avahi_discover"
 FILES_avahi-discover = "${datadir}/applications/avahi-discover.desktop \
-                        ${datadir}/avahi/interfaces/avahi-discover* \
+                        ${datadir}/avahi/interfaces/avahi-discover.ui \
                         ${bindir}/avahi-discover-standalone \
-                        ${datadir}/avahi/interfaces/avahi-discover.glade"
-
-RDEPENDS_python-avahi = "python-core python-dbus"
-
+                        "
 
 do_install_append () {
 	rm ${D}${sysconfdir} -rf

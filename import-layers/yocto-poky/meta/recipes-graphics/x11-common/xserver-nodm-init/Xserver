@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# This script is only needed to make sure /etc/X11/xserver-common
+# can affect XSERVER, ARGS & DPI: otherwise systemd could just use
+# /etc/default/xserver-nodm as EnvironmentFile and sysvinit could just
+# source the same file
+
+. /etc/profile
+
+# load default values for XSERVER, ARGS, DISPLAY...
+. /etc/default/xserver-nodm
+
+# Allow xserver-common to override ARGS, XSERVER, DPI
+if [ -e /etc/X11/xserver-common ] ; then
+    . /etc/X11/xserver-common
+    if [ ! -e $XSERVER ] ; then
+        XSERVER=$(which $XSERVER)
+    fi
+fi
+
+if [ -n "$DPI" ] ; then
+    ARGS="$ARGS -dpi $DPI"
+fi
+
+exec xinit /etc/X11/Xsession -- $XSERVER $DISPLAY $ARGS $*

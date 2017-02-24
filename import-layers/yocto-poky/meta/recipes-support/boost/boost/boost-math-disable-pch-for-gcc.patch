@@ -1,0 +1,31 @@
+From cabfcba1ff7511ffd6b91ca244288d44f585aad2 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Fri, 23 Sep 2016 01:04:50 -0700
+Subject: [PATCH] boost-math: disable pch for gcc
+
+Upstream-Status: Inappropriate [*]
+
+* It's a work around for a defect when build in parallel:
+https://svn.boost.org/trac/boost/ticket/12477
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ libs/math/build/Jamfile.v2 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libs/math/build/Jamfile.v2 b/libs/math/build/Jamfile.v2
+index e19fb2e..82472a7 100644
+--- a/libs/math/build/Jamfile.v2
++++ b/libs/math/build/Jamfile.v2
+@@ -13,7 +13,7 @@ project
+       #<toolset>intel-linux:<pch>off
+       <toolset>intel-darwin:<pch>off
+       <toolset>msvc-7.1:<pch>off
+-      <toolset>gcc,<target-os>windows:<pch>off
++      <toolset>gcc:<pch>off
+       #<toolset>gcc:<cxxflags>-fvisibility=hidden
+       <toolset>intel-linux:<cxxflags>-fvisibility=hidden
+       #<toolset>sun:<cxxflags>-xldscope=hidden
+-- 
+2.7.4
+

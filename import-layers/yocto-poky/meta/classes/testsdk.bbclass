@@ -44,7 +44,7 @@ def run_test_context(CTestContext, d, testdir, tcname, pn, *args):
                 msg += " (skipped=%d)" % skipped
             bb.plain(msg)
         else:
-            raise bb.build.FuncFailed("%s - FAILED - check the task log and the commands log" % pn )
+            bb.fatal("%s - FAILED - check the task log and the commands log" % pn)
 
 def testsdk_main(d):
     import os
@@ -65,7 +65,7 @@ def testsdk_main(d):
     try:
         subprocess.check_output("cd %s; %s <<EOF\n./tc\nY\nEOF" % (sdktestdir, tcname), shell=True)
     except subprocess.CalledProcessError as e:
-        bb.fatal("Couldn't install the SDK:\n%s" % e.output)
+        bb.fatal("Couldn't install the SDK:\n%s" % e.output.decode("utf-8"))
 
     try:
         run_test_context(SDKTestContext, d, sdktestdir, tcname, pn)
@@ -113,10 +113,18 @@ def testsdkext_main(d):
     testdir = d.expand("${WORKDIR}/testsdkext/")
     bb.utils.remove(testdir, True)
     bb.utils.mkdirhier(testdir)
+    sdkdir = os.path.join(testdir, 'tc')
     try:
-        subprocess.check_output("%s -y -d %s/tc" % (tcname, testdir), shell=True)
+        subprocess.check_output("%s -y -d %s" % (tcname, sdkdir), shell=True)
     except subprocess.CalledProcessError as e:
-        bb.fatal("Couldn't install the SDK EXT:\n%s" % e.output)
+        msg = "Couldn't install the extensible SDK:\n%s" % e.output.decode("utf-8")
+        logfn = os.path.join(sdkdir, 'preparing_build_system.log')
+        if os.path.exists(logfn):
+            msg += '\n\nContents of preparing_build_system.log:\n'
+            with open(logfn, 'r') as f:
+                for line in f:
+                    msg += line
+        bb.fatal(msg)
 
     try:
         bb.plain("Running SDK Compatibility tests ...")

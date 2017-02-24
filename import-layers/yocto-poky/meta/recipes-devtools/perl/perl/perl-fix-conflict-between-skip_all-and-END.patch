@@ -1,0 +1,181 @@
+Some Perl tests fail when run on a cross-compiled target machine. Apply
+a slightly tweaked upstream patch to fix the problems. Notes:
+    1. as of 2 Jun 2016, the original patch has been applied to the current
+       EUMM releases, but has not made it into perl core yet.
+    2. when the base perl package is upgraded in Yocto, this patch may need
+       to be replaced by the original upstream version to correctly apply
+       to the current version of ExtUtils-MakeMaker at that time.
+
+[YOCTO #8656]
+
+Upstream-Status: Backport
+
+Signed-off-by: Bill Randle <william.c.randle@intel.com>
+
+From 4a07a3bd18363986112cf2b39dec3c2985353ffb Mon Sep 17 00:00:00 2001
+From: Francois Perrad <francois.perrad@gadz.org>
+Date: Mon, 22 Dec 2014 19:04:34 +0100
+Subject: [PATCH] fix conflict between skip_all and END section
+
+since the commit 430de781809a6be3bcd25a349dc40ce54405ab53
+the test suite fails in cross-compil environment (perl-5.21.6 & perl-5.21.7)
+like this :
+
+    $ ./perl harness -v ../cpan/ExtUtils-MakeMaker/t/INSTALL_BASE.t
+    ../cpan/ExtUtils-MakeMaker/t/INSTALL_BASE.t ..
+    1..0 # SKIP cross-compiling and make not available
+    ok 1 - chdir updir
+    ok 2 - teardown
+    # Looks like you planned 0 tests but ran 2.
+    skipped: cross-compiling and make not available
+
+this commit restores the implicit call of plan() at import time of Test::More
+
+Signed-off-by: Francois Perrad <francois.perrad@gadz.org>
+---
+ cpan/ExtUtils-MakeMaker/t/INSTALL_BASE.t     | 7 ++++---
+ cpan/ExtUtils-MakeMaker/t/PL_FILES.t         | 4 ++--
+ cpan/ExtUtils-MakeMaker/t/basic.t            | 4 ++--
+ cpan/ExtUtils-MakeMaker/t/echo.t             | 6 +++---
+ cpan/ExtUtils-MakeMaker/t/min_perl_version.t | 4 ++--
+ cpan/ExtUtils-MakeMaker/t/pm_to_blib.t       | 4 ++--
+ cpan/ExtUtils-MakeMaker/t/recurs.t           | 4 ++--
+ cpan/ExtUtils-MakeMaker/t/several_authors.t  | 4 ++--
+ 8 files changed, 19 insertions(+), 18 deletions(-)
+
+diff --git a/cpan/ExtUtils-MakeMaker/t/INSTALL_BASE.t b/cpan/ExtUtils-MakeMaker/t/INSTALL_BASE.t
+index f27b62c..3bbb3a6 100644
+--- a/cpan/ExtUtils-MakeMaker/t/INSTALL_BASE.t
++++ b/cpan/ExtUtils-MakeMaker/t/INSTALL_BASE.t
+@@ -15,12 +15,13 @@ $CLEANUP &&= 1; # so always 1 or numerically 0
+ 
+ use MakeMaker::Test::Utils;
+ use MakeMaker::Test::Setup::BFD;
+-use Test::More;
+ use Config;
+ use ExtUtils::MM;
+-plan !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
++use Test::More
++    !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
+     ? (skip_all => "cross-compiling and make not available")
+-    : (tests => 3 + $CLEANUP + @INSTDIRS * (15 + $CLEANUP));
++    : ();
++plan tests => 3 + $CLEANUP + @INSTDIRS * (15 + $CLEANUP);
+ 
+ my $Is_VMS = $^O eq 'VMS';
+ 
+diff --git a/cpan/ExtUtils-MakeMaker/t/PL_FILES.t b/cpan/ExtUtils-MakeMaker/t/PL_FILES.t
+index 0779dbb..85d53a5 100644
+--- a/cpan/ExtUtils-MakeMaker/t/PL_FILES.t
++++ b/cpan/ExtUtils-MakeMaker/t/PL_FILES.t
+@@ -11,9 +11,9 @@ use File::Temp qw[tempdir];
+ use MakeMaker::Test::Setup::PL_FILES;
+ use MakeMaker::Test::Utils;
+ use Config;
+-use Test::More;
+ use ExtUtils::MM;
+-plan !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
++use Test::More
++    !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
+     ? (skip_all => "cross-compiling and make not available")
+     : (tests => 9);
+ 
+diff --git a/cpan/ExtUtils-MakeMaker/t/basic.t b/cpan/ExtUtils-MakeMaker/t/basic.t
+index 3dd66ad..eddf2e9 100644
+--- a/cpan/ExtUtils-MakeMaker/t/basic.t
++++ b/cpan/ExtUtils-MakeMaker/t/basic.t
+@@ -20,9 +20,9 @@ use utf8;
+ use MakeMaker::Test::Utils;
+ use MakeMaker::Test::Setup::BFD;
+ use Config;
+-use Test::More;
+ use ExtUtils::MM;
+-plan !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
++use Test::More
++    !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
+     ? (skip_all => "cross-compiling and make not available")
+     : (tests => 171);
+ use File::Find;
+diff --git a/cpan/ExtUtils-MakeMaker/t/echo.t b/cpan/ExtUtils-MakeMaker/t/echo.t
+index 789b85f..c43bc47 100644
+--- a/cpan/ExtUtils-MakeMaker/t/echo.t
++++ b/cpan/ExtUtils-MakeMaker/t/echo.t
+@@ -14,11 +14,11 @@ use MakeMaker::Test::Utils;
+ use File::Temp;
+ use Cwd 'abs_path';
+ 
+-use Test::More;
+ use ExtUtils::MM;
+-plan !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
++use Test::More
++    !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
+     ? (skip_all => "cross-compiling and make not available")
+-    : ();
++    : (tests => 18);
+ 
+ #--------------------- Setup
+ 
+diff --git a/cpan/ExtUtils-MakeMaker/t/min_perl_version.t b/cpan/ExtUtils-MakeMaker/t/min_perl_version.t
+index c5d78d6..2ef118d 100644
+--- a/cpan/ExtUtils-MakeMaker/t/min_perl_version.t
++++ b/cpan/ExtUtils-MakeMaker/t/min_perl_version.t
+@@ -13,9 +13,9 @@ use TieOut;
+ use MakeMaker::Test::Utils;
+ use MakeMaker::Test::Setup::MPV;
+ use Config;
+-use Test::More;
+ use ExtUtils::MM;
+-plan !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
++use Test::More
++    !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
+     ? (skip_all => "cross-compiling and make not available")
+     : (tests => 36);
+ use File::Path;
+diff --git a/cpan/ExtUtils-MakeMaker/t/pm_to_blib.t b/cpan/ExtUtils-MakeMaker/t/pm_to_blib.t
+index f1e348e..ebfa26c 100644
+--- a/cpan/ExtUtils-MakeMaker/t/pm_to_blib.t
++++ b/cpan/ExtUtils-MakeMaker/t/pm_to_blib.t
+@@ -12,9 +12,9 @@ use ExtUtils::MakeMaker;
+ use MakeMaker::Test::Utils;
+ use MakeMaker::Test::Setup::BFD;
+ use Config;
+-use Test::More;
+ use ExtUtils::MM;
+-plan !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
++use Test::More
++    !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
+     ? (skip_all => "cross-compiling and make not available")
+     : 'no_plan';
+ 
+diff --git a/cpan/ExtUtils-MakeMaker/t/recurs.t b/cpan/ExtUtils-MakeMaker/t/recurs.t
+index 84c09a2..661e0db 100644
+--- a/cpan/ExtUtils-MakeMaker/t/recurs.t
++++ b/cpan/ExtUtils-MakeMaker/t/recurs.t
+@@ -14,9 +14,9 @@ use File::Temp qw[tempdir];
+ use MakeMaker::Test::Utils;
+ use MakeMaker::Test::Setup::Recurs;
+ use Config;
+-use Test::More;
+ use ExtUtils::MM;
+-plan !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
++use Test::More
++    !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
+     ? (skip_all => "cross-compiling and make not available")
+     : (tests => 26);
+ 
+diff --git a/cpan/ExtUtils-MakeMaker/t/several_authors.t b/cpan/ExtUtils-MakeMaker/t/several_authors.t
+index 1a75a3e..869e9f0 100644
+--- a/cpan/ExtUtils-MakeMaker/t/several_authors.t
++++ b/cpan/ExtUtils-MakeMaker/t/several_authors.t
+@@ -13,9 +13,9 @@ use TieOut;
+ use MakeMaker::Test::Utils;
+ use MakeMaker::Test::Setup::SAS;
+ use Config;
+-use Test::More;
+ use ExtUtils::MM;
+-plan !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
++use Test::More
++    !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
+     ? (skip_all => "cross-compiling and make not available")
+     : (tests => 20);
+ use File::Path;
