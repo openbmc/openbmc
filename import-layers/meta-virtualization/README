@@ -42,7 +42,7 @@ Maintainers: Raymond Danks <ray.danks@se-eng.com>
              Bruce Ashfield <bruce.ashfield@gmail.com>
 
 When sending single patches, please using something like:
-'git send-email -1 --to meta-virtualization@yoctoproject.org --subject-prefix=meta-virtualization][PATCH'
+$ git send-email -1 --to meta-virtualization@yoctoproject.org --subject-prefix='meta-virtualization][PATCH'
 
 License
 -------

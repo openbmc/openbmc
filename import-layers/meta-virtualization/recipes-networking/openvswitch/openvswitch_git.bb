@@ -50,4 +50,5 @@ do_install_ptest() {
 
 do_install_append() {
 	oe_runmake modules_install INSTALL_MOD_PATH=${D}
+	rm -r ${D}/${localstatedir}/run
 }

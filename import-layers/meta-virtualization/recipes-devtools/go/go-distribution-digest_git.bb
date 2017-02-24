@@ -13,15 +13,13 @@ SRCREV = "d957768537c5af40e4f4cd96871f7b2bde9e2923"
 
 S = "${WORKDIR}/git"
 
-do_unpackpost() {
-	rm -rf ${S}/[A-KM-Za-ce-z]* ${S}/doc*
+# NO-OP the do compile rule because this recipe is source only.
+do_compile() {
 }
-
-addtask unpackpost after do_unpack before do_patch
 
 do_install() {
 	install -d ${D}${prefix}/local/go/src/${PKG_NAME}
-	cp -r ${S}/* ${D}${prefix}/local/go/src/${PKG_NAME}/
+	cp -r ${S}/LICENSE ${S}/digest ${D}${prefix}/local/go/src/${PKG_NAME}/
 }
 
 SYSROOT_PREPROCESS_FUNCS += "go_distribution_digeset_sysroot_preprocess"
