@@ -54,16 +54,3 @@ do_deploy_append() {
     fi
     echo "${CMDLINE}${PITFT_PARAMS}" > ${DEPLOYDIR}/bcm2835-bootfiles/cmdline.txt
 }
-
-do_bundle_initramfs_append() {
-    if [ ! -z "${INITRAMFS_IMAGE}" -a x"${INITRAMFS_IMAGE_BUNDLE}" = x1 ]; then
-        if test "x${KERNEL_IMAGETYPE}" != "xuImage" ; then
-            if test -n "${KERNEL_DEVICETREE}"; then
-                # Add RPi bootloader trailer to kernel image to enable DeviceTree support
-                for type in ${KERNEL_IMAGETYPES} ; do
-                    ${STAGING_BINDIR_NATIVE}/mkknlimg --dtok ${KERNEL_OUTPUT_DIR}/$type.initramfs ${KERNEL_OUTPUT_DIR}/$type.initramfs
-                done
-            fi
-        fi
-    fi
-}

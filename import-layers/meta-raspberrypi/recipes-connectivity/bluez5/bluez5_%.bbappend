@@ -23,4 +23,4 @@ FILES_${PN}_append_raspberrypi3 = " \
     /lib/firmware/brcm/BCM43430A1.hcd \
     "
 
-SYSTEMD_SERVICE_${PN}_raspberrypi3 += "brcm43438.service"
+SYSTEMD_SERVICE_${PN}_append_raspberrypi3 = " brcm43438.service"
