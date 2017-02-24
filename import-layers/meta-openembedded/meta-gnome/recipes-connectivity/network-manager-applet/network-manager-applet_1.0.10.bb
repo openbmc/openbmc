@@ -2,7 +2,10 @@ SUMMARY = "GTK+ applet for NetworkManager"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552"
 
-DEPENDS = "gtk+3 libnotify libsecret networkmanager dbus-glib gconf libgnome-keyring iso-codes nss"
+DEPENDS = "gtk+3 libnotify libsecret networkmanager dbus-glib \
+           gconf libgnome-keyring iso-codes nss \
+           intltool-native \
+"
 
 inherit gnomebase gsettings gtk-icon-cache gobject-introspection
 

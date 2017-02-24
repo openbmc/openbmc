@@ -24,7 +24,7 @@ CFLAGS_append = " -DDO_UNIX -DDO_IPV6 -D_GNU_SOURCE"
 
 # set the "_FILE_OFFSET_BITS" preprocessor symbol to 64 to support files
 # larger than 2GB
-CFLAGS_append = "${@base_contains('DISTRO_FEATURES', 'largefile', \
+CFLAGS_append = "${@bb.utils.contains('DISTRO_FEATURES', 'largefile', \
     ' -D_FILE_OFFSET_BITS=64', '', d)}"
 
 PACKAGECONFIG ??= ""
@@ -60,7 +60,7 @@ do_install() {
     install -m 0644 ${S}/doc/netperf_old.ps ${D}${docdir}/netperf
 }
 
-RRECOMMENDS_${PN} += "${@base_contains('PACKAGECONFIG', 'sctp', 'kernel-module-sctp', '', d)}"
+RRECOMMENDS_${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'sctp', 'kernel-module-sctp', '', d)}"
 
 INITSCRIPT_NAME="netperf"
 INITSCRIPT_PARAMS="defaults"

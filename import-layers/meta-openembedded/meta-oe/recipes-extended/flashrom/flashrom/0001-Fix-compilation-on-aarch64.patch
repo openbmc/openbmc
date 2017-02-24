@@ -1,0 +1,62 @@
+From d9e4dc750dc45e42b482d744829254a3672c11b3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 19 Oct 2016 00:24:08 +0000
+Subject: [PATCH 1/3] Fix compilation on aarch64
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ arch.h     | 2 +-
+ hwaccess.c | 2 +-
+ hwaccess.h | 6 +++---
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+Index: flashrom-0.9.6.1/arch.h
+===================================================================
+--- flashrom-0.9.6.1.orig/arch.h
++++ flashrom-0.9.6.1/arch.h
+@@ -27,7 +27,7 @@
+ #define __FLASHROM_ARCH__ "mips"
+ #elif defined(__powerpc__) || defined(__powerpc64__) || defined(__ppc__) || defined(__ppc64__)
+ #define __FLASHROM_ARCH__ "ppc"
+-#elif defined(__arm__)
++#elif defined(__arm__) || defined(__aarch64__)
+ #define __FLASHROM_ARCH__ "arm"
+ #endif
+ __FLASHROM_ARCH__
+Index: flashrom-0.9.6.1/hwaccess.c
+===================================================================
+--- flashrom-0.9.6.1.orig/hwaccess.c
++++ flashrom-0.9.6.1/hwaccess.c
+@@ -121,7 +121,7 @@ int rget_io_perms(void)
+ 	return 0;
+ }
+ 
+-#elif defined (__arm__)
++#elif defined (__arm__) || defined (__aarch64__)
+ 
+ static inline void sync_primitive(void)
+ {
+Index: flashrom-0.9.6.1/hwaccess.h
+===================================================================
+--- flashrom-0.9.6.1.orig/hwaccess.h
++++ flashrom-0.9.6.1/hwaccess.h
+@@ -68,8 +68,8 @@
+ #error Little-endian PowerPC #defines are unknown
+ #endif
+ 
+-#elif defined (__arm__)
+-#if defined (__ARMEL__)
++#elif defined (__arm__) || defined (__aarch64__)
++#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+ #define __FLASHROM_LITTLE_ENDIAN__ 1
+ #else
+ #error Big-endian ARM #defines are unknown
+@@ -337,7 +337,7 @@ int libpayload_wrmsr(int addr, msr_t msr
+ 
+ /* PCI port I/O is not yet implemented on MIPS. */
+ 
+-#elif defined(__arm__)
++#elif defined(__arm__) || defined (__aarch64__)
+ 
+ /* Non memory mapped I/O is not supported on ARM. */
+ 

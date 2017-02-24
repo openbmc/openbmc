@@ -14,10 +14,10 @@ Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
  1 file changed, 8 insertions(+), 47 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 67599c0..40fa596 100644
+index c4cfc2c..8e961c7 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -622,25 +622,10 @@ AC_SUBST(POPPLER_QT4_LIBS)
+@@ -712,25 +712,10 @@ AC_SUBST(POPPLER_QT4_LIBS)
  AC_SUBST(POPPLER_QT4_TEST_LIBS)
  
  if test x$enable_poppler_qt4 = xyes; then
@@ -47,27 +47,27 @@ index 67599c0..40fa596 100644
    AC_SUBST(MOCQT4)
    AC_MSG_RESULT([$MOCQT4])
  fi
-@@ -679,34 +664,10 @@ AC_SUBST(POPPLER_QT5_LIBS)
+@@ -769,34 +754,10 @@ AC_SUBST(POPPLER_QT5_LIBS)
  AC_SUBST(POPPLER_QT5_TEST_LIBS)
  
  if test x$enable_poppler_qt5 = xyes; then
 -  AC_CHECK_TOOL(MOCQT5, moc)
 -  AC_MSG_CHECKING([for Qt5 moc])
 -  mocversion=`$MOCQT5 -v 2>&1`
--  mocversiongrep=`echo $mocversion | grep "Qt 5\|moc 5"`
+-  mocversiongrep=`echo $mocversion | grep -E "Qt 5|moc 5"`
 -  if test x"$mocversiongrep" != x"$mocversion"; then
 -    AC_MSG_RESULT([no])
 -    # moc was not the qt5 one, try with moc-qt5
 -    AC_CHECK_TOOL(MOCQT52, moc-qt5)
 -    AC_MSG_CHECKING([for Qt5 moc-qt5])
 -    mocversion=`$MOCQT52 -v 2>&1`
--    mocversiongrep=`echo $mocversion | grep "Qt 5\|moc-qt5 5\|moc 5"`
+-    mocversiongrep=`echo $mocversion | grep -E "Qt 5|moc-qt5 5|moc 5"`
 -    if test x"$mocversiongrep" != x"$mocversion"; then
 -      AC_CHECK_TOOL(QTCHOOSER, qtchooser)
 -      AC_MSG_CHECKING([for qtchooser])
 -      qt5tooldir=`QT_SELECT=qt5 qtchooser -print-env | grep QTTOOLDIR | cut -d '=' -f 2 | cut -d \" -f 2`
 -      mocversion=`$qt5tooldir/moc -v 2>&1`
--      mocversiongrep=`echo $mocversion | grep "Qt 5\|moc 5"`
+-      mocversiongrep=`echo $mocversion | grep -E "Qt 5|moc 5"`
 -      if test x"$mocversiongrep" != x"$mocversion"; then
 -        # no valid moc found
 -        enable_poppler_qt5=no;
@@ -87,5 +87,5 @@ index 67599c0..40fa596 100644
    AC_MSG_RESULT([$MOCQT5])
  fi
 -- 
-1.9.3
+2.5.5
 

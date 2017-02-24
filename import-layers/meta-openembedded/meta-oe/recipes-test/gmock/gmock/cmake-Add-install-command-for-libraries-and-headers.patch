@@ -29,8 +29,8 @@ index 572d044..90e797a 100644
              src/gmock_main.cc)
  
 +
-+install(TARGETS gmock DESTINATION lib)
-+install(TARGETS gmock_main DESTINATION lib)
++install(TARGETS gmock DESTINATION ${CMAKE_INSTALL_LIBDIR})
++install(TARGETS gmock_main DESTINATION ${CMAKE_INSTALL_LIBDIR})
 +
  ########################################################################
  #

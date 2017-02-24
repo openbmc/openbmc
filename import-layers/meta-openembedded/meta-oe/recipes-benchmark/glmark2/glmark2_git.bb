@@ -14,7 +14,10 @@ PV = "2014.03+${SRCPV}"
 
 SRC_URI = "git://github.com/glmark2/glmark2.git;protocol=https \
            file://build-Check-packages-to-be-used-by-the-enabled-flavo.patch \
-           file://0001-Fix-wl_surface-should-be-destoryed-after-the-wl_wind.patch"
+           file://0001-Fix-wl_surface-should-be-destoryed-after-the-wl_wind.patch \
+           file://Fix-build-error-due-missing-space-before-macro.patch \
+           file://Fix-configure-for-sqrt-check.patch \
+           file://Fix-deprecated-declarations.patch"
 SRCREV = "fa71af2dfab711fac87b9504b6fc9862f44bf72a"
 
 S = "${WORKDIR}/git"
@@ -24,6 +27,9 @@ inherit waf pkgconfig
 PACKAGECONFIG ?= "${@bb.utils.contains('DISTRO_FEATURES', 'x11 opengl', 'x11-gl x11-gles2', '', d)} \
                   ${@bb.utils.contains('DISTRO_FEATURES', 'wayland opengl', 'wayland-gl wayland-gles2', '', d)} \
                   drm-gl drm-gles2"
+
+# Enable C++11 features
+CXXFLAGS += "-std=c++11"
 
 PACKAGECONFIG[x11-gl] = ",,virtual/libgl virtual/libx11"
 PACKAGECONFIG[x11-gles2] = ",,virtual/libgles2 virtual/libx11"
@@ -50,3 +56,4 @@ python __anonymous() {
     if flavors:
         d.appendVar("EXTRA_OECONF", " --with-flavors=%s" % ",".join(flavors))
 }
+

@@ -1,0 +1,21 @@
+Fixes errors found bt Clang
+
+| ../../ModemManager-1.6.4/src/mm-bearer-qmi.c:774:50: error: implicit conversion from enumeration type 'MMBearerStatus' to different enumeration type 'MMBearerConnectionStatus' [-Werror,-Wenum-conversion]
+|         MMBearerConnectionStatus bearer_status = mm_base_bearer_get_status (MM_BASE_BEARER (self));
+|                                  ~~~~~~~~~~~~~   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+| 1 error generated.
+
+
+Index: ModemManager-1.6.4/src/mm-bearer-qmi.c
+===================================================================
+--- ModemManager-1.6.4.orig/src/mm-bearer-qmi.c
++++ ModemManager-1.6.4/src/mm-bearer-qmi.c
+@@ -771,7 +771,7 @@ packet_service_status_indication_cb (Qmi
+             &connection_status,
+             NULL,
+             NULL)) {
+-        MMBearerConnectionStatus bearer_status = mm_base_bearer_get_status (MM_BASE_BEARER (self));
++        MMBearerConnectionStatus bearer_status = (MMBearerConnectionStatus)mm_base_bearer_get_status (MM_BASE_BEARER (self));
+ 
+         if (connection_status == QMI_WDS_CONNECTION_STATUS_DISCONNECTED &&
+             bearer_status != MM_BEARER_CONNECTION_STATUS_DISCONNECTED &&

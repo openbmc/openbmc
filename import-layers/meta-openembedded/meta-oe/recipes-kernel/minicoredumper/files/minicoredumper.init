@@ -1,0 +1,40 @@
+#!/bin/sh
+#
+# minicoredumper This shell script takes care of starting and stopping minicoredumper.
+#
+# chkconfig:   2345 24 89
+# description: minicoredumper.
+#
+# processname:
+# config:      /etc/minicoredumper/
+
+### BEGIN INIT INFO
+# Provides: minicoredumper
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Should-Start: $syslog $network
+# Should-Stop: $syslog $network
+# Short-Description:
+# Description:
+### END INIT INFO
+
+. /etc/init.d/functions
+
+case "$1" in
+    start)
+        echo "|/usr/bin/minicoredumper %p %u %g %s %t %h %e" > /proc/sys/kernel/core_pattern
+        ;;
+    stop)
+        echo "core" > /proc/sys/kernel/core_pattern
+	;;
+    status)
+        if  grep -q minicoredumper /proc/sys/kernel/core_pattern ; then
+            echo "minicoredumper is running"
+        else
+            echo "minicoredumper is stopped"
+        fi
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status}"
+        exit 2
+esac

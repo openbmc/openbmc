@@ -11,21 +11,26 @@ SRC_URI = "ftp://sources.redhat.com/pub/lvm2/old/LVM2.${PV}.tgz \
            file://0002-use-PTHREAD_MUTEX_RECURSIVE-instead-of-PTHREAD_MUTEX.patch \
            file://0003-Guard-use-of-mallinfo-with-__GLIBC__.patch \
            file://0004-include-fcntl.h-for-O_-defines-and-fcntl-signature.patch \
+           file://0005-tweak-MODPROBE_CMD-for-cross-compile.patch \
            "
 
 S = "${WORKDIR}/LVM2.${PV}"
 
 inherit autotools-brokensep pkgconfig systemd
 
-PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux', '', d)}"
+PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux', '', d)} \
+                   thin-provisioning-tools \
+                   odirect \
+"
 
 PACKAGECONFIG[readline] = "--enable-readline,--disable-readline,readline"
 PACKAGECONFIG[selinux] = "--enable-selinux,--disable-selinux,libselinux"
+PACKAGECONFIG[thin-provisioning-tools] = "--with-thin=internal,--with-thin=none,,thin-provisioning-tools"
+PACKAGECONFIG[odirect] = "--enable-o_direct,--disable-o_direct"
 
 # Unset user/group to unbreak install.
 EXTRA_OECONF = "--with-user= \
                 --with-group= \
-                --disable-o_direct \
                 --enable-realtime \
                 --enable-applib \
                 --enable-cmdlib \
@@ -37,7 +42,14 @@ EXTRA_OECONF = "--with-user= \
                 --with-udev-prefix= \
                 --with-usrlibdir=${libdir} \
                 --with-systemdsystemunitdir=${systemd_system_unitdir} \
+                --disable-thin_check_needs_check \
+                --with-thin-check=${sbindir}/thin_check \
+                --with-thin-dump=${sbindir}/thin_dump \
+                --with-thin-repair=${sbindir}/thin_repair \
+                --with-thin-restore=${sbindir}/thin_restore \
 "
+
+CACHED_CONFIGUREVARS += "MODPROBE_CMD=${base_sbindir}/modprobe"
 
 do_install_append() {
     # Install machine specific configuration file

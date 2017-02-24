@@ -6,7 +6,11 @@ HOMEPAGE = "https://launchpad.net/pygpgme"
 LICENSE = "LGPL-2.1"
 LIC_FILES_CHKSUM = "file://PKG-INFO;beginline=8;endline=8;md5=6517bdc8f2416f27ab725d4702f7aac3"
 
-SRC_URI = "file://run-ptest"
+SRC_URI = "file://run-ptest \
+           file://0001-reflect-2.1-reporting-for-key-imports.patch \
+           file://0002-passphrase_cb-is-deprecated.patch \
+           file://0003-handle-generic-error-when-no-passphrase-callback-pre.patch \
+"
 
 SRC_URI[md5sum] = "d38355af73f0352cde3d410b25f34fd0"
 SRC_URI[sha256sum] = "5fd887c407015296a8fd3f4b867fe0fcca3179de97ccde90449853a3dfb802e1"

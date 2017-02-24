@@ -1,0 +1,17 @@
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+
+diff --git a/Makefile b/Makefile
+index 9e74cdf..cad8109 100644
+--- a/Makefile
++++ b/Makefile
+@@ -151,7 +151,7 @@ generic	:
+ 		$(MAKE) $(TARGETS) "CC=$(CC_GENERIC)" "CCO=$(CCO_GENERIC)" "CCOC=$(CCOC_GENERIC)"
+ 
+ wipe	:	$(OBJECTS)
+-		$(CC) $(CCO) $(OBJECTS) -o wipe
++		$(CC) $(CCO) $(LDFLAGS) $(OBJECTS) -o wipe
+ 
+ wipe.o	:	wipe.c random.h misc.h version.h
+ 		$(CC) $(CCO) $(CCOC) wipe.c -o wipe.o

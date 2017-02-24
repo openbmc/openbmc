@@ -1,0 +1,16 @@
+--- iperf-2.0.5/m4/dast.m4.orig	2016-06-15 11:42:03.945581785 -0400
++++ iperf-2.0.5/m4/dast.m4	2016-06-15 11:42:11.053581641 -0400
+@@ -11,7 +11,12 @@
+ 
+ AC_DEFUN(DAST_CHECK_BOOL, [
+ 
+-AC_CHECK_SIZEOF(bool)
++if test "$ac_cv_header_stdbool_h" = yes; then
++  AC_CHECK_SIZEOF(bool,,[#include <stdbool.h>])
++else
++    AC_CHECK_SIZEOF(bool)
++fi
++
+ if test "$ac_cv_sizeof_bool" = 0 ; then
+   AC_DEFINE(bool, int)
+ fi

@@ -1,0 +1,44 @@
+From 7ead29ca6bb5e280ae07551cc3521281ecf73682 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Sat, 7 May 2016 02:06:47 -0400
+Subject: [PATCH] Makefile: fix efivar.pc not found
+
+It fixes efivar.pc not found:
+...
+| install -d -m 755 efivar/0.23-r0/image/usr/lib/pkgconfig/
+| install -m 644 efivar.pc efivar/0.23-r0/image/usr/lib/pkgconfig/
+;  install -m 644 efiboot.pc efivar/0.23-r0/image/usr/lib/pkgconfig/
+;
+| install: cannot stat 'efivar.pc': No such file or directory
+| install: cannot stat 'efiboot.pc': No such file or directory
+| make[1]: *** [install] Error 1
+| make[1]: Leaving directory `efivar/0.23-r0/git/src'
+| make: *** [install] Error 2
+| ERROR: oe_runmake failed
+...
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ src/Makefile | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index c7a0ca3..ad9c427 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -78,7 +78,9 @@ install : all
+ 		ln -fs $(x).$(VERSION) $(DESTDIR)$(libdir)/$(x).$(MAJOR_VERSION);\
+ 		ln -fs $(x).$(VERSION) $(DESTDIR)$(libdir)/$(x); )
+ 	$(INSTALL) -d -m 755 $(DESTDIR)$(PCDIR)
+-	$(foreach x, $(PCTARGETS), $(INSTALL) -m 644 $(x) $(DESTDIR)$(PCDIR) ;)
++	$(foreach x, $(PCTARGETS), $(INSTALL) -m 644 $(TOPDIR)/src/$(x).in $(DESTDIR)$(PCDIR)/$(x) ;\
++		sed -i -e "s:@@LIBDIR@@:$(libdir):g" -e "s:@@VERSION@@:$(VERSION):g" \
++			$(DESTDIR)$(PCDIR)/$(x); )
+ 	$(INSTALL) -d -m 755 $(DESTDIR)$(includedir)/efivar
+ 	$(foreach x, $(wildcard $(TOPDIR)/src/include/efivar/*.h), $(INSTALL) -m 644 $(x) $(DESTDIR)$(includedir)/efivar/$(notdir $(x));)
+ 	$(INSTALL) -d -m 755 $(DESTDIR)$(bindir)
+-- 
+2.8.1
+

@@ -1,31 +1,35 @@
-From 7036e8b0dca61432970789e5397b6fb02b362c2b Mon Sep 17 00:00:00 2001
+From 9a3c480af653b37e62d1be04d49fe7a60a80168f Mon Sep 17 00:00:00 2001
 From: Kai Kang <kai.kang@windriver.com>
 Date: Fri, 25 Sep 2015 18:14:31 +0800
-Subject: [PATCH] efivar: fix for cross compile
+Subject: [PATCH 1/2] efivar: fix for cross compile
 
 It builds and calls elf file makeguids to generate a header file which
 doesn't work for cross compile. Fix it.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Upstream-Status: Pending
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
 ---
  src/Makefile | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/Makefile b/src/Makefile
-index 6eac858..ef4eb1d 100644
+index 5fc7887..1829d22 100644
 --- a/src/Makefile
 +++ b/src/Makefile
-@@ -65,8 +65,8 @@ makeguids.o : makeguids.c
- makeguids : makeguids.o fakeguid.o
- 	$(CC) $(cflags) -o $@ $^ -ldl
- 
+@@ -29,8 +29,8 @@ all : deps $(TARGETS)
+ ./guid-symbols.c : include/efivar/efivar-guids.h
+ ./guids.bin : include/efivar/efivar-guids.h
+ ./names.bin : include/efivar/efivar-guids.h
 -include/efivar/efivar-guids.h : makeguids guids.txt
--	./makeguids guids.txt guids.bin names.bin guid-symbols.S $@
+-	./makeguids guids.txt guids.bin names.bin \
 +include/efivar/efivar-guids.h : guids.txt
-+	makeguids guids.txt guids.bin names.bin guid-symbols.S $@
++	makeguids guids.txt guids.bin names.bin \
+ 		guid-symbols.c include/efivar/efivar-guids.h
  
- guidlist.o : guids.S include/efivar/efivar-guids.h
- 	$(CC) $(cflags) -c -o guidlist.o guids.S
+ makeguids : CPPFLAGS+=-DEFIVAR_BUILD_ENVIRONMENT
 -- 
-2.6.0.rc2.10.gf4d9753
+2.4.3
 

@@ -55,6 +55,9 @@ FILES_${PN}-dbg += " \
 
 INSANE_SKIP_${PN} += "dev-deps"
 
+do_install_append() {
+    rm -r ${D}/${localstatedir}/run
+}
 
 do_install () {
     rm -rf ${D}

@@ -1,0 +1,102 @@
+Upstream-Status: Pending
+
+diff -ur libglade-2.4.0~/configure.in libglade-2.4.0/configure.in
+--- libglade-2.4.0~/configure.in	2004-05-17 12:38:31.000000000 +0100
++++ libglade-2.4.0/configure.in	2004-07-28 16:53:09.000000000 +0100
+@@ -147,6 +147,18 @@
+ AM_CONDITIONAL(HAVE_PYTHON, $have_python)
+ AC_SUBST(PYTHON)
+ 
++AC_MSG_CHECKING([for cruft in libgtk])
++AC_TRY_LINK([
++#include <gtk/gtk.h>
++#include <stdio.h>
++],      [ gtk_tree_get_type (); return 0; ],
++        [ AC_MSG_RESULT(yes)
++          have_cruft=yes ],
++        [ AC_MSG_RESULT(no)
++	  AC_DEFINE(DISABLE_CRUFT,,[leave out support for old, broken widgets])
++          have_cruft=no ])
++AC_SUBST(DISABLE_CRUFT)
++
+ dnl add debugging options ...
+ changequote(,)dnl
+ if test "x$GCC" = xyes; then
+Only in libglade-2.4.0: configure.in.orig
+diff -ur libglade-2.4.0~/glade/glade-gtk.c libglade-2.4.0/glade/glade-gtk.c
+--- libglade-2.4.0~/glade/glade-gtk.c	2004-03-13 13:47:35.000000000 +0000
++++ libglade-2.4.0/glade/glade-gtk.c	2004-07-28 16:53:52.000000000 +0100
+@@ -213,6 +213,8 @@
+ 	gtk_clist_column_titles_hide (GTK_CLIST (w));
+ }
+ 
++#ifndef DISABLE_CRUFT
++
+ static void
+ tree_set_selection_mode (GladeXML *xml, GtkWidget *w,
+ 			 const char *name, const char *value)
+@@ -238,6 +240,8 @@
+     gtk_tree_set_view_lines (GTK_TREE (w), BOOL (value));
+ }
+ 
++#endif
++
+ static void
+ list_set_selection_mode (GladeXML *xml, GtkWidget *w,
+ 			 const char *name, const char *value)
+@@ -254,6 +258,7 @@
+     gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (w), BOOL (value));
+ }
+ 
++#ifndef DISABLE_CRUFT
+ static void
+ text_set_text (GladeXML *xml, GtkWidget *w,
+ 	       const char *name, const char *value)
+@@ -262,6 +267,7 @@
+ 
+     gtk_editable_insert_text (GTK_EDITABLE (w), value, -1, &pos);
+ }
++#endif
+ 
+ static void
+ radio_menu_item_set_group (GladeXML *xml, GtkWidget *w,
+@@ -1125,13 +1131,17 @@
+     glade_register_custom_prop (GTK_TYPE_CLIST, "selection_mode", clist_set_selection_mode);
+     glade_register_custom_prop (GTK_TYPE_CLIST, "shadow_type", clist_set_shadow_type);
+     glade_register_custom_prop (GTK_TYPE_CLIST, "show_titles", clist_set_show_titles);
++#ifndef DISABLE_CRUFT
+     glade_register_custom_prop (GTK_TYPE_TREE, "selection_mode", tree_set_selection_mode);
+     glade_register_custom_prop (GTK_TYPE_TREE, "view_mode", tree_set_view_mode);
+     glade_register_custom_prop (GTK_TYPE_TREE, "view_line", tree_set_view_line);
++#endif
+     glade_register_custom_prop (GTK_TYPE_LIST, "selection_mode", list_set_selection_mode);
+     glade_register_custom_prop (GTK_TYPE_CHECK_MENU_ITEM, "always_show_toggle",
+ 				check_menu_item_set_always_show_toggle);
++#ifndef DISABLE_CRUFT
+     glade_register_custom_prop (GTK_TYPE_TEXT, "text", text_set_text);
++#endif
+     glade_register_custom_prop (GTK_TYPE_RADIO_MENU_ITEM, "group",
+ 				radio_menu_item_set_group);
+     glade_register_custom_prop (GTK_TYPE_TOOLBAR, "tooltips", toolbar_set_tooltips);
+@@ -1288,8 +1298,10 @@
+ 			   glade_standard_build_children, NULL);
+     glade_register_widget (GTK_TYPE_TEAROFF_MENU_ITEM, glade_standard_build_widget,
+ 			   NULL, NULL);
++#ifndef DISABLE_CRUFT
+     glade_register_widget (GTK_TYPE_TEXT, glade_standard_build_widget,
+ 			   NULL, NULL);
++#endif
+     glade_register_widget (GTK_TYPE_TEXT_VIEW, glade_standard_build_widget,
+ 			   NULL, NULL);
+     glade_register_widget (GTK_TYPE_TIPS_QUERY, glade_standard_build_widget,
+@@ -1304,8 +1316,10 @@
+ 			   glade_standard_build_children, NULL);
+     glade_register_widget (GTK_TYPE_TOOL_BUTTON, glade_standard_build_widget,
+ 			   NULL, NULL);
++#ifndef DISABLE_CRUFT
+     glade_register_widget (GTK_TYPE_TREE, glade_standard_build_widget,
+ 			   NULL, NULL);
++#endif
+     glade_register_widget (GTK_TYPE_TREE_VIEW, glade_standard_build_widget,
+ 			   NULL, NULL);
+     glade_register_widget (GTK_TYPE_VBUTTON_BOX, glade_standard_build_widget,

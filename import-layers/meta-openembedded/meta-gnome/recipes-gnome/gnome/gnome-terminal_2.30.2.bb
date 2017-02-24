@@ -1,7 +1,7 @@
 SUMMARY = "GNOME Terminal"
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=5b51eba4ba4cafe64073227530c061ed"
-DEPENDS = "gtk+ glib-2.0 startup-notification dbus-glib vte gnome-doc-utils intltool-native"
+DEPENDS = "gtk+ glib-2.0 startup-notification dbus-glib vte9 gnome-doc-utils intltool-native"
 PR = "r1"
 
 inherit gnome
@@ -17,3 +17,6 @@ SRC_URI[archive.sha256sum] = "2c7af2250698b9f9f53c6eaa93211c1118cf2c7e29cbbacfd1
 GNOME_COMPRESS_TYPE="bz2"
 
 RRECOMMENDS_${PN} += "gnome-common-schemas"
+
+# http://errors.yoctoproject.org/Errors/Details/68636/
+PNBLACKLIST[gnome-terminal] ?= "BROKEN: fails to build with gcc-6"

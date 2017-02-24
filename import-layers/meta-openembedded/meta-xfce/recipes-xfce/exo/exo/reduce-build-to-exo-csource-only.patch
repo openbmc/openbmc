@@ -15,11 +15,11 @@ Upstream-Status: Inappropriate [configuration]
 Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
 ---
  Makefile.am  | 10 +---------
- configure.ac | 20 --------------------
- 2 files changed, 1 insertion(+), 29 deletions(-)
+ configure.ac | 26 --------------------------
+ 2 files changed, 1 insertion(+), 35 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index ad7c6ce..3acd94a 100644
+index 9979b36..05d594e 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -1,15 +1,7 @@
@@ -40,7 +40,7 @@ index ad7c6ce..3acd94a 100644
  distclean-local:
  	rm -rf *.cache *~
 diff --git a/configure.ac b/configure.ac
-index bb9be05..23471d0 100644
+index b66c92b..5243132 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -116,15 +116,6 @@ AC_PROG_CC()
@@ -59,7 +59,7 @@ index bb9be05..23471d0 100644
  
  dnl ***************************************
  dnl *** Check for standard header files ***
-@@ -171,17 +162,6 @@ dnl ***********************************
+@@ -171,29 +162,12 @@ dnl ***********************************
  dnl *** Check for required packages ***
  dnl ***********************************
  XDT_CHECK_PACKAGE([GLIB], [glib-2.0], [2.30.0])
@@ -69,14 +69,26 @@ index bb9be05..23471d0 100644
 -XDT_CHECK_PACKAGE([LIBXFCE4UTIL], [libxfce4util-1.0], [4.10.0])
 -XDT_CHECK_PACKAGE([LIBXFCE4UI], [libxfce4ui-1], [4.10.0])
 -XDT_CHECK_OPTIONAL_PACKAGE([GIO_UNIX], [gio-unix-2.0], [2.30.0], [gio-unix], [GIO-Unix features])
--
+ 
+ dnl ***********************************************************
+ dnl *** Optional support for a GTK+3 version of the library ***
+ dnl ***********************************************************
+-XDT_CHECK_OPTIONAL_PACKAGE([GTK3],
+-                           [gtk+-3.0], [3.6.0], [gtk3],
+-                           [GTK+ 3 support])
+-XDT_CHECK_OPTIONAL_PACKAGE([LIBXFCE4UI2],
+-                           [libxfce4ui-2], [4.12.0], [libxfce4ui2],
+-                           [GTK+ 3 support: libxfce4ui-2])
+ AM_CONDITIONAL([ENABLE_GTK3_LIBRARY], [test "x$GTK3_FOUND" = "xyes" && test "x$LIBXFCE4UI2_FOUND" = "xyes" ])
+ 
 -dnl *********************
 -dnl *** Check for X11 ***
 -dnl *********************
 -XDT_CHECK_LIBX11_REQUIRE()
- 
+-
  dnl *************************
  dnl *** Check for gtk-doc ***
+ dnl *************************
 -- 
-1.9.3
+2.5.5
 

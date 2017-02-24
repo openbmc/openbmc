@@ -4,7 +4,7 @@ SECTION = "libs"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
-SRC_URI = "http://archive.mariadb.org/mariadb-${PV}/source/mariadb-${PV}.tar.gz \
+SRC_URI = "http://downloads.mariadb.com/MariaDB/mariadb-${PV}/source/mariadb-${PV}.tar.gz \
            file://fix-cmake-module-path.patch \
            file://remove-bad-path.patch \
            file://fix-mysqlclient-r-version.patch \
@@ -15,10 +15,10 @@ SRC_URI = "http://archive.mariadb.org/mariadb-${PV}/source/mariadb-${PV}.tar.gz 
            file://mysql-systemd-start \
            file://configure.cmake-fix-valgrind.patch \
            file://fix-a-building-failure.patch \
+           file://change-cc-to-cc-version.patch \
           "
-
-SRC_URI[md5sum] = "92f682b00eb137af01e59ea93f7e31f7"
-SRC_URI[sha256sum] = "45b66b7adc87cad32e553df1d5211e5b6426b78a3bc318a5ccde088bf93e6e10"
+SRC_URI[md5sum] = "fca86f1eaed2163b4bdce4f98f472324"
+SRC_URI[sha256sum] = "e142f9459507b97c5848042863b313ce70750118446bb4e35e5c07fe66007293"
 
 S = "${WORKDIR}/mariadb-${PV}"
 
@@ -139,8 +139,8 @@ do_install() {
                                                                    ${D}${systemd_unitdir}/system/install_db.service
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
-	install -d ${D}${sysconfdir}/tmpfiles.d
-	echo "f /var/log/mysqld.err 0640 mysql mysql -" \
+        install -d ${D}${sysconfdir}/tmpfiles.d
+        echo "f /var/log/mysqld.err 0640 mysql mysql -" \
             > ${D}${sysconfdir}/tmpfiles.d/99-mysqld.conf
     fi
     install -d ${D}${bindir}
@@ -169,13 +169,14 @@ RDEPENDS_${PN}-client = "perl perl-module-getopt-long perl-module-file-temp \
 RDEPENDS_${PN}-server = "perl perl-module-getopt-long perl-module-data-dumper \
     perl-module-file-basename perl-module-file-path perl-module-sys-hostname \
     perl-module-file-copy perl-module-file-temp perl-module-posix \
-    ${PN}-client"
+    ${PN}-client libdbi-perl libdbd-mysql-perl"
 RDEPENDS_${PN}-leftovers = "perl perl-module-cwd perl-module-benchmark perl-module-getopt-long \
     perl-module-posix perl-module-data-dumper perl-module-sigtrap perl-module-threads \
     perl-module-threads-shared perl-module-io-socket perl-module-sys-hostname perl-module-file-copy \
     perl-module-file-spec perl-module-file-find perl-module-file-basename perl-module-file-path \
     perl-module-constant perl-module-lib perl-module-file-temp perl-module-file-spec-functions \
     perl-module-io-socket-inet perl-module-io-select"
+RDEPENDS_${PN}-setupdb = "coreutils"
 
 # Allow old code to link to the backward compatible library
 RDEPENDS_libmysqlclient-dev = "libmysqlclient-r-dev"

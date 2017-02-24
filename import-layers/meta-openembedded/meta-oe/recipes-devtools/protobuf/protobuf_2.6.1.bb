@@ -6,7 +6,11 @@ HOMEPAGE = "https://github.com/google/protobuf"
 SECTION = "console/tools"
 LICENSE = "BSD-3-Clause"
 
+PACKAGE_BEFORE_PN = "${PN}-compiler"
+
 DEPENDS = "zlib"
+RDEPENDS_${PN}-compiler = "${PN}"
+RDEPENDS_${PN}-dev += "${PN}-compiler"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=af6809583bfde9a31595a58bb4a24514"
 
@@ -21,5 +25,7 @@ EXTRA_OECONF += " --with-protoc=echo"
 inherit autotools
 
 S = "${WORKDIR}/git"
+
+FILES_${PN}-compiler = "${bindir} ${libdir}/libprotoc${SOLIBS}"
 
 BBCLASSEXTEND = "native nativesdk"

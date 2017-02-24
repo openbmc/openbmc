@@ -1,0 +1,32 @@
+From bdcbef7b8adde424ee29e7eddc3b0570cc336449 Mon Sep 17 00:00:00 2001
+From: Frederico Cadete <frederico.cadete@awtce.be>
+Date: Tue, 21 Jun 2016 10:55:38 +0200
+Subject: [PATCH 1/2] Add install command for libraries and headers
+
+Signed-off-by: Frederico Cadete <frederico.cadete@awtce.be>
+---
+ CMakeLists.txt | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 57470c8..e969648 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -73,6 +73,14 @@ target_link_libraries(gtest_main gtest)
+ 
+ ########################################################################
+ #
++# Install rules
++install(TARGETS gtest gtest_main
++  DESTINATION ${CMAKE_INSTALL_LIBDIR})
++install(DIRECTORY ${gtest_SOURCE_DIR}/include/gtest
++  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
++
++########################################################################
++#
+ # Samples on how to link user tests with gtest or gtest_main.
+ #
+ # They are not built by default.  To build them, set the
+-- 
+2.5.0
+

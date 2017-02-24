@@ -1,0 +1,38 @@
+From b53fb3bf861f895034452e984f2accb8bebbd3c9 Mon Sep 17 00:00:00 2001
+From: Fredrik Fornwall <fredrik@fornwall.net>
+Date: Wed, 7 Sep 2016 09:25:54 +0200
+Subject: [PATCH] Use x instead of r for aarch64 register names
+
+This fixes clang compatibility.
+---
+Upstream-Status: Backport
+
+ platform/switch_aarch64_gcc.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/platform/switch_aarch64_gcc.h b/platform/switch_aarch64_gcc.h
+index 2fbc569..0b9d556 100644
+--- a/platform/switch_aarch64_gcc.h
++++ b/platform/switch_aarch64_gcc.h
+@@ -2,6 +2,7 @@
+  * this is the internal transfer function.
+  *
+  * HISTORY
++ * 07-Sep-16 Add clang support using x register naming. Fredrik Fornwall
+  * 13-Apr-13 Add support for strange GCC caller-save decisions
+  * 08-Apr-13 File creation. Michael Matz
+  *
+@@ -15,8 +16,8 @@
+ 
+ #ifdef SLP_EVAL
+ #define STACK_MAGIC 0
+-#define REGS_TO_SAVE "r19", "r20", "r21", "r22", "r23", "r24", "r25", "r26", \
+-                     "r27", "r28", "r30" /* aka lr */, \
++#define REGS_TO_SAVE "x19", "x20", "x21", "x22", "x23", "x24", "x25", "x26", \
++                     "x27", "x28", "x30" /* aka lr */, \
+                      "v8", "v9", "v10", "v11", \
+                      "v12", "v13", "v14", "v15"
+ 
+-- 
+1.9.1
+

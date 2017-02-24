@@ -21,7 +21,7 @@ do_compile_prepend() {
     export GIR_EXTRA_LIBS_PATH="${B}/gdata/.libs"
 }
 
-EXTRA_OECONF += "--disable-goa --disable-tests"
+EXTRA_OECONF += "--disable-goa --disable-tests --disable-gtk-doc"
 
 SRC_URI[archive.md5sum] = "eb552a8a8482e4231a3d1baf7262e64d"
 SRC_URI[archive.sha256sum] = "8740e071ecb2ae0d2a4b9f180d2ae5fdf9dc4c41e7ff9dc7e057f62442800827"

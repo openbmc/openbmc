@@ -1,0 +1,11 @@
+--- fbreader-0.12.10/makefiles/config.mk.orig	2016-05-03 11:11:07.259734561 -0400
++++ fbreader-0.12.10/makefiles/config.mk	2016-05-03 11:11:37.447735786 -0400
+@@ -38,7 +38,7 @@
+ 	LDFLAGS += -pg
+ endif
+ 
+-ZINCLUDE = -I $(ROOTDIR)/zlibrary/core/include -I $(ROOTDIR)/zlibrary/text/include
++ZINCLUDE = $(shell pkg-config --cflags fribidi) -I $(ROOTDIR)/zlibrary/core/include -I $(ROOTDIR)/zlibrary/text/include
+ 
+ ZLSHARED ?= yes
+ 

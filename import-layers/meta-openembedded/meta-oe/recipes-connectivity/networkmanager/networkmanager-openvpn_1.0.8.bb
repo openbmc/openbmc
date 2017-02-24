@@ -4,7 +4,7 @@ SECTION = "net/misc"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=100d5a599bead70ddcd70dcd73f2e29c"
 
-DEPENDS = "dbus dbus-glib networkmanager openvpn"
+DEPENDS = "dbus dbus-glib networkmanager openvpn intltool-native"
 
 inherit gnomebase useradd gettext systemd
 

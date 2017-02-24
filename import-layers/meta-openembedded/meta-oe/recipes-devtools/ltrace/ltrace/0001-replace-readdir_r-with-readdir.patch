@@ -1,0 +1,36 @@
+From 64f98f84fd88797e219f9dde1ca387fee4b509f0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 24 Apr 2016 16:58:17 -0700
+Subject: [PATCH] replace readdir_r with readdir
+
+glibc 2.24 has deprecated readdir_r
+
+https://sourceware.org/ml/libc-alpha/2016-02/msg00093.html
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted
+
+ sysdeps/linux-gnu/proc.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/sysdeps/linux-gnu/proc.c b/sysdeps/linux-gnu/proc.c
+index 953fd86..edb716d 100644
+--- a/sysdeps/linux-gnu/proc.c
++++ b/sysdeps/linux-gnu/proc.c
+@@ -242,9 +242,10 @@ process_tasks(pid_t pid, pid_t **ret_tasks, size_t *ret_n)
+ 	size_t alloc = 0;
+ 
+ 	while (1) {
+-		struct dirent entry;
+ 		struct dirent *result;
+-		if (readdir_r(d, &entry, &result) != 0) {
++		errno = 0;
++		result = readdir(d);
++		if (errno != 0) {
+ 		fail:
+ 			free(tasks);
+ 			closedir(d);
+-- 
+2.8.0
+

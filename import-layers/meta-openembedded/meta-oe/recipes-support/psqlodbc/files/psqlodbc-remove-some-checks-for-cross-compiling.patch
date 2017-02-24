@@ -1,0 +1,118 @@
+Subject: [PATCH] remove some checks for cross-compiling
+
+some lib check is not suitable for
+cross-compiling, so remove them.
+
+Upstream-Status: Inappropriate [not a real bug,just for cross-compiling]
+
+Signed-off-by: Song.Li <Song.Li@windriver.com>
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ configure.ac | 66 +++++++-----------------------------------------------------
+ 1 file changed, 7 insertions(+), 59 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index df5ad7a..b72bd4c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -46,57 +46,19 @@ AC_ARG_WITH(iodbc, [  --with-iodbc[[=DIR]]	  [[default=no]] DIR is the iODBC bas
+ if test "$with_iodbc" != no; then
+ 	with_unixodbc=no
+ 	AC_DEFINE(WITH_IODBC, 1, [Define to 1 to build with iODBC support])
+-	if test "$with_iodbc" = yes; then
+-		AC_PATH_PROGS(ODBC_CONFIG, iodbc-config)
+-	else
+-		ODBC_CONFIG=$with_iodbc
+-	fi
+-	if test ! -x "${ODBC_CONFIG}/bin/iodbc-config"; then
+-		if test ! -x "${ODBC_CONFIG}"; then
+-			AC_MSG_ERROR([iodbc-config not found (required for iODBC build)])
+-		fi
+-	else
+-		ODBC_CONFIG=${ODBC_CONFIG}/bin/iodbc-config
+-	fi
+ fi
+ 
+ if test "$with_unixodbc" != no; then
+ 	AC_DEFINE(WITH_UNIXODBC, 1,
+             [Define to 1 to build with unixODBC support])
+-	if test "$with_unixodbc" = yes; then
+-		AC_PATH_PROGS(ODBC_CONFIG, odbc_config)
+-	else
+-		ODBC_CONFIG=$with_unixodbc
+-	fi
+-	if test ! -x "${ODBC_CONFIG}/bin/odbc_config"; then
+-		if test ! -x "${ODBC_CONFIG}"; then
+-			AC_MSG_ERROR([odbc_config not found (required for unixODBC build)])
+-		fi
+-	else
+-		ODBC_CONFIG=${ODBC_CONFIG}/bin/odbc_config
+-	fi
+ fi
+ 
+ #
+ # ODBC include and library
+ #
+-
+-if test "$ODBC_CONFIG" != ""; then
+-	if test "$with_iodbc" != no; then
+-		ODBC_INCLUDE=`${ODBC_CONFIG} --cflags`
+-		CPPFLAGS="$CPPFLAGS ${ODBC_INCLUDE}"
+-		# Linking libiodoc is rather problematic
+-		[ODBC_LIBDIR=`${ODBC_CONFIG} --libs | sed -e "s/^\(-L\|.*[ \t]-L\)\([^ \n\r\f\t]*\).*$/-L\2/"`]
+-		LDFLAGS="$LDFLAGS ${ODBC_LIBDIR}"
+-	else
+-		ODBC_INCLUDE=`${ODBC_CONFIG} --include-prefix`
+-		CPPFLAGS="$CPPFLAGS -I${ODBC_INCLUDE}"
+-		# Linking libodoc is rather problematic
+-		ODBC_LIBDIR=`${ODBC_CONFIG} --lib-prefix`
+-		LDFLAGS="$LDFLAGS -L${ODBC_LIBDIR}"
+-	fi
+-	AC_MSG_NOTICE([using $ODBC_INCLUDE $ODBC_LIBDIR])
+-fi
++ODBC_LIBS="-lodbcinst"
++LIBS="$LIBS ${ODBC_LIBS}"
++AC_MSG_NOTICE([using $ODBC_INCLUDE $ODBC_LIBS])
+ 
+ #
+ # SQLCOLATTRIBUTE_SQLLEN check
+@@ -176,18 +138,10 @@ PGAC_ARG_BOOL(enable, pthreads, yes,
+ # Find libpq headers and libraries
+ #
+ 
+-if test -z "$PG_CONFIG"; then
+-  AC_PATH_PROGS(PG_CONFIG, pg_config)
+-fi
+-
+-if test -n "$PG_CONFIG"; then
+-  pg_includedir=`"$PG_CONFIG" --includedir`
+-  pg_libdir=`"$PG_CONFIG" --libdir`
+-  CPPFLAGS="$CPPFLAGS -I$pg_includedir"
+-  LDFLAGS="$LDFLAGS -L$pg_libdir"
+-fi
+-
+-
++pg_includedir=""
++pg_libdir=""
++CPPFLAGS="$CPPFLAGS"
++LDFLAGS="$LDFLAGS"
+ 
+ # 1. Programs
+ 
+@@ -211,12 +165,6 @@ if test "$with_iodbc" != no; then
+                  [AC_MSG_ERROR([iODBC library "iodbcinst" not found])])
+ fi
+ 
+-if test "$enable_pthreads" = yes; then
+-  AC_CHECK_LIB(pthreads, pthread_create,
+-               [],
+-	       [AC_CHECK_LIB(pthread, pthread_create)])
+-fi
+-
+ AC_CHECK_LIB(pq, PQsetSingleRowMode, [],
+ 	      [AC_MSG_ERROR([libpq library version >= 9.2 is required])])
+ 
+-- 
+2.8.1
+

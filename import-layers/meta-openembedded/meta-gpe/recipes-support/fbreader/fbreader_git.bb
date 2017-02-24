@@ -40,3 +40,6 @@ do_configure() {
 do_install() {
     oe_runmake install DESTDIR=${D} RESOLUTION=${READER_RESOLUTION}
 }
+
+# http://errors.yoctoproject.org/Errors/Details/68618/
+PNBLACKLIST[fbreader] ?= "BROKEN: fails to build with gcc-6"

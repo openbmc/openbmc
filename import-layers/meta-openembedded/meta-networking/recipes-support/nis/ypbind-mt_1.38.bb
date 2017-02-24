@@ -19,7 +19,7 @@ This is the final IPv4-only version of ypbind-mt. \
 HOMEPAGE = "http://www.linux-nis.org/nis/ypbind-mt/index.html"
 DEPENDS = " \
            yp-tools \
-           ${@base_contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)} \
+           ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)} \
           "
 RDEPENDS_${PN} += "yp-tools"
 

@@ -1,0 +1,46 @@
+--- git/src/htsmsg.c.orig	2016-06-17 11:47:53.026921237 -0400
++++ git/src/htsmsg.c	2016-06-17 11:49:03.086922457 -0400
+@@ -574,13 +574,13 @@
+     case HMF_MAP:
+       printf("MAP) = {\n");
+       htsmsg_print0(&f->hmf_msg, indent + 1);
+-      for(i = 0; i < indent; i++) printf("\t"); printf("}\n");
++      for(i = 0; i < indent; i++) {printf("\t");} printf("}\n");
+       break;
+ 
+     case HMF_LIST:
+       printf("LIST) = {\n");
+       htsmsg_print0(&f->hmf_msg, indent + 1);
+-      for(i = 0; i < indent; i++) printf("\t"); printf("}\n");
++      for(i = 0; i < indent; i++) {printf("\t");} printf("}\n");
+       break;
+       
+     case HMF_STR:
+--- git/src/dvb/dvb_tables.c.orig	2016-06-17 11:51:09.142924652 -0400
++++ git/src/dvb/dvb_tables.c	2016-06-17 11:54:33.962928219 -0400
+@@ -935,10 +935,10 @@
+     onid = (ptr[24] << 8) | ptr[25];
+     
+     /* Search all muxes on adapter */
+-    LIST_FOREACH(tdmi, &tda->tda_muxes, tdmi_adapter_link)
+-      if(tdmi->tdmi_transport_stream_id == tsid && tdmi->tdmi_network_id == onid);
+-	break;
+-    
++    LIST_FOREACH(tdmi, &tda->tda_muxes, tdmi_adapter_link) {
++      if(tdmi->tdmi_transport_stream_id == tsid && tdmi->tdmi_network_id == onid)
++    	break;
++    }
+     if(tdmi == NULL)
+       continue;
+ 
+--- git/src/epggrab/module/eit.c.orig	2016-06-17 11:49:57.726923409 -0400
++++ git/src/epggrab/module/eit.c	2016-06-17 11:50:14.526923701 -0400
+@@ -214,7 +214,7 @@
+   if (m && m->enabled) cptr = _eit_freesat_conv;
+   else
+     m = epggrab_module_find_by_id("uk_freeview");
+-    if (m && m->enabled) cptr = _eit_freesat_conv;
++  if (m && m->enabled) cptr = _eit_freesat_conv;
+ 
+   /* Convert */
+   return dvb_get_string_with_len(dst, dstlen, src, srclen, charset, cptr);

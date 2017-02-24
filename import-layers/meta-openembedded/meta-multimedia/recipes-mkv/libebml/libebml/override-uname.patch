@@ -1,0 +1,42 @@
+Allow override of the 'uname -s' for cross-compilation
+
+Signed-off-by: Christopher Larson <chris_larson@mentor.com>
+Upstream-Status: Pending
+
+diff --git a/make/linux/Makefile b/make/linux/Makefile
+index a2ac13e..4188bee 100644
+--- a/make/linux/Makefile
++++ b/make/linux/Makefile
+@@ -9,9 +9,11 @@
+ # 'make DEBUG=yes'.
+ #
+
++TARGET_OS ?= $(shell uname -s)
++
+ # Paths
+ # BeOS wants the libs and headers in /boot/home/config
+-ifeq (BeOS,$(shell uname -s))
++ifeq (BeOS,$(TARGET_OS))
+ prefix=/boot/home/config
+ else
+ prefix=/usr/local
+@@ -66,7 +68,7 @@ COMPILEFLAGS=$(WARNINGFLAGS) $(CXXFLAGS) $(CPPFLAGS) $(DEBUGFLAGS) $(INCLUDE)
+ DEPENDFLAGS  = $(CXXFLAGS) $(INCLUDE)
+ LINKFLAGS=$(LDFLAGS)
+
+-ifeq (Darwin,$(shell uname -s))
++ifeq (Darwin,$(TARGET_OS))
+ all: staticlib
+ else
+ all: staticlib sharedlib
+@@ -116,7 +118,7 @@ depend:
+		$(CXX) $(DEPENDFLAGS) -MM -MT $$o $$i >> .depend ; \
+	done
+
+-ifeq (Darwin,$(shell uname -s))
++ifeq (Darwin,$(TARGET_OS))
+ install: install_staticlib install_headers
+ else
+ install: install_staticlib install_sharedlib install_headers
+--
+2.8.0

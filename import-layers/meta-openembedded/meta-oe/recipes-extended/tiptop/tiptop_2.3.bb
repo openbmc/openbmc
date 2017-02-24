@@ -15,7 +15,7 @@ COMPATIBLE_HOST = "(i.86|x86_64|arm|powerpc).*-linux"
 do_configure_prepend () {
     # Two bugs in configure.ac when cross-compiling.
     # 1. The path of libxml2. Specify it in EXTRA_OECONF.
-    # 2. hw's value on other platforms. Replace it if the target is 
+    # 2. hw's value on other platforms. Replace it if the target is
     #    not i*86/x86_64.
     if ( echo "${TARGET_ARCH}" | grep -q -e 'i.86' -e 'x86_64' ); then
         sed -i 's= -I/usr/include/libxml2=='    ${S}/configure.ac

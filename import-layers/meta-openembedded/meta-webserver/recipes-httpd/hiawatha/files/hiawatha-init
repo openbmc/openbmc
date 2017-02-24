@@ -19,6 +19,7 @@ OPTS=""
 case "$1" in
   start)
 	echo -n "Starting $DESC: "
+	mkdir -p /var/log/hiawatha &> /dev/null
 	start-stop-daemon --start -x "$DAEMON" -- $OPTS
 	echo "$NAME."
 	;;

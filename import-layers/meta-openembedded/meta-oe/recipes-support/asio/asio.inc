@@ -6,7 +6,7 @@ HOMEPAGE = "http://think-async.com/Asio"
 SECTION = "libs"
 LICENSE = "BSL-1.0"
 
-DEPENDS = "boost"
+DEPENDS = "boost openssl"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/asio/${BP}.tar.bz2"
 

@@ -27,11 +27,11 @@ index 90e797a..98fd824 100644
  # Project-wide settings
 @@ -87,7 +90,9 @@ cxx_library(gmock_main
  
- install(TARGETS gmock DESTINATION lib)
- install(TARGETS gmock_main DESTINATION lib)
+ install(TARGETS gmock DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ install(TARGETS gmock_main DESTINATION ${CMAKE_INSTALL_LIBDIR})
 -
 +install(FILES "${CMAKE_CURRENT_BINARY_DIR}/gmock.pc"
-+    DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig/"
++    DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig/"
 +)  
  ########################################################################
  #

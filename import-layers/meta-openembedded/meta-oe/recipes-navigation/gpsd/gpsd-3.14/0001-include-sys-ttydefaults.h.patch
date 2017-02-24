@@ -1,0 +1,34 @@
+From 543f79222520cc6ab65d20f9fa356dac5c848e3b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 17 Aug 2016 02:16:12 +0000
+Subject: [PATCH] include sys/ttydefaults.h
+
+This is needed for CTRL definition, as exposed by musl on glibc
+this include file gets pulled indirectly.
+
+/usr/src/debug/gpsd/3.14-r0/gpsd-3.14/gpsmon.c:605: undefined reference to `CTRL'
+clang-3.9: error: linker command failed with exit code 1 (use -v to see invocation)
+scons: *** [gpsmon] Error 1
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ gpsmon.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/gpsmon.c b/gpsmon.c
+index bee05b8..daed818 100644
+--- a/gpsmon.c
++++ b/gpsmon.c
+@@ -20,6 +20,7 @@
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <sys/select.h>
++#include <sys/ttydefaults.h>
+ #include <fcntl.h>
+ #ifndef S_SPLINT_S
+ #include <unistd.h>
+-- 
+1.8.3.1
+

@@ -4,20 +4,38 @@ SUMMARY = "Linux DVB API applications and utilities"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
-SRC_URI = "hg://linuxtv.org/hg;module=dvb-apps;protocol=http"
-SRCREV = "3fc7dfa68484"
+DEPENDS = "v4l-utils-native"
+
+SRC_URI = " \
+            hg://linuxtv.org/hg;module=dvb-apps;protocol=http;name=apps \
+            git://linuxtv.org/git/dtv-scan-tables.git;protocol=http;destsuffix=dvb-apps/initial-scan-tables;name=scantables \
+          "
+SRCREV_apps = "3d43b280298c"
+SRCREV_scantables = "ceb11833b35f05813b1f0397a60e0f3b99430aab"
+SRCREV_FORMAT = "apps_scantables"
 
 S = "${WORKDIR}/${BPN}"
 
+TARGET_CC_ARCH += "${LDFLAGS}"
+EXTRA_OEMAKE = "VERSION_FILE='${STAGING_INCDIR}/linux/dvb/version.h'"
+
 do_configure() {
-    sed -i -e s:/usr/include:${STAGING_INCDIR}:g util/av7110_loadkeys/generate-keynames.sh 
+    sed -i -e s:/usr/include:${STAGING_INCDIR}:g util/av7110_loadkeys/generate-keynames.sh
+}
+
+do_compile_append() {
+# dvb-apps only support DVBAPI v3, so generate them from the DVBAPI v5 downloaded files
+    make -C initial-scan-tables clean
+    make -C initial-scan-tables dvbv3
 }
 
 do_install() {
     make DESTDIR=${D} install
+# dvb-apps only support DVBAPI v3, so only install the generated DVBAPI v3 files
+    make -C initial-scan-tables DATADIR=${D}/${datadir} DVBV3DIR=dvb install_v3
+
     install -d ${D}/${bindir}
     install -d ${D}/${docdir}/dvb-apps
-    install -d ${D}/${docdir}/dvb-apps/scan
     install -d ${D}/${docdir}/dvb-apps/szap
     chmod a+rx ${D}/${libdir}/*.so*
 
@@ -63,6 +81,9 @@ PACKAGES =+ "dvb-evtest dvb-evtest-dbg \
              dvb-femon dvb-femon-dbg \
              dvb-zap-data"
 
+# Expose the packages from the above spitting
+PACKAGES =+ "libdvbapi libdvbcfg libdvben50221 \
+             libesg libucsi libdvbsec"
 
 FILES_${PN} = "${bindir} ${datadir}/dvb"
 FILES_${PN}-doc = ""
@@ -86,7 +107,7 @@ FILES_dvbnet-dbg = "${bindir}/.debug/dvbnet"
 
 FILES_dvb-scan = "${bindir}/*scan "
 FILES_dvb-scan-dbg = "${bindir}/.debug/*scan"
-FILES_dvb-scan-data = "${docdir}/dvb-apps/scan"
+FILES_dvb-scan-data = "${datadir}/dvb"
 
 FILES_dvb-azap = "${bindir}/azap"
 FILES_dvb-azap-dbg = "${bindir}/.debug/azap"
@@ -104,3 +125,10 @@ FILES_dvb-femon = "${bindir}/femon"
 FILES_dvb-femon-dbg = "${bindir}/.debug/femon"
 
 FILES_dvb-zap-data = "${docdir}/dvb-apps/szap"
+
+RDEPENDS_dvbdate =+ "libdvbapi libucsi"
+RDEPENDS_dvbtraffic =+ "libdvbapi"
+RDEPENDS_dvb-scan =+ "libdvbapi libdvbcfg libdvbsec"
+RDEPENDS_dvb-apps =+ "libdvbapi libdvbcfg libdvbsec libdvben50221 libucsi"
+RDEPENDS_dvb-femon =+ "libdvbapi"
+RDEPENDS_dvbnet =+ "libdvbapi"

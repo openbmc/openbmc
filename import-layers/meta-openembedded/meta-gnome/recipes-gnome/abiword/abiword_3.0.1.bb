@@ -13,6 +13,7 @@ RCONFLICTS_${PN} = "${PN}-embedded"
 SRC_URI = " \
     http://www.abisource.com/downloads/${BPN}/${PV}/source/${BP}.tar.gz \
     file://0001-plugins-aiksaurus-Makefile.am-remove-uncomplete-opti.patch \
+    file://0002-Bug-13754-Fix-build-on-gcc-6-default-to-C-11.patch \
 "
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=c5edcc3ccd864b19004d14e9c1c9a26a"
@@ -75,7 +76,7 @@ FILES_${PN} += " \
                 ${datadir}/${PN}-${SHRT_VER}/templates/Press-Release.awt \
                 ${datadir}/${PN}-${SHRT_VER}/certs \
                 ${datadir}/${PN}-${SHRT_VER}/ui \
-                ${datadir}/${PN}-${SHRT_VER}/xsl* \ 
+                ${datadir}/${PN}-${SHRT_VER}/xsl* \
                 ${datadir}/${PN}-${SHRT_VER}/mime-info \
                 ${datadir}/${PN}-${SHRT_VER}/Pr*.xml \
 "
@@ -113,7 +114,7 @@ python populate_packages_prepend () {
     packages = d.getVar('PACKAGES', 1).split()
     for pkg in packages[1:]:
         if not pkg in blacklist and not pkg in metapkg_rdepends and not pkg.count("-dev") and not pkg.count("-dbg") and not pkg.count("static") and not pkg.count("locale") and not pkg.count("abiword-doc"):
-            print "Modifying ", pkg
+            print("Modifying %s" % pkg)
             metapkg_rdepends.append(pkg)
     d.setVar('RDEPENDS_' + metapkg, ' '.join(metapkg_rdepends))
     d.setVar('DESCRIPTION_' + metapkg, 'abiword-plugin meta package')

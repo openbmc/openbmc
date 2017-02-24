@@ -1,0 +1,33 @@
+Fix build error with gcc6:
+../../gtksourceview-2.10.5/gtksourceview/gtksourceprintcompositor.c: In function 'strdup_strftime':
+../../gtksourceview-2.10.5/gtksourceview/gtksourceprintcompositor.c:1951:3: error: format not a string literal, format string not checked [-Werror=format-nonliteral]
+   tmplen = strftime (tmpbuf, tmpbufsize, locale_format, tm);
+   ^~~~~~
+
+Patch Reference:
+https://git.gnome.org/browse/glib/commit/?id=0817af40e8c74c721c30f6ef482b1f53d12044c7
+https://git.gnome.org/browse/glib/commit/?id=8cdbc7fb2c8c876902e457abe46ee18a0b134486
+
+Upstream-Status: Pending
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+
+diff -Nurp gtksourceview-2.10.5.orig/gtksourceview/gtksourceprintcompositor.c gtksourceview-2.10.5/gtksourceview/gtksourceprintcompositor.c
+--- gtksourceview-2.10.5.orig/gtksourceview/gtksourceprintcompositor.c	2016-07-01 13:11:43.631173762 +0800
++++ gtksourceview-2.10.5/gtksourceview/gtksourceprintcompositor.c	2016-07-04 13:54:18.223726343 +0800
+@@ -1913,6 +1913,8 @@ setup_pango_layouts (GtkSourcePrintCompo
+  * GLIB - Library of useful routines for C programming
+  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald */
+ 
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+ static gchar *
+ strdup_strftime (const gchar *format, const struct tm *tm)
+ {
+@@ -1982,6 +1984,7 @@ strdup_strftime (const gchar *format, co
+ 
+ 	return convbuf;
+ }
++#pragma GCC diagnostic pop
+ 
+ static gchar *
+ evaluate_format_string (GtkSourcePrintCompositor *compositor,

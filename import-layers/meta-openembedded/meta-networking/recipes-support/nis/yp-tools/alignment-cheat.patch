@@ -1,0 +1,52 @@
+yp-tools: avoid fatal cast warning
+
+The way casting is done, we will get a fatal alignment warning on some
+architectures.  This patch cheats our way around this.
+
+We also eliminate an unused constant which causes a fatal warning.
+
+Upstream-status: Inappropriate [code does not exist in version 4.x]
+
+Signed-off-by: Joe Slater <jslater@windriver.com>
+
+--- a/lib/do_ypcall.c
++++ b/lib/do_ypcall.c
+@@ -44,7 +44,6 @@ struct dom_binding
+ typedef struct dom_binding dom_binding;
+ 
+ static const struct timeval RPCTIMEOUT = {25, 0};
+-static const struct timeval UDPTIMEOUT = {5, 0};
+ static int const MAXTRIES = 2;
+ static pthread_mutex_t ypbindlist_lock = PTHREAD_MUTEX_INITIALIZER;
+ static dom_binding *ypbindlist = NULL;
+@@ -381,7 +380,7 @@ __ypclnt_call (u_long prog, xdrproc_t xa
+ 
+ int
+ do_ypcall (const char *domain, u_long prog, xdrproc_t xargs,
+-	   caddr_t req, xdrproc_t xres, caddr_t resp)
++	   caddr_t req, xdrproc_t xres, void *resp)
+ {
+   dom_binding *ydb;
+   int status;
+@@ -450,7 +449,7 @@ do_ypcall (const char *domain, u_long pr
+ /* Like do_ypcall, but translate the status value if necessary.  */
+ int
+ do_ypcall_tr (const char *domain, u_long prog, xdrproc_t xargs,
+-	      caddr_t req, xdrproc_t xres, caddr_t resp)
++	      caddr_t req, xdrproc_t xres, void *resp)
+ {
+   int status = do_ypcall (domain, prog, xargs, req, xres, resp);
+   if (status == YPERR_SUCCESS)
+--- a/lib/internal.h
++++ b/lib/internal.h
+@@ -17,8 +17,8 @@
+ #define _INTERNAL_H_
+ 
+ extern int do_ypcall (const char *domain, u_long prog, xdrproc_t xargs,
+-		      caddr_t req, xdrproc_t xres, caddr_t resp);
++		      caddr_t req, xdrproc_t xres, void *resp);
+ extern int do_ypcall_tr (const char *domain, u_long prog, xdrproc_t xargs,
+-			 caddr_t req, xdrproc_t xres, caddr_t resp);
++			 caddr_t req, xdrproc_t xres, void *resp);
+ extern int yp_maplist (const char *, struct ypmaplist **);
+ #endif
