@@ -4,11 +4,11 @@ This patch fixes issuing with different libdir like lib64.
 This patch makes the native python binary modules findable
 in the install process of the host python.
 
-Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
 Date: 2012/03/14
 
 Updated for python 2.7.3
-Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
 Date: 2012/05/01
 
 Index: Python-3.3.0rc2/Lib/sysconfig.py

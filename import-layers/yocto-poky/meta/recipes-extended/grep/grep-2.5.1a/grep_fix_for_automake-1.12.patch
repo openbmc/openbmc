@@ -13,7 +13,7 @@ this patch avoids these kinds of errors:
 | src/Makefile.am:2: error: automatic de-ANSI-fication support has been removed
 | autoreconf: automake failed with exit status: 1
 
-Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
 2012/05/04
 
 Index: grep-2.5.1a/configure.in

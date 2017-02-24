@@ -10,7 +10,7 @@ Index: slang-2.2.4/configure
 ===================================================================
 --- slang-2.2.4.orig/configure	2012-03-14 23:40:01.283560679 +0000
 +++ slang-2.2.4/configure	2012-03-14 23:41:18.023558900 +0000
-@@ -6081,56 +6081,7 @@
+@@ -6246,68 +6246,7 @@ esac
  ELF_CFLAGS="$ELF_CFLAGS $IEEE_CFLAGS"
  CFLAGS="$CFLAGS $IEEE_CFLAGS"
  
@@ -39,7 +39,7 @@ Index: slang-2.2.4/configure
 -      fi
 -    fi
 -  ;;
--  *osf*|*openbsd*)
+-  *osf*|*openbsd*|*freebsd*)
 -    if test "X$GCC" = Xyes
 -    then
 -      RPATH="-Wl,-rpath,"
@@ -60,7 +60,19 @@ Index: slang-2.2.4/configure
 -      RPATH="$RPATH$libdir"
 -    fi
 -  else
--    RPATH="$RPATH:$libdir"
+-    _already_there=0
+-    for X in `echo $RPATH | sed 's/:/ /g'`
+-    do
+-      if test "$X" = "$libdir"
+-      then
+-        _already_there=1
+-	break
+-      fi
+-    done
+-    if test $_already_there = 0
+-    then
+-      RPATH="$RPATH:$libdir"
+-    fi
 -  fi
 -fi
 -

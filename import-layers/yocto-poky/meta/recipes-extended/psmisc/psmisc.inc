@@ -15,6 +15,9 @@ S = "${WORKDIR}/psmisc-${PV}"
 
 inherit autotools gettext
 
+PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', 'ipv6', '', d)}"
+PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,"
+
 ALLOW_EMPTY_${PN} = "1"
 
 PACKAGES =+ "fuser fuser-doc killall killall-doc pstree pstree-doc"

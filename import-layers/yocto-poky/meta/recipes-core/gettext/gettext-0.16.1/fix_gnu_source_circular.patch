@@ -6,7 +6,7 @@ Thanks to Mark Hatle for the timely pointers and fixes.
 
 Upstream-Status: Inappropriate [licensing]
 
-Signed-off-by Saul Wold <sgw@linux.intel.com>
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
 
 diff -ru gettext-0.16.1/gettext-runtime/gnulib-m4/extensions.m4 gettext.patched/gettext-runtime/gnulib-m4/extensions.m4
 --- gettext-0.16.1/gettext-runtime/gnulib-m4/extensions.m4	2006-11-27 09:14:38.000000000 -0800

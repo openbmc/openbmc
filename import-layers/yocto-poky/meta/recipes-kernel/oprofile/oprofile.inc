@@ -24,7 +24,9 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BPN}-${PV}.tar.gz \
            file://oprofile-cross-compile-tests.patch \
            file://run-ptest \
            file://root-home-dir.patch \
-           file://0001-Add-rmb-definition-for-NIOS2-architecture.patch"
+           file://0001-Add-rmb-definition-for-NIOS2-architecture.patch \
+           file://0001-Fix-FTBFS-problem-with-GCC-6.patch \
+"
 
 SRC_URI_append_libc-musl = " file://musl.patch"
 

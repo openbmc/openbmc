@@ -20,11 +20,11 @@
                     <tr>
                         <th>Package</th>
                         <th>Version</th>
-                        <th class='sizecol span2'>Size</th>
+                        <th class='sizecol col-md-2'>Size</th>
                     </tr>
                 </thead>
                 <tbody>
-					{% for runtime_dep in runtime_deps %}
+                  {% for runtime_dep in runtime_deps %}
                         <tr {{runtime_dep.size|format_vpackage_rowclass}} >
                             {% if runtime_dep.size != -1 %}
                             <td>
@@ -41,7 +41,7 @@
                             <td>{{runtime_dep.version}}&nbsp;</td>
                             <td class='sizecol'>{{runtime_dep.size|filtered_filesizeformat}}&nbsp;</td>
                         </tr>
-					{% endfor %}
+                        {% endfor %}
                  </tbody>
             </table>
         {% else %}
@@ -57,15 +57,15 @@
                     <tr>
                         <th>Package</th>
                         <th>Version</th>
-                        <th class='sizecol span2'>Size</th>
+                        <th class='sizecol col-md-2'>Size</th>
                         <th>
-                            <i class="icon-question-sign get-help" title="Five relationship types exist: recommends, suggests, provides, replaces and conflicts"></i>
+                            <span class="glyphicon glyphicon-question-sign get-help" title="Five relationship types exist: recommends, suggests, provides, replaces and conflicts"></span>
                             Relationship type
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-					{% for other_dep in other_deps %}
+                  {% for other_dep in other_deps %}
                         {% if other_dep.installed %}
                             <tr {{other_dep.size|format_vpackage_rowclass}}>
                                 {% if other_dep.size != -1 %}
@@ -86,21 +86,21 @@
                                 <td class='sizecol'>{{other_dep.size|filtered_filesizeformat}}&nbsp;</td>
                                 <td>
                                     {{other_dep.dep_type_display}}
-                                    <i class="icon-question-sign get-help hover-help" title="{{other_dep.dep_type_help}}" ></i>
+                                    <span class="glyphicon glyphicon-question-sign get-help hover-help" title="{{other_dep.dep_type_help}}" ></span>
                                 </td>
                             </tr>
                         {% else %}
-                            <tr class="muted">
+                            <tr class="text-muted">
                                 <td>{{other_dep.name}}</td>
                                 <td>{{other_dep.version}}</td>
                                 <td></td>
                                 <td>
                                     {{other_dep.dep_type_display}}
-                                    <i class="icon-question-sign get-help hover-help" title="{{other_dep.dep_type_help}}" ></i>
+                                    <span class="glyphicon glyphicon-question-sign get-help hover-help" title="{{other_dep.dep_type_help}}" ></span>
                                 </td>
                             </tr>
                         {% endif %}
-					{% endfor %}
+                        {% endfor %}
                 </tbody>
             </table>
         {% endifnotequal %}

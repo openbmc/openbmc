@@ -13,7 +13,7 @@
             "name": "Local OpenEmbedded",
             "sourcetype": "local",
             "apiurl": "../../",
-            "branches": ["HEAD", "master", "jethro", "krogoth"],
+            "branches": ["HEAD", "master"],
             "layers": [
                 {
                     "name": "openembedded-core",
@@ -27,13 +27,13 @@
             "name": "OpenEmbedded",
             "sourcetype": "layerindex",
             "apiurl": "http://layers.openembedded.org/layerindex/api/",
-            "branches": ["master", "jethro", "krogoth"]
+            "branches": ["master"]
         },
         {
             "name": "Imported layers",
             "sourcetype": "imported",
             "apiurl": "",
-            "branches": ["master", "jethro", "krogoth", "HEAD"]
+            "branches": ["master", "HEAD"]
 
         }
     ],
@@ -42,18 +42,6 @@
             "name": "master",
             "giturl": "git://git.openembedded.org/bitbake",
             "branch": "master",
-            "dirpath": ""
-        },
-        {
-            "name": "jethro",
-            "giturl": "git://git.openembedded.org/bitbake",
-            "branch": "1.28",
-            "dirpath": ""
-        },
-        {
-            "name": "krogoth",
-            "giturl": "git://git.openembedded.org/bitbake",
-            "branch": "1.30",
             "dirpath": ""
         },
         {
@@ -75,24 +63,6 @@
             "defaultlayers": [ "openembedded-core" ],
             "layersourcepriority": { "Imported layers": 99, "Local OpenEmbedded" : 10, "OpenEmbedded" :  0 },
             "helptext": "Toaster will run your builds using the tip of the <a href=\"http://cgit.openembedded.org/openembedded-core/log/\">OpenEmbedded master</a> branch, where active development takes place. This is not a stable branch, so your builds might not work as expected."
-        },
-        {
-            "name": "jethro",
-            "description": "OpenEmbedded Jethro",
-            "bitbake": "jethro",
-            "branch": "jethro",
-            "defaultlayers": [ "openembedded-core" ],
-            "layersourcepriority": { "Imported layers": 99, "Local OpenEmbedded" : 10, "OpenEmbedded" :  0 },
-            "helptext": "Toaster will run your builds with the tip of the <a href=\"http://cgit.openembedded.org/openembedded-core/log/?h=jethro\">OpenEmbedded \"Jethro\"</a> branch"
-        },
-        {
-            "name": "krogoth",
-            "description": "OpenEmbedded Krogoth",
-            "bitbake": "krogoth",
-            "branch": "krogoth",
-            "defaultlayers": [ "openembedded-core" ],
-            "layersourcepriority": { "Imported layers": 99, "Local OpenEmbedded" : 10, "OpenEmbedded" :  0 },
-            "helptext": "Toaster will run your builds with the tip of the <a href=\"http://cgit.openembedded.org/openembedded-core/log/?h=krogoth\">OpenEmbedded \"Krogoth\"</a> branch"
         },
         {
             "name": "local",

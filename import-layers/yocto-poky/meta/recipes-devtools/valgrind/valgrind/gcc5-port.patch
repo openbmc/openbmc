@@ -1,0 +1,64 @@
+backport fix from upstream to fix build errors with gcc 6
+
+http://valgrind.10908.n7.nabble.com/Valgrind-r15773-in-trunk-configure-ac-drd-tests-std-thread-cpp-drd-tests-std-thread2-cpp-td56109.html
+
+../../../valgrind-3.11.0/drd/tests/std_thread.cpp:30:3: error: '_Impl_base' is not a member of 'std::thread'
+   std::thread::_Impl_base* __t = static_cast<std::thread::_Impl_base*>(__p);
+   ^~~
+../../../valgrind-3.11.0/drd/tests/std_thread.cpp:30:28: error: '__t' was not declared in this scope
+   std::thread::_Impl_base* __t = static_cast<std::thread::_Impl_base*>(__p);
+                            ^~~
+../../../valgrind-3.11.0/drd/tests/std_thread.cpp:30:59: error: '_Impl_base' in 'class std::thread' does not name a type
+   std::thread::_Impl_base* __t = static_cast<std::thread::_Impl_base*>(__p);
+                                                           ^~~~~~~~~~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Backport
+
+Index: configure.ac
+===================================================================
+--- a/configure.ac	(revision 15772)
++++ b/configure.ac	(revision 15773)
+@@ -160,7 +160,7 @@
+      icc-1[[3-9]].*)
+ 	AC_MSG_RESULT([ok (ICC version ${gcc_version})])
+ 	;;
+-     notclang-[[3-9]].*|notclang-[[1-9][0-9]]*)
++     notclang-[[3-9]]|notclang-[[3-9]].*|notclang-[[1-9][0-9]]*)
+ 	AC_MSG_RESULT([ok (${gcc_version})])
+ 	;;
+      clang-2.9|clang-[[3-9]].*|clang-[[1-9][0-9]]*)
+Index: drd/tests/std_thread2.cpp
+===================================================================
+--- a/drd/tests/std_thread2.cpp	(revision 15772)
++++ b/drd/tests/std_thread2.cpp	(revision 15773)
+@@ -26,6 +26,7 @@
+   return 0;
+ }
+ 
++#if defined(__GNUC__) && __GNUC__ -0 < 6
+ //
+ // From libstdc++-v3/src/c++11/thread.cc
+ //
+@@ -70,3 +71,4 @@
+     }
+   }
+ }
++#endif
+Index: drd/tests/std_thread.cpp
+===================================================================
+--- a/drd/tests/std_thread.cpp	(revision 15772)
++++ b/drd/tests/std_thread.cpp	(revision 15773)
+@@ -21,6 +21,7 @@
+   return 0;
+ }
+ 
++#if defined(__GNUC__) && __GNUC__ -0 < 6
+ //
+ // From libstdc++-v3/src/c++11/thread.cc
+ //
+@@ -65,3 +66,4 @@
+     }
+   }
+ }
++#endif

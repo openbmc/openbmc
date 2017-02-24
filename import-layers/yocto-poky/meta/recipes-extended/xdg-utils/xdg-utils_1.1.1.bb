@@ -27,6 +27,7 @@ SRC_URI[sha256sum] = "b0dd63a2576e0bb16f1aa78d6ddf7d6784784a098d4df17161cd6a17c7
 
 UPSTREAM_CHECK_REGEX = "xdg-utils-(?P<pver>((\d+[\.\-_]*)+)((rc|alpha|beta)\d+)?)\.(tar\.gz|tgz)"
 
+# Needs brokensep as this doesn't use automake
 inherit autotools-brokensep distro_features_check
 
 # The xprop requires x11 in DISTRO_FEATURES

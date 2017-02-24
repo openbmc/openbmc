@@ -1,0 +1,24 @@
+commit c45bae84817a70fef6c2b661a07a492a0d23ae85
+Author: Peter Seebach <peter.seebach@windriver.com>
+Date:   Wed May 11 15:16:06 2016 -0500
+
+    Fix permissions on temporary directory
+
+    The temporary directory's permissions have to allow other users to
+    view the directory. A default umask of 022 is common, but not mandatory,
+    and secure systems may have more restrictive defaults.
+
+    Signed-off-by: Peter Seebach <peter.seebach@windriver.com>
+
+diff --git a/test/root/permissions.test b/test/root/permissions.test
+index 42615f5..098b52a 100644
+--- a/test/root/permissions.test
++++ b/test/root/permissions.test
+@@ -16,6 +16,7 @@ Cry immediately if we are not running as root.
+ First, set up a temporary directory and create a regular file with
+ defined permissions.
+ 
++	$ umask 022
+ 	$ mkdir d
+ 	$ cd d
+ 	$ umask 027

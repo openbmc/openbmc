@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # OpenEmbedded pkgdata utility
 #
@@ -240,7 +240,7 @@ def lookup_pkg(args):
         sys.exit(1)
 
     if args.reverse:
-        items = mappings.values()
+        items = list(mappings.values())
     else:
         items = []
         for pkg in pkgs:
@@ -272,6 +272,61 @@ def lookup_recipe(args):
     items = []
     for pkg in pkgs:
         items.extend(mappings.get(pkg, []))
+    print('\n'.join(items))
+
+def package_info(args):
+    # Handle both multiple arguments and multiple values within an arg (old syntax)
+    packages = []
+    if args.file:
+        with open(args.file, 'r') as f:
+            for line in f:
+                splitline = line.split()
+                if splitline:
+                    packages.append(splitline[0])
+    else:
+        for pkgitem in args.pkg:
+            packages.extend(pkgitem.split())
+        if not packages:
+            logger.error("No packages specified")
+            sys.exit(1)
+
+    mappings = defaultdict(lambda: defaultdict(str))
+    for pkg in packages:
+        pkgfile = os.path.join(args.pkgdata_dir, 'runtime-reverse', pkg)
+        if os.path.exists(pkgfile):
+            with open(pkgfile, 'r') as f:
+                for line in f:
+                    fields = line.rstrip().split(': ')
+                    if fields[0].endswith("_" + pkg):
+                        k = fields[0][:len(fields[0]) - len(pkg) - 1]
+                    else:
+                        k = fields[0]
+                    v = fields[1] if len(fields) == 2 else ""
+                    mappings[pkg][k] = v
+
+    if len(mappings) < len(packages):
+        missing = list(set(packages) - set(mappings.keys()))
+        logger.error("The following packages could not be found: %s" %
+                     ', '.join(missing))
+        sys.exit(1)
+
+    items = []
+    for pkg in packages:
+        pkg_version = mappings[pkg]['PKGV']
+        if mappings[pkg]['PKGE']:
+            pkg_version = mappings[pkg]['PKGE'] + ":" + pkg_version
+        if mappings[pkg]['PKGR']:
+            pkg_version = pkg_version + "-" + mappings[pkg]['PKGR']
+        recipe = mappings[pkg]['PN']
+        recipe_version = mappings[pkg]['PV']
+        if mappings[pkg]['PE']:
+            recipe_version = mappings[pkg]['PE'] + ":" + recipe_version
+        if mappings[pkg]['PR']:
+            recipe_version = recipe_version + "-" + mappings[pkg]['PR']
+        pkg_size = mappings[pkg]['PKGSIZE']
+
+        items.append("%s %s %s %s %s" %
+                     (pkg, pkg_version, recipe, recipe_version, pkg_size))
     print('\n'.join(items))
 
 def get_recipe_pkgs(pkgdata_dir, recipe, unpackaged):
@@ -437,6 +492,7 @@ def main():
     parser.add_argument('-d', '--debug', help='Enable debug output', action='store_true')
     parser.add_argument('-p', '--pkgdata-dir', help='Path to pkgdata directory (determined automatically if not specified)')
     subparsers = parser.add_subparsers(title='subcommands', metavar='<subcommand>')
+    subparsers.required = True
 
     parser_lookup_pkg = subparsers.add_parser('lookup-pkg',
                                           help='Translate between recipe-space package names and runtime package names',
@@ -468,6 +524,13 @@ def main():
                                           description='Looks up the specified runtime package(s) to see which recipe they were produced by')
     parser_lookup_recipe.add_argument('pkg', nargs='+', help='Runtime package name to look up')
     parser_lookup_recipe.set_defaults(func=lookup_recipe)
+
+    parser_package_info = subparsers.add_parser('package-info',
+                                          help='Shows version, recipe and size information for one or more packages',
+                                          description='Looks up the specified runtime package(s) and display information')
+    parser_package_info.add_argument('pkg', nargs='*', help='Runtime package name to look up')
+    parser_package_info.add_argument('-f', '--file', help='Read package names from the specified file (one per line, first field only)')
+    parser_package_info.set_defaults(func=package_info)
 
     parser_find_path = subparsers.add_parser('find-path',
                                           help='Find package providing a target path',
@@ -506,7 +569,10 @@ def main():
             sys.exit(1)
         logger.debug('Found bitbake path: %s' % bitbakepath)
         tinfoil = tinfoil_init()
-        args.pkgdata_dir = tinfoil.config_data.getVar('PKGDATA_DIR', True)
+        try:
+            args.pkgdata_dir = tinfoil.config_data.getVar('PKGDATA_DIR', True)
+        finally:
+            tinfoil.shutdown()
         logger.debug('Value of PKGDATA_DIR is "%s"' % args.pkgdata_dir)
         if not args.pkgdata_dir:
             logger.error('Unable to determine pkgdata directory from PKGDATA_DIR')

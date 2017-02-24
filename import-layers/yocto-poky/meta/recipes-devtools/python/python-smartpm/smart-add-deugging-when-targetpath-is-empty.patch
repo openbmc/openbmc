@@ -1,0 +1,47 @@
+From 01e51afd03131947f8d74b9a23fdbc0078249499 Mon Sep 17 00:00:00 2001
+From: Mariano Lopez <mariano.lopez@linux.intel.com>
+Date: Wed, 3 Aug 2016 07:47:09 +0000
+Subject: [PATCH] fetcher.py: Add debugging when targetpath is empty
+
+There are several errors when openining files or manipulating
+path strings, those errors point targetpath passed to
+setSucceeded() is empty. This patch won't solve the problems,
+but will add debugging to give an idea why is failing.
+
+Upstream-Status: Inappropriate [debugging]
+
+Signed-off-by: Mariano Lopez <mariano.lopez@linux.intel.com>
+---
+ smart/fetcher.py | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/smart/fetcher.py b/smart/fetcher.py
+index dd3ff6b..64aa979 100644
+--- a/smart/fetcher.py
++++ b/smart/fetcher.py
+@@ -594,6 +594,22 @@ class FetchItem(object):
+                 self._eta = None
+ 
+     def setSucceeded(self, targetpath, fetchedsize=0):
++        # It seems the in some odd cases targetpath here
++        # is empty, this will lead to bugs in several places
++        if not targetpath:
++            import traceback
++            tb_str = ""
++            for threadId, stack in sys._current_frames().items():
++                tb_str += '\nThreadID: %s' % threadId
++                for filename, lineno, name, line in traceback.extract_stack(stack):
++                    tb_str += '\nFile: "%s", line %d, in %s' % (filename, lineno, name)
++                    if line:
++                        tb_str += "\n  %s" % line.strip()
++            error_string = ["No file path specified",
++                            "URL: %s" % self._url,
++                            "Status: %s" % self._status,
++                            "Traceback: %s" % tb_str]
++            raise Error, _("\n".join(error_string))
+         if self._status is not FAILED:
+             self._status = SUCCEEDED
+             self._targetpath = targetpath
+-- 
+2.6.6
+

@@ -1,0 +1,43 @@
+[PATCH] replace krb5-config with pkg-config
+
+Upstream-Status:  Pending
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ configure.ac | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index e99b303..dc93f39 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1196,7 +1196,7 @@ AC_ARG_WITH(gssapi,
+   fi
+ ])
+ 
+-: ${KRB5CONFIG:="$GSSAPI_ROOT/bin/krb5-config"}
++KRB5CONFIG=`which pkg-config`
+ 
+ save_CPPFLAGS="$CPPFLAGS"
+ AC_MSG_CHECKING([if GSS-API support is requested])
+@@ -1207,7 +1207,7 @@ if test x"$want_gss" = xyes; then
+      if test -n "$host_alias" -a -f "$GSSAPI_ROOT/bin/$host_alias-krb5-config"; then
+         GSSAPI_INCS=`$GSSAPI_ROOT/bin/$host_alias-krb5-config --cflags gssapi`
+      elif test -f "$KRB5CONFIG"; then
+-        GSSAPI_INCS=`$KRB5CONFIG --cflags gssapi`
++        GSSAPI_INCS=`$KRB5CONFIG --cflags mit-krb5-gssapi`
+      elif test "$GSSAPI_ROOT" != "yes"; then
+         GSSAPI_INCS="-I$GSSAPI_ROOT/include"
+      fi
+@@ -1300,7 +1300,7 @@ if test x"$want_gss" = xyes; then
+         elif test -f "$KRB5CONFIG"; then
+            dnl krb5-config doesn't have --libs-only-L or similar, put everything
+            dnl into LIBS
+-           gss_libs=`$KRB5CONFIG --libs gssapi`
++           gss_libs=`$KRB5CONFIG --libs mit-krb5-gssapi`
+            LIBS="$gss_libs $LIBS"
+         else
+            case $host in
+-- 
+1.9.1
+

@@ -21,7 +21,7 @@ PACKAGECONFIG ??= " \
     ${PACKAGECONFIG_GL} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluez', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'directfb', 'directfb', '', d)} \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland egl', '', d)} \
     bz2 curl dash dtls hls neon rsvg sbc smoothstreaming sndfile uvch264 webp \
 "
 
@@ -32,13 +32,16 @@ PACKAGECONFIG[curl]            = "--enable-curl,--disable-curl,curl"
 PACKAGECONFIG[dash]            = "--enable-dash,--disable-dash,libxml2"
 PACKAGECONFIG[directfb]        = "--enable-directfb,--disable-directfb,directfb"
 PACKAGECONFIG[dtls]            = "--enable-dtls,--disable-dtls,openssl"
+PACKAGECONFIG[egl]             = "--enable-egl,--disable-egl,virtual/egl"
 PACKAGECONFIG[faac]            = "--enable-faac,--disable-faac,faac"
 PACKAGECONFIG[faad]            = "--enable-faad,--disable-faad,faad2"
 PACKAGECONFIG[flite]           = "--enable-flite,--disable-flite,flite-alsa"
 PACKAGECONFIG[fluidsynth]      = "--enable-fluidsynth,--disable-fluidsynth,fluidsynth"
 PACKAGECONFIG[gles2]           = "--enable-gles2,--disable-gles2,virtual/libgles2"
 PACKAGECONFIG[gtk]             = "--enable-gtk3,--disable-gtk3,gtk+3"
-PACKAGECONFIG[hls]             = "--enable-hls,--disable-hls,nettle"
+# ensure OpenSSL is used for HLS AES description instead of nettle
+# (OpenSSL is a shared dependency with dtls)
+PACKAGECONFIG[hls]             = "--enable-hls --with-hls-crypto=openssl,--disable-hls,openssl"
 PACKAGECONFIG[libmms]          = "--enable-libmms,--disable-libmms,libmms"
 PACKAGECONFIG[libssh2]         = "--enable-libssh2,--disable-libssh2,libssh2"
 PACKAGECONFIG[modplug]         = "--enable-modplug,--disable-modplug,libmodplug"
@@ -46,7 +49,9 @@ PACKAGECONFIG[neon]            = "--enable-neon,--disable-neon,neon"
 PACKAGECONFIG[openal]          = "--enable-openal,--disable-openal,openal-soft"
 PACKAGECONFIG[opencv]          = "--enable-opencv,--disable-opencv,opencv"
 PACKAGECONFIG[opengl]          = "--enable-opengl,--disable-opengl,virtual/libgl libglu"
-PACKAGECONFIG[opus]            = "--enable-opus,--disable-opus,libopus"
+# the opus encoder/decoder elements are now in the -base package,
+# but the opus parser remains in -bad
+PACKAGECONFIG[opusparse]       = "--enable-opus,--disable-opus,libopus"
 PACKAGECONFIG[resindvd]        = "--enable-resindvd,--disable-resindvd,libdvdread libdvdnav"
 PACKAGECONFIG[rsvg]            = "--enable-rsvg,--disable-rsvg,librsvg"
 PACKAGECONFIG[rtmp]            = "--enable-rtmp,--disable-rtmp,rtmpdump"
@@ -58,19 +63,19 @@ PACKAGECONFIG[srtp]            = "--enable-srtp,--disable-srtp,libsrtp"
 PACKAGECONFIG[uvch264]         = "--enable-uvch264,--disable-uvch264,libusb1 libgudev"
 PACKAGECONFIG[voaacenc]        = "--enable-voaacenc,--disable-voaacenc,vo-aacenc"
 PACKAGECONFIG[voamrwbenc]      = "--enable-voamrwbenc,--disable-voamrwbenc,vo-amrwbenc"
-PACKAGECONFIG[wayland]         = "--enable-wayland --enable-egl,--disable-wayland --disable-egl,wayland virtual/egl"
+PACKAGECONFIG[wayland]         = "--enable-wayland,--disable-wayland,wayland-native wayland"
 PACKAGECONFIG[webp]            = "--enable-webp,--disable-webp,libwebp"
 
 # these plugins have not been ported to 1.0 (yet):
-#   apexsink dc1394 lv2 linsys musepack nas timidity teletextdec sdl xvid wininet
-#   acm gsettings sndio cdxaparse dccp faceoverlay hdvparse tta mve nuvdemux
-#   patchdetect real sdi videomeasure gsettings
+#   apexsink dc1394 lv2 linsys musepack nas timidity sdl xvid wininet
+#   sndio cdxaparse dccp faceoverlay hdvparse tta mve nuvdemux
+#   patchdetect sdi videomeasure
 
 # these plugins have no corresponding library in OE-core or meta-openembedded:
-#   openni2 winks direct3d directsound winscreencap
+#   openni2 winks direct3d directsound winscreencap acm
 #   apple_media android_media avc bs2b chromaprint daala dts gme gsm kate ladspa
-#   libde265 mimic mpeg2enc mplex ofa openh264 opensles pvr soundtouch spandsp
-#   spc vdpau wasapi x265 zbar
+#   libde265 mimic mpeg2enc mplex nvenc ofa openh264 opensles pvr soundtouch spandsp
+#   spc teletextdec tinyalsa vdpau vulkan wasapi x265 zbar
 
 # qt5 support is disabled, because it is not present in OE core, and requires more work than
 # just adding a packageconfig (it requires access to moc, uic, rcc, and qmake paths).
@@ -81,6 +86,7 @@ EXTRA_OECONF += " \
     --enable-decklink \
     --enable-dvb \
     --enable-fbdev \
+    --enable-netsim \
     --enable-shm \
     --enable-vcd \
     --disable-acm \
@@ -109,6 +115,7 @@ EXTRA_OECONF += " \
     --disable-mplex \
     --disable-musepack \
     --disable-nas \
+    --disable-nvenc \
     --disable-ofa \
     --disable-openexr \
     --disable-openh264 \
@@ -125,7 +132,9 @@ EXTRA_OECONF += " \
     --disable-spc \
     --disable-teletextdec \
     --disable-timidity \
+    --disable-tinyalsa \
     --disable-vdpau \
+    --disable-vulkan \
     --disable-wasapi \
     --disable-wildmidi \
     --disable-wininet \

@@ -14,3 +14,7 @@ do_install() {
 		install -m 0755 ${SRC}/$i ${D}${bindir}/
 	done
 }
+
+# sotruss script requires sotruss-lib.so (given by libsotruss package), 
+# to produce trace of the library calls.
+RDEPENDS_${PN} += "libsotruss"

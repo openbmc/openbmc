@@ -1,14 +1,38 @@
 {# Popover that displays the dependences and sizes of a package 'data' used in the Packages table #}
-{% with data.package_dependencies_source.all_depends.count as dep_count %}
 {% load projecttags %}
-{% if dep_count %}
- <a data-content="<ul class='unstyled'>
-   {% for dep in data.package_dependencies_source.all_depends %}
-  <li>{{dep.depends_on.name}} {% if dep.depends_on.size > 0 %}({{dep.depends_on.size|filtered_filesizeformat}}){% endif %}</li>
-    {% endfor %}
-  </ul>" title="" class="btn" data-original-title="
-  <strong>{{data.name}}</strong> dependencies - <strong>{{data.package_dependencies_source.get_total_source_deps_size.depends_on__size__sum|filtered_filesizeformat}}</strong>">
-    {{dep_count}}
-</a>
+
+{% with package_deps=data.package_dependencies_source|for_target:extra.target_name %}
+{% with count_package=package_deps.packages|length %}
+
+{% if count_package > 0 %}
+  <a data-content='<ul class="list-unstyled">
+  {% for dep in package_deps.packages %}
+     <li>
+      {% if extra.add_links %}
+      <a href="{% url 'package_included_detail' extra.build.pk extra.target_id dep.depends_on.pk %}">
+      {{dep.depends_on.name}}</a>
+      {% else %}
+        {{dep.depends_on.name}}
+      {% endif %}
+      {% if dep.depends_on.size > 0 %}
+        ({{dep.depends_on.size|filtered_filesizeformat}})
+      {% endif %}
+     </li>
+   {% endfor %}
+   </ul>' class="btn btn-default" title='
+   <strong>
+     {% if extra.add_links %}
+      <a href="{% url 'package_included_dependencies' extra.build.pk extra.target_id data.pk %}">
+      {{data.name}}</a>
+      {% else %}
+      {{data.name}}
+      {% endif %}
+      </strong>
+      dependencies -
+      <strong>{{package_deps.size|filtered_filesizeformat}}</strong>'>
+      {{count_package}}
+  </a>
 {% endif %}
+
+{% endwith %}
 {% endwith %}

@@ -1,0 +1,49 @@
+From 2f47c975ebe52b6916a45ade023ae3bac21bb0e0 Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Tue, 21 Jun 2016 16:00:02 +0300
+Subject: [PATCH] build: Add --with-systemduserunitdir
+
+Default to "pkg-config --variable=systemduserunitdir systemd" but
+allow overriding the value.
+
+Upstream-Status: Submitted [https://bugzilla.gnome.org/show_bug.cgi?id=767911]
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ bus/Makefile.am | 2 +-
+ configure.ac    | 7 +++++++
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/bus/Makefile.am b/bus/Makefile.am
+index b189e02..52fbb0b 100644
+--- a/bus/Makefile.am
++++ b/bus/Makefile.am
+@@ -26,7 +26,7 @@ dbusservice_DATA = org.a11y.Bus.service
+ org.a11y.Bus.service: org.a11y.Bus.service.in
+ 	sed -e $(substitutions) $< > $@.tmp && mv $@.tmp $@
+ 
+-systemd_userdir = $(prefix)/lib/systemd/user
++systemd_userdir = $(systemduserunitdir)
+ systemd_user_DATA = at-spi-dbus-bus.service
+ at-spi-dbus-bus.service: at-spi-dbus-bus.service.in Makefile
+ 	sed -e $(substitutions) $< > $@.tmp && mv $@.tmp $@
+diff --git a/configure.ac b/configure.ac
+index f9061c2..2b8eeed 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -183,6 +183,13 @@ else
+ fi
+ AC_SUBST(DBUS_SERVICES_DIR)
+ 
++AC_ARG_WITH([systemduserunitdir],
++            AS_HELP_STRING([--with-systemduserunitdir=DIR],
++                           [Directory for systemd service files]),
++            [],
++            [with_systemduserunitdir=$($PKG_CONFIG --variable=systemduserunitdir systemd)])
++AC_SUBST([systemduserunitdir], [$with_systemduserunitdir])
++
+ AC_PATH_PROG(GLIB_MKENUMS, glib-mkenums)
+ 
+ GOBJECT_INTROSPECTION_CHECK([0.9.6])
+-- 
+2.1.4
+

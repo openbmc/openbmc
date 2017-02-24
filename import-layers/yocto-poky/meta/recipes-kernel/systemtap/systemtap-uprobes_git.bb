@@ -13,8 +13,6 @@ FILESEXTRAPATHS =. "${FILE_DIRNAME}/systemtap:"
 
 FILES_${PN} += "${datadir}/systemtap/runtime/uprobes"
 
-EXTRA_OEMAKE = ""
-
 # Compile and install the uprobes kernel module on machines with utrace
 # support.  Note that staprun expects it in the systemtap/runtime directory,
 # not in /lib/modules.

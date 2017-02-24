@@ -1,0 +1,35 @@
+From dc83b84dc8b4e71efce47143497aac6c126065cf Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Mon, 18 Jul 2016 08:40:29 -0700
+Subject: [PATCH] lib/aarch64/initplat.c: fix const qualifier
+
+Fixed:
+initplat.c:44:35: error: initialization discards 'const' qualifier from pointer target type [-Werror=discarded-qualifiers]
+     unsigned char *p = dest, *q = src;
+                                   ^~~
+cc1: all warnings being treated as errors
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ lib/aarch64/initplat.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/lib/aarch64/initplat.c b/lib/aarch64/initplat.c
+index 2ac03a7..aae7beb 100644
+--- a/lib/aarch64/initplat.c
++++ b/lib/aarch64/initplat.c
+@@ -41,7 +41,8 @@ void *memset(void *s, int c, __SIZE_TYPE__ n)
+ 
+ void *memcpy(void *dest, const void *src, __SIZE_TYPE__ n)
+ {
+-    unsigned char *p = dest, *q = src;
++    unsigned char *p = dest;
++    const unsigned char *q = src;
+ 
+     while (n--)
+         *p++ = *q++;
+-- 
+2.9.0
+

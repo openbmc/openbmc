@@ -9,8 +9,8 @@ RECIPE_UPSTREAM_DATE = "Oct 08, 2015"
 CHECK_DATE = "Dec 10, 2015"
 
 DEPENDS = "flex-native bison-native flex"
-DEPENDS_append_libc-musl = " libtirpc "
-DEPENDS_append_class-nativesdk += "flex-nativesdk"
+DEPENDS_append_libc-musl = " libtirpc"
+DEPENDS_append_class-nativesdk = " flex-nativesdk"
 
 MOD_PV = "497"
 S = "${WORKDIR}/trunk"

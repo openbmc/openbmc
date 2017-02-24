@@ -41,7 +41,7 @@ check_privsep_dir() {
 }
 
 check_config() {
-	/usr/sbin/sshd -t || exit 1
+	/usr/sbin/sshd -t $SSHD_OPTS || exit 1
 }
 
 check_keys() {

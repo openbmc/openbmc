@@ -42,7 +42,7 @@ def display_help(subcommand, subcommands):
 
     help = subcommands.get(subcommand, subcommand_error)[2]
     pager = subprocess.Popen('less', stdin=subprocess.PIPE)
-    pager.communicate(help)
+    pager.communicate(bytes(help, 'UTF-8'))
 
     return True
 
@@ -183,9 +183,9 @@ DESCRIPTION
 yocto_bsp_list_usage = """
 
  usage: yocto-bsp list karch
-        yocto-bsp list <karch> properties
+        yocto-bsp list <karch> --properties
                 [-o <JSON PROPERTY FILE> | --outfile <JSON PROPERTY_FILE>]
-        yocto-bsp list <karch> property <xxx>
+        yocto-bsp list <karch> --property <xxx>
                 [-o <JSON PROPERTY FILE> | --outfile <JSON PROPERTY_FILE>]
 
  This command enumerates the complete set of possible values for a
@@ -213,9 +213,9 @@ NAME
 
 SYNOPSIS
     yocto-bsp list karch
-    yocto-bsp list <karch> properties
+    yocto-bsp list <karch> --properties
             [--o <JSON PROPERTY FILE> | -outfile <JSON PROPERTY_FILE>]
-    yocto-bsp list <karch> property <xxx>
+    yocto-bsp list <karch> --property <xxx>
             [--o <JSON PROPERTY FILE> | -outfile <JSON PROPERTY_FILE>]
 
 DESCRIPTION
@@ -246,9 +246,9 @@ DESCRIPTION
     object will consist of the set of name:value pairs corresponding
     to the (possibly nested) dictionary of properties defined by the
     input statements used by the BSP.  Some example output for the
-    'list properties' command:
+    'list --properties' command:
 
-    $ yocto-bsp list arm properties
+    $ yocto-bsp list arm --properties
     "touchscreen" : {
         "msg" : Does your BSP have a touchscreen? (y/N)
         "default" : n
@@ -310,11 +310,11 @@ DESCRIPTION
     name:value pairs corresponding to the array of property values
     associated with the property.
 
-    $ yocto-bsp list i386 property xserver_choice
+    $ yocto-bsp list i386 --property xserver_choice
         ["xserver_vesa", "VESA xserver support"]
         ["xserver_i915", "i915 xserver support"]
 
-    $ yocto-bsp list arm property base_kbranch_linux_yocto_3_0
+    $ yocto-bsp list arm --property base_kbranch_linux_yocto_3_0
         Getting branches from remote repo git://git.yoctoproject.org/linux-yocto-3.0...
         ["yocto/base", "yocto/base"]
         ["yocto/eg20t", "yocto/eg20t"]

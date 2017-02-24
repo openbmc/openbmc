@@ -38,11 +38,11 @@ class TestJsUnitTests(SeleniumTestCase):
     def test_that_js_unit_tests_pass(self):
         url = reverse('js-unit-tests')
         self.get(url)
-        self.wait_until_present('#tests-failed')
+        self.wait_until_present('#qunit-testresult .failed')
 
-        failed = self.find("#tests-failed").text
-        passed = self.find("#tests-passed").text
-        total = self.find("#tests-total").text
+        failed = self.find("#qunit-testresult .failed").text
+        passed = self.find("#qunit-testresult .passed").text
+        total = self.find("#qunit-testresult .total").text
 
         logger.info("Js unit tests completed %s out of %s passed, %s failed",
                     passed,

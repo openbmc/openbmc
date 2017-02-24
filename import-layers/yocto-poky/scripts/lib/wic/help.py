@@ -45,7 +45,7 @@ def display_help(subcommand, subcommands):
     if callable(hlp):
         hlp = hlp()
     pager = subprocess.Popen('less', stdin=subprocess.PIPE)
-    pager.communicate(hlp)
+    pager.communicate(hlp.encode('utf-8'))
 
     return True
 
@@ -55,7 +55,7 @@ def wic_help(args, usage_str, subcommands):
     Subcommand help dispatcher.
     """
     if len(args) == 1 or not display_help(args[1], subcommands):
-        print usage_str
+        print(usage_str)
 
 
 def get_wic_plugins_help():
@@ -66,7 +66,7 @@ def get_wic_plugins_help():
     result = wic_plugins_help
     for plugin_type in PLUGIN_TYPES:
         result += '\n\n%s PLUGINS\n\n' % plugin_type.upper()
-        for name, plugin in pluginmgr.get_plugins(plugin_type).iteritems():
+        for name, plugin in pluginmgr.get_plugins(plugin_type).items():
             result += "\n %s plugin:\n" % name
             if plugin.__doc__:
                 result += plugin.__doc__
@@ -152,7 +152,7 @@ SYNOPSIS
         [-e | --image-name] [-s, --skip-build-check] [-D, --debug]
         [-r, --rootfs-dir] [-b, --bootimg-dir]
         [-k, --kernel-dir] [-n, --native-sysroot] [-f, --build-rootfs]
-        [-c, --compress-with]
+        [-c, --compress-with] [-m, --bmap]
 
 DESCRIPTION
     This command creates an OpenEmbedded image based on the 'OE
@@ -221,6 +221,9 @@ DESCRIPTION
 
     The -c option is used to specify compressor utility to compress
     an image. gzip, bzip2 and xz compressors are supported.
+
+    The -m option is used to produce .bmap file for the image. This file
+    can be used to flash image using bmaptool utility.
 """
 
 wic_list_usage = """
@@ -737,6 +740,10 @@ DESCRIPTION
                  It's useful if preconfigured partition UUID is added to kernel command line
                  in bootloader configuration before running wic. In this case .wks file can
                  be generated or modified to set preconfigured parition UUID using this option.
+
+         --system-id: This option is specific to wic. It specifies partition system id. It's useful
+                      for the harware that requires non-default partition system ids. The parameter
+                      in one byte long hex number either with 0x prefix or without it.
 
     * bootloader
 

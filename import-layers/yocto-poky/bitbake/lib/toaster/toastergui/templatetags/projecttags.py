@@ -90,7 +90,7 @@ def whitespace_space_filter(value, arg):
 def divide(value, arg):
     if int(arg) == 0:
         return -1
-    return int(value) / int(arg)
+    return int(value) // int(arg)
 
 @register.filter
 def multiply(value, arg):
@@ -112,11 +112,11 @@ def task_color(task_object, show_green=False):
         show_green argument should be True to get green color.
     """
     if not task_object.task_executed:
-        return 'class=muted'
+        return 'class=text-muted'
     elif task_object.outcome == task_object.OUTCOME_FAILED:
-        return 'class=error'
+        return 'class=text-danger'
     elif task_object.outcome == task_object.OUTCOME_SUCCESS and show_green:
-        return 'class=green'
+        return 'class=text-success'
     else:
         return ''
 
@@ -250,15 +250,15 @@ from django.utils.safestring import mark_safe
 @register.filter
 def format_vpackage_rowclass(size):
     if size == -1:
-        return mark_safe('class="muted"')
+        return mark_safe('class="text-muted"')
     return ''
 
 @register.filter
 def format_vpackage_namehelp(name):
     r =  name + '&nbsp;'
-    r += '<i class="icon-question-sign get-help hover-help"'
+    r += '<span class="glyphicon glyphicon-question-sign get-help hover-help"'
     r += ' title = "' + name + ' has not been built">'
-    r += '</i>'
+    r += '</span>'
     return mark_safe(r)
 
 @register.filter
@@ -269,14 +269,6 @@ def get_dict_value(dictionary, key):
         return dictionary[key]
     except (KeyError, IndexError):
         return ''
-
-@register.filter
-def format_build_date(completed_on):
-    now = timezone.now()
-    delta = now - completed_on
-
-    if delta.days >= 1:
-        return True
 
 @register.filter
 def is_shaid(text):
@@ -297,3 +289,11 @@ def cut_path_prefix(fullpath, prefixes):
         if fullpath.startswith(prefix):
             return relpath(fullpath, prefix)
     return fullpath
+
+
+@register.filter
+def for_target(package_dependencies, target):
+    """ filter the dependencies to be displayed by the supplied target
+    if no dependences are found for the target then return the predicted
+    dependences"""
+    return package_dependencies.for_target_or_none(target)

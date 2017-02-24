@@ -1,0 +1,27 @@
+Add missing header to avoid:
+
+| 1472659610.016355: ../git/pthread_stop_world.c: In function 'GC_brief_async_signal_safe_sleep':
+| 1472659610.0540252: ../git/pthread_stop_world.c:397:22: error: storage size of 'tv' isn't known
+| 1472659610.0540252:        struct timeval tv;
+| 1472659610.0540252:                       ^~
+| 1472659610.054099: ../git/pthread_stop_world.c:397:22: warning: unused variable 'tv' [-Wunused-variable]
+| 1472659610.054099:        struct timeval tv;
+| 1472659610.054099:                       ^~
+| 1472659610.054099: Makefile:1530: recipe for target 'pthread_stop_world.lo' failed
+
+in musl builds.
+
+Upstream-Status: Pending
+
+Index: git/pthread_stop_world.c
+===================================================================
+--- git.orig/pthread_stop_world.c
++++ git/pthread_stop_world.c
+@@ -45,6 +45,7 @@
+ #include <semaphore.h>
+ #include <errno.h>
+ #include <unistd.h>
++#include <sys/time.h>
+ #include "atomic_ops.h"
+ 
+ /* It's safe to call original pthread_sigmask() here.   */

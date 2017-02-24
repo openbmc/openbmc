@@ -33,6 +33,8 @@ def get_gcc_ppc_plt_settings(bb, d):
 def get_long_double_setting(bb, d):
     if d.getVar('TRANSLATED_TARGET_ARCH', True) in [ 'powerpc', 'powerpc64' ] and d.getVar('TCLIBC', True) in [ 'uclibc', 'glibc' ]:
         return "--with-long-double-128"
+    else:
+        return "--without-long-double-128"
     return ""
 
 def get_gcc_multiarch_setting(bb, d):

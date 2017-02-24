@@ -1,0 +1,112 @@
+From 5b79e28bd70a0ec5b34c5ff19b66cbbdd1e48835 Mon Sep 17 00:00:00 2001
+From: Haiqing Bai <Haiqing.Bai@windriver.com>
+Date: Fri, 18 Mar 2016 13:34:07 +0800
+Subject: [PATCH] Make smartpm to support check signatures of rpmv5.
+
+The original support for 'rpm-check-signatures' has been
+disabled for the RPMv5 does not support '_RPMVSF_NOSIGNATURES'
+now. This fix replaces the '_RPMVSF_NOSIGNATURES' with
+rpm VS flags set:RPMVSF_NODSAHEADER|RPMVSF_NORSAHEADER|
+RPMVSF_NODSA|RPMVSF_NORSA.
+
+Upstream-Status: Pending
+Signed-off-by: Haiqing Bai <Haiqing.Bai@windriver.com>
+---
+ smart/backends/rpm/base.py      | 43 +++++++++++++++++++++++++++++++----------
+ smart/backends/rpm/pm.py        |  2 +-
+ smart/plugins/yumchannelsync.py |  5 +++--
+ 3 files changed, 37 insertions(+), 13 deletions(-)
+
+diff --git a/smart/backends/rpm/base.py b/smart/backends/rpm/base.py
+index 85f4d49..dbd6165 100644
+--- a/smart/backends/rpm/base.py
++++ b/smart/backends/rpm/base.py
+@@ -63,11 +63,23 @@ def getTS(new=False):
+         if sysconf.get("rpm-dbpath"):
+             rpm.addMacro('_dbpath', "/" + sysconf.get("rpm-dbpath"))
+         getTS.ts = rpm.ts(getTS.root)
+-        if not sysconf.get("rpm-check-signatures", False):
+-            if hasattr(rpm, '_RPMVSF_NOSIGNATURES'):
+-                getTS.ts.setVSFlags(rpm._RPMVSF_NOSIGNATURES)
+-            else:
+-                raise Error, _("rpm requires checking signatures")
++
++        # _RPMVSF_NOSIGNATURES is not supported in RPMv5, so here uses
++        # RPMVSF_NODSAHEADER|RPMVSF_NORSAHEADER|RPMVSF_NODSA|RPMVSF_NORSA
++        # to replace '_RPMVSF_NOSIGNATURES' to continue to support check
++        # rpm signatures
++
++        #if not sysconf.get("rpm-check-signatures", False):
++        #    if hasattr(rpm, '_RPMVSF_NOSIGNATURES'):
++        #        getTS.ts.setVSFlags(rpm._RPMVSF_NOSIGNATURES)
++        #    else:
++        #        raise Error, _("rpm requires checking signatures")
++        if sysconf.get("rpm-check-signatures") == False:
++            getTS.ts.setVSFlags(rpm.RPMVSF_NODSAHEADER|rpm.RPMVSF_NORSAHEADER|\
++                                rpm.RPMVSF_NODSA|rpm.RPMVSF_NORSA)
++        else:
++            getTS.ts.setVSFlags(0)
++
+         rpm_dbpath = sysconf.get("rpm-dbpath", "var/lib/rpm")
+         dbdir = rpm_join_dbpath(getTS.root, rpm_dbpath)
+         if not os.path.isdir(dbdir):
+@@ -89,11 +101,22 @@ def getTS(new=False):
+         if sysconf.get("rpm-dbpath"):
+             rpm.addMacro('_dbpath', "/" + sysconf.get("rpm-dbpath"))
+         ts = rpm.ts(getTS.root)
+-        if not sysconf.get("rpm-check-signatures", False):
+-            if hasattr(rpm, '_RPMVSF_NOSIGNATURES'):
+-                ts.setVSFlags(rpm._RPMVSF_NOSIGNATURES)
+-            else:
+-                raise Error, _("rpm requires checking signatures")
++
++        # _RPMVSF_NOSIGNATURES is not supported in RPMv5, so here uses
++        # RPMVSF_NODSAHEADER|RPMVSF_NORSAHEADER|RPMVSF_NODSA|RPMVSF_NORSA
++        # to replace '_RPMVSF_NOSIGNATURES' to continue to support check
++        # rpm signatures
++
++        #if not sysconf.get("rpm-check-signatures", False):
++        #    if hasattr(rpm, '_RPMVSF_NOSIGNATURES'):
++        #        ts.setVSFlags(rpm._RPMVSF_NOSIGNATURES)
++        #    else:
++        #        raise Error, _("rpm requires checking signatures")
++        if sysconf.get("rpm-check-signatures") == False:
++            ts.setVSFlags(rpm.RPMVSF_NODSAHEADER|rpm.RPMVSF_NORSAHEADER|\
++                                rpm.RPMVSF_NODSA|rpm.RPMVSF_NORSA)
++        else:
++            ts.setVSFlags(0)
+         return ts
+     else:
+         return getTS.ts
+diff --git a/smart/backends/rpm/pm.py b/smart/backends/rpm/pm.py
+index b57a844..7b651b5 100644
+--- a/smart/backends/rpm/pm.py
++++ b/smart/backends/rpm/pm.py
+@@ -180,7 +180,7 @@ class RPMPackageManager(PackageManager):
+                 fd = os.open(path, os.O_RDONLY)
+                 try:
+                     h = ts.hdrFromFdno(fd)
+-                    if sysconf.get("rpm-check-signatures", False):
++                    if sysconf.get("rpm-check-signatures", True):
+                          if get_public_key(h) == '(none)':
+                              raise rpm.error('package is not signed')
+                 except rpm.error, e:
+diff --git a/smart/plugins/yumchannelsync.py b/smart/plugins/yumchannelsync.py
+index f8107e6..2dc5482 100644
+--- a/smart/plugins/yumchannelsync.py
++++ b/smart/plugins/yumchannelsync.py
+@@ -56,8 +56,9 @@ def _getreleasever():
+ 
+     rpmroot = sysconf.get("rpm-root", "/")
+     ts = rpmUtils.transaction.initReadOnlyTransaction(root=rpmroot)
+-    if hasattr(rpm, '_RPMVSF_NOSIGNATURES') and hasattr(rpm, '_RPMVSF_NODIGESTS'):
+-        ts.pushVSFlags(~(rpm._RPMVSF_NOSIGNATURES|rpm._RPMVSF_NODIGESTS))
++    #_RPMVSF_NOSIGNATURES is not supported in RPMv5
++    #if hasattr(rpm, '_RPMVSF_NOSIGNATURES') and hasattr(rpm, '_RPMVSF_NODIGESTS'):
++    #    ts.pushVSFlags(~(rpm._RPMVSF_NOSIGNATURES|rpm._RPMVSF_NODIGESTS))
+     releasever = None
+     # HACK: we're hard-coding the most used distros, will add more if needed
+     idx = ts.dbMatch('provides', 'fedora-release')
+-- 
+1.9.1
+

@@ -1,0 +1,29 @@
+From b0a579d83e355545b64742c997fe8b1d58bf4207 Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Mon, 13 Jun 2016 11:05:00 +0300
+Subject: [PATCH] Don't enable stack-protection by default
+
+These are set by security_flags.inc.
+
+Upstream-Status: Inappropriate [configuration]
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ configure.ac | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 068d072..d580f84 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -138,8 +138,6 @@ m4_define([compiler_flags_common],[ dnl
+   -fno-common dnl
+   -fdiagnostics-show-option dnl
+   -fno-strict-aliasing dnl
+-  -fstack-protector dnl
+-  -fstack-protector-strong dnl
+   -fno-semantic-interposition dnl
+   -Wno-deprecated-declarations dnl
+ ])
+-- 
+2.1.4
+

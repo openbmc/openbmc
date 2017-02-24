@@ -1,0 +1,62 @@
+Upstream-Status: Backport
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+From c7a76237e7a51a69d0236ebfc191e462f805cf4e Mon Sep 17 00:00:00 2001
+From: Lars Wendler <polynomial-c@gentoo.org>
+Date: Mon, 15 Feb 2016 14:42:14 +0100
+Subject: [PATCH] Don't build rpc.rquotad when --disable-rpc was requested.
+
+This fixes a buch of undefined references:
+
+x86_64-pc-linux-gnu-gcc  -march=native -mtune=native -O2 -pipe -D_GNU_SOURCE -Wa
+ll -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -pie -Wl,-O1 -Wl,--hash-st
+yle=gnu -Wl,--sort-common -Wl,--as-needed -o rpc.rquotad rquota_server.o rquota_
+svc.o svc_socket.o libquota.a
+rquota_svc.o: In function `rquotaprog_2':
+rquota_svc.c:(.text+0x1d3): undefined reference to `xdr_setquota_rslt'
+rquota_svc.c:(.text+0x1da): undefined reference to `xdr_ext_setquota_args'
+rquota_svc.c:(.text+0x2b2): undefined reference to `xdr_setquota_rslt'
+rquota_svc.c:(.text+0x2b9): undefined reference to `xdr_ext_setquota_args'
+rquota_svc.c:(.text+0x2ff): undefined reference to `xdr_getquota_rslt'
+rquota_svc.c:(.text+0x306): undefined reference to `xdr_ext_getquota_args'
+rquota_svc.c:(.text+0x31a): undefined reference to `xdr_getquota_rslt'
+rquota_svc.c:(.text+0x321): undefined reference to `xdr_ext_getquota_args'
+rquota_svc.o: In function `rquotaprog_1':
+rquota_svc.c:(.text+0x3f3): undefined reference to `xdr_setquota_rslt'
+rquota_svc.c:(.text+0x3fa): undefined reference to `xdr_setquota_args'
+rquota_svc.c:(.text+0x4d2): undefined reference to `xdr_setquota_rslt'
+rquota_svc.c:(.text+0x4d9): undefined reference to `xdr_setquota_args'
+rquota_svc.c:(.text+0x51f): undefined reference to `xdr_getquota_rslt'
+rquota_svc.c:(.text+0x526): undefined reference to `xdr_getquota_args'
+rquota_svc.c:(.text+0x53a): undefined reference to `xdr_getquota_rslt'
+rquota_svc.c:(.text+0x541): undefined reference to `xdr_getquota_args'
+collect2: error: ld returned 1 exit status
+Makefile:901: recipe for target 'rpc.rquotad' failed
+
+Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ Makefile.am | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 77f8400..6d7ea0e 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -116,8 +116,11 @@ sbin_PROGRAMS = \
+ 	xqmstats \
+ 	edquota \
+ 	setquota \
+-	convertquota \
++	convertquota
++if WITH_RPC
++sbin_PROGRAMS += \
+ 	rpc.rquotad
++endif
+ if WITH_NETLINK
+ sbin_PROGRAMS += \
+ 	quota_nld
+-- 
+2.6.1
+

@@ -596,7 +596,7 @@
             "<link linkend='checksums'>Checksums (Signatures)</link>"
             section for information).
             It is also possible to append extra metadata to the stamp using
-            the "stamp-extra-info" task flag.
+            the <filename>[stamp-extra-info]</filename> task flag.
             For example, OpenEmbedded uses this flag to make some tasks machine-specific.
         </para>
 
@@ -653,7 +653,8 @@
             </itemizedlist>
             It is possible to have functions run before and after a task's main
             function.
-            This is done using the "prefuncs" and "postfuncs" flags of the task
+            This is done using the <filename>[prefuncs]</filename>
+            and <filename>[postfuncs]</filename> flags of the task
             that lists the functions to run.
         </para>
     </section>
@@ -827,7 +828,7 @@
             itself.
             The simplest parameter to pass is "none", which causes a
             set of signature information to be written out into
-            <filename>STAMP_DIR</filename>
+            <filename>STAMPS_DIR</filename>
             corresponding to the targets specified.
             The other currently available parameter is "printdiff",
             which causes BitBake to try to establish the closest
@@ -915,7 +916,7 @@
         <para>
             Finally, after all the setscene tasks have executed, BitBake calls the
             function listed in
-            <link linkend='var-BB_SETSCENE_VERIFY_FUNCTION'><filename>BB_SETSCENE_VERIFY_FUNCTION</filename></link>
+            <link linkend='var-BB_SETSCENE_VERIFY_FUNCTION2'><filename>BB_SETSCENE_VERIFY_FUNCTION2</filename></link>
             with the list of tasks BitBake thinks has been "covered".
             The metadata can then ensure that this list is correct and can
             inform BitBake that it wants specific tasks to be run regardless

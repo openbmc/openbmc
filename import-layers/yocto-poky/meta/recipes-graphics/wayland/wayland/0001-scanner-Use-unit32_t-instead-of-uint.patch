@@ -1,0 +1,30 @@
+From 5516d32e694badca35b6c71b02a3f08f650308bf Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 15 Jul 2016 16:23:48 -0700
+Subject: [PATCH] scanner: Use unit32_t instead of uint
+
+uint32_t is C99 defined stdint type
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Upstream-Status: Submitted
+---
+ src/scanner.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/scanner.c b/src/scanner.c
+index 5f06e8e..10a4023 100644
+--- a/src/scanner.c
++++ b/src/scanner.c
+@@ -808,7 +808,7 @@ find_enumeration(struct protocol *protocol,
+ 	struct interface *i;
+ 	struct enumeration *e;
+ 	char *enum_name;
+-	uint idx = 0, j;
++	uint32_t idx = 0, j;
+ 
+ 	for (j = 0; j + 1 < strlen(enum_attribute); j++) {
+ 		if (enum_attribute[j] == '.') {
+-- 
+2.1.4
+

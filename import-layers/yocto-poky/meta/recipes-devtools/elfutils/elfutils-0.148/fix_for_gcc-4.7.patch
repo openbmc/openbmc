@@ -2,7 +2,7 @@ Upstream-Status: pending
 gcc 4.7 does not like pointer conversion, so have a void * tmp var to work 
 around following compilation issue.
 
-Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
 2011/07/07
 
 | md5.c: In function 'md5_finish_ctx':

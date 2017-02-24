@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # devtool stress tester
 #
@@ -43,15 +43,15 @@ def select_recipes(args):
     tinfoil = bb.tinfoil.Tinfoil()
     tinfoil.prepare(False)
 
-    pkg_pn = tinfoil.cooker.recipecache.pkg_pn
-    (latest_versions, preferred_versions) = bb.providers.findProviders(tinfoil.config_data, tinfoil.cooker.recipecache, pkg_pn)
+    pkg_pn = tinfoil.cooker.recipecaches[''].pkg_pn
+    (latest_versions, preferred_versions) = bb.providers.findProviders(tinfoil.config_data, tinfoil.cooker.recipecaches[''], pkg_pn)
 
     skip_classes = args.skip_classes.split(',')
 
     recipelist = []
     for pn in sorted(pkg_pn):
         pref = preferred_versions[pn]
-        inherits = [os.path.splitext(os.path.basename(f))[0] for f in tinfoil.cooker.recipecache.inherits[pref[1]]]
+        inherits = [os.path.splitext(os.path.basename(f))[0] for f in tinfoil.cooker.recipecaches[''].inherits[pref[1]]]
         for cls in skip_classes:
             if cls in inherits:
                 break
@@ -121,14 +121,18 @@ def stress_extract(args):
             sys.stdout.write('Testing %s ' % (pn + ' ').ljust(40, '.'))
             sys.stdout.flush()
             failed = False
+            skipped = None
 
             srctree = os.path.join(tmpdir, pn)
             try:
                 bb.process.run('devtool extract %s %s' % (pn, srctree))
-            except bb.process.CmdError as exc:
-                failed = True
-                with open('stress_%s_extract.log' % pn, 'w') as f:
-                    f.write(str(exc))
+            except bb.process.ExecutionError as exc:
+                if exc.exitcode == 4:
+                    skipped = 'incompatible'
+                else:
+                    failed = True
+                    with open('stress_%s_extract.log' % pn, 'w') as f:
+                        f.write(str(exc))
 
             if os.path.exists(srctree):
                 shutil.rmtree(srctree)
@@ -136,6 +140,8 @@ def stress_extract(args):
             if failed:
                 print('failed')
                 failures += 1
+            elif skipped:
+                print('skipped (%s)' % skipped)
             else:
                 print('ok')
     except KeyboardInterrupt:
@@ -162,29 +168,34 @@ def stress_modify(args):
             sys.stdout.flush()
             failed = False
             reset = True
+            skipped = None
 
             srctree = os.path.join(tmpdir, pn)
             try:
                 bb.process.run('devtool modify -x %s %s' % (pn, srctree))
-            except bb.process.CmdError as exc:
-                with open('stress_%s_modify.log' % pn, 'w') as f:
-                    f.write(str(exc))
-                failed = 'modify'
-                reset = False
-
-            if not failed:
-                try:
-                    bb.process.run('bitbake -c install %s' % pn)
-                except bb.process.CmdError as exc:
-                    with open('stress_%s_install.log' % pn, 'w') as f:
+            except bb.process.ExecutionError as exc:
+                if exc.exitcode == 4:
+                    skipped = 'incompatible'
+                else:
+                    with open('stress_%s_modify.log' % pn, 'w') as f:
                         f.write(str(exc))
-                    failed = 'build'
-            if reset:
-                try:
-                    bb.process.run('devtool reset %s' % pn)
-                except bb.process.CmdError as exc:
-                    print('devtool reset failed: %s' % str(exc))
-                    break
+                    failed = 'modify'
+                    reset = False
+
+            if not skipped:
+                if not failed:
+                    try:
+                        bb.process.run('bitbake -c install %s' % pn)
+                    except bb.process.CmdError as exc:
+                        with open('stress_%s_install.log' % pn, 'w') as f:
+                            f.write(str(exc))
+                        failed = 'build'
+                if reset:
+                    try:
+                        bb.process.run('devtool reset %s' % pn)
+                    except bb.process.CmdError as exc:
+                        print('devtool reset failed: %s' % str(exc))
+                        break
 
             if os.path.exists(srctree):
                 shutil.rmtree(srctree)
@@ -192,6 +203,8 @@ def stress_modify(args):
             if failed:
                 print('failed (%s)' % failed)
                 failures += 1
+            elif skipped:
+                print('skipped (%s)' % skipped)
             else:
                 print('ok')
     except KeyboardInterrupt:
@@ -210,9 +223,10 @@ def main():
     parser.add_argument('-d', '--debug', help='Enable debug output', action='store_true')
     parser.add_argument('-r', '--resume-from', help='Resume from specified recipe', metavar='PN')
     parser.add_argument('-o', '--only', help='Only test specified recipes (comma-separated without spaces, wildcards allowed)', metavar='PNLIST')
-    parser.add_argument('-s', '--skip', help='Skip specified recipes (comma-separated without spaces, wildcards allowed)', metavar='PNLIST')
+    parser.add_argument('-s', '--skip', help='Skip specified recipes (comma-separated without spaces, wildcards allowed)', metavar='PNLIST', default='gcc-source-*,kernel-devsrc,package-index,perf,meta-world-pkgdata,glibc-locale,glibc-mtrace,glibc-scripts,os-release')
     parser.add_argument('-c', '--skip-classes', help='Skip recipes inheriting specified classes (comma-separated) - default %(default)s', metavar='CLASSLIST', default='native,nativesdk,cross,cross-canadian,image,populate_sdk,meta,packagegroup')
     subparsers = parser.add_subparsers(title='subcommands', metavar='<subcommand>')
+    subparsers.required = True
 
     parser_modify = subparsers.add_parser('modify',
                                           help='Run "devtool modify" followed by a build with bitbake on matching recipes',

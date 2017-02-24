@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os
 import sys
@@ -29,9 +29,6 @@ if len(sys.argv) != 3:
 pty = open(sys.argv[1], "w+b", 0)
 parent = int(sys.argv[2])
 
-# Don't buffer output by line endings
-sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
-sys.stdin = os.fdopen(sys.stdin.fileno(), 'r', 0)
 nonblockingfd(pty)
 nonblockingfd(sys.stdin)
 
@@ -50,7 +47,7 @@ try:
     # Need cbreak/noecho whilst in select so we trigger on any keypress
     cbreaknoecho(sys.stdin.fileno())
     # Send our PID to the other end so they can kill us.
-    pty.write(str(os.getpid()) + "\n")
+    pty.write(str(os.getpid()).encode('utf-8') + b"\n")
     while True:
         try:
             writers = []
@@ -59,17 +56,18 @@ try:
             (ready, _, _) = select.select([pty, sys.stdin], writers , [], 0)
             try:
                 if pty in ready:
-                    i = i + pty.read()
+                    i = i + pty.read().decode('utf-8')
                 if i:
                     # Write a page at a time to avoid overflowing output 
                     # d.keys() is a good way to do that
                     sys.stdout.write(i[:4096])
+                    sys.stdout.flush()
                     i = i[4096:]
                 if sys.stdin in ready:
                     echonocbreak(sys.stdin.fileno())
-                    o = raw_input()
+                    o = input().encode('utf-8')
                     cbreaknoecho(sys.stdin.fileno())
-                    pty.write(o + "\n")
+                    pty.write(o + b"\n")
             except (IOError, OSError) as e:
                 if e.errno == 11:
                     continue

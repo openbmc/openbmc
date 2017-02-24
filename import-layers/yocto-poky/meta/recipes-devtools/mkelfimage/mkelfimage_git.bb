@@ -13,8 +13,8 @@ http://review.coreboot.org/gitweb?p=coreboot.git;a=commit;h=34fc4ab80b507739e258
 DEPENDS += "zlib"
 
 SRC_URI = "git://review.coreboot.org/p/coreboot;protocol=http \
-           file://cross-compile.patch   \
-          "
+           file://cross-compile.patch \
+           "
 SRC_URI_append_class-native = " \
            file://fix-makefile-to-find-libz.patch   \
 "
@@ -24,8 +24,11 @@ CLEANBROKEN = "1"
 S = "${WORKDIR}/git/util/mkelfImage"
 
 CFLAGS += "-fno-stack-protector"
-CACHED_CONFIGUREVARS += "HOST_CC='${BUILD_CC}'"
-EXTRA_OEMAKE += "HOST_CPPFLAGS='${BUILD_CPPFLAGS}'"
+CACHED_CONFIGUREVARS += "\
+    HOST_CC='${BUILD_CC}' \
+    HOST_CFLAGS='${BUILD_CFLAGS}' \
+    HOST_CPPFLAGS='${BUILD_CPPFLAGS}' \
+"
 
 inherit autotools-brokensep
 

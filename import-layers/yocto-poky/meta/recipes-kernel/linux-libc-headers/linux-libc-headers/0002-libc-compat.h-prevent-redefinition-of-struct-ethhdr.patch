@@ -11,10 +11,10 @@ Upstream-Status: Submitted
  include/uapi/linux/libc-compat.h | 6 ++++++
  2 files changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/include/uapi/linux/if_ether.h b/include/uapi/linux/if_ether.h
-index aa63ed0..e94da57 100644
---- a/include/uapi/linux/if_ether.h
-+++ b/include/uapi/linux/if_ether.h
+Index: linux-4.8-rc4/include/uapi/linux/if_ether.h
+===================================================================
+--- linux-4.8-rc4.orig/include/uapi/linux/if_ether.h
++++ linux-4.8-rc4/include/uapi/linux/if_ether.h
 @@ -22,6 +22,7 @@
  #define _UAPI_LINUX_IF_ETHER_H
  
@@ -23,7 +23,7 @@ index aa63ed0..e94da57 100644
  
  /*
   *	IEEE 802.3 Ethernet magic constants.  The frame sizes omit the preamble
-@@ -134,11 +135,12 @@
+@@ -138,11 +139,12 @@
   *	This is an Ethernet frame header.
   */
  
@@ -37,10 +37,10 @@ index aa63ed0..e94da57 100644
 +#endif
  
  #endif /* _UAPI_LINUX_IF_ETHER_H */
-diff --git a/include/uapi/linux/libc-compat.h b/include/uapi/linux/libc-compat.h
-index afe15c2..7d0c78a 100644
---- a/include/uapi/linux/libc-compat.h
-+++ b/include/uapi/linux/libc-compat.h
+Index: linux-4.8-rc4/include/uapi/linux/libc-compat.h
+===================================================================
+--- linux-4.8-rc4.orig/include/uapi/linux/libc-compat.h
++++ linux-4.8-rc4/include/uapi/linux/libc-compat.h
 @@ -50,6 +50,12 @@
  
  #ifndef __KERNEL__ /* we're used from userspace */
@@ -51,9 +51,6 @@ index afe15c2..7d0c78a 100644
 +#define __UAPI_DEF_ETHHDR 1
 +#endif
 +
- /* Coordinate with libc netinet/in.h header. */
- #if defined(_NETINET_IN_H)
+ /* Coordinate with libc net/if.h header. */
+ #if defined(_NET_IF_H) && defined(__USE_MISC)
  
--- 
-2.6.4
-

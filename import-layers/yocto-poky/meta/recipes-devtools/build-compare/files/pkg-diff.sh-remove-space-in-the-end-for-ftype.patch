@@ -1,0 +1,32 @@
+From 836a6783df9c582a834fca239f227063a5687715 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Thu, 14 Jul 2016 19:49:12 -0700
+Subject: [PATCH 2/4] pkg-diff.sh: remove space in the end for ftype
+
+Versions of file like 5.14 returns a " " in the end, for example:
+ftype="directory ", but we need ftype="directory", remove the space to
+fix the problem.
+
+Upstream-Status: Submitted [https://github.com/openSUSE/build-compare/pull/10]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ pkg-diff.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pkg-diff.sh b/pkg-diff.sh
+index 402d4a4..5dd3a38 100644
+--- a/pkg-diff.sh
++++ b/pkg-diff.sh
+@@ -633,7 +633,7 @@ check_single_file()
+       ;;
+   esac
+ 
+-  ftype=`/usr/bin/file old/$file | sed 's@^[^:]\+:[[:blank:]]*@@'`
++  ftype=`/usr/bin/file old/$file | sed -e 's@^[^:]\+:[[:blank:]]*@@' -e 's@[[:blank:]]*$@@'`
+   case $ftype in
+      PE32\ executable*Mono\/\.Net\ assembly*)
+        echo "PE32 Mono/.Net assembly: $file"
+-- 
+2.9.0
+

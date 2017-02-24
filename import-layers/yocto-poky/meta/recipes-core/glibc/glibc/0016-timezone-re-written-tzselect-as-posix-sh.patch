@@ -1,7 +1,7 @@
-From 3e8586eb3509e2f0d6dfb74be8f89a30b06b56e9 Mon Sep 17 00:00:00 2001
+From fdb5c9c88e3d1bc5ae6ef9ebcfcf560d3c42f0a6 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:33:03 +0000
-Subject: [PATCH 16/24] timezone: re-written tzselect as posix sh
+Subject: [PATCH 16/25] timezone: re-written tzselect as posix sh
 
 To avoid the bash dependency.
 
@@ -15,10 +15,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/timezone/Makefile b/timezone/Makefile
-index 99566cb..b6e757e 100644
+index dee7568..66a50be 100644
 --- a/timezone/Makefile
 +++ b/timezone/Makefile
-@@ -122,7 +122,7 @@ $(testdata)/XT%: testdata/XT%
+@@ -120,7 +120,7 @@ $(testdata)/XT%: testdata/XT%
  	cp $< $@
  
  $(objpfx)tzselect: tzselect.ksh $(common-objpfx)config.make
@@ -28,7 +28,7 @@ index 99566cb..b6e757e 100644
  	    -e '/TZVERSION=/s|see_Makefile|"$(version)"|' \
  	    -e '/PKGVERSION=/s|=.*|="$(PKGVERSION)"|' \
 diff --git a/timezone/tzselect.ksh b/timezone/tzselect.ksh
-index 9d70691..25f45a8 100755
+index 2c3b2f4..0c04a61 100755
 --- a/timezone/tzselect.ksh
 +++ b/timezone/tzselect.ksh
 @@ -35,7 +35,7 @@ REPORT_BUGS_TO=tz@iana.org
@@ -38,8 +38,8 @@ index 9d70691..25f45a8 100755
 -: ${TZDIR=`pwd`}
 +: ${TZDIR=$(pwd)}
  
- # Check for awk Posix compliance.
- ($AWK -v x=y 'BEGIN { exit 123 }') </dev/null >/dev/null 2>&1
+ # Output one argument as-is to standard output.
+ # Safer than 'echo', which can mishandle '\' or leading '-'.
 -- 
-2.6.4
+2.8.2
 

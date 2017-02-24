@@ -1,15 +1,15 @@
-<button class="btn btn-block layer-exists-{{data.layer_version.pk}} customise-btn"  data-recipe="{{data.pk}}"
+<button class="btn btn-default btn-block layer-exists-{{data.layer_version.pk}} customise-btn"  data-recipe="{{data.pk}}"
     {% if data.layer_version.pk not in extra.current_layers %}
     style="display:none;"
     {% endif %}
   >
   Customise
 </button>
-<button class="btn btn-block layer-add-{{data.layer_version.pk}} layerbtn" data-layer='{ "id": {{data.layer_version.pk}}, "name":  "{{data.layer_version.layer.name}}", "layerdetailurl": "{%url 'layerdetails' extra.pid data.layer_version.pk%}"}' data-directive="add"
+<button class="btn btn-default btn-block layer-add-{{data.layer_version.pk}} layerbtn" data-layer='{ "id": {{data.layer_version.pk}}, "name":  "{{data.layer_version.layer.name}}", "layerdetailurl": "{%url 'layerdetails' extra.pid data.layer_version.pk%}"}' data-directive="add"
     {% if data.layer_version.pk in extra.current_layers %}
     style="display:none;"
     {% endif %}
   >
-  <i class="icon-plus"></i>
+  <i class="glyphicon glyphicon-plus"></i>
   Add layer
 </button>

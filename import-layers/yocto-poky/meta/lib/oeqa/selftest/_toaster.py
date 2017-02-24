@@ -2,7 +2,7 @@ import unittest
 import os
 import sys
 import shlex, subprocess
-import urllib, commands, time, getpass, re, json, shlex
+import urllib.request, urllib.parse, urllib.error, subprocess, time, getpass, re, json, shlex
 
 import oeqa.utils.ftools as ftools
 from oeqa.selftest.base import oeSelfTest
@@ -290,7 +290,7 @@ class Toaster_DB_Tests(ToasterSetup):
         layers = Layer.objects.values('id', 'layer_index_url')
         cnt_err = []
         for layer in layers:
-            resp = urllib.urlopen(layer['layer_index_url'])
+            resp = urllib.request.urlopen(layer['layer_index_url'])
             if (resp.getcode() != 200):
                 cnt_err.append(layer['id'])
         self.assertEqual(len(cnt_err), 0, msg = 'Errors for layer id: %s' % cnt_err)

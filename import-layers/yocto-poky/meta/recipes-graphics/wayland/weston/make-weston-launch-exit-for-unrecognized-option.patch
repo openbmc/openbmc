@@ -1,0 +1,33 @@
+From e8b615250f700f7854b423aaaf0a0aeea92c05a9 Mon Sep 17 00:00:00 2001
+From: Tom Hochstein <tom.hochstein@nxp.com>
+Date: Sat, 7 May 2016 08:51:58 -0300
+Subject: [PATCH] weston-launch: Handle invalid command line options
+Organization: O.S. Systems Software LTDA.
+
+Exit the program if an unrecognized command line option is found.
+
+Upstream-Status: Submitted
+
+Signed-off-by: Tom Hochstein <tom.hochstein@nxp.com>
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+---
+
+ src/weston-launch.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/weston-launch.c b/src/weston-launch.c
+index b8dfb17..9987d8e 100644
+--- a/src/weston-launch.c
++++ b/src/weston-launch.c
+@@ -703,6 +703,8 @@ main(int argc, char *argv[])
+ 		case 'h':
+ 			help("weston-launch");
+ 			exit(EXIT_FAILURE);
++		default:
++			exit(EXIT_FAILURE);
+ 		}
+ 	}
+ 
+-- 
+2.8.2
+

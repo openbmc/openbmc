@@ -1,0 +1,36 @@
+From 1f0c22b79045cfcdc976643f383c1d09589d3087 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 30 Apr 2016 16:23:56 +0000
+Subject: [PATCH] Fix build when using non-glibc libc implementation on ppc
+
+glibc includes the kernel header into its own header for macros
+musl does not
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ ptrace.h | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/ptrace.h b/ptrace.h
+index d8af976..4978a69 100644
+--- a/ptrace.h
++++ b/ptrace.h
+@@ -52,7 +52,13 @@ extern long ptrace(int, int, char *, long);
+ # define ptrace_peeksiginfo_args XXX_ptrace_peeksiginfo_args
+ #endif
+ 
+-#include <linux/ptrace.h>
++#if defined(POWERPC) && !defined(__GLIBC__)
++#define pt_regs uapi_pt_regs
++#endif
++# include <linux/ptrace.h>
++#if defined(POWERPC) && !defined(__GLIBC__)
++# undef pt_regs
++#endif
+ 
+ #ifdef HAVE_STRUCT_IA64_FPREG
+ # undef ia64_fpreg
+-- 
+1.8.3.1
+

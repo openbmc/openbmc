@@ -9,26 +9,31 @@ don't want to enable features by default that are not supported by
 the latest stable e2fsprogs release.
 
 Upstream-Status: Inappropriate [configuration]
-
 Signed-off-by: Jonathan Liu <net147@gmail.com>
+
+Rebase to 1.43:
+The upstream has disabled metadata_csum by default
+this rebase just revert 64bit feature.
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  misc/mke2fs.conf.in | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/misc/mke2fs.conf.in b/misc/mke2fs.conf.in
-index a049d61..106ee80 100644
+index 78fe50a..6f1940e 100644
 --- a/misc/mke2fs.conf.in
 +++ b/misc/mke2fs.conf.in
-@@ -11,7 +11,8 @@
+@@ -11,8 +11,9 @@
  		features = has_journal
  	}
  	ext4 = {
--		features = has_journal,extent,huge_file,flex_bg,metadata_csum,64bit,dir_nlink,extra_isize
+-		features = has_journal,extent,huge_file,flex_bg,64bit,dir_nlink,extra_isize
 +		features = has_journal,extent,huge_file,flex_bg,uninit_bg,dir_nlink,extra_isize
-+		auto_64-bit_support = 1
  		inode_size = 256
++		auto_64-bit_support = 1
  	}
  	ext4dev = {
+ 		features = has_journal,extent,huge_file,flex_bg,inline_data,64bit,dir_nlink,extra_isize
 -- 
-2.7.2
+2.8.1
 

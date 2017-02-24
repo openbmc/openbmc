@@ -22,6 +22,11 @@
             and
             "<ulink url='&YOCTO_DOCS_QS_URL;#releases'>Yocto Project Release</ulink>"
             sections in the Yocto Project Quick Start.
+ 	    For Ubuntu/Debian, you might also need to do an additional install
+            of pip3.
+                <literallayout class='monospaced'>
+     $ sudo apt-get install python3-pip
+                </literallayout>
         </para>
     </section>
 
@@ -42,56 +47,6 @@
             install-compatible format.
         </para>
 
-        <section id='toaster-virtual-environment'>
-            <title>Set Up a Python Virtual Environment</title>
-
-            <para>
-                Set up a Python virtual environment that allows you
-                to maintain a dedicated Python executable and its own
-                set of installed modules.
-                Doing so separates the executable from Python and the
-                modules provided by the operating system.
-                This separation avoids any version conflicts.
-                <note>
-                    Creating a virtual environment is not absolutely
-                    necessary.
-                    However, doing so is highly recommended.
-                </note>
-            </para>
-
-            <para>
-                Follow these steps to set up your virtual environment.
-                These steps assume a Ubuntu distribution:
-                <orderedlist>
-                    <listitem><para><emphasis>Install <filename>virtualenv</filename>:</emphasis>
-                        Install the supported
-                        <filename>python-virtualenv</filename> package from your
-                        distribution rather than using <filename>pip</filename>.
-                        <literallayout class='monospaced'>
-     $ sudo apt-get install python-virtualenv
-                        </literallayout>
-                        </para></listitem>
-                    <listitem><para><emphasis>Create and Activate a Virtual Environment:</emphasis>
-                        <literallayout class='monospaced'>
-     $ virtualenv venv
-     $ source venv/bin/activate
-                        </literallayout>
-                        </para></listitem>
-                </orderedlist>
-                <note>
-                    After setting up a virtual environment in
-                    which to run Toaster, you must initialize that
-                    virtual environment each time you want to start
-                    Toaster.
-                    Use the following to initialize the environment just
-                    before you start Toaster:
-                    <literallayout class='monospaced'>
-     $ source venv/bin/activate
-                    </literallayout>
-                </note>
-            </para>
-        </section>
-
         <section id='toaster-load-packages'>
             <title>Install Toaster Packages</title>
 
@@ -99,7 +54,21 @@
                 You need to install the packages that Toaster requires.
                 Use this command:
                 <literallayout class='monospaced'>
-     $ pip install -r bitbake/toaster-requirements.txt
+     $ $ pip3 install --user -r bitbake/toaster-requirements.txt
+                </literallayout>
+                The previous command installs the necessary Toaster modules
+                into a local python 3 cache in your
+                <filename>$HOME</filename> directory.
+                The caches is actually located in
+                <filename>$HOME/.local</filename>.
+                To see what packages have been installed into your
+                <filename>$HOME</filename> directory, do the following:
+                <literallayout class='monospaced'>
+     $ pip3 list installed --local
+                </literallayout>
+                If you need to remove something, the following works:
+                <literallayout class='monospaced'>
+     $ pip3 uninstall PackageNameToUninstall
                 </literallayout>
             </para>
         </section>

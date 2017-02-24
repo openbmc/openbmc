@@ -690,6 +690,125 @@
      addtask do_deploy_setscene
      do_deploy[dirs] = "${DEPLOYDIR} ${B}"
             </literallayout>
+            The following list explains the previous example:
+            <itemizedlist>
+                <listitem><para>
+                    Adding "do_deploy" to <filename>SSTATETASKS</filename>
+                    adds some required sstate-related processing, which is
+                    implemented in the
+                    <link linkend='ref-classes-sstate'><filename>sstate</filename></link>
+                    class, to before and after the
+                    <link linkend='ref-tasks-deploy'><filename>do_deploy</filename></link>
+                    task.
+                    </para></listitem>
+                <listitem><para>
+                    The
+                    <filename>do_deploy[sstate-inputdirs] = "${DEPLOYDIR}"</filename>
+                    declares that <filename>do_deploy</filename> places its
+                    output in <filename>${DEPLOYDIR}</filename> when run
+                    normally (i.e. when not using the sstate cache).
+                    This output becomes the input to the shared state cache.
+                    </para></listitem>
+                <listitem><para>
+                    The
+                    <filename>do_deploy[sstate-outputdirs] = "${DEPLOY_DIR_IMAGE}"</filename>
+                    line causes the contents of the shared state cache to be
+                    copied to <filename>${DEPLOY_DIR_IMAGE}</filename>.
+                    <note>
+                        If <filename>do_deploy</filename> is not already in
+                        the shared state cache or if its input checksum
+                        (signature) has changed from when the output was
+                        cached, the task will be run to populate the shared
+                        state cache, after which the contents of the shared
+                        state cache is copied to
+                        <filename>${DEPLOY_DIR_IMAGE}</filename>.
+                        If <filename>do_deploy</filename> is in the shared
+                        state cache and its signature indicates that the
+                        cached output is still valid (i.e. if no
+                        relevant task inputs have changed), then the contents
+                        of the shared state cache will be copied directly to
+                        <filename>${DEPLOY_DIR_IMAGE}</filename> by the
+                        <filename>do_deploy_setscene</filename> task instead,
+                        skipping the <filename>do_deploy</filename> task.
+                    </note>
+                    </para></listitem>
+                <listitem><para>
+                    The following task definition is glue logic needed to make
+                    the previous settings effective:
+                    <literallayout class='monospaced'>
+     python do_deploy_setscene () {
+         sstate_setscene(d)
+     }
+     addtask do_deploy_setscene
+                    </literallayout>
+                    <filename>sstate_setscene()</filename> takes the flags
+                    above as input and accelerates the
+                    <filename>do_deploy</filename> task through the
+                    shared state cache if possible.
+                    If the task was accelerated,
+                    <filename>sstate_setscene()</filename> returns True.
+                    Otherwise, it returns False, and the normal
+                    <filename>do_deploy</filename> task runs.
+                    For more information, see the
+                    "<ulink url='&YOCTO_DOCS_BB_URL;#setscene'>setscene</ulink>"
+                    section in the BitBake User Manual.
+                    </para></listitem>
+                <listitem><para>
+                    The <filename>do_deploy[dirs] = "${DEPLOYDIR} ${B}"</filename>
+                    line creates <filename>${DEPLOYDIR}</filename> and
+                    <filename>${B}</filename> before the
+                    <filename>do_deploy</filename> task runs, and also sets
+                    the current working directory of
+                    <filename>do_deploy</filename> to
+                    <filename>${B}</filename>.
+                    For more information, see the
+                    "<ulink url='&YOCTO_DOCS_BB_URL;#variable-flags'>Variable Flags</ulink>"
+                    section in the BitBake User Manual.
+                    <note>
+                        In cases where
+                        <filename>sstate-inputdirs</filename> and
+                        <filename>sstate-outputdirs</filename> would be the
+                        same, you can use
+                        <filename>sstate-plaindirs</filename>.
+                        For example, to preserve the
+                        <filename>${PKGD}</filename> and
+                        <filename>${PKGDEST}</filename> output from the
+                        <link linkend='ref-tasks-package'><filename>do_package</filename></link>
+                        task, use the following:
+                        <literallayout class='monospaced'>
+     do_package[sstate-plaindirs] = "${PKGD} ${PKGDEST}"
+                        </literallayout>
+                    </note>
+                    </para></listitem>
+                <listitem><para>
+                     <filename>sstate-inputdirs</filename> and
+                     <filename>sstate-outputdirs</filename> can also be used
+                     with multiple directories.
+                     For example, the following declares
+                     <filename>PKGDESTWORK</filename> and
+                     <filename>SHLIBWORK</filename> as shared state
+                     input directories, which populates the shared state
+                     cache, and <filename>PKGDATA_DIR</filename> and
+                     <filename>SHLIBSDIR</filename> as the corresponding
+                     shared state output directories:
+                     <literallayout class='monospaced'>
+     do_package[sstate-inputdirs] = "${PKGDESTWORK} ${SHLIBSWORKDIR}"
+     do_package[sstate-outputdirs] = "${PKGDATA_DIR} ${SHLIBSDIR}"
+                     </literallayout>
+                     </para></listitem>
+                 <listitem><para>
+                     These methods also include the ability to take a lockfile
+                     when manipulating shared state directory structures,
+                     for cases where file additions or removals are sensitive:
+                     <literallayout class='monospaced'>
+     do_package[sstate-lockfile] = "${PACKAGELOCK}"
+                     </literallayout>
+                     </para></listitem>
+            </itemizedlist>
+        </para>
+
+<!--
+        <para>
             In this example, we add some extra flags to the task, a name field ("deploy"), an
             input directory where the task sends data, and the output
             directory where the data from the task should eventually be copied.
@@ -713,6 +832,7 @@
             shared state directory structures since some cases are sensitive to file
             additions or removals.
         </para>
+-->
 
         <para>
             Behind the scenes, the shared state code works by looking in
@@ -722,7 +842,7 @@
             Here is an example:
             <literallayout class='monospaced'>
      SSTATE_MIRRORS ?= "\
-     file://.* http://someserver.tld/share/sstate/PATH \n \
+     file://.* http://someserver.tld/share/sstate/PATH;downloadfilename=PATH \n \
      file://.* file:///some/local/dir/sstate/PATH"
             </literallayout>
             <note>
@@ -781,56 +901,15 @@
             <title>Debugging</title>
 
             <para>
-                When things go wrong, debugging needs to be straightforward.
-                Because of this, the Yocto Project includes strong debugging
-                tools:
-                <itemizedlist>
-                    <listitem><para>Whenever a shared state package is written
-                        out into the
-                        <link linkend='var-SSTATE_DIR'><filename>SSTATE_DIR</filename></link>,
-                        a corresponding <filename>.siginfo</filename> file is
-                        also written.
-                        This file contains a pickled Python database of all
-                        the Metadata that went into creating the hash for a
-                        given shared state package.
-                        Whenever a stamp is written into the stamp directory
-                        <link linkend='var-STAMP'><filename>STAMP</filename></link>,
-                        a corresponding <filename>.sigdata</filename> file
-                        is created that contains the same hash data that
-                        represented the executed task.
-                        </para></listitem>
-                    <listitem><para>You can use BitBake to dump out the
-                        signature construction information without executing
-                        tasks by using either of the following BitBake
-                        command-line options:
-                        <literallayout class='monospaced'>
-     &dash;&dash;dump-signatures=<replaceable>SIGNATURE_HANDLER</replaceable>
-     -S <replaceable>SIGNATURE_HANDLER</replaceable>
-                        </literallayout>
-                        <note>
-                            Two common values for
-                            <replaceable>SIGNATURE_HANDLER</replaceable> are
-                            "none" and "printdiff" to only dump the signature
-                            or to compare the dumped signature with the
-                            cached one, respectively.
-                        </note>
-                        Using BitBake with either of these options causes
-                        BitBake to dump out <filename>.sigdata</filename> files
-                        in the stamp directory for every task it would have
-                        executed instead of building the specified target
-                        package.
-                        </para></listitem>
-                    <listitem><para>There is a
-                        <filename>bitbake-diffsigs</filename> command that
-                        can process <filename>.sigdata</filename> and
-                        <filename>.siginfo</filename> files.
-                        If you specify one of these files, BitBake dumps out
-                        the dependency information in the file.
-                        If you specify two files, BitBake compares the two
-                        files and dumps out the differences between the two.
-                        This more easily helps answer the question of "What
-                        changed between X and Y?"</para></listitem>
-                </itemizedlist>
+                Seeing what metadata went into creating the input signature
+                of a shared state (sstate) task can be a useful debugging aid.
+                This information is available in signature information
+                (<filename>siginfo</filename>) files in
+                <link linkend='var-SSTATE_DIR'><filename>SSTATE_DIR</filename></link>.
+                For information on how to view and interpret information in
+                <filename>siginfo</filename> files, see the
+                "<link linkend='usingpoky-viewing-task-variable-dependencies'>Viewing Task Variable Dependencies</link>"
+                section.
             </para>
         </section>
 
@@ -898,6 +977,222 @@
             </note>
         </section>
     </section>
+</section>
+
+<section id='automatically-added-runtime-dependencies'>
+    <title>Automatically Added Runtime Dependencies</title>
+
+    <para>
+        The OpenEmbedded build system automatically adds common types of
+        runtime dependencies between packages, which means that you do not
+        need to explicitly declare the packages using
+        <link linkend='var-RDEPENDS'><filename>RDEPENDS</filename></link>.
+        Three automatic mechanisms exist (<filename>shlibdeps</filename>,
+        <filename>pcdeps</filename>, and <filename>depchains</filename>) that
+        handle shared libraries, package configuration (pkg-config) modules,
+        and <filename>-dev</filename> and <filename>-dbg</filename> packages,
+        respectively.
+        For other types of runtime dependencies, you must manually declare
+        the dependencies.
+        <itemizedlist>
+            <listitem><para>
+                <filename>shlibdeps</filename>:
+                During the
+                <link linkend='ref-tasks-package'><filename>do_package</filename></link>
+                task of each recipe, all shared libraries installed by the
+                recipe are located.
+                For each shared library, the package that contains the shared
+                library is registered as providing the shared library.
+                More specifically, the package is registered as providing the
+                <ulink url='https://en.wikipedia.org/wiki/Soname'>soname</ulink>
+                of the library.
+                The resulting shared-library-to-package mapping
+                is saved globally in
+                <link linkend='var-PKGDATA_DIR'><filename>PKGDATA_DIR</filename></link>
+                by the
+                <link linkend='ref-tasks-packagedata'><filename>do_packagedata</filename></link>
+                task.</para>
+
+                <para>Simultaneously, all executables and shared libraries
+                installed by the recipe are inspected to see what shared
+                libraries they link against.
+                For each shared library dependency that is found,
+                <filename>PKGDATA_DIR</filename> is queried to
+                see if some package (likely from a different recipe) contains
+                the shared library.
+                If such a package is found, a runtime dependency is added from
+                the package that depends on the shared library to the package
+                that contains the library.</para>
+
+                <para>The automatically added runtime dependency also includes
+                a version restriction.
+                This version restriction specifies that at least the current
+                version of the package that provides the shared library must be
+                used, as if
+                "<replaceable>package</replaceable> (>= <replaceable>version</replaceable>)"
+                had been added to
+                <link linkend='var-RDEPENDS'><filename>RDEPENDS</filename></link>.
+                This forces an upgrade of the package containing the shared
+                library when installing the package that depends on the
+                library, if needed.</para>
+
+                <para>If you want to avoid a package being registered as
+                providing a particular shared library (e.g. because the library
+                is for internal use only), then add the library to
+                <link linkend='var-PRIVATE_LIBS'><filename>PRIVATE_LIBS</filename></link>
+                inside the package's recipe.
+                </para></listitem>
+            <listitem><para>
+                <filename>pcdeps</filename>:
+                During the
+                <link linkend='ref-tasks-package'><filename>do_package</filename></link>
+                task of each recipe, all pkg-config modules
+                (<filename>*.pc</filename> files) installed by the recipe are
+                located.
+                For each module, the package that contains the module is
+                registered as providing the module.
+                The resulting module-to-package mapping is saved globally in
+                <link linkend='var-PKGDATA_DIR'><filename>PKGDATA_DIR</filename></link>
+                by the
+                <link linkend='ref-tasks-packagedata'><filename>do_packagedata</filename></link>
+                task.</para>
+
+                <para>Simultaneously, all pkg-config modules installed by the
+                recipe are inspected to see what other pkg-config modules they
+                depend on.
+                A module is seen as depending on another module if it contains
+                a "Requires:" line that specifies the other module.
+                For each module dependency,
+                <filename>PKGDATA_DIR</filename> is queried to see if some
+                package contains the module.
+                If such a package is found, a runtime dependency is added from
+                the package that depends on the module to the package that
+                contains the module.
+                <note>
+                    The <filename>pcdeps</filename> mechanism most often infers
+                    dependencies between <filename>-dev</filename> packages.
+                </note>
+                </para></listitem>
+            <listitem><para>
+                <filename>depchains</filename>:
+                If a package <filename>foo</filename> depends on a package
+                <filename>bar</filename>, then <filename>foo-dev</filename>
+                and <filename>foo-dbg</filename> are also made to depend on
+                <filename>bar-dev</filename> and <filename>bar-dbg</filename>,
+                respectively.
+                Taking the <filename>-dev</filename> packages as an example,
+                the <filename>bar-dev</filename> package might provide
+                headers and shared library symlinks needed by
+                <filename>foo-dev</filename>, which shows the need
+                for a dependency between the packages.</para>
+
+                <para>The dependencies added by <filename>depchains</filename>
+                are in the form of
+                <link linkend='var-RRECOMMENDS'><filename>RRECOMMENDS</filename></link>.
+                <note>
+                    By default, <filename>foo-dev</filename> also has an
+                    <filename>RDEPENDS</filename>-style dependency on
+                    <filename>foo</filename>, because the default value of
+                    <filename>RDEPENDS_${PN}-dev</filename> (set in
+                    <filename>bitbake.conf</filename>) includes
+                    "${PN}".
+                </note></para>
+
+                <para>To ensure that the dependency chain is never broken,
+                <filename>-dev</filename> and <filename>-dbg</filename>
+                packages are always generated by default, even if the packages
+                turn out to be empty.
+                See the
+                <link linkend='var-ALLOW_EMPTY'><filename>ALLOW_EMPTY</filename></link>
+                variable for more information.
+                </para></listitem>
+        </itemizedlist>
+    </para>
+
+    <para>
+        The <filename>do_package</filename> task depends on the
+        <link linkend='ref-tasks-packagedata'><filename>do_packagedata</filename></link>
+        task of each recipe in
+        <link linkend='var-DEPENDS'><filename>DEPENDS</filename></link>
+        through use of a
+        <filename>[</filename><ulink url='&YOCTO_DOCS_BB_URL;#variable-flags'><filename>deptask</filename></ulink><filename>]</filename>
+        declaration, which guarantees that the required
+        shared-library/module-to-package mapping information will be available
+        when needed as long as <filename>DEPENDS</filename> has been
+        correctly set.
+    </para>
+</section>
+
+<section id='fakeroot-and-pseudo'>
+    <title>Fakeroot and Pseudo</title>
+
+    <para>
+        Some tasks are easier to implement when allowed to perform certain
+        operations that are normally reserved for the root user.
+        For example, the
+        <link linkend='ref-tasks-install'><filename>do_install</filename></link>
+        task benefits from being able to set the UID and GID of installed files
+        to arbitrary values.
+    </para>
+
+    <para>
+        One approach to allowing tasks to perform root-only operations
+        would be to require BitBake to run as root.
+        However, this method is cumbersome and has security issues.
+        The approach that is actually used is to run tasks that benefit from
+        root privileges in a "fake" root environment.
+        Within this environment, the task and its child processes believe that
+        they are running as the root user, and see an internally consistent
+        view of the filesystem.
+        As long as generating the final output (e.g. a package or an image)
+        does not require root privileges, the fact that some earlier steps ran
+        in a fake root environment does not cause problems.
+    </para>
+
+    <para>
+        The capability to run tasks in a fake root environment is known as
+        "fakeroot", which is derived from the BitBake keyword/variable
+        flag that requests a fake root environment for a task.
+        In current versions of the OpenEmbedded build system,
+        the program that implements fakeroot is known as Pseudo.
+    </para>
+
+    <para>
+        Pseudo overrides system calls through the
+        <filename>LD_PRELOAD</filename> mechanism to give the
+        illusion of running as root.
+        To keep track of "fake" file ownership and permissions resulting from
+        operations that require root permissions, an sqlite3
+        database is used.
+        This database is stored in
+        <filename>${</filename><link linkend='var-WORKDIR'><filename>WORKDIR</filename></link><filename>}/pseudo/files.db</filename>
+        for individual recipes.
+        Storing the database in a file as opposed to in memory
+        gives persistence between tasks, and even between builds.
+        <note><title>Caution</title>
+            If you add your own task that manipulates the same files or
+            directories as a fakeroot task, then that task should also run
+            under fakeroot.
+            Otherwise, the task will not be able to run root-only operations,
+            and will not see the fake file ownership and permissions set by the
+            other task.
+            You should also add a dependency on
+            <filename>virtual/fakeroot-native:do_populate_sysroot</filename>,
+            giving the following:
+            <literallayout class='monospaced'>
+       fakeroot do_mytask () {
+           ...
+       }
+       do_mytask[depends] += "virtual/fakeroot-native:do_populate_sysroot"
+            </literallayout>
+        </note>
+        For more information, see the
+        <ulink url='&YOCTO_DOCS_BB_URL;#var-FAKEROOT'><filename>FAKEROOT*</filename></ulink>
+        variables in the BitBake User Manual.
+        You can also reference this
+        <ulink url='http://www.ibm.com/developerworks/opensource/library/os-aapseudo1/index.html'>Pseudo</ulink>
+        article.
+    </para>
 </section>
 
 <section id='x32'>

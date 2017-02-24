@@ -7,8 +7,8 @@ HOMEPAGE = "http://git.yoctoproject.org/cgit/cgit.cgi/ptest-runner2/about/"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=751419260aa954499f7abaabaa882bbe"
 
-SRCREV = "8bfdf946e784f4d5757bebee1fbc4b4a3d7a95c4"
-PV = "2.0+git${SRCPV}"
+SRCREV = "e2aa4256745377b784c8691f546041b59f6e046b"
+PV = "2.0.1+git${SRCPV}"
 
 SRC_URI = "git://git.yoctoproject.org/ptest-runner2"
 S = "${WORKDIR}/git"
@@ -22,5 +22,5 @@ do_compile () {
 }
 
 do_install () {
-	install -D -m 0755 ${WORKDIR}/git/ptest-runner ${D}${bindir}/ptest-runner
+	install -D -m 0755 ${S}/ptest-runner ${D}${bindir}/ptest-runner
 }

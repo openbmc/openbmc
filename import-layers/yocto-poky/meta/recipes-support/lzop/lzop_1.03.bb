@@ -15,15 +15,15 @@ SRC_URI = "http://www.lzop.org/download/${BP}.tar.gz \
            file://acinclude.m4 \
            file://x32_abi_miniacc_h.patch \
            file://0001-use-static-inlines-as-the-external-inline-definition.patch \
+           file://lzop-1.03-gcc6.patch \
           "
 SRC_URI[md5sum] = "006c5e27fb78cdd14a628fdfa5aa1905"
 SRC_URI[sha256sum] = "c1425b8c77d49f5a679d5a126c90ea6ad99585a55e335a613cae59e909dbb2c9"
 
 inherit autotools
 
-do_configure () {
-    ln -sf  ../acinclude.m4 ${S}/acinclude.m4
-    autotools_do_configure
+do_configure_prepend () {
+    install -Dm 0644 ${WORKDIR}/acinclude.m4 ${S}/acinclude.m4
 }
 
 BBCLASSEXTEND += "native nativesdk"

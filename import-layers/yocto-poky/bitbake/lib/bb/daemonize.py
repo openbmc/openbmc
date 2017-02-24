@@ -178,8 +178,8 @@ def createDaemon(function, logfile):
 #    os.dup2(0, 2)                      # standard error (2)
 
 
-    si = file('/dev/null', 'r')
-    so = file(logfile, 'w')
+    si = open('/dev/null', 'r')
+    so = open(logfile, 'w')
     se = so
 
 

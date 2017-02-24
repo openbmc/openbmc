@@ -1,0 +1,54 @@
+From f14b4706b0d04988e7e5bc8c4d2aefef9f029d9d Mon Sep 17 00:00:00 2001
+From: Michael Weiser <michael.weiser@gmx.de>
+Date: Fri, 5 Aug 2016 18:43:55 +0200
+Subject: [PATCH] Adjust to recent user page API changes
+
+4.6.0 basically renamed get_user_pages() to get_user_pages_remote() and
+introduced a new get_user_pages() that always works on the current
+task.[1] Distinguish the two APIs based on kernel version we're
+compiling for.
+
+Also, there seems to have been a massive cleansing of
+page_cache_release(page) in favour of put_page(page)[2] which was an
+alias for put_page(page)[3] since 2.6.0. Before that beginning with
+2.4.0 both page_cache_release(page) and put_page(page) have been aliases
+for __free_page(page). So using put_page() instead of
+page_cache_release(page) will produce identical code for anything after
+2.4.0.
+
+[1] https://lkml.org/lkml/2016/2/10/555
+[2] https://www.spinics.net/lists/linux-fsdevel/msg95923.html
+[3] https://www.spinics.net/lists/linux-fsdevel/msg95922.html
+---
+ zc.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+Upstream-Status: Backport [from master for 4.8 kernels]
+
+Index: cryptodev-linux-1.8/zc.c
+===================================================================
+--- cryptodev-linux-1.8.orig/zc.c
++++ cryptodev-linux-1.8/zc.c
+@@ -59,7 +59,12 @@ int __get_userbuf(uint8_t __user *addr,
+ 	}
+ 
+ 	down_read(&mm->mmap_sem);
+-	ret = get_user_pages(task, mm,
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 6, 0))
++	ret = get_user_pages_remote(
++#else
++	ret = get_user_pages(
++#endif
++			task, mm,
+ 			(unsigned long)addr, pgcount, write, 0, pg, NULL);
+ 	up_read(&mm->mmap_sem);
+ 	if (ret != pgcount)
+@@ -119,7 +124,7 @@ void release_user_pages(struct csession
+ 		else
+ 			ses->readonly_pages--;
+ 
+-		page_cache_release(ses->pages[i]);
++		put_page(ses->pages[i]);
+ 	}
+ 	ses->used_pages = 0;
+ }

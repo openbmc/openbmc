@@ -13,6 +13,11 @@ PN = "gcc-cross-${TARGET_ARCH}"
 
 require gcc-configure-common.inc
 
+# While we want the 'gnu' hash style, we explicitly set it to sysv here to
+# ensure that any recipe which doesn't obey our LDFLAGS (which also set it to
+# gnu) will hit a QA failure.
+LINKER_HASH_STYLE ?= "sysv"
+
 EXTRA_OECONF += "--enable-poison-system-directories"
 EXTRA_OECONF_append_sh4 = " \
     --with-multilib-list= \
@@ -183,12 +188,15 @@ do_install () {
 
 	# gcc-runtime installs libgcc into a special location in staging since it breaks doing a standalone build
 	case ${PN} in
-		*gcc-cross-${TARGET_ARCH}|*gcc-crosssdk-${TARGET_ARCH})
+		*gcc-cross-${TARGET_ARCH}|*gcc-crosssdk-${SDK_SYS})
 			dest=${D}/${includedir}/gcc-build-internal-${TARGET_SYS}
 			hardlinkdir . $dest
 		;;
 	esac
 }
+# This is reflected in the recipe name and target gcc shouldn't depend 
+# on SDK settings either
+do_install[vardepsexclude] += "SDK_SYS"
 
 do_package[noexec] = "1"
 do_packagedata[noexec] = "1"

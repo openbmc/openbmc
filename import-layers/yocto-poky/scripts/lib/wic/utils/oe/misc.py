@@ -28,12 +28,14 @@
 
 import os
 from collections import defaultdict
+from distutils import spawn
 
 from wic import msger
 from wic.utils import runner
 
 # executable -> recipe pairs for exec_native_cmd
-NATIVE_RECIPES = {"mcopy": "mtools",
+NATIVE_RECIPES = {"bmaptool": "bmap-tools",
+                  "mcopy": "mtools",
                   "mkdosfs": "dosfstools",
                   "mkfs.btrfs": "btrfs-tools",
                   "mkfs.ext2": "e2fsprogs",
@@ -43,6 +45,7 @@ NATIVE_RECIPES = {"mcopy": "mtools",
                   "mksquashfs": "squashfs-tools",
                   "mkswap": "util-linux",
                   "parted": "parted",
+                  "sfdisk": "util-linux",
                   "sgdisk": "gptfdisk",
                   "syslinux": "syslinux"
                  }
@@ -82,13 +85,6 @@ def exec_cmd(cmd_and_args, as_shell=False, catch=3):
 
     return out
 
-def cmd_in_path(cmd, path):
-    import scriptpath
-
-    scriptpath.add_bitbake_lib_path()
-
-    return bb.utils.which(path, cmd) != "" or False
-
 def exec_native_cmd(cmd_and_args, native_sysroot, catch=3, pseudo=""):
     """
     Execute native command, catching stderr, stdout
@@ -111,7 +107,7 @@ def exec_native_cmd(cmd_and_args, native_sysroot, catch=3, pseudo=""):
     msger.debug("exec_native_cmd: %s" % cmd_and_args)
 
     # If the command isn't in the native sysroot say we failed.
-    if cmd_in_path(args[0], native_paths):
+    if spawn.find_executable(args[0], native_paths):
         ret, out = _exec_cmd(native_cmd_and_args, True, catch)
     else:
         ret = 127
@@ -186,8 +182,8 @@ class BitbakeVars(defaultdict):
                         for line in varsfile:
                             self._parse_line(line, image)
                 else:
-                    print "Couldn't get bitbake variable from %s." % fname
-                    print "File %s doesn't exist." % fname
+                    print("Couldn't get bitbake variable from %s." % fname)
+                    print("File %s doesn't exist." % fname)
                     return
             else:
                 # Get bitbake -e output
@@ -201,8 +197,8 @@ class BitbakeVars(defaultdict):
                 msger.set_loglevel(log_level)
 
                 if ret:
-                    print "Couldn't get '%s' output." % cmd
-                    print "Bitbake failed with error:\n%s\n" % lines
+                    print("Couldn't get '%s' output." % cmd)
+                    print("Bitbake failed with error:\n%s\n" % lines)
                     return
 
                 # Parse bitbake -e output

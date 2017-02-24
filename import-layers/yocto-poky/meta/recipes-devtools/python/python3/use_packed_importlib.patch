@@ -6,7 +6,7 @@ importlib*.h files, this is impossible to do on a cross-compile environment,
 this avoids executing the binary and forces it to use the packed importlib*.h files.
 
  
-Signed-Off-By: Alejandro Hernandez <alejandro.hernandez@linux.intel.com> 
+Signed-off-by: Alejandro Hernandez <alejandro.hernandez@linux.intel.com> 
 
 Index: Python-3.5.0/Makefile.pre.in
 ===================================================================
