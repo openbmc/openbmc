@@ -1,0 +1,45 @@
+From 09505532b49573663fb4ff4dad424dc2ef4c1f84 Mon Sep 17 00:00:00 2001
+From: Kyle Russell <bkylerussell@gmail.com>
+Date: Wed, 13 Jul 2016 17:30:00 -0400
+Subject: [PATCH] collector: Allocate space on heap for chunks
+
+Nicer for embedded devices which may have smaller stack limitations.
+
+Upstream-Status: Submitted [https://github.com/xrmx/bootchart/pull/74]
+
+Signed-off-by: Kyle Russell <bkylerussell@gmail.com>
+---
+ collector/dump.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/collector/dump.c b/collector/dump.c
+index e673b5b..2f094b4 100644
+--- a/collector/dump.c
++++ b/collector/dump.c
+@@ -184,12 +184,12 @@ static void dump_buffers (DumpState *s)
+ 	log ("reading %d chunks (of %d) ...\n", max_chunk, s->map.max_chunk);
+ 	for (i = 0; i < max_chunk; i++) {
+ 		FILE *output;
+-		char buffer[CHUNK_SIZE];
+-		Chunk *c = (Chunk *)&buffer;
++		char *buffer = malloc(CHUNK_SIZE);
++		Chunk *c = (Chunk *)buffer;
+ 		size_t addr = (size_t) s->map.chunks[i];
+ 
+ 		lseek (s->mem, addr, SEEK_SET);
+-		read (s->mem, &buffer, CHUNK_SIZE);
++		read (s->mem, buffer, CHUNK_SIZE);
+ 		/*      log ("type: '%s' len %d\n",
+ 			c->dest_stream, (int)c->length); */
+ 
+@@ -197,6 +197,7 @@ static void dump_buffers (DumpState *s)
+ 		fwrite (c->data, 1, c->length, output);
+ 		bytes_dumped += c->length;
+ 		fclose (output);
++                free(buffer);
+ 	}
+ 	log ("wrote %ld kb\n", (long)(bytes_dumped+1023)/1024);
+ }
+-- 
+2.7.4
+

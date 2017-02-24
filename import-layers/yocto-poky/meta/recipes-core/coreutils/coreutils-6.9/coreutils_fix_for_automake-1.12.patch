@@ -11,7 +11,7 @@ this patch avoids these kinds of errors:
 | configure.ac:40: the top level
 | autom4te: m4 failed with exit status: 1
 
-Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
 2012/05/04
 
 Index: coreutils-6.9/m4/jm-macros.m4

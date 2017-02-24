@@ -56,6 +56,17 @@ do_install_append() {
 	if [ -e ${D}${libdir}/charset.alias ]; then
 		rm -rf ${D}${libdir}/charset.alias
 	fi
+
+	# awk is located at /usr/bin/, not /bin/
+	SPECIAL_AWK=`find ${D} -name special.awk`
+	if [ -f ${SPECIAL_AWK} ]; then
+		sed -i -e 's:#!.*awk:#! ${USRBINPATH}/awk:' ${SPECIAL_AWK}
+	fi
+
+	# not ship /usr/bin/glilypond and its releated files in embedded target system
+	rm -rf ${D}${bindir}/glilypond
+	rm -rf ${D}${libdir}/groff/glilypond
+	rm -rf ${D}${mandir}/man1/glilypond*
 }
 
 do_install_append_class-native() {

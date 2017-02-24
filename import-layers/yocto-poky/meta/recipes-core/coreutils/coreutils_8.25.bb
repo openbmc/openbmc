@@ -19,6 +19,7 @@ SRC_URI = "${GNU_MIRROR}/coreutils/${BP}.tar.xz;name=tarball \
            file://fix-selinux-flask.patch \
            file://0001-Unset-need_charset_alias-when-building-for-musl.patch \
            file://0001-uname-report-processor-and-hardware-correctly.patch \
+           file://disable-ls-output-quoting.patch \
           "
 
 SRC_URI[tarball.md5sum] = "070e43ba7f618d747414ef56ab248a48"
@@ -37,7 +38,8 @@ PACKAGECONFIG_class-target ??= "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'xattr', 'xattr', '', d)} \
 "
 
-PACKAGECONFIG_class-native ??= ""
+# The lib/oe/path.py requires xattr
+PACKAGECONFIG_class-native ??= "xattr"
 
 # with, without, depends, rdepends
 #
@@ -69,6 +71,15 @@ do_compile_prepend () {
 	mkdir -p ${B}/src
 }
 
+do_install_class-native() {
+	autotools_do_install
+	# remove groups to fix conflict with shadow-native
+	rm -f ${D}${STAGING_BINDIR_NATIVE}/groups
+	# The return is a must since native doesn't need the
+	# do_install_append() in the below.
+	return
+}
+
 do_install_append() {
 	for i in df mktemp base64; do mv ${D}${bindir}/$i ${D}${bindir}/$i.${BPN}; done
 
@@ -91,16 +102,13 @@ do_install_append() {
 	cp -a ${D}${mandir}/man1/test.1 ${D}${mandir}/man1/lbracket.1.${BPN}
 }
 
-do_install_append_class-native(){
-	# remove groups to fix conflict with shadow-native
-	rm -f ${D}${STAGING_BINDIR_NATIVE}/groups
-}
-
 inherit update-alternatives
 
 ALTERNATIVE_PRIORITY = "100"
 ALTERNATIVE_${PN} = "lbracket ${bindir_progs} ${base_bindir_progs} ${sbindir_progs} base64 mktemp df"
-ALTERNATIVE_${PN}-doc = "base64.1 mktemp.1 df.1 lbracket.1 groups.1 kill.1 uptime.1 stat.1"
+ALTERNATIVE_${PN}-doc = "base64.1 mktemp.1 df.1 lbracket.1 groups.1 kill.1 uptime.1 stat.1  hostname.1"
+
+ALTERNATIVE_LINK_NAME[hostname.1] = "${mandir}/man1/hostname.1"
 
 ALTERNATIVE_LINK_NAME[base64] = "${base_bindir}/base64"
 ALTERNATIVE_TARGET[base64] = "${bindir}/base64.${BPN}"

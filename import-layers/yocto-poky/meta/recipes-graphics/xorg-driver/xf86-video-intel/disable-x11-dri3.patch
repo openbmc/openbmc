@@ -12,6 +12,6 @@ diff --git a/configure.ac b/configure.ac
 index bd654f3..78a0e0d 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -251 +251 @@ fi
--PKG_CHECK_MODULES(X11_DRI3, [xcb-dri3 xcb-sync xcb-present x11-xcb xshmfence x11 xrender xext libdrm], [x11_dri3="yes"], [x11_dri3="no"])
-+#PKG_CHECK_MODULES(X11_DRI3, [xcb-dri3 xcb-sync xcb-present x11-xcb xshmfence x11 xrender xext libdrm], [x11_dri3="yes"], [x11_dri3="no"])
+@@ -279 +279 @@ fi
+-PKG_CHECK_MODULES(X11_DRI3, [xcb-dri3 xcb-sync xcb-xfixes xcb-present x11-xcb xshmfence x11 xcomposite xdamage xrender xrandr xxf86vm xext libdrm], [x11_dri3="yes"], [x11_dri3="no"])
++#PKG_CHECK_MODULES(X11_DRI3, [xcb-dri3 xcb-sync xcb-xfixes xcb-present x11-xcb xshmfence x11 xcomposite xdamage xrender xrandr xxf86vm xext libdrm], [x11_dri3="yes"], [x11_dri3="no"])

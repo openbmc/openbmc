@@ -3,7 +3,7 @@ Upstream-Status: Inappropriate [legacy version]
 # coreutils uses gnulib which conflicts with newer libc header on futimens
 # this patch simply renames coreutils futimes to avoid confliction
 #
-# Signed-off-by Kevin Tian <kevin.tian@intel.com>, 2010-08-18
+# Signed-off-by: Kevin Tian <kevin.tian@intel.com>, 2010-08-18
 # (this patch is licensed under GPLv2)
 
 diff --git a/lib/utimens.c b/lib/utimens.c

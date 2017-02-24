@@ -5,135 +5,163 @@
 {% block title %} Import layer - {{project.name}} - Toaster {% endblock %}
 {% block pagecontent %}
 
-{% include "projecttopbar.html" %}
+<div class="row">
+  {% include "projecttopbar.html" %}
+  {% if project and project.release %}
+  <script src="{% static 'js/layerDepsModal.js' %}"></script>
+  <script src="{% static 'js/importlayer.js' %}"></script>
+  <script>
+  $(document).ready(function (){
+    var ctx = {
+      xhrImportLayerUrl : "{% url 'xhr_importlayer' %}",
+    };
 
+    try {
+      importLayerPageInit(ctx);
+    } catch (e) {
+      document.write("Sorry, An error has occurred loading this page");
+      console.warn(e);
+    }
+  });
+  </script>
 
-        {% if project and project.release %}
-                  <script src="{% static 'js/layerDepsModal.js' %}"></script>
-                  <script src="{% static 'js/importlayer.js' %}"></script>
-                  <script>
-                    $(document).ready(function (){
-                      var ctx = {
-                        xhrImportLayerUrl : "{% url 'xhr_importlayer' %}",
-                      };
+  <form class="col-md-11">
+    <span class="help-block">The layer you are importing must be compatible with <strong>{{project.release.description}}</strong>, which is the release you are using in this project.</span>
+    <div class="alert alert-error" id="import-error" style="display:none">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      <h3>&nbsp;</h3>
+      <p></p>
+      <ul></ul>
+    </div>
+    <fieldset>
+      <div class="form-group" id="layer-name-ctrl">
+        <label class="control-label" for="import-layer-name">
+          Layer name
+          <span class="glyphicon glyphicon-question-sign get-help" title="Something like 'meta-mylayer'. Your layer name must be unique and can only include letters, numbers and dashes"></span>
+        </label>
+        <input class="form-control" id="import-layer-name" type="text" required autofocus data-autocomplete="off" data-provide="typeahead">
+        <span class="help-block" style="display: none;" id="invalid-layer-name-hint">A valid layer name can only include letters, numbers and dashes</span>
+        <span class="help-inline" style="display: none;" id="duplicated-layer-name-hint"></span>
+      </div>
+    </fieldset>
+    <div id="duplicate-layer-info" style="display:none">
+      <div class="alert alert-warning">
+        <h3>A layer called <a href="" class="dup-layer-link"><span class="dup-layer-name"></span></a> already exists</h3>
+        <p>Layer names must be unqiue. Please use a different layer name.</p>
+        <dl id="git-layer-dup" style="display:none;">
+          <dt>
+          The <span class="dup-layer-name"></span> repository url is
+          </dt>
+          <dd>
+          <span id="dup-layer-vcs-url"></span>
+          </dd>
+          <dt>
+          The <span class="dup-layer-name"></span> revision is
+          </dt>
+          <dd>
+          <span id="dup-layer-revision"></span>
+          </dd>
+        </dl>
+	<dl id="local-layer-dup" style="display:none;">
+	  <dt>
+	    The <span class="dup-layer-name"></span> directory is
+	  </dt>
+	  <dd>
+	    <span id="dup-local-source-dir-name"></span>
+	  </dd>
+	</dl>
+        <p><a href="" class="dup-layer-link">View the <span class="dup-layer-name"></span> layer information</a></p>
+      </div>
+    </div>
+    <fieldset class="fields-apart-from-layer-name" id="repo-select">
+      <legend class="radioLegend">Where is the layer source code?</legend>
+      <div class="radio">
+	<label>
+          <input type="radio" id="git-repo-radio" name="repo" value="git" checked="checked">
+	  In a <strong>Git repository</strong>
+	</label>
+	<p class="help-block radio-help">To build the layer Toaster must be able to access the Git repository, otherwise builds will fail. Toaster will fetch and checkout your chosen Git revision every time you start a build.</p>
+      </div>
+      <div class="radio">
+	<label>
+          <input type="radio" id="local-dir-radio" name="repo" value="local">
+	  In a <strong>directory</strong>
+	</label>
+	<p class="help-block radio-help">Use this option for quick layer development, by simply providing the path to the layer source code.</p>
+      </div>
+    </fieldset>
+    <fieldset class="fields-apart-from-layer-name" id="git-repo">
+      <legend>Git repository information</legend>
+      <div class="form-group">
+        <label for="layer-git-repo-url">
+          Git repository URL
+          <span class="glyphicon glyphicon-question-sign get-help" title="Fetch/clone URL of the repository. Currently, Toaster only supports Git repositories." ></span>
+        </label>
+        <input type="text" id="layer-git-repo-url" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="layer-subdir">
+          Repository subdirectory
+          <span class="text-muted">(optional)</span>
+          <span class="glyphicon glyphicon-question-sign get-help" title="Subdirectory within the repository where the layer is located, if not in the root (usually only used if the repository contains more than one layer)"></span>
+        </label>
+        <input type="text" class="form-control" id="layer-subdir">
+      </div>
+      <div class="form-group" id="layer-revision-ctrl">
+        <label for="layer-git-ref">
+          Git revision
+          <span class="glyphicon glyphicon-question-sign get-help" title="You can provide a Git branch, a tag or a commit SHA as the revision"></span>
+        </label>
+        <input type="text" class="form-control" id="layer-git-ref" required>
+        <span class="help-inline" style="display:none;" id="invalid-layer-revision-hint"></span>
+      </div>
+    </fieldset>
 
-                      try {
-                        importLayerPageInit(ctx);
-                      } catch (e) {
-                        document.write("Sorry, An error has occurred loading this page");
-                        console.warn(e);
-                      }
-                    });
-                  </script>
+    <fieldset class="fields-apart-from-layer-name" id="local-dir" style="display:none;">
+      <legend>Layer directory information</legend>
+      <div class="form-group">
+        <label for="local-dir-path" class="control-label">Enter the absolute path to the layer directory</label>
+        <input type="text" class="form-control" id="local-dir-path" required/>
+        <p class="help-block" id="hintError-dir-path-starts-with-slash" style="display:none;">The absolute path must start with "/".</p>
+        <p class="help-block" id="hintError-dir-path" style="display:none;">The directory path cannot include spaces or any of these characters: . \ ? % * : | " " &lt; &gt;</p>
+      </div>
+    </fieldset>
 
-                <form class="span11">
-                   <fieldset>
-                      <legend>Layer repository information</legend>
-                      <span class="help-block">The layer you are importing must be compatible with <strong>{{project.release.description}}</strong>, which is the release you are using in this project.</span>
-                      <div class="alert alert-error" id="import-error" style="display:none">
-                        <button type="button" class="close" data-dismiss="alert">&times;</button>
-                        <h3>&nbsp;</h3>
-                        <p></p>
-                        <ul></ul>
-                      </div>
+    <fieldset class="fields-apart-from-layer-name">
+      <legend>
+        Layer dependencies
+        <small class="text-muted">(optional)</small>
+        <span class="glyphicon glyphicon-question-sign get-help heading-help" title="Other layers this layer depends upon"></span>
+      </legend>
+      <ul class="list-unstyled lead" id="layer-deps-list">
+      </ul>
+      <div class="form-inline">
+        <div class="form-group">
+          <input type="text" autocomplete="off" data-minLength="1" data-autocomplete="off" data-provide="typeahead" placeholder="Type a layer name" id="layer-dependency" class="form-control">
+        </div>
+        <button class="btn btn-default" id="add-layer-dependency-btn">
+          Add layer
+        </button>
+        <span class="help-inline">You can only add layers Toaster knows about</span>
+    </fieldset>
+    <div class="top-air fields-apart-from-layer-name" id="form-actions">
+      <button class="btn btn-primary btn-lg" data-toggle="modal" id="import-and-add-btn" data-target="#dependencies-message" disabled>Import and add to project</button>
+      <span class="help-inline" id="import-git-layer-and-add-hint" style="vertical-align: middle;">To import a layer you need to enter a layer name, a Git repository URL and a Git revision (branch, tag or commit)</span>
+      <span class="help-inline" id="import-local-dir-and-add-hint" style="vertical-align: middle;display:none;">To import a layer you need to enter a layer name and the absolute path to the layer directory</span>
+    </div>
+  </div>
+</form>
 
-                      <div class="control-group" id="layer-name-ctrl">
-                        <label class="control-label air" for="import-layer-name">
-                            Layer name
-                            <span class="icon-question-sign get-help" title="Something like 'meta-mylayer'. Your layer name must be unique and can only include letters, numbers and dashes"></span>
-                        </label>
-                        <div class="controls">
-                          <input id="import-layer-name" type="text" required autofocus data-autocomplete="off" data-provide="typeahead">
-                          <span class="help-inline" style="display: none;" id="invalid-layer-name-hint">A valid layer name can only include letters, numbers and dashes</span>
-                          <span class="help-inline" style="display: none;" id="duplicated-layer-name-hint"></span>
-                        </div>
+  {% else %} {#project and project release#}
+  <div class="page-header">
+    <h1>Import layer</h1>
+  </div>
+  <div class="alert alert-info" id="import-error" >
+    <h3>Unsupported project type</h3>
+    <p>This project does not support importing layers.</p>
+    <ul></ul>
+  </div>
 
-                      </div>
-                      <div id="duplicate-layer-info" style="display:none">
-                        <div class="alert warning">
-                          <h3>A layer called <a href="" class="dup-layer-link"><span class="dup-layer-name"></span></a> already exists</h3>
-                          <p>Layer names must be unqiue. Please use a different layer name.</p>
-                        </div>
-                        <dl>
-                          <dt>
-                            The <span class="dup-layer-name"></span> repository url is
-                          </dt>
-                          <dd>
-                            <span id="dup-layer-vcs-url"></span>
-                          </dd>
-
-                          <dt>
-                            The <span class="dup-layer-name"></span> revision is
-                          </dt>
-                          <dd>
-                            <span id="dup-layer-revision"></span>
-                          </dd>
-                        </dl>
-
-                        <p><a href="" class="dup-layer-link">View the <span class="dup-layer-name"></span> layer information</a></p>
-
-                      </div>
-
-                      <div class="fields-apart-from-layer-name">
-                        <label for="layer-git-repo-url" class="project-form">
-                            Git repository URL
-                            <span class="icon-question-sign get-help" title="Fetch/clone URL of the repository. Currently, Toaster only supports Git repositories." ></span>
-                        </label>
-
-                        <input type="text" id="layer-git-repo-url" class="input-xxlarge" required>
-                        <label class="project-form" for="layer-subdir">
-                            Repository subdirectory
-                            <span class="muted">(optional)</span>
-                            <span class="icon-question-sign get-help" title="Subdirectory within the repository where the layer is located, if not in the root (usually only used if the repository contains more than one layer)"></span>
-                        </label>
-                        <input type="text"  id="layer-subdir">
-
-                          <div class="control-group" id="layer-revision-ctrl">
-                            <label class="control-label project-form" for="layer-git-ref">Git revision
-                              <span class="icon-question-sign get-help" title="You can provide a Git branch, a tag or a commit SHA as the revision"></span>
-                            </label>
-                            <div class="controls">
-                              <input type="text" class="span3" id="layer-git-ref" required>
-                                <span class="help-inline" style="diaply:none;" id="invalid-layer-revision-hint"></span>
-                            </div>
-                          </div>
-                       </div>
-
-                    </fieldset>
-
-                    <div class="fields-apart-from-layer-name">
-                    <fieldset class="air">
-                        <legend>
-                            Layer dependencies
-                            <span class="muted">(optional)</span>
-                            <span class="icon-question-sign get-help heading-help" title="Other layers this layer depends upon"></span>
-                        </legend>
-                        <ul class="unstyled configuration-list" id="layer-deps-list">
-                        </ul>
-                        <div class="input-append">
-                            <input type="text" autocomplete="off" data-minLength="1" data-autocomplete="off" data-provide="typeahead" placeholder="Type a layer name" id="layer-dependency" class="input-xlarge">
-                            <a class="btn" id="add-layer-dependency-btn">
-                                Add layer
-                            </a>
-                        </div>
-                        <span class="help-inline">You can only add layers Toaster knows about</span>
-                    </fieldset>
-                    <div class="air" id="form-actions">
-                      <button class="btn btn-primary btn-large" data-toggle="modal" id="import-and-add-btn" data-target="#dependencies-message" disabled>Import and add to project</button>
-                        <span class="help-inline" id="import-and-add-hint" style="vertical-align: middle;">To import a layer you need to enter a layer name, a Git repository URL and a revision (branch, tag or commit)</span>
-                    </div>
-                  </div>
-                  </form>
-
-          {% else %} {#project and project release#}
-                <div class="page-header">
-                    <h1>Import layer</h1>
-                </div>
-                      <div class="alert alert-info" id="import-error" >
-                        <h3>Unsupported project type</h3>
-                        <p>This project does not support importing layers.</p>
-                        <ul></ul>
-                      </div>
-
-          {% endif %}
+  {% endif %}
+</div>
 {% endblock %}

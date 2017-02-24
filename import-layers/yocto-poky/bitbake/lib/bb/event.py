@@ -24,14 +24,13 @@ BitBake build tools.
 
 import os, sys
 import warnings
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
+import pickle
 import logging
 import atexit
 import traceback
 import ast
+import threading
+
 import bb.utils
 import bb.compat
 import bb.exceptions
@@ -71,12 +70,27 @@ _event_handler_map = {}
 _catchall_handlers = {}
 _eventfilter = None
 _uiready = False
+_thread_lock = threading.Lock()
+_thread_lock_enabled = False
+
+if hasattr(__builtins__, '__setitem__'):
+    builtins = __builtins__
+else:
+    builtins = __builtins__.__dict__
+
+def enable_threadlock():
+    global _thread_lock_enabled
+    _thread_lock_enabled = True
+
+def disable_threadlock():
+    global _thread_lock_enabled
+    _thread_lock_enabled = False
 
 def execute_handler(name, handler, event, d):
     event.data = d
     addedd = False
-    if 'd' not in __builtins__:
-        __builtins__['d'] = d
+    if 'd' not in builtins:
+        builtins['d'] = d
         addedd = True
     try:
         ret = handler(event)
@@ -94,7 +108,7 @@ def execute_handler(name, handler, event, d):
     finally:
         del event.data
         if addedd:
-            del __builtins__['d']
+            del builtins['d']
 
 def fire_class_handlers(event, d):
     if isinstance(event, logging.LogRecord):
@@ -102,7 +116,7 @@ def fire_class_handlers(event, d):
 
     eid = str(event.__class__)[8:-2]
     evt_hmap = _event_handler_map.get(eid, {})
-    for name, handler in _handlers.iteritems():
+    for name, handler in list(_handlers.items()):
         if name in _catchall_handlers or name in evt_hmap:
             if _eventfilter:
                 if not _eventfilter(name, handler, event, d):
@@ -117,30 +131,43 @@ def print_ui_queue():
     logger = logging.getLogger("BitBake")
     if not _uiready:
         from bb.msg import BBLogFormatter
-        console = logging.StreamHandler(sys.stdout)
-        console.setFormatter(BBLogFormatter("%(levelname)s: %(message)s"))
-        logger.handlers = [console]
+        stdout = logging.StreamHandler(sys.stdout)
+        stderr = logging.StreamHandler(sys.stderr)
+        formatter = BBLogFormatter("%(levelname)s: %(message)s")
+        stdout.setFormatter(formatter)
+        stderr.setFormatter(formatter)
 
         # First check to see if we have any proper messages
         msgprint = False
-        for event in ui_queue:
+        for event in ui_queue[:]:
             if isinstance(event, logging.LogRecord):
                 if event.levelno > logging.DEBUG:
+                    if event.levelno >= logging.WARNING:
+                        logger.addHandler(stderr)
+                    else:
+                        logger.addHandler(stdout)
                     logger.handle(event)
                     msgprint = True
         if msgprint:
             return
 
         # Nope, so just print all of the messages we have (including debug messages)
-        for event in ui_queue:
+        logger.addHandler(stdout)
+        for event in ui_queue[:]:
             if isinstance(event, logging.LogRecord):
                 logger.handle(event)
 
 def fire_ui_handlers(event, d):
+    global _thread_lock
+    global _thread_lock_enabled
+
     if not _uiready:
         # No UI handlers registered yet, queue up the messages
         ui_queue.append(event)
         return
+
+    if _thread_lock_enabled:
+        _thread_lock.acquire()
 
     errors = []
     for h in _ui_handlers:
@@ -159,6 +186,9 @@ def fire_ui_handlers(event, d):
             errors.append(h)
     for h in errors:
         del _ui_handlers[h]
+
+    if _thread_lock_enabled:
+        _thread_lock.release()
 
 def fire(event, d):
     """Fire off an Event"""
@@ -187,7 +217,7 @@ def register(name, handler, mask=None, filename=None, lineno=None):
 
     if handler is not None:
         # handle string containing python code
-        if isinstance(handler, basestring):
+        if isinstance(handler, str):
             tmp = "def %s(e):\n%s" % (name, handler)
             try:
                 code = bb.methodpool.compile_cache(tmp)
@@ -224,6 +254,13 @@ def register(name, handler, mask=None, filename=None, lineno=None):
 def remove(name, handler):
     """Remove an Event handler"""
     _handlers.pop(name)
+
+def get_handlers():
+    return _handlers
+
+def set_handlers(handlers):
+    global _handlers
+    _handlers = handlers
 
 def set_eventfilter(func):
     global _eventfilter
@@ -373,7 +410,11 @@ class BuildBase(Event):
 
 
 
-
+class BuildInit(BuildBase):
+    """buildFile or buildTargets was invoked"""
+    def __init__(self, p=[]):
+        name = None
+        BuildBase.__init__(self, name, p)
 
 class BuildStarted(BuildBase, OperationStarted):
     """bbmake build run started"""
@@ -605,8 +646,9 @@ class LogHandler(logging.Handler):
             if hasattr(tb, 'tb_next'):
                 tb = list(bb.exceptions.extract_traceback(tb, context=3))
             # Need to turn the value into something the logging system can pickle
-            value = str(value)
             record.bb_exc_info = (etype, value, tb)
+            record.bb_exc_formatted = bb.exceptions.format_exception(etype, value, tb, limit=5)
+            value = str(value)
             record.exc_info = None
         fire(record, None)
 
@@ -636,6 +678,33 @@ class MetadataEvent(Event):
         Event.__init__(self)
         self.type = eventtype
         self._localdata = eventdata
+
+class ProcessStarted(Event):
+    """
+    Generic process started event (usually part of the initial startup)
+    where further progress events will be delivered
+    """
+    def __init__(self, processname, total):
+        Event.__init__(self)
+        self.processname = processname
+        self.total = total
+
+class ProcessProgress(Event):
+    """
+    Generic process progress event (usually part of the initial startup)
+    """
+    def __init__(self, processname, progress):
+        Event.__init__(self)
+        self.processname = processname
+        self.progress = progress
+
+class ProcessFinished(Event):
+    """
+    Generic process finished event (usually part of the initial startup)
+    """
+    def __init__(self, processname):
+        Event.__init__(self)
+        self.processname = processname
 
 class SanityCheck(Event):
     """

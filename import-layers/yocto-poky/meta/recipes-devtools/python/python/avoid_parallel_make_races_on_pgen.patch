@@ -4,8 +4,8 @@ Avoids parallel make races linking errors when making Parser/PGEN
 
 - Implements Richard Purdie's idea
 
-Signed-Off-By: Richard Purdie <richard.purdie@linuxfoundation.org>
-Signed-Off-By: Alejandro Hernandez <alejandro.hernandez@linux.intel.com>
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+Signed-off-by: Alejandro Hernandez <alejandro.hernandez@linux.intel.com>
 
 Index: Python-2.7.9/Makefile.pre.in
 ===================================================================

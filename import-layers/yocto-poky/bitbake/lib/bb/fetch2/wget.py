@@ -31,7 +31,8 @@ import subprocess
 import os
 import logging
 import bb
-import urllib
+import bb.progress
+import urllib.request, urllib.parse, urllib.error
 from   bb import data
 from   bb.fetch2 import FetchMethod
 from   bb.fetch2 import FetchError
@@ -40,6 +41,27 @@ from   bb.fetch2 import runfetchcmd
 from   bb.utils import export_proxies
 from   bs4 import BeautifulSoup
 from   bs4 import SoupStrainer
+
+class WgetProgressHandler(bb.progress.LineFilterProgressHandler):
+    """
+    Extract progress information from wget output.
+    Note: relies on --progress=dot (with -v or without -q/-nv) being
+    specified on the wget command line.
+    """
+    def __init__(self, d):
+        super(WgetProgressHandler, self).__init__(d)
+        # Send an initial progress event so the bar gets shown
+        self._fire_progress(0)
+
+    def writeline(self, line):
+        percs = re.findall(r'(\d+)%\s+([\d.]+[A-Z])', line)
+        if percs:
+            progress = int(percs[-1][0])
+            rate = percs[-1][1] + '/s'
+            self.update(progress, rate)
+            return False
+        return True
+
 
 class Wget(FetchMethod):
     """Class to fetch urls via 'wget'"""
@@ -62,17 +84,19 @@ class Wget(FetchMethod):
         else:
             ud.basename = os.path.basename(ud.path)
 
-        ud.localfile = data.expand(urllib.unquote(ud.basename), d)
+        ud.localfile = data.expand(urllib.parse.unquote(ud.basename), d)
         if not ud.localfile:
-            ud.localfile = data.expand(urllib.unquote(ud.host + ud.path).replace("/", "."), d)
+            ud.localfile = data.expand(urllib.parse.unquote(ud.host + ud.path).replace("/", "."), d)
 
-        self.basecmd = d.getVar("FETCHCMD_wget", True) or "/usr/bin/env wget -t 2 -T 30 -nv --passive-ftp --no-check-certificate"
+        self.basecmd = d.getVar("FETCHCMD_wget", True) or "/usr/bin/env wget -t 2 -T 30 --passive-ftp --no-check-certificate"
 
     def _runwget(self, ud, d, command, quiet):
 
+        progresshandler = WgetProgressHandler(d)
+
         logger.debug(2, "Fetching %s using command '%s'" % (ud.url, command))
         bb.fetch2.check_network_access(d, command)
-        runfetchcmd(command, d, quiet)
+        runfetchcmd(command + ' --progress=dot -v', d, quiet, log=progresshandler)
 
     def download(self, ud, d):
         """Fetch urls"""
@@ -83,6 +107,10 @@ class Wget(FetchMethod):
             dldir = d.getVar("DL_DIR", True)
             bb.utils.mkdirhier(os.path.dirname(dldir + os.sep + ud.localfile))
             fetchcmd += " -O " + dldir + os.sep + ud.localfile
+
+        if ud.user:
+            up = ud.user.split(":")
+            fetchcmd += " --user=%s --password=%s --auth-no-challenge" % (up[0],up[1])
 
         uri = ud.url.split(";")[0]
         if os.path.exists(ud.localpath):
@@ -104,12 +132,12 @@ class Wget(FetchMethod):
 
         return True
 
-    def checkstatus(self, fetch, ud, d):
-        import urllib2, socket, httplib
-        from urllib import addinfourl
+    def checkstatus(self, fetch, ud, d, try_again=True):
+        import urllib.request, urllib.error, urllib.parse, socket, http.client
+        from urllib.response import addinfourl
         from bb.fetch2 import FetchConnectionCache
 
-        class HTTPConnectionCache(httplib.HTTPConnection):
+        class HTTPConnectionCache(http.client.HTTPConnection):
             if fetch.connection_cache:
                 def connect(self):
                     """Connect to the host and port specified in __init__."""
@@ -125,7 +153,7 @@ class Wget(FetchMethod):
                     if self._tunnel_host:
                         self._tunnel()
 
-        class CacheHTTPHandler(urllib2.HTTPHandler):
+        class CacheHTTPHandler(urllib.request.HTTPHandler):
             def http_open(self, req):
                 return self.do_open(HTTPConnectionCache, req)
 
@@ -139,7 +167,7 @@ class Wget(FetchMethod):
                     - geturl(): return the original request URL
                     - code: HTTP status code
                 """
-                host = req.get_host()
+                host = req.host
                 if not host:
                     raise urlllib2.URLError('no host given')
 
@@ -147,7 +175,7 @@ class Wget(FetchMethod):
                 h.set_debuglevel(self._debuglevel)
 
                 headers = dict(req.unredirected_hdrs)
-                headers.update(dict((k, v) for k, v in req.headers.items()
+                headers.update(dict((k, v) for k, v in list(req.headers.items())
                             if k not in headers))
 
                 # We want to make an HTTP/1.1 request, but the addinfourl
@@ -164,7 +192,7 @@ class Wget(FetchMethod):
                     headers["Connection"] = "Keep-Alive" # Works for HTTP/1.0
 
                 headers = dict(
-                    (name.title(), val) for name, val in headers.items())
+                    (name.title(), val) for name, val in list(headers.items()))
 
                 if req._tunnel_host:
                     tunnel_headers = {}
@@ -177,12 +205,12 @@ class Wget(FetchMethod):
                     h.set_tunnel(req._tunnel_host, headers=tunnel_headers)
 
                 try:
-                    h.request(req.get_method(), req.get_selector(), req.data, headers)
-                except socket.error, err: # XXX what error?
+                    h.request(req.get_method(), req.selector, req.data, headers)
+                except socket.error as err: # XXX what error?
                     # Don't close connection when cache is enabled.
                     if fetch.connection_cache is None:
                         h.close()
-                    raise urllib2.URLError(err)
+                    raise urllib.error.URLError(err)
                 else:
                     try:
                         r = h.getresponse(buffering=True)
@@ -222,7 +250,7 @@ class Wget(FetchMethod):
 
                 return resp
 
-        class HTTPMethodFallback(urllib2.BaseHandler):
+        class HTTPMethodFallback(urllib.request.BaseHandler):
             """
             Fallback to GET if HEAD is not allowed (405 HTTP error)
             """
@@ -230,11 +258,11 @@ class Wget(FetchMethod):
                 fp.read()
                 fp.close()
 
-                newheaders = dict((k,v) for k,v in req.headers.items()
+                newheaders = dict((k,v) for k,v in list(req.headers.items())
                                   if k.lower() not in ("content-length", "content-type"))
-                return self.parent.open(urllib2.Request(req.get_full_url(),
+                return self.parent.open(urllib.request.Request(req.get_full_url(),
                                                         headers=newheaders,
-                                                        origin_req_host=req.get_origin_req_host(),
+                                                        origin_req_host=req.origin_req_host,
                                                         unverifiable=True))
 
             """
@@ -249,38 +277,49 @@ class Wget(FetchMethod):
             """
             http_error_406 = http_error_405
 
-        class FixedHTTPRedirectHandler(urllib2.HTTPRedirectHandler):
+        class FixedHTTPRedirectHandler(urllib.request.HTTPRedirectHandler):
             """
             urllib2.HTTPRedirectHandler resets the method to GET on redirect,
             when we want to follow redirects using the original method.
             """
             def redirect_request(self, req, fp, code, msg, headers, newurl):
-                newreq = urllib2.HTTPRedirectHandler.redirect_request(self, req, fp, code, msg, headers, newurl)
+                newreq = urllib.request.HTTPRedirectHandler.redirect_request(self, req, fp, code, msg, headers, newurl)
                 newreq.get_method = lambda: req.get_method()
                 return newreq
         exported_proxies = export_proxies(d)
 
         handlers = [FixedHTTPRedirectHandler, HTTPMethodFallback]
         if export_proxies:
-            handlers.append(urllib2.ProxyHandler())
+            handlers.append(urllib.request.ProxyHandler())
         handlers.append(CacheHTTPHandler())
         # XXX: Since Python 2.7.9 ssl cert validation is enabled by default
         # see PEP-0476, this causes verification errors on some https servers
         # so disable by default.
         import ssl
         if hasattr(ssl, '_create_unverified_context'):
-            handlers.append(urllib2.HTTPSHandler(context=ssl._create_unverified_context()))
-        opener = urllib2.build_opener(*handlers)
+            handlers.append(urllib.request.HTTPSHandler(context=ssl._create_unverified_context()))
+        opener = urllib.request.build_opener(*handlers)
 
         try:
             uri = ud.url.split(";")[0]
-            r = urllib2.Request(uri)
+            r = urllib.request.Request(uri)
             r.get_method = lambda: "HEAD"
+
+            if ud.user:
+                import base64
+                encodeuser = base64.b64encode(ud.user.encode('utf-8')).decode("utf-8")
+                authheader =  "Basic %s" % encodeuser
+                r.add_header("Authorization", authheader)
+
             opener.open(r)
-        except urllib2.URLError as e:
-            # debug for now to avoid spamming the logs in e.g. remote sstate searches
-            logger.debug(2, "checkstatus() urlopen failed: %s" % e)
-            return False
+        except urllib.error.URLError as e:
+            if try_again:
+                logger.debug(2, "checkstatus: trying again")
+                return self.checkstatus(fetch, ud, d, False)
+            else:
+                # debug for now to avoid spamming the logs in e.g. remote sstate searches
+                logger.debug(2, "checkstatus() urlopen failed: %s" % e)
+                return False
         return True
 
     def _parse_path(self, regex, s):

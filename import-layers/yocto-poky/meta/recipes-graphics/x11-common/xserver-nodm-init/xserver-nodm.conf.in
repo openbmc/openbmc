@@ -1,0 +1,7 @@
+# common environment file for sysvinit and systemd
+
+XSERVER=/usr/bin/Xorg
+DISPLAY=:0
+ARGS=" -br -pn @BLANK_ARGS@ "
+HOME=@HOME@
+USER=@USER@

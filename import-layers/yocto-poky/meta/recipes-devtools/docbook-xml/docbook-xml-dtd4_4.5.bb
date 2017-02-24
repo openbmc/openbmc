@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://${WORKDIR}/LICENSE-OASIS;md5=c608985dd5f7f215e669e763
 # Note: the upstream sources are not distributed with a license file.
 # LICENSE-OASIS is included as a "patch" to workaround this. When
 # upgrading this recipe, please verify whether this is still needed.
-SRC_URI = "${DEBIAN_MIRROR}/main/d/docbook-xml/docbook-xml_${PV}.orig.tar.gz \
+SRC_URI = "http://snapshot.debian.org/archive/debian/20160728T043443Z/pool/main/d/docbook-xml/docbook-xml_${PV}.orig.tar.gz \
            file://LICENSE-OASIS \
            file://docbook-xml-update-catalog.xml.patch \
            file://docbook-xml.xml \
@@ -19,6 +19,8 @@ SRC_URI = "${DEBIAN_MIRROR}/main/d/docbook-xml/docbook-xml_${PV}.orig.tar.gz \
 
 SRC_URI[md5sum] = "487b4d44e15cffb1f4048af23f98208e"
 SRC_URI[sha256sum] = "b0f8edcf697f5318e63dd98c9a931f3fee167af0805ba441db372e0f17b2a44f"
+
+UPSTREAM_CHECK_URI = "${DEBIAN_MIRROR}/main/d/docbook-xml/"
 
 S="${WORKDIR}/docbook-xml-4.5.c31424"
 

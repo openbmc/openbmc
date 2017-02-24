@@ -12,6 +12,10 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/project/linuxquota/quota-tools/${PV}/quota-${PV
            file://0001-Do-not-accidentaly-override-commandline-passed-CFLAG.patch \
            file://fcntl.patch \
            file://remove_non_posix_types.patch \
+           file://0001-Use-NGROUPS_MAX-instead-of-NGROUPS.patch \
+           file://0002-Allow-building-on-systems-that-do-not-have-rpc-heade.patch \
+           file://0003-Don-t-build-rpc.rquotad-when-disable-rpc-was-request.patch \
+           file://0004-Fix-warnings-due-to-missing-stdlib.h.patch \
           "
 SRC_URI_append_libc-musl = " file://replace_getrpcbynumber_r.patch"
 
@@ -25,8 +29,8 @@ DEPENDS = "gettext-native e2fsprogs libnl dbus"
 
 inherit autotools-brokensep gettext pkgconfig
 
-CFLAGS += "-I${STAGING_INCDIR}/tirpc"
-LDFLAGS += "-ltirpc"
+CFLAGS += "${@bb.utils.contains('PACKAGECONFIG', 'rpc', '-I${STAGING_INCDIR}/tirpc', '', d)}"
+LDFLAGS += "${@bb.utils.contains('PACKAGECONFIG', 'rpc', '-ltirpc', '', d)}"
 ASNEEDED = ""
 
 PACKAGECONFIG ??= "tcp-wrappers rpc bsd"

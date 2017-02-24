@@ -5,7 +5,7 @@ when we update aclocal
 
 Upstream-Status: Inappropriate [configuration]
 
-Signed-off-by Saul Wold <sgw@linux.intel.com>
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
 
 Index: gettext-0.16.1/autoconf-lib-link/m4/lib-link.m4
 ===================================================================

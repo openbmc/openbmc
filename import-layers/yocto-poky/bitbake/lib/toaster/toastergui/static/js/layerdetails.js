@@ -10,25 +10,27 @@ function layerDetailsPageInit (ctx) {
   var targetTab = $("#targets-tab");
   var machineTab = $("#machines-tab");
   var detailsTab = $("#details-tab");
+  var editLayerSource = $("#edit-layer-source");
+  var saveSourceChangesBtn = $("#save-changes-for-switch");
+  var layerGitRefInput = $("#layer-git-ref");
+  var layerSubDirInput = $('#layer-subdir');
+
+  targetTab.on('show.bs.tab', targetsTabShow);
+  detailsTab.on('show.bs.tab', detailsTabShow);
+  machineTab.on('show.bs.tab', machinesTabShow);
 
   /* setup the dependencies typeahead */
-  libtoaster.makeTypeahead(layerDepInput, libtoaster.ctx.layersTypeAheadUrl, { include_added: "true" }, function(item){
+  libtoaster.makeTypeahead(layerDepInput,
+                           libtoaster.ctx.layersTypeAheadUrl,
+                           { include_added: "true" }, function(item){
     currentLayerDepSelection = item;
-
     layerDepBtn.removeAttr("disabled");
   });
 
-  $(window).on('hashchange', function(e){
-    switch(window.location.hash){
-      case '#machines':
-        machineTab.tab('show');
-        break;
-      case '#recipes':
-        targetTab.tab('show');
-        break;
-      default:
-        detailsTab.tab('show');
-        break;
+  /* disable the add layer button if its input field is empty */
+  layerDepInput.on("keyup",function(){
+    if ($(this).val().length === 0) {
+      layerDepBtn.attr("disabled", "disabled");
     }
   });
 
@@ -76,7 +78,7 @@ function layerDetailsPageInit (ctx) {
 
     addRemoveDep(currentLayerDepSelection.id, true, function(){
       /* Make a list item for the new layer dependency */
-      var newLayerDep = $("<li><a></a><span class=\"icon-trash\" data-toggle=\"tooltip\" title=\"Delete\"></span></li>");
+      var newLayerDep = $("<li><a></a><span class=\"glyphicon glyphicon-trash\" data-toggle=\"tooltip\" title=\"Delete\"></span></li>");
 
       newLayerDep.data('layer-id', currentLayerDepSelection.id);
       newLayerDep.children("span").tooltip();
@@ -94,11 +96,11 @@ function layerDetailsPageInit (ctx) {
       /* Clear the current selection */
       layerDepInput.val("");
       currentLayerDepSelection = undefined;
-      layerDepBtn.attr("disabled","disabled");
+      layerDepBtn.attr("disabled", "disabled");
     });
   });
 
-  $(".icon-pencil").click(function (){
+  $(".glyphicon-edit").click(function (){
     var mParent = $(this).parent("dd");
     mParent.prev().css("margin-top", "10px");
     mParent.children("form").slideDown();
@@ -106,8 +108,12 @@ function layerDetailsPageInit (ctx) {
     currentVal.hide();
     /* Set the current value to the input field */
     mParent.find("textarea,input").val(currentVal.text());
+    /* If the input field is empty, disable the submit button */
+    if ( mParent.find("textarea,input").val().length == 0 ) {
+      mParent.find(".change-btn").attr("disabled", "disabled");
+    }
     /* Hides the "Not set" text */
-    mParent.children(".muted").hide();
+    mParent.children(".text-muted").hide();
     /* We're editing so hide the delete icon */
     mParent.children(".delete-current-value").hide();
     mParent.find(".cancel").show();
@@ -128,30 +134,31 @@ function layerDetailsPageInit (ctx) {
       mParent.children(".current-value").show();
       /* Show the "Not set" text if we ended up with no value */
       if (!mParent.children(".current-value").html()){
-        mParent.children(".muted").fadeIn();
+        mParent.children(".text-muted").fadeIn();
         mParent.children(".delete-current-value").hide();
       } else {
         mParent.children(".delete-current-value").show();
       }
 
-      mParent.children(".icon-pencil").show();
-      mParent.prev().css("margin-top", "0px");
+      mParent.children(".glyphicon-edit").show();
+      mParent.prev().css("margin-top", "0");
     });
   });
+
 
   function defaultAddBtnText(){
       var text = " Add the "+ctx.layerVersion.name+" layer to your project";
       addRmLayerBtn.text(text);
-      addRmLayerBtn.prepend("<span class=\"icon-plus\"></span>");
+      addRmLayerBtn.prepend("<span class=\"glyphicon glyphicon-plus\"></span>");
       addRmLayerBtn.removeClass("btn-danger");
   }
 
-  detailsTab.on('show', function(){
+  function detailsTabShow(){
     if (!ctx.layerVersion.inCurrentPrj)
       defaultAddBtnText();
 
-    window.location.hash = "details";
-  });
+    window.location.hash = "information";
+  }
 
   function targetsTabShow(){
     if (!ctx.layerVersion.inCurrentPrj){
@@ -159,7 +166,7 @@ function layerDetailsPageInit (ctx) {
         var text = " Add the "+ctx.layerVersion.name+" layer to your project "+
           "to enable these recipes";
         addRmLayerBtn.text(text);
-        addRmLayerBtn.prepend("<span class=\"icon-plus\"></span>");
+        addRmLayerBtn.prepend("<span class=\"glyphicon glyphicon-plus\"></span>");
       } else {
         defaultAddBtnText();
       }
@@ -177,7 +184,7 @@ function layerDetailsPageInit (ctx) {
       $("#no-recipes-yet").hide();
     }
 
-    targetTab.removeClass("muted");
+    targetTab.removeClass("text-muted");
     if (window.location.hash === "#recipes"){
       /* re run the machinesTabShow to update the text */
       targetsTabShow();
@@ -192,20 +199,19 @@ function layerDetailsPageInit (ctx) {
     else
       $("#no-machines-yet").hide();
 
-    machineTab.removeClass("muted");
+    machineTab.removeClass("text-muted");
     if (window.location.hash === "#machines"){
       /* re run the machinesTabShow to update the text */
       machinesTabShow();
     }
 
     $(".select-machine-btn").click(function(e){
-      if ($(this).attr("disabled") === "disabled")
+      if ($(this).hasClass("disabled"))
         e.preventDefault();
     });
 
   });
 
-  targetTab.on('show', targetsTabShow);
 
   function machinesTabShow(){
     if (!ctx.layerVersion.inCurrentPrj) {
@@ -213,7 +219,7 @@ function layerDetailsPageInit (ctx) {
         var text = " Add the "+ctx.layerVersion.name+" layer to your project " +
           "to enable these machines";
         addRmLayerBtn.text(text);
-        addRmLayerBtn.prepend("<span class=\"icon-plus\"></span>");
+        addRmLayerBtn.prepend("<span class=\"glyphicon glyphicon-plus\"></span>");
       } else {
         defaultAddBtnText();
       }
@@ -221,8 +227,6 @@ function layerDetailsPageInit (ctx) {
 
     window.location.hash = "machines";
   }
-
-  machineTab.on('show', machinesTabShow);
 
   $(".pagesize").change(function(){
     var search = libtoaster.parseUrlParams();
@@ -239,17 +243,17 @@ function layerDetailsPageInit (ctx) {
 
     if (added){
       /* enable and switch all the button states */
-      $(".build-recipe-btn").removeAttr("disabled");
-      $(".select-machine-btn").removeAttr("disabled");
+      $(".build-recipe-btn").removeClass("disabled");
+      $(".select-machine-btn").removeClass("disabled");
       addRmLayerBtn.addClass("btn-danger");
       addRmLayerBtn.data('directive', "remove");
       addRmLayerBtn.text(" Remove the "+ctx.layerVersion.name+" layer from your project");
-      addRmLayerBtn.prepend("<span class=\"icon-trash\"></span>");
+      addRmLayerBtn.prepend("<span class=\"glyphicon glyphicon-trash\"></span>");
 
     } else {
       /* disable and switch all the button states */
-      $(".build-recipe-btn").attr("disabled","disabled");
-      $(".select-machine-btn").attr("disabled", "disabled");
+      $(".build-recipe-btn").addClass("disabled");
+      $(".select-machine-btn").addClass("disabled");
       addRmLayerBtn.removeClass("btn-danger");
       addRmLayerBtn.data('directive', "add");
 
@@ -257,7 +261,7 @@ function layerDetailsPageInit (ctx) {
        * on which tab is currently visible. Unfortunately we can't just call
        * tab('show') as if it's already visible it doesn't run the event.
        */
-      switch ($(".nav-pills .active a").prop('id')){
+      switch ($(".nav-tabs .active a").prop('id')){
         case 'machines-tab':
           machinesTabShow();
           break;
@@ -286,7 +290,7 @@ function layerDetailsPageInit (ctx) {
 
       setLayerInCurrentPrj(add);
 
-      $("#alert-area").show();
+      libtoaster.showChangeNotification(alertMsg);
     });
   });
 
@@ -325,7 +329,7 @@ function layerDetailsPageInit (ctx) {
             text = entryElement.val();
 
             /* Hide the "Not set" text if it's visible */
-            inputArea.find(".muted").hide();
+            inputArea.find(".text-muted").hide();
             inputArea.find(".current-value").text(text);
             /* Same behaviour as cancel in that we hide the form/show current
              * value.
@@ -343,9 +347,9 @@ function layerDetailsPageInit (ctx) {
   /* Disable the change button when we have no data in the input */
   $("dl input, dl textarea").on("input",function() {
     if ($(this).val().length === 0)
-      $(this).parent().children(".change-btn").attr("disabled", "disabled");
+      $(this).parent().next(".change-btn").attr("disabled", "disabled");
     else
-      $(this).parent().children(".change-btn").removeAttr("disabled");
+      $(this).parent().next(".change-btn").removeAttr("disabled");
   });
 
   /* This checks to see if the dt's dd has data in it or if the change data
@@ -355,11 +359,11 @@ function layerDetailsPageInit (ctx) {
     if ($(this).is("dt")) {
       var dd = $(this).next("dd");
       if (!dd.children("form:visible")|| !dd.find(".current-value").html()){
-        if (ctx.layerVersion.sourceId == 3){
+        if (ctx.layerVersion.layer_source == ctx.layerSourceTypes.TYPE_IMPORTED){
         /* There's no current value and the layer is editable
          * so show the "Not set" and hide the delete icon
          */
-        dd.find(".muted").show();
+        dd.find(".text-muted").show();
         dd.find(".delete-current-value").hide();
         } else {
           /* We're not viewing an editable layer so hide the empty dd/dl pair */
@@ -386,10 +390,132 @@ function layerDetailsPageInit (ctx) {
     $(this).parents("form").submit();
   });
 
+  $("#layer-delete-confirmed").click(function(){
 
-  layerDepsList.find(".icon-trash").click(layerDepRemoveClick);
+    $("#delete-layer-modal button[data-dismiss='modal']").hide();
+
+    var message = $('<span>You have deleted <strong>1</strong> layer from your project: <strong id="deleted-layer-name"></strong>');
+    message.find("#deleted-layer-name").text(ctx.layerVersion.name);
+
+    $.ajax({
+        type: "DELETE",
+        url: ctx.xhrUpdateLayerUrl,
+        headers: { 'X-CSRFToken' : $.cookie('csrftoken')},
+        success: function(data) {
+          if (data.error != "ok") {
+            console.warn(data.error);
+          } else {
+            libtoaster.setNotification("layer-deleted", message.html());
+            window.location.replace(data.gotoUrl);
+          }
+        },
+        error: function(data) {
+          console.warn("Call failed");
+          console.warn(data);
+        }
+    });
+  });
+
+  layerDepsList.find(".glyphicon-trash").click(layerDepRemoveClick);
   layerDepsList.find("a").tooltip();
-  $(".icon-trash").tooltip();
+  $(".glyphicon-trash").tooltip();
   $(".commit").tooltip();
 
+  editLayerSource.click(function() {
+    /* Kindly bring the git layers imported from layerindex to normal page
+     * and not this new page :(
+     */
+    $(this).hide();
+    saveSourceChangesBtn.attr("disabled", "disabled");
+
+    $("#git-repo-info, #directory-info").hide();
+    $("#edit-layer-source-form").fadeIn();
+    if ($("#layer-dir-path-in-details").val() == "") {
+      //Local dir path is empty...
+      $("#repo").prop("checked", true);
+      $("#layer-git").fadeIn();
+      $("#layer-dir").hide();
+    } else {
+      $("#layer-git").hide();
+      $("#layer-dir").fadeIn();
+    }
+  });
+
+  $('input:radio[name="source-location"]').change(function() {
+    if ($('input[name=source-location]:checked').val() == "repo") {
+      $("#layer-git").fadeIn();
+      $("#layer-dir").hide();
+      if ($("#layer-git-repo-url").val().length === 0 && layerGitRefInput.val().length === 0) {
+        saveSourceChangesBtn.attr("disabled", "disabled");
+      }
+    } else {
+      $("#layer-dir").fadeIn();
+      $("#layer-git").hide();
+    }
+  });
+
+  $("#layer-dir-path-in-details").keyup(function() {
+    saveSourceChangesBtn.removeAttr("disabled");
+  });
+
+  $("#layer-git-repo-url").keyup(function() {
+    if ($("#layer-git-repo-url").val().length > 0 && layerGitRefInput.val().length > 0) {
+      saveSourceChangesBtn.removeAttr("disabled");
+    }
+  });
+
+  layerGitRefInput.keyup(function() {
+    if ($("#layer-git-repo-url").val().length > 0 && layerGitRefInput.val().length > 0) {
+      saveSourceChangesBtn.removeAttr("disabled");
+    }
+  });
+
+
+  layerSubDirInput.keyup(function(){
+    if ($(this).val().length > 0){
+      saveSourceChangesBtn.removeAttr("disabled");
+    }
+  });
+
+  $('#cancel-changes-for-switch').click(function() {
+    $("#edit-layer-source-form").hide();
+    $("#directory-info, #git-repo-info").fadeIn();
+    editLayerSource.show();
+  });
+
+  saveSourceChangesBtn.click(function() {
+
+    var layerData = {
+      vcs_url: $('#layer-git-repo-url').val(),
+      commit: layerGitRefInput.val(),
+      dirpath: layerSubDirInput.val(),
+      local_source_dir: $('#layer-dir-path-in-details').val(),
+    };
+
+    if ($('input[name=source-location]:checked').val() == "repo") {
+      layerData.local_source_dir = "";
+    } else {
+      layerData.vcs_url = "";
+      layerData.git_ref = "";
+    }
+
+    $.ajax({
+        type: "POST",
+        url: ctx.xhrUpdateLayerUrl,
+        data: layerData,
+        headers: { 'X-CSRFToken' : $.cookie('csrftoken')},
+        success: function (data) {
+          if (data.error != "ok") {
+            console.warn(data.error);
+          } else {
+            /* success layer property changed */
+            window.location.reload();
+          }
+        },
+        error: function (data) {
+          console.warn("Call failed");
+          console.warn(data);
+        }
+    });
+  });
 }

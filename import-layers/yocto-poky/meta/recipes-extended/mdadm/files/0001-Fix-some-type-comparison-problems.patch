@@ -11,7 +11,7 @@ unsigned int too.
 
 Upstream-Status: Backport
 
-Signed-off-by : Xiao Ni <xni@redhat.com>
+Signed-off-by: : Xiao Ni <xni@redhat.com>
 Signed-off-by: Maxin B. John <maxin.john@intel.com>
 ---
 

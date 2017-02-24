@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Settings
+Name[de]=Einstellungen
+Comment=Settings for your handheld computer
+Comment[de]=Einstellungen für Ihren Handheld-Computer
+Icon=mbfolder.png
+Type=Directory
+Match=Settings

@@ -21,8 +21,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from __future__ import absolute_import
-from future_builtins import filter
+
 import re
 import string
 import logging
@@ -69,6 +68,33 @@ class ExportNode(AstNode):
 
     def eval(self, data):
         data.setVarFlag(self.var, "export", 1, op = 'exported')
+
+class UnsetNode(AstNode):
+    def __init__(self, filename, lineno, var):
+        AstNode.__init__(self, filename, lineno)
+        self.var = var
+
+    def eval(self, data):
+        loginfo = {
+            'variable': self.var,
+            'file': self.filename,
+            'line': self.lineno,
+        }
+        data.delVar(self.var,**loginfo)
+
+class UnsetFlagNode(AstNode):
+    def __init__(self, filename, lineno, var, flag):
+        AstNode.__init__(self, filename, lineno)
+        self.var = var
+        self.flag = flag
+
+    def eval(self, data):
+        loginfo = {
+            'variable': self.var,
+            'file': self.filename,
+            'line': self.lineno,
+        }
+        data.delVarFlag(self.var, self.flag, **loginfo)
 
 class DataNode(AstNode):
     """
@@ -139,7 +165,7 @@ class DataNode(AstNode):
             data.setVar(key, val, parsing=True, **loginfo)
 
 class MethodNode(AstNode):
-    tr_tbl = string.maketrans('/.+-@%&', '_______')
+    tr_tbl = str.maketrans('/.+-@%&', '_______')
 
     def __init__(self, filename, lineno, func_name, body, python, fakeroot):
         AstNode.__init__(self, filename, lineno)
@@ -271,6 +297,12 @@ def handleInclude(statements, filename, lineno, m, force):
 def handleExport(statements, filename, lineno, m):
     statements.append(ExportNode(filename, lineno, m.group(1)))
 
+def handleUnset(statements, filename, lineno, m):
+    statements.append(UnsetNode(filename, lineno, m.group(1)))
+
+def handleUnsetFlag(statements, filename, lineno, m):
+    statements.append(UnsetFlagNode(filename, lineno, m.group(1), m.group(2)))
+
 def handleData(statements, filename, lineno, groupd):
     statements.append(DataNode(filename, lineno, groupd))
 
@@ -307,10 +339,13 @@ def handleInherit(statements, filename, lineno, m):
     statements.append(InheritNode(filename, lineno, classes))
 
 def finalize(fn, d, variant = None):
-    all_handlers = {}
+    saved_handlers = bb.event.get_handlers().copy()
+
     for var in d.getVar('__BBHANDLERS', False) or []:
         # try to add the handler
         handlerfn = d.getVarFlag(var, "filename", False)
+        if not handlerfn:
+            bb.fatal("Undefined event handler function '%s'" % var)
         handlerln = int(d.getVarFlag(var, "lineno", False))
         bb.event.register(var, d.getVar(var, False), (d.getVarFlag(var, "eventmask", True) or "").split(), handlerfn, handlerln)
 
@@ -332,6 +367,7 @@ def finalize(fn, d, variant = None):
     d.setVar('BBINCLUDED', bb.parse.get_file_depends(d))
 
     bb.event.fire(bb.event.RecipeParsed(fn), d)
+    bb.event.set_handlers(saved_handlers)
 
 def _create_variants(datastores, names, function, onlyfinalise):
     def create_variant(name, orig_d, arg = None):
@@ -341,17 +377,17 @@ def _create_variants(datastores, names, function, onlyfinalise):
         function(arg or name, new_d)
         datastores[name] = new_d
 
-    for variant, variant_d in datastores.items():
+    for variant in list(datastores.keys()):
         for name in names:
             if not variant:
                 # Based on main recipe
-                create_variant(name, variant_d)
+                create_variant(name, datastores[""])
             else:
-                create_variant("%s-%s" % (variant, name), variant_d, name)
+                create_variant("%s-%s" % (variant, name), datastores[variant], name)
 
 def _expand_versions(versions):
     def expand_one(version, start, end):
-        for i in xrange(start, end + 1):
+        for i in range(start, end + 1):
             ver = _bbversions_re.sub(str(i), version, 1)
             yield ver
 
@@ -460,17 +496,13 @@ def multi_finalize(fn, d):
         safe_d.setVar("BBCLASSEXTEND", extended)
         _create_variants(datastores, extendedmap.keys(), extendfunc, onlyfinalise)
 
-    for variant, variant_d in datastores.iteritems():
+    for variant in datastores.keys():
         if variant:
             try:
                 if not onlyfinalise or variant in onlyfinalise:
-                    finalize(fn, variant_d, variant)
+                    finalize(fn, datastores[variant], variant)
             except bb.parse.SkipRecipe as e:
-                variant_d.setVar("__SKIPPED", e.args[0])
-
-    if len(datastores) > 1:
-        variants = filter(None, datastores.iterkeys())
-        safe_d.setVar("__VARIANTS", " ".join(variants))
+                datastores[variant].setVar("__SKIPPED", e.args[0])
 
     datastores[""] = d
     return datastores

@@ -1,0 +1,44 @@
+From 3aa84c47e88a4c38446ce1323abf6f2c77389104 Mon Sep 17 00:00:00 2001
+From: Prabhu <prabhu.sundararaj@freescale.com>
+Date: Mon, 16 Nov 2015 17:09:32 -0600
+Subject: [PATCH] mesa-demos: OpenVG demos with single frame need eglSwapBuffer
+
+sp and text demos rendering single frame. to display the
+single frame rendered needed a eglSwapBuffer to diplay to window.
+Hence added eglutPostRedisplay to display the frame
+
+Upstream-Status: Pending
+
+Signed-off-by: Prabhu <prabhu.sundararaj@freescale.com>
+---
+ src/egl/openvg/sp.c   | 1 +
+ src/egl/openvg/text.c | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/src/egl/openvg/sp.c b/src/egl/openvg/sp.c
+index a20c0a3..468e91e 100644
+--- a/src/egl/openvg/sp.c
++++ b/src/egl/openvg/sp.c
+@@ -500,6 +500,7 @@ draw(void)
+    }
+ 
+    vgFlush();
++   eglutPostRedisplay();
+ }
+ 
+ 
+diff --git a/src/egl/openvg/text.c b/src/egl/openvg/text.c
+index f5c6de8..492581c 100644
+--- a/src/egl/openvg/text.c
++++ b/src/egl/openvg/text.c
+@@ -360,6 +360,7 @@ display(void)
+ {
+    vgClear(0, 0, width, height);
+    glyph_string_draw(10.0, 10.0);
++   eglutPostRedisplay();
+ }
+ 
+ 
+-- 
+2.5.1
+

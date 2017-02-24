@@ -1,0 +1,25 @@
+We need to call rpmcliInit to ensure the rpm relocation code is called
+and it correctly honours the relocation environmental variables.
+
+when we export the wrsdk and source the sdk, then execute rpm2cpio xxx.rpm|cpio -t.
+we will get the following error :
+"rpm-5.4.14/rpmdb/dbconfig.c:493:
+db3New: Assertion `dbOpts != ((void *)0) && *dbOpts != '\0'' failed.
+
+Upstream-Status: Pending
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+Signed-off-by: Zhixiong Chi <zhixiong.chi@windriver.com>
+Index: rpm-5.4.15/tools/rpm2cpio.c
+===================================================================
+--- rpm-5.4.15.orig/tools/rpm2cpio.c	2012-04-27 01:46:51.000000000 +0800
++++ rpm-5.4.15/tools/rpm2cpio.c	2016-09-05 11:07:30.419903338 +0800
+@@ -87,6 +87,8 @@
+ #endif
+ 	(void) rpmtsSetVSFlags(ts, vsflags);
+ 
++	rpmcliInit(argc, argv, NULL);
++
+ 	/*@-mustmod@*/      /* LCL: segfault */
+ 	rc = rpmReadPackageFile(ts, fdi, "rpm2cpio", &h);
+ 	/*@=mustmod@*/

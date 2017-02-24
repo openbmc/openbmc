@@ -1,0 +1,29 @@
+From 05816e6f9cd65b2624bb04de65fdf61031c7017f Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Fri, 10 Jun 2016 14:01:54 +0300
+Subject: [PATCH] callgraph: Use U64_TO_POINTER
+
+This fixes a "cast to pointer from integer of different size" on i586.
+
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Upstream-Status: Pending
+---
+ lib/sp-callgraph-view.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/sp-callgraph-view.c b/lib/sp-callgraph-view.c
+index 02cc17b..58315b0 100644
+--- a/lib/sp-callgraph-view.c
++++ b/lib/sp-callgraph-view.c
+@@ -135,7 +135,7 @@ build_functions_store (StackNode *node,
+ 
+   gtk_list_store_append (state->store, &iter);
+   gtk_list_store_set (state->store, &iter,
+-                      COLUMN_NAME, (const gchar *)node->data,
++                      COLUMN_NAME, U64_TO_POINTER(node->data),
+                       COLUMN_SELF, 100.0 * size / state->profile_size,
+                       COLUMN_TOTAL, 100.0 * total / state->profile_size,
+                       COLUMN_POINTER, node,
+-- 
+2.1.4
+

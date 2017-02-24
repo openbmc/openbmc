@@ -220,7 +220,7 @@ class diskMonitor:
                 if minSpace and freeSpace < minSpace:
                     # Always show warning, the self.checked would always be False if the action is WARN
                     if self.preFreeS[k] == 0 or self.preFreeS[k] - freeSpace > self.spaceInterval and not self.checked[k]:
-                        logger.warn("The free space of %s (%s) is running low (%.3fGB left)" % \
+                        logger.warning("The free space of %s (%s) is running low (%.3fGB left)" % \
                                 (path, dev, freeSpace / 1024 / 1024 / 1024.0))
                         self.preFreeS[k] = freeSpace
 
@@ -246,7 +246,7 @@ class diskMonitor:
                         continue
                     # Always show warning, the self.checked would always be False if the action is WARN
                     if self.preFreeI[k] == 0 or self.preFreeI[k] - freeInode > self.inodeInterval and not self.checked[k]:
-                        logger.warn("The free inode of %s (%s) is running low (%.3fK left)" % \
+                        logger.warning("The free inode of %s (%s) is running low (%.3fK left)" % \
                                 (path, dev, freeInode / 1024.0))
                         self.preFreeI[k] = freeInode
 

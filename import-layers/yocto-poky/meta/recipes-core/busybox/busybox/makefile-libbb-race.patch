@@ -1,0 +1,34 @@
+There is a potential race when building libbb, as some header files  
+needed by libbb are not generated yet (or are being modified) at the time
+libbb is compiled.
+This patch avoids this scenario by building libbb as the last directory.
+
+Upstream-Status: Submitted
+Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
+
+Index: busybox-1.24.1/Makefile
+===================================================================
+diff --git a/Makefile b/Makefile
+index 5cfc763..69f3831 100644
+--- a/Makefile
++++ b/Makefile
+@@ -738,9 +738,18 @@ $(sort $(busybox-all)): $(busybox-dirs) ;
+ # Error messages still appears in the original language
+ 
+ PHONY += $(busybox-dirs)
+-$(busybox-dirs): prepare scripts
++
++libbb-dir = $(filter libbb,$(busybox-dirs))
++busybox-dirs1 = $(filter-out libbb,$(busybox-dirs))
++
++$(busybox-dirs1): prepare scripts
+ 	$(Q)$(MAKE) $(build)=$@
+ 
++ifneq ($(libbb-dir),)
++$(libbb-dir): | $(busybox-dirs1)
++	$(Q)$(MAKE) $(build)=$@
++endif
++
+ # Build the kernel release string
+ # The KERNELRELEASE is stored in a file named .kernelrelease
+ # to be used when executing for example make install or make modules_install

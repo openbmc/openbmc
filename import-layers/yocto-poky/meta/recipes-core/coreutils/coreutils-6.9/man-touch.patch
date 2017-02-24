@@ -6,7 +6,7 @@ Upstream-Status: Inappropriate [legacy version]
 # is with target format which can't be invoked on build system, disable building
 # 'touch' man page here.
 #
-# Signed-off-by Kevin Tian <kevin.tian@intel.com>, 2010-08-18
+# Signed-off-by: Kevin Tian <kevin.tian@intel.com>, 2010-08-18
 # (this patch is licensed under GPLv2)
 
 diff --git a/man/Makefile.am b/man/Makefile.am

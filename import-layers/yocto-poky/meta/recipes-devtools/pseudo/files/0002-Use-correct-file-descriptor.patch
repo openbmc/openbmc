@@ -1,0 +1,53 @@
+From 7a0632cad851826d804db0540d9a59773e6bf29c Mon Sep 17 00:00:00 2001
+From: Seebs <seebs@seebs.net>
+Date: Wed, 28 Sep 2016 22:12:29 -0500
+Subject: [PATCH 2/2] Use correct file descriptor
+
+So it turns out that pseudo_logfile() was returning 0 or -1, and
+pseudo_debug_logfile() was expecting it to be the correct file descriptor
+to use. And it's basically a mystery that any of that ever worked.
+
+Signed-off-by: Seebs <seebs@seebs.net>
+
+Upstream-Status: Backport
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ ChangeLog.txt | 3 +++
+ pseudo_util.c | 3 ++-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/ChangeLog.txt b/ChangeLog.txt
+index 4cc24de..49a6c36 100644
+--- a/ChangeLog.txt
++++ b/ChangeLog.txt
+@@ -2,6 +2,9 @@
+ 	* (seebs) Send errors to log when daemonizing, but do that a lot
+ 	  sooner to prevent startup messages which can show up spuriously
+ 	  with multiple clients.
++	* (seebs) return file descriptor from pseudo_logfile, so we set
++	  pseudo_util_debug_fd to the right value instead of to stdin.
++	  Nice bug.
+ 
+ 2016-07-28:
+ 	* (seebs) Fix performance issue on deletion with xattr changes.
+diff --git a/pseudo_util.c b/pseudo_util.c
+index 0c156cf..a60c74b 100644
+--- a/pseudo_util.c
++++ b/pseudo_util.c
+@@ -1569,7 +1569,7 @@ pseudo_logfile(char *filename, char *defname, int prefer_fd) {
+ 	if (fd == -1)
+ 		return -1;
+ 	else
+-		return 0;
++		return fd;
+ }
+ 
+ int
+@@ -1579,6 +1579,7 @@ pseudo_debug_logfile(char *defname, int prefer_fd) {
+ 
+ 	fd = pseudo_logfile(filename, defname, prefer_fd);
+ 	if (fd > -1) {
++		pseudo_diag("debug_logfile: fd %d\n", fd);
+ 		pseudo_util_debug_fd = fd;
+ 		return 0;
+ 	}

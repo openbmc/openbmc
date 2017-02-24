@@ -13,7 +13,9 @@ SRC_URI = "http://distfiles.gentoo.org/distfiles/${BP}.tar.bz2 \
            file://Update-x86emu-from-X.org.patch \
            file://fbsetup \
            file://uvesafb.conf \
-           file://ar-from-env.patch"
+           file://ar-from-env.patch \
+           file://aarch64-host.patch \
+"
 
 SRC_URI[md5sum] = "51c792ba7b874ad8c43f0d3da4cfabe0"
 SRC_URI[sha256sum] = "634964ae18ef68c8493add2ce150e3b4502badeb0d9194b4bd81241d25e6735c"

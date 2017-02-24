@@ -1,6 +1,6 @@
 Upstream-Status: Inappropriate [opensuse patch]
 
-Signed-Off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
+Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
 
 Index: guile-2.0.3/libguile/hash.c
 ===================================================================

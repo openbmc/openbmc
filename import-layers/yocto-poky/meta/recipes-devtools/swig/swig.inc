@@ -7,14 +7,14 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=e7807a6282784a7dde4c846626b08fc6 \
 
 SECTION = "devel"
 
-DEPENDS = "libpcre python"
+DEPENDS = "libpcre python3"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BPN}-${PV}.tar.gz"
 
-inherit autotools pythonnative
+inherit autotools python3native
 
 EXTRA_OECONF = " \
-    --with-python=${PYTHON} \
+    --with-python3=${PYTHON} \
     --without-allegrocl \
     --without-android \
     --without-boost \
@@ -33,7 +33,6 @@ EXTRA_OECONF = " \
     --without-perl5 \
     --without-pike \
     --without-php \
-    --without-python3 \
     --without-r \
     --without-ruby \
     --without-tcl \

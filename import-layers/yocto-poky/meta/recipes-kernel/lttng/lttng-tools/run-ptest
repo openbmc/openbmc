@@ -1,4 +1,5 @@
 #!/bin/sh
-
-make -C tests installcheck
-
+# Without --ignore-exit, the tap harness causes any FAILs within a
+# test plan to raise ERRORs; this is just noise.
+makeargs="LOG_DRIVER_FLAGS=--ignore-exit"
+make -t all >/dev/null 2>&1 && exec make -s $makeargs check 2>/dev/null

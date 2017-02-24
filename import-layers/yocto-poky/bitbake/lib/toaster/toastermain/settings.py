@@ -21,7 +21,7 @@
 
 # Django settings for Toaster project.
 
-import os, re
+import os
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -38,14 +38,19 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+TOASTER_SQLITE_DEFAULT_DIR = os.path.join(os.environ.get('TOASTER_DIR', ''),
+                                          'build')
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'toaster.sqlite',                      # Or path to database file if using sqlite3.
+        # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.db.backends.sqlite3',
+        # DB name or full path to database file if using sqlite3.
+        'NAME': "%s/toaster.sqlite" % TOASTER_SQLITE_DEFAULT_DIR,
         'USER': '',
         'PASSWORD': '',
-        'HOST': '127.0.0.1',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': '3306',                      # Set to empty string for default.
+        #'HOST': '127.0.0.1', # e.g. mysql server
+        #'PORT': '3306', # e.g. mysql port
     }
 }
 
@@ -54,58 +59,6 @@ DATABASES = {
 # https://docs.djangoproject.com/en/1.6/ref/databases/#database-is-locked-errors
 if 'sqlite' in DATABASES['default']['ENGINE']:
     DATABASES['default']['OPTIONS'] = { 'timeout': 20 }
-
-# Reinterpret database settings if we have DATABASE_URL environment variable defined
-
-if 'DATABASE_URL' in os.environ:
-    dburl = os.environ['DATABASE_URL']
-
-    if dburl.startswith('sqlite3://'):
-        result = re.match('sqlite3://(.*)', dburl)
-        if result is None:
-            raise Exception("ERROR: Could not read sqlite database url: %s" % dburl)
-        DATABASES['default'] = {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': result.group(1),
-            'USER': '',
-            'PASSWORD': '',
-            'HOST': '',
-            'PORT': '',
-        }
-    elif dburl.startswith('mysql://'):
-        # URL must be in this form: mysql://user:pass@host:port/name
-        result = re.match(r"mysql://([^:]*):([^@]*)@([^:]*):(\d*)/([^/]*)", dburl)
-        if result is None:
-            raise Exception("ERROR: Could not read mysql database url: %s" % dburl)
-        DATABASES['default'] = {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': result.group(5),
-            'USER': result.group(1),
-            'PASSWORD': result.group(2),
-            'HOST': result.group(3),
-            'PORT': result.group(4),
-        }
-    else:
-        raise Exception("FIXME: Please implement missing database url schema for url: %s" % dburl)
-
-
-# Allows current database settings to be exported as a DATABASE_URL environment variable value
-
-def getDATABASE_URL():
-    d = DATABASES['default']
-    if d['ENGINE'] == 'django.db.backends.sqlite3':
-        if d['NAME'] == ':memory:':
-            return 'sqlite3://:memory:'
-        elif d['NAME'].startswith("/"):
-            return 'sqlite3://' + d['NAME']
-        return "sqlite3://" + os.path.join(os.getcwd(), d['NAME'])
-
-    elif d['ENGINE'] == 'django.db.backends.mysql':
-        return "mysql://" + d['USER'] + ":" + d['PASSWORD'] + "@" + d['HOST'] + ":" + d['PORT'] + "/" + d['NAME']
-
-    raise Exception("FIXME: Please implement missing database url schema for engine: %s" % d['ENGINE'])
-
-
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
@@ -134,17 +87,16 @@ else:
             try:
                 import pytz
                 from pytz.exceptions import UnknownTimeZoneError
-                pass
                 try:
                     if pytz.timezone(zonename) is not None:
-                        zonefilelist[hashlib.md5(open(filepath).read()).hexdigest()] = zonename
-                except UnknownTimeZoneError, ValueError:
+                        zonefilelist[hashlib.md5(open(filepath, 'rb').read()).hexdigest()] = zonename
+                except UnknownTimeZoneError as ValueError:
                     # we expect timezone failures here, just move over
                     pass
             except ImportError:
-                zonefilelist[hashlib.md5(open(filepath).read()).hexdigest()] = zonename
+                zonefilelist[hashlib.md5(open(filepath, 'rb').read()).hexdigest()] = zonename
 
-    TIME_ZONE = zonefilelist[hashlib.md5(open('/etc/localtime').read()).hexdigest()]
+    TIME_ZONE = zonefilelist[hashlib.md5(open('/etc/localtime', 'rb').read()).hexdigest()]
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -321,7 +273,7 @@ currentdir = os.path.dirname(__file__)
 for t in os.walk(os.path.dirname(currentdir)):
     modulename = os.path.basename(t[0])
     #if we have a virtualenv skip it to avoid incorrect imports
-    if os.environ.has_key('VIRTUAL_ENV') and os.environ['VIRTUAL_ENV'] in t[0]:
+    if 'VIRTUAL_ENV' in os.environ and os.environ['VIRTUAL_ENV'] in t[0]:
         continue
 
     if ("views.py" in t[2] or "models.py" in t[2]) and not modulename in INSTALLED_APPS:

@@ -1,0 +1,61 @@
+From 7461a3de38b66edbe2f5593f9bdab9f2704d32bc Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 17 Aug 2016 04:06:34 -0400
+Subject: [PATCH] grub module explicitly keeps symbole .module_license
+
+While using oe-core toolchain to strip grub module 'all_video.mod',
+it stripped symbol table:
+--------------
+root@localhost:~# objdump -t all_video.mod
+
+all_video.mod:     file format elf64-x86-64
+
+SYMBOL TABLE:
+no symbols
+--------------
+
+It caused grub to load module all_video failed.
+--------------
+grub> insmod all_video
+error: no symbol table.
+--------------
+
+Tweak strip option to keep symbol .module_license could workaround
+the issue.
+--------------
+root@localhost:~# objdump -t all_video.mod
+
+all_video.mod:     file format elf64-x86-64
+
+SYMBOL TABLE:
+0000000000000000 l    d  .text  0000000000000000 .text
+0000000000000000 l    d  .data  0000000000000000 .data
+0000000000000000 l    d  .module_license        0000000000000000 .module_license
+0000000000000000 l    d  .bss   0000000000000000 .bss
+0000000000000000 l    d  .moddeps       0000000000000000 .moddeps
+0000000000000000 l    d  .modname       0000000000000000 .modname
+--------------
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ grub-core/genmod.sh.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/genmod.sh.in b/grub-core/genmod.sh.in
+index 76df0bb..39a9cfc 100644
+--- a/grub-core/genmod.sh.in
++++ b/grub-core/genmod.sh.in
+@@ -59,7 +59,7 @@ if test x@TARGET_APPLE_CC@ != x1; then
+ 	if test x@platform@ != xemu; then
+ 	    @STRIP@ --strip-unneeded \
+ 		-K grub_mod_init -K grub_mod_fini \
+-		-K _grub_mod_init -K _grub_mod_fini \
++		-K _grub_mod_init -K _grub_mod_fini -K .module_license \
+ 		-R .note.gnu.gold-version -R .note.GNU-stack \
+ 		-R .note -R .comment $tmpfile || exit 1
+ 	fi
+-- 
+2.8.1
+

@@ -31,7 +31,7 @@
             <filename>poky/build</filename>), start Toaster using this
             command:
             <literallayout class='monospaced'>
-     $ source ../bitbake/bin/toaster
+     $ source toaster start
             </literallayout>
             You can now run your builds from the command line, or with
             Toaster as explained in section
@@ -56,7 +56,23 @@
             set a different port.
             For example, the following command sets the port to "8400":
             <literallayout class='monospaced'>
-     $ source ../bitbake/bin/toaster webport=8400
+     $ source toaster start webport=8400
+            </literallayout>
+        </para>
+    </section>
+
+    <section id='setting-a-different-address'>
+        <title>Setting a Different Address</title>
+
+        <para>
+            By default, Toaster binds to the loop back address
+            (i.e. localhost).
+            You can use the <filename>WEBPORT</filename> parameter to
+            set a different host.
+            For example, the following command sets the host and port
+            to "0.0.0.0:8400":
+            <literallayout class='monospaced'>
+     $ source toaster start webport=0.0.0.0:8400
             </literallayout>
         </para>
     </section>
@@ -116,12 +132,14 @@
             create a superuser by following these steps:
             <orderedlist>
               <listitem><para>
-                  If you used <filename>virtualenv</filename>, which is
+                  If you used <filename>pip3</filename>, which is
                   recommended, to set up the Toaster system dependencies,
-                  you need be sure the virtual environment is activated.
-                  To activate this environment, use the following command:
+                  you need be sure the local user path is in your
+                  <filename>PATH</filename> list.
+                  To append the pip3 local user path, use the following
+                  command:
                   <literallayout class='monospaced'>
-   $ source venv/bin/activate
+   $ export PATH=$PATH:$HOME/.local/bin
                   </literallayout>
                   </para></listitem>
               <listitem><para>
@@ -211,16 +229,23 @@
                       Use the Mysql database server.
                       </para></listitem>
                   <listitem><para>
-                      If you are using Ubuntu 14.04.3, run the following:
+                      If you are using Ubuntu 16.04, run the following:
                       <literallayout class='monospaced'>
-   $ sudo apt-get install apache2 libapache2-mod-wsgi mysql-server virtualenv libmysqlclient-dev
+   $ sudo apt-get install apache2 libapache2-mod-wsgi-py3 mysql-server python3-pip libmysqlclient-dev
                       </literallayout>
                       </para></listitem>
                   <listitem><para>
-                      If you are using Fedora 22 or a RedHat distribution, run
+                      If you are using Fedora 24 or a RedHat distribution, run
                       the following:
                       <literallayout class='monospaced'>
-   $ sudo dnf install httpd mod_wsgi python-virtualenv gcc mysql-devel
+   $ sudo dnf install httpd python3-mod_wsgi python3-pip mariadb-server mariadb-devel python3-devel
+                      </literallayout>
+                      </para></listitem>
+                  <listitem><para>
+                      If you are using openSUSE Leap 42.1, run
+                      the following:
+                      <literallayout class='monospaced'>
+   $ sudo zypper install apache2 apache2-mod_wsgi-python3 python3-pip mariadb mariadb-client python3-devel
                       </literallayout>
                       </para></listitem>
               </itemizedlist>
@@ -234,28 +259,31 @@
               Perform the following steps to install Toaster:
               <orderedlist>
                   <listitem><para>
+                      Create toaster user and set its home directory to
+                      <filename>/var/www/toaster</filename>:
+                      <literallayout class='monospaced'>
+    $ sudo /usr/sbin/useradd toaster -md /var/www/toaster -s /bin/false
+    $ sudo su - toaster -s /bin/bash
+                      </literallayout>
+                      </para></listitem>
+                  <listitem><para>
                       Checkout a copy of <filename>poky</filename>
                       into the web server directory.
                       You will be using <filename>/var/www/toaster</filename>:
                       <literallayout class='monospaced'>
-   $ mkdir -p /var/www/toaster
-   $ cd /var/www/toaster/
    $ git clone git://git.yoctoproject.org/poky
    $ git checkout &DISTRO_NAME_NO_CAP;
                       </literallayout>
                       </para></listitem>
                   <listitem><para>
-                      Initialize a virtual environment and install Toaster
-                      dependencies.
-                      Using a virtual environment keeps the Python packages
+                      Install Toaster
+                      dependencies using the --user flag which
+                      keeps the Python packages
                       isolated from your system-provided packages:
                       <literallayout class='monospaced'>
    $ cd /var/www/toaster/
-   $ virtualenv venv
-   $ source ./venv/bin/activate
-   $ pip install -r ./poky/bitbake/toaster-requirements.txt
-   $ pip install mysql
-   $ pip install MySQL-python
+   $ pip3 install --user -r ./poky/bitbake/toaster-requirements.txt
+   $ pip3 install --user mysqlclient
                       </literallayout>
                       <note>
                           Isolating these packages is not required but is
@@ -270,7 +298,9 @@
                       as follows:
                       <itemizedlist>
                           <listitem><para>
-                              Edit the <filename>DATABASE</filename> settings:
+                              Edit the
+                              <ulink url='http://docs.djangoproject.com/en/1.8/ref/settings/#std:setting-SECRET_KEY'>DATABASE</ulink>
+                              settings:
                               <literallayout class='monospaced'>
    DATABASES = {
        'default': {
@@ -285,13 +315,15 @@
                               </literallayout>
                               </para></listitem>
                           <listitem><para>
-                              Edit the <filename>SECRET_KEY</filename>:
+                              Edit the
+                              <ulink url='http://docs.djangoproject.com/en/1.8/ref/settings/#std:setting-SECRET_KEY'>SECRET_KEY</ulink>:
                               <literallayout class='monospaced'>
    SECRET_KEY = '<replaceable>your_secret_key</replaceable>'
                               </literallayout>
                               </para></listitem>
                           <listitem><para>
-                              Edit the <filename>STATIC_ROOT</filename>:
+                              Edit the
+                              <ulink url='http://docs.djangoproject.com/en/1.8/ref/settings/#std:setting-SECRET_KEY'>STATIC_ROOT</ulink>:
                               <literallayout class='monospaced'>
    STATIC_ROOT = '/var/www/toaster/static_files/'
                               </literallayout>
@@ -314,9 +346,9 @@
                       default data, and gather the statically-served files:
                       <literallayout class='monospaced'>
    $ cd  /var/www/toaster/poky/
-   $ ./bitbake/lib/toaster/manage.py syncdb
    $ ./bitbake/lib/toaster/manage.py migrate
-   $ TOASTER_DIR=`pwd` TOASTER_CONF=./meta-poky/conf/toasterconf.json ./bitbake/lib/toaster/manage.py checksettings
+   $ TOASTER_DIR=`pwd` TOASTER_CONF=./meta-poky/conf/toasterconf.json \
+     ./bitbake/lib/toaster/manage.py checksettings
    $ ./bitbake/lib/toaster/manage.py collectstatic
                       </literallayout>
                       </para>
@@ -324,8 +356,8 @@
                       <para>
                           For the above set of commands, after moving to the
                           <filename>poky</filename> directory,
-                          the <filename>syncdb</filename> and <filename>migrate</filename>
-                          commands ensure the database
+                          the <filename>migrate</filename>
+                          command ensures the database
                           schema has had changes propagated correctly (i.e.
                           migrations).
                       </para>
@@ -365,7 +397,8 @@
                           Finally, the <filename>collectstatic</filename> command
                           is a Django framework command that collects all the
                           statically served files into a designated directory to
-                          be served up by the Apache web server.
+                          be served up by the Apache web server as defined by
+                          <filename>STATIC_ROOT</filename>.
                       </para></listitem>
                   <listitem><para>
                       Add an Apache configuration file for Toaster to your Apache web
@@ -378,21 +411,35 @@
                       <literallayout class='monospaced'>
    /etc/httpd/conf.d/toaster.conf
                       </literallayout>
+                      If you are using OpenSUSE, put it here:
+                      <literallayout class='monospaced'>
+   /etc/apache2/conf.d/toaster.conf
+                      </literallayout>
                       Following is a sample Apache configuration for Toaster
                       you can follow:
                       <literallayout class='monospaced'>
    Alias /static /var/www/toaster/static_files
    &lt;Directory /var/www/toaster/static_files&gt;
-           Order allow,deny
-           Allow from all
-           Require all granted
+           &lt;IfModule mod_access_compat.c&gt;
+                   Order allow,deny
+                   Allow from all
+           &lt;/IfModule&gt;
+           &lt;IfModule !mod_access_compat.c&gt;
+                   Require all granted
+           &lt;/IfModule&gt;
    &lt;/Directory&gt;
 
-   WSGIDaemonProcess toaster_wsgi python-path=/var/www/toaster/poky/bitbake/lib/toaster:/var/www/toaster/venv/lib/python2.7/site-packages
+   &lt;Directory /var/www/toaster/poky/bitbake/lib/toaster/toastermain&gt;
+           &lt;Files "wsgi.py"&gt;
+              Require all granted
+           &lt;/Files&gt;
+   &lt;/Directory&gt;
+
+   WSGIDaemonProcess toaster_wsgi python-path=/var/www/toaster/poky/bitbake/lib/toaster:/var/www/toaster/.local/lib/python3.4/site-packages
 
    WSGIScriptAlias / "/var/www/toaster/poky/bitbake/lib/toaster/toastermain/wsgi.py"
    &lt;Location /&gt;
-       WSGIProcessGroup toastern_wsgi
+       WSGIProcessGroup toaster_wsgi
    &lt;/Location&gt;
                       </literallayout>
                       If you are using Ubuntu or Debian,
@@ -404,7 +451,7 @@
                       </literallayout>
                       Finally, restart Apache to make sure all new configuration
                       is loaded.
-                      For Ubuntu and Debian use:
+                      For Ubuntu, Debian, and OpenSUSE use:
                       <literallayout class='monospaced'>
    $ sudo service apache2 restart
                       </literallayout>
@@ -414,21 +461,52 @@
                       </literallayout>
                       </para></listitem>
                   <listitem><para>
-                      Install the build runner service.
-                      This service needs to be running in order to dispatch
-                      builds.
-                      Use this command:
+                      Prepare the systemd service to run Toaster builds.
+                      Here is a sample configuration file for the service:
                       <literallayout class='monospaced'>
-   /var/www/toaster/poky/bitbake/lib/toaster/manage.py runbuilds
+   [Unit]
+   Description=Toaster runbuilds
+
+   [Service]
+   Type=forking
+   User=toaster
+   ExecStart=/usr/bin/screen -d -m -S runbuilds /var/www/toaster/poky/bitbake/lib/toaster/runbuilds-service.sh start
+   ExecStop=/usr/bin/screen -S runbuilds -X quit
+   WorkingDirectory=/var/www/toaster/poky
+
+   [Install]
+   WantedBy=multi-user.target
                       </literallayout>
-                      Here is an example:
+                      Prepare the <filename>runbuilds-service.sh</filename>
+                      script that you need to place in the
+                      <filename>/var/www/toaster/poky/bitbake/lib/toaster/</filename>
+                      directory by setting up executable permissions:
                       <literallayout class='monospaced'>
-   #!/bin/sh
-   # toaster run builds dispatcher
-   cd /var/www/toaster/
-   source ./venv/bin/activate
-   ./bitbake/lib/toaster/manage.py runbuilds
+   #!/bin/bash
+
+   #export http_proxy=http://proxy.host.com:8080
+   #export https_proxy=http://proxy.host.com:8080
+   #export GIT_PROXY_COMMAND=$HOME/bin/gitproxy
+
+   cd ~/poky/
+   source ./oe-init-build-env build
+   source ../bitbake/bin/toaster $1 noweb
+   [ "$1" == 'start' ] &amp;&amp; /bin/bash
                       </literallayout>
+                      </para></listitem>
+                  <listitem><para>
+                      Run the service:
+                      <literallayout class='monospaced'>
+   # service runbuilds start
+                      </literallayout>
+                      Since the service is running in a detached screen
+                      session, you can attach to it using this command:
+                      <literallayout class='monospaced'>
+   $ sudo su - toaster
+   $ screen -rS runbuilds
+                      </literallayout>
+                      You can detach from the service again using "Ctrl-a"
+                      followed by "d" key combination.
                       </para></listitem>
               </orderedlist>
               You can now open up a browser and start using Toaster.

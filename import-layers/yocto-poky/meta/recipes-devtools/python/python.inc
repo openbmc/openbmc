@@ -5,12 +5,12 @@ SECTION = "devel/python"
 # bump this on every change in contrib/python/generate-manifest-2.7.py
 INC_PR = "r1"
 
-LIC_FILES_CHKSUM = "file://LICENSE;md5=dd98d01d471fac8d8dbdd975229dba03"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=6b60258130e4ed10d3101517eb5b9385"
 
 SRC_URI = "http://www.python.org/ftp/python/${PV}/Python-${PV}.tar.xz"
 
-SRC_URI[md5sum] = "1dbcc848b4cd8399a8199d000f9f823c"
-SRC_URI[sha256sum] = "962b4c45af50124ea61f11a30deb4342fc0bc21126790fa1d7f6c79809413f46"
+SRC_URI[md5sum] = "57dffcee9cee8bb2ab5f82af1d8e9a69"
+SRC_URI[sha256sum] = "d7837121dd5652a05fef807c361909d255d173280c4e1a4ded94d73d80a1f978"
 
 # python recipe is actually python 2.x
 # also, exclude pre-releases for both python 2.x and 3.x

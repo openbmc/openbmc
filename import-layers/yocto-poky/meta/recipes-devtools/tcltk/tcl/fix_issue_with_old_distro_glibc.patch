@@ -12,7 +12,7 @@ Fixes tcl target recipe build on old distros which have glibc older than 2.14
 | Making directory /srv/home/nitin/builds/build-gcc47/tmp/work/x86_64-poky-linux/tcl-8.5.11-r5/image/usr/bin
 | make: *** [install-msgs] Error 1
 
-Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
 2012/04/26
 
 Index: unix/Makefile.in

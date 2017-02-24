@@ -1,7 +1,7 @@
-From 4d6bead19874e519752ceeb2a15897ff2ffbe5e8 Mon Sep 17 00:00:00 2001
+From 1794a97cba0b09b726eebc565c783c7b7c22dfba Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:31:06 +0000
-Subject: [PATCH 15/24] 'yes' within the path sets wrong config variables
+Subject: [PATCH 15/25] 'yes' within the path sets wrong config variables
 
 It seems that the 'AC_EGREP_CPP(yes...' example is quite popular
 but being such a short word to grep it is likely to produce
@@ -165,7 +165,7 @@ index f05f438..dc86399 100644
    ], libc_cv_nios2_be=yes, libc_cv_nios2_be=no)])
  if test $libc_cv_nios2_be = yes; then
 diff --git a/sysdeps/unix/sysv/linux/mips/configure b/sysdeps/unix/sysv/linux/mips/configure
-index dee56aa..f2049ed 100644
+index a5513fa..283b293 100644
 --- a/sysdeps/unix/sysv/linux/mips/configure
 +++ b/sysdeps/unix/sysv/linux/mips/configure
 @@ -414,11 +414,11 @@ else
@@ -183,7 +183,7 @@ index dee56aa..f2049ed 100644
  else
    libc_cv_mips_nan2008=no
 diff --git a/sysdeps/unix/sysv/linux/mips/configure.ac b/sysdeps/unix/sysv/linux/mips/configure.ac
-index 45147c5..4224af1 100644
+index 9147aa4..7898e24 100644
 --- a/sysdeps/unix/sysv/linux/mips/configure.ac
 +++ b/sysdeps/unix/sysv/linux/mips/configure.ac
 @@ -105,9 +105,9 @@ AC_COMPILE_IFELSE(
@@ -259,5 +259,5 @@ index 0822915..9a32fdd 100644
      ], libc_cv_ppc64_def_call_elf=yes, libc_cv_ppc64_def_call_elf=no)])
    if test $libc_cv_ppc64_def_call_elf = no; then
 -- 
-2.6.4
+2.8.2
 

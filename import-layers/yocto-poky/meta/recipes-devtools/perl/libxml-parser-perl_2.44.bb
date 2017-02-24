@@ -3,7 +3,7 @@ SECTION = "libs"
 LICENSE = "Artistic-1.0 | GPL-1.0+"
 LIC_FILES_CHKSUM = "file://README;beginline=2;endline=6;md5=c8767d7516229f07b26e42d1cf8b51f1"
 
-DEPENDS += "expat expat-native"
+DEPENDS += "expat"
 
 SRC_URI = "http://www.cpan.org/modules/by-module/XML/XML-Parser-${PV}.tar.gz"
 SRC_URI[md5sum] = "af4813fe3952362451201ced6fbce379"
@@ -32,4 +32,3 @@ do_compile_class-native() {
 }
 
 BBCLASSEXTEND="native"
-

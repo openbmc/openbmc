@@ -1,7 +1,7 @@
-From 58d424884eed7efde6c90af0cd7c6c37cf9b444a Mon Sep 17 00:00:00 2001
+From 1947f211fab4001e84bb52868cddbd401e597889 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:57:01 +0000
-Subject: [PATCH 23/24] eglibc: Install PIC archives
+Subject: [PATCH 23/25] eglibc: Install PIC archives
 
 Forward port from eglibc
 
@@ -29,7 +29,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 40 insertions(+), 2 deletions(-)
 
 diff --git a/Makerules b/Makerules
-index fa24030..1ff4634 100644
+index 53eabfa..1cd2a53 100644
 --- a/Makerules
 +++ b/Makerules
 @@ -694,6 +694,9 @@ ifeq ($(build-shared),yes)
@@ -119,5 +119,5 @@ index fa24030..1ff4634 100644
  install-no-libc.a-nosubdir: install-bin-nosubdir install-bin-script-nosubdir \
  			    install-rootsbin-nosubdir install-sbin-nosubdir \
 -- 
-2.6.4
+2.8.2
 

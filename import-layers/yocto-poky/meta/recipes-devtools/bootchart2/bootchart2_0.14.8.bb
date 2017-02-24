@@ -92,14 +92,18 @@ UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+\.\d+(\.\d+)*)"
 
 SRC_URI = "git://github.com/mmeeks/bootchart.git \
            file://bootchartd_stop.sh \
+           file://0001-Fixed-Missing-default-value-for-BOOTLOG_DEST.patch \
+           file://0001-collector-Allocate-space-on-heap-for-chunks.patch \
           "
 
 S = "${WORKDIR}/git"
 SRCREV = "48e0071048564c6af75ab969e842d6dec808da09"
 
-inherit systemd
-inherit update-rc.d
-inherit pythonnative
+inherit systemd update-rc.d python3native update-alternatives
+
+ALTERNATIVE_${PN} = "bootchartd"
+ALTERNATIVE_LINK_NAME[bootchartd] = "${base_sbindir}/bootchartd"
+ALTERNATIVE_PRIORITY = "100"
 
 # The only reason to build bootchart2-native is for a native pybootchartgui.
 BBCLASSEXTEND = "native"
@@ -109,13 +113,6 @@ SYSTEMD_SERVICE_${PN} = "bootchart2.service bootchart2-done.service bootchart2-d
 UPDATERCPN = "bootchartd-stop-initscript"
 INITSCRIPT_NAME = "bootchartd_stop.sh"
 INITSCRIPT_PARAMS = "start 99 2 3 4 5 ."
-
-# We want native pybootchartgui to execute with the correct Python interpeter.
-do_compile_append_class-native () {
-    echo "#! ${PYTHON}" | cat - ${S}/pybootchartgui.py > ${WORKDIR}/temp_pybootchartgui
-    mv ${WORKDIR}/temp_pybootchartgui ${S}/pybootchartgui.py
-    chmod +x ${S}/pybootchartgui
-}
 
 do_compile_prepend () {
     export PY_LIBDIR="${libdir}/${PYTHON_DIR}"
@@ -135,17 +132,21 @@ do_install () {
     install -m 0755 ${WORKDIR}/bootchartd_stop.sh ${D}${sysconfdir}/init.d
 
     echo 'EXIT_PROC="$EXIT_PROC matchbox-window-manager"' >> ${D}${sysconfdir}/bootchartd.conf
+
+   # Use python 3 instead of python 2
+   sed -i -e '1s,#!.*python.*,#!${bindir}/python3,' ${D}${bindir}/pybootchartgui
 }
 
 PACKAGES =+ "pybootchartgui"
-FILES_pybootchartgui += "${libdir}/python*/site-packages/pybootchartgui ${bindir}/pybootchartgui"
-RDEPENDS_pybootchartgui = "python-pycairo python-compression python-image python-textutils python-shell python-compression python-codecs"
+FILES_pybootchartgui += "${PYTHON_SITEPACKAGES_DIR}/pybootchartgui ${bindir}/pybootchartgui"
+RDEPENDS_pybootchartgui = "python3-pycairo python3-compression python3-image python3-textutils python3-shell python3-compression python3-codecs"
 RDEPENDS_${PN}_class-target += "${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'sysvinit-pidof', 'procps', d)}"
 RDEPENDS_${PN}_class-target += "lsb"
-DEPENDS_append_class-native = " python-pycairo-native"
+DEPENDS_append_class-native = " python3-pycairo-native"
 
 PACKAGES =+ "bootchartd-stop-initscript"
 FILES_bootchartd-stop-initscript += "${sysconfdir}/init.d ${sysconfdir}/rc*.d"
+RDEPENDS_bootchartd-stop-initscript = "${PN}"
 
 FILES_${PN} += "${base_libdir}/bootchart/bootchart-collector"
 FILES_${PN} += "${base_libdir}/bootchart/tmpfs"

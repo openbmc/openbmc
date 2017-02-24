@@ -100,5 +100,9 @@ if [ "$RESPONSE" != "y" ]; then
 fi
 
 echo "Writing image..."
-dd if="$IMAGE" of="$DEVICE" bs="$BLOCKSIZE"
+if which pv >/dev/null 2>&1; then
+	pv "$IMAGE" | dd of="$DEVICE" bs="$BLOCKSIZE"
+else
+	dd if="$IMAGE" of="$DEVICE" bs="$BLOCKSIZE"
+fi
 sync

@@ -2,7 +2,6 @@
 /* Unit tests for Toaster's JS */
 
 /* libtoaster tests */
-
 QUnit.test("Layer alert notification", function(assert) {
   var layer = {
     "layerdetailurl":"/toastergui/project/1/layer/22",
@@ -43,9 +42,8 @@ QUnit.test("Layer alert notification", function(assert) {
 
 QUnit.test("Project info", function(assert){
   var done = assert.async();
-  libtoaster.getProjectInfo(libtoaster.ctx.projectPageUrl, function(prjInfo){
+  libtoaster.getProjectInfo(libtoaster.ctx.xhrProjectUrl, function(prjInfo){
     assert.ok(prjInfo.machine.name);
-    assert.ok(prjInfo.releases.length > 0);
     assert.ok(prjInfo.layers.length > 0);
     assert.ok(prjInfo.freqtargets);
     assert.ok(prjInfo.release);
@@ -83,11 +81,11 @@ QUnit.test("Add layer", function(assert){
   }, 200);
 
   /* Compare the number of layers before and after the add in the project */
-  libtoaster.getProjectInfo(libtoaster.ctx.projectPageUrl, function(prjInfo){
+  libtoaster.getProjectInfo(libtoaster.ctx.xhrProjectUrl, function(prjInfo){
     var origNumLayers = prjInfo.layers.length;
 
     libtoaster.addRmLayer(layer, true, function(deps){
-      libtoaster.getProjectInfo(libtoaster.ctx.projectPageUrl,
+      libtoaster.getProjectInfo(libtoaster.ctx.xhrProjectUrl,
         function(prjInfo){
         assert.ok(prjInfo.layers.length > origNumLayers,
           "Layer not added to project");
@@ -135,10 +133,10 @@ QUnit.test("Make typeaheads", function(assert){
   libtoaster.makeTypeahead(recipesT,
     libtoaster.ctx.recipesTypeAheadUrl, {}, function(){});
 
-  assert.ok(recipesT.data('typeahead'));
-  assert.ok(layersT.data('typeahead'));
-  assert.ok(projectsT.data('typeahead'));
-  assert.ok(recipesT.data('typeahead'));
+  assert.ok(recipesT.data('ttTypeahead'));
+  assert.ok(layersT.data('ttTypeahead'));
+  assert.ok(projectsT.data('ttTypeahead'));
+  assert.ok(recipesT.data('ttTypeahead'));
 });
 
 

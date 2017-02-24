@@ -1,0 +1,31 @@
+From 8b7fbbb405959f2868ad6eadd7dd00018758a8a5 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 7 Sep 2016 14:52:04 +0300
+Subject: [PATCH] Do not error out if xsltproc is not found.
+
+This allows us to drop the hard xsltproc dependency, if we're not
+going to actually run the gtkdoc scripts (when api documentation is
+disabled).
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index b0c88d7..2a61d6e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -58,7 +58,7 @@ dnl Check for xsltproc
+ dnl
+ AC_PATH_PROG([XSLTPROC], [xsltproc])
+ if test -z "$XSLTPROC"; then
+-	AC_MSG_ERROR([xsltproc not found])
++	AC_MSG_WARN([xsltproc not found])
+ fi
+ 
+ dnl
+-- 
+2.9.3
+

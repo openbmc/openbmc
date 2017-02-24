@@ -1,4 +1,3 @@
-include conf/distro/include/package_regex.inc
 include conf/distro/include/upstream_tracking.inc
 include conf/distro/include/distro_alias.inc
 include conf/distro/include/maintainers.inc

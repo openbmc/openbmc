@@ -1,0 +1,21 @@
+Fix a string format warning when using security flags:
+
+| ../bash-3.2.48/print_cmd.c:1152:3: error: format not a string literal and no format arguments [-Werror=format-security]
+|    cprintf (indentation_string);
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/print_cmd.c b/print_cmd.c
+index d1dfd1a..956db53 100644
+--- a/print_cmd.c
++++ b/print_cmd.c
+@@ -1149,7 +1149,7 @@ indent (amount)
+   for (i = 0; amount > 0; amount--)
+     indentation_string[i++] = ' ';
+   indentation_string[i] = '\0';
+-  cprintf (indentation_string);
++  cprintf ("%s", indentation_string);
+ }
+ 
+ static void

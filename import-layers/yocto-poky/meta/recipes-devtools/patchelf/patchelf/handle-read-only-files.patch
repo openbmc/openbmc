@@ -1,0 +1,53 @@
+From 2a603acb65993698c21f1c6eb7664f93ad830d52 Mon Sep 17 00:00:00 2001
+From: Fabio Berton <fabio.berton@ossystems.com.br>
+Date: Fri, 9 Sep 2016 16:00:42 -0300
+Subject: [PATCH] handle read-only files
+Organization: O.S. Systems Software LTDA.
+
+Patch from:
+https://github.com/darealshinji/patchelf/commit/40e66392bc4b96e9b4eda496827d26348a503509
+
+Upstream-Status: Pending
+
+Signed-off-by: Fabio Berton <fabio.berton@ossystems.com.br>
+---
+ src/patchelf.cc | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/src/patchelf.cc b/src/patchelf.cc
+index 136098f..aea360e 100644
+--- a/src/patchelf.cc
++++ b/src/patchelf.cc
+@@ -388,7 +388,17 @@ void ElfFile<ElfFileParamNames>::sortShdrs()
+ 
+ static void writeFile(string fileName)
+ {
+-    int fd = open(fileName.c_str(), O_TRUNC | O_WRONLY);
++    struct stat st;
++    int fd;
++
++    if (stat(fileName.c_str(), &st) != 0)
++        error("stat");
++
++    if (chmod(fileName.c_str(), 0600) != 0)
++        error("chmod");
++
++    fd = open(fileName.c_str(), O_TRUNC | O_WRONLY);
++
+     if (fd == -1)
+         error("open");
+ 
+@@ -397,6 +407,10 @@ static void writeFile(string fileName)
+ 
+     if (close(fd) != 0)
+         error("close");
++
++    if (chmod(fileName.c_str(), st.st_mode) != 0)
++        error("chmod");
++
+ }
+ 
+ 
+-- 
+2.1.4
+

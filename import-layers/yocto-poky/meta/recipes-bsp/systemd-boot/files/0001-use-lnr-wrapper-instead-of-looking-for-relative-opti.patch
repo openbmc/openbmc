@@ -1,0 +1,61 @@
+From 9dcd2c80347493f73800d8c1cb539f1daef14394 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Tue, 26 Jul 2016 03:54:42 -0400
+Subject: [PATCH] use lnr wrapper instead of looking for --relative option for ln
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ Makefile.am  | 6 +++---
+ configure.ac | 2 --
+ 2 files changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 305099a..f08d023 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -247,7 +247,7 @@ define move-to-rootlibdir
+ 		$(MKDIR_P) $(DESTDIR)$(rootlibdir) && \
+ 		so_img_name=$$(readlink $(DESTDIR)$(libdir)/$$libname) && \
+ 		rm -f $(DESTDIR)$(libdir)/$$libname && \
+-		$(LN_S) --relative -f $(DESTDIR)$(rootlibdir)/$$so_img_name $(DESTDIR)$(libdir)/$$libname && \
++		lnr $(DESTDIR)$(rootlibdir)/$$so_img_name $(DESTDIR)$(libdir)/$$libname && \
+ 		mv $(DESTDIR)$(libdir)/$$libname.* $(DESTDIR)$(rootlibdir); \
+ 	fi
+ endef
+@@ -321,7 +321,7 @@ define install-relative-aliases
+ 	while [ -n "$$1" ]; do \
+ 		$(MKDIR_P) `dirname $(DESTDIR)$$dir/$$2` && \
+ 		rm -f $(DESTDIR)$$dir/$$2 && \
+-		$(LN_S) --relative $(DESTDIR)$$1 $(DESTDIR)$$dir/$$2 && \
++		lnr $(DESTDIR)$$1 $(DESTDIR)$$dir/$$2 && \
+ 		shift 2 || exit $$?; \
+ 	done
+ endef
+@@ -2906,7 +2906,7 @@ systemd_dbus1_generator_LDADD = \
+ dbus1-generator-install-hook:
+ 	$(AM_V_at)$(MKDIR_P) $(DESTDIR)$(usergeneratordir)
+ 	$(AM_V_RM)rm -f $(DESTDIR)$(usergeneratordir)/systemd-dbus1-generator
+-	$(AM_V_LN)$(LN_S) --relative -f $(DESTDIR)$(systemgeneratordir)/systemd-dbus1-generator $(DESTDIR)$(usergeneratordir)/systemd-dbus1-generator
++	$(AM_V_LN)lnr $(DESTDIR)$(systemgeneratordir)/systemd-dbus1-generator $(DESTDIR)$(usergeneratordir)/systemd-dbus1-generator
+ 
+ dbus1-generator-uninstall-hook:
+ 	rm -f $(DESTDIR)$(usergeneratordir)/systemd-dbus1-generator
+diff --git a/configure.ac b/configure.ac
+index 329861a..52c6e3d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -110,8 +110,6 @@ AC_PATH_PROG([SULOGIN], [sulogin], [/usr/sbin/sulogin], [$PATH:/usr/sbin:/sbin])
+ AC_PATH_PROG([MOUNT_PATH], [mount], [/usr/bin/mount], [$PATH:/usr/sbin:/sbin])
+ AC_PATH_PROG([UMOUNT_PATH], [umount], [/usr/bin/umount], [$PATH:/usr/sbin:/sbin])
+ 
+-AS_IF([! ln --relative --help > /dev/null 2>&1], [AC_MSG_ERROR([*** ln doesn't support --relative ***])])
+-
+ M4_DEFINES=
+ 
+ AC_CHECK_TOOL(OBJCOPY, objcopy)
+-- 
+2.8.1
+

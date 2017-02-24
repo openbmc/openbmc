@@ -1,0 +1,29 @@
+Configure checks for compiler to be gcc and then it enables asm_offsets
+generation. see
+
+https://cgit.freedesktop.org/mesa/mesa/commit/?id=73c9b4b0e05fc66629ba250846948dc55c0e7a0d
+
+However, we missed the check when enabling this on cross compilation
+when architecture for both host and target is x86
+
+Fixes errors like
+./gen_matypes > matypes.h
+/bin/bash: ./gen_matypes: No such file or directory
+
+-Khem
+
+Upstream-Status: Submitted
+
+Index: mesa-12.0.1/configure.ac
+===================================================================
+--- mesa-12.0.1.orig/configure.ac
++++ mesa-12.0.1/configure.ac
+@@ -732,7 +732,7 @@ test "x$enable_asm" = xno && AC_MSG_RESU
+ if test "x$enable_asm" = xyes -a "x$cross_compiling" = xyes; then
+     case "$host_cpu" in
+     i?86 | x86_64 | amd64)
+-        if test "x$host_cpu" != "x$target_cpu"; then
++        if test "x$host_cpu" != "x$target_cpu" -o "x$acv_mesa_CLANG" = xyes; then
+             enable_asm=no
+             AC_MSG_RESULT([no, cross compiling])
+         fi

@@ -4,8 +4,7 @@ METADATA_REVISION ?= "${@base_detect_revision(d)}"
 def base_detect_revision(d):
     path = base_get_scmbasepath(d)
 
-    scms = [base_get_metadata_git_revision, \
-            base_get_metadata_svn_revision]
+    scms = [base_get_metadata_git_revision]
 
     for scm in scms:
         rev = scm(path, d)
@@ -27,7 +26,7 @@ def base_detect_branch(d):
     return "<unknown>"
 
 def base_get_scmbasepath(d):
-    return d.getVar( 'COREBASE', True)
+    return os.path.join(d.getVar('COREBASE', True), 'meta')
 
 def base_get_metadata_monotone_branch(path, d):
     monotone_branch = "<unknown>"

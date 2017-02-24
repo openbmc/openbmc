@@ -30,9 +30,6 @@ class SdkUpdateTest(oeSDKExtTest):
     def test_sdk_update_http(self):
         output = self._run("devtool sdk-update \"%s\"" % self.http_url)
 
-    def test_sdk_update_local(self):
-        output = self._run("devtool sdk-update \"%s\"" % self.publish_dir)
-
     @classmethod
     def tearDownClass(self):
         self.http_service.stop()

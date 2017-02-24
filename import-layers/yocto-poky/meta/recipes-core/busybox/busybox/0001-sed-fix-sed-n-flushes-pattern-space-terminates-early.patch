@@ -1,0 +1,72 @@
+From 903542f7331c58007a3ef938d41e1c55fc329648 Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Wed, 31 Aug 2016 23:40:43 -0400
+Subject: [PATCH] sed: fix "sed n (flushes pattern space, terminates early)"
+ testcase failure
+
+This patch fix "sed n (flushes pattern space, terminates early)"
+testcase failure. We can see it at:
+
+	https://git.busybox.net/busybox/commit/?id=76d72376e0244a5cafd4880cdc623e37d86a75e4
+
+Upstream-Status: Backport
+
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+---
+ editors/sed.c       | 19 ++++++++++---------
+ testsuite/sed.tests |  6 +-----
+ 2 files changed, 11 insertions(+), 14 deletions(-)
+
+diff --git a/editors/sed.c b/editors/sed.c
+index 7bbf820..259c39c 100644
+--- a/editors/sed.c
++++ b/editors/sed.c
+@@ -1274,16 +1274,17 @@ static void process_files(void)
+ 		case 'n':
+ 			if (!G.be_quiet)
+ 				sed_puts(pattern_space, last_gets_char);
+-			if (next_line) {
+-				free(pattern_space);
+-				pattern_space = next_line;
+-				last_gets_char = next_gets_char;
+-				next_line = get_next_line(&next_gets_char, &last_puts_char, last_gets_char);
+-				substituted = 0;
+-				linenum++;
+-				break;
++			if (next_line == NULL) {
++				/* If no next line, jump to end of script and exit. */
++				goto discard_line;
+ 			}
+-			/* fall through */
++			free(pattern_space);
++			pattern_space = next_line;
++			last_gets_char = next_gets_char;
++			next_line = get_next_line(&next_gets_char, &last_puts_char, last_gets_char);
++			substituted = 0;
++			linenum++;
++			break;
+ 
+ 		/* Quit.  End of script, end of input. */
+ 		case 'q':
+diff --git a/testsuite/sed.tests b/testsuite/sed.tests
+index 34479e5..96ff7a5 100755
+--- a/testsuite/sed.tests
++++ b/testsuite/sed.tests
+@@ -73,13 +73,9 @@ testing "sed t (test/branch clears test bit)" "sed -e 's/a/b/;:loop;t loop'" \
+ testing "sed T (!test/branch)" "sed -e 's/a/1/;T notone;p;: notone;p'" \
+ 	"1\n1\n1\nb\nb\nc\nc\n" "" "a\nb\nc\n"
+ 
+-test x"$SKIP_KNOWN_BUGS" = x"" && {
+-# Normal sed end-of-script doesn't print "c" because n flushed the pattern
+-# space.  If n hits EOF, pattern space is empty when script ends.
+-# Query: how does this interact with no newline at EOF?
+ testing "sed n (flushes pattern space, terminates early)" "sed -e 'n;p'" \
+ 	"a\nb\nb\nc\n" "" "a\nb\nc\n"
+-}
++
+ # non-GNU sed: N does _not_ flush pattern space, therefore c is eaten @ script end
+ # GNU sed: N flushes pattern space, therefore c is printed too @ script end
+ testing "sed N (flushes pattern space (GNU behavior))" "sed -e 'N;p'" \
+-- 
+2.8.1
+

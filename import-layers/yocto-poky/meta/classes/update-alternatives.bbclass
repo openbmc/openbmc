@@ -71,14 +71,14 @@ def gen_updatealternativesvardeps(d):
 
     # First compute them for non_pkg versions
     for v in vars:
-        for flag in (d.getVarFlags(v) or {}):
+        for flag in sorted((d.getVarFlags(v) or {}).keys()):
             if flag == "doc" or flag == "vardeps" or flag == "vardepsexp":
                 continue
             d.appendVar('%s_VARDEPS' % (v), ' %s:%s' % (flag, d.getVarFlag(v, flag, False)))
 
     for p in pkgs:
         for v in vars:
-            for flag in (d.getVarFlags("%s_%s" % (v,p)) or {}):
+            for flag in sorted((d.getVarFlags("%s_%s" % (v,p)) or {}).keys()):
                 if flag == "doc" or flag == "vardeps" or flag == "vardepsexp":
                     continue
                 d.appendVar('%s_VARDEPS_%s' % (v,p), ' %s:%s' % (flag, d.getVarFlag('%s_%s' % (v,p), flag, False)))

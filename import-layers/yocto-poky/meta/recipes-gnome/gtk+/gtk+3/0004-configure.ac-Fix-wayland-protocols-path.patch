@@ -1,0 +1,36 @@
+From 97b78e566634579bbae51be914aeaaa921137a8b Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Thu, 9 Jun 2016 11:21:36 +0300
+Subject: [PATCH 4/4] configure.ac: Fix wayland-protocols path
+
+The wayland-protocols directory is used during build: Fix the path
+to point to sysroot specified in recipe.
+
+Normally PKG_CONFIG_SYSROOT_DIR could be used in configure.ac but that
+breaks multilib gtk+ as it would point to multilib sysroot when the
+(allarch) wayland-protocols is actually in the machine sysroot.
+
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index a3e9beb..dde9dc5 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -461,7 +461,7 @@ fi
+ if test "$enable_wayland_backend" = "yes"; then
+   # For the cairo image backend
+   cairo_backends="$cairo_backends cairo"
+-  AC_SUBST(WAYLAND_PROTOCOLS_DATADIR, `$PKG_CONFIG --variable=pkgdatadir wayland-protocols`)
++  AC_SUBST(WAYLAND_PROTOCOLS_DATADIR, ${WAYLAND_PROTOCOLS_SYSROOT_DIR}`$PKG_CONFIG --variable=pkgdatadir wayland-protocols`)
+   GDK_BACKENDS="$GDK_BACKENDS wayland"
+   GDK_WINDOWING="$GDK_WINDOWING
+ #define GDK_WINDOWING_WAYLAND"
+-- 
+2.1.4
+
