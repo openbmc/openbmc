@@ -14,5 +14,5 @@ inherit autotools
 do_install[postfuncs] += " rm_unused_bindir "
 
 rm_unused_bindir() {
-	rmdir ${D}/${bindir}
+    rmdir ${D}/${bindir}
 }

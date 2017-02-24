@@ -4,16 +4,19 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=4d92cd373abda3937c2bc47fbc49d690"
 PR = "r5"
 
-inherit packagegroup
+inherit packagegroup distro_features_check
+
+REQUIRED_DISTRO_FEATURES = "x11"
 
 RDEPENDS_${PN} = " \
     xfwm4 \
-    xfce4-session \     
+    xfce4-session \
     xfconf \
     xfdesktop \
     xfce4-panel \
     \
     gtk-xfce-engine \
+    librsvg-gtk \
     \
     xfce4-panel-plugin-actions \
     xfce4-panel-plugin-applicationsmenu \
@@ -25,7 +28,7 @@ RDEPENDS_${PN} = " \
     xfce4-panel-plugin-showdesktop \
     xfce4-panel-plugin-systray \
     xfce4-panel-plugin-tasklist \
-    xfce4-panel-plugin-windowmenu \   
+    xfce4-panel-plugin-windowmenu \
     xfce4-settings \
     \
     xfce4-notifyd \

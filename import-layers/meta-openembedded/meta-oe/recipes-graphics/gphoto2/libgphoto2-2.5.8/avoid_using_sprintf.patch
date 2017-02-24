@@ -1,0 +1,133 @@
+From 4adfe5a6c9db07537df302f3c17713515bf23a2e Mon Sep 17 00:00:00 2001
+From: Marcus Meissner <marcus@jet.franken.de>
+Date: Sat, 11 Jul 2015 09:38:13 +0000
+Subject: [PATCH] avoid use of sprintf to convert %% to %, duplicate the macro
+
+git-svn-id: https://svn.code.sf.net/p/gphoto/code/trunk/libgphoto2@15490 67ed7778-7388-44ab-90cf-0a291f65f57c
+---
+ camlibs/ptp2/chdk.c     |  8 ++---
+ camlibs/ptp2/chdk_ptp.h | 82 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 84 insertions(+), 6 deletions(-)
+
+diff --git a/camlibs/ptp2/chdk.c b/camlibs/ptp2/chdk.c
+index 5fb84ea..3b8a995 100644
+--- a/camlibs/ptp2/chdk.c
++++ b/camlibs/ptp2/chdk.c
+@@ -1119,18 +1119,14 @@ chdk_camera_capture (Camera *camera, CameraCaptureType type, CameraFilePath *pat
+ 	int		ret, retint;
+ 	char		*table, *s;
+ 	PTPParams	*params = &camera->pl->params;
+-	char		*lua;
+-	const char	*luascript =	PTP_CHDK_LUA_SERIALIZE_MSGS \
++	const char	*luascript = PTP_CHDK_LUA_SERIALIZE_MSGS_SIMPLEQUOTE \
+ 				PTP_CHDK_LUA_RLIB_SHOOT	\
+ 				"return rlib_shoot({info=true});\n";
+ 
+ 	ret =  camera_prepare_chdk_capture(camera, context);
+ 	if (ret != GP_OK) return ret;
+ 
+-	lua = malloc(strlen(luascript)+1);
+-	sprintf(lua,luascript); /* This expands the %q inside the string too ... do not optimize away. */
+-	ret = chdk_generic_script_run (params, lua, &table, &retint, context);
+-	free (lua);
++	ret = chdk_generic_script_run (params, luascript, &table, &retint, context);
+ 	GP_LOG_D("rlib_shoot returned table %s, retint %d\n", table, retint);
+ 	s = strstr(table, "exp=");
+ 	if (s) {
+diff --git a/camlibs/ptp2/chdk_ptp.h b/camlibs/ptp2/chdk_ptp.h
+index d11e0b7..65dcfd7 100644
+--- a/camlibs/ptp2/chdk_ptp.h
++++ b/camlibs/ptp2/chdk_ptp.h
+@@ -198,10 +198,92 @@ function serialize(v,opts)\n\
+ 	return table.concat(r)\n\
+ end\n"
+ 
++#define PTP_CHDK_LUA_SERIALIZE_SIMPLEQUOTE "\n\
++serialize_r = function(v,opts,r,seen,depth)\n\
++	local vt = type(v)\n\
++	if vt == 'nil' or  vt == 'boolean' or vt == 'number' then\n\
++		table.insert(r,tostring(v))\n\
++		return\n\
++	end\n\
++	if vt == 'string' then\n\
++		table.insert(r,string.format('%q',v))\n\
++		return\n\
++	end\n\
++	if vt == 'table' then\n\
++		if not depth then\n\
++			depth = 1\n\
++		end\n\
++		if depth >= opts.maxdepth then\n\
++			error('serialize: max depth')\n\
++		end\n\
++		if not seen then\n\
++			seen={}\n\
++		elseif seen[v] then\n\
++			if opts.err_cycle then\n\
++				error('serialize: cycle')\n\
++			else\n\
++				table.insert(r,'\"cycle:'..tostring(v)..'\"')\n\
++				return\n\
++			end\n\
++		end\n\
++		seen[v] = true;\n\
++		table.insert(r,'{')\n\
++		for k,v1 in pairs(v) do\n\
++			if opts.pretty then\n\
++				table.insert(r,'\\n'..string.rep(' ',depth))\n\
++			end\n\
++			if type(k) == 'string' and string.match(k,'^[_%a][%a%d_]*$') then\n\
++				table.insert(r,k)\n\
++			else\n\
++				table.insert(r,'[')\n\
++				serialize_r(k,opts,r,seen,depth+1)\n\
++				table.insert(r,']')\n\
++			end\n\
++			table.insert(r,'=')\n\
++			serialize_r(v1,opts,r,seen,depth+1)\n\
++			table.insert(r,',')\n\
++		end\n\
++		if opts.pretty then\n\
++			table.insert(r,'\\n'..string.rep(' ',depth-1))\n\
++		end\n\
++		table.insert(r,'}')\n\
++		return\n\
++	end\n\
++	if opts.err_type then\n\
++		error('serialize: unsupported type ' .. vt, 2)\n\
++	else\n\
++		table.insert(r,'\"'..tostring(v)..'\"')\n\
++	end\n\
++end\n\
++serialize_defaults = {\n\
++	maxdepth=10,\n\
++	err_type=true,\n\
++	err_cycle=true,\n\
++	pretty=false,\n\
++}\n\
++function serialize(v,opts)\n\
++	if opts then\n\
++		for k,v in pairs(serialize_defaults) do\n\
++			if not opts[k] then\n\
++				opts[k]=v\n\
++			end\n\
++		end\n\
++	else\n\
++		opts=serialize_defaults\n\
++	end\n\
++	local r={}\n\
++	serialize_r(v,opts,r)\n\
++	return table.concat(r)\n\
++end\n"
++
+ #define PTP_CHDK_LUA_SERIALIZE_MSGS \
+ PTP_CHDK_LUA_SERIALIZE\
+ "usb_msg_table_to_string=serialize\n"
+ 
++#define PTP_CHDK_LUA_SERIALIZE_MSGS_SIMPLEQUOTE \
++PTP_CHDK_LUA_SERIALIZE_SIMPLEQUOTE\
++"usb_msg_table_to_string=serialize\n"
++
+ #define PTP_CHDK_LUA_EXTEND_TABLE \
+ "function extend_table(target,source,deep)\n\
+ 	if type(target) ~= 'table' then\n\

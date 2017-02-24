@@ -17,12 +17,12 @@ The meta-python layer depends on:
 
 	URI: git://git.openembedded.org/openembedded-core
 	layers: meta
-	branch: krogoth 
+	branch: morty
 	revision: HEAD
 
 	URI: git://git.openembedded.org/meta-openembedded
 	layers: meta-oe
-	branch:  krogoth
+	branch: morty
 	revision: HEAD
 
 Please follow the recommended setup procedures of your OE distribution.
@@ -39,13 +39,14 @@ comments and patch review. It is subscriber only, so please register
 before posting.
 
 Send pull requests to openembedded-devel@lists.openembedded.org with
-'[meta-python][krogoth]' in the subject.
+'[meta-python]' in the subject.
 
 When sending single patches, please use something like: 
-'git send-email -M -1 --to=openembedded-devel@lists.openembedded.org --subject-prefix=meta-python][krogoth][PATCH'
+'git send-email -M -1 --to=openembedded-devel@lists.openembedded.org --subject-prefix=meta-python][morty][PATCH'
 
 Maintenance
 -------------------------
 
-krogoth Branch Maintainer:
+morty branch maintainer(s):
 Armin Kuster <akuster808@gmail.com>
+

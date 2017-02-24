@@ -11,8 +11,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=a6f89e2100d9b6cdffcea4f398e37343 \
 PR = "r5"
 
 SRC_URI = "http://telepathy.freedesktop.org/releases/libtelepathy/libtelepathy-${PV}.tar.gz \
-           file://prefer_python_2.5.patch \
-           file://doublefix.patch"
+    file://prefer_python_2.5.patch \
+    file://doublefix.patch \
+"
 
 SRC_URI[md5sum] = "490ca1a0c614d4466394b72d43bf7370"
 SRC_URI[sha256sum] = "e0d230be855125163579743418203c6f6be2f10f98c4f065735c1dc9ed115878"
@@ -20,4 +21,4 @@ SRC_URI[sha256sum] = "e0d230be855125163579743418203c6f6be2f10f98c4f065735c1dc9ed
 inherit autotools pkgconfig pythonnative
 
 FILES_${PN} += "${datadir}/telepathy \
-		${datadir}/dbus-1"
+    ${datadir}/dbus-1"

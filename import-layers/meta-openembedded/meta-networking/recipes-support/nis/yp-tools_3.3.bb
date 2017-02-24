@@ -11,11 +11,10 @@ ypwhich, yppasswd, domainname, nisdomainname \
 and ypdomainname. \
 "
 
-PNBLACKLIST[yp-tools] ?= "BROKEN: fails to build for qemuarm."
-
 SRC_URI = "http://www.linux-nis.org/download/yp-tools/${BP}.tar.bz2 \
            file://domainname.service \
            file://yp-tools-ipv4-ipv6-Provide-an-in-place-version-of-mapv4v6addr.patch \
+           file://alignment-cheat.patch \
 "
 SRC_URI[md5sum] = "acebeecc11a73fb8097503670344834c"
 SRC_URI[sha256sum] = "812be817df3d4c25813552be336c6c6ad5aedaf65611b81af3ad9f98fb3c2e50"

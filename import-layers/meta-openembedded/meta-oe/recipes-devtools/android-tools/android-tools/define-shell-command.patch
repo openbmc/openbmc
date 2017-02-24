@@ -1,0 +1,23 @@
+Description: we intend to run on Linux system so the shell is always /bin/sh,
+             for the host or the target.
+Author: Fathi Boudra <fabo@debian.org>
+
+Upstream-Status: Inappropriate
+---
+ system/core/adb/services.c |    4 ----
+ 1 file changed, 4 deletions(-)
+
+--- a/system/core/adb/services.c
++++ b/system/core/adb/services.c
+@@ -299,11 +299,7 @@ static int create_subproc_raw(const char
+ }
+ #endif  /* !ABD_HOST */
+ 
+-#if ADB_HOST
+ #define SHELL_COMMAND "/bin/sh"
+-#else
+-#define SHELL_COMMAND "/system/bin/sh"
+-#endif
+ 
+ #if !ADB_HOST
+ static void subproc_waiter_service(int fd, void *cookie)

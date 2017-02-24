@@ -6,9 +6,9 @@ LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://COPYING;md5=11f384074d8e93e263b5664ef08a411a"
 
 SRC_URI = "http://osdn.dl.sourceforge.jp/anthy/37536/anthy-9100h.tar.gz \
-           file://not_build_elc.patch \
-           file://2ch_t.patch \
-          "
+    file://not_build_elc.patch \
+    file://2ch_t.patch \
+"
 
 SRC_URI_append_class-target = "file://target-helpers.patch"
 SRC_URI_append_class-native = "file://native-helpers.patch"
@@ -25,18 +25,21 @@ PACKAGES += "${PN}-el libanthy0 libanthy-dev"
 
 FILES_${PN}-dbg += "${libdir}/.debug"
 FILES_libanthy0 = "${libdir}/libanthy.so.*  \
-		   ${libdir}/libanthydic.so.*   \
-		   ${libdir}/libanthyinput.so.*"
+    ${libdir}/libanthydic.so.* \
+    ${libdir}/libanthyinput.so.* \
+"
 
 FILES_libanthy-dev = "${libdir}/libanthy*.la \
-		      ${libdir}/libanthy*.a \
-		      ${libdir}/libanthy*.so \
-		      ${includedir}/anthy   \
-		      ${libdir}/pkgconfig/anthy.pc"
+    ${libdir}/libanthy*.a \
+    ${libdir}/libanthy*.so \
+    ${includedir}/anthy \
+    ${libdir}/pkgconfig/anthy.pc \
+"
 
 FILES_${PN}-el = "${datadir}/emacs/*"
 FILES_${PN} = "${datadir}/* \
-	       ${bindir}/* \
-	       ${sysconfdir}/anthy-conf"
+    ${bindir}/* \
+    ${sysconfdir}/anthy-conf \
+"
 
 BBCLASSEXTEND = "native"

@@ -12,7 +12,7 @@ SRC_URI[archive.sha256sum] = "b2c63916866485793b87398266dd7778548c1734923c272a94
 SRC_URI += "file://0001-libgnome-Makefile.am-allow-deprecated-symbols.patch"
 GNOME_COMPRESS_TYPE="bz2"
 
-DEPENDS += "libcanberra gconf-native gnome-vfs libbonobo esound"
+DEPENDS += "libcanberra gconf-native gnome-vfs libbonobo esound intltool-native"
 
 EXTRA_OECONF += "--disable-gtk-doc"
 

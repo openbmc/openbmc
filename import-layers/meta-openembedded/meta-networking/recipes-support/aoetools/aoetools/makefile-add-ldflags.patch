@@ -1,0 +1,31 @@
+Add LDFLAGS variable to Makefile, make sure the extra linker flags can be passed.
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+
+diff --git a/Makefile b/Makefile
+index 0c56ade..79f2e2b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -68,17 +68,17 @@ clean :
+ 	rm -f ${CONF_SCRIPTS} ${AOE_PING_OBJ} ${AOE_CFG_OBJ} ${SANCHECK_OBJ} ${PROGS}
+ 
+ aoeping : ${AOE_PING_OBJ}
+-	${CC} ${CFLAGS} -o $@ ${AOE_PING_OBJ}
++	${CC} ${CFLAGS} ${LDFLAGS} -o $@ ${AOE_PING_OBJ}
+ aoeping.o : aoeping.c dat.h fns.h
+ 	${CC} ${CFLAGS} -o $@ -c $<
+ linux.o : linux.c config.h
+ 	${CC} ${CFLAGS} -o $@ -c $<
+ aoecfg: ${AOE_CFG_OBJ}
+-	${CC} ${CFLAGS} -o $@ ${AOE_CFG_OBJ}
++	${CC} ${CFLAGS} ${LDFLAGS} -o $@ ${AOE_CFG_OBJ}
+ aoecfg.o : aoecfg.c dat.h fns.h
+ 	${CC} ${CFLAGS} -o $@ -c $<
+ aoe-sancheck : ${SANCHECK_OBJ}
+-	-$(CC) $(CFLAGS) -o $@ ${SANCHECK_OBJ} $(SANCHECKLIBS)
++	-$(CC) $(CFLAGS) ${LDFLAGS} -o $@ ${SANCHECK_OBJ} $(SANCHECKLIBS)
+ aoe-sancheck.o : aoe-sancheck.c
+ 	-$(CC) $(CFLAGS) -o $@ -c $<
+ 

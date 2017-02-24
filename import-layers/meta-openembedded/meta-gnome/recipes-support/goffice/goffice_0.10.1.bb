@@ -47,3 +47,5 @@ python populate_packages_prepend () {
     do_split_packages(d, goffice_libdir, '(.*)', 'goffice-plugin-%s', 'Goffice plugin for %s', allow_dirs=True)
 }
 
+# | ../../goffice-0.10.1/goffice/math/go-complex.c:75:3: error: format not a string literal, argument types not checked [-Werror=format-nonliteral]
+PNBLACKLIST[goffice] ?= "BROKEN: fails to build with gcc-6"

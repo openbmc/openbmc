@@ -1,9 +1,11 @@
 DESCRIPTION = "Tracker is a tool designed to extract information and metadata about your personal data so that it can be searched easily and quickly."
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=ee31012bf90e7b8c108c69f197f3e3a4"
-DEPENDS = "file gstreamer dbus libexif gettext sqlite3 icu gst-plugins-base libgnome-keyring poppler tiff enca libgsf libunistring giflib taglib bzip2 upower gtk+3 libgee networkmanager"
+DEPENDS = "file gstreamer dbus libexif gettext sqlite3 icu gst-plugins-base libgnome-keyring poppler tiff enca libgsf libunistring giflib taglib bzip2 upower gtk+3 libgee networkmanager intltool-native"
 
 RDEPENDS_${PN} += " gvfs gsettings-desktop-schemas"
+
+RDEPENDS_${PN}-nautilus-extension += "nautilus"
 HOMEPAGE = "http://projects.gnome.org/tracker/"
 
 PR = "r7"
@@ -13,7 +15,8 @@ inherit autotools pkgconfig gnomebase gettext gsettings systemd gobject-introspe
 VER_DIR = "${@gnome_verdir("${PV}")}"
 SRC_URI = "http://ftp.gnome.org/pub/GNOME/sources/tracker/${VER_DIR}/tracker-${PV}.tar.xz \
            file://enable-sqlite-crosscompile.patch \
-	   file://fix-removable-media-detection.patch \
+           file://fix-removable-media-detection.patch \
+           file://giflib5-support.patch \
            file://90tracker \
            file://tracker-store.service \
            file://tracker-miner-fs.service \
@@ -80,3 +83,6 @@ FILES_${PN}-nautilus-extension += "${libdir}/nautilus/extensions-2.0/*.so"
 
 SRC_URI[md5sum] = "f3a871beeebf86fd752863ebd22af9ac"
 SRC_URI[sha256sum] = "9b59330aa2e9e09feee587ded895e9247f71fc25f46b023d616d9969314bc7f1"
+
+# http://errors.yoctoproject.org/Errors/Details/81007/
+PNBLACKLIST[tracker] ?= "BROKEN: fails to build with new binutils-2.27"

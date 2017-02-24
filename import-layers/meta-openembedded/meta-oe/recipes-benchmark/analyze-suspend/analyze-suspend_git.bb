@@ -17,13 +17,13 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=12f884d2ae1ff87c09e5b7ccc2c4ca7e"
 RDEPENDS_${PN} += "python-core python-datetime python-stringold"
 
 PV = "3.2+gitr${SRCPV}"
-SRCREV = "bce3cbec43bc2ce7a8c79b210314dd9d9ac1010b"
+SRCREV = "c669e002a2e7504f21e277ad248fa81033926391"
 SRC_URI = "git://github.com/01org/suspendresume.git;protocol=https"
 S = "${WORKDIR}/git"
 
 do_install() {
-	install -Dm 0755 analyze_suspend.py ${D}${bindir}/analyze_suspend.py
-	install -Dm 0644 README ${D}${docdir}/analyze-suspend/README
+    install -Dm 0755 analyze_suspend.py ${D}${bindir}/analyze_suspend.py
+    install -Dm 0644 README ${D}${docdir}/analyze-suspend/README
 }
 
 BBCLASSEXTEND = "native"

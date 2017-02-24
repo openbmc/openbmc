@@ -1,0 +1,31 @@
+SUMMARY = "Python bindings for the DBus inter-process communication system"
+SECTION = "devel/python"
+HOMEPAGE = "http://www.freedesktop.org/Software/dbus"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://COPYING;md5=0b83047ce9e948b67c0facc5f233476a"
+DEPENDS = "expat dbus dbus-glib virtual/libintl python-pyrex-native"
+
+SRC_URI = "http://dbus.freedesktop.org/releases/dbus-python/dbus-python-${PV}.tar.gz \
+"
+
+SRC_URI[md5sum] = "7372a588c83a7232b4e08159bfd48fe5"
+SRC_URI[sha256sum] = "e2f1d6871f74fba23652e51d10873e54f71adab0525833c19bad9e99b1b2f9cc"
+S = "${WORKDIR}/dbus-python-${PV}"
+
+inherit distutils-base autotools pkgconfig
+
+PACKAGECONFIG ?= ""
+PACKAGECONFIG[docs] = "--enable-html-docs,--disable-html-docs,python3-docutils-native"
+PACKAGECONFIG[api-docs] = "--enable-api-docs,--disable-api-docs,python3-docutils-native python3-epydoc-native"
+
+export STAGING_LIBDIR
+export STAGING_INCDIR
+
+RDEPENDS_${PN} = "python-io python-logging python-stringold python-threading python-xml"
+
+FILES_${PN}-dev += "${libdir}/pkgconfig"
+
+do_install_append() {
+    # Remove files that clash with python3-dbus; their content is same
+    rm ${D}${includedir}/dbus-1.0/dbus/dbus-python.h ${D}${libdir}/pkgconfig/dbus-python.pc
+}

@@ -1,0 +1,34 @@
+From 9c51a0d7690fb3b08871dae2486af4032d8442fb Mon Sep 17 00:00:00 2001
+From: Paul Barker <paul@paulbarker.me.uk>
+Date: Sat, 4 Jun 2016 15:42:48 +0100
+Subject: [PATCH 2/2] Fix trimmed printf in grep
+
+Using a default trim value of INT_MAX/2 when printing a line causes nothing to
+be printed on a system built using OpenEmbedded for the qemux86 target. This may
+also affect other systems.
+
+Signed-off-by: Paul Barker <paul@paulbarker.me.uk>
+Upstream-status: Submitted
+---
+ toys/posix/grep.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/toys/posix/grep.c b/toys/posix/grep.c
+index 2ca02d2..f38c538 100644
+--- a/toys/posix/grep.c
++++ b/toys/posix/grep.c
+@@ -74,7 +74,10 @@ static void outline(char *line, char dash, char *name, long lcount, long bcount,
+   if (!line || (lcount && (toys.optflags&FLAG_n)))
+     printf("%ld%c", lcount, line ? dash : TT.outdelim);
+   if (bcount && (toys.optflags&FLAG_b)) printf("%ld%c", bcount-1, dash);
+-  if (line) xprintf("%.*s%c", trim ? trim : INT_MAX/2, line, TT.outdelim);
++  if (line) {
++    if (trim) xprintf("%.*s%c", trim, line, TT.outdelim);
++    else xprintf("%s%c", line, TT.outdelim);
++  }
+ }
+ 
+ // Show matches in one file
+-- 
+2.1.4
+

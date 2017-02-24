@@ -1,0 +1,78 @@
+From 6697fcf9d7f53126b442bf19890640b5f88c8aa4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Fri, 29 Jul 2016 21:24:20 +0200
+Subject: [PATCH] suppress string format literal warning to fix build with gcc6
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+works around:
+| ../../libgnomeui-2.24.5/libgnomeui/gnome-dateedit.c: In function 'day_selected':
+| ../../libgnomeui-2.24.5/libgnomeui/gnome-dateedit.c:156:9: error: format not a string literal, format string not checked [-Werror=format-nonliteral]
+|          strftime_date_format, &mtm) == 0)
+|          ^~~~~~~~~~~~~~~~~~~~
+| ../../libgnomeui-2.24.5/libgnomeui/gnome-dateedit.c: In function 'gnome_date_edit_set_time':
+| ../../libgnomeui-2.24.5/libgnomeui/gnome-dateedit.c:704:2: error: format not a string literal, format string not checked [-Werror=format-nonliteral]
+|   if (strftime (buffer, sizeof (buffer), strftime_date_format, mytm) == 0)
+|   ^~
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ libgnomeui/gnome-dateedit.c | 6 ++++++
+ libgnomeui/gnome-gconf-ui.c | 3 +++
+ 2 files changed, 9 insertions(+)
+
+diff --git a/libgnomeui/gnome-dateedit.c b/libgnomeui/gnome-dateedit.c
+index 69ab699..41541c3 100644
+--- a/libgnomeui/gnome-dateedit.c
++++ b/libgnomeui/gnome-dateedit.c
+@@ -152,9 +152,12 @@ day_selected (GtkCalendar *calendar, GnomeDateEdit *gde)
+ 	else
+ 		mtm.tm_year = year;
+ 
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+ 	if (strftime (buffer, sizeof (buffer),
+ 		      strftime_date_format, &mtm) == 0)
+ 		strcpy (buffer, "???");
++#pragma GCC diagnostic pop
+ 	buffer[sizeof(buffer)-1] = '\0';
+ 
+ 	/* FIXME: what about set time */
+@@ -701,8 +704,11 @@ gnome_date_edit_set_time (GnomeDateEdit *gde, time_t the_time)
+ 	mytm = localtime (&the_time);
+ 
+ 	/* Set the date */
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+ 	if (strftime (buffer, sizeof (buffer), strftime_date_format, mytm) == 0)
+ 		strcpy (buffer, "???");
++#pragma GCC diagnostic pop
+ 	buffer[sizeof(buffer)-1] = '\0';
+ 
+ 	str_utf8 = g_locale_to_utf8 (buffer, -1, NULL, NULL, NULL);
+diff --git a/libgnomeui/gnome-gconf-ui.c b/libgnomeui/gnome-gconf-ui.c
+index 43c0f44..a84b2c0 100644
+--- a/libgnomeui/gnome-gconf-ui.c
++++ b/libgnomeui/gnome-gconf-ui.c
+@@ -180,12 +180,15 @@ error_idle_func (gpointer data)
+                                 "configuration settings may not work properly.");
+                 }
+ 
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+                 dialog = gtk_message_dialog_new (NULL /* parent */,
+                                                  0 /* flags */,
+                                                  GTK_MESSAGE_ERROR,
+                                                  GTK_BUTTONS_OK,
+                                                  fmt,
+                                                  gnome_program_get_human_readable_name(gnome_program_get()));
++#pragma GCC diagnostic pop
+                 gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_OK);
+                 g_signal_connect (dialog, "response",
+                                   G_CALLBACK (gtk_widget_destroy),
+-- 
+2.5.5
+

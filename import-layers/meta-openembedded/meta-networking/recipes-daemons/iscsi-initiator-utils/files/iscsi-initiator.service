@@ -5,6 +5,7 @@ After=syslog.target
 [Service]
 EnvironmentFile=/etc/default/iscsi-initiator
 ExecStartPre=/sbin/modprobe iscsi_tcp
+ExecStartPre=/usr/lib/iscsi/set_initiatorname
 ExecStart=/usr/sbin/iscsid -f $OPTS_ISCSID
 
 [Install]

@@ -1,0 +1,11 @@
+--- crda-3.18/utils/key2pub.py.orig	2016-06-18 09:54:23.671326113 -0400
++++ crda-3.18/utils/key2pub.py	2016-06-18 09:54:34.387326300 -0400
+@@ -115,7 +115,7 @@
+ 	.n = _n, .len_n = sizeof(_n),	\
+ }
+ 
+-static const struct key_params keys[] = {
++static const struct key_params keys[] __attribute__((unused))= {
+ ''')
+     for n in xrange(n + 1):
+         output.write('	KEYS(e_%d, n_%d),\n' % (n, n))

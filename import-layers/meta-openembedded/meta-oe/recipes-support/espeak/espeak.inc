@@ -3,7 +3,8 @@ SECTION = "base"
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://License.txt;md5=cb7a20edb4c9f5f478de6523dcd7362c"
 
-SRC_URI = "${SOURCEFORGE_MIRROR}/espeak/espeak-${PV}-source.zip"
+SRC_URI = "${SOURCEFORGE_MIRROR}/espeak/espeak-${PV}-source.zip \
+           file://fix-gcc6-errors.patch"
 
 S = "${WORKDIR}/espeak-${PV}-source"
 

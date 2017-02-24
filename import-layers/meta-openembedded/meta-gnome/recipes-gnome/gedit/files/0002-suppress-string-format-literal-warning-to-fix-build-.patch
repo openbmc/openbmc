@@ -1,0 +1,38 @@
+From 4ebdf8023f763f75a7e1b548894de2e8b784f4a8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Fri, 29 Jul 2016 23:19:40 +0200
+Subject: [PATCH] suppress string format literal warning to fix build with gcc6
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ plugins/time/gedit-time-plugin.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/plugins/time/gedit-time-plugin.c b/plugins/time/gedit-time-plugin.c
+index d2ffdb9..441d9f9 100644
+--- a/plugins/time/gedit-time-plugin.c
++++ b/plugins/time/gedit-time-plugin.c
+@@ -473,12 +473,15 @@ get_time (const gchar* format)
+   	clock = time (NULL);
+   	now = localtime (&clock);
+ 
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+ 	do
+ 	{
+ 		out_length += 255;
+ 		out = g_realloc (out, out_length);
+ 	}
+   	while (strftime (out, out_length, locale_format, now) == 0);
++#pragma GCC diagnostic pop
+ 
+ 	g_free (locale_format);
+ 
+-- 
+2.5.5
+

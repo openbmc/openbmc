@@ -1,0 +1,45 @@
+From 55a0adfc416ad85dbc440eaa667d98c200a8ce62 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Thu, 18 Dec 2014 17:23:37 +0800
+Subject: [PATCH] adduser: add -M option for useradd
+
+The useradd (from package passwd) in debian based system sets -M (--no-create-home) by default,
+but the one we are using (from package shadow) sets -m (--create-home) by default, so we
+need to explicitly add -M option for useradd call or it will try to create home twice and
+throw a confused message:
+"The home directory `/home/newuser' already exists. Not copying from `/etc/skel'"
+
+Upstream-Status: Submitted [1]
+
+[1] https://lists.alioth.debian.org/pipermail/adduser-devel/2016-October/005478.html
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ adduser | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/adduser b/adduser
+index a5f83f3..f6cb52c 100755
+--- a/adduser
++++ b/adduser
+@@ -435,7 +435,7 @@ if ($action eq "addsysuser") {
+     $undouser = $new_name;
+     my $useradd = &which('useradd');
+     &systemcall($useradd, '-d', $home_dir, '-g', $ingroup_name, '-s',
+-		$shell, '-u', $new_uid, $new_name);
++	        $shell, '-u', $new_uid, '-M', $new_name);
+     if(!$disabled_login) {
+         my $usermod = &which('usermod');
+         &systemcall($usermod, '-p', '*', $new_name);
+@@ -525,7 +525,7 @@ if ($action eq "adduser") {
+     $undouser = $new_name;
+     my $useradd = &which('useradd');
+     &systemcall($useradd, '-d', $home_dir, '-g', $ingroup_name, '-s',
+-		$shell, '-u', $new_uid, $new_name);
++               $shell, '-u', $new_uid, '-M', $new_name);
+     &invalidate_nscd();
+ 
+     create_homedir (1); # copy skeleton data
+-- 
+1.8.5.2
+

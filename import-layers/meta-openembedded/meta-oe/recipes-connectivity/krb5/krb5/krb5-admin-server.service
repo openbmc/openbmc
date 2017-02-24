@@ -1,0 +1,14 @@
+[Unit]
+Description=MIT Kerberos KDC administrative daemon
+After=syslog.target network.target
+ConditionPathExists=/etc/krb5.conf
+
+[Service]
+Type=forking
+ExecStartPre=/bin/sh -c "test ! -f /var/log/kadmind.log || test ! -x /sbin/restorecon || /sbin/restorecon -F /var/log/kadmind.log"
+ExecStart=/usr/sbin/kadmind
+SuccessExitStatus=1 2 SIGKILL
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

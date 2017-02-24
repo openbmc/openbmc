@@ -39,6 +39,8 @@ S = "${WORKDIR}/git"
 
 PV = "0.5.0+git${@'${SRCPV}'.split('+')[-1]}"
 
+TARGET_CC_ARCH += "${LDFLAGS}"
+
 # The exact version of SYSTEMD does not matter but should be greater than 209.
 #
 EXTRA_OEMAKE = 'MULTIPATH_VERSION=${PV} DESTDIR=${D} syslibdir=${base_libdir} \

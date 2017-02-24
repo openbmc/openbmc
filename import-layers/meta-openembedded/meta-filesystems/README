@@ -10,22 +10,22 @@ Dependencies
 This layer depends on:
 
   URI: git://git.openembedded.org/bitbake
-  branch: 1.28
+  branch: morty
 
   URI: git://git.openembedded.org/openembedded-core
   layers: meta
-  branch: krogoth
+  branch: morty
 
   URI: git://git.openembedded.org/meta-openembedded
   layers: meta-oe
-  branch: krogoth
+  branch: morty
 
 Patches
 =======
 
 Please submit any patches against the filesystems layer to the
 OpenEmbedded development mailing list (openembedded-devel@lists.openembedded.org)
-with '[meta-filesystems][krogoth]' in the subject.
+with '[meta-filesystems]' in the subject.
 
 Maintainers List:
   physfs      Andreas Müller <schnitzeltony@googlemail.com>
@@ -66,9 +66,9 @@ When sending single patches, please use something like:
 
    git send-email -1 -M \
         --to openembedded-devel@lists.openembedded.org \
-        --subject-prefix=meta-filesystems][krogoth][PATCH
+        --subject-prefix=meta-filesystems][morty][PATCH
 
-krogoth Branch Maintainer:
+morty branch maintainer(s):
 Armin Kuster <akuster808@gmail.com>
 
 Table of Contents

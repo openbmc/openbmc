@@ -1,0 +1,26 @@
+This checks whether the format string is a literal on the calling function. As bonobo_debug_print()
+takes already a va_list, we specify the format on the functions that call it
+The second number, which is 0 here, should then be the argument index of the variadic argument
+
+Fixed warning with clang
+
+| ../../libbonobo-2.32.1/bonobo/bonobo-debug.c:58:32: error: format string is not a string literal [-Werror,-Wformat-nonliteral]
+|         vfprintf (_bonobo_debug_file, fmt, args);
+|                                       ^~~
+| 1 error generated.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: libbonobo-2.32.1/bonobo/bonobo-debug.c
+===================================================================
+--- libbonobo-2.32.1.orig/bonobo/bonobo-debug.c
++++ libbonobo-2.32.1/bonobo/bonobo-debug.c
+@@ -47,6 +47,7 @@ bonobo_debug_init(void)
+ 	  _bonobo_debug_file = stderr;
+ }
+ 
++__attribute__((__format__ (printf, 2, 0)))
+ void
+ bonobo_debug_print (const char *name, char *fmt, ...)
+ {

@@ -1,0 +1,23 @@
+Upstream-Status: Inappropriate [configuration]
+
+Set the path of default configure file.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+diff --git a/misc/init.d/cfengine3.in b/misc/init.d/cfengine3.in
+index d6ae26f..1dee283 100644
+--- a/misc/init.d/cfengine3.in
++++ b/misc/init.d/cfengine3.in
+@@ -101,11 +101,7 @@ if [ -z "$LOCKDIR" ]; then
+ fi
+ 
+ # default control file
+-if [ "$DEBIAN" = "1" ]; then
+-    DEFAULT=/etc/default/cfengine3
+-else
+-    DEFAULT=/etc/sysconfig/cfengine3
+-fi
++DEFAULT=/etc/default/cfengine3
+ 
+ if [ -f $DEFAULT ]; then
+     . $DEFAULT

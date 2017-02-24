@@ -1,0 +1,19 @@
+--- redis-3.0.2/deps/hiredis/Makefile.orig	2016-05-06 19:36:26.179003036 -0700
++++ redis-3.0.2/deps/hiredis/Makefile	2016-05-06 19:40:15.341340736 -0700
+@@ -25,7 +25,7 @@
+ 
+ # Fallback to gcc when $CC is not in $PATH.
+ CC?=$(shell sh -c 'type $(CC) >/dev/null 2>/dev/null && echo $(CC) || echo gcc')
+-OPTIMIZATION?=-O3
++OPTIMIZATION?=-O2
+ WARNINGS=-Wall -W -Wstrict-prototypes -Wwrite-strings
+ DEBUG?= -g -ggdb
+ REAL_CFLAGS=$(OPTIMIZATION) -fPIC $(CFLAGS) $(WARNINGS) $(DEBUG) $(ARCH)
+@@ -68,6 +68,7 @@
+ 
+ $(STLIBNAME): $(OBJ)
+ 	$(STLIB_MAKE_CMD) $(OBJ)
++	$(RANLIB) $@
+ 
+ dynamic: $(DYLIBNAME)
+ static: $(STLIBNAME)

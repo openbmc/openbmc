@@ -9,9 +9,10 @@ SECTION = "x11/gnome"
 
 PR = "r7"
 
-DEPENDS = "gnome-doc-utils-native gconf glib-2.0 gnome-desktop gtk+ \
-           pango libwnck gnome-menus cairo libgweather dbus dbus-glib \
-	   librsvg libcanberra"
+DEPENDS = "gnome-doc-utils gconf glib-2.0 gnome-desktop gtk+ \
+    pango libwnck gnome-menus cairo libgweather dbus dbus-glib \
+    librsvg libcanberra \
+"
 RDEPENDS_${PN} = "python"
 
 inherit gtk-doc gnome autotools-brokensep gettext pkgconfig gconf gobject-introspection
@@ -19,7 +20,8 @@ inherit gtk-doc gnome autotools-brokensep gettext pkgconfig gconf gobject-intros
 SRCREV = "8292bd2b8a36df7eed3c760899400790cde68590"
 SRC_URI = "git://git.gnome.org/gnome-panel;branch=gnome-2-32 \
            file://0001-Fix-build-with-gcc-5.patch \
-	  "
+           file://0001-Add-gnome-doc-utils.make.patch \
+"
 
 S = "${WORKDIR}/git"
 
@@ -29,7 +31,6 @@ PACKAGECONFIG ??= ""
 PACKAGECONFIG[networkmanager] = "--enable-network-manager,--disable-network-manager,networkmanager"
 
 do_configure_prepend() {
-    gnome-doc-prepare --automake
     sed -i -e s:help:: ${S}/Makefile.am
     sed -i -e s:^#!@PYTHON@:#!/usr/bin/python: ${S}/gnome-panel/gnome-panel-add.in
 }
@@ -43,3 +44,5 @@ FILES_${PN} =+ "${datadir}/gnome* \
                 ${datadir}/PolicyKit \
                 ${libdir}/bonobo \
 "
+
+PNBLACKLIST[gnome-panel] ?= "Depends on broken libgweather"

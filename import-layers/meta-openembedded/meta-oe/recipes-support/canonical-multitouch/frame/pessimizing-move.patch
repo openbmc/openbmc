@@ -1,0 +1,27 @@
+let compiler decide on copy elision
+Fixes compiler errors with clang
+| ../../frame-2.5.0/src/x11/device_x11.cpp:126:13: error: moving a temporary object prevents copy elision [-Werror,-Wpessimizing-move]
+|             std::move(UniqueUFAxis(static_cast<oif::frame::UFAxis*>(axis)));
+|             ^
+| ../../frame-2.5.0/src/x11/device_x11.cpp:126:13: note: remove std::move call here
+|             std::move(UniqueUFAxis(static_cast<oif::frame::UFAxis*>(axis)));
+|             ^~~~~~~~~~                                                    ~
+| 1 error generated.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+
+Index: frame-2.5.0/src/x11/device_x11.cpp
+===================================================================
+--- frame-2.5.0.orig/src/x11/device_x11.cpp
++++ frame-2.5.0/src/x11/device_x11.cpp
+@@ -122,8 +122,7 @@ UFDeviceX11::UFDeviceX11(Display* displa
+         UFAxis_* axis = new UFAxis(type, valuator_info->min, valuator_info->max,
+                                    valuator_info->resolution);
+ 
+-        axes_[type] =
+-            std::move(UniqueUFAxis(static_cast<oif::frame::UFAxis*>(axis)));
++        axes_[type] = UniqueUFAxis(static_cast<oif::frame::UFAxis*>(axis));
+ 
+         axis_map_[valuator_info->number] = type;
+ 

@@ -1,0 +1,83 @@
+From d5c6c92045f9b6ad32365f39b8cc77f2fcd7d0f5 Mon Sep 17 00:00:00 2001
+From: Fabio Berton <fabio.berton@ossystems.com.br>
+Date: Wed, 5 Oct 2016 10:57:29 -0300
+Subject: [PATCH 2/3] Fix Eq CAPS plugin name
+Organization: O.S. Systems Software LTDA.
+
+Patch from:
+https://git.backbone.ws/portage/overlay/commit/7a069112054fbb5dc94a857e9c020a38cb1c6fde
+
+Upstream-Status: Pending
+
+Signed-off-by: Fabio Berton <fabio.berton@ossystems.com.br>
+---
+ README      | 8 ++++----
+ ctl_equal.c | 2 +-
+ pcm_equal.c | 2 +-
+ 3 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/README b/README
+index b77fd2d..2df3dc5 100644
+--- a/README
++++ b/README
+@@ -1,11 +1,11 @@
+ Alsaequal is a real-time adjustable equalizer plugin for ALSA. It can
+ be adjusted using any ALSA compatible mixer, e.g. alsamixergui.
+ 
+-Alsaequal uses the Eq CAPS LADSPA Plugin for audio processing, actually
++Alsaequal uses the Eq10 CAPS LADSPA Plugin for audio processing, actually
+ alsaequal is a generic LADSPA plugin interface with real-time access to
+ the LADSPA controls (the LADSPA plugin included with alsa doesn't allow
+ for real-time controls) but it was developed for and only tested with
+-Eq CAPS LADSPA plugin. You are welcome to try it with other plugins, it
++Eq10 CAPS LADSPA plugin. You are welcome to try it with other plugins, it
+ may work. Let me know how it goes, you can reach me at
+ <charles@thedigitalmachine.net>.
+ 
+@@ -66,7 +66,7 @@ ctl.<name_equal> {
+ 	library -- location of the LADSPA library, the default is
+ 					"/usr/lib/ladspa/caps.so"
+ 	module -- module name within the LADSPA library, the deafault
+-					is "Eq"
++					is "Eq10"
+ 	channels -- number of channels, the default is 2
+ }
+ 
+@@ -81,7 +81,7 @@ pcm.<name_pcm> {
+ 	library -- location of the LADSPA library, the default is
+ 					"/usr/lib/ladspa/caps.so"
+ 	module -- module name within the LADSPA library, the deafault
+-					is "Eq"
++					is "Eq10"
+ 	channels -- number of channels, the default is 2
+ }
+ 
+diff --git a/ctl_equal.c b/ctl_equal.c
+index 40747d4..afba793 100644
+--- a/ctl_equal.c
++++ b/ctl_equal.c
+@@ -167,7 +167,7 @@ SND_CTL_PLUGIN_DEFINE_FUNC(equal)
+ 	snd_ctl_equal_t *equal;
+ 	const char *controls = ".alsaequal.bin";
+ 	const char *library = "/usr/lib/ladspa/caps.so";
+-	const char *module = "Eq";
++	const char *module = "Eq10";
+ 	long channels = 2;
+ 	const char *sufix = " Playback Volume";
+ 	int err, i, index;
+diff --git a/pcm_equal.c b/pcm_equal.c
+index 2bc87fb..b0b4265 100644
+--- a/pcm_equal.c
++++ b/pcm_equal.c
+@@ -151,7 +151,7 @@ SND_PCM_PLUGIN_DEFINE_FUNC(equal)
+ 	snd_config_t *sconf = NULL;
+ 	const char *controls = ".alsaequal.bin";
+ 	const char *library = "/usr/lib/ladspa/caps.so";
+-	const char *module = "Eq";
++	const char *module = "Eq10";
+ 	long channels = 2;
+ 	int err;
+ 	
+-- 
+2.1.4
+

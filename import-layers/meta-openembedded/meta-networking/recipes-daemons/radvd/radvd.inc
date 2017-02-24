@@ -62,6 +62,6 @@ USERADD_PARAM_${PN} = "--system --home ${localstatedir}/run/radvd/ -M -g nogroup
 
 pkg_postinst_${PN} () {
     if [ -z "$D" -a -x /etc/init.d/populate-volatile.sh ]; then
-	/etc/init.d/populate-volatile.sh update
+        /etc/init.d/populate-volatile.sh update
     fi
 }

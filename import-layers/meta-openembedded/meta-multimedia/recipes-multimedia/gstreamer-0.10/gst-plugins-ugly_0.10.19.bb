@@ -23,8 +23,8 @@ PACKAGECONFIG[amrnb] = "--enable-amrnb,--disable-amrnb,opencore-amr"
 PACKAGECONFIG[amrwb] = "--enable-amrwb,--disable-amrwb,opencore-amr"
 
 do_configure_prepend() {
-	# This m4 file contains nastiness which conflicts with libtool 2.2.2
-	rm ${S}/m4/lib-link.m4 || true
+    # This m4 file contains nastiness which conflicts with libtool 2.2.2
+    rm ${S}/m4/lib-link.m4 || true
 }
 
 SRC_URI[md5sum] = "1d81c593e22a6cdf0f2b4f57eae93df2"

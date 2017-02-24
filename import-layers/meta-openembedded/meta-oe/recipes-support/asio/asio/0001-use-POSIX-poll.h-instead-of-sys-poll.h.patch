@@ -1,0 +1,64 @@
+From dac36a170188917e2f61b0394ba8a2f6509ddf3a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andr=C3=A9=20Draszik?= <adraszik@tycoint.com>
+Date: Tue, 8 Nov 2016 20:39:55 +0000
+Subject: [PATCH] use POSIX poll.h instead of sys/poll.h
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+POSIX specifies that <poll.h> is the correct header to
+include for poll()
+  http://pubs.opengroup.org/onlinepubs/009695399/functions/poll.html
+whereas <sys/poll.h> is only needed for ancient glibc (<2.3),
+so let's follow POSIX instead.
+
+As a side-effect, this silences numerous compilation warnings
+when compiling against the musl C-library:
+
+In file included from ../../../../asio-1.10.6/src/examples/cpp03/../../../include/asio/detail/socket_types.hpp:57:0,
+                 from ../../../../asio-1.10.6/src/examples/cpp03/../../../include/asio/impl/error_code.ipp:29,
+                 from ../../../../asio-1.10.6/src/examples/cpp03/../../../include/asio/error_code.hpp:185,
+                 from ../../../../asio-1.10.6/src/examples/cpp03/../../../include/asio/detail/throw_error.hpp:19,
+                 from ../../../../asio-1.10.6/src/examples/cpp03/../../../include/asio/detail/impl/posix_tss_ptr.ipp:23,
+                 from ../../../../asio-1.10.6/src/examples/cpp03/../../../include/asio/detail/posix_tss_ptr.hpp:74,
+                 from ../../../../asio-1.10.6/src/examples/cpp03/../../../include/asio/detail/tss_ptr.hpp:27,
+                 from ../../../../asio-1.10.6/src/examples/cpp03/../../../include/asio/detail/call_stack.hpp:20,
+                 from ../../../../asio-1.10.6/src/examples/cpp03/../../../include/asio/impl/handler_alloc_hook.ipp:19,
+                 from ../../../../asio-1.10.6/src/examples/cpp03/../../../include/asio/handler_alloc_hook.hpp:78,
+                 from ../../../../asio-1.10.6/src/examples/cpp03/../../../include/asio/detail/handler_alloc_helpers.hpp:21,
+                 from ../../../../asio-1.10.6/src/examples/cpp03/../../../include/asio/detail/bind_handler.hpp:19,
+                 from ../../../../asio-1.10.6/src/examples/cpp03/../../../include/asio/detail/wrapped_handler.hpp:18,
+                 from ../../../../asio-1.10.6/src/examples/cpp03/../../../include/asio/io_service.hpp:24,
+                 from ../../../../asio-1.10.6/src/examples/cpp03/../../../include/asio/basic_io_object.hpp:19,
+                 from ../../../../asio-1.10.6/src/examples/cpp03/../../../include/asio/basic_socket.hpp:20,
+                 from ../../../../asio-1.10.6/src/examples/cpp03/../../../include/asio/basic_datagram_socket.hpp:20,
+                 from ../../../../asio-1.10.6/src/examples/cpp03/../../../include/asio.hpp:19,
+                 from ../../../../asio-1.10.6/src/examples/cpp03/buffers/reference_counted.cpp:11:
+<sysroot>/usr/include/sys/poll.h:1:2: warning: #warning redirecting incorrect #include <sys/poll.h> to <poll.h> [-Wcpp]
+ #warning redirecting incorrect #include <sys/poll.h> to <poll.h>
+  ^~~~~~~
+
+etc.
+
+Signed-off-by: André Draszik <adraszik@tycoint.com>
+---
+Upstream-Status: Submitted https://svn.boost.org/trac/boost/ticket/12419
+ include/asio/detail/socket_types.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/asio/detail/socket_types.hpp b/include/asio/detail/socket_types.hpp
+index f2600c2..cb61b8e 100644
+--- a/include/asio/detail/socket_types.hpp
++++ b/include/asio/detail/socket_types.hpp
+@@ -54,7 +54,7 @@
+ #else
+ # include <sys/ioctl.h>
+ # if !defined(__SYMBIAN32__)
+-#  include <sys/poll.h>
++#  include <poll.h>
+ # endif
+ # include <sys/types.h>
+ # include <sys/stat.h>
+-- 
+2.10.2
+

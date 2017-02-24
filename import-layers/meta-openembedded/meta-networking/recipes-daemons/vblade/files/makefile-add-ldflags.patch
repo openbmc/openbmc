@@ -1,0 +1,19 @@
+Add LDFLAGS variable to Makefile, make sure the extra linker flags can be passed.
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+
+diff --git a/makefile b/makefile
+index 98008da..c328ba7 100644
+--- a/makefile
++++ b/makefile
+@@ -11,7 +11,7 @@ mandir = ${sharedir}/man
+ O=aoe.o bpf.o ${PLATFORM}.o ata.o
+ 
+ vblade: $O
+-	${CC} -o vblade $O
++	${CC} ${LDFLAGS} -o vblade $O
+ 
+ aoe.o : aoe.c config.h dat.h fns.h makefile
+ 	${CC} ${CFLAGS} -c $<

@@ -1,18 +1,18 @@
 This layer depends on:
 
 URI: git://github.com/openembedded/oe-core.git
-branch: krogoth 
+branch: morty
 revision: HEAD
 
 URI: git://github.com/openembedded/meta-oe.git
 layers: meta-oe, meta-python
-branch: krogoth 
+branch: morty
 revision: HEAD
 
-Send pull requests to openembedded-devel@lists.openembedded.org with '[meta-efl][krogoth]' in the subject'
+Send pull requests to openembedded-devel@lists.openembedded.org with '[meta-efl]' in the subject'
 
 When sending single patches, please using something like:
-'git send-email -M -1 --to openembedded-devel@lists.openembedded.org --subject-prefix=meta-efl][krogoth][PATCH'
+'git send-email -M -1 --to openembedded-devel@lists.openembedded.org --subject-prefix=meta-efl][morty][PATCH'
 
-krogoth branch maintainer(s):
+morty branch maintainer(s):
 Armin Kuster <akuster808@gmail.com>

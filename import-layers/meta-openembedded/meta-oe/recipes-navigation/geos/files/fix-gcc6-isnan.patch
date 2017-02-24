@@ -1,0 +1,22 @@
+--- geos-3.4.2/configure.in.orig	2016-06-08 17:46:43.002250304 +0000
++++ geos-3.4.2/configure.in	2016-06-08 17:57:36.342241606 +0000
+@@ -197,7 +197,7 @@
+ AC_LANG_PUSH([C++])
+ AC_CACHE_CHECK([for isnan], ac_cv_isnan,
+  [AC_TRY_LINK([#include <cmath>],
+- [double x; int y; y = isnan(x);],
++ [double x; int y; y = std::isnan(x);],
+  ac_cv_isnan=yes,
+  ac_cv_isnan=no
+ )])
+--- geos-3.4.2/include/geos/platform.h.in.orig	2016-06-08 14:06:53.910234182 -0400
++++ geos-3.4.2/include/geos/platform.h.in	2016-06-08 14:07:19.298233844 -0400
+@@ -84,7 +84,7 @@
+ #endif
+ 
+ #if defined(HAVE_ISNAN)
+-# define ISNAN(x) (isnan(x))
++# define ISNAN(x) (std::isnan(x))
+ #else
+ # if defined(_MSC_VER)
+ #  define ISNAN(x) _isnan(x)

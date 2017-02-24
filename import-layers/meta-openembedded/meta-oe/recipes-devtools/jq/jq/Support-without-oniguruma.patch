@@ -1,0 +1,68 @@
+From 18b4b18b41f5ed396d73449ce8d6ec408d95d6b2 Mon Sep 17 00:00:00 2001
+From: David Tolnay <dtolnay@gmail.com>
+Date: Sat, 21 Nov 2015 10:05:37 -0800
+Subject: [PATCH] Support --without-oniguruma
+
+Upstream-Status: Backport
+
+Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+
+---
+ configure.ac | 41 ++++++++++++++++++++---------------------
+ 1 file changed, 20 insertions(+), 21 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 9e2c8cf..7f6be34 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -52,27 +52,26 @@ fi
+ AC_ARG_WITH([oniguruma],
+     [AS_HELP_STRING([--with-oniguruma=prefix],
+         [try this for a non-standard install prefix of the oniguruma library])],
+-    [ONIGURUMAPATHSET=1],
+-    [ONIGURUMAPATHSET=0])
+-
+-if test $ONIGURUMAPATHSET = 1; then
+-  CFLAGS="$CFLAGS -I${with_oniguruma}/include"
+-  LDFLAGS="$LDFLAGS -L${with_oniguruma}/lib"
+-fi
+-
+-# check for ONIGURUMA library
+-HAVE_ONIGURUMA=0
+-AC_CHECK_HEADER("oniguruma.h",
+-    AC_CHECK_LIB([onig],[onig_version],[LIBS="$LIBS -lonig"; HAVE_ONIGURUMA=1;]))
+-
+-# handle check results
+-if test $HAVE_ONIGURUMA != 1; then
+-    AC_MSG_NOTICE([Oniguruma was not found.])
+-    AC_MSG_NOTICE([ Try setting the location using '--with-oniguruma=PREFIX' ])
+-else
+-    AC_DEFINE([HAVE_ONIGURUMA],1,[Define to 1 if Oniguruma is installed])
+-fi
+-
++    [],
++    [with_oniguruma=yes])
++
++AS_IF([test "x$with_oniguruma" != xno], [
++    AS_IF([test "x$with_oniguruma" != xyes], [
++        CFLAGS="$CFLAGS -I${with_oniguruma}/include"
++        LDFLAGS="$LDFLAGS -L${with_oniguruma}/lib"
++    ])
++    # check for ONIGURUMA library
++    have_oniguruma=0
++    AC_CHECK_HEADER("oniguruma.h",
++        AC_CHECK_LIB([onig],[onig_version],[LIBS="$LIBS -lonig"; have_oniguruma=1;]))
++    # handle check results
++    AS_IF([test $have_oniguruma = 1], [
++        AC_DEFINE([HAVE_ONIGURUMA], 1, [Define to 1 if Oniguruma is installed])
++    ], [
++        AC_MSG_NOTICE([Oniguruma was not found.])
++        AC_MSG_NOTICE([Try setting the location using '--with-oniguruma=PREFIX'])
++    ])
++])
+ 
+ dnl Check for valgrind
+ AC_CHECK_PROGS(valgrind_cmd, valgrind)
+-- 
+1.9.1
+

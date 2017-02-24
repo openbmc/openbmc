@@ -18,7 +18,7 @@ SRC_URI = "${E_SVN}/trunk/THEMES;module=${SRCNAME};protocol=http"
 S = "${WORKDIR}/${SRCNAME}/e"
 
 do_compile() {
-    # unfortunately hardcoded edje_cc in Makefile     
+    # unfortunately hardcoded edje_cc in Makefile
     sed -i "s#\tedje_cc#\t${STAGING_BINDIR_NATIVE}/edje_cc#g" Makefile
     make
 }

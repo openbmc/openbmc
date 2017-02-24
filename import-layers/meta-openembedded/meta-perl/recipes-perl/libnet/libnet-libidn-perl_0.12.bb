@@ -30,5 +30,5 @@ inherit cpan
 FILES_${PN}-dbg += "${libdir}/perl/vendor_perl/*/auto/Net/LibIDN/.debug/"
 
 do_configure_prepend() {
-	rm -rf ${S}/.pc/
+    rm -rf ${S}/.pc/
 }

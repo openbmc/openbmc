@@ -1,0 +1,17 @@
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+
+diff --git a/Makefile b/Makefile
+index 951b617..6d9b73d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -22,7 +22,7 @@ static: $(OBJECTS)
+ 	$(AR) cru libx86.a $(OBJECTS)
+ 
+ shared: $(OBJECTS)
+-	$(CC) $(CFLAGS) -o libx86.so.1 -shared -Wl,-soname,libx86.so.1 $(OBJECTS)
++	$(CC) $(CFLAGS) $(LDFLAGS) -o libx86.so.1 -shared -Wl,-soname,libx86.so.1 $(OBJECTS)
+ 
+ objclean:
+ 	$(MAKE) -C x86emu clean

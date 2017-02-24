@@ -2,8 +2,8 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 SYSTEMD_PACKAGES += "dhcp-client"
-SYSTEMD_SERVICE_dhcp-client = "dhclient.service"
-SYSTEMD_AUTO_ENABLE_dhcp-client = "disable"
+SYSTEMD_SERVICE_${PN}-client = "dhclient.service"
+SYSTEMD_AUTO_ENABLE_${PN}-client = "disable"
 
 FILES_${PN}-client += "${systemd_unitdir}/system/dhclient.service"
 RPROVIDES_dhcp-server += "dhcp-server-systemd"

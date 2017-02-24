@@ -2,7 +2,6 @@ DESCRIPTION = "Python Jinja2: A small but fast and easy to use stand-alone templ
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=20c831f91dd3bd486020f672ba2be386"
 
-PR = "r0"
 PYPI_PACKAGE = "Jinja2"
 
 SRC_URI[md5sum] = "edb51693fe22c53cee5403775c71a99e"

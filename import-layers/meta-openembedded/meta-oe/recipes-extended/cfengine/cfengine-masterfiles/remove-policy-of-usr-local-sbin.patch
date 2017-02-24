@@ -1,0 +1,28 @@
+Upstream-Status: Inappropriate [configuration]
+
+Directory /usr/local is not used for us. Remove the policy that not to install
+binaries to /usr/local/sbin.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+diff --git a/cfe_internal/update/update_bins.cf b/cfe_internal/update/update_bins.cf
+index 1796caa..697af0d 100644
+--- a/cfe_internal/update/update_bins.cf
++++ b/cfe_internal/update/update_bins.cf
+@@ -55,16 +55,6 @@ bundle agent cfe_internal_bins
+       depth_search => u_recurse_basedir("inf"),
+       action => u_immediate;
+ 
+-      "/usr/local/sbin/$(agents)"
+-      comment => "Create symlinks of CFE binaries in /usr/local/sbin",
+-      handle => canonify("cfe_internal_bins_files_sbin_$(agents)"),
+-      move_obstructions => "true",
+-      link_from => u_ln_s("$(sys.workdir)/bin/$(agents)");
+-
+-      "/usr/local/sbin/$(agents).cfsaved"
+-      comment => "Remove all .cfsaved file extension",
+-      handle => canonify("cfe_internal_bins_files_remove_$(agent)_cfsaved"),
+-      delete => u_tidy;
+ }
+ 
+ bundle agent cfe_internal_update_bins

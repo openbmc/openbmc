@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=dc7371b50816c96e145fa0f8ade8e24d \
 
 SECTION = "libs"
 
-DEPENDS= "libxml2 bzip2 glib-2.0 zlib"
+DEPENDS= "libxml2 bzip2 glib-2.0 zlib intltool-native"
 
 inherit autotools pkgconfig gnome gconf gobject-introspection
 
@@ -24,6 +24,6 @@ EXTRA_OECONF = "\
     --with-bz2 \
 "
 
-RDEPENDS_${PN} = "gconf" 
+RDEPENDS_${PN} = "gconf"
 
 FILES_${PN} += "${datadir}/thumbnailers"

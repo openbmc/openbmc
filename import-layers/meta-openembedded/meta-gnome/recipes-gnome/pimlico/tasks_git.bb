@@ -7,3 +7,6 @@ PV = "0.13+git${SRCPV}"
 PR = "r3"
 
 S = "${WORKDIR}/git"
+
+# ../../git/libkoto/koto-utils.c:81:3: error: format not a string literal, argument types not checked [-Werror=format-nonliteral]
+PNBLACKLIST[tasks] ?= "Fails to build with gcc-6"

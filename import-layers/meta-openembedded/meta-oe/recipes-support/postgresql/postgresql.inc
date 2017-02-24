@@ -31,8 +31,6 @@ SRC_URI = "http://ftp.postgresql.org/pub/source/v${PV}/${BP}.tar.bz2 \
     file://postgresql-setup \
     file://postgresql.service \
     file://0001-Use-pkg-config-for-libxml2-detection.patch \
-    file://postgresql-CVE-2016-0766.patch \
-    file://postgresql-CVE-2016-0773.patch \
 "
 
 LEAD_SONAME = "libpq.so"
@@ -41,6 +39,8 @@ LEAD_SONAME = "libpq.so"
 export LDFLAGS_SL = "${LDFLAGS}"
 
 inherit autotools pkgconfig perlnative pythonnative useradd update-rc.d systemd
+
+CFLAGS += "-I${STAGING_INCDIR}/${PYTHON_DIR}"
 
 SYSTEMD_SERVICE_${PN} = "postgresql.service"
 SYSTEMD_AUTO_ENABLE_${PN} = "disable"
@@ -111,12 +111,6 @@ python populate_packages_prepend() {
 }
 
 do_configure() {
-    # do_configure_prepend
-    # make sure configure finds python includdirs with these envs
-    export BUILD_SYS=${BUILD_SYS} HOST_SYS=${HOST_SYS} \
-           STAGING_INCDIR=${STAGING_INCDIR} \
-           STAGING_LIBDIR=${STAGING_LIBDIR}
-
     # do_configure
     autotools_do_configure
 
@@ -181,7 +175,7 @@ do_install_append() {
 
     # install COPYRIGHT README HISTORY
     install -d -m 0755 ${D}${docdir}/${BPN}
-    for i in ${B}/{COPYRIGHT,README,HISTORY} ${B}/doc/{KNOWN_BUGS,MISSING_FEATURES,README*,bug.template}; do
+    for i in ${B}/COPYRIGHT ${B}/README ${B}/HISTORY ${B}/doc/KNOWN_BUGS ${B}/doc/MISSING_FEATURES ${B}/doc/README* ${B}/doc/bug.template; do
         [ -f $i ] && install $i ${D}${docdir}/${BPN}
     done
 

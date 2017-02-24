@@ -15,8 +15,6 @@ DEPENDS += "cups python libusb"
 
 inherit autotools-brokensep python-dir pythonnative pkgconfig
 
-export BUILD_SYS
-export HOST_SYS
 export STAGING_INCDIR
 export STAGING_LIBDIR
 

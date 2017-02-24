@@ -1,0 +1,19 @@
+diff --git a/plugins.d/charts.d.plugin b/plugins.d/charts.d.plugin
+index 40c0356..bca57b3 100755
+--- a/plugins.d/charts.d.plugin
++++ b/plugins.d/charts.d.plugin
+@@ -184,10 +184,10 @@ fi
+ # timeout command we use, providing a function that
+ # can emulate the timeout command we need:
+ # > timeout SECONDS command ...
+-if [ $check_for_timeout -eq 1 ]
+-	then
+-	require_cmd timeout || exit 1
+-fi
++#if [ $check_for_timeout -eq 1 ]
++#	then
++#	require_cmd timeout || exit 1
++#fi
+
+ # -----------------------------------------------------------------------------
+ # internal checks

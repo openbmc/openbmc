@@ -1,0 +1,44 @@
+From 0690452b863286e524d2037427816b7850301f93 Mon Sep 17 00:00:00 2001
+From: Haiqing Bai <Haiqing.Bai@windriver.com>
+Date: Tue, 6 Sep 2016 09:27:38 +0800
+Subject: [PATCH] networkmanager: fixed issues of
+ NetworkManager-wait-online.service.in.
+
+Remove network.target in "Before" to avoid circle dependency.
+Wants=network.target
+Before=network.target network-online.target
+
+Correct the "WantedBy" to network-online.target.
+
+Upstream-status: Pending
+
+Signed-off-by: Haiqing Bai <Haiqing.Bai@windriver.com>
+---
+ data/NetworkManager-wait-online.service.in | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/data/NetworkManager-wait-online.service.in b/data/NetworkManager-wait-online.service.in
+index 6ad6942..1753d20 100644
+--- a/data/NetworkManager-wait-online.service.in
++++ b/data/NetworkManager-wait-online.service.in
+@@ -1,13 +1,14 @@
+ [Unit]
+ Description=Network Manager Wait Online
++Documentation=man:nm-online(1)
+ Requisite=NetworkManager.service
+ After=NetworkManager.service
+-Wants=network.target
+-Before=network.target network-online.target
++Before=network-online.target
+ 
+ [Service]
+ Type=oneshot
+ ExecStart=@bindir@/nm-online -s -q --timeout=30
++RemainAfterExit=yes
+ 
+ [Install]
+-WantedBy=multi-user.target
++WantedBy=network-online.target
+-- 
+1.9.1
+

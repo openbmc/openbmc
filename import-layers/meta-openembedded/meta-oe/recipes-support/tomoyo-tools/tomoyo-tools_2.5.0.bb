@@ -22,9 +22,9 @@ DEPENDS = "linux-libc-headers ncurses"
 EXTRA_OEMAKE = "-e USRLIBDIR=${libdir}"
 
 do_compile () {
-	oe_runmake 'CC=${CC}'
+    oe_runmake 'CC=${CC}'
 }
 
 do_install() {
-	oe_runmake install INSTALLDIR=${D}
+    oe_runmake install INSTALLDIR=${D}
 }

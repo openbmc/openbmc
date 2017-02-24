@@ -1,0 +1,24 @@
+diff -aur glcompbench-2012.08/src/libmatrix/shader-source.cc Fixed/src/libmatrix/shader-source.cc
+--- glcompbench-2012.08/src/libmatrix/shader-source.cc	2012-08-22 13:41:36.000000000 -0500
++++ Fixed/src/libmatrix/shader-source.cc	2016-08-24 14:23:49.576023317 -0500
+@@ -34,7 +34,7 @@
+ bool
+ ShaderSource::load_file(const std::string& filename, std::string& str)
+ {
+-    std::auto_ptr<std::istream> is_ptr(Util::get_resource(filename));
++    std::unique_ptr<std::istream> is_ptr(Util::get_resource(filename));
+     std::istream& inputFile(*is_ptr);
+ 
+     if (!inputFile)
+diff -aur glcompbench-2012.08/src/texture.cc Fixed/src/texture.cc
+--- glcompbench-2012.08/src/texture.cc	2012-08-22 13:41:36.000000000 -0500
++++ Fixed/src/texture.cc	2016-08-24 14:23:28.223917438 -0500
+@@ -52,7 +52,7 @@
+ 
+         Log::debug("Reading PNG file %s\n", filename.c_str());
+ 
+-        const std::auto_ptr<std::istream> is_ptr(Util::get_resource(filename));
++        const std::unique_ptr<std::istream> is_ptr(Util::get_resource(filename));
+         if (!(*is_ptr)) {
+             Log::error("Cannot open file %s!\n", filename.c_str());
+             return false;

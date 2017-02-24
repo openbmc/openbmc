@@ -26,7 +26,7 @@ PACKAGECONFIG[elementary] = "--enable-efl-tests,--disable-efl-tests,elementary"
 PACKAGECONFIG[gtk+3] = "--enable-gtk-tests,--disable-gtk-tests,gtk+3"
 
 do_install_append() {
-	rm -f ${D}/${libdir}/weston/*.la
+    rm -f ${D}/${libdir}/weston/*.la
 }
 
 FILES_${PN} += "${bindir}/wfits ${libdir}/weston/*.so"

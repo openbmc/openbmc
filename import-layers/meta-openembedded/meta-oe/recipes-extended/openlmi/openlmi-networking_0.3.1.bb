@@ -6,7 +6,7 @@ HOMEPAGE = "http://www.openlmi.org/"
 LICENSE = "LGPL-2.1+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=7c13b3376cea0ce68d2d2da0a1b3a72c"
 SECTION = "System/Management"
-DEPENDS = "openlmi-providers konkretcmpi sblim-cmpi-devel cim-schema-exper networkmanager dbus libcheck glib-2.0"
+DEPENDS = "openlmi-providers konkretcmpi konkretcmpi-native sblim-cmpi-devel cim-schema-exper networkmanager dbus libcheck glib-2.0"
 
 SRC_URI = "http://fedorahosted.org/released/${BPN}/${BP}.tar.gz \
            file://0001-fix-lib64-can-not-be-shiped-in-64bit-target.patch \

@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=0636e73ff0215e8d672dc4c32c317bb3"
 
 SRC_URI = "http://www.gnokii.org/download/gnokii/gnokii-${PV}.tar.bz2"
 
-DEPENDS = "glib-2.0"
+DEPENDS = "glib-2.0 intltool-native"
 X11DEPENDS = " libxpm gtk+"
 
 PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)}"
@@ -24,8 +24,9 @@ EXTRA_OECONF = "--disable-smsd"
 
 FILES_${PN} = "${bindir} ${sbindir}"
 FILES_libgnokii-dev = "${includedir} ${libdir}/lib*.so ${libdir}/*.la \
-                ${libdir}/*.a ${libdir}/*.o ${libdir}/pkgconfig \
-	        /lib/*.a /lib/*.o ${datadir}/aclocal"
+    ${libdir}/*.a ${libdir}/*.o ${libdir}/pkgconfig \
+    /lib/*.a /lib/*.o ${datadir}/aclocal \
+"
 FILES_${PN}-dev = ""
 FILES_libgnokii = "${libdir}/libgnokii.so.*"
 

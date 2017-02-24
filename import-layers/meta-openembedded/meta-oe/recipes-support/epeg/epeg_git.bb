@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=e7732a9290ea1e4b034fdc15cf49968d \
 DEPENDS = "jpeg libexif"
 
 SRC_URI = "git://github.com/mattes/epeg.git"
-SRCREV = "d78becc558a682f1be0a78b1af90d1b4a08e5b4e"
+SRCREV = "337f55346425fbf2d283e794b702318ef2a74bcb"
 S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig

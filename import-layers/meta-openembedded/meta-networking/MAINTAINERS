@@ -2,18 +2,18 @@ This file contains a list of maintainers for the meta-networking layer.
 
 Please submit any patches against meta-networking to the OpenEmbedded
 development mailing list (openembedded-devel@lists.openembedded.org) with
-'[meta-networking][krogoth]' in the subject.
+'[meta-networking]' in the subject.
 
 When sending single patches, please use something like:
 
    git send-email -1 -M \
         --to openembedded-devel@lists.openembedded.org \
-        --subject-prefix=meta-networking][krogoth][PATCH
-
-krogoth Branch Maintainer:
-Armin Kuster <akuster808@gmail.com>
+        --subject-prefix=meta-networking][morty][PATCH
 
 You may also contact the maintainers directly.
+
+morty branch maintainer(s):
+Armin Kuster <akuster808@gmail.com>
 
 Descriptions of section entries:
 

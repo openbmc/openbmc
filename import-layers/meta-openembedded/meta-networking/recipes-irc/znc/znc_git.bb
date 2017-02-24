@@ -21,6 +21,9 @@ S = "${WORKDIR}/git"
 
 inherit autotools-brokensep pkgconfig
 
+PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', 'ipv6', '', d)}"
+PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,"
+
 # ZNC has a custom autogen.sh that states that this command is needed *and* expected to fail
 do_configure_prepend() {
     automake --add-missing || true

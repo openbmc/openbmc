@@ -22,7 +22,7 @@ do_configure() {
     cp -R --no-dereference --preserve=mode,links -v ${S}/autoconf/configure.in ${S}
 
     if ! [ -d ${S}/platforms/${DISTRO} ] ; then
-        cp -R --no-dereference --preserve=mode,links -v ${S}/platforms/unknown ${S}/platforms/${DISTRO} 
+        cp -R --no-dereference --preserve=mode,links -v ${S}/platforms/unknown ${S}/platforms/${DISTRO}
     fi
 
     gnu-configize --force
