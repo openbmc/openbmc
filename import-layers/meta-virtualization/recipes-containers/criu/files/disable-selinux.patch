@@ -1,0 +1,26 @@
+Upstream-Status: Inappropriate [disable feature]
+
+It shows warning when build crius if libselinux has been built already:
+
+  WARNING: QA Issue: criu rdepends on libselinux, but it isn't a build dependency? [build-deps]
+
+Apply this patch to disable selinux support when 'selinux' is not in PACKAGECONF.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+diff --git a/Makefile.config b/Makefile.config
+index ce4b8d8..3ac2780 100644
+--- a/Makefile.config
++++ b/Makefile.config
+@@ -8,11 +8,6 @@ ifeq ($(call try-cc,$(LIBBSD_DEV_TEST),-lbsd),y)
+ 	DEFINES += -DCONFIG_HAS_LIBBSD
+ endif
+ 
+-ifeq ($(call pkg-config-check,libselinux),y)
+-	LIBS := -lselinux $(LIBS)
+-	DEFINES += -DCONFIG_HAS_SELINUX
+-endif
+-
+ $(CONFIG): scripts/utilities.mak scripts/feature-tests.mak include/config-base.h
+ 	$(E) "  GEN     " $@
+ 	$(Q) @echo '#ifndef __CR_CONFIG_H__' > $@

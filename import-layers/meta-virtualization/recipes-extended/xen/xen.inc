@@ -3,7 +3,7 @@ HOMEPAGE = "http://xen.org"
 LICENSE = "GPLv2"
 SECTION = "console/tools"
 
-LIC_FILES_CHKSUM = "file://COPYING;md5=a6260c12cd5de27e80d89ae18e48d20a"
+LIC_FILES_CHKSUM = "file://COPYING;md5=bbb4b1bdc2c3b6743da3c39d03249095"
 
 COMPATIBLE_HOST = '(x86_64.*).*-linux|aarch64.*-linux'
 
@@ -52,6 +52,7 @@ DEPENDS = " \
     xz \
     yajl \
     zlib \
+    gnu-efi \
     "
 
 # inherit setuptools adds python to RDEPENDS, override it
@@ -151,6 +152,7 @@ PACKAGES = "\
     ${PN}-base \
     ${PN}-blktap \
     ${PN}-console \
+    ${PN}-cpuid \
     ${PN}-dbg \
     ${PN}-dev \
     ${PN}-devd \
@@ -196,6 +198,7 @@ PACKAGES = "\
     ${PN}-libxenvchan-dev \
     ${PN}-libxlutil \
     ${PN}-libxlutil-dev \
+    ${PN}-livepatch \
     ${PN}-misc \
     ${PN}-pygrub \
     ${PN}-python \
@@ -369,6 +372,10 @@ FILES_${PN}-console = "\
     ${sbindir}/xenconsoled \
     "
 
+FILES_${PN}-cpuid = "\
+    ${bindir}/xen-cpuid \
+    "
+
 FILES_${PN}-devd = "\
     ${sysconfdir}/init.d/xendriverdomain \
     "
@@ -397,6 +404,10 @@ FILES_${PN}-hvmloader = "\
 
 FILES_${PN}-kdd = "\
     ${sbindir}/kdd \
+    "
+
+FILES_${PN}-livepatch += " \
+    ${sbindir}/xen-livepatch \
     "
 
 FILES_${PN}-misc = "\
@@ -527,6 +538,7 @@ FILES_${PN}-remus = "\
     "
 
 FILES_${PN}-scripts-network = " \
+    ${sysconfdir}/xen/scripts/colo-proxy-setup \
     ${sysconfdir}/xen/scripts/network-bridge \
     ${sysconfdir}/xen/scripts/network-nat \
     ${sysconfdir}/xen/scripts/network-route \
@@ -544,6 +556,7 @@ FILES_${PN}-scripts-block = " \
     ${sysconfdir}/xen/scripts/blktap \
     ${sysconfdir}/xen/scripts/block \
     ${sysconfdir}/xen/scripts/block-common.sh \
+    ${sysconfdir}/xen/scripts/block-dummy \
     ${sysconfdir}/xen/scripts/block-enbd \
     ${sysconfdir}/xen/scripts/block-iscsi \
     ${sysconfdir}/xen/scripts/block-nbd \
@@ -667,6 +680,7 @@ FILES_${PN}-xm = "\
 FILES_${PN}-xencommons += "\
     ${sysconfdir}/default/xencommons \
     ${sysconfdir}/init.d/xencommons \
+    ${sysconfdir}/xen/scripts/launch-xenstore \
     ${systemd_unitdir}/modules-load.d/xen.conf \
     ${systemd_unitdir}/system/proc-xen.mount \
     ${systemd_unitdir}/system/xen-qemu-dom0-disk-backend.service \
@@ -744,9 +758,11 @@ export XEN_OS = "Linux"
 
 # this is used for the header (#!${bindir}/python) of the install python scripts
 export PYTHONPATH="${bindir}/python"
+export ac_cv_path_PYTHONPATH="${bindir}/python"
 
-# seabios forcefully sets HOSTCC to CC - fixup to allow it to build native conf executable
+# xen and seabios require HOSTCC and HOSTCXX set to cross-compile
 export HOSTCC="${BUILD_CC}"
+export HOSTCXX="${BUILD_CXX}"
 
 # make xen requires CROSS_COMPILE set by hand as it does not abide by ./configure
 export CROSS_COMPILE="${TARGET_PREFIX}"
@@ -825,6 +841,13 @@ do_stubs() {
 
 addtask stubs after do_configure before do_compile
 
+# Allow all hypervisor settings in a defconfig
+EXTRA_OEMAKE += "XEN_CONFIG_EXPERT=y"
+# Build release versions always. Technically since we track release
+# tarballs this always happens but occasionally people pull in patches
+# from staging that reverts this
+EXTRA_OEMAKE += "debug=n"
+
 do_configure() {
 
     #./configure --enable-xsmpolicy does not set XSM_ENABLE must be done manually
@@ -832,11 +855,19 @@ do_configure() {
         echo "XSM_ENABLE := y" > ${S}/.config
     fi
 
+    if [ -f "${WORKDIR}/defconfig" ]; then
+        cp "${WORKDIR}/defconfig" "${B}/xen/.config" || \
+        bbfatal "Unable to copy defconfig to .config"
+    fi
+
     # do configure
     oe_runconf
 }
 
 do_compile() {
+    # workaround for build bug when CFLAGS is exported
+    # https://www.mail-archive.com/xen-devel@lists.xen.org/msg67822.html
+    unset CFLAGS
     oe_runmake
 }
 

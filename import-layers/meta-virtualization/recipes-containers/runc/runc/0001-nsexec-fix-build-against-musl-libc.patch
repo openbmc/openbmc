@@ -1,0 +1,48 @@
+From ac6bd953192fa6752a07be7501f69f7cffe33e8e Mon Sep 17 00:00:00 2001
+From: Natanael Copa <natanael.copa@docker.com>
+Date: Tue, 19 Apr 2016 10:43:00 +0200
+Subject: [PATCH] nsexec: fix build against musl libc
+
+Remove a wrongly added include which was added in commit 3c2e77ee (Add a
+compatibility header for CentOS/RHEL 6, 2016-01-29) apparently to
+fix this compile error on centos 6:
+
+> In file included from
+> Godeps/_workspace/src/github.com/opencontainers/runc/libcontainer/nsenter/nsexec.c:20:
+> /usr/include/linux/netlink.h:35: error: expected specifier-qualifier-list before 'sa_family_t'
+
+The glibc bits/sockaddr.h says that this header should never be included
+directly[1]. Instead, sys/socket.h should be used.
+
+The problem was correctly fixed later, in commit 394fb55 (Fix build
+error on centos6, 2016-03-02) so the incorrect bits/sockaddr.h can
+safely be removed.
+
+This is needed to build musl libc.
+
+Fixes #761
+
+[1]: https://github.molgen.mpg.de/git-mirror/glibc/blob/20003c49884422da7ffbc459cdeee768a6fee07b/bits/sockaddr.h#L20
+
+Signed-off-by: Natanael Copa <natanael.copa@docker.com>
+Signed-off-by: Paul Barker <paul@paulbarker.me.uk>
+Upstream-status: Backport
+---
+ libcontainer/nsenter/nsexec.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/libcontainer/nsenter/nsexec.c b/libcontainer/nsenter/nsexec.c
+index 8f37d6c..40a8f89 100644
+--- a/libcontainer/nsenter/nsexec.c
++++ b/libcontainer/nsenter/nsexec.c
+@@ -18,7 +18,6 @@
+ #include <unistd.h>
+ #include <grp.h>
+ 
+-#include <bits/sockaddr.h>
+ #include <linux/types.h>
+ 
+ // All arguments should be above the stack because it grows down
+-- 
+2.1.4
+

@@ -1,0 +1,24 @@
+Xen
+---
+
+For any issues with the xen recipes please make sure you CC cardoe@gentoo.org
+
+configuring the hypervisor
+--------------------------
+
+Since 4.7.0 Xen supports using Kconfig to configure the hypervisor. Similarly
+to how the recipe for busybox works, you can provide a .config as a defconfig
+to override the default configuration of the hypervisor. The easiest way
+for you to take advantage of this is to create a .config for Xen and then
+copy it to your Yocto layer as 'defconfig' inside of
+'recipes-extended/xen/files/' and then create a bbappend adding
+'file://defconfig' to your SRC_URI.
+
+security patches
+----------------
+
+The base recipe does not include security fixes that the Xen community releases
+as XSAs (http://xenbits.xen.org/xsa/). The easiest way to include those is to
+drop patches in 'recipes-extened/xen/files' and create a bbappend adding those
+patches to SRC_URI and they will be applied. Alternatively, you can override
+the SRC_URI to a git repo you provide that contains the patches.
