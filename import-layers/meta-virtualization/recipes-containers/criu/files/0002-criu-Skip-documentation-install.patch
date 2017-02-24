@@ -1,29 +1,28 @@
-From e9c2a94b9eb37ad24672b10caa398bd18282b962 Mon Sep 17 00:00:00 2001
-From: Yang Shi <yang.shi@windriver.com>
-Date: Tue, 26 Aug 2014 14:44:51 -0700
+From 07d9b3d0c372e45127dd51781d9564e8bee90dbe Mon Sep 17 00:00:00 2001
+From: Jianchuan Wang <jianchuan.wang@windriver.com>
+Date: Tue, 16 Aug 2016 09:42:24 +0800
 Subject: [PATCH 2/2] criu: Skip documentation install
 
 asciidoc is needed to generate CRIU documentation, so skip it in install.
 
-Signed-off-by: Yang Shi <yang.shi@windriver.com>
-Signed-off-by: Nam Ninh <nam.ninh@windriver.com>
+Signed-off-by: Jianchuan Wang <jianchuan.wang@windriver.com>
 ---
- Makefile | 2 +-
+ Makefile.install | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Makefile b/Makefile
-index 43252ec..e25edcc 100644
---- a/Makefile
-+++ b/Makefile
-@@ -265,7 +265,7 @@ install: $(PROGRAM) install-man
- 	$(Q) install -m 644 scripts/logrotate.d/criu-service $(DESTDIR)$(LOGROTATEDIR)
+diff --git a/Makefile.install b/Makefile.install
+index a30dc96..33143fb 100644
+--- a/Makefile.install
++++ b/Makefile.install
+@@ -22,7 +22,7 @@ install-tree:
+ .PHONY: install-tree
  
  install-man:
 -	$(Q) $(MAKE) -C Documentation install
 +#	$(Q) $(MAKE) -C Documentation install
+ .PHONY: install-man
  
- .PHONY: install install-man
- 
+ install-lib: lib
 -- 
-2.0.2
+2.7.4
 

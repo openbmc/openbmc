@@ -11,21 +11,22 @@ LICENSE = "GPLv2"
 
 EXCLUDE_FROM_WORLD = "1"
 
-LIC_FILES_CHKSUM = "file://COPYING;md5=5cc804625b8b491b6b4312f0c9cb5efa"
+LIC_FILES_CHKSUM = "file://COPYING;md5=412de458544c1cb6a2b512cd399286e2"
 
-SRCREV = "4c5b23e52c1dc4e3fbbc7472b92e7b1ce9d22f02"
+SRCREV = "c031417255f6a5c4409d15ff0b36af5f6e90c559"
 PR = "r0"
-PV = "1.6+git${SRCPV}"
+PV = "2.5+git${SRCPV}"
 
 SRC_URI = "git://github.com/xemul/criu.git;protocol=git \
-	   file://0001-criu-Fix-toolchain-hardcode.patch \
-	   file://0002-criu-Skip-documentation-install.patch \
-       file://0001-criu-Change-libraries-install-directory.patch \
-	  "
+           file://0001-criu-Fix-toolchain-hardcode.patch \
+           file://0002-criu-Skip-documentation-install.patch \
+           file://0001-criu-Change-libraries-install-directory.patch \
+           ${@bb.utils.contains('PACKAGECONFIG', 'selinux', '', 'file://disable-selinux.patch', d)} \
+          "
 
 COMPATIBLE_HOST = "(x86_64|arm|aarch64).*-linux"
 
-DEPENDS += "protobuf-c-native protobuf-c"
+DEPENDS += "libnl libcap protobuf-c-native protobuf-c"
 
 S = "${WORKDIR}/git"
 
@@ -34,14 +35,16 @@ S = "${WORKDIR}/git"
 # if the ARCH is ARMv7 or ARMv6.
 # ARM BSPs need set CRIU_BUILD_ARCH variable for building CRIU.
 #
-EXTRA_OEMAKE_arm += "ARCH=${CRIU_BUILD_ARCH} WERROR=0"
-EXTRA_OEMAKE_x86-64 += "ARCH=${TARGET_ARCH} WERROR=0"
-EXTRA_OEMAKE_aarch64 += "ARCH=${TARGET_ARCH} WERROR=0"
+EXTRA_OEMAKE_arm += "ARCH=arm UNAME-M=${CRIU_BUILD_ARCH} WERROR=0"
+EXTRA_OEMAKE_x86-64 += "ARCH=x86 WERROR=0"
+EXTRA_OEMAKE_aarch64 += "ARCH=arm64 WERROR=0"
 
 EXTRA_OEMAKE_append += "SBINDIR=${sbindir} LIBDIR=${libdir} INCLUDEDIR=${includedir} PIEGEN=no"
 EXTRA_OEMAKE_append += "LOGROTATEDIR=${sysconfdir} SYSTEMDUNITDIR=${systemd_unitdir}"
 
-CFLAGS += "-D__USE_GNU -D_GNU_SOURCE"
+CFLAGS += "-D__USE_GNU -D_GNU_SOURCE " 
+
+CFLAGS += " -I${STAGING_INCDIR} -I${STAGING_INCDIR}/libnl3"
 
 # overide LDFLAGS to allow criu to build without: "x86_64-poky-linux-ld: unrecognized option '-Wl,-O1'"
 export LDFLAGS=""
@@ -51,9 +54,12 @@ export HOST_SYS
 
 inherit setuptools
 
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[selinux] = ",,libselinux"
+
 do_compile_prepend() {
-    rm -rf ${S}/protobuf/google/protobuf/descriptor.proto
-    ln -s  ${PKG_CONFIG_SYSROOT_DIR}/usr/include/google/protobuf/descriptor.proto ${S}/protobuf/google/protobuf/descriptor.proto
+    rm -rf ${S}/images/google/protobuf/descriptor.proto
+    ln -s  ${PKG_CONFIG_SYSROOT_DIR}/usr/include/google/protobuf/descriptor.proto ${S}/images/google/protobuf/descriptor.proto
 }
 
 do_compile () {

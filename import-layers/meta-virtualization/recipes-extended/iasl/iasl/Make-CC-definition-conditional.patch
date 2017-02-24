@@ -1,0 +1,29 @@
+[PATCH] Make CC definition conditional
+
+Upstream-Status: pending
+
+By hardcoding CC's definition to gcc, make this packages unable to
+cross-compile. the -e options of make can not override the CC since
+it is not defined in Makefile, but in Makefile.config
+
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+---
+ generate/unix/Makefile.config | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/generate/unix/Makefile.config b/generate/unix/Makefile.config
+index 8d41399..72d597d 100644
+--- a/generate/unix/Makefile.config
++++ b/generate/unix/Makefile.config
+@@ -35,7 +35,7 @@
+ .SUFFIXES :
+ PROGS = acpibin acpidump acpiexamples acpiexec acpihelp acpinames acpisrc acpixtract iasl
+ HOST ?= _CYGWIN
+-CC =    gcc
++CC ?=    gcc
+ 
+ #
+ # Common defines
+-- 
+1.9.1
+
