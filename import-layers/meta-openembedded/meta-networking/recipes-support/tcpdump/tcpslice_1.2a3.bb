@@ -22,15 +22,15 @@ DEPENDS += "libpcap"
 # cross-compilation options to configure!
 #
 do_configure () {
-	oe_runconf \
-            --srcdir="." \
-            ac_cv_build=${BUILD_SYS} \
-            ac_cv_host=${HOST_SYS} \
-            ac_cv_target=${HOST_SYS}
+    oe_runconf \
+        --srcdir="." \
+        ac_cv_build=${BUILD_SYS} \
+        ac_cv_host=${HOST_SYS} \
+        ac_cv_target=${HOST_SYS}
 }
 
 do_install () {
-	mkdir -p ${D}/usr/sbin
-	install -c -m 555 tcpslice ${D}/usr/sbin
+    mkdir -p ${D}/usr/sbin
+    install -c -m 555 tcpslice ${D}/usr/sbin
 }
 

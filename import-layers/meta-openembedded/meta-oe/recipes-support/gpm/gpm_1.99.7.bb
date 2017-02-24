@@ -13,6 +13,7 @@ SRC_URI = "ftp://arcana.linux.it/pub/gpm/gpm-${PV}.tar.bz2 \
            file://no-docs.patch \
            file://processcreds.patch \
            file://eglibc-2.17.patch \
+           file://remove_nested_functions.patch \
            file://init"
 
 inherit autotools-brokensep update-rc.d

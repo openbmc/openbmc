@@ -1,0 +1,35 @@
+From 0fabde0515e180c53961c27346dd7a79cffa4c1f Mon Sep 17 00:00:00 2001
+From: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
+Date: Thu, 11 Aug 2016 11:49:36 +0200
+Subject: [PATCH] configure.ac: Allow user to disable gflags
+
+Under some circumstances like cross-compilation, the user might not want
+to enable support for gflags.
+
+This patch allows support for --without-gflags
+
+Signed-off-by: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
+---
+ configure.ac | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 7b4d21e7ae8a..eba5e5cda1ea 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -136,7 +136,11 @@ AC_ARG_WITH(gflags, AS_HELP_STRING[--with-gflags=GFLAGS_DIR],
+   CFLAGS="$CFLAGS $GFLAGS_CFLAGS"
+   LIBS="$LIBS $GFLAGS_LIBS"
+ )
+-AC_CHECK_LIB(gflags, main, ac_cv_have_libgflags=1, ac_cv_have_libgflags=0)
++if test x"$with_gflags" = x"no"; then
++  ac_cv_have_libgflags=0
++else
++  AC_CHECK_LIB(gflags, main, ac_cv_have_libgflags=1, ac_cv_have_libgflags=0)
++fi
+ if test x"$ac_cv_have_libgflags" = x"1"; then
+   AC_DEFINE(HAVE_LIB_GFLAGS, 1, [define if you have google gflags library])
+   if test x"$GFLAGS_LIBS" = x""; then
+-- 
+2.8.1
+

@@ -1,0 +1,63 @@
+From 9c226fbc6a42540cb492fcfcb81ff16fffb086d6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Tue, 30 Aug 2016 23:24:53 +0200
+Subject: [PATCH] configure.ac: header detection of hash_map is broken - pin to
+ correct implementation
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ configure.ac | 31 ++++---------------------------
+ 1 file changed, 4 insertions(+), 27 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 4f2118e..16c09d5 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -252,35 +252,12 @@ AC_SUBST(GTKMATHVIEW_SIZEOF_WCHAR_T, "$ac_cv_sizeof_wchar_t")
+ 
+ AC_LANG_PUSH(C++)
+ 
+-AC_CHECK_HEADERS(unordered_map,
+-	[
+-		AC_DEFINE(GMV_HAVE_UNORDERED_MAP,1,[Define if <unordered_map> is provided])
+-		GMV_HAVE_UNORDERED_MAP_CFLAGS=-DGMV_HAVE_UNORDERED_MAP=1
+-	],
+-	[
+-		GMV_HAVE_UNORDERED_MAP_CFLAGS=
+-	]
+-)
++GMV_HAVE_UNORDERED_MAP_CFLAGS=
+ AC_SUBST(GMV_HAVE_UNORDERED_MAP_CFLAGS)
+-AC_CHECK_HEADERS(hash_map,
+-	[
+-		AC_DEFINE(GMV_HAVE_HASH_MAP,1,[Define if <hash_map> is provided])
+-		GMV_HAVE_HASH_MAP_CFLAGS=-DGMV_HAVE_HASH_MAP=1
+-	],
+-	[
+-		GMV_HAVE_HASH_MAP_CFLAGS=
+-	]
+-)
++GMV_HAVE_HASH_MAP_CFLAGS=
+ AC_SUBST(GMV_HAVE_HASH_MAP_CFLAGS)
+-AC_CHECK_HEADERS(ext/hash_map,
+-	[
+-		AC_DEFINE(GMV_HAVE_EXT_HASH_MAP,1,[Define if <ext/hash_map> is provided])
+-		GMV_HAVE_EXT_HASH_MAP_CFLAGS=-DGMV_HAVE_EXT_HASH_MAP=1
+-	],
+-	[
+-		GMV_HAVE_EXT_HASH_MAP_CFLAGS=
+-	]
+-)
++AC_DEFINE(GMV_HAVE_EXT_HASH_MAP,1,[Define if <ext/hash_map> is provided])
++GMV_HAVE_EXT_HASH_MAP_CFLAGS=-DGMV_HAVE_EXT_HASH_MAP=1
+ AC_SUBST(GMV_HAVE_EXT_HASH_MAP_CFLAGS)
+ 
+ AC_MSG_CHECKING([whether the C++ compiler supports the standard character traits])
+-- 
+2.5.5
+

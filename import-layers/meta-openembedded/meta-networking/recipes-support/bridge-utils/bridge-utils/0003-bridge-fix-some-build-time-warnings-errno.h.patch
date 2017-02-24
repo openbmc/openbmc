@@ -1,0 +1,46 @@
+From 2b9dc245f93ab27d7da42a16ddbb9212888006e4 Mon Sep 17 00:00:00 2001
+From: root <git@andred.net>
+Date: Wed, 20 Jul 2016 23:40:33 +0100
+Subject: [PATCH 3/5] bridge: fix some build-time warnings (errno.h)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+There is a build-time warning at the moment when building
+against musl, as the code here #include's the wrong file,
+sys/errno.h instead of errno.h
+
+In file included from brctl.c:22:0:
+<sysroot>/usr/include/sys/errno.h:1:2: warning: #warning redirecting incorrect #include <sys/errno.h> to <errno.h> [-Wcpp]
+ #warning redirecting incorrect #include <sys/errno.h> to <errno.h>
+  ^~~~~~~
+
+glibc headers silently redirect sys/errno.h to errno.h so the
+issue is not seen there.
+
+Let's fix the #include's to so as to use the correct ones
+and silence the compiler.
+
+Upstream-Status: Pending
+
+Signed-off-by: André Draszik <git@andred.net>
+---
+ brctl/brctl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/brctl/brctl.c b/brctl/brctl.c
+index 46ca352..8855234 100644
+--- a/brctl/brctl.c
++++ b/brctl/brctl.c
+@@ -19,7 +19,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+-#include <sys/errno.h>
++#include <errno.h>
+ #include <getopt.h>
+ 
+ #include "libbridge.h"
+-- 
+2.8.1
+

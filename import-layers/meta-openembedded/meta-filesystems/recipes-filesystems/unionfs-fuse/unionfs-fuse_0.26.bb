@@ -11,7 +11,7 @@ SRC_URI[md5sum] = "689c636484756f6f7a728ef354cbeac2"
 SRC_URI[sha256sum] = "8d5c9dcb51ecb9a9b03890e16d17e37d602b0c1f23ed6a9ddec2b0f719c9f662"
 
 do_install() {
-	oe_runmake install DESTDIR=${D} PREFIX=${exec_prefix}
+    oe_runmake install DESTDIR=${D} PREFIX=${exec_prefix}
 }
 
 RDEPENDS_${PN} += "bash"

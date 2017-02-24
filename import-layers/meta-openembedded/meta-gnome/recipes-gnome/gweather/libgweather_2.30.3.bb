@@ -20,4 +20,5 @@ FILES_${PN} += "${datadir}/gnome* \
 PACKAGES =+ "${PN}-locationdata"
 FILES_${PN}-locationdata = "${datadir}/libgweather/Locations*"
 
-
+# http://errors.yoctoproject.org/Errors/Details/68608/
+PNBLACKLIST[libgweather] ?= "BROKEN: fails to build with gcc-6"

@@ -52,8 +52,8 @@ FILES_${PN}-dev += "${libdir}/gstreamer-${LIBV}/libresindvd.la"
 FILES_${PN}-voamrwbenc += "${datadir}/gstreamer-${LIBV}/presets/GstVoAmrwbEnc.prs"
 
 do_configure_prepend() {
-	# This m4 file contains nastiness which conflicts with libtool 2.2.2
-	rm ${S}/m4/lib-link.m4 || true
+    # This m4 file contains nastiness which conflicts with libtool 2.2.2
+    rm ${S}/m4/lib-link.m4 || true
 }
 
 SRC_URI[md5sum] = "fcb09798114461955260e4d940db5987"

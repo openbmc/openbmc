@@ -4,7 +4,9 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d791728a073bc009b4ffaf00b7599855"
 DEPENDS = "virtual/libx11 libxpm gtk+ libxfce4util libxfce4ui xfconf libwnck dbus-glib startup-notification exo-native"
 
-inherit xfce update-alternatives
+inherit xfce update-alternatives distro_features_check
+
+REQUIRED_DISTRO_FEATURES = "x11"
 
 SRC_URI += "file://0001-don-t-block-display-events-when-time-is-set-backward.patch"
 SRC_URI[md5sum] = "197ef087ca6a263627f1bea6d5a79d6f"

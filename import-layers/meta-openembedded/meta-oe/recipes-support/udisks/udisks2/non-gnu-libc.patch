@@ -1,0 +1,26 @@
+musl does not define __GNUC_PREREQ therefore check for C library being glibc
+if not then define the macro
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Index: udisks-2.1.7/udisks/udisksclient.c
+===================================================================
+--- udisks-2.1.7.orig/udisks/udisksclient.c
++++ udisks-2.1.7/udisks/udisksclient.c
+@@ -27,8 +27,15 @@
+ #include "udisksobjectinfo.h"
+ 
+ /* For __GNUC_PREREQ usage below */
+-#ifdef __GNUC__
++#ifdef __GLIBC__
+ # include <features.h>
++#else
++#if defined(__GNUC__)
++#define	__GNUC_PREREQ(__maj, __min)	\
++	(__GNUC__ > (__maj) || __GNUC__ == (__maj) && __GNUC_MINOR__ >= (__min))
++#else
++#define	__GNUC_PREREQ(__maj, __min) 0
++#endif
+ #endif
+ 
+ /**

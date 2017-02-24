@@ -8,7 +8,6 @@ hashing for multi-user applications."
 HOMEPAGE = "https://bitbucket.org/ecollins/passlib"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=bae8faa3e2689ee0df3f2127fc4517f5"
-PR = "r0"
 
 SRC_URI[md5sum] = "d2edd6c42cde136a538b48d90a06ad67"
 SRC_URI[sha256sum] = "a83d34f53dc9b17aa42c9a35c3fbcc5120f3fcb07f7f8721ec45e6a27be347fc"

@@ -1,0 +1,65 @@
+At least lcms wasn't deterministicly detected from sysroot.
+
+This will allow to export LCMS_ENABLED=False when lcms isn't in PACKAGECONFIG.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
+diff -uNr Imaging-1.1.7.orig/setup.py Imaging-1.1.7/setup.py
+--- Imaging-1.1.7.orig/setup.py	2013-07-22 10:17:02.081457075 +0200
++++ Imaging-1.1.7/setup.py	2013-07-22 13:10:09.029707492 +0200
+@@ -39,6 +39,12 @@
+ TIFF_ROOT = None
+ FREETYPE_ROOT =  os.environ['STAGING_LIBDIR'], os.environ['STAGING_INCDIR']
+ LCMS_ROOT = None
++TCL_ENABLED = os.getenv('TCL_ENABLED', "True")
++JPEG_ENABLED = os.getenv('JPEG_ENABLED', "True")
++ZLIB_ENABLED = os.getenv('ZLIB_ENABLED', "True")
++TIFF_ENABLED = os.getenv('TIFF_ENABLED', "True")
++FREETYPE_ENABLED = os.getenv('FREETYPE_ENABLED', "True")
++LCMS_ENABLED = os.getenv('LCMS_ENABLED', "True")
+ 
+ # FIXME: add mechanism to explicitly *disable* the use of a library
+ 
+@@ -220,22 +226,22 @@
+             zlib = jpeg = tiff = freetype = tcl = tk = lcms = None
+         feature = feature()
+ 
+-        if find_include_file(self, "zlib.h"):
++        if ZLIB_ENABLED == 'True' and find_include_file(self, "zlib.h"):
+             if find_library_file(self, "z"):
+                 feature.zlib = "z"
+             elif sys.platform == "win32" and find_library_file(self, "zlib"):
+                 feature.zlib = "zlib" # alternative name
+ 
+-        if find_include_file(self, "jpeglib.h"):
++        if JPEG_ENABLED == 'True' and find_include_file(self, "jpeglib.h"):
+             if find_library_file(self, "jpeg"):
+                 feature.jpeg = "jpeg"
+             elif sys.platform == "win32" and find_library_file(self, "libjpeg"):
+                 feature.jpeg = "libjpeg" # alternative name
+ 
+-        if find_library_file(self, "tiff"):
++        if TIFF_ENABLED == 'True' and find_library_file(self, "tiff"):
+             feature.tiff = "tiff"
+ 
+-        if find_library_file(self, "freetype"):
++        if FREETYPE_ENABLED == 'True' and find_library_file(self, "freetype"):
+             # look for freetype2 include files
+             freetype_version = 0
+             for dir in self.compiler.include_dirs:
+@@ -256,11 +262,11 @@
+                 if dir:
+                     add_directory(self.compiler.include_dirs, dir, 0)
+ 
+-        if find_include_file(self, "lcms.h"):
++        if LCMS_ENABLED == 'True' and find_include_file(self, "lcms.h"):
+             if find_library_file(self, "lcms"):
+                 feature.lcms = "lcms"
+ 
+-        if _tkinter and find_include_file(self, "tk.h"):
++        if TCL_ENABLED == 'True' and _tkinter and find_include_file(self, "tk.h"):
+             # the library names may vary somewhat (e.g. tcl84 or tcl8.4)
+             version = TCL_VERSION[0] + TCL_VERSION[2]
+             if find_library_file(self, "tcl" + version):

@@ -50,3 +50,6 @@ do_install () {
     # needed for xfsdump
     oe_runmake install-dev
 }
+
+# http://errors.yoctoproject.org/Errors/Details/83236/
+PNBLACKLIST[xfsprogs] ?= "BROKEN: Needs upgrade to 4.5.0 version to be compatible with Kernel uapi changes from 4.5"

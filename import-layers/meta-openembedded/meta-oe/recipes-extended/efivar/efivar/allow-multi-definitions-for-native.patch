@@ -1,0 +1,23 @@
+Upstream-Status: Pending
+
+It fails to create .so file when build efivar-native:
+
+| lib.o:(*IND*+0x0): multiple definition of `efi_set_variable'
+| lib.o:lib.c:(.text+0xa0): first defined here
+
+Add link option '-z muldefs' to fix it.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+diff --git a/Make.rules b/Make.rules
+index d9c0609..874bce0 100644
+--- a/Make.rules
++++ b/Make.rules
+@@ -20,6 +20,7 @@ include $(TOPDIR)/Make.version
+ 	$(CCLD) $(ccldflags) $(CPPFLAGS) $(SOFLAGS) \
+ 	  -Wl,-soname,$@.$(MAJOR_VERSION) \
+ 	  -Wl,--version-script=$(MAP) \
++	  -Wl,-z,muldefs \
+ 	  -o $@ $^ $(LDLIBS)
+ 
+ %.o : %.c

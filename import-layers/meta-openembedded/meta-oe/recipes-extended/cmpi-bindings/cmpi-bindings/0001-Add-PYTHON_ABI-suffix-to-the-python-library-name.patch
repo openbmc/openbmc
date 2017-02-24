@@ -1,0 +1,27 @@
+From a701ed30ac1bc2f77d063c237d6ae040a2d53f6b Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Mon, 16 May 2016 16:52:24 +0300
+Subject: [PATCH] Add 'm' suffix to the python library name.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ swig/python/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/swig/python/CMakeLists.txt b/swig/python/CMakeLists.txt
+index 128798b..391cef7 100644
+--- a/swig/python/CMakeLists.txt
++++ b/swig/python/CMakeLists.txt
+@@ -49,7 +49,7 @@ ADD_DEFINITIONS(-DCMPI_PLATFORM_LINUX_GENERIC_GNU -DCMPI_VERSION=200)
+ SET( NAME pyCmpiProvider )
+ ADD_LIBRARY( ${NAME} SHARED ${SWIG_OUTPUT})
+ #TARGET_LINK_LIBRARIES( ${NAME} ${PYTHON_LIBRARIES} )
+-TARGET_LINK_LIBRARIES( ${NAME} python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION} )
++TARGET_LINK_LIBRARIES( ${NAME} python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}m )
+ TARGET_LINK_LIBRARIES( ${NAME} pthread )
+ TARGET_LINK_LIBRARIES( ${NAME} dl )
+ TARGET_LINK_LIBRARIES( ${NAME} util )
+-- 
+2.8.1
+

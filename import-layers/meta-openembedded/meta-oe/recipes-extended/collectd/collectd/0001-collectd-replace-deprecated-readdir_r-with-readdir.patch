@@ -1,0 +1,66 @@
+Subject: [PATCH] collectd: replace deprecated readdir_r() with readdir()
+
+* Replace the usage of readdir_r() with readdir()
+  to address a compilation error under glibc 2.24
+  due to the deprecation of readdir_r
+
+| ../../collectd-5.5.0/src/vserver.c: In function 'vserver_read':
+| ../../collectd-5.5.0/src/vserver.c:167:3: error: 'readdir_r' is deprecated [-Werror=deprecated-declarations]
+|    status = readdir_r (proc, (struct dirent *) dirent_buffer, &dent);
+|    ^~~~~~
+| In file included from /buildarea4/myu2/build/prj_test_20160722/bitbake_build/tmp/sysroots/qemux86/usr/include/features.h:368:0,
+|                  from /buildarea4/myu2/build/prj_test_20160722/bitbake_build/tmp/sysroots/qemux86/usr/include/stdio.h:27,
+|                  from ../../collectd-5.5.0/src/daemon/collectd.h:34,
+|                  from ../../collectd-5.5.0/src/vserver.c:29:
+| /buildarea4/myu2/build/prj_test_20160722/bitbake_build/tmp/sysroots/qemux86/usr/include/dirent.h:189:12: note: declared here
+|  extern int __REDIRECT (readdir_r,
+|             ^
+
+  [1]https://sourceware.org/git/gitweb.cgi?p=glibc.git;a=commitdiff;h=7584a3f96de88d5eefe5d6c634515278cbfbf052;hp=8d9c92017d85f23ba6a2b3614b2f2bcf1820d6f0
+
+Upstream-Status: Pending
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ src/vserver.c | 15 ++++-----------
+ 1 file changed, 4 insertions(+), 11 deletions(-)
+
+diff --git a/src/vserver.c b/src/vserver.c
+index bd2e867..2e4e715 100644
+--- a/src/vserver.c
++++ b/src/vserver.c
+@@ -131,15 +131,8 @@ static derive_t vserver_get_sock_bytes(const char *s)
+ 
+ static int vserver_read (void)
+ {
+-#if NAME_MAX < 1024
+-# define DIRENT_BUFFER_SIZE (sizeof (struct dirent) + 1024 + 1)
+-#else
+-# define DIRENT_BUFFER_SIZE (sizeof (struct dirent) + NAME_MAX + 1)
+-#endif
+-
+ 	DIR 			*proc;
+-	struct dirent 	*dent; /* 42 */
+-	char dirent_buffer[DIRENT_BUFFER_SIZE];
++	struct dirent 	*dent = NULL; /* 42 */
+ 
+ 	errno = 0;
+ 	proc = opendir (PROCDIR);
+@@ -164,11 +157,11 @@ static int vserver_read (void)
+ 
+ 		int status;
+ 
+-		status = readdir_r (proc, (struct dirent *) dirent_buffer, &dent);
+-		if (status != 0)
++		dent = readdir (proc);
++		if (dent == NULL && errno != 0)
+ 		{
+ 			char errbuf[4096];
+-			ERROR ("vserver plugin: readdir_r failed: %s",
++			ERROR ("vserver plugin: readdir failed: %s",
+ 					sstrerror (errno, errbuf, sizeof (errbuf)));
+ 			closedir (proc);
+ 			return (-1);
+-- 
+2.8.2
+

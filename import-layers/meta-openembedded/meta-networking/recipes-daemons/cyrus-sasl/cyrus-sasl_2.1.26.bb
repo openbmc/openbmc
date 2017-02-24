@@ -5,14 +5,14 @@ LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://COPYING;md5=3f55e0974e3d6db00ca6f57f2d206396"
 
 SRC_URI = "ftp://ftp.cyrusimap.org/cyrus-sasl/cyrus-sasl-${PV}.tar.gz \
-	   file://avoid-to-call-AC_TRY_RUN.patch \
-	   file://Fix-hardcoded-libdir.patch \
-	   file://debian_patches_0009_sasldb_al.diff \
-	   file://debian_patches_0014_avoid_pic_overwrite.diff \
-	   file://sasl.h-include-stddef.h-for-size_t-on-NetBSD.patch \
-	   file://saslauthd.service \
-	   file://saslauthd.conf \
-	   "
+    file://avoid-to-call-AC_TRY_RUN.patch \
+    file://Fix-hardcoded-libdir.patch \
+    file://debian_patches_0009_sasldb_al.diff \
+    file://debian_patches_0014_avoid_pic_overwrite.diff \
+    file://sasl.h-include-stddef.h-for-size_t-on-NetBSD.patch \
+    file://saslauthd.service \
+    file://saslauthd.conf \
+"
 
 inherit autotools-brokensep pkgconfig useradd systemd
 
@@ -24,8 +24,9 @@ EXTRA_OECONF += "--with-dblib=berkeley \
                  andrew_cv_runpath_switch=none"
 
 PACKAGECONFIG ??= "ntlm \
-        ${@base_contains('DISTRO_FEATURES', 'ldap', 'ldap', '', d)} \
-        ${@base_contains('DISTRO_FEATURES', 'pam', 'pam', '', d)} \
+        ${@bb.utils.contains('DISTRO_FEATURES', 'ldap', 'ldap', '', d)} \
+        ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'pam', '', d)} \
+        ${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', 'ipv6', '', d)} \
         "
 PACKAGECONFIG[gssapi] = "--enable-gssapi=yes,--enable-gssapi=no,krb5,"
 PACKAGECONFIG[pam] = "--with-pam,--without-pam,libpam,"
@@ -33,6 +34,7 @@ PACKAGECONFIG[opie] = "--with-opie,--without-opie,opie,"
 PACKAGECONFIG[des] = "--with-des,--without-des,,"
 PACKAGECONFIG[ldap] = "--with-ldap=${STAGING_LIBDIR} --enable-ldapdb,--without-ldap --disable-ldapdb,openldap,"
 PACKAGECONFIG[ntlm] = "--with-ntlm,--without-ntlm,,"
+PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,"
 
 CFLAGS += "-fPIC"
 
@@ -54,7 +56,7 @@ do_compile_prepend () {
 }
 
 do_install_append() {
-    if ${@base_contains('DISTRO_FEATURES','systemd','true','false',d)}; then
+    if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -d ${D}${systemd_unitdir}/system
         install -m 0644 ${WORKDIR}/saslauthd.service ${D}${systemd_unitdir}/system
 

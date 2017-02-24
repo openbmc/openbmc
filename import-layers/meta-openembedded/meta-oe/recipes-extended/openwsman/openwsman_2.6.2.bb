@@ -12,10 +12,10 @@ SECTION = "Applications/System"
 
 DEPENDS = "curl libxml2 openssl libpam"
 
-SRCREV = "ed7a119e036c53078d70fd85936d94dc9b9b98be"
-PV = "2.6.2"
+SRCREV = "feb7ec9b004fcaea0dbe65ce8a1a79cc29dd994c"
+PV = "2.6.3"
 
-SRC_URI = "git://github.com/Openwsman/openwsman.git;protocol=http \
+SRC_URI = "git://github.com/Openwsman/openwsman.git \
            file://libssl-is-required-if-eventint-supported.patch \
            file://openwsmand.service"
 
@@ -39,8 +39,6 @@ EXTRA_OECMAKE = "-DBUILD_BINDINGS=NO \
                 "
 
 do_configure_prepend() {
-    export HOST_SYS=${HOST_SYS}
-    export BUILD_SYS=${BUILD_SYS}
     export STAGING_INCDIR=${STAGING_INCDIR}
     export STAGING_LIBDIR=${STAGING_LIBDIR}
 }

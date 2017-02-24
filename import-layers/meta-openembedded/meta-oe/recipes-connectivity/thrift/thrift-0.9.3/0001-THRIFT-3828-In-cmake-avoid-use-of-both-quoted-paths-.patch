@@ -1,0 +1,110 @@
+From bc577820ad25795543b31f123e309cdaebc7d6c6 Mon Sep 17 00:00:00 2001
+From: Cody P Schafer <dev@codyps.com>
+Date: Mon, 16 May 2016 15:21:10 -0400
+Subject: [PATCH 1/2] THRIFT-3828 In cmake avoid use of both quoted paths and
+ SYSTEM with include_directories()
+
+This allows us to avoid issues where there are no paths to be added to
+the include path (include_directories() errors when given an empty
+string).
+
+Specifically, gcc-6 requires that libraries stop passing paths like
+'/usr/include' (or they will get libstdc++ build errors), so these paths
+will be empty more often in the future.
+---
+ lib/cpp/CMakeLists.txt      | 8 ++++----
+ lib/cpp/test/CMakeLists.txt | 2 +-
+ test/cpp/CMakeLists.txt     | 6 +++---
+ tutorial/cpp/CMakeLists.txt | 2 +-
+ 4 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/lib/cpp/CMakeLists.txt b/lib/cpp/CMakeLists.txt
+index 4c7caeb..a716ac3 100755
+--- a/lib/cpp/CMakeLists.txt
++++ b/lib/cpp/CMakeLists.txt
+@@ -24,7 +24,7 @@ else()
+   find_package(Boost 1.53.0 REQUIRED)
+ endif()
+ 
+-include_directories(SYSTEM "${Boost_INCLUDE_DIRS}")
++include_directories(${Boost_INCLUDE_DIRS})
+ include_directories(src)
+ 
+ # SYSLIBS contains libraries that need to be linked to all lib targets
+@@ -104,7 +104,7 @@ if(OPENSSL_FOUND AND WITH_OPENSSL)
+        src/thrift/transport/TSSLSocket.cpp
+        src/thrift/transport/TSSLServerSocket.cpp
+     )
+-    include_directories(SYSTEM "${OPENSSL_INCLUDE_DIR}")
++    include_directories(${OPENSSL_INCLUDE_DIR})
+     list(APPEND SYSLIBS "${OPENSSL_LIBRARIES}")
+ endif()
+ 
+@@ -162,7 +162,7 @@ TARGET_LINK_LIBRARIES_THRIFT(thrift ${SYSLIBS})
+ 
+ if(WITH_LIBEVENT)
+     find_package(Libevent REQUIRED)  # Libevent comes with CMake support form upstream
+-    include_directories(SYSTEM ${LIBEVENT_INCLUDE_DIRS})
++    include_directories(${LIBEVENT_INCLUDE_DIRS})
+ 
+     ADD_LIBRARY_THRIFT(thriftnb ${thriftcppnb_SOURCES})
+     TARGET_LINK_LIBRARIES_THRIFT(thriftnb ${SYSLIBS} ${LIBEVENT_LIBRARIES})
+@@ -171,7 +171,7 @@ endif()
+ 
+ if(WITH_ZLIB)
+     find_package(ZLIB REQUIRED)
+-    include_directories(SYSTEM ${ZLIB_INCLUDE_DIRS})
++    include_directories(${ZLIB_INCLUDE_DIRS})
+ 
+     ADD_LIBRARY_THRIFT(thriftz ${thriftcppz_SOURCES})
+     TARGET_LINK_LIBRARIES_THRIFT(thriftz ${SYSLIBS} ${ZLIB_LIBRARIES})
+diff --git a/lib/cpp/test/CMakeLists.txt b/lib/cpp/test/CMakeLists.txt
+index 5de9fc4..c956c38 100644
+--- a/lib/cpp/test/CMakeLists.txt
++++ b/lib/cpp/test/CMakeLists.txt
+@@ -20,7 +20,7 @@
+ # Find required packages
+ set(Boost_USE_STATIC_LIBS ON) # Force the use of static boost test framework
+ find_package(Boost 1.53.0 REQUIRED COMPONENTS chrono filesystem system thread unit_test_framework)
+-include_directories(SYSTEM "${Boost_INCLUDE_DIRS}")
++include_directories(${Boost_INCLUDE_DIRS})
+ 
+ #Make sure gen-cpp files can be included
+ include_directories("${CMAKE_CURRENT_BINARY_DIR}")
+diff --git a/test/cpp/CMakeLists.txt b/test/cpp/CMakeLists.txt
+index 2d75f2e..b1409de 100755
+--- a/test/cpp/CMakeLists.txt
++++ b/test/cpp/CMakeLists.txt
+@@ -22,13 +22,13 @@ include(ThriftMacros)
+ 
+ set(Boost_USE_STATIC_LIBS ON)
+ find_package(Boost 1.53.0 REQUIRED COMPONENTS program_options system filesystem)
+-include_directories(SYSTEM "${Boost_INCLUDE_DIRS}")
++include_directories(${Boost_INCLUDE_DIRS})
+ 
+ find_package(OpenSSL REQUIRED)
+-include_directories(SYSTEM "${OPENSSL_INCLUDE_DIR}")
++include_directories(${OPENSSL_INCLUDE_DIR})
+ 
+ find_package(Libevent REQUIRED)  # Libevent comes with CMake support from upstream
+-include_directories(SYSTEM ${LIBEVENT_INCLUDE_DIRS})
++include_directories(${LIBEVENT_INCLUDE_DIRS})
+ 
+ #Make sure gen-cpp files can be included
+ include_directories("${CMAKE_CURRENT_BINARY_DIR}")
+diff --git a/tutorial/cpp/CMakeLists.txt b/tutorial/cpp/CMakeLists.txt
+index 2b0c143..5ecae17 100644
+--- a/tutorial/cpp/CMakeLists.txt
++++ b/tutorial/cpp/CMakeLists.txt
+@@ -18,7 +18,7 @@
+ #
+ 
+ find_package(Boost 1.53.0 REQUIRED)
+-include_directories(SYSTEM "${Boost_INCLUDE_DIRS}")
++include_directories(${Boost_INCLUDE_DIRS})
+ 
+ #Make sure gen-cpp files can be included
+ include_directories("${CMAKE_CURRENT_BINARY_DIR}")
+-- 
+2.9.3
+

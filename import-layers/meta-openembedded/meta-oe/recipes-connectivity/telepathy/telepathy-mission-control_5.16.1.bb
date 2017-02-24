@@ -23,15 +23,15 @@ PACKAGECONFIG[connman] = "--with-connectivity=connman,,connman"
 PACKAGECONFIG[nm] = "--with-connectivity=nm,,networkmanager"
 
 PACKAGES =+ " \
-	libmissioncontrol \
-	libmissioncontrol-config \
-	libmissioncontrol-server \
-	libmissioncontrol-dev \
-	libmissioncontrol-config-dev \
-	libmissioncontrol-server-dev \
-	libmissioncontrol-dbg \
-	libmissioncontrol-config-dbg \
-	libmissioncontrol-server-dbg \
+    libmissioncontrol \
+    libmissioncontrol-config \
+    libmissioncontrol-server \
+    libmissioncontrol-dev \
+    libmissioncontrol-config-dev \
+    libmissioncontrol-server-dev \
+    libmissioncontrol-dbg \
+    libmissioncontrol-config-dbg \
+    libmissioncontrol-server-dbg \
 "
 
 FILES_${PN} += "${datadir}/dbus* ${datadir}/glib-2.0/schemas"

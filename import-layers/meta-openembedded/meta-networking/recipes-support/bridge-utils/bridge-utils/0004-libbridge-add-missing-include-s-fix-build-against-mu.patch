@@ -1,0 +1,47 @@
+From c45b73829a8b8c7924df528baa7e16498f917288 Mon Sep 17 00:00:00 2001
+From: root <git@andred.net>
+Date: Wed, 20 Jul 2016 23:40:33 +0100
+Subject: [PATCH 4/5] libbridge: add missing #include's (fix build against
+ musl)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fixes error like:
+
+In file included from libbridge_devif.c:28:0:
+libbridge.h:45:17: error: field 'max_age' has incomplete type
+  struct timeval max_age;
+                 ^~~~~~~
+In file included from libbridge_devif.c:28:0:
+libbridge.h:51:2: error: unknown type name 'u_int16_t'
+  u_int16_t root_port;
+  ^~~~~~~~~
+
+These types are not standard C but rather Posix,
+for struct timeval see:
+http://pubs.opengroup.org/onlinepubs/7908799/xsh/systime.h.html
+
+Upstream-Status: Pending
+
+Signed-off-by: André Draszik <git@andred.net>
+---
+ libbridge/libbridge.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/libbridge/libbridge.h b/libbridge/libbridge.h
+index 53ec869..b0727c1 100644
+--- a/libbridge/libbridge.h
++++ b/libbridge/libbridge.h
+@@ -20,6 +20,8 @@
+ #define _LIBBRIDGE_H
+ 
+ #include <sys/socket.h>
++#include <sys/time.h>
++#include <sys/types.h>
+ #include <linux/in6.h>
+ #include <linux/if.h>
+ #include <linux/if_bridge.h>
+-- 
+2.8.1
+

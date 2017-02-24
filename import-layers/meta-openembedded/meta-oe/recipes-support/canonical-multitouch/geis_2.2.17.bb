@@ -19,7 +19,9 @@ REQUIRED_DISTRO_FEATURES = "x11"
 
 DEPENDS += "grail dbus-glib python3 virtual/libx11 libxext libxi libxcb dbus frame"
 
-SRC_URI = "https://launchpad.net/${BPN}/trunk/${PV}/+download/${BPN}-${PV}.tar.xz"
+SRC_URI = "https://launchpad.net/${BPN}/trunk/${PV}/+download/${BPN}-${PV}.tar.xz\
+           file://fix-indentation-for-gcc6.patch \
+"
 SRC_URI[md5sum] = "2ff9d76a3ea5794516bb02c9d1924faf"
 SRC_URI[sha256sum] = "8a60f5683852094038904e690d23cc5a90a980fc52da67f0f28890baa25c70eb"
 
@@ -27,6 +29,7 @@ EXTRA_OECONF = "--disable-integration-tests"
 
 FILES_${PN}-bin = "${bindir}"
 RDEPENDS_${PN}-bin = " \
+    python3-argparse \
     python3-compression \
     python3-core \
     python3-crypt \

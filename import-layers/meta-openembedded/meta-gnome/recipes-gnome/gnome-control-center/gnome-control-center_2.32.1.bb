@@ -16,6 +16,7 @@ LDFLAGS += "-lgthread-2.0 -lxml2"
 
 do_configure_prepend() {
     sed -i s:help::g ${S}/Makefile.am
+    rm -f ${S}/m4/gnome-doc-utils.m4
 }
 do_install_append() {
     rm -rf ${D}${datadir}/mime
@@ -30,3 +31,5 @@ FILES_${PN} += "${datadir}/icon* \
 FILES_${PN}-dbg += "${libdir}/window-manager-settings/.debug"
 FILES_${PN}-dev += "${libdir}/window-manager-settings/*.la"
 FILES_${PN}-staticdev += "${libdir}/window-manager-settings/*.a"
+
+PNBLACKLIST[gnome-control-center] ?= "Depends on broken gnome-menus"

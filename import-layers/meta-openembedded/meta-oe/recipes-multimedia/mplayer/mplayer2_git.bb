@@ -139,7 +139,7 @@ do_configure() {
     sed -i 's|extra_cflags="-I. $extra_cflags"|extra_cflags="-I. -I${STAGING_INCDIR}/directfb $extra_cflags"|g' ${S}/configure
     export SIMPLE_TARGET_SYS="$(echo ${TARGET_SYS} | sed s:${TARGET_VENDOR}::g)"
     ./configure ${EXTRA_OECONF}
-    
+
 }
 
 do_compile () {

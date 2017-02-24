@@ -105,7 +105,7 @@ python populate_packages_prepend () {
         output_pattern = 'evas-' + plugin_type[:-1] + "-%s",
         description = 'Evas module %s',
         allow_dirs=True, recursive=False, extra_depends="" )
-        
+
         plugin_type = "cserve2"
         bb.note( "splitting packages for evas %s..." % plugin_type )
         basedir = d.expand( '${libdir}/evas/%s/loaders' % plugin_type)

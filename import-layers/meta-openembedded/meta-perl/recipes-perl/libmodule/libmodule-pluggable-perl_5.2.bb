@@ -26,13 +26,13 @@ S = "${WORKDIR}/${SRCNAME}-${PV}"
 inherit cpan
 
 RDEPENDS_${PN} = " perl-module-base \
-		   perl-module-deprecate \
-                   perl-module-file-basename \
-		   perl-module-file-find \
-                   perl-module-file-spec \
-		   perl-module-file-spec-functions \
-		   perl-module-if \
-                   perl-module-test-more \
+    perl-module-deprecate \
+    perl-module-file-basename \
+    perl-module-file-find \
+    perl-module-file-spec \
+    perl-module-file-spec-functions \
+    perl-module-if \
+    perl-module-test-more \
 "
 
 BBCLASSEXTEND = "native"

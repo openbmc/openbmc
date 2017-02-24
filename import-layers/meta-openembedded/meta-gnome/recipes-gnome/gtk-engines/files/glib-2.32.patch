@@ -1,0 +1,23 @@
+From 8d49a386f467cbf8e0842d2218126f643e50f834 Mon Sep 17 00:00:00 2001
+From: Dominique Leuenberger <dimstar@opensuse.org>
+Date: Sun, 27 Nov 2011 14:24:57 +0000
+Subject: Fix build with glib 2.31: Only glib.h can be #include'd. Fixes bug #664914
+
+Upstream-Status: Backport
+
+---
+diff --git a/engines/clearlooks/src/animation.c b/engines/clearlooks/src/animation.c
+index 1f7a41f..56a9286 100644
+--- a/engines/clearlooks/src/animation.c
++++ b/engines/clearlooks/src/animation.c
+@@ -28,7 +28,7 @@
+ #include "animation.h"
+ 
+ #ifdef HAVE_WORKING_ANIMATION
+-#include <glib/gtimer.h>
++#include <glib.h>
+ 
+ struct _AnimationInfo {
+ 	GTimer *timer;
+--
+cgit v0.9.0.2

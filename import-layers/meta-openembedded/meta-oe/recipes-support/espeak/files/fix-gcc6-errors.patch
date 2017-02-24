@@ -1,0 +1,19 @@
+Fix gcc6 errors with narrowing
+
+| tr_languages.cpp:462:73: error: narrowing conversion of '171' from 'int' to 'char' inside { } [-Wnarrowing]
+|     static const char ko_voiced[] = {0x02,0x05,0x06,0xab,0xaf,0xb7,0xbc,0};  // voiced consonants, l,m,n,N
+
+Upstream-Status: Backport
+
+Signed-off-by: Derek Straka <derek@asterius.io>
+--- a/src/tr_languages.cpp
++++ b/src/tr_languages.cpp
+@@ -459,7 +459,7 @@
+ 	case L('k','o'):   // Korean, TEST
+ 		{
+ 			static const char ko_ivowels[] = {0x63,0x64,0x67,0x68,0x6d,0x72,0x74,0x75,0};  // y and i vowels
+-			static const char ko_voiced[] = {0x02,0x05,0x06,0xab,0xaf,0xb7,0xbc,0};  // voiced consonants, l,m,n,N
++			static const char ko_voiced[] = {0x02,0x05,0x06,(char)0xab,(char)0xaf,(char)0xb7,(char)0xbc,0};  // voiced consonants, l,m,n,N
+ 			tr = new Translator();
+ 
+ 			tr->letter_bits_offset = OFFSET_KOREAN;

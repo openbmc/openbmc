@@ -15,7 +15,7 @@ of known secure NIS server (/etc/yp.conf) Binds to \
 the server which answered as first. \
 "
 HOMEPAGE = "http://www.linux-nis.org/nis/ypbind-mt/index.html"
-DEPENDS = "yp-tools ${@base_contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)}"
+DEPENDS = "yp-tools ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)}"
 PROVIDES += "ypbind"
 
 PNBLACKLIST[ypbind-mt] ?= "BROKEN: Depends on broken yp-tools"

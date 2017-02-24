@@ -1,0 +1,10 @@
+[Unit]
+Description=Initialize EDAC Drivers For Machine Hardware
+
+[Service]
+Type=oneshot
+ExecStart=@SBINDIR@/edac-ctl --register-labels
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

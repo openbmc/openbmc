@@ -1,0 +1,75 @@
+Description: fix snmpd crash via AgentX connection
+
+ taken from Fedora, net-snmp-5.7-agentx-crash.patch
+
+bz729738 - net-snmp dumps core in netsnmp_oid_find_prefix
+bz1038011 - net-snmp: snmpd crashes/hangs when AgentX subagent times-out
+
+commit f9304c83f76202db0e684269ca1af32e43cd9db4
+Author: Jan Safranek <jsafranek@users.sourceforge.net>
+Date:   Tue Feb 7 14:53:44 2012 +0100
+
+    CHANGES: PATCH 1633670: fixed snmpd crashing when an AgentX subagent
+    disconnect in the middle of processing of a request.
+
+    I fixed also the memory leak reported in the tracker comments.
+
+Upstream-Status: Backport
+
+Signed-off-by: Zhu Yanjun <yanjun.zhu@windriver.com>
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+
+---
+ agent/mibgroup/agentx/master.c       | 5 +++++
+ agent/mibgroup/agentx/master_admin.c | 9 +++++++--
+ 2 files changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/agent/mibgroup/agentx/master.c b/agent/mibgroup/agentx/master.c
+index c42a42a..baeebaf 100644
+--- a/agent/mibgroup/agentx/master.c
++++ b/agent/mibgroup/agentx/master.c
+@@ -219,6 +219,9 @@ agentx_got_response(int operation,
+     if (!cache) {
+         DEBUGMSGTL(("agentx/master", "response too late on session %8p\n",
+                     session));
++        /* response is too late, free the cache */
++        if (magic)
++            netsnmp_free_delegated_cache((netsnmp_delegated_cache*) magic);
+         return 0;
+     }
+     requests = cache->requests;
+@@ -606,6 +609,8 @@ agentx_master_handler(netsnmp_mib_handler *handler,
+     result = snmp_async_send(ax_session, pdu, agentx_got_response, cb_data);
+     if (result == 0) {
+         snmp_free_pdu(pdu);
++        if (cb_data)
++            netsnmp_free_delegated_cache((netsnmp_delegated_cache*) cb_data);
+     }
+ 
+     return SNMP_ERR_NOERROR;
+diff --git a/agent/mibgroup/agentx/master_admin.c b/agent/mibgroup/agentx/master_admin.c
+index f16f392..b84b85e 100644
+--- a/agent/mibgroup/agentx/master_admin.c
++++ b/agent/mibgroup/agentx/master_admin.c
+@@ -133,11 +133,16 @@ close_agentx_session(netsnmp_session * session, int sessid)
+          * requests, so that the delegated request will be completed and
+          * further requests can be processed
+          */
+-        netsnmp_remove_delegated_requests_for_session(session);
++	while (netsnmp_remove_delegated_requests_for_session(session)) {
++		DEBUGMSGTL(("agentx/master", "Continue removing delegated reqests\n"));
++	}
++
+         if (session->subsession != NULL) {
+             netsnmp_session *subsession = session->subsession;
+             for(; subsession; subsession = subsession->next) {
+-                netsnmp_remove_delegated_requests_for_session(subsession);
++                while (netsnmp_remove_delegated_requests_for_session(subsession)) {
++			DEBUGMSGTL(("agentx/master", "Continue removing delegated subsession reqests\n"));
++		}
+             }
+         }
+                 
+-- 
+2.7.4
+

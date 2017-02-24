@@ -4,4 +4,4 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD;md5=377548
 
 # empty by default
 # BSP layers can add stuff like meta-openmoko example:
-# 
+#

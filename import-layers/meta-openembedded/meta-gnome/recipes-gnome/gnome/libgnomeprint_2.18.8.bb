@@ -24,3 +24,5 @@ FILES_${PN}-staticdev += "\
     ${libdir}/${PN}/${PV}/modules/*.a \
     ${libdir}/${PN}/${PV}/modules/*/*.a \
 "
+
+PNBLACKLIST[libgnomeprint] ?= "Depends on broken libgnomecups"

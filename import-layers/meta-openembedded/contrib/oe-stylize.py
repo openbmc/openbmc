@@ -102,6 +102,7 @@ OE_vars = [
     'AR',
     'ARCH',
     'ARM_INSTRUCTION_SET',
+    'MIPS_INSTRUCTION_SET',
     'ARM_MUTEX',
     'ART_CONFIG',
     'B',

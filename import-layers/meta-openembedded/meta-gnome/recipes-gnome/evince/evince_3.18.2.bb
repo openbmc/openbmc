@@ -2,15 +2,19 @@ SUMMARY = "Evince is a document viewer for document formats like pdf, ps, djvu"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=96f2f8d5ee576a2163977938ea36fa7b"
 SECTION = "x11/office"
-DEPENDS = "gtk+3 libsecret gnome-desktop3 poppler gstreamer1.0-plugins-base orc adwaita-icon-theme"
+DEPENDS = "gtk+3 libsecret gnome-desktop3 poppler gstreamer1.0-plugins-base orc adwaita-icon-theme intltool-native"
 PR = "r5"
 
-inherit gnome pkgconfig gtk-icon-cache gsettings gobject-introspection
+inherit gnome pkgconfig gtk-icon-cache gsettings gobject-introspection distro_features_check
+
+REQUIRED_DISTRO_FEATURES = "x11"
 
 SRC_URI[archive.md5sum] = "c39af6b8b1c44d4393ef8ac9dab99c0b"
 SRC_URI[archive.sha256sum] = "42ad6c7354d881a9ecab136ea84ff867acb942605bcfac48b6c12e1c2d8ecb17"
 
-SRC_URI += "file://0001-help-remove-YELP-macro.patch"
+SRC_URI += "file://0001-help-remove-YELP-macro.patch \
+            file://0002-fix-gcc6-errors.patch \
+"
 
 EXTRA_OECONF = " --enable-thumbnailer \
 "

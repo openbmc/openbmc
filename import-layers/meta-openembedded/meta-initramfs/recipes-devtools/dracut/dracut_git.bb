@@ -57,5 +57,5 @@ RDEPENDS_${PN} = "findutils cpio util-linux-blkid util-linux-getopt util-linux b
 RRECOMMENDS_${PN} = " \
                      kernel-modules \
                      busybox \
-                     coreutils \ 
+                     coreutils \
                     "

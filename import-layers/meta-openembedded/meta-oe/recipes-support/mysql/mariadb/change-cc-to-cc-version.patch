@@ -1,0 +1,26 @@
+mariadb: replace the CC with CC_VERSION and CXX with CXX_VERSION
+
+mysqlbug.sh is a bug report script. It makes a report with the build information,
+including gcc version. The CC is the local path of gcc, which is useless for bug
+report, and the path may expose private information, so change it to CC_VERSION.
+
+Upstream-Status: Pending
+
+Signed-off-by: Yue Tao <Yue.Tao@windriver.com>
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+================================
+diff --git a/scripts/mysqlbug.sh.old b/scripts/mysqlbug.sh
+index e9df210..d4b8d53 100644
+--- a/scripts/mysqlbug.sh.old
++++ b/scripts/mysqlbug.sh
+@@ -24,8 +24,8 @@ VERSION="@VERSION@@MYSQL_SERVER_SUFFIX@"
+ COMPILATION_COMMENT="@COMPILATION_COMMENT@"
+ BUGmysql="maria-developers@lists.launchpad.net"
+ # This is set by configure
+-COMP_CALL_INFO="CC='@SAVE_CC@'  CFLAGS='@SAVE_CFLAGS@'  CXX='@SAVE_CXX@'  CXXFLAGS='@SAVE_CXXFLAGS@'  LDFLAGS='@SAVE_LDFLAGS@'  ASFLAGS='@SAVE_ASFLAGS@'"
+-COMP_RUN_INFO="CC='@CC@'  CFLAGS='@CFLAGS@'  CXX='@CXX@'  CXXFLAGS='@CXXFLAGS@'  LDFLAGS='@LDFLAGS@'  ASFLAGS='@ASFLAGS@'"
++COMP_CALL_INFO="CC='@CC_VERSION@'  CFLAGS='@SAVE_CFLAGS@'  CXX='@CXX_VERSION@'  CXXFLAGS='@SAVE_CXXFLAGS@'  LDFLAGS='@SAVE_LDFLAGS@'  ASFLAGS='@SAVE_ASFLAGS@'"
++COMP_RUN_INFO="CC='@CC_VERSION@'  CFLAGS='@CFLAGS@'  CXX='@CXX_VERSION@'  CXXFLAGS='@CXXFLAGS@'  LDFLAGS='@LDFLAGS@'  ASFLAGS='@ASFLAGS@'"
+ CONFIGURE_LINE="@CONF_COMMAND@"
+ 
+ LIBC_INFO=""

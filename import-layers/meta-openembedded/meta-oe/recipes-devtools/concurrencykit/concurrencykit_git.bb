@@ -10,7 +10,7 @@ SECTION = "base"
 PV = "0.5.1+git${SRCPV}"
 SRCREV = "f97d3da5c375ac2fc5a9173cdd36cb828915a2e1"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=a0b24c1a8f9ad516a297d055b0294231"
-SRC_URI = "git://github.com/concurrencykit/ck.git;protocol=https \
+SRC_URI = "git://github.com/concurrencykit/ck.git \
            file://cross.patch \
 "
 

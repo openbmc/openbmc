@@ -101,7 +101,7 @@ do_install () {
 
      install -m 0755 -d ${D}${sysconfdir}/avahi/services/
      install -m 0644 ${WORKDIR}/cloud9-avahi.service ${D}${sysconfdir}/avahi/services/
-     
+
      install -d ${D}${systemd_unitdir}/system
      install -m 0644 ${WORKDIR}/cloud9.service ${D}${systemd_unitdir}/system
 }

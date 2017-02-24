@@ -18,3 +18,5 @@ do_configure_prepend () {
     # Make automake happy
     touch ChangeLog
 }
+
+CFLAGS_append_libc-musl = " -D__GNU_LIBRARY__"

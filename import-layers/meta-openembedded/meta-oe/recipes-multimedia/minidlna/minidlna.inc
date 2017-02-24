@@ -19,16 +19,16 @@ S = "${WORKDIR}/git"
 EXTRA_AUTORECONF = ""
 
 do_install_append(){
-	install -d ${D}${sysconfdir}
-	install -m 0755 minidlna.conf ${D}${sysconfdir}
+    install -d ${D}${sysconfdir}
+    install -m 0755 minidlna.conf ${D}${sysconfdir}
 
 # Systemd script
-	install -d ${D}${nonarch_base_libdir}/systemd/system
-	install -m 0755 ${WORKDIR}/minidlna.service ${D}${nonarch_base_libdir}/systemd/system
+    install -d ${D}${nonarch_base_libdir}/systemd/system
+    install -m 0755 ${WORKDIR}/minidlna.service ${D}${nonarch_base_libdir}/systemd/system
 
 # Sysvinit script
-	install -d ${D}${sysconfdir}/init.d
-	install -m 0755 ${WORKDIR}/minidlna-daemon.init.d ${D}${sysconfdir}/init.d/minidlna
+    install -d ${D}${sysconfdir}/init.d
+    install -m 0755 ${WORKDIR}/minidlna-daemon.init.d ${D}${sysconfdir}/init.d/minidlna
 
 }
 

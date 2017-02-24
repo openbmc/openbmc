@@ -1,0 +1,36 @@
+From fea2619e6d07ac72b2eff6f408bb3daa2dbdf671 Mon Sep 17 00:00:00 2001
+From: Sean Davis <smd.seandavis@gmail.com>
+Date: Thu, 27 Oct 2016 20:31:36 -0400
+Subject: [PATCH] Probable fix for Thunar detailed view (Xfce #12916)
+
+Upstream-Status: Pending [1-2]
+
+[1] https://git.xfce.org/xfce/exo/commit/?id=fea2619e6d07ac72b2eff6f408bb3daa2dbdf671
+[2] https://bugzilla.xfce.org/show_bug.cgi?id=12916
+
+---
+ exo/exo-tree-view.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/exo/exo-tree-view.c b/exo/exo-tree-view.c
+index 8c8564f..2d0fc04 100644
+--- a/exo/exo-tree-view.c
++++ b/exo/exo-tree-view.c
+@@ -385,13 +385,9 @@ exo_tree_view_button_press_event (GtkWidget      *widget,
+         }
+     }
+ 
+-  /* see bug http://bugzilla.xfce.org/show_bug.cgi?id=6230 for more information */
+   if (G_LIKELY (gtk_tree_selection_get_select_function (selection) == (GtkTreeSelectionFunc) exo_noop_false))
+     {
+-      /* just reset the select function (previously set to exo_noop_false),
+-       * there's no clean way to do this, so what the heck.
+-       */
+-      gtk_tree_selection_set_select_function (selection, NULL, NULL, NULL);
++      gtk_tree_selection_set_select_function (selection, (GtkTreeSelectionFunc) exo_noop_true, NULL, NULL);
+     }
+ 
+   /* release the path (if any) */
+-- 
+2.5.5
+

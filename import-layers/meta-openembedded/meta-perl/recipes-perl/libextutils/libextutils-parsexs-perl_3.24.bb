@@ -22,26 +22,26 @@ S = "${WORKDIR}/${SRCNAME}-${PV}"
 inherit cpan
 
 RDEPENDS_${PN} = " perl-module-carp \
-                   perl-module-cwd \
-                   perl-module-dynaloader \
-                   perl-module-extutils-cbuilder \
-		   perl-module-extutils-makemaker \
-                   perl-module-file-basename \
-                   perl-module-file-spec \
-		   perl-module-lib \
-                   perl-module-symbol \
-                   perl-module-test-more \
+    perl-module-cwd \
+    perl-module-dynaloader \
+    perl-module-extutils-cbuilder \
+    perl-module-extutils-makemaker \
+    perl-module-file-basename \
+    perl-module-file-spec \
+    perl-module-lib \
+    perl-module-symbol \
+    perl-module-test-more \
 "
 
 RPROVIDES_${PN} += " libextutils-parsexs-constants-perl \
-                     libextutils-parsexs-countlines-perl \
-                     libextutils-parsexs-eval-perl \
-                     libextutils-parsexs-utilities-perl \
-                     libextutils-typemaps-perl \
-                     libextutils-typemaps-cmd-perl \
-                     libextutils-typemaps-inputmap-perl \
-                     libextutils-typemaps-outputmap-perl \
-                     libextutils-typemaps-type-perl \
+    libextutils-parsexs-countlines-perl \
+    libextutils-parsexs-eval-perl \
+    libextutils-parsexs-utilities-perl \
+    libextutils-typemaps-perl \
+    libextutils-typemaps-cmd-perl \
+    libextutils-typemaps-inputmap-perl \
+    libextutils-typemaps-outputmap-perl \
+    libextutils-typemaps-type-perl \
 "
 
 BBCLASSEXTEND = "native"

@@ -8,10 +8,6 @@ AUTHOR = "Gustavo Sverzut Barbieri <barbieri@gmail.com>"
 DEPENDS = "python-cython-native python-pyrex-native python-numeric eina edbus python-dbus"
 RDEPENDS_${PN} += "python-lang python-dbus"
 
-# necessary to let the call for python-config succeed
-export BUILD_SYS
-export HOST_SYS
-
 inherit e-base autotools pkgconfig distutils-base
 
 SRCNAME = "python-e_dbus"

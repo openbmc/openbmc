@@ -1,0 +1,11 @@
+[Unit]
+Description=Enable minicoredumper.
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/sh -c '/bin/echo "|/usr/bin/minicoredumper %%p %%u %%g %%s %%t %%h %%e" > /proc/sys/kernel/core_pattern'
+ExecStop=/bin/sh -c '/bin/echo "core" > /proc/sys/kernel/core_pattern'
+
+[Install]
+WantedBy=multi-user.target

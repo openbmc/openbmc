@@ -1,0 +1,61 @@
+Index: git/src/image-reader.cpp
+===================================================================
+--- git.orig/src/image-reader.cpp	2016-07-29 16:17:51.000000000 -0500
++++ git/src/image-reader.cpp	2016-07-29 16:18:43.000000000 -0500
+@@ -120,7 +120,7 @@
+ 
+     Log::debug("Reading PNG file %s\n", filename.c_str());
+ 
+-    const std::auto_ptr<std::istream> is_ptr(Util::get_resource(filename));
++    const std::unique_ptr<std::istream> is_ptr(Util::get_resource(filename));
+     if (!(*is_ptr)) {
+         Log::error("Cannot open file %s!\n", filename.c_str());
+         return false;
+Index: git/src/libmatrix/shader-source.cc
+===================================================================
+--- git.orig/src/libmatrix/shader-source.cc	2016-07-29 16:18:14.000000000 -0500
++++ git/src/libmatrix/shader-source.cc	2016-07-29 16:18:43.000000000 -0500
+@@ -34,7 +34,7 @@
+ bool
+ ShaderSource::load_file(const std::string& filename, std::string& str)
+ {
+-    std::auto_ptr<std::istream> is_ptr(Util::get_resource(filename));
++    std::unique_ptr<std::istream> is_ptr(Util::get_resource(filename));
+     std::istream& inputFile(*is_ptr);
+ 
+     if (!inputFile)
+Index: git/src/model.cpp
+===================================================================
+--- git.orig/src/model.cpp	2016-07-29 16:18:00.000000000 -0500
++++ git/src/model.cpp	2016-07-29 16:18:43.000000000 -0500
+@@ -361,7 +361,7 @@
+ 
+     Log::debug("Loading model from 3ds file '%s'\n", filename.c_str());
+ 
+-    const std::auto_ptr<std::istream> input_file_ptr(Util::get_resource(filename));
++    const std::unique_ptr<std::istream> input_file_ptr(Util::get_resource(filename));
+     std::istream& input_file(*input_file_ptr);
+ 
+     if (!input_file) {
+@@ -681,7 +681,7 @@
+ {
+     Log::debug("Loading model from obj file '%s'\n", filename.c_str());
+ 
+-    const std::auto_ptr<std::istream> input_file_ptr(Util::get_resource(filename));
++    const std::unique_ptr<std::istream> input_file_ptr(Util::get_resource(filename));
+     std::istream& inputFile(*input_file_ptr);
+     if (!inputFile)
+     {
+Index: git/src/scene-jellyfish.cpp
+===================================================================
+--- git.orig/src/scene-jellyfish.cpp	2016-07-29 16:18:08.000000000 -0500
++++ git/src/scene-jellyfish.cpp	2016-07-29 16:18:43.000000000 -0500
+@@ -272,7 +272,7 @@
+ {
+     Log::debug("Loading model from file '%s'\n", filename.c_str());
+ 
+-    const std::auto_ptr<std::istream> input_file_ptr(Util::get_resource(filename));
++    const std::unique_ptr<std::istream> input_file_ptr(Util::get_resource(filename));
+     std::istream& inputFile(*input_file_ptr);
+     if (!inputFile)
+     {

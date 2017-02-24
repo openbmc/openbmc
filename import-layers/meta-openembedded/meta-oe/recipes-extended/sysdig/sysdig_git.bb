@@ -30,6 +30,6 @@ EXTRA_OECMAKE = ' -DUSE_BUNDLED_LUAJIT="OFF" \
 
 FILES_${PN} += " \
     ${DIR_ETC}/* \
-    ${datadir}/zsh/* \ 
+    ${datadir}/zsh/* \
     ${prefix}/src/*  \
 "

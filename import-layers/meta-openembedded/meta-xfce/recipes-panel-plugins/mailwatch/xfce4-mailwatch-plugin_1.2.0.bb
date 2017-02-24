@@ -9,3 +9,6 @@ DEPENDS += "gnutls libgcrypt"
 
 SRC_URI[md5sum] = "7263114ec0f2987a3aff15afeeb45577"
 SRC_URI[sha256sum] = "624acc8229a8593c0dfeb28f883f4958119a715cc81cecdbaf29efc8ab1edcad"
+
+PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', 'ipv6', '', d)}"
+PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,"

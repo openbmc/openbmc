@@ -1,0 +1,46 @@
+Description: sort the filelist when it is complete to get reproducible behaviour
+Author: Reiner Herrmann <reiner@reiner-h.de>
+Bug-Debian: https://bugs.debian.org/795790
+
+Upstream-Status: Pending
+
+Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+
+Index: rdfind-1.3.4/Fileinfo.hh
+===================================================================
+--- rdfind-1.3.4.orig/Fileinfo.hh
++++ rdfind-1.3.4/Fileinfo.hh
+@@ -189,6 +189,10 @@ public:
+   static bool compareondepth(const Fileinfo &a, const Fileinfo &b)
+   {return (a.depth() < b.depth());}
+ 
++  //returns true if a has lower filename than b)
++  static bool compareonfilename(const Fileinfo &a, const Fileinfo &b)
++  {return (a.name().compare(b.name()) < 0);}
++
+   //fills with bytes from the file. if lasttype is supplied,
+   //it is used to see if the file needs to be read again - useful if
+   //file is shorter than the length of the bytes field.
+@@ -235,6 +239,10 @@ public:
+   static bool equaldepth(const Fileinfo &a, const Fileinfo &b)
+   {return (a.depth()==b.depth());}
+ 
++  //returns true if filenames are equal
++  static bool equalfilename(const Fileinfo &a, const Fileinfo &b)
++  {return (a.name()==b.name());}
++
+   //returns true if file is a regular file. call readfileinfo first!
+   bool isRegularFile() {return m_info.is_file;}
+ 
+Index: rdfind-1.3.4/rdfind.cc
+===================================================================
+--- rdfind-1.3.4.orig/rdfind.cc
++++ rdfind-1.3.4/rdfind.cc
+@@ -349,6 +349,7 @@ int main(int narg, char *argv[])
+   cout<<dryruntext<<"Now have "<<filelist1.size()<<" files in total."<<endl;
+   
+   
++  gswd.sortlist(&Fileinfo::compareonfilename,&Fileinfo::equalfilename);
+ 
+   //mark files with a unique number
+   gswd.markitems();

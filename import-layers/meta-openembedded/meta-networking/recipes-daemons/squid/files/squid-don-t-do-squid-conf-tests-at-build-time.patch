@@ -1,0 +1,63 @@
+From 54a9c2ba60adc7ec2724786662fd398e7c03999f Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Thu, 25 Aug 2016 15:22:57 +0800
+Subject: [PATCH] squid: don't do squid-conf-tests at build time
+
+* squid-conf-tests is a test to run "squid -k parse -f"
+  to perse the config files, which should not be run
+  at build time since we are cross compiling, so remove
+  it but it will be added back for the runtime ptest.
+
+* Fix the directories of the conf files for squid-conf-tests
+  so that it can run on the target board.
+
+Upstream-Status: Inappropriate [cross compile specific]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ test-suite/Makefile.am | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
+
+diff --git a/test-suite/Makefile.am b/test-suite/Makefile.am
+index d5468be..77fc480 100644
+--- a/test-suite/Makefile.am
++++ b/test-suite/Makefile.am
+@@ -41,8 +41,7 @@ TESTS += debug \
+ 	MemPoolTest\
+ 	mem_node_test\
+ 	mem_hdr_test\
+-	$(ESI_TESTS) \
+-	squid-conf-tests
++	$(ESI_TESTS)
+ 
+ ## Sort by alpha - any build failures are significant.
+ check_PROGRAMS += debug \
+@@ -125,19 +124,19 @@ VirtualDeleteOperator_SOURCES = VirtualDeleteOperator.cc $(DEBUG_SOURCE)
+ ##$(TARGLIB): $(LIBOBJS)
+ ##	$(AR_R) $(TARGLIB) $(LIBOBJS)
+ 
+-squid-conf-tests: $(top_builddir)/src/squid.conf.default $(srcdir)/squidconf/*
++squid-conf-tests: $(sysconfdir)/squid.conf.default squidconf/*
+ 	@failed=0; cfglist="$?"; rm -f $@ || $(TRUE); \
+ 	for cfg in $$cfglist ; do \
+-		$(top_builddir)/src/squid -k parse -f $$cfg || \
++		squid -k parse -f $$cfg || \
+ 			{ echo "FAIL: squid.conf test: $$cfg" | \
+-				sed s%$(top_builddir)/src/%% | \
+-				sed s%$(srcdir)/squidconf/%% ; \
++				sed s%$(sysconfdir)/%% | \
++				sed s%squidconf/%% ; \
+ 				failed=1; break; \
+ 			}; \
+ 		if test "$$failed" -eq 0; then \
+ 			echo "PASS: squid.conf test: $$cfg" | \
+-				sed s%$(top_builddir)/src/%% | \
+-				sed s%$(srcdir)/squidconf/%% ; \
++				sed s%$(sysconfdir)/%% | \
++				sed s%squidconf/%% ; \
+ 		else break; fi; \
+ 	done; \
+ 	if test "$$failed" -eq 0; then cp $(TRUE) $@ ; fi
+-- 
+2.8.3
+

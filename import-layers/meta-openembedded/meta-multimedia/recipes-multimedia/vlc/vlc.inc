@@ -21,7 +21,7 @@ ARM_INSTRUCTION_SET = "arm"
 
 EXTRA_OECONF = "\
     --enable-run-as-root \
-    --enable-xvideo \ 
+    --enable-xvideo \
     --disable-screen --disable-caca \
     --enable-httpd --enable-vlm \
     --enable-freetype \

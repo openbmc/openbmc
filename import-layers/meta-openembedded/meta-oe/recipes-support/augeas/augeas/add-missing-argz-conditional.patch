@@ -1,0 +1,20 @@
+Add missing GL_GENERATE_ARGZ_H conditional
+
+- GL_GENERATE_ARGZ_H is used in gnulib/lib/Makefile.am
+
+Upstream-Status: Pending
+Signed-off-by: Constantin Musca <constantinx.musca@intel.com>
+
+Index: augeas-1.0.0/configure.ac
+===================================================================
+--- augeas-1.0.0.orig/configure.ac
++++ augeas-1.0.0/configure.ac
+@@ -55,6 +55,8 @@ AC_ARG_WITH([failmalloc],
+ 
+ AM_CONDITIONAL([WITH_FAILMALLOC], [test x$with_failmalloc != xno])
+ 
++AM_CONDITIONAL([GL_GENERATE_ARGZ_H], [test -n "$ARGZ_H"])
++
+ dnl --enable-debug=(yes|no)
+ AC_ARG_ENABLE([debug],
+               [AC_HELP_STRING([--enable-debug=no/yes],

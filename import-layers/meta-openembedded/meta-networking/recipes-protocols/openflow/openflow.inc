@@ -20,7 +20,7 @@ PACKAGECONFIG[openssl] = "--enable-ssl,--disable-ssl, openssl, libssl"
 
 EXTRA_OECONF += " \
                  KARCH=${TARGET_ARCH} \
-                 ${@base_contains('PACKAGECONFIG', 'openssl', 'SSL_LIBS="-lssl -lcrypto"', '', d)} \
+                 ${@bb.utils.contains('PACKAGECONFIG', 'openssl', 'SSL_LIBS="-lssl -lcrypto"', '', d)} \
                 "
 
 S = "${WORKDIR}/git"

@@ -17,7 +17,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
 
 SECTION = "x11/gnome"
 
-DEPENDS = "gnome-doc-utils-native gtk+3 dconf gconf glib-2.0 gnome-desktop3 gtk+ pango libwnck3 gnome-menus cairo libgweather3 dbus-glib librsvg libcanberra" 
+DEPENDS = "gnome-doc-utils-native gtk+3 dconf gconf glib-2.0 gnome-desktop3 gtk+ pango libwnck3 gnome-menus cairo libgweather3 dbus-glib librsvg libcanberra"
 
 inherit gtk-doc gnome gettext pkgconfig
 
@@ -48,4 +48,4 @@ FILES_${PN} =+ "${datadir}/gnome* \
                 ${libdir}/bonobo \
 "
 
-
+PNBLACKLIST[gnome-panel3] ?= "Depends on broken gnome-menus"

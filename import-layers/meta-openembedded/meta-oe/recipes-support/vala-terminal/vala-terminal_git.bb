@@ -1,6 +1,6 @@
 SUMMARY = "A lightweight Terminal Emulator based on libvte, written in Vala"
 SECTION = "x11/applications"
-DEPENDS = "vte intltool-native"
+DEPENDS = "vte9 intltool-native"
 SRCREV = "0fefa38087581f85fa0631b40500b9428369c146"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552"

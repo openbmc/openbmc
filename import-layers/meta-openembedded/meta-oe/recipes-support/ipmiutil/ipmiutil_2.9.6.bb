@@ -15,7 +15,7 @@ HOMEPAGE = "http://ipmiutil.sourceforge.net"
 LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=5f9372493401f309e6149dd2ce0a044b"
 
-#PARALLEL_MAKE = ""
+PARALLEL_MAKE = ""
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/ipmiutil/ipmiutil-${PV}.tar.gz \
     file://fix_systemd_path.patch "
@@ -31,7 +31,7 @@ PACKAGECONFIG[systemd] = "--enable-systemd=${datadir}/${BPN}, --enable-systemd=n
 PACKAGECONFIG[sha256] = "--enable-sha256, --enable-sha256=no, openssl-native, openssl"
 PACKAGECONFIG[lanplus] = "--enable-lanplus, --enable-lanplus=no, openssl-native, openssl"
 PACKAGECONFIG[landesk] = "--enable-landesk, --enable-landesk=no"
-PACKAGECONFIG[sensors] = "--enable-libsensors, --enable-libsensors=no" 
+PACKAGECONFIG[sensors] = "--enable-libsensors, --enable-libsensors=no"
 
 #build with some GPL code
 PACKAGECONFIG[gpl] = "--enable-gpl, --enable-gpl=no"

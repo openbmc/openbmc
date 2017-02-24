@@ -10,21 +10,22 @@ HOMEPAGE = "http://werkzeug.pocoo.org/"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=a68f5361a2b2ca9fdf26b38aaecb6faa"
 
-SRC_URI[md5sum] = "daf443a939459e12f14fd2e4658a26df"
-SRC_URI[sha256sum] = "afdb04f183eef3b20827eb4520dcb75c1cd1f0ba7a7de3f463ff7a462eee8164"
+SRC_URI[md5sum] = "1d34afa1f19abcef4c0da51ebc2c4ea7"
+SRC_URI[sha256sum] = "e72c46bc14405cba7a26bd2ce28df734471bc9016bc8b4cb69466c2c14c2f7e5"
 
 PYPI_PACKAGE = "Werkzeug"
 
 RDEPENDS_${PN} += " \
-    python-difflib \
-    python-email \
-    python-html \
-    python-json \
-    python-netserver \
-    python-numbers \
-    python-pkgutil \
-    python-subprocess \
-    python-threading \
-    python-unixadmin \
-    python-zlib \
+    ${PYTHON_PN}-datetime \
+    ${PYTHON_PN}-difflib \
+    ${PYTHON_PN}-email \
+    ${PYTHON_PN}-html \
+    ${PYTHON_PN}-io \
+    ${PYTHON_PN}-json \
+    ${PYTHON_PN}-netserver \
+    ${PYTHON_PN}-numbers \
+    ${PYTHON_PN}-pkgutil \
+    ${PYTHON_PN}-subprocess \
+    ${PYTHON_PN}-threading \
+    ${PYTHON_PN}-unixadmin \
 "
