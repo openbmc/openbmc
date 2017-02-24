@@ -16,6 +16,8 @@ SRC_URI[netcat-patch.sha256sum] = "eee759327ffea293e81d0dde67921b7fcfcad279ffd7a
 
 S = "${WORKDIR}/${BPN}-${PV}"
 
+EXTRA_OEMAKE += "'LDFLAGS=${LDFLAGS}'"
+
 do_configure[noexec] = "1"
 
 netcat_do_patch() {

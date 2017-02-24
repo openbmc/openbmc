@@ -11,9 +11,9 @@ RDEPENDS_${PN} += "libpng gtk+ libgcrypt"
 inherit autotools binconfig pkgconfig
 
 SRC_URI  = "\
-	 ${DEBIAN_MIRROR}/main/libv/libvncserver/libvncserver_0.9.10+dfsg.orig.tar.xz \
-	 file://0001-remove-webclients-build.patch \
-	 file://0002-common-add-sha1.patch \
+    ${DEBIAN_MIRROR}/main/libv/libvncserver/libvncserver_0.9.10+dfsg.orig.tar.xz \
+    file://0001-remove-webclients-build.patch \
+    file://0002-common-add-sha1.patch \
 "
 
 SRC_URI[md5sum] = "e883b6c7bd339a5e1c48645051abe5c4"

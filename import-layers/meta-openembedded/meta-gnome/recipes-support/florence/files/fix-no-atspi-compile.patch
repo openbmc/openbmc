@@ -1,0 +1,30 @@
+diff --git a/src/florence.c b/src/florence.c
+index b27c31b..feadefe 100644
+--- a/src/florence.c
++++ b/src/florence.c
+@@ -44,12 +44,6 @@
+ /* exit signal */
+ static int flo_exit=FALSE;
+ 
+-#ifdef ENABLE_AT_SPI2
+-void flo_check_show (struct florence *florence, AtspiAccessible *obj);
+-#else
+-void flo_check_show (struct florence *florence, Accessible *obj);
+-#endif
+-
+ /* Called on destroy event (systray quit or close window) */
+ void flo_destroy (void)
+ {
+@@ -61,6 +55,12 @@ void flo_destroy (void)
+ }
+ 
+ #ifdef AT_SPI
++#ifdef ENABLE_AT_SPI2
++void flo_check_show (struct florence *florence, AtspiAccessible *obj);
++#else
++void flo_check_show (struct florence *florence, Accessible *obj);
++#endif
++
+ /* Called to destroy the icon */
+ void flo_icon_destroy (GtkWidget *widget, gpointer user_data)
+ {

@@ -15,11 +15,6 @@ inherit pkgconfig binconfig
 
 BBCLASSEXTEND = "native"
 
-do_configure_prepend() {
-    sed -i 's:PREFIX= /usr/local:PREFIX= ${prefix}:g' ${S}/Makefile
-    sed -i 's:MULTILIB= lib:MULTILIB= ${baselib}:g' ${S}/Makefile
-}
-
 # http://luajit.org/install.html#cross
 # Host luajit needs to be compiled with the same pointer size
 # If you want to cross-compile to any 32 bit target on an x64 OS,
@@ -30,20 +25,52 @@ BUILD_CC_ARCH_append_powerpc = ' -m32'
 BUILD_CC_ARCH_append_x86 = ' -m32'
 BUILD_CC_ARCH_append_arm = ' -m32'
 
-EXTRA_OEMAKE_append_class-target = '\
-    CROSS=${HOST_PREFIX} \
-    HOST_CC="${BUILD_CC} ${BUILD_CC_ARCH}" \
-    TARGET_CFLAGS="${TOOLCHAIN_OPTIONS} ${TARGET_CC_ARCH}" \
-    TARGET_LDFLAGS="${TOOLCHAIN_OPTIONS}" \
-    TARGET_SHLDFLAGS="${TOOLCHAIN_OPTIONS}" \
-'
+# The lua makefiles expect the TARGET_SYS to be from uname -s
+# Values: Windows, Linux, Darwin, iOS, SunOS, PS3, GNU/kFreeBSD
+LUA_TARGET_OS = "Unknown"
+LUA_TARGET_OS_darwin = "Darwin"
+LUA_TARGET_OS_linux = "Linux"
+LUA_TARGET_OS_linux-gnueabi = "Linux"
+LUA_TARGET_OS_mingw32 = "Windows"
+
+# We don't want the lua buildsystem's compiler optimizations, or its
+# stripping, and we don't want it to pick up CFLAGS or LDFLAGS, as those apply
+# to both host and target compiles
+EXTRA_OEMAKE = "\
+    Q= E='@:' \
+    \
+    CCOPT= CCOPT_x86= CFLAGS= LDFLAGS= TARGET_STRIP='@:' \
+    \
+    'TARGET_SYS=${LUA_TARGET_OS}' \
+    \
+    'CC=${CC}' \
+    'TARGET_AR=${AR} rcus' \
+    'TARGET_CFLAGS=${CFLAGS}' \
+    'TARGET_LDFLAGS=${LDFLAGS}' \
+    'TARGET_SHLDFLAGS=${LDFLAGS}' \
+    'HOST_CC=${BUILD_CC}' \
+    'HOST_CFLAGS=${BUILD_CFLAGS}' \
+    'HOST_LDFLAGS=${BUILD_LDFLAGS}' \
+    \
+    'PREFIX=${prefix}' \
+    'MULTILIB=${baselib}' \
+"
 
 do_compile () {
     oe_runmake
 }
 
+# There's INSTALL_LIB and INSTALL_SHARE also, but the lua binary hardcodes the
+# '/share' and '/' + LUA_MULTILIB paths, so we don't want to break those
+# expectations.
+EXTRA_OEMAKEINST = "\
+    'DESTDIR=${D}' \
+    'INSTALL_BIN=${D}${bindir}' \
+    'INSTALL_INC=${D}${includedir}/luajit-$(MAJVER).$(MINVER)' \
+    'INSTALL_MAN=${D}${mandir}/man1' \
+"
 do_install () {
-    oe_runmake 'DESTDIR=${D}' install
+    oe_runmake ${EXTRA_OEMAKEINST} install
     rmdir ${D}${datadir}/lua/5.* \
           ${D}${datadir}/lua \
           ${D}${libdir}/lua/5.* \
@@ -52,6 +79,9 @@ do_install () {
 
 PACKAGES += 'luajit-common'
 
+# See the comment for EXTRA_OEMAKEINST. This is needed to ensure the hardcoded
+# paths are packaged regardless of what the libdir and datadir paths are.
+FILES_${PN} += "${prefix}/${baselib} ${prefix}/share"
 FILES_${PN} += "${libdir}/libluajit-5.1.so.2 \
     ${libdir}/libluajit-5.1.so.${PV} \
 "

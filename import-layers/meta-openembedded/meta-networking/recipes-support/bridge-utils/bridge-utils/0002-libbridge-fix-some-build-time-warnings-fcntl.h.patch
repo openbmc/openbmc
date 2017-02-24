@@ -1,0 +1,64 @@
+From 68fafc4ea10365ac2e74ab7c660d097696857677 Mon Sep 17 00:00:00 2001
+From: root <git@andred.net>
+Date: Wed, 20 Jul 2016 23:40:32 +0100
+Subject: [PATCH 2/5] libbridge: fix some build-time warnings (fcntl.h)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+There are build-time warnings at the moment when building
+against musl, as the code here #include's the wrong file,
+sys/fcntl.h instead of fcntl.h
+
+In file included from libbridge_devif.c:26:0:
+<sysroot>/usr/include/sys/fcntl.h:1:2: warning: #warning redirecting incorrect #include <sys/fcntl.h> to <fcntl.h> [-Wcpp]
+ #warning redirecting incorrect #include <sys/fcntl.h> to <fcntl.h>
+  ^~~~~~~
+In file included from libbridge_if.c:23:0:
+<sysroot>/usr/include/sys/fcntl.h:1:2: warning: #warning redirecting incorrect #include <sys/fcntl.h> to <fcntl.h> [-Wcpp]
+ #warning redirecting incorrect #include <sys/fcntl.h> to <fcntl.h>
+  ^~~~~~~
+
+glibc headers silently redirect sys/fcntl.h to fcntl.h so the
+issue is not seen there.
+
+Let's fix the #include's to so as to use the correct ones
+and silence the compiler.
+
+Upstream-Status: Pending
+
+Signed-off-by: André Draszik <git@andred.net>
+---
+ libbridge/libbridge_devif.c | 2 +-
+ libbridge/libbridge_if.c    | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libbridge/libbridge_devif.c b/libbridge/libbridge_devif.c
+index 1e83925..2cf78f6 100644
+--- a/libbridge/libbridge_devif.c
++++ b/libbridge/libbridge_devif.c
+@@ -23,7 +23,7 @@
+ #include <errno.h>
+ #include <string.h>
+ #include <dirent.h>
+-#include <sys/fcntl.h>
++#include <fcntl.h>
+ 
+ #include "libbridge.h"
+ #include "libbridge_private.h"
+diff --git a/libbridge/libbridge_if.c b/libbridge/libbridge_if.c
+index 77d3f8a..9cf4bac 100644
+--- a/libbridge/libbridge_if.c
++++ b/libbridge/libbridge_if.c
+@@ -20,7 +20,7 @@
+ #include <stdlib.h>
+ #include <errno.h>
+ #include <string.h>
+-#include <sys/fcntl.h>
++#include <fcntl.h>
+ #include <sys/ioctl.h>
+ 
+ #include "libbridge.h"
+-- 
+2.8.1
+

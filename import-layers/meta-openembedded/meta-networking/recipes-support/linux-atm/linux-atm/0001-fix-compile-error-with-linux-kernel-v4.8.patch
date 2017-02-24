@@ -1,0 +1,74 @@
+From 7cdafc0dee8054f82777ed3bf6d4c8b5582d09ad Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Tue, 18 Oct 2016 07:56:02 +0000
+Subject: [PATCH] fix compile error with linux kernel v4.8
+
+In src/maint/zntune.c, the glibc time.h is included before linux
+time.h, so when compile the zntune.c, it break down by errors:
+
+	redefinition of 'struct timespec' 'struct timeval'
+	                'struct timezone' 'struct itimerval'
+
+We should exclude the linux time.h by disable linux/atm_zatm.h and
+move some useful definition in linux/atm_zatm.h to zntune.c to resolve
+it.
+
+Upstream-status: Pending
+
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+---
+ src/include/atm_zatm.h | 26 ++++++++++++++++++++++++++
+ src/maint/zntune.c     |  3 +--
+ 2 files changed, 27 insertions(+), 2 deletions(-)
+ create mode 100644 src/include/atm_zatm.h
+
+diff --git a/src/include/atm_zatm.h b/src/include/atm_zatm.h
+new file mode 100644
+index 0000000..7d64f4d
+--- /dev/null
++++ b/src/include/atm_zatm.h
+@@ -0,0 +1,26 @@
++#include <linux/atmapi.h>
++#include <linux/atmioc.h>
++
++#define ZATM_GETPOOL    _IOW('a',ATMIOC_SARPRV+1,struct atmif_sioc)
++                                                /* get pool statistics */
++#define ZATM_GETPOOLZ   _IOW('a',ATMIOC_SARPRV+2,struct atmif_sioc)
++                                                /* get statistics and zero */
++#define ZATM_SETPOOL    _IOW('a',ATMIOC_SARPRV+3,struct atmif_sioc)
++
++struct zatm_pool_info {
++        int ref_count;                  /* free buffer pool usage counters */
++        int low_water,high_water;       /* refill parameters */
++        int rqa_count,rqu_count;        /* queue condition counters */
++        int offset,next_off;            /* alignment optimizations: offset */
++        int next_cnt,next_thres;        /* repetition counter and threshold */
++};                                                /* set pool parameters */
++
++struct zatm_pool_req {
++        int pool_num;                   /* pool number */
++        struct zatm_pool_info info;     /* actual information */
++};
++
++#define ZATM_OAM_POOL           0       /* free buffer pool for OAM cells */
++#define ZATM_AAL0_POOL          1       /* free buffer pool for AAL0 cells */
++#define ZATM_AAL5_POOL_BASE     2       /* first AAL5 free buffer pool */
++#define ZATM_LAST_POOL  ZATM_AAL5_POOL_BASE+10 /* max. 64 kB */
+diff --git a/src/maint/zntune.c b/src/maint/zntune.c
+index 62d62ab..bb93eab 100644
+--- a/src/maint/zntune.c
++++ b/src/maint/zntune.c
+@@ -13,9 +13,8 @@
+ #include <sys/socket.h>
+ #include <sys/ioctl.h>
+ #include <atm.h>
++#include <atm_zatm.h>
+ #include <sys/time.h> /* for struct timeval, although it's not used */
+-#include <linux/atm_zatm.h>
+-
+ 
+ static void usage(const char *name)
+ {
+-- 
+2.9.0
+

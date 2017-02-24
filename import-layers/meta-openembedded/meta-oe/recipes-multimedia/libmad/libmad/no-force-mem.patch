@@ -1,0 +1,18 @@
+This option no longer exists in gcc 3.4.1
+
+RP - 18/07/2008
+
+Upstream-Status: Inappropriate [configuration]
+
+Index: libmad-0.15.1b/configure.ac
+===================================================================
+--- libmad-0.15.1b.orig/configure.ac	2008-07-18 15:45:30.000000000 +0100
++++ libmad-0.15.1b/configure.ac	2008-07-18 15:45:37.000000000 +0100
+@@ -140,7 +140,6 @@
+     case "$optimize" in
+ 	-O|"-O "*)
+ 	    optimize="-O"
+-	    optimize="$optimize -fforce-mem"
+ 	    optimize="$optimize -fforce-addr"
+ 	    : #x optimize="$optimize -finline-functions"
+ 	    : #- optimize="$optimize -fstrength-reduce"

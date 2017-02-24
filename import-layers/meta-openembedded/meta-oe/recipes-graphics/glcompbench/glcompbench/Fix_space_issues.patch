@@ -1,0 +1,22 @@
+diff -aur glcompbench-2012.08/src/composite-canvas.cc Fixed/src/composite-canvas.cc
+--- glcompbench-2012.08/src/composite-canvas.cc	2012-08-22 13:41:36.000000000 -0500
++++ Fixed/src/composite-canvas.cc	2016-08-24 14:05:28.970565709 -0500
+@@ -41,7 +41,7 @@
+ #include "log.h"
+ #include "profiler.h"
+ 
+-const std::string glcompbench_version_string("glcompbench "GLCOMPBENCH_VERSION);
++const std::string glcompbench_version_string("glcompbench " GLCOMPBENCH_VERSION);
+ 
+ /*******************
+  * Private methods *
+@@ -495,7 +495,7 @@
+     // When we complete an iteration, reset the count and tell the caller.
+ 
+     if (stats.total >= current_test_duration_) {
+-        Log::info("FPS: %"PRIu64"\n", (uint64_t)(1000 * stats.nsamples / stats.total));
++        Log::info("FPS: %" PRIu64 "\n", (uint64_t)(1000 * stats.nsamples / stats.total));
+ 
+         for (Profiler::Point p = 0; p < profiler.get_num_points(); p += 2) {
+             profiler.get_stats(p, p + 1, stats);
+

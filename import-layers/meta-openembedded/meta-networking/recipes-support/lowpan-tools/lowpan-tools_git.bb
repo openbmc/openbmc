@@ -9,7 +9,9 @@ DEPENDS = "flex-native bison-native libnl python"
 
 PV = "0.3.1+git${SRCPV}"
 SRC_URI = "git://git.code.sf.net/p/linux-zigbee/linux-zigbee \
-           file://no-help2man.patch"
+           file://no-help2man.patch \
+           file://0001-Fix-build-errors-with-clang.patch \
+           "
 SRCREV = "38f42dbfce9e13629263db3bd3b81f14c69bb733"
 
 S = "${WORKDIR}/git"
@@ -18,8 +20,10 @@ inherit autotools python-dir pkgconfig
 
 CACHED_CONFIGUREVARS += "am_cv_python_pythondir=${PYTHON_SITEPACKAGES_DIR}/lowpan-tools"
 
+CFLAGS += "-Wno-initializer-overrides"
+
 do_install_append() {
-	rmdir ${D}${localstatedir}/run
+    rmdir ${D}${localstatedir}/run
 }
 
 FILES_${PN}-dbg += "${libexecdir}/lowpan-tools/.debug/"

@@ -1,0 +1,72 @@
+Description: add -o argument to preserve ownership
+Author: Markus Mayer <mmayer@mmayer.net>
+
+See also https://android-review.googlesource.com/#/c/100312/
+
+Upstream-Status: Inappropriate
+---
+ system/extras/ext4_utils/make_ext4fs.c      |    6 ++++++
+ system/extras/ext4_utils/make_ext4fs_main.c |   10 ++++++++--
+ 2 files changed, 14 insertions(+), 2 deletions(-)
+
+--- a/system/extras/ext4_utils/make_ext4fs_main.c
++++ b/system/extras/ext4_utils/make_ext4fs_main.c
+@@ -49,13 +49,15 @@ extern struct fs_info info;
+ 
+ extern struct selabel_handle* selinux_android_file_context_handle(void);
+ 
++extern int preserve_owner;
++
+ static void usage(char *path)
+ {
+ 	fprintf(stderr, "%s [ -l <len> ] [ -j <journal size> ] [ -b <block_size> ]\n", basename(path));
+ 	fprintf(stderr, "    [ -g <blocks per group> ] [ -i <inodes> ] [ -I <inode size> ]\n");
+ 	fprintf(stderr, "    [ -L <label> ] [ -f ] [ -a <android mountpoint> ]\n");
+ 	fprintf(stderr, "    [ -S file_contexts ] [ -C fs_config ] [ -T timestamp ]\n");
+-	fprintf(stderr, "    [ -z | -s ] [ -w ] [ -c ] [ -J ] [ -v ] [ -B <block_list_file> ]\n");
++	fprintf(stderr, "    [ -z | -s ] [ -w ] [ -c ] [ -J ] [ -o ] [ -v ] [ -B <block_list_file> ]\n");
+ 	fprintf(stderr, "    <filename> [<directory>]\n");
+ }
+ 
+@@ -81,7 +83,7 @@ int main(int argc, char **argv)
+ 	struct selinux_opt seopts[] = { { SELABEL_OPT_PATH, "" } };
+ #endif
+ 
+-	while ((opt = getopt(argc, argv, "l:j:b:g:i:I:L:a:S:T:C:B:fwzJsctv")) != -1) {
++	while ((opt = getopt(argc, argv, "l:j:b:g:i:I:L:a:S:T:C:B:fwzJsctov")) != -1) {
+ 		switch (opt) {
+ 		case 'l':
+ 			info.len = parse_num(optarg);
+@@ -144,6 +146,10 @@ int main(int argc, char **argv)
+ 			}
+ #endif
+ 			break;
++		case 'o':
++			preserve_owner = 1;
++			printf("Warning: Enabling 'preserve ownership', this is an unofficial feature!\n");
++			break;
+ 		case 'v':
+ 			verbose = 1;
+ 			break;
+--- a/system/extras/ext4_utils/make_ext4fs.c
++++ b/system/extras/ext4_utils/make_ext4fs.c
+@@ -67,6 +67,8 @@
+ 
+ #endif
+ 
++int preserve_owner = 0;
++
+ /* TODO: Not implemented:
+    Allocating blocks in the same block group as the file inode
+    Hash or binary tree directories
+@@ -185,6 +187,10 @@ static u32 build_directory_structure(con
+ 		} else {
+ 			dentries[i].mtime = fixed_time;
+ 		}
++		if (preserve_owner) {
++			dentries[i].uid = stat.st_uid;
++			dentries[i].gid = stat.st_gid;
++		}
+ 		uint64_t capabilities;
+ 		if (fs_config_func != NULL) {
+ #ifdef ANDROID

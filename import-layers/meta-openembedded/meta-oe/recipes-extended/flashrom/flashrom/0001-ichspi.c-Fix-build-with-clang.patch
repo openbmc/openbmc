@@ -1,0 +1,29 @@
+From a2f603c54013cd0b04bb0103dc615644f315d5e8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 15 Nov 2016 17:39:24 +0000
+Subject: [PATCH] ichspi.c: Fix build with clang
+
+ichspi.c:1130:24: error: duplicate 'const' declaration specifier [-Werror,-Wduplicate-decl-specifier]
+        static const uint32_t const dec_berase[4] = {
+                              ^
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ ichspi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ichspi.c b/ichspi.c
+index 0223ae3..e47aebd 100644
+--- a/ichspi.c
++++ b/ichspi.c
+@@ -1127,7 +1127,7 @@ static void ich_hwseq_set_addr(uint32_t addr)
+ static uint32_t ich_hwseq_get_erase_block_size(unsigned int addr)
+ {
+ 	uint8_t enc_berase;
+-	static const uint32_t const dec_berase[4] = {
++	static const uint32_t dec_berase[4] = {
+ 		256,
+ 		4 * 1024,
+ 		8 * 1024,
+-- 
+1.9.1
+

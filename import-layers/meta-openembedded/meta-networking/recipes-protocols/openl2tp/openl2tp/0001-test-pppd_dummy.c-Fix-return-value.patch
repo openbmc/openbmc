@@ -1,0 +1,38 @@
+From ce5f5563ab54db9d28dba44a0e25e8a8c7bb9876 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 19 Oct 2016 00:34:35 +0000
+Subject: [PATCH] test/pppd_dummy.c: Fix return value
+
+pause() is defined in unistd.h, clang does not
+like the fact that we are using a function without
+declaration
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ test/pppd_dummy.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/test/pppd_dummy.c b/test/pppd_dummy.c
+index 148e7d2..b564c36 100644
+--- a/test/pppd_dummy.c
++++ b/test/pppd_dummy.c
+@@ -26,6 +26,7 @@
+ #include <sys/types.h>
+ #include <sys/wait.h>
+ #include <syslog.h>
++#include <unistd.h>
+ 
+ #define PPPD_DUMMY_TMP_FILE	"/tmp/pppd_dummy"
+ 
+@@ -40,7 +41,7 @@ int main(int argc, char **argv)
+ 	
+ 	if (file == NULL) {
+ 		syslog(LOG_ERR, "Failed to open %s\n", filename);
+-		return;
++		return -1;
+ 	}
+ 
+ 	for (arg = 1; arg < argc; arg++) {
+-- 
+1.9.1
+

@@ -1,0 +1,51 @@
+From ad1be542b87b3186f8ef7bee2c594daefe5bb4c8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 18 Oct 2016 21:31:40 +0000
+Subject: [PATCH] Fix warnings found with clang
+
+| /mnt/oe/openembedded-core/build/workspace/sources/libplist/src/base64.c:107:12: error: non-void function 'base64decode' should return a value [-Wreturn-type]
+|         if (!buf) return;
+|                   ^
+| /mnt/oe/openembedded-core/build/workspace/sources/libplist/src/base64.c:109:16: error: non-void function 'base64decode' should return a value [-Wreturn-type]
+|         if (len <= 0) return;
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libcnary/node.c | 2 +-
+ src/base64.c    | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/libcnary/node.c b/libcnary/node.c
+index 1f9f669..d6f3f63 100644
+--- a/libcnary/node.c
++++ b/libcnary/node.c
+@@ -104,7 +104,7 @@ int node_detach(node_t* parent, node_t* child) {
+ 
+ int node_insert(node_t* parent, unsigned int index, node_t* child)
+ {
+-	if (!parent || !child) return;
++	if (!parent || !child) return -1;
+ 	child->isLeaf = TRUE;
+ 	child->isRoot = FALSE;
+ 	child->parent = parent;
+diff --git a/src/base64.c b/src/base64.c
+index 65c6061..531a06a 100644
+--- a/src/base64.c
++++ b/src/base64.c
+@@ -104,9 +104,9 @@ static int base64decode_block(unsigned char *target, const char *data, size_t da
+ 
+ unsigned char *base64decode(const char *buf, size_t *size)
+ {
+-	if (!buf) return;
++	if (!buf) return 0;
+ 	size_t len = strlen(buf);
+-	if (len <= 0) return;
++	if (len <= 0) return 0;
+ 	unsigned char *outbuf = (unsigned char*)malloc((len/4)*3+3);
+ 
+ 	unsigned char *line;
+-- 
+1.9.1
+

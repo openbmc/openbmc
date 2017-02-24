@@ -5,6 +5,9 @@ LIC_FILES_CHKSUM = "file://COPYING.LIB;md5=6e29c688d912da12b66b73e32b03d812"
 DEPENDS = "xkbcomp gtk+ iso-codes libxi libxml2"
 
 GNOME_COMPRESS_TYPE = "xz"
+inherit gnomebase gettext gobject-introspection distro_features_check
+
+REQUIRED_DISTRO_FEATURES = "x11"
 
 inherit gnomebase gettext gobject-introspection
 SRC_URI[archive.md5sum] = "290ea2a8abc40f78a3a16bdae6f02808"

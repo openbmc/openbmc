@@ -1,0 +1,53 @@
+From 7bc1932cabfafca8c68e18bd43e3d203c70d2dd8 Mon Sep 17 00:00:00 2001
+From: root <git@andred.net>
+Date: Wed, 20 Jul 2016 23:40:33 +0100
+Subject: [PATCH 5/5] build: don't ignore CFLAGS from environment
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+We need to take them into account so as to behave nicely towards
+build environments which expect to be able to set them, e.g. for
+optimisation flags, or debug options.
+
+Therefore they need to be added to the compiler command line of
+every source file, and in addition, the same CFLAGS that were
+used during compilation must also always be used during linking!
+
+Upstream-Status: Pending
+
+Signed-off-by: André Draszik <git@andred.net>
+---
+ brctl/Makefile.in     | 2 +-
+ libbridge/Makefile.in | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/brctl/Makefile.in b/brctl/Makefile.in
+index e1956d6..eff260c 100644
+--- a/brctl/Makefile.in
++++ b/brctl/Makefile.in
+@@ -34,7 +34,7 @@ install: $(PROGRAMS)
+ 	$(INSTALL) -m 755 $(PROGRAMS) $(DESTDIR)$(sbindir)
+ 
+ brctl:	$(brctl_OBJECTS) ../libbridge/libbridge.a
+-	$(CC) $(LDFLAGS) $(brctl_OBJECTS) $(LIBS) -o brctl
++	$(CC) $(CFLAGS) $(LDFLAGS) $(brctl_OBJECTS) $(LIBS) -o brctl
+ 
+ %.o: %.c brctl.h
+ 	$(CC) $(CFLAGS) $(INCLUDE) -c $< 
+diff --git a/libbridge/Makefile.in b/libbridge/Makefile.in
+index 20512c4..4e1cddc 100644
+--- a/libbridge/Makefile.in
++++ b/libbridge/Makefile.in
+@@ -5,7 +5,7 @@ AR=ar
+ RANLIB=@RANLIB@
+ 
+ CC=@CC@
+-CFLAGS = -Wall -g $(KERNEL_HEADERS)
++CFLAGS = -Wall -g $(KERNEL_HEADERS) @CFLAGS@
+ 
+ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+-- 
+2.8.1
+

@@ -32,3 +32,6 @@ do_install () {
 FILES_${PN} += "${bindir}"
 RDEPENDS_${PN} = "kernel-module-netmap"
 RRECOMMENDS_${PN} = "kernel-module-netmap"
+
+# http://errors.yoctoproject.org/Errors/Details/69733/
+PNBLACKLIST[netmap] ?= "BROKEN: Tries to build kernel module and fails, either it should be disabled or there should be dependency on kernel like in netmap-modules"

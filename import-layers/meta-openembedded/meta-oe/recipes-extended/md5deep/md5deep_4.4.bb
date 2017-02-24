@@ -9,6 +9,7 @@ SRCREV = "cd2ed7416685a5e83eb10bb659d6e9bec01244ae"
 
 SRC_URI = "git://github.com/jessek/hashdeep.git \
         file://wrong-variable-expansion.patch \
+        file://0001-Fix-errors-found-by-clang.patch \
         "
 
 S = "${WORKDIR}/git"

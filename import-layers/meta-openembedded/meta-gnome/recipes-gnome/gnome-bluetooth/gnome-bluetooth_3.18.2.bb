@@ -6,8 +6,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=eb723b61539feef013de476e68b5c50a \
 
 SECTION = "x11/gnome"
 
-DEPENDS = "udev gtk+3 libnotify libcanberra"
-DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES','bluez5','bluez5','bluez4',d)}"
+DEPENDS = "udev gtk+3 libnotify libcanberra intltool-native \
+    ${@bb.utils.contains('DISTRO_FEATURES','bluez5','bluez5','bluez4',d)} \
+"
 
 inherit gnomebase gtk-icon-cache gobject-introspection
 

@@ -1,0 +1,30 @@
+From 27e4639254f2b2eb7d04790bd8cf16ecfcbac1c2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 19 Oct 2016 01:07:16 +0000
+Subject: [PATCH] adjust signature of main()
+
+clang complains about the types of main() function
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/main.c b/main.c
+index 81ba543..ee7506c 100644
+--- a/main.c
++++ b/main.c
+@@ -159,7 +159,7 @@ extern int breakflg;
+ 
+ unsigned char **mainenv;
+ 
+-int main(int argc, unsigned char **argv, unsigned char **envv)
++int main(int argc, char **argv, char **envv)
+ {
+ 	CAP *cap;
+ 	unsigned char *s;
+-- 
+1.9.1
+

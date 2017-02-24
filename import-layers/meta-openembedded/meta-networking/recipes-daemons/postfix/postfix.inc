@@ -7,8 +7,8 @@ has a definite Sendmail-ish flavor, but the inside is completely different."
 HOMEPAGE= "http://www.postfix.org"
 SECTION = "mail"
 DEPENDS = "virtual/db libpcre openssl postfix-native \
-    ${@base_contains('DISTRO_FEATURES', 'ldap', 'openldap', '', d)} \
-    ${@base_contains('DISTRO_FEATURES', 'sasl', 'cyrus-sasl', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'ldap', 'openldap', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'sasl', 'cyrus-sasl', '', d)} \
 "
 DEPENDS_class-native = "virtual/db-native openssl-native libpcre-native"
 
@@ -52,9 +52,9 @@ export SYSLIBS = "${LDFLAGS}"
 
 # ldap support
 export CCARGS-ldap  = "\
-    ${@base_contains('DISTRO_FEATURES', 'ldap', '-DHAS_LDAP', '', d)}"
+    ${@bb.utils.contains('DISTRO_FEATURES', 'ldap', '-DHAS_LDAP', '', d)}"
 export AUXLIBS-ldap = "\
-    ${@base_contains('DISTRO_FEATURES', 'ldap', '-lldap -llber', '', d)}"
+    ${@bb.utils.contains('DISTRO_FEATURES', 'ldap', '-lldap -llber', '', d)}"
 
 # no native openldap
 export CCARGS-ldap_class-native = ""
@@ -63,9 +63,9 @@ export AUXLIBS-ldap_class-native = ""
 # SASL support -DUSE_LDAP_SASL -DUSE_SASL_AUTH
 # current openldap didn't enable SASL
 export CCARGS-sasl  = "\
-    ${@base_contains('DISTRO_FEATURES', 'sasl', '-DUSE_SASL_AUTH -DUSE_CYRUS_SASL -I=/usr/include/sasl', '', d)}"
+    ${@bb.utils.contains('DISTRO_FEATURES', 'sasl', '-DUSE_SASL_AUTH -DUSE_CYRUS_SASL -I=/usr/include/sasl', '', d)}"
 export AUXLIBS-sasl = "\
-    ${@base_contains('DISTRO_FEATURES', 'sasl', '-lsasl2', '', d)}"
+    ${@bb.utils.contains('DISTRO_FEATURES', 'sasl', '-lsasl2', '', d)}"
 export CCARGS-sasl_class-native = ""
 export AUXLIBS-sasl_class-native = ""
 
@@ -223,6 +223,11 @@ ALTERNATIVE_${PN} = "sendmail"
 ALTERNATIVE_TARGET[sendmail] = "${sbindir}/sendmail.postfix"
 ALTERNATIVE_LINK_NAME[sendmail] = "${sbindir}/sendmail"
 ALTERNATIVE_PRIORITY = "120"
+
+ALTERNATIVE_${PN}-doc += "mailq.1 newaliases.1 sendmail.1"
+ALTERNATIVE_LINK_NAME[mailq.1] = "${mandir}/man1/mailq.1"
+ALTERNATIVE_LINK_NAME[newaliases.1] = "${mandir}/man1/newaliases.1"
+ALTERNATIVE_LINK_NAME[sendmail.1] = "${mandir}/man1/sendmail.1"
 
 pkg_postinst_${PN} () {
     if [ "x$D" = "x" ]; then

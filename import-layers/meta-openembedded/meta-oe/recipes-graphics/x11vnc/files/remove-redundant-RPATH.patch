@@ -1,0 +1,86 @@
+From 7be055c13c7d0d640941830a3291af3b404928c1 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 27 Jun 2016 04:44:14 -0400
+Subject: [PATCH] configure.ac: remove redundant RPATH
+
+It caused oe QA issue:
+...
+|ERROR: QA Issue: x11vnc: work/i586-poky-linux/x11vnc/0.9.13-r0/packages-split/
+x11vnc/usr/bin/x11vnc contains probably-redundant RPATH /usr/lib [useless-rpaths]
+...
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.ac | 21 +++++----------------
+ 1 file changed, 5 insertions(+), 16 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 6f664d0..f986686 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -330,10 +330,8 @@ if test "x$with_crypto" != "xno" -a "x$with_ssl" != "xno"; then
+ 		saved_LDFLAGS="$LDFLAGS"
+ 		CPPFLAGS="$CPPFLAGS -I$with_ssl/include"
+ 		LDFLAGS="$LDFLAGS -L$with_ssl/lib"
+-		if test "x$ld_minus_R" = "xno"; then
++		if test "x$ld_minus_R" = "xno" -o "x$GCC" = "xyes"; then
+ 			:
+-		elif test "x$GCC" = "xyes"; then
+-			LDFLAGS="$LDFLAGS -Xlinker -R$with_ssl/lib"
+ 		else
+ 			LDFLAGS="$LDFLAGS -R$with_ssl/lib"
+ 		fi
+@@ -447,10 +445,8 @@ if test ! -z "$with_system_libvncserver" -a "x$with_system_libvncserver" != "xno
+ 	fi
+ 	if test "x$with_system_libvncserver" != "xyes"; then
+ 		rflag=""
+-		if test "x$ld_minus_R" = "xno"; then
++		if test "x$ld_minus_R" = "xno" -o "x$GCC" = "xyes"; then
+ 			:
+-		elif test "x$GCC" = "xyes"; then
+-			rflag="-Xlinker -R$with_system_libvncserver/lib"
+ 		else
+ 			rflag="-R$with_system_libvncserver/lib"
+ 		fi
+@@ -484,10 +480,8 @@ new enough.
+ 	elif libvncserver-config --version 1>/dev/null 2>&1; then
+ 		rflag=""
+ 		rprefix=`libvncserver-config --prefix`
+-		if test "x$ld_minus_R" = "xno"; then
++		if test "x$ld_minus_R" = "xno" -o "x$GCC" = "xyes"; then
+ 			:
+-		elif test "x$GCC" = "xyes"; then
+-			rflag=" -Xlinker -R$rprefix/lib "
+ 		else
+ 			rflag=" -R$rprefix/lib "
+ 		fi
+@@ -541,11 +535,8 @@ if test "x$with_jpeg" != "xno"; then
+ 		saved_LDFLAGS="$LDFLAGS"
+ 		CPPFLAGS="$CPPFLAGS -I$with_jpeg/include"
+ 		LDFLAGS="$LDFLAGS -L$with_jpeg/lib"
+-		if test "x$ld_minus_R" = "xno"; then
++		if test "x$ld_minus_R" = "xno" -o "x$GCC" = "xyes"; then
+ 			:
+-		elif test "x$GCC" = "xyes"; then
+-			# this is not complete... in general a rat's nest.
+-			LDFLAGS="$LDFLAGS -Xlinker -R$with_jpeg/lib"
+ 		else
+ 			LDFLAGS="$LDFLAGS -R$with_jpeg/lib"
+ 		fi
+@@ -590,10 +581,8 @@ if test "x$with_zlib" != "xno" -a "x$with_libz" != "xno"; then
+ 		saved_LDFLAGS="$LDFLAGS"
+ 		CPPFLAGS="$CPPFLAGS -I$with_zlib/include"
+ 		LDFLAGS="$LDFLAGS -L$with_zlib/lib"
+-		if test "x$ld_minus_R" = "xno"; then
++		if test "x$ld_minus_R" = "xno" -o "x$GCC" = "xyes"; then
+ 			:
+-		elif test "x$GCC" = "xyes"; then
+-			LDFLAGS="$LDFLAGS -Xlinker -R$with_zlib/lib"
+ 		else
+ 			LDFLAGS="$LDFLAGS -R$with_zlib/lib"
+ 		fi
+-- 
+2.8.1
+

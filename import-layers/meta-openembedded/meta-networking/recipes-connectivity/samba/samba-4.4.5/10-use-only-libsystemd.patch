@@ -1,0 +1,30 @@
+diff -ur samba-4.4.2/lib/util/debug.c samba-4.4.2/lib/util/debug.c
+--- samba-4.4.2/lib/util/debug.c	2016-05-08 18:33:24.000000000 +0200
++++ samba-4.4.2/lib/util/debug.c	2016-05-08 18:27:09.341481492 +0200
+@@ -102,7 +102,7 @@
+ 	.fd = 2 /* stderr by default */
+ };
+ 
+-#if defined(WITH_SYSLOG) || defined(HAVE_LIBSYSTEMD_JOURNAL)
++#if defined(WITH_SYSLOG) || defined(HAVE_LIBSYSTEMD)
+ static int debug_level_to_priority(int level)
+ {
+ 	/*
+@@ -179,7 +179,7 @@
+ }
+ #endif /* WITH_SYSLOG */
+ 
+-#ifdef HAVE_LIBSYSTEMD_JOURNAL
++#ifdef HAVE_LIBSYSTEMD
+ #include <systemd/sd-journal.h>
+ static void debug_systemd_log(int msg_level,
+ 			      const char *msg, const char *msg_no_nl)
+@@ -251,7 +251,7 @@
+ 	},
+ #endif
+ 
+-#ifdef HAVE_LIBSYSTEMD_JOURNAL
++#ifdef HAVE_LIBSYSTEMD
+ 	{
+ 		.name = "systemd",
+ 		.log = debug_systemd_log,

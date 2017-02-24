@@ -1,0 +1,14 @@
+Upstream-Status: Submitted [https://bugzilla.gnome.org/show_bug.cgi?id=691545]
+
+Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
+diff -Nurd vte-0.28.2/gnome-pty-helper/configure.in vte-0.28.2/gnome-pty-helper/configure.in
+--- vte-0.28.2/gnome-pty-helper/configure.in	2010-07-15 20:08:44.000000000 +0300
++++ vte-0.28.2/gnome-pty-helper/configure.in	2013-01-11 14:50:34.971027440 +0200
+@@ -8,7 +8,6 @@
+ AC_ISC_POSIX
+ AC_PROG_CC
+ AC_STDC_HEADERS
+-AM_PROG_CC_STDC
+
+ if test -z "$enable_maintainer_mode"; then
+   enable_maintainer_mode=yes

@@ -1,0 +1,32 @@
+From 1ea09653692efdd6443fb6770e8523bf6c9e49b9 Mon Sep 17 00:00:00 2001
+From: Fabio Berton <fabio.berton@ossystems.com.br>
+Date: Thu, 6 Oct 2016 11:54:07 -0300
+Subject: Avoid ambiguity in div invocation
+Organization: O.S. Systems Software LTDA.
+
+Patch from:
+https://anonscm.debian.org/cgit/pkg-multimedia/caps.git/commit/?id=9a99c225fb813ae69f146e3d90f7b47bdbd97708
+
+Upstream-Status: Pending
+
+Signed-off-by: Fabio Berton <fabio.berton@ossystems.com.br>
+---
+ AutoFilter.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/AutoFilter.cc b/AutoFilter.cc
+index fc087d0..bd6b12f 100644
+--- a/AutoFilter.cc
++++ b/AutoFilter.cc
+@@ -69,7 +69,7 @@ AutoFilter::activate()
+ void
+ AutoFilter::cycle (uint frames)
+ {
+-	div_t qr = div (frames, blocksize);
++	div_t qr = div ((int)frames, (int)blocksize);
+ 	int blocks = qr.quot;
+ 	if (qr.rem) ++blocks;
+ 	double over_blocks = 1./blocks;
+-- 
+2.1.4
+

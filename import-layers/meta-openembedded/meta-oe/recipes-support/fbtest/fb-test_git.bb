@@ -11,10 +11,10 @@ SRC_URI = "git://github.com/prpplague/fb-test-app.git"
 S = "${WORKDIR}/git"
 
 do_install() {
-	install -d ${D}${bindir}
-	install -m 0755 fb-test ${D}${bindir}
-	# avoid collisions with perf (perf) and mesa-demos (offset)
-	for prog in perf rect offset ; do
-		install -m 0755 $prog ${D}${bindir}/fb-$prog
-	done
+    install -d ${D}${bindir}
+    install -m 0755 fb-test ${D}${bindir}
+    # avoid collisions with perf (perf) and mesa-demos (offset)
+    for prog in perf rect offset ; do
+        install -m 0755 $prog ${D}${bindir}/fb-$prog
+    done
 }

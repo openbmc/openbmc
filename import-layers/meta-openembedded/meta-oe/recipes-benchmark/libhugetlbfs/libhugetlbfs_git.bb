@@ -4,7 +4,7 @@ LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://LGPL-2.1;md5=2d5025d4aa3495befef8f17206a5b0a1"
 
 DEPENDS = "sysfsutils perl"
-RDEPENDS_${PN} += "bash perl python python-io python-lang python-subprocess python-resource"
+RDEPENDS_${PN} += "bash perl python python-io python-lang python-subprocess python-resource ${PN}-perl"
 RDEPENDS_${PN}-tests += "bash"
 
 PV = "2.19"
@@ -19,11 +19,12 @@ SRC_URI = " \
     file://0001-run_test.py-not-use-hard-coded-path-.-obj-hugeadm.patch \
     file://libhugetlbfs-elf_i386-avoid-search-host-library-path.patch \
     file://libhugetlbfs-avoid-using-restrict-as-var-name.patch \
+    file://Force-text-segment-alignment-to-0x08000000-for-i386-.patch \
 "
 
 S = "${WORKDIR}/git"
 
-COMPATIBLE_HOST = "(x86_64|powerpc|powerpc64|aarch64|arm).*-linux*"
+COMPATIBLE_HOST = "(i.86|x86_64|powerpc|powerpc64|aarch64|arm).*-linux*"
 
 LIBARGS = "LIB32=${baselib} LIB64=${baselib}"
 LIBHUGETLBFS_ARCH = "${TARGET_ARCH}"
@@ -36,6 +37,7 @@ CFLAGS += "-fexpensive-optimizations -frename-registers -fomit-frame-pointer -g0
 TARGET_CC_ARCH += "${LDFLAGS}"
 
 #The CUSTOM_LDSCRIPTS doesn't work with the gold linker
+inherit cpan-base
 do_configure() {
     if [ "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', 'ld-is-gold', '', d)}" = "ld-is-gold" ] ; then
       sed -i 's/CUSTOM_LDSCRIPTS = yes/CUSTOM_LDSCRIPTS = no/'  Makefile
@@ -43,6 +45,11 @@ do_configure() {
 
     # fixup perl module directory hardcoded to perl5
     sed -i 's/perl5/perl/g'  Makefile
+
+    # fixup to install perl module under $(LIBDIR)/perl/${@get_perl_version(d)}/TLBC
+    # to avoid below error
+    # Can't locate TLBC/OpCollect.pm in @INC
+    sed -i '/^PMDIR/ s:perl:perl/${@get_perl_version(d)}:g' Makefile
 }
 
 do_install() {

@@ -4,7 +4,7 @@ DESCRIPTION = "LCOV is a graphical front-end for GCC's coverage testing \
 tool gcov. It collects gcov data for multiple source files and creates \
 HTML pages containing the source code annotated with coverage information. \
 It also adds overview pages for easy navigation within the file structure. \
-LCOV supports statement, function and branch coverage measurement." 
+LCOV supports statement, function and branch coverage measurement."
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 

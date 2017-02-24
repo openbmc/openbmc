@@ -1,0 +1,29 @@
+From 209fad8ebd17bf46d0431dafbb547f429a3cffdf Mon Sep 17 00:00:00 2001
+From: Paul Barker <paul@paulbarker.me.uk>
+Date: Sat, 4 Jun 2016 15:05:49 +0100
+Subject: [PATCH 1/2] Fix TOYBOX_VERSION
+
+The latest tagged version is 0.7.1.
+
+Signed-off-by: Paul Barker <paul@paulbarker.me.uk>
+Upstream-status: Submitted
+---
+ main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/main.c b/main.c
+index eeae2f3..bedb333 100644
+--- a/main.c
++++ b/main.c
+@@ -6,7 +6,7 @@
+ #include "toys.h"
+ 
+ #ifndef TOYBOX_VERSION
+-#define TOYBOX_VERSION "0.7.0"
++#define TOYBOX_VERSION "0.7.1"
+ #endif
+ 
+ // Populate toy_list[].
+-- 
+2.1.4
+

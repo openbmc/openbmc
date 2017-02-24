@@ -1,0 +1,33 @@
+From 126e0d3c1ad74cf5b0abe9e98ec444bcc3c83159 Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen.kooi@linaro.org>
+Date: Fri, 4 Mar 2016 14:53:55 +0100
+Subject: [PATCH 2/2] disable static build
+
+Signed-off-by: Koen Kooi <koen.kooi@linaro.org>
+
+Upstream-Status: Inappropriate [meta-oe specific]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+---
+ src/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index 1829d22..c7a0ca3 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -8,9 +8,9 @@ include $(TOPDIR)/Make.defaults
+ 
+ LIBTARGETS=libefivar.so libefiboot.so
+ STATICLIBTARGETS=libefivar.a libefiboot.a
+-BINTARGETS=efivar efivar-static
++BINTARGETS=efivar
+ PCTARGETS=efivar.pc efiboot.pc
+-TARGETS=$(LIBTARGETS) $(STATICLIBTARGETS) $(BINTARGETS) $(PCTARGETS)
++TARGETS=$(LIBTARGETS) $(BINTARGETS) $(PCTARGETS)
+ 
+ LIBEFIBOOT_SOURCES = crc32.c creator.c disk.c gpt.c linux.c loadopt.c
+ LIBEFIBOOT_OBJECTS = $(patsubst %.c,%.o,$(LIBEFIBOOT_SOURCES))
+-- 
+2.4.3
+

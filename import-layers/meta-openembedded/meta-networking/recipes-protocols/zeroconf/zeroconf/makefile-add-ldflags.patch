@@ -1,0 +1,19 @@
+Add LDFLAGS variable to Makefile, make sure the extra linker flags can be passed.
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+
+diff --git a/Makefile b/Makefile
+index 77f3364..c98083f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -18,7 +18,7 @@ clean:
+ 
+ zeroconf: zeroconf.o delay.o
+ 	$(Q)echo "Creating $@"
+-	$(Q)$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
++	$(Q)$(CC) $(CFLAGS) ${LDFLAGS} -o $@ $^ $(LIBS)
+ 
+ 
+ # Automatic dependency generation

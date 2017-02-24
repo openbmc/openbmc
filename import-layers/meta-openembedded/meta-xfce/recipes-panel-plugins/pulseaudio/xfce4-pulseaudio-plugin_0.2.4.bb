@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=f5eac6bb0d6ec0dc655e417781d4015f"
 
 inherit xfce-panel-plugin distro_features_check
 
-REQUIRED_DISTRO_FEATURES = "pulseaudio"
+REQUIRED_DISTRO_FEATURES = "pulseaudio x11"
 
 DEPENDS += "pulseaudio"
 

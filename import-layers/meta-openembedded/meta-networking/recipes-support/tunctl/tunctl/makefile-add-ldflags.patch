@@ -1,0 +1,19 @@
+Add LDFLAGS variable to Makefile, make sure the extra linker flags can be passed.
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+
+diff --git a/Makefile b/Makefile
+index a0aa7f6..d6ce2c7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -14,7 +14,7 @@ MAN_DIR ?= /usr/share/man/man$(MANS)
+ all : $(BIN) $(MAN)
+ 
+ $(BIN) : $(BIN).c
+-	$(CC) $(CFLAGS) -o $(BIN) $(BIN).c
++	$(CC) $(CFLAGS) ${LDFLAGS} -o $(BIN) $(BIN).c
+ 
+ $(MAN) : $(PACKAGE).sgml
+ 	docbook2man $(PACKAGE).sgml

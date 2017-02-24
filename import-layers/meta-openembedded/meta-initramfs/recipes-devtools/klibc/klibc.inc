@@ -27,6 +27,7 @@ EXTRA_OEMAKE = "'KLIBCARCH=${KLIBC_ARCH}' \
                 'KLIBCLIBGCC=${STAGING_DIR_TARGET}${libdir}/${TARGET_SYS}/*/libgcc.a' \
                 'prefix=${exec_prefix}' \
                 'INSTALLROOT=${D}' \
+                'INSTALLDIR=${libdir}/klibc' \
                 'SHLIBDIR=${libdir}' \
                 "
 

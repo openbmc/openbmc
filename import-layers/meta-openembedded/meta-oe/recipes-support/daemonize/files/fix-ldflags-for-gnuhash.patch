@@ -1,0 +1,23 @@
+Add the LDFLAGS to the final link to avoid errors with missing GNU_HASH
+
+Upstream-Status: Submitted [https://github.com/bmc/daemonize/pull/22]
+
+Signed-off-by: Derek Straka <derek@asterius.io>
+
+diff --git a/Makefile.in b/Makefile.in
+index 8a4d078..40d3dee 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -24,10 +24,10 @@ LDFLAGS		= @LDFLAGS@
+ all: daemonize 
+ 
+ daemonize: daemonize.o getopt.o $(MISSING_OBJECTS)
+-	$(CC) $(CFLAGS) -o $@ $^
++	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+ 
+ testdaemon: testdaemon.o
+-	$(CC) $(CFLAGS) -o $@ $^
++	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+  
+ psman: daemonize.ps
+ 

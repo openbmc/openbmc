@@ -28,18 +28,19 @@ SRC_URI[sha256sum] = "be8f75eff936b8e41b112462db51adf689715658a1b09e0d6b05d11ec9
 
 inherit autotools gettext update-alternatives texinfo
 
-SRC_URI += "${@base_contains('DISTRO_FEATURES', 'ipv6', '', 'file://fix-disable-ipv6.patch', d)}"
-noipv6="${@base_contains('DISTRO_FEATURES', 'ipv6', '', '--disable-ipv6 gl_cv_socket_ipv6=no', d)}"
+SRC_URI += "${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', '', 'file://fix-disable-ipv6.patch', d)}"
 
 PACKAGECONFIG ??= "ftp uucpd \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'pam', '', d)} \
+                   ${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', 'ipv6 ping6', '', d)} \
                   "
 PACKAGECONFIG[ftp] = "--enable-ftp,--disable-ftp,readline"
 PACKAGECONFIG[uucpd] = "--enable-uucpd,--disable-uucpd,readline"
 PACKAGECONFIG[pam] = "--with-pam,--without-pam,libpam"
+PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6 gl_cv_socket_ipv6=no,"
+PACKAGECONFIG[ping6] = "--enable-ping6,--disable-ping6,"
 
 EXTRA_OECONF = "--with-ncurses-include-dir=${STAGING_INCDIR} \
-        ${noipv6} \
         inetutils_cv_path_login=${base_bindir}/login \
         --with-libreadline-prefix=${STAGING_LIBDIR} \
         --enable-rpath=no \
@@ -56,8 +57,7 @@ do_install_append () {
     install -m 0755 -d ${D}${base_sbindir}
     install -m 0755 -d ${D}${sbindir}
     install -m 0755 -d ${D}${sysconfdir}/xinetd.d
-    mv ${D}${bindir}/ping ${D}${base_bindir}/
-    mv ${D}${bindir}/ping6 ${D}${base_bindir}/
+    mv ${D}${bindir}/ping* ${D}${base_bindir}/
     mv ${D}${bindir}/ifconfig ${D}${base_sbindir}/
     mv ${D}${libexecdir}/syslogd ${D}${base_sbindir}/
     mv ${D}${bindir}/hostname ${D}${base_bindir}/
@@ -135,7 +135,7 @@ ALTERNATIVE_LINK_NAME[ifconfig]  = "${base_sbindir}/ifconfig"
 ALTERNATIVE_${PN}-ping = "ping"
 ALTERNATIVE_LINK_NAME[ping]   = "${base_bindir}/ping"
 
-ALTERNATIVE_${PN}-ping6 = "ping6"
+ALTERNATIVE_${PN}-ping6 = "${@bb.utils.contains('PACKAGECONFIG', 'ping6', 'ping6', '', d)}"
 ALTERNATIVE_LINK_NAME[ping6]  = "${base_bindir}/ping6"
 
 

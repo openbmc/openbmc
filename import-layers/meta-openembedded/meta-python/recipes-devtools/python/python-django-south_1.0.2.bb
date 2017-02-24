@@ -8,6 +8,10 @@ SRC_URI[md5sum] = "c76a9758b2011bc3b6c39f881bba2f66"
 SRC_URI[sha256sum] = "d360bd31898f9df59f6faa786551065bba45b35e7ee3c39b381b4fbfef7392f4"
 
 PYPI_PACKAGE = "South"
-inherit pypi distutils
+inherit pypi setuptools
 
 BBCLASSEXTEND = "nativesdk"
+
+RDEPENDS_${PN} += "\
+    ${PYTHON_PN}-django \
+    "

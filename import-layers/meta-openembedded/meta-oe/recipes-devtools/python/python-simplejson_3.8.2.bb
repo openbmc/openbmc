@@ -14,7 +14,7 @@ SRC_URI[sha256sum] = "d58439c548433adcda98e695be53e526ba940a4b9c44fb9a05d92cd495
 
 S = "${WORKDIR}/${SRCNAME}-${PV}"
 
-inherit distutils
+inherit setuptools
 
 RDEPENDS_${PN} = "\
     python-core \

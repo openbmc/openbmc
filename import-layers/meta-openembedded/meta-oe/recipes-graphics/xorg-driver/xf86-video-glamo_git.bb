@@ -13,7 +13,7 @@ SRC_URI = "git://git.openmoko.org/git/xf86-video-glamo.git;branch=master \
            file://0001-glamo-kms-driver-drop-unused-xf86_config.patch \
            file://0001-fix-build-with-KMS-disabled.patch \
            file://0003-glamo-driver-adapt-to-xserver-0.13-video-API.patch \
-           file://0001-glamo-driver-remove-references-to-mibstore.patch \   
+           file://0001-glamo-driver-remove-references-to-mibstore.patch \
            file://0004-glamo.h-use-const-for-jbt6k74_state_path.patch \
 "
 

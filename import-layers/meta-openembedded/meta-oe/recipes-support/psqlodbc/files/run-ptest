@@ -1,0 +1,46 @@
+#!/bin/sh
+
+BASEDIR="$(dirname $(readlink -f $0))"
+
+# init and start postgresql server for testing
+PGDATA="/var/lib/postgresql/data"
+if [ -f "${PGDATA}/PG_VERSION" ]; then
+	echo "Data directory is not empty! Skip initdb."
+else
+	echo "Initializing database: "
+	chown -R postgres:postgres ${PGDATA}
+	su -l postgres -c "/usr/bin/initdb --pgdata='$PGDATA'"
+fi
+
+SYSV_INIT="/etc/init.d/postgresql-server"
+if [ -e ${SYSV_INIT} ]; then
+	RESTART_POSTGRESQL="${SYSV_INIT} restart"
+	STOP_POSTGRESQL="${SYSV_INIT} stop"
+else
+	RESTART_POSTGRESQL="systemctl restart postgresql"
+	STOP_POSTGRESQL="systemctl stop postgresql"
+fi
+
+${RESTART_POSTGRESQL} || echo "Failed to restart postgresql, skip the tests."
+
+if [ ! -d ${BASEDIR}/results ]; then
+	mkdir ${BASEDIR}/results
+fi
+
+# Generate odbc config files and reset db
+${BASEDIR}/odbcini-gen.sh || echo "FAIL: Generate odbc config files"
+ODBCSYSINI=. ODBCINSTINI=./odbcinst.ini ODBCINI=./odbc.ini \
+	${BASEDIR}/reset-db < ${BASEDIR}/sampletables.sql \
+	|| echo "FAIL: reset db with sample tables"
+
+# Run the actual tests
+TESTS=
+for i in `ls ${BASEDIR}/exe/*-test`; do
+	TESTS="$TESTS $(basename ${i%-test})"
+done
+
+${BASEDIR}/runsuite ${TESTS} --inputdir=${BASEDIR}
+
+# Cleanup
+${STOP_POSTGRESQL}
+rm -f regression.diffs odbcinst.ini odbc.ini

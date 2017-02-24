@@ -18,6 +18,7 @@ PR = "r1"
 
 SRC_URI = "http://www.progsoc.org/~wildfire/zeroconf/download/${BPN}-${PV}.tar.gz \
            file://compilefix.patch \
+           file://makefile-add-ldflags.patch \
            file://zeroconf-default \
            file://debian-zeroconf"
 

@@ -1,0 +1,33 @@
+From 3484bdfa7adbaebcf8bb8e7d4820f64b12717932 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Fri, 29 Jul 2016 15:37:18 +0800
+Subject: [PATCH] python-mccabe: remove unnecessary setup_requires
+ pytest-runner
+
+* Remove setup_requires pytest-runner as the
+  setup_requires pytest-runner actually is not
+  used for pytest which only in do_compile phase
+  via setup.py build
+
+Upstream-Status: Pending
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ setup.py | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index e59903d..bf2aaba 100644
+--- a/setup.py
++++ b/setup.py
+@@ -33,7 +33,6 @@ setup(
+     license='Expat license',
+     py_modules=['mccabe'],
+     zip_safe=False,
+-    setup_requires=['pytest-runner'],
+     tests_require=['pytest'],
+     entry_points={
+         'flake8.extension': [
+-- 
+2.8.1
+

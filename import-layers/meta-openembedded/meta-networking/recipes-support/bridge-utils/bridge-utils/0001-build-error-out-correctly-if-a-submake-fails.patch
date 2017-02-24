@@ -1,0 +1,69 @@
+From 5e102b453e254d16af1f95053134f58348e0f83a Mon Sep 17 00:00:00 2001
+From: root <git@andred.net>
+Date: Wed, 20 Jul 2016 23:40:30 +0100
+Subject: [PATCH 1/5] build: error out correctly if a submake fails
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Due to use of a for loop, return status from submake was always
+ignored.
+
+In the context of build-systems like OE this causes them to not
+detect any errors and continue happily, resulting in a successful,
+but incomplete, build.
+
+Fix by having a nicer Makefile.in which now has rules for the
+individual targets (directories) so that make itself can
+figure out all the dependencies and build those targets as
+needed rather than using a for loop to iterate over the
+directories in a shell and thus loosing the return status of
+the command inside the loop.
+
+This has the added advantage that parallel builds work now.
+
+Upstream-Status: Pending
+
+Signed-off-by: André Draszik <git@andred.net>
+---
+ Makefile.in | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 6028513..dab88bb 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -13,11 +13,11 @@ distdir = $(PACKAGE)-$(VERSION)
+ 
+ SUBDIRS=libbridge brctl doc
+ 
+-all:
+-	for x in $(SUBDIRS); do $(MAKE) $(MFLAGS) -C $$x ; done
++all: override ACTION=
++all: $(SUBDIRS)
+ 
+-clean:
+-	for x in $(SUBDIRS); do $(MAKE) $(MFLAGS) -C $$x clean ; done
++clean: override ACTION=clean
++clean: $(SUBDIRS)
+ 
+ distclean:	clean
+ 	rm -f config.log
+@@ -30,6 +30,12 @@ maintainer-clean: distclean
+ 	rm -f libbridge/Makefile
+ 	rm -f doc/Makefile
+ 
+-install:
+-	for x in $(SUBDIRS); do $(MAKE) $(MFLAGS) -C $$x install; done
++install: override ACTION=install
++install: $(SUBDIRS)
+ 
++
++brctl: libbridge
++$(SUBDIRS):
++	$(MAKE) $(MFLAGS) -C $@ $(ACTION)
++
++.PHONY: $(SUBDIRS)
+-- 
+2.8.1
+

@@ -1,4 +1,4 @@
-DESCRIPTION = "Brcrypt hashing for Flask."
+DESCRIPTION = "Bcrypt hashing for Flask."
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=0ee2ee5bee7fe96597770e92db5719a8"
 
@@ -9,4 +9,4 @@ PYPI_PACKAGE = "Flask-Bcrypt"
 
 inherit pypi setuptools
 
-RDEPENDS_${PN} = "python-bcrypt"
+RDEPENDS_${PN} += "${PYTHON_PN}-bcrypt ${PYTHON_PN}-flask"

@@ -1,0 +1,13 @@
+[Unit]
+Description=Netdata, Real-time performance monitoring
+RequiresMountsFor=/var
+
+[Service]
+User=root
+ExecStartPre=/bin/mkdir -p /var/log/netdata
+ExecStartPre=/bin/chown -R nobody.netdata @@datadir/netdata/web
+ExecStartPre=/bin/chown -R nobody.netdata /var/cache/netdata
+ExecStart=/usr/sbin/netdata -nd
+
+[Install]
+WantedBy=multi-user.target

@@ -36,6 +36,8 @@ FILES_${PN}-dev += "${libdir}/${BPN}/devel/*.la \
                     ${base_libdir}/security/*.la \
                    "
 
+INSANE_SKIP_${PN}-dev += "dev-elf"
+
 FILES_${PN}-dbg += "${libdir}/${BPN}/standalone/.debug/ \
                     ${libdir}/${BPN}/devel/.debug/ \
                     ${base_libdir}/security/.debug/"

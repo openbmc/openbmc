@@ -1,0 +1,27 @@
+after gcc linking has changed, all the libraries must be explicitely specified 
+This patch avoids this linking error:
+
+| ccache i586-poky-linux-gcc -march=i586 --sysroot=/disk0/pokybuild/build1/tmp/sysroots/i586-poky-linux  -fexpensive-optimizations -fomit-frame-pointer -frename-registers -O2 -ggdb -feliminate-unused-debug-types  -Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed -o xtscal main.o calibrate.o -lX11 -lXft -lXext -lXcalibrate^M
+| /disk0/pokybuild/build1/tmp/sysroots/x86_64-linux/usr/libexec/i586-poky-linux/gcc/i586-poky-linux/4.5.1/ld: ^?: invalid DSO for symbol `XRenderChangePicture' definition^M
+| /disk0/pokybuild/build1/tmp/sysroots/i586-poky-linux/usr/lib/libXrender.so.1: could not read symbols: Bad value^M
+| collect2: ld returned 1 exit status^M
+| make: *** [xtscal] Error 1
+
+Nitin A Kamble <nitin.a.kamble@intel.com>
+Date: 2011/01/11
+
+Upstream-Status: Pending
+
+Index: xtscal-0.6.3/configure.ac
+===================================================================
+--- xtscal-0.6.3.orig/configure.ac
++++ xtscal-0.6.3/configure.ac
+@@ -9,7 +9,7 @@ AM_INIT_AUTOMAKE([foreign dist-bzip2])
+ # Checks for programs.
+ AC_PROG_CC
+ 
+-PKG_CHECK_MODULES(XTSCAL, x11 xft xext xcalibrate)
++PKG_CHECK_MODULES(XTSCAL, x11 xft xext xcalibrate xrender)
+ 
+ AC_CONFIG_FILES([Makefile])
+ AC_OUTPUT

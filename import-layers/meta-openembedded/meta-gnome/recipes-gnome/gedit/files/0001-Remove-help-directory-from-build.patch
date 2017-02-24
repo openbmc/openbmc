@@ -1,0 +1,29 @@
+From 1d2e6165e3154e27ecde329a40c05f0880afb9e0 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 17 May 2016 14:14:03 +0300
+Subject: [PATCH] Remove help directory from build
+
+It hardcodes the use of xml2po utility, which is provided by obsolete gnome-doc-utils
+
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ Makefile.am | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index e57b203..a88152d 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -3,9 +3,6 @@ ACLOCAL_AMFLAGS = -I m4
+ 
+ SUBDIRS = gedit pixmaps po data plugin-loaders plugins docs tests win32 osx
+ 
+-if !OS_OSX
+-SUBDIRS += help
+-endif
+ 
+ distuninstallcheck_listfiles = find . -type f -print | grep -v scrollkeeper
+ 
+-- 
+2.8.1
+

@@ -1,0 +1,36 @@
+directfb: Fix for hangs in direct_test, fusion_skirmish on exit
+
+Upstream-Status: Pending
+Signed-off-by: Lauren Post <lauren.post@freescale.com>
+
+--- a/lib/fusion/fusion.c	2013-01-18 22:57:11.000000000 +0800
++++ b/lib/fusion/fusion.c	2013-07-04 10:42:56.502699119 +0800
+@@ -2853,9 +2853,14 @@
+           direct_mutex_lock( &world->event_dispatcher_mutex );
+ 
+           while (1) {
+-               if (!world->event_dispatcher_buffers)
++               if (!world->event_dispatcher_buffers){
+                     direct_waitqueue_wait( &world->event_dispatcher_cond, &world->event_dispatcher_mutex );
+-
++                    if (world->dispatch_stop) {
++                         D_DEBUG_AT( Fusion_Main_Dispatch, "  -> IGNORING (dispatch_stop!)\n" );
++                         direct_mutex_unlock( &world->event_dispatcher_mutex );
++                         return NULL;
++                    }
++               }
+                buf = (FusionEventDispatcherBuffer *)world->event_dispatcher_buffers;
+                D_MAGIC_ASSERT( buf, FusionEventDispatcherBuffer );
+ 
+@@ -2872,6 +2877,11 @@
+ //D_INFO("waiting...\n");
+                     D_ASSERT( buf->read_pos == buf->write_pos );
+                     direct_waitqueue_wait( &world->event_dispatcher_cond, &world->event_dispatcher_mutex );
++		      if (world->dispatch_stop) {
++                         D_DEBUG_AT( Fusion_Main_Dispatch, "  -> IGNORING (dispatch_stop!)\n" );
++                         direct_mutex_unlock( &world->event_dispatcher_mutex );
++                         return NULL;
++                    }
+                }
+ 
+                buf = (FusionEventDispatcherBuffer *)world->event_dispatcher_buffers;

@@ -6,9 +6,9 @@ inherit packagegroup distro_features_check
 REQUIRED_DISTRO_FEATURES = "x11"
 
 RDEPENDS_${PN} = "\
-	font-adobe-100dpi \
-	font-adobe-utopia-100dpi \
-	font-bh-100dpi \
-	font-bh-lucidatypewriter-100dpi \
-	font-bitstream-100dpi \
+    font-adobe-100dpi \
+    font-adobe-utopia-100dpi \
+    font-bh-100dpi \
+    font-bh-lucidatypewriter-100dpi \
+    font-bitstream-100dpi \
 "

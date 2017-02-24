@@ -2,9 +2,15 @@ Upstream: http://www.mail-archive.com/bug-inetutils@gnu.org/msg02103.html
 
 Upstream-Status: Pending
 
-diff -ur inetutils-1.8.orig/ping/ping_common.h inetutils-1.8/ping/ping_common.h
---- inetutils-1.8.orig/ping/ping_common.h	2010-05-15 20:55:47.000000000 +0930
-+++ inetutils-1.8/ping/ping_common.h	2010-12-01 12:19:08.000000000 +1030
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ ping/ping_common.h | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/ping/ping_common.h b/ping/ping_common.h
+index 1dfd1b5..3bfbd12 100644
+--- a/ping/ping_common.h
++++ b/ping/ping_common.h
 @@ -17,10 +17,14 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see `http://www.gnu.org/licenses/'. */
@@ -20,18 +26,32 @@ diff -ur inetutils-1.8.orig/ping/ping_common.h inetutils-1.8/ping/ping_common.h
  #include <icmp.h>
  #include <error.h>
  #include <progname.h>
-@@ -66,13 +70,19 @@
+@@ -62,7 +66,12 @@ struct ping_stat
+    want to follow the traditional behaviour of ping.  */
+ #define DEFAULT_PING_COUNT 0
+ 
++#ifdef HAVE_IPV6
+ #define PING_HEADER_LEN (USE_IPV6 ? sizeof (struct icmp6_hdr) : ICMP_MINLEN)
++#else
++#define PING_HEADER_LEN (ICMP_MINLEN)
++#endif
++
+ #define PING_TIMING(s)  ((s) >= sizeof (struct timeval))
+ #define PING_DATALEN    (64 - PING_HEADER_LEN)  /* default data length */
+ 
+@@ -74,13 +83,20 @@ struct ping_stat
    (t).tv_usec = ((i)%PING_PRECISION)*(1000000/PING_PRECISION) ;\
  } while (0)
  
 +#ifdef HAVE_IPV6
- /* Not sure about this step*/
- #define _PING_BUFLEN(p, USE_IPV6) ((USE_IPV6)? ((p)->ping_datalen + sizeof (struct icmp6_hdr)) : \
- 				   ((p)->ping_datalen + sizeof (icmphdr_t)))
-+#else
-+#define _PING_BUFLEN(p, USE_IPV6) ((p)->ping_datalen + sizeof (icmphdr_t))
-+#endif
+ /* FIXME: Adjust IPv6 case for options and their consumption.  */
+ #define _PING_BUFLEN(p, u) ((u)? ((p)->ping_datalen + sizeof (struct icmp6_hdr)) : \
+ 				   (MAXIPLEN + (p)->ping_datalen + ICMP_TSLEN))
  
++#else
++#define _PING_BUFLEN(p, u) (MAXIPLEN + (p)->ping_datalen + ICMP_TSLEN)
++#endif
++
 +#ifdef HAVE_IPV6
  typedef int (*ping_efp6) (int code, void *closure, struct sockaddr_in6 * dest,
  			  struct sockaddr_in6 * from, struct icmp6_hdr * icmp,
@@ -40,7 +60,7 @@ diff -ur inetutils-1.8.orig/ping/ping_common.h inetutils-1.8/ping/ping_common.h
  
  typedef int (*ping_efp) (int code,
  			 void *closure,
-@@ -81,13 +91,17 @@
+@@ -89,13 +105,17 @@ typedef int (*ping_efp) (int code,
  			 struct ip * ip, icmphdr_t * icmp, int datalen);
  
  union event {
@@ -58,3 +78,6 @@ diff -ur inetutils-1.8.orig/ping/ping_common.h inetutils-1.8/ping/ping_common.h
  };
  
  typedef struct ping_data PING;
+-- 
+2.8.3
+

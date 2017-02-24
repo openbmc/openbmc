@@ -34,6 +34,7 @@ EXTRA_OECONF = " \
 
 do_configure_prepend() {
     sed -i -e "s:\bdocs::g" ${S}/Makefile.am
+    rm -f ${S}/m4/gnome-doc-utils.m4
 }
 
 do_install_prepend() {
@@ -103,3 +104,5 @@ pkg_postrm_${PN} () {
     delgroup gdm || true
     sed -i /gdm/d ${sysconfdir}/X11/default-display-manager || true
 }
+
+PNBLACKLIST[gdm] ?= "Depends on broken gnome-panel"
