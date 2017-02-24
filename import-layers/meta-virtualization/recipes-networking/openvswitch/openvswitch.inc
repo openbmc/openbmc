@@ -15,7 +15,7 @@ DEPENDS += "bridge-utils openssl python perl"
 
 RDEPENDS_${PN} += "util-linux-uuidgen util-linux-libuuid coreutils \
 	python perl perl-module-strict ${PN}-switch \
-        bash"
+        bash python-twisted"
 RDEPENDS_${PN}-testcontroller = "${PN} lsb ${PN}-pki"
 RDEPENDS_${PN}-switch = "${PN} openssl procps util-linux-uuidgen"
 RDEPENDS_${PN}-pki = "${PN}"
@@ -69,7 +69,8 @@ FILES_${PN}-switch = "\
 FILES_${PN} += "${datadir}/ovsdbmonitor"
 FILES_${PN} += "/run"
 
-inherit autotools update-rc.d systemd
+FILES_${PN} += "${libdir}/python${PYTHON_BASEVERSION}/"
+inherit autotools update-rc.d systemd python-dir
 
 SYSTEMD_PACKAGES = "${PN}-switch"
 SYSTEMD_SERVICE_${PN}-switch = " \
@@ -102,6 +103,8 @@ do_install_append() {
 		${D}/${systemd_unitdir}/system/openvswitch-nonetwork.service
 
 	oe_runmake modules_install INSTALL_MOD_PATH=${D}
+	install -d ${D}${libdir}/python${PYTHON_BASEVERSION}/site-packages
+	cp -r ${S}/python/ovstest/ ${D}${libdir}/python${PYTHON_BASEVERSION}/site-packages/
 }
 
 pkg_postinst_${PN}-pki () {

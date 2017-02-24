@@ -1,0 +1,28 @@
+From ffc71da15c3da068f85d16617b6e0c0175fc0110 Mon Sep 17 00:00:00 2001
+From: He Zhe <zhe.he@windriver.com>
+Date: Tue, 23 Aug 2016 02:28:47 -0400
+Subject: [PATCH] ptest: Remove Windows-1252 check from esxutilstest
+
+Currently we use iconv from glibc-locale and it does not support
+Windows-1252 and we don't need support windows character encoding.
+
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ tests/esxutilstest.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/tests/esxutilstest.c b/tests/esxutilstest.c
+index 44bdc84..3223de3 100644
+--- a/tests/esxutilstest.c
++++ b/tests/esxutilstest.c
+@@ -258,7 +258,6 @@ mymain(void)
+     DO_TEST(ParseDatastorePath);
+     DO_TEST(ConvertDateTimeToCalendarTime);
+     DO_TEST(EscapeDatastoreItem);
+-    DO_TEST(ConvertWindows1252ToUTF8);
+ 
+     return result == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
+ }
+-- 
+2.8.1
+
