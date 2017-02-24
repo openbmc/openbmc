@@ -32,6 +32,11 @@ VIRTUAL-RUNTIME_obmc-chassis-state-manager ?= "phosphor-state-manager-chassis"
 # interface.
 VIRTUAL-RUNTIME_obmc-host-state-manager ?= "phosphor-state-manager-host"
 
+# obmc-fan-presence
+#
+# Provides implementations of fan presence detection
+VIRTUAL-RUNTIME_obmc-fan-presence ?= "phosphor-fan-presence-tach"
+
 # obmc-inventory-manager
 #
 # Provides an implementation of the xyz.openbmc_project.Inventory.Manager
