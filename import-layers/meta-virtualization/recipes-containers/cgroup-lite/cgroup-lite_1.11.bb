@@ -4,10 +4,10 @@ DESCRIPTION =  "Light-weight package to set up cgroups at system boot."
 HOMEPAGE = "http://packages.ubuntu.com/source/precise/cgroup-lite"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://debian/copyright;md5=5d5da4e0867cf06014f87102154d0102"
-SRC_URI = "http://archive.ubuntu.com/ubuntu/pool/main/c/cgroup-lite/cgroup-lite_1.1.tar.gz"
+SRC_URI = "https://launchpad.net/ubuntu/+archive/primary/+files/cgroup-lite_1.11.tar.xz"
 SRC_URI += "file://cgroups-init"
-SRC_URI[md5sum] = "041a0d8ad2b192271a2e5507fdb6809f"
-SRC_URI[sha256sum] = "e7f9992b90b5b4634f3b8fb42580ff28ff31093edb297ab872c37f61a94586bc"
+SRC_URI[md5sum] = "b20976194ee8fdb61e6b55281fb6ead4"
+SRC_URI[sha256sum] = "a79ab9ae6fb3ff3ce0aa5539b055c0379eaffdc6c5f003af4010fcea683c1a45"
 
 inherit update-rc.d
 

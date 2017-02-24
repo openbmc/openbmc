@@ -11,9 +11,9 @@ diff -Naur protobuf-c-0.15.old/src/Makefile.am protobuf-c-0.15/src/Makefile.am
 @@ -23,7 +23,7 @@
  lib_LTLIBRARIES = libprotobuf-c.la
  protobufcincludedir = $(includedir)/google/protobuf-c
- 
+
 -EXTRA_DIST = CMakeLists.txt test/CMakeLists.txt
-+EXTRA_DIST = CMakeLists.txt 
- 
++EXTRA_DIST = CMakeLists.txt
+
  libprotobuf_c_la_SOURCES = \
  google/protobuf-c/protobuf-c-dispatch.c \
