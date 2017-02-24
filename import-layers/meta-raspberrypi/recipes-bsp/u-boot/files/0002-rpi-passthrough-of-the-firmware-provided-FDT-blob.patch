@@ -1,0 +1,156 @@
+From ade243a211d62327e9ebadce27bbbff7981e37f0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?C=C3=A9dric=20Schieli?= <cschieli@gmail.com>
+Date: Fri, 11 Nov 2016 11:59:07 +0100
+Subject: [PATCH] rpi: passthrough of the firmware provided FDT blob
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Raspberry firmware used to pass a FDT blob at a fixed address (0x100),
+but this is not true anymore. The address now depends on both the
+memory size and the blob size [1].
+
+If one wants to passthrough this FDT blob to the kernel, the most
+reliable way is to save its address from the r2/x0 register in the
+U-Boot entry point and expose it in a environment variable for
+further processing.
+
+This patch just does this:
+- save the provided address in the global variable fw_dtb_pointer
+- expose it in ${fdt_addr} if it points to a a valid FDT blob
+
+There are many different ways to use it. One can, for example, use
+the following script which will extract from the tree the command
+line built by the firmware, then hand over the blob to a previously
+loaded kernel:
+
+fdt addr ${fdt_addr}
+fdt get value bootargs /chosen bootargs
+bootz ${kernel_addr_r} - ${fdt_addr}
+
+Alternatively, users relying on sysboot/pxe can simply omit any FDT
+statement in their extlinux.conf file, U-Boot will automagically pick
+${fdt_addr} and pass it to the kernel.
+
+[1] https://www.raspberrypi.org/forums//viewtopic.php?f=107&t=134018
+
+Upstream-Status: Backport
+
+Signed-off-by: Cédric Schieli <cschieli@gmail.com>
+Acked-by: Stephen Warren <swarren@nvidia.com>
+Signed-off-by: Jonathan Liu <net147@gmail.com>
+---
+ board/raspberrypi/rpi/Makefile        |  1 +
+ board/raspberrypi/rpi/lowlevel_init.S | 36 +++++++++++++++++++++++++++++++++++
+ board/raspberrypi/rpi/rpi.c           | 29 ++++++++++++++++++++++++++++
+ 3 files changed, 66 insertions(+)
+ create mode 100644 board/raspberrypi/rpi/lowlevel_init.S
+
+diff --git a/board/raspberrypi/rpi/Makefile b/board/raspberrypi/rpi/Makefile
+index 4ce2c98..dcb25ac 100644
+--- a/board/raspberrypi/rpi/Makefile
++++ b/board/raspberrypi/rpi/Makefile
+@@ -5,3 +5,4 @@
+ #
+ 
+ obj-y	:= rpi.o
++obj-y	+= lowlevel_init.o
+diff --git a/board/raspberrypi/rpi/lowlevel_init.S b/board/raspberrypi/rpi/lowlevel_init.S
+new file mode 100644
+index 0000000..cdbd8e1
+--- /dev/null
++++ b/board/raspberrypi/rpi/lowlevel_init.S
+@@ -0,0 +1,36 @@
++/*
++ * (C) Copyright 2016
++ * Cédric Schieli <cschieli@gmail.com>
++ *
++ * SPDX-License-Identifier:	GPL-2.0+
++ */
++
++#include <config.h>
++
++.align 8
++.global fw_dtb_pointer
++fw_dtb_pointer:
++#ifdef CONFIG_ARM64
++	.dword 0x0
++#else
++	.word 0x0
++#endif
++
++/*
++ * Routine: save_boot_params (called after reset from start.S)
++ * Description: save ATAG/FDT address provided by the firmware at boot time
++ */
++
++.global save_boot_params
++save_boot_params:
++
++	/* The firmware provided ATAG/FDT address can be found in r2/x0 */
++#ifdef CONFIG_ARM64
++	adr	x8, fw_dtb_pointer
++	str	x0, [x8]
++#else
++	str	r2, fw_dtb_pointer
++#endif
++
++	/* Returns */
++	b	save_boot_params_ret
+diff --git a/board/raspberrypi/rpi/rpi.c b/board/raspberrypi/rpi/rpi.c
+index 6245b36..ffd6d31 100644
+--- a/board/raspberrypi/rpi/rpi.c
++++ b/board/raspberrypi/rpi/rpi.c
+@@ -25,6 +25,9 @@
+ 
+ DECLARE_GLOBAL_DATA_PTR;
+ 
++/* From lowlevel_init.S */
++extern unsigned long fw_dtb_pointer;
++
+ static const struct bcm2835_gpio_platdata gpio_platdata = {
+ 	.base = BCM2835_GPIO_BASE,
+ };
+@@ -285,6 +288,31 @@ static void set_fdtfile(void)
+ 	setenv("fdtfile", fdtfile);
+ }
+ 
++/*
++ * If the firmware provided a valid FDT at boot time, let's expose it in
++ * ${fdt_addr} so it may be passed unmodified to the kernel.
++ */
++static void set_fdt_addr(void)
++{
++	if (getenv("fdt_addr"))
++		return;
++
++	if (fdt_magic(fw_dtb_pointer) != FDT_MAGIC)
++		return;
++
++	setenv_hex("fdt_addr", fw_dtb_pointer);
++}
++
++/*
++ * Prevent relocation from stomping on a firmware provided FDT blob.
++ */
++unsigned long board_get_usable_ram_top(unsigned long total_size)
++{
++	if ((gd->ram_top - fw_dtb_pointer) > SZ_64M)
++		return gd->ram_top;
++	return fw_dtb_pointer & ~0xffff;
++}
++
+ static void set_usbethaddr(void)
+ {
+ 	ALLOC_CACHE_ALIGN_BUFFER(struct msg_get_mac_address, msg, 1);
+@@ -356,6 +384,7 @@ static void set_serial_number(void)
+ 
+ int misc_init_r(void)
+ {
++	set_fdt_addr();
+ 	set_fdtfile();
+ 	set_usbethaddr();
+ #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
+-- 
+2.10.2
+

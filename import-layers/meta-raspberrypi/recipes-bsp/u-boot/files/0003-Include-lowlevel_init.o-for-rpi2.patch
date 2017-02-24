@@ -1,0 +1,25 @@
+From 1eb01436bc57ad32519a4567a1c9ec82d52d60a1 Mon Sep 17 00:00:00 2001
+From: Paul Barker <paul@paulbarker.me.uk>
+Date: Tue, 29 Nov 2016 19:47:49 +0000
+Subject: [PATCH] Include lowlevel_init.o for rpi2
+
+Signed-off-by: Paul Barker <paul@paulbarker.me.uk>
+Upstream-status: Inappropriate
+    (not needed upstream as rpi_2 board directory is removed in latest
+    version)
+---
+ board/raspberrypi/rpi_2/Makefile | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/board/raspberrypi/rpi_2/Makefile b/board/raspberrypi/rpi_2/Makefile
+index d82cd21..9f865c5 100644
+--- a/board/raspberrypi/rpi_2/Makefile
++++ b/board/raspberrypi/rpi_2/Makefile
+@@ -5,3 +5,4 @@
+ #
+
+ obj-y	:= ../rpi/rpi.o
++obj-y	+= ../rpi/lowlevel_init.o
+--
+2.1.4
+

@@ -4,8 +4,8 @@ Git repository web frontend:
     http://git.yoctoproject.org/cgit/cgit.cgi/meta-raspberrypi/
 Mailing list (yocto mailing list):
     yocto@yoctoproject.org
-Issues management (redmine):
-    http://redmine.gherzan.ro/projects/meta-raspberrypi
+Issues management (Github Issues):
+    https://github.com/agherzan/meta-raspberrypi/issues
 
 
 Contents:
@@ -37,7 +37,7 @@ Contents:
 6. Source code and mirrors
 7. Contribution
     7.A. Mailing List
-    7.B. Redmine
+    7.B. Github Issues
 8. Maintainers
 
 
@@ -79,6 +79,8 @@ c. Set MACHINE in local.conf to one of the supported boards:
     - raspberrypi0
     - raspberrypi2
     - raspberrypi3
+    - raspberrypi-cm (dummy alias for raspberrypi)
+    - raspberrypi-cm3 (dummy alias for raspberrypi2)
 d. bitbake rpi-hwup-image
 e. dd to a SD card the generated sdimg file (use xzcat if rpi-sdimg.xz is used)
 f. Boot your RPI.
@@ -157,7 +159,7 @@ VIDEO_CAMERA = "1"
 3.G. Enable offline compositing support
 =======================================
 Set this variable to enable support for dispmanx offline compositing
-DISMANX_OFFLINE = "1"
+DISPMANX_OFFLINE = "1"
 
 This will enable the firmware to fall back to off-line compositing of
 Dispmanx elements. Normally the compositing is done on-line, during scanout,

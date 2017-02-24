@@ -12,8 +12,8 @@ COMPATIBLE_MACHINE = "raspberrypi"
 
 SRC_URI = "http://www.airspayce.com/mikem/bcm2835/bcm2835-${PV}.tar.gz"
 
-SRC_URI[md5sum] = "3a40c01ee7d81fbff80c54fbe1a351b5"
-SRC_URI[sha256sum] = "fc6b0412525e6b7e85aeffec67e2d01a99fb906346620041e6684d59ea5517a7"
+SRC_URI[md5sum] = "258caf3437012d09a651e1852d0bd60c"
+SRC_URI[sha256sum] = "52180b8a61b6546c1df4aed259d0a4d2fa56e50605e0d4d967a76bf2b23dafb8"
 
 inherit autotools
 
@@ -21,7 +21,7 @@ do_compile_append() {
     # Now compiling the examples provided by the package
     mkdir -p ${B}/examples
     for file in `ls ${S}/examples`; do
-        ${CC} ${S}/examples/${file}/${file}.c -o ${B}/examples/${file} -Bstatic -L${B}/src -lbcm2835 -I${S}/src
+        ${CC} ${LDFLAGS} ${S}/examples/${file}/${file}.c -o ${B}/examples/${file} -Bstatic -L${B}/src -lbcm2835 -I${S}/src
     done
 }
 
