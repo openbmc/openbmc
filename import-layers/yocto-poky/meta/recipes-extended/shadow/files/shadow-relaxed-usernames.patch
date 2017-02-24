@@ -1,0 +1,100 @@
+
+The groupadd from shadow does not allow upper case group names, the
+same is true for the upstream shadow. But distributions like
+Debian/Ubuntu/CentOS has their own way to cope with this problem,
+this patch is picked up from CentOS release 7.0 to relax the usernames
+restrictions to allow the upper case group names, and the relaxation is
+POSIX compliant because POSIX indicate that usernames are composed of 
+characters from the portable filename character set [A-Za-z0-9._-].
+
+Upstream-Status: Pending
+
+Signed-off-by: Shan Hai <shan.hai@windriver.com> 
+
+diff -urpN a/libmisc/chkname.c b/libmisc/chkname.c
+index 5089112..f40a0da 100644
+--- a/libmisc/chkname.c
++++ b/libmisc/chkname.c
+@@ -49,21 +49,28 @@
+ static bool is_valid_name (const char *name)
+ {
+ 	/*
+-	 * User/group names must match [a-z_][a-z0-9_-]*[$]
+-	 */
+-	if (('\0' == *name) ||
+-	    !((('a' <= *name) && ('z' >= *name)) || ('_' == *name))) {
++         * User/group names must match gnu e-regex:
++         *    [a-zA-Z0-9_.][a-zA-Z0-9_.-]{0,30}[a-zA-Z0-9_.$-]?
++         *
++         * as a non-POSIX, extension, allow "$" as the last char for
++         * sake of Samba 3.x "add machine script"
++         */
++	if ( ('\0' == *name) ||
++             !((*name >= 'a' && *name <= 'z') ||
++               (*name >= 'A' && *name <= 'Z') ||
++               (*name >= '0' && *name <= '9') ||
++               (*name == '_') || (*name == '.') 
++	      )) {
+ 		return false;
+ 	}
+ 
+ 	while ('\0' != *++name) {
+-		if (!(( ('a' <= *name) && ('z' >= *name) ) ||
+-		      ( ('0' <= *name) && ('9' >= *name) ) ||
+-		      ('_' == *name) ||
+-		      ('-' == *name) ||
+-		      ('.' == *name) ||
+-		      ( ('$' == *name) && ('\0' == *(name + 1)) )
+-		     )) {
++                if (!(  (*name >= 'a' && *name <= 'z') ||
++                        (*name >= 'A' && *name <= 'Z') ||
++                        (*name >= '0' && *name <= '9') ||
++                        (*name == '_') || (*name == '.') || (*name == '-') ||
++                        (*name == '$' && *(name + 1) == '\0') 
++                     )) {
+ 			return false;
+ 		}
+ 	}
+diff -urpN a/man/groupadd.8.xml b/man/groupadd.8.xml
+index 230fd0c..94f7807 100644
+--- a/man/groupadd.8.xml
++++ b/man/groupadd.8.xml
+@@ -222,12 +222,6 @@
+    <refsect1 id='caveats'>
+      <title>CAVEATS</title>
+      <para>
+-       Groupnames must start with a lower case letter or an underscore,
+-       followed by lower case letters, digits, underscores, or dashes.
+-       They can end with a dollar sign.
+-       In regular expression terms: [a-z_][a-z0-9_-]*[$]?
+-     </para>
+-     <para>
+        Groupnames may only be up to &GROUP_NAME_MAX_LENGTH; characters long.
+      </para>
+      <para>
+diff -urpN a/man/useradd.8.xml b/man/useradd.8.xml
+index 5dec989..fe623b9 100644
+--- a/man/useradd.8.xml
++++ b/man/useradd.8.xml
+@@ -336,7 +336,7 @@
+ 	</term>
+ 	<listitem>
+ 	  <para>
+-	    Do no create the user's home directory, even if the system
++	    Do not create the user's home directory, even if the system
+ 	    wide setting from <filename>/etc/login.defs</filename>
+ 	    (<option>CREATE_HOME</option>) is set to
+ 	    <replaceable>yes</replaceable>.
+@@ -607,12 +607,6 @@
+     </para>
+ 
+     <para>
+-      Usernames must start with a lower case letter or an underscore,
+-      followed by lower case letters, digits, underscores, or dashes.
+-      They can end with a dollar sign.
+-      In regular expression terms: [a-z_][a-z0-9_-]*[$]?
+-    </para>
+-    <para>
+       Usernames may only be up to 32 characters long.
+     </para>
+   </refsect1>

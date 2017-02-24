@@ -1,0 +1,203 @@
+From b1503fe2693d602b3e24e4b832dc0934960d5d22 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Mon, 19 Oct 2015 18:29:21 +0300
+Subject: [PATCH 2/5] configure.ac: add host-gi, gi-cross-wrapper,
+ gi-ldd-wrapper and introspection-data options
+
+With the first option, gobject-introspection tools (g-ir-doc-tool and g-ir-scanner)
+that are already installed in the host system will be used for building the source tree.
+
+With the second option, g-ir-scanner will be instructed to use an executable
+wrapper to run binaries it's producing, and g-ir-compiler will be run
+through the same wrapper (host system's g-ir-compiler cannot be used because
+it's producing architecture-specific output).
+
+With the third option, giscanner will be instructed to use a special ldd
+command instead of system's ldd (which does not work when the binary to inspect
+is compiled for a different architecture).
+
+With the fourth option, it is possible to disable building of introspection data
+(.gir and .typelib files), which may be difficult or impossible in cross-compilation
+environments, because of lack of emulation (or native hardware) for the target architecture
+on which the target binaries can be run.
+
+These options are useful when cross-compiling for a different target architecture.
+
+Upstream-Status: Pending [review on oe-core list]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ Makefile.am       |  2 ++
+ common.mk         | 39 +++++++++++++++++++++++++++++++++++++++
+ configure.ac      | 42 ++++++++++++++++++++++++++++++++++++++++++
+ tests/Makefile.am |  5 ++++-
+ 4 files changed, 87 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index b080a89..ce8d29b 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -21,7 +21,9 @@ include Makefile-cmph.am
+ include Makefile-girepository.am
+ include Makefile-giscanner.am
+ include Makefile-examples.am
++if BUILD_INTROSPECTION_DATA
+ include Makefile-gir.am
++endif
+ include Makefile-tools.am
+ include Makefile-msvcproj.am
+ 
+diff --git a/common.mk b/common.mk
+index e26c637..9f3a65f 100644
+--- a/common.mk
++++ b/common.mk
+@@ -6,6 +6,15 @@
+ # module itself.
+ #
+ 
++if USE_HOST_GI
++INTROSPECTION_SCANNER = \
++    env PATH="$(PATH)" \
++        LPATH=.libs \
++        CC="$(CC)" \
++        PYTHONPATH=$(top_builddir):$(top_srcdir) \
++        UNINSTALLED_INTROSPECTION_BUILDDIR=$(top_builddir) \
++        g-ir-scanner
++else
+ INTROSPECTION_SCANNER = \
+     env PATH=".libs:$(PATH)" \
+         LPATH=.libs \
+@@ -14,9 +23,24 @@ INTROSPECTION_SCANNER = \
+         UNINSTALLED_INTROSPECTION_SRCDIR=$(top_srcdir) \
+         UNINSTALLED_INTROSPECTION_BUILDDIR=$(top_builddir) \
+         $(top_builddir)/g-ir-scanner
++endif
++
++if USE_CROSS_WRAPPER
++CROSS_WRAPPER_ARG = --use-binary-wrapper=$(GI_CROSS_WRAPPER)
++else
++CROSS_WRAPPER_ARG =
++endif
++
++if USE_LDD_WRAPPER
++LDD_WRAPPER_ARG = --use-ldd-wrapper=$(GI_LDD_WRAPPER)
++else
++LDD_WRAPPER_ARG =
++endif
+ 
+ INTROSPECTION_SCANNER_ARGS = \
+     --verbose \
++    $(CROSS_WRAPPER_ARG) \
++    $(LDD_WRAPPER_ARG) \
+     -I$(top_srcdir) \
+     --add-include-path=$(srcdir) \
+     --add-include-path=$(top_srcdir)/gir \
+@@ -24,9 +48,15 @@ INTROSPECTION_SCANNER_ARGS = \
+     --add-include-path=$(top_builddir) \
+     --add-include-path=$(top_builddir)/gir
+ 
++if USE_CROSS_WRAPPER
++INTROSPECTION_COMPILER = \
++    env PATH=".libs:$(PATH)" \
++        $(GI_CROSS_WRAPPER) $(top_builddir)/.libs/g-ir-compiler$(EXEEXT)
++else
+ INTROSPECTION_COMPILER = \
+     env PATH=".libs:$(PATH)" \
+         $(top_builddir)/g-ir-compiler$(EXEEXT)
++endif
+ 
+ INTROSPECTION_COMPILER_ARGS = \
+     --includedir=$(srcdir) \
+@@ -35,6 +65,14 @@ INTROSPECTION_COMPILER_ARGS = \
+     --includedir=$(top_builddir) \
+     --includedir=$(top_builddir)/gir
+ 
++if USE_HOST_GI
++INTROSPECTION_DOCTOOL = \
++    env PATH="$(PATH)" \
++        LPATH=.libs \
++        PYTHONPATH=$(top_builddir):$(top_srcdir) \
++        UNINSTALLED_INTROSPECTION_BUILDDIR=$(top_builddir) \
++        g-ir-doc-tool
++else
+ INTROSPECTION_DOCTOOL = \
+     env PATH=".libs:$(PATH)" \
+         LPATH=.libs \
+@@ -42,6 +80,7 @@ INTROSPECTION_DOCTOOL = \
+         UNINSTALLED_INTROSPECTION_SRCDIR=$(top_srcdir) \
+         UNINSTALLED_INTROSPECTION_BUILDDIR=$(top_builddir) \
+         $(top_builddir)/g-ir-doc-tool
++endif
+ 
+ INTROSPECTION_DOCTOOL_ARGS = \
+     --add-include-path=$(srcdir) \
+diff --git a/configure.ac b/configure.ac
+index 6c91fa5..21340a5 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -360,6 +360,48 @@ fi
+ 
+ AC_SUBST(EXTRA_LINK_FLAGS)
+ 
++AC_ARG_ENABLE([host-gi],
++[AS_HELP_STRING([--enable-host-gi],[Use gobject introspection tools installed in the host system (useful when cross-compiling)])],
++[case "${enableval}" in
++  yes) host_gi=true ;;
++  no)  host_gi=false ;;
++  *) AC_MSG_ERROR([bad value ${enableval} for --enable-host-gi]) ;;
++esac],[host_gi=false])
++AM_CONDITIONAL([USE_HOST_GI], [test x$host_gi = xtrue])
++
++AC_ARG_ENABLE([gi-cross-wrapper],
++[AS_HELP_STRING([--enable-gi-cross-wrapper=path],[Use a wrapper to run gicompiler and binaries produced by giscanner (useful when cross-compiling)])],
++[
++GI_CROSS_WRAPPER="${enableval}"
++use_wrapper=true
++],[
++GI_CROSS_WRAPPER=""
++use_wrapper=false
++])
++AC_SUBST(GI_CROSS_WRAPPER)
++AM_CONDITIONAL([USE_CROSS_WRAPPER], [test x$use_wrapper = xtrue])
++
++AC_ARG_ENABLE([gi-ldd-wrapper],
++[AS_HELP_STRING([--enable-gi-ldd-wrapper=path],[Use a ldd wrapper instead of system's ldd command in giscanner (useful when cross-compiling)])],
++[
++GI_LDD_WRAPPER="${enableval}"
++use_ldd_wrapper=true
++],[
++GI_LDD_WRAPPER=""
++use_ldd_wrapper=false
++])
++AC_SUBST(GI_LDD_WRAPPER)
++AM_CONDITIONAL([USE_LDD_WRAPPER], [test x$use_ldd_wrapper = xtrue])
++
++AC_ARG_ENABLE([introspection-data],
++[AS_HELP_STRING([--enable-introspection-data],[Build introspection data (.gir and .typelib files) in addition to library and tools])],
++[case "${enableval}" in
++  yes) introspection_data=true ;;
++  no)  introspection_data=false ;;
++  *) AC_MSG_ERROR([bad value ${enableval} for --enable-introspection-data]) ;;
++esac],[introspection_data=true])
++AM_CONDITIONAL([BUILD_INTROSPECTION_DATA], [test x$introspection_data = xtrue])
++
+ AC_CONFIG_FILES([
+ Makefile
+ tests/Makefile
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index bdd0fa7..75dd3c9 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -1,6 +1,9 @@
+ include $(top_srcdir)/common.mk
+ 
+-SUBDIRS = . scanner repository offsets warn
++SUBDIRS = . scanner repository warn
++if BUILD_INTROSPECTION_DATA
++SUBDIRS += offsets
++endif
+ 
+ EXTRA_DIST=
+ BUILT_SOURCES=
+-- 
+2.7.0
+

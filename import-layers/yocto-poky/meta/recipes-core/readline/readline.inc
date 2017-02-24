@@ -32,6 +32,8 @@ do_install_append () {
 	oe_libinstall -so -C shlib libreadline ${D}${libdir}
 
 	rmdir ${D}${bindir}
+	rm -rf ${D}${datadir}/${BPN}/*.c
+	rmdir ${D}${datadir}/${BPN} || true
 
 	install -m 0755 -d ${D}${sysconfdir}
 	install -m 0644 ${WORKDIR}/inputrc ${D}${sysconfdir}/inputrc

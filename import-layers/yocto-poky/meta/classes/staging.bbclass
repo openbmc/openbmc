@@ -1,3 +1,37 @@
+# These directories will be staged in the sysroot
+SYSROOT_DIRS = " \
+    ${includedir} \
+    ${libdir} \
+    ${base_libdir} \
+    ${nonarch_base_libdir} \
+    ${datadir} \
+"
+
+# These directories are also staged in the sysroot when they contain files that
+# are usable on the build system
+SYSROOT_DIRS_NATIVE = " \
+    ${bindir} \
+    ${sbindir} \
+    ${base_bindir} \
+    ${base_sbindir} \
+    ${libexecdir} \
+    ${sysconfdir} \
+    ${localstatedir} \
+"
+SYSROOT_DIRS_append_class-native = " ${SYSROOT_DIRS_NATIVE}"
+SYSROOT_DIRS_append_class-cross = " ${SYSROOT_DIRS_NATIVE}"
+SYSROOT_DIRS_append_class-crosssdk = " ${SYSROOT_DIRS_NATIVE}"
+
+# These directories will not be staged in the sysroot
+SYSROOT_DIRS_BLACKLIST = " \
+    ${mandir} \
+    ${docdir} \
+    ${infodir} \
+    ${datadir}/locale \
+    ${datadir}/applications \
+    ${datadir}/fonts \
+    ${datadir}/pixmaps \
+"
 
 sysroot_stage_dir() {
 	src="$1"
@@ -14,43 +48,18 @@ sysroot_stage_dir() {
 	)
 }
 
-sysroot_stage_libdir() {
-	src="$1"
-	dest="$2"
-
-	sysroot_stage_dir $src $dest
-}
-
 sysroot_stage_dirs() {
 	from="$1"
 	to="$2"
 
-	sysroot_stage_dir $from${includedir} $to${includedir}
-	if [ "${BUILD_SYS}" = "${HOST_SYS}" ]; then
-		sysroot_stage_dir $from${bindir} $to${bindir}
-		sysroot_stage_dir $from${sbindir} $to${sbindir}
-		sysroot_stage_dir $from${base_bindir} $to${base_bindir}
-		sysroot_stage_dir $from${base_sbindir} $to${base_sbindir}
-		sysroot_stage_dir $from${libexecdir} $to${libexecdir}
-		sysroot_stage_dir $from${sysconfdir} $to${sysconfdir}
-		sysroot_stage_dir $from${localstatedir} $to${localstatedir}
-	fi
-	if [ -d $from${libdir} ]
-	then
-		sysroot_stage_libdir $from${libdir} $to${libdir}
-	fi
-	if [ -d $from${base_libdir} ]
-	then
-		sysroot_stage_libdir $from${base_libdir} $to${base_libdir}
-	fi
-	if [ -d $from${nonarch_base_libdir} ]
-	then
-		sysroot_stage_libdir $from${nonarch_base_libdir} $to${nonarch_base_libdir}
-	fi
-	sysroot_stage_dir $from${datadir} $to${datadir}
-	# We don't care about docs/info/manpages/locales
-	rm -rf $to${mandir}/ $to${docdir}/ $to${infodir}/ ${to}${datadir}/locale/
-	rm -rf $to${datadir}/applications/ $to${datadir}/fonts/ $to${datadir}/pixmaps/
+	for dir in ${SYSROOT_DIRS}; do
+		sysroot_stage_dir "$from$dir" "$to$dir"
+	done
+
+	# Remove directories we do not care about
+	for dir in ${SYSROOT_DIRS_BLACKLIST}; do
+		rm -rf "$to$dir"
+	done
 }
 
 sysroot_stage_all() {
@@ -172,13 +181,26 @@ python sysroot_cleansstate () {
 do_configure[prefuncs] += "sysroot_cleansstate"
 
 
+BB_SETSCENE_VERIFY_FUNCTION2 = "sysroot_checkhashes2"
+
+def sysroot_checkhashes2(covered, tasknames, fns, d, invalidtasks):
+    problems = set()
+    configurefns = set()
+    for tid in invalidtasks:
+        if tasknames[tid] == "do_configure" and tid not in covered:
+            configurefns.add(fns[tid])
+    for tid in covered:
+        if tasknames[tid] == "do_populate_sysroot" and fns[tid] in configurefns:
+            problems.add(tid)
+    return problems
+
 BB_SETSCENE_VERIFY_FUNCTION = "sysroot_checkhashes"
 
 def sysroot_checkhashes(covered, tasknames, fnids, fns, d, invalidtasks = None):
     problems = set()
     configurefnids = set()
     if not invalidtasks:
-        invalidtasks = xrange(len(tasknames))
+        invalidtasks = range(len(tasknames))
     for task in invalidtasks:
         if tasknames[task] == "do_configure" and task not in covered:
             configurefnids.add(fnids[task])

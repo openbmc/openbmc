@@ -37,5 +37,5 @@ class TestSample(SeleniumTestCase):
     def test_landing_page_has_brand(self):
         url = reverse('landing')
         self.get(url)
-        brand_link = self.find('span.brand a')
+        brand_link = self.find('.toaster-navbar-brand a.brand')
         self.assertEqual(brand_link.text.strip(), 'Toaster')

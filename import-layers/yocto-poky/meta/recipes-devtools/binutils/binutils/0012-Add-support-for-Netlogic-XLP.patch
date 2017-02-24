@@ -1,7 +1,7 @@
-From 9f967c555b3fda64af4549ae252a0fba00120529 Mon Sep 17 00:00:00 2001
+From c2e138f4ccdf8af81c18c8511c901d3deee696b5 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 14 Feb 2016 17:06:19 +0000
-Subject: [PATCH 12/14] Add support for Netlogic XLP
+Subject: [PATCH 12/13] Add support for Netlogic XLP
 
 Patch From: Nebu Philips <nphilips@netlogicmicro.com>
 
@@ -35,10 +35,10 @@ Upstream-Status: Pending
  15 files changed, 65 insertions(+), 25 deletions(-)
 
 diff --git a/bfd/aoutx.h b/bfd/aoutx.h
-index f78b910..d0d8dd3 100644
+index be0126a..4ca7e24 100644
 --- a/bfd/aoutx.h
 +++ b/bfd/aoutx.h
-@@ -802,6 +802,7 @@ NAME (aout, machine_type) (enum bfd_architecture arch,
+@@ -812,6 +812,7 @@ NAME (aout, machine_type) (enum bfd_architecture arch,
  	case bfd_mach_mipsisa64r6:
  	case bfd_mach_mips_sb1:
  	case bfd_mach_mips_xlr:
@@ -47,10 +47,10 @@ index f78b910..d0d8dd3 100644
  	  arch_flags = M_MIPS2;
  	  break;
 diff --git a/bfd/archures.c b/bfd/archures.c
-index 51068b9..727741f 100644
+index 96c9109..5a30d02 100644
 --- a/bfd/archures.c
 +++ b/bfd/archures.c
-@@ -181,6 +181,7 @@ DESCRIPTION
+@@ -197,6 +197,7 @@ DESCRIPTION
  .#define bfd_mach_mips_octeon2		6502
  .#define bfd_mach_mips_octeon3          6503
  .#define bfd_mach_mips_xlr              887682   {* decimal 'XLR'  *}
@@ -59,10 +59,10 @@ index 51068b9..727741f 100644
  .#define bfd_mach_mipsisa32r2           33
  .#define bfd_mach_mipsisa32r3           34
 diff --git a/bfd/bfd-in2.h b/bfd/bfd-in2.h
-index 779ffbf..bf5a565 100644
+index 30513c4..5e8ed4c 100644
 --- a/bfd/bfd-in2.h
 +++ b/bfd/bfd-in2.h
-@@ -1993,6 +1993,7 @@ enum bfd_architecture
+@@ -2008,6 +2008,7 @@ enum bfd_architecture
  #define bfd_mach_mips_octeon2          6502
  #define bfd_mach_mips_octeon3          6503
  #define bfd_mach_mips_xlr              887682   /* decimal 'XLR'  */
@@ -71,10 +71,10 @@ index 779ffbf..bf5a565 100644
  #define bfd_mach_mipsisa32r2           33
  #define bfd_mach_mipsisa32r3           34
 diff --git a/bfd/config.bfd b/bfd/config.bfd
-index 5c27b49..d553039 100644
+index ab17e72..863be89 100644
 --- a/bfd/config.bfd
 +++ b/bfd/config.bfd
-@@ -1066,6 +1066,11 @@ case "${targ}" in
+@@ -1084,6 +1084,11 @@ case "${targ}" in
      targ_defvec=mips_elf32_le_vec
      targ_selvecs="mips_elf32_be_vec mips_elf64_be_vec mips_elf64_le_vec"
      ;;
@@ -83,11 +83,11 @@ index 5c27b49..d553039 100644
 +	targ_selvecs="mips_elf32_trad_le_vec mips_elf64_trad_be_vec mips_elf64_trad_le_vec"
 +	want64=true
 +	;;
-   mips*-*-elf* | mips*-*-rtems* | mips*-*-vxworks | mips*-*-windiss)
+   mips*-*-elf* | mips*-*-rtems* | mips*-*-windiss | mips*-*-none)
      targ_defvec=mips_elf32_be_vec
      targ_selvecs="mips_elf32_le_vec mips_elf64_be_vec mips_elf64_le_vec"
 diff --git a/bfd/cpu-mips.c b/bfd/cpu-mips.c
-index 8a9475d..de7e5a3 100644
+index d209fb6..b6a86ae 100644
 --- a/bfd/cpu-mips.c
 +++ b/bfd/cpu-mips.c
 @@ -104,7 +104,8 @@ enum
@@ -111,10 +111,10 @@ index 8a9475d..de7e5a3 100644
  
  /* The default architecture is mips:3000, but with a machine number of
 diff --git a/bfd/elfxx-mips.c b/bfd/elfxx-mips.c
-index 1f2f4a3..700afd3 100644
+index e47276b..71c30a0 100644
 --- a/bfd/elfxx-mips.c
 +++ b/bfd/elfxx-mips.c
-@@ -6605,6 +6605,9 @@ _bfd_elf_mips_mach (flagword flags)
+@@ -6646,6 +6646,9 @@ _bfd_elf_mips_mach (flagword flags)
      case E_MIPS_MACH_XLR:
        return bfd_mach_mips_xlr;
  
@@ -124,7 +124,7 @@ index 1f2f4a3..700afd3 100644
      default:
        switch (flags & EF_MIPS_ARCH)
  	{
-@@ -11901,6 +11904,10 @@ mips_set_isa_flags (bfd *abfd)
+@@ -11949,6 +11952,10 @@ mips_set_isa_flags (bfd *abfd)
        val = E_MIPS_ARCH_64R2 | E_MIPS_MACH_OCTEON2;
        break;
  
@@ -135,7 +135,7 @@ index 1f2f4a3..700afd3 100644
      case bfd_mach_mipsisa32:
        val = E_MIPS_ARCH_32;
        break;
-@@ -13931,6 +13938,7 @@ static const struct mips_mach_extension mips_mach_extensions[] =
+@@ -13975,6 +13982,7 @@ static const struct mips_mach_extension mips_mach_extensions[] =
    { bfd_mach_mips_octeonp, bfd_mach_mips_octeon },
    { bfd_mach_mips_octeon, bfd_mach_mipsisa64r2 },
    { bfd_mach_mips_loongson_3a, bfd_mach_mipsisa64r2 },
@@ -144,10 +144,10 @@ index 1f2f4a3..700afd3 100644
    /* MIPS64 extensions.  */
    { bfd_mach_mipsisa64r2, bfd_mach_mipsisa64 },
 diff --git a/binutils/readelf.c b/binutils/readelf.c
-index d5dd46f..66810cc 100644
+index 274ddd1..d31558c 100644
 --- a/binutils/readelf.c
 +++ b/binutils/readelf.c
-@@ -3140,6 +3140,7 @@ get_machine_flags (unsigned e_flags, unsigned e_machine)
+@@ -3230,6 +3230,7 @@ get_machine_flags (unsigned e_flags, unsigned e_machine)
  	    case E_MIPS_MACH_OCTEON2: strcat (buf, ", octeon2"); break;
  	    case E_MIPS_MACH_OCTEON3: strcat (buf, ", octeon3"); break;
  	    case E_MIPS_MACH_XLR:  strcat (buf, ", xlr"); break;
@@ -156,7 +156,7 @@ index d5dd46f..66810cc 100644
  	    /* We simply ignore the field in this case to avoid confusion:
  	       MIPS ELF does not specify EF_MIPS_MACH, it is a GNU
 diff --git a/gas/config/tc-mips.c b/gas/config/tc-mips.c
-index a2d45a4..75902c0 100644
+index eb8b26b..e59dce6 100644
 --- a/gas/config/tc-mips.c
 +++ b/gas/config/tc-mips.c
 @@ -552,6 +552,7 @@ static int mips_32bitmode = 0;
@@ -175,20 +175,20 @@ index a2d45a4..75902c0 100644
     )
  
  /* Whether the processor uses hardware interlocks to protect reads
-@@ -18702,7 +18704,7 @@ static const struct mips_cpu_info mips_cpu_info_table[] =
+@@ -18858,7 +18860,7 @@ static const struct mips_cpu_info mips_cpu_info_table[] =
    /* Broadcom XLP.
       XLP is mostly like XLR, with the prominent exception that it is
       MIPS64R2 rather than MIPS64.  */
 -  { "xlp",	      0, 0,			ISA_MIPS64R2, CPU_XLR },
 +  { "xlp",	      0, 0,			ISA_MIPS64R2, CPU_XLP },
  
-   /* i6400.  */
+   /* MIPS 64 Release 6 */
    { "i6400",	      0, ASE_MSA,		ISA_MIPS64R6, CPU_MIPS64R6},
 diff --git a/gas/configure b/gas/configure
-index 89f18b3..86b19ae 100755
+index 45da030..aba89f7 100755
 --- a/gas/configure
 +++ b/gas/configure
-@@ -12851,6 +12851,9 @@ _ACEOF
+@@ -12914,6 +12914,9 @@ _ACEOF
  	  mipsisa64r6 | mipsisa64r6el)
  	    mips_cpu=mips64r6
  	    ;;
@@ -199,7 +199,7 @@ index 89f18b3..86b19ae 100755
  	    mips_cpu=r3900
  	    ;;
 diff --git a/gas/configure.tgt b/gas/configure.tgt
-index 086e0d2..2b71270 100644
+index 1b9fd99..a9f1977 100644
 --- a/gas/configure.tgt
 +++ b/gas/configure.tgt
 @@ -339,7 +339,7 @@ case ${generic_target} in
@@ -212,10 +212,10 @@ index 086e0d2..2b71270 100644
    mips-*-openbsd*)			fmt=elf em=tmips ;;
  
 diff --git a/include/elf/mips.h b/include/elf/mips.h
-index 57de3bc..9ba141d 100644
+index 7e813de..d7d72c1 100644
 --- a/include/elf/mips.h
 +++ b/include/elf/mips.h
-@@ -285,6 +285,7 @@ END_RELOC_NUMBERS (R_MIPS_maxext)
+@@ -290,6 +290,7 @@ END_RELOC_NUMBERS (R_MIPS_maxext)
  #define E_MIPS_MACH_SB1         0x008a0000
  #define E_MIPS_MACH_OCTEON	0x008b0000
  #define E_MIPS_MACH_XLR     	0x008c0000
@@ -224,10 +224,10 @@ index 57de3bc..9ba141d 100644
  #define E_MIPS_MACH_OCTEON3	0x008e0000
  #define E_MIPS_MACH_5400	0x00910000
 diff --git a/include/opcode/mips.h b/include/opcode/mips.h
-index 9318fcc..9be5645 100644
+index b1d4ef6..f2c8e88 100644
 --- a/include/opcode/mips.h
 +++ b/include/opcode/mips.h
-@@ -1228,8 +1228,10 @@ static const unsigned int mips_isa_table[] = {
+@@ -1232,8 +1232,10 @@ static const unsigned int mips_isa_table[] = {
  #define INSN_LOONGSON_2F          0x80000000
  /* Loongson 3A.  */
  #define INSN_LOONGSON_3A          0x00000400
@@ -240,7 +240,7 @@ index 9318fcc..9be5645 100644
  
  /* DSP ASE */
  #define ASE_DSP			0x00000001
-@@ -1326,6 +1328,7 @@ static const unsigned int mips_isa_table[] = {
+@@ -1331,6 +1333,7 @@ static const unsigned int mips_isa_table[] = {
  #define CPU_OCTEON2	6502
  #define CPU_OCTEON3	6503
  #define CPU_XLR     	887682   	/* decimal 'XLR'   */
@@ -248,7 +248,7 @@ index 9318fcc..9be5645 100644
  
  /* Return true if the given CPU is included in INSN_* mask MASK.  */
  
-@@ -1403,6 +1406,9 @@ cpu_is_member (int cpu, unsigned int mask)
+@@ -1408,6 +1411,9 @@ cpu_is_member (int cpu, unsigned int mask)
        return ((mask & INSN_ISA_MASK) == INSN_ISA32R6)
  	     || ((mask & INSN_ISA_MASK) == INSN_ISA64R6);
  
@@ -259,10 +259,10 @@ index 9318fcc..9be5645 100644
        return FALSE;
      }
 diff --git a/ld/configure.tgt b/ld/configure.tgt
-index b45b1e5..fb2f36a 100644
+index 212327c..212e09c 100644
 --- a/ld/configure.tgt
 +++ b/ld/configure.tgt
-@@ -495,6 +495,8 @@ mips*el-sde-elf*)	targ_emul=elf32ltsmip
+@@ -499,6 +499,8 @@ mips*el-sde-elf* | mips*el-mti-elf* | mips*el-img-elf*)
  mips*-sde-elf* | mips*-mti-elf* | mips*-img-elf*)
  			targ_emul=elf32btsmip
  			targ_extra_emuls="elf32ltsmip elf32btsmipn32 elf64btsmip elf32ltsmipn32 elf64ltsmip" ;;
@@ -272,7 +272,7 @@ index b45b1e5..fb2f36a 100644
  			targ_extra_emuls="elf32lr5900"
  			targ_extra_libpath=$targ_extra_emuls ;;
 diff --git a/opcodes/mips-dis.c b/opcodes/mips-dis.c
-index 8200920..40d9fe2 100644
+index 3f874e7..9813d0e 100644
 --- a/opcodes/mips-dis.c
 +++ b/opcodes/mips-dis.c
 @@ -648,13 +648,11 @@ const struct mips_arch_choice mips_arch_choices[] =
@@ -295,7 +295,7 @@ index 8200920..40d9fe2 100644
    /* This entry, mips16, is here only for ISA/processor selection; do
       not print its name.  */
 diff --git a/opcodes/mips-opc.c b/opcodes/mips-opc.c
-index 402f887..3764836 100644
+index a95eff1..99fb7bb 100644
 --- a/opcodes/mips-opc.c
 +++ b/opcodes/mips-opc.c
 @@ -320,7 +320,8 @@ decode_mips_operand (const char *p)
@@ -308,7 +308,7 @@ index 402f887..3764836 100644
  #define IVIRT	ASE_VIRT
  #define IVIRT64	ASE_VIRT64
  
-@@ -957,6 +958,7 @@ const struct mips_opcode mips_builtin_opcodes[] =
+@@ -958,6 +959,7 @@ const struct mips_opcode mips_builtin_opcodes[] =
  {"clo",			"U,s",		0x70000021, 0xfc0007ff, WR_1|RD_2,		0,		I32|N55,	0,	I37 },
  {"clz",			"d,s",		0x00000050, 0xfc1f07ff, WR_1|RD_2,		0,		I37,		0,	0 },
  {"clz",			"U,s",		0x70000020, 0xfc0007ff, WR_1|RD_2,		0,		I32|N55,	0,	I37 },
@@ -316,7 +316,7 @@ index 402f887..3764836 100644
  /* ctc0 is at the bottom of the table.  */
  {"ctc1",		"t,G",		0x44c00000, 0xffe007ff,	RD_1|WR_CC|CM,		0,		I1,		0,	0 },
  {"ctc1",		"t,S",		0x44c00000, 0xffe007ff,	RD_1|WR_CC|CM,		0,		I1,		0,	0 },
-@@ -989,12 +991,13 @@ const struct mips_opcode mips_builtin_opcodes[] =
+@@ -990,12 +992,13 @@ const struct mips_opcode mips_builtin_opcodes[] =
  {"daddiu",		"t,r,j",	0x64000000, 0xfc000000, WR_1|RD_2,		0,		I3,		0,	0 },
  {"daddu",		"d,v,t",	0x0000002d, 0xfc0007ff, WR_1|RD_2|RD_3,		0,		I3,		0,	0 },
  {"daddu",		"t,r,I",	0,    (int) M_DADDU_I,	INSN_MACRO,		0,		I3,		0,	0 },
@@ -331,7 +331,7 @@ index 402f887..3764836 100644
  /* dctr and dctw are used on the r5000.  */
  {"dctr",		"o(b)",	 	0xbc050000, 0xfc1f0000, RD_2,			0,		I3,		0,	0 },
  {"dctw",		"o(b)",		0xbc090000, 0xfc1f0000, RD_2,			0,		I3,		0,	0 },
-@@ -1066,6 +1069,7 @@ const struct mips_opcode mips_builtin_opcodes[] =
+@@ -1067,6 +1070,7 @@ const struct mips_opcode mips_builtin_opcodes[] =
  {"dmfc0",		"t,G,H",	0x40200000, 0xffe007f8,	WR_1|RD_C0|LC,		0,		I64,		0,	0 },
  {"dmfgc0",		"t,G",		0x40600100, 0xffe007ff, WR_1|RD_C0|LC,		0,		0,		IVIRT64, 0 },
  {"dmfgc0",		"t,G,H",	0x40600100, 0xffe007f8, WR_1|RD_C0|LC,		0,		0,		IVIRT64, 0 },
@@ -339,7 +339,7 @@ index 402f887..3764836 100644
  {"dmt",			"",		0x41600bc1, 0xffffffff, TRAP,			0,		0,		MT32,	0 },
  {"dmt",			"t",		0x41600bc1, 0xffe0ffff, WR_1|TRAP,		0,		0,		MT32,	0 },
  {"dmtc0",		"t,G",		0x40a00000, 0xffe007ff,	RD_1|WR_C0|WR_CC|CM,	0,		I3,		0,	EE },
-@@ -1081,6 +1085,8 @@ const struct mips_opcode mips_builtin_opcodes[] =
+@@ -1082,6 +1086,8 @@ const struct mips_opcode mips_builtin_opcodes[] =
  /* dmfc3 is at the bottom of the table.  */
  /* dmtc3 is at the bottom of the table.  */
  {"dmuh",		"d,s,t",	0x000000dc, 0xfc0007ff, WR_1|RD_2|RD_3,		0,		I69,		0,	0 },
@@ -348,7 +348,7 @@ index 402f887..3764836 100644
  {"dmul",		"d,s,t",	0x0000009c, 0xfc0007ff, WR_1|RD_2|RD_3,		0,		I69,		0,	0 },
  {"dmul",		"d,v,t",	0x70000003, 0xfc0007ff, WR_1|RD_2|RD_3|WR_HILO,	0,		IOCT,		0,	0 },
  {"dmul",		"d,v,t",	0,    (int) M_DMUL,	INSN_MACRO,		0,		I3,		0,	M32|I69 },
-@@ -1234,9 +1240,9 @@ const struct mips_opcode mips_builtin_opcodes[] =
+@@ -1235,9 +1241,9 @@ const struct mips_opcode mips_builtin_opcodes[] =
  {"ld",			"s,-b(+R)",	0xec180000, 0xfc1c0000, WR_1,			RD_pc,		I69,		0,	0 },
  {"ld",			"t,A(b)",	0,    (int) M_LD_AB,	INSN_MACRO,		0,		I1,		0,	0 },
  {"ld",			"t,o(b)",	0xdc000000, 0xfc000000, WR_1|RD_3|LM,		0,		I3,		0,	0 },
@@ -361,7 +361,7 @@ index 402f887..3764836 100644
  {"ldc1",		"T,o(b)",	0xd4000000, 0xfc000000, WR_1|RD_3|CLD|FP_D,	0,		I2,		0,	SF },
  {"ldc1",		"E,o(b)",	0xd4000000, 0xfc000000, WR_1|RD_3|CLD|FP_D,	0,		I2,		0,	SF },
  {"ldc1",		"T,A(b)",	0,    (int) M_LDC1_AB,	INSN_MACRO,		INSN2_M_FP_D,	I2,		0,	SF },
-@@ -1401,7 +1407,7 @@ const struct mips_opcode mips_builtin_opcodes[] =
+@@ -1402,7 +1408,7 @@ const struct mips_opcode mips_builtin_opcodes[] =
  {"mflo",		"d,9",		0x00000012, 0xff9f07ff, WR_1|RD_LO,		0,		0,		D32,	0 },
  {"mflo1",		"d",		0x70000012, 0xffff07ff,	WR_1|RD_LO,		0,		EE,		0,	0 },
  {"mflhxu",		"d",		0x00000052, 0xffff07ff,	WR_1|MOD_HILO,		0,		0,		SMT,	0 },
@@ -370,7 +370,7 @@ index 402f887..3764836 100644
  {"mfsa",		"d",		0x00000028, 0xffff07ff,	WR_1,			0,		EE,		0,	0 },
  {"min.ob",		"X,Y,Q",	0x78000006, 0xfc20003f,	WR_1|RD_2|RD_3|FP_D,	0,		SB1,		MX,	0 },
  {"min.ob",		"D,S,Q",	0x48000006, 0xfc20003f,	WR_1|RD_2|RD_3|FP_D,	0,		N54,		0,	0 },
-@@ -1446,10 +1452,13 @@ const struct mips_opcode mips_builtin_opcodes[] =
+@@ -1447,10 +1453,13 @@ const struct mips_opcode mips_builtin_opcodes[] =
  /* move is at the top of the table.  */
  {"msgn.qh",		"X,Y,Q",	0x78200000, 0xfc20003f,	WR_1|RD_2|RD_3|FP_D,	0,		0,		MX,	0 },
  {"msgsnd",		"t",		0,    (int) M_MSGSND,	INSN_MACRO,		0,		XLR,		0,	0 },
@@ -386,7 +386,7 @@ index 402f887..3764836 100644
  {"msub.d",		"D,R,S,T",	0x4c000029, 0xfc00003f, WR_1|RD_2|RD_3|RD_4|FP_D, 0,		I4_33,		0,	I37 },
  {"msub.d",		"D,S,T",	0x46200019, 0xffe0003f,	WR_1|RD_2|RD_3|FP_D,	0,		IL2E,		0,	0 },
  {"msub.d",		"D,S,T",	0x72200019, 0xffe0003f,	WR_1|RD_2|RD_3|FP_D,	0,		IL2F,		0,	0 },
-@@ -1499,7 +1508,7 @@ const struct mips_opcode mips_builtin_opcodes[] =
+@@ -1500,7 +1509,7 @@ const struct mips_opcode mips_builtin_opcodes[] =
  {"mtlo",		"s,7",		0x00000013, 0xfc1fe7ff, RD_1|WR_LO,		0,		0,		D32,	0 },
  {"mtlo1",		"s",		0x70000013, 0xfc1fffff,	RD_1|WR_LO,		0,		EE,		0,	0 },
  {"mtlhx",		"s",		0x00000053, 0xfc1fffff,	RD_1|MOD_HILO,		0,		0,		SMT,	0 },
@@ -395,7 +395,7 @@ index 402f887..3764836 100644
  {"mtm0",		"s",		0x70000008, 0xfc1fffff, RD_1,			0,		IOCT,		0,	0 },
  {"mtm0",    		"s,t",		0x70000008, 0xfc00ffff, RD_1|RD_2,		0,		IOCT3,		0,	0 },
  {"mtm1",		"s",		0x7000000c, 0xfc1fffff, RD_1,			0,		IOCT,		0,	0 },
-@@ -1936,9 +1945,9 @@ const struct mips_opcode mips_builtin_opcodes[] =
+@@ -1937,9 +1946,9 @@ const struct mips_opcode mips_builtin_opcodes[] =
  {"suxc1",		"S,t(b)",	0x4c00000d, 0xfc0007ff, RD_1|RD_2|RD_3|SM|FP_D,	0,		I5_33|N55,	0,	I37},
  {"sw",			"t,o(b)",	0xac000000, 0xfc000000,	RD_1|RD_3|SM,		0,		I1,		0,	0 },
  {"sw",			"t,A(b)",	0,    (int) M_SW_AB,	INSN_MACRO,		0,		I1,		0,	0 },
@@ -409,5 +409,5 @@ index 402f887..3764836 100644
  {"swc0",		"E,A(b)",	0,    (int) M_SWC0_AB,	INSN_MACRO,		0,		I1,		0,	IOCT|IOCTP|IOCT2|I37 },
  {"swc1",		"T,o(b)",	0xe4000000, 0xfc000000,	RD_1|RD_3|SM|FP_S,	0,		I1,		0,	0 },
 -- 
-2.7.1
+2.9.0
 

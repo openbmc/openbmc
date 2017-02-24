@@ -2,7 +2,7 @@ SUMMARY = "An sh-compatible command language interpreter"
 HOMEPAGE = "http://tiswww.case.edu/php/chet/bash/bashtop.html"
 SECTION = "base/shell"
 
-DEPENDS = "ncurses bison-native"
+DEPENDS = "ncurses bison-native virtual/libiconv"
 
 inherit autotools gettext texinfo update-alternatives ptest
 

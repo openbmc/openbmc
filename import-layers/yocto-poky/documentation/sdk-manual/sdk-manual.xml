@@ -36,6 +36,11 @@
                 <date>April 2016</date>
                 <revremark>Released with the Yocto Project 2.1 Release.</revremark>
             </revision>
+            <revision>
+                <revnumber>2.2</revnumber>
+                <date>October 2016</date>
+                <revremark>Released with the Yocto Project 2.2 Release.</revremark>
+            </revision>
        </revhistory>
 
     <copyright>
@@ -61,13 +66,17 @@
 
     <xi:include href="sdk-intro.xml"/>
 
+    <xi:include href="sdk-extensible.xml"/>
+
     <xi:include href="sdk-using.xml"/>
 
-    <xi:include href="sdk-extensible.xml"/>
+    <xi:include href="sdk-working-projects.xml"/>
 
     <xi:include href="sdk-appendix-obtain.xml"/>
 
     <xi:include href="sdk-appendix-customizing.xml"/>
+
+    <xi:include href="sdk-appendix-mars.xml"/>
 
 <!--    <index id='index'>
       <title>Index</title>

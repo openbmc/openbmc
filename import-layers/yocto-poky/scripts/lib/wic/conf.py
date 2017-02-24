@@ -70,7 +70,7 @@ class ConfigMgr(object):
         self.create = {}
 
         # initialize the values with defaults
-        for sec, vals in self.DEFAULTS.iteritems():
+        for sec, vals in self.DEFAULTS.items():
             setattr(self, sec, vals)
 
     def __set_ksconf(self, ksconf):

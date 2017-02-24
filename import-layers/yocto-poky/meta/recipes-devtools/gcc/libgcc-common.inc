@@ -1,6 +1,6 @@
 BPN = "libgcc"
 
-require gcc-shared-source.inc
+require gcc-configure-common.inc
 
 INHIBIT_DEFAULT_DEPS = "1"
 
@@ -111,9 +111,15 @@ fakeroot python do_multilib_install() {
         if not tune_bitness:
             tune_bitness = '32' # /lib => 32bit lib
 
+        tune_abiextension = tune_parameters['abiextension']
+        if tune_abiextension:
+            libcextension = '-gnu' + tune_abiextension
+        else:
+            libcextension = ''
+
         src = '../../../' + tune_baselib + '/' + \
             tune_arch + d.getVar('TARGET_VENDOR', True) + 'ml' + ml + \
-            '-' + d.getVar('TARGET_OS', True) + '/' + binv + '/'
+            '-' + d.getVar('TARGET_OS', True) + libcextension +  '/' + binv + '/'
 
         dest = d.getVar('D', True) + d.getVar('libdir', True) + '/' + \
             d.getVar('TARGET_SYS', True) + '/' + binv + '/' + tune_bitness
@@ -123,15 +129,18 @@ fakeroot python do_multilib_install() {
         os.symlink(src, dest)
 }
 
-def get_original_vendoros(d):
-    vendoros = d.expand('${TARGET_VENDOR}-${TARGET_OS}')
+def get_original_os(d):
+    vendoros = d.expand('${TARGET_ARCH}${ORIG_TARGET_VENDOR}-${TARGET_OS}')
     for suffix in [d.getVar('ABIEXTENSION', True), d.getVar('LIBCEXTENSION', True)]:
         if suffix and vendoros.endswith(suffix):
             vendoros = vendoros[:-len(suffix)]
+    # Arm must use linux-gnueabi not linux as only the former is accepted by gcc
+    if vendoros.startswith("arm-") and not vendoros.endswith("-gnueabi"):
+        vendoros = vendoros + "-gnueabi"
     return vendoros
 
-ORIG_TARGET_VENDOROS := "${@get_original_vendoros(d)}"
-BASETARGET_SYS = "${TARGET_ARCH}${ORIG_TARGET_VENDOROS}"
+ORIG_TARGET_VENDOR := "${TARGET_VENDOR}"
+BASETARGET_SYS = "${@get_original_os(d)}"
 
 addtask extra_symlinks after do_multilib_install before do_package do_populate_sysroot
 fakeroot python do_extra_symlinks() {

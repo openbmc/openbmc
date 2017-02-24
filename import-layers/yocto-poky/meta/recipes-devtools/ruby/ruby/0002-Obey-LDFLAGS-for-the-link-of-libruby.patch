@@ -1,0 +1,28 @@
+Upstream-Status: Pending
+
+From 306e95a9818d39d3349075aac9609e062b0f19ce Mon Sep 17 00:00:00 2001
+From: Christopher Larson <chris_larson@mentor.com>
+Date: Thu, 5 May 2016 10:59:07 -0700
+Subject: [PATCH 2/2] Obey LDFLAGS for the link of libruby
+
+Signed-off-by: Christopher Larson <chris_larson@mentor.com>
+---
+ Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 7da2488..5b4aea1 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -75,7 +75,7 @@ EXTLIBS =
+ LIBS = @LIBS@ $(EXTLIBS)
+ MISSING = @LIBOBJS@ @ALLOCA@
+ LDSHARED = @LIBRUBY_LDSHARED@
+-DLDFLAGS = @LIBRUBY_DLDFLAGS@ $(XLDFLAGS) $(ARCH_FLAG)
++DLDFLAGS = @LIBRUBY_DLDFLAGS@ @LDFLAGS@ $(XLDFLAGS) $(ARCH_FLAG)
+ SOLIBS = @SOLIBS@
+ MAINLIBS = @MAINLIBS@
+ ARCHMINIOBJS = @MINIOBJS@
+-- 
+2.8.0
+

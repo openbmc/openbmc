@@ -47,7 +47,7 @@
             <listitem><para><emphasis>
                 <link linkend='usingpoky'>Using the Yocto Project</link>:</emphasis>
                 Provides an overview of the components that make up the Yocto Project
-                followed by information about debugng images created in the Yocto Project.
+                followed by information about debugging images created in the Yocto Project.
                 </para></listitem>
             <listitem><para><emphasis>
                 <link linkend='closer-look'>A Closer Look at the Yocto Project Development Environment</link>:</emphasis>
@@ -78,6 +78,11 @@
             <listitem><para><emphasis>
                 <link linkend='ref-tasks'>Tasks</link>:</emphasis>
                 Describes the tasks defined by the OpenEmbedded build system.
+                </para></listitem>
+            <listitem><para><emphasis>
+                <link linkend='ref-devtool-reference'><filename>devtool</filename> Quick Reference</link>:</emphasis>
+                Provides a quick reference for the <filename>devtool</filename>
+                command.
                 </para></listitem>
             <listitem><para><emphasis>
                 <link linkend='ref-qa-checks'>QA Error and Warning Messages</link>:</emphasis>
@@ -252,12 +257,6 @@
                         <literallayout class='monospaced'>
      $ sudo apt-get install make xsltproc docbook-utils fop dblatex xmlto
                         </literallayout></para></listitem>
-                    <listitem><para><emphasis>SDK Installer Extras:</emphasis>
-                        Packages needed if you are going to be using the
-                        the standard or extensible SDK:
-                        <literallayout class='monospaced'>
-     $ sudo apt-get install autoconf automake libtool libglib2.0-dev libarchive-dev
-                        </literallayout></para></listitem>
                     <listitem><para><emphasis>OpenEmbedded Self-Test (<filename>oe-selftest</filename>):</emphasis>
                         Packages needed if you are going to run
                         <filename>oe-selftest</filename>:
@@ -296,17 +295,11 @@
      $ sudo dnf install make docbook-style-dsssl docbook-style-xsl \
      docbook-dtds docbook-utils fop libxslt dblatex xmlto xsltproc
                         </literallayout></para></listitem>
-                    <listitem><para><emphasis>SDK Installer Extras:</emphasis>
-                        Packages needed if you are going to be using the
-                        standard or extensible SDK:
-                        <literallayout class='monospaced'>
-     $ sudo dnf install autoconf automake libtool glib2-devel libarchive-devel
-                        </literallayout></para></listitem>
                     <listitem><para><emphasis>OpenEmbedded Self-Test (<filename>oe-selftest</filename>):</emphasis>
                         Packages needed if you are going to run
                         <filename>oe-selftest</filename>:
                         <literallayout class='monospaced'>
-     $ sudo dnf install GitPython
+     $ sudo dnf install python3-GitPython
                         </literallayout>
                         </para></listitem>
                 </itemizedlist>
@@ -338,12 +331,6 @@
                         Yocto Project documentation manuals:
                         <literallayout class='monospaced'>
      $ sudo zypper install make fop xsltproc dblatex xmlto
-                        </literallayout></para></listitem>
-                    <listitem><para><emphasis>SDK Installer Extras:</emphasis>
-                        Packages needed if you are going to be using the
-                        standard or extensible SDK:
-                        <literallayout class='monospaced'>
-     $ sudo zypper install autoconf automake libtool glib2-devel libarchive-devel
                         </literallayout></para></listitem>
                     <listitem><para><emphasis>OpenEmbedded Self-Test (<filename>oe-selftest</filename>):</emphasis>
                         Packages needed if you are going to run
@@ -394,12 +381,6 @@
      $ sudo yum install make docbook-style-dsssl docbook-style-xsl \
      docbook-dtds docbook-utils fop libxslt dblatex xmlto xsltproc
                         </literallayout></para></listitem>
-                    <listitem><para><emphasis>SDK Installer Extras:</emphasis>
-                        Packages needed if you are going to be using the
-                        standard or extensible SDK:
-                        <literallayout class='monospaced'>
-     $ sudo yum install autoconf automake libtool glib2-devel libarchive-devel
-                        </literallayout></para></listitem>
                     <listitem><para><emphasis>OpenEmbedded Self-Test (<filename>oe-selftest</filename>):</emphasis>
                         Packages needed if you are going to run
                         <filename>oe-selftest</filename>:
@@ -422,8 +403,7 @@
             <itemizedlist>
                 <listitem><para>Git 1.8.3.1 or greater</para></listitem>
                 <listitem><para>tar 1.24 or greater</para></listitem>
-                <listitem><para>Python 2.7.3 or greater not including
-                    Python 3.x, which is not supported.</para></listitem>
+                <listitem><para>Python 3.4.0 or greater</para></listitem>
             </itemizedlist>
         </para>
 

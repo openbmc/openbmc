@@ -51,7 +51,7 @@ index b565e93..7741ccc
          GST_WARNING_OBJECT (self, "seek to 0 bytes failed");
        }
  
-@@ -1632,8 +1630,10 @@ gst_sub_parse_sink_event (GstPad * pad, GstObject * parent, GstEvent * event)
+@@ -1641,8 +1639,10 @@ gst_sub_parse_sink_event (GstPad * pad, GstObject * parent, GstEvent * event)
        gst_event_parse_segment (event, &s);
        if (s->format == GST_FORMAT_TIME)
          gst_event_copy_segment (event, &self->segment);

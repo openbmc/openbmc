@@ -67,9 +67,9 @@ diff --git a/fsdev/virtfs-proxy-helper.c b/fsdev/virtfs-proxy-helper.c
  #include <sys/vfs.h>
  #include <sys/ioctl.h>
 @@ -26,7 +25,11 @@
- #include "virtio-9p-marshal.h"
- #include "hw/9pfs/virtio-9p-proxy.h"
- #include "fsdev/virtio-9p-marshal.h"
+ #include "9p-iov-marshal.h"
+ #include "hw/9pfs/9p-proxy.h"
+ #include "fsdev/9p-iov-marshal.h"
 -
 +/*
 + * Include this one last due to some versions of it being buggy:

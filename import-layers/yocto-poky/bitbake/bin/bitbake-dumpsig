@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # bitbake-dumpsig
 # BitBake task signature dump utility
@@ -23,6 +23,7 @@ import sys
 import warnings
 import optparse
 import logging
+import pickle
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(sys.argv[0])), 'lib'))
 
@@ -51,15 +52,14 @@ options, args = parser.parse_args(sys.argv)
 if len(args) == 1:
     parser.print_help()
 else:
-    import cPickle
     try:
         output = bb.siggen.dump_sigfile(args[1])
     except IOError as e:
         logger.error(str(e))
         sys.exit(1)
-    except cPickle.UnpicklingError, EOFError:
+    except (pickle.UnpicklingError, EOFError):
         logger.error('Invalid signature data - ensure you are specifying a sigdata/siginfo file')
         sys.exit(1)
 
     if output:
-        print '\n'.join(output)
+        print('\n'.join(output))

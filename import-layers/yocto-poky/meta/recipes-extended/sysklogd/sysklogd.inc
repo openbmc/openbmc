@@ -55,7 +55,7 @@ ALTERNATIVE_LINK_NAME[syslog-conf] = "${sysconfdir}/syslog.conf"
 pkg_prerm_${PN} () {
 	if test "x$D" = "x"; then
 	if test "$1" = "upgrade" -o "$1" = "remove"; then
-		/etc/init.d/syslog stop
+		/etc/init.d/syslog stop || :
 	fi
 	fi
 }

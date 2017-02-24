@@ -59,7 +59,7 @@ class KernelRecipeHandler(RecipeHandler):
                     kpatchlevel = -1
                     ksublevel = -1
                     kextraversion = ''
-                    with open(makefile, 'r') as f:
+                    with open(makefile, 'r', errors='surrogateescape') as f:
                         for i, line in enumerate(f):
                             if i > 10:
                                 break

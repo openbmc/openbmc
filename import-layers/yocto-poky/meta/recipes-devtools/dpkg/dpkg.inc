@@ -2,14 +2,12 @@ SUMMARY = "Package maintenance system from Debian"
 LICENSE = "GPLv2.0+"
 SECTION = "base"
 
-SRC_URI = "${DEBIAN_MIRROR}/main/d/dpkg/dpkg_${PV}.tar.xz"
-
-SRC_URI_append_class-native = " file://0001-When-running-do_package_write_deb-we-have-trees-of-h.patch"
-
 DEPENDS = "zlib bzip2 perl ncurses"
 DEPENDS_class-native = "bzip2-replacement-native zlib-native virtual/update-alternatives-native gettext-native perl-native"
 RDEPENDS_${PN} = "${VIRTUAL-RUNTIME_update-alternatives} xz run-postinsts perl"
 RDEPENDS_${PN}_class-native = "xz-native"
+
+UPSTREAM_CHECK_URI = "${DEBIAN_MIRROR}/main/d/dpkg/"
 
 inherit autotools gettext perlnative pkgconfig systemd
 
@@ -35,6 +33,7 @@ EXTRA_OECONF = "\
 		"
 
 EXTRA_OECONF += "TAR=tar"
+EXTRA_OECONF_append_class-target = " DEB_HOST_ARCH=${DPKG_ARCH}"
 
 do_configure () {
     echo >> ${S}/m4/compiler.m4
@@ -74,6 +73,14 @@ RPROVIDES_update-alternatives-dpkg += "update-alternatives"
 PACKAGES += "${PN}-perl"
 FILES_${PN}-perl = "${libdir}/perl"
 
+# Split out start-stop-daemon to its own package.  Note that it
+# is installed in a different directory than the one used for
+# the bitbake version.
+#
+PACKAGES =+ "${PN}-start-stop"
+FILES_${PN}-start-stop = "${sbindir}/start-stop-daemon"
+
+RDEPENDS_${PN} += "${PN}-start-stop"
+
+
 BBCLASSEXTEND = "native"
-
-

@@ -1,0 +1,37 @@
+From e7a8c925b9316a72bdc8f32789ffe56fda5c4788 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 26 Aug 2016 18:20:32 +0300
+Subject: [PATCH] Use pkg-config for pcre dependency instead of -config script.
+
+RP 2014/5/22
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ configure.ac | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 1d172a1..a9236da 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -380,11 +380,12 @@ if test "$WITH_PCRE" != "no"; then
+ 			PCRE_LIB="-L$WITH_PCRE/lib -lpcre"
+ 			CPPFLAGS="$CPPFLAGS -I$WITH_PCRE/include"
+ 		else
+-			AC_PATH_PROG(PCRECONFIG, pcre-config)
+-			if test x"$PCRECONFIG" != x; then
+-				PCRE_LIB=`$PCRECONFIG --libs`
+-				CPPFLAGS="$CPPFLAGS `$PCRECONFIG --cflags`"
+-			fi
++			PKG_CHECK_MODULES(PCREPKG, [libpcre], [
++				PCRE_LIB=${PCREPKG_LIBS}
++				CPPFLAGS="$CPPFLAGS ${PCREPKG_CFLAGS}"
++			], [
++				AC_MSG_ERROR([pcre pkgconfig not found, install the pcre-devel package or build with --without-pcre])
++			])
+ 		fi
+ 
+   if test x"$PCRE_LIB" != x; then
+-- 
+2.9.3
+

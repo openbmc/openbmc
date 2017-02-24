@@ -3,7 +3,7 @@
 import sys
 import os
 import re
-import ftools
+from . import ftools
 
 
 # A parser that can be used to identify weather a line is a test result or a section statement.

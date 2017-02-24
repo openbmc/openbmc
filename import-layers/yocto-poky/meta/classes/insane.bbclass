@@ -54,8 +54,8 @@ UNKNOWN_CONFIGURE_WHITELIST ?= "--enable-nls --disable-nls --disable-silent-rule
 # feel free to add and correct.
 #
 #           TARGET_OS  TARGET_ARCH   MACHINE, OSABI, ABIVERSION, Little Endian, 32bit?
-def package_qa_get_machine_dict():
-    return {
+def package_qa_get_machine_dict(d):
+    machdata = {
             "darwin9" : { 
                         "arm" :       (40,     0,    0,          True,          32),
                       },
@@ -66,6 +66,8 @@ def package_qa_get_machine_dict():
                         "i586" :      (3,      0,    0,          True,          32),
                         "x86_64":     (62,     0,    0,          True,          64),
                         "epiphany":   (4643,   0,    0,          True,          32),
+                        "mips":       ( 8,     0,    0,          False,         32),
+                        "mipsel":     ( 8,     0,    0,          True,          32),
                       },
             "linux" : { 
                         "aarch64" :   (183,    0,    0,          True,          64),
@@ -87,6 +89,10 @@ def package_qa_get_machine_dict():
                         "mipsel":     ( 8,     0,    0,          True,          32),
                         "mips64":     ( 8,     0,    0,          False,         64),
                         "mips64el":   ( 8,     0,    0,          True,          64),
+                        "mipsisa32r6":   ( 8,  0,    0,          False,         32),
+                        "mipsisa32r6el": ( 8,  0,    0,          True,          32),
+                        "mipsisa64r6":   ( 8,  0,    0,          False,         64),
+                        "mipsisa64r6el": ( 8,  0,    0,          True,          64),
                         "nios2":      (113,    0,    0,          True,          32),
                         "s390":       (22,     0,    0,          False,         32),
                         "sh4":        (42,     0,    0,          True,          32),
@@ -168,18 +174,32 @@ def package_qa_get_machine_dict():
                       },
         }
 
+    # Add in any extra user supplied data which may come from a BSP layer, removing the
+    # need to always change this class directly
+    extra_machdata = (d.getVar("PACKAGEQA_EXTRA_MACHDEFFUNCS", True) or "").split()
+    for m in extra_machdata:
+        call = m + "(machdata, d)"
+        locs = { "machdata" : machdata, "d" : d}
+        machdata = bb.utils.better_eval(call, locs)
 
-def package_qa_clean_path(path,d):
-    """ Remove the common prefix from the path. In this case it is the TMPDIR"""
-    return path.replace(d.getVar("TMPDIR", True) + "/", "")
+    return machdata
+
+
+def package_qa_clean_path(path, d, pkg=None):
+    """
+    Remove redundant paths from the path for display.  If pkg isn't set then
+    TMPDIR is stripped, otherwise PKGDEST/pkg is stripped.
+    """
+    if pkg:
+        path = path.replace(os.path.join(d.getVar("PKGDEST", True), pkg), "/")
+    return path.replace(d.getVar("TMPDIR", True), "/").replace("//", "/")
 
 def package_qa_write_error(type, error, d):
     logfile = d.getVar('QA_LOGFILE', True)
     if logfile:
         p = d.getVar('P', True)
-        f = file( logfile, "a+")
-        print >> f, "%s: %s [%s]" % (p, error, type)
-        f.close()
+        with open(logfile, "a+") as f:
+            f.write("%s: %s [%s]\n" % (p, error, type))
 
 def package_qa_handle_error(error_class, error_msg, d):
     package_qa_write_error(error_class, error_msg, d)
@@ -400,7 +420,7 @@ def package_qa_check_unsafe_references_in_binaries(path, name, d, elf, messages)
         sysroot_path_usr = sysroot_path + exec_prefix
 
         try:
-            ldd_output = bb.process.Popen(["prelink-rtld", "--root", sysroot_path, path], stdout=sub.PIPE).stdout.read()
+            ldd_output = bb.process.Popen(["prelink-rtld", "--root", sysroot_path, path], stdout=sub.PIPE).stdout.read().decode("utf-8")
         except bb.process.CmdError:
             error_msg = pn + ": prelink-rtld aborted when processing %s" % path
             package_qa_handle_error("unsafe-references-in-binaries", error_msg, d)
@@ -495,6 +515,8 @@ def package_qa_check_arch(path,name,d, elf, messages):
     """
     Check if archs are compatible
     """
+    import re
+
     if not elf:
         return
 
@@ -520,15 +542,15 @@ def package_qa_check_arch(path,name,d, elf, messages):
 
     #if this will throw an exception, then fix the dict above
     (machine, osabi, abiversion, littleendian, bits) \
-        = package_qa_get_machine_dict()[target_os][target_arch]
+        = package_qa_get_machine_dict(d)[target_os][target_arch]
 
     # Check the architecture and endiannes of the binary
-    if not ((machine == elf.machine()) or \
-        ((("virtual/kernel" in provides) or bb.data.inherits_class("module", d) ) and (target_os == "linux-gnux32" or target_os == "linux-gnun32"))):
-        package_qa_add_message(messages, "arch", "Architecture did not match (%d to %d) on %s" % \
-                 (machine, elf.machine(), package_qa_clean_path(path,d)))
-    elif not ((bits == elf.abiSize()) or  \
-        ((("virtual/kernel" in provides) or bb.data.inherits_class("module", d) ) and (target_os == "linux-gnux32" or target_os == "linux-gnun32"))):
+    is_32 = (("virtual/kernel" in provides) or bb.data.inherits_class("module", d)) and \
+            (target_os == "linux-gnux32" or re.match('mips64.*32', d.getVar('DEFAULTTUNE', True)))
+    if not ((machine == elf.machine()) or is_32):
+        package_qa_add_message(messages, "arch", "Architecture did not match (%s, expected %s) on %s" % \
+                 (oe.qa.elf_machine_to_string(elf.machine()), oe.qa.elf_machine_to_string(machine), package_qa_clean_path(path,d)))
+    elif not ((bits == elf.abiSize()) or is_32):
         package_qa_add_message(messages, "arch", "Bit size did not match (%d to %d) %s on %s" % \
                  (bits, elf.abiSize(), bpn, package_qa_clean_path(path,d)))
     elif not littleendian == elf.isLittleEndian():
@@ -672,23 +694,24 @@ def package_qa_check_symlink_to_sysroot(path, name, d, elf, messages):
                 trimmed = path.replace(os.path.join (d.getVar("PKGDEST", True), name), "")
                 package_qa_add_message(messages, "symlink-to-sysroot", "Symlink %s in %s points to TMPDIR" % (trimmed, name))
 
-def package_qa_check_license(workdir, d):
+# Check license variables
+do_populate_lic[postfuncs] += "populate_lic_qa_checksum"
+python populate_lic_qa_checksum() {
     """
-    Check for changes in the license files 
+    Check for changes in the license files.
     """
     import tempfile
     sane = True
 
-    lic_files = d.getVar('LIC_FILES_CHKSUM', True)
+    lic_files = d.getVar('LIC_FILES_CHKSUM', True) or ''
     lic = d.getVar('LICENSE', True)
     pn = d.getVar('PN', True)
 
     if lic == "CLOSED":
         return
 
-    if not lic_files:
-        package_qa_handle_error("license-checksum", pn + ": Recipe file does not have license file information (LIC_FILES_CHKSUM)", d)
-        return
+    if not lic_files and d.getVar('SRC_URI', True):
+        sane = package_qa_handle_error("license-checksum", pn + ": Recipe file fetches files and does not have license file information (LIC_FILES_CHKSUM)", d)
 
     srcdir = d.getVar('S', True)
 
@@ -696,7 +719,7 @@ def package_qa_check_license(workdir, d):
         try:
             (type, host, path, user, pswd, parm) = bb.fetch.decodeurl(url)
         except bb.fetch.MalformedUrl:
-            package_qa_handle_error("license-checksum", pn + ": LIC_FILES_CHKSUM contains an invalid URL: " + url, d)
+            sane = package_qa_handle_error("license-checksum", pn + ": LIC_FILES_CHKSUM contains an invalid URL: " + url, d)
             continue
         srclicfile = os.path.join(srcdir, path)
         if not os.path.isfile(srclicfile):
@@ -720,7 +743,7 @@ def package_qa_check_license(workdir, d):
             linesout = 0
             for line in fi:
                 lineno += 1
-                if (lineno >= beginline): 
+                if (lineno >= beginline):
                     if ((lineno <= endline) or not endline):
                         fo.write(line)
                         linesout += 1
@@ -752,7 +775,11 @@ def package_qa_check_license(workdir, d):
             else:
                 msg = pn + ": LIC_FILES_CHKSUM is not specified for " +  url
                 msg = msg + "\n" + pn + ": The md5 checksum is " + md5chksum
-            package_qa_handle_error("license-checksum", msg, d)
+            sane = package_qa_handle_error("license-checksum", msg, d)
+
+    if not sane:
+        bb.fatal("Fatal QA errors found, failing task.")
+}
 
 def package_qa_check_staged(path,d):
     """
@@ -984,12 +1011,12 @@ def package_qa_check_expanded_d(path,name,d,elf,messages):
     return sane
 
 def package_qa_check_encoding(keys, encode, d):
-    def check_encoding(key,enc):
+    def check_encoding(key, enc):
         sane = True
         value = d.getVar(key, True)
         if value:
             try:
-                s = unicode(value, enc)
+                s = value.encode(enc)
             except UnicodeDecodeError as e:
                 error_msg = "%s has non %s characters" % (key,enc)
                 sane = False
@@ -1208,12 +1235,6 @@ Rerun configure task after fixing this.""")
 Missing inherit gettext?""" % (gt, config))
 
     ###########################################################################
-    # Check license variables
-    ###########################################################################
-
-    package_qa_check_license(workdir, d)
-
-    ###########################################################################
     # Check unrecognised configure options (with a white list)
     ###########################################################################
     if bb.data.inherits_class("autotools", d):
@@ -1221,7 +1242,7 @@ Missing inherit gettext?""" % (gt, config))
         try:
             flag = "WARNING: unrecognized options:"
             log = os.path.join(d.getVar('B', True), 'config.log')
-            output = subprocess.check_output(['grep', '-F', flag, log]).replace(', ', ' ')
+            output = subprocess.check_output(['grep', '-F', flag, log]).decode("utf-8").replace(', ', ' ')
             options = set()
             for line in output.splitlines():
                 options |= set(line.partition(flag)[2].split())
@@ -1250,10 +1271,9 @@ Missing inherit gettext?""" % (gt, config))
 }
 
 python do_qa_unpack() {
-    bb.note("Checking has ${S} been created")
-
+    src_uri = d.getVar('SRC_URI', True)
     s_dir = d.getVar('S', True)
-    if not os.path.exists(s_dir):
+    if src_uri and not os.path.exists(s_dir):
         bb.warn('%s: the directory %s (%s) pointed to by the S variable doesn\'t exist - please set S within the recipe to point to where the source has been unpacked to' % (d.getVar('PN', True), d.getVar('S', False), s_dir))
 }
 
@@ -1261,8 +1281,8 @@ python do_qa_unpack() {
 #addtask qa_staging after do_populate_sysroot before do_build
 do_populate_sysroot[postfuncs] += "do_qa_staging "
 
-# Check broken config.log files, for packages requiring Gettext which don't
-# have it in DEPENDS and for correct LIC_FILES_CHKSUM
+# Check broken config.log files, for packages requiring Gettext which
+# don't have it in DEPENDS.
 #addtask qa_configure after do_configure before do_compile
 do_configure[postfuncs] += "do_qa_configure "
 

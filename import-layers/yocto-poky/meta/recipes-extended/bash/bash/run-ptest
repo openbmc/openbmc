@@ -1,2 +1,22 @@
 #!/bin/sh
+
+en_US=`locale -a | grep en_US*`
+fr_FR=`locale -a | grep fr_FR*`
+de_DE=`locale -a | grep de_DE*`
+
+if [ -z "$en_US" ]
+then
+        echo "Warning: The en_US* locales is needed to run the intl.tests, please add it."
+fi
+ 
+if [ -z "$fr_FR" ]
+then
+        echo "Warning: The fr_FR* locales is needed to run the intl.tests, please add it."
+fi
+ 
+if [ -z "$de_DE" ]
+then
+        echo "Warning: The de_DE* locales is needed to run the intl.tests, please add it."
+fi
+
 make -k THIS_SH=/bin/bash BUILD_DIR=`pwd` srcdir=`pwd`  runtest

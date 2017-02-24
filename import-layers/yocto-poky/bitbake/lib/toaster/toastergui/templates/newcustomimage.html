@@ -5,10 +5,17 @@
 {% block pagecontent %}
 
 {% include "newcustomimage_modal.html" %}
-{% include "projecttopbar.html" %}
 
-{% url table_name project.id as xhr_table_url %}
-<h2>{{title}} (<span class="table-count-{{table_name}}">0</span>)</h2>
-{% include "toastertable.html" %}
+<div class="row">
+
+  {% include "projecttopbar.html" %}
+
+  <div class="col-md-12">
+    {% url table_name project.id as xhr_table_url %}
+    <h2>{{title}} (<span class="table-count-{{table_name}}">0</span>)</h2>
+    {% include "toastertable.html" %}
+  </div>
+
+</div>
 
 {% endblock %}

@@ -1,12 +1,12 @@
 
-    <ul class="nav nav-pills">
+    <ul class="nav nav-tabs">
     {% if active_tab == "detail" %}
         <li class="active">
     {% else %}
         <li class="">
     {% endif %}
             <a href="{% url 'package_included_detail' build.id target.id package.id %}">
-                <i class="icon-question-sign get-help" title="The files this package adds to the image root file system"></i>
+                <span class="glyphicon glyphicon-question-sign get-help" title="The files this package adds to the image root file system"></span>
                 Files in root file system ({{packageFileCount}})
             </a>
         </li>
@@ -16,7 +16,7 @@
         <li class="">
     {% endif %}
             <a href="{% url 'package_included_dependencies' build.id target.id package.id %}">
-                <i class="icon-question-sign get-help" title="Package runtime dependencies"></i>
+                <span class="glyphicon glyphicon-question-sign get-help" title="Package runtime dependencies"></span>
                 Runtime dependencies ({{dependency_count}})
             </a>
         </li>
@@ -26,7 +26,7 @@
         <li class="">
     {% endif %}
             <a href="{% url 'package_included_reverse_dependencies' build.id target.id package.id %}">
-                <i class="icon-question-sign get-help" title="The package runtime reverse dependencies (i.e. the packages in this image that depend on this package). Reverse dependencies reflect only the 'depends' dependency type"></i>
+                <span class="glyphicon glyphicon-question-sign get-help" title="The package runtime reverse dependencies (i.e. the packages in this image that depend on this package). Reverse dependencies reflect only the 'depends' dependency type"></span>
                 Reverse runtime dependencies ({{reverse_count}})
             </a>
         </li>

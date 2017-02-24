@@ -1,0 +1,56 @@
+From d647bb2fa1bd288a6ac02c18318f3cba2a34c3a0 Mon Sep 17 00:00:00 2001
+From: Nikos Mavrogiannopoulos <nmav@redhat.com>
+Date: Tue, 26 Jul 2016 08:50:24 +0200
+Subject: [PATCH 4/4] tools: eliminated compiler warnings
+
+---
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+ src/asn1Coding.c   | 2 +-
+ src/asn1Decoding.c | 2 +-
+ src/asn1Parser.c   | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/asn1Coding.c b/src/asn1Coding.c
+index d4df593..b516bfe 100644
+--- a/src/asn1Coding.c
++++ b/src/asn1Coding.c
+@@ -188,7 +188,7 @@ main (int argc, char *argv[])
+ 	default:
+ 	  fprintf (stderr,
+ 		   "asn1Coding: ?? getopt returned character code Ox%x ??\n",
+-		   option_result);
++		   (unsigned)option_result);
+ 	}
+     }
+ 
+diff --git a/src/asn1Decoding.c b/src/asn1Decoding.c
+index 078963e..20f91ac 100644
+--- a/src/asn1Decoding.c
++++ b/src/asn1Decoding.c
+@@ -131,7 +131,7 @@ main (int argc, char *argv[])
+ 	default:
+ 	  fprintf (stderr,
+ 		   "asn1Decoding: ?? getopt returned character code Ox%x ??\n",
+-		   option_result);
++		   (unsigned)option_result);
+ 	}
+     }
+ 
+diff --git a/src/asn1Parser.c b/src/asn1Parser.c
+index 7a3ae67..475bfc9 100644
+--- a/src/asn1Parser.c
++++ b/src/asn1Parser.c
+@@ -139,7 +139,7 @@ main (int argc, char *argv[])
+ 	default:
+ 	  fprintf (stderr,
+ 		   "asn1Parser: ?? getopt returned character code Ox%x ??\n",
+-		   option_result);
++		   (unsigned)option_result);
+ 	}
+ 
+     }
+-- 
+1.9.1
+

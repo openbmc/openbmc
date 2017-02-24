@@ -1,22 +1,28 @@
 # Inherit this class in recipes to enable building their introspection files
 
-# This sets up autoconf-based recipes to build introspection data (or not),
+# python3native is inherited to prevent introspection tools being run with
+# host's python 3 (they need to be run with native python 3)
+#
+# This also sets up autoconf-based recipes to build introspection data (or not),
 # depending on distro and machine features (see gobject-introspection-data class).
-inherit gobject-introspection-data
-EXTRA_OECONF_prepend = "${@bb.utils.contains('GI_DATA_ENABLED', 'True', '--enable-introspection', '--disable-introspection', d)} "
+inherit python3native gobject-introspection-data
+EXTRA_OECONF_prepend_class-target = "${@bb.utils.contains('GI_DATA_ENABLED', 'True', '--enable-introspection', '--disable-introspection', d)} "
+
+# When building native recipes, disable introspection, as it is not necessary,
+# pulls in additional dependencies, and makes build times longer
+EXTRA_OECONF_prepend_class-native = "--disable-introspection "
+EXTRA_OECONF_prepend_class-nativesdk = "--disable-introspection "
 
 UNKNOWN_CONFIGURE_WHITELIST_append = " --enable-introspection --disable-introspection"
 
 # Generating introspection data depends on a combination of native and target
 # introspection tools, and qemu to run the target tools.
-DEPENDS_append = " gobject-introspection gobject-introspection-native qemu-native"
+DEPENDS_append_class-target = " gobject-introspection gobject-introspection-native qemu-native"
 
-# This is necessary for python scripts to succeed - distutils fails if these
-# are not set
-export BUILD_SYS
-export HOST_SYS
-export STAGING_INCDIR
-export STAGING_LIBDIR
+# Even though introspection is disabled on -native, gobject-introspection package is still
+# needed for m4 macros.
+DEPENDS_append_class-native = " gobject-introspection-native"
+DEPENDS_append_class-nativesdk = " gobject-introspection-native"
 
 # This is used by introspection tools to find .gir includes
 export XDG_DATA_DIRS = "${STAGING_DATADIR}"

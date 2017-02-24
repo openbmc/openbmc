@@ -76,8 +76,8 @@ MODULES_DIR=/init.d  # place to look for modules
 # make mount stop complaining about missing /etc/fstab
 touch /etc/fstab
 
-# initialize /proc, /sys and /var/lock
-mkdir -p /proc /sys /var/lock
+# initialize /proc, /sys, /run/lock and /var/lock
+mkdir -p /proc /sys /run/lock /var/lock
 mount -t proc proc /proc
 mount -t sysfs sysfs /sys
 

@@ -1,0 +1,8 @@
+{% load projecttags  %}
+{% if vcs_ref|is_shaid %}
+<a class="btn btn-default" data-content="{{vcs_ref}}">
+ {{vcs_ref|truncatechars:10}}
+</a>
+{% else %}
+{{vcs_ref}}
+{% endif %}

@@ -6,7 +6,7 @@ syscall so that it works with both x32 and x86-64.
 
 Received this patch from H.J. Lu <hjl.tools@gmail.com>
 
-Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
 2011/12/02
 
 --- libaio-0.3.109/src/syscall-x86_64.h.x32	2009-10-09 11:17:02.000000000 -0700

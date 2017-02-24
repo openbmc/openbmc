@@ -11,60 +11,88 @@
 
 {% block pagedetailinfomain %}
 
-<div class="row span11">
-    <div class="page-header">
+<div class="row">
+  <div class="col-md-12">
+    <div class="page-header build-data">
         <h1><a href="{%url 'recipe' build.pk task.recipe.pk %}">{{task.recipe.name}}_{{task.recipe.version}}</a> {{task.task_name}}</h1>
     </div>
 
 {# Outcome section #}
 <h2 {{ task|task_color:True }}>
     {{task.get_outcome_display}}
-    <i class="icon-question-sign get-help heading-help" title="{{task.get_outcome_help}}"></i>
+    <span class="glyphicon glyphicon-question-sign get-help" title="{{task.get_outcome_help}}"></i>
 </h2>
 {%if task.task_executed %}
     {# executed tasks outcome #}
     {% if task.logfile %}
-            <a class="btn btn-large" href="{% url 'build_artifact' build.id "tasklogfile" task.pk %}" style="margin:15px;">Download task log</a>
+            <a class="btn btn-default btn-lg"
+               href="{% url 'build_artifact' build.id 'tasklogfile' task.pk %}">
+              Download task log
+            </a>
     {% endif %}
         {# show stack trace for failed task #}
         {% if task.outcome == task.OUTCOME_FAILED and log_head %}
             <h3>Python stack trace</h3>
             <div>
                 <pre style="min-height:160px;">
-                    <code>{{log_head}}</code><a id="full-trace-show" data-target="#fulltrace" data-toggle="collapse" class="btn btn-mini">...</a>
+                    <code>{{log_head}}</code><a id="full-trace-show" data-target="#fulltrace" data-toggle="collapse" class="btn btn-xs">...</a>
                     <div id="fulltrace" class="collapse" style="margin-top: -20px; height: 0px;">
-                        <code>{{log_body}}</code><br><a id="full-trace-hide" class="btn btn-mini collapsed" style="font-family:Helvetica Neue" data-target="#fulltrace" data-toggle="collapse">Collapse stack trace<i class="icon-caret-up"></i></a></div></pre>
+                        <code>{{log_body}}</code><br><a id="full-trace-hide" class="btn btn-xs collapsed" style="font-family:Helvetica Neue" data-target="#fulltrace" data-toggle="collapse">Collapse stack trace<i class="icon-caret-up"></i></a></div></pre>
             </div>
         {% endif %}
 {% else %}
 {# not executed tasks outcome #}
     {% if task.outcome == task.OUTCOME_PREBUILT %}
         {% if not showing_matches %}
-            <a class="btn" href="javascript:reload_params({'show_matches' : 'true' })">Match to tasks in previous builds <i class="icon-question-sign get-help" style="margin-top:20px;" title="This shows you a list of tasks from previous builds with the same signature generated from the same inputs as used in the prebuilt task. Any of them could be the task that generated the output this prebuilt task is reusing"></i></a>
+            <a class="btn btn-default"
+                href="javascript:reload_params({'show_matches' : 'true'
+        })">Match to tasks in previous builds <span class="glyphicon
+glyphicon-question-sign get-help" title="This shows you a list of tasks from
+previous builds with the same signature generated from the same inputs as used
+in the prebuilt task. Any of them could be the task that generated the output
+this prebuilt task is reusing"></span></a>
         {% elif matching_tasks %}
             <h3 class="details">Prebuilt task could be based on
-                <i class="icon-question-sign get-help heading-help" title="This table shows a list of tasks from previous builds with the same signature generated from the same inputs as used in the prebuilt task. Any of them could be the task that generated the output this prebuilt task is reusing"></i>
+                <span class="glyphicon glyphicon-question-sign get-help" title="This
+                    table shows a list of tasks from previous builds with the
+                same signature generated from the same inputs as used in the
+            prebuilt task. Any of them could be the task that generated the
+        output this prebuilt task is reusing"></span>
             </h3>
+        <div class="table-responsive">
             <table class="table table-bordered table-hover">
                 <thead>
                     <th>
-                        <i class="icon-question-sign get-help" title="The name of the recipe to which each task applies"></i>
+                        <span class="glyphicon glyphicon-question-sign
+                            get-help" title="The name of the recipe to which
+                        each task applies"></span>
                         Recipe
                     </th>
                     <th>
-                        <i class="icon-question-sign get-help" title="The name of the task"></i>
+                        <span class="glyphicon glyphicon-question-sign get-help" title="The name
+                            of the task"></span>
                         Task
                     </th>
                     <th>
-                        <i class="icon-question-sign get-help" title="This value tells you if a task had to run (executed) in order to generate the task output, or if the output was provided by another task and therefore the task didn't need to run (not executed)"></i>
+                        <span class="glyphicon glyphicon-question-sign get-help" title="This
+                            value tells you if a task had to run (executed) in
+                        order to generate the task output, or if the output was
+                    provided by another task and therefore the task didn't need
+                to run (not executed)"></span>
                         Executed
                     </th>
                     <th>
-                        <i class="icon-question-sign get-help" title="This column tells you if 'executed' tasks succeeded or failed. The column also tells you why 'not executed' tasks did not need to run"></i>
+                        <span class="glyphicon glyphicon-question-sign
+                            get-help" title="This column tells you if
+                        'executed' tasks succeeded or failed. The column also
+                    tells you why 'not executed' tasks did not need to
+                run"></span>
                         Outcome
                     </th>
                     <th>
-                        <i class="icon-question-sign get-help" title="The date and time the build finished"></i>
+                        <span class="glyphicon glyphicon-question-sign
+                            get-help" title="The date and time the build
+                        finished"></span>
                         Build completed on
                     </th>
                 </thead>
@@ -72,27 +100,34 @@
                     {% for match in matching_tasks %}
                         <tr {{ match|task_color }}>
                             <td>
-                                <a href="{%url "task" match.build.pk match.pk%}">{{match.recipe.name}}</a>
+                                {{match.recipe.name}}
                             </td>
                             <td>
                                 <a href="{%url "task" match.build.pk match.pk%}">{{match.task_name}}</a>
                                 {% if task.get_description %}
-                                    <i class="icon-question-sign get-help hover-help" title="{{task.get_description}}"></i>
+                                    <span class="glyphicon
+                                        glyphicon-question-sign get-help
+                                    hover-help"
+                                title="{{task.get_description}}"></span>
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="{%url "task" match.build.pk match.pk%}">{{match.get_executed_display}}</a>
+                                {{match.get_executed_display}}
                             </td>
                             <td>
-                                <a href="{%url "task" match.build.pk match.pk%}">{{match.get_outcome_display}} </a><i class="icon-question-sign get-help hover-help" title="{{match.get_outcome_help}}"></i>
+                                {{match.get_outcome_display}}
+                                <span class="glyphicon glyphicon-question-sign
+                                get-help hover-help"
+                            title="{{match.get_outcome_help}}"></span>
                             </td>
                             <td>
-                                <a href="{%url "task" match.build.pk match.pk%}">{{match.build.completed_on|date:"d/m/y H:i"}}</a>
+                                {{match.build.completed_on|date:"d/m/y H:i"}}
                             </td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
+        </div>
         {% else %}
             <p class="alert">
                 <strong> We have found no tasks matching this prebuilt task</strong><br/>
@@ -102,10 +137,11 @@
     {% elif task.outcome == task.OUTCOME_COVERED %}
         <dl class="dl-horizontal">
             <dt>
-                <i class="icon-question-sign get-help" title="The task(s) providing the outcome of this task"></i> Task covered by
+                <span class="glyphicon glyphicon-question-sign get-help" title="The task(s)
+                    providing the outcome of this task"></span> Task covered by
             </dt>
             <dd>
-                <ul>
+                <ul class="list-unstyled">
                   {% for t in covered_by %}
                     <li>
                       <a href="{%url 'task' t.build.pk t.pk%}"
@@ -122,7 +158,10 @@
     {%elif task.outcome == task.OUTCOME_CACHED%}
             {% for t in task.get_related_setscene %}
                 {% if forloop.last %}
-                    <a class="btn btn-large" href="{% url 'build_artifact' build.id "tasklogfile" t.pk %}" style="margin:15px;">Download task log</a>
+                    <a class="btn btn-default btn-lg"
+                       href="{% url 'build_artifact' build.id "tasklogfile" t.pk %}">
+                      Download task log
+                    </a>
                 {% endif %}
             {% endfor %}
 
@@ -137,38 +176,56 @@
     {% if task.task_executed %}
     <h2>
         Executed
-        <i class="icon-question-sign get-help heading-help" title="'Executed' tasks are those that need to run in order to generate the task output"></i>
+        <span class="glyphicon glyphicon-question-sign get-help"
+            title="'Executed' tasks are those that need to run in order to
+        generate the task output"></span>
     {% else %}
-    <h2 class="muted">
+    <h2>
         Not Executed
-        <i class="icon-question-sign get-help heading-help" title="'Not executed' tasks don't need to run because their outcome is provided by another task"></i>
+        <span class="glyphicon glyphicon-question-sign get-help" title="'Not
+            executed' tasks don't need to run because their outcome is provided
+        by another task"></span>
     {% endif %}
     </h2>
 
 <dl class="dl-horizontal">
     <dt>
-        <i class="icon-question-sign get-help" title="To make builds more efficient, the build system detects changes in the 'inputs' to a given task by creating a 'task signature'. If the signature changes, the build system assumes the inputs have changed and the task needs to be rerun"></i>
+        <span class="glyphicon glyphicon-question-sign get-help" title="To make builds more
+            efficient, the build system detects changes in the 'inputs' to a
+        given task by creating a 'task signature'. If the signature changes,
+    the build system assumes the inputs have changed and the task needs to be
+rerun"></span>
         Task inputs signature
     </dt>
     <dd>
         {{task.sstate_checksum}}
     </dd>
-</dl>
     {% if task.sstate_result != task.SSTATE_NA %}
+  </dl>
         <div class="alert alert-info">Attempting to restore output from sstate cache
-            <i class="icon-question-sign get-help get-help-blue" title="The build system is searching for the task output in your <code>sstate-cache</code> directory and mirrors. If the build system finds the task output, it will reuse it instead of building it from scratch by running the real task. Reusing the task output makes the build faster"></i>
+            <span class="glyphicon glyphicon-question-sign get-help
+                get-help-blue" title="The build system is searching for the
+                task output in your <code>sstate-cache</code> directory and
+                mirrors. If the build system finds the task output, it will reuse it
+                instead of building it from scratch by running the real task. Reusing the
+                task output makes the build faster"></span>
         </div>
         <dl class="dl-horizontal">
             <dt>
-                <i class="icon-question-sign get-help" title="The name of the file searched for in your <code>sstate-cache</code> directory and mirrors"></i>
+                <span class="glyphicon glyphicon-question-sign get-help" title="The name of the
+                    file searched for in your <code>sstate-cache</code>
+                    directory and mirrors"></span>
                 File searched for
             </dt>
             <dd><code>{{task.path_to_sstate_obj}}</code></dd>
             <dt>
-                <i class="icon-question-sign get-help" title="The locations searched for the above file (i.e. your <code>sstate-cache</code> directory and any mirrors you have set up)"></i>
+                <span class="glyphicon glyphicon-question-sign get-help" title="The locations
+                    searched for the above file (i.e. your
+                    <code>sstate-cache</code> directory and any mirrors you have
+                    set up)"></span>
                 URI(s) searched
             </dt>
-            <dd><ul>{% for uri in uri_list %}<li><code>{{uri}}</code></li>{% endfor %}</ul></dd>
+            <dd><ul class="list-unstyled">{% for uri in uri_list %}<li><code>{{uri}}</code></li>{% endfor %}</ul></dd>
         </dl>
     {% endif %}
     {% if task.sstate_result == task.SSTATE_MISS %}
@@ -176,7 +233,7 @@
             <strong>File not in sstate cache.</strong> Running the real task instead.
         </div>
     {% elif task.sstate_result == task.SSTATE_FAILED%}
-        <div class="alert">
+        <div class="alert alert-warning">
             <strong>Failed</strong> to restore output from sstate cache. The file was found but could not be unpacked.
         </div>
         <dl class="dl-horizontal">
@@ -192,13 +249,16 @@
     {% endif %}
     <dl class="dl-horizontal">
     <dt>
-        <i class="icon-question-sign get-help" title="The running sequence of each task in the build"></i>
+        <span class="glyphicon glyphicon-question-sign get-help" title="The
+            running sequence of each task in the build"></span>
         Task order
     </dt>
-    <dd><a href="{%url "tasks_task" build.pk task.order %}#{{task.order}}">{{task.order}}</a></dd>
+    <dd><a href="{%url "tasks" build.pk %}?page={{task_in_tasks_table_pg}}&limit=25#task-{{task.order}}">{{task.order}}</a></dd>
     {% if task.task_executed %}
         <dt>
-            <i class="icon-question-sign get-help" title="Indicates if this task executes a Python or Shell function(s)"></i>
+            <span class="glyphicon glyphicon-question-sign get-help"
+                title="Indicates if this task executes a Python or Shell
+            function(s)"></span>
             Task script type
         </dt>
         <dd>{{task.get_script_type_display}}</dd>
@@ -211,29 +271,31 @@
     <dd><code>{{task.source_url}}</code></dd>
 -->
     <dt>
-        <i class="icon-question-sign get-help" title="Task dependency chain (i.e. other tasks)"></i>
+        <span class="glyphicon glyphicon-question-sign get-help" title="Task dependency chain
+            (i.e. other tasks)"></span>
         Dependencies
     </dt>
     <dd>
-        <ul>
-            {% for dep in deps %}
-                <li><a href="{%url 'task' dep.build.pk dep.pk%}" class="task-info" title="{{dep.get_executed_display}} | {{dep.get_outcome_display}}">{{dep.recipe.name}}_{{dep.recipe.version}} <span class="task-name">{{dep.task_name}}</span></a></li>
-            {% empty %}
-                <li class="muted">This task has no dependencies</li>
-            {% endfor %}
+        <ul class="list-unstyled">
+        {% for dep in deps %}
+            <li><a href="{%url 'task' dep.build.pk dep.pk%}" class="task-info" title="{{dep.get_executed_display}} | {{dep.get_outcome_display}}">{{dep.recipe.name}}_{{dep.recipe.version}} <span class="task-name">{{dep.task_name}}</span></a></li>
+        {% empty %}
+            <li class="text-muted" style="margin-bottom: -10px;">This task has no dependencies</li>
+        {% endfor %}
         </ul>
     </dd>
     <dt>
-        <i class="icon-question-sign get-help" title="Tasks that depend on this task"></i>
+        <span class="glyphicon glyphicon-question-sign get-help" title="Tasks that depend on this
+            task"></span>
         Reverse dependencies
     </dt>
     <dd>
-        <ul>
-            {% for dep in rdeps %}
-                <li><a href="{%url 'task' dep.build.pk dep.pk%}" class="task-info" title="{{dep.get_executed_display}} | {{dep.get_outcome_display}}">{{dep.recipe.name}}_{{dep.recipe.version}} <span class="task-name">{{dep.task_name}}</span></a></li>
-            {% empty %}
-                <li class="muted">This task has no reverse dependencies</li>
-            {% endfor %}
+        <ul class="list-unstyled">
+        {% for dep in rdeps %}
+            <li><a href="{%url 'task' dep.build.pk dep.pk%}" class="task-info" title="{{dep.get_executed_display}} | {{dep.get_outcome_display}}">{{dep.recipe.name}}_{{dep.recipe.version}} <span class="task-name">{{dep.task_name}}</span></a></li>
+        {% empty %}
+            <li class="text-muted">This task has no reverse dependencies</li>
+        {% endfor %}
         </ul>
 </dl>
 
@@ -244,28 +306,36 @@
     <dl class="dl-horizontal">
         {% if task.elapsed_time %}
         <dt>
-            <i class="icon-question-sign get-help" title="How long it took the task to finish in seconds"></i>
+            <span class="glyphicon glyphicon-question-sign get-help" title="How
+                long it took the task to finish in seconds"></span>
             Time (secs)
         </dt>
         <dd>{{task.elapsed_time|format_none_and_zero|floatformat:2}}</dd>
         {% endif %}
         {% if task.cpu_time_user > 0 %}
         <dt>
-            <i class="icon-question-sign get-help" title="Total amount of time spent executing in user mode, in seconds. Note that this time can be greater than the task time due to parallel execution."></i>
+            <span class="glyphicon glyphicon-question-sign get-help" title="Total amount of time
+                spent executing in user mode, in seconds. Note that this time
+            can be greater than the task time due to parallel
+        execution."></span>
             User CPU time (secs)
         </dt>
         <dd>{{task.cpu_time_user|format_none_and_zero|floatformat:2}}</dd>
         {% endif %}
         {% if task.cpu_time_system > 0 %}
         <dt>
-            <i class="icon-question-sign get-help" title="Total amount of time spent executing in kernel mode, in seconds. Note that this time can be greater than the task time due to parallel execution."></i>
+            <span class="glyphicon glyphicon-question-sign get-help" title="Total amount of time
+                spent executing in kernel mode, in seconds. Note that this time
+            can be greater than the task time due to parallel
+        execution."></span>
             System CPU time (secs)
         </dt>
         <dd>{{task.cpu_time_system|format_none_and_zero|floatformat:2}}</dd>
         {% endif %}
         {% if task.disk_io > 0 %}
         <dt>
-            <i class="icon-question-sign get-help" title="Number of bytes written to and read from the disk during the task"></i>
+            <span class="glyphicon glyphicon-question-sign get-help" title="Number of bytes
+                written to and read from the disk during the task"></span>
             Disk I/O (bytes)
         </dt>
         <dd>{{task.disk_io|format_none_and_zero|intcomma}}</dd>
@@ -273,5 +343,6 @@
     </dl>
 
 </div>
+
 {% endblock %}
 

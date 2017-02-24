@@ -1,0 +1,59 @@
+From c234cc557f60729e071d6da59747c1a9289555c5 Mon Sep 17 00:00:00 2001
+From: Peter Dimov <pdimov@pdimov.com>
+Date: Sun, 28 Aug 2016 21:28:21 +0300
+Subject: [PATCH 4/4] Use <atomic> by default when BOOST_NO_CXX11_HDR_ATOMIC is
+ not defined
+
+---
+Upstream-Status: Backport [https://github.com/boostorg/smart_ptr/commit/20fedcff2ca3143503ec4e876d47745ab0ec7b0c]
+Signed-off-by: André Draszik <git@andred.net>
+ boost/smart_ptr/detail/atomic_count.hpp    | 3 +++
+ boost/smart_ptr/detail/sp_counted_base.hpp | 3 +++
+ boost/smart_ptr/detail/spinlock.hpp        | 3 +++
+ 3 files changed, 9 insertions(+)
+
+diff --git a/boost/smart_ptr/detail/atomic_count.hpp b/boost/smart_ptr/detail/atomic_count.hpp
+index 8aefd44..6e4f71a 100644
+--- a/boost/smart_ptr/detail/atomic_count.hpp
++++ b/boost/smart_ptr/detail/atomic_count.hpp
+@@ -73,6 +73,9 @@
+ #elif defined( BOOST_DISABLE_THREADS ) && !defined( BOOST_SP_ENABLE_THREADS ) && !defined( BOOST_DISABLE_WIN32 )
+ # include <boost/smart_ptr/detail/atomic_count_nt.hpp>
+ 
++#elif !defined( BOOST_NO_CXX11_HDR_ATOMIC )
++# include <boost/smart_ptr/detail/atomic_count_std_atomic.hpp>
++
+ #elif defined( __GNUC__ ) && ( defined( __i386__ ) || defined( __x86_64__ ) ) && !defined( __PATHSCALE__ )
+ # include <boost/smart_ptr/detail/atomic_count_gcc_x86.hpp>
+ 
+diff --git a/boost/smart_ptr/detail/sp_counted_base.hpp b/boost/smart_ptr/detail/sp_counted_base.hpp
+index 0995ca8..83ede23 100644
+--- a/boost/smart_ptr/detail/sp_counted_base.hpp
++++ b/boost/smart_ptr/detail/sp_counted_base.hpp
+@@ -44,6 +44,9 @@
+ #elif defined( BOOST_SP_HAS_CLANG_C11_ATOMICS )
+ # include <boost/smart_ptr/detail/sp_counted_base_clang.hpp>
+ 
++#elif !defined( BOOST_NO_CXX11_HDR_ATOMIC )
++# include <boost/smart_ptr/detail/sp_counted_base_std_atomic.hpp>
++
+ #elif defined( __SNC__ )
+ # include <boost/smart_ptr/detail/sp_counted_base_snc_ps3.hpp>
+ 
+diff --git a/boost/smart_ptr/detail/spinlock.hpp b/boost/smart_ptr/detail/spinlock.hpp
+index 19f93d7..0b618df 100644
+--- a/boost/smart_ptr/detail/spinlock.hpp
++++ b/boost/smart_ptr/detail/spinlock.hpp
+@@ -43,6 +43,9 @@
+ #elif defined( BOOST_SP_USE_PTHREADS )
+ #  include <boost/smart_ptr/detail/spinlock_pt.hpp>
+ 
++#elif !defined( BOOST_NO_CXX11_HDR_ATOMIC )
++#  include <boost/smart_ptr/detail/spinlock_std_atomic.hpp>
++
+ #elif defined(__GNUC__) && defined( __arm__ ) && !defined( __thumb__ )
+ #  include <boost/smart_ptr/detail/spinlock_gcc_arm.hpp>
+ 
+-- 
+2.9.3
+

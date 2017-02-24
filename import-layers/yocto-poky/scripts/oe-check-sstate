@@ -1,0 +1,121 @@
+#!/usr/bin/env python3
+
+# Query which tasks will be restored from sstate
+#
+# Copyright 2016 Intel Corporation
+# Authored-by:  Paul Eggleton <paul.eggleton@intel.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+import sys
+import os
+import subprocess
+import tempfile
+import shutil
+import re
+
+scripts_path = os.path.dirname(os.path.realpath(__file__))
+lib_path = scripts_path + '/lib'
+sys.path = sys.path + [lib_path]
+import scriptutils
+import scriptpath
+scriptpath.add_bitbake_lib_path()
+import argparse_oe
+
+
+def translate_virtualfns(tasks):
+    import bb.tinfoil
+    tinfoil = bb.tinfoil.Tinfoil()
+    try:
+        tinfoil.prepare(False)
+
+        recipecaches = tinfoil.cooker.recipecaches
+        outtasks = []
+        for task in tasks:
+            (mc, fn, taskname) = bb.runqueue.split_tid(task)
+            if taskname.endswith('_setscene'):
+                taskname = taskname[:-9]
+            outtasks.append('%s:%s' % (recipecaches[mc].pkg_fn[fn], taskname))
+    finally:
+        tinfoil.shutdown()
+    return outtasks
+
+
+def check(args):
+    tmpdir = tempfile.mkdtemp(prefix='oe-check-sstate-')
+    try:
+        env = os.environ.copy()
+        if not args.same_tmpdir:
+            env['BB_ENV_EXTRAWHITE'] = env.get('BB_ENV_EXTRAWHITE', '') + ' TMPDIR_forcevariable'
+            env['TMPDIR_forcevariable'] = tmpdir
+
+        try:
+            output = subprocess.check_output(
+                    'bitbake -n %s' % ' '.join(args.target),
+                    stderr=subprocess.STDOUT,
+                    env=env,
+                    shell=True)
+
+            task_re = re.compile('NOTE: Running setscene task [0-9]+ of [0-9]+ \(([^)]+)\)')
+            tasks = []
+            for line in output.decode('utf-8').splitlines():
+                res = task_re.match(line)
+                if res:
+                    tasks.append(res.group(1))
+            outtasks = translate_virtualfns(tasks)
+        except subprocess.CalledProcessError as e:
+            print('ERROR: bitbake failed:\n%s' % e.output.decode('utf-8'))
+            return e.returncode
+    finally:
+        shutil.rmtree(tmpdir)
+
+    if args.log:
+        with open(args.log, 'wb') as f:
+            f.write(output)
+
+    if args.outfile:
+        with open(args.outfile, 'w') as f:
+            for task in outtasks:
+                f.write('%s\n' % task)
+    else:
+        for task in outtasks:
+            print(task)
+
+    return 0
+
+
+def main():
+    parser = argparse_oe.ArgumentParser(description='OpenEmbedded sstate check tool. Does a dry-run to check restoring the specified targets from shared state, and lists the tasks that would be restored. Set BB_SETSCENE_ENFORCE=1 in the environment if you wish to ensure real tasks are disallowed.')
+
+    parser.add_argument('target', nargs='+', help='Target to check')
+    parser.add_argument('-o', '--outfile', help='Write list to a file instead of stdout')
+    parser.add_argument('-l', '--log', help='Write full log to a file')
+    parser.add_argument('-s', '--same-tmpdir', action='store_true', help='Use same TMPDIR for check (list will then be dependent on what tasks have executed previously)')
+
+    parser.set_defaults(func=check)
+
+    args = parser.parse_args()
+
+    ret = args.func(args)
+    return ret
+
+
+if __name__ == "__main__":
+    try:
+        ret = main()
+    except Exception:
+        ret = 1
+        import traceback
+        traceback.print_exc()
+    sys.exit(ret)

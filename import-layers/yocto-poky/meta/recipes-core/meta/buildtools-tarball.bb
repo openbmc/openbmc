@@ -1,4 +1,4 @@
-DESCRIPTION = "SDK type target for building a standalone tarball containing python, chrpath, make, git and tar. The \
+DESCRIPTION = "SDK type target for building a standalone tarball containing python3, chrpath, make, git and tar. The \
                tarball can be used to run bitbake builds on systems which don't meet the usual version requirements."
 SUMMARY = "Standalone tarball for running builds on systems with inadequate software"
 LICENSE = "MIT"
@@ -8,11 +8,10 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=4d92cd373abda3937c2bc47fbc49d
 TOOLCHAIN_TARGET_TASK ?= ""
 
 TOOLCHAIN_HOST_TASK ?= "\
-    nativesdk-python-core \
-    nativesdk-python-modules \
-    nativesdk-python-misc \
-    nativesdk-python-git \
-    nativesdk-python-pexpect \
+    nativesdk-python3-core \
+    nativesdk-python3-modules \
+    nativesdk-python3-misc \
+    nativesdk-python3-git \
     nativesdk-ncurses-terminfo-base \
     nativesdk-chrpath \
     nativesdk-tar \
@@ -24,11 +23,18 @@ TOOLCHAIN_HOST_TASK ?= "\
     nativesdk-wget \
     nativesdk-ca-certificates \
     nativesdk-texinfo \
+    nativesdk-locale-base-en-us \
     "
+
+MULTIMACH_TARGET_SYS = "${SDK_ARCH}-nativesdk${SDK_VENDOR}-${SDK_OS}"
+PACKAGE_ARCH = "${SDK_ARCH}_${SDK_OS}"
+PACKAGE_ARCHS = ""
+TARGET_ARCH = "none"
+TARGET_OS = "none"
 
 SDK_PACKAGE_ARCHS += "buildtools-dummy-${SDKPKGSUFFIX}"
 
-TOOLCHAIN_OUTPUTNAME ?= "${SDK_NAME}-buildtools-nativesdk-standalone-${DISTRO_VERSION}"
+TOOLCHAIN_OUTPUTNAME ?= "${SDK_ARCH}-buildtools-nativesdk-standalone-${DISTRO_VERSION}"
 
 SDK_TITLE = "Build tools"
 
@@ -38,7 +44,17 @@ EXCLUDE_FROM_WORLD = "1"
 
 inherit meta
 inherit populate_sdk
-inherit toolchain-scripts
+inherit toolchain-scripts-base
+inherit nopackages
+
+deltask install
+deltask package
+deltask packagedata
+deltask populate_sysroot
+
+do_populate_sdk[stamp-extra-info] = "${PACKAGE_ARCH}"
+
+REAL_MULTIMACH_TARGET_SYS = "none"
 
 create_sdk_files_append () {
 	rm -f ${SDK_OUTPUT}/${SDKPATH}/site-config-*

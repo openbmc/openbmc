@@ -3,7 +3,7 @@
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 DESC=bluetooth
 
-DAEMON=/usr/lib/bluez5/bluetooth/bluetoothd
+DAEMON=@LIBEXECDIR@/bluetooth/bluetoothd
 
 # If you want to be ignore error of "org.freedesktop.hostname1",
 # please enable NOPLUGIN_OPTION.

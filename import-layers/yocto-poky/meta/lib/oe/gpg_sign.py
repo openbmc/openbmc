@@ -71,11 +71,11 @@ class LocalSigner(object):
                     passphrase = fobj.readline();
 
             job = subprocess.Popen(cmd, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
-            (_, stderr) = job.communicate(passphrase)
+            (_, stderr) = job.communicate(passphrase.encode("utf-8"))
 
             if job.returncode:
                 raise bb.build.FuncFailed("GPG exited with code %d: %s" %
-                                          (job.returncode, stderr))
+                                          (job.returncode, stderr.decode("utf-8")))
 
         except IOError as e:
             bb.error("IO error (%s): %s" % (e.errno, e.strerror))
@@ -90,7 +90,7 @@ class LocalSigner(object):
         """Return the gpg version"""
         import subprocess
         try:
-            return subprocess.check_output((self.gpg_bin, "--version")).split()[2]
+            return subprocess.check_output((self.gpg_bin, "--version")).split()[2].decode("utf-8")
         except subprocess.CalledProcessError as e:
             raise bb.build.FuncFailed("Could not get gpg version: %s" % e)
 
@@ -113,4 +113,3 @@ def get_signer(d, backend):
         return LocalSigner(d)
     else:
         bb.fatal("Unsupported signing backend '%s'" % backend)
-

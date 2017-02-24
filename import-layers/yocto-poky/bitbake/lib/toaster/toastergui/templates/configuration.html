@@ -6,21 +6,17 @@
 <li>Configuration</li>
 {% endblock %}
 
-{% block nav-configuration %}
-  <li class="active"><a href="{% url 'configuration' build.pk %}">Configuration</a></li>
-{% endblock %}
-
 {% block buildinfomain %}
 <!-- page title -->
-<div class="row-fluid span10">
- <div class="page-header">
+<div class="col-md-10">
+
+ <div class="page-header build-data">
      <h1>Configuration</h1>
  </div>
-</div>
 
 <!-- configuration table -->
-<div class="row-fluid pull-right span10" id="navTab">
-<ul class="nav nav-pills">
+<div id="navTab">
+<ul class="nav nav-tabs">
     <li class="active"><a href="#">Summary</a></li>
     <li class=""><a href="{% url 'configvars' build.id %}">BitBake variables</a></li>
 </ul>
@@ -39,34 +35,51 @@
       {%if TUNE_FEATURES %}<dt>Tune features</dt><dd>{{TUNE_FEATURES}}</dd> {% endif %}
       {%if TARGET_FPU %}<dt>Target FPU</dt><dd>{{TARGET_FPU}}</dd> {% endif %}
       {%if targets.all %}<dt>Target(s)</dt>
-          <dd> <ul> {% for target in targets.all %}
+          <dd> <ul class="list-unstyled"> {% for target in targets.all %}
                <li>{{target.target}}{%if forloop.counter > 1 %}<br>{% endif %}</li>
           {% endfor %} </ul> </dd> {% endif %}
     </dl>
     <h3>Layers</h3>
-    <div class="span9" style="margin-left:0px;">
-    <table class="table table-bordered table-hover">
-      <thead>
-        <tr>
-          <th>Layer</th>
-          <th>Layer branch</th>
-          <th>Layer commit</th>
-        </tr>
-      </thead>
-      <tbody>{% for lv in build.layer_version_build.all|dictsort:"layer.name" %}
-        <tr>
+    <div class="row">
+      <div class="col-md-9 table-responsive">
+        <table class="table table-bordered table-hover">
+          <thead>
+            <tr>
+              <th>Layer</th>
+              <th>Layer branch</th>
+              <th>Layer commit</th>
+            </tr>
+          </thead>
+          <tbody>{% for lv in build.layer_version_build.all|dictsort:"layer.name" %}
+          <tr>
             <td>{{lv.layer.name}}</td>
+	    {% if lv.layer.local_source_dir %}
+	    <td>
+	      <span class="text-muted">Not applicable</span>
+	      <span class="glyphicon glyphicon-question-sign get-help" data-original-title="" title="The source code of {{lv.layer.name}} is not in a Git repository, so there is no branch associated with it"> </span>
+	    </td>
+	    {% else %}
             <td>{{lv.branch}}</td>
-            <td> <a class="btn" data-content="<ul class='unstyled'>
-                <li>{{lv.commit}}</li> </ul>">
-                    {{lv.commit|truncatechars:13}}
-                </a></td>
-        </tr>{% endfor %}
-      </tbody>
-    </table>
+	    {% endif %}
+	    {% if lv.layer.local_source_dir %}
+	    <td>
+	      <span class="text-muted">Not applicable</span>
+	      <span class="glyphicon glyphicon-question-sign get-help" data-original-title="" title="The source code of {{lv.layer.name}} is not in a Git repository, so there is no commit associated with it"> </span>
+	    </td>
+	    {% else %}
+            <td> <a class="btn btn-default" data-content="<ul class='list-unstyled'>
+                  <li>{{lv.commit}}</li> </ul>">
+                {{lv.commit|truncatechars:13}}
+            </a></td>
+	    {% endif %}
+          </tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
-
 </div>
+
+</div> <!-- end of 10-column section -->
 {% endblock %}

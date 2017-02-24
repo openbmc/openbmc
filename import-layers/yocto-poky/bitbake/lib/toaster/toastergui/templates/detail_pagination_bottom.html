@@ -6,8 +6,8 @@
 
 {# only paginate if 10 or more rows unfiltered, all pages #}
 {% if object_count >= 10 %}
-<div class="pagination">
-  <ul>
+<div id="pagination-detail">
+  <ul class="pagination">
 {%if objects.has_previous %}
     <li><a href="javascript:reload_params({'page':{{objects.previous_page_number}}})">&laquo;</a></li>
 {%else%}
@@ -23,16 +23,18 @@
 {%endif%}
   </ul>
 
-  <div class="pull-right">
-    <span class="help-inline" style="padding-bottom:10px;">Show rows:</span>
-    <select class="pagesize">
-      {% with "10 25 50 100 150" as list%}
+  <form class="navbar-form navbar-right">
+    <div class=form-group">
+      <label>Show rows:</label>
+      <select class="pagesize form-control">
+        {% with "10 25 50 100 150" as list%}
         {% for i in list.split %}
-          <option value="{{i}}">{{i}}</option>
+        <option value="{{i}}">{{i}}</option>
         {% endfor %}
-      {% endwith %}
-    </select>
-  </div>
+        {% endwith %}
+      </select>
+    </div>
+  </form>
 </div>
 
 <!-- Update page display settings -->

@@ -161,13 +161,17 @@
                 cross-compilation.
                 You can pass additional parameters to
                 <filename>configure</filename> through the
-                <filename><link linkend='var-EXTRA_OECONF'>EXTRA_OECONF</link></filename> variable.
+                <filename><link linkend='var-EXTRA_OECONF'>EXTRA_OECONF</link></filename>
+                or
+                <link linkend='var-PACKAGECONFIG_CONFARGS'><filename>PACKAGECONFIG_CONFARGS</filename></link>
+                variables.
                 </para></listitem>
             <listitem><para><link linkend='ref-tasks-compile'><filename>do_compile</filename></link> -
                 Runs <filename>make</filename> with arguments that specify the
                 compiler and linker.
                 You can pass additional arguments through
-                the <filename><link linkend='var-EXTRA_OEMAKE'>EXTRA_OEMAKE</link></filename> variable.
+                the <filename><link linkend='var-EXTRA_OEMAKE'>EXTRA_OEMAKE</link></filename>
+                variable.
                 </para></listitem>
             <listitem><para><link linkend='ref-tasks-install'><filename>do_install</filename></link> -
                 Runs <filename>make install</filename> and passes in
@@ -194,7 +198,14 @@
         class or the
         <link linkend='ref-classes-package'><filename>package</filename></link>
         class.
+    </para>
+
+    <para>
         The class also contains some commonly used functions such as
+        <filename>oe_runmake</filename>, which runs
+        <filename>make</filename> with the arguments specified in
+        <link linkend='var-EXTRA_OEMAKE'><filename>EXTRA_OEMAKE</filename></link>
+        variable as well as the arguments passed directly to
         <filename>oe_runmake</filename>.
     </para>
 </section>
@@ -1092,36 +1103,6 @@
     </para>
 </section>
 
-<section id='ref-classes-gummiboot'>
-    <title><filename>gummiboot.bbclass</filename></title>
-
-    <para>
-        The <filename>gummiboot</filename> class provides functions specific
-        to the gummiboot bootloader for building bootable images.
-        This is an internal class and is not intended to be
-        used directly.
-        Set the
-        <link linkend='var-EFI_PROVIDER'><filename>EFI_PROVIDER</filename></link>
-        variable to "gummiboot" to use this class.
-    </para>
-
-    <para>
-        For information on more variables used and supported in this class,
-        see the
-        <link linkend='var-GUMMIBOOT_CFG'><filename>GUMMIBOOT_CFG</filename></link>,
-        <link linkend='var-GUMMIBOOT_ENTRIES'><filename>GUMMIBOOT_ENTRIES</filename></link>,
-        and
-        <link linkend='var-GUMMIBOOT_TIMEOUT'><filename>GUMMIBOOT_TIMEOUT</filename></link>
-        variables.
-    </para>
-
-    <para>
-        You can also see the
-        <ulink url='http://freedesktop.org/wiki/Software/gummiboot/'>Gummiboot documentation</ulink>
-        for more information.
-    </para>
-</section>
-
 <section id='ref-classes-gzipnative'>
     <title><filename>gzipnative.bbclass</filename></title>
 
@@ -1381,22 +1362,6 @@
     </para>
 </section>
 
-<section id='ref-classes-image-swab'>
-    <title><filename>image-swab.bbclass</filename></title>
-
-    <para>
-        The <filename>image-swab</filename> class enables the
-        <ulink url='&YOCTO_HOME_URL;/tools-resources/projects/swabber'>Swabber</ulink>
-        tool in order to detect and log accesses to the host system during
-        the OpenEmbedded build process.
-        <note>
-            This class is currently unmaintained.
-            The <filename>strace</filename> package needs to be installed
-            in the build host as a dependency for this tool.
-        </note>
-    </para>
-</section>
-
 <section id='ref-classes-image-vm'>
     <title><filename>image-vm.bbclass</filename></title>
 
@@ -1599,6 +1564,17 @@
                 <link linkend='var-FILES'><filename>FILES</filename></link>
                 variable values that contain "//", which is invalid.
                 </para></listitem>
+            <listitem><para><emphasis><filename>host-user-contaminated:</filename></emphasis>
+                Checks that no package produced by the recipe contains any
+                files outside of <filename>/home</filename> with a user or
+                group ID that matches the user running BitBake.
+                A match usually indicates that the files are being installed
+                with an incorrect UID/GID, since target IDs are independent
+                from host IDs.
+                For additional information, see the section describing the
+                <link linkend='ref-tasks-install'><filename>do_install</filename></link>
+                task.
+                </para></listitem>
             <listitem><para><emphasis><filename>incompatible-license:</filename></emphasis>
                 Report when packages are excluded from being created due to
                 being marked with a license that is in
@@ -1625,6 +1601,25 @@
                 These files can be deleted at the end of
                 <filename>do_install</filename> if the files are not
                 needed in any package.
+                </para></listitem>
+            <listitem><para><emphasis><filename>invalid-chars:</filename></emphasis>
+                Checks that the recipe metadata variables
+                <link linkend='var-DESCRIPTION'><filename>DESCRIPTION</filename></link>,
+                <link linkend='var-SUMMARY'><filename>SUMMARY</filename></link>,
+                <link linkend='var-LICENSE'><filename>LICENSE</filename></link>,
+                and
+                <link linkend='var-SECTION'><filename>SECTION</filename></link>
+                do not contain non-UTF-8 characters.
+                Some package managers do not support such characters.
+                </para></listitem>
+            <listitem><para><emphasis><filename>invalid-packageconfig:</filename></emphasis>
+                Checks that no undefined features are being added to
+                <link linkend='var-PACKAGECONFIG'><filename>PACKAGECONFIG</filename></link>.
+                For example, any name "foo" for which the following form
+                does not exist:
+                <literallayout class='monospaced'>
+     PACKAGECONFIG[foo] = "..."
+                </literallayout>
                 </para></listitem>
             <listitem><para><emphasis><filename>la:</filename></emphasis>
                 Checks <filename>.la</filename> files for any <filename>TMPDIR</filename>
@@ -3294,6 +3289,43 @@
     </para>
 </section>
 
+<section id='ref-classes-systemd-boot'>
+    <title><filename>systemd-boot.bbclass</filename></title>
+
+    <para>
+        The <filename>systemd-boot</filename> class provides functions specific
+        to the systemd-boot bootloader for building bootable images.
+        This is an internal class and is not intended to be used directly.
+        <note>
+            The <filename>systemd-boot</filename> class is a result from
+            merging the <filename>gummiboot</filename> class used in previous
+            Yocto Project releases with the <filename>systemd</filename>
+            project.
+        </note>
+        Set the
+        <link linkend='var-EFI_PROVIDER'><filename>EFI_PROVIDER</filename></link>
+        variable to "systemd-boot" to use this class.
+        Doing so creates a standalone EFI bootloader that is not dependent
+        on systemd.
+    </para>
+
+    <para>
+        For information on more variables used and supported in this class,
+        see the
+        <link linkend='var-SYSTEMD_BOOT_CFG'><filename>SYSTEMD_BOOT_CFG</filename></link>,
+        <link linkend='var-SYSTEMD_BOOT_ENTRIES'><filename>SYSTEMD_BOOT_ENTRIES</filename></link>,
+        and
+        <link linkend='var-SYSTEMD_BOOT_TIMEOUT'><filename>SYSTEMD_BOOT_TIMEOUT</filename></link>
+        variables.
+    </para>
+
+    <para>
+        You can also see the
+        <ulink url='http://www.freedesktop.org/wiki/Software/systemd/systemd-boot/'>Systemd-boot documentation</ulink>
+        for more information.
+    </para>
+</section>
+
 <section id='ref-classes-terminal'>
     <title><filename>terminal.bbclass</filename></title>
 
@@ -3698,7 +3730,9 @@
         software that uses the Waf build system.
         You can use the
         <link linkend='var-EXTRA_OECONF'><filename>EXTRA_OECONF</filename></link>
-        variable to specify additional configuration options to be passed on
+        or
+        <link linkend='var-PACKAGECONFIG_CONFARGS'><filename>PACKAGECONFIG_CONFARGS</filename></link>
+        variables to specify additional configuration options to be passed on
         the Waf command line.
     </para>
 </section>

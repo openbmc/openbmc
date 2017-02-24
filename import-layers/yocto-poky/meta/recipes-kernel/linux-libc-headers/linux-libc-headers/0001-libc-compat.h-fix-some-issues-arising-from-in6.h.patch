@@ -11,10 +11,10 @@ Upstream-Status: Submitted
  include/uapi/linux/libc-compat.h | 25 ++++++++-----------------
  1 file changed, 8 insertions(+), 17 deletions(-)
 
-Index: linux-4.4/include/uapi/linux/libc-compat.h
+Index: linux-4.8-rc4/include/uapi/linux/libc-compat.h
 ===================================================================
---- linux-4.4.orig/include/uapi/linux/libc-compat.h
-+++ linux-4.4/include/uapi/linux/libc-compat.h
+--- linux-4.8-rc4.orig/include/uapi/linux/libc-compat.h
++++ linux-4.8-rc4/include/uapi/linux/libc-compat.h
 @@ -48,13 +48,12 @@
  #ifndef _UAPI_LIBC_COMPAT_H
  #define _UAPI_LIBC_COMPAT_H
@@ -23,16 +23,17 @@ Index: linux-4.4/include/uapi/linux/libc-compat.h
 -#if defined(__GLIBC__)
 +#ifndef __KERNEL__ /* we're used from userspace */
  
--/* Coordinate with glibc netinet/in.h header. */
-+/* Coordinate with libc netinet/in.h header. */
- #if defined(_NETINET_IN_H)
+-/* Coordinate with glibc net/if.h header. */
+-#if defined(_NET_IF_H) && defined(__USE_MISC)
++/* Coordinate with libc net/if.h header. */
++#if defined(_NET_IF_H)
  
 -/* GLIBC headers included first so don't define anything
 +/* LIBC headers included first so don't define anything
   * that would already be defined. */
- #define __UAPI_DEF_IN_ADDR		0
- #define __UAPI_DEF_IN_IPPROTO		0
-@@ -64,15 +63,7 @@
+ 
+ #define __UAPI_DEF_IF_IFCONF 0
+@@ -98,15 +97,7 @@
  #define __UAPI_DEF_IN_CLASS		0
  
  #define __UAPI_DEF_IN6_ADDR		0
@@ -48,7 +49,7 @@ Index: linux-4.4/include/uapi/linux/libc-compat.h
  #define __UAPI_DEF_SOCKADDR_IN6		0
  #define __UAPI_DEF_IPV6_MREQ		0
  #define __UAPI_DEF_IPPROTO_V6		0
-@@ -80,10 +71,10 @@
+@@ -114,10 +105,10 @@
  #define __UAPI_DEF_IN6_PKTINFO		0
  #define __UAPI_DEF_IP6_MTUINFO		0
  
@@ -61,7 +62,7 @@ Index: linux-4.4/include/uapi/linux/libc-compat.h
   * __UAPI_DEF_* defines and adjust appropriately. */
  #define __UAPI_DEF_IN_ADDR		1
  #define __UAPI_DEF_IN_IPPROTO		1
-@@ -93,7 +84,7 @@
+@@ -127,7 +118,7 @@
  #define __UAPI_DEF_IN_CLASS		1
  
  #define __UAPI_DEF_IN6_ADDR		1
@@ -70,16 +71,16 @@ Index: linux-4.4/include/uapi/linux/libc-compat.h
   * coordinate. */
  #define __UAPI_DEF_IN6_ADDR_ALT		1
  #define __UAPI_DEF_SOCKADDR_IN6		1
-@@ -115,7 +106,7 @@
+@@ -149,7 +140,7 @@
  /* If we did not see any headers from any supported C libraries,
   * or we are being included in the kernel, then define everything
   * that we need. */
 -#else /* !defined(__GLIBC__) */
 +#else /* __KERNEL__ */
  
- /* Definitions for in.h */
- #define __UAPI_DEF_IN_ADDR		1
-@@ -138,6 +129,6 @@
+ /* Definitions for if.h */
+ #define __UAPI_DEF_IF_IFCONF 1
+@@ -182,6 +173,6 @@
  /* Definitions for xattr.h */
  #define __UAPI_DEF_XATTR		1
  

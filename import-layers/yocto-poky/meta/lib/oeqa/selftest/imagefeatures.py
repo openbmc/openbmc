@@ -98,3 +98,30 @@ class ImageFeatures(oeSelfTest):
         # Build a core-image-weston
         bitbake('core-image-weston')
 
+    def test_bmap(self):
+        """
+        Summary:     Check bmap support
+        Expected:    1. core-image-minimal can be build with bmap support
+                     2. core-image-minimal is sparse
+        Product:     oe-core
+        Author:      Ed Bartosh <ed.bartosh@linux.intel.com>
+        """
+
+        features = 'IMAGE_FSTYPES += " ext4 ext4.bmap"'
+        self.write_config(features)
+
+        image_name = 'core-image-minimal'
+        bitbake(image_name)
+
+        deploy_dir_image = get_bb_var('DEPLOY_DIR_IMAGE')
+        link_name = get_bb_var('IMAGE_LINK_NAME', image_name)
+        image_path = os.path.join(deploy_dir_image, "%s.ext4" % link_name)
+        bmap_path = "%s.bmap" % image_path
+
+        # check if result image and bmap file are in deploy directory
+        self.assertTrue(os.path.exists(image_path))
+        self.assertTrue(os.path.exists(bmap_path))
+
+        # check if result image is sparse
+        image_stat = os.stat(image_path)
+        self.assertTrue(image_stat.st_size > image_stat.st_blocks * 512)

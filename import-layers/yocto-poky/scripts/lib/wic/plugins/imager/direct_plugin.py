@@ -86,7 +86,8 @@ class DirectPlugin(ImagerPlugin):
                                             kernel_dir,
                                             native_sysroot,
                                             compressor,
-                                            creatoropts)
+                                            creatoropts,
+                                            opts.bmap)
 
         try:
             creator.create()
