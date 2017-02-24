@@ -4,8 +4,8 @@ SECTION = "devel/libs"
 LICENSE = "LGPLv3+"
 LIC_FILES_CHKSUM = "file://COPYING.LESSER;md5=e6a600fd5e1d9cbde2d983680233ad02"
 
-# tag 2.29
-SRCREV = "d79506694d7ba1c3da865d095238289d6175057d"
+# tag 2.32
+SRCREV = "b0a60c3302973ca1878d149d61f2f612c8f27fac"
 
 S = "${WORKDIR}/git"
 
@@ -16,7 +16,7 @@ SRC_URI = "git://git.drogon.net/wiringPi \
 
 COMPATIBLE_MACHINE = "raspberrypi"
 
-CFLAGS_prepend = "-I${S}/wiringPi -I${S}/devLib"
+CFLAGS_prepend = "-I${S}/wiringPi -I${S}/devLib "
 
 EXTRA_OEMAKE += "'INCLUDE_DIR=${D}${includedir}' 'LIB_DIR=${D}${libdir}'"
 EXTRA_OEMAKE += "'DESTDIR=${D}/usr' 'PREFIX=""'"

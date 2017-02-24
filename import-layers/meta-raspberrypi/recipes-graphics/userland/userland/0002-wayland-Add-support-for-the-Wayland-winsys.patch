@@ -1,7 +1,7 @@
-From 79ce2b4125359593f37c5b9744a37203e24249de Mon Sep 17 00:00:00 2001
+From e3d2d0007e1c6c32ab7d9a28f1e399d42b511333 Mon Sep 17 00:00:00 2001
 From: Tomeu Vizoso <tomeu.vizoso@collabora.com>
 Date: Tue, 1 Oct 2013 13:19:20 +0200
-Subject: [PATCH 02/13] wayland: Add support for the Wayland winsys
+Subject: [PATCH 02/12] wayland: Add support for the Wayland winsys
 
 * Adds EGL_WL_bind_wayland_display extension
 * Adds wayland-egl library
@@ -20,8 +20,9 @@ vc_vchi_dispmanx.h
  .gitignore                                         |   2 +
  CMakeLists.txt                                     |  11 +
  README.md                                          |   4 +
- buildme                                            |  14 +-
- interface/khronos/CMakeLists.txt                   |  52 ++++-
+ buildme                                            |  10 +-
+ .../linux/apps/raspicam/CMakeLists.txt             |   2 +-
+ interface/khronos/CMakeLists.txt                   |  53 ++++-
  interface/khronos/common/khrn_client.c             |  15 ++
  interface/khronos/common/khrn_client.h             |  10 +
  interface/khronos/common/khrn_client_mangle.h      |   3 +
@@ -46,7 +47,7 @@ vc_vchi_dispmanx.h
  interface/vmcs_host/vc_vchi_dispmanx.h             |  15 ++
  interface/wayland/dispmanx.xml                     | 123 +++++++++++
  makefiles/cmake/Wayland.cmake                      |  72 ++++++
- 29 files changed, 1260 insertions(+), 97 deletions(-)
+ 30 files changed, 1258 insertions(+), 98 deletions(-)
  create mode 100644 interface/khronos/common/linux/khrn_wayland.c
  copy interface/{vmcs_host/vc_vchi_dispmanx.h => khronos/common/linux/khrn_wayland.h} (56%)
  create mode 100644 interface/khronos/ext/egl_wayland.c
@@ -57,20 +58,20 @@ vc_vchi_dispmanx.h
  create mode 100644 makefiles/cmake/Wayland.cmake
 
 diff --git a/.gitignore b/.gitignore
-index 8df9393..d0d1387 100644
+index 4a88665..5da71a9 100644
 --- a/.gitignore
 +++ b/.gitignore
-@@ -10,3 +10,5 @@
+@@ -13,3 +13,5 @@ build/
  *.lai
  *.la
  *.a
 +
 +*~
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 3113618..56b7fb8 100644
+index 98252c3..d6ae907 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -19,6 +19,17 @@ include(makefiles/cmake/global_settings.cmake)
+@@ -24,6 +24,17 @@ include(makefiles/cmake/global_settings.cmake)
  include(makefiles/cmake/arm-linux.cmake)
  include(makefiles/cmake/vmcs.cmake)
  
@@ -101,11 +102,12 @@ index 358d2b4..4da4448 100644
 +
 +$ BUILD_WAYLAND=1 ./buildme.
 diff --git a/buildme b/buildme
-index d5d3de9..c46f214 100755
+index 1061745..d0e6e54 100755
 --- a/buildme
 +++ b/buildme
-@@ -1,10 +1,14 @@
- #!/bin/bash
+@@ -8,6 +8,10 @@ fi
+ 
+ BUILDSUBDIR=`echo $BUILDTYPE | tr '[A-Z]' '[a-z]'`;
  
 +if [ -n "$BUILD_WAYLAND" ]; then
 +       WAYLAND_VARS="-DBUILD_WAYLAND=TRUE"
@@ -113,32 +115,37 @@ index d5d3de9..c46f214 100755
 +
  if [ "armv6l" = `arch` ] || [ "armv7l" = `arch` ]; then
  	# Native compile on the Raspberry Pi
- 	mkdir -p build/raspberry/release
- 	pushd build/raspberry/release
--	cmake -DCMAKE_BUILD_TYPE=Release ../../..
-+	cmake -DCMAKE_BUILD_TYPE=Release $WAYLAND_VARS ../../..
- 	if [ "armv6l" = `arch` ]; then
- 		make
- 	else
-@@ -17,9 +21,15 @@ if [ "armv6l" = `arch` ] || [ "armv7l" = `arch` ]; then
- 	fi
+ 	mkdir -p build/raspberry/$BUILDSUBDIR
+@@ -32,9 +36,13 @@ elif [ "$1" = "--native" ]; then
+ 	make -j 6 $*
  else
  	# Cross compile on a more capable machine
-+
 +	if [ -n "$BUILD_WAYLAND" ]; then
 +		# Use wayland-scanner from the build platform
 +		WAYLAND_VARS+=" -DWAYLAND_SCANNER_EXECUTABLE:FILEPATH=/usr/bin/wayland-scanner"
 +	fi
-+
- 	mkdir -p build/arm-linux/release/
- 	pushd build/arm-linux/release/
--	cmake -DCMAKE_TOOLCHAIN_FILE=../../../makefiles/cmake/toolchains/arm-linux-gnueabihf.cmake -DCMAKE_BUILD_TYPE=Release ../../..
-+	cmake -DCMAKE_TOOLCHAIN_FILE=../../../makefiles/cmake/toolchains/arm-linux-gnueabihf.cmake -DCMAKE_BUILD_TYPE=Release $WAYLAND_VARS ../../..
+ 	mkdir -p build/arm-linux/$BUILDSUBDIR
+ 	pushd build/arm-linux/$BUILDSUBDIR
+-	cmake -DCMAKE_TOOLCHAIN_FILE=../../../makefiles/cmake/toolchains/arm-linux-gnueabihf.cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE ../../..
++	cmake -DCMAKE_TOOLCHAIN_FILE=../../../makefiles/cmake/toolchains/arm-linux-gnueabihf.cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE $WAYLAND_VARS ../../..
  	make -j 6
  
  	if [ "$1" != "" ]; then
+diff --git a/host_applications/linux/apps/raspicam/CMakeLists.txt b/host_applications/linux/apps/raspicam/CMakeLists.txt
+index e6aa6b8..69059cb 100644
+--- a/host_applications/linux/apps/raspicam/CMakeLists.txt
++++ b/host_applications/linux/apps/raspicam/CMakeLists.txt
+@@ -28,7 +28,7 @@ add_executable(raspividyuv  ${COMMON_SOURCES} RaspiVidYUV.c)
+ 
+ set (MMAL_LIBS mmal_core mmal_util mmal_vc_client)
+ 
+-target_link_libraries(raspistill ${MMAL_LIBS} vcos bcm_host brcmGLESv2 brcmEGL m)
++target_link_libraries(raspistill ${MMAL_LIBS} vcos bcm_host brcmGLESv2 brcmEGL m ${WAYLAND_SERVER_LIBRARIES} ${WAYLAND_CLIENT_LIBRARIES})
+ target_link_libraries(raspiyuv   ${MMAL_LIBS} vcos bcm_host)
+ target_link_libraries(raspivid   ${MMAL_LIBS} vcos bcm_host)
+ target_link_libraries(raspividyuv   ${MMAL_LIBS} vcos bcm_host)
 diff --git a/interface/khronos/CMakeLists.txt b/interface/khronos/CMakeLists.txt
-index c437291..6778e10 100644
+index 9ad615b..3d3571a 100644
 --- a/interface/khronos/CMakeLists.txt
 +++ b/interface/khronos/CMakeLists.txt
 @@ -6,6 +6,12 @@
@@ -154,7 +161,7 @@ index c437291..6778e10 100644
  set(EGL_SOURCE
     egl/egl_client_config.c
     egl/egl_client_context.c
-@@ -55,19 +61,63 @@ set(CLIENT_SOURCE
+@@ -55,12 +61,56 @@ set(CLIENT_SOURCE
     common/khrn_int_hash_asm.s
     common/khrn_client_cache.c)
  
@@ -211,16 +218,18 @@ index c437291..6778e10 100644
  # TODO do we need EGL_static and GLESv2_static now that khrn_static exists?
  add_library(EGL_static STATIC ${EGL_SOURCE})
  add_library(GLESv2_static STATIC ${GLES_SOURCE})
- add_library(khrn_static STATIC
-    ${EGL_SOURCE} ${GLES_SOURCE} ${VG_SOURCE} ${WFC_SOURCE} ${CLIENT_SOURCE})
- 
--target_link_libraries(EGL khrn_client vchiq_arm vcos bcm_host -lm)
-+target_link_libraries(EGL ${EGL_LIBS})
+@@ -72,8 +122,7 @@ include_directories (../../host_applications/linux/libs/sm )
+ set(VCSM_LIBS vcsm)
+ add_definitions(-DKHRONOS_HAVE_VCSM)
+ endif()
+-
+-target_link_libraries(EGL khrn_client vchiq_arm vcos bcm_host ${VCSM_LIBS} -lm)
++target_link_libraries(EGL ${EGL_LIBS} ${VCSM_LIBS})
  target_link_libraries(GLESv2 EGL khrn_client vcos)
  target_link_libraries(WFC EGL)
  target_link_libraries(OpenVG EGL)
 diff --git a/interface/khronos/common/khrn_client.c b/interface/khronos/common/khrn_client.c
-index e38a85f..783a68e 100644
+index ef4babd..d7e798e 100644
 --- a/interface/khronos/common/khrn_client.c
 +++ b/interface/khronos/common/khrn_client.c
 @@ -54,6 +54,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
@@ -333,7 +342,7 @@ index 4f3ce49..84f6ec0 100644
  /* OpenGL ES 1.1 and 2.0 functions */
  
 diff --git a/interface/khronos/common/linux/khrn_client_platform_linux.c b/interface/khronos/common/linux/khrn_client_platform_linux.c
-index 9d43d15..00821d3 100644
+index 710d20f..50d60a6 100644
 --- a/interface/khronos/common/linux/khrn_client_platform_linux.c
 +++ b/interface/khronos/common/linux/khrn_client_platform_linux.c
 @@ -37,6 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
@@ -348,7 +357,7 @@ index 9d43d15..00821d3 100644
  extern VCOS_LOG_CAT_T khrn_client_log;
  
  extern void vc_vchi_khronos_init();
-@@ -460,13 +465,36 @@ EGLDisplay khrn_platform_set_display_id(EGLNativeDisplayType display_id)
+@@ -464,13 +469,36 @@ EGLDisplay khrn_platform_set_display_id(EGLNativeDisplayType display_id)
  	   return EGL_NO_DISPLAY;
  }
  #else
@@ -387,7 +396,7 @@ index 9d43d15..00821d3 100644
  #endif
  
  #ifdef WANT_X
-@@ -801,22 +829,81 @@ static EGL_DISPMANX_WINDOW_T *check_default(EGLNativeWindowType win)
+@@ -805,22 +833,81 @@ static EGL_DISPMANX_WINDOW_T *check_default(EGLNativeWindowType win)
  void platform_get_dimensions(EGLDisplay dpy, EGLNativeWindowType win,
        uint32_t *width, uint32_t *height, uint32_t *swapchain_count)
  {
@@ -767,7 +776,7 @@ index b723b76..b9bf08c 100644
 -#endif
 +struct wl_dispmanx_client_buffer *allocate_wl_buffer(struct wl_egl_window *window, KHRN_IMAGE_FORMAT_T color);
 diff --git a/interface/khronos/egl/egl_client.c b/interface/khronos/egl/egl_client.c
-index 234da65..024f3ed 100644
+index b8bb374..03fe67b 100644
 --- a/interface/khronos/egl/egl_client.c
 +++ b/interface/khronos/egl/egl_client.c
 @@ -153,6 +153,10 @@ by an attribute value"
@@ -941,7 +950,7 @@ index 4cfa9ff..6a715af 100644
  }
  
 diff --git a/interface/khronos/egl/egl_client_surface.c b/interface/khronos/egl/egl_client_surface.c
-index 0dc10e2..49cf7e5 100644
+index 128325e..42350bf 100644
 --- a/interface/khronos/egl/egl_client_surface.c
 +++ b/interface/khronos/egl/egl_client_surface.c
 @@ -46,6 +46,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
@@ -1533,7 +1542,7 @@ index 0000000..8bafc15
 +Libs: -L${libdir} -lwayland-egl
 +Cflags: -I${includedir}
 diff --git a/interface/vmcs_host/CMakeLists.txt b/interface/vmcs_host/CMakeLists.txt
-index e0c6e13..35150ed 100755
+index 0b3adc9..f44d01f 100755
 --- a/interface/vmcs_host/CMakeLists.txt
 +++ b/interface/vmcs_host/CMakeLists.txt
 @@ -9,13 +9,24 @@ add_definitions(-fno-strict-aliasing)
@@ -1595,10 +1604,10 @@ index 37fdae1..fe3619a 100755
  }
  #endif
 diff --git a/interface/vmcs_host/vc_vchi_dispmanx.c b/interface/vmcs_host/vc_vchi_dispmanx.c
-index d188068..3e668f5 100755
+index 133e86d..45f4cff 100755
 --- a/interface/vmcs_host/vc_vchi_dispmanx.c
 +++ b/interface/vmcs_host/vc_vchi_dispmanx.c
-@@ -1316,3 +1316,45 @@ static void *dispmanx_notify_func( void *arg ) {
+@@ -1319,3 +1319,45 @@ static void *dispmanx_notify_func( void *arg ) {
     }
     return 0;
  }
@@ -1876,5 +1885,5 @@ index 0000000..ad90d30
 +    set(${_sources} ${${_sources}} PARENT_SCOPE)
 +endfunction()
 -- 
-2.9.0
+2.10.2
 

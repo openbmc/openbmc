@@ -1,7 +1,7 @@
-From 6e634184ee4b3d2c98c3213a3931845ec3014754 Mon Sep 17 00:00:00 2001
+From 098faed5e7035b51f14700fdf4cf5875aa7af97e Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 29 Mar 2016 20:38:30 -0700
-Subject: [PATCH 11/13] Fix for framerate with nested composition
+Subject: [PATCH 10/12] Fix for framerate with nested composition
 
 frame rate appears irregular and lower than expected when using nested composition.
 
@@ -11,7 +11,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 8 insertions(+)
 
 diff --git a/interface/khronos/egl/egl_client.c b/interface/khronos/egl/egl_client.c
-index 024f3ed..83970ec 100644
+index 03fe67b..13a110c 100644
 --- a/interface/khronos/egl/egl_client.c
 +++ b/interface/khronos/egl/egl_client.c
 @@ -2342,6 +2342,9 @@ EGLAPI EGLBoolean EGLAPIENTRY eglSwapBuffers(EGLDisplay dpy, EGLSurface surf)
@@ -56,5 +56,5 @@ index 024f3ed..83970ec 100644
  #ifdef ANDROID
                 CLIENT_UNLOCK();
 -- 
-2.9.0
+2.10.2
 

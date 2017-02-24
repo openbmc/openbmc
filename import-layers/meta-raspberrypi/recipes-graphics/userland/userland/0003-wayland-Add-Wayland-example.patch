@@ -1,7 +1,7 @@
-From b6ee187184456d66095146e3dc06b6baa29c17d7 Mon Sep 17 00:00:00 2001
+From 8a4b3ea902bbcc08452e13a61ffbdc834bc13ea3 Mon Sep 17 00:00:00 2001
 From: Tomeu Vizoso <tomeu.vizoso@collabora.com>
 Date: Tue, 1 Oct 2013 13:19:20 +0200
-Subject: [PATCH 03/13] wayland: Add Wayland example
+Subject: [PATCH 03/12] wayland: Add Wayland example
 
 ---
  .../linux/apps/hello_pi/CMakeLists.txt             |   1 +
@@ -844,23 +844,23 @@ index 0000000..1a7bfc4
 +}
 +
 diff --git a/host_applications/linux/apps/hello_pi/rebuild.sh b/host_applications/linux/apps/hello_pi/rebuild.sh
-index fa4539e..37120ac 100755
+index 8225dd5..0be6ce7 100755
 --- a/host_applications/linux/apps/hello_pi/rebuild.sh
 +++ b/host_applications/linux/apps/hello_pi/rebuild.sh
-@@ -13,6 +13,7 @@ make -C hello_jpeg clean
- make -C hello_videocube clean
+@@ -14,6 +14,7 @@ make -C hello_videocube clean
  make -C hello_teapot clean
  make -C hello_fft clean
+ make -C hello_mmal_encode clean
 +make -C hello_wayland clean
  
  make -C libs/ilclient
  make -C libs/vgfont
-@@ -29,4 +30,4 @@ make -C hello_jpeg
- make -C hello_videocube
+@@ -31,4 +32,4 @@ make -C hello_videocube
  make -C hello_teapot
  make -C hello_fft
+ make -C hello_mmal_encode
 -
 +make -C hello_wayland
 -- 
-2.9.0
+2.10.2
 

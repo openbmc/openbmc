@@ -13,9 +13,9 @@ ARM_KEEP_OABI ?= "1"
 # Quirk for udev greater or equal 141
 UDEV_GE_141 ?= "1"
 
-# Set the verbosity of kernel messages during runtime
-# You can define CMDLINE_DEBUG in your local.conf or distro.conf to override this behaviour
-CMDLINE_DEBUG ?= '${@base_conditional("DISTRO_TYPE", "release", "quiet", "debug", d)}'
+# You can define CMDLINE_DEBUG as "debug" in your local.conf or distro.conf
+# to enable kernel debugging.
+CMDLINE_DEBUG ?= ""
 CMDLINE_append = " ${CMDLINE_DEBUG}"
 
 KERNEL_INITRAMFS ?= '${@base_conditional("INITRAMFS_IMAGE_BUNDLE", "1", "1", "", d)}'
@@ -110,6 +110,16 @@ do_configure_prepend() {
     fi
     # Activate CONFIG_LEGACY_PTYS
     kernel_configure_variable LEGACY_PTYS y
+
+    # Activate the configuration options for VC4
+    VC4GRAPHICS="${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", "1", "0", d)}"
+    if [ ${VC4GRAPHICS} = "1" ]; then
+        kernel_configure_variable I2C_BCM2835 y
+        kernel_configure_variable DRM y
+        kernel_configure_variable DRM_FBDEV_EMULATION y
+        kernel_configure_variable DRM_VC4 y
+        kernel_configure_variable FB_BCM2708 n
+    fi
 
     # Keep this the last line
     # Remove all modified configs and add the rest to .config
