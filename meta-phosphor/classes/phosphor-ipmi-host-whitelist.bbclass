@@ -24,4 +24,4 @@ python phosphor_ipmi_host_whitelist_postinstall() {
 
     install_whitelist(d)
 }
-do_install[postfuncs] += "phosphor_ipmi_host_whitelist_postinstall"
+do_populate_sysroot[postfuncs] += "phosphor_ipmi_host_whitelist_postinstall"
