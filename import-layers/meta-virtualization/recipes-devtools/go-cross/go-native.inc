@@ -16,7 +16,7 @@ do_compile() {
     mkdir -p ${WORKDIR}/build-tmp
 
     cd src
-    ./make.bash --host-only
+    CGO_ENABLED=0 ./make.bash --host-only
 }
 
 

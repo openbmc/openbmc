@@ -25,7 +25,7 @@ index 8dc9083..a993d63 100644
 +	@echo 'SCRIPT_DIR=$$(dirname $$0)' >> add_person_python
 +	@echo '$$SCRIPT_DIR/add_person.py "$$@"' >> add_person_python
  	@chmod +x add_person_python
- 
+
  list_people_python: list_people.py protoc_middleman
  	@echo "Writing shortcut script list_people_python..."
  	@echo '#! /bin/sh' > list_people_python
@@ -33,6 +33,6 @@ index 8dc9083..a993d63 100644
 +	@echo 'SCRIPT_DIR=$$(dirname $$0)' >> list_people_python
 +	@echo '$$SCRIPT_DIR/list_people.py "$$@"' >> list_people_python
  	@chmod +x list_people_python
--- 
+--
 1.9.3
 

@@ -1,11 +1,10 @@
 DESCRIPTION = "A toolkit to interact with the virtualization capabilities of recent versions of Linux." 
 HOMEPAGE = "http://libvirt.org"
-LICENSE = "LGPLv2.1+"
-LICENSE_${PN}-ptest = "GPLv2+ & LGPLv2.1"
+LICENSE = "LGPLv2.1+ & GPLv2+"
+LICENSE_${PN}-ptest = "GPLv2+ & LGPLv2.1+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://COPYING.LESSER;md5=4b54a1fd55a448865a0b32d41598759d"
 SECTION = "console/tools"
-PR = "r1"
 
 DEPENDS = "bridge-utils gnutls libxml2 lvm2 avahi parted curl libpcap util-linux e2fsprogs pm-utils \
 	   iptables dnsmasq readline libtasn1 libxslt-native"
@@ -33,10 +32,15 @@ SRC_URI = "http://libvirt.org/sources/libvirt-${PV}.tar.gz;name=libvirt \
            file://libvirt-use-pkg-config-to-locate-libcap.patch \
            file://0001-to-fix-build-error.patch \
            file://Revert-build-add-prefix-to-SYSTEMD_UNIT_DIR.patch \
+           file://install-missing-file.patch \
+           file://0001-nsslinktest-also-build-virAtomic.h.patch \
+           file://0001-qemu-Let-empty-default-VNC-password-work-as-document.patch \
+           file://0001-ptest-add-missing-test_helper-files.patch \
+           file://0001-ptest-Remove-Windows-1252-check-from-esxutilstest.patch \
           "
 
-SRC_URI[libvirt.md5sum] = "b48b06bbc7efbe9973ed0f3f223d6da2"
-SRC_URI[libvirt.sha256sum] = "e3c6fc2683178660b371efb3ac7a1103a3f4b78efac7ffe560bc5917974ccf05"
+SRC_URI[libvirt.md5sum] = "f9dc1e63d559eca50ae0ee798a4c6c6d"
+SRC_URI[libvirt.sha256sum] = "93a23c44eb431da46c9458f95a66e29c9b98e37515d44b6be09e75b35ec94ac8"
 
 inherit autotools gettext update-rc.d pkgconfig ptest systemd
 
@@ -107,7 +111,7 @@ FILES_${PN}-libvirtd = " \
         /usr/lib/sysctl.d/60-libvirtd.conf \
 	${sbindir}/libvirtd \
 	${systemd_unitdir}/system/* \
-	${@base_contains('DISTRO_FEATURES', 'sysvinit', '', '${libexecdir}/libvirt-guests.sh', d)} \
+	${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', '', '${libexecdir}/libvirt-guests.sh', d)} \
         "
 
 FILES_${PN}-virsh = "${bindir}/virsh"
@@ -136,7 +140,6 @@ INITSCRIPT_PARAMS_${PN}-libvirtd = "defaults 72"
 
 SYSTEMD_PACKAGES = "${PN}-libvirtd"
 SYSTEMD_SERVICE_${PN}-libvirtd = " \
-    libvirtd.socket \
     libvirtd.service \
     virtlockd.service \
     libvirt-guests.service \
@@ -167,9 +170,9 @@ PRIVATE_LIBS_${PN}-ptest = " \
 # full config
 PACKAGECONFIG ??= "qemu yajl uml openvz vmware vbox esx iproute2 lxc test \
                    remote macvtap libvirtd netcf udev python ebtables \
-                   ${@base_contains('DISTRO_FEATURES', 'selinux', 'selinux audit libcap-ng', '', d)} \
-                   ${@base_contains('DISTRO_FEATURES', 'xen', 'xen libxl xen-inotify', '', d)} \
-                   ${@base_contains('DISTRO_FEATURES', 'x11', 'polkit', '', d)} \
+                   ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux audit libcap-ng', '', d)} \
+                   ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'xen libxl xen-inotify', '', d)} \
+                   ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'polkit', '', d)} \
                   "
 
 # enable,disable,depends,rdepends
@@ -248,7 +251,7 @@ do_install_append() {
 	     >> ${D}${sysconfdir}/default/volatiles/99_libvirt
 
 	# Add hook support for libvirt
-	mkdir -p ${D}/etc/libvirt/hooks 
+	mkdir -p ${D}/etc/libvirt/hooks
 
 	# remove .la references to our working diretory
 	for i in `find ${D}${libdir} -type f -name *.la`; do
@@ -269,8 +272,10 @@ do_compile_ptest() {
 do_install_ptest() {
 	oe_runmake -C tests install-ptest
 
+	find ${S}/tests -maxdepth 1 -type d -exec cp -r {} ${D}${PTEST_PATH}/tests/ \;
+
 	# remove .la files for ptest, they aren't required and can trigger QA errors
-	for i in `find ${D}${PTEST_PATH} -type f -name *.la`; do
+	for i in `find ${D}${PTEST_PATH} -type f \( -name *.la -o -name *.o \)`; do
                 rm -f $i
 	done
 }

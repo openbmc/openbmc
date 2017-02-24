@@ -5,7 +5,7 @@ After=network.target docker.socket
 Requires=docker.socket
 
 [Service]
-ExecStart=/usr/bin/docker -d -H fd:// --registry-mirror=http://localhost:5000 --insecure-registry=http://localhost:5000
+ExecStart=/usr/bin/docker daemon -H fd:// --registry-mirror=http://localhost:5000 --insecure-registry=http://localhost:5000 --raw-logs
 MountFlags=slave
 LimitNOFILE=1048576
 LimitNPROC=1048576
