@@ -2,7 +2,6 @@
 # Copyright (C) 2011 Intel Corporation
 #
 
-LICENSE = "MIT"
 PR = "r40"
 
 inherit packagegroup distro_features_check

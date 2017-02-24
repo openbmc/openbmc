@@ -26,12 +26,12 @@ def validate_html5(url):
             warnings = int(resp['x-w3c-validator-warnings'])
 
             if status == 'Invalid':
-                config.logger.warn("Failed %s is %s\terrors %s warnings %s (check at %s)", url, status, errors, warnings, urlrequest)
+                config.logger.warning("Failed %s is %s\terrors %s warnings %s (check at %s)", url, status, errors, warnings, urlrequest)
             else:
                 config.logger.debug("OK! %s", url)
 
     except Exception as exc:
-        config.logger.warn("Failed validation call: %s", exc)
+        config.logger.warning("Failed validation call: %s", exc)
     return (status, errors, warnings)
 
 

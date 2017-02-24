@@ -6,23 +6,19 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=a6f89e2100d9b6cdffcea4f398e37343 \
                     file://tests/check/elements/xingmux.c;beginline=1;endline=21;md5=4c771b8af188724855cb99cadd390068"
 
 SRC_URI = " \
-    git://anongit.freedesktop.org/gstreamer/gst-plugins-ugly;name=base \
+    git://anongit.freedesktop.org/gstreamer/gst-plugins-ugly;branch=1.8;name=base \
     git://anongit.freedesktop.org/gstreamer/common;destsuffix=git/common;name=common \
 "
 
-PV = "1.7.2+git${SRCPV}"
+PV = "1.8.2+git${SRCPV}"
 
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>(\d+(\.\d+)+))"
 
-SRCREV_base = "8bdb68edbc605e21314b608e7a39bdbaab7302b8"
-SRCREV_common = "b64f03f6090245624608beb5d2fff335e23a01c0"
+SRCREV_base = "79fe43c00925455a37fab6fc428e7f08655a9bbd"
+SRCREV_common = "f363b3205658a38e84fa77f19dee218cd4445275"
 SRCREV_FORMAT = "base"
 
 S = "${WORKDIR}/git"
-
-# The mpg123 plugin was added prior to the 1.7.2 release
-# https://cgit.freedesktop.org/gstreamer/gst-plugins-ugly/commit/?id=43bd45ba991ef3247957ca37cdcb52f4b8c0acb1
-PACKAGECONFIG[mpg123] = "--enable-mpg123,--disable-mpg123,mpg123"
 
 do_configure_prepend() {
 	${S}/autogen.sh --noconfigure

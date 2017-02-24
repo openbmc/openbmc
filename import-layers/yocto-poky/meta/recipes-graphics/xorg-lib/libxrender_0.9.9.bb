@@ -11,7 +11,7 @@ require xorg-lib-common.inc
 LICENSE = "MIT-style"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d8bc71986d3b9b3639f6dfd6fac8f196"
 
-DEPENDS += "virtual/libx11 renderproto xproto xdmcp"
+DEPENDS += "virtual/libx11 renderproto xproto"
 
 PE = "1"
 

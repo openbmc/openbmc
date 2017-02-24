@@ -1,7 +1,7 @@
-From b1ae604880562ed065f614a745d3f8922838bc5a Mon Sep 17 00:00:00 2001
+From e4cd40722f597dff39c7214fab1742dd5bcc67eb Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:07:33 +0000
-Subject: [PATCH 02/14] configure: widen the regexp for SH architectures
+Subject: [PATCH 02/13] configure: widen the regexp for SH architectures
 
 gprof needs to know about uclibc
 
@@ -14,10 +14,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/configure b/configure
-index 34b66f7..85414ab 100755
+index ad3dfb7..2a74a77 100755
 --- a/configure
 +++ b/configure
-@@ -3445,7 +3445,7 @@ case "${target}" in
+@@ -3444,7 +3444,7 @@ case "${target}" in
      ;;
    s390-*-* | s390x-*-*)
      ;;
@@ -26,7 +26,7 @@ index 34b66f7..85414ab 100755
      ;;
    sh64-*-* | sh5*-*-*)
      ;;
-@@ -3939,7 +3939,7 @@ case "${target}" in
+@@ -3946,7 +3946,7 @@ case "${target}" in
    or1k*-*-*)
      noconfigdirs="$noconfigdirs gdb"
      ;;
@@ -36,10 +36,10 @@ index 34b66f7..85414ab 100755
        sh*-*-elf)
           ;;
 diff --git a/gprof/configure b/gprof/configure
-index 693b927..d4db554 100755
+index bf3ecaa..626e1c7 100755
 --- a/gprof/configure
 +++ b/gprof/configure
-@@ -5869,6 +5869,11 @@ linux* | k*bsd*-gnu | kopensolaris*-gnu)
+@@ -5873,6 +5873,11 @@ linux* | k*bsd*-gnu | kopensolaris*-gnu)
    lt_cv_deplibs_check_method=pass_all
    ;;
  
@@ -52,5 +52,5 @@ index 693b927..d4db554 100755
    if echo __ELF__ | $CC -E - | $GREP __ELF__ > /dev/null; then
      lt_cv_deplibs_check_method='match_pattern /lib[^/]+(\.so\.[0-9]+\.[0-9]+|_pic\.a)$'
 -- 
-2.7.1
+2.9.0
 

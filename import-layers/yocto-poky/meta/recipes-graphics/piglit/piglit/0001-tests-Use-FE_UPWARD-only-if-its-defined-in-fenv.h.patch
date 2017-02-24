@@ -1,0 +1,54 @@
+From 0fc2c2932699cfd68be96c820fddfdd79b48b788 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 9 Jul 2016 07:52:19 +0000
+Subject: [PATCH] tests: Use FE_UPWARD only if its defined in fenv.h
+
+On ARM, musl does not define FE_* when arch does not have
+VFP, (which is right interpretation), therefore check if
+its defined before using it
+
+Fixes errors like
+
+tests/general/roundmode-pixelstore.c:82:19: error: 'FE_UPWARD' undeclared (first use in this function)
+  ret = fesetround(FE_UPWARD);
+                   ^~~~~~~~~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ tests/general/roundmode-getintegerv.c | 2 ++
+ tests/general/roundmode-pixelstore.c  | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/tests/general/roundmode-getintegerv.c b/tests/general/roundmode-getintegerv.c
+index 28ecfaf..5c27579 100644
+--- a/tests/general/roundmode-getintegerv.c
++++ b/tests/general/roundmode-getintegerv.c
+@@ -81,7 +81,9 @@ piglit_init(int argc, char **argv)
+ {
+ 	int ret;
+ 	bool pass = true;
++#ifdef FE_UPWARD
+ 	ret = fesetround(FE_UPWARD);
++#endif
+ 	if (ret != 0) {
+ 		printf("Couldn't set rounding mode\n");
+ 		piglit_report_result(PIGLIT_SKIP);
+diff --git a/tests/general/roundmode-pixelstore.c b/tests/general/roundmode-pixelstore.c
+index 9284f43..3fcb396 100644
+--- a/tests/general/roundmode-pixelstore.c
++++ b/tests/general/roundmode-pixelstore.c
+@@ -79,7 +79,9 @@ piglit_init(int argc, char **argv)
+ {
+ 	int ret;
+ 	bool pass = true;
++#ifdef FE_UPWARD
+ 	ret = fesetround(FE_UPWARD);
++#endif
+ 	if (ret != 0) {
+ 		printf("Couldn't set rounding mode\n");
+ 		piglit_report_result(PIGLIT_SKIP);
+-- 
+1.8.3.1
+

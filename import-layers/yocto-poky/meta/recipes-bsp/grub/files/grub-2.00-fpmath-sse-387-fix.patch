@@ -6,7 +6,7 @@ configure:20574: i586-poky-linux-gcc  -m32    -march=core2 -msse3 -mtune=generic
 conftest.c:1:0: error: SSE instruction set disabled, using 387 arithmetics [-Werror]
 cc1: all warnings being treated as errors
 
-Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
 2012/04/13
 
 Index: grub-1.99/configure.ac

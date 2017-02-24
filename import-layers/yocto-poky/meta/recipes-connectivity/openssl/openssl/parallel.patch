@@ -6,6 +6,9 @@ https://gitweb.gentoo.org/repo/gentoo.git/plain/dev-libs/openssl/files/openssl-1
 Upstream-Status: Pending
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 
+Refreshed for 1.0.2i
+Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
+
 --- openssl-1.0.2g/crypto/Makefile
 +++ openssl-1.0.2g/crypto/Makefile
 @@ -85,11 +85,11 @@
@@ -133,7 +136,7 @@ Signed-off-by: Ross Burton <ross.burton@intel.com>
  		fi; \
 --- openssl-1.0.2g/test/Makefile
 +++ openssl-1.0.2g/test/Makefile
-@@ -139,7 +139,7 @@
+@@ -144,7 +144,7 @@
  tags:
  	ctags $(SRC)
  
@@ -142,7 +145,7 @@ Signed-off-by: Ross Burton <ross.burton@intel.com>
  
  apps:
  	@(cd ..; $(MAKE) DIRS=apps all)
-@@ -421,130 +421,130 @@
+@@ -438,136 +438,136 @@
  		link_app.$${shlib_target}
  
  $(RSATEST)$(EXE_EXT): $(RSATEST).o $(DLIBCRYPTO)
@@ -309,13 +312,21 @@ Signed-off-by: Ross Burton <ross.burton@intel.com>
 -	@target=$(CLIENTHELLOTEST) $(BUILD_CMD)
 +	+@target=$(CLIENTHELLOTEST) $(BUILD_CMD)
  
+ $(BADDTLSTEST)$(EXE_EXT): $(BADDTLSTEST).o
+-	@target=$(BADDTLSTEST) $(BUILD_CMD)
++	+@target=$(BADDTLSTEST) $(BUILD_CMD)
+ 
  $(SSLV2CONFTEST)$(EXE_EXT): $(SSLV2CONFTEST).o
 -	@target=$(SSLV2CONFTEST) $(BUILD_CMD)
 +	+@target=$(SSLV2CONFTEST) $(BUILD_CMD)
  
+ $(DTLSTEST)$(EXE_EXT): $(DTLSTEST).o ssltestlib.o $(DLIBSSL) $(DLIBCRYPTO)
+-	@target=$(DTLSTEST); exobj=ssltestlib.o; $(BUILD_CMD)
++	+@target=$(DTLSTEST); exobj=ssltestlib.o; $(BUILD_CMD)
+ 
  #$(AESTEST).o: $(AESTEST).c
  #	$(CC) -c $(CFLAGS) -DINTERMEDIATE_VALUE_KAT -DTRACE_KAT_MCT $(AESTEST).c
-@@ -557,7 +557,7 @@
+@@ -580,6 +580,6 @@
  #	fi
  
  dummytest$(EXE_EXT): dummytest.o $(DLIBCRYPTO)

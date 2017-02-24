@@ -6,7 +6,12 @@
  * addToProject: Whether to add layers to project on accept
  * successAdd: function to run on success
  */
-function showLayerDepsModal(layer, dependencies, title, body, addToProject, successAdd) {
+function showLayerDepsModal(layer,
+                            dependencies,
+                            title,
+                            body,
+                            addToProject,
+                            successAdd) {
 
   if ($("#dependencies-modal").length === 0) {
     $.get(libtoaster.ctx.htmlUrl + "/layer_deps_modal.html", function(html){
@@ -33,17 +38,20 @@ function showLayerDepsModal(layer, dependencies, title, body, addToProject, succ
 
     var deplistHtml = "";
     for (var i = 0; i < dependencies.length; i++) {
-      deplistHtml += "<li><label class=\"checkbox\"><input name=\"dependencies\" value=\"";
+      deplistHtml += "<li><div class=\"checkbox\"><label><input name=\"dependencies\" value=\"";
       deplistHtml += dependencies[i].id;
       deplistHtml +="\" type=\"checkbox\" checked=\"checked\"/>";
       deplistHtml += dependencies[i].name;
-      deplistHtml += "</label></li>";
+      deplistHtml += "</label></div></li>";
     }
     $('#dependencies-list').html(deplistHtml);
 
     $("#dependencies-modal").data("deps", dependencies);
 
-    $('#dependencies-modal').modal('show');
+    /* Clear any alert notifications before showing the modal */
+    $(".alert").fadeOut(function(){
+      $('#dependencies-modal').modal('show');
+    });
 
     /* Discard the old submission function */
     $("#dependencies-modal-form").unbind('submit');

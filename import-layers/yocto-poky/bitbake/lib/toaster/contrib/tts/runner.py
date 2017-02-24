@@ -146,7 +146,7 @@ def execute_tests(dir_under_test, testname):
 
     except Exception as exc:
         import traceback
-        config.logger.error("Exception while running test. Tracedump: \n%s", traceback.format_exc(exc))
+        config.logger.error("Exception while running test. Tracedump: \n%s", traceback.format_exc())
     finally:
         os.chdir(crt_dir)
     return len(result.failures)
@@ -211,7 +211,7 @@ def main():
 
     except ShellCmdException as exc:
         import traceback
-        config.logger.error("Error while setting up testing. Traceback: \n%s", traceback.format_exc(exc))
+        config.logger.error("Error while setting up testing. Traceback: \n%s", traceback.format_exc())
     finally:
         if need_cleanup and testdir is not None:
             clean_up(testdir)

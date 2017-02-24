@@ -14,10 +14,10 @@ Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
  dist/Makefile.in |    2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/dist/Makefile.in b/dist/Makefile.in
-index 0a42375..d9e05b9 100644
---- a/dist/Makefile.in
-+++ b/dist/Makefile.in
+Index: db-6.0.30/dist/Makefile.in
+===================================================================
+--- db-6.0.30.orig/dist/Makefile.in
++++ db-6.0.30/dist/Makefile.in
 @@ -863,7 +863,7 @@ $(libdb_version): $(C_OBJS)
  	$(LN) -s $(libdb_version) $(libdb)
  
@@ -27,6 +27,3 @@ index 0a42375..d9e05b9 100644
  	$(SOLINK) $(SOFLAGS) $(LDFLAGS) -o $@ $(C_OBJS) \
  		$(LIBCSO_LIBS)
  	$(RM) $(libdb)
--- 
-1.7.9.5
-

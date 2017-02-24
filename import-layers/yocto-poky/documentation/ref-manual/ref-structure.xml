@@ -660,9 +660,21 @@
         <title><filename>build/tmp/cache/</filename></title>
 
         <para>
-            When BitBake parses the metadata, it creates a cache file of the result that can
-            be used when subsequently running commands.
-            BitBake stores these results here on a per-machine basis.
+            When BitBake parses the metadata (recipes and configuration files),
+            it caches the results in <filename>build/tmp/cache/</filename>
+            to speed up future builds.
+            The results are stored on a per-machine basis.
+        </para>
+
+        <para>
+            During subsequent builds, BitBake checks each recipe (together
+            with, for example, any files included or appended to it) to see
+            if they have been modified.
+            Changes can be detected, for example, through file modification
+            time (mtime) changes and hashing of file contents.
+            If no changes to the file are detected, then the parsed result
+            stored in the cache is reused.
+            If the file has changed, it is reparsed.
         </para>
     </section>
 
@@ -801,8 +813,9 @@
         <title><filename>build/tmp/stamps/</filename></title>
 
         <para>
-            This directory holds information that BitBake uses for accounting purposes
-            to track what tasks have run and when they have run.
+            This directory holds information that BitBake uses for
+            accounting purposes to track what tasks have run and when they
+            have run.
             The directory is sub-divided by architecture, package name, and
             version.
             Following is an example:
@@ -811,6 +824,13 @@
             </literallayout>
             Although the files in the directory are empty of data,
             BitBake uses the filenames and timestamps for tracking purposes.
+        </para>
+
+        <para>
+            For information on how BitBake uses stamp files to determine if
+            a task should be rerun, see the
+            "<link linkend='stamp-files-and-the-rerunning-of-tasks'>Stamp Files and the Rerunning of Tasks</link>"
+            section.
         </para>
     </section>
 

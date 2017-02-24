@@ -50,7 +50,7 @@ C = "3"
     def parsehelper(self, content, suffix = ".bb"):
 
         f = tempfile.NamedTemporaryFile(suffix = suffix)
-        f.write(content)
+        f.write(bytes(content, "utf-8"))
         f.flush()
         os.chdir(os.path.dirname(f.name))
         return f
@@ -67,6 +67,23 @@ C = "3"
         f = self.parsehelper(testfileB)
         with self.assertRaises(bb.parse.ParseError):
             d = bb.parse.handle(f.name, self.d)['']
+
+    unsettest = """
+A = "1"
+B = "2"
+B[flag] = "3"
+
+unset A
+unset B[flag]
+"""
+
+    def test_parse_unset(self):
+        f = self.parsehelper(self.unsettest)
+        d = bb.parse.handle(f.name, self.d)['']
+        self.assertEqual(d.getVar("A", True), None)
+        self.assertEqual(d.getVarFlag("A","flag", True), None)
+        self.assertEqual(d.getVar("B", True), "2")
+        
 
     overridetest = """
 RRECOMMENDS_${PN} = "a"

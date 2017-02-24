@@ -10,18 +10,17 @@ import bb.utils
 import subprocess
 from abc import ABCMeta, abstractmethod
 
-class BuildProject():
-
-    __metaclass__ = ABCMeta
+class BuildProject(metaclass=ABCMeta):
 
     def __init__(self, d, uri, foldername=None, tmpdir="/tmp/"):
         self.d = d
         self.uri = uri
         self.archive = os.path.basename(uri)
         self.localarchive = os.path.join(tmpdir,self.archive)
-        self.fname = re.sub(r'.tar.bz2|tar.gz$', '', self.archive)
         if foldername:
             self.fname = foldername
+        else:
+            self.fname = re.sub(r'\.tar\.bz2$|\.tar\.gz$|\.tar\.xz$', '', self.archive)
 
     # Download self.archive to self.localarchive
     def _download_archive(self):
@@ -118,10 +117,10 @@ class SDKBuildProject(BuildProject):
         subprocess.check_call(cmd, shell=True)
 
         #Change targetdir to project folder
-        self.targetdir = self.targetdir + self.fname
+        self.targetdir = os.path.join(self.targetdir, self.fname)
 
-    def run_configure(self, configure_args=''):
-        return super(SDKBuildProject, self).run_configure(configure_args=(configure_args or '$CONFIGURE_FLAGS'), extra_cmds=' gnu-configize; ')
+    def run_configure(self, configure_args='', extra_cmds=' gnu-configize; '):
+        return super(SDKBuildProject, self).run_configure(configure_args=(configure_args or '$CONFIGURE_FLAGS'), extra_cmds=extra_cmds)
 
     def run_install(self, install_args=''):
         return super(SDKBuildProject, self).run_install(install_args=(install_args or "DESTDIR=%s/../install" % self.targetdir))
@@ -134,4 +133,3 @@ class SDKBuildProject(BuildProject):
     def _run(self, cmd):
         self.log("Running . %s; " % self.sdkenv + cmd)
         return subprocess.call(". %s; " % self.sdkenv + cmd, shell=True)
-

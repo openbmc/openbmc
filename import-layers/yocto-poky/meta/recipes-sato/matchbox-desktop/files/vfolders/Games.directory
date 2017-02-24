@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Games
+Name[de]=Spiele
+Comment=Games of all kind
+Comment[de]=Spiele aller Art
+Icon=mbfolder.png
+Type=Directory
+Match=Game
+

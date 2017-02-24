@@ -1,0 +1,69 @@
+#!/bin/sh
+# Copyright (C) 2016 O.S. Systems Software LTDA.
+# Copyright (C) 2016 Freescale Semiconductor
+
+export PATH="/sbin:/usr/sbin:/bin:/usr/bin"
+
+usage() {
+    cat <<EOF
+    $0 [<openvt arguments>] [-- <weston options>]
+EOF
+}
+
+## Module support
+modules_dir=@DATADIR@/weston-start
+
+# Add weston extra argument
+add_weston_argument() {
+	weston_args="$weston_args $1"
+}
+
+# Add openvt extra argument
+add_openvt_argument() {
+	openvt_args="$openvt_args $1"
+}
+
+if [ -n "$WAYLAND_DISPLAY" ]; then
+	echo "ERROR: A Wayland compositor is already running, nested Weston instance is not supported yet."
+	exit 1
+fi
+if [ -n "$DISPLAY" ]; then
+	launcher="weston"
+else
+	launcher="weston-launch --"
+fi
+
+openvt_args="-s"
+while [ -n "$1" ]; do
+	if [ "$1" = "--" ]; then
+		shift
+		break
+	fi
+	openvt_args="$openvt_args $1"
+	shift
+done
+
+weston_args=$*
+
+# Load and run modules
+if [ -d "$modules_dir" ]; then
+	for m in "$modules_dir"/*; do
+		# Skip backup files
+		if [ "`echo $m | sed -e 's/\~$//'`" != "$m" ]; then
+			continue
+		fi
+
+		# process module
+		. $m
+	done
+fi
+
+if test -z "$XDG_RUNTIME_DIR"; then
+    export XDG_RUNTIME_DIR=/run/user/`id -u`
+    if ! test -d "$XDG_RUNTIME_DIR"; then
+        mkdir --parents $XDG_RUNTIME_DIR
+        chmod 0700 $XDG_RUNTIME_DIR
+    fi
+fi
+
+exec openvt $openvt_args -- $launcher $weston_args --log=@LOCALSTATEDIR@/log/weston.log

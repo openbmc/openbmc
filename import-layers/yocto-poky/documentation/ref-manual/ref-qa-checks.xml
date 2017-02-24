@@ -918,7 +918,8 @@ can be found then it should be implemented.  I can't find one at the moment.
                     and the upstream change log or release notes.
                     Once you have worked out what the appropriate
                     change is, you can update
-                    <link linkend='var-EXTRA_OECONF'><filename>EXTRA_OECONF</filename></link>
+                    <link linkend='var-EXTRA_OECONF'><filename>EXTRA_OECONF</filename></link>,
+                    <link linkend='var-PACKAGECONFIG_CONFARGS'><filename>PACKAGECONFIG_CONFARGS</filename></link>,
                     or the individual
                     <link linkend='var-PACKAGECONFIG'><filename>PACKAGECONFIG</filename></link>
                     option values accordingly.
@@ -1107,7 +1108,7 @@ can be found then it should be implemented.  I can't find one at the moment.
             <listitem>
                 <para id='qa-issue-installed-vs-shipped'>
                     <code>
-      &lt;recipename&gt;: Files/directories were installed but not shipped [installed-vs-shipped]
+      &lt;recipename&gt;: Files/directories were installed but not shipped in any package [installed-vs-shipped]
                     </code>
                 </para>
 

@@ -1,0 +1,30 @@
+Upstream-Status: Backport
+
+Backport from:
+https://github.com/experimental-platform/platform-hostname-avahi/pull/9
+
+It sometimes fails to run avahi with error: "Could not receive return value
+from daemon process". It has same root cause with
+https://github.com/lxc/lxc/issues/25.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+From 5150983102ad5ad43f0dae203cb332c168eb5a71 Mon Sep 17 00:00:00 2001
+From: Hinnerk Haardt <haardt@information-control.de>
+Date: Thu, 17 Dec 2015 11:52:19 +0100
+Subject: [PATCH] Fix `chroot.c: fork() failed: Resource temporarily
+ unavailable` as per https://github.com/lxc/lxc/issues/25.
+
+---
+ avahi-daemon/avahi-daemon.conf | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/avahi-daemon/avahi-daemon.conf b/avahi-daemon/avahi-daemon.conf
+index 95166f8..3d5b7a6 100644
+--- a/avahi-daemon/avahi-daemon.conf
++++ b/avahi-daemon/avahi-daemon.conf
+@@ -65,4 +65,3 @@ rlimit-data=4194304
+ rlimit-fsize=0
+ rlimit-nofile=768
+ rlimit-stack=4194304
+-rlimit-nproc=3

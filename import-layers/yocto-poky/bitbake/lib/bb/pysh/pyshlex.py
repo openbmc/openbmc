@@ -20,7 +20,7 @@ except NameError:
     from Set import Set as set
 
 from ply import lex
-from sherrors import *
+from bb.pysh.sherrors import *
 
 class NeedMore(Exception):
     pass

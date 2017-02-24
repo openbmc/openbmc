@@ -1,0 +1,24 @@
+SIGEMT is not defined everywhere e.g musl does
+not define it. Therefore check it being defined
+before using it.
+
+Fixes errors e.g.
+../../strace-4.13/tests/signal2name.c:45:7: error: 'SIGEMT' undeclared (first use in this function)
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+
+Index: strace-4.13/tests/signal2name.c
+===================================================================
+--- strace-4.13.orig/tests/signal2name.c
++++ strace-4.13/tests/signal2name.c
+@@ -42,7 +42,9 @@ signal2name(int sig)
+ 	CASE(SIGEMT);
+ 	CASE(SIGLOST);
+ #elif defined MIPS
++#ifdef SIGEMT
+ 	CASE(SIGEMT);
++#endif
+ 	CASE(SIGIOT);
+ 	CASE(SIGPWR);
+ #else

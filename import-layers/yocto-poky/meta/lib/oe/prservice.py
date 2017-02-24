@@ -1,7 +1,7 @@
 
 def prserv_make_conn(d, check = False):
     import prserv.serv
-    host_params = filter(None, (d.getVar("PRSERV_HOST", True) or '').split(':'))
+    host_params = list([_f for _f in (d.getVar("PRSERV_HOST", True) or '').split(':') if _f])
     try:
         conn = None
         conn = prserv.serv.PRServerConnection(host_params[0], int(host_params[1]))
@@ -9,7 +9,7 @@ def prserv_make_conn(d, check = False):
             if not conn.ping():
                 raise Exception('service not available')
         d.setVar("__PRSERV_CONN",conn)
-    except Exception, exc:
+    except Exception as exc:
         bb.fatal("Connecting to PR service %s:%s failed: %s" % (host_params[0], host_params[1], str(exc)))
 
     return conn
@@ -114,7 +114,7 @@ def prserv_export_tofile(d, metainfo, datainfo, lockdown, nomax=False):
     bb.utils.unlockfile(lf)
 
 def prserv_check_avail(d):
-    host_params = filter(None, (d.getVar("PRSERV_HOST", True) or '').split(':'))
+    host_params = list([_f for _f in (d.getVar("PRSERV_HOST", True) or '').split(':') if _f])
     try:
         if len(host_params) != 2:
             raise TypeError

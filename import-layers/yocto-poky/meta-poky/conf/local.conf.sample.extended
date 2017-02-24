@@ -265,9 +265,6 @@
 #COPYLEFT_RECIPE_TYPES = 'target'
 #
 
-# Remove the old image before the new one generated to save disk space
-#RM_OLD_IMAGE = "1"
-
 #
 # GCC/LD FLAGS to enable more secure code generation
 #
@@ -370,16 +367,6 @@
 #
 #IPK_HIERARCHICAL_FEED = "1"
 #
-
-# Using RPM4
-#
-# Currently the rootfs_rpm code has a hard depends on rpmresolve:do_populate_sysroot,
-# when using rpm4 the rpmresolve code will not compile due to a missing header file.
-# That dependency needs to be removed when using RPM4, also the PREFERRED_VERSION needs
-# to be set. This example shows how to enable rpm4
-# PREFERRED_VERSION_rpm = "4.11.2"
-# PREFERRED_VERSION_rpm-native = "4.11.2"
-# RPMROOTFSDEPENDS_remove = "rpmresolve-native:do_populate_sysroot"
 
 #
 # Use busybox/mdev for system initialization

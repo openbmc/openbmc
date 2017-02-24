@@ -1,0 +1,82 @@
+From 6c2d111177e91184073c44f83d4a6182aaba06d7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andr=C3=A9=20Draszik?= <adraszik@tycoint.com>
+Date: Thu, 25 Aug 2016 13:15:01 +0100
+Subject: [PATCH 3/3] src: switch to using strerror_l() instead of strerror_r()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+glibc provides two versions of strerror_r(), which
+can be chosen between using feature test macros
+_GNU_SOURCE and _POSIX_C_SOURCE. libnl is built using
+the former, hence we get the glibc special version,
+and all code so far has been written for this.
+
+Other C libraries like musl on the other hand only try
+to be posix compliant, and only ever provide the posix
+version of strerror_r(), which has a different signature.
+
+Uses in libnl hence generally cause printf() of an *int*
+with a *string format* specifier for that reason.
+
+Additionally, strerror_r() has been deprecated:
+  http://austingroupbugs.net/view.php?id=655
+
+Switch to using strerror_l().
+
+Signed-off-by: André Draszik <adraszik@tycoint.com>
+Reviewed-by: Stephane Ayotte <sayotte@tycoint.com>
+Signed-off-by: Thomas Haller <thaller@redhat.com>
+---
+Upstream-Status: Backport https://github.com/thom311/libnl/commit/6c2d111177e91184073c44f83d4a6182aaba06d7
+ src/lib/utils.c | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
+
+diff --git a/src/lib/utils.c b/src/lib/utils.c
+index 467aaed..5878f27 100644
+--- a/src/lib/utils.c
++++ b/src/lib/utils.c
+@@ -22,6 +22,7 @@
+  */
+ 
+ #include <netlink/cli/utils.h>
++#include <locale.h>
+ 
+ /**
+  * Parse a text based 32 bit unsigned integer argument
+@@ -70,7 +71,6 @@ void nl_cli_print_version(void)
+ void nl_cli_fatal(int err, const char *fmt, ...)
+ {
+ 	va_list ap;
+-	char buf[256];
+ 
+ 	fprintf(stderr, "Error: ");
+ 
+@@ -79,8 +79,22 @@ void nl_cli_fatal(int err, const char *fmt, ...)
+ 		vfprintf(stderr, fmt, ap);
+ 		va_end(ap);
+ 		fprintf(stderr, "\n");
+-	} else
+-		fprintf(stderr, "%s\n", strerror_r(err, buf, sizeof(buf)));
++	} else {
++		char *buf;
++		locale_t loc = newlocale(LC_MESSAGES_MASK, "", (locale_t)0);
++		if (loc == (locale_t)0) {
++			if (errno == ENOENT)
++				loc = newlocale(LC_MESSAGES_MASK,
++						"POSIX", (locale_t)0);
++			if (loc == (locale_t)0)
++				buf = "newlocale() failed";
++		}
++		if (loc != (locale_t)0)
++			buf = strerror_l(err, loc);
++		fprintf(stderr, "%s\n", buf);
++		if (loc != (locale_t)0)
++			freelocale(loc);
++	}
+ 
+ 	exit(abs(err));
+ }
+-- 
+2.9.3
+

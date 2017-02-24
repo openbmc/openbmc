@@ -24,7 +24,7 @@ import re
 import json
 import logging
 import scriptutils
-import urlparse
+from urllib.parse import urlparse, urldefrag, urlsplit
 import hashlib
 
 logger = logging.getLogger('recipetool')
@@ -61,8 +61,8 @@ class RecipeHandler(object):
         libpaths = list(set([base_libdir, libdir]))
         libname_re = re.compile('^lib(.+)\.so.*$')
         pkglibmap = {}
-        for lib, item in shlib_providers.iteritems():
-            for path, pkg in item.iteritems():
+        for lib, item in shlib_providers.items():
+            for path, pkg in item.items():
                 if path in libpaths:
                     res = libname_re.match(lib)
                     if res:
@@ -74,7 +74,7 @@ class RecipeHandler(object):
 
         # Now turn it into a library->recipe mapping
         pkgdata_dir = d.getVar('PKGDATA_DIR', True)
-        for libname, pkg in pkglibmap.iteritems():
+        for libname, pkg in pkglibmap.items():
             try:
                 with open(os.path.join(pkgdata_dir, 'runtime', pkg)) as f:
                     for line in f:
@@ -167,7 +167,7 @@ class RecipeHandler(object):
         unmappedpc = []
         pcdeps = list(set(pcdeps))
         for pcdep in pcdeps:
-            if isinstance(pcdep, basestring):
+            if isinstance(pcdep, str):
                 recipe = recipemap.get(pcdep, None)
                 if recipe:
                     deps.append(recipe)
@@ -256,30 +256,56 @@ def validate_pv(pv):
 
 def determine_from_filename(srcfile):
     """Determine name and version from a filename"""
-    part = ''
+    if is_package(srcfile):
+        # Force getting the value from the package metadata
+        return None, None
+
     if '.tar.' in srcfile:
-        namepart = srcfile.split('.tar.')[0].lower()
+        namepart = srcfile.split('.tar.')[0]
     else:
-        namepart = os.path.splitext(srcfile)[0].lower()
-    splitval = namepart.rsplit('_', 1)
+        namepart = os.path.splitext(srcfile)[0]
+    namepart = namepart.lower().replace('_', '-')
+    if namepart.endswith('.src'):
+        namepart = namepart[:-4]
+    if namepart.endswith('.orig'):
+        namepart = namepart[:-5]
+    splitval = namepart.split('-')
+    logger.debug('determine_from_filename: split name %s into: %s' % (srcfile, splitval))
+
+    ver_re = re.compile('^v?[0-9]')
+
+    pv = None
+    pn = None
     if len(splitval) == 1:
-        splitval = namepart.rsplit('-', 1)
-    pn = splitval[0].replace('_', '-')
-    if len(splitval) > 1:
-        if splitval[1][0] in '0123456789':
-            pv = splitval[1]
+        # Try to split the version out if there is no separator (or a .)
+        res = re.match('^([^0-9]+)([0-9.]+.*)$', namepart)
+        if res:
+            if len(res.group(1)) > 1 and len(res.group(2)) > 1:
+                pn = res.group(1).rstrip('.')
+                pv = res.group(2)
         else:
-            pn = '-'.join(splitval).replace('_', '-')
-            pv = None
+            pn = namepart
     else:
-        pv = None
+        if splitval[-1] in ['source', 'src']:
+            splitval.pop()
+        if len(splitval) > 2 and re.match('^(alpha|beta|stable|release|rc[0-9]|pre[0-9]|p[0-9]|[0-9]{8})', splitval[-1]) and ver_re.match(splitval[-2]):
+            pv = '-'.join(splitval[-2:])
+            if pv.endswith('-release'):
+                pv = pv[:-8]
+            splitval = splitval[:-2]
+        elif ver_re.match(splitval[-1]):
+            pv = splitval.pop()
+        pn = '-'.join(splitval)
+        if pv and pv.startswith('v'):
+            pv = pv[1:]
+    logger.debug('determine_from_filename: name = "%s" version = "%s"' % (pn, pv))
     return (pn, pv)
 
 def determine_from_url(srcuri):
     """Determine name and version from a URL"""
     pn = None
     pv = None
-    parseres = urlparse.urlparse(srcuri.lower().split(';', 1)[0])
+    parseres = urlparse(srcuri.lower().split(';', 1)[0])
     if parseres.path:
         if 'github.com' in parseres.netloc:
             res = re.search(r'.*/(.*?)/archive/(.*)-final\.(tar|zip)', parseres.path)
@@ -310,43 +336,66 @@ def supports_srcrev(uri):
     # odd interactions with the urldata cache which lead to errors
     localdata.setVar('SRCREV', '${AUTOREV}')
     bb.data.update_data(localdata)
-    fetcher = bb.fetch2.Fetch([uri], localdata)
-    urldata = fetcher.ud
-    for u in urldata:
-        if urldata[u].method.supports_srcrev():
+    try:
+        fetcher = bb.fetch2.Fetch([uri], localdata)
+        urldata = fetcher.ud
+        for u in urldata:
+            if urldata[u].method.supports_srcrev():
+                return True
+    except bb.fetch2.FetchError as e:
+        logger.debug('FetchError in supports_srcrev: %s' % str(e))
+        # Fall back to basic check
+        if uri.startswith(('git://', 'gitsm://')):
             return True
     return False
 
 def reformat_git_uri(uri):
     '''Convert any http[s]://....git URI into git://...;protocol=http[s]'''
     checkuri = uri.split(';', 1)[0]
-    if checkuri.endswith('.git') or '/git/' in checkuri:
-        res = re.match('(https?)://([^;]+(\.git)?)(;.*)?$', uri)
+    if checkuri.endswith('.git') or '/git/' in checkuri or re.match('https?://github.com/[^/]+/[^/]+/?$', checkuri):
+        res = re.match('(http|https|ssh)://([^;]+(\.git)?)(;.*)?$', uri)
         if res:
             # Need to switch the URI around so that the git fetcher is used
             return 'git://%s;protocol=%s%s' % (res.group(2), res.group(1), res.group(4) or '')
+        elif '@' in checkuri:
+            # Catch e.g. git@git.example.com:repo.git
+            return 'git://%s;protocol=ssh' % checkuri.replace(':', '/', 1)
     return uri
+
+def is_package(url):
+    '''Check if a URL points to a package'''
+    checkurl = url.split(';', 1)[0]
+    if checkurl.endswith(('.deb', '.ipk', '.rpm', '.srpm')):
+        return True
+    return False
 
 def create_recipe(args):
     import bb.process
     import tempfile
     import shutil
+    import oe.recipeutils
 
     pkgarch = ""
     if args.machine:
         pkgarch = "${MACHINE_ARCH}"
 
+    extravalues = {}
     checksums = (None, None)
     tempsrc = ''
+    source = args.source
     srcsubdir = ''
     srcrev = '${AUTOREV}'
-    if '://' in args.source:
+
+    if os.path.isfile(source):
+        source = 'file://%s' % os.path.abspath(source)
+
+    if scriptutils.is_src_url(source):
         # Fetch a URL
-        fetchuri = reformat_git_uri(urlparse.urldefrag(args.source)[0])
+        fetchuri = reformat_git_uri(urldefrag(source)[0])
         if args.binary:
             # Assume the archive contains the directory structure verbatim
             # so we need to extract to a subdirectory
-            fetchuri += ';subdir=%s' % os.path.splitext(os.path.basename(urlparse.urlsplit(fetchuri).path))[0]
+            fetchuri += ';subdir=${BP}'
         srcuri = fetchuri
         rev_re = re.compile(';rev=([^;]+)')
         res = rev_re.search(srcuri)
@@ -357,10 +406,7 @@ def create_recipe(args):
         srctree = tempsrc
         if fetchuri.startswith('npm://'):
             # Check if npm is available
-            npm = bb.utils.which(tinfoil.config_data.getVar('PATH', True), 'npm')
-            if not npm:
-                logger.error('npm:// URL requested but npm is not available - you need to either build nodejs-native or install npm using your package manager')
-                sys.exit(1)
+            check_npm(tinfoil.config_data)
         logger.info('Fetching %s...' % srcuri)
         try:
             checksums = scriptutils.fetch_uri(tinfoil.config_data, fetchuri, srctree, srcrev)
@@ -377,19 +423,50 @@ def create_recipe(args):
                 srcsubdir = dirlist[0]
                 srctree = os.path.join(srctree, srcsubdir)
             else:
-                with open(singleitem, 'r') as f:
+                with open(singleitem, 'r', errors='surrogateescape') as f:
                     if '<html' in f.read(100).lower():
                         logger.error('Fetching "%s" returned a single HTML page - check the URL is correct and functional' % fetchuri)
                         sys.exit(1)
+        if os.path.exists(os.path.join(srctree, '.gitmodules')) and srcuri.startswith('git://'):
+            srcuri = 'gitsm://' + srcuri[6:]
+            logger.info('Fetching submodules...')
+            bb.process.run('git submodule update --init --recursive', cwd=srctree)
+
+        if is_package(fetchuri):
+            tmpfdir = tempfile.mkdtemp(prefix='recipetool-')
+            try:
+                pkgfile = None
+                try:
+                    fileuri = fetchuri + ';unpack=0'
+                    scriptutils.fetch_uri(tinfoil.config_data, fileuri, tmpfdir, srcrev)
+                    for root, _, files in os.walk(tmpfdir):
+                        for f in files:
+                            pkgfile = os.path.join(root, f)
+                            break
+                except bb.fetch2.BBFetchException as e:
+                    logger.warn('Second fetch to get metadata failed: %s' % str(e).rstrip())
+
+                if pkgfile:
+                    if pkgfile.endswith(('.deb', '.ipk')):
+                        stdout, _ = bb.process.run('ar x %s control.tar.gz' % pkgfile, cwd=tmpfdir)
+                        stdout, _ = bb.process.run('tar xf control.tar.gz ./control', cwd=tmpfdir)
+                        values = convert_debian(tmpfdir)
+                        extravalues.update(values)
+                    elif pkgfile.endswith(('.rpm', '.srpm')):
+                        stdout, _ = bb.process.run('rpm -qp --xml %s > pkginfo.xml' % pkgfile, cwd=tmpfdir)
+                        values = convert_rpm_xml(os.path.join(tmpfdir, 'pkginfo.xml'))
+                        extravalues.update(values)
+            finally:
+                shutil.rmtree(tmpfdir)
     else:
         # Assume we're pointing to an existing source tree
         if args.extract_to:
             logger.error('--extract-to cannot be specified if source is a directory')
             sys.exit(1)
-        if not os.path.isdir(args.source):
-            logger.error('Invalid source directory %s' % args.source)
+        if not os.path.isdir(source):
+            logger.error('Invalid source directory %s' % source)
             sys.exit(1)
-        srctree = args.source
+        srctree = source
         srcuri = ''
         if os.path.exists(os.path.join(srctree, '.git')):
             # Try to get upstream repo location from origin remote
@@ -401,7 +478,7 @@ def create_recipe(args):
                 for line in stdout.splitlines():
                     splitline = line.split()
                     if len(splitline) > 1:
-                        if splitline[0] == 'origin' and '://' in splitline[1]:
+                        if splitline[0] == 'origin' and scriptutils.is_src_url(splitline[1]):
                             srcuri = reformat_git_uri(splitline[1])
                             srcsubdir = 'git'
                             break
@@ -429,36 +506,11 @@ def create_recipe(args):
     lines_before.append('# Recipe created by %s' % os.path.basename(sys.argv[0]))
     lines_before.append('# This is the basis of a recipe and may need further editing in order to be fully functional.')
     lines_before.append('# (Feel free to remove these comments when editing.)')
-    lines_before.append('#')
-
-    licvalues = guess_license(srctree_use)
-    lic_files_chksum = []
-    if licvalues:
-        licenses = []
-        for licvalue in licvalues:
-            if not licvalue[0] in licenses:
-                licenses.append(licvalue[0])
-            lic_files_chksum.append('file://%s;md5=%s' % (licvalue[1], licvalue[2]))
-        lines_before.append('# WARNING: the following LICENSE and LIC_FILES_CHKSUM values are best guesses - it is')
-        lines_before.append('# your responsibility to verify that the values are complete and correct.')
-        if len(licvalues) > 1:
-            lines_before.append('#')
-            lines_before.append('# NOTE: multiple licenses have been detected; if that is correct you should separate')
-            lines_before.append('# these in the LICENSE value using & if the multiple licenses all apply, or | if there')
-            lines_before.append('# is a choice between the multiple licenses. If in doubt, check the accompanying')
-            lines_before.append('# documentation to determine which situation is applicable.')
-    else:
-        lines_before.append('# Unable to find any files that looked like license statements. Check the accompanying')
-        lines_before.append('# documentation and source headers and set LICENSE and LIC_FILES_CHKSUM accordingly.')
-        lines_before.append('#')
-        lines_before.append('# NOTE: LICENSE is being set to "CLOSED" to allow you to at least start building - if')
-        lines_before.append('# this is not accurate with respect to the licensing of the software being built (it')
-        lines_before.append('# will not be in most cases) you must specify the correct value before using this')
-        lines_before.append('# recipe for anything other than initial testing/development!')
-        licenses = ['CLOSED']
-    lines_before.append('LICENSE = "%s"' % ' '.join(licenses))
-    lines_before.append('LIC_FILES_CHKSUM = "%s"' % ' \\\n                    '.join(lic_files_chksum))
+    # We need a blank line here so that patch_recipe_lines can rewind before the LICENSE comments
     lines_before.append('')
+
+    handled = []
+    licvalues = handle_license_vars(srctree_use, lines_before, handled, extravalues, tinfoil.config_data)
 
     classes = []
 
@@ -515,10 +567,16 @@ def create_recipe(args):
         lines_before.append('')
         lines_before.append('# Modify these as desired')
         lines_before.append('PV = "%s+git${SRCPV}"' % (realpv or '1.0'))
+        if not args.autorev and srcrev == '${AUTOREV}':
+            if os.path.exists(os.path.join(srctree, '.git')):
+                (stdout, _) = bb.process.run('git rev-parse HEAD', cwd=srctree)
+            srcrev = stdout.rstrip()
         lines_before.append('SRCREV = "%s"' % srcrev)
     lines_before.append('')
 
-    if srcsubdir:
+    if srcsubdir and not args.binary:
+        # (for binary packages we explicitly specify subdir= when fetching to
+        # match the default value of S, so we don't need to set it in that case)
         lines_before.append('S = "${WORKDIR}/%s"' % srcsubdir)
         lines_before.append('')
 
@@ -549,40 +607,36 @@ def create_recipe(args):
     handlers = [item[0] for item in handlers]
 
     # Apply the handlers
-    handled = []
-    handled.append(('license', licvalues))
-
     if args.binary:
         classes.append('bin_package')
         handled.append('buildsystem')
 
-    extravalues = {}
     for handler in handlers:
         handler.process(srctree_use, classes, lines_before, lines_after, handled, extravalues)
 
     extrafiles = extravalues.pop('extrafiles', {})
+    extra_pn = extravalues.pop('PN', None)
+    extra_pv = extravalues.pop('PV', None)
 
-    if not realpv:
-        realpv = extravalues.get('PV', None)
-        if realpv:
-            if not validate_pv(realpv):
-                realpv = None
-            else:
-                realpv = realpv.lower().split()[0]
-                if '_' in realpv:
-                    realpv = realpv.replace('_', '-')
-    if not pn:
-        pn = extravalues.get('PN', None)
-        if pn:
-            if pn.startswith('GNU '):
-                pn = pn[4:]
-            if ' ' in pn:
-                # Probably a descriptive identifier rather than a proper name
-                pn = None
-            else:
-                pn = pn.lower()
-                if '_' in pn:
-                    pn = pn.replace('_', '-')
+    if extra_pv and not realpv:
+        realpv = extra_pv
+        if not validate_pv(realpv):
+            realpv = None
+        else:
+            realpv = realpv.lower().split()[0]
+            if '_' in realpv:
+                realpv = realpv.replace('_', '-')
+    if extra_pn and not pn:
+        pn = extra_pn
+        if pn.startswith('GNU '):
+            pn = pn[4:]
+        if ' ' in pn:
+            # Probably a descriptive identifier rather than a proper name
+            pn = None
+        else:
+            pn = pn.lower()
+            if '_' in pn:
+                pn = pn.replace('_', '-')
 
     if not outfile:
         if not pn:
@@ -590,8 +644,11 @@ def create_recipe(args):
             # devtool looks for this specific exit code, so don't change it
             sys.exit(15)
         else:
-            if srcuri and srcuri.startswith(('git://', 'hg://', 'svn://')):
-                outfile = '%s_%s.bb' % (pn, srcuri.split(':', 1)[0])
+            if srcuri and srcuri.startswith(('gitsm://', 'git://', 'hg://', 'svn://')):
+                suffix = srcuri.split(':', 1)[0]
+                if suffix == 'gitsm':
+                    suffix = 'git'
+                outfile = '%s_%s.bb' % (pn, suffix)
             elif realpv:
                 outfile = '%s_%s.bb' % (pn, realpv)
             else:
@@ -610,7 +667,7 @@ def create_recipe(args):
         else:
             extraoutdir = os.path.join(os.path.dirname(outfile), pn)
         bb.utils.mkdirhier(extraoutdir)
-        for destfn, extrafile in extrafiles.iteritems():
+        for destfn, extrafile in extrafiles.items():
             shutil.move(extrafile, os.path.join(extraoutdir, destfn))
 
     lines = lines_before
@@ -662,6 +719,12 @@ def create_recipe(args):
         outlines.append('')
     outlines.extend(lines_after)
 
+    if extravalues:
+        if 'LICENSE' in extravalues and not licvalues:
+            # Don't blow away 'CLOSED' value that comments say we set
+            del extravalues['LICENSE']
+        _, outlines = oe.recipeutils.patch_recipe_lines(outlines, extravalues, trailing_newline=False)
+
     if args.extract_to:
         scriptutils.git_convert_standalone_clone(srctree)
         if os.path.isdir(args.extract_to):
@@ -679,13 +742,71 @@ def create_recipe(args):
         sys.stdout.write('\n'.join(outlines) + '\n')
     else:
         with open(outfile, 'w') as f:
-            f.write('\n'.join(outlines) + '\n')
+            lastline = None
+            for line in outlines:
+                if not lastline and not line:
+                    # Skip extra blank lines
+                    continue
+                f.write('%s\n' % line)
+                lastline = line
         logger.info('Recipe %s has been created; further editing may be required to make it fully functional' % outfile)
 
     if tempsrc:
-        shutil.rmtree(tempsrc)
+        if args.keep_temp:
+            logger.info('Preserving temporary directory %s' % tempsrc)
+        else:
+            shutil.rmtree(tempsrc)
 
     return 0
+
+def handle_license_vars(srctree, lines_before, handled, extravalues, d):
+    licvalues = guess_license(srctree, d)
+    lic_files_chksum = []
+    lic_unknown = []
+    if licvalues:
+        licenses = []
+        for licvalue in licvalues:
+            if not licvalue[0] in licenses:
+                licenses.append(licvalue[0])
+            lic_files_chksum.append('file://%s;md5=%s' % (licvalue[1], licvalue[2]))
+            if licvalue[0] == 'Unknown':
+                lic_unknown.append(licvalue[1])
+        lines_before.append('# WARNING: the following LICENSE and LIC_FILES_CHKSUM values are best guesses - it is')
+        lines_before.append('# your responsibility to verify that the values are complete and correct.')
+        if len(licvalues) > 1:
+            lines_before.append('#')
+            lines_before.append('# NOTE: multiple licenses have been detected; if that is correct you should separate')
+            lines_before.append('# these in the LICENSE value using & if the multiple licenses all apply, or | if there')
+            lines_before.append('# is a choice between the multiple licenses. If in doubt, check the accompanying')
+            lines_before.append('# documentation to determine which situation is applicable.')
+        if lic_unknown:
+            lines_before.append('#')
+            lines_before.append('# The following license files were not able to be identified and are')
+            lines_before.append('# represented as "Unknown" below, you will need to check them yourself:')
+            for licfile in lic_unknown:
+                lines_before.append('#   %s' % licfile)
+            lines_before.append('#')
+    else:
+        lines_before.append('# Unable to find any files that looked like license statements. Check the accompanying')
+        lines_before.append('# documentation and source headers and set LICENSE and LIC_FILES_CHKSUM accordingly.')
+        lines_before.append('#')
+        lines_before.append('# NOTE: LICENSE is being set to "CLOSED" to allow you to at least start building - if')
+        lines_before.append('# this is not accurate with respect to the licensing of the software being built (it')
+        lines_before.append('# will not be in most cases) you must specify the correct value before using this')
+        lines_before.append('# recipe for anything other than initial testing/development!')
+        licenses = ['CLOSED']
+    pkg_license = extravalues.pop('LICENSE', None)
+    if pkg_license:
+        if licenses == ['Unknown']:
+            lines_before.append('# NOTE: The following LICENSE value was determined from the original package metadata')
+            licenses = [pkg_license]
+        else:
+            lines_before.append('# NOTE: Original package metadata indicates license is: %s' % pkg_license)
+    lines_before.append('LICENSE = "%s"' % ' '.join(licenses))
+    lines_before.append('LIC_FILES_CHKSUM = "%s"' % ' \\\n                    '.join(lic_files_chksum))
+    lines_before.append('')
+    handled.append(('license', licvalues))
+    return licvalues
 
 def get_license_md5sums(d, static_only=False):
     import bb.utils
@@ -751,7 +872,7 @@ def crunch_license(licfile):
 
     # Note: these are carefully constructed!
     license_title_re = re.compile('^\(?(#+ *)?(The )?.{1,10} [Ll]icen[sc]e( \(.{1,10}\))?\)?:?$')
-    license_statement_re = re.compile('^This (project|software) is( free software)? released under the .{1,10} [Ll]icen[sc]e:?$')
+    license_statement_re = re.compile('^(This (project|software) is( free software)? (released|licen[sc]ed)|(Released|Licen[cs]ed)) under the .{1,10} [Ll]icen[sc]e:?$')
     copyright_re = re.compile('^(#+)? *Copyright .*$')
 
     crunched_md5sums = {}
@@ -781,7 +902,7 @@ def crunch_license(licfile):
     # https://github.com/FFmpeg/FFmpeg/blob/master/COPYING.LGPLv3
     crunched_md5sums['2ebfb3bb49b9a48a075cc1425e7f4129'] = 'LGPLv3'
     lictext = []
-    with open(licfile, 'r') as f:
+    with open(licfile, 'r', errors='surrogateescape') as f:
         for line in f:
             # Drop opening statements
             if copyright_re.match(line):
@@ -792,14 +913,14 @@ def crunch_license(licfile):
                 continue
             # Squash spaces, and replace smart quotes, double quotes
             # and backticks with single quotes
-            line = oe.utils.squashspaces(line.strip()).decode("utf-8")
+            line = oe.utils.squashspaces(line.strip())
             line = line.replace(u"\u2018", "'").replace(u"\u2019", "'").replace(u"\u201c","'").replace(u"\u201d", "'").replace('"', '\'').replace('`', '\'')
             if line:
                 lictext.append(line)
 
     m = hashlib.md5()
     try:
-        m.update(' '.join(lictext))
+        m.update(' '.join(lictext).encode('utf-8'))
         md5val = m.hexdigest()
     except UnicodeEncodeError:
         md5val = None
@@ -807,9 +928,9 @@ def crunch_license(licfile):
     license = crunched_md5sums.get(md5val, None)
     return license, md5val, lictext
 
-def guess_license(srctree):
+def guess_license(srctree, d):
     import bb
-    md5sums = get_license_md5sums(tinfoil.config_data)
+    md5sums = get_license_md5sums(d)
 
     licenses = []
     licspecs = ['*LICEN[CS]E*', 'COPYING*', '*[Ll]icense*', 'LEGAL*', '[Ll]egal*', '*GPL*', 'README.lic*', 'COPYRIGHT*', '[Cc]opyright*']
@@ -842,7 +963,7 @@ def split_pkg_licenses(licvalues, packages, outlines, fallback_licenses=None, pn
     """
     pkglicenses = {pn: []}
     for license, licpath, _ in licvalues:
-        for pkgname, pkgpath in packages.iteritems():
+        for pkgname, pkgpath in packages.items():
             if licpath.startswith(pkgpath + '/'):
                 if pkgname in pkglicenses:
                     pkglicenses[pkgname].append(license)
@@ -854,7 +975,7 @@ def split_pkg_licenses(licvalues, packages, outlines, fallback_licenses=None, pn
             pkglicenses[pn].append(license)
     outlicenses = {}
     for pkgname in packages:
-        license = ' '.join(list(set(pkglicenses.get(pkgname, ['Unknown']))))
+        license = ' '.join(list(set(pkglicenses.get(pkgname, ['Unknown'])))) or 'Unknown'
         if license == 'Unknown' and pkgname in fallback_licenses:
             license = fallback_licenses[pkgname]
         outlines.append('LICENSE_%s = "%s"' % (pkgname, license))
@@ -869,7 +990,7 @@ def read_pkgconfig_provides(d):
             for line in f:
                 pkgmap[os.path.basename(line.rstrip())] = os.path.splitext(os.path.basename(fn))[0]
     recipemap = {}
-    for pc, pkg in pkgmap.iteritems():
+    for pc, pkg in pkgmap.items():
         pkgdatafile = os.path.join(pkgdatadir, 'runtime', pkg)
         if os.path.exists(pkgdatafile):
             with open(pkgdatafile, 'r') as f:
@@ -878,73 +999,84 @@ def read_pkgconfig_provides(d):
                         recipemap[pc] = line.split(':', 1)[1].strip()
     return recipemap
 
-def convert_pkginfo(pkginfofile):
-    values = {}
-    with open(pkginfofile, 'r') as f:
-        indesc = False
-        for line in f:
-            if indesc:
-                if line.strip():
-                    values['DESCRIPTION'] += ' ' + line.strip()
-                else:
-                    indesc = False
-            else:
-                splitline = line.split(': ', 1)
-                key = line[0]
-                value = line[1]
-                if key == 'LICENSE':
-                    for dep in value.split(','):
-                        dep = dep.split()[0]
-                        mapped = depmap.get(dep, '')
-                        if mapped:
-                            depends.append(mapped)
-                elif key == 'License':
-                    values['LICENSE'] = value
-                elif key == 'Summary':
-                    values['SUMMARY'] = value
-                elif key == 'Description':
-                    values['DESCRIPTION'] = value
-                    indesc = True
-    return values
-
 def convert_debian(debpath):
+    value_map = {'Package': 'PN',
+                 'Version': 'PV',
+                 'Section': 'SECTION',
+                 'License': 'LICENSE',
+                 'Homepage': 'HOMEPAGE'}
+
     # FIXME extend this mapping - perhaps use distro_alias.inc?
     depmap = {'libz-dev': 'zlib'}
 
     values = {}
     depends = []
-    with open(os.path.join(debpath, 'control')) as f:
+    with open(os.path.join(debpath, 'control'), 'r', errors='surrogateescape') as f:
         indesc = False
         for line in f:
             if indesc:
-                if line.strip():
+                if line.startswith(' '):
                     if line.startswith(' This package contains'):
                         indesc = False
                     else:
-                        values['DESCRIPTION'] += ' ' + line.strip()
+                        if 'DESCRIPTION' in values:
+                            values['DESCRIPTION'] += ' ' + line.strip()
+                        else:
+                            values['DESCRIPTION'] = line.strip()
                 else:
                     indesc = False
-            else:
+            if not indesc:
                 splitline = line.split(':', 1)
-                key = line[0]
-                value = line[1]
+                if len(splitline) < 2:
+                    continue
+                key = splitline[0]
+                value = splitline[1].strip()
                 if key == 'Build-Depends':
                     for dep in value.split(','):
                         dep = dep.split()[0]
                         mapped = depmap.get(dep, '')
                         if mapped:
                             depends.append(mapped)
-                elif key == 'Section':
-                    values['SECTION'] = value
                 elif key == 'Description':
                     values['SUMMARY'] = value
                     indesc = True
+                else:
+                    varname = value_map.get(key, None)
+                    if varname:
+                        values[varname] = value
 
-    if depends:
-        values['DEPENDS'] = ' '.join(depends)
+    #if depends:
+    #    values['DEPENDS'] = ' '.join(depends)
 
     return values
 
+def convert_rpm_xml(xmlfile):
+    '''Converts the output from rpm -qp --xml to a set of variable values'''
+    import xml.etree.ElementTree as ElementTree
+    rpmtag_map = {'Name': 'PN',
+                  'Version': 'PV',
+                  'Summary': 'SUMMARY',
+                  'Description': 'DESCRIPTION',
+                  'License': 'LICENSE',
+                  'Url': 'HOMEPAGE'}
+
+    values = {}
+    tree = ElementTree.parse(xmlfile)
+    root = tree.getroot()
+    for child in root:
+        if child.tag == 'rpmTag':
+            name = child.attrib.get('name', None)
+            if name:
+                varname = rpmtag_map.get(name, None)
+                if varname:
+                    values[varname] = child[0].text
+    return values
+
+
+def check_npm(d):
+    if not os.path.exists(os.path.join(d.getVar('STAGING_BINDIR_NATIVE', True), 'npm')):
+        logger.error('npm required to process specified source, but npm is not available - you need to build nodejs-native first')
+        sys.exit(14)
 
 def register_commands(subparsers):
     parser_create = subparsers.add_parser('create',
@@ -959,5 +1091,7 @@ def register_commands(subparsers):
     parser_create.add_argument('-b', '--binary', help='Treat the source tree as something that should be installed verbatim (no compilation, same directory structure)', action='store_true')
     parser_create.add_argument('--also-native', help='Also add native variant (i.e. support building recipe for the build host as well as the target machine)', action='store_true')
     parser_create.add_argument('--src-subdir', help='Specify subdirectory within source tree to use', metavar='SUBDIR')
+    parser_create.add_argument('-a', '--autorev', help='When fetching from a git repository, set SRCREV in the recipe to a floating revision instead of fixed', action="store_true")
+    parser_create.add_argument('--keep-temp', action="store_true", help='Keep temporary directory (for debugging)')
     parser_create.set_defaults(func=create_recipe)
 

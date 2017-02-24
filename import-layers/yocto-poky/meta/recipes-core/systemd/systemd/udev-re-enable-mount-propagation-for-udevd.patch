@@ -1,0 +1,31 @@
+From: Michael Biebl <biebl@debian.org>
+Date: Sat, 27 Sep 2014 04:19:24 +0200
+Subject: udev: re-enable mount propagation for udevd
+
+Upstream-Status: Backport [http://http.debian.net/debian/pool/main/s/systemd/systemd_215-17+deb8u4.debian.tar.xz]
+
+laptop-mode-tools remounts file systems from within a udev rule to apply
+certain mount options. With MountFlags=slave, those mounts then become private
+to the systemd-udevd namespace and are no longer accessible from outside the
+namespace.
+While the root cause is the broken behaviour of laptop-mode-tools, with mount
+propagation turned off, this can result in a read-only root file system.
+Therefore revert the relevant parts from commit
+c2c13f2df42e0691aecabe3979ea81cd7faa35c7 to re-enable mount propagation for
+udevd.
+
+Once affected packages have been fixed, this patch should be dropped
+again.
+
+Closes: #762018
+diff --git a/units/systemd-udevd.service.in b/units/systemd-udevd.service.in
+index e7216d6..1e9a600 100644
+--- a/units/systemd-udevd.service.in
++++ b/units/systemd-udevd.service.in
+@@ -21,6 +21,5 @@ Sockets=systemd-udevd-control.socket systemd-udevd-kernel.socket
+ Restart=always
+ RestartSec=0
+ ExecStart=@rootlibexecdir@/systemd-udevd
+-MountFlags=slave
+ KillMode=mixed
+ WatchdogSec=1min

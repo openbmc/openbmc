@@ -2,9 +2,6 @@
 #
 # Copyright (C) 2007-2011 Linux Foundation
 
-LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=4d92cd373abda3937c2bc47fbc49d690 \
-                    file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
-
 # IMAGE_FEATURES control content of the core reference images
 # 
 # By default we install packagegroup-core-boot and packagegroup-base-extended packages;

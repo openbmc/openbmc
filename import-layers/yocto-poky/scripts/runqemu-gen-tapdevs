@@ -69,32 +69,38 @@ if [ ! -x "$IFCONFIG" ]; then
        exit 1
 fi
 
-# Ensure we start with a clean slate
-for tap in `$IFCONFIG link | grep tap | awk '{ print \$2 }' | sed s/://`; do
-	echo "Note: Destroying pre-existing tap interface $tap..."
-	$TUNCTL -d $tap
-done
-
-echo "Creating $COUNT tap devices for UID: $TUID GID: $GID..."
-for ((index=0; index < $COUNT; index++)); do
-	echo "Creating tap$index"
-	ifup=`$RUNQEMU_IFUP $TUID $GID $SYSROOT 2>&1`
-	if [ $? -ne 0 ]; then
-		echo "Error running tunctl: $ifup"
-		exit 1
-	fi
-done
+if [ $COUNT -ge 0 ]; then
+	# Ensure we start with a clean slate
+	for tap in `$IFCONFIG link | grep tap | awk '{ print \$2 }' | sed s/://`; do
+		echo "Note: Destroying pre-existing tap interface $tap..."
+		$TUNCTL -d $tap
+	done
+	rm -f /etc/runqemu-nosudo
+else
+	echo "Error: Incorrect count: $COUNT"
+	exit 1
+fi
 
 if [ $COUNT -gt 0 ]; then
+	echo "Creating $COUNT tap devices for UID: $TUID GID: $GID..."
+	for ((index=0; index < $COUNT; index++)); do
+		echo "Creating tap$index"
+		ifup=`$RUNQEMU_IFUP $TUID $GID $SYSROOT 2>&1`
+		if [ $? -ne 0 ]; then
+			echo "Error running tunctl: $ifup"
+			exit 1
+		fi
+	done
+
 	echo "Note: For systems running NetworkManager, it's recommended"
 	echo "Note: that the tap devices be set as unmanaged in the"
 	echo "Note: NetworkManager.conf file. Add the following lines to"
 	echo "Note: /etc/NetworkManager/NetworkManager.conf"
 	echo "[keyfile]"
 	echo "unmanaged-devices=interface-name:tap*"
-fi
 
-# The runqemu script will check for this file, and if it exists,
-# will use the existing bank of tap devices without creating
-# additional ones via sudo.
-touch /etc/runqemu-nosudo
+	# The runqemu script will check for this file, and if it exists,
+	# will use the existing bank of tap devices without creating
+	# additional ones via sudo.
+	touch /etc/runqemu-nosudo
+fi

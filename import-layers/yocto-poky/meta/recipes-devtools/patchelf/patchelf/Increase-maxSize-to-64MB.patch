@@ -1,0 +1,46 @@
+From e3658740ec100e4c8cf83295460b032979e1a99a Mon Sep 17 00:00:00 2001
+From: Fabio Berton <fabio.berton@ossystems.com.br>
+Date: Fri, 9 Sep 2016 18:21:32 -0300
+Subject: [PATCH] Increase maxSize to 64MB
+Organization: O.S. Systems Software LTDA.
+
+Fix error:
+
+/
+|ERROR: qemu-native-2.5.0-r1 do_populate_sysroot_setscene: '('patchelf-uninative',
+|'--set-interpreter', '../build/tmp/sysroots-uninative/x86_64-linux/lib/
+|ld-linux-x86-64.so.2', '../build/tmp/work/x86_64-linux/qemu-native/2.5.0-r1/
+|sstate-install-populate_sysroot/x86_64-linux/usr/bin/qemu-mips64')'
+|failed with exit code 1 and the following output:
+|warning: working around a Linux kernel bug by creating a hole of 36032512
+|bytes in ‘../build/tmp/work/x86_64-linux/qemu-native/2.5.0-r1/
+|sstate-install-populate_sysroot/x86_64-linux/usr/bin/qemu-mips64’
+|maximum file size exceeded
+\
+
+Similar issue is discussed here:
+https://github.com/NixOS/patchelf/issues/47
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Fabio Berton <fabio.berton@ossystems.com.br>
+---
+ src/patchelf.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/patchelf.cc b/src/patchelf.cc
+index a59c12d..0fd7355 100644
+--- a/src/patchelf.cc
++++ b/src/patchelf.cc
+@@ -279,7 +279,7 @@ static void readFile(string fileName)
+     struct stat st;
+     if (stat(fileName.c_str(), &st) != 0) error("stat");
+     fileSize = st.st_size;
+-    maxSize = fileSize + 32 * 1024 * 1024;
++    maxSize = fileSize + 64 * 1024 * 1024;
+ 
+     contents = (unsigned char *) malloc(fileSize + maxSize);
+     if (!contents) abort();
+-- 
+2.1.4
+

@@ -1,0 +1,116 @@
+#!/usr/bin/env python3
+
+import sys, os, subprocess, re, shutil
+
+whitelist = (
+    # type is supported by dash
+    'if type systemctl >/dev/null 2>/dev/null; then',
+    'if type systemd-tmpfiles >/dev/null 2>/dev/null; then',
+    'if type update-rc.d >/dev/null 2>/dev/null; then',
+    'command -v',
+    # HOSTNAME is set locally
+    'buildhistory_single_commit "$CMDLINE" "$HOSTNAME"',
+    # False-positive, match is a grep not shell expression
+    'grep "^$groupname:[^:]*:[^:]*:\\([^,]*,\\)*$username\\(,[^,]*\\)*"',
+    # TODO verify dash's '. script args' behaviour
+    '. $target_sdk_dir/${oe_init_build_env_path} $target_sdk_dir >> $LOGFILE'
+    )
+
+def is_whitelisted(s):
+    for w in whitelist:
+        if w in s:
+            return True
+    return False
+
+def process(recipe, function, script):
+    import tempfile
+
+    if not script.startswith("#!"):
+        script = "#! /bin/sh\n" + script
+
+    fn = tempfile.NamedTemporaryFile(mode="w+t")
+    fn.write(script)
+    fn.flush()
+
+    try:
+        subprocess.check_output(("checkbashisms.pl", fn.name), universal_newlines=True, stderr=subprocess.STDOUT)
+        # No bashisms, so just return
+        return
+    except subprocess.CalledProcessError as e:
+        # TODO check exit code is 1
+
+        # Replace the temporary filename with the function and split it
+        output = e.output.replace(fn.name, function).splitlines()
+        if len(results) % 2 != 0:
+            print("Unexpected output from checkbashism: %s" % str(output))
+            return
+
+        # Turn the output into a list of (message, source) values
+        result = []
+        # Check the results against the whitelist
+        for message, source in zip(output[0::2], output[1::2]):
+            if not is_whitelisted(source):
+                result.append((message, source))
+        return result
+
+def get_tinfoil():
+    scripts_path = os.path.dirname(os.path.realpath(__file__))
+    lib_path = scripts_path + '/lib'
+    sys.path = sys.path + [lib_path]
+    import scriptpath
+    scriptpath.add_bitbake_lib_path()
+    import bb.tinfoil
+    tinfoil = bb.tinfoil.Tinfoil()
+    tinfoil.prepare()
+    # tinfoil.logger.setLevel(logging.WARNING)
+    return tinfoil
+
+if __name__=='__main__':
+    import shutil
+    if shutil.which("checkbashisms.pl") is None:
+        print("Cannot find checkbashisms.pl on $PATH")
+        sys.exit(1)
+
+    tinfoil = get_tinfoil()
+
+    # This is only the default configuration and should iterate over
+    # recipecaches to handle multiconfig environments
+    pkg_pn = tinfoil.cooker.recipecaches[""].pkg_pn
+
+    # TODO: use argparse and have --help
+    if len(sys.argv) > 1:
+        initial_pns = sys.argv[1:]
+    else:
+        initial_pns = sorted(pkg_pn)
+
+    pns = []
+    print("Generating file list...")
+    for pn in initial_pns:
+        for fn in pkg_pn[pn]:
+            # There's no point checking multiple BBCLASSEXTENDed variants of the same recipe
+            realfn, _, _ = bb.cache.virtualfn2realfn(fn)
+            if realfn not in pns:
+                pns.append(realfn)
+
+
+    def func(fn):
+        result = []
+        data = tinfoil.parse_recipe_file(fn)
+        for key in data.keys():
+            if data.getVarFlag(key, "func", True) and not data.getVarFlag(key, "python", True):
+                script = data.getVar(key, False)
+                if not script: continue
+                #print ("%s:%s" % (fn, key))
+                r = process(fn, key, script)
+                if r: result.extend(r)
+        return fn, result
+
+    print("Scanning scripts...\n")
+    import multiprocessing
+    pool = multiprocessing.Pool()
+    for pn,results in pool.imap(func, pns):
+        if results:
+            print(pn)
+            for message,source in results:
+                print(" %s\n  %s" % (message, source))
+            print()

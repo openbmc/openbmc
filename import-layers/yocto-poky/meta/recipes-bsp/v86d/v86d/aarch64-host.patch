@@ -1,0 +1,18 @@
+Accept aarch64 as valid build host
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: v86d-0.1.10/configure
+===================================================================
+--- v86d-0.1.10.orig/configure
++++ v86d-0.1.10/configure
+@@ -26,7 +26,7 @@ copt_x86emu_test()
+ 	local m=`uname -m`
+ 	if [ "$m" = "i686" -o "$m" = "i586" -o "$m" = "i486" -o "$m" = "i386" ]; then
+ 		echo "n";
+-	elif [ "$m" = "x86_64" ]; then
++	elif [ "$m" = "x86_64" -o "$m" = "aarch64" ]; then
+ 		echo "y";
+ 	else
+ 		echo "It looks like your architecture '$m' isn't supported by this version of v86d." >&2

@@ -11,15 +11,15 @@ diff -dNaur bash-3.2.48/Makefile.in.orig bash-3.2.48/Makefile.in
  
  recho$(EXEEXT):		$(SUPPORT_SRC)recho.c
 -	@$(CC_FOR_BUILD) $(CCFLAGS_FOR_BUILD) -o $@ $(SUPPORT_SRC)recho.c ${LIBS_FOR_BUILD}
-+	@$(CC) $(CCFLAGS) -o $@ $<
++	@$(CC) $(CCFLAGS) $(LDFLAGS) -o $@ $<
  
  zecho$(EXEEXT):		$(SUPPORT_SRC)zecho.c
 -	@$(CC_FOR_BUILD) $(CCFLAGS_FOR_BUILD) -o $@ $(SUPPORT_SRC)zecho.c ${LIBS_FOR_BUILD}
-+	@$(CC) $(CCFLAGS) -o $@ $<
++	@$(CC) $(CCFLAGS) $(LDFLAGS) -o $@ $<
  
  printenv$(EXEEXT):	$(SUPPORT_SRC)printenv.c
 -	@$(CC_FOR_BUILD) $(CCFLAGS_FOR_BUILD) -o $@ $(SUPPORT_SRC)printenv.c ${LIBS_FOR_BUILD}
-+	@$(CC) $(CCFLAGS) -o $@ $<
++	@$(CC) $(CCFLAGS) $(LDFLAGS) -o $@ $<
  
 -test tests check:	force $(Program) $(TESTS_SUPPORT)
 +test tests check:

@@ -65,9 +65,9 @@ def runtool(cmdln_or_args, catch=1):
         process = subprocess.Popen(cmdln_or_args, stdout=sout,
                                    stderr=serr, shell=shell)
         (sout, serr) = process.communicate()
-        # combine stdout and stderr, filter None out
-        out = ''.join(filter(None, [sout, serr]))
-    except OSError, err:
+        # combine stdout and stderr, filter None out and decode
+        out = ''.join([out.decode('utf-8') for out in [sout, serr] if out])
+    except OSError as err:
         if err.errno == 2:
             # [Errno 2] No such file or directory
             msger.error('Cannot run command: %s, lost dependency?' % cmd)

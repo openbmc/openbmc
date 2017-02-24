@@ -3,19 +3,14 @@ import logging
 import os
 import re
 import tempfile
+import pickle
 import bb.data
 from bb.checksum import FileChecksumCache
 
 logger = logging.getLogger('BitBake.SigGen')
 
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
-    logger.info('Importing cPickle failed.  Falling back to a very slow implementation.')
-
 def init(d):
-    siggens = [obj for obj in globals().itervalues()
+    siggens = [obj for obj in globals().values()
                       if type(obj) is type and issubclass(obj, SignatureGenerator)]
 
     desired = d.getVar("BB_SIGNATURE_HANDLER", True) or "noop"
@@ -138,7 +133,7 @@ class SignatureGeneratorBasic(SignatureGenerator):
                 var = lookupcache[dep]
                 if var is not None:
                     data = data + str(var)
-            self.basehash[fn + "." + task] = hashlib.md5(data).hexdigest()
+            self.basehash[fn + "." + task] = hashlib.md5(data.encode("utf-8")).hexdigest()
             taskdeps[task] = alldeps
 
         self.taskdeps[fn] = taskdeps
@@ -149,8 +144,9 @@ class SignatureGeneratorBasic(SignatureGenerator):
 
     def finalise(self, fn, d, variant):
 
-        if variant:
-            fn = "virtual:" + variant + ":" + fn
+        mc = d.getVar("__BBMULTICONFIG", False) or ""
+        if variant or mc:
+            fn = bb.cache.realfn2virtual(fn, variant, mc)
 
         try:
             taskdeps = self._build_data(fn, d)
@@ -221,9 +217,9 @@ class SignatureGeneratorBasic(SignatureGenerator):
         if taint:
             data = data + taint
             self.taints[k] = taint
-            logger.warn("%s is tainted from a forced run" % k)
+            logger.warning("%s is tainted from a forced run" % k)
 
-        h = hashlib.md5(data).hexdigest()
+        h = hashlib.md5(data.encode("utf-8")).hexdigest()
         self.taskhash[k] = h
         #d.setVar("BB_TASKHASH_task-%s" % task, taskhash[task])
         return h
@@ -287,7 +283,7 @@ class SignatureGeneratorBasic(SignatureGenerator):
             with os.fdopen(fd, "wb") as stream:
                 p = pickle.dump(data, stream, -1)
                 stream.flush()
-            os.chmod(tmpfile, 0664)
+            os.chmod(tmpfile, 0o664)
             os.rename(tmpfile, sigfile)
         except (OSError, IOError) as err:
             try:
@@ -298,23 +294,25 @@ class SignatureGeneratorBasic(SignatureGenerator):
 
         computed_basehash = calc_basehash(data)
         if computed_basehash != self.basehash[k]:
-            bb.error("Basehash mismatch %s verses %s for %s" % (computed_basehash, self.basehash[k], k))
-        if k in self.taskhash:
+            bb.error("Basehash mismatch %s versus %s for %s" % (computed_basehash, self.basehash[k], k))
+        if runtime and k in self.taskhash:
             computed_taskhash = calc_taskhash(data)
             if computed_taskhash != self.taskhash[k]:
-                bb.error("Taskhash mismatch %s verses %s for %s" % (computed_taskhash, self.taskhash[k], k))
+                bb.error("Taskhash mismatch %s versus %s for %s" % (computed_taskhash, self.taskhash[k], k))
 
 
-    def dump_sigs(self, dataCache, options):
+    def dump_sigs(self, dataCaches, options):
         for fn in self.taskdeps:
             for task in self.taskdeps[fn]:
+                tid = fn + ":" + task
+                (mc, _, _) = bb.runqueue.split_tid(tid)
                 k = fn + "." + task
                 if k not in self.taskhash:
                     continue
-                if dataCache.basetaskhash[k] != self.basehash[k]:
+                if dataCaches[mc].basetaskhash[k] != self.basehash[k]:
                     bb.error("Bitbake's cached basehash does not match the one we just generated (%s)!" % k)
-                    bb.error("The mismatched hashes were %s and %s" % (dataCache.basetaskhash[k], self.basehash[k]))
-                self.dump_sigtask(fn, task, dataCache.stamp[fn], True)
+                    bb.error("The mismatched hashes were %s and %s" % (dataCaches[mc].basetaskhash[k], self.basehash[k]))
+                self.dump_sigtask(fn, task, dataCaches[mc].stamp[fn], True)
 
 class SignatureGeneratorBasicHash(SignatureGeneratorBasic):
     name = "basichash"
@@ -368,10 +366,12 @@ def clean_basepaths_list(a):
 def compare_sigfiles(a, b, recursecb = None):
     output = []
 
-    p1 = pickle.Unpickler(open(a, "rb"))
-    a_data = p1.load()
-    p2 = pickle.Unpickler(open(b, "rb"))
-    b_data = p2.load()
+    with open(a, 'rb') as f:
+        p1 = pickle.Unpickler(f)
+        a_data = p1.load()
+    with open(b, 'rb') as f:
+        p2 = pickle.Unpickler(f)
+        b_data = p2.load()
 
     def dict_diff(a, b, whitelist=set()):
         sa = set(a.keys())
@@ -453,6 +453,11 @@ def compare_sigfiles(a, b, recursecb = None):
         for dep in changed:
             output.append("Variable %s value changed from '%s' to '%s'" % (dep, a_data['varvals'][dep], b_data['varvals'][dep]))
 
+    if not 'file_checksum_values' in a_data:
+         a_data['file_checksum_values'] = {}
+    if not 'file_checksum_values' in b_data:
+         b_data['file_checksum_values'] = {}
+
     changed, added, removed = file_checksums_diff(a_data['file_checksum_values'], b_data['file_checksum_values'])
     if changed:
         for f, old, new in changed:
@@ -464,6 +469,10 @@ def compare_sigfiles(a, b, recursecb = None):
         for f in removed:
             output.append("Dependency on checksum of file %s was removed" % (f))
 
+    if not 'runtaskdeps' in a_data:
+         a_data['runtaskdeps'] = {}
+    if not 'runtaskdeps' in b_data:
+         b_data['runtaskdeps'] = {}
 
     if len(a_data['runtaskdeps']) != len(b_data['runtaskdeps']):
         changed = ["Number of task dependencies changed"]
@@ -536,7 +545,7 @@ def calc_basehash(sigdata):
         if val is not None:
             basedata = basedata + str(val)
 
-    return hashlib.md5(basedata).hexdigest()
+    return hashlib.md5(basedata.encode("utf-8")).hexdigest()
 
 def calc_taskhash(sigdata):
     data = sigdata['basehash']
@@ -553,14 +562,15 @@ def calc_taskhash(sigdata):
         else:
             data = data + sigdata['taint']
 
-    return hashlib.md5(data).hexdigest()
+    return hashlib.md5(data.encode("utf-8")).hexdigest()
 
 
 def dump_sigfile(a):
     output = []
 
-    p1 = pickle.Unpickler(open(a, "rb"))
-    a_data = p1.load()
+    with open(a, 'rb') as f:
+        p1 = pickle.Unpickler(f)
+        a_data = p1.load()
 
     output.append("basewhitelist: %s" % (a_data['basewhitelist']))
 

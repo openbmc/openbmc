@@ -5,7 +5,6 @@
 SUMMARY = "Linux Standard Base (LSB)"
 DESCRIPTION = "Packages required to satisfy the Linux Standard Base (LSB) specification"
 PR = "r10"
-LICENSE = "MIT"
 
 inherit packagegroup distro_features_check
 
@@ -201,16 +200,6 @@ RDEPENDS_packagegroup-core-lsb-python = "\
     python-misc \
 "
 
-def get_libqt3(d):
-    if 'linuxstdbase' in d.getVar('DISTROOVERRIDES', False) or "":
-        if 'qt3' in d.getVar('BBFILE_COLLECTIONS', False) or "":
-            return 'libqt-mt3'
-
-        bb.warn('The meta-qt3 layer should be added, this layer provides Qt 3.x' \
-                'libraries. Its intended use is for passing LSB tests as Qt3 is' \
-                'a requirement for LSB.')
-    return ''
-
 QT4PKGS = " \
     libqtcore4 \
     libqtgui4 \
@@ -229,8 +218,8 @@ def get_libqt4(d):
         if 'qt4' in d.getVar('BBFILE_COLLECTIONS', False) or "":
             return d.getVar('QT4PKGS', False)
 
-        bb.warn('The meta-qt4 layer should be added, this layer provides Qt 4.x' \
-                'libraries. Its intended use is for passing LSB tests as Qt4 is' \
+        bb.warn('The meta-qt4 layer should be added, this layer provides Qt 4.x ' \
+                'libraries. Its intended use is for passing LSB tests as Qt4 is ' \
                 'a requirement for LSB.')
     return ''
 
@@ -255,7 +244,6 @@ RDEPENDS_packagegroup-core-lsb-desktop = "\
     atk \
     libasound \
     ${@get_libqt4(d)} \
-    ${@get_libqt3(d)} \
 "
 
 RDEPENDS_packagegroup-core-lsb-runtime-add = "\

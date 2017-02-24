@@ -51,7 +51,7 @@ def sizetype(arg):
     Converts size string in <num>[K|k|M|G] format into the integer value
     """
     if arg.isdigit():
-        return int(arg) * 1024L
+        return int(arg) * 1024
 
     if not arg[:-1].isdigit():
         raise ArgumentTypeError("Invalid size: %r" % arg)
@@ -60,9 +60,9 @@ def sizetype(arg):
     if arg.endswith("k") or arg.endswith("K"):
         return size
     if arg.endswith("M"):
-        return size * 1024L
+        return size * 1024
     if arg.endswith("G"):
-        return size * 1024L * 1024L
+        return size * 1024 * 1024
 
     raise ArgumentTypeError("Invalid size: %r" % arg)
 
@@ -92,7 +92,25 @@ def cannedpathtype(arg):
         raise ArgumentTypeError("file not found: %s" % arg)
     return result
 
-class KickStart(object):
+def systemidtype(arg):
+    """
+    Custom type for ArgumentParser
+    Checks if the argument sutisfies system id requirements,
+    i.e. if it's one byte long integer > 0
+    """
+    error = "Invalid system type: %s. must be hex "\
+            "between 0x1 and 0xFF" % arg
+    try:
+        result = int(arg, 16)
+    except ValueError:
+        raise ArgumentTypeError(error)
+
+    if result <= 0 or result > 0xff:
+        raise ArgumentTypeError(error)
+
+    return arg
+
+class KickStart():
     """"Kickstart parser implementation."""
 
     def __init__(self, confpath):
@@ -106,10 +124,10 @@ class KickStart(object):
         subparsers = parser.add_subparsers()
 
         part = subparsers.add_parser('part')
-        part.add_argument('mountpoint')
+        part.add_argument('mountpoint', nargs='?')
         part.add_argument('--active', action='store_true')
         part.add_argument('--align', type=int)
-        part.add_argument("--extra-space", type=sizetype, default=10*1024L)
+        part.add_argument("--extra-space", type=sizetype, default=10*1024)
         part.add_argument('--fsoptions', dest='fsopts')
         part.add_argument('--fstype')
         part.add_argument('--label')
@@ -121,6 +139,7 @@ class KickStart(object):
         part.add_argument('--size', type=sizetype, default=0)
         part.add_argument('--source')
         part.add_argument('--sourceparams')
+        part.add_argument('--system-id', type=systemidtype)
         part.add_argument('--use-uuid', action='store_true')
         part.add_argument('--uuid')
 

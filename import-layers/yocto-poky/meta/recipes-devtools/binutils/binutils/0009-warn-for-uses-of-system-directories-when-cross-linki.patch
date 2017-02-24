@@ -1,7 +1,7 @@
-From 4daa841ce16ba52b717bdff9eb1dfc4f19638814 Mon Sep 17 00:00:00 2001
+From 7ab8e318659eb5d9adc758c78d084a95560b93fd Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 15 Jan 2016 06:31:09 +0000
-Subject: [PATCH 09/14] warn for uses of system directories when cross linking
+Subject: [PATCH 09/13] warn for uses of system directories when cross linking
 
 2008-07-02  Joseph Myers  <joseph@codesourcery.com>
 
@@ -63,10 +63,10 @@ Upstream-Status: Pending
  9 files changed, 86 insertions(+)
 
 diff --git a/ld/config.in b/ld/config.in
-index 276fb77..35c58eb 100644
+index 2c6d698..d3cb7e8 100644
 --- a/ld/config.in
 +++ b/ld/config.in
-@@ -14,6 +14,9 @@
+@@ -17,6 +17,9 @@
     language is requested. */
  #undef ENABLE_NLS
  
@@ -77,10 +77,10 @@ index 276fb77..35c58eb 100644
  #undef EXTRA_SHLIB_EXTENSION
  
 diff --git a/ld/configure b/ld/configure
-index eb4f0d7..e9054b4 100755
+index 3df1149..0601c98 100755
 --- a/ld/configure
 +++ b/ld/configure
-@@ -790,6 +790,7 @@ with_lib_path
+@@ -792,6 +792,7 @@ with_lib_path
  enable_targets
  enable_64_bit_bfd
  with_sysroot
@@ -88,7 +88,7 @@ index eb4f0d7..e9054b4 100755
  enable_gold
  enable_got
  enable_compressed_debug_sections
-@@ -1446,6 +1447,8 @@ Optional Features:
+@@ -1449,6 +1450,8 @@ Optional Features:
    --disable-largefile     omit support for large files
    --enable-targets        alternative target configurations
    --enable-64-bit-bfd     64-bit support (on hosts with narrower word sizes)
@@ -97,7 +97,7 @@ index eb4f0d7..e9054b4 100755
    --enable-gold[=ARG]     build gold [ARG={default,yes,no}]
    --enable-got=<type>     GOT handling scheme (target, single, negative,
                            multigot)
-@@ -16306,6 +16309,19 @@ fi
+@@ -16313,6 +16316,19 @@ fi
  
  
  
@@ -118,7 +118,7 @@ index eb4f0d7..e9054b4 100755
  if test "${enable_gold+set}" = set; then :
    enableval=$enable_gold; case "${enableval}" in
 diff --git a/ld/configure.ac b/ld/configure.ac
-index e28f38e..7b474e7 100644
+index d17281f..9fb3db9 100644
 --- a/ld/configure.ac
 +++ b/ld/configure.ac
 @@ -95,6 +95,16 @@ AC_SUBST(use_sysroot)
@@ -139,10 +139,10 @@ index e28f38e..7b474e7 100644
  dnl "install_as_default" is set to false if gold is the default linker.
  dnl "installed_linker" is the installed BFD linker name.
 diff --git a/ld/ld.h b/ld/ld.h
-index d84ec4e..3476b26 100644
+index 85a48ad..a8fdddf 100644
 --- a/ld/ld.h
 +++ b/ld/ld.h
-@@ -164,6 +164,14 @@ typedef struct {
+@@ -169,6 +169,14 @@ typedef struct
    /* If set, display the target memory usage (per memory region).  */
    bfd_boolean print_memory_usage;
  
@@ -158,10 +158,10 @@ index d84ec4e..3476b26 100644
    enum endian_enum endian;
  
 diff --git a/ld/ld.texinfo b/ld/ld.texinfo
-index 2389661..d06112b 100644
+index bc16764..838c75d 100644
 --- a/ld/ld.texinfo
 +++ b/ld/ld.texinfo
-@@ -2338,6 +2338,18 @@ string identifying the original linked file does not change.
+@@ -2357,6 +2357,18 @@ string identifying the original linked file does not change.
  
  Passing @code{none} for @var{style} disables the setting from any
  @code{--build-id} options earlier on the command line.
@@ -181,7 +181,7 @@ index 2389661..d06112b 100644
  
  @c man end
 diff --git a/ld/ldfile.c b/ld/ldfile.c
-index 96f9ecc..af231c0 100644
+index e397737..013727b 100644
 --- a/ld/ldfile.c
 +++ b/ld/ldfile.c
 @@ -114,6 +114,23 @@ ldfile_add_library_path (const char *name, bfd_boolean cmdline)
@@ -209,7 +209,7 @@ index 96f9ecc..af231c0 100644
  
  /* Try to open a BFD for a lang_input_statement.  */
 diff --git a/ld/ldlex.h b/ld/ldlex.h
-index 6f11e7b..0ca3110 100644
+index cf943e4..12cfcaa 100644
 --- a/ld/ldlex.h
 +++ b/ld/ldlex.h
 @@ -144,6 +144,8 @@ enum option_values
@@ -222,7 +222,7 @@ index 6f11e7b..0ca3110 100644
  
  /* The initial parser states.  */
 diff --git a/ld/ldmain.c b/ld/ldmain.c
-index bb0b9cc..a23c56c 100644
+index e7a8dff..3ccf2af 100644
 --- a/ld/ldmain.c
 +++ b/ld/ldmain.c
 @@ -257,6 +257,8 @@ main (int argc, char **argv)
@@ -235,7 +235,7 @@ index bb0b9cc..a23c56c 100644
    /* We initialize DEMANGLING based on the environment variable
       COLLECT_NO_DEMANGLE.  The gcc collect2 program will demangle the
 diff --git a/ld/lexsup.c b/ld/lexsup.c
-index e2fb212..a2064f1 100644
+index 6d28e91..5c9da57 100644
 --- a/ld/lexsup.c
 +++ b/ld/lexsup.c
 @@ -530,6 +530,14 @@ static const struct ld_option ld_options[] =
@@ -269,5 +269,5 @@ index e2fb212..a2064f1 100644
      }
  
 -- 
-2.7.1
+2.9.0
 

@@ -15,7 +15,7 @@ class Command(BaseCommand):
             try:
                 b = Build.objects.get(pk = bid)
             except ObjectDoesNotExist:
-                print 'build %s does not exist, skipping...' %(bid)
+                print('build %s does not exist, skipping...' %(bid))
                 continue
             # theoretically, just b.delete() would suffice
             # however SQLite runs into problems when you try to

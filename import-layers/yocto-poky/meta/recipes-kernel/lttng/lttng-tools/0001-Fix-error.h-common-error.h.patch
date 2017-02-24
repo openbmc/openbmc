@@ -1,0 +1,33 @@
+From 6712db617fe9155ea236f6840c2bd18dbec4c871 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Wed, 15 Jun 2016 17:18:03 -0400
+Subject: [PATCH] Fix: error.h -> common/error.h
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Backport
+
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Jérémie Galarneau <jeremie.galarneau@efficios.com>
+Signed-off-by: Peter Liu <peter.x.liu@external.atlascopco.com>
+---
+ src/bin/lttng-sessiond/agent.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/bin/lttng-sessiond/agent.c b/src/bin/lttng-sessiond/agent.c
+index 7cbbbde..310a7e8 100644
+--- a/src/bin/lttng-sessiond/agent.c
++++ b/src/bin/lttng-sessiond/agent.c
+@@ -29,7 +29,7 @@
+ #include "agent.h"
+ #include "ust-app.h"
+ #include "utils.h"
+-#include "error.h"
++#include "common/error.h"
+ 
+ #define AGENT_RET_CODE_INDEX(code) (code - AGENT_RET_CODE_SUCCESS)
+ 
+-- 
+1.9.1
+

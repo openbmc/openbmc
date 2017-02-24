@@ -1,0 +1,63 @@
+From d8fcc3cbeec4defb5babde5bd09ea294dd3fd08b Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Sun, 3 Jul 2016 19:01:59 -0700
+Subject: [PATCH] system.h/query.c: support nosignature
+
+* Define SUPPORT_NOSIGNATURES to 1 in system.h
+* !QVA_ISSET(qva->qva_flags, SIGNATURE) -> QVA_ISSET(qva->qva_flags, SIGNATURE),
+  otherwise, when use --nosignature would read database and verify
+  signature, this is not expected.
+
+Upstream-Status: Submitted [Sent email to rpm-devel@rpm5.org]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ lib/query.c | 6 +++---
+ system.h    | 4 ++--
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/lib/query.c b/lib/query.c
+index 50a7453..b761d76 100644
+--- a/lib/query.c
++++ b/lib/query.c
+@@ -954,19 +954,19 @@ JBJDEBUG((stderr, "--> %s(%p,%p,%p)\n", __FUNCTION__, ts, qva, argv));
+     vsflags = (rpmVSFlags) rpmExpandNumeric("%{?_vsflags_query}");
+     vsflags = (rpmVSFlags) 0;	/* XXX FIXME: ignore default disablers. */
+ #if defined(SUPPORT_NOSIGNATURES)
+-    if (!QVA_ISSET(qva->qva_flags, DIGEST)) {
++    if (QVA_ISSET(qva->qva_flags, DIGEST)) {
+ 	VSF_SET(vsflags, NOSHA1HEADER);
+ 	VSF_SET(vsflags, NOMD5HEADER);
+ 	VSF_SET(vsflags, NOSHA1);
+ 	VSF_SET(vsflags, NOMD5);
+     }
+-    if (!QVA_ISSET(qva->qva_flags, SIGNATURE)) {
++    if (QVA_ISSET(qva->qva_flags, SIGNATURE)) {
+ 	VSF_SET(vsflags, NODSAHEADER);
+ 	VSF_SET(vsflags, NORSAHEADER);
+ 	VSF_SET(vsflags, NODSA);
+ 	VSF_SET(vsflags, NORSA);
+     }
+-    if (!QVA_ISSET(qva->qva_flags, HDRCHK)) {
++    if (QVA_ISSET(qva->qva_flags, HDRCHK)) {
+ 	VSF_SET(vsflags, NOHDRCHK);
+     }
+     VSF_CLR(vsflags, NEEDPAYLOAD);	/* XXX needed? */
+diff --git a/system.h b/system.h
+index 2ff8906..ad4619a 100644
+--- a/system.h
++++ b/system.h
+@@ -787,9 +787,9 @@ static inline const char *rcsid(const char *p) { \
+ #define SUPPORT_I18NSTRING_TYPE	1
+ 
+ /**
+- * Eliminate signature/digest disablers.
++ * Signature/digest disablers.
+  */
+-#undef	SUPPORT_NOSIGNATURES
++#define SUPPORT_NOSIGNATURES 1
+ 
+ /**
+  * Permit ar(1) payloads. Disabled while rpmio/iosm.c is under development.
+-- 
+2.9.0

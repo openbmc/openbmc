@@ -15,15 +15,17 @@ LICENSE = "Sleepycat"
 VIRTUAL_NAME ?= "virtual/db"
 RCONFLICTS_${PN} = "db3"
 
+PR = "r1"
+
 SRC_URI = "http://download.oracle.com/berkeley-db/db-${PV}.tar.gz"
-SRC_URI += "file://arm-thumb-mutex_db5.patch;patchdir=.. \
+SRC_URI += "file://arm-thumb-mutex_db5.patch \
             file://fix-parallel-build.patch \
            "
 
 SRC_URI[md5sum] = "b99454564d5b4479750567031d66fe24"
 SRC_URI[sha256sum] = "e0a992d740709892e81f9d93f06daf305cf73fb81b545afe72478043172c3628"
 
-LIC_FILES_CHKSUM = "file://../LICENSE;md5=ed1158e31437f4f87cdd4ab2b8613955"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=ed1158e31437f4f87cdd4ab2b8613955"
 
 inherit autotools
 
@@ -35,14 +37,6 @@ inherit autotools
 #
 # to select the correct db in the build (distro) .conf
 PROVIDES += "${VIRTUAL_NAME}"
-
-# bitbake isn't quite clever enough to deal with sleepycat,
-# the distribution sits in the expected directory, but all
-# the builds must occur from a sub-directory.  The following
-# persuades bitbake to go to the right place
-S = "${WORKDIR}/db-${PV}/dist"
-B = "${WORKDIR}/db-${PV}/build_unix"
-SPDX_S = "${WORKDIR}/db-${PV}"
 
 # The executables go in a separate package - typically there
 # is no need to install these unless doing real database
@@ -75,21 +69,23 @@ ARM_MUTEX = "--with-mutex=ARM/gcc-assembly"
 MUTEX = ""
 MUTEX_arm = "${ARM_MUTEX}"
 MUTEX_armeb = "${ARM_MUTEX}"
-EXTRA_OECONF += "${MUTEX}"
-EXTRA_OEMAKE_class-target = "LIBTOOL=${STAGING_BINDIR_CROSS}/${HOST_SYS}-libtool"
+EXTRA_OECONF += "${MUTEX} STRIP=true"
+EXTRA_OEMAKE_append_class-target = " LIBTOOL=${STAGING_BINDIR_CROSS}/${HOST_SYS}-libtool"
+
+AUTOTOOLS_SCRIPT_PATH = "${S}/dist"
 
 # Cancel the site stuff - it's set for db3 and destroys the
 # configure.
 CONFIG_SITE = ""
 do_configure() {
-	gnu-configize --force ${S}
-	export STRIP="true"
+    cd ${B}
+	gnu-configize --force ${AUTOTOOLS_SCRIPT_PATH}
 	oe_runconf
 }
 
 do_compile_prepend() {
-	sed -i -e 's|hardcode_into_libs=yes|hardcode_into_libs=no|' \
-		${B}/libtool
+    # Stop libtool adding RPATHs
+    sed -i -e 's|hardcode_into_libs=yes|hardcode_into_libs=no|' ${B}/libtool
 }
 
 do_install_append() {
@@ -114,4 +110,3 @@ INSANE_SKIP_${PN} = "dev-so"
 INSANE_SKIP_${PN}-cxx = "dev-so"
 
 BBCLASSEXTEND = "native nativesdk"
-

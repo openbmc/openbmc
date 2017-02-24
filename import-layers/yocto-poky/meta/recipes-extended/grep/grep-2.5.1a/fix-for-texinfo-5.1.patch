@@ -1,6 +1,6 @@
 Upstream-Status: Inappropriate [Poky Specific this is gplv2 version]
 
-Signed-off-by Saul Wold <sgw@linux.intel.com>
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
 
 Index: grep-2.5.1a/doc/grep.texi
 ===================================================================

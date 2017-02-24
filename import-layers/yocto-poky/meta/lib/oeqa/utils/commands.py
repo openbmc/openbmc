@@ -41,7 +41,7 @@ class Command(object):
         self.data = data
 
         self.options = dict(self.defaultopts)
-        if isinstance(self.cmd, basestring):
+        if isinstance(self.cmd, str):
             self.options["shell"] = True
         if self.data:
             self.options['stdin'] = subprocess.PIPE
@@ -78,7 +78,10 @@ class Command(object):
                 self.process.kill()
                 self.thread.join()
 
-        self.output = self.output.rstrip()
+        if not self.output:
+            self.output = ""
+        else:
+            self.output = self.output.decode("utf-8", errors='replace').rstrip()
         self.status = self.process.poll()
 
         self.log.debug("Command '%s' returned %d as exit code." % (self.cmd, self.status))
@@ -103,6 +106,7 @@ def runCmd(command, ignore_status=False, timeout=None, assert_error=True, **opti
     result.command = command
     result.status = cmd.status
     result.output = cmd.output
+    result.error = cmd.error
     result.pid = cmd.process.pid
 
     if result.status and not ignore_status:
@@ -123,7 +127,7 @@ def bitbake(command, ignore_status=False, timeout=None, postconfig=None, **optio
     else:
         extra_args = ""
 
-    if isinstance(command, basestring):
+    if isinstance(command, str):
         cmd = "bitbake " + extra_args + " " + command
     else:
         cmd = [ "bitbake" ] + [a for a in (command + extra_args.split(" ")) if a not in [""]]
@@ -141,22 +145,45 @@ def get_bb_env(target=None, postconfig=None):
     else:
         return bitbake("-e", postconfig=postconfig).output
 
-def get_bb_var(var, target=None, postconfig=None):
-    val = None
+def get_bb_vars(variables=None, target=None, postconfig=None):
+    """Get values of multiple bitbake variables"""
     bbenv = get_bb_env(target, postconfig=postconfig)
+
+    var_re = re.compile(r'^(export )?(?P<var>\w+)="(?P<value>.*)"$')
+    unset_re = re.compile(r'^unset (?P<var>\w+)$')
     lastline = None
+    values = {}
     for line in bbenv.splitlines():
-        if re.search("^(export )?%s=" % var, line):
-            val = line.split('=', 1)[1]
-            val = val.strip('\"')
-            break
-        elif re.match("unset %s$" % var, line):
-            # Handle [unexport] variables
-            if lastline.startswith('#   "'):
-                val = lastline.split('\"')[1]
-                break
+        match = var_re.match(line)
+        val = None
+        if match:
+            val = match.group('value')
+        else:
+            match = unset_re.match(line)
+            if match:
+                # Handle [unexport] variables
+                if lastline.startswith('#   "'):
+                    val = lastline.split('"')[1]
+        if val:
+            var = match.group('var')
+            if variables is None:
+                values[var] = val
+            else:
+                if var in variables:
+                    values[var] = val
+                    variables.remove(var)
+                # Stop after all required variables have been found
+                if not variables:
+                    break
         lastline = line
-    return val
+    if variables:
+        # Fill in missing values
+        for var in variables:
+            values[var] = None
+    return values
+
+def get_bb_var(var, target=None, postconfig=None):
+    return get_bb_vars([var], target, postconfig)[var]
 
 def get_test_layer():
     layers = get_bb_var("BBLAYERS").split()
@@ -196,7 +223,7 @@ def runqemu(pn, ssh=True):
         tinfoil.config_data.setVar("TEST_QEMUBOOT_TIMEOUT", "1000")
         import oe.recipeutils
         recipefile = oe.recipeutils.pn_to_recipe(tinfoil.cooker, pn)
-        recipedata = oe.recipeutils.parse_recipe(recipefile, [], tinfoil.config_data)
+        recipedata = oe.recipeutils.parse_recipe(tinfoil.cooker, recipefile, [])
 
         # The QemuRunner log is saved out, but we need to ensure it is at the right
         # log level (and then ensure that since it's a child of the BitBake logger,
@@ -237,3 +264,15 @@ def runqemu(pn, ssh=True):
             qemu.stop()
         except:
             pass
+
+def updateEnv(env_file):
+    """
+    Source a file and update environment.
+    """
+
+    cmd = ". %s; env -0" % env_file
+    result = runCmd(cmd)
+
+    for line in result.output.split("\0"):
+        (key, _, value) = line.partition("=")
+        os.environ[key] = value

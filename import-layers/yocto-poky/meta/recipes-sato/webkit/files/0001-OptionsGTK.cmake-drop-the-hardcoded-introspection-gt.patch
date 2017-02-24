@@ -13,11 +13,11 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  Source/cmake/OptionsGTK.cmake | 6 ------
  1 file changed, 6 deletions(-)
 
-diff --git a/Source/cmake/OptionsGTK.cmake b/Source/cmake/OptionsGTK.cmake
-index e5f1f5b..4698036 100644
---- a/Source/cmake/OptionsGTK.cmake
-+++ b/Source/cmake/OptionsGTK.cmake
-@@ -443,12 +443,6 @@ if (USE_LIBHYPHEN)
+Index: webkitgtk-2.12.1/Source/cmake/OptionsGTK.cmake
+===================================================================
+--- webkitgtk-2.12.1.orig/Source/cmake/OptionsGTK.cmake
++++ webkitgtk-2.12.1/Source/cmake/OptionsGTK.cmake
+@@ -424,12 +424,6 @@ if (USE_LIBHYPHEN)
      endif ()
  endif ()
  
@@ -27,9 +27,6 @@ index e5f1f5b..4698036 100644
 -    set(ENABLE_INTROSPECTION OFF)
 -endif ()
 -
- set(DERIVED_SOURCES_GOBJECT_DOM_BINDINGS_DIR ${DERIVED_SOURCES_DIR}/webkitdom)
- set(DERIVED_SOURCES_WEBKITGTK_DIR ${DERIVED_SOURCES_DIR}/webkitgtk)
- set(DERIVED_SOURCES_WEBKITGTK_API_DIR ${DERIVED_SOURCES_WEBKITGTK_DIR}/webkit)
--- 
-2.7.0
-
+ # Override the cached variable, gtk-doc does not really work when building on Mac.
+ if (APPLE)
+     set(ENABLE_GTKDOC OFF)

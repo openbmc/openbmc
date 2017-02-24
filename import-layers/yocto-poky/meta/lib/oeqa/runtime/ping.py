@@ -14,7 +14,7 @@ class PingTest(oeRuntimeTest):
         endtime = time.time() + 60
         while count < 5 and time.time() < endtime:
             proc = subprocess.Popen("ping -c 1 %s" % self.target.ip, shell=True, stdout=subprocess.PIPE)
-            output += proc.communicate()[0]
+            output += proc.communicate()[0].decode("utf-8")
             if proc.poll() == 0:
                 count += 1
             else:

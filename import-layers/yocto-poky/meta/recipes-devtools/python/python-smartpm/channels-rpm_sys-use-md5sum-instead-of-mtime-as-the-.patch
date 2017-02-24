@@ -1,0 +1,38 @@
+channels/rpm_sys: use md5sum instead of mtime as the digest
+
+Use the internal getFileDigest() function (which defaults to md5) instead of
+mtime for getting the file digest. On some systems mtime proved to be
+unreliable because of delayed update. This caused smart to miss rpm db updates
+and thus get its understanding of installed packages out of sync.
+
+Upstream-Status: Pending
+
+Signed-off-by: Markus Lehtonen <markus.lehtonen@linux.intel.com>
+---
+ smart/channels/rpm_sys.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/smart/channels/rpm_sys.py b/smart/channels/rpm_sys.py
+index b9fda27..6f1fe94 100644
+--- a/smart/channels/rpm_sys.py
++++ b/smart/channels/rpm_sys.py
+@@ -22,6 +22,7 @@
+ from smart.backends.rpm.header import RPMDBLoader
+ from smart.backends.rpm.base import getTS, rpm_join_dbpath
+ from smart.channel import PackageChannel
++from smart.util.filetools import getFileDigest
+ from smart import *
+ import os
+ 
+@@ -35,7 +36,7 @@ class RPMSysChannel(PackageChannel):
+         dbdir = rpm_join_dbpath(sysconf.get("rpm-root", "/"),
+                             sysconf.get("rpm-dbpath", "var/lib/rpm"))
+         path = os.path.join(dbdir, "Packages")
+-        digest = os.path.getmtime(path)
++        digest = getFileDigest(path)
+         if digest == self._digest:
+             return True
+         self.removeLoaders()
+-- 
+2.6.6
+

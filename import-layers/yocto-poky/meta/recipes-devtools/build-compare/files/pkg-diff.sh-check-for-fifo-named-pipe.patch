@@ -1,0 +1,35 @@
+From a78fe4f792a9ac9f4d364e836c8855f48561d6f2 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Thu, 14 Jul 2016 19:52:18 -0700
+Subject: [PATCH 3/4] pkg-diff.sh: check for fifo(named pipe)
+
+Otherwise "cmp -s fifo1 fifo2" will wait for inputing forever.
+
+Upstream-Status: Submitted [https://github.com/openSUSE/build-compare/pull/10]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ pkg-diff.sh | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/pkg-diff.sh b/pkg-diff.sh
+index 5dd3a38..1f353aa 100644
+--- a/pkg-diff.sh
++++ b/pkg-diff.sh
+@@ -735,6 +735,13 @@ check_single_file()
+          return 1
+        fi
+        ;;
++     fifo*pipe*)
++       ftype_new="`/usr/bin/file new/$file | sed -e 's@^[^:]\+:[[:blank:]]*@@' -e 's@[[:blank:]]*$@@'`"
++       if [ "$ftype_new" = "$ftype"  ]; then
++         return 0
++       fi
++       return 1
++       ;;
+      *)
+        if ! diff_two_files; then
+            return 1
+-- 
+2.9.0
+

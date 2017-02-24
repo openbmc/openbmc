@@ -57,6 +57,8 @@ __config_regexp__  = re.compile( r"""
 __include_regexp__ = re.compile( r"include\s+(.+)" )
 __require_regexp__ = re.compile( r"require\s+(.+)" )
 __export_regexp__ = re.compile( r"export\s+([a-zA-Z0-9\-_+.${}/]+)$" )
+__unset_regexp__ = re.compile( r"unset\s+([a-zA-Z0-9\-_+.${}/]+)$" )
+__unset_flag_regexp__ = re.compile( r"unset\s+([a-zA-Z0-9\-_+.${}/]+)\[([a-zA-Z0-9\-_+.${}/]+)\]$" )
 
 def init(data):
     topdir = data.getVar('TOPDIR', False)
@@ -84,13 +86,13 @@ def include(parentfn, fn, lineno, data, error_out):
         bbpath = "%s:%s" % (dname, data.getVar("BBPATH", True))
         abs_fn, attempts = bb.utils.which(bbpath, fn, history=True)
         if abs_fn and bb.parse.check_dependency(data, abs_fn):
-            logger.warn("Duplicate inclusion for %s in %s" % (abs_fn, data.getVar('FILE', True)))
+            logger.warning("Duplicate inclusion for %s in %s" % (abs_fn, data.getVar('FILE', True)))
         for af in attempts:
             bb.parse.mark_dependency(data, af)
         if abs_fn:
             fn = abs_fn
     elif bb.parse.check_dependency(data, fn):
-        logger.warn("Duplicate inclusion for %s in %s" % (fn, data.getVar('FILE', True)))
+        logger.warning("Duplicate inclusion for %s in %s" % (fn, data.getVar('FILE', True)))
 
     try:
         bb.parse.handle(fn, data, True)
@@ -183,6 +185,16 @@ def feeder(lineno, s, fn, statements):
     m = __export_regexp__.match(s)
     if m:
         ast.handleExport(statements, fn, lineno, m)
+        return
+
+    m = __unset_regexp__.match(s)
+    if m:
+        ast.handleUnset(statements, fn, lineno, m)
+        return
+
+    m = __unset_flag_regexp__.match(s)
+    if m:
+        ast.handleUnsetFlag(statements, fn, lineno, m)
         return
 
     raise ParseError("unparsed line: '%s'" % s, fn, lineno);

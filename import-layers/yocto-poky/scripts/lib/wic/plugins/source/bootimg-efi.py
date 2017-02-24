@@ -84,7 +84,7 @@ class BootimgEFIPlugin(SourcePlugin):
     @classmethod
     def do_configure_gummiboot(cls, hdddir, creator, cr_workdir):
         """
-        Create loader-specific (gummiboot) config
+        Create loader-specific systemd-boot/gummiboot config
         """
         install_cmd = "install -d %s/loader" % hdddir
         exec_cmd(install_cmd)
@@ -149,7 +149,8 @@ class BootimgEFIPlugin(SourcePlugin):
         try:
             if source_params['loader'] == 'grub-efi':
                 cls.do_configure_grubefi(hdddir, creator, cr_workdir)
-            elif source_params['loader'] == 'gummiboot':
+            elif source_params['loader'] == 'gummiboot' \
+                 or source_params['loader'] == 'systemd-boot':
                 cls.do_configure_gummiboot(hdddir, creator, cr_workdir)
             else:
                 msger.error("unrecognized bootimg-efi loader: %s" % source_params['loader'])
@@ -189,13 +190,19 @@ class BootimgEFIPlugin(SourcePlugin):
                 exec_cmd(cp_cmd, True)
                 shutil.move("%s/grub.cfg" % cr_workdir,
                             "%s/hdd/boot/EFI/BOOT/grub.cfg" % cr_workdir)
-            elif source_params['loader'] == 'gummiboot':
+            elif source_params['loader'] == 'gummiboot' \
+                 or source_params['loader'] == 'systemd-boot':
                 cp_cmd = "cp %s/EFI/BOOT/* %s/EFI/BOOT" % (bootimg_dir, hdddir)
                 exec_cmd(cp_cmd, True)
             else:
                 msger.error("unrecognized bootimg-efi loader: %s" % source_params['loader'])
         except KeyError:
             msger.error("bootimg-efi requires a loader, none specified")
+
+        startup = os.path.join(bootimg_dir, "startup.nsh")
+        if os.path.exists(startup):
+            cp_cmd = "cp %s %s/" % (startup, hdddir)
+            exec_cmd(cp_cmd, True)
 
         du_cmd = "du -bks %s" % hdddir
         out = exec_cmd(du_cmd)
@@ -210,12 +217,6 @@ class BootimgEFIPlugin(SourcePlugin):
 
         msger.debug("Added %d extra blocks to %s to get to %d total blocks" % \
                     (extra_blocks, part.mountpoint, blocks))
-
-        # Ensure total sectors is an integral number of sectors per
-        # track or mcopy will complain. Sectors are 512 bytes, and we
-        # generate images with 32 sectors per track. This calculation is
-        # done in blocks, thus the mod by 16 instead of 32.
-        blocks += (16 - (blocks % 16))
 
         # dosfs image, created by mkdosfs
         bootimg = "%s/boot.img" % cr_workdir

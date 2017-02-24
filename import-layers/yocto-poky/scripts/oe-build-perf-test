@@ -1,0 +1,211 @@
+#!/usr/bin/python3
+#
+# Build performance test script
+#
+# Copyright (c) 2016, Intel Corporation.
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms and conditions of the GNU General Public License,
+# version 2, as published by the Free Software Foundation.
+#
+# This program is distributed in the hope it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+"""Build performance test script"""
+import argparse
+import errno
+import fcntl
+import logging
+import os
+import shutil
+import sys
+import unittest
+from datetime import datetime
+
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)) + '/lib')
+import scriptpath
+scriptpath.add_oe_lib_path()
+import oeqa.buildperf
+from oeqa.buildperf import (BuildPerfTestLoader, BuildPerfTestResult,
+                            BuildPerfTestRunner, KernelDropCaches)
+from oeqa.utils.commands import runCmd
+from oeqa.utils.git import GitRepo, GitError
+
+
+# Set-up logging
+LOG_FORMAT = '[%(asctime)s] %(levelname)s: %(message)s'
+logging.basicConfig(level=logging.INFO, format=LOG_FORMAT,
+                    datefmt='%Y-%m-%d %H:%M:%S')
+log = logging.getLogger()
+
+
+def acquire_lock(lock_f):
+    """Acquire flock on file"""
+    log.debug("Acquiring lock %s", os.path.abspath(lock_f.name))
+    try:
+        fcntl.flock(lock_f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except IOError as err:
+        if err.errno == errno.EAGAIN:
+            return False
+        raise
+    log.debug("Lock acquired")
+    return True
+
+
+def pre_run_sanity_check():
+    """Sanity check of build environment"""
+    build_dir = os.environ.get("BUILDDIR")
+    if not build_dir:
+        log.error("BUILDDIR not set. Please run the build environmnent setup "
+                  "script.")
+        return False
+    if os.getcwd() != build_dir:
+        log.error("Please run this script under BUILDDIR (%s)", build_dir)
+        return False
+
+    ret = runCmd('which bitbake', ignore_status=True)
+    if ret.status:
+        log.error("bitbake command not found")
+        return False
+    return True
+
+def init_git_repo(path):
+    """Check/create Git repository where to store results"""
+    path = os.path.abspath(path)
+    if os.path.isfile(path):
+        log.error("Invalid Git repo %s: path exists but is not a directory", path)
+        return False
+    if not os.path.isdir(path):
+        try:
+            os.mkdir(path)
+        except (FileNotFoundError, PermissionError) as err:
+            log.error("Failed to mkdir %s: %s", path, err)
+            return False
+    if not os.listdir(path):
+        log.info("Initializing a new Git repo at %s", path)
+        GitRepo.init(path)
+    try:
+        GitRepo(path, is_topdir=True)
+    except GitError:
+        log.error("No Git repository but a non-empty directory found at %s.\n"
+                  "Please specify a Git repository, an empty directory or "
+                  "a non-existing directory", path)
+        return False
+    return True
+
+
+def setup_file_logging(log_file):
+    """Setup loggin to file"""
+    log_dir = os.path.dirname(log_file)
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+    formatter = logging.Formatter(LOG_FORMAT)
+    handler = logging.FileHandler(log_file)
+    handler.setFormatter(formatter)
+    log.addHandler(handler)
+
+
+def archive_build_conf(out_dir):
+    """Archive build/conf to test results"""
+    src_dir = os.path.join(os.environ['BUILDDIR'], 'conf')
+    tgt_dir = os.path.join(out_dir, 'build', 'conf')
+    os.makedirs(os.path.dirname(tgt_dir))
+    shutil.copytree(src_dir, tgt_dir)
+
+
+def parse_args(argv):
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    parser.add_argument('-D', '--debug', action='store_true',
+                        help='Enable debug level logging')
+    parser.add_argument('--globalres-file',
+                        type=os.path.abspath,
+                        help="Append results to 'globalres' csv file")
+    parser.add_argument('--lock-file', default='./oe-build-perf.lock',
+                        metavar='FILENAME', type=os.path.abspath,
+                        help="Lock file to use")
+    parser.add_argument('-o', '--out-dir', default='results-{date}',
+                        type=os.path.abspath,
+                        help="Output directory for test results")
+    parser.add_argument('--log-file',
+                        default='{out_dir}/oe-build-perf-test.log',
+                        help="Log file of this script")
+    parser.add_argument('--run-tests', nargs='+', metavar='TEST',
+                        help="List of tests to run")
+    parser.add_argument('--commit-results', metavar='GIT_DIR',
+                        type=os.path.abspath,
+                        help="Commit result data to a (local) git repository")
+    parser.add_argument('--commit-results-branch', metavar='BRANCH',
+                        default="{git_branch}",
+                        help="Commit results to branch BRANCH.")
+    parser.add_argument('--commit-results-tag', metavar='TAG',
+                        default="{git_branch}/{git_commit_count}-g{git_commit}/{tag_num}",
+                        help="Tag results commit with TAG.")
+
+    return parser.parse_args(argv)
+
+
+def main(argv=None):
+    """Script entry point"""
+    args = parse_args(argv)
+
+    # Set-up log file
+    out_dir = args.out_dir.format(date=datetime.now().strftime('%Y%m%d%H%M%S'))
+    setup_file_logging(args.log_file.format(out_dir=out_dir))
+
+    if args.debug:
+        log.setLevel(logging.DEBUG)
+
+    lock_f = open(args.lock_file, 'w')
+    if not acquire_lock(lock_f):
+        log.error("Another instance of this script is running, exiting...")
+        return 1
+
+    if not pre_run_sanity_check():
+        return 1
+    if args.commit_results:
+        if not init_git_repo(args.commit_results):
+            return 1
+
+    # Check our capability to drop caches and ask pass if needed
+    KernelDropCaches.check()
+
+    # Load build perf tests
+    loader = BuildPerfTestLoader()
+    if args.run_tests:
+        suite = loader.loadTestsFromNames(args.run_tests, oeqa.buildperf)
+    else:
+        suite = loader.loadTestsFromModule(oeqa.buildperf)
+
+    archive_build_conf(out_dir)
+    runner = BuildPerfTestRunner(out_dir, verbosity=2)
+
+    # Suppress logger output to stderr so that the output from unittest
+    # is not mixed with occasional logger output
+    log.handlers[0].setLevel(logging.CRITICAL)
+
+    # Run actual tests
+    result = runner.run(suite)
+
+    # Restore logger output to stderr
+    log.handlers[0].setLevel(log.level)
+
+    if args.globalres_file:
+        result.update_globalres_file(args.globalres_file)
+    if args.commit_results:
+        result.git_commit_results(args.commit_results,
+                                  args.commit_results_branch,
+                                  args.commit_results_tag)
+    if result.wasSuccessful():
+        return 0
+
+    return 2
+
+
+if __name__ == '__main__':
+    sys.exit(main())
+

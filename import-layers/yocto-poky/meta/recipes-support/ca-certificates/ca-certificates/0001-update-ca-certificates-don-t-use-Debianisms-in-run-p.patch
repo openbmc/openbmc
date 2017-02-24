@@ -6,9 +6,13 @@ This solves errors such as
 
 | Running hooks in [...]/rootfs/etc/ca-certificates/update.d...
 | [...]/usr/sbin/update-ca-certificates: line 194: Not: command not found
+| [...]/usr/sbin/update-ca-certificates: line 230: Not a directory: --: command not found
+| E: Not a directory: -- exited with code 127.
+
 
 Upstream-Status: Inappropriate
 Signed-off-by: Ross Burton <ross.burton@intel.com>
+Signed-off-by: Maciej Borzecki <maciej.borzecki@rndity.com>
 ---
  sbin/update-ca-certificates | 4 +---
  1 file changed, 1 insertion(+), 3 deletions(-)
@@ -24,7 +28,7 @@ Index: git/sbin/update-ca-certificates
 -  VERBOSE_ARG=
 -  [ "$verbose" = 0 ] || VERBOSE_ARG="--verbose"
 -  eval run-parts "$VERBOSE_ARG" --test -- "$HOOKSDIR" | while read hook
-+  eval run-parts --test -- "$HOOKSDIR" | while read hook
++  eval run-parts --test "$HOOKSDIR" | while read hook
    do
      ( cat "$ADDED"
        cat "$REMOVED" ) | "$hook" || echo "E: $hook exited with code $?."
