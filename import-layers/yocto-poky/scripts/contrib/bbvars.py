@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,12 +24,12 @@ import os.path
 import re
 
 def usage():
-    print 'Usage: %s -d FILENAME [-d FILENAME]* -m METADIR [-m MATADIR]*' % os.path.basename(sys.argv[0])
-    print '  -d FILENAME         documentation file to search'
-    print '  -h, --help          display this help and exit'
-    print '  -m METADIR          meta directory to search for recipes'
-    print '  -t FILENAME         documentation config file (for doc tags)'
-    print '  -T                  Only display variables with doc tags (requires -t)'
+    print('Usage: %s -d FILENAME [-d FILENAME]* -m METADIR [-m MATADIR]*' % os.path.basename(sys.argv[0]))
+    print('  -d FILENAME         documentation file to search')
+    print('  -h, --help          display this help and exit')
+    print('  -m METADIR          meta directory to search for recipes')
+    print('  -t FILENAME         documentation config file (for doc tags)')
+    print('  -T                  Only display variables with doc tags (requires -t)')
 
 def recipe_bbvars(recipe):
     ''' Return a unique set of every bbvar encountered in the recipe '''
@@ -37,9 +37,9 @@ def recipe_bbvars(recipe):
     vset = set()
     try:
         r = open(recipe)
-    except IOError as (errno, strerror):
-        print 'WARNING: Failed to open recipe ', recipe
-        print strerror
+    except IOError as err:
+        print('WARNING: Failed to open recipe ', recipe)
+        print(err.args[1])
 
     for line in r:
         # Strip any comments from the line
@@ -59,8 +59,8 @@ def collect_bbvars(metadir):
     for root,dirs,files in os.walk(metadir):
         for name in files:
             if name.find(".bb") >= 0:
-                for key in recipe_bbvars(os.path.join(root,name)).iterkeys():
-                    if bbvars.has_key(key):
+                for key in recipe_bbvars(os.path.join(root,name)).keys():
+                    if key in bbvars:
                         bbvars[key] = bbvars[key] + 1
                     else:
                         bbvars[key] = 1
@@ -71,9 +71,9 @@ def bbvar_is_documented(var, docfiles):
     for doc in docfiles:
         try:
             f = open(doc)
-        except IOError as (errno, strerror):
-            print 'WARNING: Failed to open doc ', doc
-            print strerror
+        except IOError as err:
+            print('WARNING: Failed to open doc ', doc)
+            print(err.args[1])
         for line in f:
             if prog.match(line):
                 return True
@@ -87,8 +87,8 @@ def bbvar_doctag(var, docconf):
 
     try:
         f = open(docconf)
-    except IOError as (errno, strerror):
-        return strerror
+    except IOError as err:
+        return err.args[1]
 
     for line in f:
         m = prog.search(line)
@@ -109,8 +109,8 @@ def main():
     # Collect and validate input
     try:
         opts, args = getopt.getopt(sys.argv[1:], "d:hm:t:T", ["help"])
-    except getopt.GetoptError, err:
-        print '%s' % str(err)
+    except getopt.GetoptError as err:
+        print('%s' % str(err))
         usage()
         sys.exit(2)
 
@@ -122,13 +122,13 @@ def main():
             if os.path.isfile(a):
                 docfiles.append(a)
             else:
-                print 'ERROR: documentation file %s is not a regular file' % (a)
+                print('ERROR: documentation file %s is not a regular file' % a)
                 sys.exit(3)
         elif o == '-m':
             if os.path.isdir(a):
                 metadirs.append(a)
             else:
-                print 'ERROR: meta directory %s is not a directory' % (a)
+                print('ERROR: meta directory %s is not a directory' % a)
                 sys.exit(4)
         elif o == "-t":
             if os.path.isfile(a):
@@ -139,31 +139,31 @@ def main():
             assert False, "unhandled option"
 
     if len(docfiles) == 0:
-        print 'ERROR: no docfile specified'
+        print('ERROR: no docfile specified')
         usage()
         sys.exit(5)
 
     if len(metadirs) == 0:
-        print 'ERROR: no metadir specified'
+        print('ERROR: no metadir specified')
         usage()
         sys.exit(6)
 
     if onlydoctags and docconf == "":
-        print 'ERROR: no docconf specified'
+        print('ERROR: no docconf specified')
         usage()
         sys.exit(7)
 
     # Collect all the variable names from the recipes in the metadirs
     for m in metadirs:
-        for key,cnt in collect_bbvars(m).iteritems():
-            if bbvars.has_key(key):
+        for key,cnt in collect_bbvars(m).items():
+            if key in bbvars:
                 bbvars[key] = bbvars[key] + cnt
             else:
                 bbvars[key] = cnt
 
     # Check each var for documentation
     varlen = 0
-    for v in bbvars.iterkeys():
+    for v in bbvars.keys():
         if len(v) > varlen:
             varlen = len(v)
         if not bbvar_is_documented(v, docfiles):
@@ -172,14 +172,14 @@ def main():
     varlen = varlen + 1
 
     # Report all undocumented variables
-    print 'Found %d undocumented bb variables (out of %d):' % (len(undocumented), len(bbvars))
+    print('Found %d undocumented bb variables (out of %d):' % (len(undocumented), len(bbvars)))
     header = '%s%s%s' % (str("VARIABLE").ljust(varlen), str("COUNT").ljust(6), str("DOCTAG").ljust(7))
-    print header
-    print str("").ljust(len(header), '=')
+    print(header)
+    print(str("").ljust(len(header), '='))
     for v in undocumented:
         doctag = bbvar_doctag(v, docconf)
         if not onlydoctags or not doctag == "":
-            print '%s%s%s' % (v.ljust(varlen), str(bbvars[v]).ljust(6), doctag)
+            print('%s%s%s' % (v.ljust(varlen), str(bbvars[v]).ljust(6), doctag))
 
 
 if __name__ == "__main__":

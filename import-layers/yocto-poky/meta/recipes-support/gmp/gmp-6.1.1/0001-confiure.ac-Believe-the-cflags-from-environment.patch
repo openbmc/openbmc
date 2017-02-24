@@ -1,0 +1,52 @@
+From ae1a4c37417a3bbbf8ea1cab198982b0cad47e29 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 12 Aug 2016 17:08:13 +0000
+Subject: [PATCH] confiure.ac: Believe the cflags from environment
+
+In some toolchains e.g. OpenEmbedded -march options
+are passed on compiler cmdline, it does not use
+the expected target triplets to make these decision
+during configure.
+
+Secondly, dont set armv4 for march when no selection
+is made, since it is passed from cmdline
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Inappropriate[OE-Specific]
+
+ configure.ac | 11 -----------
+ 1 file changed, 11 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 857ea3b..359e919 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -607,15 +607,6 @@ case $host in
+     GMP_INCLUDE_MPN(arm/arm-defs.m4)
+     CALLING_CONVENTIONS_OBJS='arm32call.lo arm32check.lo'
+ 
+-    # This is needed for clang, which is not content with flags like -mfpu=neon
+-    # alone.
+-    case $host in
+-      *-*-*eabi)
+-        gcc_cflags_fpmode="-mfloat-abi=softfp" ;;
+-      *-*-*eabihf)
+-        gcc_cflags_fpmode="-mfloat-abi=hard" ;;
+-    esac
+-
+     # FIXME: We make mandatory compiler options optional here.  We should
+     # either enforce them, or organise to strip paths as the corresponding
+     # options fail.
+@@ -686,8 +677,6 @@ case $host in
+ 	;;
+       *)
+ 	path="arm"
+-	gcc_cflags_arch="-march=armv4"
+-	GMP_DEFINE_RAW(["define(<NOTHUMB>,1)"])
+ 	;;
+     esac
+     ;;
+-- 
+1.9.1
+

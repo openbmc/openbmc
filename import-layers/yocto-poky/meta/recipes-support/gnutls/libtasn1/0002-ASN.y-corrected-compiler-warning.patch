@@ -1,0 +1,28 @@
+From 3542c01618fcde83b29640ea2c60bfd2629ae0b7 Mon Sep 17 00:00:00 2001
+From: Nikos Mavrogiannopoulos <nmav@redhat.com>
+Date: Tue, 26 Jul 2016 08:47:49 +0200
+Subject: [PATCH 2/4] ASN.y: corrected compiler warning
+
+---
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+ lib/ASN1.y | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/ASN1.y b/lib/ASN1.y
+index 731415d..6db638f 100644
+--- a/lib/ASN1.y
++++ b/lib/ASN1.y
+@@ -621,7 +621,7 @@ _asn1_create_errorDescription (int error, char *error_desc)
+     case ASN1_NAME_TOO_LONG:
+       snprintf (error_desc, ASN1_MAX_ERROR_DESCRIPTION_SIZE,
+                 "%s:%u: name too long (more than %u characters)", file_name,
+-                line_number, ASN1_MAX_NAME_SIZE);
++                line_number, (unsigned)ASN1_MAX_NAME_SIZE);
+       break;
+     case ASN1_IDENTIFIER_NOT_FOUND:
+       snprintf (error_desc, ASN1_MAX_ERROR_DESCRIPTION_SIZE,
+-- 
+1.9.1
+

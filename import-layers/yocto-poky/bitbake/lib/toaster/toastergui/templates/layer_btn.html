@@ -1,17 +1,17 @@
-<button class="btn btn-danger btn-block layer-exists-{{data.pk}} layerbtn"  data-layer='{ "id": {{data.pk}}, "name":  "{{data.layer.name}}", "layerdetailurl": "{%url 'layerdetails' extra.pid data.pk%}"}' data-directive="remove"
+<a class="btn btn-danger btn-block layer-exists-{{data.pk}} layerbtn"  data-layer='{ "id": {{data.pk}}, "name":  "{{data.layer.name}}", "layerdetailurl": "{%url 'layerdetails' extra.pid data.pk%}"}' data-directive="remove"
     {% if data.pk not in extra.current_layers %}
     style="display:none;"
     {% endif %}
   >
-  <i class="icon-trash"></i>
+  <span class="glyphicon glyphicon-trash"></span>
   Remove layer
-</button>
-<button class="btn btn-block layer-add-{{data.pk}} layerbtn" data-layer='{ "id": {{data.pk}}, "name":  "{{data.layer.name}}", "layerdetailurl": "{%url 'layerdetails' extra.pid data.pk%}"}' data-directive="add"
+</a>
+<a class="btn btn-default btn-block layer-add-{{data.pk}} layerbtn" data-layer='{ "id": {{data.pk}}, "name":  "{{data.layer.name}}", "layerdetailurl": "{%url 'layerdetails' extra.pid data.pk%}"}' data-directive="add"
     {% if data.pk in extra.current_layers %}
     style="display:none;"
     {% endif %}
   >
-  <i class="icon-plus"></i>
+  <span class="glyphicon glyphicon-plus"></span>
   Add layer
-</button>
+</a>
 

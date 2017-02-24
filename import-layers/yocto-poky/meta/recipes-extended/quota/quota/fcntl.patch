@@ -59,20 +59,6 @@ Index: quota-tools/dqblk_v2.h
  #include <sys/types.h>
  #include "quota_tree.h"
  
-Index: quota-tools/quotaops.c
-===================================================================
---- quota-tools.orig/quotaops.c
-+++ quota-tools/quotaops.c
-@@ -34,7 +34,9 @@
- 
- #include "config.h"
- 
-+#if defined(RPC)
- #include <rpc/rpc.h>
-+#endif
- #include <sys/types.h>
- #include <sys/stat.h>
- #include <sys/file.h>
 Index: quota-tools/rquota_client.c
 ===================================================================
 --- quota-tools.orig/rquota_client.c
@@ -97,17 +83,3 @@ Index: quota-tools/rquota_client.c
  #include "common.h"
  #include "quotaio.h"
  #include "quotasys.h"
-Index: quota-tools/setquota.c
-===================================================================
---- quota-tools.orig/setquota.c
-+++ quota-tools/setquota.c
-@@ -7,7 +7,9 @@
- 
- #include "config.h"
- 
-+#if defined(RPC)
- #include <rpc/rpc.h>
-+#endif
- #include <sys/types.h>
- #include <errno.h>
- #include <stdio.h>

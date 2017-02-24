@@ -1,0 +1,45 @@
+Remove the perl checks in intltool.m4.  This can find a different perl binary to
+the one that the intltool scripts will actually be using (as they hard-code a
+specific binary), for example in the intltool-native case they'll be using
+nativeperl yet this fragment can find and test the host perl.
+
+This can result in recipes failing in do_configure as intltool.m4 finds a host
+perl which doesn't have XML::Parser installed, despite the fact that intltool
+will work fine as nativeperl has XML::Parser.
+
+Upstream-Status: Submitted (https://bugs.launchpad.net/intltool/+bug/1197875)
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+--- a/intltool.m4.orig	2013-07-02 11:22:23.000000000 -0700
++++ b/intltool.m4	2013-07-02 11:22:32.000000000 -0700
+@@ -26,1 +26,1 @@ dnl IT_PROG_INTLTOOL([MINIMUM-VERSION], [no-xml])
+-# serial 42 IT_PROG_INTLTOOL
++# serial 42.1 IT_PROG_INTLTOOL
+@@ -131,27 +131,6 @@ if test -z "$xgversion" -o -z "$mmversio
+     AC_MSG_ERROR([GNU gettext tools not found; required for intltool])
+ fi
+ 
+-AC_PATH_PROG(INTLTOOL_PERL, perl)
+-if test -z "$INTLTOOL_PERL"; then
+-   AC_MSG_ERROR([perl not found])
+-fi
+-AC_MSG_CHECKING([for perl >= 5.8.1])
+-$INTLTOOL_PERL -e "use 5.8.1;" > /dev/null 2>&1
+-if test $? -ne 0; then
+-   AC_MSG_ERROR([perl 5.8.1 is required for intltool])
+-else
+-   IT_PERL_VERSION=`$INTLTOOL_PERL -e "printf '%vd', $^V"`
+-   AC_MSG_RESULT([$IT_PERL_VERSION])
+-fi
+-if test "x$2" != "xno-xml"; then
+-   AC_MSG_CHECKING([for XML::Parser])
+-   if `$INTLTOOL_PERL -e "require XML::Parser" 2>/dev/null`; then
+-       AC_MSG_RESULT([ok])
+-   else
+-       AC_MSG_ERROR([XML::Parser perl module is required for intltool])
+-   fi
+-fi
+-
+ # Substitute ALL_LINGUAS so we can use it in po/Makefile
+ AC_SUBST(ALL_LINGUAS)
+ 

@@ -11,14 +11,13 @@ this off.
 Upstream-Status: Inappropriate
 Signed-off-by: Roy.Li <rongqing.li@windriver.com>
 ---
- configure |   60 ++++++------------------------------------------------------
- 1 files changed, 6 insertions(+), 54 deletions(-)
+ configure |   72 +++++---------------------------------------------------------
+ 1 file changed, 6 insertions(+), 66 deletions(-)
 
 diff --git a/configure b/configure
-index f1586c3..d22814f 100755
 --- a/configure
 +++ b/configure
-@@ -6991,6 +6991,7 @@ $as_echo_n "checking for the pcre library and header files ... " >&6; }
+@@ -7191,6 +7191,7 @@ $as_echo_n "checking for the pcre library and header files ... " >&6; }
  	 /usr/include/pcre,/usr/lib \
  	 /usr/pcre/include,/usr/pcre/lib \
  	 /usr/include,/usr/lib \
@@ -26,7 +25,7 @@ index f1586c3..d22814f 100755
  	 /opt/include/pcre,/opt/lib \
  	 /opt/pcre/include,/opt/pcre/lib \
  	 /opt/include,/opt/lib"
-@@ -7021,14 +7022,14 @@ $as_echo_n "checking for the pcre library and header files ... " >&6; }
+@@ -7221,14 +7222,14 @@ $as_echo_n "checking for the pcre library and header files ... " >&6; }
          xincdir=`echo $include_and_lib | tr ',' ' ' | awk '{print $1}'`
  	xlibdir=`echo $include_and_lib | tr ',' ' ' | awk '{print $2}'`
  	found=0
@@ -45,7 +44,7 @@ index f1586c3..d22814f 100755
  	      jd_with_pcre_library="yes"
  	      found=1
  	      break
-@@ -7054,56 +7055,7 @@ $as_echo "yes: $jd_pcre_library_dir and $jd_pcre_include_dir" >&6; }
+@@ -7255,68 +7255,7 @@ $as_echo "yes: $jd_pcre_library_dir and $jd_pcre_include_dir" >&6; }
      then
        PCRE_LIB=""
      else
@@ -74,7 +73,7 @@ index f1586c3..d22814f 100755
 -      fi
 -    fi
 -  ;;
--  *osf*|*openbsd*)
+-  *osf*|*openbsd*|*freebsd*)
 -    if test "X$GCC" = Xyes
 -    then
 -      RPATH="-Wl,-rpath,"
@@ -95,7 +94,19 @@ index f1586c3..d22814f 100755
 -      RPATH="$RPATH$jd_pcre_library_dir"
 -    fi
 -  else
--    RPATH="$RPATH:$jd_pcre_library_dir"
+-    _already_there=0
+-    for X in `echo $RPATH | sed 's/:/ /g'`
+-    do
+-      if test "$X" = "$jd_pcre_library_dir"
+-      then
+-        _already_there=1
+-	break
+-      fi
+-    done
+-    if test $_already_there = 0
+-    then
+-      RPATH="$RPATH:$jd_pcre_library_dir"
+-    fi
 -  fi
 -fi
 -
@@ -103,6 +114,3 @@ index f1586c3..d22814f 100755
      fi
  
      PCRE_INC=-I$jd_pcre_include_dir
--- 
-1.7.4.1
-

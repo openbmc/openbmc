@@ -1,6 +1,6 @@
 inherit crosssdk
 
-PN = "gcc-crosssdk-initial-${TARGET_ARCH}"
+PN = "gcc-crosssdk-initial-${SDK_SYS}"
 
 SYSTEMHEADERS = "${SDKPATHNATIVE}${prefix_nativesdk}/include"
 SYSTEMLIBS = "${SDKPATHNATIVE}${base_libdir_nativesdk}/"

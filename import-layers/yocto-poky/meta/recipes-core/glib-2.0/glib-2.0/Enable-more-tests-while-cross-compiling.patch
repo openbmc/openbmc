@@ -46,7 +46,7 @@ index 868873f..533e454 100644
 @@ -545,7 +548,6 @@ test.gresource: test.gresource.xml Makefile $(shell $(glib_compile_resources) --
  
  EXTRA_DIST += test.gresource.xml test1.txt test2.gresource.xml test2.txt test3.gresource.xml test3.txt test4.gresource.xml
- CLEANFILES += test_resources.c test_resources2.[ch] plugin_resources.c test.gresource
+ CLEANFILES += test-generated.txt test_resources.c test_resources2.[ch] plugin_resources.c test.gresource
 -endif # !CROSS_COMPILING
  
  BUILT_SOURCES += giotypefuncs.c

@@ -1,0 +1,57 @@
+From b1ed3533433501ec52c8289a5b3a294e57e7f798 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <martin.jansa@gmail.com>
+Date: Thu, 26 May 2016 11:31:52 +0000
+Subject: [PATCH] src/video: make it compatible with wayland 1.10
+
+| build/.libs/SDL_waylandevents.o: In function `wl_registry_bind':
+| /usr/include/wayland-client-protocol.h:305: undefined reference to `wl_proxy_marshal_constructor_versioned'
+| /usr/include/wayland-client-protocol.h:305: undefined reference to `wl_proxy_marshal_constructor_versioned'
+| build/.libs/SDL_waylandkeyboard.o: In function `wl_registry_bind':
+| /usr/include/wayland-client-protocol.h:305: undefined reference to `wl_proxy_marshal_constructor_versioned'
+| /usr/include/wayland-client-protocol.h:305: undefined reference to `wl_proxy_marshal_constructor_versioned'
+| build/.libs/SDL_waylandvideo.o: In function `wl_registry_bind':
+| /usr/include/wayland-client-protocol.h:305: undefined reference to `wl_proxy_marshal_constructor_versioned'
+| collect2: error: ld returned 1 exit status
+| make: *** [build/libSDL2.la] Error 1
+| ERROR: oe_runmake failed
+
+Upstream-Status: Pending
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
+---
+ src/video/wayland/SDL_waylanddyn.h | 1 +
+ src/video/wayland/SDL_waylandsym.h | 4 ++++
+ src/video/webos/SDL_waylanddyn.h   | 1 +
+ src/video/webos/SDL_waylandsym.h   | 4 ++++
+ 4 files changed, 10 insertions(+)
+
+diff --git a/src/video/wayland/SDL_waylanddyn.h b/src/video/wayland/SDL_waylanddyn.h
+index 8d9313a..c7b0157 100644
+--- a/src/video/wayland/SDL_waylanddyn.h
++++ b/src/video/wayland/SDL_waylanddyn.h
+@@ -79,6 +79,7 @@ void SDL_WAYLAND_UnloadSymbols(void);
+ #define wl_proxy_get_user_data (*WAYLAND_wl_proxy_get_user_data)
+ #define wl_proxy_add_listener (*WAYLAND_wl_proxy_add_listener)
+ #define wl_proxy_marshal_constructor (*WAYLAND_wl_proxy_marshal_constructor)
++#define wl_proxy_marshal_constructor_versioned (*WAYLAND_wl_proxy_marshal_constructor_versioned)
+ 
+ #define wl_seat_interface (*WAYLAND_wl_seat_interface)
+ #define wl_surface_interface (*WAYLAND_wl_surface_interface)
+diff --git a/src/video/wayland/SDL_waylandsym.h b/src/video/wayland/SDL_waylandsym.h
+index c3b4fa5..b9a0d97 100644
+--- a/src/video/wayland/SDL_waylandsym.h
++++ b/src/video/wayland/SDL_waylandsym.h
+@@ -55,6 +55,10 @@ SDL_WAYLAND_SYM(void, wl_list_insert_list, (struct wl_list *, struct wl_list *))
+ SDL_WAYLAND_MODULE(WAYLAND_CLIENT_1_4)
+ SDL_WAYLAND_SYM(struct wl_proxy *, wl_proxy_marshal_constructor, (struct wl_proxy *, uint32_t opcode, const struct wl_interface *interface, ...))
+ 
++/* These functions are available in Wayland >= 1.10 */
++SDL_WAYLAND_MODULE(WAYLAND_CLIENT_1_10)
++SDL_WAYLAND_SYM(struct wl_proxy *, wl_proxy_marshal_constructor_versioned, (struct wl_proxy *proxy, uint32_t opcode, const struct wl_interface *interface, uint32_t version, ...))
++
+ SDL_WAYLAND_INTERFACE(wl_seat_interface)
+ SDL_WAYLAND_INTERFACE(wl_surface_interface)
+ SDL_WAYLAND_INTERFACE(wl_shm_pool_interface)
+-- 
+1.9.1
+

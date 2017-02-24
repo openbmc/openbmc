@@ -1,4 +1,4 @@
-OPTIONS="-C"
+#OPTIONS="-C"
 # The above option means syslogd will log to 16K shm circular buffer.
 # You could use `logread' to read it.
 

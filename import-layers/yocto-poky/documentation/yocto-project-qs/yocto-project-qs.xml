@@ -255,8 +255,7 @@
                         tar 1.24 or greater
                         </para></listitem>
                     <listitem><para>
-                        Python 2.7.3 or greater excluding Python
-                        3.x, which is not supported.
+                        Python 3.4.0 or greater.
                         </para></listitem>
                 </itemizedlist>
                 If your build host does not meet any of these three listed
@@ -391,8 +390,8 @@
         </para>
 
         <para>
-            You can try out the Yocto Project using the command-line interface
-            by finishing this quick start, which presents steps that let you
+            To use the Yocto Project through the command-line interface,
+            finish this quick start, which presents steps that let you
             do the following:
             <itemizedlist>
                 <listitem><para>
@@ -401,230 +400,239 @@
                     </para></listitem>
                 <listitem><para>
                     Easily change configurations so that you can quickly
-                    create a second image, which would be for MinnowBoard
+                    create a second image that you can load onto bootable
+                    media and actually boot target hardware.
+                    This example uses the MinnowBoard
                     MAX-compatible boards.
                     </para></listitem>
             </itemizedlist>
             <note>
-                The steps in this section do not provide detail, but rather
-                provide minimal, working commands and examples designed to
-                just get you started.
+                The steps in the following two sections do not provide detail,
+                but rather provide minimal, working commands and examples
+                designed to just get you started.
                 For more details, see the appropriate manuals in the
                 <ulink url='&YOCTO_HOME_URL;/documentation'>Yocto Project manual set</ulink>.
             </note>
         </para>
 
-        <para>
-            Use the following commands to build your image.
-            The OpenEmbedded build system creates an entire Linux
-            distribution, including the toolchain, from source.
-            <note><title>Note about Network Proxies</title>
-                <para>
-                    By default, the build process searches for source code
-                    using a pre-determined order through a set of
-                    locations.
-                    If you are working behind a firewall and your build
-                    host is not set up for proxies, you could encounter
-                    problems with the build process when fetching source
-                    code (e.g. fetcher failures or Git failures).
-                </para>
+        <section id='building-an-image-for-emulation'>
+            <title>Building an Image for Emulation</title>
 
-                <para>
-                    If you do not know your proxy settings, consult your
-                    local network infrastructure resources and get that
-                    information.
-                    A good starting point could also be to check your web
-                    browser settings.
-                    Finally, you can find more information on using the
-                    Yocto Project behind a firewall in the Yocto Project
-                    Reference Manual
-                    <ulink url='&YOCTO_DOCS_REF_URL;#how-does-the-yocto-project-obtain-source-code-and-will-it-work-behind-my-firewall-or-proxy-server'>FAQ</ulink>
-                    and on the
-                    "<ulink url='https://wiki.yoctoproject.org/wiki/Working_Behind_a_Network_Proxy'>Working Behind a Network Proxy</ulink>"
-                    wiki page.
-                </para>
-            </note>
-        </para>
+            <para>
+                Use the following commands to build your image.
+                The OpenEmbedded build system creates an entire Linux
+                distribution, including the toolchain, from source.
+                <note><title>Note about Network Proxies</title>
+                    <para>
+                        By default, the build process searches for source code
+                        using a pre-determined order through a set of
+                        locations.
+                        If you are working behind a firewall and your build
+                        host is not set up for proxies, you could encounter
+                        problems with the build process when fetching source
+                        code (e.g. fetcher failures or Git failures).
+                    </para>
 
-        <para>
-            <orderedlist>
-                <listitem><para><emphasis>Be Sure Your Build Host is Set Up:</emphasis>
-                    The steps to build an image in this section depend on
-                    your build host being properly set up.
-                    Be sure you have worked through the requirements
-                    described in the
-                    "<link linkend='yp-resources'>Setting Up to Use the Yocto Project</link>"
-                    section.
-                    </para></listitem>
-                <listitem><para><emphasis>Check Out Your Branch:</emphasis>
-                    Be sure you are in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
-                    (e.g. <filename>poky</filename>) and then check out
-                    the branch associated with the latest Yocto Project
-                    Release:
-                    <literallayout class='monospaced'>
+                    <para>
+                        If you do not know your proxy settings, consult your
+                        local network infrastructure resources and get that
+                        information.
+                        A good starting point could also be to check your web
+                        browser settings.
+                        Finally, you can find more information on using the
+                        Yocto Project behind a firewall in the Yocto Project
+                        Reference Manual
+                        <ulink url='&YOCTO_DOCS_REF_URL;#how-does-the-yocto-project-obtain-source-code-and-will-it-work-behind-my-firewall-or-proxy-server'>FAQ</ulink>
+                        and on the
+                        "<ulink url='https://wiki.yoctoproject.org/wiki/Working_Behind_a_Network_Proxy'>Working Behind a Network Proxy</ulink>"
+                        wiki page.
+                    </para>
+                </note>
+            </para>
+
+            <para>
+                <orderedlist>
+                    <listitem><para><emphasis>Be Sure Your Build Host is Set Up:</emphasis>
+                        The steps to build an image in this section depend on
+                        your build host being properly set up.
+                        Be sure you have worked through the requirements
+                        described in the
+                        "<link linkend='yp-resources'>Setting Up to Use the Yocto Project</link>"
+                        section.
+                        </para></listitem>
+                    <listitem><para><emphasis>Check Out Your Branch:</emphasis>
+                        Be sure you are in the
+                        <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+                        (e.g. <filename>poky</filename>) and then check out
+                        the branch associated with the latest Yocto Project
+                        Release:
+                        <literallayout class='monospaced'>
      $ cd ~/poky
      $ git checkout -b &DISTRO_NAME_NO_CAP; origin/&DISTRO_NAME_NO_CAP;
-                    </literallayout>
-                    Git's <filename>checkout</filename> command checks out
-                    the current Yocto Project release into a local branch
-                    whose name matches the release (i.e.
-                    <filename>&DISTRO_NAME_NO_CAP;</filename>).
-                    The local branch tracks the upstream branch of the
-                    same name.
-                    Creating your own branch based on the released
-                    branch ensures you are using the latest files for
-                    that release.
-                    </para></listitem>
-                <listitem><para><emphasis>Initialize the Build Environment:</emphasis>
-                    Run the
-                    <ulink url='&YOCTO_DOCS_REF_URL;#structure-core-script'><filename>&OE_INIT_FILE;</filename></ulink>
-                    environment setup script to define the OpenEmbedded
-                    build environment on your build host.
-                    <literallayout class='monospaced'>
+                        </literallayout>
+                        Git's <filename>checkout</filename> command checks out
+                        the current Yocto Project release into a local branch
+                        whose name matches the release (i.e.
+                        <filename>&DISTRO_NAME_NO_CAP;</filename>).
+                        The local branch tracks the upstream branch of the
+                        same name.
+                        Creating your own branch based on the released
+                        branch ensures you are using the latest files for
+                        that release.
+                        </para></listitem>
+                    <listitem><para><emphasis>Initialize the Build Environment:</emphasis>
+                        Run the
+                        <ulink url='&YOCTO_DOCS_REF_URL;#structure-core-script'><filename>&OE_INIT_FILE;</filename></ulink>
+                        environment setup script to define the OpenEmbedded
+                        build environment on your build host.
+                        <literallayout class='monospaced'>
      $ source &OE_INIT_FILE;
-                    </literallayout>
-                    Among other things, the script creates the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>,
-                    which is <filename>build</filename> in this case
-                    and is located in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
-                    After the script runs, your current working directory
-                    is set to the Build Directory.
-                    Later, when the build completes, the Build Directory
-                    contains all the files created during the build.
-                    <note>
-                        For information on running a memory-resident
-                        <ulink url='&YOCTO_DOCS_REF_URL;#usingpoky-components-bitbake'>BitBake</ulink>,
-                        see the
-                        <ulink url='&YOCTO_DOCS_REF_URL;#structure-memres-core-script'><filename>oe-init-build-env-memres</filename></ulink>
-                        setup script.
-                    </note>
-                    </para></listitem>
-                <listitem><para><emphasis>Examine Your Local Configuration File:</emphasis>
-                    When you set up the build environment, a local
-                    configuration file named
-                    <filename>local.conf</filename> becomes available in
-                    a <filename>conf</filename> subdirectory of the
-                    Build Directory.
-                    Before using BitBake to start the build, you can
-                    look at this file and be sure your general
-                    configurations are how you want them:
-                    <itemizedlist>
-                        <listitem><para>
-                            To help conserve disk space during builds,
-                            you can add the following statement to your
-                            project's configuration file, which for this
-                            example is
-                            <filename>poky/build/conf/local.conf</filename>.
-                            Adding this statement deletes the work
-                            directory used for building a recipe once the
-                            recipe is built.
-                            <literallayout class='monospaced'>
+                        </literallayout>
+                        Among other things, the script creates the
+                        <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>,
+                        which is <filename>build</filename> in this case
+                        and is located in the
+                        <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+                        After the script runs, your current working directory
+                        is set to the Build Directory.
+                        Later, when the build completes, the Build Directory
+                        contains all the files created during the build.
+                        <note>
+                            For information on running a memory-resident
+                            <ulink url='&YOCTO_DOCS_REF_URL;#usingpoky-components-bitbake'>BitBake</ulink>,
+                            see the
+                            <ulink url='&YOCTO_DOCS_REF_URL;#structure-memres-core-script'><filename>oe-init-build-env-memres</filename></ulink>
+                            setup script.
+                        </note>
+                        </para></listitem>
+                    <listitem><para><emphasis>Examine Your Local Configuration File:</emphasis>
+                        When you set up the build environment, a local
+                        configuration file named
+                        <filename>local.conf</filename> becomes available in
+                        a <filename>conf</filename> subdirectory of the
+                        Build Directory.
+                        Before using BitBake to start the build, you can
+                        look at this file and be sure your general
+                        configurations are how you want them:
+                        <itemizedlist>
+                            <listitem><para>
+                                To help conserve disk space during builds,
+                                you can add the following statement to your
+                                project's configuration file, which for this
+                                example is
+                                <filename>poky/build/conf/local.conf</filename>.
+                                Adding this statement deletes the work
+                                directory used for building a recipe once the
+                                recipe is built.
+                                <literallayout class='monospaced'>
      INHERIT += "rm_work"
-                            </literallayout>
-                            </para></listitem>
-                        <listitem><para>
-                            By default, the target machine for the build is
-                            <filename>qemux86</filename>,
-                            which produces an image that can be used in
-                            the QEMU emulator and is targeted at an
-                            <trademark class='registered'>Intel</trademark>
-                            32-bit based architecture.
-                            Further on in this example, this default is
-                            easily changed through the
-                            <ulink url='&YOCTO_DOCS_REF_URL;#var-MACHINE'><filename>MACHINE</filename></ulink>
-                            variable so that you can quickly
-                            build an image for a different machine.
-                            </para></listitem>
-                        <listitem><para>
-                            Another consideration before you build is the
-                            package manager used when creating the image.
-                            The default <filename>local.conf</filename>
-                            file selects the RPM package manager.
-                            You can control this configuration by using the
-                            <filename><ulink url='&YOCTO_DOCS_REF_URL;#var-PACKAGE_CLASSES'><filename>PACKAGE_CLASSES</filename></ulink></filename>
-                            variable.</para>
-                            <para>Selection of the package manager is separate
-                            from whether package management is used at runtime
-                            in the target image.</para>
-                            <para>For additional package manager selection
-                            information, see the
-                            "<ulink url='&YOCTO_DOCS_REF_URL;#ref-classes-package'><filename>package.bbclass</filename></ulink>"
-                            section in the Yocto Project Reference Manual.
-                            </para></listitem>
-                    </itemizedlist>
-                    </para></listitem>
-                <listitem><para><emphasis>Start the Build:</emphasis>
-                    Continue with the following command to build an OS image
-                    for the target, which is
-                    <filename>core-image-sato</filename> in this example:
-                    <note>
-                        Depending on the number of processors and cores, the
-                        amount of RAM, the speed of your Internet connection
-                        and other factors, the build process could take several
-                        hours the first time you run it.
-                        Subsequent builds run much faster since parts of the
-                        build are cached.
-                    </note>
-                    <literallayout class='monospaced'>
+                                </literallayout>
+                                </para></listitem>
+                            <listitem><para>
+                                By default, the target machine for the build is
+                                <filename>qemux86</filename>,
+                                which produces an image that can be used in
+                                the QEMU emulator and is targeted at an
+                                <trademark class='registered'>Intel</trademark>
+                                32-bit based architecture.
+                                Further on in this example, this default is
+                                easily changed through the
+                                <ulink url='&YOCTO_DOCS_REF_URL;#var-MACHINE'><filename>MACHINE</filename></ulink>
+                                variable so that you can quickly
+                                build an image for a different machine.
+                                </para></listitem>
+                            <listitem><para>
+                                Another consideration before you build is the
+                                package manager used when creating the image.
+                                The default <filename>local.conf</filename>
+                                file selects the RPM package manager.
+                                You can control this configuration by using the
+                                <filename><ulink url='&YOCTO_DOCS_REF_URL;#var-PACKAGE_CLASSES'><filename>PACKAGE_CLASSES</filename></ulink></filename>
+                                variable.</para>
+                                <para>Selection of the package manager is separate
+                                from whether package management is used at runtime
+                                in the target image.</para>
+                                <para>For additional package manager selection
+                                information, see the
+                                "<ulink url='&YOCTO_DOCS_REF_URL;#ref-classes-package'><filename>package.bbclass</filename></ulink>"
+                                section in the Yocto Project Reference Manual.
+                                </para></listitem>
+                        </itemizedlist>
+                        </para></listitem>
+                    <listitem><para><emphasis>Start the Build:</emphasis>
+                        Continue with the following command to build an OS image
+                        for the target, which is
+                        <filename>core-image-sato</filename> in this example:
+                        <note>
+                            Depending on the number of processors and cores, the
+                            amount of RAM, the speed of your Internet connection
+                            and other factors, the build process could take several
+                            hours the first time you run it.
+                            Subsequent builds run much faster since parts of the
+                            build are cached.
+                        </note>
+                        <literallayout class='monospaced'>
      $ bitbake core-image-sato
-                    </literallayout>
-                    For information on using the
-                    <filename>bitbake</filename> command, see the
-                    "<ulink url='&YOCTO_DOCS_REF_URL;#usingpoky-components-bitbake'>BitBake</ulink>"
-                    section in the Yocto Project Reference Manual, or see the
-                    "<ulink url='&YOCTO_DOCS_BB_URL;#bitbake-user-manual-command'>BitBake Command</ulink>"
-                    section in the BitBake User Manual.
-                    For information on other targets, see the
-                    "<ulink url='&YOCTO_DOCS_REF_URL;#ref-images'>Images</ulink>"
-                    chapter in the Yocto Project Reference Manual.
-                    </para></listitem>
-                <listitem><para><emphasis>Simulate Your Image Using QEMU:</emphasis>
-                    Once this particular image is built, you can start QEMU
-                    and run the image:
-                    <literallayout class='monospaced'>
+                        </literallayout>
+                        For information on using the
+                        <filename>bitbake</filename> command, see the
+                        "<ulink url='&YOCTO_DOCS_REF_URL;#usingpoky-components-bitbake'>BitBake</ulink>"
+                        section in the Yocto Project Reference Manual, or see the
+                        "<ulink url='&YOCTO_DOCS_BB_URL;#bitbake-user-manual-command'>BitBake Command</ulink>"
+                        section in the BitBake User Manual.
+                        For information on other targets, see the
+                        "<ulink url='&YOCTO_DOCS_REF_URL;#ref-images'>Images</ulink>"
+                        chapter in the Yocto Project Reference Manual.
+                        </para></listitem>
+                    <listitem><para><emphasis>Simulate Your Image Using QEMU:</emphasis>
+                        Once this particular image is built, you can start QEMU
+                        and run the image:
+                        <literallayout class='monospaced'>
      $ runqemu qemux86
-                    </literallayout>
-                    If you want to learn more about running QEMU, see the
-                    "<ulink url="&YOCTO_DOCS_DEV_URL;#dev-manual-qemu">Using the Quick EMUlator (QEMU)</ulink>"
-                    chapter in the Yocto Project Development Manual.
-                    </para></listitem>
-                <listitem><para><emphasis>Exit QEMU:</emphasis>
-                    Exit QEMU by either clicking on the shutdown icon or by
-                    opening a terminal, typing
-                    <filename>poweroff</filename>, and then pressing "Enter".
-                    </para></listitem>
-            </orderedlist>
-        </para>
+                        </literallayout>
+                        If you want to learn more about running QEMU, see the
+                        "<ulink url="&YOCTO_DOCS_DEV_URL;#dev-manual-qemu">Using the Quick EMUlator (QEMU)</ulink>"
+                        chapter in the Yocto Project Development Manual.
+                        </para></listitem>
+                    <listitem><para><emphasis>Exit QEMU:</emphasis>
+                        Exit QEMU by either clicking on the shutdown icon or by
+                        opening a terminal, typing
+                        <filename>poweroff</filename>, and then pressing "Enter".
+                        </para></listitem>
+                </orderedlist>
+            </para>
+        </section>
 
-        <para id='qs-minnowboard-example'>
-            The following steps show how easy it is to set up to build an
-            image for a new machine.
-            These steps build an image for the MinnowBoard MAX, which is
-            supported by the Yocto Project and the
-            <filename>meta-intel</filename> <filename>intel-corei7-64</filename>
-            and <filename>intel-core2-32</filename> Board Support Packages
-            (BSPs).
-            <note>
-                The MinnowBoard MAX ships with 64-bit firmware.
-                If you want to use the board in 32-bit mode, you must
-                download the
-                <ulink url='http://firmware.intel.com/projects/minnowboard-max'>32-bit firmware</ulink>.
-            </note>
-        </para>
+        <section id='building-an-image-for-hardware'>
+            <title>Building an Image for Hardware</title>
 
-        <para>
-            <orderedlist>
-                <listitem><para><emphasis>Create a Local Copy of the
-                    <filename>meta-intel</filename> Repository:</emphasis>
-                    Building an image for the MinnowBoard MAX requires the
-                    <filename>meta-intel</filename> layer.
-                    Use the <filename>git clone</filename> command to create
-                    a local copy of the repository inside your
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>,
-                    which is <filename>poky</filename> in this example:
-                    <literallayout class='monospaced'>
+            <para id='qs-minnowboard-example'>
+                The following steps show how easy it is to set up to build an
+                image for a new machine.
+                These steps build an image for the MinnowBoard MAX, which is
+                supported by the Yocto Project and the
+                <filename>meta-intel</filename> <filename>intel-corei7-64</filename>
+                and <filename>intel-core2-32</filename> Board Support Packages
+                (BSPs).
+                <note>
+                    The MinnowBoard MAX ships with 64-bit firmware.
+                    If you want to use the board in 32-bit mode, you must
+                    download the
+                    <ulink url='http://firmware.intel.com/projects/minnowboard-max'>32-bit firmware</ulink>.
+                </note>
+            </para>
+
+            <para>
+                <orderedlist>
+                    <listitem><para><emphasis>Create a Local Copy of the
+                        <filename>meta-intel</filename> Repository:</emphasis>
+                        Building an image for the MinnowBoard MAX requires the
+                        <filename>meta-intel</filename> layer.
+                        Use the <filename>git clone</filename> command to create
+                        a local copy of the repository inside your
+                        <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>,
+                        which is <filename>poky</filename> in this example:
+                        <literallayout class='monospaced'>
      $ cd $HOME/poky
      $ git clone git://git.yoctoproject.org/meta-intel
      Cloning into 'meta-intel'...
@@ -634,121 +642,133 @@
      remote: Total 11988 (delta 6881), reused 11752 (delta 6645)
      Resolving deltas: 100% (6881/6881), done.
      Checking connectivity... done.
-                    </literallayout>
-                    By default when you clone a Git repository, the
-                    "master" branch is checked out.
-                    Before you build your image that uses the
-                    <filename>meta-intel</filename> layer, you must be
-                    sure that both repositories
-                    (<filename>meta-intel</filename> and
-                    <filename>poky</filename>) are using the same releases.
-                    Consequently, you need to checkout out the
-                    "<filename>&DISTRO_NAME_NO_CAP;</filename>" release after
-                    cloning <filename>meta-intel</filename>:
-                    <literallayout class='monospaced'>
+                        </literallayout>
+                        By default when you clone a Git repository, the
+                        "master" branch is checked out.
+                        Before you build your image that uses the
+                        <filename>meta-intel</filename> layer, you must be
+                        sure that both repositories
+                        (<filename>meta-intel</filename> and
+                        <filename>poky</filename>) are using the same releases.
+                        Consequently, you need to checkout out the
+                        "<filename>&DISTRO_NAME_NO_CAP;</filename>" release after
+                        cloning <filename>meta-intel</filename>:
+                        <literallayout class='monospaced'>
      $ cd $HOME/poky/meta-intel
      $ git checkout &DISTRO_NAME_NO_CAP;
      Branch &DISTRO_NAME_NO_CAP; set up to track remote branch &DISTRO_NAME_NO_CAP; from origin.
      Switched to a new branch '&DISTRO_NAME_NO_CAP;'
-                    </literallayout>
-                    </para></listitem>
-                <listitem><para><emphasis>Configure the Build:</emphasis>
-                    To configure the build, you edit the
-                    <filename>bblayers.conf</filename> and
-                    <filename>local.conf</filename> files, both of which are
-                    located in the <filename>build/conf</filename> directory.
-                    </para>
+                        </literallayout>
+                        </para></listitem>
+                    <listitem><para><emphasis>Configure the Build:</emphasis>
+                        To configure the build, you edit the
+                        <filename>bblayers.conf</filename> and
+                        <filename>local.conf</filename> files, both of which are
+                        located in the <filename>build/conf</filename> directory.
+                        </para>
 
-                    <para>Here is a quick way to make the edits.
-                    The first command uses the
-                    <filename>bitbake-layers add-layer</filename> command
-                    to add the <filename>meta-intel</filename>
-                    layer, which contains the <filename>intel-core*</filename>
-                    BSPs to the build.
-                    The second command selects the BSP by setting the
-                    <ulink url='&YOCTO_DOCS_REF_URL;#var-MACHINE'><filename>MACHINE</filename></ulink>
-                    variable.
-                    <literallayout class='monospaced'>
+                        <para>Here is a quick way to make the edits.
+                        The first command uses the
+                        <filename>bitbake-layers add-layer</filename> command
+                        to add the <filename>meta-intel</filename>
+                        layer, which contains the <filename>intel-core*</filename>
+                        BSPs to the build.
+                        The second command selects the BSP by setting the
+                        <ulink url='&YOCTO_DOCS_REF_URL;#var-MACHINE'><filename>MACHINE</filename></ulink>
+                        variable.
+                        <literallayout class='monospaced'>
      $ cd $HOME/poky/build
      $ bitbake-layers add-layer "$HOME/poky/meta-intel"
      $ echo 'MACHINE = "intel-corei7-64"' >> conf/local.conf
-                    </literallayout>
-                    <note><title>Notes</title>
-                    <para>
-                        If you want a 64-bit build, use the following:
-                        <literallayout class='monospaced'>
+                        </literallayout>
+                        <note><title>Notes</title>
+                        <para>
+                            If you want a 64-bit build, use the following:
+                            <literallayout class='monospaced'>
      $ echo 'MACHINE = "intel-corei7-64"' >> conf/local.conf
-                        </literallayout>
-                    </para>
+                            </literallayout>
+                        </para>
 
-                    <para>
-                        If you want 32-bit images, use the following:
-                        <literallayout class='monospaced'>
+                        <para>
+                            If you want 32-bit images, use the following:
+                            <literallayout class='monospaced'>
      $ echo 'MACHINE = "intel-core2-32"' >> conf/local.conf
+                            </literallayout>
+                        </para>
+                        </note>
+                        </para></listitem>
+                    <listitem><para><emphasis>Build an Image for MinnowBoard MAX:</emphasis>
+                        The type of image you build depends on your goals.
+                        For example, the previous build created a
+                        <filename>core-image-sato</filename> image, which is an
+                        image with Sato support.
+                        It is possible to build many image types for the
+                        MinnowBoard MAX.
+                        Some possibilities are <filename>core-image-base</filename>,
+                        which is a console-only image.
+                        Another choice could be a
+                        <filename>core-image-full-cmdline</filename>, which is
+                        another console-only image but has more full-features
+                        Linux system functionality installed.
+                        For types of images you can build using the Yocto
+                        Project, see the
+                        "<ulink url='&YOCTO_DOCS_REF_URL;#ref-images'>Images</ulink>"
+                        chapter in the Yocto Project Reference Manual.</para>
+                        <para>Because configuration changes are minimal to set up
+                        for this second build, the OpenEmbedded build system can
+                        re-use files from previous builds as much as possible.
+                        Re-using files means this second build will be much faster
+                        than an initial build.
+                        For this example, the <filename>core-image-base</filename>
+                        image is built:
+                        <literallayout class='monospaced'>
+     $ bitbake core-image-base
                         </literallayout>
-                    </para>
-                    </note>
-                    </para></listitem>
-                <listitem><para><emphasis>Build a Minimal Image for MinnowBoard MAX:</emphasis>
-                    Use the following command to build the minimal image for
-                    MinnowBoard MAX.
-                    Because configuration changes are minimal to set up for
-                    this second build, the OpenEmbedded build system can
-                    re-use files from previous builds as much as possible.
-                    Re-using files means this second build will be much faster
-                    than an initial build.
-                    <literallayout class='monospaced'>
-     $ bitbake core-image-minimal
-                    </literallayout>
-                    Once the build completes, the resulting basic console image
-                    is located in the Build Directory here:
-                    <literallayout class='monospaced'>
-     tmp/deploy/images/intel-corei7-64/core-image-minimal-intel-corei7-64.hddimg
-                    </literallayout>
-                    </para></listitem>
-                <listitem><para><emphasis>Write the Image:</emphasis>
-                    You can write the image to a USB key, SATA drive, or SD
-                    card by using the <filename>mkefidisk.sh</filename> script,
-                    which is included in the <filename>poky</filename>
-                    repository at
-                    <filename>scripts/contrib/mkefidisk.sh</filename>:
-                    <literallayout class='monospaced'>
-     $ sudo $HOME/source/poky/scripts/contrib/mkefidisk.sh <replaceable>HOST_DEVICE</replaceable> \
-        tmp/deploy/images/intel-corei7-64/core-image-minimal-intel-corei7-64.hddimg <replaceable>TARGET_DEVICE</replaceable>
-                    </literallayout>
-                    In the previous command,
-                    <replaceable>HOST_DEVICE</replaceable> is the device node
-                    on the build host (e.g. <filename>/dev/sdc</filename> or
-                    <filename>/dev/mmcblk0</filename>).
-                    <replaceable>TARGET_DEVICE</replaceable> is the name of the
-                    device as the MinnowBoard MAX sees it (e.g.
-                    <filename>/dev/sda</filename> or
-                    <filename>/dev/mmcblk0</filename>).
-                    </para></listitem>
-                <listitem><para><emphasis>Boot the Hardware:</emphasis>
-                    With the boot device provisioned, you can insert the
-                    media into the MinnowBoard MAX and boot the hardware.
-                    The board should automatically detect the media and boot to
-                    the bootloader and subsequently the operating system.
-                    </para>
+                        Once the build completes, the resulting console-only image
+                        is located in the Build Directory here:
+                        <literallayout class='monospaced'>
+     tmp/deploy/images/intel-corei7-64/core-image-base-intel-corei7-64.hddimg
+                        </literallayout>
+                        </para></listitem>
+                    <listitem><para><emphasis>Write the Image:</emphasis>
+                        You can write the image just built to a bootable media
+                        (e.g. a USB key, SATA drive, SD card, etc.) using the
+                        <filename>dd</filename> utility:
+                        <literallayout class='monospaced'>
+     $ sudo dd if=tmp/deploy/images/intel-corei7-64/core-image-minimal-intel-corei7-64.wic of=TARGET_DEVICE
+                        </literallayout>
+                        In the previous command, the
+                        <filename>TARGET_DEVICE</filename> is the device node in
+                        the host machine (e.g. <filename>/dev/sdc</filename>, which
+                        is most likely a USB stick, or
+                        <filename>/dev/mmcblk0</filename>, which is most likely an
+                        SD card.
+                        </para></listitem>
+                    <listitem><para><emphasis>Boot the Hardware:</emphasis>
+                        With the boot device provisioned, you can insert the
+                        media into the MinnowBoard MAX and boot the hardware.
+                        The board should automatically detect the media and boot to
+                        the bootloader and subsequently the operating system.
+                        </para>
 
-                    <para>If the board does not boot automatically, you can
-                    boot it manually from the EFI shell as follows:
-                    <literallayout class='monospaced'>
+                        <para>If the board does not boot automatically, you can
+                        boot it manually from the EFI shell as follows:
+                        <literallayout class='monospaced'>
      Shell> connect -r
      Shell> map -r
      Shell> fs0:
      Shell> bootx64
-                    </literallayout>
-                    <note>
-                        For a 32-bit image use the following:
-                        <literallayout class='monospaced'>
-     Shell> bootia32
                         </literallayout>
-                    </note>
-                    </para></listitem>
-            </orderedlist>
-        </para>
+                        <note>
+                            For a 32-bit image use the following:
+                            <literallayout class='monospaced'>
+     Shell> bootia32
+                            </literallayout>
+                        </note>
+                        </para></listitem>
+                </orderedlist>
+            </para>
+        </section>
     </section>
 
     <section id='qs-next-steps'>

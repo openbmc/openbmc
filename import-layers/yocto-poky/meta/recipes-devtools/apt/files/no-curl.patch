@@ -1,13 +1,23 @@
 Upstream-Status: Inappropriate [configuration]
+From 5d61ac822fd9a3871cd5089389c210606232ecdc Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?An=C3=ADbal=20Lim=C3=B3n?= <anibal.limon@linux.intel.com>
+Date: Thu, 26 May 2016 15:34:45 -0500
+Subject: [PATCH] Upstream-Status: Inappropriate [configuration]
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+Signed-off-by: Aníbal Limón <anibal.limon@linux.intel.com>
 ---
- configure.in     |    6 ------
- methods/makefile |    7 -------
- 2 files changed, 13 deletions(-)
+ configure.ac     | 7 -------
+ methods/makefile | 7 -------
+ 2 files changed, 14 deletions(-)
 
+diff --git a/configure.ac b/configure.ac
+index e47f459..cd24264 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -86,12 +86,6 @@ AC_CHECK_HEADER(db.h,
+@@ -83,13 +83,6 @@ AC_CHECK_HEADER(db.h,
  
  LIBS="$saveLIBS"
  
@@ -17,9 +27,12 @@ Upstream-Status: Inappropriate [configuration]
 -        curl_ok=no)],
 -     AC_MSG_ERROR([failed: I need CURL due https support]),
 -)
- 
+-
  AC_SUBST(BDBLIB)
  
+ HAVE_ZLIB=no
+diff --git a/methods/makefile b/methods/makefile
+index 3274e92..255086b 100644
 --- a/methods/makefile
 +++ b/methods/makefile
 @@ -51,13 +51,6 @@ LIB_MAKES = apt-pkg/makefile
@@ -28,11 +41,14 @@ Upstream-Status: Inappropriate [configuration]
  
 -# The https method
 -PROGRAM=https
--SLIBS = -lapt-pkg -lcurl $(INTLLIBS)
+-SLIBS = -lapt-pkg -lcurl $(INTLLIBS) -lresolv
 -LIB_MAKES = apt-pkg/makefile
 -SOURCE = https.cc server.cc
 -include $(PROGRAM_H)
 -
  # The ftp method
  PROGRAM=ftp
- SLIBS = -lapt-pkg $(SOCKETLIBS) $(INTLLIBS)
+ SLIBS = -lapt-pkg $(SOCKETLIBS) $(INTLLIBS) -lresolv
+-- 
+2.1.4
+

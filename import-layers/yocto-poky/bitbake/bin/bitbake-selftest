@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Copyright (C) 2012 Richard Purdie
 #
@@ -25,31 +25,48 @@ try:
 except RuntimeError as exc:
     sys.exit(str(exc))
 
-def usage():
-    print('usage: [BB_SKIP_NETTESTS=yes] %s [-v] [testname1 [testname2]...]' % os.path.basename(sys.argv[0]))
-
-verbosity = 1
-
-tests = sys.argv[1:]
-if '-v' in sys.argv:
-    tests.remove('-v')
-    verbosity = 2
-
-if tests:
-    if '--help' in sys.argv[1:]:
-        usage()
-        sys.exit(0)
-else:
-    tests = ["bb.tests.codeparser",
-             "bb.tests.cow",
-             "bb.tests.data",
-             "bb.tests.fetch",
-             "bb.tests.parse",
-             "bb.tests.utils"]
+tests = ["bb.tests.codeparser",
+         "bb.tests.cow",
+         "bb.tests.data",
+         "bb.tests.fetch",
+         "bb.tests.parse",
+         "bb.tests.utils"]
 
 for t in tests:
     t = '.'.join(t.split('.')[:3])
     __import__(t)
 
-unittest.main(argv=["bitbake-selftest"] + tests, verbosity=verbosity)
 
+# Set-up logging
+class StdoutStreamHandler(logging.StreamHandler):
+    """Special handler so that unittest is able to capture stdout"""
+    def __init__(self):
+        # Override __init__() because we don't want to set self.stream here
+        logging.Handler.__init__(self)
+
+    @property
+    def stream(self):
+        # We want to dynamically write wherever sys.stdout is pointing to
+        return sys.stdout
+
+
+handler = StdoutStreamHandler()
+bb.logger.addHandler(handler)
+bb.logger.setLevel(logging.DEBUG)
+
+
+ENV_HELP = """\
+Environment variables:
+  BB_SKIP_NETTESTS      set to 'yes' in order to skip tests using network
+                        connection
+  BB_TMPDIR_NOCLEAN     set to 'yes' to preserve test tmp directories
+"""
+
+class main(unittest.main):
+    def _print_help(self, *args, **kwargs):
+        super(main, self)._print_help(*args, **kwargs)
+        print(ENV_HELP)
+
+
+if __name__ == '__main__':
+        main(defaultTest=tests, buffer=True)

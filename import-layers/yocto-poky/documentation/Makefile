@@ -133,7 +133,7 @@ TARFILES = dev-style.css dev-manual.html \
            figures/index-downloads.png figures/kernel-dev-flow.png \
            figures/kernel-overview-1.png figures/kernel-overview-2-generic.png \
            figures/source-repos.png figures/yp-download.png \
-           figures/recipe-workflow.png figures/build-workspace-directory.png \
+           figures/recipe-workflow.png \
            figures/devtool-add-flow.png figures/devtool-modify-flow.png \
            figures/devtool-upgrade-flow.png \
            eclipse
@@ -249,7 +249,8 @@ TARFILES = mega-manual.html mega-style.css figures/yocto-environment.png \
 	figures/compatible-layers.png figures/import-layer.png figures/new-project.png \
 	figures/sdk-environment.png figures/sdk-installed-standard-sdk-directory.png \
 	figures/sdk-devtool-add-flow.png figures/sdk-installed-extensible-sdk-directory.png \
-	figures/sdk-devtool-modify-flow.png figures/sdk-eclipse-dev-flow.png
+	figures/sdk-devtool-modify-flow.png figures/sdk-eclipse-dev-flow.png \
+	figures/sdk-devtool-upgrade-flow.png
 	endif
 
 MANUALS = $(DOC)/$(DOC).html
@@ -269,7 +270,8 @@ TARFILES = ref-manual.html ref-style.css figures/poky-title.png \
 	figures/images.png figures/sdk.png figures/source-fetching.png \
 	figures/patching.png figures/configuration-compile-autoreconf.png \
 	figures/analysis-for-package-splitting.png figures/image-generation.png \
-	figures/sdk-generation.png figures/building-an-image.png
+	figures/sdk-generation.png figures/building-an-image.png \
+	figures/build-workspace-directory.png
 MANUALS = $(DOC)/$(DOC).html $(DOC)/eclipse
 FIGURES = figures
 STYLESHEET = $(DOC)/*.css
@@ -282,6 +284,7 @@ TARFILES = sdk-manual.html sdk-style.css figures/sdk-title.png \
            figures/sdk-environment.png figures/sdk-installed-standard-sdk-directory.png \
 	   figures/sdk-installed-extensible-sdk-directory.png figures/sdk-devtool-add-flow.png \
 	   figures/sdk-devtool-modify-flow.png figures/sdk-eclipse-dev-flow.png \
+	   figures/sdk-devtool-upgrade-flow.png \
            eclipse
 MANUALS = $(DOC)/$(DOC).html $(DOC)/eclipse
 FIGURES = figures

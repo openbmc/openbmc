@@ -26,7 +26,7 @@ BitBake build tools.
 # Based on functions from the base bb module, Copyright 2003 Holger Schurig
 
 import os
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import bb
 import bb.utils
 from   bb import data
@@ -42,7 +42,7 @@ class Local(FetchMethod):
 
     def urldata_init(self, ud, d):
         # We don't set localfile as for this fetcher the file is already local!
-        ud.decodedurl = urllib.unquote(ud.url.split("://")[1].split(";")[0])
+        ud.decodedurl = urllib.parse.unquote(ud.url.split("://")[1].split(";")[0])
         ud.basename = os.path.basename(ud.decodedurl)
         ud.basepath = ud.decodedurl
         ud.needdonestamp = False

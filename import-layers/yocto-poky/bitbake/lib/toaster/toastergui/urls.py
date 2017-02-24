@@ -21,8 +21,10 @@ from django.views.generic import RedirectView, TemplateView
 
 from django.http import HttpResponseBadRequest
 from toastergui import tables
+from toastergui import buildtables
 from toastergui import typeaheads
 from toastergui import api
+from toastergui import widgets
 
 urlpatterns = patterns('toastergui.views',
         # landing page
@@ -34,17 +36,28 @@ urlpatterns = patterns('toastergui.views',
 
         # build info navigation
         url(r'^build/(?P<build_id>\d+)$', 'builddashboard', name="builddashboard"),
+        url(r'^build/(?P<build_id>\d+)/tasks/$',
+            buildtables.BuildTasksTable.as_view(
+                template_name="buildinfo-toastertable.html"),
+            name='tasks'),
 
-        url(r'^build/(?P<build_id>\d+)/tasks/$', 'tasks', name='tasks'),
-        url(r'^build/(?P<build_id>\d+)/tasks/(?P<task_id>\d+)/$', 'tasks_task', name='tasks_task'),
         url(r'^build/(?P<build_id>\d+)/task/(?P<task_id>\d+)$', 'task', name='task'),
 
-        url(r'^build/(?P<build_id>\d+)/recipes/$', 'recipes', name='recipes'),
+        url(r'^build/(?P<build_id>\d+)/recipes/$',
+            buildtables.BuiltRecipesTable.as_view(
+                template_name="buildinfo-toastertable.html"),
+            name='recipes'),
+
         url(r'^build/(?P<build_id>\d+)/recipe/(?P<recipe_id>\d+)/active_tab/(?P<active_tab>\d{1})$', 'recipe', name='recipe'),
+
         url(r'^build/(?P<build_id>\d+)/recipe/(?P<recipe_id>\d+)$', 'recipe', name='recipe'),
         url(r'^build/(?P<build_id>\d+)/recipe_packages/(?P<recipe_id>\d+)$', 'recipe_packages', name='recipe_packages'),
 
-        url(r'^build/(?P<build_id>\d+)/packages/$', 'bpackage', name='packages'),
+        url(r'^build/(?P<build_id>\d+)/packages/$',
+            buildtables.BuiltPackagesTable.as_view(
+                template_name="buildinfo-toastertable.html"),
+            name='packages'),
+
         url(r'^build/(?P<build_id>\d+)/package/(?P<package_id>\d+)$', 'package_built_detail',
                 name='package_built_detail'),
         url(r'^build/(?P<build_id>\d+)/package_built_dependencies/(?P<package_id>\d+)$',
@@ -56,17 +69,31 @@ urlpatterns = patterns('toastergui.views',
         url(r'^build/(?P<build_id>\d+)/package_included_reverse_dependencies/(?P<target_id>\d+)/(?P<package_id>\d+)$',
             'package_included_reverse_dependencies', name='package_included_reverse_dependencies'),
 
-        # images are known as targets in the internal model
-        url(r'^build/(?P<build_id>\d+)/target/(?P<target_id>\d+)$', 'target', name='target'),
-        url(r'^build/(?P<build_id>\d+)/target/(?P<target_id>\d+)/targetpkg$', 'targetpkg', name='targetpkg'),
+        url(r'^build/(?P<build_id>\d+)/target/(?P<target_id>\d+)$',
+            buildtables.InstalledPackagesTable.as_view(
+                template_name="target.html"),
+            name='target'),
+
+
         url(r'^dentries/build/(?P<build_id>\d+)/target/(?P<target_id>\d+)$', 'xhr_dirinfo', name='dirinfo_ajax'),
         url(r'^build/(?P<build_id>\d+)/target/(?P<target_id>\d+)/dirinfo$', 'dirinfo', name='dirinfo'),
         url(r'^build/(?P<build_id>\d+)/target/(?P<target_id>\d+)/dirinfo_filepath/_(?P<file_path>(?:/[^/\n]+)*)$', 'dirinfo', name='dirinfo_filepath'),
         url(r'^build/(?P<build_id>\d+)/configuration$', 'configuration', name='configuration'),
         url(r'^build/(?P<build_id>\d+)/configvars$', 'configvars', name='configvars'),
-        url(r'^build/(?P<build_id>\d+)/buildtime$', 'buildtime', name='buildtime'),
-        url(r'^build/(?P<build_id>\d+)/cputime$', 'cputime', name='cputime'),
-        url(r'^build/(?P<build_id>\d+)/diskio$', 'diskio', name='diskio'),
+        url(r'^build/(?P<build_id>\d+)/buildtime$',
+            buildtables.BuildTimeTable.as_view(
+                template_name="buildinfo-toastertable.html"),
+            name='buildtime'),
+
+        url(r'^build/(?P<build_id>\d+)/cputime$',
+            buildtables.BuildCPUTimeTable.as_view(
+                template_name="buildinfo-toastertable.html"),
+            name='cputime'),
+
+        url(r'^build/(?P<build_id>\d+)/diskio$',
+            buildtables.BuildIOTable.as_view(
+                template_name="buildinfo-toastertable.html"),
+            name='diskio'),
 
         # image information dir
         url(r'^build/(?P<build_id>\d+)/target/(?P<target_id>\d+)/packagefile/(?P<packagefile_id>\d+)$',
@@ -164,26 +191,46 @@ urlpatterns = patterns('toastergui.views',
             name='xhr_configvaredit'),
 
         url(r'^xhr_importlayer/$', 'xhr_importlayer', name='xhr_importlayer'),
-        url(r'^xhr_updatelayer/$', 'xhr_updatelayer', name='xhr_updatelayer'),
+
+        url(r'^xhr_layer/(?P<pid>\d+)/(?P<layerversion_id>\d+)$',
+            api.XhrLayer.as_view(),
+            name='xhr_layer'),
 
         # JS Unit tests
         url(r'^js-unit-tests/$', 'jsunittests', name='js-unit-tests'),
 
         # image customisation functionality
-        url(r'^xhr_customrecipe/(?P<recipe_id>\d+)/packages/(?P<package_id>\d+|)$',
-            'xhr_customrecipe_packages', name='xhr_customrecipe_packages'),
+        url(r'^xhr_customrecipe/(?P<recipe_id>\d+)'
+            '/packages/(?P<package_id>\d+|)$',
+            api.XhrCustomRecipePackages.as_view(),
+            name='xhr_customrecipe_packages'),
 
         url(r'^xhr_customrecipe/(?P<recipe_id>\d+)/packages/$',
-            'xhr_customrecipe_packages', name='xhr_customrecipe_packages'),
+            api.XhrCustomRecipePackages.as_view(),
+            name='xhr_customrecipe_packages'),
 
-        url(r'^xhr_customrecipe/(?P<recipe_id>\d+)$', 'xhr_customrecipe_id',
+        url(r'^xhr_customrecipe/(?P<recipe_id>\d+)$',
+            api.XhrCustomRecipeId.as_view(),
             name='xhr_customrecipe_id'),
-        url(r'^xhr_customrecipe/', 'xhr_customrecipe',
+
+        url(r'^xhr_customrecipe/',
+            api.XhrCustomRecipe.as_view(),
             name='xhr_customrecipe'),
 
         url(r'^xhr_buildrequest/project/(?P<pid>\d+)$',
-           api.XhrBuildRequest.as_view(),
+            api.XhrBuildRequest.as_view(),
             name='xhr_buildrequest'),
+
+        url(r'xhr_project/(?P<project_id>\d+)$',
+            api.XhrProject.as_view(),
+            name='xhr_project'),
+
+        url(r'xhr_build/(?P<build_id>\d+)$',
+            api.XhrBuild.as_view(),
+            name='xhr_build'),
+
+        url(r'^mostrecentbuilds$', widgets.MostRecentBuildsView.as_view(),
+            name='most_recent_builds'),
 
           # default redirection
         url(r'^$', RedirectView.as_view(url='landing', permanent=True)),

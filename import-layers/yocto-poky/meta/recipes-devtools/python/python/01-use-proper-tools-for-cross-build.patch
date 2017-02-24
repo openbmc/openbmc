@@ -7,13 +7,13 @@ Signed-off-by: Michael 'Mickey' Lauer <mickey@vanille-media.de>
 Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
 
 Rebased for python-2.7.9
-Signed-Off-By: Alejandro Hernandez <alejandro.hernandez@linux.intel.com>
+Signed-off-by: Alejandro Hernandez <alejandro.hernandez@linux.intel.com>
 
-Index: Python-2.7.9/Makefile.pre.in
+Index: Python-2.7.12/Makefile.pre.in
 ===================================================================
---- Python-2.7.9.orig/Makefile.pre.in
-+++ Python-2.7.9/Makefile.pre.in
-@@ -234,6 +234,7 @@ LIBFFI_INCLUDEDIR=	@LIBFFI_INCLUDEDIR@
+--- Python-2.7.12.orig/Makefile.pre.in
++++ Python-2.7.12/Makefile.pre.in
+@@ -246,6 +246,7 @@ LIBFFI_INCLUDEDIR=	@LIBFFI_INCLUDEDIR@
  ##########################################################################
  # Parser
  PGEN=		Parser/pgen$(EXE)
@@ -21,7 +21,7 @@ Index: Python-2.7.9/Makefile.pre.in
  
  PSRCS=		\
  		Parser/acceler.c \
-@@ -445,7 +446,7 @@ $(BUILDPYTHON):	Modules/python.o $(LIBRA
+@@ -513,7 +514,7 @@ $(BUILDPYTHON):	Modules/python.o $(LIBRA
  			$(BLDLIBRARY) $(LIBS) $(MODLIBS) $(SYSLIBS) $(LDLAST)
  
  platform: $(BUILDPYTHON) pybuilddir.txt
@@ -30,16 +30,16 @@ Index: Python-2.7.9/Makefile.pre.in
  
  # Create build directory and generate the sysconfig build-time data there.
  # pybuilddir.txt contains the name of the build dir and is used for
-@@ -611,7 +612,7 @@ Modules/pwdmodule.o: $(srcdir)/Modules/p
- $(GRAMMAR_H): $(GRAMMAR_INPUT) $(PGENSRCS)
- 		@$(MKDIR_P) Include
- 		$(MAKE) $(PGEN)
--		$(PGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)
-+		$(HOSTPGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)
- $(GRAMMAR_C): $(GRAMMAR_H) $(GRAMMAR_INPUT) $(PGENSRCS)
- 		$(MAKE) $(GRAMMAR_H)
- 		touch $(GRAMMAR_C)
-@@ -1043,27 +1044,27 @@ libinstall:	build_all $(srcdir)/Lib/$(PL
+@@ -684,7 +685,7 @@ $(GRAMMAR_H): $(GRAMMAR_INPUT) $(PGEN)
+ 	@$(MKDIR_P) Include
+ 	# Avoid copying the file onto itself for an in-tree build
+ 	if test "$(cross_compiling)" != "yes"; then \
+-		$(PGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C); \
++		$(HOSTPGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C); \
+ 	else \
+ 		cp $(srcdir)/Include/graminit.h $(GRAMMAR_H).tmp; \
+ 		mv $(GRAMMAR_H).tmp $(GRAMMAR_H); \
+@@ -1133,27 +1134,27 @@ libinstall:	build_all $(srcdir)/Lib/$(PL
  			$(DESTDIR)$(LIBDEST)/distutils/tests ; \
  	fi
  	PYTHONPATH=$(DESTDIR)$(LIBDEST)  $(RUNSHARED) \
@@ -73,11 +73,11 @@ Index: Python-2.7.9/Makefile.pre.in
  
  # Create the PLATDIR source directory, if one wasn't distributed..
  $(srcdir)/Lib/$(PLATDIR):
-Index: Python-2.7.9/setup.py
+Index: Python-2.7.12/setup.py
 ===================================================================
---- Python-2.7.9.orig/setup.py
-+++ Python-2.7.9/setup.py
-@@ -334,6 +334,7 @@ class PyBuildExt(build_ext):
+--- Python-2.7.12.orig/setup.py
++++ Python-2.7.12/setup.py
+@@ -350,6 +350,7 @@ class PyBuildExt(build_ext):
              self.failed.append(ext.name)
              self.announce('*** WARNING: renaming "%s" since importing it'
                            ' failed: %s' % (ext.name, why), level=3)
@@ -85,7 +85,7 @@ Index: Python-2.7.9/setup.py
              assert not self.inplace
              basename, tail = os.path.splitext(ext_filename)
              newname = basename + "_failed" + tail
-@@ -558,6 +559,9 @@ class PyBuildExt(build_ext):
+@@ -574,6 +575,9 @@ class PyBuildExt(build_ext):
  
          # XXX Omitted modules: gl, pure, dl, SGI-specific modules
  

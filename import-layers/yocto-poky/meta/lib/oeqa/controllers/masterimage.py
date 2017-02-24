@@ -24,9 +24,7 @@ from oeqa.utils import CommandError
 
 from abc import ABCMeta, abstractmethod
 
-class MasterImageHardwareTarget(oeqa.targetcontrol.BaseTarget):
-
-    __metaclass__ = ABCMeta
+class MasterImageHardwareTarget(oeqa.targetcontrol.BaseTarget, metaclass=ABCMeta):
 
     supported_image_fstypes = ['tar.gz', 'tar.bz2']
 
@@ -165,6 +163,46 @@ class GummibootTarget(MasterImageHardwareTarget):
 
     def __init__(self, d):
         super(GummibootTarget, self).__init__(d)
+        # this the value we need to set in the LoaderEntryOneShot EFI variable
+        # so the system boots the 'test' bootloader label and not the default
+        # The first four bytes are EFI bits, and the rest is an utf-16le string
+        # (EFI vars values need to be utf-16)
+        # $ echo -en "test\0" | iconv -f ascii -t utf-16le | hexdump -C
+        # 00000000  74 00 65 00 73 00 74 00  00 00                    |t.e.s.t...|
+        self.efivarvalue = r'\x07\x00\x00\x00\x74\x00\x65\x00\x73\x00\x74\x00\x00\x00'
+        self.deploy_cmds = [
+                'mount -L boot /boot',
+                'mkdir -p /mnt/testrootfs',
+                'mount -L testrootfs /mnt/testrootfs',
+                'modprobe efivarfs',
+                'mount -t efivarfs efivarfs /sys/firmware/efi/efivars',
+                'cp ~/test-kernel /boot',
+                'rm -rf /mnt/testrootfs/*',
+                'tar xvf ~/test-rootfs.%s -C /mnt/testrootfs' % self.image_fstype,
+                'printf "%s" > /sys/firmware/efi/efivars/LoaderEntryOneShot-4a67b082-0a4c-41cf-b6c7-440b29bb8c4f' % self.efivarvalue
+                ]
+
+    def _deploy(self):
+        # make sure these aren't mounted
+        self.master.run("umount /boot; umount /mnt/testrootfs; umount /sys/firmware/efi/efivars;")
+        # from now on, every deploy cmd should return 0
+        # else an exception will be thrown by sshcontrol
+        self.master.ignore_status = False
+        self.master.copy_to(self.rootfs, "~/test-rootfs." + self.image_fstype)
+        self.master.copy_to(self.kernel, "~/test-kernel")
+        for cmd in self.deploy_cmds:
+            self.master.run(cmd)
+
+    def _start(self, params=None):
+        self.power_cycle(self.master)
+        # there are better ways than a timeout but this should work for now
+        time.sleep(120)
+
+
+class SystemdbootTarget(MasterImageHardwareTarget):
+
+    def __init__(self, d):
+        super(SystemdbootTarget, self).__init__(d)
         # this the value we need to set in the LoaderEntryOneShot EFI variable
         # so the system boots the 'test' bootloader label and not the default
         # The first four bytes are EFI bits, and the rest is an utf-16le string

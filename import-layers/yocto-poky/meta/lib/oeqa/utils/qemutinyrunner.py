@@ -13,7 +13,7 @@ import re
 import socket
 import select
 import bb
-from qemurunner import QemuRunner
+from .qemurunner import QemuRunner
 
 class QemuTinyRunner(QemuRunner):
 
@@ -50,7 +50,7 @@ class QemuTinyRunner(QemuRunner):
                 self.server_socket.connect(self.socketfile)
                 bb.note("Created listening socket for qemu serial console.")
                 tries = 0
-            except socket.error, msg:
+            except socket.error as msg:
                 self.server_socket.close()
                 bb.fatal("Failed to create listening socket.")
                 tries -= 1
@@ -60,7 +60,7 @@ class QemuTinyRunner(QemuRunner):
             with open(self.logfile, "a") as f:
                 f.write("%s" % msg)
 
-    def start(self, qemuparams = None):
+    def start(self, qemuparams = None, ssh=True, extra_bootparams=None):
 
         if self.display:
             os.environ["DISPLAY"] = self.display
@@ -102,7 +102,7 @@ class QemuTinyRunner(QemuRunner):
             bb.note("Qemu pid didn't appeared in %s seconds" % self.runqemutime)
             output = self.runqemu.stdout
             self.stop()
-            bb.note("Output from runqemu:\n%s" % output.read())
+            bb.note("Output from runqemu:\n%s" % output.read().decode("utf-8"))
             return False
 
         return self.is_alive()
@@ -131,7 +131,7 @@ class QemuTinyRunner(QemuRunner):
         # Walk the process tree from the process specified looking for a qemu-system. Return its [pid'cmd]
         #
         ps = subprocess.Popen(['ps', 'axww', '-o', 'pid,ppid,command'], stdout=subprocess.PIPE).communicate()[0]
-        processes = ps.split('\n')
+        processes = ps.decode("utf-8").split('\n')
         nfields = len(processes[0].split()) - 1
         pids = {}
         commands = {}
@@ -160,9 +160,9 @@ class QemuTinyRunner(QemuRunner):
                 if p not in parents:
                     parents.append(p)
                     newparents = next
-        #print "Children matching %s:" % str(parents)
+        #print("Children matching %s:" % str(parents))
         for p in parents:
-            # Need to be careful here since runqemu-internal runs "ldd qemu-system-xxxx"
+            # Need to be careful here since runqemu runs "ldd qemu-system-xxxx"
             # Also, old versions of ldd (2.11) run "LD_XXXX qemu-system-xxxx"
             basecmd = commands[p].split()[0]
             basecmd = os.path.basename(basecmd)

@@ -34,6 +34,7 @@ SRC_URI += "\
         file://Fix_elf_cvt_gunhash.patch \
         file://elf_begin.c-CVE-2014-9447-fix.patch \
         file://fix-build-gcc-4.8.patch \
+        file://gcc6.patch \
 "
 # Only apply when building uclibc based target recipe
 SRC_URI_append_libc-uclibc = " file://uclibc-support-for-elfutils-0.148.patch"

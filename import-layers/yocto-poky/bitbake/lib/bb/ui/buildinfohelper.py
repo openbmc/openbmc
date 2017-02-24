@@ -21,28 +21,29 @@ import bb
 import re
 import os
 
-os.environ["DJANGO_SETTINGS_MODULE"] = "toaster.toastermain.settings"
-
-
 import django
 from django.utils import timezone
 
+import toaster
+# Add toaster module to the search path to help django.setup() find the right
+# modules
+sys.path.insert(0, os.path.dirname(toaster.__file__))
 
-def _configure_toaster():
-    """ Add toaster to sys path for importing modules
-    """
-    sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'toaster'))
-_configure_toaster()
-
+#Set the DJANGO_SETTINGS_MODULE if it's not already set
+os.environ["DJANGO_SETTINGS_MODULE"] =\
+    os.environ.get("DJANGO_SETTINGS_MODULE",
+                   "toaster.toastermain.settings")
+# Setup django framework (needs to be done before importing modules)
 django.setup()
 
 from orm.models import Build, Task, Recipe, Layer_Version, Layer, Target, LogMessage, HelpText
-from orm.models import Target_Image_File, BuildArtifact
+from orm.models import Target_Image_File, TargetKernelFile, TargetSDKFile
 from orm.models import Variable, VariableHistory
 from orm.models import Package, Package_File, Target_Installed_Package, Target_File
 from orm.models import Task_Dependency, Package_Dependency
 from orm.models import Recipe_Dependency, Provides
 from orm.models import Project, CustomImagePackage, CustomImageRecipe
+from orm.models import signal_runbuilds
 
 from bldcontrol.models import BuildEnvironment, BuildRequest
 
@@ -54,10 +55,10 @@ from datetime import datetime, timedelta
 
 from django.db import transaction, connection
 
+
 # pylint: disable=invalid-name
 # the logger name is standard throughout BitBake
 logger = logging.getLogger("ToasterLogger")
-
 
 class NotExisting(Exception):
     pass
@@ -121,11 +122,27 @@ class ORMWrapper(object):
 
         return vars(self)[dictname][key]
 
+    def get_similar_target_with_image_files(self, target):
+        """
+        Get a Target object "similar" to target; i.e. with the same target
+        name ('core-image-minimal' etc.) and machine.
+        """
+        return target.get_similar_target_with_image_files()
+
+    def get_similar_target_with_sdk_files(self, target):
+        return target.get_similar_target_with_sdk_files()
+
+    def clone_image_artifacts(self, target_from, target_to):
+        target_to.clone_image_artifacts_from(target_from)
+
+    def clone_sdk_artifacts(self, target_from, target_to):
+        target_to.clone_sdk_artifacts_from(target_from)
+
     def _timestamp_to_datetime(self, secs):
         """
         Convert timestamp in seconds to Python datetime
         """
-        return datetime(1970, 1, 1) + timedelta(seconds=secs)
+        return timezone.make_aware(datetime(1970, 1, 1) + timedelta(seconds=secs))
 
     # pylint: disable=no-self-use
     # we disable detection of no self use in functions because the methods actually work on the object
@@ -134,55 +151,33 @@ class ORMWrapper(object):
     # pylint: disable=bad-continuation
     # we do not follow the python conventions for continuation indentation due to long lines here
 
-    def create_build_object(self, build_info, brbe, project_id):
-        assert 'machine' in build_info
-        assert 'distro' in build_info
-        assert 'distro_version' in build_info
-        assert 'started_on' in build_info
-        assert 'cooker_log_path' in build_info
-        assert 'build_name' in build_info
-        assert 'bitbake_version' in build_info
-
+    def get_or_create_build_object(self, brbe):
         prj = None
         buildrequest = None
-        if brbe is not None:            # this build was triggered by a request from a user
+        if brbe is not None:
+            # Toaster-triggered build
             logger.debug(1, "buildinfohelper: brbe is %s" % brbe)
             br, _ = brbe.split(":")
-            buildrequest = BuildRequest.objects.get(pk = br)
+            buildrequest = BuildRequest.objects.get(pk=br)
             prj = buildrequest.project
-
-        elif project_id is not None:    # this build was triggered by an external system for a specific project
-            logger.debug(1, "buildinfohelper: project is %s" % prj)
-            prj = Project.objects.get(pk = project_id)
-
-        else:                           # this build was triggered by a legacy system, or command line interactive mode
+        else:
+            # CLI build
             prj = Project.objects.get_or_create_default_project()
             logger.debug(1, "buildinfohelper: project is not specified, defaulting to %s" % prj)
 
-
         if buildrequest is not None:
+            # reuse existing Build object
             build = buildrequest.build
-            logger.info("Updating existing build, with %s", build_info)
             build.project = prj
-            build.machine=build_info['machine']
-            build.distro=build_info['distro']
-            build.distro_version=build_info['distro_version']
-            build.cooker_log_path=build_info['cooker_log_path']
-            build.build_name=build_info['build_name']
-            build.bitbake_version=build_info['bitbake_version']
             build.save()
-
         else:
+            # create new Build object
+            now = timezone.now()
             build = Build.objects.create(
-                                    project = prj,
-                                    machine=build_info['machine'],
-                                    distro=build_info['distro'],
-                                    distro_version=build_info['distro_version'],
-                                    started_on=build_info['started_on'],
-                                    completed_on=build_info['started_on'],
-                                    cooker_log_path=build_info['cooker_log_path'],
-                                    build_name=build_info['build_name'],
-                                    bitbake_version=build_info['bitbake_version'])
+                project=prj,
+                started_on=now,
+                completed_on=now,
+                build_name='')
 
         logger.debug(1, "buildinfohelper: build is created %s" % build)
 
@@ -192,8 +187,17 @@ class ORMWrapper(object):
 
         return build
 
+    def update_build(self, build, data_dict):
+        for key in data_dict:
+            setattr(build, key, data_dict[key])
+        build.save()
+
     @staticmethod
     def get_or_create_targets(target_info):
+        """
+        NB get_or_create() is used here because for Toaster-triggered builds,
+        we already created the targets when the build was triggered.
+        """
         result = []
         for target in target_info['targets']:
             task = ''
@@ -203,17 +207,14 @@ class ORMWrapper(object):
                 task = task[3:]
             if task == 'build':
                 task = ''
-            obj, created = Target.objects.get_or_create(build=target_info['build'],
-                                                        target=target)
-            if created:
-                obj.is_image = False
-                if task:
-                    obj.task = task
-                obj.save()
+
+            obj, _ = Target.objects.get_or_create(build=target_info['build'],
+                                                  target=target,
+                                                  task=task)
             result.append(obj)
         return result
 
-    def update_build_object(self, build, errors, warnings, taskfailures):
+    def update_build_stats_and_outcome(self, build, errors, warnings, taskfailures):
         assert isinstance(build,Build)
         assert isinstance(errors, int)
         assert isinstance(warnings, int)
@@ -234,9 +235,14 @@ class ORMWrapper(object):
         build.completed_on = timezone.now()
         build.outcome = outcome
         build.save()
+        signal_runbuilds()
 
     def update_target_set_license_manifest(self, target, license_manifest_path):
         target.license_manifest_path = license_manifest_path
+        target.save()
+
+    def update_target_set_package_manifest(self, target, package_manifest_path):
+        target.package_manifest_path = package_manifest_path
         target.save()
 
     def update_task_object(self, build, task_name, recipe_name, task_stats):
@@ -372,7 +378,7 @@ class ORMWrapper(object):
             layer_copy, c = Layer_Version.objects.get_or_create(
                 build=build_obj,
                 layer=layer_obj.layer,
-                up_branch=layer_obj.up_branch,
+                release=layer_obj.release,
                 branch=layer_version_information['branch'],
                 commit=layer_version_information['commit'],
                 local_path=layer_version_information['local_path'],
@@ -415,13 +421,24 @@ class ORMWrapper(object):
         assert 'name' in layer_information
         assert 'layer_index_url' in layer_information
 
+        # From command line builds we have no brbe as the request is directly
+        # from bitbake
         if brbe is None:
-            layer_object, _ = Layer.objects.get_or_create(
-                                name=layer_information['name'],
-                                layer_index_url=layer_information['layer_index_url'])
+            # If we don't have git commit sha then we're using a non-git
+            # layer so set the layer_source_dir to identify it as such
+            if not layer_information['version']['commit']:
+                local_source_dir = layer_information["local_path"]
+            else:
+                local_source_dir = None
+
+            layer_object, _ = \
+                Layer.objects.get_or_create(
+                    name=layer_information['name'],
+                    local_source_dir=local_source_dir,
+                    layer_index_url=layer_information['layer_index_url'])
+
             return layer_object
         else:
-            # we are under managed mode; we must match the layer used in the Project Layer
             br_id, be_id = brbe.split(":")
 
             # find layer by checkout path;
@@ -434,7 +451,11 @@ class ORMWrapper(object):
             # note that this is different
             buildrequest = BuildRequest.objects.get(pk = br_id)
             for brl in buildrequest.brlayer_set.all():
-                localdirname = os.path.join(bc.getGitCloneDirectory(brl.giturl, brl.commit), brl.dirpath)
+                if brl.local_source_dir:
+                    localdirname = os.path.join(brl.local_source_dir,
+                                                brl.dirpath)
+                else:
+                    localdirname = os.path.join(bc.getGitCloneDirectory(brl.giturl, brl.commit), brl.dirpath)
                 # we get a relative path, unless running in HEAD mode where the path is absolute
                 if not localdirname.startswith("/"):
                     localdirname = os.path.join(bc.be.sourcedir, localdirname)
@@ -445,6 +466,11 @@ class ORMWrapper(object):
                   # That created this build request.
                     if brl.layer_version:
                         return brl.layer_version
+
+                # This might be a local layer (i.e. no git info) so try
+                # matching local_source_dir
+                if brl.local_source_dir and brl.local_source_dir == layer_information["local_path"]:
+                    return brl.layer_version
 
                     # we matched the BRLayer, but we need the layer_version that generated this BR; reverse of the Project.schedule_build()
                     #logger.debug(1, "Matched %s to BRlayer %s" % (pformat(layer_information["local_path"]), localdirname))
@@ -494,7 +520,7 @@ class ORMWrapper(object):
             parent_obj = self._cached_get(Target_File, target = target_obj, path = parent_path, inodetype = Target_File.ITYPE_DIRECTORY)
             tf_obj = Target_File.objects.create(
                         target = target_obj,
-                        path = unicode(path, 'utf-8'),
+                        path = path,
                         size = size,
                         inodetype = Target_File.ITYPE_DIRECTORY,
                         permission = permission,
@@ -519,7 +545,7 @@ class ORMWrapper(object):
 
             tf_obj = Target_File.objects.create(
                         target = target_obj,
-                        path = unicode(path, 'utf-8'),
+                        path = path,
                         size = size,
                         inodetype = inodetype,
                         permission = permission,
@@ -550,9 +576,7 @@ class ORMWrapper(object):
                 filetarget_path = "/".join(fcpl)
 
             try:
-                filetarget_obj = Target_File.objects.get(
-                                     target = target_obj,
-                                     path = unicode(filetarget_path, 'utf-8'))
+                filetarget_obj = Target_File.objects.get(target = target_obj, path = filetarget_path)
             except Target_File.DoesNotExist:
                 # we might have an invalid link; no way to detect this. just set it to None
                 filetarget_obj = None
@@ -561,7 +585,7 @@ class ORMWrapper(object):
 
             tf_obj = Target_File.objects.create(
                         target = target_obj,
-                        path = unicode(path, 'utf-8'),
+                        path = path,
                         size = size,
                         inodetype = Target_File.ITYPE_SYMLINK,
                         permission = permission,
@@ -606,8 +630,8 @@ class ORMWrapper(object):
                         Recipe,
                         name=built_recipe.name,
                         layer_version__build=None,
-                        layer_version__up_branch=
-                        built_recipe.layer_version.up_branch,
+                        layer_version__release=
+                        built_recipe.layer_version.release,
                         file_path=built_recipe.file_path,
                         version=built_recipe.version
                     )
@@ -664,8 +688,8 @@ class ORMWrapper(object):
                         dep_type = tdeptype,
                         target = target_obj))
                 except KeyError as e:
-                    logger.warn("Could not add dependency to the package %s "
-                                "because %s is an unknown package", p, px)
+                    logger.warning("Could not add dependency to the package %s "
+                                   "because %s is an unknown package", p, px)
 
         if len(packagedeps_objs) > 0:
             Package_Dependency.objects.bulk_create(packagedeps_objs)
@@ -673,23 +697,26 @@ class ORMWrapper(object):
             logger.info("No package dependencies created")
 
         if len(errormsg) > 0:
-            logger.warn("buildinfohelper: target_package_info could not identify recipes: \n%s", errormsg)
+            logger.warning("buildinfohelper: target_package_info could not identify recipes: \n%s", errormsg)
 
     def save_target_image_file_information(self, target_obj, file_name, file_size):
-        Target_Image_File.objects.create( target = target_obj,
-                            file_name = file_name,
-                            file_size = file_size)
+        Target_Image_File.objects.create(target=target_obj,
+            file_name=file_name, file_size=file_size)
 
-    def save_artifact_information(self, build_obj, file_name, file_size):
-        # we skip the image files from other builds
-        if Target_Image_File.objects.filter(file_name = file_name).count() > 0:
-            return
+    def save_target_kernel_file(self, target_obj, file_name, file_size):
+        """
+        Save kernel file (bzImage, modules*) information for a Target target_obj.
+        """
+        TargetKernelFile.objects.create(target=target_obj,
+            file_name=file_name, file_size=file_size)
 
-        # do not update artifacts found in other builds
-        if BuildArtifact.objects.filter(file_name = file_name).count() > 0:
-            return
-
-        BuildArtifact.objects.create(build = build_obj, file_name = file_name, file_size = file_size)
+    def save_target_sdk_file(self, target_obj, file_name, file_size):
+        """
+        Save SDK artifacts to the database, associating them with a
+        Target object.
+        """
+        TargetSDKFile.objects.create(target=target_obj, file_name=file_name,
+            file_size=file_size)
 
     def create_logmessage(self, log_information):
         assert 'build' in log_information
@@ -857,6 +884,11 @@ class BuildInfoHelper(object):
         Keeps in memory all data that needs matching before writing it to the database
     """
 
+    # tasks which produce image files; note we include '', as we set
+    # the task for a target to '' (i.e. 'build') if no target is
+    # explicitly defined
+    IMAGE_GENERATING_TASKS = ['', 'build', 'image', 'populate_sdk_ext']
+
     # pylint: disable=protected-access
     # the code will look into the protected variables of the event; no easy way around this
     # pylint: disable=bad-continuation
@@ -888,22 +920,55 @@ class BuildInfoHelper(object):
     ###################
     ## methods to convert event/external info into objects that the ORM layer uses
 
+    def _ensure_build(self):
+        """
+        Ensure the current build object exists and is up to date with
+        data on the bitbake server
+        """
+        if not 'build' in self.internal_state or not self.internal_state['build']:
+            # create the Build object
+            self.internal_state['build'] = \
+                self.orm_wrapper.get_or_create_build_object(self.brbe)
 
-    def _get_build_information(self, build_log_path):
+        build = self.internal_state['build']
+
+        # update missing fields on the Build object with found data
         build_info = {}
-        build_info['machine'] = self.server.runCommand(["getVariable", "MACHINE"])[0]
-        build_info['distro'] = self.server.runCommand(["getVariable", "DISTRO"])[0]
-        build_info['distro_version'] = self.server.runCommand(["getVariable", "DISTRO_VERSION"])[0]
-        build_info['started_on'] = timezone.now()
-        build_info['completed_on'] = timezone.now()
-        build_info['cooker_log_path'] = build_log_path
-        build_info['build_name'] = self.server.runCommand(["getVariable", "BUILDNAME"])[0]
-        build_info['bitbake_version'] = self.server.runCommand(["getVariable", "BB_VERSION"])[0]
-        build_info['project'] = self.project = self.server.runCommand(["getVariable", "TOASTER_PROJECT"])[0]
-        return build_info
+
+        # set to True if at least one field is going to be set
+        changed = False
+
+        if not build.build_name:
+            build_name = self.server.runCommand(["getVariable", "BUILDNAME"])[0]
+
+            # only reset the build name if the one on the server is actually
+            # a valid value for the build_name field
+            if build_name != None:
+                build_info['build_name'] = build_name
+                changed = True
+
+        if not build.machine:
+            build_info['machine'] = self.server.runCommand(["getVariable", "MACHINE"])[0]
+            changed = True
+
+        if not build.distro:
+            build_info['distro'] = self.server.runCommand(["getVariable", "DISTRO"])[0]
+            changed = True
+
+        if not build.distro_version:
+            build_info['distro_version'] = self.server.runCommand(["getVariable", "DISTRO_VERSION"])[0]
+            changed = True
+
+        if not build.bitbake_version:
+            build_info['bitbake_version'] = self.server.runCommand(["getVariable", "BB_VERSION"])[0]
+            changed = True
+
+        if changed:
+            self.orm_wrapper.update_build(self.internal_state['build'], build_info)
 
     def _get_task_information(self, event, recipe):
         assert 'taskname' in vars(event)
+        self._ensure_build()
 
         task_information = {}
         task_information['build'] = self.internal_state['build']
@@ -918,8 +983,7 @@ class BuildInfoHelper(object):
         return task_information
 
     def _get_layer_version_for_path(self, path):
-        assert path.startswith("/")
-        assert 'build' in self.internal_state
+        self._ensure_build()
 
         def _slkey_interactive(layer_version):
             assert isinstance(layer_version, Layer_Version)
@@ -930,9 +994,12 @@ class BuildInfoHelper(object):
             # we can match to the recipe file path
             if path.startswith(lvo.local_path):
                 return lvo
+            if lvo.layer.local_source_dir and \
+               path.startswith(lvo.layer.local_source_dir):
+                return lvo
 
         #if we get here, we didn't read layers correctly; dump whatever information we have on the error log
-        logger.warn("Could not match layer version for recipe path %s : %s", path, self.orm_wrapper.layer_version_objects)
+        logger.warning("Could not match layer version for recipe path %s : %s", path, self.orm_wrapper.layer_version_objects)
 
         #mockup the new layer
         unknown_layer, _ = Layer.objects.get_or_create(name="Unidentified layer", layer_index_url="")
@@ -963,6 +1030,8 @@ class BuildInfoHelper(object):
         return recipe_info
 
     def _get_path_information(self, task_object):
+        self._ensure_build()
+
         assert isinstance(task_object, Task)
         build_stats_format = "{tmpdir}/buildstats/{buildname}/{package}/"
         build_stats_path = []
@@ -1003,19 +1072,33 @@ class BuildInfoHelper(object):
                 self.internal_state['lvs'][self.orm_wrapper.get_update_layer_object(layerinfos[layer], self.brbe)] = layerinfos[layer]['version']
                 self.internal_state['lvs'][self.orm_wrapper.get_update_layer_object(layerinfos[layer], self.brbe)]['local_path'] = layerinfos[layer]['local_path']
             except NotExisting as nee:
-                logger.warn("buildinfohelper: cannot identify layer exception:%s ", nee)
+                logger.warning("buildinfohelper: cannot identify layer exception:%s ", nee)
 
+    def store_started_build(self):
+        self._ensure_build()
 
-    def store_started_build(self, event, build_log_path):
+    def save_build_log_file_path(self, build_log_path):
+        self._ensure_build()
+
+        if not self.internal_state['build'].cooker_log_path:
+            data_dict = {'cooker_log_path': build_log_path}
+            self.orm_wrapper.update_build(self.internal_state['build'], data_dict)
+
+    def save_build_targets(self, event):
+        self._ensure_build()
+
+        # create target information
         assert '_pkgs' in vars(event)
-        build_information = self._get_build_information(build_log_path)
+        target_information = {}
+        target_information['targets'] = event._pkgs
+        target_information['build'] = self.internal_state['build']
 
-        # Update brbe and project as they can be changed for every build
-        self.project = build_information['project']
+        self.internal_state['targets'] = self.orm_wrapper.get_or_create_targets(target_information)
 
-        build_obj = self.orm_wrapper.create_build_object(build_information, self.brbe, self.project)
+    def save_build_layers_and_variables(self):
+        self._ensure_build()
 
-        self.internal_state['build'] = build_obj
+        build_obj = self.internal_state['build']
 
         # save layer version information for this build
         if not 'lvs' in self.internal_state:
@@ -1025,13 +1108,6 @@ class BuildInfoHelper(object):
                 self.orm_wrapper.get_update_layer_version_object(build_obj, layer_obj, self.internal_state['lvs'][layer_obj])
 
             del self.internal_state['lvs']
-
-        # create target information
-        target_information = {}
-        target_information['targets'] = event._pkgs
-        target_information['build'] = build_obj
-
-        self.internal_state['targets'] = self.orm_wrapper.get_or_create_targets(target_information)
 
         # Save build configuration
         data = self.server.runCommand(["getAllKeysWithFlags", ["doc", "func"]])[0]
@@ -1055,7 +1131,8 @@ class BuildInfoHelper(object):
                         abs_file_name = vh['file']
                         for pp in path_prefixes:
                             if abs_file_name.startswith(pp + "/"):
-                                vh['file']=abs_file_name[len(pp + "/"):]
+                                # preserve layer name in relative path
+                                vh['file']=abs_file_name[pp.rfind("/")+1:]
                                 break
 
         # save the variables
@@ -1063,35 +1140,48 @@ class BuildInfoHelper(object):
 
         return self.brbe
 
+    def set_recipes_to_parse(self, num_recipes):
+        """
+        Set the number of recipes which need to be parsed for this build.
+        This is set the first time ParseStarted is received by toasterui.
+        """
+        self._ensure_build()
+        self.internal_state['build'].recipes_to_parse = num_recipes
+        self.internal_state['build'].save()
+
+    def set_recipes_parsed(self, num_recipes):
+        """
+        Set the number of recipes parsed so far for this build; this is updated
+        each time a ParseProgress or ParseCompleted event is received by
+        toasterui.
+        """
+        self._ensure_build()
+        if num_recipes <= self.internal_state['build'].recipes_to_parse:
+            self.internal_state['build'].recipes_parsed = num_recipes
+            self.internal_state['build'].save()
 
     def update_target_image_file(self, event):
         evdata = BuildInfoHelper._get_data_from_event(event)
 
         for t in self.internal_state['targets']:
             if t.is_image == True:
-                output_files = list(evdata.viewkeys())
+                output_files = list(evdata.keys())
                 for output in output_files:
                     if t.target in output and 'rootfs' in output and not output.endswith(".manifest"):
                         self.orm_wrapper.save_target_image_file_information(t, output, evdata[output])
 
     def update_artifact_image_file(self, event):
+        self._ensure_build()
         evdata = BuildInfoHelper._get_data_from_event(event)
         for artifact_path in evdata.keys():
-            self.orm_wrapper.save_artifact_information(self.internal_state['build'], artifact_path, evdata[artifact_path])
+            self.orm_wrapper.save_artifact_information(
+                self.internal_state['build'], artifact_path,
+                evdata[artifact_path])
 
     def update_build_information(self, event, errors, warnings, taskfailures):
-        if 'build' in self.internal_state:
-            self.orm_wrapper.update_build_object(self.internal_state['build'], errors, warnings, taskfailures)
-
-
-    def store_license_manifest_path(self, event):
-        deploy_dir = BuildInfoHelper._get_data_from_event(event)['deploy_dir']
-        image_name = BuildInfoHelper._get_data_from_event(event)['image_name']
-        path = deploy_dir + "/licenses/" + image_name + "/license.manifest"
-        for target in self.internal_state['targets']:
-            if target.target in image_name:
-                self.orm_wrapper.update_target_set_license_manifest(target, path)
-
+        self._ensure_build()
+        self.orm_wrapper.update_build_stats_and_outcome(
+            self.internal_state['build'], errors, warnings, taskfailures)
 
     def store_started_task(self, event):
         assert isinstance(event, (bb.runqueue.sceneQueueTaskStarted, bb.runqueue.runQueueTaskStarted, bb.runqueue.runQueueTaskSkipped))
@@ -1134,6 +1224,7 @@ class BuildInfoHelper(object):
 
 
     def store_tasks_stats(self, event):
+        self._ensure_build()
         task_data = BuildInfoHelper._get_data_from_event(event)
 
         for (task_file, task_name, task_stats, recipe_name) in task_data:
@@ -1229,6 +1320,8 @@ class BuildInfoHelper(object):
 
 
     def store_target_package_data(self, event):
+        self._ensure_build()
+
         # for all image targets
         for target in self.internal_state['targets']:
             if target.is_image:
@@ -1240,17 +1333,32 @@ class BuildInfoHelper(object):
                     self.orm_wrapper.save_target_package_information(self.internal_state['build'], target, imgdata, pkgdata, self.internal_state['recipes'], built_package=True)
                     self.orm_wrapper.save_target_package_information(self.internal_state['build'], target, imgdata.copy(), pkgdata, self.internal_state['recipes'], built_package=False)
                 except KeyError as e:
-                    logger.warn("KeyError in save_target_package_information"
-                                "%s ", e)
+                    logger.warning("KeyError in save_target_package_information"
+                                   "%s ", e)
 
-                try:
-                    self.orm_wrapper.save_target_file_information(self.internal_state['build'], target, filedata)
-                except KeyError as e:
-                    logger.warn("KeyError in save_target_file_information"
-                                "%s ", e)
+                # only try to find files in the image if the task for this
+                # target is one which produces image files; otherwise, the old
+                # list of files in the files-in-image.txt file will be
+                # appended to the target even if it didn't produce any images
+                if target.task in BuildInfoHelper.IMAGE_GENERATING_TASKS:
+                    try:
+                        self.orm_wrapper.save_target_file_information(self.internal_state['build'], target, filedata)
+                    except KeyError as e:
+                        logger.warning("KeyError in save_target_file_information"
+                                       "%s ", e)
 
 
 
+    def cancel_cli_build(self):
+        """
+        If a build is currently underway, set its state to CANCELLED;
+        note that this only gets called for command line builds which are
+        interrupted, so it doesn't touch any BuildRequest objects
+        """
+        self._ensure_build()
+        self.internal_state['build'].outcome = Build.CANCELLED
+        self.internal_state['build'].save()
+        signal_runbuilds()
 
     def store_dependency_information(self, event):
         assert '_depgraph' in vars(event)
@@ -1392,10 +1500,12 @@ class BuildInfoHelper(object):
         Task_Dependency.objects.bulk_create(taskdeps_objects)
 
         if len(errormsg) > 0:
-            logger.warn("buildinfohelper: dependency info not identify recipes: \n%s", errormsg)
+            logger.warning("buildinfohelper: dependency info not identify recipes: \n%s", errormsg)
 
 
     def store_build_package_information(self, event):
+        self._ensure_build()
+
         package_info = BuildInfoHelper._get_data_from_event(event)
         self.orm_wrapper.save_build_package_information(
             self.internal_state['build'],
@@ -1411,10 +1521,12 @@ class BuildInfoHelper(object):
 
     def _store_build_done(self, errorcode):
         logger.info("Build exited with errorcode %d", errorcode)
+
+        if not self.brbe:
+            return
+
         br_id, be_id = self.brbe.split(":")
-        be = BuildEnvironment.objects.get(pk = be_id)
-        be.lock = BuildEnvironment.LOCK_LOCK
-        be.save()
+
         br = BuildRequest.objects.get(pk = br_id)
 
         # if we're 'done' because we got cancelled update the build outcome
@@ -1432,6 +1544,10 @@ class BuildInfoHelper(object):
             br.state = BuildRequest.REQ_FAILED
         br.save()
 
+        be = BuildEnvironment.objects.get(pk = be_id)
+        be.lock = BuildEnvironment.LOCK_FREE
+        be.save()
+        signal_runbuilds()
 
     def store_log_error(self, text):
         mockevent = MockEvent()
@@ -1449,30 +1565,25 @@ class BuildInfoHelper(object):
         mockevent.lineno = -1
         self.store_log_event(mockevent)
 
-
     def store_log_event(self, event):
+        self._ensure_build()
+
         if event.levelno < formatter.WARNING:
             return
 
-        if 'args' in vars(event):
-            event.msg = event.msg % event.args
+        # early return for CLI builds
+        if self.brbe is None:
+            if not 'backlog' in self.internal_state:
+                self.internal_state['backlog'] = []
+            self.internal_state['backlog'].append(event)
+            return
 
-        if not 'build' in self.internal_state:
-            if self.brbe is None:
-                if not 'backlog' in self.internal_state:
-                    self.internal_state['backlog'] = []
-                self.internal_state['backlog'].append(event)
-                return
-            else:   # we're under Toaster control, the build is already created
-                br, _ = self.brbe.split(":")
-                buildrequest = BuildRequest.objects.get(pk = br)
-                self.internal_state['build'] = buildrequest.build
-
-        if 'build' in self.internal_state and 'backlog' in self.internal_state:
+        if 'backlog' in self.internal_state:
             # if we have a backlog of events, do our best to save them here
             if len(self.internal_state['backlog']):
                 tempevent = self.internal_state['backlog'].pop()
-                logger.debug(1, "buildinfohelper: Saving stored event %s " % tempevent)
+                logger.debug(1, "buildinfohelper: Saving stored event %s "
+                             % tempevent)
                 self.store_log_event(tempevent)
             else:
                 logger.info("buildinfohelper: All events saved")
@@ -1491,26 +1602,324 @@ class BuildInfoHelper(object):
         else:
             log_information['level'] = LogMessage.INFO
 
-        log_information['message'] = event.msg
+        log_information['message'] = event.getMessage()
         log_information['pathname'] = event.pathname
         log_information['lineno'] = event.lineno
         logger.info("Logging error 2: %s", log_information)
 
         self.orm_wrapper.create_logmessage(log_information)
 
+    def _get_filenames_from_image_license(self, image_license_manifest_path):
+        """
+        Find the FILES line in the image_license.manifest file,
+        which has the basenames of the bzImage and modules files
+        in this format:
+        FILES: bzImage--4.4.11+git0+3a5f494784_53e84104c5-r0-qemux86-20160603165040.bin modules--4.4.11+git0+3a5f494784_53e84104c5-r0-qemux86-20160603165040.tgz
+        """
+        files = []
+        with open(image_license_manifest_path) as image_license:
+            for line in image_license:
+                if line.startswith('FILES'):
+                    files_str = line.split(':')[1].strip()
+                    files_str = re.sub(r' {2,}', ' ', files_str)
+
+                    # ignore lines like "FILES:" with no filenames
+                    if files_str:
+                        files += files_str.split(' ')
+        return files
+
+    def _endswith(self, str_to_test, endings):
+        """
+        Returns True if str ends with one of the strings in the list
+        endings, False otherwise
+        """
+        endswith = False
+        for ending in endings:
+            if str_to_test.endswith(ending):
+                endswith = True
+                break
+        return endswith
+
+    def _get_image_files(self, deploy_dir_image, image_name, image_file_extensions):
+        """
+        Find files in deploy_dir_image whose basename starts with the
+        string image_name and ends with one of the strings in
+        image_file_extensions.
+
+        Returns a list of file dictionaries like
+
+        [
+            {
+                'path': '/path/to/image/file',
+                'size': <file size in bytes>
+            }
+        ]
+        """
+        image_files = []
+
+        for dirpath, _, filenames in os.walk(deploy_dir_image):
+            for filename in filenames:
+                if filename.startswith(image_name) and \
+                self._endswith(filename, image_file_extensions):
+                    image_file_path = os.path.join(dirpath, filename)
+                    image_file_size = os.stat(image_file_path).st_size
+
+                    image_files.append({
+                        'path': image_file_path,
+                        'size': image_file_size
+                    })
+
+        return image_files
+
+    def scan_image_artifacts(self):
+        """
+        Scan for built image artifacts in DEPLOY_DIR_IMAGE and associate them
+        with a Target object in self.internal_state['targets'].
+
+        We have two situations to handle:
+
+        1. This is the first time a target + machine has been built, so
+        add files from the DEPLOY_DIR_IMAGE to the target.
+
+        OR
+
+        2. There are no new files for the target (they were already produced by
+        a previous build), so copy them from the most recent previous build with
+        the same target, task and machine.
+        """
+        deploy_dir_image = \
+            self.server.runCommand(['getVariable', 'DEPLOY_DIR_IMAGE'])[0]
+
+        # if there's no DEPLOY_DIR_IMAGE, there aren't going to be
+        # any image artifacts, so we can return immediately
+        if not deploy_dir_image:
+            return
+
+        buildname = self.server.runCommand(['getVariable', 'BUILDNAME'])[0]
+        machine = self.server.runCommand(['getVariable', 'MACHINE'])[0]
+        image_name = self.server.runCommand(['getVariable', 'IMAGE_NAME'])[0]
+
+        # location of the manifest files for this build;
+        # note that this file is only produced if an image is produced
+        license_directory = \
+            self.server.runCommand(['getVariable', 'LICENSE_DIRECTORY'])[0]
+
+        # file name extensions for image files
+        image_file_extensions_unique = {}
+        image_fstypes = self.server.runCommand(
+            ['getVariable', 'IMAGE_FSTYPES'])[0]
+        if image_fstypes != None:
+            image_types_str = image_fstypes.strip()
+            image_file_extensions = re.sub(r' {2,}', ' ', image_types_str)
+            image_file_extensions_unique = set(image_file_extensions.split(' '))
+
+        targets = self.internal_state['targets']
+
+        # filter out anything which isn't an image target
+        image_targets = [target for target in targets if target.is_image]
+
+        for image_target in image_targets:
+            # this is set to True if we find at least one file relating to
+            # this target; if this remains False after the scan, we copy the
+            # files from the most-recent Target with the same target + machine
+            # onto this Target instead
+            has_files = False
+
+            # we construct this because by the time we reach
+            # BuildCompleted, this has reset to
+            # 'defaultpkgname-<MACHINE>-<BUILDNAME>';
+            # we need to change it to
+            # <TARGET>-<MACHINE>-<BUILDNAME>
+            real_image_name = re.sub(r'^defaultpkgname', image_target.target,
+                image_name)
+
+            image_license_manifest_path = os.path.join(
+                license_directory,
+                real_image_name,
+                'image_license.manifest')
+
+            image_package_manifest_path = os.path.join(
+                license_directory,
+                real_image_name,
+                'image_license.manifest')
+
+            # if image_license.manifest exists, we can read the names of
+            # bzImage, modules etc. files for this build from it, then look for
+            # them in the DEPLOY_DIR_IMAGE; note that this file is only produced
+            # if an image file was produced
+            if os.path.isfile(image_license_manifest_path):
+                has_files = True
+
+                basenames = self._get_filenames_from_image_license(
+                    image_license_manifest_path)
+
+                for basename in basenames:
+                    artifact_path = os.path.join(deploy_dir_image, basename)
+                    if not os.path.exists(artifact_path):
+                        logger.warning("artifact %s doesn't exist, skipping" % artifact_path)
+                        continue
+                    artifact_size = os.stat(artifact_path).st_size
+
+                    # note that the artifact will only be saved against this
+                    # build if it hasn't been already
+                    self.orm_wrapper.save_target_kernel_file(image_target,
+                        artifact_path, artifact_size)
+
+                # store the license manifest path on the target
+                # (this file is also created any time an image file is created)
+                license_manifest_path = os.path.join(license_directory,
+                    real_image_name, 'license.manifest')
+
+                self.orm_wrapper.update_target_set_license_manifest(
+                    image_target, license_manifest_path)
+
+                # store the package manifest path on the target (this file
+                # is created any time an image file is created)
+                package_manifest_path = os.path.join(deploy_dir_image,
+                    real_image_name + '.rootfs.manifest')
+
+                if os.path.exists(package_manifest_path):
+                    self.orm_wrapper.update_target_set_package_manifest(
+                        image_target, package_manifest_path)
+
+            # scan the directory for image files relating to this build
+            # (via real_image_name); note that we don't have to set
+            # has_files = True, as searching for the license manifest file
+            # will already have set it to true if at least one image file was
+            # produced; note that the real_image_name includes BUILDNAME, which
+            # in turn includes a timestamp; so if no files were produced for
+            # this timestamp (i.e. the build reused existing image files already
+            # in the directory), no files will be recorded against this target
+            image_files = self._get_image_files(deploy_dir_image,
+                real_image_name, image_file_extensions_unique)
+
+            for image_file in image_files:
+                self.orm_wrapper.save_target_image_file_information(
+                    image_target, image_file['path'], image_file['size'])
+
+            if not has_files:
+                # copy image files and build artifacts from the
+                # most-recently-built Target with the
+                # same target + machine as this Target; also copy the license
+                # manifest path, as that is not treated as an artifact and needs
+                # to be set separately
+                similar_target = \
+                    self.orm_wrapper.get_similar_target_with_image_files(
+                        image_target)
+
+                if similar_target:
+                    logger.info('image artifacts for target %s cloned from ' \
+                        'target %s' % (image_target.pk, similar_target.pk))
+                    self.orm_wrapper.clone_image_artifacts(similar_target,
+                        image_target)
+
+    def _get_sdk_targets(self):
+        """
+        Return targets which could generate SDK artifacts, i.e.
+        "do_populate_sdk" and "do_populate_sdk_ext".
+        """
+        return [target for target in self.internal_state['targets'] \
+            if target.task in ['populate_sdk', 'populate_sdk_ext']]
+
+    def scan_sdk_artifacts(self, event):
+        """
+        Note that we have to intercept an SDKArtifactInfo event from
+        toaster.bbclass (via toasterui) to get hold of the SDK variables we
+        need to be able to scan for files accurately: this is because
+        variables like TOOLCHAIN_OUTPUTNAME have reset to None by the time
+        BuildCompleted is fired by bitbake, so we have to get those values
+        while the build is still in progress.
+
+        For populate_sdk_ext, this runs twice, with two different
+        TOOLCHAIN_OUTPUTNAME settings, each of which will capture some of the
+        files in the SDK output directory.
+        """
+        sdk_vars = BuildInfoHelper._get_data_from_event(event)
+        toolchain_outputname = sdk_vars['TOOLCHAIN_OUTPUTNAME']
+
+        # targets which might have created SDK artifacts
+        sdk_targets = self._get_sdk_targets()
+
+        # location of SDK artifacts
+        tmpdir = self.server.runCommand(['getVariable', 'TMPDIR'])[0]
+        sdk_dir = os.path.join(tmpdir, 'deploy', 'sdk')
+
+        # all files in the SDK directory
+        artifacts = []
+        for dir_path, _, filenames in os.walk(sdk_dir):
+            for filename in filenames:
+                full_path = os.path.join(dir_path, filename)
+                if not os.path.islink(full_path):
+                    artifacts.append(full_path)
+
+        for sdk_target in sdk_targets:
+            # find files in the SDK directory which haven't already been
+            # recorded against a Target and whose basename matches
+            # TOOLCHAIN_OUTPUTNAME
+            for artifact_path in artifacts:
+                basename = os.path.basename(artifact_path)
+
+                toolchain_match = basename.startswith(toolchain_outputname)
+
+                # files which match the name of the target which produced them;
+                # for example,
+                # poky-glibc-x86_64-core-image-sato-i586-toolchain-ext-2.1+snapshot.sh
+                target_match = re.search(sdk_target.target, basename)
+
+                # targets which produce "*-nativesdk-*" files
+                is_ext_sdk_target = sdk_target.task in \
+                    ['do_populate_sdk_ext', 'populate_sdk_ext']
+
+                # SDK files which don't match the target name, i.e.
+                # x86_64-nativesdk-libc.*
+                # poky-glibc-x86_64-buildtools-tarball-i586-buildtools-nativesdk-standalone-2.1+snapshot*
+                is_ext_sdk_file = re.search('-nativesdk-', basename)
+
+                file_from_target = (toolchain_match and target_match) or \
+                    (is_ext_sdk_target and is_ext_sdk_file)
+
+                if file_from_target:
+                    # don't record the file if it's already been added to this
+                    # target
+                    matching_files = TargetSDKFile.objects.filter(
+                        target=sdk_target, file_name=artifact_path)
+
+                    if matching_files.count() == 0:
+                        artifact_size = os.stat(artifact_path).st_size
+
+                        self.orm_wrapper.save_target_sdk_file(
+                            sdk_target, artifact_path, artifact_size)
+
+    def clone_required_sdk_artifacts(self):
+        """
+        If an SDK target doesn't have any SDK artifacts, this means that
+        the postfuncs of populate_sdk or populate_sdk_ext didn't fire, which
+        in turn means that the targets of this build didn't generate any new
+        artifacts.
+
+        In this case, clone SDK artifacts for targets in the current build
+        from existing targets for this build.
+        """
+        sdk_targets = self._get_sdk_targets()
+        for sdk_target in sdk_targets:
+            # only clone for SDK targets which have no TargetSDKFiles yet
+            if sdk_target.targetsdkfile_set.all().count() == 0:
+                similar_target = \
+                    self.orm_wrapper.get_similar_target_with_sdk_files(
+                        sdk_target)
+                if similar_target:
+                    logger.info('SDK artifacts for target %s cloned from ' \
+                        'target %s' % (sdk_target.pk, similar_target.pk))
+                    self.orm_wrapper.clone_sdk_artifacts(similar_target,
+                        sdk_target)
+
     def close(self, errorcode):
-        if self.brbe is not None:
-            self._store_build_done(errorcode)
+        self._store_build_done(errorcode)
 
         if 'backlog' in self.internal_state:
-            if 'build' in self.internal_state:
-                # we save missed events in the database for the current build
-                tempevent = self.internal_state['backlog'].pop()
-                self.store_log_event(tempevent)
-            else:
-                # we have no build, and we still have events; something amazingly wrong happend
-                for event in self.internal_state['backlog']:
-                    logger.error("UNSAVED log: %s", event.msg)
+            # we save missed events in the database for the current build
+            tempevent = self.internal_state['backlog'].pop()
+            self.store_log_event(tempevent)
 
         if not connection.features.autocommits_when_autocommit_is_off:
             transaction.set_autocommit(True)
@@ -1519,3 +1928,7 @@ class BuildInfoHelper(object):
         # being incorrectly attached to the previous Toaster-triggered build;
         # see https://bugzilla.yoctoproject.org/show_bug.cgi?id=9021
         self.brbe = None
+
+        # unset the internal Build object to prevent it being reused for the
+        # next build
+        self.internal_state['build'] = None

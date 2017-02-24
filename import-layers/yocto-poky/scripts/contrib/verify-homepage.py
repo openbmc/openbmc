@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # This script can be used to verify HOMEPAGE values for all recipes in
 # the current configuration.
@@ -7,7 +7,7 @@
 import sys
 import os
 import subprocess
-import urllib2
+import urllib.request
 
 
 # Allow importing scripts/lib modules
@@ -33,30 +33,30 @@ def wgetHomepage(pn, homepage):
         return 0
 
 def verifyHomepage(bbhandler):
-    pkg_pn = bbhandler.cooker.recipecache.pkg_pn
+    pkg_pn = bbhandler.cooker.recipecaches[''].pkg_pn
     pnlist = sorted(pkg_pn)
     count = 0
     checked = []
     for pn in pnlist:
         for fn in pkg_pn[pn]:
             # There's no point checking multiple BBCLASSEXTENDed variants of the same recipe
-            realfn, _ = bb.cache.Cache.virtualfn2realfn(fn)
+            realfn, _, _ = bb.cache.virtualfn2realfn(fn)
             if realfn in checked:
                 continue
-            data = bb.cache.Cache.loadDataFull(realfn, bbhandler.cooker.collection.get_file_appends(realfn), bbhandler.config_data)
+            data = bbhandler.parse_recipe_file(realfn)
             homepage = data.getVar("HOMEPAGE", True)
             if homepage:
                 try:
-                    urllib2.urlopen(homepage, timeout=5)
+                    urllib.request.urlopen(homepage, timeout=5)
                 except Exception:
                     count = count + wgetHomepage(os.path.basename(realfn), homepage)
             checked.append(realfn)
     return count
 
 if __name__=='__main__':
-    bbhandler = bb.tinfoil.Tinfoil()
-    bbhandler.prepare()
-    logger.info("Start verifying HOMEPAGE:")
-    failcount = verifyHomepage(bbhandler)
-    logger.info("Finished verifying HOMEPAGE.")
-    logger.info("Summary: %s failed" % failcount)
+    with bb.tinfoil.Tinfoil() as bbhandler:
+        bbhandler.prepare()
+        logger.info("Start verifying HOMEPAGE:")
+        failcount = verifyHomepage(bbhandler)
+        logger.info("Finished verifying HOMEPAGE.")
+        logger.info("Summary: %s failed" % failcount)

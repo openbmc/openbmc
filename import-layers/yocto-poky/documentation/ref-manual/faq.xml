@@ -33,9 +33,7 @@
             <para id='faq-not-meeting-requirements'>
                 My development system does not meet the
                 required Git, tar, and Python versions.
-                In particular, I do not have Python 2.7.3 or greater, or
-                I do have Python 3.x, which is specifically not supported by
-                the Yocto Project.
+                In particular, I do not have Python 3.4.0 or greater.
                 Can I still use the Yocto Project?
             </para>
         </question>

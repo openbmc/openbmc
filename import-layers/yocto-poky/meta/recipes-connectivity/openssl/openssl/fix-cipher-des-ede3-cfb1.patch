@@ -4,7 +4,7 @@ This patch adds the fix for one of the ciphers used in openssl, namely
 the cipher des-ede3-cfb1. Complete bug log and patch is present here:
 http://rt.openssl.org/Ticket/Display.html?id=2867
 
-Signed-Off-By: Muhammad Shakeel <muhammad_shakeel@mentor.com>
+Signed-off-by: Muhammad Shakeel <muhammad_shakeel@mentor.com>
 
 Index: openssl-1.0.2/crypto/evp/e_des3.c
 ===================================================================

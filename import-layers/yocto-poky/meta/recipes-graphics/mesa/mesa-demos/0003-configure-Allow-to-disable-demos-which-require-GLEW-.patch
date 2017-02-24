@@ -1,8 +1,7 @@
-From b25e9c675cf560b8b037dc855c6b3b1d09957867 Mon Sep 17 00:00:00 2001
+From 779438770bedf3d53e6ad8f7cd6889b7f50daf3b Mon Sep 17 00:00:00 2001
 From: Martin Jansa <Martin.Jansa@gmail.com>
 Date: Wed, 9 Jul 2014 14:23:41 +0200
-Subject: [PATCH 3/9] configure: Allow to disable demos which require GLEW or
- GLU
+Subject: [PATCH] configure: Allow to disable demos which require GLEW or GLU
 
 * in some systems without X11 support we don't have GLEW, but
   mesa-demos are still useful
@@ -10,17 +9,20 @@ Subject: [PATCH 3/9] configure: Allow to disable demos which require GLEW or
 Upstream-Status: Pending
 
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
+Port to 8.3.0
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
 ---
  configure.ac                  | 49 ++++++++++++++++++++---------
- src/Makefile.am               | 14 ++++++---
+ src/Makefile.am               | 18 ++++++++---
  src/demos/Makefile.am         | 73 ++++++++++++++++++++++++-------------------
  src/egl/Makefile.am           |  8 +++--
- src/egl/opengles1/Makefile.am | 44 +++++++++++++++-----------
- src/egl/opengles2/Makefile.am | 33 ++++++++++---------
- 6 files changed, 135 insertions(+), 86 deletions(-)
+ src/egl/opengles1/Makefile.am | 10 ++++--
+ src/egl/opengles2/Makefile.am | 29 ++++++++---------
+ 6 files changed, 117 insertions(+), 70 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 9445424..bc4c8d1 100644
+index 0525b09..28834cd 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -93,25 +93,44 @@ AC_EGREP_HEADER([glutInitContextProfile],
@@ -92,10 +94,11 @@ index 9445424..bc4c8d1 100644
  AM_CONDITIONAL(HAVE_GLESV1, test "x$glesv1_enabled" = "xyes")
  AM_CONDITIONAL(HAVE_GLESV2, test "x$glesv2_enabled" = "xyes")
 diff --git a/src/Makefile.am b/src/Makefile.am
-index 1647d64..754c47c 100644
+index 1647d64..8b89dee 100644
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
-@@ -23,14 +23,18 @@
+@@ -22,15 +22,19 @@
+ # Authors:
  #    Eric Anholt <eric@anholt.net>
  
 +if HAVE_GLEW
@@ -116,7 +119,7 @@ index 1647d64..754c47c 100644
  	objviewer \
  	osdemos \
  	perf \
-@@ -40,8 +39,12 @@ SUBDIRS = \
+@@ -40,8 +44,12 @@ SUBDIRS = \
  	slang \
  	tests \
  	tools \
@@ -289,10 +292,10 @@ index d64a49e..4fe1ca8 100644
 +	openvg
 +endif
 diff --git a/src/egl/opengles1/Makefile.am b/src/egl/opengles1/Makefile.am
-index 7a9828d..3455e75 100644
+index fa397c2..21853e8 100644
 --- a/src/egl/opengles1/Makefile.am
 +++ b/src/egl/opengles1/Makefile.am
-@@ -36,28 +36,43 @@ AM_LDFLAGS = \
+@@ -36,9 +36,12 @@ AM_LDFLAGS = \
  	$(EGL_LIBS) \
  	-lm
  
@@ -301,42 +304,13 @@ index 7a9828d..3455e75 100644
  if HAVE_EGL
  if HAVE_GLESV1
 -noinst_PROGRAMS = \
--	bindtex \
--	clear \
-+noinst_PROGRAMS += \
- 	drawtex_screen \
-+	gears_screen \
-+	torus_screen \
-+	tri_screen
-+
-+drawtex_screen_SOURCES = drawtex.c
-+gears_screen_SOURCES = gears.c
-+torus_screen_SOURCES = torus.c
-+tri_screen_SOURCES = tri.c
-+
-+drawtex_screen_LDADD = ../eglut/libeglut_screen.la
-+gears_screen_LDADD = ../eglut/libeglut_screen.la
-+torus_screen_LDADD = ../eglut/libeglut_screen.la
-+tri_screen_LDADD = ../eglut/libeglut_screen.la
-+
 +if HAVE_X11
-+noinst_PROGRAMS += \
-+	clear
-+
 +bin_PROGRAMS = \
-+	bindtex \
+ 	bindtex \
+ 	clear \
  	drawtex_x11 \
- 	eglfbdev \
- 	es1_info \
--	gears_screen \
- 	gears_x11 \
- 	msaa \
- 	pbuffer\
- 	render_tex \
- 	texture_from_pixmap \
--	torus_screen \
+@@ -52,8 +55,6 @@ noinst_PROGRAMS = \
  	torus_x11 \
--	tri_screen \
  	tri_x11 \
  	two_win
 -endif
@@ -344,26 +318,7 @@ index 7a9828d..3455e75 100644
  
  bindtex_LDADD = $(X11_LIBS)
  es1_info_LDADD = $(X11_LIBS)
-@@ -71,22 +86,15 @@ two_win_LDADD = $(X11_LIBS)
- clear_LDADD = ../eglut/libeglut_x11.la $(EGL_LIBS) $(X11_LIBS)
- clear_LDFLAGS =
- 
--drawtex_screen_SOURCES = drawtex.c
--gears_screen_SOURCES = gears.c
--torus_screen_SOURCES = torus.c
--tri_screen_SOURCES = tri.c
--
- drawtex_x11_SOURCES = drawtex.c
- gears_x11_SOURCES = gears.c
- torus_x11_SOURCES = torus.c
- tri_x11_SOURCES = tri.c
- 
--drawtex_screen_LDADD = ../eglut/libeglut_screen.la
--gears_screen_LDADD = ../eglut/libeglut_screen.la
--torus_screen_LDADD = ../eglut/libeglut_screen.la
--tri_screen_LDADD = ../eglut/libeglut_screen.la
--
- drawtex_x11_LDADD = ../eglut/libeglut_x11.la
+@@ -76,3 +77,6 @@ drawtex_x11_LDADD = ../eglut/libeglut_x11.la
  gears_x11_LDADD = ../eglut/libeglut_x11.la
  torus_x11_LDADD = ../eglut/libeglut_x11.la
  tri_x11_LDADD = ../eglut/libeglut_x11.la
@@ -371,35 +326,35 @@ index 7a9828d..3455e75 100644
 +endif
 +endif
 diff --git a/src/egl/opengles2/Makefile.am b/src/egl/opengles2/Makefile.am
-index 41c1b80..74af460 100644
+index b80ba50..17f8d49 100644
 --- a/src/egl/opengles2/Makefile.am
 +++ b/src/egl/opengles2/Makefile.am
-@@ -36,26 +36,29 @@ AM_LDFLAGS = \
+@@ -33,27 +33,28 @@ AM_LDFLAGS = \
+ 	$(EGL_LIBS) \
+ 	-lm
+ 
++bin_PROGRAMS =
++
  if HAVE_EGL
  if HAVE_GLESV2
- bin_PROGRAMS = \
+-bin_PROGRAMS =
+-if HAVE_X11
+-bin_PROGRAMS += \
 -	es2_info \
--	es2gears_screen \
 -	es2gears_x11 \
 -	es2tri
-+	es2gears_screen
-+
-+es2gears_screen_SOURCES = es2gears.c
-+es2gears_screen_LDADD = ../eglut/libeglut_screen.la
-+
+-endif
  if HAVE_WAYLAND
  bin_PROGRAMS += es2gears_wayland
 -endif
 -endif
--endif
++
++es2gears_wayland_SOURCES = es2gears.c
++es2gears_wayland_LDADD = ../eglut/libeglut_wayland.la
+ endif
  
 -es2_info_LDADD = $(X11_LIBS)
 -es2tri_LDADD = $(X11_LIBS)
-+es2gears_wayland_SOURCES = es2gears.c
-+es2gears_wayland_LDADD = ../eglut/libeglut_wayland.la
-+endif
- 
--es2gears_screen_SOURCES = es2gears.c
 +if HAVE_X11
 +bin_PROGRAMS += \
 +	es2tri \
@@ -408,8 +363,6 @@ index 41c1b80..74af460 100644
  
 +es2_info_LDADD = $(X11_LIBS)
  es2gears_x11_SOURCES = es2gears.c
--
--es2gears_screen_LDADD = ../eglut/libeglut_screen.la
 -
  es2gears_x11_LDADD = ../eglut/libeglut_x11.la
 +es2tri_LDADD = $(X11_LIBS)
@@ -420,5 +373,5 @@ index 41c1b80..74af460 100644
 -es2gears_wayland_SOURCES = es2gears.c
 -es2gears_wayland_LDADD = ../eglut/libeglut_wayland.la
 -- 
-2.0.0
+2.1.4
 

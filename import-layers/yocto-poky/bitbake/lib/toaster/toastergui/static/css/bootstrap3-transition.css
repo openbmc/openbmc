@@ -1,0 +1,238 @@
+/* Changes to the top bar. Template: base.html */
+
+.navbar .brand {
+  padding: 5px 20px;
+}
+
+.logo {
+  padding-top: 2px !important;
+}
+
+/* Changes to the tables pagination */
+
+.pagination {
+  margin: 0 0 40px 0;
+}
+
+select[class^="pagesize"] {
+  margin-bottom: 0;
+}
+
+/* Project configuration page */
+
+ul.configuration-list {
+  margin-left: 0px;
+}
+
+.configuration-list .checkbox {
+  margin-top: 0;
+}
+
+/* Breadcrumbs */
+
+.breadcrumb {
+  padding: 8px 0;
+}
+
+.breadcrumb > li + li::before {
+  content: none;
+}
+
+.breadcrumb .divider {
+  color: #999;
+  padding: 0 5px;
+}
+
+/* Remove the hovering from the .btn-primary buttons when they are disabled */
+
+.btn-primary.disabled.focus,
+.btn-primary.disabled:focus,
+.btn-primary.disabled:hover,
+.btn-primary.focus[disabled],
+.btn-primary[disabled]:focus,
+.btn-primary[disabled]:hover,
+fieldset[disabled] .btn-primary.focus,
+fieldset[disabled] .btn-primary:focus,
+fieldset[disabled] .btn-primary:hover {
+  background-color: #04c;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+}
+
+/* Table search input field */
+
+.navbar-search {
+  width: 60%;
+}
+
+.navbar-search .input-append {
+  width: 90%;
+}
+
+.navbar-search .input-append input[type="text"] {
+  width: 80%;
+}
+
+#search {
+  width: 60%;
+}
+
+/* Definition lists */
+
+.dl-horizontal dd {
+  margin-left: 220px;
+}
+
+.dl-horizontal dt {
+  width: 200px;
+}
+
+/* Table controls */
+
+.navbar-inner > .navbar-search .input-append {
+  margin-bottom: 5px;
+}
+
+.navbar-search.input-append {
+  margin-bottom: 20px;
+}
+
+/* Modal dialogs */
+
+.modal-dialog {
+  width: 700px;
+}
+
+.modal-body {
+  overflow-y: scroll;
+  max-height: 350px;
+}
+
+.modal-body ul.list-unstyled {
+  margin-left: 0;
+}
+
+.modal-footer {
+  background-color: #f5f5f5;
+}
+
+.modal-content form {
+  margin-bottom: 0;
+}
+
+.modal-dialog .checkbox label,
+.modal-dialog .radio label {
+  padding-left: 0;
+}
+
+/* Typeahead */
+
+.tt-menu {
+  width: 120%;
+  padding: 10px 8px;
+}
+
+.tt-suggestion {
+  padding: 3px 8px;
+  cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.tt-suggestion.active,
+.tt-suggestion:hover {
+  background-color: #0081c2;
+  color: white;
+}
+
+/* Build form */
+
+#build-input {
+  width: 20em;
+}
+
+/* Clear filter tooltips in toastertables */
+
+.tooltip .btn-small {
+  margin: 10px;
+}
+
+/* Table cell notifications */
+
+.inline-notification,
+#temp-inline-notify {
+  padding: 10px;
+}
+
+/* Table buttons */
+
+td .btn {
+  white-space: normal;
+}
+
+th.add-del-layers {
+  width: 18%;
+}
+
+th.add_rm_pkg_btn {
+  width: 20%;
+}
+
+/* Edit columsn menu */
+
+.dropdown-menu {
+  min-width: 200px;
+}
+
+/* Popover content */
+
+.popover-content > ul {
+  margin-left: 0;
+}
+
+h3.popover-title {
+  line-height: 20px;
+}
+
+.popover {
+  max-width: 400px;
+}
+
+/* Errors and warnings accordions */
+
+#errors .panel-heading,
+#warnings .panel-heading {
+  background-color: transparent;
+}
+
+a.toggle-errors:hover,
+a.toggle-warnings:hover,
+a.warning:focus {
+  text-decoration: none;
+}
+
+a.toggle-errors:focus,
+a.toggle-warnings:focus {
+  outline: none;
+}
+
+/* Landing page */
+
+.jumbotron p {
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+.jumbotron ul {
+  margin-left: 10px;
+  font-size: 21px;
+  font-weight: 200;
+}
+
+.jumbotron ul > li {
+  line-height: 30px;
+}
+
+.jumbotron .img-thumbnail {
+  padding: 0;
+}

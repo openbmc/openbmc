@@ -110,7 +110,7 @@ class Command:
             return False
         except SystemExit as exc:
             arg = exc.args[0]
-            if isinstance(arg, basestring):
+            if isinstance(arg, str):
                 self.finishAsyncCommand(arg)
             else:
                 self.finishAsyncCommand("Exited with %s" % arg)

@@ -1,0 +1,54 @@
+gcc6 has fixed a long standing c++ include issue where <cheader>
+was different from <header.h> inclusion via
+
+https://gcc.gnu.org/ml/libstdc++/2016-01/msg00025.html
+
+and its also descibed in https://gcc.gnu.org/gcc-6/porting_to.html
+rpmio component uses some .cpp and .cc fies which need to use
+C stdlib.h from C library and not the C++ libstdc++ header
+therefore we pass _GLIBCXX_INCLUDE_NEXT_C_HEADERS so that it
+keeps the old behavior
+
+/a/build/tmp/sysroots/raspberrypi2/usr/include/c++/6.0.1/cstdlib:143:11: error: '::getenv' has not been declared
+   using ::getenv;
+           ^~~~~~
+In file included from ../../rpm-5.4.15/system.h:201:0,
+                 from ../../rpm-5.4.15/rpmio/rpmjs.cpp:1:
+/a/build/tmp/sysroots/raspberrypi2/usr/include/c++/6.0.1/stdlib.h:62:12: error: 'std::getenv' has not been declared
+ using std::getenv;
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: rpm-5.4.15/rpmio/Makefile.am
+===================================================================
+--- rpm-5.4.15.orig/rpmio/Makefile.am
++++ rpm-5.4.15/rpmio/Makefile.am
+@@ -151,7 +151,7 @@ librpmio_la_SOURCES = \
+ 	groestl.c hamsi.c jh.c keccak.c lane.c luffa.c md2.c md6.c radiogatun.c\
+ 	salsa10.c salsa20.c shabal.c shavite3.c simd.c skein.c tib3.c tiger.c \
+ 	rpmgit.c rpmio-stub.c \
+-	rpmjs.cpp rpmjsio.c rpmkeyring.c \
++	rpmjni.cc rpmjs.cpp rpmjsio.c rpmkeyring.c \
+ 	rpmnix.c rpmodbc.c rpmsql.c set.c \
+ 	ar.c \
+ 	argv.c \
+@@ -195,7 +195,6 @@ librpmio_la_SOURCES = \
+ 	rpmhook.c \
+ 	rpmio.c \
+ 	rpmiob.c \
+-	rpmjni.cc \
+ 	rpmku.c \
+ 	rpmlog.c \
+ 	rpmltc.c \
+@@ -279,7 +278,9 @@ keccak.lo: $(top_srcdir)/rpmio/keccak.c
+ #rpmjs.lo: $(top_srcdir)/rpmio/rpmjs.c
+ #	@$(LTCOMPILE) -O0 -c $<
+ rpmjs.lo: $(top_srcdir)/rpmio/rpmjs.cpp
+-	@$(LTCOMPILE) -O0 -c $<
++	@$(LTCOMPILE) -O0 -c -D_GLIBCXX_INCLUDE_NEXT_C_HEADERS $<
++rpmjni.lo: $(top_srcdir)/rpmio/rpmjni.cc
++	@$(LTCOMPILE) -O0 -c -D_GLIBCXX_INCLUDE_NEXT_C_HEADERS $<
+ 
+ YACC = byacc -d
+ getdate.c: getdate.y

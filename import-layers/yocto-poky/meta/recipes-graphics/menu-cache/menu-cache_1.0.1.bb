@@ -6,7 +6,7 @@ LICENSE = "LGPLv2.1+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=0964c689fcf4c21c6797ea87408416b6"
 
 SECTION = "x11/libs"
-DEPENDS = "glib-2.0 intltool-native libfm-extra"
+DEPENDS = "glib-2.0 libfm-extra"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/lxde/menu-cache-${PV}.tar.xz"
 

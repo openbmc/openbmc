@@ -1,35 +1,51 @@
-[PATCH] disable test
+From 67bc7948e0a721c75d636931abc105da5dcb0763 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?An=C3=ADbal=20Lim=C3=B3n?= <anibal.limon@linux.intel.com>
+Date: Thu, 26 May 2016 15:32:11 -0500
+Subject: [PATCH] [PATCH] disable test
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 Upstream-Status: Inappropriate [configuration]
 
 test needs gtest package, so not build the test dir
 
 Signed-off-by: Roy Li <rongqing.li@windriver.com>
+Signed-off-by: Aníbal Limón <anibal.limon@linux.intel.com>
 ---
- Makefile     | 7 +++----
- configure.ac | 6 ------
- 2 files changed, 3 insertions(+), 10 deletions(-)
+ Makefile     | 9 +++------
+ configure.ac | 7 -------
+ 2 files changed, 3 insertions(+), 13 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 5f5fb27..5070e96 100644
+index 7680f08..69527a5 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -9,8 +9,8 @@ endif
  .PHONY: default
  default: startup all
  
--.PHONY: headers library clean veryclean all binary program doc test update-po
+-.PHONY: fast headers library clean veryclean all binary program doc test update-po
 -all headers library clean veryclean binary program doc manpages docbook test update-po startup dirs:
-+.PHONY: headers library clean veryclean all binary program doc update-po
++.PHONY: fast headers library clean veryclean all binary program doc update-po
 +all headers library clean veryclean binary program doc manpages docbook update-po startup dirs:
  	$(MAKE) -C vendor $@
  	$(MAKE) -C apt-pkg $@
  	$(MAKE) -C apt-inst $@
-@@ -21,9 +21,8 @@ all headers library clean veryclean binary program doc manpages docbook test upd
+@@ -21,8 +21,6 @@ all headers library clean veryclean binary program doc manpages docbook test upd
  	$(MAKE) -C dselect $@
- #	$(MAKE) -C doc $@
+ 	$(MAKE) -C doc $@
  	$(MAKE) -C po $@
--	$(MAKE) -C test $@
+-	# FIXME: -C test has issue swith parallel builds, investigate!
+-	-$(MAKE) -C test $@
+ 
+ fast:
+ 	$(MAKE) -C vendor all
+@@ -32,9 +30,8 @@ fast:
+ 	$(MAKE) -C methods all
+ 	$(MAKE) -C cmdline all
+ 	$(MAKE) -C ftparchive all
+-	$(MAKE) -C test all
  
 -all headers library clean veryclean binary program doc manpages docbook test update-po: startup dirs
 +all headers library clean veryclean binary program doc manpages docbook update-po: startup dirs
@@ -37,22 +53,23 @@ index 5f5fb27..5070e96 100644
  dirs: startup
  
 diff --git a/configure.ac b/configure.ac
-index 5663aaf..b0f9564 100644
+index 1f05da5..e47f459 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -89,12 +89,6 @@ AC_CHECK_LIB(curl, curl_easy_init,
+@@ -90,13 +90,6 @@ AC_CHECK_LIB(curl, curl_easy_init,
       AC_MSG_ERROR([failed: I need CURL due https support]),
  )
  
 -AC_LANG_PUSH([C++])
 -AC_CHECK_HEADER(gtest/gtest.h,,
--     AC_MSG_ERROR([failed: I need gtest to build tests]),
+-     AC_MSG_WARN([failed: I need gtest (packaged as libgtest-dev) for unit testing]),
 -)
 -AC_LANG_POP([C++])
 -
- 
+-
  AC_SUBST(BDBLIB)
  
+ HAVE_ZLIB=no
 -- 
-1.9.1
+2.1.4
 

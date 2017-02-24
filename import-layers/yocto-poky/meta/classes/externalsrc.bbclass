@@ -29,6 +29,23 @@ EXTERNALSRC_SYMLINKS ?= "oe-workdir:${WORKDIR} oe-logs:${T}"
 
 python () {
     externalsrc = d.getVar('EXTERNALSRC', True)
+
+    # If this is the base recipe and EXTERNALSRC is set for it or any of its
+    # derivatives, then enable BB_DONT_CACHE to force the recipe to always be
+    # re-parsed so that the file-checksums function for do_compile is run every
+    # time.
+    bpn = d.getVar('BPN', True)
+    if bpn == d.getVar('PN', True):
+        classextend = (d.getVar('BBCLASSEXTEND', True) or '').split()
+        if (externalsrc or
+                ('native' in classextend and
+                 d.getVar('EXTERNALSRC_pn-%s-native' % bpn, True)) or
+                ('nativesdk' in classextend and
+                 d.getVar('EXTERNALSRC_pn-nativesdk-%s' % bpn, True)) or
+                ('cross' in classextend and
+                 d.getVar('EXTERNALSRC_pn-%s-cross' % bpn, True))):
+            d.setVar('BB_DONT_CACHE', '1')
+
     if externalsrc:
         d.setVar('S', externalsrc)
         externalsrcbuild = d.getVar('EXTERNALSRC_BUILD', True)
@@ -85,10 +102,8 @@ python () {
         d.prependVarFlag('do_compile', 'prefuncs', "externalsrc_compile_prefunc ")
         d.prependVarFlag('do_configure', 'prefuncs', "externalsrc_configure_prefunc ")
 
-        # Force the recipe to be always re-parsed so that the file_checksums
-        # function is run every time
-        d.setVar('BB_DONT_CACHE', '1')
         d.setVarFlag('do_compile', 'file-checksums', '${@srctree_hash_files(d)}')
+        d.setVarFlag('do_configure', 'file-checksums', '${@srctree_configure_hash_files(d)}')
 
         # We don't want the workdir to go away
         d.appendVar('RM_WORK_EXCLUDE', ' ' + d.getVar('PN', True))
@@ -145,10 +160,31 @@ def srctree_hash_files(d):
             env = os.environ.copy()
             env['GIT_INDEX_FILE'] = tmp_index.name
             subprocess.check_output(['git', 'add', '.'], cwd=s_dir, env=env)
-            sha1 = subprocess.check_output(['git', 'write-tree'], cwd=s_dir, env=env)
+            sha1 = subprocess.check_output(['git', 'write-tree'], cwd=s_dir, env=env).decode("utf-8")
         with open(oe_hash_file, 'w') as fobj:
             fobj.write(sha1)
         ret = oe_hash_file + ':True'
     else:
         ret = d.getVar('EXTERNALSRC', True) + '/*:True'
     return ret
+
+def srctree_configure_hash_files(d):
+    """
+    Get the list of files that should trigger do_configure to re-execute,
+    based on the value of CONFIGURE_FILES
+    """
+    in_files = (d.getVar('CONFIGURE_FILES', True) or '').split()
+    out_items = []
+    search_files = []
+    for entry in in_files:
+        if entry.startswith('/'):
+            out_items.append('%s:%s' % (entry, os.path.exists(entry)))
+        else:
+            search_files.append(entry)
+    if search_files:
+        s_dir = d.getVar('EXTERNALSRC', True)
+        for root, _, files in os.walk(s_dir):
+            for f in files:
+                if f in search_files:
+                    out_items.append('%s:True' % os.path.join(root, f))
+    return ' '.join(out_items)

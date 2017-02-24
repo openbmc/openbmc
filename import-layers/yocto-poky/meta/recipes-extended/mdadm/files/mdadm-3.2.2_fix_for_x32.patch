@@ -6,7 +6,7 @@ set by tune settings are lost. Causing compile failure with x32 toolchain
 As the bitbake defined CC is good, there is no need to redfine CC in the 
 make file, hence making the CC definition in the Makefile conditional.
 
-Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com> 2011/12/07
+Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com> 2011/12/07
 
 Index: mdadm-3.3/Makefile
 ===================================================================

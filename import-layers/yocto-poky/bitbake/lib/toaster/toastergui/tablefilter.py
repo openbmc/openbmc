@@ -286,7 +286,7 @@ class TableFilterMap(object):
     def to_json(self, queryset):
         data = {}
 
-        for filter_name, table_filter in self.__filters.iteritems():
+        for filter_name, table_filter in self.__filters.items():
             data[filter_name] = table_filter.to_json()
 
         return data

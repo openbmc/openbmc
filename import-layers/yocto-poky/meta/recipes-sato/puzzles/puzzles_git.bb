@@ -21,45 +21,54 @@ PV = "0.0+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 
-inherit autotools-brokensep distro_features_check pkgconfig
+inherit autotools distro_features_check pkgconfig
 
-PACKAGECONFIG ??= "gtk2"
+CFLAGS_append = " -Wno-deprecated-declarations"
+
+PACKAGECONFIG ??= "gtk3"
 PACKAGECONFIG[gtk2] = "--with-gtk=2,,gtk+,"
 PACKAGECONFIG[gtk3] = "--with-gtk=3,,gtk+3,"
 
-do_configure_prepend () {
-    ./mkfiles.pl
+PACKAGES += "${PN}-extra"
+FILES_${PN} = ""
+FILES_${PN}-extra = "${prefix}/bin ${datadir}/applications"
+
+python __anonymous () {
+    var = d.expand("FILES_${PN}")
+    data = d.getVar(var, False)
+    for name in ("bridges", "fifteen", "inertia", "map", "samegame", "slant"):
+        data = data + " ${bindir}/%s" % name
+        data = data + " ${datadir}/applications/%s.desktop" % name
+    d.setVar(var, data)
 }
 
-FILES_${PN} = "${prefix}/bin/* ${datadir}/applications/*"
+do_configure_prepend () {
+    cd ${S}
+    ./mkfiles.pl
+    cd ${B}
+}
 
-do_install () {
-    rm -rf ${D}/*
-    export prefix=${D}
-    export DESTDIR=${D}
-    install -d ${D}/${prefix}/bin/
-    oe_runmake install
-
-
-    install -d ${D}/${datadir}/applications/
+do_install_append () {
+    # net conflicts with Samba, so rename it
+    mv ${D}${bindir}/net ${D}${bindir}/puzzles-net
 
     # Create desktop shortcuts
+    install -d ${D}/${datadir}/applications/
     cd ${D}/${prefix}/bin
     for prog in *; do
 	if [ -x $prog ]; then
             # Convert prog to Title Case
-            title=$(echo $prog | sed 's/\(^\| \)./\U&/g')
+            title=$(echo $prog | sed 's/puzzles-//' | sed 's/\(^\| \)./\U&/g')
 	    echo "making ${D}/${datadir}/applications/$prog.desktop"
 	    cat <<STOP > ${D}/${datadir}/applications/$prog.desktop
 [Desktop Entry]
 Name=$title
-Exec=${prefix}/bin/$prog
+Exec=${bindir}/$prog
 Icon=applications-games
 Terminal=false
 Type=Application
 Categories=Game;
 StartupNotify=true
-X-MB-SingleInstance=true
 STOP
         fi
     done

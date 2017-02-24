@@ -1,12 +1,12 @@
 {# TODO move to snippets dir #}
 {% if data.is_locale_package %}
 <p class="text-center">
-  <span class="muted">Locale package</span>
-  <i class="icon-question-sign get-help hover-help" title=""
-      data-original-title="This package is included in your image
+  <span class="text-muted">Locale package</span>
+  <span class="glyphicon glyphicon-question-sign get-help hover-help"
+      title="This package is included in your image
       based on the locale specified in the IMAGE_LINGUAS variable"
       style="visibility: hidden;">
-  </i>
+  </span>
 </p>
 
 {% else %}
@@ -21,12 +21,12 @@
     <i class="icon-trash no-tooltip"></i>
     Remove package
   </button>
-  <button class="btn btn-block add-rm-package-btn" data-directive="add" data-id="{{data.pk}}" data-package-url="{% url 'xhr_customrecipe_packages' extra.recipe_id data.pk %}" data-name="{{data.name}}" style="
+  <button class="btn btn-default btn-block add-rm-package-btn" data-directive="add" data-id="{{data.pk}}" data-package-url="{% url 'xhr_customrecipe_packages' extra.recipe_id data.pk %}" data-name="{{data.name}}" style="
       {% if data.pk in extra.current_packages %}
       display:none
       {% endif %}
       ">
-    <i class="icon-plus"></i>
+    <i class="glyphicon glyphicon-plus"></i>
     Add package
   </button>
 </div>

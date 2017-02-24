@@ -1,0 +1,42 @@
+From d6501b107940e9f548c89236d773c6d33c15a5c9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 16 Apr 2016 13:28:59 -0700
+Subject: [PATCH 1/2] Do not ignore return value of write()
+
+gcc warns about ignoring return value when compiling
+with fortify turned on.
+
+assert when write() fails
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted
+
+ glib/tests/unix.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/glib/tests/unix.c b/glib/tests/unix.c
+index 3543458..4e7ed85 100644
+--- a/glib/tests/unix.c
++++ b/glib/tests/unix.c
+@@ -32,14 +32,15 @@ test_pipe (void)
+   GError *error = NULL;
+   int pipefd[2];
+   char buf[1024];
+-  ssize_t bytes_read;
++  ssize_t bytes_read, bytes_written;
+   gboolean res;
+ 
+   res = g_unix_open_pipe (pipefd, FD_CLOEXEC, &error);
+   g_assert (res);
+   g_assert_no_error (error);
+ 
+-  write (pipefd[1], "hello", sizeof ("hello"));
++  bytes_written = write (pipefd[1], "hello", sizeof ("hello"));
++  g_assert (bytes_written != -1 && "write() failed");
+   memset (buf, 0, sizeof (buf));
+   bytes_read = read (pipefd[0], buf, sizeof(buf) - 1);
+   g_assert_cmpint (bytes_read, >, 0);
+-- 
+2.8.0
+

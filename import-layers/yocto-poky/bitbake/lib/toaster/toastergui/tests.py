@@ -25,12 +25,13 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
 from django.utils import timezone
+from django.db.models import Q
 
 from orm.models import Project, Release, BitbakeVersion, Package, LogMessage
-from orm.models import ReleaseLayerSourcePriority, LayerSource, Layer, Build
+from orm.models import LayerSource, Layer, Build
 from orm.models import Layer_Version, Recipe, Machine, ProjectLayer, Target
 from orm.models import CustomImageRecipe, ProjectVariable
-from orm.models import Branch, CustomImagePackage
+from orm.models import CustomImagePackage
 
 import toastermain
 import inspect
@@ -57,7 +58,6 @@ class ViewTests(TestCase):
 
         self.project = Project.objects.first()
         self.recipe1 = Recipe.objects.get(pk=2)
-        self.recipe2 = Recipe.objects.last()
         self.customr = CustomImageRecipe.objects.first()
         self.cust_package = CustomImagePackage.objects.first()
         self.package = Package.objects.first()
@@ -77,14 +77,18 @@ class ViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response['Content-Type'].startswith('application/json'))
 
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
 
         self.assertTrue("error" in data)
         self.assertEqual(data["error"], "ok")
         self.assertTrue("rows" in data)
 
-        self.assertTrue(self.project.name in [x["name"] for x in data["rows"]])
-        self.assertTrue("id" in data["rows"][0])
+        name_found = False
+        for row in data["rows"]:
+            name_found = row['name'].find(self.project.name)
+
+        self.assertTrue(name_found,
+                        "project name not found in projects table")
 
     def test_typeaheads(self):
         """Test typeahead ReST API"""
@@ -102,7 +106,7 @@ class ViewTests(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertTrue(response['Content-Type'].startswith('application/json'))
 
-            data = json.loads(response.content)
+            data = json.loads(response.content.decode('utf-8'))
 
             self.assertTrue("error" in data)
             self.assertEqual(data["error"], "ok")
@@ -145,34 +149,34 @@ class ViewTests(TestCase):
 
     def test_xhr_import_layer(self):
         """Test xhr_importlayer API"""
-        LayerSource.objects.create(sourcetype=LayerSource.TYPE_IMPORTED)
         #Test for importing an already existing layer
         args = {'vcs_url' : "git://git.example.com/test",
                 'name' : "base-layer",
                 'git_ref': "c12b9596afd236116b25ce26dbe0d793de9dc7ce",
                 'project_id': self.project.id,
+                'local_source_dir': "",
                 'dir_path' : "/path/in/repository"}
         response = self.client.post(reverse('xhr_importlayer'), args)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data["error"], "ok")
 
         #Test to verify import of a layer successful
         args['name'] = "meta-oe"
         response = self.client.post(reverse('xhr_importlayer'), args)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertTrue(data["error"], "ok")
 
         #Test for html tag in the data
         args['<'] = "testing html tag"
         response = self.client.post(reverse('xhr_importlayer'), args)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertNotEqual(data["error"], "ok")
 
         #Empty data passed
         args = {}
         response = self.client.post(reverse('xhr_importlayer'), args)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertNotEqual(data["error"], "ok")
 
     def test_custom_ok(self):
@@ -182,7 +186,7 @@ class ViewTests(TestCase):
                   'base': self.recipe1.id}
         response = self.client.post(url, params)
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data['error'], 'ok')
         self.assertTrue('url' in data)
         # get recipe from the database
@@ -198,7 +202,7 @@ class ViewTests(TestCase):
                        {'name': 'custom', 'project': self.project.id}]:
             response = self.client.post(url, params)
             self.assertEqual(response.status_code, 200)
-            data = json.loads(response.content)
+            data = json.loads(response.content.decode('utf-8'))
             self.assertNotEqual(data["error"], "ok")
 
     def test_xhr_custom_wrong_project(self):
@@ -207,7 +211,7 @@ class ViewTests(TestCase):
         params = {'name': 'custom', 'project': 0, "base": self.recipe1.id}
         response = self.client.post(url, params)
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertNotEqual(data["error"], "ok")
 
     def test_xhr_custom_wrong_base(self):
@@ -216,7 +220,7 @@ class ViewTests(TestCase):
         params = {'name': 'custom', 'project': self.project.id, "base": 0}
         response = self.client.post(url, params)
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertNotEqual(data["error"], "ok")
 
     def test_xhr_custom_details(self):
@@ -231,7 +235,7 @@ class ViewTests(TestCase):
                              'project_id': self.project.id,
                             }
                    }
-        self.assertEqual(json.loads(response.content), expected)
+        self.assertEqual(json.loads(response.content.decode('utf-8')), expected)
 
     def test_xhr_custom_del(self):
         """Test deleting custom recipe"""
@@ -244,12 +248,18 @@ class ViewTests(TestCase):
         url = reverse('xhr_customrecipe_id', args=(recipe.id,))
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content), {"error": "ok"})
+
+        gotoUrl = reverse('projectcustomimages', args=(self.project.pk,))
+
+        self.assertEqual(json.loads(response.content.decode('utf-8')),
+                         {"error": "ok",
+                          "gotoUrl": gotoUrl})
+
         # try to delete not-existent recipe
         url = reverse('xhr_customrecipe_id', args=(recipe.id,))
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 200)
-        self.assertNotEqual(json.loads(response.content)["error"], "ok")
+        self.assertNotEqual(json.loads(response.content.decode('utf-8'))["error"], "ok")
 
     def test_xhr_custom_packages(self):
         """Test adding and deleting package to a custom recipe"""
@@ -259,7 +269,7 @@ class ViewTests(TestCase):
                                                  self.cust_package.id)))
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content),
+        self.assertEqual(json.loads(response.content.decode('utf-8')),
                          {"error": "ok"})
         self.assertEqual(self.customr.appends_set.first().name,
                          self.cust_package.name)
@@ -270,7 +280,7 @@ class ViewTests(TestCase):
 
         response = self.client.delete(del_url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content), {"error": "ok"})
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {"error": "ok"})
         all_packages = self.customr.get_all_packages().values_list('pk',
                                                                    flat=True)
 
@@ -282,7 +292,7 @@ class ViewTests(TestCase):
 
         response = self.client.delete(del_url)
         self.assertEqual(response.status_code, 200)
-        self.assertNotEqual(json.loads(response.content)["error"], "ok")
+        self.assertNotEqual(json.loads(response.content.decode('utf-8'))["error"], "ok")
 
     def test_xhr_custom_packages_err(self):
         """Test error conditions of xhr_customrecipe_packages"""
@@ -293,51 +303,60 @@ class ViewTests(TestCase):
             for method in (self.client.put, self.client.delete):
                 response = method(url)
                 self.assertEqual(response.status_code, 200)
-                self.assertNotEqual(json.loads(response.content),
+                self.assertNotEqual(json.loads(response.content.decode('utf-8')),
                                     {"error": "ok"})
 
     def test_download_custom_recipe(self):
         """Download the recipe file generated for the custom image"""
 
         # Create a dummy recipe file for the custom image generation to read
-        open("/tmp/a_recipe.bb", 'wa').close()
+        open("/tmp/a_recipe.bb", 'a').close()
         response = self.client.get(reverse('customrecipedownload',
                                            args=(self.project.id,
                                                  self.customr.id)))
 
         self.assertEqual(response.status_code, 200)
 
-
     def test_software_recipes_table(self):
         """Test structure returned for Software RecipesTable"""
         table = SoftwareRecipesTable()
         request = RequestFactory().get('/foo/', {'format': 'json'})
         response = table.get(request, pid=self.project.id)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
+
+        recipes = Recipe.objects.filter(Q(is_image=False))
+        self.assertTrue(len(recipes) > 1,
+                        "Need more than one software recipe to test "
+                        "SoftwareRecipesTable")
+
+        recipe1 = recipes[0]
+        recipe2 = recipes[1]
 
         rows = data['rows']
-        row1 = next(x for x in rows if x['name'] == self.recipe1.name)
-        row2 = next(x for x in rows if x['name'] == self.recipe2.name)
+        row1 = next(x for x in rows if x['name'] == recipe1.name)
+        row2 = next(x for x in rows if x['name'] == recipe2.name)
 
         self.assertEqual(response.status_code, 200, 'should be 200 OK status')
 
         # check other columns have been populated correctly
-        self.assertEqual(row1['name'], self.recipe1.name)
-        self.assertEqual(row1['version'], self.recipe1.version)
-        self.assertEqual(row1['get_description_or_summary'],
-                         self.recipe1.description)
-        self.assertEqual(row1['layer_version__layer__name'],
-                         self.recipe1.layer_version.layer.name)
-        self.assertEqual(row2['name'], self.recipe2.name)
-        self.assertEqual(row2['version'], self.recipe2.version)
-        self.assertEqual(row2['get_description_or_summary'],
-                         self.recipe2.description)
-        self.assertEqual(row2['layer_version__layer__name'],
-                         self.recipe2.layer_version.layer.name)
+        self.assertTrue(recipe1.name in row1['name'])
+        self.assertTrue(recipe1.version in row1['version'])
+        self.assertTrue(recipe1.description in
+                        row1['get_description_or_summary'])
+
+        self.assertTrue(recipe1.layer_version.layer.name in
+                        row1['layer_version__layer__name'])
+
+        self.assertTrue(recipe2.name in row2['name'])
+        self.assertTrue(recipe2.version in row2['version'])
+        self.assertTrue(recipe2.description in
+                        row2['get_description_or_summary'])
+
+        self.assertTrue(recipe2.layer_version.layer.name in
+                        row2['layer_version__layer__name'])
 
     def test_toaster_tables(self):
         """Test all ToasterTables instances"""
-        current_recipes = self.project.get_available_recipes()
 
         def get_data(table, options={}):
             """Send a request and parse the json response"""
@@ -354,19 +373,36 @@ class ViewTests(TestCase):
                     'layerid': self.lver.pk,
                     'recipeid': self.recipe1.pk,
                     'recipe_id': image_recipe.pk,
-                    'custrecipeid': self.customr.pk
-                   }
+                    'custrecipeid': self.customr.pk,
+                    'build_id': 1,
+                    'target_id': 1}
 
             response = table.get(request, **args)
-            return json.loads(response.content)
+            return json.loads(response.content.decode('utf-8'))
+
+        def get_text_from_td(td):
+            """If we have html in the td then extract the text portion"""
+            # just so we don't waste time parsing non html
+            if "<" not in td:
+                ret = td
+            else:
+                ret = BeautifulSoup(td, "html.parser").text
+
+            if len(ret):
+                return "0"
+            else:
+                return ret
 
         # Get a list of classes in tables module
         tables = inspect.getmembers(toastergui.tables, inspect.isclass)
+        tables.extend(inspect.getmembers(toastergui.buildtables,
+                                         inspect.isclass))
 
         for name, table_cls in tables:
             # Filter out the non ToasterTables from the tables module
             if not issubclass(table_cls, toastergui.widgets.ToasterTable) or \
-                table_cls == toastergui.widgets.ToasterTable:
+                table_cls == toastergui.widgets.ToasterTable or \
+               'Mixin' in name:
                 continue
 
             # Get the table data without any options, this also does the
@@ -379,8 +415,10 @@ class ViewTests(TestCase):
                             "Cannot test on a %s table with < 1 row" % name)
 
             if table.default_orderby:
-                row_one = all_data['rows'][0][table.default_orderby.strip("-")]
-                row_two = all_data['rows'][1][table.default_orderby.strip("-")]
+                row_one = get_text_from_td(
+                    all_data['rows'][0][table.default_orderby.strip("-")])
+                row_two = get_text_from_td(
+                    all_data['rows'][1][table.default_orderby.strip("-")])
 
                 if '-' in table.default_orderby:
                     self.assertTrue(row_one >= row_two,
@@ -399,28 +437,36 @@ class ViewTests(TestCase):
                     # If a column is orderable test it in both order
                     # directions ordering on the columns field_name
                     ascending = get_data(table_cls(),
-                                         {"orderby" : column['field_name']})
+                                         {"orderby": column['field_name']})
 
-                    row_one = ascending['rows'][0][column['field_name']]
-                    row_two = ascending['rows'][1][column['field_name']]
+                    row_one = get_text_from_td(
+                        ascending['rows'][0][column['field_name']])
+                    row_two = get_text_from_td(
+                        ascending['rows'][1][column['field_name']])
 
                     self.assertTrue(row_one <= row_two,
-                                    "Ascending sort applied but row 0 is less "
-                                    "than row 1 %s %s " %
-                                    (column['field_name'], name))
-
+                                    "Ascending sort applied but row 0: \"%s\""
+                                    " is less than row 1: \"%s\" "
+                                    "%s %s " %
+                                    (row_one, row_two,
+                                     column['field_name'], name))
 
                     descending = get_data(table_cls(),
-                                          {"orderby" :
+                                          {"orderby":
                                            '-'+column['field_name']})
 
-                    row_one = descending['rows'][0][column['field_name']]
-                    row_two = descending['rows'][1][column['field_name']]
+                    row_one = get_text_from_td(
+                        descending['rows'][0][column['field_name']])
+                    row_two = get_text_from_td(
+                        descending['rows'][1][column['field_name']])
 
                     self.assertTrue(row_one >= row_two,
-                                    "Descending sort applied but row 0 is "
-                                    "greater than row 1 %s %s" %
-                                    (column['field_name'], name))
+                                    "Descending sort applied but row 0: %s"
+                                    "is greater than row 1: %s"
+                                    "field %s table %s" %
+                                    (row_one,
+                                     row_two,
+                                     column['field_name'], name))
 
                     # If the two start rows are the same we haven't actually
                     # changed the order

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # SPDX-License-Identifier:     BSD-3-Clause
@@ -106,8 +106,8 @@ def tc_name(sub_name):
 
 def log(*msg):
         tmp = "".join(map(str, msg)) # 'map(str, ...' allows numbers
-        for line in tmp.split("\n"):
-                print "#", line
+        for line in tmp.splitlines():
+                print("#", line)
 
 #-------------------------------------------------------------------------------
 # Like log(), but with a timestamp added
@@ -265,7 +265,7 @@ cmd = ("cyclictest",
        "-d", str(interval_delta),
        "-l", str(loop_count)
        )
-rex = re.compile("C:\s*(\d+).*Min:\s*(\d+).*Avg:\s*(\d+).*Max:\s*(\d+)")
+rex = re.compile(b"C:\s*(\d+).*Min:\s*(\d+).*Avg:\s*(\d+).*Max:\s*(\d+)")
 
 def run_cyclictest_once():
         res = subprocess.check_output(cmd)
@@ -283,7 +283,7 @@ def run_cyclictest_once():
         avg_sum = 0
         avg_cnt = 0
 
-        for line in res.split("\n"):
+        for line in res.splitlines():
                 m = rex.search(line)
                 if m is not None:
                         minlist.append(int(m.group(2)))
@@ -324,7 +324,7 @@ def run_cyclictest_suite():
         t = time.time()
         max_list = []
 
-        for i in xrange(0, suite_size):
+        for i in range(0, suite_size):
                 tmp_min, tmp_avg, tmp_max = run_cyclictest_once()
 
                 msg = "%2d/%2d:" % (i+1, suite_size)
@@ -376,11 +376,11 @@ class cyclictest_runner:
                         log()
                         log("PASS")
 
-                        print
-                        print tc_name(name), "[Min/us,Avg/us,Max/us]:",
-                        print "%d,%.1f,%d" % (bm_min,bm_avg, bm_max)
-                        print "PASS:", tc_name(name)
-                        print
+                        print()
+                        print(tc_name(name), "[Min/us,Avg/us,Max/us]:",)
+                        print("%d,%.1f,%d" % (bm_min,bm_avg, bm_max))
+                        print("PASS:", tc_name(name))
+                        print()
 
                 except Exception:
                         log()
@@ -391,9 +391,9 @@ class cyclictest_runner:
                         log("WD: ", os.getcwd())
                         log()
                         log("FAIL")
-                        print
-                        print "FAIL:", tc_name(name)
-                        print
+                        print()
+                        print("FAIL:", tc_name(name))
+                        print()
 
 #-------------------------------------------------------------------------------
 

@@ -138,7 +138,7 @@ do_install () {
 	update-rc.d -r ${D} sysfs.sh start 02 S .
 	update-rc.d -r ${D} populate-volatile.sh start 37 S .
 	update-rc.d -r ${D} read-only-rootfs-hook.sh start 29 S .
-	update-rc.d -r ${D} devpts.sh start 38 S .
+	update-rc.d -r ${D} devpts.sh start 06 S .
 	if [ "${TARGET_ARCH}" = "arm" ]; then
 	        update-rc.d -r ${D} alignment.sh start 06 S .
 	fi

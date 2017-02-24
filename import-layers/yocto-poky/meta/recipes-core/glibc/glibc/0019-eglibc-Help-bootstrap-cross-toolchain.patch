@@ -1,7 +1,7 @@
-From c2d49eab20db4ab02b6de62092fedc623d757146 Mon Sep 17 00:00:00 2001
+From e881face7a10354612bf634b44e09e3bc6462c67 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:49:28 +0000
-Subject: [PATCH 19/24] eglibc: Help bootstrap cross toolchain
+Subject: [PATCH 19/25] eglibc: Help bootstrap cross toolchain
 
 Taken from EGLIBC, r1484 + r1525
 
@@ -29,7 +29,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  create mode 100644 include/stubs-bootstrap.h
 
 diff --git a/Makefile b/Makefile
-index 9a01c93..a6ae003 100644
+index 32748b3..6d055ba 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -69,9 +69,18 @@ subdir-dirs = include
@@ -96,5 +96,5 @@ index 0000000..1d2b669
 +   EGLIBC subdir 'stubs' make targets, on every .o file in EGLIBC, but
 +   an empty stubs.h like this will do fine for GCC.  */
 -- 
-2.6.4
+2.8.2
 

@@ -6,44 +6,42 @@ This solves relocation problems with GIOModule for native builds of glib.
 Upstream-Status: Inappropriate
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 
+Port patch to 2.48
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ gio/giomodule.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
 diff --git a/gio/giomodule.c b/gio/giomodule.c
-index 56c498c..a2e32b7 100644
+index da7c167..cc0bc7c 100644
 --- a/gio/giomodule.c
 +++ b/gio/giomodule.c
-@@ -47,6 +47,27 @@
- #include "gdesktopappinfo.h"
- #endif
- 
+@@ -40,6 +40,8 @@
+ #include "gnetworkmonitor.h"
+ #ifdef G_OS_WIN32
+ #include "gregistrysettingsbackend.h"
++#else
 +#include <dlfcn.h>
-+
-+/*
-+ * Generate a GIO module directory based on where glib is installed
-+ */
-+static const char *
-+_get_gio_module_dir (void)
-+{
-+  Dl_info info;
-+
-+  if (dladdr (g_io_module_new, &info)) {
-+    char *libdir = g_path_get_dirname (info.dli_fname);
-+    char *dir = g_build_filename (libdir, "gio", "modules", NULL);
-+    g_free (libdir);
-+    return dir;
-+  } else {
-+    return GIO_MODULE_DIR;
-+  }
-+}
-+
-+
- /**
-  * SECTION:giomodule
-  * @short_description: Loadable GIO Modules
-@@ -1057,7 +1078,7 @@ _g_io_modules_ensure_loaded (void)
-       /* Then load the compiled in path */
-       module_dir = g_getenv ("GIO_MODULE_DIR");
-       if (module_dir == NULL)
--        module_dir = GIO_MODULE_DIR;
-+        module_dir = _get_gio_module_dir ();
+ #endif
+ #include <glib/gstdio.h>
  
-       g_io_modules_scan_all_in_directory_with_scope (module_dir, scope);
+@@ -1036,7 +1038,15 @@ get_gio_module_dir (void)
+ #endif
+       g_free (install_dir);
+ #else
+-      module_dir = g_strdup (GIO_MODULE_DIR);
++      Dl_info info;
++
++      if (dladdr (g_io_module_new, &info)) {
++        char *libdir = g_path_get_dirname (info.dli_fname);
++        module_dir = g_build_filename (libdir, "gio", "modules", NULL);
++        g_free (libdir);
++      } else {
++        module_dir = g_strdup (GIO_MODULE_DIR);
++      }
+ #endif
+     }
  
+-- 
+2.1.4
+

@@ -73,3 +73,5 @@ FILES_libcogl-path = "${libdir}/libcogl-path${SOLIBS}"
 RPROVIDES_libcogl = "cogl-1.0"
 RCONFLICTS_libcogl = "cogl-1.0"
 RREPLACES_libcogl = "cogl-1.0"
+
+COMPATIBLE_HOST_armv4 = 'null'

@@ -6,7 +6,7 @@ Avoid this build issue:
 | make[1]: mkdir_p@: Command not found
 | make[1]: *** [install-data-yes] Error 127
 
-Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
 2012/07/13
 
 Index: sed-4.1.2/intl/Makefile.in

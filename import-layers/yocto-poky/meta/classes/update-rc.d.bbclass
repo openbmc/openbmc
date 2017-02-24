@@ -1,6 +1,7 @@
 UPDATERCPN ?= "${PN}"
 
-DEPENDS_append_class-target = " update-rc.d-native update-rc.d initscripts"
+DEPENDS_append_class-target = "${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', ' update-rc.d-native update-rc.d initscripts', '', d)}"
+
 UPDATERCD = "update-rc.d"
 UPDATERCD_class-cross = ""
 UPDATERCD_class-native = ""
@@ -12,7 +13,7 @@ INIT_D_DIR = "${sysconfdir}/init.d"
 
 updatercd_preinst() {
 if [ -z "$D" -a -f "${INIT_D_DIR}/${INITSCRIPT_NAME}" ]; then
-	${INIT_D_DIR}/${INITSCRIPT_NAME} stop
+	${INIT_D_DIR}/${INITSCRIPT_NAME} stop || :
 fi
 if type update-rc.d >/dev/null 2>/dev/null; then
 	if [ -n "$D" ]; then
@@ -36,8 +37,8 @@ fi
 }
 
 updatercd_prerm() {
-if [ -z "$D" ]; then
-	${INIT_D_DIR}/${INITSCRIPT_NAME} stop
+if [ -z "$D" -a -x "${INIT_D_DIR}/${INITSCRIPT_NAME}" ]; then
+	${INIT_D_DIR}/${INITSCRIPT_NAME} stop || :
 fi
 }
 
@@ -56,15 +57,15 @@ fi
 def update_rc_after_parse(d):
     if d.getVar('INITSCRIPT_PACKAGES', False) == None:
         if d.getVar('INITSCRIPT_NAME', False) == None:
-            raise bb.build.FuncFailed("%s inherits update-rc.d but doesn't set INITSCRIPT_NAME" % d.getVar('FILE', False))
+            bb.fatal("%s inherits update-rc.d but doesn't set INITSCRIPT_NAME" % d.getVar('FILE', False))
         if d.getVar('INITSCRIPT_PARAMS', False) == None:
-            raise bb.build.FuncFailed("%s inherits update-rc.d but doesn't set INITSCRIPT_PARAMS" % d.getVar('FILE', False))
+            bb.fatal("%s inherits update-rc.d but doesn't set INITSCRIPT_PARAMS" % d.getVar('FILE', False))
 
 python __anonymous() {
     update_rc_after_parse(d)
 }
 
-PACKAGESPLITFUNCS_prepend = "populate_packages_updatercd "
+PACKAGESPLITFUNCS_prepend = "${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'populate_packages_updatercd ', '', d)}"
 PACKAGESPLITFUNCS_remove_class-nativesdk = "populate_packages_updatercd "
 
 populate_packages_updatercd[vardeps] += "updatercd_prerm updatercd_postrm updatercd_preinst updatercd_postinst"
@@ -120,8 +121,7 @@ python populate_packages_updatercd () {
 
     # Check that this class isn't being inhibited (generally, by
     # systemd.bbclass) before doing any work.
-    if bb.utils.contains('DISTRO_FEATURES', 'sysvinit', True, False, d) or \
-       not d.getVar("INHIBIT_UPDATERCD_BBCLASS", True):
+    if not d.getVar("INHIBIT_UPDATERCD_BBCLASS", True):
         pkgs = d.getVar('INITSCRIPT_PACKAGES', True)
         if pkgs == None:
             pkgs = d.getVar('UPDATERCPN', True)
