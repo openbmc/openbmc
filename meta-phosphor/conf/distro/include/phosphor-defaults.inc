@@ -17,6 +17,11 @@ PREFERRED_PROVIDER_virtual/obmc-flash-mgmt ?= "obmc-phosphor-flashd"
 PREFERRED_PROVIDER_virtual/obmc-host-ipmi-hw ?= "phosphor-ipmi-hw-example"
 PREFERRED_PROVIDER_virtual/obmc-host-state-mgmt ?= "phosphor-state-manager"
 
+# obmc-fan-presence
+#
+# Provides an implementation for fan presence detection
+VIRTUAL-RUNTIME_obmc-fan-presence ?= "phosphor-fan-presence"
+
 # obmc-inventory-manager
 #
 # Provides an implementation of the xyz.openbmc_project.Inventory.Manager
