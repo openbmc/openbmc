@@ -1,21 +1,20 @@
 import ast
+import sys
 import codegen
 import logging
+import pickle
+import bb.pysh as pysh
 import os.path
 import bb.utils, bb.data
+import hashlib
 from itertools import chain
-from pysh import pyshyacc, pyshlex, sherrors
+from bb.pysh import pyshyacc, pyshlex, sherrors
 from bb.cache import MultiProcessCache
-
 
 logger = logging.getLogger('BitBake.CodeParser')
 
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
-    logger.info('Importing cPickle failed.  Falling back to a very slow implementation.')
-
+def bbhash(s):
+    return hashlib.md5(s.encode("utf-8")).hexdigest()
 
 def check_indent(codestr):
     """If the code is indented, add a top level piece of code to 'remove' the indentation"""
@@ -68,11 +67,12 @@ class SetCache(object):
         
         new = []
         for i in items:
-            new.append(intern(i))
+            new.append(sys.intern(i))
         s = frozenset(new)
-        if hash(s) in self.setcache:
-            return self.setcache[hash(s)]
-        self.setcache[hash(s)] = s
+        h = hash(s)
+        if h in self.setcache:
+            return self.setcache[h]
+        self.setcache[h] = s
         return s
 
 codecache = SetCache()
@@ -117,7 +117,7 @@ class shellCacheLine(object):
 
 class CodeParserCache(MultiProcessCache):
     cache_file_name = "bb_codeparser.dat"
-    CACHE_VERSION = 7
+    CACHE_VERSION = 8
 
     def __init__(self):
         MultiProcessCache.__init__(self)
@@ -191,6 +191,7 @@ class BufferedLogger(Logger):
 
 class PythonParser():
     getvars = (".getVar", ".appendVar", ".prependVar")
+    getvarflags = (".getVarFlag", ".appendVarFlag", ".prependVarFlag")
     containsfuncs = ("bb.utils.contains", "base_contains", "bb.utils.contains_any")
     execfuncs = ("bb.build.exec_func", "bb.build.exec_task")
 
@@ -210,15 +211,20 @@ class PythonParser():
 
     def visit_Call(self, node):
         name = self.called_node_name(node.func)
-        if name and name.endswith(self.getvars) or name in self.containsfuncs:
+        if name and (name.endswith(self.getvars) or name.endswith(self.getvarflags) or name in self.containsfuncs):
             if isinstance(node.args[0], ast.Str):
                 varname = node.args[0].s
                 if name in self.containsfuncs and isinstance(node.args[1], ast.Str):
                     if varname not in self.contains:
                         self.contains[varname] = set()
                     self.contains[varname].add(node.args[1].s)
-                else:                      
-                    self.references.add(node.args[0].s)
+                elif name.endswith(self.getvarflags):
+                    if isinstance(node.args[1], ast.Str):
+                        self.references.add('%s[%s]' % (varname, node.args[1].s))
+                    else:
+                        self.warn(node.func, node.args[1])
+                else:
+                    self.references.add(varname)
             else:
                 self.warn(node.func, node.args[0])
         elif name and name.endswith(".expand"):
@@ -268,7 +274,7 @@ class PythonParser():
         if not node or not node.strip():
             return
 
-        h = hash(str(node))
+        h = bbhash(str(node))
 
         if h in codeparsercache.pythoncache:
             self.references = set(codeparsercache.pythoncache[h].refs)
@@ -313,7 +319,7 @@ class ShellParser():
         commands it executes.
         """
 
-        h = hash(str(value))
+        h = bbhash(str(value))
 
         if h in codeparsercache.shellcache:
             self.execs = set(codeparsercache.shellcache[h].execs)

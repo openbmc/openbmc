@@ -1,0 +1,75 @@
+From 1cc0aa4dbd3c7f1267809e0e1ca57d46f4803bfd Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 17 Apr 2016 23:25:18 +0000
+Subject: [PATCH] Cus428Midi: Explicitly cast constant to char type
+
+This is flagged by gcc6
+Cus428Midi.cc:83:1: error: narrowing conversion of '-1' from 'int' to 'char' inside { } [-Wnarrowing]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ us428control/Cus428Midi.cc | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/us428control/Cus428Midi.cc b/us428control/Cus428Midi.cc
+index b9e6783..bef7bb1 100644
+--- a/us428control/Cus428Midi.cc
++++ b/us428control/Cus428Midi.cc
+@@ -32,22 +32,22 @@ char Cus428Midi::KnobParam[] = {
+ 	0x2A,
+ 	0x29,
+ 	0x28,
+-	-1,
++	static_cast<char>(-1),
+ 	0x10,
+ 	0x11,
+ 	0x18,
+ 	0x19,
+ 	0x1A,
+-	-1,
+-	-1,
+-	-1,
+-	-1,
++	static_cast<char>(-1),
++	static_cast<char>(-1),
++	static_cast<char>(-1),
++	static_cast<char>(-1),
+ 	0x2C,
+ 	0x2D,
+ 	0x2E,
+ 	0x2F,
+-	-1,
+-	-1,
++	static_cast<char>(-1),
++	static_cast<char>(-1),
+ 	0x20,
+ 	0x21,
+ 	0x22,
+@@ -64,14 +64,14 @@ char Cus428Midi::KnobParam[] = {
+ 	5,
+ 	6,
+ 	7,
+-	-1,
+-	-1,
+-	-1,
+-	-1,
+-	-1,
+-	-1,
+-	-1,
+-	-1,
++	static_cast<char>(-1),
++	static_cast<char>(-1),
++	static_cast<char>(-1),
++	static_cast<char>(-1),
++	static_cast<char>(-1),
++	static_cast<char>(-1),
++	static_cast<char>(-1),
++	static_cast<char>(-1),
+ 	0x30,
+ 	0x31,
+ 	0x32,
+-- 
+1.9.1
+

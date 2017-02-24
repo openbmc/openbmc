@@ -1,0 +1,30 @@
+From 2225ab2038bfe50f16f972e39d89bcd0bd7767f5 Mon Sep 17 00:00:00 2001
+From: Steffen Pankratz <kratz00@gmx.de>
+Date: Tue, 9 Feb 2016 13:49:42 +0100
+Subject: [PATCH] Fixed: Missing default value for BOOTLOG_DEST
+
+Upstream-Status: Backport
+
+BUILDLOG_DEST seems to be a typo or mix-up which was introduced with 281d1df80884bf2969c509ec60ee8a6593524fe8
+
+Signed-off-by: Peter Liu <peter.x.liu@external.atlascopco.com>
+---
+ bootchartd.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/bootchartd.in b/bootchartd.in
+index f58ab9e..30af677 100755
+--- a/bootchartd.in
++++ b/bootchartd.in
+@@ -37,7 +37,7 @@ PATH="/sbin:/bin:/usr/sbin:/usr/bin:$PATH"
+ 
+ # Defaults, in case we can't find our configuration
+ SAMPLE_HZ=50
+-BUILDLOG_DEST=/var/log/bootchart.tgz
++BOOTLOG_DEST=/var/log/bootchart.tgz
+ AUTO_RENDER="no"
+ AUTO_RENDER_DIR="/var/log"
+ AUTO_RENDER_FORMAT="png"
+-- 
+1.9.1
+

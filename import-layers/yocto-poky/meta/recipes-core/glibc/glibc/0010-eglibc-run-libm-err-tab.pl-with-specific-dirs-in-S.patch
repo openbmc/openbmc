@@ -1,7 +1,7 @@
-From 69a3e30b49d28a7386d18725528652931510cbfc Mon Sep 17 00:00:00 2001
+From 91af416408b8718b004c83d93a6daa1f34cba48d Mon Sep 17 00:00:00 2001
 From: Ting Liu <b28495@freescale.com>
 Date: Wed, 19 Dec 2012 04:39:57 -0600
-Subject: [PATCH 10/24] eglibc: run libm-err-tab.pl with specific dirs in ${S}
+Subject: [PATCH 10/25] eglibc: run libm-err-tab.pl with specific dirs in ${S}
 
 libm-err-tab.pl will parse all the files named "libm-test-ulps"
 in the given dir recursively. To avoid parsing the one in
@@ -10,7 +10,7 @@ ${S}/.pc/aarch64-0001-glibc-fsf-v1-eaf6f205.patch/ports/sysdeps/
 aarch64/libm-test-ulps), run libm-err-tab.pl with specific dirs
 in ${S}.
 
-Upstream-Status: Inappropriate [OE specific]
+Upstream-Status: inappropriate [OE specific]
 
 Signed-off-by: Ting Liu <b28495@freescale.com>
 ---
@@ -18,7 +18,7 @@ Signed-off-by: Ting Liu <b28495@freescale.com>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/manual/Makefile b/manual/Makefile
-index cdb6763..0b32a0a 100644
+index f2f694f..e062833 100644
 --- a/manual/Makefile
 +++ b/manual/Makefile
 @@ -105,7 +105,8 @@ $(objpfx)libm-err.texi: $(objpfx)stamp-libm-err
@@ -32,5 +32,5 @@ index cdb6763..0b32a0a 100644
  	touch $@
  
 -- 
-2.6.4
+2.8.2
 

@@ -1,28 +1,27 @@
-From 13e85dd1763e99d21a60323671b9a5df08bdae75 Mon Sep 17 00:00:00 2001
+From 0b98309fdbcd36fa92ab53e33c51b485b905e294 Mon Sep 17 00:00:00 2001
 From: Tanu Kaskinen <tanuk@iki.fi>
 Date: Fri, 23 Oct 2015 12:59:53 +0300
-Subject: [PATCH 3/4] card: move profile selection after pa_card_new()
+Subject: [PATCH 3/5] card: move profile selection after pa_card_new()
 
 I want module-alsa-card to set the availability of unavailable
 profiles before the initial card profile gets selected, so that the
 selection logic can use correct availability information.
 module-alsa-card initializes the jack state after calling
 pa_card_new(), however, and the profile selection happens in
-pa_card_new(). This patch solves that by introducing pa_card_put() and
-moving the profile selection code there.
+pa_card_new(). This patch solves that by moving parts of pa_card_new()
+to pa_card_choose_initial_profile() and pa_card_put().
+
+pa_card_choose_initial_profile() applies the profile selection policy,
+so module-alsa-card can first call pa_card_new(), then initialize the
+jack state, and then call pa_card_choose_initial_profile(). After that
+module-alsa-card can still override the profile selection policy, in
+case module-alsa-card was loaded with the "profile" argument. Finally,
+pa_card_put() finalizes the card creation.
 
 An alternative solution would have been to move the jack
 initialization to happen before pa_card_new() and use pa_card_new_data
 instead of pa_card in the jack initialization code, but I disliked
 that idea (I want to get rid of the "new data" pattern eventually).
-
-The CARD_NEW hook is used when applying the initial profile policy, so
-that was moved to pa_card_put(). That required changing the hook data
-from pa_card_new_data to pa_card. module-card-restore now uses
-pa_card_set_profile() instead of pa_card_new_data_set_profile(). That
-required adding a state variable to pa_card, because
-pa_card_set_profile() needs to distinguish between setting the initial
-profile and setting the profile in other situations.
 
 The order in which the initial profile policy is applied is reversed
 in this patch. Previously the first one to set it won, now the last
@@ -30,32 +29,34 @@ one to set it wins. I think this is better, because if you have N
 parties that want to set the profile, we avoid checking N times
 whether someone else has already set the profile.
 
-http://bugzilla.yoctoproject.org/show_bug.cgi?id=8448
-
-Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
-
-Rebased on 8.0.
-
-Upstream-Status: Denied [The patch set needs some work to be accepted.
-The review thread:
-http://thread.gmane.org/gmane.comp.audio.pulseaudio.general/24301]
+Upstream-Status: Accepted [expected in 10.0]
 
 Signed-off-by: Tanu Kaskinen <tanuk@iki.fi>
 ---
- src/modules/alsa/module-alsa-card.c          | 19 +++----
- src/modules/bluetooth/module-bluez4-device.c | 18 +++----
- src/modules/bluetooth/module-bluez5-device.c |  1 +
- src/modules/macosx/module-coreaudio-device.c |  1 +
- src/modules/module-card-restore.c            | 24 +++++----
- src/pulsecore/card.c                         | 81 +++++++++++++++-------------
- src/pulsecore/card.h                         |  7 +++
- 7 files changed, 86 insertions(+), 65 deletions(-)
+ src/modules/alsa/module-alsa-card.c          | 32 +++++----
+ src/modules/bluetooth/module-bluez4-device.c | 31 +++++----
+ src/modules/bluetooth/module-bluez5-device.c |  2 +
+ src/modules/macosx/module-coreaudio-device.c |  2 +
+ src/modules/module-card-restore.c            | 36 +++++++---
+ src/pulsecore/card.c                         | 99 +++++++++++++++++-----------
+ src/pulsecore/card.h                         |  9 +++
+ src/pulsecore/core.h                         |  1 +
+ 8 files changed, 143 insertions(+), 69 deletions(-)
 
 diff --git a/src/modules/alsa/module-alsa-card.c b/src/modules/alsa/module-alsa-card.c
-index 9e8cde2..fe240f0 100644
+index d761683..1976230 100644
 --- a/src/modules/alsa/module-alsa-card.c
 +++ b/src/modules/alsa/module-alsa-card.c
-@@ -770,15 +770,6 @@ int pa__init(pa_module *m) {
+@@ -671,7 +671,7 @@ int pa__init(pa_module *m) {
+     struct userdata *u;
+     pa_reserve_wrapper *reserve = NULL;
+     const char *description;
+-    const char *profile = NULL;
++    const char *profile_str = NULL;
+     char *fn = NULL;
+     bool namereg_fail = false;
+ 
+@@ -799,16 +799,6 @@ int pa__init(pa_module *m) {
          goto fail;
      }
  
@@ -64,6 +65,7 @@ index 9e8cde2..fe240f0 100644
 -            pa_card_new_data_set_profile(&data, profile);
 -        else {
 -            pa_log("No such profile: %s", profile);
+-            pa_card_new_data_done(&data);
 -            goto fail;
 -        }
 -    }
@@ -71,28 +73,47 @@ index 9e8cde2..fe240f0 100644
      u->card = pa_card_new(m->core, &data);
      pa_card_new_data_done(&data);
  
-@@ -789,6 +780,16 @@ int pa__init(pa_module *m) {
-     u->card->set_profile = card_set_profile;
+@@ -822,6 +812,26 @@ int pa__init(pa_module *m) {
+             (pa_hook_cb_t) card_suspend_changed, u);
  
      init_jacks(u);
-+    pa_card_put(u->card);
 +
-+    if ((profile = pa_modargs_get_value(u->modargs, "profile", NULL))) {
-+        u->card->active_profile = pa_hashmap_get(u->card->profiles, profile);
-+        if (!u->card->active_profile) {
-+            pa_log("No such profile: %s", profile);
++    pa_card_choose_initial_profile(u->card);
++
++    /* If the "profile" modarg is given, we have to override whatever the usual
++     * policy chose in pa_card_choose_initial_profile(). */
++    profile_str = pa_modargs_get_value(u->modargs, "profile", NULL);
++    if (profile_str) {
++        pa_card_profile *profile;
++
++        profile = pa_hashmap_get(u->card->profiles, profile_str);
++        if (!profile) {
++            pa_log("No such profile: %s", profile_str);
 +            goto fail;
 +        }
++
++        pa_card_set_profile(u->card, profile, false);
 +    }
++
++    pa_card_put(u->card);
 +
      init_profile(u);
      init_eld_ctls(u);
  
 diff --git a/src/modules/bluetooth/module-bluez4-device.c b/src/modules/bluetooth/module-bluez4-device.c
-index dd18217..5d0d3db 100644
+index a2de525..13fb7ab 100644
 --- a/src/modules/bluetooth/module-bluez4-device.c
 +++ b/src/modules/bluetooth/module-bluez4-device.c
-@@ -2304,15 +2304,6 @@ static int add_card(struct userdata *u) {
+@@ -2238,7 +2238,7 @@ static int add_card(struct userdata *u) {
+     pa_bluez4_profile_t *d;
+     pa_bluez4_form_factor_t ff;
+     char *n;
+-    const char *default_profile;
++    const char *profile_str;
+     const pa_bluez4_device *device;
+     const pa_bluez4_uuid *uuid;
+ 
+@@ -2298,16 +2298,6 @@ static int add_card(struct userdata *u) {
      *d = PA_BLUEZ4_PROFILE_OFF;
      pa_hashmap_put(data.profiles, p->name, p);
  
@@ -101,6 +122,7 @@ index dd18217..5d0d3db 100644
 -            pa_card_new_data_set_profile(&data, default_profile);
 -        else {
 -            pa_log("Profile '%s' not valid or not supported by device.", default_profile);
+-            pa_card_new_data_done(&data);
 -            return -1;
 -        }
 -    }
@@ -108,127 +130,126 @@ index dd18217..5d0d3db 100644
      u->card = pa_card_new(u->core, &data);
      pa_card_new_data_done(&data);
  
-@@ -2323,6 +2314,15 @@ static int add_card(struct userdata *u) {
- 
+@@ -2319,6 +2309,25 @@ static int add_card(struct userdata *u) {
      u->card->userdata = u;
      u->card->set_profile = card_set_profile;
-+    pa_card_put(u->card);
+ 
++    pa_card_choose_initial_profile(u->card);
 +
-+    if ((default_profile = pa_modargs_get_value(u->modargs, "profile", NULL))) {
-+        u->card->active_profile = pa_hashmap_get(u->card->profiles, default_profile);
-+        if (!u->card->active_profile) {
-+            pa_log("Profile '%s' not valid or not supported by device.", default_profile);
++    /* If the "profile" modarg is given, we have to override whatever the usual
++     * policy chose in pa_card_choose_initial_profile(). */
++    profile_str = pa_modargs_get_value(u->modargs, "profile", NULL);
++    if (profile_str) {
++        pa_card_profile *profile;
++
++        profile = pa_hashmap_get(u->card->profiles, profile_str);
++        if (!profile) {
++            pa_log("No such profile: %s", profile_str);
 +            return -1;
 +        }
++
++        pa_card_set_profile(u->card, profile, false);
 +    }
- 
++
++    pa_card_put(u->card);
++
      d = PA_CARD_PROFILE_DATA(u->card->active_profile);
  
+     if (*d != PA_BLUEZ4_PROFILE_OFF && (!device->transports[*d] ||
 diff --git a/src/modules/bluetooth/module-bluez5-device.c b/src/modules/bluetooth/module-bluez5-device.c
-index b015c67..7b90a31 100644
+index 84e6d55..498d0e1 100644
 --- a/src/modules/bluetooth/module-bluez5-device.c
 +++ b/src/modules/bluetooth/module-bluez5-device.c
-@@ -1959,6 +1959,7 @@ static int add_card(struct userdata *u) {
+@@ -1953,6 +1953,8 @@ static int add_card(struct userdata *u) {
  
      u->card->userdata = u;
      u->card->set_profile = set_profile_cb;
++    pa_card_choose_initial_profile(u->card);
 +    pa_card_put(u->card);
  
      p = PA_CARD_PROFILE_DATA(u->card->active_profile);
      u->profile = *p;
 diff --git a/src/modules/macosx/module-coreaudio-device.c b/src/modules/macosx/module-coreaudio-device.c
-index 0c92d42..7190ee9 100644
+index 6c9e55d..d91c656 100644
 --- a/src/modules/macosx/module-coreaudio-device.c
 +++ b/src/modules/macosx/module-coreaudio-device.c
-@@ -807,6 +807,7 @@ int pa__init(pa_module *m) {
+@@ -821,6 +821,8 @@ int pa__init(pa_module *m) {
      pa_card_new_data_done(&card_new_data);
      u->card->userdata = u;
      u->card->set_profile = card_set_profile;
++    pa_card_choose_initial_profile(u->card);
 +    pa_card_put(u->card);
  
      u->rtpoll = pa_rtpoll_new();
      pa_thread_mq_init(&u->thread_mq, m->core->mainloop, u->rtpoll);
 diff --git a/src/modules/module-card-restore.c b/src/modules/module-card-restore.c
-index f906843..dce6674 100644
+index 7545aa5..718a0dd 100644
 --- a/src/modules/module-card-restore.c
 +++ b/src/modules/module-card-restore.c
-@@ -515,34 +515,38 @@ static pa_hook_result_t port_offset_change_callback(pa_core *c, pa_device_port *
-     return PA_HOOK_OK;
- }
- 
--static pa_hook_result_t card_new_hook_callback(pa_core *c, pa_card_new_data *new_data, struct userdata *u) {
-+static pa_hook_result_t card_new_hook_callback(pa_core *c, pa_card *card, struct userdata *u) {
-     struct entry *e;
-     void *state;
-     pa_device_port *p;
-     struct port_info *p_info;
- 
--    pa_assert(new_data);
-+    pa_assert(c);
-+    pa_assert(card);
-+    pa_assert(u);
- 
--    if (!(e = entry_read(u, new_data->name)))
-+    if (!(e = entry_read(u, card->name)))
+@@ -551,16 +551,6 @@ static pa_hook_result_t card_new_hook_callback(pa_core *c, pa_card_new_data *new
+     if (!(e = entry_read(u, new_data->name)))
          return PA_HOOK_OK;
  
-     if (e->profile[0]) {
+-    if (e->profile[0]) {
 -        if (!new_data->active_profile) {
 -            pa_card_new_data_set_profile(new_data, e->profile);
 -            pa_log_info("Restored profile '%s' for card %s.", new_data->active_profile, new_data->name);
 -            new_data->save_profile = true;
-+        pa_card_profile *profile;
- 
-+        profile = pa_hashmap_get(card->profiles, e->profile);
-+        if (profile) {
-+            pa_card_set_profile(card, profile, true);
-+            pa_log_info("Restored profile '%s' for card %s.", card->active_profile->name, card->name);
-         } else
+-
+-        } else
 -            pa_log_debug("Not restoring profile for card %s, because already set.", new_data->name);
-+            pa_log_debug("Tried to restore profile %s for card %s, but the card doesn't have such profile.",
-+                         e->profile, card->name);
-     }
- 
+-    }
+-
      /* Always restore the latency offsets because their
       * initial value is always 0 */
  
--    pa_log_info("Restoring port latency offsets for card %s.", new_data->name);
-+    pa_log_info("Restoring port latency offsets for card %s.", card->name);
+@@ -590,6 +580,30 @@ static pa_hook_result_t card_new_hook_callback(pa_core *c, pa_card_new_data *new
+     return PA_HOOK_OK;
+ }
  
-     PA_HASHMAP_FOREACH(p_info, e->ports, state)
--        if ((p = pa_hashmap_get(new_data->ports, p_info->name))) {
-+        if ((p = pa_hashmap_get(card->ports, p_info->name))) {
-             p->latency_offset = p_info->offset;
-             if (!p->preferred_profile && p_info->profile)
-                 pa_device_port_set_preferred_profile(p, p_info->profile);
++static pa_hook_result_t card_choose_initial_profile_callback(pa_core *core, pa_card *card, struct userdata *u) {
++    struct entry *e;
++
++    if (!(e = entry_read(u, card->name)))
++        return PA_HOOK_OK;
++
++    if (e->profile[0]) {
++        pa_card_profile *profile;
++
++        profile = pa_hashmap_get(card->profiles, e->profile);
++        if (profile) {
++            pa_log_info("Restoring profile '%s' for card %s.", card->active_profile->name, card->name);
++            pa_card_set_profile(card, profile, true);
++        } else {
++            pa_log_debug("Tried to restore profile %s for card %s, but the card doesn't have such profile.",
++                         e->profile, card->name);
++        }
++    }
++
++    entry_free(e);
++
++    return PA_HOOK_OK;
++}
++
+ static pa_hook_result_t card_preferred_port_changed_callback(pa_core *core, pa_card_preferred_port_changed_hook_data *data,
+                                                              struct userdata *u) {
+     struct entry *e;
+@@ -634,6 +648,8 @@ int pa__init(pa_module*m) {
+     u->module = m;
+ 
+     pa_module_hook_connect(m, &m->core->hooks[PA_CORE_HOOK_CARD_NEW], PA_HOOK_EARLY, (pa_hook_cb_t) card_new_hook_callback, u);
++    pa_module_hook_connect(m, &m->core->hooks[PA_CORE_HOOK_CARD_CHOOSE_INITIAL_PROFILE], PA_HOOK_NORMAL,
++                           (pa_hook_cb_t) card_choose_initial_profile_callback, u);
+     pa_module_hook_connect(m, &m->core->hooks[PA_CORE_HOOK_CARD_PUT], PA_HOOK_NORMAL, (pa_hook_cb_t) card_put_hook_callback, u);
+     pa_module_hook_connect(m, &m->core->hooks[PA_CORE_HOOK_CARD_PREFERRED_PORT_CHANGED], PA_HOOK_NORMAL, (pa_hook_cb_t) card_preferred_port_changed_callback, u);
+     pa_module_hook_connect(m, &m->core->hooks[PA_CORE_HOOK_CARD_PROFILE_CHANGED], PA_HOOK_NORMAL, (pa_hook_cb_t) card_profile_changed_callback, u);
 diff --git a/src/pulsecore/card.c b/src/pulsecore/card.c
-index f92ac87..1a6e705 100644
+index 0ac70b9..a0c3d93 100644
 --- a/src/pulsecore/card.c
 +++ b/src/pulsecore/card.c
-@@ -148,6 +148,7 @@ pa_card *pa_card_new(pa_core *core, pa_card_new_data *data) {
-     pa_assert(!pa_hashmap_isempty(data->profiles));
- 
-     c = pa_xnew0(pa_card, 1);
-+    c->state = PA_CARD_STATE_INIT;
- 
-     if (!(name = pa_namereg_register(core, data->name, PA_NAMEREG_CARD, c, data->namereg_fail))) {
-         pa_xfree(c);
-@@ -156,12 +157,6 @@ pa_card *pa_card_new(pa_core *core, pa_card_new_data *data) {
- 
-     pa_card_new_data_set_name(data, name);
- 
--    if (pa_hook_fire(&core->hooks[PA_CORE_HOOK_CARD_NEW], data) < 0) {
--        pa_xfree(c);
--        pa_namereg_unregister(core, name);
--        return NULL;
--    }
--
-     c->core = core;
-     c->name = pa_xstrdup(data->name);
-     c->proplist = pa_proplist_copy(data->proplist);
-@@ -184,38 +179,43 @@ pa_card *pa_card_new(pa_core *core, pa_card_new_data *data) {
-     PA_HASHMAP_FOREACH(port, c->ports, state)
-         port->card = c;
+@@ -176,38 +176,56 @@ pa_card *pa_card_new(pa_core *core, pa_card_new_data *data) {
+     c->preferred_input_port = data->preferred_input_port;
+     c->preferred_output_port = data->preferred_output_port;
  
 -    if (data->active_profile)
 -        if ((c->active_profile = pa_hashmap_get(c->profiles, data->active_profile)))
@@ -252,50 +273,85 @@ index f92ac87..1a6e705 100644
 -            PA_HASHMAP_FOREACH(profile, c->profiles, state)
 -                if (!c->active_profile || profile->priority > c->active_profile->priority)
 -                    c->active_profile = profile;
--        }
--        pa_assert(c->active_profile);
-+void pa_card_put(pa_card *card) {
++void pa_card_choose_initial_profile(pa_card *card) {
 +    pa_card_profile *profile;
 +    void *state;
++    pa_card_profile *best = NULL;
 +
 +    pa_assert(card);
++
++    /* By default, pick the highest priority profile that is not unavailable,
++     * or if all profiles are unavailable, pick the profile with the highest
++     * priority regardless of its availability. */
 +
 +    PA_HASHMAP_FOREACH(profile, card->profiles, state) {
 +        if (profile->available == PA_AVAILABLE_NO)
 +            continue;
 +
-+        if (!card->active_profile || profile->priority > card->active_profile->priority)
-+            card->active_profile = profile;
++        if (!best || profile->priority > best->priority)
++            best = profile;
++    }
++
++    if (!best) {
++        PA_HASHMAP_FOREACH(profile, card->profiles, state) {
++            if (!best || profile->priority > best->priority)
++                best = profile;
+         }
+-        pa_assert(c->active_profile);
      }
++    pa_assert(best);
  
 -    pa_device_init_description(c->proplist, c);
 -    pa_device_init_icon(c->proplist, true);
 -    pa_device_init_intended_roles(c->proplist);
-+    /* If all profiles are unavailable, then we still need to pick one */
-+    if (!card->active_profile) {
-+        PA_HASHMAP_FOREACH(profile, card->profiles, state)
-+            if (!card->active_profile || profile->priority > card->active_profile->priority)
-+                card->active_profile = profile;
-+    }
-+    pa_assert(card->active_profile);
++    card->active_profile = best;
++    card->save_profile = false;
  
 -    pa_assert_se(pa_idxset_put(core->cards, c, &c->index) >= 0);
-+    pa_hook_fire(&card->core->hooks[PA_CORE_HOOK_CARD_NEW], card);
++    /* Let policy modules override the default. */
++    pa_hook_fire(&card->core->hooks[PA_CORE_HOOK_CARD_CHOOSE_INITIAL_PROFILE], card);
++}
  
 -    pa_log_info("Created %u \"%s\"", c->index, c->name);
 -    pa_subscription_post(core, PA_SUBSCRIPTION_EVENT_CARD|PA_SUBSCRIPTION_EVENT_NEW, c->index);
-+    pa_assert_se(pa_idxset_put(card->core->cards, card, &card->index) >= 0);
-+    card->state = PA_CARD_STATE_LINKED;
++void pa_card_put(pa_card *card) {
++    pa_assert(card);
  
 -    pa_hook_fire(&core->hooks[PA_CORE_HOOK_CARD_PUT], c);
 -    return c;
++    pa_assert_se(pa_idxset_put(card->core->cards, card, &card->index) >= 0);
++    card->linked = true;
++
 +    pa_log_info("Created %u \"%s\"", card->index, card->name);
 +    pa_hook_fire(&card->core->hooks[PA_CORE_HOOK_CARD_PUT], card);
 +    pa_subscription_post(card->core, PA_SUBSCRIPTION_EVENT_CARD|PA_SUBSCRIPTION_EVENT_NEW, card->index);
  }
  
  void pa_card_free(pa_card *c) {
-@@ -306,20 +306,27 @@ int pa_card_set_profile(pa_card *c, pa_card_profile *profile, bool save) {
+@@ -218,15 +236,15 @@ void pa_card_free(pa_card *c) {
+ 
+     core = c->core;
+ 
+-    pa_hook_fire(&core->hooks[PA_CORE_HOOK_CARD_UNLINK], c);
+-
+-    pa_namereg_unregister(core, c->name);
+-
+-    pa_idxset_remove_by_data(c->core->cards, c, NULL);
++    if (c->linked) {
++        pa_hook_fire(&core->hooks[PA_CORE_HOOK_CARD_UNLINK], c);
+ 
+-    pa_log_info("Freed %u \"%s\"", c->index, c->name);
++        pa_idxset_remove_by_data(c->core->cards, c, NULL);
++        pa_log_info("Freed %u \"%s\"", c->index, c->name);
++        pa_subscription_post(c->core, PA_SUBSCRIPTION_EVENT_CARD|PA_SUBSCRIPTION_EVENT_REMOVE, c->index);
++    }
+ 
+-    pa_subscription_post(c->core, PA_SUBSCRIPTION_EVENT_CARD|PA_SUBSCRIPTION_EVENT_REMOVE, c->index);
++    pa_namereg_unregister(core, c->name);
+ 
+     pa_assert(pa_idxset_isempty(c->sinks));
+     pa_idxset_free(c->sinks, NULL);
+@@ -298,20 +316,27 @@ int pa_card_set_profile(pa_card *c, pa_card_profile *profile, bool save) {
          return 0;
      }
  
@@ -307,7 +363,7 @@ index f92ac87..1a6e705 100644
 +     * be probably good to change this so that also the initial profile can be
 +     * set up in set_profile(), but if set_profile() fails, that would need
 +     * some better handling than what we do here currently. */
-+    if (c->state != PA_CARD_STATE_INIT && (r = c->set_profile(c, profile)) < 0)
++    if (c->linked && (r = c->set_profile(c, profile)) < 0)
          return r;
  
 -    pa_subscription_post(c->core, PA_SUBSCRIPTION_EVENT_CARD|PA_SUBSCRIPTION_EVENT_CHANGE, c->index);
@@ -321,7 +377,7 @@ index f92ac87..1a6e705 100644
          update_port_preferred_profile(c);
  
 -    pa_hook_fire(&c->core->hooks[PA_CORE_HOOK_CARD_PROFILE_CHANGED], c);
-+    if (c->state != PA_CARD_STATE_INIT) {
++    if (c->linked) {
 +        pa_log_info("Changed profile of card %u \"%s\" to %s", c->index, c->name, profile->name);
 +        pa_hook_fire(&c->core->hooks[PA_CORE_HOOK_CARD_PROFILE_CHANGED], c);
 +        pa_subscription_post(c->core, PA_SUBSCRIPTION_EVENT_CARD|PA_SUBSCRIPTION_EVENT_CHANGE, c->index);
@@ -330,37 +386,44 @@ index f92ac87..1a6e705 100644
      return 0;
  }
 diff --git a/src/pulsecore/card.h b/src/pulsecore/card.h
-index fff9057..a944301 100644
+index d4970e3..fd1fe0a 100644
 --- a/src/pulsecore/card.h
 +++ b/src/pulsecore/card.h
-@@ -34,6 +34,11 @@ typedef enum pa_available {
-     PA_AVAILABLE_YES = 2,
- } pa_available_t;
+@@ -86,6 +86,8 @@ struct pa_card {
  
-+typedef enum pa_card_state {
-+    PA_CARD_STATE_INIT,
-+    PA_CARD_STATE_LINKED,
-+} pa_card_state_t;
+     pa_suspend_cause_t suspend_cause;
+ 
++    bool linked;
 +
- struct pa_card_profile {
-     pa_card *card;
-     char *name;
-@@ -66,6 +71,7 @@ struct pa_card_profile {
+     void *userdata;
  
- struct pa_card {
-     uint32_t index;
-+    pa_card_state_t state;
-     pa_core *core;
- 
-     char *name;
-@@ -120,6 +126,7 @@ void pa_card_new_data_set_profile(pa_card_new_data *data, const char *profile);
+     int (*set_profile)(pa_card *c, pa_card_profile *profile);
+@@ -128,6 +130,13 @@ void pa_card_new_data_set_preferred_port(pa_card_new_data *data, pa_direction_t
  void pa_card_new_data_done(pa_card_new_data *data);
  
  pa_card *pa_card_new(pa_core *c, pa_card_new_data *data);
++
++/* Select the initial card profile according to the configured policies. This
++ * must be called between pa_card_new() and pa_card_put(), after the port and
++ * profile availablities have been initialized. */
++void pa_card_choose_initial_profile(pa_card *card);
++
 +void pa_card_put(pa_card *c);
  void pa_card_free(pa_card *c);
  
  void pa_card_add_profile(pa_card *c, pa_card_profile *profile);
+diff --git a/src/pulsecore/core.h b/src/pulsecore/core.h
+index 00d7f2f..802111b 100644
+--- a/src/pulsecore/core.h
++++ b/src/pulsecore/core.h
+@@ -118,6 +118,7 @@ typedef enum pa_core_hook {
+     PA_CORE_HOOK_CLIENT_PROPLIST_CHANGED,
+     PA_CORE_HOOK_CLIENT_SEND_EVENT,
+     PA_CORE_HOOK_CARD_NEW,
++    PA_CORE_HOOK_CARD_CHOOSE_INITIAL_PROFILE,
+     PA_CORE_HOOK_CARD_PUT,
+     PA_CORE_HOOK_CARD_UNLINK,
+     PA_CORE_HOOK_CARD_PREFERRED_PORT_CHANGED,
 -- 
-2.7.0
+2.8.1
 

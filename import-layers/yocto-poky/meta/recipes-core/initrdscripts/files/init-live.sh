@@ -80,7 +80,9 @@ read_args() {
 boot_live_root() {
     # Watches the udev event queue, and exits if all current events are handled
     udevadm settle --timeout=3 --quiet
-    killall "${_UDEV_DAEMON##*/}" 2>/dev/null
+    # Kills the current udev running processes, which survived after
+    # device node creation events were handled, to avoid unexpected behavior
+    killall -9 "${_UDEV_DAEMON##*/}" 2>/dev/null
 
     # Allow for identification of the real root even after boot
     mkdir -p  ${ROOT_MOUNT}/media/realroot

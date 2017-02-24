@@ -111,6 +111,13 @@
                     </para></listitem>
             </itemizedlist>
         </para>
+
+        <para>
+            For an overview of Toaster shipped with the Yocto Project &DISTRO;
+            Release, see the
+            "<ulink url='https://youtu.be/BlXdOYLgPxA'>Toaster - Yocto Project 2.2</ulink>"
+            video.
+        </para>
     </section>
 
     <section id='toaster-installation-options'>

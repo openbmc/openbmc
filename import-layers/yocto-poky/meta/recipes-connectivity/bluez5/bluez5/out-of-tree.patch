@@ -1,0 +1,26 @@
+From ed55b49a226ca3909f52416be2ae5ce1c5ca2cb2 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Fri, 22 Apr 2016 15:40:37 +0100
+Subject: [PATCH] Makefile.obexd: add missing mkdir in builtin.h generation
+
+In parallel out-of-tree builds it's possible that obexd/src/builtin.h is
+generated before the target directory has been implicitly created. Solve this by
+creating the directory before writing into it.
+
+Upstream-Status: Submitted
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+---
+ Makefile.obexd | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Makefile.obexd b/Makefile.obexd
+index 2e33cbc..c8286f0 100644
+--- a/Makefile.obexd
++++ b/Makefile.obexd
+@@ -105,2 +105,3 @@ obexd/src/plugin.$(OBJEXT): obexd/src/builtin.h
+ obexd/src/builtin.h: obexd/src/genbuiltin $(obexd_builtin_sources)
++	$(AM_V_at)$(MKDIR_P) $(dir $@)
+ 	$(AM_V_GEN)$(srcdir)/obexd/src/genbuiltin $(obexd_builtin_modules) > $@
+-- 
+2.8.0.rc3
+

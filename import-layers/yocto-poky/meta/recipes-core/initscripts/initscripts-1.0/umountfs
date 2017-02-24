@@ -12,7 +12,7 @@
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 
 echo "Deactivating swap..."
-swapoff -a
+[ -x /sbin/swapoff ] && swapoff -a
 
 # We leave /proc mounted.
 echo "Unmounting local filesystems..."

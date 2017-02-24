@@ -1,0 +1,51 @@
+From 4cdf2e9df13c6327fcc94d53e4953005543aef3d Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 6 Apr 2016 17:43:02 +0300
+Subject: [PATCH 01/10] distutils: set the prefix to be inside staging
+ directory
+
+The proper prefix is inside our staging area.
+
+Upstream-Status: Inappropriate [embedded specific]
+Signed-off-by: Michael 'Mickey' Lauer <mickey@vanille-media.de>
+Signed-off-by: Phil Blundell <philb@gnu.org>
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ Lib/distutils/sysconfig.py | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/Lib/distutils/sysconfig.py b/Lib/distutils/sysconfig.py
+index de7da1d..f3aacf7 100644
+--- a/Lib/distutils/sysconfig.py
++++ b/Lib/distutils/sysconfig.py
+@@ -75,7 +75,7 @@ def get_python_inc(plat_specific=0, prefix=None):
+     sys.exec_prefix -- i.e., ignore 'plat_specific'.
+     """
+     if prefix is None:
+-        prefix = plat_specific and EXEC_PREFIX or PREFIX
++        prefix = os.environ['STAGING_INCDIR'].rstrip('include')
+ 
+     if os.name == "posix":
+         if python_build:
+@@ -115,12 +115,16 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
+     If 'prefix' is supplied, use it instead of sys.prefix or
+     sys.exec_prefix -- i.e., ignore 'plat_specific'.
+     """
++    lib_basename = os.environ['STAGING_LIBDIR'].split('/')[-1]
+     if prefix is None:
+-        prefix = plat_specific and EXEC_PREFIX or PREFIX
++        if plat_specific:
++            prefix = os.environ['STAGING_LIBDIR'].rstrip(lib_basename)
++        else:
++            prefix = PREFIX
+ 
+     if os.name == "posix":
+         libpython = os.path.join(prefix,
+-                                 "lib", "python" + get_python_version())
++                                 lib_basename, "python" + get_python_version())
+         if standard_lib:
+             return libpython
+         else:
+-- 
+2.8.0.rc3
+

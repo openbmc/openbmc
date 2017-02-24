@@ -3,7 +3,7 @@ Upstream-Status: Inappropriate [this is 2.18(GPLv2) specific]
 # glibc also implements the function group_member. To avoid name conflict,
 # here let us append a "_" to which's version.
 #
-# Signed-off-by Dexuan Cui <dexuan.cui@intel.com>, 2010-08-20
+# Signed-off-by: Dexuan Cui <dexuan.cui@intel.com>, 2010-08-20
 # (this patch is licensed under GPLv2)
 
 --- which-2.18/bash.c

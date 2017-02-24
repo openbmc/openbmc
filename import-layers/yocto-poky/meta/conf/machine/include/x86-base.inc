@@ -20,7 +20,7 @@ SERIAL_CONSOLE ?= "115200 ttyS0"
 # kernel-related variables
 #
 PREFERRED_PROVIDER_virtual/kernel ??= "linux-yocto"
-PREFERRED_VERSION_linux-yocto ??= "4.4%"
+PREFERRED_VERSION_linux-yocto ??= "4.8%"
 
 #
 # XSERVER subcomponents, used to build the XSERVER variable

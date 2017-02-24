@@ -36,7 +36,7 @@ index 9bbd952..ba6405a 100644
          finally:
              del getTS.ts
              cb.grabOutput(False)
-+            if probs and sysconf.has("attempt-install", soft=True):
++            if (probs is not None) and sysconf.has("attempt-install", soft=True):
 +                def remove_conflict(pkgNEVR):
 +                    for key in changeset.keys():
 +                        if pkgNEVR == str(key):
@@ -67,8 +67,8 @@ index 9bbd952..ba6405a 100644
 +                        retry = 0
 +
              prog.setDone()
--            if probs:
-+            if probs and (not retry):
+-            if probs is not None:
++            if (probs is not None) and (not retry):
                  raise Error, "\n".join([x[0] for x in probs])
              prog.stop()
 +            if retry and len(changeset):

@@ -12,3 +12,6 @@ PACKAGE_EXTRA_ARCHS_tune-ppce500mc = "${PACKAGE_EXTRA_ARCHS_tune-powerpc} ppce50
 
 # glibc configure options to get e500mc specific library (for sqrt)
 GLIBC_EXTRA_OECONF += "${@bb.utils.contains('TUNE_FEATURES', 'ppce500mc', '-with-cpu=e500mc', '', d)}"
+
+# pass -mcpu=e500mc for ppce500mc kernel cross compile
+TARGET_CC_KERNEL_ARCH = "-mcpu=e500mc"

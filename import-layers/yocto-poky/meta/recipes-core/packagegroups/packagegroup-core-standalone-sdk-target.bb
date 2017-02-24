@@ -1,6 +1,5 @@
 SUMMARY = "Target packages for the standalone SDK"
 PR = "r8"
-LICENSE = "MIT"
 
 inherit packagegroup
 

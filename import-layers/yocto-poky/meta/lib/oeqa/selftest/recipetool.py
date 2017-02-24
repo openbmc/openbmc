@@ -1,7 +1,7 @@
 import os
 import logging
 import tempfile
-import urlparse
+import urllib.parse
 
 from oeqa.utils.commands import runCmd, bitbake, get_bb_var, create_temp_layer
 from oeqa.utils.decorators import testcase
@@ -278,7 +278,7 @@ class RecipetoolTests(RecipetoolBase):
                          '}\n']
         _, output = self._try_recipetool_appendfile('selftest-recipetool-appendfile', '/etc/selftest-replaceme-patched', self.testfile, '', expectedlines, ['testfile'])
         for line in output.splitlines():
-            if line.startswith('WARNING: '):
+            if 'WARNING: ' in line:
                 self.assertIn('add-file.patch', line, 'Unexpected warning found in output:\n%s' % line)
                 break
         else:
@@ -383,13 +383,13 @@ class RecipetoolTests(RecipetoolBase):
     @testcase(1194)
     def test_recipetool_create_git(self):
         # Ensure we have the right data in shlibs/pkgdata
-        bitbake('libpng pango libx11 libxext jpeg libxsettings-client libcheck')
+        bitbake('libpng pango libx11 libxext jpeg libcheck')
         # Try adding a recipe
         tempsrc = os.path.join(self.tempdir, 'srctree')
         os.makedirs(tempsrc)
         recipefile = os.path.join(self.tempdir, 'libmatchbox.bb')
         srcuri = 'git://git.yoctoproject.org/libmatchbox'
-        result = runCmd('recipetool create -o %s %s -x %s' % (recipefile, srcuri, tempsrc))
+        result = runCmd(['recipetool', 'create', '-o', recipefile, srcuri + ";rev=9f7cf8895ae2d39c465c04cc78e918c157420269", '-x', tempsrc])
         self.assertTrue(os.path.isfile(recipefile), 'recipetool did not create recipe file; output:\n%s' % result.output)
         checkvars = {}
         checkvars['LICENSE'] = 'LGPLv2.1'
@@ -397,7 +397,7 @@ class RecipetoolTests(RecipetoolBase):
         checkvars['S'] = '${WORKDIR}/git'
         checkvars['PV'] = '1.11+git${SRCPV}'
         checkvars['SRC_URI'] = srcuri
-        checkvars['DEPENDS'] = set(['libcheck', 'libjpeg-turbo', 'libpng', 'libx11', 'libxsettings-client', 'libxext', 'pango'])
+        checkvars['DEPENDS'] = set(['libcheck', 'libjpeg-turbo', 'libpng', 'libx11', 'libxext', 'pango'])
         inherits = ['autotools', 'pkgconfig']
         self._test_recipe_contents(recipefile, checkvars, inherits)
 
@@ -442,6 +442,49 @@ class RecipetoolTests(RecipetoolBase):
         inherits = ['cmake', 'python-dir', 'gettext', 'pkgconfig']
         self._test_recipe_contents(recipefile, checkvars, inherits)
 
+    def test_recipetool_create_github(self):
+        # Basic test to see if github URL mangling works
+        temprecipe = os.path.join(self.tempdir, 'recipe')
+        os.makedirs(temprecipe)
+        recipefile = os.path.join(temprecipe, 'meson_git.bb')
+        srcuri = 'https://github.com/mesonbuild/meson'
+        result = runCmd('recipetool create -o %s %s' % (temprecipe, srcuri))
+        self.assertTrue(os.path.isfile(recipefile))
+        checkvars = {}
+        checkvars['LICENSE'] = set(['Apache-2.0'])
+        checkvars['SRC_URI'] = 'git://github.com/mesonbuild/meson;protocol=https'
+        inherits = ['setuptools']
+        self._test_recipe_contents(recipefile, checkvars, inherits)
+
+    def test_recipetool_create_github_tarball(self):
+        # Basic test to ensure github URL mangling doesn't apply to release tarballs
+        temprecipe = os.path.join(self.tempdir, 'recipe')
+        os.makedirs(temprecipe)
+        pv = '0.32.0'
+        recipefile = os.path.join(temprecipe, 'meson_%s.bb' % pv)
+        srcuri = 'https://github.com/mesonbuild/meson/releases/download/%s/meson-%s.tar.gz' % (pv, pv)
+        result = runCmd('recipetool create -o %s %s' % (temprecipe, srcuri))
+        self.assertTrue(os.path.isfile(recipefile))
+        checkvars = {}
+        checkvars['LICENSE'] = set(['Apache-2.0'])
+        checkvars['SRC_URI'] = 'https://github.com/mesonbuild/meson/releases/download/${PV}/meson-${PV}.tar.gz'
+        inherits = ['setuptools']
+        self._test_recipe_contents(recipefile, checkvars, inherits)
+
+    def test_recipetool_create_git_http(self):
+        # Basic test to check http git URL mangling works
+        temprecipe = os.path.join(self.tempdir, 'recipe')
+        os.makedirs(temprecipe)
+        recipefile = os.path.join(temprecipe, 'matchbox-terminal_git.bb')
+        srcuri = 'http://git.yoctoproject.org/git/matchbox-terminal'
+        result = runCmd('recipetool create -o %s %s' % (temprecipe, srcuri))
+        self.assertTrue(os.path.isfile(recipefile))
+        checkvars = {}
+        checkvars['LICENSE'] = set(['GPLv2'])
+        checkvars['SRC_URI'] = 'git://git.yoctoproject.org/git/matchbox-terminal;protocol=http'
+        inherits = ['pkgconfig', 'autotools']
+        self._test_recipe_contents(recipefile, checkvars, inherits)
+
 class RecipetoolAppendsrcBase(RecipetoolBase):
     def _try_recipetool_appendsrcfile(self, testrecipe, newfile, destfile, options, expectedlines, expectedfiles):
         cmd = 'recipetool appendsrcfile %s %s %s %s %s' % (options, self.templayerdir, testrecipe, newfile, destfile)
@@ -471,7 +514,7 @@ class RecipetoolAppendsrcBase(RecipetoolBase):
         '''Return the first file:// in SRC_URI for the specified recipe.'''
         src_uri = get_bb_var('SRC_URI', recipe).split()
         for uri in src_uri:
-            p = urlparse.urlparse(uri)
+            p = urllib.parse.urlparse(uri)
             if p.scheme == 'file':
                 return p.netloc + p.path
 

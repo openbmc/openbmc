@@ -1,3 +1,6 @@
+2016/09/30 - Zubair Lutfullah Kakakhel <Zubair.Kakakhel@imgtec.com>
+  - Add Release 6 support
+
 2012/03/30 - Mark Hatle <mark.hatle@windriver.com>
   - Initial Version
 
@@ -6,9 +9,14 @@ MIPS currently defines 12 ABIs.  Combinations of:
  *) Hardware/Software Floating Point
  *) o32, n32, n64 ABI
 
+Release 6 of the ISA is a major revision and doesn't build up on previous
+releases of the ISA.
+
+For more details about tuples, check https://wiki.debian.org/Multiarch/Tuples
+
 TUNE_ARCH, the GNU canonical arch, is defined as:
 
-mips${MIPSPKGSFX_BYTE}${MIPSPKGSFX_ENDIAN}
+"mips${MIPSPKGSFX_32R6}${MIPSPKGSFX_64R6}${MIPSPKGSFX_BYTE}${MIPSPKGSFX_R6}${MIPSPKGSFX_ENDIAN}"
 
 The package arch is defined in such a way to generated a standard naming
 scheme.  The scheme is: <mips variant>[-nf][-n32]
@@ -34,3 +42,12 @@ that the tune is using a non-floating point ABI.
 MIPSPKGSFX_ABI - This is used to specify an alternative ABI when the previous
 values are not enough to distringuish the package.  "-n32" is added when
 building for N32 ABI.
+
+MIPSPKGSFX_R6 - This is used to specify the presence of release 6.
+"r6" is added in the tuple for release 6 of the isa.
+
+MIPSPKGSFX_64R6 - This is used to specify "isa" in the tuple.
+Release 6 onwards we use "mipsisa64" instead of just "mips64".
+
+MIPSPKGSFX_32R6 -  This is used to specify "isa32" in the tuple.
+Release 6 onwards we use "mipsisa32" instead of just "mips".

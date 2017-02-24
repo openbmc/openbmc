@@ -10,45 +10,31 @@ function importLayerPageInit (ctx) {
   var layerDepInput = $("#layer-dependency");
   var layerNameCtrl = $("#layer-name-ctrl");
   var duplicatedLayerName = $("#duplicated-layer-name-hint");
+  var localDirPath = $("#local-dir-path");
 
   var layerDeps = {};
   var layerDepsDeps = {};
   var currentLayerDepSelection;
   var validLayerName = /^(\w|-)+$/;
 
-  libtoaster.makeTypeahead(layerDepInput, libtoaster.ctx.layersTypeAheadUrl, { include_added: "true" }, function(item){
+  libtoaster.makeTypeahead(layerDepInput,
+                           libtoaster.ctx.layersTypeAheadUrl,
+                           { include_added: "true" }, function(item){
     currentLayerDepSelection = item;
+    layerDepBtn.removeAttr("disabled");
   });
 
-  // choices available in the typeahead
-  var layerDepsChoices = {};
-
-  // when the typeahead choices change, store an array of the available layer
-  // choices locally, to use for enabling/disabling the "Add layer" button
-  layerDepInput.on("typeahead-choices-change", function (event, data) {
-    layerDepsChoices = {};
-
-    if (data.choices) {
-      data.choices.forEach(function (item) {
-        layerDepsChoices[item.name] = item;
-      });
-    }
+  layerDepInput.on("typeahead:select", function(event, data){
+    currentLayerDepSelection = data;
   });
+
+  // Disable local dir repo when page is loaded.
+  $('#local-dir').hide();
 
   // disable the "Add layer" button when the layer input typeahead is empty
   // or not in the typeahead choices
-  layerDepInput.on("input change", function () {
-    // get the choices from the typeahead
-    var choice = layerDepsChoices[$(this).val()];
-
-    if (choice) {
-      layerDepBtn.removeAttr("disabled");
-      currentLayerDepSelection = choice;
-    }
-    else {
-      layerDepBtn.attr("disabled", "disabled");
-      currentLayerDepSelection = undefined;
-    }
+  layerDepInput.on("input change", function(){
+    layerDepBtn.attr("disabled","disabled");
   });
 
   /* We automatically add "openembedded-core" layer for convenience as a
@@ -70,7 +56,7 @@ function importLayerPageInit (ctx) {
     layerDeps[currentLayerDepSelection.id] = currentLayerDepSelection;
 
     /* Make a list item for the new layer dependency */
-    var newLayerDep = $("<li><a></a><span class=\"icon-trash\" data-toggle=\"tooltip\" title=\"Delete\"></span></li>");
+    var newLayerDep = $("<li><a></a><span class=\"glyphicon glyphicon-trash\" data-toggle=\"tooltip\" title=\"Remove\"></span></li>");
 
     newLayerDep.data('layer-id', currentLayerDepSelection.id);
     newLayerDep.children("span").tooltip();
@@ -91,7 +77,8 @@ function importLayerPageInit (ctx) {
 
     $("#layer-deps-list").append(newLayerDep);
 
-    libtoaster.getLayerDepsForProject(currentLayerDepSelection.layerdetailurl, function (data){
+    libtoaster.getLayerDepsForProject(currentLayerDepSelection.layerdetailurl,
+                                      function (data){
         /* These are the dependencies of the layer added as a dependency */
         if (data.list.length > 0) {
           currentLayerDepSelection.url = currentLayerDepSelection.layerdetailurl;
@@ -105,7 +92,8 @@ function importLayerPageInit (ctx) {
       }, null);
   });
 
-  importAndAddBtn.click(function(){
+  importAndAddBtn.click(function(e){
+    e.preventDefault();
     /* This is a list of the names from layerDeps for the layer deps
      * modal dialog body
      */
@@ -145,7 +133,9 @@ function importLayerPageInit (ctx) {
       var body = "<strong>"+layer.name+"</strong>'s dependencies ("+
         depNames.join(", ")+"</span>) require some layers that are not added to your project. Select the ones you want to add:</p>";
 
-      showLayerDepsModal(layer, depDepsArray, title, body, false, function(layerObsList){
+      showLayerDepsModal(layer,
+                         depDepsArray,
+                         title, body, false, function(layerObsList){
         /* Add the accepted layer dependencies' ids to the allDeps array */
         for (var key in layerObsList){
           allDeps.push(layerObsList[key].id);
@@ -167,7 +157,15 @@ function importLayerPageInit (ctx) {
         dir_path: $("#layer-subdir").val(),
         project_id: libtoaster.ctx.projectId,
         layer_deps: layerDepsCsv,
+        local_source_dir: $('#local-dir-path').val(),
       };
+
+      if ($('input[name=repo]:checked').val() == "git") {
+        layerData.local_source_dir = "";
+      } else {
+        layerData.vcs_url = "";
+        layerData.git_ref = "";
+      }
 
       $.ajax({
           type: "POST",
@@ -178,9 +176,8 @@ function importLayerPageInit (ctx) {
             if (data.error != "ok") {
               console.log(data.error);
             } else {
-              /* Success layer import now go to the project page */
-              $.cookie('layer-imported-alert', JSON.stringify(data), { path: '/'});
-              window.location.replace(libtoaster.ctx.projectPageUrl+'?notify=layer-imported');
+              createImportedNotification(data);
+              window.location.replace(libtoaster.ctx.projectPageUrl);
             }
           },
           error: function (data) {
@@ -190,6 +187,30 @@ function importLayerPageInit (ctx) {
       });
     }
   });
+
+  /* Layer imported notification */
+  function createImportedNotification(imported){
+    var message = "Layer imported";
+
+    if (imported.deps_added.length === 0) {
+      message = "You have imported <strong><a class=\"alert-link\" href=\""+imported.imported_layer.layerdetailurl+"\">"+imported.imported_layer.name+"</a></strong> and added it to your project.";
+    } else {
+
+      var links = "<a href=\""+imported.imported_layer.layerdetailurl+"\">"+imported.imported_layer.name+"</a>, ";
+
+      imported.deps_added.map (function(item, index){
+        links +='<a href="'+item.layerdetailurl+'">'+item.name+'</a>';
+        /*If we're at the last element we don't want the trailing comma */
+        if (imported.deps_added[index+1] !== undefined)
+          links += ', ';
+      });
+
+      /* Length + 1 here to do deps + the imported layer */
+      message = 'You have imported <strong><a href="'+imported.imported_layer.layerdetailurl+'">'+imported.imported_layer.name+'</a></strong> and added <strong>'+(imported.deps_added.length+1)+'</strong> layers to your project: <strong>'+links+'</strong>';
+    }
+
+    libtoaster.setNotification("layer-imported", message);
+  }
 
   function enable_import_btn(enabled) {
     var importAndAddHint = $("#import-and-add-hint");
@@ -207,25 +228,48 @@ function importLayerPageInit (ctx) {
   function check_form() {
     var valid = false;
     var inputs = $("input:required");
+    var inputStr = inputs.val().split("");
 
-    for (var i=0; i<inputs.length; i++){
-      if (!(valid = inputs[i].value)){
+    for (var i=0; i<inputs.val().length; i++){
+      if (!(valid = inputStr[i])){
         enable_import_btn(false);
         break;
       }
     }
 
-    if (valid)
-      enable_import_btn(true);
+    if (valid) {
+      if ($("#local-dir-radio").prop("checked") &&
+          localDirPath.val().length > 0) {
+        enable_import_btn(true);
+      }
+
+      if ($("#git-repo-radio").prop("checked") &&
+          vcsURLInput.val().length > 0 && gitRefInput.val().length > 0) {
+        enable_import_btn(true);
+      }
+    }
+
+    if (inputs.val().length == 0)
+      enable_import_btn(false);
   }
 
   function layerExistsError(layer){
     var dupLayerInfo = $("#duplicate-layer-info");
-    dupLayerInfo.find(".dup-layer-name").text(layer.name);
-    dupLayerInfo.find(".dup-layer-link").attr("href", layer.layerdetailurl);
-    dupLayerInfo.find("#dup-layer-vcs-url").text(layer.vcs_url);
-    dupLayerInfo.find("#dup-layer-revision").text(layer.vcs_reference);
 
+    if (layer.local_source_dir) {
+      $("#git-layer-dup").hide();
+      $("#local-layer-dup").fadeIn();
+      dupLayerInfo.find(".dup-layer-name").text(layer.name);
+      dupLayerInfo.find(".dup-layer-link").attr("href", layer.layerdetailurl);
+      dupLayerInfo.find("#dup-local-source-dir-name").text(layer.local_source_dir);
+    } else {
+      $("#git-layer-dup").fadeIn();
+      $("#local-layer-dup").hide();
+      dupLayerInfo.find(".dup-layer-name").text(layer.name);
+      dupLayerInfo.find(".dup-layer-link").attr("href", layer.layerdetailurl);
+      dupLayerInfo.find("#dup-layer-vcs-url").text(layer.vcs_url);
+      dupLayerInfo.find("#dup-layer-revision").text(layer.vcs_reference);
+    }
     $(".fields-apart-from-layer-name").fadeOut(function(){
 
       dupLayerInfo.fadeIn();
@@ -233,13 +277,13 @@ function importLayerPageInit (ctx) {
   }
 
   layerNameInput.on('blur', function() {
-      if (!$(this).val()){
-        return;
-      }
-      var name = $(this).val();
+    if (!$(this).val()){
+      return;
+    }
+    var name = $(this).val();
 
-      /* Check if the layer name exists */
-      $.getJSON(libtoaster.ctx.layersTypeAheadUrl,
+    /* Check if the layer name exists */
+    $.getJSON(libtoaster.ctx.layersTypeAheadUrl,
         { include_added: "true" , search: name, format: "json" },
         function(layer) {
           if (layer.results.length > 0) {
@@ -262,7 +306,7 @@ function importLayerPageInit (ctx) {
 
   layerNameInput.on('input', function() {
     if ($(this).val() && !validLayerName.test($(this).val())){
-      layerNameCtrl.addClass("error")
+      layerNameCtrl.addClass("has-error")
       $("#invalid-layer-name-hint").show();
       enable_import_btn(false);
       return;
@@ -270,16 +314,19 @@ function importLayerPageInit (ctx) {
 
     if ($("#duplicate-layer-info").css("display") != "None"){
       $("#duplicate-layer-info").fadeOut(function(){
-        $(".fields-apart-from-layer-name").show();
-      });
+      $(".fields-apart-from-layer-name").show();
+      radioDisplay();
+    });
 
-    }
+  }
+
+    radioDisplay();
 
     /* Don't remove the error class if we're displaying the error for another
      * reason.
      */
     if (!duplicatedLayerName.is(":visible"))
-      layerNameCtrl.removeClass("error")
+      layerNameCtrl.removeClass("has-error")
 
     $("#invalid-layer-name-hint").hide();
     check_form();
@@ -300,4 +347,72 @@ function importLayerPageInit (ctx) {
     }
   });
 
+  function radioDisplay() {
+    if ($('input[name=repo]:checked').val() == "local") {
+      $('#git-repo').hide();
+      $('#import-git-layer-and-add-hint').hide();
+      $('#local-dir').fadeIn();
+      $('#import-local-dir-and-add-hint').fadeIn();
+    } else {
+      $('#local-dir').hide();
+      $('#import-local-dir-and-add-hint').hide();
+      $('#git-repo').fadeIn();
+      $('#import-git-layer-and-add-hint').fadeIn();
+    }
+  }
+
+  $('input:radio[name="repo"]').change(function() {
+    radioDisplay();
+    if ($("#local-dir-radio").prop("checked")) {
+      if (localDirPath.val().length > 0) {
+        enable_import_btn(true);
+      } else {
+        enable_import_btn(false);
+      }
+    }
+    if ($("#git-repo-radio").prop("checked")) {
+      if (vcsURLInput.val().length > 0 && gitRefInput.val().length > 0) {
+        enable_import_btn(true);
+      } else {
+        enable_import_btn(false);
+      }
+    }
+  });
+
+  localDirPath.on('input', function(){
+    if ($(this).val().trim().length == 0) {
+      $('#import-and-add-btn').attr("disabled","disabled");
+      $('#local-dir').addClass('has-error');
+      $('#hintError-dir-abs-path').show();
+      $('#hintError-dir-path-starts-with-slash').show();
+    } else {
+      var input = $(this);
+      var reBeginWithSlash = /^\//;
+      var reCheckVariable = /^\$/;
+      var re = /([ <>\\|":\.%\?\*]+)/;
+
+      var invalidDir = re.test(input.val());
+      var invalidSlash = reBeginWithSlash.test(input.val());
+      var invalidVar = reCheckVariable.test(input.val());
+
+      if (!invalidSlash && !invalidVar) {
+        $('#local-dir').addClass('has-error');
+        $('#import-and-add-btn').attr("disabled","disabled");
+        $('#hintError-dir-abs-path').show();
+        $('#hintError-dir-path-starts-with-slash').show();
+      } else if (invalidDir) {
+        $('#local-dir').addClass('has-error');
+        $('#import-and-add-btn').attr("disabled","disabled");
+        $('#hintError-dir-path').show();
+      } else {
+        $('#local-dir').removeClass('has-error');
+        if (layerNameInput.val().length > 0) {
+          $('#import-and-add-btn').removeAttr("disabled");
+        }
+        $('#hintError-dir-abs-path').hide();
+        $('#hintError-dir-path-starts-with-slash').hide();
+        $('#hintError-dir-path').hide();
+      }
+    }
+  });
 }

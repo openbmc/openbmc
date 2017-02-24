@@ -1,0 +1,38 @@
+From 1bfde222926be624a30a6e4b2cdc2c5064a36298 Mon Sep 17 00:00:00 2001
+From: Ioan-Adrian Ratiu <adrian.ratiu@ni.com>
+Date: Fri, 29 Jul 2016 01:19:37 +0300
+Subject: [PATCH] configure.ac: explicitely check stdint.h
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Otherwise HAVE_STDINT_H will not be defined or the var will not be
+picked up from cache so builds could fail with errors like:
+| ../../dbus-1.10.8/dbus/dbus-internals.h:239:8: error: ‘uintptr_t’ undeclared (first use in this function)
+
+Signed-off-by: Ioan-Adrian Ratiu <adrian.ratiu@ni.com>
+[smcv: fix Autoconf underquoting]
+Reviewed-by: Simon McVittie <simon.mcvittie@collabora.co.uk>
+
+Upstream-Status: Backport [from dbus-1.10]
+
+---
+ configure.ac | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index cf5c5b9..a228d63 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -699,6 +699,8 @@ AC_CHECK_HEADERS(byteswap.h)
+ 
+ AC_CHECK_HEADERS(unistd.h)
+ 
++AC_CHECK_HEADERS([stdint.h])
++
+ AC_CHECK_HEADERS(ws2tcpip.h)
+ 
+ AC_CHECK_HEADERS(alloca.h)
+-- 
+2.9.2
+

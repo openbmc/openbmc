@@ -1,0 +1,26 @@
+ucontext structure is different between musl and glibc for ppc
+therefore its not enough just to check for arch alone, we also
+need to check for libc type.
+
+Fixes errors like
+
+Source/JavaScriptCore/heap/MachineStackMarker.cpp:90:65: error: 'struct mcontext_t' has no member named 'uc_regs'; did you mean 'gregs'?
+     thread->suspendedMachineContext = *userContext->uc_mcontext.uc_regs;
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: webkitgtk-2.12.3/Source/JavaScriptCore/heap/MachineStackMarker.cpp
+===================================================================
+--- webkitgtk-2.12.3.orig/Source/JavaScriptCore/heap/MachineStackMarker.cpp
++++ webkitgtk-2.12.3/Source/JavaScriptCore/heap/MachineStackMarker.cpp
+@@ -86,7 +86,7 @@ static void pthreadSignalHandlerSuspendR
+     }
+ 
+     ucontext_t* userContext = static_cast<ucontext_t*>(ucontext);
+-#if CPU(PPC)
++#if CPU(PPC) && defined(__GLIBC__)
+     thread->suspendedMachineContext = *userContext->uc_mcontext.uc_regs;
+ #else
+     thread->suspendedMachineContext = userContext->uc_mcontext;

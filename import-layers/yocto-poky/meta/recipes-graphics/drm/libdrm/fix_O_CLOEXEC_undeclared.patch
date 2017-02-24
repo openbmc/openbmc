@@ -19,6 +19,6 @@ diff -Naur libdrm-2.4.66-orig/tests/drmdevice.c libdrm-2.4.66/tests/drmdevice.c
   */
  
 +#include <config.h>
+ #include <errno.h>
  #include <stdio.h>
  #include <stdlib.h>
- #include <sys/stat.h>

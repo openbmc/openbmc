@@ -1,0 +1,7 @@
+[X-GNOME-Metatheme]
+Encoding=UTF-8
+Type=X-GNOME-Metatheme
+Name=Sato
+GtkTheme=Adwaita
+IconTheme=Sato
+MatchboxTheme=Sato

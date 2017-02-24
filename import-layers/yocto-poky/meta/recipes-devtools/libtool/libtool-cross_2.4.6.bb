@@ -35,11 +35,6 @@ do_install () {
 	install -c -m 0644 ${S}/m4/*.m4 ${D}${target_datadir}/aclocal/
 }
 
-SYSROOT_PREPROCESS_FUNCS += "libtoolcross_sysroot_preprocess"
-
-libtoolcross_sysroot_preprocess () {
-	sysroot_stage_dir ${D}${bindir_crossscripts} ${SYSROOT_DESTDIR}${bindir_crossscripts}
-	sysroot_stage_dir ${D}${target_datadir} ${SYSROOT_DESTDIR}${target_datadir}
-}
+SYSROOT_DIRS += "${bindir_crossscripts} ${target_datadir}"
 
 SSTATE_SCAN_FILES += "libtoolize *-libtool"

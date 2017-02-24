@@ -1,0 +1,56 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+kbd is out of source built, then the value of $(srcdir) is relative path of
+${S}/tests to ${B}/tests. Macro DATADIR is defined with $(srcdir) and replaced
+in .c files by compiler, and string @DATADIR@ is replaced with $(srdir) by rule
+"%: %.in" in Makefile.
+
+But kbd-ptest puts test cases and resource files in same directory, then some
+ptest cases fail to find resources.
+
+Replace DATADIR and @DATADIR@ with current directory(dot) to make test cases
+run as expected.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 1976333..b36aef3 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -1,7 +1,7 @@
+ AM_CPPFLAGS = \
+ 	-I$(srcdir)/../src/libkeymap \
+ 	-I$(builddir)/../src/libkeymap \
+-	-DDATADIR=\"$(srcdir)\" -DBUILDDIR=\"$(builddir)\"
++	-DDATADIR=\".\" -DBUILDDIR=\"$(builddir)\"
+ 
+ AM_CFLAGS = $(CHECK_CFLAGS)
+ LDADD  = $(top_builddir)/src/libkeymap/libkeymap.la $(CHECK_LIBS)
+diff --git a/tests/alt-is-meta.in b/tests/alt-is-meta.in
+index ddd5ed8..772fb51 100755
+--- a/tests/alt-is-meta.in
++++ b/tests/alt-is-meta.in
+@@ -7,8 +7,8 @@ cd "$cwd"
+ rc=0
+ temp="$(mktemp "@BUILDDIR@/temp.XXXXXXXXX")"
+ 
+-./libkeymap-showmaps "@DATADIR@"/alt-is-meta.map > "$temp" || rc=$?
+-cmp -s "@DATADIR@//alt-is-meta.output" "$temp" || rc=$?
++./libkeymap-showmaps ./alt-is-meta.map > "$temp" || rc=$?
++cmp -s "./alt-is-meta.output" "$temp" || rc=$?
+ 
+ if [ "$rc" != 0 ]; then
+ 	printf 'failed\n'
+diff --git a/tests/dumpkeys-fulltable.in b/tests/dumpkeys-fulltable.in
+index 7c856e5..14d92c1 100755
+--- a/tests/dumpkeys-fulltable.in
++++ b/tests/dumpkeys-fulltable.in
+@@ -5,7 +5,7 @@ cwd="$(readlink -ev "${0%/*}")"
+ cd "$cwd"
+ 
+ BUILDDIR="@BUILDDIR@"
+-DATADIR="@DATADIR@"
++DATADIR="."
+ 
+ check_keymap() {
+ 	local kmap temp rc

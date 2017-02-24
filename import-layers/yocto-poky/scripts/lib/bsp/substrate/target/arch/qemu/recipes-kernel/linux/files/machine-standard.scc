@@ -4,15 +4,15 @@ define KMACHINE {{=machine}}
 define KARCH {{=qemuarch}}
 
 {{ if qemuarch == "i386" or qemuarch == "x86_64": }}
-include {{=map_standard_kbranch(need_new_kbranch, new_kbranch, existing_kbranch)}}
+include {{=map_standard_kbranch(need_new_kbranch, new_kbranch, existing_kbranch)}} nopatch
 {{ if qemuarch == "arm": }}
-include bsp/arm-versatile-926ejs/arm-versatile-926ejs-standard
+include bsp/arm-versatile-926ejs/arm-versatile-926ejs-standard nopatch
 {{ if qemuarch == "powerpc": }}
-include bsp/qemu-ppc32/qemu-ppc32-standard
+include bsp/qemu-ppc32/qemu-ppc32-standard nopatch
 {{ if qemuarch == "mips": }}
-include bsp/mti-malta32/mti-malta32-be-standard
+include bsp/mti-malta32/mti-malta32-be-standard nopatch
 {{ if qemuarch == "mips64": }}
-include bsp/mti-malta64/mti-malta64-be-standard
+include bsp/mti-malta64/mti-malta64-be-standard nopatch
 {{ if need_new_kbranch == "y": }}
 define KTYPE {{=new_kbranch}}
 branch {{=machine}}

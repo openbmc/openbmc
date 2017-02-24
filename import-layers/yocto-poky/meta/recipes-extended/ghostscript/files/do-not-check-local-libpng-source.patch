@@ -16,17 +16,17 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index ab30a97..b762fd7 100644
+index bf6d3f5..01df03f 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -955,11 +955,11 @@ AC_SUBST(ZLIBDIR)
+@@ -930,11 +930,11 @@ AC_SUBST(ZLIBDIR)
  AC_SUBST(FT_SYS_ZLIB)
  
  dnl png for the png output device; it also requires zlib
 -LIBPNGDIR=src
 +LIBPNGDIR=$srcdir/libpng
  PNGDEVS=''
- PNGDEVS_ALL='png48 png16m pnggray pngmono png256 png16 pngalpha'
+ PNGDEVS_ALL='png48 png16m pnggray pngmono pngmonod png256 png16 pngalpha'
  AC_MSG_CHECKING([for local png library source])
 -if test -f $srcdir/libpng/pngread.c; then
 +if false; then
@@ -34,5 +34,5 @@ index ab30a97..b762fd7 100644
          SHARE_LIBPNG=0
          LIBPNGDIR=$srcdir/libpng
 -- 
-1.9.1
+2.8.1
 

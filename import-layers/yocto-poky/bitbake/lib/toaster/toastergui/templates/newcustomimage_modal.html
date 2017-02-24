@@ -12,37 +12,49 @@
   });
 </script>
 
-<div class="modal hide fade in" id="new-custom-image-modal" aria-hidden="false">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h3>New custom image</h3>
-  </div>
+<div class="modal fade" id="new-custom-image-modal" aria-hidden="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3>New custom image</h3>
+      </div>
 
-  <div class="modal-body">
-    <!--
-    this container is visible if there are multiple image recipes which could
-    be used as a basis for the new custom image; radio buttons are added to it
-    via newCustomImageModalSetRecipes() as required
-    -->
-    <div data-role="image-selector" style="display:none;">
-      <h4>Which image do you want to customise?</h4>
-      <div data-role="image-selector-radios"></div>
-      <span class="help-block error" id="invalid-recipe-help" style="display:none"></span>
-      <div class="air"></div>
+      <div class="modal-body">
+        <!--
+          this container is visible if there are multiple image recipes which could
+          be used as a basis for the new custom image; radio buttons are added to it
+          via newCustomImageModalSetRecipes() as required
+        -->
+        <div data-role="image-selector" style="display:none;">
+          <h4>Which image do you want to customise?</h4>
+          <span class="help-block text-danger" id="invalid-recipe-help" style="display:none"></span>
+          <div data-role="image-selector-radios"></div>
+          <div class="air"></div>
+        </div>
+
+        <h4>Name your custom image</h4>
+
+        <div class="row">
+          <div class="col-md-10">
+            <p class="help-block">Image names must be unique. They should not contain spaces or capital letters, and the only allowed special character is dash (-).
+            </p>
+            <div class="form-group">
+              <input type="text" class="form-control input-lg" placeholder="Type the custom image name" required>
+            </div>
+            <span class="help-block text-danger" id="invalid-name-help" style="display:none"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="create-new-custom-image-btn" class="btn btn-primary btn-large" disabled>
+          <span data-role="submit-state">Create custom image</span>
+          <span data-role="loading-state" style="display:none">
+            <i class="fa-pulse icon-spinner"></i>&nbsp;Creating custom image...
+          </span>
+        </button>
+      </div>
     </div>
-
-    <h4>Name your custom image</h4>
-
-    <div class="row-fluid">
-      <span class="help-block span8">Image names must be unique. They should not contain spaces or capital letters, and the only allowed special character is dash (-).<p></p>
-      </span></div>
-    <div class="control-group controls">
-      <input type="text" class="huge" placeholder="Type the custom image name" required>
-      <span class="help-block error" id="invalid-name-help" style="display:none"></span>
-    </div>
-  </div>
-
-  <div class="modal-footer">
-    <button id="create-new-custom-image-btn" class="btn btn-primary btn-large" data-original-title="" title="" disabled>Create custom image</button>
   </div>
 </div>

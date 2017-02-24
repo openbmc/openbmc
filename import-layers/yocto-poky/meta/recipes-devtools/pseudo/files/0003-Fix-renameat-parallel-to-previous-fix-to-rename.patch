@@ -1,0 +1,64 @@
+From d9ab3a0acc94151048498b1ea4d69e7707df1526 Mon Sep 17 00:00:00 2001
+From: Seebs <seebs@seebs.net>
+Date: Fri, 30 Sep 2016 10:56:35 -0500
+Subject: [PATCH 3/3] Fix renameat (parallel to previous fix to rename)
+
+There was a bug in rename(), which was duplicated when renameat() was
+implemented, and which got fixed two years ago for rename(), but no
+one ever uses renameat() so it didn't get fixed there. Thanks
+to Anton Gerasimov <anton@advancedtelematic.com> for the bug report
+and patch.
+
+Signed-off-by: Seebs <seebs@seebs.net>
+
+Upstream-Status: Backport
+Signed-off-by: Joshua Lock <joshua.g.lock@intel.com>
+
+---
+ ChangeLog.txt              | 4 ++++
+ ports/unix/guts/renameat.c | 7 ++++++-
+ 2 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/ChangeLog.txt b/ChangeLog.txt
+index 65b9759..ca04cc0 100644
+--- a/ChangeLog.txt
++++ b/ChangeLog.txt
+@@ -1,3 +1,7 @@
++2016-09-30:
++	* (seebs) Fix rename at, matching fix from ee00f63d for rename. Bug
++	  and fix provided by Anton Gerasimov <anton@advancedtelematic.com>.
++
+ 2016-09-28:
+ 	* (seebs) Send errors to log when daemonizing, but do that a lot
+ 	  sooner to prevent startup messages which can show up spuriously
+diff --git a/ports/unix/guts/renameat.c b/ports/unix/guts/renameat.c
+index ade0509..d5e36fa 100644
+--- a/ports/unix/guts/renameat.c
++++ b/ports/unix/guts/renameat.c
+@@ -11,6 +11,7 @@
+ 	int oldrc, newrc;
+ 	int save_errno;
+ 	int old_db_entry = 0;
++	int may_unlinked = 0;
+ 
+ 	pseudo_debug(PDBGF_FILE, "renameat: %d,%s->%d,%s\n",
+ 		olddirfd, oldpath ? oldpath : "<nil>",
+@@ -44,10 +45,14 @@
+ 	/* as with unlink, we have to mark that the file may get deleted */
+ 	msg = pseudo_client_op(OP_MAY_UNLINK, 0, -1, newdirfd, newpath, newrc ? NULL : &newbuf);
+ 	if (msg && msg->result == RESULT_SUCCEED)
++		may_unlinked = 1;
++	msg = pseudo_client_op(OP_STAT, 0, -1, olddirfd, oldpath, oldrc ? NULL : &oldbuf);
++	if (msg && msg->result == RESULT_SUCCEED)
+ 		old_db_entry = 1;
++
+ 	rc = real_renameat(olddirfd, oldpath, newdirfd, newpath);
+ 	save_errno = errno;
+-	if (old_db_entry) {
++	if (may_unlinked) {
+ 		if (rc == -1) {
+ 			/* since we failed, that wasn't really unlinked -- put
+ 			 * it back.
+-- 
+2.7.4
+

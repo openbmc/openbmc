@@ -13,20 +13,20 @@
         You can use existing, pre-built toolchains by locating and running
         an SDK installer script that ships with the Yocto Project.
         Using this method, you select and download an architecture-specific
-        toolchain installer and then run the script to hand-install the
+        SDK installer and then run the script to hand-install the
         toolchain.
     </para>
 
     <para>
         You can find SDK installers here:
         <itemizedlist>
-            <listitem><para><emphasis>Standard SDK Installers</emphasis>
+            <listitem><para><emphasis>Standard SDK Installers:</emphasis>
                 Go to <ulink url='&YOCTO_TOOLCHAIN_DL_URL;'></ulink>
                 and find the folder that matches your host development system
                 (i.e. <filename>i686</filename> for 32-bit machines or
                 <filename>x86_64</filename> for 64-bit machines).</para>
 
-                <para>Go into that folder and download the toolchain installer
+                <para>Go into that folder and download the SDK installer
                 whose name includes the appropriate target architecture.
                 The toolchains provided by the Yocto Project are based off of
                 the <filename>core-image-sato</filename> image and contain
@@ -39,9 +39,14 @@
      poky-glibc-x86_64-core-image-sato-i586-toolchain-&DISTRO;.sh
                 </literallayout>
                 </para></listitem>
-            <listitem><para><emphasis>Extensible SDK Installers</emphasis>
-                Installers for the extensible SDK are in
+            <listitem><para><emphasis>Extensible SDK Installers:</emphasis>
+                Installers for the extensible SDK are also located in
                 <ulink url='&YOCTO_TOOLCHAIN_DL_URL;'></ulink>.
+                These installers have the string
+                <filename>ext</filename> as part of their names:
+                <literallayout class='monospaced'>
+     poky-glibc-x86_64-core-image-sato-core2-64-toolchain-ext-&DISTRO;.sh
+                </literallayout>
                 </para></listitem>
         </itemizedlist>
     </para>
@@ -51,8 +56,8 @@
     <title>Building an SDK Installer</title>
 
     <para>
-        As an alternative to locating and downloading a toolchain installer,
-        you can build the toolchain installer assuming you have first sourced
+        As an alternative to locating and downloading a SDK installer,
+        you can build the SDK installer assuming you have first sourced
         the environment setup script.
         See the
         "<ulink url='&YOCTO_DOCS_QS_URL;#qs-building-images'>Building Images</ulink>"
@@ -69,7 +74,7 @@
     </para>
 
     <para>
-        To build the toolchain installer for a standard SDK and populate
+        To build the SDK installer for a standard SDK and populate
         the SDK image, use the following command:
         <literallayout class='monospaced'>
      $ bitbake <replaceable>image</replaceable> -c populate_sdk
@@ -78,28 +83,38 @@
         <literallayout class='monospaced'>
      $ bitbake <replaceable>image</replaceable> -c populate_sdk_ext
         </literallayout>
-        These commands result in a toolchain installer that contains the sysroot
+        These commands result in a SDK installer that contains the sysroot
         that matches your target root filesystem.
     </para>
 
     <para>
-        When the <filename>bitbake</filename> command completes, the toolchain
+        When the <filename>bitbake</filename> command completes, the SDK
         installer will be in
         <filename>tmp/deploy/sdk</filename> in the Build Directory.
-        <note>
-            By default, this toolchain does not build static binaries.
-            If you want to use the toolchain to build these types of libraries,
-            you need to be sure your image has the appropriate static
-            development libraries.
-            Use the
-            <ulink url='&YOCTO_DOCS_REF_URL;#var-IMAGE_INSTALL'><filename>IMAGE_INSTALL</filename></ulink>
-            variable inside your <filename>local.conf</filename> file to
-            install the appropriate library packages.
-            Following is an example using <filename>glibc</filename> static
-            development libraries:
-            <literallayout class='monospaced'>
+        <note><title>Notes</title>
+            <itemizedlist>
+                <listitem><para>
+                    By default, this toolchain does not build static binaries.
+                    If you want to use the toolchain to build these types of
+                    libraries, you need to be sure your image has the
+                    appropriate static development libraries.
+                    Use the
+                    <ulink url='&YOCTO_DOCS_REF_URL;#var-IMAGE_INSTALL'><filename>IMAGE_INSTALL</filename></ulink>
+                    variable inside your <filename>local.conf</filename> file
+                    to install the appropriate library packages.
+                    Following is an example using <filename>glibc</filename>
+                    static development libraries:
+                    <literallayout class='monospaced'>
      IMAGE_INSTALL_append = " glibc-staticdev"
-            </literallayout>
+                    </literallayout>
+                    </para></listitem>
+                <listitem><para>
+                    For additional information on building the installer,
+                    see the
+                    <ulink url='https://wiki.yoctoproject.org/wiki/TipsAndTricks/RunningEclipseAgainstBuiltImage'>Cookbook guide to Making an Eclipse Debug Capable Image</ulink>
+                    wiki page.
+                    </para></listitem>
+            </itemizedlist>
         </note>
     </para>
 </section>
@@ -168,7 +183,7 @@
 
     <para>
         The following figure shows the resulting directory structure after
-        you install the Standard SDK by running the <filename>.sh</filename>
+        you install the Standard SDK by running the <filename>*.sh</filename>
         SDK installation script:
     </para>
 
@@ -191,7 +206,7 @@
         is the directory where the SDK is installed.
         By default, this directory is <filename>/opt/poky/</filename>.
         And, <replaceable>version</replaceable> represents the specific
-        snapshot of the SDK (e.g. <filename>&DISTRO;+snapshot</filename>).
+        snapshot of the SDK (e.g. <filename>&DISTRO;</filename>).
         Furthermore, <replaceable>target</replaceable> represents the target
         architecture (e.g. <filename>i586</filename>) and
         <replaceable>host</replaceable> represents the development system's
@@ -209,7 +224,7 @@
 
     <para>
         The following figure shows the resulting directory structure after
-        you install the Extensible SDK by running the <filename>.sh</filename>
+        you install the Extensible SDK by running the <filename>*.sh</filename>
         SDK installation script:
     </para>
 

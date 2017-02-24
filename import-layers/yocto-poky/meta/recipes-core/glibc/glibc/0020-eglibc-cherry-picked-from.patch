@@ -1,7 +1,7 @@
-From 588d936b9aa65e7cc8b1eb2cad1d209087db43a9 Mon Sep 17 00:00:00 2001
+From 723a31d3e2627211b39fbcc08f75b3c23c4096c5 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 31 Dec 2015 15:10:33 -0800
-Subject: [PATCH 20/24] eglibc: cherry-picked from
+Subject: [PATCH 20/25] eglibc: cherry-picked from
 
 http://www.eglibc.org/archives/patches/msg00772.html
 
@@ -15,10 +15,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 13 insertions(+), 1 deletion(-)
 
 diff --git a/resolv/res_libc.c b/resolv/res_libc.c
-index a8394e0..981ac7c 100644
+index a4b376f..3256e12 100644
 --- a/resolv/res_libc.c
 +++ b/resolv/res_libc.c
-@@ -18,6 +18,7 @@
+@@ -21,11 +21,13 @@
  #include <atomic.h>
  #include <limits.h>
  #include <sys/types.h>
@@ -26,15 +26,13 @@ index a8394e0..981ac7c 100644
  #include <netinet/in.h>
  #include <arpa/nameser.h>
  #include <resolv.h>
-@@ -28,6 +29,7 @@
-    out) since res_init() should go into libc.so but the rest of that
-    file should not.  */
+ #include <libc-lock.h>
  
 +__libc_lock_define_initialized (static, lock);
  extern unsigned long long int __res_initstamp attribute_hidden;
  /* We have atomic increment operations on 64-bit platforms.  */
  #if __WORDSIZE == 64
-@@ -35,7 +37,6 @@ extern unsigned long long int __res_initstamp attribute_hidden;
+@@ -33,7 +35,6 @@ extern unsigned long long int __res_initstamp attribute_hidden;
  # define atomicincunlock(lock) (void) 0
  # define atomicinc(var) catomic_increment (&(var))
  #else
@@ -42,7 +40,7 @@ index a8394e0..981ac7c 100644
  # define atomicinclock(lock) __libc_lock_lock (lock)
  # define atomicincunlock(lock) __libc_lock_unlock (lock)
  # define atomicinc(var) ++var
-@@ -94,7 +95,18 @@ res_init(void) {
+@@ -92,7 +93,18 @@ res_init(void) {
  int
  __res_maybe_init (res_state resp, int preinit)
  {
@@ -62,5 +60,5 @@ index a8394e0..981ac7c 100644
  			if (resp->nscount > 0)
  				__res_iclose (resp, true);
 -- 
-2.6.4
+2.8.2
 

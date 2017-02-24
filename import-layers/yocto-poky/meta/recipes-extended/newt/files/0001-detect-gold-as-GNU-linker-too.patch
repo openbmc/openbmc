@@ -1,0 +1,31 @@
+From 58245b859ffbcb1780575bf1b0a018d55e74e434 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Wed, 21 Sep 2016 21:14:40 +0200
+Subject: [PATCH] detect gold as GNU linker too
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 03e8bda..c2fce51 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -28,7 +28,7 @@ AC_CHECK_SIZEOF([void *])
+ AC_MSG_CHECKING([for GNU ld])
+ LD=`$CC -print-prog-name=ld 2>&5`
+ 
+-if test `$LD -v 2>&1 | $ac_cv_path_GREP -c "GNU ld"` = 0; then
++if test `$LD -v 2>&1 | $ac_cv_path_GREP -c "GNU "` = 0; then
+   # Not
+   GNU_LD=""
+   AC_MSG_RESULT([no])
+-- 
+2.5.5
+

@@ -1,0 +1,70 @@
+From 04cfd84423f693d879dc3ffebb0f6fe2680c254f Mon Sep 17 00:00:00 2001
+From: Haiqing Bai <Haiqing.Bai@windriver.com>
+Date: Fri, 18 Mar 2016 15:59:21 +0800
+Subject: [PATCH 3/3] remove des in pkcs11.
+
+Upstream-Status: Pending
+
+Signed-off-by: Haiqing Bai <Haiqing.Bai@windriver.com>
+
+---
+ pkcs11.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/pkcs11.h b/pkcs11.h
+index b01d58f..98b36e6 100644
+--- a/pkcs11.h
++++ b/pkcs11.h
+@@ -342,9 +342,11 @@ typedef unsigned long ck_key_type_t;
+ #define CKK_GENERIC_SECRET	(0x10)
+ #define CKK_RC2			(0x11)
+ #define CKK_RC4			(0x12)
++#ifndef OPENSSL_NO_DES
+ #define CKK_DES			(0x13)
+ #define CKK_DES2		(0x14)
+ #define CKK_DES3		(0x15)
++#endif /* OPENSSL_NO_DES */
+ #define CKK_CAST		(0x16)
+ #define CKK_CAST3		(0x17)
+ #define CKK_CAST128		(0x18)
+@@ -512,6 +514,7 @@ typedef unsigned long ck_mechanism_type_t;
+ #define CKM_RC2_CBC_PAD			(0x105)
+ #define CKM_RC4_KEY_GEN			(0x110)
+ #define CKM_RC4				(0x111)
++#ifndef OPENSSL_NO_DES
+ #define CKM_DES_KEY_GEN			(0x120)
+ #define CKM_DES_ECB			(0x121)
+ #define CKM_DES_CBC			(0x122)
+@@ -525,6 +528,7 @@ typedef unsigned long ck_mechanism_type_t;
+ #define CKM_DES3_MAC			(0x134)
+ #define CKM_DES3_MAC_GENERAL		(0x135)
+ #define CKM_DES3_CBC_PAD		(0x136)
++#endif /* OPENSSL_NO_DES */
+ #define CKM_CDMF_KEY_GEN		(0x140)
+ #define CKM_CDMF_ECB			(0x141)
+ #define CKM_CDMF_CBC			(0x142)
+@@ -610,8 +614,10 @@ typedef unsigned long ck_mechanism_type_t;
+ #define CKM_MD5_KEY_DERIVATION		(0x390)
+ #define CKM_MD2_KEY_DERIVATION		(0x391)
+ #define CKM_SHA1_KEY_DERIVATION		(0x392)
++#ifndef OPENSSL_NO_DES
+ #define CKM_PBE_MD2_DES_CBC		(0x3a0)
+ #define CKM_PBE_MD5_DES_CBC		(0x3a1)
++#endif /* OPENSSL_NO_DES */
+ #define CKM_PBE_MD5_CAST_CBC		(0x3a2)
+ #define CKM_PBE_MD5_CAST3_CBC		(0x3a3)
+ #define CKM_PBE_MD5_CAST5_CBC		(0x3a4)
+@@ -620,8 +626,10 @@ typedef unsigned long ck_mechanism_type_t;
+ #define CKM_PBE_SHA1_CAST128_CBC	(0x3a5)
+ #define CKM_PBE_SHA1_RC4_128		(0x3a6)
+ #define CKM_PBE_SHA1_RC4_40		(0x3a7)
++#ifndef OPENSSL_NO_DES
+ #define CKM_PBE_SHA1_DES3_EDE_CBC	(0x3a8)
+ #define CKM_PBE_SHA1_DES2_EDE_CBC	(0x3a9)
++#endif /* OPENSSL_NO_DES */
+ #define CKM_PBE_SHA1_RC2_128_CBC	(0x3aa)
+ #define CKM_PBE_SHA1_RC2_40_CBC		(0x3ab)
+ #define CKM_PKCS5_PBKD2			(0x3b0)
+-- 
+1.9.1
+

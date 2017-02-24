@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Copyright (c) 2011, Intel Corporation.
 # All rights reserved.
@@ -52,26 +52,22 @@ class Record:
         self.size = 0
         self.records = []
 
-    def __cmp__(this, that):
+    def __lt__(this, that):
         if that is None:
-            return 1
+            return False
         if not isinstance(that, Record):
             raise TypeError
         if len(this.records) > 0 and len(that.records) == 0:
-            return -1
-        if len(this.records) == 0 and len(that.records) > 0:
-            return 1
-        if this.size < that.size:
-            return -1
+            return False
         if this.size > that.size:
-            return 1
-        return 0
+            return False
+        return True
 
     def show(self, minsize):
         total = 0
         if self.size <= minsize:
             return 0
-        print "%10d %s" % (self.size, self.path)
+        print("%10d %s" % (self.size, self.path))
         for r in self.records:
             total += r.show(minsize)
         if len(self.records) == 0:
@@ -85,8 +81,8 @@ def main():
         minsize = int(sys.argv[1])
     rootfs = Record.create(".")
     total = rootfs.show(minsize)
-    print "Displayed %d/%d bytes (%.2f%%)" % \
-          (total, rootfs.size, 100 * float(total) / rootfs.size)
+    print("Displayed %d/%d bytes (%.2f%%)" % \
+          (total, rootfs.size, 100 * float(total) / rootfs.size))
 
 
 if __name__ == "__main__":

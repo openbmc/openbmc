@@ -4,7 +4,7 @@ fail=0
 for test in ./test/*
 do
 	$test
-	if [ $? -eq 0 ]
+	if [ $? -ne 0 ]
 	then
 		fail=1
 	fi

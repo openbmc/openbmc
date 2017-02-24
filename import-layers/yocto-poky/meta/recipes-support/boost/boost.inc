@@ -8,11 +8,14 @@ ARM_INSTRUCTION_SET_armv5 = "arm"
 BOOST_LIBS = "\
 	atomic \
 	chrono \
+	container \
 	date_time \
+	exception \
 	filesystem \
 	graph \
 	iostreams \
 	log \
+	math \
 	program_options \
 	random \
 	regex \
@@ -22,12 +25,30 @@ BOOST_LIBS = "\
 	timer \
 	test \
 	thread \
+	wave \
 	"
 
-# optional boost-python library
-PACKAGECONFIG ??= ""
+# only supported by x86 and powerpc
+BOOST_LIBS_append_x86 = " context coroutine"
+BOOST_LIBS_append_x86-64 = " context coroutine"
+BOOST_LIBS_append_powerpc = " context coroutine"
+# need consistent settings for native builds (x86 override not applied for native)
+BOOST_LIBS_remove_class-native = " context coroutine"
+
+# optional libraries
+PACKAGECONFIG ??= "locale"
+PACKAGECONFIG[locale] = ",,icu"
+PACKAGECONFIG[graph_parallel] = ",,,boost-mpi mpich"
+PACKAGECONFIG[mpi] = ",,mpich"
 PACKAGECONFIG[python] = ",,python python3"
-BOOST_LIBS += "${@bb.utils.contains('PACKAGECONFIG', 'python', 'python python3', '', d)}"
+
+BOOST_LIBS += "\
+    ${@bb.utils.contains('PACKAGECONFIG', 'locale', 'locale', '', d)} \
+    ${@bb.utils.contains('PACKAGECONFIG', 'graph_parallel', 'graph_parallel mpi', \
+                         bb.utils.contains('PACKAGECONFIG', 'mpi', 'mpi', '', d), d)} \
+    ${@bb.utils.contains('PACKAGECONFIG', 'python', 'python python3', '', d)} \
+"
+
 inherit python-dir
 PYTHON_ROOT = "${STAGING_DIR_HOST}/${prefix}"
 
@@ -54,6 +75,10 @@ python __anonymous () {
 }
 
 # Override the contents of specific packages
+FILES_${PN}-graph = "${libdir}/libboost_graph.so.*"
+FILES_${PN}-graph_parallel = "${libdir}/libboost_graph_parallel.so.*"
+FILES_${PN}-locale = "${libdir}/libboost_locale.so.*"
+FILES_${PN}-mpi = "${libdir}/mpi.so ${libdir}/libboost_mpi*.so.*"
 FILES_boost-serialization = "${libdir}/libboost_serialization*.so.* \
 	${libdir}/libboost_wserialization*.so.*"
 FILES_boost-test = "${libdir}/libboost_prg_exec_monitor*.so.* \
@@ -142,7 +167,7 @@ def get_boost_parallel_make(d):
 BOOST_PARALLEL_MAKE = "${@get_boost_parallel_make(d)}"
 BJAM_OPTS    = '${BOOST_PARALLEL_MAKE} -d+2 -q \
 		${BJAM_TOOLS} \
-		-sBOOST_BUILD_USER_CONFIG=${S}/tools/build/example/user-config.jam \
+		-sBOOST_BUILD_USER_CONFIG=${WORKDIR}/user-config.jam \
 		--build-dir=${S}/${TARGET_SYS} \
 		--disable-icu \
 		${BJAM_EXTRA}'
@@ -150,25 +175,26 @@ BJAM_OPTS    = '${BOOST_PARALLEL_MAKE} -d+2 -q \
 # Native compilation of bzip2 isn't working
 BJAM_OPTS_append_class-native = ' -sNO_BZIP2=1'
 
-do_boostconfig() {
-	cp -f boost/config/platform/linux.hpp boost/config/platform/linux-gnueabi.hpp
+do_configure() {
+	cp -f ${S}/boost/config/platform/linux.hpp ${S}/boost/config/platform/linux-gnueabi.hpp
 
 	# D2194:Fixing the failure of "error: duplicate initialization of gcc with the following parameters" during compilation.
-	sed -i "/^using gcc : 4.3.1/d" ${S}/tools/build/example/user-config.jam
-	sed -i "/^using python : ${PYTHON_BASEVERSION}"/d ${S}/tools/build/example/user-config.jam
-	echo 'using gcc : 4.3.1 : ${CXX} : <cflags>"${CFLAGS}" <cxxflags>"${CXXFLAGS}" <linkflags>"${LDFLAGS}" ;' >> ${S}/tools/build/example/user-config.jam
-	echo "using python : ${PYTHON_BASEVERSION} : : ${STAGING_INCDIR}/python${PYTHON_BASEVERSION} ;" >> ${S}/tools/build/example/user-config.jam
-	echo "using python : 3.5 : : ${STAGING_INCDIR}/python3.5m ;" >> ${S}/tools/build/example/user-config.jam
+	rm -f ${WORKDIR}/user-config.jam
+	echo 'using gcc : 4.3.1 : ${CXX} : <cflags>"${CFLAGS}" <cxxflags>"${CXXFLAGS}" <linkflags>"${LDFLAGS}" ;' >> ${WORKDIR}/user-config.jam
+	echo "using python : ${PYTHON_BASEVERSION} : : ${STAGING_INCDIR}/python${PYTHON_BASEVERSION} ;" >> ${WORKDIR}/user-config.jam
+	echo "using python : 3.5 : : ${STAGING_INCDIR}/python3.5m ;" >> ${WORKDIR}/user-config.jam
+
+	if ${@bb.utils.contains('BOOST_LIBS', 'mpi', 'true', 'false', d)}; then
+		echo "using mpi : : <find-shared-library>mpi ;" >> ${WORKDIR}/user-config.jam
+	fi
 
 	CC="${BUILD_CC}" CFLAGS="${BUILD_CFLAGS}" ./bootstrap.sh --with-bjam=bjam --with-toolset=gcc --with-python-root=${PYTHON_ROOT}
-	sed -i '/^using python/d' project-config.jam
+	sed -i '/^using python/d' ${S}/project-config.jam
 }
-
-do_boostconfig[dirs] = "${S}"
-addtask do_boostconfig after do_patch before do_configure
 
 do_compile() {
 	set -ex
+	rm -rf ${S}/${TARGET_SYS}
 	bjam ${BJAM_OPTS} --prefix=${prefix} \
 		--exec-prefix=${exec_prefix} \
 		--libdir=${libdir} \

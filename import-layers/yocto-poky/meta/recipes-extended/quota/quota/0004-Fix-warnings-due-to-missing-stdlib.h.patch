@@ -1,0 +1,46 @@
+Upstream-Status: Backport
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+From c4b56ee58b9b76d2598535cf6109a27b22e60abe Mon Sep 17 00:00:00 2001
+From: Jan Kara <jack@suse.cz>
+Date: Wed, 30 Mar 2016 10:21:13 +0200
+Subject: [PATCH] Fix warnings due to missing stdlib.h
+
+When compiling without RPC, we do not get stdlib.h automatically
+included via other includes and thus miss some function definitions.
+Include stdlib.h explicitely.
+
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ quotaops.c | 1 +
+ setquota.c | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/quotaops.c b/quotaops.c
+index 590dc1b..56cf622 100644
+--- a/quotaops.c
++++ b/quotaops.c
+@@ -52,6 +52,7 @@
+ #include <time.h>
+ #include <ctype.h>
+ #include <limits.h>
++#include <stdlib.h>
+ 
+ #if defined(RPC)
+ #include "rquota.h"
+diff --git a/setquota.c b/setquota.c
+index 8ecd9c3..421631e 100644
+--- a/setquota.c
++++ b/setquota.c
+@@ -17,6 +17,7 @@
+ #include <getopt.h>
+ #include <time.h>
+ #include <ctype.h>
++#include <stdlib.h>
+ 
+ #if defined(RPC)
+ #include "rquota.h"
+-- 
+2.6.1
+

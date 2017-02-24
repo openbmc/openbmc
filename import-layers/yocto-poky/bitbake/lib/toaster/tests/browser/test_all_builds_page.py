@@ -27,6 +27,7 @@ from tests.browser.selenium_helpers import SeleniumTestCase
 
 from orm.models import BitbakeVersion, Release, Project, Build, Target
 
+
 class TestAllBuildsPage(SeleniumTestCase):
     """ Tests for all builds page /builds/ """
 
@@ -57,12 +58,59 @@ class TestAllBuildsPage(SeleniumTestCase):
             'outcome': Build.SUCCEEDED
         }
 
+        self.project1_build_failure = {
+            'project': self.project1,
+            'started_on': now,
+            'completed_on': now,
+            'outcome': Build.FAILED
+        }
+
         self.default_project_build_success = {
             'project': self.default_project,
             'started_on': now,
             'completed_on': now,
             'outcome': Build.SUCCEEDED
         }
+
+    def _get_build_time_element(self, build):
+        """
+        Return the HTML element containing the build time for a build
+        in the recent builds area
+        """
+        selector = 'div[data-latest-build-result="%s"] ' \
+            '[data-role="data-recent-build-buildtime-field"]' % build.id
+
+        # because this loads via Ajax, wait for it to be visible
+        self.wait_until_present(selector)
+
+        build_time_spans = self.find_all(selector)
+
+        self.assertEqual(len(build_time_spans), 1)
+
+        return build_time_spans[0]
+
+    def _get_row_for_build(self, build):
+        """ Get the table row for the build from the all builds table """
+        self.wait_until_present('#allbuildstable')
+
+        rows = self.find_all('#allbuildstable tr')
+
+        # look for the row with a download link on the recipe which matches the
+        # build ID
+        url = reverse('builddashboard', args=(build.id,))
+        selector = 'td.target a[href="%s"]' % url
+
+        found_row = None
+        for row in rows:
+
+            outcome_links = row.find_elements_by_css_selector(selector)
+            if len(outcome_links) == 1:
+                found_row = row
+                break
+
+        self.assertNotEqual(found_row, None)
+
+        return found_row
 
     def test_show_tasks_with_suffix(self):
         """ Task should be shown as suffix on build name """
@@ -95,17 +143,17 @@ class TestAllBuildsPage(SeleniumTestCase):
         url = reverse('all-builds')
         self.get(url)
 
-        # shouldn't see a run again button for command-line builds
-        selector = 'div[data-latest-build-result="%s"] button' % default_build.id
+        # shouldn't see a rebuild button for command-line builds
+        selector = 'div[data-latest-build-result="%s"] .rebuild-btn' % default_build.id
         run_again_button = self.find_all(selector)
         self.assertEqual(len(run_again_button), 0,
-                         'should not see a run again button for cli builds')
+                         'should not see a rebuild button for cli builds')
 
-        # should see a run again button for non-command-line builds
-        selector = 'div[data-latest-build-result="%s"] button' % build1.id
+        # should see a rebuild button for non-command-line builds
+        selector = 'div[data-latest-build-result="%s"] .rebuild-btn' % build1.id
         run_again_button = self.find_all(selector)
         self.assertEqual(len(run_again_button), 1,
-                         'should see a run again button for non-cli builds')
+                         'should see a rebuild button for non-cli builds')
 
     def test_tooltips_on_project_name(self):
         """
@@ -124,7 +172,7 @@ class TestAllBuildsPage(SeleniumTestCase):
         # get the project name cells from the table
         cells = self.find_all('#allbuildstable td[class="project"]')
 
-        selector = 'i.get-help'
+        selector = 'span.get-help'
 
         for cell in cells:
             content = cell.get_attribute('innerHTML')
@@ -141,3 +189,45 @@ class TestAllBuildsPage(SeleniumTestCase):
             else:
                 msg = 'found unexpected project name cell in all builds table'
                 self.fail(msg)
+
+    def test_builds_time_links(self):
+        """
+        Successful builds should have links on the time column and in the
+        recent builds area; failed builds should not have links on the time column,
+        or in the recent builds area
+        """
+        build1 = Build.objects.create(**self.project1_build_success)
+        build2 = Build.objects.create(**self.project1_build_failure)
+
+        # add some targets to these builds so they have recipe links
+        # (and so we can find the row in the ToasterTable corresponding to
+        # a particular build)
+        Target.objects.create(build=build1, target='foo')
+        Target.objects.create(build=build2, target='bar')
+
+        url = reverse('all-builds')
+        self.get(url)
+
+        # test recent builds area for successful build
+        element = self._get_build_time_element(build1)
+        links = element.find_elements_by_css_selector('a')
+        msg = 'should be a link on the build time for a successful recent build'
+        self.assertEquals(len(links), 1, msg)
+
+        # test recent builds area for failed build
+        element = self._get_build_time_element(build2)
+        links = element.find_elements_by_css_selector('a')
+        msg = 'should not be a link on the build time for a failed recent build'
+        self.assertEquals(len(links), 0, msg)
+
+        # test the time column for successful build
+        build1_row = self._get_row_for_build(build1)
+        links = build1_row.find_elements_by_css_selector('td.time a')
+        msg = 'should be a link on the build time for a successful build'
+        self.assertEquals(len(links), 1, msg)
+
+        # test the time column for failed build
+        build2_row = self._get_row_for_build(build2)
+        links = build2_row.find_elements_by_css_selector('td.time a')
+        msg = 'should not be a link on the build time for a failed build'
+        self.assertEquals(len(links), 0, msg)

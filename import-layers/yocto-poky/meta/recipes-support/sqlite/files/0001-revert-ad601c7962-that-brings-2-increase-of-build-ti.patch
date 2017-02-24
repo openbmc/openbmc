@@ -1,0 +1,56 @@
+From 4b286b441e8efa9a34eb0db8227748ebffd91c35 Mon Sep 17 00:00:00 2001
+From: Jianxun Zhang <jianxun.zhang@linux.intel.com>
+Date: Thu, 13 Oct 2016 09:24:21 -0700
+Subject: [PATCH] revert ad601c7962 that brings 2% increase of build time.
+
+The comment of the change in sqlite fossil project is:
+"For in-memory databases, it does not matter if pcache
+entries are marked "clean" or "writable"."
+
+Upstream Status: Inappropriate
+
+Signed-off-by: Jianxun Zhang <jianxun.zhang@linux.intel.com>
+---
+ sqlite3.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
+
+diff --git a/sqlite3.c b/sqlite3.c
+index ccddfe6..ecae550 100644
+--- a/sqlite3.c
++++ b/sqlite3.c
+@@ -13146,7 +13146,7 @@ struct PgHdr {
+   sqlite3_pcache_page *pPage;    /* Pcache object page handle */
+   void *pData;                   /* Page data */
+   void *pExtra;                  /* Extra content */
+-  PgHdr *pDirty;                 /* Transient list of dirty sorted by pgno */
++  PgHdr *pDirty;                 /* Transient list of dirty pages */
+   Pager *pPager;                 /* The pager this page is part of */
+   Pgno pgno;                     /* Page number for this page */
+ #ifdef SQLITE_CHECK_PAGES
+@@ -43504,13 +43504,7 @@ bitvec_end:
+ /* #include "sqliteInt.h" */
+ 
+ /*
+-** A complete page cache is an instance of this structure.  Every
+-** entry in the cache holds a single page of the database file.  The
+-** btree layer only operates on the cached copy of the database pages.
+-**
+-** A page cache entry is "clean" if it exactly matches what is currently
+-** on disk.  A page is "dirty" if it has been modified and needs to be
+-** persisted to disk.
++** A complete page cache is an instance of this structure.
+ **
+ ** pDirty, pDirtyTail, pSynced:
+ **   All dirty pages are linked into the doubly linked list using
+@@ -48314,7 +48308,7 @@ static int pager_end_transaction(Pager *pPager, int hasMaster, int bCommit){
+   pPager->pInJournal = 0;
+   pPager->nRec = 0;
+   if( rc==SQLITE_OK ){
+-    if( pagerFlushOnCommit(pPager, bCommit) ){
++    if( MEMDB || pagerFlushOnCommit(pPager, bCommit) ){
+       sqlite3PcacheCleanAll(pPager->pPCache);
+     }else{
+       sqlite3PcacheClearWritable(pPager->pPCache);
+-- 
+2.7.4
+

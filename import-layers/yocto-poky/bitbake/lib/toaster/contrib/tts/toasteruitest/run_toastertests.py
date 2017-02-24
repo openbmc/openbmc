@@ -74,7 +74,7 @@ def get_tests_from_cfg(suite=None):
     try:
         tests_from_cfg = eval(config.get('toaster_test_' + target_suite, 'test_cases'))
     except:
-        print 'Failed to get test cases from cfg file. Make sure the format is correct.'
+        print('Failed to get test cases from cfg file. Make sure the format is correct.')
         return None
 
     prefix = 'toaster_automation_test.toaster_cases.test_'
@@ -100,7 +100,7 @@ def main():
         testslist = get_tests_from_cfg()
 
     if not testslist:
-        print 'Failed to get test cases.'
+        print('Failed to get test cases.')
         exit(1)
 
     suite = unittest.TestSuite()

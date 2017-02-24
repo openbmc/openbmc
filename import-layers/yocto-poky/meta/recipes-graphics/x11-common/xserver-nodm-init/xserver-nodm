@@ -26,10 +26,11 @@ done
 case "$1" in
   start)
        . /etc/profile
-       username=root
+
+       #default for USER
+       . /etc/default/xserver-nodm
        echo "Starting Xserver"
-       if [ -f /etc/X11/Xusername ]; then
-           username=`cat /etc/X11/Xusername`
+       if [ "$USER" != "root" ]; then
            # setting for rootless X
            chmod o+w /var/log
            chmod g+r /dev/tty[0-3]
@@ -38,8 +39,9 @@ case "$1" in
                chmod o+rw /dev/hidraw*
            fi
        fi
+
        # Using su rather than sudo as latest 1.8.1 cause failure [YOCTO #1211]
-       su -l -c '/etc/X11/Xserver&' $username 
+       su -l -c '/etc/xserver-nodm/Xserver &' $USER
        # Wait for the desktop to say its finished loading
        # before loading the rest of the system
        # dbus-wait org.matchbox_project.desktop Loaded

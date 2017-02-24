@@ -17,6 +17,9 @@ SSTATE_EXTRAPATH   = ""
 SSTATE_EXTRAPATHWILDCARD = ""
 SSTATE_PATHSPEC   = "${SSTATE_DIR}/${SSTATE_EXTRAPATHWILDCARD}*/${SSTATE_PKGSPEC}"
 
+# explicitly make PV to depend on evaluated value of PV variable
+PV[vardepvalue] = "${PV}"
+
 # We don't want the sstate to depend on things like the distro string
 # of the system, we let the sstate paths take care of this.
 SSTATE_EXTRAPATH[vardepvalue] = ""
@@ -27,6 +30,8 @@ SSTATE_DUPWHITELIST = "${DEPLOY_DIR_IMAGE}/ ${DEPLOY_DIR}/licenses/ ${DEPLOY_DIR
 SSTATE_DUPWHITELIST += "${STAGING_ETCDIR_NATIVE}/sgml ${STAGING_DATADIR_NATIVE}/sgml"
 # Archive the sources for many architectures in one deploy folder
 SSTATE_DUPWHITELIST += "${DEPLOY_DIR_SRC}"
+# Ignore overlapping README
+SSTATE_DUPWHITELIST += "${DEPLOY_DIR}/sdk/README_-_DO_NOT_DELETE_FILES_IN_THIS_DIRECTORY.txt"
 
 SSTATE_SCAN_FILES ?= "*.la *-config *_config"
 SSTATE_SCAN_CMD ?= 'find ${SSTATE_BUILDDIR} \( -name "${@"\" -o -name \"".join(d.getVar("SSTATE_SCAN_FILES", True).split())}" \) -type f'
@@ -95,7 +100,7 @@ python () {
         scan_cmd = "grep -Irl ${STAGING_DIR} ${SSTATE_BUILDDIR}"
         d.setVar('SSTATE_SCAN_CMD', scan_cmd)
 
-    unique_tasks = set((d.getVar('SSTATETASKS', True) or "").split())
+    unique_tasks = sorted(set((d.getVar('SSTATETASKS', True) or "").split()))
     d.setVar('SSTATETASKS', " ".join(unique_tasks))
     for task in unique_tasks:
         d.prependVarFlag(task, 'prefuncs', "sstate_task_prefunc ")
@@ -170,6 +175,8 @@ def sstate_install(ss, d):
     if os.access(manifest, os.R_OK):
         bb.fatal("Package already staged (%s)?!" % manifest)
 
+    d.setVar("SSTATE_INST_POSTRM", manifest + ".postrm")
+
     locks = []
     for lock in ss['lockfiles-shared']:
         locks.append(bb.utils.lockfile(lock, True))
@@ -200,6 +207,7 @@ def sstate_install(ss, d):
             f = os.path.normpath(f)
             realmatch = True
             for w in whitelist:
+                w = os.path.normpath(w)
                 if f.startswith(w):
                     realmatch = False
                     break
@@ -402,6 +410,13 @@ def sstate_clean_manifest(manifest, d):
         except OSError:
             pass
 
+    postrm = manifest + ".postrm"
+    if os.path.exists(manifest + ".postrm"):
+        import subprocess
+        os.chmod(postrm, 0o755)
+        subprocess.call(postrm, shell=True)
+        oe.path.remove(postrm)
+
     oe.path.remove(manifest)
 
 def sstate_clean(ss, d):
@@ -563,6 +578,8 @@ def sstate_package(ss, d):
     for state in ss['dirs']:
         if not os.path.exists(state[1]):
             continue
+        if d.getVar('SSTATE_SKIP_CREATION', True) == '1':
+            continue
         srcbase = state[0].rstrip("/").rsplit('/', 1)[0]
         for walkroot, dirs, files in os.walk(state[1]):
             for file in files:
@@ -623,22 +640,16 @@ def pstaging_fetch(sstatefetch, sstatepkg, d):
 
     # Try a fetch from the sstate mirror, if it fails just return and
     # we will build the package
-    uris = ['file://{0}'.format(sstatefetch),
-            'file://{0}.siginfo'.format(sstatefetch)]
+    uris = ['file://{0};downloadfilename={0}'.format(sstatefetch),
+            'file://{0}.siginfo;downloadfilename={0}.siginfo'.format(sstatefetch)]
     if bb.utils.to_boolean(d.getVar("SSTATE_VERIFY_SIG", True), False):
-        uris += ['file://{0}.sig'.format(sstatefetch)]
+        uris += ['file://{0}.sig;downloadfilename={0}.sig'.format(sstatefetch)]
 
     for srcuri in uris:
         localdata.setVar('SRC_URI', srcuri)
         try:
             fetcher = bb.fetch2.Fetch([srcuri], localdata, cache=False)
             fetcher.download()
-
-            # Need to optimise this, if using file:// urls, the fetcher just changes the local path
-            # For now work around by symlinking
-            localpath = bb.data.expand(fetcher.localpath(srcuri), localdata)
-            if localpath != sstatepkg and os.path.exists(localpath) and not os.path.exists(sstatepkg):
-                os.symlink(localpath, sstatepkg)
 
         except bb.fetch2.BBFetchException:
             break
@@ -647,7 +658,7 @@ def sstate_setscene(d):
     shared_state = sstate_state_fromvars(d)
     accelerate = sstate_installpkg(shared_state, d)
     if not accelerate:
-        raise bb.build.FuncFailed("No suitable staging package found")
+        bb.fatal("No suitable staging package found")
 
 python sstate_task_prefunc () {
     shared_state = sstate_state_fromvars(d)
@@ -661,9 +672,9 @@ python sstate_task_postfunc () {
     sstate_install(shared_state, d)
     for intercept in shared_state['interceptfuncs']:
         bb.build.exec_func(intercept, d, (d.getVar("WORKDIR", True),))
-    omask = os.umask(002)
-    if omask != 002:
-       bb.note("Using umask 002 (not %0o) for sstate packaging" % omask)
+    omask = os.umask(0o002)
+    if omask != 0o002:
+       bb.note("Using umask 0o002 (not %0o) for sstate packaging" % omask)
     sstate_package(shared_state, d)
     os.umask(omask)
 }
@@ -725,6 +736,7 @@ def sstate_checkhashes(sq_fn, sq_task, sq_hash, sq_hashfn, d, siginfo=False):
 
     ret = []
     missed = []
+    missing = []
     extension = ".tgz"
     if siginfo:
         extension = extension + ".siginfo"
@@ -745,6 +757,18 @@ def sstate_checkhashes(sq_fn, sq_task, sq_hash, sq_hashfn, d, siginfo=False):
             extrapath = ""
 
         return spec, extrapath, tname
+
+    def sstate_pkg_to_pn(pkg, d):
+        """
+        Translate an sstate filename to a PN value by way of SSTATE_PKGSPEC. This is slightly hacky but
+        we don't have access to everything in this context.
+        """
+        pkgspec = d.getVar('SSTATE_PKGSPEC', False)
+        try:
+            idx = pkgspec.split(':').index('${PN}')
+        except ValueError:
+            bb.fatal('Unable to find ${PN} in SSTATE_PKGSPEC')
+        return pkg.split(':')[idx]
 
 
     for task in range(len(sq_fn)):
@@ -780,6 +804,8 @@ def sstate_checkhashes(sq_fn, sq_task, sq_hash, sq_hashfn, d, siginfo=False):
         if localdata.getVar('BB_NO_NETWORK', True) == "1" and localdata.getVar('SSTATE_MIRROR_ALLOW_NETWORK', True) == "1":
             localdata.delVar('BB_NO_NETWORK')
 
+        whitelist = bb.runqueue.get_setscene_enforce_whitelist(d)
+
         from bb.fetch2 import FetchConnectionCache
         def checkstatus_init(thread_worker):
             thread_worker.connection_cache = FetchConnectionCache()
@@ -806,7 +832,14 @@ def sstate_checkhashes(sq_fn, sq_task, sq_hash, sq_hashfn, d, siginfo=False):
             except:
                 missed.append(task)
                 bb.debug(2, "SState: Unsuccessful fetch test for %s" % srcuri)
-                pass     
+                if whitelist:
+                    pn = sstate_pkg_to_pn(sstatefile, d)
+                    taskname = sq_task[task]
+                    if not bb.runqueue.check_setscene_enforce_whitelist(pn, taskname, whitelist):
+                        missing.append(task)
+                        bb.error('Sstate artifact unavailable for %s.%s' % (pn, taskname))
+                pass
+            bb.event.fire(bb.event.ProcessProgress("Checking sstate mirror object availability", len(tasklist) - thread_worker.tasks.qsize()), d)
 
         tasklist = []
         for task in range(len(sq_fn)):
@@ -817,16 +850,23 @@ def sstate_checkhashes(sq_fn, sq_task, sq_hash, sq_hashfn, d, siginfo=False):
             tasklist.append((task, sstatefile))
 
         if tasklist:
-            bb.note("Checking sstate mirror object availability (for %s objects)" % len(tasklist))
+            bb.event.fire(bb.event.ProcessStarted("Checking sstate mirror object availability", len(tasklist)), d)
+
             import multiprocessing
             nproc = min(multiprocessing.cpu_count(), len(tasklist))
 
+            bb.event.enable_threadlock()
             pool = oe.utils.ThreadedPool(nproc, len(tasklist),
                     worker_init=checkstatus_init, worker_end=checkstatus_end)
             for t in tasklist:
                 pool.add_task(checkstatus, t)
             pool.start()
             pool.wait_completion()
+            bb.event.disable_threadlock()
+
+            bb.event.fire(bb.event.ProcessFinished("Checking sstate mirror object availability"), d)
+            if whitelist and missing:
+                bb.fatal('Required artifacts were unavailable - exiting')
 
     inheritlist = d.getVar("INHERIT", True)
     if "toaster" in inheritlist:
@@ -905,6 +945,9 @@ def setscene_depvalid(task, taskdependees, notneeded, d):
             # Nothing need depend on libc-initial/gcc-cross-initial
             if "-initial" in taskdependees[task][0]:
                 continue
+            # For meta-extsdk-toolchain we want all sysroot dependencies
+            if taskdependees[dep][0] == 'meta-extsdk-toolchain':
+                return False
             # Native/Cross populate_sysroot need their dependencies
             if isNativeCross(taskdependees[task][0]) and isNativeCross(taskdependees[dep][0]):
                 return False
@@ -982,6 +1025,8 @@ python sstate_eventhandler2() {
         for r in toremove:
             (stamp, manifest, workdir) = r.split()
             for m in glob.glob(manifest + ".*"):
+                if m.endswith(".postrm"):
+                    continue
                 sstate_clean_manifest(m, d)
             bb.utils.remove(stamp + "*")
             if removeworkdir:

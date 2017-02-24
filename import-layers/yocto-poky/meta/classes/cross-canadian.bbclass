@@ -15,7 +15,8 @@ STAGING_BINDIR_TOOLCHAIN = "${STAGING_DIR_NATIVE}${bindir_native}/${SDK_ARCH}${S
 # Update BASE_PACKAGE_ARCH and PACKAGE_ARCHS
 #
 PACKAGE_ARCH = "${SDK_ARCH}-${SDKPKGSUFFIX}"
-CANADIANEXTRAOS = "linux-uclibc linux-musl"
+BASECANADIANEXTRAOS ?= "linux-uclibc linux-musl"
+CANADIANEXTRAOS = "${BASECANADIANEXTRAOS}"
 CANADIANEXTRAVENDOR = ""
 MODIFYTOS ??= "1"
 python () {
@@ -34,8 +35,13 @@ python () {
 
     tos = d.getVar("TARGET_OS", True)
     whitelist = []
+    extralibcs = [""]
+    if "uclibc" in d.getVar("BASECANADIANEXTRAOS", True):
+        extralibcs.append("uclibc")
+    if "musl" in d.getVar("BASECANADIANEXTRAOS", True):
+        extralibcs.append("musl")
     for variant in ["", "spe", "x32", "eabi", "n32"]:
-        for libc in ["", "uclibc", "musl"]:
+        for libc in extralibcs:
             entry = "linux"
             if variant and libc:
                 entry = entry + "-" + libc + variant
@@ -59,15 +65,22 @@ python () {
     if tarch == "x86_64":
         d.setVar("LIBCEXTENSION", "")
         d.setVar("ABIEXTENSION", "")
-        d.appendVar("CANADIANEXTRAOS", " linux-gnux32 linux-uclibcx32 linux-muslx32")
+        d.appendVar("CANADIANEXTRAOS", " linux-gnux32")
+        for extraos in d.getVar("BASECANADIANEXTRAOS", True).split():
+            d.appendVar("CANADIANEXTRAOS", " " + extraos + "x32")
     elif tarch == "powerpc":
         # PowerPC can build "linux" and "linux-gnuspe"
         d.setVar("LIBCEXTENSION", "")
         d.setVar("ABIEXTENSION", "")
-        d.appendVar("CANADIANEXTRAOS", " linux-gnuspe linux-uclibcspe linux-muslspe")
+        d.appendVar("CANADIANEXTRAOS", " linux-gnuspe")
+        for extraos in d.getVar("BASECANADIANEXTRAOS", True).split():
+            d.appendVar("CANADIANEXTRAOS", " " + extraos + "spe")
     elif tarch == "mips64":
-        d.appendVar("CANADIANEXTRAOS", " linux-gnun32 linux-uclibcn32 linux-musln32")
+        d.appendVar("CANADIANEXTRAOS", " linux-gnun32")
+        for extraos in d.getVar("BASECANADIANEXTRAOS", True).split():
+            d.appendVar("CANADIANEXTRAOS", " " + extraos + "n32")
     if tarch == "arm" or tarch == "armeb":
+        d.appendVar("CANADIANEXTRAOS", " linux-gnueabi linux-musleabi linux-uclibceabi")
         d.setVar("TARGET_OS", "linux-gnueabi")
     else:
         d.setVar("TARGET_OS", "linux")

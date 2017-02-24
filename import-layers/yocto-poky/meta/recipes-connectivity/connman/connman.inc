@@ -26,11 +26,9 @@ EXTRA_OECONF += "\
     --enable-loopback \
     --enable-ethernet \
     --enable-tools \
-    --enable-test \
     --disable-polkit \
     --enable-client \
 "
-CFLAGS += "-D_GNU_SOURCE"
 
 PACKAGECONFIG ??= "wispr \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'systemd','systemd', '', d)} \
@@ -140,10 +138,7 @@ PACKAGES =+ "${PN}-tools ${PN}-tests ${PN}-client"
 FILES_${PN}-tools = "${bindir}/wispr"
 RDEPENDS_${PN}-tools ="${PN}"
 
-FILES_${PN}-tests = "${bindir}/*-test ${libdir}/${BPN}/test/*"
-RDEPENDS_${PN}-tests = "python-dbus python-pygobject python-textutils python-subprocess python-fcntl python-netclient \
-                        ${PN} \
-"
+FILES_${PN}-tests = "${bindir}/*-test"
 
 FILES_${PN}-client = "${bindir}/connmanctl"
 RDEPENDS_${PN}-client ="${PN}"

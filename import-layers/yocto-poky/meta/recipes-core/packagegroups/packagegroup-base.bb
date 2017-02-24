@@ -1,5 +1,4 @@
 SUMMARY = "Merge machine and distro options to create a basic machine task/package"
-LICENSE = "MIT"
 PR = "r83"
 
 #

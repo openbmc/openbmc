@@ -86,13 +86,14 @@ match_host() {
 
 	# Match by netmask
 	if valid_ipv4 $GLOB; then
-		HOST_IP=$(gethostip -d $HOST)
-		if valid_ipv4 $HOST_IP; then
-			match_ipv4 $GLOB $HOST_IP
-			if [ $? -eq 0 ]; then
-				return 0
+		for HOST_IP in $(getent ahostsv4 $HOST | grep ' STREAM ' | cut -d ' ' -f 1) ; do
+			if valid_ipv4 $HOST_IP; then
+				match_ipv4 $GLOB $HOST_IP
+				if [ $? -eq 0 ]; then
+					return 0
+				fi
 			fi
-		fi
+		done
 	fi
 
 	return 1

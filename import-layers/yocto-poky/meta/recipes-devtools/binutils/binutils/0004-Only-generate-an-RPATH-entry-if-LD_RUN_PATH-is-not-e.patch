@@ -1,7 +1,7 @@
-From c008c7f97c1cf487749c6c375820a1f3b3c6c53d Mon Sep 17 00:00:00 2001
+From 4ff83779de8621715c6c2a79cf7ed8d74ff2d7c5 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:27:17 +0000
-Subject: [PATCH 04/14] Only generate an RPATH entry if LD_RUN_PATH is not
+Subject: [PATCH 04/13] Only generate an RPATH entry if LD_RUN_PATH is not
  empty
 
 for cases where -rpath isn't specified. debian (#151024)
@@ -15,10 +15,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 4 insertions(+)
 
 diff --git a/ld/emultempl/elf32.em b/ld/emultempl/elf32.em
-index 0405d4f..73c5447 100644
+index 47fa549..f4c640e 100644
 --- a/ld/emultempl/elf32.em
 +++ b/ld/emultempl/elf32.em
-@@ -1242,6 +1242,8 @@ fragment <<EOF
+@@ -1244,6 +1244,8 @@ fragment <<EOF
  	      && command_line.rpath == NULL)
  	    {
  	      lib_path = (const char *) getenv ("LD_RUN_PATH");
@@ -27,7 +27,7 @@ index 0405d4f..73c5447 100644
  	      if (gld${EMULATION_NAME}_search_needed (lib_path, &n,
  						      force))
  		break;
-@@ -1523,6 +1525,8 @@ gld${EMULATION_NAME}_before_allocation (void)
+@@ -1525,6 +1527,8 @@ gld${EMULATION_NAME}_before_allocation (void)
    rpath = command_line.rpath;
    if (rpath == NULL)
      rpath = (const char *) getenv ("LD_RUN_PATH");
@@ -37,5 +37,5 @@ index 0405d4f..73c5447 100644
    for (abfd = link_info.input_bfds; abfd; abfd = abfd->link.next)
      if (bfd_get_flavour (abfd) == bfd_target_elf_flavour)
 -- 
-2.7.1
+2.9.0
 

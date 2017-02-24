@@ -1,0 +1,33 @@
+From 0c4cab9594c96c2dc435a8d9724605824bcbf917 Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Tue, 19 Apr 2016 02:57:45 -0400
+Subject: [PATCH] fix run-builtins failed
+
+FAIL: run-builtins
+1. redirect the stderr output of command exec with -l option in
+   builtins.tests to /dev/null
+2. ensure the system contain the locales "en_US.UTF-8"
+
+Upstream-Status: Pending
+
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+---
+ tests/builtins.tests | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/builtins.tests b/tests/builtins.tests
+index 9d77520..63f3af8 100644
+--- a/tests/builtins.tests
++++ b/tests/builtins.tests
+@@ -109,7 +109,7 @@ esac
+ 
+ # test options to exec
+ (exec -a specialname ${THIS_SH} -c 'echo $0' )
+-(exec -l -a specialname ${THIS_SH} -c 'echo $0' )
++(exec -l -a specialname ${THIS_SH} -c 'echo $0' ) 2> /dev/null
+ # test `clean' environment.  if /bin/sh is bash, and the script version of
+ # printenv is run, there will be variables in the environment that bash
+ # sets on startup.  Also test code that prefixes argv[0] with a dash.
+-- 
+2.8.1
+

@@ -1,0 +1,37 @@
+From 88e67caed662d8344c8db56176c9f1221e6cd2a2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 23 Mar 2016 06:30:09 +0000
+Subject: [PATCH 03/10] mips-linux-nat: Define _ABIO32 if not defined
+
+This helps building gdb on mips64 on musl, since
+musl does not provide sgidefs.h this define is
+only defined when GCC is using o32 ABI, in that
+case gcc emits it as built-in define and hence
+it works ok for mips32
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ gdb/mips-linux-nat.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/gdb/mips-linux-nat.c b/gdb/mips-linux-nat.c
+index bfe9fcb..449b43a 100644
+--- a/gdb/mips-linux-nat.c
++++ b/gdb/mips-linux-nat.c
+@@ -46,6 +46,11 @@
+ #define PTRACE_GET_THREAD_AREA 25
+ #endif
+ 
++/* musl does not define and relies on compiler built-in macros for it   */
++#ifndef _ABIO32
++#define _ABIO32 1
++#endif
++
+ /* Assume that we have PTRACE_GETREGS et al. support.  If we do not,
+    we'll clear this and use PTRACE_PEEKUSER instead.  */
+ static int have_ptrace_regsets = 1;
+-- 
+2.8.2
+

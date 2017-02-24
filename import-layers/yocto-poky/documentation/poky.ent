@@ -1,10 +1,10 @@
-<!ENTITY DISTRO "2.1">
-<!ENTITY DISTRO_COMPRESSED "21">
-<!ENTITY DISTRO_NAME_NO_CAP "krogoth">
-<!ENTITY DISTRO_NAME "Krogoth">
-<!ENTITY YOCTO_DOC_VERSION "2.1">
-<!ENTITY POKYVERSION "15.0.0">
-<!ENTITY POKYVERSION_COMPRESSED "1500">
+<!ENTITY DISTRO "2.2">
+<!ENTITY DISTRO_COMPRESSED "22">
+<!ENTITY DISTRO_NAME_NO_CAP "morty">
+<!ENTITY DISTRO_NAME "Morty">
+<!ENTITY YOCTO_DOC_VERSION "2.2">
+<!ENTITY POKYVERSION "17.0.0">
+<!ENTITY POKYVERSION_COMPRESSED "1700">
 <!ENTITY YOCTO_POKY "poky-&DISTRO_NAME_NO_CAP;-&POKYVERSION;">
 <!ENTITY COPYRIGHT_YEAR "2010-2016">
 <!ENTITY YOCTO_DL_URL "http://downloads.yoctoproject.org">
@@ -62,7 +62,7 @@
 <!ENTITY OE_INIT_FILE "oe-init-build-env">
 <!ENTITY UBUNTU_HOST_PACKAGES_ESSENTIAL "gawk wget git-core diffstat unzip texinfo gcc-multilib \
      build-essential chrpath socat">
-<!ENTITY FEDORA_HOST_PACKAGES_ESSENTIAL "gawk make wget tar bzip2 gzip python unzip perl patch \
+<!ENTITY FEDORA_HOST_PACKAGES_ESSENTIAL "gawk make wget tar bzip2 gzip python3 unzip perl patch \
      diffutils diffstat git cpp gcc gcc-c++ glibc-devel texinfo chrpath \
      ccache perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue perl-bignum socat \
      findutils which">

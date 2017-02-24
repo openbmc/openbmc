@@ -1,0 +1,35 @@
+From 26faa2c157a27a18a9f767976730fe0c115e3af4 Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Wed, 13 Jul 2016 19:19:02 +0300
+Subject: [PATCH] cmake: install bash-completions in the right place
+
+The completionsdir variable is a full path and should not be
+prefixed.
+
+This does mean the files may be installed outside of
+CMAKE_INSTALL_PREFIX -- the alternative is more difficult and
+means that bash completion files may be installed where
+bash-completion can't find them.
+
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Upstream-Status: Submitted [mailing list]
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8e2abba..784a8f9 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -532,7 +532,7 @@ install (
+ if (BASH_COMPLETION_FOUND)
+ 	install(
+ 		FILES completions/bash/piglit
+-		DESTINATION ${CMAKE_INSTALL_PREFIX}/${BASH_COMPLETION_COMPLETIONSDIR}/
++		DESTINATION ${BASH_COMPLETION_COMPLETIONSDIR}/
+ 	)
+ endif (BASH_COMPLETION_FOUND)
+ 
+-- 
+2.8.1
+

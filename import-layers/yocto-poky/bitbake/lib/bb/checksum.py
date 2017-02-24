@@ -19,19 +19,12 @@ import glob
 import operator
 import os
 import stat
+import pickle
 import bb.utils
 import logging
 from bb.cache import MultiProcessCache
 
 logger = logging.getLogger("BitBake.Cache")
-
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
-    logger.info("Importing cPickle failed. "
-                "Falling back to a very slow implementation.")
-
 
 # mtime cache (non-persistent)
 # based upon the assumption that files do not change during bitbake run
@@ -127,13 +120,15 @@ class FileChecksumCache(MultiProcessCache):
                             checksums.extend(checksum_dir(f))
                     else:
                         checksum = checksum_file(f)
-                        checksums.append((f, checksum))
+                        if checksum:
+                            checksums.append((f, checksum))
             elif os.path.isdir(pth):
                 if not os.path.islink(pth):
                     checksums.extend(checksum_dir(pth))
             else:
                 checksum = checksum_file(pth)
-                checksums.append((pth, checksum))
+                if checksum:
+                    checksums.append((pth, checksum))
 
         checksums.sort(key=operator.itemgetter(1))
         return checksums

@@ -9,6 +9,12 @@ SRC_URI = "git://github.com/openSUSE/build-compare.git \
            file://Rename-rpm-check.sh-to-pkg-diff.sh.patch;striplevel=1 \
            file://Ignore-DWARF-sections.patch;striplevel=1 \
            file://0001-Add-support-for-deb-and-ipk-packaging.patch \
+           file://functions.sh-remove-space-at-head.patch \
+           file://functions.sh-run-rpm-once-to-make-it-faster.patch \
+           file://pkg-diff.sh-check-for-fifo-named-pipe.patch \
+           file://pkg-diff.sh-check_single_file-return-at-once-when-sa.patch \
+           file://pkg-diff.sh-remove-space-in-the-end-for-ftype.patch \
+           file://functions.sh-improve-deb-and-ipk-checking.patch \
            "
 
 SRCREV = "c5352c054c6ef15735da31b76d6d88620f4aff0a"

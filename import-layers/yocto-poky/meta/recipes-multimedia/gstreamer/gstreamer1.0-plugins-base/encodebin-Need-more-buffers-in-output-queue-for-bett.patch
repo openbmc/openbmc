@@ -17,7 +17,7 @@ diff --git a/gst/encoding/gstencodebin.c b/gst/encoding/gstencodebin.c
 index 6728e58..32daae4 100644
 --- a/gst/encoding/gstencodebin.c
 +++ b/gst/encoding/gstencodebin.c
-@@ -1138,8 +1138,7 @@ _create_stream_group (GstEncodeBin * ebin, GstEncodingProfile * sprof,
+@@ -1228,8 +1228,7 @@ _create_stream_group (GstEncodeBin * ebin, GstEncodingProfile * sprof,
     * We only use a 1buffer long queue here, the actual queueing will be done
     * in the input queue */
    last = sgroup->outqueue = gst_element_factory_make ("queue", NULL);

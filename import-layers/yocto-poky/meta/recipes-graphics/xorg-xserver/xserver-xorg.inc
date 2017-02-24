@@ -69,7 +69,7 @@ PACKAGES =+ "${PN}-sdl \
              xf86-video-modesetting"
 
 SUMMARY_xf86-video-modesetting = "X.Org X server -- modesetting display driver"
-INSANE_SKIP_xf86-video-modesetting = "xorg-driver-abi"
+INSANE_SKIP_${MLPREFIX}xf86-video-modesetting = "xorg-driver-abi"
 
 XSERVER_RRECOMMENDS = "xkeyboard-config rgb xserver-xf86-config xkbcomp"
 RRECOMMENDS_${PN} += "${XSERVER_RRECOMMENDS}"
@@ -131,6 +131,7 @@ PACKAGECONFIG[dri2] = "--enable-dri2,--disable-dri2,dri2proto"
 # DRI3 requires xshmfence to also be enabled
 PACKAGECONFIG[dri3] = "--enable-dri3,--disable-dri3,dri3proto"
 PACKAGECONFIG[glx] = "--enable-glx,--disable-glx,glproto virtual/libgl virtual/libx11"
+PACKAGECONFIG[glamor] = "--enable-glamor,--disable-glamor,libepoxy,libegl"
 PACKAGECONFIG[unwind] = "--enable-libunwind,--disable-libunwind,libunwind"
 PACKAGECONFIG[xshmfence] = "--enable-xshmfence,--disable-xshmfence,libxshmfence"
 PACKAGECONFIG[xmlto] = "--with-xmlto, --without-xmlto, xmlto-native docbook-xml-dtd4-native docbook-xsl-stylesheets-native"
@@ -167,9 +168,10 @@ python populate_packages_prepend() {
         }
         p = subprocess.Popen(args="pkg-config --variable=%s xorg-server" % abis[name],
                              shell=True, env=newenv, stdout=subprocess.PIPE)
-        output = p.communicate()[0]
+        stdout, stderr = p.communicate()
+        output = stdout.decode("utf-8").split(".")[0]
         mlprefix = d.getVar('MLPREFIX', True) or ''
-        return "%sxorg-abi-%s-%s" % (mlprefix, name, output.split(".")[0])
+        return "%sxorg-abi-%s-%s" % (mlprefix, name, output)
 
     pn = d.getVar("PN", True)
     d.appendVar("RPROVIDES_" + pn, " " + get_abi("input"))

@@ -1,0 +1,37 @@
+From d4e6d07fef28d1bd8bfbceab4cc196ef54c23dd8 Mon Sep 17 00:00:00 2001
+From: Tanu Kaskinen <tanuk@iki.fi>
+Date: Tue, 7 Jun 2016 16:51:00 +0300
+Subject: [PATCH 2/5] card: don't allow the CARD_NEW hook to fail
+
+There is currently no use for allowing modules to cancel card creation,
+and I don't see need for that in the future either. Let's simplify
+things by removing the failure handling code.
+
+Upstream-Status: Accepted [expected in 10.0]
+
+Signed-off-by: Tanu Kaskinen <tanuk@iki.fi>
+---
+ src/pulsecore/card.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/src/pulsecore/card.c b/src/pulsecore/card.c
+index 410746b..0ac70b9 100644
+--- a/src/pulsecore/card.c
++++ b/src/pulsecore/card.c
+@@ -149,12 +149,7 @@ pa_card *pa_card_new(pa_core *core, pa_card_new_data *data) {
+     }
+ 
+     pa_card_new_data_set_name(data, name);
+-
+-    if (pa_hook_fire(&core->hooks[PA_CORE_HOOK_CARD_NEW], data) < 0) {
+-        pa_xfree(c);
+-        pa_namereg_unregister(core, name);
+-        return NULL;
+-    }
++    pa_hook_fire(&core->hooks[PA_CORE_HOOK_CARD_NEW], data);
+ 
+     c->core = core;
+     c->name = pa_xstrdup(data->name);
+-- 
+2.8.1
+

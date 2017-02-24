@@ -55,7 +55,7 @@ class TestRealPath(unittest.TestCase):
         for d in self.DIRS:
             os.mkdir(os.path.join(self.root, d))
         for f in self.FILES:
-            file(os.path.join(self.root, f), "w")
+            open(os.path.join(self.root, f), "w")
         for l in self.LINKS:
             os.symlink(l[1], os.path.join(self.root, l[0]))
 
@@ -85,5 +85,5 @@ class TestRealPath(unittest.TestCase):
 
     def test_loop(self):
         for e in self.EXCEPTIONS:
-            self.assertRaisesRegexp(OSError, r'\[Errno %u\]' % e[1],
+            self.assertRaisesRegex(OSError, r'\[Errno %u\]' % e[1],
                                     self.__realpath, e[0], False, False)
