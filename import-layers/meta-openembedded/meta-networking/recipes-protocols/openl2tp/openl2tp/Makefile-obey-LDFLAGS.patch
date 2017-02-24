@@ -1,0 +1,15 @@
+Upstream-Status: Pending
+
+--- openl2tp-1.8/Makefile.orig	2016-09-16 14:54:18.554291976 +0200
++++ openl2tp-1.8/Makefile	2016-09-16 14:57:23.559090400 +0200
+@@ -157,8 +157,8 @@ ADD_CFLAGS=			-I. -Iusl -Icli -isystem i
+ 				-MMD -Wall -Wno-strict-aliasing \
+ 				$(ADD_CPPFLAGS) $(CPPFLAGS.dmalloc) \
+ 				-DSYS_LIBDIR=$(SYS_LIBDIR)
+-LDFLAGS.l2tpd=		-Wl,-E -L. -Lusl -lusl -ldl $(LIBS.dmalloc) -lc
+-LDFLAGS.l2tpconfig=	-Lcli -lcli -lreadline $(LIBS.dmalloc) $(READLINE_LDFLAGS) -lc
++LDFLAGS.l2tpd=		-Wl,-E -L. -Lusl -lusl -ldl $(LIBS.dmalloc) -lc $(LDFLAGS)
++LDFLAGS.l2tpconfig=	-Lcli -lcli -lreadline $(LIBS.dmalloc) $(READLINE_LDFLAGS) -lc $(LDFLAGS)
+ 
+ OPT_CFLAGS?=		-O
+ 

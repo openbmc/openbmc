@@ -21,5 +21,5 @@ FILES_${PN} += "${libdir}/enlightenment/modules/*/*.desktop \
 FILES_${PN}-staticdev += "${libdir}/enlightenment/modules/*/*/*.a"
 FILES_${PN}-dev += "${libdir}/enlightenment/modules/*/*/*.la"
 FILES_${PN}-dbg += "${libdir}/enlightenment/modules/*/*/.debug"
- 
+
 SRC_URI += "file://configure.patch"

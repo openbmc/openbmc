@@ -1,0 +1,27 @@
+From 3fb9b6aeed2e2758239e59ba9ba1ca98535fe510 Mon Sep 17 00:00:00 2001
+From: Otavio Salvador <otavio@ossystems.com.br>
+Date: Fri, 19 Aug 2016 15:08:44 +0000
+Subject: [PATCH] Fix build error due missing space before macro
+Organization: O.S. Systems Software LTDA.
+
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+---
+ src/native-state-x11.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/native-state-x11.cpp b/src/native-state-x11.cpp
+index 3b66b77..3c1703b 100644
+--- a/src/native-state-x11.cpp
++++ b/src/native-state-x11.cpp
+@@ -60,7 +60,7 @@ NativeStateX11::display()
+ bool
+ NativeStateX11::create_window(WindowProperties const& properties)
+ {
+-    static const char *win_name("glmark2 "GLMARK_VERSION);
++    static const char *win_name("glmark2 " GLMARK_VERSION);
+ 
+     if (!xdpy_) {
+         Log::error("Error: X11 Display has not been initialized!\n");
+-- 
+2.1.4
+

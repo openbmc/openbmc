@@ -18,6 +18,7 @@ CONFIGUREOPTS = " --prefix=${prefix} \
                   --oldincludedir=${oldincludedir} \
                   --infodir=${infodir} \
                   --mandir=${mandir} \
+                  ${PACKAGECONFIG_CONFARGS} \
                 "
 
 # Three methods for waf cross compile:
@@ -65,8 +66,6 @@ do_configure() {
                 -L ${STAGING_DIR_HOST} \
                 -E LD_LIBRARY_PATH=${libdir_qemu}:${base_libdir_qemu}"
 
-    export BUILD_SYS=${BUILD_SYS}
-    export HOST_SYS=${HOST_SYS}
     export BUILD_ARCH=${BUILD_ARCH}
     export HOST_ARCH=${HOST_ARCH}
     export STAGING_LIBDIR=${STAGING_LIBDIR}

@@ -12,8 +12,8 @@ EXTRA_OEMAKE = "-e MAKEFLAGS="
 CFLAGS += "-I ${S}/include "
 
 do_install() {
-	unset datadir
-	unset mandir
-	oe_runmake 'DESTDIR=${D}' install
+    unset datadir
+    unset mandir
+    oe_runmake 'DESTDIR=${D}' install
 }
 

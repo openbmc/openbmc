@@ -1,0 +1,16 @@
+configure.ac: never generate the docs even if a2x is found as xmllint will fail finding custom dtd files
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Derek Straka <derek@asterius.io>
+--- git/configure.ac.orig	2016-08-15 09:53:46.787003658 -0400
++++ git/configure.ac	2016-08-15 09:53:51.698972432 -0400
+@@ -37,7 +37,7 @@
+ ])
+  
+ AC_CHECK_PROG([ASCIIDOC], [a2x], [a2x])
+-AM_CONDITIONAL([HAVE_DOCTOOLS], [test "x$ASCIIDOC" != "x"])
++AM_CONDITIONAL([HAVE_DOCTOOLS], [false])
+ AS_IF([test "x$ASCIIDOC" = "x"],
+       [AC_MSG_WARN([asciidoc not installed, man pages will not be created])])
+ 

@@ -1,0 +1,39 @@
+--- evince-3.18.2/backend/comics/comics-document.c.orig	2016-06-22 20:08:01.789805750 +0000
++++ evince-3.18.2/backend/comics/comics-document.c	2016-06-22 20:07:00.817804688 +0000
+@@ -241,6 +241,8 @@
+ /* This function shows how to use the choosen command for decompressing a
+  * comic book file. It modifies fields of the ComicsDocument struct with 
+  * this information */
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+ static gboolean 
+ comics_generate_command_lines (ComicsDocument *comics_document, 
+ 			       GError         **error)
+@@ -296,6 +298,7 @@
+ 	}
+ 
+ }
++#pragma GCC diagnostic pop
+ 
+ /* This function chooses an external command for decompressing a comic 
+  * book based on its mime tipe. */
+--- evince-3.18.2/libdocument/ev-document-misc.c.orig	2016-06-22 20:01:49.205799262 +0000
++++ evince-3.18.2/libdocument/ev-document-misc.c	2016-06-22 20:02:27.233799924 +0000
+@@ -519,7 +519,8 @@
+ 
+ 	return (dp / di);
+ }
+-
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wformat-y2k"
+ /* Returns a locale specific date and time representation */
+ gchar *
+ ev_document_misc_format_date (GTime utime)
+@@ -542,6 +543,7 @@
+ 
+ 	return g_locale_to_utf8 (s, -1, NULL, NULL, NULL);
+ }
++#pragma GCC diagnostic pop
+ 
+ void
+ ev_document_misc_get_pointer_position (GtkWidget *widget,

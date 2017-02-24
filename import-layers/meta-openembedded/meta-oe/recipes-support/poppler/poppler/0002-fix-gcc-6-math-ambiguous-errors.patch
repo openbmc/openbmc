@@ -1,0 +1,11 @@
+--- poppler-0.45.0/poppler/CairoOutputDev.cc.orig	2016-06-17 14:23:35.399083929 -0400
++++ poppler-0.45.0/poppler/CairoOutputDev.cc	2016-06-17 14:36:53.351097825 -0400
+@@ -42,7 +42,7 @@
+ #endif
+ 
+ #include <string.h>
+-#include <math.h>
++#include <cmath>
+ #include <assert.h>
+ #include <cairo.h>
+ 

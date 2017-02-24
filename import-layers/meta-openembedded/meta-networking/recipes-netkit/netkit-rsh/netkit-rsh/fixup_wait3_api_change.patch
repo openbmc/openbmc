@@ -1,0 +1,34 @@
+Fix build issue do to Deprecate union wait and remove support from wait functions [BZ #19613]
+
+| rlogin.c: In function 'catch_child':
+| rlogin.c:463:13: error: storage size of 'status' isn't known
+|   union wait status;
+
+https://sourceware.org/ml/libc-alpha/2016-02/msg00342.html
+
+Upstream-Status: Inappropriate [ no upstream maintaner ]
+
+Signed-off-by Armin Kuster <akuster@mvista.com>
+
+Index: netkit-rsh-0.17/rlogin/rlogin.c
+===================================================================
+--- netkit-rsh-0.17.orig/rlogin/rlogin.c
++++ netkit-rsh-0.17/rlogin/rlogin.c
+@@ -460,7 +460,7 @@ writeroob(int ignore)
+ void
+ catch_child(int ignore)
+ {
+-	union wait status;
++	int status;
+ 	int pid;
+ 
+ 	(void)ignore;
+@@ -471,7 +471,7 @@ catch_child(int ignore)
+ 			return;
+ 		/* if the child (reader) dies, just quit */
+ 		if (pid < 0 || (pid == childpid && !WIFSTOPPED(status)))
+-			done((int)(status.w_termsig | status.w_retcode));
++            done((int)(WTERMSIG(status) | WEXITSTATUS(status)));
+ 	}
+ 	/* NOTREACHED */
+ }

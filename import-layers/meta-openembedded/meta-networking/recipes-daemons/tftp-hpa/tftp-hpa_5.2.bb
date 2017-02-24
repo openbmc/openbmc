@@ -37,6 +37,9 @@ export AR = "${HOST_PREFIX}ar cq"
 
 EXTRA_OECONF += "--disable-option-checking"
 
+PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', 'ipv6', '', d)}"
+PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,"
+
 # configure.in has errors
 do_configure() {
     oe_runconf

@@ -1,0 +1,34 @@
+From 5f9e80acb0a1ac399839bf160e43f6120c4b5128 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 18 Oct 2016 23:49:09 +0000
+Subject: [PATCH] Fix build errors with clang
+
+| ../../../../../../../workspace/sources/lowpan-tools/src/coordinator.c:313:50: error: format specifies type 'unsigned char' but the argument has type 'int' [-Werror,-Wformat]
+|                 fprintf(stderr, "Opt: %c (%hhx)\n", (char)opt, opt);
+|                                           ~~~~                 ^~~
+|                                           %x
+| 1 error generated.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/coordinator.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/coordinator.c b/src/coordinator.c
+index c139aae..f0de6d2 100644
+--- a/src/coordinator.c
++++ b/src/coordinator.c
+@@ -310,7 +310,7 @@ int main(int argc, char **argv)
+ #else
+ 		opt = getopt(argc, argv, "l:f:d:m:n:i:s:p:c:hv");
+ #endif
+-		fprintf(stderr, "Opt: %c (%hhx)\n", opt, opt);
++		fprintf(stderr, "Opt: %c (%hhx)\n", opt, (unsigned char)opt);
+ 		if (opt == -1)
+ 			break;
+ 
+-- 
+1.9.1
+

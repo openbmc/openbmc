@@ -7,25 +7,24 @@ Upstream-Status: Pending
 Signed-off-by: Raphael Freudiger <raphael.freudiger@siemens.com>
 Reviewed-By: Pascal Bach <pascal.bach@siemens.com>
 
-Index: p7zip_9.20.1/makefile.machine
-=====================================================================
---- p7zip_9.20.1/makefile.machine	2011-03-13 12:54:57.000000000 +0100
-+++ p7zip_9.20.1/makefile.machine	2015-02-03 08:39:44.427696944 +0100
-@@ -4,14 +4,14 @@
+diff -Nurp p7zip_15.14.1_orig/makefile.machine p7zip_15.14.1/makefile.machine
+--- p7zip_15.14.1_orig/makefile.machine	2016-03-23 20:37:47.000000000 +0100
++++ p7zip_15.14.1/makefile.machine	2016-06-17 15:33:39.720454477 +0200
+@@ -2,7 +2,7 @@
+ # makefile for Linux (x86, PPC, alpha ...)
+ #
  
- OPTFLAGS=-O
+-OPTFLAGS=-O -s
++OPTFLAGS=-O
  
--ALLFLAGS=${OPTFLAGS} -pipe -s \
-+ALLFLAGS=${OPTFLAGS} -pipe \
+ ALLFLAGS=${OPTFLAGS} -pipe \
      	-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE \
- 	-DNDEBUG -D_REENTRANT -DENV_UNIX \
+@@ -10,8 +10,6 @@ ALLFLAGS=${OPTFLAGS} -pipe \
  	-D_7ZIP_LARGE_PAGES \
  	$(LOCAL_FLAGS)
  
--CXX=g++ $(ALLFLAGS)
--CC=gcc $(ALLFLAGS)
-+CXX+=$(ALLFLAGS)
-+CC+=$(ALLFLAGS)
+-CXX=g++
+-CC=gcc
  CC_SHARED=-fPIC
  LINK_SHARED=-fPIC -shared
  

@@ -19,15 +19,12 @@ EXTRA_OECONF = "--disable-docs --with-python-includes=${STAGING_INCDIR}/../"
 inherit distutils
 
 do_compile_prepend() {
-    BUILD_SYS=${BUILD_SYS} HOST_SYS=${HOST_SYS} \
     ${STAGING_BINDIR_NATIVE}/python setup.py build ${DISTUTILS_BUILD_ARGS} || \
     true
 }
 
 # need to export these variables for python-config to work
 export PYTHONPATH
-export BUILD_SYS
-export HOST_SYS
 export STAGING_INCDIR
 export STAGING_LIBDIR
 

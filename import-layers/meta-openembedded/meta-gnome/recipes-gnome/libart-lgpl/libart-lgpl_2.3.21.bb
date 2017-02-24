@@ -24,5 +24,5 @@ FILES_${PN}-dev += "${bindir}/libart2-config"
 S = "${WORKDIR}/libart_lgpl-${PV}"
 
 do_configure_prepend() {
-	cp ${WORKDIR}/${ART_CONFIG} ${S}/art_config.h
+    cp ${WORKDIR}/${ART_CONFIG} ${S}/art_config.h
 }

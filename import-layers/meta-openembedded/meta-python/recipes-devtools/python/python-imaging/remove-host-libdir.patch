@@ -1,0 +1,25 @@
+Avoid getting host sysroot paths in the library paths to fix issue like:
+
+| /home/andrei/work/yocto/build-rpi-master/tmp/sysroots/x86_64-linux/usr/lib/libz.so: file not recognized: File format not recognized
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
+
+
+Index: Imaging-1.1.7/setup.py
+===================================================================
+--- Imaging-1.1.7.orig/setup.py
++++ Imaging-1.1.7/setup.py
+@@ -155,11 +155,6 @@ class pil_build_ext(build_ext):
+ 
+         # FIXME: check /opt/stuff directories here?
+ 
+-        prefix = sysconfig.get_config_var("prefix")
+-        if prefix:
+-            add_directory(library_dirs, os.path.join(prefix, "lib"))
+-            add_directory(include_dirs, os.path.join(prefix, "include"))
+-
+         #
+         # locate tkinter libraries
+ 

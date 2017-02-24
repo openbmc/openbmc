@@ -16,3 +16,6 @@ SRC_URI[md5sum] = "5c0d378d907bebc38b51c3d7e4117011"
 SRC_URI[sha256sum] = "2b142b1027fb0a62c41347600e01a53fa274dad15445a7da48083c830c3138b3"
 
 inherit autotools
+
+# http://errors.yoctoproject.org/Errors/Details/68667/
+PNBLACKLIST[open-vcdiff] ?= "BROKEN: fails to build with gcc-6"

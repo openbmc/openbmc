@@ -79,7 +79,7 @@ index 0000000..a89326a
 +  ${CC} -c -Werror-implicit-function-declaration $(TESTFLOAT_OPTS) \
 +    $(C_INCLUDES) -O3 -o $@
 +MAKELIB = ${AR} crs $@
-+LINK = ${CC} -o $@
++LINK = ${CC} -o $@ ${LDFLAGS}
 +OTHER_LIBS = -lm
 +
 +OBJ = .o

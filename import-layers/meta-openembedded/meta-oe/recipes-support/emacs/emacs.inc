@@ -14,7 +14,7 @@ X11DEPENDS = " \
     libx11 libxau libxcomposite libxcursor libxdamage libxdmcp libxext libxfixes \
     libxft libxpm libxrandr libxrender \
     gdk-pixbuf glib-2.0 gtk+ pango libxcb harfbuzz icu \
-" 
+"
 
 EXTRA_OECONF =  "--without-sound --with-crt-dir=${STAGING_LIBDIR} "
 
@@ -55,7 +55,7 @@ do_compile_prepend() {
     if [ -e $treedir ];then
         rm -rf $treedir
     fi
-    
+
     mkdir -p $treedir/${base_libdir}
 
     if [ -f ${TOOLCHAIN_PATH}/${TARGET_SYS}/${base_libdir}/libgcc_s.so ]; then

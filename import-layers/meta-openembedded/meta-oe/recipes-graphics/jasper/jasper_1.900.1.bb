@@ -10,6 +10,7 @@ inherit autotools lib_package
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[jpeg] = "--enable-libjpeg,--disable-libjpeg,jpeg"
+PACKAGECONFIG[opengl] = "--enable-opengl,--disable-opengl,freeglut"
 
 EXTRA_OECONF = "--enable-shared"
 

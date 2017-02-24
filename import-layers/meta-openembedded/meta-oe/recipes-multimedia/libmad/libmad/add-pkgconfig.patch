@@ -1,0 +1,70 @@
+Here is a patch for adding pkg-config support to libmad.
+It would make life a bit easier for distro maintainers if this was applied.
+In case you didn't know, pkg-config is a tool for providing LDFLAGS and
+CFLAGS for packages using shared libraries. It's on freedesktop.org.
+Debian has already been distributing the pkg-config file mad.pc with
+libmad for some time, and people developing on debian (notably xmms2 
+developers) have started relying on this support being present, causing
+some confusion for people installing from source and on some BSDs which
+do not provide mad.pc (google: pkgconfig libmad).
+
+EMH
+
+Upstream-Status: Inappropriate [configuration]
+
+--h31gzZEtNLTqOjlF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename=&quot;libmad-0.15.1b-pkgconfig.patch&quot;
+
+diff -Naur libmad-0.15.1b.old/configure.ac libmad-0.15.1b/configure.ac
+--- libmad-0.15.1b.old/configure.ac	2004-01-23 10:41:32.000000000 +0100
++++ libmad-0.15.1b/configure.ac	2004-08-07 02:25:24.633462168 +0200
+@@ -429,5 +429,5 @@
+ dnl AC_SUBST(LTLIBOBJS)
+ 
+ AC_CONFIG_FILES([Makefile msvc++/Makefile  \
+-	libmad.list])
++	libmad.list mad.pc])
+ AC_OUTPUT
+diff -Naur libmad-0.15.1b.old/mad.pc.in libmad-0.15.1b/mad.pc.in
+--- libmad-0.15.1b.old/mad.pc.in	1970-01-01 01:00:00.000000000 +0100
++++ libmad-0.15.1b/mad.pc.in	2004-08-07 02:04:59.617692872 +0200
+@@ -0,0 +1,14 @@
++# libmad pkg-config source file
++
++prefix=@prefix@
++exec_prefix=@exec_prefix@
++libdir=@libdir@
++includedir=@includedir@
++
++Name: mad
++Description: MPEG Audio Decoder
++Version: @VERSION@
++Requires:
++Conflicts:
++Libs: -L${libdir} -lmad -lm
++Cflags: -I${includedir}
+diff -Naur libmad-0.15.1b.old/Makefile.am libmad-0.15.1b/Makefile.am
+--- libmad-0.15.1b.old/Makefile.am	2004-02-17 03:02:03.000000000 +0100
++++ libmad-0.15.1b/Makefile.am	2004-08-07 02:03:19.859858368 +0200
+@@ -24,6 +24,9 @@
+ SUBDIRS =		
+ DIST_SUBDIRS =		msvc++
+ 
++pkgconfigdir =		$(libdir)/pkgconfig
++pkgconfig_DATA =	mad.pc
++
+ lib_LTLIBRARIES =	libmad.la
+ include_HEADERS =	mad.h
+ 
+@@ -34,7 +37,8 @@
+ minimad_LDADD =		libmad.la
+ 
+ EXTRA_DIST =		mad.h.sed  \
+-			CHANGES COPYRIGHT CREDITS README TODO VERSION
++			CHANGES COPYRIGHT CREDITS README TODO VERSION \
++			mad.pc.in
+ 
+ exported_headers =	version.h fixed.h bit.h timer.h stream.h frame.h  \
+ 			synth.h decoder.h
+

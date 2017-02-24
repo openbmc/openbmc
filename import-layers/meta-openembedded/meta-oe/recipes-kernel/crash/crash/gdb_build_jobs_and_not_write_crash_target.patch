@@ -16,7 +16,7 @@ index 27a1d47..bcf2d2f 100644
 @@ -232,8 +232,8 @@ gdb_merge: force
  	@if [ ! -f ${GDB}/config.status ]; then \
  	  (cd ${GDB}; ./configure --host=${GDB_TARGET} --build=${GDB_HOST} --with-separate-debug-dir=/usr/lib/debug \
- 	    --with-bugurl="" --with-expat=no --with-python=no; \
+ 	    --with-bugurl="" --with-expat=no --with-python=no --disable-sim; \
 -	  make --no-print-directory CRASH_TARGET=${TARGET}; echo ${TARGET} > crash.target) \
 -	else make --no-print-directory rebuild; fi
 +	  make --no-print-directory CRASH_TARGET=${TARGET} ${GDB_MAKE_JOBS}; ) \

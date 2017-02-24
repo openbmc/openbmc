@@ -13,10 +13,6 @@ RDEPENDS_${PN} += "python-lang"
 
 PROVIDES = "python-ecore python-eldbus python-edje python-elementary python-emotion python-evas"
 
-# necessary to let the call for python-config succeed
-export BUILD_SYS
-export HOST_SYS
-
 inherit e-base distutils pkgconfig
 
 SRCVER = "${PV}"

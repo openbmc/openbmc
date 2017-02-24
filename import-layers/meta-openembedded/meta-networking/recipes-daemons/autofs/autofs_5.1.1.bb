@@ -36,7 +36,7 @@ CFLAGS += "${LDFLAGS}"
 
 PACKAGECONFIG[systemd] = "--with-systemd=${systemd_unitdir}/system,--without-systemd,systemd"
 
-PACKAGECONFIG ?= "${@base_contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)}"
+PACKAGECONFIG ?= "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)}"
 
 EXTRA_OEMAKE = "DONTSTRIP=1"
 EXTRA_OECONF += "--disable-mount-locking \
@@ -57,10 +57,10 @@ do_configure_prepend () {
 
 do_install_append () {
     if [ -d ${D}/run ]; then
-	rmdir ${D}/run
+        rmdir ${D}/run
     fi
     if [ -d ${D}${localstatedir}/run ]; then
-	rmdir ${D}${localstatedir}/run
+        rmdir ${D}${localstatedir}/run
     fi
 }
 

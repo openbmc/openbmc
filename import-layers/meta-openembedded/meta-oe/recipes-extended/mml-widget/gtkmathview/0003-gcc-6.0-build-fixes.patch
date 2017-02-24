@@ -1,0 +1,93 @@
+From: Gert Wollny <gw.fossdev@gmail.com>
+Date: Sun, 26 Jun 2016 13:25:00 +0200
+Description: gcc 6.0 build fixes
+Bug: https://bugs.debian.org/811682
+
+Slightly adapted to our environment
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+--- a/src/engine/common/View.cc
++++ b/src/engine/common/View.cc
+@@ -291,7 +291,7 @@
+ 	  }
+     }
+ 
+-  return false;
++  return SmartPtr<Element>();
+ }
+ 
+ bool
+--- a/src/backend/common/tfm/TFM.hh
++++ b/src/backend/common/tfm/TFM.hh
+@@ -37,7 +37,7 @@
+     unsigned char face;
+     const char* codingScheme;
+     int designSize;
+-    int checksum;
++    unsigned int checksum;
+     unsigned int nDimensions;
+     unsigned int nCharacters;
+   };
+@@ -52,7 +52,7 @@
+   struct Kerning
+   {
+     UChar8 index;
+-    int value;
++    unsigned int value;
+   };
+ 
+   struct Ligature
+@@ -67,7 +67,7 @@
+     UChar8 index;
+     int width;
+     int height;
+-    int depth;
++    unsigned int depth;
+     int italicCorrection;
+     unsigned char nKernings;
+     const Kerning* kerning;
+--- a/src/backend/common/StandardSymbolsShaper.hh
++++ b/src/backend/common/StandardSymbolsShaper.hh
+@@ -32,20 +32,20 @@
+   struct HStretchyChar
+   {
+     Char16 ch;
+-    Char8 normal;
+-    Char8 left;
+-    Char8 glue;
+-    Char8 right;
++    UChar8 normal;
++    UChar8 left;
++    UChar8 glue;
++    UChar8 right;
+   };
+   
+   struct VStretchyChar
+   {
+     Char16 ch;
+-    Char8 normal;
+-    Char8 top;
+-    Char8 glue;
+-    Char8 middle;
+-    Char8 bottom;
++    UChar8 normal;
++    UChar8 top;
++    UChar8 glue;
++    UChar8 middle;
++    UChar8 bottom;
+   };
+ 
+ protected:
+--- a/src/backend/common/StandardSymbolsShaper.cc
++++ b/src/backend/common/StandardSymbolsShaper.cc
+@@ -29,7 +29,7 @@
+ #include "ShapingContext.hh"
+ 
+ struct GlyphMap {
+-  Char8 index;
++  UChar8 index;
+   Char16 ch;
+ };
+ 

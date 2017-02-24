@@ -25,17 +25,17 @@ DEPENDS += "libmodule-build-perl-native \
 "
 
 RPROVIDES_${PN} = " libhtml-element-perl \
-		    libhtml-tree-assubs-perl \
-		    libhtml-tree-perl \
-		    libhtml-treebuilder-perl \
+    libhtml-tree-assubs-perl \
+    libhtml-tree-perl \
+    libhtml-treebuilder-perl \
 "
 
 RDEPENDS_${PN} = " perl-module-b \
-                   perl-module-base \
-                   perl-module-strict \
-                   perl-module-warnings \
-                   perl-module-exporter \
-                   perl-module-carp \
+    perl-module-base \
+    perl-module-strict \
+    perl-module-warnings \
+    perl-module-exporter \
+    perl-module-carp \
 "
 
 BBCLASSEXTEND = "native"

@@ -10,20 +10,20 @@ DEPENDS = "pciutils zlib efivar"
 
 COMPATIBLE_HOST = "(i.86|x86_64|arm|aarch64).*-linux"
 
-SRC_URI = "https://github.com/rhinstaller/efibootmgr/releases/download/${BP}/${BP}.tar.bz2 \
-           file://ldflags.patch \
+SRCREV = "75d25807ba81cb724964c989012611272c8f1f5d"
+SRC_URI = "git://github.com/rhinstaller/efibootmgr.git;protocol=https \
           "
 
-SRC_URI[md5sum] = "6647f5cd807bc8484135ba74fcbcc39a"
-SRC_URI[sha256sum] = "a66f5850677e86255d93cb1cead04c3c48a823a2b864c579321f2a07f00256e6"
+S = "${WORKDIR}/git"
+
+
+inherit pkgconfig
 
 EXTRA_OEMAKE = "'CC=${CC}' 'CFLAGS=${CFLAGS} -I${S}/src/include `pkg-config --cflags efivar` \
                  -DEFIBOOTMGR_VERSION=\"$(RELEASE_MAJOR).$(RELEASE_MINOR)\" '"
 
 do_install () {
-    install -D -p -m0755 src/efibootmgr/efibootmgr ${D}/${sbindir}/efibootmgr
+    install -D -p -m0755 src/efibootmgr ${D}/${sbindir}/efibootmgr
 }
 
-inherit pkgconfig
 
-PNBLACKLIST[efibootmgr] ?= "Depends on blacklisted efivar"

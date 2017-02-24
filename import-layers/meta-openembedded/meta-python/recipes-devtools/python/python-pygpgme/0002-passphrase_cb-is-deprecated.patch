@@ -1,0 +1,50 @@
+From dc75482af095d667a4a92655c4e7eb312e80c42d Mon Sep 17 00:00:00 2001
+From: Daniel Kahn Gillmor <dkg@fifthhorseman.net>
+Date: Mon, 1 Feb 2016 19:25:12 -0500
+Subject: [PATCH 2/5] passphrase_cb is deprecated
+
+https://bugs.gnupg.org/gnupg/issue767 indicates that
+gpgme_set_passphrase_cb is a deprecated corner of the API and that
+developers using gpgme should really rely on the gpg-agent to handle
+this stuff.  This should actually simplify things for most
+installations -- just strip out all passphrase handling from your
+application entirely, relying on gpg to figure out how to find the
+agent, and relying on the agent figuring out how to prompt the user
+(if necessary).
+
+However, if a developer really wants to use the passphrase callback
+approach, they'll have to use loopback pinentry.  This sets up the
+test suite to be able to make those tests.
+
+Upstream-Status: Backport
+
+Signed-off-by: Catalin Enache <catalin.enache@windriver.com>
+---
+ tests/util.py | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/tests/util.py b/tests/util.py
+index cd803c2..86892ca 100644
+--- a/tests/util.py
++++ b/tests/util.py
+@@ -28,7 +28,9 @@ keydir = os.path.join(os.path.dirname(__file__), 'keys')
+ 
+ class GpgHomeTestCase(unittest.TestCase):
+ 
+-    gpg_conf_contents = ''
++    gpg_conf_contents = 'pinentry-mode loopback'
++    gpg_agent_conf_contents = 'allow-loopback-pinentry'
++
+     import_keys = []
+ 
+     def keyfile(self, key):
+@@ -41,6 +43,10 @@ class GpgHomeTestCase(unittest.TestCase):
+         fp.write(self.gpg_conf_contents.encode('UTF-8'))
+         fp.close()
+ 
++        fp = open(os.path.join(self._gpghome, 'gpg-agent.conf'), 'wb')
++        fp.write(self.gpg_agent_conf_contents.encode('UTF-8'))
++        fp.close()
++
+         # import requested keys into the keyring
+         ctx = gpgme.Context()

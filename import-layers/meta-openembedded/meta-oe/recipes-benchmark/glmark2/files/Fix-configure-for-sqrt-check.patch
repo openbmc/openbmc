@@ -1,0 +1,13 @@
+Index: git/wscript
+===================================================================
+--- git.orig/wscript	2016-07-29 13:15:44.954249796 -0500
++++ git/wscript	2016-07-29 15:52:06.196768865 -0500
+@@ -90,7 +90,7 @@
+         ctx.check_cxx(lib = lib, uselib_store = uselib)
+ 
+     # Check required functions
+-    req_funcs = [('memset', 'string.h', []) ,('sqrt', 'math.h', ['m'])]
++    req_funcs = [('memset', 'string.h', [])]
+     for func, header, uselib in req_funcs:
+         ctx.check_cxx(function_name = func, header_name = header,
+                       uselib = uselib, mandatory = True)

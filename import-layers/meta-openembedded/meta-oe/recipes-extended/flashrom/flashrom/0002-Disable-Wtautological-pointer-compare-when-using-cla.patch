@@ -1,0 +1,35 @@
+From 9be0d152dfe8ac0f9b665d61aeb3f99dae533e0f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 19 Oct 2016 00:25:09 +0000
+Subject: [PATCH 2/3] Disable Wtautological-pointer-compare when using clang
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ flashrom.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/flashrom.c b/flashrom.c
+index 04e9934..bf49104 100644
+--- a/flashrom.c
++++ b/flashrom.c
+@@ -1569,6 +1569,9 @@ int selfcheck(void)
+ 	 * For 'flashchips' we check the first element to be non-null. In the
+ 	 * other cases there exist use cases where the first element can be
+ 	 * null. */
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wtautological-pointer-compare"
++
+ 	if (flashchips == NULL || flashchips[0].vendor == NULL) {
+ 		msg_gerr("Flashchips table miscompilation!\n");
+ 		ret = 1;
+@@ -1602,6 +1605,7 @@ int selfcheck(void)
+ 		msg_gerr("Known laptops table does not exist!\n");
+ 		ret = 1;
+ 	}
++#pragma clang diagnostic pop
+ #endif
+ 	return ret;
+ }
+-- 
+1.9.1
+

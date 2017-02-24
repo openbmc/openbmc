@@ -1,0 +1,32 @@
+From e3cd445a4ee44a16faa646d7b642d02eea62b1f8 Mon Sep 17 00:00:00 2001
+From: Zoltan Kuscsik <zoltan.kuscsik@linaro.org>
+Date: Fri, 1 Jul 2016 09:30:31 +0200
+Subject: [PATCH] Makefile: fix path for sshfs.1
+
+Fix source path when build directory differs
+from the source dir.
+
+Upstream-Status: Accepted
+
+https://github.com/libfuse/sshfs/pull/24
+
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index f003bae..3d8f9cb 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -24,7 +24,7 @@ sshfs.1: sshfs.1.in
+ 	$(AM_V_GEN)sed \
+ 	    -e 's,__IDMAP_DEFAULT__,$(IDMAP_DEFAULT),g' \
+ 	    -e 's,__UNMOUNT_COMMAND__,$(UNMOUNT_COMMAND),g' \
+-	    <sshfs.1.in >sshfs.1.tmp || exit 1; \
++	    <$(srcdir)/sshfs.1.in >sshfs.1.tmp || exit 1; \
+ 	mv sshfs.1.tmp sshfs.1
+ 
+ if SSH_NODELAY_SO
+-- 
+1.9.1
+

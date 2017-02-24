@@ -1,0 +1,61 @@
+From f43ef44806ffb8e3b35d99070dde9b6cc1714d3d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 8 Sep 2015 21:32:20 +0000
+Subject: [PATCH] gfx,direct: Aboid usng VLAs and printf formats
+
+VLAs are flagged by clang when using non-POD types, therefore replace
+the usage with alloca which is exact same allocation on stack
+
+ __attribute__((__format__ (__printf__))) is not portable as used here
+ therefore disable the check for clang here, we lose no functionality
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ lib/direct/util.h | 2 +-
+ src/gfx/util.cpp  | 8 ++++----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/lib/direct/util.h b/lib/direct/util.h
+index 72941e9..8e7fa4a 100644
+--- a/lib/direct/util.h
++++ b/lib/direct/util.h
+@@ -98,7 +98,7 @@
+ #define D_CONST_FUNC
+ #endif
+ 
+-#if __GNUC__ >= 3
++#if __GNUC__ >= 3 && !defined __clang__
+ #define D_FORMAT_PRINTF(n)         __attribute__((__format__ (__printf__, n, n+1)))
+ #define D_FORMAT_VPRINTF(n)        __attribute__((__format__ (__printf__, n, 0)))
+ #else
+diff --git a/src/gfx/util.cpp b/src/gfx/util.cpp
+index 40032bc..d1015d4 100644
+--- a/src/gfx/util.cpp
++++ b/src/gfx/util.cpp
+@@ -294,8 +294,8 @@ dfb_gfx_copy_regions_stereo( CoreSurface           *source,
+ {
+      unsigned int i, n = 0;
+      DFBRectangle rect = { 0, 0, source->config.size.w, source->config.size.h };
+-     DFBRectangle rects[num];
+-     DFBPoint     points[num];
++     DFBRectangle *rects =  (DFBRectangle*)alloca( sizeof(struct DFBRectangle) * num);
++     DFBPoint *points =  (DFBPoint*)alloca( sizeof(struct DFBPoint) * num);
+ 
+      for (i=0; i<num; i++) {
+           DFB_REGION_ASSERT( &regions[i] );
+@@ -351,8 +351,8 @@ dfb_gfx_copy_regions_client( CoreSurface             *source,
+ {
+      unsigned int             i, n = 0;
+      DFBRectangle             rect = { 0, 0, source->config.size.w, source->config.size.h };
+-     DFBRectangle             rects[num];
+-     DFBPoint                 points[num];
++     DFBRectangle            *rects =  (DFBRectangle*)alloca( sizeof(struct DFBRectangle) * num);
++     DFBPoint                *points =  (DFBPoint*)alloca( sizeof(struct DFBPoint) * num);
+      CoreGraphicsStateClient *client = _client ? _client : &StateClient::Get()->client;
+      CardState               *state  = client->state;
+      CardState                backup;
+-- 
+2.5.1
+

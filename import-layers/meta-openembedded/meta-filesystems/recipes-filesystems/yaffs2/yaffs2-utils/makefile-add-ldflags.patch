@@ -1,0 +1,21 @@
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+
+diff --git a/utils/Makefile b/utils/Makefile
+index 710ebbf..6259893 100644
+--- a/utils/Makefile
++++ b/utils/Makefile
+@@ -57,10 +57,10 @@ $(COMMONOBJS) $(MKYAFFSIMAGEOBJS) $(MKYAFFS2IMAGEOBJS) : %.o: %.c
+ 	$(CC) -c $(CFLAGS) $< -o $@
+ 
+ mkyaffsimage: $(MKYAFFSIMAGEOBJS) $(COMMONOBJS)
+-	$(CC) -o $@  $^
++	$(CC) $(LDFLAGS) -o $@  $^
+ 
+ mkyaffs2image: $(MKYAFFS2IMAGEOBJS) $(COMMONOBJS)
+-	$(CC) -o $@ $^
++	$(CC) $(LDFLAGS) -o $@ $^
+ 
+ 
+ clean:

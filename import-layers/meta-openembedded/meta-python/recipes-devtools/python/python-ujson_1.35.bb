@@ -10,4 +10,7 @@ SRC_URI[sha256sum] = "f66073e5506e91d204ab0c614a148d5aa938bdbf104751be66f8ad7a22
 PYPI_PACKAGE = "ujson"
 inherit pypi setuptools
 
-RDEPENDS_${PN} += "python-numbers"
+RDEPENDS_${PN} += "\
+    ${PYTHON_PN}-datetime \
+    ${PYTHON_PN}-numbers \
+    "

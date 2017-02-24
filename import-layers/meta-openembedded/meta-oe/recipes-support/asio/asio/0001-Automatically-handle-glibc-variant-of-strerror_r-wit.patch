@@ -1,0 +1,46 @@
+From 45c855400842fd40f200ae9b7abf9debf4ab5436 Mon Sep 17 00:00:00 2001
+From: Christopher Kohlhoff <chris@kohlhoff.com>
+Date: Sun, 28 Aug 2016 09:21:53 +1000
+Subject: [PATCH] Automatically handle glibc variant of strerror_r without
+ #ifdefs.
+
+---
+Upstream-Status: Backport https://github.com/chriskohlhoff/asio/commit/443bc17d13eb5e37de780ea6e23157493cf7b3b9
+ include/asio/impl/error_code.ipp | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
+
+diff --git a/include/asio/impl/error_code.ipp b/include/asio/impl/error_code.ipp
+index ccb70dd..a117658 100644
+--- a/include/asio/impl/error_code.ipp
++++ b/include/asio/impl/error_code.ipp
+@@ -97,20 +97,18 @@ public:
+ #if defined(__sun) || defined(__QNX__) || defined(__SYMBIAN32__)
+     using namespace std;
+     return strerror(value);
+-#elif defined(__MACH__) && defined(__APPLE__) \
+-  || defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__) \
+-  || defined(_AIX) || defined(__hpux) || defined(__osf__) \
+-  || defined(__ANDROID__)
+-    char buf[256] = "";
+-    using namespace std;
+-    strerror_r(value, buf, sizeof(buf));
+-    return buf;
+ #else
+     char buf[256] = "";
+-    return strerror_r(value, buf, sizeof(buf));
++    using namespace std;
++    return strerror_result(strerror_r(value, buf, sizeof(buf)), buf);
+ #endif
+ #endif // defined(ASIO_WINDOWS)
+   }
++
++private:
++  // Helper function to adapt the result from glibc's variant of strerror_r.
++  static const char* strerror_result(int, const char* s) { return s; }
++  static const char* strerror_result(const char* s, const char*) { return s; }
+ };
+ 
+ } // namespace detail
+-- 
+2.9.3
+

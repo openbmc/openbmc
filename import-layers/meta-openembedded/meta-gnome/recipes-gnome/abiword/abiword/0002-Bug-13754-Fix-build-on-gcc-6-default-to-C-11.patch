@@ -1,0 +1,74 @@
+From a83e6f50dbd5efa16fb39efe32b9de370f103130 Mon Sep 17 00:00:00 2001
+From: Hubert Figuiere <hub@figuiere.net>
+Date: Sat, 23 Jan 2016 20:46:02 +0000
+Subject: [PATCH] Bug 13754 - Fix build on gcc-6 (default to C++11).
+
+This is debian bug https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=811381
+
+git-svn-id: svn+ssh://svn.abisource.com/svnroot/abiword/trunk@35182 bcba8976-2d24-0410-9c9c-aab3bd5fdfd6
+
+Upstream-Status: Backport
+---
+ plugins/collab/backends/service/xp/RealmProtocol.cpp | 4 ++--
+ plugins/collab/backends/service/xp/soa_soup.cpp      | 2 +-
+ plugins/latex/xp/ie_exp_LaTeX.cpp                    | 2 +-
+ plugins/xslfo/xp/ie_exp_XSL-FO.cpp                   | 2 +-
+ 4 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/plugins/collab/backends/service/xp/RealmProtocol.cpp b/plugins/collab/backends/service/xp/RealmProtocol.cpp
+index fb426eb..347a49c 100644
+--- a/plugins/collab/backends/service/xp/RealmProtocol.cpp
++++ b/plugins/collab/backends/service/xp/RealmProtocol.cpp
+@@ -6,8 +6,8 @@ namespace protocolv1 {
+ 
+ #define MAX_PACKET_DATA_SIZE 64*1024*1024
+ 		
+-#define RPV1_PACKET_NONEXISTENT -2
+-#define RPV1_PACKET_VARIABLE -1
++#define RPV1_PACKET_NONEXISTENT uint32_t(-2)
++#define RPV1_PACKET_VARIABLE uint32_t(-1)
+ 	
+ static uint32_t body_size[6] = {
+ 	RPV1_PACKET_NONEXISTENT, /* 0: reserved */
+diff --git a/plugins/collab/backends/service/xp/soa_soup.cpp b/plugins/collab/backends/service/xp/soa_soup.cpp
+index 4b81735..f4f5134 100644
+--- a/plugins/collab/backends/service/xp/soa_soup.cpp
++++ b/plugins/collab/backends/service/xp/soa_soup.cpp
+@@ -163,7 +163,7 @@ namespace soup_soa {
+ 	
+ 	static bool _invoke(const std::string& /*url*/, const soa::method_invocation& /*mi*/, SoaSoupSession& sess, std::string& result) {
+ 		if (!sess.m_session || !sess.m_msg )
+-			return soa::GenericPtr();
++			return false;
+ 
+ 		guint status = soup_session_send_message (sess.m_session, sess.m_msg);
+ 		if (!(SOUP_STATUS_IS_SUCCESSFUL (status) ||
+diff --git a/plugins/latex/xp/ie_exp_LaTeX.cpp b/plugins/latex/xp/ie_exp_LaTeX.cpp
+index 7aaf3a9..8bcc250 100644
+--- a/plugins/latex/xp/ie_exp_LaTeX.cpp
++++ b/plugins/latex/xp/ie_exp_LaTeX.cpp
+@@ -1330,7 +1330,7 @@ void s_LaTeX_Listener::_outputData(const UT_UCSChar * data, UT_uint32 length)
+ 	m_pie->write(sBuf.c_str(),sBuf.size());
+ }
+ 
+-#define SUB(a,who) case a: subst = "\\(\\"who"\\)"; return true;
++#define SUB(a,who) case a: subst = "\\(\\" who"\\)"; return true;
+ #define SUBd(a,who) case a: subst = who; return true;
+ static bool _convertLettersToSymbols(char c, const char *& subst)
+ {
+diff --git a/plugins/xslfo/xp/ie_exp_XSL-FO.cpp b/plugins/xslfo/xp/ie_exp_XSL-FO.cpp
+index cc5e4e6..957226e 100644
+--- a/plugins/xslfo/xp/ie_exp_XSL-FO.cpp
++++ b/plugins/xslfo/xp/ie_exp_XSL-FO.cpp
+@@ -1451,7 +1451,7 @@ void s_XSL_FO_Listener::_openSection(PT_AttrPropIndex api)
+ 	{ \
+ 		UT_UTF8String esc = szValue; \
+ 		esc.escapeXML(); \
+-		buf += " "x"=\""; \
++		buf += " " x"=\""; \
+ 		buf += esc.utf8_str(); \
+ 		buf += "\""; \
+ 	}
+-- 
+2.5.5
+

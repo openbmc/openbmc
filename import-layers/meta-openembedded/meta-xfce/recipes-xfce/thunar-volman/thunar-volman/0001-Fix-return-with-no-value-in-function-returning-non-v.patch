@@ -1,0 +1,26 @@
+From 2e295e9ce8f7f60a271adf004588b0d8db88db09 Mon Sep 17 00:00:00 2001
+From: Matt Thirtytwo <matt.59491@gmail.com>
+Date: Sat, 7 Mar 2015 22:50:32 +0100
+Subject: [PATCH] Fix return with no value in function returning non-void (bug
+ #11656)
+
+---
+ thunar-volman/tvm-block-device.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/thunar-volman/tvm-block-device.c b/thunar-volman/tvm-block-device.c
+index da31efa..edb6cad 100644
+--- a/thunar-volman/tvm-block-device.c
++++ b/thunar-volman/tvm-block-device.c
+@@ -714,7 +714,7 @@ tvm_block_device_mount (TvmContext *context)
+   GMountOperation *mount_operation;
+   GVolume         *volume;
+ 
+-  g_return_if_fail (context != NULL);
++  g_return_val_if_fail ((context != NULL), FALSE);
+ 
+   /* determine the GVolume corresponding to the udev device */
+   volume = 
+-- 
+1.9.0
+

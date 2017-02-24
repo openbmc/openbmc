@@ -12,7 +12,7 @@ HOMEPAGE = "http://www.python-ldap.org/"
 DEPENDS = "python openldap cyrus-sasl"
 
 PYPI_PACKAGE = "python-ldap"
-inherit pypi setuptools  
+inherit pypi setuptools
 
 LIC_FILES_CHKSUM = "file://LICENCE;md5=a41c82edffa04912007cae1d20cac555"
 SRC_URI[md5sum] = "a15827ca13c90e9101e5e9405c1d83be"

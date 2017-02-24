@@ -1,0 +1,62 @@
+test for __compar_fn_t and if not defined by libc then define it
+help make directfb compile with musl
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: DirectFB-1.7.7/configure.in
+===================================================================
+--- DirectFB-1.7.7.orig/configure.in
++++ DirectFB-1.7.7/configure.in
+@@ -112,6 +112,17 @@ AC_CHECK_SIZEOF(long)
+ AC_CHECK_SIZEOF(long long)
+ AC_CHECK_FUNCS(fork)
+ 
++AC_CACHE_CHECK([for compar_fn_t in stdlib.h],ccache_cv_COMPAR_FN_T, [
++    AC_TRY_COMPILE(
++        [#include <stdlib.h>],
++        [void test_fn(void) { qsort(NULL, 0, 0, (__compar_fn_t)NULL); }],
++        ccache_cv_COMPAR_FN_T=yes,
++        ccache_cv_COMPAR_FN_T=no)])
++if test x"$ccache_cv_COMPAR_FN_T" = x"yes"; then
++   AC_DEFINE(HAVE_COMPAR_FN_T, 1,
++             Define to 1 if you have the `__compar_fn_t' typedef.)
++fi
++
+ AC_PATH_PROGS(PERL, perl5 perl)
+ 
+ AC_PATH_PROG(MAN2HTML, man2html, no)
+Index: DirectFB-1.7.7/inputdrivers/lirc/lirc.c
+===================================================================
+--- DirectFB-1.7.7.orig/inputdrivers/lirc/lirc.c
++++ DirectFB-1.7.7/inputdrivers/lirc/lirc.c
+@@ -59,6 +59,11 @@
+ 
+ #include <core/input_driver.h>
+ 
++#if HAVE_COMPAR_FN_T
++#define COMPAR_FN_T __compar_fn_t
++#else
++typedef int (*COMPAR_FN_T)(const void *, const void *);
++#endif
+ 
+ DFB_INPUT_DRIVER( lirc )
+ 
+@@ -97,7 +102,7 @@ static DFBInputDeviceKeySymbol lirc_pars
+           qsort ( keynames,
+                   D_ARRAY_SIZE( keynames ),
+                   sizeof(keynames[0]),
+-                  (__compar_fn_t) keynames_sort_compare );
++                  (COMPAR_FN_T) keynames_sort_compare );
+           keynames_sorted = true;
+      }
+ 
+@@ -124,7 +129,7 @@ static DFBInputDeviceKeySymbol lirc_pars
+                symbol_name = bsearch( name, keynames,
+                                       D_ARRAY_SIZE( keynames ),
+                                       sizeof(keynames[0]),
+-                                      (__compar_fn_t) keynames_compare );
++                                      (COMPAR_FN_T) keynames_compare );
+                if (symbol_name)
+                     return symbol_name->symbol;
+                break;

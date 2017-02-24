@@ -1,6 +1,7 @@
 require lirc.inc
 
 SRC_URI += " \
+    file://0001-lircrcd-Mark-local-inline-funtions-as-static.patch \
     file://lircd.service \
     file://lircd.init \
     file://lircexec.init \
@@ -17,7 +18,7 @@ SYSTEMD_PACKAGES = "lirc"
 SYSTEMD_SERVICE_${PN} = "lircd.service lircmd.service"
 SYSTEMD_AUTO_ENABLE_lirc = "enable"
 
-inherit autotools pkgconfig systemd pythonnative
+inherit autotools pkgconfig systemd python3native
 
 PACKAGECONFIG[systemd] = "--with-systemdsystemunitdir=${systemd_unitdir}/system/,--without-systemdsystemunitdir,systemd"
 PACKAGECONFIG[x11] = "--with-x,--with-x=no,libx11,"

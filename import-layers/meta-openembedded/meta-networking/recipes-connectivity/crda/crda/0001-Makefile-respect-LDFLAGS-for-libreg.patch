@@ -1,0 +1,29 @@
+From 1e1a78b7b4fa1662b4447aa19c15b1e839b7e9db Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Stefan=20M=C3=BCller-Klieser?= <s.mueller-klieser@phytec.de>
+Date: Wed, 24 Aug 2016 10:58:45 +0200
+Subject: [PATCH] Makefile: respect LDFLAGS for libreg
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Stefan Müller-Klieser <s.mueller-klieser@phytec.de>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 2879896..1650db8 100644
+--- a/Makefile
++++ b/Makefile
+@@ -116,7 +116,7 @@ keys-%.c: utils/key2pub.py $(wildcard $(PUBKEY_DIR)/*.pem)
+ 
+ $(LIBREG): regdb.h reglib.h reglib.c
+ 	$(NQ) '  CC  ' $@
+-	$(Q)$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ -shared -Wl,-soname,$(LIBREG) $^ $(LIBREGLDLIBS)
++	$(Q)$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ -shared -Wl,-soname,$(LIBREG) $^ $(LDFLAGS) $(LIBREGLDLIBS)
+ 
+ install-libreg-headers:
+ 	$(NQ) '  INSTALL  libreg-headers'
+-- 
+1.9.1
+

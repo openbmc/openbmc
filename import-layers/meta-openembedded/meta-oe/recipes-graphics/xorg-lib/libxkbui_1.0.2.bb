@@ -1,6 +1,6 @@
 require recipes-graphics/xorg-lib/xorg-lib-common.inc
 SUMMARY = "X11 keyboard UI presentation library"
-LICENSE = "GPL"
+LICENSE = "SGI-1"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4641deddaa80fe7ca88e944e1fd94a94"
 DEPENDS += "virtual/libx11 libxt libxkbfile"
 PE = "1"

@@ -13,7 +13,7 @@ LIC_FILES_CHKSUM = "file://doc/COPYING;md5=1678edfe8de9be9564d23761ae2fa794"
 DEPENDS = "xfsprogs"
 
 SRC_URI = "ftp://oss.sgi.com/projects/xfs/cmd_tars/dmapi-${PV}.tar.gz \
-	   file://remove-install-as-user.patch \
+           file://remove-install-as-user.patch \
            file://dmapi_aarch64_configure_support.patch \
           "
 SRC_URI[md5sum] = "cd825d4e141c16011367e0a0dd98c9c5"
@@ -29,3 +29,5 @@ do_install () {
     install -d ${D}${libdir}
     oe_runmake install install-dev PKG_DEVLIB_DIR=${libdir}
 }
+
+PNBLACKLIST[dmapi] ?= "Depends on broken xfsprogs"

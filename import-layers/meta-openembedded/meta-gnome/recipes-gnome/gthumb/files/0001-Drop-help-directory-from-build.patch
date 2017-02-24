@@ -1,0 +1,25 @@
+From 48cb878cb724e7a509260f014db6365510b8b541 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 17 May 2016 14:05:29 +0300
+Subject: [PATCH] Drop help directory from build
+
+It hardcodes the use of xml2po tool form gnome-doc-utils
+
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index d056875..3fc4a41 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,4 +1,4 @@
+-SUBDIRS = m4 copy-n-paste data po gthumb extensions tests help
++SUBDIRS = m4 copy-n-paste data po gthumb extensions tests
+ 
+ ACLOCAL_AMFLAGS = -I m4
+ AMCFLAGS = -fPIC -DPIC
+-- 
+2.8.1
+

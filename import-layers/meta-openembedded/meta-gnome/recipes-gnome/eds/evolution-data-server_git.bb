@@ -48,7 +48,7 @@ do_compile_prepend() {
 
 EXTRA_OECONF = "--without-openldap \
                 --with-libdb=${STAGING_DIR_HOST}${prefix} \
-                --disable-nntp --disable-goa --disable-weather"
+                --disable-nntp --disable-goa --disable-weather --disable-gtk-doc"
 
 PACKAGES =+ "libcamel libcamel-dev libebook libebook-dev libecal libecal-dev \
              libedata-book libedata-book-dev libedata-cal libedata-cal-dev \

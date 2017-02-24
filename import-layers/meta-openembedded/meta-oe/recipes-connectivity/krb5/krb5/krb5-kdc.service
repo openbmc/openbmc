@@ -1,0 +1,13 @@
+[Unit]
+Description=MIT Kerberos KDC
+After=syslog.target network.target
+ConditionPathExists=/etc/krb5.conf
+
+[Service]
+Type=forking
+ExecStart=/usr/sbin/krb5kdc
+SuccessExitStatus=1 2 SIGKILL
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

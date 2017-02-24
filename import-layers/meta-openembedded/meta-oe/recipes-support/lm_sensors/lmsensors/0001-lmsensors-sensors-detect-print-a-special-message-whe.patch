@@ -1,0 +1,40 @@
+From c4428260e7685ebaf5c26c6ecaae5a56849853e8 Mon Sep 17 00:00:00 2001
+From: Li Zhou <li.zhou@windriver.com>
+Date: Tue, 6 Sep 2016 14:04:29 +0800
+Subject: [PATCH] lmsensors: sensors-detect: print a special message when there
+ isn't enough cpu info
+
+When running sensors-detect, if there isn't enough information in
+/proc/cpuinfo for this arch (e.g. ppc64), "Use of uninitialized value
+in concatenation (.) or string at /usr/sbin/sensors-detect line 2867"
+and incomplete "# Processor: (//)" will be printed.
+Here print out a prompt for such a case.
+
+Upstream-Status: Pending
+
+Signed-off-by: Li Zhou <li.zhou@windriver.com>
+---
+ prog/detect/sensors-detect | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/prog/detect/sensors-detect b/prog/detect/sensors-detect
+index 3c2b44f..5f62405 100755
+--- a/prog/detect/sensors-detect
++++ b/prog/detect/sensors-detect
+@@ -2864,7 +2864,12 @@ sub initialize_cpu_list
+ sub print_cpu_info
+ {
+ 	my $cpu = $cpu[0];
+-	print "# Processor: $cpu->{'model name'} ($cpu->{'cpu family'}/$cpu->{model}/$cpu->{stepping})\n";
++	if ( $cpu->{'model name'} && $cpu->{'cpu family'} && $cpu->{model} && $cpu->{stepping} ) {
++		print "# Processor: $cpu->{'model name'} ($cpu->{'cpu family'}/$cpu->{model}/$cpu->{stepping})\n";
++	}
++	else {
++		print "# Processor: There isn't enough cpu info for this arch!!!\n";
++	}
+ }
+ 
+ # @i2c_adapters is a list of references to hashes, one hash per I2C/SMBus
+-- 
+1.9.1
+

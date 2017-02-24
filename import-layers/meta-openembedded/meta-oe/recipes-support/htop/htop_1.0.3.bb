@@ -16,7 +16,7 @@ SRC_URI[sha256sum] = "055c57927f75847fdc222b5258b079a9542811a9dcf5421c615c7e17f5
 LDFLAGS_append_libc-uclibc = " -lubacktrace"
 
 do_configure_prepend () {
-	rm -rf ${S}/config.h
+    rm -rf ${S}/config.h
 }
 
 inherit autotools

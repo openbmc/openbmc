@@ -45,3 +45,5 @@ python populate_packages_prepend () {
         recursive=True,
         prepend=True)
 }
+
+PNBLACKLIST[gnumeric] ?= "Depends on broken libgnomeprint"

@@ -17,6 +17,8 @@ SRCREV = "r1435"
 SRC_URI = "svn://google-breakpad.googlecode.com/svn;module=trunk;protocol=http"
 S = "${WORKDIR}/trunk"
 
+COMPATIBLE_MACHINE_powerpc = "(!.*ppc).*"
+
 do_install_append() {
         install -d ${D}${includedir}
         install -d ${D}${includedir}/breakpad

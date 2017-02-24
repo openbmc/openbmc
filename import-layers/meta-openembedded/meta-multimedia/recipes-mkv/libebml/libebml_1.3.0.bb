@@ -2,15 +2,49 @@ SUMMARY = "libebml is a C++ libary to parse EBML files"
 LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://LICENSE.LGPL;md5=f14599a2f089f6ff8c97e2baa4e3d575"
 
-SRC_URI = "http://dl.matroska.org/downloads/libebml/libebml-${PV}.tar.bz2"
+SRC_URI = "\
+    http://dl.matroska.org/downloads/libebml/libebml-${PV}.tar.bz2 \
+    file://ldflags.patch \
+    file://override-uname.patch \
+"
 SRC_URI[md5sum] = "efec729bf5a51e649e1d9d1f61c0ae7a"
 SRC_URI[sha256sum] = "83b074d6b62715aa0080406ea84d33df2e44b5d874096640233a4db49b8096de"
 
-EXTRA_OEMAKE = "-e MAKEFLAGS="
+do_unpack[postfuncs] += "dos2unix"
 
-do_compile() {
-    cd ${S}/make/linux
-    oe_runmake CROSS="${TARGET_PREFIX}"
+dos2unix () {
+    cr="$(printf '\r')"
+    for f in ${S}/make/*/Makefile; do
+        tr -d "$cr" <"$f" >"$f.new" && \
+            mv "$f.new" "$f"
+    done
+}
+
+LIBEBML_OS = "Unknown"
+LIBEBML_OS_linux = "Linux"
+LIBEBML_OS_darwin = "Darwin"
+LIBEBML_OS_mingw32 = "Windows"
+
+EXTRA_OEMAKE = "\
+    'TARGET_OS=${LIBEBML_OS}' \
+    \
+    'CXX=${CXX}' \
+    'LD=${CXX}' \
+    'AR=${AR}' \
+    'RANLIB=${RANLIB}' \
+    \
+    'DEBUGFLAGS=' \
+    'CPPFLAGS=${CPPFLAGS}' \
+    'CXXFLAGS=${CXXFLAGS}' \
+    'LDFLAGS=${LDFLAGS}' \
+    \
+    'prefix=${prefix}' \
+    'libdir=${libdir}' \
+    'includedir=${includedir}/ebml' \
+"
+
+do_compile () {
+    oe_runmake -C make/linux
 }
 
 do_install() {

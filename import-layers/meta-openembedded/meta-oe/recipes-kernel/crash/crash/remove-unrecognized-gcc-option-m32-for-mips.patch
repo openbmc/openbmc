@@ -13,16 +13,16 @@ diff --git a/configure.c b/configure.c
 index cf1973b..71e97b3 100644
 --- a/configure.c
 +++ b/configure.c
-@@ -148,7 +148,7 @@ void add_extra_lib(char *);
+@@ -151,7 +151,7 @@ void add_extra_lib(char *);
  #define TARGET_CFLAGS_PPC64_ON_X86_64  "TARGET_CFLAGS="
  #define TARGET_CFLAGS_MIPS            "TARGET_CFLAGS=-D_FILE_OFFSET_BITS=64"
  #define TARGET_CFLAGS_MIPS_ON_X86     "TARGET_CFLAGS=-D_FILE_OFFSET_BITS=64"
 -#define TARGET_CFLAGS_MIPS_ON_X86_64  "TARGET_CFLAGS=-m32 -D_FILE_OFFSET_BITS=64"
 +#define TARGET_CFLAGS_MIPS_ON_X86_64  "TARGET_CFLAGS=-D_FILE_OFFSET_BITS=64"
+ #define TARGET_CFLAGS_SPARC64         "TARGET_CFLAGS="
  
  #define GDB_TARGET_DEFAULT        "GDB_CONF_FLAGS="
- #define GDB_TARGET_ARM_ON_X86     "GDB_CONF_FLAGS=--target=arm-elf-linux"
-@@ -158,7 +158,7 @@ void add_extra_lib(char *);
+@@ -162,7 +162,7 @@ void add_extra_lib(char *);
  #define GDB_TARGET_ARM64_ON_X86_64  "GDB_CONF_FLAGS=--target=aarch64-elf-linux"   /* TBD */
  #define GDB_TARGET_PPC64_ON_X86_64  "GDB_CONF_FLAGS=--target=powerpc64le-unknown-linux-gnu"
  #define GDB_TARGET_MIPS_ON_X86     "GDB_CONF_FLAGS=--target=mipsel-elf-linux"

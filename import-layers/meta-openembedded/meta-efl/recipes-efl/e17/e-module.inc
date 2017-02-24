@@ -5,7 +5,7 @@ DEPENDS = "e-wm"
 SRCREV = "${EFL_SRCREV}"
 INC_PR = "r0"
 
-SRCNAME = "E-MODULES-EXTRA/${PN}"
+SRCNAME = "E-MODULES-EXTRA/${BPN}"
 
 inherit e gettext
 SRC_URI = "${E_SVN}/trunk;module=${SRCNAME};protocol=http;scmdata=keep"

@@ -1,0 +1,126 @@
+ src/tracker-extract/tracker-extract-gif.c |   36 +++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
+--- a/src/tracker-extract/tracker-extract-gif.c	
++++ a/src/tracker-extract/tracker-extract-gif.c	
+@@ -75,6 +75,39 @@
+ 	return (GIF_OK);
+ }
+ 
++#if GIFLIB_MAJOR >= 5
++static inline void
++gif_error (const gchar *action, int err)
++{
++	const char *str = GifErrorString (err);
++	if (str != NULL) {
++		g_message ("%s, error: '%s'", action, str);
++	} else {
++		g_message ("%s, undefined error %d", action, err);
++	}
++}
++#else /* GIFLIB_MAJOR >= 5 */
++static inline void print_gif_error()
++{
++#if defined(GIFLIB_MAJOR) && defined(GIFLIB_MINOR) && ((GIFLIB_MAJOR == 4 && GIFLIB_MINOR >= 2) || GIFLIB_MAJOR > 4)
++	const char *str = GifErrorString ();
++	if (str != NULL) {
++		g_message ("GIF, error: '%s'", str);
++	} else {
++		g_message ("GIF, undefined error");
++	}
++#else
++	PrintGifError();
++#endif
++}
++#endif /* GIFLIB_MAJOR >= 5 */
++
++/* giflib 5.1 changed the API of DGifCloseFile to take two arguments */
++#if !defined(GIFLIB_MAJOR) || \
++    !(GIFLIB_MAJOR > 5 || (GIFLIB_MAJOR == 5 && GIFLIB_MINOR >= 1))
++#define DGifCloseFile(a, b) DGifCloseFile(a)
++#endif
++
+ static void
+ read_metadata (TrackerSparqlBuilder *preupdate,
+                TrackerSparqlBuilder *metadata,
+@@ -100,14 +133,22 @@
+ 		ExtBlock extBlock;
+ 
+ 		if (DGifGetRecordType(gifFile, &RecordType) == GIF_ERROR) {
+-			PrintGifError();
++#if GIFLIB_MAJOR < 5
++			print_gif_error ();
++#else  /* GIFLIB_MAJOR < 5 */
++			gif_error ("Could not read next GIF record type", gifFile->Error);
++#endif /* GIFLIB_MAJOR < 5 */
+ 			return;
+ 		}
+ 
+ 		switch (RecordType) {
+ 			case IMAGE_DESC_RECORD_TYPE:
+ 			if (DGifGetImageDesc(gifFile) == GIF_ERROR) {
+-				PrintGifError();
++#if GIFLIB_MAJOR < 5
++				print_gif_error();
++#else  /* GIFLIB_MAJOR < 5 */
++				gif_error ("Could not get GIF record information", gifFile->Error);
++#endif /* GIFLIB_MAJOR < 5 */
+ 				return;
+ 			}
+ 
+@@ -117,7 +158,11 @@
+ 			framedata = g_malloc (framewidth*frameheight);
+ 
+ 			if (DGifGetLine(gifFile, framedata, framewidth*frameheight)==GIF_ERROR) {
+-				PrintGifError();
++#if GIFLIB_MAJOR < 5
++				print_gif_error();
++#else  /* GIFLIB_MAJOR < 5 */
++				gif_error ("Could not load a block of GIF pixes", gifFile->Error);
++#endif /* GIFLIB_MAJOR < 5 */
+ 				return;
+ 			}
+ 
+@@ -593,6 +638,9 @@
+ 	gchar *filename, *uri;
+ 	GFile *file;
+ 	int fd;
++#if GIFLIB_MAJOR >= 5
++	int err;
++#endif
+ 
+ 	preupdate = tracker_extract_info_get_preupdate_builder (info);
+ 	metadata = tracker_extract_info_get_metadata_builder (info);
+@@ -617,8 +665,14 @@
+ 		return FALSE;
+ 	}	
+ 
++#if GIFLIB_MAJOR < 5
+ 	if ((gifFile = DGifOpenFileHandle (fd)) == NULL) {
+-		PrintGifError ();
++		print_gif_error ();
++#else   /* GIFLIB_MAJOR < 5 */
++	if ((gifFile = DGifOpenFileHandle (fd, &err)) == NULL) {
++		gif_error ("Could not open GIF file with handle", err);
++#endif /* GIFLIB_MAJOR < 5 */
++		g_free (filename);
+ 		close (fd);
+ 		return FALSE;
+ 	}
+@@ -637,10 +691,15 @@
+ 	g_string_free (where, TRUE);
+ 
+ 	g_free (uri);
+-
++#if GIFLIB_MAJOR < 5
+ 	if (DGifCloseFile (gifFile) != GIF_OK) {
+-		PrintGifError ();
++		print_gif_error ();
++	}
++#else  /* GIFLIB_MAJOR < 5 */
++	if (DGifCloseFile (gifFile, NULL) != GIF_OK) {
++		gif_error ("Could not close GIF file", gifFile->Error);
+ 	}
++#endif /* GIFLIB_MAJOR < 5 */
+ 
+ 	return TRUE;
+ }

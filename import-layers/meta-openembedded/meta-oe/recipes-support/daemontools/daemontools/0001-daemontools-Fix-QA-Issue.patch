@@ -1,0 +1,26 @@
+From a86c4209da695909424db0c9108592194a3094b7 Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@cn.fujitsu.com>
+Date: Sat, 6 Aug 2016 00:47:37 +0900
+Subject: [PATCH] daemontools: Fix QA Issue
+
+To fix the QA Issues as following:
+
+ERROR: daemontools-0.76-r0 do_package_qa: QA Issue: No GNU_HASH in the elf binary: '/build-poky/tmp/work/i586-poky-linux/daemontools/0.76-r0/packages-split/daemontools/usr/bin/tai64nlocal'
+
+Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
+---
+ src/conf-ld | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/conf-ld b/src/conf-ld
+index 2a44210..c7e7755 100644
+--- a/src/conf-ld
++++ b/src/conf-ld
+@@ -1,3 +1,3 @@
+-${CC}
++${CC} ${LDFLAGS}
+ 
+ This will be used to link .o files into an executable.
+-- 
+2.7.4
+

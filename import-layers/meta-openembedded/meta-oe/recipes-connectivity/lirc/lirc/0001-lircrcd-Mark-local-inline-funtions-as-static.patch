@@ -1,0 +1,49 @@
+From c2be4543e4777c9e3d74b30326ba37b01917b0a9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 25 Aug 2016 03:02:37 +0000
+Subject: [PATCH] lircrcd: Mark local inline funtions as static
+
+These functions are not used anywhere outside
+this file, so they should be converted into static
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ daemons/lircrcd.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/daemons/lircrcd.c b/daemons/lircrcd.c
+index 55777cd..5ddc94d 100644
+--- a/daemons/lircrcd.c
++++ b/daemons/lircrcd.c
+@@ -153,7 +153,7 @@ char *s;
+ /* A safer write(), since sockets might not write all but only some of the
+    bytes requested */
+ 
+-inline int write_socket(int fd, char *buf, int len)
++static inline int write_socket(int fd, char *buf, int len)
+ {
+ 	int done, todo = len;
+ 
+@@ -167,7 +167,7 @@ inline int write_socket(int fd, char *buf, int len)
+ 	return (len);
+ }
+ 
+-inline int write_socket_len(int fd, char *buf)
++static inline int write_socket_len(int fd, char *buf)
+ {
+ 	int len;
+ 
+@@ -177,7 +177,7 @@ inline int write_socket_len(int fd, char *buf)
+ 	return (1);
+ }
+ 
+-inline int read_timeout(int fd, char *buf, int len, int timeout)
++static inline int read_timeout(int fd, char *buf, int len, int timeout)
+ {
+ 	fd_set fds;
+ 	struct timeval tv;
+-- 
+1.9.1
+

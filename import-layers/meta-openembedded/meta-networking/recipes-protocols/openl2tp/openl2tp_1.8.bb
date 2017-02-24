@@ -14,14 +14,16 @@ DEPENDS = "popt flex readline"
 SRC_URI = "http://ftp.jaist.ac.jp/pub/sourceforge/o/op/${PN}/${PN}/${PV}/${BP}.tar.gz \
            file://Makefile-modify-CFLAGS-to-aviod-build-error.patch \
            file://openl2tp-simplify-gcc-warning-hack.patch \
-          "
+           file://Makefile-obey-LDFLAGS.patch \
+           file://0001-test-pppd_dummy.c-Fix-return-value.patch \
+           "
 SRC_URI[md5sum] = "e3d08dedfb9e6a9a1e24f6766f6dadd0"
 SRC_URI[sha256sum] = "1c97704d4b963a87fbc0e741668d4530933991515ae9ab0dffd11b5444f4860f"
 
 inherit autotools-brokensep pkgconfig
 
 PARALLEL_MAKE = ""
-EXTRA_OEMAKE = 'CFLAGS="${CFLAGS} -Wno-nused-but-set-variable"'
+EXTRA_OEMAKE = 'CFLAGS="${CFLAGS} -Wno-unused-but-set-variable"'
 
 do_compile_prepend() {
     sed -i -e "s:SYS_LIBDIR=.*:SYS_LIBDIR=${libdir}:g" \
