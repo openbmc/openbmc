@@ -2,6 +2,10 @@
 Description=Phosphor Inband IPMI
 Wants=clear-once.service
 After=clear-once.service
+Wants=obmc-mapper.target
+After=obmc-mapper.target
+Wants=mapper-wait@-org-openbmc-settings-host0.service
+After=mapper-wait@-org-openbmc-settings-host0.service
 
 [Service]
 Restart=always

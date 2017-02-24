@@ -4,6 +4,8 @@ Wants=mapper-wait@-org-openbmc-NetworkManager-Interface.service
 After=mapper-wait@-org-openbmc-NetworkManager-Interface.service
 Wants=mapper-wait@-org-openbmc-settings-host0.service
 After=mapper-wait@-org-openbmc-settings-host0.service
+Wants=mapper-wait@-org-openbmc-control-power0.service
+After=mapper-wait@-org-openbmc-control-power0.service
 
 [Service]
 Restart=always
