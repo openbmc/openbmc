@@ -1,7 +1,7 @@
-From e3ffe9438fe8417586d0045d00eb1368ca3a71b6 Mon Sep 17 00:00:00 2001
+From a3d43c1b754fc0576b428d36a877b9b50dd5d1ce Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 6 Feb 2016 11:10:47 -0800
-Subject: [PATCH 06/13] zero-out wl buffers in egl_surface_free
+Subject: [PATCH 06/12] zero-out wl buffers in egl_surface_free
 
 origins from buildroot
 
@@ -11,7 +11,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 2 insertions(+)
 
 diff --git a/interface/khronos/egl/egl_client_surface.c b/interface/khronos/egl/egl_client_surface.c
-index 49cf7e5..512c83b 100644
+index 42350bf..1f923d9 100644
 --- a/interface/khronos/egl/egl_client_surface.c
 +++ b/interface/khronos/egl/egl_client_surface.c
 @@ -690,11 +690,13 @@ void egl_surface_free(EGL_SURFACE_T *surface)
@@ -29,5 +29,5 @@ index 49cf7e5..512c83b 100644
  #endif
     }
 -- 
-2.9.0
+2.10.2
 
