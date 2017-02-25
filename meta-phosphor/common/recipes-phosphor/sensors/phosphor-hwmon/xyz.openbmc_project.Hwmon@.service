@@ -1,6 +1,7 @@
 [Unit]
 Description=Phosphor Hwmon Poller
 ConditionFileNotEmpty=/etc/default/obmc/hwmon/%I.conf
+StopWhenUnneeded=true
 
 [Service]
 Restart=always
