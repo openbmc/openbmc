@@ -1,8 +1,7 @@
 [Unit]
 Description=Phosphor Fan Control
-Wants=obmc-fans-ready.target
+Wants=obmc-fans-ready.target obmc-fan-control.target
 After=obmc-fans-ready.target
-Wants=obmc-fan-control.target
 Before=obmc-fan-control.target
 
 [Service]

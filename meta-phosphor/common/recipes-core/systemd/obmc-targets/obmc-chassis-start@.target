@@ -1,9 +1,7 @@
 [Unit]
 Description=Chassis%i (Start)
-Wants={SYSTEMD_DEFAULT_TARGET}
-After={SYSTEMD_DEFAULT_TARGET}
-Wants=mapper-wait@-org-openbmc-control-chassis%i.service
-After=mapper-wait@-org-openbmc-control-chassis%i.service
+Wants={SYSTEMD_DEFAULT_TARGET} mapper-wait@-org-openbmc-control-chassis%i.service
+After={SYSTEMD_DEFAULT_TARGET} mapper-wait@-org-openbmc-control-chassis%i.service
 Conflicts=obmc-chassis-stop@%i.target
 RefuseManualStop=yes
 OnFailure=obmc-quiesce-host@%i.target

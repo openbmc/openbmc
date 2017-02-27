@@ -1,10 +1,8 @@
 [Unit]
 Description=Stop Power%i
-Wants=obmc-power-stop@%i.target
+Wants=obmc-power-stop@%i.target mapper-wait@-org-openbmc-control-power%i.service
 Before=obmc-power-stop@%i.target
-After=obmc-power-stop-pre@%i.target
-Wants=mapper-wait@-org-openbmc-control-power%i.service
-After=mapper-wait@-org-openbmc-control-power%i.service
+After=obmc-power-stop-pre@%i.target mapper-wait@-org-openbmc-control-power%i.service
 Conflicts=obmc-power-chassis-on@%i.target
 
 [Service]
