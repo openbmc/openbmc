@@ -1,10 +1,7 @@
 [Unit]
 Description=Phosphor MBOX Daemon
-BindsTo=dev-aspeed\x2dlpc\x2dctrl.device
-After=dev-aspeed\x2dlpc\x2dctrl.device
-BindsTo=dev-aspeed\x2dmbox.device
-After=dev-aspeed\x2dmbox.device
-
+BindsTo=dev-aspeed\x2dlpc\x2dctrl.device dev-aspeed\x2dmbox.device
+After=dev-aspeed\x2dlpc\x2dctrl.device dev-aspeed\x2dmbox.device
 
 [Service]
 Restart=always

@@ -1,9 +1,7 @@
 [Unit]
 Description=Wait for Power%i to turn on
-Before=obmc-power-on@%i.target
-Wants=obmc-power-start@%i.target
-Before=obmc-power-start@%i.target
-Wants=mapper-wait@-org-openbmc-control-power%i.service
+Before=obmc-power-on@%i.target obmc-power-start@%i.target 
+Wants=obmc-power-start@%i.target mapper-wait@-org-openbmc-control-power%i.service
 After=mapper-wait@-org-openbmc-control-power%i.service
 Conflicts=obmc-power-chassis-off@%i.target
 
