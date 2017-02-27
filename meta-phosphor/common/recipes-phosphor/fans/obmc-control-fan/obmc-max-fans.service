@@ -1,8 +1,7 @@
 [Unit]
 Description=Set Fans to Maximum
 Wants=mapper-wait@-org-openbmc-control-fans.service
-After=mapper-wait@-org-openbmc-control-fans.service
-After=obmc-fan-control.target
+After=mapper-wait@-org-openbmc-control-fans.service obmc-fan-control.target
 
 [Service]
 Type=oneshot
