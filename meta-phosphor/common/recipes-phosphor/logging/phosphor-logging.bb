@@ -22,7 +22,7 @@ PROVIDES += "virtual/obmc-logging-mgmt"
 RPROVIDES_${PN} += "virtual-obmc-logging-mgmt"
 
 SRC_URI += "git://github.com/openbmc/phosphor-logging"
-SRCREV = "23b475a04b61ce1b25dc3ca9c0db04fdfdd415e3"
+SRCREV = "1a7508bbfd10ab9b97cfff757e57a88b7a34c576"
 
 S = "${WORKDIR}/git"
 
