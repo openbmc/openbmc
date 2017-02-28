@@ -17,7 +17,7 @@ PROVIDES += "virtual/obmc-net-ipmi"
 RPROVIDES_${PN} += "virtual-obmc-net-ipmi"
 
 SRC_URI += "git://github.com/openbmc/phosphor-net-ipmid"
-SRCREV = "1e7aa196037367c44fc7e61903890505a1104615"
+SRCREV = "1e5a76a058dda15ec234483152f5fb9b5109589e"
 
 S = "${WORKDIR}/git"
 
