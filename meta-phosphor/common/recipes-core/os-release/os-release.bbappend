@@ -1,7 +1,8 @@
 def run_git(d, cmd):
         try:
                 oeroot = d.getVar('COREBASE', True)
-                return bb.process.run("git --git-dir %s/.git %s" %(oeroot, cmd))[0].strip('\n')
+                return bb.process.run("git --work-tree %s --git-dir %s/.git %s"
+                                      % (oeroot, oeroot, cmd))[0].strip('\n')
         except:
                 pass
 
