@@ -10,6 +10,6 @@ S = "${WORKDIR}/git"
 # Copies example led layout yaml file
 do_install() {
     SRC=${S}
-    DEST=${STAGING_DATADIR_NATIVE}/phosphor-led-manager
+    DEST=${D}${datadir}/phosphor-led-manager
     install -D ${SRC}/led.yaml ${DEST}/led.yaml
 }
