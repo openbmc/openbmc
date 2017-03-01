@@ -11,6 +11,10 @@ SOFTWARE_MGR_PACKAGES = " \
     ${PN}-version \
 "
 PACKAGE_BEFORE_PN = "${PN}-version"
+PACKAGES_remove = "${PN}"
+RDEPENDS_${PN}-dev = "${SOFTWARE_MGR_PACKAGES}"
+RDEPENDS_${PN}-staticdev = "${SOFTWARE_MGR_PACKAGES}"
+
 DBUS_PACKAGES = "${SOFTWARE_MGR_PACKAGES}"
 
 # Set SYSTEMD_PACKAGES to empty because we do not want ${PN} and DBUS_PACKAGES
