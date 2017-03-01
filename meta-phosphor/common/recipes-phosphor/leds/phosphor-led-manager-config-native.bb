@@ -3,14 +3,15 @@ PR = "r1"
 
 inherit obmc-phosphor-utils
 inherit obmc-phosphor-license
+inherit native
 
 # Default is the example set of data.
-PHOSPHOR_LED_MANAGER_CONFIG ??= "${PN}-example-native"
+PHOSPHOR_LED_MANAGER_CONFIG ??= "${BPN}-example-native"
 
 # Choose appropriate yaml file
 def get_depends(d):
     if d.getVar('USE_MRW', 'yes'):
-        return "${PN}-mrw-native"
+        return "${BPN}-mrw-native"
     else:
         return "${PHOSPHOR_LED_MANAGER_CONFIG}"
 
