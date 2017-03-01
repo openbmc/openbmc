@@ -14,6 +14,6 @@ RDEPENDS_${PN} += "libsystemd"
 
 S = "${WORKDIR}/git"
 
-DBUS_SERVICE_${PN} += "xyz.openbmc_project.ledmanager.service"
+DBUS_SERVICE_${PN} += "xyz.openbmc_project.LED.GroupManager.service"
 
 EXTRA_OECONF = "YAML_PATH=${STAGING_DATADIR_NATIVE}/${PN}"
