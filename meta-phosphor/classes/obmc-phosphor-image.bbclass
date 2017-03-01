@@ -24,15 +24,15 @@ inherit core-image
 inherit obmc-phosphor-license
 inherit obmc-phosphor-utils
 
-FEATURE_PACKAGES_obmc-bmc-state-mgmt ?= "${@cf_enabled(d, 'obmc-bmc-state-mgmt', 'virtual-obmc-bmc-state-mgmt')}"
+FEATURE_PACKAGES_obmc-bmc-state-mgmt ?= "packagegroup-obmc-apps-bmc-state-mgmt"
 FEATURE_PACKAGES_obmc-chassis-mgmt ?= "${@cf_enabled(d, 'obmc-phosphor-chassis-mgmt', 'virtual-obmc-chassis-mgmt')}"
-FEATURE_PACKAGES_obmc-chassis-state-mgmt ?= "${@cf_enabled(d, 'obmc-chassis-state-mgmt', 'virtual-obmc-chassis-state-mgmt')}"
+FEATURE_PACKAGES_obmc-chassis-state-mgmt ?= "packagegroup-obmc-apps-chassis-state-mgmt"
 FEATURE_PACKAGES_obmc-event-mgmt ?= "${@df_enabled(d, 'obmc-phosphor-event-mgmt', 'virtual-obmc-event-mgmt')}"
 FEATURE_PACKAGES_obmc-fan-mgmt ?= "${@cf_enabled(d, 'obmc-phosphor-fan-mgmt', 'virtual-obmc-fan-mgmt')}"
 FEATURE_PACKAGES_obmc-flash-mgmt ?= "${@cf_enabled(d, 'obmc-phosphor-flash-mgmt', 'virtual-obmc-flash-mgmt')}"
 FEATURE_PACKAGES_obmc-host-ctl ?= "${@cf_enabled(d, 'obmc-host-ctl', 'virtual-obmc-host-ctl')}"
 FEATURE_PACKAGES_obmc-host-ipmi ?= "${@cf_enabled(d, 'obmc-host-ipmi', 'virtual-obmc-host-ipmi-hw')}"
-FEATURE_PACKAGES_obmc-host-state-mgmt ?= "${@cf_enabled(d, 'obmc-host-state-mgmt', 'virtual-obmc-host-state-mgmt')}"
+FEATURE_PACKAGES_obmc-host-state-mgmt ?= "packagegroup-obmc-apps-host-state-mgmt"
 FEATURE_PACKAGES_obmc-inventory ?= "packagegroup-obmc-apps-inventory"
 FEATURE_PACKAGES_obmc-leds ?= "packagegroup-obmc-apps-leds"
 FEATURE_PACKAGES_obmc-logging-mgmt ?= "${@df_enabled(d, 'obmc-logging-mgmt', 'virtual-obmc-logging-mgmt')}"

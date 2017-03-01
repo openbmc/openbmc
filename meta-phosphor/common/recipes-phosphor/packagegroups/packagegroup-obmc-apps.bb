@@ -7,12 +7,25 @@ inherit obmc-phosphor-license
 
 PROVIDES = "${PACKAGES}"
 PACKAGES = " \
+        ${PN}-bmc-state-mgmt \
+        ${PN}-chassis-state-mgmt \
         ${PN}-extras \
         ${PN}-extrasdev \
+        ${PN}-host-state-mgmt \
         ${PN}-inventory \
         ${PN}-leds \
         ${PN}-sensors \
         ${PN}-software \
+        "
+
+SUMMARY_${PN}-bmc-state-mgmt = "BMC state management"
+RDEPENDS_${PN}-bmc-state-mgmt = " \
+        ${VIRTUAL-RUNTIME_obmc-bmc-state-manager} \
+        "
+
+SUMMARY_${PN}-chassis-state-mgmt = "Chassis state management"
+RDEPENDS_${PN}-chassis-state-mgmt = " \
+        ${VIRTUAL-RUNTIME_obmc-chassis-state-manager} \
         "
 
 SUMMARY_${PN}-extras = "Extra features"
@@ -23,6 +36,11 @@ RDEPENDS_${PN}-extras = " \
 SUMMARY_${PN}-extrasdev = "Development features"
 RDEPENDS_${PN}-extrasdev = " \
         rest-dbus \
+        "
+
+SUMMARY_${PN}-host-state-mgmt = "Host state management"
+RDEPENDS_${PN}-host-state-mgmt = " \
+        ${VIRTUAL-RUNTIME_obmc-host-state-manager} \
         "
 
 SUMMARY_${PN}-inventory = "Inventory applications"
