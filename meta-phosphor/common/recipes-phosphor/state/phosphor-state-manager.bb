@@ -36,18 +36,12 @@ RDEPENDS_${PN}-host += "libsystemd phosphor-dbus-interfaces"
 RDEPENDS_${PN}-chassis += "libsystemd phosphor-dbus-interfaces"
 RDEPENDS_${PN}-bmc += "libsystemd phosphor-dbus-interfaces"
 
-PROVIDES += "virtual/obmc-host-state-mgmt"
-RPROVIDES_${PN}-host += "virtual-obmc-host-state-mgmt"
 FILES_${PN}-host = "${sbindir}/phosphor-host-state-manager"
 DBUS_SERVICE_${PN}-host += "xyz.openbmc_project.State.Host.service"
 
-PROVIDES += "virtual/obmc-chassis-state-mgmt"
-RPROVIDES_${PN}-chassis += "virtual-obmc-chassis-state-mgmt"
 FILES_${PN}-chassis = "${sbindir}/phosphor-chassis-state-manager"
 DBUS_SERVICE_${PN}-chassis += "xyz.openbmc_project.State.Chassis.service"
 
-PROVIDES += "virtual/obmc-bmc-state-mgmt"
-RPROVIDES_${PN}-bmc += "virtual-obmc-bmc-state-mgmt"
 FILES_${PN}-bmc = "${sbindir}/phosphor-bmc-state-manager"
 DBUS_SERVICE_${PN}-bmc += "xyz.openbmc_project.State.BMC.service"
 
