@@ -3,6 +3,7 @@ Description=Inventory Upload
 Wants=obmc-host-start-pre@%i.target
 Before=obmc-host-start-pre@%i.target
 Conflicts=obmc-chassis-stop@%i.target
+ConditionPathExists=!/tmp/hostRunning
 
 [Service]
 Restart=no
