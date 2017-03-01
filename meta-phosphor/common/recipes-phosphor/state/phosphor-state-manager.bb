@@ -13,6 +13,10 @@ STATE_MGR_PACKAGES = " \
     ${PN}-bmc \
 "
 PACKAGES =+ "${STATE_MGR_PACKAGES}"
+PACKAGES_remove = "${PN}"
+RDEPENDS_${PN}-dev = "${STATE_MGR_PACKAGES}"
+RDEPENDS_${PN}-staticdev = "${STATE_MGR_PACKAGES}"
+
 DBUS_PACKAGES = "${STATE_MGR_PACKAGES}"
 
 # Set SYSTEMD_PACKAGES to empty because we do not want ${PN} and DBUS_PACKAGES
