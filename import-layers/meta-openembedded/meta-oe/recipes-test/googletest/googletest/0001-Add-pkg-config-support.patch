@@ -1,0 +1,115 @@
+From fea8edce9ea54ac7b0668c1674ed604a5c9d36ac Mon Sep 17 00:00:00 2001
+From: Lei YU <mine260309@gmail.com>
+Date: Wed, 1 Mar 2017 16:43:52 +0800
+Subject: [PATCH] Add pkg-config support
+
+---
+ googlemock/CMakeLists.txt | 9 +++++++++
+ googlemock/gmock.pc.in    | 9 +++++++++
+ googletest/CMakeLists.txt | 9 +++++++++
+ googletest/gtest.pc.in    | 9 +++++++++
+ 4 files changed, 36 insertions(+)
+ create mode 100644 googlemock/gmock.pc.in
+ create mode 100644 googletest/gtest.pc.in
+
+diff --git a/googlemock/CMakeLists.txt b/googlemock/CMakeLists.txt
+index beb259a..b6d479b 100644
+--- a/googlemock/CMakeLists.txt
++++ b/googlemock/CMakeLists.txt
+@@ -27,6 +27,9 @@ if (COMMAND pre_project_set_up_hermetic_build)
+   pre_project_set_up_hermetic_build()
+ endif()
+ 
++# pkg-config support
++configure_file("gmock.pc.in" "gmock.pc" @ONLY)
++
+ ########################################################################
+ #
+ # Project-wide settings
+@@ -73,6 +76,8 @@ if (MSVC AND MSVC_VERSION EQUAL 1700)
+   add_definitions(/D _VARIADIC_MAX=10)
+ endif()
+ 
++install(DIRECTORY ${gmock_SOURCE_DIR}/include/gmock DESTINATION include)
++
+ ########################################################################
+ #
+ # Defines the gmock & gmock_main libraries.  User tests should link
+@@ -100,6 +105,10 @@ if (DEFINED CMAKE_VERSION AND NOT "${CMAKE_VERSION}" VERSION_LESS "2.8.11")
+   target_include_directories(gmock_main INTERFACE "${gmock_SOURCE_DIR}/include")
+ endif()
+ 
++
++install(FILES "${CMAKE_CURRENT_BINARY_DIR}/gmock.pc"
++    DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig/"
++)  
+ ########################################################################
+ #
+ # Install rules
+diff --git a/googlemock/gmock.pc.in b/googlemock/gmock.pc.in
+new file mode 100644
+index 0000000..e758d3e
+--- /dev/null
++++ b/googlemock/gmock.pc.in
+@@ -0,0 +1,9 @@
++Name: libgmock
++Version: 1.8.0
++Description: Google's framework for writing C++ tests on a variety of platforms
++ 
++prefix=@CMAKE_INSTALL_PREFIX@
++includedir=${prefix}/include
++libdir=${prefix}/lib
++Cflags:-I${includedir}/gmock
++Libs: -L${libdir} -lgmock -lgmock_main
+diff --git a/googletest/CMakeLists.txt b/googletest/CMakeLists.txt
+index 621d0f0..25f6957 100644
+--- a/googletest/CMakeLists.txt
++++ b/googletest/CMakeLists.txt
+@@ -34,6 +34,9 @@ if (COMMAND pre_project_set_up_hermetic_build)
+   pre_project_set_up_hermetic_build()
+ endif()
+ 
++# pkg-config support
++configure_file("gtest.pc.in" "gtest.pc" @ONLY)
++
+ ########################################################################
+ #
+ # Project-wide settings
+@@ -66,6 +69,8 @@ include_directories(
+   ${gtest_SOURCE_DIR}/include
+   ${gtest_SOURCE_DIR})
+ 
++install(DIRECTORY ${gtest_SOURCE_DIR}/include/gtest DESTINATION include)
++
+ # Where Google Test's libraries can be found.
+ link_directories(${gtest_BINARY_DIR}/src)
+ 
+@@ -79,6 +84,10 @@ if (MSVC AND MSVC_VERSION EQUAL 1700)
+   add_definitions(/D _VARIADIC_MAX=10)
+ endif()
+ 
++install(FILES "${CMAKE_CURRENT_BINARY_DIR}/gtest.pc"
++    DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig/"
++)
++
+ ########################################################################
+ #
+ # Defines the gtest & gtest_main libraries.  User tests should link
+diff --git a/googletest/gtest.pc.in b/googletest/gtest.pc.in
+new file mode 100644
+index 0000000..92cba3f
+--- /dev/null
++++ b/googletest/gtest.pc.in
+@@ -0,0 +1,9 @@
++Name: libgtest
++Version: 1.8.0
++Description: Google's framework for writing C++ tests on a variety of platforms
++
++prefix=@CMAKE_INSTALL_PREFIX@
++includedir=${prefix}/include
++libdir=${prefix}/lib
++Cflags:-I${includedir}/gtest
++Libs: -L${libdir} -lgtest -lgtest_main
+-- 
+1.9.1
+

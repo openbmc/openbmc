@@ -1,1 +1,1 @@
-RRECOMMENDS_${PN}_append = " gtest gmock sdbusplus phosphor-logging"
+RRECOMMENDS_${PN}_append = " googletest sdbusplus phosphor-logging"
