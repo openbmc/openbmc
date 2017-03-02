@@ -7,6 +7,7 @@ After=obmc-power-on@%i.target
 Wants=fsi-scan@%i.service
 After=fsi-scan@%i.service
 Conflicts=obmc-power-chassis-off@%i.target
+ConditionPathExists=!/run/openbmc/chassis@%i-on
 
 [Service]
 ExecStart={bindir}/vcs_workaround.sh {MACHINE}

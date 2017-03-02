@@ -3,6 +3,7 @@ Description=Enable AVSBus on VRMs
 Wants=obmc-host-start-pre@%i.target
 Before=obmc-host-start-pre@%i.target
 Conflicts=obmc-chassis-stop@%i.target
+ConditionPathExists=!/run/openbmc/chassis@%i-on
 
 [Service]
 ExecStart={bindir}/zaius_avsbus.sh vdn_max
