@@ -23,7 +23,7 @@ RDEPENDS_${PN} += "phosphor-time-manager"
 RRECOMMENDS_${PN} += "virtual-obmc-settings-mgmt"
 SRC_URI += "git://github.com/openbmc/phosphor-host-ipmid"
 
-SRCREV = "b9ac6a425beec03d2b65085cec6b5e6d5272b241"
+SRCREV = "a66239bb3e1d8ba252f7cbf2691b7416f9bce32d"
 
 # Setup IPMI Whitelist Conf files
 WHITELIST_CONF = " \
