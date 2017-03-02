@@ -7,6 +7,7 @@ After=obmc-fan-control.target
 Wants=mapper-wait@-org-openbmc-control-power%i.service
 After=mapper-wait@-org-openbmc-control-power%i.service
 Conflicts=obmc-power-chassis-off@%i.target
+ConditionPathExists=!/run/openbmc/chassis@%i-on
 
 [Service]
 RemainAfterExit=yes

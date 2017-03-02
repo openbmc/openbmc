@@ -3,6 +3,7 @@ Description=Disable UCD VCS rails
 Wants=obmc-power-start-pre@%i.target
 Before=obmc-power-start-pre@%i.target
 Conflicts=obmc-power-chassis-off@%i.target
+ConditionPathExists=!/run/openbmc/chassis@%i-on
 
 [Service]
 ExecStart={bindir}/ucd_disable_vcs.sh
