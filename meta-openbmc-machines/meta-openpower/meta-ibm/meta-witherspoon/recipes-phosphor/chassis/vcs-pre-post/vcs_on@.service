@@ -5,6 +5,7 @@ After=vcs_workaround@%i.service
 Wants=obmc-host-start-pre@%i.target
 Before=obmc-host-start-pre@%i.target
 Conflicts=obmc-power-chassis-off@%i.target
+ConditionPathExists=!/run/openbmc/chassis@%i-on
 
 [Service]
 ExecStart={bindir}/vcs_on.sh
