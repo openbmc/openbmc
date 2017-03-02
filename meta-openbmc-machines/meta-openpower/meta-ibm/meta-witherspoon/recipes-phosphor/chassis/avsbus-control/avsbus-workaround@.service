@@ -4,6 +4,7 @@ Wants=ucd_disable_vcs@%i.service
 After=ucd_disable_vcs@%i.service
 Before=avsbus-disable@%i.service
 Conflicts=obmc-power-chassis-off@%i.target
+ConditionPathExists=!/run/openbmc/chassis@%i-on
 
 [Service]
 ExecStart={bindir}/avsbus-workaround.sh
