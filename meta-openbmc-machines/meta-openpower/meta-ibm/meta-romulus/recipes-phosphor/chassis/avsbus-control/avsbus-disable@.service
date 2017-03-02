@@ -4,6 +4,7 @@ Wants=avsbus-workaround@%i.service
 After=avsbus-workaround@%i.service
 Before=vrm-control@%i.service
 Conflicts=obmc-power-chassis-off@%i.target
+ConditionPathExists=!/run/openbmc/chassis@%i-on
 
 [Service]
 ExecStart={bindir}/avsbus-disable.sh

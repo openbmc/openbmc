@@ -3,6 +3,7 @@ Description=Enable the AVS bus on VRMs
 Wants=vrm-control@%i.service
 After=vrm-control@%i.service
 Conflicts=obmc-power-chassis-off@%i.target
+ConditionPathExists=!/run/openbmc/chassis@%i-on
 
 [Service]
 ExecStart={bindir}/avsbus-enable.sh
