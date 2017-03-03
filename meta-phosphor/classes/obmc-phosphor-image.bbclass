@@ -89,3 +89,10 @@ IMAGE_FSTYPES += "${@image_overlay_enabled(d, "overlay")}"
 inherit ${@image_overlay_enabled(d, "image-overlay")}
 
 do_image_complete[depends] += "obmc-phosphor-debug-tarball:do_image_complete"
+
+# The /etc/version file is misleading and not useful.  Remove it.
+# Users should instead rely on /etc/os-release.
+remove_etc_version() {
+        rm ${IMAGE_ROOTFS}${sysconfdir}/version
+}
+ROOTFS_POSTPROCESS_COMMAND += "remove_etc_version ; "
