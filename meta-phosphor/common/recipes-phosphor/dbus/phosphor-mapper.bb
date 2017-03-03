@@ -20,6 +20,7 @@ RDEPENDS_${PN} += " \
         python-xml \
         python-dbus \
         python-pygobject \
+        pyphosphor-dbus \
         "
 SRC_URI += "git://github.com/openbmc/phosphor-objmgr"
 
