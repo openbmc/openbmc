@@ -22,10 +22,6 @@ SRCREV="9dd93cfa7309ed5fd97c47a302dc1e2d227b526e"
 MBOXD_FLASH_SIZE ??= "32M"
 SYSTEMD_SUBSTITUTIONS += "FLASH_SIZE:${MBOXD_FLASH_SIZE}:${PN}.service"
 
-# Hacks because ${STAGING_KERNEL_DIR} points to the kernel source tree, not the
-# installed, pre-processed headers. Requires the aspeed-lpc-ctrl-h patch above.
-CFLAGS_append = "-I include"
-
 do_install_append() {
     install -d ${D}/lib/udev/rules.d
     install -m 0644 ${WORKDIR}/99-aspeed-mbox.rules ${D}/lib/udev/rules.d
