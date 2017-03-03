@@ -14,3 +14,8 @@ do_install() {
     install -d ${D}${bindir}
     install -m 0755 iicmaster ${D}${bindir}
 }
+
+# Fix GNU_HASH warning
+INSANE_SKIP_${PN} = "ldflags"
+INSANE_SKIP_${PN}-dev = "ldflags"
+INSANE_SKIP_${PN}-staticdev = "ldflags"

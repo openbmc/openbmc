@@ -98,8 +98,11 @@ def SystemdUnit(unit):
 
 
 def systemd_parse_unit(d, path):
-    import ConfigParser
-    parser = ConfigParser.SafeConfigParser()
+    try:
+        import ConfigParser
+    except ImportError:
+        import configparser as ConfigParser
+    parser = ConfigParser.SafeConfigParser(strict=False)
     parser.optionxform = str
     parser.read('%s' % path)
     return parser
@@ -154,11 +157,11 @@ python() {
 
         var = 'SYSTEMD_USER_%s' % file
         user = listvar_to_list(d, var)
-        if len(user) is 0:
+        if len(list(user)) is 0:
             var = 'SYSTEMD_USER_%s' % pkg
             user = listvar_to_list(d, var)
-        if len(user) is not 0:
-            if len(user) is not 1:
+        if len(list(user)) is not 0:
+            if len(list(user)) is not 1:
                 bb.fatal('Too many users assigned to %s: \'%s\'' % (var, ' '.join(user)))
 
             user = user[0]
@@ -230,7 +233,7 @@ python systemd_do_postinst() {
             spec, file = spec.rsplit(':', 1)
             all_subs.setdefault(file, []).append(spec)
 
-        for f, v in all_subs.iteritems():
+        for f, v in all_subs.items():
             subs = dict([ x.split(':') for x in v])
             if not subs:
                 continue
