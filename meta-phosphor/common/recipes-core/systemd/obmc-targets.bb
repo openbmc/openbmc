@@ -36,6 +36,7 @@ SYSTEMD_SERVICE_${PN} += " \
         obmc-fans-ready.target \
         obmc-fan-control.target \
         obmc-standby.target \
+        obmc-fsi-disable.target \
         "
 
 SYSTEMD_SERVICE_${PN} += "${@compose_list(d, 'CHASSIS_FMT', 'CHASSIS_TARGETS')}"
