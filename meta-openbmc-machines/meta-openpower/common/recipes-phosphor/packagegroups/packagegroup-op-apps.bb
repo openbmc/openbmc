@@ -31,6 +31,7 @@ RDEPENDS_${PN}-chassis = " \
         obmc-op-control-power \
         obmc-pcie-detect \
         obmc-watchdog \
+        obmc-host-failure-reboots \
         "
 #Pull in obmc-fsi-scan on all P9 OpenPOWER systems
 RDEPENDS_${PN}-chassis += "${@mf_enabled(d, 'obmc-fsi-scan', 'obmc-fsi-scan')}"
