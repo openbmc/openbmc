@@ -5,4 +5,5 @@ After={SYSTEMD_DEFAULT_TARGET}
 Wants=mapper-wait@-xyz-openbmc_project-state-chassis%i.service
 After=mapper-wait@-xyz-openbmc_project-state-chassis%i.service
 Conflicts=obmc-power-chassis-on@%i.target
+Conflicts=obmc-chassis-reset@%i.target
 RefuseManualStop=yes

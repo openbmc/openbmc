@@ -1,0 +1,4 @@
+[Unit]
+Description=Chassis%i (Reset Check)
+Conflicts=obmc-power-chassis-off%i.target
+RefuseManualStop=yes
