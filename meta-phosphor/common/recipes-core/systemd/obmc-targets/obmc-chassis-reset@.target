@@ -1,0 +1,6 @@
+[Unit]
+Description=Chassis%i (Reset Check)
+Wants=mapper-wait@-org-openbmc-control-power%i.service
+After=mapper-wait@-org-openbmc-control-power%i.service
+Conflicts=obmc-power-chassis-off%i.target
+RefuseManualStop=yes
