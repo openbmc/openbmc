@@ -1,0 +1,177 @@
+0xa6:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm0
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      State:
+        0x04:
+          type: string
+          assert: Disabled
+          dassert: Enabled
+0xa8:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm1
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      State:
+        0x04:
+          type: string
+          assert: Disabled
+          dassert: Enabled
+0xba:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm10
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      State:
+        0x04:
+          type: string
+          assert: Disabled
+          dassert: Enabled
+0xbc:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm11
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      State:
+        0x04:
+          type: string
+          assert: Disabled
+          dassert: Enabled
+0xbe:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm12
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      State:
+        0x04:
+          type: string
+          assert: Disabled
+          dassert: Enabled
+0xc0:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm13
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      State:
+        0x04:
+          type: string
+          assert: Disabled
+          dassert: Enabled
+0xc2:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm14
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      State:
+        0x04:
+          type: string
+          assert: Disabled
+          dassert: Enabled
+0xc4:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm15
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      State:
+        0x04:
+          type: string
+          assert: Disabled
+          dassert: Enabled
+0xaa:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm2
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      State:
+        0x04:
+          type: string
+          assert: Disabled
+          dassert: Enabled
+0xac:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm3
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      State:
+        0x04:
+          type: string
+          assert: Disabled
+          dassert: Enabled
+0xae:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm4
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      State:
+        0x04:
+          type: string
+          assert: Disabled
+          dassert: Enabled
+0xb0:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm5
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      State:
+        0x04:
+          type: string
+          assert: Disabled
+          dassert: Enabled
+0xb2:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm6
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      State:
+        0x04:
+          type: string
+          assert: Disabled
+          dassert: Enabled
+0xb4:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm7
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      State:
+        0x04:
+          type: string
+          assert: Disabled
+          dassert: Enabled
+0xb6:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm8
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      State:
+        0x04:
+          type: string
+          assert: Disabled
+          dassert: Enabled
+0xb8:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm9
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      State:
+        0x04:
+          type: string
+          assert: Disabled
+          dassert: Enabled
+
