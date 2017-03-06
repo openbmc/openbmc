@@ -1,0 +1,13 @@
+[Unit]
+Description=Enable reboot on host failures
+Wants=mapper-wait@-org-openbmc-settings-host0.service
+After=mapper-wait@-org-openbmc-settings-host0.service
+
+[Service]
+ExecStart = /usr/bin/busctl set-property org.openbmc.settings.Host /org/openbmc/settings/host0 org.openbmc.settings.Host auto_reboot s "yes"
+ExecStop = /usr/bin/busctl set-property org.openbmc.settings.Host /org/openbmc/settings/host0 org.openbmc.settings.Host auto_reboot s "no"
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
