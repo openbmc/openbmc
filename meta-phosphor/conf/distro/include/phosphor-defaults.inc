@@ -88,5 +88,14 @@ PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-properties ?= \
 PREFERRED_PROVIDER_virtual/phosphor-led-manager-config-native ?= \
     "${@cf_enabled(d, 'obmc-mrw', 'phosphor-led-manager-config-mrw-native', 'phosphor-led-manager-config-example-native')}"
 
+# The phosphor-host-ipmid application is data-driven and requires an input
+# mapping of IPMI inventory sensor metadata to DBus objects interfaces and properties.
+# This virtual is a native recipe that provides that mapping by installing
+# configuration files in the format and native sysroot location expected by
+# the phosphor-host-ipmid build process in the native sysroot.
+PREFERRED_PROVIDER_virtual/phosphor-ipmi-sensor-inventory ?= \
+    "${@cf_enabled(d, 'obmc-mrw', 'phosphor-ipmi-sensor-inventory-mrw-native', 'phosphor-ipmi-sensor-inventory-example-native')}"
+
+
 OBMC_DBUS_PATH_ROOT ?= "/xyz/openbmc_project"
 OBMC_DBUS_IFACE_ROOT ?= "xyz.openbmc_project"

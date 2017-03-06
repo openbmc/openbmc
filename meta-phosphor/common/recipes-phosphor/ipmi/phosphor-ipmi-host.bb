@@ -14,6 +14,8 @@ DEPENDS += "phosphor-logging"
 DEPENDS += "phosphor-mapper"
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "packagegroup-obmc-ipmid-providers"
+DEPENDS += "virtual/phosphor-ipmi-sensor-inventory"
+
 RDEPENDS_${PN}-dev += "phosphor-logging"
 RDEPENDS_${PN}-dev += "phosphor-mapper-dev"
 RDEPENDS_${PN} += "clear-once"
@@ -32,6 +34,7 @@ WHITELIST_CONF = " \
         "
 EXTRA_OECONF = " \
         WHITELIST_CONF="${WHITELIST_CONF}" \
+        SENSOR_YAML_GEN=${STAGING_DIR_NATIVE}${config_datadir}/config.yaml \
         "
 
 S = "${WORKDIR}/git"
