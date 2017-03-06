@@ -1,0 +1,12 @@
+[Unit]
+Description=Create file to indicate Pgood%i is on
+After=obmc-power-reset-on@%i.target
+
+[Service]
+RemainAfterExit=no
+Type=oneshot
+ExecStart=/bin/sh -c "mkdir -p /run/openbmc/ && touch /run/openbmc/chassis@%i-on"
+
+
+[Install]
+WantedBy=obmc-chassis-reset@%i.target

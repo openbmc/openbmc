@@ -1,0 +1,7 @@
+[Unit]
+Description=Chassis Power%i (On) after reset
+Wants={SYSTEMD_DEFAULT_TARGET}
+After={SYSTEMD_DEFAULT_TARGET}
+Conflicts=obmc-power-chassis-off@%i.target
+RefuseManualStart=yes
+RefuseManualStop=yes
