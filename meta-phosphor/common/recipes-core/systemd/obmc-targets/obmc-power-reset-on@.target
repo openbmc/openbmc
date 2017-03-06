@@ -1,0 +1,7 @@
+[Unit]
+Description=Chassis%i power on after reset
+Requires=op-reset-pgood-check@%i.service
+After=op-reset-pgood-check@%i.service
+Conflicts=obmc-power-chassis-off@%i.target
+RefuseManualStart=yes
+RefuseManualStop=yes
