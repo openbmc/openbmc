@@ -1,0 +1,14 @@
+[Unit]
+Description=Check Pgood%i
+Wants=mapper-wait@-org-openbmc-control-power%i.service
+After=mapper-wait@-org-openbmc-control-power%i.service
+Before=obmc-chassis-reset-pgood-on@%i.target
+
+[Service]
+RemainAfterExit=no
+Type=oneshot
+ExecStart=/bin/sh -c "busctl get-property `mapper get-service /org/openbmc/control/power%i` /org/openbmc/control/power%i org.openbmc.control.Power pgood | sed 's/i\s*[1]/on/' | grep on"
+
+
+[Install]
+WantedBy=obmc-chassis-reset@%i.target
