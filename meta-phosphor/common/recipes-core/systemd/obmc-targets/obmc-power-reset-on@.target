@@ -1,0 +1,5 @@
+[Unit]
+Description=Chassis%i power on after reset
+Conflicts=obmc-power-chassis-off@%i.target
+RefuseManualStart=yes
+RefuseManualStop=yes
