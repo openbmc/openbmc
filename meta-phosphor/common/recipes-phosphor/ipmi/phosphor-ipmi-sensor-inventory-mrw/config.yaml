@@ -1,0 +1,17 @@
+#provide the boolean value in the following format
+#'"true"','"false"'
+
+0x0C:
+  xyz.openbmc_project.State.Decorator.OperationalStatus:
+    Functional:
+      0x04:
+        type:   "bool"
+        assert: '"false"'
+        deassert: '"true"'
+0x07:
+  xyz.openbmc_project.Inventory.Item:
+    Present:
+      0x07:
+        type: "bool"
+        assert: '"true"' 
+        deassert: '"false"'
