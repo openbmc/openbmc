@@ -1,0 +1,11 @@
+[Unit]
+Description=Mount UBIFS volume pnor-rw%I
+Requires=obmc-flash-bios-ubiattach.service
+After=obmc-flash-bios-ubiattach.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/sh -c '{sbindir}ubimkvol /dev/ubi0 -N pnor-rw%i -s 1MiB; \
+                      mkdir /media/pnor-rw%i; \
+                      mount -t ubifs ubi0:pnor-rw%i /media/pnor-rw%i'
