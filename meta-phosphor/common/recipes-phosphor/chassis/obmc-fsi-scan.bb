@@ -7,7 +7,7 @@ inherit obmc-phosphor-license
 
 TMPL = "fsi-scan@.service"
 INSTFMT = "fsi-scan@{0}.service"
-TGTFMT = "obmc-power-chassis-on@{0}.target"
+TGTFMT = "obmc-chassis-poweron@{0}.target"
 FMT = "../${TMPL}:${TGTFMT}.requires/${INSTFMT}"
 
 SYSTEMD_SERVICE_${PN} += "${TMPL}"
