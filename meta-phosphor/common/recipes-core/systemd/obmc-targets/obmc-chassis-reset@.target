@@ -1,8 +1,12 @@
 [Unit]
 Description=Chassis%i (Reset Check)
-Wants={SYSTEMD_DEFAULT_TARGET}
-After={SYSTEMD_DEFAULT_TARGET}
 Wants=mapper-wait@-org-openbmc-control-power%i.service
 After=mapper-wait@-org-openbmc-control-power%i.service
+Wants=mapper-wait@-xyz-openbmc_project-state-chassis%i.service
+After=mapper-wait@-xyz-openbmc_project-state-chassis%i.service
 Conflicts=obmc-chassis-stop@%i.target
 RefuseManualStop=yes
+OnFailureJobMode=flush
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
