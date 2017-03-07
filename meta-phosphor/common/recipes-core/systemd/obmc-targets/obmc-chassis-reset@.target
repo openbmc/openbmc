@@ -2,5 +2,10 @@
 Description=Chassis%i (Reset Check)
 Wants=mapper-wait@-org-openbmc-control-power%i.service
 After=mapper-wait@-org-openbmc-control-power%i.service
+Wants=mapper-wait@-xyz-openbmc_project-state-chassis%i.service
+After=mapper-wait@-xyz-openbmc_project-state-chassis%i.service
 Conflicts=obmc-power-chassis-off%i.target
 RefuseManualStop=yes
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
