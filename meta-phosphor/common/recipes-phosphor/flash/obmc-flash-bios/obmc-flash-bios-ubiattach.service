@@ -1,0 +1,8 @@
+[Unit]
+Description=Attach the PNOR mtd device to UBI
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/sh -c 'grep pnor /proc/mtd |cut -c 4 |xargs {sbindir}/ubiattach /dev/ubi_ctrl -m'
+ExecStop=/bin/sh -c 'grep pnor /proc/mtd |cut -c 4 |xargs {sbindir}/ubidetach /dev/ubi_ctrl -m'
