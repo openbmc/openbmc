@@ -230,7 +230,7 @@ python systemd_do_postinst() {
             spec, file = spec.rsplit(':', 1)
             all_subs.setdefault(file, []).append(spec)
 
-        for f, v in all_subs.iteritems():
+        for f, v in all_subs.items():
             subs = dict([ x.split(':') for x in v])
             if not subs:
                 continue
