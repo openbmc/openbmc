@@ -4,7 +4,7 @@ Wants=obmc-host-started@%i.target
 After=obmc-host-started@%i.target
 Wants=mapper-wait@-org-openbmc-watchdog-host%i.service
 After=mapper-wait@-org-openbmc-watchdog-host%i.service
-Conflicts=obmc-chassis-stop@%i.target
+Conflicts=obmc-host-stop@%i.target
 
 [Service]
 Type=oneshot
@@ -13,4 +13,4 @@ ExecStart={sbindir}/mapper call /org/openbmc/watchdog/host%i org.openbmc.Watchdo
 ExecStart={sbindir}/mapper call /org/openbmc/watchdog/host%i org.openbmc.Watchdog start
 
 [Install]
-WantedBy=obmc-chassis-start@%i.target
+WantedBy=obmc-host-start@%i.target

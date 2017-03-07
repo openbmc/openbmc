@@ -2,7 +2,7 @@
 Description=Turn VCS rails off
 Wants=obmc-power-stop-pre@%i.target
 Before=obmc-power-stop-pre@%i.target
-Conflicts=obmc-chassis-start@%i.target
+Conflicts=obmc-host-start@%i.target
 
 [Service]
 ExecStart={bindir}/zaius_vcs.sh off
@@ -10,4 +10,4 @@ Type=oneshot
 RemainAfterExit=yes
 
 [Install]
-WantedBy=obmc-chassis-stop@%i.target
+WantedBy=obmc-host-stop@%i.target

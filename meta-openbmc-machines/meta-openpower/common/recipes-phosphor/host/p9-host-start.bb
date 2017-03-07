@@ -24,7 +24,7 @@ do_install() {
 
 TMPL = "start_host@.service"
 INSTFMT = "start_host@{0}.service"
-TGTFMT = "obmc-chassis-start@{0}.target"
+TGTFMT = "obmc-host-start@{0}.target"
 FMT = "../${TMPL}:${TGTFMT}.requires/${INSTFMT}"
 
 SYSTEMD_SERVICE_${PN} += "${TMPL}"

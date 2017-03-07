@@ -3,4 +3,4 @@ Description=Quiesce Target
 Wants={SYSTEMD_DEFAULT_TARGET}
 After={SYSTEMD_DEFAULT_TARGET}
 RefuseManualStop=yes
-Conflicts=obmc-power-chassis-off@%i.target
+Conflicts=obmc-chassis-poweroff@%i.target
