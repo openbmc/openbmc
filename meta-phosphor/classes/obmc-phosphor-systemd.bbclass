@@ -154,11 +154,11 @@ python() {
 
         var = 'SYSTEMD_USER_%s' % file
         user = listvar_to_list(d, var)
-        if len(user) is 0:
+        if len(list(user)) is 0:
             var = 'SYSTEMD_USER_%s' % pkg
             user = listvar_to_list(d, var)
-        if len(user) is not 0:
-            if len(user) is not 1:
+        if len(list(user)) is not 0:
+            if len(list(user)) is not 1:
                 bb.fatal('Too many users assigned to %s: \'%s\'' % (var, ' '.join(user)))
 
             user = user[0]
