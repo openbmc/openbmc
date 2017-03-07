@@ -1,6 +1,6 @@
 [Unit]
 Description=Soft power off of the host
-Conflicts=obmc-chassis-start@%i.target
+Conflicts=obmc-host-start@%i.target
 
 [Service]
 Restart=no
@@ -9,4 +9,4 @@ RemainAfterExit=yes
 ExecStart={sbindir}/mapper call /org/openbmc/HostServices org.openbmc.HostServices SoftPowerOff
 
 [Install]
-WantedBy=obmc-stop-host@%i.target
+WantedBy=obmc-host-shutdown@%i.target

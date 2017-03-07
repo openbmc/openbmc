@@ -12,12 +12,12 @@ DBUS_SERVICE_${PN} += "${@compose_list(d, 'FMT', 'OBMC_WATCHDOG_INSTANCES')}"
 SYSTEMD_SERVICE_${PN} += "obmc-start-watchdog@.service obmc-stop-watchdog@.service"
 
 START_TMPL = "obmc-start-watchdog@.service"
-START_TGTFMT = "obmc-chassis-start@{1}.target"
+START_TGTFMT = "obmc-host-start@{1}.target"
 START_INSTFMT = "obmc-start-watchdog@{0}.service"
 START_FMT = "../${START_TMPL}:${START_TGTFMT}.requires/${START_INSTFMT}"
 
 STOP_TMPL = "obmc-stop-watchdog@.service"
-STOP_TGTFMT = "obmc-chassis-stop@{1}.target"
+STOP_TGTFMT = "obmc-host-stop@{1}.target"
 STOP_INSTFMT = "obmc-stop-watchdog@{0}.service"
 STOP_FMT = "../${STOP_TMPL}:${STOP_TGTFMT}.requires/${STOP_INSTFMT}"
 
