@@ -7,7 +7,7 @@ Requires=obmc-power-reset-on@%i.target
 
 [Service]
 RemainAfterExit=no
-ExecStart=/bin/systemctl start obmc-power-chassis-on@%i.target
+ExecStart=/bin/systemctl start obmc-chassis-poweron@%i.target
 
 
 [Install]
