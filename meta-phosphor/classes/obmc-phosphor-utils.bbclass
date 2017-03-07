@@ -1,14 +1,11 @@
 # Helper functions for checking feature variables.
 
-inherit utils
-
-
 def df_enabled(d, feature, truevalue, falsevalue=""):
-    return base_contains("DISTRO_FEATURES", feature, truevalue, falsevalue, d)
+    return bb.utils.contains("DISTRO_FEATURES", feature, truevalue, falsevalue, d)
 
 
 def mf_enabled(d, feature, truevalue, falsevalue=""):
-    return base_contains("MACHINE_FEATURES", feature, truevalue, falsevalue, d)
+    return bb.utils.contains("MACHINE_FEATURES", feature, truevalue, falsevalue, d)
 
 
 def cf_enabled(d, feature, truevalue, falsevalue=""):
