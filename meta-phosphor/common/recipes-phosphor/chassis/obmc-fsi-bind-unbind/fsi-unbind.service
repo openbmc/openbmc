@@ -1,0 +1,11 @@
+[Unit]
+Description=Unbind FSI Driver
+Conflicts=obmc-fsi-enable.target
+
+[Service]
+ExecStart=/bin/sh -c "echo fsi-master > /sys/bus/platform/drivers/fsi-master-gpio/unbind"
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+RequiredBy=obmc-fsi-disable.target

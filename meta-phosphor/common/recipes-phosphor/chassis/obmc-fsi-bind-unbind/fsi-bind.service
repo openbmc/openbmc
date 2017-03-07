@@ -1,0 +1,13 @@
+[Unit]
+Description=Bind FSI Driver
+Wants=fsi-scan.service
+Before=fsi-scan.service
+Conflicts=obmc-fsi-disable.target
+
+[Service]
+ExecStart=/bin/sh -c "echo fsi-master > /sys/bus/platform/drivers/fsi-master-gpio/bind"
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+RequiredBy=obmc-fsi-enable.target

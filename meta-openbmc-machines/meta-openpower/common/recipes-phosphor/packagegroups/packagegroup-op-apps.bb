@@ -32,8 +32,9 @@ RDEPENDS_${PN}-chassis = " \
         obmc-pcie-detect \
         obmc-watchdog \
         "
-#Pull in obmc-fsi-scan on all P9 OpenPOWER systems
+#Pull in FSI apps on all P9 OpenPOWER systems
 RDEPENDS_${PN}-chassis += "${@mf_enabled(d, 'obmc-fsi-scan', 'obmc-fsi-scan')}"
+RDEPENDS_${PN}-chassis += "${@mf_enabled(d, 'obmc-fsi-bind-unbind', 'obmc-fsi-bind-unbind')}"
 
 SUMMARY_${PN}-fans = "OpenPOWER Fans"
 RDEPENDS_${PN}-fans = " \
