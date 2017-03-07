@@ -2,7 +2,7 @@
 Description=Reset CPLD to wait after VDD is powered up
 Wants=op-wait-power-off@%i.service
 After=op-wait-power-off@%i.service
-Conflicts=obmc-power-chassis-on@%i.target
+Conflicts=obmc-chassis-poweron@%i.target
 
 [Service]
 ExecStart={bindir}/cpld_reset.sh
@@ -10,4 +10,4 @@ Type=oneshot
 RemainAfterExit=yes
 
 [Install]
-WantedBy=obmc-power-chassis-off@%i.target
+WantedBy=obmc-chassis-poweroff@%i.target

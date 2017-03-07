@@ -59,7 +59,7 @@ RDEPENDS_${PN} += "phosphor-mapper"
 
 TMPL = "op-stop-host@.service"
 INSTFMT = "op-stop-host@{0}.service"
-TGTFMT = "obmc-stop-host@{0}.target"
+TGTFMT = "obmc-host-shutdown@{0}.target"
 FMT = "../${TMPL}:${TGTFMT}.wants/${INSTFMT}"
 
 SYSTEMD_SERVICE_${PN} += "${TMPL}"
