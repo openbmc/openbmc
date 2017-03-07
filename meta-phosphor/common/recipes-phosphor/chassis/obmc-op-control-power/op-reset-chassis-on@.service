@@ -1,0 +1,13 @@
+[Unit]
+Description=Start Chassis%i On After BMC Reset
+Wants=op-reset-set-power-on@%i.service
+After=op-reset-set-power-on@%i.service
+
+[Service]
+RemainAfterExit=no
+Type=oneshot
+ExecStart=/bin/systemctl start obmc-chassis-reset@%i.target
+
+
+[Install]
+WantedBy=obmc-chassis-reset@%i.target
