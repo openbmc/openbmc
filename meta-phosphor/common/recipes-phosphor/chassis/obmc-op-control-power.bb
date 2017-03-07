@@ -19,6 +19,7 @@ SYSTEMD_SERVICE_${PN} += " \
         op-wait-power-off@.service \
         op-reset-pgood-check@.service \
         op-reset-set-power-on@.service \
+        op-reset-chassis-on@.service \
         "
 
 SYSTEMD_ENVIRONMENT_FILE_${PN} += "obmc/power_control"
@@ -50,6 +51,10 @@ RESET_ON_TMPL = "op-reset-set-power-on@.service"
 RESET_ON_INSTFMT = "op-reset-set-power-on@{0}.service"
 RESET_ON_FMT = "../${RESET_ON_TMPL}:${RESET_TGTFMT}.requires/${RESET_ON_INSTFMT}"
 
+RESET_ON_CHASSIS_TMPL = "op-reset-chassis-on@.service"
+RESET_ON_CHASSIS_INSTFMT = "op-reset-chassis-on@{0}.service"
+RESET_ON_CHASSIS_FMT = "../${RESET_ON_CHASSIS_TMPL}:${RESET_TGTFMT}.requires/${RESET_ON_CHASSIS_INSTFMT}"
+
 # Build up requires relationship for START_TGTFMT and STOP_TGTFMT
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'START_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'STOP_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
@@ -57,6 +62,7 @@ SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'ON_FMT', 'OBMC_POWER_INSTANCES', 
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'OFF_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'RESET_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'RESET_ON_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'RESET_ON_CHASSIS_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
 
 # Now show that the main control target requires these power targets
 START_TMPL_CTRL = "obmc-power-chassis-on@.target"
