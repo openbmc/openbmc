@@ -15,7 +15,7 @@ DBUS_SERVICE_${PN} += "${@compose_list(d, 'FMT', 'OBMC_HOST_INSTANCES')}"
 SYSTEMD_SERVICE_${PN} = "op-start-host@.service"
 
 START_TMPL = "op-start-host@.service"
-START_TGTFMT = "obmc-chassis-start@{1}.target"
+START_TGTFMT = "obmc-host-start@{1}.target"
 START_INSTFMT = "obmc-start-host@{0}.service"
 START_FMT = "../${START_TMPL}:${START_TGTFMT}.requires/${START_INSTFMT}"
 
