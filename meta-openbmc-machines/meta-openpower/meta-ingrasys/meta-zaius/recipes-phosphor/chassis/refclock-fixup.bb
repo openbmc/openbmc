@@ -6,7 +6,7 @@ inherit obmc-phosphor-license
 
 TMPL = "op-refclock-fixup@.service"
 INSTFMT = "op-refclock-fixup@{0}.service"
-TGTFMT = "obmc-chassis-start@{0}.target"
+TGTFMT = "obmc-host-start@{0}.target"
 FMT = "../${TMPL}:${TGTFMT}.wants/${INSTFMT}"
 
 SYSTEMD_SERVICE_${PN} += "${TMPL}"
