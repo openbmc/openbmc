@@ -26,7 +26,7 @@ def set_append(d, var, val, sep=' '):
 
 
 def listvar_to_list(d, list_var, sep=' '):
-    return filter(bool, (d.getVar(list_var, True) or '').split(sep))
+    return list(filter(bool, (d.getVar(list_var, True) or '').split(sep)))
 
 
 def compose_list(d, fmtvar, *listvars, **kw):
