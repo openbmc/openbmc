@@ -18,5 +18,5 @@ do_install() {
 
         DEST=${D}${properties_datadir}
         install -d ${DEST}
-        install example.yaml ${DEST}
+        install example.yaml ${DEST}/out.yaml
 }
