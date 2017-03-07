@@ -98,8 +98,8 @@ def SystemdUnit(unit):
 
 
 def systemd_parse_unit(d, path):
-    import ConfigParser
-    parser = ConfigParser.SafeConfigParser()
+    import configparser
+    parser = configparser.SafeConfigParser(strict=False)
     parser.optionxform = str
     parser.read('%s' % path)
     return parser
