@@ -9,6 +9,13 @@ inherit obmc-phosphor-dbus-service
 
 RDEPENDS_${PN} += "mtd-utils-ubifs"
 
+SRC_URI += "file://ubimount-size.conf"
+
 SKELETON_DIR = "flashbios"
 DBUS_SERVICE_${PN} += "org.openbmc.control.Flash.service"
 SYSTEMD_SERVICE_${PN} += "obmc-flash-init.service"
+
+do_install_append() {
+        install -m 0755 -d ${D}${sysconfdir}
+        install -m 0644 ${WORKDIR}/ubimount-size.conf ${D}${sysconfdir}/ubimount-size.conf
+}
