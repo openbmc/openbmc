@@ -6,7 +6,7 @@ After=obmc-power-start-pre@%i.target
 After=obmc-fan-control.target
 Wants=mapper-wait@-org-openbmc-control-power%i.service
 After=mapper-wait@-org-openbmc-control-power%i.service
-Conflicts=obmc-power-chassis-off@%i.target
+Conflicts=obmc-chassis-poweroff@%i.target
 ConditionPathExists=!/run/openbmc/chassis@%i-on
 
 [Service]
@@ -15,4 +15,4 @@ Type=oneshot
 ExecStart={sbindir}/mapper call /org/openbmc/control/power%i org.openbmc.control.Power setPowerState i 1
 
 [Install]
-WantedBy=obmc-chassis-start@%i.target
+WantedBy=obmc-host-start@%i.target
