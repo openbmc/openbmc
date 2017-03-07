@@ -1,5 +1,4 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
-SRC_URI_append = "file://Configure.patch"
 
 # General config settings.
 EXTRA_OECONF_append = " shared no-hw no-err no-psk no-srp no-engines "
