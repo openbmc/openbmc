@@ -1,0 +1,11 @@
+diff --git a/configure.ac b/configure.ac
+--- a/configure.ac
++++ b/configure.ac
+@@ -222,7 +222,6 @@
+ AM_CONDITIONAL(WITH_COMMON, test "$with_common" = "yes")
+
+ # compiler warnings, errors, required cflags, and code coverage support
+-GNOME_COMPILE_WARNINGS([maximum])
+ AC_MSG_CHECKING(for Gnome code coverage support)
+ m4_ifdef([GNOME_CODE_COVERAGE],
+          [AC_MSG_RESULT(yes)
