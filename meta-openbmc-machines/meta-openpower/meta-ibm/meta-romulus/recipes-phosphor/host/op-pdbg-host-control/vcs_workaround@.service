@@ -2,7 +2,7 @@
 Description=Run VCS workaround on host%i
 Wants=avsbus-enable@%i.service
 After=avsbus-enable@%i.service
-Conflicts=obmc-power-chassis-off@%i.target
+Conflicts=obmc-chassis-poweroff@%i.target
 
 [Service]
 ExecStart={bindir}/vcs_workaround.sh {MACHINE}
@@ -10,4 +10,4 @@ Type=oneshot
 RemainAfterExit=yes
 
 [Install]
-WantedBy=obmc-power-chassis-on@%i.target
+WantedBy=obmc-chassis-poweron@%i.target
