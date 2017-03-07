@@ -24,10 +24,10 @@ PACKAGES += "${FAN_PRESENCE_PACKAGES}"
 SYSTEMD_PACKAGES = "${FAN_PRESENCE_PACKAGES}"
 RDEPENDS_${PN}-dev = "${FAN_PRESENCE_PACKAGES}"
 
-# Needed to install into the obmc-chassis-start target
+# Needed to install into the obmc-host-start target
 TMPL = "phosphor-fan-presence-tach@.service"
 INSTFMT = "phosphor-fan-presence-tach@{0}.service"
-TGTFMT = "obmc-chassis-start@{0}.target"
+TGTFMT = "obmc-host-start@{0}.target"
 FMT = "../${TMPL}:${TGTFMT}.requires/${INSTFMT}"
 
 FILES_${PN}-tach = "${sbindir}/phosphor-fan-presence-tach"

@@ -5,7 +5,7 @@ Wants=obmc-power-start@%i.target
 Before=obmc-power-start@%i.target
 Wants=mapper-wait@-org-openbmc-control-power%i.service
 After=mapper-wait@-org-openbmc-control-power%i.service
-Conflicts=obmc-power-chassis-off@%i.target
+Conflicts=obmc-chassis-poweroff@%i.target
 ConditionPathExists=!/run/openbmc/chassis@%i-on
 
 [Service]
@@ -15,4 +15,4 @@ ExecStart={sbindir}/pgood_wait /org/openbmc/control/power%i on
 TimeoutSec=30
 
 [Install]
-WantedBy=obmc-chassis-start@%i.target
+WantedBy=obmc-host-start@%i.target
