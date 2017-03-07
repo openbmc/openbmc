@@ -36,6 +36,8 @@ SYSTEMD_SERVICE_${PN} += " \
         obmc-fans-ready.target \
         obmc-fan-control.target \
         obmc-standby.target \
+        obmc-fsi-disable.target \
+        obmc-fsi-enable.target \
         "
 
 SYSTEMD_SERVICE_${PN} += "${@compose_list(d, 'CHASSIS_FMT', 'CHASSIS_TARGETS')}"
@@ -49,3 +51,6 @@ SYSTEMD_LINK_${PN} += "${@compose_list(d, 'SYNCH_POWER_LINK_FMT', 'SYNCH_POWER_T
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'CHASSIS_POWER_LINK_FMT', 'CHASSIS_POWER_TARGETS', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'HOST_LINK_SYNCH_FMT', 'HOST_SYNCH_TARGETS', 'OBMC_HOST_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'HOST_LINK_ACTION_FMT', 'HOST_ACTION_TARGETS', 'OBMC_HOST_INSTANCES')}"
+
+FSI_FMT_CTRL     = "../obmc-fsi-enable.target:obmc-power-chassis-on@{0}.target.requires/obmc-fsi-enable.target"
+SYSTEMD_LINK_${PN} +=  "${@compose_list(d, 'FSI_FMT_CTRL', 'OBMC_CHASSIS_INSTANCES')}"
