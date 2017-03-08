@@ -1,0 +1,20 @@
+SysBoot:
+    sys_boot_status:
+        Action: 'Off'
+        DutyOn: 50
+        Period: 0
+Attention:
+    identify:
+        Action: 'Off'
+        DutyOn: 50
+        Period: 0
+PlatformFault:
+    plt_fault:
+        Action: 'Off'
+        DutyOn: 50
+        Period: 0
+HddFault:
+    hdd_fault:
+        Action: 'Off'
+        DutyOn: 50
+        Period: 0
