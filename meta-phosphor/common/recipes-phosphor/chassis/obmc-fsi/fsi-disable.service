@@ -1,0 +1,8 @@
+[Unit]
+Description=Disable FSI
+Conflicts=fsi-enable.service
+
+[Service]
+ExecStart=/bin/sh -c "echo fsi-master > /sys/bus/platform/drivers/fsi-master-gpio/unbind"
+Type=oneshot
+RemainAfterExit=yes
