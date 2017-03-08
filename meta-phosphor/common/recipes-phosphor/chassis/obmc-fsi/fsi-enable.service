@@ -1,0 +1,10 @@
+[Unit]
+Description=Enable FSI
+Conflicts=fsi-disable.service
+ConditionDirectoryNotEmpty=!/sys/bus/platform/drivers/fsi-master-gpio/fsi-master
+
+[Service]
+ExecStart=/bin/sh -c "echo fsi-master > /sys/bus/platform/drivers/fsi-master-gpio/bind"
+ExecStart=/bin/sh -c "echo 1 > /sys/bus/platform/devices/fsi-master/scan"
+Type=oneshot
+RemainAfterExit=yes
