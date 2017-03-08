@@ -3,5 +3,6 @@ Description=Power%i Off
 After=obmc-power-stop-pre@%i.target
 Wants={SYSTEMD_DEFAULT_TARGET}
 Conflicts=obmc-power-chassis-on@%i.target
+Conflicts=fsi-disable.service
 RefuseManualStart=yes
 RefuseManualStop=yes
