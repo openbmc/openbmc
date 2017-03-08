@@ -33,8 +33,8 @@ RDEPENDS_${PN}-chassis = " \
         obmc-watchdog \
         obmc-host-failure-reboots \
         "
-#Pull in obmc-fsi-scan on all P9 OpenPOWER systems
-RDEPENDS_${PN}-chassis += "${@mf_enabled(d, 'obmc-fsi-scan', 'obmc-fsi-scan')}"
+#Pull in obmc-fsi on all P9 OpenPOWER systems
+RDEPENDS_${PN}-chassis += "${@mf_enabled(d, 'obmc-fsi', 'obmc-fsi')}"
 
 SUMMARY_${PN}-fans = "OpenPOWER Fans"
 RDEPENDS_${PN}-fans = " \

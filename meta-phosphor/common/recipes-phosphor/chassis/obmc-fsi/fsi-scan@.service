@@ -1,0 +1,15 @@
+[Unit]
+Description=Scan FSI devices
+Wants=obmc-power-on@%i.target
+After=obmc-power-on@%i.target
+Wants=obmc-host-start-pre@%i.target
+Before=obmc-host-start-pre@%i.target
+Conflicts=obmc-power-chassis-off@%i.target
+
+[Service]
+ExecStart=/bin/sh -c "echo 1 > /sys/bus/platform/devices/fsi-master/scan"
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+RequiredBy=obmc-power-chassis-on@%i.target
