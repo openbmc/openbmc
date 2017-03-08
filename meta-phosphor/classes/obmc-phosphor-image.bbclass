@@ -75,6 +75,7 @@ CORE_IMAGE_EXTRA_INSTALL_append = " bash \
         pam-plugin-access \
         ${OBMC_IMAGE_EXTRA_INSTALL} \
         ffdc \
+        rsync \
         "
 
 OBMC_IMAGE_EXTRA_INSTALL ?= ""
