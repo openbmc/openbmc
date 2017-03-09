@@ -24,7 +24,7 @@ SYSTEMD_SUBSTITUTIONS += "FLASH_SIZE:${MBOXD_FLASH_SIZE}:${PN}.service"
 
 # Hacks because ${STAGING_KERNEL_DIR} points to the kernel source tree, not the
 # installed, pre-processed headers. Requires the aspeed-lpc-ctrl-h patch above.
-CFLAGS_append = "-I include"
+CFLAGS_append += "-I include"
 
 do_install_append() {
     install -d ${D}/lib/udev/rules.d
