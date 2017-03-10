@@ -6,7 +6,7 @@ Before=avsbus-enable@%i.service
 Conflicts=obmc-power-chassis-off@%i.target
 
 [Service]
-ExecStart={bindir}/vrm-control.sh vdna=0.9 vddra=1.35 vdnb=0.9 vddrb=1.35
+ExecStart={bindir}/vrm-control.sh vdna=0.9 vdnb=0.9
 Type=oneshot
 RemainAfterExit=yes
 
