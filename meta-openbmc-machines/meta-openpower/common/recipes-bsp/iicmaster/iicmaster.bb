@@ -14,3 +14,6 @@ do_install() {
     install -d ${D}${bindir}
     install -m 0755 iicmaster ${D}${bindir}
 }
+
+#TODO: openbmc/openbmc#1362 - Fix GNU_HASH warnings in iic2master
+TARGET_CC_ARCH += "${LDFLAGS}"
