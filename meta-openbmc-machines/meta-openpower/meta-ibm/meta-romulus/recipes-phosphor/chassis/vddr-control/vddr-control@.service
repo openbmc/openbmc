@@ -1,0 +1,15 @@
+[Unit]
+Description=Apply voltage overrides to VDDRs
+Wants=cpld_trigger@%i.service
+After=cpld_trigger@%i.service
+Wants=obmc-host-start-pre@%i.target
+Before=obmc-host-start-pre@%i.target
+Conflicts=obmc-power-chassis-off@%i.target
+
+[Service]
+ExecStart={bindir}/vddr.sh
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=obmc-power-chassis-on@%i.target
