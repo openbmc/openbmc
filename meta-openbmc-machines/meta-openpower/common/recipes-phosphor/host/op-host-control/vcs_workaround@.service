@@ -9,7 +9,7 @@ After=fsi-scan@%i.service
 Conflicts=obmc-power-chassis-off@%i.target
 
 [Service]
-ExecStart={bindir}/vcs_workaround.sh {MACHINE}
+ExecStart={sbindir}/openpower-proc-control vcsWorkaround
 Type=oneshot
 RemainAfterExit=yes
 
