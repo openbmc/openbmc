@@ -1,1 +1,1 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/op-pdbg-host-control:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/op-host-control:"
