@@ -9,4 +9,7 @@ RDEPENDS_${PN} = " \
     ldd \
     ethtool \
     net-tools \
+    phosphor-logging \
     "
+
+DEPENDS += "phosphor-logging"
