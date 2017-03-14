@@ -9,6 +9,8 @@ require ${PN}.inc
 DEPENDS += "python-pyyaml-native"
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbusplus sdbusplus-native"
+DEPENDS += "phosphor-logging"
+
 DEPENDS += "virtual/${PN}-config-native"
 RDEPENDS_${PN} += "libsystemd"
 
