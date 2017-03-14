@@ -19,14 +19,21 @@ vrm_set_page()
 }
 
 # Usage: vrm_avs_enable <bus> <i2c_address> <page>
+# Initializes the AVSBus VOUT setpoint to the value in PMBus VOUT_COMMAND
 # Sets OPERATION PMBUS register to
 # - Enable/Disable: On
 # - VOUT Source: AVSBus Target Rail Voltage
 # - AVSBus Copy: VOUT_COMMAND remains unchanged
+# Writes to VOUT setpoint over AVSBus will persist after the VRM is switched to
+# PMBus control. Switching back to AVSBus control restores this persisted
+# setpoint rather than re-initializing to PMBus VOUT_COMMAND. This behavior is
+# known to Intersil and writing VOUT_COMMAND over PMBus is the only workaround.
 vrm_avs_enable()
 {
     vrm_set_page "$@"
     echo Enabling AVSBus on bus $1 VRM @$2 rail $3...
+    local vout_command=`i2cget -y $1 $2 0x21 w`
+    i2cset -y $1 $2 0x21 $vout_command w
     i2cset -y $1 $2 0x01 0xb0 b
 }
 
