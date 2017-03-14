@@ -10,6 +10,7 @@ inherit obmc-phosphor-dbus-service
 
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbusplus"
+DEPENDS += "phosphor-dbus-interfaces"
 RDEPENDS_${PN} += "libsystemd"
 
 DBUS_SERVICE_${PN} += "xyz.openbmc_project.led.controller@.service"
