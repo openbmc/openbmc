@@ -1,0 +1,13 @@
+[Unit]
+Description=Enable BCM NIC_FUNC_MODE
+Wants=cpld_trigger@%i.service
+Before=cpld_trigger@%i.service
+Conflicts=obmc-power-chassis-off@%i.target
+
+[Service]
+ExecStart={bindir}/set_nic_func_mode.sh
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=obmc-power-chassis-on@%i.target
