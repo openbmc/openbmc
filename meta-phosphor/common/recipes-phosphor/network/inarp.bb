@@ -5,6 +5,7 @@ PR = "r1"
 
 inherit autotools
 inherit obmc-phosphor-license
+inherit obmc-phosphor-systemd
 
 DEPENDS += "autoconf-archive-native"
 RDEPENDS_${PN} += "network"
