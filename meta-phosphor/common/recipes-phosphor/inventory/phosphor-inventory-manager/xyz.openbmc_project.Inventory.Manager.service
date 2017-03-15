@@ -1,5 +1,6 @@
 [Unit]
 Description=Phosphor Inventory Manager
+Before=mapper-wait@-xyz-openbmc_project-inventory.service
 
 [Service]
 Restart=always
