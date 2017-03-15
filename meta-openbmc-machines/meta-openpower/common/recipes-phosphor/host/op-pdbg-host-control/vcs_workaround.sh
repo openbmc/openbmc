@@ -17,7 +17,7 @@ p9_dd1_vcs_workaround()
 }
 
 # Put the CFAM/FSI slave into async mode
-putcfam -p0 0x900 1
+putcfam -p0 0x840 1
 
 #Set hMFSI error recovery
 putcfam -p0 0x34b8 0x0000c000
