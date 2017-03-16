@@ -1,0 +1,55 @@
+From af8bbda6866dfd1956a6c21333b2d1bd5c99b14c Mon Sep 17 00:00:00 2001
+From: Christopher Bostic <cbostic@linux.vnet.ibm.com>
+Date: Wed, 15 Mar 2017 15:59:54 -0500
+Subject: [PATCH linux dev-4.7] drivers/fsi: Add more time between clocking and
+ data sampling
+To: joel@jms.id.au
+Cc: openbmc@lists.ozlabs.org
+
+Under high work loads the ARM core can occasionaly hit invalid
+timings between the FSI clock and data lines which leads to
+data crc errors.  Add further delay between clock switch and
+data line changes.
+
+Signed-off-by: Christopher Bostic <cbostic@linux.vnet.ibm.com>
+---
+ drivers/fsi/fsi-master-gpio.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/fsi/fsi-master-gpio.c b/drivers/fsi/fsi-master-gpio.c
+index a8976d5..a93453f 100644
+--- a/drivers/fsi/fsi-master-gpio.c
++++ b/drivers/fsi/fsi-master-gpio.c
+@@ -13,7 +13,7 @@
+ 
+ #include "fsi-master.h"
+ 
+-#define	FSI_GPIO_STD_DLY	1	/* Standard pin delay in nS */
++#define	FSI_GPIO_STD_DLY	1	/* Standard pin delay in uS */
+ #define	FSI_ECHO_DELAY_CLOCKS	16	/* Number clocks for echo delay */
+ #define	FSI_PRE_BREAK_CLOCKS	50	/* Number clocks to prep for break */
+ #define	FSI_BREAK_CLOCKS	256	/* Number of clocks to issue break */
+@@ -86,9 +86,9 @@ static void clock_toggle(struct fsi_master_gpio *master, int count)
+ 	int i;
+ 
+ 	for (i = 0; i < count; i++) {
+-		ndelay(FSI_GPIO_STD_DLY);
++		udelay(FSI_GPIO_STD_DLY);
+ 		gpiod_set_value(master->gpio_clk, 0);
+-		ndelay(FSI_GPIO_STD_DLY);
++		udelay(FSI_GPIO_STD_DLY);
+ 		gpiod_set_value(master->gpio_clk, 1);
+ 	}
+ }
+@@ -97,7 +97,7 @@ static int sda_in(struct fsi_master_gpio *master)
+ {
+ 	int in;
+ 
+-	ndelay(FSI_GPIO_STD_DLY);
++	udelay(FSI_GPIO_STD_DLY);
+ 	in = gpiod_get_value(master->gpio_data);
+ 	return in ? 1 : 0;
+ }
+-- 
+1.8.2.2
+
