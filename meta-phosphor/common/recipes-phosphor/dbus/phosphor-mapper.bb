@@ -13,7 +13,7 @@ inherit obmc-phosphor-systemd
 DEPENDS += "systemd"
 DEPENDS += "autoconf-archive-native"
 
-DBUS_SERVICE_${PN} += "xyz.openbmc_project.ObjectMapper.service"
+DBUS_SERVICE_${PN} += "xyz.openbmc_project.object_mapper.service"
 SYSTEMD_SERVICE_${PN} = "mapper-wait@.service"
 RDEPENDS_libmapper += "libsystemd"
 RDEPENDS_${PN} += " \
