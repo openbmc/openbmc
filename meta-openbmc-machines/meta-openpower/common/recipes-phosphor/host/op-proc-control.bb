@@ -13,4 +13,4 @@ DEPENDS += "autoconf-archive-native phosphor-logging"
 RDEPENDS_${PN} += "phosphor-logging"
 
 SRC_URI += "git://github.com/openbmc/openpower-proc-control"
-SRCREV = "0c0eeff6e991077f6a4570880b01396ac1b9e2e5"
+SRCREV = "29ddffdc90170059713855d5428c38d4feea9196"
