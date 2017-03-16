@@ -116,6 +116,15 @@ PREFERRED_PROVIDER_virtual/phosphor-led-manager-config-native ?= \
 PREFERRED_PROVIDER_virtual/phosphor-ipmi-sensor-inventory ?= \
     "${@cf_enabled(d, 'obmc-mrw', 'phosphor-ipmi-sensor-inventory-mrw-native', 'phosphor-ipmi-sensor-inventory-example-native')}"
 
+# The phosphor-logging application has a data driven plugin that adds FRU
+# callout information to error logs, when applications generating error logs
+# add the requisite callout metadata to the systemd journal.  The plugin requires
+# an input mapping of Linux sysfs devices to OpenBMC DBus objects.
+# This virtual is a native recipe that provides that mapping by installing
+# configuration files in the format and native sysroot location expected by
+# the phosphor-logging build process in the native sysroot.
+PREFERRED_PROVIDER_virtual/phosphor-logging-callouts ?= \
+    "${@cf_enabled(d, 'obmc-mrw', 'phosphor-logging-callouts-mrw-native', 'phosphor-logging-callouts-example-native')}"
 
 OBMC_DBUS_PATH_ROOT ?= "/xyz/openbmc_project"
 OBMC_DBUS_IFACE_ROOT ?= "xyz.openbmc_project"
