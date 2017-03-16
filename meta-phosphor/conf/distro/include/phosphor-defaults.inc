@@ -103,5 +103,8 @@ PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-properties ?= \
 PREFERRED_PROVIDER_virtual/phosphor-led-manager-config-native ?= \
     "${@cf_enabled(d, 'obmc-mrw', 'phosphor-led-manager-config-mrw-native', 'phosphor-led-manager-config-example-native')}"
 
+PREFERRED_PROVIDER_virtual/phosphor-logging-callouts ?= \
+    "${@cf_enabled(d, 'obmc-mrw', 'phosphor-logging-callouts-mrw-native', 'phosphor-logging-callouts-example-native')}"
+
 OBMC_DBUS_PATH_ROOT ?= "/xyz/openbmc_project"
 OBMC_DBUS_IFACE_ROOT ?= "xyz.openbmc_project"
