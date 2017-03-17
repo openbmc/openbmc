@@ -17,7 +17,7 @@ PROVIDES += "virtual/phosphor-ipmi-sensor-inventory"
 S = "${WORKDIR}"
 
 do_install() {
-        DEST=${D}${config_datadir}
+        DEST=${D}${sensor_datadir}
         install -d ${DEST}
 
         ${bindir}/perl-native/perl \

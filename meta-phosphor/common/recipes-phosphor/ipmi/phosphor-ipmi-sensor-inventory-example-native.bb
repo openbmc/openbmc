@@ -16,7 +16,7 @@ do_install() {
         # sensor data extracted  from the mrw.
         # provides a sample output file.
 
-        DEST=${D}${config_datadir}
+        DEST=${D}${sensor_datadir}
         install -d ${DEST}
         install config.yaml ${DEST}/sensor.yaml
 }
