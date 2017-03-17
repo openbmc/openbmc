@@ -1,0 +1,195 @@
+From d100e52bdaef13d3f9aab162719919f660111479 Mon Sep 17 00:00:00 2001
+From: Christopher Bostic <cbostic@linux.vnet.ibm.com>
+Date: Fri, 17 Mar 2017 16:00:48 -0500
+Subject: [PATCH linux dev-4.7 v3] drivers/fsi: Increase delay before sampling
+ input on SDA
+To: joel@jms.id.au
+Cc: openbmc@lists.ozlabs.org
+
+During high cpu loads the SDA in line can shift relative to the
+clock signal which can corrupt the received input data.  Slow
+down the time to sample input to account for this.
+
+Add sysfs files to adjust the three main openfsi protocol timing
+values: clock delay; sample delay; clock off time.
+
+Signed-off-by: Christopher Bostic <cbostic@linux.vnet.ibm.com>
+---
+v3 - Add sysfs files to adjust protocol timings
+
+v2 - Increase delay for SDA in sampling only.
+
+   - Decrease the original delay for SDA sampling from 1us to 200ns
+---
+ drivers/fsi/fsi-master-gpio.c | 107 ++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 103 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/fsi/fsi-master-gpio.c b/drivers/fsi/fsi-master-gpio.c
+index a8976d5..0907977 100644
+--- a/drivers/fsi/fsi-master-gpio.c
++++ b/drivers/fsi/fsi-master-gpio.c
+@@ -14,6 +14,7 @@
+ #include "fsi-master.h"
+ 
+ #define	FSI_GPIO_STD_DLY	1	/* Standard pin delay in nS */
++#define	FSI_GPIO_SDA_IN_DLY	200	/* Wait to sample SDA line, in nS */
+ #define	FSI_ECHO_DELAY_CLOCKS	16	/* Number clocks for echo delay */
+ #define	FSI_PRE_BREAK_CLOCKS	50	/* Number clocks to prep for break */
+ #define	FSI_BREAK_CLOCKS	256	/* Number of clocks to issue break */
+@@ -65,6 +66,10 @@
+ 
+ static DEFINE_SPINLOCK(fsi_gpio_cmd_lock);	/* lock around fsi commands */
+ 
++static int clock_delay = FSI_GPIO_STD_DLY;
++static int clock_off_time = FSI_GPIO_STD_DLY;
++static int sample_delay = FSI_GPIO_SDA_IN_DLY;
++
+ struct fsi_master_gpio {
+ 	struct fsi_master	master;
+ 	struct gpio_desc	*gpio_clk;
+@@ -86,9 +91,11 @@ static void clock_toggle(struct fsi_master_gpio *master, int count)
+ 	int i;
+ 
+ 	for (i = 0; i < count; i++) {
+-		ndelay(FSI_GPIO_STD_DLY);
++		udelay(clock_delay / 1000);
++		ndelay(clock_delay % 1000);
+ 		gpiod_set_value(master->gpio_clk, 0);
+-		ndelay(FSI_GPIO_STD_DLY);
++		udelay(clock_off_time / 1000);
++		ndelay(clock_off_time % 1000);
+ 		gpiod_set_value(master->gpio_clk, 1);
+ 	}
+ }
+@@ -97,7 +104,8 @@ static int sda_in(struct fsi_master_gpio *master)
+ {
+ 	int in;
+ 
+-	ndelay(FSI_GPIO_STD_DLY);
++	udelay(sample_delay / 1000);
++	ndelay(sample_delay % 1000);
+ 	in = gpiod_get_value(master->gpio_data);
+ 	return in ? 1 : 0;
+ }
+@@ -497,10 +505,77 @@ static ssize_t store_scan(struct device *dev,
+ 
+ static DEVICE_ATTR(scan, 0200, NULL, store_scan);
+ 
++static ssize_t clock_delay_show(struct device *dev,
++				struct device_attribute *attr, char *buf)
++{
++	return snprintf(buf, PAGE_SIZE - 1, "%u\n", clock_delay);
++}
++
++static ssize_t clock_delay_store(struct device *dev,
++				struct device_attribute *attr,
++				const char *buf, size_t count)
++{
++	int rc;
++	unsigned long val = 0;
++
++	rc = kstrtoul(buf, 0, &val);
++	clock_delay = val;
++
++	return count;
++}
++
++DEVICE_ATTR(clock_delay, S_IRUGO | S_IWUSR, clock_delay_show,
++		clock_delay_store);
++
++static ssize_t clock_off_time_show(struct device *dev,
++				struct device_attribute *attr, char *buf)
++{
++	return snprintf(buf, PAGE_SIZE - 1, "%u\n", clock_off_time);
++}
++
++static ssize_t clock_off_time_store(struct device *dev,
++				struct device_attribute *attr,
++				const char *buf, size_t count)
++{
++	int rc;
++	unsigned long val = 0;
++
++	rc = kstrtoul(buf, 0, &val);
++	clock_off_time = val;
++
++	return count;
++}
++
++DEVICE_ATTR(clock_off_time, S_IRUGO | S_IWUSR, clock_off_time_show,
++		clock_off_time_store);
++
++static ssize_t sample_delay_show(struct device *dev,
++				struct device_attribute *attr, char *buf)
++{
++	return snprintf(buf, PAGE_SIZE - 1, "%u\n", sample_delay);
++}
++
++static ssize_t sample_delay_store(struct device *dev,
++				struct device_attribute *attr,
++				const char *buf, size_t count)
++{
++	int rc;
++	unsigned long val = 0;
++
++	rc = kstrtoul(buf, 0, &val);
++	sample_delay = val;
++
++	return count;
++}
++
++DEVICE_ATTR(sample_delay, S_IRUGO | S_IWUSR, sample_delay_show,
++		sample_delay_store);
++
+ static int fsi_master_gpio_probe(struct platform_device *pdev)
+ {
+ 	struct fsi_master_gpio *master;
+ 	struct gpio_desc *gpio;
++	int rc;
+ 
+ 	master = devm_kzalloc(&pdev->dev, sizeof(*master), GFP_KERNEL);
+ 	if (!master)
+@@ -548,8 +623,29 @@ static int fsi_master_gpio_probe(struct platform_device *pdev)
+ 	master->master.send_break = fsi_master_gpio_break;
+ 	master->master.link_enable = fsi_master_gpio_link_enable;
+ 	platform_set_drvdata(pdev, master);
++	rc = device_create_file(&pdev->dev, &dev_attr_clock_off_time);
++	if (rc)
++		goto done;
++	rc = device_create_file(&pdev->dev, &dev_attr_clock_delay);
++	if (rc)
++		goto rem_clock_off;
++	rc = device_create_file(&pdev->dev, &dev_attr_sample_delay);
++	if (rc)
++		goto rem_clock_delay;
++	rc = device_create_file(&pdev->dev, &dev_attr_scan);
++	if (rc)
++		goto rem_sample_delay;
+ 
+-	return device_create_file(&pdev->dev, &dev_attr_scan);
++	return rc;
++
++rem_sample_delay:
++	device_remove_file(&pdev->dev, &dev_attr_sample_delay);
++rem_clock_delay:
++	device_remove_file(&pdev->dev, &dev_attr_clock_delay);
++rem_clock_off:
++	device_remove_file(&pdev->dev, &dev_attr_clock_off_time);
++done:
++	return rc;
+ }
+ 
+ 
+@@ -576,6 +672,9 @@ static int fsi_master_gpio_remove(struct platform_device *pdev)
+ 		devm_gpiod_put(&pdev->dev, master->gpio_mux);
+ 	}
+ 	fsi_master_unregister(&master->master);
++	device_remove_file(&pdev->dev, &dev_attr_clock_off_time);
++	device_remove_file(&pdev->dev, &dev_attr_clock_delay);
++	device_remove_file(&pdev->dev, &dev_attr_sample_delay);
+ 	device_remove_file(&pdev->dev, &dev_attr_scan);
+ 
+ 	return 0;
+-- 
+1.8.2.2
+
