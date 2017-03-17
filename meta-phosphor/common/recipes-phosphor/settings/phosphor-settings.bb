@@ -7,6 +7,7 @@ inherit allarch
 inherit obmc-phosphor-license
 inherit setuptools
 inherit obmc-phosphor-dbus-service
+inherit pythonnative
 
 DBUS_SERVICE_${PN} = "org.openbmc.settings.Host.service"
 
@@ -20,3 +21,8 @@ SRC_URI += "git://github.com/openbmc/phosphor-settingsd"
 SRCREV = "aaa74c14cd5799ac560dc92445a14c28832026c1"
 
 S = "${WORKDIR}/git"
+
+python do_path_test () {
+    import yaml
+}
+addtask path_test after do_configure before do_compile
