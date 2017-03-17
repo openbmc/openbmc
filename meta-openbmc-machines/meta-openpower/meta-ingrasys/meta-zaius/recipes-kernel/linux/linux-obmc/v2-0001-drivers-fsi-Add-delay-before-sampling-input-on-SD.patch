@@ -1,0 +1,44 @@
+From 830e392d5d21d468d6816af1da04b989c68127eb Mon Sep 17 00:00:00 2001
+From: Christopher Bostic <cbostic@linux.vnet.ibm.com>
+Date: Fri, 17 Mar 2017 16:00:48 -0500
+Subject: [PATCH linux dev-4.7 v2] drivers/fsi: Add delay before sampling input
+ on SDA
+To: joel@jms.id.au
+Cc: openbmc@lists.ozlabs.org
+
+During high cpu loads the SDA in line can shift relative to the
+clock signal which can corrupt the received input data.  Slow
+down the time to sample input to account for this.
+
+Signed-off-by: Christopher Bostic <cbostic@linux.vnet.ibm.com>
+---
+v2 - Increase delay for SDA in sampling only.
+   - Decrease the original delay for SDA sampling from 1us to 200ns
+---
+ drivers/fsi/fsi-master-gpio.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/fsi/fsi-master-gpio.c b/drivers/fsi/fsi-master-gpio.c
+index a8976d5..8e832e0 100644
+--- a/drivers/fsi/fsi-master-gpio.c
++++ b/drivers/fsi/fsi-master-gpio.c
+@@ -14,6 +14,7 @@
+ #include "fsi-master.h"
+ 
+ #define	FSI_GPIO_STD_DLY	1	/* Standard pin delay in nS */
++#define	FSI_GPIO_SDA_IN_DLY	200	/* Wait to sample SDA line, in nS */
+ #define	FSI_ECHO_DELAY_CLOCKS	16	/* Number clocks for echo delay */
+ #define	FSI_PRE_BREAK_CLOCKS	50	/* Number clocks to prep for break */
+ #define	FSI_BREAK_CLOCKS	256	/* Number of clocks to issue break */
+@@ -97,7 +98,7 @@ static int sda_in(struct fsi_master_gpio *master)
+ {
+ 	int in;
+ 
+-	ndelay(FSI_GPIO_STD_DLY);
++	ndelay(FSI_GPIO_SDA_IN_DLY);
+ 	in = gpiod_get_value(master->gpio_data);
+ 	return in ? 1 : 0;
+ }
+-- 
+1.8.2.2
+
