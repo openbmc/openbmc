@@ -17,6 +17,8 @@ DEPENDS += "phosphor-mapper"
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "packagegroup-obmc-ipmid-providers"
 DEPENDS += "virtual/phosphor-ipmi-sensor-inventory"
+DEPENDS += "sdbusplus"
+DEPENDS += "phosphor-dbus-interfaces"
 
 RDEPENDS_${PN}-dev += "phosphor-logging"
 RDEPENDS_${PN}-dev += "phosphor-mapper-dev"
@@ -24,6 +26,8 @@ RDEPENDS_${PN} += "clear-once"
 RDEPENDS_${PN} += "network"
 RDEPENDS_${PN} += "libmapper"
 RDEPENDS_${PN} += "phosphor-time-manager"
+RDEPENDS_${PN} += "sdbusplus phosphor-dbus-interfaces"
+
 RRECOMMENDS_${PN} += "virtual-obmc-settings-mgmt"
 SRC_URI += "git://github.com/openbmc/phosphor-host-ipmid"
 
