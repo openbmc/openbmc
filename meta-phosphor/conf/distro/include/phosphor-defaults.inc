@@ -98,7 +98,7 @@ PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-hostfw-config ?= "phosphor-ipmi-fru
 PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-inventory ?= \
     "${@cf_enabled(d, 'obmc-mrw', 'phosphor-ipmi-fru-inventory-mrw-native', 'phosphor-ipmi-fru-inventory-example-native')}"
 PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-properties ?= \
-    "${@cf_enabled(d, 'obmc-mrw', 'phosphor-ipmi-fru-properties-mrw-native', 'phosphor-ipmi-fru-properties-example-native')}"
+    "${@cf_enabled(d, 'obmc-mrw', 'phosphor-ipmi-fru-properties-mrw-native', 'phosphor-ipmi-fru-properties-native')}"
 
 # The phosphor-led-manager application is data-driven and requires an input
 # yaml of LED group and members.
