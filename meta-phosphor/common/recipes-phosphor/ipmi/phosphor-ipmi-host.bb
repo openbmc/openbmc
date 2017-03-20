@@ -17,6 +17,7 @@ DEPENDS += "phosphor-mapper"
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "packagegroup-obmc-ipmid-providers"
 DEPENDS += "virtual/phosphor-ipmi-sensor-inventory"
+DEPENDS += "phosphor-dbus-interfaces"
 
 RDEPENDS_${PN}-dev += "phosphor-logging"
 RDEPENDS_${PN}-dev += "phosphor-mapper-dev"
