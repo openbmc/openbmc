@@ -126,5 +126,13 @@ PREFERRED_PROVIDER_virtual/phosphor-ipmi-sensor-inventory ?= \
 PREFERRED_PROVIDER_virtual/phosphor-logging-callouts ?= \
     "${@cf_enabled(d, 'obmc-mrw', 'phosphor-logging-callouts-mrw-native', 'phosphor-logging-callouts-example-native')}"
 
+# The phosphor-fan-presence application is data driven and requires an
+# input YAML that maps fans to their tach sensors.
+# This virtual is a native recipe that provides that mapping by installing
+# configuration files in the format and native sysroot location expected by
+# the phosphor-fan-presence build process in the native sysroot.
+PREFERRED_PROVIDER_virtual/phosphor-fan-presence-config ?= \
+    "${@cf_enabled(d, 'obmc-mrw', 'phosphor-fan-presence-mrw-native', 'phosphor-fan-presence-example-native')}"
+
 OBMC_DBUS_PATH_ROOT ?= "/xyz/openbmc_project"
 OBMC_DBUS_IFACE_ROOT ?= "xyz.openbmc_project"

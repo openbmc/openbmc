@@ -9,11 +9,14 @@ LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
 inherit autotools pkgconfig pythonnative
 inherit obmc-phosphor-systemd
+inherit phosphor-fan-presence
 
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "python-pyyaml-native"
+DEPENDS += "python-mako-native"
 DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-logging"
+DEPENDS += "virtual/phosphor-fan-presence-config"
 RDEPENDS_${PN} += "sdbusplus"
 
 FAN_PRESENCE_PACKAGES = " \
@@ -38,3 +41,6 @@ SRC_URI += "git://github.com/openbmc/phosphor-fan-presence"
 SRCREV = "6d9b18d5e51b269d741c13120a35a7b780ac8928"
 
 S = "${WORKDIR}/git"
+
+EXTRA_OECONF = \
+    "FAN_DETECT_YAML_FILE=${STAGING_DIR_NATIVE}${presence_datadir}/config.yaml"
