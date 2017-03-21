@@ -2,18 +2,20 @@ SUMMARY = "Phosphor Fan Presence"
 DESCRIPTION = "Phosphor fan presence provides a set of fan presence \
 daemons to monitor fan presence changes by different methods of \
 presence detection."
-HOMEPAGE = "https://github.com/openbmc/phosphor-fan-presence"
 PR = "r1"
-LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
+
+require ${PN}.inc
 
 inherit autotools pkgconfig pythonnative
 inherit obmc-phosphor-systemd
+inherit phosphor-fan-presence
 
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "python-pyyaml-native"
+DEPENDS += "python-mako-native"
 DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-logging"
+DEPENDS += "virtual/phosphor-fan-presence-config"
 RDEPENDS_${PN} += "sdbusplus"
 
 FAN_PRESENCE_PACKAGES = " \
@@ -34,7 +36,7 @@ FILES_${PN}-tach = "${sbindir}/phosphor-fan-presence-tach"
 SYSTEMD_SERVICE_${PN}-tach += "${TMPL}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT', 'OBMC_CHASSIS_INSTANCES')}"
 
-SRC_URI += "git://github.com/openbmc/phosphor-fan-presence"
-SRCREV = "2b44a6c0b282cf50c563a175535c4c32f55a81dc"
-
 S = "${WORKDIR}/git"
+
+EXTRA_OECONF = \
+    "FAN_DETECT_YAML_FILE=${STAGING_DIR_NATIVE}${presence_datadir}/config.yaml"
