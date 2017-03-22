@@ -5,6 +5,7 @@ After=obmc-host-started@%i.target
 Wants=mapper-wait@-org-openbmc-watchdog-host%i.service
 After=mapper-wait@-org-openbmc-watchdog-host%i.service
 Conflicts=obmc-chassis-stop@%i.target
+ConditionPathExists=!/run/openbmc/host@%i-on
 
 [Service]
 Type=oneshot

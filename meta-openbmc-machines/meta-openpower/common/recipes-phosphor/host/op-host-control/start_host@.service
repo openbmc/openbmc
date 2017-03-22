@@ -7,6 +7,7 @@ Before=obmc-host-started@%i.target
 Wants=obmc-power-on@%i.target
 After=obmc-power-on@%i.target
 Conflicts=obmc-chassis-stop@%i.target
+ConditionPathExists=!/run/openbmc/host@%i-on
 
 [Service]
 ExecStart={sbindir}/openpower-proc-control startHost
