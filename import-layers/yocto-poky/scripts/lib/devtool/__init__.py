@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Development tool - utility functions for plugins
 #
@@ -26,10 +26,11 @@ import re
 
 logger = logging.getLogger('devtool')
 
-
 class DevtoolError(Exception):
     """Exception for handling devtool errors"""
-    pass
+    def __init__(self, message, exitcode=1):
+        super(DevtoolError, self).__init__(message)
+        self.exitcode = exitcode
 
 
 def exec_build_env_command(init_path, builddir, cmd, watch=False, **options):
@@ -59,7 +60,7 @@ def exec_build_env_command(init_path, builddir, cmd, watch=False, **options):
 def exec_watch(cmd, **options):
     """Run program with stdout shown on sys.stdout"""
     import bb
-    if isinstance(cmd, basestring) and not "shell" in options:
+    if isinstance(cmd, str) and not "shell" in options:
         options["shell"] = True
 
     process = subprocess.Popen(
@@ -69,6 +70,7 @@ def exec_watch(cmd, **options):
     buf = ''
     while True:
         out = process.stdout.read(1)
+        out = out.decode('utf-8')
         if out:
             sys.stdout.write(out)
             sys.stdout.flush()
@@ -144,8 +146,7 @@ def parse_recipe(config, tinfoil, pn, appends, filter_workspace=True):
                             not path.startswith(config.workspace_path)]
     else:
         append_files = None
-    return oe.recipeutils.parse_recipe(recipefile, append_files,
-                                       tinfoil.config_data)
+    return oe.recipeutils.parse_recipe(tinfoil.cooker, recipefile, append_files)
 
 def check_workspace_recipe(workspace, pn, checksrc=True, bbclassextend=False):
     """
@@ -155,7 +156,7 @@ def check_workspace_recipe(workspace, pn, checksrc=True, bbclassextend=False):
 
     workspacepn = pn
 
-    for recipe, value in workspace.iteritems():
+    for recipe, value in workspace.items():
         if recipe == pn:
             break
         if bbclassextend:
@@ -195,15 +196,18 @@ def use_external_build(same_dir, no_same_dir, d):
         b_is_s = False
     return b_is_s
 
-def setup_git_repo(repodir, version, devbranch, basetag='devtool-base'):
+def setup_git_repo(repodir, version, devbranch, basetag='devtool-base', d=None):
     """
     Set up the git repository for the source tree
     """
     import bb.process
+    import oe.patch
     if not os.path.exists(os.path.join(repodir, '.git')):
         bb.process.run('git init', cwd=repodir)
         bb.process.run('git add .', cwd=repodir)
-        commit_cmd = ['git', 'commit', '-q']
+        commit_cmd = ['git']
+        oe.patch.GitApplyTree.gitCommandUserOptions(commit_cmd, d=d)
+        commit_cmd += ['commit', '-q']
         stdout, _ = bb.process.run('git status --porcelain', cwd=repodir)
         if not stdout:
             commit_cmd.append('--allow-empty')
@@ -255,3 +259,32 @@ def get_bbclassextend_targets(recipefile, pn):
             elif variant in ['native', 'cross', 'crosssdk']:
                 targets.append('%s-%s' % (pn, variant))
     return targets
+
+def ensure_npm(config, basepath, fixed_setup=False):
+    """
+    Ensure that npm is available and either build it or show a
+    reasonable error message
+    """
+    tinfoil = setup_tinfoil(config_only=True, basepath=basepath)
+    try:
+        nativepath = tinfoil.config_data.getVar('STAGING_BINDIR_NATIVE', True)
+    finally:
+        tinfoil.shutdown()
+
+    npmpath = os.path.join(nativepath, 'npm')
+    if not os.path.exists(npmpath):
+        logger.info('Building nodejs-native')
+        try:
+            exec_build_env_command(config.init_path, basepath,
+                                'bitbake -q nodejs-native', watch=True)
+        except bb.process.ExecutionError as e:
+            if "Nothing PROVIDES 'nodejs-native'" in e.stdout:
+                if fixed_setup:
+                    msg = 'nodejs-native is required for npm but is not available within this SDK'
+                else:
+                    msg = 'nodejs-native is required for npm but is not available - you will likely need to add a layer that provides nodejs'
+                raise DevtoolError(msg)
+            else:
+                raise
+        if not os.path.exists(npmpath):
+            raise DevtoolError('Built nodejs-native but npm binary still could not be found at %s' % npmpath)

@@ -32,7 +32,7 @@ def get_layer_git_status(path):
                                 shell=True,
                                 stderr=subprocess.STDOUT)
         return ""
-    except subprocess.CalledProcessError, ex:
+    except subprocess.CalledProcessError as ex:
         # Silently treat errors as "modified", without checking for the
         # (expected) return code 1 in a modified git repo. For example, we get
         # output and a 129 return code when a layer isn't a git repo at all.
@@ -71,7 +71,9 @@ Build Configuration:  |
 Layer Revisions:      |
 -----------------------
 ''',
-            get_layer_revs(d)
+            get_layer_revs(d),
+            '''
+'''
        ))
 }
 

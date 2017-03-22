@@ -10,23 +10,22 @@ Signed-off-by: Chong Lu <Chong.Lu@windriver.com>
  2 files changed, 19 insertions(+), 1 deletion(-)
 
 diff --git a/configure.ac b/configure.ac
-index 0209bac..b969e25 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -36,7 +36,7 @@ AC_INIT([strace],
  AC_CONFIG_SRCDIR([strace.c])
  AC_CONFIG_AUX_DIR([.])
  AC_CONFIG_HEADERS([config.h])
--AM_INIT_AUTOMAKE([foreign nostdinc dist-xz no-dist-gzip silent-rules parallel-tests])
-+AM_INIT_AUTOMAKE([foreign nostdinc dist-xz no-dist-gzip silent-rules serial-tests])
+-AM_INIT_AUTOMAKE([foreign nostdinc dist-xz silent-rules parallel-tests])
++AM_INIT_AUTOMAKE([foreign nostdinc dist-xz silent-rules serial-tests])
  AM_MAINTAINER_MODE
  AC_CANONICAL_HOST
  
 diff --git a/tests/Makefile.am b/tests/Makefile.am
-index 0f23b4b..429f7e9 100644
+index 9023029..e1917fa 100644
 --- a/tests/Makefile.am
 +++ b/tests/Makefile.am
-@@ -332,3 +332,21 @@ ksysent.h: $(srcdir)/ksysent.sed
+@@ -784,3 +784,21 @@ ksysent.h: $(srcdir)/ksysent.sed
  
  BUILT_SOURCES = ksysent.h
  CLEANFILES = ksysent.h $(TESTS:=.tmp)
@@ -48,6 +47,3 @@ index 0f23b4b..429f7e9 100644
 +		sed -i -e 's/$${srcdir=.}/./g' $(DESTDIR)/$(TESTDIR)/$$file; \
 +	done
 +	for i in net net-fd scm_rights-fd sigaction; do sed -i -e 's/$$srcdir/./g' $(DESTDIR)/$(TESTDIR)/$$i.test; done
--- 
-1.9.1
-

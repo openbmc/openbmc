@@ -17,10 +17,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see http://www.gnu.org/licenses/.
 
-# Usage: source toaster [start|stop]
-#                       [webport=<port>] [noui] [noweb]
-
-# Helper function to kill a background toaster development server
+HELP="
+Usage: source toaster start|stop [webport=<address:port>] [noweb]
+    Optional arguments:
+        [noweb] Setup the environment for building with toaster but don't start the development server
+        [webport] Set the development server (default: localhost:8000)
+"
 
 webserverKillAll()
 {
@@ -31,9 +33,6 @@ webserverKillAll()
             while kill -0 $pid 2>/dev/null; do
                 kill -SIGTERM -$pid 2>/dev/null
                 sleep 1
-                # Kill processes if they are still running - may happen
-                # in interactive shells
-                ps fux | grep "python.*manage.py runserver" | awk '{print $2}' | xargs kill
             done
             rm  ${pidfile}
         fi
@@ -57,7 +56,8 @@ webserverStartAll()
         echo "Failed migrations, aborting system start" 1>&2
         return $retval
     fi
-
+    # Make sure that checksettings can pick up any value for TEMPLATECONF
+    export TEMPLATECONF
     $MANAGE checksettings --traceback || retval=1
 
     if [ $retval -eq 1 ]; then
@@ -67,7 +67,7 @@ webserverStartAll()
 
     echo "Starting webserver..."
 
-    $MANAGE runserver "0.0.0.0:$WEB_PORT" \
+    $MANAGE runserver "$ADDR_PORT" \
            </dev/null >>${BUILDDIR}/toaster_web.log 2>&1 \
            & echo $! >${BUILDDIR}/.toastermain.pid
 
@@ -77,7 +77,8 @@ webserverStartAll()
         retval=1
         rm "${BUILDDIR}/.toastermain.pid"
     else
-        echo "Webserver address:  http://0.0.0.0:$WEB_PORT/"
+        echo "Toaster development webserver started at http://$ADDR_PORT"
+        echo -e "\nYou can now run 'bitbake <target>' on the command line and monitor your build in Toaster.\nYou can also use a Toaster project to configure and run a build.\n"
     fi
 
     return $retval
@@ -91,14 +92,8 @@ stop_system()
     # prevent reentry
     if [ $INSTOPSYSTEM -eq 1 ]; then return; fi
     INSTOPSYSTEM=1
-    if [ -f ${BUILDDIR}/.toasterui.pid ]; then
-        kill `cat ${BUILDDIR}/.toasterui.pid` 2>/dev/null
-        rm ${BUILDDIR}/.toasterui.pid
-    fi
     webserverKillAll
     # unset exported variables
-    unset DATABASE_URL
-    unset TOASTER_CONF
     unset TOASTER_DIR
     unset BITBAKE_UI
     unset BBBASEDIR
@@ -109,11 +104,11 @@ stop_system()
 
 verify_prereq() {
     # Verify Django version
-    reqfile=$(python -c "import os; print os.path.realpath('$BBBASEDIR/toaster-requirements.txt')")
+    reqfile=$(python3 -c "import os; print(os.path.realpath('$BBBASEDIR/toaster-requirements.txt'))")
     exp='s/Django\([><=]\+\)\([^,]\+\),\([><=]\+\)\(.\+\)/'
     exp=$exp'import sys,django;version=django.get_version().split(".");'
     exp=$exp'sys.exit(not (version \1 "\2".split(".") and version \3 "\4".split(".")))/p'
-    if ! sed -n "$exp" $reqfile | python - ; then
+    if ! sed -n "$exp" $reqfile | python3 - ; then
         req=`grep ^Django $reqfile`
         echo "This program needs $req"
         echo "Please install with pip install -r $reqfile"
@@ -133,8 +128,8 @@ else
 fi
 
 export BBBASEDIR=`dirname $TOASTER`/..
-MANAGE=$BBBASEDIR/lib/toaster/manage.py
-OEROOT=`dirname $TOASTER`/../..
+MANAGE="python3 $BBBASEDIR/lib/toaster/manage.py"
+OE_ROOT=`dirname $TOASTER`/../..
 
 # this is the configuraton file we are using for toaster
 # we are using the same logic that oe-setup-builddir uses
@@ -144,29 +139,17 @@ OEROOT=`dirname $TOASTER`/../..
 # in the local layers that currently make using an arbitrary
 # toasterconf.json difficult.
 
-. $OEROOT/.templateconf
+. $OE_ROOT/.templateconf
 if [ -n "$TEMPLATECONF" ]; then
     if [ ! -d "$TEMPLATECONF" ]; then
         # Allow TEMPLATECONF=meta-xyz/conf as a shortcut
-        if [ -d "$OEROOT/$TEMPLATECONF" ]; then
-            TEMPLATECONF="$OEROOT/$TEMPLATECONF"
-        fi
-        if [ ! -d "$TEMPLATECONF" ]; then
-            echo >&2 "Error: '$TEMPLATECONF' must be a directory containing toasterconf.json"
-            return 1
+        if [ -d "$OE_ROOT/$TEMPLATECONF" ]; then
+            TEMPLATECONF="$OE_ROOT/$TEMPLATECONF"
         fi
     fi
 fi
 
-if [ "$TOASTER_CONF" = "" ]; then
-    TOASTER_CONF="$TEMPLATECONF/toasterconf.json"
-    export TOASTER_CONF=$(python -c "import os; print os.path.realpath('$TOASTER_CONF')")
-fi
-
-if [ ! -f $TOASTER_CONF ]; then
-    echo "$TOASTER_CONF configuration file not found. Set TOASTER_CONF to specify file or fix .templateconf"
-    return 1
-fi
+unset OE_ROOT
 
 # this defines the dir toaster will use for
 # 1) clones of layers (in _toaster_clones )
@@ -178,7 +161,7 @@ fi
 export TOASTER_DIR=`pwd`
 
 WEBSERVER=1
-WEB_PORT="8000"
+ADDR_PORT="localhost:8000"
 unset CMD
 for param in $*; do
     case $param in
@@ -192,7 +175,24 @@ for param in $*; do
             CMD=$param
     ;;
     webport=*)
-            WEB_PORT="${param#*=}"
+            ADDR_PORT="${param#*=}"
+            # Split the addr:port string
+            ADDR=`echo $ADDR_PORT | cut -f 1 -d ':'`
+            PORT=`echo $ADDR_PORT | cut -f 2 -d ':'`
+            # If only a port has been speified then set address to localhost.
+            if [ $ADDR = $PORT ] ; then
+                ADDR_PORT="localhost:$PORT"
+            fi
+    ;;
+    --help)
+            echo "$HELP"
+            return 0
+    ;;
+    *)
+            echo "$HELP"
+            return 1
+    ;;
+
     esac
 done
 
@@ -226,11 +226,9 @@ if [ "$CMD" = "start" ] ; then
 	return 1
 fi
 elif [ "$CMD" = "" ]; then
-    if [ -z "$BBSERVER" ]; then
-        CMD="start"
-    else
-        CMD="stop"
-    fi
+    echo "No command specified"
+    echo "$HELP"
+    return 1
 fi
 
 echo "The system will $CMD."
@@ -241,15 +239,9 @@ case $CMD in
     start )
         # check if addr:port is not in use
         if [ "$CMD" == 'start' ]; then
-             $MANAGE checksocket "0.0.0.0:$WEB_PORT" || return 1
-        fi
-
-        # kill Toaster web server if it's alive
-        if [ -e $BUILDDIR/.toastermain.pid ] && kill -0 `cat $BUILDDIR/.toastermain.pid`; then
-            echo "Warning: bitbake appears to be dead, but the Toaster web server is running." 1>&2
-            echo " Something fishy is going on." 1>&2
-            echo "Cleaning up the web server to start from a clean slate."
-            webserverKillAll
+            if [ $WEBSERVER -gt 0 ]; then
+                $MANAGE checksocket "$ADDR_PORT" || return 1
+            fi
         fi
 
         # Create configuration file
@@ -262,7 +254,6 @@ case $CMD in
             return 4
         fi
         export BITBAKE_UI='toasterui'
-        export DATABASE_URL=`$MANAGE get-dburl`
         $MANAGE runbuilds & echo $! >${BUILDDIR}/.runbuilds.pid
         # set fail safe stop system on terminal exit
         trap stop_system SIGHUP

@@ -399,7 +399,7 @@ ERROR: Unable to parse base: ParseError in configuration INHERITs: Could not inh
      <link linkend='var-BBFILES'>BBFILES</link> += "${LAYERDIR}/*.bb"
 
      <link linkend='var-BBFILE_COLLECTIONS'>BBFILE_COLLECTIONS</link> += "mylayer"
-     <link linkend='var-BBFILE_PATTERN'>BBFILE_PATTERN_mylayer</link> := "^${LAYERDIR}/"
+     <link linkend='var-BBFILE_PATTERN'>BBFILE_PATTERN_mylayer</link> := "^${LAYERDIR_RE}/"
                 </literallayout>
                 For information on these variables, click the links
                 to go to the definitions in the glossary.</para>

@@ -10,7 +10,7 @@ undesired size, when compiled with the x32 abi toolchain.
 2013/05/23
 Received this fix from H J Lu.
 
-Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
 
 # HG changeset patch
 # User H.J. Lu <hjl.tools@gmail.com>

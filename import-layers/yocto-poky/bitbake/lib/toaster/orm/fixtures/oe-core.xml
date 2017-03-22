@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<django-objects version="1.0">
+  <!-- Set the project default value for DISTRO -->
+  <object model="orm.toastersetting" pk="1">
+    <field type="CharField" name="name">DEFCONF_DISTRO</field>
+    <field type="CharField" name="value">nodistro</field>
+  </object>
+
+  <!-- Bitbake versions which correspond to the metadata release -->
+  <object model="orm.bitbakeversion" pk="1">
+    <field type="CharField" name="name">morty</field>
+    <field type="CharField" name="giturl">git://git.openembedded.org/bitbake</field>
+    <field type="CharField" name="branch">1.32</field>
+  </object>
+  <object model="orm.bitbakeversion" pk="2">
+    <field type="CharField" name="name">HEAD</field>
+  </object>
+
+  <!-- Releases available -->
+  <object model="orm.release" pk="1">
+    <field type="CharField" name="name">morty</field>
+    <field type="CharField" name="description">Openembedded Morty</field>
+    <field rel="ManyToOneRel" to="orm.bitbakeversion" name="bitbake_version">1</field>
+    <field type="CharField" name="branch_name">morty</field>
+    <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href=\"http://cgit.openembedded.org/openembedded-core/log/?h=morty\"&gt;OpenEmbedded Morty&lt;/a&gt; branch.</field>
+  </object>
+  <object model="orm.release" pk="2">
+    <field type="CharField" name="name">local</field>
+    <field type="CharField" name="description">Local Openembedded</field>
+    <field rel="ManyToOneRel" to="orm.bitbakeversion" name="bitbake_version">2</field>
+    <field type="CharField" name="branch_name">HEAD</field>
+    <field type="TextField" name="helptext">Toaster will run your builds with the version of OpenEmbedded that you have cloned or downloaded to your computer.</field>
+  </object>
+
+  <!-- Default layers for each release -->
+  <object model="orm.releasedefaultlayer" pk="1">
+    <field rel="ManyToOneRel" to="orm.release" name="release">1</field>
+    <field type="CharField" name="layer_name">openembedded-core</field>
+  </object>
+  <object model="orm.releasedefaultlayer" pk="4">
+    <field rel="ManyToOneRel" to="orm.release" name="release">2</field>
+    <field type="CharField" name="layer_name">openembedded-core</field>
+  </object>
+
+  <!-- TYPE_LOCAL = 0 Layers for the Local release -->
+  <object model="orm.layer" pk="1">
+    <field type="CharField" name="name">openembedded-core</field>
+    <field type="CharField" name="vcs_url">git://git.openembedded.org/openembedded-core</field>
+  </object>
+  <object model="orm.layer_version" pk="1">
+    <field rel="ManyToOneRel" to="orm.layer" name="layer">1</field>
+    <field rel="ManyToOneRel" to="orm.release" name="release">2</field>
+    <field type="CharField" name="local_path">OE-CORE-LAYER-DIR</field>
+    <field type="CharField" name="branch">HEAD</field>
+    <field type="CharField" name="dirpath">meta</field>
+    <field type="IntegerField" name="layer_source">0</field>
+  </object>
+
+</django-objects>

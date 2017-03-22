@@ -9,7 +9,7 @@ SRC_URI = "file://skeleton \
 	   "
 
 do_compile () {
-	${CC} ${WORKDIR}/skeleton_test.c -o ${WORKDIR}/skeleton-test
+	${CC} ${CFLAGS} ${LDFLAGS} ${WORKDIR}/skeleton_test.c -o ${WORKDIR}/skeleton-test
 }
 
 do_install () {

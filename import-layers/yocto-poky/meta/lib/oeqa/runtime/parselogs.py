@@ -55,18 +55,25 @@ x86_common = [
     'Could not enable PowerButton event',
     'probe of LNXPWRBN:00 failed with error -22',
     'pmd_set_huge: Cannot satisfy',
+    'failed to setup card detect gpio',
+    'amd_nb: Cannot enumerate AMD northbridges',
+    'failed to retrieve link info, disabling eDP',
 ] + common_errors
 
 qemux86_common = [
     'wrong ELF class',
     "fail to add MMCONFIG information, can't access extended PCI configuration space under this bridge.",
     "can't claim BAR ",
+    'amd_nb: Cannot enumerate AMD northbridges',
+    'uvesafb: 5000 ms task timeout, infinitely waiting',
+    'tsc: HPET/PMTIMER calibration failed',
 ] + common_errors
 
 ignore_errors = { 
     'default' : common_errors,
     'qemux86' : [
         'Failed to access perfctr msr (MSR',
+        'pci 0000:00:00.0: [Firmware Bug]: reg 0x..: invalid BAR (can\'t size)',
         ] + qemux86_common,
     'qemux86-64' : qemux86_common,
     'qemumips' : [
@@ -81,16 +88,28 @@ ignore_errors = {
         'host side 80-wire cable detection failed, limiting max speed',
         'mode "640x480" test failed',
         'Failed to load module "glx"',
+        'can\'t handle BAR above 4GB',
+        'Cannot reserve Legacy IO',
         ] + common_errors,
     'qemuarm' : [
         'mmci-pl18x: probe of fpga:05 failed with error -22',
         'mmci-pl18x: probe of fpga:0b failed with error -22',
-        'Failed to load module "glx"'
+        'Failed to load module "glx"',
+        'OF: amba_device_add() failed (-19) for /amba/smc@10100000',
+        'OF: amba_device_add() failed (-19) for /amba/mpmc@10110000',
+        'OF: amba_device_add() failed (-19) for /amba/sctl@101e0000',
+        'OF: amba_device_add() failed (-19) for /amba/watchdog@101e1000',
+        'OF: amba_device_add() failed (-19) for /amba/sci@101f0000',
+        'OF: amba_device_add() failed (-19) for /amba/ssp@101f4000',
+        'OF: amba_device_add() failed (-19) for /amba/fpga/sci@a000',
+        'Failed to initialize \'/amba/timer@101e3000\': -22',
+        'jitterentropy: Initialization failed with host not compliant with requirements: 2',
         ] + common_errors,
     'qemuarm64' : [
         'Fatal server error:',
         '(EE) Server terminated with error (1). Closing log file.',
         'dmi: Firmware registration failed.',
+        'irq: type mismatch, failed to map hwirq-27 for /intc',
         ] + common_errors,
     'emenlow' : [
         '[Firmware Bug]: ACPI: No _BQC method, cannot determine initial brightness',
@@ -110,11 +129,19 @@ ignore_errors = {
         '(EE) Failed to load module psbdrv',
         '(EE) open /dev/fb0: No such file or directory',
         '(EE) AIGLX: reverting to software rendering',
+        'dmi: Firmware registration failed.',
+        'ioremap error for 0x78',
         ] + x86_common,
     'intel-corei7-64' : x86_common,
     'crownbay' : x86_common,
     'genericx86' : x86_common,
-    'genericx86-64' : x86_common,
+    'genericx86-64' : [
+        'Direct firmware load for i915',
+        'Failed to load firmware i915',
+        'Failed to fetch GuC',
+        'Failed to initialize GuC',
+        'The driver is built-in, so to load the firmware you need to',
+        ] + x86_common,
     'edgerouter' : [
         'Fatal server error:',
         ] + common_errors,
@@ -153,6 +180,9 @@ class ParseLogsTest(oeRuntimeTest):
     def getMachine(self):
         return oeRuntimeTest.tc.d.getVar("MACHINE", True)
 
+    def getWorkdir(self):
+        return oeRuntimeTest.tc.d.getVar("WORKDIR", True)
+
     #get some information on the CPU of the machine to display at the beginning of the output. This info might be useful in some cases.
     def getHardwareInfo(self):
         hwi = ""
@@ -190,16 +220,19 @@ class ParseLogsTest(oeRuntimeTest):
 
     #copy the log files to be parsed locally
     def transfer_logs(self, log_list):
-        target_logs = 'target_logs'
+        workdir = self.getWorkdir()
+        self.target_logs = workdir + '/' + 'target_logs'
+        target_logs = self.target_logs
         if not os.path.exists(target_logs):
             os.makedirs(target_logs)
+        bb.utils.remove(self.target_logs + "/*")
         for f in log_list:
             self.target.copy_from(f, target_logs)
 
     #get the local list of logs
     def get_local_log_list(self, log_locations):
         self.transfer_logs(self.getLogList(log_locations))
-        logs = [ os.path.join('target_logs',f) for f in os.listdir('target_logs') if os.path.isfile(os.path.join('target_logs',f)) ]
+        logs = [ os.path.join(self.target_logs, f) for f in os.listdir(self.target_logs) if os.path.isfile(os.path.join(self.target_logs, f)) ]
         return logs
 
     #build the grep command to be used with filters and exclusions
@@ -238,7 +271,7 @@ class ParseLogsTest(oeRuntimeTest):
             result = None
             thegrep = self.build_grepcmd(errors, ignore_errors, log)
             try:
-                result = subprocess.check_output(thegrep, shell=True)
+                result = subprocess.check_output(thegrep, shell=True).decode("utf-8")
             except:
                 pass
             if (result is not None):
@@ -246,7 +279,7 @@ class ParseLogsTest(oeRuntimeTest):
                 rez = result.splitlines()
                 for xrez in rez:
                     try:
-                        grep_output = subprocess.check_output(['grep', '-F', xrez, '-B', str(lines_before), '-A', str(lines_after), log])
+                        grep_output = subprocess.check_output(['grep', '-F', xrez, '-B', str(lines_before), '-A', str(lines_after), log]).decode("utf-8")
                     except:
                         pass
                     results[log.replace('target_logs/','')][xrez]=grep_output
@@ -262,7 +295,7 @@ class ParseLogsTest(oeRuntimeTest):
         self.write_dmesg()
         log_list = self.get_local_log_list(self.log_locations)
         result = self.parse_logs(self.errors, self.ignore_errors, log_list)
-        print self.getHardwareInfo()
+        print(self.getHardwareInfo())
         errcount = 0
         for log in result:
             self.msg += "Log: "+log+"\n"

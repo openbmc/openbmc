@@ -55,6 +55,11 @@
                 <date>April 2016</date>
                 <revremark>Released with the Yocto Project 2.1 Release.</revremark>
             </revision>
+            <revision>
+                <revnumber>2.2</revnumber>
+                <date>October 2016</date>
+                <revremark>Released with the Yocto Project 2.2 Release.</revremark>
+            </revision>
        </revhistory>
 
     <copyright>
@@ -111,13 +116,17 @@
     <xi:include
         xmlns:xi="http://www.w3.org/2003/XInclude" href="../sdk-manual/sdk-intro.xml"/>
     <xi:include
+        xmlns:xi="http://www.w3.org/2003/XInclude" href="../sdk-manual/sdk-extensible.xml"/>
+    <xi:include
         xmlns:xi="http://www.w3.org/2003/XInclude" href="../sdk-manual/sdk-using.xml"/>
     <xi:include
-        xmlns:xi="http://www.w3.org/2003/XInclude" href="../sdk-manual/sdk-extensible.xml"/>
+        xmlns:xi="http://www.w3.org/2003/XInclude" href="../sdk-manual/sdk-working-projects.xml"/>
     <xi:include
         xmlns:xi="http://www.w3.org/2003/XInclude" href="../sdk-manual/sdk-appendix-obtain.xml"/>
     <xi:include
         xmlns:xi="http://www.w3.org/2003/XInclude" href="../sdk-manual/sdk-appendix-customizing.xml"/>
+    <xi:include
+        xmlns:xi="http://www.w3.org/2003/XInclude" href="../sdk-manual/sdk-appendix-mars.xml"/>
 
 <!-- Includes bsp-guide title image and then bsp-guide chapters -->
 
@@ -189,6 +198,9 @@
 
     <xi:include
         xmlns:xi="http://www.w3.org/2003/XInclude" href="../ref-manual/ref-tasks.xml"/>
+
+    <xi:include
+        xmlns:xi="http://www.w3.org/2003/XInclude" href="../ref-manual/ref-devtool-reference.xml"/>
 
     <xi:include
         xmlns:xi="http://www.w3.org/2003/XInclude" href="../ref-manual/ref-qa-checks.xml"/>

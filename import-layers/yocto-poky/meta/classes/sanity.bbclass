@@ -135,8 +135,7 @@ is a good way to visualise the changes."""
         bb.note("Your conf/bblayers.conf has been automatically updated.")
         return
 
-        if not status.reparse:
-            status.addresult()
+        status.addresult()
 
     elif current_lconf == 6 and lconf_version > 6:
         # Handle rename of meta-yocto -> meta-poky
@@ -459,19 +458,19 @@ def check_gcc_march(sanity_data):
 
         # Check if GCC could work without march
         if not result:
-            status,res = oe.utils.getstatusoutput("${BUILD_PREFIX}gcc gcc_test.c -o gcc_test")
+            status,res = oe.utils.getstatusoutput(sanity_data.expand("${BUILD_CC} gcc_test.c -o gcc_test"))
             if status == 0:
                 result = True;
 
         if not result:
-            status,res = oe.utils.getstatusoutput("${BUILD_PREFIX}gcc -march=native gcc_test.c -o gcc_test")
+            status,res = oe.utils.getstatusoutput(sanity_data.expand("${BUILD_CC} -march=native gcc_test.c -o gcc_test"))
             if status == 0:
                 message = "BUILD_CFLAGS_append = \" -march=native\""
                 result = True;
 
         if not result:
             build_arch = sanity_data.getVar('BUILD_ARCH', True)
-            status,res = oe.utils.getstatusoutput("${BUILD_PREFIX}gcc -march=%s gcc_test.c -o gcc_test" % build_arch)
+            status,res = oe.utils.getstatusoutput(sanity_data.expand("${BUILD_CC} -march=%s gcc_test.c -o gcc_test" % build_arch))
             if status == 0:
                 message = "BUILD_CFLAGS_append = \" -march=%s\"" % build_arch
                 result = True;
@@ -557,20 +556,17 @@ def check_perl_modules(sanity_data):
         return "Required perl module(s) not found: %s\n\n%s\n" % (ret, errresult)
     return None
 
-def sanity_check_conffiles(status, d):
+def sanity_check_conffiles(d):
     funcs = d.getVar('BBLAYERS_CONF_UPDATE_FUNCS', True).split()
     for func in funcs:
         conffile, current_version, required_version, func = func.split(":")
         if check_conf_exists(conffile, d) and d.getVar(current_version, True) is not None and \
                 d.getVar(current_version, True) != d.getVar(required_version, True):
-            success = True
             try:
                 bb.build.exec_func(func, d, pythonexception=True)
             except NotImplementedError as e:
-                success = False
-                status.addresult(str(e))
-            if success:
-                status.reparse = True
+                bb.fatal(e)
+            d.setVar("BB_INVALIDCONF", True)
 
 def sanity_handle_abichanges(status, d):
     #
@@ -673,11 +669,11 @@ def check_sanity_version_change(status, d):
     if not check_app_exists("${MAKE}", d):
         missing = missing + "GNU make,"
 
-    if not check_app_exists('${BUILD_PREFIX}gcc', d):
-        missing = missing + "C Compiler (%sgcc)," % d.getVar("BUILD_PREFIX", True)
+    if not check_app_exists('${BUILD_CC}', d):
+        missing = missing + "C Compiler (%s)," % d.getVar("BUILD_CC", True)
 
-    if not check_app_exists('${BUILD_PREFIX}g++', d):
-        missing = missing + "C++ Compiler (%sg++)," % d.getVar("BUILD_PREFIX", True)
+    if not check_app_exists('${BUILD_CXX}', d):
+        missing = missing + "C++ Compiler (%s)," % d.getVar("BUILD_CXX", True)
 
     required_utilities = d.getVar('SANITY_REQUIRED_UTILITIES', True)
 
@@ -746,7 +742,7 @@ def check_sanity_version_change(status, d):
             status.addresult("You have a 32-bit libc, but no 32-bit headers.  You must install the 32-bit libc headers.\n")
 
     bbpaths = d.getVar('BBPATH', True).split(":")
-    if ("." in bbpaths or "./" in bbpaths or "" in bbpaths) and not status.reparse:
+    if ("." in bbpaths or "./" in bbpaths or "" in bbpaths):
         status.addresult("BBPATH references the current directory, either through "    \
                 "an empty entry, a './' or a '.'.\n\t This is unsafe and means your "\
                 "layer configuration is adding empty elements to BBPATH.\n\t "\
@@ -764,6 +760,16 @@ def check_sanity_version_change(status, d):
 
     # Check that TMPDIR isn't located on nfs
     status.addresult(check_not_nfs(tmpdir, "TMPDIR"))
+
+def sanity_check_locale(d):
+    """
+    Currently bitbake switches locale to en_US.UTF-8 so check that this locale actually exists.
+    """
+    import locale
+    try:
+        locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
+    except locale.Error:
+        raise_sanity_error("You system needs to support the en_US.UTF-8 locale.", d)
 
 def check_sanity_everybuild(status, d):
     import os, stat
@@ -784,7 +790,7 @@ def check_sanity_everybuild(status, d):
     if (LooseVersion(bb.__version__) < LooseVersion(minversion)):
         status.addresult('Bitbake version %s is required and version %s was found\n' % (minversion, bb.__version__))
 
-    sanity_check_conffiles(status, d)
+    sanity_check_locale(d)
 
     paths = d.getVar('PATH', True).split(":")
     if "." in paths or "./" in paths or "" in paths:
@@ -829,8 +835,8 @@ def check_sanity_everybuild(status, d):
 
     check_supported_distro(d)
 
-    omask = os.umask(022)
-    if omask & 0755:
+    omask = os.umask(0o022)
+    if omask & 0o755:
         status.addresult("Please use a umask which allows a+rx and u+rwx\n")
     os.umask(omask)
 
@@ -891,13 +897,13 @@ def check_sanity_everybuild(status, d):
                 continue
 
             if mirror.startswith('file://'):
-                import urlparse
-                check_symlink(urlparse.urlparse(mirror).path, d)
+                import urllib
+                check_symlink(urllib.parse.urlparse(mirror).path, d)
                 # SSTATE_MIRROR ends with a /PATH string
                 if mirror.endswith('/PATH'):
                     # remove /PATH$ from SSTATE_MIRROR to get a working
                     # base directory path
-                    mirror_base = urlparse.urlparse(mirror[:-1*len('/PATH')]).path
+                    mirror_base = urllib.parse.urlparse(mirror[:-1*len('/PATH')]).path
                     check_symlink(mirror_base, d)
 
     # Check that TMPDIR hasn't changed location since the last time we were run
@@ -920,17 +926,17 @@ def check_sanity_everybuild(status, d):
         with open(checkfile, "w") as f:
             f.write(tmpdir)
 
-    # Check /bin/sh links to dash or bash
-    real_sh = os.path.realpath('/bin/sh')
-    if not real_sh.endswith('/dash') and not real_sh.endswith('/bash'):
-        status.addresult("Error, /bin/sh links to %s, must be dash or bash\n" % real_sh)
+    # If /bin/sh is a symlink, check that it points to dash or bash
+    if os.path.islink('/bin/sh'):
+        real_sh = os.path.realpath('/bin/sh')
+        if not real_sh.endswith('/dash') and not real_sh.endswith('/bash'):
+            status.addresult("Error, /bin/sh links to %s, must be dash or bash\n" % real_sh)
 
 def check_sanity(sanity_data):
     class SanityStatus(object):
         def __init__(self):
             self.messages = ""
             self.network_error = False
-            self.reparse = False
 
         def addresult(self, message):
             if message:
@@ -986,7 +992,6 @@ def check_sanity(sanity_data):
 
     if status.messages != "":
         raise_sanity_error(sanity_data.expand(status.messages), sanity_data, status.network_error)
-    return status.reparse
 
 # Create a copy of the datastore and finalise it to ensure appends and 
 # overrides are set - the datastore has yet to be finalised at ConfigParsed
@@ -995,15 +1000,20 @@ def copy_data(e):
     sanity_data.finalize()
     return sanity_data
 
+addhandler config_reparse_eventhandler
+config_reparse_eventhandler[eventmask] = "bb.event.ConfigParsed"
+python config_reparse_eventhandler() {
+    sanity_check_conffiles(e.data)
+}
+
 addhandler check_sanity_eventhandler
 check_sanity_eventhandler[eventmask] = "bb.event.SanityCheck bb.event.NetworkTest"
 python check_sanity_eventhandler() {
     if bb.event.getName(e) == "SanityCheck":
         sanity_data = copy_data(e)
+        check_sanity(sanity_data)
         if e.generateevents:
             sanity_data.setVar("SANITY_USE_EVENTS", "1")
-        reparse = check_sanity(sanity_data)
-        e.data.setVar("BB_INVALIDCONF", reparse)
         bb.event.fire(bb.event.SanityCheckPassed(), e.data)
     elif bb.event.getName(e) == "NetworkTest":
         sanity_data = copy_data(e)

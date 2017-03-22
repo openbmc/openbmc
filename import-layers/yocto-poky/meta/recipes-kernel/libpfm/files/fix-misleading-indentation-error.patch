@@ -1,0 +1,38 @@
+Upstream-Status: Pending
+
+Fix compile error:
+
+| syst_count.c:346:3: error: this 'for' clause does not guard... [-Werror=misleading-indentation] 
+|    for(c=cmin ; c < cmax; c++) 
+|       ^~~ 
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+diff --git a/perf_examples/syst_count.c b/perf_examples/syst_count.c
+index 0d53078..2dfb9b9 100644
+--- a/perf_examples/syst_count.c
++++ b/perf_examples/syst_count.c
+@@ -343,8 +343,9 @@ measure(void)
+ 
+ 		for (delay = 1 ; delay <= options.delay; delay++) {
+ 
+-		for(c=cmin ; c < cmax; c++)
+-			start_cpu(c);
++			for(c=cmin ; c < cmax; c++) {
++				start_cpu(c);
++			}
+ 
+ 			if (0) {
+ 				tv.tv_sec = 0;
+@@ -353,8 +354,9 @@ measure(void)
+ 			} else
+ 				sleep(1);
+ 
+-		for(c=cmin ; c < cmax; c++)
+-			stop_cpu(c);
++			for(c=cmin ; c < cmax; c++) {
++				stop_cpu(c);
++			}
+ 
+ 			for(c = cmin; c < cmax; c++) {
+ 				printf("# %'ds -----\n", delay);

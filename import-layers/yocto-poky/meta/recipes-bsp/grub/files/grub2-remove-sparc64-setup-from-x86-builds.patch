@@ -1,104 +1,44 @@
+Subject: [PATCH] grub2: remove grub-sparc64-setup from x86 builds
+
+* remove the grub-sparc64-setup files from the x86 builds.
+
 Upstream-Status: Inappropriate [embedded specific]
 
-remove the grub-sparc64-setup files from the x86 builds.
+Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ Makefile.util.def | 18 ------------------
+ 1 file changed, 18 deletions(-)
 
-Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+diff --git a/Makefile.util.def b/Makefile.util.def
+index b80187c..a670cf2 100644
+--- a/Makefile.util.def
++++ b/Makefile.util.def
+@@ -321,24 +321,6 @@ program = {
+ };
+ 
+ program = {
+-  name = grub-sparc64-setup;
+-  installdir = sbin;
+-  mansection = 8;
+-  common = util/grub-setup.c;
+-  common = util/lvm.c;
+-  common = grub-core/kern/emu/argp_common.c;
+-  common = grub-core/lib/reed_solomon.c;
+-  common = util/ieee1275/ofpath.c;
+-
+-  ldadd = libgrubmods.a;
+-  ldadd = libgrubkern.a;
+-  ldadd = libgrubgcry.a;
+-  ldadd = grub-core/gnulib/libgnu.a;
+-  ldadd = '$(LIBINTL) $(LIBDEVMAPPER) $(LIBUTIL) $(LIBZFS) $(LIBNVPAIR) $(LIBGEOM)';
+-  cppflags = '-DGRUB_SETUP_SPARC64=1';
+-};
+-
+-program = {
+   name = grub-ofpathname;
+   installdir = sbin;
+   mansection = 8;
+-- 
+2.8.1
 
---- a/Makefile.util.am	2014-08-15 11:41:02.441011278 -0700
-+++ b/Makefile.util.am	2014-08-15 11:44:26.245021142 -0700
-@@ -4692,9 +4692,9 @@
- endif
- 
- if COND_emu
--sbin_PROGRAMS += grub-sparc64-setup
-+sbin_PROGRAMS +=
- if COND_MAN_PAGES
--man_MANS += grub-sparc64-setup.8
-+man_MANS +=
- 
- grub-sparc64-setup.8: grub-sparc64-setup
- 	chmod a+x grub-sparc64-setup
-@@ -4715,9 +4715,9 @@
- endif
- 
- if COND_i386_pc
--sbin_PROGRAMS += grub-sparc64-setup
-+sbin_PROGRAMS +=
- if COND_MAN_PAGES
--man_MANS += grub-sparc64-setup.8
-+man_MANS +=
- 
- grub-sparc64-setup.8: grub-sparc64-setup
- 	chmod a+x grub-sparc64-setup
-@@ -4738,9 +4738,9 @@
- endif
- 
- if COND_i386_efi
--sbin_PROGRAMS += grub-sparc64-setup
-+sbin_PROGRAMS +=
- if COND_MAN_PAGES
--man_MANS += grub-sparc64-setup.8
-+man_MANS +=
- 
- grub-sparc64-setup.8: grub-sparc64-setup
- 	chmod a+x grub-sparc64-setup
-@@ -4761,9 +4761,9 @@
- endif
- 
- if COND_i386_qemu
--sbin_PROGRAMS += grub-sparc64-setup
-+sbin_PROGRAMS +=
- if COND_MAN_PAGES
--man_MANS += grub-sparc64-setup.8
-+man_MANS +=
- 
- grub-sparc64-setup.8: grub-sparc64-setup
- 	chmod a+x grub-sparc64-setup
-@@ -4784,9 +4784,9 @@
- endif
- 
- if COND_i386_coreboot
--sbin_PROGRAMS += grub-sparc64-setup
-+sbin_PROGRAMS +=
- if COND_MAN_PAGES
--man_MANS += grub-sparc64-setup.8
-+man_MANS +=
- 
- grub-sparc64-setup.8: grub-sparc64-setup
- 	chmod a+x grub-sparc64-setup
-@@ -4807,9 +4807,9 @@
- endif
- 
- if COND_i386_multiboot
--sbin_PROGRAMS += grub-sparc64-setup
-+sbin_PROGRAMS +=
- if COND_MAN_PAGES
--man_MANS += grub-sparc64-setup.8
-+man_MANS +=
- 
- grub-sparc64-setup.8: grub-sparc64-setup
- 	chmod a+x grub-sparc64-setup
-@@ -4830,9 +4830,9 @@
- endif
- 
- if COND_i386_ieee1275
--sbin_PROGRAMS += grub-sparc64-setup
-+sbin_PROGRAMS +=
- if COND_MAN_PAGES
--man_MANS += grub-sparc64-setup.8
-+man_MANS +=
- 
- grub-sparc64-setup.8: grub-sparc64-setup
- 	chmod a+x grub-sparc64-setup
-@@ -4853,9 +4853,9 @@
- endif
- 
- if COND_x86_64_efi
--sbin_PROGRAMS += grub-sparc64-setup
-+sbin_PROGRAMS +=
- if COND_MAN_PAGES
--man_MANS += grub-sparc64-setup.8
-+man_MANS +=
- 
- grub-sparc64-setup.8: grub-sparc64-setup
- 	chmod a+x grub-sparc64-setup

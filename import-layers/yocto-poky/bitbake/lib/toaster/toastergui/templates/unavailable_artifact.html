@@ -6,10 +6,12 @@
 {% block title %} Build artifact does not exist - Toaster {% endblock %}
 
 {% block pagecontent %}
-    <div class="row-fluid air">
-        <div class="alert alert-info span8 lead">
-            <p>The build artifact you are trying to download does not exist.</p>
-            <p><a href="javascript:window.history.back()">Back to previous page</a></p>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="alert alert-info lead top-air">
+                <p>The build artifact you are trying to download does not exist.</p>
+                <p><a href="javascript:window.history.back()">Back to previous page</a></p>
+            </div>
         </div>
     </div>
 {% endblock %}

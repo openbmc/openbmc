@@ -34,43 +34,42 @@ class GitANNEX(Git):
         """
         return ud.type in ['gitannex']
 
-    def uses_annex(self, ud, d):
+    def uses_annex(self, ud, d, wd):
         for name in ud.names:
             try:
-                runfetchcmd("%s rev-list git-annex" % (ud.basecmd), d, quiet=True)
+                runfetchcmd("%s rev-list git-annex" % (ud.basecmd), d, quiet=True, workdir=wd)
                 return True
             except bb.fetch.FetchError:
                 pass
 
         return False
 
-    def update_annex(self, ud, d):
+    def update_annex(self, ud, d, wd):
         try:
-            runfetchcmd("%s annex get --all" % (ud.basecmd), d, quiet=True)
+            runfetchcmd("%s annex get --all" % (ud.basecmd), d, quiet=True, workdir=wd)
         except bb.fetch.FetchError:
             return False
-        runfetchcmd("chmod u+w -R %s/annex" % (ud.clonedir), d, quiet=True)
+        runfetchcmd("chmod u+w -R %s/annex" % (ud.clonedir), d, quiet=True, workdir=wd)
 
         return True
 
     def download(self, ud, d):
         Git.download(self, ud, d)
 
-        os.chdir(ud.clonedir)
-        annex = self.uses_annex(ud, d)
+        annex = self.uses_annex(ud, d, ud.clonedir)
         if annex:
-            self.update_annex(ud, d)
+            self.update_annex(ud, d, ud.clonedir)
 
     def unpack(self, ud, destdir, d):
         Git.unpack(self, ud, destdir, d)
 
-        os.chdir(ud.destdir)
         try:
-            runfetchcmd("%s annex sync" % (ud.basecmd), d)
+            runfetchcmd("%s annex init" % (ud.basecmd), d, workdir=ud.destdir)
         except bb.fetch.FetchError:
             pass
 
-        annex = self.uses_annex(ud, d)
+        annex = self.uses_annex(ud, d, ud.destdir)
         if annex:
-            runfetchcmd("%s annex get" % (ud.basecmd), d)
-            runfetchcmd("chmod u+w -R %s/.git/annex" % (ud.destdir), d, quiet=True)
+            runfetchcmd("%s annex get" % (ud.basecmd), d, workdir=ud.destdir)
+            runfetchcmd("chmod u+w -R %s/.git/annex" % (ud.destdir), d, quiet=True, workdir=ud.destdir)
+

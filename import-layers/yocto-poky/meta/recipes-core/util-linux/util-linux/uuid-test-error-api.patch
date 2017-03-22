@@ -3,19 +3,23 @@ This patch adds error() API implementation for non-glibc system C libs
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
-Index: util-linux-2.27.1/tests/helpers/test_uuidd.c
-===================================================================
---- util-linux-2.27.1.orig/tests/helpers/test_uuidd.c
-+++ util-linux-2.27.1/tests/helpers/test_uuidd.c
+---
+ misc-utils/test_uuidd.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 61 insertions(+), 1 deletion(-)
+
+diff --git a/misc-utils/test_uuidd.c b/misc-utils/test_uuidd.c
+index 36f3b3d..7d579ce 100644
+--- a/misc-utils/test_uuidd.c
++++ b/misc-utils/test_uuidd.c
 @@ -23,7 +23,6 @@
   *
   *	make uuidd uuidgen localstatedir=/var
   */
 -#include <error.h>
- #include <libgen.h>
  #include <pthread.h>
  #include <stdio.h>
-@@ -39,6 +38,17 @@
+ #include <stdlib.h>
+@@ -38,6 +37,17 @@
  #include "xalloc.h"
  #include "strutils.h"
  
@@ -33,7 +37,7 @@ Index: util-linux-2.27.1/tests/helpers/test_uuidd.c
  #define LOG(level,args) if (loglev >= level) { fprintf args; }
  
  size_t nprocesses = 4;
-@@ -257,6 +267,56 @@ static void object_dump(size_t idx, obje
+@@ -256,6 +266,56 @@ static void object_dump(size_t idx, object_t *obj)
  	fprintf(stderr, "}\n");
  }
  
@@ -90,3 +94,6 @@ Index: util-linux-2.27.1/tests/helpers/test_uuidd.c
  int main(int argc, char *argv[])
  {
  	size_t i, nfailed = 0, nignored = 0;
+-- 
+2.8.3
+

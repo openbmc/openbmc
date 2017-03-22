@@ -1,0 +1,110 @@
+From a00d3161fd7b6a698bdd2ed5f0ac5faac580ee2a Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Wed, 3 Aug 2016 23:13:00 -0400
+Subject: [PATCH] fix run-intl failed
+
+1. Filter extra white space of intl.right
+
+   Due to the extra white space of intl.right, when the result of
+   sub-test unicode2.sub of intl.tests compared to it, the test
+   failed.
+
+   So we need to filter the extra white space of intl.right.
+
+   Import this patch for intl.right from bash devel branch:
+
+	http://git.savannah.gnu.org/cgit/bash.git/log/?h=devel
+
+   commit is:
+
+	85ec0778f9d778e1820fb8c0e3e996f2d1103b45
+
+2. Change intl.right correspond to the unicode3.sub's output
+
+   In sub-test unicode3.sub of intl.tests, the payload value is:
+
+	payload=$'\065\247\100\063\231\053\306\123\070\237\242\352\263'
+
+   It used quoted string expansion(escaped octal) to assign ASCII
+   characters to variables. So when the test run the following:
+
+	printf %q "$payload"
+
+   It produced:
+
+	$'5\247@3\231+\306S8\237\242\352\263'
+
+   When compared to the intl.right(contain the converted character), it failed.
+
+   Import parts of patch for intl.right from bash devel branch:
+
+	http://git.savannah.gnu.org/cgit/bash.git/log/?h=devel
+
+   commit is:
+
+	74b8cbb41398b4453d8ba04d0cdd1b25f9dcb9e3
+
+Upstream-Status: Backport
+
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+---
+ tests/intl.right | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/tests/intl.right b/tests/intl.right
+index acf108a..1efdfbe 100644
+--- a/tests/intl.right
++++ b/tests/intl.right
+@@ -18,34 +18,34 @@ a√©b
+ 1.0000
+ 1,0000
+ Passed all 1378 Unicode tests
+-0000000   303 277 012                                                    
++0000000 303 277 012
+ 0000003
+-0000000   303 277 012                                                    
++0000000 303 277 012
+ 0000003
+-0000000   303 277 012                                                    
++0000000 303 277 012
+ 0000003
+-0000000   303 277 012                                                    
++0000000 303 277 012
+ 0000003
+-0000000   357 277 277 012                                                
++0000000 357 277 277 012
+ 0000004
+-0000000   357 277 277 012                                                
++0000000 357 277 277 012
+ 0000004
+-0000000   012                                                            
++0000000 012
+ 0000001
+-0000000   012                                                            
++0000000 012
+ 0000001
+-0000000   012                                                            
++0000000 012
+ 0000001
+-0000000   012                                                            
++0000000 012
+ 0000001
+-0000000   303 277 012                                                    
++0000000 303 277 012
+ 0000003
+-0000000   303 277 012                                                    
++0000000 303 277 012
+ 0000003
+-0000000   303 277 012                                                    
++0000000 303 277 012
+ 0000003
+-0000000   101 040 302 243 040 305 222 012                                
++0000000 101 040 302 243 040 305 222 012
+ 0000010
+ ./unicode3.sub: line 2: 5ß@3ô+∆S8ü¢Í≥: command not found
+-5ß@3ô+∆S8ü¢Í≥
++$'5\247@3\231+\306S8\237\242\352\263'
+ + : $'5\247@3\231+\306S8\237\242\352\263'
+-- 
+2.8.1
+

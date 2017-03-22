@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os
 import sys
@@ -10,7 +10,11 @@ import bb
 import select
 import errno
 import signal
+import pickle
 from multiprocessing import Lock
+
+if sys.getfilesystemencoding() != "utf-8":
+    sys.exit("Please use a locale setting which supports utf-8.\nPython can't change the filesystem locale after loading so we need a utf-8 when python starts or things won't work.")
 
 # Users shouldn't be running this code directly
 if len(sys.argv) != 2 or not sys.argv[1].startswith("decafbad"):
@@ -30,18 +34,15 @@ if sys.argv[1].startswith("decafbadbad"):
 # updates to log files for use with tail
 try:
     if sys.stdout.name == '<stdout>':
-        sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+        import fcntl
+        fl = fcntl.fcntl(sys.stdout.fileno(), fcntl.F_GETFL)
+        fl |= os.O_SYNC 
+        fcntl.fcntl(sys.stdout.fileno(), fcntl.F_SETFL, fl)
+        #sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
 except:
     pass
 
 logger = logging.getLogger("BitBake")
-
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
-    bb.msg.note(1, bb.msg.domain.Cache, "Importing cPickle failed. Falling back to a very slow implementation.")
-
 
 worker_pipe = sys.stdout.fileno()
 bb.utils.nonblockingfd(worker_pipe)
@@ -62,10 +63,10 @@ if 0:
     consolelog.setFormatter(conlogformat)
     logger.addHandler(consolelog)
 
-worker_queue = ""
+worker_queue = b""
 
 def worker_fire(event, d):
-    data = "<event>" + pickle.dumps(event) + "</event>"
+    data = b"<event>" + pickle.dumps(event) + b"</event>"
     worker_fire_prepickled(data)
 
 def worker_fire_prepickled(event):
@@ -91,7 +92,7 @@ def worker_child_fire(event, d):
     global worker_pipe
     global worker_pipe_lock
 
-    data = "<event>" + pickle.dumps(event) + "</event>"
+    data = b"<event>" + pickle.dumps(event) + b"</event>"
     try:
         worker_pipe_lock.acquire()
         worker_pipe.write(data)
@@ -114,7 +115,7 @@ def sigterm_handler(signum, frame):
     os.killpg(0, signal.SIGTERM)
     sys.exit()
 
-def fork_off_task(cfg, data, workerdata, fn, task, taskname, appends, taskdepdata, quieterrors=False):
+def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, appends, taskdepdata, quieterrors=False):
     # We need to setup the environment BEFORE the fork, since
     # a fork() or exec*() activates PSEUDO...
 
@@ -159,7 +160,8 @@ def fork_off_task(cfg, data, workerdata, fn, task, taskname, appends, taskdepdat
         pipeout = os.fdopen(pipeout, 'wb', 0)
         pid = os.fork()
     except OSError as e:
-        bb.msg.fatal("RunQueue", "fork failed: %d (%s)" % (e.errno, e.strerror))
+        logger.critical("fork failed: %d (%s)" % (e.errno, e.strerror))
+        sys.exit(1)
 
     if pid == 0:
         def child():
@@ -191,15 +193,19 @@ def fork_off_task(cfg, data, workerdata, fn, task, taskname, appends, taskdepdat
             if umask:
                 os.umask(umask)
 
-            data.setVar("BB_WORKERCONTEXT", "1")
-            data.setVar("BB_TASKDEPDATA", taskdepdata)
-            data.setVar("BUILDNAME", workerdata["buildname"])
-            data.setVar("DATE", workerdata["date"])
-            data.setVar("TIME", workerdata["time"])
-            bb.parse.siggen.set_taskdata(workerdata["sigdata"])
-            ret = 0
             try:
-                the_data = bb.cache.Cache.loadDataFull(fn, appends, data)
+                bb_cache = bb.cache.NoCache(databuilder)
+                (realfn, virtual, mc) = bb.cache.virtualfn2realfn(fn)
+                the_data = databuilder.mcdata[mc]
+                the_data.setVar("BB_WORKERCONTEXT", "1")
+                the_data.setVar("BB_TASKDEPDATA", taskdepdata)
+                the_data.setVar("BUILDNAME", workerdata["buildname"])
+                the_data.setVar("DATE", workerdata["date"])
+                the_data.setVar("TIME", workerdata["time"])
+                bb.parse.siggen.set_taskdata(workerdata["sigdata"])
+                ret = 0
+
+                the_data = bb_cache.loadDataFull(fn, appends)
                 the_data.setVar('BB_TASKHASH', workerdata["runq_hash"][task])
 
                 bb.utils.set_process_name("%s:%s" % (the_data.getVar("PN", True), taskname.replace("do_", "")))
@@ -207,13 +213,23 @@ def fork_off_task(cfg, data, workerdata, fn, task, taskname, appends, taskdepdat
                 # exported_vars() returns a generator which *cannot* be passed to os.environ.update() 
                 # successfully. We also need to unset anything from the environment which shouldn't be there 
                 exports = bb.data.exported_vars(the_data)
+
                 bb.utils.empty_environment()
                 for e, v in exports:
                     os.environ[e] = v
+
                 for e in fakeenv:
                     os.environ[e] = fakeenv[e]
                     the_data.setVar(e, fakeenv[e])
                     the_data.setVarFlag(e, 'export', "1")
+
+                task_exports = the_data.getVarFlag(taskname, 'exports', True)
+                if task_exports:
+                    for e in task_exports.split():
+                        the_data.setVarFlag(e, 'export', '1')
+                        v = the_data.getVar(e, True)
+                        if v is not None:
+                            os.environ[e] = v
 
                 if quieterrors:
                     the_data.setVarFlag(taskname, "quieterrors", "1")
@@ -240,7 +256,7 @@ def fork_off_task(cfg, data, workerdata, fn, task, taskname, appends, taskdepdat
                 bb.utils.process_profilelog(profname)
                 os._exit(ret)
     else:
-        for key, value in envbackup.iteritems():
+        for key, value in iter(envbackup.items()):
             if value is None:
                 del os.environ[key]
             else:
@@ -257,22 +273,22 @@ class runQueueWorkerPipe():
         if pipeout:
             pipeout.close()
         bb.utils.nonblockingfd(self.input)
-        self.queue = ""
+        self.queue = b""
 
     def read(self):
         start = len(self.queue)
         try:
-            self.queue = self.queue + self.input.read(102400)
+            self.queue = self.queue + (self.input.read(102400) or b"")
         except (OSError, IOError) as e:
             if e.errno != errno.EAGAIN:
                 raise
 
         end = len(self.queue)
-        index = self.queue.find("</event>")
+        index = self.queue.find(b"</event>")
         while index != -1:
             worker_fire_prepickled(self.queue[:index+8])
             self.queue = self.queue[index+8:]
-            index = self.queue.find("</event>")
+            index = self.queue.find(b"</event>")
         return (end > start)
 
     def close(self):
@@ -288,7 +304,7 @@ class BitbakeWorker(object):
     def __init__(self, din):
         self.input = din
         bb.utils.nonblockingfd(self.input)
-        self.queue = ""
+        self.queue = b""
         self.cookercfg = None
         self.databuilder = None
         self.data = None
@@ -325,12 +341,12 @@ class BitbakeWorker(object):
                 except (OSError, IOError):
                     pass
             if len(self.queue):
-                self.handle_item("cookerconfig", self.handle_cookercfg)
-                self.handle_item("workerdata", self.handle_workerdata)
-                self.handle_item("runtask", self.handle_runtask)
-                self.handle_item("finishnow", self.handle_finishnow)
-                self.handle_item("ping", self.handle_ping)
-                self.handle_item("quit", self.handle_quit)
+                self.handle_item(b"cookerconfig", self.handle_cookercfg)
+                self.handle_item(b"workerdata", self.handle_workerdata)
+                self.handle_item(b"runtask", self.handle_runtask)
+                self.handle_item(b"finishnow", self.handle_finishnow)
+                self.handle_item(b"ping", self.handle_ping)
+                self.handle_item(b"quit", self.handle_quit)
 
             for pipe in self.build_pipes:
                 self.build_pipes[pipe].read()
@@ -340,12 +356,12 @@ class BitbakeWorker(object):
 
 
     def handle_item(self, item, func):
-        if self.queue.startswith("<" + item + ">"):
-            index = self.queue.find("</" + item + ">")
+        if self.queue.startswith(b"<" + item + b">"):
+            index = self.queue.find(b"</" + item + b">")
             while index != -1:
                 func(self.queue[(len(item) + 2):index])
                 self.queue = self.queue[(index + len(item) + 3):]
-                index = self.queue.find("</" + item + ">")
+                index = self.queue.find(b"</" + item + b">")
 
     def handle_cookercfg(self, data):
         self.cookercfg = pickle.loads(data)
@@ -359,12 +375,13 @@ class BitbakeWorker(object):
         bb.msg.loggerDefaultVerbose = self.workerdata["logdefaultverbose"]
         bb.msg.loggerVerboseLogs = self.workerdata["logdefaultverboselogs"]
         bb.msg.loggerDefaultDomains = self.workerdata["logdefaultdomain"]
-        self.data.setVar("PRSERV_HOST", self.workerdata["prhost"])
+        for mc in self.databuilder.mcdata:
+            self.databuilder.mcdata[mc].setVar("PRSERV_HOST", self.workerdata["prhost"])
 
     def handle_ping(self, _):
         workerlog_write("Handling ping\n")
 
-        logger.warn("Pong from bitbake-worker!")
+        logger.warning("Pong from bitbake-worker!")
 
     def handle_quit(self, data):
         workerlog_write("Handling quit\n")
@@ -377,7 +394,7 @@ class BitbakeWorker(object):
         fn, task, taskname, quieterrors, appends, taskdepdata = pickle.loads(data)
         workerlog_write("Handling runtask %s %s %s\n" % (task, fn, taskname))
 
-        pid, pipein, pipeout = fork_off_task(self.cookercfg, self.data, self.workerdata, fn, task, taskname, appends, taskdepdata, quieterrors)
+        pid, pipein, pipeout = fork_off_task(self.cookercfg, self.data, self.databuilder, self.workerdata, fn, task, taskname, appends, taskdepdata, quieterrors)
 
         self.build_pids[pid] = task
         self.build_pipes[pid] = runQueueWorkerPipe(pipein, pipeout)
@@ -409,12 +426,12 @@ class BitbakeWorker(object):
         self.build_pipes[pid].close()
         del self.build_pipes[pid]
 
-        worker_fire_prepickled("<exitcode>" + pickle.dumps((task, status)) + "</exitcode>")
+        worker_fire_prepickled(b"<exitcode>" + pickle.dumps((task, status)) + b"</exitcode>")
 
     def handle_finishnow(self, _):
         if self.build_pids:
             logger.info("Sending SIGTERM to remaining %s tasks", len(self.build_pids))
-            for k, v in self.build_pids.iteritems():
+            for k, v in iter(self.build_pids.items()):
                 try:
                     os.kill(-k, signal.SIGTERM)
                     os.waitpid(-1, 0)
@@ -424,7 +441,7 @@ class BitbakeWorker(object):
             self.build_pipes[pipe].read()
 
 try:
-    worker = BitbakeWorker(sys.stdin)
+    worker = BitbakeWorker(os.fdopen(sys.stdin.fileno(), 'rb'))
     if not profiling:
         worker.serve()
     else:

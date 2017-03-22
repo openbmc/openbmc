@@ -54,7 +54,7 @@ index d80e72c..b05f01e 100644
  # dummy targets for $(TESTS) so that make does not complain.
  
 +install-ptest:
-+	cd $(BUILDDIR); tar -cf - $(TESTDIR) --exclude *.o | ( cd $(DESTDIR) && tar -xf - )
++	cd $(BUILDDIR); tar -c --exclude=*.o $(TESTDIR) | ( cd $(DESTDIR) && tar -xf - )
 +	for i in $(EXTRA_DIST) tst-regex2.c; do install $(srcdir)/$$i $(DESTDIR)/$(TESTDIR); done
 +	sed -e 's/^Makefile:/_Makefile:/' -e 's/^srcdir = \(.*\)/srcdir = ./' -e 's/bash/sh/' -i $(DESTDIR)/$(TESTDIR)/Makefile
 +	for i in `grep -rl "../sed/sed" $(DESTDIR)/$(TESTDIR)`; do sed -e 's/..\/sed\/sed/sed/' -i $$i; done

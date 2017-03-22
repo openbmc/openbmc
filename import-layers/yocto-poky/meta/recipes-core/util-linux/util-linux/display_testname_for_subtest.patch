@@ -3,16 +3,23 @@ Display testname for subtest
 Signed-off-by: Tudor Florea <tudor.florea@enea.com>
 Upstream-Status: Pending
 
-diff -ruN a/functions.sh b/functions.sh
---- a/tests/functions.sh	2015-11-12 21:32:02.434542124 +0100
-+++ b/tests/functions.sh	2015-11-12 21:40:37.095317280 +0100
-@@ -297,7 +297,7 @@
- 	if [ "$TS_PARALLEL" == "yes" ]; then
- 		TS_TITLE=$(printf "%13s: %-30s ...\n%16s: %-27s ..." "$TS_COMPONENT" "$TS_DESC" "" "$TS_SUBNAME")
- 	else
--		TS_TITLE=$(printf "%16s: %-27s ..." "" "$TS_SUBNAME")
-+               TS_TITLE=$(printf "%13s: %-30s ..." "$TS_COMPONENT" "$TS_SUBNAME")
- 		echo -n "$TS_TITLE"
+---
+ tests/functions.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/functions.sh b/tests/functions.sh
+index 5246605..b24dc15 100644
+--- a/tests/functions.sh
++++ b/tests/functions.sh
+@@ -320,7 +320,7 @@ function ts_init_subtest {
+ 
+ 	if [ "$TS_PARSABLE" != "yes" ]; then
+ 		[ $TS_NSUBTESTS -eq 1 ] && echo
+-		printf "%16s: %-27s ..." "" "$TS_SUBNAME"
++		printf "%13s: %-30s ..." "$TS_COMPONENT" "$TS_SUBNAME"
  	fi
  }
+ 
+-- 
+2.8.3
 

@@ -1,0 +1,37 @@
+If you:
+
+TCLIBC=musl bitbake unwind
+TCLIBC=musl bitbake gcc-runtime -c cleansstate
+TCLIBC=musl bitbake gcc-runtime
+
+you will see libstdc++ fail to build due to finding libunwind's header file.
+
+Khem: "When we build any of gcc components they expect to use internal version 
+and that works with glibc based gcc since the search headers first look into gcc 
+headers, however with musl the gcc headers are searched after the standard 
+headers ( which is by design the right thing )."
+
+This patch hacks around the issue by looking for a define used during gcc-runtime's 
+build and skipping to the internal header in that case.
+
+[YOCTO #10129]
+
+RP 2016/8/18
+
+Upstream-Status: Inappropriate [really need to fix gcc]
+
+Index: git/include/unwind.h
+===================================================================
+--- git.orig/include/unwind.h
++++ git/include/unwind.h
+@@ -23,6 +23,10 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER L
+ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
+ 
++#ifdef _GLIBCXX_SHARED
++#include_next <unwind.h>
++#endif
++
+ #ifndef _UNWIND_H
+ #define _UNWIND_H
+ 

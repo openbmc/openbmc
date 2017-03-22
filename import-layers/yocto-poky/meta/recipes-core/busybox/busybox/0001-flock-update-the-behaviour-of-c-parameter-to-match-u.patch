@@ -1,0 +1,73 @@
+From 198f18addf1d814c2fefcb492f3b9fbd221669bb Mon Sep 17 00:00:00 2001
+From: "Maxin B. John" <maxin.john@intel.com>
+Date: Wed, 20 Apr 2016 18:24:45 +0300
+Subject: [PATCH] flock: update the behaviour of -c parameter to match upstream
+
+In upstream, -c 'PROG ARGS' means "run sh -c 'PROG ARGS'"
+
+function                                             old     new   delta
+flock_main                                           286     377     +91
+.rodata                                           155849  155890     +41
+
+Upstream-Status: Submitted
+[ http://lists.busybox.net/pipermail/busybox/2016-April/084142.html ]
+
+Signed-off-by: Maxin B. John <maxin.john@intel.com>
+---
+ util-linux/flock.c | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
+
+diff --git a/util-linux/flock.c b/util-linux/flock.c
+index 05a747f..c85a25d 100644
+--- a/util-linux/flock.c
++++ b/util-linux/flock.c
+@@ -20,6 +20,7 @@ int flock_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
+ int flock_main(int argc UNUSED_PARAM, char **argv)
+ {
+ 	int mode, opt, fd;
++    char *cmd_args[4];
+ 	enum {
+ 		OPT_s = (1 << 0),
+ 		OPT_x = (1 << 1),
+@@ -57,7 +58,6 @@ int flock_main(int argc UNUSED_PARAM, char **argv)
+ 	/* If it is "flock FILE -c PROG", then -c isn't caught by getopt32:
+ 	 * we use "+" in order to support "flock -opt FILE PROG -with-opts",
+ 	 * we need to remove -c by hand.
+-	 * TODO: in upstream, -c 'PROG ARGS' means "run sh -c 'PROG ARGS'"
+ 	 */
+ 	if (argv[0]
+ 	 && argv[0][0] == '-'
+@@ -65,7 +65,10 @@ int flock_main(int argc UNUSED_PARAM, char **argv)
+ 	    || (ENABLE_LONG_OPTS && strcmp(argv[0] + 1, "-command") == 0)
+ 	    )
+ 	) {
+-		argv++;
++        if (argc != optind + 3)
++            bb_error_msg_and_die("-c requires exactly one command argument");
++        else
++            argv++;
+ 	}
+ 
+ 	if (OPT_s == LOCK_SH && OPT_x == LOCK_EX && OPT_n == LOCK_NB && OPT_u == LOCK_UN) {
+@@ -89,9 +92,14 @@ int flock_main(int argc UNUSED_PARAM, char **argv)
+ 			return EXIT_FAILURE;
+ 		bb_perror_nomsg_and_die();
+ 	}
+-
+-	if (argv[0])
+-		return spawn_and_wait(argv);
+-
++    if (argv[0]) {
++        cmd_args[0] = getenv("SHELL");
++        if (!cmd_args[0])
++            cmd_args[0] = (char*)DEFAULT_SHELL;
++        cmd_args[1] = (char*)"-c";
++        cmd_args[2] = argv[0];
++        cmd_args[3] = NULL;
++        return spawn_and_wait(cmd_args);
++    }
+ 	return EXIT_SUCCESS;
+ }
+-- 
+2.4.0
+

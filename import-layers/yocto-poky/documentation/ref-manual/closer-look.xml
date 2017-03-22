@@ -888,7 +888,9 @@
                         class,
                         you can add additional configuration options by using
                         the <link linkend='var-EXTRA_OECONF'><filename>EXTRA_OECONF</filename></link>
-                        variable.
+                        or
+                        <link linkend='var-PACKAGECONFIG_CONFARGS'><filename>PACKAGECONFIG_CONFARGS</filename></link>
+                        variables.
                         For information on how this variable works within
                         that class, see the
                         <filename>meta/classes/autotools.bbclass</filename> file.
@@ -1209,6 +1211,199 @@
                 which includes the environment setup script.
             </para>
         </section>
+
+        <section id='stamp-files-and-the-rerunning-of-tasks'>
+            <title>Stamp Files and the Rerunning of Tasks</title>
+
+            <para>
+                For each task that completes successfully, BitBake writes a
+                stamp file into the
+                <link linkend='var-STAMPS_DIR'><filename>STAMPS_DIR</filename></link>
+                directory.
+                The beginning of the stamp file's filename is determined by the
+                <link linkend='var-STAMP'><filename>STAMP</filename></link>
+                variable, and the end of the name consists of the task's name
+                and current
+                <ulink url='&YOCTO_DOCS_BB_URL;#checksums'>input checksum</ulink>.
+                <note>
+                    This naming scheme assumes that
+                    <ulink url='&YOCTO_DOCS_BB_URL;#var-BB_SIGNATURE_HANDLER'><filename>BB_SIGNATURE_HANDLER</filename></ulink>
+                    is "OEBasicHash", which is almost always the case in
+                    current OpenEmbedded.
+                </note>
+                To determine if a task needs to be rerun, BitBake checks if a
+                stamp file with a matching input checksum exists for the task.
+                If such a stamp file exists, the task's output is assumed to
+                exist and still be valid.
+                If the file does not exist, the task is rerun.
+                <note>
+                    <para>The stamp mechanism is more general than the shared
+                    state (sstate) cache mechanism described in the
+                    "<link linkend='setscene-tasks-and-shared-state'>Setscene Tasks and Shared State</link>"
+                    section.
+                    BitBake avoids rerunning any task that has a valid
+                    stamp file, not just tasks that can be accelerated through
+                    the sstate cache.</para>
+                    <para>However, you should realize that stamp files only
+                    serve as a marker that some work has been done and that
+                    these files do not record task output.
+                    The actual task output would usually be somewhere in
+                    <link linkend='var-TMPDIR'><filename>TMPDIR</filename></link>
+                    (e.g. in some recipe's
+                    <link linkend='var-WORKDIR'><filename>WORKDIR</filename></link>.)
+                    What the sstate cache mechanism adds is a way to cache task
+                    output that can then be shared between build machines.
+                    </para>
+                </note>
+                Since <filename>STAMPS_DIR</filename> is usually a subdirectory
+                of <filename>TMPDIR</filename>, removing
+                <filename>TMPDIR</filename> will also remove
+                <filename>STAMPS_DIR</filename>, which means tasks will
+                properly be rerun to repopulate <filename>TMPDIR</filename>.
+            </para>
+
+            <para>
+                If you want some task to always be considered "out of date",
+                you can mark it with the
+                <ulink url='&YOCTO_DOCS_BB_URL;#variable-flags'><filename>nostamp</filename></ulink>
+                varflag.
+                If some other task depends on such a task, then that task will
+                also always be considered out of date, which might not be what
+                you want.
+            </para>
+
+            <para>
+                For details on how to view information about a task's
+                signature, see the
+                "<link linkend='usingpoky-viewing-task-variable-dependencies'>Viewing Task Variable Dependencies</link>"
+                section.
+            </para>
+        </section>
+
+        <section id='setscene-tasks-and-shared-state'>
+            <title>Setscene Tasks and Shared State</title>
+
+            <para>
+                The description of tasks so far assumes that BitBake needs to
+                build everything and there are no prebuilt objects available.
+                BitBake does support skipping tasks if prebuilt objects are
+                available.
+                These objects are usually made available in the form of a
+                shared state (sstate) cache.
+                <note>
+                    For information on variables affecting sstate, see the
+                    <link linkend='var-SSTATE_DIR'><filename>SSTATE_DIR</filename></link>
+                    and
+                    <link linkend='var-SSTATE_MIRRORS'><filename>SSTATE_MIRRORS</filename></link>
+                    variables.
+                </note>
+            </para>
+
+            <para>
+                The idea of a setscene task (i.e
+                <filename>do_</filename><replaceable>taskname</replaceable><filename>_setscene</filename>)
+                is a version of the task where
+                instead of building something, BitBake can skip to the end
+                result and simply place a set of files into specific locations
+                as needed.
+                In some cases, it makes sense to have a setscene task variant
+                (e.g. generating package files in the
+                <filename>do_package_write_*</filename> task).
+                In other cases, it does not make sense, (e.g. a
+                <link linkend='ref-tasks-patch'><filename>do_patch</filename></link>
+                task or
+                <link linkend='ref-tasks-unpack'><filename>do_unpack</filename></link>
+                task) since the work involved would be equal to or greater than
+                the underlying task.
+            </para>
+
+            <para>
+                In the OpenEmbedded build system, the common tasks that have
+                setscene variants are <link linkend='ref-tasks-package'><filename>do_package</filename></link>,
+                <filename>do_package_write_*</filename>,
+                <link linkend='ref-tasks-deploy'><filename>do_deploy</filename></link>,
+                <link linkend='ref-tasks-packagedata'><filename>do_packagedata</filename></link>,
+                and
+                <link linkend='ref-tasks-populate_sysroot'><filename>do_populate_sysroot</filename></link>.
+                Notice that these are most of the tasks whose output is an
+                end result.
+            </para>
+
+            <para>
+                The OpenEmbedded build system has knowledge of the relationship
+                between these tasks and other tasks that precede them.
+                For example, if BitBake runs
+                <filename>do_populate_sysroot_setscene</filename> for
+                something, there is little point in running any of the
+                <filename>do_fetch</filename>, <filename>do_unpack</filename>,
+                <filename>do_patch</filename>,
+                <filename>do_configure</filename>,
+                <filename>do_compile</filename>, and
+                <filename>do_install</filename> tasks.
+                However, if <filename>do_package</filename> needs to be run,
+                BitBake would need to run those other tasks.
+            </para>
+
+            <para>
+                It becomes more complicated if everything can come from an
+                sstate cache because some objects are simply not required at
+                all.
+                For example, you do not need a compiler or native tools, such
+                as quilt, if there is nothing to compile or patch.
+                If the <filename>do_package_write_*</filename> packages are
+                available from sstate, BitBake does not need the
+                <filename>do_package</filename> task data.
+            </para>
+
+            <para>
+                To handle all these complexities, BitBake runs in two phases.
+                The first is the "setscene" stage.
+                During this stage, BitBake first checks the sstate cache for
+                any targets it is planning to build.
+                BitBake does a fast check to see if the object exists rather
+                than a complete download.
+                If nothing exists, the second phase, which is the setscene
+                stage, completes and the main build proceeds.
+            </para>
+
+            <para>
+                If objects are found in the sstate cache, the OpenEmbedded
+                build system works backwards from the end targets specified
+                by the user.
+                For example, if an image is being built, the OpenEmbedded build
+                system first looks for the packages needed for that image and
+                the tools needed to construct an image.
+                If those are available, the compiler is not needed.
+                Thus, the compiler is not even downloaded.
+                If something was found to be unavailable, or the download or
+                setscene task fails, the OpenEmbedded build system then tries
+                to install dependencies, such as the compiler, from the cache.
+            </para>
+
+            <para>
+                The availability of objects in the sstate cache is handled by
+                the function specified by the
+                <ulink url='&YOCTO_DOCS_BB_URL;#var-BB_HASHCHECK_FUNCTION'><filename>BB_HASHCHECK_FUNCTION</filename></ulink>
+                variable and returns a list of the objects that are available.
+                The function specified by the
+                <ulink url='&YOCTO_DOCS_BB_URL;#var-BB_SETSCENE_DEPVALID'><filename>BB_SETSCENE_DEPVALID</filename></ulink>
+                variable is the function that determines whether a given
+                dependency needs to be followed, and whether for any given
+                relationship the function needs to be passed.
+                The function returns a True or False value.
+            </para>
+
+            <para>
+                Once the setscene process completes, the OpenEmbedded build
+                system has a list of tasks that it believes it can "accelerate"
+                and therefore does not need to run.
+                There is a final function call to the function specified by the
+                <ulink url='&YOCTO_DOCS_BB_URL;#var-BB_SETSCENE_VERIFY_FUNCTION2'><filename>BB_SETSCENE_VERIFY_FUNCTION2</filename></ulink>
+                variable that is able to require the tasks to be run that
+                that the OpenEmbedded build system initially was going to
+                skip.
+            </para>
+        </section>
     </section>
 
     <section id='images-dev-environment'>
@@ -1402,6 +1597,10 @@
                 <listitem><para><link linkend='var-SDK_INCLUDE_PKGDATA'><filename>SDK_INCLUDE_PKGDATA</filename></link>:
                     Specifies whether or not packagedata will be included in
                     the extensible SDK for all recipes in the "world" target.
+                    </para></listitem>
+                <listitem><para><link linkend='var-SDK_INCLUDE_TOOLCHAIN'><filename>SDK_INCLUDE_TOOLCHAIN</filename></link>:
+                    Specifies whether or not the toolchain will be included
+                    when building the extensible SDK.
                     </para></listitem>
                 <listitem><para><link linkend='var-SDK_LOCAL_CONF_WHITELIST'><filename>SDK_LOCAL_CONF_WHITELIST</filename></link>:
                     A list of variables allowed through from the build system

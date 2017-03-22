@@ -5,13 +5,11 @@
 	xmlns:fo="http://www.w3.org/1999/XSL/Format"
 	version="1.0">
 
-<!--
   <xsl:import href="http://downloads.yoctoproject.org/mirror/docbook-mirror/docbook-xsl-1.76.1/eclipse/eclipse3.xsl" />
--->
+
+<!--
 
   <xsl:import href="../template/1.76.1/docbook-xsl-1.76.1/eclipse/eclipse3.xsl" />
-
-<!--
 
   <xsl:import
 	  href="http://docbook.sourceforge.net/release/xsl/1.76.1/eclipse/eclipse3.xsl" />

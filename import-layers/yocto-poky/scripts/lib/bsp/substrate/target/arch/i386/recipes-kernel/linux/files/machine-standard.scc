@@ -3,7 +3,7 @@ define KMACHINE {{=machine}}
 
 define KARCH i386
 
-include {{=map_standard_kbranch(need_new_kbranch, new_kbranch, existing_kbranch)}}
+include {{=map_standard_kbranch(need_new_kbranch, new_kbranch, existing_kbranch)}} nopatch
 {{ if need_new_kbranch == "y": }}
 define KTYPE {{=new_kbranch}}
 branch {{=machine}}

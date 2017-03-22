@@ -19,6 +19,10 @@
     <para>
         The following sections describe normal tasks associated with building
         a recipe.
+        For more information on tasks and dependencies, see the
+        "<ulink url='&YOCTO_DOCS_BB_URL;#tasks'>Tasks</ulink>" and
+        "<ulink url='&YOCTO_DOCS_BB_URL;#dependencies'>Dependencies</ulink>"
+        sections in the BitBake User Manual.
     </para>
 
     <section id='ref-tasks-build'>
@@ -31,43 +35,23 @@
         </para>
     </section>
 
-    <section id='ref-tasks-checkpkg'>
-        <title><filename>do_checkpkg</filename></title>
-
-        <para>
-            Provides information about the recipe including its upstream
-            version and status.
-            The upstream version and status reveals whether or not a version
-            of the recipe exists upstream and a status of not updated, updated,
-            or unknown.
-        </para>
-
-        <para>
-            The <filename>checkpkg</filename> task is included as part of the
-            <link linkend='ref-classes-distrodata'><filename>distrodata</filename></link>
-            class.
-        </para>
-
-        <para>
-            To build the <filename>checkpkg</filename> task, use the
-            <filename>bitbake</filename> command with the "-c" option and
-            task name:
-            <literallayout class='monospaced'>
-     $ bitbake core-image-minimal -c checkpkg
-            </literallayout>
-            By default, the results are stored in
-            <link linkend='var-LOG_DIR'><filename>$LOG_DIR</filename></link>
-            (e.g. <filename>$BUILD_DIR/tmp/log</filename>).
-        </para>
-    </section>
-
     <section id='ref-tasks-compile'>
         <title><filename>do_compile</filename></title>
 
         <para>
-            Compiles the source in the compilation directory, which is pointed
-            to by the
-            <link linkend='var-B'><filename>B</filename></link> variable.
+            Compiles the source code.
+            This task runs with the current working directory set
+            to
+            <filename>${</filename><link linkend='var-B'><filename>B</filename></link><filename>}</filename>.
+        </para>
+
+        <para>
+            The default behavior of this task is to run the
+            <filename>oe_runmake</filename> function if a makefile
+            (<filename>Makefile</filename>, <filename>makefile</filename>,
+            or <filename>GNUmakefile</filename>) is found.
+            If no such file is found, the <filename>do_compile</filename>
+            task does nothing.
         </para>
     </section>
 
@@ -86,6 +70,20 @@
         <para>
             Configures the source by enabling and disabling any build-time and
             configuration options for the software being built.
+            The task runs with the current working directory set to
+            <filename>${</filename><link linkend='var-B'><filename>B</filename></link><filename>}</filename>.
+        </para>
+
+        <para>
+            The default behavior of this task is to run
+            <filename>oe_runmake clean</filename> if a makefile
+            (<filename>Makefile</filename>, <filename>makefile</filename>,
+            or <filename>GNUmakefile</filename>) is found and
+            <link linkend='var-CLEANBROKEN'><filename>CLEANBROKEN</filename></link>
+            is not set to "1".
+            If no such file is found or the <filename>CLEANBROKEN</filename>
+            variable is set to "1", the <filename>do_configure</filename>
+            task does nothing.
         </para>
     </section>
 
@@ -102,18 +100,62 @@
         <title><filename>do_deploy</filename></title>
 
         <para>
-            Writes output files that are to be deployed to the deploy
-            directory, which is defined by the
-            <link linkend='var-DEPLOYDIR'><filename>DEPLOYDIR</filename></link>
-            variable.
+            Writes output files that are to be deployed to
+            <filename>${</filename><link linkend='var-DEPLOY_DIR_IMAGE'><filename>DEPLOY_DIR_IMAGE</filename></link><filename>}</filename>.
+            The task runs with the current working directory set to
+            <filename>${</filename><link linkend='var-B'><filename>B</filename></link><filename>}</filename>.
         </para>
 
         <para>
-            The <filename>do_deploy</filename> task is a
-            shared state (sstate) task, which means that the task can
-            be accelerated through sstate use.
-            Realize also that if the task is re-executed, any previous output
-            is removed (i.e. "cleaned").
+            Recipes implementing this task should inherit the
+            <link linkend='ref-classes-deploy'><filename>deploy</filename></link>
+            class and should write the output to
+            <filename>${</filename><link linkend='var-DEPLOYDIR'><filename>DEPLOYDIR</filename></link><filename>}</filename>,
+            which is not to be confused with
+            <filename>${</filename><link linkend='var-DEPLOY_DIR'><filename>DEPLOY_DIR</filename></link><filename>}</filename>.
+            The <filename>deploy</filename> class sets up
+            <filename>do_deploy</filename> as a shared state (sstate) task that
+            can be accelerated through sstate use.
+            The sstate mechanism takes care of copying the output from
+            <filename>${DEPLOYDIR}</filename> to
+            <filename>${DEPLOY_DIR_IMAGE}</filename>.
+            <note>
+            <title>Caution</title>
+                Do not write the output directly to
+                <filename>${DEPLOY_DIR_IMAGE}</filename>, as this causes
+                the sstate mechanism to malfunction.
+            </note>
+        </para>
+
+        <para>
+            The <filename>do_deploy</filename> task is not added as a task
+            by default and consequently needs to be added manually.
+            If you want the task to run after
+            <link linkend='ref-tasks-compile'><filename>do_compile</filename></link>,
+            you can add it by doing the following:
+            <literallayout class='monospaced'>
+     addtask deploy after do_compile
+            </literallayout>
+            Adding <filename>do_deploy</filename> after other tasks works the
+            same way.
+            <note>
+                You do not need to add <filename>before do_build</filename>
+                to the <filename>addtask</filename> command (though it is
+                harmless), because the
+                <link linkend='ref-classes-base'><filename>base</filename></link>
+                class contains the following:
+                <literallayout class='monospaced'>
+     do_build[recrdeptask] += "do_deploy"
+                </literallayout>
+                See the
+                "<ulink url='&YOCTO_DOCS_BB_URL;#dependencies'>Dependencies</ulink>"
+                section in the BitBake User Manual for more information.
+            </note>
+        </para>
+
+        <para>
+            If the <filename>do_deploy</filename> task re-executes, any
+            previous output is removed (i.e. "cleaned").
         </para>
     </section>
 
@@ -213,11 +255,59 @@
         <title><filename>do_install</filename></title>
 
         <para>
-            Copies files from the compilation directory, which is defined by
-            the
-            <link linkend='var-B'><filename>B</filename></link> variable,
-            to a holding area defined by the
-            <link linkend='var-D'><filename>D</filename></link> variable.
+            Copies files that are to be packaged into the holding area
+            <filename>${</filename><link linkend='var-D'><filename>D</filename></link><filename>}</filename>.
+            This task runs with the current working directory set to
+            <filename>${</filename><link linkend='var-B'><filename>B</filename></link><filename>}</filename>,
+            which is the compilation directory.
+            The <filename>do_install</filename> task, as well as other tasks
+            that either directly or indirectly depend on the installed files
+            (e.g.
+            <link linkend='ref-tasks-package'><filename>do_package</filename></link>,
+            <link linkend='ref-tasks-package_write_deb'><filename>do_package_write_*</filename></link>,
+            and
+            <link linkend='ref-tasks-rootfs'><filename>do_rootfs</filename></link>),
+            run under
+            <link linkend='fakeroot-and-pseudo'>fakeroot</link>.
+            <note>
+                <title>Caution</title>
+
+                <para>
+                    When installing files, be careful not to set the owner and
+                    group IDs of the installed files to unintended values.
+                    Some methods of copying files, notably when using the
+                    recursive <filename>cp</filename> command, can preserve the
+                    UID and/or GID of the original file, which is usually not
+                    what you want.
+                    The
+                    <link linkend='ref-classes-insane'><filename>host-user-contaminated</filename></link>
+                    QA check checks for files that probably have the wrong
+                    ownership.
+                </para>
+
+                <para>
+                    Safe methods for installing files include the following:
+                    <itemizedlist>
+                        <listitem><para>
+                            The <filename>install</filename> utility.
+                            This utility is the preferred method.
+                            </para></listitem>
+                        <listitem><para>
+                            The <filename>cp</filename> command with the
+                            "--no-preserve=ownership" option.
+                            </para></listitem>
+                        <listitem><para>
+                            The <filename>tar</filename> command with the
+                            "--no-same-owner" option.
+                            See the <filename>bin_package.bbclass</filename>
+                            file in the <filename>meta/classes</filename>
+                            directory of the
+                            <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+                            for an example.
+                            </para></listitem>
+                    </itemizedlist>
+                </para>
+            </note>
         </para>
     </section>
 
@@ -234,8 +324,26 @@
         <title><filename>do_package</filename></title>
 
         <para>
-            Analyzes the content of the holding area and splits it into subsets
-            based on available packages and files.
+            Analyzes the content of the holding area
+            <filename>${</filename><link linkend='var-D'><filename>D</filename></link><filename>}</filename>
+            and splits the content into subsets based on available packages
+            and files.
+            This task makes use of the
+            <link linkend='var-PACKAGES'><filename>PACKAGES</filename></link>
+            and
+            <link linkend='var-FILES'><filename>FILES</filename></link>
+            variables.
+        </para>
+
+        <para>
+            The <filename>do_package</filename> task, in conjunction with the
+            <link linkend='ref-tasks-packagedata'><filename>do_packagedata</filename></link>
+            task, also saves some important package metadata.
+            For additional information, see the
+            <link linkend='var-PKGDESTWORK'><filename>PKGDESTWORK</filename></link>
+            variable and the
+            "<link linkend='automatically-added-runtime-dependencies'>Automatically Added Runtime Dependencies</link>"
+            section.
         </para>
     </section>
 
@@ -309,8 +417,11 @@
         <title><filename>do_packagedata</filename></title>
 
         <para>
-            Creates package metadata used by the build system to generate the
-            final packages.
+            Saves package metadata generated by the
+            <link linkend='ref-tasks-package'><filename>do_package</filename></link>
+            task in
+            <link linkend='var-PKGDATA_DIR'><filename>PKGDATA_DIR</filename></link>
+            to make it available globally.
         </para>
     </section>
 
@@ -349,16 +460,25 @@
         <title><filename>do_populate_sysroot</filename></title>
 
         <para>
-            Copies a subset of the files installed by the
+            Stages (copies) a subset of the files installed by the
             <link linkend='ref-tasks-install'><filename>do_install</filename></link>
-            task into the sysroot to make them available to other recipes.
-            Files that would typically not be needed by other recipes at build
-            time are skipped.
-            Skipped files include files installed into
-            <filename>/etc.</filename>
-            For information on what files are copied, see the
-            <link linkend='ref-classes-staging'><filename>staging</filename></link>
-            class.
+            task into the appropriate sysroot.
+            For information on how to access these files from other recipes,
+            see the
+            <link linkend='var-STAGING_DIR_HOST'><filename>STAGING_DIR*</filename></link>
+            variables.
+            Directories that would typically not be needed by other recipes at
+            build time (e.g. <filename>/etc</filename>) are not copied by
+            default.
+        </para>
+
+        <para>
+            For information on what directories are copied by default, see the
+            <link linkend='var-SYSROOT_DIRS'><filename>SYSROOT_DIRS*</filename></link>
+            variables.
+            You can change these variables inside your recipe if you need
+            to make additional (or fewer) directories available to other
+            recipes at build time.
         </para>
 
         <para>
@@ -416,6 +536,36 @@
         These tasks are typically manually triggered (e.g. by using the
         <filename>bitbake -c</filename> command-line option):
     </para>
+
+    <section id='ref-tasks-checkpkg'>
+        <title><filename>do_checkpkg</filename></title>
+
+        <para>
+            Provides information about the recipe including its upstream
+            version and status.
+            The upstream version and status reveals whether or not a version
+            of the recipe exists upstream and a status of not updated, updated,
+            or unknown.
+        </para>
+
+        <para>
+            The <filename>checkpkg</filename> task is included as part of the
+            <link linkend='ref-classes-distrodata'><filename>distrodata</filename></link>
+            class.
+        </para>
+
+        <para>
+            To build the <filename>checkpkg</filename> task, use the
+            <filename>bitbake</filename> command with the "-c" option and
+            task name:
+            <literallayout class='monospaced'>
+     $ bitbake core-image-minimal -c checkpkg
+            </literallayout>
+            By default, the results are stored in
+            <link linkend='var-LOG_DIR'><filename>$LOG_DIR</filename></link>
+            (e.g. <filename>$BUILD_DIR/tmp/log</filename>).
+        </para>
+    </section>
 
     <section id='ref-tasks-checkuri'>
         <title><filename>do_checkuri</filename></title>
@@ -540,6 +690,22 @@
             </note>
         </para>
      </section>
+
+    <section id='ref-tasks-devpyshell'>
+        <title><filename>do_devpyshell</filename></title>
+
+        <para>
+            Starts a shell in which an interactive Python interpreter allows
+            you to interact with the BitBake build environment.
+            From within this shell, you can directly examine and set
+            bits from the data store and execute functions as if within
+            the BitBake environment.
+            See the
+            "<ulink url='&YOCTO_DOCS_DEV_URL;#platdev-appdev-devpyshell'>Using a Development Python Shell</ulink>"
+            section in the Yocto Project Development Manual for more
+            information about using <filename>devpyshell</filename>.
+        </para>
+    </section>
 
     <section id='ref-tasks-devshell'>
         <title><filename>do_devshell</filename></title>

@@ -1,0 +1,42 @@
+From b06b22fecc7deda8c65e28670562ca2371e4e725 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 16 Apr 2016 13:43:54 -0700
+Subject: [PATCH 2/2] tests: Ignore y2k warnings
+
+silences
+| ../../../../../../../../workspace/sources/glib-2.0/glib/tests/gdatetime.c: In function 'test_strftime':
+| ../../../../../../../../workspace/sources/glib-2.0/glib/tests/gdatetime.c:1338:3: error: '%c' yields only last 2 digits of year in some locales [-Werror=format-y2k]
+|    "a%a A%A b%b B%B c%c C%C d%d e%e F%F g%g G%G h%h H%H I%I j%j m%m M%M "
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted
+
+ glib/tests/gdatetime.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/glib/tests/gdatetime.c b/glib/tests/gdatetime.c
+index 16a163c..e6062fc 100644
+--- a/glib/tests/gdatetime.c
++++ b/glib/tests/gdatetime.c
+@@ -1326,6 +1326,9 @@ test_z (void)
+   g_time_zone_unref (tz);
+ }
+ 
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wformat-y2k"
++
+ static void
+ test_strftime (void)
+ {
+@@ -1351,6 +1354,7 @@ test_strftime (void)
+     }
+ #endif
+ }
++#pragma GCC diagnostic pop
+ 
+ static void
+ test_find_interval (void)
+-- 
+2.8.0
+

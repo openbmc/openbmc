@@ -3,7 +3,7 @@ Upstream-Status: Inappropriate [legacy version]
 # remove the line to cause recursive inclusion error from autoreconf, sicne
 # newer autoconf has included this definition. Simply rename it here.
 #
-# Signed-off-by Kevin Tian <kevin.tian@intel.com>, 2010-08-18
+# Signed-off-by: Kevin Tian <kevin.tian@intel.com>, 2010-08-18
 # (this patch is licensed under GPLv2)
 
 diff --git a/extensions.m4 b/extensions.m4

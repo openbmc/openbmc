@@ -47,8 +47,6 @@ do_configure () {
 export I = "${STAGING_INCDIR}"
 export L = "${STAGING_INCDIR}"
 
-EXTRA_OEMAKE = ""
-
 do_compile () {
 	oe_runmake 'CC=${CC}' 'CFGL=${LDFLAGS} -L./lib -llsof' 'DEBUG=' 'INCL=${CFLAGS}'
 }

@@ -33,6 +33,7 @@ python toaster_layerinfo_dumpdata() {
 
     def _get_git_branch(layer_path):
         branch = subprocess.Popen("git symbolic-ref HEAD 2>/dev/null ", cwd=layer_path, shell=True, stdout=subprocess.PIPE).communicate()[0]
+        branch = branch.decode('utf-8')
         branch = branch.replace('refs/heads/', '').rstrip()
         return branch
 
@@ -135,60 +136,16 @@ python toaster_package_dumpdata() {
 
 # 2. Dump output image files information
 
-python toaster_image_dumpdata() {
-    """
-    Image filename for output images is not standardized.
-    image_types.bbclass will spell out IMAGE_CMD_xxx variables that actually
-    have hardcoded ways to create image file names in them.
-    So we look for files starting with the set name.
-
-    We also look for other files in the images/ directory which don't
-    match IMAGE_NAME, such as the kernel bzImage, modules tarball etc.
-    """
-
-    dir_to_walk = d.getVar('DEPLOY_DIR_IMAGE', True);
-    image_name = d.getVar('IMAGE_NAME', True);
-    image_info_data = {}
-    artifact_info_data = {}
-
-    # collect all images and artifacts in the images directory
-    for dirpath, dirnames, filenames in os.walk(dir_to_walk):
-        for filename in filenames:
-            full_path = os.path.join(dirpath, filename)
-            try:
-                if filename.startswith(image_name):
-                    # image
-                    image_info_data[full_path] = os.stat(full_path).st_size
-                else:
-                    # other non-image artifact
-                    if not os.path.islink(full_path):
-                        artifact_info_data[full_path] = os.stat(full_path).st_size
-            except OSError as e:
-                bb.event.fire(bb.event.MetadataEvent("OSErrorException", e), d)
-
-    bb.event.fire(bb.event.MetadataEvent("ImageFileSize", image_info_data), d)
-    bb.event.fire(bb.event.MetadataEvent("ArtifactFileSize", artifact_info_data), d)
-}
-
 python toaster_artifact_dumpdata() {
     """
-    Dump data about artifacts in the SDK_DEPLOY directory
+    Dump data about SDK variables
     """
 
-    dir_to_walk = d.getVar("SDK_DEPLOY", True)
-    artifact_info_data = {}
+    event_data = {
+      "TOOLCHAIN_OUTPUTNAME": d.getVar("TOOLCHAIN_OUTPUTNAME", True)
+    }
 
-    # collect all artifacts in the sdk directory
-    for dirpath, dirnames, filenames in os.walk(dir_to_walk):
-        for filename in filenames:
-            full_path = os.path.join(dirpath, filename)
-            try:
-                if not os.path.islink(full_path):
-                    artifact_info_data[full_path] = os.stat(full_path).st_size
-            except OSError as e:
-                bb.event.fire(bb.event.MetadataEvent("OSErrorException", e), d)
-
-    bb.event.fire(bb.event.MetadataEvent("ArtifactFileSize", artifact_info_data), d)
+    bb.event.fire(bb.event.MetadataEvent("SDKArtifactInfo", event_data), d)
 }
 
 # collect list of buildstats files based on fired events; when the build completes, collect all stats and fire an event with collected data
@@ -331,15 +288,22 @@ python toaster_buildhistory_dump() {
                             images[target][dependsname] = {'size': 0, 'depends' : []}
                         images[target][pname]['depends'].append((dependsname, deptype))
 
-            with open("%s/files-in-image.txt" % installed_img_path, "r") as fin:
-                for line in fin:
-                    lc = [ x for x in line.strip().split(" ") if len(x) > 0 ]
-                    if lc[0].startswith("l"):
-                        files[target]['syms'].append(lc)
-                    elif lc[0].startswith("d"):
-                        files[target]['dirs'].append(lc)
-                    else:
-                        files[target]['files'].append(lc)
+            # files-in-image.txt is only generated if an image file is created,
+            # so the file entries ('syms', 'dirs', 'files') for a target will be
+            # empty for rootfs builds and other "image" tasks which don't
+            # produce image files
+            # (e.g. "bitbake core-image-minimal -c populate_sdk")
+            files_in_image_path = "%s/files-in-image.txt" % installed_img_path
+            if os.path.exists(files_in_image_path):
+                with open(files_in_image_path, "r") as fin:
+                    for line in fin:
+                        lc = [ x for x in line.strip().split(" ") if len(x) > 0 ]
+                        if lc[0].startswith("l"):
+                            files[target]['syms'].append(lc)
+                        elif lc[0].startswith("d"):
+                            files[target]['dirs'].append(lc)
+                        else:
+                            files[target]['files'].append(lc)
 
             for pname in images[target]:
                 if not pname in allpkgs:
@@ -360,15 +324,18 @@ python toaster_buildhistory_dump() {
 
 }
 
-# dump information related to license manifest path
-
-python toaster_licensemanifest_dump() {
-    deploy_dir = d.getVar('DEPLOY_DIR', True);
-    image_name = d.getVar('IMAGE_NAME', True);
-
-    data = { 'deploy_dir' : deploy_dir, 'image_name' : image_name }
-
-    bb.event.fire(bb.event.MetadataEvent("LicenseManifestPath", data), d)
+# get list of artifacts from sstate manifest
+python toaster_artifacts() {
+    if e.taskname in ["do_deploy", "do_image_complete", "do_populate_sdk", "do_populate_sdk_ext"]:
+        d2 = d.createCopy()
+        d2.setVar('FILE', e.taskfile)
+        d2.setVar('SSTATE_MANMACH', d2.expand("${MACHINE}"))
+        manifest = oe.sstatesig.sstate_get_manifest_filename(e.taskname[3:], d2)[0]
+        if os.access(manifest, os.R_OK):
+            with open(manifest) as fmanifest:
+                artifacts = [fname.strip() for fname in fmanifest]
+                data = {"task": e.taskid, "artifacts": artifacts}
+                bb.event.fire(bb.event.MetadataEvent("TaskArtifacts", data), d2)
 }
 
 # set event handlers
@@ -381,17 +348,17 @@ toaster_collect_task_stats[eventmask] = "bb.event.BuildCompleted bb.build.TaskSu
 addhandler toaster_buildhistory_dump
 toaster_buildhistory_dump[eventmask] = "bb.event.BuildCompleted"
 
+addhandler toaster_artifacts
+toaster_artifacts[eventmask] = "bb.runqueue.runQueueTaskSkipped bb.runqueue.runQueueTaskCompleted"
+
 do_packagedata_setscene[postfuncs] += "toaster_package_dumpdata "
 do_packagedata_setscene[vardepsexclude] += "toaster_package_dumpdata "
 
 do_package[postfuncs] += "toaster_package_dumpdata "
 do_package[vardepsexclude] += "toaster_package_dumpdata "
 
-do_image_complete[postfuncs] += "toaster_image_dumpdata "
-do_image_complete[vardepsexclude] += "toaster_image_dumpdata "
-
-do_rootfs[postfuncs] += "toaster_licensemanifest_dump "
-do_rootfs[vardepsexclude] += "toaster_licensemanifest_dump "
-
 do_populate_sdk[postfuncs] += "toaster_artifact_dumpdata "
 do_populate_sdk[vardepsexclude] += "toaster_artifact_dumpdata "
+
+do_populate_sdk_ext[postfuncs] += "toaster_artifact_dumpdata "
+do_populate_sdk_ext[vardepsexclude] += "toaster_artifact_dumpdata "

@@ -1,0 +1,97 @@
+From 3d3424e9a8d6ad56160b98bf6e223c0346164468 Mon Sep 17 00:00:00 2001
+From: Matthew Fortune <matthew.fortune@imgtec.com>
+Date: Thu, 29 Sep 2016 11:13:46 +0100
+Subject: [PATCH] Refine .cfi_sections check to only consider compact eh_frame
+
+The .cfi_sections directive can be safely used multiple times
+with different sections named at any time unless the compact form
+of exception handling is requested after CFI information has
+been emitted.  Only the compact form of CFI information changes
+the way in which CFI is generated and therefore cannot be
+retrospectively requested after generating CFI information.
+
+gas/
+
+	PR gas/20648
+	* dw2gencfi.c (dot_cfi_sections): Refine the check for
+	inconsistent .cfi_sections to only consider compact vs non
+	compact forms.
+	* testsuite/gas/cfi/cfi-common-9.d: New file.
+	* testsuite/gas/cfi/cfi-common-9.s: New file.
+	* testsuite/gas/cfi/cfi.exp: Run new test.
+---
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com
+
+ gas/ChangeLog                        | 10 ++++++++++
+ gas/dw2gencfi.c                      |  5 ++++-
+ gas/testsuite/gas/cfi/cfi-common-9.d | 23 +++++++++++++++++++++++
+ gas/testsuite/gas/cfi/cfi-common-9.s |  4 ++++
+ gas/testsuite/gas/cfi/cfi.exp        |  1 +
+ 5 files changed, 42 insertions(+), 1 deletion(-)
+ create mode 100644 gas/testsuite/gas/cfi/cfi-common-9.d
+ create mode 100644 gas/testsuite/gas/cfi/cfi-common-9.s
+
+Index: git/gas/dw2gencfi.c
+===================================================================
+--- git.orig/gas/dw2gencfi.c
++++ git/gas/dw2gencfi.c
+@@ -1244,7 +1244,10 @@ dot_cfi_sections (int ignored ATTRIBUTE_
+       }
+ 
+   demand_empty_rest_of_line ();
+-  if (cfi_sections_set && cfi_sections != sections)
++  if (cfi_sections_set
++      && (sections & (CFI_EMIT_eh_frame | CFI_EMIT_eh_frame_compact))
++      && (cfi_sections & (CFI_EMIT_eh_frame | CFI_EMIT_eh_frame_compact))
++	 != (sections & (CFI_EMIT_eh_frame | CFI_EMIT_eh_frame_compact)))
+     as_bad (_("inconsistent uses of .cfi_sections"));
+   cfi_sections = sections;
+ }
+Index: git/gas/testsuite/gas/cfi/cfi-common-9.d
+===================================================================
+--- /dev/null
++++ git/gas/testsuite/gas/cfi/cfi-common-9.d
+@@ -0,0 +1,23 @@
++#objdump: -Wf
++#name: CFI common 9
++#...
++Contents of the .eh_frame section:
++
++00000000 0+0010 0+0000 CIE
++  Version:               1
++  Augmentation:          "zR"
++  Code alignment factor: .*
++  Data alignment factor: .*
++  Return address column: .*
++  Augmentation data:     [01]b
++
++  DW_CFA_nop
++  DW_CFA_nop
++  DW_CFA_nop
++
++00000014 0+00(10|18|1c|20) 0+0018 FDE cie=0+0000 pc=.*
++
++  DW_CFA_nop
++  DW_CFA_nop
++  DW_CFA_nop
++#...
+Index: git/gas/testsuite/gas/cfi/cfi-common-9.s
+===================================================================
+--- /dev/null
++++ git/gas/testsuite/gas/cfi/cfi-common-9.s
+@@ -0,0 +1,4 @@
++	.cfi_sections .eh_frame
++	.cfi_startproc simple
++	.cfi_sections .debug_frame
++	.cfi_endproc
+Index: git/gas/testsuite/gas/cfi/cfi.exp
+===================================================================
+--- git.orig/gas/testsuite/gas/cfi/cfi.exp
++++ git/gas/testsuite/gas/cfi/cfi.exp
+@@ -135,4 +135,5 @@ if { ![istarget "hppa64*-*"] } then {
+     run_dump_test "cfi-common-6"
+   }
+   run_dump_test "cfi-common-7"
++  run_dump_test "cfi-common-9"
+ }

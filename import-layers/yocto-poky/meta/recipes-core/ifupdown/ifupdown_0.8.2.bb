@@ -13,8 +13,6 @@ SRC_URI = "git://anonscm.debian.org/git/collab-maint/ifupdown.git;protocol=https
 	  "
 SRCREV = "05ea2fd4f49bb1201aeef2a42efbcff8f336112f"
 
-EXTRA_OEMAKE = ""
-
 S = "${WORKDIR}/git"
 
 

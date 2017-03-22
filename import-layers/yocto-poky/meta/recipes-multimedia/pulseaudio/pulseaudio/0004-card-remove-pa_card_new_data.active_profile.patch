@@ -1,0 +1,72 @@
+From 375bc56fd3d66f40a9650224e5bfea4002494ade Mon Sep 17 00:00:00 2001
+From: Tanu Kaskinen <tanuk@iki.fi>
+Date: Fri, 23 Oct 2015 13:50:35 +0300
+Subject: [PATCH 4/5] card: remove pa_card_new_data.active_profile
+
+It's not being used any more.
+
+Upstream-Status: Accepted [expected in 10.0]
+
+Signed-off-by: Tanu Kaskinen <tanuk@iki.fi>
+---
+ src/pulsecore/card.c | 8 --------
+ src/pulsecore/card.h | 5 -----
+ 2 files changed, 13 deletions(-)
+
+diff --git a/src/pulsecore/card.c b/src/pulsecore/card.c
+index a0c3d93..bc5b75b 100644
+--- a/src/pulsecore/card.c
++++ b/src/pulsecore/card.c
+@@ -96,13 +96,6 @@ void pa_card_new_data_set_name(pa_card_new_data *data, const char *name) {
+     data->name = pa_xstrdup(name);
+ }
+ 
+-void pa_card_new_data_set_profile(pa_card_new_data *data, const char *profile) {
+-    pa_assert(data);
+-
+-    pa_xfree(data->active_profile);
+-    data->active_profile = pa_xstrdup(profile);
+-}
+-
+ void pa_card_new_data_set_preferred_port(pa_card_new_data *data, pa_direction_t direction, pa_device_port *port) {
+     pa_assert(data);
+ 
+@@ -125,7 +118,6 @@ void pa_card_new_data_done(pa_card_new_data *data) {
+         pa_hashmap_free(data->ports);
+ 
+     pa_xfree(data->name);
+-    pa_xfree(data->active_profile);
+ }
+ 
+ pa_card *pa_card_new(pa_core *core, pa_card_new_data *data) {
+diff --git a/src/pulsecore/card.h b/src/pulsecore/card.h
+index fd1fe0a..5699475 100644
+--- a/src/pulsecore/card.h
++++ b/src/pulsecore/card.h
+@@ -101,15 +101,11 @@ typedef struct pa_card_new_data {
+     pa_module *module;
+ 
+     pa_hashmap *profiles;
+-    char *active_profile;
+-
+     pa_hashmap *ports;
+     pa_device_port *preferred_input_port;
+     pa_device_port *preferred_output_port;
+ 
+     bool namereg_fail:1;
+-
+-    bool save_profile:1;
+ } pa_card_new_data;
+ 
+ typedef struct {
+@@ -125,7 +121,6 @@ void pa_card_profile_set_available(pa_card_profile *c, pa_available_t available)
+ 
+ pa_card_new_data *pa_card_new_data_init(pa_card_new_data *data);
+ void pa_card_new_data_set_name(pa_card_new_data *data, const char *name);
+-void pa_card_new_data_set_profile(pa_card_new_data *data, const char *profile);
+ void pa_card_new_data_set_preferred_port(pa_card_new_data *data, pa_direction_t direction, pa_device_port *port);
+ void pa_card_new_data_done(pa_card_new_data *data);
+ 
+-- 
+2.8.1
+

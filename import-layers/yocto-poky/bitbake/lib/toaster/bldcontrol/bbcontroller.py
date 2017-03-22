@@ -30,7 +30,6 @@ from bldcontrol.models import BuildEnvironment, BRLayer, BRVariable, BRTarget, B
 # load Bitbake components
 path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 sys.path.insert(0, path)
-import bb.server.xmlrpc
 
 class BitbakeController(object):
     """ This is the basic class that controlls a bitbake server.
@@ -38,6 +37,7 @@ class BitbakeController(object):
     """
 
     def __init__(self, be):
+        import bb.server.xmlrpc
         self.connection = bb.server.xmlrpc._create_server(be.bbaddress,
                                                           int(be.bbport))[0]
 
@@ -79,7 +79,7 @@ def getBuildEnvironmentController(**kwargs):
         The return object MUST always be a BuildEnvironmentController.
     """
 
-    from localhostbecontroller import LocalhostBEController
+    from bldcontrol.localhostbecontroller import LocalhostBEController
 
     be = BuildEnvironment.objects.filter(Q(**kwargs))[0]
     if be.betype == BuildEnvironment.TYPE_LOCAL:

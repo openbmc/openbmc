@@ -3,96 +3,82 @@
  * This object really just helps readability since we can then have
  * a traceable namespace.
  */
-var libtoaster = (function (){
+var libtoaster = (function () {
+  // prevent conflicts with Bootstrap 2's typeahead (required during
+  // transition from v2 to v3)
+  var typeahead = jQuery.fn.typeahead.noConflict();
+  jQuery.fn._typeahead = typeahead;
 
-  /* makeTypeahead parameters
-   * elementSelector: JQuery elementSelector string
-   * xhrUrl: the url to get the JSON from expects JSON in the form:
-   *  { "list": [ { "name": "test", "detail" : "a test thing"  }, .... ] }
+  /* Make a typeahead from an input element
+   *
+   * _makeTypeahead parameters
+   * jQElement: input element as selected by $('selector')
+   * xhrUrl: the url to get the JSON from; this URL should return JSON in the
+   * format:
+   *   { "results": [ { "name": "test", "detail" : "a test thing"  }, ... ] }
    * xhrParams: the data/parameters to pass to the getJSON url e.g.
-   *  { 'type' : 'projects' } the text typed will be passed as 'search'.
-   *  selectedCB: function to call once an item has been selected one
-   *  arg of the item.
+   *   { 'type' : 'projects' }; the text typed will be passed as 'search'.
+   * selectedCB: function to call once an item has been selected; has
+   * signature selectedCB(item), where item is an item in the format shown
+   * in the JSON list above, i.e.
+   *   { "name": "name", "detail": "detail" }.
    */
-  function _makeTypeahead (jQElement, xhrUrl, xhrParams, selectedCB) {
-    if (!xhrUrl || xhrUrl.length === 0)
-      throw("No url to typeahead supplied");
+  function _makeTypeahead(jQElement, xhrUrl, xhrParams, selectedCB) {
+    if (!xhrUrl || xhrUrl.length === 0) {
+      throw("No url supplied for typeahead");
+    }
 
     var xhrReq;
 
-    jQElement.typeahead({
-        // each time the typeahead's choices change, a
-        // "typeahead-choices-change" event is fired with an object
-        // containing the available choices in a "choices" property
-        source: function(query, process){
+    jQElement._typeahead(
+      {
+        highlight: true,
+        classNames: {
+          open: "dropdown-menu",
+          cursor: "active"
+        }
+      },
+      {
+        source: function (query, syncResults, asyncResults) {
           xhrParams.search = query;
 
-          /* If we have a request in progress don't fire off another one*/
-          if (xhrReq)
+          // if we have a request in progress, cancel it and start another
+          if (xhrReq) {
             xhrReq.abort();
+          }
 
-          xhrReq = $.getJSON(xhrUrl, this.options.xhrParams, function(data){
+          xhrReq = $.getJSON(xhrUrl, xhrParams, function (data) {
             if (data.error !== "ok") {
-              console.log("Error getting data from server "+data.error);
+              console.error("Error getting data from server: " + data.error);
               return;
             }
 
             xhrReq = null;
 
-            jQElement.trigger("typeahead-choices-change", {choices: data.results});
-
-            return process(data.results);
+            asyncResults(data.results);
           });
         },
-        updater: function(item) {
-          var itemObj = this.$menu.find('.active').data('itemObject');
-          selectedCB(itemObj);
-          return item;
+
+        // how the selected item is shown in the input
+        display: function (item) {
+          return item.name;
         },
-        matcher: function(item) {
-          if (!item.hasOwnProperty('name')) {
-            console.log("Name property missing in data");
-            return 0;
+
+        templates: {
+          // how the item is displayed in the dropdown
+          suggestion: function (item) {
+            var elt = document.createElement("div");
+            elt.innerHTML = item.name + " " + item.detail;
+            return elt;
           }
+        }
+      }
+    );
 
-          if (this.$element.val().length === 0)
-            return 0;
-
-          return 1;
-        },
-        highlighter: function (item) {
-          /* Use jquery to escape the item name and detail */
-          var current = $("<span></span>").text(item.name + ' '+item.detail);
-          current = current.html();
-
-          var query = this.query.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&')
-          return current.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
-            return '<strong>' + match + '</strong>'
-          })
-        },
-        sorter: function (items) { return items; },
-        xhrUrl: xhrUrl,
-        xhrParams: xhrParams,
-        xhrReq: xhrReq,
+    // when an item is selected using the typeahead, invoke the callback
+    jQElement.on("typeahead:select", function (event, item) {
+      selectedCB(item);
     });
-
-
-    /* Copy of bootstrap's render func but sets selectedObject value */
-    function customRenderFunc (items) {
-      var that = this;
-
-      items = $(items).map(function (i, item) {
-        i = $(that.options.item).attr('data-value', item.name).data('itemObject', item);
-        i.find('a').html(that.highlighter(item));
-        return i[0];
-      });
-
-      items.first().addClass('active');
-      this.$menu.html(items);
-      return this;
-    }
-
-    jQElement.data('typeahead').render = customRenderFunc;
   }
 
   /* startABuild:
@@ -162,11 +148,25 @@ var libtoaster = (function (){
     });
   }
 
+  function _getMostRecentBuilds(url, onsuccess, onfail) {
+    $.ajax({
+      url: url,
+      type: 'GET',
+      data : {format: 'json'},
+      headers: {'X-CSRFToken': $.cookie('csrftoken')},
+      success: function (data) {
+        onsuccess ? onsuccess(data) : console.log(data);
+      },
+      error: function (data) {
+        onfail ? onfail(data) : console.error(data);
+      }
+    });
+  }
+
   /* Get a project's configuration info */
   function _getProjectInfo(url, onsuccess, onfail){
     $.ajax({
         type: "GET",
-        data : { format: "json" },
         url: url,
         headers: { 'X-CSRFToken' : $.cookie('csrftoken')},
         success: function (_data) {
@@ -193,7 +193,7 @@ var libtoaster = (function (){
   function _editCurrentProject(data, onSuccess, onFail){
     $.ajax({
         type: "POST",
-        url: libtoaster.ctx.projectPageUrl + "?format=json",
+        url: libtoaster.ctx.xhrProjectUrl,
         data: data,
         headers: { 'X-CSRFToken' : $.cookie('csrftoken')},
         success: function (data) {
@@ -314,11 +314,11 @@ var libtoaster = (function (){
     var alertMsg;
 
     if (layerDepsList.length > 0 && add === true) {
-      alertMsg = $("<span>You have added <strong>"+(layerDepsList.length+1)+"</strong> layers to your project: <a id=\"layer-affected-name\"></a> and its dependencies </span>");
+      alertMsg = $("<span>You have added <strong>"+(layerDepsList.length+1)+"</strong> layers to your project: <a class=\"alert-link\" id=\"layer-affected-name\"></a> and its dependencies </span>");
 
       /* Build the layer deps list */
       layerDepsList.map(function(layer, i){
-        var link = $("<a></a>");
+        var link = $("<a class=\"alert-link\"></a>");
 
         link.attr("href", layer.layerdetailurl);
         link.text(layer.name);
@@ -330,9 +330,9 @@ var libtoaster = (function (){
         alertMsg.append(link);
       });
     } else if (layerDepsList.length === 0 && add === true) {
-      alertMsg = $("<span>You have added <strong>1</strong> layer to your project: <a id=\"layer-affected-name\"></a></span></span>");
+      alertMsg = $("<span>You have added <strong>1</strong> layer to your project: <a class=\"alert-link\" id=\"layer-affected-name\"></a></span></span>");
     } else if (add === false) {
-      alertMsg = $("<span>You have removed <strong>1</strong> layer from your project: <a id=\"layer-affected-name\"></a></span>");
+      alertMsg = $("<span>You have removed <strong>1</strong> layer from your project: <a class=\"alert-link\" id=\"layer-affected-name\"></a></span>");
     }
 
     alertMsg.children("#layer-affected-name").text(layer.name);
@@ -342,10 +342,12 @@ var libtoaster = (function (){
   }
 
   function _showChangeNotification(message){
-    var alertMsg = $("#change-notification-msg");
+    $(".alert-dismissible").fadeOut().promise().done(function(){
+      var alertMsg = $("#change-notification-msg");
 
-    alertMsg.html(message);
-    $("#change-notification, #change-notification *").fadeIn();
+      alertMsg.html(message);
+      $("#change-notification, #change-notification *").fadeIn();
+    });
   }
 
   function _createCustomRecipe(name, baseRecipeId, doneCb){
@@ -374,11 +376,98 @@ var libtoaster = (function (){
     });
   }
 
+  /* Validate project names. Use unique project names
+
+     All arguments accepted by this function are JQeury objects.
+
+     For example if the HTML element has "hint-error-project-name", then
+     it is passed to this function as $("#hint-error-project-name").
+
+     Arg1 - projectName : This is a string object. In the HTML, project name will be entered here.
+     Arg2 - hintEerror : This is a jquery object which will accept span which throws error for
+            duplicate project
+     Arg3 - ctrlGrpValidateProjectName : This object holds the div with class "control-group"
+     Arg4 - enableOrDisableBtn : This object will help the API to enable or disable the form.
+            For example in the new project the create project button will be hidden if the
+            duplicate project exist. Similarly in the projecttopbar the save button will be
+            disabled if the project name already exist.
+
+     Return - This function doesn't return anything. It sets/unsets the behavior of the elements.
+  */
+
+  function _makeProjectNameValidation(projectName, hintError,
+                ctrlGrpValidateProjectName, enableOrDisableBtn ) {
+
+     function checkProjectName(projectName){
+       $.ajax({
+            type: "GET",
+            url: libtoaster.ctx.projectsTypeAheadUrl,
+            data: { 'search' : projectName },
+            headers: { 'X-CSRFToken' : $.cookie('csrftoken')},
+            success: function(data){
+              if (data.results.length > 0 &&
+                  data.results[0].name === projectName) {
+                // This project name exists hence show the error and disable
+                // the save button
+                ctrlGrpValidateProjectName.addClass('has-error');
+                hintError.show();
+                enableOrDisableBtn.attr('disabled', 'disabled');
+              } else {
+                ctrlGrpValidateProjectName.removeClass('has-error');
+                hintError.hide();
+                enableOrDisableBtn.removeAttr('disabled');
+              }
+            },
+            error: function (data) {
+              console.log(data);
+            },
+       });
+     }
+
+     /* The moment user types project name remove the error */
+     projectName.on("input", function() {
+        var projectName = $(this).val();
+        checkProjectName(projectName)
+     });
+
+     /* Validate new project name */
+     projectName.on("blur", function(){
+        var projectName = $(this).val();
+        checkProjectName(projectName)
+     });
+  }
+
+  // if true, the loading spinner for Ajax requests will be displayed
+  // if requests take more than 1200ms
+  var ajaxLoadingTimerEnabled = true;
+
+  // turn on the page-level loading spinner for Ajax requests
+  function _enableAjaxLoadingTimer() {
+    ajaxLoadingTimerEnabled = true;
+  }
+
+  // turn off the page-level loading spinner for Ajax requests
+  function _disableAjaxLoadingTimer() {
+    ajaxLoadingTimerEnabled = false;
+  }
+
+  /* Utility function to set a notification for the next page load */
+  function _setNotification(name, message){
+    var data = {
+      name: name,
+      message: message
+    };
+
+    $.cookie('toaster-notification', JSON.stringify(data), { path: '/'});
+  }
 
   return {
+    enableAjaxLoadingTimer: _enableAjaxLoadingTimer,
+    disableAjaxLoadingTimer: _disableAjaxLoadingTimer,
     reload_params : reload_params,
     startABuild : _startABuild,
     cancelABuild : _cancelABuild,
+    getMostRecentBuilds: _getMostRecentBuilds,
     makeTypeahead : _makeTypeahead,
     getProjectInfo: _getProjectInfo,
     getLayerDepsForProject : _getLayerDepsForProject,
@@ -390,6 +479,8 @@ var libtoaster = (function (){
     makeLayerAddRmAlertMsg : _makeLayerAddRmAlertMsg,
     showChangeNotification : _showChangeNotification,
     createCustomRecipe: _createCustomRecipe,
+    makeProjectNameValidation: _makeProjectNameValidation,
+    setNotification: _setNotification,
   };
 })();
 
@@ -421,9 +512,23 @@ function reload_params(params) {
     window.location.href = url+"?"+callparams.join('&');
 }
 
-
 /* Things that happen for all pages */
 $(document).ready(function() {
+
+  (function showNotificationRequest(){
+    var cookie = $.cookie('toaster-notification');
+
+    if (!cookie)
+      return;
+
+    var notificationData = JSON.parse(cookie);
+
+    libtoaster.showChangeNotification(notificationData.message);
+
+    $.removeCookie('toaster-notification', { path: "/"});
+  })();
+
+
 
   var ajaxLoadingTimer;
 
@@ -493,9 +598,7 @@ $(document).ready(function() {
       delay: { show : 300 }
     });
 
-    // show help bubble only on hover inside tables
-    $(".hover-help").css("visibility","hidden");
-
+    // show help bubble on hover inside tables
     $("table").on("mouseover", "th, td", function () {
         $(this).find(".hover-help").css("visibility","visible");
     });
@@ -509,14 +612,14 @@ $(document).ready(function() {
     // show task type and outcome in task details pages
     $(".task-info").tooltip({ container: 'body', html: true, delay: {show: 200}, placement: 'right' });
 
-    // initialise the tooltips for the icon-pencil icons
-    $(".icon-pencil").tooltip({ container: 'body', html: true, delay: {show: 400}, title: "Change" });
+    // initialise the tooltips for the edit icons
+    $(".glyphicon-edit").tooltip({ container: 'body', html: true, delay: {show: 400}, title: "Change" });
 
     // initialise the tooltips for the download icons
     $(".icon-download-alt").tooltip({ container: 'body', html: true, delay: { show: 200 } });
 
     // initialise popover for debug information
-    $(".icon-info-sign").popover( { placement: 'bottom', html: true, container: 'body' });
+    $(".glyphicon-info-sign").popover( { placement: 'bottom', html: true, container: 'body' });
 
     // linking directly to tabs
     $(function(){
@@ -582,7 +685,9 @@ $(document).ready(function() {
         window.clearTimeout(ajaxLoadingTimer);
 
       ajaxLoadingTimer = window.setTimeout(function() {
-        $("#loading-notification").fadeIn();
+        if (libtoaster.ajaxLoadingTimerEnabled) {
+          $("#loading-notification").fadeIn();
+        }
       }, 1200);
     });
 
@@ -612,6 +717,11 @@ $(document).ready(function() {
         ids[this.id] = true;
       });
     }
+
+    /* Make sure we don't have a notification overlay a modal */
+    $(".modal").on('show.bs.modal', function(){
+      $(".alert-dismissible").fadeOut();
+    });
 
     if (libtoaster.debug) {
       check_for_duplicate_ids();

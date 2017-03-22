@@ -1,3 +1,13 @@
+From 79ad2885e26631077dd6b8aebe17ae95b38133a6 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Tue, 26 Jul 2016 14:23:59 +0800
+Subject: [PATCH] fix for multijob build
+
+make sure that comm.sh script generates comm.h header before doing
+anything else
+
+Signed-off-by: Amadeusz Sawiski <amade@asmblr.net>
+
 Upstream-Status: Backport
 
 Backport patch to fix parallel build failure and update context to make patch
@@ -6,25 +16,13 @@ coulde be applied.
 http://git.savannah.gnu.org/cgit/screen.git/commit?id=c0de6dd
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
 ---
-From c0de6dd7970b2c7b426a5c39dcbc31c2bef87232 Mon Sep 17 00:00:00 2001
-From: =?UTF-8?q?Amadeusz=20S=C5=82awi=C5=84ski?= <amade@asmblr.net>
-Date: Thu, 2 Jan 2014 18:18:06 +0100
-Subject: [PATCH] fix for multijob build
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-
-make sure that comm.sh script generates comm.h header before doing
-anything else
-
-Signed-off-by: Amadeusz Sławiński <amade@asmblr.net>
----
- Makefile.in | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ Makefile.in | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/Makefile.in b/Makefile.in
-index ce86cbc..dea16d8 100644
+index aca7da3..3607711 100644
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -298,7 +298,7 @@ search.o: layout.h viewport.h canvas.h search.c config.h screen.h os.h osdef.h a
@@ -51,8 +49,10 @@ index ce86cbc..dea16d8 100644
   braille.h
 -list_generic.o: list_generic.h list_generic.c layer.h screen.h osdef.h
 -list_display.o: list_generic.h list_display.c layer.h screen.h osdef.h
--list_window.o: list_generic.h list_window.c window.h layer.h screen.h osdef.h
 +list_generic.o: list_generic.h list_generic.c layer.h screen.h osdef.h comm.h
 +list_display.o: list_generic.h list_display.c layer.h screen.h osdef.h comm.h
-+list_window.o: list_generic.h list_window.c window.h layer.h screen.h osdef.h comm.h
+ list_window.o: list_generic.h list_window.c window.h layer.h screen.h osdef.h comm.h
  
+-- 
+1.9.1
+

@@ -1,298 +1,336 @@
+/* New Toaster custom css file for Bootstrap 3 */
+
+/* Set required top body padding for the fixed top navbard */
+body { padding-top: 50px; }
+
 /* Style the Yocto Project logo */
-.logo img { height: 30px; width: auto !important; }
-.logo { padding-top: 4px !important; padding-bottom:0px !important; }
+img.logo { height: 30px; vertical-align: bottom; }
 
-/* style the version information */
-.brand > a { color: #777; }
-.brand > a:hover { color: #999; text-decoration: none; }
-.icon-info-sign { color: #777; font-size: 16px; margin-left: 5px;}
-.icon-info-sign:hover { color: #999; cursor: pointer; }
+/* Style the Yocto Project logo and the Toaster name in the top navbar */
+.toaster-navbar-brand { float: left; margin: 7px 25px 0 0; }
+.toaster-navbar-brand a.brand { color: #777; height: 50px; padding: 15px 5px 15px 15px; font-size: 20px; line-height: 25px; display: inline; }
+.toaster-navbar-brand > a { text-decoration: none; }
+.toaster-navbar-brand > a.brand:hover { color: #5e5e5e; }
 
-/* Style the breadcrumb */
-.breadcrumb { display: inline-block; background-color: transparent; }
+/* Style the debugging information in the top navbar */
+.glyphicon-info-sign { color: #777; font-size: 16px; }
+.glyphicon-info-sign:hover { color: #999; cursor: pointer; }
+
+/* Override the negative right margin for the navbar-right class */
+#new-project-button { margin-right: 0; }
+
+/* Increase popovers width to fit commit SHAs */
+.popover { max-width: 350px; }
+
+/* Set a limit to popover height to handle long dependency lists */
+.popover-content { max-height: 350px; overflow: scroll; }
+
+/* Set a limit to modal dialogs height to handle long variable history */
+[id^="variable-"] .modal-content { max-height: 550px; overflow-y: scroll; }
+
+/* Make sure long values in variable history do not make the modal dialogs
+ * scroll horizontally */
+[id^="variable-"] .modal-content p { word-break: break-all; }
+
+/* Increase bottom margin of definition lists inside popovers for the Toaster version information in the top navbar, and also inside the right hand columns of our details pages */
+.popover-content dd,
+.item-info dd { margin-bottom: 15px; }
+
+/* Style the horizontal definition lists */
+.dl-horizontal dt { width: 200px; line-height: 25px; }
+.dl-horizontal dd { margin-left: 220px; line-height: 25px; }
+
+/* Style our build results */
+.build-result .progress { margin-bottom: 0; }
+.alert-link.build-warnings,
+.glyphicon-warning-sign.build-warnings { color: #8a6d3b; }
+.build-result .project-name { margin-top: -10px; margin-bottom: 5px; }
+.rebuild-btn, .cancel-build-btn { cursor: pointer; }
 
 /* Styles for the help information */
 .get-help { color: #CCCCCC; }
-.get-help:hover, .icon-plus-sign:hover { color: #999999; cursor: pointer; }
-.get-help-green { color: #468847; }
-.get-help-green:hover { color: #347132; cursor: pointer; }
+.get-help:hover { color: #999999; cursor: pointer; }
+.get-help-green { color: #3c763d; }
+.get-help-green:hover { color: #2b542c; cursor: pointer; }
 .get-help-blue { color: #3A87AD; }
 .get-help-blue:hover { color: #005580; cursor: pointer; }
-.get-help-yellow { color: #C09853; }
-.get-help-yellow:hover { color: #B38942; cursor: pointer; }
-.get-help-red { color: #B94A48; font-size: 16px; padding-left: 2px; }
-.get-help-red:hover { color: #943A38; cursor: pointer; }
-.build-form>i:first-of-type { margin-left: 5px; }
-.manual { margin: 11px 15px 0 11px;}
+.get-help-red { color: #a94442; }
+.get-help-red:hover { color: #843534; cursor: pointer; }
+
+/* Styles for our table controls */
+.form-control[id^="search-input-"],
+.form-control[id^="new-search-input-"],
+#search{ width: 30em; }
+#search-input-selectpackagestable,
+#search-input-packagestable,
+.form-control[id^="no-results-search-input-"] { width: 20em; }
+#edit-columns-button { margin-right: 30px; }
+.navbar-default[id^="table-chrome-"],
+#variables .navbar-default { background-color: transparent; }
+[id^="table-chrome-collapse-"] .navbar-form { margin-left: -15px; }
+.dropdown-menu.editcol { padding-left: 10px; min-width: 200px; }
+span[class^="remove-search-btn-"] { position: absolute; right: 5px; top: 0; bottom: 0; height: 14px; margin: auto; font-size: 14px; cursor: pointer; color: #777;}
+span[class^="remove-search-btn-"]:hover { color: #333; }
+#no-results-special-selectpackagestable .form-inline { margin-top: 20px; }
+[id^="pagination-"] .pagination,
+[id^="pagination-"] .navbar-form { margin-top: 0; }
+[id^="table-chrome-"] .navbar-form { margin-left: -15px; margin-right: -15px; }
+[id^="table-chrome-"] .detail-page-contols,
+#packages-built .detail-page-controls { padding-left: 0; padding-right: 0; }
+
+/* Override the default font-weight for labels: it's a bit too much */
+label { font-weight: normal; }
+
+/* Firefox workaround for awkward fieldset styling. See http://getbootstrap.com/css/#tables-responsive */
+@-moz-document url-prefix() { fieldset { display: table-cell; } }
+
+/* Table heading sortable / not sortable states */
+thead > tr > th > a { font-weight: normal; }
+thead > tr > th > a.sorted { font-weight: bold; color: #333; }
+
+/* Give some extra space to the 'clear filter' buttons */
+.tooltip .btn { margin: 5px; }
+
+/* In table headings, separate the help bubble from the column heading */
+thead > tr > th > .glyphicon-question-sign { margin-right: 5px; }
+
+/* Style build outcome in tables, download, remove and change icons */
+tbody > tr > td > .glyphicon-ok-circle,
+dd > .glyphicon-ok-circle { color: #3c763d; }
+tbody > tr > td > .glyphicon-minus-sign { color: #a94442; }
+.glyphicon-download-alt,
+.glyphicon-edit { color: #337ab7; }
+.failed_tasks .glyphicon-download-alt { margin-left: 5px; }
+.glyphicon-download-alt:hover,
+.glyphicon-edit:hover { color: #23527c; cursor: pointer; text-decoration: none; }
+.glyphicon-trash { color: #a94442; }
+.btn-danger > .glyphicon-trash,
+.btn-danger > .glyphicon-trash:hover { color: #fff; }
+.glyphicon-trash:hover { color: #843534; cursor: pointer; }
+
+/* Set the font size for icons inside headings, lead paragraphs and definition lists */
+h1 > .glyphicon-edit,
+p.lead .glyphicon { font-size: 16px; }
+h2 > .glyphicon-question-sign,
+h3 > .glyphicon-question-sign,
 .heading-help { font-size: 14px; }
 
-/* Styles for the external link */
-.get-info { color: #0088CC; }
-.get-info:hover { color: #005580; cursor: pointer; text-decoration: none; }
+/* Create a class for wells without background colour */
+.well-transparent { background-color: transparent; }
 
-/* Styles for code and pre tags */
-code { background-color: transparent; border: none; color: #333333; }
-dd code, .alert code { white-space: pre-wrap; word-break: break-all; word-wrap: break-word; }
-.alert-warning code, .alert-warning pre { background-color: transparent; border: none; color: #C09853; margin-bottom: 0px; }
-.alert-error code { background-color: transparent; border: none; color: #B94A48; margin-bottom:0px; }
-.alert-error pre { background-color: transparent; border: none; color: #B94A48; word-break: normal; margin-bottom: 0px; }
-.alert-warning pre { word-break: normal; }
-.alert-info a { font-weight: 300; }
-.alert-info code { color: #3A87AD; }
-.tooltip code { background-color: transparent; color: #FFFFFF; font-weight: normal; border: none; font-size: 1em; }
+/* Create a class for the left navigation headers */
+.nav-header { display: block; font-size: 12px; font-weight: bold; line-height: 20px; color: #999; text-transform: uppercase; margin-top: 20px !important; margin-bottom: 15px; padding-left: 15px; }
 
-/* Style for definition lists */
-dd ul { list-style-type: none; margin: 0px; }
-dt, dd  {line-height: 25px; }
-dd li { line-height: 25px; }
-.item-info dd { line-height: 20px; margin-bottom: 10px; }
+/* Increase the tabs padding and margin in the project pages to fit the build form and the main content */
+#project-topbar .nav-tabs > li > a { padding: 15px; }
+#project-topbar { margin-bottom: 20px; }
 
-/* Style the filter modal dialogs */
-.modal { width: 800px; margin-left: -400px; }
-.modal-footer .btn { float: left; }
-.modal-body { max-height: 300px; }
+/* Style the project name change form in the project pages */
+#project-name-change-input { width: 20em; }
 
-/* Hover style for the clear search icon */
-.icon-remove-sign:hover { color: #999999; cursor: pointer; }
+/* Style the build form in the project pages */
+#project-topbar .input-lg { width: 18em; }
+#project-topbar form .glyphicon { top: 15px; right: 4px; }
+#build-button { padding: 10px 30px; }
 
-/* Some extra space before headings when needed */
-.details { margin-top: 30px; }
-.air { margin-top: 30px; }
+/* Style the form links in the project page (all machines, all layers, etc) */
+.form-link { margin-top: 10px; }
 
-/* Required classes for the highlight behaviour in tables */
-.highlight { -webkit-animation: target-fade 10s 1; -moz-animation: target-fade 10s 1; animation: target-fade 10s 1; }
+/* Style the most built recipes list in the project page */
+#freq-build-list .checkbox input[type="checkbox"] { position: relative; margin: 0 10px 0 0; vertical-align: middle; }
+#freq-build-list.lead > li { line-height: 25px; }
+#freq-build-list { margin-top: 20px; }
+#freq-build-list label { padding-left: 0; }
+#freq-build-btn { margin-top: 10px; }
+#no-most-built { margin-top: 20px; }
+
+/* Style the layers section in the project page and the layer dependencies in the import layer form */
+#layer-container .form-inline { margin-top: 20px; }
+#layer-add-input { width: 17em; }
+ul.lead { margin-top: 20px; }
+ul.lead > li { line-height: 38px; }
+ul.lead .glyphicon-trash,
+ul.lead .glyphicon-trash { font-size: 16px; margin-left: 7px; }
+#layers-in-project-list .tooltip-inner  { max-width: 600px; }
+#no-layers-in-project { margin-top: 20px; }
+#no-layers-in-project ul { margin-top: 10px; }
+
+/* Style the layer information icons in the layer details pages */
+dd .glyphicon-trash,
+dd .glyphicon-edit { margin-left: 5px; }
+
+/* Style the forms and definition lists in the layer details pages */
+#change-repo-form .form-control { width: 17em; }
+#information { margin-bottom: 5em; }
+#information dd > form { margin-bottom: 5px; margin-top: 5px; }
+#edit-layer-source-form fieldset { margin-top: 20px; }
+#directory-info,
+#git-repo-info { margin-top: 20px; }
+#layer-dir-path-in-details { width: 55%; }
+.add-deps .form-control { width: 15em; }
+
+/* Style the forms and definition lists in the BitBake variables page */
+.variable-list { margin-bottom: 20px; }
+dd.variable-list form { margin-top: 10px; }
+#new-dl_dir,
+#filter-image_fstypes,
+#new-image_install,
+#new-sstate_dir,
+#new-imagefs_types { width: 20em; }
+#package_classes-select { width: 10em; }
+.scrolling { border: 1px solid #dddddd; height: 154px; overflow: auto; padding: 0 10px; width: 27.5%; margin-bottom: 10px; margin-top: 10px; }
+.scrolling.has-error { border-color: #a94442; }
+.help-block.text-danger { color: #a94442; }
+.tooltip-inner code { color: #fff; }
+.text-danger > code { color: #a94442; }
+dd.variable-list .glyphicon-question-sign { font-size: 14px; }
+dd.variable-list .glyphicon-edit { font-size: 16px; }
+dt .glyphicon-trash { margin-left: 5px; font-size: 16px; }
+#change-package_classes-form .checkbox { margin-top: 5px; }
+#variable-form h5 { margin-top: 0; }
+#variable-form .col-md-5 { padding-left: 45px; }
+
+/* Create a class for additional top margin that we can use in headings */
+.top-air { margin-top: 40px; }
+
+/* Add some bottom margin to our h2's */
+h2 { margin-bottom: 25px; }
+
+/* Style the typeahead */
+.tt-menu { min-width: 400px; padding-bottom: 10px; }
+.tt-suggestion { padding: 5px 10px; }
+.tt-suggestion:hover,
+.tt-suggestion:active { background-color: #f5f5f5; cursor: pointer; }
+
+/* Style the import layer form controls*/
+legend { border: none; }
+fieldset.fields-apart-from-layer-name { margin-top: 20px; }
+.radioLegend { margin-bottom: 0; }
+#layer-name-ctrl { margin-top: 20px; }
+#import-layer-name,
+#layer-subdir { width: 20%; }
+#layer-git-repo-url { width: 40%; }
+#layer-git-ref { width: 32%; }
+#local-dir-path { width: 45%; }
+#layer-dependency { width: 16em; }
+#layer-deps-list { margin-top: 0; }
+#form-actions { margin-bottom: 30px; }
+#duplicate-layer-info dl { margin-top: 10px; }
+#duplicate-layer-info dd { margin-bottom: 10px; }
+.help-inline { color: #737373; margin-left: 10px; }
+.radio-help { width: 50%; margin-left: 20px; }
+#repo-select div:nth-of-type(2) { margin-top: 15px; }
+
+/* Give some padding to the in-cell tooltips we use for notifications in tables */
+td > .tooltip-inner,
+.inline-notification { padding: 10px; }
+
+/* Set sane widths for table columns */
+#newcustomimagestable .get_description_or_summary,
+#imagerecipestable .get_description_or_summary,
+#softwarerecipestable .get_description_or_summary,
+#layerstable .layer__summary { width: 30%; }
+#recipestable .get_description_or_summary { width: 40%; }
+#machinestable .name { white-space: nowrap; }
+#machinestable .description { width: 45%; }
+#otable .variable_value,
+#otable .file { word-break: break-all; width: 25%; }
+[id^="variable-"] .file { word-break: break-all; }
+
+/* For the tables still not ported to ToasterTables, style the table headings
+ * that are not sortable */
+th > span.text-muted { font-weight: normal; }
+
+/* Override the rather ugly default code styles */
+code { color: #333; background-color: transparent; }
+
+/* Style our breadcrumbs */
+.breadcrumb > li + li::before { content: none; }
+.breadcrumb { background-color: transparent; padding-left: 0; padding-top: 15px; }
+.breadcrumb .divider { color: #777; margin: 0 5px; }
+
+/* Reduce top margin for the page-header class */
+.page-header { margin-top: 30px; }
+
+/* Set some space around the layer button in the layer details pages */
+.tab-content { margin-top: 20px; }
+.tab-pane { margin-top: 20px; }
+
+/* Style the new window icons */
+.glyphicon-new-window:hover { text-decoration: none; }
+.dl-horizontal > dd > .glyphicon-new-window { margin-left: 5px; }
+
+/* Style the special no results message in the custom image details page */
+[id^="no-results-special-"] > .alert-warning > ol { margin-top: 10px; }
+
+/* style the loading spinner in the new custom image dialog */
+#create-new-custom-image-btn [data-role="loading-state"] {
+  padding-left: 16px;
+}
+
+/* icon has to be absolutely positioned, otherwise the spin animation doesn't work */
+#create-new-custom-image-btn [data-role="loading-state"] .icon-spinner {
+  position: absolute;
+  left: 26px;
+  bottom: 26px;
+}
+
+/* Style the content of modal dialogs */
+.modal-footer { text-align: left; }
+.date-filter-controls { margin-top: 10px; }
+.date-filter-controls span { margin: 0 10px; }
+
+/* Style the fixed positioned notifications */
+#loading-notification { position: fixed; z-index: 1101; top: 3%; left: 40%; right: 40%; -webkit-box-shadow: 0 0 10px #c09853; -moz-box-shadow: 0 0 10px #c09853; box-shadow: 0 0 10px #c09853; }
+
+.change-notification { position: fixed; z-index: 1101; top: 4%; left: 30%; right: 30%; -webkit-box-shadow: 0 0 10px #3a87ad; -moz-box-shadow: 0 0 10px #3a87ad; box-shadow: 0 0 10px #3a87ad; }
+
+.alert-success.change-notification { -webkit-box-shadow: 0 0 10px #3c763d; -moz-box-shadow: 0 0 10px #3c763d; box-shadow: 0 0 10px #3c763d; }
+
+/* Style the new project form */
+#new-project-name { width: 33%; }
+#projectversion { width: 20%; margin-bottom: 10px; }
+
+/* Style the Toaster screenshot in the landing page */
+.img-thumbnail { padding: 0; }
+
+/* Set the layout for the build information pages */
+
+#nav { margin-top: 10px; }
+.page-header.build-data { margin-top: 0px; }
+.build-data > h1 { margin-top: 8px; }
+
+/* Style the build outcome information in the build dashboard */
+.log { margin-left: 30px; }
+.show-warnings { font-weight: 700; color: #8a6d3b; }
+.show-warnings:hover { color: #66512c; }
+
+/* Style the errors and warnings information in the build dashboard */
+#errors .panel-heading { background-color: transparent; color: #843534; }
+#warnings .panel-heading { background-color: transparent; color: #8a6d3b; }
+#warnings .panel-heading a:hover { color: #66512c; }
+h2.panel-title { font-size: 30px; }
+.alert-danger pre,
+.alert-warning pre { background-color: transparent; border: none; }
+.alert-danger pre { color: #a94442; }
+#error-info pre,
+#warning-info pre { white-space: pre-wrap; }
+.alert-warning pre { color: #8a6d3b; }
+
+/* Style the wells in the build dashboard */
+.dashboard-section h3 { margin-top: 10px; margin-bottom: 20px; }
+.col-md-4.dashboard-section dd { margin-bottom: 10px; }
+
+/* Make the help in tables insivisble until you hover over the right cell */
+.hover-help { visibility: hidden; }
+
+#add-remove-layer-btn { margin-bottom: 20px; }
+
+/* Blue hightlight animation for tasks and directory structure tables */
+.highlight { -webkit-animation: target-fade 15s 1; -moz-animation: target-fade 15s 1; animation: target-fade 15s 1; }
 @-webkit-keyframes target-fade { 0% { background-color: #D9EDF7; } 25% { background-color: #D9EDF7; } 100% { background-color: white; } }
 @-moz-keyframes target-fade { 0% { background-color: #D9EDF7; } 25% { background-color: #D9EDF7; } 100% { background-color: white; } }
 @keyframes target-fade { 0% { background-color: #D9EDF7; } 25% { background-color: #D9EDF7; } 100% { background-color: white; } }
-
-/* This makes tooltips work inside modal dialogs */
-.tooltip { z-index: 2000 !important; }
-
-/* Override default Twitter Boostrap styles for anchor tags inside tables */
-td a, td a > code { color: #333333; }
-td code { white-space: normal; }
-td a:hover, td a > code:hover { color: #000000; text-decoration: underline; }
-
-/* Override default Twitter Bootstrap styles for tr.error */
-.table tbody tr.error > td { background-color: transparent; } /* override default Bootstrap behaviour */
-.table-hover tbody tr.error:hover > td { background-color: #F5F5F5;} /* override default Bootstrap behaviour */
-
-/* Right justify Bootstrap table columns for size fields */
-.table .sizecol { text-align: right; }
-
-/* Set error, warning, success and muted styles */
-.error, .red, td.error a, tr.error a { color: #b94a48; }
-a.error:hover, a.error:focus, tr.error a:hover { color: #943A38; text-decoration: underline; }
-.warning, .yellow { color: #c09853;}
-a.warning { background-color: transparent; }
-a.warning:hover, a.warning:focus { color: #B38942; text-decoration: underline; }
-.success, .green { color: #468847;}
-.success:hover { color: #347132; text-decoration: underline; }
-td > .success:hover { text-decoration: underline; }
-.muted a { color:#999999; }
-.muted a:hover { color:#999999; }
-
-/* Sorting functionality styles for table headings */
-.sorted { color: #333333; font-weight: bold; }
-.sorted:hover { color: #000000; text-decoration: underline; }
-th > a, th > span { font-weight: normal; }
-
-/* Force long strings like commit hashes to wrap */
-.iscommit { white-space: pre-wrap; word-break: break-all; word-wrap: break-word;}
-
-/* Make the popovers scrollable if they are too long */
-.popover-content { max-height: 30em; overflow-y: scroll; }
-
-/* Styles for the directory structure table. We'll probably won't use those in production */
-.one { padding-left: 18px !important; }
-.two { padding-left: 36px !important; }
-.three { padding-left: 54px !important; }
-.content-directory a { color: #0088CC; }
-.content-directory a:hover { color: #005580; text-decoration: underline; }
-.symlink { color: #CCCCCC; }
-
-/* Styles for the navbar actions */
-.btn-group + .btn-group { margin-right: 10px; }
-.navbar-inner > .btn-group { margin-top: 6px; }
-[id^="search-input-"], #search { width: 80%; }
-
-/* Styles for the parent item in the left navigation */
-
-.nav > li > a.nav-parent { font-size: 18px; line-height: 25px;  }
-
-/* Other styles */
-.dropdown-menu { padding: 10px; }
-select { width: auto; }
-.page-header { color: #5A5A5A; }
-.top-air { margin-top: 40px;}
-.progress { margin-bottom: 0px; }
-.lead .badge { font-size: 18px; font-weight: normal; border-radius: 15px; padding: 9px; }
-.lead ol, .lead ul { padding: 10px 0 0 20px; }
-.lead ol > li, .lead ul > li {
-    line-height: 35px;
-}
-.well > .lead, .alert .lead { margin-bottom: 0px; }
-.well-transparent { background-color: transparent; }
-.no-results { margin: 10px 0; }
-.task-name { margin-left: 7px; }
-.icon-hand-right {color: #CCCCCC; }
-.help-inline { margin: 5px; }
-.dashboard-section { background-color: transparent; }
-
-/* styles for landing page - analysis mode */
-.hero-unit { margin: 20px 0 30px; }
-.hero-unit > .close { font-size:40px; }
-.hero-actions { margin-top: 30px; }
-
-/* styles for landing page - build mode */
-.hero-unit p { line-height: 25px; }
-.hero-unit p, .hero-unit .btn-large { margin-top: 15px; }
-.hero-unit ul { margin-top: 20px; }
-.hero-unit li { line-height: 30px; }
-.hero-unit img { background-color: #eee; margin-top: 15px; }
-
-/* make tables Chrome-happy (me, not so much) */
-table { table-layout: fixed; word-wrap: break-word; }
-
-table p { margin-bottom: 0 }
-.table td { vertical-align: middle; }
-
-/* styles for the new build button */
-.new-build .btn-primary { padding: 4px 30px; }
-.new-build .alert { margin-top: 10px; }
-.new-build .alert p { margin-top: 10px; }
-
-/* styles for showing the project name in build mode */
-.project-name { padding-top: 0; }
-.project-name .label { font-weight: normal; margin-bottom: 5px; margin-left: -15px; padding: 5px; }
-.project-name .label > a { color: #fff; font-weight: normal; }
-
-/* styles for showing help icons next to command-line builds */
-.build-result .get-help-green, .build-result .get-help-red, .build-result .get-help-blue { margin-right: 35px; margin-top: 8px; font-size: 16px; }
-
-/* Remove bottom margin for forms inside modal dialogs */
-#dependencies-modal-form { margin-bottom: 0px; }
-
-/* Custom column widths */
-.narrow-col { width: 8%; }
-.medium-col { width: 12%; }
-
-/* Configuration styles */
-.icon-trash { color: #B94A48; font-size: 16px; padding-left: 5px; }
-.icon-trash:hover { color: #943A38; text-decoration: none; cursor: pointer; }
-.icon-pencil, .icon-download-alt, .icon-refresh, .icon-star-empty, .icon-star  { font-size: 16px; color: #0088CC; padding-left: 2px; }
-.icon-pencil:hover, .icon-download-alt:hover, .icon-refresh:hover, .icon-star-empty:hover, .icon-star:hover, .icon-tasks:hover { color: #005580; text-decoration: none; cursor: pointer; }
-.icon-share { padding-left: 2px; }
-.alert-success .icon-refresh, .alert-success .icon-tasks { color: #468847; }
-.alert-success .icon-refresh:hover, .alert-success .icon-tasks:hover { color: #347132; }
-.alert-error .icon-refresh, .alert-error .icon-tasks { color: #b94a48; }
-.alert-error .icon-refresh:hover, .alert-error .icon-tasks:hover { color: #943A38; }
-.configuration-list li, .configuration-list label { line-height: 35px; font-size: 21px; font-weight: 200; margin-bottom: 0px;}
-.configuration-list { font-size: 16px; margin-bottom: 1.5em; }
-.configuration-list i { font-size: 16px; }
-/*.configuration-layers { height: 135px; overflow: scroll; }*/
-.counter { font-weight: normal; }
-.well-alert { background-color: #FCF8E3; border: 1px solid #FBEED5; border-radius: 4px; }
-.well-alert > .lead { color: #C09853; padding-bottom: .75em; }
-.configuration-alert { margin-bottom: 0px; padding: 8px 14px; }
-.configuration-alert p { margin-bottom: 0px; }
-.project-form { margin-top: 10px; }
-.add-layers .btn-block + .btn-block, .build .btn-block + .btn-block { margin-top: 0px; }
-input.huge { font-size: 17.5px; padding: 11px; min-width: 60%; }
-.build-form { margin-bottom: 0px; }
-.build-form .input-append { margin-bottom: 0px; }
-.build-form .btn-large { padding: 11px 35px; }
-.build-form p { font-size:17.5px ;margin:12px 0 0 10px;}
-#layer-container form, #target-container form { margin-bottom: 0px; }
-.btn-primary .icon-question-sign, .btn-danger .icon-question-sign { color: #fff; }
-.btn-primary .icon-question-sign:hover, .btn-danger .icon-question-sign:hover { color: #999; }
-a code { color: #0088CC; }
-a code:hover { color: #005580; }
-.localconf { font-size: 17.5px; margin-top: 40px; }
-.localconf code { font-size: 17.5px; }
-#add-layer-dependencies {  margin-top: 5px; }
-.link-action { font-size: 17.5px; margin-top: 40px; }
-.link-action code { font-size: 17.5px; }
-.artifact { width: 9em; }
-.control-group { margin-bottom: 0px; }
-#project-details form { margin: 0px; }
-dd form { margin: 10px 0 0 0; }
-dl textarea { resize: vertical; }
-.navbar-fixed-top {  z-index: 1; }
-.popover { z-index: 2; }
-.btn-danger .icon-trash { color: #fff; }
-.bbappends { list-style-type: none; margin-left: 0; }
-.bbappends li { line-height: 25px; }
-.configuration-list input[type="checkbox"] { margin-top:13px;margin-right:10px; }
-.alert input[type="checkbox"] { margin-top: 0px; margin-right: 3px; }
-.alert ol { padding: 10px 0px 0px 20px; }
-.alert ol > li { line-height: 35px; }
-.dl-vertical form { margin-top: 10px; }
-.scrolling { border: 1px solid #dddddd; height: 154px; overflow: auto; padding: 8px; width: 27.5%; margin-bottom: 10px; }
-.lead .help-block { font-size: 14px; line-height: 20px; font-weight: normal; }
-.button-place  .btn { margin: 0 0 20px 0; }
-.tooltip-inner { max-width: 250px; }
-.new-build { padding: 20px; }
-.new-build li { line-height: 30px; }
-.new-build li .alert { line-height: 20px; width: 200px; white-space: normal; }
-.new-build h6 { margin: 10px 0 0 0; color: #5a5a5a; }
-.new-build h3 { margin: 0; color: #5a5a5a; }
-.new-build form { margin: 5px 0 0; }
-.new-build .input-append { margin-bottom: 0; }
-#build-selected { margin-top: 15px; }
-div.add-deps { margin-top: 15px; }
-.btn.log { margin-left: 20px; }
-
-
-.animate-repeat {
-  list-style:none;
-  box-sizing:border-box;
-}
-
-.animate-repeat.ng-move,
-.animate-repeat.ng-enter,
-.animate-repeat.ng-leave {
-  -webkit-transition:all linear 0.5s;
-  transition:all linear 0.5s;
-}
-
-.animate-repeat.ng-leave.ng-leave-active,
-.animate-repeat.ng-move,
-.animate-repeat.ng-enter {
-  opacity:0;
-}
-
-.animate-repeat.ng-leave,
-.animate-repeat.ng-enter.ng-enter-active {
-  opacity:1;
-}
-
-.tab-pane table { margin-top: 10px; }
-
-thead .description, .get_description_or_summary { width: 364px; }
-thead .add-del-layers { width: 124px; }
-
-#loading-notification {
-  position: fixed;
-  z-index: 101;
-  top: 3%;
-  left: 40%;
-  right: 40%;
-  -webkit-box-shadow: 0 0 10px #c09853;
-  -moz-box-shadow: 0 0 10px #c09853;
-  box-shadow: 0 0 10px #c09853;
-}
-
-#change-notification {
-  position: fixed;
-  z-index: 101;
-  top: 3%;
-  left: 20%;
-  right: 20%;
-  -webkit-box-shadow: 0 0 10px #3a87ad;
-  -moz-box-shadow: 0 0 10px #3a87ad;
-  box-shadow: 0 0 10px #3a87ad;
-}
 
 /* Copied in from newer version of Font-Awesome 4.3.0 */
 .fa-spin {
@@ -330,14 +368,3 @@ thead .add-del-layers { width: 124px; }
   }
 }
 /* End copied in from newer version of Font-Awesome 4.3.0 */
-
-.top-padded {
-  padding-top: 60px;
-}
-
-input.input-lg {
-  font-size: 18px;
-  height: 22px;
-  line-height: 1.33333;
-  padding: 10px 16px;
-}

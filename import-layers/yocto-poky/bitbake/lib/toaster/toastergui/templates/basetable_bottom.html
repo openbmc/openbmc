@@ -2,12 +2,10 @@
     </table>
 
 <!-- Show pagination controls -->
-<div class="pagination pagination-centered">
-   <div class="pull-left">
-   Showing {{objects.start_index}} to {{objects.end_index}} out of {{objects.paginator.count}} entries.
-   </div>
+<div id="pagination-basetable_bottom">
+   <!--span class="help-inline">Showing {{objects.start_index}} to {{objects.end_index}} out of {{objects.paginator.count}} entries.</span-->
 
-   <ul class="pagination" style="display: block-inline">
+   <ul class="pagination">
 {%if objects.has_previous %}
   <li><a href="javascript:reload_params({'page':{{objects.previous_page_number}}})">&laquo;</a></li>
 {%else%}
@@ -22,16 +20,18 @@
   <li class="disabled"><a href="#">&raquo;</a></li>
 {%endif%}
   </ul>
-  <div class="pull-right">
-    <span class="help-inline" style="padding-top:5px;">Show rows:</span>
-    <select style="margin-top:5px;margin-bottom:0px;" class="pagesize">
-      {% with "10 25 50 100 150" as list%}
+  <form class="navbar-form navbar-right">
+    <div class="form-group">
+      <label>Show rows:</label>
+      <select class="form-control pagesize">
+        {% with "10 25 50 100 150" as list%}
         {% for i in list.split %}
-            <option value="{{i}}">{{i}}</option>
+        <option value="{{i}}">{{i}}</option>
         {% endfor %}
-      {% endwith %}
-    </select>
-   </div>
+        {% endwith %}
+      </select>
+    </div>
+  </form>
 </div>
 
 <!-- Update page display settings -->

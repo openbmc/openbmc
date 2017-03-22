@@ -8,7 +8,7 @@ def bad_runtime_vars(cfgdata, d):
         return
 
     for var in d.getVar("__recipe_sanity_badruntimevars", True).split():
-        val = d.getVar(var, 0)
+        val = d.getVar(var, False)
         if val and val != cfgdata.get(var):
             __note("%s should be %s_${PN}" % (var, var), d)
 
@@ -16,11 +16,11 @@ __recipe_sanity_reqvars = "DESCRIPTION"
 __recipe_sanity_reqdiffvars = ""
 def req_vars(cfgdata, d):
     for var in d.getVar("__recipe_sanity_reqvars", True).split():
-        if not d.getVar(var, 0):
+        if not d.getVar(var, False):
             __note("%s should be set" % var, d)
 
     for var in d.getVar("__recipe_sanity_reqdiffvars", True).split():
-        val = d.getVar(var, 0)
+        val = d.getVar(var, False)
         cfgval = cfgdata.get(var)
 
         if not val:
@@ -29,7 +29,7 @@ def req_vars(cfgdata, d):
             __note("%s should be defined to something other than default (%s)" % (var, cfgval), d)
 
 def var_renames_overwrite(cfgdata, d):
-    renames = d.getVar("__recipe_sanity_renames", 0)
+    renames = d.getVar("__recipe_sanity_renames", False)
     if renames:
         for (key, newkey, oldvalue, newvalue) in renames:
             if oldvalue != newvalue and oldvalue != cfgdata.get(newkey):
@@ -50,7 +50,7 @@ def can_use_autotools_base(cfgdata, d):
         if cfg.find(i) != -1:
             return False
 
-    for clsfile in d.getVar("__inherit_cache", 0):
+    for clsfile in d.getVar("__inherit_cache", False):
         (base, _) = os.path.splitext(os.path.basename(clsfile))
         if cfg.find("%s_do_configure" % base) != -1:
             __note("autotools_base usage needs verification, spotted %s_do_configure" % base, d)
@@ -60,7 +60,7 @@ def can_use_autotools_base(cfgdata, d):
 def can_delete_FILESPATH(cfgdata, d):
     expected = cfgdata.get("FILESPATH")
     expectedpaths = d.expand(expected)
-    unexpanded = d.getVar("FILESPATH", 0)
+    unexpanded = d.getVar("FILESPATH", False)
     filespath = d.getVar("FILESPATH", True).split(":")
     filespath = [os.path.normpath(f) for f in filespath if os.path.exists(f)]
     for fp in filespath:
@@ -73,7 +73,7 @@ def can_delete_FILESPATH(cfgdata, d):
 def can_delete_FILESDIR(cfgdata, d):
     expected = cfgdata.get("FILESDIR")
     #expected = "${@bb.utils.which(d.getVar('FILESPATH', True), '.')}"
-    unexpanded = d.getVar("FILESDIR", 0)
+    unexpanded = d.getVar("FILESDIR", False)
     if unexpanded is None:
         return False
 
@@ -90,7 +90,7 @@ def can_delete_others(p, cfgdata, d):
     for k in ["S", "PV", "PN", "DESCRIPTION", "DEPENDS",
               "SECTION", "PACKAGES", "EXTRA_OECONF", "EXTRA_OEMAKE"]:
     #for k in cfgdata:
-        unexpanded = d.getVar(k, 0)
+        unexpanded = d.getVar(k, False)
         cfgunexpanded = cfgdata.get(k)
         if not cfgunexpanded:
             continue
@@ -117,7 +117,7 @@ python do_recipe_sanity () {
         #(can_use_autotools_base, "candidate for use of autotools_base"),
         (incorrect_nonempty_PACKAGES, "native or cross recipe with non-empty PACKAGES"),
     ]
-    cfgdata = d.getVar("__recipe_sanity_cfgdata", 0)
+    cfgdata = d.getVar("__recipe_sanity_cfgdata", False)
 
     for (func, msg) in sanitychecks:
         if func(cfgdata, d):
@@ -143,8 +143,8 @@ python recipe_sanity_eh () {
 
     cfgdata = {}
     for k in d.keys():
-        if not isinstance(d.getVar(k, 0), bb.data_smart.DataSmart):
-            cfgdata[k] = d.getVar(k, 0)
+        if not isinstance(d.getVar(k, False), bb.data_smart.DataSmart):
+            cfgdata[k] = d.getVar(k, False)
 
     d.setVar("__recipe_sanity_cfgdata", cfgdata)
     #d.setVar("__recipe_sanity_cfgdata", d)

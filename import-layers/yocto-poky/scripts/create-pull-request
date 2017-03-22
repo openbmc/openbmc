@@ -39,13 +39,15 @@ Usage: $CMD [-h] [-o output_dir] [-m msg_body_file] [-s subject] [-r relative_to
   -l local branch     Local branch name (default: HEAD)
   -c                  Create an RFC (Request for Comment) patch series
   -h                  Display this help message
+  -a                  Automatically push local branch (-l) to remote branch (-b),
+                      or set CPR_CONTRIB_AUTO_PUSH in env
   -i commit_id        Ending commit (default: HEAD)
   -m msg_body_file    The file containing a blurb to be inserted into the summary email
   -o output_dir       Specify the output directory for the messages (default: pull-PID)
   -p prefix           Use [prefix N/M] instead of [PATCH N/M] as the subject prefix
   -r relative_to      Starting commit (default: master)
   -s subject          The subject to be inserted into the summary email
-  -u remote           The git remote where the branch is located
+  -u remote           The git remote where the branch is located, or set CPR_CONTRIB_REMOTE in env
   -d relative_dir     Generate patches relative to directory
 
  Examples:
@@ -58,8 +60,9 @@ Usage: $CMD [-h] [-o output_dir] [-m msg_body_file] [-s subject] [-r relative_to
 EOM
 }
 
+REMOTE="$CPR_CONTRIB_REMOTE"
 # Parse and validate arguments
-while getopts "b:cd:hi:m:o:p:r:s:u:l:" OPT; do
+while getopts "b:acd:hi:m:o:p:r:s:u:l:" OPT; do
 	case $OPT in
 	b)
 		BRANCH="$OPTARG"
@@ -101,34 +104,44 @@ while getopts "b:cd:hi:m:o:p:r:s:u:l:" OPT; do
 		;;
 	u)
 		REMOTE="$OPTARG"
-		REMOTE_URL=$(git config remote.$REMOTE.url)
-		if [ $? -ne 0 ]; then
-			echo "ERROR: git config failed to find a url for '$REMOTE'"
-			echo
-			echo "To add a remote url for $REMOTE, use:"
-			echo "  git config remote.$REMOTE.url <url>"
-			exit 1
-		fi
-
-		# Rewrite private URLs to public URLs
-		# Determine the repository name for use in the WEB_URL later
-		case "$REMOTE_URL" in
-		*@*)
-			USER_RE="[A-Za-z0-9_.@][A-Za-z0-9_.@-]*\$\?"
-			PROTO_RE="[a-z][a-z+]*://"
-			GIT_RE="\(^\($PROTO_RE\)\?$USER_RE@\)\([^:/]*\)[:/]\(.*\)"
-			REMOTE_URL=${REMOTE_URL%.git}
-			REMOTE_REPO=$(echo $REMOTE_URL | sed "s#$GIT_RE#\4#")
-			REMOTE_URL=$(echo $REMOTE_URL | sed "s#$GIT_RE#git://\3/\4#")
-			;;
-		*)
-			echo "WARNING: Unrecognized remote URL: $REMOTE_URL"
-			echo "         The pull and browse URLs will likely be incorrect"
-			;;
-		esac
+		;;
+	a)
+		CPR_CONTRIB_AUTO_PUSH="1"
 		;;
 	esac
 done
+
+if [ -z "$REMOTE" ]; then
+	echo "ERROR: Missing parameter -u or CPR_CONTRIB_REMOTE in env, no git remote!"
+	usage
+	exit 1
+fi
+
+REMOTE_URL=$(git config remote.$REMOTE.url)
+if [ $? -ne 0 ]; then
+	echo "ERROR: git config failed to find a url for '$REMOTE'"
+	echo
+	echo "To add a remote url for $REMOTE, use:"
+	echo "  git config remote.$REMOTE.url <url>"
+	exit 1
+fi
+
+# Rewrite private URLs to public URLs
+# Determine the repository name for use in the WEB_URL later
+case "$REMOTE_URL" in
+*@*)
+	USER_RE="[A-Za-z0-9_.@][A-Za-z0-9_.@-]*\$\?"
+	PROTO_RE="[a-z][a-z+]*://"
+	GIT_RE="\(^\($PROTO_RE\)\?$USER_RE@\)\([^:/]*\)[:/]\(.*\)"
+	REMOTE_URL=${REMOTE_URL%.git}
+	REMOTE_REPO=$(echo $REMOTE_URL | sed "s#$GIT_RE#\4#")
+	REMOTE_URL=$(echo $REMOTE_URL | sed "s#$GIT_RE#git://\3/\4#")
+	;;
+*)
+	echo "WARNING: Unrecognized remote URL: $REMOTE_URL"
+	echo "         The pull and browse URLs will likely be incorrect"
+	;;
+esac
 
 if [ -z "$BRANCH" ]; then
 	BRANCH=$(git branch | grep -e "^\* " | cut -d' ' -f2)
@@ -138,12 +151,6 @@ fi
 if [ -z "$L_BRANCH" ]; then
 	L_BRANCH=HEAD
 	echo "NOTE: Assuming local branch HEAD, use -l to override."
-fi
-
-if [ -z "$REMOTE_URL" ]; then
-	echo "ERROR: Missing parameter -u, no git remote!"
-	usage
-	exit 1
 fi
 
 if [ $RFC -eq 1 ]; then
@@ -171,6 +178,11 @@ esac
 # Perform a sanity test on the web URL. Issue a warning if it is not
 # accessible, but do not abort as users may want to run offline.
 if [ -n "$WEB_URL" ]; then
+	if [ "$CPR_CONTRIB_AUTO_PUSH" = "1" ]; then
+		echo "Pushing '$BRANCH' on '$REMOTE' as requested..."
+		git push $REMOTE $L_BRANCH:$BRANCH
+		echo ""
+	fi
 	wget --no-check-certificate -q $WEB_URL -O /dev/null
 	if [ $? -ne 0 ]; then
 		echo "WARNING: Branch '$BRANCH' was not found on the contrib git tree."
@@ -217,6 +229,7 @@ else
 fi
 if [ $? -ne 0 ]; then
 	echo "ERROR: git request-pull reported an error"
+	rm -rf $ODIR
 	exit 1
 fi
 
@@ -249,7 +262,13 @@ if [ -n "$BODY" ]; then
 	sed -i "/BLURB HERE/ d" "$CL"
 fi
 
-# If the user specified a subject, replace the SUBJECT token with it.
+# Set subject automatically if there is only one patch
+patch_cnt=`git log --pretty=oneline ${RELATIVE_TO}..${L_BRANCH} | wc -l`
+if [ -z "$SUBJECT" -a $patch_cnt -eq 1 ]; then
+    SUBJECT="`git log --format=%s ${RELATIVE_TO}..${L_BRANCH}`"
+fi
+
+# Replace the SUBJECT token with it.
 if [ -n "$SUBJECT" ]; then
 	sed -i -e "s/\*\*\* SUBJECT HERE \*\*\*/$SUBJECT/" "$CL"
 fi

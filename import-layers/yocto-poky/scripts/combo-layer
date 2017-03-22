@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # ex:ts=4:sw=4:sts=4:et
 # -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 #
@@ -26,10 +26,14 @@ import optparse
 import logging
 import subprocess
 import tempfile
-import ConfigParser
+import configparser
 import re
+import copy
+import pipes
+import shutil
 from collections import OrderedDict
 from string import Template
+from functools import reduce
 
 __version__ = "0.2.1"
 
@@ -73,7 +77,7 @@ class Configuration(object):
                 else:
                     # Apply special type transformations for some properties.
                     # Type matches the RawConfigParser.get*() methods.
-                    types = {'signoff': 'boolean', 'update': 'boolean'}
+                    types = {'signoff': 'boolean', 'update': 'boolean', 'history': 'boolean'}
                     if name in types:
                         value = getattr(parser, 'get' + types[name])(section, name)
                     self.repos[repo][name] = value
@@ -84,7 +88,7 @@ class Configuration(object):
                     self.commit_msg_template = value
 
         logger.debug("Loading config file %s" % self.conffile)
-        self.parser = ConfigParser.ConfigParser()
+        self.parser = configparser.ConfigParser()
         with open(self.conffile) as f:
             self.parser.readfp(f)
 
@@ -113,7 +117,7 @@ class Configuration(object):
 
                 self.localconffile = lcfile
                 logger.debug("Loading local config file %s" % self.localconffile)
-                self.localparser = ConfigParser.ConfigParser()
+                self.localparser = configparser.ConfigParser()
                 with open(self.localconffile) as f:
                     self.localparser.readfp(f)
 
@@ -174,28 +178,28 @@ class Configuration(object):
             logger.error("ERROR: patchutils package is missing, please install it (e.g. # apt-get install patchutils)")
             sys.exit(1)
 
-def runcmd(cmd,destdir=None,printerr=True,out=None):
+def runcmd(cmd,destdir=None,printerr=True,out=None,env=None):
     """
         execute command, raise CalledProcessError if fail
         return output if succeed
     """
     logger.debug("run cmd '%s' in %s" % (cmd, os.getcwd() if destdir is None else destdir))
     if not out:
-        out = os.tmpfile()
+        out = tempfile.TemporaryFile()
         err = out
     else:
-        err = os.tmpfile()
+        err = tempfile.TemporaryFile()
     try:
-        subprocess.check_call(cmd, stdout=out, stderr=err, cwd=destdir, shell=isinstance(cmd, str))
-    except subprocess.CalledProcessError,e:
+        subprocess.check_call(cmd, stdout=out, stderr=err, cwd=destdir, shell=isinstance(cmd, str), env=env or os.environ)
+    except subprocess.CalledProcessError as e:
         err.seek(0)
         if printerr:
             logger.error("%s" % err.read())
         raise e
 
     err.seek(0)
-    output = err.read()
-    logger.debug("output: %s" % output )
+    output = err.read().decode('utf-8')
+    logger.debug("output: %s" % output.replace(chr(0), '\\0'))
     return output
 
 def action_init(conf, args):
@@ -426,7 +430,7 @@ file_exclude = %s''' % (name, file_filter or '<empty>', repo.get('file_exclude',
                     runcmd('git replace --graft %s %s' % (start, startrev))
             try:
                 runcmd(merge)
-            except Exception, error:
+            except Exception as error:
                 logger.info('''Merging component repository history failed, perhaps because of merge conflicts.
 It may be possible to commit anyway after resolving these conflicts.
 
@@ -478,32 +482,32 @@ def check_repo_clean(repodir):
         sys.exit(1)
 
 def check_patch(patchfile):
-    f = open(patchfile)
+    f = open(patchfile, 'rb')
     ln = f.readline()
     of = None
     in_patch = False
     beyond_msg = False
-    pre_buf = ''
+    pre_buf = b''
     while ln:
         if not beyond_msg:
-            if ln == '---\n':
+            if ln == b'---\n':
                 if not of:
                     break
                 in_patch = False
                 beyond_msg = True
-            elif ln.startswith('--- '):
+            elif ln.startswith(b'--- '):
                 # We have a diff in the commit message
                 in_patch = True
                 if not of:
                     print('WARNING: %s contains a diff in its commit message, indenting to avoid failure during apply' % patchfile)
-                    of = open(patchfile + '.tmp', 'w')
+                    of = open(patchfile + '.tmp', 'wb')
                     of.write(pre_buf)
-                    pre_buf = ''
-            elif in_patch and not ln[0] in '+-@ \n\r':
+                    pre_buf = b''
+            elif in_patch and not ln[0] in b'+-@ \n\r':
                 in_patch = False
         if of:
             if in_patch:
-                of.write(' ' + ln)
+                of.write(b' ' + ln)
             else:
                 of.write(ln)
         else:
@@ -516,7 +520,7 @@ def check_patch(patchfile):
 
 def drop_to_shell(workdir=None):
     if not sys.stdin.isatty():
-        print "Not a TTY so can't drop to shell for resolution, exiting."
+        print("Not a TTY so can't drop to shell for resolution, exiting.")
         return False
 
     shell = os.environ.get('SHELL', 'bash')
@@ -526,7 +530,7 @@ def drop_to_shell(workdir=None):
           '       exit 1  -- abort\n' % shell);
     ret = subprocess.call([shell], cwd=workdir)
     if ret != 0:
-        print "Aborting"
+        print("Aborting")
         return False
     else:
         return True
@@ -610,8 +614,12 @@ def action_pull(conf, args):
 def action_update(conf, args):
     """
         update the component repos
-        generate the patch list
-        apply the generated patches
+        either:
+           generate the patch list
+           apply the generated patches
+        or:
+           re-creates the entire component history and merges them
+           into the current branch with a merge commit
     """
     components = [arg.split(':')[0] for arg in args[1:]]
     revisions = {}
@@ -624,16 +632,39 @@ def action_update(conf, args):
     # make sure combo repo is clean
     check_repo_clean(os.getcwd())
 
-    import uuid
-    patch_dir = "patch-%s" % uuid.uuid4()
-    if not os.path.exists(patch_dir):
-        os.mkdir(patch_dir)
+    # Check whether we keep the component histories. Must be
+    # set either via --history command line parameter or consistently
+    # in combo-layer.conf. Mixing modes is (currently, and probably
+    # permanently because it would be complicated) not supported.
+    if conf.history:
+        history = True
+    else:
+        history = None
+        for name in repos:
+            repo = conf.repos[name]
+            repo_history = repo.get('history', False)
+            if history is None:
+                history = repo_history
+            elif history != repo_history:
+                logger.error("'history' property is set inconsistently")
+                sys.exit(1)
 
     # Step 1: update the component repos
     if conf.nopull:
         logger.info("Skipping pull (-n)")
     else:
         action_pull(conf, ['arg0'] + components)
+
+    if history:
+        update_with_history(conf, components, revisions, repos)
+    else:
+        update_with_patches(conf, components, revisions, repos)
+
+def update_with_patches(conf, components, revisions, repos):
+    import uuid
+    patch_dir = "patch-%s" % uuid.uuid4()
+    if not os.path.exists(patch_dir):
+        os.mkdir(patch_dir)
 
     for name in repos:
         revision = revisions.get(name, None)
@@ -711,6 +742,21 @@ def action_update(conf, args):
     runcmd("rm -rf %s" % patch_dir)
 
     # Step 7: commit the updated config file if it's being tracked
+    commit_conf_file(conf, components)
+
+def conf_commit_msg(conf, components):
+    # create the "components" string
+    component_str = "all components"
+    if len(components) > 0:
+        # otherwise tell which components were actually changed
+        component_str = ", ".join(components)
+
+    # expand the template with known values
+    template = Template(conf.commit_msg_template)
+    msg = template.substitute(components = component_str)
+    return msg
+
+def commit_conf_file(conf, components, commit=True):
     relpath = os.path.relpath(conf.conffile)
     try:
         output = runcmd("git status --porcelain %s" % relpath, printerr=False)
@@ -718,23 +764,15 @@ def action_update(conf, args):
         # Outside the repository
         output = None
     if output:
-        logger.info("Committing updated configuration file")
         if output.lstrip().startswith("M"):
-
-            # create the "components" string
-            component_str = "all components"
-            if len(components) > 0:
-                # otherwise tell which components were actually changed
-                component_str = ", ".join(components)
-
-            # expand the template with known values
-            template = Template(conf.commit_msg_template)
-            raw_msg = template.substitute(components = component_str)
-
-            # sanitize the string before using it in command line
-            msg = raw_msg.replace('"', '\\"')
-
-            runcmd('git commit -m "%s" %s' % (msg, relpath))
+            logger.info("Committing updated configuration file")
+            if commit:
+                msg = conf_commit_msg(conf, components)
+                runcmd('git commit -m'.split() + [msg, relpath])
+            else:
+                runcmd('git add %s' % relpath)
+            return True
+    return False
 
 def apply_patchlist(conf, repos):
     """
@@ -851,6 +889,418 @@ def action_splitpatch(conf, args):
             logger.info("(skipping %s - no changes)", name)
         else:
             logger.info(patch_filename)
+
+def update_with_history(conf, components, revisions, repos):
+    '''Update all components with full history.
+
+    Works by importing all commits reachable from a component's
+    current head revision.  If those commits are rooted in an already
+    imported commit, their content gets mixed with the content of the
+    combined repo of that commit (new or modified files overwritten,
+    removed files removed).
+
+    The last commit is an artificial merge commit that merges all the
+    updated components into the combined repository.
+
+    The HEAD ref only gets updated at the very end. All intermediate work
+    happens in a worktree which will get garbage collected by git eventually
+    after a failure.
+    '''
+    # Remember current HEAD and what we need to add to it.
+    head = runcmd("git rev-parse HEAD").strip()
+    additional_heads = {}
+
+    # Track the mapping between original commit and commit in the
+    # combined repo. We do not have to distinguish between components,
+    # because commit hashes are different anyway. Often we can
+    # skip find_revs() entirely (for example, when all new commits
+    # are derived from the last imported revision).
+    #
+    # Using "head" (typically the merge commit) instead of the actual
+    # commit for the component leads to a nicer history in the combined
+    # repo.
+    old2new_revs = {}
+    for name in repos:
+        repo = conf.repos[name]
+        revision = repo['last_revision']
+        if revision:
+            old2new_revs[revision] = head
+
+    def add_p(parents):
+        '''Insert -p before each entry.'''
+        parameters = []
+        for p in parents:
+            parameters.append('-p')
+            parameters.append(p)
+        return parameters
+
+    # Do all intermediate work with a separate work dir and index,
+    # chosen via env variables (can't use "git worktree", it is too
+    # new). This is useful (no changes to current work tree unless the
+    # update succeeds) and required (otherwise we end up temporarily
+    # removing the combo-layer hooks that we currently use when
+    # importing a new component).
+    #
+    # Not cleaned up after a failure at the moment.
+    wdir = os.path.join(os.getcwd(), ".git", "combo-layer")
+    windex = wdir + ".index"
+    if os.path.isdir(wdir):
+        shutil.rmtree(wdir)
+    os.mkdir(wdir)
+    wenv = copy.deepcopy(os.environ)
+    wenv["GIT_WORK_TREE"] = wdir
+    wenv["GIT_INDEX_FILE"] = windex
+    # This one turned out to be needed in practice.
+    wenv["GIT_OBJECT_DIRECTORY"] = os.path.join(os.getcwd(), ".git", "objects")
+    wargs = {"destdir": wdir, "env": wenv}
+
+    for name in repos:
+        revision = revisions.get(name, None)
+        repo = conf.repos[name]
+        ldir = repo['local_repo_dir']
+        dest_dir = repo['dest_dir']
+        branch = repo.get('branch', "master")
+        hook = repo.get('hook', None)
+        largs = {"destdir": ldir, "env": None}
+        file_include = repo.get('file_filter', '').split()
+        file_include.sort() # make sure that short entries like '.' come first.
+        file_exclude = repo.get('file_exclude', '').split()
+
+        def include_file(file):
+            if not file_include:
+                # No explicit filter set, include file.
+                return True
+            for filter in file_include:
+                if filter == '.':
+                    # Another special case: include current directory and thus all files.
+                    return True
+                if os.path.commonprefix((filter, file)) == filter:
+                    # Included in directory or direct file match.
+                    return True
+                # Check for wildcard match *with* allowing * to match /, i.e.
+                # src/*.c does match src/foobar/*.c. That's not how it is done elsewhere
+                # when passing the filtering to "git archive", but it is unclear what
+                # the intended semantic is (the comment on file_exclude that "append a * wildcard
+                # at the end" to match the full content of a directories implies that
+                # slashes are indeed not special), so here we simply do what's easy to
+                # implement in Python.
+                logger.debug('fnmatch(%s, %s)' % (file, filter))
+                if fnmatch.fnmatchcase(file, filter):
+                    return True
+            return False
+
+        def exclude_file(file):
+            for filter in file_exclude:
+                if fnmatch.fnmatchcase(file, filter):
+                    return True
+            return False
+
+        def file_filter(files):
+            '''Clean up file list so that only included files remain.'''
+            index = 0
+            while index < len(files):
+                file = files[index]
+                if not include_file(file) or exclude_file(file):
+                    del files[index]
+                else:
+                    index += 1
+
+
+        # Generate the revision list.
+        logger.info("Analyzing commits from %s..." % name)
+        top_revision = revision or branch
+        if not check_rev_branch(name, ldir, top_revision, branch):
+            sys.exit(1)
+
+        last_revision = repo['last_revision']
+        rev_list_args = "--full-history --sparse --topo-order --reverse"
+        if not last_revision:
+            logger.info("Warning: last_revision of component %s is not set, starting from the first commit" % name)
+            rev_list_args = rev_list_args + ' ' + top_revision
+        else:
+            if not check_rev_branch(name, ldir, last_revision, branch):
+                sys.exit(1)
+            rev_list_args = "%s %s..%s" % (rev_list_args, last_revision, top_revision)
+
+            # By definition, the current HEAD contains the latest imported
+            # commit of each component. We use that as initial mapping even
+            # though the commits do not match exactly because
+            # a) it always works (in contrast to find_revs, which relies on special
+            #    commit messages)
+            # b) it is faster than find_revs, which will only be called on demand
+            #    and can be skipped entirely in most cases
+            # c) last but not least, the combined history looks nicer when all
+            #    new commits are rooted in the same merge commit
+            old2new_revs[last_revision] = head
+
+        # We care about all commits (--full-history and --sparse) and
+        # we want reconstruct the topology and thus do not care
+        # about ordering by time (--topo-order). We ask for the ones
+        # we need to import first to be listed first (--reverse).
+        revs = runcmd("git rev-list %s" % rev_list_args, **largs).split()
+        logger.debug("To be imported: %s" % revs)
+        # Now 'revs' contains all revisions reachable from the top revision.
+        # All revisions derived from the 'last_revision' definitely are new,
+        # whereas the others may or may not have been imported before. For
+        # a linear history in the component, that second set will be empty.
+        # To distinguish between them, we also get the shorter list
+        # of revisions starting at the ancestor.
+        if last_revision:
+            ancestor_revs = runcmd("git rev-list --ancestry-path %s" % rev_list_args, **largs).split()
+        else:
+            ancestor_revs = []
+        logger.debug("Ancestors: %s" % ancestor_revs)
+
+        # Now import each revision.
+        logger.info("Importing commits from %s..." % name)
+        def import_rev(rev):
+            global scanned_revs
+
+            # If it is part of the new commits, we definitely need
+            # to import it. Otherwise we need to check, we might have
+            # imported it before. If it was imported and we merely
+            # fail to find it because commit messages did not track
+            # the mapping, then we end up importing it again. So
+            # combined repos using "updating with history" really should
+            # enable the "From ... rev:" commit header modifications.
+            if rev not in ancestor_revs and rev not in old2new_revs and not scanned_revs:
+                logger.debug("Revision %s triggers log analysis." % rev)
+                find_revs(old2new_revs, head)
+                scanned_revs = True
+            new_rev = old2new_revs.get(rev, None)
+            if new_rev:
+                return new_rev
+
+            # If the commit is not in the original list of revisions
+            # to be imported, then it must be a parent of one of those
+            # commits and it was skipped during earlier imports or not
+            # found. Importing such merge commits leads to very ugly
+            # history (long cascade of merge commits which all point
+            # to to older commits) when switching from "update via
+            # patches" to "update with history".
+            #
+            # We can avoid importing merge commits if all non-merge commits
+            # reachable from it were already imported. In that case we
+            # can root the new commits in the current head revision.
+            def is_imported(prev):
+                parents = runcmd("git show --no-patch --pretty=format:%P " + prev, **largs).split()
+                if len(parents) > 1:
+                    for p in parents:
+                        if not is_imported(p):
+                            logger.debug("Must import %s because %s is not imported." % (rev, p))
+                            return False
+                    return True
+                elif prev in old2new_revs:
+                    return True
+                else:
+                    logger.debug("Must import %s because %s is not imported." % (rev, prev))
+                    return False
+            if rev not in revs and is_imported(rev):
+                old2new_revs[rev] = head
+                return head
+
+            # Need to import rev. Collect some information about it.
+            logger.debug("Importing %s" % rev)
+            (parents, author_name, author_email, author_timestamp, body) = \
+                runcmd("git show --no-patch --pretty=format:%P%x00%an%x00%ae%x00%at%x00%B " + rev, **largs).split(chr(0))
+            parents = parents.split()
+            if parents:
+                # Arbitrarily pick the first parent as base. It may or may not have
+                # been imported before. For example, if the parent is a merge commit
+                # and previously the combined repository used patching as update
+                # method, then the actual merge commit parent never was imported.
+                # To cover this, We recursively import parents.
+                parent = parents[0]
+                new_parent = import_rev(parent)
+                # Clean index and working tree. TODO: can we combine this and the
+                # next into one command with less file IO?
+                # "git reset --hard" does not work, it changes HEAD of the parent
+                # repo, which we wanted to avoid. Probably need to keep
+                # track of the rev that corresponds to the index and use apply_commit().
+                runcmd("git rm -q --ignore-unmatch -rf .", **wargs)
+                # Update index and working tree to match the parent.
+                runcmd("git checkout -q -f %s ." % new_parent, **wargs)
+            else:
+                parent = None
+                # Clean index and working tree.
+                runcmd("git rm -q --ignore-unmatch -rf .", **wargs)
+
+            # Modify index and working tree such that it mirrors the commit.
+            apply_commit(parent, rev, largs, wargs, dest_dir, file_filter=file_filter)
+
+            # Now commit.
+            new_tree = runcmd("git write-tree", **wargs).strip()
+            env = copy.deepcopy(wenv)
+            env['GIT_AUTHOR_NAME'] = author_name
+            env['GIT_AUTHOR_EMAIL'] = author_email
+            env['GIT_AUTHOR_DATE'] = author_timestamp
+            if hook:
+                # Need to turn the verbatim commit message into something resembling a patch header
+                # for the hook.
+                with tempfile.NamedTemporaryFile(delete=False) as patch:
+                    patch.write('Subject: [PATCH] ')
+                    patch.write(body)
+                    patch.write('\n---\n')
+                    patch.close()
+                    runcmd([hook, patch.name, rev, name])
+                    with open(patch.name) as f:
+                        body = f.read()[len('Subject: [PATCH] '):][:-len('\n---\n')]
+
+            # We can skip non-merge commits that did not change any files. Those are typically
+            # the result of file filtering, although they could also have been introduced
+            # intentionally upstream, in which case we drop some information here.
+            if len(parents) == 1:
+                parent_rev = import_rev(parents[0])
+                old_tree = runcmd("git show -s --pretty=format:%T " + parent_rev, **wargs).strip()
+                commit = old_tree != new_tree
+                if not commit:
+                    new_rev = parent_rev
+            else:
+                commit = True
+            if commit:
+                new_rev = runcmd("git commit-tree".split() + add_p([import_rev(p) for p in parents]) +
+                                 ["-m", body, new_tree],
+                                 env=env).strip()
+            old2new_revs[rev] = new_rev
+
+            return new_rev
+
+        if revs:
+            for rev in revs:
+                import_rev(rev)
+            # Remember how to update our current head. New components get added,
+            # updated components get the delta between current head and the updated component
+            # applied.
+            additional_heads[old2new_revs[revs[-1]]] = head if repo['last_revision'] else None
+            repo['last_revision'] = revs[-1]
+
+    # Now construct the final merge commit. We create the tree by
+    # starting with the head and applying the changes from each
+    # components imported head revision.
+    if additional_heads:
+        runcmd("git reset --hard", **wargs)
+        for rev, base in additional_heads.items():
+            apply_commit(base, rev, wargs, wargs, None)
+
+        # Commit with all component branches as parents as well as the previous head.
+        logger.info("Writing final merge commit...")
+        msg = conf_commit_msg(conf, components)
+        new_tree = runcmd("git write-tree", **wargs).strip()
+        new_rev = runcmd("git commit-tree".split() +
+                         add_p([head] + list(additional_heads.keys())) +
+                         ["-m", msg, new_tree],
+                         **wargs).strip()
+        # And done! This is the first time we change the HEAD in the actual work tree.
+        runcmd("git reset --hard %s" % new_rev)
+
+        # Update and stage the (potentially modified)
+        # combo-layer.conf, but do not commit separately.
+        for name in repos:
+            repo = conf.repos[name]
+            rev = repo['last_revision']
+            conf.update(name, "last_revision", rev)
+        if commit_conf_file(conf, components, False):
+            # Must augment the previous commit.
+            runcmd("git commit --amend -C HEAD")
+
+
+scanned_revs = False
+def find_revs(old2new, head):
+    '''Construct mapping from original commit hash to commit hash in
+    combined repo by looking at the commit messages. Depends on the
+    "From ... rev: ..." convention.'''
+    logger.info("Analyzing log messages to find previously imported commits...")
+    num_known = len(old2new)
+    log = runcmd("git log --grep='From .* rev: [a-fA-F0-9][a-fA-F0-9]*' --pretty=format:%H%x00%B%x00 " + head).split(chr(0))
+    regex = re.compile(r'From .* rev: ([a-fA-F0-9]+)')
+    for new_rev, body in zip(*[iter(log)]* 2):
+        # Use the last one, in the unlikely case there are more than one.
+        rev = regex.findall(body)[-1]
+        if rev not in old2new:
+            old2new[rev] = new_rev.strip()
+    logger.info("Found %d additional commits, leading to: %s" % (len(old2new) - num_known, old2new))
+
+
+def apply_commit(parent, rev, largs, wargs, dest_dir, file_filter=None):
+    '''Compare revision against parent, remove files deleted in the
+    commit, re-write new or modified ones. Moves them into dest_dir.
+    Optionally filters files.
+    '''
+    if not dest_dir:
+        dest_dir = "."
+    # -r recurses into sub-directories, given is the full overview of
+    # what changed.  We do not care about copy/edits or renames, so we
+    # can disable those with --no-renames (but we still parse them,
+    # because it was not clear from git documentation whether C and M
+    # lines can still occur).
+    logger.debug("Applying changes between %s and %s in %s" % (parent, rev, largs["destdir"]))
+    delete = []
+    update = []
+    if parent:
+        # Apply delta.
+        changes = runcmd("git diff-tree --no-commit-id --no-renames --name-status -r --raw -z %s %s" % (parent, rev), **largs).split(chr(0))
+        for status, name in zip(*[iter(changes)]*2):
+            if status[0] in "ACMRT":
+                update.append(name)
+            elif status[0] in "D":
+                delete.append(name)
+            else:
+                logger.error("Unknown status %s of file %s in revision %s" % (status, name, rev))
+                sys.exit(1)
+    else:
+        # Copy all files.
+        update.extend(runcmd("git ls-tree -r --name-only -z %s" % rev, **largs).split(chr(0)))
+
+    # Include/exclude files as define in the component config.
+    # Both updated and deleted file lists get filtered, because it might happen
+    # that a file gets excluded, pulled from a different component, and then the
+    # excluded file gets deleted. In that case we must keep the copy.
+    if file_filter:
+        file_filter(update)
+        file_filter(delete)
+
+    # We export into a tar archive here and extract with tar because it is simple (no
+    # need to implement file and symlink writing ourselves) and gives us some degree
+    # of parallel IO. The downside is that we have to pass the list of files via
+    # command line parameters - hopefully there will never be too many at once.
+    if update:
+        target = os.path.join(wargs["destdir"], dest_dir)
+        if not os.path.isdir(target):
+            os.makedirs(target)
+        quoted_target = pipes.quote(target)
+        # os.sysconf('SC_ARG_MAX') is lying: running a command with
+        # string length 629343 already failed with "Argument list too
+        # long" although SC_ARG_MAX = 2097152. "man execve" explains
+        # the limitations, but those are pretty complicated. So here
+        # we just hard-code a fixed value which is more likely to work.
+        max_cmdsize = 64 * 1024
+        while update:
+            quoted_args = []
+            unquoted_args = []
+            cmdsize = 100 + len(quoted_target)
+            while update:
+                quoted_next = pipes.quote(update[0])
+                size_next = len(quoted_next) + len(dest_dir) + 1
+                logger.debug('cmdline length %d + %d < %d?' % (cmdsize, size_next, os.sysconf('SC_ARG_MAX')))
+                if cmdsize + size_next < max_cmdsize:
+                    quoted_args.append(quoted_next)
+                    unquoted_args.append(update.pop(0))
+                    cmdsize += size_next
+                else:
+                    logger.debug('Breaking the cmdline at length %d' % cmdsize)
+                    break
+            logger.debug('Final cmdline length %d / %d' % (cmdsize, os.sysconf('SC_ARG_MAX')))
+            cmd = "git archive %s %s | tar -C %s -xf -" % (rev, ' '.join(quoted_args), quoted_target)
+            logger.debug('First cmdline length %d' % len(cmd))
+            runcmd(cmd, **largs)
+            cmd = "git add -f".split() + [os.path.join(dest_dir, x) for x in unquoted_args]
+            logger.debug('Second cmdline length %d' % reduce(lambda x, y: x + len(y), cmd, 0))
+            runcmd(cmd, **wargs)
+    if delete:
+        for path in delete:
+            if dest_dir:
+                path = os.path.join(dest_dir, path)
+        runcmd("git rm -f --ignore-unmatch".split() + [os.path.join(dest_dir, x) for x in delete], **wargs)
 
 def action_error(conf, args):
     logger.info("invalid action %s" % args[0])

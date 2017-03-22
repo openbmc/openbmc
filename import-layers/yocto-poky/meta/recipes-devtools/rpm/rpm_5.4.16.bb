@@ -116,6 +116,9 @@ SRC_URI += " \
 	   file://rpm-fix-lua-tests-compilation-failure.patch \
 	   file://rpmqv.c-check-_gpg_passphrase-before-ask-for-input.patch \
 	   file://0001-Disable-__sync_add_and_fetch_8-on-nios2.patch \
+	   file://gcc6-stdlib.patch \
+	   file://0001-system.h-query.c-support-nosignature.patch \
+	   file://rpm-ensure-rpm2cpio-call-rpm-relocation-code.patch \
 "
 
 # OE specific changes
@@ -151,6 +154,7 @@ SRC_URI += " \
 	   file://rpm-rpmdb-grammar.patch \
 	   file://rpm-disable-blaketest.patch \
 	   file://rpm-autogen-force.patch \
+	   file://rpmdb-prevent-race-in-tmpdir-creation.patch \
 	   file://rpmdb-more-verbose-error-logging-in-rpmTempFile.patch \
 "
 
@@ -164,7 +168,7 @@ SRC_URI_append_libc-musl = "\
 
 UPSTREAM_CHECK_REGEX = "rpm-(?P<pver>(\d+[\.\-_]*)+)-.*$"
 
-inherit autotools gettext
+inherit autotools gettext python-dir
 
 acpaths = "-I ${S}/db/dist/aclocal -I ${S}/db/dist/aclocal_java"
 
@@ -257,7 +261,7 @@ PACKAGECONFIG[xar] = "--with-xar,--without-xar,xar,"
 
 WITH_PYTHON = " --with-python=${PYTHON_BASEVERSION} \
 		--with-python-inc-dir=${STAGING_INCDIR}/python${PYTHON_BASEVERSION} \
-		--with-python-lib-dir=${libdir}/python${PYTHON_BASEVERSION}/site-packages \
+		--with-python-lib-dir=${PYTHON_SITEPACKAGES_DIR} \
 		--without-pythonembed"
 PACKAGECONFIG[python] = "${WITH_PYTHON},--without-python,python,"
 
@@ -344,7 +348,7 @@ EXTRA_OECONF += "--verbose \
 		--program-prefix= \
 		YACC=byacc"
 
-CFLAGS_append = " -DRPM_VENDOR_WINDRIVER -DRPM_VENDOR_POKY -DRPM_VENDOR_OE"
+CFLAGS_append = " -DRPM_VENDOR_WINDRIVER -DRPM_VENDOR_POKY -DRPM_VENDOR_OE -D_GLIBCXX_INCLUDE_NEXT_C_HEADERS"
 
 LDFLAGS_append_libc-uclibc = "-lrt -lpthread"
 
@@ -475,7 +479,7 @@ RDEPENDS_${PN}-build = "file bash perl"
 
 RDEPENDS_python-rpm = "${PN} python"
 
-FILES_python-rpm = "${libdir}/python*/site-packages/rpm"
+FILES_python-rpm = "${PYTHON_SITEPACKAGES_DIR}/rpm"
 PROVIDES += "python-rpm"
 
 FILES_perl-module-rpm = "${libdir}/perl/*/* \
@@ -510,7 +514,7 @@ FILES_${PN}-staticdev = " \
 		${libdir}/librpmmisc.a \
 		${libdir}/librpmbuild.a \
 		${libdir}/rpm/lib/liblua.a \
-		${libdir}/python*/site-packages/rpm/*.a \
+		${PYTHON_SITEPACKAGES_DIR}/rpm/*.a \
 		"
 
 do_configure() {
@@ -524,7 +528,7 @@ do_configure() {
 	sed -e 's/pkg-config --exists uuid/pkg-config --exists ossp-uuid/g' \
 	    -e 's/pkg-config uuid/pkg-config ossp-uuid/g' -i ${S}/configure
 
-	( cd ${S}/syck ; set +e ; rm -- -l* ; make distclean ) || :
+	( cd ${S}/syck ; set +e ; rm -- -l* ; rm Makefile config.h config.status lib/Makefile libtool stamp-h1 tests/.deps tests/Makefile  ) || :
 
 	export varprefix=${localstatedir}
 	oe_runconf
@@ -551,53 +555,19 @@ do_install_append() {
 	install -m 0755 ${WORKDIR}/pythondeps.sh ${D}/${libdir}/rpm/pythondeps.sh
 	install -m 0755 ${WORKDIR}/perfile_rpmdeps.sh ${D}/${libdir}/rpm/perfile_rpmdeps.sh
 
-	# Remove unpackaged files (based on list in rpm.spec)
-	rm -f ${D}/${libdir}/rpm/{Specfile.pm,cpanflute,cpanflute2,rpmdiff,rpmdiff.cgi,sql.prov,sql.req,tcl.req,trpm}
-
-	rm -f ${D}/${mandir}/man8/rpmcache.8*
-	rm -f ${D}/${mandir}/man8/rpmgraph.8*
-	rm -f ${D}/${mandir}/*/man8/rpmcache.8*
-	rm -f ${D}/${mandir}/*/man8/rpmgraph.8*
-	rm -rf ${D}/${mandir}/{fr,ko}
-
 	rm -f ${D}/${includedir}/popt.h
 	rm -f ${D}/${libdir}/libpopt.*
 	rm -f ${D}/${libdir}/pkgconfig/popt.pc
 	rm -f ${D}/${datadir}/locale/*/LC_MESSAGES/popt.mo
 	rm -f ${D}/${mandir}/man3/popt.3
 
-	rm -f ${D}/${mandir}/man1/xar.1*
-	rm -f ${D}/${bindir}/xar
-	rm -rf ${D}/${includedir}/xar
-	rm -f ${D}/${libdir}/libxar*
-
-	rm -f ${D}/${bindir}/lz*
-	rm -f ${D}/${bindir}/unlzma
-	rm -f ${D}/${bindir}/unxz
-	rm -f ${D}/${bindir}/xz*
-	rm -rf ${D}/${includedir}/lzma*
-	rm -f ${D}/${mandir}/man1/lz*.1
-	rm -f ${D}/${libdir}/pkgconfig/liblzma*
-
-	rm -f ${D}/${libdir}/python%{with_python_version}/site-packages/*.a
-	rm -f ${D}/${libdir}/python%{with_python_version}/site-packages/*.la
-	rm -f ${D}/${libdir}/python%{with_python_version}/site-packages/rpm/*.a
-	rm -f ${D}/${libdir}/python%{with_python_version}/site-packages/rpm/*.la
-
-	#find ${D}/${libdir}/perl5 -type f -a \( -name perllocal.pod -o -name .packlist \
-	#	-o \( -name '*.bs' -a -empty \) \) -exec rm -f {} ';'
-	#find ${D}/${libdir}/perl5 -type d -depth -exec rmdir {} 2>/dev/null ';'
+	rm -f ${D}${PYTHON_SITEPACKAGES_DIR}/*.a
+	rm -f ${D}${PYTHON_SITEPACKAGES_DIR}/*.la
+	rm -f ${D}${PYTHON_SITEPACKAGES_DIR}/rpm/*.a
+	rm -f ${D}${PYTHON_SITEPACKAGES_DIR}/rpm/*.la
 
 	rm -f ${D}/${libdir}/rpm/dbconvert.sh
-
 	rm -f ${D}/${libdir}/rpm/libsqldb.*
-
-	# We don't want, nor need the Mandriva multiarch items
-	rm -f ${D}/${bindir}/multiarch-dispatch
-	rm -f ${D}/${bindir}/multiarch-platform
-	rm -f ${D}/${libdir}/rpm/check-multiarch-files
-	rm -f ${D}/${libdir}/rpm/mkmultiarch
-	rm -f ${D}/${includedir}/multiarch-dispatch.h
 
 	rm -f ${D}/${libdir}/rpm/gstreamer.sh
 	rm -f ${D}/${libdir}/rpm/gem_helper.rb
@@ -607,12 +577,10 @@ do_install_append() {
 	rm -f ${D}/${libdir}/rpm/macros.d/kernel
 	rm -f ${D}/${libdir}/rpm/macros.d/gstreamer
 	rm -f ${D}/${libdir}/rpm/bin/mgo
-	rm -f ${D}/${libdir}/rpm/bin/dbconvert
 	rm -f ${D}/${libdir}/rpm/bin/pom2spec
 
 	rm -rf ${D}/var/lib/wdj ${D}/var/cache/wdj
 	rm -f ${D}/${libdir}/rpm/bin/api-sanity-checker.pl
-
 }
 
 do_install_append_class-target() {
@@ -645,11 +613,11 @@ EOF
 }
 
 do_install_append_class-native () {
-	sed -i -e 's|^#!.*/usr/bin/python|#! /usr/bin/env nativepython|' ${D}/${libdir}/python2.7/site-packages/rpm/transaction.py
+	sed -i -e 's|^#!.*/usr/bin/python|#! /usr/bin/env nativepython|' ${D}${PYTHON_SITEPACKAGES_DIR}/rpm/transaction.py
 }
 
 do_install_append_class-nativesdk () {
-	sed -i -e 's|^#!.*/usr/bin/python|#! /usr/bin/env python|' ${D}/${libdir}/python2.7/site-packages/rpm/transaction.py
+	sed -i -e 's|^#!.*/usr/bin/python|#! /usr/bin/env python|' ${D}${PYTHON_SITEPACKAGES_DIR}/rpm/transaction.py
 }
 
 def multilib_rpmmacros(d):

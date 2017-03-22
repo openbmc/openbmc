@@ -1,0 +1,41 @@
+From 402a821e604f280e62c34bf4d40c6d1b4c6c892d Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Mon, 4 Jul 2016 20:11:33 -0700
+Subject: [PATCH] functions.sh: remove space at head
+
+The command like:
+rpm -qp --nodigest --nosignature --qf '<foo> [%{REQUIRENAME}\n]\n'
+                                            ^^space
+
+The space will be printed, and will impact the check result, so remove it.
+
+Upstream-Status: Submitted [https://github.com/openSUSE/build-compare/pull/9]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ functions.sh | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/functions.sh b/functions.sh
+index 85c9003..b1069d2 100644
+--- a/functions.sh
++++ b/functions.sh
+@@ -26,6 +26,7 @@ function trim_release_old()
+   sed -e "
+   /\(\/boot\|\/lib\/modules\|\/lib\/firmware\|\/usr\/src\|$version_release_old_regex_l\$\)/{s,$version_release_old_regex_l,@VERSION@-@RELEASE_LONG@,g;s,$version_release_old_regex_s,@VERSION@-@RELEASE_SHORT@,g}
+   s/\(\/var\/adm\/update-scripts\/\)${name_ver_rel_old_regex_l}\([^[:blank:]]\+\)/\1@NAME_VER_REL@\2/g
++  s/^ *//g
+   "
+ }
+ function trim_release_new()
+@@ -33,6 +34,7 @@ function trim_release_new()
+   sed -e "
+   /\(\/boot\|\/lib\/modules\|\/lib\/firmware\|\/usr\/src\|$version_release_new_regex_l\$\)/{s,$version_release_new_regex_l,@VERSION@-@RELEASE_LONG@,g;s,$version_release_new_regex_s,@VERSION@-@RELEASE_SHORT@,g}
+   s/\(\/var\/adm\/update-scripts\/\)${name_ver_rel_new_regex_l}\([^[:blank:]]\+\)/\1@NAME_VER_REL@\2/g
++  s/^ *//g
+   "
+ }
+ # Get single directory or filename with long or short release string
+-- 
+2.9.0
+

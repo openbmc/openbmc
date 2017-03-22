@@ -1,0 +1,37 @@
+autogen-native: fix script err when processing libguile
+
+do_configure for autogen will fail if project directory path
+contains '-I' character, which is caused by the unsuitable sed
+script when processing libguile.
+
+Upstream-Status: Pending
+
+Signed-off-by: Zhenbo Gao <zhenbo.gao@windriver.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+
+diff --git a/config/ag_macros.m4 b/config/ag_macros.m4
+index 58186b6..58ed2ad 100644
+--- a/config/ag_macros.m4
++++ b/config/ag_macros.m4
+@@ -32,7 +32,7 @@ AC_DEFUN([INVOKE_AG_MACROS_LAST],[
+   GUILE_FLAGS
+   [ag_gv=`gdir=\`pkg-config --cflags-only-I \
+   guile-${GUILE_EFFECTIVE_VERSION} | \
+-  sed 's/-I *//;s/ *-I.*/ /g'\`
++  sed 's/ *-I *\// \//g'\`
+   for d in $gdir
+   do  test -f "$d/libguile/version.h" && gdir=$d && break
+   done
+diff --git a/config/misc.def b/config/misc.def
+index 490d361..6e183ef 100644
+--- a/config/misc.def
++++ b/config/misc.def
+@@ -342,7 +342,7 @@ do-always = <<- _END_ALWAYS_
+ 	GUILE_FLAGS
+ 	[ag_gv=`gdir=\`pkg-config --cflags-only-I \
+ 			guile-${GUILE_EFFECTIVE_VERSION} | \
+-			sed 's/-I *//;s/ *-I.*/ /g'\`
++			sed 's/ *-I *\// \//g'\`
+ 		test -z "$gdir" && gdir=/usr/include
+ 		for d in $gdir
+ 		do  test -f "$d/libguile/version.h" && gdir=$d && break

@@ -4,7 +4,7 @@
 {% load static %}
 {% block pagecontent %}
 
-<div class="section">
+{% with recipe.get_base_recipe_file as base_recipe_file %}
   <ul class="breadcrumb">
     <li>
       <a href="{% url 'project' project.id %}">{{project.name}}</a>
@@ -17,7 +17,6 @@
       {{recipe.name}} ({{recipe.layer_version.layer.name}})
     </li>
   </ul>
-</div>
 
 <script src="{% static 'js/customrecipe.js' %}"></script>
 <script>
@@ -29,6 +28,7 @@
         includedPackagesCount: {{recipe.includes_set.count}},
         baseRecipeId: {{recipe.base_recipe.pk}},
         xhrPackageListUrl: "{% url 'xhr_customrecipe_packages' recipe.pk %}",
+        xhrCustomRecipeUrl: "{% url 'xhr_customrecipe_id' recipe.pk %}",
       }
     };
 
@@ -40,95 +40,137 @@
     }
   });
 </script>
+
+<!-- Delete recipe modal -->
+<div id="delete-recipe-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+        <p>Are you sure you want to delete the <strong>{{recipe.name}}</strong>
+         custom image?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="delete-custom-recipe-confirmed">
+          <span data-role="submit-state">Delete custom image</span>
+          <span data-role="loading-state" style="display:none">
+            <span class="fa-pulse">
+            <i class="fa-pulse icon-spinner"></i>
+          </span>
+            &nbsp;Deleting custom image...
+          </span>
+        </button>
+        <button type="button" class="btn btn-link" data-dismiss="modal">Cancel</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!-- end delete recipe modal -->
+
 <!-- package dependencies modal -->
-<div style="display:none" id="package-deps-modal" class="modal hide fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-    <h3><span class="package-to-add-name"></span> dependencies</h3>
-  </div>
-  <div class="modal-body">
-    <p>Based on information from a previous build it is likely that adding <strong class="package-to-add-name"></strong> will also add the following packages to your custom image:</p>
-    <ul id="package-add-dep-list">
-    </ul>
-  </div>
-  <div class="modal-footer">
-    <p class="help-block text-left">Total package size: <strong id="package-deps-total-size"></strong></p>
-    <button id="add-package-deps-modal-btn" type="submit" class="btn btn-primary" data-dismiss="modal">Add package</button>
-    <button class="btn" data-dismiss="modal">Cancel</button>
-  </div>
-</div>
+<div id="package-deps-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+        <h3><span class="package-to-add-name"></span> dependencies</h3>
+      </div>
+      <div class="modal-body">
+        <p>Based on information from a previous build it is likely that adding <strong class="package-to-add-name"></strong> will also add the following packages to your custom image:
+        </p>
+        <ul id="package-add-dep-list">
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <p class="help-block text-left">Total package size: <strong id="package-deps-total-size"></strong></p>
+        <button id="add-package-deps-modal-btn" type="submit" class="btn btn-primary" data-dismiss="modal">Add packages</button>
+        <button class="btn btn-link" data-dismiss="modal">Cancel</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 <!-- end package dependencies modal -->
 
 <!-- package reverse dependencies modal -->
-<div style="display:none" id="package-reverse-deps-modal" class="modal hide fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-    <h3><span class="package-to-rm-name"></span> reverse dependencies</h3>
-  </div>
-  <div class="modal-body">
-    <p> <strong class="reverse-deps-count"></strong> <span class="reverse-deps-package"></span> in your image <span class="reverse-deps-depends"></span> on <strong class="package-to-rm-name"></strong>:</p>
-    <ul id="package-reverse-dep-list">
-    </ul>
-    <p>In order to remove <strong class="package-to-rm-name"></strong>, you must remove <span class="reverse-deps-this"></span> <strong class="reverse-deps-count"></strong> <span class="reverse-deps-package"></span> as well.</p>
-  </div>
-  <div class="modal-footer">
-    <p class="help-block text-left">Total package size: <strong id="package-reverse-deps-total-size"></strong></p>
-    <button id="rm-package-reverse-deps-modal-btn" type="submit" class="btn btn-primary" data-dismiss="modal">Remove all <span class="reverse-deps-count-plus1"></button>
-    <button class="btn" data-dismiss="modal">Cancel</button>
-  </div>
-</div>
+<div style="display:none" id="package-reverse-deps-modal" class="modal fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+        <h3><span class="package-to-rm-name"></span> reverse dependencies</h3>
+      </div>
+      <div class="modal-body">
+        <p> <strong class="reverse-deps-count"></strong> <span class="reverse-deps-package"></span> in your image <span class="reverse-deps-depends"></span> on <strong class="package-to-rm-name"></strong>:</p>
+        <ul id="package-reverse-dep-list">
+        </ul>
+        <p>In order to remove <strong class="package-to-rm-name"></strong>, you must remove <span class="reverse-deps-this"></span> <strong class="reverse-deps-count"></strong> <span class="reverse-deps-package"></span> as well.</p>
+      </div>
+      <div class="modal-footer">
+        <p class="help-block text-left">Total package size: <strong id="package-reverse-deps-total-size"></strong></p>
+        <button id="rm-package-reverse-deps-modal-btn" type="submit" class="btn btn-primary" data-dismiss="modal">Remove all <span class="reverse-deps-count-plus1"></button>
+        <button class="btn btn-link" data-dismiss="modal">Cancel</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 <!-- end package dependencies modal -->
 
-
-<div class="row-fluid span11">
-  <div class="alert alert-success lead" id="image-created-notification" style="margin-top: 15px; display: none">
-    <button type="button" data-dismiss="alert" class="close">x</button>
-    Your custom image <strong>{{recipe.name}}</strong> has been created. You can now add or remove packages as needed.
-  </div>
-  <div class="page-header air">
-    <h1>
-      {{recipe.name}}
-      <small>({{recipe.layer_version.layer.name}})</small>
-    </h1>
-  </div>
+<div class="alert alert-success alert-dismissible change-notification" id="image-created-notification" style="display: none">
+	<button type="button" data-dismiss="alert" class="close">&times;</button>
+	<p>Your custom image <strong>{{recipe.name}}</strong> has been created. You can now add or remove packages as needed.</p>
+</div>
+<div class="page-header">
+  <h1>
+    {{recipe.name}}
+    <small>({{recipe.layer_version.layer.name}})</small>
+  </h1>
 </div>
 
-<div class="row-fluid span11">
-  <div class="span8">
+<div class="row">
+  <div class="col-md-8">
     <div class="button-place btn-group" style="width: 100%">
-      <a class="btn btn-large span6 build-custom-image" href="#" style="width: 50%">
+      <a class="btn btn-default btn-lg build-custom-image" href="#" style="width: 50%">
         Build {{recipe.name}}
       </a>
-      <a href="{% url 'customrecipedownload' project.id recipe.id %}" class="btn btn-large span6" style="width: 50%">
+      <a href="{% url 'customrecipedownload' project.id recipe.id %}" class="btn btn-default btn-lg" style="width: 50%"
+               {% if not base_recipe_file %}
+               disabled="disabled"
+               {% endif %}>
         Download recipe file
+        {% if not base_recipe_file %}
+        <i class="icon-question-sign get-help"
+           data-original-title="The recipe file doesn't exist yet, so you cannot download it. You need to build your custom image first"></i>
+        {% endif %}
       </a>
     </div>
-    <div id="no-results-special-{{table_name}}" class="air" style="display:none;">
-      <div class="alert">
+    <div id="no-results-special-{{table_name}}" class="top-air" style="display:none;">
+      <div class="alert alert-warning">
         <h3>No packages found</h3>
-        <p>You might consider <a href={% url 'projectsoftwarerecipes' project.id %}>searching the list of recipes</a> instead. If you find a recipe that matches the name of the package you want:</p>
+        <p>You might consider <a href={% url 'projectsoftwarerecipes' project.id %}>searching the list of recipes</a> instead.</p> 
+        <p>If you find a recipe that matches the name of the package you want:</p>
         <ol>
           <li>Add the layer providing the recipe to your project</li>
           <li>Build the recipe</li>
           <li>Once the build completes, come back to this page and search for the package</li>
         </ol>
-        <form class="input-append no-results">
-          <input type="text" class="input-xlarge no-results-search-input" id="no-results-search-input-{{table_name}}" name="search" placeholder="Search {{title|lower}}" />
-          <a href="#" class="add-on btn" id="no-results-remove-search-btn" tabindex="-1">
-            <i class="icon-remove"></i>
-          </a>
-          <button class="btn search-submit-{{table_name}}">Search</button>
+        <form class="form-inline no-results">
+          <div class="form-group">
+            <div class="btn-group">
+              <input type="text" class="form-control no-results-search-input" id="no-results-search-input-{{table_name}}" name="search" placeholder="Search {{title|lower}}" />
+              <span class="remove-search-btn-{{table_name}} glyphicon glyphicon-remove-circle" id="no-results-remove-search-btn" tabindex="-1"></span>
+            </div>
+          </div>
+          <button class="btn btn-default search-submit-{{table_name}}">Search</button>
           <button class="btn btn-link" id="no-results-show-all-packages">Show all packages</button>
         </form>
       </div>
-      </div>
-      <div id="results-found-{{table_name}}">
+    </div>
+    <div id="results-found-{{table_name}}">
       <div id="packages-table">
         {% if recipe.get_all_packages.count == 0 and last_build == None %}
         <h2> Add | Remove packages </h2>
-        <div class="alert alert-info air">
+        <div class="alert alert-info">
           <p class="lead">Toaster has no package information for {{recipe.name}}. To generate package information, build {{recipe.name}}</p>
-          <button class="btn btn-info btn-large build-custom-image" style="margin:20px 0 10px 0;">Build {{recipe.name}}</button>
+          <button class="btn btn-info btn-lg build-custom-image" style="margin:20px 0 10px 0;">Build {{recipe.name}}</button>
         </div>
         {% else %}
         {# ToasterTable for Adding remove packages #}
@@ -137,87 +179,90 @@
         {% include "toastertable.html" %}
         {% endif %}
       </div>
-      </div>
     </div>
-    <div class="span4 well">
-      <h2 style="margin-bottom:20px;">About {{recipe.name}}</h2>
+  </div>
+  <div class="col-md-4">
+    <div class="well">
+      <h2>About {{recipe.name}}</h2>
 
-      <dl>
+      <dl class="item-info">
         <dt>
-          Approx. packages included
-          <i class="icon-question-sign get-help" title="" data-original-title="The number of packages included is based on information from previous builds and from parsing layers, so we can never be sure it is 100% accurate"></i>
+        Approx. packages included
+        <span class="glyphicon glyphicon-question-sign get-help" title="" data-original-title="The number of packages included is based on information from previous builds and from parsing layers, so we can never be sure it is 100% accurate"></span>
         </dt>
         <dd id="total-num-packages">{{recipe.get_all_packages.count}}</dd>
         <dt>
-          Approx. package size
-          <i class="icon-question-sign get-help" title="" data-original-title="Package size is based on information from previous builds, so we can never be sure it is 100% accurate"></i>
+        Approx. package size
+        <span class="glyphicon glyphicon-question-sign get-help" title="Package size is based on information from previous builds, so we can never be sure it is 100% accurate"></span>
         </dt>
         <dd id="total-size-packages">{{approx_pkg_size.size__sum|filtered_filesizeformat}}</dd>
         {% if last_build %}
         <dt>Last build</dt>
         <dd>
-          <i class="icon-ok-sign success"></i>
-          <a href="{% url 'projectbuilds' project.id%}">{{last_build.completed_on|date:"d/m/y H:i"}}</a>
+        <span class="glyphicon glyphicon-ok-circle"></span>
+        <a href="{% url 'projectbuilds' project.id%}">{{last_build.completed_on|date:"d/m/y H:i"}}</a>
         </dd>
         {% endif %}
-        <dt>Layer</dt>
-        <dd><a href="{% url 'layerdetails' project.id recipe.layer_version.pk %}">{{recipe.layer_version.layer.name}}</a></dd>
         <dt>Based on</dt>
         <dd><a href="{% url 'recipedetails' project.id recipe.base_recipe.pk %}">{{recipe.base_recipe.name}}</a></dd>
         {% if recipe.get_last_successful_built_target %}
         {% with recipe.get_last_successful_built_target as last_build_target %}
         <dt>Last build</dt>
         <dd>
-          <i class="icon-ok-sign success"></i>
-          <a href="{% url 'builddashboard' last_build_target.build.pk %}">
-            {{last_build_target.build.completed_on|date:"d/m/y H:i"}}</a>
+        <span class="glyphicon glyphicon-ok-circle"></span>
+        <a href="{% url 'builddashboard' last_build_target.build.pk %}">
+          {{last_build_target.build.completed_on|date:"d/m/y H:i"}}</a>
         </dd>
         {% endwith %}
         {% endif %}
+        {% if base_recipe_file %}
         <dt>Recipe file</dt>
         <dd>
-          <code>{{recipe.name}}_{{recipe.version}}.bb</code>
-          <a href="{% url 'customrecipedownload' project.pk recipe.pk %}"><i class="icon-share" title="" data-original-title="View recipe file"></i></a>
+        <code>{{recipe.name}}_{{recipe.version}}.bb</code>
+        <a href="{% url 'customrecipedownload' project.pk recipe.pk %}"><span class="glyphicon glyphicon-download-alt" data-toggle="tooltip" title="Download recipe file"></span></a>
         </dd>
+        {% endif %}
         <dt>Layer</dt>
         <dd><a href="{% url 'layerdetails' project.id recipe.layer_version.pk %}">{{recipe.layer_version.layer.name}}</a></dd>
         {% if recipe.summary %}
         <dt>
-          Summary
+        Summary
         </dt>
         <dd>
-          {{recipe.summary}}
+        {{recipe.summary}}
         </dd>
         {% endif %}
         {% if recipe.description %}
         <dt>
-          Description
+        Description
         </dt>
         <dd>
-          {{recipe.description}}
+        {{recipe.description}}
         </dd>
         {% endif %}
         <dt>Version</dt>
         <dd>
-          {{recipe.version}}
+        {{recipe.version}}
         </dd>
         {% if recipe.section %}
         <dt>Section</dt>
         <dd>
-          {{recipe.section}}
+        {{recipe.section}}
         </dd>
         {% endif %}
         <dt>License</dt>
         <dd>
-          {{recipe.license}}
-          <i class="icon-question-sign get-help" title="" data-original-title="All custom images have their license set to MIT. This is because the license applies only to the recipe (.bb) file, and not to the image itself. To see which licenses apply to the image you must check the license manifest generated with each build"></i>
-          </dd>
+        {{recipe.license}}
+        <span class="glyphicon glyphicon-question-sign get-help" title="All custom images have their license set to MIT. This is because the license applies only to the recipe (.bb) file, and not to the image itself. To see which licenses apply to the image you must check the license manifest generated with each build"></i>
+        </dd>
       </dl>
-      <!--
-      <i class="icon-trash no-tooltip"></i>
-      <a href="#" class="error" id="delete">Delete custom image</a>
-        -->
+      <i class="icon-trash text-danger"></i>
+      <a href="#delete-recipe-modal" data-target="#delete-recipe-modal" data-toggle="modal" class="text-danger" id="delete-recipe">
+        Delete custom image
+      </a>
     </div>
   </div>
+</div>
 
-  {% endblock %}
+{% endwith %}{# end base_recipe_file #}
+{% endblock %}

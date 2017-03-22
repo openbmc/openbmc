@@ -7,7 +7,7 @@ Fix libacpi for x32
 
 Patch Received from:  H.J. Lu <hjl.tools@gmail.com>
 
-Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com> 2011/12/05
+Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com> 2011/12/05
 
 Index: libacpi-0.2/Makefile
 ===================================================================

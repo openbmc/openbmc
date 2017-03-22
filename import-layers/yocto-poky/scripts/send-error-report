@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Sends an error report (if the report-error class was enabled) to a
 # remote server.
@@ -7,7 +7,7 @@
 # Author: Andreea Proca <andreea.b.proca@intel.com>
 # Author: Michael Wood <michael.g.wood@intel.com>
 
-import urllib2
+import urllib.request, urllib.error
 import sys
 import json
 import os
@@ -25,10 +25,10 @@ log = logging.getLogger("send-error-report")
 logging.basicConfig(format='%(levelname)s: %(message)s')
 
 def getPayloadLimit(url):
-    req = urllib2.Request(url, None)
+    req = urllib.request.Request(url, None)
     try:
-        response = urllib2.urlopen(req)
-    except urllib2.URLError as e:
+        response = urllib.request.urlopen(req)
+    except urllib.error.URLError as e:
         # Use this opportunity to bail out if we can't even contact the server
         log.error("Could not contact server: " + url)
         log.error(e.reason)
@@ -44,12 +44,12 @@ def getPayloadLimit(url):
 
 def ask_for_contactdetails():
     print("Please enter your name and your email (optionally), they'll be saved in the file you send.")
-    username = raw_input("Name (required): ")
-    email = raw_input("E-mail (not required): ")
+    username = input("Name (required): ")
+    email = input("E-mail (not required): ")
     return username, email
 
 def edit_content(json_file_path):
-    edit = raw_input("Review information before sending? (y/n): ")
+    edit = input("Review information before sending? (y/n): ")
     if 'y' in edit or 'Y' in edit:
         editor = os.environ.get('EDITOR', None)
         if editor:
@@ -108,7 +108,7 @@ def prepare_data(args):
         if max_log_size != 0:
             for fail in jsondata['failures']:
                 if len(fail['log']) > max_log_size:
-                    print "Truncating log to allow for upload"
+                    print("Truncating log to allow for upload")
                     fail['log'] = fail['log'][-max_log_size:]
 
         data = json.dumps(jsondata, indent=4, sort_keys=True)
@@ -125,7 +125,7 @@ def prepare_data(args):
         with open(args.error_file, 'r') as json_fp:
             data = json_fp.read()
 
-    return data
+    return data.encode('utf-8')
 
 
 def send_data(data, args):
@@ -136,14 +136,14 @@ def send_data(data, args):
     else:
         url = "http://"+args.server+"/ClientPost/"
 
-    req = urllib2.Request(url, data=data, headers=headers)
+    req = urllib.request.Request(url, data=data, headers=headers)
     try:
-        response = urllib2.urlopen(req)
-    except urllib2.HTTPError, e:
+        response = urllib.request.urlopen(req)
+    except urllib.error.HTTPError as e:
         logging.error(e.reason)
         sys.exit(1)
 
-    print response.read()
+    print(response.read())
 
 
 if __name__ == '__main__':
@@ -192,7 +192,7 @@ if __name__ == '__main__':
     args = arg_parse.parse_args()
 
     if (args.json == False):
-        print "Preparing to send errors to: "+args.server
+        print("Preparing to send errors to: "+args.server)
 
     data = prepare_data(args)
     send_data(data, args)
