@@ -1,0 +1,121 @@
+#!/bin/sh
+#/etc/init.d/wd_keepalive: start wd_keepalive daemon.
+
+### BEGIN INIT INFO
+# Provides:          wd_keepalive
+# Short-Description: Start watchdog keepalive daemon
+# Required-Start:    $remote_fs
+# Required-Stop:     $remote_fs
+# X-Start-Before:    $all
+# Default-Start:     2 3 4 5
+# Default-Stop
+### END INIT INFO
+
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+
+test -x /usr/sbin/wd_keepalive || exit 0
+
+# For configuration of the init script use the file
+# /etc/default/watchdog, do not edit this init script.
+
+# Set run_watchdog to 1 to start watchdog or 0 to disable it.
+run_watchdog=0
+
+# Specify additional watchdog options here (see manpage).
+watchdog_options=""
+
+# Specify module to load
+watchdog_module="none"
+
+[ -e /etc/default/watchdog ] && . /etc/default/watchdog
+
+NAME=wd_keepalive
+DAEMON=/usr/sbin/wd_keepalive
+
+STOP_RETRY_SCHEDULE='TERM/10/forever/KILL/1'
+
+# . /lib/lsb/init-functions
+
+# Mock Debian stuff
+log_begin_msg() {
+    echo -n $*
+}
+
+log_end_msg() {
+    if [ "$1" = "0" ]; then
+        echo 'done'
+    else
+        echo 'error'
+    fi
+}
+
+log_daemon_msg() {
+    echo $*
+}
+
+log_progress_msg() {
+    echo $*
+}
+
+
+case "$1" in
+  start)
+    if [ $run_watchdog = 1 ]
+    then
+        [ ${watchdog_module:-none} != "none" ] && /sbin/modprobe $watchdog_module
+	echo -n "Starting watchdog keepalive daemon: "
+	if start-stop-daemon --start --quiet \
+	    --exec $DAEMON -- $watchdog_options
+	then
+	    echo wd_keepalive.
+	else
+	    echo
+	fi
+    fi
+    ;;
+
+  stop)
+    if [ $run_watchdog = 1 ]
+    then
+	echo -n "Stopping watchdog keepalive daemon: "
+	if start-stop-daemon --stop --quiet --pidfile /var/run/$NAME.pid \
+	    $STOP_RETRY_SCHEDULE
+	then
+	    echo wd_keepalive.
+	else
+	    echo
+	fi
+    fi
+    ;;
+
+  status)
+    status_of_proc "$DAEMON" "$NAME" && exit 0 || exit $?
+    ;;
+
+  restart)
+    $0 force-reload
+    ;;
+
+  force-reload)
+    if [ $run_watchdog = 0 ]; then exit 0; fi
+    echo -n "Restarting $NAME daemon."
+    start-stop-daemon --stop --quiet --pidfile /var/run/$NAME.pid \
+	$STOP_RETRY_SCHEDULE
+    echo -n "."
+    if start-stop-daemon --start --quiet --pidfile /var/run/$NAME.pid \
+	--exec $DAEMON -- $watchdog_options
+    then
+	echo "done."
+    else
+	echo
+    fi
+    ;;
+
+  *)
+    echo "Usage: /etc/init.d/wd_keepalive {start|stop|status|restart|force-reload}"
+    exit 1
+
+esac
+
+exit 0
+

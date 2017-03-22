@@ -61,3 +61,6 @@ ac_cv_have_long_long_format=yes
 
 # apache
 ac_cv_o_nonblock_inherited=${ac_cv_o_nonblock_inherited=no}
+
+# rsync
+rsync_cv_HAVE_C99_VSNPRINTF=${rsync_cv_HAVE_C99_VSNPRINTF=yes}

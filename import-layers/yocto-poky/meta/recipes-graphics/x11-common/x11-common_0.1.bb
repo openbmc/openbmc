@@ -9,22 +9,14 @@ inherit distro_features_check
 REQUIRED_DISTRO_FEATURES = "x11"
 
 SRC_URI = "file://etc \
-           file://Xserver.in \
            file://gplv2-license.patch"
 
 S = "${WORKDIR}"
 
-PACKAGECONFIG ??= "blank"
-# dpms and screen saver will be on only if 'blank' is in PACKAGECONFIG
-PACKAGECONFIG[blank] = ""
-
 do_install() {
 	cp -R ${S}/etc ${D}${sysconfdir}
-	sed -e 's/@BLANK_ARGS@/${@bb.utils.contains('PACKAGECONFIG', 'blank', '', '-s 0 -dpms', d)}/' \
-		${S}/Xserver.in > ${D}${sysconfdir}/X11/Xserver
-
 	chmod -R 755 ${D}${sysconfdir}
 }
 
-RDEPENDS_${PN} = "dbus-x11 xmodmap xdpyinfo xtscal xinit formfactor"
+RDEPENDS_${PN} = "dbus-x11 xmodmap xdpyinfo xinput-calibrator formfactor"
 

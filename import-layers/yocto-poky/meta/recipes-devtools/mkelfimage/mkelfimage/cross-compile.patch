@@ -1,13 +1,43 @@
-make the tool to be cross compilable.
+From dc2712119d6832e24a9b7bed9ed4ce5ae03ce0a3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 14 Jul 2012 14:14:07 -0700
+Subject: [PATCH] mkelfimage: Fix cross build
+
+Make the tool to be cross compilable, by separating the variables for build
+tools from those for the target. Also modified to obey LDFLAGS.
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Christopher Larson <chris_larson@mentor.com>
+
 Upstream-Status: Pending
 
-Index: mkelfImage/configure.ac
-===================================================================
---- mkelfImage.orig/configure.ac	2012-07-14 14:04:48.964898667 -0700
-+++ mkelfImage/configure.ac	2012-07-14 14:10:47.800916083 -0700
-@@ -70,6 +70,9 @@
+---
+ Makefile.conf.in    | 3 +++
+ configure.ac        | 7 +++++--
+ linux-i386/Makefile | 2 +-
+ linux-ia64/Makefile | 2 +-
+ main/Makefile       | 4 ++--
+ 5 files changed, 12 insertions(+), 6 deletions(-)
+
+diff --git a/Makefile.conf.in b/Makefile.conf.in
+index 4645e44..dcb6cf2 100644
+--- a/Makefile.conf.in
++++ b/Makefile.conf.in
+@@ -17,6 +17,9 @@ DEFS=@DEFS@
+ LIBS=@LIBS@
+ HOST_CC=@HOST_CC@
+ HOST_CFLAGS=@HOST_CFLAGS@  $(DEFS)
++CC=@CC@
++CFLAGS=@CFLAGS@ $(DEFS)
++LDFLAGS=@LDFLAGS@
+
+ I386_CC     =@I386_CC@
+ I386_LD     =@I386_LD@
+diff --git a/configure.ac b/configure.ac
+index 652b952..0f2ac72 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -70,6 +70,9 @@ if test "with_default" != no ; then
  		AC_MSG_ERROR([cc not found])
  	fi
  	eval "${with_default}_CC='$CC'"
@@ -17,55 +47,60 @@ Index: mkelfImage/configure.ac
  	AC_PROG_CPP
  	if test "$CPP" = no; then
  		AC_MSG_ERROR([cpp not found])
-@@ -172,7 +175,6 @@
+@@ -172,8 +175,8 @@ fi
  
  dnl ---Output variables...
  
 -HOST_CC=$CC
- HOST_CFLAGS="$HOST_CFLAGS -O2 -Wall \$(HOST_CPPFLAGS)"
+-HOST_CFLAGS="$HOST_CFLAGS -O2 -Wall \$(HOST_CPPFLAGS)"
++CFLAGS="${CFLAGS:--O2} -Wall \$(CPPFLAGS)"
++HOST_CFLAGS="${HOST_CFLAGS:--O2} -Wall \$(HOST_CPPFLAGS)"
  
  dnl TODO: figure out how to set these appropriately for compilers other than gcc
-Index: mkelfImage/linux-i386/Makefile
-===================================================================
---- mkelfImage.orig/linux-i386/Makefile	2012-07-14 14:04:48.964898667 -0700
-+++ mkelfImage/linux-i386/Makefile	2012-07-14 14:04:49.032898671 -0700
-@@ -4,7 +4,7 @@
+ I386_CFLAGS="$I386_CFLAGS -Os -ffreestanding -Wall -W -Wno-format \$(I386_CPPFLAGS)"
+diff --git a/linux-i386/Makefile b/linux-i386/Makefile
+index 51531d6..7e8aa3c 100644
+--- a/linux-i386/Makefile
++++ b/linux-i386/Makefile
+@@ -4,7 +4,7 @@ LI386_DEP=Makefile Makefile.conf $(LI386_DIR)/Makefile
  
  $(LI386_OBJ)/mkelf-linux-i386.o: $(LI386_DIR)/mkelf-linux-i386.c $(LI386_DIR)/convert.bin.c $(LI386_DEP)
  	$(MKDIR) -p $(@D)
 -	$(HOST_CC) $(HOST_CFLAGS) -c -g $< -o $@
-+	$(CC) $(HOST_CFLAGS) -c -g $< -o $@
++	$(CC) $(CFLAGS) -c -g $< -o $@
  
  
  ifdef I386_CC
-Index: mkelfImage/linux-ia64/Makefile
-===================================================================
---- mkelfImage.orig/linux-ia64/Makefile	2012-07-14 14:04:48.964898667 -0700
-+++ mkelfImage/linux-ia64/Makefile	2012-07-14 14:04:49.032898671 -0700
-@@ -4,7 +4,7 @@
+diff --git a/linux-ia64/Makefile b/linux-ia64/Makefile
+index 38f5d8c..5df8870 100644
+--- a/linux-ia64/Makefile
++++ b/linux-ia64/Makefile
+@@ -4,7 +4,7 @@ LIA64_DEP=Makefile Makefile.conf $(LIA64_DIR)/Makefile
  
  $(LIA64_OBJ)/mkelf-linux-ia64.o: $(LIA64_DIR)/mkelf-linux-ia64.c $(LIA64_DIR)/convert.bin.c $(LIA64_DEP)
  	$(MKDIR) -p $(@D)
 -	$(HOST_CC) $(HOST_CFLAGS) -c -g $< -o $@
-+	$(CC) $(HOST_CFLAGS) -c -g $< -o $@
++	$(CC) $(CFLAGS) -c -g $< -o $@
  
  ifdef IA64_CC
  
-Index: mkelfImage/main/Makefile
-===================================================================
---- mkelfImage.orig/main/Makefile	2012-07-14 14:04:48.964898667 -0700
-+++ mkelfImage/main/Makefile	2012-07-14 14:04:49.032898671 -0700
-@@ -4,11 +4,11 @@
+diff --git a/main/Makefile b/main/Makefile
+index 403b0a4..cd53613 100644
+--- a/main/Makefile
++++ b/main/Makefile
+@@ -4,11 +4,11 @@ MKELF_OBJS=$(OBJDIR)/main/mkelfImage.o \
  
  $(OBJDIR)/sbin/mkelfImage: $(MKELF_OBJS) $(DEPS)
  	$(MKDIR) -p $(@D)
 -	$(HOST_CC) $(HOST_CFLAGS) $(MKELF_OBJS) -o $@ $(LIBS)
-+	$(CC) $(HOST_CFLAGS) $(MKELF_OBJS) -o $@ $(LIBS)
++	$(CC) $(CFLAGS) $(LDFLAGS) $(MKELF_OBJS) -o $@ $(LIBS)
  
  $(OBJDIR)/main/mkelfImage.o: main/mkelfImage.c include/mkelfImage.h $(DEPS)
  	$(MKDIR) -p $(@D)
 -	$(HOST_CC) $(HOST_CFLAGS) -c $< -o $@
-+	$(CC) $(HOST_CFLAGS) -c $< -o $@
++	$(CC) $(CFLAGS) -c $< -o $@
  
  $(OBJDIR)/man/man8/mkelfImage.8: main/mkelfImage.man
  	$(MKDIR) -p $(@D)
+--
+2.8.0

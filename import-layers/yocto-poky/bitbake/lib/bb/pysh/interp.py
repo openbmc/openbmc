@@ -474,7 +474,7 @@ class Environment:
         """
         # Save and remove previous arguments
         prevargs = []        
-        for i in xrange(int(self._env['#'])):
+        for i in range(int(self._env['#'])):
             i = str(i+1)
             prevargs.append(self._env[i])
             del self._env[i]
@@ -488,7 +488,7 @@ class Environment:
         return prevargs
         
     def get_positional_args(self):
-        return [self._env[str(i+1)] for i in xrange(int(self._env['#']))]
+        return [self._env[str(i+1)] for i in range(int(self._env['#']))]
         
     def get_variables(self):
         return dict(self._env)

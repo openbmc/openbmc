@@ -1,0 +1,40 @@
+From 426e38468463a4abb495cf6a269b9635b2107519 Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Tue, 17 May 2016 13:51:24 +0300
+Subject: [PATCH] glib-gettext.m4: Update AM_GLIB_GNU_GETTEXT to match glib
+
+This avoids
+  error: m4_copy: won't overwrite defined macro: glib_DEFUN
+
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Upstream-Status: Inappropriate [No upstream]
+---
+ m4/glib-gettext.m4 | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/m4/glib-gettext.m4 b/m4/glib-gettext.m4
+index 81f8fd2..e2b142b 100644
+--- a/m4/glib-gettext.m4
++++ b/m4/glib-gettext.m4
+@@ -310,7 +310,7 @@ msgstr ""
+ # on various variables needed by the Makefile.in.in installed by
+ # glib-gettextize.
+ dnl
+-glib_DEFUN([GLIB_GNU_GETTEXT],
++AU_DEFUN([GLIB_GNU_GETTEXT],
+   [AC_REQUIRE([AC_PROG_CC])dnl
+    AC_REQUIRE([AC_HEADER_STDC])dnl
+ 
+@@ -381,7 +381,8 @@ glib_DEFUN([GLIB_GNU_GETTEXT],
+    rm -f po/POTFILES
+    sed -e "/^#/d" -e "/^\$/d" -e "s,.*,	$posrcprefix& \\\\," -e "\$s/\(.*\) \\\\/\1/" \
+ 	< $srcdir/po/POTFILES.in > po/POTFILES
+-  ])
++  ]
++  [[$0: This macro is deprecated. You should use upstream gettext instead.]])
+ 
+ # AX_GLIB_DEFINE_LOCALEDIR(VARIABLE)
+ # -------------------------------
+-- 
+2.1.4
+

@@ -1,12 +1,12 @@
-<!ENTITY DISTRO "2.1">
-<!ENTITY DISTRO_COMPRESSED "21">
-<!ENTITY DISTRO_NAME_NO_CAP "krogoth">
-<!ENTITY DISTRO_NAME "Krogoth">
-<!ENTITY YOCTO_DOC_VERSION "2.1">
-<!ENTITY POKYVERSION "15.0.0">
-<!ENTITY POKYVERSION_COMPRESSED "1500">
+<!ENTITY DISTRO "2.2.1">
+<!ENTITY DISTRO_COMPRESSED "221">
+<!ENTITY DISTRO_NAME_NO_CAP "morty">
+<!ENTITY DISTRO_NAME "Morty">
+<!ENTITY YOCTO_DOC_VERSION "2.2.1">
+<!ENTITY POKYVERSION "17.0.1">
+<!ENTITY POKYVERSION_COMPRESSED "1701">
 <!ENTITY YOCTO_POKY "poky-&DISTRO_NAME_NO_CAP;-&POKYVERSION;">
-<!ENTITY COPYRIGHT_YEAR "2010-2016">
+<!ENTITY COPYRIGHT_YEAR "2010-2017">
 <!ENTITY YOCTO_DL_URL "http://downloads.yoctoproject.org">
 <!ENTITY YOCTO_HOME_URL "http://www.yoctoproject.org">
 <!ENTITY YOCTO_LISTS_URL "http://lists.yoctoproject.org">
@@ -61,13 +61,14 @@
 <!ENTITY OE_INIT_PATH "&YOCTO_POKY;/oe-init-build-env">
 <!ENTITY OE_INIT_FILE "oe-init-build-env">
 <!ENTITY UBUNTU_HOST_PACKAGES_ESSENTIAL "gawk wget git-core diffstat unzip texinfo gcc-multilib \
-     build-essential chrpath socat">
-<!ENTITY FEDORA_HOST_PACKAGES_ESSENTIAL "gawk make wget tar bzip2 gzip python unzip perl patch \
+     build-essential chrpath socat cpio python python3 pip3 pexpect">
+<!ENTITY FEDORA_HOST_PACKAGES_ESSENTIAL "gawk make wget tar bzip2 gzip python3 unzip perl patch \
      diffutils diffstat git cpp gcc gcc-c++ glibc-devel texinfo chrpath \
      ccache perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue perl-bignum socat \
-     findutils which">
+     findutils which file cpio python pip3 pexpect">
 <!ENTITY OPENSUSE_HOST_PACKAGES_ESSENTIAL "python gcc gcc-c++ git chrpath make wget python-xml \
-     diffstat makeinfo python-curses patch socat">
+     diffstat makeinfo python-curses patch socat python3 python3-curses tar pip3 pexpect">
 <!ENTITY CENTOS_HOST_PACKAGES_ESSENTIAL "gawk make wget tar bzip2 gzip python unzip perl patch \
      diffutils diffstat git cpp gcc gcc-c++ glibc-devel texinfo chrpath socat \
-     perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue">
+     perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue pip3 pexpect">
+

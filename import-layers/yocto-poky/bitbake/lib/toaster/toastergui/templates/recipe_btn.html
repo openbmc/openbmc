@@ -1,16 +1,17 @@
-<button data-recipe-name="{{data.name}}" class="btn btn-block layer-exists-{{data.layer_version.pk}} build-recipe-btn" style="margin-top: 5px;
+<a data-recipe-name="{{data.name}}" class="btn btn-default btn-block layer-exists-{{data.layer_version.pk}} build-recipe-btn" style="margin-top: 5px;
   {% if data.layer_version.pk not in extra.current_layers %}
     display:none;
   {% endif %}"
  >
   Build recipe
-</button>
-<button class="btn btn-block layerbtn layer-add-{{data.layer_version.pk}}" data-layer='{ "id": {{data.layer_version.pk}}, "name":  "{{data.layer_version.layer.name}}", "layerdetailurl": "{%url 'layerdetails' extra.pid data.layer_version.pk%}"}' data-directive="add"
+</a>
+<a class="btn btn-default btn-block layerbtn layer-add-{{data.layer_version.pk}}" data-layer='{ "id": {{data.layer_version.pk}}, "name":  "{{data.layer_version.layer.name}}", "layerdetailurl": "{%url 'layerdetails' extra.pid data.layer_version.pk%}"}' data-directive="add"
     {% if data.layer_version.pk in extra.current_layers %}
      style="display:none;"
     {% endif %}
 >
-  <i class="icon-plus"></i>
+  <span class="glyphicon glyphicon-plus"></span>
   Add layer
-  <i title="" class="icon-question-sign get-help" data-original-title="To build this target, you must first add the {{data.layer_version.layer.name}} layer to your project"></i>
-</button>
+  <span class="glyphicon glyphicon-question-sign get-help" title="To build this
+      recipe you must first add the {{data.layer_version.layer.name}} layer to your project"></i>
+</a>

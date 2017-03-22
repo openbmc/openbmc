@@ -21,12 +21,10 @@ S = "${WORKDIR}"
 
 do_install() {
 	install -d ${D}${sysconfdir}
-	install -p -m 755 ${S}/login.defs_shadow-sysroot ${D}${sysconfdir}/login.defs
+	install -p -m 644 ${S}/login.defs_shadow-sysroot ${D}${sysconfdir}/login.defs
 }
 
-sysroot_stage_all() {
-	sysroot_stage_dir ${D} ${SYSROOT_DESTDIR}
-}
+SYSROOT_DIRS += "${sysconfdir}"
 
 # don't create any packages
 # otherwise: dbus-dev depends on shadow-sysroot-dev which depends on shadow-sysroot 

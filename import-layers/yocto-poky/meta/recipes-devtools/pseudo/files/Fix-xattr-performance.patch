@@ -1,0 +1,117 @@
+From 0d9071f3090bbd7880558f3b488b236ac19b44fc Mon Sep 17 00:00:00 2001
+From: seebs <seebs@seebs.net>
+Date: Thu, 28 Jul 2016 14:02:12 -0500
+Subject: [PATCH 1/2] Fix xattr performance
+
+When deleting files, we *do* know the inode and attribute, most of the
+time, so we pass those in whenever possible. The full purge of unmatched
+xattrs should not happen when the correct dev/ino are believed to be known.
+
+Signed-off-by: Seebs <seebs@seebs.net>
+
+[YOCTO #9929]
+Upstream-Status: Backport (0d9071f3090bbd7880558f3b488b236ac19b44fc)
+Signed-off-by: Joshua Lock <joshua.g.lock@intel.com>
+---
+ ChangeLog.txt |  3 +++
+ pseudo.c      | 11 ++++++++---
+ pseudo_db.c   | 15 +++++++++------
+ pseudo_db.h   |  2 +-
+ 4 files changed, 21 insertions(+), 10 deletions(-)
+
+diff --git a/ChangeLog.txt b/ChangeLog.txt
+index 131f163..d6359ca 100644
+--- a/ChangeLog.txt
++++ b/ChangeLog.txt
+@@ -1,3 +1,6 @@
++2016-07-28:
++	* (seebs) Fix performance issue on deletion with xattr changes.
++
+ 2016-07-08:
+ 	* (RP) release 1.8.1
+ 	* (joshuagl) Fix log table creation issue
+diff --git a/pseudo.c b/pseudo.c
+index 52f649f..db1c400 100644
+--- a/pseudo.c
++++ b/pseudo.c
+@@ -600,7 +600,12 @@ pseudo_op(pseudo_msg_t *msg, const char *program, const char *tag, char **respon
+ 				if (by_path.deleting != 0) {
+ 					pseudo_debug(PDBGF_FILE, "inode mismatch for '%s' -- old one was marked for deletion, deleting.\n",
+ 						msg->path);
+-					pdb_did_unlink_file(msg->path, by_path.deleting);
++					/* in this case, we don't trust the
++					 * existing entries, so we will do the
++					 * more expensive sweep for stray
++					 * xattrs.
++					 */
++					pdb_did_unlink_file(msg->path, NULL, by_path.deleting);
+ 				} else {
+ 					pseudo_diag("inode mismatch: '%s' ino %llu in db, %llu in request.\n",
+ 						msg->path,
+@@ -698,7 +703,7 @@ pseudo_op(pseudo_msg_t *msg, const char *program, const char *tag, char **respon
+ 				if (by_ino.deleting != 0) {
+ 					pseudo_debug(PDBGF_FILE, "inode mismatch for '%s' -- old one was marked for deletion, deleting.\n",
+ 						msg->path);
+-					pdb_did_unlink_file(path_by_ino, by_ino.deleting);
++					pdb_did_unlink_file(path_by_ino, &by_ino, by_ino.deleting);
+ 				} else {
+ 					pseudo_diag("path mismatch [%d link%s]: ino %llu db '%s' req '%s'.\n",
+ 						msg->nlink,
+@@ -930,7 +935,7 @@ pseudo_op(pseudo_msg_t *msg, const char *program, const char *tag, char **respon
+ 		}
+ 		break;
+ 	case OP_DID_UNLINK:
+-		pdb_did_unlink_file(msg->path, msg->client);
++		pdb_did_unlink_file(msg->path, msg, msg->client);
+ 		break;
+ 	case OP_CANCEL_UNLINK:
+ 		pdb_cancel_unlink_file(msg);
+diff --git a/pseudo_db.c b/pseudo_db.c
+index 289bb29..e7dd193 100644
+--- a/pseudo_db.c
++++ b/pseudo_db.c
+@@ -1848,7 +1848,7 @@ pdb_did_unlink_files(int deleting) {
+ 
+ /* confirm deletion of a specific file by a given client */
+ int
+-pdb_did_unlink_file(char *path, int deleting) {
++pdb_did_unlink_file(char *path, pseudo_msg_t *msg, int deleting) {
+ 	static sqlite3_stmt *delete_exact;
+ 	int rc, exact;
+ 	char *sql_delete_exact = "DELETE FROM files WHERE path = ? AND deleting = ?;";
+@@ -1878,11 +1878,14 @@ pdb_did_unlink_file(char *path, int deleting) {
+ 	exact = sqlite3_changes(file_db);
+ 	pseudo_debug(PDBGF_DB, "(exact %d)\n", exact);
+ 	sqlite3_reset(delete_exact);
+-	sqlite3_clear_bindings(delete_exact);
+-	/* we have to clean everything because we don't know for sure the
+-	 * device/inode...
+-	 */
+-	pdb_clear_unused_xattrs();
++	if (msg) {
++		pdb_clear_xattrs(msg);
++	} else {
++		/* we have to clean everything because we don't know for sure the
++		 * device/inode...
++		 */
++		pdb_clear_unused_xattrs();
++	}
+ 	return rc != SQLITE_DONE;
+ }
+ 
+diff --git a/pseudo_db.h b/pseudo_db.h
+index a54f3c1..1b2599c 100644
+--- a/pseudo_db.h
++++ b/pseudo_db.h
+@@ -39,7 +39,7 @@ typedef struct {
+ 
+ extern int pdb_maybe_backup(void);
+ extern int pdb_cancel_unlink_file(pseudo_msg_t *msg);
+-extern int pdb_did_unlink_file(char *path, int deleting);
++extern int pdb_did_unlink_file(char *path, pseudo_msg_t *msg, int deleting);
+ extern int pdb_did_unlink_files(int deleting);
+ extern int pdb_link_file(pseudo_msg_t *msg);
+ extern int pdb_may_unlink_file(pseudo_msg_t *msg, int deleting);
+-- 
+2.7.4
+

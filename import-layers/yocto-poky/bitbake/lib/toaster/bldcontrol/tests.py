@@ -53,7 +53,7 @@ class BEControllerTests(object):
             # setting layers, skip any layer info
             bc.setLayers(BITBAKE_LAYER, POKY_LAYERS)
         except NotImplementedError:
-            print "Test skipped due to command not implemented yet"
+            print("Test skipped due to command not implemented yet")
             return True
         # We are ok with the exception as we're handling the git already exists
         except BuildSetupException:
@@ -79,7 +79,7 @@ class BEControllerTests(object):
             # setting layers, skip any layer info
             layerSet = bc.setLayers(BITBAKE_LAYER, POKY_LAYERS)
         except NotImplementedError:
-            print "Test skipped due to command not implemented yet"
+            print("Test skipped due to command not implemented yet")
             return True
         # We are ok with the exception as we're handling the git already exists
         except BuildSetupException:
@@ -139,22 +139,3 @@ class RunBuildsCommandTests(TestCase):
         self.assertTrue(br.state == BuildRequest.REQ_INPROGRESS, "Request is not updated")
         # no more selections possible here
         self.assertRaises(IndexError, command._selectBuildRequest)
-
-
-class UtilityTests(TestCase):
-    def test_reduce_path(self):
-        from bldcontrol.management.commands.loadconf import _reduce_canon_path, _get_id_for_sourcetype
-
-        self.assertTrue( _reduce_canon_path("/") == "/")
-        self.assertTrue( _reduce_canon_path("/home/..") == "/")
-        self.assertTrue( _reduce_canon_path("/home/../ana") == "/ana")
-        self.assertTrue( _reduce_canon_path("/home/../ana/..") == "/")
-        self.assertTrue( _reduce_canon_path("/home/ana/mihai/../maria") == "/home/ana/maria")
-
-    def test_get_id_for_sorucetype(self):
-        from bldcontrol.management.commands.loadconf import _reduce_canon_path, _get_id_for_sourcetype
-        self.assertTrue( _get_id_for_sourcetype("layerindex") == 1)
-        self.assertTrue( _get_id_for_sourcetype("local") == 0)
-        self.assertTrue( _get_id_for_sourcetype("imported") == 2)
-        with self.assertRaises(Exception):
-            _get_id_for_sourcetype("unknown")

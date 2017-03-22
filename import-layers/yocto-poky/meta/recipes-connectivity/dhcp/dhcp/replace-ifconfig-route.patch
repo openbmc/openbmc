@@ -8,23 +8,32 @@ Upstream-Status: Pending
 
 Signed-off-by: Muhammad Shakeel <muhammad_shakeel@mentor.com>
 
---- dhcp-4.2.5-P1/client/scripts/linux.orig	2013-09-04 12:22:55.000000000 +0500
-+++ dhcp-4.2.5-P1/client/scripts/linux	2013-09-04 12:52:19.068761518 +0500
-@@ -103,17 +103,11 @@
+Rebase to 4.3.4
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ client/scripts/linux | 82 ++++++++++++++++++++++++++++------------------------
+ 1 file changed, 45 insertions(+), 37 deletions(-)
+
+diff --git a/client/scripts/linux b/client/scripts/linux
+index a02cfd9..232a0aa 100755
+--- a/client/scripts/linux
++++ b/client/scripts/linux
+@@ -101,17 +101,11 @@ fi
  if [ x$old_broadcast_address != x ]; then
    old_broadcast_arg="broadcast $old_broadcast_address"
  fi
 -if [ x$new_subnet_mask != x ]; then
 -  new_subnet_arg="netmask $new_subnet_mask"
--fi
++if [ -n "$new_subnet_mask" ]; then
++    new_mask="/$new_subnet_mask"
+ fi
 -if [ x$old_subnet_mask != x ]; then
 -  old_subnet_arg="netmask $old_subnet_mask"
 -fi
 -if [ x$alias_subnet_mask != x ]; then
 -  alias_subnet_arg="netmask $alias_subnet_mask"
-+if [ -n "$new_subnet_mask" ]; then
-+    new_mask="/$new_subnet_mask"
- fi
+-fi
 -if [ x$new_interface_mtu != x ]; then
 -  mtu_arg="mtu $new_interface_mtu"
 +if [ -n "$alias_subnet_mask" ]; then
@@ -32,7 +41,7 @@ Signed-off-by: Muhammad Shakeel <muhammad_shakeel@mentor.com>
  fi
  if [ x$IF_METRIC != x ]; then
    metric_arg="metric $IF_METRIC"
-@@ -127,9 +121,9 @@
+@@ -125,9 +119,9 @@ fi
  if [ x$reason = xPREINIT ]; then
    if [ x$alias_ip_address != x ]; then
      # Bring down alias interface. Its routes will disappear too.
@@ -44,7 +53,7 @@ Signed-off-by: Muhammad Shakeel <muhammad_shakeel@mentor.com>
  
    # We need to give the kernel some time to get the interface up.
    sleep 1
-@@ -156,25 +150,30 @@
+@@ -154,25 +148,30 @@ if [ x$reason = xBOUND ] || [ x$reason = xRENEW ] || \
    if [ x$old_ip_address != x ] && [ x$alias_ip_address != x ] && \
  		[ x$alias_ip_address != x$old_ip_address ]; then
      # Possible new alias. Remove old alias.
@@ -81,7 +90,7 @@ Signed-off-by: Muhammad Shakeel <muhammad_shakeel@mentor.com>
      done
    else
      # we haven't changed the address, have we changed other options           
-@@ -182,21 +181,23 @@
+@@ -180,21 +179,23 @@ if [ x$reason = xBOUND ] || [ x$reason = xRENEW ] || \
      if [ x$new_routers != x ] && [ x$new_routers != x$old_routers ] ; then
        # if we've changed routers delete the old and add the new.
        for router in $old_routers; do
@@ -112,7 +121,7 @@ Signed-off-by: Muhammad Shakeel <muhammad_shakeel@mentor.com>
    fi
    make_resolv_conf
    exit_with_hooks 0
-@@ -206,42 +207,49 @@
+@@ -204,42 +205,49 @@ if [ x$reason = xEXPIRE ] || [ x$reason = xFAIL ] || [ x$reason = xRELEASE ] \
     || [ x$reason = xSTOP ]; then
    if [ x$alias_ip_address != x ]; then
      # Turn off alias interface.
@@ -174,3 +183,6 @@ Signed-off-by: Muhammad Shakeel <muhammad_shakeel@mentor.com>
    exit_with_hooks 1
  fi
  
+-- 
+2.8.1
+

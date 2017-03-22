@@ -26,7 +26,6 @@
 
 import os
 import tempfile
-import uuid
 
 from wic.utils.oe.misc import msger, parse_sourceparams
 from wic.utils.oe.misc import exec_cmd, exec_native_cmd
@@ -38,7 +37,7 @@ partition_methods = {
     "do_configure_partition":None,
 }
 
-class Partition(object):
+class Partition():
 
     def __init__(self, args, lineno):
         self.args = args
@@ -57,10 +56,9 @@ class Partition(object):
         self.size = args.size
         self.source = args.source
         self.sourceparams = args.sourceparams
+        self.system_id = args.system_id
         self.use_uuid = args.use_uuid
         self.uuid = args.uuid
-        if args.use_uuid and not self.uuid:
-            self.uuid = str(uuid.uuid4())
 
         self.lineno = lineno
         self.source_file = ""
@@ -148,6 +146,12 @@ class Partition(object):
                                                      oe_builddir,
                                                      bootimg_dir, kernel_dir, rootfs_dir,
                                                      native_sysroot)
+        # further processing required Partition.size to be an integer, make
+        # sure that it is one
+        if type(self.size) is not int:
+            msger.error("Partition %s internal size is not an integer. " \
+                          "This a bug in source plugin %s and needs to be fixed." \
+                          % (self.mountpoint, self.source))
 
     def prepare_rootfs_from_fs_image(self, cr_workdir, oe_builddir,
                                      rootfs_dir):
@@ -159,7 +163,7 @@ class Partition(object):
         out = exec_cmd(du_cmd)
         rootfs_size = out.split()[0]
 
-        self.size = rootfs_size
+        self.size = int(rootfs_size)
         self.source_file = rootfs
 
     def prepare_rootfs(self, cr_workdir, oe_builddir, rootfs_dir,
@@ -186,6 +190,10 @@ class Partition(object):
         if os.path.isfile(rootfs):
             os.remove(rootfs)
 
+        if not self.fstype:
+            msger.error("File system for partition %s not specified in kickstart, " \
+                        "use --fstype option" % (self.mountpoint))
+
         for prefix in ("ext", "btrfs", "vfat", "squashfs"):
             if self.fstype.startswith(prefix):
                 method = getattr(self, "prepare_rootfs_" + prefix)
@@ -196,7 +204,7 @@ class Partition(object):
                 # get the rootfs size in the right units for kickstart (kB)
                 du_cmd = "du -Lbks %s" % rootfs
                 out = exec_cmd(du_cmd)
-                self.size = out.split()[0]
+                self.size = int(out.split()[0])
 
                 break
 
@@ -219,9 +227,7 @@ class Partition(object):
         msger.debug("Added %d extra blocks to %s to get to %d total blocks" % \
                     (extra_blocks, self.mountpoint, rootfs_size))
 
-        dd_cmd = "dd if=/dev/zero of=%s bs=1024 seek=%d count=0 bs=1k" % \
-            (rootfs, rootfs_size)
-        exec_cmd(dd_cmd)
+        exec_cmd("truncate %s -s %d" % (rootfs, rootfs_size * 1024))
 
         extra_imagecmd = "-i 8192"
 
@@ -254,9 +260,7 @@ class Partition(object):
         msger.debug("Added %d extra blocks to %s to get to %d total blocks" % \
                     (extra_blocks, self.mountpoint, rootfs_size))
 
-        dd_cmd = "dd if=/dev/zero of=%s bs=1024 seek=%d count=0 bs=1k" % \
-            (rootfs, rootfs_size)
-        exec_cmd(dd_cmd)
+        exec_cmd("truncate %s -s %d" % (rootfs, rootfs_size * 1024))
 
         label_str = ""
         if self.label:
@@ -283,14 +287,6 @@ class Partition(object):
 
         msger.debug("Added %d extra blocks to %s to get to %d total blocks" % \
                     (extra_blocks, self.mountpoint, blocks))
-
-        # Ensure total sectors is an integral number of sectors per
-        # track or mcopy will complain. Sectors are 512 bytes, and we
-        # generate images with 32 sectors per track. This calculation
-        # is done in blocks, thus the mod by 16 instead of 32. Apply
-        # sector count fix only when needed.
-        if blocks % 16 != 0:
-            blocks += (16 - (blocks % 16))
 
         label_str = "-n boot"
         if self.label:
@@ -319,9 +315,7 @@ class Partition(object):
         """
         Prepare an empty ext2/3/4 partition.
         """
-        dd_cmd = "dd if=/dev/zero of=%s bs=1k seek=%d count=0" % \
-            (rootfs, self.size)
-        exec_cmd(dd_cmd)
+        exec_cmd("truncate %s -s %d" % (rootfs, self.size * 1024))
 
         extra_imagecmd = "-i 8192"
 
@@ -338,9 +332,7 @@ class Partition(object):
         """
         Prepare an empty btrfs partition.
         """
-        dd_cmd = "dd if=/dev/zero of=%s bs=1k seek=%d count=0" % \
-            (rootfs, self.size)
-        exec_cmd(dd_cmd)
+        exec_cmd("truncate %s -s %d" % (rootfs, self.size * 1024))
 
         label_str = ""
         if self.label:
@@ -393,7 +385,7 @@ class Partition(object):
         out = exec_cmd(du_cmd)
         fs_size = out.split()[0]
 
-        self.size = fs_size
+        self.size = int(fs_size)
 
     def prepare_swap_partition(self, cr_workdir, oe_builddir, native_sysroot):
         """
@@ -401,9 +393,7 @@ class Partition(object):
         """
         path = "%s/fs.%s" % (cr_workdir, self.fstype)
 
-        dd_cmd = "dd if=/dev/zero of=%s bs=1k seek=%d count=0" % \
-            (path, self.size)
-        exec_cmd(dd_cmd)
+        exec_cmd("truncate %s -s %d" % (path, self.size * 1024))
 
         import uuid
         label_str = ""

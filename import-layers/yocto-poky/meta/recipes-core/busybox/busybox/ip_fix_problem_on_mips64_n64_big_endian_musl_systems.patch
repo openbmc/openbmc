@@ -1,0 +1,90 @@
+From 4ab372d49a6e82b0bf097dedb96d26330c5f2d5f Mon Sep 17 00:00:00 2001
+From: Szabolcs Nagy <nsz@port70.net>
+Date: Sun, 24 Apr 2016 17:39:02 +0200
+Subject: [PATCH] ip: fix problem on mips64 n64 big endian musl systems
+
+Use designated initializers for struct msghdr.
+The struct layout is non-portable and musl libc does not match what busybox expects.
+
+Signed-off-by: Szabolcs Nagy <nsz@port70.net>
+Tested-by: Waldemar Brodkorb <wbx@openadk.org>
+Signed-off-by: Denys Vlasenko <vda.linux@googlemail.com>
+
+Upstream-Status: Backport
+
+https://git.busybox.net/busybox/commit/?id=4ab372d49a6e82b0bf097dedb96d26330c5f2d5f
+
+Signed-off-by: Armin Kuster <akuster@mvista.com>
+
+---
+ networking/libiproute/libnetlink.c | 37 ++++++++++++++++++++++++-------------
+ 1 file changed, 24 insertions(+), 13 deletions(-)
+
+diff --git a/networking/libiproute/libnetlink.c b/networking/libiproute/libnetlink.c
+index c7533a4..cbb5daf 100644
+--- a/networking/libiproute/libnetlink.c
++++ b/networking/libiproute/libnetlink.c
+@@ -71,11 +71,15 @@ int FAST_FUNC rtnl_dump_request(struct rtnl_handle *rth, int type, void *req, in
+ 	struct nlmsghdr nlh;
+ 	struct sockaddr_nl nladdr;
+ 	struct iovec iov[2] = { { &nlh, sizeof(nlh) }, { req, len } };
++	/* Use designated initializers, struct layout is non-portable */
+ 	struct msghdr msg = {
+-		(void*)&nladdr, sizeof(nladdr),
+-		iov,  2,
+-		NULL, 0,
+-		0
++		.msg_name = (void*)&nladdr,
++		.msg_namelen = sizeof(nladdr),
++		.msg_iov = iov,
++		.msg_iovlen = 2,
++		.msg_control = NULL,
++		.msg_controllen = 0,
++		.msg_flags = 0
+ 	};
+ 
+ 	memset(&nladdr, 0, sizeof(nladdr));
+@@ -104,12 +108,15 @@ static int rtnl_dump_filter(struct rtnl_handle *rth,
+ 	while (1) {
+ 		int status;
+ 		struct nlmsghdr *h;
+-
++		/* Use designated initializers, struct layout is non-portable */
+ 		struct msghdr msg = {
+-			(void*)&nladdr, sizeof(nladdr),
+-			&iov, 1,
+-			NULL, 0,
+-			0
++			.msg_name = (void*)&nladdr,
++			.msg_namelen = sizeof(nladdr),
++			.msg_iov = &iov,
++			.msg_iovlen = 1,
++			.msg_control = NULL,
++			.msg_controllen = 0,
++			.msg_flags = 0
+ 		};
+ 
+ 		status = recvmsg(rth->fd, &msg, 0);
+@@ -211,11 +218,15 @@ int FAST_FUNC rtnl_talk(struct rtnl_handle *rtnl, struct nlmsghdr *n,
+ 	struct sockaddr_nl nladdr;
+ 	struct iovec iov = { (void*)n, n->nlmsg_len };
+ 	char   *buf = xmalloc(8*1024); /* avoid big stack buffer */
++	/* Use designated initializers, struct layout is non-portable */
+ 	struct msghdr msg = {
+-		(void*)&nladdr, sizeof(nladdr),
+-		&iov, 1,
+-		NULL, 0,
+-		0
++		.msg_name = (void*)&nladdr,
++		.msg_namelen = sizeof(nladdr),
++		.msg_iov = &iov,
++		.msg_iovlen = 1,
++		.msg_control = NULL,
++		.msg_controllen = 0,
++		.msg_flags = 0
+ 	};
+ 
+ 	memset(&nladdr, 0, sizeof(nladdr));
+-- 
+2.3.5
+

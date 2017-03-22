@@ -65,22 +65,30 @@ def copytree(src, dst):
     # This way we also preserve hardlinks between files in the tree.
 
     bb.utils.mkdirhier(dst)
-    cmd = 'tar -cf - -C %s -p . | tar -xf - -C %s' % (src, dst)
-    check_output(cmd, shell=True, stderr=subprocess.STDOUT)
+    cmd = "tar --xattrs --xattrs-include='*' -cf - -C %s -p . | tar --xattrs --xattrs-include='*' -xf - -C %s" % (src, dst)
+    subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
 
 def copyhardlinktree(src, dst):
     """ Make the hard link when possible, otherwise copy. """
     bb.utils.mkdirhier(dst)
     if os.path.isdir(src) and not len(os.listdir(src)):
-        return	
+        return
 
     if (os.stat(src).st_dev ==  os.stat(dst).st_dev):
         # Need to copy directories only with tar first since cp will error if two 
         # writers try and create a directory at the same time
-        cmd = 'cd %s; find . -type d -print | tar -cf - -C %s -p --files-from - --no-recursion | tar -xf - -C %s' % (src, src, dst)
-        check_output(cmd, shell=True, stderr=subprocess.STDOUT)
-        cmd = 'cd %s; find . -print0 | cpio --null -pdlu %s' % (src, dst)
-        check_output(cmd, shell=True, stderr=subprocess.STDOUT)
+        cmd = "cd %s; find . -type d -print | tar --xattrs --xattrs-include='*' -cf - -C %s -p --no-recursion --files-from - | tar --xattrs --xattrs-include='*' -xf - -C %s" % (src, src, dst)
+        subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
+        source = ''
+        if os.path.isdir(src):
+            import glob
+            if len(glob.glob('%s/.??*' % src)) > 0:
+                source = '%s/.??* ' % src
+            source = source + '%s/*' % src
+        else:
+            source = src
+        cmd = 'cp -afl --preserve=xattr %s %s' % (source, dst)
+        subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
     else:
         copytree(src, dst)
 
@@ -104,47 +112,6 @@ def symlink(source, destination, force=False):
     except OSError as e:
         if e.errno != errno.EEXIST or os.readlink(destination) != source:
             raise
-
-class CalledProcessError(Exception):
-    def __init__(self, retcode, cmd, output = None):
-        self.retcode = retcode
-        self.cmd = cmd
-        self.output = output
-    def __str__(self):
-        return "Command '%s' returned non-zero exit status %d with output %s" % (self.cmd, self.retcode, self.output)
-
-# Not needed when we move to python 2.7
-def check_output(*popenargs, **kwargs):
-    r"""Run command with arguments and return its output as a byte string.
-
-    If the exit code was non-zero it raises a CalledProcessError.  The
-    CalledProcessError object will have the return code in the returncode
-    attribute and output in the output attribute.
-
-    The arguments are the same as for the Popen constructor.  Example:
-
-    >>> check_output(["ls", "-l", "/dev/null"])
-    'crw-rw-rw- 1 root root 1, 3 Oct 18  2007 /dev/null\n'
-
-    The stdout argument is not allowed as it is used internally.
-    To capture standard error in the result, use stderr=STDOUT.
-
-    >>> check_output(["/bin/sh", "-c",
-    ...               "ls -l non_existent_file ; exit 0"],
-    ...              stderr=STDOUT)
-    'ls: non_existent_file: No such file or directory\n'
-    """
-    if 'stdout' in kwargs:
-        raise ValueError('stdout argument not allowed, it will be overridden.')
-    process = subprocess.Popen(stdout=subprocess.PIPE, *popenargs, **kwargs)
-    output, unused_err = process.communicate()
-    retcode = process.poll()
-    if retcode:
-        cmd = kwargs.get("args")
-        if cmd is None:
-            cmd = popenargs[0]
-        raise CalledProcessError(retcode, cmd, output=output)
-    return output
 
 def find(dir, **walkoptions):
     """ Given a directory, recurses into that directory,

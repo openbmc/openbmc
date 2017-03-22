@@ -1,0 +1,39 @@
+Upstream-Status: Backport [29faa2db]
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+
+
+From 29faa2db44b04b9cf7f4d96e32691f424490c730 Mon Sep 17 00:00:00 2001
+From: Matthias Clasen <mclasen@redhat.com>
+Date: Sun, 11 Sep 2016 11:47:55 -0400
+Subject: [PATCH] Redo focus handling in treeview once more
+
+The fix for bug 767468 had some unintended side-effects. This is
+an attempt at doing the same fix (don't grab focus when we are
+grab-shadowed), while avoiding the breakage, by using GTK+'s
+internal tracking for grab-shadowed-ness.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=770508
+---
+ gtk/gtktreeview.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/gtk/gtktreeview.c b/gtk/gtktreeview.c
+index a7463cc..73d3557 100644
+--- a/gtk/gtktreeview.c
++++ b/gtk/gtktreeview.c
+@@ -3050,11 +3050,10 @@ static void
+ grab_focus_and_unset_draw_keyfocus (GtkTreeView *tree_view)
+ {
+   GtkWidget *widget = GTK_WIDGET (tree_view);
+-  GtkWidget *grab_widget = gtk_grab_get_current ();
+ 
+   if (gtk_widget_get_can_focus (widget) &&
+       !gtk_widget_has_focus (widget) &&
+-      (!grab_widget || grab_widget == widget))
++      !_gtk_widget_get_shadowed (widget))
+     gtk_widget_grab_focus (widget);
+ 
+   tree_view->priv->draw_keyfocus = 0;
+-- 
+2.9.3
+

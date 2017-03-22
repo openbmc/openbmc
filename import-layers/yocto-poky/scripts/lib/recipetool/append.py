@@ -61,7 +61,7 @@ def find_target_file(targetpath, d, pkglist=None):
                       '/etc/gshadow': '/etc/gshadow should be managed through the useradd and extrausers classes',
                       '${sysconfdir}/hostname': '${sysconfdir}/hostname contents should be set by setting hostname_pn-base-files = "value" in configuration',}
 
-    for pthspec, message in invalidtargets.iteritems():
+    for pthspec, message in invalidtargets.items():
         if fnmatch.fnmatchcase(targetpath, d.expand(pthspec)):
             raise InvalidTargetFileError(d.expand(message))
 
@@ -90,7 +90,7 @@ def find_target_file(targetpath, d, pkglist=None):
                             if fnmatch.fnmatchcase(fullpth, targetpath):
                                 recipes[targetpath].append(pn)
                     elif line.startswith('pkg_preinst_') or line.startswith('pkg_postinst_'):
-                        scriptval = line.split(':', 1)[1].strip().decode('string_escape')
+                        scriptval = line.split(':', 1)[1].strip().encode('utf-8').decode('unicode_escape')
                         if 'update-alternatives --install %s ' % targetpath in scriptval:
                             recipes[targetpath].append('?%s' % pn)
                         elif targetpath_re.search(scriptval):
@@ -115,8 +115,7 @@ def _parse_recipe(pn, tinfoil):
         # Error already logged
         return None
     append_files = tinfoil.cooker.collection.get_file_appends(recipefile)
-    rd = oe.recipeutils.parse_recipe(recipefile, append_files,
-                                    tinfoil.config_data)
+    rd = oe.recipeutils.parse_recipe(tinfoil.cooker, recipefile, append_files)
     return rd
 
 def determine_file_source(targetpath, rd):
@@ -152,7 +151,7 @@ def determine_file_source(targetpath, rd):
         # Check patches
         srcpatches = []
         patchedfiles = oe.recipeutils.get_recipe_patched_files(rd)
-        for patch, filelist in patchedfiles.iteritems():
+        for patch, filelist in patchedfiles.items():
             for fileitem in filelist:
                 if fileitem[0] == srcpath:
                     srcpatches.append((patch, fileitem[1]))
@@ -172,7 +171,7 @@ def get_source_path(cmdelements):
     """Find the source path specified within a command"""
     command = cmdelements[0]
     if command in ['install', 'cp']:
-        helptext = subprocess.check_output('LC_ALL=C %s --help' % command, shell=True)
+        helptext = subprocess.check_output('LC_ALL=C %s --help' % command, shell=True).decode('utf-8')
         argopts = ''
         argopt_line_re = re.compile('^-([a-zA-Z0-9]), --[a-z-]+=')
         for line in helptext.splitlines():
@@ -270,7 +269,7 @@ def appendfile(args):
     postinst_pns = []
 
     selectpn = None
-    for targetpath, pnlist in recipes.iteritems():
+    for targetpath, pnlist in recipes.items():
         for pn in pnlist:
             if pn.startswith('?'):
                 alternative_pns.append(pn[1:])
@@ -351,7 +350,7 @@ def appendsrc(args, files, rd, extralines=None):
 
     copyfiles = {}
     extralines = extralines or []
-    for newfile, srcfile in files.iteritems():
+    for newfile, srcfile in files.items():
         src_destdir = os.path.dirname(srcfile)
         if not args.use_workdir:
             if rd.getVar('S', True) == rd.getVar('STAGING_KERNEL_DIR', True):

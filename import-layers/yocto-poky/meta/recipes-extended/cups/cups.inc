@@ -3,13 +3,13 @@ SECTION = "console/utils"
 LICENSE = "GPLv2 & LGPLv2"
 DEPENDS = "gnutls libpng jpeg dbus dbus-glib zlib libusb"
 
-SRC_URI = "https://www.cups.org/software/${PV}/${BP}-source.tar.bz2 \
+SRC_URI = "https://github.com/apple/cups/releases/download/release-${PV}/${BP}-source.tar.gz \
            file://use_echo_only_in_init.patch \
            file://0001-don-t-try-to-run-generated-binaries.patch \
            file://cups_serverbin.patch \
 	  "
 
-UPSTREAM_CHECK_URI = "http://www.cups.org/software.php"
+UPSTREAM_CHECK_URI = "https://github.com/apple/cups/releases"
 UPSTREAM_CHECK_REGEX = "cups-(?P<pver>\d+\.\d+(\.\d+)?)-source.tar"
 
 LEAD_SONAME = "libcupsdriver.so"
@@ -44,6 +44,7 @@ EXTRA_OECONF = " \
                --without-perl \
                --without-python \
                --without-java \
+               DSOFLAGS='${LDFLAGS}' \
                "
 
 EXTRA_AUTORECONF += "--exclude=autoheader"

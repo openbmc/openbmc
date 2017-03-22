@@ -1,0 +1,45 @@
+From 005bd11809a1ce65e9f2c28e884354a4741650b9 Mon Sep 17 00:00:00 2001
+From: Andre McCurdy <armccurdy@gmail.com>
+Date: Tue, 13 Dec 2016 11:29:55 +0800
+Subject: [PATCH] make ld-XXX.so strlen intercept optional
+
+Hack: Depending on how glibc was compiled (e.g. optimised for size or
+built with _FORTIFY_SOURCE enabled) the strlen symbol might not be
+found in ld-XXX.so. Therefore although we should still try to
+intercept it, don't make it mandatory to do so.
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ coregrind/m_redir.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/coregrind/m_redir.c b/coregrind/m_redir.c
+index ff35009..d7d6816 100644
+--- a/coregrind/m_redir.c
++++ b/coregrind/m_redir.c
+@@ -1275,7 +1275,18 @@ static void add_hardwired_spec (const  HChar* sopatt, const HChar* fnpatt,
+    spec->to_addr     = to_addr;
+    spec->isWrap      = False;
+    spec->isGlobal    = False;
+-   spec->mandatory   = mandatory;
++
++   /* Hack: Depending on how glibc was compiled (e.g. optimised for size or
++      built with _FORTIFY_SOURCE enabled) the strlen symbol might not be found.
++      Therefore although we should still try to intercept it, don't make it
++      mandatory to do so. We over-ride "mandatory" here to avoid the need to
++      patch the many different architecture specific callers to
++      add_hardwired_spec(). */
++   if (0==VG_(strcmp)("strlen", fnpatt))
++      spec->mandatory = NULL;
++   else
++      spec->mandatory = mandatory;
++
+    /* VARIABLE PARTS */
+    spec->mark        = False; /* not significant */
+    spec->done        = False; /* not significant */
+-- 
+1.9.1
+

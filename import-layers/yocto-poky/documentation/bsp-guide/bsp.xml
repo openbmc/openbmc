@@ -1467,20 +1467,19 @@
 	     5) MIPS    (32-bit)
 	     6) MIPS64  (64-bit)
      3
-     Would you like to use the default (4.1) kernel? (y/n) [default: y]
+     Would you like to use the default (4.8) kernel? (y/n) [default: y]
      Do you need a new machine branch for this BSP (the alternative is to re-use an existing branch)? [y/n] [default: y]
-     Getting branches from remote repo git://git.yoctoproject.org/linux-yocto-4.1.git...
-     Please choose a machine branch to base your new BSP branch on: [default: standard/base]
+     Getting branches from remote repo git://git.yoctoproject.org/linux-yocto-4.8.git...
+     Please choose a machine branch to base this BSP on: [default: standard/base]
 	     1) standard/arm-versatile-926ejs
 	     2) standard/base
-	     3) standard/beagleboard
-	     4) standard/beaglebone
-	     5) standard/edgerouter
-	     6) standard/fsl-mpc8315e-rdb
-	     7) standard/mti-malta32
-	     8) standard/mti-malta64
-	     9) standard/qemuarm64
-	     10) standard/qemuppc
+	     3) standard/beaglebone
+	     4) standard/edgerouter
+	     5) standard/fsl-mpc8315e-rdb
+	     6) standard/mti-malta32
+	     7) standard/mti-malta64
+	     8) standard/qemuarm64
+	     9) standard/qemuppc
      1
      Would you like SMP support? (y/n) [default: y]
      Does your BSP have a touchscreen? (y/n) [default: n]
@@ -1495,7 +1494,7 @@
                             In the example, we use the ARM architecture.
                             </para></listitem>
                         <listitem><para>The script then prompts you for the kernel.
-                            The default 4.4 kernel is acceptable.
+                            The default 4.8 kernel is acceptable.
                             So, the example accepts the default.
                             If you enter 'n', the script prompts you to further enter the kernel
                             you do want to use.</para></listitem>

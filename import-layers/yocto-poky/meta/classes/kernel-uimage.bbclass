@@ -14,8 +14,7 @@ python __anonymous () {
         if d.getVar("KEEPUIMAGE", True) != 'yes':
             typeformake = d.getVar("KERNEL_IMAGETYPE_FOR_MAKE", True) or ""
             if "uImage" in typeformake.split():
-                typeformake.replace('uImage', 'vmlinux')
-            d.setVar('KERNEL_IMAGETYPE_FOR_MAKE', typeformake)
+                d.setVar('KERNEL_IMAGETYPE_FOR_MAKE', typeformake.replace('uImage', 'vmlinux'))
 }
 
 do_uboot_mkimage() {

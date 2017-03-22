@@ -1,0 +1,41 @@
+Backport patch to fix build with gold linker.
+
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Upstream-Status: Backport
+
+
+
+From 93a7113485cf1c55fd7076116faf5b3a690706b2 Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Tue, 30 Aug 2016 17:17:28 +0300
+Subject: [PATCH] cmake: Link test utils with "-ldl"
+
+Without this linking CXX executables (e.g. fbo-blit-stretch) fails
+with gold linker:
+
+| libpiglitutil_gl.so.0: error: undefined reference to 'dlsym'
+| libpiglitutil_gl.so.0: error: undefined reference to 'dlerror'
+| libpiglitutil_gl.so.0: error: undefined reference to 'dlopen'
+
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Reviewed-by: Emil Velikov <emil.velikov@collabora.com>
+---
+ tests/util/CMakeLists.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/tests/util/CMakeLists.txt b/tests/util/CMakeLists.txt
+index e1f8073..3d5bef5 100644
+--- a/tests/util/CMakeLists.txt
++++ b/tests/util/CMakeLists.txt
+@@ -11,6 +11,8 @@ set_source_files_properties(
+ 	PROPERTIES GENERATED 1
+ 	)
+ 
++link_libraries(${CMAKE_DL_LIBS})
++
+ if(HAVE_LIBCACA)
+     link_libraries(caca)
+ endif()
+-- 
+2.9.3
+

@@ -7,8 +7,8 @@ Upstream-Status: Pending
 
 Index: git/elfparser.h
 ===================================================================
---- git.orig/elfparser.h	2011-07-16 18:57:41.000000000 -0700
-+++ git/elfparser.h	2011-07-16 20:28:54.733829895 -0700
+--- git.orig/lib/util/elfparser.h	2011-07-16 18:57:41.000000000 -0700
++++ git/lib/util/elfparser.h	2011-07-16 20:28:54.733829895 -0700
 @@ -17,6 +17,10 @@
   */
  #include <glib.h>

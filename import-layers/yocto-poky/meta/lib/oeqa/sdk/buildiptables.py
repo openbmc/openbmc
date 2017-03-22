@@ -8,7 +8,7 @@ class BuildIptablesTest(oeSDKTest):
     @classmethod
     def setUpClass(self):
         self.project = SDKBuildProject(oeSDKTest.tc.sdktestdir + "/iptables/", oeSDKTest.tc.sdkenv, oeSDKTest.tc.d,
-                        "http://netfilter.org/projects/iptables/files/iptables-1.4.13.tar.bz2")
+                        "http://downloads.yoctoproject.org/mirror/sources/iptables-1.4.13.tar.bz2")
         self.project.download_archive()
 
     def test_iptables(self):

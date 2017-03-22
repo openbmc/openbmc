@@ -135,7 +135,7 @@ class VariableParse:
                     self.contains[k] = parser.contains[k].copy()
                 else:
                     self.contains[k].update(parser.contains[k])
-            value = utils.better_eval(codeobj, DataContext(self.d))
+            value = utils.better_eval(codeobj, DataContext(self.d), {'d' : self.d})
             return str(value)
 
 
@@ -372,7 +372,7 @@ class DataSmart(MutableMapping):
 
     def expandWithRefs(self, s, varname):
 
-        if not isinstance(s, basestring): # sanity check
+        if not isinstance(s, str): # sanity check
             return VariableParse(varname, self, s)
 
         if varname and varname in self.expand_cache:
@@ -397,8 +397,7 @@ class DataSmart(MutableMapping):
             except bb.parse.SkipRecipe:
                 raise
             except Exception as exc:
-                exc_class, exc, tb = sys.exc_info()
-                raise ExpansionError, ExpansionError(varname, s, exc), tb
+                raise ExpansionError(varname, s, exc) from exc
 
         varparse.value = s
 
@@ -749,13 +748,14 @@ class DataSmart(MutableMapping):
                 if match:
                     removes.extend(self.expand(r).split())
 
-            filtered = filter(lambda v: v not in removes,
-                              value.split())
-            value = " ".join(filtered)
-            if expand and var in self.expand_cache:
-                 # We need to ensure the expand cache has the correct value
-                 # flag == "_content" here
-                self.expand_cache[var].value = value
+            if removes:
+                filtered = filter(lambda v: v not in removes,
+                                  value.split())
+                value = " ".join(filtered)
+                if expand and var in self.expand_cache:
+                    # We need to ensure the expand cache has the correct value
+                    # flag == "_content" here
+                    self.expand_cache[var].value = value
         return value
 
     def delVarFlag(self, var, flag, **loginfo):
@@ -917,7 +917,7 @@ class DataSmart(MutableMapping):
              yield k
 
     def __len__(self):
-        return len(frozenset(self))
+        return len(frozenset(iter(self)))
 
     def __getitem__(self, item):
         value = self.getVar(item, False)
@@ -966,4 +966,4 @@ class DataSmart(MutableMapping):
                     data.update({i:value})
 
         data_str = str([(k, data[k]) for k in sorted(data.keys())])
-        return hashlib.md5(data_str).hexdigest()
+        return hashlib.md5(data_str.encode("utf-8")).hexdigest()

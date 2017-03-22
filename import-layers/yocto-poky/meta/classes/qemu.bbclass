@@ -4,6 +4,11 @@
 #
 
 def qemu_target_binary(data):
+    package_arch = data.getVar("PACKAGE_ARCH", True)
+    qemu_target_binary = (data.getVar("QEMU_TARGET_BINARY_%s" % package_arch, True) or "")
+    if qemu_target_binary:
+        return qemu_target_binary
+
     target_arch = data.getVar("TARGET_ARCH", True)
     if target_arch in ("i486", "i586", "i686"):
         target_arch = "i386"

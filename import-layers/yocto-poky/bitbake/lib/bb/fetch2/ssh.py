@@ -114,12 +114,10 @@ class SSH(FetchMethod):
             fr = host
         fr += ':%s' % path
 
-
-        import commands
         cmd = 'scp -B -r %s %s %s/' % (
             portarg,
-            commands.mkarg(fr),
-            commands.mkarg(dldir)
+            fr,
+            dldir
         )
 
         bb.fetch2.check_network_access(d, cmd, urldata.url)

@@ -1,7 +1,7 @@
-From 6a41635e29c4a6c064b1f66e79a8fe2026f4361b Mon Sep 17 00:00:00 2001
+From 18a7ae169e8d55ace683357d1de6b07e4fdf797a Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:32:49 +0000
-Subject: [PATCH 05/14] Explicitly link with libm on uclibc
+Subject: [PATCH 05/13] Explicitly link with libm on uclibc
 
 Description:
 
@@ -31,7 +31,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 6 insertions(+)
 
 diff --git a/gas/configure.tgt b/gas/configure.tgt
-index 0b490d4..086e0d2 100644
+index e2df659..1b9fd99 100644
 --- a/gas/configure.tgt
 +++ b/gas/configure.tgt
 @@ -487,6 +487,12 @@ case ${generic_target} in
@@ -48,5 +48,5 @@ index 0b490d4..086e0d2 100644
    aarch64 | alpha | arm | i386 | ia64 | microblaze | mips | ns32k | or1k | or1knd | pdp11 | ppc | sparc | z80 | z8k)
      bfd_gas=yes
 -- 
-2.7.1
+2.9.0
 

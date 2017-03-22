@@ -3,7 +3,7 @@ import sys
 import errno
 import datetime
 import itertools
-from commands import runCmd
+from .commands import runCmd
 
 def get_host_dumper(d):
     cmds = d.getVar("testimage_dump_host", True)

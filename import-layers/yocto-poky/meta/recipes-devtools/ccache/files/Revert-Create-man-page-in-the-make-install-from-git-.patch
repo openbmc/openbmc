@@ -1,0 +1,33 @@
+From 94fabcdda5c7e54ccdbc1f0aeccb26ce30e61226 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Mon, 18 Jul 2016 19:53:00 -0700
+Subject: [PATCH] Revert "Create man page in the make-install-from-git-repo
+ case"
+
+This reverts commit b86784902d28defd5e475c8922de594787df4541.
+
+We dont' have asciidoc, so revert it.
+
+Upstream-Status: Inappropriate [OE-Core specific]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index d474f2a..c6cdc04 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -76,7 +76,7 @@ ccache$(EXEEXT): $(ccache_objs) $(extra_libs)
+ 	$(CC) $(all_cflags) -o $@ $(ccache_objs) $(LDFLAGS) $(extra_libs) $(LIBS)
+ 
+ .PHONY: install
+-install: all $(srcdir)/ccache.1
++install: all
+ 	$(installcmd) -d $(DESTDIR)$(bindir)
+ 	$(installcmd) -m 755 ccache$(EXEEXT) $(DESTDIR)$(bindir)
+ 	$(installcmd) -d $(DESTDIR)$(mandir)/man1
+-- 
+2.9.0
+

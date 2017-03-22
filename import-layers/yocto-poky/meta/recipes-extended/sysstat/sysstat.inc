@@ -14,6 +14,7 @@ UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)\.tar"
 
 DEPENDS += "base-passwd"
 
+# autotools-brokensep as this package doesn't use automake
 inherit autotools-brokensep gettext systemd
 
 EXTRA_OECONF += "--disable-sensors"

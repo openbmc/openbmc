@@ -1,14 +1,12 @@
 # ex:ts=4:sw=4:sts=4:et
 # -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 """
-BitBake 'Fetch' implementations
-
-Classes for obtaining upstream sources for the
-BitBake build tools.
+BitBake 'Fetch' implementation for perforce
 
 """
 
 # Copyright (C) 2003, 2004  Chris Larson
+# Copyright (C) 2016 Kodak Alaris, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as
@@ -25,9 +23,7 @@ BitBake build tools.
 #
 # Based on functions from the base bb module, Copyright 2003 Holger Schurig
 
-from future_builtins import zip
 import os
-import subprocess
 import logging
 import bb
 from   bb import data
@@ -37,151 +33,178 @@ from   bb.fetch2 import logger
 from   bb.fetch2 import runfetchcmd
 
 class Perforce(FetchMethod):
+    """ Class to fetch from perforce repositories """
     def supports(self, ud, d):
+        """ Check to see if a given url can be fetched with perforce. """
         return ud.type in ['p4']
 
-    def doparse(url, d):
-        parm = {}
-        path = url.split("://")[1]
-        delim = path.find("@");
-        if delim != -1:
-            (user, pswd, host, port) = path.split('@')[0].split(":")
-            path = path.split('@')[1]
-        else:
-            (host, port) = d.getVar('P4PORT', False).split(':')
-            user = ""
-            pswd = ""
-
-        if path.find(";") != -1:
-            keys=[]
-            values=[]
-            plist = path.split(';')
-            for item in plist:
-                if item.count('='):
-                    (key, value) = item.split('=')
-                    keys.append(key)
-                    values.append(value)
-
-            parm = dict(zip(keys, values))
-        path = "//" + path.split(';')[0]
-        host += ":%s" % (port)
-        parm["cset"] = Perforce.getcset(d, path, host, user, pswd, parm)
-
-        return host, path, user, pswd, parm
-    doparse = staticmethod(doparse)
-
-    def getcset(d, depot, host, user, pswd, parm):
-        p4opt = ""
-        if "cset" in parm:
-            return parm["cset"];
-        if user:
-            p4opt += " -u %s" % (user)
-        if pswd:
-            p4opt += " -P %s" % (pswd)
-        if host:
-            p4opt += " -p %s" % (host)
-
-        p4date = d.getVar("P4DATE", True)
-        if "revision" in parm:
-            depot += "#%s" % (parm["revision"])
-        elif "label" in parm:
-            depot += "@%s" % (parm["label"])
-        elif p4date:
-            depot += "@%s" % (p4date)
-
-        p4cmd = d.getVar('FETCHCMD_p4', True) or "p4"
-        logger.debug(1, "Running %s%s changes -m 1 %s", p4cmd, p4opt, depot)
-        p4file, errors = bb.process.run("%s%s changes -m 1 %s" % (p4cmd, p4opt, depot))
-        cset = p4file.strip()
-        logger.debug(1, "READ %s", cset)
-        if not cset:
-            return -1
-
-        return cset.split(' ')[1]
-    getcset = staticmethod(getcset)
-
     def urldata_init(self, ud, d):
-        (host, path, user, pswd, parm) = Perforce.doparse(ud.url, d)
-
-        base_path = path.replace('/...', '')
-        base_path = self._strip_leading_slashes(base_path)
-        
-        if "label" in parm:
-            version = parm["label"]
-        else:
-            version = Perforce.getcset(d, path, host, user, pswd, parm)
-
-        ud.localfile = data.expand('%s+%s+%s.tar.gz' % (host, base_path.replace('/', '.'), version), d)
-
-    def download(self, ud, d):
         """
-        Fetch urls
+        Initialize perforce specific variables within url data.  If P4CONFIG is
+        provided by the env, use it.  If P4PORT is specified by the recipe, use
+        its values, which may override the settings in P4CONFIG.
         """
+        ud.basecmd = d.getVar('FETCHCMD_p4', True)
+        if not ud.basecmd:
+            ud.basecmd = "/usr/bin/env p4"
 
-        (host, depot, user, pswd, parm) = Perforce.doparse(ud.url, d)
+        ud.dldir = d.getVar('P4DIR', True)
+        if not ud.dldir:
+            ud.dldir = '%s/%s' % (d.getVar('DL_DIR', True), 'p4')
 
-        if depot.find('/...') != -1:
-            path = depot[:depot.find('/...')]
+        path = ud.url.split('://')[1]
+        path = path.split(';')[0]
+        delim = path.find('@');
+        if delim != -1:
+            (ud.user, ud.pswd) = path.split('@')[0].split(':')
+            ud.path = path.split('@')[1]
         else:
-            path = depot[:depot.rfind('/')]
+            ud.path = path
 
-        module = parm.get('module', os.path.basename(path))
+        ud.usingp4config = False
+        p4port = d.getVar('P4PORT', True)
 
-        # Get the p4 command
+        if p4port:
+            logger.debug(1, 'Using recipe provided P4PORT: %s' % p4port)
+            ud.host = p4port
+        else:
+            logger.debug(1, 'Trying to use P4CONFIG to automatically set P4PORT...')
+            ud.usingp4config = True
+            p4cmd = '%s info | grep "Server address"' % ud.basecmd
+            bb.fetch2.check_network_access(d, p4cmd)
+            ud.host = runfetchcmd(p4cmd, d, True)
+            ud.host = ud.host.split(': ')[1].strip()
+            logger.debug(1, 'Determined P4PORT to be: %s' % ud.host)
+            if not ud.host:
+                raise FetchError('Could not determine P4PORT from P4CONFIG')
+	
+        if ud.path.find('/...') >= 0:
+            ud.pathisdir = True
+        else:
+            ud.pathisdir = False
+
+        cleanedpath = ud.path.replace('/...', '').replace('/', '.')
+        cleanedhost = ud.host.replace(':', '.')
+        ud.pkgdir = os.path.join(ud.dldir, cleanedhost, cleanedpath)
+
+        ud.setup_revisons(d)
+
+        ud.localfile = data.expand('%s_%s_%s.tar.gz' % (cleanedhost, cleanedpath, ud.revision), d)
+
+    def _buildp4command(self, ud, d, command, depot_filename=None):
+        """
+        Build a p4 commandline.  Valid commands are "changes", "print", and
+        "files".  depot_filename is the full path to the file in the depot
+        including the trailing '#rev' value.
+        """
         p4opt = ""
-        if user:
-            p4opt += " -u %s" % (user)
 
-        if pswd:
-            p4opt += " -P %s" % (pswd)
+        if ud.user:
+            p4opt += ' -u "%s"' % (ud.user)
 
-        if host:
-            p4opt += " -p %s" % (host)
+        if ud.pswd:
+            p4opt += ' -P "%s"' % (ud.pswd)
 
-        p4cmd = d.getVar('FETCHCMD_p4', True) or "p4"
+        if ud.host and not ud.usingp4config:
+            p4opt += ' -p %s' % (ud.host)
 
-        # create temp directory
-        logger.debug(2, "Fetch: creating temporary directory")
-        bb.utils.mkdirhier(d.expand('${WORKDIR}'))
-        mktemp = d.getVar("FETCHCMD_p4mktemp", True) or d.expand("mktemp -d -q '${WORKDIR}/oep4.XXXXXX'")
-        tmpfile, errors = bb.process.run(mktemp)
-        tmpfile = tmpfile.strip()
-        if not tmpfile:
-            raise FetchError("Fetch: unable to create temporary directory.. make sure 'mktemp' is in the PATH.", ud.url)
-
-        if "label" in parm:
-            depot = "%s@%s" % (depot, parm["label"])
+        if hasattr(ud, 'revision') and ud.revision:
+            pathnrev = '%s@%s' % (ud.path, ud.revision)
         else:
-            cset = Perforce.getcset(d, depot, host, user, pswd, parm)
-            depot = "%s@%s" % (depot, cset)
+            pathnrev = '%s' % (ud.path)
 
-        os.chdir(tmpfile)
-        logger.info("Fetch " + ud.url)
-        logger.info("%s%s files %s", p4cmd, p4opt, depot)
-        p4file, errors = bb.process.run("%s%s files %s" % (p4cmd, p4opt, depot))
-        p4file = [f.rstrip() for f in p4file.splitlines()]
+        if depot_filename:
+            if ud.pathisdir: # Remove leading path to obtain filename
+                filename = depot_filename[len(ud.path)-1:]
+            else:
+                filename = depot_filename[depot_filename.rfind('/'):]
+            filename = filename[:filename.find('#')] # Remove trailing '#rev'
 
-        if not p4file:
-            raise FetchError("Fetch: unable to get the P4 files from %s" % depot, ud.url)
+        if command == 'changes':
+            p4cmd = '%s%s changes -m 1 //%s' % (ud.basecmd, p4opt, pathnrev)
+        elif command == 'print':
+            if depot_filename != None:
+                p4cmd = '%s%s print -o "p4/%s" "%s"' % (ud.basecmd, p4opt, filename, depot_filename)
+            else:
+                raise FetchError('No depot file name provided to p4 %s' % command, ud.url)
+        elif command == 'files':
+            p4cmd = '%s%s files //%s' % (ud.basecmd, p4opt, pathnrev)
+        else:
+            raise FetchError('Invalid p4 command %s' % command, ud.url)
+
+        return p4cmd
+
+    def _p4listfiles(self, ud, d):
+        """
+        Return a list of the file names which are present in the depot using the
+        'p4 files' command, including trailing '#rev' file revision indicator
+        """
+        p4cmd = self._buildp4command(ud, d, 'files')
+        bb.fetch2.check_network_access(d, p4cmd)
+        p4fileslist = runfetchcmd(p4cmd, d, True)
+        p4fileslist = [f.rstrip() for f in p4fileslist.splitlines()]
+
+        if not p4fileslist:
+            raise FetchError('Unable to fetch listing of p4 files from %s@%s' % (ud.host, ud.path))
 
         count = 0
+        filelist = []
 
-        for file in p4file:
-            list = file.split()
-
-            if list[2] == "delete":
+        for filename in p4fileslist:
+            item = filename.split(' - ')
+            lastaction = item[1].split()
+            logger.debug(1, 'File: %s Last Action: %s' % (item[0], lastaction[0]))
+            if lastaction[0] == 'delete':
                 continue
+            filelist.append(item[0])
 
-            dest = list[0][len(path)+1:]
-            where = dest.find("#")
+        return filelist
 
-            subprocess.call("%s%s print -o %s/%s %s" % (p4cmd, p4opt, module, dest[:where], list[0]), shell=True)
-            count = count + 1
+    def download(self, ud, d):
+        """ Get the list of files, fetch each one """
+        filelist = self._p4listfiles(ud, d)
+        if not filelist:
+            raise FetchError('No files found in depot %s@%s' % (ud.host, ud.path))
 
-        if count == 0:
-            logger.error()
-            raise FetchError("Fetch: No files gathered from the P4 fetch", ud.url)
+        bb.utils.remove(ud.pkgdir, True)
+        bb.utils.mkdirhier(ud.pkgdir)
 
-        runfetchcmd("tar -czf %s %s" % (ud.localpath, module), d, cleanup = [ud.localpath])
-        # cleanup
-        bb.utils.prunedir(tmpfile)
+        for afile in filelist:
+            p4fetchcmd = self._buildp4command(ud, d, 'print', afile)
+            bb.fetch2.check_network_access(d, p4fetchcmd)
+            runfetchcmd(p4fetchcmd, d, workdir=ud.pkgdir)
+
+        runfetchcmd('tar -czf %s p4' % (ud.localpath), d, cleanup=[ud.localpath], workdir=ud.pkgdir)
+
+    def clean(self, ud, d):
+        """ Cleanup p4 specific files and dirs"""
+        bb.utils.remove(ud.localpath)
+        bb.utils.remove(ud.pkgdir, True)
+
+    def supports_srcrev(self):
+        return True
+
+    def _revision_key(self, ud, d, name):
+        """ Return a unique key for the url """
+        return 'p4:%s' % ud.pkgdir
+
+    def _latest_revision(self, ud, d, name):
+        """ Return the latest upstream scm revision number """
+        p4cmd = self._buildp4command(ud, d, "changes")
+        bb.fetch2.check_network_access(d, p4cmd)
+        tip = runfetchcmd(p4cmd, d, True)
+
+        if not tip:
+            raise FetchError('Could not determine the latest perforce changelist')
+
+        tipcset = tip.split(' ')[1]
+        logger.debug(1, 'p4 tip found to be changelist %s' % tipcset)
+        return tipcset
+
+    def sortable_revision(self, ud, d, name):
+        """ Return a sortable revision number """
+        return False, self._build_revision(ud, d)
+
+    def _build_revision(self, ud, d):
+        return ud.revision
+

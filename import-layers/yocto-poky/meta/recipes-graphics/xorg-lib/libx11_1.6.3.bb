@@ -5,6 +5,8 @@ BBCLASSEXTEND = "native nativesdk"
 
 SRC_URI += "file://disable_tests.patch \
             file://libX11-Add-missing-NULL-check.patch \
+            file://CVE-2016-7942.patch \
+            file://CVE-2016-7943.patch \
            "
 
 SRC_URI[md5sum] = "2e36b73f8a42143142dda8129f02e4e0"

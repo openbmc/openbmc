@@ -384,9 +384,10 @@
 
             <para>
                 The resulting <filename>.config</filename> file is
-                located in
-                <filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-WORKDIR'><filename>WORKDIR</filename></ulink><filename>}</filename> under the
-                <filename>linux-${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-PACKAGE_ARCH'><filename>PACKAGE_ARCH</filename></ulink><filename>}-${<ulink url='&YOCTO_DOCS_REF_URL;#var-LINUX_KERNEL_TYPE'><filename>LINUX_KERNEL_TYPE</filename></ulink>}-build</filename> directory.
+                located in the build directory,
+                <filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-B'><filename>B</filename></ulink><filename>}</filename>,
+                which expands to
+                <filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-WORKDIR'><filename>WORKDIR</filename></ulink><filename>}</filename><filename>/linux-</filename><filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-PACKAGE_ARCH'><filename>PACKAGE_ARCH</filename></ulink><filename>}-${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-LINUX_KERNEL_TYPE'><filename>LINUX_KERNEL_TYPE</filename></ulink><filename>}-build</filename>.
                 You can use the entire <filename>.config</filename> file as the
                 <filename>defconfig</filename> file as described in the
                 "<link linkend='changing-the-configuration'>Changing the Configuration</link>" section.
@@ -394,6 +395,16 @@
                 see the
                 "<ulink url='&YOCTO_DOCS_DEV_URL;#using-menuconfig'>Using <filename>menuconfig</filename></ulink>"
                 section in the Yocto Project Development Manual.
+                <note>
+                    You can determine what a variable expands to by looking
+                    at the output of the <filename>bitbake -e</filename>
+                    command:
+                    <literallayout class='monospaced'>
+     $ bitbake -e virtual/kernel
+                    </literallayout>
+                    Search the output for the variable in which you are
+                    interested to see exactly how it is expanded and used.
+                </note>
             </para>
 
             <para>
@@ -512,8 +523,14 @@
                 </literallayout>
                 Taking this step ensures you have the sources prepared
                 and the configuration completed.
-                You can find the sources in the
-                <filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-WORKDIR'><filename>WORKDIR</filename></ulink><filename>}/linux</filename> directory.
+                You can find the sources in the build directory within the
+                <filename>source/</filename> directory, which is a symlink
+                (i.e. <filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-B'><filename>B</filename></ulink><filename>}/source</filename>).
+                The <filename>source/</filename> directory expands to
+                <filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-WORKDIR'><filename>WORKDIR</filename></ulink><filename>}</filename><filename>/linux-</filename><filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-PACKAGE_ARCH'><filename>PACKAGE_ARCH</filename></ulink><filename>}-${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-LINUX_KERNEL_TYPE'><filename>LINUX_KERNEL_TYPE</filename></ulink><filename>}-build/source</filename>.
+                The directory pointed to by the
+                <filename>source/</filename> symlink is also known as
+                <filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-STAGING_KERNEL_DIR'><filename>STAGING_KERNEL_DIR</filename></ulink><filename>}</filename>.
             </para>
 
             <para>

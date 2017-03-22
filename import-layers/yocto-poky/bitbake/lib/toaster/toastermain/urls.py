@@ -71,7 +71,7 @@ import os
 currentdir = os.path.dirname(__file__)
 for t in os.walk(os.path.dirname(currentdir)):
     #if we have a virtualenv skip it to avoid incorrect imports
-    if os.environ.has_key('VIRTUAL_ENV') and os.environ['VIRTUAL_ENV'] in t[0]:
+    if 'VIRTUAL_ENV' in os.environ and os.environ['VIRTUAL_ENV'] in t[0]:
         continue
 
     if "urls.py" in t[2] and t[0] != currentdir:
@@ -84,7 +84,7 @@ for t in os.walk(os.path.dirname(currentdir)):
         if not conflict:
             urlpatterns.insert(0, url(r'^' + modulename + '/', include ( modulename + '.urls')))
         else:
-            logger.warn("Module \'%s\' has a regexp conflict, was not added to the urlpatterns" % modulename)
+            logger.warning("Module \'%s\' has a regexp conflict, was not added to the urlpatterns" % modulename)
 
 from pprint import pformat
 #logger.debug("urlpatterns list %s", pformat(urlpatterns))

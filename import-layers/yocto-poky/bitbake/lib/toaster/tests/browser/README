@@ -4,15 +4,16 @@ These tests require Selenium to be installed in your Python environment.
 
 The simplest way to install this is via pip:
 
-  pip install selenium
+  pip install selenium==2.53.2
 
-Alternatively, if you used pip to install the libraries required by Toaster,
-selenium will already be installed.
+Note that if you use other versions of Selenium, some of the tests (such as
+tests.browser.test_js_unit_tests.TestJsUnitTests) may fail, as these rely on
+a Selenium test report with a version-specific format.
 
 To run tests against Chrome:
 
 * Download chromedriver for your host OS from
-  https://code.google.com/p/chromedriver/downloads/list
+  https://sites.google.com/a/chromium.org/chromedriver/downloads
 * On *nix systems, put chromedriver on PATH
 * On Windows, put chromedriver.exe in the same directory as chrome.exe
 
@@ -23,15 +24,30 @@ To run tests against PhantomJS (headless):
 * On *nix systems, put phantomjs on PATH
 * Not tested on Windows
 
-Firefox should work without requiring additional software to be installed.
+To run tests against Firefox, you may need to install the Marionette driver,
+depending on how new your version of Firefox is. One clue that you need to do
+this is if you see an exception like:
 
-The test case will instantiate a Selenium driver set by the
+  selenium.common.exceptions.WebDriverException: Message: The browser
+  appears to have exited before we could connect. If you specified
+  a log_file in the FirefoxBinary constructor, check it for details.
+
+See https://developer.mozilla.org/en-US/docs/Mozilla/QA/Marionette/WebDriver
+for installation instructions. Ensure that the Marionette executable (renamed
+as wires on Linux or wires.exe on Windows) is on your PATH; and use "marionette"
+as the browser string passed via TOASTER_TESTS_BROWSER (see below).
+
+(Note: The Toaster tests have been checked against Firefox 47 with the
+Marionette driver.)
+
+The test cases will instantiate a Selenium driver set by the
 TOASTER_TESTS_BROWSER environment variable, or Chrome if this is not specified.
 
 Available drivers:
 
 * chrome (default)
 * firefox
+* marionette (for newer Firefoxes)
 * ie
 * phantomjs
 

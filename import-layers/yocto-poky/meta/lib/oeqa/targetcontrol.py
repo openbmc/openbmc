@@ -43,9 +43,7 @@ def get_target_controller(d):
         return controller(d)
 
 
-class BaseTarget(object):
-
-    __metaclass__ = ABCMeta
+class BaseTarget(object, metaclass=ABCMeta):
 
     supported_image_fstypes = []
 
@@ -68,7 +66,7 @@ class BaseTarget(object):
         bb.note("SSH log file: %s" %  self.sshlog)
 
     @abstractmethod
-    def start(self, params=None, ssh=True):
+    def start(self, params=None, ssh=True, extra_bootparams=None):
         pass
 
     @abstractmethod
@@ -121,12 +119,17 @@ class QemuTarget(BaseTarget):
 
         self.image_fstype = self.get_image_fstype(d)
         self.qemulog = os.path.join(self.testdir, "qemu_boot_log.%s" % self.datetime)
-        self.origrootfs = os.path.join(d.getVar("DEPLOY_DIR_IMAGE", True),  d.getVar("IMAGE_LINK_NAME", True) + '.' + self.image_fstype)
-        self.rootfs = os.path.join(self.testdir, d.getVar("IMAGE_LINK_NAME", True) + '-testimage.' + self.image_fstype)
+        self.rootfs = os.path.join(d.getVar("DEPLOY_DIR_IMAGE", True),  d.getVar("IMAGE_LINK_NAME", True) + '.' + self.image_fstype)
         self.kernel = os.path.join(d.getVar("DEPLOY_DIR_IMAGE", True), d.getVar("KERNEL_IMAGETYPE", False) + '-' + d.getVar('MACHINE', False) + '.bin')
         dump_target_cmds = d.getVar("testimage_dump_target", True)
         dump_host_cmds = d.getVar("testimage_dump_host", True)
         dump_dir = d.getVar("TESTIMAGE_DUMP_DIR", True)
+        if d.getVar("QEMU_USE_KVM", False) is not None \
+           and d.getVar("QEMU_USE_KVM", False) == "True" \
+           and "x86" in d.getVar("MACHINE", True):
+            use_kvm = True
+        else:
+            use_kvm = False
 
         # Log QemuRunner log output to a file
         import oe.path
@@ -155,17 +158,14 @@ class QemuTarget(BaseTarget):
                             display = d.getVar("BB_ORIGENV", False).getVar("DISPLAY", True),
                             logfile = self.qemulog,
                             boottime = int(d.getVar("TEST_QEMUBOOT_TIMEOUT", True)),
+                            use_kvm = use_kvm,
                             dump_dir = dump_dir,
                             dump_host_cmds = d.getVar("testimage_dump_host", True))
 
         self.target_dumper = TargetDumper(dump_target_cmds, dump_dir, self.runner)
 
     def deploy(self):
-        try:
-            bb.utils.mkdirhier(self.testdir)
-            shutil.copyfile(self.origrootfs, self.rootfs)
-        except Exception as e:
-            bb.fatal("Error copying rootfs: %s" % e)
+        bb.utils.mkdirhier(self.testdir)
 
         qemuloglink = os.path.join(self.testdir, "qemu_boot_log")
         if os.path.islink(qemuloglink):
@@ -176,8 +176,8 @@ class QemuTarget(BaseTarget):
         bb.note("Qemu log file: %s" % self.qemulog)
         super(QemuTarget, self).deploy()
 
-    def start(self, params=None, ssh=True):
-        if self.runner.start(params, get_ip=ssh):
+    def start(self, params=None, ssh=True, extra_bootparams=None):
+        if self.runner.start(params, get_ip=ssh, extra_bootparams=extra_bootparams):
             if ssh:
                 self.ip = self.runner.ip
                 self.server_ip = self.runner.server_ip
@@ -232,7 +232,7 @@ class SimpleRemoteTarget(BaseTarget):
     def deploy(self):
         super(SimpleRemoteTarget, self).deploy()
 
-    def start(self, params=None, ssh=True):
+    def start(self, params=None, ssh=True, extra_bootparams=None):
         if ssh:
             self.connection = SSHControl(self.ip, logfile=self.sshlog, port=self.port)
 

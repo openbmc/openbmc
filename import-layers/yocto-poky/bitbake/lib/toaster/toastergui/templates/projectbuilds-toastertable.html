@@ -3,54 +3,63 @@
 {% load static %}
 
 {% block extraheadcontent %}
-  <link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}" type='text/css'>
-  <link rel="stylesheet" href="{% static 'css/jquery-ui.structure.min.css' %}" type='text/css'>
-  <link rel="stylesheet" href="{% static 'css/jquery-ui.theme.min.css' %}" type='text/css'>
-  <script src="{% static 'js/jquery-ui.min.js' %}">
-  </script>
+<link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}" type='text/css'>
+<link rel="stylesheet" href="{% static 'css/jquery-ui.structure.min.css' %}" type='text/css'>
+<link rel="stylesheet" href="{% static 'css/jquery-ui.theme.min.css' %}" type='text/css'>
+<script src="{% static 'js/jquery-ui.min.js' %}">
+</script>
 {% endblock %}
 
 {% block title %} {{title}} - {{project.name}} - Toaster {% endblock %}
 
 {% block pagecontent %}
+<div class="row">
 
   {% include "projecttopbar.html" %}
 
-  <div class="row-fluid">
+  <div class="col-md-12">
     {% with mru=mru mrb_type=mrb_type %}
-      {% include 'mrb_section.html' %}
+    {% include 'mrb_section.html' %}
     {% endwith %}
 
-    <h2 class="page-header top-air" data-role="page-title"></h2>
+    <h2 class="top-air" data-role="page-title"></h2>
 
+    {% if not build_in_progress_none_completed %}
     {% url 'projectbuilds' project.id as xhr_table_url %}
     {% include 'toastertable.html' %}
+    {% endif %}
   </div>
 
-  <script>
-    $(document).ready(function () {
-      // title
-      var tableElt = $("#{{table_name}}");
-      var titleElt = $("[data-role='page-title']");
+ <script>
+ $(document).ready(function () {
+   // title
+   var tableElt = $("#{{table_name}}");
+   var titleElt = $("[data-role='page-title']");
 
-      tableElt.on("table-done", function (e, total, tableParams) {
-        var title = "All project builds";
+   tableElt.on("table-done", function (e, total, tableParams) {
+     var title = "All project builds";
 
-        if (tableParams.search || tableParams.filter) {
-          if (total === 0) {
-            title = "No project builds found";
-          }
-          else if (total > 0) {
-            title = total + " project build" + (total > 1 ? 's' : '') + " found";
-          }
-        }
+     if (tableParams.search || tableParams.filter) {
+       if (total === 0) {
+         title = "No project builds found";
+       }
+       else if (total > 0) {
+         title = total + " project build" + (total > 1 ? 's' : '') + " found";
+       }
+     }
 
-        titleElt.text(title);
-      });
+     if (total === 0) {
+       titleElt.hide();
+     } else {
+       titleElt.show();
+       titleElt.text(title);
+     }
+   });
 
-      // highlight builds tab
-      $("#topbar-builds-tab").addClass("active")
-    });
-  </script>
+   // highlight builds tab
+   $("#topbar-builds-tab").addClass("active")
+ });
+ </script>
 
+</div>
 {% endblock %}

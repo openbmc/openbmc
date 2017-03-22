@@ -26,12 +26,17 @@ SYSTEMD_SERVICE_${PN} = "ofono.service"
 do_install_append() {
   install -d ${D}${sysconfdir}/init.d/
   install -m 0755 ${WORKDIR}/ofono ${D}${sysconfdir}/init.d/ofono
+
+  # Ofono still has one test tool that refers to Python 2 in the shebang
+  sed -i -e '1s,#!.*python.*,#!${bindir}/python3,' ${D}${libdir}/ofono/test/set-ddr
+
 }
 
 PACKAGES =+ "${PN}-tests"
 
 RDEPENDS_${PN} += "dbus"
+RRECOMMENDS_${PN} += "kernel-module-tun mobile-broadband-provider-info"
 
-FILES_${PN} += "${base_libdir}/udev ${systemd_unitdir}"
+FILES_${PN} += "${systemd_unitdir}"
 FILES_${PN}-tests = "${libdir}/${BPN}/test"
-RDEPENDS_${PN}-tests = "python python-pygobject python-dbus"
+RDEPENDS_${PN}-tests = "python3 python3-pygobject python3-dbus"

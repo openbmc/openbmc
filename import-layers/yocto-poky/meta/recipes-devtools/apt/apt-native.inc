@@ -17,8 +17,8 @@ python do_install () {
 }
 
 python do_install_config () {
-    indir = os.path.dirname(d.getVar('FILE',1))
-    infile = file(oe.path.join(indir, 'files', 'apt.conf'), 'r')
+    indir = os.path.dirname(d.getVar('FILE', True))
+    infile = open(oe.path.join(indir, 'files', 'apt.conf'), 'r')
     data = infile.read()
     infile.close()
 
@@ -30,7 +30,7 @@ python do_install_config () {
 
     outpath = oe.path.join(outdir, 'apt.conf.sample')
     if not os.path.exists(outpath):
-        outfile = file(outpath, 'w')
+        outfile = open(outpath, 'w')
         outfile.write(data)
         outfile.close()
 }

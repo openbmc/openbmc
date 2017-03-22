@@ -57,7 +57,6 @@ USE_ALTERNATIVES_FOR = " \
 	strings \
 	strip \
 "
-USE_ALTERNATIVES_FOR_remove_mips = "ld.gold dwp"
 
 python do_package_prepend() {
     make_alts = d.getVar("USE_ALTERNATIVES_FOR", True) or ""
@@ -72,6 +71,7 @@ B = "${S}/build.${HOST_SYS}.${TARGET_SYS}"
 
 EXTRA_OECONF = "--program-prefix=${TARGET_PREFIX} \
                 --disable-werror \
+                --enable-deterministic-archives \
                 --enable-plugins \
                 ${LDGOLD} \
                 ${@bb.utils.contains('DISTRO_FEATURES', 'multiarch', '--enable-64-bit-bfd', '', d)}"

@@ -1,0 +1,14 @@
+# Running build tests
+
+These tests are to test the running of builds and the data produced by the builds.
+Your oe build environment must be sourced/initialised for these tests to run.
+
+The simplest way to run the tests are the following commands:
+
+$ . oe-init-build-env
+$ cd bitbake/lib/toaster/ # path my vary but this is into toaster's directory
+$ DJANGO_SETTINGS_MODULE='toastermain.settings_test' ./manage.py test tests.builds
+
+Optional environment variables:
+ - TOASTER_DIR (where toaster keeps it's artifacts)
+ - TOASTER_CONF a path to the toasterconf.json file. This will need to be set if you don't execute the tests from toaster's own directory.

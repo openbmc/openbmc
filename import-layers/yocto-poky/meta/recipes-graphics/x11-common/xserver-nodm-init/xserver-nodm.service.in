@@ -1,0 +1,10 @@
+[Unit]
+Description=Xserver startup without a display manager
+
+[Service]
+EnvironmentFile=/etc/default/xserver-nodm
+User=@USER@
+ExecStart=/etc/xserver-nodm/Xserver
+
+[Install]
+Alias=display-manager.service

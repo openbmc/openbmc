@@ -1,0 +1,92 @@
+From 84d2a5509892b65ed60d39e6e2f9719e3762e40e Mon Sep 17 00:00:00 2001
+From: ktkachov <ktkachov@138bc75d-0d04-0410-961f-82ee72b054a4>
+Date: Tue, 31 May 2016 08:29:39 +0000
+Subject: [PATCH] [ARM] PR target/71056: Don't use vectorized builtins when
+ NEON is not available
+
+	PR target/71056
+	* config/arm/arm-builtins.c (arm_builtin_vectorized_function): Return
+	NULL_TREE early if NEON is not available.  Remove now redundant check
+	in ARM_CHECK_BUILTIN_MODE.
+
+	* gcc.target/arm/pr71056.c: New test.
+
+
+
+git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/branches/gcc-6-branch@236910 138bc75d-0d04-0410-961f-82ee72b054a4
+---
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+ gcc/ChangeLog                          |  7 +++++++
+ gcc/config/arm/arm-builtins.c          |  6 +++++-
+ gcc/testsuite/ChangeLog                |  5 +++++
+ gcc/testsuite/gcc.target/arm/pr71056.c | 32 ++++++++++++++++++++++++++++++++
+ 4 files changed, 49 insertions(+), 1 deletion(-)
+ create mode 100644 gcc/testsuite/gcc.target/arm/pr71056.c
+
+diff --git a/gcc/config/arm/arm-builtins.c b/gcc/config/arm/arm-builtins.c
+index 90fb40f..68b2839 100644
+--- a/gcc/config/arm/arm-builtins.c
++++ b/gcc/config/arm/arm-builtins.c
+@@ -2861,6 +2861,10 @@ arm_builtin_vectorized_function (unsigned int fn, tree type_out, tree type_in)
+   int in_n, out_n;
+   bool out_unsigned_p = TYPE_UNSIGNED (type_out);
+ 
++  /* Can't provide any vectorized builtins when we can't use NEON.  */
++  if (!TARGET_NEON)
++    return NULL_TREE;
++
+   if (TREE_CODE (type_out) != VECTOR_TYPE
+       || TREE_CODE (type_in) != VECTOR_TYPE)
+     return NULL_TREE;
+@@ -2875,7 +2879,7 @@ arm_builtin_vectorized_function (unsigned int fn, tree type_out, tree type_in)
+    NULL_TREE is returned if no such builtin is available.  */
+ #undef ARM_CHECK_BUILTIN_MODE
+ #define ARM_CHECK_BUILTIN_MODE(C)    \
+-  (TARGET_NEON && TARGET_FPU_ARMV8   \
++  (TARGET_FPU_ARMV8   \
+    && flag_unsafe_math_optimizations \
+    && ARM_CHECK_BUILTIN_MODE_1 (C))
+ 
+diff --git a/gcc/testsuite/gcc.target/arm/pr71056.c b/gcc/testsuite/gcc.target/arm/pr71056.c
+new file mode 100644
+index 0000000..136754e
+--- /dev/null
++++ b/gcc/testsuite/gcc.target/arm/pr71056.c
+@@ -0,0 +1,32 @@
++/* PR target/71056.  */
++/* { dg-do compile } */
++/* { dg-require-effective-target arm_vfp3_ok } */
++/* { dg-options "-O3 -mfpu=vfpv3" } */
++
++/* Check that compiling for a non-NEON target doesn't try to introduce
++   a NEON vectorized builtin.  */
++
++extern char *buff;
++int f2 ();
++struct T1
++{
++  int reserved[2];
++  unsigned int ip;
++  unsigned short cs;
++  unsigned short rsrv2;
++};
++void
++f3 (const char *p)
++{
++  struct T1 x;
++  __builtin_memcpy (&x, p, sizeof (struct T1));
++  x.reserved[0] = __builtin_bswap32 (x.reserved[0]);
++  x.reserved[1] = __builtin_bswap32 (x.reserved[1]);
++  x.ip = __builtin_bswap32 (x.ip);
++  x.cs = x.cs << 8 | x.cs >> 8;
++  x.rsrv2 = x.rsrv2 << 8 | x.rsrv2 >> 8;
++  if (f2 ())
++    {
++      __builtin_memcpy (buff, "\n", 1);
++    }
++}
+-- 
+2.9.0
+

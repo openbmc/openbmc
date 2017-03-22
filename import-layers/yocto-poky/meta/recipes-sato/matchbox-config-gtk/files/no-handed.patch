@@ -1,10 +1,13 @@
 Upstream-Status: Inappropriate [configuration]
+---
+ appearance/mb-appearance.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Index: appearance/mb-appearance.c
-===================================================================
---- appearance/mb-appearance.c	(revision 1614)
-+++ appearance/mb-appearance.c	(working copy)
-@@ -300,11 +300,13 @@
+diff --git a/appearance/mb-appearance.c b/appearance/mb-appearance.c
+index 6af8376..71fd57b 100644
+--- a/appearance/mb-appearance.c
++++ b/appearance/mb-appearance.c
+@@ -317,11 +317,13 @@ on_gconf_value_changed (GConfClient* client, const gchar* key, GConfValue* value
      gtk_font_button_set_font_name (GTK_FONT_BUTTON (font_button),
                                     gconf_value_get_string (value));
    } else if (strcmp (key, HANDED_KEY) == 0) {
@@ -18,18 +21,19 @@ Index: appearance/mb-appearance.c
    }
  }
  
-@@ -395,12 +397,13 @@
-   gtk_container_add (GTK_CONTAINER (align), font_button);
+@@ -408,10 +410,12 @@ main (int argc, char **argv) {
  
    /* Left/Right Handed */
--  
+   
 +#if 0
-   frame = new_frame (_("Orientation"), &align);
-   gtk_box_pack_start (GTK_BOX (box), frame, TRUE, TRUE, 0);
    handed_check = gtk_check_button_new_with_mnemonic (_("_Left-handed"));
+   frame = new_frame (_("Orientation"),handed_check);
+   gtk_box_pack_start (GTK_BOX (box), frame, TRUE, TRUE, 0);
    g_signal_connect (handed_check, "toggled", G_CALLBACK (on_handed_set), NULL);
-   gtk_container_add (GTK_CONTAINER (align), handed_check);
 +#endif
  
    gconf_client_add_dir (gconf, INTERFACE_DIR, GCONF_CLIENT_PRELOAD_ONELEVEL, NULL);
    g_signal_connect (gconf, "value-changed", G_CALLBACK (on_gconf_value_changed), NULL);
+-- 
+2.8.1
+

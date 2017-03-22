@@ -34,23 +34,22 @@
 import os
 import sys
 from abc import ABCMeta, abstractmethod
-from tags import *
+from .tags import *
 import shlex
 import json
 import subprocess
 import shutil
 
-class Line():
+class Line(metaclass=ABCMeta):
     """
     Generic (abstract) container representing a line that will appear
     in the BSP-generating program.
     """
-    __metaclass__ = ABCMeta
 
     def __init__(self, line):
         self.line = line
         self.generated_line = ""
-        self.prio = sys.maxint
+        self.prio = sys.maxsize
         self.discard = False
 
     @abstractmethod
@@ -155,7 +154,7 @@ class InputLine(Line):
         try:
             self.prio = int(props["prio"])
         except KeyError:
-            self.prio = sys.maxint
+            self.prio = sys.maxsize
 
     def gen(self, context = None):
         try:
@@ -201,7 +200,7 @@ class EditBoxInputLine(InputLine):
 
         msg += " [default: " + default_choice + "]"
 
-        line = name + " = default(raw_input(\"" + msg + " \"), " + name + ")"
+        line = name + " = default(input(\"" + msg + " \"), " + name + ")"
 
         return line
 
@@ -314,16 +313,15 @@ class BooleanInputLine(InputLine):
 
         msg += " [default: " + default_choice + "]"
 
-        line = name + " = boolean(raw_input(\"" + msg + " \"), " + name + ")"
+        line = name + " = boolean(input(\"" + msg + " \"), " + name + ")"
 
         return line
 
 
-class ListInputLine(InputLine):
+class ListInputLine(InputLine, metaclass=ABCMeta):
     """
     Base class for List-based Input lines. e.g. Choicelist, Checklist.
     """
-    __metaclass__ = ABCMeta
 
     def __init__(self, props, tag, lineno):
         InputLine.__init__(self, props, tag, lineno)
@@ -464,9 +462,9 @@ class ListInputLine(InputLine):
         choices_str = self.gen_choices_str(choicepairs)
         choices_val_list = self.gen_choices_val_list(choicepairs)
         if checklist:
-            choiceval = default(find_choicevals(raw_input(msg + "\n" + choices_str), choices_val_list), default_choice)
+            choiceval = default(find_choicevals(input(msg + "\n" + choices_str), choices_val_list), default_choice)
         else:
-            choiceval = default(find_choiceval(raw_input(msg + "\n" + choices_str), choices_val_list), default_choice)
+            choiceval = default(find_choiceval(input(msg + "\n" + choices_str), choices_val_list), default_choice)
 
         return choiceval
 
@@ -540,12 +538,12 @@ def get_verified_git_repo(input_str, name):
     """
     msg = input_str.strip() + " "
 
-    giturl = default(raw_input(msg), name)
+    giturl = default(input(msg), name)
 
     while True:
         if verify_git_repo(giturl):
             return giturl
-        giturl = default(raw_input(msg), name)
+        giturl = default(input(msg), name)
 
 
 def get_verified_file(input_str, name, filename_can_be_null):
@@ -555,14 +553,14 @@ def get_verified_file(input_str, name, filename_can_be_null):
     """
     msg = input_str.strip() + " "
 
-    filename = default(raw_input(msg), name)
+    filename = default(input(msg), name)
 
     while True:
         if not filename and filename_can_be_null:
             return filename
         if os.path.isfile(filename):
             return filename
-        filename = default(raw_input(msg), name)
+        filename = default(input(msg), name)
 
 
 def replace_file(replace_this, with_this):
@@ -1263,13 +1261,13 @@ def conditional_filename(filename):
             return None
         end = filename.find(CLOSE_TAG, opentag_start)
         if end == -1:
-            print "No close tag found for open tag in filename %s" % filename
+            print("No close tag found for open tag in filename %s" % filename)
             sys.exit(1)
 
         # we have a {{ tag i.e. code
         tag = filename[opentag_start + len(OPEN_TAG):end].strip()
         if not tag.lstrip().startswith(IF_TAG):
-            print "Only 'if' tags are allowed in file or directory names, filename: %s" % filename
+            print("Only 'if' tags are allowed in file or directory names, filename: %s" % filename)
             sys.exit(1)
 
         return CodeLine(tag)
@@ -1286,7 +1284,7 @@ class InputLineGroup(InputLine):
     def __init__(self, codeline):
         InputLine.__init__(self, {}, "", 0)
         self.group = []
-        self.prio = sys.maxint
+        self.prio = sys.maxsize
         self.group.append(codeline)
 
     def append(self, line):
@@ -1364,7 +1362,7 @@ def run_program_lines(linelist, codedump):
         of = open("bspgen.out", "w")
         of.write(buf)
         of.close()
-    exec buf
+    exec(buf)
 
 
 def gen_target(files, context = None):
@@ -1387,7 +1385,7 @@ def gen_supplied_property_vals(properties, program_lines):
     Generate user-specified entries for input values instead of
     generating input prompts.
     """
-    for name, val in properties.iteritems():
+    for name, val in properties.items():
         program_line = name + " = \"" + val + "\""
         program_lines.append(program_line)
 
@@ -1515,7 +1513,7 @@ def expand_targets(context, bsp_output_dir, expand_common=True):
 
     arches = os.listdir(arch_path)
     if arch not in arches or arch == "common":
-        print "Invalid karch, exiting\n"
+        print("Invalid karch, exiting\n")
         sys.exit(1)
 
     target = os.path.join(arch_path, arch)
@@ -1541,7 +1539,7 @@ def yocto_common_create(machine, target, scripts_path, layer_output_dir, codedum
     expand_common - boolean, use the contents of (for bsp layers) arch/common
     """
     if os.path.exists(layer_output_dir):
-        print "\nlayer output dir already exists, exiting. (%s)" % layer_output_dir
+        print("\nlayer output dir already exists, exiting. (%s)" % layer_output_dir)
         sys.exit(1)
 
     properties = None
@@ -1549,11 +1547,13 @@ def yocto_common_create(machine, target, scripts_path, layer_output_dir, codedum
     if properties_file:
         try:
             infile = open(properties_file, "r")
+            properties = json.load(infile)
         except IOError:
-            print "Couldn't open properties file %s for reading, exiting" % properties_file
+            print("Couldn't open properties file %s for reading, exiting" % properties_file)
             sys.exit(1)
-
-        properties = json.load(infile)
+        except ValueError:
+            print("Wrong format on properties file %s, exiting" % properties_file)
+            sys.exit(1)
 
     if properties_str and not properties:
         properties = json.loads(properties_str)
@@ -1597,8 +1597,8 @@ def yocto_layer_create(layer_name, scripts_path, layer_output_dir, codedump, pro
     """
     yocto_common_create(layer_name, "layer", scripts_path, layer_output_dir, codedump, properties_file, properties, False)
 
-    print "\nNew layer created in %s.\n" % (layer_output_dir)
-    print "Don't forget to add it to your BBLAYERS (for details see %s/README)." % (layer_output_dir)
+    print("\nNew layer created in %s.\n" % layer_output_dir)
+    print("Don't forget to add it to your BBLAYERS (for details see %s/README)." % layer_output_dir)
 
 
 def yocto_bsp_create(machine, arch, scripts_path, bsp_output_dir, codedump, properties_file, properties=None):
@@ -1616,21 +1616,21 @@ def yocto_bsp_create(machine, arch, scripts_path, bsp_output_dir, codedump, prop
     """
     yocto_common_create(machine, arch, scripts_path, bsp_output_dir, codedump, properties_file, properties)
 
-    print "\nNew %s BSP created in %s" % (arch, bsp_output_dir)
+    print("\nNew %s BSP created in %s" % (arch, bsp_output_dir))
 
 
 def print_dict(items, indent = 0):
     """
     Print the values in a possibly nested dictionary.
     """
-    for key, val in items.iteritems():
-        print "    "*indent + "\"%s\" :" % key,
+    for key, val in items.items():
+        print("    "*indent + "\"%s\" :" % key)
         if type(val) == dict:
-            print "{"
+            print("{")
             print_dict(val, indent + 1)
-            print "    "*indent + "}"
+            print("    "*indent + "}")
         else:
-            print "%s" % val
+            print("%s" % val)
 
 
 def get_properties(input_lines):
@@ -1681,7 +1681,7 @@ def yocto_layer_list_properties(arch, scripts_path, properties_file, expand_comm
         try:
             of = open(properties_file, "w")
         except IOError:
-            print "Couldn't open properties file %s for writing, exiting" % properties_file
+            print("Couldn't open properties file %s for writing, exiting" % properties_file)
             sys.exit(1)
 
         json.dump(properties, of, indent=1)
@@ -1755,10 +1755,10 @@ def print_values(type, values_list):
     """
     if type == "choicelist":
         for value in values_list:
-            print "[\"%s\", \"%s\"]" % (value[0], value[1])
+            print("[\"%s\", \"%s\"]" % (value[0], value[1]))
     elif type == "boolean":
         for value in values_list:
-            print "[\"%s\", \"%s\"]" % (value[0], value[1])
+            print("[\"%s\", \"%s\"]" % (value[0], value[1]))
 
 
 def yocto_layer_list_property_values(arch, property, scripts_path, properties_file, expand_common=True):
@@ -1789,7 +1789,7 @@ def yocto_layer_list_property_values(arch, property, scripts_path, properties_fi
 
     input_line = find_input_line(property, input_lines)
     if not input_line:
-        print "Couldn't find values for property %s" % property
+        print("Couldn't find values for property %s" % property)
         return
 
     values_list = []
@@ -1818,7 +1818,7 @@ def yocto_layer_list_property_values(arch, property, scripts_path, properties_fi
         try:
             of = open(properties_file, "w")
         except IOError:
-            print "Couldn't open properties file %s for writing, exiting" % properties_file
+            print("Couldn't open properties file %s for writing, exiting" % properties_file)
             sys.exit(1)
 
         json.dump(values_list, of)
@@ -1826,44 +1826,28 @@ def yocto_layer_list_property_values(arch, property, scripts_path, properties_fi
     print_values(type, values_list)
 
 
-def yocto_bsp_list(args, scripts_path, properties_file):
+def yocto_bsp_list(args, scripts_path):
     """
     Print available architectures, or the complete list of properties
     defined by the BSP, or the possible values for a particular BSP
     property.
     """
-    if len(args) < 1:
-        return False
-
-    if args[0] == "karch":
+    if args.karch == "karch":
         lib_path = scripts_path + '/lib'
         bsp_path = lib_path + '/bsp'
         arch_path = bsp_path + '/substrate/target/arch'
-        print "Architectures available:"
+        print("Architectures available:")
         for arch in os.listdir(arch_path):
             if arch == "common" or arch == "layer":
                 continue
-            print "    %s" % arch
-        return True
-    else:
-        arch = args[0]
+            print("    %s" % arch)
+        return
 
-    if len(args) < 2 or len(args) > 3:
-        return False
+    if args.properties:
+        yocto_layer_list_properties(args.karch, scripts_path, args.properties_file)
+    elif args.property:
+        yocto_layer_list_property_values(args.karch, args.property, scripts_path, args.properties_file)
 
-    if len(args) == 2:
-        if args[1] == "properties":
-            yocto_layer_list_properties(arch, scripts_path, properties_file)
-        else:
-            return False
-
-    if len(args) == 3:
-        if args[1] == "property":
-            yocto_layer_list_property_values(arch, args[2], scripts_path, properties_file)
-        else:
-            return False
-
-    return True
 
 
 def yocto_layer_list(args, scripts_path, properties_file):

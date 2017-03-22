@@ -10,6 +10,7 @@ class LocalSigner(object):
         self.gpg_bin = d.getVar('GPG_BIN', True) or \
                   bb.utils.which(os.getenv('PATH'), 'gpg')
         self.gpg_path = d.getVar('GPG_PATH', True)
+        self.gpg_version = self.get_gpg_version()
         self.rpm_bin = bb.utils.which(os.getenv('PATH'), "rpm")
 
     def export_pubkey(self, output_file, keyid, armor=True):
@@ -31,15 +32,18 @@ class LocalSigner(object):
 
         cmd = self.rpm_bin + " --addsign --define '_gpg_name %s'  " % keyid
         cmd += "--define '_gpg_passphrase %s' " % passphrase
+        if self.gpg_version > (2,1,):
+            cmd += "--define '_gpg_sign_cmd_extra_args --pinentry-mode=loopback' "
         if self.gpg_bin:
             cmd += "--define '%%__gpg %s' " % self.gpg_bin
         if self.gpg_path:
             cmd += "--define '_gpg_path %s' " % self.gpg_path
-        cmd += ' '.join(files)
 
-        status, output = oe.utils.getstatusoutput(cmd)
-        if status:
-            raise bb.build.FuncFailed("Failed to sign RPM packages: %s" % output)
+        # Sign in chunks of 100 packages
+        for i in range(0, len(files), 100):
+            status, output = oe.utils.getstatusoutput(cmd + ' '.join(files[i:i+100]))
+            if status:
+                raise bb.build.FuncFailed("Failed to sign RPM packages: %s" % output)
 
     def detach_sign(self, input_file, keyid, passphrase_file, passphrase=None, armor=True):
         """Create a detached signature of a file"""
@@ -58,9 +62,7 @@ class LocalSigner(object):
 
         #gpg > 2.1 supports password pipes only through the loopback interface
         #gpg < 2.1 errors out if given unknown parameters
-        dots = self.get_gpg_version().split('.')
-        assert len(dots) >= 2
-        if int(dots[0]) >= 2 and int(dots[1]) >= 1:
+        if self.gpg_version > (2,1,):
             cmd += ['--pinentry-mode', 'loopback']
 
         cmd += [input_file]
@@ -71,11 +73,11 @@ class LocalSigner(object):
                     passphrase = fobj.readline();
 
             job = subprocess.Popen(cmd, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
-            (_, stderr) = job.communicate(passphrase)
+            (_, stderr) = job.communicate(passphrase.encode("utf-8"))
 
             if job.returncode:
                 raise bb.build.FuncFailed("GPG exited with code %d: %s" %
-                                          (job.returncode, stderr))
+                                          (job.returncode, stderr.decode("utf-8")))
 
         except IOError as e:
             bb.error("IO error (%s): %s" % (e.errno, e.strerror))
@@ -87,10 +89,11 @@ class LocalSigner(object):
 
 
     def get_gpg_version(self):
-        """Return the gpg version"""
+        """Return the gpg version as a tuple of ints"""
         import subprocess
         try:
-            return subprocess.check_output((self.gpg_bin, "--version")).split()[2]
+            ver_str = subprocess.check_output((self.gpg_bin, "--version")).split()[2].decode("utf-8")
+            return tuple([int(i) for i in ver_str.split('.')])
         except subprocess.CalledProcessError as e:
             raise bb.build.FuncFailed("Could not get gpg version: %s" % e)
 
@@ -113,4 +116,3 @@ def get_signer(d, backend):
         return LocalSigner(d)
     else:
         bb.fatal("Unsupported signing backend '%s'" % backend)
-

@@ -20,3 +20,6 @@ IMAGE_ROOTFS_SIZE = "8192"
 IMAGE_ROOTFS_EXTRA_SPACE = "0"
 
 BAD_RECOMMENDATIONS += "busybox-syslog"
+
+# Use the same restriction as initramfs-live-install
+COMPATIBLE_HOST = "(i.86|x86_64).*-linux"

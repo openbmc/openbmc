@@ -34,6 +34,8 @@ efi_populate() {
         install -d ${DEST}/loader
         install -d ${DEST}/loader/entries
         install -m 0644 ${DEPLOY_DIR_IMAGE}/${EFI_IMAGE} ${DEST}${EFIDIR}/${DEST_EFI_IMAGE}
+        EFIPATH=$(echo "${EFIDIR}" | sed 's/\//\\/g')
+        printf 'fs0:%s\%s\n' "$EFIPATH" "$DEST_EFI_IMAGE" >${DEST}/startup.nsh
         install -m 0644 ${GUMMIBOOT_CFG} ${DEST}/loader/loader.conf
         for i in ${GUMMIBOOT_ENTRIES}; do
             install -m 0644 ${i} ${DEST}/loader/entries
@@ -72,7 +74,7 @@ python build_efi_cfg() {
     try:
          cfgfile = open(cfile, 'w')
     except OSError:
-        raise bb.build.funcFailed('Unable to open %s' % (cfile))
+        bb.fatal('Unable to open %s' % cfile)
 
     cfgfile.write('# Automatically created by OE\n')
     cfgfile.write('default %s\n' % (labels.split()[0]))
@@ -88,14 +90,14 @@ python build_efi_cfg() {
 
         overrides = localdata.getVar('OVERRIDES', True)
         if not overrides:
-            raise bb.build.FuncFailed('OVERRIDES not defined')
+            bb.fatal('OVERRIDES not defined')
 
         entryfile = "%s/%s.conf" % (s, label)
         d.appendVar("GUMMIBOOT_ENTRIES", " " + entryfile)
         try:
             entrycfg = open(entryfile, "w")
         except OSError:
-            raise bb.build.funcFailed('Unable to open %s' % (entryfile))
+            bb.fatal('Unable to open %s' % entryfile)
         localdata.setVar('OVERRIDES', label + ':' + overrides)
         bb.data.update_data(localdata)
 

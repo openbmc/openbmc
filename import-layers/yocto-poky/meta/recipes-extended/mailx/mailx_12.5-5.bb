@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=4202a0a62910cf94f7af8a3436a2a2dd"
 
 DEPENDS = "openssl"
 
-SRC_URI = "${DEBIAN_MIRROR}/main/h/heirloom-mailx/heirloom-mailx_12.5.orig.tar.gz;name=archive \
+SRC_URI = "http://snapshot.debian.org/archive/debian/20160728T043443Z/pool/main/h/heirloom-mailx/heirloom-mailx_12.5.orig.tar.gz;name=archive \
            file://0001-Don-t-reuse-weak-symbol-optopt-to-fix-FTBFS-on-mips.patch \
            file://0002-Patched-out-SSL2-support-since-it-is-no-longer-suppo.patch \
            file://0003-Fixed-Lintian-warning-warning-macro-N-not-defined.patch \
@@ -28,6 +28,7 @@ SRC_URI[archive.sha256sum] = "015ba4209135867f37a0245d22235a392b8bbed956913286b8
 
 # for this package we're mostly interested in tracking debian patches,
 # and not in the upstream version where all development has effectively stopped
+UPSTREAM_CHECK_URI = "${DEBIAN_MIRROR}/main/h/heirloom-mailx/"
 UPSTREAM_CHECK_REGEX = "(?P<pver>((\d+\.*)+)-((\d+\.*)+))\.(diff|debian\.tar)\.(gz|xz)"
 
 S = "${WORKDIR}/heirloom-mailx-12.5"
