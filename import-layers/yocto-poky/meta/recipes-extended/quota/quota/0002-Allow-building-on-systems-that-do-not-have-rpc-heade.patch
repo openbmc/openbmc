@@ -1,0 +1,153 @@
+Upstream-Status: Backport
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+From f30e1ada8326463cc0af048afa058bc2f1dc9370 Mon Sep 17 00:00:00 2001
+From: Theodore Ts'o <tytso@mit.edu>
+Date: Tue, 29 Mar 2016 20:48:04 -0400
+Subject: [PATCH] Allow building on systems that do not have rpc header files
+
+Android's bionic C library doesn't have Sun RPC support.
+
+Signed-off-by: Theodore Ts'o <tytso@mit.edu>
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ Makefile.am | 30 ++++++++++++++++--------------
+ quotaops.c  |  2 ++
+ setquota.c  |  2 ++
+ 3 files changed, 20 insertions(+), 14 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 6d7ea0e..82db99f 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,7 +1,5 @@
+ ACLOCAL_AMFLAGS = -I m4
+ 
+-BUILT_SOURCES = rquota.h rquota.c rquota_clnt.c
+-
+ docdir = $(datadir)/doc/@PACKAGE@
+ doc_DATA = \
+ 	README.mailserver \
+@@ -12,11 +10,6 @@ doc_DATA = \
+ 	doc/quotas.preformated \
+ 	doc/quotas-1.eps
+ 
+-rpcsvcdir = $(includedir)/rpcsvc
+-rpcsvc_DATA = \
+-	rquota.h \
+-	rquota.x
+-
+ sysconf_DATA = \
+ 	warnquota.conf \
+ 	quotatab \
+@@ -35,15 +28,12 @@ man_MANS = \
+ 	quota.1 \
+ 	quot.8 \
+ 	repquota.8 \
+-	rpc.rquotad.8 \
+ 	rquota.3 \
+ 	setquota.8 \
+ 	warnquota.conf.5 \
+ 	warnquota.8 \
+ 	xqmstats.8
+ 
+-CLEANFILES = rquota.c rquota.h rquota_clnt.c
+-
+ SUBDIRS = po
+ 
+ EXTRA_DIST = \
+@@ -55,9 +45,15 @@ EXTRA_DIST = \
+ 	Changelog \
+ 	ldap-scripts
+ 
+-noinst_LIBRARIES = \
+-	libquota.a \
+-	librpcclient.a
++noinst_LIBRARIES = libquota.a
++
++if WITH_RPC
++rpcsvcdir = $(includedir)/rpcsvc
++rpcsvc_DATA = \
++	rquota.h \
++	rquota.x
++
++noinst_LIBRARIES += librpcclient.a
+ 
+ librpcclient_a_SOURCES = \
+ 	rquota.c \
+@@ -67,8 +63,10 @@ librpcclient_a_SOURCES = \
+ 	rquota_clnt.c
+ librpcclient_a_CFLAGS = -Wno-unused
+ 
+-if WITH_RPC
+ RPCLIBS = librpcclient.a
++BUILT_SOURCES = rquota.h rquota.c rquota_clnt.c
++CLEANFILES = rquota.c rquota.h rquota_clnt.c
++man_MANS += rpc.rquotad.8
+ endif
+ 
+ libquota_a_SOURCES = \
+@@ -217,6 +215,7 @@ convertquota_LDADD = \
+ 	libquota.a \
+ 	$(RPCLIBS)
+ 
++if WITH_RPC
+ rpc_rquotad_SOURCES = \
+ 	rquota_server.c \
+ 	rquota_svc.c \
+@@ -225,6 +224,7 @@ rpc_rquotad_LDADD = \
+ 	libquota.a \
+ 	$(WRAP_LIBS) \
+ 	$(RPCLIBS)
++endif
+ 
+ quota_nld_SOURCES = quota_nld.c
+ quota_nld_CFLAGS = \
+@@ -236,6 +236,7 @@ quota_nld_LDADD = \
+ 	$(DBUS_LIBS) \
+ 	$(LIBNL3_LIBS)
+ 
++if WITH_RPC
+ # ------------------
+ # Rpcgen conversions
+ # ------------------
+@@ -250,6 +251,7 @@ quota_nld_LDADD = \
+ rquota_clnt.c: rquota.x
+ 	@rm -f $@
+ 	@$(RPCGEN) -l -o $@ $<
++endif
+ 
+ # --------
+ # Quotaoff
+diff --git a/quotaops.c b/quotaops.c
+index 47ef9a7..136aec3 100644
+--- a/quotaops.c
++++ b/quotaops.c
+@@ -34,7 +34,9 @@
+ 
+ #include "config.h"
+ 
++#if defined(RPC)
+ #include <rpc/rpc.h>
++#endif
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <sys/file.h>
+diff --git a/setquota.c b/setquota.c
+index 51d7b3c..8ecd9c3 100644
+--- a/setquota.c
++++ b/setquota.c
+@@ -7,7 +7,9 @@
+ 
+ #include "config.h"
+ 
++#if defined(RPC)
+ #include <rpc/rpc.h>
++#endif
+ #include <sys/types.h>
+ #include <errno.h>
+ #include <stdio.h>
+-- 
+2.6.1
+

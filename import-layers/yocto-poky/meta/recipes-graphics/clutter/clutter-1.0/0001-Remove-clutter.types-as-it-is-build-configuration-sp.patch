@@ -1,0 +1,143 @@
+From 3a0404dfbc65c6a864e01d1200a48074e19d5def Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 2 Sep 2016 14:28:38 +0300
+Subject: [PATCH] Remove clutter.types as it is build configuration-specific.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ doc/reference/clutter.types | 122 --------------------------------------------
+ 1 file changed, 122 deletions(-)
+ delete mode 100644 doc/reference/clutter.types
+
+diff --git a/doc/reference/clutter.types b/doc/reference/clutter.types
+deleted file mode 100644
+index 0037acc..0000000
+--- a/doc/reference/clutter.types
++++ /dev/null
+@@ -1,122 +0,0 @@
+-cally_actor_get_type
+-cally_clone_get_type
+-cally_group_get_type
+-cally_rectangle_get_type
+-cally_root_get_type
+-cally_stage_get_type
+-cally_text_get_type
+-cally_texture_get_type
+-cally_util_get_type
+-clutter_action_get_type
+-clutter_actor_box_get_type
+-clutter_actor_get_type
+-clutter_actor_meta_get_type
+-clutter_align_constraint_get_type
+-clutter_alpha_get_type
+-clutter_animatable_get_type
+-clutter_animation_get_type
+-clutter_animator_get_type
+-clutter_animator_key_get_type
+-clutter_backend_get_type
+-clutter_behaviour_depth_get_type
+-clutter_behaviour_ellipse_get_type
+-clutter_behaviour_get_type
+-clutter_behaviour_opacity_get_type
+-clutter_behaviour_path_get_type
+-clutter_behaviour_rotate_get_type
+-clutter_behaviour_scale_get_type
+-clutter_bin_layout_get_type
+-clutter_bind_constraint_get_type
+-clutter_binding_pool_get_type
+-clutter_blur_effect_get_type
+-clutter_box_get_type
+-clutter_box_layout_get_type
+-clutter_brightness_contrast_effect_get_type
+-clutter_cairo_texture_get_type
+-clutter_canvas_get_type
+-clutter_child_meta_get_type
+-clutter_click_action_get_type
+-clutter_clip_node_get_type
+-clutter_clone_get_type
+-clutter_color_get_type
+-clutter_color_node_get_type
+-clutter_colorize_effect_get_type
+-clutter_constraint_get_type
+-clutter_container_get_type
+-clutter_content_get_type
+-clutter_deform_effect_get_type
+-clutter_desaturate_effect_get_type
+-clutter_device_manager_get_type
+-clutter_drag_action_get_type
+-clutter_drop_action_get_type
+-clutter_effect_get_type
+-clutter_event_get_type
+-clutter_event_sequence_get_type
+-clutter_fixed_layout_get_type
+-clutter_flow_layout_get_type
+-clutter_fog_get_type
+-clutter_geometry_get_type
+-clutter_gesture_action_get_type
+-clutter_glx_texture_pixmap_get_type
+-clutter_grid_layout_get_type
+-clutter_group_get_type
+-clutter_image_get_type
+-clutter_input_device_get_type
+-clutter_interval_get_type
+-clutter_keyframe_transition_get_type
+-clutter_knot_get_type
+-clutter_layout_manager_get_type
+-clutter_layout_meta_get_type
+-clutter_list_model_get_type
+-clutter_margin_get_type
+-clutter_media_get_type
+-clutter_model_get_type
+-clutter_model_iter_get_type
+-clutter_offscreen_effect_get_type
+-clutter_page_turn_effect_get_type
+-clutter_paint_node_get_type
+-clutter_paint_volume_get_type
+-clutter_pan_action_get_type
+-clutter_param_color_get_type
+-clutter_param_fixed_get_type
+-clutter_param_units_get_type
+-clutter_path_constraint_get_type
+-clutter_path_get_type
+-clutter_path_node_get_type
+-clutter_perspective_get_type
+-clutter_pipeline_node_get_type
+-clutter_point_get_type
+-clutter_property_transition_get_type
+-clutter_rect_get_type
+-clutter_rectangle_get_type
+-clutter_rotate_action_get_type
+-clutter_score_get_type
+-clutter_script_get_type
+-clutter_scriptable_get_type
+-clutter_scroll_actor_get_type
+-clutter_settings_get_type
+-clutter_shader_effect_get_type
+-clutter_shader_float_get_type
+-clutter_shader_get_type
+-clutter_shader_int_get_type
+-clutter_shader_matrix_get_type
+-clutter_size_get_type
+-clutter_snap_constraint_get_type
+-clutter_stage_get_type
+-clutter_stage_manager_get_type
+-clutter_state_get_type
+-clutter_state_key_get_type
+-clutter_swipe_action_get_type
+-clutter_table_layout_get_type
+-clutter_tap_action_get_type
+-clutter_text_buffer_get_type
+-clutter_text_get_type
+-clutter_text_node_get_type
+-clutter_texture_get_type
+-clutter_texture_node_get_type
+-clutter_timeline_get_type
+-clutter_transition_get_type
+-clutter_transition_group_get_type
+-clutter_units_get_type
+-clutter_vertex_get_type
+-clutter_zoom_action_get_type
+-- 
+2.9.3
+

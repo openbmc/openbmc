@@ -1,0 +1,26 @@
+KBRANCH_genericx86  = "standard/base"
+KBRANCH_genericx86-64  = "standard/base"
+
+KMACHINE_genericx86 ?= "common-pc"
+KMACHINE_genericx86-64 ?= "common-pc-64"
+KBRANCH_edgerouter = "standard/edgerouter"
+KBRANCH_beaglebone = "standard/beaglebone"
+KBRANCH_mpc8315e-rdb = "standard/fsl-mpc8315e-rdb"
+
+SRCREV_machine_genericx86    ?= "021b4aef55b44597587a1ce5879be642b3dca155"
+SRCREV_machine_genericx86-64 ?= "021b4aef55b44597587a1ce5879be642b3dca155"
+SRCREV_machine_edgerouter ?= "6076f16536329465b62bd2037b8582a5e18f85d1"
+SRCREV_machine_beaglebone ?= "85dc85153cd7e3b72d34f967c4c0edde590c79a8"
+SRCREV_machine_mpc8315e-rdb ?= "f73222eb3bbd07a45564397a88dec554e848da7d"
+
+COMPATIBLE_MACHINE_genericx86 = "genericx86"
+COMPATIBLE_MACHINE_genericx86-64 = "genericx86-64"
+COMPATIBLE_MACHINE_edgerouter = "edgerouter"
+COMPATIBLE_MACHINE_beaglebone = "beaglebone"
+COMPATIBLE_MACHINE_mpc8315e-rdb = "mpc8315e-rdb"
+
+LINUX_VERSION_genericx86 = "4.8.12"
+LINUX_VERSION_genericx86-64 = "4.8.12"
+LINUX_VERSION_edgerouter = "4.8.12"
+LINUX_VERSION_beaglebone = "4.8.12"
+LINUX_VERSION_mpc8315e-rdb = "4.8.12"

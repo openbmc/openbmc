@@ -47,3 +47,10 @@ EXCLUDE_FROM_WORLD_pn-perf_libc-musl = "1"
 
 # error: 'RTLD_NEXT' was not declared in this scope
 EXCLUDE_FROM_WORLD_pn-gcc-sanitizers_libc-musl = "1"
+
+# gcc fails to build when libuwind is staged before building gcc since
+# it then finds the unwind.h header from libunwind and not from libgcc
+# and on arm specially they are different since libgcc defines some functions
+# as macros which are functions in libunwind and it fails during linking
+# libbacktrace/backtrace.c:76: undefined reference to `_Unwind_GetIP'
+EXCLUDE_FROM_WORLD_pn-libunwind_libc-musl_arm = "1"

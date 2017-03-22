@@ -1,6 +1,8 @@
 #!/bin/sh
 
 [ -z "$ENVCLEANED" ] && exec /usr/bin/env -i ENVCLEANED=1 HOME="$HOME" \
+	LC_ALL=en_US.UTF-8 \
+	TERM=$TERM \
 	http_proxy="$http_proxy" https_proxy="$https_proxy" ftp_proxy="$ftp_proxy" \
 	no_proxy="$no_proxy" all_proxy="$all_proxy" GIT_PROXY_COMMAND="$GIT_PROXY_COMMAND" "$0" "$@"
 [ -f /etc/environment ] && . /etc/environment
@@ -26,7 +28,7 @@ fi
 if [ "$INST_ARCH" != "$SDK_ARCH" ]; then
 	# Allow for installation of ix86 SDK on x86_64 host
 	if [ "$INST_ARCH" != x86_64 -o "$SDK_ARCH" != ix86 ]; then
-		echo "Error: Installation machine not supported!"
+		echo "Error: Incompatible SDK installer! Your host is $INST_ARCH and this SDK was built for $SDK_ARCH hosts."
 		exit 1
 	fi
 fi
@@ -45,7 +47,8 @@ relocate=1
 savescripts=0
 verbose=0
 publish=0
-while getopts ":yd:npDRS" OPT; do
+listcontents=0
+while getopts ":yd:npDRSl" OPT; do
 	case $OPT in
 	y)
 		answer="Y"
@@ -70,6 +73,9 @@ while getopts ":yd:npDRS" OPT; do
 	S)
 		savescripts=1
 		;;
+	l)
+		listcontents=1
+		;;
 	*)
 		echo "Usage: $(basename $0) [-y] [-d <dir>]"
 		echo "  -y         Automatic yes to all prompts"
@@ -81,10 +87,17 @@ while getopts ":yd:npDRS" OPT; do
 		echo "  -S         Save relocation scripts"
 		echo "  -R         Do not relocate executables"
 		echo "  -D         use set -x to see what is going on"
+		echo "  -l         list files that will be extracted"
 		exit 1
 		;;
 	esac
 done
+
+payload_offset=$(($(grep -na -m1 "^MARKER:$" $0|cut -d':' -f1) + 1))
+if [ "$listcontents" = "1" ] ; then
+    tail -n +$payload_offset $0| tar tvJ || exit 1
+    exit
+fi
 
 titlestr="@SDK_TITLE@ installer version @SDK_VERSION@"
 printf "%s\n" "$titlestr"
@@ -128,6 +141,16 @@ if [ "$SDK_EXTENSIBLE" = "1" ]; then
 	if echo "$target_sdk_dir" | grep -q '[+\ @$]'; then
 		echo "The target directory path ($target_sdk_dir) contains illegal" \
 		     "characters such as spaces, @, \$ or +. Abort!"
+		exit 1
+	fi
+	# The build system doesn't work well with /tmp on NFS
+	fs_dev_path="$target_sdk_dir"
+	while [ ! -d "$fs_dev_path" ] ; do
+		fs_dev_path=`dirname $fs_dev_path`
+        done
+	fs_dev_type=`stat -f -c '%t' "$fs_dev_path"`
+	if [ "$fsdevtype" = "6969" ] ; then
+		echo "The target directory path $target_sdk_dir is on NFS, this is not possible. Abort!"
 		exit 1
 	fi
 else
@@ -184,8 +207,6 @@ if [ ! -x $target_sdk_dir -o ! -w $target_sdk_dir -o ! -r $target_sdk_dir ]; the
 	# now that we have sudo rights, create the directory
 	$SUDO_EXEC mkdir -p $target_sdk_dir >/dev/null 2>&1
 fi
-
-payload_offset=$(($(grep -na -m1 "^MARKER:$" $0|cut -d':' -f1) + 1))
 
 printf "Extracting SDK..."
 tail -n +$payload_offset $0| $SUDO_EXEC tar xJ -C $target_sdk_dir --checkpoint=.2500 $EXTRA_TAR_OPTIONS || exit 1

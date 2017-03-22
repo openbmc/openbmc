@@ -2,7 +2,7 @@ uuid.pc is generated at build time so should be installed from the current
 directory, and not $S.
 
 Upstream-Status: Pending [should be submitted]
-Signed-Off-By: Ross Burton <ross.burton@intel.com>
+Signed-off-by: Ross Burton <ross.burton@intel.com>
 
 Index: uuid-1.6.2/Makefile.in
 ===================================================================

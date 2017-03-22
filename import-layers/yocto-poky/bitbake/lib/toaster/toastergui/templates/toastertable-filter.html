@@ -1,20 +1,24 @@
 <!-- filter modal -->
-<div id="filter-modal-{{table_name}}" class="modal hide fade" tabindex="-1" role="dialog" aria-hidden="false">
-  <form id="filter-modal-form-{{table_name}}" style="margin-bottom: 0px">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-      <h3 id="filter-modal-title-{{table_name}}">&nbsp;</h3>
-    </div>
-    <div class="modal-body">
-      <p>Show:</p>
-      <span id="filter-actions-{{table_name}}"></span>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-primary" type="submit" data-role="filter-apply">
+<div id="filter-modal-{{table_name}}" class="modal fade" tabindex="-1" role="dialog" aria-hidden="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+          <h3 id="filter-modal-title-{{table_name}}">&nbsp;</h3>
+	</div>
+	<div class="modal-body">
+	  <form id="filter-modal-form-{{table_name}}" style="margin-bottom: 0px">
+	  <p>Show:</p>
+	  <span id="filter-actions-{{table_name}}"></span>
+	</div>
+	<div class="modal-footer">
+          <button class="btn btn-primary" type="submit" data-role="filter-apply">
         Apply
-      </button>
+	  </button>
+	</div>
+      </form>
     </div>
-  </form>
+  </div>
 </div>
 <button id="clear-filter-btn-{{table_name}}" style="display:none"></button>
 <!-- end filter modal -->

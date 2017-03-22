@@ -1,0 +1,31 @@
+From 72b09de92cc597c53b1d762882b67a17fe56846c Mon Sep 17 00:00:00 2001
+From: Nick Clifton <nickc@redhat.com>
+Date: Tue, 23 Aug 2016 09:45:11 +0100
+Subject: [PATCH 16/16] Fix seg-fault in ARM linker when trying to parse a
+ binary file.
+
+	* elf32-arm.c (elf32_arm_count_additional_relocs): Return zero if
+	there is no arm data associated with the section.
+---
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+ bfd/elf32-arm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/bfd/elf32-arm.c b/bfd/elf32-arm.c
+index 700bec3..3fab609 100644
+--- a/bfd/elf32-arm.c
++++ b/bfd/elf32-arm.c
+@@ -18207,7 +18207,7 @@ elf32_arm_count_additional_relocs (asection *sec)
+ {
+   struct _arm_elf_section_data *arm_data;
+   arm_data = get_arm_elf_section_data (sec);
+-  return arm_data->additional_reloc_count;
++  return arm_data == NULL ? 0 : arm_data->additional_reloc_count;
+ }
+ 
+ /* Called to set the sh_flags, sh_link and sh_info fields of OSECTION which
+-- 
+2.10.1
+

@@ -1,0 +1,55 @@
+From 78bb645a42c216b37b8d930c7c849a3fa89babf8 Mon Sep 17 00:00:00 2001
+From: Takashi Iwai <tiwai@suse.com>
+Date: Sat, 16 Jan 2016 12:02:30 -0500
+Subject: [PATCH] Fix protocol minor version fall-back
+
+mount.nfs currently expects mount(2) to fail with EPROTONOSUPPORT if
+the kernel doesn't understand the requested NFS version.
+
+Unfortunately if the requested minor is not known to the kernel
+it returns -EINVAL.
+In kernels since 3.11 this can happen in nfs4_alloc_client(), if
+compiled without NFS_V4_2.
+
+More generally it can happen in in nfs_validate_text_mount_data()
+when nfs_parse_mount_options() returns 0 because
+nfs_parse_version_string()
+didn't recognise the version.
+
+EPROTONOSUPPORT is only returned if NFSv4 support is completely compiled
+out.
+
+So nfs_autonegotiate needs to check for EINVAL as well as
+EPROTONOSUPPORT.
+
+URL: https://bugzilla.opensuse.org/show_bug.cgi?id=959211
+Reported-by: Takashi Iwai <tiwai@suse.com>
+Signed-off-by: NeilBrown <neilb@suse.com>
+Signed-off-by: Steve Dickson <steved@redhat.com>
+
+
+Upstream-Status: Backport
+http://git.linux-nfs.org/?p=steved/nfs-utils.git;a=patch;h=78bb645a42c216b37b8d930c7c849a3fa89babf8
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ utils/mount/stropts.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/utils/mount/stropts.c b/utils/mount/stropts.c
+index c8f5a6d..86829a9 100644
+--- a/utils/mount/stropts.c
++++ b/utils/mount/stropts.c
+@@ -841,6 +841,9 @@ check_result:
+ 	case EPROTONOSUPPORT:
+ 		/* A clear indication that the server or our
+ 		 * client does not support NFS version 4 and minor */
++	case EINVAL:
++		/* A less clear indication that our client
++		 * does not support NFSv4 minor version. */
+ 		if (mi->version.v_mode == V_GENERAL &&
+ 			mi->version.minor == 0)
+ 				return result;
+-- 
+2.7.4
+

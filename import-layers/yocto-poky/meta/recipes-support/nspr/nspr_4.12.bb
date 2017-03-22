@@ -147,6 +147,9 @@ TESTS = " \
 
 inherit autotools
 
+PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', 'ipv6', '', d)}"
+PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,"
+
 do_compile_prepend() {
 	oe_runmake CROSS_COMPILE=1 CFLAGS="-DXP_UNIX" LDFLAGS="" CC=gcc -C config export
 }
@@ -157,10 +160,13 @@ do_compile_append() {
 
 do_install_append() {
     install -D ${WORKDIR}/nspr.pc.in ${D}${libdir}/pkgconfig/nspr.pc
-    sed -i s:OEPREFIX:${prefix}:g ${D}${libdir}/pkgconfig/nspr.pc
-    sed -i s:OELIBDIR:${libdir}:g ${D}${libdir}/pkgconfig/nspr.pc
-    sed -i s:OEINCDIR:${includedir}:g ${D}${libdir}/pkgconfig/nspr.pc
-    sed -i s:OEEXECPREFIX:${exec_prefix}:g ${D}${libdir}/pkgconfig/nspr.pc
+    sed -i  \
+    -e 's:NSPRVERSION:${PV}:g' \
+    -e 's:OEPREFIX:${prefix}:g' \
+    -e 's:OELIBDIR:${libdir}:g' \
+    -e 's:OEINCDIR:${includedir}:g' \
+    -e 's:OEEXECPREFIX:${exec_prefix}:g' \
+    ${D}${libdir}/pkgconfig/nspr.pc
 
     mkdir -p ${D}${libdir}/nspr/tests
     install -m 0755 ${S}/pr/tests/runtests.pl ${D}${libdir}/nspr/tests

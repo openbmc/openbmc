@@ -1,8 +1,7 @@
 SUMMARY = "GNU debugger"
 HOMEPAGE = "http://www.gnu.org/software/gdb/"
-LICENSE = "GPLv3+"
 SECTION = "devel"
-DEPENDS = "expat zlib ncurses ${LTTNGUST}"
+DEPENDS = "expat zlib ncurses virtual/libiconv ${LTTNGUST}"
 
 LTTNGUST = "lttng-ust"
 LTTNGUST_aarch64 = ""
@@ -16,17 +15,9 @@ LTTNGUST_mips64eln32 = ""
 LTTNGUST_sh4 = ""
 LTTNGUST_libc-musl = ""
 
-INC_PR = "r0"
-
-LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552 \
-		file://COPYING.LIB;md5=9f604d8a4f8e74f4f5140845a21b6674 \
-		file://COPYING3;md5=d32239bcb673463ab874e80d47fae504 \
-		file://COPYING3.LIB;md5=6a6a8e020838b23406c81b19c1d46df6"
-
 inherit autotools texinfo
 
-SRC_URI = "${GNU_MIRROR}/gdb/gdb-${PV}.tar.gz \
-          "
+UPSTREAM_CHECK_GITTAGREGEX = "gdb\-(?P<pver>.+)\-release"
 
 B = "${WORKDIR}/build-${TARGET_SYS}"
 
@@ -40,12 +31,15 @@ EXTRA_OECONF = "--disable-gdbtk --disable-tui --disable-x --disable-werror \
                 ${GDBPROPREFIX} ${EXPAT} \
                 ${@bb.utils.contains('DISTRO_FEATURES', 'multiarch', '--enable-64-bit-bfd', '', d)} \
                 --disable-rpath \
-               "
+                --disable-gas --disable-binutils \
+                --disable-ld --disable-gold \
+                --disable-gprof \
+"
 
 PACKAGECONFIG ??= "readline"
 # Use --without-system-readline to compile with readline 5.
 PACKAGECONFIG[readline] = "--with-system-readline,--without-system-readline,readline"
-PACKAGECONFIG[python] = "--with-python=${WORKDIR}/python,--without-python,python,python python-codecs"
+PACKAGECONFIG[python] = "--with-python=${WORKDIR}/python,--without-python,python3,python3 python3-codecs"
 PACKAGECONFIG[babeltrace] = "--with-babeltrace,--without-babeltrace,babeltrace"
 
 GDBPROPREFIX = "--program-prefix=''"
@@ -69,4 +63,3 @@ RRECOMMENDS_gdb_append_linux = " glibc-thread-db "
 RRECOMMENDS_gdb_append_linux-gnueabi = " glibc-thread-db "
 RRECOMMENDS_gdbserver_append_linux = " glibc-thread-db "
 RRECOMMENDS_gdbserver_append_linux-gnueabi = " glibc-thread-db "
-

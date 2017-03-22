@@ -27,5 +27,5 @@ class ConnmanTest(oeRuntimeTest):
     def test_connmand_running(self):
         (status, output) = self.target.run(oeRuntimeTest.pscmd + ' | grep [c]onnmand')
         if status != 0:
-            print self.service_status("connman")
+            print(self.service_status("connman"))
             self.fail("No connmand process running")

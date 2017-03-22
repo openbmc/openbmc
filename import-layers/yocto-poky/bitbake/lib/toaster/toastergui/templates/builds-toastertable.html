@@ -13,16 +13,20 @@
 
 {% block pagecontent %}
 
-  <div class="row-fluid">
+<div class="row">
+  <div class="col-md-12">
     {% with mru=mru mrb_type=mrb_type %}
       {% include 'mrb_section.html' %}
     {% endwith %}
 
-    <h1 class="page-header top-air" data-role="page-title"></h1>
+    <div class="page-header">
+      <h1 class="top-air" data-role="page-title"></h1>
+    </div>
 
     {% url 'builds' as xhr_table_url %}
     {% include 'toastertable.html' %}
   </div>
+</div>
 
   <script>
     $(document).ready(function () {

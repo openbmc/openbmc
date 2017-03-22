@@ -1,0 +1,33 @@
+From 6d2363a705697f615d9e5af5d6703b291e618b46 Mon Sep 17 00:00:00 2001
+From: Daniel Klauer <daniel.klauer@gin.de>
+Date: Thu, 12 May 2016 17:55:01 +0200
+Subject: [PATCH] Fix channel command --remove-all option parsing
+
+Option.take_action() stores a list of options given for validation later.
+It strips leading dashes and turns remaining dashes into underscores.
+This list is what ensure_action() will compare its arguments against,
+thus we must use underscores here.
+
+Upstream-Status: Pending
+
+Signed-off-by: Daniel Klauer <daniel.klauer@gin.de>
+---
+ smart/commands/channel.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/smart/commands/channel.py b/smart/commands/channel.py
+index 108f3f1..6234f69 100644
+--- a/smart/commands/channel.py
++++ b/smart/commands/channel.py
+@@ -164,7 +164,7 @@ def main(ctrl, opts):
+     opts.check_args_of_option("edit", 0)
+     opts.check_args_of_option("enable", -1)
+     opts.check_args_of_option("disable", -1)
+-    opts.ensure_action("channel", ["add", "set", "remove", "remove-all",
++    opts.ensure_action("channel", ["add", "set", "remove", "remove_all",
+                        "list", "show", "yaml", "enable", "disable"])
+     opts.check_remaining_args()
+ 
+-- 
+1.9.1
+

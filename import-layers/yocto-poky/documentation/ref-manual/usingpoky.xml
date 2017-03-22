@@ -119,8 +119,8 @@
     </para>
 </section>
 
-<section id='usingpoky-debugging'>
-    <title>Debugging Build Failures</title>
+<section id='usingpoky-debugging-tools-and-techniques'>
+    <title>Debugging Tools and Techniques</title>
 
     <para>
         The exact method for debugging build failures depends on the nature of
@@ -163,23 +163,420 @@
         <ulink url='&YOCTO_DOCS_BB_URL;#bitbake-user-manual'>BitBake User Manual</ulink>.
     </note>
 
+    <section id='usingpoky-debugging-viewing-logs-from-failed-tasks'>
+        <title>Viewing Logs from Failed Tasks</title>
 
-    <section id='usingpoky-debugging-taskfailures'>
-        <title>Task Failures</title>
-
-        <para>The log file for shell tasks is available in
-            <filename>${WORKDIR}/temp/log.do_<replaceable>taskname</replaceable>.pid</filename>.
-            For example, the <filename>do_compile</filename> task for the QEMU minimal image for the x86
-            machine (<filename>qemux86</filename>) might be
-            <filename>tmp/work/qemux86-poky-linux/core-image-minimal/1.0-r0/temp/log.do_compile.20830</filename>.
-            To see what
-            <ulink url='&YOCTO_DOCS_DEV_URL;#bitbake-term'>BitBake</ulink>
-            runs to generate that log, look at the corresponding
-            <filename>run.do_<replaceable>taskname</replaceable>.pid</filename> file located in the same directory.
+        <para>
+            You can find the log for a task in the file
+            <filename>${</filename><link linkend='var-WORKDIR'><filename>WORKDIR</filename></link><filename>}/temp/log.do_</filename><replaceable>taskname</replaceable>.
+            For example, the log for the
+            <link linkend='ref-tasks-compile'><filename>do_compile</filename></link>
+            task of the QEMU minimal image for the x86 machine
+            (<filename>qemux86</filename>) might be in
+            <filename>tmp/work/qemux86-poky-linux/core-image-minimal/1.0-r0/temp/log.do_compile</filename>.
+            To see the commands
+            <ulink url='&YOCTO_DOCS_DEV_URL;#bitbake-term'>BitBake</ulink> ran
+            to generate a log, look at the corresponding
+            <filename>run.do_</filename><replaceable>taskname</replaceable>
+            file in the same directory.
         </para>
 
         <para>
-            Presently, the output from Python tasks is sent directly to the console.
+            <filename>log.do_</filename><replaceable>taskname</replaceable> and
+            <filename>run.do_</filename><replaceable>taskname</replaceable>
+            are actually symbolic links to
+            <filename>log.do_</filename><replaceable>taskname</replaceable><filename>.</filename><replaceable>pid</replaceable>
+            and
+            <filename>log.run_</filename><replaceable>taskname</replaceable><filename>.</filename><replaceable>pid</replaceable>,
+            where <replaceable>pid</replaceable> is the PID the task had when
+            it ran.
+            The symlinks always point to the files corresponding to the most
+            recent run.
+        </para>
+    </section>
+
+    <section id='usingpoky-debugging-viewing-variable-values'>
+        <title>Viewing Variable Values</title>
+        <para>
+            BitBake's <filename>-e</filename> option is used to display
+            variable values after parsing.
+            The following command displays the variable values after the
+            configuration files (i.e. <filename>local.conf</filename>,
+            <filename>bblayers.conf</filename>,
+            <filename>bitbake.conf</filename> and so forth) have been
+            parsed:
+            <literallayout class='monospaced'>
+     $ bitbake -e
+            </literallayout>
+            The following command displays variable values after a specific
+            recipe has been parsed.
+            The variables include those from the configuration as well:
+            <literallayout class='monospaced'>
+     $ bitbake -e recipename
+            </literallayout>
+            <note><para>
+                Each recipe has its own private set of variables (datastore).
+                Internally, after parsing the configuration, a copy of the
+                resulting datastore is made prior to parsing each recipe.
+                This copying implies that variables set in one recipe will
+                not be visible to other recipes.</para>
+
+                <para>Likewise, each task within a recipe gets a private
+                datastore based on the recipe datastore, which means that
+                variables set within one task will not be visible to
+                other tasks.</para>
+            </note>
+        </para>
+
+        <para>
+            In the output of <filename>bitbake -e</filename>, each variable is
+            preceded by a description of how the variable got its value,
+            including temporary values that were later overriden.
+            This description also includes variable flags (varflags) set on
+            the variable.
+            The output can be very helpful during debugging.
+        </para>
+
+        <para>
+            Variables that are exported to the environment are preceded by
+            <filename>export</filename> in the output of
+            <filename>bitbake -e</filename>.
+            See the following example:
+            <literallayout class='monospaced'>
+     export CC="i586-poky-linux-gcc -m32 -march=i586 --sysroot=/home/ulf/poky/build/tmp/sysroots/qemux86"
+            </literallayout>
+        </para>
+
+        <para>
+            In addition to variable values, the output of the
+            <filename>bitbake -e</filename> and
+            <filename>bitbake -e</filename>&nbsp;<replaceable>recipe</replaceable>
+            commands includes the following information:
+            <itemizedlist>
+                <listitem><para>
+                    The output starts with a tree listing all configuration
+                    files and classes included globally, recursively listing
+                    the files they include or inherit in turn.
+                    Much of the behavior of the OpenEmbedded build system
+                    (including the behavior of the
+                    <link linkend='normal-recipe-build-tasks'>normal recipe build tasks</link>)
+                    is implemented in the
+                    <link linkend='ref-classes-base'><filename>base</filename></link>
+                    class and the classes it inherits, rather than being built
+                    into BitBake itself.
+                    </para></listitem>
+                <listitem><para>
+                    After the variable values, all functions appear in the
+                    output.
+                    For shell functions, variables referenced within the
+                    function body are expanded.
+                    If a function has been modified using overrides or
+                    using override-style operators like
+                    <filename>_append</filename> and
+                    <filename>_prepend</filename>, then the final assembled
+                    function body appears in the output.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='viewing-package-information-with-oe-pkgdata-util'>
+        <title>Viewing Package Information with <filename>oe-pkgdata-util</filename></title>
+
+        <para>
+            You can use the <filename>oe-pkgdata-util</filename> command-line
+            utility to query
+            <link linkend='var-PKGDATA_DIR'><filename>PKGDATA_DIR</filename></link>
+            and display various package-related information.
+            When you use the utility, you must use it to view information
+            on packages that have already been built.
+        </para>
+
+        <para>
+            Following are a few of the available
+            <filename>oe-pkgdata-util</filename> subcommands.
+            <note>
+                You can use the standard * and ? globbing wildcards as part of
+                package names and paths.
+            </note>
+            <itemizedlist>
+                <listitem><para>
+                    <filename>oe-pkgdata-util list-pkgs [</filename><replaceable>pattern</replaceable><filename>]</filename>:
+                    Lists all packages that have been built, optionally
+                    limiting the match to packages that match
+                    <replaceable>pattern</replaceable>.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>oe-pkgdata-util list-pkg-files&nbsp;</filename><replaceable>package</replaceable><filename>&nbsp;...</filename>:
+                    Lists the files and directories contained in the given
+                    packages.
+                    <note>
+                        <para>
+                        A different way to view the contents of a package is
+                        to look at the
+                        <filename>${</filename><link linkend='var-WORKDIR'><filename>WORKDIR</filename></link><filename>}/packages-split</filename>
+                        directory of the recipe that generates the
+                        package.
+                        This directory is created by the
+                        <link linkend='ref-tasks-package'><filename>do_package</filename></link>
+                        task and has one subdirectory for each package the
+                        recipe generates, which contains the files stored in
+                        that package.</para>
+                        <para>
+                        If you want to inspect the
+                        <filename>${WORKDIR}/packages-split</filename>
+                        directory, make sure that
+                        <link linkend='ref-classes-rm-work'><filename>rm_work</filename></link>
+                        is not enabled when you build the recipe.
+                        </para>
+                        </note>
+                    </para></listitem>
+                <listitem><para>
+                    <filename>oe-pkgdata-util find-path&nbsp;</filename><replaceable>path</replaceable><filename>&nbsp;...</filename>:
+                    Lists the names of the packages that contain the given
+                    paths.
+                    For example, the following tells us that
+                    <filename>/usr/share/man/man1/make.1</filename>
+                    is contained in the <filename>make-doc</filename>
+                    package:
+                    <literallayout class='monospaced'>
+     $ oe-pkgdata-util find-path /usr/share/man/man1/make.1
+     make-doc: /usr/share/man/man1/make.1
+                    </literallayout>
+                    </para></listitem>
+                <listitem><para>
+                    <filename>oe-pkgdata-util lookup-recipe&nbsp;</filename><replaceable>package</replaceable><filename>&nbsp;...</filename>:
+                    Lists the name of the recipes that
+                    produce the given packages.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+
+        <para>
+            For more information on the <filename>oe-pkgdata-util</filename>
+            command, use the help facility:
+            <literallayout class='monospaced'>
+     $ oe-pkgdata-util &dash;&dash;help
+     $ oe-pkgdata-util <replaceable>subcommand</replaceable> --help
+            </literallayout>
+        </para>
+    </section>
+
+    <section id='usingpoky-viewing-dependencies-between-recipes-and-tasks'>
+        <title>Viewing Dependencies Between Recipes and Tasks</title>
+
+        <para>
+            Sometimes it can be hard to see why BitBake wants to build other
+            recipes before the one you have specified.
+            Dependency information can help you understand why a recipe is
+            built.
+        </para>
+
+        <para>
+            To generate dependency information for a recipe, run the following
+            command:
+            <literallayout class='monospaced'>
+     $ bitbake -g <replaceable>recipename</replaceable>
+            </literallayout>
+            This command writes the following files in the current directory:
+            <itemizedlist>
+                <listitem><para>
+                    <filename>pn-buildlist</filename>: A list of
+                    recipes/targets involved in building
+                    <replaceable>recipename</replaceable>.
+                    "Involved" here means that at least one task from the
+                     recipe needs to run when building
+                    <replaceable>recipename</replaceable> from scratch.
+                    Targets that are in
+                    <link linkend='var-ASSUME_PROVIDED'><filename>ASSUME_PROVIDED</filename></link>
+                    are not listed.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>pn-depends.dot</filename>: A graph showing
+                    dependencies between build-time targets (recipes).
+                    </para></listitem>
+                <listitem><para>
+                    <filename>package-depends.dot</filename>: A graph showing
+                    known dependencies between runtime targets.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>task-depends.dot</filename>: A graph showing
+                    dependencies between tasks.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+
+        <para>
+            The graphs are in
+            <ulink url='https://en.wikipedia.org/wiki/DOT_%28graph_description_language%29'>DOT</ulink>
+            format and can be converted to images (e.g. using the
+            <filename>dot</filename> tool from
+            <ulink url='http://www.graphviz.org/'>Graphviz</ulink>).
+            <note><title>Notes</title>
+                <itemizedlist>
+                    <listitem><para>
+                        DOT files use a plain text format.
+                        The graphs generated using the
+                        <filename>bitbake -g</filename> command are often so
+                        large as to be difficult to read without special
+                        pruning (e.g. with Bitbake's
+                        <filename>-I</filename> option) and processing.
+                        Despite the form and size of the graphs, the
+                        corresponding <filename>.dot</filename> files can still
+                        be possible to read and provide useful information.
+                        </para>
+
+                        <para>As an example, the
+                        <filename>task-depends.dot</filename> file contains
+                        lines such as the following:
+                        <literallayout class='monospaced'>
+     "libxslt.do_configure" -> "libxml2.do_populate_sysroot"
+                        </literallayout>
+                        The above example line reveals that the
+                        <link linkend='ref-tasks-configure'><filename>do_configure</filename></link>
+                        task in <filename>libxslt</filename> depends on the
+                        <link linkend='ref-tasks-populate_sysroot'><filename>do_populate_sysroot</filename></link>
+                        task in <filename>libxml2</filename>, which is a normal
+                        <link linkend='var-DEPENDS'><filename>DEPENDS</filename></link>
+                        dependency between the two recipes.
+                        </para></listitem>
+                    <listitem><para>
+                        For an example of how <filename>.dot</filename> files
+                        can be processed, see the
+                        <filename>scripts/contrib/graph-tool</filename> Python
+                        script, which finds and displays paths between graph
+                        nodes.
+                        </para></listitem>
+                </itemizedlist>
+            </note>
+        </para>
+
+        <para>
+            You can use a different method to view dependency information
+            by using the following command:
+            <literallayout class='monospaced'>
+     $ bitbake -g -u depexp <replaceable>recipename</replaceable>
+            </literallayout>
+            This command displays a GUI window from which you can view
+            build-time and runtime dependencies for the recipes involved in
+            building <replaceable>recipename</replaceable>.
+        </para>
+    </section>
+
+    <section id='usingpoky-viewing-task-variable-dependencies'>
+        <title>Viewing Task Variable Dependencies</title>
+
+        <para>
+            As mentioned in the
+            "<ulink url='&YOCTO_DOCS_BB_URL;#checksums'>Checksums (Signatures)</ulink>"
+            section of the BitBake User Manual, BitBake tries to automatically
+            determine what variables a task depends on so that it can rerun
+            the task if any values of the variables change.
+            This determination is usually reliable.
+            However, if you do things like construct variable names at runtime,
+            then you might have to manually declare dependencies on those
+            variables using <filename>vardeps</filename> as described in the
+            "<ulink url='&YOCTO_DOCS_BB_URL;#variable-flags'>Variable Flags</ulink>"
+            section of the BitBake User Manual.
+        </para>
+
+        <para>
+            If you are unsure whether a variable dependency is being picked up
+            automatically for a given task, you can list the variable
+            dependencies BitBake has determined by doing the following:
+            <orderedlist>
+                <listitem><para>
+                    Build the recipe containing the task:
+                    <literallayout class='monospaced'>
+     $ bitbake <replaceable>recipename</replaceable>
+                    </literallayout>
+                    </para></listitem>
+                <listitem><para>
+                    Inside the
+                    <link linkend='var-STAMPS_DIR'><filename>STAMPS_DIR</filename></link>
+                    directory, find the signature data
+                    (<filename>sigdata</filename>) file that corresponds to the
+                    task.
+                    The <filename>sigdata</filename> files contain a pickled
+                    Python database of all the metadata that went into creating
+                    the input checksum for the task.
+                    As an example, for the
+                    <link linkend='ref-tasks-fetch'><filename>do_fetch</filename></link>
+                    task of the <filename>db</filename> recipe, the
+                    <filename>sigdata</filename> file might be found in the
+                    following location:
+                    <literallayout class='monospaced'>
+     ${BUILDDIR}/tmp/stamps/i586-poky-linux/db/6.0.30-r1.do_fetch.sigdata.7c048c18222b16ff0bcee2000ef648b1
+                    </literallayout>
+                    For tasks that are accelerated through the shared state
+                    (<link linkend='shared-state-cache'>sstate</link>)
+                    cache, an additional <filename>siginfo</filename> file is
+                    written into
+                    <link linkend='var-SSTATE_DIR'><filename>SSTATE_DIR</filename></link>
+                    along with the cached task output.
+                    The <filename>siginfo</filename> files contain exactly the
+                    same information as <filename>sigdata</filename> files.
+                    </para></listitem>
+                <listitem><para>
+                    Run <filename>bitbake-dumpsig</filename> on the
+                    <filename>sigdata</filename> or
+                    <filename>siginfo</filename> file.
+                    Here is an example:
+                    <literallayout class='monospaced'>
+     $ bitbake-dumpsig ${BUILDDIR}/tmp/stamps/i586-poky-linux/db/6.0.30-r1.do_fetch.sigdata.7c048c18222b16ff0bcee2000ef648b1
+                    </literallayout>
+                    In the output of the above command, you will find a line
+                    like the following, which lists all the (inferred) variable
+                    dependencies for the task.
+                    This list also includes indirect dependencies from
+                    variables depending on other variables, recursively.
+                    <literallayout class='monospaced'>
+     Task dependencies: ['PV', 'SRCREV', 'SRC_URI', 'SRC_URI[md5sum]', 'SRC_URI[sha256sum]', 'base_do_fetch']
+                    </literallayout>
+                    <note>
+                        Functions (e.g. <filename>base_do_fetch</filename>)
+                        also count as variable dependencies.
+                        These functions in turn depend on the variables they
+                        reference.
+                    </note>
+                    The output of <filename>bitbake-dumpsig</filename> also includes
+                    the value each variable had, a list of dependencies for each
+                    variable, and
+                    <ulink url='&YOCTO_DOCS_BB_URL;#var-BB_HASHBASE_WHITELIST'><filename>BB_HASHBASE_WHITELIST</filename></ulink>
+                    information.
+                    </para></listitem>
+            </orderedlist>
+        </para>
+
+        <para>
+            There is also a <filename>bitbake-diffsigs</filename> command for
+            comparing two <filename>siginfo</filename> or
+            <filename>sigdata</filename> files.
+            This command can be helpful when trying to figure out what changed
+            between two versions of a task.
+            If you call <filename>bitbake-diffsigs</filename> with just one
+            file, the command behaves like
+            <filename>bitbake-dumpsig</filename>.
+        </para>
+
+        <para>
+            You can also use BitBake to dump out the signature construction
+            information without executing tasks by using either of the
+            following BitBake command-line options:
+            <literallayout class='monospaced'>
+     &dash;&dash;dump-signatures=<replaceable>SIGNATURE_HANDLER</replaceable>
+     -S <replaceable>SIGNATURE_HANDLER</replaceable>
+            </literallayout>
+            <note>
+                Two common values for
+                <replaceable>SIGNATURE_HANDLER</replaceable> are "none" and
+                "printdiff", which dump only the signature or compare the
+                dumped signature with the cached one, respectively.
+            </note>
+            Using BitBake with either of these options causes BitBake to dump
+            out <filename>sigdata</filename> files in the
+            <filename>stamps</filename> directory for every task it would have
+            executed instead of building the specified target package.
         </para>
     </section>
 
@@ -187,7 +584,7 @@
         <title>Running Specific Tasks</title>
 
         <para>
-            Any given package consists of a set of tasks.
+            Any given recipe consists of a set of tasks.
             The standard BitBake behavior in most cases is:
             <filename>do_fetch</filename>,
             <filename>do_unpack</filename>,
@@ -209,15 +606,39 @@
         </para>
 
         <para>
-            If you wish to rerun a task, use the <filename>-f</filename> force
-            option.
-            For example, the following sequence forces recompilation after
-            changing files in the work directory.
+            The <filename>-c</filename> option respects task dependencies,
+            which means that all other tasks (including tasks from other
+            recipes) that the specified task depends on will be run before the
+            task.
+            Even when you manually specify a task to run with
+            <filename>-c</filename>, BitBake will only run the task if it
+            considers it "out of date".
+            See the
+            "<link linkend='stamp-files-and-the-rerunning-of-tasks'>Stamp Files and the Rerunning of Tasks</link>"
+            section for how BitBake determines whether a task is "out of date".
+        </para>
+
+        <para>
+            If you want to force an up-to-date task to be rerun (e.g.
+            because you made manual modifications to the recipe's
+            <link linkend='var-WORKDIR'><filename>WORKDIR</filename></link>
+            that you want to try out), then you can use the
+            <filename>-f</filename> option.
+            <note>
+                The reason <filename>-f</filename> is never required when
+                running the
+                <link linkend='ref-tasks-devshell'><filename>do_devshell</filename></link>
+                task is because the
+                <filename>[</filename><ulink url='&YOCTO_DOCS_BB_URL;#variable-flags'><filename>nostamp</filename></ulink><filename>]</filename>
+                variable flag is already set for the task.
+            </note>
+            The following example shows one way you can use the
+            <filename>-f</filename> option:
             <literallayout class='monospaced'>
      $ bitbake matchbox-desktop
                .
                .
-        <replaceable>make some changes to the source code in the work directory</replaceable>
+     make some changes to the source code in the work directory
                .
                .
      $ bitbake matchbox-desktop -c compile -f
@@ -236,6 +657,50 @@
         </para>
 
         <para>
+            Another, shorter way to rerun a task and all
+            <link linkend='normal-recipe-build-tasks'>normal recipe build tasks</link>
+            that depend on it is to use the <filename>-C</filename>
+            option.
+            <note>
+                This option is upper-cased and is separate from the
+                <filename>-c</filename> option, which is lower-cased.
+            </note>
+            Using this option invalidates the given task and then runs the
+            <link linkend='ref-tasks-build'><filename>do_build</filename></link>
+            task, which is the default task if no task is given, and the
+            tasks on which it depends.
+            You could replace the final two commands in the previous example
+            with the following single command:
+            <literallayout class='monospaced'>
+     $ bitbake matchbox-desktop -C compile
+            </literallayout>
+            Internally, the <filename>-f</filename> and
+            <filename>-C</filename> options work by tainting (modifying) the
+            input checksum of the specified task.
+            This tainting indirectly causes the task and its
+            dependent tasks to be rerun through the normal task dependency
+            mechanisms.
+            <note>
+                BitBake explicitly keeps track of which tasks have been
+                tainted in this fashion, and will print warnings such as the
+                following for builds involving such tasks:
+                <literallayout class='monospaced'>
+     WARNING: /home/ulf/poky/meta/recipes-sato/matchbox-desktop/matchbox-desktop_2.1.bb.do_compile is tainted from a forced run
+                </literallayout>
+                The purpose of the warning is to let you know that the work
+                directory and build output might not be in the clean state they
+                would be in for a "normal" build, depending on what actions
+                you took.
+                To get rid of such warnings, you can remove the work directory
+                and rebuild the recipe, as follows:
+                <literallayout class='monospaced'>
+     $ bitbake matchbox-desktop -c clean
+     $ bitbake matchbox-desktop
+                </literallayout>
+            </note>
+        </para>
+
+        <para>
             You can view a list of tasks in a given package by running the
             <filename>do_listtasks</filename> task as follows:
             <literallayout class='monospaced'>
@@ -246,24 +711,77 @@
         </para>
     </section>
 
-    <section id='usingpoky-debugging-dependencies'>
-        <title>Dependency Graphs</title>
+    <section id='checking-for-missing-build-time-dependencies'>
+        <title>Checking for Missing Build-Time Dependencies</title>
 
         <para>
-            Sometimes it can be hard to see why BitBake wants to build
-            other packages before building a given package you have specified.
-            The <filename>bitbake -g <replaceable>targetname</replaceable></filename> command
-            creates the <filename>pn-buildlist</filename>,
-            <filename>pn-depends.dot</filename>,
-            <filename>package-depends.dot</filename>, and
-            <filename>task-depends.dot</filename> files in the current
-            directory.
-            These files show what will be built and the package and task
-            dependencies, which are useful for debugging problems.
-            You can use the
-            <filename>bitbake -g -u depexp <replaceable>targetname</replaceable></filename>
-            command to display the results in a more human-readable form.
+            A recipe might build successfully even though some of its
+            build-time dependencies are missing from
+            <link linkend='var-DEPENDS'><filename>DEPENDS</filename></link>.
+            Following are the two most common ways in which that can happen:
+            <itemizedlist>
+                <listitem><para>
+                    The build-time dependency just happens to already exist in
+                    the staging sysroot
+                    (<link linkend='var-STAGING_DIR_HOST'><filename>STAGING_DIR_HOST</filename></link>)
+                    by the time the recipe is built.
+                    This situation occurs when the build-time dependency is
+                    built earlier during recipe processing.
+                    </para></listitem>
+                <listitem><para>
+                    The component built by the recipe conditionally enables
+                    functionality depending on whether it can find the
+                    build-time dependency in the staging sysroot.
+                    If the build-time dependency is missing, the corresponding
+                    functionality is disabled.
+                    This condition is known as a "floating dependency".
+                    </para></listitem>
+            </itemizedlist>
         </para>
+
+        <para>
+            Because dealing with the second case is more complex, focus will
+            be on the first case.
+            The
+            <link linkend='ref-classes-insane'><filename>build-deps</filename></link>
+            QA check checks that every library the component linked against is
+            declared as a build-time dependency.
+            If that is not the case, then the first situation described in the
+            previous list exists, and <filename>build-deps</filename> reports
+            a missing build-time dependency.
+        </para>
+
+        <para>
+            Another, more manual, way to check a recipe for missing build-time
+            dependencies of the first type is to build with an empty staging
+            sysroot.
+            This method can also find missing build-time dependencies
+            that are not in the form of libraries, which the
+            <filename>build-deps</filename> QA check is unable to find.
+        </para>
+
+        <para>
+            An easy way to empty the staging sysroots is to simply remove
+            <link linkend='var-TMPDIR'><filename>TMPDIR</filename></link>,
+            which is usually
+            <filename>${</filename><link linkend='var-BUILDDIR'><filename>BUILDDIR</filename></link><filename>}/tmp</filename>,
+            as it includes the staging sysroots.
+            Another, faster method to empty the staging sysroots is to use the
+            <filename>scripts/wipe-sysroot</filename> script,
+            which removes just the staging sysroots and keeps everything else
+            in <filename>TMPDIR</filename>.
+            <note>
+                The <filename>scripts/</filename> directory appears in
+                <filename>PATH</filename> after running the build environment
+                initialization script (i.e.
+                <link linkend='structure-core-script'><filename>oe-init-build-env</filename></link>
+                or
+                <link linkend='structure-memres-core-script'><filename>oe-init-build-env-memres</filename></link>),
+                which results in the ability to to run
+                <filename>wipe-sysroot</filename> immediately.
+            </note>
+        </para>
+
     </section>
 
     <section id='usingpoky-debugging-bitbake'>
@@ -336,48 +854,76 @@
         </para>
     </section>
 
-    <section id='usingpoky-debugging-variables'>
-        <title>Variables</title>
-        <para>
-            You can use the <filename>-e</filename> BitBake option to
-            display the parsing environment for a configuration.
-            The following displays the general parsing environment:
-            <literallayout class='monospaced'>
-     $ bitbake -e
-            </literallayout>
-            This next example shows the parsing environment for a specific
-            recipe:
-            <literallayout class='monospaced'>
-     $ bitbake -e <replaceable>recipename</replaceable>
-            </literallayout>
-        </para>
-    </section>
-
     <section id='recipe-logging-mechanisms'>
         <title>Recipe Logging Mechanisms</title>
         <para>
-            Best practices exist while writing recipes that both log build progress and
-            act on build conditions such as warnings and errors.
-            Both Python and Bash language bindings exist for the logging mechanism:
+            The Yocto Project provides several logging functions for producing
+            debugging output and reporting errors and warnings.
+            For Python functions, the following logging functions exist.
+            All of these functions log to
+            <filename>${T}/log.do_</filename><replaceable>task</replaceable>,
+            and can also log to standard output (stdout) with the right
+            settings:
             <itemizedlist>
-                <listitem><para><emphasis>Python:</emphasis> For Python functions, BitBake
-                    supports several loglevels: <filename>bb.fatal</filename>,
-                    <filename>bb.error</filename>, <filename>bb.warn</filename>,
-                    <filename>bb.note</filename>, <filename>bb.plain</filename>,
-                    and <filename>bb.debug</filename>.</para></listitem>
-                <listitem><para><emphasis>Bash:</emphasis> For Bash functions, the same set
-                    of loglevels exist and are accessed with a similar syntax:
-                    <filename>bbfatal</filename>, <filename>bberror</filename>,
-                    <filename>bbwarn</filename>, <filename>bbnote</filename>,
-                    <filename>bbplain</filename>, and <filename>bbdebug</filename>.</para></listitem>
+                <listitem><para>
+                    <filename>bb.plain(</filename><replaceable>msg</replaceable><filename>)</filename>:
+                    Writes <replaceable>msg</replaceable> as is to the log while
+                    also logging to stdout.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>bb.note(</filename><replaceable>msg</replaceable><filename>)</filename>:
+                    Writes "NOTE: <replaceable>msg</replaceable>" to the log.
+                    Also logs to stdout if BitBake is called with "-v".
+                    </para></listitem>
+                <listitem><para>
+                    <filename>bb.debug(</filename><replaceable>level</replaceable><filename>,&nbsp;</filename><replaceable>msg</replaceable><filename>)</filename>:
+                    Writes "DEBUG: <replaceable>msg</replaceable>" to the log.
+                    Also logs to stdout if the log level is greater than or
+                    equal to <replaceable>level</replaceable>.
+                    See the
+                    "<ulink url='&YOCTO_DOCS_BB_URL;#usage-and-syntax'>-D</ulink>"
+                    option in the BitBake User Manual for more information.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>bb.warn(</filename><replaceable>msg</replaceable><filename>)</filename>:
+                    Writes "WARNING: <replaceable>msg</replaceable>" to the log
+                    while also logging to stdout.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>bb.error(</filename><replaceable>msg</replaceable><filename>)</filename>:
+                    Writes "ERROR: <replaceable>msg</replaceable>" to the log
+                    while also logging to stdout.
+                    <note>
+                        Calling this function does not cause the task to fail.
+                    </note>
+                    </para></listitem>
+                <listitem><para>
+                    <filename>bb.fatal(</filename><replaceable>msg</replaceable><filename>)</filename>:
+                    This logging function is similar to
+                    <filename>bb.error(</filename><replaceable>msg</replaceable><filename>)</filename>
+                    but also causes the calling task to fail.
+                    <note>
+                        <filename>bb.fatal()</filename> raises an exception,
+                        which means you do not need to put a "return"
+                        statement after the function.
+                    </note>
+                    </para></listitem>
             </itemizedlist>
         </para>
 
         <para>
-            For guidance on how logging is handled in both Python and Bash recipes, see the
-            <filename>logging.bbclass</filename> file in the
+            The same logging functions are also available in shell functions,
+            under the names
+            <filename>bbplain</filename>, <filename>bbnote</filename>,
+            <filename>bbdebug</filename>, <filename>bbwarn</filename>,
+            <filename>bberror</filename>, and <filename>bbfatal</filename>.
+            The
+            <link linkend='ref-classes-logging'><filename>logging</filename></link>
+            class implements these functions.
+            See that class in the
             <filename>meta/classes</filename> folder of the
-            <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+            <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+            for information.
         </para>
 
         <section id='logging-with-python'>
@@ -456,18 +1002,92 @@
         <para>
             Here are some other tips that you might find useful:
             <itemizedlist>
-                <listitem><para>When adding new packages, it is worth watching for
-                    undesirable items making their way into compiler command lines.
-                    For example, you do not want references to local system files like
-                    <filename>/usr/lib/</filename> or <filename>/usr/include/</filename>.
+                <listitem><para>
+                    When adding new packages, it is worth watching for
+                    undesirable items making their way into compiler command
+                    lines.
+                    For example, you do not want references to local system
+                    files like
+                    <filename>/usr/lib/</filename> or
+                    <filename>/usr/include/</filename>.
                     </para></listitem>
-                <listitem><para>If you want to remove the <filename>psplash</filename>
+                <listitem><para>
+                    If you want to remove the <filename>psplash</filename>
                     boot splashscreen,
-                    add <filename>psplash=false</filename> to  the kernel command line.
+                    add <filename>psplash=false</filename> to  the kernel
+                    command line.
                     Doing so prevents <filename>psplash</filename> from loading
                     and thus allows you to see the console.
                     It is also possible to switch out of the splashscreen by
-                    switching the virtual console (e.g. Fn+Left or Fn+Right on a Zaurus).
+                    switching the virtual console (e.g. Fn+Left or Fn+Right
+                    on a Zaurus).
+                    </para></listitem>
+                <listitem><para>
+                    Removing
+                    <link linkend='var-TMPDIR'><filename>TMPDIR</filename></link>
+                    (usually <filename>tmp/</filename>, within the
+                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>)
+                    can often fix temporary build issues.
+                    Removing <filename>TMPDIR</filename> is usually a
+                    relatively cheap operation, because task output will be
+                    cached in
+                    <link linkend='var-SSTATE_DIR'><filename>SSTATE_DIR</filename></link>
+                    (usually <filename>sstate-cache/</filename>, which is
+                    also in the Build Directory).
+                    <note>
+                        Removing <filename>TMPDIR</filename> might be a
+                        workaround rather than a fix.
+                        Consequently, trying to determine the underlying cause
+                        of an issue before removing the directory is a good
+                        idea.
+                    </note>
+                    </para></listitem>
+                <listitem><para>
+                    Understanding how a feature is used in practice within
+                    existing recipes can be very helpful.
+                    It is recommended that you configure some method that
+                    allows you to quickly search through files.</para>
+
+                    <para>Using GNU Grep, you can use the following shell
+                    function to recursively search through common
+                    recipe-related files, skipping binary files,
+                    <filename>.git</filename> directories, and the
+                    Build Directory (assuming its name starts with
+                    "build"):
+                    <literallayout class='monospaced'>
+     g() {
+         grep -Ir \
+              --exclude-dir=.git \
+              --exclude-dir='build*' \
+              --include='*.bb*' \
+              --include='*.inc*' \
+              --include='*.conf*' \
+              --include='*.py*' \
+              "$@"
+     }
+                    </literallayout>
+                    Following are some usage examples:
+                    <literallayout class='monospaced'>
+     $ g FOO    # Search recursively for "FOO"
+     $ g -i foo # Search recursively for "foo", ignoring case
+     $ g -w FOO # Search recursively for "FOO" as a word, ignoring e.g. "FOOBAR"
+                    </literallayout>
+                    If figuring out how some feature works requires a lot of
+                    searching, it might indicate that the documentation should
+                    be extended or improved.
+                    In such cases, consider filing a documentation bug using
+                    the Yocto Project implementation of
+                    <ulink url='https://bugzilla.yoctoproject.org/'>Bugzilla</ulink>.
+                    For general information on how to submit a bug against
+                    the Yocto Project, see the
+                    "<ulink url='&YOCTO_DOCS_DEV_URL;#tracking-bugs'>Tracking Bugs</ulink>"
+                    section in the Yocto Project Development Manual.
+                    <note>
+                        The manuals might not be the right place to document
+                        variables that are purely internal and have a limited
+                        scope (e.g. internal variables used to implement a
+                        single <filename>.bbclass</filename> file).
+                    </note>
                     </para></listitem>
             </itemizedlist>
         </para>
@@ -951,6 +1571,19 @@
         * PR changed from "r0" to "r1"
         * PV changed from "0.1.10" to "0.1.12"
                 </literallayout>
+                <note>
+                    The <filename>buildhistory-diff</filename> tool requires
+                    the <filename>GitPython</filename> package.
+                    Be sure to install it using Pip3 as follows:
+                    <literallayout class='monospaced'>
+   $ pip3 install GitPython --user
+                    </literallayout>
+                    Alternatively, you can install
+                    <filename>python3-git</filename> using the appropriate
+                    distribution package manager (e.g.
+                    <filename>apt-get</filename>, <filename>dnf</filename>, or
+                    <filename>zipper</filename>).
+                </note>
             </para>
 
             <para>

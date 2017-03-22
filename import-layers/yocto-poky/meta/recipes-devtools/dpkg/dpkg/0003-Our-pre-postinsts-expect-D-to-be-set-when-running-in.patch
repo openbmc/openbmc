@@ -8,30 +8,41 @@ Subject: [PATCH 3/5] Our pre/postinsts expect $D to be set when running in a
 Upstream-Status: Inappropriate [OE Specific]
 
 RP 2011/12/07
+ALIMON 2016/05/26
+
 ---
- src/script.c | 31 ++-----------------------------
- 1 file changed, 2 insertions(+), 29 deletions(-)
+ src/script.c | 39 +++------------------------------------
+ 1 file changed, 3 insertions(+), 36 deletions(-)
 
 diff --git a/src/script.c b/src/script.c
-index a958145..24c49f9 100644
+index 3c88be8..ce66a86 100644
 --- a/src/script.c
 +++ b/src/script.c
-@@ -100,36 +100,9 @@ maintscript_pre_exec(struct command *cmd)
- 	size_t instdirl = strlen(instdir);
- 
- 	if (*instdir) {
+@@ -97,43 +97,10 @@ setexecute(const char *path, struct stat *stab)
+ static const char *
+ maintscript_pre_exec(struct command *cmd)
+ {
+-	const char *admindir = dpkg_db_get_dir();
+-	const char *changedir = fc_script_chrootless ? instdir : "/";
+-	size_t instdirl = strlen(instdir);
+-
+-	if (*instdir && !fc_script_chrootless) {
 -		if (strncmp(admindir, instdir, instdirl) != 0)
 -			ohshit(_("admindir must be inside instdir for dpkg to work properly"));
 -		if (setenv("DPKG_ADMINDIR", admindir + instdirl, 1) < 0)
 -			ohshite(_("unable to setenv for subprocesses"));
+-		if (setenv("DPKG_ROOT", "", 1) < 0)
+-			ohshite(_("unable to setenv for subprocesses"));
 -
 -		if (chroot(instdir))
 -			ohshite(_("failed to chroot to '%.250s'"), instdir);
--	}
++	if (*instdir) {
++		setenv("D", instdir, 1);
+ 	}
 -	/* Switch to a known good directory to give the maintainer script
 -	 * a saner environment, also needed after the chroot(). */
--	if (chdir("/"))
--		ohshite(_("failed to chdir to '%.255s'"), "/");
+-	if (chdir(changedir))
+-		ohshite(_("failed to chdir to '%.255s'"), changedir);
 -	if (debug_has_flag(dbg_scripts)) {
 -		struct varbuf args = VARBUF_INIT;
 -		const char **argv = cmd->argv;
@@ -44,9 +55,8 @@ index a958145..24c49f9 100644
 -		debug(dbg_scripts, "fork/exec %s (%s )", cmd->filename,
 -		      args.buf);
 -		varbuf_destroy(&args);
-+		setenv("D", instdir, 1);
- 	}
--	if (!instdirl)
+-	}
+-	if (!instdirl || fc_script_chrootless)
 -		return cmd->filename;
 -
 -	assert(strlen(cmd->filename) >= instdirl);

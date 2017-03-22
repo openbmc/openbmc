@@ -1,0 +1,43 @@
+From 630de45f3d5f9a2dda7fad99acd21449b8c4111d Mon Sep 17 00:00:00 2001
+From: Awais Belal <awais_belal@mentor.com>
+Date: Thu, 8 Dec 2016 18:27:01 +0500
+Subject: [PATCH 2/2] * grub-core/kern/efi/mm.c (grub_efi_get_memory_map):
+ Never  return a descriptor_size==0 to avoid potential divisions by zero.
+
+Upstream-status: Backport [ http://git.savannah.gnu.org/cgit/grub.git/commit/?id=69aee43fa64601cabf6efa9279c10d69b466662e ]
+
+Signed-off-by: Awais Belal <awais_belal@mentor.com>
+---
+ grub-core/kern/efi/mm.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/grub-core/kern/efi/mm.c b/grub-core/kern/efi/mm.c
+index b00e0bc..9f1d194 100644
+--- a/grub-core/kern/efi/mm.c
++++ b/grub-core/kern/efi/mm.c
+@@ -235,6 +235,7 @@ grub_efi_get_memory_map (grub_efi_uintn_t *memory_map_size,
+   grub_efi_boot_services_t *b;
+   grub_efi_uintn_t key;
+   grub_efi_uint32_t version;
++  grub_efi_uintn_t size;
+ 
+   if (grub_efi_is_finished)
+     {
+@@ -264,10 +265,14 @@ grub_efi_get_memory_map (grub_efi_uintn_t *memory_map_size,
+     map_key = &key;
+   if (! descriptor_version)
+     descriptor_version = &version;
++  if (! descriptor_size)
++    descriptor_size = &size;
+ 
+   b = grub_efi_system_table->boot_services;
+   status = efi_call_5 (b->get_memory_map, memory_map_size, memory_map, map_key,
+ 			      descriptor_size, descriptor_version);
++  if (*descriptor_size == 0)
++    *descriptor_size = sizeof (grub_efi_memory_descriptor_t);
+   if (status == GRUB_EFI_SUCCESS)
+     return 1;
+   else if (status == GRUB_EFI_BUFFER_TOO_SMALL)
+-- 
+1.9.1
+

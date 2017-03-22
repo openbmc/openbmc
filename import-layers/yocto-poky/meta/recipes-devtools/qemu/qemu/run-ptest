@@ -1,8 +1,10 @@
 #!/bin/sh
 #
 #This script is used to run qemu test suites
-ptestdir=$(pwd)
-cd tests
+#
 
+ptestdir=$(dirname "$(readlink -f "$0")")
 export SRC_PATH=$ptestdir
-make -k runtest-TESTS | sed '/: OK/ s/^/PASS: /g'
+
+cd $ptestdir/tests
+make -f Makefile.include -k runtest-TESTS | sed '/: OK/ s/^/PASS: /g'

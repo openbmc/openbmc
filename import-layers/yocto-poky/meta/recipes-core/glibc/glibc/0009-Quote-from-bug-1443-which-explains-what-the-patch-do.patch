@@ -1,7 +1,7 @@
-From 502f061d846e58aac7aca67e4e0d6ba9e0763b17 Mon Sep 17 00:00:00 2001
+From 1b61649e545de76dd79a5e2c39bb16d0c4623160 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:20:09 +0000
-Subject: [PATCH 09/24] Quote from bug 1443 which explains what the patch does
+Subject: [PATCH 09/25] Quote from bug 1443 which explains what the patch does
  :
 
   We build some random program and link it with -lust.  When we run it,
@@ -45,7 +45,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/sysdeps/arm/dl-machine.h b/sysdeps/arm/dl-machine.h
-index 6fb20bd..8805537 100644
+index 60eee00..7d54d5e 100644
 --- a/sysdeps/arm/dl-machine.h
 +++ b/sysdeps/arm/dl-machine.h
 @@ -499,7 +499,7 @@ elf_machine_rel (struct link_map *map, const Elf32_Rel *reloc,
@@ -58,5 +58,5 @@ index 6fb20bd..8805537 100644
  
  	case R_ARM_TLS_TPOFF32:
 -- 
-2.6.4
+2.8.2
 

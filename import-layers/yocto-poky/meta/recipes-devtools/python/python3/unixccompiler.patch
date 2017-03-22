@@ -18,9 +18,9 @@ Index: Python-3.3.2/Lib/distutils/unixccompiler.py
  
      def library_dir_option(self, dir):
 -        return "-L" + dir
-+        if dir.startswith("."):
-+            return "-L" + dir
-+        return "-L=" + dir
++        if dir.startswith("/"):
++            return "-L=" + dir
++        return "-L" + dir
  
      def _is_gcc(self, compiler_name):
          return "gcc" in compiler_name or "g++" in compiler_name

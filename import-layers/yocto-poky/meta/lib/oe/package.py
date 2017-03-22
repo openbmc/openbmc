@@ -8,7 +8,7 @@ def runstrip(arg):
     # 8 - shared library
     # 16 - kernel module
 
-    import commands, stat, subprocess
+    import stat, subprocess
 
     (file, elftype, strip) = arg
 
@@ -64,8 +64,8 @@ def filedeprunner(arg):
 
     def process_deps(pipe, pkg, pkgdest, provides, requires):
         for line in pipe:
-            f = line.split(" ", 1)[0].strip()
-            line = line.split(" ", 1)[1].strip()
+            f = line.decode("utf-8").split(" ", 1)[0].strip()
+            line = line.decode("utf-8").split(" ", 1)[1].strip()
 
             if line.startswith("Requires:"):
                 i = requires
@@ -114,7 +114,12 @@ def read_shlib_providers(d):
             m = list_re.match(file)
             if m:
                 dep_pkg = m.group(1)
-                fd = open(os.path.join(dir, file))
+                try:
+                    fd = open(os.path.join(dir, file))
+                except IOError:
+                    # During a build unrelated shlib files may be deleted, so
+                    # handle files disappearing between the listdirs and open.
+                    continue
                 lines = fd.readlines()
                 fd.close()
                 for l in lines:
@@ -149,7 +154,7 @@ def npm_split_package_dirs(pkgdir):
                 if os.path.exists(pkgfile):
                     with open(pkgfile, 'r') as f:
                         data = json.loads(f.read())
-                packages[pkgname] = (relpth, data)
+                    packages[pkgname] = (relpth, data)
     # We want the main package for a module sorted *after* its subpackages
     # (so that it doesn't otherwise steal the files for the subpackage), so
     # this is a cheap way to do that whilst still having an otherwise

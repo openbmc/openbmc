@@ -1,0 +1,41 @@
+From 672a56be14426eae44864673c6c2afca0ab89d46 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?An=C3=ADbal=20Lim=C3=B3n?= <anibal.limon@linux.intel.com>
+Date: Fri, 13 May 2016 11:11:28 -0500
+Subject: [PATCH] testcases/network/nfsv4/acl/acl1.c: Security fix on string
+ printf
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fixes:
+
+acl1.c: In function 'test_acl_default':
+acl1.c:317:2: error: format not a string literal and no format arguments
+[-Werror=format-security]
+  printf(cmd);
+
+[YOCTO #9548]
+
+Signed-off-by: Aníbal Limón <anibal.limon@linux.intel.com>
+
+Upstream-Status: Pending
+---
+ testcases/network/nfsv4/acl/acl1.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/testcases/network/nfsv4/acl/acl1.c b/testcases/network/nfsv4/acl/acl1.c
+index b8b67b4..7c7c506 100644
+--- a/testcases/network/nfsv4/acl/acl1.c
++++ b/testcases/network/nfsv4/acl/acl1.c
+@@ -314,7 +314,7 @@ void test_acl_default(char *dir, acl_t acl)
+ 	char *cmd = malloc(256);
+ 
+ 	strcpy(cmd, "chmod 7777 ");
+-	printf(cmd);
++	printf(cmd, NULL);
+ 	strcat(cmd, dir);
+ 	system(cmd);
+ 	acl2 = acl_get_file(path, ACL_TYPE_ACCESS);
+-- 
+2.1.4
+

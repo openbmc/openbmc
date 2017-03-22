@@ -24,44 +24,55 @@
   });
 </script>
 
-<!-- Comment out the ability to change the project release, until we decide what to do this functionality -->
+<div id="delete-project-modal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4>Are you sure you want to delete this project?</h4>
+      </div>
+      <div class="modal-body">
+        <p>Deleting the <strong class="project-name"></strong> project
+        will:</p>
+        <ul>
+          <li>Cancel its builds currently in progress</li>
+          <li>Remove its configuration information</li>
+          <li>Remove its imported layers</li>
+          <li>Remove its custom images</li>
+          <li>Remove all its build information</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="delete-project-confirmed">
+          <span data-role="submit-state">Delete project</span>
+          <span data-role="loading-state" style="display:none">
+            <span class="fa-pulse">
+            <i class="fa-pulse icon-spinner"></i>
+          </span>
+            &nbsp;Deleting project...
+          </span>
+        </button>
+        <button type="button" class="btn btn-link" data-dismiss="modal">Cancel</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
 
-<!--div id="change-release-modal" class="modal hide fade in" tabindex="-1" role="dialog" aria-labelledby="change-release-modal" aria-hidden="false">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-    <h3>Changing Yocto Project release to <span class="proposed-release-change-name"></span></h3>
-  </div>
-  <div class="modal-body">
-    <p>The following added layers do not exist for <span class="proposed-release-change-name"></span>: </p>
-    <ul id="layers-to-remove-list">
-    </ul>
-    <p>If you change the Yocto Project release to <span class="proposed-release-change-name"></span>, the above layers will be deleted from your added layers.</p>
-  </div>
-  <div class="modal-footer">
-    <button id="change-release-and-rm-layers" data-dismiss="modal" type="submit" class="btn btn-primary">Change release and delete layers</button>
-    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-  </div>
-</div-->
 
-
-<div class="row-fluid" id="project-page" style="display:none">
-  <div class="span6">
+<div class="row" id="project-page" style="display:none">
+  <div class="col-md-6">
     <div class="well well-transparent" id="machine-section">
       <h3>Machine</h3>
 
-      <p class="lead"><span id="project-machine-name"></span> <i title="" data-original-title="" id="change-machine-toggle" class="icon-pencil"></i></p>
+      <p class="lead"><span id="project-machine-name"></span> <span class="glyphicon glyphicon-edit" id="change-machine-toggle"></span></p>
 
-      <form id="select-machine-form" style="display:none;">
-        <div class="alert alert-info">
-          <strong>Machine changes have a big impact on build outcome.</strong> You cannot really compare the builds for the new machine with the previous ones.
+      <form id="select-machine-form" style="display:none;" class="form-inline">
+        <span class="help-block">Machine suggestions come from the list of layers added to your project. If you don't see the machine you are looking for, <a href="{% url 'projectmachines' project.id %}">check the full list of machines</a></span>
+        <div class="form-group">
+          <input class="form-control" id="machine-change-input" autocomplete="off" value="" data-provide="typeahead" data-minlength="1" data-autocomplete="off" type="text">
         </div>
-
-        <div class="input-append">
-          <input id="machine-change-input" autocomplete="off" value="" data-provide="typeahead" data-minlength="1" data-autocomplete="off" type="text">
-            <button id="machine-change-btn" class="btn" type="button">Save</button> <a href="#" id="cancel-machine-change" class="btn btn-link">Cancel</a>
-        </div>
-
-        <p><a href="{% url 'projectmachines' project.id %}" class="link">View compatible machines</a></p>
+        <button id="machine-change-btn" class="btn btn-default" type="button">Save</button>
+        <a href="#" id="cancel-machine-change" class="btn btn-link">Cancel</a>
+        <p class="form-link"><a href="{% url 'projectmachines' project.id %}">View compatible machines</a></p>
       </form>
     </div>
 
@@ -69,11 +80,11 @@
       <h3>Most built recipes</h3>
 
       <div class="alert alert-info" style="display:none" id="no-most-built">
-        <span class="lead">You haven't built any recipes yet</span>
-        <p style="margin-top: 10px;"><a href="{% url 'projectimagerecipes' project.id %}">Choose a recipe to build</a></p>
+        <h4>You haven't built any recipes yet</h4>
+        <p class="form-link"><a href="{% url 'projectimagerecipes' project.id %}">Choose a recipe to build</a></p>
       </div>
 
-      <ul class="unstyled configuration-list" id="freq-build-list">
+      <ul class="list-unstyled lead" id="freq-build-list">
       </ul>
       <button class="btn btn-primary" id="freq-build-btn" disabled="disabled">Build selected recipes</button>
     </div>
@@ -97,44 +108,37 @@
     </div>
   </div>
 
-  <div class="span6">
+  <div class="col-md-6">
     <div class="well well-transparent" id="layer-container">
-      <h3>Layers <span class="muted counter">(<span id="project-layers-count"></span>)</span>
-        <i data-original-title="OpenEmbedded organises metadata into modules called 'layers'. Layers allow you to isolate different types of customizations from each other. <a href='http://www.yoctoproject.org/docs/current/dev-manual/dev-manual.html#understanding-and-creating-layers' target='_blank'>More on layers</a>" class="icon-question-sign get-help heading-help" title=""></i>
+      <h3>Layers <span class="counter">(<span id="project-layers-count"></span>)</span>
+        <span title="OpenEmbedded organises recipes and machines into thematic groups called <strong>layers</strong>. Click on a layer name to see the recipes and machines it includes." class="glyphicon glyphicon-question-sign get-help"></span>
       </h3>
 
-      <div class="alert lead" id="no-layers-in-project" style="display:none">
-        You need to add some layers. For that you can:
+      <div class="alert alert-warning" id="no-layers-in-project" style="display:none">
+        <h4>This project has no layers</h4>
+        In order to build this project you need to add some layers first. For that you can:
         <ul>
-          <li><a href="{% url 'projectlayers' project.id %}">View all layers compatible with this project</a></li>
+          <li><a href="{% url 'projectlayers' project.id %}">Choose from the layers compatible with this project</a></li>
           <li><a href="{% url 'importlayer' project.id %}">Import a layer</a></li>
           <li><a href="http://www.yoctoproject.org/docs/current/dev-manual/dev-manual.html#understanding-and-creating-layers" target="_blank">Read about layers in the documentation</a></li>
+          <li>Or type a layer name below</li>
         </ul>
-        <p>Or type a layer name below.</p>
       </div>
 
-      <form style="margin-top:20px">
-        <!--div class="control-group error"-->
-
-        <div class="input-append">
-          <input id="layer-add-input" autocomplete="off" placeholder="Type a layer name" data-minlength="1" data-autocomplete="off" data-provide="typeahead" data-source="" type="text">
-            <button id="add-layer-btn" class="btn" disabled>Add</button>
+      <form class="form-inline">
+        <div class="form-group">
+          <input id="layer-add-input" class="form-control" autocomplete="off" placeholder="Type a layer name" data-minlength="1" data-autocomplete="off" data-provide="typeahead" data-source="" type="text">
         </div>
-
-        <div id="import-alert" class="alert alert-info" style="display:none;">
-          Toaster does not know about this layer. Please <a href="#">import it</a>
-        </div>
-
-        <p>
+        <button id="add-layer-btn" class="btn btn-default" disabled>Add layer</button>
+        <p class="form-link">
           <a href="{% url 'projectlayers' project.id %}" id="view-compatible-layers">View compatible layers</a>
-          <i data-original-title="View all the layers you can build with the release selected for this project, which is Yocto Project master" class="icon-question-sign get-help" title=""></i>
-          | <a href="{% url 'importlayer' project.id %}">Import layer</a>
+          <span class="text-muted">|</span>
+          <a href="{% url 'importlayer' project.id %}">Import layer</a>
         </p>
       </form>
 
-      <ul class="unstyled configuration-list" id="layers-in-project-list">
+      <ul class="list-unstyled lead" id="layers-in-project-list">
       </ul>
-    </div>
   </div>
 </div>
 {% endblock %}

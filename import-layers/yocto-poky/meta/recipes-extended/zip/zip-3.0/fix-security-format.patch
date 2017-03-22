@@ -1,0 +1,42 @@
+zip: Fixing security formatting issues
+
+Fix security formatting issues related to printing without NULL argument
+
+zip.c: In function 'help_extended':
+zip.c:1031:5: error: format not a string literal and no format arguments [-Werror=format-security]
+     printf(text[i]);
+     ^
+zip.c: In function 'version_info':
+zip.c:1228:5: error: format not a string literal and no format arguments [-Werror=format-security]
+     printf(cryptnote[i]);
+     ^
+
+[YOCTO #9552]
+[https://bugzilla.yoctoproject.org/show_bug.cgi?id=9552]
+
+Upstream-Status: Pending
+
+Signed-off-by: Edwin Plauchu <edwin.plauchu.camacho@intel.com>
+
+diff --git a/zip.c b/zip.c
+index 439821f..d7da768 100644
+--- a/zip.c
++++ b/zip.c
+@@ -1028,7 +1028,7 @@ local void help_extended()
+ 
+   for (i = 0; i < sizeof(text)/sizeof(char *); i++)
+   {
+-    printf(text[i]);
++    fputs(text[i],stdout);
+     putchar('\n');
+   }
+ #ifdef DOS
+@@ -1225,7 +1225,7 @@ local void version_info()
+             CR_MAJORVER, CR_MINORVER, CR_BETA_VER, CR_VERSION_DATE);
+   for (i = 0; i < sizeof(cryptnote)/sizeof(char *); i++)
+   {
+-    printf(cryptnote[i]);
++    fputs(cryptnote[i],stdout);
+     putchar('\n');
+   }
+   ++i;  /* crypt support means there IS at least one compilation option */

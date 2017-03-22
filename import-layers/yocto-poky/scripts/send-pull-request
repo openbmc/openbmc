@@ -158,11 +158,16 @@ GIT_EXTRA_CC=$(for R in $EXTRA_CC; do echo -n "--cc='$R' "; done)
 unset IFS
 
 # Handoff to git-send-email. It will perform the send confirmation.
+# Mail threading was already handled by git-format-patch in
+# create-pull-request, so we must not allow git-send-email to
+# add In-Reply-To and References headers again.
 PATCHES=$(echo $PDIR/*.patch)
 if [ $AUTO_CL -eq 1 ]; then
 	# Send the cover letter to every recipient, both specified as well as
 	# harvested. Then remove it from the patches list.
-	eval "git send-email $GIT_TO $GIT_CC $GIT_EXTRA_CC --confirm=always --no-chain-reply-to --suppress-cc=all $CL"
+	# --no-thread is redundant here (only sending a single message) and
+	# merely added for the sake of consistency.
+	eval "git send-email $GIT_TO $GIT_CC $GIT_EXTRA_CC --confirm=always --no-thread --suppress-cc=all $CL"
 	if [ $? -eq 1 ]; then
 		echo "ERROR: failed to send cover-letter with automatic recipients."
 		exit 1
@@ -172,7 +177,7 @@ fi
 
 # Send the patch to the specified recipients and, if -c was specified, those git
 # finds in this specific patch.
-eval "git send-email $GIT_TO $GIT_EXTRA_CC --confirm=always --no-chain-reply-to $GITSOBCC $PATCHES"
+eval "git send-email $GIT_TO $GIT_EXTRA_CC --confirm=always --no-thread $GITSOBCC $PATCHES"
 if [ $? -eq 1 ]; then
 	echo "ERROR: failed to send patches."
 	exit 1

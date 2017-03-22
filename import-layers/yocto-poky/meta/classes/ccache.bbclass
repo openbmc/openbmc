@@ -4,5 +4,3 @@ CCACHE_DISABLE[unexport] = "1"
 
 do_configure[dirs] =+ "${CCACHE_DIR}"
 do_kernel_configme[dirs] =+ "${CCACHE_DIR}"
-
-do_clean[cleandirs] += "${CCACHE_DIR}"

@@ -1,0 +1,15 @@
+There is no need to explicitly check that msgfmt was found as the gettext macros
+handle this for us if NLS is enabled.
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/configure.ac b/configure.ac
+index e56079a..284bbe0 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -39,4 +38,0 @@ AM_GNU_GETTEXT_VERSION([0.19.4])
+-if test "x$GMSGFMT" = "x:"; then
+-   AC_MSG_ERROR([missing gnu /usr/bin/msgfmt])
+-fi
+-

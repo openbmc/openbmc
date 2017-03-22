@@ -4,7 +4,7 @@ function projectTopBarInit(ctx) {
 
   var projectNameForm = $("#project-name-change-form");
   var projectNameContainer = $("#project-name-container");
-  var projectName = $("#project-name");
+  var projectName = $(".project-name");
   var projectNameFormToggle = $("#project-change-form-toggle");
   var projectNameChangeCancel = $("#project-name-change-cancel");
 
@@ -25,13 +25,14 @@ function projectTopBarInit(ctx) {
     e.preventDefault();
     projectNameForm.hide();
     projectNameContainer.fadeIn();
+    $("#project-name-change-input").val(projectName.first().text());
   });
 
   $("#project-name-change-btn").click(function(){
     var newProjectName = $("#project-name-change-input").val();
 
     libtoaster.editCurrentProject({ projectName: newProjectName }, function (){
-      projectName.html(newProjectName);
+      projectName.text(newProjectName);
       libtoaster.ctx.projectName = newProjectName;
       projectNameChangeCancel.click();
     });
@@ -87,4 +88,10 @@ function projectTopBarInit(ctx) {
         window.location.replace(libtoaster.ctx.projectBuildsUrl);
     }, null);
   });
+
+  /* Call makeProjectNameValidation function */
+  libtoaster.makeProjectNameValidation($("#project-name-change-input"),
+      $("#hint-error-project-name"), $("#validate-project-name"),
+      $("#project-name-change-btn"));
+
 }

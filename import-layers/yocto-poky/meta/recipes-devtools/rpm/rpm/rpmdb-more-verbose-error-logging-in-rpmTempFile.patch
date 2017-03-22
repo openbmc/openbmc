@@ -5,32 +5,10 @@ Upstream-Status: Inappropriate [debugging]
 Signed-off-by: Markus Lehtonen <markus.lehtonen@linux.intel.com>
 
 diff --git a/rpmdb/signature.c b/rpmdb/signature.c
-index dce6c4e..a1d0f06 100644
+index 100204b..e56ab3d 100644
 --- a/rpmdb/signature.c
 +++ b/rpmdb/signature.c
-@@ -37,6 +37,7 @@ int rpmTempFile(const char * prefix, const char ** fnptr, void * fdptr)
-     int temput;
-     FD_t fd = NULL;
-     unsigned int ran;
-+    int ret = 0;
- 
-     if (!prefix) prefix = "";
- 
-@@ -44,8 +45,11 @@ int rpmTempFile(const char * prefix, const char ** fnptr, void * fdptr)
-     if (!_initialized) {
- 	_initialized = 1;
- 	tempfn = rpmGenPath(prefix, tpmacro, NULL);
--	if (rpmioMkpath(tempfn, 0755, (uid_t) -1, (gid_t) -1))
--	    goto errxit;
-+        ret = rpmioMkpath(tempfn, 0755, (uid_t) -1, (gid_t) -1);
-+        if (ret) {
-+            rpmlog(RPMLOG_ERR, _("error creating temporary directory %s: %d\n"), tempfn, ret);
-+            goto errxit;
-+        }
-     }
- 
-     /* XXX should probably use mkstemp here */
-@@ -68,12 +72,16 @@ int rpmTempFile(const char * prefix, const char ** fnptr, void * fdptr)
+@@ -72,12 +72,16 @@ int rpmTempFile(const char * prefix, const char ** fnptr, void * fdptr)
  #endif
  
  	temput = urlPath(tempfn, &tfn);

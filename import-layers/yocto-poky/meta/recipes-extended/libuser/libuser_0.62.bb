@@ -14,16 +14,17 @@ SECTION = "base"
 SRC_URI = "https://fedorahosted.org/releases/l/i/libuser/libuser-${PV}.tar.xz \
            file://0001-Check-for-issetugid.patch \
            file://0002-remove-unused-execinfo.h.patch \
-          "
+           file://0001-modules-files.c-parse_field-fix-string-formating-in-.patch \
+           "
 
 SRC_URI[md5sum] = "63e5e5c551e99dc5302b40b80bd6d4f2"
 SRC_URI[sha256sum] = "a58ff4fabb01a25043b142185a33eeea961109dd60d4b40b6a9df4fa3cace20b"
 
-DEPENDS = "popt libpam glib-2.0 docbook-utils-native linuxdoc-tools-native python"
+DEPENDS = "popt libpam glib-2.0 docbook-utils-native linuxdoc-tools-native python3"
 
-inherit autotools gettext pythonnative python-dir pkgconfig
+inherit autotools gettext python3native python3-dir pkgconfig gtk-doc
 
-EXTRA_OEMAKE = "PYTHON_CPPFLAGS=-I${STAGING_INCDIR}/${PYTHON_DIR}"
+EXTRA_OEMAKE = "PYTHON_CPPFLAGS=-I${STAGING_INCDIR}/${PYTHON_DIR}${PYTHON_ABI}"
 
 PACKAGES += "${PN}-python "
 

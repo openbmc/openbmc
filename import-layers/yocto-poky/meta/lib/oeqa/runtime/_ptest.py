@@ -11,7 +11,7 @@ import subprocess
 def setUpModule():
     if not oeRuntimeTest.hasFeature("package-management"):
         skipModule("Image doesn't have package management feature")
-    if not oeRuntimeTest.hasPackage("smart"):
+    if not oeRuntimeTest.hasPackage("smartpm"):
         skipModule("Image doesn't have smart installed")
     if "package_rpm" != oeRuntimeTest.tc.d.getVar("PACKAGE_CLASSES", True).split()[0]:
         skipModule("Rpm is not the primary package manager")
@@ -105,7 +105,7 @@ class PtestRunnerTest(oeRuntimeTest):
     def test_ptestrunner(self):
         self.add_smart_channel()
         (runnerstatus, result) = self.target.run('which ptest-runner', 0)
-        cond = oeRuntimeTest.hasPackage("ptest-runner") and oeRuntimeTest.hasFeature("ptest") and oeRuntimeTest.hasPackage("-ptest") and (runnerstatus != 0)
+        cond = oeRuntimeTest.hasPackage("ptest-runner") and oeRuntimeTest.hasFeature("ptest") and oeRuntimeTest.hasPackageMatch("-ptest") and (runnerstatus != 0)
         if cond:
             self.install_packages(self.install_complementary("*-ptest"))
             self.install_packages(['ptest-runner'])

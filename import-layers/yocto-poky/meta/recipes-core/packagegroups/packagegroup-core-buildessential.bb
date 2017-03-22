@@ -4,7 +4,6 @@
 #
 
 SUMMARY = "Essential build dependencies"
-LICENSE = "MIT"
 
 inherit packagegroup
 

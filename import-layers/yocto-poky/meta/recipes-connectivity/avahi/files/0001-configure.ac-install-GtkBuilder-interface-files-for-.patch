@@ -1,0 +1,28 @@
+From a59f13fab31a6e25bb03b2c2bc3aea576f857b6c Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Sun, 12 Jun 2016 18:32:49 +0300
+Subject: [PATCH] configure.ac: install GtkBuilder interface files for GTK+3
+ too
+
+Upstream-Status: Pending
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index aebb716..48bdf63 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -965,7 +965,7 @@ AC_SUBST(avahi_socket)
+ #
+ # Avahi interfaces dir
+ #
+-if test "x$HAVE_PYTHON_DBUS" = "xyes" -o "x$HAVE_GTK" = "xyes"; then
++if test "x$HAVE_PYTHON_DBUS" = "xyes" -o "x$HAVE_GTK" = "xyes" -o "x$HAVE_GTK3" = "xyes"; then
+ 	interfacesdir="${datadir}/${PACKAGE}/interfaces/"
+ 	AC_SUBST(interfacesdir)
+ fi
+-- 
+2.1.4
+

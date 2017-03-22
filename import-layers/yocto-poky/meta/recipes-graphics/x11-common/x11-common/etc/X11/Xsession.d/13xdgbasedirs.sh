@@ -7,7 +7,7 @@
 # In the ideal case where SystemD is booting and userspace is initiated by a
 # SystemD user session this will have been set already, so don't overwrite it.
 
-if [ -z "$XGD_RUNTIME_DIR" ]; then
-	XDG_RUNTIME_DIR="/tmp"
-        export XDG_RUNTIME_DIR
+if [ -z "$XDG_RUNTIME_DIR" ]; then
+    XDG_RUNTIME_DIR="/tmp"
+    export XDG_RUNTIME_DIR
 fi

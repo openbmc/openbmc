@@ -4,61 +4,32 @@ Upstream-Status: Denied [upstream have indicated they don't want a pkg-config de
 
 RP 2014/5/22
 
-Index: libgcrypt-1.2.4/configure.ac
-===================================================================
---- libgcrypt-1.2.4.orig/configure.ac	2008-03-19 22:14:50.000000000 +0000
-+++ libgcrypt-1.2.4/configure.ac	2008-03-19 22:14:58.000000000 +0000
-@@ -807,6 +807,7 @@
+Rebase to 1.7.0
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.ac        |  1 +
+ src/libgcrypt.m4    | 71 +++--------------------------------------------------
+ src/libgcrypt.pc.in | 33 +++++++++++++++++++++++++
+ 3 files changed, 38 insertions(+), 67 deletions(-)
+ create mode 100644 src/libgcrypt.pc.in
+
+diff --git a/configure.ac b/configure.ac
+index f683e21..566e1c8 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2314,6 +2314,7 @@ random/Makefile
  doc/Makefile
  src/Makefile
  src/gcrypt.h
 +src/libgcrypt.pc
  src/libgcrypt-config
+ src/versioninfo.rc
  tests/Makefile
- w32-dll/Makefile
-Index: libgcrypt-1.2.4/src/libgcrypt.pc.in
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ libgcrypt-1.2.4/src/libgcrypt.pc.in	2008-03-19 22:14:58.000000000 +0000
-@@ -0,0 +1,33 @@
-+# Process this file with autoconf to produce a pkg-config metadata file.
-+# Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation
-+# Author: Simon Josefsson
-+#
-+# This file is free software; as a special exception the author gives
-+# unlimited permission to copy and/or distribute it, with or without
-+# modifications, as long as this notice is preserved.
-+#
-+# This file is distributed in the hope that it will be useful, but
-+# WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
-+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-+
-+prefix=@prefix@
-+exec_prefix=@exec_prefix@
-+libdir=@libdir@
-+includedir=@includedir@
-+
-+# API info
-+api_version=@LIBGCRYPT_CONFIG_API_VERSION@
-+host=@LIBGCRYPT_CONFIG_HOST@
-+
-+# Misc information.
-+symmetric_ciphers=@LIBGCRYPT_CIPHERS@
-+asymmetric_ciphers=@LIBGCRYPT_PUBKEY_CIPHERS@
-+digests=@LIBGCRYPT_DIGESTS@
-+
-+Name: libgcrypt
-+Description: GNU crypto library
-+URL: http://www.gnupg.org
-+Version: @VERSION@
-+Libs: -L${libdir} -lgcrypt
-+Libs.private: -L${libdir} -lgpg-error
-+Cflags: -I${includedir} 
-Index: libgcrypt-1.6.1/src/libgcrypt.m4
-===================================================================
---- libgcrypt-1.6.1.orig/src/libgcrypt.m4	2013-12-16 17:44:32.000000000 +0000
-+++ libgcrypt-1.6.1/src/libgcrypt.m4	2014-05-13 21:25:37.478389833 +0000
-@@ -22,17 +22,7 @@
+diff --git a/src/libgcrypt.m4 b/src/libgcrypt.m4
+index c67cfec..4ea5f2c 100644
+--- a/src/libgcrypt.m4
++++ b/src/libgcrypt.m4
+@@ -29,30 +29,6 @@ dnl is added to the gpg_config_script_warn variable.
  dnl
  AC_DEFUN([AM_PATH_LIBGCRYPT],
  [ AC_REQUIRE([AC_CANONICAL_HOST])
@@ -66,17 +37,30 @@ Index: libgcrypt-1.6.1/src/libgcrypt.m4
 -            AC_HELP_STRING([--with-libgcrypt-prefix=PFX],
 -                           [prefix where LIBGCRYPT is installed (optional)]),
 -     libgcrypt_config_prefix="$withval", libgcrypt_config_prefix="")
--  if test x$libgcrypt_config_prefix != x ; then
--     if test x${LIBGCRYPT_CONFIG+set} != xset ; then
--        LIBGCRYPT_CONFIG=$libgcrypt_config_prefix/bin/libgcrypt-config
+-  if test x"${LIBGCRYPT_CONFIG}" = x ; then
+-     if test x"${libgcrypt_config_prefix}" != x ; then
+-        LIBGCRYPT_CONFIG="${libgcrypt_config_prefix}/bin/libgcrypt-config"
+-     else
+-       case "${SYSROOT}" in
+-         /*)
+-           if test -x "${SYSROOT}/bin/libgcrypt-config" ; then
+-             LIBGCRYPT_CONFIG="${SYSROOT}/bin/libgcrypt-config"
+-           fi
+-           ;;
+-         '')
+-           ;;
+-          *)
+-           AC_MSG_WARN([Ignoring \$SYSROOT as it is not an absolute path.])
+-           ;;
+-       esac
 -     fi
 -  fi
- 
--  AC_PATH_TOOL(LIBGCRYPT_CONFIG, libgcrypt-config, no)
+-
+-  AC_PATH_PROG(LIBGCRYPT_CONFIG, libgcrypt-config, no)
    tmp=ifelse([$1], ,1:1.2.0,$1)
    if echo "$tmp" | grep ':' >/dev/null 2>/dev/null ; then
       req_libgcrypt_api=`echo "$tmp"     | sed 's/\(.*\):\(.*\)/\1/'`
-@@ -42,48 +32,13 @@
+@@ -62,48 +38,13 @@ AC_DEFUN([AM_PATH_LIBGCRYPT],
       min_libgcrypt_version="$tmp"
    fi
  
@@ -128,7 +112,7 @@ Index: libgcrypt-1.6.1/src/libgcrypt.m4
          if test "$tmp" -gt 0 ; then
             AC_MSG_CHECKING([LIBGCRYPT API version])
             if test "$req_libgcrypt_api" -eq "$tmp" ; then
-@@ -96,10 +51,8 @@
+@@ -116,10 +57,8 @@ AC_DEFUN([AM_PATH_LIBGCRYPT],
       fi
    fi
    if test $ok = yes; then
@@ -140,7 +124,7 @@ Index: libgcrypt-1.6.1/src/libgcrypt.m4
      if test x"$libgcrypt_config_host" != xnone ; then
        if test x"$libgcrypt_config_host" != x"$host" ; then
    AC_MSG_WARN([[
-@@ -113,8 +66,6 @@
+@@ -134,8 +73,6 @@ AC_DEFUN([AM_PATH_LIBGCRYPT],
        fi
      fi
    else
@@ -149,3 +133,45 @@ Index: libgcrypt-1.6.1/src/libgcrypt.m4
      ifelse([$3], , :, [$3])
    fi
    AC_SUBST(LIBGCRYPT_CFLAGS)
+diff --git a/src/libgcrypt.pc.in b/src/libgcrypt.pc.in
+new file mode 100644
+index 0000000..2fc8f53
+--- /dev/null
++++ b/src/libgcrypt.pc.in
+@@ -0,0 +1,33 @@
++# Process this file with autoconf to produce a pkg-config metadata file.
++# Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation
++# Author: Simon Josefsson
++#
++# This file is free software; as a special exception the author gives
++# unlimited permission to copy and/or distribute it, with or without
++# modifications, as long as this notice is preserved.
++#
++# This file is distributed in the hope that it will be useful, but
++# WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
++# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
++
++prefix=@prefix@
++exec_prefix=@exec_prefix@
++libdir=@libdir@
++includedir=@includedir@
++
++# API info
++api_version=@LIBGCRYPT_CONFIG_API_VERSION@
++host=@LIBGCRYPT_CONFIG_HOST@
++
++# Misc information.
++symmetric_ciphers=@LIBGCRYPT_CIPHERS@
++asymmetric_ciphers=@LIBGCRYPT_PUBKEY_CIPHERS@
++digests=@LIBGCRYPT_DIGESTS@
++
++Name: libgcrypt
++Description: GNU crypto library
++URL: http://www.gnupg.org
++Version: @VERSION@
++Libs: -L${libdir} -lgcrypt
++Libs.private: -L${libdir} -lgpg-error
++Cflags: -I${includedir} 
+-- 
+2.8.1
+

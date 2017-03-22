@@ -3,18 +3,22 @@ LICENSE = "MIT & LGPLv2+ & GPLv3 & GPLv2+ & BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b2beded7103a3d8a442a2a0391d607b0"
 
 SRC_URI = "git://anongit.freedesktop.org/piglit \
-           file://0001-tests-Fix-missing-include-of-Xutil.h.patch"
+           file://0001-cmake-install-bash-completions-in-the-right-place.patch \
+           file://0001-tests-Use-FE_UPWARD-only-if-its-defined-in-fenv.h.patch \
+           file://0001-cmake-Link-utils-with-xcb-explicitly.patch \
+           file://0001-cmake-Link-test-utils-with-ldl.patch \
+           "
 
-# From 2015-02-19
-SRCREV = "c4585427913e4cb28994b4bfb11d49778273aa2c"
+# From 2016-07-07
+SRCREV = "c39e41a86551eb390b8da23232dc8577639403d0"
 # (when PV goes above 1.0 remove the trailing r)
 PV = "1.0+gitr${SRCPV}"
 
 S = "${WORKDIR}/git"
 
-DEPENDS = "virtual/libx11 libxrender waffle virtual/libgl libglu python-mako-native python-numpy-native"
+DEPENDS = "libpng virtual/libx11 libxrender waffle virtual/libgl libglu python3-mako-native python3-numpy-native python3-six-native"
 
-inherit cmake pythonnative distro_features_check
+inherit cmake python3native distro_features_check bash-completion
 # depends on virtual/libx11
 REQUIRED_DISTRO_FEATURES = "x11"
 
@@ -34,10 +38,15 @@ do_configure_prepend() {
    fi
 }
 
-RDEPENDS_${PN} = "waffle python python-mako python-json python-subprocess \
-	python-argparse python-importlib python-unixadmin python-xml \
-	python-multiprocessing python-textutils python-netserver python-shell \
+do_install() {
+	oe_runmake -C ${B} 'DESTDIR=${D}' install/strip
+}
+
+RDEPENDS_${PN} = "waffle python3 python3-mako python3-json \
+	python3-subprocess python3-misc python3-importlib \
+	python3-unixadmin python3-xml python3-multiprocessing \
+	python3-six python3-shell python3-io python3-argparse \
 	mesa-demos bash \
 	"
 
-INSANE_SKIP_${PN} += "dev-so"
+INSANE_SKIP_${PN} += "dev-so already-stripped"

@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Applications
+Comment=Applications
+Icon=gnome-applications.png
+Type=Directory
+Match=AudioVideo;Audio;Video;Graphics;Network;Office;Utility;System;Development;meta-fallback;

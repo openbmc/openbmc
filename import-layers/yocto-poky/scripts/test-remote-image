@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Copyright (c) 2014 Intel Corporation
 #
@@ -92,12 +92,10 @@ def get_args_parser():
     parser.add_argument('--skip-download', required=False, action="store_true", dest="skip_download", default=False, help='Skip downloading the images completely. This needs the correct files to be present in the directory specified by the target profile.')
     return parser
 
-class BaseTargetProfile(object):
+class BaseTargetProfile(object, metaclass=ABCMeta):
     """
     This class defines the meta profile for a specific target (MACHINE type + image type).
     """
-
-    __metaclass__ = ABCMeta
 
     def __init__(self, image_type):
         self.image_type = image_type
@@ -191,12 +189,10 @@ class AutoTargetProfile(BaseTargetProfile):
         return controller.get_extra_files()
 
 
-class BaseRepoProfile(object):
+class BaseRepoProfile(object, metaclass=ABCMeta):
     """
     This class defines the meta profile for an images repository.
     """
-
-    __metaclass__ = ABCMeta
 
     def __init__(self, repolink, localdir):
         self.localdir = localdir
@@ -289,7 +285,7 @@ class HwAuto():
         result = bitbake("%s -c testimage" % image_type, ignore_status=True, postconfig=postconfig)
         testimage_results = ftools.read_file(os.path.join(get_bb_var("T", image_type), "log.do_testimage"))
         log.info('Runtime tests results for %s:' % image_type)
-        print testimage_results
+        print(testimage_results)
         return result
 
     # Start the procedure!

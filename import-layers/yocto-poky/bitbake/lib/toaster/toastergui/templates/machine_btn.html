@@ -1,16 +1,16 @@
-<a href="{% url 'project' extra.pid %}?setMachine={{data.name}}" class="btn btn-block layer-exists-{{data.layer_version.id}}"
+<a href="{% url 'project' extra.pid %}?setMachine={{data.name}}" class="btn btn-default btn-block layer-exists-{{data.layer_version.id}}"
     {% if data.layer_version.pk not in extra.current_layers %}
     style="display:none;"
     {% endif %}
 >
   Select machine</a>
-<button class="btn btn-block layerbtn layer-add-{{data.layer_version.id}}" data-layer='{ "id": {{data.layer_version.id}}, "name":  "{{data.layer_version.layer.name}}", "layerdetailurl": "{%url 'layerdetails' extra.pid data.layer_version.id %}"}' data-directive="add"
+<a class="btn btn-default btn-block layerbtn layer-add-{{data.layer_version.id}}" data-layer='{ "id": {{data.layer_version.id}}, "name":  "{{data.layer_version.layer.name}}", "layerdetailurl": "{%url 'layerdetails' extra.pid data.layer_version.id %}"}' data-directive="add"
     {% if data.layer_version.pk in extra.current_layers %}
     style="display:none;"
     {% endif %}
 >
-  <i class="icon-plus"></i>
+  <span class="glyphicon glyphicon-plus"></span>
   Add layer
-  <i title="" class="icon-question-sign get-help" data-original-title="To enable this machine, you must first add the {{data.layer_version.layer.name}} layer to your project"></i>
-</button>
+  <span class="glyphicon glyphicon-question-sign get-help" title="To select this machine, you must first add the {{data.layer_version.layer.name}} layer to your project"></i>
+</a>
 

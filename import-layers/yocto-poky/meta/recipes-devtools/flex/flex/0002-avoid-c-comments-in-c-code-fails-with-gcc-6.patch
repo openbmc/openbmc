@@ -1,0 +1,64 @@
+From 7072befe1397af4eb01c3ff7edf99f0cd5076089 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Tue, 30 Aug 2016 14:25:32 +0200
+Subject: [PATCH] avoid c++ comments in c-code - fails with gcc-6
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+fixes:
+
+| error: C++ style comments are not allowed in ISO C90
+| num_to_alloc = 1; // After all that talk, this was set to 1 anyways...
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ src/flex.skl | 2 +-
+ src/scan.c   | 2 +-
+ src/skel.c   | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/flex.skl b/src/flex.skl
+index 73a0b9e..ed71627 100644
+--- a/src/flex.skl
++++ b/src/flex.skl
+@@ -2350,7 +2350,7 @@ void yyFlexLexer::yyensure_buffer_stack(void)
+ 		 * scanner will even need a stack. We use 2 instead of 1 to avoid an
+ 		 * immediate realloc on the next call.
+          */
+-		num_to_alloc = 1; // After all that talk, this was set to 1 anyways...
++		num_to_alloc = 1; /* After all that talk, this was set to 1 anyways... */
+ 		YY_G(yy_buffer_stack) = (struct yy_buffer_state**)yyalloc
+ 								(num_to_alloc * sizeof(struct yy_buffer_state*)
+ 								M4_YY_CALL_LAST_ARG);
+diff --git a/src/scan.c b/src/scan.c
+index b55df2d..f1dce75 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -4672,7 +4672,7 @@ static void yyensure_buffer_stack (void)
+ 		 * scanner will even need a stack. We use 2 instead of 1 to avoid an
+ 		 * immediate realloc on the next call.
+          */
+-		num_to_alloc = 1; // After all that talk, this was set to 1 anyways...
++		num_to_alloc = 1; /* After all that talk, this was set to 1 anyways...*/
+ 		(yy_buffer_stack) = (struct yy_buffer_state**)yyalloc
+ 								(num_to_alloc * sizeof(struct yy_buffer_state*)
+ 								);
+diff --git a/src/skel.c b/src/skel.c
+index ef657d3..26cc889 100644
+--- a/src/skel.c
++++ b/src/skel.c
+@@ -2561,7 +2561,7 @@ const char *skel[] = {
+   "		 * scanner will even need a stack. We use 2 instead of 1 to avoid an",
+   "		 * immediate realloc on the next call.",
+   "         */",
+-  "		num_to_alloc = 1; // After all that talk, this was set to 1 anyways...",
++  "		num_to_alloc = 1; /* After all that talk, this was set to 1 anyways... */",
+   "		YY_G(yy_buffer_stack) = (struct yy_buffer_state**)yyalloc",
+   "								(num_to_alloc * sizeof(struct yy_buffer_state*)",
+   "								M4_YY_CALL_LAST_ARG);",
+-- 
+2.5.5
+

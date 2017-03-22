@@ -20,7 +20,7 @@ conftest.c:1:0: error: SSE instruction set disabled, using 387
 arithmetics [-Werror]
 cc1: all warnings being treated as errors
 
-Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com>
+Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
 Upstream-Status: Pending

@@ -67,8 +67,10 @@
                 By default, the Yocto build system strips symbols from the
                 binaries it packages, which makes it difficult to use some
                 of the tools.
-                </para><para>You can prevent that by putting the following
-                in your local.conf when you build the image:
+                </para><para>You can prevent that by setting the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-INHIBIT_PACKAGE_STRIP'><filename>INHIBIT_PACKAGE_STRIP</filename></ulink>
+                variable to "1" in your
+                <filename>local.conf</filename> when you build the image:
                 </para>
             </note>
             <literallayout class='monospaced'>

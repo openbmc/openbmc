@@ -21,11 +21,11 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-__version__ = "1.30.0"
+__version__ = "1.32.0"
 
 import sys
-if sys.version_info < (2, 7, 3):
-    raise RuntimeError("Sorry, python 2.7.3 or later is required for this version of bitbake")
+if sys.version_info < (3, 4, 0):
+    raise RuntimeError("Sorry, python 3.4.0 or later is required for this version of bitbake")
 
 
 class BBHandledException(Exception):
@@ -84,8 +84,8 @@ def plain(*args):
     mainlogger.plain(''.join(args))
 
 def debug(lvl, *args):
-    if isinstance(lvl, basestring):
-        mainlogger.warn("Passed invalid debug level '%s' to bb.debug", lvl)
+    if isinstance(lvl, str):
+        mainlogger.warning("Passed invalid debug level '%s' to bb.debug", lvl)
         args = (lvl,) + args
         lvl = 1
     mainlogger.debug(lvl, ''.join(args))
@@ -94,7 +94,7 @@ def note(*args):
     mainlogger.info(''.join(args))
 
 def warn(*args):
-    mainlogger.warn(''.join(args))
+    mainlogger.warning(''.join(args))
 
 def error(*args, **kwargs):
     mainlogger.error(''.join(args), extra=kwargs)

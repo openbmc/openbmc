@@ -1,0 +1,130 @@
+From a1b93c25311834f2f411e9bfe2e616899ba2122d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 6 Nov 2016 10:23:55 -0800
+Subject: [PATCH 3/3] Fix build breaks due to missing a.out.h
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ include/bsd/nlist.h                     |  1 -
+ include/bsd/nlist.h => src/local-aout.h | 47 ++++++++++++++++++++++-----------
+ src/nlist.c                             |  9 +++++++
+ 3 files changed, 41 insertions(+), 16 deletions(-)
+ copy include/bsd/nlist.h => src/local-aout.h (63%)
+
+diff --git a/include/bsd/nlist.h b/include/bsd/nlist.h
+index 0389ab7..9c7e3d8 100644
+--- a/include/bsd/nlist.h
++++ b/include/bsd/nlist.h
+@@ -28,7 +28,6 @@
+ #define LIBBSD_NLIST_H
+ 
+ #include <sys/cdefs.h>
+-#include <a.out.h>
+ 
+ /* __BEGIN_DECLS */
+ #ifdef __cplusplus
+diff --git a/include/bsd/nlist.h b/src/local-aout.h
+similarity index 63%
+copy from include/bsd/nlist.h
+copy to src/local-aout.h
+index 0389ab7..2adb93e 100644
+--- a/include/bsd/nlist.h
++++ b/src/local-aout.h
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright © 2009 Guillem Jover <guillem@hadrons.org>
++ * Copyright © 2016 Khem Raj <raj.khem@gmail.com>
+  *
+  * Redistribution and use in source and binary forms, with or without
+  * modification, are permitted provided that the following conditions
+@@ -24,20 +24,37 @@
+  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  */
+ 
+-#ifndef LIBBSD_NLIST_H
+-#define LIBBSD_NLIST_H
++#ifndef LIBBSD_LOCAL_AOUT_H
++#define LIBBSD_LOCAL_AOUT_H
+ 
+-#include <sys/cdefs.h>
+-#include <a.out.h>
++#define N_UNDF  0
++#define N_ABS   2
++#define N_TEXT  4
++#define N_DATA  6
++#define N_BSS   8
++#define N_FN    15
++#define N_EXT   1
++#define N_TYPE  036
++#define N_STAB  0340
++#define N_INDR  0xa
++#define N_SETA  0x14    /* Absolute set element symbol.  */
++#define N_SETT  0x16    /* Text set element symbol.  */
++#define N_SETD  0x18    /* Data set element symbol.  */
++#define N_SETB  0x1A    /* Bss set element symbol.  */
++#define N_SETV  0x1C    /* Pointer to set vector in data area.  */
+ 
+-/* __BEGIN_DECLS */
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
+-extern int nlist(const char *filename, struct nlist *list);
+-#ifdef __cplusplus
+-}
+-#endif
+-/* __END_DECLS */
++struct nlist
++{
++  union
++    {
++      char *n_name;
++      struct nlist *n_next;
++      long n_strx;
++    } n_un;
++  unsigned char n_type;
++  char n_other;
++  short n_desc;
++  unsigned long n_value;
++};
+ 
+-#endif
++#endif /* LIBBSD_LOCAL_AOUT_H */
+diff --git a/src/nlist.c b/src/nlist.c
+index 0cffe55..625d310 100644
+--- a/src/nlist.c
++++ b/src/nlist.c
+@@ -40,7 +40,11 @@ static char sccsid[] = "@(#)nlist.c	8.1 (Berkeley) 6/4/93";
+ 
+ #include <errno.h>
+ #include <fcntl.h>
++#ifdef __GLIBC__
+ #include <a.out.h>
++#else
++#define __NO_A_OUT_SUPPORT
++#endif
+ #include <stdio.h>
+ #include <string.h>
+ #include <unistd.h>
+@@ -48,12 +52,17 @@ static char sccsid[] = "@(#)nlist.c	8.1 (Berkeley) 6/4/93";
+ #if !defined(__NO_A_OUT_SUPPORT)
+ #define _NLIST_DO_AOUT
+ #endif
++
+ #define _NLIST_DO_ELF
+ 
+ #ifdef _NLIST_DO_ELF
+ #include "local-elf.h"
+ #endif
+ 
++#ifdef _NLIST_DO_ELF
++#include "local-aout.h"
++#endif
++
+ #define SIZE_T_MAX 0xffffffffU
+ 
+ #ifdef _NLIST_DO_AOUT
+-- 
+2.10.2
+

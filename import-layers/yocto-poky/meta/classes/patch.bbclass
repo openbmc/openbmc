@@ -5,6 +5,9 @@ QUILTRCFILE ?= "${STAGING_ETCDIR_NATIVE}/quiltrc"
 
 PATCHDEPENDENCY = "${PATCHTOOL}-native:do_populate_sysroot"
 
+PATCH_GIT_USER_NAME ?= "OpenEmbedded"
+PATCH_GIT_USER_EMAIL ?= "oe.patch@oe"
+
 inherit terminal
 
 def src_patches(d, all = False ):

@@ -55,5 +55,5 @@ class TestProjectPage(SeleniumTestCase):
         self.get(url)
 
         # check that we get a project page with the correct heading
-        project_name = self.find('#project-name').text.strip()
+        project_name = self.find('.project-name').text.strip()
         self.assertEqual(project_name, self.CLI_BUILDS_PROJECT_NAME)

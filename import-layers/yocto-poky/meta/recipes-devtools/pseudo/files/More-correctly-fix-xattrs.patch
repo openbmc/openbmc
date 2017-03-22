@@ -1,0 +1,37 @@
+From 45eca34c754d416a38bee90fb2d3c110a0b6cc5f Mon Sep 17 00:00:00 2001
+From: Seebs <seebs@seebs.net>
+Date: Thu, 3 Nov 2016 11:36:12 -0500
+Subject: [PATCH] More-correctly fix xattrs
+
+Fix provided by Patrick Ohly <patrick.ohly@intel.com>. This resolves
+the actual cause of the path length mismatches, and explains why
+I couldn't quite explain why the previous one had only sometimes
+worked, also why it showed up on directories but not plain files.
+
+Signed-off-by: Seebs <seebs@seebs.net>
+
+Fixes [YOCTO #10623]
+
+Upstream-Status: Backport [commit 45eca34c754d416a38bee90fb2d3c110a0b6cc5f]
+
+Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
+---
+ pseudo_client.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pseudo_client.c b/pseudo_client.c
+index 6a08df3..b1a00fa 100644
+--- a/pseudo_client.c
++++ b/pseudo_client.c
+@@ -1676,7 +1676,7 @@ pseudo_client_op(pseudo_op_t op, int access, int fd, int dirfd, const char *path
+ 	 * empty path for that.
+ 	 */
+ 	if (path_extra_1) {
+-		size_t full_len = path_extra_1len + 1 + pathlen;
++		size_t full_len = path_extra_1len + 1 + pathlen - strip_slash;
+ 		size_t partial_len = pathlen - 1 - strip_slash;
+ 		if (path_extra_2) {
+ 			full_len += path_extra_2len + 1;
+-- 
+2.1.4
+

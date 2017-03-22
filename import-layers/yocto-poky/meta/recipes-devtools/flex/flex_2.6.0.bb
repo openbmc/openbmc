@@ -14,12 +14,16 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/flex/flex-${PV}.tar.bz2 \
            file://run-ptest \
            file://do_not_create_pdf_doc.patch \
            file://0001-tests-add-a-target-for-building-tests-without-runnin.patch \
+           file://0002-avoid-c-comments-in-c-code-fails-with-gcc-6.patch \
+           file://CVE-2016-6354.patch \
            ${@bb.utils.contains('PTEST_ENABLED', '1', '', 'file://disable-tests.patch', d)} \
            "
 
 SRC_URI[md5sum] = "266270f13c48ed043d95648075084d59"
 SRC_URI[sha256sum] = "24e611ef5a4703a191012f80c1027dc9d12555183ce0ecd46f3636e587e9b8e9"
 
+# Flex has moved to github from 2.6.1 onwards
+UPSTREAM_CHECK_URI = "https://github.com/westes/flex/releases"
 UPSTREAM_CHECK_REGEX = "flex-(?P<pver>\d+(\.\d+)+)\.tar"
 
 inherit autotools gettext texinfo ptest
@@ -51,5 +55,8 @@ do_install_ptest() {
 	cp ${S}/build-aux/test-driver ${D}${PTEST_PATH}/build-aux/
 	cp -r ${S}/tests/* ${D}${PTEST_PATH}
 	cp -r ${B}/tests/* ${D}${PTEST_PATH}
-	sed -e 's/^Makefile:/_Makefile:/' -e 's/^srcdir = \(.*\)/srcdir = ./' -e 's/^top_srcdir = \(.*\)/top_srcdir = ./'  -i ${D}${PTEST_PATH}/Makefile
+	sed -e 's/^Makefile:/_Makefile:/' \
+	    -e 's/^srcdir = \(.*\)/srcdir = ./' -e 's/^top_srcdir = \(.*\)/top_srcdir = ./' \
+	    -e 's/^builddir = \(.*\)/builddir = ./' -e 's/^top_builddir = \(.*\)/top_builddir = ./' \
+	    -i ${D}${PTEST_PATH}/Makefile
 }

@@ -126,15 +126,6 @@ VERSION: local|*
 AUTOREPLY_TESTSUITE_DIR: /opt/lsb/test/python
 AUTOREPLY_RESULTS_DIR: /opt/lsb/test/python/results
 
-[qt3-azov]
-RUN: 1
-VERSION: local|*
-
-[qt3-azov|local|*]
-AUTOREPLY_TESTSUITE_DIR: /opt/lsb/test/qt3-azov
-AUTOREPLY_X11_FONT_PATH: [default]
-AUTOREPLY_RESULTS_DIR: /opt/lsb/test/qt3-azov/results
-
 [qt4-azov]
 RUN: 1
 VERSION: local|*

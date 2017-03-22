@@ -26,3 +26,6 @@ BBCLASSEXTEND = "native"
 
 SRC_URI[md5sum] = "499a7773c65aba513609fe651853c5f3"
 SRC_URI[sha256sum] = "0baca8c9f5d934450a70896c4ad38d06475521255ca63b717a6510fdb6e287bd"
+
+PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', 'ipv6', '', d)}"
+PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,"

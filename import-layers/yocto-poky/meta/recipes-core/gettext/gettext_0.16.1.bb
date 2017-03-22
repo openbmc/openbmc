@@ -9,7 +9,7 @@ PR = "r6"
 DEPENDS = "virtual/libiconv"
 DEPENDS_class-native = ""
 PROVIDES = "virtual/libintl virtual/gettext"
-PROVIDES_class-native = ""
+PROVIDES_class-native = "virtual/gettext-native"
 
 SRC_URI = "${GNU_MIRROR}/gettext/gettext-${PV}.tar.gz \
            file://gettext-vpath.patch \
@@ -21,16 +21,28 @@ SRC_URI = "${GNU_MIRROR}/gettext/gettext-${PV}.tar.gz \
            file://hardcode_macro_version.patch \
           "
 
-LDFLAGS_prepend_libc-uclibc = " -lrt -lpthread "
-
 SRC_URI[md5sum] = "3d9ad24301c6d6b17ec30704a13fe127"
 SRC_URI[sha256sum] = "0bf850d1a079fb5a61f0a47b1a9efd35eb44032255375e1cedb0253bc27b376d"
 
 PARALLEL_MAKE = ""
 
+LDFLAGS_prepend_libc-uclibc = " -lrt -lpthread "
+
 inherit autotools texinfo
 
-EXTRA_OECONF += "--without-lisp --disable-csharp --disable-openmp --without-emacs"
+EXTRA_OECONF += "--without-lispdir \
+                 --disable-csharp \
+                 --disable-libasprintf \
+                 --disable-java \
+                 --disable-native-java \
+                 --disable-openmp \
+                 --without-emacs \
+                "
+EXTRA_OECONF_append_libc-musl = "\
+                                 gt_cv_func_gnugettext1_libc=yes \
+                                 gt_cv_func_gnugettext2_libc=yes \
+                                "
+
 acpaths = '-I ${S}/autoconf-lib-link/m4/ \
            -I ${S}/gettext-runtime/m4 \
            -I ${S}/gettext-tools/m4'
@@ -41,7 +53,6 @@ do_configure_prepend() {
 
 do_install_append_libc-musl () {
 	rm -f ${D}${libdir}/charset.alias
-	rm -f ${D}${includedir}/libintl.h
 }
 
 # these lack the .x behind the .so, but shouldn't be in the -dev package
@@ -93,20 +104,21 @@ FILES_gettext-runtime-doc = "${mandir}/man1/gettext.* \
                              ${infodir}/autosprintf.info \
                             "
 
-
 do_install_append() {
-	rm -f ${D}${libdir}/preloadable_libintl.so
+    rm -f ${D}${libdir}/preloadable_libintl.so
+}
+
+do_install_append_class-native () {
+	rm ${D}${datadir}/aclocal/*
+	rm ${D}${datadir}/gettext/config.rpath
+	rm ${D}${datadir}/gettext/po/Makefile.in.in
+	rm ${D}${datadir}/gettext/po/remove-potcdate.sin
 }
 
 # Anyone inheriting gettext will have both gettext-native and gettext
 # available, and we don't want to use older macros from the target gettext in
 # a non-gplv3 build, so kill them and let dependent recipes rely on
 # gettext-native.
-
-SYSROOT_PREPROCESS_FUNCS += "remove_sysroot_m4_macros"
-
-remove_sysroot_m4_macros () {
-    rm -r "${SYSROOT_DESTDIR}${datadir}/aclocal"
-}
+SYSROOT_DIRS_BLACKLIST += "${datadir}/aclocal"
 
 BBCLASSEXTEND = "native nativesdk"

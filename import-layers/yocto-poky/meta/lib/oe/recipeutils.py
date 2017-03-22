@@ -2,7 +2,7 @@
 #
 # Some code borrowed from the OE layer index
 #
-# Copyright (C) 2013-2015 Intel Corporation
+# Copyright (C) 2013-2016 Intel Corporation
 #
 
 import sys
@@ -11,31 +11,32 @@ import os.path
 import tempfile
 import textwrap
 import difflib
-import utils
+from . import utils
 import shutil
 import re
 import fnmatch
+import glob
 from collections import OrderedDict, defaultdict
 
 
 # Help us to find places to insert values
-recipe_progression = ['SUMMARY', 'DESCRIPTION', 'HOMEPAGE', 'BUGTRACKER', 'SECTION', 'LICENSE', 'LIC_FILES_CHKSUM', 'PROVIDES', 'DEPENDS', 'PR', 'PV', 'SRCREV', 'SRC_URI', 'S', 'do_fetch()', 'do_unpack()', 'do_patch()', 'EXTRA_OECONF', 'do_configure()', 'EXTRA_OEMAKE', 'do_compile()', 'do_install()', 'do_populate_sysroot()', 'INITSCRIPT', 'USERADD', 'GROUPADD', 'PACKAGES', 'FILES', 'RDEPENDS', 'RRECOMMENDS', 'RSUGGESTS', 'RPROVIDES', 'RREPLACES', 'RCONFLICTS', 'ALLOW_EMPTY', 'do_package()', 'do_deploy()']
+recipe_progression = ['SUMMARY', 'DESCRIPTION', 'HOMEPAGE', 'BUGTRACKER', 'SECTION', 'LICENSE', 'LICENSE_FLAGS', 'LIC_FILES_CHKSUM', 'PROVIDES', 'DEPENDS', 'PR', 'PV', 'SRCREV', 'SRCPV', 'SRC_URI', 'S', 'do_fetch()', 'do_unpack()', 'do_patch()', 'EXTRA_OECONF', 'EXTRA_OECMAKE', 'EXTRA_OESCONS', 'do_configure()', 'EXTRA_OEMAKE', 'do_compile()', 'do_install()', 'do_populate_sysroot()', 'INITSCRIPT', 'USERADD', 'GROUPADD', 'PACKAGES', 'FILES', 'RDEPENDS', 'RRECOMMENDS', 'RSUGGESTS', 'RPROVIDES', 'RREPLACES', 'RCONFLICTS', 'ALLOW_EMPTY', 'populate_packages()', 'do_package()', 'do_deploy()']
 # Variables that sometimes are a bit long but shouldn't be wrapped
 nowrap_vars = ['SUMMARY', 'HOMEPAGE', 'BUGTRACKER', 'SRC_URI[md5sum]', 'SRC_URI[sha256sum]']
 list_vars = ['SRC_URI', 'LIC_FILES_CHKSUM']
 meta_vars = ['SUMMARY', 'DESCRIPTION', 'HOMEPAGE', 'BUGTRACKER', 'SECTION']
 
 
-def pn_to_recipe(cooker, pn):
+def pn_to_recipe(cooker, pn, mc=''):
     """Convert a recipe name (PN) to the path to the recipe file"""
     import bb.providers
 
-    if pn in cooker.recipecache.pkg_pn:
-        best = bb.providers.findBestProvider(pn, cooker.data, cooker.recipecache, cooker.recipecache.pkg_pn)
+    if pn in cooker.recipecaches[mc].pkg_pn:
+        best = bb.providers.findBestProvider(pn, cooker.data, cooker.recipecaches[mc], cooker.recipecaches[mc].pkg_pn)
         return best[3]
-    elif pn in cooker.recipecache.providers:
-        filenames = cooker.recipecache.providers[pn]
-        eligible, foundUnique = bb.providers.filterProviders(filenames, pn, cooker.expanded_data, cooker.recipecache)
+    elif pn in cooker.recipecaches[mc].providers:
+        filenames = cooker.recipecaches[mc].providers[pn]
+        eligible, foundUnique = bb.providers.filterProviders(filenames, pn, cooker.expanded_data, cooker.recipecaches[mc])
         filename = eligible[0]
         return filename
     else:
@@ -49,13 +50,14 @@ def get_unavailable_reasons(cooker, pn):
     return taskdata.get_reasons(pn)
 
 
-def parse_recipe(fn, appendfiles, d):
+def parse_recipe(cooker, fn, appendfiles):
     """
     Parse an individual recipe file, optionally with a list of
     bbappend files.
     """
     import bb.cache
-    envdata = bb.cache.Cache.loadDataFull(fn, appendfiles, d)
+    parser = bb.cache.NoCache(cooker.databuilder)
+    envdata = parser.loadDataFull(fn, appendfiles)
     return envdata
 
 
@@ -78,7 +80,7 @@ def parse_recipe_simple(cooker, pn, d, appends=True):
         appendfiles = cooker.collection.get_file_appends(recipefile)
     else:
         appendfiles = None
-    return parse_recipe(recipefile, appendfiles, d)
+    return parse_recipe(cooker, recipefile, appendfiles)
 
 
 def get_var_files(fn, varlist, d):
@@ -158,14 +160,18 @@ def split_var_value(value, assignment=True):
     return outlist
 
 
-def patch_recipe_file(fn, values, patch=False, relpath=''):
-    """Update or insert variable values into a recipe file (assuming you
-       have already identified the exact file you want to update.)
+def patch_recipe_lines(fromlines, values, trailing_newline=True):
+    """Update or insert variable values into lines from a recipe.
        Note that some manual inspection/intervention may be required
        since this cannot handle all situations.
     """
 
     import bb.utils
+
+    if trailing_newline:
+        newline = '\n'
+    else:
+        newline = ''
 
     recipe_progression_res = []
     recipe_progression_restrs = []
@@ -190,14 +196,14 @@ def patch_recipe_file(fn, values, patch=False, relpath=''):
     remainingnames = {}
     for k in values.keys():
         remainingnames[k] = get_recipe_pos(k)
-    remainingnames = OrderedDict(sorted(remainingnames.iteritems(), key=lambda x: x[1]))
+    remainingnames = OrderedDict(sorted(remainingnames.items(), key=lambda x: x[1]))
 
     modifying = False
 
     def outputvalue(name, lines, rewindcomments=False):
         if values[name] is None:
             return
-        rawtext = '%s = "%s"\n' % (name, values[name])
+        rawtext = '%s = "%s"%s' % (name, values[name], newline)
         addlines = []
         if name in nowrap_vars:
             addlines.append(rawtext)
@@ -205,19 +211,19 @@ def patch_recipe_file(fn, values, patch=False, relpath=''):
             splitvalue = split_var_value(values[name], assignment=False)
             if len(splitvalue) > 1:
                 linesplit = ' \\\n' + (' ' * (len(name) + 4))
-                addlines.append('%s = "%s%s"\n' % (name, linesplit.join(splitvalue), linesplit))
+                addlines.append('%s = "%s%s"%s' % (name, linesplit.join(splitvalue), linesplit, newline))
             else:
                 addlines.append(rawtext)
         else:
             wrapped = textwrap.wrap(rawtext)
             for wrapline in wrapped[:-1]:
-                addlines.append('%s \\\n' % wrapline)
-            addlines.append('%s\n' % wrapped[-1])
+                addlines.append('%s \\%s' % (wrapline, newline))
+            addlines.append('%s%s' % (wrapped[-1], newline))
         if rewindcomments:
             # Ensure we insert the lines before any leading comments
             # (that we'd want to ensure remain leading the next value)
             for i, ln in reversed(list(enumerate(lines))):
-                if ln[0] != '#':
+                if not ln.startswith('#'):
                     lines[i+1:i+1] = addlines
                     break
             else:
@@ -230,7 +236,7 @@ def patch_recipe_file(fn, values, patch=False, relpath=''):
         if modifying:
             # Insert anything that should come before this variable
             pos = get_recipe_pos(varname)
-            for k in remainingnames.keys()[:]:
+            for k in list(remainingnames):
                 if remainingnames[k] > -1 and pos >= remainingnames[k] and not k in existingnames:
                     outputvalue(k, newlines, rewindcomments=True)
                     del remainingnames[k]
@@ -247,18 +253,32 @@ def patch_recipe_file(fn, values, patch=False, relpath=''):
 
     # First run - establish which values we want to set are already in the file
     varlist = [re.escape(item) for item in values.keys()]
-    with open(fn, 'r') as f:
-        changed, fromlines = bb.utils.edit_metadata(f, varlist, patch_recipe_varfunc)
+    bb.utils.edit_metadata(fromlines, varlist, patch_recipe_varfunc)
     # Second run - actually set everything
     modifying = True
     varlist.extend(recipe_progression_restrs)
     changed, tolines = bb.utils.edit_metadata(fromlines, varlist, patch_recipe_varfunc, match_overrides=True)
 
     if remainingnames:
-        if tolines[-1].strip() != '':
+        if tolines and tolines[-1].strip() != '':
             tolines.append('\n')
         for k in remainingnames.keys():
             outputvalue(k, tolines)
+
+    return changed, tolines
+
+
+def patch_recipe_file(fn, values, patch=False, relpath=''):
+    """Update or insert variable values into a recipe file (assuming you
+       have already identified the exact file you want to update.)
+       Note that some manual inspection/intervention may be required
+       since this cannot handle all situations.
+    """
+
+    with open(fn, 'r') as f:
+        fromlines = f.readlines()
+
+    _, tolines = patch_recipe_lines(fromlines, values)
 
     if patch:
         relfn = os.path.relpath(fn, relpath)
@@ -318,7 +338,7 @@ def patch_recipe(d, fn, varvalues, patch=False, relpath=''):
     varfiles = get_var_files(fn, varlist, d)
     locs = localise_file_vars(fn, varfiles, varlist)
     patches = []
-    for f,v in locs.iteritems():
+    for f,v in locs.items():
         vals = {k: varvalues[k] for k in v}
         patchdata = patch_recipe_file(f, vals, patch, relpath)
         if patch:
@@ -347,6 +367,7 @@ def copy_recipe_files(d, tgt_dir, whole_dir=False, download=True):
     # Copy local files to target directory and gather any remote files
     bb_dir = os.path.dirname(d.getVar('FILE', True)) + os.sep
     remotes = []
+    copied = []
     includes = [path for path in d.getVar('BBINCLUDED', True).split() if
                 path.startswith(bb_dir) and os.path.exists(path)]
     for path in fetch.localpaths() + includes:
@@ -358,13 +379,14 @@ def copy_recipe_files(d, tgt_dir, whole_dir=False, download=True):
                 if not os.path.exists(subdir):
                     os.makedirs(subdir)
                 shutil.copy2(path, os.path.join(tgt_dir, relpath))
+                copied.append(relpath)
         else:
             remotes.append(path)
     # Simply copy whole meta dir, if requested
     if whole_dir:
         shutil.copytree(bb_dir, tgt_dir)
 
-    return remotes
+    return copied, remotes
 
 
 def get_recipe_local_files(d, patches=False):
@@ -378,8 +400,16 @@ def get_recipe_local_files(d, patches=False):
                     bb.utils.exec_flat_python_func('patch_path', uri, fetch, '')):
                 continue
             # Skip files that are referenced by absolute path
-            if not os.path.isabs(fetch.ud[uri].basepath):
-                ret[fetch.ud[uri].basepath] = fetch.localpath(uri)
+            fname = fetch.ud[uri].basepath
+            if os.path.isabs(fname):
+                continue
+            # Handle subdir=
+            subdir = fetch.ud[uri].parm.get('subdir', '')
+            if subdir:
+                if os.path.isabs(subdir):
+                    continue
+                fname = os.path.join(subdir, fname)
+            ret[fname] = fetch.localpath(uri)
     return ret
 
 
@@ -419,8 +449,8 @@ def get_recipe_patched_files(d):
 def validate_pn(pn):
     """Perform validation on a recipe name (PN) for a new recipe."""
     reserved_names = ['forcevariable', 'append', 'prepend', 'remove']
-    if not re.match('[0-9a-z-.]+', pn):
-        return 'Recipe name "%s" is invalid: only characters 0-9, a-z, - and . are allowed' % pn
+    if not re.match('^[0-9a-z-.+]+$', pn):
+        return 'Recipe name "%s" is invalid: only characters 0-9, a-z, -, + and . are allowed' % pn
     elif pn in reserved_names:
         return 'Recipe name "%s" is invalid: is a reserved keyword' % pn
     elif pn.startswith('pn-'):
@@ -429,6 +459,60 @@ def validate_pn(pn):
         return 'Recipe name "%s" is invalid: should be just a name, not a file name' % pn
     return ''
 
+
+def get_bbfile_path(d, destdir, extrapathhint=None):
+    """
+    Determine the correct path for a recipe within a layer
+    Parameters:
+        d: Recipe-specific datastore
+        destdir: destination directory. Can be the path to the base of the layer or a
+            partial path somewhere within the layer.
+        extrapathhint: a path relative to the base of the layer to try
+    """
+    import bb.cookerdata
+
+    destdir = os.path.abspath(destdir)
+    destlayerdir = find_layerdir(destdir)
+
+    # Parse the specified layer's layer.conf file directly, in case the layer isn't in bblayers.conf
+    confdata = d.createCopy()
+    confdata.setVar('BBFILES', '')
+    confdata.setVar('LAYERDIR', destlayerdir)
+    destlayerconf = os.path.join(destlayerdir, "conf", "layer.conf")
+    confdata = bb.cookerdata.parse_config_file(destlayerconf, confdata)
+    pn = d.getVar('PN', True)
+
+    bbfilespecs = (confdata.getVar('BBFILES', True) or '').split()
+    if destdir == destlayerdir:
+        for bbfilespec in bbfilespecs:
+            if not bbfilespec.endswith('.bbappend'):
+                for match in glob.glob(bbfilespec):
+                    splitext = os.path.splitext(os.path.basename(match))
+                    if splitext[1] == '.bb':
+                        mpn = splitext[0].split('_')[0]
+                        if mpn == pn:
+                            return os.path.dirname(match)
+
+    # Try to make up a path that matches BBFILES
+    # this is a little crude, but better than nothing
+    bpn = d.getVar('BPN', True)
+    recipefn = os.path.basename(d.getVar('FILE', True))
+    pathoptions = [destdir]
+    if extrapathhint:
+        pathoptions.append(os.path.join(destdir, extrapathhint))
+    if destdir == destlayerdir:
+        pathoptions.append(os.path.join(destdir, 'recipes-%s' % bpn, bpn))
+        pathoptions.append(os.path.join(destdir, 'recipes', bpn))
+        pathoptions.append(os.path.join(destdir, bpn))
+    elif not destdir.endswith(('/' + pn, '/' + bpn)):
+        pathoptions.append(os.path.join(destdir, bpn))
+    closepath = ''
+    for pathoption in pathoptions:
+        bbfilepath = os.path.join(pathoption, 'test.bb')
+        for bbfilespec in bbfilespecs:
+            if fnmatch.fnmatchcase(bbfilepath, bbfilespec):
+                return pathoption
+    return None
 
 def get_bbappend_path(d, destlayerdir, wildcardver=False):
     """Determine how a bbappend for a recipe should be named and located within another layer"""
@@ -536,7 +620,7 @@ def bbappend_recipe(rd, destlayerdir, srcfiles, install=None, wildcardver=False,
     bbappendlines = []
     if extralines:
         if isinstance(extralines, dict):
-            for name, value in extralines.iteritems():
+            for name, value in extralines.items():
                 bbappendlines.append((name, '=', value))
         else:
             # Do our best to split it
@@ -550,14 +634,14 @@ def bbappend_recipe(rd, destlayerdir, srcfiles, install=None, wildcardver=False,
                     raise Exception('Invalid extralines value passed')
 
     def popline(varname):
-        for i in xrange(0, len(bbappendlines)):
+        for i in range(0, len(bbappendlines)):
             if bbappendlines[i][0] == varname:
                 line = bbappendlines.pop(i)
                 return line
         return None
 
     def appendline(varname, op, value):
-        for i in xrange(0, len(bbappendlines)):
+        for i in range(0, len(bbappendlines)):
             item = bbappendlines[i]
             if item[0] == varname:
                 bbappendlines[i] = (item[0], item[1], item[2] + ' ' + value)
@@ -576,7 +660,7 @@ def bbappend_recipe(rd, destlayerdir, srcfiles, install=None, wildcardver=False,
     copyfiles = {}
     if srcfiles:
         instfunclines = []
-        for newfile, origsrcfile in srcfiles.iteritems():
+        for newfile, origsrcfile in srcfiles.items():
             srcfile = origsrcfile
             srcurientry = None
             if not srcfile:
@@ -644,7 +728,7 @@ def bbappend_recipe(rd, destlayerdir, srcfiles, install=None, wildcardver=False,
 
                 if removevar in removevalues:
                     remove = removevalues[removevar]
-                    if isinstance(remove, basestring):
+                    if isinstance(remove, str):
                         if remove in splitval:
                             splitval.remove(remove)
                             changed = True
@@ -674,7 +758,7 @@ def bbappend_recipe(rd, destlayerdir, srcfiles, install=None, wildcardver=False,
 
         varnames = [item[0] for item in bbappendlines]
         if removevalues:
-            varnames.extend(removevalues.keys())
+            varnames.extend(list(removevalues.keys()))
 
         with open(appendpath, 'r') as f:
             (updated, newlines) = bb.utils.edit_metadata(f, varnames, appendfile_varfunc)
@@ -699,7 +783,7 @@ def bbappend_recipe(rd, destlayerdir, srcfiles, install=None, wildcardver=False,
     if copyfiles:
         if machine:
             destsubdir = os.path.join(destsubdir, machine)
-        for newfile, srcfile in copyfiles.iteritems():
+        for newfile, srcfile in copyfiles.items():
             filedest = os.path.join(appenddir, destsubdir, os.path.basename(srcfile))
             if os.path.abspath(newfile) != os.path.abspath(filedest):
                 bb.note('Copying %s to %s' % (newfile, filedest))
@@ -710,14 +794,16 @@ def bbappend_recipe(rd, destlayerdir, srcfiles, install=None, wildcardver=False,
 
 
 def find_layerdir(fn):
-    """ Figure out relative path to base of layer for a file (e.g. a recipe)"""
-    pth = os.path.dirname(fn)
+    """ Figure out the path to the base of the layer containing a file (e.g. a recipe)"""
+    pth = fn
     layerdir = ''
     while pth:
         if os.path.exists(os.path.join(pth, 'conf', 'layer.conf')):
             layerdir = pth
             break
         pth = os.path.dirname(pth)
+        if pth == '/':
+            return None
     return layerdir
 
 
@@ -725,12 +811,12 @@ def replace_dir_vars(path, d):
     """Replace common directory paths with appropriate variable references (e.g. /etc becomes ${sysconfdir})"""
     dirvars = {}
     # Sort by length so we get the variables we're interested in first
-    for var in sorted(d.keys(), key=len):
+    for var in sorted(list(d.keys()), key=len):
         if var.endswith('dir') and var.lower() == var:
             value = d.getVar(var, True)
             if value.startswith('/') and not '\n' in value and value not in dirvars:
                 dirvars[value] = var
-    for dirpath in sorted(dirvars.keys(), reverse=True):
+    for dirpath in sorted(list(dirvars.keys()), reverse=True):
         path = path.replace(dirpath, '${%s}' % dirvars[dirpath])
     return path
 

@@ -1,0 +1,23 @@
+nss does not build on mips with clang because wrong types are used?
+
+pqg.c:339:16: error: comparison of constant 18446744073709551615 with expression of type 'unsigned long' is always true [-Werror,-Wtautological-constant-out-of-range-compare]
+     if (addend < MP_DIGIT_MAX) {
+       ~~~~~~ ^ ~~~~~~~~~~~~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+Index: nss-3.24/nss/lib/freebl/pqg.c
+===================================================================
+--- nss-3.24.orig/nss/lib/freebl/pqg.c
++++ nss-3.24/nss/lib/freebl/pqg.c
+@@ -322,8 +322,8 @@ generate_h_candidate(SECItem *hit, mp_in
+ 
+ static SECStatus
+ addToSeed(const SECItem * seed,
+-          unsigned long   addend,
+-          int             seedlen, /* g in 186-1 */
++          unsigned long long  addend,
++          int                 seedlen, /* g in 186-1 */
+           SECItem * seedout)
+ {
+     mp_int s, sum, modulus, tmp;

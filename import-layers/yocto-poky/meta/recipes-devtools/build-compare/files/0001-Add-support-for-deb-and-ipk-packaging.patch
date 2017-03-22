@@ -3,7 +3,7 @@ From: Paul Eggleton <paul.eggleton@linux.intel.com>
 Date: Tue, 1 Sep 2015 12:04:33 +0100
 Subject: [PATCH] Add support for deb and ipk packaging
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://github.com/openSUSE/build-compare/pull/10]
 
 Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
 ---
@@ -34,7 +34,7 @@ index 06079df..85c9003 100644
      return $RES
  }
 +
-+function adjust_controlfile () {
++function adjust_controlfile() {
 +    cat $1/control | sed '/^Version: /d' > $1/control.fixed
 +    mv $1/control.fixed $1/control
 +    cat $2/control | sed '/^Version: /d' > $2/control.fixed

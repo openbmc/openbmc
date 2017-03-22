@@ -13,7 +13,7 @@ LIC_FILES_CHKSUM = "file://pong-clock-no-flicker.c;beginline=1;endline=23;md5=dd
 S = "${WORKDIR}"
 
 do_compile () {
-	${CC} -o pong-clock pong-clock-no-flicker.c `pkg-config --cflags --libs x11 xau xdmcp`
+	${CC} ${CFLAGS} ${LDFLAGS} -o pong-clock pong-clock-no-flicker.c `pkg-config --cflags --libs x11 xau xdmcp`
 }
 
 do_install () {

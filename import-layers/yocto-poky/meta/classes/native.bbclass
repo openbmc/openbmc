@@ -87,8 +87,7 @@ datadir = "${STAGING_DATADIR_NATIVE}"
 
 baselib = "lib"
 
-# Libtool's default paths are correct for the native machine
-lt_cv_sys_lib_dlsearch_path_spec[unexport] = "1"
+export lt_cv_sys_lib_dlsearch_path_spec = "${libdir} ${base_libdir} /lib /lib64 /usr/lib /usr/lib64"
 
 NATIVE_PACKAGE_PATH_SUFFIX ?= ""
 bindir .= "${NATIVE_PACKAGE_PATH_SUFFIX}"

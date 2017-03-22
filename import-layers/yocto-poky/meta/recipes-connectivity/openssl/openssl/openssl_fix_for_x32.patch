@@ -2,10 +2,10 @@ Upstream-Status: Pending
 
 Received from H J Liu @ Intel
 Make the assembly syntax compatible with x32 gcc. Othewise x32 gcc throws errors.
-Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com> 2011/07/13
+Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com> 2011/07/13
 
 ported the patch to the 1.0.0e version
-Signed-Off-By: Nitin A Kamble <nitin.a.kamble@intel.com> 2011/12/01
+Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com> 2011/12/01
 Index: openssl-1.0.2/crypto/bn/bn.h
 ===================================================================
 --- openssl-1.0.2.orig/crypto/bn/bn.h
